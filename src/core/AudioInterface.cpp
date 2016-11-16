@@ -58,10 +58,10 @@ void AudioInterface::step() {
 	int i = bufferFrame % AUDIO_BUFFER_SIZE;
 	audio1Buffer[i] = getf(inputs[AUDIO1_INPUT]);
 	audio2Buffer[i] = getf(inputs[AUDIO2_INPUT]);
-	std::unique_lock<std::mutex> lock(mutex);
+	// std::unique_lock<std::mutex> lock(mutex);
 	bufferFrame++;
 	if (bufferFrame == audioFrameNeeded) {
-		lock.unlock();
+	// lock.unlock();
 		cv.notify_all();
 	}
 }
@@ -83,7 +83,7 @@ void AudioInterface::openDevice(int deviceId) {
 	streamParams.nChannels = 2;
 	streamParams.firstChannel = 0;
 	unsigned int sampleRate = SAMPLE_RATE;
-	unsigned int bufferFrames = 256;
+	unsigned int bufferFrames = 512;
 
 	audioFrame = -1;
 	running = true;
@@ -183,11 +183,11 @@ struct AudioChoice : ChoiceButton {
 
 
 AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()) {
-	box.size = Vec(15*4, 380);
+	box.size = Vec(15*8, 380);
 	inputs.resize(AudioInterface::NUM_INPUTS);
 
-	createInputPort(this, AudioInterface::AUDIO1_INPUT, Vec(15, 120));
-	createInputPort(this, AudioInterface::AUDIO2_INPUT, Vec(15, 170));
+	createInputPort(this, AudioInterface::AUDIO1_INPUT, Vec(15, 100));
+	createInputPort(this, AudioInterface::AUDIO2_INPUT, Vec(70, 100));
 
 	AudioChoice *audioChoice = new AudioChoice();
 	audioChoice->audioInterface = dynamic_cast<AudioInterface*>(module);

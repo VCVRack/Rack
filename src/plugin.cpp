@@ -74,8 +74,13 @@ void pluginInit() {
 		loadPlugin("plugins/AudibleInstruments/plugin.dll");
 
 	#elif defined(LINUX) || defined(APPLE)
+		#if defined(LINUX)
+			const char *globPath = "plugins/*/plugin.so";
+		#elif defined(APPLE)
+			const char *globPath = "plugins/*/plugin.dylib";
+		#endif
 		glob_t result;
-		glob("plugins/*/plugin.so", GLOB_TILDE, NULL, &result);
+		glob(globPath, GLOB_TILDE, NULL, &result);
 		for (int i = 0; i < (int) result.gl_pathc; i++) {
 			loadPlugin(result.gl_pathv[i]);
 		}

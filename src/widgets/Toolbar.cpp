@@ -17,9 +17,9 @@ struct NewItem : MenuItem {
 struct SaveItem : MenuItem {
 	void onAction() {
 		const char *path = noc_file_dialog_open(NOC_FILE_DIALOG_SAVE, filters, NULL, "Untitled.json");
-		printf("Saving patch %s\n", path);
 
 		if (path) {
+			printf("Saving patch %s\n", path);
 			FILE *file = fopen(path, "w");
 
 			json_t *root = gRackWidget->toJson();
@@ -35,9 +35,9 @@ struct SaveItem : MenuItem {
 struct OpenItem : MenuItem {
 	void onAction() {
 		const char *path = noc_file_dialog_open(NOC_FILE_DIALOG_OPEN, filters, NULL, NULL);
-		printf("Loading patch %s\n", path);
 
 		if (path) {
+			printf("Loading patch %s\n", path);
 			FILE *file = fopen(path, "r");
 
 			json_error_t error;

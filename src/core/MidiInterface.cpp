@@ -187,11 +187,11 @@ struct MidiChoice : ChoiceButton {
 
 
 MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
-	box.size = Vec(15*4, 380);
+	box.size = Vec(15*8, 380);
 	outputs.resize(MidiInterface::NUM_OUTPUTS);
 
-	createOutputPort(this, MidiInterface::GATE_OUTPUT, Vec(15, 120));
-	createOutputPort(this, MidiInterface::PITCH_OUTPUT, Vec(15, 170));
+	createOutputPort(this, MidiInterface::GATE_OUTPUT, Vec(15, 100));
+	createOutputPort(this, MidiInterface::PITCH_OUTPUT, Vec(70, 100));
 
 	MidiChoice *midiChoice = new MidiChoice();
 	midiChoice->midiInterface = dynamic_cast<MidiInterface*>(module);

@@ -56,7 +56,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	Vec mousePos = Vec(xpos, ypos);
+	Vec mousePos = Vec(xpos, ypos).round();
 	Vec mouseRel = mousePos.minus(gMousePos);
 	gMousePos = mousePos;
 
@@ -169,15 +169,15 @@ void guiInit() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-  window = glfwCreateWindow(1020, 700, "5V", NULL, NULL);
+	window = glfwCreateWindow(1020, 700, "Rack", NULL, NULL);
 	assert(window);
 	glfwMakeContextCurrent(window);
 
 	glfwSetWindowSizeCallback(window, windowSizeCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
-  // glfwSetCursorPosCallback(window, cursorPosCallback);
+	// glfwSetCursorPosCallback(window, cursorPosCallback);
 	glfwSetCursorEnterCallback(window, cursorEnterCallback);
-  glfwSetScrollCallback(window, scrollCallback);
+	glfwSetScrollCallback(window, scrollCallback);
 	glfwSetCharCallback(window, charCallback);
 	glfwSetKeyCallback(window, keyCallback);
 

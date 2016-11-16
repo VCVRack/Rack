@@ -39,7 +39,7 @@ void rackStep() {
 	// Param interpolation
 	if (smoothModule) {
 		float value = smoothModule->params[smoothParamId];
-		const float minSpeed = 0.01 * 60.0 / SAMPLE_RATE; // Roughly 0.01 every graphics frame
+		const float minSpeed = 0.001 * 60.0 / SAMPLE_RATE;
 		const float lpCoeff = 60.0 / SAMPLE_RATE / 1.0; // decay rate is 1 graphics frame
 		float delta = smoothValue - value;
 		float speed = fmaxf(fabsf(delta) * lpCoeff, minSpeed);
@@ -74,10 +74,9 @@ void rackRun() {
 			cv.wait_for(lock, std::chrono::milliseconds(1));
 		}
 		frame++;
-		lock.unlock();
 		// Speed up
-		// for (int i = 0; i < 16; i++)
-		rackStep();
+		for (int i = 0; i < 16; i++)
+			rackStep();
 	}
 }
 
@@ -99,6 +98,7 @@ void rackStop() {
 
 void rackAddModule(Module *module) {
 	assert(module);
+	std::unique_lock<std::mutex> lock(mutex);
 	// Check that the module is not already added
 	assert(modules.find(module) == modules.end());
 	modules.insert(module);
@@ -106,11 +106,11 @@ void rackAddModule(Module *module) {
 
 void rackRemoveModule(Module *module) {
 	assert(module);
+	std::unique_lock<std::mutex> lock(mutex);
 	// Remove parameter interpolation which point to this module
 	if (module == smoothModule) {
 		smoothModule = NULL;
 	}
-	// FIXME use a mutex here
 	// Check that all wires are disconnected
 	for (Wire *wire : wires) {
 		assert(wire->outputModule != module);
@@ -124,6 +124,7 @@ void rackRemoveModule(Module *module) {
 
 void rackConnectWire(Wire *wire) {
 	assert(wire);
+	std::unique_lock<std::mutex> lock(mutex);
 	// It would probably be good to reset the wire voltage
 	wire->value = 0.0;
 	// Check that the wire is not already added
@@ -144,6 +145,7 @@ void rackConnectWire(Wire *wire) {
 
 void rackDisconnectWire(Wire *wire) {
 	assert(wire);
+	std::unique_lock<std::mutex> lock(mutex);
 	// Disconnect wire from inputModule
 	wire->inputModule->inputs[wire->inputId] = NULL;
 	wire->outputModule->outputs[wire->outputId] = NULL;
