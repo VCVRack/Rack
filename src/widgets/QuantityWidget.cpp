@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void QuantityWidget::setValue(float value) {
 	this->value = clampf(value, minValue, maxValue);
@@ -15,3 +17,6 @@ void QuantityWidget::setDefaultValue(float defaultValue) {
 	this->defaultValue = defaultValue;
 	setValue(defaultValue);
 }
+
+
+} // namespace rack

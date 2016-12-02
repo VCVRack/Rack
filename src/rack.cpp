@@ -2,35 +2,56 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include <list>
+#include <set>
+#include <chrono>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include "rack.hpp"
 
+#include "Rack.hpp"
+
+
+namespace rack {
 
 static std::thread thread;
 static std::mutex mutex;
-static std::condition_variable cv;
-static long frame;
-static long frameLimit;
 static bool running;
 
 static std::set<Module*> modules;
 // Merely used for keeping track of which module inputs point to which module outputs, to prevent pointer mistakes and make the rack API rigorous
 static std::set<Wire*> wires;
 
-
+// Parameter interpolation
 static Module *smoothModule = NULL;
 static int smoothParamId;
 static float smoothValue;
+
+
+// HACK
+static std::mutex requestMutex;
+static std::condition_variable requestCv;
+static bool request = false;
+
+struct RackRequest {
+	RackRequest() {
+		std::unique_lock<std::mutex> lock(requestMutex);
+		request = true;
+	}
+	~RackRequest() {
+		std::unique_lock<std::mutex> lock(requestMutex);
+		request = false;
+		lock.unlock();
+		requestCv.notify_all();
+	}
+};
+// END HACK
 
 
 void rackInit() {
 }
 
 void rackDestroy() {
-	// Make sure there are no wires or modules in the rack on destruction. This suggests that a module failed to remove itself when the GUI was destroyed.
+	// Make sure there are no wires or modules in the rack on destruction. This suggests that a module failed to remove itself before the GUI was destroyed.
 	assert(wires.empty());
 	assert(modules.empty());
 }
@@ -39,23 +60,16 @@ void rackStep() {
 	// Param interpolation
 	if (smoothModule) {
 		float value = smoothModule->params[smoothParamId];
-		const float minSpeed = 0.001 * 60.0 / SAMPLE_RATE;
-		const float lpCoeff = 60.0 / SAMPLE_RATE / 1.0; // decay rate is 1 graphics frame
+		const float lambda = 60.0; // decay rate is 1 graphics frame
+		const float snap = 0.0001;
 		float delta = smoothValue - value;
-		float speed = fmaxf(fabsf(delta) * lpCoeff, minSpeed);
-
-		if (delta < 0) {
-			value -= speed;
-			if (value < smoothValue) value = smoothValue;
-		}
-		else if (delta > 0) {
-			value += speed;
-			if (value > smoothValue) value = smoothValue;
-		}
-
-		smoothModule->params[smoothParamId] = value;
-		if (value == smoothValue) {
+		if (fabsf(delta) < snap) {
+			smoothModule->params[smoothParamId] = smoothValue;
 			smoothModule = NULL;
+		}
+		else {
+			value += delta * lambda / SAMPLE_RATE;
+			smoothModule->params[smoothParamId] = value;
 		}
 	}
 	// Step all modules
@@ -64,41 +78,44 @@ void rackStep() {
 	}
 }
 
-void rackRun() {
-	while (1) {
-		std::unique_lock<std::mutex> lock(mutex);
-		if (!running)
-			break;
-		if (frame >= frameLimit) {
-			// Delay for at most 1ms if there are no needed frames
-			cv.wait_for(lock, std::chrono::milliseconds(1));
+static void rackRun() {
+	// Every time the rack waits and locks a mutex, it steps this many frames
+	const int stepSize = 32;
+
+	while (running) {
+		auto start = std::chrono::high_resolution_clock::now();
+		// This lock is to make sure the GUI gets higher priority than this thread
+		{
+			std::unique_lock<std::mutex> lock(requestMutex);
+			while (request)
+				requestCv.wait(lock);
 		}
-		frame++;
-		// Speed up
-		for (int i = 0; i < 16; i++)
-			rackStep();
+		{
+			std::lock_guard<std::mutex> lock(mutex);
+			for (int i = 0; i < stepSize; i++) {
+				rackStep();
+			}
+		}
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::nanoseconds((long) (0.9 * 1e9 * stepSize / SAMPLE_RATE)) - (end - start);
+		std::this_thread::sleep_for(duration);
 	}
 }
 
 void rackStart() {
-	frame = 0;
-	frameLimit = 0;
 	running = true;
 	thread = std::thread(rackRun);
 }
 
 void rackStop() {
-	{
-		std::unique_lock<std::mutex> lock(mutex);
-		running = false;
-	}
-	cv.notify_all();
+	running = false;
 	thread.join();
 }
 
 void rackAddModule(Module *module) {
 	assert(module);
-	std::unique_lock<std::mutex> lock(mutex);
+	RackRequest rm;
+	std::lock_guard<std::mutex> lock(mutex);
 	// Check that the module is not already added
 	assert(modules.find(module) == modules.end());
 	modules.insert(module);
@@ -106,7 +123,8 @@ void rackAddModule(Module *module) {
 
 void rackRemoveModule(Module *module) {
 	assert(module);
-	std::unique_lock<std::mutex> lock(mutex);
+	RackRequest rm;
+	std::lock_guard<std::mutex> lock(mutex);
 	// Remove parameter interpolation which point to this module
 	if (module == smoothModule) {
 		smoothModule = NULL;
@@ -124,7 +142,8 @@ void rackRemoveModule(Module *module) {
 
 void rackConnectWire(Wire *wire) {
 	assert(wire);
-	std::unique_lock<std::mutex> lock(mutex);
+	RackRequest rm;
+	std::lock_guard<std::mutex> lock(mutex);
 	// It would probably be good to reset the wire voltage
 	wire->value = 0.0;
 	// Check that the wire is not already added
@@ -145,7 +164,8 @@ void rackConnectWire(Wire *wire) {
 
 void rackDisconnectWire(Wire *wire) {
 	assert(wire);
-	std::unique_lock<std::mutex> lock(mutex);
+	RackRequest rm;
+	std::lock_guard<std::mutex> lock(mutex);
 	// Disconnect wire from inputModule
 	wire->inputModule->inputs[wire->inputId] = NULL;
 	wire->outputModule->outputs[wire->outputId] = NULL;
@@ -153,19 +173,6 @@ void rackDisconnectWire(Wire *wire) {
 	auto it = wires.find(wire);
 	assert(it != wires.end());
 	wires.erase(it);
-}
-
-long rackGetFrame() {
-	return frame;
-}
-
-void rackRequestFrame(long f) {
-	std::unique_lock<std::mutex> lock(mutex);
-	if (f > frameLimit) {
-		frameLimit = f;
-		lock.unlock();
-		cv.notify_all();
-	}
 }
 
 void rackSetParamSmooth(Module *module, int paramId, float value) {
@@ -180,3 +187,6 @@ void rackSetParamSmooth(Module *module, int paramId, float value) {
 	smoothParamId = paramId;
 	smoothValue = value;
 }
+
+
+} // namespace rack

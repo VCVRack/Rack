@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void SpriteWidget::draw(NVGcontext *vg) {
 	int imageId = loadImage(spriteFilename);
@@ -24,3 +26,6 @@ void SpriteWidget::draw(NVGcontext *vg) {
 	nvgRect(vg, pos.x, pos.y, spriteSize.x, spriteSize.y);
 	nvgFill(vg);
 }
+
+
+} // namespace rack

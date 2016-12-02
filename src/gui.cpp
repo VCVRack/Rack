@@ -1,5 +1,5 @@
-#include "5V.hpp"
 #include <unistd.h>
+#include "Rack.hpp"
 
 // #define NANOVG_GLEW
 #define NANOVG_IMPLEMENTATION
@@ -10,12 +10,17 @@
 #include "../lib/oui/blendish.h"
 
 
-static GLFWwindow *window;
-static NVGcontext *vg = NULL;
+namespace rack {
+
+Scene *gScene = NULL;
+RackWidget *gRackWidget = NULL;
 
 Vec gMousePos;
 Widget *gHoveredWidget = NULL;
 Widget *gDraggedWidget = NULL;
+
+static GLFWwindow *window;
+static NVGcontext *vg = NULL;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
@@ -146,7 +151,9 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void renderGui() {
 	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
+	// The docs say to use the framebuffer size to get pixel-perfect matching for high-DPI displays, but I actually don't want this. A "screen" pixel
+	// glfwGetFramebufferSize(window, &width, &height);
+	glfwGetWindowSize(window, &width, &height);
 
 	// Update and render
 	glViewport(0, 0, width, height);
@@ -188,6 +195,7 @@ void guiInit() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
+	glfwSetWindowSizeLimits(window, 240, 160, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
 	vg = nvgCreateGL2(NVG_ANTIALIAS);
@@ -195,10 +203,14 @@ void guiInit() {
 
 	// Set up Blendish
 	bndSetFont(loadFont("res/DejaVuSans.ttf"));
-	bndSetIconImage(loadImage("res/blender_icons16.png"));
+	// bndSetIconImage(loadImage("res/blender_icons16.png"));
+
+	gScene = new Scene();
 }
 
 void guiDestroy() {
+	delete gScene;
+
 	nvgDeleteGL2(vg);
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -292,3 +304,6 @@ void drawImage(NVGcontext *vg, Vec pos, int imageId) {
 	nvgRect(vg, pos.x, pos.y, width, height);
 	nvgFill(vg);
 }
+
+
+} // namespace rack

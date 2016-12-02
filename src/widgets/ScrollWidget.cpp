@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 ScrollWidget::ScrollWidget() {
 	container = new Widget();
@@ -40,3 +42,6 @@ void ScrollWidget::onScroll(Vec scrollRel) {
 	hScrollBar->move(scrollRel.x);
 	vScrollBar->move(scrollRel.y);
 }
+
+
+} // namespace rack

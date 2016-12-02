@@ -1,6 +1,8 @@
 #include "core.hpp"
 
 
+using namespace rack;
+
 Plugin *coreInit() {
 	Plugin *plugin = createPlugin("Core", "Core");
 	createModel<AudioInterfaceWidget>(plugin, "AudioInterface", "Audio Interface");

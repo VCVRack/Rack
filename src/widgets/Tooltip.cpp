@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void Tooltip::step() {
 	// Follow the mouse
@@ -14,3 +16,6 @@ void Tooltip::draw(NVGcontext *vg) {
 	bndTooltipBackground(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
 	Widget::draw(vg);
 }
+
+
+} // namespace rack

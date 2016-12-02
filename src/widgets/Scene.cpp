@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 Scene::Scene() {
 	scrollWidget = new ScrollWidget();
@@ -20,3 +22,6 @@ void Scene::onResize() {
 	scrollWidget->box.size = box.size.minus(scrollWidget->box.pos);
 	scrollWidget->onResize();
 }
+
+
+} // namespace rack

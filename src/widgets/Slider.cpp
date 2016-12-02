@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 #define SLIDER_SENSITIVITY 0.001
 
@@ -27,3 +29,6 @@ void Slider::onDragEnd() {
 	state = BND_DEFAULT;
 	guiCursorUnlock();
 }
+
+
+} // namespace rack

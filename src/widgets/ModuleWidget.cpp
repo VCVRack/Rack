@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 ModuleWidget::ModuleWidget(Module *module) {
 	this->module = module;
@@ -15,6 +17,21 @@ ModuleWidget::~ModuleWidget() {
 		rackRemoveModule(module);
 		delete module;
 	}
+}
+
+void ModuleWidget::addInput(InputPort *input) {
+	inputs.push_back(input);
+	addChild(input);
+}
+
+void ModuleWidget::addOutput(OutputPort *output) {
+	outputs.push_back(output);
+	addChild(output);
+}
+
+void ModuleWidget::addParam(ParamWidget *param) {
+	params.push_back(param);
+	addChild(param);
 }
 
 json_t *ModuleWidget::toJson() {
@@ -161,3 +178,6 @@ void ModuleWidget::onMouseDown(int button) {
 		gScene->addChild(overlay);
 	}
 }
+
+
+} // namespace rack

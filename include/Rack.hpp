@@ -2,10 +2,12 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <memory>
 #include "widgets.hpp"
-#include "rack.hpp"
 
+
+namespace rack {
 
 extern Scene *gScene;
 extern RackWidget *gRackWidget;
@@ -20,9 +22,9 @@ struct Model;
 struct Plugin {
 	virtual ~Plugin();
 
-	// A unique identifier for your plugin, e.g. "simple"
+	// A unique identifier for your plugin, e.g. "foo"
 	std::string slug;
-	// Human readable name for your plugin, e.g. "Simple Modular"
+	// Human readable name for your plugin, e.g. "Foo Modular"
 	std::string name;
 	// A list of the models made available by this plugin
 	std::list<Model*> models;
@@ -43,17 +45,6 @@ extern std::list<Plugin*> gPlugins;
 
 void pluginInit();
 void pluginDestroy();
-
-////////////////////
-// midi.cpp
-////////////////////
-
-void midiInit();
-void midiDestroy();
-int midiPortCount();
-std::string midiPortName(int portId);
-void midiPortOpen(int portId);
-void midiPortClose();
 
 ////////////////////
 // gui.cpp
@@ -77,6 +68,34 @@ void drawImage(NVGcontext *vg, Vec pos, int imageId);
 // rack.cpp
 ////////////////////
 
+// TODO Find a clean way to make this a variable
+#define SAMPLE_RATE 44100
+
+
+struct Wire;
+
+struct Module {
+	std::vector<float> params;
+	// Pointers to voltage values at each port
+	// If value is NULL, the input/output is disconnected
+	std::vector<float*> inputs;
+	std::vector<float*> outputs;
+
+	virtual ~Module() {}
+
+	// Always called on each sample frame before calling getOutput()
+	virtual void step() {}
+};
+
+struct Wire {
+	Module *outputModule = NULL;
+	int outputId;
+	Module *inputModule = NULL;
+	int inputId;
+	// The voltage which is pointed to by module inputs/outputs
+	float value = 0.0;
+};
+
 void rackInit();
 void rackDestroy();
 void rackStart();
@@ -87,18 +106,7 @@ void rackRemoveModule(Module *module);
 // Does not transfer ownership
 void rackConnectWire(Wire *wire);
 void rackDisconnectWire(Wire *wire);
-long rackGetFrame();
-void rackRequestFrame(long frame);
 void rackSetParamSmooth(Module *module, int paramId, float value);
-
-////////////////////
-// Implemented by plugin
-////////////////////
-
-// Called once to initialize and return Plugin.
-// Plugin is destructed by the 5V engine when it closes
-extern "C"
-Plugin *init();
 
 ////////////////////
 // Optional helpers for plugins
@@ -133,47 +141,50 @@ Model *createModel(Plugin *plugin, std::string slug, std::string name) {
 }
 
 template <class TParam>
-ParamWidget *createParamWidget(ModuleWidget *moduleWidget, int paramId, float minValue, float maxValue, float defaultValue, Vec pos) {
+ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	ParamWidget *param = new TParam();
-	param->moduleWidget = moduleWidget;
+	param->box.pos = pos;
+	param->module = module;
 	param->paramId = paramId;
 	param->setLimits(minValue, maxValue);
 	param->setDefaultValue(defaultValue);
-	param->box.pos = pos;
-	// Create bi-directional association between the Param and ModelWidget
-	moduleWidget->params[paramId] = param;
-	moduleWidget->addChild(param);
 	return param;
 }
 
 inline
-InputPort *createInputPort(ModuleWidget *moduleWidget, int inputId, Vec pos) {
+InputPort *createInput(Vec pos, Module *module, int inputId) {
 	InputPort *port = new InputPort();
-	port->moduleWidget = moduleWidget;
+	port->box.pos = pos;
+	port->module = module;
 	port->inputId = inputId;
-	port->box.pos = pos;
-	// Create bi-directional association between the InputPort and ModelWidget
-	moduleWidget->inputs[inputId] = port;
-	moduleWidget->addChild(port);
 	return port;
 }
 
 inline
-OutputPort *createOutputPort(ModuleWidget *moduleWidget, int outputId, Vec pos) {
+OutputPort *createOutput(Vec pos, Module *module, int outputId) {
 	OutputPort *port = new OutputPort();
-	port->moduleWidget = moduleWidget;
-	port->outputId = outputId;
 	port->box.pos = pos;
-	// Create bi-directional association between the OutputPort and ModelWidget
-	moduleWidget->outputs[outputId] = port;
-	moduleWidget->addChild(port);
+	port->module = module;
+	port->outputId = outputId;
 	return port;
 }
 
 inline
-Screw *createScrew(ModuleWidget *moduleWidget, Vec pos) {
+Screw *createScrew(Vec pos) {
 	Screw *screw = new Screw();
 	screw->box.pos = pos;
-	moduleWidget->addChild(screw);
 	return screw;
 }
+
+
+} // namespace rack
+
+
+////////////////////
+// Implemented by plugin
+////////////////////
+
+// Called once to initialize and return Plugin.
+// Plugin is destructed when Rack closes
+extern "C"
+rack::Plugin *init();

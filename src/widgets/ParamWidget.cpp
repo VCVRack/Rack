@@ -1,18 +1,15 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 json_t *ParamWidget::toJson() {
-	json_t *paramJ = json_object();
-
-	json_t *valueJ = json_real(value);
-	json_object_set_new(paramJ, "value", valueJ);
-
+	json_t *paramJ = json_real(value);
 	return paramJ;
 }
 
 void ParamWidget::fromJson(json_t *root) {
-	json_t *valueJ = json_object_get(root, "value");
-	setValue(json_number_value(valueJ));
+	setValue(json_number_value(root));
 }
 
 void ParamWidget::onMouseDown(int button) {
@@ -22,8 +19,10 @@ void ParamWidget::onMouseDown(int button) {
 }
 
 void ParamWidget::onChange() {
-	assert(moduleWidget);
-	assert(moduleWidget->module);
+	assert(module);
 	// moduleWidget->module->params[paramId] = value;
-	rackSetParamSmooth(moduleWidget->module, paramId, value);
+	rackSetParamSmooth(module, paramId, value);
 }
+
+
+} // namespace rack

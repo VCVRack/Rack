@@ -1,9 +1,11 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 Port::Port() {
 	box.size = Vec(20, 20);
-	type = rand() % 5;
+	type = randomi64() % 5;
 }
 
 Port::~Port() {
@@ -42,6 +44,12 @@ void Port::drawGlow(NVGcontext *vg) {
 	nvgFill(vg);
 }
 
+void Port::onMouseDown(int button) {
+	if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+		disconnect();
+	}
+}
+
 void Port::onDragEnd() {
 	WireWidget *w = gRackWidget->activeWire;
 	assert(w);
@@ -52,3 +60,6 @@ void Port::onDragEnd() {
 	}
 	gRackWidget->activeWire = NULL;
 }
+
+
+} // namespace rack

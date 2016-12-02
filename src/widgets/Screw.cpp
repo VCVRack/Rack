@@ -1,10 +1,15 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 Screw::Screw() {
 	box.size = Vec(15, 15);
 	spriteOffset = Vec(-7, -7);
 	spriteSize = Vec(29, 29);
 	spriteFilename = "res/screw.png";
-	index = rand() % 5;
+	index = randomi64() % 5;
 }
+
+
+} // namespace rack

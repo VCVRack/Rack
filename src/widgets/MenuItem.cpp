@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void MenuItem::draw(NVGcontext *vg) {
 	bndMenuItem(vg, box.pos.x, box.pos.y, box.size.x, box.size.y, state, -1, text.c_str());
@@ -24,3 +26,6 @@ void MenuItem::onMouseUp(int button) {
 	}
 	delete overlay;
 }
+
+
+} // namespace rack

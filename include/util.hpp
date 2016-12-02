@@ -1,16 +1,14 @@
 #pragma once
 
+#include <stdint.h>
 #include <math.h>
 
-////////////////////
-// Utilities
-// A header-only file with handy inline functions
-////////////////////
 
-#ifndef M_PI
-	#define M_PI 3.141592653589793238462643383
-	#define M_E 2.718281828459045235360287471
-#endif
+namespace rack {
+
+////////////////////
+// Math
+////////////////////
 
 inline float clampf(float x, float min, float max) {
 	return fmaxf(min, fminf(max, x));
@@ -21,7 +19,7 @@ inline float mapf(float x, float xMin, float xMax, float yMin, float yMax) {
 }
 
 inline float crossf(float a, float b, float frac) {
-	return (1 - frac) * a + frac * b;
+	return (1.0 - frac) * a + frac * b;
 }
 
 inline int mini(int a, int b) {
@@ -39,14 +37,36 @@ inline int eucMod(int a, int base) {
 	return mod < 0 ? mod + base : mod;
 }
 
-inline float getf(float *p, float v=0.0) {
+inline float getf(const float *p, float v = 0.0) {
 	return p ? *p : v;
 }
 
 inline void setf(float *p, float v) {
-	if (p) *p = v;
+	if (p)
+		*p = v;
 }
 
+// Linearly interpolate an array `p` with index `x`
+inline float interpf(float *p, float x) {
+	int i = x;
+	x -= i;
+	return crossf(p[i], p[i+1], x);
+}
+
+////////////////////
+// RNG
+////////////////////
+
+uint64_t randomi64(void);
+
+// Return a uniform random number on [0.0, 1.0)
+inline float randomf(void) {
+	return (float)randomi64() / UINT64_MAX;
+}
+
+////////////////////
+// 2D float vector
+////////////////////
 
 struct Vec {
 	float x, y;
@@ -115,3 +135,6 @@ struct Rect {
 		return pos.plus(size);
 	}
 };
+
+
+} // namespace rack

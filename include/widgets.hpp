@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
+#include <vector>
 #include <list>
 #include <map>
 
@@ -13,11 +14,14 @@
 #include "../lib/nanovg/src/nanovg.h"
 #include "../lib/oui/blendish.h"
 
-#include "rack.hpp"
 #include "util.hpp"
 
 
-struct MenuEntry;
+namespace rack {
+
+struct Module;
+struct Wire;
+
 struct RackWidget;
 struct ParamWidget;
 struct InputPort;
@@ -73,6 +77,11 @@ struct Widget {
 	virtual void onChange() {}
 };
 
+// Widget that does not respond to events
+struct TransparentWidget : virtual Widget {
+	Widget *pick(Vec pos) { return NULL; }
+};
+
 // Widget that does not respond to events, but allows its children to
 struct TranslucentWidget : virtual Widget {
 	Widget *pick(Vec pos) {
@@ -82,11 +91,6 @@ struct TranslucentWidget : virtual Widget {
 		}
 		return picked;
 	}
-};
-
-// Widget that does not respond to events
-struct TransparentWidget : virtual Widget {
-	Widget *pick(Vec pos) { return NULL; }
 };
 
 struct SpriteWidget : virtual Widget {
@@ -230,6 +234,11 @@ struct ModuleWidget : Widget {
 
 	ModuleWidget(Module *module);
 	~ModuleWidget();
+	// Convenience functions for adding special widgets (calls addChild())
+	void addInput(InputPort *input);
+	void addOutput(OutputPort *output);
+	void addParam(ParamWidget *param);
+
 	json_t *toJson();
 	void fromJson(json_t *root);
 	void disconnectPorts();
@@ -270,10 +279,14 @@ struct RackWidget : Widget {
 	WireWidget *activeWire = NULL;
 
 	RackWidget();
-
+	~RackWidget();
 	void clear();
+	void savePatch(std::string filename);
+	void loadPatch(std::string filename);
 	json_t *toJson();
 	void fromJson(json_t *root);
+
+	int frame = 0;
 	void repositionModule(ModuleWidget *module);
 	void step();
 	void draw(NVGcontext *vg);
@@ -296,8 +309,7 @@ struct Screw : TransparentWidget, SpriteWidget {
 };
 
 struct ParamWidget : QuantityWidget {
-	// Ancestor ModuleWidget, used for accessing the Module
-	ModuleWidget *moduleWidget;
+	Module *module = NULL;
 	int paramId;
 
 	json_t *toJson();
@@ -325,12 +337,13 @@ struct ToggleSwitch : virtual Switch {
 		index = 0;
 	}
 	void onDragDrop(Widget *origin) {
-		if (origin == this) {
-			// Cycle through modes
-			// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
-			float v = value + 1.0;
-			setValue(v > maxValue ? minValue : v);
-		}
+		if (origin != this)
+			return;
+
+		// Cycle through modes
+		// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
+		float v = value + 1.0;
+		setValue(v > maxValue ? minValue : v);
 	}
 };
 
@@ -350,8 +363,7 @@ struct MomentarySwitch : virtual Switch {
 ////////////////////
 
 struct Port : Widget {
-	// Ancestor ModuleWidget, used for accessing the Module
-	ModuleWidget *moduleWidget;
+	Module *module = NULL;
 	WireWidget *connectedWire = NULL;
 
 	Port();
@@ -361,6 +373,7 @@ struct Port : Widget {
 	int type;
 	void draw(NVGcontext *vg);
 	void drawGlow(NVGcontext *vg);
+	void onMouseDown(int button);
 	void onDragEnd();
 };
 
@@ -396,3 +409,6 @@ struct Scene : Widget {
 	Scene();
 	void onResize();
 };
+
+
+} // namespace rack

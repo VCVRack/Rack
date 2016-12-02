@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 ScrollBar::ScrollBar() {
 	box.size.x = BND_SCROLLBAR_WIDTH;
@@ -36,3 +38,6 @@ void ScrollBar::onDragEnd() {
 	state = BND_DEFAULT;
 	guiCursorUnlock();
 }
+
+
+} // namespace rack

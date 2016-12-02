@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void OutputPort::draw(NVGcontext *vg) {
 	Port::draw(vg);
@@ -32,3 +34,6 @@ void OutputPort::onDragDrop(Widget *origin) {
 		connectedWire = gRackWidget->activeWire;
 	}
 }
+
+
+} // namespace rack

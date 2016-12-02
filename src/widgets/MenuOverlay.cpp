@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void MenuOverlay::onMouseDown(int button) {
 	if (parent) {
@@ -8,3 +10,6 @@ void MenuOverlay::onMouseDown(int button) {
 	// Commit sudoku
 	delete this;
 }
+
+
+} // namespace rack

@@ -1,11 +1,13 @@
-#include "core.hpp"
 #include <assert.h>
 #include <mutex>
-#include <condition_variable>
-#include <rtaudio/RtAudio.h>
+#include <portaudio.h>
+#include "core.hpp"
 
 
-#define AUDIO_BUFFER_SIZE 16384
+using namespace rack;
+
+static bool audioInitialized = false;
+
 
 struct AudioInterface : Module {
 	enum ParamIds {
@@ -20,27 +22,21 @@ struct AudioInterface : Module {
 		NUM_OUTPUTS
 	};
 
-	float audio1Buffer[AUDIO_BUFFER_SIZE] = {};
-	float audio2Buffer[AUDIO_BUFFER_SIZE] = {};
-	// Current frame for step(), called by the rack thread
-	long bufferFrame = 0;
-	// Current frame for processAudio(), called by audio thread
-	long audioFrame = 0;
-	long audioFrameNeeded = -1;
-	RtAudio audio;
-	// The audio thread should wait on the rack thread until the buffer has enough samples
+	PaStream *stream = NULL;
+	float *buffer;
+	int bufferFrames;
+	int bufferFrame;
+	// Used because the GUI thread and Rack thread can both interact with this class
 	std::mutex mutex;
-	std::condition_variable cv;
-	bool running;
 
 	AudioInterface();
 	~AudioInterface();
 	void step();
 
+	int getDeviceCount();
+	std::string getDeviceName(int deviceId);
+	// Use -1 as the deviceId to close the current device
 	void openDevice(int deviceId);
-	void closeDevice();
-	// Blocks until the buffer has enough samples
-	void processAudio(float *outputBuffer, int frameCount);
 };
 
 
@@ -48,94 +44,97 @@ AudioInterface::AudioInterface() {
 	params.resize(NUM_PARAMS);
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
+
+	buffer = new float[1<<14];
+
+	// Lazy initialize PulseAudio
+	if (!audioInitialized) {
+		PaError err = Pa_Initialize();
+		if (err) {
+			printf("Failed to initialize PortAudio: %s\n", Pa_GetErrorText(err));
+			return;
+		}
+		audioInitialized = true;
+	}
 }
 
 AudioInterface::~AudioInterface() {
-	closeDevice();
+	openDevice(-1);
+	delete[] buffer;
 }
 
 void AudioInterface::step() {
-	int i = bufferFrame % AUDIO_BUFFER_SIZE;
-	audio1Buffer[i] = getf(inputs[AUDIO1_INPUT]);
-	audio2Buffer[i] = getf(inputs[AUDIO2_INPUT]);
-	// std::unique_lock<std::mutex> lock(mutex);
-	bufferFrame++;
-	if (bufferFrame == audioFrameNeeded) {
-	// lock.unlock();
-		cv.notify_all();
+	std::lock_guard<std::mutex> lock(mutex);
+
+	if (!stream)
+		return;
+
+	buffer[2*bufferFrame + 0] = getf(inputs[AUDIO1_INPUT]) / 5.0;
+	buffer[2*bufferFrame + 1] = getf(inputs[AUDIO2_INPUT]) / 5.0;
+
+	if (++bufferFrame >= bufferFrames) {
+		bufferFrame = 0;
+		PaError err = Pa_WriteStream(stream, buffer, bufferFrames);
+		if (err) {
+			// Ignore buffer underflows
+			if (err != paOutputUnderflowed) {
+				printf("Failed to write buffer to audio stream: %s\n", Pa_GetErrorText(err));
+				return;
+			}
+		}
 	}
 }
 
-int audioCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
-	AudioInterface *that = (AudioInterface*) userData;
-	that->processAudio((float*) outputBuffer, nBufferFrames);
-	return 0;
+int AudioInterface::getDeviceCount() {
+	return Pa_GetDeviceCount();
+}
+
+std::string AudioInterface::getDeviceName(int deviceId) {
+	const PaDeviceInfo *info = Pa_GetDeviceInfo(deviceId);
+	return info ? std::string(info->name) : "";
 }
 
 void AudioInterface::openDevice(int deviceId) {
-	assert(!audio.isStreamOpen());
-	if (deviceId < 0) {
-		deviceId = audio.getDefaultOutputDevice();
+	PaError err;
+	std::lock_guard<std::mutex> lock(mutex);
+
+	// Close existing device
+	if (stream) {
+		err = Pa_CloseStream(stream);
+		if (err) {
+			printf("Failed to close audio stream: %s\n", Pa_GetErrorText(err));
+		}
+		stream = NULL;
 	}
 
-	RtAudio::StreamParameters streamParams;
-	streamParams.deviceId = deviceId;
-	streamParams.nChannels = 2;
-	streamParams.firstChannel = 0;
-	unsigned int sampleRate = SAMPLE_RATE;
-	unsigned int bufferFrames = 512;
+	// Open new device
+	bufferFrames = 256;
+	bufferFrame = 0;
+	if (deviceId >= 0) {
+		const PaDeviceInfo *info = Pa_GetDeviceInfo(deviceId);
+		if (!info) {
+			printf("Failed to query audio device\n");
+			return;
+		}
 
-	audioFrame = -1;
-	running = true;
+		PaStreamParameters outputParameters;
+		outputParameters.device = deviceId;
+		outputParameters.channelCount = 2;
+		outputParameters.sampleFormat = paFloat32;
+		outputParameters.suggestedLatency = info->defaultLowOutputLatency;
+		outputParameters.hostApiSpecificStreamInfo = NULL;
 
-	try {
-		audio.openStream(&streamParams, NULL, RTAUDIO_FLOAT32, sampleRate, &bufferFrames, &audioCallback, this);
-		audio.startStream();
-	}
-	catch (RtAudioError &e) {
-		printf("Could not open audio stream: %s\n", e.what());
-	}
-}
+		err = Pa_OpenStream(&stream, NULL, &outputParameters, SAMPLE_RATE, bufferFrames, paNoFlag, NULL, NULL);
+		if (err) {
+			printf("Failed to open audio stream: %s\n", Pa_GetErrorText(err));
+			return;
+		}
 
-void AudioInterface::closeDevice() {
-	if (!audio.isStreamOpen()) {
-		return;
-	}
-	{
-		std::unique_lock<std::mutex> lock(mutex);
-		running = false;
-	}
-	cv.notify_all();
-
-	try {
-		// Blocks until stream thread exits
-		audio.stopStream();
-		audio.closeStream();
-	}
-	catch (RtAudioError &e) {
-		printf("Could not close audio stream: %s\n", e.what());
-	}
-}
-
-void AudioInterface::processAudio(float *outputBuffer, int frameCount) {
-	std::unique_lock<std::mutex> lock(mutex);
-	if (audioFrame < 0) {
-		// This audio thread is new. Reset the frame positions
-		audioFrame = rackGetFrame();
-		bufferFrame = audioFrame;
-	}
-	audioFrameNeeded = audioFrame + frameCount;
-	rackRequestFrame(audioFrameNeeded);
-	// Wait for needed frames
-	while (running && bufferFrame < audioFrameNeeded) {
-		cv.wait(lock);
-	}
-	// Copy values from internal buffer to audio buffer, while holding the mutex just in case our audio buffer wraps around
-	for (int frame = 0; frame < frameCount; frame++) {
-		int i = audioFrame % AUDIO_BUFFER_SIZE;
-		outputBuffer[2*frame + 0] = audio1Buffer[i] / 5.0;
-		outputBuffer[2*frame + 1] = audio2Buffer[i] / 5.0;
-		audioFrame++;
+		err = Pa_StartStream(stream);
+		if (err) {
+			printf("Failed to start audio stream: %s\n", Pa_GetErrorText(err));
+			return;
+		}
 	}
 }
 
@@ -144,7 +143,6 @@ struct AudioItem : MenuItem {
 	AudioInterface *audioInterface;
 	int deviceId;
 	void onAction() {
-		audioInterface->closeDevice();
 		audioInterface->openDevice(deviceId);
 	}
 };
@@ -156,23 +154,17 @@ struct AudioChoice : ChoiceButton {
 		Menu *menu = new Menu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 
-		int deviceCount = audioInterface->audio.getDeviceCount();
+		int deviceCount = audioInterface->getDeviceCount();
 		if (deviceCount == 0) {
 			MenuLabel *label = new MenuLabel();
 			label->text = "No audio devices";
 			menu->pushChild(label);
 		}
 		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
-			RtAudio::DeviceInfo info = audioInterface->audio.getDeviceInfo(deviceId);
-			if (!info.probed)
-				continue;
-
-			char text[100];
-			snprintf(text, 100, "%s (%d in, %d out)", info.name.c_str(), info.inputChannels, info.outputChannels);
-
 			AudioItem *audioItem = new AudioItem();
 			audioItem->audioInterface = audioInterface;
 			audioItem->deviceId = deviceId;
+			std::string text = audioInterface->getDeviceName(deviceId);
 			audioItem->text = text;
 			menu->pushChild(audioItem);
 		}
@@ -184,17 +176,18 @@ struct AudioChoice : ChoiceButton {
 
 AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()) {
 	box.size = Vec(15*8, 380);
-	inputs.resize(AudioInterface::NUM_INPUTS);
 
-	createInputPort(this, AudioInterface::AUDIO1_INPUT, Vec(15, 100));
-	createInputPort(this, AudioInterface::AUDIO2_INPUT, Vec(70, 100));
+	addInput(createInput(Vec(15, 100), module, AudioInterface::AUDIO1_INPUT));
+	addInput(createInput(Vec(70, 100), module, AudioInterface::AUDIO2_INPUT));
 
-	AudioChoice *audioChoice = new AudioChoice();
-	audioChoice->audioInterface = dynamic_cast<AudioInterface*>(module);
-	audioChoice->text = "Audio Interface";
-	audioChoice->box.pos = Vec(0, 0);
-	audioChoice->box.size.x = box.size.x;
-	addChild(audioChoice);
+	{
+		AudioChoice *audioChoice = new AudioChoice();
+		audioChoice->audioInterface = dynamic_cast<AudioInterface*>(module);
+		audioChoice->text = "Audio Interface";
+		audioChoice->box.pos = Vec(0, 0);
+		audioChoice->box.size.x = box.size.x;
+		addChild(audioChoice);
+	}
 }
 
 void AudioInterfaceWidget::draw(NVGcontext *vg) {

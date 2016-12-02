@@ -1,6 +1,8 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 #include <algorithm>
 
+
+namespace rack {
 
 Widget::~Widget() {
 	// You should only delete orphaned widgets
@@ -87,3 +89,6 @@ Widget *Widget::pick(Vec pos) {
 	}
 	return this;
 }
+
+
+} // namespace rack

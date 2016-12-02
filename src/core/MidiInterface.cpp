@@ -1,8 +1,13 @@
-#include "core.hpp"
 #include <assert.h>
-#include <rtmidi/RtMidi.h>
 #include <list>
 #include <algorithm>
+#include <portmidi.h>
+#include "core.hpp"
+
+
+using namespace rack;
+
+static bool midiInitialized = false;
 
 
 struct MidiInterface : Module {
@@ -18,7 +23,7 @@ struct MidiInterface : Module {
 		NUM_OUTPUTS
 	};
 
-	RtMidiIn midi;
+	PortMidiStream *stream = NULL;
 	std::list<int> notes;
 	bool pedal = false;
 	bool gate = false;
@@ -29,35 +34,45 @@ struct MidiInterface : Module {
 	~MidiInterface();
 	void step();
 
+	int getPortCount();
+	std::string getPortName(int portId);
+	// -1 will close the port
 	void openPort(int portId);
-	void closePort();
 	void pressNote(int note);
 	void releaseNote(int note);
 	void processMidi(long msg);
 };
 
 
-void midiCallback(double timeStamp, std::vector<unsigned char> *message, void *userData) {
-	MidiInterface *that = (MidiInterface*) userData;
-	if (message->size() < 3)
-		return;
-
-	long msg = (message->at(0)) | (message->at(1) << 8) | (message->at(2) << 16);
-	that->processMidi(msg);
-}
-
 MidiInterface::MidiInterface() {
 	params.resize(NUM_PARAMS);
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
-	midi.setCallback(midiCallback, this);
+
+	// Lazy initialize PortMidi
+	if (!midiInitialized) {
+		PmError err = Pm_Initialize();
+		if (err) {
+			printf("Failed to initialize PortMidi: %s\n", Pm_GetErrorText(err));
+			return;
+		}
+		midiInitialized = true;
+	}
 }
 
 MidiInterface::~MidiInterface() {
-	closePort();
+	openPort(-1);
 }
 
 void MidiInterface::step() {
+	if (stream) {
+		// Read MIDI events
+		PmEvent event;
+		while (Pm_Read(stream, &event, 1) > 0) {
+			processMidi(event.message);
+		}
+	}
+
 	if (outputs[GATE_OUTPUT]) {
 		*outputs[GATE_OUTPUT] = gate ? 5.0 : 0.0;
 	}
@@ -66,20 +81,35 @@ void MidiInterface::step() {
 	}
 }
 
-void MidiInterface::openPort(int portId) {
-	closePort();
-	try {
-		midi.openPort(portId);
-	}
-	catch (RtMidiError &e) {
-		printf("Could not open midi port: %s\n", e.what());
-	}
+int MidiInterface::getPortCount() {
+	return Pm_CountDevices();
 }
 
-void MidiInterface::closePort() {
-	if (!midi.isPortOpen())
-		return;
-	midi.closePort();
+std::string MidiInterface::getPortName(int portId) {
+	const PmDeviceInfo *info = Pm_GetDeviceInfo(portId);
+	return info ? std::string(info->name) : "";
+}
+
+void MidiInterface::openPort(int portId) {
+	PmError err;
+
+	// Close existing port
+	if (stream) {
+		err = Pm_Close(stream);
+		if (err) {
+			printf("Failed to close MIDI port: %s\n", Pm_GetErrorText(err));
+		}
+		stream = NULL;
+	}
+
+	// Open new port
+	if (portId >= 0) {
+		err = Pm_OpenInput(&stream, portId, NULL, 128, NULL, NULL);
+		if (err) {
+			printf("Failed to open MIDI port: %s\n", Pm_GetErrorText(err));
+			return;
+		}
+	}
 }
 
 void MidiInterface::pressNote(int note) {
@@ -155,7 +185,6 @@ struct MidiItem : MenuItem {
 	MidiInterface *midiInterface;
 	int portId;
 	void onAction() {
-		midiInterface->closePort();
 		midiInterface->openPort(portId);
 	}
 };
@@ -167,7 +196,7 @@ struct MidiChoice : ChoiceButton {
 		Menu *menu = new Menu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 
-		int portCount = midiInterface->midi.getPortCount();
+		int portCount = midiInterface->getPortCount();
 		if (portCount == 0) {
 			MenuLabel *label = new MenuLabel();
 			label->text = "No MIDI devices";
@@ -177,7 +206,7 @@ struct MidiChoice : ChoiceButton {
 			MidiItem *midiItem = new MidiItem();
 			midiItem->midiInterface = midiInterface;
 			midiItem->portId = portId;
-			midiItem->text = midiInterface->midi.getPortName();
+			midiItem->text = midiInterface->getPortName(portId);
 			menu->pushChild(midiItem);
 		}
 		overlay->addChild(menu);
@@ -188,17 +217,18 @@ struct MidiChoice : ChoiceButton {
 
 MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
 	box.size = Vec(15*8, 380);
-	outputs.resize(MidiInterface::NUM_OUTPUTS);
 
-	createOutputPort(this, MidiInterface::GATE_OUTPUT, Vec(15, 100));
-	createOutputPort(this, MidiInterface::PITCH_OUTPUT, Vec(70, 100));
+	addOutput(createOutput(Vec(15, 100), module, MidiInterface::GATE_OUTPUT));
+	addOutput(createOutput(Vec(70, 100), module, MidiInterface::PITCH_OUTPUT));
 
-	MidiChoice *midiChoice = new MidiChoice();
-	midiChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
-	midiChoice->text = "MIDI Interface";
-	midiChoice->box.pos = Vec(0, 0);
-	midiChoice->box.size.x = box.size.x;
-	addChild(midiChoice);
+	{
+		MidiChoice *midiChoice = new MidiChoice();
+		midiChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
+		midiChoice->text = "MIDI Interface";
+		midiChoice->box.pos = Vec(0, 0);
+		midiChoice->box.size.x = box.size.x;
+		addChild(midiChoice);
+	}
 }
 
 void MidiInterfaceWidget::draw(NVGcontext *vg) {

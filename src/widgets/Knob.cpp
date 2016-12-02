@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 #define KNOB_SENSITIVITY 0.001
 
@@ -19,3 +21,6 @@ void Knob::onDragMove(Vec mouseRel) {
 void Knob::onDragEnd() {
 	guiCursorUnlock();
 }
+
+
+} // namespace rack

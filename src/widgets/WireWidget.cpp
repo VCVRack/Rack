@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color) {
 	float dist = pos1.minus(pos2).norm();
@@ -72,9 +74,9 @@ void WireWidget::updateWire() {
 	}
 	if (inputPort && outputPort) {
 		wire = new Wire();
-		wire->outputModule = outputPort->moduleWidget->module;
+		wire->outputModule = outputPort->module;
 		wire->outputId = outputPort->outputId;
-		wire->inputModule = inputPort->moduleWidget->module;
+		wire->inputModule = inputPort->module;
 		wire->inputId = inputPort->inputId;
 		rackConnectWire(wire);
 	}
@@ -110,3 +112,6 @@ void WireWidget::draw(NVGcontext *vg) {
 	}
 	nvgRestore(vg);
 }
+
+
+} // namespace rack

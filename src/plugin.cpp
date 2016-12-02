@@ -7,9 +7,11 @@
 	#include <glob.h>
 #endif
 
-#include "5V.hpp"
+#include "Rack.hpp"
 #include "core/core.hpp"
 
+
+namespace rack {
 
 std::list<Plugin*> gPlugins;
 
@@ -62,6 +64,7 @@ void pluginInit() {
 
 	// Search for plugin libraries
 	#if defined(WINDOWS)
+		// TODO
 		// WIN32_FIND_DATA ffd;
 		// HANDLE hFind = FindFirstFile("plugins/*/plugin.dll", &ffd);
 		// if (hFind != INVALID_HANDLE_VALUE) {
@@ -101,3 +104,6 @@ Plugin::~Plugin() {
 		delete model;
 	}
 }
+
+
+} // namespace rack

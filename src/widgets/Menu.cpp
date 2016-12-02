@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 void Menu::pushChild(Widget *child) {
 	child->box.pos = Vec(0, box.size.y);
@@ -25,3 +27,6 @@ void Menu::draw(NVGcontext *vg) {
 
 	Widget::draw(vg);
 }
+
+
+} // namespace rack

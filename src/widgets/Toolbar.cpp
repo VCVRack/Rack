@@ -1,9 +1,11 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
 extern "C" {
 	#include "../lib/noc/noc_file_dialog.h"
 }
 
+
+namespace rack {
 
 static const char *filters = "JSON Patch\0*.json\0";
 
@@ -17,17 +19,8 @@ struct NewItem : MenuItem {
 struct SaveItem : MenuItem {
 	void onAction() {
 		const char *path = noc_file_dialog_open(NOC_FILE_DIALOG_SAVE, filters, NULL, "Untitled.json");
-
 		if (path) {
-			printf("Saving patch %s\n", path);
-			FILE *file = fopen(path, "w");
-
-			json_t *root = gRackWidget->toJson();
-			assert(root);
-			json_dumpf(root, file, JSON_INDENT(2));
-			json_decref(root);
-
-			fclose(file);
+			gRackWidget->savePatch(path);
 		}
 	}
 };
@@ -35,23 +28,8 @@ struct SaveItem : MenuItem {
 struct OpenItem : MenuItem {
 	void onAction() {
 		const char *path = noc_file_dialog_open(NOC_FILE_DIALOG_OPEN, filters, NULL, NULL);
-
 		if (path) {
-			printf("Loading patch %s\n", path);
-			FILE *file = fopen(path, "r");
-
-			json_error_t error;
-			json_t *root = json_loadf(file, 0, &error);
-			if (root) {
-				gRackWidget->clear();
-				gRackWidget->fromJson(root);
-				json_decref(root);
-			}
-			else {
-				printf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
-			}
-
-			fclose(file);
+			gRackWidget->loadPatch(path);
 		}
 	}
 };
@@ -169,3 +147,6 @@ void Toolbar::draw(NVGcontext *vg) {
 
 	Widget::draw(vg);
 }
+
+
+} // namespace rack

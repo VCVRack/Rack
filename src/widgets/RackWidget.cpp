@@ -1,6 +1,8 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 #include <algorithm>
 
+
+namespace rack {
 
 RackWidget::RackWidget() {
 	moduleContainer = new TranslucentWidget();
@@ -10,10 +12,56 @@ RackWidget::RackWidget() {
 	addChild(wireContainer);
 }
 
+RackWidget::~RackWidget() {
+}
+
 void RackWidget::clear() {
 	activeWire = NULL;
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
+}
+
+void RackWidget::savePatch(std::string filename) {
+	printf("Saving patch %s\n", filename.c_str());
+	FILE *file = fopen(filename.c_str(), "w");
+	if (!file)
+		return;
+
+	json_t *root = toJson();
+	if (root) {
+		json_dumpf(root, file, JSON_INDENT(2));
+		json_decref(root);
+	}
+
+	fclose(file);
+}
+
+void RackWidget::loadPatch(std::string filename) {
+	printf("Loading patch %s\n", filename.c_str());
+	FILE *file = fopen(filename.c_str(), "r");
+	if (!file)
+		return;
+
+	json_error_t error;
+	json_t *root = json_loadf(file, 0, &error);
+	if (root) {
+		clear();
+		fromJson(root);
+		json_decref(root);
+	}
+	else {
+		printf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
+	}
+
+	fclose(file);
+}
+
+// Recursive function to get the ModuleWidget eventually containing a widget
+static ModuleWidget *getAncestorModuleWidget(Widget *w) {
+	if (!w) return NULL;
+	ModuleWidget *m = dynamic_cast<ModuleWidget*>(w);
+	if (m) return m;
+	return getAncestorModuleWidget(w->parent);
 }
 
 json_t *RackWidget::toJson() {
@@ -48,11 +96,18 @@ json_t *RackWidget::toJson() {
 	for (Widget *w : wireContainer->children) {
 		WireWidget *wireWidget = dynamic_cast<WireWidget*>(w);
 		assert(wireWidget);
+		// Only serialize WireWidgets connected on both ends
+		if (!(wireWidget->outputPort && wireWidget->inputPort))
+			continue;
 		// wire
 		json_t *wire = json_object();
 		{
-			int outputModuleId = moduleIds[wireWidget->outputPort->moduleWidget];
-			int inputModuleId = moduleIds[wireWidget->inputPort->moduleWidget];
+			ModuleWidget *outputModuleWidget = getAncestorModuleWidget(wireWidget->outputPort);
+			assert(outputModuleWidget);
+			ModuleWidget *inputModuleWidget = getAncestorModuleWidget(wireWidget->inputPort);
+			assert(inputModuleWidget);
+			int outputModuleId = moduleIds[outputModuleWidget];
+			int inputModuleId = moduleIds[inputModuleWidget];
 			json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
 			json_object_set_new(wire, "outputId", json_integer(wireWidget->outputPort->outputId));
 			json_object_set_new(wire, "inputModuleId", json_integer(inputModuleId));
@@ -141,7 +196,7 @@ void RackWidget::fromJson(json_t *root) {
 		inputPort->connectedWire = wireWidget;
 		wireWidget->updateWire();
 		// Add wire to rack
-		gRackWidget->wireContainer->addChild(wireWidget);
+		wireContainer->addChild(wireWidget);
 	}
 }
 
@@ -196,6 +251,12 @@ void RackWidget::step() {
 			repositionModule(module);
 			module->requested = false;
 		}
+	}
+
+	// Autosave every 2 minutes
+	if (++frame >= 60*60*2) {
+		frame = 0;
+		savePatch("autosave.json");
 	}
 
 	Widget::step();
@@ -262,3 +323,6 @@ void RackWidget::onMouseDown(int button) {
 		gScene->addChild(overlay);
 	}
 }
+
+
+} // namespace rack

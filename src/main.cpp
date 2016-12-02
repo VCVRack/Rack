@@ -1,33 +1,42 @@
-#include "5V.hpp"
-#include <time.h>
-#include <unistd.h>
+#if defined(APPLE)
+	#include "CoreFoundation/CoreFoundation.h"
+	#include <unistd.h>
+	#include <libgen.h>
+#endif
+
+#include "Rack.hpp"
 
 
-Scene *gScene = NULL;
-RackWidget *gRackWidget = NULL;
-
+using namespace rack;
 
 int main() {
+	// Set working directory
+#if defined(APPLE)
+	{
+		CFBundleRef bundle = CFBundleGetMainBundle();
+		CFURLRef bundleURL = CFBundleCopyBundleURL(bundle);
+		char path[PATH_MAX];
+		Boolean success = CFURLGetFileSystemRepresentation(bundleURL, TRUE, (UInt8 *)path, PATH_MAX);
+		assert(success);
+		CFRelease(bundleURL);
+
+		// chdir(dirname(path));
+	}
+#endif
+
+
 	pluginInit();
 	rackInit();
 	guiInit();
-	gScene = new Scene();
-	// audioInit();
-	// audioDeviceOpen();
-	// midiInit();
+	gRackWidget->loadPatch("autosave.json");
+
 	rackStart();
-
-	// Blocks until user exits
 	guiRun();
-
-	// Cleanup
-	// midiDestroy();
-	// audioDeviceClose();
-	// audioDestroy();
-	delete gScene;
-	guiDestroy();
 	rackStop();
+
+	gRackWidget->savePatch("autosave.json");
+	guiDestroy();
 	rackDestroy();
 	pluginDestroy();
-  return 0;
+	return 0;
 }

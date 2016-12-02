@@ -1,5 +1,7 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
+
+namespace rack {
 
 Button::Button() {
 	box.size.y = BND_WIDGET_HEIGHT;
@@ -22,3 +24,6 @@ void Button::onDragDrop(Widget *origin) {
 		onAction();
 	}
 }
+
+
+} // namespace rack

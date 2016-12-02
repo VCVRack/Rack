@@ -1,18 +1,18 @@
-#include "../5V.hpp"
+#include "Rack.hpp"
 
 
-Plugin *coreInit();
+rack::Plugin *coreInit();
 
 ////////////////////
 // module widgets
 ////////////////////
 
-struct AudioInterfaceWidget : ModuleWidget {
+struct AudioInterfaceWidget : rack::ModuleWidget {
 	AudioInterfaceWidget();
 	void draw(NVGcontext *vg);
 };
 
-struct MidiInterfaceWidget : ModuleWidget {
+struct MidiInterfaceWidget : rack::ModuleWidget {
 	MidiInterfaceWidget();
 	void draw(NVGcontext *vg);
 };
