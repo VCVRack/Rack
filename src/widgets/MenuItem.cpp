@@ -15,16 +15,13 @@ void MenuItem::onMouseLeave() {
 	state = BND_DEFAULT;
 }
 
-void MenuItem::onMouseUp(int button) {
+void MenuItem::onDragDrop(Widget *origin) {
+	if (origin != this)
+		return;
+
 	onAction();
-	// Remove overlay from scene
-	// HACK
-	Widget *overlay = parent->parent;
-	assert(overlay);
-	if (overlay->parent) {
-		overlay->parent->removeChild(overlay);
-	}
-	delete overlay;
+	// deletes `this`
+	gScene->setOverlay(NULL);
 }
 
 

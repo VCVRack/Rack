@@ -3,10 +3,10 @@
 
 namespace rack {
 
-void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color) {
+void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, float tension, NVGcolor color) {
 	float dist = pos1.minus(pos2).norm();
-	Vec slump = Vec(0, 100.0 + 0.5*dist);
-	Vec pos3 = pos1.plus(pos2).div(2).plus(slump);
+	float slump = (1.0 - tension) * (150.0 + 1.0*dist);
+	Vec pos3 = pos1.plus(pos2).div(2).plus(Vec(0, slump));
 
 	NVGcolor colorOutline = nvgRGBf(0, 0, 0);
 
@@ -108,7 +108,8 @@ void WireWidget::draw(NVGcontext *vg) {
 	float wireOpacity = gScene->toolbar->wireOpacitySlider->value / 100.0;
 	if (wireOpacity > 0.0) {
 		nvgGlobalAlpha(vg, wireOpacity);
-		drawWire(vg, outputPos, inputPos, color);
+		float tension = gScene->toolbar->wireTensionSlider->value;
+		drawWire(vg, outputPos, inputPos, tension, color);
 	}
 	nvgRestore(vg);
 }

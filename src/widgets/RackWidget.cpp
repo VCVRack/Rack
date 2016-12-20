@@ -5,7 +5,7 @@
 namespace rack {
 
 RackWidget::RackWidget() {
-	moduleContainer = new TranslucentWidget();
+	moduleContainer = new Widget();
 	addChild(moduleContainer);
 
 	wireContainer = new TransparentWidget();
@@ -56,25 +56,9 @@ void RackWidget::loadPatch(std::string filename) {
 	fclose(file);
 }
 
-// Recursive function to get the ModuleWidget eventually containing a widget
-static ModuleWidget *getAncestorModuleWidget(Widget *w) {
-	if (!w) return NULL;
-	ModuleWidget *m = dynamic_cast<ModuleWidget*>(w);
-	if (m) return m;
-	return getAncestorModuleWidget(w->parent);
-}
-
 json_t *RackWidget::toJson() {
 	// root
 	json_t *root = json_object();
-
-	// rack
-	json_t *rack = json_object();
-	{
-		json_t *size = json_pack("[f, f]", (double) box.size.x, (double) box.size.y);
-		json_object_set_new(rack, "size", size);
-	}
-	json_object_set_new(root, "rack", rack);
 
 	// modules
 	json_t *modulesJ = json_array();
@@ -102,9 +86,9 @@ json_t *RackWidget::toJson() {
 		// wire
 		json_t *wire = json_object();
 		{
-			ModuleWidget *outputModuleWidget = getAncestorModuleWidget(wireWidget->outputPort);
+			ModuleWidget *outputModuleWidget = wireWidget->outputPort->getAncestorOfType<ModuleWidget>();
 			assert(outputModuleWidget);
-			ModuleWidget *inputModuleWidget = getAncestorModuleWidget(wireWidget->inputPort);
+			ModuleWidget *inputModuleWidget = wireWidget->inputPort->getAncestorOfType<ModuleWidget>();
 			assert(inputModuleWidget);
 			int outputModuleId = moduleIds[outputModuleWidget];
 			int inputModuleId = moduleIds[inputModuleWidget];
@@ -121,26 +105,16 @@ json_t *RackWidget::toJson() {
 }
 
 void RackWidget::fromJson(json_t *root) {
-	// TODO There's virtually no validation in here. Bad input will result in a crash.
-	// rack
-	json_t *rack = json_object_get(root, "rack");
-	assert(rack);
-	{
-		// size
-		json_t *size = json_object_get(rack, "size");
-		double width, height;
-		json_unpack(size, "[F, F]", &width, &height);
-		box.size = Vec(width, height);
-	}
-
 	// modules
 	std::map<int, ModuleWidget*> moduleWidgets;
 	json_t *modulesJ = json_object_get(root, "modules");
+	if (!modulesJ) return;
 	size_t moduleId;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
 		// Get plugin
 		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
+		if (!pluginSlugJ) continue;
 		const char *pluginSlug = json_string_value(pluginSlugJ);
 		Plugin *plugin = NULL;
 		for (Plugin *p : gPlugins) {
@@ -149,7 +123,7 @@ void RackWidget::fromJson(json_t *root) {
 				break;
 			}
 		}
-		assert(plugin);
+		if (!plugin) continue;
 
 		// Get model
 		json_t *modelSlug = json_object_get(moduleJ, "model");
@@ -160,10 +134,11 @@ void RackWidget::fromJson(json_t *root) {
 				break;
 			}
 		}
-		assert(model);
+		if (!model) continue;
 
 		// Create ModuleWidget
 		ModuleWidget *moduleWidget = model->createModuleWidget();
+		assert(moduleWidget);
 		moduleWidget->fromJson(moduleJ);
 		moduleContainer->addChild(moduleWidget);
 		moduleWidgets[moduleId] = moduleWidget;
@@ -171,23 +146,25 @@ void RackWidget::fromJson(json_t *root) {
 
 	// wires
 	json_t *wiresJ = json_object_get(root, "wires");
+	if (!wiresJ) return;
 	size_t wireId;
 	json_t *wireJ;
 	json_array_foreach(wiresJ, wireId, wireJ) {
 		int outputModuleId, outputId;
 		int inputModuleId, inputId;
-		json_unpack(wireJ, "{s:i, s:i, s:i, s:i}",
+		int err = json_unpack(wireJ, "{s:i, s:i, s:i, s:i}",
 			"outputModuleId", &outputModuleId, "outputId", &outputId,
 			"inputModuleId", &inputModuleId, "inputId", &inputId);
+		if (err) continue;
 		// Get ports
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
-		assert(outputModuleWidget);
+		if (!outputModuleWidget) continue;
 		OutputPort *outputPort = outputModuleWidget->outputs[outputId];
-		assert(outputPort);
+		if (!outputPort) continue;
 		ModuleWidget *inputModuleWidget = moduleWidgets[inputModuleId];
-		assert(inputModuleWidget);
+		if (!inputModuleWidget) continue;
 		InputPort *inputPort = inputModuleWidget->inputs[inputId];
-		assert(inputPort);
+		if (!inputPort) continue;
 		// Create WireWidget
 		WireWidget *wireWidget = new WireWidget();
 		wireWidget->outputPort = outputPort;
@@ -253,8 +230,9 @@ void RackWidget::step() {
 		}
 	}
 
-	// Autosave every 2 minutes
-	if (++frame >= 60*60*2) {
+	// Autosave every 15 seconds
+	// (This is alpha software, expect crashes!)
+	if (++frame >= 60*15) {
 		frame = 0;
 		savePatch("autosave.json");
 	}
@@ -299,7 +277,7 @@ struct AddModuleMenuItem : MenuItem {
 };
 
 void RackWidget::onMouseDown(int button) {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+	if (button == 1) {
 		// Get relative position of the click
 		Vec modulePos = gMousePos.minus(getAbsolutePos());
 
@@ -320,7 +298,7 @@ void RackWidget::onMouseDown(int button) {
 			}
 		}
 		overlay->addChild(menu);
-		gScene->addChild(overlay);
+		gScene->setOverlay(overlay);
 	}
 }
 

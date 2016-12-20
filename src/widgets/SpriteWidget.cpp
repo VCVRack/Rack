@@ -16,7 +16,7 @@ void SpriteWidget::draw(NVGcontext *vg) {
 	nvgImageSize(vg, imageId, &width, &height);
 	int stride = width / spriteSize.x;
 	if (stride == 0) {
-		printf("Width of SpriteWidget is %d but spriteSize is %f\n", width, spriteSize.x);
+		printf("Size of SpriteWidget is %d, %d but spriteSize is %f, %f\n", width, height, spriteSize.x, spriteSize.y);
 		return;
 	}
 	Vec offset = Vec((index % stride) * spriteSize.x, (index / stride) * spriteSize.y);

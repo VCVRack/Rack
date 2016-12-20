@@ -26,9 +26,10 @@ struct MidiInterface : Module {
 	PortMidiStream *stream = NULL;
 	std::list<int> notes;
 	bool pedal = false;
-	bool gate = false;
 	int note = 64; // C4
 	int pitchWheel = 64;
+	bool retrigger = true;
+	bool retriggered = false;
 
 	MidiInterface();
 	~MidiInterface();
@@ -74,6 +75,11 @@ void MidiInterface::step() {
 	}
 
 	if (outputs[GATE_OUTPUT]) {
+		bool gate = pedal || !notes.empty();
+		if (retrigger && retriggered) {
+			gate = false;
+			retriggered = false;
+		}
 		*outputs[GATE_OUTPUT] = gate ? 5.0 : 0.0;
 	}
 	if (outputs[PITCH_OUTPUT]) {
@@ -113,12 +119,14 @@ void MidiInterface::openPort(int portId) {
 }
 
 void MidiInterface::pressNote(int note) {
+	// Remove existing similar note
 	auto it = std::find(notes.begin(), notes.end(), note);
 	if (it != notes.end())
 		notes.erase(it);
+	// Push note
 	notes.push_back(note);
-	this->gate = true;
 	this->note = note;
+	retriggered = true;
 }
 
 void MidiInterface::releaseNote(int note) {
@@ -135,10 +143,7 @@ void MidiInterface::releaseNote(int note) {
 		auto it2 = notes.end();
 		it2--;
 		this->note = *it2;
-	}
-	else {
-		// No notes are held, turn the gate off
-		this->gate = false;
+		retriggered = true;
 	}
 }
 
@@ -158,7 +163,7 @@ void MidiInterface::processMidi(long msg) {
 			releaseNote(data1);
 		} break;
 		case 0x9: // note on
-			if (data2) {
+			if (data2 > 0) {
 				pressNote(data1);
 			}
 			else {
@@ -210,7 +215,7 @@ struct MidiChoice : ChoiceButton {
 			menu->pushChild(midiItem);
 		}
 		overlay->addChild(menu);
-		gScene->addChild(overlay);
+		gScene->setOverlay(overlay);
 	}
 };
 

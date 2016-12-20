@@ -7,6 +7,14 @@
 #include "Rack.hpp"
 
 
+namespace rack {
+
+std::string gApplicationName = "Virtuoso Rack";
+std::string gApplicationVersion = "v0.0.0";
+
+} // namespace rack
+
+
 using namespace rack;
 
 int main() {
@@ -20,7 +28,7 @@ int main() {
 		assert(success);
 		CFRelease(bundleURL);
 
-		// chdir(dirname(path));
+		chdir(dirname(path));
 	}
 #endif
 
@@ -40,3 +48,4 @@ int main() {
 	pluginDestroy();
 	return 0;
 }
+

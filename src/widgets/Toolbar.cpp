@@ -1,9 +1,5 @@
 #include "Rack.hpp"
 
-extern "C" {
-	#include "../lib/noc/noc_file_dialog.h"
-}
-
 
 namespace rack {
 
@@ -18,7 +14,7 @@ struct NewItem : MenuItem {
 
 struct SaveItem : MenuItem {
 	void onAction() {
-		const char *path = noc_file_dialog_open(NOC_FILE_DIALOG_SAVE, filters, NULL, "Untitled.json");
+		const char *path = guiSaveDialog(filters, "Untitled.json");
 		if (path) {
 			gRackWidget->savePatch(path);
 		}
@@ -27,7 +23,7 @@ struct SaveItem : MenuItem {
 
 struct OpenItem : MenuItem {
 	void onAction() {
-		const char *path = noc_file_dialog_open(NOC_FILE_DIALOG_OPEN, filters, NULL, NULL);
+		const char *path = guiOpenDialog(filters, NULL);
 		if (path) {
 			gRackWidget->loadPatch(path);
 		}
@@ -58,7 +54,7 @@ struct FileChoice : ChoiceButton {
 			menu->pushChild(saveAsItem);
 		}
 		overlay->addChild(menu);
-		gScene->addChild(overlay);
+		gScene->setOverlay(overlay);
 	}
 };
 
@@ -77,6 +73,12 @@ struct SampleRateChoice : ChoiceButton {
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
+		{
+			MenuLabel *item = new MenuLabel();
+			item->text = "(sample rate switching not yet implemented)";
+			menu->pushChild(item);
+		}
+
 		float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (int i = 0; i < 6; i++) {
 			SampleRateItem *item = new SampleRateItem();
@@ -88,20 +90,20 @@ struct SampleRateChoice : ChoiceButton {
 		}
 
 		overlay->addChild(menu);
-		gScene->addChild(overlay);
+		gScene->setOverlay(overlay);
 	}
 };
 
 
 Toolbar::Toolbar() {
 	float margin = 5;
-	box.size = Vec(1020, BND_WIDGET_HEIGHT + 2*margin);
+	box.size.y = BND_WIDGET_HEIGHT + 2*margin;
 
 	float xPos = margin;
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(xPos, margin);
-		label->text = "Rack v0.0.0 alpha";
+		label->text = gApplicationName + " " + gApplicationVersion;
 		addChild(label);
 		xPos += 150;
 	}
@@ -132,12 +134,26 @@ Toolbar::Toolbar() {
 		wireOpacitySlider = new Slider();
 		wireOpacitySlider->box.pos = Vec(xPos, margin);
 		wireOpacitySlider->box.size.x = 150;
-		wireOpacitySlider->label = "Wire opacity";
+		wireOpacitySlider->label = "Cable opacity";
+		wireOpacitySlider->precision = 0;
 		wireOpacitySlider->unit = "%";
 		wireOpacitySlider->setLimits(0.0, 100.0);
-		wireOpacitySlider->setDefaultValue(100.0);
+		wireOpacitySlider->setDefaultValue(50.0);
 		addChild(wireOpacitySlider);
 		xPos += wireOpacitySlider->box.size.x;
+	}
+
+	xPos += margin;
+	{
+		wireTensionSlider = new Slider();
+		wireTensionSlider->box.pos = Vec(xPos, margin);
+		wireTensionSlider->box.size.x = 150;
+		wireTensionSlider->label = "Cable tension";
+		// wireTensionSlider->unit = "";
+		wireTensionSlider->setLimits(0.0, 1.0);
+		wireTensionSlider->setDefaultValue(0.5);
+		addChild(wireTensionSlider);
+		xPos += wireTensionSlider->box.size.x;
 	}
 }
 

@@ -11,9 +11,7 @@ Slider::Slider() {
 
 void Slider::draw(NVGcontext *vg) {
 	float progress = mapf(value, minValue, maxValue, 0.0, 1.0);
-	char quantity[100];
-	snprintf(quantity, 100, "%.3g%s", value, unit.c_str());
-	bndSlider(vg, box.pos.x, box.pos.y, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, label.c_str(), quantity);
+	bndSlider(vg, box.pos.x, box.pos.y, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, getText().c_str(), NULL);
 }
 
 void Slider::onDragStart() {

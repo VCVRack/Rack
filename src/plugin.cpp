@@ -15,6 +15,7 @@ namespace rack {
 
 std::list<Plugin*> gPlugins;
 
+static
 int loadPlugin(const char *path) {
 	// Load dynamic/shared library
 	#if defined(WINDOWS)
@@ -24,8 +25,8 @@ int loadPlugin(const char *path) {
 		return -1;
 	}
 	#elif defined(LINUX) || defined(APPLE)
-		char ppath[512];
-		snprintf(ppath, 512, "./%s", path);
+		char ppath[1024];
+		snprintf(ppath, sizeof(ppath), "./%s", path);
 		void *handle = dlopen(ppath, RTLD_NOW | RTLD_GLOBAL);
 	if (!handle) {
 		fprintf(stderr, "Failed to load library %s: %s\n", path, dlerror());
@@ -61,24 +62,24 @@ void pluginInit() {
 	// Load core
 	Plugin *corePlugin = coreInit();
 	gPlugins.push_back(corePlugin);
-
 	// Search for plugin libraries
 	#if defined(WINDOWS)
-		// TODO
-		// WIN32_FIND_DATA ffd;
-		// HANDLE hFind = FindFirstFile("plugins/*/plugin.dll", &ffd);
-		// if (hFind != INVALID_HANDLE_VALUE) {
-		// 	do {
-		// 		loadPlugin(ffd.cFileName);
-		// 	} while (FindNextFile(hFind, &ffd));
-		// }
-		// FindClose(hFind);
-		loadPlugin("plugins/Simple/plugin.dll");
-		loadPlugin("plugins/AudibleInstruments/plugin.dll");
+		WIN32_FIND_DATA ffd;
+		HANDLE hFind = FindFirstFile("plugins/*", &ffd);
+		if (hFind != INVALID_HANDLE_VALUE) {
+			do {
+				char pluginFilename[MAX_PATH];
+				snprintf(pluginFilename, sizeof(pluginFilename), "plugins/%s/plugin.dll", ffd.cFileName);
+				loadPlugin(pluginFilename);
+			} while (FindNextFile(hFind, &ffd));
+		}
+		FindClose(hFind);
 
 	#elif defined(LINUX) || defined(APPLE)
 		#if defined(LINUX)
 			const char *globPath = "plugins/*/plugin.so";
+		#elif defined(WINDOWS)
+			const char *globPath = "plugins/*/plugin.dll";
 		#elif defined(APPLE)
 			const char *globPath = "plugins/*/plugin.dylib";
 		#endif

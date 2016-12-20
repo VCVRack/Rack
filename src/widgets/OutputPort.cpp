@@ -4,7 +4,7 @@
 namespace rack {
 
 void OutputPort::draw(NVGcontext *vg) {
-	Port::draw(vg);
+	SpriteWidget::draw(vg);
 	if (gRackWidget->activeWire && gRackWidget->activeWire->outputPort) {
 		Port::drawGlow(vg);
 	}

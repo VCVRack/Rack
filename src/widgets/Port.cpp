@@ -5,7 +5,12 @@ namespace rack {
 
 Port::Port() {
 	box.size = Vec(20, 20);
-	type = randomi64() % 5;
+	spriteOffset = Vec(-18, -18);
+	spriteSize = Vec(56, 56);
+	spriteFilename = "res/port.png";
+	
+	std::uniform_int_distribution<> dist(0, 4);
+	index = dist(rng);
 }
 
 Port::~Port() {
@@ -20,19 +25,6 @@ void Port::disconnect() {
 	}
 }
 
-void Port::draw(NVGcontext *vg) {
-	Vec pos = box.pos.plus(Vec(-18, -18));
-	int width, height;
-	int imageId = loadImage("res/port.png");
-	nvgImageSize(vg, imageId, &width, &height);
-	float offsetY = type * width;
-	NVGpaint paint = nvgImagePattern(vg, pos.x, pos.y - offsetY, width, height, 0.0, imageId, 1.0);
-	nvgFillPaint(vg, paint);
-	nvgBeginPath(vg);
-	nvgRect(vg, pos.x, pos.y, width, width);
-	nvgFill(vg);
-}
-
 void Port::drawGlow(NVGcontext *vg) {
 	Vec c = box.getCenter();
 	NVGcolor icol = nvgRGBAf(1, 1, 1, 0.5);
@@ -45,7 +37,7 @@ void Port::drawGlow(NVGcontext *vg) {
 }
 
 void Port::onMouseDown(int button) {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+	if (button == 1) {
 		disconnect();
 	}
 }

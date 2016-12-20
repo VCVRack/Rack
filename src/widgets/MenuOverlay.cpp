@@ -3,12 +3,18 @@
 
 namespace rack {
 
-void MenuOverlay::onMouseDown(int button) {
-	if (parent) {
-		parent->removeChild(this);
+void MenuOverlay::step() {
+	// Try to fit all children into the overlay's box
+	for (Widget *child : children) {
+		child->box = child->box.clamp(box);
 	}
-	// Commit sudoku
-	delete this;
+}
+
+void MenuOverlay::onDragDrop(Widget *origin) {
+	if (origin == this) {
+		// deletes `this`
+		gScene->setOverlay(NULL);
+	}
 }
 
 

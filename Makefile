@@ -1,6 +1,6 @@
 ARCH ?= linux
 CFLAGS = -MMD -g -Wall -O2
-CXXFLAGS = -MMD -g -Wall -std=c++11 -O2 -ffast-math \
+CXXFLAGS = -MMD -g -Wall -std=c++11 -O2 -ffast-math -fno-exceptions \
 	-I./lib -I./include
 LDFLAGS =
 
@@ -15,7 +15,7 @@ CXX = g++
 SOURCES += lib/noc/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_GTK $(shell pkg-config --cflags gtk+-2.0)
 CXXFLAGS += -DLINUX
-LDFLAGS += -lpthread -lGL -lGLEW -lglfw -ldl -lprofiler -ljansson -lportaudio -lportmidi \
+LDFLAGS += -lpthread -lGL -lGLEW -lglfw -ldl -ljansson -lportaudio -lportmidi \
 	$(shell pkg-config --libs gtk+-2.0)
 TARGET = Rack
 endif

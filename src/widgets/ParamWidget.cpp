@@ -13,13 +13,15 @@ void ParamWidget::fromJson(json_t *root) {
 }
 
 void ParamWidget::onMouseDown(int button) {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+	if (button == 1) {
 		setValue(defaultValue);
 	}
 }
 
 void ParamWidget::onChange() {
-	assert(module);
+	if (!module)
+		return;
+
 	// moduleWidget->module->params[paramId] = value;
 	rackSetParamSmooth(module, paramId, value);
 }

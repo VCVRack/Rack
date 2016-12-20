@@ -1,6 +1,9 @@
 #include <unistd.h>
 #include "Rack.hpp"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 // #define NANOVG_GLEW
 #define NANOVG_IMPLEMENTATION
 #include "../lib/nanovg/src/nanovg.h"
@@ -8,6 +11,10 @@
 #include "../lib/nanovg/src/nanovg_gl.h"
 #define BLENDISH_IMPLEMENTATION
 #include "../lib/oui/blendish.h"
+
+extern "C" {
+	#include "../lib/noc/noc_file_dialog.h"
+}
 
 
 namespace rack {
@@ -18,44 +25,45 @@ RackWidget *gRackWidget = NULL;
 Vec gMousePos;
 Widget *gHoveredWidget = NULL;
 Widget *gDraggedWidget = NULL;
+Widget *gSelectedWidget = NULL;
 
-static GLFWwindow *window;
+static GLFWwindow *window = NULL;
 static NVGcontext *vg = NULL;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
 	gScene->box.size = Vec(width, height);
-	gScene->onResize();
 }
 
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
-	if (gHoveredWidget) {
-		// onMouseDown and onMouseUp
-		if (action == GLFW_PRESS) {
-			gHoveredWidget->onMouseDown(button);
-		}
-		else if (action == GLFW_RELEASE) {
-			gHoveredWidget->onMouseUp(button);
-		}
-	}
+	if (action == GLFW_PRESS) {
+		// onMouseDown
+		Widget *w = gScene->onMouseDown(gMousePos, button);
+		gSelectedWidget = w;
 
-	// onDragStart, onDragEnd, and onDragDrop
-	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (action == GLFW_PRESS) {
-			if (gHoveredWidget) {
-				gDraggedWidget = gHoveredWidget;
+		if (button == GLFW_MOUSE_BUTTON_LEFT) {
+			gDraggedWidget = w;
+			if (gDraggedWidget) {
+				// onDragStart
 				gDraggedWidget->onDragStart();
 			}
 		}
-		else if (action == GLFW_RELEASE) {
+	}
+	else if (action == GLFW_RELEASE) {
+		// onMouseUp
+		Widget *w = gScene->onMouseUp(gMousePos, button);
+
+		if (button == GLFW_MOUSE_BUTTON_LEFT) {
 			if (gDraggedWidget) {
-				Widget *dropped = gScene->pick(gMousePos);
-				if (dropped) {
-					dropped->onDragDrop(gDraggedWidget);
-				}
-				gDraggedWidget->onDragEnd();
-				gDraggedWidget = NULL;
+				// onDragDrop
+				w->onDragDrop(gDraggedWidget);
 			}
+			// gDraggedWidget might have been set to null in the last event, recheck here
+			if (gDraggedWidget) {
+				// onDragEnd
+				gDraggedWidget->onDragEnd();
+			}
+			gDraggedWidget = NULL;
 		}
 	}
 }
@@ -70,40 +78,33 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	}
 
 	// onScroll
-	int middleButton = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
-	if (middleButton == GLFW_PRESS) {
-		gScene->scrollWidget->onScroll(mouseRel.neg());
-	}
-
-	Widget *hovered = gScene->pick(mousePos);
+	// int middleButton = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
+	// if (middleButton == GLFW_PRESS) {
+	// 	gScene->scrollWidget->onScroll(mouseRel.neg());
+	// }
 
 	if (gDraggedWidget) {
 		// onDragMove
 		// Drag slower if Ctrl is held
-		bool fine = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
-		float factor = fine ? 0.1 : 1.0;
+		bool fine = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+		float factor = fine ? 1.0/8.0 : 1.0;
 		gDraggedWidget->onDragMove(mouseRel.mult(factor));
-		// onDragHover
-		if (hovered) {
-			hovered->onDragHover(gDraggedWidget);
-		}
 	}
 	else {
-		// onMouseEnter and onMouseLeave
+		// onMouseMove
+		Widget *hovered = gScene->onMouseMove(gMousePos, mouseRel);
+
 		if (hovered != gHoveredWidget) {
 			if (gHoveredWidget) {
+				// onMouseLeave
 				gHoveredWidget->onMouseLeave();
 			}
 			if (hovered) {
+			// onMouseEnter
 				hovered->onMouseEnter();
 			}
 		}
 		gHoveredWidget = hovered;
-
-		// onMouseMove
-		if (hovered) {
-			hovered->onMouseMove(mouseRel);
-		}
 	}
 }
 
@@ -119,7 +120,7 @@ void cursorEnterCallback(GLFWwindow* window, int entered) {
 void scrollCallback(GLFWwindow *window, double x, double y) {
 	Vec scrollRel = Vec(x, y);
 	// onScroll
-	gScene->scrollWidget->onScroll(scrollRel.mult(-95));
+	gScene->onScroll(gMousePos, scrollRel.mult(-95));
 }
 
 void charCallback(GLFWwindow *window, unsigned int value) {
@@ -151,7 +152,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void renderGui() {
 	int width, height;
-	// The docs say to use the framebuffer size to get pixel-perfect matching for high-DPI displays, but I actually don't want this. A "screen" pixel
+	// The docs say to use the framebuffer size to get pixel-perfect matching for high-DPI displays, but I actually don't want this. On 2x displays, one gui pixel should be 2x2 monitor pixels.
 	// glfwGetFramebufferSize(window, &width, &height);
 	glfwGetWindowSize(window, &width, &height);
 
@@ -176,9 +177,11 @@ void guiInit() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	window = glfwCreateWindow(1020, 700, "Rack", NULL, NULL);
+	window = glfwCreateWindow(1020, 700, gApplicationName.c_str(), NULL, NULL);
 	assert(window);
 	glfwMakeContextCurrent(window);
+
+	glfwSwapInterval(1);
 
 	glfwSetWindowSizeCallback(window, windowSizeCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
@@ -203,7 +206,7 @@ void guiInit() {
 
 	// Set up Blendish
 	bndSetFont(loadFont("res/DejaVuSans.ttf"));
-	// bndSetIconImage(loadImage("res/blender_icons16.png"));
+	// bndSetIconImage(loadImage("res/icons.png"));
 
 	gScene = new Scene();
 }
@@ -248,6 +251,16 @@ void guiCursorLock() {
 void guiCursorUnlock() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
+
+const char *guiSaveDialog(const char *filters, const char *filename) {
+	return noc_file_dialog_open(NOC_FILE_DIALOG_SAVE, filters, NULL, filename);
+}
+
+const char *guiOpenDialog(const char *filters, const char *filename) {
+	return noc_file_dialog_open(NOC_FILE_DIALOG_OPEN, filters, NULL, filename);
+}
+
+
 
 
 

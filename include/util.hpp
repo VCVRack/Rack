@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include <random>
 
 
 namespace rack {
@@ -10,8 +11,15 @@ namespace rack {
 // Math
 ////////////////////
 
+/** Limits a value between a minimum and maximum
+If min > max for some reason, returns min;
+*/
 inline float clampf(float x, float min, float max) {
-	return fmaxf(min, fminf(max, x));
+	if (x > max)
+		x = max;
+	if (x < min)
+		x = min;
+	return x;
 }
 
 inline float mapf(float x, float xMin, float xMax, float yMin, float yMax) {
@@ -30,6 +38,17 @@ inline int maxi(int a, int b) {
 	return a > b ? a : b;
 }
 
+inline float quadraticBipolar(float x) {
+	float x2 = x*x;
+	return x >= 0.0 ? x2 : -x2;
+}
+
+inline float quarticBipolar(float x) {
+	float x2 = x*x;
+	float x4 = x2*x2;
+	return x >= 0.0 ? x4 : -x4;
+}
+
 // Euclidean modulus, always returns 0 <= mod < base for positive base
 // Assumes this architecture's division is non-Euclidean
 inline int eucMod(int a, int base) {
@@ -46,7 +65,9 @@ inline void setf(float *p, float v) {
 		*p = v;
 }
 
-// Linearly interpolate an array `p` with index `x`
+/** Linearly interpolate an array `p` with index `x`
+Assumes that the array at `p` is of length at least ceil(x)+1.
+*/
 inline float interpf(float *p, float x) {
 	int i = x;
 	x -= i;
@@ -57,12 +78,7 @@ inline float interpf(float *p, float x) {
 // RNG
 ////////////////////
 
-uint64_t randomi64(void);
-
-// Return a uniform random number on [0.0, 1.0)
-inline float randomf(void) {
-	return (float)randomi64() / UINT64_MAX;
-}
+extern std::mt19937 rng;
 
 ////////////////////
 // 2D float vector
@@ -114,10 +130,12 @@ struct Rect {
 	Rect() {}
 	Rect(Vec pos, Vec size) : pos(pos), size(size) {}
 
+	/** Returns whether this Rect contains another Rect, inclusive on the top/left, non-inclusive on the bottom/right */
 	bool contains(Vec v) {
 		return pos.x <= v.x && v.x < pos.x + size.x
 			&& pos.y <= v.y && v.y < pos.y + size.y;
 	}
+	/** Returns whether this Rect overlaps with another Rect */
 	bool intersects(Rect r) {
 		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
 			&& (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
@@ -133,6 +151,14 @@ struct Rect {
 	}
 	Vec getBottomRight() {
 		return pos.plus(size);
+	}
+	/** Clamps the position to fix inside a bounding box */
+	Rect clamp(Rect bound) {
+		Rect r;
+		r.size = size;
+		r.pos.x = clampf(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
+		r.pos.y = clampf(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
+		return r;
 	}
 };
 

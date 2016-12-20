@@ -4,7 +4,7 @@
 namespace rack {
 
 void InputPort::draw(NVGcontext *vg) {
-	Port::draw(vg);
+	SpriteWidget::draw(vg);
 	if (gRackWidget->activeWire && gRackWidget->activeWire->inputPort) {
 		Port::drawGlow(vg);
 	}
@@ -27,6 +27,7 @@ void InputPort::onDragStart() {
 }
 
 void InputPort::onDragDrop(Widget *origin) {
+	printf("%p\n", origin);
 	if (connectedWire) return;
 	if (gRackWidget->activeWire) {
 		if (gRackWidget->activeWire->inputPort) return;

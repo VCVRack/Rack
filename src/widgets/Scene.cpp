@@ -17,10 +17,27 @@ Scene::Scene() {
 	scrollWidget->box.pos.y = toolbar->box.size.y;
 }
 
-void Scene::onResize() {
+void Scene::setOverlay(Widget *w) {
+	if (overlay) {
+		removeChild(overlay);
+		delete overlay;
+		overlay = NULL;
+	}
+	if (w) {
+		addChild(w);
+		overlay = w;
+		overlay->box.pos = Vec();
+	}
+}
+
+void Scene::step() {
 	toolbar->box.size.x = box.size.x;
 	scrollWidget->box.size = box.size.minus(scrollWidget->box.pos);
-	scrollWidget->onResize();
+	if (overlay) {
+		overlay->box.size = box.size;
+	}
+
+	Widget::step();
 }
 
 

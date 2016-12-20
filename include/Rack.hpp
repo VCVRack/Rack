@@ -9,6 +9,9 @@
 
 namespace rack {
 
+extern std::string gApplicationName;
+extern std::string gApplicationVersion;
+
 extern Scene *gScene;
 extern RackWidget *gRackWidget;
 
@@ -53,12 +56,15 @@ void pluginDestroy();
 extern Vec gMousePos;
 extern Widget *gHoveredWidget;
 extern Widget *gDraggedWidget;
+extern Widget *gSelectedWidget;
 
 void guiInit();
 void guiDestroy();
 void guiRun();
 void guiCursorLock();
 void guiCursorUnlock();
+const char *guiSaveDialog(const char *filters, const char *filename);
+const char *guiOpenDialog(const char *filters, const char *filename);
 
 int loadFont(std::string filename);
 int loadImage(std::string filename);

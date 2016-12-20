@@ -145,7 +145,7 @@ struct DeleteModuleMenuItem : MenuItem {
 };
 
 void ModuleWidget::onMouseDown(int button) {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+	if (button == 1) {
 		MenuOverlay *overlay = new MenuOverlay();
 		Menu *menu = new Menu();
 		menu->box.pos = gMousePos;
@@ -155,12 +155,12 @@ void ModuleWidget::onMouseDown(int button) {
 			menu->pushChild(menuLabel);
 
 			ResetParamsMenuItem *resetItem = new ResetParamsMenuItem();
-			resetItem->text = "Initialize parameters";
+			resetItem->text = "Reset parameters";
 			resetItem->moduleWidget = this;
 			menu->pushChild(resetItem);
 
 			DisconnectPortsMenuItem *disconnectItem = new DisconnectPortsMenuItem();
-			disconnectItem->text = "Disconnect wires";
+			disconnectItem->text = "Disconnect cables";
 			disconnectItem->moduleWidget = this;
 			menu->pushChild(disconnectItem);
 
@@ -175,7 +175,7 @@ void ModuleWidget::onMouseDown(int button) {
 			menu->pushChild(deleteItem);
 		}
 		overlay->addChild(menu);
-		gScene->addChild(overlay);
+		gScene->setOverlay(overlay);
 	}
 }
 

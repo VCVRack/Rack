@@ -12,6 +12,8 @@ Widget::~Widget() {
 		gHoveredWidget = NULL;
 	if (gDraggedWidget == this)
 		gDraggedWidget = NULL;
+	if (gSelectedWidget == this)
+		gSelectedWidget = NULL;
 	clearChildren();
 }
 
@@ -77,18 +79,52 @@ void Widget::draw(NVGcontext *vg) {
 	nvgRestore(vg);
 }
 
-Widget *Widget::pick(Vec pos) {
-	if (!box.contains(pos))
-		return NULL;
-	pos = pos.minus(box.pos);
+Widget *Widget::onMouseDown(Vec pos, int button) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;
-		Widget *picked = child->pick(pos);
-		if (picked)
-			return picked;
+		if (child->box.contains(pos)) {
+			Widget *w = child->onMouseDown(pos.minus(child->box.pos), button);
+			if (w)
+				return w;
+		}
 	}
-	return this;
+	return NULL;
 }
 
+Widget *Widget::onMouseUp(Vec pos, int button) {
+	for (auto it = children.rbegin(); it != children.rend(); it++) {
+		Widget *child = *it;
+		if (child->box.contains(pos)) {
+			Widget *w = child->onMouseUp(pos.minus(child->box.pos), button);
+			if (w)
+				return w;
+		}
+	}
+	return NULL;
+}
+
+Widget *Widget::onMouseMove(Vec pos, Vec mouseRel) {
+	for (auto it = children.rbegin(); it != children.rend(); it++) {
+		Widget *child = *it;
+		if (child->box.contains(pos)) {
+			Widget *w = child->onMouseMove(pos.minus(child->box.pos), mouseRel);
+			if (w)
+				return w;
+		}
+	}
+	return NULL;
+}
+
+Widget *Widget::onScroll(Vec pos, Vec scrollRel) {
+	for (auto it = children.rbegin(); it != children.rend(); it++) {
+		Widget *child = *it;
+		if (child->box.contains(pos)) {
+			Widget *w = child->onScroll(pos.minus(child->box.pos), scrollRel);
+			if (w)
+				return w;
+		}
+	}
+	return NULL;
+}
 
 } // namespace rack

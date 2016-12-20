@@ -9,6 +9,8 @@ void Tooltip::step() {
 
 	// Wrap size to contents
 	// box.size = getChildrenBoundingBox().getBottomRight();
+
+	Widget::step();
 }
 
 

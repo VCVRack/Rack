@@ -169,7 +169,7 @@ struct AudioChoice : ChoiceButton {
 			menu->pushChild(audioItem);
 		}
 		overlay->addChild(menu);
-		gScene->addChild(overlay);
+		gScene->setOverlay(overlay);
 	}
 };
 
