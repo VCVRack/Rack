@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
-#include <vector>
 #include <list>
 #include <map>
 

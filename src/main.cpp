@@ -33,9 +33,9 @@ int main() {
 #endif
 
 
-	pluginInit();
 	rackInit();
 	guiInit();
+	pluginInit();
 	gRackWidget->loadPatch("autosave.json");
 
 	rackStart();

@@ -152,9 +152,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void renderGui() {
 	int width, height;
-	// The docs say to use the framebuffer size to get pixel-perfect matching for high-DPI displays, but I actually don't want this. On 2x displays, one gui pixel should be 2x2 monitor pixels.
-	// glfwGetFramebufferSize(window, &width, &height);
-	glfwGetWindowSize(window, &width, &height);
+	glfwGetFramebufferSize(window, &width, &height);
+	// glfwGetWindowSize(window, &width, &height);
 
 	// Update and render
 	glViewport(0, 0, width, height);
