@@ -203,10 +203,12 @@ struct MidiChoice : ChoiceButton {
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 
 		int portCount = midiInterface->getPortCount();
-		if (portCount == 0) {
-			MenuLabel *label = new MenuLabel();
-			label->text = "No MIDI devices";
-			menu->pushChild(label);
+		{
+			MidiItem *midiItem = new MidiItem();
+			midiItem->midiInterface = midiInterface;
+			midiItem->portId = -1;
+			midiItem->text = "No device";
+			menu->pushChild(midiItem);
 		}
 		for (int portId = 0; portId < portCount; portId++) {
 			MidiItem *midiItem = new MidiItem();
@@ -238,7 +240,7 @@ MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
 	{
 		MidiChoice *midiChoice = new MidiChoice();
 		midiChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
-		midiChoice->text = "MIDI Interface";
+		midiChoice->text = "MIDI device";
 		midiChoice->box.pos = Vec(margin, yPos);
 		midiChoice->box.size.x = box.size.x - 10;
 		addChild(midiChoice);

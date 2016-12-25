@@ -199,17 +199,18 @@ struct AudioChoice : ChoiceButton {
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 
 		int deviceCount = audioInterface->getDeviceCount();
-		if (deviceCount == 0) {
-			MenuLabel *label = new MenuLabel();
-			label->text = "No audio devices";
-			menu->pushChild(label);
+		{
+			AudioItem *audioItem = new AudioItem();
+			audioItem->audioInterface = audioInterface;
+			audioItem->deviceId = -1;
+			audioItem->text = "No device";
+			menu->pushChild(audioItem);
 		}
 		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
 			AudioItem *audioItem = new AudioItem();
 			audioItem->audioInterface = audioInterface;
 			audioItem->deviceId = deviceId;
-			std::string text = audioInterface->getDeviceName(deviceId);
-			audioItem->text = text;
+			audioItem->text = audioInterface->getDeviceName(deviceId);
 			menu->pushChild(audioItem);
 		}
 		overlay->addChild(menu);
@@ -235,7 +236,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()
 	{
 		AudioChoice *audioChoice = new AudioChoice();
 		audioChoice->audioInterface = dynamic_cast<AudioInterface*>(module);
-		audioChoice->text = "Audio Interface";
+		audioChoice->text = "Audio device";
 		audioChoice->box.pos = Vec(margin, yPos);
 		audioChoice->box.size.x = box.size.x - 10;
 		addChild(audioChoice);
