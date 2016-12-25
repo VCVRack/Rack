@@ -3,11 +3,6 @@
 
 namespace rack {
 
-ScrollBar::ScrollBar() {
-	box.size.x = BND_SCROLLBAR_WIDTH;
-	box.size.y = BND_SCROLLBAR_HEIGHT;
-}
-
 void ScrollBar::draw(NVGcontext *vg) {
 	float boxSize = (orientation == VERTICAL ? box.size.y : box.size.x);
 	float maxOffset = containerSize - boxSize;

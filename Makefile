@@ -29,6 +29,9 @@ CFLAGS += -DNOC_FILE_DIALOG_OSX
 CXXFLAGS += -DAPPLE -stdlib=libc++ -I$(HOME)/local/include
 LDFLAGS += -stdlib=libc++ -L$(HOME)/local/lib -lpthread -lglew -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -ldl -ljansson -lportaudio -lportmidi
 TARGET = Rack
+
+Rack.app: $(TARGET)
+	./bundle.sh
 endif
 
 # Windows

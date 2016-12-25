@@ -162,6 +162,9 @@ struct QuantityWidget : virtual Widget {
 
 struct Label : Widget {
 	std::string text;
+	Label() {
+		box.size.y = BND_WIDGET_HEIGHT;
+	}
 	void draw(NVGcontext *vg);
 };
 
@@ -209,7 +212,9 @@ struct Button : OpaqueWidget {
 	std::string text;
 	BNDwidgetState state = BND_DEFAULT;
 
-	Button();
+	Button() {
+		box.size.y = BND_WIDGET_HEIGHT;
+	}
 	void draw(NVGcontext *vg);
 	void onMouseEnter();
 	void onMouseLeave() ;
@@ -223,7 +228,9 @@ struct ChoiceButton : Button {
 struct Slider : OpaqueWidget, QuantityWidget {
 	BNDwidgetState state = BND_DEFAULT;
 
-	Slider();
+	Slider() {
+		box.size.y = BND_WIDGET_HEIGHT;
+	}
 	void draw(NVGcontext *vg);
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
@@ -236,7 +243,9 @@ struct ScrollBar : OpaqueWidget {
 	float containerSize = 0.0;
 	BNDwidgetState state = BND_DEFAULT;
 
-	ScrollBar();
+	ScrollBar() {
+		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
+	}
 	void draw(NVGcontext *vg);
 	void move(float delta);
 	void onDragStart();

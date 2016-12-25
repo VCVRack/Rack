@@ -7,7 +7,14 @@
 
 using namespace rack;
 
-static bool midiInitialized = false;
+
+void midiInit() {
+	PmError err = Pm_Initialize();
+	if (err) {
+		printf("Failed to initialize PortMidi: %s\n", Pm_GetErrorText(err));
+		return;
+	}
+}
 
 
 struct MidiInterface : Module {
@@ -49,16 +56,6 @@ MidiInterface::MidiInterface() {
 	params.resize(NUM_PARAMS);
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
-
-	// Lazy initialize PortMidi
-	if (!midiInitialized) {
-		PmError err = Pm_Initialize();
-		if (err) {
-			printf("Failed to initialize PortMidi: %s\n", Pm_GetErrorText(err));
-			return;
-		}
-		midiInitialized = true;
-	}
 }
 
 MidiInterface::~MidiInterface() {
@@ -93,7 +90,11 @@ int MidiInterface::getPortCount() {
 
 std::string MidiInterface::getPortName(int portId) {
 	const PmDeviceInfo *info = Pm_GetDeviceInfo(portId);
-	return info ? std::string(info->name) : "";
+	if (!info)
+		return "";
+	char name[1024];
+	snprintf(name, sizeof(name), "%s: %s (%s)", info->interf, info->name, info->input ? "input" : "output");
+	return name;
 }
 
 void MidiInterface::openPort(int portId) {
@@ -223,16 +224,44 @@ struct MidiChoice : ChoiceButton {
 MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
 	box.size = Vec(15*8, 380);
 
-	addOutput(createOutput(Vec(15, 100), module, MidiInterface::GATE_OUTPUT));
-	addOutput(createOutput(Vec(70, 100), module, MidiInterface::PITCH_OUTPUT));
+	float margin = 5;
+	float yPos = margin;
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "MIDI Interface";
+		addChild(label);
+		yPos += label->box.size.y + margin;
+	}
 
 	{
 		MidiChoice *midiChoice = new MidiChoice();
 		midiChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
 		midiChoice->text = "MIDI Interface";
-		midiChoice->box.pos = Vec(0, 0);
-		midiChoice->box.size.x = box.size.x;
+		midiChoice->box.pos = Vec(margin, yPos);
+		midiChoice->box.size.x = box.size.x - 10;
 		addChild(midiChoice);
+		yPos += midiChoice->box.size.y + margin;
+	}
+
+	yPos += 5;
+	addOutput(createOutput(Vec(25, yPos), module, MidiInterface::PITCH_OUTPUT));
+	addOutput(createOutput(Vec(75, yPos), module, MidiInterface::GATE_OUTPUT));
+	yPos += 25 + margin;
+
+	{
+		Label *pitchLabel = new Label();
+		pitchLabel->box.pos = Vec(25-12, yPos);
+		pitchLabel->text = "Pitch";
+		addChild(pitchLabel);
+
+		Label *gateLabel = new Label();
+		gateLabel->box.pos = Vec(75-12, yPos);
+		gateLabel->text = "Gate";
+		addChild(gateLabel);
+
+		yPos += pitchLabel->box.size.y + margin;
 	}
 }
 

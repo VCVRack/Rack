@@ -3,6 +3,9 @@
 
 rack::Plugin *coreInit();
 
+void audioInit();
+void midiInit();
+
 ////////////////////
 // module widgets
 ////////////////////

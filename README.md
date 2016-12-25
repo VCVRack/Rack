@@ -1,8 +1,6 @@
 *Note: This software is in semi-public alpha. If you have stumbled upon this project, feel free to try it out and report bugs to the GitHub issue tracker. However, with more users it becomes difficult to make breaking changes, so please don't spread this to your friends and the Internet just yet, until the official announcement has been made.*
 
-	░█▀▄░█▀█░█▀▀░█░█
-	░█▀▄░█▀█░█░░░█▀▄
-	░▀░▀░▀░▀░▀▀▀░▀░▀
+# Rack
 
 Eurorack-style modular DAW
 
