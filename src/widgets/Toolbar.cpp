@@ -105,7 +105,7 @@ Toolbar::Toolbar() {
 		label->box.pos = Vec(xPos, margin);
 		label->text = gApplicationName + " " + gApplicationVersion;
 		addChild(label);
-		xPos += 150;
+		xPos += 175;
 	}
 
 	xPos += margin;

@@ -67,7 +67,9 @@ void ModuleWidget::fromJson(json_t *root) {
 	size_t paramId;
 	json_t *paramJ;
 	json_array_foreach(paramsJ, paramId, paramJ) {
-		params[paramId]->fromJson(paramJ);
+		if (0 <= paramId && paramId < params.size()) {
+			params[paramId]->fromJson(paramJ);
+		}
 	}
 }
 

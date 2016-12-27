@@ -10,7 +10,7 @@
 namespace rack {
 
 std::string gApplicationName = "Virtuoso Rack";
-std::string gApplicationVersion = "v0.0.0";
+std::string gApplicationVersion = "v0.0.0 alpha";
 
 } // namespace rack
 

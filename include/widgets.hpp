@@ -348,8 +348,9 @@ struct RackWidget : OpaqueWidget {
 };
 
 struct ModulePanel : TransparentWidget {
-	std::string imageFilename;
 	NVGcolor backgroundColor;
+	NVGcolor highlightColor;
+	std::string imageFilename;
 	void draw(NVGcontext *vg);
 };
 

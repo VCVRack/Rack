@@ -5,32 +5,34 @@ namespace rack {
 
 void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, float tension, NVGcolor color) {
 	float dist = pos1.minus(pos2).norm();
-	float slump = (1.0 - tension) * (150.0 + 1.0*dist);
-	Vec pos3 = pos1.plus(pos2).div(2).plus(Vec(0, slump));
-
-	NVGcolor colorOutline = nvgRGBf(0, 0, 0);
+	Vec slump;
+	slump.y = (1.0 - tension) * (150.0 + 1.0*dist);
+	Vec pos3 = pos1.plus(pos2).div(2).plus(slump);
 
 	nvgLineJoin(vg, NVG_ROUND);
-	nvgStrokeWidth(vg, 4);
+
 	// Shadow
-	// Vec pos4 = pos3.plus(slump.mult(0.1));
-	// NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.2);
-	// nvgBeginPath(vg);
-	// nvgMoveTo(vg, pos1.x, pos1.y);
-	// nvgQuadTo(vg, pos4.x, pos4.y, pos2.x, pos2.y);
-	// nvgStrokeColor(vg, colorShadow);
-	// nvgStroke(vg);
+	Vec pos4 = pos3.plus(slump.mult(0.08));
+	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.08);
+	nvgBeginPath(vg);
+	nvgMoveTo(vg, pos1.x, pos1.y);
+	nvgQuadTo(vg, pos4.x, pos4.y, pos2.x, pos2.y);
+	nvgStrokeColor(vg, colorShadow);
+	nvgStrokeWidth(vg, 5);
+	nvgStroke(vg);
 
 	// Wire outline
+	NVGcolor colorOutline = nvgRGBf(0, 0, 0);
 	nvgBeginPath(vg);
 	nvgMoveTo(vg, pos1.x, pos1.y);
 	nvgQuadTo(vg, pos3.x, pos3.y, pos2.x, pos2.y);
 	nvgStrokeColor(vg, colorOutline);
+	nvgStrokeWidth(vg, 4);
 	nvgStroke(vg);
 
 	// Wire solid
-	nvgStrokeWidth(vg, 2);
 	nvgStrokeColor(vg, color);
+	nvgStrokeWidth(vg, 2);
 	nvgStroke(vg);
 }
 

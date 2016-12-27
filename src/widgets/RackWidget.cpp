@@ -60,6 +60,10 @@ json_t *RackWidget::toJson() {
 	// root
 	json_t *root = json_object();
 
+	// version
+	json_t *versionJ = json_string(gApplicationVersion.c_str());
+	json_object_set_new(root, "version", versionJ);
+
 	// modules
 	json_t *modulesJ = json_array();
 	std::map<ModuleWidget*, int> moduleIds;
@@ -86,16 +90,28 @@ json_t *RackWidget::toJson() {
 		// wire
 		json_t *wire = json_object();
 		{
+			// Get the modules at each end of the wire
 			ModuleWidget *outputModuleWidget = wireWidget->outputPort->getAncestorOfType<ModuleWidget>();
 			assert(outputModuleWidget);
+			int outputModuleId = moduleIds[outputModuleWidget];
+
 			ModuleWidget *inputModuleWidget = wireWidget->inputPort->getAncestorOfType<ModuleWidget>();
 			assert(inputModuleWidget);
-			int outputModuleId = moduleIds[outputModuleWidget];
 			int inputModuleId = moduleIds[inputModuleWidget];
+
+			// Get output/input ports
+			auto outputIt = std::find(outputModuleWidget->outputs.begin(), outputModuleWidget->outputs.end(), wireWidget->outputPort);
+			assert(outputIt != outputModuleWidget->outputs.end());
+			int outputId = outputIt - outputModuleWidget->outputs.begin();
+
+			auto inputIt = std::find(inputModuleWidget->inputs.begin(), inputModuleWidget->inputs.end(), wireWidget->inputPort);
+			assert(inputIt != inputModuleWidget->inputs.end());
+			int inputId = inputIt - inputModuleWidget->inputs.begin();
+
 			json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
-			json_object_set_new(wire, "outputId", json_integer(wireWidget->outputPort->outputId));
+			json_object_set_new(wire, "outputId", json_integer(outputId));
 			json_object_set_new(wire, "inputModuleId", json_integer(inputModuleId));
-			json_object_set_new(wire, "inputId", json_integer(wireWidget->inputPort->inputId));
+			json_object_set_new(wire, "inputId", json_integer(inputId));
 		}
 		json_array_append_new(wires, wire);
 	}

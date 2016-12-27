@@ -10,9 +10,7 @@ void ModulePanel::draw(NVGcontext *vg) {
 	// Background gradient
 	Vec c = box.getTopRight();
 	float length = box.size.norm();
-	NVGcolor color1 = nvgLerpRGBA(backgroundColor, nvgRGBf(1.0, 1.0, 1.0), 0.5);
-	NVGcolor color2 = backgroundColor;
-	paint = nvgRadialGradient(vg, c.x, c.y, 0.0, length, color1, color2);
+	paint = nvgRadialGradient(vg, c.x, c.y, 0.0, length, highlightColor, backgroundColor);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
 	// Background image
