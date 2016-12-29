@@ -27,8 +27,3 @@ build/%.cc.o: %.cc
 build/%.m.o: %.m
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $<
-
-# Utilities
-
-clean:
-	rm -rf build $(TARGET)

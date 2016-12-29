@@ -54,5 +54,32 @@ endif
 
 all: $(TARGET)
 
+dist: $(TARGET)
+	# Rack
+	mkdir -p dist/Rack
+	cp LICENSE* dist/Rack/
+ifeq ($(ARCH), linux)
+	cp Rack dist/Rack/
+endif
+ifeq ($(ARCH), apple)
+	./bundle.sh
+	cp -R Rack.app dist/Rack/
+endif
+ifeq ($(ARCH), windows)
+	cp Rack.exe dist/Rack/
+	./copy_dlls.sh
+	cp *.dll dist/Rack/
+endif
+	cp -R res dist/Rack/
+	mkdir -p dist/Rack/plugins
+	# Fundamental
+	$(MAKE) -C plugins/Fundamental dist
+	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+	# zip
+	cd dist && zip -5 -r Rack.zip Rack
+
+clean:
+	rm -rfv build $(TARGET) dist
+
 
 include Makefile.inc

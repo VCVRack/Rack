@@ -27,7 +27,6 @@ void InputPort::onDragStart() {
 }
 
 void InputPort::onDragDrop(Widget *origin) {
-	printf("%p\n", origin);
 	if (connectedWire) return;
 	if (gRackWidget->activeWire) {
 		if (gRackWidget->activeWire->inputPort) return;

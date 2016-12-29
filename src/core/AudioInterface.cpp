@@ -91,20 +91,24 @@ void AudioInterface::step() {
 
 		// Input
 		// (for some reason, if you write the output stream before you read the input stream, PortAudio can segfault on Windows.)
-		err = Pa_ReadStream(stream, inputBuffer, numFrames);
-		if (err) {
-			// Ignore buffer underflows
-			if (err != paInputOverflowed) {
-				printf("Audio input buffer underflow\n");
+		if (numInputs > 0) {
+			err = Pa_ReadStream(stream, inputBuffer, numFrames);
+			if (err) {
+				// Ignore buffer underflows
+				if (err != paInputOverflowed) {
+					printf("Audio input buffer underflow\n");
+				}
 			}
 		}
 
 		// Output
-		err = Pa_WriteStream(stream, outputBuffer, numFrames);
-		if (err) {
-			// Ignore buffer underflows
-			if (err != paOutputUnderflowed) {
-				printf("Audio output buffer underflow\n");
+		if (numOutputs > 0) {
+			err = Pa_WriteStream(stream, outputBuffer, numFrames);
+			if (err) {
+				// Ignore buffer underflows
+				if (err != paOutputUnderflowed) {
+					printf("Audio output buffer underflow\n");
+				}
 			}
 		}
 	}
@@ -168,7 +172,11 @@ void AudioInterface::openDevice(int deviceId) {
 		inputParameters.suggestedLatency = info->defaultLowInputLatency;
 		inputParameters.hostApiSpecificStreamInfo = NULL;
 
-		err = Pa_OpenStream(&stream, &inputParameters, &outputParameters, SAMPLE_RATE, numFrames, paNoFlag, NULL, NULL);
+		// Don't use stream parameters if 0 input or output channels
+		PaStreamParameters *outputP = numOutputs == 0 ? NULL : &outputParameters;
+		PaStreamParameters *inputP = numInputs == 0 ? NULL : &inputParameters;
+
+		err = Pa_OpenStream(&stream, inputP, outputP, SAMPLE_RATE, numFrames, paNoFlag, NULL, NULL);
 		if (err) {
 			printf("Failed to open audio stream: %s\n", Pa_GetErrorText(err));
 			return;

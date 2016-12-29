@@ -2,7 +2,7 @@
 
 # Rack
 
-Eurorack-style modular DAW
+Open source Eurorack-style modular DAW
 
 ## Building
 

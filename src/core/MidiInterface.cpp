@@ -33,7 +33,7 @@ struct MidiInterface : Module {
 	PortMidiStream *stream = NULL;
 	std::list<int> notes;
 	bool pedal = false;
-	int note = 60; // C4, most modules should use 261.63 Hz
+	int note = 60; // C4, most modules should use 261.626 Hz
 	int pitchWheel = 64;
 	bool retrigger = false;
 	bool retriggered = false;

@@ -262,15 +262,16 @@ void RackWidget::draw(NVGcontext *vg) {
 	nvgRect(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
 	NVGpaint paint;
 	{
-		int imageId = loadImage("res/wood.jpg");
-		int imageWidth, imageHeight;
-		nvgImageSize(vg, imageId, &imageWidth, &imageHeight);
-		paint = nvgImagePattern(vg, box.pos.x, box.pos.y, imageWidth, imageHeight, 0.0, imageId, 1.0);
-		nvgFillPaint(vg, paint);
+		// int imageId = loadImage("res/background.png");
+		// int imageWidth, imageHeight;
+		// nvgImageSize(vg, imageId, &imageWidth, &imageHeight);
+		// paint = nvgImagePattern(vg, box.pos.x, box.pos.y, imageWidth, imageHeight, 0.0, imageId, 1.0);
+		// nvgFillPaint(vg, paint);
+		nvgFillColor(vg, nvgRGBf(0.25, 0.25, 0.25));
 		nvgFill(vg);
 	}
 	{
-		int imageId = loadImage("res/rackrails.png");
+		int imageId = loadImage("res/rails.png");
 		int imageWidth, imageHeight;
 		nvgImageSize(vg, imageId, &imageWidth, &imageHeight);
 		paint = nvgImagePattern(vg, box.pos.x, box.pos.y, imageWidth, imageHeight, 0.0, imageId, 1.0);
