@@ -13,6 +13,7 @@ Install dependencies
 - [jansson](http://www.digip.org/jansson/)
 - [portaudio](http://www.portaudio.com/)
 - [portmidi](http://portmedia.sourceforge.net/portmidi/)
+- [libsamplerate](http://www.mega-nerd.com/SRC/)
 - GTK+-2.0 if Linux (for file open/save dialog)
 
 Run `make ARCH=linux` or `make ARCH=windows` or `make ARCH=apple`

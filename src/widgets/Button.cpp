@@ -15,6 +15,14 @@ void Button::onMouseLeave() {
 	state = BND_DEFAULT;
 }
 
+void Button::onDragStart() {
+	state = BND_ACTIVE;
+}
+
+void Button::onDragEnd() {
+	state = BND_HOVER;
+}
+
 void Button::onDragDrop(Widget *origin) {
 	if (origin == this) {
 		onAction();

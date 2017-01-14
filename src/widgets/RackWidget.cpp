@@ -248,8 +248,7 @@ void RackWidget::step() {
 
 	// Autosave every 15 seconds
 	// (This is alpha software, expect crashes!)
-	if (++frame >= 60*15) {
-		frame = 0;
+	if (gGuiFrame % (60*15) == 0) {
 		savePatch("autosave.json");
 	}
 

@@ -8,9 +8,8 @@ Port::Port() {
 	spriteOffset = Vec(-18, -18);
 	spriteSize = Vec(56, 56);
 	spriteFilename = "res/port.png";
-	
-	std::uniform_int_distribution<> dist(0, 4);
-	index = dist(rng);
+
+	index = randomu32() % 5;
 }
 
 Port::~Port() {

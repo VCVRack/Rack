@@ -94,6 +94,7 @@ void pluginInit() {
 
 void pluginDestroy() {
 	for (Plugin *plugin : gPlugins) {
+		// TODO unload plugin with `dlclose` or `FreeLibrary`
 		delete plugin;
 	}
 	gPlugins.clear();

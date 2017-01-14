@@ -12,13 +12,20 @@ namespace rack {
 ////////////////////
 
 /** Limits a value between a minimum and maximum
-If min > max for some reason, returns min;
+If min > max for some reason, returns min
 */
 inline float clampf(float x, float min, float max) {
 	if (x > max)
 		x = max;
 	if (x < min)
 		x = min;
+	return x;
+}
+
+/** If the magnitude of x if less than eps, return 0 */
+inline float chopf(float x, float eps) {
+	if (x < eps && x > -eps)
+		return 0.0;
 	return x;
 }
 
@@ -43,10 +50,20 @@ inline float quadraticBipolar(float x) {
 	return x >= 0.0 ? x2 : -x2;
 }
 
+inline float cubic(float x) {
+	// optimal with --fast-math
+	return x*x*x;
+}
+
 inline float quarticBipolar(float x) {
 	float x2 = x*x;
 	float x4 = x2*x2;
 	return x >= 0.0 ? x4 : -x4;
+}
+
+inline float quintic(float x) {
+	// optimal with --fast-math
+	return x*x*x*x*x;
 }
 
 // Euclidean modulus, always returns 0 <= mod < base for positive base
@@ -68,17 +85,21 @@ inline void setf(float *p, float v) {
 /** Linearly interpolate an array `p` with index `x`
 Assumes that the array at `p` is of length at least ceil(x)+1.
 */
-inline float interpf(float *p, float x) {
-	int i = x;
-	x -= i;
-	return crossf(p[i], p[i+1], x);
+inline float interpf(const float *p, float x) {
+	int xi = x;
+	float xf = x - xi;
+	return crossf(p[xi], p[xi+1], xf);
 }
 
 ////////////////////
 // RNG
 ////////////////////
 
-extern std::mt19937 rng;
+uint32_t randomu32();
+/** Returns a uniform random float in the interval [0.0, 1.0) */
+float randomf();
+/** Returns a normal random number with mean 0 and std dev 1 */
+float randomNormal();
 
 ////////////////////
 // 2D float vector

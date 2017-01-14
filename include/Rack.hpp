@@ -57,6 +57,7 @@ extern Vec gMousePos;
 extern Widget *gHoveredWidget;
 extern Widget *gDraggedWidget;
 extern Widget *gSelectedWidget;
+extern int gGuiFrame;
 
 void guiInit();
 void guiDestroy();
@@ -82,10 +83,13 @@ struct Wire;
 
 struct Module {
 	std::vector<float> params;
-	// Pointers to voltage values at each port
-	// If value is NULL, the input/output is disconnected
+	/** Pointers to voltage values at each port
+	If value is NULL, the input/output is disconnected
+	*/
 	std::vector<float*> inputs;
 	std::vector<float*> outputs;
+	/** For CPU usage */
+	float cpuTime = 0.0;
 
 	virtual ~Module() {}
 

@@ -98,6 +98,15 @@ void ModuleWidget::cloneParams(ModuleWidget *source) {
 void ModuleWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 	bndBevel(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
+
+	// CPU usage text
+	if (module) {
+		char text[32];
+		snprintf(text, sizeof(text), "%.2f%%", module->cpuTime * 10);
+		nvgSave(vg);
+		bndSlider(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT, BND_CORNER_ALL, BND_DEFAULT, module->cpuTime, text, NULL);
+		nvgRestore(vg);
+	}
 }
 
 void ModuleWidget::onDragStart() {

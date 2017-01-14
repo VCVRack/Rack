@@ -79,12 +79,12 @@ struct Widget {
 
 	/** Called when a widget responds to `onMouseDown` for a left button press */
 	virtual void onDragStart() {}
+	/** Called when the left button is released and this widget is being dragged */
+	virtual void onDragEnd() {}
 	/** Called when a widget responds to `onMouseMove` and is being dragged */
 	virtual void onDragMove(Vec mouseRel) {}
 	/** Called when a widget responds to `onMouseUp` for a left button release and a widget is being dragged */
 	virtual void onDragDrop(Widget *origin) {}
-	/** Called when the left button is released and this widget is being dragged */
-	virtual void onDragEnd() {}
 
 	virtual void onAction() {}
 	virtual void onChange() {}
@@ -217,7 +217,9 @@ struct Button : OpaqueWidget {
 	}
 	void draw(NVGcontext *vg);
 	void onMouseEnter();
-	void onMouseLeave() ;
+	void onMouseLeave();
+	void onDragStart();
+	void onDragEnd();
 	void onDragDrop(Widget *origin);
 };
 
@@ -339,7 +341,6 @@ struct RackWidget : OpaqueWidget {
 	json_t *toJson();
 	void fromJson(json_t *root);
 
-	int frame = 0;
 	void repositionModule(ModuleWidget *module);
 	void step();
 	void draw(NVGcontext *vg);

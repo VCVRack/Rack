@@ -27,6 +27,8 @@ Widget *gHoveredWidget = NULL;
 Widget *gDraggedWidget = NULL;
 Widget *gSelectedWidget = NULL;
 
+int gGuiFrame;
+
 static GLFWwindow *window = NULL;
 static NVGcontext *vg = NULL;
 
@@ -225,8 +227,10 @@ void guiRun() {
 		glfwGetWindowSize(window, &width, &height);
 		windowSizeCallback(window, width, height);
 	}
+	gGuiFrame = 0;
 	double lastTime = 0.0;
 	while(!glfwWindowShouldClose(window)) {
+		gGuiFrame++;
 		glfwPollEvents();
 		{
 			double xpos, ypos;

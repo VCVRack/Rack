@@ -73,8 +73,18 @@ void rackStep() {
 		}
 	}
 	// Step all modules
+	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
 	for (Module *module : modules) {
+		// Start clock for CPU usage
+		start = std::chrono::high_resolution_clock::now();
+		// Step module by one frame
 		module->step();
+		// Stop clock and smooth step time value
+		end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> diff = end - start;
+		float elapsed = diff.count() * SAMPLE_RATE;
+		const float lambda = 1.0;
+		module->cpuTime += (elapsed - module->cpuTime) * lambda / SAMPLE_RATE;
 	}
 }
 
