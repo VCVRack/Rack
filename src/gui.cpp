@@ -6,14 +6,14 @@
 
 // #define NANOVG_GLEW
 #define NANOVG_IMPLEMENTATION
-#include "../lib/nanovg/src/nanovg.h"
+#include "../ext/nanovg/src/nanovg.h"
 #define NANOVG_GL2_IMPLEMENTATION
-#include "../lib/nanovg/src/nanovg_gl.h"
+#include "../ext/nanovg/src/nanovg_gl.h"
 #define BLENDISH_IMPLEMENTATION
-#include "../lib/oui/blendish.h"
+#include "../ext/oui/blendish.h"
 
 extern "C" {
-	#include "../lib/noc/noc_file_dialog.h"
+	#include "../ext/noc/noc_file_dialog.h"
 }
 
 

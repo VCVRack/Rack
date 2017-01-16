@@ -8,8 +8,8 @@
 
 #include <jansson.h>
 
-#include "../lib/nanovg/src/nanovg.h"
-#include "../lib/oui/blendish.h"
+#include "../ext/nanovg/src/nanovg.h"
+#include "../ext/oui/blendish.h"
 
 #include "util.hpp"
 
