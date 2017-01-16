@@ -1,5 +1,5 @@
 #include <unistd.h>
-#include "Rack.hpp"
+#include "rack.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

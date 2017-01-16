@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <random>
+#include <string>
 
 
 namespace rack {
@@ -182,6 +183,13 @@ struct Rect {
 		return r;
 	}
 };
+
+////////////////////
+// Helper functions
+////////////////////
+
+/** Converts a printf format string and optional arguments into a std::string */
+std::string stringf(const char *format, ...);
 
 
 } // namespace rack

@@ -4,16 +4,13 @@
 #include <list>
 #include <vector>
 #include <memory>
+#include <set>
+#include <thread>
+#include <mutex>
 #include "widgets.hpp"
 
 
 namespace rack {
-
-extern std::string gApplicationName;
-extern std::string gApplicationVersion;
-
-extern Scene *gScene;
-extern RackWidget *gRackWidget;
 
 ////////////////////
 // Plugin manager
@@ -75,10 +72,6 @@ void drawImage(NVGcontext *vg, Vec pos, int imageId);
 // rack.cpp
 ////////////////////
 
-// TODO Find a clean way to make this a variable
-#define SAMPLE_RATE 44100
-
-
 struct Wire;
 
 struct Module {
@@ -106,17 +99,27 @@ struct Wire {
 	float value = 0.0;
 };
 
-void rackInit();
-void rackDestroy();
-void rackStart();
-void rackStop();
-// Does not transfer ownership
-void rackAddModule(Module *module);
-void rackRemoveModule(Module *module);
-// Does not transfer ownership
-void rackConnectWire(Wire *wire);
-void rackDisconnectWire(Wire *wire);
-void rackSetParamSmooth(Module *module, int paramId, float value);
+struct Rack {
+	Rack();
+	~Rack();
+	/** Launches rack thread */
+	void start();
+	void stop();
+	void run();
+	void step();
+	/** Does not transfer pointer ownership */
+	void addModule(Module *module);
+	void removeModule(Module *module);
+	/** Does not transfer pointer ownership */
+	void addWire(Wire *wire);
+	void removeWire(Wire *wire);
+	void setParamSmooth(Module *module, int paramId, float value);
+
+	float sampleRate;
+
+	struct Impl;
+	Impl *impl;
+};
 
 ////////////////////
 // Optional helpers for plugins
@@ -186,6 +189,17 @@ Screw *createScrew(Vec pos) {
 	return screw;
 }
 
+////////////////////
+// Globals
+////////////////////
+
+extern std::string gApplicationName;
+extern std::string gApplicationVersion;
+
+extern Scene *gScene;
+extern RackWidget *gRackWidget;
+
+extern Rack *gRack;
 
 } // namespace rack
 

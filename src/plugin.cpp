@@ -7,7 +7,7 @@
 	#include <glob.h>
 #endif
 
-#include "Rack.hpp"
+#include "rack.hpp"
 #include "core/core.hpp"
 
 

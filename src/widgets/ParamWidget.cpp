@@ -1,4 +1,4 @@
-#include "Rack.hpp"
+#include "rack.hpp"
 
 
 namespace rack {
@@ -23,7 +23,7 @@ void ParamWidget::onChange() {
 		return;
 
 	// moduleWidget->module->params[paramId] = value;
-	rackSetParamSmooth(module, paramId, value);
+	gRack->setParamSmooth(module, paramId, value);
 }
 
 

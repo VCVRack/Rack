@@ -1,4 +1,6 @@
 #include "util.hpp"
+#include <stdio.h>
+#include <stdarg.h>
 
 
 namespace rack {
@@ -21,6 +23,21 @@ float randomf() {
 
 float randomNormal(){
 	return normalDist(rng);
+}
+
+std::string stringf(const char *format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	size_t size = vsnprintf(NULL, 0, format, ap);
+	if (size < 0)
+		return "";
+	size++;
+	char *buf = new char[size];
+	vsnprintf(buf, size, format, ap);
+	va_end(ap);
+	std::string s = buf;
+	delete[] buf;
+	return s;
 }
 
 

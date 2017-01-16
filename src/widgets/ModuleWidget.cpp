@@ -1,4 +1,4 @@
-#include "Rack.hpp"
+#include "rack.hpp"
 
 
 namespace rack {
@@ -6,7 +6,7 @@ namespace rack {
 ModuleWidget::ModuleWidget(Module *module) {
 	this->module = module;
 	if (module) {
-		rackAddModule(module);
+		gRack->addModule(module);
 	}
 }
 
@@ -14,7 +14,7 @@ ModuleWidget::~ModuleWidget() {
 	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
 	disconnectPorts();
 	if (module) {
-		rackRemoveModule(module);
+		gRack->removeModule(module);
 		delete module;
 	}
 }
@@ -101,10 +101,9 @@ void ModuleWidget::draw(NVGcontext *vg) {
 
 	// CPU usage text
 	if (module) {
-		char text[32];
-		snprintf(text, sizeof(text), "%.2f%%", module->cpuTime * 10);
+		std::string text = stringf("%.1f%%", module->cpuTime * 100.0);
 		nvgSave(vg);
-		bndSlider(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT, BND_CORNER_ALL, BND_DEFAULT, module->cpuTime, text, NULL);
+		bndSlider(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT, BND_CORNER_ALL, BND_DEFAULT, module->cpuTime, text.c_str(), NULL);
 		nvgRestore(vg);
 	}
 }

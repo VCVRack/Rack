@@ -37,12 +37,16 @@ struct AudioInterface : Module {
 	PaStream *stream = NULL;
 	int numOutputs;
 	int numInputs;
-	int numFrames;
+	int bufferFrame;
 	float outputBuffer[1<<14] = {};
 	float inputBuffer[1<<14] = {};
-	int bufferFrame;
 	// Used because the GUI thread and Rack thread can both interact with this class
 	std::mutex mutex;
+
+	// Set these and call openDevice()
+	int deviceId = -1;
+	float sampleRate = 44100.0;
+	int blockSize = 256;
 
 	AudioInterface();
 	~AudioInterface();
@@ -50,8 +54,8 @@ struct AudioInterface : Module {
 
 	int getDeviceCount();
 	std::string getDeviceName(int deviceId);
-	// Use -1 as the deviceId to close the current device
-	void openDevice(int deviceId);
+	void openDevice();
+	void closeDevice();
 };
 
 
@@ -59,10 +63,11 @@ AudioInterface::AudioInterface() {
 	params.resize(NUM_PARAMS);
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
+	closeDevice();
 }
 
 AudioInterface::~AudioInterface() {
-	openDevice(-1);
+	closeDevice();
 }
 
 void AudioInterface::step() {
@@ -85,14 +90,14 @@ void AudioInterface::step() {
 		setf(outputs[i], inputBuffer[numOutputs * bufferFrame + i] * 5.0);
 	}
 
-	if (++bufferFrame >= numFrames) {
+	if (++bufferFrame >= blockSize) {
 		bufferFrame = 0;
 		PaError err;
 
 		// Input
 		// (for some reason, if you write the output stream before you read the input stream, PortAudio can segfault on Windows.)
 		if (numInputs > 0) {
-			err = Pa_ReadStream(stream, inputBuffer, numFrames);
+			err = Pa_ReadStream(stream, inputBuffer, blockSize);
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paInputOverflowed) {
@@ -103,7 +108,7 @@ void AudioInterface::step() {
 
 		// Output
 		if (numOutputs > 0) {
-			err = Pa_WriteStream(stream, outputBuffer, numFrames);
+			err = Pa_WriteStream(stream, outputBuffer, blockSize);
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paOutputUnderflowed) {
@@ -123,29 +128,13 @@ std::string AudioInterface::getDeviceName(int deviceId) {
 	if (!info)
 		return "";
 	const PaHostApiInfo *apiInfo = Pa_GetHostApiInfo(info->hostApi);
-	char name[1024];
-	snprintf(name, sizeof(name), "%s: %s (%d in, %d out)", apiInfo->name, info->name, info->maxInputChannels, info->maxOutputChannels);
-	return name;
+	return stringf("%s: %s (%d in, %d out)", apiInfo->name, info->name, info->maxInputChannels, info->maxOutputChannels);
 }
 
-void AudioInterface::openDevice(int deviceId) {
+void AudioInterface::openDevice() {
+	closeDevice();
 	std::lock_guard<std::mutex> lock(mutex);
 
-	// Close existing device
-	if (stream) {
-		PaError err;
-		err = Pa_CloseStream(stream);
-		if (err) {
-			// This shouldn't happen:
-			printf("Failed to close audio stream: %s\n", Pa_GetErrorText(err));
-		}
-		stream = NULL;
-	}
-	numOutputs = 0;
-	numInputs = 0;
-
-	numFrames = 256;
-	bufferFrame = 0;
 	// Open new device
 	if (deviceId >= 0) {
 		PaError err;
@@ -173,10 +162,10 @@ void AudioInterface::openDevice(int deviceId) {
 		inputParameters.hostApiSpecificStreamInfo = NULL;
 
 		// Don't use stream parameters if 0 input or output channels
-		PaStreamParameters *outputP = numOutputs == 0 ? NULL : &outputParameters;
-		PaStreamParameters *inputP = numInputs == 0 ? NULL : &inputParameters;
-
-		err = Pa_OpenStream(&stream, inputP, outputP, SAMPLE_RATE, numFrames, paNoFlag, NULL, NULL);
+		err = Pa_OpenStream(&stream,
+			numInputs == 0 ? NULL : &outputParameters,
+			numOutputs == 0 ? NULL : &inputParameters,
+			sampleRate, blockSize, paNoFlag, NULL, NULL);
 		if (err) {
 			printf("Failed to open audio stream: %s\n", Pa_GetErrorText(err));
 			return;
@@ -190,12 +179,30 @@ void AudioInterface::openDevice(int deviceId) {
 	}
 }
 
+void AudioInterface::closeDevice() {
+	std::lock_guard<std::mutex> lock(mutex);
+
+	if (stream) {
+		PaError err;
+		err = Pa_CloseStream(stream);
+		if (err) {
+			// This shouldn't happen:
+			printf("Failed to close audio stream: %s\n", Pa_GetErrorText(err));
+		}
+		stream = NULL;
+	}
+	numOutputs = 0;
+	numInputs = 0;
+	bufferFrame = 0;
+}
+
 
 struct AudioItem : MenuItem {
 	AudioInterface *audioInterface;
 	int deviceId;
 	void onAction() {
-		audioInterface->openDevice(deviceId);
+		audioInterface->deviceId = deviceId;
+		audioInterface->openDevice();
 	}
 };
 
@@ -224,6 +231,81 @@ struct AudioChoice : ChoiceButton {
 		overlay->addChild(menu);
 		gScene->setOverlay(overlay);
 	}
+	void step() {
+		std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
+		if (name.empty())
+			text = "(no device)";
+		else
+			text = name;
+	}
+};
+
+
+struct SampleRateItem : MenuItem {
+	AudioInterface *audioInterface;
+	float sampleRate;
+	void onAction() {
+		audioInterface->sampleRate = sampleRate;
+		audioInterface->openDevice();
+	}
+};
+
+struct SampleRateChoice : ChoiceButton {
+	AudioInterface *audioInterface;
+	void onAction() {
+		MenuOverlay *overlay = new MenuOverlay();
+		Menu *menu = new Menu();
+		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+
+		const float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
+		for (int i = 0; i < 6; i++) {
+			SampleRateItem *item = new SampleRateItem();
+			item->audioInterface = audioInterface;
+			item->sampleRate = sampleRates[i];
+			item->text = stringf("%.0f", sampleRates[i]);
+			menu->pushChild(item);
+		}
+
+		overlay->addChild(menu);
+		gScene->setOverlay(overlay);
+	}
+	void step() {
+		this->text = stringf("%.0f", audioInterface->sampleRate);
+	}
+};
+
+
+struct BlockSizeItem : MenuItem {
+	AudioInterface *audioInterface;
+	int blockSize;
+	void onAction() {
+		audioInterface->blockSize = blockSize;
+		audioInterface->openDevice();
+	}
+};
+
+struct BlockSizeChoice : ChoiceButton {
+	AudioInterface *audioInterface;
+	void onAction() {
+		MenuOverlay *overlay = new MenuOverlay();
+		Menu *menu = new Menu();
+		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+
+		const int blockSizes[6] = {128, 256, 512, 1024, 2048, 4096};
+		for (int i = 0; i < 6; i++) {
+			BlockSizeItem *item = new BlockSizeItem();
+			item->audioInterface = audioInterface;
+			item->blockSize = blockSizes[i];
+			item->text = stringf("%d", blockSizes[i]);
+			menu->pushChild(item);
+		}
+
+		overlay->addChild(menu);
+		gScene->setOverlay(overlay);
+	}
+	void step() {
+		this->text = stringf("%d", audioInterface->blockSize);
+	}
 };
 
 
@@ -242,13 +324,48 @@ AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()
 	}
 
 	{
-		AudioChoice *audioChoice = new AudioChoice();
-		audioChoice->audioInterface = dynamic_cast<AudioInterface*>(module);
-		audioChoice->text = "Audio device";
-		audioChoice->box.pos = Vec(margin, yPos);
-		audioChoice->box.size.x = box.size.x - 10;
-		addChild(audioChoice);
-		yPos += audioChoice->box.size.y + 2*margin;
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "Audio device";
+		addChild(label);
+		yPos += label->box.size.y + margin;
+
+		AudioChoice *choice = new AudioChoice();
+		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
+		choice->box.pos = Vec(margin, yPos);
+		choice->box.size.x = box.size.x - 10;
+		addChild(choice);
+		yPos += choice->box.size.y + 2*margin;
+	}
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "Sample rate";
+		addChild(label);
+		yPos += label->box.size.y + margin;
+
+		SampleRateChoice *choice = new SampleRateChoice();
+		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
+		choice->box.pos = Vec(margin, yPos);
+		choice->box.size.x = box.size.x - 10;
+		addChild(choice);
+		yPos += choice->box.size.y + 2*margin;
+	}
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "Block size";
+		addChild(label);
+		yPos += label->box.size.y + margin;
+
+		BlockSizeChoice *choice = new BlockSizeChoice();
+		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
+		choice->box.pos = Vec(margin, yPos);
+		choice->box.size.x = box.size.x - 10;
+		addChild(choice);
+		yPos += choice->box.size.y + 2*margin;
 	}
 
 	{

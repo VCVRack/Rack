@@ -92,9 +92,7 @@ std::string MidiInterface::getPortName(int portId) {
 	const PmDeviceInfo *info = Pm_GetDeviceInfo(portId);
 	if (!info)
 		return "";
-	char name[1024];
-	snprintf(name, sizeof(name), "%s: %s (%s)", info->interf, info->name, info->input ? "input" : "output");
-	return name;
+	return stringf("%s: %s (%s)", info->interf, info->name, info->input ? "input" : "output");
 }
 
 void MidiInterface::openPort(int portId) {

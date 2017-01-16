@@ -1,4 +1,4 @@
-#include "Rack.hpp"
+#include "rack.hpp"
 
 
 namespace rack {
@@ -70,7 +70,7 @@ WireWidget::~WireWidget() {
 
 void WireWidget::updateWire() {
 	if (wire) {
-		rackDisconnectWire(wire);
+		gRack->removeWire(wire);
 		delete wire;
 		wire = NULL;
 	}
@@ -80,7 +80,7 @@ void WireWidget::updateWire() {
 		wire->outputId = outputPort->outputId;
 		wire->inputModule = inputPort->module;
 		wire->inputId = inputPort->inputId;
-		rackConnectWire(wire);
+		gRack->addWire(wire);
 	}
 }
 

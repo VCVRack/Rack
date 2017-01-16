@@ -4,7 +4,7 @@
 	#include <libgen.h>
 #endif
 
-#include "Rack.hpp"
+#include "rack.hpp"
 
 
 namespace rack {
@@ -12,14 +12,16 @@ namespace rack {
 std::string gApplicationName = "Virtuoso Rack";
 std::string gApplicationVersion = "v0.0.0 alpha";
 
+Rack *gRack;
+
 } // namespace rack
 
 
 using namespace rack;
 
 int main() {
-	// Set working directory
 #if defined(APPLE)
+	// macOS workaround for setting the working directory to the location of the .app
 	{
 		CFBundleRef bundle = CFBundleGetMainBundle();
 		CFURLRef bundleURL = CFBundleCopyBundleURL(bundle);
@@ -32,19 +34,18 @@ int main() {
 	}
 #endif
 
-
-	rackInit();
+	gRack = new Rack();
 	guiInit();
 	pluginInit();
 	gRackWidget->loadPatch("autosave.json");
 
-	rackStart();
+	gRack->start();
 	guiRun();
-	rackStop();
+	gRack->stop();
 
 	gRackWidget->savePatch("autosave.json");
 	guiDestroy();
-	rackDestroy();
+	delete gRack;
 	pluginDestroy();
 	return 0;
 }

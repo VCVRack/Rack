@@ -1,7 +1,9 @@
-#include "Rack.hpp"
+#include "rack.hpp"
 
 
-rack::Plugin *coreInit();
+using namespace rack;
+
+Plugin *coreInit();
 
 void audioInit();
 void midiInit();
@@ -10,12 +12,12 @@ void midiInit();
 // module widgets
 ////////////////////
 
-struct AudioInterfaceWidget : rack::ModuleWidget {
+struct AudioInterfaceWidget : ModuleWidget {
 	AudioInterfaceWidget();
 	void draw(NVGcontext *vg);
 };
 
-struct MidiInterfaceWidget : rack::ModuleWidget {
+struct MidiInterfaceWidget : ModuleWidget {
 	MidiInterfaceWidget();
 	void draw(NVGcontext *vg);
 };
