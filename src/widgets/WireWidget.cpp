@@ -87,18 +87,21 @@ void WireWidget::updateWire() {
 void WireWidget::draw(NVGcontext *vg) {
 	Vec outputPos, inputPos;
 	Vec absolutePos = getAbsolutePos();
+	float wireOpacity = gScene->toolbar->wireOpacitySlider->value / 100.0;
 
 	if (outputPort) {
 		outputPos = Rect(outputPort->getAbsolutePos(), outputPort->box.size).getCenter();
 	}
 	else {
 		outputPos = gMousePos;
+		wireOpacity = 1.0;
 	}
 	if (inputPort) {
 		inputPos = Rect(inputPort->getAbsolutePos(), inputPort->box.size).getCenter();
 	}
 	else {
 		inputPos = gMousePos;
+		wireOpacity = 1.0;
 	}
 
 	outputPos = outputPos.minus(absolutePos);
@@ -107,7 +110,6 @@ void WireWidget::draw(NVGcontext *vg) {
 	bndNodePort(vg, outputPos.x, outputPos.y, BND_DEFAULT, color);
 	bndNodePort(vg, inputPos.x, inputPos.y, BND_DEFAULT, color);
 	nvgSave(vg);
-	float wireOpacity = gScene->toolbar->wireOpacitySlider->value / 100.0;
 	if (wireOpacity > 0.0) {
 		nvgGlobalAlpha(vg, wireOpacity);
 		float tension = gScene->toolbar->wireTensionSlider->value;

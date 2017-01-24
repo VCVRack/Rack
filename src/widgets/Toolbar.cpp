@@ -62,7 +62,7 @@ struct FileChoice : ChoiceButton {
 struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction() {
-		printf("\"\"\"\"\"\"\"\"switching\"\"\"\"\"\"\"\" sample rate to %f\n", sampleRate);
+		gRack->sampleRate = sampleRate;
 	}
 };
 
@@ -73,24 +73,19 @@ struct SampleRateChoice : ChoiceButton {
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		{
-			MenuLabel *item = new MenuLabel();
-			item->text = "(sample rate switching not yet implemented)";
-			menu->pushChild(item);
-		}
-
 		float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (int i = 0; i < 6; i++) {
 			SampleRateItem *item = new SampleRateItem();
-			char text[100];
-			snprintf(text, 100, "%.0f Hz", sampleRates[i]);
-			item->text = std::string(text);
+			item->text = stringf("%.0f Hz", sampleRates[i]);
 			item->sampleRate = sampleRates[i];
 			menu->pushChild(item);
 		}
 
 		overlay->addChild(menu);
 		gScene->setOverlay(overlay);
+	}
+	void step() {
+		text = stringf("%.0f Hz", gRack->sampleRate);
 	}
 };
 

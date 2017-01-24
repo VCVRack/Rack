@@ -276,7 +276,7 @@ int loadImage(std::string filename) {
 	auto it = images.find(filename);
 	if (it == images.end()) {
 		// Load image
-		imageId = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+		imageId = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_NEAREST);
 		if (imageId == 0) {
 			printf("Failed to load image %s\n", filename.c_str());
 		}

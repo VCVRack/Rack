@@ -100,10 +100,19 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	bndBevel(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
 
 	// CPU usage text
-	if (module) {
-		std::string text = stringf("%.1f%%", module->cpuTime * 100.0);
+	if (true) {
+		float cpuTime = module ? module->cpuTime : 0.0;
+		std::string text = stringf("%.1f%%", cpuTime * 100.0);
 		nvgSave(vg);
-		bndSlider(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT, BND_CORNER_ALL, BND_DEFAULT, module->cpuTime, text.c_str(), NULL);
+
+		nvgBeginPath(vg);
+		cpuTime = clampf(cpuTime, 0.0, 1.0);
+		const float barWidth = 15.0;
+		nvgRect(vg, box.pos.x, box.pos.y + (1.0 - cpuTime) * box.size.y, barWidth, cpuTime * box.size.y);
+		nvgFillColor(vg, nvgHSLA(0.33 * cubic(1.0 - cpuTime), 1.0, 0.5, 128));
+		nvgFill(vg);
+
+		bndLabel(vg, box.pos.x, box.pos.y + box.size.y - BND_WIDGET_HEIGHT, box.size.x, BND_WIDGET_HEIGHT, -1, text.c_str());
 		nvgRestore(vg);
 	}
 }

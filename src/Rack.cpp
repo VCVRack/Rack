@@ -132,6 +132,11 @@ void Rack::step() {
 		const float lambda = 1.0;
 		module->cpuTime += (elapsed - module->cpuTime) * lambda / sampleRate;
 	}
+	// Step cables by moving their output values to inputs
+	for (Wire *wire : impl->wires) {
+		wire->inputValue = wire->outputValue;
+		wire->outputValue = 0.0;
+	}
 }
 
 void Rack::addModule(Module *module) {
@@ -166,8 +171,6 @@ void Rack::addWire(Wire *wire) {
 	assert(wire);
 	VIPLock vipLock(impl->vipMutex);
 	std::lock_guard<std::mutex> lock(impl->mutex);
-	// It would probably be good to reset the wire voltage
-	wire->value = 0.0;
 	// Check that the wire is not already added
 	assert(impl->wires.find(wire) == impl->wires.end());
 	assert(wire->outputModule);
@@ -180,8 +183,8 @@ void Rack::addWire(Wire *wire) {
 	}
 	// Connect the wire to inputModule
 	impl->wires.insert(wire);
-	wire->inputModule->inputs[wire->inputId] = &wire->value;
-	wire->outputModule->outputs[wire->outputId] = &wire->value;
+	wire->inputModule->inputs[wire->inputId] = &wire->inputValue;
+	wire->outputModule->outputs[wire->outputId] = &wire->outputValue;
 }
 
 void Rack::removeWire(Wire *wire) {

@@ -15,7 +15,8 @@ CXX = g++
 SOURCES += ext/noc/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_GTK $(shell pkg-config --cflags gtk+-2.0)
 CXXFLAGS += -DLINUX
-LDFLAGS += -rdynamic -lpthread -lGL -lGLEW -lglfw -ldl -ljansson -lportaudio -lportmidi -lsamplerate \
+LDFLAGS += -rdynamic \
+	-lpthread -lGL -lGLEW -lglfw -ldl -ljansson -lportaudio -lportmidi -lsamplerate \
 	$(shell pkg-config --libs gtk+-2.0)
 TARGET = Rack
 endif

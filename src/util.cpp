@@ -1,6 +1,7 @@
 #include "util.hpp"
 #include <stdio.h>
 #include <stdarg.h>
+#include <random>
 
 
 namespace rack {
@@ -25,6 +26,7 @@ float randomNormal(){
 	return normalDist(rng);
 }
 
+
 std::string stringf(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
@@ -32,12 +34,18 @@ std::string stringf(const char *format, ...) {
 	if (size < 0)
 		return "";
 	size++;
-	char *buf = new char[size];
-	vsnprintf(buf, size, format, ap);
+	std::string s;
+	s.resize(size);
+	vsnprintf(&s[0], size, format, ap);
 	va_end(ap);
-	std::string s = buf;
-	delete[] buf;
 	return s;
+}
+
+std::string ellipsize(std::string s, size_t len) {
+	if (s.size() <= len)
+		return s;
+	else
+		return s.substr(0, len - 3) + "...";
 }
 
 

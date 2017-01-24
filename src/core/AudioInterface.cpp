@@ -2,6 +2,7 @@
 #include <mutex>
 #include <portaudio.h>
 #include "core.hpp"
+#include "dsp.hpp"
 
 using namespace rack;
 
@@ -9,7 +10,7 @@ using namespace rack;
 void audioInit() {
 	PaError err = Pa_Initialize();
 	if (err) {
-		printf("Failed to initialize PortAudio: %s\n", Pa_GetErrorText(err));
+		fprintf(stderr, "Failed to initialize PortAudio: %s\n", Pa_GetErrorText(err));
 		return;
 	}
 }
@@ -22,31 +23,35 @@ struct AudioInterface : Module {
 	enum InputIds {
 		AUDIO1_INPUT,
 		AUDIO2_INPUT,
-		AUDIO3_INPUT,
-		AUDIO4_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
 		AUDIO1_OUTPUT,
 		AUDIO2_OUTPUT,
-		AUDIO3_OUTPUT,
-		AUDIO4_OUTPUT,
 		NUM_OUTPUTS
 	};
 
 	PaStream *stream = NULL;
-	int numOutputs;
-	int numInputs;
-	int bufferFrame;
-	float outputBuffer[1<<14] = {};
-	float inputBuffer[1<<14] = {};
-	// Used because the GUI thread and Rack thread can both interact with this class
-	std::mutex mutex;
-
-	// Set these and call openDevice()
+	// Stream properties
 	int deviceId = -1;
 	float sampleRate = 44100.0;
 	int blockSize = 256;
+	int numOutputs = 0;
+	int numInputs = 0;
+
+	// Used because the GUI thread and Rack thread can both interact with this class
+	std::mutex mutex;
+
+	SampleRateConverter<2> inSrc;
+	SampleRateConverter<2> outSrc;
+
+	struct Frame {
+		float samples[2];
+	};
+	// in device's sample rate
+	RingBuffer<Frame, (1<<15)> inBuffer;
+	// in rack's sample rate
+	RingBuffer<Frame, (1<<15)> outBuffer;
 
 	AudioInterface();
 	~AudioInterface();
@@ -54,8 +59,19 @@ struct AudioInterface : Module {
 
 	int getDeviceCount();
 	std::string getDeviceName(int deviceId);
-	void openDevice();
+
+	void openDevice(int deviceId, float sampleRate, int blockSize);
 	void closeDevice();
+
+	void setDeviceId(int deviceId) {
+		openDevice(deviceId, sampleRate, blockSize);
+	}
+	void setSampleRate(float sampleRate) {
+		openDevice(deviceId, sampleRate, blockSize);
+	}
+	void setBlockSize(int blockSize) {
+		openDevice(deviceId, sampleRate, blockSize);
+	}
 };
 
 
@@ -63,7 +79,6 @@ AudioInterface::AudioInterface() {
 	params.resize(NUM_PARAMS);
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
-	closeDevice();
 }
 
 AudioInterface::~AudioInterface() {
@@ -72,50 +87,96 @@ AudioInterface::~AudioInterface() {
 
 void AudioInterface::step() {
 	std::lock_guard<std::mutex> lock(mutex);
-
-	if (!stream) {
-		setf(inputs[AUDIO1_OUTPUT], 0.0);
-		setf(inputs[AUDIO2_OUTPUT], 0.0);
-		setf(inputs[AUDIO3_OUTPUT], 0.0);
-		setf(inputs[AUDIO4_OUTPUT], 0.0);
+	if (!stream)
 		return;
+
+	// Get input and pass it through the sample rate converter
+	if (numOutputs > 0) {
+		Frame f;
+		f.samples[0] = getf(inputs[AUDIO1_INPUT]);
+		f.samples[1] = getf(inputs[AUDIO2_INPUT]);
+
+		inSrc.setRatio(sampleRate / gRack->sampleRate);
+		int inLength = 1;
+		int outLength = 16;
+		float buf[2*outLength];
+		inSrc.process(f.samples, &inLength, buf, &outLength);
+		for (int i = 0; i < outLength; i++) {
+			if (inBuffer.full())
+				break;
+			Frame f;
+			f.samples[0] = buf[2*i + 0];
+			f.samples[1] = buf[2*i + 1];
+			inBuffer.push(f);
+		}
 	}
 
-	// Input ports -> Output buffer
-	for (int i = 0; i < numOutputs; i++) {
-		outputBuffer[numOutputs * bufferFrame + i] = getf(inputs[i]) / 5.0;
-	}
-	// Input buffer -> Output ports
-	for (int i = 0; i < numInputs; i++) {
-		setf(outputs[i], inputBuffer[numOutputs * bufferFrame + i] * 5.0);
-	}
-
-	if (++bufferFrame >= blockSize) {
-		bufferFrame = 0;
+	// Read/write stream if we have enough input
+	// TODO If numOutputs == 0, call this when outBuffer.empty()
+	bool streamReady = (numOutputs > 0) ? ((int)inBuffer.size() >= blockSize) : (outBuffer.empty());
+	if (streamReady) {
+		// printf("%d %d\n", inBuffer.size(), outBuffer.size());
 		PaError err;
 
-		// Input
+		// Read output from input stream
 		// (for some reason, if you write the output stream before you read the input stream, PortAudio can segfault on Windows.)
 		if (numInputs > 0) {
-			err = Pa_ReadStream(stream, inputBuffer, blockSize);
+			float *buf = new float[numInputs * blockSize];
+			err = Pa_ReadStream(stream, buf, blockSize);
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paInputOverflowed) {
-					printf("Audio input buffer underflow\n");
+					fprintf(stderr, "Audio input buffer underflow\n");
 				}
 			}
+
+			// Pass output through sample rate converter
+			outSrc.setRatio(gRack->sampleRate / sampleRate);
+			int inLength = blockSize;
+			int outLength = 8*blockSize;
+			float *outBuf = new float[2*outLength];
+			outSrc.process(buf, &inLength, outBuf, &outLength);
+			// Add to output ring buffer
+			for (int i = 0; i < outLength; i++) {
+				if (outBuffer.full())
+					break;
+				Frame f;
+				f.samples[0] = outBuf[2*i + 0];
+				f.samples[1] = outBuf[2*i + 1];
+				outBuffer.push(f);
+			}
+			delete[] outBuf;
+			delete[] buf;
 		}
 
-		// Output
+
+		// Write input to output stream
 		if (numOutputs > 0) {
-			err = Pa_WriteStream(stream, outputBuffer, blockSize);
+			float *buf = new float[numOutputs * blockSize]();
+			for (int i = 0; i < blockSize; i++) {
+				assert(!inBuffer.empty());
+				Frame f = inBuffer.shift();
+				for (int channel = 0; channel < numOutputs; channel++) {
+					buf[i * numOutputs + channel] = f.samples[channel];
+				}
+			}
+
+			err = Pa_WriteStream(stream, buf, blockSize);
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paOutputUnderflowed) {
-					printf("Audio output buffer underflow\n");
+					fprintf(stderr, "Audio output buffer underflow\n");
 				}
 			}
+			delete[] buf;
 		}
+	}
+
+	// Set output
+	if (!outBuffer.empty()) {
+		Frame f = outBuffer.shift();
+		setf(outputs[AUDIO1_OUTPUT], f.samples[0]);
+		setf(outputs[AUDIO2_OUTPUT], f.samples[1]);
 	}
 }
 
@@ -131,52 +192,61 @@ std::string AudioInterface::getDeviceName(int deviceId) {
 	return stringf("%s: %s (%d in, %d out)", apiInfo->name, info->name, info->maxInputChannels, info->maxOutputChannels);
 }
 
-void AudioInterface::openDevice() {
+void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 	closeDevice();
 	std::lock_guard<std::mutex> lock(mutex);
+
+	this->sampleRate = sampleRate;
+	this->blockSize = blockSize;
 
 	// Open new device
 	if (deviceId >= 0) {
 		PaError err;
-		const PaDeviceInfo *info = Pa_GetDeviceInfo(deviceId);
-		if (!info) {
-			printf("Failed to query audio device\n");
+		const PaDeviceInfo *deviceInfo = Pa_GetDeviceInfo(deviceId);
+		if (!deviceInfo) {
+			fprintf(stderr, "Failed to query audio device\n");
 			return;
 		}
 
-		numOutputs = mini(info->maxOutputChannels, 4);
-		numInputs = mini(info->maxInputChannels, 4);
+		numOutputs = mini(deviceInfo->maxOutputChannels, 2);
+		numInputs = mini(deviceInfo->maxInputChannels, 2);
 
 		PaStreamParameters outputParameters;
 		outputParameters.device = deviceId;
 		outputParameters.channelCount = numOutputs;
 		outputParameters.sampleFormat = paFloat32;
-		outputParameters.suggestedLatency = info->defaultLowOutputLatency;
+		outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
 		outputParameters.hostApiSpecificStreamInfo = NULL;
 
 		PaStreamParameters inputParameters;
 		inputParameters.device = deviceId;
 		inputParameters.channelCount = numInputs;
 		inputParameters.sampleFormat = paFloat32;
-		inputParameters.suggestedLatency = info->defaultLowInputLatency;
+		inputParameters.suggestedLatency = deviceInfo->defaultLowInputLatency;
 		inputParameters.hostApiSpecificStreamInfo = NULL;
 
 		// Don't use stream parameters if 0 input or output channels
 		err = Pa_OpenStream(&stream,
-			numInputs == 0 ? NULL : &outputParameters,
-			numOutputs == 0 ? NULL : &inputParameters,
+			numInputs == 0 ? NULL : &inputParameters,
+			numOutputs == 0 ? NULL : &outputParameters,
 			sampleRate, blockSize, paNoFlag, NULL, NULL);
 		if (err) {
-			printf("Failed to open audio stream: %s\n", Pa_GetErrorText(err));
+			fprintf(stderr, "Failed to open audio stream: %s\n", Pa_GetErrorText(err));
 			return;
 		}
 
 		err = Pa_StartStream(stream);
 		if (err) {
-			printf("Failed to start audio stream: %s\n", Pa_GetErrorText(err));
+			fprintf(stderr, "Failed to start audio stream: %s\n", Pa_GetErrorText(err));
 			return;
 		}
+
+		// Correct sample rate
+		const PaStreamInfo *streamInfo = Pa_GetStreamInfo(stream);
+		this->sampleRate = streamInfo->sampleRate;
 	}
+
+	this->deviceId = deviceId;
 }
 
 void AudioInterface::closeDevice() {
@@ -187,13 +257,19 @@ void AudioInterface::closeDevice() {
 		err = Pa_CloseStream(stream);
 		if (err) {
 			// This shouldn't happen:
-			printf("Failed to close audio stream: %s\n", Pa_GetErrorText(err));
+			fprintf(stderr, "Failed to close audio stream: %s\n", Pa_GetErrorText(err));
 		}
-		stream = NULL;
 	}
+
+	// Reset stream settings
+	stream = NULL;
+	deviceId = -1;
 	numOutputs = 0;
 	numInputs = 0;
-	bufferFrame = 0;
+
+	// Clear buffers
+	inBuffer.clear();
+	outBuffer.clear();
 }
 
 
@@ -201,8 +277,7 @@ struct AudioItem : MenuItem {
 	AudioInterface *audioInterface;
 	int deviceId;
 	void onAction() {
-		audioInterface->deviceId = deviceId;
-		audioInterface->openDevice();
+		audioInterface->setDeviceId(deviceId);
 	}
 };
 
@@ -233,10 +308,7 @@ struct AudioChoice : ChoiceButton {
 	}
 	void step() {
 		std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
-		if (name.empty())
-			text = "(no device)";
-		else
-			text = name;
+		text = name.empty() ? "(no device)" : ellipsize(name, 14);
 	}
 };
 
@@ -245,8 +317,7 @@ struct SampleRateItem : MenuItem {
 	AudioInterface *audioInterface;
 	float sampleRate;
 	void onAction() {
-		audioInterface->sampleRate = sampleRate;
-		audioInterface->openDevice();
+		audioInterface->setSampleRate(sampleRate);
 	}
 };
 
@@ -262,7 +333,7 @@ struct SampleRateChoice : ChoiceButton {
 			SampleRateItem *item = new SampleRateItem();
 			item->audioInterface = audioInterface;
 			item->sampleRate = sampleRates[i];
-			item->text = stringf("%.0f", sampleRates[i]);
+			item->text = stringf("%.0f Hz", sampleRates[i]);
 			menu->pushChild(item);
 		}
 
@@ -270,7 +341,7 @@ struct SampleRateChoice : ChoiceButton {
 		gScene->setOverlay(overlay);
 	}
 	void step() {
-		this->text = stringf("%.0f", audioInterface->sampleRate);
+		this->text = stringf("%.0f Hz", audioInterface->sampleRate);
 	}
 };
 
@@ -279,8 +350,7 @@ struct BlockSizeItem : MenuItem {
 	AudioInterface *audioInterface;
 	int blockSize;
 	void onAction() {
-		audioInterface->blockSize = blockSize;
-		audioInterface->openDevice();
+		audioInterface->setBlockSize(blockSize);
 	}
 };
 
@@ -381,10 +451,6 @@ AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()
 	addInput(createInput(Vec(75, yPos), module, AudioInterface::AUDIO2_INPUT));
 	yPos += 35 + margin;
 
-	addInput(createInput(Vec(25, yPos), module, AudioInterface::AUDIO3_INPUT));
-	addInput(createInput(Vec(75, yPos), module, AudioInterface::AUDIO4_INPUT));
-	yPos += 35 + margin;
-
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
@@ -396,10 +462,6 @@ AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()
 	yPos += 5;
 	addOutput(createOutput(Vec(25, yPos), module, AudioInterface::AUDIO1_OUTPUT));
 	addOutput(createOutput(Vec(75, yPos), module, AudioInterface::AUDIO2_OUTPUT));
-	yPos += 35 + margin;
-
-	addOutput(createOutput(Vec(25, yPos), module, AudioInterface::AUDIO3_OUTPUT));
-	addOutput(createOutput(Vec(75, yPos), module, AudioInterface::AUDIO4_OUTPUT));
 	yPos += 35 + margin;
 }
 

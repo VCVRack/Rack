@@ -64,6 +64,14 @@ json_t *RackWidget::toJson() {
 	json_t *versionJ = json_string(gApplicationVersion.c_str());
 	json_object_set_new(root, "version", versionJ);
 
+	// wireOpacity
+	json_t *wireOpacityJ = json_real(gScene->toolbar->wireOpacitySlider->value);
+	json_object_set_new(root, "wireOpacity", wireOpacityJ);
+
+	// wireTension
+	json_t *wireTensionJ = json_real(gScene->toolbar->wireTensionSlider->value);
+	json_object_set_new(root, "wireTension", wireTensionJ);
+
 	// modules
 	json_t *modulesJ = json_array();
 	std::map<ModuleWidget*, int> moduleIds;
@@ -121,6 +129,24 @@ json_t *RackWidget::toJson() {
 }
 
 void RackWidget::fromJson(json_t *root) {
+	// version
+	json_t *versionJ = json_object_get(root, "version");
+	if (versionJ) {
+		const char *version = json_string_value(versionJ);
+		if (gApplicationVersion != version)
+			printf("JSON version mismatch, attempting to convert JSON version %s to %s\n", version, gApplicationVersion.c_str());
+	}
+
+	// wireOpacity
+	json_t *wireOpacityJ = json_object_get(root, "wireOpacity");
+	if (wireOpacityJ)
+		gScene->toolbar->wireOpacitySlider->value = json_number_value(wireOpacityJ);
+
+	// wireTension
+	json_t *wireTensionJ = json_object_get(root, "wireTension");
+	if (wireTensionJ)
+		gScene->toolbar->wireTensionSlider->value = json_number_value(wireTensionJ);
+
 	// modules
 	std::map<int, ModuleWidget*> moduleWidgets;
 	json_t *modulesJ = json_object_get(root, "modules");

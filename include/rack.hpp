@@ -95,8 +95,10 @@ struct Wire {
 	int outputId;
 	Module *inputModule = NULL;
 	int inputId;
-	// The voltage which is pointed to by module inputs/outputs
-	float value = 0.0;
+	/** The voltage connected to input ports */
+	float inputValue = 0.0;
+	/** The voltage connected to output ports */
+	float outputValue = 0.0;
 };
 
 struct Rack {
