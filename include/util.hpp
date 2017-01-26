@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include <string>
-#include "math.hpp"
 
 
 namespace rack {

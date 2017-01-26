@@ -100,19 +100,23 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	bndBevel(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
 
 	// CPU usage text
-	if (true) {
+	if (gScene->toolbar->cpuUsageButton->value != 0.0) {
 		float cpuTime = module ? module->cpuTime : 0.0;
 		std::string text = stringf("%.1f%%", cpuTime * 100.0);
+
 		nvgSave(vg);
+		nvgBeginPath(vg);
+		nvgRect(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT);
+		nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
+		nvgFill(vg);
 
 		nvgBeginPath(vg);
 		cpuTime = clampf(cpuTime, 0.0, 1.0);
-		const float barWidth = 15.0;
-		nvgRect(vg, box.pos.x, box.pos.y + (1.0 - cpuTime) * box.size.y, barWidth, cpuTime * box.size.y);
-		nvgFillColor(vg, nvgHSLA(0.33 * cubic(1.0 - cpuTime), 1.0, 0.5, 128));
+		nvgRect(vg, box.pos.x, box.pos.y, box.size.x * cpuTime, BND_WIDGET_HEIGHT);
+		nvgFillColor(vg, nvgHSL(0.33 * cubic(1.0 - cpuTime), 1.0, 0.4));
 		nvgFill(vg);
 
-		bndLabel(vg, box.pos.x, box.pos.y + box.size.y - BND_WIDGET_HEIGHT, box.size.x, BND_WIDGET_HEIGHT, -1, text.c_str());
+		bndMenuItem(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT, BND_DEFAULT, -1, text.c_str());
 		nvgRestore(vg);
 	}
 }

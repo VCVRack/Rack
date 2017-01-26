@@ -1,6 +1,6 @@
 ARCH ?= linux
 CFLAGS = -MMD -g -Wall -O2
-CXXFLAGS = -MMD -g -Wall -std=c++11 -O3 -ffast-math -fno-exceptions \
+CXXFLAGS = -MMD -g -Wall -std=c++11 -O3 -msse -mfpmath=sse -ffast-math -fno-exceptions \
 	-I./ext -I./include
 LDFLAGS =
 

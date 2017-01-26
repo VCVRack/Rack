@@ -7,7 +7,7 @@ namespace rack {
 
 
 void Knob::step() {
-	index = eucMod((int) roundf(mapf(value, minValue, maxValue, minIndex, maxIndex)), spriteCount);
+	index = eucmod((int) roundf(mapf(value, minValue, maxValue, minIndex, maxIndex)), spriteCount);
 }
 
 void Knob::onDragStart() {

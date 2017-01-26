@@ -60,11 +60,11 @@ inline float quintic(float x) {
 	return x*x*x*x*x;
 }
 
-// Euclidean modulus, always returns 0 <= mod < base for positive base
-// Assumes this architecture's division is non-Euclidean
-inline int eucMod(int a, int base) {
-	int mod = a % base;
-	return mod < 0 ? mod + base : mod;
+inline float sincf(float x) {
+	if (x == 0.0)
+		return 1.0;
+	x *= M_PI;
+	return sinf(x) / x;
 }
 
 inline float getf(const float *p, float v = 0.0) {
@@ -83,6 +83,25 @@ inline float interpf(const float *p, float x) {
 	int xi = x;
 	float xf = x - xi;
 	return crossf(p[xi], p[xi+1], xf);
+}
+
+// Euclidean modulus, always returns 0 <= mod < base for positive base
+// Assumes this architecture's division is non-Euclidean
+inline int eucmod(int a, int base) {
+	int mod = a % base;
+	return mod < 0 ? mod + base : mod;
+}
+
+inline int log2i(int n) {
+	int i = 0;
+	while (n >>= 1) {
+		i++;
+	}
+	return i;
+}
+
+inline bool ispow2(int n) {
+	return n > 0 && (n & (n - 1)) == 0;
 }
 
 ////////////////////
@@ -166,80 +185,6 @@ struct Rect {
 		return r;
 	}
 };
-
-////////////////////
-// Simple FFT implementation
-////////////////////
-
-// Derived from the Italian Wikipedia article for FFT
-// https://it.wikipedia.org/wiki/Trasformata_di_Fourier_veloce
-// If you need speed, use KissFFT, pffft, etc instead.
-
-inline int log2i(int n) {
-	int i = 0;
-	while (n >>= 1) {
-		i++;
-	}
-	return i;
-}
-
-inline bool isPowerOf2(int n) {
-	return n > 0 && (n & (n-1)) == 0;
-}
-
-/*
-inline int reverse(int N, int n)    //calculating revers number
-{
-  int j, p = 0;
-  for(j = 1; j <= log2i(N); j++) {
-    if(n & (1 << (log2i(N) - j)))
-      p |= 1 << (j - 1);
-  }
-  return p;
-}
-
-inline void ordina(complex<double>* f1, int N) //using the reverse order in the array
-{
-  complex<double> f2[MAX];
-  for(int i = 0; i < N; i++)
-    f2[i] = f1[reverse(N, i)];
-  for(int j = 0; j < N; j++)
-    f1[j] = f2[j];
-}
-
-inline void transform(complex<double>* f, int N)
-{
-  ordina(f, N);    //first: reverse order
-  complex<double> *W;
-  W = (complex<double> *)malloc(N / 2 * sizeof(complex<double>));
-  W[1] = polar(1., -2. * M_PI / N);
-  W[0] = 1;
-  for(int i = 2; i < N / 2; i++)
-    W[i] = pow(W[1], i);
-  int n = 1;
-  int a = N / 2;
-  for(int j = 0; j < log2i(N); j++) {
-    for(int i = 0; i < N; i++) {
-      if(!(i & n)) {
-        complex<double> temp = f[i];
-        complex<double> Temp = W[(i * a) % (n * a)] * f[i + n];
-        f[i] = temp + Temp;
-        f[i + n] = temp - Temp;
-      }
-    }
-    n *= 2;
-    a = a / 2;
-  }
-}
-
-inline void FFT(complex<double>* f, int N, double d)
-{
-  transform(f, N);
-  for(int i = 0; i < N; i++)
-    f[i] *= d; //multiplying by step
-}
-*/
-
 
 
 } // namespace rack

@@ -4,6 +4,7 @@
 #include <math.h>
 #include <chrono>
 #include <condition_variable>
+#include <xmmintrin.h>
 
 #include "rack.hpp"
 
@@ -82,6 +83,10 @@ void Rack::stop() {
 }
 
 void Rack::run() {
+	// Set CPU to denormals-are-zero mode
+	// http://carlh.net/plugins/denormals.php
+	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+
 	// Every time the rack waits and locks a mutex, it steps this many frames
 	const int stepSize = 32;
 

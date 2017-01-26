@@ -7,7 +7,7 @@
 #include <set>
 #include <thread>
 #include <mutex>
-#include "widgets.hpp"
+#include "rackwidgets.hpp"
 
 
 namespace rack {

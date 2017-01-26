@@ -98,9 +98,9 @@ Toolbar::Toolbar() {
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(xPos, margin);
-		label->text = gApplicationName + " " + gApplicationVersion;
+		label->text = gApplicationVersion;
 		addChild(label);
-		xPos += 175;
+		xPos += 100;
 	}
 
 	xPos += margin;
@@ -149,6 +149,16 @@ Toolbar::Toolbar() {
 		wireTensionSlider->setDefaultValue(0.5);
 		addChild(wireTensionSlider);
 		xPos += wireTensionSlider->box.size.x;
+	}
+
+	xPos += margin;
+	{
+		cpuUsageButton = new RadioButton();
+		cpuUsageButton->box.pos = Vec(xPos, margin);
+		cpuUsageButton->box.size.x = 100;
+		cpuUsageButton->label = "CPU usage";
+		addChild(cpuUsageButton);
+		xPos += cpuUsageButton->box.size.x;
 	}
 }
 

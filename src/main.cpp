@@ -9,8 +9,8 @@
 
 namespace rack {
 
-std::string gApplicationName = "Virtuoso Rack";
-std::string gApplicationVersion = "v0.0.0 alpha";
+std::string gApplicationName = "VCV Rack";
+std::string gApplicationVersion = "v0.1.0 alpha";
 
 Rack *gRack;
 

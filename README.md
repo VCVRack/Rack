@@ -1,6 +1,6 @@
 *Note: This software is in semi-public alpha. If you have stumbled upon this project, feel free to try it out and report bugs to the GitHub issue tracker. However, with more users it becomes difficult to make breaking changes, so please don't spread this to your friends and the Internet just yet, until the official announcement has been made.*
 
-*Feel free to post **bugs**, **enhancements**, and **questions** on the [Issue Tracker](https://github.com/AndrewBelt/Rack/issues). To vote for a feature, give a thumbs-up on the first post.*
+*Feel free to post bugs, enhancements, and questions on the [Issue Tracker](https://github.com/AndrewBelt/Rack/issues). To vote for a feature, give a thumbs-up on the first post.*
 
 # Rack
 
