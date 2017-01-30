@@ -28,16 +28,18 @@ float randomNormal(){
 
 
 std::string stringf(const char *format, ...) {
-	va_list ap;
-	va_start(ap, format);
-	size_t size = vsnprintf(NULL, 0, format, ap);
+	va_list args;
+	va_start(args, format);
+	int size = vsnprintf(NULL, 0, format, args);
+	va_end(args);
 	if (size < 0)
 		return "";
 	size++;
 	std::string s;
 	s.resize(size);
-	vsnprintf(&s[0], size, format, ap);
-	va_end(ap);
+	va_start(args, format);
+	vsnprintf(&s[0], size, format, args);
+	va_end(args);
 	return s;
 }
 

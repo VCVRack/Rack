@@ -3,25 +3,19 @@
 #include <assert.h>
 #include <string.h>
 #include <samplerate.h>
-#include <complex.h>
+#include <complex>
 #include "math.hpp"
 
 
 namespace rack {
 
 
-/** Construct a C-style complex float
-With -O3 this is as fast as the 1.0 + 1.0*I syntax but it stops the compiler from complaining 
-*/
-inline float _Complex complexf(float r, float i) {
-	union {
-		float x[2];
-		float _Complex c;
-	} v;
-	v.x[0] = r;
-	v.x[1] = i;
-	return v.c;
-}
+/** Useful for storing arrays of samples in ring buffers and casting them to `float*` to be used by interleaved processors, like SampleRateConverter */
+template <size_t CHANNELS>
+struct Frame {
+	float samples[CHANNELS];
+};
+
 
 /** Simple FFT implementation
 If you need something fast, use pffft, KissFFT, etc instead.
@@ -30,14 +24,14 @@ The size N must be a power of 2
 struct SimpleFFT {
 	int N;
 	/** Twiddle factors e^(2pi k/N), interleaved complex numbers */
-	float _Complex *tw;
+	std::complex<float> *tw;
 	SimpleFFT(int N, bool inverse) : N(N) {
-		tw = new float _Complex[N];
+		tw = new std::complex<float>[N];
 		for (int i = 0; i < N; i++) {
 			float phase = 2*M_PI * (float)i / N;
 			if (inverse)
 				phase *= -1.0;
-			tw[i] = cexpf(phase * complexf(0.0, 1.0));
+			tw[i] = std::exp(std::complex<float>(0.0, phase));
 		}
 	}
 	~SimpleFFT() {
@@ -48,9 +42,9 @@ struct SimpleFFT {
 	y must be size N/s
 	s is the stride factor for the x array which divides the size N
 	*/
-	void dft(const float _Complex *x, float _Complex *y, int s=1) {
+	void dft(const std::complex<float> *x, std::complex<float> *y, int s=1) {
 		for (int k = 0; k < N/s; k++) {
-			float _Complex yk = 0.0;
+			std::complex<float> yk = 0.0;
 			for (int n = 0; n < N; n += s) {
 				int m = (n*k) % N;
 				yk += x[n] * tw[m];
@@ -58,14 +52,14 @@ struct SimpleFFT {
 			y[k] = yk;
 		}
 	}
-	void fft(const float _Complex *x, float _Complex *y, int s=1) {
+	void fft(const std::complex<float> *x, std::complex<float> *y, int s=1) {
 		if (N/s <= 2) {
 			// Naive DFT is faster than further FFT recursions at this point
 			dft(x, y, s);
 			return;
 		}
-		float _Complex e[N/(2*s)]; // Even inputs
-		float _Complex o[N/(2*s)]; // Odd inputs
+		std::complex<float> *e = new std::complex<float>[N/(2*s)]; // Even inputs
+		std::complex<float> *o = new std::complex<float>[N/(2*s)]; // Odd inputs
 		fft(x, e, 2*s);
 		fft(x + s, o, 2*s);
 		for (int k = 0; k < N/(2*s); k++) {
@@ -73,6 +67,8 @@ struct SimpleFFT {
 			y[k] = e[k] + tw[m] * o[k];
 			y[k + N/(2*s)] = e[k] - tw[m] * o[k];
 		}
+		delete[] e;
+		delete[] o;
 	}
 };
 
@@ -81,17 +77,17 @@ struct SimpleFFT {
 S must be a power of 2.
 push() is constant time O(1)
 */
-template <typename T, size_t S>
+template <typename T, int S>
 struct RingBuffer {
 	T data[S];
-	size_t start = 0;
-	size_t end = 0;
+	int start = 0;
+	int end = 0;
 
-	size_t mask(size_t i) const {
+	int mask(int i) const {
 		return i & (S - 1);
 	}
 	void push(T t) {
-		size_t i = mask(end++);
+		int i = mask(end++);
 		data[i] = t;
 	}
 	T shift() {
@@ -106,8 +102,11 @@ struct RingBuffer {
 	bool full() const {
 		return end - start >= S;
 	}
-	size_t size() const {
+	int size() const {
 		return end - start;
+	}
+	int capacity() const {
+		return S - size();
 	}
 };
 
@@ -116,17 +115,17 @@ struct RingBuffer {
 S must be a power of 2.
 push() is constant time O(2) relative to RingBuffer
 */
-template <typename T, size_t S>
+template <typename T, int S>
 struct DoubleRingBuffer {
 	T data[S*2];
-	size_t start = 0;
-	size_t end = 0;
+	int start = 0;
+	int end = 0;
 
-	size_t mask(size_t i) const {
+	int mask(int i) const {
 		return i & (S - 1);
 	}
 	void push(T t) {
-		size_t i = mask(end++);
+		int i = mask(end++);
 		data[i] = t;
 		data[i + S] = t;
 	}
@@ -142,8 +141,11 @@ struct DoubleRingBuffer {
 	bool full() const {
 		return end - start >= S;
 	}
-	size_t size() const {
+	int size() const {
 		return end - start;
+	}
+	int capacity() const {
+		return S - size();
 	}
 	/** Returns a pointer to S consecutive elements for appending.
 	If any data is appended, you must call endIncr afterwards.
@@ -152,12 +154,16 @@ struct DoubleRingBuffer {
 	T *endData() {
 		return &data[mask(end)];
 	}
-	void endIncr(size_t n) {
-		size_t mend = mask(end) + n;
-		if (mend > S) {
+	void endIncr(int n) {
+		int e = mask(end);
+		int e1 = e + n;
+		int e2 = mini(e1, S);
+		// Copy data forward
+		memcpy(data + S + e, data + e, sizeof(T) * (e2 - e));
+
+		if (e1 > S) {
 			// Copy data backward from the doubled block to the main block
-			memcpy(data, &data[S], sizeof(T) * (mend - S));
-			// Don't bother copying forward
+			memcpy(data, data + S, sizeof(T) * (e1 - S));
 		}
 		end += n;
 	}
@@ -167,7 +173,7 @@ struct DoubleRingBuffer {
 	const T *startData() const {
 		return &data[mask(start)];
 	}
-	void startIncr(size_t n) {
+	void startIncr(int n) {
 		start += n;
 	}
 };
@@ -245,8 +251,9 @@ struct SampleRateConverter {
 		data.src_ratio = r;
 	}
 	/** `in` and `out` are interlaced with the number of channels */
-	void process(float *in, int *inFrames, float *out, int *outFrames) {
-		data.data_in = in;
+	void process(const float *in, int *inFrames, float *out, int *outFrames) {
+		// The const cast is okay since src_process does not modify it
+		data.data_in = const_cast<float*>(in);
 		data.input_frames = *inFrames;
 		data.data_out = out;
 		data.output_frames = *outFrames;

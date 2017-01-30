@@ -42,16 +42,13 @@ struct AudioInterface : Module {
 	// Used because the GUI thread and Rack thread can both interact with this class
 	std::mutex mutex;
 
-	SampleRateConverter<2> inSrc;
-	SampleRateConverter<2> outSrc;
+	SampleRateConverter<2> inputSrc;
+	SampleRateConverter<2> outputSrc;
 
-	struct Frame {
-		float samples[2];
-	};
 	// in device's sample rate
-	RingBuffer<Frame, (1<<15)> inBuffer;
+	DoubleRingBuffer<Frame<2>, (1<<15)> inputBuffer;
 	// in rack's sample rate
-	RingBuffer<Frame, (1<<15)> outBuffer;
+	DoubleRingBuffer<Frame<2>, (1<<15)> outputBuffer;
 
 	AudioInterface();
 	~AudioInterface();
@@ -92,37 +89,29 @@ void AudioInterface::step() {
 
 	// Get input and pass it through the sample rate converter
 	if (numOutputs > 0) {
-		Frame f;
-		f.samples[0] = getf(inputs[AUDIO1_INPUT]);
-		f.samples[1] = getf(inputs[AUDIO2_INPUT]);
+		Frame<2> f;
+		f.samples[0] = getf(inputs[AUDIO1_INPUT]) / 5.0;
+		f.samples[1] = getf(inputs[AUDIO2_INPUT]) / 5.0;
 
-		inSrc.setRatio(sampleRate / gRack->sampleRate);
-		int inLength = 1;
-		int outLength = 16;
-		float buf[2*outLength];
-		inSrc.process(f.samples, &inLength, buf, &outLength);
-		for (int i = 0; i < outLength; i++) {
-			if (inBuffer.full())
-				break;
-			Frame f;
-			f.samples[0] = buf[2*i + 0];
-			f.samples[1] = buf[2*i + 1];
-			inBuffer.push(f);
-		}
+		inputSrc.setRatio(sampleRate / gRack->sampleRate);
+		int inLen = 1;
+		int outLen = inputBuffer.capacity();
+		inputSrc.process((const float*) &f, &inLen, (float*) inputBuffer.endData(), &outLen);
+		inputBuffer.endIncr(outLen);
 	}
 
 	// Read/write stream if we have enough input
-	// TODO If numOutputs == 0, call this when outBuffer.empty()
-	bool streamReady = (numOutputs > 0) ? ((int)inBuffer.size() >= blockSize) : (outBuffer.empty());
+	bool streamReady = (numOutputs > 0) ? (inputBuffer.size() >= blockSize) : (outputBuffer.empty());
 	if (streamReady) {
-		// printf("%d %d\n", inBuffer.size(), outBuffer.size());
 		PaError err;
 
 		// Read output from input stream
 		// (for some reason, if you write the output stream before you read the input stream, PortAudio can segfault on Windows.)
 		if (numInputs > 0) {
-			float *buf = new float[numInputs * blockSize];
-			err = Pa_ReadStream(stream, buf, blockSize);
+			Frame<2> *buf = new Frame<2>[blockSize];
+			printf("read %d\n", blockSize);
+			err = Pa_ReadStream(stream, (float*) buf, blockSize);
+			printf("read done\n");
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paInputOverflowed) {
@@ -131,52 +120,36 @@ void AudioInterface::step() {
 			}
 
 			// Pass output through sample rate converter
-			outSrc.setRatio(gRack->sampleRate / sampleRate);
-			int inLength = blockSize;
-			int outLength = 8*blockSize;
-			float *outBuf = new float[2*outLength];
-			outSrc.process(buf, &inLength, outBuf, &outLength);
-			// Add to output ring buffer
-			for (int i = 0; i < outLength; i++) {
-				if (outBuffer.full())
-					break;
-				Frame f;
-				f.samples[0] = outBuf[2*i + 0];
-				f.samples[1] = outBuf[2*i + 1];
-				outBuffer.push(f);
-			}
-			delete[] outBuf;
+			outputSrc.setRatio(gRack->sampleRate / sampleRate);
+			int inLen = blockSize;
+			int outLen = outputBuffer.capacity();
+			outputSrc.process((float*) buf, &inLen, (float*) outputBuffer.endData(), &outLen);
+			outputBuffer.endIncr(outLen);
 			delete[] buf;
 		}
 
 
 		// Write input to output stream
 		if (numOutputs > 0) {
-			float *buf = new float[numOutputs * blockSize]();
-			for (int i = 0; i < blockSize; i++) {
-				assert(!inBuffer.empty());
-				Frame f = inBuffer.shift();
-				for (int channel = 0; channel < numOutputs; channel++) {
-					buf[i * numOutputs + channel] = f.samples[channel];
-				}
-			}
-
-			err = Pa_WriteStream(stream, buf, blockSize);
+			assert(inputBuffer.size() >= blockSize);
+			printf("write %d\n", blockSize);
+			err = Pa_WriteStream(stream, (const float*) inputBuffer.startData(), blockSize);
+			printf("write done\n");
+			inputBuffer.startIncr(blockSize);
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paOutputUnderflowed) {
 					fprintf(stderr, "Audio output buffer underflow\n");
 				}
 			}
-			delete[] buf;
 		}
 	}
 
 	// Set output
-	if (!outBuffer.empty()) {
-		Frame f = outBuffer.shift();
-		setf(outputs[AUDIO1_OUTPUT], f.samples[0]);
-		setf(outputs[AUDIO2_OUTPUT], f.samples[1]);
+	if (!outputBuffer.empty()) {
+		Frame<2> f = outputBuffer.shift();
+		setf(outputs[AUDIO1_OUTPUT], 5.0 * f.samples[0]);
+		setf(outputs[AUDIO2_OUTPUT], 5.0 * f.samples[1]);
 	}
 }
 
@@ -244,9 +217,8 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		// Correct sample rate
 		const PaStreamInfo *streamInfo = Pa_GetStreamInfo(stream);
 		this->sampleRate = streamInfo->sampleRate;
+		this->deviceId = deviceId;
 	}
-
-	this->deviceId = deviceId;
 }
 
 void AudioInterface::closeDevice() {
@@ -256,7 +228,6 @@ void AudioInterface::closeDevice() {
 		PaError err;
 		err = Pa_CloseStream(stream);
 		if (err) {
-			// This shouldn't happen:
 			fprintf(stderr, "Failed to close audio stream: %s\n", Pa_GetErrorText(err));
 		}
 	}
@@ -268,8 +239,10 @@ void AudioInterface::closeDevice() {
 	numInputs = 0;
 
 	// Clear buffers
-	inBuffer.clear();
-	outBuffer.clear();
+	inputBuffer.clear();
+	outputBuffer.clear();
+	inputSrc.reset();
+	outputSrc.reset();
 }
 
 

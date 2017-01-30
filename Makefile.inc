@@ -1,5 +1,5 @@
 
-OBJECTS = $(patsubst %, build/%.o, $(SOURCES))
+OBJECTS += $(patsubst %, build/%.o, $(SOURCES))
 DEPS = $(patsubst %, build/%.d, $(SOURCES))
 
 
