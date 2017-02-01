@@ -99,7 +99,7 @@ void AudioInterface::step() {
 
 		// Once full, sample rate convert the input
 		if (inputBuffer.full()) {
-			inputSrc.setRatio(sampleRate / gRack->sampleRate);
+			inputSrc.setRatio(sampleRate / gSampleRate);
 			int inLen = inputBuffer.size();
 			int outLen = inputSrcBuffer.capacity();
 			inputSrc.process((const float*) inputBuffer.startData(), &inLen, (float*) inputSrcBuffer.endData(), &outLen);
@@ -127,7 +127,7 @@ void AudioInterface::step() {
 			}
 
 			// Pass output through sample rate converter
-			outputSrc.setRatio(gRack->sampleRate / sampleRate);
+			outputSrc.setRatio(gSampleRate / sampleRate);
 			int inLen = blockSize;
 			int outLen = outputBuffer.capacity();
 			outputSrc.process((float*) buf, &inLen, (float*) outputBuffer.endData(), &outLen);

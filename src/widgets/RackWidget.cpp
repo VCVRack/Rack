@@ -1,5 +1,9 @@
-#include "rack.hpp"
+#include <map>
 #include <algorithm>
+#include "scene.hpp"
+#include "engine.hpp"
+#include "plugin.hpp"
+#include "gui.hpp"
 
 
 namespace rack {
@@ -10,6 +14,8 @@ RackWidget::RackWidget() {
 
 	wireContainer = new TransparentWidget();
 	addChild(wireContainer);
+
+	railsImage = Image::load("res/rails.png");
 }
 
 RackWidget::~RackWidget() {
@@ -65,11 +71,11 @@ json_t *RackWidget::toJson() {
 	json_object_set_new(root, "version", versionJ);
 
 	// wireOpacity
-	json_t *wireOpacityJ = json_real(gScene->toolbar->wireOpacitySlider->value);
+	json_t *wireOpacityJ = json_real(dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value);
 	json_object_set_new(root, "wireOpacity", wireOpacityJ);
 
 	// wireTension
-	json_t *wireTensionJ = json_real(gScene->toolbar->wireTensionSlider->value);
+	json_t *wireTensionJ = json_real(dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value);
 	json_object_set_new(root, "wireTension", wireTensionJ);
 
 	// modules
@@ -140,12 +146,12 @@ void RackWidget::fromJson(json_t *root) {
 	// wireOpacity
 	json_t *wireOpacityJ = json_object_get(root, "wireOpacity");
 	if (wireOpacityJ)
-		gScene->toolbar->wireOpacitySlider->value = json_number_value(wireOpacityJ);
+		dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value = json_number_value(wireOpacityJ);
 
 	// wireTension
 	json_t *wireTensionJ = json_object_get(root, "wireTension");
 	if (wireTensionJ)
-		gScene->toolbar->wireTensionSlider->value = json_number_value(wireTensionJ);
+		dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value = json_number_value(wireTensionJ);
 
 	// modules
 	std::map<int, ModuleWidget*> moduleWidgets;
@@ -296,10 +302,9 @@ void RackWidget::draw(NVGcontext *vg) {
 		nvgFill(vg);
 	}
 	{
-		int imageId = loadImage("res/rails.png");
 		int imageWidth, imageHeight;
-		nvgImageSize(vg, imageId, &imageWidth, &imageHeight);
-		paint = nvgImagePattern(vg, box.pos.x, box.pos.y, imageWidth, imageHeight, 0.0, imageId, 1.0);
+		nvgImageSize(vg, railsImage->handle, &imageWidth, &imageHeight);
+		paint = nvgImagePattern(vg, box.pos.x, box.pos.y, imageWidth, imageHeight, 0.0, railsImage->handle, 1.0);
 		nvgFillPaint(vg, paint);
 		nvgFill(vg);
 	}

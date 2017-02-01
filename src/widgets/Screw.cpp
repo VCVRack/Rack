@@ -1,4 +1,4 @@
-#include "rack.hpp"
+#include "scene.hpp"
 
 
 namespace rack {
@@ -7,7 +7,7 @@ Screw::Screw() {
 	box.size = Vec(15, 15);
 	spriteOffset = Vec(-7, -7);
 	spriteSize = Vec(29, 29);
-	spriteFilename = "res/screw.png";
+	spriteImage = Image::load("res/screw.png");
 
 	index = randomu32() % 5;
 }

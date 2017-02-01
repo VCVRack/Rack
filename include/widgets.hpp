@@ -1,19 +1,45 @@
 #pragma once
-
-#include <assert.h>
-#include <stdio.h>
-#include <math.h>
 #include <list>
-#include <map>
+#include <memory>
 
 #include "../ext/nanovg/src/nanovg.h"
 #include "../ext/oui/blendish.h"
+#include "../ext/nanosvg/src/nanosvg.h"
 
 #include "math.hpp"
 #include "util.hpp"
 
 
 namespace rack {
+
+
+////////////////////
+// resources
+////////////////////
+
+// Constructing these directly will load from the disk each time. Use the load() functions to load from disk and cache them as long as the shared_ptr is held.
+// Implemented in gui.cpp
+
+struct Font {
+	int handle;
+	Font(const std::string &filename);
+	~Font();
+	static std::shared_ptr<Font> load(const std::string &filename);
+};
+
+struct Image {
+	int handle;
+	Image(const std::string &filename);
+	~Image();
+	static std::shared_ptr<Image> load(const std::string &filename);
+};
+
+struct SVG {
+	NSVGimage *image;
+	SVG(const std::string &filename);
+	~SVG();
+	static std::shared_ptr<SVG> load(const std::string &filename);
+};
 
 
 ////////////////////
@@ -122,7 +148,7 @@ struct OpaqueWidget : virtual Widget {
 struct SpriteWidget : virtual Widget {
 	Vec spriteOffset;
 	Vec spriteSize;
-	std::string spriteFilename;
+	std::shared_ptr<Image> spriteImage;
 	int index = 0;
 	void draw(NVGcontext *vg);
 };
@@ -275,6 +301,25 @@ struct Tooltip : Widget {
 	void step();
 	void draw(NVGcontext *vg);
 };
+
+struct Scene : OpaqueWidget {
+	Widget *overlay = NULL;
+	void setOverlay(Widget *w);
+	void step();
+};
+
+
+////////////////////
+// globals
+////////////////////
+
+extern Vec gMousePos;
+extern Widget *gHoveredWidget;
+extern Widget *gDraggedWidget;
+extern Widget *gSelectedWidget;
+extern int gGuiFrame;
+
+extern Scene *gScene;
 
 
 } // namespace rack

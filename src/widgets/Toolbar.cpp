@@ -1,4 +1,6 @@
-#include "rack.hpp"
+#include "scene.hpp"
+#include "gui.hpp"
+#include "engine.hpp"
 
 
 namespace rack {
@@ -62,7 +64,7 @@ struct FileChoice : ChoiceButton {
 struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction() {
-		gRack->sampleRate = sampleRate;
+		gSampleRate = sampleRate;
 	}
 };
 
@@ -85,7 +87,7 @@ struct SampleRateChoice : ChoiceButton {
 		gScene->setOverlay(overlay);
 	}
 	void step() {
-		text = stringf("%.0f Hz", gRack->sampleRate);
+		text = stringf("%.0f Hz", gSampleRate);
 	}
 };
 

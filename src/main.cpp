@@ -7,16 +7,6 @@
 #include "rack.hpp"
 
 
-namespace rack {
-
-std::string gApplicationName = "VCV Rack";
-std::string gApplicationVersion = "v0.1.0 alpha";
-
-Rack *gRack;
-
-} // namespace rack
-
-
 using namespace rack;
 
 int main() {
@@ -34,18 +24,20 @@ int main() {
 	}
 #endif
 
-	gRack = new Rack();
+	engineInit();
 	guiInit();
+	sceneInit();
 	pluginInit();
 	gRackWidget->loadPatch("autosave.json");
 
-	gRack->start();
+	engineStart();
 	guiRun();
-	gRack->stop();
+	engineStop();
 
 	gRackWidget->savePatch("autosave.json");
+	sceneDestroy();
 	guiDestroy();
-	delete gRack;
+	engineDestroy();
 	pluginDestroy();
 	return 0;
 }

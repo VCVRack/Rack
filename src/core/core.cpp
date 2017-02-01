@@ -3,12 +3,20 @@
 
 using namespace rack;
 
-Plugin *coreInit() {
+
+struct CorePlugin : Plugin {
+	CorePlugin() {
+		slug = "Core";
+		name = "Core";
+		createModel<AudioInterfaceWidget>(this, "AudioInterface", "Audio Interface");
+		createModel<MidiInterfaceWidget>(this, "MidiInterface", "MIDI Interface");
+	}
+};
+
+
+Plugin *init() {
 	audioInit();
 	midiInit();
 
-	Plugin *plugin = createPlugin("Core", "Core");
-	createModel<AudioInterfaceWidget>(plugin, "AudioInterface", "Audio Interface");
-	createModel<MidiInterfaceWidget>(plugin, "MidiInterface", "MIDI Interface");
-	return plugin;
+	return new CorePlugin();
 }

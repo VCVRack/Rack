@@ -3,8 +3,6 @@
 
 using namespace rack;
 
-Plugin *coreInit();
-
 void audioInit();
 void midiInit();
 

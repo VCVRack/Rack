@@ -7,8 +7,7 @@
 	#include <glob.h>
 #endif
 
-#include "rack.hpp"
-#include "core/core.hpp"
+#include "plugin.hpp"
 
 
 namespace rack {
@@ -60,8 +59,10 @@ int loadPlugin(const char *path) {
 
 void pluginInit() {
 	// Load core
-	Plugin *corePlugin = coreInit();
+	// This function is defined in core.cpp
+	Plugin *corePlugin = init();
 	gPlugins.push_back(corePlugin);
+
 	// Search for plugin libraries
 	#if defined(WINDOWS)
 		WIN32_FIND_DATA ffd;

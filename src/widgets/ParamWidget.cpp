@@ -1,4 +1,5 @@
-#include "rack.hpp"
+#include "scene.hpp"
+#include "engine.hpp"
 
 
 namespace rack {
@@ -23,7 +24,7 @@ void ParamWidget::onChange() {
 		return;
 
 	// moduleWidget->module->params[paramId] = value;
-	gRack->setParamSmooth(module, paramId, value);
+	engineSetParamSmooth(module, paramId, value);
 }
 
 

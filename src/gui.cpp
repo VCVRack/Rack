@@ -1,16 +1,19 @@
-#include <unistd.h>
-#include "rack.hpp"
+#include <map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-// #define NANOVG_GLEW
-#define NANOVG_IMPLEMENTATION
-#include "../ext/nanovg/src/nanovg.h"
+#include "gui.hpp"
+#include "scene.hpp"
+
+// Include implementations here
+// By the way, please stop packaging your libraries like this. It's easiest to use a single source file (e.g. foo.c) and a single header (e.g. foo.h)
 #define NANOVG_GL2_IMPLEMENTATION
 #include "../ext/nanovg/src/nanovg_gl.h"
 #define BLENDISH_IMPLEMENTATION
 #include "../ext/oui/blendish.h"
+#define NANOSVG_IMPLEMENTATION
+#include "../ext/nanosvg/src/nanosvg.h"
 
 extern "C" {
 	#include "../ext/noc/noc_file_dialog.h"
@@ -19,18 +22,9 @@ extern "C" {
 
 namespace rack {
 
-Scene *gScene = NULL;
-RackWidget *gRackWidget = NULL;
-
-Vec gMousePos;
-Widget *gHoveredWidget = NULL;
-Widget *gDraggedWidget = NULL;
-Widget *gSelectedWidget = NULL;
-
-int gGuiFrame;
-
 static GLFWwindow *window = NULL;
 static NVGcontext *vg = NULL;
+static std::shared_ptr<Font> defaultFont;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
@@ -178,7 +172,7 @@ void guiInit() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	window = glfwCreateWindow(1020, 700, gApplicationName.c_str(), NULL, NULL);
+	window = glfwCreateWindow(1000, 750, gApplicationName.c_str(), NULL, NULL);
 	assert(window);
 	glfwMakeContextCurrent(window);
 
@@ -206,15 +200,13 @@ void guiInit() {
 	assert(vg);
 
 	// Set up Blendish
-	bndSetFont(loadFont("res/DejaVuSans.ttf"));
+	defaultFont = Font::load("res/DejaVuSans.ttf");
+	bndSetFont(defaultFont->handle);
 	// bndSetIconImage(loadImage("res/icons.png"));
-
-	gScene = new Scene();
 }
 
 void guiDestroy() {
-	delete gScene;
-
+	defaultFont.reset();
 	nvgDeleteGL2(vg);
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -264,61 +256,83 @@ const char *guiOpenDialog(const char *filters, const char *filename) {
 }
 
 
+////////////////////
+// resources
+////////////////////
 
-
-
-std::map<std::string, int> images;
-std::map<std::string, int> fonts;
-
-int loadImage(std::string filename) {
-	assert(vg);
-	int imageId;
-	auto it = images.find(filename);
-	if (it == images.end()) {
-		// Load image
-		imageId = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY | NVG_IMAGE_NEAREST);
-		if (imageId == 0) {
-			printf("Failed to load image %s\n", filename.c_str());
-		}
-		else {
-			printf("Loaded image %s\n", filename.c_str());
-		}
-		images[filename] = imageId;
+Font::Font(const std::string &filename) {
+	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
+	if (handle >= 0) {
+		fprintf(stderr, "Loaded font %s\n", filename.c_str());
 	}
 	else {
-		imageId = it->second;
+		fprintf(stderr, "Failed to load font %s\n", filename.c_str());
 	}
-	return imageId;
 }
 
-int loadFont(std::string filename) {
-	assert(vg);
-	int fontId;
-	auto it = fonts.find(filename);
-	if (it == fonts.end()) {
-		fontId = nvgCreateFont(vg, filename.c_str(), filename.c_str());
-		if (fontId < 0) {
-			printf("Failed to load font %s\n", filename.c_str());
-		}
-		else {
-			printf("Loaded font %s\n", filename.c_str());
-		}
-		fonts[filename] = fontId;
+Font::~Font() {
+	// There is no NanoVG deleteFont() function, so do nothing
+}
+
+std::shared_ptr<Font> Font::load(const std::string &filename) {
+	static std::map<std::string, std::weak_ptr<Font>> cache;
+	auto sp = cache[filename].lock();
+	if (!sp)
+		cache[filename] = sp = std::make_shared<Font>(filename);
+	return sp;
+}
+
+////////////////////
+// Image
+////////////////////
+
+Image::Image(const std::string &filename) {
+	handle = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+	if (handle > 0) {
+		fprintf(stderr, "Loaded image %s\n", filename.c_str());
 	}
 	else {
-		fontId = it->second;
+		fprintf(stderr, "Failed to load image %s\n", filename.c_str());
 	}
-	return fontId;
 }
 
+Image::~Image() {
+	// TODO What if handle is invalid?
+	nvgDeleteImage(vg, handle);
+}
 
-void drawImage(NVGcontext *vg, Vec pos, int imageId) {
-	int width, height;
-	nvgImageSize(vg, imageId, &width, &height);
-	NVGpaint paint = nvgImagePattern(vg, pos.x, pos.y, width, height, 0, imageId, 1.0);
-	nvgFillPaint(vg, paint);
-	nvgRect(vg, pos.x, pos.y, width, height);
-	nvgFill(vg);
+std::shared_ptr<Image> Image::load(const std::string &filename) {
+	static std::map<std::string, std::weak_ptr<Image>> cache;
+	auto sp = cache[filename].lock();
+	if (!sp)
+		cache[filename] = sp = std::make_shared<Image>(filename);
+	return sp;
+}
+
+////////////////////
+// SVG
+////////////////////
+
+SVG::SVG(const std::string &filename) {
+	image = nsvgParseFromFile(filename.c_str(), "px", 96.0);
+	if (image) {
+		fprintf(stderr, "Loaded SVG %s\n", filename.c_str());
+	}
+	else {
+		fprintf(stderr, "Failed to load SVG %s\n", filename.c_str());
+	}
+}
+
+SVG::~SVG() {
+	nsvgDelete(image);
+}
+
+std::shared_ptr<SVG> SVG::load(const std::string &filename) {
+	static std::map<std::string, std::weak_ptr<SVG>> cache;
+	auto sp = cache[filename].lock();
+	if (!sp)
+		cache[filename] = sp = std::make_shared<SVG>(filename);
+	return sp;
 }
 
 

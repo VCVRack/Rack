@@ -1,7 +1,7 @@
 #pragma once
-
-#include "widgets.hpp"
+#include <vector>
 #include <jansson.h>
+#include "widgets.hpp"
 
 
 namespace rack {
@@ -14,7 +14,7 @@ struct RackWidget;
 struct ParamWidget;
 struct InputPort;
 struct OutputPort;
-
+struct Scene;
 
 ////////////////////
 // module
@@ -76,6 +76,7 @@ struct RackWidget : OpaqueWidget {
 	// Only put WireWidgets in here
 	Widget *wireContainer;
 	WireWidget *activeWire = NULL;
+	std::shared_ptr<Image> railsImage;
 
 	RackWidget();
 	~RackWidget();
@@ -94,7 +95,7 @@ struct RackWidget : OpaqueWidget {
 
 struct ModulePanel : TransparentWidget {
 	NVGcolor backgroundColor;
-	std::string imageFilename;
+	std::shared_ptr<Image> backgroundImage;
 	void draw(NVGcontext *vg);
 };
 
@@ -205,18 +206,17 @@ struct Toolbar : OpaqueWidget {
 	void draw(NVGcontext *vg);
 };
 
-struct Scene : OpaqueWidget {
+struct RackScene : Scene {
 	Toolbar *toolbar;
 	ScrollWidget *scrollWidget;
-	Widget *overlay = NULL;
 
-	Scene();
-	void setOverlay(Widget *w);
+	RackScene();
 	void step();
 };
 
+
 ////////////////////
-// component library
+// Component Library
 ////////////////////
 
 struct PJ301M : SpriteWidget {
@@ -224,7 +224,7 @@ struct PJ301M : SpriteWidget {
 		box.size = Vec(24, 24);
 		spriteOffset = Vec(-10, -10);
 		spriteSize = Vec(48, 48);
-		spriteFilename = "res/ComponentLibrary/PJ301M.png";
+		spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
 	}
 };
 struct InputPortPJ301M : InputPort, PJ301M {};
@@ -235,7 +235,7 @@ struct PJ3410 : SpriteWidget {
 		box.size = Vec(31, 31);
 		spriteOffset = Vec(-9, -9);
 		spriteSize = Vec(54, 54);
-		spriteFilename = "res/ComponentLibrary/PJ3410.png";
+		spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
 	}
 };
 struct InputPortPJ3410 : InputPort, PJ3410 {};
@@ -246,10 +246,24 @@ struct CL1362 : SpriteWidget {
 		box.size = Vec(33, 29);
 		spriteOffset = Vec(-10, -10);
 		spriteSize = Vec(57, 54);
-		spriteFilename = "res/ComponentLibrary/CL1362.png";
+		spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
 	}
 };
 struct InputPortCL1362 : InputPort, CL1362 {};
 struct OutputPortCL1362 : OutputPort, CL1362 {};
+
+
+////////////////////
+// globals
+////////////////////
+
+extern std::string gApplicationName;
+extern std::string gApplicationVersion;
+
+extern Scene *gScene;
+extern RackWidget *gRackWidget;
+
+void sceneInit();
+void sceneDestroy();
 
 } // namespace rack

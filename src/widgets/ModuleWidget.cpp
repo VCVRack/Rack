@@ -1,4 +1,6 @@
-#include "rack.hpp"
+#include "scene.hpp"
+#include "engine.hpp"
+#include "plugin.hpp"
 
 
 namespace rack {
@@ -6,7 +8,7 @@ namespace rack {
 ModuleWidget::ModuleWidget(Module *module) {
 	this->module = module;
 	if (module) {
-		gRack->addModule(module);
+		engineAddModule(module);
 	}
 }
 
@@ -14,7 +16,7 @@ ModuleWidget::~ModuleWidget() {
 	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
 	disconnectPorts();
 	if (module) {
-		gRack->removeModule(module);
+		engineRemoveModule(module);
 		delete module;
 	}
 }
@@ -100,7 +102,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	bndBevel(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
 
 	// CPU usage text
-	if (gScene->toolbar->cpuUsageButton->value != 0.0) {
+	if (dynamic_cast<RackScene*>(gScene)->toolbar->cpuUsageButton->value != 0.0) {
 		float cpuTime = module ? module->cpuTime : 0.0;
 		std::string text = stringf("%.1f%%", cpuTime * 100.0);
 

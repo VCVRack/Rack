@@ -1,4 +1,4 @@
-#include "rack.hpp"
+#include "scene.hpp"
 
 
 namespace rack {
@@ -13,11 +13,10 @@ void ModulePanel::draw(NVGcontext *vg) {
 	nvgFill(vg);
 
 	// Background image
-	if (!imageFilename.empty()) {
-		int imageId = loadImage(imageFilename);
+	if (backgroundImage) {
 		int width, height;
-		nvgImageSize(vg, imageId, &width, &height);
-		paint = nvgImagePattern(vg, box.pos.x, box.pos.y, width, height, 0.0, imageId, 1.0);
+		nvgImageSize(vg, backgroundImage->handle, &width, &height);
+		paint = nvgImagePattern(vg, box.pos.x, box.pos.y, width, height, 0.0, backgroundImage->handle, 1.0);
 		nvgFillPaint(vg, paint);
 		nvgFill(vg);
 	}

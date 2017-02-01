@@ -1,4 +1,5 @@
-#include "rack.hpp"
+#include "scene.hpp"
+#include "engine.hpp"
 
 
 namespace rack {
@@ -112,7 +113,7 @@ WireWidget::~WireWidget() {
 
 void WireWidget::updateWire() {
 	if (wire) {
-		gRack->removeWire(wire);
+		engineRemoveWire(wire);
 		delete wire;
 		wire = NULL;
 	}
@@ -122,14 +123,15 @@ void WireWidget::updateWire() {
 		wire->outputId = outputPort->outputId;
 		wire->inputModule = inputPort->module;
 		wire->inputId = inputPort->inputId;
-		gRack->addWire(wire);
+		engineAddWire(wire);
 	}
 }
 
 void WireWidget::draw(NVGcontext *vg) {
 	Vec outputPos, inputPos;
 	Vec absolutePos = getAbsolutePos();
-	float opacity = gScene->toolbar->wireOpacitySlider->value / 100.0;
+	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value / 100.0;
+	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
 
 	// Compute location of pos1 and pos2
 	if (outputPort) {
@@ -150,7 +152,6 @@ void WireWidget::draw(NVGcontext *vg) {
 	outputPos = outputPos.minus(absolutePos);
 	inputPos = inputPos.minus(absolutePos);
 
-	float tension = gScene->toolbar->wireTensionSlider->value;
 	drawWire(vg, outputPos, inputPos, tension, color, opacity);
 }
 
