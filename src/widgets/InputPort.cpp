@@ -3,13 +3,6 @@
 
 namespace rack {
 
-void InputPort::draw(NVGcontext *vg) {
-	SpriteWidget::draw(vg);
-	if (gRackWidget->activeWire && gRackWidget->activeWire->inputPort) {
-		Port::drawGlow(vg);
-	}
-}
-
 void InputPort::onDragStart() {
 	if (connectedWire) {
 		// Disconnect wire from this port, but set it as the active wire

@@ -14,10 +14,8 @@ void midiInit();
 
 struct AudioInterfaceWidget : ModuleWidget {
 	AudioInterfaceWidget();
-	void draw(NVGcontext *vg);
 };
 
 struct MidiInterfaceWidget : ModuleWidget {
 	MidiInterfaceWidget();
-	void draw(NVGcontext *vg);
 };

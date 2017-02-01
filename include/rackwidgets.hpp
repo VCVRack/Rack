@@ -94,7 +94,6 @@ struct RackWidget : OpaqueWidget {
 
 struct ModulePanel : TransparentWidget {
 	NVGcolor backgroundColor;
-	NVGcolor highlightColor;
 	std::string imageFilename;
 	void draw(NVGcontext *vg);
 };
@@ -167,7 +166,7 @@ struct MomentarySwitch : virtual Switch {
 // ports
 ////////////////////
 
-struct Port : OpaqueWidget, SpriteWidget {
+struct Port : OpaqueWidget {
 	Module *module = NULL;
 	WireWidget *connectedWire = NULL;
 
@@ -175,8 +174,6 @@ struct Port : OpaqueWidget, SpriteWidget {
 	~Port();
 	void disconnect();
 
-	int type;
-	void drawGlow(NVGcontext *vg);
 	void onMouseDown(int button);
 	void onDragEnd();
 };
@@ -184,7 +181,6 @@ struct Port : OpaqueWidget, SpriteWidget {
 struct InputPort : Port {
 	int inputId;
 
-	void draw(NVGcontext *vg);
 	void onDragStart();
 	void onDragDrop(Widget *origin);
 };
@@ -192,7 +188,6 @@ struct InputPort : Port {
 struct OutputPort : Port {
 	int outputId;
 
-	void draw(NVGcontext *vg);
 	void onDragStart();
 	void onDragDrop(Widget *origin);
 };
@@ -220,5 +215,41 @@ struct Scene : OpaqueWidget {
 	void step();
 };
 
+////////////////////
+// component library
+////////////////////
+
+struct PJ301M : SpriteWidget {
+	PJ301M() {
+		box.size = Vec(24, 24);
+		spriteOffset = Vec(-10, -10);
+		spriteSize = Vec(48, 48);
+		spriteFilename = "res/ComponentLibrary/PJ301M.png";
+	}
+};
+struct InputPortPJ301M : InputPort, PJ301M {};
+struct OutputPortPJ301M: OutputPort, PJ301M {};
+
+struct PJ3410 : SpriteWidget {
+	PJ3410() {
+		box.size = Vec(31, 31);
+		spriteOffset = Vec(-9, -9);
+		spriteSize = Vec(54, 54);
+		spriteFilename = "res/ComponentLibrary/PJ3410.png";
+	}
+};
+struct InputPortPJ3410 : InputPort, PJ3410 {};
+struct OutputPortPJ3410: OutputPort, PJ3410 {};
+
+struct CL1362 : SpriteWidget {
+	CL1362() {
+		box.size = Vec(33, 29);
+		spriteOffset = Vec(-10, -10);
+		spriteSize = Vec(57, 54);
+		spriteFilename = "res/ComponentLibrary/CL1362.png";
+	}
+};
+struct InputPortCL1362 : InputPort, CL1362 {};
+struct OutputPortCL1362 : OutputPort, CL1362 {};
 
 } // namespace rack

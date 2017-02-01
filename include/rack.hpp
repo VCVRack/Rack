@@ -166,18 +166,18 @@ ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, f
 	return param;
 }
 
-inline
+template <class TInputPort>
 InputPort *createInput(Vec pos, Module *module, int inputId) {
-	InputPort *port = new InputPort();
+	InputPort *port = new TInputPort();
 	port->box.pos = pos;
 	port->module = module;
 	port->inputId = inputId;
 	return port;
 }
 
-inline
+template <class TOutputPort>
 OutputPort *createOutput(Vec pos, Module *module, int outputId) {
-	OutputPort *port = new OutputPort();
+	OutputPort *port = new TOutputPort();
 	port->box.pos = pos;
 	port->module = module;
 	port->outputId = outputId;

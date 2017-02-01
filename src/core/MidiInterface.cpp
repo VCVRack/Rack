@@ -224,6 +224,14 @@ struct MidiChoice : ChoiceButton {
 MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
 	box.size = Vec(15*8, 380);
 
+	{
+		ModulePanel *panel = new ModulePanel();
+		panel->box.size = box.size;
+		panel->backgroundColor = nvgRGBf(0.90, 0.90, 0.90);
+		// panel->imageFilename = "";
+		addChild(panel);
+	}
+
 	float margin = 5;
 	float yPos = margin;
 
@@ -246,8 +254,8 @@ MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
 	}
 
 	yPos += 5;
-	addOutput(createOutput(Vec(25, yPos), module, MidiInterface::PITCH_OUTPUT));
-	addOutput(createOutput(Vec(75, yPos), module, MidiInterface::GATE_OUTPUT));
+	addOutput(createOutput<OutputPortPJ3410>(Vec(20, yPos), module, MidiInterface::PITCH_OUTPUT));
+	addOutput(createOutput<OutputPortPJ3410>(Vec(70, yPos), module, MidiInterface::GATE_OUTPUT));
 	yPos += 25 + margin;
 
 	{
@@ -263,9 +271,4 @@ MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
 
 		yPos += pitchLabel->box.size.y + margin;
 	}
-}
-
-void MidiInterfaceWidget::draw(NVGcontext *vg) {
-	bndBackground(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
-	ModuleWidget::draw(vg);
 }

@@ -45,10 +45,11 @@ struct AudioInterface : Module {
 	SampleRateConverter<2> inputSrc;
 	SampleRateConverter<2> outputSrc;
 
-	// in device's sample rate
-	DoubleRingBuffer<Frame<2>, (1<<15)> inputBuffer;
 	// in rack's sample rate
+	DoubleRingBuffer<Frame<2>, 32> inputBuffer;
 	DoubleRingBuffer<Frame<2>, (1<<15)> outputBuffer;
+	// in device's sample rate
+	DoubleRingBuffer<Frame<2>, (1<<15)> inputSrcBuffer;
 
 	AudioInterface();
 	~AudioInterface();
@@ -89,29 +90,35 @@ void AudioInterface::step() {
 
 	// Get input and pass it through the sample rate converter
 	if (numOutputs > 0) {
-		Frame<2> f;
-		f.samples[0] = getf(inputs[AUDIO1_INPUT]) / 5.0;
-		f.samples[1] = getf(inputs[AUDIO2_INPUT]) / 5.0;
+		if (!inputBuffer.full()) {
+			Frame<2> f;
+			f.samples[0] = getf(inputs[AUDIO1_INPUT]) / 5.0;
+			f.samples[1] = getf(inputs[AUDIO2_INPUT]) / 5.0;
+			inputBuffer.push(f);
+		}
 
-		inputSrc.setRatio(sampleRate / gRack->sampleRate);
-		int inLen = 1;
-		int outLen = inputBuffer.capacity();
-		inputSrc.process((const float*) &f, &inLen, (float*) inputBuffer.endData(), &outLen);
-		inputBuffer.endIncr(outLen);
+		// Once full, sample rate convert the input
+		if (inputBuffer.full()) {
+			inputSrc.setRatio(sampleRate / gRack->sampleRate);
+			int inLen = inputBuffer.size();
+			int outLen = inputSrcBuffer.capacity();
+			inputSrc.process((const float*) inputBuffer.startData(), &inLen, (float*) inputSrcBuffer.endData(), &outLen);
+			inputBuffer.startIncr(inLen);
+			inputSrcBuffer.endIncr(outLen);
+		}
 	}
 
-	// Read/write stream if we have enough input
-	bool streamReady = (numOutputs > 0) ? (inputBuffer.size() >= blockSize) : (outputBuffer.empty());
+	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
+	bool streamReady = (numOutputs > 0) ? (inputSrcBuffer.size() >= blockSize) : (outputBuffer.empty());
 	if (streamReady) {
+		// printf("%p\t%d\t%d\n", this, inputSrcBuffer.size(), outputBuffer.size());
 		PaError err;
 
 		// Read output from input stream
 		// (for some reason, if you write the output stream before you read the input stream, PortAudio can segfault on Windows.)
 		if (numInputs > 0) {
 			Frame<2> *buf = new Frame<2>[blockSize];
-			printf("read %d\n", blockSize);
 			err = Pa_ReadStream(stream, (float*) buf, blockSize);
-			printf("read done\n");
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paInputOverflowed) {
@@ -131,11 +138,9 @@ void AudioInterface::step() {
 
 		// Write input to output stream
 		if (numOutputs > 0) {
-			assert(inputBuffer.size() >= blockSize);
-			printf("write %d\n", blockSize);
-			err = Pa_WriteStream(stream, (const float*) inputBuffer.startData(), blockSize);
-			printf("write done\n");
-			inputBuffer.startIncr(blockSize);
+			assert(inputSrcBuffer.size() >= blockSize);
+			err = Pa_WriteStream(stream, (const float*) inputSrcBuffer.startData(), blockSize);
+			inputSrcBuffer.startIncr(blockSize);
 			if (err) {
 				// Ignore buffer underflows
 				if (err != paOutputUnderflowed) {
@@ -241,6 +246,7 @@ void AudioInterface::closeDevice() {
 	// Clear buffers
 	inputBuffer.clear();
 	outputBuffer.clear();
+	inputSrcBuffer.clear();
 	inputSrc.reset();
 	outputSrc.reset();
 }
@@ -355,6 +361,14 @@ struct BlockSizeChoice : ChoiceButton {
 AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()) {
 	box.size = Vec(15*8, 380);
 
+	{
+		ModulePanel *panel = new ModulePanel();
+		panel->box.size = box.size;
+		panel->backgroundColor = nvgRGBf(0.90, 0.90, 0.90);
+		// panel->imageFilename = "";
+		addChild(panel);
+	}
+
 	float margin = 5;
 	float yPos = margin;
 
@@ -420,8 +434,8 @@ AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()
 	}
 
 	yPos += 5;
-	addInput(createInput(Vec(25, yPos), module, AudioInterface::AUDIO1_INPUT));
-	addInput(createInput(Vec(75, yPos), module, AudioInterface::AUDIO2_INPUT));
+	addInput(createInput<InputPortPJ3410>(Vec(20, yPos), module, AudioInterface::AUDIO1_INPUT));
+	addInput(createInput<InputPortPJ3410>(Vec(70, yPos), module, AudioInterface::AUDIO2_INPUT));
 	yPos += 35 + margin;
 
 	{
@@ -433,12 +447,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()
 	}
 
 	yPos += 5;
-	addOutput(createOutput(Vec(25, yPos), module, AudioInterface::AUDIO1_OUTPUT));
-	addOutput(createOutput(Vec(75, yPos), module, AudioInterface::AUDIO2_OUTPUT));
+	addOutput(createOutput<OutputPortPJ3410>(Vec(20, yPos), module, AudioInterface::AUDIO1_OUTPUT));
+	addOutput(createOutput<OutputPortPJ3410>(Vec(70, yPos), module, AudioInterface::AUDIO2_OUTPUT));
 	yPos += 35 + margin;
-}
-
-void AudioInterfaceWidget::draw(NVGcontext *vg) {
-	bndBackground(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
-	ModuleWidget::draw(vg);
 }
