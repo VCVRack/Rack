@@ -30,9 +30,6 @@ CFLAGS += -DNOC_FILE_DIALOG_OSX
 CXXFLAGS += -DAPPLE -stdlib=libc++ -I$(HOME)/local/include
 LDFLAGS += -stdlib=libc++ -L$(HOME)/local/lib -lpthread -lglew -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -ldl -ljansson -lportaudio -lportmidi -lsamplerate
 TARGET = Rack
-
-Rack.app: $(TARGET)
-	./bundle.sh
 endif
 
 # Windows
@@ -52,41 +49,13 @@ LDFLAGS += \
 	-L$(HOME)/pkg/portaudio-r1891-build/lib/x64/ReleaseMinDependency -lportaudio_x64 \
 	-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows
 TARGET = Rack.exe
-# OBJECTS = Rack.res
+OBJECTS = Rack.res
+
+all: $(TARGET)
 
 %.res: %.rc
 	windres $^ -O coff -o $@
 endif
-
-
-all: $(TARGET)
-
-dist: $(TARGET)
-	# Rack
-	mkdir -p dist/Rack
-	cp LICENSE* dist/Rack/
-ifeq ($(ARCH), linux)
-	cp Rack dist/Rack/
-endif
-ifeq ($(ARCH), apple)
-	./bundle.sh
-	cp -R Rack.app dist/Rack/
-endif
-ifeq ($(ARCH), windows)
-	cp Rack.exe dist/Rack/
-	./copy_dlls.sh
-	cp *.dll dist/Rack/
-endif
-	cp -R res dist/Rack/
-	mkdir -p dist/Rack/plugins
-	# Fundamental
-	$(MAKE) -C plugins/Fundamental dist
-	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
-	# zip
-	cd dist && zip -5 -r Rack.zip Rack
-
-clean:
-	rm -rfv build $(TARGET) dist
 
 
 include Makefile.inc

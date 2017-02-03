@@ -7,10 +7,6 @@ namespace rack {
 #define KNOB_SENSITIVITY 0.001
 
 
-void Knob::step() {
-	index = eucmod((int) roundf(mapf(value, minValue, maxValue, minIndex, maxIndex)), spriteCount);
-}
-
 void Knob::onDragStart() {
 	guiCursorLock();
 }

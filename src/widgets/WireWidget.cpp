@@ -4,10 +4,28 @@
 
 namespace rack {
 
-void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, float tension, NVGcolor color, float opacity) {
-	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.08);
+static void drawPlug(NVGcontext *vg, Vec pos, NVGcolor color) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
+	nvgBeginPath(vg);
+	nvgCircle(vg, pos.x, pos.y, 10.5);
+	nvgFillColor(vg, colorOutline);
+	nvgFill(vg);
+
+	nvgBeginPath(vg);
+	nvgCircle(vg, pos.x, pos.y, 9.5);
+	nvgFillColor(vg, color);
+	nvgFill(vg);
+
+	nvgBeginPath(vg);
+	nvgCircle(vg, pos.x, pos.y, 5.5);
+	nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
+	nvgFill(vg);
+}
+
+static void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color, float tension, float opacity) {
+	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.08);
+	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Wire
 	if (opacity > 0.0) {
@@ -35,68 +53,36 @@ void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, float tension, NVGcolor color,
 		nvgMoveTo(vg, pos1.x, pos1.y);
 		nvgQuadTo(vg, pos3.x, pos3.y, pos2.x, pos2.y);
 		nvgStrokeColor(vg, colorOutline);
-		nvgStrokeWidth(vg, 6);
+		nvgStrokeWidth(vg, 5);
 		nvgStroke(vg);
 
 		// Wire solid
 		nvgStrokeColor(vg, color);
-		nvgStrokeWidth(vg, 4);
+		nvgStrokeWidth(vg, 3);
 		nvgStroke(vg);
 
 		nvgRestore(vg);
 	}
-
-	// First plug
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos1.x, pos1.y, 21/2.0);
-	nvgFillColor(vg, colorOutline);
-	nvgFill(vg);
-
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos1.x, pos1.y, 19/2.0);
-	nvgFillColor(vg, color);
-	nvgFill(vg);
-
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos1.x, pos1.y, 11/2.0);
-	nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
-	nvgFill(vg);
-
-	// Second plug
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos2.x, pos2.y, 21/2.0);
-	nvgFillColor(vg, colorOutline);
-	nvgFill(vg);
-
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos2.x, pos2.y, 19/2.0);
-	nvgFillColor(vg, color);
-	nvgFill(vg);
-
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos2.x, pos2.y, 11/2.0);
-	nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
-	nvgFill(vg);
 }
 
 
 static NVGcolor wireColors[8] = {
-	nvgRGB(0x50, 0x50, 0x50),
-	nvgRGB(0xac, 0x41, 0x42),
-	nvgRGB(0x90, 0xa9, 0x59),
-	nvgRGB(0xf4, 0xbf, 0x75),
-	nvgRGB(0x6a, 0x9f, 0xb5),
-	nvgRGB(0xaa, 0x75, 0x9f),
-	nvgRGB(0x75, 0xb5, 0xaa),
-	nvgRGB(0xf5, 0xf5, 0xf5),
+	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
+	nvgRGB(0xc9, 0x18, 0x47), // red
+	nvgRGB(0x0c, 0x8e, 0x15), // green
+	nvgRGB(0x09, 0x86, 0xad), // blue
+	nvgRGB(0x44, 0x44, 0x44), // black
+	nvgRGB(0x66, 0x66, 0x66), // gray
+	nvgRGB(0x88, 0x88, 0x88), // light gray
+	nvgRGB(0xaa, 0xaa, 0xaa), // white
 };
-static int wireColorId = 1;
+static int nextWireColorId = 1;
 
 
 
 WireWidget::WireWidget() {
-	wireColorId = (wireColorId + 1) % 8;
-	color = wireColors[wireColorId];
+	color = wireColors[nextWireColorId];
+	nextWireColorId = (nextWireColorId + 1) % 8;
 }
 
 WireWidget::~WireWidget() {
@@ -152,8 +138,11 @@ void WireWidget::draw(NVGcontext *vg) {
 	outputPos = outputPos.minus(absolutePos);
 	inputPos = inputPos.minus(absolutePos);
 
-	drawWire(vg, outputPos, inputPos, tension, color, opacity);
+	drawWire(vg, outputPos, inputPos, color, tension, opacity);
+	drawPlug(vg, outputPos, color);
+	drawPlug(vg, inputPos, color);
 }
+
 
 
 } // namespace rack

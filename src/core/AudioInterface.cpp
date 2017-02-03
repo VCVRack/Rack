@@ -46,7 +46,7 @@ struct AudioInterface : Module {
 	SampleRateConverter<2> outputSrc;
 
 	// in rack's sample rate
-	DoubleRingBuffer<Frame<2>, 32> inputBuffer;
+	DoubleRingBuffer<Frame<2>, 16> inputBuffer;
 	DoubleRingBuffer<Frame<2>, (1<<15)> outputBuffer;
 	// in device's sample rate
 	DoubleRingBuffer<Frame<2>, (1<<15)> inputSrcBuffer;
@@ -121,7 +121,7 @@ void AudioInterface::step() {
 			err = Pa_ReadStream(stream, (float*) buf, blockSize);
 			if (err) {
 				// Ignore buffer underflows
-				if (err != paInputOverflowed) {
+				if (err == paInputOverflowed) {
 					fprintf(stderr, "Audio input buffer underflow\n");
 				}
 			}
@@ -143,7 +143,7 @@ void AudioInterface::step() {
 			inputSrcBuffer.startIncr(blockSize);
 			if (err) {
 				// Ignore buffer underflows
-				if (err != paOutputUnderflowed) {
+				if (err == paOutputUnderflowed) {
 					fprintf(stderr, "Audio output buffer underflow\n");
 				}
 			}
@@ -308,7 +308,8 @@ struct SampleRateChoice : ChoiceButton {
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 
 		const float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
-		for (int i = 0; i < 6; i++) {
+		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
+		for (int i = 0; i < sampleRatesLen; i++) {
 			SampleRateItem *item = new SampleRateItem();
 			item->audioInterface = audioInterface;
 			item->sampleRate = sampleRates[i];
@@ -340,8 +341,9 @@ struct BlockSizeChoice : ChoiceButton {
 		Menu *menu = new Menu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 
-		const int blockSizes[6] = {128, 256, 512, 1024, 2048, 4096};
-		for (int i = 0; i < 6; i++) {
+		const int blockSizes[] = {64, 128, 256, 512, 1024, 2048, 4096};
+		int blockSizesLen = sizeof(blockSizes) / sizeof(blockSizes[0]);
+		for (int i = 0; i < blockSizesLen; i++) {
 			BlockSizeItem *item = new BlockSizeItem();
 			item->audioInterface = audioInterface;
 			item->blockSize = blockSizes[i];
@@ -362,23 +364,13 @@ AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()
 	box.size = Vec(15*8, 380);
 
 	{
-		ModulePanel *panel = new ModulePanel();
+		Panel *panel = new LightPanel();
 		panel->box.size = box.size;
-		panel->backgroundColor = nvgRGBf(0.90, 0.90, 0.90);
-		// panel->imageFilename = "";
 		addChild(panel);
 	}
 
 	float margin = 5;
 	float yPos = margin;
-
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "Audio Interface";
-		addChild(label);
-		yPos += label->box.size.y + margin;
-	}
 
 	{
 		Label *label = new Label();

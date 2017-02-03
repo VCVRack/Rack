@@ -93,8 +93,9 @@ struct RackWidget : OpaqueWidget {
 	void onMouseDown(int button);
 };
 
-struct ModulePanel : TransparentWidget {
+struct Panel : TransparentWidget {
 	NVGcolor backgroundColor;
+	NVGcolor borderColor;
 	std::shared_ptr<Image> backgroundImage;
 	void draw(NVGcontext *vg);
 };
@@ -109,7 +110,7 @@ struct Light : TransparentWidget, SpriteWidget {
 };
 
 // If you don't add these to your ModuleWidget, it will fall out of the RackWidget
-struct Screw : TransparentWidget, SpriteWidget {
+struct Screw : TransparentWidget {
 	Screw();
 };
 
@@ -123,12 +124,15 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	void onChange();
 };
 
-struct Knob : ParamWidget, SpriteWidget {
-	int minIndex, maxIndex, spriteCount;
-	void step();
+struct Knob : ParamWidget {
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
+};
+
+struct SpriteKnob : Knob, SpriteWidget {
+	int minIndex, maxIndex, spriteCount;
+	void step();
 };
 
 struct Switch : ParamWidget, SpriteWidget {
@@ -212,46 +216,8 @@ struct RackScene : Scene {
 
 	RackScene();
 	void step();
+	void draw(NVGcontext *vg);
 };
-
-
-////////////////////
-// Component Library
-////////////////////
-
-struct PJ301M : SpriteWidget {
-	PJ301M() {
-		box.size = Vec(24, 24);
-		spriteOffset = Vec(-10, -10);
-		spriteSize = Vec(48, 48);
-		spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
-	}
-};
-struct InputPortPJ301M : InputPort, PJ301M {};
-struct OutputPortPJ301M: OutputPort, PJ301M {};
-
-struct PJ3410 : SpriteWidget {
-	PJ3410() {
-		box.size = Vec(31, 31);
-		spriteOffset = Vec(-9, -9);
-		spriteSize = Vec(54, 54);
-		spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
-	}
-};
-struct InputPortPJ3410 : InputPort, PJ3410 {};
-struct OutputPortPJ3410: OutputPort, PJ3410 {};
-
-struct CL1362 : SpriteWidget {
-	CL1362() {
-		box.size = Vec(33, 29);
-		spriteOffset = Vec(-10, -10);
-		spriteSize = Vec(57, 54);
-		spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
-	}
-};
-struct InputPortCL1362 : InputPort, CL1362 {};
-struct OutputPortCL1362 : OutputPort, CL1362 {};
-
 
 ////////////////////
 // globals

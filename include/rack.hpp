@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "engine.hpp"
 #include "gui.hpp"
+#include "components.hpp"
 
 
 namespace rack {
@@ -10,14 +11,6 @@ namespace rack {
 ////////////////////
 // helpers
 ////////////////////
-
-inline
-Plugin *createPlugin(std::string slug, std::string name) {
-	Plugin *plugin = new Plugin();
-	plugin->slug = slug;
-	plugin->name = name;
-	return plugin;
-}
 
 template <class TModuleWidget>
 Model *createModel(Plugin *plugin, std::string slug, std::string name) {

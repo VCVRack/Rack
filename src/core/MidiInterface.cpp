@@ -225,10 +225,8 @@ MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
 	box.size = Vec(15*8, 380);
 
 	{
-		ModulePanel *panel = new ModulePanel();
+		Panel *panel = new LightPanel();
 		panel->box.size = box.size;
-		panel->backgroundColor = nvgRGBf(0.90, 0.90, 0.90);
-		// panel->imageFilename = "";
 		addChild(panel);
 	}
 

@@ -1,9 +1,6 @@
 #include "core.hpp"
 
 
-using namespace rack;
-
-
 struct CorePlugin : Plugin {
 	CorePlugin() {
 		slug = "Core";
