@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <mutex>
+#include <thread>
 #include <portaudio.h>
 #include "core.hpp"
 #include "dsp.hpp"
@@ -40,7 +41,8 @@ struct AudioInterface : Module {
 	int numInputs = 0;
 
 	// Used because the GUI thread and Rack thread can both interact with this class
-	std::mutex mutex;
+	std::mutex bufferMutex;
+	bool streamRunning;
 
 	SampleRateConverter<2> inputSrc;
 	SampleRateConverter<2> outputSrc;
@@ -54,6 +56,7 @@ struct AudioInterface : Module {
 	AudioInterface();
 	~AudioInterface();
 	void step();
+	void stepStream(const float *input, float *output, int numFrames);
 
 	int getDeviceCount();
 	std::string getDeviceName(int deviceId);
@@ -84,9 +87,22 @@ AudioInterface::~AudioInterface() {
 }
 
 void AudioInterface::step() {
-	std::lock_guard<std::mutex> lock(mutex);
 	if (!stream)
 		return;
+
+	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
+	if (numOutputs > 0) {
+		while (inputSrcBuffer.size() >= blockSize && streamRunning) {
+			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
+		}
+	}
+	else if (numInputs > 0) {
+		while (outputBuffer.empty() && streamRunning) {
+			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
+		}
+	}
+
+	std::lock_guard<std::mutex> lock(bufferMutex);
 
 	// Get input and pass it through the sample rate converter
 	if (numOutputs > 0) {
@@ -98,55 +114,14 @@ void AudioInterface::step() {
 		}
 
 		// Once full, sample rate convert the input
+		// inputBuffer -> SRC -> inputSrcBuffer
 		if (inputBuffer.full()) {
 			inputSrc.setRatio(sampleRate / gSampleRate);
 			int inLen = inputBuffer.size();
 			int outLen = inputSrcBuffer.capacity();
-			inputSrc.process((const float*) inputBuffer.startData(), &inLen, (float*) inputSrcBuffer.endData(), &outLen);
+			inputSrc.process(inputBuffer.startData(), &inLen, inputSrcBuffer.endData(), &outLen);
 			inputBuffer.startIncr(inLen);
 			inputSrcBuffer.endIncr(outLen);
-		}
-	}
-
-	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
-	bool streamReady = (numOutputs > 0) ? (inputSrcBuffer.size() >= blockSize) : (outputBuffer.empty());
-	if (streamReady) {
-		// printf("%p\t%d\t%d\n", this, inputSrcBuffer.size(), outputBuffer.size());
-		PaError err;
-
-		// Read output from input stream
-		// (for some reason, if you write the output stream before you read the input stream, PortAudio can segfault on Windows.)
-		if (numInputs > 0) {
-			Frame<2> *buf = new Frame<2>[blockSize];
-			err = Pa_ReadStream(stream, (float*) buf, blockSize);
-			if (err) {
-				// Ignore buffer underflows
-				if (err == paInputOverflowed) {
-					fprintf(stderr, "Audio input buffer underflow\n");
-				}
-			}
-
-			// Pass output through sample rate converter
-			outputSrc.setRatio(gSampleRate / sampleRate);
-			int inLen = blockSize;
-			int outLen = outputBuffer.capacity();
-			outputSrc.process((float*) buf, &inLen, (float*) outputBuffer.endData(), &outLen);
-			outputBuffer.endIncr(outLen);
-			delete[] buf;
-		}
-
-
-		// Write input to output stream
-		if (numOutputs > 0) {
-			assert(inputSrcBuffer.size() >= blockSize);
-			err = Pa_WriteStream(stream, (const float*) inputSrcBuffer.startData(), blockSize);
-			inputSrcBuffer.startIncr(blockSize);
-			if (err) {
-				// Ignore buffer underflows
-				if (err == paOutputUnderflowed) {
-					fprintf(stderr, "Audio output buffer underflow\n");
-				}
-			}
 		}
 	}
 
@@ -155,6 +130,47 @@ void AudioInterface::step() {
 		Frame<2> f = outputBuffer.shift();
 		setf(outputs[AUDIO1_OUTPUT], 5.0 * f.samples[0]);
 		setf(outputs[AUDIO2_OUTPUT], 5.0 * f.samples[1]);
+	}
+}
+
+void AudioInterface::stepStream(const float *input, float *output, int numFrames) {
+	if (numOutputs > 0) {
+		// Wait for enough input before proceeding
+		while (inputSrcBuffer.size() < numFrames) {
+			if (!streamRunning)
+				return;
+			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
+		}
+	}
+
+	std::lock_guard<std::mutex> lock(bufferMutex);
+	// input stream -> output buffer
+	if (numInputs > 0) {
+		Frame<2> inputFrames[numFrames];
+		for (int i = 0; i < numFrames; i++) {
+			for (int c = 0; c < 2; c++) {
+				inputFrames[i].samples[c] = (numInputs > c) ? input[i*numInputs + c] : 0.0;
+			}
+		}
+
+		// Pass output through sample rate converter
+		outputSrc.setRatio(gSampleRate / sampleRate);
+		int inLen = numFrames;
+		int outLen = outputBuffer.capacity();
+		outputSrc.process(inputFrames, &inLen, outputBuffer.endData(), &outLen);
+		outputBuffer.endIncr(outLen);
+	}
+
+	// input buffer -> output stream
+	if (numOutputs > 0) {
+		for (int i = 0; i < numFrames; i++) {
+			if (inputSrcBuffer.empty())
+				break;
+			Frame<2> f = inputSrcBuffer.shift();
+			for (int c = 0; c < numOutputs; c++) {
+				output[i*numOutputs + c] = f.samples[c];
+			}
+		}
 	}
 }
 
@@ -170,9 +186,15 @@ std::string AudioInterface::getDeviceName(int deviceId) {
 	return stringf("%s: %s (%d in, %d out)", apiInfo->name, info->name, info->maxInputChannels, info->maxOutputChannels);
 }
 
+static int paCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
+	AudioInterface *p = (AudioInterface *) userData;
+	p->stepStream((const float *) inputBuffer, (float *) outputBuffer, framesPerBuffer);
+	return paContinue;
+}
+
 void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 	closeDevice();
-	std::lock_guard<std::mutex> lock(mutex);
+	std::lock_guard<std::mutex> lock(bufferMutex);
 
 	this->sampleRate = sampleRate;
 	this->blockSize = blockSize;
@@ -207,7 +229,7 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		err = Pa_OpenStream(&stream,
 			numInputs == 0 ? NULL : &inputParameters,
 			numOutputs == 0 ? NULL : &outputParameters,
-			sampleRate, blockSize, paNoFlag, NULL, NULL);
+			sampleRate, blockSize, paNoFlag, paCallback, this);
 		if (err) {
 			fprintf(stderr, "Failed to open audio stream: %s\n", Pa_GetErrorText(err));
 			return;
@@ -218,6 +240,8 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 			fprintf(stderr, "Failed to start audio stream: %s\n", Pa_GetErrorText(err));
 			return;
 		}
+		// This should go after Pa_StartStream because sometimes it will call the callback once synchronously, and that time it should return early
+		streamRunning = true;
 
 		// Correct sample rate
 		const PaStreamInfo *streamInfo = Pa_GetStreamInfo(stream);
@@ -227,10 +251,16 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 }
 
 void AudioInterface::closeDevice() {
-	std::lock_guard<std::mutex> lock(mutex);
+	std::lock_guard<std::mutex> lock(bufferMutex);
 
 	if (stream) {
 		PaError err;
+		streamRunning = false;
+		err = Pa_StopStream(stream);
+		if (err) {
+			fprintf(stderr, "Failed to stop audio stream: %s\n", Pa_GetErrorText(err));
+		}
+
 		err = Pa_CloseStream(stream);
 		if (err) {
 			fprintf(stderr, "Failed to close audio stream: %s\n", Pa_GetErrorText(err));

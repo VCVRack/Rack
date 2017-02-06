@@ -20,7 +20,7 @@ int main() {
 		assert(success);
 		CFRelease(bundleURL);
 
-		// chdir(dirname(path));
+		chdir(dirname(path));
 	}
 #endif
 

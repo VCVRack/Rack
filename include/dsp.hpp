@@ -251,11 +251,11 @@ struct SampleRateConverter {
 		data.src_ratio = r;
 	}
 	/** `in` and `out` are interlaced with the number of channels */
-	void process(const float *in, int *inFrames, float *out, int *outFrames) {
-		// The const cast is okay since src_process does not modify it
-		data.data_in = const_cast<float*>(in);
+	void process(const Frame<CHANNELS> *in, int *inFrames, Frame<CHANNELS> *out, int *outFrames) {
+		// Old versions of libsamplerate use float* here instead of const float*
+		data.data_in = (float*) in;
 		data.input_frames = *inFrames;
-		data.data_out = out;
+		data.data_out = (float*) out;
 		data.output_frames = *outFrames;
 		src_process(state, &data);
 		*inFrames = data.input_frames_used;

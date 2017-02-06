@@ -76,13 +76,17 @@ static NVGcolor wireColors[8] = {
 	nvgRGB(0x88, 0x88, 0x88), // light gray
 	nvgRGB(0xaa, 0xaa, 0xaa), // white
 };
-static int nextWireColorId = 1;
-
+static int lastWireColorId = -1;
 
 
 WireWidget::WireWidget() {
-	color = wireColors[nextWireColorId];
-	nextWireColorId = (nextWireColorId + 1) % 8;
+	int wireColorId;
+	do {
+		wireColorId = randomu32() % 8;
+	} while (wireColorId == lastWireColorId);
+	lastWireColorId = wireColorId;
+
+	color = wireColors[wireColorId];
 }
 
 WireWidget::~WireWidget() {

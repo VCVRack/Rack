@@ -47,9 +47,9 @@ struct FileChoice : ChoiceButton {
 			openItem->text = "Open";
 			menu->pushChild(openItem);
 
-			MenuItem *saveItem = new SaveItem();
-			saveItem->text = "Save";
-			menu->pushChild(saveItem);
+			// MenuItem *saveItem = new SaveItem();
+			// saveItem->text = "Save";
+			// menu->pushChild(saveItem);
 
 			MenuItem *saveAsItem = new SaveItem();
 			saveAsItem->text = "Save As";

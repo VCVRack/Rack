@@ -49,13 +49,16 @@ LDFLAGS += \
 	-L$(HOME)/pkg/portaudio-r1891-build/lib/x64/ReleaseMinDependency -lportaudio_x64 \
 	-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows
 TARGET = Rack.exe
-OBJECTS = Rack.res
-
-all: $(TARGET)
+# OBJECTS = Rack.res
 
 %.res: %.rc
 	windres $^ -O coff -o $@
 endif
 
+
+all: $(TARGET)
+
+clean:
+	rm -rf $(TARGET) build
 
 include Makefile.inc
