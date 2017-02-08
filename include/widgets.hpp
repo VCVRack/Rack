@@ -69,8 +69,10 @@ struct Widget {
 	Gives ownership of widget to this widget instance.
 	*/
 	void addChild(Widget *widget);
-	// Does not delete widget but transfers ownership to caller
-	// Silenty fails if widget is not a child
+	/** Removes widget from list of children if it exists.
+	Does not delete widget but transfers ownership to caller
+	Silently fails if widget is not a child
+	*/
 	void removeChild(Widget *widget);
 	void clearChildren();
 

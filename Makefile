@@ -1,30 +1,22 @@
-ARCH ?= linux
-CFLAGS = -MMD -g -Wall -O2
-CXXFLAGS = -MMD -g -Wall -std=c++11 -O3 -msse -mfpmath=sse -ffast-math -fno-exceptions \
+ARCH ?= lin
+FLAGS = -g -Wall -O3 -msse -mfpmath=sse -ffast-math \
 	-I./ext -I./include
-LDFLAGS =
+CXXFLAGS = -fno-exceptions
 
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
 
 
-# Linux
-ifeq ($(ARCH), linux)
-CC = gcc
-CXX = g++
+ifeq ($(ARCH), lin)
 SOURCES += ext/noc/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_GTK $(shell pkg-config --cflags gtk+-2.0)
-CXXFLAGS += -DLINUX
 LDFLAGS += -rdynamic \
 	-lpthread -lGL -lGLEW -lglfw -ldl -ljansson -lportaudio -lportmidi -lsamplerate \
 	$(shell pkg-config --libs gtk+-2.0)
 TARGET = Rack
 endif
 
-# Apple
-ifeq ($(ARCH), apple)
-CC = clang
-CXX = clang++
+ifeq ($(ARCH), mac)
 SOURCES += ext/noc/noc_file_dialog.m
 CFLAGS += -DNOC_FILE_DIALOG_OSX
 CXXFLAGS += -DAPPLE -stdlib=libc++ -I$(HOME)/local/include
@@ -32,13 +24,10 @@ LDFLAGS += -stdlib=libc++ -L$(HOME)/local/lib -lpthread -lglew -lglfw3 -framewor
 TARGET = Rack
 endif
 
-# Windows
-ifeq ($(ARCH), windows)
-CC = x86_64-w64-mingw32-gcc
-CXX = x86_64-w64-mingw32-g++
+ifeq ($(ARCH), win)
 SOURCES += ext/noc/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_WIN32
-CXXFLAGS += -DWINDOWS -D_USE_MATH_DEFINES -DGLEW_STATIC \
+CXXFLAGS += -DGLEW_STATIC \
 	-I$(HOME)/pkg/portaudio-r1891-build/include
 LDFLAGS += \
 	-Wl,-Bstatic,--whole-archive \

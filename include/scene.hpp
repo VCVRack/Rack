@@ -104,14 +104,9 @@ struct Panel : TransparentWidget {
 // params
 ////////////////////
 
-struct Light : TransparentWidget, SpriteWidget {
+struct Light : TransparentWidget {
 	NVGcolor color;
 	void draw(NVGcontext *vg);
-};
-
-// If you don't add these to your ModuleWidget, it will fall out of the RackWidget
-struct Screw : TransparentWidget {
-	Screw();
 };
 
 struct ParamWidget : OpaqueWidget, QuantityWidget {

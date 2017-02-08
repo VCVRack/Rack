@@ -61,9 +61,9 @@ OutputPort *createOutput(Vec pos, Module *module, int outputId) {
 	return port;
 }
 
-inline
+template <class TScrew>
 Screw *createScrew(Vec pos) {
-	Screw *screw = new Screw();
+	Screw *screw = new TScrew();
 	screw->box.pos = pos;
 	return screw;
 }
