@@ -42,4 +42,12 @@ void InputPort::onDragLeave(Widget *origin) {
 	}
 }
 
+void InputPort::draw(NVGcontext *vg) {
+	if (gRackWidget->activeWire) {
+		if (gRackWidget->activeWire->inputPort)
+			nvgGlobalAlpha(vg, 0.5);
+	}
+	SpriteWidget::draw(vg);
+}
+
 } // namespace rack

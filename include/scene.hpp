@@ -168,7 +168,7 @@ struct MomentarySwitch : virtual Switch {
 // ports
 ////////////////////
 
-struct Port : OpaqueWidget {
+struct Port : OpaqueWidget, SpriteWidget {
 	Module *module = NULL;
 	WireWidget *connectedWire = NULL;
 
@@ -187,6 +187,7 @@ struct InputPort : Port {
 	void onDragDrop(Widget *origin);
 	void onDragEnter(Widget *origin);
 	void onDragLeave(Widget *origin);
+	void draw(NVGcontext *vg);
 };
 
 struct OutputPort : Port {
@@ -196,6 +197,7 @@ struct OutputPort : Port {
 	void onDragDrop(Widget *origin);
 	void onDragEnter(Widget *origin);
 	void onDragLeave(Widget *origin);
+	void draw(NVGcontext *vg);
 };
 
 ////////////////////

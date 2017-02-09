@@ -77,38 +77,41 @@ struct BefacoSlidePot : SpriteKnob {
 // Jacks
 ////////////////////
 
-struct PJ301M : SpriteWidget {
+template <typename BASE>
+struct PJ301M : BASE {
 	PJ301M() {
-		box.size = Vec(24, 24);
-		spriteOffset = Vec(-2, -2);
-		spriteSize = Vec(30, 30);
-		spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
+		this->box.size = Vec(24, 24);
+		this->spriteOffset = Vec(-2, -2);
+		this->spriteSize = Vec(30, 30);
+		this->spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
 	}
 };
-struct InputPortPJ301M : InputPort, PJ301M {};
-struct OutputPortPJ301M: OutputPort, PJ301M {};
+typedef PJ301M<InputPort> InputPortPJ301M;
+typedef PJ301M<OutputPort> OutputPortPJ301M;
 
-struct PJ3410 : SpriteWidget {
+template <typename BASE>
+struct PJ3410 : BASE {
 	PJ3410() {
-		box.size = Vec(32, 32);
-		spriteOffset = Vec(-1, -1);
-		spriteSize = Vec(36, 36);
-		spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
+		this->box.size = Vec(32, 32);
+		this->spriteOffset = Vec(-1, -1);
+		this->spriteSize = Vec(36, 36);
+		this->spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
 	}
 };
-struct InputPortPJ3410 : InputPort, PJ3410 {};
-struct OutputPortPJ3410: OutputPort, PJ3410 {};
+typedef PJ3410<InputPort> InputPortPJ3410;
+typedef PJ3410<OutputPort> OutputPortPJ3410;
 
-struct CL1362 : SpriteWidget {
+template <typename BASE>
+struct CL1362 : BASE {
 	CL1362() {
-		box.size = Vec(33, 29);
-		spriteOffset = Vec(-2, -2);
-		spriteSize = Vec(39, 36);
-		spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
+		this->box.size = Vec(33, 29);
+		this->spriteOffset = Vec(-2, -2);
+		this->spriteSize = Vec(39, 36);
+		this->spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
 	}
 };
-struct InputPortCL1362 : InputPort, CL1362 {};
-struct OutputPortCL1362 : OutputPort, CL1362 {};
+typedef CL1362<InputPort> InputPortCL1362;
+typedef CL1362<OutputPort> OutputPortCL1362;
 
 ////////////////////
 // Misc
