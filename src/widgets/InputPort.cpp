@@ -22,11 +22,24 @@ void InputPort::onDragStart() {
 void InputPort::onDragDrop(Widget *origin) {
 	if (connectedWire) return;
 	if (gRackWidget->activeWire) {
+		gRackWidget->activeWire->hoveredInputPort = NULL;
 		if (gRackWidget->activeWire->inputPort) return;
 		gRackWidget->activeWire->inputPort = this;
 		connectedWire = gRackWidget->activeWire;
 	}
 }
 
+void InputPort::onDragEnter(Widget *origin) {
+	if (connectedWire) return;
+	if (gRackWidget->activeWire) {
+		gRackWidget->activeWire->hoveredInputPort = this;
+	}
+}
+
+void InputPort::onDragLeave(Widget *origin) {
+	if (gRackWidget->activeWire) {
+		gRackWidget->activeWire->hoveredInputPort = NULL;
+	}
+}
 
 } // namespace rack

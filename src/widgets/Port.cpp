@@ -36,5 +36,4 @@ void Port::onDragEnd() {
 	gRackWidget->activeWire = NULL;
 }
 
-
 } // namespace rack

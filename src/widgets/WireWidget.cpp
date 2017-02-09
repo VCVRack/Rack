@@ -7,16 +7,18 @@ namespace rack {
 static void drawPlug(NVGcontext *vg, Vec pos, NVGcolor color) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos.x, pos.y, 10.5);
-	nvgFillColor(vg, colorOutline);
-	nvgFill(vg);
-
+	// Plug solid
 	nvgBeginPath(vg);
 	nvgCircle(vg, pos.x, pos.y, 9.5);
 	nvgFillColor(vg, color);
 	nvgFill(vg);
 
+	// Border
+	nvgStrokeWidth(vg, 1.0);
+	nvgStrokeColor(vg, colorOutline);
+	nvgStroke(vg);
+
+	// Hole
 	nvgBeginPath(vg);
 	nvgCircle(vg, pos.x, pos.y, 5.5);
 	nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
@@ -118,25 +120,35 @@ void WireWidget::updateWire() {
 }
 
 void WireWidget::draw(NVGcontext *vg) {
-	Vec outputPos, inputPos;
 	Vec absolutePos = getAbsolutePos();
 	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value / 100.0;
 	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
 
-	// Compute location of pos1 and pos2
+	// Display the actively dragged wire as opaque
+	if (gRackWidget->activeWire == this)
+		opacity = 1.0;
+
+	// Compute location of outputPos and inputPos
+	Vec outputPos;
 	if (outputPort) {
 		outputPos = Rect(outputPort->getAbsolutePos(), outputPort->box.size).getCenter();
 	}
+	else if (hoveredOutputPort) {
+		outputPos = Rect(hoveredOutputPort->getAbsolutePos(), hoveredOutputPort->box.size).getCenter();
+	}
 	else {
 		outputPos = gMousePos;
-		opacity = 1.0;
 	}
+
+	Vec inputPos;
 	if (inputPort) {
 		inputPos = Rect(inputPort->getAbsolutePos(), inputPort->box.size).getCenter();
 	}
+	else if (hoveredInputPort) {
+		inputPos = Rect(hoveredInputPort->getAbsolutePos(), hoveredInputPort->box.size).getCenter();
+	}
 	else {
 		inputPos = gMousePos;
-		opacity = 1.0;
 	}
 
 	outputPos = outputPos.minus(absolutePos);

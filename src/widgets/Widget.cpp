@@ -8,12 +8,10 @@ Widget::~Widget() {
 	// You should only delete orphaned widgets
 	assert(!parent);
 	// Stop dragging and hovering this widget
-	if (gHoveredWidget == this)
-		gHoveredWidget = NULL;
-	if (gDraggedWidget == this)
-		gDraggedWidget = NULL;
-	if (gSelectedWidget == this)
-		gSelectedWidget = NULL;
+	if (gHoveredWidget == this) gHoveredWidget = NULL;
+	if (gDraggedWidget == this) gDraggedWidget = NULL;
+	if (gDragHoveredWidget == this) gDragHoveredWidget = NULL;
+	if (gSelectedWidget == this) gSelectedWidget = NULL;
 	clearChildren();
 }
 
@@ -71,9 +69,9 @@ void Widget::step() {
 }
 
 void Widget::draw(NVGcontext *vg) {
-	nvgSave(vg);
 	nvgTranslate(vg, box.pos.x, box.pos.y);
 	for (Widget *child : children) {
+		nvgSave(vg);
 		child->draw(vg);
 	}
 	nvgRestore(vg);

@@ -60,6 +60,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 				gDraggedWidget->onDragEnd();
 			}
 			gDraggedWidget = NULL;
+			gDragHoveredWidget = NULL;
 		}
 	}
 }
@@ -69,27 +70,33 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	Vec mouseRel = mousePos.minus(gMousePos);
 	gMousePos = mousePos;
 
-	if (glfwGetInputMode(window, GLFW_CURSOR) != GLFW_CURSOR_DISABLED) {
-		// TODO Lock gMousePos
-	}
+	bool locked = glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
 
-	// onScroll
-	// int middleButton = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
-	// if (middleButton == GLFW_PRESS) {
-	// 	gScene->scrollWidget->onScroll(mouseRel.neg());
-	// }
+	// onMouseMove
+	Widget *hovered = gScene->onMouseMove(gMousePos, mouseRel);
 
 	if (gDraggedWidget) {
 		// onDragMove
 		// Drag slower if Ctrl is held
-		bool fine = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
-		float factor = fine ? 1.0/8.0 : 1.0;
-		gDraggedWidget->onDragMove(mouseRel.mult(factor));
+		if (locked) {
+			bool ctrl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+			if (ctrl)
+				mouseRel = mouseRel.mult(0.1);
+		}
+		gDraggedWidget->onDragMove(mouseRel);
+
+		if (hovered != gDragHoveredWidget) {
+			if (gDragHoveredWidget) {
+				gDragHoveredWidget->onDragLeave(gDraggedWidget);
+			}
+			if (hovered) {
+				hovered->onDragEnter(gDraggedWidget);
+			}
+			gDragHoveredWidget = hovered;
+		}
+
 	}
 	else {
-		// onMouseMove
-		Widget *hovered = gScene->onMouseMove(gMousePos, mouseRel);
-
 		if (hovered != gHoveredWidget) {
 			if (gHoveredWidget) {
 				// onMouseLeave
@@ -99,8 +106,8 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 			// onMouseEnter
 				hovered->onMouseEnter();
 			}
+			gHoveredWidget = hovered;
 		}
-		gHoveredWidget = hovered;
 	}
 }
 

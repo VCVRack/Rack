@@ -59,6 +59,8 @@ struct ModuleWidget : OpaqueWidget {
 struct WireWidget : OpaqueWidget {
 	OutputPort *outputPort = NULL;
 	InputPort *inputPort = NULL;
+	OutputPort *hoveredOutputPort = NULL;
+	InputPort *hoveredInputPort = NULL;
 	Wire *wire = NULL;
 	NVGcolor color;
 
@@ -183,6 +185,8 @@ struct InputPort : Port {
 
 	void onDragStart();
 	void onDragDrop(Widget *origin);
+	void onDragEnter(Widget *origin);
+	void onDragLeave(Widget *origin);
 };
 
 struct OutputPort : Port {
@@ -190,6 +194,8 @@ struct OutputPort : Port {
 
 	void onDragStart();
 	void onDragDrop(Widget *origin);
+	void onDragEnter(Widget *origin);
+	void onDragLeave(Widget *origin);
 };
 
 ////////////////////

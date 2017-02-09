@@ -21,6 +21,8 @@ void RadioButton::onDragDrop(Widget *origin) {
 			value = 1.0;
 		else
 			value = 0.0;
+
+		onAction();
 	}
 }
 

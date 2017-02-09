@@ -104,6 +104,8 @@ struct Widget {
 	/** Called when a widget responds to `onMouseMove` and is being dragged */
 	virtual void onDragMove(Vec mouseRel) {}
 	/** Called when a widget responds to `onMouseUp` for a left button release and a widget is being dragged */
+	virtual void onDragEnter(Widget *origin) {}
+	virtual void onDragLeave(Widget *origin) {}
 	virtual void onDragDrop(Widget *origin) {}
 
 	virtual void onAction() {}
@@ -318,6 +320,7 @@ struct Scene : OpaqueWidget {
 extern Vec gMousePos;
 extern Widget *gHoveredWidget;
 extern Widget *gDraggedWidget;
+extern Widget *gDragHoveredWidget;
 extern Widget *gSelectedWidget;
 extern int gGuiFrame;
 

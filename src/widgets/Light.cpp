@@ -10,14 +10,13 @@ void Light::draw(NVGcontext *vg) {
 	Vec r = box.size.div(2.0);
 
 	nvgBeginPath(vg);
-	nvgEllipse(vg, c.x, c.y, r.x, r.y);
-	nvgFillColor(vg, colorOutline);
-	nvgFill(vg);
-
-	nvgBeginPath(vg);
 	nvgEllipse(vg, c.x, c.y, r.x - 1.0, r.y - 1.0);
 	nvgFillColor(vg, color);
 	nvgFill(vg);
+
+	nvgStrokeWidth(vg, 1.0);
+	nvgStrokeColor(vg, colorOutline);
+	nvgStroke(vg);
 
 	// float radius = box.size.x / 2.0;
 	// NVGcolor icol, ocol;
