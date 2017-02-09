@@ -289,7 +289,7 @@ void RackWidget::step() {
 
 void RackWidget::draw(NVGcontext *vg) {
 	nvgBeginPath(vg);
-	nvgRect(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
+	nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
 
 	// Background color
 	nvgFillColor(vg, nvgRGBf(0.2, 0.2, 0.2));
@@ -299,7 +299,7 @@ void RackWidget::draw(NVGcontext *vg) {
 	{
 		int imageWidth, imageHeight;
 		nvgImageSize(vg, railsImage->handle, &imageWidth, &imageHeight);
-		NVGpaint paint = nvgImagePattern(vg, box.pos.x, box.pos.y, imageWidth, imageHeight, 0.0, railsImage->handle, 1.0);
+		NVGpaint paint = nvgImagePattern(vg, 0.0, 0.0, imageWidth, imageHeight, 0.0, railsImage->handle, 1.0);
 		nvgFillPaint(vg, paint);
 		nvgFill(vg);
 	}

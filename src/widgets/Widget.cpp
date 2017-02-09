@@ -69,12 +69,12 @@ void Widget::step() {
 }
 
 void Widget::draw(NVGcontext *vg) {
-	nvgTranslate(vg, box.pos.x, box.pos.y);
 	for (Widget *child : children) {
 		nvgSave(vg);
+		nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
 		child->draw(vg);
+		nvgRestore(vg);
 	}
-	nvgRestore(vg);
 }
 
 Widget *Widget::onMouseDown(Vec pos, int button) {

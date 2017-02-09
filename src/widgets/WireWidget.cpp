@@ -120,7 +120,7 @@ void WireWidget::updateWire() {
 }
 
 void WireWidget::draw(NVGcontext *vg) {
-	Vec absolutePos = getAbsolutePos();
+	Vec absolutePos = getAbsolutePos().minus(box.pos);
 	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value / 100.0;
 	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
 

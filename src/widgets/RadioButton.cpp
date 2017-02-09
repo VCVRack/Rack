@@ -4,7 +4,7 @@
 namespace rack {
 
 void RadioButton::draw(NVGcontext *vg) {
-	bndRadioButton(vg, box.pos.x, box.pos.y, box.size.x, box.size.y, BND_CORNER_NONE, value == 0.0 ? state : BND_ACTIVE, -1, label.c_str());
+	bndRadioButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, value == 0.0 ? state : BND_ACTIVE, -1, label.c_str());
 }
 
 void RadioButton::onMouseEnter() {

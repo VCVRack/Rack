@@ -10,7 +10,7 @@ void ScrollBar::draw(NVGcontext *vg) {
 	float offset = containerOffset / maxOffset;
 	float size = boxSize / containerSize;
 	size = clampf(size, 0.0, 1.0);
-	bndScrollBar(vg, box.pos.x, box.pos.y, box.size.x, box.size.y, state, offset, size);
+	bndScrollBar(vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }
 
 void ScrollBar::move(float delta) {

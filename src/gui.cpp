@@ -165,7 +165,10 @@ void renderGui() {
 
 	nvgBeginFrame(vg, width, height, 1.0);
 
+	nvgSave(vg);
 	gScene->draw(vg);
+	nvgRestore(vg);
+
 	nvgEndFrame(vg);
 	glfwSwapBuffers(window);
 }

@@ -165,8 +165,8 @@ Toolbar::Toolbar() {
 }
 
 void Toolbar::draw(NVGcontext *vg) {
-	bndBackground(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
-	bndBevel(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
+	bndBackground(vg, 0.0, 0.0, box.size.x, box.size.y);
+	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 
 	Widget::draw(vg);
 }

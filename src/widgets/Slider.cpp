@@ -8,7 +8,7 @@ namespace rack {
 
 void Slider::draw(NVGcontext *vg) {
 	float progress = mapf(value, minValue, maxValue, 0.0, 1.0);
-	bndSlider(vg, box.pos.x, box.pos.y, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, getText().c_str(), NULL);
+	bndSlider(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, getText().c_str(), NULL);
 }
 
 void Slider::onDragStart() {

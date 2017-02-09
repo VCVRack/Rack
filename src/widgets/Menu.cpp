@@ -23,7 +23,7 @@ void Menu::draw(NVGcontext *vg) {
 		child->box.size.x = box.size.x;
 	}
 
-	bndMenuBackground(vg, box.pos.x, box.pos.y, box.size.x, box.size.y, BND_CORNER_NONE);
+	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
 
 	Widget::draw(vg);
 }

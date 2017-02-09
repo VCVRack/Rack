@@ -99,7 +99,7 @@ void ModuleWidget::cloneParams(ModuleWidget *source) {
 
 void ModuleWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
-	bndBevel(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
+	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 
 	// CPU usage text
 	if (dynamic_cast<RackScene*>(gScene)->toolbar->cpuUsageButton->value != 0.0) {
@@ -108,17 +108,17 @@ void ModuleWidget::draw(NVGcontext *vg) {
 
 		nvgSave(vg);
 		nvgBeginPath(vg);
-		nvgRect(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT);
+		nvgRect(vg, 0.0, 0.0, box.size.x, BND_WIDGET_HEIGHT);
 		nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
 		nvgFill(vg);
 
 		nvgBeginPath(vg);
 		cpuTime = clampf(cpuTime, 0.0, 1.0);
-		nvgRect(vg, box.pos.x, box.pos.y, box.size.x * cpuTime, BND_WIDGET_HEIGHT);
+		nvgRect(vg, 0.0, 0.0, box.size.x * cpuTime, BND_WIDGET_HEIGHT);
 		nvgFillColor(vg, nvgHSL(0.33 * cubic(1.0 - cpuTime), 1.0, 0.4));
 		nvgFill(vg);
 
-		bndMenuItem(vg, box.pos.x, box.pos.y, box.size.x, BND_WIDGET_HEIGHT, BND_DEFAULT, -1, text.c_str());
+		bndMenuItem(vg, 0.0, 0.0, box.size.x, BND_WIDGET_HEIGHT, BND_DEFAULT, -1, text.c_str());
 		nvgRestore(vg);
 	}
 }

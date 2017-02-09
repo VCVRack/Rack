@@ -6,11 +6,10 @@ namespace rack {
 
 void Light::draw(NVGcontext *vg) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
-	Vec c = box.getCenter();
 	Vec r = box.size.div(2.0);
 
 	nvgBeginPath(vg);
-	nvgEllipse(vg, c.x, c.y, r.x - 1.0, r.y - 1.0);
+	nvgEllipse(vg, r.x, r.y, r.x - 1.0, r.y - 1.0);
 	nvgFillColor(vg, color);
 	nvgFill(vg);
 
