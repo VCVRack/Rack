@@ -8,7 +8,7 @@
 
 // Include implementations here
 // By the way, please stop packaging your libraries like this. It's easiest to use a single source file (e.g. foo.c) and a single header (e.g. foo.h)
-#define NANOVG_GL2_IMPLEMENTATION
+#define NANOVG_GL3_IMPLEMENTATION
 #include "../ext/nanovg/src/nanovg_gl.h"
 #define BLENDISH_IMPLEMENTATION
 #include "../ext/oui/blendish.h"
@@ -180,8 +180,12 @@ void guiInit() {
 	err = glfwInit();
 	assert(err);
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#ifndef WINDOWS
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 	window = glfwCreateWindow(1000, 750, gApplicationName.c_str(), NULL, NULL);
 	assert(window);
 	glfwMakeContextCurrent(window);
@@ -206,7 +210,7 @@ void guiInit() {
 	glfwSetWindowSizeLimits(window, 240, 160, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
-	vg = nvgCreateGL2(NVG_ANTIALIAS);
+	vg = nvgCreateGL3(NVG_ANTIALIAS);
 	assert(vg);
 
 	// Set up Blendish
@@ -217,7 +221,7 @@ void guiInit() {
 
 void guiDestroy() {
 	defaultFont.reset();
-	nvgDeleteGL2(vg);
+	nvgDeleteGL3(vg);
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
