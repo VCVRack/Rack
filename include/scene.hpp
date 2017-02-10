@@ -24,16 +24,15 @@ struct Scene;
 struct Model;
 struct ModuleWidget : OpaqueWidget {
 	Model *model = NULL;
-	// Eventually this should be replaced with a `moduleId` which will be used for inter-process communication between the gui world and the audio world.
+	/** Owns the module pointer */
 	Module *module = NULL;
-	// int moduleId;
 
 	std::vector<InputPort*> inputs;
 	std::vector<OutputPort*> outputs;
 	std::vector<ParamWidget*> params;
 
-	ModuleWidget(Module *module);
 	~ModuleWidget();
+	void setModule(Module *module);
 	// Convenience functions for adding special widgets (calls addChild())
 	void addInput(InputPort *input);
 	void addOutput(OutputPort *output);

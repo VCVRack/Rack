@@ -221,7 +221,9 @@ struct MidiChoice : ChoiceButton {
 };
 
 
-MidiInterfaceWidget::MidiInterfaceWidget() : ModuleWidget(new MidiInterface()) {
+MidiInterfaceWidget::MidiInterfaceWidget() {
+	MidiInterface *module = new MidiInterface();
+	setModule(module);
 	box.size = Vec(15*8, 380);
 
 	{

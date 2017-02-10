@@ -45,19 +45,20 @@ inline float quadraticBipolar(float x) {
 }
 
 inline float cubic(float x) {
-	// optimal with --fast-math
 	return x*x*x;
 }
 
 inline float quarticBipolar(float x) {
-	float x2 = x*x;
-	float x4 = x2*x2;
-	return x >= 0.0 ? x4 : -x4;
+	return x >= 0.0 ? x*x*x*x : -x*x*x*x;
 }
 
 inline float quintic(float x) {
 	// optimal with --fast-math
 	return x*x*x*x*x;
+}
+
+inline float sqrtBipolar(float x) {
+	return x >= 0.0 ? sqrtf(x) : -sqrtf(-x);
 }
 
 inline float sincf(float x) {

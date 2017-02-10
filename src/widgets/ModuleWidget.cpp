@@ -5,20 +5,21 @@
 
 namespace rack {
 
-ModuleWidget::ModuleWidget(Module *module) {
-	this->module = module;
-	if (module) {
-		engineAddModule(module);
-	}
-}
-
 ModuleWidget::~ModuleWidget() {
 	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
 	disconnectPorts();
-	if (module) {
-		engineRemoveModule(module);
-		delete module;
+	setModule(NULL);
+}
+
+void ModuleWidget::setModule(Module *module) {
+	if (this->module) {
+		engineRemoveModule(this->module);
+		delete this->module;
 	}
+	if (module) {
+		engineAddModule(module);
+	}
+	this->module = module;
 }
 
 void ModuleWidget::addInput(InputPort *input) {

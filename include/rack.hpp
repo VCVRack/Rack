@@ -68,5 +68,13 @@ Screw *createScrew(Vec pos) {
 	return screw;
 }
 
+template <class TLight>
+ValueLight *createValueLight(Vec pos, float *value) {
+	ValueLight *light = new TLight();
+	light->box.pos = pos;
+	light->value = value;
+	return light;
+}
+
 
 } // namespace rack

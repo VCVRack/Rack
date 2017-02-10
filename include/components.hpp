@@ -4,6 +4,16 @@
 
 namespace rack {
 
+#define SCHEME_BLACK nvgRGB(0x00, 0x00, 0x00)
+#define SCHEME_WHITE nvgRGB(0xff, 0xff, 0xff)
+#define SCHEME_RED nvgRGB(0xed, 0x2c, 0x24)
+#define SCHEME_ORANGE nvgRGB(0xf2, 0xb1, 0x20)
+#define SCHEME_YELLOW nvgRGB(0xf9, 0xdf, 0x1c)
+#define SCHEME_GREEN nvgRGB(0x90, 0xc7, 0x3e)
+#define SCHEME_CYAN nvgRGB(0x22, 0xe6, 0xef)
+#define SCHEME_BLUE nvgRGB(0x29, 0xb2, 0xef)
+#define SCHEME_PURPLE nvgRGB(0xd5, 0x2b, 0xed)
+
 ////////////////////
 // Knobs
 ////////////////////
@@ -112,6 +122,52 @@ struct CL1362 : BASE {
 };
 typedef CL1362<InputPort> InputPortCL1362;
 typedef CL1362<OutputPort> OutputPortCL1362;
+
+////////////////////
+// Lights
+////////////////////
+
+struct ValueLight : Light {
+	float *value;
+};
+
+struct RedValueLight : ValueLight {
+	void step() {
+		float v = sqrtBipolar(getf(value));
+		color = nvgLerpRGBA(SCHEME_BLACK, SCHEME_RED, v);
+	}
+};
+
+struct GreenRedPolarityLight : ValueLight {
+	void step() {
+		float v = sqrtBipolar(getf(value));
+		if (v >= 0.0)
+			color = nvgLerpRGBA(SCHEME_BLACK, SCHEME_GREEN, v);
+		else
+			color = nvgLerpRGBA(SCHEME_BLACK, SCHEME_RED, -v);
+	}
+};
+
+template <typename BASE>
+struct LargeLight : BASE {
+	LargeLight() {
+		this->box.size = Vec(20, 20);
+	}
+};
+
+template <typename BASE>
+struct MediumLight : BASE {
+	MediumLight() {
+		this->box.size = Vec(12, 12);
+	}
+};
+
+template <typename BASE>
+struct SmallLight : BASE {
+	SmallLight() {
+		this->box.size = Vec(8, 8);
+	}
+};
 
 ////////////////////
 // Misc

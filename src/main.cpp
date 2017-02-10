@@ -4,7 +4,10 @@
 	#include <libgen.h>
 #endif
 
-#include "rack.hpp"
+#include "engine.hpp"
+#include "gui.hpp"
+#include "scene.hpp"
+#include "plugin.hpp"
 
 
 using namespace rack;

@@ -6,10 +6,10 @@ namespace rack {
 
 void Light::draw(NVGcontext *vg) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
-	Vec r = box.size.div(2.0);
+	float radius = box.size.x / 2.0;
 
 	nvgBeginPath(vg);
-	nvgEllipse(vg, r.x, r.y, r.x - 1.0, r.y - 1.0);
+	nvgCircle(vg, radius, radius, radius);
 	nvgFillColor(vg, color);
 	nvgFill(vg);
 
@@ -17,18 +17,17 @@ void Light::draw(NVGcontext *vg) {
 	nvgStrokeColor(vg, colorOutline);
 	nvgStroke(vg);
 
-	// float radius = box.size.x / 2.0;
-	// NVGcolor icol, ocol;
+	// nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 	// NVGpaint paint;
-	// icol = color;
-	// icol.a = clampf(color.a / 10.0, 0.0, 1.0);
-	// ocol = color;
+	// NVGcolor icol = color;
+	// icol.a = 0.2;
+	// NVGcolor ocol = color;
 	// ocol.a = 0.0;
 	// float oradius = radius + 20.0;
-	// paint = nvgRadialGradient(vg, c.x, c.y, radius, oradius, icol, ocol);
+	// paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
 	// nvgFillPaint(vg, paint);
 	// nvgBeginPath(vg);
-	// nvgRect(vg, c.x - oradius, c.y - oradius, 2*oradius, 2*oradius);
+	// nvgRect(vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
 	// nvgFill(vg);
 }
 

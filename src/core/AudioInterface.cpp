@@ -256,7 +256,8 @@ void AudioInterface::closeDevice() {
 	if (stream) {
 		PaError err;
 		streamRunning = false;
-		err = Pa_StopStream(stream);
+		err = Pa_AbortStream(stream);
+		// err = Pa_StopStream(stream);
 		if (err) {
 			fprintf(stderr, "Failed to stop audio stream: %s\n", Pa_GetErrorText(err));
 		}
@@ -390,7 +391,9 @@ struct BlockSizeChoice : ChoiceButton {
 };
 
 
-AudioInterfaceWidget::AudioInterfaceWidget() : ModuleWidget(new AudioInterface()) {
+AudioInterfaceWidget::AudioInterfaceWidget() {
+	AudioInterface *module = new AudioInterface();
+	setModule(module);
 	box.size = Vec(15*8, 380);
 
 	{

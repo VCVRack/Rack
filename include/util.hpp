@@ -1,7 +1,6 @@
 #pragma once
 
 // Include most of the C standard library for convenience
-// (C++ programmers will hate me)
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>

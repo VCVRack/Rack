@@ -180,12 +180,12 @@ void guiInit() {
 	err = glfwInit();
 	assert(err);
 
-#ifndef WINDOWS
+// #ifndef WINDOWS
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#endif
+// #endif
 	window = glfwCreateWindow(1000, 750, gApplicationName.c_str(), NULL, NULL);
 	assert(window);
 	glfwMakeContextCurrent(window);
