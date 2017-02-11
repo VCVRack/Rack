@@ -13,7 +13,6 @@ void guiCursorUnlock();
 const char *guiSaveDialog(const char *filters, const char *filename);
 const char *guiOpenDialog(const char *filters, const char *filename);
 
-// TODO This should probably go in another file, like resources.hpp?
-void drawSVG(NVGcontext *vg, NSVGimage *svg);
+extern NVGcontext *gVg;
 
 } // namespace rack

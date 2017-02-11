@@ -181,7 +181,7 @@ void ModuleWidget::onMouseDown(int button) {
 			menu->pushChild(menuLabel);
 
 			ResetParamsMenuItem *resetItem = new ResetParamsMenuItem();
-			resetItem->text = "Reset parameters";
+			resetItem->text = "Initialize parameters";
 			resetItem->moduleWidget = this;
 			menu->pushChild(resetItem);
 

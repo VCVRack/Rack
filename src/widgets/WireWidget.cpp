@@ -32,7 +32,7 @@ static void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color, float t
 	// Wire
 	if (opacity > 0.0) {
 		nvgSave(vg);
-		nvgGlobalAlpha(vg, opacity);
+		nvgGlobalAlpha(vg, powf(opacity, 1.5));
 
 		float dist = pos1.minus(pos2).norm();
 		Vec slump;

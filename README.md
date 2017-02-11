@@ -18,6 +18,6 @@ Install dependencies
 - [libsamplerate](http://www.mega-nerd.com/SRC/)
 - GTK+-2.0 if Linux (for file open/save dialog)
 
-Run `make ARCH=linux` or `make ARCH=windows` or `make ARCH=apple`
+Run `make ARCH=lin` or `make ARCH=win` or `make ARCH=mac`
 
 If the build breaks because you think I've missed a step, feel free to post an issue.

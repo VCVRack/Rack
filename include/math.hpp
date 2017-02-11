@@ -61,6 +61,12 @@ inline float sqrtBipolar(float x) {
 	return x >= 0.0 ? sqrtf(x) : -sqrtf(-x);
 }
 
+/** This is pretty much a scaled sinh */
+inline float exponentialBipolar(float b, float x) {
+	const float a = b - 1.0 / b;
+	return (powf(b, x) - powf(b, -x)) / a;
+}
+
 inline float sincf(float x) {
 	if (x == 0.0)
 		return 1.0;
@@ -144,6 +150,12 @@ struct Vec {
 	}
 	Vec round() {
 		return Vec(roundf(x), roundf(y));
+	}
+	bool isFinite() {
+		return isfinite(x) && isfinite(y);
+	}
+	bool isZero() {
+		return x == 0.0 && y == 0.0;
 	}
 };
 

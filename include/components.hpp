@@ -4,19 +4,37 @@
 
 namespace rack {
 
-#define SCHEME_BLACK nvgRGB(0x00, 0x00, 0x00)
-#define SCHEME_WHITE nvgRGB(0xff, 0xff, 0xff)
-#define SCHEME_RED nvgRGB(0xed, 0x2c, 0x24)
-#define SCHEME_ORANGE nvgRGB(0xf2, 0xb1, 0x20)
-#define SCHEME_YELLOW nvgRGB(0xf9, 0xdf, 0x1c)
-#define SCHEME_GREEN nvgRGB(0x90, 0xc7, 0x3e)
-#define SCHEME_CYAN nvgRGB(0x22, 0xe6, 0xef)
-#define SCHEME_BLUE nvgRGB(0x29, 0xb2, 0xef)
-#define SCHEME_PURPLE nvgRGB(0xd5, 0x2b, 0xed)
+
+enum ColorNames {
+	COLOR_BLACK,
+	COLOR_WHITE,
+	COLOR_RED,
+	COLOR_ORANGE,
+	COLOR_YELLOW,
+	COLOR_GREEN,
+	COLOR_CYAN,
+	COLOR_BLUE,
+	COLOR_PURPLE,
+	NUM_COLORS
+};
+
+extern const NVGcolor colors[NUM_COLORS];
 
 ////////////////////
 // Knobs
 ////////////////////
+
+struct SynthTechAlco : SpriteKnob {
+	SynthTechAlco() {
+		box.size = Vec(45, 45);
+		spriteOffset = Vec(-3, -2);
+		spriteSize = Vec(51, 51);
+		minIndex = 49;
+		maxIndex = -51;
+		spriteCount = 120;
+		spriteImage = Image::load("res/ComponentLibrary/SynthTechAlco.png");
+	}
+};
 
 struct KnobDavies1900h : SpriteKnob {
 	KnobDavies1900h() {
@@ -102,7 +120,7 @@ typedef PJ301M<OutputPort> OutputPortPJ301M;
 template <typename BASE>
 struct PJ3410 : BASE {
 	PJ3410() {
-		this->box.size = Vec(32, 32);
+		this->box.size = Vec(32, 31);
 		this->spriteOffset = Vec(-1, -1);
 		this->spriteSize = Vec(36, 36);
 		this->spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
@@ -131,22 +149,30 @@ struct ValueLight : Light {
 	float *value;
 };
 
-struct RedValueLight : ValueLight {
+template <int COLOR>
+struct ColorValueLight : ValueLight {
 	void step() {
 		float v = sqrtBipolar(getf(value));
-		color = nvgLerpRGBA(SCHEME_BLACK, SCHEME_RED, v);
+		color = nvgLerpRGBA(colors[COLOR_BLACK], colors[COLOR], v);
 	}
 };
 
-struct GreenRedPolarityLight : ValueLight {
+typedef ColorValueLight<COLOR_RED> RedValueLight;
+typedef ColorValueLight<COLOR_YELLOW> YellowValueLight;
+typedef ColorValueLight<COLOR_GREEN> GreenValueLight;
+
+template <int COLOR_POS, int COLOR_NEG>
+struct PolarityLight : ValueLight {
 	void step() {
 		float v = sqrtBipolar(getf(value));
 		if (v >= 0.0)
-			color = nvgLerpRGBA(SCHEME_BLACK, SCHEME_GREEN, v);
+			color = nvgLerpRGBA(colors[COLOR_BLACK], colors[COLOR_POS], v);
 		else
-			color = nvgLerpRGBA(SCHEME_BLACK, SCHEME_RED, -v);
+			color = nvgLerpRGBA(colors[COLOR_BLACK], colors[COLOR_NEG], -v);
 	}
 };
+
+typedef PolarityLight<COLOR_GREEN, COLOR_RED> GreenRedPolarityLight;
 
 template <typename BASE>
 struct LargeLight : BASE {
@@ -197,13 +223,13 @@ struct SilverScrew : Screw {
 struct LightPanel : Panel {
 	LightPanel() {
 		backgroundColor = nvgRGB(0xe8, 0xe8, 0xe8);
-		borderColor = nvgRGB(0xac, 0xac, 0xac);
+		borderColor = nvgRGB(0xa1, 0xa1, 0xa1);
 	}
 };
 
 struct DarkPanel : Panel {
 	DarkPanel() {
-		backgroundColor = nvgRGB(0x0f, 0x0f, 0x0f);
+		backgroundColor = nvgRGB(0x17, 0x17, 0x17);
 		borderColor = nvgRGB(0x5e, 0x5e, 0x5e);
 	}
 };

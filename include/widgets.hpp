@@ -43,7 +43,7 @@ struct SVG {
 
 
 ////////////////////
-// base class and traits
+// Base widget
 ////////////////////
 
 /** A node in the 2D scene graph */
@@ -112,6 +112,22 @@ struct Widget {
 	virtual void onChange() {}
 };
 
+struct TransformWidget : Widget {
+	/** The transformation matrix */
+	float transform[6];
+	TransformWidget();
+	void reset();
+	void translate(Vec delta);
+	void rotate(float angle);
+	void scale(Vec s);
+	void draw(NVGcontext *vg);
+};
+
+
+////////////////////
+// Trait widgets
+////////////////////
+
 /** Widget that does not respond to events */
 struct TransparentWidget : virtual Widget {
 	Widget *onMouseDown(Vec pos, int button) {return NULL;}
@@ -157,6 +173,33 @@ struct SpriteWidget : virtual Widget {
 	void draw(NVGcontext *vg);
 };
 
+struct SVGWidget : virtual Widget {
+	std::shared_ptr<SVG> svg;
+	/** Sets the box size to the svg page */
+	void step();
+	void draw(NVGcontext *vg);
+};
+
+/** Caches a widget's draw() result to a framebuffer so it is called less frequently
+When `dirty` is true, `scene` will be re-rendered on the next call to step().
+Events are not passed to the underlying scene.
+*/
+struct FramebufferWidget : virtual Widget {
+	bool dirty = true;
+	/** The root object in the framebuffer scene
+	Its position is ignored for now, fixed at (0, 0)
+	The FramebufferWidget owns the pointer
+	*/
+	Widget *scene = NULL;
+	struct Internal;
+	Internal *internal;
+
+	FramebufferWidget();
+	~FramebufferWidget();
+	void step();
+	void draw(NVGcontext *vg);
+};
+
 struct QuantityWidget : virtual Widget {
 	float value = 0.0;
 	float minValue = 0.0;
@@ -179,7 +222,7 @@ struct QuantityWidget : virtual Widget {
 };
 
 ////////////////////
-// gui elements
+// GUI widgets
 ////////////////////
 
 struct Label : Widget {
