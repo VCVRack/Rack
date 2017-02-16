@@ -105,11 +105,15 @@ void WireWidget::updateWire() {
 		wire = NULL;
 	}
 	if (inputPort && outputPort) {
+		// Check correct types
+		assert(inputPort->type == Port::INPUT);
+		assert(outputPort->type == Port::OUTPUT);
+
 		wire = new Wire();
 		wire->outputModule = outputPort->module;
-		wire->outputId = outputPort->outputId;
+		wire->outputId = outputPort->portId;
 		wire->inputModule = inputPort->module;
-		wire->inputId = inputPort->inputId;
+		wire->inputId = inputPort->portId;
 		engineAddWire(wire);
 	}
 }

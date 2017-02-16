@@ -12,8 +12,7 @@ struct Wire;
 
 struct RackWidget;
 struct ParamWidget;
-struct InputPort;
-struct OutputPort;
+struct Port;
 struct Scene;
 
 ////////////////////
@@ -27,15 +26,15 @@ struct ModuleWidget : OpaqueWidget {
 	/** Owns the module pointer */
 	Module *module = NULL;
 
-	std::vector<InputPort*> inputs;
-	std::vector<OutputPort*> outputs;
+	std::vector<Port*> inputs;
+	std::vector<Port*> outputs;
 	std::vector<ParamWidget*> params;
 
 	~ModuleWidget();
 	void setModule(Module *module);
 	// Convenience functions for adding special widgets (calls addChild())
-	void addInput(InputPort *input);
-	void addOutput(OutputPort *output);
+	void addInput(Port *input);
+	void addOutput(Port *output);
 	void addParam(ParamWidget *param);
 
 	json_t *toJson();
@@ -56,10 +55,10 @@ struct ModuleWidget : OpaqueWidget {
 };
 
 struct WireWidget : OpaqueWidget {
-	OutputPort *outputPort = NULL;
-	InputPort *inputPort = NULL;
-	OutputPort *hoveredOutputPort = NULL;
-	InputPort *hoveredInputPort = NULL;
+	Port *inputPort = NULL;
+	Port *outputPort = NULL;
+	Port *hoveredInputPort = NULL;
+	Port *hoveredOutputPort = NULL;
 	Wire *wire = NULL;
 	NVGcolor color;
 
@@ -182,35 +181,27 @@ struct MomentarySwitch : virtual Switch {
 ////////////////////
 
 struct Port : OpaqueWidget, SpriteWidget {
+	enum PortType {
+		INPUT,
+		OUTPUT
+	};
+
 	Module *module = NULL;
 	WireWidget *connectedWire = NULL;
+	PortType type;
+	int portId;
 
 	Port();
 	~Port();
 	void disconnect();
 
+	void draw(NVGcontext *vg);
 	void onMouseDown(int button);
 	void onDragEnd();
-};
-
-struct InputPort : Port {
-	int inputId;
-
 	void onDragStart();
 	void onDragDrop(Widget *origin);
 	void onDragEnter(Widget *origin);
 	void onDragLeave(Widget *origin);
-	void draw(NVGcontext *vg);
-};
-
-struct OutputPort : Port {
-	int outputId;
-
-	void onDragStart();
-	void onDragDrop(Widget *origin);
-	void onDragEnter(Widget *origin);
-	void onDragLeave(Widget *origin);
-	void draw(NVGcontext *vg);
 };
 
 ////////////////////

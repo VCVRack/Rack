@@ -22,12 +22,12 @@ void ModuleWidget::setModule(Module *module) {
 	this->module = module;
 }
 
-void ModuleWidget::addInput(InputPort *input) {
+void ModuleWidget::addInput(Port *input) {
 	inputs.push_back(input);
 	addChild(input);
 }
 
-void ModuleWidget::addOutput(OutputPort *output) {
+void ModuleWidget::addOutput(Port *output) {
 	outputs.push_back(output);
 	addChild(output);
 }
@@ -77,10 +77,10 @@ void ModuleWidget::fromJson(json_t *root) {
 }
 
 void ModuleWidget::disconnectPorts() {
-	for (InputPort *input : inputs) {
+	for (Port *input : inputs) {
 		input->disconnect();
 	}
-	for (OutputPort *output : outputs) {
+	for (Port *output : outputs) {
 		output->disconnect();
 	}
 }

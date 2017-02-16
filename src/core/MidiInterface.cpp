@@ -254,8 +254,8 @@ MidiInterfaceWidget::MidiInterfaceWidget() {
 	}
 
 	yPos += 5;
-	addOutput(createOutput<OutputPortPJ3410>(Vec(20, yPos), module, MidiInterface::PITCH_OUTPUT));
-	addOutput(createOutput<OutputPortPJ3410>(Vec(70, yPos), module, MidiInterface::GATE_OUTPUT));
+	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::PITCH_OUTPUT));
+	addOutput(createOutput<PJ3410Port>(Vec(70, yPos), module, MidiInterface::GATE_OUTPUT));
 	yPos += 25 + margin;
 
 	{

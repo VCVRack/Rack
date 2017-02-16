@@ -207,11 +207,11 @@ void RackWidget::fromJson(json_t *root) {
 		// Get ports
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
 		if (!outputModuleWidget) continue;
-		OutputPort *outputPort = outputModuleWidget->outputs[outputId];
+		Port *outputPort = outputModuleWidget->outputs[outputId];
 		if (!outputPort) continue;
 		ModuleWidget *inputModuleWidget = moduleWidgets[inputModuleId];
 		if (!inputModuleWidget) continue;
-		InputPort *inputPort = inputModuleWidget->inputs[inputId];
+		Port *inputPort = inputModuleWidget->inputs[inputId];
 		if (!inputPort) continue;
 		// Create WireWidget
 		WireWidget *wireWidget = new WireWidget();

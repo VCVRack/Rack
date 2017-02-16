@@ -459,8 +459,8 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	}
 
 	yPos += 5;
-	addInput(createInput<InputPortPJ3410>(Vec(20, yPos), module, AudioInterface::AUDIO1_INPUT));
-	addInput(createInput<InputPortPJ3410>(Vec(70, yPos), module, AudioInterface::AUDIO2_INPUT));
+	addInput(createInput<PJ3410Port>(Vec(20, yPos), module, AudioInterface::AUDIO1_INPUT));
+	addInput(createInput<PJ3410Port>(Vec(70, yPos), module, AudioInterface::AUDIO2_INPUT));
 	yPos += 35 + margin;
 
 	{
@@ -472,7 +472,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	}
 
 	yPos += 5;
-	addOutput(createOutput<OutputPortPJ3410>(Vec(20, yPos), module, AudioInterface::AUDIO1_OUTPUT));
-	addOutput(createOutput<OutputPortPJ3410>(Vec(70, yPos), module, AudioInterface::AUDIO2_OUTPUT));
+	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, AudioInterface::AUDIO1_OUTPUT));
+	addOutput(createOutput<PJ3410Port>(Vec(70, yPos), module, AudioInterface::AUDIO2_OUTPUT));
 	yPos += 35 + margin;
 }

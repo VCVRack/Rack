@@ -96,41 +96,32 @@ struct BefacoSlidePot : SpriteKnob {
 // Jacks
 ////////////////////
 
-template <typename BASE>
-struct PJ301M : BASE {
-	PJ301M() {
-		this->box.size = Vec(24, 24);
-		this->spriteOffset = Vec(-2, -2);
-		this->spriteSize = Vec(30, 30);
-		this->spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
+struct PJ301MPort : Port {
+	PJ301MPort() {
+		box.size = Vec(24, 24);
+		spriteOffset = Vec(-2, -2);
+		spriteSize = Vec(30, 30);
+		spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
 	}
 };
-typedef PJ301M<InputPort> InputPortPJ301M;
-typedef PJ301M<OutputPort> OutputPortPJ301M;
 
-template <typename BASE>
-struct PJ3410 : BASE {
-	PJ3410() {
-		this->box.size = Vec(32, 31);
-		this->spriteOffset = Vec(-1, -1);
-		this->spriteSize = Vec(36, 36);
-		this->spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
+struct PJ3410Port : Port {
+	PJ3410Port() {
+		box.size = Vec(32, 31);
+		spriteOffset = Vec(-1, -1);
+		spriteSize = Vec(36, 36);
+		spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
 	}
 };
-typedef PJ3410<InputPort> InputPortPJ3410;
-typedef PJ3410<OutputPort> OutputPortPJ3410;
 
-template <typename BASE>
-struct CL1362 : BASE {
-	CL1362() {
-		this->box.size = Vec(33, 29);
-		this->spriteOffset = Vec(-2, -2);
-		this->spriteSize = Vec(39, 36);
-		this->spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
+struct CL1362Port : Port {
+	CL1362Port() {
+		box.size = Vec(33, 29);
+		spriteOffset = Vec(-2, -2);
+		spriteSize = Vec(39, 36);
+		spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
 	}
 };
-typedef CL1362<InputPort> InputPortCL1362;
-typedef CL1362<OutputPort> OutputPortCL1362;
 
 ////////////////////
 // Lights
