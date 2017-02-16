@@ -75,8 +75,9 @@ struct SampleRateChoice : ChoiceButton {
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
-		for (int i = 0; i < 6; i++) {
+		float sampleRates[] = {44100, 48000, 88200, 96000, 176400, 192000};
+		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
+		for (int i = 0; i < sampleRatesLen; i++) {
 			SampleRateItem *item = new SampleRateItem();
 			item->text = stringf("%.0f Hz", sampleRates[i]);
 			item->sampleRate = sampleRates[i];

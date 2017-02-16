@@ -8,15 +8,18 @@ void Light::draw(NVGcontext *vg) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 	float radius = box.size.x / 2.0;
 
+	// Solid
 	nvgBeginPath(vg);
 	nvgCircle(vg, radius, radius, radius);
 	nvgFillColor(vg, color);
 	nvgFill(vg);
 
+	// Border
 	nvgStrokeWidth(vg, 1.0);
 	nvgStrokeColor(vg, colorOutline);
 	nvgStroke(vg);
 
+	// Glow
 	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 	NVGpaint paint;
 	NVGcolor icol = color;

@@ -79,8 +79,7 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 }
 
 
-void SVGWidget::step() {
-	// Automatically wrap box size to SVG page size
+void SVGWidget::wrap() {
 	if (svg)
 		box.size = Vec(svg->handle->width, svg->handle->height);
 	else

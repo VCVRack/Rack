@@ -1,8 +1,13 @@
 #pragma once
+
+#include "math.hpp"
+#include "util.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
 #include "gui.hpp"
+#include "scene.hpp"
 #include "components.hpp"
+#include "dsp.hpp"
 
 
 namespace rack {

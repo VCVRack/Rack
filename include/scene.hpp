@@ -131,6 +131,20 @@ struct SpriteKnob : Knob, SpriteWidget {
 	void step();
 };
 
+/** A knob which rotates an SVG and caches it in a framebuffer */
+struct SVGKnob : Knob, FramebufferWidget {
+	/** Angles in radians */
+	float minAngle, maxAngle;
+	/** Not owned */
+	TransformWidget *tw;
+	SVGWidget *sw;
+
+	SVGKnob();
+	void setSVG(std::shared_ptr<SVG> svg);
+	void step();
+	void onChange();
+};
+
 struct Switch : ParamWidget, SpriteWidget {
 };
 

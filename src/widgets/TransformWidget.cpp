@@ -5,10 +5,10 @@ namespace rack {
 
 
 TransformWidget::TransformWidget() {
-	reset();
+	identity();
 }
 
-void TransformWidget::reset() {
+void TransformWidget::identity() {
 	nvgTransformIdentity(transform);
 }
 

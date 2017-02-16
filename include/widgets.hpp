@@ -95,6 +95,10 @@ struct Widget {
 	virtual void onMouseEnter() {}
 	/** Called when another widget begins responding to `onMouseMove` events */
 	virtual void onMouseLeave() {}
+	virtual void onSelect() {}
+	virtual void onDeselect() {}
+	virtual void onText(int codepoint) {}
+	virtual void onKey(int key) {}
 	virtual Widget *onScroll(Vec pos, Vec scrollRel);
 
 	/** Called when a widget responds to `onMouseDown` for a left button press */
@@ -116,7 +120,7 @@ struct TransformWidget : Widget {
 	/** The transformation matrix */
 	float transform[6];
 	TransformWidget();
-	void reset();
+	void identity();
 	void translate(Vec delta);
 	void rotate(float angle);
 	void scale(Vec s);
@@ -175,8 +179,8 @@ struct SpriteWidget : virtual Widget {
 
 struct SVGWidget : virtual Widget {
 	std::shared_ptr<SVG> svg;
-	/** Sets the box size to the svg page */
-	void step();
+	/** Sets the box size to the svg image size */
+	void wrap();
 	void draw(NVGcontext *vg);
 };
 
@@ -185,9 +189,9 @@ When `dirty` is true, `scene` will be re-rendered on the next call to step().
 Events are not passed to the underlying scene.
 */
 struct FramebufferWidget : virtual Widget {
+	/** Set this to true to re-render the scene to the framebuffer in the next step() */
 	bool dirty = true;
 	/** The root object in the framebuffer scene
-	Its position is ignored for now, fixed at (0, 0)
 	The FramebufferWidget owns the pointer
 	*/
 	Widget *scene = NULL;
@@ -196,6 +200,9 @@ struct FramebufferWidget : virtual Widget {
 
 	FramebufferWidget();
 	~FramebufferWidget();
+	void setScene(Widget *w) {
+		scene = w;
+	}
 	void step();
 	void draw(NVGcontext *vg);
 };
@@ -342,6 +349,25 @@ struct ScrollWidget : OpaqueWidget {
 	void step();
 	void draw(NVGcontext *vg);
 	Widget *onScroll(Vec pos, Vec scrollRel);
+};
+
+struct TextField : OpaqueWidget {
+	std::string text;
+	int begin = 0;
+	int end = 0;
+
+	TextField() {
+		box.size.y = BND_WIDGET_HEIGHT;
+	}
+	void draw(NVGcontext *vg);
+	Widget *onMouseDown(Vec pos, int button);
+	void onText(int codepoint);
+	void onKey(int scancode);
+	void onSelect();
+};
+
+struct PasswordField : TextField {
+	void draw(NVGcontext *vg);
 };
 
 struct Tooltip : Widget {

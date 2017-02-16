@@ -32,13 +32,16 @@ FramebufferWidget::~FramebufferWidget() {
 	delete internal;
 }
 
-/** A margin in pixels around the scene in the framebuffer */
+/** A margin in pixels around the scene in the framebuffer
+This prevents cutting the rendered SVG off on the box edges.
+*/
 static const int margin = 1;
 
 void FramebufferWidget::step() {
 	if (!scene)
 		return;
 
+	// Step scene before rendering
 	scene->step();
 
 	// Render the scene to the framebuffer if dirty
@@ -73,13 +76,15 @@ void FramebufferWidget::step() {
 void FramebufferWidget::draw(NVGcontext *vg) {
 	if (!internal->fb)
 		return;
+	if (!scene)
+		return;
 
 	// Draw framebuffer image
 	int width, height;
 	nvgImageSize(vg, internal->fb->image, &width, &height);
 	nvgBeginPath(vg);
 	nvgRect(vg, -margin, -margin, width, height);
-	NVGpaint paint = nvgImagePattern(vg, -margin, -margin, width, height, 0.0, internal->fb->image, 1.0);
+	NVGpaint paint = nvgImagePattern(vg, -margin + scene->box.pos.x, -margin + scene->box.pos.y, width, height, 0.0, internal->fb->image, 1.0);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
 }

@@ -6,8 +6,7 @@
 #include "gui.hpp"
 #include "scene.hpp"
 
-// Include implementations here
-// By the way, please stop packaging your libraries like this. It's best to use a single source file (e.g. foo.c) and a single header (e.g. foo.h)
+// #define NANOVG_GL2_IMPLEMENTATION
 #define NANOVG_GL3_IMPLEMENTATION
 #include "../ext/nanovg/src/nanovg_gl.h"
 #include "../ext/nanovg/src/nanovg_gl_utils.h"
@@ -36,13 +35,22 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 	if (action == GLFW_PRESS) {
 		// onMouseDown
 		Widget *w = gScene->onMouseDown(gMousePos, button);
-		gSelectedWidget = w;
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			gDraggedWidget = w;
-			if (gDraggedWidget) {
+			if (w) {
 				// onDragStart
-				gDraggedWidget->onDragStart();
+				w->onDragStart();
+			}
+			gDraggedWidget = w;
+
+			if (w != gSelectedWidget) {
+				if (gSelectedWidget) {
+					w->onDeselect();
+				}
+				if (w) {
+					w->onSelect();
+				}
+				gSelectedWidget = w;
 			}
 		}
 	}
@@ -127,13 +135,16 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 	gScene->onScroll(gMousePos, scrollRel.mult(-95));
 }
 
-void charCallback(GLFWwindow *window, unsigned int value) {
+void charCallback(GLFWwindow *window, unsigned int codepoint) {
+	if (gSelectedWidget) {
+		gSelectedWidget->onText(codepoint);
+	}
 }
 
 static int lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight;
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (action == GLFW_PRESS) {
+	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		if (key == GLFW_KEY_F11 || key == GLFW_KEY_ESCAPE) {
 			// Toggle fullscreen
 			GLFWmonitor *monitor = glfwGetWindowMonitor(window);
@@ -149,6 +160,11 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				assert(monitor);
 				const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 				glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+			}
+		}
+		else {
+			if (gSelectedWidget) {
+				gSelectedWidget->onKey(key);
 			}
 		}
 	}
@@ -181,6 +197,8 @@ void guiInit() {
 	err = glfwInit();
 	assert(err);
 
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -209,6 +227,7 @@ void guiInit() {
 	glfwSetWindowSizeLimits(window, 240, 160, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
+	// gVg = nvgCreateGL2(NVG_ANTIALIAS);
 	gVg = nvgCreateGL3(NVG_ANTIALIAS);
 	assert(gVg);
 
@@ -220,6 +239,7 @@ void guiInit() {
 
 void guiDestroy() {
 	defaultFont.reset();
+	// nvgDeleteGL2(gVg);
 	nvgDeleteGL3(gVg);
 	glfwDestroyWindow(window);
 	glfwTerminate();

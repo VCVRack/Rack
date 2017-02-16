@@ -36,56 +36,47 @@ struct SynthTechAlco : SpriteKnob {
 	}
 };
 
-struct KnobDavies1900h : SpriteKnob {
-	KnobDavies1900h() {
+struct Davies1900hKnob : SVGKnob {
+	Davies1900hKnob() {
 		box.size = Vec(36, 36);
-		spriteOffset = Vec(-2, -2);
-		spriteSize = Vec(42, 42);
-		minIndex = 44;
-		maxIndex = -46;
-		spriteCount = 120;
+		minAngle = -0.75*M_PI;
+		maxAngle = 0.75*M_PI;
 	}
 };
 
-struct KnobDavies1900hWhite : KnobDavies1900h {
-	KnobDavies1900hWhite() {
-		spriteImage = Image::load("res/ComponentLibrary/Davies1900hWhite.png");
+struct Davies1900hWhiteKnob : Davies1900hKnob {
+	Davies1900hWhiteKnob() {
+		setSVG(SVG::load("res/ComponentLibrary/Davies1900hWhite.svg"));
 	}
 };
 
-struct KnobDavies1900hBlack : KnobDavies1900h {
-	KnobDavies1900hBlack() {
-		spriteImage = Image::load("res/ComponentLibrary/Davies1900hBlack.png");
+struct Davies1900hBlackKnob : Davies1900hKnob {
+	Davies1900hBlackKnob() {
+		setSVG(SVG::load("res/ComponentLibrary/Davies1900hBlack.svg"));
 	}
 };
 
-struct KnobDavies1900hRed : KnobDavies1900h {
-	KnobDavies1900hRed() {
-		spriteImage = Image::load("res/ComponentLibrary/Davies1900hRed.png");
+struct Davies1900hRedKnob : Davies1900hKnob {
+	Davies1900hRedKnob() {
+		setSVG(SVG::load("res/ComponentLibrary/Davies1900hRed.svg"));
 	}
 };
 
-struct BefacoBigKnob : SpriteKnob {
+struct BefacoBigKnob : SVGKnob {
 	BefacoBigKnob() {
 		box.size = Vec(75, 75);
-		spriteOffset = Vec(-2, -2);
-		spriteSize = Vec(81, 81);
-		minIndex = 44;
-		maxIndex = -46;
-		spriteCount = 120;
-		spriteImage = Image::load("res/ComponentLibrary/BefacoBigKnob.png");
+		minAngle = -0.75*M_PI;
+		maxAngle = 0.75*M_PI;
+		setSVG(SVG::load("res/ComponentLibrary/BefacoBigKnob.svg"));
 	}
 };
 
-struct BefacoTinyKnob : SpriteKnob {
+struct BefacoTinyKnob : SVGKnob {
 	BefacoTinyKnob() {
 		box.size = Vec(26, 26);
-		spriteOffset = Vec(-2, -2);
-		spriteSize = Vec(32, 32);
-		minIndex = 44;
-		maxIndex = -46;
-		spriteCount = 120;
-		spriteImage = Image::load("res/ComponentLibrary/BefacoTinyKnob.png");
+		minAngle = -0.75*M_PI;
+		maxAngle = 0.75*M_PI;
+		setSVG(SVG::load("res/ComponentLibrary/BefacoTinyKnob.svg"));
 	}
 };
 

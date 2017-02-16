@@ -15,7 +15,7 @@ void Tooltip::step() {
 
 
 void Tooltip::draw(NVGcontext *vg) {
-	bndTooltipBackground(vg, box.pos.x, box.pos.y, box.size.x, box.size.y);
+	bndTooltipBackground(vg, 0.0, 0.0, box.size.x, box.size.y);
 	Widget::draw(vg);
 }
 

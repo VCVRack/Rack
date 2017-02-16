@@ -68,7 +68,7 @@ static void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color, float t
 }
 
 
-static NVGcolor wireColors[8] = {
+static const NVGcolor wireColors[8] = {
 	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
 	nvgRGB(0xc9, 0x18, 0x47), // red
 	nvgRGB(0x0c, 0x8e, 0x15), // green
@@ -82,13 +82,8 @@ static int lastWireColorId = -1;
 
 
 WireWidget::WireWidget() {
-	int wireColorId;
-	do {
-		wireColorId = randomu32() % 8;
-	} while (wireColorId == lastWireColorId);
-	lastWireColorId = wireColorId;
-
-	color = wireColors[wireColorId];
+	lastWireColorId = (lastWireColorId + 1) % 8;
+	color = wireColors[lastWireColorId];
 }
 
 WireWidget::~WireWidget() {
