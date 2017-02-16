@@ -1,6 +1,6 @@
 #include <map>
 #include <algorithm>
-#include "scene.hpp"
+#include "app.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
 #include "gui.hpp"

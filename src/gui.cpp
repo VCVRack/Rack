@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "gui.hpp"
-#include "scene.hpp"
+#include "app.hpp"
 
 // #define NANOVG_GL2_IMPLEMENTATION
 #define NANOVG_GL3_IMPLEMENTATION

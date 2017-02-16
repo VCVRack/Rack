@@ -1,4 +1,4 @@
-#include "scene.hpp"
+#include "app.hpp"
 
 
 namespace rack {

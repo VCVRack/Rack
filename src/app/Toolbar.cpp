@@ -1,4 +1,4 @@
-#include "scene.hpp"
+#include "app.hpp"
 #include "gui.hpp"
 #include "engine.hpp"
 

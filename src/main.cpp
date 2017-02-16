@@ -6,7 +6,7 @@
 
 #include "engine.hpp"
 #include "gui.hpp"
-#include "scene.hpp"
+#include "app.hpp"
 #include "plugin.hpp"
 
 
