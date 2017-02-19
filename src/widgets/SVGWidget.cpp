@@ -1,31 +1,42 @@
 #include "widgets.hpp"
 
 
+// #define DEBUG_ONLY(x) x
+#define DEBUG_ONLY(x)
+
 namespace rack {
 
 
-static NVGcolor getNVGColor(int color) {
-	return nvgRGBA((color >> 0) & 0xff, (color >> 8) & 0xff, (color >> 16) & 0xff, (color >> 24) & 0xff);
-	// return nvgRGBA((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, (color) & 0xff);
+static NVGcolor getNVGColor(uint32_t color) {
+	return nvgRGBA(
+		(color >> 0) & 0xff,
+		(color >> 8) & 0xff,
+		(color >> 16) & 0xff,
+		(color >> 24) & 0xff);
 }
 
 static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
-	for (NSVGshape *shape = svg->shapes; shape; shape = shape->next) {
-		// printf("	new shape: id \"%s\", fillrule %d\n", shape->id, shape->fillRule);
+	DEBUG_ONLY(printf("new image: %g x %g px\n", svg->width, svg->height);)
+	int shapeIndex = 0;
+	for (NSVGshape *shape = svg->shapes; shape; shape = shape->next, shapeIndex++) {
+		DEBUG_ONLY(printf("	new shape: %d id \"%s\", fillrule %d\n", shapeIndex, shape->id, shape->fillRule);)
 
 		if (!(shape->flags & NSVG_FLAGS_VISIBLE))
 			continue;
 
 		nvgSave(vg);
-		nvgGlobalAlpha(vg, shape->opacity);
+
+		if (shape->opacity < 1.0)
+			nvgGlobalAlpha(vg, shape->opacity);
+
 		nvgStrokeWidth(vg, shape->strokeWidth);
-		// strokeDashOffset, strokeDashArray, strokeDashCount not supported
-		// strokeLineJoin, strokeLineCap not supported
+		// strokeDashOffset, strokeDashArray, strokeDashCount not yet supported
+		// strokeLineJoin, strokeLineCap not yet supported
 
 		// Build path
 		nvgBeginPath(vg);
 		for (NSVGpath *path = shape->paths; path; path = path->next) {
-			// printf("		new path: %d points, %s\n", path->npts, path->closed ? "closed" : "notclosed");
+			DEBUG_ONLY(printf("		new path: %d points, %s\n", path->npts, path->closed ? "closed" : "open");)
 
 			nvgMoveTo(vg, path->pts[0], path->pts[1]);
 			for (int i = 1; i < path->npts; i += 3) {
@@ -37,7 +48,6 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 			if (path->closed)
 				nvgClosePath(vg);
 
-
 			if (path->next)
 				nvgPathWinding(vg, NVG_HOLE);
 		}
@@ -48,7 +58,7 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 				case NSVG_PAINT_COLOR: {
 					NVGcolor color = getNVGColor(shape->fill.color);
 					nvgFillColor(vg, color);
-					// printf("		fill color (%f %f %f %f)\n", color.r, color.g, color.b, color.a);
+					DEBUG_ONLY(printf("		fill color (%g, %g, %g, %g)\n", color.r, color.g, color.b, color.a);)
 				} break;
 				case NSVG_PAINT_LINEAR_GRADIENT: {
 					// NSVGgradient *g = shape->fill.gradient;
@@ -63,8 +73,8 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 			switch (shape->stroke.type) {
 				case NSVG_PAINT_COLOR: {
 					NVGcolor color = getNVGColor(shape->stroke.color);
-					nvgFillColor(vg, color);
-					// printf("		stroke color (%f %f %f %f)\n", color.r, color.g, color.b, color.a);
+					nvgStrokeColor(vg, color);
+					DEBUG_ONLY(printf("		stroke color (%g, %g, %g, %g)\n", color.r, color.g, color.b, color.a);)
 				} break;
 				case NSVG_PAINT_LINEAR_GRADIENT: {
 					// NSVGgradient *g = shape->stroke.gradient;
@@ -76,6 +86,8 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 
 		nvgRestore(vg);
 	}
+
+	DEBUG_ONLY(printf("\n");)
 }
 
 
@@ -87,7 +99,9 @@ void SVGWidget::wrap() {
 }
 
 void SVGWidget::draw(NVGcontext *vg) {
-	drawSVG(vg, svg->handle);
+	if (svg && svg->handle) {
+		drawSVG(vg, svg->handle);
+	}
 }
 
 

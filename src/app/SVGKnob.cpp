@@ -35,6 +35,26 @@ void SVGKnob::step() {
 	FramebufferWidget::step();
 }
 
+void SVGKnob::draw(NVGcontext *vg) {
+	// Draw circular shadow below knob
+	// TODO This is a hack. Make a CircularShadow its own class
+	{
+		nvgBeginPath(vg);
+		float margin = 5.0;
+		nvgRect(vg, -margin, -margin, box.size.x + 2*margin, box.size.y + 2*margin);
+		nvgFillColor(vg, nvgRGBAf(0.0, 0.0, 0.0, 0.25));
+		Vec c = box.size.div(2.0);
+		float radius = c.x - 1;
+		NVGcolor icol = nvgRGBAf(0.0, 0.0, 0.0, 0.25);
+		NVGcolor ocol = nvgRGBAf(0.0, 0.0, 0.0, 0.0);
+		NVGpaint paint = nvgRadialGradient(vg, c.x, c.y + 1, radius, radius + 3, icol, ocol);
+		nvgFillPaint(vg, paint);
+		nvgFill(vg);
+	}
+
+	FramebufferWidget::draw(vg);
+}
+
 void SVGKnob::onChange() {
 	dirty = true;
 	ParamWidget::onChange();

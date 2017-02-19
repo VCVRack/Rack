@@ -5,6 +5,53 @@
 
 namespace rack {
 
+////////////////////
+// integer functions
+////////////////////
+
+inline int mini(int a, int b) {
+	return a < b ? a : b;
+}
+
+inline int maxi(int a, int b) {
+	return a > b ? a : b;
+}
+
+inline int absi(int a) {
+	return a >= 0 ? a : -a;
+}
+
+// Euclidean modulus, always returns 0 <= mod < base for positive base
+// Assumes this architecture's division is non-Euclidean
+inline int eucmod(int a, int base) {
+	int mod = a % base;
+	return mod < 0 ? mod + base : mod;
+}
+
+inline int log2i(int n) {
+	int i = 0;
+	while (n >>= 1) {
+		i++;
+	}
+	return i;
+}
+
+inline bool ispow2(int n) {
+	return n > 0 && (n & (n - 1)) == 0;
+}
+
+////////////////////
+// float functions
+////////////////////
+
+inline float radtodeg(float x) {
+	return x * (180.0 / M_PI);
+}
+
+inline float degtorad(float x) {
+	return x * (M_PI / 180.0);
+}
+
 /** Limits a value between a minimum and maximum
 If min > max for some reason, returns min
 */
@@ -29,14 +76,6 @@ inline float mapf(float x, float xMin, float xMax, float yMin, float yMax) {
 
 inline float crossf(float a, float b, float frac) {
 	return (1.0 - frac) * a + frac * b;
-}
-
-inline int mini(int a, int b) {
-	return a < b ? a : b;
-}
-
-inline int maxi(int a, int b) {
-	return a > b ? a : b;
 }
 
 inline float quadraticBipolar(float x) {
@@ -90,25 +129,6 @@ inline float interpf(const float *p, float x) {
 	int xi = x;
 	float xf = x - xi;
 	return crossf(p[xi], p[xi+1], xf);
-}
-
-// Euclidean modulus, always returns 0 <= mod < base for positive base
-// Assumes this architecture's division is non-Euclidean
-inline int eucmod(int a, int base) {
-	int mod = a % base;
-	return mod < 0 ? mod + base : mod;
-}
-
-inline int log2i(int n) {
-	int i = 0;
-	while (n >>= 1) {
-		i++;
-	}
-	return i;
-}
-
-inline bool ispow2(int n) {
-	return n > 0 && (n & (n - 1)) == 0;
 }
 
 ////////////////////

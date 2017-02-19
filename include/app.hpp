@@ -141,6 +141,7 @@ struct SVGKnob : Knob, FramebufferWidget {
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
 	void step();
+	void draw(NVGcontext *vg);
 	void onChange();
 };
 
@@ -180,15 +181,16 @@ struct MomentarySwitch : virtual Switch {
 // ports
 ////////////////////
 
-struct Port : OpaqueWidget, SpriteWidget {
+struct Port : OpaqueWidget {
 	enum PortType {
+		DEFAULT,
 		INPUT,
 		OUTPUT
 	};
 
 	Module *module = NULL;
 	WireWidget *connectedWire = NULL;
-	PortType type;
+	PortType type = DEFAULT;
 	int portId;
 
 	Port();
@@ -202,6 +204,21 @@ struct Port : OpaqueWidget, SpriteWidget {
 	void onDragDrop(Widget *origin);
 	void onDragEnter(Widget *origin);
 	void onDragLeave(Widget *origin);
+};
+
+struct SpritePort : Port, SpriteWidget {
+	void draw(NVGcontext *vg) {
+		Port::draw(vg);
+		SpriteWidget::draw(vg);
+	}
+};
+
+struct SVGPort : Port, FramebufferWidget {
+	SVGWidget *sw;
+
+	SVGPort();
+	void setSVG(std::shared_ptr<SVG> svg);
+	void draw(NVGcontext *vg);
 };
 
 ////////////////////

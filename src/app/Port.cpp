@@ -24,7 +24,6 @@ void Port::draw(NVGcontext *vg) {
 		if (type == INPUT ? gRackWidget->activeWire->inputPort : gRackWidget->activeWire->outputPort)
 			nvgGlobalAlpha(vg, 0.5);
 	}
-	SpriteWidget::draw(vg);
 }
 
 void Port::onMouseDown(int button) {

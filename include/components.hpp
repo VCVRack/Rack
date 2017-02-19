@@ -24,15 +24,239 @@ extern const NVGcolor colors[NUM_COLORS];
 // Knobs
 ////////////////////
 
-struct SynthTechAlco : SpriteKnob {
+struct Rogan : SVGKnob {
+	Rogan() {
+		minAngle = -0.75*M_PI;
+		maxAngle = 0.75*M_PI;
+	}
+};
+
+struct Rogan6PS : Rogan {
+	Rogan6PS() {
+		box.size = Vec(89, 89);
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
+	}
+};
+
+struct Rogan5PS : Rogan {
+	Rogan5PS() {
+		box.size = Vec(60, 60);
+	}
+};
+
+struct Rogan3PS : Rogan {
+	Rogan3PS() {
+		box.size = Vec(52, 52);
+	}
+};
+
+struct Rogan3P : Rogan {
+	Rogan3P() {
+		box.size = Vec(42, 42);
+	}
+};
+
+struct Rogan2S : Rogan {
+	Rogan2S() {
+		box.size = Vec(43, 43);
+	}
+};
+
+struct Rogan2PS : Rogan {
+	Rogan2PS() {
+		box.size = Vec(43, 43);
+	}
+};
+
+struct Rogan2P : Rogan {
+	Rogan2P() {
+		box.size = Vec(34, 34);
+	}
+};
+
+struct Rogan1PS : Rogan {
+	Rogan1PS() {
+		box.size = Vec(40, 40);
+	}
+};
+
+struct Rogan1P : Rogan {
+	Rogan1P() {
+		box.size = Vec(31, 31);
+	}
+};
+
+
+struct Rogan6PSWhite : Rogan6PS {
+	Rogan6PSWhite() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan6PSWhite.svg"));
+	}
+};
+
+struct Rogan5PSGray : Rogan5PS {
+	Rogan5PSGray() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan5PSGray.svg"));
+	}
+};
+
+struct Rogan3PSBlue : Rogan3PS {
+	Rogan3PSBlue() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSBlue.svg"));
+	}
+};
+
+struct Rogan3PSRed : Rogan3PS {
+	Rogan3PSRed() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSRed.svg"));
+	}
+};
+
+struct Rogan3PSGreen : Rogan3PS {
+	Rogan3PSGreen() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSGreen.svg"));
+	}
+};
+
+struct Rogan3PSWhite : Rogan3PS {
+	Rogan3PSWhite() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSWhite.svg"));
+	}
+};
+
+struct Rogan3PBlue : Rogan3P {
+	Rogan3PBlue() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PBlue.svg"));
+	}
+};
+
+struct Rogan3PRed : Rogan3P {
+	Rogan3PRed() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PRed.svg"));
+	}
+};
+
+struct Rogan3PGreen : Rogan3P {
+	Rogan3PGreen() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PGreen.svg"));
+	}
+};
+
+struct Rogan3PWhite : Rogan3P {
+	Rogan3PWhite() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan3PWhite.svg"));
+	}
+};
+
+struct Rogan2SGray : Rogan2S {
+	Rogan2SGray() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2SGray.svg"));
+	}
+};
+
+struct Rogan2PSBlue : Rogan2PS {
+	Rogan2PSBlue() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSBlue.svg"));
+	}
+};
+
+struct Rogan2PSRed : Rogan2PS {
+	Rogan2PSRed() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSRed.svg"));
+	}
+};
+
+struct Rogan2PSGreen : Rogan2PS {
+	Rogan2PSGreen() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSGreen.svg"));
+	}
+};
+
+struct Rogan2PSWhite : Rogan2PS {
+	Rogan2PSWhite() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSWhite.svg"));
+	}
+};
+
+struct Rogan2PBlue : Rogan2P {
+	Rogan2PBlue() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PBlue.svg"));
+	}
+};
+
+struct Rogan2PRed : Rogan2P {
+	Rogan2PRed() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PRed.svg"));
+	}
+};
+
+struct Rogan2PGreen : Rogan2P {
+	Rogan2PGreen() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PGreen.svg"));
+	}
+};
+
+struct Rogan2PWhite : Rogan2P {
+	Rogan2PWhite() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan2PWhite.svg"));
+	}
+};
+
+struct Rogan1PSBlue : Rogan1PS {
+	Rogan1PSBlue() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSBlue.svg"));
+	}
+};
+
+struct Rogan1PSRed : Rogan1PS {
+	Rogan1PSRed() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSRed.svg"));
+	}
+};
+
+struct Rogan1PSGreen : Rogan1PS {
+	Rogan1PSGreen() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSGreen.svg"));
+	}
+};
+
+struct Rogan1PSWhite : Rogan1PS {
+	Rogan1PSWhite() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSWhite.svg"));
+	}
+};
+
+struct Rogan1PBlue : Rogan1P {
+	Rogan1PBlue() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PBlue.svg"));
+	}
+};
+
+struct Rogan1PRed : Rogan1P {
+	Rogan1PRed() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PRed.svg"));
+	}
+};
+
+struct Rogan1PGreen : Rogan1P {
+	Rogan1PGreen() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PGreen.svg"));
+	}
+};
+
+struct Rogan1PWhite : Rogan1P {
+	Rogan1PWhite() {
+		setSVG(SVG::load("res/ComponentLibrary/Rogan1PWhite.svg"));
+	}
+};
+
+
+struct SynthTechAlco : SVGKnob {
 	SynthTechAlco() {
 		box.size = Vec(45, 45);
-		spriteOffset = Vec(-3, -2);
-		spriteSize = Vec(51, 51);
-		minIndex = 49;
-		maxIndex = -51;
-		spriteCount = 120;
-		spriteImage = Image::load("res/ComponentLibrary/SynthTechAlco.png");
+		minAngle = -0.82*M_PI;
+		maxAngle = 0.82*M_PI;
+		setSVG(SVG::load("res/ComponentLibrary/SynthTechAlco.svg"));
 	}
 };
 
@@ -59,6 +283,15 @@ struct Davies1900hBlackKnob : Davies1900hKnob {
 struct Davies1900hRedKnob : Davies1900hKnob {
 	Davies1900hRedKnob() {
 		setSVG(SVG::load("res/ComponentLibrary/Davies1900hRed.svg"));
+	}
+};
+
+struct Trimpot : SVGKnob {
+	Trimpot() {
+		box.size = Vec(17, 17);
+		minAngle = -0.75*M_PI;
+		maxAngle = 0.75*M_PI;
+		setSVG(SVG::load("res/ComponentLibrary/Trimpot.svg"));
 	}
 };
 
@@ -96,30 +329,33 @@ struct BefacoSlidePot : SpriteKnob {
 // Jacks
 ////////////////////
 
-struct PJ301MPort : Port {
+struct PJ301MPort : SpritePort {
 	PJ301MPort() {
 		box.size = Vec(24, 24);
 		spriteOffset = Vec(-2, -2);
 		spriteSize = Vec(30, 30);
 		spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
+		// setSVG(SVG::load("res/ComponentLibrary/PJ301M.svg"));
 	}
 };
 
-struct PJ3410Port : Port {
+struct PJ3410Port : SpritePort {
 	PJ3410Port() {
 		box.size = Vec(32, 31);
 		spriteOffset = Vec(-1, -1);
 		spriteSize = Vec(36, 36);
 		spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
+		// setSVG(SVG::load("res/ComponentLibrary/PJ3410.svg"));
 	}
 };
 
-struct CL1362Port : Port {
+struct CL1362Port : SpritePort {
 	CL1362Port() {
 		box.size = Vec(33, 29);
 		spriteOffset = Vec(-2, -2);
 		spriteSize = Vec(39, 36);
 		spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
+		// setSVG(SVG::load("res/ComponentLibrary/CL1362.svg"));
 	}
 };
 

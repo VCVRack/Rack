@@ -23,11 +23,13 @@ void ModuleWidget::setModule(Module *module) {
 }
 
 void ModuleWidget::addInput(Port *input) {
+	assert(input->type == Port::INPUT);
 	inputs.push_back(input);
 	addChild(input);
 }
 
 void ModuleWidget::addOutput(Port *output) {
+	assert(output->type == Port::OUTPUT);
 	outputs.push_back(output);
 	addChild(output);
 }
