@@ -4,7 +4,7 @@
 
 # Rack
 
-Open source Eurorack-style modular DAW
+Open source virtual Eurorack DAW
 
 ## Building
 
@@ -21,3 +21,9 @@ Install dependencies
 Run `make ARCH=lin` or `make ARCH=win` or `make ARCH=mac`
 
 If the build breaks because you think I've missed a step, feel free to post an issue.
+
+## License
+
+Rack source code by Andrew Belt: BSD-3-Clause
+
+Component Library graphics by [Grayscale](http://grayscale.info/): [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)

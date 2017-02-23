@@ -1,6 +1,10 @@
 #include "dsp.hpp"
 
 
+#define DR_WAV_IMPLEMENTATION
+#include "../ext/dr_libs/dr_wav.h"
+
+
 namespace rack {
 
 

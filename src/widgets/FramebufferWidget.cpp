@@ -32,11 +32,6 @@ FramebufferWidget::~FramebufferWidget() {
 	delete internal;
 }
 
-/** A margin in pixels around the scene in the framebuffer
-This prevents cutting the rendered SVG off on the box edges.
-*/
-static const int margin = 1;
-
 void FramebufferWidget::step() {
 	if (!scene)
 		return;

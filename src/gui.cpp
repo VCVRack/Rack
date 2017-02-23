@@ -79,19 +79,11 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	Vec mouseRel = mousePos.minus(gMousePos);
 	gMousePos = mousePos;
 
-	bool locked = glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
-
 	// onMouseMove
 	Widget *hovered = gScene->onMouseMove(gMousePos, mouseRel);
 
 	if (gDraggedWidget) {
 		// onDragMove
-		// Drag slower if Ctrl is held
-		if (locked) {
-			bool ctrl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
-			if (ctrl)
-				mouseRel = mouseRel.mult(0.1);
-		}
 		gDraggedWidget->onDragMove(mouseRel);
 
 		if (hovered != gDragHoveredWidget) {
@@ -270,6 +262,10 @@ void guiRun() {
 		lastTime = currTime;
 		(void) lastTime;
 	}
+}
+
+bool guiIsKeyPressed(int key) {
+	return glfwGetKey(window, key) == GLFW_PRESS;
 }
 
 void guiCursorLock() {

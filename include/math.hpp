@@ -44,6 +44,11 @@ inline bool ispow2(int n) {
 // float functions
 ////////////////////
 
+/** Returns 1.0 for positive numbers and -1.0 for negative numbers (including positive/negative zero) */
+inline float sgnf(float x) {
+	return copysignf(1.0, x);
+}
+
 inline float radtodeg(float x) {
 	return x * (180.0 / M_PI);
 }

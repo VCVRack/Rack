@@ -440,8 +440,8 @@ struct SilverScrew : Screw {
 
 struct LightPanel : Panel {
 	LightPanel() {
-		backgroundColor = nvgRGB(0xe8, 0xe8, 0xe8);
-		borderColor = nvgRGB(0xa1, 0xa1, 0xa1);
+		backgroundColor = nvgRGB(0xf2, 0xf2, 0xf2);
+		borderColor = nvgRGB(0xb8, 0xb8, 0xb8);
 	}
 };
 

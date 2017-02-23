@@ -5,6 +5,8 @@ namespace rack {
 
 
 SVGKnob::SVGKnob() {
+	margin = 1;
+
 	tw = new TransformWidget();
 	setScene(tw);
 
@@ -44,7 +46,7 @@ void SVGKnob::draw(NVGcontext *vg) {
 		nvgRect(vg, -margin, -margin, box.size.x + 2*margin, box.size.y + 2*margin);
 		nvgFillColor(vg, nvgRGBAf(0.0, 0.0, 0.0, 0.25));
 		Vec c = box.size.div(2.0);
-		float radius = c.x - 1;
+		float radius = c.x;
 		NVGcolor icol = nvgRGBAf(0.0, 0.0, 0.0, 0.25);
 		NVGcolor ocol = nvgRGBAf(0.0, 0.0, 0.0, 0.0);
 		NVGpaint paint = nvgRadialGradient(vg, c.x, c.y + 1, radius, radius + 3, icol, ocol);

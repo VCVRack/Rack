@@ -8,6 +8,7 @@ namespace rack {
 void guiInit();
 void guiDestroy();
 void guiRun();
+bool guiIsKeyPressed(int key);
 void guiCursorLock();
 void guiCursorUnlock();
 const char *guiSaveDialog(const char *filters, const char *filename);

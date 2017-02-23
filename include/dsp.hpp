@@ -5,6 +5,7 @@
 #include <samplerate.h>
 #include <complex>
 #include "math.hpp"
+#include "../ext/dr_libs/dr_wav.h"
 
 
 namespace rack {
@@ -316,6 +317,25 @@ struct RCFilter {
 	}
 	float highpass() {
 		return xstate[0] - ystate[0];
+	}
+};
+
+
+struct PeakFilter {
+	float state = 0.0;
+	float c = 0.0;
+
+	/** Rate is lambda / sampleRate */
+	void setRate(float r) {
+		c = 1.0 - r;
+	}
+	void process(float x) {
+		if (x > state)
+			state = x;
+		state *= c;
+	}
+	float peak() {
+		return state;
 	}
 };
 
