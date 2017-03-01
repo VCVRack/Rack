@@ -234,6 +234,14 @@ struct Toolbar : OpaqueWidget {
 	void draw(NVGcontext *vg);
 };
 
+struct PluginManagerWidget : Widget {
+	Widget *loginWidget;
+	Widget *manageWidget;
+	Widget *downloadWidget;
+	PluginManagerWidget();
+	void step();
+};
+
 struct RackScene : Scene {
 	Toolbar *toolbar;
 	ScrollWidget *scrollWidget;

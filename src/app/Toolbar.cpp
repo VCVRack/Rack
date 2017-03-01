@@ -96,15 +96,7 @@ struct SampleRateChoice : ChoiceButton {
 Toolbar::Toolbar() {
 	float margin = 5;
 	box.size.y = BND_WIDGET_HEIGHT + 2*margin;
-
-	float xPos = margin;
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(xPos, margin);
-		label->text = gApplicationVersion;
-		addChild(label);
-		xPos += 100;
-	}
+	float xPos = 0;
 
 	xPos += margin;
 	{
@@ -162,6 +154,14 @@ Toolbar::Toolbar() {
 		cpuUsageButton->label = "CPU usage";
 		addChild(cpuUsageButton);
 		xPos += cpuUsageButton->box.size.x;
+	}
+
+	xPos += margin;
+	{
+		Widget *pluginManager = new PluginManagerWidget();
+		pluginManager->box.pos = Vec(xPos, margin);
+		addChild(pluginManager);
+		xPos += pluginManager->box.size.x;
 	}
 }
 

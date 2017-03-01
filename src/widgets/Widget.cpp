@@ -70,6 +70,8 @@ void Widget::step() {
 
 void Widget::draw(NVGcontext *vg) {
 	for (Widget *child : children) {
+		if (!child->visible)
+			continue;
 		nvgSave(vg);
 		nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
 		child->draw(vg);
@@ -80,6 +82,8 @@ void Widget::draw(NVGcontext *vg) {
 Widget *Widget::onMouseDown(Vec pos, int button) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;
+		if (!child->visible)
+			continue;
 		if (child->box.contains(pos)) {
 			Widget *w = child->onMouseDown(pos.minus(child->box.pos), button);
 			if (w)
@@ -92,6 +96,8 @@ Widget *Widget::onMouseDown(Vec pos, int button) {
 Widget *Widget::onMouseUp(Vec pos, int button) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;
+		if (!child->visible)
+			continue;
 		if (child->box.contains(pos)) {
 			Widget *w = child->onMouseUp(pos.minus(child->box.pos), button);
 			if (w)
@@ -104,6 +110,8 @@ Widget *Widget::onMouseUp(Vec pos, int button) {
 Widget *Widget::onMouseMove(Vec pos, Vec mouseRel) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;
+		if (!child->visible)
+			continue;
 		if (child->box.contains(pos)) {
 			Widget *w = child->onMouseMove(pos.minus(child->box.pos), mouseRel);
 			if (w)
@@ -116,6 +124,8 @@ Widget *Widget::onMouseMove(Vec pos, Vec mouseRel) {
 Widget *Widget::onScroll(Vec pos, Vec scrollRel) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;
+		if (!child->visible)
+			continue;
 		if (child->box.contains(pos)) {
 			Widget *w = child->onScroll(pos.minus(child->box.pos), scrollRel);
 			if (w)

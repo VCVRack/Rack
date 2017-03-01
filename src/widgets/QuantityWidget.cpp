@@ -25,16 +25,7 @@ void QuantityWidget::setDefaultValue(float defaultValue) {
 std::string QuantityWidget::getText() {
 	std::string text = label;
 	text += ": ";
-	char valueStr[128];
-	if (precision >= 0) {
-		float factor = powf(10.0, precision);
-		float v = roundf(value / factor) * factor;
-		snprintf(valueStr, sizeof(valueStr), "%.0f", v);
-	}
-	else {
-		snprintf(valueStr, sizeof(valueStr), "%.*f", -precision, value);
-	}
-	text += valueStr;
+	text += stringf("%.*f", precision, value);
 	text += unit;
 	return text;
 }

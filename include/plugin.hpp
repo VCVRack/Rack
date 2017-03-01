@@ -37,6 +37,16 @@ extern std::list<Plugin*> gPlugins;
 void pluginInit();
 void pluginDestroy();
 
+void pluginOpenBrowser(std::string url);
+void pluginLogIn(std::string email, std::string password);
+void pluginLogOut();
+void pluginRefresh();
+void pluginCancelDownload();
+bool pluginIsLoggedIn();
+bool pluginIsDownloading();
+float pluginGetDownloadProgress();
+std::string pluginGetDownloadName();
+
 } // namespace rack
 
 

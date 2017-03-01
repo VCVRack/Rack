@@ -52,6 +52,7 @@ struct Widget {
 	Rect box = Rect(Vec(), Vec(INFINITY, INFINITY));
 	Widget *parent = NULL;
 	std::list<Widget*> children;
+	bool visible = true;
 
 	virtual ~Widget();
 
@@ -219,10 +220,10 @@ struct QuantityWidget : virtual Widget {
 	std::string label;
 	/** Include a space character if you want a space after the number, e.g. " Hz" */
 	std::string unit;
-	/** The digit place to round for displaying values.
-	A precision of -2 will display as "1.00" for example.
+	/** The decimal place to round for displaying values.
+	A precision of 2 will display as "1.00" for example.
 	*/
-	int precision = -2;
+	int precision = 2;
 
 	QuantityWidget();
 	void setValue(float value);
@@ -357,6 +358,7 @@ struct ScrollWidget : OpaqueWidget {
 
 struct TextField : OpaqueWidget {
 	std::string text;
+	std::string placeholder;
 	int begin = 0;
 	int end = 0;
 
@@ -371,6 +373,13 @@ struct TextField : OpaqueWidget {
 };
 
 struct PasswordField : TextField {
+	void draw(NVGcontext *vg);
+};
+
+struct ProgressBar : TransparentWidget, QuantityWidget {
+	ProgressBar() {
+		box.size.y = BND_WIDGET_HEIGHT;
+	}
 	void draw(NVGcontext *vg);
 };
 

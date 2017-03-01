@@ -34,11 +34,10 @@ std::string stringf(const char *format, ...) {
 	va_end(args);
 	if (size < 0)
 		return "";
-	size++;
 	std::string s;
 	s.resize(size);
 	va_start(args, format);
-	vsnprintf(&s[0], size, format, args);
+	vsnprintf(&s[0], size+1, format, args);
 	va_end(args);
 	return s;
 }

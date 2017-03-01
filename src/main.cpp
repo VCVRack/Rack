@@ -27,10 +27,10 @@ int main() {
 	}
 #endif
 
+	pluginInit();
 	engineInit();
 	guiInit();
 	sceneInit();
-	pluginInit();
 	gRackWidget->loadPatch("autosave.json");
 
 	engineStart();

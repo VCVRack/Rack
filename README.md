@@ -24,6 +24,6 @@ If the build breaks because you think I've missed a step, feel free to post an i
 
 ## License
 
-Rack source code by Andrew Belt: BSD-3-Clause
+Rack source code by [Andrew Belt](https://andrewbelt.name/): [BSD-3-Clause](LICENSE.txt)
 
 Component Library graphics by [Grayscale](http://grayscale.info/): [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
