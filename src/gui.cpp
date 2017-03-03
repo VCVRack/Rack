@@ -6,9 +6,11 @@
 #include "gui.hpp"
 #include "app.hpp"
 
-// #define NANOVG_GL2_IMPLEMENTATION
-#define NANOVG_GL3_IMPLEMENTATION
+#define NANOVG_GL2_IMPLEMENTATION
+// #define NANOVG_GL3_IMPLEMENTATION
 #include "../ext/nanovg/src/nanovg_gl.h"
+// Hack to get framebuffer objects working on OpenGL 2 (we blindly assume the extension is supported)
+#define NANOVG_FBO_VALID 1
 #include "../ext/nanovg/src/nanovg_gl_utils.h"
 #define BLENDISH_IMPLEMENTATION
 #include "../ext/oui/blendish.h"
@@ -189,12 +191,12 @@ void guiInit() {
 	err = glfwInit();
 	assert(err);
 
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	std::string title = gApplicationName + " " + gApplicationVersion;
 	window = glfwCreateWindow(1000, 750, title.c_str(), NULL, NULL);
 	assert(window);
@@ -214,14 +216,18 @@ void guiInit() {
 	glewExperimental = GL_TRUE;
 	err = glewInit();
 	assert(err == GLEW_OK);
+
+	// Check framebuffer support
+	assert(GLEW_EXT_framebuffer_object);
+
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
 	glfwSetWindowSizeLimits(window, 240, 160, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
-	// gVg = nvgCreateGL2(NVG_ANTIALIAS);
-	gVg = nvgCreateGL3(NVG_ANTIALIAS);
+	gVg = nvgCreateGL2(NVG_ANTIALIAS);
+	// gVg = nvgCreateGL3(NVG_ANTIALIAS);
 	assert(gVg);
 
 	// Set up Blendish
@@ -232,8 +238,8 @@ void guiInit() {
 
 void guiDestroy() {
 	defaultFont.reset();
-	// nvgDeleteGL2(gVg);
-	nvgDeleteGL3(gVg);
+	nvgDeleteGL2(gVg);
+	// nvgDeleteGL3(gVg);
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }

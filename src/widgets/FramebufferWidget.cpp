@@ -47,7 +47,8 @@ void FramebufferWidget::step() {
 
 		internal->setFramebuffer(NULL);
 		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, width, height, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
-		assert(fb);
+		if (!fb)
+			return;
 		internal->setFramebuffer(fb);
 
 		// TODO Support screens with pixelRatio != 1.0 (e.g. Retina) by using the actual size of the framebuffer, etc.

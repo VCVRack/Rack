@@ -5,18 +5,21 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/param.h> // for MAXPATHLEN
 #include <fcntl.h>
-
-#if defined(WINDOWS)
-	#include <windows.h>
-#elif defined(LINUX) || defined(APPLE)
-	#include <dlfcn.h>
-	#include <glob.h>
-#endif
 
 #include <curl/curl.h>
 #include <zip.h>
 #include <jansson.h>
+
+#if defined(WINDOWS)
+	#include <windows.h>
+	#include <shellapi.h>
+	#include <direct.h>
+	#define mkdir(_dir, _perms) _mkdir(_dir)
+#endif
+#include <dlfcn.h>
+#include <dirent.h>
 
 #include "plugin.hpp"
 
@@ -39,20 +42,26 @@ Plugin::~Plugin() {
 }
 
 
-static int loadPlugin(const char *path) {
+static int loadPlugin(std::string slug) {
+	#if defined(LINUX)
+		std::string path = "./plugins/" + slug + "/plugin.so";
+	#elif defined(WINDOWS)
+		std::string path = "./plugins/" + slug + "/plugin.dll";
+	#elif defined(APPLE)
+		std::string path = "./plugins/" + slug + "/plugin.dylib";
+	#endif
+
 	// Load dynamic/shared library
 	#if defined(WINDOWS)
-		HINSTANCE handle = LoadLibrary(path);
+		HINSTANCE handle = LoadLibrary(path.c_str());
 		if (!handle) {
-			fprintf(stderr, "Failed to load library %s\n", path);
+			fprintf(stderr, "Failed to load library %s\n", path.c_str());
 			return -1;
 		}
 	#elif defined(LINUX) || defined(APPLE)
-		char ppath[1024];
-		snprintf(ppath, sizeof(ppath), "./%s", path);
-		void *handle = dlopen(ppath, RTLD_NOW | RTLD_GLOBAL);
+		void *handle = dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 		if (!handle) {
-			fprintf(stderr, "Failed to load library %s: %s\n", path, dlerror());
+			fprintf(stderr, "Failed to load library %s: %s\n", path.c_str(), dlerror());
 			return -1;
 		}
 	#endif
@@ -66,23 +75,23 @@ static int loadPlugin(const char *path) {
 		initCallback = (InitCallback) dlsym(handle, "init");
 	#endif
 	if (!initCallback) {
-		fprintf(stderr, "Failed to read init() symbol in %s\n", path);
+		fprintf(stderr, "Failed to read init() symbol in %s\n", path.c_str());
 		return -2;
 	}
 
 	// Add plugin to map
 	Plugin *plugin = initCallback();
 	if (!plugin) {
-		fprintf(stderr, "Library %s did not return a plugin\n", path);
+		fprintf(stderr, "Library %s did not return a plugin\n", path.c_str());
 		return -3;
 	}
 	gPlugins.push_back(plugin);
-	fprintf(stderr, "Loaded plugin %s\n", path);
+	fprintf(stderr, "Loaded plugin %s\n", path.c_str());
 	return 0;
 }
 
 void pluginInit() {
-	curl_global_init(CURL_GLOBAL_ALL);
+	curl_global_init(CURL_GLOBAL_NOTHING);
 
 	// Load core
 	// This function is defined in core.cpp
@@ -90,33 +99,16 @@ void pluginInit() {
 	gPlugins.push_back(corePlugin);
 
 	// Search for plugin libraries
-	#if defined(WINDOWS)
-		WIN32_FIND_DATA ffd;
-		HANDLE hFind = FindFirstFile("plugins/*", &ffd);
-		if (hFind != INVALID_HANDLE_VALUE) {
-			do {
-				char pluginFilename[MAX_PATH];
-				snprintf(pluginFilename, sizeof(pluginFilename), "plugins/%s/plugin.dll", ffd.cFileName);
-				loadPlugin(pluginFilename);
-			} while (FindNextFile(hFind, &ffd));
+	DIR *dir = opendir("plugins");
+	if (dir) {
+		struct dirent *d;
+		while ((d = readdir(dir))) {
+			if (d->d_name[0] == '.')
+				continue;
+			loadPlugin(d->d_name);
 		}
-		FindClose(hFind);
-
-	#elif defined(LINUX) || defined(APPLE)
-		#if defined(LINUX)
-			const char *globPath = "plugins/*/plugin.so";
-		#elif defined(WINDOWS)
-			const char *globPath = "plugins/*/plugin.dll";
-		#elif defined(APPLE)
-			const char *globPath = "plugins/*/plugin.dylib";
-		#endif
-		glob_t result;
-		glob(globPath, GLOB_TILDE, NULL, &result);
-		for (int i = 0; i < (int) result.gl_pathc; i++) {
-			loadPlugin(result.gl_pathv[i]);
-		}
-		globfree(&result);
-	#endif
+		closedir(dir);
+	}
 }
 
 void pluginDestroy() {
@@ -169,7 +161,7 @@ static size_t write_string_callback(void *data, size_t size, size_t nmemb, void 
 	return len;
 }
 
-static void extract_zip(int zipfd, int dirfd) {
+static void extract_zip(const char *dir, int zipfd) {
 	int err = 0;
 	zip_t *za = zip_fdopen(zipfd, 0, &err);
 	if (!za) return;
@@ -181,15 +173,20 @@ static void extract_zip(int zipfd, int dirfd) {
 		if (err) goto cleanup;
 		int nameLen = strlen(zs.name);
 
+		char path[MAXPATHLEN] = "\0";
+		strncat(path, dir, MAXPATHLEN);
+		strncat(path, "/", MAXPATHLEN);
+		strncat(path, zs.name, MAXPATHLEN);
+
 		if (zs.name[nameLen - 1] == '/') {
-			err = mkdirat(dirfd, zs.name, 0755);
+			err = mkdir(path, 0755);
 			if (err) goto cleanup;
 		}
 		else {
 			zip_file_t *zf = zip_fopen_index(za, i, 0);
 			if (!zf) goto cleanup;
 
-			int out = openat(dirfd, zs.name, O_RDWR | O_TRUNC | O_CREAT, 0644);
+			int out = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 			assert(out != -1);
 
 			while (1) {
@@ -289,18 +286,23 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 	downloadName = name;
 	downloadProgress = 0.0;
 
-	std::string filename = slug + ".zip";
-	int dir = open("plugins", O_RDONLY | O_DIRECTORY);
-	int zip = openat(dir, filename.c_str(), O_RDWR | O_TRUNC | O_CREAT, 0644);
+	const char *dir = "plugins";
+	char path[MAXPATHLEN] = "\0";
+	strncat(path, dir, MAXPATHLEN);
+	strncat(path, "/", MAXPATHLEN);
+	strncat(path, slug.c_str(), MAXPATHLEN);
+	strncat(path, ".zip", MAXPATHLEN);
+	int zip = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 	// Download zip
 	download_file(zip, url.c_str());
 	// Unzip file
 	lseek(zip, 0, SEEK_SET);
-	extract_zip(zip, dir);
-	// Close files
+	extract_zip(dir, zip);
+	// Close file
 	close(zip);
-	close(dir);
 	downloadName = "";
+
+	// Load plugin
 }
 
 void pluginRefresh() {
