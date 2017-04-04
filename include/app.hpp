@@ -104,6 +104,11 @@ struct Panel : TransparentWidget {
 // params
 ////////////////////
 
+struct CircularShadow : TransparentWidget {
+	float blur = 0.0;
+	void draw(NVGcontext *vg);
+};
+
 struct Light : TransparentWidget {
 	NVGcolor color;
 	void draw(NVGcontext *vg);
@@ -137,15 +142,22 @@ struct SVGKnob : Knob, FramebufferWidget {
 	/** Not owned */
 	TransformWidget *tw;
 	SVGWidget *sw;
+	CircularShadow *shadow;
 
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
 	void step();
-	void draw(NVGcontext *vg);
 	void onChange();
 };
 
 struct Switch : ParamWidget, SpriteWidget {
+};
+
+struct SVGSwitch : ParamWidget, FramebufferWidget {
+	/** Not owned */
+	TransformWidget *tw;
+	SVGWidget *swPressed;
+	SVGWidget *swReleased;
 };
 
 struct ToggleSwitch : virtual Switch {

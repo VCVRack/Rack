@@ -186,28 +186,24 @@ struct SVGWidget : virtual Widget {
 };
 
 /** Caches a widget's draw() result to a framebuffer so it is called less frequently
-When `dirty` is true, `scene` will be re-rendered on the next call to step().
+When `dirty` is true, its children will be re-rendered on the next call to step().
 Events are not passed to the underlying scene.
 */
 struct FramebufferWidget : virtual Widget {
-	/** Set this to true to re-render the scene to the framebuffer in the next step() */
+	/** Set this to true to re-render the children to the framebuffer in the next step() */
 	bool dirty = true;
-	/** A margin in pixels around the scene in the framebuffer
+	/** A margin in pixels around the children in the framebuffer
 	This prevents cutting the rendered SVG off on the box edges.
 	*/
 	int margin = 0;
 	/** The root object in the framebuffer scene
 	The FramebufferWidget owns the pointer
 	*/
-	Widget *scene = NULL;
 	struct Internal;
 	Internal *internal;
 
 	FramebufferWidget();
 	~FramebufferWidget();
-	void setScene(Widget *w) {
-		scene = w;
-	}
 	void step();
 	void draw(NVGcontext *vg);
 };

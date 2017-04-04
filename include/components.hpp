@@ -360,7 +360,7 @@ struct CL1362Port : SpritePort {
 };
 
 ////////////////////
-// Lights
+// LEDs
 ////////////////////
 
 struct ValueLight : Light {
@@ -412,6 +412,20 @@ struct SmallLight : BASE {
 		this->box.size = Vec(8, 8);
 	}
 };
+
+////////////////////
+// Switches
+////////////////////
+
+// struct BefacoBigKnob :  {
+// 	BefacoBigKnob() {
+// 		box.size = Vec(75, 75);
+// 		minAngle = -0.75*M_PI;
+// 		maxAngle = 0.75*M_PI;
+// 		setSVG(SVG::load("res/ComponentLibrary/BefacoBigKnob.svg"));
+// 	}
+// };
+
 
 ////////////////////
 // Misc

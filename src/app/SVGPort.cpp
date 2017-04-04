@@ -6,7 +6,7 @@ namespace rack {
 
 SVGPort::SVGPort() {
 	sw = new SVGWidget();
-	setScene(sw);
+	addChild(sw);
 }
 
 void SVGPort::setSVG(std::shared_ptr<SVG> svg) {

@@ -10,6 +10,7 @@ namespace rack {
 
 struct FramebufferWidget::Internal {
 	NVGLUframebuffer *fb = NULL;
+	Vec offset;
 
 	~Internal() {
 		setFramebuffer(NULL);
@@ -26,24 +27,23 @@ FramebufferWidget::FramebufferWidget() {
 }
 
 FramebufferWidget::~FramebufferWidget() {
-	if (scene) {
-		delete scene;
-	}
 	delete internal;
 }
 
 void FramebufferWidget::step() {
-	if (!scene)
+	if (children.empty())
 		return;
 
-	// Step scene before rendering
-	scene->step();
+	// Step children before rendering
+	Widget::step();
 
 	// Render the scene to the framebuffer if dirty
 	if (dirty) {
-		assert(scene->box.size.isFinite());
-		int width = ceilf(scene->box.size.x) + 2*margin;
-		int height = ceilf(scene->box.size.y) + 2*margin;
+		Rect childrenBox = getChildrenBoundingBox();
+		assert(childrenBox.size.isFinite());
+		int width = ceilf(childrenBox.size.x) + 2*margin;
+		int height = ceilf(childrenBox.size.y) + 2*margin;
+		internal->offset = childrenBox.pos.minus(Vec(margin, margin));
 
 		internal->setFramebuffer(NULL);
 		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, width, height, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
@@ -59,8 +59,8 @@ void FramebufferWidget::step() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		nvgBeginFrame(gVg, width, height, pixelRatio);
 
-		nvgTranslate(gVg, margin, margin);
-		scene->draw(gVg);
+		nvgTranslate(gVg, -internal->offset.x, -internal->offset.y);
+		Widget::draw(gVg);
 
 		nvgEndFrame(gVg);
 		nvgluBindFramebuffer(NULL);
@@ -72,17 +72,18 @@ void FramebufferWidget::step() {
 void FramebufferWidget::draw(NVGcontext *vg) {
 	if (!internal->fb)
 		return;
-	if (!scene)
-		return;
 
 	// Draw framebuffer image
 	int width, height;
 	nvgImageSize(vg, internal->fb->image, &width, &height);
 	nvgBeginPath(vg);
-	nvgRect(vg, -margin, -margin, width, height);
-	NVGpaint paint = nvgImagePattern(vg, -margin + scene->box.pos.x, -margin + scene->box.pos.y, width, height, 0.0, internal->fb->image, 1.0);
+	nvgRect(vg, internal->offset.x, internal->offset.y, width, height);
+	NVGpaint paint = nvgImagePattern(vg, internal->offset.x, internal->offset.y, width, height, 0.0, internal->fb->image, 1.0);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
+
+	// nvgFillColor(vg, nvgRGBA(255, 0, 0, 64));
+	// nvgFill(vg);
 }
 
 
