@@ -124,6 +124,7 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	void onChange();
 };
 
+/** Implements vertical dragging behavior for ParamWidgets */
 struct Knob : ParamWidget {
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
@@ -150,42 +151,76 @@ struct SVGKnob : Knob, FramebufferWidget {
 	void onChange();
 };
 
-struct Switch : ParamWidget, SpriteWidget {
-};
-
-struct SVGSwitch : ParamWidget, FramebufferWidget {
+struct SVGSlider : Knob, FramebufferWidget {
+	/** Intermediate positions will be interpolated between these positions */
+	Vec minHandlePos, maxHandlePos;
 	/** Not owned */
-	TransformWidget *tw;
-	SVGWidget *swPressed;
-	SVGWidget *swReleased;
+	SVGWidget *background;
+	SVGWidget *handle;
+
+	SVGSlider();
+	void step();
+	void onChange();
 };
 
+struct Switch : ParamWidget {
+	virtual void setIndex(int index) {}
+};
+
+struct SVGSwitch : virtual Switch, FramebufferWidget {
+	std::vector<std::shared_ptr<SVG>> frames;
+	/** Not owned */
+	SVGWidget *sw;
+
+	SVGSwitch();
+	/** Adds an SVG file to represent the next switch position */
+	void addFrame(std::shared_ptr<SVG> svg);
+	void setIndex(int index);
+	void step();
+};
+
+/** A switch that cycles through each mechanical position */
 struct ToggleSwitch : virtual Switch {
 	void onDragStart() {
-		index = 1;
+		// Cycle through values
+		// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
+		float v = value + 1.0;
+		setValue(v <= maxValue ? v : minValue);
+	}
+	void onChange() {
+		int index = (int)roundf(value);
+		setIndex(index);
+		ParamWidget::onChange();
+	}
+};
+
+/** FIXME I don't think this should exist. The audio engine should read from a MomentarySwitch and increment its internal state, instead of relying on the knob to do that logic. */
+struct ModeSwitch : virtual Switch {
+	void onDragStart() {
+		setIndex(1);
 	}
 	void onDragEnd() {
-		index = 0;
+		setIndex(0);
 	}
 	void onDragDrop(Widget *origin) {
 		if (origin != this)
 			return;
-
-		// Cycle through modes
+		// Cycle through values
 		// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
 		float v = value + 1.0;
-		setValue(v > maxValue ? minValue : v);
+		setValue(v <= maxValue ? v : minValue);
 	}
 };
 
+/** A switch that is turned on when held */
 struct MomentarySwitch : virtual Switch {
 	void onDragStart() {
 		setValue(maxValue);
-		index = 1;
+		setIndex(1);
 	}
 	void onDragEnd() {
 		setValue(minValue);
-		index = 0;
+		setIndex(0);
 	}
 };
 
@@ -218,19 +253,18 @@ struct Port : OpaqueWidget {
 	void onDragLeave(Widget *origin);
 };
 
-struct SpritePort : Port, SpriteWidget {
-	void draw(NVGcontext *vg) {
-		Port::draw(vg);
-		SpriteWidget::draw(vg);
-	}
-};
-
 struct SVGPort : Port, FramebufferWidget {
-	SVGWidget *sw;
+	SVGWidget *background;
 
 	SVGPort();
-	void setSVG(std::shared_ptr<SVG> svg);
 	void draw(NVGcontext *vg);
+};
+
+/** If you don't add these to your ModuleWidget, they will fall out of the rack... */
+struct SVGScrew : FramebufferWidget {
+	SVGWidget *sw;
+
+	SVGScrew();
 };
 
 ////////////////////

@@ -5,12 +5,13 @@ namespace rack {
 
 
 SVGKnob::SVGKnob() {
-	margin = 4;
+	padding = Vec(1, 1);
 
 	shadow = new CircularShadow();
 	shadow->blur = 5.0;
 	shadow->box.pos = Vec(0, 1);
-	addChild(shadow);
+	// TODO Remove shadow entirely
+	// addChild(shadow);
 
 	tw = new TransformWidget();
 	addChild(tw);

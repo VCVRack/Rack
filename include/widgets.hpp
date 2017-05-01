@@ -195,7 +195,7 @@ struct FramebufferWidget : virtual Widget {
 	/** A margin in pixels around the children in the framebuffer
 	This prevents cutting the rendered SVG off on the box edges.
 	*/
-	int margin = 0;
+	Vec padding;
 	/** The root object in the framebuffer scene
 	The FramebufferWidget owns the pointer
 	*/

@@ -21,6 +21,7 @@ void Port::disconnect() {
 
 void Port::draw(NVGcontext *vg) {
 	if (gRackWidget->activeWire) {
+		// Dim the Port if the active wire cannot plug into this Port
 		if (type == INPUT ? gRackWidget->activeWire->inputPort : gRackWidget->activeWire->outputPort)
 			nvgGlobalAlpha(vg, 0.5);
 	}

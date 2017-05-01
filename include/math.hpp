@@ -191,6 +191,9 @@ struct Rect {
 
 	Rect() {}
 	Rect(Vec pos, Vec size) : pos(pos), size(size) {}
+	static Rect fromMinMax(Vec min, Vec max) {
+		return Rect(min, max.minus(min));
+	}
 
 	/** Returns whether this Rect contains another Rect, inclusive on the top/left, non-inclusive on the bottom/right */
 	bool contains(Vec v) {

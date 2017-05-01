@@ -313,15 +313,17 @@ struct BefacoTinyKnob : SVGKnob {
 	}
 };
 
-struct BefacoSlidePot : SpriteKnob {
+struct BefacoSlidePot : SVGSlider {
 	BefacoSlidePot() {
-		box.size = Vec(12, 122);
-		spriteOffset = Vec(-2, -6);
-		spriteSize = Vec(18, 134);
-		minIndex = 97;
-		maxIndex = 0;
-		spriteCount = 98;
-		spriteImage = Image::load("res/ComponentLibrary/BefacoSlidePot.png");
+		Vec margin = Vec(3.5, 3.5);
+		maxHandlePos = Vec(-1, -2).plus(margin);
+		minHandlePos = Vec(-1, 87).plus(margin);
+		background->svg = SVG::load("res/ComponentLibrary/BefacoSlidePot.svg");
+		background->wrap();
+		background->box.pos = margin;
+		box.size = background->box.size.plus(margin.mult(2));
+		handle->svg = SVG::load("res/ComponentLibrary/BefacoSlidePotHandle.svg");
+		handle->wrap();
 	}
 };
 
@@ -329,33 +331,30 @@ struct BefacoSlidePot : SpriteKnob {
 // Jacks
 ////////////////////
 
-struct PJ301MPort : SpritePort {
+struct PJ301MPort : SVGPort {
 	PJ301MPort() {
-		box.size = Vec(24, 24);
-		spriteOffset = Vec(-2, -2);
-		spriteSize = Vec(30, 30);
-		spriteImage = Image::load("res/ComponentLibrary/PJ301M.png");
-		// setSVG(SVG::load("res/ComponentLibrary/PJ301M.svg"));
+		padding = Vec(1, 1);
+		background->svg = SVG::load("res/ComponentLibrary/PJ301M.svg");
+		background->wrap();
+		box.size = background->box.size;
 	}
 };
 
-struct PJ3410Port : SpritePort {
+struct PJ3410Port : SVGPort {
 	PJ3410Port() {
-		box.size = Vec(32, 31);
-		spriteOffset = Vec(-1, -1);
-		spriteSize = Vec(36, 36);
-		spriteImage = Image::load("res/ComponentLibrary/PJ3410.png");
-		// setSVG(SVG::load("res/ComponentLibrary/PJ3410.svg"));
+		padding = Vec(1, 1);
+		background->svg = SVG::load("res/ComponentLibrary/PJ3410.svg");
+		background->wrap();
+		box.size = background->box.size;
 	}
 };
 
-struct CL1362Port : SpritePort {
+struct CL1362Port : SVGPort {
 	CL1362Port() {
-		box.size = Vec(33, 29);
-		spriteOffset = Vec(-2, -2);
-		spriteSize = Vec(39, 36);
-		spriteImage = Image::load("res/ComponentLibrary/CL1362.png");
-		// setSVG(SVG::load("res/ComponentLibrary/CL1362.svg"));
+		padding = Vec(1, 1);
+		background->svg = SVG::load("res/ComponentLibrary/CL1362.svg");
+		background->wrap();
+		box.size = background->box.size;
 	}
 };
 
@@ -417,45 +416,41 @@ struct SmallLight : BASE {
 // Switches
 ////////////////////
 
-// struct BefacoBigKnob :  {
-// 	BefacoBigKnob() {
-// 		box.size = Vec(75, 75);
-// 		minAngle = -0.75*M_PI;
-// 		maxAngle = 0.75*M_PI;
-// 		setSVG(SVG::load("res/ComponentLibrary/BefacoBigKnob.svg"));
-// 	}
-// };
+struct NKK : SVGSwitch, ToggleSwitch {
+	NKK() {
+		addFrame(SVG::load("res/ComponentLibrary/NKK0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/NKK1.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/NKK2.svg"));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
 
 
 ////////////////////
 // Misc
 ////////////////////
 
-/** If you don't add these to your ModuleWidget, it will fall out of the rack... */
-struct Screw : SpriteWidget {
-	Screw() {
-		box.size = Vec(15, 14);
-		spriteOffset = Vec(0, 0);
-		spriteSize = Vec(15, 14);
+struct ScrewSilver : SVGScrew {
+	ScrewSilver() {
+		sw->svg = SVG::load("res/ComponentLibrary/ScrewSilver.svg");
+		sw->wrap();
+		box.size = sw->box.size;
 	}
 };
 
-struct BlackScrew : Screw {
-	BlackScrew() {
-		spriteImage = Image::load("res/ComponentLibrary/ScrewBlack.png");
-	}
-};
-
-struct SilverScrew : Screw {
-	SilverScrew() {
-		spriteImage = Image::load("res/ComponentLibrary/ScrewSilver.png");
+struct ScrewBlack : SVGScrew {
+	ScrewBlack() {
+		sw->svg = SVG::load("res/ComponentLibrary/ScrewBlack.svg");
+		sw->wrap();
+		box.size = sw->box.size;
 	}
 };
 
 struct LightPanel : Panel {
 	LightPanel() {
-		backgroundColor = nvgRGB(0xf2, 0xf2, 0xf2);
-		borderColor = nvgRGB(0xb8, 0xb8, 0xb8);
+		backgroundColor = nvgRGB(0xe8, 0xe8, 0xe8);
+		borderColor = nvgRGB(0xac, 0xac, 0xac);
 	}
 };
 

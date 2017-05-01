@@ -69,8 +69,8 @@ Port *createOutput(Vec pos, Module *module, int outputId) {
 }
 
 template <class TScrew>
-Screw *createScrew(Vec pos) {
-	Screw *screw = new TScrew();
+Widget *createScrew(Vec pos) {
+	Widget *screw = new TScrew();
 	screw->box.pos = pos;
 	return screw;
 }

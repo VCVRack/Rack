@@ -5,13 +5,10 @@ namespace rack {
 
 
 SVGPort::SVGPort() {
-	sw = new SVGWidget();
-	addChild(sw);
-}
+	padding = Vec(1, 1);
 
-void SVGPort::setSVG(std::shared_ptr<SVG> svg) {
-	sw->svg = svg;
-	sw->wrap();
+	background = new SVGWidget();
+	addChild(background);
 }
 
 void SVGPort::draw(NVGcontext *vg) {

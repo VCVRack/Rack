@@ -6,7 +6,7 @@
 
 namespace rack {
 
-#define KNOB_SENSITIVITY 0.001
+#define KNOB_SENSITIVITY 0.0015
 
 
 void Knob::onDragStart() {
