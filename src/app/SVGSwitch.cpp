@@ -19,14 +19,15 @@ void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 		sw->svg = svg;
 }
 
-void SVGSwitch::setIndex(int index) {
+void SVGSwitch::step() {
+	FramebufferWidget::step();
+}
+
+void SVGSwitch::onChange() {
+	int index = roundf(mapf(value, minValue, maxValue, 0, frames.size() - 1));
 	if (0 <= index && index < (int)frames.size())
 		sw->svg = frames[index];
 	dirty = true;
-}
-
-void SVGSwitch::step() {
-	FramebufferWidget::step();
 }
 
 

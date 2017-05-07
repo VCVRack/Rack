@@ -23,8 +23,7 @@ void ParamWidget::onChange() {
 	if (!module)
 		return;
 
-	// module->params[paramId] = value;
-	engineSetParamSmooth(module, paramId, value);
+	module->params[paramId] = value;
 }
 
 

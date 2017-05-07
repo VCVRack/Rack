@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "gui.hpp"
+#include "engine.hpp"
 // For GLFW_KEY_LEFT_CONTROL, etc.
 #include <GLFW/glfw3.h>
 
@@ -22,6 +23,13 @@ void Knob::onDragMove(Vec mouseRel) {
 
 void Knob::onDragEnd() {
 	guiCursorUnlock();
+}
+
+void Knob::onChange() {
+	if (!module)
+		return;
+
+	engineSetParamSmooth(module, paramId, value);
 }
 
 

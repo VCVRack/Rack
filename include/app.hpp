@@ -129,6 +129,8 @@ struct Knob : ParamWidget {
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
+	/** Tell engine to smoothly vary this parameter */
+	void onChange();
 };
 
 struct SpriteKnob : Knob, SpriteWidget {
@@ -164,7 +166,6 @@ struct SVGSlider : Knob, FramebufferWidget {
 };
 
 struct Switch : ParamWidget {
-	virtual void setIndex(int index) {}
 };
 
 struct SVGSwitch : virtual Switch, FramebufferWidget {
@@ -175,8 +176,8 @@ struct SVGSwitch : virtual Switch, FramebufferWidget {
 	SVGSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<SVG> svg);
-	void setIndex(int index);
 	void step();
+	void onChange();
 };
 
 /** A switch that cycles through each mechanical position */
@@ -184,31 +185,10 @@ struct ToggleSwitch : virtual Switch {
 	void onDragStart() {
 		// Cycle through values
 		// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
-		float v = value + 1.0;
-		setValue(v <= maxValue ? v : minValue);
-	}
-	void onChange() {
-		int index = (int)roundf(value);
-		setIndex(index);
-		ParamWidget::onChange();
-	}
-};
-
-/** FIXME I don't think this should exist. The audio engine should read from a MomentarySwitch and increment its internal state, instead of relying on the knob to do that logic. */
-struct ModeSwitch : virtual Switch {
-	void onDragStart() {
-		setIndex(1);
-	}
-	void onDragEnd() {
-		setIndex(0);
-	}
-	void onDragDrop(Widget *origin) {
-		if (origin != this)
-			return;
-		// Cycle through values
-		// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
-		float v = value + 1.0;
-		setValue(v <= maxValue ? v : minValue);
+		if (value >= maxValue)
+			setValue(minValue);
+		else
+			setValue(value + 1.0);
 	}
 };
 
@@ -216,11 +196,9 @@ struct ModeSwitch : virtual Switch {
 struct MomentarySwitch : virtual Switch {
 	void onDragStart() {
 		setValue(maxValue);
-		setIndex(1);
 	}
 	void onDragEnd() {
 		setValue(minValue);
-		setIndex(0);
 	}
 };
 

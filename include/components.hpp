@@ -413,7 +413,7 @@ struct SmallLight : BASE {
 };
 
 ////////////////////
-// Switches
+// Switches and Buttons
 ////////////////////
 
 struct NKK : SVGSwitch, ToggleSwitch {
@@ -421,6 +421,52 @@ struct NKK : SVGSwitch, ToggleSwitch {
 		addFrame(SVG::load("res/ComponentLibrary/NKK0.svg"));
 		addFrame(SVG::load("res/ComponentLibrary/NKK1.svg"));
 		addFrame(SVG::load("res/ComponentLibrary/NKK2.svg"));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
+struct CKSS : SVGSwitch, ToggleSwitch {
+	CKSS() {
+		addFrame(SVG::load("res/ComponentLibrary/CKSS0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/CKSS1.svg"));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
+struct CKD6 : SVGSwitch, MomentarySwitch {
+	CKD6() {
+		addFrame(SVG::load("res/ComponentLibrary/CKD6_0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/CKD6_1.svg"));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
+struct TL1105 : SVGSwitch, MomentarySwitch {
+	TL1105() {
+		addFrame(SVG::load("res/ComponentLibrary/TL1105_0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/TL1105_1.svg"));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
+struct BefacoSwitch : SVGSwitch, ToggleSwitch {
+	BefacoSwitch() {
+		addFrame(SVG::load("res/ComponentLibrary/BefacoSwitch_0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/BefacoSwitch_1.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/BefacoSwitch_2.svg"));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
+struct BefacoPush : SVGSwitch, MomentarySwitch {
+	BefacoPush() {
+		addFrame(SVG::load("res/ComponentLibrary/BefacoPush_0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/BefacoPush_1.svg"));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
