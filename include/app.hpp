@@ -145,7 +145,6 @@ struct SVGKnob : Knob, FramebufferWidget {
 	/** Not owned */
 	TransformWidget *tw;
 	SVGWidget *sw;
-	CircularShadow *shadow;
 
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);

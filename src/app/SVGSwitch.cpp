@@ -28,6 +28,7 @@ void SVGSwitch::onChange() {
 	if (0 <= index && index < (int)frames.size())
 		sw->svg = frames[index];
 	dirty = true;
+	ParamWidget::onChange();
 }
 
 

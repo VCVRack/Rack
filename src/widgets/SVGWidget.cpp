@@ -112,7 +112,7 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 
 
 void SVGWidget::wrap() {
-	if (svg) {
+	if (svg && svg->handle) {
 		box.size = Vec(svg->handle->width, svg->handle->height);
 	}
 	else {

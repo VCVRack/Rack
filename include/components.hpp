@@ -5,21 +5,6 @@
 namespace rack {
 
 
-enum ColorNames {
-	COLOR_BLACK,
-	COLOR_WHITE,
-	COLOR_RED,
-	COLOR_ORANGE,
-	COLOR_YELLOW,
-	COLOR_GREEN,
-	COLOR_CYAN,
-	COLOR_BLUE,
-	COLOR_PURPLE,
-	NUM_COLORS
-};
-
-extern const NVGcolor colors[NUM_COLORS];
-
 ////////////////////
 // Knobs
 ////////////////////
@@ -286,6 +271,24 @@ struct Davies1900hRedKnob : Davies1900hKnob {
 	}
 };
 
+struct Davies1900hLargeWhiteKnob : Davies1900hKnob {
+	Davies1900hLargeWhiteKnob() {
+		setSVG(SVG::load("res/ComponentLibrary/Davies1900hLargeWhite.svg"));
+	}
+};
+
+struct Davies1900hLargeBlackKnob : Davies1900hKnob {
+	Davies1900hLargeBlackKnob() {
+		setSVG(SVG::load("res/ComponentLibrary/Davies1900hLargeBlack.svg"));
+	}
+};
+
+struct Davies1900hLargeRedKnob : Davies1900hKnob {
+	Davies1900hLargeRedKnob() {
+		setSVG(SVG::load("res/ComponentLibrary/Davies1900hLargeRed.svg"));
+	}
+};
+
 struct Trimpot : SVGKnob {
 	Trimpot() {
 		box.size = Vec(17, 17);
@@ -366,30 +369,49 @@ struct ValueLight : Light {
 	float *value;
 };
 
-template <int COLOR>
 struct ColorValueLight : ValueLight {
+	NVGcolor baseColor;
 	void step() {
 		float v = sqrtBipolar(getf(value));
-		color = nvgLerpRGBA(colors[COLOR_BLACK], colors[COLOR], v);
+		color = baseColor;
+		color.a = clampf(v, 0.0, 1.0);
 	}
 };
 
-typedef ColorValueLight<COLOR_RED> RedValueLight;
-typedef ColorValueLight<COLOR_YELLOW> YellowValueLight;
-typedef ColorValueLight<COLOR_GREEN> GreenValueLight;
+struct RedValueLight : ColorValueLight {
+	RedValueLight() {
+		baseColor = nvgRGB(0xed, 0x2c, 0x24);
+	}
+};
 
-template <int COLOR_POS, int COLOR_NEG>
+struct YellowValueLight : ColorValueLight {
+	YellowValueLight() {
+		baseColor = nvgRGB(0xf9, 0xdf, 0x1c);
+	}
+};
+
+struct GreenValueLight : ColorValueLight {
+	GreenValueLight() {
+		baseColor = nvgRGB(0x90, 0xc7, 0x3e);
+	}
+};
+
 struct PolarityLight : ValueLight {
+	NVGcolor posColor;
+	NVGcolor negColor;
 	void step() {
 		float v = sqrtBipolar(getf(value));
-		if (v >= 0.0)
-			color = nvgLerpRGBA(colors[COLOR_BLACK], colors[COLOR_POS], v);
-		else
-			color = nvgLerpRGBA(colors[COLOR_BLACK], colors[COLOR_NEG], -v);
+		color = (v >= 0.0) ? posColor : negColor;
+		color.a = clampf(fabsf(v), 0.0, 1.0);
 	}
 };
 
-typedef PolarityLight<COLOR_GREEN, COLOR_RED> GreenRedPolarityLight;
+struct GreenRedPolarityLight : PolarityLight {
+	GreenRedPolarityLight() {
+		posColor = nvgRGB(0x90, 0xc7, 0x3e);
+		negColor = nvgRGB(0xed, 0x2c, 0x24);
+	}
+};
 
 template <typename BASE>
 struct LargeLight : BASE {
@@ -418,9 +440,9 @@ struct SmallLight : BASE {
 
 struct NKK : SVGSwitch, ToggleSwitch {
 	NKK() {
-		addFrame(SVG::load("res/ComponentLibrary/NKK0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/NKK1.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/NKK2.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/NKK_0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/NKK_1.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/NKK_2.svg"));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -428,8 +450,8 @@ struct NKK : SVGSwitch, ToggleSwitch {
 
 struct CKSS : SVGSwitch, ToggleSwitch {
 	CKSS() {
-		addFrame(SVG::load("res/ComponentLibrary/CKSS0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/CKSS1.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/CKSS_0.svg"));
+		addFrame(SVG::load("res/ComponentLibrary/CKSS_1.svg"));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
