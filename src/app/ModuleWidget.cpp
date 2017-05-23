@@ -56,6 +56,11 @@ json_t *ModuleWidget::toJson() {
 		json_array_append_new(paramsJ, paramJ);
 	}
 	json_object_set_new(root, "params", paramsJ);
+	// data
+	json_t *dataJ = module ? module->toJsonData() : NULL;
+	if (dataJ) {
+		json_object_set_new(root, "data", dataJ);
+	}
 
 	return root;
 }
@@ -76,6 +81,12 @@ void ModuleWidget::fromJson(json_t *root) {
 			params[paramId]->fromJson(paramJ);
 		}
 	}
+
+	// data
+	json_t *dataJ = json_object_get(root, "data");
+	if (dataJ && module) {
+		module->fromJsonData(dataJ);
+	}
 }
 
 void ModuleWidget::disconnectPorts() {
@@ -90,13 +101,6 @@ void ModuleWidget::disconnectPorts() {
 void ModuleWidget::resetParams() {
 	for (ParamWidget *param : params) {
 		param->setValue(param->defaultValue);
-	}
-}
-
-void ModuleWidget::cloneParams(ModuleWidget *source) {
-	assert(params.size() == source->params.size());
-	for (size_t i = 0; i < params.size(); i++) {
-		params[i]->setValue(source->params[i]->value);
 	}
 }
 
@@ -157,9 +161,11 @@ struct CloneModuleMenuItem : MenuItem {
 	void onAction() {
 		// Create new module from model
 		ModuleWidget *clonedModuleWidget = moduleWidget->model->createModuleWidget();
+		json_t *moduleJ = moduleWidget->toJson();
+		clonedModuleWidget->fromJson(moduleJ);
+		json_decref(moduleJ);
 		clonedModuleWidget->requestedPos = moduleWidget->box.pos;
 		clonedModuleWidget->requested = true;
-		clonedModuleWidget->cloneParams(moduleWidget);
 		gRackWidget->moduleContainer->addChild(clonedModuleWidget);
 	}
 };

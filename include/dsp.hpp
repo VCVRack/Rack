@@ -74,6 +74,13 @@ struct SimpleFFT {
 };
 
 
+typedef void (*stepCallback)(float x, const float y[], float dydt[]);
+/** Solve an ODE system using the 1st order Euler method */
+void stepEuler(stepCallback f, float x, float dx, float y[], int len);
+/** Solve an ODE system using the 4th order Runge-Kutta method */
+void stepRK4(stepCallback f, float x, float dx, float y[], int len);
+
+
 /** A simple cyclic buffer.
 S must be a power of 2.
 push() is constant time O(1)
@@ -247,8 +254,12 @@ struct SampleRateConverter {
 	~SampleRateConverter() {
 		src_delete(state);
 	}
+	/** output_sample_rate / input_sample_rate */
 	void setRatio(float r) {
 		src_set_ratio(state, r);
+		data.src_ratio = r;
+	}
+	void setRatioSmooth(float r) {
 		data.src_ratio = r;
 	}
 	/** `in` and `out` are interlaced with the number of channels */
@@ -264,6 +275,65 @@ struct SampleRateConverter {
 	}
 	void reset() {
 		src_reset(state);
+	}
+};
+
+
+/** Perform a direct convolution
+x[-len + 1] to x[0] must be defined
+*/
+inline float convolve(const float *x, const float *kernel, int len) {
+	float y = 0.0;
+	for (int i = 0; i < len; i++) {
+		y += x[-i] * kernel[i];
+	}
+	return y;
+}
+
+inline void blackmanHarrisWindow(float *x, int n) {
+	const float a0 = 0.35875;
+	const float a1 = 0.48829;
+	const float a2 = 0.14128;
+	const float a3 = 0.01168;
+	for (int i = 0; i < n; i++) {
+		x[i] *= a0
+			- a1 * cosf(2 * M_PI * i / (n - 1))
+			+ a2 * cosf(4 * M_PI * i / (n - 1))
+			- a3 * cosf(6 * M_PI * i / (n - 1));
+	}
+}
+
+inline void boxcarFIR(float *x, int n, float cutoff) {
+	for (int i = 0; i < n; i++) {
+		float t = (float)i / (n - 1) * 2.0 - 1.0;
+		x[i] = sincf(t * n * cutoff);
+	}
+}
+
+
+template<int OVERSAMPLE, int QUALITY>
+struct Decimator {
+	DoubleRingBuffer<float, OVERSAMPLE*QUALITY> inBuffer;
+	float kernel[OVERSAMPLE*QUALITY];
+
+	Decimator(float cutoff = 0.9) {
+		boxcarFIR(kernel, OVERSAMPLE*QUALITY, cutoff * 0.5 / OVERSAMPLE);
+		blackmanHarrisWindow(kernel, OVERSAMPLE*QUALITY);
+		// The sum of the kernel should be 1
+		float sum = 0.0;
+		for (int i = 0; i < OVERSAMPLE*QUALITY; i++) {
+			sum += kernel[i];
+		}
+		for (int i = 0; i < OVERSAMPLE*QUALITY; i++) {
+			kernel[i] /= sum;
+		}
+	}
+	float process(float *in) {
+		memcpy(inBuffer.endData(), in, OVERSAMPLE*sizeof(float));
+		inBuffer.endIncr(OVERSAMPLE);
+		float out = convolve(inBuffer.endData() + OVERSAMPLE*QUALITY, kernel, OVERSAMPLE*QUALITY);
+		// Ignore the ring buffer's start position
+		return out;
 	}
 };
 
@@ -336,6 +406,30 @@ struct PeakFilter {
 	}
 	float peak() {
 		return state;
+	}
+};
+
+
+struct SlewLimiter {
+	float rise = 1.0;
+	float fall = 1.0;
+	float out = 0.0;
+	float process(float in) {
+		float delta = clampf(in - out, -fall, rise);
+		out += delta;
+		return out;
+	}
+};
+
+
+/** Triggered when input value rises above 0.0 */
+struct Trigger {
+	float lastIn = 0.0;
+	/** Returns whether a trigger is detected */
+	bool process(float in) {
+		bool triggered = (lastIn <= 0.0 && in > 0.0);
+		lastIn = in;
+		return triggered;
 	}
 };
 

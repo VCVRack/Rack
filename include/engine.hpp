@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <jansson.h>
 #include "util.hpp"
 
 
@@ -20,6 +21,8 @@ struct Module {
 
 	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate */
 	virtual void step() {}
+	virtual json_t *toJsonData() { return NULL; }
+	virtual void fromJsonData(json_t *root) {}
 };
 
 struct Wire {

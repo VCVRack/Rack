@@ -17,6 +17,11 @@ inline int maxi(int a, int b) {
 	return a > b ? a : b;
 }
 
+/** Limits a value between a minimum and maximum */
+inline int clampi(int x, int min, int max) {
+	return x > max ? max : x < min ? min : x;
+}
+
 inline int absi(int a) {
 	return a >= 0 ? a : -a;
 }
@@ -49,30 +54,14 @@ inline float sgnf(float x) {
 	return copysignf(1.0, x);
 }
 
-inline float radtodeg(float x) {
-	return x * (180.0 / M_PI);
-}
-
-inline float degtorad(float x) {
-	return x * (M_PI / 180.0);
-}
-
-/** Limits a value between a minimum and maximum
-If min > max for some reason, returns min
-*/
+/** Limits a value between a minimum and maximum */
 inline float clampf(float x, float min, float max) {
-	if (x > max)
-		x = max;
-	if (x < min)
-		x = min;
-	return x;
+	return x > max ? max : x < min ? min : x;
 }
 
 /** If the magnitude of x if less than eps, return 0 */
 inline float chopf(float x, float eps) {
-	if (x < eps && x > -eps)
-		return 0.0;
-	return x;
+	return -eps < x && x < eps ? 0.0 : x;
 }
 
 inline float mapf(float x, float xMin, float xMax, float yMin, float yMax) {

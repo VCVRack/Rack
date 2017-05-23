@@ -41,7 +41,6 @@ struct ModuleWidget : OpaqueWidget {
 	void fromJson(json_t *root);
 	void disconnectPorts();
 	void resetParams();
-	void cloneParams(ModuleWidget *source);
 
 	void draw(NVGcontext *vg);
 
