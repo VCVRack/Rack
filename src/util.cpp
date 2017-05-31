@@ -7,7 +7,7 @@
 namespace rack {
 
 // TODO
-// Convert this to xoroshiro128+ and custom normal dist implementation
+// Convert this to xoroshiro128+ or something, and write custom normal dist implementation
 
 static std::random_device rd;
 static std::mt19937 rng(rd());

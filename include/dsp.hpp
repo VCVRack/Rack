@@ -422,14 +422,28 @@ struct SlewLimiter {
 };
 
 
-/** Triggered when input value rises above 0.0 */
-struct Trigger {
-	float lastIn = 0.0;
-	/** Returns whether a trigger is detected */
+struct SchmittTrigger {
+	// false is low, true is high
+	bool state = false;
+	float low = 0.0;
+	float high = 1.0;
+	void setThresholds(float low, float high) {
+		this->low = low;
+		this->high = high;
+	}
+	/** Returns true if triggered */
 	bool process(float in) {
-		bool triggered = (lastIn <= 0.0 && in > 0.0);
-		lastIn = in;
-		return triggered;
+		if (state) {
+			if (in < low)
+				state = false;
+		}
+		else {
+			if (in >= high) {
+				state = true;
+				return true;
+			}
+		}
+		return false;
 	}
 };
 

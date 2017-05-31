@@ -113,8 +113,7 @@ Toolbar::Toolbar() {
 		SampleRateChoice *srChoice = new SampleRateChoice();
 		srChoice->box.pos = Vec(xPos, margin);
 		srChoice->box.size.x = 100;
-		// TODO Change to actual sample rate, e.g. 44100 Hz
-		srChoice->text = "Sample Rate";
+		srChoice->text = "";
 		addChild(srChoice);
 		xPos += srChoice->box.size.x;
 	}

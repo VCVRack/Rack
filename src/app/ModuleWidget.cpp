@@ -105,6 +105,8 @@ void ModuleWidget::resetParams() {
 }
 
 void ModuleWidget::draw(NVGcontext *vg) {
+	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+
 	Widget::draw(vg);
 	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 
@@ -128,6 +130,8 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		bndMenuItem(vg, 0.0, 0.0, box.size.x, BND_WIDGET_HEIGHT, BND_DEFAULT, -1, text.c_str());
 		nvgRestore(vg);
 	}
+
+	nvgResetScissor(vg);
 }
 
 void ModuleWidget::onDragStart() {

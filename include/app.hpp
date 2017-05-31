@@ -132,13 +132,13 @@ struct Knob : ParamWidget {
 	void onChange();
 };
 
-struct SpriteKnob : Knob, SpriteWidget {
+struct SpriteKnob : virtual Knob, SpriteWidget {
 	int minIndex, maxIndex, spriteCount;
 	void step();
 };
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
-struct SVGKnob : Knob, FramebufferWidget {
+struct SVGKnob : virtual Knob, FramebufferWidget {
 	/** Angles in radians */
 	float minAngle, maxAngle;
 	/** Not owned */
@@ -149,6 +149,14 @@ struct SVGKnob : Knob, FramebufferWidget {
 	void setSVG(std::shared_ptr<SVG> svg);
 	void step();
 	void onChange();
+};
+
+/** Snaps to the nearest integer value on mouse release */
+struct SnapKnob : virtual Knob {
+	void onDragEnd() {
+		setValue(roundf(value));
+		Knob::onDragEnd();
+	}
 };
 
 struct SVGSlider : Knob, FramebufferWidget {

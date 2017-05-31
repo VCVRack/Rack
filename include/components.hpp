@@ -26,16 +26,16 @@ namespace rack {
 
 struct Rogan : SVGKnob {
 	Rogan() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
 	}
 };
 
 struct Rogan6PS : Rogan {
 	Rogan6PS() {
 		box.size = Vec(89, 89);
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
+		// minAngle = -0.83*M_PI;
+		// maxAngle = 0.83*M_PI;
 	}
 };
 
@@ -263,8 +263,8 @@ struct SynthTechAlco : SVGKnob {
 struct Davies1900hKnob : SVGKnob {
 	Davies1900hKnob() {
 		box.size = Vec(36, 36);
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
 	}
 };
 
@@ -304,6 +304,14 @@ struct Davies1900hLargeRedKnob : Davies1900hKnob {
 	}
 };
 
+struct Davies1900hSmallBlackKnob : Davies1900hKnob {
+	Davies1900hSmallBlackKnob() {
+		setSVG(SVG::load("res/ComponentLibrary/Davies1900hSmallBlack.svg"));
+	}
+};
+
+struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob, SnapKnob {};
+
 struct Trimpot : SVGKnob {
 	Trimpot() {
 		box.size = Vec(17, 17);
@@ -321,6 +329,8 @@ struct BefacoBigKnob : SVGKnob {
 		setSVG(SVG::load("res/ComponentLibrary/BefacoBigKnob.svg"));
 	}
 };
+
+struct BefacoBigSnapKnob : BefacoBigKnob, SnapKnob {};
 
 struct BefacoTinyKnob : SVGKnob {
 	BefacoTinyKnob() {
@@ -457,6 +467,13 @@ template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
 		this->box.size = Vec(8, 8);
+	}
+};
+
+template <typename BASE>
+struct TinyLight : BASE {
+	TinyLight() {
+		this->box.size = Vec(5, 5);
 	}
 };
 

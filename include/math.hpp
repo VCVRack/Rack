@@ -28,7 +28,7 @@ inline int absi(int a) {
 
 // Euclidean modulus, always returns 0 <= mod < base for positive base
 // Assumes this architecture's division is non-Euclidean
-inline int eucmod(int a, int base) {
+inline int eucmodi(int a, int base) {
 	int mod = a % base;
 	return mod < 0 ? mod + base : mod;
 }
@@ -41,7 +41,7 @@ inline int log2i(int n) {
 	return i;
 }
 
-inline bool ispow2(int n) {
+inline bool ispow2i(int n) {
 	return n > 0 && (n & (n - 1)) == 0;
 }
 
@@ -52,6 +52,11 @@ inline bool ispow2(int n) {
 /** Returns 1.0 for positive numbers and -1.0 for negative numbers (including positive/negative zero) */
 inline float sgnf(float x) {
 	return copysignf(1.0, x);
+}
+
+inline float eucmodf(float a, float base) {
+	float mod = fmodf(a, base);
+	return mod < 0.0 ? mod + base : mod;
 }
 
 /** Limits a value between a minimum and maximum */
@@ -117,7 +122,7 @@ inline void setf(float *p, float v) {
 }
 
 /** Linearly interpolate an array `p` with index `x`
-Assumes that the array at `p` is of length at least ceil(x)+1.
+Assumes that the array at `p` is of length at least floor(x)+1.
 */
 inline float interpf(const float *p, float x) {
 	int xi = x;

@@ -6,7 +6,7 @@ namespace rack {
 
 void Light::draw(NVGcontext *vg) {
 	NVGcolor bgColor = nvgRGBf(0.0, 0.0, 0.0);
-	float radius = box.size.x / 2.0;
+	float radius = roundf(box.size.x / 2.0);
 	float oradius = radius + 30.0;
 
 	// Solid
