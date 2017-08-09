@@ -15,7 +15,7 @@ SVGSlider::SVGSlider() {
 void SVGSlider::step() {
 	if (dirty) {
 		// Update handle position
-		Vec handlePos = Vec(mapf(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), mapf(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
+		Vec handlePos = Vec(rescalef(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), rescalef(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
 		handle->box.pos = handlePos;
 	}
 	FramebufferWidget::step();

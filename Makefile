@@ -1,5 +1,5 @@
 ARCH ?= lin
-FLAGS = -g -Wall -O3 -msse -mfpmath=sse -ffast-math -fno-finite-math-only \
+FLAGS = -g -Wall -O2 -msse -mfpmath=sse -ffast-math -fno-finite-math-only \
 	-I./ext -I./include
 CXXFLAGS = -fno-exceptions
 

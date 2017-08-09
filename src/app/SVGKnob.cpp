@@ -24,7 +24,7 @@ void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
 void SVGKnob::step() {
 	// Re-transform TransformWidget if dirty
 	if (dirty) {
-		float angle = mapf(value, minValue, maxValue, minAngle, maxAngle);
+		float angle = rescalef(value, minValue, maxValue, minAngle, maxAngle);
 		tw->identity();
 		// Rotate SVG
 		Vec center = sw->box.getCenter();

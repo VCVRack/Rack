@@ -104,6 +104,12 @@ void ModuleWidget::resetParams() {
 	}
 }
 
+void ModuleWidget::randomizeParams() {
+	for (ParamWidget *param : params) {
+		param->setValue(rescalef(randomf(), 0.0, 1.0, param->minValue, param->maxValue));
+	}
+}
+
 void ModuleWidget::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
@@ -160,6 +166,13 @@ struct ResetParamsMenuItem : MenuItem {
 	}
 };
 
+struct RandomizeParamsMenuItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	void onAction() {
+		moduleWidget->randomizeParams();
+	}
+};
+
 struct CloneModuleMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
@@ -196,6 +209,11 @@ void ModuleWidget::onMouseDown(int button) {
 			resetItem->text = "Initialize";
 			resetItem->moduleWidget = this;
 			menu->pushChild(resetItem);
+
+			RandomizeParamsMenuItem *randomizeParams = new RandomizeParamsMenuItem();
+			randomizeParams->text = "Randomize";
+			randomizeParams->moduleWidget = this;
+			menu->pushChild(randomizeParams);
 
 			DisconnectPortsMenuItem *disconnectItem = new DisconnectPortsMenuItem();
 			disconnectItem->text = "Disconnect cables";

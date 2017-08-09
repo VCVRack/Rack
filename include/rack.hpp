@@ -1,7 +1,7 @@
 #pragma once
 
-#include "math.hpp"
 #include "util.hpp"
+#include "math.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
 #include "gui.hpp"

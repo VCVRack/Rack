@@ -76,9 +76,43 @@ struct SimpleFFT {
 
 typedef void (*stepCallback)(float x, const float y[], float dydt[]);
 /** Solve an ODE system using the 1st order Euler method */
-void stepEuler(stepCallback f, float x, float dx, float y[], int len);
+inline void stepEuler(stepCallback f, float x, float dx, float y[], int len) {
+	float k[len];
+
+	f(x, y, k);
+	for (int i = 0; i < len; i++) {
+		y[i] += dx * k[i];
+	}
+}
 /** Solve an ODE system using the 4th order Runge-Kutta method */
-void stepRK4(stepCallback f, float x, float dx, float y[], int len);
+inline void stepRK4(stepCallback f, float x, float dx, float y[], int len) {
+	float k1[len];
+	float k2[len];
+	float k3[len];
+	float k4[len];
+	float yi[len];
+
+	f(x, y, k1);
+
+	for (int i = 0; i < len; i++) {
+		yi[i] = y[i] + k1[i] * dx / 2.0;
+	}
+	f(x + dx / 2.0, yi, k2);
+
+	for (int i = 0; i < len; i++) {
+		yi[i] = y[i] + k2[i] * dx / 2.0;
+	}
+	f(x + dx / 2.0, yi, k3);
+
+	for (int i = 0; i < len; i++) {
+		yi[i] = y[i] + k3[i] * dx;
+	}
+	f(x + dx, yi, k4);
+
+	for (int i = 0; i < len; i++) {
+		y[i] += dx * (k1[i] + 2.0 * k2[i] + 2.0 * k3[i] + k4[i]) / 6.0;
+	}
+}
 
 
 /** A simple cyclic buffer.
@@ -423,8 +457,8 @@ struct SlewLimiter {
 
 
 struct SchmittTrigger {
-	// false is low, true is high
-	bool state = false;
+	/** 0 unknown, 1 low, 2 high */
+	int state = 0;
 	float low = 0.0;
 	float high = 1.0;
 	void setThresholds(float low, float high) {
@@ -433,17 +467,19 @@ struct SchmittTrigger {
 	}
 	/** Returns true if triggered */
 	bool process(float in) {
-		if (state) {
-			if (in < low)
-				state = false;
+		bool triggered = false;
+		if (in >= high) {
+			if (state == 1)
+				triggered = true;
+			state = 2;
 		}
-		else {
-			if (in >= high) {
-				state = true;
-				return true;
-			}
+		else if (in <= low) {
+			state = 1;
 		}
-		return false;
+		return triggered;
+	}
+	void reset() {
+		state = 0;
 	}
 };
 

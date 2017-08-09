@@ -24,7 +24,7 @@ void SVGSwitch::step() {
 }
 
 void SVGSwitch::onChange() {
-	int index = roundf(mapf(value, minValue, maxValue, 0, frames.size() - 1));
+	int index = roundf(rescalef(value, minValue, maxValue, 0, frames.size() - 1));
 	if (0 <= index && index < (int)frames.size())
 		sw->svg = frames[index];
 	dirty = true;

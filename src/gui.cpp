@@ -25,7 +25,7 @@ extern "C" {
 namespace rack {
 
 static GLFWwindow *window = NULL;
-static std::shared_ptr<Font> defaultFont;
+std::shared_ptr<Font> gGuiFont;
 NVGcontext *gVg = NULL;
 
 
@@ -232,13 +232,13 @@ void guiInit() {
 	assert(gVg);
 
 	// Set up Blendish
-	defaultFont = Font::load("res/DejaVuSans.ttf");
-	bndSetFont(defaultFont->handle);
+	gGuiFont = Font::load("res/DejaVuSans.ttf");
+	bndSetFont(gGuiFont->handle);
 	// bndSetIconImage(loadImage("res/icons.png"));
 }
 
 void guiDestroy() {
-	defaultFont.reset();
+	gGuiFont.reset();
 	nvgDeleteGL2(gVg);
 	// nvgDeleteGL3(gVg);
 	glfwDestroyWindow(window);

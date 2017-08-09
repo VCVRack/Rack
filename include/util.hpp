@@ -11,6 +11,24 @@
 #include <mutex>
 
 
+/** Surrounds raw text with quotes
+Example:
+	printf("Hello " STRINGIFY(world))
+will expand to
+	printf("Hello " "world")
+and of course the C++ lexer/parser will then concatenate the string literals
+*/
+#define STRINGIFY(x) #x
+/** Converts a macro to a string literal
+Example:
+	#define NAME "world"
+	printf("Hello " TOSTRING(NAME))
+will expand to
+	printf("Hello " "world")
+*/
+#define TOSTRING(x) STRINGIFY(x)
+
+
 namespace rack {
 
 

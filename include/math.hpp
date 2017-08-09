@@ -69,7 +69,7 @@ inline float chopf(float x, float eps) {
 	return -eps < x && x < eps ? 0.0 : x;
 }
 
-inline float mapf(float x, float xMin, float xMax, float yMin, float yMax) {
+inline float rescalef(float x, float xMin, float xMax, float yMin, float yMax) {
 	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
@@ -128,6 +128,15 @@ inline float interpf(const float *p, float x) {
 	int xi = x;
 	float xf = x - xi;
 	return crossf(p[xi], p[xi+1], xf);
+}
+
+/** Complex multiply c = a * b
+It is of course acceptable to reuse arguments
+i.e. cmultf(&ar, &ai, ar, ai, br, bi)
+*/
+inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {
+	*cr = ar * br - ai * bi;
+	*ci = ar * bi + ai * br;
 }
 
 ////////////////////

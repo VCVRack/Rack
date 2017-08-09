@@ -518,6 +518,14 @@ struct TL1105 : SVGSwitch, MomentarySwitch {
 	}
 };
 
+struct LEDButton : SVGSwitch, MomentarySwitch {
+	LEDButton() {
+		addFrame(SVG::load("res/ComponentLibrary/LEDButton.svg"));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
 struct BefacoSwitch : SVGSwitch, ToggleSwitch {
 	BefacoSwitch() {
 		addFrame(SVG::load("res/ComponentLibrary/BefacoSwitch_0.svg"));
@@ -560,8 +568,8 @@ struct ScrewBlack : SVGScrew {
 
 struct LightPanel : Panel {
 	LightPanel() {
-		// backgroundColor = nvgRGB(0xe8, 0xe8, 0xe8);
-		backgroundColor = nvgRGB(0xf4, 0xf4, 0xf4);
+		// backgroundColor = nvgRGB(0xe6, 0xe6, 0xe6);
+		backgroundColor = nvgRGB(0xf0, 0xf0, 0xf0);
 		borderColor = nvgRGB(0xac, 0xac, 0xac);
 	}
 };
