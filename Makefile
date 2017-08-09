@@ -10,9 +10,10 @@ SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 ifeq ($(ARCH), lin)
 SOURCES += ext/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_GTK $(shell pkg-config --cflags gtk+-2.0)
+CXXFLAGS += $(shell pkg-config --cflags glew glfw3 jansson samplerate libcurl libzip)
 LDFLAGS += -rdynamic \
-	-lpthread -lGL -lGLEW -lglfw -ldl -ljansson -lportaudio -lportmidi -lsamplerate -lcurl -lzip \
-	$(shell pkg-config --libs gtk+-2.0)
+	-lpthread -lGL -ldl -lportaudio -lportmidi \
+	$(shell pkg-config --libs gtk+-2.0 glew glfw3 jansson samplerate libcurl libzip)
 TARGET = Rack
 endif
 
