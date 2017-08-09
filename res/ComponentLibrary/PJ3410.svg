@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="28.946px" height="28.946px" viewBox="0 0 28.946 28.946" enable-background="new 0 0 28.946 28.946" xml:space="preserve">
+<g>
+	<defs>
+		<rect id="SVGID_1_" width="28.946" height="28.946"/>
+	</defs>
+	<clipPath id="SVGID_2_">
+		<use xlink:href="#SVGID_1_"  overflow="visible"/>
+	</clipPath>
+	<path clip-path="url(#SVGID_2_)" fill="#E7E7E7" d="M14.471,28.797c-7.897-0.05-14.322-6.479-14.32-14.334
+		c0.003-7.86,6.427-14.28,14.32-14.313c7.869,0.038,14.293,6.458,14.325,14.311c-0.018,7.86-6.442,14.291-14.323,14.336H14.471z"/>
+	<path clip-path="url(#SVGID_2_)" fill="#666866" d="M14.473,0.301c7.843,0.037,14.143,6.323,14.173,14.162
+		c-0.017,7.842-6.334,14.14-14.173,14.184c-7.85-0.049-14.174-6.327-14.172-14.184C0.304,6.621,6.635,0.331,14.473,0.301 M14.474,0
+		L14.474,0h-0.003C6.494,0.032,0.004,6.521,0,14.463C-0.002,22.4,6.49,28.897,14.471,28.946c7.965-0.045,14.458-6.542,14.475-14.483
+		C28.914,6.525,22.422,0.038,14.474,0"/>
+	<path clip-path="url(#SVGID_2_)" fill="#555555" d="M3.832,14.463c0.029,5.901,4.739,10.614,10.641,10.641
+		c5.873-0.016,10.628-4.762,10.62-10.641c-0.005-5.869-4.757-10.604-10.62-10.621C8.58,3.867,3.873,8.567,3.832,14.463"/>
+	<path clip-path="url(#SVGID_2_)" d="M8.793,14.467c0.016,3.148,2.526,5.662,5.674,5.676c3.134-0.008,5.668-2.539,5.664-5.676
+		c-0.002-3.131-2.535-5.655-5.664-5.664C11.324,8.817,8.814,11.323,8.793,14.467"/>
+	<g opacity="0.33" clip-path="url(#SVGID_2_)">
+		<g>
+			<defs>
+				<rect id="SVGID_3_" x="5.932" y="5.943" width="17.061" height="17.059"/>
+			</defs>
+			<clipPath id="SVGID_4_">
+				<use xlink:href="#SVGID_3_"  overflow="visible"/>
+			</clipPath>
+			<path clip-path="url(#SVGID_4_)" fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" d="M6.182,14.465
+				c0.023,4.599,3.69,8.268,8.289,8.287c4.574-0.013,8.276-3.707,8.271-8.287c-0.003-4.572-3.706-8.26-8.271-8.271
+				C9.881,6.213,6.215,9.873,6.182,14.465z"/>
+		</g>
+	</g>
+</g>
+</svg>
