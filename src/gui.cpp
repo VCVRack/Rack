@@ -21,6 +21,9 @@ extern "C" {
 	#include "../ext/noc/noc_file_dialog.h"
 }
 
+#if GLFW_VERSION_MINOR == 0 && GLFW_VERSION_REVISION <= 4
+#define OLD_GLFW_VERSION
+#endif
 
 namespace rack {
 
@@ -140,6 +143,7 @@ static int lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight;
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		if (key == GLFW_KEY_F11 || key == GLFW_KEY_ESCAPE) {
+#ifndef OLD_GLFW_VERSION
 			// Toggle fullscreen
 			GLFWmonitor *monitor = glfwGetWindowMonitor(window);
 			if (monitor) {
@@ -155,6 +159,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 				glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 			}
+#endif
 		}
 		else {
 			if (gSelectedWidget) {
@@ -197,7 +202,9 @@ void guiInit() {
 	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifndef OLD_GLFW_VERSION
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+#endif
 	std::string title = gApplicationName + " " + gApplicationVersion;
 	window = glfwCreateWindow(1000, 750, title.c_str(), NULL, NULL);
 	assert(window);
@@ -224,7 +231,9 @@ void guiInit() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
+#ifndef OLD_GLFW_VERSION
 	glfwSetWindowSizeLimits(window, 240, 160, GLFW_DONT_CARE, GLFW_DONT_CARE);
+#endif
 
 	// Set up NanoVG
 	gVg = nvgCreateGL2(NVG_ANTIALIAS);

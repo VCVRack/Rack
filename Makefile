@@ -8,16 +8,17 @@ SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 
 
 ifeq ($(ARCH), lin)
-SOURCES += ext/noc/noc_file_dialog.c
+SOURCES += ext/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_GTK $(shell pkg-config --cflags gtk+-2.0)
+CXXFLAGS += $(shell pkg-config --cflags glew glfw3 jansson samplerate libcurl libzip)
 LDFLAGS += -rdynamic \
-	-lpthread -lGL -lGLEW -lglfw -ldl -ljansson -lportaudio -lportmidi -lsamplerate -lcurl -lzip \
-	$(shell pkg-config --libs gtk+-2.0)
+	-lpthread -lGL -ldl -lportaudio -lportmidi \
+	$(shell pkg-config --libs gtk+-2.0 glew glfw3 jansson samplerate libcurl libzip)
 TARGET = Rack
 endif
 
 ifeq ($(ARCH), mac)
-SOURCES += ext/noc/noc_file_dialog.m
+SOURCES += ext/noc_file_dialog.m
 CFLAGS += -DNOC_FILE_DIALOG_OSX
 CXXFLAGS += -DAPPLE -stdlib=libc++ -I$(HOME)/local/include -I/usr/local/lib/libzip/include
 LDFLAGS += -stdlib=libc++ -L$(HOME)/local/lib -lpthread -lglew -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -ldl -ljansson -lportaudio -lportmidi -lsamplerate -lcurl -lzip
@@ -25,7 +26,7 @@ TARGET = Rack
 endif
 
 ifeq ($(ARCH), win)
-SOURCES += ext/noc/noc_file_dialog.c
+SOURCES += ext/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_WIN32
 CXXFLAGS += -DGLEW_STATIC \
 	-I$(HOME)/pkg/portaudio-r1891-build/include -I/mingw64/lib/libzip/include -I$(HOME)/local/include

@@ -1,0 +1,2 @@
+Component Library graphics by Grayscale (http://grayscale.info/)
+Licensed under CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)

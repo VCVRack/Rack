@@ -7,3 +7,9 @@
 [submodule "ext/dr_libs"]
 	path = ext/dr_libs
 	url = https://github.com/mackron/dr_libs.git
+[submodule "ext/oui"]
+	path = ext/oui
+	url = git://github.com/IceDragon200/oui-blendish
+[submodule "ext/noc"]
+	path = ext/noc
+	url = git@github.com:guillaumechereau/noc.git
