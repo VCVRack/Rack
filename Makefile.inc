@@ -1,17 +1,16 @@
 FLAGS += -MMD
-CXXFLAGS += -std=c++11
 
 
 ifeq ($(ARCH), lin)
 CC ?= gcc
 CXX ?= g++
-FLAGS += -DLINUX
+FLAGS += -DARCH_LIN
 endif
 
 ifeq ($(ARCH), mac)
 CC ?= clang
 CXX ?= clang++
-FLAGS += -DAPPLE
+FLAGS += -DARCH_MAC
 CXXFLAGS += -stdlib=libc++
 LDFLAGS += -stdlib=libc++
 endif
@@ -19,7 +18,7 @@ endif
 ifeq ($(ARCH), win)
 CC ?= x86_64-w64-mingw32-gcc
 CXX ?= x86_64-w64-mingw32-g++
-FLAGS += -DWINDOWS -D_USE_MATH_DEFINES
+FLAGS += -DARCH_WIN -D_USE_MATH_DEFINES
 endif
 
 

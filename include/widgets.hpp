@@ -387,6 +387,7 @@ struct Tooltip : Widget {
 struct Scene : OpaqueWidget {
 	Widget *overlay = NULL;
 	void setOverlay(Widget *w);
+	Menu *createMenu();
 	void step();
 };
 

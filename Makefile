@@ -1,7 +1,7 @@
 ARCH ?= lin
-FLAGS = -g -Wall -O2 -msse -mfpmath=sse -ffast-math -fno-finite-math-only \
+FLAGS += -g -Wall -O3 -march=core2 -ffast-math \
 	-I./ext -I./include
-CXXFLAGS = -fno-exceptions
+CXXFLAGS += -std=c++11 -fno-exceptions
 
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c

@@ -40,40 +40,40 @@ void ModuleWidget::addParam(ParamWidget *param) {
 }
 
 json_t *ModuleWidget::toJson() {
-	json_t *root = json_object();
+	json_t *rootJ = json_object();
 
 	// plugin
-	json_object_set_new(root, "plugin", json_string(model->plugin->slug.c_str()));
+	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
 	// model
-	json_object_set_new(root, "model", json_string(model->slug.c_str()));
+	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// pos
 	json_t *pos = json_pack("[f, f]", (double) box.pos.x, (double) box.pos.y);
-	json_object_set_new(root, "pos", pos);
+	json_object_set_new(rootJ, "pos", pos);
 	// params
 	json_t *paramsJ = json_array();
 	for (ParamWidget *paramWidget : params) {
 		json_t *paramJ = paramWidget->toJson();
 		json_array_append_new(paramsJ, paramJ);
 	}
-	json_object_set_new(root, "params", paramsJ);
+	json_object_set_new(rootJ, "params", paramsJ);
 	// data
 	json_t *dataJ = module ? module->toJsonData() : NULL;
 	if (dataJ) {
-		json_object_set_new(root, "data", dataJ);
+		json_object_set_new(rootJ, "data", dataJ);
 	}
 
-	return root;
+	return rootJ;
 }
 
-void ModuleWidget::fromJson(json_t *root) {
+void ModuleWidget::fromJson(json_t *rootJ) {
 	// pos
-	json_t *pos = json_object_get(root, "pos");
+	json_t *pos = json_object_get(rootJ, "pos");
 	double x, y;
 	json_unpack(pos, "[F, F]", &x, &y);
 	box.pos = Vec(x, y);
 
 	// params
-	json_t *paramsJ = json_object_get(root, "params");
+	json_t *paramsJ = json_object_get(rootJ, "params");
 	size_t paramId;
 	json_t *paramJ;
 	json_array_foreach(paramsJ, paramId, paramJ) {
@@ -83,7 +83,7 @@ void ModuleWidget::fromJson(json_t *root) {
 	}
 
 	// data
-	json_t *dataJ = json_object_get(root, "data");
+	json_t *dataJ = json_object_get(rootJ, "data");
 	if (dataJ && module) {
 		module->fromJsonData(dataJ);
 	}
@@ -197,41 +197,36 @@ struct DeleteModuleMenuItem : MenuItem {
 
 void ModuleWidget::onMouseDown(int button) {
 	if (button == 1) {
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
-		menu->box.pos = gMousePos;
-		{
-			MenuLabel *menuLabel = new MenuLabel();
-			menuLabel->text = model->plugin->name + ": " + model->name;
-			menu->pushChild(menuLabel);
+		Menu *menu = gScene->createMenu();
 
-			ResetParamsMenuItem *resetItem = new ResetParamsMenuItem();
-			resetItem->text = "Initialize";
-			resetItem->moduleWidget = this;
-			menu->pushChild(resetItem);
+		MenuLabel *menuLabel = new MenuLabel();
+		menuLabel->text = model->plugin->name + ": " + model->name;
+		menu->pushChild(menuLabel);
 
-			RandomizeParamsMenuItem *randomizeParams = new RandomizeParamsMenuItem();
-			randomizeParams->text = "Randomize";
-			randomizeParams->moduleWidget = this;
-			menu->pushChild(randomizeParams);
+		ResetParamsMenuItem *resetItem = new ResetParamsMenuItem();
+		resetItem->text = "Initialize";
+		resetItem->moduleWidget = this;
+		menu->pushChild(resetItem);
 
-			DisconnectPortsMenuItem *disconnectItem = new DisconnectPortsMenuItem();
-			disconnectItem->text = "Disconnect cables";
-			disconnectItem->moduleWidget = this;
-			menu->pushChild(disconnectItem);
+		RandomizeParamsMenuItem *randomizeParams = new RandomizeParamsMenuItem();
+		randomizeParams->text = "Randomize";
+		randomizeParams->moduleWidget = this;
+		menu->pushChild(randomizeParams);
 
-			CloneModuleMenuItem *cloneItem = new CloneModuleMenuItem();
-			cloneItem->text = "Clone";
-			cloneItem->moduleWidget = this;
-			menu->pushChild(cloneItem);
+		DisconnectPortsMenuItem *disconnectItem = new DisconnectPortsMenuItem();
+		disconnectItem->text = "Disconnect cables";
+		disconnectItem->moduleWidget = this;
+		menu->pushChild(disconnectItem);
 
-			DeleteModuleMenuItem *deleteItem = new DeleteModuleMenuItem();
-			deleteItem->text = "Delete";
-			deleteItem->moduleWidget = this;
-			menu->pushChild(deleteItem);
-		}
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
+		CloneModuleMenuItem *cloneItem = new CloneModuleMenuItem();
+		cloneItem->text = "Clone";
+		cloneItem->moduleWidget = this;
+		menu->pushChild(cloneItem);
+
+		DeleteModuleMenuItem *deleteItem = new DeleteModuleMenuItem();
+		deleteItem->text = "Delete";
+		deleteItem->moduleWidget = this;
+		menu->pushChild(deleteItem);
 	}
 }
 

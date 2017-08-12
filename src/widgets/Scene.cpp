@@ -16,6 +16,18 @@ void Scene::setOverlay(Widget *w) {
 	}
 }
 
+Menu *Scene::createMenu() {
+	// Get relative position of the click
+	MenuOverlay *overlay = new MenuOverlay();
+	Menu *menu = new Menu();
+	menu->box.pos = gMousePos;
+
+	overlay->addChild(menu);
+	gScene->setOverlay(overlay);
+
+	return menu;
+}
+
 void Scene::step() {
 	if (overlay) {
 		overlay->box.size = box.size;

@@ -30,5 +30,4 @@ void RackScene::draw(NVGcontext *vg) {
 }
 
 
-
 } // namespace rack

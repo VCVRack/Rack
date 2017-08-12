@@ -12,7 +12,7 @@
 #include <zip.h>
 #include <jansson.h>
 
-#if defined(WINDOWS)
+#if ARCH_WIN
 	#include <windows.h>
 	#include <shellapi.h>
 	#include <direct.h>
@@ -43,22 +43,22 @@ Plugin::~Plugin() {
 
 
 static int loadPlugin(std::string slug) {
-	#if defined(LINUX)
+	#if ARCH_LIN
 		std::string path = "./plugins/" + slug + "/plugin.so";
-	#elif defined(WINDOWS)
+	#elif ARCH_WIN
 		std::string path = "./plugins/" + slug + "/plugin.dll";
-	#elif defined(APPLE)
+	#elif ARCH_MAC
 		std::string path = "./plugins/" + slug + "/plugin.dylib";
 	#endif
 
 	// Load dynamic/shared library
-	#if defined(WINDOWS)
+	#if ARCH_WIN
 		HINSTANCE handle = LoadLibrary(path.c_str());
 		if (!handle) {
 			fprintf(stderr, "Failed to load library %s\n", path.c_str());
 			return -1;
 		}
-	#elif defined(LINUX) || defined(APPLE)
+	#elif ARCH_LIN || ARCH_MAC
 		void *handle = dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
 		if (!handle) {
 			fprintf(stderr, "Failed to load library %s: %s\n", path.c_str(), dlerror());
@@ -69,9 +69,9 @@ static int loadPlugin(std::string slug) {
 	// Call plugin init() function
 	typedef Plugin *(*InitCallback)();
 	InitCallback initCallback;
-	#if defined(WINDOWS)
+	#if ARCH_WIN
 		initCallback = (InitCallback) GetProcAddress(handle, "init");
-	#elif defined(LINUX) || defined(APPLE)
+	#elif ARCH_LIN || ARCH_MAC
 		initCallback = (InitCallback) dlsym(handle, "init");
 	#endif
 	if (!initCallback) {
@@ -173,10 +173,8 @@ static void extract_zip(const char *dir, int zipfd) {
 		if (err) goto cleanup;
 		int nameLen = strlen(zs.name);
 
-		char path[MAXPATHLEN] = "\0";
-		strncat(path, dir, MAXPATHLEN);
-		strncat(path, "/", MAXPATHLEN);
-		strncat(path, zs.name, MAXPATHLEN);
+		char path[MAXPATHLEN];
+		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
 
 		if (zs.name[nameLen - 1] == '/') {
 			err = mkdir(path, 0755);
@@ -213,15 +211,15 @@ cleanup:
 
 void pluginOpenBrowser(std::string url) {
 	// shell injection is possible, so make sure the URL is trusted
-#if defined(LINUX)
+#if ARCH_LIN
 	std::string command = "xdg-open " + url;
 	system(command.c_str());
 #endif
-#if defined(APPLE)
+#if ARCH_MAC
 	std::string command = "open " + url;
 	system(command.c_str());
 #endif
-#if defined(WINDOWS)
+#if ARCH_WIN
 	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
@@ -245,14 +243,14 @@ void pluginLogIn(std::string email, std::string password) {
 	if (res == CURLE_OK) {
 		// Parse JSON response
 		json_error_t error;
-		json_t *root = json_loads(resText.c_str(), 0, &error);
-		if (root) {
-			json_t *tokenJ = json_object_get(root, "token");
+		json_t *rootJ = json_loads(resText.c_str(), 0, &error);
+		if (rootJ) {
+			json_t *tokenJ = json_object_get(rootJ, "token");
 			if (tokenJ) {
 				// Set the token, which logs the user in
 				token = json_string_value(tokenJ);
 			}
-			json_decref(root);
+			json_decref(rootJ);
 		}
 	}
 }
@@ -287,11 +285,8 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 	downloadProgress = 0.0;
 
 	const char *dir = "plugins";
-	char path[MAXPATHLEN] = "\0";
-	strncat(path, dir, MAXPATHLEN);
-	strncat(path, "/", MAXPATHLEN);
-	strncat(path, slug.c_str(), MAXPATHLEN);
-	strncat(path, ".zip", MAXPATHLEN);
+	char path[MAXPATHLEN];
+	snprintf(path, sizeof(path), "%s/%s.zip", dir, slug.c_str());
 	int zip = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 	// Download zip
 	download_file(zip, url.c_str());
@@ -329,9 +324,9 @@ void pluginRefresh() {
 	if (res == CURLE_OK) {
 		// Parse JSON response
 		json_error_t error;
-		json_t *root = json_loads(resText.c_str(), 0, &error);
-		if (root) {
-			json_t *pluginsJ = json_object_get(root, "plugins");
+		json_t *rootJ = json_loads(resText.c_str(), 0, &error);
+		if (rootJ) {
+			json_t *pluginsJ = json_object_get(rootJ, "plugins");
 			if (pluginsJ) {
 				// Iterate through each plugin object
 				size_t index;
@@ -340,7 +335,7 @@ void pluginRefresh() {
 					pluginRefreshPlugin(pluginJ);
 				}
 			}
-			json_decref(root);
+			json_decref(rootJ);
 		}
 	}
 

@@ -4,7 +4,7 @@
 #include "plugin.hpp"
 
 
-#if defined(APPLE)
+#if ARCH_MAC
 #include <CoreFoundation/CoreFoundation.h>
 #include <unistd.h> // for chdir and access
 #include <libgen.h> // for dirname
@@ -81,7 +81,7 @@ void fixCwd() {
 using namespace rack;
 
 int main() {
-#if defined(APPLE)
+#if ARCH_MAC
 	fixCwd();
 #endif
 

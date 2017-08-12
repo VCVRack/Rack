@@ -1,8 +1,9 @@
 ARCH ?= lin
 
 
-FLAGS += -fPIC -g -Wall -O3 -msse -mfpmath=sse -ffast-math \
+FLAGS += -fPIC -g -Wall -O3 -march=core2 -ffast-math \
 	-I../../include
+CXXFLAGS += -std=c++11 -fno-exceptions
 LDFLAGS +=
 
 

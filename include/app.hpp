@@ -289,7 +289,6 @@ struct RackScene : Scene {
 extern std::string gApplicationName;
 extern std::string gApplicationVersion;
 
-extern Scene *gScene;
 extern RackWidget *gRackWidget;
 
 void sceneInit();

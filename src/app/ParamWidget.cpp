@@ -9,8 +9,8 @@ json_t *ParamWidget::toJson() {
 	return paramJ;
 }
 
-void ParamWidget::fromJson(json_t *root) {
-	setValue(json_number_value(root));
+void ParamWidget::fromJson(json_t *rootJ) {
+	setValue(json_number_value(rootJ));
 }
 
 void ParamWidget::onMouseDown(int button) {

@@ -33,10 +33,10 @@ void RackWidget::savePatch(std::string filename) {
 	if (!file)
 		return;
 
-	json_t *root = toJson();
-	if (root) {
-		json_dumpf(root, file, JSON_INDENT(2));
-		json_decref(root);
+	json_t *rootJ = toJson();
+	if (rootJ) {
+		json_dumpf(rootJ, file, JSON_INDENT(2));
+		json_decref(rootJ);
 	}
 
 	fclose(file);
@@ -49,11 +49,11 @@ void RackWidget::loadPatch(std::string filename) {
 		return;
 
 	json_error_t error;
-	json_t *root = json_loadf(file, 0, &error);
-	if (root) {
+	json_t *rootJ = json_loadf(file, 0, &error);
+	if (rootJ) {
 		clear();
-		fromJson(root);
-		json_decref(root);
+		fromJson(rootJ);
+		json_decref(rootJ);
 	}
 	else {
 		printf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
@@ -64,19 +64,19 @@ void RackWidget::loadPatch(std::string filename) {
 
 json_t *RackWidget::toJson() {
 	// root
-	json_t *root = json_object();
+	json_t *rootJ = json_object();
 
 	// version
 	json_t *versionJ = json_string(gApplicationVersion.c_str());
-	json_object_set_new(root, "version", versionJ);
+	json_object_set_new(rootJ, "version", versionJ);
 
 	// wireOpacity
 	json_t *wireOpacityJ = json_real(dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value);
-	json_object_set_new(root, "wireOpacity", wireOpacityJ);
+	json_object_set_new(rootJ, "wireOpacity", wireOpacityJ);
 
 	// wireTension
 	json_t *wireTensionJ = json_real(dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value);
-	json_object_set_new(root, "wireTension", wireTensionJ);
+	json_object_set_new(rootJ, "wireTension", wireTensionJ);
 
 	// modules
 	json_t *modulesJ = json_array();
@@ -91,7 +91,7 @@ json_t *RackWidget::toJson() {
 		json_t *moduleJ = moduleWidget->toJson();
 		json_array_append_new(modulesJ, moduleJ);
 	}
-	json_object_set_new(root, "modules", modulesJ);
+	json_object_set_new(rootJ, "modules", modulesJ);
 
 	// wires
 	json_t *wires = json_array();
@@ -129,14 +129,14 @@ json_t *RackWidget::toJson() {
 		}
 		json_array_append_new(wires, wire);
 	}
-	json_object_set_new(root, "wires", wires);
+	json_object_set_new(rootJ, "wires", wires);
 
-	return root;
+	return rootJ;
 }
 
-void RackWidget::fromJson(json_t *root) {
+void RackWidget::fromJson(json_t *rootJ) {
 	// version
-	json_t *versionJ = json_object_get(root, "version");
+	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
 		const char *version = json_string_value(versionJ);
 		if (gApplicationVersion != version)
@@ -144,18 +144,18 @@ void RackWidget::fromJson(json_t *root) {
 	}
 
 	// wireOpacity
-	json_t *wireOpacityJ = json_object_get(root, "wireOpacity");
+	json_t *wireOpacityJ = json_object_get(rootJ, "wireOpacity");
 	if (wireOpacityJ)
 		dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value = json_number_value(wireOpacityJ);
 
 	// wireTension
-	json_t *wireTensionJ = json_object_get(root, "wireTension");
+	json_t *wireTensionJ = json_object_get(rootJ, "wireTension");
 	if (wireTensionJ)
 		dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value = json_number_value(wireTensionJ);
 
 	// modules
 	std::map<int, ModuleWidget*> moduleWidgets;
-	json_t *modulesJ = json_object_get(root, "modules");
+	json_t *modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ) return;
 	size_t moduleId;
 	json_t *moduleJ;
@@ -193,7 +193,7 @@ void RackWidget::fromJson(json_t *root) {
 	}
 
 	// wires
-	json_t *wiresJ = json_object_get(root, "wires");
+	json_t *wiresJ = json_object_get(rootJ, "wires");
 	if (!wiresJ) return;
 	size_t wireId;
 	json_t *wireJ;
@@ -320,12 +320,8 @@ struct AddModuleMenuItem : MenuItem {
 
 void RackWidget::onMouseDown(int button) {
 	if (button == 1) {
-		// Get relative position of the click
 		Vec modulePos = gMousePos.minus(getAbsolutePos());
-
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
-		menu->box.pos = gMousePos;
+		Menu *menu = gScene->createMenu();
 
 		MenuLabel *menuLabel = new MenuLabel();
 		menuLabel->text = "Add Module";
@@ -339,8 +335,6 @@ void RackWidget::onMouseDown(int button) {
 				menu->pushChild(item);
 			}
 		}
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
 	}
 }
 
