@@ -7,7 +7,7 @@ namespace rack {
 
 ModuleWidget::~ModuleWidget() {
 	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
-	disconnectPorts();
+	disconnect();
 	setModule(NULL);
 }
 
@@ -57,15 +57,19 @@ json_t *ModuleWidget::toJson() {
 	}
 	json_object_set_new(rootJ, "params", paramsJ);
 	// data
-	json_t *dataJ = module ? module->toJsonData() : NULL;
-	if (dataJ) {
-		json_object_set_new(rootJ, "data", dataJ);
+	if (module) {
+		json_t *dataJ = module->toJson();
+		if (dataJ) {
+			json_object_set_new(rootJ, "data", dataJ);
+		}
 	}
 
 	return rootJ;
 }
 
 void ModuleWidget::fromJson(json_t *rootJ) {
+	initialize();
+
 	// pos
 	json_t *pos = json_object_get(rootJ, "pos");
 	double x, y;
@@ -85,11 +89,11 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	// data
 	json_t *dataJ = json_object_get(rootJ, "data");
 	if (dataJ && module) {
-		module->fromJsonData(dataJ);
+		module->fromJson(dataJ);
 	}
 }
 
-void ModuleWidget::disconnectPorts() {
+void ModuleWidget::disconnect() {
 	for (Port *input : inputs) {
 		input->disconnect();
 	}
@@ -98,15 +102,21 @@ void ModuleWidget::disconnectPorts() {
 	}
 }
 
-void ModuleWidget::resetParams() {
+void ModuleWidget::initialize() {
 	for (ParamWidget *param : params) {
 		param->setValue(param->defaultValue);
 	}
+	if (module) {
+		module->initialize();
+	}
 }
 
-void ModuleWidget::randomizeParams() {
+void ModuleWidget::randomize() {
 	for (ParamWidget *param : params) {
 		param->setValue(rescalef(randomf(), 0.0, 1.0, param->minValue, param->maxValue));
+	}
+	if (module) {
+		module->randomize();
 	}
 }
 
@@ -117,7 +127,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 
 	// CPU usage text
-	if (dynamic_cast<RackScene*>(gScene)->toolbar->cpuUsageButton->value != 0.0) {
+	if (dynamic_cast<RackScene*>(gScene)->toolbar->cpuUsageButton->value > 0.0) {
 		float cpuTime = module ? module->cpuTime : 0.0;
 		std::string text = stringf("%.1f%%", cpuTime * 100.0);
 
@@ -152,32 +162,33 @@ void ModuleWidget::onDragMove(Vec mouseRel) {
 void ModuleWidget::onDragEnd() {
 }
 
-struct DisconnectPortsMenuItem : MenuItem {
+struct DisconnectMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
-		moduleWidget->disconnectPorts();
+		moduleWidget->disconnect();
 	}
 };
 
-struct ResetParamsMenuItem : MenuItem {
+struct InitializeMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
-		moduleWidget->resetParams();
+		moduleWidget->initialize();
 	}
 };
 
-struct RandomizeParamsMenuItem : MenuItem {
+struct RandomizeMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
-		moduleWidget->randomizeParams();
+		moduleWidget->randomize();
 	}
 };
 
-struct CloneModuleMenuItem : MenuItem {
+struct CloneMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
 		// Create new module from model
 		ModuleWidget *clonedModuleWidget = moduleWidget->model->createModuleWidget();
+		// JSON serialization is the most straightforward way to do this
 		json_t *moduleJ = moduleWidget->toJson();
 		clonedModuleWidget->fromJson(moduleJ);
 		json_decref(moduleJ);
@@ -187,7 +198,7 @@ struct CloneModuleMenuItem : MenuItem {
 	}
 };
 
-struct DeleteModuleMenuItem : MenuItem {
+struct DeleteMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
 		gRackWidget->moduleContainer->removeChild(moduleWidget);
@@ -203,27 +214,27 @@ void ModuleWidget::onMouseDown(int button) {
 		menuLabel->text = model->plugin->name + ": " + model->name;
 		menu->pushChild(menuLabel);
 
-		ResetParamsMenuItem *resetItem = new ResetParamsMenuItem();
+		InitializeMenuItem *resetItem = new InitializeMenuItem();
 		resetItem->text = "Initialize";
 		resetItem->moduleWidget = this;
 		menu->pushChild(resetItem);
 
-		RandomizeParamsMenuItem *randomizeParams = new RandomizeParamsMenuItem();
-		randomizeParams->text = "Randomize";
-		randomizeParams->moduleWidget = this;
-		menu->pushChild(randomizeParams);
+		RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
+		randomizeItem->text = "Randomize";
+		randomizeItem->moduleWidget = this;
+		menu->pushChild(randomizeItem);
 
-		DisconnectPortsMenuItem *disconnectItem = new DisconnectPortsMenuItem();
+		DisconnectMenuItem *disconnectItem = new DisconnectMenuItem();
 		disconnectItem->text = "Disconnect cables";
 		disconnectItem->moduleWidget = this;
 		menu->pushChild(disconnectItem);
 
-		CloneModuleMenuItem *cloneItem = new CloneModuleMenuItem();
+		CloneMenuItem *cloneItem = new CloneMenuItem();
 		cloneItem->text = "Clone";
 		cloneItem->moduleWidget = this;
 		menu->pushChild(cloneItem);
 
-		DeleteModuleMenuItem *deleteItem = new DeleteModuleMenuItem();
+		DeleteMenuItem *deleteItem = new DeleteMenuItem();
 		deleteItem->text = "Delete";
 		deleteItem->moduleWidget = this;
 		menu->pushChild(deleteItem);

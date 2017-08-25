@@ -1,10 +1,9 @@
-ARCH ?= lin
+# All paths here assume the PWD is plugin/something
 
+include ../../Makefile-arch.inc
 
-FLAGS += -fPIC -g -Wall -O3 -march=core2 -ffast-math \
+FLAGS += -fPIC \
 	-I../../include
-CXXFLAGS += -std=c++11 -fno-exceptions
-LDFLAGS +=
 
 
 ifeq ($(ARCH), lin)
@@ -23,11 +22,9 @@ TARGET = plugin.dll
 endif
 
 
-
 all: $(TARGET)
 
 clean:
 	rm -rfv build $(TARGET)
-
 
 include ../../Makefile.inc

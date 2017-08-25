@@ -1,7 +1,7 @@
-ARCH ?= lin
-FLAGS += -g -Wall -O3 -march=core2 -ffast-math \
+include Makefile-arch.inc
+
+FLAGS += \
 	-I./ext -I./include
-CXXFLAGS += -std=c++11 -fno-exceptions
 
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
@@ -11,7 +11,9 @@ ifeq ($(ARCH), lin)
 SOURCES += ext/noc/noc_file_dialog.c
 CFLAGS += -DNOC_FILE_DIALOG_GTK $(shell pkg-config --cflags gtk+-2.0)
 LDFLAGS += -rdynamic \
-	-lpthread -lGL -lGLEW -lglfw -ldl -ljansson -lportaudio -lportmidi -lsamplerate -lcurl -lzip \
+	-lpthread -lGL -ldl \
+	-lportaudio -lportmidi \
+	-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip \
 	$(shell pkg-config --libs gtk+-2.0)
 TARGET = Rack
 endif
@@ -40,9 +42,6 @@ LDFLAGS += \
 	-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows
 TARGET = Rack.exe
 # OBJECTS = Rack.res
-
-%.res: %.rc
-	windres $^ -O coff -o $@
 endif
 
 
@@ -50,5 +49,9 @@ all: $(TARGET)
 
 clean:
 	rm -rf $(TARGET) build
+
+# For Windows resources
+%.res: %.rc
+	windres $^ -O coff -o $@
 
 include Makefile.inc

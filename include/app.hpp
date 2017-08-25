@@ -39,9 +39,15 @@ struct ModuleWidget : OpaqueWidget {
 
 	json_t *toJson();
 	void fromJson(json_t *root);
-	void disconnectPorts();
-	void resetParams();
-	void randomizeParams();
+
+	/** Disconnects cables from all ports */
+	void disconnect();
+	/** Resets the state of the module */
+	void initialize();
+	/** Randomizes the state of the module
+	This method just randomizes parameters. Override and call this function if your module contains other state information that you wish to randomize.
+	*/
+	void randomize();
 
 	void draw(NVGcontext *vg);
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include <jansson.h>
 #include "util.hpp"
+#include <jansson.h>
 
 
 namespace rack {
@@ -21,8 +21,13 @@ struct Module {
 
 	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate */
 	virtual void step() {}
-	virtual json_t *toJsonData() { return NULL; }
-	virtual void fromJsonData(json_t *root) {}
+
+	/** Override these to store extra internal data in the "data" property */
+	virtual json_t *toJson() { return NULL; }
+	virtual void fromJson(json_t *root) {}
+
+	virtual void initialize() {}
+	virtual void randomize() {}
 };
 
 struct Wire {
