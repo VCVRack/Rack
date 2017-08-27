@@ -15,6 +15,11 @@ endif
 WGET = wget -nc
 UNTAR = tar xf
 UNZIP = unzip
+ifeq ($(ARCH),win)
+	CMAKE = cmake -G 'MSYS Makefiles'
+else
+	CMAKE = cmake
+endif
 
 # Packages
 glew = glew-2.1.0
@@ -34,14 +39,14 @@ all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(portmidi
 $(glew):
 	$(WGET) https://downloads.sourceforge.net/project/glew/glew/$(patsubst glew-%,%,$@)/$@.tgz
 	$(UNTAR) $@.tgz
-	$(MAKE) -C $@
+	$(MAKE) -C $@ glew.lib
 	# On Linux, default lib path is lib64, so change it back to lib.
 	$(MAKE) -C $@ GLEW_DEST="$(LOCAL)" LIBDIR="$(LOCAL)/lib" install
 
 $(glfw):
 	$(WGET) https://github.com/glfw/glfw/releases/download/$(patsubst glfw-%,%,$@)/$@.zip
 	$(UNZIP) $@.zip
-	cd $@ && cmake . \
+	cd $@ && $(CMAKE) . \
 		-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DBUILD_SHARED_LIBS=ON \
 		-DGLFW_USE_CHDIR=ON -DGLFW_USE_MENUBAR=ON -DGLFW_USE_RETINA=ON
 	$(MAKE) -C $@
@@ -80,7 +85,7 @@ $(libzip):
 $(portmidi):
 	git clone https://github.com/AndrewBelt/portmidi.git $@
 	# TODO Fix on Windows
-	cd $@ && cmake . -DCMAKE_INSTALL_PREFIX="$(LOCAL)"
+	cd $@ && $(CMAKE) . -DCMAKE_INSTALL_PREFIX="$(LOCAL)"
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
 
