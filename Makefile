@@ -1,7 +1,8 @@
 include Makefile-arch.inc
 
 FLAGS += \
-	-I./include
+	-Iinclude \
+	-Idep/include -Idep/lib/libzip/include
 
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
@@ -19,8 +20,10 @@ endif
 
 ifeq ($(ARCH), mac)
 	SOURCES += ext/osdialog/osdialog_mac.m
-	CXXFLAGS += -DAPPLE -stdlib=libc++ -I$(HOME)/local/include -I/usr/local/lib/libzip/include
-	LDFLAGS += -stdlib=libc++ -L$(HOME)/local/lib -lpthread -lglew -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -ldl -ljansson -lportaudio -lportmidi -lsamplerate -lcurl -lzip
+	CXXFLAGS += -DAPPLE -stdlib=libc++
+	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
+		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
 	TARGET = Rack
 endif
 
@@ -45,7 +48,12 @@ endif
 all: $(TARGET)
 
 run: $(TARGET)
-	LD_LIBRARY_PATH=dep/lib ./$(TARGET)
+ifeq ($(ARCH), lin)
+	LD_LIBRARY_PATH=dep/lib ./$<
+endif
+ifeq ($(ARCH), mac)
+	DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<
+endif
 
 clean:
 	rm -rf $(TARGET) build
