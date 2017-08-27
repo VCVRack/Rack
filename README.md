@@ -9,9 +9,9 @@
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
 
 Clone this repository and `cd` into it.
-On Windows, use [MSYS2](http://www.msys2.org/) to set up a \*NIX shell.
+On Windows, use [MSYS2](http://www.msys2.org/) and launch a mingw32/64 shell.
 
-Clone submodules in `/ext`.
+Clone submodules.
 
 	git submodule update --init
 

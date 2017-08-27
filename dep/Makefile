@@ -35,9 +35,8 @@ $(glew):
 	$(WGET) https://downloads.sourceforge.net/project/glew/glew/$(patsubst glew-%,%,$@)/$@.tgz
 	$(UNTAR) $@.tgz
 	$(MAKE) -C $@
-	ln -s lib lib64
-	$(MAKE) -C $@ GLEW_DEST="$(LOCAL)" install
-	rm lib64
+	# On Linux, default lib path is lib64, so change it back to lib.
+	$(MAKE) -C $@ GLEW_DEST="$(LOCAL)" LIBDIR="$(LOCAL)/lib" install
 
 $(glfw):
 	$(WGET) https://github.com/glfw/glfw/releases/download/$(patsubst glfw-%,%,$@)/$@.zip
