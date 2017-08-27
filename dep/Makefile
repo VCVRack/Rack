@@ -78,13 +78,9 @@ $(libzip):
 	$(MAKE) -C $@ install
 
 $(portmidi):
-	git clone https://github.com/aoeu/portmidi.git $@
-	# TODO Does not yet work
-	cd $@ && cmake . -DCMAKE_INSTALL_PREFIX="$(LOCAL)" \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=$(PWD)/$@/Release \
-		-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(PWD)/$@/Release \
-		-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$(PWD)/$@/Release
+	git clone https://github.com/AndrewBelt/portmidi.git $@
+	# TODO Fix on Windows
+	cd $@ && cmake . -DCMAKE_INSTALL_PREFIX="$(LOCAL)"
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
 
