@@ -13,7 +13,7 @@
 #define NANOVG_FBO_VALID 1
 #include "../ext/nanovg/src/nanovg_gl_utils.h"
 #define BLENDISH_IMPLEMENTATION
-#include "../ext/oui/blendish.h"
+#include "../ext/oui-blendish/blendish.h"
 #define NANOSVG_IMPLEMENTATION
 #include "../ext/nanosvg/src/nanosvg.h"
 

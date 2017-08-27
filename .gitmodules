@@ -10,3 +10,6 @@
 [submodule "ext/osdialog"]
 	path = ext/osdialog
 	url = https://github.com/AndrewBelt/osdialog.git
+[submodule "ext/oui-blendish"]
+	path = ext/oui-blendish
+	url = https://github.com/AndrewBelt/oui-blendish.git

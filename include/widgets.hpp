@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../ext/nanovg/src/nanovg.h"
-#include "../ext/oui/blendish.h"
+#include "../ext/oui-blendish/blendish.h"
 #include "../ext/nanosvg/src/nanosvg.h"
 
 #include "math.hpp"
