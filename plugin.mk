@@ -1,10 +1,10 @@
 # All paths here assume the PWD is plugin/something
 
-include ../../Makefile-arch.inc
-
 FLAGS += -fPIC \
 	-I../../include
 
+
+include ../../arch.mk
 
 ifeq ($(ARCH), lin)
 LDFLAGS += -shared
@@ -27,4 +27,4 @@ all: $(TARGET)
 clean:
 	rm -rfv build $(TARGET)
 
-include ../../Makefile.inc
+include ../../compile.mk

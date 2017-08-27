@@ -1,11 +1,11 @@
-include Makefile-arch.inc
-
 FLAGS += \
 	-I./include
 
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
 
+
+include arch.mk
 
 ifeq ($(ARCH), lin)
 	SOURCES += ext/osdialog/osdialog_gtk2.c
@@ -54,4 +54,4 @@ clean:
 %.res: %.rc
 	windres $^ -O coff -o $@
 
-include Makefile.inc
+include compile.mk
