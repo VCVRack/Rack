@@ -1,3 +1,6 @@
+VERSION ?= dev
+FLAGS += -DVERSION=$(VERSION)
+
 # Generate dependency files build/*.d
 FLAGS += -MMD
 # Optimization

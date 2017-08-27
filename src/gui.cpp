@@ -17,10 +17,6 @@
 #define NANOSVG_IMPLEMENTATION
 #include "../ext/nanosvg/src/nanosvg.h"
 
-extern "C" {
-	#include "../ext/noc/noc_file_dialog.h"
-}
-
 
 namespace rack {
 
@@ -282,14 +278,6 @@ void guiCursorLock() {
 
 void guiCursorUnlock() {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-}
-
-const char *guiSaveDialog(const char *filters, const char *filename) {
-	return noc_file_dialog_open(NOC_FILE_DIALOG_SAVE, filters, NULL, filename);
-}
-
-const char *guiOpenDialog(const char *filters, const char *filename) {
-	return noc_file_dialog_open(NOC_FILE_DIALOG_OPEN, filters, NULL, filename);
 }
 
 

@@ -4,7 +4,7 @@
 namespace rack {
 
 std::string gApplicationName = "VCV Rack";
-std::string gApplicationVersion = "v0.2.1 alpha";
+std::string gApplicationVersion = TOSTRING(VERSION);
 
 RackWidget *gRackWidget = NULL;
 

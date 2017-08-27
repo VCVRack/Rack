@@ -1,6 +1,7 @@
 #include "app.hpp"
 #include "gui.hpp"
 #include "engine.hpp"
+#include "../ext/osdialog/osdialog.h"
 
 
 namespace rack {
@@ -16,18 +17,20 @@ struct NewItem : MenuItem {
 
 struct SaveItem : MenuItem {
 	void onAction() {
-		const char *path = guiSaveDialog(filters, "Untitled.json");
+		char *path = osdialog_file(OSDIALOG_SAVE, "./patches", "Untitled.json", NULL);
 		if (path) {
 			gRackWidget->savePatch(path);
+			free(path);
 		}
 	}
 };
 
 struct OpenItem : MenuItem {
 	void onAction() {
-		const char *path = guiOpenDialog(filters, NULL);
+		char *path = osdialog_file(OSDIALOG_OPEN, "./patches", NULL, NULL);
 		if (path) {
 			gRackWidget->loadPatch(path);
+			free(path);
 		}
 	}
 };
