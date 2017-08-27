@@ -45,7 +45,7 @@ endif
 all: $(TARGET)
 
 run: $(TARGET)
-	./$(TARGET)
+	LD_LIBRARY_PATH=dep/lib ./$(TARGET)
 
 clean:
 	rm -rf $(TARGET) build
