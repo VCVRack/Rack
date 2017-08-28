@@ -14,5 +14,6 @@ void guiCursorUnlock();
 
 extern NVGcontext *gVg;
 extern std::shared_ptr<Font> gGuiFont;
+extern float gPixelRatio;
 
 } // namespace rack
