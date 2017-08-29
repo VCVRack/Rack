@@ -10,6 +10,7 @@ namespace rack {
 
 struct FramebufferWidget::Internal {
 	NVGLUframebuffer *fb = NULL;
+	Rect box;
 
 	~Internal() {
 		setFramebuffer(NULL);
@@ -20,6 +21,7 @@ struct FramebufferWidget::Internal {
 		this->fb = fb;
 	}
 };
+
 
 FramebufferWidget::FramebufferWidget() {
 	internal = new Internal();
@@ -35,7 +37,9 @@ void FramebufferWidget::step() {
 
 	// Render the scene to the framebuffer if dirty
 	if (dirty) {
-		Vec fbSize = box.size.plus(padding.mult(2));
+		internal->box.pos = padding.neg();
+		internal->box.size = box.size.plus(padding.mult(2));
+		Vec fbSize = internal->box.size.mult(gPixelRatio);
 		assert(fbSize.isFinite());
 
 		internal->setFramebuffer(NULL);
@@ -44,14 +48,13 @@ void FramebufferWidget::step() {
 			return;
 		internal->setFramebuffer(fb);
 
-		// TODO Support screens with pixelRatio != 1.0 (e.g. Retina) by using the actual size of the framebuffer, etc.
-		const float pixelRatio = 1.0;
 		nvgluBindFramebuffer(fb);
 		glViewport(0.0, 0.0, fbSize.x, fbSize.y);
 		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		nvgBeginFrame(gVg, fbSize.x, fbSize.y, pixelRatio);
+		nvgBeginFrame(gVg, fbSize.x, fbSize.y, gPixelRatio);
 
+		nvgScale(gVg, gPixelRatio, gPixelRatio);
 		nvgTranslate(gVg, padding.x, padding.y);
 		Widget::draw(gVg);
 
@@ -67,14 +70,13 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		return;
 
 	// Draw framebuffer image
-	int width, height;
-	nvgImageSize(vg, internal->fb->image, &width, &height);
 	nvgBeginPath(vg);
-	nvgRect(vg, -padding.x, -padding.y, width, height);
-	NVGpaint paint = nvgImagePattern(vg, -padding.x, -padding.y, width, height, 0.0, internal->fb->image, 1.0);
+	nvgRect(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y);
+	NVGpaint paint = nvgImagePattern(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y, 0.0, internal->fb->image, 1.0);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
 
+	// For debugging bounding box of framebuffer image
 	// nvgFillColor(vg, nvgRGBA(255, 0, 0, 64));
 	// nvgFill(vg);
 }

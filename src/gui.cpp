@@ -23,6 +23,7 @@ namespace rack {
 static GLFWwindow *window = NULL;
 std::shared_ptr<Font> gGuiFont;
 NVGcontext *gVg = NULL;
+float gPixelRatio = 0.0;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
@@ -136,6 +137,7 @@ static int lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight;
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		if (key == GLFW_KEY_F11 || key == GLFW_KEY_ESCAPE) {
+			/*
 			// Toggle fullscreen
 			GLFWmonitor *monitor = glfwGetWindowMonitor(window);
 			if (monitor) {
@@ -151,6 +153,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 				const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 				glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 			}
+			*/
 		}
 		else {
 			if (gSelectedWidget) {
@@ -167,16 +170,20 @@ void errorCallback(int error, const char *description) {
 void renderGui() {
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-	// glfwGetWindowSize(window, &width, &height);
+	int windowWidth, windowHeight;
+	glfwGetWindowSize(window, &windowWidth, &windowHeight);
+	gPixelRatio = (float)width / windowWidth;
 
 	// Update and render
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	nvgBeginFrame(gVg, width, height, 1.0);
+	nvgBeginFrame(gVg, width, height, gPixelRatio);
 
 	nvgSave(gVg);
+	nvgReset(gVg);
+	nvgScale(gVg, gPixelRatio, gPixelRatio);
 	gScene->draw(gVg);
 	nvgRestore(gVg);
 
@@ -225,7 +232,7 @@ void guiInit() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
-	glfwSetWindowSizeLimits(window, 240, 160, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(window, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
 	gVg = nvgCreateGL2(NVG_ANTIALIAS);
