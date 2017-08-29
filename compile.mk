@@ -20,7 +20,8 @@ ifeq ($(ARCH), mac)
 endif
 
 ifeq ($(ARCH), win)
-	FLAGS += -DARCH_WIN -D_USE_MATH_DEFINES
+	FLAGS += -DARCH_WIN
+	FLAGS += -D_USE_MATH_DEFINES
 endif
 
 

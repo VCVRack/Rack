@@ -51,6 +51,10 @@ $(glfw):
 		-DGLFW_USE_CHDIR=ON -DGLFW_USE_MENUBAR=ON -DGLFW_USE_RETINA=ON
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
+ifeq ($(ARCH),win)
+	# Not sure why the GLFW build system puts a .dll in the lib directory
+	mv "$(LOCAL)/lib/glfw3.dll" "$(LOCAL)/bin/"
+endif
 
 $(jansson):
 	$(WGET) http://www.digip.org/jansson/releases/$@.tar.gz
@@ -84,7 +88,6 @@ $(libzip):
 
 $(portmidi):
 	git clone https://github.com/AndrewBelt/portmidi.git $@
-	# TODO Fix on Windows
 	cd $@ && $(CMAKE) . -DCMAKE_INSTALL_PREFIX="$(LOCAL)"
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
