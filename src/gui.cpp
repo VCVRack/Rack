@@ -163,6 +163,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 }
 
+void errorCallback(int error, const char *description) {
+	fprintf(stderr, "GLFW error %d: %s\n", error, description);
+}
+
 void renderGui() {
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
@@ -191,6 +195,7 @@ void guiInit() {
 	int err;
 
 	// Set up GLFW
+	glfwSetErrorCallback(errorCallback);
 	err = glfwInit();
 	assert(err);
 

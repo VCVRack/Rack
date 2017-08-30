@@ -16,9 +16,9 @@ WGET = wget -nc
 UNTAR = tar xf
 UNZIP = unzip
 ifeq ($(ARCH),win)
-	CMAKE = cmake -G 'MSYS Makefiles'
+CMAKE = cmake -G 'MSYS Makefiles'
 else
-	CMAKE = cmake
+CMAKE = cmake
 endif
 
 # Packages
@@ -30,6 +30,7 @@ libcurl = curl-7.54.1
 libzip = libzip-1.2.0
 portmidi = portmidi
 portaudio = portaudio
+asio = asiosdk2.3
 
 
 .NOTPARALLEL:
@@ -51,6 +52,10 @@ $(glfw):
 		-DGLFW_USE_CHDIR=ON -DGLFW_USE_MENUBAR=ON -DGLFW_USE_RETINA=ON
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
+ifeq ($(ARCH),win)
+	# Not sure why the GLFW build system puts a .dll in the lib directory
+	mv "$(LOCAL)/lib/glfw3.dll" "$(LOCAL)/bin/"
+endif
 
 $(jansson):
 	$(WGET) http://www.digip.org/jansson/releases/$@.tar.gz
@@ -84,15 +89,23 @@ $(libzip):
 
 $(portmidi):
 	git clone https://github.com/AndrewBelt/portmidi.git $@
-	# TODO Fix on Windows
 	cd $@ && $(CMAKE) . -DCMAKE_INSTALL_PREFIX="$(LOCAL)"
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
 
-$(portaudio):
+$(asio):
+	echo "For ASIO support, download and move the ASIO SDK to $@"
+	exit 1
+
+ifeq ($(ARCH),win)
+PORTAUDIO_DEPS = $(asio)
+PORTAUDIO_ASIO = --with-host_os=mingw --with-winapi=wmme,asio --with-asiodir="../$(asio)"
+endif
+
+$(portaudio): $(PORTAUDIO_DEPS)
 	$(WGET) http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz
 	$(UNTAR) pa_stable_v190600_20161030.tgz
-	cd $@ && ./configure --prefix="$(LOCAL)"
+	cd $@ && ./configure --prefix="$(LOCAL)" $(PORTAUDIO_ASIO)
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
 

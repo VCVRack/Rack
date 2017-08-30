@@ -29,17 +29,10 @@ endif
 
 ifeq ($(ARCH), win)
 	SOURCES += ext/osdialog/osdialog_win.c
-	CXXFLAGS += -DGLEW_STATIC \
-		-I$(HOME)/pkg/portaudio-r1891-build/include -I/mingw64/lib/libzip/include -I$(HOME)/local/include
-	LDFLAGS += \
-		-Wl,-Bstatic,--whole-archive \
-		-ljansson -lsamplerate \
-		-Wl,-Bdynamic,--no-whole-archive \
-		-lpthread -lglfw3 -lgdi32 -lglew32 -lopengl32 -lcomdlg32 -lole32 -lzip \
-		-L $(HOME)/local/lib -lcurl \
-		-lportmidi \
-		-L$(HOME)/pkg/portaudio-r1891-build/lib/x64/ReleaseMinDependency -lportaudio_x64 \
-		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows
+	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
+		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
+		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
+		-Ldep/lib -lglew32 -lglfw3dll -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
 	TARGET = Rack.exe
 	# OBJECTS = Rack.res
 endif
@@ -53,6 +46,10 @@ ifeq ($(ARCH), lin)
 endif
 ifeq ($(ARCH), mac)
 	DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<
+endif
+ifeq ($(ARCH), win)
+	# TODO get rid of the mingw64 path
+	env PATH=dep/bin:/mingw64/bin ./$<
 endif
 
 clean:

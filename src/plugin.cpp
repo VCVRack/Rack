@@ -17,8 +17,9 @@
 	#include <shellapi.h>
 	#include <direct.h>
 	#define mkdir(_dir, _perms) _mkdir(_dir)
+#else
+	#include <dlfcn.h>
 #endif
-#include <dlfcn.h>
 #include <dirent.h>
 
 #include "plugin.hpp"
