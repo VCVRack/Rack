@@ -8,14 +8,28 @@
 
 namespace rack {
 
+static Vec rackGridSize = Vec(15, 380);
+
+
+struct WireContainer : TransparentWidget {
+	void draw(NVGcontext *vg) {
+		// Wire plugs
+		for (Widget *child : children) {
+			WireWidget *wire = dynamic_cast<WireWidget*>(child);
+			assert(wire);
+			wire->drawPlugs(vg);
+		}
+
+		Widget::draw(vg);
+	}
+};
+
 RackWidget::RackWidget() {
 	moduleContainer = new Widget();
 	addChild(moduleContainer);
 
-	wireContainer = new TransparentWidget();
+	wireContainer = new WireContainer();
 	addChild(wireContainer);
-
-	railsImage = Image::load("res/rails.png");
 }
 
 RackWidget::~RackWidget() {
@@ -227,12 +241,12 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 void RackWidget::repositionModule(ModuleWidget *module) {
 	// Create possible positions
-	int x0 = roundf(module->requestedPos.x / 15);
-	int y0 = roundf(module->requestedPos.y / 380);
+	int x0 = roundf(module->requestedPos.x / rackGridSize.x);
+	int y0 = roundf(module->requestedPos.y / rackGridSize.y);
 	std::vector<Vec> positions;
 	for (int y = maxi(0, y0 - 2); y < y0 + 2; y++) {
 		for (int x = maxi(0, x0 - 40); x < x0 + 40; x++) {
-			positions.push_back(Vec(x*15, y*380));
+			positions.push_back(Vec(x * rackGridSize.x, y * rackGridSize.y));
 		}
 	}
 
@@ -279,7 +293,6 @@ void RackWidget::step() {
 	}
 
 	// Autosave every 15 seconds
-	// (This is alpha software, expect crashes!)
 	if (gGuiFrame % (60*15) == 0) {
 		savePatch("autosave.json");
 	}
@@ -295,13 +308,41 @@ void RackWidget::draw(NVGcontext *vg) {
 	nvgFillColor(vg, nvgRGBf(0.2, 0.2, 0.2));
 	nvgFill(vg);
 
-	// Rails image
-	{
-		int imageWidth, imageHeight;
-		nvgImageSize(vg, railsImage->handle, &imageWidth, &imageHeight);
-		NVGpaint paint = nvgImagePattern(vg, 0.0, 0.0, imageWidth, imageHeight, 0.0, railsImage->handle, 1.0);
-		nvgFillPaint(vg, paint);
+	// Rails
+	// TODO Put this in a framebuffer cache and tile
+	const float railHeight = 15;
+	nvgFillColor(vg, nvgRGBf(0.8, 0.8, 0.8));
+	nvgStrokeWidth(vg, 1.0);
+	nvgStrokeColor(vg, nvgRGBf(0.6, 0.6, 0.6));
+	float holeRadius = 3.5;
+	for (float railY = 0; railY < box.size.y; railY += rackGridSize.y) {
+		// Top rail
+		nvgBeginPath(vg);
+		nvgRect(vg, 0, railY, box.size.x, railHeight);
+		for (float railX = 0; railX < box.size.x; railX += rackGridSize.x) {
+			nvgCircle(vg, railX + rackGridSize.x / 2, railY + railHeight / 2, holeRadius);
+			nvgPathWinding(vg, NVG_HOLE);
+		}
 		nvgFill(vg);
+
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 0, railY + railHeight - 0.5);
+		nvgLineTo(vg, box.size.x, railY + railHeight - 0.5);
+		nvgStroke(vg);
+
+		// Bottom rail
+		nvgBeginPath(vg);
+		nvgRect(vg, 0, railY + rackGridSize.y - railHeight, box.size.x, railHeight);
+		for (float railX = 0; railX < box.size.x; railX += rackGridSize.x) {
+			nvgCircle(vg, railX + rackGridSize.x / 2, railY + rackGridSize.y - railHeight + railHeight / 2, holeRadius);
+			nvgPathWinding(vg, NVG_HOLE);
+		}
+		nvgFill(vg);
+
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 0, railY + rackGridSize.y - 0.5);
+		nvgLineTo(vg, box.size.x, railY + rackGridSize.y - 0.5);
+		nvgStroke(vg);
 	}
 
 	Widget::draw(vg);

@@ -70,10 +70,12 @@ struct WireWidget : OpaqueWidget {
 
 	WireWidget();
 	~WireWidget();
+	/** Synchronizes the plugged state of the widget to the owned wire */
 	void updateWire();
+	Vec getOutputPos();
+	Vec getInputPos();
 	void draw(NVGcontext *vg);
-	void drawOutputPlug(NVGcontext *vg);
-	void drawInputPlug(NVGcontext *vg);
+	void drawPlugs(NVGcontext *vg);
 };
 
 struct RackWidget : OpaqueWidget {
@@ -82,7 +84,6 @@ struct RackWidget : OpaqueWidget {
 	// Only put WireWidgets in here
 	Widget *wireContainer;
 	WireWidget *activeWire = NULL;
-	std::shared_ptr<Image> railsImage;
 
 	RackWidget();
 	~RackWidget();

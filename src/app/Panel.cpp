@@ -20,9 +20,11 @@ void Panel::draw(NVGcontext *vg) {
 		nvgFill(vg);
 	}
 
-	// Border color
+	// Border
+	nvgBeginPath(vg);
+	nvgRect(vg, 0.5, 0.5, box.size.x - 1, box.size.y - 1);
 	nvgStrokeColor(vg, borderColor);
-	nvgStrokeWidth(vg, 0.5);
+	nvgStrokeWidth(vg, 1.0);
 	nvgStroke(vg);
 }
 

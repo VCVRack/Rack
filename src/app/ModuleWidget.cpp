@@ -124,7 +124,6 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
 	Widget::draw(vg);
-	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 
 	// CPU usage text
 	if (dynamic_cast<RackScene*>(gScene)->toolbar->cpuUsageButton->value > 0.0) {

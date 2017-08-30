@@ -118,8 +118,35 @@ void WireWidget::updateWire() {
 	}
 }
 
+Vec WireWidget::getOutputPos() {
+	Vec pos;
+	if (outputPort) {
+		pos = Rect(outputPort->getAbsolutePos(), outputPort->box.size).getCenter();
+	}
+	else if (hoveredOutputPort) {
+		pos = Rect(hoveredOutputPort->getAbsolutePos(), hoveredOutputPort->box.size).getCenter();
+	}
+	else {
+		pos = gMousePos;
+	}
+	return pos.minus(getAbsolutePos().minus(box.pos));
+}
+
+Vec WireWidget::getInputPos() {
+	Vec pos;
+	if (inputPort) {
+		pos = Rect(inputPort->getAbsolutePos(), inputPort->box.size).getCenter();
+	}
+	else if (hoveredInputPort) {
+		pos = Rect(hoveredInputPort->getAbsolutePos(), hoveredInputPort->box.size).getCenter();
+	}
+	else {
+		pos = gMousePos;
+	}
+	return pos.minus(getAbsolutePos().minus(box.pos));
+}
+
 void WireWidget::draw(NVGcontext *vg) {
-	Vec absolutePos = getAbsolutePos().minus(box.pos);
 	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value / 100.0;
 	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
 
@@ -127,37 +154,13 @@ void WireWidget::draw(NVGcontext *vg) {
 	if (gRackWidget->activeWire == this)
 		opacity = 1.0;
 
-	// Compute location of outputPos and inputPos
-	Vec outputPos;
-	if (outputPort) {
-		outputPos = Rect(outputPort->getAbsolutePos(), outputPort->box.size).getCenter();
-	}
-	else if (hoveredOutputPort) {
-		outputPos = Rect(hoveredOutputPort->getAbsolutePos(), hoveredOutputPort->box.size).getCenter();
-	}
-	else {
-		outputPos = gMousePos;
-	}
-
-	Vec inputPos;
-	if (inputPort) {
-		inputPos = Rect(inputPort->getAbsolutePos(), inputPort->box.size).getCenter();
-	}
-	else if (hoveredInputPort) {
-		inputPos = Rect(hoveredInputPort->getAbsolutePos(), hoveredInputPort->box.size).getCenter();
-	}
-	else {
-		inputPos = gMousePos;
-	}
-
-	outputPos = outputPos.minus(absolutePos);
-	inputPos = inputPos.minus(absolutePos);
-
-	drawWire(vg, outputPos, inputPos, color, tension, opacity);
-	drawPlug(vg, outputPos, color);
-	drawPlug(vg, inputPos, color);
+	drawWire(vg, getOutputPos(), getInputPos(), color, tension, opacity);
+	drawPlug(vg, getOutputPos(), color);
+	drawPlug(vg, getInputPos(), color);
 }
 
+void WireWidget::drawPlugs(NVGcontext *vg) {
+}
 
 
 } // namespace rack
