@@ -160,6 +160,7 @@ void WireWidget::draw(NVGcontext *vg) {
 }
 
 void WireWidget::drawPlugs(NVGcontext *vg) {
+	// TODO Figure out a way to draw plugs first and wires last, and cut the plug portion of the wire off.
 }
 
 

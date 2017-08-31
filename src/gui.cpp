@@ -271,7 +271,11 @@ void guiRun() {
 			cursorPosCallback(window, xpos, ypos);
 		}
 		gScene->step();
-		renderGui();
+
+		bool visible = glfwGetWindowAttrib(window, GLFW_VISIBLE) && !glfwGetWindowAttrib(window, GLFW_ICONIFIED);
+		if (visible) {
+			renderGui();
+		}
 
 		double currTime = glfwGetTime();
 		// printf("%lf fps\n", 1.0/(currTime - lastTime));

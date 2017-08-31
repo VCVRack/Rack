@@ -311,9 +311,9 @@ void RackWidget::draw(NVGcontext *vg) {
 	// Rails
 	// TODO Put this in a framebuffer cache and tile
 	const float railHeight = 15;
-	nvgFillColor(vg, nvgRGBf(0.8, 0.8, 0.8));
+	nvgFillColor(vg, nvgRGBf(0.85, 0.85, 0.85));
 	nvgStrokeWidth(vg, 1.0);
-	nvgStrokeColor(vg, nvgRGBf(0.6, 0.6, 0.6));
+	nvgStrokeColor(vg, nvgRGBf(0.7, 0.7, 0.7));
 	float holeRadius = 3.5;
 	for (float railY = 0; railY < box.size.y; railY += rackGridSize.y) {
 		// Top rail

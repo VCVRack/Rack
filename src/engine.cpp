@@ -98,9 +98,10 @@ static void engineRun() {
 			}
 		}
 		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::nanoseconds((long) (0.5 * 1e9 * stepSize / gSampleRate)) - (end - start);
+		auto duration = std::chrono::nanoseconds((long) (0.10 * 1e9 * stepSize / gSampleRate)) - (end - start);
 		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
-		// std::this_thread::sleep_for(duration);
+		// if (duration > 0)
+		// 	std::this_thread::sleep_for(duration);
 	}
 }
 
