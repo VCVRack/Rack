@@ -214,8 +214,8 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 			return;
 		}
 
-		numOutputs = mini(deviceInfo->maxOutputChannels, 2);
-		numInputs = mini(deviceInfo->maxInputChannels, 2);
+		numOutputs = mini(deviceInfo->maxOutputChannels, 8);
+		numInputs = mini(deviceInfo->maxInputChannels, 8);
 
 		PaStreamParameters outputParameters;
 		outputParameters.device = deviceId;
