@@ -3,9 +3,6 @@
 
 using namespace rack;
 
-void audioInit();
-void midiInit();
-
 ////////////////////
 // module widgets
 ////////////////////

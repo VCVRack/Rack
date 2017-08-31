@@ -7,13 +7,18 @@
 
 using namespace rack;
 
+static bool initialized = false;
 
 void audioInit() {
+	if (initialized)
+		return;
+
 	PaError err = Pa_Initialize();
 	if (err) {
 		fprintf(stderr, "Failed to initialize PortAudio: %s\n", Pa_GetErrorText(err));
 		return;
 	}
+	initialized = true;
 }
 
 
@@ -80,6 +85,7 @@ AudioInterface::AudioInterface() {
 	params.resize(NUM_PARAMS);
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
+	audioInit();
 }
 
 AudioInterface::~AudioInterface() {

@@ -12,8 +12,5 @@ struct CorePlugin : Plugin {
 
 
 Plugin *init() {
-	audioInit();
-	midiInit();
-
 	return new CorePlugin();
 }

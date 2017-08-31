@@ -7,13 +7,18 @@
 
 using namespace rack;
 
+static bool initialized = false;
 
 void midiInit() {
+	if (initialized)
+		return;
+
 	PmError err = Pm_Initialize();
 	if (err) {
 		printf("Failed to initialize PortMidi: %s\n", Pm_GetErrorText(err));
 		return;
 	}
+	initialized = true;
 }
 
 
@@ -56,6 +61,7 @@ MidiInterface::MidiInterface() {
 	params.resize(NUM_PARAMS);
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
+	midiInit();
 }
 
 MidiInterface::~MidiInterface() {
