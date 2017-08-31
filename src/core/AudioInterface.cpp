@@ -28,13 +28,11 @@ struct AudioInterface : Module {
 	};
 	enum InputIds {
 		AUDIO1_INPUT,
-		AUDIO2_INPUT,
-		NUM_INPUTS
+		NUM_INPUTS = AUDIO1_INPUT + 8
 	};
 	enum OutputIds {
 		AUDIO1_OUTPUT,
-		AUDIO2_OUTPUT,
-		NUM_OUTPUTS
+		NUM_OUTPUTS = AUDIO1_OUTPUT + 8
 	};
 
 	PaStream *stream = NULL;
@@ -49,14 +47,14 @@ struct AudioInterface : Module {
 	std::mutex bufferMutex;
 	bool streamRunning;
 
-	SampleRateConverter<2> inputSrc;
-	SampleRateConverter<2> outputSrc;
+	SampleRateConverter<8> inputSrc;
+	SampleRateConverter<8> outputSrc;
 
 	// in rack's sample rate
-	DoubleRingBuffer<Frame<2>, 16> inputBuffer;
-	DoubleRingBuffer<Frame<2>, (1<<15)> outputBuffer;
+	DoubleRingBuffer<Frame<8>, 16> inputBuffer;
+	DoubleRingBuffer<Frame<8>, (1<<15)> outputBuffer;
 	// in device's sample rate
-	DoubleRingBuffer<Frame<2>, (1<<15)> inputSrcBuffer;
+	DoubleRingBuffer<Frame<8>, (1<<15)> inputSrcBuffer;
 
 	AudioInterface();
 	~AudioInterface();
@@ -113,9 +111,10 @@ void AudioInterface::step() {
 	// Get input and pass it through the sample rate converter
 	if (numOutputs > 0) {
 		if (!inputBuffer.full()) {
-			Frame<2> f;
-			f.samples[0] = getf(inputs[AUDIO1_INPUT]) / 5.0;
-			f.samples[1] = getf(inputs[AUDIO2_INPUT]) / 5.0;
+			Frame<8> f;
+			for (int i = 0; i < 8; i++) {
+				f.samples[i] = getf(inputs[AUDIO1_INPUT + i]) / 5.0;
+			}
 			inputBuffer.push(f);
 		}
 
@@ -133,9 +132,10 @@ void AudioInterface::step() {
 
 	// Set output
 	if (!outputBuffer.empty()) {
-		Frame<2> f = outputBuffer.shift();
-		setf(outputs[AUDIO1_OUTPUT], 5.0 * f.samples[0]);
-		setf(outputs[AUDIO2_OUTPUT], 5.0 * f.samples[1]);
+		Frame<8> f = outputBuffer.shift();
+		for (int i = 0; i < 8; i++) {
+			setf(outputs[AUDIO1_OUTPUT + i], 5.0 * f.samples[i]);
+		}
 	}
 }
 
@@ -152,10 +152,10 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 	std::lock_guard<std::mutex> lock(bufferMutex);
 	// input stream -> output buffer
 	if (numInputs > 0) {
-		Frame<2> inputFrames[numFrames];
+		Frame<8> inputFrames[numFrames];
 		for (int i = 0; i < numFrames; i++) {
-			for (int c = 0; c < 2; c++) {
-				inputFrames[i].samples[c] = (numInputs > c) ? input[i*numInputs + c] : 0.0;
+			for (int c = 0; c < 8; c++) {
+				inputFrames[i].samples[c] = (c < numInputs) ? input[i*numInputs + c] : 0.0;
 			}
 		}
 
@@ -172,9 +172,9 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 		for (int i = 0; i < numFrames; i++) {
 			if (inputSrcBuffer.empty())
 				break;
-			Frame<2> f = inputSrcBuffer.shift();
+			Frame<8> f = inputSrcBuffer.shift();
 			for (int c = 0; c < numOutputs; c++) {
-				output[i*numOutputs + c] = f.samples[c];
+				output[i*numOutputs + c] = (c < 8) ? f.samples[c] : 0.0;
 			}
 		}
 	}
@@ -400,7 +400,7 @@ struct BlockSizeChoice : ChoiceButton {
 AudioInterfaceWidget::AudioInterfaceWidget() {
 	AudioInterface *module = new AudioInterface();
 	setModule(module);
-	box.size = Vec(15*8, 380);
+	box.size = Vec(15*12, 380);
 
 	{
 		Panel *panel = new LightPanel();
@@ -409,21 +409,23 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	}
 
 	float margin = 5;
+	float labelHeight = 15;
 	float yPos = margin;
+	float xPos;
 
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
 		label->text = "Audio device";
 		addChild(label);
-		yPos += label->box.size.y + margin;
+		yPos += labelHeight + margin;
 
 		AudioChoice *choice = new AudioChoice();
 		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
 		choice->box.pos = Vec(margin, yPos);
 		choice->box.size.x = box.size.x - 10;
 		addChild(choice);
-		yPos += choice->box.size.y + 2*margin;
+		yPos += choice->box.size.y + margin;
 	}
 
 	{
@@ -431,14 +433,14 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->box.pos = Vec(margin, yPos);
 		label->text = "Sample rate";
 		addChild(label);
-		yPos += label->box.size.y + margin;
+		yPos += labelHeight + margin;
 
 		SampleRateChoice *choice = new SampleRateChoice();
 		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
 		choice->box.pos = Vec(margin, yPos);
 		choice->box.size.x = box.size.x - 10;
 		addChild(choice);
-		yPos += choice->box.size.y + 2*margin;
+		yPos += choice->box.size.y + margin;
 	}
 
 	{
@@ -446,14 +448,14 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->box.pos = Vec(margin, yPos);
 		label->text = "Block size";
 		addChild(label);
-		yPos += label->box.size.y + margin;
+		yPos += labelHeight + margin;
 
 		BlockSizeChoice *choice = new BlockSizeChoice();
 		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
 		choice->box.pos = Vec(margin, yPos);
 		choice->box.size.x = box.size.x - 10;
 		addChild(choice);
-		yPos += choice->box.size.y + 2*margin;
+		yPos += choice->box.size.y + margin;
 	}
 
 	{
@@ -461,12 +463,33 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->box.pos = Vec(margin, yPos);
 		label->text = "Outputs";
 		addChild(label);
-		yPos += label->box.size.y + margin;
+		yPos += labelHeight + margin;
 	}
 
 	yPos += 5;
-	addInput(createInput<PJ3410Port>(Vec(20, yPos), module, AudioInterface::AUDIO1_INPUT));
-	addInput(createInput<PJ3410Port>(Vec(70, yPos), module, AudioInterface::AUDIO2_INPUT));
+	xPos = 10;
+	for (int i = 0; i < 4; i++) {
+		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_INPUT + i));
+		Label *label = new Label();
+		label->box.pos = Vec(xPos + 4, yPos + 28);
+		label->text = stringf("%d", i);
+		addChild(label);
+
+		xPos += 37 + margin;
+	}
+	yPos += 35 + margin;
+
+	yPos += 5;
+	xPos = 10;
+	for (int i = 4; i < 8; i++) {
+		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_INPUT + i));
+		Label *label = new Label();
+		label->box.pos = Vec(xPos + 4, yPos + 28);
+		label->text = stringf("%d", i);
+		addChild(label);
+
+		xPos += 37 + margin;
+	}
 	yPos += 35 + margin;
 
 	{
@@ -474,11 +497,32 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->box.pos = Vec(margin, yPos);
 		label->text = "Inputs";
 		addChild(label);
-		yPos += label->box.size.y + margin;
+		yPos += labelHeight + margin;
 	}
 
 	yPos += 5;
-	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, AudioInterface::AUDIO1_OUTPUT));
-	addOutput(createOutput<PJ3410Port>(Vec(70, yPos), module, AudioInterface::AUDIO2_OUTPUT));
+	xPos = 10;
+	for (int i = 0; i < 4; i++) {
+		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_OUTPUT + i));
+		Label *label = new Label();
+		label->box.pos = Vec(xPos + 4, yPos + 28);
+		label->text = stringf("%d", i);
+		addChild(label);
+
+		xPos += 37 + margin;
+	}
+	yPos += 35 + margin;
+
+	yPos += 5;
+	xPos = 10;
+	for (int i = 4; i < 8; i++) {
+		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_OUTPUT + i));
+		Label *label = new Label();
+		label->box.pos = Vec(xPos + 4, yPos + 28);
+		label->text = stringf("%d", i);
+		addChild(label);
+
+		xPos += 37 + margin;
+	}
 	yPos += 35 + margin;
 }
