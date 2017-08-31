@@ -73,7 +73,13 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 	}
 }
 
+static bool mouseLockedLast = false;
+
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+	// GLFW on Mac sends the mouse into negative coordinates when the mouse is locked/unlocked for some reason.
+	if (xpos < 0.0 || ypos < 0.0)
+		return;
+
 	Vec mousePos = Vec(xpos, ypos).round();
 	Vec mouseRel = mousePos.minus(gMousePos);
 	gMousePos = mousePos;
