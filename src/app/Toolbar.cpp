@@ -37,10 +37,10 @@ struct OpenItem : MenuItem {
 
 struct FileChoice : ChoiceButton {
 	void onAction() {
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
+		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
+
 		{
 			MenuItem *newItem = new NewItem();
 			newItem->text = "New";
@@ -58,8 +58,6 @@ struct FileChoice : ChoiceButton {
 			saveAsItem->text = "Save As";
 			menu->pushChild(saveAsItem);
 		}
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
 	}
 };
 
@@ -73,8 +71,7 @@ struct SampleRateItem : MenuItem {
 
 struct SampleRateChoice : ChoiceButton {
 	void onAction() {
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
+		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
@@ -86,9 +83,6 @@ struct SampleRateChoice : ChoiceButton {
 			item->sampleRate = sampleRates[i];
 			menu->pushChild(item);
 		}
-
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
 	}
 	void step() {
 		text = stringf("%.0f Hz", gSampleRate);
@@ -116,7 +110,6 @@ Toolbar::Toolbar() {
 		SampleRateChoice *srChoice = new SampleRateChoice();
 		srChoice->box.pos = Vec(xPos, margin);
 		srChoice->box.size.x = 100;
-		srChoice->text = "";
 		addChild(srChoice);
 		xPos += srChoice->box.size.x;
 	}

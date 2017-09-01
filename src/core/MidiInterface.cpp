@@ -30,15 +30,23 @@ struct MidiInterface : Module {
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		GATE_OUTPUT,
 		PITCH_OUTPUT,
+		GATE_OUTPUT,
+		MOD_OUTPUT,
+		PITCHWHEEL_OUTPUT,
 		NUM_OUTPUTS
 	};
 
+	int portId = -1;
 	PortMidiStream *stream = NULL;
 	std::list<int> notes;
+	/** Filter MIDI channel
+	-1 means all MIDI channels
+	*/
+	int channel = -1;
 	bool pedal = false;
 	int note = 60; // C4, most modules should use 261.626 Hz
+	int mod = 0;
 	int pitchWheel = 64;
 	bool retrigger = false;
 	bool retriggered = false;
@@ -62,6 +70,8 @@ MidiInterface::MidiInterface() {
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
 	midiInit();
+
+	printf("<<<%d>>>\n", getPortCount());
 }
 
 MidiInterface::~MidiInterface() {
@@ -77,6 +87,9 @@ void MidiInterface::step() {
 		}
 	}
 
+	if (outputs[PITCH_OUTPUT]) {
+		*outputs[PITCH_OUTPUT] = ((note - 64)) / 12.0;
+	}
 	if (outputs[GATE_OUTPUT]) {
 		bool gate = pedal || !notes.empty();
 		if (retrigger && retriggered) {
@@ -85,8 +98,11 @@ void MidiInterface::step() {
 		}
 		*outputs[GATE_OUTPUT] = gate ? 5.0 : 0.0;
 	}
-	if (outputs[PITCH_OUTPUT]) {
-		*outputs[PITCH_OUTPUT] = ((note - 64) + 2.0*(pitchWheel - 64) / 64.0) / 12.0;
+	if (outputs[MOD_OUTPUT]) {
+		*outputs[MOD_OUTPUT] = mod;
+	}
+	if (outputs[PITCHWHEEL_OUTPUT]) {
+		*outputs[PITCHWHEEL_OUTPUT] = (pitchWheel - 64) / 64.0 / 12.0;
 	}
 }
 
@@ -121,6 +137,7 @@ void MidiInterface::openPort(int portId) {
 			return;
 		}
 	}
+	this->portId = portId;
 }
 
 void MidiInterface::pressNote(int note) {
@@ -202,9 +219,9 @@ struct MidiItem : MenuItem {
 struct MidiChoice : ChoiceButton {
 	MidiInterface *midiInterface;
 	void onAction() {
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
+		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
 
 		int portCount = midiInterface->getPortCount();
 		{
@@ -221,8 +238,45 @@ struct MidiChoice : ChoiceButton {
 			midiItem->text = midiInterface->getPortName(portId);
 			menu->pushChild(midiItem);
 		}
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
+	}
+	void step() {
+		std::string name = midiInterface->getPortName(midiInterface->portId);
+		text = name.empty() ? "(no device)" : ellipsize(name, 14);
+	}
+};
+
+struct ChannelItem : MenuItem {
+	MidiInterface *midiInterface;
+	int channel;
+	void onAction() {
+		midiInterface->channel = channel;
+	}
+};
+
+struct ChannelChoice : ChoiceButton {
+	MidiInterface *midiInterface;
+	void onAction() {
+		Menu *menu = gScene->createMenu();
+		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		{
+			ChannelItem *channelItem = new ChannelItem();
+			channelItem->midiInterface = midiInterface;
+			channelItem->channel = -1;
+			channelItem->text = "All";
+			menu->pushChild(channelItem);
+		}
+		for (int channel = 0; channel < 16; channel++) {
+			ChannelItem *channelItem = new ChannelItem();
+			channelItem->midiInterface = midiInterface;
+			channelItem->channel = channel;
+			channelItem->text = stringf("%d", channel + 1);
+			menu->pushChild(channelItem);
+		}
+	}
+	void step() {
+		text = (midiInterface->channel >= 0) ? stringf("%d", midiInterface->channel + 1) : "All";
 	}
 };
 
@@ -239,42 +293,52 @@ MidiInterfaceWidget::MidiInterfaceWidget() {
 	}
 
 	float margin = 5;
+	float labelHeight = 15;
 	float yPos = margin;
 
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "MIDI Interface";
+		label->text = "MIDI device";
 		addChild(label);
-		yPos += label->box.size.y + margin;
-	}
+		yPos += labelHeight + margin;
 
-	{
 		MidiChoice *midiChoice = new MidiChoice();
 		midiChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
-		midiChoice->text = "MIDI device";
 		midiChoice->box.pos = Vec(margin, yPos);
 		midiChoice->box.size.x = box.size.x - 10;
 		addChild(midiChoice);
 		yPos += midiChoice->box.size.y + margin;
 	}
 
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "MIDI channel";
+		addChild(label);
+		yPos += labelHeight + margin;
+
+		ChannelChoice *channelChoice = new ChannelChoice();
+		channelChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
+		channelChoice->box.pos = Vec(margin, yPos);
+		channelChoice->box.size.x = box.size.x - 10;
+		addChild(channelChoice);
+		yPos += channelChoice->box.size.y + margin;
+	}
+
 	yPos += 5;
 	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::PITCH_OUTPUT));
-	addOutput(createOutput<PJ3410Port>(Vec(70, yPos), module, MidiInterface::GATE_OUTPUT));
-	yPos += 25 + margin;
+	yPos += 37 + margin;
 
-	{
-		Label *pitchLabel = new Label();
-		pitchLabel->box.pos = Vec(25-12, yPos);
-		pitchLabel->text = "Pitch";
-		addChild(pitchLabel);
+	yPos += 5;
+	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::GATE_OUTPUT));
+	yPos += 37 + margin;
 
-		Label *gateLabel = new Label();
-		gateLabel->box.pos = Vec(75-12, yPos);
-		gateLabel->text = "Gate";
-		addChild(gateLabel);
+	yPos += 5;
+	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::MOD_OUTPUT));
+	yPos += 37 + margin;
 
-		yPos += pitchLabel->box.size.y + margin;
-	}
+	yPos += 5;
+	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::PITCHWHEEL_OUTPUT));
+	yPos += 37 + margin;
 }

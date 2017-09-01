@@ -300,9 +300,9 @@ struct AudioItem : MenuItem {
 struct AudioChoice : ChoiceButton {
 	AudioInterface *audioInterface;
 	void onAction() {
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
+		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
 
 		int deviceCount = audioInterface->getDeviceCount();
 		{
@@ -319,8 +319,6 @@ struct AudioChoice : ChoiceButton {
 			audioItem->text = audioInterface->getDeviceName(deviceId);
 			menu->pushChild(audioItem);
 		}
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
 	}
 	void step() {
 		std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
@@ -340,9 +338,9 @@ struct SampleRateItem : MenuItem {
 struct SampleRateChoice : ChoiceButton {
 	AudioInterface *audioInterface;
 	void onAction() {
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
+		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
 
 		const float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
 		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
@@ -353,9 +351,6 @@ struct SampleRateChoice : ChoiceButton {
 			item->text = stringf("%.0f Hz", sampleRates[i]);
 			menu->pushChild(item);
 		}
-
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
 	}
 	void step() {
 		this->text = stringf("%.0f Hz", audioInterface->sampleRate);
@@ -374,9 +369,9 @@ struct BlockSizeItem : MenuItem {
 struct BlockSizeChoice : ChoiceButton {
 	AudioInterface *audioInterface;
 	void onAction() {
-		MenuOverlay *overlay = new MenuOverlay();
-		Menu *menu = new Menu();
+		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
 
 		const int blockSizes[] = {64, 128, 256, 512, 1024, 2048, 4096};
 		int blockSizesLen = sizeof(blockSizes) / sizeof(blockSizes[0]);
@@ -387,9 +382,6 @@ struct BlockSizeChoice : ChoiceButton {
 			item->text = stringf("%d", blockSizes[i]);
 			menu->pushChild(item);
 		}
-
-		overlay->addChild(menu);
-		gScene->setOverlay(overlay);
 	}
 	void step() {
 		this->text = stringf("%d", audioInterface->blockSize);
@@ -423,7 +415,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		AudioChoice *choice = new AudioChoice();
 		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
 		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 10;
+		choice->box.size.x = box.size.x - 2*margin;
 		addChild(choice);
 		yPos += choice->box.size.y + margin;
 	}
@@ -438,7 +430,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		SampleRateChoice *choice = new SampleRateChoice();
 		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
 		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 10;
+		choice->box.size.x = box.size.x - 2*margin;
 		addChild(choice);
 		yPos += choice->box.size.y + margin;
 	}
@@ -453,7 +445,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		BlockSizeChoice *choice = new BlockSizeChoice();
 		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
 		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 10;
+		choice->box.size.x = box.size.x - 2*margin;
 		addChild(choice);
 		yPos += choice->box.size.y + margin;
 	}
