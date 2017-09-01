@@ -70,8 +70,6 @@ MidiInterface::MidiInterface() {
 	inputs.resize(NUM_INPUTS);
 	outputs.resize(NUM_OUTPUTS);
 	midiInit();
-
-	printf("<<<%d>>>\n", getPortCount());
 }
 
 MidiInterface::~MidiInterface() {
@@ -96,13 +94,13 @@ void MidiInterface::step() {
 			gate = false;
 			retriggered = false;
 		}
-		*outputs[GATE_OUTPUT] = gate ? 5.0 : 0.0;
+		*outputs[GATE_OUTPUT] = gate ? 10.0 : 0.0;
 	}
 	if (outputs[MOD_OUTPUT]) {
-		*outputs[MOD_OUTPUT] = mod;
+		*outputs[MOD_OUTPUT] = mod / 127.0 * 10.0;
 	}
 	if (outputs[PITCHWHEEL_OUTPUT]) {
-		*outputs[PITCHWHEEL_OUTPUT] = (pitchWheel - 64) / 64.0 / 12.0;
+		*outputs[PITCHWHEEL_OUTPUT] = (pitchWheel - 64) / 64.0 * 10.0;
 	}
 }
 
@@ -128,6 +126,7 @@ void MidiInterface::openPort(int portId) {
 		}
 		stream = NULL;
 	}
+	this->portId = -1;
 
 	// Open new port
 	if (portId >= 0) {
@@ -174,10 +173,11 @@ void MidiInterface::processMidi(long msg) {
 	int status = (msg >> 4) & 0xf;
 	int data1 = (msg >> 8) & 0xff;
 	int data2 = (msg >> 16) & 0xff;
-
-	if (channel != 0)
-		return;
 	printf("channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
+
+	// Filter channels
+	if (this->channel >= 0 && this->channel != channel)
+		return;
 
 	switch (status) {
 		// note off
@@ -195,7 +195,10 @@ void MidiInterface::processMidi(long msg) {
 			break;
 		case 0xb: // cc
 			switch (data1) {
-				case 0x40:
+				case 0x01: // mod
+					this->mod = data2;
+					break;
+				case 0x40: // sustain
 					pedal = (data2 >= 64);
 					releaseNote(-1);
 					break;
