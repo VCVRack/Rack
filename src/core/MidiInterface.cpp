@@ -86,7 +86,7 @@ void MidiInterface::step() {
 	}
 
 	if (outputs[PITCH_OUTPUT]) {
-		*outputs[PITCH_OUTPUT] = ((note - 64)) / 12.0;
+		*outputs[PITCH_OUTPUT] = ((note - 60)) / 12.0;
 	}
 	if (outputs[GATE_OUTPUT]) {
 		bool gate = pedal || !notes.empty();
@@ -173,7 +173,7 @@ void MidiInterface::processMidi(long msg) {
 	int status = (msg >> 4) & 0xf;
 	int data1 = (msg >> 8) & 0xff;
 	int data2 = (msg >> 16) & 0xff;
-	printf("channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
+	// printf("channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
 
 	// Filter channels
 	if (this->channel >= 0 && this->channel != channel)
