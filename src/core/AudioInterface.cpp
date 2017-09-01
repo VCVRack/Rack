@@ -322,7 +322,7 @@ struct AudioChoice : ChoiceButton {
 	}
 	void step() {
 		std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
-		text = name.empty() ? "(no device)" : ellipsize(name, 14);
+		text = ellipsize(name, 24);
 	}
 };
 

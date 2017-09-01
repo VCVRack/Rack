@@ -244,7 +244,7 @@ struct MidiChoice : ChoiceButton {
 	}
 	void step() {
 		std::string name = midiInterface->getPortName(midiInterface->portId);
-		text = name.empty() ? "(no device)" : ellipsize(name, 14);
+		text = ellipsize(name, 8);
 	}
 };
 
@@ -287,7 +287,7 @@ struct ChannelChoice : ChoiceButton {
 MidiInterfaceWidget::MidiInterfaceWidget() {
 	MidiInterface *module = new MidiInterface();
 	setModule(module);
-	box.size = Vec(15*8, 380);
+	box.size = Vec(15*6, 380);
 
 	{
 		Panel *panel = new LightPanel();
@@ -317,7 +317,7 @@ MidiInterfaceWidget::MidiInterfaceWidget() {
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "MIDI channel";
+		label->text = "Channel";
 		addChild(label);
 		yPos += labelHeight + margin;
 
@@ -329,19 +329,47 @@ MidiInterfaceWidget::MidiInterfaceWidget() {
 		yPos += channelChoice->box.size.y + margin;
 	}
 
-	yPos += 5;
-	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::PITCH_OUTPUT));
-	yPos += 37 + margin;
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "1V/oct";
+		addChild(label);
+		yPos += labelHeight + margin;
 
-	yPos += 5;
-	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::GATE_OUTPUT));
-	yPos += 37 + margin;
+		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::PITCH_OUTPUT));
+		yPos += 37 + margin;
+	}
 
-	yPos += 5;
-	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::MOD_OUTPUT));
-	yPos += 37 + margin;
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "Gate";
+		addChild(label);
+		yPos += labelHeight + margin;
 
-	yPos += 5;
-	addOutput(createOutput<PJ3410Port>(Vec(20, yPos), module, MidiInterface::PITCHWHEEL_OUTPUT));
-	yPos += 37 + margin;
+		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::GATE_OUTPUT));
+		yPos += 37 + margin;
+	}
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "Mod Wheel";
+		addChild(label);
+		yPos += labelHeight + margin;
+
+		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::MOD_OUTPUT));
+		yPos += 37 + margin;
+	}
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "Pitch Wheel";
+		addChild(label);
+		yPos += labelHeight + margin;
+
+		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::PITCHWHEEL_OUTPUT));
+		yPos += 37 + margin;
+	}
 }
