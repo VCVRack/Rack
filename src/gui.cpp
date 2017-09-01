@@ -17,6 +17,10 @@
 #define NANOSVG_IMPLEMENTATION
 #include "../ext/nanosvg/src/nanosvg.h"
 
+#ifdef ARCH_MAC
+	// For CGAssociateMouseAndMouseCursorPosition
+	#include <ApplicationServices/ApplicationServices.h>
+#endif
 
 namespace rack {
 
@@ -76,6 +80,21 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	Vec mousePos = Vec(xpos, ypos).round();
 	Vec mouseRel = mousePos.minus(gMousePos);
+
+#ifdef ARCH_MAC
+	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
+	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
+	int mouseMode = glfwGetInputMode(window, GLFW_CURSOR);
+	if (mouseMode == GLFW_CURSOR_HIDDEN) {
+		// CGSetLocalEventsSuppressionInterval(0.0);
+		glfwSetCursorPos(window, gMousePos.x, gMousePos.y);
+		CGAssociateMouseAndMouseCursorPosition(true);
+		mousePos = gMousePos;
+	}
+	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
+	glfwSetCursor(window, NULL);
+#endif
+
 	gMousePos = mousePos;
 
 	// onMouseMove
@@ -94,7 +113,6 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 			}
 			gDragHoveredWidget = hovered;
 		}
-
 	}
 	else {
 		if (hovered != gHoveredWidget) {
@@ -289,7 +307,11 @@ bool guiIsKeyPressed(int key) {
 }
 
 void guiCursorLock() {
+#ifdef ARCH_MAC
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+#else
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+#endif
 }
 
 void guiCursorUnlock() {
