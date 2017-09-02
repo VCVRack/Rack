@@ -8,8 +8,6 @@
 
 namespace rack {
 
-static Vec rackGridSize = Vec(15, 380);
-
 
 struct WireContainer : TransparentWidget {
 	void draw(NVGcontext *vg) {
@@ -25,6 +23,12 @@ struct WireContainer : TransparentWidget {
 };
 
 RackWidget::RackWidget() {
+	rails = new FramebufferWidget();
+	RackRail *rail = new RackRail();
+	rail->box.size = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+	rails->addChild(rail);
+	rails->box.size = rail->box.size;
+
 	moduleContainer = new Widget();
 	addChild(moduleContainer);
 
@@ -33,6 +37,7 @@ RackWidget::RackWidget() {
 }
 
 RackWidget::~RackWidget() {
+	delete rails;
 }
 
 void RackWidget::clear() {
@@ -241,12 +246,12 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 void RackWidget::repositionModule(ModuleWidget *module) {
 	// Create possible positions
-	int x0 = roundf(module->requestedPos.x / rackGridSize.x);
-	int y0 = roundf(module->requestedPos.y / rackGridSize.y);
+	int x0 = roundf(module->requestedPos.x / RACK_GRID_WIDTH);
+	int y0 = roundf(module->requestedPos.y / RACK_GRID_HEIGHT);
 	std::vector<Vec> positions;
 	for (int y = maxi(0, y0 - 2); y < y0 + 2; y++) {
 		for (int x = maxi(0, x0 - 40); x < x0 + 40; x++) {
-			positions.push_back(Vec(x * rackGridSize.x, y * rackGridSize.y));
+			positions.push_back(Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
 		}
 	}
 
@@ -275,6 +280,8 @@ void RackWidget::repositionModule(ModuleWidget *module) {
 }
 
 void RackWidget::step() {
+	rails->step();
+
 	// Resize to be a bit larger than the ScrollWidget viewport
 	assert(parent);
 	assert(parent->parent);
@@ -301,49 +308,12 @@ void RackWidget::step() {
 }
 
 void RackWidget::draw(NVGcontext *vg) {
+	// Draw rails
 	nvgBeginPath(vg);
 	nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
-
-	// Background color
-	nvgFillColor(vg, nvgRGBf(0.2, 0.2, 0.2));
+	NVGpaint paint = nvgImagePattern(vg, rails->box.pos.x, rails->box.pos.y, rails->box.size.x, rails->box.size.y, 0.0, rails->getImageHandle(), 1.0);
+	nvgFillPaint(vg, paint);
 	nvgFill(vg);
-
-	// Rails
-	// TODO Put this in a framebuffer cache and tile
-	const float railHeight = 15;
-	nvgFillColor(vg, nvgRGBf(0.85, 0.85, 0.85));
-	nvgStrokeWidth(vg, 1.0);
-	nvgStrokeColor(vg, nvgRGBf(0.7, 0.7, 0.7));
-	float holeRadius = 3.5;
-	for (float railY = 0; railY < box.size.y; railY += rackGridSize.y) {
-		// Top rail
-		nvgBeginPath(vg);
-		nvgRect(vg, 0, railY, box.size.x, railHeight);
-		for (float railX = 0; railX < box.size.x; railX += rackGridSize.x) {
-			nvgCircle(vg, railX + rackGridSize.x / 2, railY + railHeight / 2, holeRadius);
-			nvgPathWinding(vg, NVG_HOLE);
-		}
-		nvgFill(vg);
-
-		nvgBeginPath(vg);
-		nvgMoveTo(vg, 0, railY + railHeight - 0.5);
-		nvgLineTo(vg, box.size.x, railY + railHeight - 0.5);
-		nvgStroke(vg);
-
-		// Bottom rail
-		nvgBeginPath(vg);
-		nvgRect(vg, 0, railY + rackGridSize.y - railHeight, box.size.x, railHeight);
-		for (float railX = 0; railX < box.size.x; railX += rackGridSize.x) {
-			nvgCircle(vg, railX + rackGridSize.x / 2, railY + rackGridSize.y - railHeight + railHeight / 2, holeRadius);
-			nvgPathWinding(vg, NVG_HOLE);
-		}
-		nvgFill(vg);
-
-		nvgBeginPath(vg);
-		nvgMoveTo(vg, 0, railY + rackGridSize.y - 0.5);
-		nvgLineTo(vg, box.size.x, railY + rackGridSize.y - 0.5);
-		nvgStroke(vg);
-	}
 
 	Widget::draw(vg);
 }

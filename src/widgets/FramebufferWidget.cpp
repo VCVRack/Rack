@@ -81,5 +81,11 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	// nvgFill(vg);
 }
 
+int FramebufferWidget::getImageHandle() {
+	if (!internal->fb)
+		return -1;
+	return internal->fb->image;
+}
+
 
 } // namespace rack

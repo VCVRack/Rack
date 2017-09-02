@@ -206,6 +206,7 @@ struct FramebufferWidget : virtual Widget {
 	~FramebufferWidget();
 	void step();
 	void draw(NVGcontext *vg);
+	int getImageHandle();
 };
 
 struct QuantityWidget : virtual Widget {

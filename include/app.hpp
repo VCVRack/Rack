@@ -20,6 +20,9 @@ struct Scene;
 ////////////////////
 
 // A 1U module should be 15x380. Thus the width of a module should be a factor of 15.
+#define RACK_GRID_WIDTH 15
+#define RACK_GRID_HEIGHT 380
+
 struct Model;
 struct ModuleWidget : OpaqueWidget {
 	Model *model = NULL;
@@ -79,6 +82,7 @@ struct WireWidget : OpaqueWidget {
 };
 
 struct RackWidget : OpaqueWidget {
+	FramebufferWidget *rails;
 	// Only put ModuleWidgets in here
 	Widget *moduleContainer;
 	// Only put WireWidgets in here
@@ -98,6 +102,10 @@ struct RackWidget : OpaqueWidget {
 	void draw(NVGcontext *vg);
 
 	void onMouseDown(int button);
+};
+
+struct RackRail : TransparentWidget {
+	void draw(NVGcontext *vg);
 };
 
 struct Panel : TransparentWidget {
