@@ -58,10 +58,45 @@ struct MidiInterface : Module {
 	int getPortCount();
 	std::string getPortName(int portId);
 	// -1 will close the port
-	void openPort(int portId);
+	void setPortId(int portId);
+	void setChannel(int channel) {
+		this->channel = channel;
+	}
 	void pressNote(int note);
 	void releaseNote(int note);
 	void processMidi(long msg);
+
+	json_t *toJson() {
+		json_t *rootJ = json_object();
+		if (portId >= 0) {
+			std::string portName = getPortName(portId);
+			json_object_set_new(rootJ, "portName", json_string(portName.c_str()));
+			json_object_set_new(rootJ, "channel", json_integer(channel));
+		}
+		return rootJ;
+	}
+
+	void fromJson(json_t *rootJ) {
+		json_t *portNameJ = json_object_get(rootJ, "portName");
+		if (portNameJ) {
+			std::string portName = json_string_value(portNameJ);
+			for (int i = 0; i < getPortCount(); i++) {
+				if (portName == getPortName(i)) {
+					setPortId(i);
+					break;
+				}
+			}
+		}
+
+		json_t *channelJ = json_object_get(rootJ, "channel");
+		if (channelJ) {
+			setChannel(json_integer_value(channelJ));
+		}
+	}
+
+	void initialize() {
+		setPortId(-1);
+	}
 };
 
 
@@ -73,7 +108,7 @@ MidiInterface::MidiInterface() {
 }
 
 MidiInterface::~MidiInterface() {
-	openPort(-1);
+	setPortId(-1);
 }
 
 void MidiInterface::step() {
@@ -115,7 +150,7 @@ std::string MidiInterface::getPortName(int portId) {
 	return stringf("%s: %s (%s)", info->interf, info->name, info->input ? "input" : "output");
 }
 
-void MidiInterface::openPort(int portId) {
+void MidiInterface::setPortId(int portId) {
 	PmError err;
 
 	// Close existing port
@@ -215,7 +250,7 @@ struct MidiItem : MenuItem {
 	MidiInterface *midiInterface;
 	int portId;
 	void onAction() {
-		midiInterface->openPort(portId);
+		midiInterface->setPortId(portId);
 	}
 };
 
@@ -252,7 +287,7 @@ struct ChannelItem : MenuItem {
 	MidiInterface *midiInterface;
 	int channel;
 	void onAction() {
-		midiInterface->channel = channel;
+		midiInterface->setChannel(channel);
 	}
 };
 
