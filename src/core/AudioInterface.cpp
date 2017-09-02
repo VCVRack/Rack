@@ -76,6 +76,44 @@ struct AudioInterface : Module {
 	void setBlockSize(int blockSize) {
 		openDevice(deviceId, sampleRate, blockSize);
 	}
+
+	json_t *toJson() {
+		json_t *rootJ = json_object();
+		if (deviceId >= 0) {
+			std::string deviceName = getDeviceName(deviceId);
+			json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+			json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
+			json_object_set_new(rootJ, "blockSize", json_integer(blockSize));
+		}
+		return rootJ;
+	}
+
+	void fromJson(json_t *rootJ) {
+		json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
+		if (deviceNameJ) {
+			std::string deviceName = json_string_value(deviceNameJ);
+			for (int i = 0; i < getDeviceCount(); i++) {
+				if (deviceName == getDeviceName(i)) {
+					setDeviceId(i);
+					break;
+				}
+			}
+		}
+
+		json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
+		if (sampleRateJ) {
+			setSampleRate(json_number_value(sampleRateJ));
+		}
+
+		json_t *blockSizeJ = json_object_get(rootJ, "blockSize");
+		if (blockSizeJ) {
+			setBlockSize(json_integer_value(blockSizeJ));
+		}
+	}
+
+	void initialize() {
+		closeDevice();
+	}
 };
 
 
