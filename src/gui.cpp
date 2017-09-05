@@ -192,20 +192,24 @@ void renderGui() {
 	glfwGetWindowSize(window, &windowWidth, &windowHeight);
 	gPixelRatio = (float)width / windowWidth;
 
-	// Update and render
-	glViewport(0, 0, width, height);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	bool visible = glfwGetWindowAttrib(window, GLFW_VISIBLE) && !glfwGetWindowAttrib(window, GLFW_ICONIFIED);
+	if (visible) {
+		// Update and render
+		glViewport(0, 0, width, height);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	nvgBeginFrame(gVg, width, height, gPixelRatio);
+		nvgBeginFrame(gVg, width, height, gPixelRatio);
 
-	nvgSave(gVg);
-	nvgReset(gVg);
-	nvgScale(gVg, gPixelRatio, gPixelRatio);
-	gScene->draw(gVg);
-	nvgRestore(gVg);
+		nvgSave(gVg);
+		nvgReset(gVg);
+		nvgScale(gVg, gPixelRatio, gPixelRatio);
+		gScene->draw(gVg);
+		nvgRestore(gVg);
 
-	nvgEndFrame(gVg);
+		nvgEndFrame(gVg);
+	}
+
 	glfwSwapBuffers(window);
 }
 
@@ -290,10 +294,7 @@ void guiRun() {
 		}
 		gScene->step();
 
-		bool visible = glfwGetWindowAttrib(window, GLFW_VISIBLE) && !glfwGetWindowAttrib(window, GLFW_ICONIFIED);
-		if (visible) {
-			renderGui();
-		}
+		renderGui();
 
 		double currTime = glfwGetTime();
 		// printf("%lf fps\n", 1.0/(currTime - lastTime));
