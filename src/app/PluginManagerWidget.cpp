@@ -16,7 +16,7 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct RegisterButton : Button {
 			void onAction() {
-				std::thread t(pluginOpenBrowser, "http://vcvrack.com/");
+				std::thread t(openBrowser, "http://vcvrack.com/");
 				t.detach();
 			}
 		};
@@ -60,6 +60,16 @@ PluginManagerWidget::PluginManagerWidget() {
 		logInButton->emailField = emailField;
 		logInButton->passwordField = passwordField;
 		loginWidget->addChild(logInButton);
+		pos.x += logInButton->box.size.x;
+
+		struct StatusLabel : Label {
+			void step() {
+				text = pluginGetLoginStatus();
+			}
+		};
+		Label *label = new StatusLabel();
+		label->box.pos = pos;
+		loginWidget->addChild(label);
 
 		addChild(loginWidget);
 	}
@@ -70,7 +80,7 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct ManageButton : Button {
 			void onAction() {
-				std::thread t(pluginOpenBrowser, "http://vcvrack.com/");
+				std::thread t(openBrowser, "http://vcvrack.com/");
 				t.detach();
 			}
 		};

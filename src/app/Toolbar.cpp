@@ -151,13 +151,13 @@ Toolbar::Toolbar() {
 		xPos += cpuUsageButton->box.size.x;
 	}
 
-	// xPos += margin;
-	// {
-	// 	Widget *pluginManager = new PluginManagerWidget();
-	// 	pluginManager->box.pos = Vec(xPos, margin);
-	// 	addChild(pluginManager);
-	// 	xPos += pluginManager->box.size.x;
-	// }
+	xPos += margin;
+	{
+		Widget *pluginManager = new PluginManagerWidget();
+		pluginManager->box.pos = Vec(xPos, margin);
+		addChild(pluginManager);
+		xPos += pluginManager->box.size.x;
+	}
 }
 
 void Toolbar::draw(NVGcontext *vg) {

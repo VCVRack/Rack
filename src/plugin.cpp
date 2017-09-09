@@ -8,7 +8,6 @@
 #include <sys/param.h> // for MAXPATHLEN
 #include <fcntl.h>
 
-#include <curl/curl.h>
 #include <zip.h>
 #include <jansson.h>
 
@@ -23,17 +22,18 @@
 #include <dirent.h>
 
 #include "plugin.hpp"
+#include "util/request.hpp"
 
 
 namespace rack {
 
 std::list<Plugin*> gPlugins;
 
-static const std::string apiUrl = "http://localhost:8081";
 static std::string token;
 static bool isDownloading = false;
 static float downloadProgress = 0.0;
 static std::string downloadName;
+static std::string loginStatus;
 
 
 Plugin::~Plugin() {
@@ -92,7 +92,7 @@ static int loadPlugin(std::string slug) {
 }
 
 void pluginInit() {
-	curl_global_init(CURL_GLOBAL_NOTHING);
+	requestInit();
 
 	// Load core
 	// This function is defined in core.cpp
@@ -118,49 +118,13 @@ void pluginDestroy() {
 		delete plugin;
 	}
 	gPlugins.clear();
-	curl_global_cleanup();
+	requestDestroy();
 }
 
 ////////////////////
 // CURL and libzip helpers
 ////////////////////
 
-static size_t write_file_callback(void *data, size_t size, size_t nmemb, void *p) {
-	int fd = *((int*)p);
-	ssize_t len = write(fd, data, size*nmemb);
-	return len;
-}
-
-static int progress_callback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
-	if (dltotal == 0.0)
-		return 0;
-	float progress = dlnow / dltotal;
-	downloadProgress = progress;
-	return 0;
-}
-
-static CURLcode download_file(int fd, const char *url) {
-	CURL *curl = curl_easy_init();
-
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_file_callback);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fd);
-	curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
-	curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, NULL);
-	CURLcode res = curl_easy_perform(curl);
-	curl_easy_cleanup(curl);
-	return res;
-}
-
-static size_t write_string_callback(void *data, size_t size, size_t nmemb, void *p) {
-	std::string &text = *((std::string*)p);
-	char *dataStr = (char*) data;
-	size_t len = size * nmemb;
-	text.append(dataStr, len);
-	return len;
-}
 
 static void extract_zip(const char *dir, int zipfd) {
 	int err = 0;
@@ -210,50 +174,32 @@ cleanup:
 // plugin manager
 ////////////////////
 
-void pluginOpenBrowser(std::string url) {
-	// shell injection is possible, so make sure the URL is trusted
-#if ARCH_LIN
-	std::string command = "xdg-open " + url;
-	system(command.c_str());
-#endif
-#if ARCH_MAC
-	std::string command = "open " + url;
-	system(command.c_str());
-#endif
-#if ARCH_WIN
-	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#endif
-}
+static std::string apiHost = "http://api.vcvrack.com";
 
 void pluginLogIn(std::string email, std::string password) {
-	CURL *curl = curl_easy_init();
-	assert(curl);
+	json_t *reqJ = json_object();
+	json_object_set(reqJ, "email", json_string(email.c_str()));
+	json_object_set(reqJ, "password", json_string(password.c_str()));
+	json_t *resJ = requestJson(POST_METHOD, apiHost + "/token", reqJ);
 
-	std::string postFields = "email=" + email + "&password=" + password;
-	std::string url = apiUrl + "/token";
-	std::string resText;
-
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_string_callback);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postFields.c_str());
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, postFields.size());
-	CURLcode res = curl_easy_perform(curl);
-	curl_easy_cleanup(curl);
-
-	if (res == CURLE_OK) {
-		// Parse JSON response
-		json_error_t error;
-		json_t *rootJ = json_loads(resText.c_str(), 0, &error);
-		if (rootJ) {
-			json_t *tokenJ = json_object_get(rootJ, "token");
-			if (tokenJ) {
-				// Set the token, which logs the user in
-				token = json_string_value(tokenJ);
-			}
-			json_decref(rootJ);
+	if (resJ) {
+		// TODO parse response
+		json_t *errorJ = json_object_get(resJ, "error");
+		if (errorJ) {
+			const char *errorStr = json_string_value(errorJ);
+			loginStatus = errorStr;
 		}
+		else {
+			json_t *tokenJ = json_object_get(resJ, "token");
+			if (tokenJ) {
+				const char *tokenStr = json_string_value(tokenJ);
+				token = tokenStr;
+				loginStatus = "";
+			}
+		}
+		json_decref(resJ);
 	}
+	json_decref(reqJ);
 }
 
 void pluginLogOut() {
@@ -261,6 +207,9 @@ void pluginLogOut() {
 }
 
 static void pluginRefreshPlugin(json_t *pluginJ) {
+	// TODO
+	// Refactor
+
 	json_t *slugJ = json_object_get(pluginJ, "slug");
 	if (!slugJ) return;
 	std::string slug = json_string_value(slugJ);
@@ -290,7 +239,7 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 	snprintf(path, sizeof(path), "%s/%s.zip", dir, slug.c_str());
 	int zip = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 	// Download zip
-	download_file(zip, url.c_str());
+	// download_file(zip, url.c_str());
 	// Unzip file
 	lseek(zip, 0, SEEK_SET);
 	extract_zip(dir, zip);
@@ -302,9 +251,13 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 }
 
 void pluginRefresh() {
+	// TODO
+	// Refactor with requestJson()
+
 	if (token.empty())
 		return;
 
+	/*
 	isDownloading = true;
 	downloadProgress = 0.0;
 	downloadName = "";
@@ -341,6 +294,7 @@ void pluginRefresh() {
 	}
 
 	isDownloading = false;
+	*/
 }
 
 void pluginCancelDownload() {
@@ -361,6 +315,10 @@ float pluginGetDownloadProgress() {
 
 std::string pluginGetDownloadName() {
 	return downloadName;
+}
+
+std::string pluginGetLoginStatus() {
+	return loginStatus;
 }
 
 

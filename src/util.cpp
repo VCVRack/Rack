@@ -49,5 +49,20 @@ std::string ellipsize(std::string s, size_t len) {
 		return s.substr(0, len - 3) + "...";
 }
 
+void openBrowser(std::string url) {
+	// shell injection is possible, so make sure the URL is trusted or hard coded
+#if ARCH_LIN
+	std::string command = "xdg-open " + url;
+	system(command.c_str());
+#endif
+#if ARCH_MAC
+	std::string command = "open " + url;
+	system(command.c_str());
+#endif
+#if ARCH_WIN
+	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+#endif
+}
+
 
 } // namespace rack

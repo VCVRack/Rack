@@ -52,6 +52,7 @@ std::string stringf(const char *format, ...);
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
 std::string ellipsize(std::string s, size_t len);
 
+void openBrowser(std::string url);
 
 /** Threads which obtain a VIPLock will cause wait() to block for other less important threads.
 This does not provide the VIPs with an exclusive lock. That should be left up to another mutex shared between the less important thread.
