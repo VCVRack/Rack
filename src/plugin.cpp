@@ -126,17 +126,22 @@ void pluginDestroy() {
 ////////////////////
 
 
-static void extract_zip(const char *dir, int zipfd) {
+static void extractZip(const char *filename, const char *dir) {
 	int err = 0;
-	zip_t *za = zip_fdopen(zipfd, 0, &err);
+	zip_t *za = zip_open(filename, 0, &err);
+	printf("err: %d\n", err);
+	printf("0\n");
 	if (!za) return;
+	printf("1\n");
 	if (err) goto cleanup;
+	printf("2\n");
 
 	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
 		zip_stat_t zs;
 		err = zip_stat_index(za, i, 0, &zs);
 		if (err) goto cleanup;
 		int nameLen = strlen(zs.name);
+		printf("3\n");
 
 		char path[MAXPATHLEN];
 		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
@@ -152,6 +157,7 @@ static void extract_zip(const char *dir, int zipfd) {
 			int out = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 			assert(out != -1);
 
+			printf("4\n");
 			while (1) {
 				char buffer[4096];
 				int len = zip_fread(zf, buffer, sizeof(buffer));
@@ -167,6 +173,7 @@ static void extract_zip(const char *dir, int zipfd) {
 	}
 
 cleanup:
+	printf("5\n");
 	zip_close(za);
 }
 
@@ -181,9 +188,9 @@ void pluginLogIn(std::string email, std::string password) {
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
 	json_t *resJ = requestJson(POST_METHOD, apiHost + "/token", reqJ);
+	json_decref(reqJ);
 
 	if (resJ) {
-		// TODO parse response
 		json_t *errorJ = json_object_get(resJ, "error");
 		if (errorJ) {
 			const char *errorStr = json_string_value(errorJ);
@@ -199,7 +206,6 @@ void pluginLogIn(std::string email, std::string password) {
 		}
 		json_decref(resJ);
 	}
-	json_decref(reqJ);
 }
 
 void pluginLogOut() {
@@ -207,94 +213,75 @@ void pluginLogOut() {
 }
 
 static void pluginRefreshPlugin(json_t *pluginJ) {
-	// TODO
-	// Refactor
-
 	json_t *slugJ = json_object_get(pluginJ, "slug");
 	if (!slugJ) return;
-	std::string slug = json_string_value(slugJ);
+	const char *slug = json_string_value(slugJ);
 
 	json_t *nameJ = json_object_get(pluginJ, "name");
 	if (!nameJ) return;
-	std::string name = json_string_value(nameJ);
+	const char *name = json_string_value(nameJ);
 
-	json_t *urlJ = json_object_get(pluginJ, "download");
-	if (!urlJ) return;
-	std::string url = json_string_value(urlJ);
+	json_t *downloadJ = json_object_get(pluginJ, "download");
+	if (!downloadJ) return;
+	const char *download = json_string_value(downloadJ);
 
 	// Find slug in plugins list
 	for (Plugin *p : gPlugins) {
 		if (p->slug == slug) {
-			return;
+			// return;
 		}
 	}
 
 	// If plugin is not loaded, download the zip file to /plugins
-	fprintf(stderr, "Downloading %s from %s\n", name.c_str(), url.c_str());
 	downloadName = name;
 	downloadProgress = 0.0;
 
-	const char *dir = "plugins";
-	char path[MAXPATHLEN];
-	snprintf(path, sizeof(path), "%s/%s.zip", dir, slug.c_str());
-	int zip = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 	// Download zip
-	// download_file(zip, url.c_str());
-	// Unzip file
-	lseek(zip, 0, SEEK_SET);
-	extract_zip(dir, zip);
-	// Close file
-	close(zip);
-	downloadName = "";
+	std::string filename = "plugins/";
+	filename += slug;
+	filename += ".zip";
+	bool success = requestDownload(download, filename, &downloadProgress);
+	if (success) {
+		// Unzip file
+		extractZip(filename.c_str(), "plugins");
+		// Load plugin
+		loadPlugin(slug);
+	}
 
-	// Load plugin
+	downloadName = "";
 }
 
 void pluginRefresh() {
-	// TODO
-	// Refactor with requestJson()
-
 	if (token.empty())
 		return;
 
-	/*
 	isDownloading = true;
 	downloadProgress = 0.0;
 	downloadName = "";
 
-	// Get plugin list from /plugin
-	CURL *curl = curl_easy_init();
-	assert(curl);
+	json_t *reqJ = json_object();
+	json_object_set(reqJ, "token", json_string(token.c_str()));
+	json_t *resJ = requestJson(GET_METHOD, apiHost + "/purchases", reqJ);
+	json_decref(reqJ);
 
-	std::string url = apiUrl + "/plugins?token=" + token;
-	std::string resText;
-
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_string_callback);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
-	CURLcode res = curl_easy_perform(curl);
-	curl_easy_cleanup(curl);
-
-	if (res == CURLE_OK) {
-		// Parse JSON response
-		json_error_t error;
-		json_t *rootJ = json_loads(resText.c_str(), 0, &error);
-		if (rootJ) {
-			json_t *pluginsJ = json_object_get(rootJ, "plugins");
-			if (pluginsJ) {
-				// Iterate through each plugin object
-				size_t index;
-				json_t *pluginJ;
-				json_array_foreach(pluginsJ, index, pluginJ) {
-					pluginRefreshPlugin(pluginJ);
-				}
-			}
-			json_decref(rootJ);
+	if (resJ) {
+		json_t *errorJ = json_object_get(resJ, "error");
+		if (errorJ) {
+			const char *errorStr = json_string_value(errorJ);
+			printf("Plugin refresh error: %s\n", errorStr);
 		}
+		else {
+			json_t *purchasesJ = json_object_get(resJ, "purchases");
+			size_t index;
+			json_t *purchaseJ;
+			json_array_foreach(purchasesJ, index, purchaseJ) {
+				pluginRefreshPlugin(purchaseJ);
+			}
+		}
+		json_decref(resJ);
 	}
 
 	isDownloading = false;
-	*/
 }
 
 void pluginCancelDownload() {
