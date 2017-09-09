@@ -129,19 +129,14 @@ void pluginDestroy() {
 static void extractZip(const char *filename, const char *dir) {
 	int err = 0;
 	zip_t *za = zip_open(filename, 0, &err);
-	printf("err: %d\n", err);
-	printf("0\n");
 	if (!za) return;
-	printf("1\n");
 	if (err) goto cleanup;
-	printf("2\n");
 
 	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
 		zip_stat_t zs;
 		err = zip_stat_index(za, i, 0, &zs);
 		if (err) goto cleanup;
 		int nameLen = strlen(zs.name);
-		printf("3\n");
 
 		char path[MAXPATHLEN];
 		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
@@ -157,7 +152,6 @@ static void extractZip(const char *filename, const char *dir) {
 			int out = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
 			assert(out != -1);
 
-			printf("4\n");
 			while (1) {
 				char buffer[4096];
 				int len = zip_fread(zf, buffer, sizeof(buffer));
@@ -173,7 +167,6 @@ static void extractZip(const char *filename, const char *dir) {
 	}
 
 cleanup:
-	printf("5\n");
 	zip_close(za);
 }
 
@@ -268,7 +261,7 @@ void pluginRefresh() {
 		json_t *errorJ = json_object_get(resJ, "error");
 		if (errorJ) {
 			const char *errorStr = json_string_value(errorJ);
-			printf("Plugin refresh error: %s\n", errorStr);
+			fprintf(stderr, "Plugin refresh error: %s\n", errorStr);
 		}
 		else {
 			json_t *purchasesJ = json_object_get(resJ, "purchases");
