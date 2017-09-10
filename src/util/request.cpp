@@ -123,7 +123,9 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 	if (!curl)
 		return false;
 
-	FILE *file = fopen(filename.c_str(), "w");
+	FILE *file = fopen(filename.c_str(), "wb");
+	if (!file)
+		return false;
 
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	curl_easy_setopt(curl, CURLOPT_VERBOSE, false);

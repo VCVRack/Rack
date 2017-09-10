@@ -218,7 +218,7 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 	// Find slug in plugins list
 	for (Plugin *p : gPlugins) {
 		if (p->slug == slug) {
-			// return;
+			return;
 		}
 	}
 
