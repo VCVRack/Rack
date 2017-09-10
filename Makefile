@@ -129,7 +129,7 @@ endif
 
 ifeq ($(ARCH), mac)
 	cd dist && ln -s /Applications Applications
-	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack.dmg
+	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack-$(VERSION)-$(ARCH).dmg
 else
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
