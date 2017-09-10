@@ -84,27 +84,34 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libsamplerate.so.0 dist/Rack/
 endif
 ifeq ($(ARCH), mac)
+	mkdir -p $(BUNDLE)
 	mkdir -p $(BUNDLE)/Contents
+	mkdir -p $(BUNDLE)/Contents/Resources
 	cp Info.plist $(BUNDLE)/Contents/
 
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp Rack $(BUNDLE)/Contents/MacOS/
+	cp icon.icns $(BUNDLE)/Contents/Resources/
 
 	otool -L $(BUNDLE)/Contents/MacOS/Rack
 
-	# cp /usr/local/opt/glew/lib/libGLEW.2.0.0.dylib $(BUNDLE)/Contents/MacOS/
-	# cp /usr/local/opt/jansson/lib/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/
-	# cp /usr/local/opt/portaudio/lib/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/
-	# cp /usr/local/opt/portmidi/lib/libportmidi.dylib $(BUNDLE)/Contents/MacOS/
-	# cp /usr/local/opt/libsamplerate/lib/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/
-	# cp /usr/local/opt/libzip/lib/libzip.4.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libzip.5.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libportmidi.dylib $(BUNDLE)/Contents/MacOS/
 
-	# install_name_tool -change /usr/local/opt/glew/lib/libGLEW.2.0.0.dylib @executable_path/libGLEW.2.0.0.dylib $(BUNDLE)/Contents/MacOS/Rack
-	# install_name_tool -change /usr/local/opt/jansson/lib/libjansson.4.dylib @executable_path/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/Rack
-	# install_name_tool -change /usr/local/opt/portaudio/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/Rack
-	# install_name_tool -change /usr/local/opt/portmidi/lib/libportmidi.dylib @executable_path/libportmidi.dylib $(BUNDLE)/Contents/MacOS/Rack
-	# install_name_tool -change /usr/local/opt/libsamplerate/lib/libsamplerate.0.dylib @executable_path/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/Rack
-	# install_name_tool -change /usr/local/opt/libzip/lib/libzip.4.dylib @executable_path/libzip.4.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change /usr/local/lib/libGLEW.2.1.0.dylib @executable_path/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change lib/libglfw.3.dylib @executable_path/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libjansson.4.dylib @executable_path/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libsamplerate.0.dylib @executable_path/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libcurl.4.dylib @executable_path/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libzip.5.dylib @executable_path/libzip.5.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change @rpath/libportmidi.dylib @executable_path/libportmidi.dylib $(BUNDLE)/Contents/MacOS/Rack
 
 	otool -L $(BUNDLE)/Contents/MacOS/Rack
 
