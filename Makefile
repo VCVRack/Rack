@@ -54,7 +54,7 @@ ifeq ($(ARCH), win)
 endif
 
 clean:
-	rm -rf $(TARGET) build dist
+	rm -rfv $(TARGET) build dist
 
 # For Windows resources
 %.res: %.rc
@@ -127,4 +127,9 @@ endif
 	$(MAKE) -C plugins/Fundamental dist
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 
+ifeq ($(ARCH), mac)
+	cd dist && ln -s /Applications Applications
+	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack.dmg
+else
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+endif
