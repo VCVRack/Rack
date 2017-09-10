@@ -53,26 +53,33 @@ void fixCwd() {
 	if (isCorrectCwd())
 		return;
 
+/*
 	// Get path of binary inside the app bundle
-	// It should be something like */Rack.app/Contents/MacOS
+	// It should be something like .../Rack.app/Contents/MacOS
 	char path[PATH_MAX];
 	uint32_t pathLen = sizeof(path);
 	int err = _NSGetExecutablePath(path, &pathLen);
 	assert(!err);
+	if (isCorrectCwd())
+		return;
 
 	// Switch to the directory of the actual binary
 	chdir(dirname(path));
+	if (isCorrectCwd())
+		return;
+
 	// and then go up three directories to get to the parent directory
 	chdir("../../../");
 	if (isCorrectCwd())
 		return;
+*/
 
 	// Switch to a default absolute path
 	chdir("/Applications/Rack");
 	if (isCorrectCwd())
 		return;
 
-	alert("Install Rack", "To install Rack, please move the Rack directory to your /Applications folder.", 2);
+	alert("Install Rack", "To install Rack, please move the Rack directory (including the Rack app and plugins directory) to the /Applications folder.", 2);
 	exit(1);
 }
 #endif

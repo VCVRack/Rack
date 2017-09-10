@@ -19,7 +19,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Rack</string>
 	<key>CFBundleIconFile</key>
-	<string></string>
+	<string>icon</string>
 	<key>CFBundleLongVersionString</key>
 	<string>0.0.0</string>
 	<key>CFBundleShortVersionString</key>
@@ -27,6 +27,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHighResolutionCapable</key>
-	<string>NO</string>
+	<string>YES</string>
 </dict>
 </plist>
