@@ -33,9 +33,10 @@ ifeq ($(ARCH), win)
 	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
+		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lportaudio_x64 -lportmidi \
+		-Wl,-Bstatic -ljansson -lsamplerate
 	TARGET = Rack.exe
-	# OBJECTS = Rack.res
+	OBJECTS = Rack.res
 endif
 
 
@@ -80,8 +81,6 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libzip.so.5 dist/Rack/
 	cp dep/lib/libportaudio.so.2 dist/Rack/
 	cp dep/lib/libportmidi.so dist/Rack/
-	cp dep/lib/libsamplerate.so.0 dist/Rack/
-	cp dep/lib/libsamplerate.so.0 dist/Rack/
 endif
 ifeq ($(ARCH), mac)
 	mkdir -p $(BUNDLE)
@@ -118,9 +117,19 @@ ifeq ($(ARCH), mac)
 	cp -R Rack.app dist/Rack/
 endif
 ifeq ($(ARCH), win)
-	# TODO Copy dlls
-	cp Rack/*.dll dist/Rack/
-	cp Rack/Rack.exe dist/Rack/
+	cp Rack.exe dist/Rack/
+	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
+	cp /mingw64/bin/zlib1.dll dist/Rack/
+	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
+	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
+	cp dep/bin/glew32.dll dist/Rack/
+	cp dep/bin/glfw3.dll dist/Rack/
+	cp dep/bin/libcurl-4.dll dist/Rack/
+	cp dep/bin/libjansson-4.dll dist/Rack/
+	cp dep/bin/libportmidi.dll dist/Rack/
+	cp dep/bin/libsamplerate-0.dll dist/Rack/
+	cp dep/bin/libzip-5.dll dist/Rack/
+	cp dep/bin/portaudio_x64.dll dist/Rack/
 endif
 
 	# Fundamental

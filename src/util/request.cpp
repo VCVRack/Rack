@@ -13,15 +13,6 @@ static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *us
 }
 
 
-void requestInit() {
-	curl_global_init(CURL_GLOBAL_NOTHING);
-}
-
-void requestDestroy() {
-	curl_global_cleanup();
-}
-
-
 json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 	CURL *curl = curl_easy_init();
 	if (!curl)
@@ -91,7 +82,9 @@ json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 
 	// Perform request
 	printf("Requesting %s\n", url.c_str());
+	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	CURLcode res = curl_easy_perform(curl);
+	printf("%d\n", res);
 
 	// Cleanup
 	if (method != GET_METHOD)

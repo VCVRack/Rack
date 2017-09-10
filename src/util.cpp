@@ -3,6 +3,10 @@
 #include <stdarg.h>
 #include <random>
 
+#if ARCH_WIN
+#include <windows.h>
+#include <shellapi.h>
+#endif
 
 namespace rack {
 

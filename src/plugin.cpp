@@ -13,7 +13,6 @@
 
 #if ARCH_WIN
 	#include <windows.h>
-	#include <shellapi.h>
 	#include <direct.h>
 	#define mkdir(_dir, _perms) _mkdir(_dir)
 #else
@@ -56,7 +55,8 @@ static int loadPlugin(std::string slug) {
 	#if ARCH_WIN
 		HINSTANCE handle = LoadLibrary(path.c_str());
 		if (!handle) {
-			fprintf(stderr, "Failed to load library %s\n", path.c_str());
+			int error = GetLastError();
+			fprintf(stderr, "Failed to load library %s: %d\n", path.c_str(), error);
 			return -1;
 		}
 	#elif ARCH_LIN || ARCH_MAC
@@ -92,8 +92,6 @@ static int loadPlugin(std::string slug) {
 }
 
 void pluginInit() {
-	requestInit();
-
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *corePlugin = init();
@@ -118,7 +116,6 @@ void pluginDestroy() {
 		delete plugin;
 	}
 	gPlugins.clear();
-	requestDestroy();
 }
 
 ////////////////////

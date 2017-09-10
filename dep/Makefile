@@ -93,21 +93,21 @@ $(portmidi):
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
 
-$(asio):
-	echo "For ASIO support, download and move the ASIO SDK to $@"
-	exit 1
-
+$(portaudio):
 ifeq ($(ARCH),win)
-PORTAUDIO_DEPS = $(asio)
-PORTAUDIO_ASIO = --with-host_os=mingw --with-winapi=wmme,asio --with-asiodir="../$(asio)"
-endif
-
-$(portaudio): $(PORTAUDIO_DEPS)
+	$(WGET) https://github.com/adfernandes/precompiled-portaudio-windows/raw/master/portaudio-r1891-build.zip
+	$(UNZIP) portaudio-r1891-build.zip
+	mv portaudio-r1891-build $@
+	cp portaudio/lib/x64/ReleaseMinDependency/portaudio_x64.lib "$(LOCAL)/lib"
+	cp portaudio/lib/x64/ReleaseMinDependency/portaudio_x64.dll "$(LOCAL)/bin"
+	cp portaudio/include/*.h "$(LOCAL)/include"
+else
 	$(WGET) http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz
 	$(UNTAR) pa_stable_v190600_20161030.tgz
 	cd $@ && ./configure --prefix="$(LOCAL)" $(PORTAUDIO_ASIO)
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
+endif
 
 clean:
 	git clean -fdxi
