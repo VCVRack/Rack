@@ -124,17 +124,13 @@ void pluginDestroy() {
 // CURL and libzip helpers
 ////////////////////
 
-
-static void extractZip(const char *filename, const char *dir) {
+static int extractZipHandle(zip_t *za, const char *dir) {
 	int err = 0;
-	zip_t *za = zip_open(filename, 0, &err);
-	if (!za) return;
-	if (err) goto cleanup;
-
 	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
 		zip_stat_t zs;
 		err = zip_stat_index(za, i, 0, &zs);
-		if (err) goto cleanup;
+		if (err)
+			return err;
 		int nameLen = strlen(zs.name);
 
 		char path[MAXPATHLEN];
@@ -142,11 +138,13 @@ static void extractZip(const char *filename, const char *dir) {
 
 		if (zs.name[nameLen - 1] == '/') {
 			err = mkdir(path, 0755);
-			if (err) goto cleanup;
+			if (err)
+				return err;
 		}
 		else {
 			zip_file_t *zf = zip_fopen_index(za, i, 0);
-			if (!zf) goto cleanup;
+			if (!zf)
+				return 1;
 
 			FILE *outFile = fopen(path, "wb");
 			if (!outFile)
@@ -161,13 +159,26 @@ static void extractZip(const char *filename, const char *dir) {
 			}
 
 			err = zip_fclose(zf);
-			assert(!err);
+			if (err)
+				return err;
 			fclose(outFile);
 		}
 	}
+	return 0;
+}
 
-cleanup:
+static int extractZip(const char *filename, const char *dir) {
+	int err = 0;
+	zip_t *za = zip_open(filename, 0, &err);
+	if (!za)
+		return 1;
+
+	if (!err) {
+		err = extractZipHandle(za, dir);
+	}
+
 	zip_close(za);
+	return err;
 }
 
 ////////////////////
@@ -236,9 +247,13 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 	bool success = requestDownload(download, filename, &downloadProgress);
 	if (success) {
 		// Unzip file
-		extractZip(filename.c_str(), "plugins");
-		// Load plugin
-		loadPlugin(slug);
+		int err = extractZip(filename.c_str(), "plugins");
+		if (!err) {
+			// Load plugin
+			loadPlugin(slug);
+			// Delete zip
+			remove(filename.c_str());
+		}
 	}
 
 	downloadName = "";
