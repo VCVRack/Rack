@@ -59,9 +59,11 @@ inline float eucmodf(float a, float base) {
 	return mod < 0.0 ? mod + base : mod;
 }
 
-/** Limits a value between a minimum and maximum */
+/** Limits a value between a minimum and maximum
+If min < max, returns max
+*/
 inline float clampf(float x, float min, float max) {
-	return x > max ? max : x < min ? min : x;
+	return fmaxf(min, fminf(max, x));
 }
 
 /** If the magnitude of x if less than eps, return 0 */
