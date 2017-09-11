@@ -15,8 +15,12 @@ void Knob::onDragStart() {
 }
 
 void Knob::onDragMove(Vec mouseRel) {
-	// Drag slower if Ctrl is held
+	// Drag slower if Ctrl is held (Command on Mac)
+#ifdef ARCH_MAC
+	if (guiIsKeyPressed(GLFW_KEY_LEFT_SUPER) || guiIsKeyPressed(GLFW_KEY_RIGHT_SUPER))
+#else
 	if (guiIsKeyPressed(GLFW_KEY_LEFT_CONTROL) || guiIsKeyPressed(GLFW_KEY_RIGHT_CONTROL))
+#endif
 		mouseRel = mouseRel.mult(0.1);
 	setValue(value - KNOB_SENSITIVITY * (maxValue - minValue) * mouseRel.y);
 }

@@ -35,6 +35,14 @@ void windowSizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
+#ifdef ARCH_MAC
+	// Ctrl-left click --> right click
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (guiIsKeyPressed(GLFW_KEY_LEFT_CONTROL) || guiIsKeyPressed(GLFW_KEY_RIGHT_CONTROL))
+			button = GLFW_MOUSE_BUTTON_RIGHT;
+	}
+#endif
+
 	if (action == GLFW_PRESS) {
 		// onMouseDown
 		Widget *w = gScene->onMouseDown(gMousePos, button);
