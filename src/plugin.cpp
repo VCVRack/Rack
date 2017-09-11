@@ -23,6 +23,11 @@
 #include "plugin.hpp"
 #include "util/request.hpp"
 
+#if LIBZIP_VERSION_MAJOR == 0 && LIBZIP_VERSION_MINOR <= 10
+typedef zip zip_t;
+typedef zip_file zip_file_t;
+typedef struct zip_stat zip_stat_t;
+#endif
 
 namespace rack {
 
@@ -131,7 +136,7 @@ static void extractZip(const char *filename, const char *dir) {
 	if (!za) return;
 	if (err) goto cleanup;
 
-	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
+	for (zip_uint64_t i = 0; i < zip_get_num_entries(za, 0); i++) {
 		zip_stat_t zs;
 		err = zip_stat_index(za, i, 0, &zs);
 		if (err) goto cleanup;

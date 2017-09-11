@@ -10,11 +10,12 @@ include arch.mk
 
 ifeq ($(ARCH), lin)
 	SOURCES += ext/osdialog/osdialog_gtk2.c
-	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
+	CFLAGS += $(shell pkg-config --cflags gtk+-2.0 gl glew glfw3 jansson libzip portaudio-2.0 samplerate)
+	CXXFLAGS += $(shell pkg-config --cflags gl glew glfw3 jansson libzip portaudio-2.0 samplerate)
 	LDFLAGS += -rdynamic \
-		-lpthread -lGL -ldl \
-		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
+		-lpthread -ldl \
+		$(shell pkg-config --libs gtk+-2.0 gl glew glfw3 jansson libzip portaudio-2.0 samplerate) \
+		-Ldep/lib -lcurl -lportmidi
 	TARGET = Rack
 endif
 

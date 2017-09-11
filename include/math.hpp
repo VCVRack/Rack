@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math.h>
+#include <cmath>
 
 
 namespace rack {
@@ -182,7 +182,7 @@ struct Vec {
 		return Vec(roundf(x), roundf(y));
 	}
 	bool isFinite() {
-		return isfinite(x) && isfinite(y);
+		return std::isfinite(x) && std::isfinite(y);
 	}
 	bool isZero() {
 		return x == 0.0 && y == 0.0;
