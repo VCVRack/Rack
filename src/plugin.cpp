@@ -92,6 +92,8 @@ static int loadPlugin(std::string slug) {
 }
 
 void pluginInit() {
+
+
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *corePlugin = init();
@@ -146,20 +148,21 @@ static void extractZip(const char *filename, const char *dir) {
 			zip_file_t *zf = zip_fopen_index(za, i, 0);
 			if (!zf) goto cleanup;
 
-			int out = open(path, O_RDWR | O_TRUNC | O_CREAT, 0644);
-			assert(out != -1);
+			FILE *outFile = fopen(path, "wb");
+			if (!outFile)
+				continue;
 
 			while (1) {
 				char buffer[4096];
 				int len = zip_fread(zf, buffer, sizeof(buffer));
 				if (len <= 0)
 					break;
-				write(out, buffer, len);
+				fwrite(buffer, 1, len, outFile);
 			}
 
 			err = zip_fclose(zf);
 			assert(!err);
-			close(out);
+			fclose(outFile);
 		}
 	}
 
