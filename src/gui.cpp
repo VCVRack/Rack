@@ -1,8 +1,5 @@
 #include <map>
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
 #include "gui.hpp"
 #include "app.hpp"
 
@@ -24,7 +21,7 @@
 
 namespace rack {
 
-static GLFWwindow *window = NULL;
+GLFWwindow *gWindow = NULL;
 std::shared_ptr<Font> gGuiFont;
 NVGcontext *gVg = NULL;
 float gPixelRatio = 0.0;
@@ -92,15 +89,15 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 #ifdef ARCH_MAC
 	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
-	int mouseMode = glfwGetInputMode(window, GLFW_CURSOR);
+	int mouseMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
 	if (mouseMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
-		glfwSetCursorPos(window, gMousePos.x, gMousePos.y);
+		glfwSetCursorPos(gWindow, gMousePos.x, gMousePos.y);
 		CGAssociateMouseAndMouseCursorPosition(true);
 		mousePos = gMousePos;
 	}
 	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
-	glfwSetCursor(window, NULL);
+	glfwSetCursor(gWindow, NULL);
 #endif
 
 	gMousePos = mousePos;
@@ -165,19 +162,19 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		if (key == GLFW_KEY_F11 || key == GLFW_KEY_ESCAPE) {
 			/*
 			// Toggle fullscreen
-			GLFWmonitor *monitor = glfwGetWindowMonitor(window);
+			GLFWmonitor *monitor = glfwGetWindowMonitor(gWindow);
 			if (monitor) {
 				// Window mode
-				glfwSetWindowMonitor(window, NULL, lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight, 0);
+				glfwSetWindowMonitor(gWindow, NULL, lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight, 0);
 			}
 			else {
 				// Fullscreen
-				glfwGetWindowPos(window, &lastWindowX, &lastWindowY);
-				glfwGetWindowSize(window, &lastWindowWidth, &lastWindowHeight);
+				glfwGetWindowPos(gWindow, &lastWindowX, &lastWindowY);
+				glfwGetWindowSize(gWindow, &lastWindowWidth, &lastWindowHeight);
 				monitor = glfwGetPrimaryMonitor();
 				assert(monitor);
 				const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-				glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+				glfwSetWindowMonitor(gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 			}
 			*/
 		}
@@ -195,12 +192,12 @@ void errorCallback(int error, const char *description) {
 
 void renderGui() {
 	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
+	glfwGetFramebufferSize(gWindow, &width, &height);
 	int windowWidth, windowHeight;
-	glfwGetWindowSize(window, &windowWidth, &windowHeight);
+	glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 	gPixelRatio = (float)width / windowWidth;
 
-	bool visible = glfwGetWindowAttrib(window, GLFW_VISIBLE) && !glfwGetWindowAttrib(window, GLFW_ICONIFIED);
+	bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);
 	if (visible) {
 		// Update and render
 		glViewport(0, 0, width, height);
@@ -218,7 +215,7 @@ void renderGui() {
 		nvgEndFrame(gVg);
 	}
 
-	glfwSwapBuffers(window);
+	glfwSwapBuffers(gWindow);
 }
 
 void guiInit() {
@@ -237,19 +234,19 @@ void guiInit() {
 	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	std::string title = gApplicationName + " " + gApplicationVersion;
-	window = glfwCreateWindow(1000, 750, title.c_str(), NULL, NULL);
-	assert(window);
-	glfwMakeContextCurrent(window);
+	gWindow = glfwCreateWindow(1000, 750, title.c_str(), NULL, NULL);
+	assert(gWindow);
+	glfwMakeContextCurrent(gWindow);
 
 	glfwSwapInterval(1);
 
-	glfwSetWindowSizeCallback(window, windowSizeCallback);
-	glfwSetMouseButtonCallback(window, mouseButtonCallback);
-	// glfwSetCursorPosCallback(window, cursorPosCallback);
-	glfwSetCursorEnterCallback(window, cursorEnterCallback);
-	glfwSetScrollCallback(window, scrollCallback);
-	glfwSetCharCallback(window, charCallback);
-	glfwSetKeyCallback(window, keyCallback);
+	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
+	glfwSetMouseButtonCallback(gWindow, mouseButtonCallback);
+	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
+	glfwSetCursorEnterCallback(gWindow, cursorEnterCallback);
+	glfwSetScrollCallback(gWindow, scrollCallback);
+	glfwSetCharCallback(gWindow, charCallback);
+	glfwSetKeyCallback(gWindow, keyCallback);
 
 	// Set up GLEW
 	glewExperimental = GL_TRUE;
@@ -262,7 +259,7 @@ void guiInit() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
-	glfwSetWindowSizeLimits(window, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
 	gVg = nvgCreateGL2(NVG_ANTIALIAS);
@@ -279,26 +276,26 @@ void guiDestroy() {
 	gGuiFont.reset();
 	nvgDeleteGL2(gVg);
 	// nvgDeleteGL3(gVg);
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(gWindow);
 	glfwTerminate();
 }
 
 void guiRun() {
-	assert(window);
+	assert(gWindow);
 	{
 		int width, height;
-		glfwGetWindowSize(window, &width, &height);
-		windowSizeCallback(window, width, height);
+		glfwGetWindowSize(gWindow, &width, &height);
+		windowSizeCallback(gWindow, width, height);
 	}
 	gGuiFrame = 0;
 	double lastTime = 0.0;
-	while(!glfwWindowShouldClose(window)) {
+	while(!glfwWindowShouldClose(gWindow)) {
 		gGuiFrame++;
 		glfwPollEvents();
 		{
 			double xpos, ypos;
-			glfwGetCursorPos(window, &xpos, &ypos);
-			cursorPosCallback(window, xpos, ypos);
+			glfwGetCursorPos(gWindow, &xpos, &ypos);
+			cursorPosCallback(gWindow, xpos, ypos);
 		}
 		gScene->step();
 
@@ -311,20 +308,16 @@ void guiRun() {
 	}
 }
 
-bool guiIsKeyPressed(int key) {
-	return glfwGetKey(window, key) == GLFW_PRESS;
-}
-
 void guiCursorLock() {
 #ifdef ARCH_MAC
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
 }
 
 void guiCursorUnlock() {
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 

@@ -30,12 +30,9 @@ Widget *TextField::onMouseDown(Vec pos, int button) {
 
 
 void TextField::onText(int codepoint) {
-	if (begin < end)
-		text.erase(begin, end - begin);
 	char c = codepoint;
-	text.insert(begin, &c, 1);
-	begin++;
-	end = begin;
+	std::string newText(1, c);
+	insertText(newText);
 }
 
 void TextField::onKey(int key) {
@@ -83,6 +80,21 @@ void TextField::onKey(int key) {
 		case GLFW_KEY_END:
 			end = begin = text.size();
 			break;
+		case GLFW_KEY_V:
+			if (guiIsModPressed()) {
+				const char *newText = glfwGetClipboardString(gWindow);
+				if (newText)
+					insertText(newText);
+			}
+			break;
+		case GLFW_KEY_C:
+			if (guiIsModPressed()) {
+				if (begin < end) {
+					std::string selectedText = text.substr(begin, end - begin);
+					glfwSetClipboardString(gWindow, selectedText.c_str());
+				}
+			}
+			break;
 	}
 
 	begin = mini(maxi(begin, 0), text.size());
@@ -92,6 +104,14 @@ void TextField::onKey(int key) {
 void TextField::onSelect() {
 	begin = 0;
 	end = text.size();
+}
+
+void TextField::insertText(std::string newText) {
+	if (begin < end)
+		text.erase(begin, end - begin);
+	text.insert(begin, newText);
+	begin += newText.size();
+	end = begin;
 }
 
 

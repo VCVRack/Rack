@@ -367,6 +367,7 @@ struct TextField : OpaqueWidget {
 	void onText(int codepoint);
 	void onKey(int scancode);
 	void onSelect();
+	void insertText(std::string newText);
 };
 
 struct PasswordField : TextField {
