@@ -299,11 +299,6 @@ void RackWidget::step() {
 		}
 	}
 
-	// Autosave every 15 seconds
-	if (gGuiFrame % (60*15) == 0) {
-		savePatch("autosave.json");
-	}
-
 	Widget::step();
 }
 

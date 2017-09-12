@@ -5,6 +5,8 @@
 #include <curl/curl.h>
 
 
+namespace rack {
+
 static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	std::string *str = (std::string*) userdata;
 	size_t len = size * nmemb;
@@ -145,3 +147,6 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 
 	return res == CURLE_OK;
 }
+
+
+} // namespace rack

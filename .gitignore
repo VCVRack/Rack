@@ -1,4 +1,7 @@
-Rack
-Rack.exe
-autosave.json
-build
+/Rack
+/Rack.exe
+/autosave.json
+/settings.json
+/plugins
+/build
+/dep

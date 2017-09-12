@@ -2,6 +2,7 @@
 #include "gui.hpp"
 #include "app.hpp"
 #include "plugin.hpp"
+#include "settings.hpp"
 
 
 #if ARCH_MAC
@@ -96,6 +97,7 @@ int main() {
 	engineInit();
 	guiInit();
 	sceneInit();
+	settingsLoad("settings.json");
 	gRackWidget->loadPatch("autosave.json");
 
 	engineStart();
@@ -103,6 +105,7 @@ int main() {
 	engineStop();
 
 	gRackWidget->savePatch("autosave.json");
+	settingsSave("settings.json");
 	sceneDestroy();
 	guiDestroy();
 	engineDestroy();

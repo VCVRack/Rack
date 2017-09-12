@@ -33,6 +33,7 @@ struct Model {
 };
 
 extern std::list<Plugin*> gPlugins;
+extern std::string gToken;
 
 void pluginInit();
 void pluginDestroy();

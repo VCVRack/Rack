@@ -2,6 +2,7 @@
 
 #include "gui.hpp"
 #include "app.hpp"
+#include "settings.hpp"
 
 #define NANOVG_GL2_IMPLEMENTATION
 // #define NANOVG_GL3_IMPLEMENTATION
@@ -155,7 +156,7 @@ void charCallback(GLFWwindow *window, unsigned int codepoint) {
 	}
 }
 
-static int lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight;
+// static int lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight;
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
@@ -299,7 +300,14 @@ void guiRun() {
 		}
 		gScene->step();
 
+		// Render
 		renderGui();
+
+		// Autosave every 15 seconds
+		if (gGuiFrame % (60*15) == 0) {
+			gRackWidget->savePatch("autosave.json");
+			settingsSave("settings.json");
+		}
 
 		double currTime = glfwGetTime();
 		// printf("%lf fps\n", 1.0/(currTime - lastTime));

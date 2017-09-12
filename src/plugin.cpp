@@ -27,8 +27,8 @@
 namespace rack {
 
 std::list<Plugin*> gPlugins;
+std::string gToken;
 
-static std::string token;
 static bool isDownloading = false;
 static float downloadProgress = 0.0;
 static std::string downloadName;
@@ -204,7 +204,7 @@ void pluginLogIn(std::string email, std::string password) {
 			json_t *tokenJ = json_object_get(resJ, "token");
 			if (tokenJ) {
 				const char *tokenStr = json_string_value(tokenJ);
-				token = tokenStr;
+				gToken = tokenStr;
 				loginStatus = "";
 			}
 		}
@@ -213,7 +213,7 @@ void pluginLogIn(std::string email, std::string password) {
 }
 
 void pluginLogOut() {
-	token = "";
+	gToken = "";
 }
 
 static void pluginRefreshPlugin(json_t *pluginJ) {
@@ -260,7 +260,7 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 }
 
 void pluginRefresh() {
-	if (token.empty())
+	if (gToken.empty())
 		return;
 
 	isDownloading = true;
@@ -268,7 +268,7 @@ void pluginRefresh() {
 	downloadName = "";
 
 	json_t *reqJ = json_object();
-	json_object_set(reqJ, "token", json_string(token.c_str()));
+	json_object_set(reqJ, "token", json_string(gToken.c_str()));
 	json_t *resJ = requestJson(GET_METHOD, apiHost + "/purchases", reqJ);
 	json_decref(reqJ);
 
@@ -297,7 +297,7 @@ void pluginCancelDownload() {
 }
 
 bool pluginIsLoggedIn() {
-	return token != "";
+	return gToken != "";
 }
 
 bool pluginIsDownloading() {
