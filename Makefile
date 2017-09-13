@@ -142,3 +142,7 @@ ifeq ($(ARCH), mac)
 else
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
+
+
+eachplugin:
+	$(foreach f,$(wildcard plugins/*),(cd $f && ${CMD});)
