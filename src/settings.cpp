@@ -18,12 +18,12 @@ static json_t *settingsToJson() {
 	// opacity
 	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value;
 	json_t *opacityJ = json_real(opacity);
-	json_object_set_new(rootJ, "opacity", opacityJ);
+	json_object_set_new(rootJ, "wireOpacity", opacityJ);
 
 	// tension
 	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
 	json_t *tensionJ = json_real(tension);
-	json_object_set_new(rootJ, "tension", tensionJ);
+	json_object_set_new(rootJ, "wireTension", tensionJ);
 
 	return rootJ;
 }
@@ -35,12 +35,12 @@ static void settingsFromJson(json_t *rootJ) {
 		gToken = json_string_value(tokenJ);
 
 	// opacity
-	json_t *opacityJ = json_object_get(rootJ, "opacity");
+	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");
 	if (opacityJ)
 		dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value = json_number_value(opacityJ);
 
 	// tension
-	json_t *tensionJ = json_object_get(rootJ, "tension");
+	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
 		dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value = json_number_value(tensionJ);
 }
