@@ -36,8 +36,9 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 #ifdef ARCH_MAC
 	// Ctrl-left click --> right click
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (guiIsKeyPressed(GLFW_KEY_LEFT_CONTROL) || guiIsKeyPressed(GLFW_KEY_RIGHT_CONTROL))
+		if (glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
 			button = GLFW_MOUSE_BUTTON_RIGHT;
+		}
 	}
 #endif
 
