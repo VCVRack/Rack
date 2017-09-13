@@ -502,7 +502,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_INPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i);
+		label->text = stringf("%d", i + 1);
 		addChild(label);
 
 		xPos += 37 + margin;
@@ -515,7 +515,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_INPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i);
+		label->text = stringf("%d", i + 1);
 		addChild(label);
 
 		xPos += 37 + margin;
@@ -536,7 +536,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_OUTPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i);
+		label->text = stringf("%d", i + 1);
 		addChild(label);
 
 		xPos += 37 + margin;
@@ -549,7 +549,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_OUTPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i);
+		label->text = stringf("%d", i + 1);
 		addChild(label);
 
 		xPos += 37 + margin;
