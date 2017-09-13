@@ -6,8 +6,6 @@
 
 namespace rack {
 
-static const char *filters = "JSON Patch\0*.json\0";
-
 
 struct NewItem : MenuItem {
 	void onAction() {
@@ -17,7 +15,7 @@ struct NewItem : MenuItem {
 
 struct SaveItem : MenuItem {
 	void onAction() {
-		char *path = osdialog_file(OSDIALOG_SAVE, "./patches", "Untitled.json", NULL);
+		char *path = osdialog_file(OSDIALOG_SAVE, "./patches", "Untitled.vcv", NULL);
 		if (path) {
 			gRackWidget->savePatch(path);
 			free(path);
