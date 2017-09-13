@@ -25,6 +25,6 @@ endif
 all: $(TARGET)
 
 clean:
-	rm -rfv build $(TARGET)
+	rm -rfv build $(TARGET) dist
 
 include ../../compile.mk
