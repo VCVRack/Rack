@@ -63,7 +63,7 @@ inline float eucmodf(float a, float base) {
 If min < max, returns max
 */
 inline float clampf(float x, float min, float max) {
-	return x > max ? max : x < min ? min : x;
+	return fmaxf(fminf(x, max), min);
 }
 
 /** If the magnitude of x if less than eps, return 0 */
