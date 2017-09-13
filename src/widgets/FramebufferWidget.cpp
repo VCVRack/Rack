@@ -40,7 +40,7 @@ void FramebufferWidget::step() {
 		internal->box.pos = padding.neg();
 		internal->box.size = box.size.plus(padding.mult(2));
 		Vec fbSize = internal->box.size.mult(gPixelRatio);
-		assert(fbSize.isFinite());
+		// assert(fbSize.isFinite());
 
 		internal->setFramebuffer(NULL);
 		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, fbSize.x, fbSize.y, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);

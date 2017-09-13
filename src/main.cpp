@@ -86,12 +86,6 @@ void fixCwd() {
 #endif
 
 
-#ifdef ARCH_LIN
-// Tell Linux linker to request older version of glibc
-__asm__(".symver realpath,realpath@GLIBC_2.2.5");
-#endif
-
-
 using namespace rack;
 
 int main() {

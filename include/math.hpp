@@ -181,9 +181,6 @@ struct Vec {
 	Vec round() {
 		return Vec(roundf(x), roundf(y));
 	}
-	bool isFinite() {
-		return isfinite(x) && isfinite(y);
-	}
 	bool isZero() {
 		return x == 0.0 && y == 0.0;
 	}
