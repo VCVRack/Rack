@@ -143,6 +143,7 @@ else
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 
+CMD ?= make
 
 eachplugin:
 	$(foreach f,$(wildcard plugins/*),(cd $f && ${CMD});)
