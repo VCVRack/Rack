@@ -11,7 +11,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.vcvrack.rack</string>
 	<key>CFBundleVersion</key>
-	<string>0.0.0</string>
+	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
@@ -21,9 +21,9 @@
 	<key>CFBundleIconFile</key>
 	<string>icon</string>
 	<key>CFBundleLongVersionString</key>
-	<string>0.0.0</string>
+	<string></string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.0</string>
+	<string></string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHighResolutionCapable</key>
