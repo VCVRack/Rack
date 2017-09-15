@@ -121,6 +121,20 @@ Widget *Widget::onMouseMove(Vec pos, Vec mouseRel) {
 	return NULL;
 }
 
+Widget *Widget::onHoverKey(Vec pos, int key) {
+	for (auto it = children.rbegin(); it != children.rend(); it++) {
+		Widget *child = *it;
+		if (!child->visible)
+			continue;
+		if (child->box.contains(pos)) {
+			Widget *w = child->onHoverKey(pos.minus(child->box.pos), key);
+			if (w)
+				return w;
+		}
+	}
+	return NULL;
+}
+
 Widget *Widget::onScroll(Vec pos, Vec scrollRel) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;

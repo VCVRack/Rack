@@ -226,29 +226,49 @@ void RackWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-void RackWidget::repositionModule(ModuleWidget *module) {
+void RackWidget::addModule(ModuleWidget *m) {
+	moduleContainer->addChild(m);
+}
+
+void RackWidget::deleteModule(ModuleWidget *m) {
+	moduleContainer->removeChild(m);
+}
+
+void RackWidget::cloneModule(ModuleWidget *m) {
+	// Create new module from model
+	ModuleWidget *clonedModuleWidget = m->model->createModuleWidget();
+	// JSON serialization is the most straightforward way to do this
+	json_t *moduleJ = m->toJson();
+	clonedModuleWidget->fromJson(moduleJ);
+	json_decref(moduleJ);
+	clonedModuleWidget->requestedPos = m->box.pos;
+	clonedModuleWidget->requested = true;
+	addModule(clonedModuleWidget);
+}
+
+void RackWidget::repositionModule(ModuleWidget *m) {
 	// Create possible positions
-	int x0 = roundf(module->requestedPos.x / RACK_GRID_WIDTH);
-	int y0 = roundf(module->requestedPos.y / RACK_GRID_HEIGHT);
+	int x0 = roundf(m->requestedPos.x / RACK_GRID_WIDTH);
+	int y0 = roundf(m->requestedPos.y / RACK_GRID_HEIGHT);
 	std::vector<Vec> positions;
-	for (int y = maxi(0, y0 - 2); y < y0 + 2; y++) {
-		for (int x = maxi(0, x0 - 40); x < x0 + 40; x++) {
+	for (int y = maxi(0, y0 - 4); y < y0 + 4; y++) {
+		for (int x = maxi(0, x0 - 200); x < x0 + 200; x++) {
 			positions.push_back(Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
 		}
 	}
 
 	// Sort possible positions by distance to the requested position
-	Vec requestedPos = module->requestedPos;
+	Vec requestedPos = m->requestedPos;
 	std::sort(positions.begin(), positions.end(), [requestedPos](Vec a, Vec b) {
 		return a.minus(requestedPos).norm() < b.minus(requestedPos).norm();
 	});
 
 	// Find a position that does not collide
 	for (Vec pos : positions) {
-		Rect newBox = Rect(pos, module->box.size);
+		Rect newBox = Rect(pos, m->box.size);
 		bool collides = false;
 		for (Widget *child2 : moduleContainer->children) {
-			if (module == child2) continue;
+			if (m == child2) continue;
 			if (newBox.intersects(child2->box)) {
 				collides = true;
 				break;
@@ -256,7 +276,7 @@ void RackWidget::repositionModule(ModuleWidget *module) {
 		}
 		if (collides) continue;
 
-		module->box.pos = pos;
+		m->box.pos = pos;
 		break;
 	}
 }

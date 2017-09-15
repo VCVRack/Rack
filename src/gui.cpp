@@ -157,34 +157,13 @@ void charCallback(GLFWwindow *window, unsigned int codepoint) {
 	}
 }
 
-// static int lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight;
-
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		if (key == GLFW_KEY_F11 || key == GLFW_KEY_ESCAPE) {
-			/*
-			// Toggle fullscreen
-			GLFWmonitor *monitor = glfwGetWindowMonitor(gWindow);
-			if (monitor) {
-				// Window mode
-				glfwSetWindowMonitor(gWindow, NULL, lastWindowX, lastWindowY, lastWindowWidth, lastWindowHeight, 0);
-			}
-			else {
-				// Fullscreen
-				glfwGetWindowPos(gWindow, &lastWindowX, &lastWindowY);
-				glfwGetWindowSize(gWindow, &lastWindowWidth, &lastWindowHeight);
-				monitor = glfwGetPrimaryMonitor();
-				assert(monitor);
-				const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-				glfwSetWindowMonitor(gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-			}
-			*/
-		}
-		else {
-			if (gSelectedWidget) {
-				gSelectedWidget->onKey(key);
-			}
-		}
+		// onKey
+		if (gSelectedWidget && gSelectedWidget->onKey(key))
+			return;
+		// onHoverKey
+		gScene->onHoverKey(gMousePos, key);
 	}
 }
 
@@ -227,6 +206,9 @@ void guiInit() {
 	glfwSetErrorCallback(errorCallback);
 	err = glfwInit();
 	assert(err);
+
+	const char *glVersion = (const char *)glGetString(GL_VERSION);
+	printf("OpenGL version %s\n", glVersion);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -327,6 +309,14 @@ void guiCursorLock() {
 
 void guiCursorUnlock() {
 	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+bool guiIsModPressed() {
+#ifdef ARCH_MAC
+	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
+#else
+	return glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+#endif
 }
 
 

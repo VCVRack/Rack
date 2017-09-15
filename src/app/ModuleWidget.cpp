@@ -1,6 +1,7 @@
 #include "app.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
+#include "gui.hpp"
 
 
 namespace rack {
@@ -125,6 +126,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 
 	Widget::draw(vg);
 
+/*
 	// CPU usage text
 	if (dynamic_cast<RackScene*>(gScene)->toolbar->cpuUsageButton->value > 0.0) {
 		float cpuTime = module ? module->cpuTime : 0.0;
@@ -145,8 +147,36 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		bndMenuItem(vg, 0.0, 0.0, box.size.x, BND_WIDGET_HEIGHT, BND_DEFAULT, -1, text.c_str());
 		nvgRestore(vg);
 	}
+*/
 
 	nvgResetScissor(vg);
+}
+
+Widget *ModuleWidget::onMouseMove(Vec pos, Vec mouseRel) {
+	return OpaqueWidget::onMouseMove(pos, mouseRel);
+}
+
+Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
+	switch (key) {
+		case GLFW_KEY_DELETE:
+		case GLFW_KEY_BACKSPACE:
+			gRackWidget->deleteModule(this);
+			delete this;
+			break;
+		case GLFW_KEY_I:
+			if (guiIsModPressed())
+				initialize();
+			break;
+		case GLFW_KEY_R:
+			if (guiIsModPressed())
+				randomize();
+			break;
+		case GLFW_KEY_D:
+			if (guiIsModPressed())
+				gRackWidget->cloneModule(this);
+			break;
+	}
+	return NULL;
 }
 
 void ModuleWidget::onDragStart() {
@@ -185,22 +215,14 @@ struct RandomizeMenuItem : MenuItem {
 struct CloneMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
-		// Create new module from model
-		ModuleWidget *clonedModuleWidget = moduleWidget->model->createModuleWidget();
-		// JSON serialization is the most straightforward way to do this
-		json_t *moduleJ = moduleWidget->toJson();
-		clonedModuleWidget->fromJson(moduleJ);
-		json_decref(moduleJ);
-		clonedModuleWidget->requestedPos = moduleWidget->box.pos;
-		clonedModuleWidget->requested = true;
-		gRackWidget->moduleContainer->addChild(clonedModuleWidget);
+		gRackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct DeleteMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
-		gRackWidget->moduleContainer->removeChild(moduleWidget);
+		gRackWidget->deleteModule(moduleWidget);
 		delete moduleWidget;
 	}
 };
@@ -229,7 +251,7 @@ void ModuleWidget::onMouseDown(int button) {
 		menu->pushChild(disconnectItem);
 
 		CloneMenuItem *cloneItem = new CloneMenuItem();
-		cloneItem->text = "Clone";
+		cloneItem->text = "Duplicate";
 		cloneItem->moduleWidget = this;
 		menu->pushChild(cloneItem);
 

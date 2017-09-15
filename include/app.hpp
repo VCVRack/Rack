@@ -57,6 +57,8 @@ struct ModuleWidget : OpaqueWidget {
 	bool requested = false;
 	Vec requestedPos;
 	Vec dragPos;
+	Widget *onMouseMove(Vec pos, Vec mouseRel);
+	Widget *onHoverKey(Vec pos, int key);
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
@@ -97,7 +99,12 @@ struct RackWidget : OpaqueWidget {
 	json_t *toJson();
 	void fromJson(json_t *root);
 
-	void repositionModule(ModuleWidget *module);
+	void addModule(ModuleWidget *m);
+	/** Transfers ownership to the caller so they must `delete` it if that is the intension */
+	void deleteModule(ModuleWidget *m);
+	void cloneModule(ModuleWidget *m);
+	/** Moves a module to the closest non-colliding position */
+	void repositionModule(ModuleWidget *m);
 	void step();
 	void draw(NVGcontext *vg);
 

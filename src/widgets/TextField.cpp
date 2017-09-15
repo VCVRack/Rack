@@ -29,13 +29,13 @@ Widget *TextField::onMouseDown(Vec pos, int button) {
 }
 
 
-void TextField::onText(int codepoint) {
+bool TextField::onText(int codepoint) {
 	char c = codepoint;
 	std::string newText(1, c);
 	insertText(newText);
 }
 
-void TextField::onKey(int key) {
+bool TextField::onKey(int key) {
 	switch (key) {
 		case GLFW_KEY_BACKSPACE:
 			if (begin < end) {

@@ -139,6 +139,7 @@ Toolbar::Toolbar() {
 		xPos += wireTensionSlider->box.size.x;
 	}
 
+	/*
 	xPos += margin;
 	{
 		cpuUsageButton = new RadioButton();
@@ -148,6 +149,7 @@ Toolbar::Toolbar() {
 		addChild(cpuUsageButton);
 		xPos += cpuUsageButton->box.size.x;
 	}
+	*/
 
 	xPos += margin;
 	{
