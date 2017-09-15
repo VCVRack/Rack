@@ -264,10 +264,11 @@ struct Menu : OpaqueWidget {
 
 struct MenuEntry : OpaqueWidget {
 	std::string text;
+	std::string rightText;
 	MenuEntry() {
 		box.size = Vec(0, BND_WIDGET_HEIGHT);
 	}
-	float computeMinWidth(NVGcontext *vg);
+	virtual float computeMinWidth(NVGcontext *vg);
 };
 
 struct MenuLabel : MenuEntry {
@@ -277,6 +278,7 @@ struct MenuLabel : MenuEntry {
 struct MenuItem : MenuEntry {
 	BNDwidgetState state = BND_DEFAULT;
 
+	float computeMinWidth(NVGcontext *vg);
 	void draw(NVGcontext *vg);
 
 	void onMouseEnter();

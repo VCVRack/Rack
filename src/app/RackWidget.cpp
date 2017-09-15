@@ -337,7 +337,8 @@ void RackWidget::onMouseDown(int button) {
 		for (Plugin *plugin : gPlugins) {
 			for (Model *model : plugin->models) {
 				AddModuleMenuItem *item = new AddModuleMenuItem();
-				item->text = model->plugin->name + ": " + model->name;
+				item->text = model->name;
+				item->rightText = model->plugin->name;
 				item->model = model;
 				item->modulePos = modulePos;
 				menu->pushChild(item);

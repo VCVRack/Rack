@@ -7,6 +7,14 @@
 namespace rack {
 
 
+#ifdef ARCH_MAC
+	#define MOD_KEY_NAME "Cmd"
+#else
+	#define MOD_KEY_NAME "Ctrl"
+#endif
+
+
+
 extern GLFWwindow *gWindow;
 extern NVGcontext *gVg;
 extern std::shared_ptr<Font> gGuiFont;

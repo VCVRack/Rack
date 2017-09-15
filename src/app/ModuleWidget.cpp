@@ -176,7 +176,7 @@ Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 				gRackWidget->cloneModule(this);
 			break;
 	}
-	return NULL;
+	return this;
 }
 
 void ModuleWidget::onDragStart() {
@@ -237,11 +237,13 @@ void ModuleWidget::onMouseDown(int button) {
 
 		InitializeMenuItem *resetItem = new InitializeMenuItem();
 		resetItem->text = "Initialize";
+		resetItem->rightText = MOD_KEY_NAME "+I";
 		resetItem->moduleWidget = this;
 		menu->pushChild(resetItem);
 
 		RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
 		randomizeItem->text = "Randomize";
+		randomizeItem->rightText = MOD_KEY_NAME "+R";
 		randomizeItem->moduleWidget = this;
 		menu->pushChild(randomizeItem);
 
@@ -252,11 +254,13 @@ void ModuleWidget::onMouseDown(int button) {
 
 		CloneMenuItem *cloneItem = new CloneMenuItem();
 		cloneItem->text = "Duplicate";
+		cloneItem->rightText = MOD_KEY_NAME "+D";
 		cloneItem->moduleWidget = this;
 		menu->pushChild(cloneItem);
 
 		DeleteMenuItem *deleteItem = new DeleteMenuItem();
 		deleteItem->text = "Delete";
+		deleteItem->rightText = "Backspace/Delete";
 		deleteItem->moduleWidget = this;
 		menu->pushChild(deleteItem);
 	}
