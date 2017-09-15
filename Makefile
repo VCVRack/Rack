@@ -54,6 +54,13 @@ ifeq ($(ARCH), win)
 	env PATH=dep/bin:/mingw64/bin ./$<
 endif
 
+debug: $(TARGET)
+ifeq ($(ARCH), mac)
+	lldb ./Rack
+else
+	gdb -ex run ./Rack
+endif
+
 clean:
 	rm -rfv $(TARGET) build dist
 
