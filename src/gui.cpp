@@ -207,9 +207,6 @@ void guiInit() {
 	err = glfwInit();
 	assert(err);
 
-	const char *glVersion = (const char *)glGetString(GL_VERSION);
-	printf("OpenGL version %s\n", glVersion);
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

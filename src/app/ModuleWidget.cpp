@@ -152,10 +152,6 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	nvgResetScissor(vg);
 }
 
-Widget *ModuleWidget::onMouseMove(Vec pos, Vec mouseRel) {
-	return OpaqueWidget::onMouseMove(pos, mouseRel);
-}
-
 Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 	switch (key) {
 		case GLFW_KEY_DELETE:
