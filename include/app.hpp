@@ -121,6 +121,14 @@ struct Panel : TransparentWidget {
 	void draw(NVGcontext *vg);
 };
 
+struct PanelBorder : TransparentWidget {
+	void draw(NVGcontext *vg);
+};
+
+struct SVGPanel : FramebufferWidget {
+	void addBackground(std::shared_ptr<SVG> svg);
+};
+
 ////////////////////
 // params
 ////////////////////

@@ -39,7 +39,7 @@ void FramebufferWidget::step() {
 	if (dirty) {
 		internal->box.pos = padding.neg();
 		internal->box.size = box.size.plus(padding.mult(2));
-		Vec fbSize = internal->box.size.mult(gPixelRatio);
+		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 		// assert(fbSize.isFinite());
 
 		internal->setFramebuffer(NULL);
@@ -54,7 +54,7 @@ void FramebufferWidget::step() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		nvgBeginFrame(gVg, fbSize.x, fbSize.y, gPixelRatio);
 
-		nvgScale(gVg, gPixelRatio, gPixelRatio);
+		nvgScale(gVg, gPixelRatio * oversample, gPixelRatio * oversample);
 		nvgTranslate(gVg, padding.x, padding.y);
 		Widget::draw(gVg);
 
