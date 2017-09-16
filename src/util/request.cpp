@@ -103,11 +103,6 @@ json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 }
 
 
-static size_t writeFileCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-	FILE *file = (FILE*) userdata;
-	return fwrite(ptr, size, nmemb, file);
-}
-
 static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
 	float *progress = (float*) clientp;
 	if (progress) {

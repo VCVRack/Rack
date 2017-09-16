@@ -92,8 +92,6 @@ static int loadPlugin(std::string slug) {
 }
 
 void pluginInit() {
-
-
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *corePlugin = init();
@@ -242,6 +240,7 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 
 	// Download zip
 	std::string filename = "plugins/";
+	mkdir(filename.c_str(), 0755);
 	filename += slug;
 	filename += ".zip";
 	bool success = requestDownload(download, filename, &downloadProgress);
