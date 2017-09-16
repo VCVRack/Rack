@@ -14,7 +14,7 @@ ifeq ($(ARCH), lin)
 	LDFLAGS += -rdynamic \
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
+		-Ldep/lib -Ldep/lib64 -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
 	TARGET = Rack
 endif
 
@@ -44,7 +44,7 @@ all: $(TARGET)
 
 run: $(TARGET)
 ifeq ($(ARCH), lin)
-	LD_LIBRARY_PATH=dep/lib ./$<
+	LD_LIBRARY_PATH=dep/lib:dep/lib64 ./$<
 endif
 ifeq ($(ARCH), mac)
 	DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<
@@ -150,6 +150,7 @@ else
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 
+CMD ?= make
 
 eachplugin:
 	$(foreach f,$(wildcard plugins/*),(cd $f && ${CMD});)

@@ -25,6 +25,35 @@ Build Rack.
 
 	make
 
+## Building the plugins
+
+change into the plugins directory and git clone all the plugin projects, e.g.
+
+	cp plugins
+	git clone https://github.com/VCVRack/Fundamental
+
+for each plugin project:
+
+	cd <plugin project>
+	git submodule update --init
+	make
+	cd ..
+
+for the *AudibleInstruments* project you also need to init submodules inside the eurorack directory:
+
+	cd AudibleInstruments
+	git submodule update --init
+	cd eurorack
+	git submodule update --init
+	cd ..
+	make
+	cd ..
+
+go back to the main directory and start Rack:
+
+	cd ..
+	make run
+
 ## License
 
 Rack source code by [Andrew Belt](https://andrewbelt.name/) licensed under the [BSD-3-Clause](LICENSE.txt)
