@@ -3,6 +3,7 @@
 #include "gui.hpp"
 #include "app.hpp"
 #include "settings.hpp"
+#include "../ext/osdialog/osdialog.h"
 
 #define NANOVG_GL2_IMPLEMENTATION
 // #define NANOVG_GL3_IMPLEMENTATION
@@ -216,7 +217,11 @@ void guiInit() {
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	std::string title = gApplicationName + " " + gApplicationVersion;
 	gWindow = glfwCreateWindow(1000, 750, title.c_str(), NULL, NULL);
-	assert(gWindow);
+	if (!gWindow) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0? If so, are the latest drivers installed?");
+		exit(1);
+	}
+
 	glfwMakeContextCurrent(gWindow);
 
 	glfwSwapInterval(1);

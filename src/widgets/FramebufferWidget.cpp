@@ -42,6 +42,7 @@ void FramebufferWidget::step() {
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 		// assert(fbSize.isFinite());
 
+		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, fbSize.x, fbSize.y, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 		if (!fb)
