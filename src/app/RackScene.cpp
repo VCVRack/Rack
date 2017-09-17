@@ -29,5 +29,25 @@ void RackScene::draw(NVGcontext *vg) {
 	Scene::draw(vg);
 }
 
+Widget *RackScene::onHoverKey(Vec pos, int key) {
+	switch (key) {
+		case GLFW_KEY_N:
+			if (guiIsModPressed()) {
+				gRackWidget->clear();
+				return this;
+			}
+			break;
+		case GLFW_KEY_Q:
+			if (guiIsModPressed()) {
+				glfwSetWindowShouldClose(gWindow, GLFW_TRUE);
+				return this;
+			}
+			break;
+	}
+
+	return Widget::onHoverKey(pos, key);
+}
+
+
 
 } // namespace rack

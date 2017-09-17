@@ -305,6 +305,7 @@ struct RackScene : Scene {
 	RackScene();
 	void step();
 	void draw(NVGcontext *vg);
+	Widget *onHoverKey(Vec pos, int key);
 };
 
 ////////////////////

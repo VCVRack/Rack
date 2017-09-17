@@ -88,7 +88,7 @@ void fixCwd() {
 
 using namespace rack;
 
-int main() {
+int main(int argc, char* argv[]) {
 #if ARCH_MAC
 	fixCwd();
 #endif
@@ -98,7 +98,10 @@ int main() {
 	guiInit();
 	sceneInit();
 	settingsLoad("settings.json");
-	gRackWidget->loadPatch("autosave.json");
+	if (argc >= 2)
+		gRackWidget->loadPatch(argv[1]);
+	else
+		gRackWidget->loadPatch("autosave.json");
 
 	engineStart();
 	guiRun();
