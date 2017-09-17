@@ -24,6 +24,7 @@ extern float gPixelRatio;
 void guiInit();
 void guiDestroy();
 void guiRun();
+void guiClose();
 void guiCursorLock();
 void guiCursorUnlock();
 bool guiIsModPressed();

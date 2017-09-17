@@ -39,7 +39,7 @@ Widget *RackScene::onHoverKey(Vec pos, int key) {
 			break;
 		case GLFW_KEY_Q:
 			if (guiIsModPressed()) {
-				glfwSetWindowShouldClose(gWindow, GLFW_TRUE);
+				guiClose();
 				return this;
 			}
 			break;

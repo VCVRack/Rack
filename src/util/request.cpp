@@ -17,18 +17,13 @@ static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *us
 
 json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 	CURL *curl = curl_easy_init();
-	if (!curl)
-		return NULL;
+	assert(curl);
 
-	assert(dataJ);
-	char *reqStr;
-	if (method != GET_METHOD) {
-		reqStr = json_dumps(dataJ, 0);
-	}
+	char *reqStr = NULL;
 
-	// Set URL
-	if (method == GET_METHOD) {
-		if (dataJ) {
+	// Process data
+	if (dataJ) {
+		if (method == GET_METHOD) {
 			// Append ?key=value&... to url
 			url += "?";
 			bool isFirst = true;
@@ -49,7 +44,11 @@ json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 				}
 			}
 		}
+		else {
+			reqStr = json_dumps(dataJ, 0);
+		}
 	}
+
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
 	// Set HTTP method
@@ -75,7 +74,7 @@ json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
 	// Body callbacks
-	if (method != GET_METHOD)
+	if (reqStr)
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, reqStr);
 
 	std::string resText;
@@ -88,7 +87,7 @@ json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 	CURLcode res = curl_easy_perform(curl);
 
 	// Cleanup
-	if (method != GET_METHOD)
+	if (reqStr)
 		free(reqStr);
 	curl_easy_cleanup(curl);
 	curl_slist_free_all(headers);

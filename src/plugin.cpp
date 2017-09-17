@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include <unistd.h>
+#include <thread>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h> // for MAXPATHLEN
@@ -21,7 +22,9 @@
 #include <dirent.h>
 
 #include "plugin.hpp"
+#include "gui.hpp" // for guiClose
 #include "util/request.hpp"
+#include "../ext/osdialog/osdialog.h"
 
 
 namespace rack {
@@ -34,13 +37,14 @@ static float downloadProgress = 0.0;
 static std::string downloadName;
 static std::string loginStatus;
 
+static std::string apiHost = "http://api.vcvrack.com";
+
 
 Plugin::~Plugin() {
 	for (Model *model : models) {
 		delete model;
 	}
 }
-
 
 static int loadPlugin(std::string slug) {
 	#if ARCH_LIN
@@ -91,35 +95,8 @@ static int loadPlugin(std::string slug) {
 	return 0;
 }
 
-void pluginInit() {
-	// Load core
-	// This function is defined in core.cpp
-	Plugin *corePlugin = init();
-	gPlugins.push_back(corePlugin);
-
-	// Search for plugin libraries
-	DIR *dir = opendir("plugins");
-	if (dir) {
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			if (d->d_name[0] == '.')
-				continue;
-			loadPlugin(d->d_name);
-		}
-		closedir(dir);
-	}
-}
-
-void pluginDestroy() {
-	for (Plugin *plugin : gPlugins) {
-		// TODO free shared library handle with `dlclose` or `FreeLibrary`
-		delete plugin;
-	}
-	gPlugins.clear();
-}
-
 ////////////////////
-// CURL and libzip helpers
+// plugin helpers
 ////////////////////
 
 static int extractZipHandle(zip_t *za, const char *dir) {
@@ -179,42 +156,7 @@ static int extractZip(const char *filename, const char *dir) {
 	return err;
 }
 
-////////////////////
-// plugin manager
-////////////////////
-
-static std::string apiHost = "http://api.vcvrack.com";
-
-void pluginLogIn(std::string email, std::string password) {
-	json_t *reqJ = json_object();
-	json_object_set(reqJ, "email", json_string(email.c_str()));
-	json_object_set(reqJ, "password", json_string(password.c_str()));
-	json_t *resJ = requestJson(POST_METHOD, apiHost + "/token", reqJ);
-	json_decref(reqJ);
-
-	if (resJ) {
-		json_t *errorJ = json_object_get(resJ, "error");
-		if (errorJ) {
-			const char *errorStr = json_string_value(errorJ);
-			loginStatus = errorStr;
-		}
-		else {
-			json_t *tokenJ = json_object_get(resJ, "token");
-			if (tokenJ) {
-				const char *tokenStr = json_string_value(tokenJ);
-				gToken = tokenStr;
-				loginStatus = "";
-			}
-		}
-		json_decref(resJ);
-	}
-}
-
-void pluginLogOut() {
-	gToken = "";
-}
-
-static void pluginRefreshPlugin(json_t *pluginJ) {
+static void refreshPurchase(json_t *pluginJ) {
 	json_t *slugJ = json_object_get(pluginJ, "slug");
 	if (!slugJ) return;
 	const char *slug = json_string_value(slugJ);
@@ -258,6 +200,92 @@ static void pluginRefreshPlugin(json_t *pluginJ) {
 	downloadName = "";
 }
 
+static void checkVersion() {
+	json_t *resJ = requestJson(GET_METHOD, apiHost + "/version", NULL);
+
+	if (resJ) {
+		json_t *versionJ = json_object_get(resJ, "version");
+		if (versionJ) {
+			const char *version = json_string_value(versionJ);
+			if (version && version != gApplicationVersion) {
+				char text[1024];
+				snprintf(text, sizeof(text), "Rack %s is available.\n\nYou have Rack %s.\n\nWould you like to download the new version on the website?", version, gApplicationVersion.c_str());
+				if (osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, text)) {
+					std::thread t(openBrowser, "https://vcvrack.com/");
+					t.detach();
+					guiClose();
+				}
+			}
+		}
+		json_decref(resJ);
+	}
+}
+
+////////////////////
+// plugin API
+////////////////////
+
+void pluginInit() {
+	if (gApplicationVersion != "dev") {
+		std::thread versionThread(checkVersion);
+		versionThread.detach();
+	}
+
+	// Load core
+	// This function is defined in core.cpp
+	Plugin *corePlugin = init();
+	gPlugins.push_back(corePlugin);
+
+	// Search for plugin libraries
+	DIR *dir = opendir("plugins");
+	if (dir) {
+		struct dirent *d;
+		while ((d = readdir(dir))) {
+			if (d->d_name[0] == '.')
+				continue;
+			loadPlugin(d->d_name);
+		}
+		closedir(dir);
+	}
+}
+
+void pluginDestroy() {
+	for (Plugin *plugin : gPlugins) {
+		// TODO free shared library handle with `dlclose` or `FreeLibrary`
+		delete plugin;
+	}
+	gPlugins.clear();
+}
+
+void pluginLogIn(std::string email, std::string password) {
+	json_t *reqJ = json_object();
+	json_object_set(reqJ, "email", json_string(email.c_str()));
+	json_object_set(reqJ, "password", json_string(password.c_str()));
+	json_t *resJ = requestJson(POST_METHOD, apiHost + "/token", reqJ);
+	json_decref(reqJ);
+
+	if (resJ) {
+		json_t *errorJ = json_object_get(resJ, "error");
+		if (errorJ) {
+			const char *errorStr = json_string_value(errorJ);
+			loginStatus = errorStr;
+		}
+		else {
+			json_t *tokenJ = json_object_get(resJ, "token");
+			if (tokenJ) {
+				const char *tokenStr = json_string_value(tokenJ);
+				gToken = tokenStr;
+				loginStatus = "";
+			}
+		}
+		json_decref(resJ);
+	}
+}
+
+void pluginLogOut() {
+	gToken = "";
+}
+
 void pluginRefresh() {
 	if (gToken.empty())
 		return;
@@ -282,7 +310,7 @@ void pluginRefresh() {
 			size_t index;
 			json_t *purchaseJ;
 			json_array_foreach(purchasesJ, index, purchaseJ) {
-				pluginRefreshPlugin(purchaseJ);
+				refreshPurchase(purchaseJ);
 			}
 		}
 		json_decref(resJ);

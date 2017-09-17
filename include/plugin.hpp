@@ -37,7 +37,6 @@ extern std::string gToken;
 
 void pluginInit();
 void pluginDestroy();
-
 void pluginLogIn(std::string email, std::string password);
 void pluginLogOut();
 void pluginRefresh();

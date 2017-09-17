@@ -54,7 +54,6 @@ std::string ellipsize(std::string s, size_t len) {
 }
 
 void openBrowser(std::string url) {
-	// shell injection is possible, so make sure the URL is trusted or hard coded
 #if ARCH_LIN
 	std::string command = "xdg-open " + url;
 	(void)system(command.c_str());

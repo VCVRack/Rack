@@ -301,6 +301,10 @@ void guiRun() {
 	}
 }
 
+void guiClose() {
+	glfwSetWindowShouldClose(gWindow, GLFW_TRUE);
+}
+
 void guiCursorLock() {
 #ifdef ARCH_MAC
 	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);

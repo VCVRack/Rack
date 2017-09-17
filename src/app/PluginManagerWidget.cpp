@@ -16,7 +16,7 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct RegisterButton : Button {
 			void onAction() {
-				std::thread t(openBrowser, "http://vcvrack.com/");
+				std::thread t(openBrowser, "https://vcvrack.com/");
 				t.detach();
 			}
 		};
@@ -80,7 +80,7 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct ManageButton : Button {
 			void onAction() {
-				std::thread t(openBrowser, "http://vcvrack.com/");
+				std::thread t(openBrowser, "https://vcvrack.com/");
 				t.detach();
 			}
 		};
