@@ -57,7 +57,7 @@ void openBrowser(std::string url) {
 	// shell injection is possible, so make sure the URL is trusted or hard coded
 #if ARCH_LIN
 	std::string command = "xdg-open " + url;
-	system(command.c_str());
+	(void)system(command.c_str());
 #endif
 #if ARCH_MAC
 	std::string command = "open " + url;

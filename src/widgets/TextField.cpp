@@ -33,6 +33,7 @@ bool TextField::onText(int codepoint) {
 	char c = codepoint;
 	std::string newText(1, c);
 	insertText(newText);
+	return true;
 }
 
 bool TextField::onKey(int key) {
@@ -99,6 +100,7 @@ bool TextField::onKey(int key) {
 
 	begin = mini(maxi(begin, 0), text.size());
 	end = mini(maxi(end, 0), text.size());
+	return true;
 }
 
 void TextField::onSelect() {

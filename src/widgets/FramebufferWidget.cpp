@@ -41,6 +41,9 @@ void FramebufferWidget::step() {
 		internal->box.size = box.size.plus(padding.mult(2));
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 		// assert(fbSize.isFinite());
+		// Reject zero area size
+		if (fbSize.x <= 0.0 || fbSize.y <= 0.0)
+			return;
 
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);

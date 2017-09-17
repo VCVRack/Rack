@@ -126,9 +126,8 @@ void ModuleWidget::draw(NVGcontext *vg) {
 
 	Widget::draw(vg);
 
-/*
 	// CPU usage text
-	if (dynamic_cast<RackScene*>(gScene)->toolbar->cpuUsageButton->value > 0.0) {
+	if (0) {
 		float cpuTime = module ? module->cpuTime : 0.0;
 		std::string text = stringf("%.1f%%", cpuTime * 100.0);
 
@@ -147,7 +146,6 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		bndMenuItem(vg, 0.0, 0.0, box.size.x, BND_WIDGET_HEIGHT, BND_DEFAULT, -1, text.c_str());
 		nvgRestore(vg);
 	}
-*/
 
 	nvgResetScissor(vg);
 }
