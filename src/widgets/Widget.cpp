@@ -1,4 +1,5 @@
 #include "widgets.hpp"
+#include "app.hpp"
 #include <algorithm>
 
 
@@ -60,6 +61,28 @@ void Widget::clearChildren() {
 		delete child;
 	}
 	children.clear();
+}
+
+void Widget::finalizeEvents() {
+	// Stop dragging and hovering this widget
+	if (gHoveredWidget == this) {
+		gHoveredWidget->onMouseLeave();
+		gHoveredWidget = NULL;
+	}
+	if (gDraggedWidget == this) {
+		gDraggedWidget->onDragEnd();
+		gDraggedWidget = NULL;
+	}
+	if (gDragHoveredWidget == this) {
+		gDragHoveredWidget = NULL;
+	}
+	if (gSelectedWidget == this) {
+		gSelectedWidget->onDeselect();
+		gSelectedWidget = NULL;
+	}
+	for (Widget *child : children) {
+		child->finalizeEvents();
+	}
 }
 
 void Widget::step() {

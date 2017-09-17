@@ -76,6 +76,8 @@ struct Widget {
 	*/
 	void removeChild(Widget *widget);
 	void clearChildren();
+	/** Recursively finalizes event start/end pairs as needed */
+	void finalizeEvents();
 
 	/** Advances the module by one frame */
 	virtual void step();

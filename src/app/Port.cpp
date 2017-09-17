@@ -9,6 +9,13 @@ Port::Port() {
 
 Port::~Port() {
 	disconnect();
+
+	if (gRackWidget->activeWire) {
+		if (gRackWidget->activeWire->hoveredInputPort == this)
+			gRackWidget->activeWire->hoveredInputPort = NULL;
+		if (gRackWidget->activeWire->hoveredOutputPort == this)
+			gRackWidget->activeWire->hoveredOutputPort = NULL;
+	}
 }
 
 void Port::disconnect() {

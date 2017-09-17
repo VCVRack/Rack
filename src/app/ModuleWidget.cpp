@@ -155,6 +155,7 @@ Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 		case GLFW_KEY_DELETE:
 		case GLFW_KEY_BACKSPACE:
 			gRackWidget->deleteModule(this);
+			this->finalizeEvents();
 			delete this;
 			break;
 		case GLFW_KEY_I:
@@ -217,6 +218,7 @@ struct DeleteMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction() {
 		gRackWidget->deleteModule(moduleWidget);
+		moduleWidget->finalizeEvents();
 		delete moduleWidget;
 	}
 };
