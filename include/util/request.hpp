@@ -8,10 +8,10 @@ namespace rack {
 
 
 enum RequestMethod {
-	GET_METHOD,
-	POST_METHOD,
-	PUT_METHOD,
-	DELETE_METHOD,
+	METHOD_GET,
+	METHOD_POST,
+	METHOD_PUT,
+	METHOD_DELETE,
 };
 
 /** Requests a JSON API URL over HTTP(S), using the data as the query (GET) or the body (POST, etc) */

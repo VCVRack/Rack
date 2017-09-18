@@ -17,6 +17,10 @@ ifeq ($(ARCH), mac)
 	FLAGS += -DARCH_MAC
 	CXXFLAGS += -stdlib=libc++
 	LDFLAGS += -stdlib=libc++
+	MAC_SDK_FLAGS = -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk \
+		-mmacosx-version-min=10.7
+	FLAGS += $(MAC_SDK_FLAGS)
+	LDFLAGS += $(MAC_SDK_FLAGS)
 endif
 
 ifeq ($(ARCH), win)

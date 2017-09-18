@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <string.h>
 #include <unistd.h>
-#include <thread>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h> // for MAXPATHLEN
@@ -22,9 +21,8 @@
 #include <dirent.h>
 
 #include "plugin.hpp"
-#include "gui.hpp" // for guiClose
+#include "app.hpp"
 #include "util/request.hpp"
-#include "../ext/osdialog/osdialog.h"
 
 
 namespace rack {
@@ -37,7 +35,6 @@ static float downloadProgress = 0.0;
 static std::string downloadName;
 static std::string loginStatus;
 
-static std::string apiHost = "http://api.vcvrack.com";
 
 
 Plugin::~Plugin() {
@@ -200,37 +197,11 @@ static void refreshPurchase(json_t *pluginJ) {
 	downloadName = "";
 }
 
-static void checkVersion() {
-	json_t *resJ = requestJson(GET_METHOD, apiHost + "/version", NULL);
-
-	if (resJ) {
-		json_t *versionJ = json_object_get(resJ, "version");
-		if (versionJ) {
-			const char *version = json_string_value(versionJ);
-			if (version && version != gApplicationVersion) {
-				char text[1024];
-				snprintf(text, sizeof(text), "Rack %s is available.\n\nYou have Rack %s.\n\nWould you like to download the new version on the website?", version, gApplicationVersion.c_str());
-				if (osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, text)) {
-					std::thread t(openBrowser, "https://vcvrack.com/");
-					t.detach();
-					guiClose();
-				}
-			}
-		}
-		json_decref(resJ);
-	}
-}
-
 ////////////////////
 // plugin API
 ////////////////////
 
 void pluginInit() {
-	if (gApplicationVersion != "dev") {
-		std::thread versionThread(checkVersion);
-		versionThread.detach();
-	}
-
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *corePlugin = init();
@@ -261,7 +232,7 @@ void pluginLogIn(std::string email, std::string password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	json_t *resJ = requestJson(POST_METHOD, apiHost + "/token", reqJ);
+	json_t *resJ = requestJson(METHOD_POST, gApiHost + "/token", reqJ);
 	json_decref(reqJ);
 
 	if (resJ) {
@@ -296,7 +267,7 @@ void pluginRefresh() {
 
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "token", json_string(gToken.c_str()));
-	json_t *resJ = requestJson(GET_METHOD, apiHost + "/purchases", reqJ);
+	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/purchases", reqJ);
 	json_decref(reqJ);
 
 	if (resJ) {

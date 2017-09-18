@@ -314,6 +314,7 @@ struct RackScene : Scene {
 
 extern std::string gApplicationName;
 extern std::string gApplicationVersion;
+extern std::string gApiHost;
 
 extern RackWidget *gRackWidget;
 

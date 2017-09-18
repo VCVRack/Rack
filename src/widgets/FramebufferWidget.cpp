@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include "../ext/nanovg/src/nanovg_gl.h"
 #include "../ext/nanovg/src/nanovg_gl_utils.h"
+#include "../ext/osdialog/osdialog.h"
 
 
 namespace rack {
@@ -39,6 +40,7 @@ void FramebufferWidget::step() {
 	if (dirty) {
 		internal->box.pos = padding.neg();
 		internal->box.size = box.size.plus(padding.mult(2));
+		internal->box.size = Vec(ceilf(internal->box.size.x), ceilf(internal->box.size.y));
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 		// assert(fbSize.isFinite());
 		// Reject zero area size
@@ -48,6 +50,14 @@ void FramebufferWidget::step() {
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, fbSize.x, fbSize.y, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+
+		if (!fb) {
+			char buf[1024];
+			snprintf(buf, sizeof(buf), "%f %f, %f %f; %f %f; %p\n", internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y, fbSize.x, fbSize.y, fb);
+			if (!osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK_CANCEL, buf))
+				exit(0);
+		}
+
 		if (!fb)
 			return;
 		internal->setFramebuffer(fb);

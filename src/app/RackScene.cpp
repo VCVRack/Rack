@@ -1,8 +1,30 @@
 #include "app.hpp"
 #include "gui.hpp"
+#include "util/request.hpp"
+#include "../ext/osdialog/osdialog.h"
+#include <thread>
 
 
 namespace rack {
+
+
+static std::string versionMessage = "";
+
+static void checkVersion() {
+	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/version", NULL);
+
+	if (resJ) {
+		json_t *versionJ = json_object_get(resJ, "version");
+		if (versionJ) {
+			const char *version = json_string_value(versionJ);
+			if (version && version != gApplicationVersion) {
+				versionMessage = stringf("Rack %s is available.\n\nYou have Rack %s.\n\nWould you like to download the new version on the website?", version, gApplicationVersion.c_str());
+			}
+		}
+		json_decref(resJ);
+	}
+}
+
 
 RackScene::RackScene() {
 	scrollWidget = new ScrollWidget();
@@ -16,6 +38,12 @@ RackScene::RackScene() {
 	toolbar = new Toolbar();
 	addChild(toolbar);
 	scrollWidget->box.pos.y = toolbar->box.size.y;
+
+	// Check for new version
+	if (gApplicationVersion != "dev" || true) {
+		std::thread versionThread(checkVersion);
+		versionThread.detach();
+	}
 }
 
 void RackScene::step() {
@@ -23,6 +51,16 @@ void RackScene::step() {
 	scrollWidget->box.size = box.size.minus(scrollWidget->box.pos);
 
 	Scene::step();
+
+	// Version popup message
+	if (!versionMessage.empty()) {
+		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, versionMessage.c_str())) {
+			std::thread t(openBrowser, "https://vcvrack.com/");
+			t.detach();
+			guiClose();
+		}
+		versionMessage = "";
+	}
 }
 
 void RackScene::draw(NVGcontext *vg) {
