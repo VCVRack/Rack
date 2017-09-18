@@ -150,28 +150,28 @@ struct OpaqueWidget : virtual Widget {
 	Widget *onMouseDown(Vec pos, int button) {
 		Widget *w = Widget::onMouseDown(pos, button);
 		if (w) return w;
-		onMouseDown(button);
+		onMouseDownOpaque(button);
 		return this;
 	}
 	Widget *onMouseUp(Vec pos, int button) {
 		Widget *w = Widget::onMouseUp(pos, button);
 		if (w) return w;
-		onMouseUp(button);
+		onMouseUpOpaque(button);
 		return this;
 	}
 	Widget *onMouseMove(Vec pos, Vec mouseRel) {
 		Widget *w = Widget::onMouseMove(pos, mouseRel);
 		if (w) return w;
-		onMouseMove(mouseRel);
+		onMouseMoveOpaque(mouseRel);
 		return this;
 	}
 
 	/** "High level" events called by the above lower level events.
 	Use these if you don't care about the clicked position.
 	*/
-	virtual void onMouseDown(int button) {}
-	virtual void onMouseUp(int button) {}
-	virtual void onMouseMove(Vec mouseRel) {}
+	virtual void onMouseDownOpaque(int button) {}
+	virtual void onMouseUpOpaque(int button) {}
+	virtual void onMouseMoveOpaque(Vec mouseRel) {}
 };
 
 struct SpriteWidget : virtual Widget {

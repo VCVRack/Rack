@@ -40,7 +40,7 @@ RackScene::RackScene() {
 	scrollWidget->box.pos.y = toolbar->box.size.y;
 
 	// Check for new version
-	if (gApplicationVersion != "dev" || true) {
+	if (gApplicationVersion != "dev") {
 		std::thread versionThread(checkVersion);
 		versionThread.detach();
 	}

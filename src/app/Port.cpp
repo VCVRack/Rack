@@ -34,7 +34,7 @@ void Port::draw(NVGcontext *vg) {
 	}
 }
 
-void Port::onMouseDown(int button) {
+void Port::onMouseDownOpaque(int button) {
 	if (button == 1) {
 		disconnect();
 	}

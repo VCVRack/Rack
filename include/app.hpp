@@ -61,7 +61,7 @@ struct ModuleWidget : OpaqueWidget {
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
-	void onMouseDown(int button);
+	void onMouseDownOpaque(int button);
 };
 
 struct WireWidget : OpaqueWidget {
@@ -107,7 +107,7 @@ struct RackWidget : OpaqueWidget {
 	void step();
 	void draw(NVGcontext *vg);
 
-	void onMouseDown(int button);
+	void onMouseDownOpaque(int button);
 };
 
 struct RackRail : TransparentWidget {
@@ -145,7 +145,7 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 
 	json_t *toJson();
 	void fromJson(json_t *root);
-	void onMouseDown(int button);
+	void onMouseDownOpaque(int button);
 	void onChange();
 };
 
@@ -255,7 +255,7 @@ struct Port : OpaqueWidget {
 	void disconnect();
 
 	void draw(NVGcontext *vg);
-	void onMouseDown(int button);
+	void onMouseDownOpaque(int button);
 	void onDragEnd();
 	void onDragStart();
 	void onDragDrop(Widget *origin);

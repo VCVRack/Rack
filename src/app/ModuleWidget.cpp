@@ -82,7 +82,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	size_t paramId;
 	json_t *paramJ;
 	json_array_foreach(paramsJ, paramId, paramJ) {
-		if (0 <= paramId && paramId < params.size()) {
+		if (paramId < params.size()) {
 			params[paramId]->fromJson(paramJ);
 		}
 	}
@@ -223,7 +223,7 @@ struct DeleteMenuItem : MenuItem {
 	}
 };
 
-void ModuleWidget::onMouseDown(int button) {
+void ModuleWidget::onMouseDownOpaque(int button) {
 	if (button == 1) {
 		Menu *menu = gScene->createMenu();
 

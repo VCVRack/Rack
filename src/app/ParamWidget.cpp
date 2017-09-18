@@ -13,7 +13,7 @@ void ParamWidget::fromJson(json_t *rootJ) {
 	setValue(json_number_value(rootJ));
 }
 
-void ParamWidget::onMouseDown(int button) {
+void ParamWidget::onMouseDownOpaque(int button) {
 	if (button == 1) {
 		setValue(defaultValue);
 	}

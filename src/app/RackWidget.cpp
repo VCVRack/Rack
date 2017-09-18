@@ -326,7 +326,7 @@ struct AddModuleMenuItem : MenuItem {
 	}
 };
 
-void RackWidget::onMouseDown(int button) {
+void RackWidget::onMouseDownOpaque(int button) {
 	if (button == 1) {
 		Vec modulePos = gMousePos.minus(getAbsolutePos());
 		Menu *menu = gScene->createMenu();
