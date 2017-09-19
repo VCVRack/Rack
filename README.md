@@ -2,6 +2,8 @@
 
 *Rack* is the engine for the VCV open-source virtual Eurorack DAW.
 
+![Rack screenshot](https://vcvrack.com/images/screenshot.png)
+
 ## Building
 
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
@@ -11,7 +13,7 @@ On Windows, use [MSYS2](http://www.msys2.org/) and launch a mingw64 shell.
 
 Clone submodules.
 
-	git submodule update --init
+	git submodule update --init --recursive
 
 Build dependencies locally.
 
@@ -26,6 +28,22 @@ Build Rack.
 Run Rack.
 
 	make run
+
+## Building plugins
+
+Clone your favorite plugin in the `plugins/` directory. e.g.:
+
+	cd plugins
+	git clone https://github.com/VCVRack/Fundamental.git
+
+Clone submodules.
+
+	cd Fundamental
+	git submodule update --init --recursive
+
+Build plugin.
+
+	make
 
 ## License
 
