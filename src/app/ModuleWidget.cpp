@@ -9,6 +9,7 @@ namespace rack {
 ModuleWidget::~ModuleWidget() {
 	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
 	disconnect();
+	// Remove and delete the Module instance
 	setModule(NULL);
 }
 
@@ -223,42 +224,48 @@ struct DeleteMenuItem : MenuItem {
 	}
 };
 
+Menu *ModuleWidget::createContextMenu() {
+	Menu *menu = gScene->createMenu();
+
+	MenuLabel *menuLabel = new MenuLabel();
+	menuLabel->text = model->plugin->name + ": " + model->name;
+	menu->pushChild(menuLabel);
+
+	InitializeMenuItem *resetItem = new InitializeMenuItem();
+	resetItem->text = "Initialize";
+	resetItem->rightText = MOD_KEY_NAME "+I";
+	resetItem->moduleWidget = this;
+	menu->pushChild(resetItem);
+
+	RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
+	randomizeItem->text = "Randomize";
+	randomizeItem->rightText = MOD_KEY_NAME "+R";
+	randomizeItem->moduleWidget = this;
+	menu->pushChild(randomizeItem);
+
+	DisconnectMenuItem *disconnectItem = new DisconnectMenuItem();
+	disconnectItem->text = "Disconnect cables";
+	disconnectItem->moduleWidget = this;
+	menu->pushChild(disconnectItem);
+
+	CloneMenuItem *cloneItem = new CloneMenuItem();
+	cloneItem->text = "Duplicate";
+	cloneItem->rightText = MOD_KEY_NAME "+D";
+	cloneItem->moduleWidget = this;
+	menu->pushChild(cloneItem);
+
+	DeleteMenuItem *deleteItem = new DeleteMenuItem();
+	deleteItem->text = "Delete";
+	deleteItem->rightText = "Backspace/Delete";
+	deleteItem->moduleWidget = this;
+	menu->pushChild(deleteItem);
+
+	return menu;
+}
+
 void ModuleWidget::onMouseDownOpaque(int button) {
 	if (button == 1) {
-		Menu *menu = gScene->createMenu();
-
-		MenuLabel *menuLabel = new MenuLabel();
-		menuLabel->text = model->plugin->name + ": " + model->name;
-		menu->pushChild(menuLabel);
-
-		InitializeMenuItem *resetItem = new InitializeMenuItem();
-		resetItem->text = "Initialize";
-		resetItem->rightText = MOD_KEY_NAME "+I";
-		resetItem->moduleWidget = this;
-		menu->pushChild(resetItem);
-
-		RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
-		randomizeItem->text = "Randomize";
-		randomizeItem->rightText = MOD_KEY_NAME "+R";
-		randomizeItem->moduleWidget = this;
-		menu->pushChild(randomizeItem);
-
-		DisconnectMenuItem *disconnectItem = new DisconnectMenuItem();
-		disconnectItem->text = "Disconnect cables";
-		disconnectItem->moduleWidget = this;
-		menu->pushChild(disconnectItem);
-
-		CloneMenuItem *cloneItem = new CloneMenuItem();
-		cloneItem->text = "Duplicate";
-		cloneItem->rightText = MOD_KEY_NAME "+D";
-		cloneItem->moduleWidget = this;
-		menu->pushChild(cloneItem);
-
-		DeleteMenuItem *deleteItem = new DeleteMenuItem();
-		deleteItem->text = "Delete";
-		deleteItem->rightText = "Backspace/Delete";
-		deleteItem->moduleWidget = this;
-		menu->pushChild(deleteItem);
+		createContextMenu();
 	}
 }
 

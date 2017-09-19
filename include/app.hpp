@@ -51,6 +51,7 @@ struct ModuleWidget : OpaqueWidget {
 	This method just randomizes parameters. Override and call this function if your module contains other state information that you wish to randomize.
 	*/
 	void randomize();
+	virtual Menu *createContextMenu();
 
 	void draw(NVGcontext *vg);
 
