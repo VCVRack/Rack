@@ -89,7 +89,7 @@ $(libzip):
 
 $(portmidi):
 	git clone https://github.com/AndrewBelt/portmidi.git $@
-	cd $@ && $(CMAKE) . -DCMAKE_INSTALL_PREFIX="$(LOCAL)"
+	cd $@ && $(CMAKE) . -DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DCMAKE_BUILD_TYPE=Release
 	$(MAKE) -C $@
 	$(MAKE) -C $@ install
 
