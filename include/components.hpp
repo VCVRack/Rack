@@ -361,7 +361,6 @@ struct BefacoSlidePot : SVGSlider {
 
 struct PJ301MPort : SVGPort {
 	PJ301MPort() {
-		padding = Vec(1, 1);
 		background->svg = SVG::load("res/ComponentLibrary/PJ301M.svg");
 		background->wrap();
 		box.size = background->box.size;
@@ -370,7 +369,6 @@ struct PJ301MPort : SVGPort {
 
 struct PJ3410Port : SVGPort {
 	PJ3410Port() {
-		padding = Vec(1, 1);
 		background->svg = SVG::load("res/ComponentLibrary/PJ3410.svg");
 		background->wrap();
 		box.size = background->box.size;
@@ -379,7 +377,6 @@ struct PJ3410Port : SVGPort {
 
 struct CL1362Port : SVGPort {
 	CL1362Port() {
-		padding = Vec(1, 1);
 		background->svg = SVG::load("res/ComponentLibrary/CL1362.svg");
 		background->wrap();
 		box.size = background->box.size;

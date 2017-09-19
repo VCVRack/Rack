@@ -38,8 +38,8 @@ void FramebufferWidget::step() {
 
 	// Render the scene to the framebuffer if dirty
 	if (dirty) {
-		internal->box.pos = padding.neg();
-		internal->box.size = box.size.plus(padding.mult(2));
+		internal->box.pos = Vec(0, 0);
+		internal->box.size = box.size;
 		internal->box.size = Vec(ceilf(internal->box.size.x), ceilf(internal->box.size.y));
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 		// assert(fbSize.isFinite());
@@ -50,14 +50,6 @@ void FramebufferWidget::step() {
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, fbSize.x, fbSize.y, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
-
-		if (!fb) {
-			char buf[1024];
-			snprintf(buf, sizeof(buf), "%f %f, %f %f; %f %f; %p\n", internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y, fbSize.x, fbSize.y, fb);
-			if (!osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK_CANCEL, buf))
-				exit(0);
-		}
-
 		if (!fb)
 			return;
 		internal->setFramebuffer(fb);
@@ -66,10 +58,9 @@ void FramebufferWidget::step() {
 		glViewport(0.0, 0.0, fbSize.x, fbSize.y);
 		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		nvgBeginFrame(gVg, fbSize.x, fbSize.y, gPixelRatio);
+		nvgBeginFrame(gVg, fbSize.x, fbSize.y, gPixelRatio * oversample);
 
 		nvgScale(gVg, gPixelRatio * oversample, gPixelRatio * oversample);
-		nvgTranslate(gVg, padding.x, padding.y);
 		Widget::draw(gVg);
 
 		nvgEndFrame(gVg);

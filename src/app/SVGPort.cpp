@@ -5,8 +5,6 @@ namespace rack {
 
 
 SVGPort::SVGPort() {
-	padding = Vec(1, 1);
-
 	background = new SVGWidget();
 	addChild(background);
 }

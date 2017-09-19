@@ -215,8 +215,9 @@ void guiInit() {
 	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	std::string title = gApplicationName + " " + gApplicationVersion;
-	gWindow = glfwCreateWindow(1000, 750, title.c_str(), NULL, NULL);
+	gWindow = glfwCreateWindow(640, 480, title.c_str(), NULL, NULL);
 	if (!gWindow) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0? If so, are the latest drivers installed?");
 		exit(1);

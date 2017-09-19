@@ -5,8 +5,6 @@ namespace rack {
 
 
 SVGKnob::SVGKnob() {
-	padding = Vec(1, 1);
-
 	tw = new TransformWidget();
 	addChild(tw);
 

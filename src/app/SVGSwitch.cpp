@@ -5,8 +5,6 @@ namespace rack {
 
 
 SVGSwitch::SVGSwitch() {
-	padding = Vec(1, 1);
-
 	sw = new SVGWidget();
 	addChild(sw);
 }
