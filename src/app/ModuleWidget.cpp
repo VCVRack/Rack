@@ -115,7 +115,7 @@ void ModuleWidget::initialize() {
 
 void ModuleWidget::randomize() {
 	for (ParamWidget *param : params) {
-		param->setValue(rescalef(randomf(), 0.0, 1.0, param->minValue, param->maxValue));
+		param->randomize();
 	}
 	if (module) {
 		module->randomize();

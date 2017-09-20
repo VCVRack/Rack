@@ -44,8 +44,10 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 			if (path->closed)
 				nvgClosePath(vg);
 
-			if (path->next)
-				nvgPathWinding(vg, NVG_HOLE);
+			// if ()
+				// nvgPathWinding(vg, NVG_SOLID);
+			// else
+			// 	nvgPathWinding(vg, NVG_HOLE);
 		}
 
 		// Fill shape

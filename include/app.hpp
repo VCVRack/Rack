@@ -146,6 +146,7 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 
 	json_t *toJson();
 	void fromJson(json_t *root);
+	virtual void randomize();
 	void onMouseDownOpaque(int button);
 	void onChange();
 };
@@ -227,6 +228,8 @@ struct ToggleSwitch : virtual Switch {
 
 /** A switch that is turned on when held */
 struct MomentarySwitch : virtual Switch {
+	/** Don't randomize state */
+	void randomize() {}
 	void onDragStart() {
 		setValue(maxValue);
 	}

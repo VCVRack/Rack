@@ -1,5 +1,6 @@
 #include "settings.hpp"
 #include "app.hpp"
+#include "gui.hpp"
 #include "plugin.hpp"
 #include <jansson.h>
 
@@ -25,6 +26,10 @@ static json_t *settingsToJson() {
 	json_t *tensionJ = json_real(tension);
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
+	// allowCursorLock
+	json_t *allowCursorLockJ = json_boolean(gAllowCursorLock);
+	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
+
 	return rootJ;
 }
 
@@ -43,6 +48,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
 		dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value = json_number_value(tensionJ);
+
+	// allowCursorLock
+	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
+	if (allowCursorLockJ)
+		gAllowCursorLock = json_is_true(allowCursorLockJ);
 }
 
 

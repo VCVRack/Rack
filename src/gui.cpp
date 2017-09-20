@@ -14,6 +14,7 @@
 #define BLENDISH_IMPLEMENTATION
 #include "../ext/oui-blendish/blendish.h"
 #define NANOSVG_IMPLEMENTATION
+#define NANOSVG_ALL_COLOR_KEYWORDS
 #include "../ext/nanosvg/src/nanosvg.h"
 
 #ifdef ARCH_MAC
@@ -24,9 +25,10 @@
 namespace rack {
 
 GLFWwindow *gWindow = NULL;
-std::shared_ptr<Font> gGuiFont;
 NVGcontext *gVg = NULL;
+std::shared_ptr<Font> gGuiFont;
 float gPixelRatio = 0.0;
+bool gAllowCursorLock = true;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
@@ -307,15 +309,19 @@ void guiClose() {
 }
 
 void guiCursorLock() {
+	if (gAllowCursorLock) {
 #ifdef ARCH_MAC
-	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
-	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
+	}
 }
 
 void guiCursorUnlock() {
-	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	if (gAllowCursorLock) {
+		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
 }
 
 bool guiIsModPressed() {
