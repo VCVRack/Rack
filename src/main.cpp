@@ -101,13 +101,13 @@ int main(int argc, char* argv[]) {
 	if (argc >= 2)
 		gRackWidget->loadPatch(argv[1]);
 	else
-		gRackWidget->loadPatch("autosave.json");
+		gRackWidget->loadPatch("autosave.vcv");
 
 	engineStart();
 	guiRun();
 	engineStop();
 
-	gRackWidget->savePatch("autosave.json");
+	gRackWidget->savePatch("autosave.vcv");
 	settingsSave("settings.json");
 	sceneDestroy();
 	guiDestroy();
