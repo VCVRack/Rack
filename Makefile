@@ -42,6 +42,9 @@ endif
 
 all: $(TARGET)
 
+dep:
+	$(MAKE) -C dep
+
 run: $(TARGET)
 ifeq ($(ARCH), lin)
 	LD_LIBRARY_PATH=dep/lib ./$<
@@ -165,4 +168,4 @@ distplugins:
 plugins:
 	for f in plugins/*; do (cd "$$f" && ${CMD}); done
 
-.PHONY: all run debug clean dist allplugins cleanplugins distplugins plugins
+.PHONY: all dep run debug clean dist allplugins cleanplugins distplugins plugins
