@@ -151,5 +151,18 @@ else
 endif
 
 
-eachplugin:
-	$(foreach f,$(wildcard plugins/*),(cd $f && ${CMD});)
+# Plugin helpers
+
+allplugins:
+	for f in plugins/*; do $(MAKE) -C "$$f"; done
+
+cleanplugins:
+	for f in plugins/*; do $(MAKE) -C "$$f" clean; done
+
+distplugins:
+	for f in plugins/*; do $(MAKE) -C "$$f" dist; done
+
+plugins:
+	for f in plugins/*; do (cd "$$f" && ${CMD}); done
+
+.PHONY: all run debug clean dist allplugins cleanplugins distplugins plugins
