@@ -36,6 +36,11 @@ asio = asiosdk2.3
 .NOTPARALLEL:
 
 all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(portmidi) $(portaudio)
+	@echo ""
+	@echo "#######################################"
+	@echo "# Built all dependencies successfully #"
+	@echo "#######################################"
+	@echo ""
 
 $(glew):
 	$(WGET) https://downloads.sourceforge.net/project/glew/glew/$(patsubst glew-%,%,$@)/$@.tgz
@@ -110,4 +115,4 @@ else
 endif
 
 clean:
-	git clean -fdxi
+	git clean -ffdxi
