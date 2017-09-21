@@ -6,7 +6,7 @@ Vec gMousePos;
 Widget *gHoveredWidget = NULL;
 Widget *gDraggedWidget = NULL;
 Widget *gDragHoveredWidget = NULL;
-Widget *gSelectedWidget = NULL;
+Widget *gFocusedWidget = NULL;
 int gGuiFrame;
 
 Scene *gScene = NULL;

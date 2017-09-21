@@ -100,10 +100,10 @@ struct Widget {
 	virtual void onMouseEnter() {}
 	/** Called when another widget begins responding to `onMouseMove` events */
 	virtual void onMouseLeave() {}
-	virtual void onSelect() {}
-	virtual void onDeselect() {}
-	virtual bool onText(int codepoint) {return false;}
-	virtual bool onKey(int key) {return false;}
+	virtual void onFocus() {}
+	virtual void onDefocus() {}
+	virtual bool onFocusText(int codepoint) {return false;}
+	virtual bool onFocusKey(int key) {return false;}
 	virtual Widget *onScroll(Vec pos, Vec scrollRel);
 
 	/** Called when a widget responds to `onMouseDown` for a left button press */
@@ -370,9 +370,9 @@ struct TextField : OpaqueWidget {
 	}
 	void draw(NVGcontext *vg);
 	Widget *onMouseDown(Vec pos, int button);
-	bool onText(int codepoint);
-	bool onKey(int scancode);
-	void onSelect();
+	bool onFocusText(int codepoint);
+	bool onFocusKey(int scancode);
+	void onFocus();
 	void insertText(std::string newText);
 };
 
@@ -408,7 +408,7 @@ extern Vec gMousePos;
 extern Widget *gHoveredWidget;
 extern Widget *gDraggedWidget;
 extern Widget *gDragHoveredWidget;
-extern Widget *gSelectedWidget;
+extern Widget *gFocusedWidget;
 extern int gGuiFrame;
 
 extern Scene *gScene;

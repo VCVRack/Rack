@@ -70,14 +70,30 @@ void RackScene::draw(NVGcontext *vg) {
 Widget *RackScene::onHoverKey(Vec pos, int key) {
 	switch (key) {
 		case GLFW_KEY_N:
-			if (guiIsModPressed()) {
+			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				gRackWidget->clear();
 				return this;
 			}
 			break;
 		case GLFW_KEY_Q:
-			if (guiIsModPressed()) {
+			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				guiClose();
+				return this;
+			}
+			break;
+		case GLFW_KEY_O:
+			if (guiIsModPressed() && !guiIsShiftPressed()) {
+				gRackWidget->openDialog();
+				return this;
+			}
+			break;
+		case GLFW_KEY_S:
+			if (guiIsModPressed() && !guiIsShiftPressed()) {
+				gRackWidget->saveDialog();
+				return this;
+			}
+			if (guiIsModPressed() && guiIsShiftPressed()) {
+				gRackWidget->saveAsDialog();
 				return this;
 			}
 			break;

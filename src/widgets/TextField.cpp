@@ -10,7 +10,7 @@ namespace rack {
 
 void TextField::draw(NVGcontext *vg) {
 	BNDwidgetState state;
-	if (this == gSelectedWidget)
+	if (this == gFocusedWidget)
 		state = BND_ACTIVE;
 	else if (this == gHoveredWidget)
 		state = BND_HOVER;
@@ -29,14 +29,14 @@ Widget *TextField::onMouseDown(Vec pos, int button) {
 }
 
 
-bool TextField::onText(int codepoint) {
+bool TextField::onFocusText(int codepoint) {
 	char c = codepoint;
 	std::string newText(1, c);
 	insertText(newText);
 	return true;
 }
 
-bool TextField::onKey(int key) {
+bool TextField::onFocusKey(int key) {
 	switch (key) {
 		case GLFW_KEY_BACKSPACE:
 			if (begin < end) {
@@ -103,7 +103,7 @@ bool TextField::onKey(int key) {
 	return true;
 }
 
-void TextField::onSelect() {
+void TextField::onFocus() {
 	begin = 0;
 	end = text.size();
 }

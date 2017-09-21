@@ -1,7 +1,6 @@
 #include "app.hpp"
 #include "gui.hpp"
 #include "engine.hpp"
-#include "../ext/osdialog/osdialog.h"
 
 
 namespace rack {
@@ -13,23 +12,21 @@ struct NewItem : MenuItem {
 	}
 };
 
-struct SaveItem : MenuItem {
+struct OpenItem : MenuItem {
 	void onAction() {
-		char *path = osdialog_file(OSDIALOG_SAVE, "./patches", "Untitled.vcv", NULL);
-		if (path) {
-			gRackWidget->savePatch(path);
-			free(path);
-		}
+		gRackWidget->openDialog();
 	}
 };
 
-struct OpenItem : MenuItem {
+struct SaveItem : MenuItem {
 	void onAction() {
-		char *path = osdialog_file(OSDIALOG_OPEN, "./patches", NULL, NULL);
-		if (path) {
-			gRackWidget->loadPatch(path);
-			free(path);
-		}
+		gRackWidget->saveDialog();
+	}
+};
+
+struct SaveAsItem : MenuItem {
+	void onAction() {
+		gRackWidget->saveAsDialog();
 	}
 };
 
@@ -48,11 +45,11 @@ struct FileChoice : ChoiceButton {
 			openItem->text = "Open";
 			menu->pushChild(openItem);
 
-			// MenuItem *saveItem = new SaveItem();
-			// saveItem->text = "Save";
-			// menu->pushChild(saveItem);
+			MenuItem *saveItem = new SaveItem();
+			saveItem->text = "Save";
+			menu->pushChild(saveItem);
 
-			MenuItem *saveAsItem = new SaveItem();
+			MenuItem *saveAsItem = new SaveAsItem();
 			saveAsItem->text = "Save As";
 			menu->pushChild(saveAsItem);
 		}

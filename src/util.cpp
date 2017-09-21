@@ -1,7 +1,9 @@
 #include "util.hpp"
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include <random>
+#include <libgen.h> // for dirname and basename
 
 #if ARCH_WIN
 #include <windows.h>
@@ -51,6 +53,20 @@ std::string ellipsize(std::string s, size_t len) {
 		return s;
 	else
 		return s.substr(0, len - 3) + "...";
+}
+
+std::string extractDirectory(std::string path) {
+	char *pathDup = strdup(path.c_str());
+	std::string directory = dirname(pathDup);
+	free(pathDup);
+	return directory;
+}
+
+std::string extractFilename(std::string path) {
+	char *pathDup = strdup(path.c_str());
+	std::string filename = basename(pathDup);
+	free(pathDup);
+	return filename;
 }
 
 void openBrowser(std::string url) {

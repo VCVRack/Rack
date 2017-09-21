@@ -29,5 +29,6 @@ void guiClose();
 void guiCursorLock();
 void guiCursorUnlock();
 bool guiIsModPressed();
+bool guiIsShiftPressed();
 
 } // namespace rack

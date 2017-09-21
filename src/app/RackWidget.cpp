@@ -4,6 +4,7 @@
 #include "engine.hpp"
 #include "plugin.hpp"
 #include "gui.hpp"
+#include "../ext/osdialog/osdialog.h"
 
 
 namespace rack {
@@ -45,6 +46,36 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 }
+
+void RackWidget::openDialog() {
+	std::string dir = lastPath.empty() ? "." : extractDirectory(lastPath);
+	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
+	if (path) {
+		loadPatch(path);
+		lastPath = path;
+		free(path);
+	}
+}
+
+void RackWidget::saveDialog() {
+	if (!lastPath.empty()) {
+		savePatch(lastPath);
+	}
+	else {
+		saveAsDialog();
+	}
+}
+
+void RackWidget::saveAsDialog() {
+	std::string dir = lastPath.empty() ? "." : extractDirectory(lastPath);
+	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcv", NULL);
+	if (path) {
+		savePatch(path);
+		lastPath = path;
+		free(path);
+	}
+}
+
 
 void RackWidget::savePatch(std::string filename) {
 	printf("Saving patch %s\n", filename.c_str());

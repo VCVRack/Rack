@@ -13,4 +13,5 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 struct MidiInterfaceWidget : ModuleWidget {
 	MidiInterfaceWidget();
+	void step();
 };

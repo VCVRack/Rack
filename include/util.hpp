@@ -52,6 +52,9 @@ std::string stringf(const char *format, ...);
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
 std::string ellipsize(std::string s, size_t len);
 
+std::string extractDirectory(std::string path);
+std::string extractFilename(std::string path);
+
 /** Opens a URL, also happens to work with PDFs and folders.
 Shell injection is possible, so make sure the URL is trusted or hard coded.
 May block, so open in a new thread.

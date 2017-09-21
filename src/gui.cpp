@@ -56,14 +56,14 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 			}
 			gDraggedWidget = w;
 
-			if (w != gSelectedWidget) {
-				if (gSelectedWidget) {
-					w->onDeselect();
+			if (w != gFocusedWidget) {
+				if (gFocusedWidget) {
+					w->onDefocus();
 				}
 				if (w) {
-					w->onSelect();
+					w->onFocus();
 				}
-				gSelectedWidget = w;
+				gFocusedWidget = w;
 			}
 		}
 	}
@@ -155,15 +155,15 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	if (gSelectedWidget) {
-		gSelectedWidget->onText(codepoint);
+	if (gFocusedWidget) {
+		gFocusedWidget->onFocusText(codepoint);
 	}
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		// onKey
-		if (gSelectedWidget && gSelectedWidget->onKey(key))
+		// onFocusKey
+		if (gFocusedWidget && gFocusedWidget->onFocusKey(key))
 			return;
 		// onHoverKey
 		gScene->onHoverKey(gMousePos, key);
@@ -218,8 +218,7 @@ void guiInit() {
 	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	std::string title = gApplicationName + " " + gApplicationVersion;
-	gWindow = glfwCreateWindow(640, 480, title.c_str(), NULL, NULL);
+	gWindow = glfwCreateWindow(640, 480, "", NULL, NULL);
 	if (!gWindow) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0? If so, are the latest drivers installed?");
 		exit(1);
@@ -280,12 +279,24 @@ void guiRun() {
 	double lastTime = 0.0;
 	while(!glfwWindowShouldClose(gWindow)) {
 		gGuiFrame++;
+
+		// Poll events
 		glfwPollEvents();
 		{
 			double xpos, ypos;
 			glfwGetCursorPos(gWindow, &xpos, &ypos);
 			cursorPosCallback(gWindow, xpos, ypos);
 		}
+
+		// Set window title
+		std::string title = gApplicationName + " " + gApplicationVersion;
+		if (!gRackWidget->lastPath.empty()) {
+			title += " - ";
+			title += extractFilename(gRackWidget->lastPath);
+		}
+		glfwSetWindowTitle(gWindow, title.c_str());
+
+		// Step scene
 		gScene->step();
 
 		// Render
@@ -330,6 +341,10 @@ bool guiIsModPressed() {
 #else
 	return glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
 #endif
+}
+
+bool guiIsShiftPressed() {
+	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
 

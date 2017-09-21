@@ -155,20 +155,22 @@ Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 	switch (key) {
 		case GLFW_KEY_DELETE:
 		case GLFW_KEY_BACKSPACE:
-			gRackWidget->deleteModule(this);
-			this->finalizeEvents();
-			delete this;
+			if (!guiIsModPressed() && !guiIsShiftPressed()) {
+				gRackWidget->deleteModule(this);
+				this->finalizeEvents();
+				delete this;
+			}
 			break;
 		case GLFW_KEY_I:
-			if (guiIsModPressed())
+			if (guiIsModPressed() && !guiIsShiftPressed())
 				initialize();
 			break;
 		case GLFW_KEY_R:
-			if (guiIsModPressed())
+			if (guiIsModPressed() && !guiIsShiftPressed())
 				randomize();
 			break;
 		case GLFW_KEY_D:
-			if (guiIsModPressed())
+			if (guiIsModPressed() && !guiIsShiftPressed())
 				gRackWidget->cloneModule(this);
 			break;
 	}

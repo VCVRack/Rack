@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <portmidi.h>
 #include "core.hpp"
+#include "gui.hpp"
 
 
 using namespace rack;
@@ -407,4 +408,13 @@ MidiInterfaceWidget::MidiInterfaceWidget() {
 		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::PITCHWHEEL_OUTPUT));
 		yPos += 37 + margin;
 	}
+}
+
+void MidiInterfaceWidget::step() {
+	// Assume QWERTY
+#define MIDI_KEY(key, midi) if (glfwGetKey(gWindow, key)) printf("%d\n", midi);
+
+	// MIDI_KEY(GLFW_KEY_Z, 48);
+
+	ModuleWidget::step();
 }

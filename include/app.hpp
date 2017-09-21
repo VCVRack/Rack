@@ -90,10 +90,15 @@ struct RackWidget : OpaqueWidget {
 	// Only put WireWidgets in here
 	Widget *wireContainer;
 	WireWidget *activeWire = NULL;
+	std::string lastPath;
 
 	RackWidget();
 	~RackWidget();
+
 	void clear();
+	void openDialog();
+	void saveDialog();
+	void saveAsDialog();
 	void savePatch(std::string filename);
 	void loadPatch(std::string filename);
 	json_t *toJson();

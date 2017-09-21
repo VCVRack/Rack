@@ -12,7 +12,7 @@ Widget::~Widget() {
 	if (gHoveredWidget == this) gHoveredWidget = NULL;
 	if (gDraggedWidget == this) gDraggedWidget = NULL;
 	if (gDragHoveredWidget == this) gDragHoveredWidget = NULL;
-	if (gSelectedWidget == this) gSelectedWidget = NULL;
+	if (gFocusedWidget == this) gFocusedWidget = NULL;
 	clearChildren();
 }
 
@@ -76,9 +76,9 @@ void Widget::finalizeEvents() {
 	if (gDragHoveredWidget == this) {
 		gDragHoveredWidget = NULL;
 	}
-	if (gSelectedWidget == this) {
-		gSelectedWidget->onDeselect();
-		gSelectedWidget = NULL;
+	if (gFocusedWidget == this) {
+		gFocusedWidget->onDefocus();
+		gFocusedWidget = NULL;
 	}
 	for (Widget *child : children) {
 		child->finalizeEvents();
