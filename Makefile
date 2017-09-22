@@ -25,7 +25,6 @@ ifeq ($(ARCH), mac)
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
 		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
 	TARGET = Rack
-	BUNDLE = $(TARGET).app
 endif
 
 ifeq ($(ARCH), win)
@@ -93,6 +92,7 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libportmidi.so dist/Rack/
 endif
 ifeq ($(ARCH), mac)
+	$(eval BUNDLE := dist/Rack/$(TARGET).app)
 	mkdir -p $(BUNDLE)
 	mkdir -p $(BUNDLE)/Contents
 	mkdir -p $(BUNDLE)/Contents/Resources
@@ -123,8 +123,6 @@ ifeq ($(ARCH), mac)
 	install_name_tool -change @rpath/libportmidi.dylib @executable_path/libportmidi.dylib $(BUNDLE)/Contents/MacOS/Rack
 
 	otool -L $(BUNDLE)/Contents/MacOS/Rack
-
-	cp -R Rack.app dist/Rack/
 endif
 ifeq ($(ARCH), win)
 	cp Rack.exe dist/Rack/
