@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <math.h>
 
 
@@ -76,7 +78,7 @@ inline float rescalef(float x, float xMin, float xMax, float yMin, float yMax) {
 }
 
 inline float crossf(float a, float b, float frac) {
-	return (1.0 - frac) * a + frac * b;
+	return a + frac * (b - a);
 }
 
 inline float quadraticBipolar(float x) {
