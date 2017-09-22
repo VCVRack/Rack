@@ -4,9 +4,6 @@
 [submodule "ext/nanosvg"]
 	path = ext/nanosvg
 	url = https://github.com/memononen/nanosvg.git
-[submodule "ext/dr_libs"]
-	path = ext/dr_libs
-	url = https://github.com/mackron/dr_libs.git
 [submodule "ext/osdialog"]
 	path = ext/osdialog
 	url = https://github.com/AndrewBelt/osdialog.git
