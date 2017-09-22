@@ -8,6 +8,7 @@
 #include "dsp/fir.hpp"
 #include "dsp/decimator.hpp"
 #include "dsp/filter.hpp"
+#include "dsp/minblep.hpp"
 
 
 #include <assert.h>

@@ -15,8 +15,6 @@ Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system
 Install [Xcode](https://developer.apple.com/xcode/) or *command line developer tools* with `xcode-select --install`.
 Install [CMake](https://cmake.org/), preferably from [Homebrew](https://brew.sh/).
 
-If you would like MacOS 10.7+ users to be able to run your binaries and plugins, install the MacOS 10.7 SDK using the [xcodelegacy](https://github.com/devernay/xcodelegacy) script.
-
 ### Windows
 
 Install [MSYS2](http://www.msys2.org/) and launch the mingw64 shell (not the default msys2 shell).
