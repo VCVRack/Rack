@@ -99,7 +99,7 @@ $(libsamplerate):
 	$(MAKE) -C libsamplerate-0.1.9 install
 
 $(libcurl):
-	$(WGET) https://curl.haxx.se/download/curl-7.54.1.tar.gz
+	$(WGET) https://github.com/curl/curl/files/1101227/curl-7.54.1.tar.gz
 	$(UNTAR) curl-7.54.1.tar.gz
 	cd curl-7.54.1 && ./configure --prefix="$(LOCAL)" \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
