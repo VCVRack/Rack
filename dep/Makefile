@@ -1,5 +1,5 @@
 
-LOCAL = $(PWD)
+LOCAL = $(shell pwd)
 
 # Arch-specifics
 include ../arch.mk
