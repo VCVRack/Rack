@@ -59,18 +59,20 @@ static void engineStep() {
 		}
 	}
 	// Step all modules
-	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+	// std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
 	for (Module *module : modules) {
 		// Start clock for CPU usage
-		start = std::chrono::high_resolution_clock::now();
+		// start = std::chrono::high_resolution_clock::now();
+
 		// Step module by one frame
 		module->step();
+
 		// Stop clock and smooth step time value
-		end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> diff = end - start;
-		float elapsed = diff.count() * gSampleRate;
-		const float lambda = 1.0;
-		module->cpuTime += (elapsed - module->cpuTime) * lambda / gSampleRate;
+		// end = std::chrono::high_resolution_clock::now();
+		// std::chrono::duration<float> diff = end - start;
+		// float elapsed = diff.count() * gSampleRate;
+		// const float lambda = 1.0;
+		// module->cpuTime += (elapsed - module->cpuTime) * lambda / gSampleRate;
 	}
 	// Step cables by moving their output values to inputs
 	for (Wire *wire : wires) {
@@ -85,23 +87,35 @@ static void engineRun() {
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 
 	// Every time the engine waits and locks a mutex, it steps this many frames
-	const int stepSize = 32;
+	const int mutexSteps = 64;
+	// Time in seconds that the engine is rushing ahead of the estimated clock time
+	float ahead = 0.0;
+	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	while (running) {
 		vipMutex.wait();
 
-		auto start = std::chrono::high_resolution_clock::now();
 		{
 			std::lock_guard<std::mutex> lock(mutex);
-			for (int i = 0; i < stepSize; i++) {
+			for (int i = 0; i < mutexSteps; i++) {
 				engineStep();
 			}
 		}
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::nanoseconds((long) (0.10 * 1e9 * stepSize / gSampleRate)) - (end - start);
+
+		float stepTime = mutexSteps / gSampleRate;
+		ahead += stepTime;
+		auto currTime = std::chrono::high_resolution_clock::now();
+		const float aheadFactor = 2.0;
+		ahead -= aheadFactor * std::chrono::duration<float>(currTime - lastTime).count();
+		lastTime = currTime;
+		ahead = fmaxf(ahead, 0.0);
+
 		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
-		// if (duration > 0)
-		// 	std::this_thread::sleep_for(duration);
+		// The number of steps to wait before possibly sleeping
+		const float aheadMax = 1.0; // seconds
+		if (ahead > aheadMax) {
+			std::this_thread::sleep_for(std::chrono::duration<float>(stepTime));
+		}
 	}
 }
 
@@ -128,7 +142,7 @@ void engineRemoveModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
-	// Remove parameter interpolation which point to this module
+	// If a param is being smoothed on this module, remove it immediately
 	if (module == smoothModule) {
 		smoothModule = NULL;
 	}
@@ -157,8 +171,9 @@ void engineAddWire(Wire *wire) {
 		assert(!(wire2->outputModule == wire->outputModule && wire2->outputId == wire->outputId));
 		assert(!(wire2->inputModule == wire->inputModule && wire2->inputId == wire->inputId));
 	}
-	// Connect the wire to inputModule
+	// Add the wire
 	wires.insert(wire);
+	// Connect the wire to inputModule
 	wire->inputModule->inputs[wire->inputId] = &wire->inputValue;
 	wire->outputModule->outputs[wire->outputId] = &wire->outputValue;
 }
@@ -171,6 +186,7 @@ void engineRemoveWire(Wire *wire) {
 	wire->inputModule->inputs[wire->inputId] = NULL;
 	wire->outputModule->outputs[wire->outputId] = NULL;
 
+	// Remove the wire
 	auto it = wires.find(wire);
 	assert(it != wires.end());
 	wires.erase(it);
@@ -179,12 +195,9 @@ void engineRemoveWire(Wire *wire) {
 void engineSetParamSmooth(Module *module, int paramId, float value) {
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
-	// Check existing parameter interpolation
-	if (smoothModule) {
-		if (!(smoothModule == module && smoothParamId == paramId)) {
-			// Jump param value to smooth value
-			smoothModule->params[smoothParamId] = smoothValue;
-		}
+	// Since only one param can be smoothed at a time, if another param is currently being smoothed, skip to its final state
+	if (smoothModule && !(smoothModule == module && smoothParamId == paramId)) {
+		smoothModule->params[smoothParamId] = smoothValue;
 	}
 	smoothModule = module;
 	smoothParamId = paramId;
