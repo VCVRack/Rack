@@ -1,8 +1,8 @@
 #include "widgets.hpp"
 
 
-#define DEBUG_ONLY(x) x
-// #define DEBUG_ONLY(x)
+// #define DEBUG_ONLY(x) x
+#define DEBUG_ONLY(x)
 
 namespace rack {
 
@@ -38,9 +38,6 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 			continue;
 
 		nvgSave(vg);
-
-		// Only evenodd fillrule is supported
-		if (shape->fillRule == NSVG_FILLRULE_EVENODD) {}
 
 		if (shape->opacity < 1.0)
 			nvgGlobalAlpha(vg, shape->opacity);
@@ -95,6 +92,25 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 				nvgPathWinding(vg, NVG_SOLID);
 			else
 				nvgPathWinding(vg, NVG_HOLE);
+
+/*
+			// Shoelace algorithm for computing the area, and thus the winding direction
+			float area = 0.0;
+			Vec p0 = Vec(path->pts[0], path->pts[1]);
+			for (int i = 1; i < path->npts; i += 3) {
+				float *p = &path->pts[2*i];
+				Vec p1 = (i < path->npts) ? Vec(p[4], p[5]) : Vec(path->pts[0], path->pts[1]);
+				area += 0.5 * (p1.x - p0.x) * (p1.y + p0.y);
+				printf("%f %f, %f %f\n", p0.x, p0.y, p1.x, p1.y);
+				p0 = p1;
+			}
+			printf("%f\n", area);
+
+			if (area < 0.0)
+				nvgPathWinding(vg, NVG_CCW);
+			else
+				nvgPathWinding(vg, NVG_CW);
+*/
 		}
 
 		// Fill shape
