@@ -1,8 +1,8 @@
 #include "widgets.hpp"
 
 
-// #define DEBUG_ONLY(x) x
-#define DEBUG_ONLY(x)
+#define DEBUG_ONLY(x) x
+// #define DEBUG_ONLY(x)
 
 namespace rack {
 
@@ -15,9 +15,22 @@ static NVGcolor getNVGColor(uint32_t color) {
 		(color >> 24) & 0xff);
 }
 
+/** Returns the parameterized value of the line p2--p3 where it intersects with p0--p1 */
+static float getLineCrossing(Vec p0, Vec p1, Vec p2, Vec p3) {
+	Vec b = p2.minus(p0);
+	Vec d = p1.minus(p0);
+	Vec e = p3.minus(p2);
+	float m = d.x * e.y - d.y * e.x;
+	// Check if lines are parallel, or if either pair of points are equal
+	if (fabsf(m) < 1e-6)
+		return NAN;
+	return -(d.x * b.y - d.y * b.x) / m;
+}
+
 static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 	DEBUG_ONLY(printf("new image: %g x %g px\n", svg->width, svg->height);)
 	int shapeIndex = 0;
+	// Iterate shape linked list
 	for (NSVGshape *shape = svg->shapes; shape; shape = shape->next, shapeIndex++) {
 		DEBUG_ONLY(printf("	new shape: %d id \"%s\", fillrule %d, from (%f, %f) to (%f, %f)\n", shapeIndex, shape->id, shape->fillRule, shape->bounds[0], shape->bounds[1], shape->bounds[2], shape->bounds[3]);)
 
@@ -26,11 +39,15 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 
 		nvgSave(vg);
 
+		// Only evenodd fillrule is supported
+		if (shape->fillRule == NSVG_FILLRULE_EVENODD) {}
+
 		if (shape->opacity < 1.0)
 			nvgGlobalAlpha(vg, shape->opacity);
 
 		// Build path
 		nvgBeginPath(vg);
+		// Iterate path linked list
 		for (NSVGpath *path = shape->paths; path; path = path->next) {
 			DEBUG_ONLY(printf("		new path: %d points, %s, from (%f, %f) to (%f, %f)\n", path->npts, path->closed ? "closed" : "open", path->bounds[0], path->bounds[1], path->bounds[2], path->bounds[3]);)
 
@@ -39,14 +56,42 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 				float *p = &path->pts[2*i];
 				nvgBezierTo(vg, p[0], p[1], p[2], p[3], p[4], p[5]);
 				// nvgLineTo(vg, p[4], p[5]);
+				DEBUG_ONLY(printf("			bezier (%f, %f) to (%f, %f)\n", p[-2], p[-1], p[4], p[5]);)
 			}
 
 			if (path->closed)
 				nvgClosePath(vg);
 
-			// TODO
-			// This is totally wrong but works by coincidence
-			if (!path->next)
+			// Compute whether this is a hole or a solid.
+			// Assume that no paths are crossing (usually true for normal SVG graphics).
+			// Also assume that the topology is the same if we use straight lines rather than Beziers (not always the case but usually true).
+			// Using the even-odd fill rule, if we draw a line from a point on the path to a point outside the boundary (e.g. top left) and count the number of times it crosses another path, the parity of this count determines whether the path is a hole (odd) or solid (even).
+			int crossings = 0;
+			Vec p0 = Vec(path->pts[0], path->pts[1]);
+			Vec p1 = Vec(path->bounds[0] - 1.0, path->bounds[1] - 1.0);
+			// Iterate all other paths
+			for (NSVGpath *path2 = shape->paths; path2; path2 = path2->next) {
+				if (path2 == path)
+					continue;
+
+				// Iterate all lines on the path
+				if (path2->npts < 4)
+					continue;
+				for (int i = 1; i < path2->npts + 3; i += 3) {
+					float *p = &path2->pts[2*i];
+					// The previous point
+					Vec p2 = Vec(p[-2], p[-1]);
+					// The current point
+					Vec p3 = (i < path2->npts) ? Vec(p[4], p[5]) : Vec(path2->pts[0], path2->pts[1]);
+					float crossing = getLineCrossing(p0, p1, p2, p3);
+					float crossing2 = getLineCrossing(p2, p3, p0, p1);
+					if (0.0 <= crossing && crossing < 1.0 && 0.0 <= crossing2) {
+						crossings++;
+					}
+				}
+			}
+
+			if (crossings % 2 == 0)
 				nvgPathWinding(vg, NVG_SOLID);
 			else
 				nvgPathWinding(vg, NVG_HOLE);
@@ -62,6 +107,7 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 				} break;
 				case NSVG_PAINT_LINEAR_GRADIENT: {
 					NSVGgradient *g = shape->fill.gradient;
+					(void)g;
 					DEBUG_ONLY(printf("		linear gradient: %f\t%f\n", g->fx, g->fy);)
 				} break;
 				case NSVG_PAINT_RADIAL_GRADIENT: {
@@ -75,7 +121,7 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 					NVGcolor color1 = getNVGColor(g->stops[g->nstops - 1].color);
 
 					float inverse[6];
-					Rect shapeBox = Rect::fromMinMax(Vec(shape->bounds[0], shape->bounds[1]), Vec(shape->bounds[2], shape->bounds[3]));
+					// Rect shapeBox = Rect::fromMinMax(Vec(shape->bounds[0], shape->bounds[1]), Vec(shape->bounds[2], shape->bounds[3]));
 					nvgTransformInverse(inverse, g->xform);
 					Vec c;
 					nvgTransformPoint(&c.x, &c.y, inverse, 5, 5);
