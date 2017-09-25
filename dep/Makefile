@@ -94,9 +94,9 @@ $(jansson):
 $(libsamplerate):
 	$(WGET) http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz
 	$(UNTAR) libsamplerate-0.1.9.tar.gz
-	cd libsamplerate-0.1.9 && ./configure --prefix="$(LOCAL)"
-	$(MAKE) -C libsamplerate-0.1.9
-	$(MAKE) -C libsamplerate-0.1.9 install
+	cd libsamplerate-0.1.9 && ./configure --prefix="$(LOCAL)" --disable-fftw --disable-sndfile
+	$(MAKE) -C libsamplerate-0.1.9/src
+	$(MAKE) -C libsamplerate-0.1.9/src install
 
 $(libcurl):
 	$(WGET) https://github.com/curl/curl/files/1101227/curl-7.54.1.tar.gz
