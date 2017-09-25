@@ -304,7 +304,7 @@ void guiRun() {
 
 		// Autosave every 15 seconds
 		if (gGuiFrame % (60*15) == 0) {
-			gRackWidget->savePatch("autosave.json");
+			gRackWidget->savePatch("autosave.vcv");
 			settingsSave("settings.json");
 		}
 

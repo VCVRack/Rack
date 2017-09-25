@@ -159,6 +159,7 @@ Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 				gRackWidget->deleteModule(this);
 				this->finalizeEvents();
 				delete this;
+				return NULL;
 			}
 			break;
 		case GLFW_KEY_I:

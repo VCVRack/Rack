@@ -45,6 +45,7 @@ void RackWidget::clear() {
 	activeWire = NULL;
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
+	lastPath = "";
 }
 
 void RackWidget::openDialog() {
