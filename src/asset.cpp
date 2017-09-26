@@ -1,25 +1,28 @@
 #include "asset.hpp"
-#include <stdlib.h> // for realpath
 #include <assert.h>
+#include <sys/stat.h> // for mkdir
+
+#if ARCH_MAC
+	#include <CoreFoundation/CoreFoundation.h>
+	#include <pwd.h>
+#endif
 
 
 namespace rack {
 
 
-static std::string fileRealPath(std::string path) {
-	char *rpath = realpath(path.c_str(), NULL);
-	if (!rpath)
-		return "";
-
-	std::string rrpath = path;
-	free(rpath);
-	return rrpath;
-}
-
 std::string assetGlobal(std::string filename) {
 	std::string path;
 #if ARCH_MAC
-	// TODO
+	CFBundleRef bundle = CFBundleGetMainBundle();
+	CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
+	char buf[PATH_MAX];
+	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
+	assert(success);
+	CFRelease(resourcesUrl);
+	path = buf;
+	path += "/";
+	path += filename;
 #endif
 #if ARCH_WIN
 	path = "./" + filename;
@@ -27,13 +30,20 @@ std::string assetGlobal(std::string filename) {
 #if ARCH_LIN
 	path = "./" + filename;
 #endif
-	return fileRealPath(path);
+	return path;
 }
 
 std::string assetLocal(std::string filename) {
 	std::string path;
 #if ARCH_MAC
-	// TODO
+	// Get home directory
+	struct passwd *pw = getpwuid(getuid());
+	assert(pw);
+	path = pw->pw_dir;
+	path += "/Documents/Rack";
+	mkdir(path.c_str(), 0755);
+	path += "/";
+	path += filename;
 #endif
 #if ARCH_WIN
 	// TODO
@@ -43,12 +53,14 @@ std::string assetLocal(std::string filename) {
 	// If Rack is "installed" (however that may be defined), look in ~/.Rack or something instead
 	path = "./" + filename;
 #endif
-	return fileRealPath(path);
+	return path;
 }
 
 std::string assetPlugin(Plugin *plugin, std::string filename) {
 	assert(plugin);
-	return fileRealPath(plugin->path + "/" + filename);
+	std::string path;
+	path = plugin->path + "/" + filename;
+	return path;
 }
 
 

@@ -4,11 +4,16 @@
 #include "plugin.hpp"
 #include "settings.hpp"
 #include "asset.hpp"
+#include <unistd.h>
 
 
 using namespace rack;
 
 int main(int argc, char* argv[]) {
+	char *cwd = getcwd(NULL, 0);
+	printf("Current working directory is %s\n", cwd);
+	free(cwd);
+
 	pluginInit();
 	engineInit();
 	guiInit();

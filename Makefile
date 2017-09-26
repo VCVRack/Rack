@@ -74,29 +74,15 @@ include compile.mk
 
 
 dist: all
-ifndef VERSION
-	$(error VERSION is not set.)
-endif
-	mkdir -p dist/Rack
-	mkdir -p dist/Rack/plugins
-	cp -R LICENSE* res dist/Rack/
-ifeq ($(ARCH), lin)
-	cp Rack Rack.sh dist/Rack/
-	cp dep/lib/libsamplerate.so.0 dist/Rack/
-	cp dep/lib/libjansson.so.4 dist/Rack/
-	cp dep/lib/libGLEW.so.2.1 dist/Rack/
-	cp dep/lib/libglfw.so.3 dist/Rack/
-	cp dep/lib/libcurl.so.4 dist/Rack/
-	cp dep/lib/libzip.so.5 dist/Rack/
-	cp dep/lib/libportaudio.so.2 dist/Rack/
-	cp dep/lib/libportmidi.so dist/Rack/
-endif
+	$(MAKE) -C plugins/Fundamental dist
+
 ifeq ($(ARCH), mac)
-	$(eval BUNDLE := dist/Rack/$(TARGET).app)
+	$(eval BUNDLE := dist/$(TARGET).app)
 	mkdir -p $(BUNDLE)
 	mkdir -p $(BUNDLE)/Contents
 	mkdir -p $(BUNDLE)/Contents/Resources
 	cp Info.plist $(BUNDLE)/Contents/
+	cp -R LICENSE* res $(BUNDLE)/Contents/Resources
 
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp Rack $(BUNDLE)/Contents/MacOS/
@@ -123,8 +109,13 @@ ifeq ($(ARCH), mac)
 	install_name_tool -change @rpath/libportmidi.dylib @executable_path/libportmidi.dylib $(BUNDLE)/Contents/MacOS/Rack
 
 	otool -L $(BUNDLE)/Contents/MacOS/Rack
+
+	mkdir -p $(BUNDLE)/Contents/Resources/plugins
+	cp -R plugins/Fundamental/dist/Fundamental $(BUNDLE)/Contents/Resources/plugins
 endif
 ifeq ($(ARCH), win)
+	mkdir -p dist/Rack
+	cp -R LICENSE* res dist/Rack/
 	cp Rack.exe dist/Rack/
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/zlib1.dll dist/Rack/
@@ -138,11 +129,24 @@ ifeq ($(ARCH), win)
 	cp dep/bin/libsamplerate-0.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
 	cp dep/bin/portaudio_x64.dll dist/Rack/
-endif
-
-	# Fundamental
-	$(MAKE) -C plugins/Fundamental dist
+	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+endif
+ifeq ($(ARCH), lin)
+	mkdir -p dist/Rack
+	cp -R LICENSE* res dist/Rack/
+	cp Rack Rack.sh dist/Rack/
+	cp dep/lib/libsamplerate.so.0 dist/Rack/
+	cp dep/lib/libjansson.so.4 dist/Rack/
+	cp dep/lib/libGLEW.so.2.1 dist/Rack/
+	cp dep/lib/libglfw.so.3 dist/Rack/
+	cp dep/lib/libcurl.so.4 dist/Rack/
+	cp dep/lib/libzip.so.5 dist/Rack/
+	cp dep/lib/libportaudio.so.2 dist/Rack/
+	cp dep/lib/libportmidi.so dist/Rack/
+	mkdir -p dist/Rack/plugins
+	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+endif
 
 ifeq ($(ARCH), mac)
 	cd dist && ln -s /Applications Applications
