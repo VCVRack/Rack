@@ -256,8 +256,8 @@ struct Label : Widget {
 
 // Deletes itself from parent when clicked
 struct MenuOverlay : OpaqueWidget {
-	void step();
 	void onDragDrop(Widget *origin);
+	bool onScrollOpaque(Vec scrollRel) {return true;}
 };
 
 struct Menu : OpaqueWidget {
@@ -266,6 +266,8 @@ struct Menu : OpaqueWidget {
 	}
 	// Resizes menu and calls addChild()
 	void pushChild(Widget *child);
+	void fit();
+	void step();
 	void draw(NVGcontext *vg);
 	bool onScrollOpaque(Vec scrollRel);
 };
@@ -337,31 +339,30 @@ struct Slider : OpaqueWidget, QuantityWidget {
 	void onDragEnd();
 };
 
+/** Parent must be a ScrollWidget */
 struct ScrollBar : OpaqueWidget {
 	enum { VERTICAL, HORIZONTAL } orientation;
-	float containerOffset = 0.0;
-	float containerSize = 0.0;
 	BNDwidgetState state = BND_DEFAULT;
 
 	ScrollBar() {
 		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 	}
-	void step();
 	void draw(NVGcontext *vg);
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
 };
 
-// Handles a container with scrollbars
+/** Handles a container with ScrollBar */
 struct ScrollWidget : OpaqueWidget {
 	Widget *container;
-	ScrollBar *hScrollBar;
-	ScrollBar *vScrollBar;
+	ScrollBar *horizontalScrollBar;
+	ScrollBar *verticalScrollBar;
+	Vec offset;
 
 	ScrollWidget();
 	void step();
-	void draw(NVGcontext *vg);
+	Widget *onMouseMove(Vec pos, Vec mouseRel);
 	bool onScrollOpaque(Vec scrollRel);
 };
 

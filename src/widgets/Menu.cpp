@@ -9,6 +9,17 @@ void Menu::pushChild(Widget *child) {
 	box.size.y += child->box.size.y;
 }
 
+void Menu::fit() {
+	// Try to fit into the parent's box
+	if (parent)
+		box = box.clamp(Rect(Vec(0, 0), parent->box.size));
+}
+
+void Menu::step() {
+	fit();
+	Widget::step();
+}
+
 void Menu::draw(NVGcontext *vg) {
 	// Resize the width to the widest child
 	for (Widget *child : children) {
@@ -33,7 +44,8 @@ bool Menu::onScrollOpaque(Vec scrollRel) {
 	if (!parent)
 		return true;
 	if (!parent->box.contains(box))
-		box.pos = box.pos.plus(scrollRel.neg());
+		box.pos = box.pos.plus(scrollRel);
+	fit();
 	return true;
 }
 

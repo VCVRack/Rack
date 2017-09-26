@@ -151,7 +151,7 @@ void cursorEnterCallback(GLFWwindow* window, int entered) {
 void scrollCallback(GLFWwindow *window, double x, double y) {
 	Vec scrollRel = Vec(x, y);
 	// onScroll
-	gScene->onScroll(gMousePos, scrollRel.mult(-38.0));
+	gScene->onScroll(gMousePos, scrollRel.mult(50.0));
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {

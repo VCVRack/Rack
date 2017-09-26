@@ -4,17 +4,16 @@
 
 namespace rack {
 
-void ScrollBar::step() {
-	float boxSize = (orientation == VERTICAL ? box.size.y : box.size.x);
-	float maxOffset = containerSize - boxSize;
-	containerOffset = clampf(containerOffset, 0.0, maxOffset);
-	Widget::step();
-}
 
 void ScrollBar::draw(NVGcontext *vg) {
-	float boxSize = (orientation == VERTICAL ? box.size.y : box.size.x);
-	float maxOffset = containerSize - boxSize;
-	float offset = containerOffset / maxOffset;
+	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
+	assert(scrollWidget);
+	Vec containerCorner = scrollWidget->container->getChildrenBoundingBox().getBottomRight();
+
+	float containerSize = (orientation == HORIZONTAL) ? containerCorner.x : containerCorner.y;
+	float boxSize = (orientation == HORIZONTAL) ? box.size.x : box.size.y;
+	float offset = (orientation == HORIZONTAL) ? scrollWidget->offset.x : scrollWidget->offset.y;
+	offset = offset / (containerSize - boxSize);
 	float size = boxSize / containerSize;
 	size = clampf(size, 0.0, 1.0);
 	bndScrollBar(vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
@@ -26,7 +25,12 @@ void ScrollBar::onDragStart() {
 }
 
 void ScrollBar::onDragMove(Vec mouseRel) {
-	containerOffset += (orientation == VERTICAL ? mouseRel.y : mouseRel.x);
+	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
+	assert(scrollWidget);
+	if (orientation == HORIZONTAL)
+		scrollWidget->offset.x += mouseRel.x;
+	else
+		scrollWidget->offset.y += mouseRel.y;
 }
 
 void ScrollBar::onDragEnd() {

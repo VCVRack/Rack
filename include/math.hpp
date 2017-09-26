@@ -147,6 +147,8 @@ inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi)
 // 2D float vector
 ////////////////////
 
+struct Rect;
+
 struct Vec {
 	float x, y;
 
@@ -186,6 +188,7 @@ struct Vec {
 	bool isZero() {
 		return x == 0.0 && y == 0.0;
 	}
+	Vec clamp(Rect bound);
 };
 
 
@@ -235,6 +238,13 @@ struct Rect {
 		return r;
 	}
 };
+
+
+inline Vec Vec::clamp(Rect bound) {
+	return Vec(
+		clampf(x, bound.pos.x, bound.pos.x + bound.size.x),
+		clampf(y, bound.pos.y, bound.pos.y + bound.size.y));
+}
 
 
 } // namespace rack

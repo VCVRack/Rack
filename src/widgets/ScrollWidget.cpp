@@ -1,4 +1,5 @@
 #include "widgets.hpp"
+#include "gui.hpp"
 
 
 namespace rack {
@@ -7,42 +8,46 @@ ScrollWidget::ScrollWidget() {
 	container = new Widget();
 	addChild(container);
 
-	hScrollBar = new ScrollBar();
-	hScrollBar->orientation = ScrollBar::HORIZONTAL;
-	addChild(hScrollBar);
+	horizontalScrollBar = new ScrollBar();
+	horizontalScrollBar->orientation = ScrollBar::HORIZONTAL;
+	addChild(horizontalScrollBar);
 
-	vScrollBar = new ScrollBar();
-	vScrollBar->orientation = ScrollBar::VERTICAL;
-	addChild(vScrollBar);
+	verticalScrollBar = new ScrollBar();
+	verticalScrollBar->orientation = ScrollBar::VERTICAL;
+	addChild(verticalScrollBar);
 }
 
 void ScrollWidget::step() {
-	Vec b = Vec(box.size.x - vScrollBar->box.size.x, box.size.y - hScrollBar->box.size.y);
+	// Clamp scroll offset
+	Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
+	offset = offset.clamp(Rect(Vec(0, 0), containerCorner.minus(box.size)));
 
-	hScrollBar->box.pos.y = b.y;
-	hScrollBar->box.size.x = b.x;
+	// Resize scroll bars
+	Vec inner = Vec(box.size.x - verticalScrollBar->box.size.x, box.size.y - horizontalScrollBar->box.size.y);
+	horizontalScrollBar->box.pos.y = inner.y;
+	horizontalScrollBar->box.size.x = inner.x;
+	verticalScrollBar->box.pos.x = inner.x;
+	verticalScrollBar->box.size.y = inner.y;
 
-	vScrollBar->box.pos.x = b.x;
-	vScrollBar->box.size.y = b.y;
+	// Update the container's positions from the offset
+	container->box.pos = offset.neg().round();
 
 	Widget::step();
 }
 
-void ScrollWidget::draw(NVGcontext *vg) {
-	// Update the scrollbar sizes
-	Vec c = container->getChildrenBoundingBox().getBottomRight();
-	hScrollBar->containerSize = c.x;
-	vScrollBar->containerSize = c.y;
+Widget *ScrollWidget::onMouseMove(Vec pos, Vec mouseRel) {
+	Widget *w = Widget::onMouseMove(pos, mouseRel);
+	if (w) return w;
 
-	// Update the container's positions from the scrollbar offsets
-	container->box.pos = Vec(-hScrollBar->containerOffset, -vScrollBar->containerOffset).round();
-
-	Widget::draw(vg);
+	if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+		offset = offset.minus(mouseRel);
+		return this;
+	}
+	return NULL;
 }
 
 bool ScrollWidget::onScrollOpaque(Vec scrollRel) {
-	hScrollBar->containerOffset += scrollRel.x;
-	vScrollBar->containerOffset += scrollRel.y;
+	offset = offset.minus(scrollRel);
 	return true;
 }
 
