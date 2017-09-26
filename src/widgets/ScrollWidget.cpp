@@ -36,13 +36,13 @@ void ScrollWidget::step() {
 }
 
 Widget *ScrollWidget::onMouseMove(Vec pos, Vec mouseRel) {
-	Widget *w = Widget::onMouseMove(pos, mouseRel);
-	if (w) return w;
-
 	if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
 		offset = offset.minus(mouseRel);
 		return this;
 	}
+
+	Widget *w = Widget::onMouseMove(pos, mouseRel);
+	if (w) return w;
 	return NULL;
 }
 
