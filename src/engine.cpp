@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include <set>
+#include <vector>
+#include <algorithm>
 #include <chrono>
 #include <thread>
 #include <xmmintrin.h>
@@ -22,9 +23,9 @@ static std::mutex mutex;
 static std::thread thread;
 static VIPMutex vipMutex;
 
-static std::set<Module*> modules;
+static std::vector<Module*> modules;
 // Merely used for keeping track of which module inputs point to which module outputs, to prevent pointer mistakes and make the rack API more rigorous
-static std::set<Wire*> wires;
+static std::vector<Wire*> wires;
 
 // Parameter interpolation
 static Module *smoothModule = NULL;
@@ -58,21 +59,10 @@ static void engineStep() {
 			smoothModule->params[smoothParamId] = value;
 		}
 	}
-	// Step all modules
-	// std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
-	for (Module *module : modules) {
-		// Start clock for CPU usage
-		// start = std::chrono::high_resolution_clock::now();
-
-		// Step module by one frame
+	// Step modules
+	for (size_t i = 0; i < modules.size(); i++) {
+		Module *module = modules[i];
 		module->step();
-
-		// Stop clock and smooth step time value
-		// end = std::chrono::high_resolution_clock::now();
-		// std::chrono::duration<float> diff = end - start;
-		// float elapsed = diff.count() * gSampleRate;
-		// const float lambda = 1.0;
-		// module->cpuTime += (elapsed - module->cpuTime) * lambda / gSampleRate;
 	}
 	// Step cables by moving their output values to inputs
 	for (Wire *wire : wires) {
@@ -134,8 +124,9 @@ void engineAddModule(Module *module) {
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
 	// Check that the module is not already added
-	assert(modules.find(module) == modules.end());
-	modules.insert(module);
+	auto it = std::find(modules.begin(), modules.end(), module);
+	assert(it == modules.end());
+	modules.push_back(module);
 }
 
 void engineRemoveModule(Module *module) {
@@ -151,10 +142,9 @@ void engineRemoveModule(Module *module) {
 		assert(wire->outputModule != module);
 		assert(wire->inputModule != module);
 	}
-	auto it = modules.find(module);
-	if (it != modules.end()) {
-		modules.erase(it);
-	}
+	auto it = std::find(modules.begin(), modules.end(), module);
+	assert(it != modules.end());
+	modules.erase(it);
 }
 
 void engineAddWire(Wire *wire) {
@@ -162,7 +152,8 @@ void engineAddWire(Wire *wire) {
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
 	// Check that the wire is not already added
-	assert(wires.find(wire) == wires.end());
+	auto it = std::find(wires.begin(), wires.end(), wire);
+	assert(it == wires.end());
 	assert(wire->outputModule);
 	assert(wire->inputModule);
 	// Check that the inputs/outputs are not already used by another cable
@@ -172,7 +163,7 @@ void engineAddWire(Wire *wire) {
 		assert(!(wire2->inputModule == wire->inputModule && wire2->inputId == wire->inputId));
 	}
 	// Add the wire
-	wires.insert(wire);
+	wires.push_back(wire);
 	// Connect the wire to inputModule
 	wire->inputModule->inputs[wire->inputId] = &wire->inputValue;
 	wire->outputModule->outputs[wire->outputId] = &wire->outputValue;
@@ -187,7 +178,7 @@ void engineRemoveWire(Wire *wire) {
 	wire->outputModule->outputs[wire->outputId] = NULL;
 
 	// Remove the wire
-	auto it = wires.find(wire);
+	auto it = std::find(wires.begin(), wires.end(), wire);
 	assert(it != wires.end());
 	wires.erase(it);
 }
