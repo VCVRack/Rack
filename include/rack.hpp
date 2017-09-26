@@ -8,6 +8,7 @@
 #include "app.hpp"
 #include "components.hpp"
 #include "dsp.hpp"
+#include "asset.hpp"
 
 
 namespace rack {

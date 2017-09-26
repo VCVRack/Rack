@@ -13,21 +13,25 @@ struct Model;
 struct Plugin {
 	virtual ~Plugin();
 
-	// A unique identifier for your plugin, e.g. "foo"
+	/** A unique identifier for your plugin, e.g. "foo" */
 	std::string slug;
-	// Human readable name for your plugin, e.g. "Foo Modular"
+	/** Human readable name for your plugin, e.g. "Foo Modular" */
 	std::string name;
+	/** The file path of the plugins directory */
+	std::string path;
 	/** A list of the models made available by this plugin */
 	std::list<Model*> models;
+	/** OS-dependent library handle */
+	void *handle = NULL;
 };
 
 struct Model {
 	virtual ~Model() {}
 
 	Plugin *plugin;
-	// A unique identifier for the model in this plugin, e.g. "vco"
+	/** A unique identifier for the model in this plugin, e.g. "VCO" */
 	std::string slug;
-	// Human readable name for your model, e.g. "VCO"
+	/** Human readable name for your model, e.g. "Voltage Controlled Oscillator" */
 	std::string name;
 	virtual ModuleWidget *createModuleWidget() { return NULL; }
 };
@@ -54,8 +58,7 @@ std::string pluginGetLoginStatus();
 // Implemented by plugin
 ////////////////////
 
-/** Called once to initialize and return Plugin.
-Plugin is destructed when Rack closes
+/** Called once to initialize and return the Plugin instance.
 */
 extern "C"
-rack::Plugin *init();
+void init(rack::Plugin *plugin);

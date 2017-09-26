@@ -1,16 +1,9 @@
 #include "core.hpp"
 
 
-struct CorePlugin : Plugin {
-	CorePlugin() {
-		slug = "Core";
-		name = "Core";
-		createModel<AudioInterfaceWidget>(this, "AudioInterface", "Audio Interface");
-		createModel<MidiInterfaceWidget>(this, "MidiInterface", "MIDI Interface");
-	}
-};
-
-
-Plugin *init() {
-	return new CorePlugin();
+void init(rack::Plugin *plugin) {
+	plugin->slug = "Core";
+	plugin->name = "Core";
+	createModel<AudioInterfaceWidget>(plugin, "AudioInterface", "Audio Interface");
+	createModel<MidiInterfaceWidget>(plugin, "MidiInterface", "MIDI Interface");
 }

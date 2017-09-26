@@ -2,7 +2,7 @@
 
 #include "gui.hpp"
 #include "app.hpp"
-#include "settings.hpp"
+#include "asset.hpp"
 #include "../ext/osdialog/osdialog.h"
 
 #define NANOVG_GL2_IMPLEMENTATION
@@ -255,9 +255,9 @@ void guiInit() {
 	assert(gVg);
 
 	// Set up Blendish
-	gGuiFont = Font::load("res/DejaVuSans.ttf");
+	gGuiFont = Font::load(assetGlobal("res/DejaVuSans.ttf"));
 	bndSetFont(gGuiFont->handle);
-	// bndSetIconImage(loadImage("res/icons.png"));
+	// bndSetIconImage(loadImage(assetGlobal("res/icons.png")));
 }
 
 void guiDestroy() {
@@ -301,12 +301,6 @@ void guiRun() {
 
 		// Render
 		renderGui();
-
-		// Autosave every 15 seconds
-		if (gGuiFrame % (60*15) == 0) {
-			gRackWidget->savePatch("autosave.vcv");
-			settingsSave("settings.json");
-		}
 
 		double currTime = glfwGetTime();
 		// printf("%lf fps\n", 1.0/(currTime - lastTime));

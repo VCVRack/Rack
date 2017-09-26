@@ -4,6 +4,8 @@
 #include "engine.hpp"
 #include "plugin.hpp"
 #include "gui.hpp"
+#include "settings.hpp"
+#include "asset.hpp"
 #include "../ext/osdialog/osdialog.h"
 
 
@@ -49,7 +51,7 @@ void RackWidget::clear() {
 }
 
 void RackWidget::openDialog() {
-	std::string dir = lastPath.empty() ? "." : extractDirectory(lastPath);
+	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
 	if (path) {
 		loadPatch(path);
@@ -68,7 +70,7 @@ void RackWidget::saveDialog() {
 }
 
 void RackWidget::saveAsDialog() {
-	std::string dir = lastPath.empty() ? "." : extractDirectory(lastPath);
+	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcv", NULL);
 	if (path) {
 		savePatch(path);
@@ -331,6 +333,12 @@ void RackWidget::step() {
 			repositionModule(module);
 			module->requested = false;
 		}
+	}
+
+	// Autosave every 15 seconds
+	if (gGuiFrame % (60*15) == 0) {
+		savePatch(assetLocal("autosave.vcv"));
+		settingsSave(assetLocal("settings.json"));
 	}
 
 	Widget::step();

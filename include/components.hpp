@@ -1,5 +1,6 @@
 #pragma once
 #include "app.hpp"
+#include "asset.hpp"
 
 
 namespace rack {
@@ -90,163 +91,163 @@ struct Rogan1P : Rogan {
 
 struct Rogan6PSWhite : Rogan6PS {
 	Rogan6PSWhite() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan6PSWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan6PSWhite.svg")));
 	}
 };
 
 struct Rogan5PSGray : Rogan5PS {
 	Rogan5PSGray() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan5PSGray.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan5PSGray.svg")));
 	}
 };
 
 struct Rogan3PSBlue : Rogan3PS {
 	Rogan3PSBlue() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSBlue.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSBlue.svg")));
 	}
 };
 
 struct Rogan3PSRed : Rogan3PS {
 	Rogan3PSRed() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSRed.svg")));
 	}
 };
 
 struct Rogan3PSGreen : Rogan3PS {
 	Rogan3PSGreen() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSGreen.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSGreen.svg")));
 	}
 };
 
 struct Rogan3PSWhite : Rogan3PS {
 	Rogan3PSWhite() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PSWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSWhite.svg")));
 	}
 };
 
 struct Rogan3PBlue : Rogan3P {
 	Rogan3PBlue() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PBlue.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PBlue.svg")));
 	}
 };
 
 struct Rogan3PRed : Rogan3P {
 	Rogan3PRed() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PRed.svg")));
 	}
 };
 
 struct Rogan3PGreen : Rogan3P {
 	Rogan3PGreen() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PGreen.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PGreen.svg")));
 	}
 };
 
 struct Rogan3PWhite : Rogan3P {
 	Rogan3PWhite() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan3PWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PWhite.svg")));
 	}
 };
 
 struct Rogan2SGray : Rogan2S {
 	Rogan2SGray() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2SGray.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2SGray.svg")));
 	}
 };
 
 struct Rogan2PSBlue : Rogan2PS {
 	Rogan2PSBlue() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSBlue.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSBlue.svg")));
 	}
 };
 
 struct Rogan2PSRed : Rogan2PS {
 	Rogan2PSRed() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSRed.svg")));
 	}
 };
 
 struct Rogan2PSGreen : Rogan2PS {
 	Rogan2PSGreen() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSGreen.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSGreen.svg")));
 	}
 };
 
 struct Rogan2PSWhite : Rogan2PS {
 	Rogan2PSWhite() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PSWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSWhite.svg")));
 	}
 };
 
 struct Rogan2PBlue : Rogan2P {
 	Rogan2PBlue() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PBlue.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PBlue.svg")));
 	}
 };
 
 struct Rogan2PRed : Rogan2P {
 	Rogan2PRed() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PRed.svg")));
 	}
 };
 
 struct Rogan2PGreen : Rogan2P {
 	Rogan2PGreen() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PGreen.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PGreen.svg")));
 	}
 };
 
 struct Rogan2PWhite : Rogan2P {
 	Rogan2PWhite() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan2PWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PWhite.svg")));
 	}
 };
 
 struct Rogan1PSBlue : Rogan1PS {
 	Rogan1PSBlue() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSBlue.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSBlue.svg")));
 	}
 };
 
 struct Rogan1PSRed : Rogan1PS {
 	Rogan1PSRed() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSRed.svg")));
 	}
 };
 
 struct Rogan1PSGreen : Rogan1PS {
 	Rogan1PSGreen() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSGreen.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSGreen.svg")));
 	}
 };
 
 struct Rogan1PSWhite : Rogan1PS {
 	Rogan1PSWhite() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PSWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSWhite.svg")));
 	}
 };
 
 struct Rogan1PBlue : Rogan1P {
 	Rogan1PBlue() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PBlue.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PBlue.svg")));
 	}
 };
 
 struct Rogan1PRed : Rogan1P {
 	Rogan1PRed() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PRed.svg")));
 	}
 };
 
 struct Rogan1PGreen : Rogan1P {
 	Rogan1PGreen() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PGreen.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PGreen.svg")));
 	}
 };
 
 struct Rogan1PWhite : Rogan1P {
 	Rogan1PWhite() {
-		setSVG(SVG::load("res/ComponentLibrary/Rogan1PWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PWhite.svg")));
 	}
 };
 
@@ -256,7 +257,7 @@ struct SynthTechAlco : SVGKnob {
 		box.size = Vec(45, 45);
 		minAngle = -0.82*M_PI;
 		maxAngle = 0.82*M_PI;
-		setSVG(SVG::load("res/ComponentLibrary/SynthTechAlco.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco.svg")));
 	}
 };
 
@@ -270,43 +271,43 @@ struct Davies1900hKnob : SVGKnob {
 
 struct Davies1900hWhiteKnob : Davies1900hKnob {
 	Davies1900hWhiteKnob() {
-		setSVG(SVG::load("res/ComponentLibrary/Davies1900hWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hWhite.svg")));
 	}
 };
 
 struct Davies1900hBlackKnob : Davies1900hKnob {
 	Davies1900hBlackKnob() {
-		setSVG(SVG::load("res/ComponentLibrary/Davies1900hBlack.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hBlack.svg")));
 	}
 };
 
 struct Davies1900hRedKnob : Davies1900hKnob {
 	Davies1900hRedKnob() {
-		setSVG(SVG::load("res/ComponentLibrary/Davies1900hRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hRed.svg")));
 	}
 };
 
 struct Davies1900hLargeWhiteKnob : Davies1900hKnob {
 	Davies1900hLargeWhiteKnob() {
-		setSVG(SVG::load("res/ComponentLibrary/Davies1900hLargeWhite.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeWhite.svg")));
 	}
 };
 
 struct Davies1900hLargeBlackKnob : Davies1900hKnob {
 	Davies1900hLargeBlackKnob() {
-		setSVG(SVG::load("res/ComponentLibrary/Davies1900hLargeBlack.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeBlack.svg")));
 	}
 };
 
 struct Davies1900hLargeRedKnob : Davies1900hKnob {
 	Davies1900hLargeRedKnob() {
-		setSVG(SVG::load("res/ComponentLibrary/Davies1900hLargeRed.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeRed.svg")));
 	}
 };
 
 struct Davies1900hSmallBlackKnob : Davies1900hKnob {
 	Davies1900hSmallBlackKnob() {
-		setSVG(SVG::load("res/ComponentLibrary/Davies1900hSmallBlack.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hSmallBlack.svg")));
 	}
 };
 
@@ -317,7 +318,7 @@ struct Trimpot : SVGKnob {
 		box.size = Vec(17, 17);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
-		setSVG(SVG::load("res/ComponentLibrary/Trimpot.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Trimpot.svg")));
 	}
 };
 
@@ -326,7 +327,7 @@ struct BefacoBigKnob : SVGKnob {
 		box.size = Vec(75, 75);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
-		setSVG(SVG::load("res/ComponentLibrary/BefacoBigKnob.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoBigKnob.svg")));
 	}
 };
 
@@ -337,7 +338,7 @@ struct BefacoTinyKnob : SVGKnob {
 		box.size = Vec(26, 26);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
-		setSVG(SVG::load("res/ComponentLibrary/BefacoTinyKnob.svg"));
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoTinyKnob.svg")));
 	}
 };
 
@@ -346,11 +347,11 @@ struct BefacoSlidePot : SVGSlider {
 		Vec margin = Vec(3.5, 3.5);
 		maxHandlePos = Vec(-1, -2).plus(margin);
 		minHandlePos = Vec(-1, 87).plus(margin);
-		background->svg = SVG::load("res/ComponentLibrary/BefacoSlidePot.svg");
+		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePot.svg"));
 		background->wrap();
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
-		handle->svg = SVG::load("res/ComponentLibrary/BefacoSlidePotHandle.svg");
+		handle->svg = SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePotHandle.svg"));
 		handle->wrap();
 	}
 };
@@ -361,7 +362,7 @@ struct BefacoSlidePot : SVGSlider {
 
 struct PJ301MPort : SVGPort {
 	PJ301MPort() {
-		background->svg = SVG::load("res/ComponentLibrary/PJ301M.svg");
+		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/PJ301M.svg"));
 		background->wrap();
 		box.size = background->box.size;
 	}
@@ -369,7 +370,7 @@ struct PJ301MPort : SVGPort {
 
 struct PJ3410Port : SVGPort {
 	PJ3410Port() {
-		background->svg = SVG::load("res/ComponentLibrary/PJ3410.svg");
+		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/PJ3410.svg"));
 		background->wrap();
 		box.size = background->box.size;
 	}
@@ -377,7 +378,7 @@ struct PJ3410Port : SVGPort {
 
 struct CL1362Port : SVGPort {
 	CL1362Port() {
-		background->svg = SVG::load("res/ComponentLibrary/CL1362.svg");
+		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/CL1362.svg"));
 		background->wrap();
 		box.size = background->box.size;
 	}
@@ -480,9 +481,9 @@ struct TinyLight : BASE {
 
 struct NKK : SVGSwitch, ToggleSwitch {
 	NKK() {
-		addFrame(SVG::load("res/ComponentLibrary/NKK_0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/NKK_1.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/NKK_2.svg"));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/NKK_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/NKK_1.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/NKK_2.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -490,8 +491,8 @@ struct NKK : SVGSwitch, ToggleSwitch {
 
 struct CKSS : SVGSwitch, ToggleSwitch {
 	CKSS() {
-		addFrame(SVG::load("res/ComponentLibrary/CKSS_0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/CKSS_1.svg"));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSS_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSS_1.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -499,8 +500,8 @@ struct CKSS : SVGSwitch, ToggleSwitch {
 
 struct CKD6 : SVGSwitch, MomentarySwitch {
 	CKD6() {
-		addFrame(SVG::load("res/ComponentLibrary/CKD6_0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/CKD6_1.svg"));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKD6_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKD6_1.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -508,8 +509,8 @@ struct CKD6 : SVGSwitch, MomentarySwitch {
 
 struct TL1105 : SVGSwitch, MomentarySwitch {
 	TL1105() {
-		addFrame(SVG::load("res/ComponentLibrary/TL1105_0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/TL1105_1.svg"));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/TL1105_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/TL1105_1.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -517,7 +518,7 @@ struct TL1105 : SVGSwitch, MomentarySwitch {
 
 struct LEDButton : SVGSwitch, MomentarySwitch {
 	LEDButton() {
-		addFrame(SVG::load("res/ComponentLibrary/LEDButton.svg"));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/LEDButton.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -525,9 +526,9 @@ struct LEDButton : SVGSwitch, MomentarySwitch {
 
 struct BefacoSwitch : SVGSwitch, ToggleSwitch {
 	BefacoSwitch() {
-		addFrame(SVG::load("res/ComponentLibrary/BefacoSwitch_0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/BefacoSwitch_1.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/BefacoSwitch_2.svg"));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSwitch_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSwitch_1.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSwitch_2.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -535,8 +536,8 @@ struct BefacoSwitch : SVGSwitch, ToggleSwitch {
 
 struct BefacoPush : SVGSwitch, MomentarySwitch {
 	BefacoPush() {
-		addFrame(SVG::load("res/ComponentLibrary/BefacoPush_0.svg"));
-		addFrame(SVG::load("res/ComponentLibrary/BefacoPush_1.svg"));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoPush_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoPush_1.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -549,7 +550,7 @@ struct BefacoPush : SVGSwitch, MomentarySwitch {
 
 struct ScrewSilver : SVGScrew {
 	ScrewSilver() {
-		sw->svg = SVG::load("res/ComponentLibrary/ScrewSilver.svg");
+		sw->svg = SVG::load(assetGlobal("res/ComponentLibrary/ScrewSilver.svg"));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -557,7 +558,7 @@ struct ScrewSilver : SVGScrew {
 
 struct ScrewBlack : SVGScrew {
 	ScrewBlack() {
-		sw->svg = SVG::load("res/ComponentLibrary/ScrewBlack.svg");
+		sw->svg = SVG::load(assetGlobal("res/ComponentLibrary/ScrewBlack.svg"));
 		sw->wrap();
 		box.size = sw->box.size;
 	}

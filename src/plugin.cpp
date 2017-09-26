@@ -22,6 +22,7 @@
 
 #include "plugin.hpp"
 #include "app.hpp"
+#include "asset.hpp"
 #include "util/request.hpp"
 
 
@@ -43,53 +44,68 @@ Plugin::~Plugin() {
 	}
 }
 
-static int loadPlugin(std::string slug) {
-	#if ARCH_LIN
-		std::string path = "./plugins/" + slug + "/plugin.so";
-	#elif ARCH_WIN
-		std::string path = "./plugins/" + slug + "/plugin.dll";
-	#elif ARCH_MAC
-		std::string path = "./plugins/" + slug + "/plugin.dylib";
-	#endif
+static int loadPlugin(std::string path) {
+	std::string libraryFilename;
+#if ARCH_LIN
+	libraryFilename = path + "/" + "plugin.so";
+#elif ARCH_WIN
+	libraryFilename = path + "/" + "plugin.dll";
+#elif ARCH_MAC
+	libraryFilename = path + "/" + "plugin.dylib";
+#endif
 
 	// Load dynamic/shared library
-	#if ARCH_WIN
-		HINSTANCE handle = LoadLibrary(path.c_str());
-		if (!handle) {
-			int error = GetLastError();
-			fprintf(stderr, "Failed to load library %s: %d\n", path.c_str(), error);
-			return -1;
-		}
-	#elif ARCH_LIN || ARCH_MAC
-		void *handle = dlopen(path.c_str(), RTLD_NOW | RTLD_GLOBAL);
-		if (!handle) {
-			fprintf(stderr, "Failed to load library %s: %s\n", path.c_str(), dlerror());
-			return -1;
-		}
-	#endif
+#if ARCH_WIN
+	HINSTANCE handle = LoadLibrary(libraryFilename.c_str());
+	if (!handle) {
+		int error = GetLastError();
+		fprintf(stderr, "Failed to load library %s: %d\n", libraryFilename.c_str(), error);
+		return -1;
+	}
+#elif ARCH_LIN || ARCH_MAC
+	void *handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
+	if (!handle) {
+		fprintf(stderr, "Failed to load library %s: %s\n", libraryFilename.c_str(), dlerror());
+		return -1;
+	}
+#endif
 
 	// Call plugin init() function
-	typedef Plugin *(*InitCallback)();
+	typedef void (*InitCallback)(Plugin *);
 	InitCallback initCallback;
-	#if ARCH_WIN
-		initCallback = (InitCallback) GetProcAddress(handle, "init");
-	#elif ARCH_LIN || ARCH_MAC
-		initCallback = (InitCallback) dlsym(handle, "init");
-	#endif
+#if ARCH_WIN
+	initCallback = (InitCallback) GetProcAddress(handle, "init");
+#elif ARCH_LIN || ARCH_MAC
+	initCallback = (InitCallback) dlsym(handle, "init");
+#endif
 	if (!initCallback) {
-		fprintf(stderr, "Failed to read init() symbol in %s\n", path.c_str());
+		fprintf(stderr, "Failed to read init() symbol in %s\n", libraryFilename.c_str());
 		return -2;
 	}
 
-	// Add plugin to map
-	Plugin *plugin = initCallback();
-	if (!plugin) {
-		fprintf(stderr, "Library %s did not return a plugin\n", path.c_str());
-		return -3;
-	}
+	// Construct and initialize Plugin instance
+	Plugin *plugin = new Plugin();
+	plugin->path = path;
+	plugin->handle = handle;
+	initCallback(plugin);
+
+	// Add plugin to list
 	gPlugins.push_back(plugin);
-	fprintf(stderr, "Loaded plugin %s\n", path.c_str());
+	fprintf(stderr, "Loaded plugin %s\n", libraryFilename.c_str());
 	return 0;
+}
+
+static void loadPlugins(std::string path) {
+	DIR *dir = opendir(path.c_str());
+	if (dir) {
+		struct dirent *d;
+		while ((d = readdir(dir))) {
+			if (d->d_name[0] == '.')
+				continue;
+			loadPlugin(path + "/" + d->d_name);
+		}
+		closedir(dir);
+	}
 }
 
 ////////////////////
@@ -178,14 +194,13 @@ static void refreshPurchase(json_t *pluginJ) {
 	downloadProgress = 0.0;
 
 	// Download zip
-	std::string filename = "plugins/";
-	mkdir(filename.c_str(), 0755);
-	filename += slug;
-	filename += ".zip";
+	std::string pluginsDir = assetLocal("plugins");
+	mkdir(pluginsDir.c_str(), 0755);
+	std::string filename = pluginsDir + "/" + slug + ".zip";
 	bool success = requestDownload(download, filename, &downloadProgress);
 	if (success) {
 		// Unzip file
-		int err = extractZip(filename.c_str(), "plugins");
+		int err = extractZip(filename.c_str(), pluginsDir.c_str());
 		if (!err) {
 			// Load plugin
 			loadPlugin(slug);
@@ -204,26 +219,33 @@ static void refreshPurchase(json_t *pluginJ) {
 void pluginInit() {
 	// Load core
 	// This function is defined in core.cpp
-	Plugin *corePlugin = init();
+	Plugin *corePlugin = new Plugin();
+	init(corePlugin);
 	gPlugins.push_back(corePlugin);
 
-	// Search for plugin libraries
-	DIR *dir = opendir("plugins");
-	if (dir) {
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			if (d->d_name[0] == '.')
-				continue;
-			loadPlugin(d->d_name);
-		}
-		closedir(dir);
-	}
+	// Load plugins from global directory
+	std::string globalPlugins = assetGlobal("plugins");
+	loadPlugins(globalPlugins);
+
+	// Load plugins from local directory
+	std::string localPlugins = assetLocal("plugins");
+	if (globalPlugins != localPlugins)
+		loadPlugins(localPlugins);
 }
 
 void pluginDestroy() {
 	for (Plugin *plugin : gPlugins) {
-		// TODO free shared library handle with `dlclose` or `FreeLibrary`
-		delete plugin;
+		// Free library handle
+#if ARCH_WIN
+		if (plugin->handle)
+			FreeLibrary(plugin->handle);
+#elif ARCH_LIN || ARCH_MAC
+		if (plugin->handle)
+			dlclose(plugin->handle);
+#endif
+
+		// For some reason this segfaults
+		// delete plugin;
 	}
 	gPlugins.clear();
 }

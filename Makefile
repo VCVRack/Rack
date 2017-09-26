@@ -60,7 +60,7 @@ debug: $(TARGET)
 ifeq ($(ARCH), mac)
 	lldb ./Rack
 else
-	gdb -ex run ./Rack
+	LD_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
 endif
 
 clean:
