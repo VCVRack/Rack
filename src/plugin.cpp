@@ -238,7 +238,7 @@ void pluginDestroy() {
 		// Free library handle
 #if ARCH_WIN
 		if (plugin->handle)
-			FreeLibrary(plugin->handle);
+			FreeLibrary((HINSTANCE)plugin->handle);
 #elif ARCH_LIN || ARCH_MAC
 		if (plugin->handle)
 			dlclose(plugin->handle);
