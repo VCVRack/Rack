@@ -15,14 +15,18 @@ std::string assetGlobal(std::string filename) {
 	std::string path;
 #if ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
-	CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
-	char buf[PATH_MAX];
-	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
-	assert(success);
-	CFRelease(resourcesUrl);
-	path = buf;
-	path += "/";
-	path += filename;
+	if (bundle) {
+		CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
+		char buf[PATH_MAX];
+		Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
+		assert(success);
+		CFRelease(resourcesUrl);
+		path = buf;
+	}
+	else {
+		path = ".";
+	}
+	path += "/" + filename;
 #endif
 #if ARCH_WIN
 	path = "./" + filename;
@@ -36,14 +40,19 @@ std::string assetGlobal(std::string filename) {
 std::string assetLocal(std::string filename) {
 	std::string path;
 #if ARCH_MAC
-	// Get home directory
-	struct passwd *pw = getpwuid(getuid());
-	assert(pw);
-	path = pw->pw_dir;
-	path += "/Documents/Rack";
-	mkdir(path.c_str(), 0755);
-	path += "/";
-	path += filename;
+	// TODO Need some way to determine whether it's running from an app bundle
+	if (1) {
+		// Get home directory
+		struct passwd *pw = getpwuid(getuid());
+		assert(pw);
+		path = pw->pw_dir;
+		path += "/Documents/Rack";
+		mkdir(path.c_str(), 0755);
+	}
+	else {
+		path = ".";
+	}
+	path += "/" + filename;
 #endif
 #if ARCH_WIN
 	// TODO
