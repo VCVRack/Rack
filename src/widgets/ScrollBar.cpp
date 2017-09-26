@@ -4,6 +4,13 @@
 
 namespace rack {
 
+void ScrollBar::step() {
+	float boxSize = (orientation == VERTICAL ? box.size.y : box.size.x);
+	float maxOffset = containerSize - boxSize;
+	containerOffset = clampf(containerOffset, 0.0, maxOffset);
+	Widget::step();
+}
+
 void ScrollBar::draw(NVGcontext *vg) {
 	float boxSize = (orientation == VERTICAL ? box.size.y : box.size.x);
 	float maxOffset = containerSize - boxSize;
@@ -13,21 +20,13 @@ void ScrollBar::draw(NVGcontext *vg) {
 	bndScrollBar(vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }
 
-void ScrollBar::move(float delta) {
-	float boxSize = (orientation == VERTICAL ? box.size.y : box.size.x);
-	float maxOffset = containerSize - boxSize;
-	containerOffset += delta;
-	containerOffset = clampf(containerOffset, 0.0, maxOffset);
-}
-
 void ScrollBar::onDragStart() {
 	state = BND_ACTIVE;
 	guiCursorLock();
 }
 
 void ScrollBar::onDragMove(Vec mouseRel) {
-	float delta = (orientation == VERTICAL ? mouseRel.y : mouseRel.x);
-	move(delta);
+	containerOffset += (orientation == VERTICAL ? mouseRel.y : mouseRel.x);
 }
 
 void ScrollBar::onDragEnd() {

@@ -145,7 +145,7 @@ struct TransparentWidget : virtual Widget {
 	Widget *onScroll(Vec pos, Vec scrollRel) {return NULL;}
 };
 
-/** Widget that itself responds to mouse events */
+/** Widget that automatically responds to all mouse events but gives a chance for children to respond instead */
 struct OpaqueWidget : virtual Widget {
 	Widget *onMouseDown(Vec pos, int button) {
 		Widget *w = Widget::onMouseDown(pos, button);
@@ -165,6 +165,13 @@ struct OpaqueWidget : virtual Widget {
 		onMouseMoveOpaque(mouseRel);
 		return this;
 	}
+	Widget *onScroll(Vec pos, Vec scrollRel) {
+		Widget *w = Widget::onScroll(pos, scrollRel);
+		if (w) return w;
+		if (onScrollOpaque(scrollRel))
+			return this;
+		return NULL;
+	}
 
 	/** "High level" events called by the above lower level events.
 	Use these if you don't care about the clicked position.
@@ -172,6 +179,7 @@ struct OpaqueWidget : virtual Widget {
 	virtual void onMouseDownOpaque(int button) {}
 	virtual void onMouseUpOpaque(int button) {}
 	virtual void onMouseMoveOpaque(Vec mouseRel) {}
+	virtual bool onScrollOpaque(Vec scrollRel) {return false;}
 };
 
 struct SpriteWidget : virtual Widget {
@@ -249,9 +257,6 @@ struct Label : Widget {
 // Deletes itself from parent when clicked
 struct MenuOverlay : OpaqueWidget {
 	void step();
-	Widget *onScroll(Vec pos, Vec scrollRel) {
-		return this;
-	}
 	void onDragDrop(Widget *origin);
 };
 
@@ -262,6 +267,7 @@ struct Menu : OpaqueWidget {
 	// Resizes menu and calls addChild()
 	void pushChild(Widget *child);
 	void draw(NVGcontext *vg);
+	bool onScrollOpaque(Vec scrollRel);
 };
 
 struct MenuEntry : OpaqueWidget {
@@ -340,8 +346,8 @@ struct ScrollBar : OpaqueWidget {
 	ScrollBar() {
 		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 	}
+	void step();
 	void draw(NVGcontext *vg);
-	void move(float delta);
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
@@ -356,7 +362,7 @@ struct ScrollWidget : OpaqueWidget {
 	ScrollWidget();
 	void step();
 	void draw(NVGcontext *vg);
-	Widget *onScroll(Vec pos, Vec scrollRel);
+	bool onScrollOpaque(Vec scrollRel);
 };
 
 struct TextField : OpaqueWidget {

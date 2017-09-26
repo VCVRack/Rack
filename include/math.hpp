@@ -62,10 +62,10 @@ inline float eucmodf(float a, float base) {
 }
 
 /** Limits a value between a minimum and maximum
-If min < max, returns max
+If min > max, the limits are switched
 */
 inline float clampf(float x, float min, float max) {
-	return fmaxf(fminf(x, max), min);
+	return fmaxf(fminf(x, fmaxf(min, max)), fminf(min, max));
 }
 
 /** If the magnitude of x if less than eps, return 0 */
@@ -199,10 +199,15 @@ struct Rect {
 		return Rect(min, max.minus(min));
 	}
 
-	/** Returns whether this Rect contains another Rect, inclusive on the top/left, non-inclusive on the bottom/right */
+	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right */
 	bool contains(Vec v) {
 		return pos.x <= v.x && v.x < pos.x + size.x
 			&& pos.y <= v.y && v.y < pos.y + size.y;
+	}
+	/** Returns whether this Rect contains an entire Rect */
+	bool contains(Rect r) {
+		return pos.x <= r.pos.x && r.pos.x + r.size.x <= pos.x + size.x
+			&& pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
 	}
 	/** Returns whether this Rect overlaps with another Rect */
 	bool intersects(Rect r) {

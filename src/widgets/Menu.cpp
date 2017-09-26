@@ -29,4 +29,13 @@ void Menu::draw(NVGcontext *vg) {
 }
 
 
+bool Menu::onScrollOpaque(Vec scrollRel) {
+	if (!parent)
+		return true;
+	if (!parent->box.contains(box))
+		box.pos = box.pos.plus(scrollRel.neg());
+	return true;
+}
+
+
 } // namespace rack

@@ -40,13 +40,10 @@ void ScrollWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
 
-Widget *ScrollWidget::onScroll(Vec pos, Vec scrollRel) {
-	Widget *w = Widget::onScroll(pos, scrollRel);
-	if (w) return w;
-
-	hScrollBar->move(scrollRel.x);
-	vScrollBar->move(scrollRel.y);
-	return this;
+bool ScrollWidget::onScrollOpaque(Vec scrollRel) {
+	hScrollBar->containerOffset += scrollRel.x;
+	vScrollBar->containerOffset += scrollRel.y;
+	return true;
 }
 
 
