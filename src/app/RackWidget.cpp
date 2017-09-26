@@ -366,6 +366,22 @@ struct AddModuleMenuItem : MenuItem {
 	}
 };
 
+struct AddPluginMenuItem : MenuItem {
+	Plugin *plugin;
+	Vec modulePos;
+	Menu *createChildMenu() {
+		Menu *menu = new Menu();
+		for (Model *model : plugin->models) {
+			AddModuleMenuItem *item = new AddModuleMenuItem();
+			item->text = model->name;
+			item->model = model;
+			item->modulePos = modulePos;
+			menu->pushChild(item);
+		}
+		return menu;
+	}
+};
+
 void RackWidget::onMouseDownOpaque(int button) {
 	if (button == 1) {
 		Vec modulePos = gMousePos.minus(getAbsolutePos());
@@ -375,14 +391,11 @@ void RackWidget::onMouseDownOpaque(int button) {
 		menuLabel->text = "Add Module";
 		menu->pushChild(menuLabel);
 		for (Plugin *plugin : gPlugins) {
-			for (Model *model : plugin->models) {
-				AddModuleMenuItem *item = new AddModuleMenuItem();
-				item->text = model->name;
-				item->rightText = model->plugin->name;
-				item->model = model;
-				item->modulePos = modulePos;
-				menu->pushChild(item);
-			}
+			AddPluginMenuItem *item = new AddPluginMenuItem();
+			item->text = plugin->name;
+			item->plugin = plugin;
+			item->modulePos = modulePos;
+			menu->pushChild(item);
 		}
 	}
 }

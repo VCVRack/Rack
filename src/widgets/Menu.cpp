@@ -3,10 +3,28 @@
 
 namespace rack {
 
+Menu::~Menu() {
+	setChildMenu(NULL);
+}
+
 void Menu::pushChild(Widget *child) {
 	child->box.pos = Vec(0, box.size.y);
 	addChild(child);
 	box.size.y += child->box.size.y;
+}
+
+void Menu::setChildMenu(Menu *menu) {
+	if (childMenu) {
+		if (childMenu->parent)
+			childMenu->parent->removeChild(childMenu);
+		delete childMenu;
+		childMenu = NULL;
+	}
+	if (menu) {
+		childMenu = menu;
+		assert(parent);
+		parent->addChild(childMenu);
+	}
 }
 
 void Menu::fit() {

@@ -22,6 +22,15 @@ void MenuItem::draw(NVGcontext *vg) {
 
 void MenuItem::onMouseEnter() {
 	state = BND_HOVER;
+
+	// Try to create child menu
+	Menu *childMenu = createChildMenu();
+	if (childMenu) {
+		childMenu->box.pos = parent->box.pos.plus(box.getTopRight());
+		Menu *parentMenu = dynamic_cast<Menu*>(parent);
+		assert(parentMenu);
+		parentMenu->setChildMenu(childMenu);
+	}
 }
 
 void MenuItem::onMouseLeave() {

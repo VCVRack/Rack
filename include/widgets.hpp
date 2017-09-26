@@ -261,11 +261,16 @@ struct MenuOverlay : OpaqueWidget {
 };
 
 struct Menu : OpaqueWidget {
+	Menu *parentMenu = NULL;
+	Menu *childMenu = NULL;
+
 	Menu() {
 		box.size = Vec(0, 0);
 	}
+	~Menu();
 	// Resizes menu and calls addChild()
 	void pushChild(Widget *child);
+	void setChildMenu(Menu *menu);
 	void fit();
 	void step();
 	void draw(NVGcontext *vg);
@@ -291,8 +296,9 @@ struct MenuItem : MenuEntry {
 	float computeMinWidth(NVGcontext *vg);
 	void draw(NVGcontext *vg);
 
+	virtual Menu *createChildMenu() {return NULL;}
 	void onMouseEnter();
-	void onMouseLeave() ;
+	void onMouseLeave();
 	void onDragDrop(Widget *origin);
 };
 
