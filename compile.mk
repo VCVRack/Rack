@@ -29,7 +29,7 @@ endif
 
 
 OBJECTS += $(patsubst %, build/%.o, $(SOURCES))
-DEPS = $(patsubst %, %.d, $(OBJECTS))
+DEPS = $(patsubst %.o, %.d, $(OBJECTS))
 
 
 # Final targets
