@@ -17,12 +17,15 @@ struct Plugin {
 	std::string slug;
 	/** Human readable name for your plugin, e.g. "Foo Modular" */
 	std::string name;
-	/** The file path of the plugins directory */
-	std::string path;
 	/** A list of the models made available by this plugin */
 	std::list<Model*> models;
+	/** The file path of the plugins directory */
+	std::string path;
 	/** OS-dependent library handle */
 	void *handle = NULL;
+	/** Optional metadata for the Add Module context menu */
+	std::string homepageUrl;
+	std::string manualUrl;
 };
 
 struct Model {

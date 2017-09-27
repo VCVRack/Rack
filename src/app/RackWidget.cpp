@@ -366,10 +366,18 @@ struct AddModuleMenuItem : MenuItem {
 	}
 };
 
+struct UrlItem : MenuItem {
+	std::string url;
+	void onAction() {
+		openBrowser(url);
+	}
+};
+
 struct AddPluginMenuItem : MenuItem {
 	Plugin *plugin;
 	Vec modulePos;
 	Menu *createChildMenu() {
+		// Model items
 		Menu *menu = new Menu();
 		for (Model *model : plugin->models) {
 			AddModuleMenuItem *item = new AddModuleMenuItem();
@@ -378,6 +386,39 @@ struct AddPluginMenuItem : MenuItem {
 			item->modulePos = modulePos;
 			menu->pushChild(item);
 		}
+
+		// Metadata items
+		{
+			MenuLabel *label = new MenuLabel();
+			menu->pushChild(label);
+		}
+		{
+			MenuLabel *label = new MenuLabel();
+			label->text = plugin->name;
+			menu->pushChild(label);
+		}
+
+		if (!plugin->homepageUrl.empty()) {
+			UrlItem *item = new UrlItem();
+			item->text = "Homepage";
+			item->url = plugin->homepageUrl;
+			menu->pushChild(item);
+		}
+
+		if (!plugin->manualUrl.empty()) {
+			UrlItem *item = new UrlItem();
+			item->text = "Manual";
+			item->url = plugin->manualUrl;
+			menu->pushChild(item);
+		}
+
+		if (!plugin->path.empty()) {
+			UrlItem *item = new UrlItem();
+			item->text = "Browse Directory";
+			item->url = plugin->path;
+			menu->pushChild(item);
+		}
+
 		return menu;
 	}
 };
