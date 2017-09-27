@@ -67,6 +67,7 @@ struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction() {
 		gSampleRate = sampleRate;
+		gPaused = false;
 	}
 };
 
@@ -90,7 +91,10 @@ struct SampleRateChoice : ChoiceButton {
 		}
 	}
 	void step() {
-		text = stringf("%.0f Hz", gSampleRate);
+		if (gPaused)
+			text = "Paused";
+		else
+			text = stringf("%.0f Hz", gSampleRate);
 	}
 };
 
