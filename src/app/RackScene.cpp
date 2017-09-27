@@ -68,6 +68,9 @@ void RackScene::draw(NVGcontext *vg) {
 }
 
 Widget *RackScene::onHoverKey(Vec pos, int key) {
+	Widget *w = Widget::onHoverKey(pos, key);
+	if (w) return w;
+
 	switch (key) {
 		case GLFW_KEY_N:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
@@ -99,7 +102,7 @@ Widget *RackScene::onHoverKey(Vec pos, int key) {
 			break;
 	}
 
-	return Widget::onHoverKey(pos, key);
+	return NULL;
 }
 
 

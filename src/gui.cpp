@@ -241,9 +241,6 @@ void guiInit() {
 	err = glewInit();
 	assert(err == GLEW_OK);
 
-	// Check framebuffer support
-	assert(GLEW_EXT_framebuffer_object);
-
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 

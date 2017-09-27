@@ -10,5 +10,12 @@ void MenuOverlay::onDragDrop(Widget *origin) {
 	}
 }
 
+Widget *MenuOverlay::onHoverKey(Vec pos, int key) {
+	Widget *w = Widget::onHoverKey(pos, key);
+	if (w) return w;
+	// Steal all keys
+	return this;
+}
+
 
 } // namespace rack

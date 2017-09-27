@@ -258,6 +258,7 @@ struct Label : Widget {
 struct MenuOverlay : OpaqueWidget {
 	void onDragDrop(Widget *origin);
 	bool onScrollOpaque(Vec scrollRel) {return true;}
+	Widget *onHoverKey(Vec pos, int key);
 };
 
 struct Menu : OpaqueWidget {
