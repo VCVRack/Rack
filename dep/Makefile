@@ -65,7 +65,7 @@ all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(portmidi
 	@echo ""
 
 $(glew):
-	$(WGET) https://downloads.sourceforge.net/project/glew/glew/2.1.0/glew-2.1.0.tgz
+	$(WGET) https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz
 	$(UNTAR) glew-2.1.0.tgz
 	$(MAKE) -C glew-2.1.0 glew.lib
 	# On Linux, default lib path is lib64, so change it back to lib.
