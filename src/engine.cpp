@@ -15,6 +15,7 @@
 namespace rack {
 
 float gSampleRate;
+bool gPaused = false;
 
 
 static bool running = false;
@@ -85,7 +86,7 @@ static void engineRun() {
 	while (running) {
 		vipMutex.wait();
 
-		{
+		if (!gPaused) {
 			std::lock_guard<std::mutex> lock(mutex);
 			for (int i = 0; i < mutexSteps; i++) {
 				engineStep();

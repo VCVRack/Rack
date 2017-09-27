@@ -57,6 +57,12 @@ struct FileChoice : ChoiceButton {
 };
 
 
+struct PauseItem : MenuItem {
+	void onAction() {
+		gPaused = !gPaused;
+	}
+};
+
 struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction() {
@@ -69,6 +75,10 @@ struct SampleRateChoice : ChoiceButton {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
+
+		PauseItem *pauseItem = new PauseItem();
+		pauseItem->text = gPaused ? "Resume Engine" : "Pause Engine";
+		menu->pushChild(pauseItem);
 
 		float sampleRates[] = {44100, 48000, 88200, 96000, 176400, 192000};
 		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);

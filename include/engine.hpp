@@ -55,6 +55,7 @@ void engineRemoveWire(Wire *wire);
 void engineSetParamSmooth(Module *module, int paramId, float value);
 
 extern float gSampleRate;
+extern bool gPaused;
 
 
 } // namespace rack
