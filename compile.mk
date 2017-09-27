@@ -4,7 +4,7 @@ FLAGS += -DVERSION=$(VERSION)
 # Generate dependency files alongside the object files
 FLAGS += -MMD
 # Optimization
-FLAGS += -O3 -march=core2 -ffast-math
+FLAGS += -O3 -march=nocona -ffast-math
 FLAGS += -g -Wall
 CXXFLAGS += -std=c++11
 
