@@ -52,8 +52,13 @@ struct MidiInterface : Module {
 	bool retrigger = false;
 	bool retriggered = false;
 
-	MidiInterface();
-	~MidiInterface();
+	MidiInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+		midiInit();
+	}
+	~MidiInterface() {
+		setPortId(-1);
+	}
+
 	void step();
 
 	int getPortCount();
@@ -100,17 +105,6 @@ struct MidiInterface : Module {
 	}
 };
 
-
-MidiInterface::MidiInterface() {
-	params.resize(NUM_PARAMS);
-	inputs.resize(NUM_INPUTS);
-	outputs.resize(NUM_OUTPUTS);
-	midiInit();
-}
-
-MidiInterface::~MidiInterface() {
-	setPortId(-1);
-}
 
 void MidiInterface::step() {
 	if (stream) {

@@ -71,8 +71,11 @@ void FramebufferWidget::step() {
 }
 
 void FramebufferWidget::draw(NVGcontext *vg) {
-	if (!internal->fb)
+	if (!internal->fb) {
+		// Bypass framebuffer cache entirely
+		// Widget::draw(vg);
 		return;
+	}
 
 	// Draw framebuffer image
 	nvgBeginPath(vg);

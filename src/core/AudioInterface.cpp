@@ -56,8 +56,13 @@ struct AudioInterface : Module {
 	// in device's sample rate
 	DoubleRingBuffer<Frame<8>, (1<<15)> inputSrcBuffer;
 
-	AudioInterface();
-	~AudioInterface();
+	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+		audioInit();
+	}
+	~AudioInterface() {
+		closeDevice();
+	}
+
 	void step();
 	void stepStream(const float *input, float *output, int numFrames);
 
@@ -116,17 +121,6 @@ struct AudioInterface : Module {
 	}
 };
 
-
-AudioInterface::AudioInterface() {
-	params.resize(NUM_PARAMS);
-	inputs.resize(NUM_INPUTS);
-	outputs.resize(NUM_OUTPUTS);
-	audioInit();
-}
-
-AudioInterface::~AudioInterface() {
-	closeDevice();
-}
 
 void AudioInterface::step() {
 	if (!stream)

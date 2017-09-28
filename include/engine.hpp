@@ -17,6 +17,14 @@ struct Module {
 	/** For CPU usage */
 	float cpuTime = 0.0;
 
+	/** Deprecated, use constructor below this one */
+	Module() {}
+	/** Constructs Module with a fixed number of params, inputs, and outputs */
+	Module(int numParams, int numInputs, int numOutputs) {
+		params.resize(numParams);
+		inputs.resize(numInputs);
+		outputs.resize(numOutputs);
+	}
 	virtual ~Module() {}
 
 	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate */

@@ -369,8 +369,17 @@ struct ScrollWidget : OpaqueWidget {
 
 	ScrollWidget();
 	void step();
-	Widget *onMouseMove(Vec pos, Vec mouseRel);
 	bool onScrollOpaque(Vec scrollRel);
+};
+
+struct ZoomWidget : Widget {
+	float zoom = 1.0;
+	void draw(NVGcontext *vg);
+	Widget *onMouseDown(Vec pos, int button);
+	Widget *onMouseUp(Vec pos, int button);
+	Widget *onMouseMove(Vec pos, Vec mouseRel);
+	Widget *onHoverKey(Vec pos, int key);
+	Widget *onScroll(Vec pos, Vec scrollRel);
 };
 
 struct TextField : OpaqueWidget {

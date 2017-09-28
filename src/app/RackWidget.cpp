@@ -1,5 +1,6 @@
 #include <map>
 #include <algorithm>
+#include <thread>
 #include "app.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
@@ -369,7 +370,8 @@ struct AddModuleMenuItem : MenuItem {
 struct UrlItem : MenuItem {
 	std::string url;
 	void onAction() {
-		openBrowser(url);
+		std::thread t(openBrowser, url);
+		t.detach();
 	}
 };
 

@@ -137,6 +137,11 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 			gHoveredWidget = hovered;
 		}
 	}
+	if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+		// TODO
+		// Define a new global called gScrollWidget, which remembers the widget where middle-click was first pressed
+		gScene->onScroll(mousePos, mouseRel);
+	}
 }
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {

@@ -25,7 +25,6 @@ static std::thread thread;
 static VIPMutex vipMutex;
 
 static std::vector<Module*> modules;
-// Merely used for keeping track of which module inputs point to which module outputs, to prevent pointer mistakes and make the rack API more rigorous
 static std::vector<Wire*> wires;
 
 // Parameter interpolation
