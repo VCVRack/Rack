@@ -58,12 +58,24 @@ struct Widget {
 
 	Vec getAbsolutePos();
 	Rect getChildrenBoundingBox();
+
 	template <class T>
 	T *getAncestorOfType() {
 		if (!parent) return NULL;
 		T *p = dynamic_cast<T*>(parent);
 		if (p) return p;
 		return parent->getAncestorOfType<T>();
+	}
+
+	template <class T>
+	T *getFirstDescendantOfType() {
+		for (Widget *child : children) {
+			T *c = dynamic_cast<T*>(child);
+			if (c) return c;
+			c = child->getFirstDescendantOfType<T>();
+			if (c) return c;
+		}
+		return NULL;
 	}
 
 	/** Adds widget to list of children.

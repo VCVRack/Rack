@@ -17,7 +17,7 @@ void Knob::onDragStart() {
 void Knob::onDragMove(Vec mouseRel) {
 	// Drag slower if Mod
 	if (guiIsModPressed())
-		mouseRel = mouseRel.mult(0.1);
+		mouseRel = mouseRel.mult(1/16.0);
 	setValue(value - KNOB_SENSITIVITY * (maxValue - minValue) * mouseRel.y);
 }
 
