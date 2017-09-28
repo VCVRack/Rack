@@ -167,7 +167,7 @@ static void updateActive() {
 	// Set inputs/outputs to active
 	for (Wire *wire : wires) {
 		wire->outputModule->outputs[wire->outputId].active = true;
-		wire->inputModule->outputs[wire->inputId].active = true;
+		wire->inputModule->inputs[wire->inputId].active = true;
 	}
 }
 
