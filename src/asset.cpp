@@ -1,6 +1,8 @@
 #include "asset.hpp"
+#include "util.hpp"
 #include <assert.h>
 #include <sys/stat.h> // for mkdir
+#include "../ext/osdialog/osdialog.h"
 
 #if ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
@@ -11,11 +13,31 @@
 namespace rack {
 
 
+#if ARCH_MAC
+/** Is it actually difficult to determine whether we are running in a Mac bundle or not.
+This heuristically guesses based on the existence of a Resources directory
+*/
+static bool isBundle() {
+	CFBundleRef bundle = CFBundleGetMainBundle();
+	if (bundle) {
+		CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
+		char buf[PATH_MAX];
+		Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
+		assert(success);
+		CFRelease(resourcesUrl);
+		if (extractFilename(buf) == "Resources")
+			return true;
+	}
+	return false;
+}
+#endif
+
+
 std::string assetGlobal(std::string filename) {
 	std::string path;
 #if ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
-	if (bundle) {
+	if (bundle && isBundle()) {
 		CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
 		char buf[PATH_MAX];
 		Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
@@ -40,8 +62,7 @@ std::string assetGlobal(std::string filename) {
 std::string assetLocal(std::string filename) {
 	std::string path;
 #if ARCH_MAC
-	// TODO Need some way to determine whether it's running from an app bundle
-	if (1) {
+	if (isBundle()) {
 		// Get home directory
 		struct passwd *pw = getpwuid(getuid());
 		assert(pw);
