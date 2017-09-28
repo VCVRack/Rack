@@ -115,23 +115,16 @@ void MidiInterface::step() {
 		}
 	}
 
-	if (outputs[PITCH_OUTPUT]) {
-		*outputs[PITCH_OUTPUT] = ((note - 60)) / 12.0;
+	outputs[PITCH_OUTPUT].value = ((note - 60)) / 12.0;
+
+	bool gate = pedal || !notes.empty();
+	if (retrigger && retriggered) {
+		gate = false;
+		retriggered = false;
 	}
-	if (outputs[GATE_OUTPUT]) {
-		bool gate = pedal || !notes.empty();
-		if (retrigger && retriggered) {
-			gate = false;
-			retriggered = false;
-		}
-		*outputs[GATE_OUTPUT] = gate ? 10.0 : 0.0;
-	}
-	if (outputs[MOD_OUTPUT]) {
-		*outputs[MOD_OUTPUT] = mod / 127.0 * 10.0;
-	}
-	if (outputs[PITCHWHEEL_OUTPUT]) {
-		*outputs[PITCHWHEEL_OUTPUT] = (pitchWheel - 64) / 64.0 * 10.0;
-	}
+	outputs[GATE_OUTPUT].value = gate ? 10.0 : 0.0;
+	outputs[MOD_OUTPUT].value = mod / 127.0 * 10.0;
+	outputs[PITCHWHEEL_OUTPUT].value = (pitchWheel - 64) / 64.0 * 10.0;
 }
 
 int MidiInterface::getPortCount() {

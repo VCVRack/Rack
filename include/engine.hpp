@@ -7,14 +7,34 @@
 namespace rack {
 
 
+struct Param {
+	float value = 0.0;
+};
+
+struct Input {
+	/** Voltage of the port, zero if not plugged in. Read-only by Module */
+	float value = 0.0;
+	/** Whether a wire is plugged in */
+	bool active = false;
+	/** Returns the value if a wire is plugged in, otherwise returns the given default value */
+	float normalize(float normalValue) {
+		return active ? value : normalValue;
+	}
+};
+
+struct Output {
+	/** Voltage of the port. Write-only by Module */
+	float value = 0.0;
+	/** Whether a wire is plugged in */
+	bool active = false;
+};
+
+
 struct Module {
-	std::vector<float> params;
-	/** Pointers to voltage values at each port
-	If value is NULL, the input/output is disconnected
-	*/
-	std::vector<float*> inputs;
-	std::vector<float*> outputs;
-	/** For CPU usage */
+	std::vector<Param> params;
+	std::vector<Input> inputs;
+	std::vector<Output> outputs;
+	/** For CPU usage meter */
 	float cpuTime = 0.0;
 
 	/** Deprecated, use constructor below this one */
@@ -34,6 +54,7 @@ struct Module {
 	virtual json_t *toJson() { return NULL; }
 	virtual void fromJson(json_t *root) {}
 
+	/** Override these to implement behavior when user clicks Initialize and Randomize */
 	virtual void initialize() {}
 	virtual void randomize() {}
 };
@@ -43,10 +64,7 @@ struct Wire {
 	int outputId;
 	Module *inputModule = NULL;
 	int inputId;
-	/** The voltage connected to input ports */
-	float inputValue = 0.0;
-	/** The voltage connected to output ports */
-	float outputValue = 0.0;
+	void step();
 };
 
 void engineInit();
@@ -60,6 +78,7 @@ void engineRemoveModule(Module *module);
 /** Does not transfer pointer ownership */
 void engineAddWire(Wire *wire);
 void engineRemoveWire(Wire *wire);
+void engineSetParam(Module *module, int paramId, float value);
 void engineSetParamSmooth(Module *module, int paramId, float value);
 
 extern float gSampleRate;

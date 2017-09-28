@@ -33,6 +33,11 @@ static int smoothParamId;
 static float smoothValue;
 
 
+void Wire::step() {
+	float value = outputModule->outputs[outputId].value;
+	inputModule->inputs[inputId].value = value;
+}
+
 void engineInit() {
 	gSampleRate = 44100.0;
 }
@@ -46,28 +51,28 @@ void engineDestroy() {
 static void engineStep() {
 	// Param interpolation
 	if (smoothModule) {
-		float value = smoothModule->params[smoothParamId];
+		float value = smoothModule->params[smoothParamId].value;
 		const float lambda = 60.0; // decay rate is 1 graphics frame
 		const float snap = 0.0001;
 		float delta = smoothValue - value;
 		if (fabsf(delta) < snap) {
-			smoothModule->params[smoothParamId] = smoothValue;
+			smoothModule->params[smoothParamId].value = smoothValue;
 			smoothModule = NULL;
 		}
 		else {
 			value += delta * lambda / gSampleRate;
-			smoothModule->params[smoothParamId] = value;
+			smoothModule->params[smoothParamId].value = value;
 		}
 	}
+
 	// Step modules
-	for (size_t i = 0; i < modules.size(); i++) {
-		Module *module = modules[i];
+	for (Module *module : modules) {
 		module->step();
 	}
+
 	// Step cables by moving their output values to inputs
 	for (Wire *wire : wires) {
-		wire->inputValue = wire->outputValue;
-		wire->outputValue = 0.0;
+		wire->step();
 	}
 }
 
@@ -133,7 +138,7 @@ void engineRemoveModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
-	// If a param is being smoothed on this module, remove it immediately
+	// If a param is being smoothed on this module, stop smoothing it immediately
 	if (module == smoothModule) {
 		smoothModule = NULL;
 	}
@@ -142,45 +147,63 @@ void engineRemoveModule(Module *module) {
 		assert(wire->outputModule != module);
 		assert(wire->inputModule != module);
 	}
+	// Check that the module actually exists
 	auto it = std::find(modules.begin(), modules.end(), module);
 	assert(it != modules.end());
+	// Remove it
 	modules.erase(it);
+}
+
+static void updateActive() {
+	// Set everything to inactive
+	for (Module *module : modules) {
+		for (Input &input : module->inputs) {
+			input.active = false;
+		}
+		for (Output &output : module->outputs) {
+			output.active = false;
+		}
+	}
+	// Set inputs/outputs to active
+	for (Wire *wire : wires) {
+		wire->outputModule->outputs[wire->outputId].active = true;
+		wire->inputModule->outputs[wire->inputId].active = true;
+	}
 }
 
 void engineAddWire(Wire *wire) {
 	assert(wire);
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
-	// Check that the wire is not already added
-	auto it = std::find(wires.begin(), wires.end(), wire);
-	assert(it == wires.end());
+	// Check wire properties
 	assert(wire->outputModule);
 	assert(wire->inputModule);
-	// Check that the inputs/outputs are not already used by another cable
+	// Check that the wire is not already added, and that the input is not already used by another cable
 	for (Wire *wire2 : wires) {
 		assert(wire2 != wire);
-		assert(!(wire2->outputModule == wire->outputModule && wire2->outputId == wire->outputId));
 		assert(!(wire2->inputModule == wire->inputModule && wire2->inputId == wire->inputId));
 	}
 	// Add the wire
 	wires.push_back(wire);
-	// Connect the wire to inputModule
-	wire->inputModule->inputs[wire->inputId] = &wire->inputValue;
-	wire->outputModule->outputs[wire->outputId] = &wire->outputValue;
+	updateActive();
 }
 
 void engineRemoveWire(Wire *wire) {
 	assert(wire);
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
-	// Disconnect wire from inputModule
-	wire->inputModule->inputs[wire->inputId] = NULL;
-	wire->outputModule->outputs[wire->outputId] = NULL;
-
-	// Remove the wire
+	// Check that the wire is already added
 	auto it = std::find(wires.begin(), wires.end(), wire);
 	assert(it != wires.end());
+	// Set input to 0V
+	wire->inputModule->inputs[wire->inputId].value = 0.0;
+	// Remove the wire
 	wires.erase(it);
+	updateActive();
+}
+
+void engineSetParam(Module *module, int paramId, float value) {
+	module->params[paramId].value = value;
 }
 
 void engineSetParamSmooth(Module *module, int paramId, float value) {
@@ -188,7 +211,7 @@ void engineSetParamSmooth(Module *module, int paramId, float value) {
 	std::lock_guard<std::mutex> lock(mutex);
 	// Since only one param can be smoothed at a time, if another param is currently being smoothed, skip to its final state
 	if (smoothModule && !(smoothModule == module && smoothParamId == paramId)) {
-		smoothModule->params[smoothParamId] = smoothValue;
+		smoothModule->params[smoothParamId].value = smoothValue;
 	}
 	smoothModule = module;
 	smoothParamId = paramId;

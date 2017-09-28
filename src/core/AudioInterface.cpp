@@ -145,7 +145,7 @@ void AudioInterface::step() {
 		if (!inputBuffer.full()) {
 			Frame<8> f;
 			for (int i = 0; i < 8; i++) {
-				f.samples[i] = getf(inputs[AUDIO1_INPUT + i]) / 5.0;
+				f.samples[i] = inputs[AUDIO1_INPUT + i].value / 5.0;
 			}
 			inputBuffer.push(f);
 		}
@@ -166,7 +166,7 @@ void AudioInterface::step() {
 	if (!outputBuffer.empty()) {
 		Frame<8> f = outputBuffer.shift();
 		for (int i = 0; i < 8; i++) {
-			setf(outputs[AUDIO1_OUTPUT + i], 5.0 * f.samples[i]);
+			outputs[AUDIO1_OUTPUT + i].value = 5.0 * f.samples[i];
 		}
 	}
 }

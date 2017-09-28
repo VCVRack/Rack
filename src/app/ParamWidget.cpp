@@ -28,7 +28,7 @@ void ParamWidget::onChange() {
 	if (!module)
 		return;
 
-	module->params[paramId] = value;
+	engineSetParam(module, paramId, value);
 }
 
 
