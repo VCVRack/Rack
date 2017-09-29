@@ -38,7 +38,7 @@ struct Module {
 	float cpuTime = 0.0;
 
 	/** Deprecated, use constructor below this one */
-	// Module() {}
+	Module() {}
 	/** Constructs Module with a fixed number of params, inputs, and outputs */
 	Module(int numParams, int numInputs, int numOutputs) {
 		params.resize(numParams);
