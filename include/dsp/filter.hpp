@@ -59,31 +59,4 @@ struct SlewLimiter {
 };
 
 
-struct SchmittTrigger {
-	/** 0 unknown, 1 low, 2 high */
-	int state = 0;
-	float low = 0.0;
-	float high = 1.0;
-	void setThresholds(float low, float high) {
-		this->low = low;
-		this->high = high;
-	}
-	/** Returns true if triggered */
-	bool process(float in) {
-		bool triggered = false;
-		if (in >= high) {
-			if (state == 1)
-				triggered = true;
-			state = 2;
-		}
-		else if (in <= low) {
-			state = 1;
-		}
-		return triggered;
-	}
-	void reset() {
-		state = 0;
-	}
-};
-
 } // namespace rack

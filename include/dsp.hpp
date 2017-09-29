@@ -9,6 +9,7 @@
 #include "dsp/decimator.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/minblep.hpp"
+#include "dsp/digital.hpp"
 
 
 #include <assert.h>
