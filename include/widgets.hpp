@@ -273,9 +273,13 @@ struct MenuOverlay : OpaqueWidget {
 	Widget *onHoverKey(Vec pos, int key);
 };
 
+struct MenuEntry;
+
 struct Menu : OpaqueWidget {
 	Menu *parentMenu = NULL;
 	Menu *childMenu = NULL;
+	/** The entry which created the child menu */
+	MenuEntry *activeEntry = NULL;
 
 	Menu() {
 		box.size = Vec(0, 0);
@@ -304,14 +308,11 @@ struct MenuLabel : MenuEntry {
 };
 
 struct MenuItem : MenuEntry {
-	BNDwidgetState state = BND_DEFAULT;
-
 	float computeMinWidth(NVGcontext *vg);
 	void draw(NVGcontext *vg);
 
 	virtual Menu *createChildMenu() {return NULL;}
 	void onMouseEnter();
-	void onMouseLeave();
 	void onDragDrop(Widget *origin);
 };
 
