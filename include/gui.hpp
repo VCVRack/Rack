@@ -8,9 +8,9 @@ namespace rack {
 
 
 #ifdef ARCH_MAC
-	#define MOD_KEY_NAME "Cmd"
+	#define GUI_MOD_KEY_NAME "Cmd"
 #else
-	#define MOD_KEY_NAME "Ctrl"
+	#define GUI_MOD_KEY_NAME "Ctrl"
 #endif
 
 

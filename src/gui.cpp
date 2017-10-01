@@ -155,6 +155,10 @@ void cursorEnterCallback(GLFWwindow* window, int entered) {
 
 void scrollCallback(GLFWwindow *window, double x, double y) {
 	Vec scrollRel = Vec(x, y);
+#if ARCH_LIN || ARCH_WIN
+	if (guiIsShiftPressed())
+		scrollRel = Vec(y, x);
+#endif
 	// onScroll
 	gScene->onScroll(gMousePos, scrollRel.mult(50.0));
 }

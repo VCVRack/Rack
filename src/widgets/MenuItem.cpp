@@ -36,10 +36,10 @@ void MenuItem::onMouseEnter() {
 	// Try to create child menu
 	Menu *childMenu = createChildMenu();
 	if (childMenu) {
-		childMenu->box.pos = parent->box.pos.plus(box.getTopRight());
-		parentMenu->setChildMenu(childMenu);
 		parentMenu->activeEntry = this;
+		childMenu->box.pos = parent->box.pos.plus(box.getTopRight());
 	}
+	parentMenu->setChildMenu(childMenu);
 }
 
 void MenuItem::onDragDrop(Widget *origin) {

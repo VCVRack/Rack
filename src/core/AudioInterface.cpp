@@ -206,7 +206,7 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 				break;
 			Frame<8> f = inputSrcBuffer.shift();
 			for (int c = 0; c < numOutputs; c++) {
-				output[i*numOutputs + c] = (c < 8) ? f.samples[c] : 0.0;
+				output[i*numOutputs + c] = (c < 8) ? clampf(f.samples[c], -1.0, 1.0) : 0.0;
 			}
 		}
 	}

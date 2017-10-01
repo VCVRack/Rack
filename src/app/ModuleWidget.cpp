@@ -236,13 +236,13 @@ Menu *ModuleWidget::createContextMenu() {
 
 	InitializeMenuItem *resetItem = new InitializeMenuItem();
 	resetItem->text = "Initialize";
-	resetItem->rightText = MOD_KEY_NAME "+I";
+	resetItem->rightText = GUI_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->pushChild(resetItem);
 
 	RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
 	randomizeItem->text = "Randomize";
-	randomizeItem->rightText = MOD_KEY_NAME "+R";
+	randomizeItem->rightText = GUI_MOD_KEY_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->pushChild(randomizeItem);
 
@@ -253,7 +253,7 @@ Menu *ModuleWidget::createContextMenu() {
 
 	CloneMenuItem *cloneItem = new CloneMenuItem();
 	cloneItem->text = "Duplicate";
-	cloneItem->rightText = MOD_KEY_NAME "+D";
+	cloneItem->rightText = GUI_MOD_KEY_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->pushChild(cloneItem);
 

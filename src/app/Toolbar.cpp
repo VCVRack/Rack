@@ -39,18 +39,22 @@ struct FileChoice : ChoiceButton {
 		{
 			MenuItem *newItem = new NewItem();
 			newItem->text = "New";
+			newItem->rightText = GUI_MOD_KEY_NAME "+N";
 			menu->pushChild(newItem);
 
 			MenuItem *openItem = new OpenItem();
 			openItem->text = "Open";
+			openItem->rightText = GUI_MOD_KEY_NAME "+O";
 			menu->pushChild(openItem);
 
 			MenuItem *saveItem = new SaveItem();
 			saveItem->text = "Save";
+			saveItem->rightText = GUI_MOD_KEY_NAME "+S";
 			menu->pushChild(saveItem);
 
 			MenuItem *saveAsItem = new SaveAsItem();
 			saveAsItem->text = "Save As";
+			saveAsItem->rightText = GUI_MOD_KEY_NAME "+Shift+S";
 			menu->pushChild(saveAsItem);
 		}
 	}

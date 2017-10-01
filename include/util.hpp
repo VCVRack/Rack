@@ -32,6 +32,23 @@ will expand to
 namespace rack {
 
 
+/** C#-style property constructor
+Example:
+	Foo *foo = construct<Foo>(&Foo::greeting, "Hello world");
+*/
+template<typename T>
+T *construct() {
+	return new T();
+}
+
+template<typename T, typename F, typename V, typename... Args>
+T *construct(F f, V v, Args... args) {
+	T *o = construct<T>(args...);
+	o->*f = v;
+	return o;
+}
+
+
 ////////////////////
 // RNG
 ////////////////////
