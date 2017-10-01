@@ -87,34 +87,32 @@ WireWidget::WireWidget() {
 }
 
 WireWidget::~WireWidget() {
-	if (outputPort) {
-		outputPort->connectedWire = NULL;
-		outputPort = NULL;
-	}
-	if (inputPort) {
-		inputPort->connectedWire = NULL;
-		inputPort = NULL;
-	}
+	outputPort = NULL;
+	inputPort = NULL;
 	updateWire();
 }
 
 void WireWidget::updateWire() {
-	if (wire) {
-		engineRemoveWire(wire);
-		delete wire;
-		wire = NULL;
-	}
 	if (inputPort && outputPort) {
 		// Check correct types
 		assert(inputPort->type == Port::INPUT);
 		assert(outputPort->type == Port::OUTPUT);
 
-		wire = new Wire();
-		wire->outputModule = outputPort->module;
-		wire->outputId = outputPort->portId;
-		wire->inputModule = inputPort->module;
-		wire->inputId = inputPort->portId;
-		engineAddWire(wire);
+		if (!wire) {
+			wire = new Wire();
+			wire->outputModule = outputPort->module;
+			wire->outputId = outputPort->portId;
+			wire->inputModule = inputPort->module;
+			wire->inputId = inputPort->portId;
+			engineAddWire(wire);
+		}
+	}
+	else {
+		if (wire) {
+			engineRemoveWire(wire);
+			delete wire;
+			wire = NULL;
+		}
 	}
 }
 
@@ -150,17 +148,17 @@ void WireWidget::draw(NVGcontext *vg) {
 	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value / 100.0;
 	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
 
-	// Display the actively dragged wire as opaque
-	if (gRackWidget->activeWire == this)
+	// Draw as opaque if an "incomplete" wire
+	if (!(inputPort && outputPort))
 		opacity = 1.0;
 
 	drawWire(vg, getOutputPos(), getInputPos(), color, tension, opacity);
-	drawPlug(vg, getOutputPos(), color);
-	drawPlug(vg, getInputPos(), color);
 }
 
 void WireWidget::drawPlugs(NVGcontext *vg) {
 	// TODO Figure out a way to draw plugs first and wires last, and cut the plug portion of the wire off.
+	drawPlug(vg, getOutputPos(), color);
+	drawPlug(vg, getInputPos(), color);
 }
 
 

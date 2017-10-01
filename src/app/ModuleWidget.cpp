@@ -97,10 +97,10 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 
 void ModuleWidget::disconnect() {
 	for (Port *input : inputs) {
-		input->disconnect();
+		gRackWidget->wireContainer->removeAllWires(input);
 	}
 	for (Port *output : outputs) {
-		output->disconnect();
+		gRackWidget->wireContainer->removeAllWires(output);
 	}
 }
 

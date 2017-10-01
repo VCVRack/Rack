@@ -13,19 +13,6 @@
 namespace rack {
 
 
-struct WireContainer : TransparentWidget {
-	void draw(NVGcontext *vg) {
-		// Wire plugs
-		for (Widget *child : children) {
-			WireWidget *wire = dynamic_cast<WireWidget*>(child);
-			assert(wire);
-			wire->drawPlugs(vg);
-		}
-
-		Widget::draw(vg);
-	}
-};
-
 RackWidget::RackWidget() {
 	rails = new FramebufferWidget();
 	RackRail *rail = new RackRail();
@@ -45,7 +32,7 @@ RackWidget::~RackWidget() {
 }
 
 void RackWidget::clear() {
-	activeWire = NULL;
+	wireContainer->activeWire = NULL;
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 	lastPath = "";
@@ -253,8 +240,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 		WireWidget *wireWidget = new WireWidget();
 		wireWidget->outputPort = outputPort;
 		wireWidget->inputPort = inputPort;
-		outputPort->connectedWire = wireWidget;
-		inputPort->connectedWire = wireWidget;
 		wireWidget->updateWire();
 		// Add wire to rack
 		wireContainer->addChild(wireWidget);

@@ -83,13 +83,25 @@ struct WireWidget : OpaqueWidget {
 	void drawPlugs(NVGcontext *vg);
 };
 
+struct WireContainer : TransparentWidget {
+	WireWidget *activeWire = NULL;
+	/** Takes ownership of `w` and adds it as a child if it isn't already */
+	void setActiveWire(WireWidget *w);
+	/** "Drops" the wire onto the port, making an engine connection if successful */
+	void commitActiveWire();
+	void removeTopWire(Port *port);
+	void removeAllWires(Port *port);
+	/** Returns the most recently added wire connected to the given Port, i.e. the top of the stack */
+	WireWidget *getTopWire(Port *port);
+	void draw(NVGcontext *vg);
+};
+
 struct RackWidget : OpaqueWidget {
 	FramebufferWidget *rails;
 	// Only put ModuleWidgets in here
 	Widget *moduleContainer;
 	// Only put WireWidgets in here
-	Widget *wireContainer;
-	WireWidget *activeWire = NULL;
+	WireContainer *wireContainer;
 	std::string lastPath;
 
 	RackWidget();
@@ -249,20 +261,15 @@ struct MomentarySwitch : virtual Switch {
 
 struct Port : OpaqueWidget {
 	enum PortType {
-		DEFAULT,
 		INPUT,
 		OUTPUT
 	};
 
 	Module *module = NULL;
-	WireWidget *connectedWire = NULL;
-	PortType type = DEFAULT;
+	PortType type = INPUT;
 	int portId;
 
-	Port();
 	~Port();
-	void disconnect();
-
 	void draw(NVGcontext *vg);
 	void onMouseDownOpaque(int button);
 	void onDragEnd();
