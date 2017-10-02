@@ -168,19 +168,26 @@ Widget *ModuleWidget::onMouseMove(Vec pos, Vec mouseRel) {
 Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 	switch (key) {
 		case GLFW_KEY_I:
-			if (guiIsModPressed() && !guiIsShiftPressed())
+			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				initialize();
+				return this;
+			}
 			break;
 		case GLFW_KEY_R:
-			if (guiIsModPressed() && !guiIsShiftPressed())
+			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				randomize();
+				return this;
+			}
 			break;
 		case GLFW_KEY_D:
-			if (guiIsModPressed() && !guiIsShiftPressed())
+			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				gRackWidget->cloneModule(this);
+				return this;
+			}
 			break;
 	}
-	return this;
+
+	return Widget::onHoverKey(pos, key);
 }
 
 void ModuleWidget::onDragStart() {
