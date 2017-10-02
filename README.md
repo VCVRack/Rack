@@ -6,6 +6,12 @@
 
 This README includes instructions for building Rack from source. For information about the software, go to https://vcvrack.com/.
 
+## The [Issue Tracker](https://github.com/VCVRack/Rack/issues) *is* the official developer's forum
+
+Bug reports, feature requests, and even *questions/discussions* are welcome on the GitHub Issue Tracker for all VCVRack repos.
+
+Please vote on feature requests by using the Thumbs Up/Down reaction on the first post.
+
 ## Setting up your development environment
 
 Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system, since specific versions are compiled locally during the build process. However, you need proper tools to build these dependencies.
