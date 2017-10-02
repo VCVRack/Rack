@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "engine.hpp"
+#include "components.hpp"
 
 
 namespace rack {
@@ -84,6 +85,17 @@ static int lastWireColorId = -1;
 WireWidget::WireWidget() {
 	lastWireColorId = (lastWireColorId + 1) % 6;
 	color = wireColors[lastWireColorId];
+
+	PolarityLight *inputPolarityLight = new MediumLight<PolarityLight>();
+	PolarityLight *outputPolarityLight = new MediumLight<PolarityLight>();
+	outputPolarityLight->posColor = inputPolarityLight->posColor = COLOR_GREEN;
+	outputPolarityLight->negColor = inputPolarityLight->negColor = COLOR_RED;
+
+	inputLight = inputPolarityLight;
+	outputLight = outputPolarityLight;
+	addChild(inputLight);
+	addChild(outputLight);
+
 }
 
 WireWidget::~WireWidget() {
@@ -157,8 +169,27 @@ void WireWidget::draw(NVGcontext *vg) {
 
 void WireWidget::drawPlugs(NVGcontext *vg) {
 	// TODO Figure out a way to draw plugs first and wires last, and cut the plug portion of the wire off.
-	drawPlug(vg, getOutputPos(), color);
+	Vec outputPos = getOutputPos();
+	Vec inputPos = getInputPos();
+	drawPlug(vg, outputPos, color);
 	drawPlug(vg, getInputPos(), color);
+
+	// Draw plug light
+	/*
+	if (wire) {
+		Output &output = wire->outputModule->outputs[wire->outputId];
+		float value = output.value / 10.0;
+		outputLight->box.pos = outputPos.minus(Vec(6, 6));
+		inputLight->box.pos = inputPos.minus(Vec(6, 6));
+		outputLight->setValue(value);
+		inputLight->setValue(value);
+	}
+	else {
+		outputLight->setValue(0.0);
+		inputLight->setValue(0.0);
+	}
+	Widget::draw(vg);
+	*/
 }
 
 

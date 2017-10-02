@@ -389,13 +389,18 @@ struct CL1362Port : SVGPort {
 ////////////////////
 
 struct ValueLight : Light {
-	float *value;
+	float *value = NULL;
+	virtual void setValue(float v) {}
+	void step() {
+		if (value)
+			setValue(*value);
+	}
 };
 
 struct ColorValueLight : ValueLight {
 	NVGcolor baseColor;
-	void step() {
-		float v = sqrtBipolar(getf(value));
+	void setValue(float v) {
+		v = sqrtBipolar(v);
 		color = baseColor;
 		color.a = clampf(v, 0.0, 1.0);
 	}
@@ -422,8 +427,8 @@ struct GreenValueLight : ColorValueLight {
 struct PolarityLight : ValueLight {
 	NVGcolor posColor;
 	NVGcolor negColor;
-	void step() {
-		float v = sqrtBipolar(getf(value));
+	void setValue(float v) {
+		v = sqrtBipolar(v);
 		color = (v >= 0.0) ? posColor : negColor;
 		color.a = clampf(fabsf(v), 0.0, 1.0);
 	}
@@ -438,8 +443,8 @@ struct GreenRedPolarityLight : PolarityLight {
 
 struct ModeValueLight : ValueLight {
 	std::vector<NVGcolor> colors;
-	void step() {
-		int mode = clampi((int)roundf(getf(value)), 0, colors.size());
+	void setValue(float v) {
+		int mode = clampi((int)roundf(v), 0, colors.size());
 		color = colors[mode];
 	}
 	void addColor(NVGcolor color) {

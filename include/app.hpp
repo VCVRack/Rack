@@ -66,11 +66,14 @@ struct ModuleWidget : OpaqueWidget {
 	void onMouseDownOpaque(int button);
 };
 
+struct ValueLight;
 struct WireWidget : OpaqueWidget {
-	Port *inputPort = NULL;
 	Port *outputPort = NULL;
-	Port *hoveredInputPort = NULL;
+	Port *inputPort = NULL;
 	Port *hoveredOutputPort = NULL;
+	Port *hoveredInputPort = NULL;
+	ValueLight *inputLight;
+	ValueLight *outputLight;
 	Wire *wire = NULL;
 	NVGcolor color;
 
