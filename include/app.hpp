@@ -58,6 +58,7 @@ struct ModuleWidget : OpaqueWidget {
 	bool requested = false;
 	Vec requestedPos;
 	Vec dragPos;
+	Widget *onMouseMove(Vec pos, Vec mouseRel);
 	Widget *onHoverKey(Vec pos, int key);
 	void onDragStart();
 	void onDragMove(Vec mouseRel);

@@ -151,17 +151,22 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	nvgResetScissor(vg);
 }
 
+Widget *ModuleWidget::onMouseMove(Vec pos, Vec mouseRel) {
+	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
+	if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+		if (!guiIsModPressed() && !guiIsShiftPressed()) {
+			gRackWidget->deleteModule(this);
+			this->finalizeEvents();
+			delete this;
+			// Kinda sketchy because events will be passed further down the tree
+			return NULL;
+		}
+	}
+	return OpaqueWidget::onMouseMove(pos, mouseRel);
+}
+
 Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 	switch (key) {
-		case GLFW_KEY_DELETE:
-		case GLFW_KEY_BACKSPACE:
-			if (!guiIsModPressed() && !guiIsShiftPressed()) {
-				gRackWidget->deleteModule(this);
-				this->finalizeEvents();
-				delete this;
-				return NULL;
-			}
-			break;
 		case GLFW_KEY_I:
 			if (guiIsModPressed() && !guiIsShiftPressed())
 				initialize();
