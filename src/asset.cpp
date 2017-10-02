@@ -77,6 +77,8 @@ std::string assetLocal(std::string filename) {
 #endif
 #if ARCH_WIN
 	// TODO
+	// Use ~/My Documents/Rack or something
+	path = "./" + filename;
 #endif
 #if ARCH_LIN
 	// TODO

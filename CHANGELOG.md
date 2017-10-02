@@ -2,8 +2,9 @@ Tip: Use `git checkout v0.3.2` for example to check out any previous version men
 
 
 ### dev
+- Cables can now stack on output ports
 - Added sub-menus for each plugin, includes optional plugin metadata like URLs
-- Added middle-click and drag to scroll
+- Added middle-click-and-drag to scroll, shift-scroll to scroll horizontally
 - Added engine pausing in sample rate menu
 - Support for AMD Phenom II processors
 - Use self-contained Mac app bundle, no need for a Rack folder
