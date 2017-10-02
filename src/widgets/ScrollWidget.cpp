@@ -35,6 +35,23 @@ void ScrollWidget::step() {
 	Widget::step();
 }
 
+Widget *ScrollWidget::onMouseMove(Vec pos, Vec mouseRel) {
+	const float arrowSpeed = 50.0;
+	if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		offset = offset.minus(Vec(1, 0).mult(arrowSpeed));
+	}
+	if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		offset = offset.minus(Vec(-1, 0).mult(arrowSpeed));
+	}
+	if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) {
+		offset = offset.minus(Vec(0, 1).mult(arrowSpeed));
+	}
+	if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		offset = offset.minus(Vec(0, -1).mult(arrowSpeed));
+	}
+	return OpaqueWidget::onMouseMove(pos, mouseRel);
+}
+
 bool ScrollWidget::onScrollOpaque(Vec scrollRel) {
 	offset = offset.minus(scrollRel);
 	return true;
