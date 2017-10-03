@@ -1,6 +1,7 @@
 #include "settings.hpp"
 #include "app.hpp"
 #include "gui.hpp"
+#include "engine.hpp"
 #include "plugin.hpp"
 #include <jansson.h>
 
@@ -30,6 +31,11 @@ static json_t *settingsToJson() {
 	json_t *allowCursorLockJ = json_boolean(gAllowCursorLock);
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
+	// sampleRate
+	float sampleRate = gSampleRate;
+	json_t *sampleRateJ = json_real(sampleRate);
+	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
+
 	return rootJ;
 }
 
@@ -53,6 +59,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
 		gAllowCursorLock = json_is_true(allowCursorLockJ);
+
+	// sampleRate
+	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
+	if (sampleRateJ)
+		gSampleRate = json_number_value(sampleRateJ);
 }
 
 
