@@ -402,7 +402,7 @@ struct ColorValueLight : ValueLight {
 	void setValue(float v) {
 		v = sqrtBipolar(v);
 		color = baseColor;
-		color.a = clampf(v * baseColor.a, 0.0, 1.0);
+		color.a *= clampf(v, 0.0, 1.0);
 	}
 };
 
@@ -430,7 +430,7 @@ struct PolarityLight : ValueLight {
 	void setValue(float v) {
 		v = sqrtBipolar(v);
 		color = (v >= 0.0) ? posColor : negColor;
-		color.a = clampf(fabsf(v) * color.a, 0.0, 1.0);
+		color.a *= clampf(fabsf(v), 0.0, 1.0);
 	}
 };
 

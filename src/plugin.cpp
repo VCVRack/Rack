@@ -89,6 +89,11 @@ static int loadPlugin(std::string path) {
 	plugin->handle = handle;
 	initCallback(plugin);
 
+	// Check that this is a unique slug
+	for (Plugin *otherPlugin : gPlugins) {
+		assert(plugin->slug != otherPlugin->slug);
+	}
+
 	// Add plugin to list
 	gPlugins.push_back(plugin);
 	fprintf(stderr, "Loaded plugin %s\n", libraryFilename.c_str());
