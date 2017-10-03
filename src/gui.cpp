@@ -1,4 +1,5 @@
 #include <map>
+#include <queue>
 
 #include "gui.hpp"
 #include "app.hpp"
@@ -85,6 +86,28 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 			gDragHoveredWidget = NULL;
 		}
 	}
+}
+
+struct MouseButtonArguments {
+	GLFWwindow *window;
+	int button;
+	int action;
+	int mods;
+};
+
+static std::queue<MouseButtonArguments> mouseButtonQueue;
+void mouseButtonStickyPop() {
+	if (!mouseButtonQueue.empty()) {
+		MouseButtonArguments args = mouseButtonQueue.front();
+		mouseButtonQueue.pop();
+		mouseButtonCallback(args.window, args.button, args.action, args.mods);
+	}
+}
+
+void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int mods) {
+	// Defer multiple clicks per frame to future frames
+	MouseButtonArguments args = {window, button, action, mods};
+	mouseButtonQueue.push(args);
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -238,7 +261,7 @@ void guiInit() {
 	glfwSwapInterval(1);
 
 	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
-	glfwSetMouseButtonCallback(gWindow, mouseButtonCallback);
+	glfwSetMouseButtonCallback(gWindow, mouseButtonStickyCallback);
 	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
 	glfwSetCursorEnterCallback(gWindow, cursorEnterCallback);
 	glfwSetScrollCallback(gWindow, scrollCallback);
@@ -293,6 +316,7 @@ void guiRun() {
 			glfwGetCursorPos(gWindow, &xpos, &ypos);
 			cursorPosCallback(gWindow, xpos, ypos);
 		}
+		mouseButtonStickyPop();
 
 		// Set window title
 		std::string title = gApplicationName + " " + gApplicationVersion;

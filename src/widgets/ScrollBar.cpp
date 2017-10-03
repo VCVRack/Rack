@@ -8,13 +8,13 @@ namespace rack {
 void ScrollBar::draw(NVGcontext *vg) {
 	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
 	assert(scrollWidget);
-	Vec containerCorner = scrollWidget->container->getChildrenBoundingBox().getBottomRight();
+	Vec viewportCorner = scrollWidget->container->getChildrenBoundingBox().getBottomRight();
 
-	float containerSize = (orientation == HORIZONTAL) ? containerCorner.x : containerCorner.y;
-	float boxSize = (orientation == HORIZONTAL) ? box.size.x : box.size.y;
-	float offset = (orientation == HORIZONTAL) ? scrollWidget->offset.x : scrollWidget->offset.y;
-	offset = offset / (containerSize - boxSize);
-	float size = boxSize / containerSize;
+	float viewportSize = (orientation == HORIZONTAL) ? viewportCorner.x : viewportCorner.y;
+	float containerSize = (orientation == HORIZONTAL) ? scrollWidget->box.size.x : scrollWidget->box.size.y;
+	float viewportOffset = (orientation == HORIZONTAL) ? scrollWidget->offset.x : scrollWidget->offset.y;
+	float offset = viewportOffset / (viewportSize - containerSize);
+	float size = containerSize / viewportSize;
 	size = clampf(size, 0.0, 1.0);
 	bndScrollBar(vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }

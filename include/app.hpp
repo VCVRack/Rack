@@ -157,7 +157,8 @@ struct CircularShadow : TransparentWidget {
 };
 
 struct Light : TransparentWidget {
-	NVGcolor color;
+	NVGcolor bgColor = nvgRGBf(0, 0, 0);
+	NVGcolor color = nvgRGBf(1, 1, 1);
 	void draw(NVGcontext *vg);
 };
 
@@ -321,6 +322,7 @@ struct PluginManagerWidget : Widget {
 struct RackScene : Scene {
 	Toolbar *toolbar;
 	ScrollWidget *scrollWidget;
+	ZoomWidget *zoomWidget;
 
 	RackScene();
 	void step();

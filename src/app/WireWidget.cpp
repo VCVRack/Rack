@@ -172,7 +172,7 @@ void WireWidget::drawPlugs(NVGcontext *vg) {
 	Vec outputPos = getOutputPos();
 	Vec inputPos = getInputPos();
 	drawPlug(vg, outputPos, color);
-	drawPlug(vg, getInputPos(), color);
+	drawPlug(vg, inputPos, color);
 
 	// Draw plug light
 	/*

@@ -304,12 +304,10 @@ void RackWidget::repositionModule(ModuleWidget *m) {
 void RackWidget::step() {
 	rails->step();
 
-	// Resize to be a bit larger than the ScrollWidget viewport
-	assert(parent);
-	assert(parent->parent);
+	// Expand size to fit modules
 	Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
-	Vec viewportSize = parent->parent->box.size.minus(parent->box.pos);
-	box.size = moduleSize.max(viewportSize).plus(Vec(500, 500));
+	// We assume that the size is reset by a parent before calling step(). Otherwise it will grow unbounded.
+	box.size = box.size.max(moduleSize);
 
 	// Reposition modules
 	for (Widget *child : moduleContainer->children) {

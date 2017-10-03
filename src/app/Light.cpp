@@ -5,8 +5,7 @@ namespace rack {
 
 
 void Light::draw(NVGcontext *vg) {
-	NVGcolor bgColor = nvgRGBf(0.0, 0.0, 0.0);
-	float radius = roundf(box.size.x / 2.0);
+	float radius = box.size.x / 2.0;
 	float oradius = radius + 30.0;
 
 	// Solid
@@ -17,7 +16,9 @@ void Light::draw(NVGcontext *vg) {
 
 	// Border
 	nvgStrokeWidth(vg, 1.0);
-	nvgStrokeColor(vg, nvgTransRGBAf(bgColor, 0.5));
+	NVGcolor borderColor = bgColor;
+	borderColor.a *= 0.5;
+	nvgStrokeColor(vg, borderColor);
 	nvgStroke(vg);
 
 	// Inner glow

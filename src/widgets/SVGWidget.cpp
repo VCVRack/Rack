@@ -15,6 +15,31 @@ static NVGcolor getNVGColor(uint32_t color) {
 		(color >> 24) & 0xff);
 }
 
+static NVGpaint getPaint(NVGcontext *vg, NSVGpaint *p) {
+	assert(p->type == NSVG_PAINT_LINEAR_GRADIENT || p->type == NSVG_PAINT_RADIAL_GRADIENT);
+	NSVGgradient *g = p->gradient;
+	assert(g->nstops >= 1);
+	NVGcolor icol = getNVGColor(g->stops[0].color);
+	NVGcolor ocol = getNVGColor(g->stops[g->nstops - 1].color);
+
+	float inverse[6];
+	nvgTransformInverse(inverse, g->xform);
+	DEBUG_ONLY(printf("			inverse: %f %f %f %f %f %f\n", inverse[0], inverse[1], inverse[2], inverse[3], inverse[4], inverse[5]);)
+	Vec s, e;
+	DEBUG_ONLY(printf("			sx: %f sy: %f ex: %f ey: %f\n", s.x, s.y, e.x, e.y);)
+	// Is it always the case that the gradient should be transformed from (0, 0) to (0, 1)?
+	nvgTransformPoint(&s.x, &s.y, inverse, 0, 0);
+	nvgTransformPoint(&e.x, &e.y, inverse, 0, 1);
+	DEBUG_ONLY(printf("			sx: %f sy: %f ex: %f ey: %f\n", s.x, s.y, e.x, e.y);)
+
+	NVGpaint paint;
+	if (p->type == NSVG_PAINT_LINEAR_GRADIENT)
+		paint = nvgLinearGradient(vg, s.x, s.y, e.x, e.y, icol, ocol);
+	else
+		paint = nvgRadialGradient(vg, s.x, s.y, 0.0, 160, icol, ocol);
+	return paint;
+}
+
 /** Returns the parameterized value of the line p2--p3 where it intersects with p0--p1 */
 static float getLineCrossing(Vec p0, Vec p1, Vec p2, Vec p3) {
 	Vec b = p2.minus(p0);
@@ -121,30 +146,15 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 					nvgFillColor(vg, color);
 					DEBUG_ONLY(printf("		fill color (%g, %g, %g, %g)\n", color.r, color.g, color.b, color.a);)
 				} break;
-				case NSVG_PAINT_LINEAR_GRADIENT: {
-					NSVGgradient *g = shape->fill.gradient;
-					(void)g;
-					DEBUG_ONLY(printf("		linear gradient: %f\t%f\n", g->fx, g->fy);)
-				} break;
+				case NSVG_PAINT_LINEAR_GRADIENT:
 				case NSVG_PAINT_RADIAL_GRADIENT: {
 					NSVGgradient *g = shape->fill.gradient;
-					DEBUG_ONLY(printf("		radial gradient: %f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", g->fx, g->fy, g->xform[0], g->xform[1], g->xform[2], g->xform[3], g->xform[4], g->xform[5]);)
+					(void)g;
+					DEBUG_ONLY(printf("		gradient: type: %s xform: %f %f %f %f %f %f spread: %d fx: %f fy: %f nstops: %d\n", (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT ? "linear" : "radial"), g->xform[0], g->xform[1], g->xform[2], g->xform[3], g->xform[4], g->xform[5], g->spread, g->fx, g->fy, g->nstops);)
 					for (int i = 0; i < g->nstops; i++) {
 						DEBUG_ONLY(printf("			stop: #%08x\t%f\n", g->stops[i].color, g->stops[i].offset);)
 					}
-					assert(g->nstops >= 1);
-					NVGcolor color0 = getNVGColor(g->stops[0].color);
-					NVGcolor color1 = getNVGColor(g->stops[g->nstops - 1].color);
-
-					float inverse[6];
-					// Rect shapeBox = Rect::fromMinMax(Vec(shape->bounds[0], shape->bounds[1]), Vec(shape->bounds[2], shape->bounds[3]));
-					nvgTransformInverse(inverse, g->xform);
-					Vec c;
-					nvgTransformPoint(&c.x, &c.y, inverse, 5, 5);
-					printf("%f %f\n", c.x, c.y);
-
-					NVGpaint paint = nvgRadialGradient(vg, c.x, c.y, 0.0, 160, color0, color1);
-					nvgFillPaint(vg, paint);
+					nvgFillPaint(vg, getPaint(vg, &shape->fill));
 				} break;
 			}
 			nvgFill(vg);
@@ -171,6 +181,9 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 		}
 
 		nvgRestore(vg);
+
+		// if (std::string(shape->id) == "rect19347")
+		// 	exit(0);
 	}
 
 	DEBUG_ONLY(printf("\n");)

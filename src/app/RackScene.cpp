@@ -8,7 +8,7 @@
 namespace rack {
 
 
-static std::string versionMessage = "";
+static std::string newVersion = "";
 
 static void checkVersion() {
 	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/version", NULL);
@@ -18,7 +18,7 @@ static void checkVersion() {
 		if (versionJ) {
 			const char *version = json_string_value(versionJ);
 			if (version && version != gApplicationVersion) {
-				versionMessage = stringf("Rack %s is available.\n\nYou have Rack %s.\n\nWould you like to download the new version on the website?", version, gApplicationVersion.c_str());
+				newVersion = version;
 			}
 		}
 		json_decref(resJ);
@@ -29,14 +29,14 @@ static void checkVersion() {
 RackScene::RackScene() {
 	scrollWidget = new ScrollWidget();
 	{
-		// ZoomWidget *zoomWidget = new ZoomWidget();
-		// zoomWidget->zoom = 0.8;
-		// scrollWidget->container->addChild(zoomWidget);
-
-		assert(!gRackWidget);
-		gRackWidget = new RackWidget();
-		scrollWidget->container->addChild(gRackWidget);
-		// zoomWidget->addChild(gRackWidget);
+		zoomWidget = new ZoomWidget();
+		zoomWidget->zoom = 1.0;
+		{
+			assert(!gRackWidget);
+			gRackWidget = new RackWidget();
+			zoomWidget->addChild(gRackWidget);
+		}
+		scrollWidget->container->addChild(zoomWidget);
 	}
 	addChild(scrollWidget);
 
@@ -52,19 +52,29 @@ RackScene::RackScene() {
 }
 
 void RackScene::step() {
+	// Resize owned descendants
 	toolbar->box.size.x = box.size.x;
 	scrollWidget->box.size = box.size.minus(scrollWidget->box.pos);
 
+	// Resize to be a bit larger than the ScrollWidget viewport
+	gRackWidget->box.size = scrollWidget->box.size
+		.minus(scrollWidget->container->box.pos)
+		.plus(Vec(500, 500))
+		.div(zoomWidget->zoom);
+
 	Scene::step();
 
+	zoomWidget->box.size = gRackWidget->box.size.mult(zoomWidget->zoom);
+
 	// Version popup message
-	if (!versionMessage.empty()) {
+	if (!newVersion.empty()) {
+		std::string versionMessage = stringf("Rack %s is available.\n\nYou have Rack %s.\n\nWould you like to download the new version on the website?", newVersion, gApplicationVersion.c_str());
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, versionMessage.c_str())) {
 			std::thread t(openBrowser, "https://vcvrack.com/");
 			t.detach();
 			guiClose();
 		}
-		versionMessage = "";
+		newVersion = "";
 	}
 }
 

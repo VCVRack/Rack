@@ -402,7 +402,7 @@ struct ColorValueLight : ValueLight {
 	void setValue(float v) {
 		v = sqrtBipolar(v);
 		color = baseColor;
-		color.a = clampf(v, 0.0, 1.0);
+		color.a = clampf(v * baseColor.a, 0.0, 1.0);
 	}
 };
 
@@ -430,7 +430,7 @@ struct PolarityLight : ValueLight {
 	void setValue(float v) {
 		v = sqrtBipolar(v);
 		color = (v >= 0.0) ? posColor : negColor;
-		color.a = clampf(fabsf(v), 0.0, 1.0);
+		color.a = clampf(fabsf(v) * color.a, 0.0, 1.0);
 	}
 };
 
@@ -543,6 +543,15 @@ struct BefacoPush : SVGSwitch, MomentarySwitch {
 	BefacoPush() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoPush_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoPush_1.svg")));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
+struct PB61303 : SVGSwitch, MomentarySwitch {
+	PB61303() {
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303_1.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
