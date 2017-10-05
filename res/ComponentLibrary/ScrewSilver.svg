@@ -14,7 +14,7 @@
    viewBox="0 0 3.9687497 3.9684593"
    version="1.1"
    id="svg18800"
-   inkscape:version="0.92.1 r"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
    sodipodi:docname="ScrewSilver.svg">
   <defs
      id="defs18794" />
@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9195959"
-     inkscape:cx="-9.1841246"
-     inkscape:cy="0.3712724"
+     inkscape:zoom="15.839192"
+     inkscape:cx="12.536378"
+     inkscape:cy="6.1745754"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -58,23 +58,23 @@
      id="layer1"
      transform="translate(-30.138143,-67.088277)">
     <g
-       transform="matrix(0.29088789,0,0,-0.29088791,-123.69638,254.62016)"
+       transform="matrix(0.2493325,0,0,-0.2493323,-101.43655,228.11323)"
        id="g18792"
-       style="stroke-width:0.9844557">
+       style="stroke-width:1.14853203">
       <path
          d="m 535.6665,631.5 c -3.511,0 -6.367,2.855 -6.367,6.366 0,3.511 2.856,6.367 6.367,6.367 3.511,0 6.367,-2.856 6.367,-6.367 0,-3.511 -2.856,-6.366 -6.367,-6.366"
-         style="fill:#bcbcbc;fill-opacity:1;fill-rule:nonzero;stroke:#acacac;stroke-width:0.90957141;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="fill:#bcbcbc;fill-opacity:1;fill-rule:nonzero;stroke:#acacac;stroke-width:1.061167;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="path6833"
          inkscape:connector-curvature="0" />
       <path
          inkscape:connector-curvature="0"
          id="path6843"
-         style="fill:#727272;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.9844557"
+         style="fill:#727272;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.14853203"
          d="m 536.448,633.741 h -1.562 v 8.25 h 1.562 z" />
       <path
          inkscape:connector-curvature="0"
          id="path6845"
-         style="fill:#727272;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.9844557"
+         style="fill:#727272;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.14853203"
          d="m 539.792,637.085 h -8.25 v 1.562 h 8.25 z" />
     </g>
   </g>

@@ -9,8 +9,9 @@ This README includes instructions for building Rack from source. For information
 ## The [Issue Tracker](https://github.com/VCVRack/Rack/issues) *is* the official developer's forum
 
 Bug reports, feature requests, and even *questions/discussions* are welcome on the GitHub Issue Tracker for all VCVRack repos.
+However, please search before posting to avoid duplicates.
 
-Please vote on feature requests by using the Thumbs Up/Down reaction on the first post.
+You may vote on feature requests by using the Thumbs Up/Down reaction on the first post.
 
 ## Setting up your development environment
 
@@ -37,6 +38,7 @@ With your distro's package manager, make sure you have installed `gcc`, `make`, 
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
 
 Clone this repository and `cd` into it.
+If you would like to build a previous version instead of the master branch, run `git checkout v0.3.2` for example.
 
 Clone submodules.
 
