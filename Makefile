@@ -74,6 +74,7 @@ include compile.mk
 
 
 dist: all
+	rm -rf dist
 	$(MAKE) -C plugins/Fundamental dist
 
 ifeq ($(ARCH), mac)

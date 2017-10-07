@@ -25,6 +25,93 @@ namespace rack {
 // Knobs
 ////////////////////
 
+struct RoundKnob : SVGKnob {
+	RoundKnob() {
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
+	}
+};
+
+struct RoundBlackKnob : RoundKnob {
+	RoundBlackKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundBlack.svg")));
+		box.size = Vec(38, 38);
+	}
+};
+
+struct RoundSmallBlackKnob : RoundBlackKnob {
+	RoundSmallBlackKnob() {
+		box.size = Vec(28, 28);
+	}
+};
+
+struct RoundLargeBlackKnob : RoundBlackKnob {
+	RoundLargeBlackKnob() {
+		box.size = Vec(46, 46);
+	}
+};
+
+struct RoundHugeBlackKnob : RoundBlackKnob {
+	RoundHugeBlackKnob() {
+		box.size = Vec(56, 56);
+	}
+};
+
+struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob, SnapKnob {};
+
+
+struct Davies1900hKnob : SVGKnob {
+	Davies1900hKnob() {
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
+	}
+};
+
+struct Davies1900hWhiteKnob : Davies1900hKnob {
+	Davies1900hWhiteKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hWhite.svg")));
+	}
+};
+
+struct Davies1900hBlackKnob : Davies1900hKnob {
+	Davies1900hBlackKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hBlack.svg")));
+	}
+};
+
+struct Davies1900hRedKnob : Davies1900hKnob {
+	Davies1900hRedKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hRed.svg")));
+	}
+};
+
+struct Davies1900hLargeWhiteKnob : Davies1900hKnob {
+	Davies1900hLargeWhiteKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeWhite.svg")));
+	}
+};
+
+struct Davies1900hLargeBlackKnob : Davies1900hKnob {
+	Davies1900hLargeBlackKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeBlack.svg")));
+	}
+};
+
+struct Davies1900hLargeRedKnob : Davies1900hKnob {
+	Davies1900hLargeRedKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeRed.svg")));
+	}
+};
+
+struct Davies1900hSmallBlackKnob : Davies1900hKnob {
+	Davies1900hSmallBlackKnob() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hSmallBlack.svg")));
+	}
+};
+
+struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob, SnapKnob {};
+
+
 struct Rogan : SVGKnob {
 	Rogan() {
 		minAngle = -0.83*M_PI;
@@ -260,58 +347,6 @@ struct SynthTechAlco : SVGKnob {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco.svg")));
 	}
 };
-
-struct Davies1900hKnob : SVGKnob {
-	Davies1900hKnob() {
-		box.size = Vec(36, 36);
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
-	}
-};
-
-struct Davies1900hWhiteKnob : Davies1900hKnob {
-	Davies1900hWhiteKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hWhite.svg")));
-	}
-};
-
-struct Davies1900hBlackKnob : Davies1900hKnob {
-	Davies1900hBlackKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hBlack.svg")));
-	}
-};
-
-struct Davies1900hRedKnob : Davies1900hKnob {
-	Davies1900hRedKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hRed.svg")));
-	}
-};
-
-struct Davies1900hLargeWhiteKnob : Davies1900hKnob {
-	Davies1900hLargeWhiteKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeWhite.svg")));
-	}
-};
-
-struct Davies1900hLargeBlackKnob : Davies1900hKnob {
-	Davies1900hLargeBlackKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeBlack.svg")));
-	}
-};
-
-struct Davies1900hLargeRedKnob : Davies1900hKnob {
-	Davies1900hLargeRedKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hLargeRed.svg")));
-	}
-};
-
-struct Davies1900hSmallBlackKnob : Davies1900hKnob {
-	Davies1900hSmallBlackKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hSmallBlack.svg")));
-	}
-};
-
-struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob, SnapKnob {};
 
 struct Trimpot : SVGKnob {
 	Trimpot() {

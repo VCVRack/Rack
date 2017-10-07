@@ -167,8 +167,14 @@ struct Vec {
 	Vec mult(float s) {
 		return Vec(x * s, y * s);
 	}
+	Vec mult(Vec b) {
+		return Vec(x * b.x, y * b.y);
+	}
 	Vec div(float s) {
 		return Vec(x / s, y / s);
+	}
+	Vec div(Vec b) {
+		return Vec(x / b.x, y / b.y);
 	}
 	float dot(Vec b) {
 		return x * b.x + y * b.y;

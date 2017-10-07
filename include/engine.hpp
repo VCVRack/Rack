@@ -49,6 +49,7 @@ struct Module {
 
 	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate */
 	virtual void step() {}
+	virtual void onSampleRateChange() {}
 
 	/** Override these to store extra internal data in the "data" property */
 	virtual json_t *toJson() { return NULL; }
@@ -80,6 +81,7 @@ void engineAddWire(Wire *wire);
 void engineRemoveWire(Wire *wire);
 void engineSetParam(Module *module, int paramId, float value);
 void engineSetParamSmooth(Module *module, int paramId, float value);
+void engineSetSampleRate(float sampleRate);
 
 extern float gSampleRate;
 extern bool gPaused;

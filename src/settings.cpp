@@ -62,8 +62,10 @@ static void settingsFromJson(json_t *rootJ) {
 
 	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
-	if (sampleRateJ)
-		gSampleRate = json_number_value(sampleRateJ);
+	if (sampleRateJ) {
+		float sampleRate = json_number_value(sampleRateJ);
+		engineSetSampleRate(sampleRate);
+	}
 }
 
 
