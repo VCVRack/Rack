@@ -18,38 +18,6 @@ ifeq ($(ARCH), lin)
 	TARGET = Rack
 endif
 
-ifeq ($(ARCH), lin)
-	SOURCES += ext/osdialog/osdialog_gtk2.c
-	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
-	LDFLAGS += -rdynamic \
-		-lpthread -lGL -ldl \
-		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
-	TARGET = Rack
-endif
-
-ifeq ($(ARCH), mac)
-	SOURCES += ext/osdialog/osdialog_mac.m
-	CXXFLAGS += -DAPPLE -stdlib=libc++
-	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
-		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
-	TARGET = Rack
-endif
-
-ifeq ($(ARCH), win)
-	SOURCES += ext/osdialog/osdialog_win.c
-	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
-		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lportaudio_x64 -lrtmidi \
-		-Wl,-Bstatic -ljansson -lsamplerate
-	TARGET = Rack.exe
-	OBJECTS = Rack.res
-endif
-
-
-all: $(TARGET)
 ifeq ($(ARCH), mac)
 	SOURCES += ext/osdialog/osdialog_mac.m
 	CXXFLAGS += -DAPPLE -stdlib=libc++

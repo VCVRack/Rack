@@ -39,13 +39,13 @@ struct MidiInterface : Module {
 	bool retriggered = false;
 
 	MidiInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
-        try {
-            midiIn = new RtMidiIn(RtMidi::UNSPECIFIED, "VCVRack");
-        }
-        catch ( RtMidiError &error ) {
-            fprintf(stderr,"Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
-        }
-    }
+		try {
+			midiIn = new RtMidiIn(RtMidi::UNSPECIFIED, "VCVRack");
+		}
+		catch ( RtMidiError &error ) {
+			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+		}
+	}
 	~MidiInterface() {
 		setPortId(-1);
 	}
@@ -99,14 +99,14 @@ struct MidiInterface : Module {
 
 void MidiInterface::step() {
 	if (midiIn->isPortOpen()) {
-        std::vector<unsigned char> message;
+		std::vector<unsigned char> message;
 
-        // midiIn->getMessage returns empty vector if there are no messages in the queue
-        double stamp = midiIn->getMessage( &message );
-        while(message.size() > 0){
-            processMidi(message);
-            stamp = midiIn->getMessage( &message );
-        }
+		// midiIn->getMessage returns empty vector if there are no messages in the queue
+		double stamp = midiIn->getMessage( &message );
+		while (message.size() > 0) {
+			processMidi(message);
+			stamp = midiIn->getMessage( &message );
+		}
 	}
 
 	outputs[PITCH_OUTPUT].value = ((note - 60)) / 12.0;
@@ -126,26 +126,26 @@ int MidiInterface::getPortCount() {
 }
 
 std::string MidiInterface::getPortName(int portId) {
-    std::string portName;
-    try {
-        portName = midiIn->getPortName(portId);
-    }
-    catch ( RtMidiError &error ) {
-        fprintf(stderr, "Failed to get Port Name: %d, %s\n", portId, error.getMessage().c_str());
-    }
+	std::string portName;
+	try {
+		portName = midiIn->getPortName(portId);
+	}
+	catch ( RtMidiError &error ) {
+		fprintf(stderr, "Failed to get Port Name: %d, %s\n", portId, error.getMessage().c_str());
+	}
 	return portName;
 }
 
 void MidiInterface::setPortId(int portId) {
-    // Close port if it was previously opened
+	// Close port if it was previously opened
 	if (midiIn->isPortOpen()) {
-        midiIn->closePort();
+		midiIn->closePort();
 	}
 	this->portId = -1;
 
 	// Open new port
 	if (portId >= 0) {
-        midiIn->openPort(portId, "Midi Interface");
+		midiIn->openPort(portId, "Midi Interface");
 	}
 	this->portId = portId;
 }
@@ -180,45 +180,45 @@ void MidiInterface::releaseNote(int note) {
 }
 
 void MidiInterface::processMidi(std::vector<unsigned char> msg) {
-    int channel = msg[0]& 0xf;
-    int status = (msg[0]>>4) & 0xf;
-    int data1 = msg[1];
-    int data2 = msg[2];
+	int channel = msg[0] & 0xf;
+	int status = (msg[0] >> 4) & 0xf;
+	int data1 = msg[1];
+	int data2 = msg[2];
 
-    //fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1,data2);
+	//fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1,data2);
 
 	// Filter channels
 	if (this->channel >= 0 && this->channel != channel)
 		return;
 
 	switch (status) {
-		// note off
-		case 0x8: {
+	// note off
+	case 0x8: {
+		releaseNote(data1);
+	} break;
+	case 0x9: // note on
+		if (data2 > 0) {
+			pressNote(data1);
+		}
+		else {
+			// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
 			releaseNote(data1);
-		} break;
-		case 0x9: // note on
-			if (data2 > 0) {
-				pressNote(data1);
-			}
-			else {
-				// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
-				releaseNote(data1);
-			}
+		}
+		break;
+	case 0xb: // cc
+		switch (data1) {
+		case 0x01: // mod
+			this->mod = data2;
 			break;
-		case 0xb: // cc
-			switch (data1) {
-				case 0x01: // mod
-					this->mod = data2;
-					break;
-				case 0x40: // sustain
-					pedal = (data2 >= 64);
-					releaseNote(-1);
-					break;
-			}
+		case 0x40: // sustain
+			pedal = (data2 >= 64);
+			releaseNote(-1);
 			break;
-		case 0xe: // pitch wheel
-			this->pitchWheel = data2;
-			break;
+		}
+		break;
+	case 0xe: // pitch wheel
+		this->pitchWheel = data2;
+		break;
 	}
 }
 
@@ -227,7 +227,7 @@ struct MidiItem : MenuItem {
 	MidiInterface *midiInterface;
 	int portId;
 	void onAction() {
-	midiInterface->setPortId(portId);
+		midiInterface->setPortId(portId);
 	}
 };
 
@@ -299,7 +299,7 @@ struct ChannelChoice : ChoiceButton {
 MidiInterfaceWidget::MidiInterfaceWidget() {
 	MidiInterface *module = new MidiInterface();
 	setModule(module);
-	box.size = Vec(15*6, 380);
+	box.size = Vec(15 * 6, 380);
 
 	{
 		Panel *panel = new LightPanel();
