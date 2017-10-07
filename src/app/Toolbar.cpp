@@ -70,7 +70,7 @@ struct PauseItem : MenuItem {
 struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction() {
-		gSampleRate = sampleRate;
+		engineSetSampleRate(sampleRate);
 		gPaused = false;
 	}
 };

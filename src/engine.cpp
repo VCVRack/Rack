@@ -39,7 +39,7 @@ void Wire::step() {
 }
 
 void engineInit() {
-	gSampleRate = 44100.0;
+	engineSetSampleRate(44100.0);
 }
 
 void engineDestroy() {
@@ -216,6 +216,16 @@ void engineSetParamSmooth(Module *module, int paramId, float value) {
 	smoothModule = module;
 	smoothParamId = paramId;
 	smoothValue = value;
+}
+
+void engineSetSampleRate(float newSampleRate) {
+	VIPLock vipLock(vipMutex);
+	std::lock_guard<std::mutex> lock(mutex);
+	gSampleRate = newSampleRate;
+	// onSampleRateChange
+	for (Module *module : modules) {
+		module->onSampleRateChange();
+	}
 }
 
 
