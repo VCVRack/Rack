@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <list>
 #include <algorithm>
-#include <rtmidi/RtMidi.h>
+#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "gui.hpp"
 #include "../../include/engine.hpp"
@@ -40,7 +40,7 @@ struct MidiInterface : Module {
 
 	MidiInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
         try {
-            midiIn = new RtMidiIn();
+            midiIn = new RtMidiIn(RtMidi::UNSPECIFIED, "VCVRack");
         }
         catch ( RtMidiError &error ) {
             fprintf(stderr,"Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
@@ -145,7 +145,7 @@ void MidiInterface::setPortId(int portId) {
 
 	// Open new port
 	if (portId >= 0) {
-        midiIn->openPort(portId);
+        midiIn->openPort(portId, "Midi Interface");
 	}
 	this->portId = portId;
 }
@@ -185,7 +185,7 @@ void MidiInterface::processMidi(std::vector<unsigned char> msg) {
     int data1 = msg[1];
     int data2 = msg[2];
 
-    //    fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1,data2);
+    //fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1,data2);
 
 	// Filter channels
 	if (this->channel >= 0 && this->channel != channel)
