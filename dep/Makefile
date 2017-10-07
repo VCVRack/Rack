@@ -4,9 +4,11 @@ LOCAL = $(shell pwd)
 include ../arch.mk
 
 ifeq ($(ARCH),mac)
-	export CFLAGS = -mmacosx-version-min=10.7
-	export CXXFLAGS = $(CFLAGS)
-	export LDFLAGS = $(CFLAGS)
+	MACOS_FLAGS = -mmacosx-version-min=10.7 -stdlib=libc++
+	export CFLAGS = $(MACOS_FLAGS)
+	export CXXFLAGS = $(MACOS_FLAGS)
+	export CPPFLAGS = $(MACOS_FLAGS)
+	export LDFLAGS = $(MACOS_FLAGS)
 endif
 
 # Commands
@@ -98,13 +100,13 @@ $(libsamplerate):
 	$(MAKE) -C libsamplerate-0.1.9/src install
 
 $(libcurl):
-	$(WGET) https://github.com/curl/curl/files/1101227/curl-7.54.1.tar.gz
-	$(UNTAR) curl-7.54.1.tar.gz
-	cd curl-7.54.1 && ./configure --prefix="$(LOCAL)" \
+	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
+	$(UNTAR) curl-7.56.0.tar.gz
+	cd curl-7.56.0 && ./configure --prefix="$(LOCAL)" \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
 		--without-zlib --without-ssl --without-ca-bundle --without-ca-path --without-ca-fallback --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2
-	$(MAKE) -C curl-7.54.1
-	$(MAKE) -C curl-7.54.1 install
+	$(MAKE) -C curl-7.56.0
+	$(MAKE) -C curl-7.56.0 install
 
 $(libzip):
 	$(WGET) https://nih.at/libzip/libzip-1.2.0.tar.gz
@@ -114,10 +116,11 @@ $(libzip):
 	$(MAKE) -C libzip-1.2.0 install
 
 $(rtmidi):
-	git clone https://github.com/thestk/rtmidi.git rtmidi
-	cd rtmidi && ./autogen.sh && ./configure --prefix="$(LOCAL)"
-	$(MAKE) -C rtmidi
-	$(MAKE) -C rtmidi install
+	$(WGET) http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-3.0.0.tar.gz
+	$(UNTAR) rtmidi-3.0.0.tar.gz
+	cd rtmidi-3.0.0 && ./configure --prefix="$(LOCAL)"
+	$(MAKE) -C rtmidi-3.0.0
+	$(MAKE) -C rtmidi-3.0.0 install
 
 $(portaudio):
 ifeq ($(ARCH),win)

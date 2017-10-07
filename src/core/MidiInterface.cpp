@@ -30,9 +30,9 @@ struct MidiIO {
 	MidiIO(bool isOut = false) {
 		try {
 			if (isOut) {
-				rtMidi = new RtMidiOut(RtMidi::UNSPECIFIED, "VCVRack");
+				rtMidi = new RtMidiOut(RtMidi::UNSPECIFIED, "Rack");
 			} else {
-				rtMidi = new RtMidiIn(RtMidi::UNSPECIFIED, "VCVRack");
+				rtMidi = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
 			}
 		}
 		catch (RtMidiError &error) {
