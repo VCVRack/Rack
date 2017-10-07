@@ -41,6 +41,9 @@ struct SchmittTrigger {
 		}
 		return false;
 	}
+	bool isHigh() {
+		return state == HIGH;
+	}
 	void reset() {
 		state = UNKNOWN;
 	}
