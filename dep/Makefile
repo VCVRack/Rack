@@ -1,4 +1,3 @@
-
 LOCAL = $(shell pwd)
 
 # Arch-specifics
@@ -28,7 +27,7 @@ ifeq ($(ARCH),lin)
 	libsamplerate = lib/libsamplerate.so
 	libcurl = lib/libcurl.so
 	libzip = lib/libzip.so
-	portmidi = lib/libportmidi.so
+	rtmidi = lib/librtmidi.so
 	portaudio = lib/libportaudio.so
 endif
 
@@ -39,7 +38,7 @@ ifeq ($(ARCH),mac)
 	libsamplerate = lib/libsamplerate.dylib
 	libcurl = lib/libcurl.dylib
 	libzip = lib/libzip.dylib
-	portmidi = lib/libportmidi.dylib
+	rtmidi = lib/librtmidi.dylib
 	portaudio = lib/libportaudio.dylib
 endif
 
@@ -50,14 +49,14 @@ ifeq ($(ARCH),win)
 	libsamplerate = bin/libsamplerate-0.dll
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
-	portmidi = bin/libportmidi.dll
+    rtmidi = bin/rtmidi.dll
 	portaudio = bin/libportaudio_x64.dll
 endif
 
 
 .NOTPARALLEL:
 
-all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(portmidi) $(portaudio)
+all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(rtmidi) $(portaudio)
 	@echo ""
 	@echo "#######################################"
 	@echo "# Built all dependencies successfully #"
@@ -114,11 +113,11 @@ $(libzip):
 	$(MAKE) -C libzip-1.2.0
 	$(MAKE) -C libzip-1.2.0 install
 
-$(portmidi):
-	git clone https://github.com/AndrewBelt/portmidi.git portmidi
-	cd portmidi && $(CMAKE) . -DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DCMAKE_BUILD_TYPE=Release
-	$(MAKE) -C portmidi
-	$(MAKE) -C portmidi install
+$(rtmidi):
+	git clone https://github.com/thestk/rtmidi.git rtmidi
+	cd rtmidi && ./autogen.sh && ./configure --prefix="$(LOCAL)"
+	$(MAKE) -C rtmidi
+	$(MAKE) -C rtmidi install
 
 $(portaudio):
 ifeq ($(ARCH),win)

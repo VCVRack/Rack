@@ -18,12 +18,22 @@ ifeq ($(ARCH), lin)
 	TARGET = Rack
 endif
 
+ifeq ($(ARCH), lin)
+	SOURCES += ext/osdialog/osdialog_gtk2.c
+	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
+	LDFLAGS += -rdynamic \
+		-lpthread -lGL -ldl \
+		$(shell pkg-config --libs gtk+-2.0) \
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
+	TARGET = Rack
+endif
+
 ifeq ($(ARCH), mac)
 	SOURCES += ext/osdialog/osdialog_mac.m
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lportmidi
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
 	TARGET = Rack
 endif
 
@@ -32,7 +42,29 @@ ifeq ($(ARCH), win)
 	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lportaudio_x64 -lportmidi \
+		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lportaudio_x64 -lrtmidi \
+		-Wl,-Bstatic -ljansson -lsamplerate
+	TARGET = Rack.exe
+	OBJECTS = Rack.res
+endif
+
+
+all: $(TARGET)
+ifeq ($(ARCH), mac)
+	SOURCES += ext/osdialog/osdialog_mac.m
+	CXXFLAGS += -DAPPLE -stdlib=libc++
+	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
+		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
+	TARGET = Rack
+endif
+
+ifeq ($(ARCH), win)
+	SOURCES += ext/osdialog/osdialog_win.c
+	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
+		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
+		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
+		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lportaudio_x64 -lrtmidi \
 		-Wl,-Bstatic -ljansson -lsamplerate
 	TARGET = Rack.exe
 	OBJECTS = Rack.res
@@ -98,7 +130,7 @@ ifeq ($(ARCH), mac)
 	cp dep/lib/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libzip.5.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libportmidi.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/librtmidi.dylib $(BUNDLE)/Contents/MacOS/
 
 	install_name_tool -change /usr/local/lib/libGLEW.2.1.0.dylib @executable_path/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change lib/libglfw.3.dylib @executable_path/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/Rack
@@ -107,7 +139,7 @@ ifeq ($(ARCH), mac)
 	install_name_tool -change $(PWD)/dep/lib/libcurl.4.dylib @executable_path/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libzip.5.dylib @executable_path/libzip.5.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/Rack
-	install_name_tool -change @rpath/libportmidi.dylib @executable_path/libportmidi.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change @rpath/librtmidi.dylib @executable_path/librtmidi.dylib $(BUNDLE)/Contents/MacOS/Rack
 
 	otool -L $(BUNDLE)/Contents/MacOS/Rack
 
@@ -126,7 +158,7 @@ ifeq ($(ARCH), win)
 	cp dep/bin/glfw3.dll dist/Rack/
 	cp dep/bin/libcurl-4.dll dist/Rack/
 	cp dep/bin/libjansson-4.dll dist/Rack/
-	cp dep/bin/libportmidi.dll dist/Rack/
+	cp dep/bin/librtmidi.dll dist/Rack/
 	cp dep/bin/libsamplerate-0.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
 	cp dep/bin/portaudio_x64.dll dist/Rack/
@@ -144,7 +176,7 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libcurl.so.4 dist/Rack/
 	cp dep/lib/libzip.so.5 dist/Rack/
 	cp dep/lib/libportaudio.so.2 dist/Rack/
-	cp dep/lib/libportmidi.so dist/Rack/
+	cp dep/lib/librtmidi.so dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 endif
