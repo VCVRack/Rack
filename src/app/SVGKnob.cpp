@@ -24,6 +24,8 @@ void SVGKnob::step() {
 	if (dirty) {
 		float angle = rescalef(value, minValue, maxValue, minAngle, maxAngle);
 		tw->identity();
+		// Scale SVG to box
+		tw->scale(box.size.div(sw->box.size));
 		// Rotate SVG
 		Vec center = sw->box.getCenter();
 		tw->translate(center);
