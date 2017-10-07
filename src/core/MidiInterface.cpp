@@ -1,27 +1,13 @@
 #include <assert.h>
 #include <list>
 #include <algorithm>
-#include <portmidi.h>
+#include <rtmidi/RtMidi.h>
 #include "core.hpp"
 #include "gui.hpp"
+#include "../../include/engine.hpp"
 
 
 using namespace rack;
-
-static bool initialized = false;
-
-void midiInit() {
-	if (initialized)
-		return;
-
-	PmError err = Pm_Initialize();
-	if (err) {
-		printf("Failed to initialize PortMidi: %s\n", Pm_GetErrorText(err));
-		return;
-	}
-	initialized = true;
-}
-
 
 struct MidiInterface : Module {
 	enum ParamIds {
@@ -39,7 +25,7 @@ struct MidiInterface : Module {
 	};
 
 	int portId = -1;
-	PortMidiStream *stream = NULL;
+	RtMidiIn *midiIn = NULL;
 	std::list<int> notes;
 	/** Filter MIDI channel
 	-1 means all MIDI channels
@@ -53,8 +39,13 @@ struct MidiInterface : Module {
 	bool retriggered = false;
 
 	MidiInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
-		midiInit();
-	}
+        try {
+            midiIn = new RtMidiIn();
+        }
+        catch ( RtMidiError &error ) {
+            fprintf(stderr,"Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+        }
+    }
 	~MidiInterface() {
 		setPortId(-1);
 	}
@@ -70,7 +61,7 @@ struct MidiInterface : Module {
 	}
 	void pressNote(int note);
 	void releaseNote(int note);
-	void processMidi(long msg);
+	void processMidi(std::vector<unsigned char> msg);
 
 	json_t *toJson() {
 		json_t *rootJ = json_object();
@@ -107,12 +98,15 @@ struct MidiInterface : Module {
 
 
 void MidiInterface::step() {
-	if (stream) {
-		// Read MIDI events
-		PmEvent event;
-		while (Pm_Read(stream, &event, 1) > 0) {
-			processMidi(event.message);
-		}
+	if (midiIn->isPortOpen()) {
+        std::vector<unsigned char> message;
+
+        // midiIn->getMessage returns empty vector if there are no messages in the queue
+        double stamp = midiIn->getMessage( &message );
+        while(message.size() > 0){
+            processMidi(message);
+            stamp = midiIn->getMessage( &message );
+        }
 	}
 
 	outputs[PITCH_OUTPUT].value = ((note - 60)) / 12.0;
@@ -128,36 +122,30 @@ void MidiInterface::step() {
 }
 
 int MidiInterface::getPortCount() {
-	return Pm_CountDevices();
+	return midiIn->getPortCount();
 }
 
 std::string MidiInterface::getPortName(int portId) {
-	const PmDeviceInfo *info = Pm_GetDeviceInfo(portId);
-	if (!info)
-		return "";
-	return stringf("%s: %s (%s)", info->interf, info->name, info->input ? "input" : "output");
+    std::string portName;
+    try {
+        portName = midiIn->getPortName(portId);
+    }
+    catch ( RtMidiError &error ) {
+        fprintf(stderr, "Failed to get Port Name: %d, %s\n", portId, error.getMessage().c_str());
+    }
+	return portName;
 }
 
 void MidiInterface::setPortId(int portId) {
-	PmError err;
-
-	// Close existing port
-	if (stream) {
-		err = Pm_Close(stream);
-		if (err) {
-			printf("Failed to close MIDI port: %s\n", Pm_GetErrorText(err));
-		}
-		stream = NULL;
+    // Close port if it was previously opened
+	if (midiIn->isPortOpen()) {
+        midiIn->closePort();
 	}
 	this->portId = -1;
 
 	// Open new port
 	if (portId >= 0) {
-		err = Pm_OpenInput(&stream, portId, NULL, 128, NULL, NULL);
-		if (err) {
-			printf("Failed to open MIDI port: %s\n", Pm_GetErrorText(err));
-			return;
-		}
+        midiIn->openPort(portId);
 	}
 	this->portId = portId;
 }
@@ -191,12 +179,13 @@ void MidiInterface::releaseNote(int note) {
 	}
 }
 
-void MidiInterface::processMidi(long msg) {
-	int channel = msg & 0xf;
-	int status = (msg >> 4) & 0xf;
-	int data1 = (msg >> 8) & 0xff;
-	int data2 = (msg >> 16) & 0xff;
-	// printf("channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
+void MidiInterface::processMidi(std::vector<unsigned char> msg) {
+    int channel = msg[0]& 0xf;
+    int status = (msg[0]>>4) & 0xf;
+    int data1 = msg[1];
+    int data2 = msg[2];
+
+    //    fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1,data2);
 
 	// Filter channels
 	if (this->channel >= 0 && this->channel != channel)
@@ -238,7 +227,7 @@ struct MidiItem : MenuItem {
 	MidiInterface *midiInterface;
 	int portId;
 	void onAction() {
-		midiInterface->setPortId(portId);
+	midiInterface->setPortId(portId);
 	}
 };
 
