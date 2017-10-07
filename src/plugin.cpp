@@ -100,6 +100,10 @@ static int loadPlugin(std::string path) {
 	return 0;
 }
 
+static bool comparePlugins(Plugin *a, Plugin *b) {
+	return a->slug < b->slug;
+}
+
 static void loadPlugins(std::string path) {
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
@@ -111,6 +115,9 @@ static void loadPlugins(std::string path) {
 		}
 		closedir(dir);
 	}
+
+	// Sort plugins
+	gPlugins.sort(comparePlugins);
 }
 
 ////////////////////
