@@ -80,6 +80,7 @@ struct MidiIO {
 		}
 	}
 
+	virtual void resetMidi()=0; // called when midi port is set
 };
 
 int MidiIO::getPortCount() {
@@ -98,6 +99,9 @@ std::string MidiIO::getPortName(int portId) {
 }
 
 void MidiIO::setPortId(int portId) {
+
+	resetMidi(); // reset Midi values
+
 	// Close port if it was previously opened
 	if (rtMidi->isPortOpen()) {
 		rtMidi->closePort();
@@ -251,8 +255,19 @@ struct MIDIToCVInterface : MidiIO, Module {
 		setPortId(-1);
 	}
 
+	virtual void resetMidi();
 };
 
+void MIDIToCVInterface::resetMidi(){
+	mod = 0;
+	pitchWheel = 64;
+	afterTouch = 0;
+	vel = 0;
+	resetLight = 1.0;
+	outputs[GATE_OUTPUT].value = 0.0;
+	notes.clear();
+	updateLights();
+}
 
 void MIDIToCVInterface::step() {
 	if (rtMidi->isPortOpen()) {
@@ -540,6 +555,11 @@ void MIDICCToCVInterface::step() {
 	}
 }
 
+void MIDICCToCVInterface::resetMidi() {
+	for (int i =0 ; i< NUM_OUTPUTS; i++){
+		cc[i] = 0;
+	}
+};
 
 void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	int channel = msg[0] & 0xf;
