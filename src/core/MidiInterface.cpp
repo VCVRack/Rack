@@ -474,6 +474,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 
 	int cc[NUM_OUTPUTS];
 	int ccNum[NUM_OUTPUTS];
+	bool ccNumInited[NUM_OUTPUTS];
 	float lights[NUM_OUTPUTS];
 
 
@@ -507,6 +508,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
 			if (ccNumJ) {
 				ccNum[i] = json_integer_value(ccNumJ);
+				ccNumInited[i] = true;
 			}
 
 		}
@@ -562,45 +564,44 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 }
 
 
-struct CCNumItem : MenuItem {
-	MIDICCToCVInterface *midiModule;
-	int cc;
-	int num;
+struct CCTextField : TextField {
+	void draw(NVGcontext *vg);
 
-	void onAction() {
-		midiModule->ccNum[num] = cc;
-	}
+	int *ccNum;
+	bool *inited;
 };
 
-struct CCNumChoice : ChoiceButton {
-	MIDICCToCVInterface *midiModule;
-	int num;
 
-	void onAction() {
-		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-
-		for (int cc = 0; cc < 128; cc++) {
-			CCNumItem *ccNumItem = new CCNumItem();
-			ccNumItem->midiModule = midiModule;
-			ccNumItem->cc = cc;
-			ccNumItem->num = num;
-			ccNumItem->text = std::to_string(cc);
-			menu->pushChild(ccNumItem);
+void CCTextField::draw(NVGcontext *vg) {
+	// Note: this might not be the best way to do this.
+	// Text field should have a virtual "onTextChange" function or something.
+	// draw() is triggered way more frequently
+	if (text.size() > 0) {
+		if (*inited) {
+			*inited = false;
+			text = std::to_string(*ccNum);
 		}
-	}
-
-	void step() {
-		text = std::to_string(midiModule->ccNum[num]);
-	}
-};
+		try {
+			*ccNum = std::stoi(text, NULL, 10);
+			// Only allow valid cc numbers
+			if (*ccNum < 0 || *ccNum > 127) {
+				text = "";
+				begin = 0;
+				end = text.size();
+			}
+		} catch (...) {
+			text = "";
+			begin = 0;
+			end = text.size();
+		}
+	};
+	TextField::draw(vg);
+}
 
 MIDICCToCVWidget::MIDICCToCVWidget() {
 	MIDICCToCVInterface *module = new MIDICCToCVInterface();
 	setModule(module);
-	box.size = Vec(15 * 18, 380);
+	box.size = Vec(16 * 15, 380);
 
 	{
 		Panel *panel = new LightPanel();
@@ -612,17 +613,29 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 	float labelHeight = 15;
 	float yPos = margin;
 
+	addChild(createScrew<ScrewSilver>(Vec(margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(margin, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 365)));
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(box.size.x - margin - 11 * 15, margin);
+		label->text = "MIDI CC to CV";
+		addChild(label);
+		yPos = labelHeight * 2;
+
+	}
+
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "MIDI CC to CV";
+		label->text = "MIDI Interface";
 		addChild(label);
-		yPos += labelHeight + margin;
 
 		MidiChoice *midiChoice = new MidiChoice();
 		midiChoice->midiModule = dynamic_cast<MidiIO *>(module);
-		midiChoice->box.pos = Vec(margin, yPos);
-		midiChoice->box.size.x = box.size.x - 10;
+		midiChoice->box.pos = Vec((box.size.x - 10) / 2 + margin, yPos);
+		midiChoice->box.size.x = (box.size.x / 2.0) - margin;
 		addChild(midiChoice);
 		yPos += midiChoice->box.size.y + margin;
 	}
@@ -632,31 +645,31 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 		label->box.pos = Vec(margin, yPos);
 		label->text = "Channel";
 		addChild(label);
-		yPos += labelHeight + margin;
 
 		ChannelChoice *channelChoice = new ChannelChoice();
 		channelChoice->midiModule = dynamic_cast<MidiIO *>(module);
-		channelChoice->box.pos = Vec(margin, yPos);
-		channelChoice->box.size.x = box.size.x - 10;
+		channelChoice->box.pos = Vec((box.size.x - 10) / 2 + margin, yPos);
+		channelChoice->box.size.x = (box.size.x / 2.0) - margin;
 		addChild(channelChoice);
-		yPos += channelChoice->box.size.y + margin + 15;
+		yPos += channelChoice->box.size.y + margin * 2;
 	}
 
 	for (int i = 0; i < MIDICCToCVInterface::NUM_OUTPUTS; i++) {
-		CCNumChoice *ccNumChoice = new CCNumChoice();
-		ccNumChoice->midiModule = module;
-		ccNumChoice->num = module->ccNum[i];
-		ccNumChoice->box.pos = Vec(10 + (i % 4) * (67), yPos);
-		ccNumChoice->box.size.x = 15 * 3;
+		CCTextField *ccNumChoice = new CCTextField();
+		ccNumChoice->ccNum = &module->ccNum[i];
+		ccNumChoice->inited = &module->ccNumInited[i];
+		ccNumChoice->text = std::to_string(module->ccNum[i]);
+		ccNumChoice->box.pos = Vec(10 + (i % 4) * (63), yPos);
+		ccNumChoice->box.size.x = 15 * 2;
 
 		addChild(ccNumChoice);
 
 		yPos += labelHeight + margin;
-		addOutput(createOutput<PJ3410Port>(Vec(10 + (i % 4) * (67), yPos + 5), module, i));
-		addChild(createValueLight<SmallLight<GreenValueLight>>(Vec((i % 4) * (67) + 32, yPos + 5), &module->lights[i]));
+		addOutput(createOutput<PJ3410Port>(Vec((i % 4) * (63) + 10, yPos + 5), module, i));
+		addChild(createValueLight<SmallLight<GreenValueLight>>(Vec((i % 4) * (63) + 32, yPos + 5), &module->lights[i]));
 
 		if ((i + 1) % 4 == 0) {
-			yPos += 40 + margin;
+			yPos += 50 + margin;
 		} else {
 			yPos -= labelHeight + margin;
 		}
