@@ -203,6 +203,7 @@ struct ChannelChoice : ChoiceButton {
  */
 struct MIDIToCVInterface : MidiIO, Module {
 	enum ParamIds {
+		RESET_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -228,6 +229,9 @@ struct MIDIToCVInterface : MidiIO, Module {
 	bool retrigger = false;
 	bool retriggered = false;
 	float lights[NUM_OUTPUTS];
+
+	SchmittTrigger resetTrigger;
+	float resetLight = 0.0;
 
 	MIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 
@@ -260,6 +264,8 @@ struct MIDIToCVInterface : MidiIO, Module {
 	}
 
 	virtual void resetMidi();
+	void updateLights();
+
 };
 
 void MIDIToCVInterface::resetMidi(){
@@ -271,6 +277,15 @@ void MIDIToCVInterface::resetMidi(){
 	outputs[GATE_OUTPUT].value = 0.0;
 	notes.clear();
 	updateLights();
+}
+
+void MIDIToCVInterface::updateLights() {
+	lights[GATE_OUTPUT] = outputs[GATE_OUTPUT].value/10;
+	lights[MOD_OUTPUT] = mod / 127.0;
+	lights[PITCHWHEEL_OUTPUT] = pitchWheel / 127.0;
+	lights[CHANNEL_AFTERTOUCH_OUTPUT] = afterTouch / 127.0;
+	lights[VELOCITY_OUTPUT] = vel / 127.0;
+
 }
 
 void MIDIToCVInterface::step() {
@@ -293,22 +308,24 @@ void MIDIToCVInterface::step() {
 		gate = false;
 		retriggered = false;
 	}
+	if (resetTrigger.process(params[RESET_PARAM].value)) {
+		resetMidi();
+		return;
+	}
+
+	if (resetLight > 0) {
+		resetLight -= resetLight/0.55/gSampleRate; // fade out light
+	}
+
+
 	outputs[GATE_OUTPUT].value = gate ? 10.0 : 0.0;
-	lights[GATE_OUTPUT] = gate ? 1.0 : 0.0;
-
 	outputs[MOD_OUTPUT].value = mod / 127.0 * 10.0;
-	lights[MOD_OUTPUT] = mod / 127.0;
-
 	outputs[PITCHWHEEL_OUTPUT].value = (pitchWheel - 64) / 64.0 * 10.0;
-	lights[MOD_OUTPUT] = pitchWheel / 127.0;
-
 	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch / 127.0 * 10.0;
-	lights[CHANNEL_AFTERTOUCH_OUTPUT] = afterTouch / 127.0;
-
 	outputs[VELOCITY_OUTPUT].value = vel / 127.0 * 10.0;
-	lights[VELOCITY_OUTPUT] = vel / 127.0;
-}
+	updateLights();
 
+}
 
 void MIDIToCVInterface::pressNote(int note) {
 	// Remove existing similar note
@@ -416,6 +433,8 @@ MidiToCVWidget::MidiToCVWidget() {
 
 	}
 
+	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
+	addChild(createValueLight<SmallLight<RedValueLight>>(Vec(7*15+5, labelHeight+5), &module->resetLight));
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
