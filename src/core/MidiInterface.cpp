@@ -696,7 +696,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 		channelChoice->box.pos = Vec((box.size.x - 10) / 2 + margin, yPos);
 		channelChoice->box.size.x = (box.size.x / 2.0) - margin;
 		addChild(channelChoice);
-		yPos += channelChoice->box.size.y + margin * 2;
+		yPos += channelChoice->box.size.y + margin * 3;
 	}
 
 	for (int i = 0; i < MIDICCToCVInterface::NUM_OUTPUTS; i++) {
@@ -704,8 +704,8 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 		ccNumChoice->ccNum = &module->ccNum[i];
 		ccNumChoice->inited = &module->ccNumInited[i];
 		ccNumChoice->text = std::to_string(module->ccNum[i]);
-		ccNumChoice->box.pos = Vec(10 + (i % 4) * (63), yPos);
-		ccNumChoice->box.size.x = 15 * 2;
+		ccNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
+		ccNumChoice->box.size.x = 29;
 
 		addChild(ccNumChoice);
 
@@ -714,7 +714,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 		addChild(createValueLight<SmallLight<GreenValueLight>>(Vec((i % 4) * (63) + 32, yPos + 5), &module->lights[i]));
 
 		if ((i + 1) % 4 == 0) {
-			yPos += 50 + margin;
+			yPos += 47 + margin;
 		} else {
 			yPos -= labelHeight + margin;
 		}
