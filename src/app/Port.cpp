@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "gui.hpp"
 
 
 namespace rack {
@@ -34,7 +35,7 @@ void Port::onDragStart() {
 	// Try to grab wire on top of stack
 	WireWidget *wire = gRackWidget->wireContainer->getTopWire(this);
 
-	if (wire) {
+	if (wire && !guiIsModPressed()) {
 		// Disconnect existing wire
 		if (type == INPUT)
 			wire->inputPort = NULL;
