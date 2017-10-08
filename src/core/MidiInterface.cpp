@@ -150,6 +150,10 @@ struct MidiChoice : ChoiceButton {
 	}
 
 	void step() {
+		if (midiModule->portId < 0) {
+			text = "No Device";
+			return;
+		}
 		std::string name = midiModule->getPortName(midiModule->portId);
 		text = ellipsize(name, 15);
 	}
@@ -507,6 +511,8 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	void step();
 
 	void processMidi(std::vector<unsigned char> msg);
+
+	virtual void resetMidi();
 
 	virtual json_t *toJson() {
 		json_t *rootJ = json_object();
