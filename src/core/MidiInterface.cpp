@@ -40,7 +40,7 @@ struct MidiInterface : Module {
 
 	MidiInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 		try {
-			midiIn = new RtMidiIn(RtMidi::UNSPECIFIED, "VCVRack");
+			midiIn = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
 		}
 		catch ( RtMidiError &error ) {
 			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());

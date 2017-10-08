@@ -4,9 +4,11 @@ LOCAL = $(shell pwd)
 include ../arch.mk
 
 ifeq ($(ARCH),mac)
-	export CFLAGS = -mmacosx-version-min=10.7
-	export CXXFLAGS = $(CFLAGS)
-	export LDFLAGS = $(CFLAGS)
+	MACOS_FLAGS = -mmacosx-version-min=10.7 -stdlib=libc++
+	export CFLAGS = $(MACOS_FLAGS)
+	export CXXFLAGS = $(MACOS_FLAGS)
+	export CPPFLAGS = $(MACOS_FLAGS)
+	export LDFLAGS = $(MACOS_FLAGS)
 endif
 
 # Commands
@@ -114,10 +116,11 @@ $(libzip):
 	$(MAKE) -C libzip-1.2.0 install
 
 $(rtmidi):
-	git clone https://github.com/thestk/rtmidi.git rtmidi
-	cd rtmidi && ./autogen.sh && ./configure --prefix="$(LOCAL)"
-	$(MAKE) -C rtmidi
-	$(MAKE) -C rtmidi install
+	$(WGET) http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-3.0.0.tar.gz
+	$(UNTAR) rtmidi-3.0.0.tar.gz
+	cd rtmidi-3.0.0 && ./configure --prefix="$(LOCAL)"
+	$(MAKE) -C rtmidi-3.0.0
+	$(MAKE) -C rtmidi-3.0.0 install
 
 $(portaudio):
 ifeq ($(ARCH),win)
