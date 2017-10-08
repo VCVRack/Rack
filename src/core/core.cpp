@@ -7,4 +7,5 @@ void init(rack::Plugin *plugin) {
 	plugin->homepageUrl = "https://vcvrack.com/";
 	createModel<AudioInterfaceWidget>(plugin, "AudioInterface", "Audio Interface");
 	createModel<MidiInterfaceWidget>(plugin, "MidiInterface", "MIDI Interface");
+	// createModel<BridgeWidget>(plugin, "Bridge", "Bridge");
 }

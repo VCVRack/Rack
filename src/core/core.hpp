@@ -16,3 +16,7 @@ struct MidiInterfaceWidget : ModuleWidget {
 	MidiInterfaceWidget();
 	void step();
 };
+
+struct BridgeWidget : ModuleWidget {
+	BridgeWidget();
+};

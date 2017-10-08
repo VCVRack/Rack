@@ -28,6 +28,8 @@ void Port::onMouseDownOpaque(int button) {
 }
 
 void Port::onDragEnd() {
+	// FIXME
+	// If the source Port is deleted, this will be called, removing the cable
 	gRackWidget->wireContainer->commitActiveWire();
 }
 
