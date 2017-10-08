@@ -59,12 +59,16 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 
 			if (w != gFocusedWidget) {
 				if (gFocusedWidget) {
+					// onDefocus
 					w->onDefocus();
 				}
+				gFocusedWidget = NULL;
 				if (w) {
-					w->onFocus();
+					// onFocus
+					if (w->onFocus()) {
+						gFocusedWidget = w;
+					}
 				}
-				gFocusedWidget = w;
 			}
 		}
 	}
