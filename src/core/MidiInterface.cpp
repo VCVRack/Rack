@@ -381,12 +381,26 @@ MidiToCVWidget::MidiToCVWidget() {
 	float margin = 5;
 	float labelHeight = 15;
 	float yPos = margin;
-	float yGap = 40;
+	float yGap = 35;
+
+	addChild(createScrew<ScrewSilver>(Vec(margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(margin, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 365)));
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(box.size.x - margin - 7 * 15, margin);
+		label->text = "MIDI to CV";
+		addChild(label);
+		yPos = labelHeight * 2;
+
+	}
 
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "MIDI to CV";
+		label->text = "MIDI Interface";
 		addChild(label);
 		yPos += labelHeight + margin;
 
