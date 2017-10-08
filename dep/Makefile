@@ -133,7 +133,7 @@ ifeq ($(ARCH),win)
 else
 	$(WGET) http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz
 	$(UNTAR) pa_stable_v190600_20161030.tgz
-	cd portaudio && ./configure --prefix="$(LOCAL)" $(PORTAUDIO_ASIO)
+	cd portaudio && ./configure --prefix="$(LOCAL)" --disable-debug --disable-dependency-tracking --enable-mac-universal=no
 	$(MAKE) -C portaudio
 	$(MAKE) -C portaudio install
 endif
