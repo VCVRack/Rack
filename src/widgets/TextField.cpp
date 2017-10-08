@@ -103,9 +103,10 @@ bool TextField::onFocusKey(int key) {
 	return true;
 }
 
-void TextField::onFocus() {
+bool TextField::onFocus() {
 	begin = 0;
 	end = text.size();
+	return true;
 }
 
 void TextField::insertText(std::string newText) {

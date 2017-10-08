@@ -112,7 +112,7 @@ struct Widget {
 	virtual void onMouseEnter() {}
 	/** Called when another widget begins responding to `onMouseMove` events */
 	virtual void onMouseLeave() {}
-	virtual void onFocus() {}
+	virtual bool onFocus() {return false;}
 	virtual void onDefocus() {}
 	virtual bool onFocusText(int codepoint) {return false;}
 	virtual bool onFocusKey(int key) {return false;}
@@ -409,7 +409,7 @@ struct TextField : OpaqueWidget {
 	Widget *onMouseDown(Vec pos, int button);
 	bool onFocusText(int codepoint);
 	bool onFocusKey(int scancode);
-	void onFocus();
+	bool onFocus();
 	void insertText(std::string newText);
 };
 
