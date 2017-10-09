@@ -611,18 +611,24 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 struct CCTextField : TextField {
 	void onTextChange();
+	void draw(NVGcontext *vg);
 	int *ccNum;
 	bool *inited;
 };
 
+void CCTextField::draw(NVGcontext *vg) {
+	/* This is necessary, since the save
+	 * file is loaded after constructing the widget*/
+	if (*inited) {
+		*inited = false;
+		text = std::to_string(*ccNum);
+	}
+
+	TextField::draw(vg);
+}
 
 void CCTextField::onTextChange() {
 	if (text.size() > 0) {
-		if (*inited) {
-			*inited = false;
-			text = std::to_string(*ccNum);
-		}
-
 		try {
 			*ccNum = std::stoi(text);
 			// Only allow valid cc numbers
