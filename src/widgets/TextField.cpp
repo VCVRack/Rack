@@ -41,20 +41,25 @@ bool TextField::onFocusKey(int key) {
 		case GLFW_KEY_BACKSPACE:
 			if (begin < end) {
 				text.erase(begin, end - begin);
+				onTextChange();
 			}
 			else {
 				begin--;
-				if (begin >= 0)
+				if (begin >= 0) {
 					text.erase(begin, 1);
+					onTextChange();
+				}
 			}
 			end = begin;
 			break;
 		case GLFW_KEY_DELETE:
 			if (begin < end) {
 				text.erase(begin, end - begin);
+				onTextChange();
 			}
 			else {
 				text.erase(begin, 1);
+				onTextChange();
 			}
 			end = begin;
 			break;
@@ -115,6 +120,7 @@ void TextField::insertText(std::string newText) {
 	text.insert(begin, newText);
 	begin += newText.size();
 	end = begin;
+	onTextChange();
 }
 
 
