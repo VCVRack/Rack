@@ -610,35 +610,33 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 
 struct CCTextField : TextField {
-	void draw(NVGcontext *vg);
-
+	void onTextChange();
 	int *ccNum;
 	bool *inited;
 };
 
 
-void CCTextField::draw(NVGcontext *vg) {
-	// Note: this might not be the best way to do this.
-	// Text field should have a virtual "onTextChange" function or something.
-	// draw() is triggered way more frequently
+void CCTextField::onTextChange() {
 	if (text.size() > 0) {
 		if (*inited) {
 			*inited = false;
 			text = std::to_string(*ccNum);
 		}
+
 		try {
 			*ccNum = std::stoi(text);
 			// Only allow valid cc numbers
 			if (*ccNum < 0 || *ccNum > 127 || text.size() > 3) {
 				text = "";
 				begin = end = 0;
+				*ccNum = -1;
 			}
 		} catch (...) {
 			text = "";
 			begin = end = 0;
+			*ccNum = -1;
 		}
 	};
-	TextField::draw(vg);
 }
 
 MIDICCToCVWidget::MIDICCToCVWidget() {
