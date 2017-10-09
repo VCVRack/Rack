@@ -313,6 +313,7 @@ struct Toolbar : OpaqueWidget {
 	Slider *wireOpacitySlider;
 	Slider *wireTensionSlider;
 	RadioButton *cpuUsageButton;
+	RadioButton *plugLightButton;
 
 	Toolbar();
 	void draw(NVGcontext *vg);
@@ -327,7 +328,6 @@ struct PluginManagerWidget : Widget {
 };
 
 struct RackScene : Scene {
-	Toolbar *toolbar;
 	ScrollWidget *scrollWidget;
 	ZoomWidget *zoomWidget;
 
@@ -345,7 +345,9 @@ extern std::string gApplicationName;
 extern std::string gApplicationVersion;
 extern std::string gApiHost;
 
+// Easy access to "singleton" widgets
 extern RackWidget *gRackWidget;
+extern Toolbar *gToolbar;
 
 void sceneInit();
 void sceneDestroy();

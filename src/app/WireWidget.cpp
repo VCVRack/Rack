@@ -151,8 +151,8 @@ Vec WireWidget::getInputPos() {
 }
 
 void WireWidget::draw(NVGcontext *vg) {
-	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value / 100.0;
-	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
+	float opacity = gToolbar->wireOpacitySlider->value / 100.0;
+	float tension = gToolbar->wireTensionSlider->value;
 
 	// Draw as opaque if an "incomplete" wire
 	if (!(inputPort && outputPort))
@@ -169,19 +169,27 @@ void WireWidget::drawPlugs(NVGcontext *vg) {
 	drawPlug(vg, inputPos, color);
 
 	// Draw plug light
-	if (wire) {
-		Output &output = wire->outputModule->outputs[wire->outputId];
-		float value = output.value / 8.0;
-		outputLight->box.size = Vec(10, 10);
-		inputLight->box.size = Vec(10, 10);
-		outputLight->box.pos = outputPos.minus(Vec(5, 5));
-		inputLight->box.pos = inputPos.minus(Vec(5, 5));
-		outputLight->setValue(value);
-		inputLight->setValue(value);
+	if (gToolbar->plugLightButton->value > 0.0) {
+		if (wire) {
+			Output &output = wire->outputModule->outputs[wire->outputId];
+			float value = output.value / 8.0;
+			outputLight->box.size = Vec(10, 10);
+			inputLight->box.size = Vec(10, 10);
+			outputLight->box.pos = outputPos.minus(Vec(5, 5));
+			inputLight->box.pos = inputPos.minus(Vec(5, 5));
+			outputLight->setValue(value);
+			inputLight->setValue(value);
+		}
+		else {
+			outputLight->setValue(0.0);
+			inputLight->setValue(0.0);
+		}
+		outputLight->visible = true;
+		inputLight->visible = true;
 	}
 	else {
-		outputLight->setValue(0.0);
-		inputLight->setValue(0.0);
+		outputLight->visible = false;
+		inputLight->visible = false;
 	}
 	Widget::draw(vg);
 }

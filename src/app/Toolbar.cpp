@@ -53,7 +53,7 @@ struct FileChoice : ChoiceButton {
 			menu->pushChild(saveItem);
 
 			MenuItem *saveAsItem = new SaveAsItem();
-			saveAsItem->text = "Save As";
+			saveAsItem->text = "Save as";
 			saveAsItem->rightText = GUI_MOD_KEY_NAME "+Shift+S";
 			menu->pushChild(saveAsItem);
 		}
@@ -82,7 +82,7 @@ struct SampleRateChoice : ChoiceButton {
 		menu->box.size.x = box.size.x;
 
 		PauseItem *pauseItem = new PauseItem();
-		pauseItem->text = gPaused ? "Resume Engine" : "Pause Engine";
+		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
 		menu->pushChild(pauseItem);
 
 		float sampleRates[] = {44100, 48000, 88200, 96000, 176400, 192000};
@@ -152,6 +152,17 @@ Toolbar::Toolbar() {
 		wireTensionSlider->setDefaultValue(0.5);
 		addChild(wireTensionSlider);
 		xPos += wireTensionSlider->box.size.x;
+	}
+
+	xPos += margin;
+	{
+		plugLightButton = new RadioButton();
+		plugLightButton->box.pos = Vec(xPos, margin);
+		plugLightButton->box.size.x = 100;
+		plugLightButton->label = "Plug lights";
+		plugLightButton->setValue(1.0);
+		addChild(plugLightButton);
+		xPos += plugLightButton->box.size.x;
 	}
 
 	/*
