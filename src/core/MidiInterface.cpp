@@ -99,7 +99,6 @@ std::string MidiIO::getPortName(int portId) {
 }
 
 void MidiIO::setPortId(int portId) {
-	resetMidi(); // reset Midi values
 
 	// Close port if it was previously opened
 	if (rtMidi->isPortOpen()) {
@@ -119,6 +118,7 @@ struct MidiItem : MenuItem {
 	int portId;
 
 	void onAction() {
+		midiModule->resetMidi(); // reset Midi values
 		midiModule->setPortId(portId);
 	}
 };
@@ -163,6 +163,7 @@ struct ChannelItem : MenuItem {
 	int channel;
 
 	void onAction() {
+		midiModule->resetMidi(); // reset Midi values
 		midiModule->setChannel(channel);
 	}
 };
