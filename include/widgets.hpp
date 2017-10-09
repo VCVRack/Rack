@@ -411,6 +411,7 @@ struct TextField : OpaqueWidget {
 	bool onFocusKey(int scancode);
 	bool onFocus();
 	void insertText(std::string newText);
+	virtual void onTextChange() {}
 };
 
 struct PasswordField : TextField {
