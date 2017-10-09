@@ -6,6 +6,7 @@ Tip: Use `git checkout v0.3.2` for example to check out any previous version men
 - Added sub-menus for each plugin, includes optional plugin metadata like URLs
 - Added new scrolling methods: middle-click-and-drag, shift-scroll, and arrow keys
 - Added engine pausing in sample rate menu
+- Added resizable blank to Core
 - Support for AMD Phenom II processors
 - Use self-contained Mac app bundle, no need for a Rack folder
 

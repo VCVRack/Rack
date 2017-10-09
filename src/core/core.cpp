@@ -8,4 +8,6 @@ void init(rack::Plugin *plugin) {
 	createModel<AudioInterfaceWidget>(plugin, "AudioInterface", "Audio Interface");
 	createModel<MidiToCVWidget>(plugin, "MIDIToCVInterface", "MIDI-to-CV Interface");
 	createModel<MIDICCToCVWidget>(plugin, "MIDICCToCVInterface", "MIDI CC-to-CV Interface");
+	// createModel<BridgeWidget>(plugin, "Bridge", "Bridge");
+	createModel<BlankWidget>(plugin, "Blank", "Blank");
 }

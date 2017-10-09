@@ -35,28 +35,30 @@ struct ModuleWidget : OpaqueWidget {
 
 	~ModuleWidget();
 	void setModule(Module *module);
-	// Convenience functions for adding special widgets (calls addChild())
+	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addInput(Port *input);
 	void addOutput(Port *output);
 	void addParam(ParamWidget *param);
 
-	json_t *toJson();
-	void fromJson(json_t *root);
+	virtual json_t *toJson();
+	virtual void fromJson(json_t *rootJ);
 
-	/** Disconnects cables from all ports */
-	void disconnect();
-	/** Resets the state of the module */
-	void initialize();
-	/** Randomizes the state of the module
-	This method just randomizes parameters. Override and call this function if your module contains other state information that you wish to randomize.
+	/** Disconnects cables from all ports
+	Called when the user clicks Disconnect Cables in the context menu.
 	*/
-	void randomize();
+	virtual void disconnect();
+	/** Resets the parameters of the module and calls the Module's randomize().
+	Called when the user clicks Initialize in the context menu.
+	*/
+	virtual void initialize();
+	/** Randomizes the parameters of the module and calls the Module's randomize().
+	Called when the user clicks Randomize in the context menu.
+	*/
+	virtual void randomize();
 	virtual Menu *createContextMenu();
 
 	void draw(NVGcontext *vg);
 
-	bool requested = false;
-	Vec requestedPos;
 	Vec dragPos;
 	Widget *onMouseMove(Vec pos, Vec mouseRel);
 	Widget *onHoverKey(Vec pos, int key);
@@ -118,14 +120,16 @@ struct RackWidget : OpaqueWidget {
 	void savePatch(std::string filename);
 	void loadPatch(std::string filename);
 	json_t *toJson();
-	void fromJson(json_t *root);
+	void fromJson(json_t *rootJ);
 
 	void addModule(ModuleWidget *m);
 	/** Transfers ownership to the caller so they must `delete` it if that is the intension */
 	void deleteModule(ModuleWidget *m);
 	void cloneModule(ModuleWidget *m);
+	/** Sets a module's box if non-colliding. Returns true if set */
+	bool requestModuleBox(ModuleWidget *m, Rect box);
 	/** Moves a module to the closest non-colliding position */
-	void repositionModule(ModuleWidget *m);
+	bool requestModuleBoxNearest(ModuleWidget *m, Rect box);
 	void step();
 	void draw(NVGcontext *vg);
 
@@ -138,7 +142,6 @@ struct RackRail : TransparentWidget {
 
 struct Panel : TransparentWidget {
 	NVGcolor backgroundColor;
-	NVGcolor borderColor;
 	std::shared_ptr<Image> backgroundImage;
 	void draw(NVGcontext *vg);
 };
@@ -167,7 +170,7 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	int paramId;
 
 	json_t *toJson();
-	void fromJson(json_t *root);
+	void fromJson(json_t *rootJ);
 	virtual void randomize();
 	void onMouseDownOpaque(int button);
 	void onChange();

@@ -55,7 +55,7 @@ struct Module {
 	virtual json_t *toJson() { return NULL; }
 	virtual void fromJson(json_t *root) {}
 
-	/** Override these to implement behavior when user clicks Initialize and Randomize */
+	/** Override these to implement spacial behavior when user clicks Initialize and Randomize */
 	virtual void initialize() {}
 	virtual void randomize() {}
 };

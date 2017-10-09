@@ -432,6 +432,11 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		addChild(panel);
 	}
 
+	// addChild(createScrew<ScrewSilver>(Vec(15, 0)));
+	// addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 0)));
+	// addChild(createScrew<ScrewSilver>(Vec(15, 365)));
+	// addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 365)));
+
 	float margin = 5;
 	float labelHeight = 15;
 	float yPos = margin;

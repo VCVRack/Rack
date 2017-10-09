@@ -617,14 +617,12 @@ struct LightPanel : Panel {
 	LightPanel() {
 		// backgroundColor = nvgRGB(0xe6, 0xe6, 0xe6);
 		backgroundColor = nvgRGB(0xf0, 0xf0, 0xf0);
-		borderColor = nvgRGB(0xac, 0xac, 0xac);
 	}
 };
 
 struct DarkPanel : Panel {
 	DarkPanel() {
 		backgroundColor = nvgRGB(0x17, 0x17, 0x17);
-		borderColor = nvgRGB(0x5e, 0x5e, 0x5e);
 	}
 };
 
