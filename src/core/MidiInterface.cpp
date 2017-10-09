@@ -99,7 +99,6 @@ std::string MidiIO::getPortName(int portId) {
 }
 
 void MidiIO::setPortId(int portId) {
-
 	resetMidi(); // reset Midi values
 
 	// Close port if it was previously opened
@@ -283,10 +282,9 @@ void MIDIToCVInterface::resetMidi() {
 void MIDIToCVInterface::updateLights() {
 	lights[GATE_OUTPUT] = outputs[GATE_OUTPUT].value / 10;
 	lights[MOD_OUTPUT] = mod / 127.0;
-	lights[PITCHWHEEL_OUTPUT] = pitchWheel / 127.0;
+	lights[PITCHWHEEL_OUTPUT] = (pitchWheel - 64) / 127.0;
 	lights[CHANNEL_AFTERTOUCH_OUTPUT] = afterTouch / 127.0;
 	lights[VELOCITY_OUTPUT] = vel / 127.0;
-
 }
 
 void MIDIToCVInterface::step() {
@@ -420,10 +418,10 @@ MidiToCVWidget::MidiToCVWidget() {
 	float yPos = margin;
 	float yGap = 35;
 
-	addChild(createScrew<ScrewSilver>(Vec(margin, 0)));
-	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 0)));
-	addChild(createScrew<ScrewSilver>(Vec(margin, 365)));
-	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(15, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 30, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(15, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 30, 365)));
 
 	{
 		Label *label = new Label();
@@ -431,7 +429,6 @@ MidiToCVWidget::MidiToCVWidget() {
 		label->text = "MIDI to CV";
 		addChild(label);
 		yPos = labelHeight * 2;
-
 	}
 
 	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
@@ -466,8 +463,7 @@ MidiToCVWidget::MidiToCVWidget() {
 		yPos += channelChoice->box.size.y + margin + 15;
 	}
 
-	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel",
-														  "Pitch Wheel", "Aftertouch"};
+	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel", "Aftertouch"};
 
 	for (int i = 0; i < MIDIToCVInterface::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
@@ -482,8 +478,6 @@ MidiToCVWidget::MidiToCVWidget() {
 		}
 		yPos += yGap + margin;
 	}
-
-
 }
 
 void MidiToCVWidget::step() {
@@ -663,17 +657,16 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 	float labelHeight = 15;
 	float yPos = margin;
 
-	addChild(createScrew<ScrewSilver>(Vec(margin, 0)));
-	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 0)));
-	addChild(createScrew<ScrewSilver>(Vec(margin, 365)));
-	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(15, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 30, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(15, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 30, 365)));
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(box.size.x - margin - 11 * 15, margin);
 		label->text = "MIDI CC to CV";
 		addChild(label);
 		yPos = labelHeight * 2;
-
 	}
 
 	{
@@ -724,8 +717,6 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 			yPos -= labelHeight + margin;
 		}
 	}
-
-
 }
 
 void MIDICCToCVWidget::step() {
