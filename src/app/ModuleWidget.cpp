@@ -6,6 +6,7 @@
 
 namespace rack {
 
+
 ModuleWidget::~ModuleWidget() {
 	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
 	disconnect();
@@ -49,8 +50,8 @@ json_t *ModuleWidget::toJson() {
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// pos
-	json_t *pos = json_pack("[f, f]", (double) box.pos.x, (double) box.pos.y);
-	json_object_set_new(rootJ, "pos", pos);
+	json_t *posJ = json_pack("[f, f]", (double) box.pos.x, (double) box.pos.y);
+	json_object_set_new(rootJ, "pos", posJ);
 	// params
 	json_t *paramsJ = json_array();
 	for (ParamWidget *paramWidget : params) {
@@ -70,12 +71,10 @@ json_t *ModuleWidget::toJson() {
 }
 
 void ModuleWidget::fromJson(json_t *rootJ) {
-	initialize();
-
 	// pos
-	json_t *pos = json_object_get(rootJ, "pos");
+	json_t *posJ = json_object_get(rootJ, "pos");
 	double x, y;
-	json_unpack(pos, "[F, F]", &x, &y);
+	json_unpack(posJ, "[F, F]", &x, &y);
 	box.pos = Vec(x, y);
 
 	// params
@@ -197,8 +196,9 @@ void ModuleWidget::onDragStart() {
 }
 
 void ModuleWidget::onDragMove(Vec mouseRel) {
-	requestedPos = gMousePos.minus(parent->getAbsolutePos()).minus(dragPos);
-	requested = true;
+	Rect newBox = box;
+	newBox.pos = gMousePos.minus(parent->getAbsolutePos()).minus(dragPos);
+	gRackWidget->requestModuleBoxNearest(this, newBox);
 }
 
 void ModuleWidget::onDragEnd() {
