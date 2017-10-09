@@ -627,17 +627,15 @@ void CCTextField::draw(NVGcontext *vg) {
 			text = std::to_string(*ccNum);
 		}
 		try {
-			*ccNum = std::stoi(text, NULL, 10);
+			*ccNum = std::stoi(text);
 			// Only allow valid cc numbers
 			if (*ccNum < 0 || *ccNum > 127) {
 				text = "";
-				begin = 0;
-				end = text.size();
+				begin = end = 0;
 			}
 		} catch (...) {
 			text = "";
-			begin = 0;
-			end = text.size();
+			begin = end = 0;
 		}
 	};
 	TextField::draw(vg);
