@@ -10,7 +10,7 @@ static void drawPlug(NVGcontext *vg, Vec pos, NVGcolor color) {
 
 	// Plug solid
 	nvgBeginPath(vg);
-	nvgCircle(vg, pos.x, pos.y, 9.5);
+	nvgCircle(vg, pos.x, pos.y, 9);
 	nvgFillColor(vg, color);
 	nvgFill(vg);
 
@@ -21,7 +21,7 @@ static void drawPlug(NVGcontext *vg, Vec pos, NVGcolor color) {
 
 	// Hole
 	nvgBeginPath(vg);
-	nvgCircle(vg, pos.x, pos.y, 5.5);
+	nvgCircle(vg, pos.x, pos.y, 5);
 	nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
 	nvgFill(vg);
 }
@@ -86,16 +86,10 @@ WireWidget::WireWidget() {
 	lastWireColorId = (lastWireColorId + 1) % 6;
 	color = wireColors[lastWireColorId];
 
-	PolarityLight *inputPolarityLight = new MediumLight<PolarityLight>();
-	PolarityLight *outputPolarityLight = new MediumLight<PolarityLight>();
-	outputPolarityLight->posColor = inputPolarityLight->posColor = COLOR_GREEN;
-	outputPolarityLight->negColor = inputPolarityLight->negColor = COLOR_RED;
-
-	inputLight = inputPolarityLight;
-	outputLight = outputPolarityLight;
+	inputLight = construct<PolarityLight>(&PolarityLight::posColor, COLOR_GREEN, &PolarityLight::negColor, COLOR_RED);
+	outputLight = construct<PolarityLight>(&PolarityLight::posColor, COLOR_GREEN, &PolarityLight::negColor, COLOR_RED);
 	addChild(inputLight);
 	addChild(outputLight);
-
 }
 
 WireWidget::~WireWidget() {
@@ -175,12 +169,13 @@ void WireWidget::drawPlugs(NVGcontext *vg) {
 	drawPlug(vg, inputPos, color);
 
 	// Draw plug light
-	/*
 	if (wire) {
 		Output &output = wire->outputModule->outputs[wire->outputId];
-		float value = output.value / 10.0;
-		outputLight->box.pos = outputPos.minus(Vec(6, 6));
-		inputLight->box.pos = inputPos.minus(Vec(6, 6));
+		float value = output.value / 8.0;
+		outputLight->box.size = Vec(10, 10);
+		inputLight->box.size = Vec(10, 10);
+		outputLight->box.pos = outputPos.minus(Vec(5, 5));
+		inputLight->box.pos = inputPos.minus(Vec(5, 5));
 		outputLight->setValue(value);
 		inputLight->setValue(value);
 	}
@@ -189,7 +184,6 @@ void WireWidget::drawPlugs(NVGcontext *vg) {
 		inputLight->setValue(0.0);
 	}
 	Widget::draw(vg);
-	*/
 }
 
 
