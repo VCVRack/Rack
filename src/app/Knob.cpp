@@ -12,6 +12,7 @@ namespace rack {
 
 void Knob::onDragStart() {
 	guiCursorLock();
+	randomizable = false;
 }
 
 void Knob::onDragMove(Vec mouseRel) {
@@ -23,6 +24,7 @@ void Knob::onDragMove(Vec mouseRel) {
 
 void Knob::onDragEnd() {
 	guiCursorUnlock();
+	randomizable = true;
 }
 
 void Knob::onChange() {

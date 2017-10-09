@@ -15,7 +15,8 @@ void ParamWidget::fromJson(json_t *rootJ) {
 }
 
 void ParamWidget::randomize() {
-	setValue(rescalef(randomf(), 0.0, 1.0, minValue, maxValue));
+	if (randomizable)
+		setValue(rescalef(randomf(), 0.0, 1.0, minValue, maxValue));
 }
 
 void ParamWidget::onMouseDownOpaque(int button) {

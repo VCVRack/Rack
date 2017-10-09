@@ -168,6 +168,10 @@ struct Light : TransparentWidget {
 struct ParamWidget : OpaqueWidget, QuantityWidget {
 	Module *module = NULL;
 	int paramId;
+	/** Used to momentarily disable value randomization
+	To permanently disable or change randomization behavior, override the randomize() method instead of changing this.
+	*/
+	bool randomizable = true;
 
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
