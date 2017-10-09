@@ -264,11 +264,12 @@ struct MIDIToCVInterface : MidiIO, Module {
 	}
 
 	virtual void resetMidi();
+
 	void updateLights();
 
 };
 
-void MIDIToCVInterface::resetMidi(){
+void MIDIToCVInterface::resetMidi() {
 	mod = 0;
 	pitchWheel = 64;
 	afterTouch = 0;
@@ -280,7 +281,7 @@ void MIDIToCVInterface::resetMidi(){
 }
 
 void MIDIToCVInterface::updateLights() {
-	lights[GATE_OUTPUT] = outputs[GATE_OUTPUT].value/10;
+	lights[GATE_OUTPUT] = outputs[GATE_OUTPUT].value / 10;
 	lights[MOD_OUTPUT] = mod / 127.0;
 	lights[PITCHWHEEL_OUTPUT] = pitchWheel / 127.0;
 	lights[CHANNEL_AFTERTOUCH_OUTPUT] = afterTouch / 127.0;
@@ -314,7 +315,7 @@ void MIDIToCVInterface::step() {
 	}
 
 	if (resetLight > 0) {
-		resetLight -= resetLight/0.55/gSampleRate; // fade out light
+		resetLight -= resetLight / 0.55 / gSampleRate; // fade out light
 	}
 
 
@@ -434,7 +435,7 @@ MidiToCVWidget::MidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
-	addChild(createValueLight<SmallLight<RedValueLight>>(Vec(7*15+5, labelHeight+5), &module->resetLight));
+	addChild(createValueLight<SmallLight<RedValueLight>>(Vec(7 * 15 + 5, labelHeight + 5), &module->resetLight));
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
@@ -581,7 +582,7 @@ void MIDICCToCVInterface::step() {
 }
 
 void MIDICCToCVInterface::resetMidi() {
-	for (int i =0 ; i< NUM_OUTPUTS; i++){
+	for (int i = 0; i < NUM_OUTPUTS; i++) {
 		cc[i] = 0;
 	}
 };
@@ -611,7 +612,9 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 struct CCTextField : TextField {
 	void onTextChange();
+
 	void draw(NVGcontext *vg);
+
 	int *ccNum;
 	bool *inited;
 };
