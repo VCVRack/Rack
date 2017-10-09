@@ -9,62 +9,51 @@
 
 using namespace rack;
 
-struct MidiInterface : Module {
-	enum ParamIds {
-		NUM_PARAMS
-	};
-	enum InputIds {
-		NUM_INPUTS
-	};
-	enum OutputIds {
-		PITCH_OUTPUT,
-		GATE_OUTPUT,
-		MOD_OUTPUT,
-		PITCHWHEEL_OUTPUT,
-		NUM_OUTPUTS
-	};
-
+/**
+ * MidiIO implements the shared functionality of all midi modules, namely:
+ * + Channel Selection (including helper for storing json)
+ * + Interface Selection (including helper for storing json)
+ * + rtMidi initialisation (input or output)
+ */
+struct MidiIO {
 	int portId = -1;
-	RtMidiIn *midiIn = NULL;
-	std::list<int> notes;
+	RtMidi *rtMidi = NULL;
+
 	/** Filter MIDI channel
 	-1 means all MIDI channels
 	*/
 	int channel = -1;
-	bool pedal = false;
-	int note = 60; // C4, most modules should use 261.626 Hz
-	int mod = 0;
-	int pitchWheel = 64;
-	bool retrigger = false;
-	bool retriggered = false;
 
-	MidiInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+	/*
+	 * If isOut is set to true, creates a RtMidiOut, RtMidiIn otherwise
+	 */
+	MidiIO(bool isOut = false) {
 		try {
-			midiIn = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
+			if (isOut) {
+				rtMidi = new RtMidiOut(RtMidi::UNSPECIFIED, "Rack");
+			} else {
+				rtMidi = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
+			}
 		}
-		catch ( RtMidiError &error ) {
+		catch (RtMidiError &error) {
 			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
 		}
 	}
-	~MidiInterface() {
-		setPortId(-1);
-	}
 
-	void step();
+	~MidiIO() {}
 
 	int getPortCount();
+
 	std::string getPortName(int portId);
+
 	// -1 will close the port
 	void setPortId(int portId);
+
 	void setChannel(int channel) {
 		this->channel = channel;
 	}
-	void pressNote(int note);
-	void releaseNote(int note);
-	void processMidi(std::vector<unsigned char> msg);
 
-	json_t *toJson() {
-		json_t *rootJ = json_object();
+	json_t *addBaseJson(json_t *rootJ) {
 		if (portId >= 0) {
 			std::string portName = getPortName(portId);
 			json_object_set_new(rootJ, "portName", json_string(portName.c_str()));
@@ -73,7 +62,7 @@ struct MidiInterface : Module {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) {
+	void baseFromJson(json_t *rootJ) {
 		json_t *portNameJ = json_object_get(rootJ, "portName");
 		if (portNameJ) {
 			std::string portName = json_string_value(portNameJ);
@@ -91,21 +80,225 @@ struct MidiInterface : Module {
 		}
 	}
 
-	void initialize() {
-		setPortId(-1);
+	virtual void resetMidi()=0; // called when midi port is set
+};
+
+int MidiIO::getPortCount() {
+	return rtMidi->getPortCount();
+}
+
+std::string MidiIO::getPortName(int portId) {
+	std::string portName;
+	try {
+		portName = rtMidi->getPortName(portId);
+	}
+	catch (RtMidiError &error) {
+		fprintf(stderr, "Failed to get Port Name: %d, %s\n", portId, error.getMessage().c_str());
+	}
+	return portName;
+}
+
+void MidiIO::setPortId(int portId) {
+
+	resetMidi(); // reset Midi values
+
+	// Close port if it was previously opened
+	if (rtMidi->isPortOpen()) {
+		rtMidi->closePort();
+	}
+	this->portId = -1;
+
+	// Open new port
+	if (portId >= 0) {
+		rtMidi->openPort(portId, "Midi Interface");
+	}
+	this->portId = portId;
+}
+
+struct MidiItem : MenuItem {
+	MidiIO *midiModule;
+	int portId;
+
+	void onAction() {
+		midiModule->setPortId(portId);
 	}
 };
 
+struct MidiChoice : ChoiceButton {
+	MidiIO *midiModule;
 
-void MidiInterface::step() {
-	if (midiIn->isPortOpen()) {
+	void onAction() {
+		Menu *menu = gScene->createMenu();
+		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		int portCount = midiModule->getPortCount();
+		{
+			MidiItem *midiItem = new MidiItem();
+			midiItem->midiModule = midiModule;
+			midiItem->portId = -1;
+			midiItem->text = "No device";
+			menu->pushChild(midiItem);
+		}
+		for (int portId = 0; portId < portCount; portId++) {
+			MidiItem *midiItem = new MidiItem();
+			midiItem->midiModule = midiModule;
+			midiItem->portId = portId;
+			midiItem->text = midiModule->getPortName(portId);
+			menu->pushChild(midiItem);
+		}
+	}
+
+	void step() {
+		if (midiModule->portId < 0) {
+			text = "No Device";
+			return;
+		}
+		std::string name = midiModule->getPortName(midiModule->portId);
+		text = ellipsize(name, 15);
+	}
+};
+
+struct ChannelItem : MenuItem {
+	MidiIO *midiModule;
+	int channel;
+
+	void onAction() {
+		midiModule->setChannel(channel);
+	}
+};
+
+struct ChannelChoice : ChoiceButton {
+	MidiIO *midiModule;
+
+	void onAction() {
+		Menu *menu = gScene->createMenu();
+		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		{
+			ChannelItem *channelItem = new ChannelItem();
+			channelItem->midiModule = midiModule;
+			channelItem->channel = -1;
+			channelItem->text = "All";
+			menu->pushChild(channelItem);
+		}
+		for (int channel = 0; channel < 16; channel++) {
+			ChannelItem *channelItem = new ChannelItem();
+			channelItem->midiModule = midiModule;
+			channelItem->channel = channel;
+			channelItem->text = stringf("%d", channel + 1);
+			menu->pushChild(channelItem);
+		}
+	}
+
+	void step() {
+		text = (midiModule->channel >= 0) ? stringf("%d", midiModule->channel + 1) : "All";
+	}
+};
+
+/*
+ * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
+ * CV
+ */
+struct MIDIToCVInterface : MidiIO, Module {
+	enum ParamIds {
+		RESET_PARAM,
+		NUM_PARAMS
+	};
+	enum InputIds {
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		PITCH_OUTPUT = 0,
+		GATE_OUTPUT,
+		VELOCITY_OUTPUT,
+		MOD_OUTPUT,
+		PITCHWHEEL_OUTPUT,
+		CHANNEL_AFTERTOUCH_OUTPUT,
+		NUM_OUTPUTS
+	};
+
+	std::list<int> notes;
+	bool pedal = false;
+	int note = 60; // C4, most modules should use 261.626 Hz
+	int mod = 0;
+	int vel = 0;
+	int afterTouch = 0;
+	int pitchWheel = 64;
+	bool retrigger = false;
+	bool retriggered = false;
+	float lights[NUM_OUTPUTS];
+
+	SchmittTrigger resetTrigger;
+	float resetLight = 0.0;
+
+	MIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+
+	}
+
+	~MIDIToCVInterface() {
+		setPortId(-1);
+	};
+
+	void step();
+
+	void pressNote(int note);
+
+	void releaseNote(int note);
+
+	void processMidi(std::vector<unsigned char> msg);
+
+	virtual json_t *toJson() {
+		json_t *rootJ = json_object();
+		addBaseJson(rootJ);
+		return rootJ;
+	}
+
+	virtual void fromJson(json_t *rootJ) {
+		baseFromJson(rootJ);
+	}
+
+	virtual void initialize() {
+		setPortId(-1);
+	}
+
+	virtual void resetMidi();
+
+	void updateLights();
+
+};
+
+void MIDIToCVInterface::resetMidi() {
+	mod = 0;
+	pitchWheel = 64;
+	afterTouch = 0;
+	vel = 0;
+	resetLight = 1.0;
+	outputs[GATE_OUTPUT].value = 0.0;
+	notes.clear();
+	updateLights();
+}
+
+void MIDIToCVInterface::updateLights() {
+	lights[GATE_OUTPUT] = outputs[GATE_OUTPUT].value / 10;
+	lights[MOD_OUTPUT] = mod / 127.0;
+	lights[PITCHWHEEL_OUTPUT] = pitchWheel / 127.0;
+	lights[CHANNEL_AFTERTOUCH_OUTPUT] = afterTouch / 127.0;
+	lights[VELOCITY_OUTPUT] = vel / 127.0;
+
+}
+
+void MIDIToCVInterface::step() {
+	if (rtMidi->isPortOpen()) {
 		std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
-		double stamp = midiIn->getMessage( &message );
+
+		dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
 		while (message.size() > 0) {
 			processMidi(message);
-			stamp = midiIn->getMessage( &message );
+			dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
 		}
 	}
 
@@ -116,41 +309,26 @@ void MidiInterface::step() {
 		gate = false;
 		retriggered = false;
 	}
+	if (resetTrigger.process(params[RESET_PARAM].value)) {
+		resetMidi();
+		return;
+	}
+
+	if (resetLight > 0) {
+		resetLight -= resetLight / 0.55 / gSampleRate; // fade out light
+	}
+
+
 	outputs[GATE_OUTPUT].value = gate ? 10.0 : 0.0;
 	outputs[MOD_OUTPUT].value = mod / 127.0 * 10.0;
 	outputs[PITCHWHEEL_OUTPUT].value = (pitchWheel - 64) / 64.0 * 10.0;
+	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch / 127.0 * 10.0;
+	outputs[VELOCITY_OUTPUT].value = vel / 127.0 * 10.0;
+	updateLights();
+
 }
 
-int MidiInterface::getPortCount() {
-	return midiIn->getPortCount();
-}
-
-std::string MidiInterface::getPortName(int portId) {
-	std::string portName;
-	try {
-		portName = midiIn->getPortName(portId);
-	}
-	catch ( RtMidiError &error ) {
-		fprintf(stderr, "Failed to get Port Name: %d, %s\n", portId, error.getMessage().c_str());
-	}
-	return portName;
-}
-
-void MidiInterface::setPortId(int portId) {
-	// Close port if it was previously opened
-	if (midiIn->isPortOpen()) {
-		midiIn->closePort();
-	}
-	this->portId = -1;
-
-	// Open new port
-	if (portId >= 0) {
-		midiIn->openPort(portId, "Midi Interface");
-	}
-	this->portId = portId;
-}
-
-void MidiInterface::pressNote(int note) {
+void MIDIToCVInterface::pressNote(int note) {
 	// Remove existing similar note
 	auto it = std::find(notes.begin(), notes.end(), note);
 	if (it != notes.end())
@@ -161,7 +339,7 @@ void MidiInterface::pressNote(int note) {
 	retriggered = true;
 }
 
-void MidiInterface::releaseNote(int note) {
+void MIDIToCVInterface::releaseNote(int note) {
 	// Remove the note
 	auto it = std::find(notes.begin(), notes.end(), note);
 	if (it != notes.end())
@@ -169,8 +347,7 @@ void MidiInterface::releaseNote(int note) {
 
 	if (pedal) {
 		// Don't release if pedal is held
-	}
-	else if (!notes.empty()) {
+	} else if (!notes.empty()) {
 		// Play previous note
 		auto it2 = notes.end();
 		it2--;
@@ -179,7 +356,7 @@ void MidiInterface::releaseNote(int note) {
 	}
 }
 
-void MidiInterface::processMidi(std::vector<unsigned char> msg) {
+void MIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	int channel = msg[0] & 0xf;
 	int status = (msg[0] >> 4) & 0xf;
 	int data1 = msg[1];
@@ -192,114 +369,45 @@ void MidiInterface::processMidi(std::vector<unsigned char> msg) {
 		return;
 
 	switch (status) {
-	// note off
-	case 0x8: {
-		releaseNote(data1);
-	} break;
-	case 0x9: // note on
-		if (data2 > 0) {
-			pressNote(data1);
-		}
-		else {
-			// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
+		// note off
+		case 0x8: {
 			releaseNote(data1);
 		}
-		break;
-	case 0xb: // cc
-		switch (data1) {
-		case 0x01: // mod
-			this->mod = data2;
 			break;
-		case 0x40: // sustain
-			pedal = (data2 >= 64);
-			releaseNote(-1);
+		case 0x9: // note on
+			if (data2 > 0) {
+				pressNote(data1);
+				this->vel = data2;
+			} else {
+				// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
+				releaseNote(data1);
+			}
 			break;
-		}
-		break;
-	case 0xe: // pitch wheel
-		this->pitchWheel = data2;
-		break;
+		case 0xb: // cc
+			switch (data1) {
+				case 0x01: // mod
+					this->mod = data2;
+					break;
+				case 0x40: // sustain
+					pedal = (data2 >= 64);
+					releaseNote(-1);
+					break;
+			}
+			break;
+		case 0xe: // pitch wheel
+			this->pitchWheel = data2;
+			break;
+		case 0xd: // channel aftertouch
+			this->afterTouch = data1;
+			break;
 	}
 }
 
 
-struct MidiItem : MenuItem {
-	MidiInterface *midiInterface;
-	int portId;
-	void onAction() {
-		midiInterface->setPortId(portId);
-	}
-};
-
-struct MidiChoice : ChoiceButton {
-	MidiInterface *midiInterface;
-	void onAction() {
-		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		int portCount = midiInterface->getPortCount();
-		{
-			MidiItem *midiItem = new MidiItem();
-			midiItem->midiInterface = midiInterface;
-			midiItem->portId = -1;
-			midiItem->text = "No device";
-			menu->pushChild(midiItem);
-		}
-		for (int portId = 0; portId < portCount; portId++) {
-			MidiItem *midiItem = new MidiItem();
-			midiItem->midiInterface = midiInterface;
-			midiItem->portId = portId;
-			midiItem->text = midiInterface->getPortName(portId);
-			menu->pushChild(midiItem);
-		}
-	}
-	void step() {
-		std::string name = midiInterface->getPortName(midiInterface->portId);
-		text = ellipsize(name, 8);
-	}
-};
-
-struct ChannelItem : MenuItem {
-	MidiInterface *midiInterface;
-	int channel;
-	void onAction() {
-		midiInterface->setChannel(channel);
-	}
-};
-
-struct ChannelChoice : ChoiceButton {
-	MidiInterface *midiInterface;
-	void onAction() {
-		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		{
-			ChannelItem *channelItem = new ChannelItem();
-			channelItem->midiInterface = midiInterface;
-			channelItem->channel = -1;
-			channelItem->text = "All";
-			menu->pushChild(channelItem);
-		}
-		for (int channel = 0; channel < 16; channel++) {
-			ChannelItem *channelItem = new ChannelItem();
-			channelItem->midiInterface = midiInterface;
-			channelItem->channel = channel;
-			channelItem->text = stringf("%d", channel + 1);
-			menu->pushChild(channelItem);
-		}
-	}
-	void step() {
-		text = (midiInterface->channel >= 0) ? stringf("%d", midiInterface->channel + 1) : "All";
-	}
-};
-
-
-MidiInterfaceWidget::MidiInterfaceWidget() {
-	MidiInterface *module = new MidiInterface();
+MidiToCVWidget::MidiToCVWidget() {
+	MIDIToCVInterface *module = new MIDIToCVInterface();
 	setModule(module);
-	box.size = Vec(15 * 6, 380);
+	box.size = Vec(15 * 9, 380);
 
 	{
 		Panel *panel = new LightPanel();
@@ -310,16 +418,33 @@ MidiInterfaceWidget::MidiInterfaceWidget() {
 	float margin = 5;
 	float labelHeight = 15;
 	float yPos = margin;
+	float yGap = 35;
+
+	addChild(createScrew<ScrewSilver>(Vec(margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(margin, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 365)));
 
 	{
 		Label *label = new Label();
+		label->box.pos = Vec(box.size.x - margin - 7 * 15, margin);
+		label->text = "MIDI to CV";
+		addChild(label);
+		yPos = labelHeight * 2;
+
+	}
+
+	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
+	addChild(createValueLight<SmallLight<RedValueLight>>(Vec(7 * 15 + 5, labelHeight + 5), &module->resetLight));
+	{
+		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "MIDI device";
+		label->text = "MIDI Interface";
 		addChild(label);
 		yPos += labelHeight + margin;
 
 		MidiChoice *midiChoice = new MidiChoice();
-		midiChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
+		midiChoice->midiModule = dynamic_cast<MidiIO *>(module);
 		midiChoice->box.pos = Vec(margin, yPos);
 		midiChoice->box.size.x = box.size.x - 10;
 		addChild(midiChoice);
@@ -334,59 +459,276 @@ MidiInterfaceWidget::MidiInterfaceWidget() {
 		yPos += labelHeight + margin;
 
 		ChannelChoice *channelChoice = new ChannelChoice();
-		channelChoice->midiInterface = dynamic_cast<MidiInterface*>(module);
+		channelChoice->midiModule = dynamic_cast<MidiIO *>(module);
 		channelChoice->box.pos = Vec(margin, yPos);
 		channelChoice->box.size.x = box.size.x - 10;
 		addChild(channelChoice);
-		yPos += channelChoice->box.size.y + margin;
+		yPos += channelChoice->box.size.y + margin + 15;
 	}
 
-	{
+	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel",
+														  "Pitch Wheel", "Aftertouch"};
+
+	for (int i = 0; i < MIDIToCVInterface::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "1V/oct";
+		label->text = labels[i];
 		addChild(label);
-		yPos += labelHeight + margin;
 
-		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::PITCH_OUTPUT));
-		yPos += 37 + margin;
+		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, i));
+		if (i != MIDIToCVInterface::PITCH_OUTPUT) {
+			addChild(createValueLight<SmallLight<GreenValueLight>>(Vec(15 * 7.5, yPos - 5), &module->lights[i]));
+
+		}
+		yPos += yGap + margin;
 	}
 
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "Gate";
-		addChild(label);
-		yPos += labelHeight + margin;
 
-		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::GATE_OUTPUT));
-		yPos += 37 + margin;
+}
+
+void MidiToCVWidget::step() {
+	// Assume QWERTY
+#define MIDI_KEY(key, midi) if (glfwGetKey(gWindow, key)) printf("%d\n", midi);
+
+	// MIDI_KEY(GLFW_KEY_Z, 48);
+
+	ModuleWidget::step();
+}
+
+
+/*
+ * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod weel to
+ * CV
+ */
+struct MIDICCToCVInterface : MidiIO, Module {
+	enum ParamIds {
+		NUM_PARAMS
+	};
+	enum InputIds {
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		NUM_OUTPUTS = 16
+	};
+
+	int cc[NUM_OUTPUTS];
+	int ccNum[NUM_OUTPUTS];
+	bool ccNumInited[NUM_OUTPUTS];
+	float lights[NUM_OUTPUTS];
+
+
+	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
+			cc[i] = 0;
+			ccNum[i] = i;
+		}
 	}
 
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "Mod Wheel";
-		addChild(label);
-		yPos += labelHeight + margin;
-
-		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::MOD_OUTPUT));
-		yPos += 37 + margin;
+	~MIDICCToCVInterface() {
+		setPortId(-1);
 	}
 
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "Pitch Wheel";
-		addChild(label);
-		yPos += labelHeight + margin;
+	void step();
 
-		addOutput(createOutput<PJ3410Port>(Vec(28, yPos), module, MidiInterface::PITCHWHEEL_OUTPUT));
-		yPos += 37 + margin;
+	void processMidi(std::vector<unsigned char> msg);
+
+	virtual void resetMidi();
+
+	virtual json_t *toJson() {
+		json_t *rootJ = json_object();
+		addBaseJson(rootJ);
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
+			json_object_set_new(rootJ, std::to_string(i).c_str(), json_integer(ccNum[i]));
+		}
+		return rootJ;
+	}
+
+	virtual void fromJson(json_t *rootJ) {
+		baseFromJson(rootJ);
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
+			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
+			if (ccNumJ) {
+				ccNum[i] = json_integer_value(ccNumJ);
+				ccNumInited[i] = true;
+			}
+
+		}
+	}
+
+	virtual void initialize() {
+		setPortId(-1);
+	}
+
+};
+
+
+void MIDICCToCVInterface::step() {
+	if (rtMidi->isPortOpen()) {
+		std::vector<unsigned char> message;
+
+		// midiIn->getMessage returns empty vector if there are no messages in the queue
+
+		dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
+		while (message.size() > 0) {
+			processMidi(message);
+			dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
+		}
+	}
+
+	for (int i = 0; i < NUM_OUTPUTS; i++) {
+		outputs[i].value = cc[i] / 127.0 * 10.0;
+		lights[i] = 2.0 * outputs[i].value / 10.0 - 1.0;
 	}
 }
 
-void MidiInterfaceWidget::step() {
+void MIDICCToCVInterface::resetMidi() {
+	for (int i = 0; i < NUM_OUTPUTS; i++) {
+		cc[i] = 0;
+	}
+};
+
+void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
+	int channel = msg[0] & 0xf;
+	int status = (msg[0] >> 4) & 0xf;
+	int data1 = msg[1];
+	int data2 = msg[2];
+
+	//fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1,data2);
+
+	// Filter channels
+	if (this->channel >= 0 && this->channel != channel)
+		return;
+
+	if (status == 0xb) {
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
+			if (data1 == ccNum[i]) {
+				this->cc[i] = data2;
+			}
+
+		}
+	}
+}
+
+
+struct CCTextField : TextField {
+	void onTextChange();
+
+	void draw(NVGcontext *vg);
+
+	int *ccNum;
+	bool *inited;
+};
+
+void CCTextField::draw(NVGcontext *vg) {
+	/* This is necessary, since the save
+	 * file is loaded after constructing the widget*/
+	if (*inited) {
+		*inited = false;
+		text = std::to_string(*ccNum);
+	}
+
+	TextField::draw(vg);
+}
+
+void CCTextField::onTextChange() {
+	if (text.size() > 0) {
+		try {
+			*ccNum = std::stoi(text);
+			// Only allow valid cc numbers
+			if (*ccNum < 0 || *ccNum > 127 || text.size() > 3) {
+				text = "";
+				begin = end = 0;
+				*ccNum = -1;
+			}
+		} catch (...) {
+			text = "";
+			begin = end = 0;
+			*ccNum = -1;
+		}
+	};
+}
+
+MIDICCToCVWidget::MIDICCToCVWidget() {
+	MIDICCToCVInterface *module = new MIDICCToCVInterface();
+	setModule(module);
+	box.size = Vec(16 * 15, 380);
+
+	{
+		Panel *panel = new LightPanel();
+		panel->box.size = box.size;
+		addChild(panel);
+	}
+
+	float margin = 5;
+	float labelHeight = 15;
+	float yPos = margin;
+
+	addChild(createScrew<ScrewSilver>(Vec(margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(margin, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 15 - margin, 365)));
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(box.size.x - margin - 11 * 15, margin);
+		label->text = "MIDI CC to CV";
+		addChild(label);
+		yPos = labelHeight * 2;
+
+	}
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "MIDI Interface";
+		addChild(label);
+
+		MidiChoice *midiChoice = new MidiChoice();
+		midiChoice->midiModule = dynamic_cast<MidiIO *>(module);
+		midiChoice->box.pos = Vec((box.size.x - 10) / 2 + margin, yPos);
+		midiChoice->box.size.x = (box.size.x / 2.0) - margin;
+		addChild(midiChoice);
+		yPos += midiChoice->box.size.y + margin;
+	}
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = "Channel";
+		addChild(label);
+
+		ChannelChoice *channelChoice = new ChannelChoice();
+		channelChoice->midiModule = dynamic_cast<MidiIO *>(module);
+		channelChoice->box.pos = Vec((box.size.x - 10) / 2 + margin, yPos);
+		channelChoice->box.size.x = (box.size.x / 2.0) - margin;
+		addChild(channelChoice);
+		yPos += channelChoice->box.size.y + margin * 3;
+	}
+
+	for (int i = 0; i < MIDICCToCVInterface::NUM_OUTPUTS; i++) {
+		CCTextField *ccNumChoice = new CCTextField();
+		ccNumChoice->ccNum = &module->ccNum[i];
+		ccNumChoice->inited = &module->ccNumInited[i];
+		ccNumChoice->text = std::to_string(module->ccNum[i]);
+		ccNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
+		ccNumChoice->box.size.x = 29;
+
+		addChild(ccNumChoice);
+
+		yPos += labelHeight + margin;
+		addOutput(createOutput<PJ3410Port>(Vec((i % 4) * (63) + 10, yPos + 5), module, i));
+		addChild(createValueLight<SmallLight<GreenValueLight>>(Vec((i % 4) * (63) + 32, yPos + 5), &module->lights[i]));
+
+		if ((i + 1) % 4 == 0) {
+			yPos += 47 + margin;
+		} else {
+			yPos -= labelHeight + margin;
+		}
+	}
+
+
+}
+
+void MIDICCToCVWidget::step() {
 	// Assume QWERTY
 #define MIDI_KEY(key, midi) if (glfwGetKey(gWindow, key)) printf("%d\n", midi);
 

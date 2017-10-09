@@ -6,7 +6,8 @@ void init(rack::Plugin *plugin) {
 	plugin->name = "Core";
 	plugin->homepageUrl = "https://vcvrack.com/";
 	createModel<AudioInterfaceWidget>(plugin, "AudioInterface", "Audio Interface");
-	createModel<MidiInterfaceWidget>(plugin, "MidiInterface", "MIDI Interface");
+	createModel<MidiToCVWidget>(plugin, "MIDIToCVInterface", "MIDI-to-CV Interface");
+	createModel<MIDICCToCVWidget>(plugin, "MIDICCToCVInterface", "MIDI CC-to-CV Interface");
 	// createModel<BridgeWidget>(plugin, "Bridge", "Bridge");
 	createModel<BlankWidget>(plugin, "Blank", "Blank");
 }
