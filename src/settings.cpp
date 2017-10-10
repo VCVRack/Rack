@@ -18,12 +18,12 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "token", tokenJ);
 
 	// opacity
-	float opacity = dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value;
+	float opacity = gToolbar->wireOpacitySlider->value;
 	json_t *opacityJ = json_real(opacity);
 	json_object_set_new(rootJ, "wireOpacity", opacityJ);
 
 	// tension
-	float tension = dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value;
+	float tension = gToolbar->wireTensionSlider->value;
 	json_t *tensionJ = json_real(tension);
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
@@ -35,6 +35,10 @@ static json_t *settingsToJson() {
 	float sampleRate = gSampleRate;
 	json_t *sampleRateJ = json_real(sampleRate);
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
+
+	// plugLight
+	json_t *plugLightJ = json_boolean(gToolbar->plugLightButton->value > 0.0);
+	json_object_set_new(rootJ, "plugLight", plugLightJ);
 
 	return rootJ;
 }
@@ -48,12 +52,12 @@ static void settingsFromJson(json_t *rootJ) {
 	// opacity
 	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");
 	if (opacityJ)
-		dynamic_cast<RackScene*>(gScene)->toolbar->wireOpacitySlider->value = json_number_value(opacityJ);
+		gToolbar->wireOpacitySlider->value = json_number_value(opacityJ);
 
 	// tension
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
-		dynamic_cast<RackScene*>(gScene)->toolbar->wireTensionSlider->value = json_number_value(tensionJ);
+		gToolbar->wireTensionSlider->value = json_number_value(tensionJ);
 
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
@@ -66,6 +70,11 @@ static void settingsFromJson(json_t *rootJ) {
 		float sampleRate = json_number_value(sampleRateJ);
 		engineSetSampleRate(sampleRate);
 	}
+
+	// plugLight
+	json_t *plugLightJ = json_object_get(rootJ, "plugLight");
+	if (plugLightJ)
+		gToolbar->plugLightButton->setValue(json_is_true(plugLightJ) ? 1.0 : 0.0);
 }
 
 

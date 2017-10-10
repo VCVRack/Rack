@@ -395,7 +395,7 @@ struct AddPluginMenuItem : MenuItem {
 
 		if (!plugin->path.empty()) {
 			UrlItem *item = new UrlItem();
-			item->text = "Browse Directory";
+			item->text = "Browse directory";
 			item->url = plugin->path;
 			menu->pushChild(item);
 		}
@@ -410,7 +410,7 @@ void RackWidget::onMouseDownOpaque(int button) {
 		Menu *menu = gScene->createMenu();
 
 		MenuLabel *menuLabel = new MenuLabel();
-		menuLabel->text = "Add Module";
+		menuLabel->text = "Add module";
 		menu->pushChild(menuLabel);
 		for (Plugin *plugin : gPlugins) {
 			AddPluginMenuItem *item = new AddPluginMenuItem();

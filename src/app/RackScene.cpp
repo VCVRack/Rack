@@ -40,9 +40,9 @@ RackScene::RackScene() {
 	}
 	addChild(scrollWidget);
 
-	toolbar = new Toolbar();
-	addChild(toolbar);
-	scrollWidget->box.pos.y = toolbar->box.size.y;
+	gToolbar = new Toolbar();
+	addChild(gToolbar);
+	scrollWidget->box.pos.y = gToolbar->box.size.y;
 
 	// Check for new version
 	if (gApplicationVersion != "dev") {
@@ -53,7 +53,7 @@ RackScene::RackScene() {
 
 void RackScene::step() {
 	// Resize owned descendants
-	toolbar->box.size.x = box.size.x;
+	gToolbar->box.size.x = box.size.x;
 	scrollWidget->box.size = box.size.minus(scrollWidget->box.pos);
 
 	// Resize to be a bit larger than the ScrollWidget viewport
