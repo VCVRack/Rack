@@ -1,5 +1,7 @@
 # Detect architecture if ARCH is not defined
 
+ifndef ARCH
+
 MACHINE = $(shell gcc -dumpmachine)
 ifneq (,$(findstring linux,$(MACHINE)))
 	# Linux
@@ -11,5 +13,7 @@ else ifneq (,$(findstring mingw,$(MACHINE)))
 	# Windows
 	ARCH = win
 else
-	$(error Could not determine machine type. Try hacking around in Makefile-arch.inc)
+	$(error Could not determine machine type. Try hacking around in arch.mk)
+endif
+
 endif

@@ -160,7 +160,6 @@ Toolbar::Toolbar() {
 		plugLightButton->box.pos = Vec(xPos, margin);
 		plugLightButton->box.size.x = 100;
 		plugLightButton->label = "Plug lights";
-		plugLightButton->setValue(1.0);
 		addChild(plugLightButton);
 		xPos += plugLightButton->box.size.x;
 	}

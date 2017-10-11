@@ -77,6 +77,6 @@ Build plugin.
 
 ## License
 
-Rack source code by [Andrew Belt](https://andrewbelt.name/) licensed under the [BSD-3-Clause](LICENSE.txt)
+Rack source code by [Andrew Belt](https://andrewbelt.name/) licensed under [BSD-3-Clause](LICENSE.txt)
 
-Component Library graphics by [Grayscale](http://grayscale.info/) licensed under the [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+Component Library graphics by [Grayscale](http://grayscale.info/) licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)

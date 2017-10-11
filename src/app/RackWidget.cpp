@@ -268,6 +268,9 @@ void RackWidget::cloneModule(ModuleWidget *m) {
 }
 
 bool RackWidget::requestModuleBox(ModuleWidget *m, Rect box) {
+	if (box.pos.x < 0 || box.pos.y < 0)
+		return false;
+
 	for (Widget *child2 : moduleContainer->children) {
 		if (m == child2) continue;
 		if (box.intersects(child2->box)) {

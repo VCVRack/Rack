@@ -28,6 +28,8 @@ will expand to
 */
 #define TOSTRING(x) STRINGIFY(x)
 
+#define LENGTHOF(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 
 namespace rack {
 

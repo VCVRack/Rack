@@ -244,7 +244,10 @@ void guiInit() {
 	// Set up GLFW
 	glfwSetErrorCallback(errorCallback);
 	err = glfwInit();
-	assert(err);
+	if (err) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
+		exit(1);
+	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -256,7 +259,7 @@ void guiInit() {
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	gWindow = glfwCreateWindow(640, 480, "", NULL, NULL);
 	if (!gWindow) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0? If so, are the latest drivers installed?");
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, are the latest drivers installed?");
 		exit(1);
 	}
 
@@ -275,7 +278,10 @@ void guiInit() {
 	// Set up GLEW
 	glewExperimental = GL_TRUE;
 	err = glewInit();
-	assert(err == GLEW_OK);
+	if (err != GLEW_OK) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, are the latest drivers installed?");
+		exit(1);
+	}
 
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();

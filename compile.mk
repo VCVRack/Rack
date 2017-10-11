@@ -5,7 +5,8 @@ FLAGS += -DVERSION=$(VERSION) -DVERSION_$(subst .,_,$(VERSION))
 FLAGS += -MMD
 # Optimization
 FLAGS += -O3 -march=nocona -ffast-math
-FLAGS += -g -Wall
+FLAGS += -Wall
+FLAGS += -g
 CXXFLAGS += -std=c++11
 
 
