@@ -86,8 +86,10 @@ void RackWidget::savePatch(std::string filename) {
 void RackWidget::loadPatch(std::string filename) {
 	printf("Loading patch %s\n", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
-	if (!file)
+	if (!file) {
+		// Exit silently
 		return;
+	}
 
 	json_error_t error;
 	json_t *rootJ = json_loadf(file, 0, &error);
@@ -97,7 +99,8 @@ void RackWidget::loadPatch(std::string filename) {
 		json_decref(rootJ);
 	}
 	else {
-		printf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
+		std::string message = stringf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 
 	fclose(file);
@@ -168,12 +171,14 @@ json_t *RackWidget::toJson() {
 }
 
 void RackWidget::fromJson(json_t *rootJ) {
+	std::string message;
+
 	// version
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
 		const char *version = json_string_value(versionJ);
 		if (gApplicationVersion != version)
-			printf("JSON version mismatch, attempting to convert JSON version %s to %s\n", version, gApplicationVersion.c_str());
+			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version, gApplicationVersion.c_str());
 	}
 
 	// modules
@@ -183,10 +188,14 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t moduleId;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
-		// Get plugin
 		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
 		if (!pluginSlugJ) continue;
+		json_t *modelSlugJ = json_object_get(moduleJ, "model");
+		if (!modelSlugJ) continue;
 		const char *pluginSlug = json_string_value(pluginSlugJ);
+		const char *modelSlug = json_string_value(modelSlugJ);
+
+		// Search for plugin
 		Plugin *plugin = NULL;
 		for (Plugin *p : gPlugins) {
 			if (p->slug == pluginSlug) {
@@ -194,18 +203,23 @@ void RackWidget::fromJson(json_t *rootJ) {
 				break;
 			}
 		}
-		if (!plugin) continue;
+		if (!plugin) {
+			message += stringf("Could not find plugin \"%s\" for module \"%s\".\n", pluginSlug, modelSlug);
+			continue;
+		}
 
-		// Get model
-		json_t *modelSlug = json_object_get(moduleJ, "model");
+		// Get for model
 		Model *model = NULL;
 		for (Model *m : plugin->models) {
-			if (m->slug == json_string_value(modelSlug)) {
+			if (m->slug == modelSlug) {
 				model = m;
 				break;
 			}
 		}
-		if (!model) continue;
+		if (!model) {
+			message += stringf("Could not find module \"%s\" in plugin \"%s\".\n", modelSlug, pluginSlug);
+			continue;
+		}
 
 		// Create ModuleWidget
 		ModuleWidget *moduleWidget = model->createModuleWidget();
@@ -243,6 +257,11 @@ void RackWidget::fromJson(json_t *rootJ) {
 		wireWidget->updateWire();
 		// Add wire to rack
 		wireContainer->addChild(wireWidget);
+	}
+
+	// Display a message if we have something to say
+	if (!message.empty()) {
+		osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
 	}
 }
 
