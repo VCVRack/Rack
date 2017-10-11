@@ -244,7 +244,7 @@ void guiInit() {
 	// Set up GLFW
 	glfwSetErrorCallback(errorCallback);
 	err = glfwInit();
-	if (err) {
+	if (err != GLFW_TRUE) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
 		exit(1);
 	}
