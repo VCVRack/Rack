@@ -99,7 +99,6 @@ std::string MidiIO::getPortName(int portId) {
 }
 
 void MidiIO::setPortId(int portId) {
-	resetMidi(); // reset Midi values
 
 	// Close port if it was previously opened
 	if (rtMidi->isPortOpen()) {
@@ -119,6 +118,7 @@ struct MidiItem : MenuItem {
 	int portId;
 
 	void onAction() {
+		midiModule->resetMidi(); // reset Midi values
 		midiModule->setPortId(portId);
 	}
 };
@@ -163,6 +163,7 @@ struct ChannelItem : MenuItem {
 	int channel;
 
 	void onAction() {
+		midiModule->resetMidi(); // reset Midi values
 		midiModule->setChannel(channel);
 	}
 };
@@ -227,7 +228,6 @@ struct MIDIToCVInterface : MidiIO, Module {
 	int pitchWheel = 64;
 	bool retrigger = false;
 	bool retriggered = false;
-	float lights[NUM_OUTPUTS];
 
 	SchmittTrigger resetTrigger;
 	float resetLight = 0.0;
@@ -264,8 +264,6 @@ struct MIDIToCVInterface : MidiIO, Module {
 
 	virtual void resetMidi();
 
-	void updateLights();
-
 };
 
 void MIDIToCVInterface::resetMidi() {
@@ -276,15 +274,6 @@ void MIDIToCVInterface::resetMidi() {
 	resetLight = 1.0;
 	outputs[GATE_OUTPUT].value = 0.0;
 	notes.clear();
-	updateLights();
-}
-
-void MIDIToCVInterface::updateLights() {
-	lights[GATE_OUTPUT] = outputs[GATE_OUTPUT].value / 10;
-	lights[MOD_OUTPUT] = mod / 127.0;
-	lights[PITCHWHEEL_OUTPUT] = (pitchWheel - 64) / 127.0;
-	lights[CHANNEL_AFTERTOUCH_OUTPUT] = afterTouch / 127.0;
-	lights[VELOCITY_OUTPUT] = vel / 127.0;
 }
 
 void MIDIToCVInterface::step() {
@@ -322,7 +311,6 @@ void MIDIToCVInterface::step() {
 	outputs[PITCHWHEEL_OUTPUT].value = (pitchWheel - 64) / 64.0 * 10.0;
 	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch / 127.0 * 10.0;
 	outputs[VELOCITY_OUTPUT].value = vel / 127.0 * 10.0;
-	updateLights();
 
 }
 
@@ -463,7 +451,8 @@ MidiToCVWidget::MidiToCVWidget() {
 		yPos += channelChoice->box.size.y + margin + 15;
 	}
 
-	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel", "Aftertouch"};
+	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel",
+														  "Aftertouch"};
 
 	for (int i = 0; i < MIDIToCVInterface::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
@@ -472,10 +461,7 @@ MidiToCVWidget::MidiToCVWidget() {
 		addChild(label);
 
 		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, i));
-		if (i != MIDIToCVInterface::PITCH_OUTPUT) {
-			addChild(createValueLight<SmallLight<GreenValueLight>>(Vec(15 * 7.5, yPos - 5), &module->lights[i]));
 
-		}
 		yPos += yGap + margin;
 	}
 }
@@ -508,8 +494,6 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	int cc[NUM_OUTPUTS];
 	int ccNum[NUM_OUTPUTS];
 	bool ccNumInited[NUM_OUTPUTS];
-	float lights[NUM_OUTPUTS];
-
 
 	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
@@ -571,7 +555,6 @@ void MIDICCToCVInterface::step() {
 
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 		outputs[i].value = cc[i] / 127.0 * 10.0;
-		lights[i] = 2.0 * outputs[i].value / 10.0 - 1.0;
 	}
 }
 
@@ -709,7 +692,6 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 
 		yPos += labelHeight + margin;
 		addOutput(createOutput<PJ3410Port>(Vec((i % 4) * (63) + 10, yPos + 5), module, i));
-		addChild(createValueLight<SmallLight<GreenValueLight>>(Vec((i % 4) * (63) + 32, yPos + 5), &module->lights[i]));
 
 		if ((i + 1) % 4 == 0) {
 			yPos += 47 + margin;
