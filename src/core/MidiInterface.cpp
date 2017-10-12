@@ -746,11 +746,22 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	virtual json_t *toJson() {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
+		json_object_set_new(rootJ, "clock1ratio", json_integer(clock1ratio));
+		json_object_set_new(rootJ, "clock2ratio", json_integer(clock2ratio));
 		return rootJ;
 	}
 
 	virtual void fromJson(json_t *rootJ) {
 		baseFromJson(rootJ);
+		json_t *c1rJ = json_object_get(rootJ, "clock1ratio");
+		if (c1rJ) {
+			clock1ratio = json_integer_value(c1rJ);
+		}
+
+		json_t *c2rJ = json_object_get(rootJ, "clock2ratio");
+		if (c2rJ) {
+			clock2ratio = json_integer_value(c2rJ);
+		}
 	}
 
 	virtual void initialize() {
