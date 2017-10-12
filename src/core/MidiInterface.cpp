@@ -4,7 +4,8 @@
 #include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "gui.hpp"
-#include "../../include/engine.hpp"
+#include "engine.hpp"
+#include "dsp/digital.hpp"
 
 
 using namespace rack;

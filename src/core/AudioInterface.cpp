@@ -3,7 +3,9 @@
 #include <thread>
 #include <portaudio.h>
 #include "core.hpp"
-#include "dsp.hpp"
+#include "dsp/samplerate.hpp"
+#include "dsp/ringbuffer.hpp"
+
 
 using namespace rack;
 

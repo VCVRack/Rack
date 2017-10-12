@@ -1,5 +1,7 @@
 #pragma once
 
+#include "string.h"
+#include "dsp/ringbuffer.hpp"
 #include "dsp/fir.hpp"
 
 
@@ -21,7 +23,10 @@ struct Decimator {
 		for (int i = 0; i < OVERSAMPLE*QUALITY; i++) {
 			kernel[i] /= sum;
 		}
+		// Zero input buffer
+		memset(inBuffer.data, 0, sizeof(inBuffer.data));
 	}
+	/** `in` must be OVERSAMPLE floats long */
 	float process(float *in) {
 		memcpy(inBuffer.endData(), in, OVERSAMPLE*sizeof(float));
 		inBuffer.endIncr(OVERSAMPLE);

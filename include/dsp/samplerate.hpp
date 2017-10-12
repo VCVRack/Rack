@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <samplerate.h>
+#include "frame.hpp"
 
 
 namespace rack {
