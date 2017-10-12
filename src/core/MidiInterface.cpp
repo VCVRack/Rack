@@ -773,6 +773,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 void MIDIClockToCVInterface::step() {
 	static int c1_16th = 0;
 	static int c2_16th = 0;
+	static float trigger_length = 0.05;
 
 	/* Note this is in relation to the Midi clock's Tick (6x per 16th note).
 	 * Therefore, e.g. the 2:3 is calculated:
@@ -797,7 +798,7 @@ void MIDIClockToCVInterface::step() {
 	}
 
 	if (start) {
-		clockStartPulse.trigger(0.1);
+		clockStartPulse.trigger(trigger_length);
 		start = false;
 		c1_16th = -1;
 		c2_16th = -1;
@@ -805,7 +806,7 @@ void MIDIClockToCVInterface::step() {
 	}
 
 	if (stop) {
-		clockStopPulse.trigger(0.1);
+		clockStopPulse.trigger(trigger_length);
 		stop = false;
 		clock1Pulse.time = 0.0;
 		clock1Pulse.pulseTime = 0.0;
@@ -820,12 +821,12 @@ void MIDIClockToCVInterface::step() {
 
 		if (c1_16th % ratios[clock1ratio] == 0) {
 			c1_16th = 0;
-			clock1Pulse.trigger(0.1);
+			clock1Pulse.trigger(trigger_length);
 		}
 
 		if (c2_16th % ratios[clock2ratio] == 0) {
 			c2_16th = 0;
-			clock2Pulse.trigger(0.1);
+			clock2Pulse.trigger(trigger_length);
 		}
 	}
 
