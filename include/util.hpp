@@ -62,7 +62,7 @@ float randomf();
 float randomNormal();
 
 ////////////////////
-// Helper functions
+// String functions
 ////////////////////
 
 /** Converts a printf format string and optional arguments into a std::string */
@@ -73,12 +73,21 @@ std::string ellipsize(std::string s, size_t len);
 
 std::string extractDirectory(std::string path);
 std::string extractFilename(std::string path);
+std::string extractExtension(std::string path);
+
+////////////////////
+// Operating system functions
+////////////////////
 
 /** Opens a URL, also happens to work with PDFs and folders.
 Shell injection is possible, so make sure the URL is trusted or hard coded.
 May block, so open in a new thread.
 */
 void openBrowser(std::string url);
+
+////////////////////
+// Thread functions
+////////////////////
 
 /** Threads which obtain a VIPLock will cause wait() to block for other less important threads.
 This does not provide the VIPs with an exclusive lock. That should be left up to another mutex shared between the less important thread.

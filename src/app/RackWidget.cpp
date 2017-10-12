@@ -60,17 +60,24 @@ void RackWidget::saveDialog() {
 void RackWidget::saveAsDialog() {
 	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcv", NULL);
+
 	if (path) {
-		savePatch(path);
-		lastPath = path;
+		std::string pathStr = path;
 		free(path);
+		std::string extension = extractExtension(pathStr);
+		if (extension.empty()) {
+			pathStr += ".vcv";
+		}
+
+		savePatch(pathStr);
+		lastPath = pathStr;
 	}
 }
 
 
-void RackWidget::savePatch(std::string filename) {
-	printf("Saving patch %s\n", filename.c_str());
-	FILE *file = fopen(filename.c_str(), "w");
+void RackWidget::savePatch(std::string path) {
+	printf("Saving patch %s\n", path.c_str());
+	FILE *file = fopen(path.c_str(), "w");
 	if (!file)
 		return;
 
@@ -83,9 +90,9 @@ void RackWidget::savePatch(std::string filename) {
 	fclose(file);
 }
 
-void RackWidget::loadPatch(std::string filename) {
-	printf("Loading patch %s\n", filename.c_str());
-	FILE *file = fopen(filename.c_str(), "r");
+void RackWidget::loadPatch(std::string path) {
+	printf("Loading patch %s\n", path.c_str());
+	FILE *file = fopen(path.c_str(), "r");
 	if (!file) {
 		// Exit silently
 		return;

@@ -36,10 +36,12 @@ float randomNormal(){
 std::string stringf(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
+	// Compute size of required buffer
 	int size = vsnprintf(NULL, 0, format, args);
 	va_end(args);
 	if (size < 0)
 		return "";
+	// Create buffer
 	std::string s;
 	s.resize(size);
 	va_start(args, format);
@@ -67,6 +69,13 @@ std::string extractFilename(std::string path) {
 	std::string filename = basename(pathDup);
 	free(pathDup);
 	return filename;
+}
+
+std::string extractExtension(std::string path) {
+	const char *ext = strrchr(path.c_str(), '.');
+	if (!ext)
+		return "";
+	return ext + 1;
 }
 
 void openBrowser(std::string url) {
