@@ -22,6 +22,11 @@ struct MIDICCToCVWidget : ModuleWidget {
 	void step();
 };
 
+struct MIDIClockToCVWidget : ModuleWidget {
+	MIDIClockToCVWidget();
+	void step();
+};
+
 struct BridgeWidget : ModuleWidget {
 	BridgeWidget();
 };
