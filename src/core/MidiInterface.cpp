@@ -788,13 +788,18 @@ void MIDIClockToCVInterface::step() {
 	if (start) {
 		clockStartPulse.trigger(0.1);
 		start = false;
-		c1_16th = 0;
-		c2_16th = 0;
+		c1_16th = -1;
+		c2_16th = -1;
+		tick = true;
 	}
 
 	if (stop) {
 		clockStopPulse.trigger(0.1);
-		start = false;
+		stop = false;
+		clock1Pulse.time = 0.0;
+		clock1Pulse.pulseTime = 0.0;
+		clock2Pulse.time = 0.0;
+		clock2Pulse.pulseTime = 0.0;
 	}
 
 	if (running && tick) {
