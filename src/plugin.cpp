@@ -190,11 +190,17 @@ static void refreshPurchase(json_t *pluginJ) {
 	if (!nameJ) return;
 	const char *name = json_string_value(nameJ);
 
-	json_t *downloadJ = json_object_get(pluginJ, "download");
-	if (!downloadJ) return;
-	const char *download = json_string_value(downloadJ);
+	// Append token and version to download URL
+	std::string url = gApiHost;
+	url += "/download"
+	url += "?product=";
+	url += slug;
+	url += "&version=";
+	url += gApplicationVersion;
+	url += "&token=";
+	url += gToken;
 
-	// Find slug in plugins list
+	// Find slug in plugins list, and return silently if slug already exists
 	for (Plugin *p : gPlugins) {
 		if (p->slug == slug) {
 			return;
@@ -209,7 +215,7 @@ static void refreshPurchase(json_t *pluginJ) {
 	std::string pluginsDir = assetLocal("plugins");
 	mkdir(pluginsDir.c_str(), 0755);
 	std::string filename = pluginsDir + "/" + slug + ".zip";
-	bool success = requestDownload(download, filename, &downloadProgress);
+	bool success = requestDownload(url, filename, &downloadProgress);
 	if (success) {
 		// Unzip file
 		int err = extractZip(filename.c_str(), pluginsDir.c_str());
