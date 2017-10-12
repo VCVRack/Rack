@@ -217,24 +217,20 @@ void renderGui() {
 	glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 	gPixelRatio = (float)width / windowWidth;
 
+	// Update and render
+	glViewport(0, 0, width, height);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	nvgBeginFrame(gVg, width, height, gPixelRatio);
+
 	bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);
 	if (visible) {
-		// Update and render
-		glViewport(0, 0, width, height);
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		nvgBeginFrame(gVg, width, height, gPixelRatio);
-
-		nvgSave(gVg);
 		nvgReset(gVg);
 		nvgScale(gVg, gPixelRatio, gPixelRatio);
 		gScene->draw(gVg);
-		nvgRestore(gVg);
-
-		nvgEndFrame(gVg);
 	}
 
+	nvgEndFrame(gVg);
 	glfwSwapBuffers(gWindow);
 }
 
