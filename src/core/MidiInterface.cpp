@@ -785,16 +785,16 @@ void MIDIClockToCVInterface::step() {
 
 	}
 
-	if(start) {
+	if (start) {
 		clockStartPulse.trigger(0.1);
-		start=false;
+		start = false;
 		c1_16th = 0;
 		c2_16th = 0;
 	}
 
-	if(stop) {
+	if (stop) {
 		clockStopPulse.trigger(0.1);
-		start=false;
+		start = false;
 	}
 
 	if (running && tick) {
@@ -934,7 +934,6 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 	}
 
 
-
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
@@ -947,7 +946,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		ratioChoice->box.pos = Vec(margin, yPos);
 		ratioChoice->box.size.x = box.size.x - 10;
 		addChild(ratioChoice);
-		yPos += ratioChoice->box.size.y + margin+5;
+		yPos += ratioChoice->box.size.y + margin + 5;
 
 	}
 
@@ -958,7 +957,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		addChild(label);
 
 		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK1_PULSE));
-		yPos += labelHeight + margin*4;
+		yPos += labelHeight + margin * 4;
 	}
 
 
@@ -974,7 +973,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		ratioChoice->box.pos = Vec(margin, yPos);
 		ratioChoice->box.size.x = box.size.x - 10;
 		addChild(ratioChoice);
-		yPos += ratioChoice->box.size.y + margin+5;
+		yPos += ratioChoice->box.size.y + margin + 5;
 
 	}
 
@@ -985,7 +984,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		addChild(label);
 
 		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK2_PULSE));
-		yPos += labelHeight + margin*7;
+		yPos += labelHeight + margin * 7;
 	}
 
 	{
@@ -993,7 +992,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		label->box.pos = Vec(margin, yPos);
 		label->text = "Clock Start";
 		addChild(label);
-		addOutput(createOutput<PJ3410Port>(Vec(15*6, yPos - 5), module, MIDIClockToCVInterface::CLOCK_START_PULSE));
+		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK_START_PULSE));
 		yPos += 40;
 	}
 
@@ -1003,7 +1002,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		label->text = "Clock Stop";
 		addChild(label);
 
-		addOutput(createOutput<PJ3410Port>(Vec(15*6, yPos - 5), module, MIDIClockToCVInterface::CLOCK_STOP_PULSE));
+		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK_STOP_PULSE));
 	}
 }
 
