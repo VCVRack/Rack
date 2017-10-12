@@ -192,7 +192,7 @@ static void refreshPurchase(json_t *pluginJ) {
 
 	// Append token and version to download URL
 	std::string url = gApiHost;
-	url += "/download"
+	url += "/download";
 	url += "?product=";
 	url += slug;
 	url += "&version=";
