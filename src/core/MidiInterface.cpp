@@ -771,8 +771,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 };
 
 void MIDIClockToCVInterface::step() {
-	static int c1_16th = 0;
-	static int c2_16th = 0;
+	static int c_bar = 0;
 	static float trigger_length = 0.05;
 
 	/* Note this is in relation to the Midi clock's Tick (6x per 16th note).
@@ -800,9 +799,7 @@ void MIDIClockToCVInterface::step() {
 	if (start) {
 		clockStartPulse.trigger(trigger_length);
 		start = false;
-		c1_16th = -1;
-		c2_16th = -1;
-		tick = true;
+		c_bar = 0;
 	}
 
 	if (stop) {
@@ -814,19 +811,29 @@ void MIDIClockToCVInterface::step() {
 		clock2Pulse.pulseTime = 0.0;
 	}
 
-	if (running && tick) {
+	if (tick) {
 		tick = false;
-		c1_16th++;
-		c2_16th++;
 
-		if (c1_16th % ratios[clock1ratio] == 0) {
-			c1_16th = 0;
-			clock1Pulse.trigger(trigger_length);
+		/* Note: At least for my midi clock, the clock ticks are sent
+		 * even if the midi clock is stopped.
+		 * Therefore, we need to keep track of ticks even when the clock
+		 * is stopped. Otherwise we can run into weird timing issues.
+		*/
+		if (running) {
+			if (c_bar % ratios[clock1ratio] == 0) {
+				clock1Pulse.trigger(trigger_length);
+			}
+
+			if (c_bar % ratios[clock2ratio] == 0) {
+				clock2Pulse.trigger(trigger_length);
+			}
 		}
 
-		if (c2_16th % ratios[clock2ratio] == 0) {
-			c2_16th = 0;
-			clock2Pulse.trigger(trigger_length);
+		c_bar++;
+
+		// One "midi bar" = 4 whole notes = (6 ticks per 16th) 6 * 16 *4 = 384
+		if (c_bar >= 384) {
+			c_bar = 0;
 		}
 	}
 
