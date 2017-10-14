@@ -213,16 +213,17 @@ static void refreshPurchase(json_t *pluginJ) {
 
 	// Download zip
 	std::string pluginsDir = assetLocal("plugins");
-	std::string filename = pluginsDir + "/" + slug + ".zip";
-	bool success = requestDownload(url, filename, &downloadProgress);
+	std::string pluginPath = pluginsDir + "/" + slug;
+	std::string zipPath = pluginPath + ".zip";
+	bool success = requestDownload(url, zipPath, &downloadProgress);
 	if (success) {
 		// Unzip file
-		int err = extractZip(filename.c_str(), pluginsDir.c_str());
+		int err = extractZip(zipPath.c_str(), pluginsDir.c_str());
 		if (!err) {
-			// Load plugin
-			loadPlugin(slug);
 			// Delete zip
-			remove(filename.c_str());
+			remove(zipPath.c_str());
+			// Load plugin
+			loadPlugin(pluginPath);
 		}
 	}
 
