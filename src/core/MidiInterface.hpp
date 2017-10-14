@@ -81,3 +81,9 @@ struct MIDIClockToCVWidget : ModuleWidget {
 	void step();
 };
 
+struct MIDITriggerToCVWidget : ModuleWidget {
+	MIDITriggerToCVWidget();
+
+	void step();
+};
+
