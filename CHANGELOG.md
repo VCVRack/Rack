@@ -1,7 +1,10 @@
-Tip: Use `git checkout v0.3.2` for example to check out any previous version mentioned here.
+Tip: Use `git checkout v0.4.0` for example to check out any previous version mentioned here.
 
 
 ### dev
+
+
+### v0.4.0
 - Cables can now stack on output ports
 - Added sub-menus for each plugin, includes optional plugin metadata like URLs
 - Added MIDI CC-to-CV Interface, updated MIDI-to-CV Interface
@@ -11,6 +14,16 @@ Tip: Use `git checkout v0.3.2` for example to check out any previous version men
 - Added LEDs on plugs
 - Support for AMD Phenom II processors
 - Use self-contained Mac app bundle, no need for a Rack folder
+
+- Fundamental
+	- Added Lissajous mode to Scope
+	- Added two LFOs and VCO-2
+
+- Befaco
+	- Added Rampage
+
+- Audible Instruments
+	- Added Keyframer/Mixer
 
 
 ### v0.3.2
