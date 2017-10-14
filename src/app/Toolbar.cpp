@@ -30,6 +30,12 @@ struct SaveAsItem : MenuItem {
 	}
 };
 
+struct QuitItem : MenuItem {
+	void onAction() {
+		guiClose();
+	}
+};
+
 struct FileChoice : ChoiceButton {
 	void onAction() {
 		Menu *menu = gScene->createMenu();
@@ -37,25 +43,11 @@ struct FileChoice : ChoiceButton {
 		menu->box.size.x = box.size.x;
 
 		{
-			MenuItem *newItem = new NewItem();
-			newItem->text = "New";
-			newItem->rightText = GUI_MOD_KEY_NAME "+N";
-			menu->pushChild(newItem);
-
-			MenuItem *openItem = new OpenItem();
-			openItem->text = "Open";
-			openItem->rightText = GUI_MOD_KEY_NAME "+O";
-			menu->pushChild(openItem);
-
-			MenuItem *saveItem = new SaveItem();
-			saveItem->text = "Save";
-			saveItem->rightText = GUI_MOD_KEY_NAME "+S";
-			menu->pushChild(saveItem);
-
-			MenuItem *saveAsItem = new SaveAsItem();
-			saveAsItem->text = "Save as";
-			saveAsItem->rightText = GUI_MOD_KEY_NAME "+Shift+S";
-			menu->pushChild(saveAsItem);
+			menu->pushChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, GUI_MOD_KEY_NAME "+N"));
+			menu->pushChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, GUI_MOD_KEY_NAME "+O"));
+			menu->pushChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, GUI_MOD_KEY_NAME "+S"));
+			menu->pushChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Shift+S"));
+			menu->pushChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Q"));
 		}
 	}
 };
