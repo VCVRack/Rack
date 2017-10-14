@@ -35,11 +35,9 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	bool stop = false;
 
 	MIDIClockToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
-		(dynamic_cast<RtMidiIn *>(rtMidi))->ignoreTypes(true, false);
 	}
 
 	~MIDIClockToCVInterface() {
-		setPortId(-1);
 	}
 
 	void step();
@@ -70,7 +68,6 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	}
 
 	virtual void initialize() {
-		setPortId(-1);
 	}
 
 };
@@ -88,17 +85,15 @@ void MIDIClockToCVInterface::step() {
 	 * */
 	static int ratios[] = {6, 8, 12, 16, 24, 32, 48, 96, 192};
 
-	if (rtMidi->isPortOpen()) {
+	if (isPortOpen()) {
 		std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
-
-		dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
+		message = getMessage();
 		while (message.size() > 0) {
 			processMidi(message);
-			dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
+			message = getMessage();
 		}
-
 	}
 
 	if (start) {

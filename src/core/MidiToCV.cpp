@@ -45,7 +45,6 @@ struct MIDIToCVInterface : MidiIO, Module {
 	}
 
 	~MIDIToCVInterface() {
-		setPortId(-1);
 	};
 
 	void step();
@@ -67,7 +66,6 @@ struct MIDIToCVInterface : MidiIO, Module {
 	}
 
 	virtual void initialize() {
-		setPortId(-1);
 	}
 
 	virtual void resetMidi();
@@ -85,15 +83,14 @@ void MIDIToCVInterface::resetMidi() {
 }
 
 void MIDIToCVInterface::step() {
-	if (rtMidi->isPortOpen()) {
+	if (isPortOpen()) {
 		std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
-
-		dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
+		message = getMessage();
 		while (message.size() > 0) {
 			processMidi(message);
-			dynamic_cast<RtMidiIn *>(rtMidi)->getMessage(&message);
+			message = getMessage();
 		}
 	}
 

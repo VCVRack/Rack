@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include "rack.hpp"
 #include "rtmidi/RtMidi.h"
 
@@ -5,24 +6,63 @@
 using namespace rack;
 
 
-//////////////////////
-// MIDI module widgets
-//////////////////////
+/**
+ * This class allows to use one instance of rtMidiIn with
+ * multiple modules. A MidiIn port will be opened only once while multiple
+ * instances can use it simultaniously, each receiving all its incoming messages.
+ */
+struct RtMidiInSplitter {
+private:
+	std::unordered_map<std::string, RtMidiIn*> midiInMap;
+	std::unordered_map<std::string, std::unordered_map<int, std::list<std::vector<unsigned char>>>> deviceIdMessagesMap;
+public:
+	RtMidiInSplitter();
+
+	/* Returns an Id which uniquely identifies the caller in combination with the interface name */
+	int openDevice(std::string interfaceName);
+
+	/* Returns the next message in queue for given device & id*/
+	std::vector<unsigned char> getMessage(std::string deviceName, int id);
+
+	/* Returns Device names as string*/
+	std::vector<std::string> getDevices();
+
+};
+
+//struct RtMidiOutSplitter {
+//private:
+//	std::unordered_map<std::string, RtMidiOut> midiOuts;
+//public:
+//	RtMidiOutSplitter();
+//};
 
 struct MidiIO {
-	int portId;
+private:
+	static RtMidiInSplitter midiInSplitter;
+	int id = -1;
+	std::string deviceName = "";
+public:
+	void setDeviceName(const std::string &deviceName);
+
+//	static RtMidiOutSplitter MidiOutSlpitter = RtMidiOutSplitter();
+
+public:
 	int channel;
-	RtMidi *rtMidi;
+	bool isOut = false;
 
-	MidiIO(bool isOut=false);
 
-	int getPortCount();
+	MidiIO(bool isOut = false);
 
-	std::string getPortName(int portId);
+	std::vector<std::string> getDevices();
+	void openDevice(std::string deviceName);
 
-	void setPortId(int portId);
+	std::string getDeviceName();
 
 	void setChannel(int channel);
+
+	std::vector<unsigned char> getMessage();
+
+	bool isPortOpen();
 
 	json_t *addBaseJson(json_t *rootJ);
 
@@ -32,9 +72,12 @@ struct MidiIO {
 	virtual void resetMidi()=0;
 };
 
+//////////////////////
+// MIDI module widgets
+//////////////////////
+
 struct MidiItem : MenuItem {
 	MidiIO *midiModule;
-	int portId;
 
 	void onAction();
 };
@@ -63,13 +106,13 @@ struct ChannelChoice : ChoiceButton {
 };
 
 
-struct MidiToCVWidget : ModuleWidget{
+struct MidiToCVWidget : ModuleWidget {
 	MidiToCVWidget();
 
 	void step();
 };
 
-struct MIDICCToCVWidget : ModuleWidget{
+struct MIDICCToCVWidget : ModuleWidget {
 	MIDICCToCVWidget();
 
 	void step();

@@ -6,6 +6,72 @@
 
 using namespace rack;
 
+// note this is currently not thread safe but can be easily archieved by adding a mutex
+RtMidiInSplitter::RtMidiInSplitter() {
+	midiInMap = {};
+	deviceIdMessagesMap = {};
+}
+
+int RtMidiInSplitter::openDevice(std::string deviceName) {
+	int id;
+
+	if (!midiInMap[deviceName]) {
+		try {
+			RtMidiIn *t = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
+			t->ignoreTypes(true, false); // TODO: make this optional!
+			midiInMap[deviceName] = t;
+			for (int i = 0; i < t->getPortCount(); i++) {
+				if (deviceName == t->getPortName(i)) {
+					t->openPort(i);
+					break;
+				}
+			}
+		}
+		catch (RtMidiError &error) {
+			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+		}
+		id = 0;
+		deviceIdMessagesMap[deviceName] = {};
+	} else {
+		id = deviceIdMessagesMap[deviceName].size();
+	}
+
+	deviceIdMessagesMap[deviceName][id] = {};
+	return id;
+}
+
+std::vector<unsigned char> RtMidiInSplitter::getMessage(std::string deviceName, int id) {
+	std::vector<unsigned char> next_msg, ret;
+	midiInMap[deviceName]->getMessage(&next_msg);
+
+	if (next_msg.size() > 0) {
+		for (int i = 0; i < deviceIdMessagesMap[deviceName].size(); i++) {
+			deviceIdMessagesMap[deviceName][i].push_back(next_msg);
+		}
+	}
+
+	if (deviceIdMessagesMap[deviceName][id].size() == 0){
+		return next_msg;
+	}
+
+	ret = deviceIdMessagesMap[deviceName][id].front();
+	deviceIdMessagesMap[deviceName][id].pop_front();
+	return ret;
+}
+
+std::vector<std::string> RtMidiInSplitter::getDevices() {
+	/*This is a bit unneccessary */
+	RtMidiIn *t = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
+
+	std::vector<std::string> names = {};
+
+	for (int i = 0; i < t->getPortCount(); i++) {
+		names.push_back(t->getPortName(i));
+	}
+
+	return names;
+}
+
 /**
  * MidiIO implements the shared functionality of all midi modules, namely:
  * + Channel Selection (including helper for storing json)
@@ -13,48 +79,29 @@ using namespace rack;
  * + rtMidi initialisation (input or output)
  */
 MidiIO::MidiIO(bool isOut) {
-	portId = -1;
-	rtMidi = NULL;
 	channel = -1;
-
-	/*
-	 * If isOut is set to true, creates a RtMidiOut, RtMidiIn otherwise
-	 */
-	try {
-		if (isOut) {
-			rtMidi = new RtMidiOut(RtMidi::UNSPECIFIED, "Rack");
-		} else {
-			rtMidi = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
-		}
-	}
-	catch (RtMidiError &error) {
-		fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
-	}
+	this->isOut = isOut;
 };
+
+RtMidiInSplitter MidiIO::midiInSplitter = RtMidiInSplitter();
 
 void MidiIO::setChannel(int channel) {
 	this->channel = channel;
 }
 
 json_t *MidiIO::addBaseJson(json_t *rootJ) {
-	if (portId >= 0) {
-		std::string portName = getPortName(portId);
-		json_object_set_new(rootJ, "portName", json_string(portName.c_str()));
+	if (deviceName != "") {
+		json_object_set_new(rootJ, "interfaceName", json_string(deviceName.c_str()));
 		json_object_set_new(rootJ, "channel", json_integer(channel));
 	}
 	return rootJ;
 }
 
 void MidiIO::baseFromJson(json_t *rootJ) {
-	json_t *portNameJ = json_object_get(rootJ, "portName");
+	json_t *portNameJ = json_object_get(rootJ, "interfaceName");
 	if (portNameJ) {
-		std::string portName = json_string_value(portNameJ);
-		for (int i = 0; i < getPortCount(); i++) {
-			if (portName == getPortName(i)) {
-				setPortId(i);
-				break;
-			}
-		}
+		deviceName = json_string_value(portNameJ);
+		openDevice(deviceName);
 	}
 
 	json_t *channelJ = json_object_get(rootJ, "channel");
@@ -63,41 +110,35 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 	}
 }
 
-
-int MidiIO::getPortCount() {
-	return rtMidi->getPortCount();
+std::vector<std::string> MidiIO::getDevices() {
+	return midiInSplitter.getDevices();
 }
 
-std::string MidiIO::getPortName(int portId) {
-	std::string portName;
-	try {
-		portName = rtMidi->getPortName(portId);
-	}
-	catch (RtMidiError &error) {
-		fprintf(stderr, "Failed to get Port Name: %d, %s\n", portId, error.getMessage().c_str());
-	}
-	return portName;
+void MidiIO::openDevice(std::string deviceName) {
+	id = midiInSplitter.openDevice(deviceName);
+	deviceName = deviceName;
 }
 
-void MidiIO::setPortId(int portId) {
-
-	// Close port if it was previously opened
-	if (rtMidi->isPortOpen()) {
-		rtMidi->closePort();
-	}
-	this->portId = -1;
-
-	// Open new port
-	if (portId >= 0) {
-		rtMidi->openPort(portId, "Midi Interface");
-	}
-	this->portId = portId;
+std::string MidiIO::getDeviceName() {
+	return deviceName;
 }
 
+std::vector<unsigned char> MidiIO::getMessage() {
+	return midiInSplitter.getMessage(deviceName, id);
+}
+
+bool MidiIO::isPortOpen() {
+	return id > 0;
+}
+
+void MidiIO::setDeviceName(const std::string &deviceName) {
+	MidiIO::deviceName = deviceName;
+}
 
 void MidiItem::onAction() {
 	midiModule->resetMidi(); // reset Midi values
-	midiModule->setPortId(portId);
+	midiModule->openDevice(text);
+	midiModule->setDeviceName(text);
 }
 
 void MidiChoice::onAction() {
@@ -105,36 +146,35 @@ void MidiChoice::onAction() {
 	menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 	menu->box.size.x = box.size.x;
 
-	int portCount = midiModule->getPortCount();
 	{
 		MidiItem *midiItem = new MidiItem();
 		midiItem->midiModule = midiModule;
-		midiItem->portId = -1;
-		midiItem->text = "No device";
+		midiItem->text = "";
 		menu->pushChild(midiItem);
 	}
-	for (int portId = 0; portId < portCount; portId++) {
+
+	std::vector<std::string> deviceNames = midiModule->getDevices();
+	for (int i = 0; i < deviceNames.size(); i++) {
 		MidiItem *midiItem = new MidiItem();
 		midiItem->midiModule = midiModule;
-		midiItem->portId = portId;
-		midiItem->text = midiModule->getPortName(portId);
+		midiItem->text = deviceNames[i];
 		menu->pushChild(midiItem);
 	}
 }
 
 void MidiChoice::step() {
-	if (midiModule->portId < 0) {
+	if (midiModule->getDeviceName() == "") {
 		text = "No Device";
 		return;
 	}
-	std::string name = midiModule->getPortName(midiModule->portId);
+	std::string name = midiModule->getDeviceName();
 	text = ellipsize(name, 15);
 }
 
 void ChannelItem::onAction() {
-		midiModule->resetMidi(); // reset Midi values
-		midiModule->setChannel(channel);
-	}
+	midiModule->resetMidi(); // reset Midi values
+	midiModule->setChannel(channel);
+}
 
 void ChannelChoice::onAction() {
 	Menu *menu = gScene->createMenu();
