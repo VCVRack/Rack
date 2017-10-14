@@ -51,8 +51,8 @@ ifeq ($(ARCH),win)
 	libsamplerate = bin/libsamplerate-0.dll
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
-    rtmidi = bin/rtmidi.dll
-	portaudio = bin/libportaudio_x64.dll
+	rtmidi = bin/librtmidi-4.dll
+	portaudio = bin/portaudio_x64.dll
 endif
 
 
