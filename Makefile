@@ -126,7 +126,7 @@ ifeq ($(ARCH), win)
 	cp dep/bin/glfw3.dll dist/Rack/
 	cp dep/bin/libcurl-4.dll dist/Rack/
 	cp dep/bin/libjansson-4.dll dist/Rack/
-	cp dep/bin/librtmidi.dll dist/Rack/
+	cp dep/bin/librtmidi-4.dll dist/Rack/
 	cp dep/bin/libsamplerate-0.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
 	cp dep/bin/portaudio_x64.dll dist/Rack/
