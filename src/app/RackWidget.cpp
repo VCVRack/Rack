@@ -38,6 +38,11 @@ void RackWidget::clear() {
 	lastPath = "";
 }
 
+void RackWidget::initialize() {
+	clear();
+	loadPatch(assetLocal("template.vcv"));
+}
+
 void RackWidget::openDialog() {
 	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);

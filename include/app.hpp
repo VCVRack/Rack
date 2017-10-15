@@ -114,6 +114,7 @@ struct RackWidget : OpaqueWidget {
 	~RackWidget();
 
 	void clear();
+	void initialize();
 	void openDialog();
 	void saveDialog();
 	void saveAsDialog();
