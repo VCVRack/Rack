@@ -69,11 +69,11 @@ public:
 
 	double getMessage(std::vector<unsigned char> *msg);
 
-	bool isPortOpen();
-
 	json_t *addBaseJson(json_t *rootJ);
 
 	void baseFromJson(json_t *rootJ);
+
+	bool isPortOpen();
 
 	void close();
 

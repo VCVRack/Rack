@@ -52,28 +52,33 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 
 std::vector<std::string> MidiIO::getDevices() {
 	/* Note: we could also use an existing interface if one exists */
-	static RtMidiIn *t = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
+	static RtMidiIn * m = new RtMidiIn();
 
 	std::vector<std::string> names = {};
 
-	for (int i = 0; i < t->getPortCount(); i++) {
-		names.push_back(t->getPortName(i));
+	for (int i = 0; i < m->getPortCount(); i++) {
+		names.push_back(m->getPortName(i));
 	}
 
 	return names;
 }
 
 void MidiIO::openDevice(std::string deviceName) {
+	MidiInWrapper *mw = midiInMap[deviceName];
 
-	if (!midiInMap[deviceName]) {
+	if (id > 0 || deviceName != "") {
+		close();
+	}
+
+	if (!mw) {
 		try {
-			MidiInWrapper *t = new MidiInWrapper();
-			midiInMap[deviceName] = t;
+			mw = new MidiInWrapper();
+			midiInMap[deviceName] = mw;
 
 
-			for (int i = 0; i < t->getPortCount(); i++) {
-				if (deviceName == t->getPortName(i)) {
-					t->openPort(i);
+			for (int i = 0; i < mw->getPortCount(); i++) {
+				if (deviceName == mw->getPortName(i)) {
+					mw->openPort(i);
 					break;
 				}
 			}
@@ -98,9 +103,9 @@ std::string MidiIO::getDeviceName() {
 double MidiIO::getMessage(std::vector<unsigned char> *msg) {
 	std::vector<unsigned char> next_msg;
 
-	MidiInWrapper *m = midiInMap[deviceName];
+	MidiInWrapper *mw = midiInMap[deviceName];
 
-	if (!m) {
+	if (!mw) {
 		fprintf(stderr, "Device not opened!: %s\n", deviceName.c_str());
 		return 0;
 	}
@@ -108,34 +113,41 @@ double MidiIO::getMessage(std::vector<unsigned char> *msg) {
 	double stamp = midiInMap[deviceName]->getMessage(&next_msg);
 
 	if (next_msg.size() > 0) {
-		for (auto kv : m->idMessagesMap) {
-			m->idMessagesMap[kv.first].push_back(next_msg);
-			m->idStampsMap[kv.first].push_back(stamp);
+		for (auto kv : mw->idMessagesMap) {
+			mw->idMessagesMap[kv.first].push_back(next_msg);
+			mw->idStampsMap[kv.first].push_back(stamp);
 		}
 	}
 
-	if (m->idMessagesMap[id].size() <= 0) {
+	if (mw->idMessagesMap[id].size() <= 0) {
 		*msg = next_msg;
 		return stamp;
 	}
 
-	*msg = m->idMessagesMap[id].front();
-	stamp = m->idStampsMap[id].front();
-	m->idMessagesMap[id].pop_front();
+	*msg = mw->idMessagesMap[id].front();
+	stamp = mw->idStampsMap[id].front();
+	mw->idMessagesMap[id].pop_front();
 	return stamp;
 }
 
 bool MidiIO::isPortOpen() {
-	return midiInMap[deviceName] != NULL;
+	return id > 0;
 }
 
 void MidiIO::close() {
-	midiInMap[deviceName]->erase(id);
+	MidiInWrapper * mw = midiInMap[deviceName];
+	if (!mw){
+		return;
+	}
 
-	if (midiInMap[deviceName]->subscribers == 0) {
-		midiInMap[deviceName]->closePort();
+	mw->erase(id);
+
+	if (mw->subscribers == 0) {
+		mw->closePort();
 		midiInMap.erase(deviceName);
 	}
+
+	id = -1;
 }
 
 
