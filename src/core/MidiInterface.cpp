@@ -40,8 +40,7 @@ json_t *MidiIO::addBaseJson(json_t *rootJ) {
 void MidiIO::baseFromJson(json_t *rootJ) {
 	json_t *portNameJ = json_object_get(rootJ, "interfaceName");
 	if (portNameJ) {
-		deviceName = json_string_value(portNameJ);
-		openDevice(deviceName);
+		openDevice(json_string_value(portNameJ));
 	}
 
 	json_t *channelJ = json_object_get(rootJ, "channel");
@@ -64,9 +63,10 @@ std::vector<std::string> MidiIO::getDevices() {
 }
 
 void MidiIO::openDevice(std::string deviceName) {
+
 	MidiInWrapper *mw = midiInMap[deviceName];
 
-	if (id > 0 || deviceName != "") {
+	if (this->id > 0 || this->deviceName != "") {
 		close();
 	}
 
@@ -135,8 +135,11 @@ bool MidiIO::isPortOpen() {
 }
 
 void MidiIO::close() {
+
 	MidiInWrapper * mw = midiInMap[deviceName];
-	if (!mw){
+
+	if (!mw || id < 0) {
+		fprintf(stderr, "Trying to close already closed device!\n");
 		return;
 	}
 
@@ -148,6 +151,7 @@ void MidiIO::close() {
 	}
 
 	id = -1;
+	deviceName = "";
 }
 
 
