@@ -82,7 +82,10 @@ void MIDITriggerToCVInterface::step() {
 	}
 
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
-		outputs[i].value = trigger[i] / 127.0 * 10;
+		// Note: Could have an option to select between gate and velocity
+		// but trigger seams more useful
+		// outputs[i].value = trigger[i] / 127.0 * 10;
+		outputs[i].value = trigger[i] > 0 ? 10.0 : 0.0;
 	}
 }
 
