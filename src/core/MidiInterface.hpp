@@ -11,62 +11,71 @@ using namespace rack;
  * multiple modules. A MidiIn port will be opened only once while multiple
  * instances can use it simultaniously, each receiving all its incoming messages.
  */
-struct RtMidiInSplitter {
-private:
-	std::unordered_map<std::string, RtMidiIn*> midiInMap;
-	std::unordered_map<std::string, std::unordered_map<int, std::list<std::vector<unsigned char>>>> deviceIdMessagesMap;
-public:
-	RtMidiInSplitter();
 
-	/* Returns an Id which uniquely identifies the caller in combination with the interface name */
-	int openDevice(std::string interfaceName);
+struct MidiInWrapper : RtMidiIn {
+	std::unordered_map<uint, std::list<std::vector<unsigned char>>> idMessagesMap;
+	std::unordered_map<uint, std::list<double>> idStampsMap;
+	uint uuid_c = 0;
+	uint subscribers = 0;
 
-	/* Returns the next message in queue for given device & id*/
-	std::vector<unsigned char> getMessage(std::string deviceName, int id);
+	MidiInWrapper() : RtMidiIn() {
+		idMessagesMap = {};
+		idStampsMap = {};
+	};
 
-	/* Returns Device names as string*/
-	std::vector<std::string> getDevices();
+	uint add() {
+		uint id = ++uuid_c;
+		subscribers++;
+		idMessagesMap[id] = {};
+		idStampsMap[id] = {};
+		return id;
+	}
 
+	void erase(uint id) {
+		subscribers--;
+		idMessagesMap.erase(id);
+		idStampsMap.erase(id);
+	}
 };
-
-//struct RtMidiOutSplitter {
-//private:
-//	std::unordered_map<std::string, RtMidiOut> midiOuts;
-//public:
-//	RtMidiOutSplitter();
-//};
 
 struct MidiIO {
 private:
-	static RtMidiInSplitter midiInSplitter;
+	static std::unordered_map<std::string, MidiInWrapper *> midiInMap;
+	/* TODO: add for midi out*/
 	int id = -1;
 	std::string deviceName = "";
-public:
-	void setDeviceName(const std::string &deviceName);
-
-//	static RtMidiOutSplitter MidiOutSlpitter = RtMidiOutSplitter();
-
-public:
-	int channel;
 	bool isOut = false;
+
+public:
+	bool ignore_midiSysex=true;
+	bool ignore_midiTime=true;
+	bool ignore_midiSense=true;
+	int channel;
 
 
 	MidiIO(bool isOut = false);
 
+	~MidiIO() {
+		close();
+	}
+
 	std::vector<std::string> getDevices();
+
 	void openDevice(std::string deviceName);
 
 	std::string getDeviceName();
 
 	void setChannel(int channel);
 
-	std::vector<unsigned char> getMessage();
+	double getMessage(std::vector<unsigned char> *msg);
 
 	bool isPortOpen();
 
 	json_t *addBaseJson(json_t *rootJ);
 
 	void baseFromJson(json_t *rootJ);
+
+	void close();
 
 	/* called when midi port is set */
 	virtual void resetMidi()=0;

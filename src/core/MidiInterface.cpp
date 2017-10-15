@@ -6,71 +6,7 @@
 
 using namespace rack;
 
-// note this is currently not thread safe but can be easily archieved by adding a mutex
-RtMidiInSplitter::RtMidiInSplitter() {
-	midiInMap = {};
-	deviceIdMessagesMap = {};
-}
 
-int RtMidiInSplitter::openDevice(std::string deviceName) {
-	int id;
-
-	if (!midiInMap[deviceName]) {
-		try {
-			RtMidiIn *t = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
-			t->ignoreTypes(true, false); // TODO: make this optional!
-			midiInMap[deviceName] = t;
-			for (int i = 0; i < t->getPortCount(); i++) {
-				if (deviceName == t->getPortName(i)) {
-					t->openPort(i);
-					break;
-				}
-			}
-		}
-		catch (RtMidiError &error) {
-			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
-		}
-		id = 0;
-		deviceIdMessagesMap[deviceName] = {};
-	} else {
-		id = deviceIdMessagesMap[deviceName].size();
-	}
-
-	deviceIdMessagesMap[deviceName][id] = {};
-	return id;
-}
-
-std::vector<unsigned char> RtMidiInSplitter::getMessage(std::string deviceName, int id) {
-	std::vector<unsigned char> next_msg, ret;
-	midiInMap[deviceName]->getMessage(&next_msg);
-
-	if (next_msg.size() > 0) {
-		for (int i = 0; i < deviceIdMessagesMap[deviceName].size(); i++) {
-			deviceIdMessagesMap[deviceName][i].push_back(next_msg);
-		}
-	}
-
-	if (deviceIdMessagesMap[deviceName][id].size() == 0){
-		return next_msg;
-	}
-
-	ret = deviceIdMessagesMap[deviceName][id].front();
-	deviceIdMessagesMap[deviceName][id].pop_front();
-	return ret;
-}
-
-std::vector<std::string> RtMidiInSplitter::getDevices() {
-	/*This is a bit unneccessary */
-	RtMidiIn *t = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
-
-	std::vector<std::string> names = {};
-
-	for (int i = 0; i < t->getPortCount(); i++) {
-		names.push_back(t->getPortName(i));
-	}
-
-	return names;
-}
 
 /**
  * MidiIO implements the shared functionality of all midi modules, namely:
@@ -81,13 +17,17 @@ std::vector<std::string> RtMidiInSplitter::getDevices() {
 MidiIO::MidiIO(bool isOut) {
 	channel = -1;
 	this->isOut = isOut;
-};
 
-RtMidiInSplitter MidiIO::midiInSplitter = RtMidiInSplitter();
+	if (isOut) {
+		fprintf(stderr, "Midi Out is currently not supported (will be added soon)");
+	}
+};
 
 void MidiIO::setChannel(int channel) {
 	this->channel = channel;
 }
+
+std::unordered_map<std::string, MidiInWrapper*> MidiIO::midiInMap = {};
 
 json_t *MidiIO::addBaseJson(json_t *rootJ) {
 	if (deviceName != "") {
@@ -111,34 +51,97 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 }
 
 std::vector<std::string> MidiIO::getDevices() {
-	return midiInSplitter.getDevices();
+	/* Note: we could also use an existing interface if one exists */
+	static RtMidiIn *t = new RtMidiIn(RtMidi::UNSPECIFIED, "Rack");
+
+	std::vector<std::string> names = {};
+
+	for (int i = 0; i < t->getPortCount(); i++) {
+		names.push_back(t->getPortName(i));
+	}
+
+	return names;
 }
 
 void MidiIO::openDevice(std::string deviceName) {
-	id = midiInSplitter.openDevice(deviceName);
-	deviceName = deviceName;
+
+	if (!midiInMap[deviceName]) {
+		try {
+			MidiInWrapper *t = new MidiInWrapper();
+			midiInMap[deviceName] = t;
+
+
+			for (int i = 0; i < t->getPortCount(); i++) {
+				if (deviceName == t->getPortName(i)) {
+					t->openPort(i);
+					break;
+				}
+			}
+		}
+		catch (RtMidiError &error) {
+			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+			return;
+		}
+	}
+
+	this->deviceName = deviceName;
+
+	midiInMap[deviceName]->ignoreTypes(ignore_midiSysex, ignore_midiTime, ignore_midiSense);
+
+	id = midiInMap[deviceName]->add();
 }
 
 std::string MidiIO::getDeviceName() {
 	return deviceName;
 }
 
-std::vector<unsigned char> MidiIO::getMessage() {
-	return midiInSplitter.getMessage(deviceName, id);
+double MidiIO::getMessage(std::vector<unsigned char> *msg) {
+	std::vector<unsigned char> next_msg;
+
+	MidiInWrapper *m = midiInMap[deviceName];
+
+	if (!m) {
+		fprintf(stderr, "Device not opened!: %s\n", deviceName.c_str());
+		return 0;
+	}
+
+	double stamp = midiInMap[deviceName]->getMessage(&next_msg);
+
+	if (next_msg.size() > 0) {
+		for (auto kv : m->idMessagesMap) {
+			m->idMessagesMap[kv.first].push_back(next_msg);
+			m->idStampsMap[kv.first].push_back(stamp);
+		}
+	}
+
+	if (m->idMessagesMap[id].size() <= 0) {
+		*msg = next_msg;
+		return stamp;
+	}
+
+	*msg = m->idMessagesMap[id].front();
+	stamp = m->idStampsMap[id].front();
+	m->idMessagesMap[id].pop_front();
+	return stamp;
 }
 
 bool MidiIO::isPortOpen() {
-	return id > 0;
+	return midiInMap[deviceName] != NULL;
 }
 
-void MidiIO::setDeviceName(const std::string &deviceName) {
-	MidiIO::deviceName = deviceName;
+void MidiIO::close() {
+	midiInMap[deviceName]->erase(id);
+
+	if (midiInMap[deviceName]->subscribers == 0) {
+		midiInMap[deviceName]->closePort();
+		midiInMap.erase(deviceName);
+	}
 }
+
 
 void MidiItem::onAction() {
 	midiModule->resetMidi(); // reset Midi values
 	midiModule->openDevice(text);
-	midiModule->setDeviceName(text);
 }
 
 void MidiChoice::onAction() {
