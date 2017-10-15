@@ -87,10 +87,10 @@ void MIDIToCVInterface::step() {
 		std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
-		message = getMessage();
+		getMessage(&message);
 		while (message.size() > 0) {
 			processMidi(message);
-			message = getMessage();
+			getMessage(&message);
 		}
 	}
 

@@ -35,6 +35,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	bool stop = false;
 
 	MIDIClockToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+			ignore_midiTime = false;
 	}
 
 	~MIDIClockToCVInterface() {
@@ -89,10 +90,10 @@ void MIDIClockToCVInterface::step() {
 		std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
-		message = getMessage();
+		getMessage(&message);
 		while (message.size() > 0) {
 			processMidi(message);
-			message = getMessage();
+			getMessage(&message);
 		}
 	}
 
