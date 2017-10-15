@@ -1,5 +1,5 @@
 VERSION ?= dev
-FLAGS += -DVERSION=$(VERSION) -DVERSION_$(subst .,_,$(VERSION))
+FLAGS += -DVERSION=$(VERSION)
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD
