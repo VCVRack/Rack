@@ -91,7 +91,12 @@ void MidiIO::openDevice(std::string deviceName) {
 
 	this->deviceName = deviceName;
 
-	midiInMap[deviceName]->ignoreTypes(ignore_midiSysex, ignore_midiTime, ignore_midiSense);
+	/* TODO: this works for now, but is not ideal. If a clock is added and connected to a module
+	 * the time messages will still be received after the clock is removed. This adds an overhead
+	 * which can be avoided but I want to find a good solution.*/
+	if (!ignore_midiTime || !ignore_midiTime || !ignore_midiSense){
+		midiInMap[deviceName]->ignoreTypes(ignore_midiSysex, ignore_midiTime, ignore_midiSense);
+	}
 
 	id = midiInMap[deviceName]->add();
 }
@@ -139,7 +144,7 @@ void MidiIO::close() {
 	MidiInWrapper * mw = midiInMap[deviceName];
 
 	if (!mw || id < 0) {
-		fprintf(stderr, "Trying to close already closed device!\n");
+		//fprintf(stderr, "Trying to close already closed device!\n");
 		return;
 	}
 

@@ -12,13 +12,14 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 		NUM_PARAMS
 	};
 	enum InputIds {
+		CLOCK1_RATIO,
+		CLOCK2_RATIO,
 		NUM_INPUTS
 	};
 	enum OutputIds {
 		CLOCK1_PULSE,
 		CLOCK2_PULSE,
-		CLOCK_START_PULSE,
-		CLOCK_STOP_PULSE,
+		RESET_PULSE,
 		NUM_OUTPUTS
 	};
 
@@ -27,15 +28,15 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 
 	PulseGenerator clock1Pulse;
 	PulseGenerator clock2Pulse;
-	PulseGenerator clockStartPulse;
-	PulseGenerator clockStopPulse;
+	PulseGenerator resetPulse;
 	bool tick = false;
 	bool running = false;
-	bool start = false;
-	bool stop = false;
+	bool reset = false;
+
 
 	MIDIClockToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
-			ignore_midiTime = false;
+		ignore_midiTime = false;
+
 	}
 
 	~MIDIClockToCVInterface() {
@@ -69,6 +70,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	}
 
 	virtual void initialize() {
+		ignore_midiTime = false;
 	}
 
 };
@@ -85,6 +87,7 @@ void MIDIClockToCVInterface::step() {
 	 * Implying that every 16 midi clock ticks we need to send a pulse
 	 * */
 	static int ratios[] = {6, 8, 12, 16, 24, 32, 48, 96, 192};
+	static int numratios = sizeof(ratios)/sizeof(*ratios);
 
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
@@ -97,15 +100,18 @@ void MIDIClockToCVInterface::step() {
 		}
 	}
 
-	if (start) {
-		clockStartPulse.trigger(trigger_length);
-		start = false;
-		c_bar = 0;
+	if (inputs[CLOCK1_RATIO].active) {
+		clock1ratio = int(clampf(inputs[CLOCK1_RATIO].value, 0.0, numratios-1));
 	}
 
-	if (stop) {
-		clockStopPulse.trigger(trigger_length);
-		stop = false;
+	if (inputs[CLOCK2_RATIO].active) {
+		clock2ratio = int(clampf(inputs[CLOCK2_RATIO].value, 0.0, numratios-1));
+	}
+
+	if (reset) {
+		resetPulse.trigger(trigger_length);
+		reset = false;
+		c_bar = 0;
 		clock1Pulse.time = 0.0;
 		clock1Pulse.pulseTime = 0.0;
 		clock2Pulse.time = 0.0;
@@ -145,11 +151,8 @@ void MIDIClockToCVInterface::step() {
 	pulse = clock2Pulse.process(1.0 / gSampleRate);
 	outputs[CLOCK2_PULSE].value = pulse ? 10.0 : 0.0;
 
-	pulse = clockStartPulse.process(1.0 / gSampleRate);
-	outputs[CLOCK_START_PULSE].value = pulse ? 10.0 : 0.0;
-
-	pulse = clockStopPulse.process(1.0 / gSampleRate);
-	outputs[CLOCK_STOP_PULSE].value = pulse ? 10.0 : 0.0;
+	pulse = resetPulse.process(1.0 / gSampleRate);
+	outputs[RESET_PULSE].value = pulse ? 10.0 : 0.0;
 
 }
 
@@ -161,11 +164,10 @@ void MIDIClockToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	switch (msg[0]) {
 		case 0xfa:
-			start = true;
+			reset = true;
 			running = true;
 			break;
 		case 0xfc:
-			stop = true;
 			running = false;
 			break;
 		case 0xf8:
@@ -262,50 +264,56 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "Clock 1 Ratio";
+		label->text = "C1 Ratio";
 		addChild(label);
-		yPos += labelHeight + margin;
+
+		addInput(createInput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK1_RATIO));
+
+		yPos += margin*6;
 
 		ClockRatioChoice *ratioChoice = new ClockRatioChoice();
 		ratioChoice->clockRatio = &module->clock1ratio;
 		ratioChoice->box.pos = Vec(margin, yPos);
 		ratioChoice->box.size.x = box.size.x - 10;
 		addChild(ratioChoice);
-		yPos += ratioChoice->box.size.y + margin + 5;
+		yPos += ratioChoice->box.size.y + margin*2;
 
 	}
 
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "Clock 1 Pulse";
+		label->text = "C1 Pulse";
 		addChild(label);
 
 		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK1_PULSE));
-		yPos += labelHeight + margin * 4;
+		yPos += margin * 10;
 	}
 
 
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "Clock 2 Ratio";
+		label->text = "C2 Ratio";
 		addChild(label);
-		yPos += labelHeight + margin;
+
+		addInput(createInput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK2_RATIO));
+
+		yPos += margin*6;
 
 		ClockRatioChoice *ratioChoice = new ClockRatioChoice();
 		ratioChoice->clockRatio = &module->clock2ratio;
 		ratioChoice->box.pos = Vec(margin, yPos);
 		ratioChoice->box.size.x = box.size.x - 10;
 		addChild(ratioChoice);
-		yPos += ratioChoice->box.size.y + margin + 5;
+		yPos += ratioChoice->box.size.y + margin*2;
 
 	}
 
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "Clock 2 Pulse";
+		label->text = "C2 Pulse";
 		addChild(label);
 
 		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK2_PULSE));
@@ -315,19 +323,9 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
-		label->text = "Clock Start";
+		label->text = "Reset";
 		addChild(label);
-		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK_START_PULSE));
-		yPos += 40;
-	}
-
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "Clock Stop";
-		addChild(label);
-
-		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK_STOP_PULSE));
+		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::RESET_PULSE));
 	}
 }
 
