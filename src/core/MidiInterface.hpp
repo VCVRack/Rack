@@ -13,25 +13,25 @@ using namespace rack;
  */
 
 struct MidiInWrapper : RtMidiIn {
-	std::unordered_map<uint, std::list<std::vector<unsigned char>>> idMessagesMap;
-	std::unordered_map<uint, std::list<double>> idStampsMap;
-	uint uuid_c = 0;
-	uint subscribers = 0;
+	std::unordered_map<int, std::list<std::vector<unsigned char>>> idMessagesMap;
+	std::unordered_map<int, std::list<double>> idStampsMap;
+	int uid_c = 0;
+	int subscribers = 0;
 
 	MidiInWrapper() : RtMidiIn() {
 		idMessagesMap = {};
 		idStampsMap = {};
 	};
 
-	uint add() {
-		uint id = ++uuid_c;
+	int add() {
+		int id = ++uid_c;
 		subscribers++;
 		idMessagesMap[id] = {};
 		idStampsMap[id] = {};
 		return id;
 	}
 
-	void erase(uint id) {
+	void erase(int id) {
 		subscribers--;
 		idMessagesMap.erase(id);
 		idStampsMap.erase(id);
