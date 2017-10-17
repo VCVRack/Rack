@@ -185,7 +185,7 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 struct Knob : ParamWidget {
 	/** Snap to nearest integer while dragging */
 	bool snap = false;
-	float snapValue;
+	float dragValue;
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
