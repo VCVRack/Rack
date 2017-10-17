@@ -20,7 +20,7 @@ Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system
 ### Mac
 
 Install [Xcode](https://developer.apple.com/xcode/).
-Install [CMake](https://cmake.org/) and wget, preferably from [Homebrew](https://brew.sh/).
+Install [CMake](https://cmake.org/) (for some of Rack's dependencies) and wget, preferably from [Homebrew](https://brew.sh/).
 
 ### Windows
 

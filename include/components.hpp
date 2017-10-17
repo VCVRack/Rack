@@ -57,7 +57,11 @@ struct RoundHugeBlackKnob : RoundBlackKnob {
 	}
 };
 
-struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob, SnapKnob {};
+struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob {
+	RoundSmallBlackSnapKnob() {
+		snap = true;
+	}
+};
 
 
 struct Davies1900hKnob : SVGKnob {
@@ -109,7 +113,11 @@ struct Davies1900hSmallBlackKnob : Davies1900hKnob {
 	}
 };
 
-struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob, SnapKnob {};
+struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob {
+	Davies1900hSmallBlackSnapKnob() {
+		snap = true;
+	}
+};
 
 
 struct Rogan : SVGKnob {
@@ -366,7 +374,11 @@ struct BefacoBigKnob : SVGKnob {
 	}
 };
 
-struct BefacoBigSnapKnob : BefacoBigKnob, SnapKnob {};
+struct BefacoBigSnapKnob : BefacoBigKnob {
+	BefacoBigSnapKnob() {
+		snap = true;
+	}
+};
 
 struct BefacoTinyKnob : SVGKnob {
 	BefacoTinyKnob() {

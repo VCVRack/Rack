@@ -183,6 +183,9 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 
 /** Implements vertical dragging behavior for ParamWidgets */
 struct Knob : ParamWidget {
+	/** Snap to nearest integer while dragging */
+	bool snap = false;
+	float snapValue;
 	void onDragStart();
 	void onDragMove(Vec mouseRel);
 	void onDragEnd();
@@ -207,14 +210,6 @@ struct SVGKnob : virtual Knob, FramebufferWidget {
 	void setSVG(std::shared_ptr<SVG> svg);
 	void step();
 	void onChange();
-};
-
-/** Snaps to the nearest integer value on mouse release */
-struct SnapKnob : virtual Knob {
-	void onDragEnd() {
-		setValue(roundf(value));
-		Knob::onDragEnd();
-	}
 };
 
 struct SVGSlider : Knob, FramebufferWidget {
