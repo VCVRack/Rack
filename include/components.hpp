@@ -615,8 +615,7 @@ struct ScrewBlack : SVGScrew {
 
 struct LightPanel : Panel {
 	LightPanel() {
-		// backgroundColor = nvgRGB(0xe6, 0xe6, 0xe6);
-		backgroundColor = nvgRGB(0xf0, 0xf0, 0xf0);
+		backgroundColor = nvgRGB(0xe6, 0xe6, 0xe6);
 	}
 };
 
