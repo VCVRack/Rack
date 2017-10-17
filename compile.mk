@@ -1,5 +1,6 @@
-VERSION ?= dev
+ifdef VERSION
 FLAGS += -DVERSION=$(VERSION)
+endif
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD

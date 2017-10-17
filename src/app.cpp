@@ -4,7 +4,12 @@
 namespace rack {
 
 std::string gApplicationName = "VCV Rack";
-std::string gApplicationVersion = TOSTRING(VERSION);
+std::string gApplicationVersion =
+#ifdef VERSION
+	TOSTRING(VERSION);
+#else
+	"dev";
+#endif
 std::string gApiHost = "http://api.vcvrack.com";
 
 RackWidget *gRackWidget = NULL;
