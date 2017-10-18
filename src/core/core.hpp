@@ -14,12 +14,12 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 struct MidiToCVWidget : ModuleWidget {
 	MidiToCVWidget();
-	void step();
+	void step() override;
 };
 
 struct MIDICCToCVWidget : ModuleWidget {
 	MIDICCToCVWidget();
-	void step();
+	void step() override;
 };
 
 struct BridgeWidget : ModuleWidget {
@@ -32,7 +32,7 @@ struct BlankWidget : ModuleWidget {
 	Widget *bottomRightScrew;
 	Widget *rightHandle;
 	BlankWidget();
-	void step();
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
+	void step() override;
+	json_t *toJson() override;
+	void fromJson(json_t *rootJ) override;
 };

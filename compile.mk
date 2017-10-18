@@ -4,10 +4,11 @@ endif
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD
+FLAGS += -g
 # Optimization
 FLAGS += -O3 -march=nocona -ffast-math
-FLAGS += -Wall -Wextra -Wno-unused-parameter -Wsuggest-override
-FLAGS += -g
+FLAGS += -Wall -Wextra -Wno-unused-parameter
+CXXFLAGS += -Wsuggest-override
 CXXFLAGS += -std=c++11
 
 

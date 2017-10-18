@@ -206,35 +206,35 @@ void ModuleWidget::onDragEnd() {
 
 struct DisconnectMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		moduleWidget->disconnect();
 	}
 };
 
 struct InitializeMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		moduleWidget->initialize();
 	}
 };
 
 struct RandomizeMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		moduleWidget->randomize();
 	}
 };
 
 struct CloneMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		gRackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct DeleteMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		gRackWidget->deleteModule(moduleWidget);
 		moduleWidget->finalizeEvents();
 		delete moduleWidget;

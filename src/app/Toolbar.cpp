@@ -7,37 +7,37 @@ namespace rack {
 
 
 struct NewItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gRackWidget->initialize();
 	}
 };
 
 struct OpenItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gRackWidget->openDialog();
 	}
 };
 
 struct SaveItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gRackWidget->saveDialog();
 	}
 };
 
 struct SaveAsItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gRackWidget->saveAsDialog();
 	}
 };
 
 struct QuitItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		guiClose();
 	}
 };
 
 struct FileChoice : ChoiceButton {
-	void onAction() {
+	void onAction() override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -54,21 +54,21 @@ struct FileChoice : ChoiceButton {
 
 
 struct PauseItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gPaused = !gPaused;
 	}
 };
 
 struct SampleRateItem : MenuItem {
 	float sampleRate;
-	void onAction() {
+	void onAction() override {
 		engineSetSampleRate(sampleRate);
 		gPaused = false;
 	}
 };
 
 struct SampleRateChoice : ChoiceButton {
-	void onAction() {
+	void onAction() override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -86,7 +86,7 @@ struct SampleRateChoice : ChoiceButton {
 			menu->pushChild(item);
 		}
 	}
-	void step() {
+	void step() override {
 		if (gPaused)
 			text = "Paused";
 		else
