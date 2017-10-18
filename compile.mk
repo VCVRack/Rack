@@ -6,7 +6,7 @@ endif
 FLAGS += -MMD
 # Optimization
 FLAGS += -O3 -march=nocona -ffast-math
-FLAGS += -Wall
+FLAGS += -Wall -Wextra -Wno-unused-parameter -Wsuggest-override
 FLAGS += -g
 CXXFLAGS += -std=c++11
 
