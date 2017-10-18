@@ -90,7 +90,7 @@ struct SampleRateChoice : ChoiceButton {
 		if (gPaused)
 			text = "Paused";
 		else
-			text = stringf("%.0f Hz", gSampleRate);
+			text = stringf("%.0f Hz", engineGetSampleRate());
 	}
 };
 

@@ -32,8 +32,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
 	// sampleRate
-	float sampleRate = gSampleRate;
-	json_t *sampleRateJ = json_real(sampleRate);
+	json_t *sampleRateJ = json_real(engineGetSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// plugLight

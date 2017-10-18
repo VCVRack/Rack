@@ -303,7 +303,7 @@ void MIDIToCVInterface::step() {
 	}
 
 	if (resetLight > 0) {
-		resetLight -= resetLight / 0.55 / gSampleRate; // fade out light
+		resetLight -= resetLight / 0.55 / engineGetSampleRate(); // fade out light
 	}
 
 

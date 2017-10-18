@@ -82,8 +82,8 @@ void engineRemoveWire(Wire *wire);
 void engineSetParam(Module *module, int paramId, float value);
 void engineSetParamSmooth(Module *module, int paramId, float value);
 void engineSetSampleRate(float sampleRate);
+float engineGetSampleRate();
 
-extern float gSampleRate;
 extern bool gPaused;
 
 
