@@ -1,5 +1,5 @@
 #include "core.hpp"
-#include "MidiInterface.hpp"
+#include "MidiIO.hpp"
 
 
 void init(rack::Plugin *plugin) {

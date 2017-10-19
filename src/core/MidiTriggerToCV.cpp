@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "rtmidi/RtMidi.h"
 #include "core.hpp"
-#include "MidiInterface.hpp"
+#include "MidiIO.hpp"
 #include "dsp/digital.hpp"
 
 using namespace rack;
@@ -65,7 +65,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		}
 	}
 
-	void initialize() {
+	void reset() final {
 		resetMidi();
 	}
 

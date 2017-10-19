@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "rtmidi/RtMidi.h"
 #include "core.hpp"
-#include "MidiInterface.hpp"
+#include "MidiIO.hpp"
 
 /*
  * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod weel to
@@ -63,7 +63,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		}
 	}
 
-	void initialize() {
+	void reset() {
 		resetMidi();
 	}
 

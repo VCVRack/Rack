@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "rtmidi/RtMidi.h"
 #include "core.hpp"
-#include "MidiInterface.hpp"
+#include "MidiIO.hpp"
 
 using namespace rack;
 
@@ -54,7 +54,7 @@ std::vector<std::string> MidiIO::getDevices() {
 
 	std::vector<std::string> names = {};
 
-	for (int i = 0; i < m->getPortCount(); i++) {
+	for (unsigned int i = 0; i < m->getPortCount(); i++) {
 		names.push_back(m->getPortName(i));
 	}
 
@@ -75,7 +75,7 @@ void MidiIO::openDevice(std::string deviceName) {
 			midiInMap[deviceName] = mw;
 
 
-			for (int i = 0; i < mw->getPortCount(); i++) {
+			for (unsigned int i = 0; i < mw->getPortCount(); i++) {
 				if (deviceName == mw->getPortName(i)) {
 					mw->openPort(i);
 					break;
@@ -193,7 +193,7 @@ void MidiChoice::onAction() {
 	}
 
 	std::vector<std::string> deviceNames = midiModule->getDevices();
-	for (int i = 0; i < deviceNames.size(); i++) {
+	for (unsigned int i = 0; i < deviceNames.size(); i++) {
 		MidiItem *midiItem = new MidiItem();
 		midiItem->midiModule = midiModule;
 		midiItem->text = deviceNames[i];

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "rtmidi/RtMidi.h"
 #include "core.hpp"
-#include "MidiInterface.hpp"
+#include "MidiIO.hpp"
 #include "dsp/digital.hpp"
 
 using namespace rack;
@@ -69,16 +69,12 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 			clock2ratio = json_integer_value(c2rJ);
 		}
 	}
-
-	void initialize() {
-		resetMidi();
-	}
-
 };
 
 void MIDIClockToCVInterface::step() {
 	static int c_bar = 0;
 	static float trigger_length = 0.05;
+	static float sampleRate = engineGetSampleRate();
 
 	/* Note this is in relation to the Midi clock's Tick (6x per 16th note).
 	 * Therefore, e.g. the 2:3 is calculated:
@@ -146,13 +142,13 @@ void MIDIClockToCVInterface::step() {
 	}
 
 
-	bool pulse = clock1Pulse.process(1.0 / gSampleRate);
+	bool pulse = clock1Pulse.process(1.0 / sampleRate);
 	outputs[CLOCK1_PULSE].value = pulse ? 10.0 : 0.0;
 
-	pulse = clock2Pulse.process(1.0 / gSampleRate);
+	pulse = clock2Pulse.process(1.0 / sampleRate);
 	outputs[CLOCK2_PULSE].value = pulse ? 10.0 : 0.0;
 
-	pulse = resetPulse.process(1.0 / gSampleRate);
+	pulse = resetPulse.process(1.0 / sampleRate);
 	outputs[RESET_PULSE].value = pulse ? 10.0 : 0.0;
 
 }
@@ -208,7 +204,7 @@ struct ClockRatioChoice : ChoiceButton {
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		for (int ratio = 0; ratio < ratioNames.size(); ratio++) {
+		for (unsigned long ratio = 0; ratio < ratioNames.size(); ratio++) {
 			ClockRatioItem *clockRatioItem = new ClockRatioItem();
 			clockRatioItem->ratio = ratio;
 			clockRatioItem->clockRatio = clockRatio;

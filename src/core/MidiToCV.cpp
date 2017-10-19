@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "rtmidi/RtMidi.h"
 #include "core.hpp"
-#include "MidiInterface.hpp"
+#include "MidiIO.hpp"
 #include "dsp/digital.hpp"
 
 /*
@@ -65,7 +65,7 @@ struct MIDIToCVInterface : MidiIO, Module {
 		baseFromJson(rootJ);
 	}
 
-	void initialize() {
+	void reset() {
 		resetMidi();
 	}
 
@@ -84,6 +84,8 @@ void MIDIToCVInterface::resetMidi() {
 }
 
 void MIDIToCVInterface::step() {
+	static float sampleRate = engineGetSampleRate();
+	
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
 
@@ -108,7 +110,7 @@ void MIDIToCVInterface::step() {
 	}
 
 	if (resetLight > 0) {
-		resetLight -= resetLight / 0.55 / gSampleRate; // fade out light
+		resetLight -= resetLight / 0.55 / sampleRate; // fade out light
 	}
 
 
