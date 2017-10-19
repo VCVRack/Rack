@@ -38,7 +38,7 @@ With your distro's package manager, make sure you have installed `gcc`, `make`, 
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
 
 Clone this repository and `cd` into it.
-If you would like to build a previous version instead of the master branch, run `git checkout v0.3.2` for example.
+If you would like to build a previous version of Rack instead of the master branch, check out the desired tag with `git checkout v0.4.0` for example.
 
 Clone submodules.
 
@@ -60,6 +60,8 @@ Run Rack.
 	make run
 
 ## Building plugins
+
+Be sure to check out and build the version of Rack you wish to build your plugins against.
 
 Clone your favorite plugin in the `plugins/` directory. e.g.:
 
