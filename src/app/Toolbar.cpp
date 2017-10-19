@@ -8,7 +8,7 @@ namespace rack {
 
 struct NewItem : MenuItem {
 	void onAction() override {
-		gRackWidget->initialize();
+		gRackWidget->reset();
 	}
 };
 

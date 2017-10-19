@@ -56,8 +56,10 @@ struct Module {
 	virtual void fromJson(json_t *root) {}
 
 	/** Override these to implement spacial behavior when user clicks Initialize and Randomize */
-	virtual void initialize() {}
+	virtual void reset() {}
 	virtual void randomize() {}
+	/** Deprecated */
+	virtual void initialize() final {}
 };
 
 struct Wire {

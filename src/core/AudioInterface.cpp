@@ -118,7 +118,7 @@ struct AudioInterface : Module {
 		}
 	}
 
-	void initialize() override {
+	void reset() override {
 		closeDevice();
 	}
 };

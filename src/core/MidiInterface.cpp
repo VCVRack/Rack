@@ -259,7 +259,7 @@ struct MIDIToCVInterface : MidiIO, Module {
 		baseFromJson(rootJ);
 	}
 
-	virtual void initialize() {
+	virtual void reset() {
 		setPortId(-1);
 	}
 
@@ -534,7 +534,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		}
 	}
 
-	virtual void initialize() {
+	virtual void reset() {
 		setPortId(-1);
 	}
 

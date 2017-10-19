@@ -50,7 +50,9 @@ struct ModuleWidget : OpaqueWidget {
 	/** Resets the parameters of the module and calls the Module's randomize().
 	Called when the user clicks Initialize in the context menu.
 	*/
-	virtual void initialize();
+	virtual void reset();
+	/** Deprecated */
+	virtual void initialize() final {}
 	/** Randomizes the parameters of the module and calls the Module's randomize().
 	Called when the user clicks Randomize in the context menu.
 	*/
@@ -113,8 +115,10 @@ struct RackWidget : OpaqueWidget {
 	RackWidget();
 	~RackWidget();
 
+	/** Completely clear the rack's modules and wires */
 	void clear();
-	void initialize();
+	/** Clears the rack and loads the template patch */
+	void reset();
 	void openDialog();
 	void saveDialog();
 	void saveAsDialog();

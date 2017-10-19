@@ -38,7 +38,7 @@ void RackWidget::clear() {
 	lastPath = "";
 }
 
-void RackWidget::initialize() {
+void RackWidget::reset() {
 	clear();
 	loadPatch(assetLocal("template.vcv"));
 }
