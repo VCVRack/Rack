@@ -22,11 +22,13 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	int cc[NUM_OUTPUTS];
 	int ccNum[NUM_OUTPUTS];
 	bool ccNumInited[NUM_OUTPUTS];
+	bool onFocus[NUM_OUTPUTS];
 
 	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			cc[i] = 0;
 			ccNum[i] = i;
+			onFocus[i] = false;
 		}
 	}
 
@@ -104,10 +106,14 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	if (status == 0xb) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
+			if (onFocus[i]) {
+				this->ccNum[i] = data1;
+			}
+		}
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (data1 == ccNum[i]) {
 				this->cc[i] = data2;
 			}
-
 		}
 	}
 }
@@ -117,8 +123,15 @@ struct CCTextField : TextField {
 
 	void draw(NVGcontext *vg);
 
+	void onMouseDownOpaque(int button);
+
+	void onMouseUpOpaque(int button);
+
+	void onMouseLeave();
+
 	int *ccNum;
 	bool *inited;
+	bool *onFocus;
 };
 
 void CCTextField::draw(NVGcontext *vg) {
@@ -129,8 +142,30 @@ void CCTextField::draw(NVGcontext *vg) {
 		text = std::to_string(*ccNum);
 	}
 
+	if (*onFocus) {
+		text = std::to_string(*ccNum);
+	}
+
 	TextField::draw(vg);
 }
+
+void CCTextField::onMouseUpOpaque(int button) {
+	if (button == 1) {
+		*onFocus = false;
+	}
+
+}
+
+void CCTextField::onMouseDownOpaque(int button) {
+	if (button == 1) {
+		*onFocus = true;
+	}
+}
+
+void CCTextField::onMouseLeave() {
+	*onFocus = false;
+}
+
 
 void CCTextField::onTextChange() {
 	if (text.size() > 0) {
@@ -209,6 +244,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 		CCTextField *ccNumChoice = new CCTextField();
 		ccNumChoice->ccNum = &module->ccNum[i];
 		ccNumChoice->inited = &module->ccNumInited[i];
+		ccNumChoice->onFocus = &module->onFocus[i];
 		ccNumChoice->text = std::to_string(module->ccNum[i]);
 		ccNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		ccNumChoice->box.size.x = 29;

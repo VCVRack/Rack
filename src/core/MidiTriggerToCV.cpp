@@ -25,11 +25,13 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 	int trigger[NUM_OUTPUTS];
 	int triggerNum[NUM_OUTPUTS];
 	bool triggerNumInited[NUM_OUTPUTS];
+	bool onFocus[NUM_OUTPUTS];
 
 	MIDITriggerToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			trigger[i] = 0;
 			triggerNum[i] = i;
+			onFocus[i] = false;
 		}
 	}
 
@@ -117,6 +119,12 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	}
 
 	if (status == 0x9) { // note on
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
+			if (onFocus[i]) {
+				this->triggerNum[i] = data1;
+			}
+		}
+
 		for (int i = 0; i<NUM_OUTPUTS; i++) {
 			if (data1 == triggerNum[i]) {
 				trigger[i] = data2;
@@ -131,8 +139,16 @@ struct TriggerTextField : TextField {
 
 	void draw(NVGcontext *vg);
 
+	void onMouseDownOpaque(int button);
+
+	void onMouseUpOpaque(int button);
+
+	void onMouseLeave();
+
+
 	int *triggerNum;
 	bool *inited;
+	bool *onFocus;
 };
 
 void TriggerTextField::draw(NVGcontext *vg) {
@@ -140,6 +156,10 @@ void TriggerTextField::draw(NVGcontext *vg) {
 	 * file is loaded after constructing the widget*/
 	if (*inited) {
 		*inited = false;
+		text = std::to_string(*triggerNum);
+	}
+
+	if (*onFocus) {
 		text = std::to_string(*triggerNum);
 	}
 
@@ -162,6 +182,23 @@ void TriggerTextField::onTextChange() {
 			*triggerNum = -1;
 		}
 	};
+}
+
+void TriggerTextField::onMouseUpOpaque(int button) {
+	if (button == 1) {
+		*onFocus = false;
+	}
+
+}
+
+void TriggerTextField::onMouseDownOpaque(int button) {
+	if (button == 1) {
+		*onFocus = true;
+	}
+}
+
+void TriggerTextField::onMouseLeave() {
+	*onFocus = false;
 }
 
 MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
@@ -223,6 +260,7 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 		TriggerTextField *triggerNumChoice = new TriggerTextField();
 		triggerNumChoice->triggerNum = &module->triggerNum[i];
 		triggerNumChoice->inited = &module->triggerNumInited[i];
+		triggerNumChoice->onFocus = &module->onFocus[i];
 		triggerNumChoice->text = std::to_string(module->triggerNum[i]);
 		triggerNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		triggerNumChoice->box.size.x = 29;
