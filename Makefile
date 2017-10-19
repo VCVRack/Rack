@@ -74,6 +74,9 @@ include compile.mk
 
 
 dist: all
+ifndef VERSION
+	$(error VERSION must be defined when calling make)
+endif
 	rm -rf dist
 	$(MAKE) -C plugins/Fundamental dist
 
@@ -144,7 +147,7 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libcurl.so.4 dist/Rack/
 	cp dep/lib/libzip.so.5 dist/Rack/
 	cp dep/lib/libportaudio.so.2 dist/Rack/
-	cp dep/lib/librtmidi.so dist/Rack/
+	cp dep/lib/librtmidi.so.4 dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 endif

@@ -14,7 +14,7 @@
 
 namespace rack {
 
-float gSampleRate;
+float sampleRate;
 bool gPaused = false;
 
 
@@ -60,7 +60,7 @@ static void engineStep() {
 			smoothModule = NULL;
 		}
 		else {
-			value += delta * lambda / gSampleRate;
+			value += delta * lambda / sampleRate;
 			smoothModule->params[smoothParamId].value = value;
 		}
 	}
@@ -97,7 +97,7 @@ static void engineRun() {
 			}
 		}
 
-		float stepTime = mutexSteps / gSampleRate;
+		float stepTime = mutexSteps / sampleRate;
 		ahead += stepTime;
 		auto currTime = std::chrono::high_resolution_clock::now();
 		const float aheadFactor = 2.0;
@@ -221,11 +221,15 @@ void engineSetParamSmooth(Module *module, int paramId, float value) {
 void engineSetSampleRate(float newSampleRate) {
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
-	gSampleRate = newSampleRate;
+	sampleRate = newSampleRate;
 	// onSampleRateChange
 	for (Module *module : modules) {
 		module->onSampleRateChange();
 	}
+}
+
+float engineGetSampleRate() {
+	return sampleRate;
 }
 
 

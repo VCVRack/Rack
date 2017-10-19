@@ -1,12 +1,14 @@
-VERSION ?= dev
-FLAGS += -DVERSION=$(VERSION) -DVERSION_$(subst .,_,$(VERSION))
+ifdef VERSION
+FLAGS += -DVERSION=$(VERSION)
+endif
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD
+FLAGS += -g
 # Optimization
 FLAGS += -O3 -march=nocona -ffast-math
-FLAGS += -Wall
-FLAGS += -g
+FLAGS += -Wall -Wextra -Wno-unused-parameter
+CXXFLAGS += -Wsuggest-override
 CXXFLAGS += -std=c++11
 
 

@@ -7,76 +7,68 @@ namespace rack {
 
 
 struct NewItem : MenuItem {
-	void onAction() {
-		gRackWidget->clear();
+	void onAction() override {
+		gRackWidget->reset();
 	}
 };
 
 struct OpenItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gRackWidget->openDialog();
 	}
 };
 
 struct SaveItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gRackWidget->saveDialog();
 	}
 };
 
 struct SaveAsItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gRackWidget->saveAsDialog();
 	}
 };
 
+struct QuitItem : MenuItem {
+	void onAction() override {
+		guiClose();
+	}
+};
+
 struct FileChoice : ChoiceButton {
-	void onAction() {
+	void onAction() override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		{
-			MenuItem *newItem = new NewItem();
-			newItem->text = "New";
-			newItem->rightText = GUI_MOD_KEY_NAME "+N";
-			menu->pushChild(newItem);
-
-			MenuItem *openItem = new OpenItem();
-			openItem->text = "Open";
-			openItem->rightText = GUI_MOD_KEY_NAME "+O";
-			menu->pushChild(openItem);
-
-			MenuItem *saveItem = new SaveItem();
-			saveItem->text = "Save";
-			saveItem->rightText = GUI_MOD_KEY_NAME "+S";
-			menu->pushChild(saveItem);
-
-			MenuItem *saveAsItem = new SaveAsItem();
-			saveAsItem->text = "Save as";
-			saveAsItem->rightText = GUI_MOD_KEY_NAME "+Shift+S";
-			menu->pushChild(saveAsItem);
+			menu->pushChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, GUI_MOD_KEY_NAME "+N"));
+			menu->pushChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, GUI_MOD_KEY_NAME "+O"));
+			menu->pushChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, GUI_MOD_KEY_NAME "+S"));
+			menu->pushChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Shift+S"));
+			menu->pushChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Q"));
 		}
 	}
 };
 
 
 struct PauseItem : MenuItem {
-	void onAction() {
+	void onAction() override {
 		gPaused = !gPaused;
 	}
 };
 
 struct SampleRateItem : MenuItem {
 	float sampleRate;
-	void onAction() {
+	void onAction() override {
 		engineSetSampleRate(sampleRate);
 		gPaused = false;
 	}
 };
 
 struct SampleRateChoice : ChoiceButton {
-	void onAction() {
+	void onAction() override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -94,11 +86,11 @@ struct SampleRateChoice : ChoiceButton {
 			menu->pushChild(item);
 		}
 	}
-	void step() {
+	void step() override {
 		if (gPaused)
 			text = "Paused";
 		else
-			text = stringf("%.0f Hz", gSampleRate);
+			text = stringf("%.0f Hz", engineGetSampleRate());
 	}
 };
 

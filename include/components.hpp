@@ -57,7 +57,11 @@ struct RoundHugeBlackKnob : RoundBlackKnob {
 	}
 };
 
-struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob, SnapKnob {};
+struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob {
+	RoundSmallBlackSnapKnob() {
+		snap = true;
+	}
+};
 
 
 struct Davies1900hKnob : SVGKnob {
@@ -109,7 +113,11 @@ struct Davies1900hSmallBlackKnob : Davies1900hKnob {
 	}
 };
 
-struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob, SnapKnob {};
+struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob {
+	Davies1900hSmallBlackSnapKnob() {
+		snap = true;
+	}
+};
 
 
 struct Rogan : SVGKnob {
@@ -366,7 +374,11 @@ struct BefacoBigKnob : SVGKnob {
 	}
 };
 
-struct BefacoBigSnapKnob : BefacoBigKnob, SnapKnob {};
+struct BefacoBigSnapKnob : BefacoBigKnob {
+	BefacoBigSnapKnob() {
+		snap = true;
+	}
+};
 
 struct BefacoTinyKnob : SVGKnob {
 	BefacoTinyKnob() {
@@ -426,7 +438,7 @@ struct CL1362Port : SVGPort {
 struct ValueLight : Light {
 	float *value = NULL;
 	virtual void setValue(float v) {}
-	void step() {
+	void step() override {
 		if (value)
 			setValue(*value);
 	}
@@ -434,7 +446,7 @@ struct ValueLight : Light {
 
 struct ColorValueLight : ValueLight {
 	NVGcolor baseColor;
-	void setValue(float v) {
+	void setValue(float v) override {
 		v = sqrtBipolar(v);
 		color = baseColor;
 		color.a *= clampf(v, 0.0, 1.0);
@@ -462,7 +474,7 @@ struct GreenValueLight : ColorValueLight {
 struct PolarityLight : ValueLight {
 	NVGcolor posColor;
 	NVGcolor negColor;
-	void setValue(float v) {
+	void setValue(float v) override {
 		v = sqrtBipolar(v);
 		color = (v >= 0.0) ? posColor : negColor;
 		color.a *= clampf(fabsf(v), 0.0, 1.0);
@@ -478,7 +490,7 @@ struct GreenRedPolarityLight : PolarityLight {
 
 struct ModeValueLight : ValueLight {
 	std::vector<NVGcolor> colors;
-	void setValue(float v) {
+	void setValue(float v) override {
 		int mode = clampi((int)roundf(v), 0, colors.size());
 		color = colors[mode];
 	}
@@ -615,8 +627,7 @@ struct ScrewBlack : SVGScrew {
 
 struct LightPanel : Panel {
 	LightPanel() {
-		// backgroundColor = nvgRGB(0xe6, 0xe6, 0xe6);
-		backgroundColor = nvgRGB(0xf0, 0xf0, 0xf0);
+		backgroundColor = nvgRGB(0xe6, 0xe6, 0xe6);
 	}
 };
 

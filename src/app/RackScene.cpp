@@ -86,7 +86,7 @@ Widget *RackScene::onHoverKey(Vec pos, int key) {
 	switch (key) {
 		case GLFW_KEY_N:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
-				gRackWidget->clear();
+				gRackWidget->reset();
 				return this;
 			}
 			break;

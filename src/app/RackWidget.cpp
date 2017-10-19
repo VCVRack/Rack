@@ -38,6 +38,11 @@ void RackWidget::clear() {
 	lastPath = "";
 }
 
+void RackWidget::reset() {
+	clear();
+	loadPatch(assetLocal("template.vcv"));
+}
+
 void RackWidget::openDialog() {
 	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
@@ -364,7 +369,7 @@ void RackWidget::draw(NVGcontext *vg) {
 struct AddModuleMenuItem : MenuItem {
 	Model *model;
 	Vec modulePos;
-	void onAction() {
+	void onAction() override {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		gRackWidget->moduleContainer->addChild(moduleWidget);
 		// Move module nearest to the mouse position
@@ -377,7 +382,7 @@ struct AddModuleMenuItem : MenuItem {
 
 struct UrlItem : MenuItem {
 	std::string url;
-	void onAction() {
+	void onAction() override {
 		std::thread t(openBrowser, url);
 		t.detach();
 	}
@@ -386,7 +391,7 @@ struct UrlItem : MenuItem {
 struct AddPluginMenuItem : MenuItem {
 	Plugin *plugin;
 	Vec modulePos;
-	Menu *createChildMenu() {
+	Menu *createChildMenu() override {
 		// Model items
 		Menu *menu = new Menu();
 		for (Model *model : plugin->models) {

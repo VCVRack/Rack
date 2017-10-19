@@ -20,7 +20,7 @@ namespace rack {
 template <class TModuleWidget>
 Model *createModel(Plugin *plugin, std::string slug, std::string name) {
 	struct TModel : Model {
-		ModuleWidget *createModuleWidget() {
+		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
 			moduleWidget->model = this;
 			return moduleWidget;

@@ -50,22 +50,24 @@ struct ModuleWidget : OpaqueWidget {
 	/** Resets the parameters of the module and calls the Module's randomize().
 	Called when the user clicks Initialize in the context menu.
 	*/
-	virtual void initialize();
+	virtual void reset();
+	/** Deprecated */
+	virtual void initialize() final {}
 	/** Randomizes the parameters of the module and calls the Module's randomize().
 	Called when the user clicks Randomize in the context menu.
 	*/
 	virtual void randomize();
 	virtual Menu *createContextMenu();
 
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 
 	Vec dragPos;
-	Widget *onMouseMove(Vec pos, Vec mouseRel);
-	Widget *onHoverKey(Vec pos, int key);
-	void onDragStart();
-	void onDragMove(Vec mouseRel);
-	void onDragEnd();
-	void onMouseDownOpaque(int button);
+	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
+	Widget *onHoverKey(Vec pos, int key) override;
+	void onDragStart() override;
+	void onDragMove(Vec mouseRel) override;
+	void onDragEnd() override;
+	void onMouseDownOpaque(int button) override;
 };
 
 struct ValueLight;
@@ -85,7 +87,7 @@ struct WireWidget : OpaqueWidget {
 	void updateWire();
 	Vec getOutputPos();
 	Vec getInputPos();
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 	void drawPlugs(NVGcontext *vg);
 };
 
@@ -99,7 +101,7 @@ struct WireContainer : TransparentWidget {
 	void removeAllWires(Port *port);
 	/** Returns the most recently added wire connected to the given Port, i.e. the top of the stack */
 	WireWidget *getTopWire(Port *port);
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct RackWidget : OpaqueWidget {
@@ -113,7 +115,10 @@ struct RackWidget : OpaqueWidget {
 	RackWidget();
 	~RackWidget();
 
+	/** Completely clear the rack's modules and wires */
 	void clear();
+	/** Clears the rack and loads the template patch */
+	void reset();
 	void openDialog();
 	void saveDialog();
 	void saveAsDialog();
@@ -130,20 +135,20 @@ struct RackWidget : OpaqueWidget {
 	bool requestModuleBox(ModuleWidget *m, Rect box);
 	/** Moves a module to the closest non-colliding position */
 	bool requestModuleBoxNearest(ModuleWidget *m, Rect box);
-	void step();
-	void draw(NVGcontext *vg);
+	void step() override;
+	void draw(NVGcontext *vg) override;
 
-	void onMouseDownOpaque(int button);
+	void onMouseDownOpaque(int button) override;
 };
 
 struct RackRail : TransparentWidget {
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct Panel : TransparentWidget {
 	NVGcolor backgroundColor;
 	std::shared_ptr<Image> backgroundImage;
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct SVGPanel : FramebufferWidget {
@@ -156,13 +161,13 @@ struct SVGPanel : FramebufferWidget {
 
 struct CircularShadow : TransparentWidget {
 	float blur = 0.0;
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct Light : TransparentWidget {
 	NVGcolor bgColor = nvgRGBf(0, 0, 0);
 	NVGcolor color = nvgRGBf(1, 1, 1);
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct ParamWidget : OpaqueWidget, QuantityWidget {
@@ -176,22 +181,25 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 	virtual void randomize();
-	void onMouseDownOpaque(int button);
-	void onChange();
+	void onMouseDownOpaque(int button) override;
+	void onChange() override;
 };
 
 /** Implements vertical dragging behavior for ParamWidgets */
 struct Knob : ParamWidget {
-	void onDragStart();
-	void onDragMove(Vec mouseRel);
-	void onDragEnd();
+	/** Snap to nearest integer while dragging */
+	bool snap = false;
+	float dragValue;
+	void onDragStart() override;
+	void onDragMove(Vec mouseRel) override;
+	void onDragEnd() override;
 	/** Tell engine to smoothly vary this parameter */
-	void onChange();
+	void onChange() override;
 };
 
 struct SpriteKnob : virtual Knob, SpriteWidget {
 	int minIndex, maxIndex, spriteCount;
-	void step();
+	void step() override;
 };
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
@@ -204,16 +212,8 @@ struct SVGKnob : virtual Knob, FramebufferWidget {
 
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
-	void step();
-	void onChange();
-};
-
-/** Snaps to the nearest integer value on mouse release */
-struct SnapKnob : virtual Knob {
-	void onDragEnd() {
-		setValue(roundf(value));
-		Knob::onDragEnd();
-	}
+	void step() override;
+	void onChange() override;
 };
 
 struct SVGSlider : Knob, FramebufferWidget {
@@ -224,8 +224,8 @@ struct SVGSlider : Knob, FramebufferWidget {
 	SVGWidget *handle;
 
 	SVGSlider();
-	void step();
-	void onChange();
+	void step() override;
+	void onChange() override;
 };
 
 struct Switch : ParamWidget {
@@ -239,13 +239,13 @@ struct SVGSwitch : virtual Switch, FramebufferWidget {
 	SVGSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<SVG> svg);
-	void step();
-	void onChange();
+	void step() override;
+	void onChange() override;
 };
 
 /** A switch that cycles through each mechanical position */
 struct ToggleSwitch : virtual Switch {
-	void onDragStart() {
+	void onDragStart() override {
 		// Cycle through values
 		// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
 		if (value >= maxValue)
@@ -258,11 +258,11 @@ struct ToggleSwitch : virtual Switch {
 /** A switch that is turned on when held */
 struct MomentarySwitch : virtual Switch {
 	/** Don't randomize state */
-	void randomize() {}
-	void onDragStart() {
+	void randomize() override {}
+	void onDragStart() override {
 		setValue(maxValue);
 	}
-	void onDragEnd() {
+	void onDragEnd() override {
 		setValue(minValue);
 	}
 };
@@ -282,20 +282,20 @@ struct Port : OpaqueWidget {
 	int portId;
 
 	~Port();
-	void draw(NVGcontext *vg);
-	void onMouseDownOpaque(int button);
-	void onDragEnd();
-	void onDragStart();
-	void onDragDrop(Widget *origin);
-	void onDragEnter(Widget *origin);
-	void onDragLeave(Widget *origin);
+	void draw(NVGcontext *vg) override;
+	void onMouseDownOpaque(int button) override;
+	void onDragEnd() override;
+	void onDragStart() override;
+	void onDragDrop(Widget *origin) override;
+	void onDragEnter(Widget *origin) override;
+	void onDragLeave(Widget *origin) override;
 };
 
 struct SVGPort : Port, FramebufferWidget {
 	SVGWidget *background;
 
 	SVGPort();
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 /** If you don't add these to your ModuleWidget, they will fall out of the rack... */
@@ -316,7 +316,7 @@ struct Toolbar : OpaqueWidget {
 	RadioButton *plugLightButton;
 
 	Toolbar();
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct PluginManagerWidget : Widget {
@@ -324,7 +324,7 @@ struct PluginManagerWidget : Widget {
 	Widget *manageWidget;
 	Widget *downloadWidget;
 	PluginManagerWidget();
-	void step();
+	void step() override;
 };
 
 struct RackScene : Scene {
@@ -332,9 +332,9 @@ struct RackScene : Scene {
 	ZoomWidget *zoomWidget;
 
 	RackScene();
-	void step();
-	void draw(NVGcontext *vg);
-	Widget *onHoverKey(Vec pos, int key);
+	void step() override;
+	void draw(NVGcontext *vg) override;
+	Widget *onHoverKey(Vec pos, int key) override;
 };
 
 ////////////////////

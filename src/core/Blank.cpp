@@ -10,17 +10,17 @@ struct ModuleResizeHandle : Widget {
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
-	Widget *onMouseDown(Vec pos, int button) {
+	Widget *onMouseDown(Vec pos, int button) override {
 		if (button == 0)
 			return this;
 		return NULL;
 	}
-	void onDragStart() {
+	void onDragStart() override {
 		assert(parent);
 		originalWidth = parent->box.size.x;
 		totalX = 0.0;
 	}
-	void onDragMove(Vec mouseRel) {
+	void onDragMove(Vec mouseRel) override {
 		ModuleWidget *m = dynamic_cast<ModuleWidget*>(parent);
 		assert(m);
 		totalX += mouseRel.x;
@@ -38,7 +38,7 @@ struct ModuleResizeHandle : Widget {
 		}
 		gRackWidget->requestModuleBox(m, newBox);
 	}
-	void draw(NVGcontext *vg) {
+	void draw(NVGcontext *vg) override {
 		for (float x = 5.0; x <= 10.0; x += 5.0) {
 			nvgBeginPath(vg);
 			const float margin = 5.0;

@@ -103,12 +103,12 @@ void ModuleWidget::disconnect() {
 	}
 }
 
-void ModuleWidget::initialize() {
+void ModuleWidget::reset() {
 	for (ParamWidget *param : params) {
 		param->setValue(param->defaultValue);
 	}
 	if (module) {
-		module->initialize();
+		module->reset();
 	}
 }
 
@@ -170,7 +170,7 @@ Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 	switch (key) {
 		case GLFW_KEY_I:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
-				initialize();
+				reset();
 				return this;
 			}
 			break;
@@ -206,35 +206,35 @@ void ModuleWidget::onDragEnd() {
 
 struct DisconnectMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		moduleWidget->disconnect();
 	}
 };
 
-struct InitializeMenuItem : MenuItem {
+struct ResetMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
-		moduleWidget->initialize();
+	void onAction() override {
+		moduleWidget->reset();
 	}
 };
 
 struct RandomizeMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		moduleWidget->randomize();
 	}
 };
 
 struct CloneMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		gRackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct DeleteMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() {
+	void onAction() override {
 		gRackWidget->deleteModule(moduleWidget);
 		moduleWidget->finalizeEvents();
 		delete moduleWidget;
@@ -248,7 +248,7 @@ Menu *ModuleWidget::createContextMenu() {
 	menuLabel->text = model->plugin->name + ": " + model->name;
 	menu->pushChild(menuLabel);
 
-	InitializeMenuItem *resetItem = new InitializeMenuItem();
+	ResetMenuItem *resetItem = new ResetMenuItem();
 	resetItem->text = "Initialize";
 	resetItem->rightText = GUI_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;

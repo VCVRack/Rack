@@ -22,7 +22,7 @@ struct BlankWidget : ModuleWidget {
 	Widget *bottomRightScrew;
 	Widget *rightHandle;
 	BlankWidget();
-	void step();
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
+	void step() override;
+	json_t *toJson() override;
+	void fromJson(json_t *rootJ) override;
 };

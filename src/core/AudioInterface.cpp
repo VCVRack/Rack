@@ -65,7 +65,7 @@ struct AudioInterface : Module {
 		closeDevice();
 	}
 
-	void step();
+	void step() override;
 	void stepStream(const float *input, float *output, int numFrames);
 
 	int getDeviceCount();
@@ -84,7 +84,7 @@ struct AudioInterface : Module {
 		openDevice(deviceId, sampleRate, blockSize);
 	}
 
-	json_t *toJson() {
+	json_t *toJson() override {
 		json_t *rootJ = json_object();
 		if (deviceId >= 0) {
 			std::string deviceName = getDeviceName(deviceId);
@@ -95,7 +95,7 @@ struct AudioInterface : Module {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ) override {
 		json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
 		if (deviceNameJ) {
 			std::string deviceName = json_string_value(deviceNameJ);
@@ -118,7 +118,7 @@ struct AudioInterface : Module {
 		}
 	}
 
-	void initialize() {
+	void reset() override {
 		closeDevice();
 	}
 };
@@ -155,7 +155,7 @@ void AudioInterface::step() {
 		// Once full, sample rate convert the input
 		// inputBuffer -> SRC -> inputSrcBuffer
 		if (inputBuffer.full()) {
-			inputSrc.setRatio(sampleRate / gSampleRate);
+			inputSrc.setRatio(sampleRate / engineGetSampleRate());
 			int inLen = inputBuffer.size();
 			int outLen = inputSrcBuffer.capacity();
 			inputSrc.process(inputBuffer.startData(), &inLen, inputSrcBuffer.endData(), &outLen);
@@ -194,7 +194,7 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 		}
 
 		// Pass output through sample rate converter
-		outputSrc.setRatio(gSampleRate / sampleRate);
+		outputSrc.setRatio(engineGetSampleRate() / sampleRate);
 		int inLen = numFrames;
 		int outLen = outputBuffer.capacity();
 		outputSrc.process(inputFrames, &inLen, outputBuffer.endData(), &outLen);
@@ -326,14 +326,14 @@ void AudioInterface::closeDevice() {
 struct AudioItem : MenuItem {
 	AudioInterface *audioInterface;
 	int deviceId;
-	void onAction() {
+	void onAction() override {
 		audioInterface->setDeviceId(deviceId);
 	}
 };
 
 struct AudioChoice : ChoiceButton {
 	AudioInterface *audioInterface;
-	void onAction() {
+	void onAction() override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -354,7 +354,7 @@ struct AudioChoice : ChoiceButton {
 			menu->pushChild(audioItem);
 		}
 	}
-	void step() {
+	void step() override {
 		std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
 		text = ellipsize(name, 24);
 	}
@@ -364,14 +364,14 @@ struct AudioChoice : ChoiceButton {
 struct SampleRateItem : MenuItem {
 	AudioInterface *audioInterface;
 	float sampleRate;
-	void onAction() {
+	void onAction() override {
 		audioInterface->setSampleRate(sampleRate);
 	}
 };
 
 struct SampleRateChoice : ChoiceButton {
 	AudioInterface *audioInterface;
-	void onAction() {
+	void onAction() override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -386,7 +386,7 @@ struct SampleRateChoice : ChoiceButton {
 			menu->pushChild(item);
 		}
 	}
-	void step() {
+	void step() override {
 		this->text = stringf("%.0f Hz", audioInterface->sampleRate);
 	}
 };
@@ -395,14 +395,14 @@ struct SampleRateChoice : ChoiceButton {
 struct BlockSizeItem : MenuItem {
 	AudioInterface *audioInterface;
 	int blockSize;
-	void onAction() {
+	void onAction() override {
 		audioInterface->setBlockSize(blockSize);
 	}
 };
 
 struct BlockSizeChoice : ChoiceButton {
 	AudioInterface *audioInterface;
-	void onAction() {
+	void onAction() override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -417,7 +417,7 @@ struct BlockSizeChoice : ChoiceButton {
 			menu->pushChild(item);
 		}
 	}
-	void step() {
+	void step() override {
 		this->text = stringf("%d", audioInterface->blockSize);
 	}
 };

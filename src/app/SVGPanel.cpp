@@ -5,7 +5,7 @@ namespace rack {
 
 
 struct PanelBorder : TransparentWidget {
-	void draw(NVGcontext *vg) {
+	void draw(NVGcontext *vg) override {
 		NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
 		nvgBeginPath(vg);
 		nvgRect(vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);

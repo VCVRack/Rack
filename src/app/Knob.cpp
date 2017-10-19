@@ -12,6 +12,7 @@ namespace rack {
 
 void Knob::onDragStart() {
 	guiCursorLock();
+	dragValue = value;
 	randomizable = false;
 }
 
@@ -19,7 +20,11 @@ void Knob::onDragMove(Vec mouseRel) {
 	// Drag slower if Mod
 	if (guiIsModPressed())
 		mouseRel = mouseRel.mult(1/16.0);
-	setValue(value - KNOB_SENSITIVITY * (maxValue - minValue) * mouseRel.y);
+	dragValue += KNOB_SENSITIVITY * (maxValue - minValue) * -mouseRel.y;
+	if (snap)
+		setValue(roundf(dragValue));
+	else
+		setValue(dragValue);
 }
 
 void Knob::onDragEnd() {
@@ -31,7 +36,10 @@ void Knob::onChange() {
 	if (!module)
 		return;
 
-	engineSetParamSmooth(module, paramId, value);
+	if (snap)
+		engineSetParam(module, paramId, value);
+	else
+		engineSetParamSmooth(module, paramId, value);
 }
 
 

@@ -141,7 +141,7 @@ struct TransformWidget : Widget {
 	void translate(Vec delta);
 	void rotate(float angle);
 	void scale(Vec s);
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 
@@ -151,33 +151,33 @@ struct TransformWidget : Widget {
 
 /** Widget that does not respond to events */
 struct TransparentWidget : virtual Widget {
-	Widget *onMouseDown(Vec pos, int button) {return NULL;}
-	Widget *onMouseUp(Vec pos, int button) {return NULL;}
-	Widget *onMouseMove(Vec pos, Vec mouseRel) {return NULL;}
-	Widget *onScroll(Vec pos, Vec scrollRel) {return NULL;}
+	Widget *onMouseDown(Vec pos, int button) override {return NULL;}
+	Widget *onMouseUp(Vec pos, int button) override {return NULL;}
+	Widget *onMouseMove(Vec pos, Vec mouseRel) override {return NULL;}
+	Widget *onScroll(Vec pos, Vec scrollRel) override {return NULL;}
 };
 
 /** Widget that automatically responds to all mouse events but gives a chance for children to respond instead */
 struct OpaqueWidget : virtual Widget {
-	Widget *onMouseDown(Vec pos, int button) {
+	Widget *onMouseDown(Vec pos, int button) override {
 		Widget *w = Widget::onMouseDown(pos, button);
 		if (w) return w;
 		onMouseDownOpaque(button);
 		return this;
 	}
-	Widget *onMouseUp(Vec pos, int button) {
+	Widget *onMouseUp(Vec pos, int button) override {
 		Widget *w = Widget::onMouseUp(pos, button);
 		if (w) return w;
 		onMouseUpOpaque(button);
 		return this;
 	}
-	Widget *onMouseMove(Vec pos, Vec mouseRel) {
+	Widget *onMouseMove(Vec pos, Vec mouseRel) override {
 		Widget *w = Widget::onMouseMove(pos, mouseRel);
 		if (w) return w;
 		onMouseMoveOpaque(mouseRel);
 		return this;
 	}
-	Widget *onScroll(Vec pos, Vec scrollRel) {
+	Widget *onScroll(Vec pos, Vec scrollRel) override {
 		Widget *w = Widget::onScroll(pos, scrollRel);
 		if (w) return w;
 		if (onScrollOpaque(scrollRel))
@@ -199,22 +199,22 @@ struct SpriteWidget : virtual Widget {
 	Vec spriteSize;
 	std::shared_ptr<Image> spriteImage;
 	int index = 0;
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct SVGWidget : virtual Widget {
 	std::shared_ptr<SVG> svg;
 	/** Sets the box size to the svg image size */
 	void wrap();
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 /** Caches a widget's draw() result to a framebuffer so it is called less frequently
-When `dirty` is true, its children will be re-rendered on the next call to step().
+When `dirty` is true, its children will be re-rendered on the next call to step() override.
 Events are not passed to the underlying scene.
 */
 struct FramebufferWidget : virtual Widget {
-	/** Set this to true to re-render the children to the framebuffer in the next step() */
+	/** Set this to true to re-render the children to the framebuffer in the next step() override */
 	bool dirty = true;
 	/** A margin in pixels around the children in the framebuffer
 	This prevents cutting the rendered SVG off on the box edges.
@@ -228,8 +228,8 @@ struct FramebufferWidget : virtual Widget {
 
 	FramebufferWidget();
 	~FramebufferWidget();
-	void step();
-	void draw(NVGcontext *vg);
+	void step() override;
+	void draw(NVGcontext *vg) override;
 	int getImageHandle();
 };
 
@@ -263,14 +263,14 @@ struct Label : Widget {
 	Label() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 // Deletes itself from parent when clicked
 struct MenuOverlay : OpaqueWidget {
-	void onDragDrop(Widget *origin);
-	bool onScrollOpaque(Vec scrollRel) {return true;}
-	Widget *onHoverKey(Vec pos, int key);
+	void onDragDrop(Widget *origin) override;
+	bool onScrollOpaque(Vec scrollRel) override {return true;}
+	Widget *onHoverKey(Vec pos, int key) override;
 };
 
 struct MenuEntry;
@@ -289,9 +289,9 @@ struct Menu : OpaqueWidget {
 	void pushChild(Widget *child);
 	void setChildMenu(Menu *menu);
 	void fit();
-	void step();
-	void draw(NVGcontext *vg);
-	bool onScrollOpaque(Vec scrollRel);
+	void step() override;
+	void draw(NVGcontext *vg) override;
+	bool onScrollOpaque(Vec scrollRel) override;
 };
 
 struct MenuEntry : OpaqueWidget {
@@ -304,16 +304,16 @@ struct MenuEntry : OpaqueWidget {
 };
 
 struct MenuLabel : MenuEntry {
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct MenuItem : MenuEntry {
-	float computeMinWidth(NVGcontext *vg);
-	void draw(NVGcontext *vg);
+	float computeMinWidth(NVGcontext *vg) override;
+	void draw(NVGcontext *vg) override;
 
 	virtual Menu *createChildMenu() {return NULL;}
-	void onMouseEnter();
-	void onDragDrop(Widget *origin);
+	void onMouseEnter() override;
+	void onDragDrop(Widget *origin) override;
 };
 
 struct Button : OpaqueWidget {
@@ -323,16 +323,16 @@ struct Button : OpaqueWidget {
 	Button() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(NVGcontext *vg);
-	void onMouseEnter();
-	void onMouseLeave();
-	void onDragStart();
-	void onDragEnd();
-	void onDragDrop(Widget *origin);
+	void draw(NVGcontext *vg) override;
+	void onMouseEnter() override;
+	void onMouseLeave() override;
+	void onDragStart() override;
+	void onDragEnd() override;
+	void onDragDrop(Widget *origin) override;
 };
 
 struct ChoiceButton : Button {
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct RadioButton : OpaqueWidget, QuantityWidget {
@@ -341,10 +341,10 @@ struct RadioButton : OpaqueWidget, QuantityWidget {
 	RadioButton() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(NVGcontext *vg);
-	void onMouseEnter();
-	void onMouseLeave();
-	void onDragDrop(Widget *origin);
+	void draw(NVGcontext *vg) override;
+	void onMouseEnter() override;
+	void onMouseLeave() override;
+	void onDragDrop(Widget *origin) override;
 };
 
 struct Slider : OpaqueWidget, QuantityWidget {
@@ -353,10 +353,10 @@ struct Slider : OpaqueWidget, QuantityWidget {
 	Slider() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(NVGcontext *vg);
-	void onDragStart();
-	void onDragMove(Vec mouseRel);
-	void onDragEnd();
+	void draw(NVGcontext *vg) override;
+	void onDragStart() override;
+	void onDragMove(Vec mouseRel) override;
+	void onDragEnd() override;
 };
 
 /** Parent must be a ScrollWidget */
@@ -367,10 +367,10 @@ struct ScrollBar : OpaqueWidget {
 	ScrollBar() {
 		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 	}
-	void draw(NVGcontext *vg);
-	void onDragStart();
-	void onDragMove(Vec mouseRel);
-	void onDragEnd();
+	void draw(NVGcontext *vg) override;
+	void onDragStart() override;
+	void onDragMove(Vec mouseRel) override;
+	void onDragEnd() override;
 };
 
 /** Handles a container with ScrollBar */
@@ -381,19 +381,19 @@ struct ScrollWidget : OpaqueWidget {
 	Vec offset;
 
 	ScrollWidget();
-	void step();
-	Widget *onMouseMove(Vec pos, Vec mouseRel);
-	bool onScrollOpaque(Vec scrollRel);
+	void step() override;
+	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
+	bool onScrollOpaque(Vec scrollRel) override;
 };
 
 struct ZoomWidget : Widget {
 	float zoom = 1.0;
-	void draw(NVGcontext *vg);
-	Widget *onMouseDown(Vec pos, int button);
-	Widget *onMouseUp(Vec pos, int button);
-	Widget *onMouseMove(Vec pos, Vec mouseRel);
-	Widget *onHoverKey(Vec pos, int key);
-	Widget *onScroll(Vec pos, Vec scrollRel);
+	void draw(NVGcontext *vg) override;
+	Widget *onMouseDown(Vec pos, int button) override;
+	Widget *onMouseUp(Vec pos, int button) override;
+	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
+	Widget *onHoverKey(Vec pos, int key) override;
+	Widget *onScroll(Vec pos, Vec scrollRel) override;
 };
 
 struct TextField : OpaqueWidget {
@@ -405,36 +405,36 @@ struct TextField : OpaqueWidget {
 	TextField() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(NVGcontext *vg);
-	Widget *onMouseDown(Vec pos, int button);
-	bool onFocusText(int codepoint);
-	bool onFocusKey(int scancode);
-	bool onFocus();
+	void draw(NVGcontext *vg) override;
+	Widget *onMouseDown(Vec pos, int button) override;
+	bool onFocusText(int codepoint) override;
+	bool onFocusKey(int key) override;
+	bool onFocus() override;
 	void insertText(std::string newText);
 	virtual void onTextChange() {}
 };
 
 struct PasswordField : TextField {
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct ProgressBar : TransparentWidget, QuantityWidget {
 	ProgressBar() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 };
 
 struct Tooltip : Widget {
-	void step();
-	void draw(NVGcontext *vg);
+	void step() override;
+	void draw(NVGcontext *vg) override;
 };
 
 struct Scene : OpaqueWidget {
 	Widget *overlay = NULL;
 	void setOverlay(Widget *w);
 	Menu *createMenu();
-	void step();
+	void step() override;
 };
 
 

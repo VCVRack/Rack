@@ -18,7 +18,7 @@ struct Bridge : Module {
 	}
 	~Bridge() {
 	}
-	void step();
+	void step() override;
 };
 
 

@@ -15,7 +15,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		Vec pos = Vec(0, 0);
 
 		struct RegisterButton : Button {
-			void onAction() {
+			void onAction() override {
 				std::thread t(openBrowser, "https://vcvrack.com/");
 				t.detach();
 			}
@@ -46,7 +46,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		struct LogInButton : Button {
 			TextField *emailField;
 			TextField *passwordField;
-			void onAction() {
+			void onAction() override {
 				std::thread t(pluginLogIn, emailField->text, passwordField->text);
 				t.detach();
 				passwordField->text = "";
@@ -63,7 +63,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		pos.x += logInButton->box.size.x;
 
 		struct StatusLabel : Label {
-			void step() {
+			void step() override {
 				text = pluginGetLoginStatus();
 			}
 		};
@@ -79,7 +79,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		Vec pos = Vec(0, 0);
 
 		struct ManageButton : Button {
-			void onAction() {
+			void onAction() override {
 				std::thread t(openBrowser, "https://vcvrack.com/");
 				t.detach();
 			}
@@ -92,7 +92,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		pos.x += manageButton->box.size.x;
 
 		struct RefreshButton : Button {
-			void onAction() {
+			void onAction() override {
 				std::thread t(pluginRefresh);
 				t.detach();
 			}
@@ -106,7 +106,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		pos.x += refreshButton->box.size.x;
 
 		struct LogOutButton : Button {
-			void onAction() {
+			void onAction() override {
 				pluginLogOut();
 			}
 		};
@@ -125,7 +125,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		Vec pos = Vec(0, 0);
 
 		struct DownloadProgressBar : ProgressBar {
-			void step() {
+			void step() override {
 				label = "Downloading";
 				std::string name = pluginGetDownloadName();
 				if (name != "")
@@ -142,7 +142,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		pos.x += downloadProgress->box.size.x;
 
 		// struct CancelButton : Button {
-		// 	void onAction() {
+		// 	void onAction() override {
 		// 		pluginCancelDownload();
 		// 	}
 		// };
