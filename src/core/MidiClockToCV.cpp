@@ -87,7 +87,7 @@ void MIDIClockToCVInterface::step() {
 	 * Implying that every 16 midi clock ticks we need to send a pulse
 	 * */
 	static int ratios[] = {6, 8, 12, 16, 24, 32, 48, 96, 192};
-	static int numratios = sizeof(ratios)/sizeof(*ratios);
+	static int numratios = sizeof(ratios) / sizeof(*ratios);
 
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
@@ -101,11 +101,11 @@ void MIDIClockToCVInterface::step() {
 	}
 
 	if (inputs[CLOCK1_RATIO].active) {
-		clock1ratio = int(clampf(inputs[CLOCK1_RATIO].value, 0.0, numratios-1));
+		clock1ratio = int(clampf(inputs[CLOCK1_RATIO].value, 0.0, 10.0) * (numratios - 1) / 10);
 	}
 
 	if (inputs[CLOCK2_RATIO].active) {
-		clock2ratio = int(clampf(inputs[CLOCK2_RATIO].value, 0.0, numratios-1));
+		clock2ratio = int(clampf(inputs[CLOCK2_RATIO].value, 0.0, 10.0) * (numratios - 1) / 10);
 	}
 
 	if (reset) {
@@ -269,14 +269,14 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 
 		addInput(createInput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK1_RATIO));
 
-		yPos += margin*6;
+		yPos += margin * 6;
 
 		ClockRatioChoice *ratioChoice = new ClockRatioChoice();
 		ratioChoice->clockRatio = &module->clock1ratio;
 		ratioChoice->box.pos = Vec(margin, yPos);
 		ratioChoice->box.size.x = box.size.x - 10;
 		addChild(ratioChoice);
-		yPos += ratioChoice->box.size.y + margin*2;
+		yPos += ratioChoice->box.size.y + margin * 2;
 
 	}
 
@@ -299,14 +299,14 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 
 		addInput(createInput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, MIDIClockToCVInterface::CLOCK2_RATIO));
 
-		yPos += margin*6;
+		yPos += margin * 6;
 
 		ClockRatioChoice *ratioChoice = new ClockRatioChoice();
 		ratioChoice->clockRatio = &module->clock2ratio;
 		ratioChoice->box.pos = Vec(margin, yPos);
 		ratioChoice->box.size.x = box.size.x - 10;
 		addChild(ratioChoice);
-		yPos += ratioChoice->box.size.y + margin*2;
+		yPos += ratioChoice->box.size.y + margin * 2;
 
 	}
 
