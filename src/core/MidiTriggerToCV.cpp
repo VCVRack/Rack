@@ -66,6 +66,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 	}
 
 	virtual void initialize() {
+		resetMidi();
 	}
 
 };

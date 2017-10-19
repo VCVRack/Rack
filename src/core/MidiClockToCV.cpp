@@ -70,7 +70,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	}
 
 	virtual void initialize() {
-		ignore_midiTime = false;
+		resetMidi();
 	}
 
 };
