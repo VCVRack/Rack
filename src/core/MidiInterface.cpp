@@ -7,7 +7,6 @@
 using namespace rack;
 
 
-
 /**
  * MidiIO implements the shared functionality of all midi modules, namely:
  * + Channel Selection (including helper for storing json)
@@ -27,7 +26,7 @@ void MidiIO::setChannel(int channel) {
 	this->channel = channel;
 }
 
-std::unordered_map<std::string, MidiInWrapper*> MidiIO::midiInMap = {};
+std::unordered_map<std::string, MidiInWrapper *> MidiIO::midiInMap = {};
 
 json_t *MidiIO::addBaseJson(json_t *rootJ) {
 	if (deviceName != "") {
@@ -51,7 +50,7 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 
 std::vector<std::string> MidiIO::getDevices() {
 	/* Note: we could also use an existing interface if one exists */
-	static RtMidiIn * m = new RtMidiIn();
+	static RtMidiIn *m = new RtMidiIn();
 
 	std::vector<std::string> names = {};
 
@@ -85,20 +84,34 @@ void MidiIO::openDevice(std::string deviceName) {
 		}
 		catch (RtMidiError &error) {
 			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+			this->deviceName = "";
+			this->id = -1;
 			return;
 		}
 	}
 
 	this->deviceName = deviceName;
 
-	/* TODO: this works for now, but is not ideal. If a clock is added and connected to a module
-	 * the time messages will still be received after the clock is removed. This adds an overhead
-	 * which can be avoided but I want to find a good solution.*/
-	if (!ignore_midiTime || !ignore_midiTime || !ignore_midiSense){
-		midiInMap[deviceName]->ignoreTypes(ignore_midiSysex, ignore_midiTime, ignore_midiSense);
+	id = midiInMap[deviceName]->add();
+	onDeviceChange();
+}
+
+void MidiIO::setIgnores(bool ignoreSysex, bool ignoreTime, bool ignoreSense) {
+	bool sy = true, ti = true, se = true;
+
+	midiInMap[deviceName]->ignoresMap[id][0] = ignoreSysex;
+	midiInMap[deviceName]->ignoresMap[id][1] = ignoreTime;
+	midiInMap[deviceName]->ignoresMap[id][2] = ignoreSense;
+
+	for (auto kv : midiInMap[deviceName]->ignoresMap) {
+		sy = sy &&  kv.second[0];
+		ti = ti  &&  kv.second[1];
+		se = se &&  kv.second[2];
 	}
 
-	id = midiInMap[deviceName]->add();
+	midiInMap[deviceName]->ignoreTypes(se,ti,se);
+
+
 }
 
 std::string MidiIO::getDeviceName() {
@@ -141,12 +154,14 @@ bool MidiIO::isPortOpen() {
 
 void MidiIO::close() {
 
-	MidiInWrapper * mw = midiInMap[deviceName];
+	MidiInWrapper *mw = midiInMap[deviceName];
 
 	if (!mw || id < 0) {
 		//fprintf(stderr, "Trying to close already closed device!\n");
 		return;
 	}
+
+	setIgnores(); // reset ignore types for this instance
 
 	mw->erase(id);
 

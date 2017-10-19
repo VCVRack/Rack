@@ -15,6 +15,12 @@ using namespace rack;
 struct MidiInWrapper : RtMidiIn {
 	std::unordered_map<int, std::list<std::vector<unsigned char>>> idMessagesMap;
 	std::unordered_map<int, std::list<double>> idStampsMap;
+
+	/* Stores Ignore settings for each instance in the following order:
+	 * {ignore_midiSysex, ignore_midiTime, ignore_midiSense}
+	 */
+	std::unordered_map<int, bool[3]> ignoresMap;
+
 	int uid_c = 0;
 	int subscribers = 0;
 
@@ -28,6 +34,10 @@ struct MidiInWrapper : RtMidiIn {
 		subscribers++;
 		idMessagesMap[id] = {};
 		idStampsMap[id] = {};
+
+		ignoresMap[id][0] = true;
+		ignoresMap[id][1] = true;
+		ignoresMap[id][2] = true;
 		return id;
 	}
 
@@ -35,6 +45,7 @@ struct MidiInWrapper : RtMidiIn {
 		subscribers--;
 		idMessagesMap.erase(id);
 		idStampsMap.erase(id);
+		ignoresMap.erase(id);
 	}
 };
 
@@ -47,9 +58,6 @@ private:
 	bool isOut = false;
 
 public:
-	bool ignore_midiSysex=true;
-	bool ignore_midiTime=true;
-	bool ignore_midiSense=true;
 	int channel;
 
 
@@ -62,6 +70,8 @@ public:
 	std::vector<std::string> getDevices();
 
 	void openDevice(std::string deviceName);
+
+	void setIgnores(bool ignoreSysex = true, bool ignoreTime = true, bool ignoreSense = true);
 
 	std::string getDeviceName();
 
@@ -79,6 +89,9 @@ public:
 
 	/* called when midi port is set */
 	virtual void resetMidi()=0;
+
+	/* called if a user switches or sets the deivce (and after this device is initialised)*/
+	virtual void onDeviceChange(){};
 };
 
 //////////////////////

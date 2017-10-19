@@ -35,7 +35,6 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 
 
 	MIDIClockToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
-		ignore_midiTime = false;
 
 	}
 
@@ -46,9 +45,11 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 
 	void processMidi(std::vector<unsigned char> msg);
 
-	virtual void resetMidi();
+	void onDeviceChange();
 
-	virtual json_t *toJson() {
+	void resetMidi();
+
+	json_t *toJson() {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		json_object_set_new(rootJ, "clock1ratio", json_integer(clock1ratio));
@@ -56,7 +57,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 		return rootJ;
 	}
 
-	virtual void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ) {
 		baseFromJson(rootJ);
 		json_t *c1rJ = json_object_get(rootJ, "clock1ratio");
 		if (c1rJ) {
@@ -69,7 +70,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 		}
 	}
 
-	virtual void initialize() {
+	void initialize() {
 		resetMidi();
 	}
 
@@ -176,6 +177,10 @@ void MIDIClockToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	}
 
 
+}
+
+void MIDIClockToCVInterface::onDeviceChange() {
+	setIgnores(true, false);
 }
 
 struct ClockRatioItem : MenuItem {
