@@ -42,7 +42,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 
 	void processMidi(std::vector<unsigned char> msg);
 
-	virtual void resetMidi();
+	void resetMidi();
 
 	virtual json_t *toJson() {
 		json_t *rootJ = json_object();
@@ -53,7 +53,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		return rootJ;
 	}
 
-	virtual void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ) {
 		baseFromJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
@@ -65,7 +65,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		}
 	}
 
-	virtual void initialize() {
+	void initialize() {
 		resetMidi();
 	}
 
@@ -111,7 +111,7 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 		return;
 
 	if (status == 0x8) { // note off
-		for (int i = 0; i<NUM_OUTPUTS; i++) {
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (data1 == triggerNum[i]) {
 				trigger[i] = data2;
 			}
@@ -126,7 +126,7 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 			}
 		}
 
-		for (int i = 0; i<NUM_OUTPUTS; i++) {
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (data1 == triggerNum[i]) {
 				trigger[i] = data2;
 			}

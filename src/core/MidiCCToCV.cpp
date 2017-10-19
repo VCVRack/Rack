@@ -40,9 +40,9 @@ struct MIDICCToCVInterface : MidiIO, Module {
 
 	void processMidi(std::vector<unsigned char> msg);
 
-	virtual void resetMidi();
+	void resetMidi();
 
-	virtual json_t *toJson() {
+	json_t *toJson() {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
@@ -51,7 +51,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		return rootJ;
 	}
 
-	virtual void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ) {
 		baseFromJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
@@ -63,7 +63,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		}
 	}
 
-	virtual void initialize() {
+	void initialize() {
 		resetMidi();
 	}
 

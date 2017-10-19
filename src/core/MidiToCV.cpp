@@ -55,21 +55,21 @@ struct MIDIToCVInterface : MidiIO, Module {
 
 	void processMidi(std::vector<unsigned char> msg);
 
-	virtual json_t *toJson() {
+	json_t *toJson() {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		return rootJ;
 	}
 
-	virtual void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ) {
 		baseFromJson(rootJ);
 	}
 
-	virtual void initialize() {
+	void initialize() {
 		resetMidi();
 	}
 
-	virtual void resetMidi();
+	void resetMidi();
 
 };
 
