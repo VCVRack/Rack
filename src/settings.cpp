@@ -39,6 +39,10 @@ static json_t *settingsToJson() {
 	json_t *plugLightJ = json_boolean(gToolbar->plugLightButton->value > 0.0);
 	json_object_set_new(rootJ, "plugLight", plugLightJ);
 
+	// lastPath
+	json_t *lastPathJ = json_string(gRackWidget->lastPath.c_str());
+	json_object_set_new(rootJ, "lastPath", lastPathJ);
+
 	return rootJ;
 }
 
@@ -74,6 +78,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *plugLightJ = json_object_get(rootJ, "plugLight");
 	if (plugLightJ)
 		gToolbar->plugLightButton->setValue(json_is_true(plugLightJ) ? 1.0 : 0.0);
+
+	// lastPath
+	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
+	if (lastPathJ)
+		gRackWidget->lastPath = json_string_value(lastPathJ);
 }
 
 
