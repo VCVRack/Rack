@@ -12,16 +12,6 @@ struct AudioInterfaceWidget : ModuleWidget {
 	AudioInterfaceWidget();
 };
 
-struct MidiToCVWidget : ModuleWidget {
-	MidiToCVWidget();
-	void step() override;
-};
-
-struct MIDICCToCVWidget : ModuleWidget {
-	MIDICCToCVWidget();
-	void step() override;
-};
-
 struct BridgeWidget : ModuleWidget {
 	BridgeWidget();
 };
