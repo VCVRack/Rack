@@ -1,9 +1,11 @@
-#include <map>
-#include <queue>
-
 #include "gui.hpp"
 #include "app.hpp"
 #include "asset.hpp"
+
+#include <map>
+#include <queue>
+#include <thread>
+
 #include "../ext/osdialog/osdialog.h"
 
 #define NANOVG_GL2_IMPLEMENTATION
@@ -223,12 +225,9 @@ void renderGui() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgBeginFrame(gVg, width, height, gPixelRatio);
 
-	bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);
-	if (visible) {
-		nvgReset(gVg);
-		nvgScale(gVg, gPixelRatio, gPixelRatio);
-		gScene->draw(gVg);
-	}
+	nvgReset(gVg);
+	nvgScale(gVg, gPixelRatio, gPixelRatio);
+	gScene->draw(gVg);
 
 	nvgEndFrame(gVg);
 	glfwSwapBuffers(gWindow);
@@ -311,8 +310,8 @@ void guiRun() {
 		windowSizeCallback(gWindow, width, height);
 	}
 	gGuiFrame = 0;
-	double lastTime = 0.0;
 	while(!glfwWindowShouldClose(gWindow)) {
+		double startTime = glfwGetTime();
 		gGuiFrame++;
 
 		// Poll events
@@ -336,12 +335,20 @@ void guiRun() {
 		gScene->step();
 
 		// Render
-		renderGui();
+		bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);
+		if (visible) {
+			renderGui();
+		}
 
-		double currTime = glfwGetTime();
-		// printf("%lf fps\n", 1.0/(currTime - lastTime));
-		lastTime = currTime;
-		(void) lastTime;
+		// Limit framerate manually if vsync isn't working
+		double endTime = glfwGetTime();
+		double frameTime = endTime - startTime;
+		double minTime = 1.0 / 90.0;
+		if (frameTime < minTime) {
+			std::this_thread::sleep_for(std::chrono::duration<double>(minTime - frameTime));
+		}
+		endTime = glfwGetTime();
+		// printf("%lf fps\n", 1.0 / (endTime - startTime));
 	}
 }
 

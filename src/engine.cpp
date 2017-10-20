@@ -84,7 +84,7 @@ static void engineRun() {
 	// Every time the engine waits and locks a mutex, it steps this many frames
 	const int mutexSteps = 64;
 	// Time in seconds that the engine is rushing ahead of the estimated clock time
-	float ahead = 0.0;
+	double ahead = 0.0;
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	while (running) {
@@ -97,19 +97,19 @@ static void engineRun() {
 			}
 		}
 
-		float stepTime = mutexSteps / sampleRate;
+		double stepTime = mutexSteps / sampleRate;
 		ahead += stepTime;
 		auto currTime = std::chrono::high_resolution_clock::now();
-		const float aheadFactor = 2.0;
-		ahead -= aheadFactor * std::chrono::duration<float>(currTime - lastTime).count();
+		const double aheadFactor = 2.0;
+		ahead -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
 		lastTime = currTime;
 		ahead = fmaxf(ahead, 0.0);
 
 		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
 		// The number of steps to wait before possibly sleeping
-		const float aheadMax = 1.0; // seconds
+		const double aheadMax = 1.0; // seconds
 		if (ahead > aheadMax) {
-			std::this_thread::sleep_for(std::chrono::duration<float>(stepTime));
+			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
 		}
 	}
 }

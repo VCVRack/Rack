@@ -6,9 +6,11 @@ endif
 FLAGS += -MMD
 FLAGS += -g
 # Optimization
-FLAGS += -O3 -march=nocona -ffast-math
+FLAGS += -O3 -march=nocona -ffast-math -fno-finite-math-only
 FLAGS += -Wall -Wextra -Wno-unused-parameter
+ifneq ($(ARCH), mac)
 CXXFLAGS += -Wsuggest-override
+endif
 CXXFLAGS += -std=c++11
 
 
