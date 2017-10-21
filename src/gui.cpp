@@ -324,7 +324,10 @@ void guiRun() {
 		mouseButtonStickyPop();
 
 		// Set window title
-		std::string title = gApplicationName + " " + gApplicationVersion;
+		std::string title = gApplicationName;
+		if (!gApplicationVersion.empty()) {
+			title += " v" + gApplicationVersion;
+		}
 		if (!gRackWidget->lastPath.empty()) {
 			title += " - ";
 			title += extractFilename(gRackWidget->lastPath);

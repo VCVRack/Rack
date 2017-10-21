@@ -8,7 +8,7 @@ std::string gApplicationVersion =
 #ifdef VERSION
 	TOSTRING(VERSION);
 #else
-	"dev";
+	"";
 #endif
 std::string gApiHost = "http://api.vcvrack.com";
 

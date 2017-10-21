@@ -3,6 +3,9 @@ Tip: Use `git checkout v0.4.0` for example to check out any previous version men
 
 ### dev
 
+- Audible Instruments
+	- Added Low CPU mode to Braids for draft-quality rendering
+
 
 ### v0.4.0
 - Cables can now stack on output ports

@@ -434,6 +434,12 @@ struct AddPluginMenuItem : MenuItem {
 			menu->pushChild(item);
 		}
 
+		if (!plugin->version.empty()) {
+			MenuLabel *item = new MenuLabel();
+			item->text = "Version: v" + plugin->version;
+			menu->pushChild(item);
+		}
+
 		return menu;
 	}
 };
