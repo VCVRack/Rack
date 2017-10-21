@@ -63,11 +63,11 @@ std::vector<std::string> MidiIO::getDevices() {
 
 void MidiIO::openDevice(std::string deviceName) {
 
-	MidiInWrapper *mw = midiInMap[deviceName];
-
 	if (this->id > 0 || this->deviceName != "") {
 		close();
 	}
+
+	MidiInWrapper *mw = midiInMap[deviceName];
 
 	if (!mw) {
 		try {
