@@ -21,14 +21,18 @@ struct MIDICCToCVInterface : MidiIO, Module {
 
 	int cc[NUM_OUTPUTS];
 	int ccNum[NUM_OUTPUTS];
+	bool ccSync[NUM_OUTPUTS];
 	bool ccNumInited[NUM_OUTPUTS];
 	bool onFocus[NUM_OUTPUTS];
+	float lights[NUM_OUTPUTS];
+
 
 	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			cc[i] = 0;
 			ccNum[i] = i;
 			onFocus[i] = false;
+			ccSync[i]  = true;
 		}
 	}
 
@@ -46,7 +50,8 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			json_object_set_new(rootJ, std::to_string(i).c_str(), json_integer(ccNum[i]));
+			json_object_set_new(rootJ, ("ccNum" + std::to_string(i)).c_str(), json_integer(ccNum[i]));
+			json_object_set_new(rootJ, ("ccVal" + std::to_string(i)).c_str(), json_integer(cc[i]));
 		}
 		return rootJ;
 	}
@@ -54,10 +59,16 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	void fromJson(json_t *rootJ) {
 		baseFromJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
+			json_t *ccNumJ = json_object_get(rootJ, ("ccNum" + std::to_string(i)).c_str());
 			if (ccNumJ) {
 				ccNum[i] = json_integer_value(ccNumJ);
 				ccNumInited[i] = true;
+			}
+
+			json_t *ccValJ = json_object_get(rootJ, ("ccNum" + std::to_string(i)).c_str());
+			if (ccValJ) {
+				cc[i] = json_integer_value(ccValJ);
+				ccSync[i] = false;
 			}
 
 		}
@@ -83,6 +94,9 @@ void MIDICCToCVInterface::step() {
 	}
 
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
+
+		lights[i] = ccSync[i] ? 0.0 : 1.0;
+
 		outputs[i].value = cc[i] / 127.0 * 10.0;
 	}
 }
@@ -108,11 +122,20 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	if (status == 0xb) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (onFocus[i]) {
+				if (ccNum[i] != data1) {
+					ccSync[i] = false;
+				}
 				this->ccNum[i] = data1;
 			}
 		}
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
+
 			if (data1 == ccNum[i]) {
+				if (!ccSync[i]) {
+					ccSync[i] = (cc[i] <= data2+1 && cc[i] >= data2-1) ;
+					break;
+				}
+
 				this->cc[i] = data2;
 			}
 		}
@@ -133,6 +156,7 @@ struct CCTextField : TextField {
 	int *ccNum;
 	bool *inited;
 	bool *onFocus;
+	bool *ccSync;
 };
 
 void CCTextField::draw(NVGcontext *vg) {
@@ -171,6 +195,9 @@ void CCTextField::onMouseLeave() {
 void CCTextField::onTextChange() {
 	if (text.size() > 0) {
 		try {
+			if (*ccNum != std::stoi(text)) {
+				*ccSync = false;
+			}
 			*ccNum = std::stoi(text);
 			// Only allow valid cc numbers
 			if (*ccNum < 0 || *ccNum > 127 || text.size() > 3) {
@@ -246,6 +273,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 		ccNumChoice->ccNum = &module->ccNum[i];
 		ccNumChoice->inited = &module->ccNumInited[i];
 		ccNumChoice->onFocus = &module->onFocus[i];
+		ccNumChoice->ccSync = &module->ccSync[i];
 		ccNumChoice->text = std::to_string(module->ccNum[i]);
 		ccNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		ccNumChoice->box.size.x = 29;
@@ -254,6 +282,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 
 		yPos += labelHeight + margin;
 		addOutput(createOutput<PJ3410Port>(Vec((i % 4) * (63) + 10, yPos + 5), module, i));
+		addChild(createValueLight<SmallLight<RedValueLight>>(Vec((i % 4) * (63) + 32, yPos + 5), &module->lights[i]));
 
 		if ((i + 1) % 4 == 0) {
 			yPos += 47 + margin;
