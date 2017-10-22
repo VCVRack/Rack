@@ -42,6 +42,15 @@ DEPS = $(patsubst %, build/%.d, $(SOURCES))
 $(TARGET): $(OBJECTS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
+%.so:
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+%.dylib:
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+%.dll:
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
 # Object targets
 
 -include $(DEPS)

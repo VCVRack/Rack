@@ -13,9 +13,9 @@ std::string assetGlobal(std::string filename);
 /** Searches for a local resource
 */
 std::string assetLocal(std::string filename);
-/** Searches for a plugin resource, given a Plugin object
+/** Searches for a manufacturer resource, given a Manufacturer object
 */
-std::string assetPlugin(Plugin *plugin, std::string filename);
+std::string assetManufacturer(Manufacturer *manufacturer, std::string filename);
 
 
 } // namespace rack

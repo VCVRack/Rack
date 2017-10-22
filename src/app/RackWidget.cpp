@@ -208,21 +208,21 @@ void RackWidget::fromJson(json_t *rootJ) {
 		const char *modelSlug = json_string_value(modelSlugJ);
 
 		// Search for plugin
-		Plugin *plugin = NULL;
-		for (Plugin *p : gPlugins) {
-			if (p->slug == pluginSlug) {
-				plugin = p;
+		Manufacturer *manufacturer = NULL;
+		for (Manufacturer *m : gManufacturers) {
+			if (m->slug == pluginSlug) {
+				manufacturer = m;
 				break;
 			}
 		}
-		if (!plugin) {
+		if (!manufacturer) {
 			message += stringf("Could not find plugin \"%s\" for module \"%s\".\n", pluginSlug, modelSlug);
 			continue;
 		}
 
 		// Get for model
 		Model *model = NULL;
-		for (Model *m : plugin->models) {
+		for (Model *m : manufacturer->models) {
 			if (m->slug == modelSlug) {
 				model = m;
 				break;
@@ -388,13 +388,13 @@ struct UrlItem : MenuItem {
 	}
 };
 
-struct AddPluginMenuItem : MenuItem {
-	Plugin *plugin;
+struct AddManufacturerMenuItem : MenuItem {
+	Manufacturer *manufacturer;
 	Vec modulePos;
 	Menu *createChildMenu() override {
 		// Model items
 		Menu *menu = new Menu();
-		for (Model *model : plugin->models) {
+		for (Model *model : manufacturer->models) {
 			AddModuleMenuItem *item = new AddModuleMenuItem();
 			item->text = model->name;
 			item->model = model;
@@ -409,34 +409,34 @@ struct AddPluginMenuItem : MenuItem {
 		}
 		{
 			MenuLabel *label = new MenuLabel();
-			label->text = plugin->name;
+			label->text = manufacturer->name;
 			menu->pushChild(label);
 		}
 
-		if (!plugin->homepageUrl.empty()) {
+		if (!manufacturer->homepageUrl.empty()) {
 			UrlItem *item = new UrlItem();
 			item->text = "Homepage";
-			item->url = plugin->homepageUrl;
+			item->url = manufacturer->homepageUrl;
 			menu->pushChild(item);
 		}
 
-		if (!plugin->manualUrl.empty()) {
+		if (!manufacturer->manualUrl.empty()) {
 			UrlItem *item = new UrlItem();
 			item->text = "Manual";
-			item->url = plugin->manualUrl;
+			item->url = manufacturer->manualUrl;
 			menu->pushChild(item);
 		}
 
-		if (!plugin->path.empty()) {
+		if (!manufacturer->path.empty()) {
 			UrlItem *item = new UrlItem();
 			item->text = "Browse directory";
-			item->url = plugin->path;
+			item->url = manufacturer->path;
 			menu->pushChild(item);
 		}
 
-		if (!plugin->version.empty()) {
+		if (!manufacturer->version.empty()) {
 			MenuLabel *item = new MenuLabel();
-			item->text = "Version: v" + plugin->version;
+			item->text = "Version: v" + manufacturer->version;
 			menu->pushChild(item);
 		}
 
@@ -452,10 +452,10 @@ void RackWidget::onMouseDownOpaque(int button) {
 		MenuLabel *menuLabel = new MenuLabel();
 		menuLabel->text = "Add module";
 		menu->pushChild(menuLabel);
-		for (Plugin *plugin : gPlugins) {
-			AddPluginMenuItem *item = new AddPluginMenuItem();
-			item->text = plugin->name;
-			item->plugin = plugin;
+		for (Manufacturer *manufacturer : gManufacturers) {
+			AddManufacturerMenuItem *item = new AddManufacturerMenuItem();
+			item->text = manufacturer->name;
+			item->manufacturer = manufacturer;
 			item->modulePos = modulePos;
 			menu->pushChild(item);
 		}

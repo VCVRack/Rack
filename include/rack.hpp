@@ -18,7 +18,7 @@ namespace rack {
 ////////////////////
 
 template <class TModuleWidget>
-Model *createModel(Plugin *plugin, std::string slug, std::string name) {
+Model *createModel(std::string slug, std::string name) {
 	struct TModel : Model {
 		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
@@ -27,13 +27,8 @@ Model *createModel(Plugin *plugin, std::string slug, std::string name) {
 		}
 	};
 	Model *model = new TModel();
-	model->plugin = plugin;
 	model->slug = slug;
 	model->name = name;
-	// Create bi-directional association between the Plugin and Model
-	if (plugin) {
-		plugin->models.push_back(model);
-	}
 	return model;
 }
 
