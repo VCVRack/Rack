@@ -26,6 +26,7 @@ struct Plugin {
 	/** Optional metadata for the Add Module context menu */
 	std::string homepageUrl;
 	std::string manualUrl;
+	std::string version;
 };
 
 struct Model {
