@@ -51,7 +51,9 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		addBaseJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			json_object_set_new(rootJ, ("ccNum" + std::to_string(i)).c_str(), json_integer(ccNum[i]));
-			json_object_set_new(rootJ, ("ccVal" + std::to_string(i)).c_str(), json_integer(cc[i]));
+			if(outputs[i].active){
+				json_object_set_new(rootJ, ("ccVal" + std::to_string(i)).c_str(), json_integer(cc[i]));
+			}
 		}
 		return rootJ;
 	}
@@ -65,7 +67,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 				ccNumInited[i] = true;
 			}
 
-			json_t *ccValJ = json_object_get(rootJ, ("ccNum" + std::to_string(i)).c_str());
+			json_t *ccValJ = json_object_get(rootJ, ("ccVal" + std::to_string(i)).c_str());
 			if (ccValJ) {
 				cc[i] = json_integer_value(ccValJ);
 				ccSync[i] = false;
@@ -195,16 +197,19 @@ void CCTextField::onMouseLeave() {
 void CCTextField::onTextChange() {
 	if (text.size() > 0) {
 		try {
-			if (*ccNum != std::stoi(text)) {
-				*ccSync = false;
-			}
 			*ccNum = std::stoi(text);
 			// Only allow valid cc numbers
 			if (*ccNum < 0 || *ccNum > 127 || text.size() > 3) {
 				text = "";
 				begin = end = 0;
 				*ccNum = -1;
+				return;
 			}
+
+			if (!*inited && *ccNum != std::stoi(text)) {
+				*ccSync = false;
+			}
+
 		} catch (...) {
 			text = "";
 			begin = end = 0;
