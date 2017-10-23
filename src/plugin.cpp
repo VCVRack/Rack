@@ -28,7 +28,7 @@
 
 namespace rack {
 
-std::list<Manufacturer*> gManufacturers;
+std::list<Plugin*> gPlugins;
 std::string gToken;
 
 static bool isDownloading = false;
@@ -38,15 +38,15 @@ static std::string loginStatus;
 
 
 
-Manufacturer::~Manufacturer() {
+Plugin::~Plugin() {
 	for (Model *model : models) {
 		delete model;
 	}
 }
 
-void Manufacturer::addModel(Model *model) {
-	assert(!model->manufacturer);
-	model->manufacturer = this;
+void Plugin::addModel(Model *model) {
+	assert(!model->plugin);
+	model->plugin = this;
 	models.push_back(model);
 }
 
@@ -78,7 +78,7 @@ static int loadPlugin(std::string path) {
 #endif
 
 	// Call plugin's init() function
-	typedef void (*InitCallback)(Manufacturer *);
+	typedef void (*InitCallback)(Plugin *);
 	InitCallback initCallback;
 #if ARCH_WIN
 	initCallback = (InitCallback) GetProcAddress(handle, "init");
@@ -90,19 +90,14 @@ static int loadPlugin(std::string path) {
 		return -2;
 	}
 
-	// Construct and initialize Manufacturer instance
-	Manufacturer *manufacturer = new Manufacturer();
-	manufacturer->path = path;
-	manufacturer->handle = handle;
-	initCallback(manufacturer);
+	// Construct and initialize Plugin instance
+	Plugin *plugin = new Plugin();
+	plugin->path = path;
+	plugin->handle = handle;
+	initCallback(plugin);
 
-	// Check that this is a unique slug
-	for (Manufacturer *otherManufacturer : gManufacturers) {
-		assert(manufacturer->slug != otherManufacturer->slug);
-	}
-
-	// Add manufacturer to list
-	gManufacturers.push_back(manufacturer);
+	// Add plugin to list
+	gPlugins.push_back(plugin);
 	fprintf(stderr, "Loaded plugin %s\n", libraryFilename.c_str());
 	return 0;
 }
@@ -200,13 +195,6 @@ static void refreshPurchase(json_t *pluginJ) {
 	url += "&token=";
 	url += gToken;
 
-	// Find slug in plugins list, and return silently if slug already exists
-	for (Manufacturer *m : gManufacturers) {
-		if (m->slug == slug) {
-			return;
-		}
-	}
-
 	// If plugin is not loaded, download the zip file to /plugins
 	downloadName = name;
 	downloadProgress = 0.0;
@@ -237,9 +225,9 @@ static void refreshPurchase(json_t *pluginJ) {
 void pluginInit() {
 	// Load core
 	// This function is defined in core.cpp
-	Manufacturer *coreManufacturer = new Manufacturer();
+	Plugin *coreManufacturer = new Plugin();
 	init(coreManufacturer);
-	gManufacturers.push_back(coreManufacturer);
+	gPlugins.push_back(coreManufacturer);
 
 	// Load plugins from global directory
 	std::string globalPlugins = assetGlobal("plugins");
@@ -248,27 +236,29 @@ void pluginInit() {
 
 	// Load plugins from local directory
 	std::string localPlugins = assetLocal("plugins");
-	mkdir(localPlugins.c_str(), 0755);
-	printf("Loading plugins from %s\n", localPlugins.c_str());
-	if (globalPlugins != localPlugins)
+	if (globalPlugins != localPlugins) {
+		mkdir(localPlugins.c_str(), 0755);
+		printf("Loading plugins from %s\n", localPlugins.c_str());
 		loadPlugins(localPlugins);
+	}
 }
 
 void pluginDestroy() {
-	for (Manufacturer *manufacturer : gManufacturers) {
+	for (Plugin *plugin : gPlugins) {
 		// Free library handle
 #if ARCH_WIN
-		if (manufacturer->handle)
-			FreeLibrary((HINSTANCE)manufacturer->handle);
+		if (plugin->handle)
+			FreeLibrary((HINSTANCE)plugin->handle);
 #elif ARCH_LIN || ARCH_MAC
-		if (manufacturer->handle)
-			dlclose(manufacturer->handle);
+		if (plugin->handle)
+			dlclose(plugin->handle);
 #endif
 
-		// For some reason this segfaults
-		// delete manufacturer;
+		// For some reason this segfaults.
+		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
+		// delete plugin;
 	}
-	gManufacturers.clear();
+	gPlugins.clear();
 }
 
 void pluginLogIn(std::string email, std::string password) {

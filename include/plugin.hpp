@@ -10,41 +10,42 @@ struct ModuleWidget;
 struct Model;
 
 // Subclass this and return a pointer to a new one when init() is called
-struct Manufacturer {
-	/** A list of the models available by this manufacturer, add with addModel() */
+struct Plugin {
+	/** A list of the models available by this plugin, add with addModel() */
 	std::list<Model*> models;
-	/** The file path of the plugins directory */
+	/** The file path of the plugin's directory */
 	std::string path;
 	/** OS-dependent library handle */
 	void *handle = NULL;
 
-	// You may set everything below this point in your plugin
-
-	/** A unique identifier for the manufacturer, e.g. "foo" */
+	/** Used when syncing plugins with the API */
 	std::string slug;
-	/** Human readable name for the manufacturer, e.g. "Foo Modular" */
-	std::string name;
-	/** Optional metadata for the Add Module context menu */
-	std::string homepageUrl;
-	std::string manualUrl;
+	/** The version of your plugin
+	Plugins should follow the versioning scheme described at https://github.com/VCVRack/Rack/issues/266
+	Do not include the "v" in "v1.0" for example.
+	*/
 	std::string version;
 
-	virtual ~Manufacturer();
+	virtual ~Plugin();
 	void addModel(Model *model);
 };
 
 struct Model {
-	Manufacturer *manufacturer = NULL;
-	/** A unique identifier for the model, e.g. "VCO" */
+	Plugin *plugin = NULL;
+	/** An identifier for the model, e.g. "VCO". Used for saving patches. The slug, manufacturerSlug pair must be unique. */
 	std::string slug;
 	/** Human readable name for your model, e.g. "Voltage Controlled Oscillator" */
 	std::string name;
+	/** An identifier for the manufacturer, e.g. "foo". Used for saving patches. */
+	std::string manufacturerSlug;
+	/** Human readable name for the manufacturer, e.g. "Foo Modular" */
+	std::string manufacturerName;
 
 	virtual ~Model() {}
 	virtual ModuleWidget *createModuleWidget() { return NULL; }
 };
 
-extern std::list<Manufacturer*> gManufacturers;
+extern std::list<Plugin*> gPlugins;
 extern std::string gToken;
 
 void pluginInit();
@@ -66,8 +67,8 @@ std::string pluginGetLoginStatus();
 // Implemented by plugin
 ////////////////////
 
-/** Called once to initialize and return the Manufacturer instance.
+/** Called once to initialize and return the Plugin instance.
 You must implement this in your plugin
 */
 extern "C"
-void init(rack::Manufacturer *manufacturer);
+void init(rack::Plugin *plugin);

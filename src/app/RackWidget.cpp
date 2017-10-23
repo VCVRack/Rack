@@ -1,12 +1,13 @@
-#include <map>
-#include <algorithm>
-#include <thread>
 #include "app.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
 #include "gui.hpp"
 #include "settings.hpp"
 #include "asset.hpp"
+#include <map>
+#include <algorithm>
+#include <thread>
+#include <set>
 #include "../ext/osdialog/osdialog.h"
 
 
@@ -200,36 +201,29 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t moduleId;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
-		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
-		if (!pluginSlugJ) continue;
+		json_t *manufacturerSlugJ = json_object_get(moduleJ, "manufacturer");
+		if (!manufacturerSlugJ) {
+			// Backward compatibility with Rack v0.4 and lower
+			manufacturerSlugJ = json_object_get(moduleJ, "plugin");
+			if (!manufacturerSlugJ) continue;
+		}
 		json_t *modelSlugJ = json_object_get(moduleJ, "model");
 		if (!modelSlugJ) continue;
-		const char *pluginSlug = json_string_value(pluginSlugJ);
-		const char *modelSlug = json_string_value(modelSlugJ);
+		std::string manufacturerSlug = json_string_value(manufacturerSlugJ);
+		std::string modelSlug = json_string_value(modelSlugJ);
 
-		// Search for plugin
-		Manufacturer *manufacturer = NULL;
-		for (Manufacturer *m : gManufacturers) {
-			if (m->slug == pluginSlug) {
-				manufacturer = m;
-				break;
-			}
-		}
-		if (!manufacturer) {
-			message += stringf("Could not find plugin \"%s\" for module \"%s\".\n", pluginSlug, modelSlug);
-			continue;
-		}
-
-		// Get for model
+		// Search for model
 		Model *model = NULL;
-		for (Model *m : manufacturer->models) {
-			if (m->slug == modelSlug) {
-				model = m;
-				break;
+		for (Plugin *plugin : gPlugins) {
+			for (Model *m : plugin->models) {
+				if (m->manufacturerSlug == manufacturerSlug && m->slug == modelSlug) {
+					model = m;
+				}
 			}
 		}
+
 		if (!model) {
-			message += stringf("Could not find module \"%s\" in plugin \"%s\".\n", modelSlug, pluginSlug);
+			message += stringf("Could not find \"%s %s\" module\n", manufacturerSlug.c_str(), modelSlug.c_str());
 			continue;
 		}
 
@@ -389,12 +383,22 @@ struct UrlItem : MenuItem {
 };
 
 struct AddManufacturerMenuItem : MenuItem {
-	Manufacturer *manufacturer;
+	std::string manufacturerName;
 	Vec modulePos;
 	Menu *createChildMenu() override {
+		// Collect models which have this manufacturer name
+		std::set<Model*> models;
+		for (Plugin *plugin : gPlugins) {
+			for (Model *model : plugin->models) {
+				if (model->manufacturerName == manufacturerName) {
+					models.insert(model);
+				}
+			}
+		}
+
 		// Model items
 		Menu *menu = new Menu();
-		for (Model *model : manufacturer->models) {
+		for (Model *model : models) {
 			AddModuleMenuItem *item = new AddModuleMenuItem();
 			item->text = model->name;
 			item->model = model;
@@ -403,42 +407,44 @@ struct AddManufacturerMenuItem : MenuItem {
 		}
 
 		// Metadata items
+		/*
 		{
 			MenuLabel *label = new MenuLabel();
 			menu->pushChild(label);
 		}
 		{
 			MenuLabel *label = new MenuLabel();
-			label->text = manufacturer->name;
+			label->text = plugin->name;
 			menu->pushChild(label);
 		}
 
-		if (!manufacturer->homepageUrl.empty()) {
+		if (!plugin->homepageUrl.empty()) {
 			UrlItem *item = new UrlItem();
 			item->text = "Homepage";
-			item->url = manufacturer->homepageUrl;
+			item->url = plugin->homepageUrl;
 			menu->pushChild(item);
 		}
 
-		if (!manufacturer->manualUrl.empty()) {
+		if (!plugin->manualUrl.empty()) {
 			UrlItem *item = new UrlItem();
 			item->text = "Manual";
-			item->url = manufacturer->manualUrl;
+			item->url = plugin->manualUrl;
 			menu->pushChild(item);
 		}
 
-		if (!manufacturer->path.empty()) {
+		if (!plugin->path.empty()) {
 			UrlItem *item = new UrlItem();
 			item->text = "Browse directory";
-			item->url = manufacturer->path;
+			item->url = plugin->path;
 			menu->pushChild(item);
 		}
 
-		if (!manufacturer->version.empty()) {
+		if (!plugin->version.empty()) {
 			MenuLabel *item = new MenuLabel();
-			item->text = "Version: v" + manufacturer->version;
+			item->text = "Version: v" + plugin->version;
 			menu->pushChild(item);
 		}
+		*/
 
 		return menu;
 	}
@@ -452,10 +458,18 @@ void RackWidget::onMouseDownOpaque(int button) {
 		MenuLabel *menuLabel = new MenuLabel();
 		menuLabel->text = "Add module";
 		menu->pushChild(menuLabel);
-		for (Manufacturer *manufacturer : gManufacturers) {
+		// Collect manufacturer names
+		std::set<std::string> manufacturerNames;
+		for (Plugin *plugin : gPlugins) {
+			for (Model *model : plugin->models) {
+				manufacturerNames.insert(model->manufacturerName);
+			}
+		}
+		// Add menu item for each manufacturer name
+		for (std::string manufacturerName : manufacturerNames) {
 			AddManufacturerMenuItem *item = new AddManufacturerMenuItem();
-			item->text = manufacturer->name;
-			item->manufacturer = manufacturer;
+			item->text = manufacturerName;
+			item->manufacturerName = manufacturerName;
 			item->modulePos = modulePos;
 			menu->pushChild(item);
 		}

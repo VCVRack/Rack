@@ -88,10 +88,10 @@ std::string assetLocal(std::string filename) {
 	return path;
 }
 
-std::string assetManufacturer(Manufacturer *manufacturer, std::string filename) {
-	assert(manufacturer);
+std::string assetPlugin(Plugin *plugin, std::string filename) {
+	assert(plugin);
 	std::string path;
-	path = manufacturer->path + "/" + filename;
+	path = plugin->path + "/" + filename;
 	return path;
 }
 
