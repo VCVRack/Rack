@@ -377,7 +377,7 @@ QuadMidiToCVWidget::QuadMidiToCVWidget() {
 		label->text = "4";
 		addChild(label);
 	}
-	std::string labels[4] = {"1V/Oct", "Gate", "Vel", "At"};
+	std::string labels[4] = {"1V/oct", "Gate", "Velocity", "Aftertouch"};
 
 	yPos += labelHeight + margin * 2;
 	for (int i = 0; i < 4; i++) {
