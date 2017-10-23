@@ -14,7 +14,7 @@
 
 namespace rack {
 
-float sampleRate;
+float sampleRate = 0.0;
 bool gPaused = false;
 
 
@@ -33,10 +33,16 @@ static int smoothParamId;
 static float smoothValue;
 
 
+void Light::setSmooth(float v) {
+	value += (v - value) / sampleRate * 60.0;
+}
+
+
 void Wire::step() {
 	float value = outputModule->outputs[outputId].value;
 	inputModule->inputs[inputId].value = value;
 }
+
 
 void engineInit() {
 	engineSetSampleRate(44100.0);

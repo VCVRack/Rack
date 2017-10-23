@@ -28,7 +28,7 @@ static void checkVersion() {
 
 
 RackScene::RackScene() {
-	scrollWidget = new ScrollWidget();
+	scrollWidget = new RackScrollWidget();
 	{
 		zoomWidget = new ZoomWidget();
 		zoomWidget->zoom = 1.0;

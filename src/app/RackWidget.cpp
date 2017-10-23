@@ -396,6 +396,9 @@ struct AddManufacturerMenuItem : MenuItem {
 			}
 		}
 
+		if (models.empty())
+			return NULL;
+
 		// Model items
 		Menu *menu = new Menu();
 		for (Model *model : models) {
@@ -455,9 +458,14 @@ void RackWidget::onMouseDownOpaque(int button) {
 		Vec modulePos = gMousePos.minus(getAbsolutePos());
 		Menu *menu = gScene->createMenu();
 
-		MenuLabel *menuLabel = new MenuLabel();
-		menuLabel->text = "Add module";
-		menu->pushChild(menuLabel);
+		menu->pushChild(construct<MenuLabel>(&MenuLabel::text, "Add module"));
+
+		// TODO make functional
+		TextField *searchField = construct<TextField>();
+		menu->pushChild(searchField);
+		// Focus search field
+		gFocusedWidget = searchField;
+
 		// Collect manufacturer names
 		std::set<std::string> manufacturerNames;
 		for (Plugin *plugin : gPlugins) {

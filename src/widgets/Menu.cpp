@@ -42,6 +42,8 @@ void Menu::draw(NVGcontext *vg) {
 	// Resize the width to the widest child
 	for (Widget *child : children) {
 		MenuEntry *menuEntry = dynamic_cast<MenuEntry*>(child);
+		if (!menuEntry)
+			continue;
 		float width = menuEntry->computeMinWidth(vg);
 		if (width > box.size.x) {
 			box.size.x = width;

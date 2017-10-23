@@ -382,7 +382,6 @@ struct ScrollWidget : OpaqueWidget {
 
 	ScrollWidget();
 	void step() override;
-	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
 	bool onScrollOpaque(Vec scrollRel) override;
 };
 

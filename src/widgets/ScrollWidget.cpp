@@ -32,26 +32,30 @@ void ScrollWidget::step() {
 	// Update the container's positions from the offset
 	container->box.pos = offset.neg().round();
 
-	Widget::step();
-}
-
-Widget *ScrollWidget::onMouseMove(Vec pos, Vec mouseRel) {
+	// Scroll with arrow keys
 	if (!gFocusedWidget) {
-		const float arrowSpeed = 50.0;
+		float arrowSpeed = 30.0;
+		if (guiIsShiftPressed() && guiIsModPressed())
+			arrowSpeed /= 16.0;
+		else if (guiIsShiftPressed())
+			arrowSpeed *= 4.0;
+		else if (guiIsModPressed())
+			arrowSpeed /= 4.0;
+
 		if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) {
-			offset = offset.minus(Vec(1, 0).mult(arrowSpeed));
+			offset.x -= arrowSpeed;
 		}
 		if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-			offset = offset.minus(Vec(-1, 0).mult(arrowSpeed));
+			offset.x += arrowSpeed;
 		}
 		if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) {
-			offset = offset.minus(Vec(0, 1).mult(arrowSpeed));
+			offset.y -= arrowSpeed;
 		}
 		if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) {
-			offset = offset.minus(Vec(0, -1).mult(arrowSpeed));
+			offset.y += arrowSpeed;
 		}
 	}
-	return OpaqueWidget::onMouseMove(pos, mouseRel);
+	Widget::step();
 }
 
 bool ScrollWidget::onScrollOpaque(Vec scrollRel) {

@@ -29,21 +29,28 @@ struct Output {
 	bool active = false;
 };
 
+struct Light {
+	float value = 0.0;
+	void setSmooth(float v);
+};
+
 
 struct Module {
 	std::vector<Param> params;
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;
+	std::vector<Light> lights;
 	/** For CPU usage meter */
 	float cpuTime = 0.0;
 
 	/** Deprecated, use constructor below this one */
 	Module() {}
 	/** Constructs Module with a fixed number of params, inputs, and outputs */
-	Module(int numParams, int numInputs, int numOutputs) {
+	Module(int numParams, int numInputs, int numOutputs, int numLights = 0) {
 		params.resize(numParams);
 		inputs.resize(numInputs);
 		outputs.resize(numOutputs);
+		lights.resize(numLights);
 	}
 	virtual ~Module() {}
 

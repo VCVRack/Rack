@@ -164,7 +164,7 @@ struct CircularShadow : TransparentWidget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct Light : TransparentWidget {
+struct LightWidget : TransparentWidget {
 	NVGcolor bgColor = nvgRGBf(0, 0, 0);
 	NVGcolor color = nvgRGBf(1, 1, 1);
 	void draw(NVGcontext *vg) override;
@@ -324,6 +324,10 @@ struct PluginManagerWidget : Widget {
 	Widget *manageWidget;
 	Widget *downloadWidget;
 	PluginManagerWidget();
+	void step() override;
+};
+
+struct RackScrollWidget : ScrollWidget {
 	void step() override;
 };
 

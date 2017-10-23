@@ -4,7 +4,7 @@
 namespace rack {
 
 
-void Light::draw(NVGcontext *vg) {
+void LightWidget::draw(NVGcontext *vg) {
 	float radius = box.size.x / 2.0;
 	float oradius = radius + 20.0;
 

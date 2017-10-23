@@ -432,10 +432,10 @@ struct CL1362Port : SVGPort {
 };
 
 ////////////////////
-// LEDs
+// Lights
 ////////////////////
 
-struct ValueLight : Light {
+struct ValueLight : LightWidget {
 	float *value = NULL;
 	virtual void setValue(float v) {}
 	void step() override {
