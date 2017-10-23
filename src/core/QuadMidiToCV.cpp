@@ -32,12 +32,12 @@ struct QuadMIDIToCVInterface : MidiIO, Module {
 	enum Modes {
 		ROTATE,
 		RESET,
-		REASIGN
+		REASSIGN
 	};
 
 	bool pedal = false;
 
-	int mode = REASIGN;
+	int mode = REASSIGN;
 
 	int getMode() const;
 
@@ -185,69 +185,50 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 			if (activeKeys[i].pitch == data1) {
 				activeKeys[i].gate = false;
 				activeKeys[i].vel = data2;
+				if (std::find(open.begin(), open.end(), i) != open.end()) {
+					open.remove(i);
+				}
 				open.push_front(i);
 			}
 		}
 		return;
 	}
 
+	if (open.empty()) {
+		open.clear();
+		for (int i = 0; i < 4; i++) {
+			open.push_back(i);
+		}
+	}
+
+
+	if (!activeKeys[0].gate && !activeKeys[1].gate &&
+		!activeKeys[2].gate && !activeKeys[3].gate) {
+		open.sort();
+	}
+
 	switch (mode) {
 		case RESET:
-		case REASIGN:
-			for (int i = 0; i < 4; i++) {
-				if (activeKeys[i].gate == false && std::find(open.begin(), open.end(), i) == open.end()) {
+			if (open.size() == 4 ) {
+				for (int i = 0; i < 4; i++) {
+					activeKeys[i].gate = false;
 					open.push_back(i);
 				}
 			}
-
-			if (open.size() == 4) {
-				open.sort();
-			}
-
+			break;
+		case REASSIGN:
 			open.push_back(open.front());
-
 			break;
 		case ROTATE:
-			if (open.empty()) {
-				for (int i = 0; i < 4; i++) {
-					open.push_back(i);
-				}
-			} else {
-				open.sort();
-			}
 			break;
 		default:
 			fprintf(stderr, "No mode selected?!\n");
 	}
 
-	activeKeys[open.
-
-			front()
-
-	].
-			gate = true;
-	activeKeys[open.
-
-			front()
-
-	].
-			pitch = data1;
-	activeKeys[open.
-
-			front()
-
-	].
-			vel = data2;
-	fprintf(stderr,
-			"Using No: %d\n", open.
-
-					front()
-
-	);
-	open.
-
-			pop_front();
-
+	activeKeys[open.front()].gate = true;
+	activeKeys[open.front()].pitch = data1;
+	activeKeys[open.front()].vel = data2;
+	open.pop_front();
 	return;
 
 
@@ -273,7 +254,7 @@ struct ModeItem : MenuItem {
 
 struct ModeChoice : ChoiceButton {
 	QuadMIDIToCVInterface *module;
-	const std::vector<std::string> modeNames = {"ROTATE",  "RESET", "REASSIGN"};
+	const std::vector<std::string> modeNames = {"ROTATE", "RESET", "REASSIGN"};
 
 
 	void onAction() {
@@ -374,35 +355,40 @@ QuadMidiToCVWidget::QuadMidiToCVWidget() {
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "1V/Oct";
+		label->box.pos = Vec(84, yPos);
+		label->text = "1";
 		addChild(label);
 	}
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(67, yPos);
-		label->text = "Gate";
+		label->box.pos = Vec(125, yPos);
+		label->text = "2";
 		addChild(label);
 	}
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(133, yPos);
-		label->text = "Vel";
+		label->box.pos = Vec(164, yPos);
+		label->text = "3";
 		addChild(label);
 	}
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(195, yPos);
-		label->text = "At";
+		label->box.pos = Vec(203, yPos);
+		label->text = "4";
 		addChild(label);
 	}
+	std::string labels[4] = {"1V/Oct", "Gate", "Vel", "At"};
 
-	yPos += labelHeight + margin;
+	yPos += labelHeight + margin * 2;
 	for (int i = 0; i < 4; i++) {
-		addOutput(createOutput<PJ3410Port>(Vec(0 * (63) + 15, yPos + 5), module, i));
-		addOutput(createOutput<PJ3410Port>(Vec(1 * (63) + 10, yPos + 5), module, i + 4));
-		addOutput(createOutput<PJ3410Port>(Vec(2 * (63) + 10, yPos + 5), module, i + 8));
-		addOutput(createOutput<PJ3410Port>(Vec(3 * (63) + 5, yPos + 5), module, i + 12));
+		Label *label = new Label();
+		label->box.pos = Vec(margin, yPos);
+		label->text = labels[i];
+		addChild(label);
+		addOutput(createOutput<PJ3410Port>(Vec(2 * (40), yPos - 5), module, i * 4));
+		addOutput(createOutput<PJ3410Port>(Vec(3 * (40), yPos - 5), module, i * 4 + 1));
+		addOutput(createOutput<PJ3410Port>(Vec(4 * (40), yPos - 5), module, i * 4 + 2));
+		addOutput(createOutput<PJ3410Port>(Vec(5 * (40), yPos - 5), module, i * 4 + 3));
 		yPos += 40;
 	}
 
