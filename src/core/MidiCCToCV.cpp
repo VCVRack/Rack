@@ -21,13 +21,19 @@ struct MIDICCToCVInterface : MidiIO, Module {
 
 	int cc[NUM_OUTPUTS];
 	int ccNum[NUM_OUTPUTS];
+	int ccSync[NUM_OUTPUTS];
+	bool ccSyncFirst[NUM_OUTPUTS];
 	bool ccNumInited[NUM_OUTPUTS];
 	bool onFocus[NUM_OUTPUTS];
+	float lights[NUM_OUTPUTS];
+
 
 	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			cc[i] = 0;
 			ccNum[i] = i;
+			ccSync[i] = 0;
+			ccSyncFirst[i] = true;
 			onFocus[i] = false;
 		}
 	}
@@ -46,7 +52,10 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			json_object_set_new(rootJ, std::to_string(i).c_str(), json_integer(ccNum[i]));
+			json_object_set_new(rootJ, ("ccNum" + std::to_string(i)).c_str(), json_integer(ccNum[i]));
+			if (outputs[i].active) {
+				json_object_set_new(rootJ, ("ccVal" + std::to_string(i)).c_str(), json_integer(cc[i]));
+			}
 		}
 		return rootJ;
 	}
@@ -54,10 +63,15 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	void fromJson(json_t *rootJ) {
 		baseFromJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
+			json_t *ccNumJ = json_object_get(rootJ, ("ccNum" + std::to_string(i)).c_str());
 			if (ccNumJ) {
 				ccNum[i] = json_integer_value(ccNumJ);
 				ccNumInited[i] = true;
+			}
+
+			json_t *ccValJ = json_object_get(rootJ, ("ccVal" + std::to_string(i)).c_str());
+			if (ccValJ) {
+				cc[i] = json_integer_value(ccValJ);
 			}
 
 		}
@@ -68,7 +82,6 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	}
 
 };
-
 
 void MIDICCToCVInterface::step() {
 	if (isPortOpen()) {
@@ -83,6 +96,9 @@ void MIDICCToCVInterface::step() {
 	}
 
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
+
+		lights[i] = ccSync[i] / 127.0;
+
 		outputs[i].value = cc[i] / 127.0 * 10.0;
 	}
 }
@@ -90,6 +106,8 @@ void MIDICCToCVInterface::step() {
 void MIDICCToCVInterface::resetMidi() {
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 		cc[i] = 0;
+		ccSync[i] = 0;
+		ccSyncFirst[i] = true;
 	}
 };
 
@@ -108,12 +126,27 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	if (status == 0xb) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (onFocus[i]) {
-				this->ccNum[i] = data1;
+				ccSync[i] = true;
+				ccSyncFirst[i] = true;
+				ccNum[i] = data1;
 			}
-		}
-		for (int i = 0; i < NUM_OUTPUTS; i++) {
+
 			if (data1 == ccNum[i]) {
-				this->cc[i] = data2;
+				if (ccSyncFirst[i]) {
+					ccSyncFirst[i] = false;
+
+					if (data2 < cc[i] + 2 && data2 > cc[i] - 2) {
+						ccSync[i] = 0;
+					} else {
+						ccSync[i] = absi(data2 - cc[i]);
+					}
+				}
+
+				if (ccSync[i] == 0) {
+					cc[i] = data2;
+				} else {
+					ccSync[i] = absi(data2 - cc[i]);
+				}
 			}
 		}
 	}
@@ -130,21 +163,21 @@ struct CCTextField : TextField {
 
 	void onMouseLeave();
 
-	int *ccNum;
-	bool *inited;
-	bool *onFocus;
+	int num;
+
+	MIDICCToCVInterface *module;
 };
 
 void CCTextField::draw(NVGcontext *vg) {
 	/* This is necessary, since the save
 	 * file is loaded after constructing the widget*/
-	if (*inited) {
-		*inited = false;
-		text = std::to_string(*ccNum);
+	if (module->ccNumInited[num]) {
+		module->ccNumInited[num] = false;
+		text = std::to_string(module->ccNum[num]);
 	}
 
-	if (*onFocus) {
-		text = std::to_string(*ccNum);
+	if (module->onFocus[num]) {
+		text = std::to_string(module->ccNum[num]);
 	}
 
 	TextField::draw(vg);
@@ -152,23 +185,24 @@ void CCTextField::draw(NVGcontext *vg) {
 
 void CCTextField::onMouseUpOpaque(int button) {
 	if (button == 1) {
-		*onFocus = false;
+		module->onFocus[num] = false;
 	}
 
 }
 
 void CCTextField::onMouseDownOpaque(int button) {
 	if (button == 1) {
-		*onFocus = true;
+		module->onFocus[num] = true;
 	}
 }
 
 void CCTextField::onMouseLeave() {
-	*onFocus = false;
+	module->onFocus[num] = false;
 }
 
 
 void CCTextField::onTextChange() {
+	int *ccNum = &module->ccNum[num];
 	if (text.size() > 0) {
 		try {
 			*ccNum = std::stoi(text);
@@ -177,7 +211,14 @@ void CCTextField::onTextChange() {
 				text = "";
 				begin = end = 0;
 				*ccNum = -1;
+				return;
 			}
+
+			if (!module->ccNumInited[num] && *ccNum != std::stoi(text)) {
+				module->ccSync[num] = 0;
+				module->ccSyncFirst[num] = true;
+			}
+
 		} catch (...) {
 			text = "";
 			begin = end = 0;
@@ -243,9 +284,8 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 
 	for (int i = 0; i < MIDICCToCVInterface::NUM_OUTPUTS; i++) {
 		CCTextField *ccNumChoice = new CCTextField();
-		ccNumChoice->ccNum = &module->ccNum[i];
-		ccNumChoice->inited = &module->ccNumInited[i];
-		ccNumChoice->onFocus = &module->onFocus[i];
+		ccNumChoice->module = module;
+		ccNumChoice->num = i;
 		ccNumChoice->text = std::to_string(module->ccNum[i]);
 		ccNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		ccNumChoice->box.size.x = 29;
@@ -254,6 +294,8 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 
 		yPos += labelHeight + margin;
 		addOutput(createOutput<PJ3410Port>(Vec((i % 4) * (63) + 10, yPos + 5), module, i));
+		addChild(createValueLight<SmallLight<RedValueLight>>(Vec((i % 4) * (63) + 32, yPos + 5),
+															 &module->lights[i]));
 
 		if ((i + 1) % 4 == 0) {
 			yPos += 47 + margin;
