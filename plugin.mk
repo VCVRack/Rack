@@ -8,21 +8,23 @@ include ../../arch.mk
 
 ifeq ($(ARCH), lin)
 	LDFLAGS += -shared
-	PLUGIN_EXTENSION = so
+	TARGET = plugin.so
 endif
 
 ifeq ($(ARCH), mac)
 	LDFLAGS += -shared -undefined dynamic_lookup
-	PLUGIN_EXTENSION = dylib
+	TARGET = plugin.dylib
 endif
 
 ifeq ($(ARCH), win)
 	LDFLAGS += -shared -L../../ -lRack
-	PLUGIN_EXTENSION = dll
+	TARGET = plugin.dll
 endif
 
 
-clean:
-	rm -rfv build *.$(PLUGIN_EXTENSION) dist
+all: $(TARGET)
 
 include ../../compile.mk
+
+clean:
+	rm -rfv build $(TARGET) dist
