@@ -2,6 +2,7 @@
 #include "gui.hpp"
 #include "util/request.hpp"
 #include "../ext/osdialog/osdialog.h"
+#include <string.h>
 #include <thread>
 
 
@@ -17,7 +18,7 @@ static void checkVersion() {
 		json_t *versionJ = json_object_get(resJ, "version");
 		if (versionJ) {
 			const char *version = json_string_value(versionJ);
-			if (version && version != gApplicationVersion) {
+			if (version && strlen(version) > 0 && version != gApplicationVersion) {
 				newVersion = version;
 			}
 		}
@@ -45,7 +46,7 @@ RackScene::RackScene() {
 	scrollWidget->box.pos.y = gToolbar->box.size.y;
 
 	// Check for new version
-	if (gApplicationVersion != "dev") {
+	if (!gApplicationVersion.empty()) {
 		std::thread versionThread(checkVersion);
 		versionThread.detach();
 	}

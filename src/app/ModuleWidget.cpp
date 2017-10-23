@@ -45,8 +45,8 @@ void ModuleWidget::addParam(ParamWidget *param) {
 json_t *ModuleWidget::toJson() {
 	json_t *rootJ = json_object();
 
-	// plugin
-	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
+	// manufacturer
+	json_object_set_new(rootJ, "manufacturer", json_string(model->manufacturerSlug.c_str()));
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// pos
@@ -245,7 +245,7 @@ Menu *ModuleWidget::createContextMenu() {
 	Menu *menu = gScene->createMenu();
 
 	MenuLabel *menuLabel = new MenuLabel();
-	menuLabel->text = model->plugin->name + ": " + model->name;
+	menuLabel->text = model->manufacturerName + " " + model->name;
 	menu->pushChild(menuLabel);
 
 	ResetMenuItem *resetItem = new ResetMenuItem();

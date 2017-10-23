@@ -1,12 +1,13 @@
-#include <map>
-#include <algorithm>
-#include <thread>
 #include "app.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
 #include "gui.hpp"
 #include "settings.hpp"
 #include "asset.hpp"
+#include <map>
+#include <algorithm>
+#include <thread>
+#include <set>
 #include "../ext/osdialog/osdialog.h"
 
 
@@ -200,36 +201,29 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t moduleId;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
-		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
-		if (!pluginSlugJ) continue;
+		json_t *manufacturerSlugJ = json_object_get(moduleJ, "manufacturer");
+		if (!manufacturerSlugJ) {
+			// Backward compatibility with Rack v0.4 and lower
+			manufacturerSlugJ = json_object_get(moduleJ, "plugin");
+			if (!manufacturerSlugJ) continue;
+		}
 		json_t *modelSlugJ = json_object_get(moduleJ, "model");
 		if (!modelSlugJ) continue;
-		const char *pluginSlug = json_string_value(pluginSlugJ);
-		const char *modelSlug = json_string_value(modelSlugJ);
+		std::string manufacturerSlug = json_string_value(manufacturerSlugJ);
+		std::string modelSlug = json_string_value(modelSlugJ);
 
-		// Search for plugin
-		Plugin *plugin = NULL;
-		for (Plugin *p : gPlugins) {
-			if (p->slug == pluginSlug) {
-				plugin = p;
-				break;
-			}
-		}
-		if (!plugin) {
-			message += stringf("Could not find plugin \"%s\" for module \"%s\".\n", pluginSlug, modelSlug);
-			continue;
-		}
-
-		// Get for model
+		// Search for model
 		Model *model = NULL;
-		for (Model *m : plugin->models) {
-			if (m->slug == modelSlug) {
-				model = m;
-				break;
+		for (Plugin *plugin : gPlugins) {
+			for (Model *m : plugin->models) {
+				if (m->manufacturerSlug == manufacturerSlug && m->slug == modelSlug) {
+					model = m;
+				}
 			}
 		}
+
 		if (!model) {
-			message += stringf("Could not find module \"%s\" in plugin \"%s\".\n", modelSlug, pluginSlug);
+			message += stringf("Could not find \"%s %s\" module\n", manufacturerSlug.c_str(), modelSlug.c_str());
 			continue;
 		}
 
@@ -388,13 +382,23 @@ struct UrlItem : MenuItem {
 	}
 };
 
-struct AddPluginMenuItem : MenuItem {
-	Plugin *plugin;
+struct AddManufacturerMenuItem : MenuItem {
+	std::string manufacturerName;
 	Vec modulePos;
 	Menu *createChildMenu() override {
+		// Collect models which have this manufacturer name
+		std::set<Model*> models;
+		for (Plugin *plugin : gPlugins) {
+			for (Model *model : plugin->models) {
+				if (model->manufacturerName == manufacturerName) {
+					models.insert(model);
+				}
+			}
+		}
+
 		// Model items
 		Menu *menu = new Menu();
-		for (Model *model : plugin->models) {
+		for (Model *model : models) {
 			AddModuleMenuItem *item = new AddModuleMenuItem();
 			item->text = model->name;
 			item->model = model;
@@ -403,6 +407,7 @@ struct AddPluginMenuItem : MenuItem {
 		}
 
 		// Metadata items
+		/*
 		{
 			MenuLabel *label = new MenuLabel();
 			menu->pushChild(label);
@@ -439,6 +444,7 @@ struct AddPluginMenuItem : MenuItem {
 			item->text = "Version: v" + plugin->version;
 			menu->pushChild(item);
 		}
+		*/
 
 		return menu;
 	}
@@ -452,10 +458,18 @@ void RackWidget::onMouseDownOpaque(int button) {
 		MenuLabel *menuLabel = new MenuLabel();
 		menuLabel->text = "Add module";
 		menu->pushChild(menuLabel);
+		// Collect manufacturer names
+		std::set<std::string> manufacturerNames;
 		for (Plugin *plugin : gPlugins) {
-			AddPluginMenuItem *item = new AddPluginMenuItem();
-			item->text = plugin->name;
-			item->plugin = plugin;
+			for (Model *model : plugin->models) {
+				manufacturerNames.insert(model->manufacturerName);
+			}
+		}
+		// Add menu item for each manufacturer name
+		for (std::string manufacturerName : manufacturerNames) {
+			AddManufacturerMenuItem *item = new AddManufacturerMenuItem();
+			item->text = manufacturerName;
+			item->manufacturerName = manufacturerName;
 			item->modulePos = modulePos;
 			menu->pushChild(item);
 		}

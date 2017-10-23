@@ -75,7 +75,7 @@ include compile.mk
 
 dist: all
 ifndef VERSION
-	$(error VERSION must be defined when calling make)
+	$(error VERSION must be defined when making distributables)
 endif
 	rm -rf dist
 	$(MAKE) -C plugins/Fundamental dist

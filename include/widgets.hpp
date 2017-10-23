@@ -399,6 +399,7 @@ struct ZoomWidget : Widget {
 struct TextField : OpaqueWidget {
 	std::string text;
 	std::string placeholder;
+	bool multiline = false;
 	int begin = 0;
 	int end = 0;
 

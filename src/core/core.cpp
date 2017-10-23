@@ -2,15 +2,14 @@
 #include "MidiIO.hpp"
 
 
-void init(rack::Plugin *plugin) {
-	plugin->slug = "Core";
-	plugin->name = "Core";
-	plugin->homepageUrl = "https://vcvrack.com/";
-	createModel<AudioInterfaceWidget>(plugin, "AudioInterface", "Audio Interface");
-	createModel<MidiToCVWidget>(plugin, "MIDIToCVInterface", "MIDI-to-CV Interface");
-	createModel<MIDICCToCVWidget>(plugin, "MIDICCToCVInterface", "MIDI CC-to-CV Interface");
-	createModel<MIDIClockToCVWidget>(plugin, "MIDIClockToCVInterface", "MIDI Clock-to-CV Interface");
-	createModel<MIDITriggerToCVWidget>(plugin, "MIDITriggerToCVInterface", "MIDI Trigger-to-CV Interface");
-	// createModel<BridgeWidget>(plugin, "Bridge", "Bridge");
-	createModel<BlankWidget>(plugin, "Blank", "Blank");
+void init(rack::Plugin *p) {
+	p->slug = "Core";
+	p->addModel(createModel<AudioInterfaceWidget>("Core", "Core", "AudioInterface", "Audio Interface"));
+	p->addModel(createModel<MidiToCVWidget>("Core", "Core", "MIDIToCVInterface", "MIDI-to-CV Interface"));
+	p->addModel(createModel<MIDICCToCVWidget>("Core", "Core", "MIDICCToCVInterface", "MIDI CC-to-CV Interface"));
+	p->addModel(createModel<MIDIClockToCVWidget>("Core", "Core", "MIDIClockToCVInterface", "MIDI Clock-to-CV Interface"));
+	p->addModel(createModel<MIDITriggerToCVWidget>("Core", "Core", "MIDITriggerToCVInterface", "MIDI Trigger-to-CV Interface"));
+	// p->addModel(createModel<BridgeWidget>("Core", "Core", "Bridge", "Bridge"));
+	p->addModel(createModel<BlankWidget>("Core", "Core", "Blank", "Blank"));
+	p->addModel(createModel<NotesWidget>("Core", "Core", "Notes", "Notes"));
 }
