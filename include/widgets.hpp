@@ -288,7 +288,6 @@ struct Menu : OpaqueWidget {
 	// Resizes menu and calls addChild()
 	void pushChild(Widget *child);
 	void setChildMenu(Menu *menu);
-	void fit();
 	void step() override;
 	void draw(NVGcontext *vg) override;
 	bool onScrollOpaque(Vec scrollRel) override;
@@ -300,7 +299,7 @@ struct MenuEntry : OpaqueWidget {
 	MenuEntry() {
 		box.size = Vec(0, BND_WIDGET_HEIGHT);
 	}
-	virtual float computeMinWidth(NVGcontext *vg);
+	void step() override;
 };
 
 struct MenuLabel : MenuEntry {
@@ -308,9 +307,7 @@ struct MenuLabel : MenuEntry {
 };
 
 struct MenuItem : MenuEntry {
-	float computeMinWidth(NVGcontext *vg) override;
 	void draw(NVGcontext *vg) override;
-
 	virtual Menu *createChildMenu() {return NULL;}
 	void onMouseEnter() override;
 	void onDragDrop(Widget *origin) override;

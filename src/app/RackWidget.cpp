@@ -453,6 +453,25 @@ struct AddManufacturerMenuItem : MenuItem {
 	}
 };
 
+struct SearchModuleField : TextField {
+	void onTextChange() override {
+		Menu *parentMenu = getAncestorOfType<Menu>();
+		assert(parentMenu);
+
+		for (Widget *w : parentMenu->children) {
+			AddManufacturerMenuItem *a = dynamic_cast<AddManufacturerMenuItem*>(w);
+			if (!a)
+				continue;
+			if (a->manufacturerName == text) {
+				a->visible = true;
+			}
+			else {
+				a->visible = false;
+			}
+		}
+	}
+};
+
 void RackWidget::onMouseDownOpaque(int button) {
 	if (button == 1) {
 		Vec modulePos = gMousePos.minus(getAbsolutePos());
@@ -460,11 +479,14 @@ void RackWidget::onMouseDownOpaque(int button) {
 
 		menu->pushChild(construct<MenuLabel>(&MenuLabel::text, "Add module"));
 
+		/*
 		// TODO make functional
-		TextField *searchField = construct<TextField>();
+		TextField *searchField = construct<SearchModuleField>();
+		searchField->box.size.x = 100.0;
 		menu->pushChild(searchField);
 		// Focus search field
 		gFocusedWidget = searchField;
+		*/
 
 		// Collect manufacturer names
 		std::set<std::string> manufacturerNames;

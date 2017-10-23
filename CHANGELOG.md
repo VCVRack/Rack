@@ -3,6 +3,8 @@ Tip: Use `git checkout v0.4.0` for example to check out any previous version men
 
 ### dev
 
+- Automatically scroll when dragging cables to the edge of the screen
+
 - Audible Instruments
 	- Added Low CPU mode to Braids for draft-quality rendering
 

@@ -27,35 +27,27 @@ void Menu::setChildMenu(Menu *menu) {
 	}
 }
 
-void Menu::fit() {
+void Menu::step() {
 	// Try to fit into the parent's box
 	if (parent)
 		box = box.clamp(Rect(Vec(0, 0), parent->box.size));
-}
 
-void Menu::step() {
-	fit();
 	Widget::step();
-}
 
-void Menu::draw(NVGcontext *vg) {
 	// Resize the width to the widest child
 	for (Widget *child : children) {
-		MenuEntry *menuEntry = dynamic_cast<MenuEntry*>(child);
-		if (!menuEntry)
-			continue;
-		float width = menuEntry->computeMinWidth(vg);
-		if (width > box.size.x) {
-			box.size.x = width;
+		if (child->box.size.x > box.size.x) {
+			box.size.x = child->box.size.x;
 		}
 	}
 	// Resize widths of children
 	for (Widget *child : children) {
 		child->box.size.x = box.size.x;
 	}
+}
 
+void Menu::draw(NVGcontext *vg) {
 	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
-
 	Widget::draw(vg);
 }
 
@@ -65,7 +57,6 @@ bool Menu::onScrollOpaque(Vec scrollRel) {
 		return true;
 	if (!parent->box.contains(box))
 		box.pos = box.pos.plus(scrollRel);
-	fit();
 	return true;
 }
 
