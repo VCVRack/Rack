@@ -152,3 +152,8 @@ struct MIDITriggerToCVWidget : ModuleWidget {
 	void step();
 };
 
+struct QuadMidiToCVWidget : ModuleWidget {
+	QuadMidiToCVWidget();
+
+	void step();
+};
