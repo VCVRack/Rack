@@ -21,7 +21,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 
 	int cc[NUM_OUTPUTS];
 	int ccNum[NUM_OUTPUTS];
-	bool ccSync[NUM_OUTPUTS];
+	int ccSync[NUM_OUTPUTS];
 	bool ccSyncFirst[NUM_OUTPUTS];
 	bool ccNumInited[NUM_OUTPUTS];
 	bool onFocus[NUM_OUTPUTS];
@@ -32,7 +32,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			cc[i] = 0;
 			ccNum[i] = i;
-			ccSync[i] = true;
+			ccSync[i] = 0;
 			ccSyncFirst[i] = true;
 			onFocus[i] = false;
 		}
@@ -97,7 +97,7 @@ void MIDICCToCVInterface::step() {
 
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 
-		lights[i] = ccSync[i] ? 0.0 : 1.0;
+		lights[i] = ccSync[i] / 127.0;
 
 		outputs[i].value = cc[i] / 127.0 * 10.0;
 	}
@@ -106,6 +106,8 @@ void MIDICCToCVInterface::step() {
 void MIDICCToCVInterface::resetMidi() {
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 		cc[i] = 0;
+		ccSync[i] = 0;
+		ccSyncFirst[i] = true;
 	}
 };
 
@@ -133,16 +135,17 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 				if (ccSyncFirst[i]) {
 					ccSyncFirst[i] = false;
 
-					ccSync[i] = data2 < cc[i]+2 && data2 > cc[i] - 2;
+					if (data2 < cc[i] + 2 && data2 > cc[i] - 2) {
+						ccSync[i] = 0;
+					} else {
+						ccSync[i] = absi(data2 - cc[i]);
+					}
 				}
 
-				if (ccSync[i]) {
+				if (ccSync[i] == 0) {
 					cc[i] = data2;
-				} else if (cc[i] == data2) {
-					ccSync[i] = true;
-					return;
-
-
+				} else {
+					ccSync[i] = absi(data2 - cc[i]);
 				}
 			}
 		}
@@ -212,7 +215,8 @@ void CCTextField::onTextChange() {
 			}
 
 			if (!module->ccNumInited[num] && *ccNum != std::stoi(text)) {
-				module->ccSync[num] = true;
+				module->ccSync[num] = 0;
+				module->ccSyncFirst[num] = true;
 			}
 
 		} catch (...) {
