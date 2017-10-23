@@ -241,7 +241,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(box.size.x - margin - 7 * 15, margin);
-		label->text = "MIDI Clock to CV";
+		label->text = "MIDI Clk-CV";
 		addChild(label);
 		yPos = labelHeight * 2;
 	}

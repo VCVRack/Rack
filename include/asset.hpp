@@ -7,13 +7,13 @@
 namespace rack {
 
 
-/** Searches for a global read-only resource and returns its path, or "" if not found
+/** Returns the path of a global resource. Read-only
 */
 std::string assetGlobal(std::string filename);
-/** Searches for a local resource
+/** Returns the path of a local resource. Read/write
 */
 std::string assetLocal(std::string filename);
-/** Searches for a plugin resource, given a Plugin object
+/** Returns the path of a resource in the plugin's folder. Read-only
 */
 std::string assetPlugin(Plugin *plugin, std::string filename);
 

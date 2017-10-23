@@ -44,6 +44,13 @@ Plugin::~Plugin() {
 	}
 }
 
+void Plugin::addModel(Model *model) {
+	assert(!model->plugin);
+	model->plugin = this;
+	models.push_back(model);
+}
+
+
 static int loadPlugin(std::string path) {
 	std::string libraryFilename;
 #if ARCH_LIN
@@ -70,7 +77,7 @@ static int loadPlugin(std::string path) {
 	}
 #endif
 
-	// Call plugin init() function
+	// Call plugin's init() function
 	typedef void (*InitCallback)(Plugin *);
 	InitCallback initCallback;
 #if ARCH_WIN
@@ -89,19 +96,10 @@ static int loadPlugin(std::string path) {
 	plugin->handle = handle;
 	initCallback(plugin);
 
-	// Check that this is a unique slug
-	for (Plugin *otherPlugin : gPlugins) {
-		assert(plugin->slug != otherPlugin->slug);
-	}
-
 	// Add plugin to list
 	gPlugins.push_back(plugin);
 	fprintf(stderr, "Loaded plugin %s\n", libraryFilename.c_str());
 	return 0;
-}
-
-static bool comparePlugins(Plugin *a, Plugin *b) {
-	return a->slug < b->slug;
 }
 
 static void loadPlugins(std::string path) {
@@ -115,9 +113,6 @@ static void loadPlugins(std::string path) {
 		}
 		closedir(dir);
 	}
-
-	// Sort plugins
-	gPlugins.sort(comparePlugins);
 }
 
 ////////////////////
@@ -200,13 +195,6 @@ static void refreshPurchase(json_t *pluginJ) {
 	url += "&token=";
 	url += gToken;
 
-	// Find slug in plugins list, and return silently if slug already exists
-	for (Plugin *p : gPlugins) {
-		if (p->slug == slug) {
-			return;
-		}
-	}
-
 	// If plugin is not loaded, download the zip file to /plugins
 	downloadName = name;
 	downloadProgress = 0.0;
@@ -237,9 +225,9 @@ static void refreshPurchase(json_t *pluginJ) {
 void pluginInit() {
 	// Load core
 	// This function is defined in core.cpp
-	Plugin *corePlugin = new Plugin();
-	init(corePlugin);
-	gPlugins.push_back(corePlugin);
+	Plugin *coreManufacturer = new Plugin();
+	init(coreManufacturer);
+	gPlugins.push_back(coreManufacturer);
 
 	// Load plugins from global directory
 	std::string globalPlugins = assetGlobal("plugins");
@@ -248,10 +236,11 @@ void pluginInit() {
 
 	// Load plugins from local directory
 	std::string localPlugins = assetLocal("plugins");
-	mkdir(localPlugins.c_str(), 0755);
-	printf("Loading plugins from %s\n", localPlugins.c_str());
-	if (globalPlugins != localPlugins)
+	if (globalPlugins != localPlugins) {
+		mkdir(localPlugins.c_str(), 0755);
+		printf("Loading plugins from %s\n", localPlugins.c_str());
 		loadPlugins(localPlugins);
+	}
 }
 
 void pluginDestroy() {
@@ -265,7 +254,8 @@ void pluginDestroy() {
 			dlclose(plugin->handle);
 #endif
 
-		// For some reason this segfaults
+		// For some reason this segfaults.
+		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
 		// delete plugin;
 	}
 	gPlugins.clear();

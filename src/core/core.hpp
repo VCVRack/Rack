@@ -26,3 +26,10 @@ struct BlankWidget : ModuleWidget {
 	json_t *toJson() override;
 	void fromJson(json_t *rootJ) override;
 };
+
+struct NotesWidget : ModuleWidget {
+	TextField *textField;
+	NotesWidget();
+	json_t *toJson() override;
+	void fromJson(json_t *rootJ) override;
+};

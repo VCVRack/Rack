@@ -101,6 +101,14 @@ bool TextField::onFocusKey(int key) {
 				}
 			}
 			break;
+		case GLFW_KEY_ENTER:
+			if (multiline) {
+				insertText("\n");
+			}
+			else {
+				onAction();
+			}
+			break;
 	}
 
 	begin = mini(maxi(begin, 0), text.size());

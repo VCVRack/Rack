@@ -42,7 +42,6 @@ DEPS = $(patsubst %, build/%.d, $(SOURCES))
 $(TARGET): $(OBJECTS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-# Object targets
 
 -include $(DEPS)
 

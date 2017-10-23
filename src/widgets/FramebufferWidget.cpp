@@ -42,6 +42,7 @@ void FramebufferWidget::step() {
 		internal->box.size = box.size;
 		internal->box.size = Vec(ceilf(internal->box.size.x), ceilf(internal->box.size.y));
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
+
 		// assert(fbSize.isFinite());
 		// Reject zero area size
 		if (fbSize.x <= 0.0 || fbSize.y <= 0.0)
@@ -71,6 +72,20 @@ void FramebufferWidget::step() {
 }
 
 void FramebufferWidget::draw(NVGcontext *vg) {
+	// {
+	// 	float xform[6];
+	// 	nvgCurrentTransform(vg, xform);
+	// 	printf("%f %f %f %f %f %f\n", xform[0], xform[1], xform[2], xform[3], xform[4], xform[5]);
+	// 	nvgSave(vg);
+	// 	nvgResetTransform(vg);
+	// 	nvgTranslate(vg, xform[5], xform[6]);
+	// 	nvgBeginPath(vg);
+	// 	nvgRect(vg, 0, 0, 50, 50);
+	// 	nvgFillColor(vg, nvgRGBf(1.0, 0.0, 0.0));
+	// 	nvgFill(vg);
+	// 	nvgRestore(vg);
+	// }
+
 	if (!internal->fb) {
 		// Bypass framebuffer cache entirely
 		// Widget::draw(vg);
