@@ -25,5 +25,11 @@ void Slider::onDragEnd() {
 	guiCursorUnlock();
 }
 
+void Slider::onMouseDownOpaque(int button) {
+	if (button == 1) {
+		setValue(defaultValue);
+	}
+}
+
 
 } // namespace rack

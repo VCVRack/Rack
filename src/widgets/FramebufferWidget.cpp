@@ -9,9 +9,16 @@
 namespace rack {
 
 
+/** A margin in pixels around the children in the framebuffer
+This prevents cutting the rendered SVG off on the box edges.
+*/
+static const float oversample = 2.0;
+
+
 struct FramebufferWidget::Internal {
 	NVGLUframebuffer *fb = NULL;
 	Rect box;
+	Vec lastS;
 
 	~Internal() {
 		setFramebuffer(NULL);
@@ -33,10 +40,31 @@ FramebufferWidget::~FramebufferWidget() {
 }
 
 void FramebufferWidget::draw(NVGcontext *vg) {
+	// Bypass framebuffer rendering entirely
+	// Widget::draw(vg);
+	// return;
+
+	// Get world transform
+	float xform[6];
+	nvgCurrentTransform(vg, xform);
+	// Skew is not supported
+	assert(fabsf(xform[1]) < 1e-6);
+	assert(fabsf(xform[2]) < 1e-6);
+	Vec s = Vec(xform[0], xform[3]);
+	Vec b = Vec(xform[4], xform[5]);
+
+	if (gGuiFrame % 10 == 0) {
+		// Check if scale has changed
+		if (s.x != internal->lastS.x || s.y != internal->lastS.y) {
+			dirty = true;
+		}
+		internal->lastS = s;
+	}
+
+	// Render to framebuffer
 	if (dirty) {
 		internal->box.pos = Vec(0, 0);
-		internal->box.size = box.size;
-		internal->box.size = Vec(ceilf(internal->box.size.x), ceilf(internal->box.size.y));
+		internal->box.size = box.size.mult(s).ceil();
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 
 		// assert(fbSize.isFinite());
@@ -60,6 +88,8 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		nvgBeginFrame(gFramebufferVg, fbSize.x, fbSize.y, gPixelRatio * oversample);
 
 		nvgScale(gFramebufferVg, gPixelRatio * oversample, gPixelRatio * oversample);
+		// Use local scaling
+		nvgScale(gFramebufferVg, s.x, s.y);
 		Widget::draw(gFramebufferVg);
 
 		nvgEndFrame(gFramebufferVg);
@@ -72,32 +102,24 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		return;
 	}
 
-	// Draw framebuffer image
+	// Draw framebuffer image, using world coordinates
+	b = b.round();
+	nvgSave(vg);
+	nvgResetTransform(vg);
+	nvgTranslate(vg, b.x, b.y);
+
 	nvgBeginPath(vg);
 	nvgRect(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y);
 	NVGpaint paint = nvgImagePattern(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y, 0.0, internal->fb->image, 1.0);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
 
-	// For debugging bounding box of framebuffer image
-	// nvgFillColor(vg, nvgRGBA(255, 0, 0, 64));
-	// nvgFill(vg);
+	// For debugging the bounding box of the framebuffer
+	// nvgStrokeWidth(vg, 2.0);
+	// nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 128));
+	// nvgStroke(vg);
 
-	{
-		float xform[6];
-		nvgCurrentTransform(vg, xform);
-		// printf("%f %f %f %f; %f %f\n", xform[0], xform[1], xform[2], xform[3], xform[4], xform[5]);
-		nvgSave(vg);
-		nvgResetTransform(vg);
-		nvgTranslate(vg, xform[4], xform[5]);
-		nvgScale(vg, xform[0], xform[3]);
-		nvgBeginPath(vg);
-		nvgRect(vg, 0, 0, internal->box.size.x, internal->box.size.y);
-		nvgStrokeWidth(vg, 2.0);
-		nvgStrokeColor(vg, nvgRGBf(1.0, 0.0, 0.0));
-		nvgStroke(vg);
-		nvgRestore(vg);
-	}
+	nvgRestore(vg);
 }
 
 int FramebufferWidget::getImageHandle() {

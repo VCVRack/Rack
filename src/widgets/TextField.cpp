@@ -18,6 +18,10 @@ void TextField::draw(NVGcontext *vg) {
 		state = BND_DEFAULT;
 
 	bndTextField(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str(), begin, end);
+	// Draw placeholder text
+	if (text.empty() && state != BND_ACTIVE) {
+		bndIconLabelCaret(vg, 0.0, 0.0, box.size.x, box.size.y, -1, bndGetTheme()->textFieldTheme.itemColor, 13, placeholder.c_str(), bndGetTheme()->textFieldTheme.itemColor, 0, -1);
+	}
 }
 
 Widget *TextField::onMouseDown(Vec pos, int button) {

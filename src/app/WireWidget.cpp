@@ -1,6 +1,7 @@
 #include "app.hpp"
 #include "engine.hpp"
 #include "components.hpp"
+#include "gui.hpp"
 
 
 namespace rack {

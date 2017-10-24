@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "gui.hpp"
 
 
 namespace rack {

@@ -27,6 +27,11 @@ static json_t *settingsToJson() {
 	json_t *tensionJ = json_real(tension);
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
+	// zoom
+	float zoom = gToolbar->zoomSlider->value;
+	json_t *zoomJ = json_real(zoom);
+	json_object_set_new(rootJ, "zoom", zoomJ);
+
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_boolean(gAllowCursorLock);
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
@@ -61,6 +66,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
 		gToolbar->wireTensionSlider->value = json_number_value(tensionJ);
+
+	// zoom
+	json_t *zoomJ = json_object_get(rootJ, "zoom");
+	if (zoomJ)
+		gToolbar->zoomSlider->value = json_number_value(zoomJ);
 
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");

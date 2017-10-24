@@ -33,6 +33,8 @@ NVGcontext *gFramebufferVg = NULL;
 std::shared_ptr<Font> gGuiFont;
 float gPixelRatio = 0.0;
 bool gAllowCursorLock = true;
+int gGuiFrame;
+Vec gMousePos;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {

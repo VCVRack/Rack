@@ -31,7 +31,6 @@ RackScene::RackScene() {
 	scrollWidget = new RackScrollWidget();
 	{
 		zoomWidget = new ZoomWidget();
-		zoomWidget->zoom = 0.5;
 		{
 			assert(!gRackWidget);
 			gRackWidget = new RackWidget();
@@ -62,6 +61,9 @@ void RackScene::step() {
 		.minus(scrollWidget->container->box.pos)
 		.plus(Vec(500, 500))
 		.div(zoomWidget->zoom);
+
+	// Set zoom from the toolbar's zoom slider
+	zoomWidget->zoom = gToolbar->zoomSlider->value / 100.0;
 
 	Scene::step();
 
