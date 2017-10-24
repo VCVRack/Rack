@@ -53,18 +53,16 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	Vec s = Vec(xform[0], xform[3]);
 	Vec b = Vec(xform[4], xform[5]);
 
-	if (gGuiFrame % 10 == 0) {
-		// Check if scale has changed
-		if (s.x != internal->lastS.x || s.y != internal->lastS.y) {
-			dirty = true;
-		}
-		internal->lastS = s;
+	// Check if scale has changed
+	if (s.x != internal->lastS.x || s.y != internal->lastS.y) {
+		dirty = true;
 	}
+	internal->lastS = s;
 
 	// Render to framebuffer
 	if (dirty) {
 		internal->box.pos = Vec(0, 0);
-		internal->box.size = box.size.mult(s).ceil();
+		internal->box.size = box.size.mult(s).ceil().plus(Vec(1, 1));
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 
 		// assert(fbSize.isFinite());
@@ -89,6 +87,8 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 
 		nvgScale(gFramebufferVg, gPixelRatio * oversample, gPixelRatio * oversample);
 		// Use local scaling
+		Vec bFrac = Vec(fmodf(b.x, 1.0), fmodf(b.y, 1.0));
+		nvgTranslate(gFramebufferVg, bFrac.x, bFrac.y);
 		nvgScale(gFramebufferVg, s.x, s.y);
 		Widget::draw(gFramebufferVg);
 
@@ -103,7 +103,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	}
 
 	// Draw framebuffer image, using world coordinates
-	b = b.round();
+	b = b.floor();
 	nvgSave(vg);
 	nvgResetTransform(vg);
 	nvgTranslate(vg, b.x, b.y);
