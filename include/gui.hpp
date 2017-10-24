@@ -17,9 +17,12 @@ namespace rack {
 
 extern GLFWwindow *gWindow;
 extern NVGcontext *gVg;
+extern NVGcontext *gFramebufferVg;
 extern std::shared_ptr<Font> gGuiFont;
 extern float gPixelRatio;
 extern bool gAllowCursorLock;
+extern int gGuiFrame;
+extern Vec gMousePos;
 
 
 void guiInit();

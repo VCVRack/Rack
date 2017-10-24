@@ -216,10 +216,6 @@ Events are not passed to the underlying scene.
 struct FramebufferWidget : virtual Widget {
 	/** Set this to true to re-render the children to the framebuffer in the next step() override */
 	bool dirty = true;
-	/** A margin in pixels around the children in the framebuffer
-	This prevents cutting the rendered SVG off on the box edges.
-	*/
-	float oversample = 2.0;
 	/** The root object in the framebuffer scene
 	The FramebufferWidget owns the pointer
 	*/
@@ -228,7 +224,6 @@ struct FramebufferWidget : virtual Widget {
 
 	FramebufferWidget();
 	~FramebufferWidget();
-	void step() override;
 	void draw(NVGcontext *vg) override;
 	int getImageHandle();
 };
@@ -354,6 +349,7 @@ struct Slider : OpaqueWidget, QuantityWidget {
 	void onDragStart() override;
 	void onDragMove(Vec mouseRel) override;
 	void onDragEnd() override;
+	void onMouseDownOpaque(int button) override;
 };
 
 /** Parent must be a ScrollWidget */
@@ -439,12 +435,10 @@ struct Scene : OpaqueWidget {
 // globals
 ////////////////////
 
-extern Vec gMousePos;
 extern Widget *gHoveredWidget;
 extern Widget *gDraggedWidget;
 extern Widget *gDragHoveredWidget;
 extern Widget *gFocusedWidget;
-extern int gGuiFrame;
 
 extern Scene *gScene;
 

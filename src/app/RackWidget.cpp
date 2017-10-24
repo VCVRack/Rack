@@ -189,9 +189,9 @@ void RackWidget::fromJson(json_t *rootJ) {
 	// version
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
-		const char *version = json_string_value(versionJ);
-		if (gApplicationVersion != version)
-			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version, gApplicationVersion.c_str());
+		std::string version = json_string_value(versionJ);
+		if (!version.empty() && gApplicationVersion != version)
+			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version.c_str(), gApplicationVersion.empty() ? "dev" : gApplicationVersion.c_str());
 	}
 
 	// modules
@@ -404,6 +404,9 @@ struct AddManufacturerMenuItem : MenuItem {
 		for (Model *model : models) {
 			AddModuleMenuItem *item = new AddModuleMenuItem();
 			item->text = model->name;
+			// item->rightText = model->plugin->slug;
+			// if (!model->plugin->version.empty())
+			// 	item->rightText += " v" + model->plugin->version;
 			item->model = model;
 			item->modulePos = modulePos;
 			menu->pushChild(item);

@@ -312,6 +312,7 @@ struct SVGScrew : FramebufferWidget {
 struct Toolbar : OpaqueWidget {
 	Slider *wireOpacitySlider;
 	Slider *wireTensionSlider;
+	Slider *zoomSlider;
 	RadioButton *cpuUsageButton;
 	RadioButton *plugLightButton;
 

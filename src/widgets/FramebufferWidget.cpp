@@ -9,9 +9,16 @@
 namespace rack {
 
 
+/** A margin in pixels around the children in the framebuffer
+This prevents cutting the rendered SVG off on the box edges.
+*/
+static const float oversample = 2.0;
+
+
 struct FramebufferWidget::Internal {
 	NVGLUframebuffer *fb = NULL;
 	Rect box;
+	Vec lastS;
 
 	~Internal() {
 		setFramebuffer(NULL);
@@ -32,15 +39,30 @@ FramebufferWidget::~FramebufferWidget() {
 	delete internal;
 }
 
-void FramebufferWidget::step() {
-	// Step children before rendering
-	Widget::step();
+void FramebufferWidget::draw(NVGcontext *vg) {
+	// Bypass framebuffer rendering entirely
+	// Widget::draw(vg);
+	// return;
 
-	// Render the scene to the framebuffer if dirty
+	// Get world transform
+	float xform[6];
+	nvgCurrentTransform(vg, xform);
+	// Skew is not supported
+	assert(fabsf(xform[1]) < 1e-6);
+	assert(fabsf(xform[2]) < 1e-6);
+	Vec s = Vec(xform[0], xform[3]);
+	Vec b = Vec(xform[4], xform[5]);
+
+	// Check if scale has changed
+	if (s.x != internal->lastS.x || s.y != internal->lastS.y) {
+		dirty = true;
+	}
+	internal->lastS = s;
+
+	// Render to framebuffer
 	if (dirty) {
 		internal->box.pos = Vec(0, 0);
-		internal->box.size = box.size;
-		internal->box.size = Vec(ceilf(internal->box.size.x), ceilf(internal->box.size.y));
+		internal->box.size = box.size.mult(s).ceil().plus(Vec(1, 1));
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 
 		// assert(fbSize.isFinite());
@@ -50,6 +72,7 @@ void FramebufferWidget::step() {
 
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
+		// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
 		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, fbSize.x, fbSize.y, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 		if (!fb)
 			return;
@@ -59,49 +82,44 @@ void FramebufferWidget::step() {
 		glViewport(0.0, 0.0, fbSize.x, fbSize.y);
 		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		nvgBeginFrame(gVg, fbSize.x, fbSize.y, gPixelRatio * oversample);
 
-		nvgScale(gVg, gPixelRatio * oversample, gPixelRatio * oversample);
-		Widget::draw(gVg);
+		nvgBeginFrame(gFramebufferVg, fbSize.x, fbSize.y, gPixelRatio * oversample);
 
-		nvgEndFrame(gVg);
+		nvgScale(gFramebufferVg, gPixelRatio * oversample, gPixelRatio * oversample);
+		// Use local scaling
+		Vec bFrac = Vec(fmodf(b.x, 1.0), fmodf(b.y, 1.0));
+		nvgTranslate(gFramebufferVg, bFrac.x, bFrac.y);
+		nvgScale(gFramebufferVg, s.x, s.y);
+		Widget::draw(gFramebufferVg);
+
+		nvgEndFrame(gFramebufferVg);
 		nvgluBindFramebuffer(NULL);
 
 		dirty = false;
 	}
-}
-
-void FramebufferWidget::draw(NVGcontext *vg) {
-	// {
-	// 	float xform[6];
-	// 	nvgCurrentTransform(vg, xform);
-	// 	printf("%f %f %f %f %f %f\n", xform[0], xform[1], xform[2], xform[3], xform[4], xform[5]);
-	// 	nvgSave(vg);
-	// 	nvgResetTransform(vg);
-	// 	nvgTranslate(vg, xform[5], xform[6]);
-	// 	nvgBeginPath(vg);
-	// 	nvgRect(vg, 0, 0, 50, 50);
-	// 	nvgFillColor(vg, nvgRGBf(1.0, 0.0, 0.0));
-	// 	nvgFill(vg);
-	// 	nvgRestore(vg);
-	// }
 
 	if (!internal->fb) {
-		// Bypass framebuffer cache entirely
-		// Widget::draw(vg);
 		return;
 	}
 
-	// Draw framebuffer image
+	// Draw framebuffer image, using world coordinates
+	b = b.floor();
+	nvgSave(vg);
+	nvgResetTransform(vg);
+	nvgTranslate(vg, b.x, b.y);
+
 	nvgBeginPath(vg);
 	nvgRect(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y);
 	NVGpaint paint = nvgImagePattern(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y, 0.0, internal->fb->image, 1.0);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
 
-	// For debugging bounding box of framebuffer image
-	// nvgFillColor(vg, nvgRGBA(255, 0, 0, 64));
-	// nvgFill(vg);
+	// For debugging the bounding box of the framebuffer
+	// nvgStrokeWidth(vg, 2.0);
+	// nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 128));
+	// nvgStroke(vg);
+
+	nvgRestore(vg);
 }
 
 int FramebufferWidget::getImageHandle() {

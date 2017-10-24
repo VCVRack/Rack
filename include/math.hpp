@@ -191,6 +191,12 @@ struct Vec {
 	Vec round() {
 		return Vec(roundf(x), roundf(y));
 	}
+	Vec floor() {
+		return Vec(floorf(x), floorf(y));
+	}
+	Vec ceil() {
+		return Vec(ceilf(x), ceilf(y));
+	}
 	bool isZero() {
 		return x == 0.0 && y == 0.0;
 	}

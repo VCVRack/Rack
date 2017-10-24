@@ -139,11 +139,24 @@ Toolbar::Toolbar() {
 		wireTensionSlider->box.pos = Vec(xPos, margin);
 		wireTensionSlider->box.size.x = 150;
 		wireTensionSlider->label = "Cable tension";
-		// wireTensionSlider->unit = "";
+		wireTensionSlider->unit = "";
 		wireTensionSlider->setLimits(0.0, 1.0);
 		wireTensionSlider->setDefaultValue(0.5);
 		addChild(wireTensionSlider);
 		xPos += wireTensionSlider->box.size.x;
+	}
+
+	xPos += margin;
+	{
+		zoomSlider = new Slider();
+		zoomSlider->box.pos = Vec(xPos, margin);
+		zoomSlider->box.size.x = 150;
+		zoomSlider->label = "Zoom";
+		zoomSlider->unit = "%";
+		zoomSlider->setLimits(50.0, 200.0);
+		zoomSlider->setDefaultValue(100.0);
+		addChild(zoomSlider);
+		xPos += zoomSlider->box.size.x;
 	}
 
 	xPos += margin;
