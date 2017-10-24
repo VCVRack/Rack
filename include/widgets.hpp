@@ -228,7 +228,6 @@ struct FramebufferWidget : virtual Widget {
 
 	FramebufferWidget();
 	~FramebufferWidget();
-	void step() override;
 	void draw(NVGcontext *vg) override;
 	int getImageHandle();
 };

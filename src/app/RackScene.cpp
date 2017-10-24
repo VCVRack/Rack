@@ -31,7 +31,7 @@ RackScene::RackScene() {
 	scrollWidget = new RackScrollWidget();
 	{
 		zoomWidget = new ZoomWidget();
-		zoomWidget->zoom = 1.0;
+		zoomWidget->zoom = 0.5;
 		{
 			assert(!gRackWidget);
 			gRackWidget = new RackWidget();

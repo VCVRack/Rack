@@ -29,6 +29,7 @@ namespace rack {
 
 GLFWwindow *gWindow = NULL;
 NVGcontext *gVg = NULL;
+NVGcontext *gFramebufferVg = NULL;
 std::shared_ptr<Font> gGuiFont;
 float gPixelRatio = 0.0;
 bool gAllowCursorLock = true;
@@ -220,15 +221,15 @@ void renderGui() {
 	gPixelRatio = (float)width / windowWidth;
 
 	// Update and render
-	glViewport(0, 0, width, height);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgBeginFrame(gVg, width, height, gPixelRatio);
 
 	nvgReset(gVg);
 	nvgScale(gVg, gPixelRatio, gPixelRatio);
 	gScene->draw(gVg);
 
+	glViewport(0, 0, width, height);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgEndFrame(gVg);
 	glfwSwapBuffers(gWindow);
 }
@@ -288,6 +289,9 @@ void guiInit() {
 	// gVg = nvgCreateGL3(NVG_ANTIALIAS);
 	assert(gVg);
 
+	gFramebufferVg = nvgCreateGL2(NVG_ANTIALIAS);
+	assert(gFramebufferVg);
+
 	// Set up Blendish
 	gGuiFont = Font::load(assetGlobal("res/DejaVuSans.ttf"));
 	bndSetFont(gGuiFont->handle);
@@ -298,6 +302,7 @@ void guiDestroy() {
 	gGuiFont.reset();
 	nvgDeleteGL2(gVg);
 	// nvgDeleteGL3(gVg);
+	nvgDeleteGL2(gFramebufferVg);
 	glfwDestroyWindow(gWindow);
 	glfwTerminate();
 }

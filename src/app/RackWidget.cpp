@@ -404,6 +404,9 @@ struct AddManufacturerMenuItem : MenuItem {
 		for (Model *model : models) {
 			AddModuleMenuItem *item = new AddModuleMenuItem();
 			item->text = model->name;
+			// item->rightText = model->plugin->slug;
+			// if (!model->plugin->version.empty())
+			// 	item->rightText += " v" + model->plugin->version;
 			item->model = model;
 			item->modulePos = modulePos;
 			menu->pushChild(item);
