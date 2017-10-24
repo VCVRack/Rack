@@ -99,17 +99,17 @@ void MidiIO::openDevice(std::string deviceName) {
 void MidiIO::setIgnores(bool ignoreSysex, bool ignoreTime, bool ignoreSense) {
 	bool sy = true, ti = true, se = true;
 
-	midiInMap[deviceName]->ignoresMap[id][0] = ignoreSysex;
-	midiInMap[deviceName]->ignoresMap[id][1] = ignoreTime;
-	midiInMap[deviceName]->ignoresMap[id][2] = ignoreSense;
+	midiInMap[deviceName]->ignoresMap[id].midiSysex = ignoreSysex;
+	midiInMap[deviceName]->ignoresMap[id].midiTime = ignoreTime;
+	midiInMap[deviceName]->ignoresMap[id].midiSense = ignoreSense;
 
 	for (auto kv : midiInMap[deviceName]->ignoresMap) {
-		sy = sy &&  kv.second[0];
-		ti = ti  &&  kv.second[1];
-		se = se &&  kv.second[2];
+		sy = sy && kv.second.midiSysex;
+		ti = ti && kv.second.midiTime;
+		se = se && kv.second.midiSense;
 	}
 
-	midiInMap[deviceName]->ignoreTypes(se,ti,se);
+	midiInMap[deviceName]->ignoreTypes(se, ti, se);
 
 
 }

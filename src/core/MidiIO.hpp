@@ -5,6 +5,11 @@
 
 using namespace rack;
 
+struct IgnoreFlags {
+	bool midiSysex = true;
+	bool midiTime = true;
+	bool midiSense = true;
+};
 
 /**
  * This class allows to use one instance of rtMidiIn with
@@ -13,13 +18,8 @@ using namespace rack;
  */
 
 struct MidiInWrapper : RtMidiIn {
-	std::unordered_map<int, std::list<std::vector<unsigned char>>> idMessagesMap;
-	std::unordered_map<int, std::list<double>> idStampsMap;
 
-	/* Stores Ignore settings for each instance in the following order:
-	 * {ignore_midiSysex, ignore_midiTime, ignore_midiSense}
-	 */
-	std::unordered_map<int, bool[3]> ignoresMap;
+	std::unordered_map<int, IgnoreFlags> ignoresMap;
 
 	int uid_c = 0;
 	int subscribers = 0;
@@ -35,9 +35,6 @@ struct MidiInWrapper : RtMidiIn {
 		idMessagesMap[id] = {};
 		idStampsMap[id] = {};
 
-		ignoresMap[id][0] = true;
-		ignoresMap[id][1] = true;
-		ignoresMap[id][2] = true;
 		return id;
 	}
 
