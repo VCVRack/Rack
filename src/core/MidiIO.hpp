@@ -11,37 +11,39 @@ struct IgnoreFlags {
 	bool midiSense = true;
 };
 
+struct MidiMessage {
+	std::vector<unsigned char> bytes;
+	double timeStamp;
+
+	MidiMessage(): bytes(0), timeStamp(0.0) {};
+
+};
+
 /**
  * This class allows to use one instance of rtMidiIn with
  * multiple modules. A MidiIn port will be opened only once while multiple
  * instances can use it simultaniously, each receiving all its incoming messages.
  */
-
 struct MidiInWrapper : RtMidiIn {
 
+	std::unordered_map<int, std::list<MidiMessage>> idMessagesMap;
 	std::unordered_map<int, IgnoreFlags> ignoresMap;
 
 	int uid_c = 0;
-	int subscribers = 0;
 
 	MidiInWrapper() : RtMidiIn() {
 		idMessagesMap = {};
-		idStampsMap = {};
 	};
 
 	int add() {
 		int id = ++uid_c;
-		subscribers++;
 		idMessagesMap[id] = {};
-		idStampsMap[id] = {};
-
+		ignoresMap[id] = IgnoreFlags();
 		return id;
 	}
 
 	void erase(int id) {
-		subscribers--;
 		idMessagesMap.erase(id);
-		idStampsMap.erase(id);
 		ignoresMap.erase(id);
 	}
 };
@@ -88,7 +90,7 @@ public:
 	virtual void resetMidi()=0;
 
 	/* called if a user switches or sets the deivce (and after this device is initialised)*/
-	virtual void onDeviceChange(){};
+	virtual void onDeviceChange() {};
 };
 
 //////////////////////
