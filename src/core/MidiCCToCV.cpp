@@ -214,7 +214,7 @@ void CCTextField::onTextChange() {
 				return;
 			}
 
-			if (!module->ccNumInited[num] && *ccNum != std::stoi(text)) {
+			if (!module->ccNumInited[num]) {
 				module->ccSync[num] = 0;
 				module->ccSyncFirst[num] = true;
 			}
