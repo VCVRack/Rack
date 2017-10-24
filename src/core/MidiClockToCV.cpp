@@ -32,6 +32,8 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	bool tick = false;
 	bool running = false;
 	bool reset = false;
+	int c_bar = 0;
+
 
 
 	MIDIClockToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
@@ -72,9 +74,8 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 };
 
 void MIDIClockToCVInterface::step() {
-	static int c_bar = 0;
 	static float trigger_length = 0.05;
-	static float sampleRate = engineGetSampleRate();
+	float sampleRate = engineGetSampleRate();
 
 	/* Note this is in relation to the Midi clock's Tick (6x per 16th note).
 	 * Therefore, e.g. the 2:3 is calculated:
@@ -87,7 +88,7 @@ void MIDIClockToCVInterface::step() {
 	static int numratios = sizeof(ratios) / sizeof(*ratios);
 
 	if (isPortOpen()) {
-		std::vector<unsigned char> message;
+		static std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
 		getMessage(&message);
