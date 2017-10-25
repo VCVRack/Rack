@@ -153,7 +153,7 @@ Toolbar::Toolbar() {
 		zoomSlider->box.size.x = 150;
 		zoomSlider->label = "Zoom";
 		zoomSlider->unit = "%";
-		zoomSlider->setLimits(25.0, 200.0);
+		zoomSlider->setLimits(33.33, 200.0);
 		zoomSlider->setDefaultValue(100.0);
 		addChild(zoomSlider);
 		xPos += zoomSlider->box.size.x;

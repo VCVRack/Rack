@@ -197,8 +197,14 @@ struct Vec {
 	Vec ceil() {
 		return Vec(ceilf(x), ceilf(y));
 	}
+	bool isEqual(Vec b) {
+		return x == b.x && y == b.y;
+	}
 	bool isZero() {
 		return x == 0.0 && y == 0.0;
+	}
+	bool isFinite() {
+		return isfinite(x) && isfinite(y);
 	}
 	Vec clamp(Rect bound);
 };
@@ -229,6 +235,9 @@ struct Rect {
 		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
 			&& (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
 	}
+	bool isEqual(Rect r) {
+		return pos.isEqual(r.pos) && size.isEqual(r.size);
+	}
 	Vec getCenter() {
 		return pos.plus(size.mult(0.5));
 	}
@@ -241,8 +250,17 @@ struct Rect {
 	Vec getBottomRight() {
 		return pos.plus(size);
 	}
-	/** Clamps the position to fix inside a bounding box */
+	/** Clamps the edges of the rectangle to fit within a bound */
 	Rect clamp(Rect bound) {
+		Rect r;
+		r.pos.x = clampf(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
+		r.pos.y = clampf(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
+		r.size.x = clampf(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
+		r.size.y = clampf(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
+		return r;
+	}
+	/** Nudges the position to fix inside a bounding box */
+	Rect nudge(Rect bound) {
 		Rect r;
 		r.size = size;
 		r.pos.x = clampf(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
