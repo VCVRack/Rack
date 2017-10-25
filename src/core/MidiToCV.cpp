@@ -84,7 +84,7 @@ void MIDIToCVInterface::resetMidi() {
 }
 
 void MIDIToCVInterface::step() {
-	static float sampleRate = engineGetSampleRate();
+	float sampleRate = engineGetSampleRate();
 	
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;

@@ -94,11 +94,12 @@ void QuadMIDIToCVInterface::resetMidi() {
 }
 
 void QuadMIDIToCVInterface::step() {
-	static float sampleRate = engineGetSampleRate();
-	static int msgsProcessed = 0;
+	float sampleRate = engineGetSampleRate();
+
 
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
+		int msgsProcessed = 0;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
 		// NOTE: For the quadmidi we will process max 4 midi messages per step to avoid
@@ -109,7 +110,6 @@ void QuadMIDIToCVInterface::step() {
 			getMessage(&message);
 			msgsProcessed++;
 		}
-		msgsProcessed = 0;
 	}
 
 

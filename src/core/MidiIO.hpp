@@ -48,6 +48,10 @@ struct MidiInWrapper : RtMidiIn {
 	}
 };
 
+/**
+ * Note: MidiIO is not thread safe which might become
+ * important in the future
+ */
 struct MidiIO {
 private:
 	static std::unordered_map<std::string, MidiInWrapper *> midiInMap;

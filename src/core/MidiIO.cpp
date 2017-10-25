@@ -50,7 +50,7 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 
 std::vector<std::string> MidiIO::getDevices() {
 	/* Note: we could also use an existing interface if one exists */
-	static RtMidiIn *m = new RtMidiIn();
+	RtMidiIn *m = new RtMidiIn();
 
 	std::vector<std::string> names = {};
 

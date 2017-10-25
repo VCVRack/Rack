@@ -34,6 +34,20 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	bool reset = false;
 	int c_bar = 0;
 
+	/* Note this is in relation to the Midi clock's Tick (6x per 16th note).
+	 * Therefore, e.g. the 2:3 is calculated:
+	 *
+	 * 24 (Ticks per quarter note) * 2 / 3 = 16
+	 *
+	 * Implying that every 16 midi clock ticks we need to send a pulse
+	 * */
+	int ratios[] = {6, 8, 12, 16, 24, 32, 48, 96, 192};
+	int numratios = sizeof(ratios) / sizeof(*ratios);
+
+	/*
+	 * Length of clock pulse
+	 */
+	float pulseTime = 0.05;
 
 
 	MIDIClockToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
@@ -74,18 +88,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 };
 
 void MIDIClockToCVInterface::step() {
-	static float trigger_length = 0.05;
 	float sampleRate = engineGetSampleRate();
-
-	/* Note this is in relation to the Midi clock's Tick (6x per 16th note).
-	 * Therefore, e.g. the 2:3 is calculated:
-	 *
-	 * 24 (Ticks per quarter note) * 2 / 3 = 16
-	 *
-	 * Implying that every 16 midi clock ticks we need to send a pulse
-	 * */
-	static int ratios[] = {6, 8, 12, 16, 24, 32, 48, 96, 192};
-	static int numratios = sizeof(ratios) / sizeof(*ratios);
 
 	if (isPortOpen()) {
 		static std::vector<unsigned char> message;
@@ -107,7 +110,7 @@ void MIDIClockToCVInterface::step() {
 	}
 
 	if (reset) {
-		resetPulse.trigger(trigger_length);
+		resetPulse.trigger(pulseTime);
 		reset = false;
 		c_bar = 0;
 		clock1Pulse.time = 0.0;
@@ -126,11 +129,11 @@ void MIDIClockToCVInterface::step() {
 		*/
 		if (running) {
 			if (c_bar % ratios[clock1ratio] == 0) {
-				clock1Pulse.trigger(trigger_length);
+				clock1Pulse.trigger(pulseTime);
 			}
 
 			if (c_bar % ratios[clock2ratio] == 0) {
-				clock2Pulse.trigger(trigger_length);
+				clock2Pulse.trigger(pulseTime);
 			}
 		}
 
