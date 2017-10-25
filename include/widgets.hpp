@@ -230,6 +230,10 @@ Events are not passed to the underlying scene.
 struct FramebufferWidget : virtual Widget {
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
+	/** A margin in pixels around the children in the framebuffer
+	This prevents cutting the rendered SVG off on the box edges.
+	*/
+	float oversample;
 	/** The root object in the framebuffer scene
 	The FramebufferWidget owns the pointer
 	*/
