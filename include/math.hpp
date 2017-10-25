@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 
 
 namespace rack {
@@ -204,7 +204,7 @@ struct Vec {
 		return x == 0.0 && y == 0.0;
 	}
 	bool isFinite() {
-		return isfinite(x) && isfinite(y);
+		return std::isfinite(x) && std::isfinite(y);
 	}
 	Vec clamp(Rect bound);
 };
