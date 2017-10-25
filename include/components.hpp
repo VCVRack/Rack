@@ -107,18 +107,6 @@ struct Davies1900hLargeRedKnob : Davies1900hKnob {
 	}
 };
 
-struct Davies1900hSmallBlackKnob : Davies1900hKnob {
-	Davies1900hSmallBlackKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Davies1900hSmallBlack.svg")));
-	}
-};
-
-struct Davies1900hSmallBlackSnapKnob : Davies1900hSmallBlackKnob {
-	Davies1900hSmallBlackSnapKnob() {
-		snap = true;
-	}
-};
-
 
 struct Rogan : SVGKnob {
 	Rogan() {
