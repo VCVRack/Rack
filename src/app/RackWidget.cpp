@@ -15,15 +15,15 @@ namespace rack {
 
 
 RackWidget::RackWidget() {
-	// rails = new FramebufferWidget();
-	// rails->box.size = Vec();
-	// rails->oversample = 1.0;
-	// {
-	// 	RackRail *rail = new RackRail();
-	// 	rail->box.size = Vec();
-	// 	rails->addChild(rail);
-	// }
-	// addChild(rails);
+	rails = new FramebufferWidget();
+	rails->box.size = Vec();
+	rails->oversample = 1.0;
+	{
+		RackRail *rail = new RackRail();
+		rail->box.size = Vec();
+		rails->addChild(rail);
+	}
+	addChild(rails);
 
 	moduleContainer = new Widget();
 	addChild(moduleContainer);
@@ -341,23 +341,23 @@ void RackWidget::step() {
 	// We assume that the size is reset by a parent before calling step(). Otherwise it will grow unbounded.
 	box.size = box.size.max(moduleSize);
 
-	// // Adjust size and position of rails
-	// Widget *rail = rails->children.front();
-	// Rect bound = getViewport(Rect(Vec(), box.size));
-	// if (!rails->box.contains(bound)) {
-	// 	// Add a margin around the otherwise tight bound, so that scrolling slightly will not require a re-render of rails.
-	// 	Vec margin = Vec(100, 100);
-	// 	bound.pos = bound.pos.minus(margin);
-	// 	bound.size = bound.size.plus(margin.mult(2));
-	// 	rails->box = bound;
-	// 	// Compute offset of rail within rails framebuffer
-	// 	Vec grid = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
-	// 	Vec gridPos = bound.pos.div(grid).floor().mult(grid);
-	// 	bound.pos = gridPos.minus(bound.pos);
-	// 	bound.size = bound.size.minus(bound.pos);
-	// 	rail->box = bound;
-	// 	rails->dirty = true;
-	// }
+	// Adjust size and position of rails
+	Widget *rail = rails->children.front();
+	Rect bound = getViewport(Rect(Vec(), box.size));
+	if (!rails->box.contains(bound)) {
+		// Add a margin around the otherwise tight bound, so that scrolling slightly will not require a re-render of rails.
+		Vec margin = Vec(100, 100);
+		bound.pos = bound.pos.minus(margin);
+		bound.size = bound.size.plus(margin.mult(2));
+		rails->box = bound;
+		// Compute offset of rail within rails framebuffer
+		Vec grid = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+		Vec gridPos = bound.pos.div(grid).floor().mult(grid);
+		bound.pos = gridPos.minus(bound.pos);
+		bound.size = bound.size.minus(bound.pos);
+		rail->box = bound;
+		rails->dirty = true;
+	}
 
 	// Autosave every 15 seconds
 	if (gGuiFrame % (60*15) == 0) {
@@ -526,7 +526,7 @@ void RackWidget::onMouseDownOpaque(int button) {
 }
 
 void RackWidget::onZoom() {
-	// rails->box.size = Vec();
+	rails->box.size = Vec();
 	Widget::onZoom();
 }
 

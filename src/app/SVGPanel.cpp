@@ -16,6 +16,10 @@ struct PanelBorder : TransparentWidget {
 };
 
 
+SVGPanel::SVGPanel() {
+	oversample = 2.0;
+}
+
 void SVGPanel::setBackground(std::shared_ptr<SVG> svg) {
 	clearChildren();
 

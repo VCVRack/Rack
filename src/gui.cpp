@@ -358,7 +358,7 @@ void guiRun() {
 			std::this_thread::sleep_for(std::chrono::duration<double>(minTime - frameTime));
 		}
 		endTime = glfwGetTime();
-		printf("%lf fps\n", 1.0 / (endTime - startTime));
+		// printf("%lf fps\n", 1.0 / (endTime - startTime));
 	}
 }
 
