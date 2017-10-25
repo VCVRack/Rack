@@ -50,12 +50,12 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 
 std::vector<std::string> MidiIO::getDevices() {
 	/* Note: we could also use an existing interface if one exists */
-	RtMidiIn *m = new RtMidiIn();
+	RtMidiIn m;
 
 	std::vector<std::string> names = {};
 
-	for (unsigned int i = 0; i < m->getPortCount(); i++) {
-		names.push_back(m->getPortName(i));
+	for (unsigned int i = 0; i < m.getPortCount(); i++) {
+		names.push_back(m.getPortName(i));
 	}
 
 	return names;

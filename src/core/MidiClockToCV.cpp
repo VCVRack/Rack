@@ -41,13 +41,13 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	 *
 	 * Implying that every 16 midi clock ticks we need to send a pulse
 	 * */
-	int ratios[] = {6, 8, 12, 16, 24, 32, 48, 96, 192};
-	int numratios = sizeof(ratios) / sizeof(*ratios);
+	const int ratios[9] = {6, 8, 12, 16, 24, 32, 48, 96, 192};
+	const int numratios = 9;
 
 	/*
 	 * Length of clock pulse
 	 */
-	float pulseTime = 0.05;
+	const float pulseTime = 0.05;
 
 
 	MIDIClockToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
