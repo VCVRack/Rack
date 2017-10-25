@@ -63,7 +63,7 @@ void RackScene::step() {
 		.div(zoomWidget->zoom);
 
 	// Set zoom from the toolbar's zoom slider
-	zoomWidget->zoom = gToolbar->zoomSlider->value / 100.0;
+	zoomWidget->setZoom(gToolbar->zoomSlider->value / 100.0);
 
 	Scene::step();
 

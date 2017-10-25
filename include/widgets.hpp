@@ -58,6 +58,8 @@ struct Widget {
 
 	Vec getAbsolutePos();
 	Rect getChildrenBoundingBox();
+	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors */
+	virtual Rect getViewport(Rect r);
 
 	template <class T>
 	T *getAncestorOfType() {
@@ -131,6 +133,7 @@ struct Widget {
 
 	virtual void onAction() {}
 	virtual void onChange() {}
+	virtual void onZoom();
 };
 
 struct TransformWidget : Widget {
@@ -144,6 +147,17 @@ struct TransformWidget : Widget {
 	void draw(NVGcontext *vg) override;
 };
 
+struct ZoomWidget : Widget {
+	float zoom = 1.0;
+	Rect getViewport(Rect r) override;
+	void setZoom(float zoom);
+	void draw(NVGcontext *vg) override;
+	Widget *onMouseDown(Vec pos, int button) override;
+	Widget *onMouseUp(Vec pos, int button) override;
+	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
+	Widget *onHoverKey(Vec pos, int key) override;
+	Widget *onScroll(Vec pos, Vec scrollRel) override;
+};
 
 ////////////////////
 // Trait widgets
@@ -214,7 +228,7 @@ When `dirty` is true, its children will be re-rendered on the next call to step(
 Events are not passed to the underlying scene.
 */
 struct FramebufferWidget : virtual Widget {
-	/** Set this to true to re-render the children to the framebuffer in the next step() override */
+	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
 	/** The root object in the framebuffer scene
 	The FramebufferWidget owns the pointer
@@ -226,6 +240,7 @@ struct FramebufferWidget : virtual Widget {
 	~FramebufferWidget();
 	void draw(NVGcontext *vg) override;
 	int getImageHandle();
+	void onZoom() override;
 };
 
 struct QuantityWidget : virtual Widget {
@@ -376,16 +391,6 @@ struct ScrollWidget : OpaqueWidget {
 	ScrollWidget();
 	void step() override;
 	bool onScrollOpaque(Vec scrollRel) override;
-};
-
-struct ZoomWidget : Widget {
-	float zoom = 1.0;
-	void draw(NVGcontext *vg) override;
-	Widget *onMouseDown(Vec pos, int button) override;
-	Widget *onMouseUp(Vec pos, int button) override;
-	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
-	Widget *onHoverKey(Vec pos, int key) override;
-	Widget *onScroll(Vec pos, Vec scrollRel) override;
 };
 
 struct TextField : OpaqueWidget {

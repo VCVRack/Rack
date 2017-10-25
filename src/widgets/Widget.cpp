@@ -40,6 +40,18 @@ Rect Widget::getChildrenBoundingBox() {
 	return Rect(topLeft, bottomRight.minus(topLeft));
 }
 
+Rect Widget::getViewport(Rect r) {
+	Rect bound;
+	if (parent) {
+		bound = parent->getViewport(box);
+	}
+	else {
+		bound = box;
+	}
+	bound.pos = bound.pos.minus(box.pos);
+	return r.clamp(bound);
+}
+
 void Widget::addChild(Widget *widget) {
 	assert(!widget->parent);
 	widget->parent = this;
@@ -170,6 +182,13 @@ Widget *Widget::onScroll(Vec pos, Vec scrollRel) {
 		}
 	}
 	return NULL;
+}
+
+void Widget::onZoom() {
+	for (auto it = children.rbegin(); it != children.rend(); it++) {
+		Widget *child = *it;
+		child->onZoom();
+	}
 }
 
 } // namespace rack

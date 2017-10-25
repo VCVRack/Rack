@@ -16,10 +16,13 @@ namespace rack {
 
 RackWidget::RackWidget() {
 	rails = new FramebufferWidget();
-	RackRail *rail = new RackRail();
-	rail->box.size = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
-	rails->addChild(rail);
-	rails->box.size = rail->box.size;
+	rails->box.size = Vec();
+	{
+		RackRail *rail = new RackRail();
+		rail->box.size = Vec();
+		rails->addChild(rail);
+	}
+	addChild(rails);
 
 	moduleContainer = new Widget();
 	addChild(moduleContainer);
@@ -29,7 +32,6 @@ RackWidget::RackWidget() {
 }
 
 RackWidget::~RackWidget() {
-	delete rails;
 }
 
 void RackWidget::clear() {
@@ -333,12 +335,28 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, Rect box) {
 }
 
 void RackWidget::step() {
-	rails->step();
-
 	// Expand size to fit modules
 	Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
 	// We assume that the size is reset by a parent before calling step(). Otherwise it will grow unbounded.
 	box.size = box.size.max(moduleSize);
+
+	// Adjust size and position of rails
+	Widget *rail = rails->children.front();
+	Rect bound = getViewport(Rect(Vec(), box.size));
+	if (!rails->box.contains(bound)) {
+		// Add a margin around the otherwise tight bound, so that scrolling slightly will not require a re-render of rails.
+		Vec margin = Vec(100, 100);
+		bound.pos = bound.pos.minus(margin);
+		bound.size = bound.size.plus(margin.mult(2));
+		rails->box = bound;
+		// Compute offset of rail within rails framebuffer
+		Vec grid = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+		Vec gridPos = bound.pos.div(grid).floor().mult(grid);
+		bound.pos = gridPos.minus(bound.pos);
+		bound.size = bound.size.minus(bound.pos);
+		rail->box = bound;
+		rails->dirty = true;
+	}
 
 	// Autosave every 15 seconds
 	if (gGuiFrame % (60*15) == 0) {
@@ -350,13 +368,6 @@ void RackWidget::step() {
 }
 
 void RackWidget::draw(NVGcontext *vg) {
-	// Draw rails
-	nvgBeginPath(vg);
-	nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
-	NVGpaint paint = nvgImagePattern(vg, rails->box.pos.x, rails->box.pos.y, rails->box.size.x, rails->box.size.y, 0.0, rails->getImageHandle(), 1.0);
-	nvgFillPaint(vg, paint);
-	nvgFill(vg);
-
 	Widget::draw(vg);
 }
 
@@ -511,6 +522,11 @@ void RackWidget::onMouseDownOpaque(int button) {
 			menu->pushChild(item);
 		}
 	}
+}
+
+void RackWidget::onZoom() {
+	rails->box.size = Vec();
+	Widget::onZoom();
 }
 
 

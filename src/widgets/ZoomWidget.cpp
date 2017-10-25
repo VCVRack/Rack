@@ -3,6 +3,20 @@
 
 namespace rack {
 
+Rect ZoomWidget::getViewport(Rect r) {
+	r.pos = r.pos.mult(zoom);
+	r.size = r.size.mult(zoom);
+	r = Widget::getViewport(r);
+	r.pos = r.pos.div(zoom);
+	r.size = r.size.div(zoom);
+	return r;
+}
+
+void ZoomWidget::setZoom(float zoom) {
+	if (zoom != this->zoom)
+		onZoom();
+	this->zoom = zoom;
+}
 
 void ZoomWidget::draw(NVGcontext *vg) {
 	nvgScale(vg, zoom, zoom);

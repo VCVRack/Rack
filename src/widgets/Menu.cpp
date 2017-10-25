@@ -30,7 +30,7 @@ void Menu::setChildMenu(Menu *menu) {
 void Menu::step() {
 	// Try to fit into the parent's box
 	if (parent)
-		box = box.clamp(Rect(Vec(0, 0), parent->box.size));
+		box = box.nudge(Rect(Vec(0, 0), parent->box.size));
 
 	Widget::step();
 
