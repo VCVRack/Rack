@@ -475,9 +475,13 @@ struct SearchModuleField : TextField {
 	}
 };
 
+Widget *RackWidget::onMouseMove(Vec pos, Vec mouseRel) {
+	lastMousePos = pos;
+	return OpaqueWidget::onMouseMove(pos, mouseRel);
+}
+
 void RackWidget::onMouseDownOpaque(int button) {
 	if (button == 1) {
-		Vec modulePos = gMousePos.minus(getAbsolutePos());
 		Menu *menu = gScene->createMenu();
 
 		menu->pushChild(construct<MenuLabel>(&MenuLabel::text, "Add module"));
@@ -503,7 +507,7 @@ void RackWidget::onMouseDownOpaque(int button) {
 			AddManufacturerMenuItem *item = new AddManufacturerMenuItem();
 			item->text = manufacturerName;
 			item->manufacturerName = manufacturerName;
-			item->modulePos = modulePos;
+			item->modulePos = lastMousePos;
 			menu->pushChild(item);
 		}
 	}

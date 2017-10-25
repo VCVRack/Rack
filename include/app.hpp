@@ -111,6 +111,7 @@ struct RackWidget : OpaqueWidget {
 	// Only put WireWidgets in here
 	WireContainer *wireContainer;
 	std::string lastPath;
+	Vec lastMousePos;
 
 	RackWidget();
 	~RackWidget();
@@ -138,6 +139,7 @@ struct RackWidget : OpaqueWidget {
 	void step() override;
 	void draw(NVGcontext *vg) override;
 
+	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
 	void onMouseDownOpaque(int button) override;
 };
 

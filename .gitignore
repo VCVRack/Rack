@@ -5,3 +5,6 @@
 /plugins
 /build
 /dep
+*.vcv
+/patches
+/design

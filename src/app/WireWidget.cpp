@@ -132,7 +132,7 @@ Vec WireWidget::getOutputPos() {
 		pos = Rect(hoveredOutputPort->getAbsolutePos(), hoveredOutputPort->box.size).getCenter();
 	}
 	else {
-		pos = gMousePos;
+		return gRackWidget->lastMousePos;
 	}
 	return pos.minus(getAbsolutePos().minus(box.pos));
 }
@@ -146,7 +146,7 @@ Vec WireWidget::getInputPos() {
 		pos = Rect(hoveredInputPort->getAbsolutePos(), hoveredInputPort->box.size).getCenter();
 	}
 	else {
-		pos = gMousePos;
+		return gRackWidget->lastMousePos;
 	}
 	return pos.minus(getAbsolutePos().minus(box.pos));
 }

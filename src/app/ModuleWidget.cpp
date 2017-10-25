@@ -192,12 +192,12 @@ Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
 }
 
 void ModuleWidget::onDragStart() {
-	dragPos = gMousePos.minus(getAbsolutePos());
+	dragPos = gRackWidget->lastMousePos.minus(box.pos);
 }
 
 void ModuleWidget::onDragMove(Vec mouseRel) {
 	Rect newBox = box;
-	newBox.pos = gMousePos.minus(parent->getAbsolutePos()).minus(dragPos);
+	newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
 	gRackWidget->requestModuleBoxNearest(this, newBox);
 }
 
