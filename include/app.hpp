@@ -141,6 +141,7 @@ struct RackWidget : OpaqueWidget {
 
 	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
 	void onMouseDownOpaque(int button) override;
+	void onZoom() override;
 };
 
 struct RackRail : TransparentWidget {

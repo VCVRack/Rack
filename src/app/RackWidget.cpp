@@ -524,5 +524,10 @@ void RackWidget::onMouseDownOpaque(int button) {
 	}
 }
 
+void RackWidget::onZoom() {
+	rails->box.size = Vec();
+	Widget::onZoom();
+}
+
 
 } // namespace rack
