@@ -422,95 +422,55 @@ struct CL1362Port : SVGPort {
 // Lights
 ////////////////////
 
-struct ValueLight : LightWidget {
-	float *value = NULL;
-	virtual void setValue(float v) {}
-	void step() override {
-		if (value)
-			setValue(*value);
+struct RedLight : ColorLightWidget {
+	RedLight() {
+		addColor(COLOR_RED);
 	}
 };
 
-struct ColorValueLight : ValueLight {
-	NVGcolor baseColor;
-	void setValue(float v) override {
-		v = sqrtBipolar(v);
-		color = baseColor;
-		color.a *= clampf(v, 0.0, 1.0);
+struct GreenLight : ColorLightWidget {
+	GreenLight() {
+		addColor(COLOR_GREEN);
 	}
 };
 
-struct RedValueLight : ColorValueLight {
-	RedValueLight() {
-		baseColor = COLOR_RED;
+struct GreenRedLight : ColorLightWidget {
+	GreenRedLight() {
+		addColor(COLOR_GREEN);
+		addColor(COLOR_RED);
 	}
 };
 
-struct YellowValueLight : ColorValueLight {
-	YellowValueLight() {
-		baseColor = COLOR_YELLOW;
-	}
-};
 
-struct GreenValueLight : ColorValueLight {
-	GreenValueLight() {
-		baseColor = COLOR_GREEN;
-	}
-};
-
-struct PolarityLight : ValueLight {
-	NVGcolor posColor;
-	NVGcolor negColor;
-	void setValue(float v) override {
-		v = sqrtBipolar(v);
-		color = (v >= 0.0) ? posColor : negColor;
-		color.a *= clampf(fabsf(v), 0.0, 1.0);
-	}
-};
-
-struct GreenRedPolarityLight : PolarityLight {
-	GreenRedPolarityLight() {
-		posColor = COLOR_GREEN;
-		negColor = COLOR_RED;
-	}
-};
-
-struct ModeValueLight : ValueLight {
-	std::vector<NVGcolor> colors;
-	void setValue(float v) override {
-		int mode = clampi((int)roundf(v), 0, colors.size());
-		color = colors[mode];
-	}
-	void addColor(NVGcolor color) {
-		colors.push_back(color);
-	}
-};
-
+/** 5mm diameter */
 template <typename BASE>
 struct LargeLight : BASE {
 	LargeLight() {
-		this->box.size = Vec(20, 20);
+		this->box.size = Vec(15, 15);
 	}
 };
 
+/** 3mm diameter */
 template <typename BASE>
 struct MediumLight : BASE {
 	MediumLight() {
-		this->box.size = Vec(12, 12);
+		this->box.size = Vec(9, 9);
 	}
 };
 
+/** 2mm diameter */
 template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
-		this->box.size = Vec(8, 8);
+		this->box.size = Vec(6, 6);
 	}
 };
 
+/** 1mm diameter */
 template <typename BASE>
 struct TinyLight : BASE {
 	TinyLight() {
-		this->box.size = Vec(5, 5);
+		this->box.size = Vec(3, 3);
 	}
 };
 

@@ -87,10 +87,10 @@ WireWidget::WireWidget() {
 	lastWireColorId = (lastWireColorId + 1) % LENGTHOF(wireColors);
 	color = wireColors[lastWireColorId];
 
-	inputLight = construct<PolarityLight>(&PolarityLight::posColor, COLOR_GREEN, &PolarityLight::negColor, COLOR_RED);
-	outputLight = construct<PolarityLight>(&PolarityLight::posColor, COLOR_GREEN, &PolarityLight::negColor, COLOR_RED);
-	addChild(inputLight);
-	addChild(outputLight);
+	// inputLight = construct<PolarityLight>(&PolarityLight::posColor, COLOR_GREEN, &PolarityLight::negColor, COLOR_RED);
+	// outputLight = construct<PolarityLight>(&PolarityLight::posColor, COLOR_GREEN, &PolarityLight::negColor, COLOR_RED);
+	// addChild(inputLight);
+	// addChild(outputLight);
 }
 
 WireWidget::~WireWidget() {
@@ -166,6 +166,7 @@ void WireWidget::drawPlugs(NVGcontext *vg) {
 	drawPlug(vg, inputPos, color);
 
 	// Draw plug light
+	/*
 	if (gToolbar->plugLightButton->value > 0.0) {
 		if (wire) {
 			Output &output = wire->outputModule->outputs[wire->outputId];
@@ -188,6 +189,7 @@ void WireWidget::drawPlugs(NVGcontext *vg) {
 		outputLight->visible = false;
 		inputLight->visible = false;
 	}
+	*/
 	Widget::draw(vg);
 }
 

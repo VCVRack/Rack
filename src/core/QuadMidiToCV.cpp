@@ -28,6 +28,10 @@ struct QuadMIDIToCVInterface : MidiIO, Module {
 		AT_OUTPUT = 12,
 		NUM_OUTPUTS = 16
 	};
+	enum LightIds {
+		RESET_LIGHT,
+		NUM_LIGHTS
+	};
 
 	enum Modes {
 		ROTATE,
@@ -47,9 +51,8 @@ struct QuadMIDIToCVInterface : MidiIO, Module {
 	std::list<int> open;
 
 	SchmittTrigger resetTrigger;
-	float resetLight = 0.0;
 
-	QuadMIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+	QuadMIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 
 	}
 
@@ -90,11 +93,10 @@ void QuadMIDIToCVInterface::resetMidi() {
 	open.clear();
 
 	pedal = false;
-	resetLight = 1.0;
+	lights[RESET_LIGHT].value = 1.0;
 }
 
 void QuadMIDIToCVInterface::step() {
-	static float sampleRate = engineGetSampleRate();
 	static int msgsProcessed = 0;
 
 	if (isPortOpen()) {
@@ -125,10 +127,7 @@ void QuadMIDIToCVInterface::step() {
 		return;
 	}
 
-	if (resetLight > 0) {
-		resetLight -= resetLight / 0.55 / sampleRate; // fade out light
-	}
-
+	lights[RESET_LIGHT].value -= lights[RESET_LIGHT].value / 0.55 / engineGetSampleRate(); // fade out light
 }
 
 
@@ -307,7 +306,7 @@ QuadMidiToCVWidget::QuadMidiToCVWidget() {
 
 	addParam(createParam<LEDButton>(Vec(12 * 15, labelHeight), module, QuadMIDIToCVInterface::RESET_PARAM, 0.0, 1.0,
 									0.0));
-	addChild(createValueLight<SmallLight<RedValueLight>>(Vec(12 * 15 + 5, labelHeight + 5), &module->resetLight));
+	addChild(createLight<SmallLight<RedLight>>(Vec(12 * 15 + 5, labelHeight + 5), module, QuadMIDIToCVInterface::RESET_LIGHT));
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);

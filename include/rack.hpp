@@ -34,9 +34,16 @@ Model *createModel(std::string manufacturerSlug, std::string manufacturerName, s
 	return model;
 }
 
-template <class TParam>
+template <class TScrew>
+Widget *createScrew(Vec pos) {
+	Widget *screw = new TScrew();
+	screw->box.pos = pos;
+	return screw;
+}
+
+template <class TParamWidget>
 ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
-	ParamWidget *param = new TParam();
+	ParamWidget *param = new TParamWidget();
 	param->box.pos = pos;
 	param->module = module;
 	param->paramId = paramId;
@@ -65,27 +72,12 @@ Port *createOutput(Vec pos, Module *module, int outputId) {
 	return port;
 }
 
-template <class TScrew>
-Widget *createScrew(Vec pos) {
-	Widget *screw = new TScrew();
-	screw->box.pos = pos;
-	return screw;
-}
-
-template <class TLight>
-ValueLight *createValueLight(Vec pos, float *value) {
-	ValueLight *light = new TLight();
+template<class TModuleLightWidget>
+ModuleLightWidget *createLight(Vec pos, Module *module, int lightId) {
+	ModuleLightWidget *light = new TModuleLightWidget();
 	light->box.pos = pos;
-	light->value = value;
-	return light;
-}
-
-/** Polyfill for future LightWidget */
-template <class TLight>
-ValueLight *createValueLight(Vec pos, Module *module, int lightId) {
-	ValueLight *light = new TLight();
-	light->box.pos = pos;
-	light->value = &module->lights[lightId].value;
+	light->module = module;
+	light->lightId = lightId;
 	return light;
 }
 
