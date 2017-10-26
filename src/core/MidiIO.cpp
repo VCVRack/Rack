@@ -181,7 +181,7 @@ void MidiItem::onAction() {
 
 void MidiChoice::onAction() {
 	Menu *menu = gScene->createMenu();
-	menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+	menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 	menu->box.size.x = box.size.x;
 
 	{
@@ -216,7 +216,7 @@ void ChannelItem::onAction() {
 
 void ChannelChoice::onAction() {
 	Menu *menu = gScene->createMenu();
-	menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+	menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 	menu->box.size.x = box.size.x;
 
 	{

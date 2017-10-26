@@ -56,8 +56,13 @@ struct Widget {
 
 	virtual ~Widget();
 
-	Vec getAbsolutePos();
 	Rect getChildrenBoundingBox();
+	/**  Returns `v` transformed into the coordinate system of `relative` */
+	virtual Vec getRelativeOffset(Vec v, Widget *relative);
+	/** Returns `v` transformed into world coordinates */
+	Vec getAbsoluteOffset(Vec v) {
+		return getRelativeOffset(v, NULL);
+	}
 	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors */
 	virtual Rect getViewport(Rect r);
 
@@ -149,6 +154,7 @@ struct TransformWidget : Widget {
 
 struct ZoomWidget : Widget {
 	float zoom = 1.0;
+	Vec getRelativeOffset(Vec v, Widget *relative) override;
 	Rect getViewport(Rect r) override;
 	void setZoom(float zoom);
 	void draw(NVGcontext *vg) override;
@@ -230,6 +236,10 @@ Events are not passed to the underlying scene.
 struct FramebufferWidget : virtual Widget {
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
+	/** A margin in pixels around the children in the framebuffer
+	This prevents cutting the rendered SVG off on the box edges.
+	*/
+	float oversample;
 	/** The root object in the framebuffer scene
 	The FramebufferWidget owns the pointer
 	*/

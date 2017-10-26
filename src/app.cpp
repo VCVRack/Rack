@@ -14,10 +14,12 @@ std::string gApiHost = "http://api.vcvrack.com";
 
 RackWidget *gRackWidget = NULL;
 Toolbar *gToolbar = NULL;
+RackScene *gRackScene = NULL;
 
 
 void sceneInit() {
-	gScene = new RackScene();
+	gRackScene = new RackScene();
+	gScene = gRackScene;
 }
 
 void sceneDestroy() {

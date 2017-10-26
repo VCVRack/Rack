@@ -201,6 +201,7 @@ void SVGWidget::wrap() {
 
 void SVGWidget::draw(NVGcontext *vg) {
 	if (svg && svg->handle) {
+		// printf("drawing svg %f %f\n", box.size.x, box.size.y);
 		drawSVG(vg, svg->handle);
 	}
 }

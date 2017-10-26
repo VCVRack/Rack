@@ -39,7 +39,7 @@ struct QuitItem : MenuItem {
 struct FileChoice : ChoiceButton {
 	void onAction() override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		{
@@ -70,7 +70,7 @@ struct SampleRateItem : MenuItem {
 struct SampleRateChoice : ChoiceButton {
 	void onAction() override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		PauseItem *pauseItem = new PauseItem();
@@ -148,12 +148,18 @@ Toolbar::Toolbar() {
 
 	xPos += margin;
 	{
-		zoomSlider = new Slider();
+		struct ZoomSlider : Slider {
+			void onAction() override {
+				Slider::onAction();
+				gRackScene->zoomWidget->setZoom(value / 100.0);
+			}
+		};
+		zoomSlider = new ZoomSlider();
 		zoomSlider->box.pos = Vec(xPos, margin);
 		zoomSlider->box.size.x = 150;
 		zoomSlider->label = "Zoom";
 		zoomSlider->unit = "%";
-		zoomSlider->setLimits(33.33, 200.0);
+		zoomSlider->setLimits(25.0, 200.0);
 		zoomSlider->setDefaultValue(100.0);
 		addChild(zoomSlider);
 		xPos += zoomSlider->box.size.x;

@@ -33,8 +33,8 @@ static int smoothParamId;
 static float smoothValue;
 
 
-void Light::setSmooth(float v) {
-	value += (v - value) / sampleRate * 60.0;
+void Light::setBrightnessSmooth(float brightness) {
+	value += (powf(brightness, 2) - value) / sampleRate * 60.0;
 }
 
 

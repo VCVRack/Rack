@@ -218,9 +218,6 @@ void errorCallback(int error, const char *description) {
 void renderGui() {
 	int width, height;
 	glfwGetFramebufferSize(gWindow, &width, &height);
-	int windowWidth, windowHeight;
-	glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
-	gPixelRatio = (float)width / windowWidth;
 
 	// Update and render
 	nvgBeginFrame(gVg, width, height, gPixelRatio);
@@ -257,7 +254,7 @@ void guiInit() {
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	gWindow = glfwCreateWindow(640, 480, "", NULL, NULL);
 	if (!gWindow) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, are the latest drivers installed?");
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
 
@@ -277,7 +274,7 @@ void guiInit() {
 	glewExperimental = GL_TRUE;
 	err = glewInit();
 	if (err != GLEW_OK) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, are the latest drivers installed?");
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
 
@@ -340,6 +337,13 @@ void guiRun() {
 			title += extractFilename(gRackWidget->lastPath);
 		}
 		glfwSetWindowTitle(gWindow, title.c_str());
+
+		// Get framebuffer size
+		int width, height;
+		glfwGetFramebufferSize(gWindow, &width, &height);
+		int windowWidth, windowHeight;
+		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
+		gPixelRatio = (float)width / windowWidth;
 
 		// Step scene
 		gScene->step();

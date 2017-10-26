@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 
 
 namespace rack {
@@ -59,6 +59,10 @@ inline float sgnf(float x) {
 inline float eucmodf(float a, float base) {
 	float mod = fmodf(a, base);
 	return mod < 0.0 ? mod + base : mod;
+}
+
+inline float nearf(float a, float b, float epsilon = 1e-6) {
+	return fabsf(a - b) <= epsilon;
 }
 
 /** Limits a value between a minimum and maximum
@@ -204,7 +208,7 @@ struct Vec {
 		return x == 0.0 && y == 0.0;
 	}
 	bool isFinite() {
-		return isfinite(x) && isfinite(y);
+		return std::isfinite(x) && std::isfinite(y);
 	}
 	Vec clamp(Rect bound);
 };
@@ -265,6 +269,21 @@ struct Rect {
 		r.size = size;
 		r.pos.x = clampf(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
 		r.pos.y = clampf(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
+		return r;
+	}
+	/** Expands this Rect to contain `other` */
+	Rect expand(Rect other) {
+		Rect r;
+		r.pos.x = fminf(pos.x, other.pos.x);
+		r.pos.y = fminf(pos.y, other.pos.y);
+		r.size.x = fmaxf(pos.x + size.x, other.pos.x + other.size.x) - r.pos.x;
+		r.size.y = fmaxf(pos.y + size.y, other.pos.y + other.size.y) - r.pos.y;
+		return r;
+	}
+	/** Returns a Rect with its position set to zero */
+	Rect zeroPos() {
+		Rect r;
+		r.size = size;
 		return r;
 	}
 };

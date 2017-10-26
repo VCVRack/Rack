@@ -16,28 +16,28 @@ Widget::~Widget() {
 	clearChildren();
 }
 
-Vec Widget::getAbsolutePos() {
-	// Recursively compute position offset from parents
-	if (!parent) {
-		return box.pos;
+Rect Widget::getChildrenBoundingBox() {
+	Rect bound;
+	for (Widget *child : children) {
+		if (child == children.front()) {
+			bound = child->box;
+		}
+		else {
+			bound = bound.expand(child->box);
+		}
 	}
-	else {
-		return box.pos.plus(parent->getAbsolutePos());
-	}
+	return bound;
 }
 
-Rect Widget::getChildrenBoundingBox() {
-	if (children.empty()) {
-		return Rect();
+Vec Widget::getRelativeOffset(Vec v, Widget *relative) {
+	if (this == relative) {
+		return v;
 	}
-
-	Vec topLeft = Vec(INFINITY, INFINITY);
-	Vec bottomRight = Vec(-INFINITY, -INFINITY);
-	for (Widget *child : children) {
-		topLeft = topLeft.min(child->box.pos);
-		bottomRight = bottomRight.max(child->box.getBottomRight());
+	v = v.plus(box.pos);
+	if (parent) {
+		v = parent->getRelativeOffset(v, relative);
 	}
-	return Rect(topLeft, bottomRight.minus(topLeft));
+	return v;
 }
 
 Rect Widget::getViewport(Rect r) {

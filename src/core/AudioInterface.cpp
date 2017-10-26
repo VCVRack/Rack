@@ -335,7 +335,7 @@ struct AudioChoice : ChoiceButton {
 	AudioInterface *audioInterface;
 	void onAction() override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
 
 		int deviceCount = audioInterface->getDeviceCount();
@@ -373,7 +373,7 @@ struct SampleRateChoice : ChoiceButton {
 	AudioInterface *audioInterface;
 	void onAction() override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
 
 		const float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
@@ -404,7 +404,7 @@ struct BlockSizeChoice : ChoiceButton {
 	AudioInterface *audioInterface;
 	void onAction() override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
 
 		const int blockSizes[] = {64, 128, 256, 512, 1024, 2048, 4096};

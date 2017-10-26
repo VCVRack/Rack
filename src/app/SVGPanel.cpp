@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "gui.hpp"
 
 
 namespace rack {
@@ -15,6 +16,13 @@ struct PanelBorder : TransparentWidget {
 	}
 };
 
+
+void SVGPanel::step() {
+	if (nearf(gPixelRatio, 1.0)) {
+		oversample = 2.0;
+	}
+	FramebufferWidget::step();
+}
 
 void SVGPanel::setBackground(std::shared_ptr<SVG> svg) {
 	clearChildren();

@@ -3,6 +3,11 @@
 
 namespace rack {
 
+
+Vec ZoomWidget::getRelativeOffset(Vec v, Widget *relative) {
+	return Widget::getRelativeOffset(v.mult(zoom), relative);
+}
+
 Rect ZoomWidget::getViewport(Rect r) {
 	r.pos = r.pos.mult(zoom);
 	r.size = r.size.mult(zoom);

@@ -6,7 +6,7 @@ namespace rack {
 
 
 void RackScrollWidget::step() {
-	Vec pos = gMousePos.minus(getAbsolutePos());
+	Vec pos = gRackWidget->lastMousePos;
 	// Scroll rack if dragging cable near the edge of the screen
 	if (gRackWidget->wireContainer->activeWire) {
 		float margin = 20.0;

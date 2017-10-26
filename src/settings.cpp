@@ -28,7 +28,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
 	// zoom
-	float zoom = gToolbar->zoomSlider->value;
+	float zoom = gRackScene->zoomWidget->zoom;
 	json_t *zoomJ = json_real(zoom);
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
@@ -69,8 +69,10 @@ static void settingsFromJson(json_t *rootJ) {
 
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
-	if (zoomJ)
-		gToolbar->zoomSlider->value = json_number_value(zoomJ);
+	if (zoomJ) {
+		gRackScene->zoomWidget->setZoom(clampf(json_number_value(zoomJ), 0.25, 4.0));
+		gToolbar->zoomSlider->setValue(json_number_value(zoomJ) * 100.0);
+	}
 
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");

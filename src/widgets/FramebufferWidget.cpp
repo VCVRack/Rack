@@ -9,12 +9,6 @@
 namespace rack {
 
 
-/** A margin in pixels around the children in the framebuffer
-This prevents cutting the rendered SVG off on the box edges.
-*/
-static const float oversample = 2.0;
-
-
 struct FramebufferWidget::Internal {
 	NVGLUframebuffer *fb = NULL;
 	Rect box;
@@ -31,6 +25,7 @@ struct FramebufferWidget::Internal {
 
 
 FramebufferWidget::FramebufferWidget() {
+	oversample = 1.0;
 	internal = new Internal();
 }
 
@@ -65,6 +60,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		if (fbSize.x <= 0.0 || fbSize.y <= 0.0)
 			return;
 
+		// printf("rendering framebuffer %f %f\n", fbSize.x, fbSize.y);
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.

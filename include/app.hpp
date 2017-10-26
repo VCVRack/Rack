@@ -155,6 +155,7 @@ struct Panel : TransparentWidget {
 };
 
 struct SVGPanel : FramebufferWidget {
+	void step() override;
 	void setBackground(std::shared_ptr<SVG> svg);
 };
 
@@ -354,6 +355,7 @@ extern std::string gApplicationVersion;
 extern std::string gApiHost;
 
 // Easy access to "singleton" widgets
+extern RackScene *gRackScene;
 extern RackWidget *gRackWidget;
 extern Toolbar *gToolbar;
 

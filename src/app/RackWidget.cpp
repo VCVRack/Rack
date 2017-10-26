@@ -17,6 +17,7 @@ namespace rack {
 RackWidget::RackWidget() {
 	rails = new FramebufferWidget();
 	rails->box.size = Vec();
+	rails->oversample = 1.0;
 	{
 		RackRail *rail = new RackRail();
 		rail->box.size = Vec();
