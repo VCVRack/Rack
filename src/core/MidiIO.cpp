@@ -56,16 +56,12 @@ std::vector<std::string> MidiIO::getDevices() {
 		return names;
 	}
 
-	RtMidiIn *m = NULL;
-	if (midiInMap.empty()) {
-		try {
-			m = new RtMidiIn();
-		} catch (RtMidiError &error) {
-			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
-			return names;
-		}
-	} else {
-		m = midiInMap.begin()->second;
+	RtMidiIn *m;
+	try {
+		m = new RtMidiIn();
+	} catch (RtMidiError &error) {
+		fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+		return names;
 	}
 
 	for (unsigned int i = 0; i < m->getPortCount(); i++) {
@@ -152,7 +148,7 @@ double MidiIO::getMessage(std::vector<unsigned char> *msg) {
 		return 0;
 	}
 
-	next_msg.timeStamp = midiInMap[deviceName]->getMessage(&next_msg.bytes);
+	next_msg.timeStamp = mw->getMessage(&next_msg.bytes);
 	if (next_msg.bytes.size() > 0) {
 		for (auto &kv : mw->idMessagesMap) {
 
