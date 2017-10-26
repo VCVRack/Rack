@@ -60,6 +60,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		if (fbSize.x <= 0.0 || fbSize.y <= 0.0)
 			return;
 
+		// printf("rendering framebuffer %f %f\n", fbSize.x, fbSize.y);
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.

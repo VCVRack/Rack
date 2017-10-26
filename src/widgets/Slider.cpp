@@ -23,11 +23,13 @@ void Slider::onDragMove(Vec mouseRel) {
 void Slider::onDragEnd() {
 	state = BND_DEFAULT;
 	guiCursorUnlock();
+	onAction();
 }
 
 void Slider::onMouseDownOpaque(int button) {
 	if (button == 1) {
 		setValue(defaultValue);
+		onAction();
 	}
 }
 

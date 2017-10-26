@@ -355,6 +355,7 @@ extern std::string gApplicationVersion;
 extern std::string gApiHost;
 
 // Easy access to "singleton" widgets
+extern RackScene *gRackScene;
 extern RackWidget *gRackWidget;
 extern Toolbar *gToolbar;
 

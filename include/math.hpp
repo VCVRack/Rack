@@ -61,6 +61,10 @@ inline float eucmodf(float a, float base) {
 	return mod < 0.0 ? mod + base : mod;
 }
 
+inline float nearf(float a, float b, float epsilon = 1e-6) {
+	return fabsf(a - b) <= epsilon;
+}
+
 /** Limits a value between a minimum and maximum
 If min > max, the limits are switched
 */
