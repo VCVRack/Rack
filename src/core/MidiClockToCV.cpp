@@ -91,7 +91,7 @@ void MIDIClockToCVInterface::step() {
 	float sampleRate = engineGetSampleRate();
 
 	if (isPortOpen()) {
-		static std::vector<unsigned char> message;
+		std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
 		getMessage(&message);

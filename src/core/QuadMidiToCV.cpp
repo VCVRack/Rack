@@ -9,7 +9,6 @@ struct MidiKey {
 	int pitch = 60;
 	int at = 0; // aftertouch
 	int vel = 0; // velocity
-	int retriggerC = 0;
 	bool gate = false;
 };
 
@@ -137,8 +136,7 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	int status = (msg[0] >> 4) & 0xf;
 	int data1 = msg[1];
 	int data2 = msg[2];
-
-	static int gate;
+	bool gate;
 
 	// Filter channels
 	if (this->channel >= 0 && this->channel != channel)
@@ -195,7 +193,6 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	}
 
 	if (open.empty()) {
-		open.clear();
 		for (int i = 0; i < 4; i++) {
 			open.push_back(i);
 		}
