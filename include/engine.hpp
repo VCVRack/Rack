@@ -97,6 +97,8 @@ void engineSetParam(Module *module, int paramId, float value);
 void engineSetParamSmooth(Module *module, int paramId, float value);
 void engineSetSampleRate(float sampleRate);
 float engineGetSampleRate();
+/** Returns the inverse of the current sample rate */
+float engineGetSampleTime();
 
 extern bool gPaused;
 
