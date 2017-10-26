@@ -18,6 +18,9 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	enum OutputIds {
 		NUM_OUTPUTS = 16
 	};
+	enum LightIds {
+		NUM_LIGHTS = 16
+	};
 
 	int cc[NUM_OUTPUTS];
 	int ccNum[NUM_OUTPUTS];
@@ -25,10 +28,9 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	bool ccSyncFirst[NUM_OUTPUTS];
 	bool ccNumInited[NUM_OUTPUTS];
 	bool onFocus[NUM_OUTPUTS];
-	float lights[NUM_OUTPUTS];
 
 
-	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			cc[i] = 0;
 			ccNum[i] = i;
@@ -97,7 +99,7 @@ void MIDICCToCVInterface::step() {
 
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 
-		lights[i] = ccSync[i] / 127.0;
+		lights[i].setBrightness(ccSync[i] / 127.0);
 
 		outputs[i].value = cc[i] / 127.0 * 10.0;
 	}
@@ -294,8 +296,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 
 		yPos += labelHeight + margin;
 		addOutput(createOutput<PJ3410Port>(Vec((i % 4) * (63) + 10, yPos + 5), module, i));
-		addChild(createValueLight<SmallLight<RedValueLight>>(Vec((i % 4) * (63) + 32, yPos + 5),
-															 &module->lights[i]));
+		addChild(createLight<SmallLight<RedLight>>(Vec((i % 4) * (63) + 32, yPos + 5), module, i));
 
 		if ((i + 1) % 4 == 0) {
 			yPos += 47 + margin;

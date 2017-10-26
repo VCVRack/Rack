@@ -7,13 +7,13 @@
 namespace rack {
 
 
+struct Model;
 struct Module;
 struct Wire;
 
 struct RackWidget;
 struct ParamWidget;
 struct Port;
-struct Scene;
 
 ////////////////////
 // module
@@ -23,7 +23,6 @@ struct Scene;
 #define RACK_GRID_WIDTH 15
 #define RACK_GRID_HEIGHT 380
 
-struct Model;
 struct ModuleWidget : OpaqueWidget {
 	Model *model = NULL;
 	/** Owns the module pointer */
@@ -168,12 +167,6 @@ struct CircularShadow : TransparentWidget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct LightWidget : TransparentWidget {
-	NVGcolor bgColor = nvgRGBf(0, 0, 0);
-	NVGcolor color = nvgRGBf(1, 1, 1);
-	void draw(NVGcontext *vg) override;
-};
-
 struct ParamWidget : OpaqueWidget, QuantityWidget {
 	Module *module = NULL;
 	int paramId;
@@ -307,6 +300,29 @@ struct SVGScrew : FramebufferWidget {
 	SVGWidget *sw;
 
 	SVGScrew();
+};
+
+////////////////////
+// lights
+////////////////////
+
+struct LightWidget : TransparentWidget {
+	NVGcolor bgColor = nvgRGBf(0, 0, 0);
+	NVGcolor color = nvgRGBf(1, 1, 1);
+	void draw(NVGcontext *vg) override;
+};
+
+/** A LightWidget that points to a module's Light or a range of lights */
+struct ModuleLightWidget : LightWidget {
+	Module *module = NULL;
+	int lightId;
+};
+
+/** Mixes colors based on the brightness of the module light at lightId, lightId + 1, etc */
+struct ColorLightWidget : ModuleLightWidget {
+	std::vector<NVGcolor> colors;
+	void addColor(NVGcolor c);
+	void step() override;
 };
 
 ////////////////////

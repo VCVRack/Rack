@@ -26,6 +26,10 @@ struct MIDIToCVInterface : MidiIO, Module {
 		CHANNEL_AFTERTOUCH_OUTPUT,
 		NUM_OUTPUTS
 	};
+	enum LightIds {
+		RESET_LIGHT,
+		NUM_LIGHTS
+	};
 
 	std::list<int> notes;
 	bool pedal = false;
@@ -38,9 +42,8 @@ struct MIDIToCVInterface : MidiIO, Module {
 	bool retriggered = false;
 
 	SchmittTrigger resetTrigger;
-	float resetLight = 0.0;
 
-	MIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+	MIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 
 	}
 
@@ -78,14 +81,11 @@ void MIDIToCVInterface::resetMidi() {
 	pitchWheel = 64;
 	afterTouch = 0;
 	vel = 0;
-	resetLight = 1.0;
 	outputs[GATE_OUTPUT].value = 0.0;
 	notes.clear();
 }
 
 void MIDIToCVInterface::step() {
-	float sampleRate = engineGetSampleRate();
-	
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
 
@@ -109,10 +109,7 @@ void MIDIToCVInterface::step() {
 		return;
 	}
 
-	if (resetLight > 0) {
-		resetLight -= resetLight / 0.55 / sampleRate; // fade out light
-	}
-
+	lights[RESET_LIGHT].value -= lights[RESET_LIGHT].value / 0.55 / engineGetSampleRate(); // fade out light
 
 	outputs[GATE_OUTPUT].value = gate ? 10.0 : 0.0;
 	outputs[MOD_OUTPUT].value = mod / 127.0 * 10.0;
@@ -228,7 +225,7 @@ MidiToCVWidget::MidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
-	addChild(createValueLight<SmallLight<RedValueLight>>(Vec(7 * 15 + 5, labelHeight + 5), &module->resetLight));
+	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module, MIDIToCVInterface::RESET_LIGHT));
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
@@ -260,7 +257,7 @@ MidiToCVWidget::MidiToCVWidget() {
 	}
 
 	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel",
-														  "Aftertouch"};
+															"Aftertouch"};
 
 	for (int i = 0; i < MIDIToCVInterface::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
