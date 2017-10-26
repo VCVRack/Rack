@@ -57,15 +57,15 @@ std::vector<std::string> MidiIO::getDevices() {
 	}
 
 	RtMidiIn *m = NULL;
-	if (midiInMap.empty()){
+	if (midiInMap.empty()) {
 		try {
-			m =  new RtMidiIn();
+			m = new RtMidiIn();
 		} catch (RtMidiError &error) {
 			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
 			return names;
 		}
 	} else {
-		m =  midiInMap.begin()->second;
+		m = midiInMap.begin()->second;
 	}
 
 	for (unsigned int i = 0; i < m->getPortCount(); i++) {
