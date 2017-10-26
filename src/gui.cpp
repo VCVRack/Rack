@@ -254,7 +254,7 @@ void guiInit() {
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	gWindow = glfwCreateWindow(640, 480, "", NULL, NULL);
 	if (!gWindow) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, are the latest drivers installed?");
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
 
@@ -274,7 +274,7 @@ void guiInit() {
 	glewExperimental = GL_TRUE;
 	err = glewInit();
 	if (err != GLEW_OK) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, are the latest drivers installed?");
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
 
