@@ -155,7 +155,7 @@ struct Panel : TransparentWidget {
 };
 
 struct SVGPanel : FramebufferWidget {
-	SVGPanel();
+	void step() override;
 	void setBackground(std::shared_ptr<SVG> svg);
 };
 

@@ -218,9 +218,6 @@ void errorCallback(int error, const char *description) {
 void renderGui() {
 	int width, height;
 	glfwGetFramebufferSize(gWindow, &width, &height);
-	int windowWidth, windowHeight;
-	glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
-	gPixelRatio = (float)width / windowWidth;
 
 	// Update and render
 	nvgBeginFrame(gVg, width, height, gPixelRatio);
@@ -340,6 +337,13 @@ void guiRun() {
 			title += extractFilename(gRackWidget->lastPath);
 		}
 		glfwSetWindowTitle(gWindow, title.c_str());
+
+		// Get framebuffer size
+		int width, height;
+		glfwGetFramebufferSize(gWindow, &width, &height);
+		int windowWidth, windowHeight;
+		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
+		gPixelRatio = (float)width / windowWidth;
 
 		// Step scene
 		gScene->step();
