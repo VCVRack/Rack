@@ -167,6 +167,7 @@ void MidiIO::close() {
 	if (mw->idMessagesMap.size() == 0) {
 		mw->closePort();
 		midiInMap.erase(deviceName);
+		delete (mw);
 	}
 
 	id = -1;
