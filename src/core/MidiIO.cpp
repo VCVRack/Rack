@@ -49,14 +49,31 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 }
 
 std::vector<std::string> MidiIO::getDevices() {
-	/* Note: we could also use an existing interface if one exists */
-	RtMidiIn m;
-
+	MidiApi *m = NULL;
 	std::vector<std::string> names = {};
 
-	for (unsigned int i = 0; i < m.getPortCount(); i++) {
-		names.push_back(m.getPortName(i));
+	if (isPortOpen()) {
+		if (isOut) {
+			//m = (RtMidiApi *) midiInMap[this->deviceName];
+			return names;
+		} else {
+			m = (MidiApi *) midiInMap[this->deviceName];
+		}
+	} else {
+		try {
+			m = (MidiApi *) new RtMidiIn();
+		} catch (RtMidiError &error) {
+			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+			return names;
+		}
 	}
+
+	for (unsigned int i = 0; i < m->getPortCount(); i++) {
+		names.push_back(m->getPortName(i));
+	}
+
+	if (!isPortOpen())
+		delete (m);
 
 	return names;
 }
@@ -80,6 +97,13 @@ void MidiIO::openDevice(std::string deviceName) {
 					mw->openPort(i);
 					break;
 				}
+			}
+
+			if (!mw->isPortOpen()) {
+				fprintf(stderr, "Failed to create RtMidiIn: No such device %s\n", deviceName.c_str());
+				this->deviceName = "";
+				this->id = -1;
+				return;
 			}
 		}
 		catch (RtMidiError &error) {
