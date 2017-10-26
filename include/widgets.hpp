@@ -56,8 +56,13 @@ struct Widget {
 
 	virtual ~Widget();
 
-	Vec getAbsolutePos();
 	Rect getChildrenBoundingBox();
+	/**  Returns `v` transformed into the coordinate system of `relative` */
+	virtual Vec getRelativeOffset(Vec v, Widget *relative);
+	/** Returns `v` transformed into world coordinates */
+	Vec getAbsoluteOffset(Vec v) {
+		return getRelativeOffset(v, NULL);
+	}
 	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors */
 	virtual Rect getViewport(Rect r);
 
@@ -149,6 +154,7 @@ struct TransformWidget : Widget {
 
 struct ZoomWidget : Widget {
 	float zoom = 1.0;
+	Vec getRelativeOffset(Vec v, Widget *relative) override;
 	Rect getViewport(Rect r) override;
 	void setZoom(float zoom);
 	void draw(NVGcontext *vg) override;

@@ -39,7 +39,7 @@ struct QuitItem : MenuItem {
 struct FileChoice : ChoiceButton {
 	void onAction() override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		{
@@ -70,7 +70,7 @@ struct SampleRateItem : MenuItem {
 struct SampleRateChoice : ChoiceButton {
 	void onAction() override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsolutePos().plus(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		PauseItem *pauseItem = new PauseItem();

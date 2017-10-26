@@ -6,7 +6,7 @@ namespace rack {
 
 void Tooltip::step() {
 	// Follow the mouse
-	box.pos = gMousePos.minus(parent->getAbsolutePos());
+	box.pos = gMousePos;
 
 	// Wrap size to contents
 	// box.size = getChildrenBoundingBox().getBottomRight();

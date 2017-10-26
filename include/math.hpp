@@ -271,6 +271,21 @@ struct Rect {
 		r.pos.y = clampf(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
+	/** Expands this Rect to contain `other` */
+	Rect expand(Rect other) {
+		Rect r;
+		r.pos.x = fminf(pos.x, other.pos.x);
+		r.pos.y = fminf(pos.y, other.pos.y);
+		r.size.x = fmaxf(pos.x + size.x, other.pos.x + other.size.x) - r.pos.x;
+		r.size.y = fmaxf(pos.y + size.y, other.pos.y + other.size.y) - r.pos.y;
+		return r;
+	}
+	/** Returns a Rect with its position set to zero */
+	Rect zeroPos() {
+		Rect r;
+		r.size = size;
+		return r;
+	}
 };
 
 

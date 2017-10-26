@@ -124,31 +124,27 @@ void WireWidget::updateWire() {
 }
 
 Vec WireWidget::getOutputPos() {
-	Vec pos;
 	if (outputPort) {
-		pos = Rect(outputPort->getAbsolutePos(), outputPort->box.size).getCenter();
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), gRackWidget);
 	}
 	else if (hoveredOutputPort) {
-		pos = Rect(hoveredOutputPort->getAbsolutePos(), hoveredOutputPort->box.size).getCenter();
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), gRackWidget);
 	}
 	else {
 		return gRackWidget->lastMousePos;
 	}
-	return pos.minus(getAbsolutePos().minus(box.pos));
 }
 
 Vec WireWidget::getInputPos() {
-	Vec pos;
 	if (inputPort) {
-		pos = Rect(inputPort->getAbsolutePos(), inputPort->box.size).getCenter();
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), gRackWidget);
 	}
 	else if (hoveredInputPort) {
-		pos = Rect(hoveredInputPort->getAbsolutePos(), hoveredInputPort->box.size).getCenter();
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), gRackWidget);
 	}
 	else {
 		return gRackWidget->lastMousePos;
 	}
-	return pos.minus(getAbsolutePos().minus(box.pos));
 }
 
 void WireWidget::draw(NVGcontext *vg) {
