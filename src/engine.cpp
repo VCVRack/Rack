@@ -14,7 +14,8 @@
 
 namespace rack {
 
-float sampleRate = 0.0;
+float sampleRate;
+float sampleTime;
 bool gPaused = false;
 
 
@@ -38,7 +39,7 @@ float Light::getBrightness() {
 }
 
 void Light::setBrightnessSmooth(float brightness) {
-	value += (brightness * brightness - value) / sampleRate * 60.0;
+	value += (brightness * brightness - value) * sampleTime * 60.0;
 }
 
 
@@ -70,7 +71,7 @@ static void engineStep() {
 			smoothModule = NULL;
 		}
 		else {
-			value += delta * lambda / sampleRate;
+			value += delta * lambda * sampleTime;
 			smoothModule->params[smoothParamId].value = value;
 		}
 	}
@@ -107,7 +108,7 @@ static void engineRun() {
 			}
 		}
 
-		double stepTime = mutexSteps / sampleRate;
+		double stepTime = mutexSteps * sampleTime;
 		ahead += stepTime;
 		auto currTime = std::chrono::high_resolution_clock::now();
 		const double aheadFactor = 2.0;
@@ -232,6 +233,7 @@ void engineSetSampleRate(float newSampleRate) {
 	VIPLock vipLock(vipMutex);
 	std::lock_guard<std::mutex> lock(mutex);
 	sampleRate = newSampleRate;
+	sampleTime = 1.0 / sampleRate;
 	// onSampleRateChange
 	for (Module *module : modules) {
 		module->onSampleRateChange();
@@ -242,5 +244,8 @@ float engineGetSampleRate() {
 	return sampleRate;
 }
 
+float engineGetSampleTime() {
+	return sampleTime;
+}
 
 } // namespace rack
