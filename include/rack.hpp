@@ -2,12 +2,12 @@
 
 #include "util.hpp"
 #include "math.hpp"
+#include "asset.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
 #include "gui.hpp"
 #include "app.hpp"
 #include "components.hpp"
-#include "asset.hpp"
 
 
 namespace rack {
@@ -77,6 +77,15 @@ ValueLight *createValueLight(Vec pos, float *value) {
 	ValueLight *light = new TLight();
 	light->box.pos = pos;
 	light->value = value;
+	return light;
+}
+
+/** Polyfill for future LightWidget */
+template <class TLight>
+ValueLight *createValueLight(Vec pos, Module *module, int lightId) {
+	ValueLight *light = new TLight();
+	light->box.pos = pos;
+	light->value = &module->lights[lightId].value;
 	return light;
 }
 

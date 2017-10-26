@@ -337,7 +337,6 @@ struct Rogan1PWhite : Rogan1P {
 
 struct SynthTechAlco : SVGKnob {
 	SynthTechAlco() {
-		box.size = Vec(45, 45);
 		minAngle = -0.82*M_PI;
 		maxAngle = 0.82*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco.svg")));

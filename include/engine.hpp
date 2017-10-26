@@ -32,6 +32,9 @@ struct Output {
 struct Light {
 	/** The square of the brightness value */
 	float value = 0.0;
+	void setBrightness(float brightness) {
+		value = brightness * brightness;
+	}
 	void setBrightnessSmooth(float brightness);
 };
 

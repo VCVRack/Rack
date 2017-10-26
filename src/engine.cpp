@@ -34,7 +34,7 @@ static float smoothValue;
 
 
 void Light::setBrightnessSmooth(float brightness) {
-	value += (powf(brightness, 2) - value) / sampleRate * 60.0;
+	value += (brightness * brightness - value) / sampleRate * 60.0;
 }
 
 
