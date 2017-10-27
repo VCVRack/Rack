@@ -35,11 +35,11 @@ static float smoothValue;
 
 
 float Light::getBrightness() {
-	return sqrtf(value);
+	return sqrtf(fmaxf(0.0, value));
 }
 
 void Light::setBrightnessSmooth(float brightness) {
-	value += (brightness * brightness - value) * sampleTime * 60.0;
+	value += (brightness * brightness - value) * sampleTime * (60.0 * 3.0);
 }
 
 
