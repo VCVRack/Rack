@@ -13,6 +13,8 @@ However, please search before posting to avoid duplicates, and limit to one issu
 
 You may vote on feature requests by using the Thumbs Up/Down reaction on the first post.
 
+I rarely accept Pull Requests, so please notify me in advance to plan your contribution before writing code.
+
 ## Setting up your development environment
 
 Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system, since specific versions are compiled locally during the build process. However, you need proper tools to build these dependencies.
@@ -63,7 +65,7 @@ Run Rack.
 
 Be sure to check out and build the version of Rack you wish to build your plugins against.
 
-Clone your favorite plugin in the `plugins/` directory. e.g.:
+You must clone the plugin in Rack's `plugins/` directory, e.g.
 
 	cd plugins
 	git clone https://github.com/VCVRack/Fundamental.git

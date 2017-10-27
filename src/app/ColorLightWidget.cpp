@@ -10,6 +10,7 @@ void ColorLightWidget::addColor(NVGcolor c) {
 }
 
 void ColorLightWidget::step() {
+	assert(module);
 	color = nvgRGBf(0, 0, 0);
 	for (int i = 0; i < (int)colors.size(); i++) {
 		NVGcolor c = colors[i];
