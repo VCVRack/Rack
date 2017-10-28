@@ -8,6 +8,11 @@ void LightWidget::draw(NVGcontext *vg) {
 	float radius = box.size.x / 2.0;
 	float oradius = radius + 20.0;
 
+	color.r = clampf(color.r, 0.0, 1.0);
+	color.g = clampf(color.g, 0.0, 1.0);
+	color.b = clampf(color.b, 0.0, 1.0);
+	color.a = clampf(color.a, 0.0, 1.0);
+
 	// Solid
 	nvgBeginPath(vg);
 	nvgCircle(vg, radius, radius, radius);

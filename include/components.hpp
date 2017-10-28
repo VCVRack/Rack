@@ -434,6 +434,19 @@ struct GreenLight : ColorLightWidget {
 	}
 };
 
+struct YellowLight : ColorLightWidget {
+	YellowLight() {
+		addColor(COLOR_YELLOW);
+	}
+};
+
+struct BlueLight : ColorLightWidget {
+	BlueLight() {
+		addColor(COLOR_BLUE);
+	}
+};
+
+/** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
 struct GreenRedLight : ColorLightWidget {
 	GreenRedLight() {
 		addColor(COLOR_GREEN);
@@ -446,7 +459,7 @@ struct GreenRedLight : ColorLightWidget {
 template <typename BASE>
 struct LargeLight : BASE {
 	LargeLight() {
-		this->box.size = Vec(15, 15);
+		this->box.size = Vec(20, 20);
 	}
 };
 
@@ -454,7 +467,7 @@ struct LargeLight : BASE {
 template <typename BASE>
 struct MediumLight : BASE {
 	MediumLight() {
-		this->box.size = Vec(9, 9);
+		this->box.size = Vec(12, 12);
 	}
 };
 
@@ -462,7 +475,7 @@ struct MediumLight : BASE {
 template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
-		this->box.size = Vec(6, 6);
+		this->box.size = Vec(8, 8);
 	}
 };
 
@@ -470,7 +483,7 @@ struct SmallLight : BASE {
 template <typename BASE>
 struct TinyLight : BASE {
 	TinyLight() {
-		this->box.size = Vec(3, 3);
+		this->box.size = Vec(5, 5);
 	}
 };
 
