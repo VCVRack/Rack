@@ -10,6 +10,9 @@
 #include "util.hpp"
 
 
+#define SVG_DPI 75.0
+
+
 namespace rack {
 
 
