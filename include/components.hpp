@@ -454,8 +454,15 @@ struct GreenRedLight : ColorLightWidget {
 	}
 };
 
+struct RedGreenBlueLight : ColorLightWidget {
+	RedGreenBlueLight() {
+		addColor(COLOR_RED);
+		addColor(COLOR_GREEN);
+		addColor(COLOR_BLUE);
+	}
+};
 
-/** 5mm diameter */
+
 template <typename BASE>
 struct LargeLight : BASE {
 	LargeLight() {
@@ -463,7 +470,6 @@ struct LargeLight : BASE {
 	}
 };
 
-/** 3mm diameter */
 template <typename BASE>
 struct MediumLight : BASE {
 	MediumLight() {
@@ -471,7 +477,6 @@ struct MediumLight : BASE {
 	}
 };
 
-/** 2mm diameter */
 template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
@@ -479,7 +484,6 @@ struct SmallLight : BASE {
 	}
 };
 
-/** 1mm diameter */
 template <typename BASE>
 struct TinyLight : BASE {
 	TinyLight() {
