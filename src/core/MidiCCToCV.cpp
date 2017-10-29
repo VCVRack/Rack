@@ -113,6 +113,8 @@ void MIDICCToCVInterface::resetMidi() {
 		cc[i].val = 0;
 		cc[i].sync = 0;
 		cc[i].syncFirst = true;
+		outputs[i].value = 0;
+		cc[i].changed = true;
 	}
 };
 

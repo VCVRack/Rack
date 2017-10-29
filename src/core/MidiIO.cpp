@@ -196,7 +196,6 @@ void MidiIO::close() {
 
 
 void MidiItem::onAction() {
-	midiModule->resetMidi(); // reset Midi values
 	midiModule->openDevice(text);
 }
 
