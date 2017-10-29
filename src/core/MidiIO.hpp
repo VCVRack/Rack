@@ -15,7 +15,7 @@ struct MidiMessage {
 	std::vector<unsigned char> bytes;
 	double timeStamp;
 
-	MidiMessage(): bytes(0), timeStamp(0.0) {};
+	MidiMessage() : bytes(0), timeStamp(0.0) {};
 
 };
 
@@ -93,9 +93,79 @@ public:
 	/* called when midi port is set */
 	virtual void resetMidi()=0;
 
-	/* called if a user switches or sets the deivce (and after this device is initialised)*/
+	/* called if a user switches or sets the device (and after this device is initialised)*/
 	virtual void onDeviceChange() {};
 };
+
+
+struct TransitionSmoother {
+	enum TransitionFunction {
+		SMOOTHSTEP,
+		EXP,
+		LIN,
+	};
+
+	enum TransitionMode {
+		DELTA,
+		CONST,
+	};
+
+	float start;
+	float end;
+	float x;
+	float delta;
+	float step;
+	TransitionFunction t;
+
+
+	void set(float start, float end, int l = 1500, TransitionFunction t = LIN,  TransitionMode m = DELTA, bool reset = true) {
+		this->start = start;
+		this->end = end;
+		this->delta = end - start;
+		this->t = t;
+
+		if (reset || x >= 1) {
+			this->x = 0;
+		}
+
+		switch (m) {
+		case DELTA:
+			/* If the change is smaller, the transition phase is longer */
+			this->step = delta > 0 ?  delta/l :  -delta/l;
+			break;
+		case CONST:
+			this->step = 1.0/l;
+			break;
+		}
+
+	}
+
+	float next() {
+		float next = start;
+
+		x += step;
+		if (x >= 1)
+			return end;
+
+		switch (t) {
+		case SMOOTHSTEP:
+			next += delta*x*x*(3-2*x);
+			break;
+		case EXP:
+			next += delta*x*x;
+			break;
+		case LIN:
+			next += delta*x;
+			break;
+		}
+
+		if ((delta > 0 && next > end) || (delta <= 0 && next < end))
+			return end;
+
+		return next;;
+	}
+};
+
 
 //////////////////////
 // MIDI module widgets

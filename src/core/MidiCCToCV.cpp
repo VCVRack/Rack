@@ -4,6 +4,17 @@
 #include "core.hpp"
 #include "MidiIO.hpp"
 
+struct CCValue {
+	int val = 0;
+	TransitionSmoother tSmooth;
+	int num = 0; // controller number
+	bool inited = false;
+	bool changed = false;
+	int sync = 0; // Output value sync (implies diff)
+	bool syncFirst = true;
+	bool onFocus = false; // Text field for output focused
+};
+
 /*
  * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod weel to
  * CV
@@ -22,27 +33,11 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		NUM_LIGHTS = 16
 	};
 
-	int cc[NUM_OUTPUTS];
-	int ccNum[NUM_OUTPUTS];
-	int ccSync[NUM_OUTPUTS];
-	bool ccSyncFirst[NUM_OUTPUTS];
-	bool ccNumInited[NUM_OUTPUTS];
-	bool onFocus[NUM_OUTPUTS];
+	CCValue cc[NUM_OUTPUTS];
 
+	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 
-	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			cc[i] = 0;
-			ccNum[i] = i;
-			ccSync[i] = 0;
-			ccSyncFirst[i] = true;
-			onFocus[i] = false;
-		}
-	}
-
-	~MIDICCToCVInterface() {
-
-	}
+	~MIDICCToCVInterface() {}
 
 	void step();
 
@@ -54,9 +49,9 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			json_object_set_new(rootJ, ("ccNum" + std::to_string(i)).c_str(), json_integer(ccNum[i]));
+			json_object_set_new(rootJ, ("ccNum" + std::to_string(i)).c_str(), json_integer(cc[i].num));
 			if (outputs[i].active) {
-				json_object_set_new(rootJ, ("ccVal" + std::to_string(i)).c_str(), json_integer(cc[i]));
+				json_object_set_new(rootJ, ("ccVal" + std::to_string(i)).c_str(), json_integer(cc[i].val));
 			}
 		}
 		return rootJ;
@@ -67,13 +62,15 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			json_t *ccNumJ = json_object_get(rootJ, ("ccNum" + std::to_string(i)).c_str());
 			if (ccNumJ) {
-				ccNum[i] = json_integer_value(ccNumJ);
-				ccNumInited[i] = true;
+				cc[i].num = json_integer_value(ccNumJ);
+				cc[i].inited = true;
 			}
 
 			json_t *ccValJ = json_object_get(rootJ, ("ccVal" + std::to_string(i)).c_str());
 			if (ccValJ) {
-				cc[i] = json_integer_value(ccValJ);
+				cc[i].val = json_integer_value(ccValJ);
+				outputs[i].value = (cc[i].val/127.0) * 10.0;
+				cc[i].changed = true;
 			}
 
 		}
@@ -97,19 +94,25 @@ void MIDICCToCVInterface::step() {
 		}
 	}
 
+
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 
-		lights[i].setBrightness(ccSync[i] / 127.0);
+		lights[i].setBrightness(cc[i].sync / 127.0);
 
-		outputs[i].value = cc[i] / 127.0 * 10.0;
+		if (cc[i].changed){
+			cc[i].tSmooth.set(outputs[i].value, (cc[i].val / 127.0 * 10.0), int(engineGetSampleRate()/32));
+			cc[i].changed = false;
+		}
+
+		outputs[i].value = cc[i].tSmooth.next();
 	}
 }
 
 void MIDICCToCVInterface::resetMidi() {
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
-		cc[i] = 0;
-		ccSync[i] = 0;
-		ccSyncFirst[i] = true;
+		cc[i].val = 0;
+		cc[i].sync = 0;
+		cc[i].syncFirst = true;
 	}
 };
 
@@ -127,27 +130,28 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	if (status == 0xb) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			if (onFocus[i]) {
-				ccSync[i] = true;
-				ccSyncFirst[i] = true;
-				ccNum[i] = data1;
+			if (cc[i].onFocus) {
+				cc[i].sync = true;
+				cc[i].syncFirst = true;
+				cc[i].num = data1;
 			}
 
-			if (data1 == ccNum[i]) {
-				if (ccSyncFirst[i]) {
-					ccSyncFirst[i] = false;
+			if (data1 == cc[i].num) {
+				if (cc[i].syncFirst) {
+					cc[i].syncFirst = false;
 
-					if (data2 < cc[i] + 2 && data2 > cc[i] - 2) {
-						ccSync[i] = 0;
+					if (data2 < cc[i].val + 2 && data2 > cc[i].val - 2) {
+						cc[i].sync = 0;
 					} else {
-						ccSync[i] = absi(data2 - cc[i]);
+						cc[i].sync = absi(data2 - cc[i].val);
 					}
 				}
 
-				if (ccSync[i] == 0) {
-					cc[i] = data2;
+				if (cc[i].sync == 0) {
+					cc[i].val = data2;
+					cc[i].changed = true;
 				} else {
-					ccSync[i] = absi(data2 - cc[i]);
+					cc[i].sync = absi(data2 - cc[i].val);
 				}
 			}
 		}
@@ -173,13 +177,13 @@ struct CCTextField : TextField {
 void CCTextField::draw(NVGcontext *vg) {
 	/* This is necessary, since the save
 	 * file is loaded after constructing the widget*/
-	if (module->ccNumInited[num]) {
-		module->ccNumInited[num] = false;
-		text = std::to_string(module->ccNum[num]);
+	if (module->cc[num].inited) {
+		module->cc[num].inited = false;
+		text = std::to_string(module->cc[num].num);
 	}
 
-	if (module->onFocus[num]) {
-		text = std::to_string(module->ccNum[num]);
+	if (module->cc[num].onFocus) {
+		text = std::to_string(module->cc[num].num);
 	}
 
 	TextField::draw(vg);
@@ -187,24 +191,24 @@ void CCTextField::draw(NVGcontext *vg) {
 
 void CCTextField::onMouseUpOpaque(int button) {
 	if (button == 1) {
-		module->onFocus[num] = false;
+		module->cc[num].onFocus = false;
 	}
 
 }
 
 void CCTextField::onMouseDownOpaque(int button) {
 	if (button == 1) {
-		module->onFocus[num] = true;
+		module->cc[num].onFocus = true;
 	}
 }
 
 void CCTextField::onMouseLeave() {
-	module->onFocus[num] = false;
+	module->cc[num].onFocus = false;
 }
 
 
 void CCTextField::onTextChange() {
-	int *ccNum = &module->ccNum[num];
+	int *ccNum = &module->cc[num].num;
 	if (text.size() > 0) {
 		try {
 			*ccNum = std::stoi(text);
@@ -216,9 +220,9 @@ void CCTextField::onTextChange() {
 				return;
 			}
 
-			if (!module->ccNumInited[num]) {
-				module->ccSync[num] = 0;
-				module->ccSyncFirst[num] = true;
+			if (!module->cc[num].inited) {
+				module->cc[num].sync = 0;
+				module->cc[num].syncFirst = true;
 			}
 
 		} catch (...) {
@@ -288,7 +292,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 		CCTextField *ccNumChoice = new CCTextField();
 		ccNumChoice->module = module;
 		ccNumChoice->num = i;
-		ccNumChoice->text = std::to_string(module->ccNum[i]);
+		ccNumChoice->text = std::to_string(module->cc[i].num);
 		ccNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		ccNumChoice->box.size.x = 29;
 
