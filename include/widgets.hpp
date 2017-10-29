@@ -229,6 +229,8 @@ struct SVGWidget : virtual Widget {
 	std::shared_ptr<SVG> svg;
 	/** Sets the box size to the svg image size */
 	void wrap();
+	/** Sets and wraps the SVG */
+	void setSVG(std::shared_ptr<SVG> svg);
 	void draw(NVGcontext *vg) override;
 };
 

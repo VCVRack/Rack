@@ -283,6 +283,9 @@ struct SynthTechAlco : SVGKnob {
 		minAngle = -0.82*M_PI;
 		maxAngle = 0.82*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco.svg")));
+		SVGWidget *cap = new SVGWidget();
+		cap->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco_cap.svg")));
+		addChild(cap);
 	}
 };
 
