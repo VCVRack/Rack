@@ -9,12 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="4.7623944mm"
-   height="4.7624998mm"
+   width="17.999601"
+   height="18"
    viewBox="0 0 4.7623944 4.7624998"
    version="1.1"
    id="svg7595"
-   inkscape:version="0.92.1 r"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
    sodipodi:docname="LEDButton.svg">
   <defs
      id="defs7589">
@@ -34,7 +34,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.9195959"
-     inkscape:cx="-1.6625256"
+     inkscape:cx="-43.394453"
      inkscape:cy="0.82092183"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -43,11 +43,12 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1600"
-     inkscape:window-height="882"
+     inkscape:window-width="2560"
+     inkscape:window-height="1422"
      inkscape:window-x="0"
      inkscape:window-y="18"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     units="px" />
   <metadata
      id="metadata7592">
     <rdf:RDF>

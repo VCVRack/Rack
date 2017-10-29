@@ -115,220 +115,163 @@ struct Rogan : SVGKnob {
 	}
 };
 
-struct Rogan6PS : Rogan {
-	Rogan6PS() {
-		box.size = Vec(89, 89);
-		// minAngle = -0.83*M_PI;
-		// maxAngle = 0.83*M_PI;
-	}
-};
-
-struct Rogan5PS : Rogan {
-	Rogan5PS() {
-		box.size = Vec(60, 60);
-	}
-};
-
-struct Rogan3PS : Rogan {
-	Rogan3PS() {
-		box.size = Vec(52, 52);
-	}
-};
-
-struct Rogan3P : Rogan {
-	Rogan3P() {
-		box.size = Vec(42, 42);
-	}
-};
-
-struct Rogan2S : Rogan {
-	Rogan2S() {
-		box.size = Vec(43, 43);
-	}
-};
-
-struct Rogan2PS : Rogan {
-	Rogan2PS() {
-		box.size = Vec(43, 43);
-	}
-};
-
-struct Rogan2P : Rogan {
-	Rogan2P() {
-		box.size = Vec(34, 34);
-	}
-};
-
-struct Rogan1PS : Rogan {
-	Rogan1PS() {
-		box.size = Vec(40, 40);
-	}
-};
-
-struct Rogan1P : Rogan {
-	Rogan1P() {
-		box.size = Vec(31, 31);
-	}
-};
-
-
-struct Rogan6PSWhite : Rogan6PS {
+struct Rogan6PSWhite : Rogan {
 	Rogan6PSWhite() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan6PSWhite.svg")));
 	}
 };
 
-struct Rogan5PSGray : Rogan5PS {
+struct Rogan5PSGray : Rogan {
 	Rogan5PSGray() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan5PSGray.svg")));
 	}
 };
 
-struct Rogan3PSBlue : Rogan3PS {
+struct Rogan3PSBlue : Rogan {
 	Rogan3PSBlue() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSBlue.svg")));
 	}
 };
 
-struct Rogan3PSRed : Rogan3PS {
+struct Rogan3PSRed : Rogan {
 	Rogan3PSRed() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSRed.svg")));
 	}
 };
 
-struct Rogan3PSGreen : Rogan3PS {
+struct Rogan3PSGreen : Rogan {
 	Rogan3PSGreen() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSGreen.svg")));
 	}
 };
 
-struct Rogan3PSWhite : Rogan3PS {
+struct Rogan3PSWhite : Rogan {
 	Rogan3PSWhite() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PSWhite.svg")));
 	}
 };
 
-struct Rogan3PBlue : Rogan3P {
+struct Rogan3PBlue : Rogan {
 	Rogan3PBlue() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PBlue.svg")));
 	}
 };
 
-struct Rogan3PRed : Rogan3P {
+struct Rogan3PRed : Rogan {
 	Rogan3PRed() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PRed.svg")));
 	}
 };
 
-struct Rogan3PGreen : Rogan3P {
+struct Rogan3PGreen : Rogan {
 	Rogan3PGreen() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PGreen.svg")));
 	}
 };
 
-struct Rogan3PWhite : Rogan3P {
+struct Rogan3PWhite : Rogan {
 	Rogan3PWhite() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan3PWhite.svg")));
 	}
 };
 
-struct Rogan2SGray : Rogan2S {
+struct Rogan2SGray : Rogan {
 	Rogan2SGray() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2SGray.svg")));
 	}
 };
 
-struct Rogan2PSBlue : Rogan2PS {
+struct Rogan2PSBlue : Rogan {
 	Rogan2PSBlue() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSBlue.svg")));
 	}
 };
 
-struct Rogan2PSRed : Rogan2PS {
+struct Rogan2PSRed : Rogan {
 	Rogan2PSRed() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSRed.svg")));
 	}
 };
 
-struct Rogan2PSGreen : Rogan2PS {
+struct Rogan2PSGreen : Rogan {
 	Rogan2PSGreen() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSGreen.svg")));
 	}
 };
 
-struct Rogan2PSWhite : Rogan2PS {
+struct Rogan2PSWhite : Rogan {
 	Rogan2PSWhite() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PSWhite.svg")));
 	}
 };
 
-struct Rogan2PBlue : Rogan2P {
+struct Rogan2PBlue : Rogan {
 	Rogan2PBlue() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PBlue.svg")));
 	}
 };
 
-struct Rogan2PRed : Rogan2P {
+struct Rogan2PRed : Rogan {
 	Rogan2PRed() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PRed.svg")));
 	}
 };
 
-struct Rogan2PGreen : Rogan2P {
+struct Rogan2PGreen : Rogan {
 	Rogan2PGreen() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PGreen.svg")));
 	}
 };
 
-struct Rogan2PWhite : Rogan2P {
+struct Rogan2PWhite : Rogan {
 	Rogan2PWhite() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan2PWhite.svg")));
 	}
 };
 
-struct Rogan1PSBlue : Rogan1PS {
+struct Rogan1PSBlue : Rogan {
 	Rogan1PSBlue() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSBlue.svg")));
 	}
 };
 
-struct Rogan1PSRed : Rogan1PS {
+struct Rogan1PSRed : Rogan {
 	Rogan1PSRed() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSRed.svg")));
 	}
 };
 
-struct Rogan1PSGreen : Rogan1PS {
+struct Rogan1PSGreen : Rogan {
 	Rogan1PSGreen() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSGreen.svg")));
 	}
 };
 
-struct Rogan1PSWhite : Rogan1PS {
+struct Rogan1PSWhite : Rogan {
 	Rogan1PSWhite() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PSWhite.svg")));
 	}
 };
 
-struct Rogan1PBlue : Rogan1P {
+struct Rogan1PBlue : Rogan {
 	Rogan1PBlue() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PBlue.svg")));
 	}
 };
 
-struct Rogan1PRed : Rogan1P {
+struct Rogan1PRed : Rogan {
 	Rogan1PRed() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PRed.svg")));
 	}
 };
 
-struct Rogan1PGreen : Rogan1P {
+struct Rogan1PGreen : Rogan {
 	Rogan1PGreen() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PGreen.svg")));
 	}
 };
 
-struct Rogan1PWhite : Rogan1P {
+struct Rogan1PWhite : Rogan {
 	Rogan1PWhite() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Rogan1PWhite.svg")));
 	}
@@ -340,6 +283,9 @@ struct SynthTechAlco : SVGKnob {
 		minAngle = -0.82*M_PI;
 		maxAngle = 0.82*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco.svg")));
+		SVGWidget *cap = new SVGWidget();
+		cap->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco_cap.svg")));
+		addChild(cap);
 	}
 };
 
@@ -454,8 +400,15 @@ struct GreenRedLight : ColorLightWidget {
 	}
 };
 
+struct RedGreenBlueLight : ColorLightWidget {
+	RedGreenBlueLight() {
+		addColor(COLOR_RED);
+		addColor(COLOR_GREEN);
+		addColor(COLOR_BLUE);
+	}
+};
 
-/** 5mm diameter */
+
 template <typename BASE>
 struct LargeLight : BASE {
 	LargeLight() {
@@ -463,7 +416,6 @@ struct LargeLight : BASE {
 	}
 };
 
-/** 3mm diameter */
 template <typename BASE>
 struct MediumLight : BASE {
 	MediumLight() {
@@ -471,7 +423,6 @@ struct MediumLight : BASE {
 	}
 };
 
-/** 2mm diameter */
 template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
@@ -479,7 +430,6 @@ struct SmallLight : BASE {
 	}
 };
 
-/** 1mm diameter */
 template <typename BASE>
 struct TinyLight : BASE {
 	TinyLight() {

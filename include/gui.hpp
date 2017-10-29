@@ -4,15 +4,14 @@
 #include <GLFW/glfw3.h>
 
 
-namespace rack {
-
-
 #ifdef ARCH_MAC
 	#define GUI_MOD_KEY_NAME "Cmd"
 #else
 	#define GUI_MOD_KEY_NAME "Ctrl"
 #endif
 
+
+namespace rack {
 
 
 extern GLFWwindow *gWindow;
@@ -33,5 +32,6 @@ void guiCursorLock();
 void guiCursorUnlock();
 bool guiIsModPressed();
 bool guiIsShiftPressed();
+
 
 } // namespace rack

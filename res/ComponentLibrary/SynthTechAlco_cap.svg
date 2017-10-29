@@ -9,12 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="14.732606mm"
-   height="14.732597mm"
-   viewBox="0 0 14.732606 14.732599"
+   width="15.804726mm"
+   height="15.803342mm"
+   viewBox="0 0 15.804726 15.803344"
    version="1.1"
    id="svg15246"
-   sodipodi:docname="Rogan3PBlue.svg"
+   sodipodi:docname="SynthTechAlco_cap.svg"
    inkscape:version="0.92.2 5c3e80d, 2017-08-06">
   <defs
      id="defs15240">
@@ -387,8 +387,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="40.936997"
-     inkscape:cy="45.5046"
+     inkscape:cx="29.738422"
+     inkscape:cy="32.700073"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -418,21 +418,21 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-47.621038,-91.127873)">
+     transform="translate(-47.530972,-84.333058)">
     <path
        inkscape:connector-curvature="0"
-       id="path7641"
-       d="m 62.353644,98.493488 c 0,4.069342 -3.297646,7.366982 -7.366994,7.366982 -4.067969,0 -7.365612,-3.29764 -7.365612,-7.366982 0,-4.067968 3.297643,-7.365615 7.365612,-7.365615 4.069348,0 7.366994,3.297647 7.366994,7.365615"
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+       id="path8217"
+       d="m 60.020116,92.23473 c 0,2.532835 -2.053272,4.586111 -4.58611,4.586111 -2.534215,0 -4.586111,-2.053276 -4.586111,-4.586111 0,-2.532835 2.051896,-4.586111 4.586111,-4.586111 2.532838,0 4.58611,2.053276 4.58611,4.586111"
+       style="fill:#a8a8a8;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
     <path
-       inkscape:connector-curvature="0"
-       id="path7643"
-       d="m 59.954477,98.493488 c 0,2.743672 -2.222775,4.967822 -4.967827,4.967822 -2.742293,0 -4.966448,-2.22415 -4.966448,-4.967822 0,-2.7423 2.224155,-4.966447 4.966448,-4.966447 2.745052,0 4.967827,2.224147 4.967827,4.966447"
-       style="fill:#307dee;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+       id="path47002"
+       d="m 55.434006,96.820841 c 0.549839,0 1.07763,-0.101974 1.566827,-0.279742 l -1.566827,-4.306369 -1.568204,4.306369 c 0.489197,0.177768 1.016988,0.279742 1.568204,0.279742"
+       style="clip-rule:nonzero;fill:#cfcfcf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775"
+       inkscape:connector-curvature="0" />
     <path
-       inkscape:connector-curvature="0"
-       id="path7645"
-       d="m 55.692205,91.163705 c -0.23151,-0.02205 -0.467155,-0.03583 -0.705555,-0.03583 -0.2384,0 -0.472666,0.01379 -0.705556,0.03583 v 2.491493 h 1.411111 z m 0,0"
-       style="fill:#307dee;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+       id="path47006"
+       d="m 55.434006,92.23473 1.566827,-4.304993 c -0.489197,-0.179144 -1.016988,-0.281118 -1.566827,-0.281118 -0.551216,0 -1.079007,0.101974 -1.568204,0.281118 z m 0,0"
+       style="clip-rule:nonzero;fill:#cfcfcf;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

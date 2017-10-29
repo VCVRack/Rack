@@ -17,6 +17,16 @@ namespace rack {
 // helpers
 ////////////////////
 
+
+inline Vec in2px(Vec inches) {
+	return inches.mult(SVG_DPI);
+}
+
+inline Vec mm2px(Vec millimeters) {
+	return millimeters.mult(SVG_DPI / 25.4);
+}
+
+
 template <class TModuleWidget>
 Model *createModel(std::string manufacturerSlug, std::string manufacturerName, std::string slug, std::string name) {
 	struct TModel : Model {

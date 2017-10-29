@@ -199,6 +199,11 @@ void SVGWidget::wrap() {
 	}
 }
 
+void SVGWidget::setSVG(std::shared_ptr<SVG> svg) {
+	this->svg = svg;
+	wrap();
+}
+
 void SVGWidget::draw(NVGcontext *vg) {
 	if (svg && svg->handle) {
 		// printf("drawing svg %f %f\n", box.size.x, box.size.y);

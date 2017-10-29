@@ -457,7 +457,7 @@ std::shared_ptr<Image> Image::load(const std::string &filename) {
 ////////////////////
 
 SVG::SVG(const std::string &filename) {
-	handle = nsvgParseFromFile(filename.c_str(), "px", 96.0);
+	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
 	if (handle) {
 		fprintf(stderr, "Loaded SVG %s\n", filename.c_str());
 	}
