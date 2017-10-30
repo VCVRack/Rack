@@ -23,6 +23,9 @@ struct Port;
 #define RACK_GRID_WIDTH 15
 #define RACK_GRID_HEIGHT 380
 
+static const Vec RACK_GRID_SIZE = Vec(15, 380);
+
+
 struct ModuleWidget : OpaqueWidget {
 	Model *model = NULL;
 	/** Owns the module pointer */
@@ -38,6 +41,7 @@ struct ModuleWidget : OpaqueWidget {
 	void addInput(Port *input);
 	void addOutput(Port *output);
 	void addParam(ParamWidget *param);
+	void setPanel(std::shared_ptr<SVG> svg);
 
 	virtual json_t *toJson();
 	virtual void fromJson(json_t *rootJ);

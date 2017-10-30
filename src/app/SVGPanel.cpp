@@ -19,18 +19,19 @@ struct PanelBorder : TransparentWidget {
 
 void SVGPanel::step() {
 	if (nearf(gPixelRatio, 1.0)) {
+		// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 		oversample = 2.0;
 	}
 	FramebufferWidget::step();
 }
 
 void SVGPanel::setBackground(std::shared_ptr<SVG> svg) {
-	clearChildren();
-
 	SVGWidget *sw = new SVGWidget();
-	sw->wrap();
-	sw->svg = svg;
+	sw->setSVG(svg);
 	addChild(sw);
+
+	// Set size
+	box.size = sw->box.size.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
 
 	PanelBorder *pb = new PanelBorder();
 	pb->box.size = box.size;
