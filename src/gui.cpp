@@ -36,6 +36,8 @@ bool gAllowCursorLock = true;
 int gGuiFrame;
 Vec gMousePos;
 
+std::string lastWindowTitle;
+
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
 	gScene->box.size = Vec(width, height);
@@ -252,7 +254,8 @@ void guiInit() {
 	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	gWindow = glfwCreateWindow(640, 480, "", NULL, NULL);
+	lastWindowTitle = "";
+	gWindow = glfwCreateWindow(640, 480, lastWindowTitle.c_str(), NULL, NULL);
 	if (!gWindow) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
@@ -328,15 +331,18 @@ void guiRun() {
 		mouseButtonStickyPop();
 
 		// Set window title
-		std::string title = gApplicationName;
+		std::string windowTitle = gApplicationName;
 		if (!gApplicationVersion.empty()) {
-			title += " v" + gApplicationVersion;
+			windowTitle += " v" + gApplicationVersion;
 		}
 		if (!gRackWidget->lastPath.empty()) {
-			title += " - ";
-			title += extractFilename(gRackWidget->lastPath);
+			windowTitle += " - ";
+			windowTitle += extractFilename(gRackWidget->lastPath);
 		}
-		glfwSetWindowTitle(gWindow, title.c_str());
+		if (windowTitle != lastWindowTitle) {
+			glfwSetWindowTitle(gWindow, windowTitle.c_str());
+			lastWindowTitle = windowTitle;
+		}
 
 		// Get framebuffer size
 		int width, height;
