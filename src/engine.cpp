@@ -39,8 +39,15 @@ float Light::getBrightness() {
 }
 
 void Light::setBrightnessSmooth(float brightness) {
-	// lambda = 3 * framerate
-	value += (brightness * brightness - value) * sampleTime * (60.0 * 3.0);
+	float v = brightness * brightness;
+	if (v < value) {
+		// Fade out light with lambda = 3 * framerate
+		value += (v - value) * sampleTime * (60.0 * 3.0);
+	}
+	else {
+		// Immediately illuminate light
+		value = v;
+	}
 }
 
 
