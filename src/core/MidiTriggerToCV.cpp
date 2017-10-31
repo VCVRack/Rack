@@ -110,7 +110,7 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	if (status == 0x8) { // note off
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (data1 == trigger[i].num) {
-				trigger[i].num = data2;
+				trigger[i].val = data2;
 			}
 		}
 		return;
@@ -118,12 +118,10 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	if (status == 0x9) { // note on
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			if (trigger[i].onFocus) {
+			if (trigger[i].onFocus && data2 > 0) {
 				trigger[i].num = data1;
 			}
-		}
 
-		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (data1 == trigger[i].num) {
 				trigger[i].val = data2;
 			}
@@ -257,6 +255,7 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 	for (int i = 0; i < MIDITriggerToCVInterface::NUM_OUTPUTS; i++) {
 		TriggerTextField *triggerNumChoice = new TriggerTextField();
 		triggerNumChoice->module = module;
+		triggerNumChoice->outNum = i;
 		triggerNumChoice->text = std::to_string(module->trigger[i].num);
 		triggerNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		triggerNumChoice->box.size.x = 29;
