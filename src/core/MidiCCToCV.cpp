@@ -175,7 +175,7 @@ struct CCTextField : TextField {
 
 	void onMouseLeave();
 
-	int num;
+	int outNum;
 
 	MIDICCToCVInterface *module;
 };
@@ -183,14 +183,14 @@ struct CCTextField : TextField {
 void CCTextField::draw(NVGcontext *vg) {
 	/* This is necessary, since the save
 	 * file is loaded after constructing the widget*/
-	if (module->cc[num].numInited) {
-		module->cc[num].numInited = false;
-		text = std::to_string(module->cc[num].num);
+	if (module->cc[outNum].numInited) {
+		module->cc[outNum].numInited = false;
+		text = std::to_string(module->cc[outNum].num);
 	}
 
 	/* If number is selected for midi learn*/
-	if (module->cc[num].numSelected) {
-		text = std::to_string(module->cc[num].num);
+	if (module->cc[outNum].numSelected) {
+		text = std::to_string(module->cc[outNum].num);
 	}
 
 	TextField::draw(vg);
@@ -198,41 +198,40 @@ void CCTextField::draw(NVGcontext *vg) {
 
 void CCTextField::onMouseUpOpaque(int button) {
 	if (button == 1) {
-		module->cc[num].numSelected = false;
+		module->cc[outNum].numSelected = false;
 	}
 
 }
 
 void CCTextField::onMouseDownOpaque(int button) {
 	if (button == 1) {
-		module->cc[num].numSelected = true;
+		module->cc[outNum].numSelected = true;
 	}
 }
 
 void CCTextField::onMouseLeave() {
-	module->cc[num].numSelected = false;
+	module->cc[outNum].numSelected = false;
 }
 
 
 void CCTextField::onTextChange() {
-	int *ccNum = &module->cc[num].num;
 	if (text.size() > 0) {
 		try {
-			*ccNum = std::stoi(text);
+			int num = std::stoi(text);
 			// Only allow valid cc numbers
-			if (*ccNum < 0 || *ccNum > 127 || text.size() > 3) {
+			if (num < 0 || num > 127 || text.size() > 3) {
 				text = "";
 				begin = end = 0;
-				*ccNum = -1;
-				return;
+				module->cc[outNum].num = -1;
+			} else {
+				module->cc[outNum].num = num;
+				module->cc[outNum].resetSync();
 			}
-
-			module->cc[num].resetSync();
 
 		} catch (...) {
 			text = "";
 			begin = end = 0;
-			*ccNum = -1;
+			module->cc[outNum].num = -1;
 		}
 	};
 }
@@ -295,7 +294,7 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 	for (int i = 0; i < MIDICCToCVInterface::NUM_OUTPUTS; i++) {
 		CCTextField *ccNumChoice = new CCTextField();
 		ccNumChoice->module = module;
-		ccNumChoice->num = i;
+		ccNumChoice->outNum = i;
 		ccNumChoice->text = std::to_string(module->cc[i].num);
 		ccNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		ccNumChoice->box.size.x = 29;

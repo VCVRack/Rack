@@ -7,10 +7,13 @@
 
 using namespace rack;
 
-/*
- * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod weel to
- * CV
- */
+struct TriggerValue {
+	int val = 0;
+	int num;
+	bool numInited = false;
+	bool onFocus = false;
+};
+
 struct MIDITriggerToCVInterface : MidiIO, Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -22,16 +25,11 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		NUM_OUTPUTS = 16
 	};
 
-	int trigger[NUM_OUTPUTS];
-	int triggerNum[NUM_OUTPUTS];
-	bool triggerNumInited[NUM_OUTPUTS];
-	bool onFocus[NUM_OUTPUTS];
+	TriggerValue trigger[NUM_OUTPUTS];
 
 	MIDITriggerToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			trigger[i] = 0;
-			triggerNum[i] = i;
-			onFocus[i] = false;
+			trigger[i].num = i;
 		}
 	}
 
@@ -48,7 +46,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			json_object_set_new(rootJ, std::to_string(i).c_str(), json_integer(triggerNum[i]));
+			json_object_set_new(rootJ, std::to_string(i).c_str(), json_integer(trigger[i].num));
 		}
 		return rootJ;
 	}
@@ -58,8 +56,8 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
 			if (ccNumJ) {
-				triggerNum[i] = json_integer_value(ccNumJ);
-				triggerNumInited[i] = true;
+				trigger[i].num = json_integer_value(ccNumJ);
+				trigger[i].numInited = true;
 			}
 
 		}
@@ -68,7 +66,6 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 	void reset() final {
 		resetMidi();
 	}
-
 };
 
 
@@ -88,13 +85,13 @@ void MIDITriggerToCVInterface::step() {
 		// Note: Could have an option to select between gate and velocity
 		// but trigger seams more useful
 		// outputs[i].value = trigger[i] / 127.0 * 10;
-		outputs[i].value = trigger[i] > 0 ? 10.0 : 0.0;
+		outputs[i].value = trigger[i].val > 0 ? 10.0 : 0.0;
 	}
 }
 
 void MIDITriggerToCVInterface::resetMidi() {
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
-		trigger[i] = 0;
+		trigger[i].val = 0;
 	}
 };
 
@@ -112,8 +109,8 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	if (status == 0x8) { // note off
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			if (data1 == triggerNum[i]) {
-				trigger[i] = data2;
+			if (data1 == trigger[i].num) {
+				trigger[i].num = data2;
 			}
 		}
 		return;
@@ -121,14 +118,14 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	if (status == 0x9) { // note on
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			if (onFocus[i]) {
-				this->triggerNum[i] = data1;
+			if (trigger[i].onFocus) {
+				trigger[i].num = data1;
 			}
 		}
 
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			if (data1 == triggerNum[i]) {
-				trigger[i] = data2;
+			if (data1 == trigger[i].num) {
+				trigger[i].val = data2;
 			}
 		}
 	}
@@ -146,22 +143,20 @@ struct TriggerTextField : TextField {
 
 	void onMouseLeave();
 
-
-	int *triggerNum;
-	bool *inited;
-	bool *onFocus;
+	int outNum;
+	MIDITriggerToCVInterface *module;
 };
 
 void TriggerTextField::draw(NVGcontext *vg) {
 	/* This is necessary, since the save
 	 * file is loaded after constructing the widget*/
-	if (*inited) {
-		*inited = false;
-		text = std::to_string(*triggerNum);
+	if (module->trigger[outNum].numInited) {
+		module->trigger[outNum].numInited = false;
+		text = std::to_string(module->trigger[outNum].num);
 	}
 
-	if (*onFocus) {
-		text = std::to_string(*triggerNum);
+	if (module->trigger[outNum].onFocus) {
+		text = std::to_string(module->trigger[outNum].num);
 	}
 
 	TextField::draw(vg);
@@ -170,36 +165,38 @@ void TriggerTextField::draw(NVGcontext *vg) {
 void TriggerTextField::onTextChange() {
 	if (text.size() > 0) {
 		try {
-			*triggerNum = std::stoi(text);
+			int num = std::stoi(text);
 			// Only allow valid cc numbers
-			if (*triggerNum < 0 || *triggerNum > 127 || text.size() > 3) {
+			if (num < 0 || num > 127 || text.size() > 3) {
 				text = "";
 				begin = end = 0;
-				*triggerNum = -1;
+				module->trigger[outNum].num = -1;
+			}else {
+				module->trigger[outNum].num = num;
 			}
 		} catch (...) {
 			text = "";
 			begin = end = 0;
-			*triggerNum = -1;
+			module->trigger[outNum].num = -1;
 		}
 	};
 }
 
 void TriggerTextField::onMouseUpOpaque(int button) {
 	if (button == 1) {
-		*onFocus = false;
+		module->trigger[outNum].onFocus = false;
 	}
 
 }
 
 void TriggerTextField::onMouseDownOpaque(int button) {
 	if (button == 1) {
-		*onFocus = true;
+		module->trigger[outNum].onFocus = true;
 	}
 }
 
 void TriggerTextField::onMouseLeave() {
-	*onFocus = false;
+	module->trigger[outNum].onFocus = false;
 }
 
 MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
@@ -259,10 +256,8 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 
 	for (int i = 0; i < MIDITriggerToCVInterface::NUM_OUTPUTS; i++) {
 		TriggerTextField *triggerNumChoice = new TriggerTextField();
-		triggerNumChoice->triggerNum = &module->triggerNum[i];
-		triggerNumChoice->inited = &module->triggerNumInited[i];
-		triggerNumChoice->onFocus = &module->onFocus[i];
-		triggerNumChoice->text = std::to_string(module->triggerNum[i]);
+		triggerNumChoice->module = module;
+		triggerNumChoice->text = std::to_string(module->trigger[i].num);
 		triggerNumChoice->box.pos = Vec(11 + (i % 4) * (63), yPos);
 		triggerNumChoice->box.size.x = 29;
 
