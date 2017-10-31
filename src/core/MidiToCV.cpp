@@ -176,7 +176,7 @@ void MIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	int data1 = msg[1];
 	int data2 = msg[2];
 
-	fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
+	// fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
 
 	// Filter channels
 	if (this->channel >= 0 && this->channel != channel)
