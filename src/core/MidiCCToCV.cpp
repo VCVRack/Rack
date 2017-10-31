@@ -5,20 +5,21 @@
 #include "MidiIO.hpp"
 
 struct CCValue {
-	int val = 0;
+	int val = 0; // Controller value
 	TransitionSmoother tSmooth;
-	int num = 0; // controller number
-	bool inited = false;
-	bool changed = false;
+	int num = 0; // Controller number
+	bool numInited = false; // Num inited by config file
+	bool numSelected = false; // Text field selected for midi learn
+	bool changed = false; // Value has been changed by midi message (only if it is in sync!)
 	int sync = 0; // Output value sync (implies diff)
-	bool syncFirst = true;
-	bool onFocus = false; // Text field for output focused
+	bool syncFirst = true; // First value after sync was reset
+
+	void resetSync() {
+		sync = 0;
+		syncFirst = true;
+	}
 };
 
-/*
- * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod weel to
- * CV
- */
 struct MIDICCToCVInterface : MidiIO, Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -35,7 +36,11 @@ struct MIDICCToCVInterface : MidiIO, Module {
 
 	CCValue cc[NUM_OUTPUTS];
 
-	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		for (int i = 0; i < NUM_OUTPUTS; i++) {
+			cc[i].num = i;
+		}
+	}
 
 	~MIDICCToCVInterface() {}
 
@@ -63,14 +68,14 @@ struct MIDICCToCVInterface : MidiIO, Module {
 			json_t *ccNumJ = json_object_get(rootJ, ("ccNum" + std::to_string(i)).c_str());
 			if (ccNumJ) {
 				cc[i].num = json_integer_value(ccNumJ);
-				cc[i].inited = true;
+				cc[i].numInited = true;
 			}
 
 			json_t *ccValJ = json_object_get(rootJ, ("ccVal" + std::to_string(i)).c_str());
 			if (ccValJ) {
 				cc[i].val = json_integer_value(ccValJ);
-				outputs[i].value = (cc[i].val/127.0) * 10.0;
-				cc[i].changed = true;
+				cc[i].tSmooth.set((cc[i].val / 127.0 * 10.0), (cc[i].val / 127.0 * 10.0));
+				cc[i].resetSync();
 			}
 
 		}
@@ -99,8 +104,8 @@ void MIDICCToCVInterface::step() {
 
 		lights[i].setBrightness(cc[i].sync / 127.0);
 
-		if (cc[i].changed){
-			cc[i].tSmooth.set(outputs[i].value, (cc[i].val / 127.0 * 10.0), int(engineGetSampleRate()/32));
+		if (cc[i].changed) {
+			cc[i].tSmooth.set(outputs[i].value, (cc[i].val / 127.0 * 10.0), int(engineGetSampleRate() / 32));
 			cc[i].changed = false;
 		}
 
@@ -111,10 +116,8 @@ void MIDICCToCVInterface::step() {
 void MIDICCToCVInterface::resetMidi() {
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 		cc[i].val = 0;
-		cc[i].sync = 0;
-		cc[i].syncFirst = true;
-		outputs[i].value = 0;
-		cc[i].changed = true;
+		cc[i].resetSync();
+		cc[i].tSmooth.set(0,0);
 	}
 };
 
@@ -132,21 +135,22 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	if (status == 0xb) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
-			if (cc[i].onFocus) {
-				cc[i].sync = true;
-				cc[i].syncFirst = true;
+			if (cc[i].numSelected) {
+				cc[i].resetSync();
 				cc[i].num = data1;
 			}
 
 			if (data1 == cc[i].num) {
+				/* If the first value we received after sync was reset is +/- 1 of
+				 * the output value the values are in sync*/
 				if (cc[i].syncFirst) {
 					cc[i].syncFirst = false;
-
 					if (data2 < cc[i].val + 2 && data2 > cc[i].val - 2) {
 						cc[i].sync = 0;
-					} else {
+					}else {
 						cc[i].sync = absi(data2 - cc[i].val);
 					}
+					return;
 				}
 
 				if (cc[i].sync == 0) {
@@ -179,12 +183,13 @@ struct CCTextField : TextField {
 void CCTextField::draw(NVGcontext *vg) {
 	/* This is necessary, since the save
 	 * file is loaded after constructing the widget*/
-	if (module->cc[num].inited) {
-		module->cc[num].inited = false;
+	if (module->cc[num].numInited) {
+		module->cc[num].numInited = false;
 		text = std::to_string(module->cc[num].num);
 	}
 
-	if (module->cc[num].onFocus) {
+	/* If number is selected for midi learn*/
+	if (module->cc[num].numSelected) {
 		text = std::to_string(module->cc[num].num);
 	}
 
@@ -193,19 +198,19 @@ void CCTextField::draw(NVGcontext *vg) {
 
 void CCTextField::onMouseUpOpaque(int button) {
 	if (button == 1) {
-		module->cc[num].onFocus = false;
+		module->cc[num].numSelected = false;
 	}
 
 }
 
 void CCTextField::onMouseDownOpaque(int button) {
 	if (button == 1) {
-		module->cc[num].onFocus = true;
+		module->cc[num].numSelected = true;
 	}
 }
 
 void CCTextField::onMouseLeave() {
-	module->cc[num].onFocus = false;
+	module->cc[num].numSelected = false;
 }
 
 
@@ -222,10 +227,7 @@ void CCTextField::onTextChange() {
 				return;
 			}
 
-			if (!module->cc[num].inited) {
-				module->cc[num].sync = 0;
-				module->cc[num].syncFirst = true;
-			}
+			module->cc[num].resetSync();
 
 		} catch (...) {
 			text = "";
