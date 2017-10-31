@@ -16,6 +16,15 @@
 namespace rack {
 
 
+inline Vec in2px(Vec inches) {
+	return inches.mult(SVG_DPI);
+}
+
+inline Vec mm2px(Vec millimeters) {
+	return millimeters.mult(SVG_DPI / 25.4);
+}
+
+
 ////////////////////
 // resources
 ////////////////////

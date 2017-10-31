@@ -46,6 +46,8 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	assert(fabsf(xform[2]) < 1e-6);
 	Vec s = Vec(xform[0], xform[3]);
 	Vec b = Vec(xform[4], xform[5]);
+	Vec bi = b.floor();
+	Vec bf = b.minus(bi);
 
 	// Render to framebuffer
 	if (dirty) {
@@ -78,8 +80,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 
 		nvgScale(gFramebufferVg, gPixelRatio * oversample, gPixelRatio * oversample);
 		// Use local scaling
-		Vec bFrac = Vec(fmodf(b.x, 1.0), fmodf(b.y, 1.0));
-		nvgTranslate(gFramebufferVg, bFrac.x, bFrac.y);
+		nvgTranslate(gFramebufferVg, bf.x, bf.y);
 		nvgScale(gFramebufferVg, s.x, s.y);
 		Widget::draw(gFramebufferVg);
 
@@ -92,10 +93,9 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	}
 
 	// Draw framebuffer image, using world coordinates
-	b = b.floor();
 	nvgSave(vg);
 	nvgResetTransform(vg);
-	nvgTranslate(vg, b.x, b.y);
+	nvgTranslate(vg, bi.x, bi.y);
 
 	nvgBeginPath(vg);
 	nvgRect(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y);

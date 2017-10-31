@@ -14,6 +14,7 @@ struct Wire;
 struct RackWidget;
 struct ParamWidget;
 struct Port;
+struct SVGPanel;
 
 ////////////////////
 // module
@@ -23,11 +24,15 @@ struct Port;
 #define RACK_GRID_WIDTH 15
 #define RACK_GRID_HEIGHT 380
 
+static const Vec RACK_GRID_SIZE = Vec(15, 380);
+
+
 struct ModuleWidget : OpaqueWidget {
 	Model *model = NULL;
 	/** Owns the module pointer */
 	Module *module = NULL;
 
+	SVGPanel *panel = NULL;
 	std::vector<Port*> inputs;
 	std::vector<Port*> outputs;
 	std::vector<ParamWidget*> params;
@@ -38,6 +43,7 @@ struct ModuleWidget : OpaqueWidget {
 	void addInput(Port *input);
 	void addOutput(Port *output);
 	void addParam(ParamWidget *param);
+	void setPanel(std::shared_ptr<SVG> svg);
 
 	virtual json_t *toJson();
 	virtual void fromJson(json_t *rootJ);

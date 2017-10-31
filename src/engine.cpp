@@ -35,13 +35,19 @@ static float smoothValue;
 
 
 float Light::getBrightness() {
-	// Scale by sqrt(2) since the RMS of a rectified sine is 1 / sqrt(2)
-	return sqrtf(fmaxf(0.0, value) * 2.0);
+	return sqrtf(fmaxf(0.0, value));
 }
 
 void Light::setBrightnessSmooth(float brightness) {
-	// lambda = 3 * framerate
-	value += (brightness * brightness - value) * sampleTime * (60.0 * 3.0);
+	float v = brightness * brightness;
+	if (v < value) {
+		// Fade out light with lambda = 3 * framerate
+		value += (v - value) * sampleTime * (60.0 * 3.0);
+	}
+	else {
+		// Immediately illuminate light
+		value = v;
+	}
 }
 
 

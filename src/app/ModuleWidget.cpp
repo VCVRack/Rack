@@ -42,6 +42,21 @@ void ModuleWidget::addParam(ParamWidget *param) {
 	addChild(param);
 }
 
+void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
+	// Remove old panel
+	if (panel) {
+		removeChild(panel);
+		panel = NULL;
+	}
+
+	panel = new SVGPanel();
+	panel->setBackground(svg);
+	addChild(panel);
+
+	box.size = panel->box.size;
+}
+
+
 json_t *ModuleWidget::toJson() {
 	json_t *rootJ = json_object();
 

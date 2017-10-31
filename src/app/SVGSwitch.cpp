@@ -11,10 +11,11 @@ SVGSwitch::SVGSwitch() {
 
 void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 	frames.push_back(svg);
-	// Automatically set the frame as this SVG file.
-	// This allows us to wrap() the widget after calling
-	if (!sw->svg)
-		sw->svg = svg;
+	// If this is our first frame, automatically set SVG and size
+	if (!sw->svg) {
+		sw->setSVG(svg);
+		box.size = sw->box.size;
+	}
 }
 
 void SVGSwitch::step() {
@@ -22,9 +23,9 @@ void SVGSwitch::step() {
 }
 
 void SVGSwitch::onChange() {
-	int index = roundf(rescalef(value, minValue, maxValue, 0, frames.size() - 1));
-	if (0 <= index && index < (int)frames.size())
-		sw->svg = frames[index];
+	assert(frames.size() > 0);
+	int index = clampi((int) roundf(value), 0, frames.size() - 1);
+	sw->setSVG(frames[index]);
 	dirty = true;
 	Switch::onChange();
 }

@@ -446,8 +446,6 @@ struct NKK : SVGSwitch, ToggleSwitch {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/NKK_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/NKK_1.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/NKK_2.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
 	}
 };
 
@@ -455,8 +453,6 @@ struct CKSS : SVGSwitch, ToggleSwitch {
 	CKSS() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSS_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSS_1.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
 	}
 };
 
@@ -464,8 +460,6 @@ struct CKD6 : SVGSwitch, MomentarySwitch {
 	CKD6() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKD6_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKD6_1.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
 	}
 };
 
@@ -473,16 +467,12 @@ struct TL1105 : SVGSwitch, MomentarySwitch {
 	TL1105() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/TL1105_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/TL1105_1.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
 	}
 };
 
 struct LEDButton : SVGSwitch, MomentarySwitch {
 	LEDButton() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/LEDButton.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
 	}
 };
 
@@ -491,8 +481,6 @@ struct BefacoSwitch : SVGSwitch, ToggleSwitch {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSwitch_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSwitch_1.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSwitch_2.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
 	}
 };
 
@@ -500,17 +488,12 @@ struct BefacoPush : SVGSwitch, MomentarySwitch {
 	BefacoPush() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoPush_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/BefacoPush_1.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
 	}
 };
 
 struct PB61303 : SVGSwitch, MomentarySwitch {
 	PB61303() {
-		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303_0.svg")));
-		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303_1.svg")));
-		sw->wrap();
-		box.size = sw->box.size;
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")));
 	}
 };
 
@@ -521,16 +504,14 @@ struct PB61303 : SVGSwitch, MomentarySwitch {
 
 struct ScrewSilver : SVGScrew {
 	ScrewSilver() {
-		sw->svg = SVG::load(assetGlobal("res/ComponentLibrary/ScrewSilver.svg"));
-		sw->wrap();
+		sw->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/ScrewSilver.svg")));
 		box.size = sw->box.size;
 	}
 };
 
 struct ScrewBlack : SVGScrew {
 	ScrewBlack() {
-		sw->svg = SVG::load(assetGlobal("res/ComponentLibrary/ScrewBlack.svg"));
-		sw->wrap();
+		sw->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/ScrewBlack.svg")));
 		box.size = sw->box.size;
 	}
 };
