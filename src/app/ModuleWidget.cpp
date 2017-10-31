@@ -43,7 +43,13 @@ void ModuleWidget::addParam(ParamWidget *param) {
 }
 
 void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
-	SVGPanel *panel = new SVGPanel();
+	// Remove old panel
+	if (panel) {
+		removeChild(panel);
+		panel = NULL;
+	}
+
+	panel = new SVGPanel();
 	panel->setBackground(svg);
 	addChild(panel);
 

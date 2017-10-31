@@ -14,6 +14,7 @@ struct Wire;
 struct RackWidget;
 struct ParamWidget;
 struct Port;
+struct SVGPanel;
 
 ////////////////////
 // module
@@ -31,6 +32,7 @@ struct ModuleWidget : OpaqueWidget {
 	/** Owns the module pointer */
 	Module *module = NULL;
 
+	SVGPanel *panel = NULL;
 	std::vector<Port*> inputs;
 	std::vector<Port*> outputs;
 	std::vector<ParamWidget*> params;
