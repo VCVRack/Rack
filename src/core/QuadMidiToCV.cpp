@@ -164,6 +164,7 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 			if (data1 == 0x40) { // pedal
 				pedal = (data2 >= 64);
 				if (!pedal) {
+					open.clear();
 					for (int i = 0; i < 4; i++) {
 						activeKeys[i].gate = false;
 						open.push_back(i);
@@ -175,7 +176,11 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 			return;
 	}
 
-	if (!pedal && !gate) {
+	if (pedal && !gate) {
+		return;
+	}
+
+	if (!gate) {
 		for (int i = 0; i < 4; i++) {
 			if (activeKeys[i].pitch == data1) {
 				activeKeys[i].gate = false;
@@ -189,12 +194,20 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 		return;
 	}
 
+	if (pedal) {
+		for (int i = 0; i < 4 ; i++) {
+			if (activeKeys[i].pitch == data1 && activeKeys[i].gate) {
+				activeKeys[i].vel = data2;
+				return;
+			}
+		}
+	}
+
 	if (open.empty()) {
 		for (int i = 0; i < 4; i++) {
 			open.push_back(i);
 		}
 	}
-
 
 	if (!activeKeys[0].gate && !activeKeys[1].gate &&
 		!activeKeys[2].gate && !activeKeys[3].gate) {
@@ -215,8 +228,6 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 			break;
 		case ROTATE:
 			break;
-		default:
-			fprintf(stderr, "No mode selected?!\n");
 	}
 
 	activeKeys[open.front()].gate = true;
