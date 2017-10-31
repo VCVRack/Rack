@@ -9,6 +9,12 @@
  * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
  * CV
  */
+struct MidiValue {
+	int val = 0; // Controller value
+	TransitionSmoother tSmooth;
+	bool changed = false; // Value has been changed by midi message (only if it is in sync!)
+};
+
 struct MIDIToCVInterface : MidiIO, Module {
 	enum ParamIds {
 		RESET_PARAM,
@@ -34,17 +40,17 @@ struct MIDIToCVInterface : MidiIO, Module {
 	std::list<int> notes;
 	bool pedal = false;
 	int note = 60; // C4, most modules should use 261.626 Hz
-	int mod = 0;
 	int vel = 0;
-	int afterTouch = 0;
-	int pitchWheel = 64;
-	bool retrigger = false;
-	bool retriggered = false;
+	MidiValue mod;
+	MidiValue afterTouch;
+	MidiValue pitchWheel;
+	bool gate = false;
 
 	SchmittTrigger resetTrigger;
 
 	MIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-
+		pitchWheel.val = 64;
+		pitchWheel.tSmooth.set(0, 0);
 	}
 
 	~MIDIToCVInterface() {
@@ -77,11 +83,14 @@ struct MIDIToCVInterface : MidiIO, Module {
 };
 
 void MIDIToCVInterface::resetMidi() {
-	mod = 0;
-	pitchWheel = 64;
-	afterTouch = 0;
+	mod.val = 0;
+	mod.tSmooth.set(0, 0);
+	pitchWheel.val = 64;
+	pitchWheel.tSmooth.set(0, 0);
+	afterTouch.val = 0;
+	afterTouch.tSmooth.set(0, 0);
 	vel = 0;
-	outputs[GATE_OUTPUT].value = 0.0;
+	gate = false;
 	notes.clear();
 }
 
@@ -99,11 +108,6 @@ void MIDIToCVInterface::step() {
 
 	outputs[PITCH_OUTPUT].value = ((note - 60)) / 12.0;
 
-	bool gate = pedal || !notes.empty();
-	if (retrigger && retriggered) {
-		gate = false;
-		retriggered = false;
-	}
 	if (resetTrigger.process(params[RESET_PARAM].value)) {
 		resetMidi();
 		return;
@@ -112,11 +116,27 @@ void MIDIToCVInterface::step() {
 	lights[RESET_LIGHT].value -= lights[RESET_LIGHT].value / 0.55 / engineGetSampleRate(); // fade out light
 
 	outputs[GATE_OUTPUT].value = gate ? 10.0 : 0.0;
-	outputs[MOD_OUTPUT].value = mod / 127.0 * 10.0;
-	outputs[PITCHWHEEL_OUTPUT].value = (pitchWheel - 64) / 64.0 * 10.0;
-	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch / 127.0 * 10.0;
 	outputs[VELOCITY_OUTPUT].value = vel / 127.0 * 10.0;
 
+	int steps = int(engineGetSampleRate() / 32);
+
+	if (mod.changed) {
+		mod.tSmooth.set(outputs[MOD_OUTPUT].value, (mod.val / 127.0 * 10.0), steps);
+		mod.changed = false;
+	}
+	outputs[MOD_OUTPUT].value = mod.tSmooth.next();
+
+	if (pitchWheel.changed) {
+		pitchWheel.tSmooth.set(outputs[PITCHWHEEL_OUTPUT].value, (pitchWheel.val - 64) / 64.0 * 10.0, steps);
+		pitchWheel.changed = false;
+	}
+	outputs[PITCHWHEEL_OUTPUT].value = pitchWheel.tSmooth.next();
+
+
+	/* NOTE: I'll leave out value smoothing for after touch for now. I currently don't
+	 * have an after touch capable device around and I assume it would require different
+	 * smoothing*/
+	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch.val / 127.0 * 10.0;
 }
 
 void MIDIToCVInterface::pressNote(int note) {
@@ -127,7 +147,7 @@ void MIDIToCVInterface::pressNote(int note) {
 	// Push note
 	notes.push_back(note);
 	this->note = note;
-	retriggered = true;
+	gate = true;
 }
 
 void MIDIToCVInterface::releaseNote(int note) {
@@ -138,12 +158,15 @@ void MIDIToCVInterface::releaseNote(int note) {
 
 	if (pedal) {
 		// Don't release if pedal is held
+		gate = true;
 	} else if (!notes.empty()) {
 		// Play previous note
 		auto it2 = notes.end();
 		it2--;
 		this->note = *it2;
-		retriggered = true;
+		gate = true;
+	} else {
+		gate = false;
 	}
 }
 
@@ -153,7 +176,7 @@ void MIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	int data1 = msg[1];
 	int data2 = msg[2];
 
-	//fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1,data2);
+	fprintf(stderr, "channel %d status %d data1 %d data2 %d\n", channel, status, data1, data2);
 
 	// Filter channels
 	if (this->channel >= 0 && this->channel != channel)
@@ -177,19 +200,24 @@ void MIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 		case 0xb: // cc
 			switch (data1) {
 				case 0x01: // mod
-					this->mod = data2;
+					mod.val = data2;
+					mod.changed = true;
 					break;
 				case 0x40: // sustain
 					pedal = (data2 >= 64);
-					releaseNote(-1);
+					if (!pedal) {
+						releaseNote(-1);
+					}
 					break;
 			}
 			break;
 		case 0xe: // pitch wheel
-			this->pitchWheel = data2;
+			pitchWheel.val = data2;
+			pitchWheel.changed = true;
 			break;
 		case 0xd: // channel aftertouch
-			this->afterTouch = data1;
+			afterTouch.val = data1;
+			afterTouch.changed = true;
 			break;
 	}
 }
@@ -225,7 +253,8 @@ MidiToCVWidget::MidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
-	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module, MIDIToCVInterface::RESET_LIGHT));
+	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module,
+											   MIDIToCVInterface::RESET_LIGHT));
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
@@ -257,7 +286,7 @@ MidiToCVWidget::MidiToCVWidget() {
 	}
 
 	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel",
-															"Aftertouch"};
+														  "Aftertouch"};
 
 	for (int i = 0; i < MIDIToCVInterface::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
