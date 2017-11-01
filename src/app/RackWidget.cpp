@@ -375,7 +375,7 @@ void RackWidget::draw(NVGcontext *vg) {
 struct AddModuleMenuItem : MenuItem {
 	Model *model;
 	Vec modulePos;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		gRackWidget->moduleContainer->addChild(moduleWidget);
 		// Move module nearest to the mouse position
@@ -388,7 +388,7 @@ struct AddModuleMenuItem : MenuItem {
 
 struct UrlItem : MenuItem {
 	std::string url;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		std::thread t(openBrowser, url);
 		t.detach();
 	}
@@ -487,13 +487,17 @@ struct SearchModuleField : TextField {
 	}
 };
 
-Widget *RackWidget::onMouseMove(Vec pos, Vec mouseRel) {
-	lastMousePos = pos;
-	return OpaqueWidget::onMouseMove(pos, mouseRel);
+void RackWidget::onMouseMove(EventMouseMove &e) {
+	OpaqueWidget::onMouseMove(e);
+	lastMousePos = e.pos;
 }
 
-void RackWidget::onMouseDownOpaque(int button) {
-	if (button == 1) {
+void RackWidget::onMouseDown(EventMouseDown &e) {
+	Widget::onMouseDown(e);
+	if (e.consumed)
+		return;
+
+	if (e.button == 1) {
 		Menu *menu = gScene->createMenu();
 
 		menu->pushChild(construct<MenuLabel>(&MenuLabel::text, "Add module"));
@@ -519,15 +523,17 @@ void RackWidget::onMouseDownOpaque(int button) {
 			AddManufacturerMenuItem *item = new AddManufacturerMenuItem();
 			item->text = manufacturerName;
 			item->manufacturerName = manufacturerName;
-			item->modulePos = lastMousePos;
+			item->modulePos = e.pos;
 			menu->pushChild(item);
 		}
 	}
+	e.consumed = true;
+	e.target = this;
 }
 
-void RackWidget::onZoom() {
+void RackWidget::onZoom(EventZoom &e) {
 	rails->box.size = Vec();
-	Widget::onZoom();
+	Widget::onZoom(e);
 }
 
 

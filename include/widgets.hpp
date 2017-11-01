@@ -8,6 +8,7 @@
 
 #include "math.hpp"
 #include "util.hpp"
+#include "events.hpp"
 
 
 #define SVG_DPI 75.0
@@ -122,36 +123,36 @@ struct Widget {
 	Return `this` to accept the event.
 	Return NULL to reject the event and pass it to the widget behind this one.
 	*/
-	virtual Widget *onMouseDown(Vec pos, int button);
-	virtual Widget *onMouseUp(Vec pos, int button);
+	virtual void onMouseDown(EventMouseDown &e);
+	virtual void onMouseUp(EventMouseUp &e);
 	/** Called on every frame, even if mouseRel = Vec(0, 0) */
-	virtual Widget *onMouseMove(Vec pos, Vec mouseRel);
-	virtual Widget *onHoverKey(Vec pos, int key);
+	virtual void onMouseMove(EventMouseMove &e);
+	virtual void onHoverKey(EventHoverKey &e);
 	/** Called when this widget begins responding to `onMouseMove` events */
-	virtual void onMouseEnter() {}
+	virtual void onMouseEnter(EventMouseEnter &e) {}
 	/** Called when another widget begins responding to `onMouseMove` events */
-	virtual void onMouseLeave() {}
-	virtual bool onFocus() {return false;}
-	virtual void onDefocus() {}
-	virtual bool onFocusText(int codepoint) {return false;}
-	virtual bool onFocusKey(int key) {return false;}
-	virtual Widget *onScroll(Vec pos, Vec scrollRel);
+	virtual void onMouseLeave(EventMouseLeave &e) {}
+	virtual void onFocus(EventFocus &e) {}
+	virtual void onDefocus(EventDefocus &e) {}
+	virtual void onText(EventText &e) {}
+	virtual void onKey(EventKey &e) {}
+	virtual void onScroll(EventScroll &e);
 
 	/** Called when a widget responds to `onMouseDown` for a left button press */
-	virtual void onDragStart() {}
+	virtual void onDragStart(EventDragStart &e) {}
 	/** Called when the left button is released and this widget is being dragged */
-	virtual void onDragEnd() {}
+	virtual void onDragEnd(EventDragEnd &e) {}
 	/** Called when a widget responds to `onMouseMove` and is being dragged */
-	virtual void onDragMove(Vec mouseRel) {}
+	virtual void onDragMove(EventDragMove &e) {}
 	/** Called when a widget responds to `onMouseUp` for a left button release and a widget is being dragged */
-	virtual void onDragEnter(Widget *origin) {}
-	virtual void onDragLeave(Widget *origin) {}
-	virtual void onDragDrop(Widget *origin) {}
-	virtual bool onPathDrop(Vec pos, const std::list<std::string>& paths);
+	virtual void onDragEnter(EventDragEnter &e) {}
+	virtual void onDragLeave(EventDragEnter &e) {}
+	virtual void onDragDrop(EventDragDrop &e) {}
+	virtual void onPathDrop(EventPathDrop &e);
 
-	virtual void onAction() {}
-	virtual void onChange() {}
-	virtual void onZoom();
+	virtual void onAction(EventAction &e) {}
+	virtual void onChange(EventChange &e) {}
+	virtual void onZoom(EventZoom &e);
 };
 
 struct TransformWidget : Widget {
@@ -171,11 +172,11 @@ struct ZoomWidget : Widget {
 	Rect getViewport(Rect r) override;
 	void setZoom(float zoom);
 	void draw(NVGcontext *vg) override;
-	Widget *onMouseDown(Vec pos, int button) override;
-	Widget *onMouseUp(Vec pos, int button) override;
-	Widget *onMouseMove(Vec pos, Vec mouseRel) override;
-	Widget *onHoverKey(Vec pos, int key) override;
-	Widget *onScroll(Vec pos, Vec scrollRel) override;
+	void onMouseDown(EventMouseDown &e) override;
+	void onMouseUp(EventMouseUp &e) override;
+	void onMouseMove(EventMouseMove &e) override;
+	void onHoverKey(EventHoverKey &e) override;
+	void onScroll(EventScroll &e) override;
 };
 
 ////////////////////
@@ -184,47 +185,36 @@ struct ZoomWidget : Widget {
 
 /** Widget that does not respond to events */
 struct TransparentWidget : virtual Widget {
-	Widget *onMouseDown(Vec pos, int button) override {return NULL;}
-	Widget *onMouseUp(Vec pos, int button) override {return NULL;}
-	Widget *onMouseMove(Vec pos, Vec mouseRel) override {return NULL;}
-	Widget *onScroll(Vec pos, Vec scrollRel) override {return NULL;}
+	void onMouseDown(EventMouseDown &e) override {}
+	void onMouseUp(EventMouseUp &e) override {}
+	void onMouseMove(EventMouseMove &e) override {}
+	void onScroll(EventScroll &e) override {}
 };
 
 /** Widget that automatically responds to all mouse events but gives a chance for children to respond instead */
 struct OpaqueWidget : virtual Widget {
-	Widget *onMouseDown(Vec pos, int button) override {
-		Widget *w = Widget::onMouseDown(pos, button);
-		if (w) return w;
-		onMouseDownOpaque(button);
-		return this;
+	void onMouseDown(EventMouseDown &e) override {
+		Widget::onMouseDown(e);
+		if (!e.target)
+			e.target = this;
+		e.consumed = true;
 	}
-	Widget *onMouseUp(Vec pos, int button) override {
-		Widget *w = Widget::onMouseUp(pos, button);
-		if (w) return w;
-		onMouseUpOpaque(button);
-		return this;
+	void onMouseUp(EventMouseUp &e) override {
+		Widget::onMouseUp(e);
+		if (!e.target)
+			e.target = this;
+		e.consumed = true;
 	}
-	Widget *onMouseMove(Vec pos, Vec mouseRel) override {
-		Widget *w = Widget::onMouseMove(pos, mouseRel);
-		if (w) return w;
-		onMouseMoveOpaque(mouseRel);
-		return this;
+	void onMouseMove(EventMouseMove &e) override {
+		Widget::onMouseMove(e);
+		if (!e.target)
+			e.target = this;
+		e.consumed = true;
 	}
-	Widget *onScroll(Vec pos, Vec scrollRel) override {
-		Widget *w = Widget::onScroll(pos, scrollRel);
-		if (w) return w;
-		if (onScrollOpaque(scrollRel))
-			return this;
-		return NULL;
+	void onScroll(EventScroll &e) override {
+		Widget::onScroll(e);
+		e.consumed = true;
 	}
-
-	/** "High level" events called by the above lower level events.
-	Use these if you don't care about the clicked position.
-	*/
-	virtual void onMouseDownOpaque(int button) {}
-	virtual void onMouseUpOpaque(int button) {}
-	virtual void onMouseMoveOpaque(Vec mouseRel) {}
-	virtual bool onScrollOpaque(Vec scrollRel) {return false;}
 };
 
 struct SpriteWidget : virtual Widget {
@@ -265,7 +255,7 @@ struct FramebufferWidget : virtual Widget {
 	~FramebufferWidget();
 	void draw(NVGcontext *vg) override;
 	int getImageHandle();
-	void onZoom() override;
+	void onZoom(EventZoom &e) override;
 };
 
 struct QuantityWidget : virtual Widget {
@@ -303,9 +293,9 @@ struct Label : Widget {
 
 // Deletes itself from parent when clicked
 struct MenuOverlay : OpaqueWidget {
-	void onDragDrop(Widget *origin) override;
-	bool onScrollOpaque(Vec scrollRel) override {return true;}
-	Widget *onHoverKey(Vec pos, int key) override;
+	void onDragDrop(EventDragDrop &e) override;
+	void onScroll(EventScroll &e) override;
+	void onHoverKey(EventHoverKey &e) override;
 };
 
 struct MenuEntry;
@@ -325,7 +315,7 @@ struct Menu : OpaqueWidget {
 	void setChildMenu(Menu *menu);
 	void step() override;
 	void draw(NVGcontext *vg) override;
-	bool onScrollOpaque(Vec scrollRel) override;
+	void onScroll(EventScroll &e) override;
 };
 
 struct MenuEntry : OpaqueWidget {
@@ -344,8 +334,8 @@ struct MenuLabel : MenuEntry {
 struct MenuItem : MenuEntry {
 	void draw(NVGcontext *vg) override;
 	virtual Menu *createChildMenu() {return NULL;}
-	void onMouseEnter() override;
-	void onDragDrop(Widget *origin) override;
+	void onMouseEnter(EventMouseEnter &e) override;
+	void onDragDrop(EventDragDrop &e) override;
 };
 
 struct Button : OpaqueWidget {
@@ -356,11 +346,11 @@ struct Button : OpaqueWidget {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 	void draw(NVGcontext *vg) override;
-	void onMouseEnter() override;
-	void onMouseLeave() override;
-	void onDragStart() override;
-	void onDragEnd() override;
-	void onDragDrop(Widget *origin) override;
+	void onMouseEnter(EventMouseEnter &e) override;
+	void onMouseLeave(EventMouseLeave &e) override;
+	void onDragStart(EventDragStart &e) override;
+	void onDragEnd(EventDragEnd &e) override;
+	void onDragDrop(EventDragDrop &e) override;
 };
 
 struct ChoiceButton : Button {
@@ -374,9 +364,9 @@ struct RadioButton : OpaqueWidget, QuantityWidget {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 	void draw(NVGcontext *vg) override;
-	void onMouseEnter() override;
-	void onMouseLeave() override;
-	void onDragDrop(Widget *origin) override;
+	void onMouseEnter(EventMouseEnter &e) override;
+	void onMouseLeave(EventMouseLeave &e) override;
+	void onDragDrop(EventDragDrop &e) override;
 };
 
 struct Slider : OpaqueWidget, QuantityWidget {
@@ -386,10 +376,10 @@ struct Slider : OpaqueWidget, QuantityWidget {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 	void draw(NVGcontext *vg) override;
-	void onDragStart() override;
-	void onDragMove(Vec mouseRel) override;
-	void onDragEnd() override;
-	void onMouseDownOpaque(int button) override;
+	void onDragStart(EventDragStart &e) override;
+	void onDragMove(EventDragMove &e) override;
+	void onDragEnd(EventDragEnd &e) override;
+	void onMouseDown(EventMouseDown &e) override;
 };
 
 /** Parent must be a ScrollWidget */
@@ -401,9 +391,9 @@ struct ScrollBar : OpaqueWidget {
 		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 	}
 	void draw(NVGcontext *vg) override;
-	void onDragStart() override;
-	void onDragMove(Vec mouseRel) override;
-	void onDragEnd() override;
+	void onDragStart(EventDragStart &e) override;
+	void onDragMove(EventDragMove &e) override;
+	void onDragEnd(EventDragEnd &e) override;
 };
 
 /** Handles a container with ScrollBar */
@@ -415,7 +405,7 @@ struct ScrollWidget : OpaqueWidget {
 
 	ScrollWidget();
 	void step() override;
-	bool onScrollOpaque(Vec scrollRel) override;
+	void onScroll(EventScroll &e) override;
 };
 
 struct TextField : OpaqueWidget {
@@ -429,10 +419,10 @@ struct TextField : OpaqueWidget {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 	void draw(NVGcontext *vg) override;
-	Widget *onMouseDown(Vec pos, int button) override;
-	bool onFocusText(int codepoint) override;
-	bool onFocusKey(int key) override;
-	bool onFocus() override;
+	void onMouseDown(EventMouseDown &e) override;
+	void onFocus(EventFocus &e) override;
+	void onText(EventText &e) override;
+	void onKey(EventKey &e) override;
 	void insertText(std::string newText);
 	virtual void onTextChange() {}
 };

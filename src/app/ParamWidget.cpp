@@ -19,13 +19,15 @@ void ParamWidget::randomize() {
 		setValue(rescalef(randomf(), 0.0, 1.0, minValue, maxValue));
 }
 
-void ParamWidget::onMouseDownOpaque(int button) {
-	if (button == 1) {
+void ParamWidget::onMouseDown(EventMouseDown &e) {
+	if (e.button == 1) {
 		setValue(defaultValue);
 	}
+	e.consumed = true;
+	e.target = this;
 }
 
-void ParamWidget::onChange() {
+void ParamWidget::onChange(EventChange &e) {
 	if (!module)
 		return;
 

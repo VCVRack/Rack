@@ -117,7 +117,7 @@ int FramebufferWidget::getImageHandle() {
 	return internal->fb->image;
 }
 
-void FramebufferWidget::onZoom() {
+void FramebufferWidget::onZoom(EventZoom &e) {
 	dirty = true;
 }
 

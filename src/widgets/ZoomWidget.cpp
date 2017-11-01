@@ -18,8 +18,10 @@ Rect ZoomWidget::getViewport(Rect r) {
 }
 
 void ZoomWidget::setZoom(float zoom) {
-	if (zoom != this->zoom)
-		onZoom();
+	if (zoom != this->zoom) {
+		EventZoom e;
+		onZoom(e);
+	}
 	this->zoom = zoom;
 }
 
@@ -28,24 +30,39 @@ void ZoomWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
 
-Widget *ZoomWidget::onMouseDown(Vec pos, int button) {
-	return Widget::onMouseDown(pos.div(zoom), button);
+void ZoomWidget::onMouseDown(EventMouseDown &e) {
+	Vec pos = e.pos;
+	e.pos = e.pos.div(zoom);
+	Widget::onMouseDown(e);
+	e.pos = pos;
 }
 
-Widget *ZoomWidget::onMouseUp(Vec pos, int button) {
-	return Widget::onMouseUp(pos.div(zoom), button);
+void ZoomWidget::onMouseUp(EventMouseUp &e) {
+	Vec pos = e.pos;
+	e.pos = e.pos.div(zoom);
+	Widget::onMouseUp(e);
+	e.pos = pos;
 }
 
-Widget *ZoomWidget::onMouseMove(Vec pos, Vec mouseRel) {
-	return Widget::onMouseMove(pos.div(zoom), mouseRel);
+void ZoomWidget::onMouseMove(EventMouseMove &e) {
+	Vec pos = e.pos;
+	e.pos = e.pos.div(zoom);
+	Widget::onMouseMove(e);
+	e.pos = pos;
 }
 
-Widget *ZoomWidget::onHoverKey(Vec pos, int key) {
-	return Widget::onHoverKey(pos.div(zoom), key);
+void ZoomWidget::onHoverKey(EventHoverKey &e) {
+	Vec pos = e.pos;
+	e.pos = e.pos.div(zoom);
+	Widget::onHoverKey(e);
+	e.pos = pos;
 }
 
-Widget *ZoomWidget::onScroll(Vec pos, Vec scrollRel) {
-	return Widget::onScroll(pos.div(zoom), scrollRel);
+void ZoomWidget::onScroll(EventScroll &e) {
+	Vec pos = e.pos;
+	e.pos = e.pos.div(zoom);
+	Widget::onScroll(e);
+	e.pos = pos;
 }
 
 

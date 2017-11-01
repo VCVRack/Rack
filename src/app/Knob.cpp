@@ -10,29 +10,30 @@ namespace rack {
 #define KNOB_SENSITIVITY 0.0015
 
 
-void Knob::onDragStart() {
+void Knob::onDragStart(EventDragStart &e) {
 	guiCursorLock();
 	dragValue = value;
 	randomizable = false;
 }
 
-void Knob::onDragMove(Vec mouseRel) {
+void Knob::onDragMove(EventDragMove &e) {
 	// Drag slower if Mod
+	float delta = KNOB_SENSITIVITY * (maxValue - minValue) * -e.mouseRel.y;
 	if (guiIsModPressed())
-		mouseRel = mouseRel.mult(1/16.0);
-	dragValue += KNOB_SENSITIVITY * (maxValue - minValue) * -mouseRel.y;
+		delta /= 16.0;
+	dragValue += delta;
 	if (snap)
 		setValue(roundf(dragValue));
 	else
 		setValue(dragValue);
 }
 
-void Knob::onDragEnd() {
+void Knob::onDragEnd(EventDragEnd &e) {
 	guiCursorUnlock();
 	randomizable = true;
 }
 
-void Knob::onChange() {
+void Knob::onChange(EventChange &e) {
 	if (!module)
 		return;
 

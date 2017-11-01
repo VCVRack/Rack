@@ -165,7 +165,22 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	nvgResetScissor(vg);
 }
 
-Widget *ModuleWidget::onMouseMove(Vec pos, Vec mouseRel) {
+void ModuleWidget::onMouseDown(EventMouseDown &e) {
+	Widget::onMouseDown(e);
+	if (e.consumed)
+		return;
+
+	if (e.button == 1) {
+		createContextMenu();
+	}
+	e.consumed = true;
+	e.target = this;
+}
+
+void ModuleWidget::onMouseMove(EventMouseMove &e) {
+	OpaqueWidget::onMouseMove(e);
+
+	// Don't delete the ModuleWidget if a TextField is focused
 	if (!gFocusedWidget) {
 		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 		if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
@@ -174,82 +189,85 @@ Widget *ModuleWidget::onMouseMove(Vec pos, Vec mouseRel) {
 				this->finalizeEvents();
 				delete this;
 				// Kinda sketchy because events will be passed further down the tree
-				return NULL;
+				return;
 			}
 		}
 	}
-	return OpaqueWidget::onMouseMove(pos, mouseRel);
 }
 
-Widget *ModuleWidget::onHoverKey(Vec pos, int key) {
-	switch (key) {
+void ModuleWidget::onHoverKey(EventHoverKey &e) {
+	switch (e.key) {
 		case GLFW_KEY_I:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				reset();
-				return this;
+				e.consumed = true;
+				return;
 			}
 			break;
 		case GLFW_KEY_R:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				randomize();
-				return this;
+				e.consumed = true;
+				return;
 			}
 			break;
 		case GLFW_KEY_D:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				gRackWidget->cloneModule(this);
-				return this;
+				e.consumed = true;
+				return;
 			}
 			break;
 	}
 
-	return Widget::onHoverKey(pos, key);
+	Widget::onHoverKey(e);
 }
 
-void ModuleWidget::onDragStart() {
+void ModuleWidget::onDragStart(EventDragStart &e) {
 	dragPos = gRackWidget->lastMousePos.minus(box.pos);
 }
 
-void ModuleWidget::onDragMove(Vec mouseRel) {
+void ModuleWidget::onDragEnd(EventDragEnd &e) {
+}
+
+void ModuleWidget::onDragMove(EventDragMove &e) {
 	Rect newBox = box;
 	newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
 	gRackWidget->requestModuleBoxNearest(this, newBox);
 }
 
-void ModuleWidget::onDragEnd() {
-}
 
 struct DisconnectMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		moduleWidget->disconnect();
 	}
 };
 
 struct ResetMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		moduleWidget->reset();
 	}
 };
 
 struct RandomizeMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		moduleWidget->randomize();
 	}
 };
 
 struct CloneMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		gRackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct DeleteMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		gRackWidget->deleteModule(moduleWidget);
 		moduleWidget->finalizeEvents();
 		delete moduleWidget;
@@ -293,12 +311,6 @@ Menu *ModuleWidget::createContextMenu() {
 	menu->pushChild(deleteItem);
 
 	return menu;
-}
-
-void ModuleWidget::onMouseDownOpaque(int button) {
-	if (button == 1) {
-		createContextMenu();
-	}
 }
 
 
