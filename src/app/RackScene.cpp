@@ -118,5 +118,17 @@ Widget *RackScene::onHoverKey(Vec pos, int key) {
 }
 
 
+bool RackScene::onPathDrop(Vec pos, const std::list<std::string>& paths) {
+	if (paths.size() >= 1) {
+		const std::string& firstPath = paths.front();
+		if (extractExtension(firstPath) == "vcv") {
+			gRackWidget->loadPatch(firstPath);
+			return true;
+		}
+	}
+	return false;
+}
+
+
 
 } // namespace rack

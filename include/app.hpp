@@ -366,6 +366,7 @@ struct RackScene : Scene {
 	void step() override;
 	void draw(NVGcontext *vg) override;
 	Widget *onHoverKey(Vec pos, int key) override;
+	bool onPathDrop(Vec pos, const std::list<std::string>& paths) override;
 };
 
 ////////////////////

@@ -147,6 +147,7 @@ struct Widget {
 	virtual void onDragEnter(Widget *origin) {}
 	virtual void onDragLeave(Widget *origin) {}
 	virtual void onDragDrop(Widget *origin) {}
+	virtual bool onPathDrop(Vec pos, const std::list<std::string>& paths);
 
 	virtual void onAction() {}
 	virtual void onChange() {}

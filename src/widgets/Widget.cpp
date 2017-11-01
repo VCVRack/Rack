@@ -184,6 +184,19 @@ Widget *Widget::onScroll(Vec pos, Vec scrollRel) {
 	return NULL;
 }
 
+bool Widget::onPathDrop(Vec pos, const std::list<std::string>& paths) {
+	for (auto it = children.rbegin(); it != children.rend(); it++) {
+		Widget *child = *it;
+		if (!child->visible)
+			continue;
+		if (child->box.contains(pos)) {
+			if (child->onPathDrop(pos.minus(child->box.pos), paths));
+				return true;
+		}
+	}
+	return false;
+}
+
 void Widget::onZoom() {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;

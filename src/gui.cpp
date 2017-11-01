@@ -203,7 +203,7 @@ void charCallback(GLFWwindow *window, unsigned int codepoint) {
 	}
 }
 
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		// onFocusKey
 		if (gFocusedWidget && gFocusedWidget->onFocusKey(key))
@@ -211,6 +211,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		// onHoverKey
 		gScene->onHoverKey(gMousePos, key);
 	}
+}
+
+void dropCallback(GLFWwindow *window, int count, const char **paths) {
+	std::list<std::string> pathsList;
+	for (int i = 0; i < count; i++) {
+		pathsList.push_back(paths[i]);
+	}
+	gScene->onPathDrop(gMousePos, pathsList);
 }
 
 void errorCallback(int error, const char *description) {
@@ -272,6 +280,7 @@ void guiInit() {
 	glfwSetScrollCallback(gWindow, scrollCallback);
 	glfwSetCharCallback(gWindow, charCallback);
 	glfwSetKeyCallback(gWindow, keyCallback);
+	glfwSetDropCallback(gWindow, dropCallback);
 
 	// Set up GLEW
 	glewExperimental = GL_TRUE;
