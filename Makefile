@@ -116,6 +116,9 @@ ifeq ($(ARCH), mac)
 
 	mkdir -p $(BUNDLE)/Contents/Resources/plugins
 	cp -R plugins/Fundamental/dist/Fundamental $(BUNDLE)/Contents/Resources/plugins
+	# Make DMG image
+	cd dist && ln -s /Applications Applications
+	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack-$(VERSION)-$(ARCH).dmg
 endif
 ifeq ($(ARCH), win)
 	mkdir -p dist/Rack
@@ -135,6 +138,11 @@ ifeq ($(ARCH), win)
 	cp dep/bin/portaudio_x64.dll dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+	# Make ZIP
+	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	# Make NSIS installer
+	makensis installer.nsi
+	mv Rack-setup.exe dist/Rack-$(VERSION)-$(ARCH).exe
 endif
 ifeq ($(ARCH), lin)
 	mkdir -p dist/Rack
@@ -149,14 +157,8 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libportaudio.so.2 dist/Rack/
 	cp dep/lib/librtmidi.so.4 dist/Rack/
 	mkdir -p dist/Rack/plugins
+	# Make ZIP
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
-endif
-
-ifeq ($(ARCH), mac)
-	cd dist && ln -s /Applications Applications
-	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack-$(VERSION)-$(ARCH).dmg
-else
-	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 
 
