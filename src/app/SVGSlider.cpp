@@ -21,9 +21,9 @@ void SVGSlider::step() {
 	FramebufferWidget::step();
 }
 
-void SVGSlider::onChange() {
+void SVGSlider::onChange(EventChange &e) {
 	dirty = true;
-	ParamWidget::onChange();
+	ParamWidget::onChange(e);
 }
 
 

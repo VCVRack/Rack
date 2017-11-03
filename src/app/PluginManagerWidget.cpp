@@ -15,7 +15,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		Vec pos = Vec(0, 0);
 
 		struct RegisterButton : Button {
-			void onAction() override {
+			void onAction(EventAction &e) override {
 				std::thread t(openBrowser, "https://vcvrack.com/");
 				t.detach();
 			}
@@ -46,7 +46,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		struct LogInButton : Button {
 			TextField *emailField;
 			TextField *passwordField;
-			void onAction() override {
+			void onAction(EventAction &e) override {
 				std::thread t(pluginLogIn, emailField->text, passwordField->text);
 				t.detach();
 				passwordField->text = "";
@@ -79,7 +79,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		Vec pos = Vec(0, 0);
 
 		struct ManageButton : Button {
-			void onAction() override {
+			void onAction(EventAction &e) override {
 				std::thread t(openBrowser, "https://vcvrack.com/");
 				t.detach();
 			}
@@ -92,7 +92,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		pos.x += manageButton->box.size.x;
 
 		struct RefreshButton : Button {
-			void onAction() override {
+			void onAction(EventAction &e) override {
 				std::thread t(pluginRefresh);
 				t.detach();
 			}
@@ -106,7 +106,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		pos.x += refreshButton->box.size.x;
 
 		struct LogOutButton : Button {
-			void onAction() override {
+			void onAction(EventAction &e) override {
 				pluginLogOut();
 			}
 		};
@@ -142,7 +142,7 @@ PluginManagerWidget::PluginManagerWidget() {
 		pos.x += downloadProgress->box.size.x;
 
 		// struct CancelButton : Button {
-		// 	void onAction() override {
+		// 	void onAction(EventAction &e) override {
 		// 		pluginCancelDownload();
 		// 	}
 		// };

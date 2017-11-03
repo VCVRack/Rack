@@ -3,18 +3,22 @@
 
 namespace rack {
 
-void MenuOverlay::onDragDrop(Widget *origin) {
-	if (origin == this) {
+void MenuOverlay::onDragDrop(EventDragDrop &e) {
+	if (e.origin == this) {
 		// deletes `this`
 		gScene->setOverlay(NULL);
 	}
 }
 
-Widget *MenuOverlay::onHoverKey(Vec pos, int key) {
-	Widget *w = Widget::onHoverKey(pos, key);
-	if (w) return w;
-	// Steal all keys
-	return this;
+void MenuOverlay::onScroll(EventScroll &e) {
+	// Don't recurse children, consume the event
+	e.consumed = true;
+}
+
+void MenuOverlay::onHoverKey(EventHoverKey &e) {
+	// Recurse children but consume the event
+	Widget::onHoverKey(e);
+	e.consumed = true;
 }
 
 

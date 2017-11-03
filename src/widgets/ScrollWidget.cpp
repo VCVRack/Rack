@@ -58,9 +58,9 @@ void ScrollWidget::step() {
 	Widget::step();
 }
 
-bool ScrollWidget::onScrollOpaque(Vec scrollRel) {
-	offset = offset.minus(scrollRel);
-	return true;
+void ScrollWidget::onScroll(EventScroll &e) {
+	offset = offset.minus(e.scrollRel);
+	e.consumed = true;
 }
 
 

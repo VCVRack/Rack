@@ -78,18 +78,21 @@ void Widget::clearChildren() {
 void Widget::finalizeEvents() {
 	// Stop dragging and hovering this widget
 	if (gHoveredWidget == this) {
-		gHoveredWidget->onMouseLeave();
+		EventMouseLeave e;
+		gHoveredWidget->onMouseLeave(e);
 		gHoveredWidget = NULL;
 	}
 	if (gDraggedWidget == this) {
-		gDraggedWidget->onDragEnd();
+		EventDragEnd e;
+		gDraggedWidget->onDragEnd(e);
 		gDraggedWidget = NULL;
 	}
 	if (gDragHoveredWidget == this) {
 		gDragHoveredWidget = NULL;
 	}
 	if (gFocusedWidget == this) {
-		gFocusedWidget->onDefocus();
+		EventDefocus e;
+		gFocusedWidget->onDefocus(e);
 		gFocusedWidget = NULL;
 	}
 	for (Widget *child : children) {
@@ -114,80 +117,51 @@ void Widget::draw(NVGcontext *vg) {
 	}
 }
 
-Widget *Widget::onMouseDown(Vec pos, int button) {
-	for (auto it = children.rbegin(); it != children.rend(); it++) {
-		Widget *child = *it;
-		if (!child->visible)
-			continue;
-		if (child->box.contains(pos)) {
-			Widget *w = child->onMouseDown(pos.minus(child->box.pos), button);
-			if (w)
-				return w;
-		}
-	}
-	return NULL;
+#define RECURSE_EVENT_POSITION(_method) { \
+	Vec pos = e.pos; \
+	for (auto it = children.rbegin(); it != children.rend(); it++) { \
+		Widget *child = *it; \
+		if (!child->visible) \
+			continue; \
+		if (child->box.contains(pos)) { \
+			e.pos = pos.minus(child->box.pos); \
+			child->_method(e); \
+			if (e.consumed) \
+				break; \
+		} \
+	} \
+	e.pos = pos; \
 }
 
-Widget *Widget::onMouseUp(Vec pos, int button) {
-	for (auto it = children.rbegin(); it != children.rend(); it++) {
-		Widget *child = *it;
-		if (!child->visible)
-			continue;
-		if (child->box.contains(pos)) {
-			Widget *w = child->onMouseUp(pos.minus(child->box.pos), button);
-			if (w)
-				return w;
-		}
-	}
-	return NULL;
+
+void Widget::onMouseDown(EventMouseDown &e) {
+	RECURSE_EVENT_POSITION(onMouseDown);
 }
 
-Widget *Widget::onMouseMove(Vec pos, Vec mouseRel) {
-	for (auto it = children.rbegin(); it != children.rend(); it++) {
-		Widget *child = *it;
-		if (!child->visible)
-			continue;
-		if (child->box.contains(pos)) {
-			Widget *w = child->onMouseMove(pos.minus(child->box.pos), mouseRel);
-			if (w)
-				return w;
-		}
-	}
-	return NULL;
+void Widget::onMouseUp(EventMouseUp &e) {
+	RECURSE_EVENT_POSITION(onMouseUp);
 }
 
-Widget *Widget::onHoverKey(Vec pos, int key) {
-	for (auto it = children.rbegin(); it != children.rend(); it++) {
-		Widget *child = *it;
-		if (!child->visible)
-			continue;
-		if (child->box.contains(pos)) {
-			Widget *w = child->onHoverKey(pos.minus(child->box.pos), key);
-			if (w)
-				return w;
-		}
-	}
-	return NULL;
+void Widget::onMouseMove(EventMouseMove &e) {
+	RECURSE_EVENT_POSITION(onMouseMove);
 }
 
-Widget *Widget::onScroll(Vec pos, Vec scrollRel) {
-	for (auto it = children.rbegin(); it != children.rend(); it++) {
-		Widget *child = *it;
-		if (!child->visible)
-			continue;
-		if (child->box.contains(pos)) {
-			Widget *w = child->onScroll(pos.minus(child->box.pos), scrollRel);
-			if (w)
-				return w;
-		}
-	}
-	return NULL;
+void Widget::onHoverKey(EventHoverKey &e) {
+	RECURSE_EVENT_POSITION(onHoverKey);
 }
 
-void Widget::onZoom() {
+void Widget::onScroll(EventScroll &e) {
+	RECURSE_EVENT_POSITION(onScroll);
+}
+
+void Widget::onPathDrop(EventPathDrop &e) {
+	RECURSE_EVENT_POSITION(onPathDrop);
+}
+
+void Widget::onZoom(EventZoom &e) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		Widget *child = *it;
-		child->onZoom();
+		child->onZoom(e);
 	}
 }
 

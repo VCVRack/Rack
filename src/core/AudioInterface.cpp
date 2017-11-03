@@ -326,14 +326,14 @@ void AudioInterface::closeDevice() {
 struct AudioItem : MenuItem {
 	AudioInterface *audioInterface;
 	int deviceId;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		audioInterface->setDeviceId(deviceId);
 	}
 };
 
 struct AudioChoice : ChoiceButton {
 	AudioInterface *audioInterface;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
@@ -364,14 +364,14 @@ struct AudioChoice : ChoiceButton {
 struct SampleRateItem : MenuItem {
 	AudioInterface *audioInterface;
 	float sampleRate;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		audioInterface->setSampleRate(sampleRate);
 	}
 };
 
 struct SampleRateChoice : ChoiceButton {
 	AudioInterface *audioInterface;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
@@ -395,14 +395,14 @@ struct SampleRateChoice : ChoiceButton {
 struct BlockSizeItem : MenuItem {
 	AudioInterface *audioInterface;
 	int blockSize;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		audioInterface->setBlockSize(blockSize);
 	}
 };
 
 struct BlockSizeChoice : ChoiceButton {
 	AudioInterface *audioInterface;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;

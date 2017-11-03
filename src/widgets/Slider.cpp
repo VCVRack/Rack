@@ -11,26 +11,30 @@ void Slider::draw(NVGcontext *vg) {
 	bndSlider(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, getText().c_str(), NULL);
 }
 
-void Slider::onDragStart() {
+void Slider::onDragStart(EventDragStart &e) {
 	state = BND_ACTIVE;
 	guiCursorLock();
 }
 
-void Slider::onDragMove(Vec mouseRel) {
-	setValue(value + SLIDER_SENSITIVITY * (maxValue - minValue) * mouseRel.x);
+void Slider::onDragMove(EventDragMove &e) {
+	setValue(value + SLIDER_SENSITIVITY * (maxValue - minValue) * e.mouseRel.x);
 }
 
-void Slider::onDragEnd() {
+void Slider::onDragEnd(EventDragEnd &e) {
 	state = BND_DEFAULT;
 	guiCursorUnlock();
-	onAction();
+	EventAction eAction;
+	onAction(eAction);
 }
 
-void Slider::onMouseDownOpaque(int button) {
-	if (button == 1) {
+void Slider::onMouseDown(EventMouseDown &e) {
+	if (e.button == 1) {
 		setValue(defaultValue);
-		onAction();
+		EventAction eAction;
+		onAction(eAction);
 	}
+	e.consumed = true;
+	e.target = this;
 }
 
 

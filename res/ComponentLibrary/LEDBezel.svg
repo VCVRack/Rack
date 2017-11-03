@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="7.5001564mm"
+   height="7.5000095mm"
+   viewBox="0 0 7.5001564 7.5000095"
+   version="1.1"
+   id="svg64581"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   sodipodi:docname="LEDBezel.svg">
+  <defs
+     id="defs64575" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-100.74496"
+     inkscape:cy="9.8683694"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="2560"
+     inkscape:window-height="1422"
+     inkscape:window-x="0"
+     inkscape:window-y="18"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata64578">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-94.523732,-120.89285)">
+    <path
+       inkscape:connector-curvature="0"
+       id="path9729"
+       d="m 94.750061,123.36034 c -0.706931,1.94578 0.297674,4.09829 2.240704,4.8066 1.947157,0.70556 4.098285,-0.29626 4.805225,-2.24208 0.70968,-1.94578 -0.29355,-4.09688 -2.239332,-4.80522 -1.945781,-0.70693 -4.096914,0.29355 -4.806597,2.2407"
+       style="fill:#2b2b2b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path64013"
+       d="m 99.30033,121.82382 c -1.557161,-0.56497 -3.279704,0.23703 -3.846089,1.79285 -0.565009,1.55716 0.237031,3.27833 1.794192,3.84334 1.557197,0.56776 3.276987,-0.23428 3.844747,-1.79144 0.56498,-1.55582 -0.23565,-3.27837 -1.79285,-3.84475"
+       style="clip-rule:nonzero;fill:#5a5a5a;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775" />
+  </g>
+</svg>
