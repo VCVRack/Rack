@@ -135,11 +135,11 @@ struct TriggerTextField : TextField {
 
 	void draw(NVGcontext *vg);
 
-	void onMouseDownOpaque(int button);
+	void onMouseDown(EventMouseDown &e);
 
-	void onMouseUpOpaque(int button);
+	void onMouseUp(EventMouseUp &e);
 
-	void onMouseLeave();
+	void onMouseLeave(EventMouseLeave &e);
 
 	int outNum;
 	MIDITriggerToCVInterface *module;
@@ -180,21 +180,24 @@ void TriggerTextField::onTextChange() {
 	};
 }
 
-void TriggerTextField::onMouseUpOpaque(int button) {
-	if (button == 1) {
+void TriggerTextField::onMouseUp(EventMouseUp &e) {
+	if (e.button == 1) {
 		module->trigger[outNum].onFocus = false;
+		e.consumed = true;
 	}
 
 }
 
-void TriggerTextField::onMouseDownOpaque(int button) {
-	if (button == 1) {
+void TriggerTextField::onMouseDown(EventMouseDown &e) {
+	if (e.button == 1) {
 		module->trigger[outNum].onFocus = true;
+		e.consumed = true;
 	}
 }
 
-void TriggerTextField::onMouseLeave() {
+void TriggerTextField::onMouseLeave(EventMouseLeave &e) {
 	module->trigger[outNum].onFocus = false;
+	e.consumed = true;
 }
 
 MIDITriggerToCVWidget::MIDITriggerToCVWidget() {

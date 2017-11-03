@@ -174,13 +174,13 @@ struct TransitionSmoother {
 struct MidiItem : MenuItem {
 	MidiIO *midiModule;
 
-	void onAction();
+	void onAction(EventAction &e);
 };
 
 struct MidiChoice : ChoiceButton {
 	MidiIO *midiModule;
 
-	void onAction();
+	void onAction(EventAction &e);
 
 	void step();
 };
@@ -189,13 +189,13 @@ struct ChannelItem : MenuItem {
 	MidiIO *midiModule;
 	int channel;
 
-	void onAction();
+	void onAction(EventAction &e);
 };
 
 struct ChannelChoice : ChoiceButton {
 	MidiIO *midiModule;
 
-	void onAction();
+	void onAction(EventAction &e);
 
 	void step();
 };

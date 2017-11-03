@@ -254,7 +254,7 @@ struct ModeItem : MenuItem {
 	int mode;
 	QuadMIDIToCVInterface *module;
 
-	void onAction() {
+	void onAction(EventAction &e) {
 		module->setMode(mode);
 	}
 };
@@ -264,7 +264,7 @@ struct ModeChoice : ChoiceButton {
 	const std::vector<std::string> modeNames = {"ROTATE", "RESET", "REASSIGN"};
 
 
-	void onAction() {
+	void onAction(EventAction &e) {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;

@@ -169,11 +169,11 @@ struct CCTextField : TextField {
 
 	void draw(NVGcontext *vg);
 
-	void onMouseDownOpaque(int button);
+	void onMouseDown(EventMouseDown &e);
 
-	void onMouseUpOpaque(int button);
+	void onMouseUp(EventMouseUp &e);
 
-	void onMouseLeave();
+	void onMouseLeave(EventMouseLeave &e);
 
 	int outNum;
 
@@ -196,21 +196,25 @@ void CCTextField::draw(NVGcontext *vg) {
 	TextField::draw(vg);
 }
 
-void CCTextField::onMouseUpOpaque(int button) {
-	if (button == 1) {
+void CCTextField::onMouseUp(EventMouseUp &e) {
+	if (e.button == 1) {
 		module->cc[outNum].numSelected = false;
+		e.consumed = true;
 	}
+
 
 }
 
-void CCTextField::onMouseDownOpaque(int button) {
-	if (button == 1) {
+void CCTextField::onMouseDown(EventMouseDown &e) {
+	if (e.button == 1) {
 		module->cc[outNum].numSelected = true;
+		e.consumed = true;
 	}
 }
 
-void CCTextField::onMouseLeave() {
+void CCTextField::onMouseLeave(EventMouseLeave &e) {
 	module->cc[outNum].numSelected = false;
+	e.consumed = true;
 }
 
 
