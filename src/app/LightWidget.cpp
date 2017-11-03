@@ -6,7 +6,7 @@ namespace rack {
 
 void LightWidget::draw(NVGcontext *vg) {
 	float radius = box.size.x / 2.0;
-	float oradius = radius + 20.0;
+	float oradius = radius + 15.0;
 
 	color.r = clampf(color.r, 0.0, 1.0);
 	color.g = clampf(color.g, 0.0, 1.0);
@@ -36,7 +36,7 @@ void LightWidget::draw(NVGcontext *vg) {
 	nvgRect(vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
 	NVGpaint paint;
 	NVGcolor icol = color;
-	icol.a *= 0.15;
+	icol.a *= 0.10;
 	NVGcolor ocol = color;
 	ocol.a = 0.0;
 	paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
