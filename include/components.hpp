@@ -409,33 +409,38 @@ struct RedGreenBlueLight : ColorLightWidget {
 };
 
 
+/** Based on the size of 5mm LEDs */
 template <typename BASE>
 struct LargeLight : BASE {
 	LargeLight() {
-		this->box.size = Vec(20, 20);
+		this->box.size = mm2px(Vec(5.179, 5.179));
 	}
 };
 
+/** Based on the size of 3mm LEDs */
 template <typename BASE>
 struct MediumLight : BASE {
 	MediumLight() {
-		this->box.size = Vec(12, 12);
+		this->box.size = mm2px(Vec(3.176, 3.176));
 	}
 };
 
+/** Based on the size of 2mm LEDs */
 template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
-		this->box.size = Vec(8, 8);
+		this->box.size = mm2px(Vec(2.176, 2.176));
 	}
 };
 
+/** Based on the size of 1mm LEDs */
 template <typename BASE>
 struct TinyLight : BASE {
 	TinyLight() {
-		this->box.size = Vec(5, 5);
+		this->box.size = mm2px(Vec(1.088, 1.088));
 	}
 };
+
 
 ////////////////////
 // Switches and Buttons
@@ -494,6 +499,12 @@ struct BefacoPush : SVGSwitch, MomentarySwitch {
 struct PB61303 : SVGSwitch, MomentarySwitch {
 	PB61303() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")));
+	}
+};
+
+struct LEDBezel : SVGSwitch, MomentarySwitch {
+	LEDBezel() {
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/LEDBezel.svg")));
 	}
 };
 
