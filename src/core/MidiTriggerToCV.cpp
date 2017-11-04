@@ -38,13 +38,13 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 	~MIDITriggerToCVInterface() {
 	}
 
-	void step();
+	void step() override;
 
 	void processMidi(std::vector<unsigned char> msg);
 
-	void resetMidi();
+	void resetMidi() override;
 
-	virtual json_t *toJson() {
+	virtual json_t *toJson() override {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
@@ -53,7 +53,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ) override {
 		baseFromJson(rootJ);
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			json_t *ccNumJ = json_object_get(rootJ, std::to_string(i).c_str());
@@ -65,7 +65,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		}
 	}
 
-	void reset() final {
+	void reset() override {
 		resetMidi();
 	}
 
@@ -136,15 +136,15 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 }
 
 struct TriggerTextField : TextField {
-	void onTextChange();
+	void onTextChange() override;
 
-	void draw(NVGcontext *vg);
+	void draw(NVGcontext *vg) override;
 
-	void onMouseDownOpaque(int button);
+	void onMouseDown(EventMouseDown &e) override;
 
-	void onMouseUpOpaque(int button);
+	void onMouseUp(EventMouseUp &e) override;
 
-	void onMouseLeave();
+	void onMouseLeave(EventMouseLeave &e) override;
 
 
 	int *triggerNum;
@@ -185,20 +185,20 @@ void TriggerTextField::onTextChange() {
 	};
 }
 
-void TriggerTextField::onMouseUpOpaque(int button) {
-	if (button == 1) {
+void TriggerTextField::onMouseDown(EventMouseDown &e) {
+	if (e.button == 1) {
+		*onFocus = true;
+	}
+}
+
+void TriggerTextField::onMouseUp(EventMouseUp &e) {
+	if (e.button == 1) {
 		*onFocus = false;
 	}
 
 }
 
-void TriggerTextField::onMouseDownOpaque(int button) {
-	if (button == 1) {
-		*onFocus = true;
-	}
-}
-
-void TriggerTextField::onMouseLeave() {
+void TriggerTextField::onMouseLeave(EventMouseLeave &e) {
 	*onFocus = false;
 }
 

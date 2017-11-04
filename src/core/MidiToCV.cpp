@@ -50,7 +50,7 @@ struct MIDIToCVInterface : MidiIO, Module {
 	~MIDIToCVInterface() {
 	};
 
-	void step();
+	void step() override;
 
 	void pressNote(int note);
 
@@ -58,21 +58,21 @@ struct MIDIToCVInterface : MidiIO, Module {
 
 	void processMidi(std::vector<unsigned char> msg);
 
-	json_t *toJson() {
+	json_t *toJson() override {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ) override {
 		baseFromJson(rootJ);
 	}
 
-	void reset() {
+	void reset() override {
 		resetMidi();
 	}
 
-	void resetMidi();
+	void resetMidi() override;
 
 };
 

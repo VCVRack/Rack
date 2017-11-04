@@ -175,12 +175,12 @@ void MidiIO::close() {
 }
 
 
-void MidiItem::onAction() {
+void MidiItem::onAction(EventAction &e) {
 	midiModule->resetMidi(); // reset Midi values
 	midiModule->openDevice(text);
 }
 
-void MidiChoice::onAction() {
+void MidiChoice::onAction(EventAction &e) {
 	Menu *menu = gScene->createMenu();
 	menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 	menu->box.size.x = box.size.x;
@@ -210,12 +210,12 @@ void MidiChoice::step() {
 	text = ellipsize(name, 15);
 }
 
-void ChannelItem::onAction() {
+void ChannelItem::onAction(EventAction &e) {
 	midiModule->resetMidi(); // reset Midi values
 	midiModule->setChannel(channel);
 }
 
-void ChannelChoice::onAction() {
+void ChannelChoice::onAction(EventAction &e) {
 	Menu *menu = gScene->createMenu();
 	menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 	menu->box.size.x = box.size.x;

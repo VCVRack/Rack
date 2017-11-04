@@ -101,59 +101,59 @@ public:
 struct MidiItem : MenuItem {
 	MidiIO *midiModule;
 
-	void onAction();
+	void onAction(EventAction &e) override;
 };
 
 struct MidiChoice : ChoiceButton {
 	MidiIO *midiModule;
 
-	void onAction();
+	void onAction(EventAction &e) override;
 
-	void step();
+	void step() override;
 };
 
 struct ChannelItem : MenuItem {
 	MidiIO *midiModule;
 	int channel;
 
-	void onAction();
+	void onAction(EventAction &e) override;
 };
 
 struct ChannelChoice : ChoiceButton {
 	MidiIO *midiModule;
 
-	void onAction();
+	void onAction(EventAction &e) override;
 
-	void step();
+	void step() override;
 };
 
 
 struct MidiToCVWidget : ModuleWidget {
 	MidiToCVWidget();
 
-	void step();
+	void step() override;
 };
 
 struct MIDICCToCVWidget : ModuleWidget {
 	MIDICCToCVWidget();
 
-	void step();
+	void step() override;
 };
 
 struct MIDIClockToCVWidget : ModuleWidget {
 	MIDIClockToCVWidget();
 
-	void step();
+	void step() override;
 };
 
 struct MIDITriggerToCVWidget : ModuleWidget {
 	MIDITriggerToCVWidget();
 
-	void step();
+	void step() override;
 };
 
 struct QuadMidiToCVWidget : ModuleWidget {
 	QuadMidiToCVWidget();
 
-	void step();
+	void step() override;
 };

@@ -41,15 +41,15 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 	~MIDIClockToCVInterface() {
 	}
 
-	void step();
+	void step() override;
 
 	void processMidi(std::vector<unsigned char> msg);
 
-	void onDeviceChange();
+	void onDeviceChange() override;
 
-	void resetMidi();
+	void resetMidi() override;
 
-	json_t *toJson() {
+	json_t *toJson()  override{
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		json_object_set_new(rootJ, "clock1ratio", json_integer(clock1ratio));
@@ -57,7 +57,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) {
+	void fromJson(json_t *rootJ)  override{
 		baseFromJson(rootJ);
 		json_t *c1rJ = json_object_get(rootJ, "clock1ratio");
 		if (c1rJ) {
@@ -183,7 +183,7 @@ struct ClockRatioItem : MenuItem {
 	int ratio;
 	int *clockRatio;
 
-	void onAction() {
+	void onAction(EventAction &e) override {
 		*clockRatio = ratio;
 	}
 };
@@ -199,7 +199,7 @@ struct ClockRatioChoice : ChoiceButton {
 	const std::vector<std::string> ratioNames_short = {"1:4 ratio", "1:3 ratio", "1:2 ratio", "2:3 ratio", "1:1 ratio",
 													   "4:3", "2:1 ratio", "4:1 ratio", "8:1 ratio"};
 
-	void onAction() {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
@@ -213,7 +213,7 @@ struct ClockRatioChoice : ChoiceButton {
 		}
 	}
 
-	void step() {
+	void step() override {
 		text = ratioNames_short[*clockRatio];
 	}
 };
