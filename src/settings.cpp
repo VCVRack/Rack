@@ -60,6 +60,10 @@ static json_t *settingsToJson() {
 	json_t *lastPathJ = json_string(gRackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
+	// window size and position
+	json_t *winJ = json_pack("[i, i, i, i]", (int)gScene->box.size.x, (int)gScene->box.size.y, (int)gScene->box.pos.x, (int)gScene->box.pos.y );
+	json_object_set_new(rootJ, "window", winJ);
+
 	return rootJ;
 }
 
@@ -123,6 +127,22 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
 	if (lastPathJ)
 		gRackWidget->lastPath = json_string_value(lastPathJ);
+
+	// window size and position
+	json_t *winJ = json_object_get(rootJ, "window");
+	int w = 0;
+	int h = 0;
+	int x = 0;
+	int y = 0;
+	json_unpack(winJ, "[i, i, i, i]", &w, &h, &x, &y);
+	if( x < 0 )
+		x = 0;
+	if( y < 0 )
+		y = 0;
+	if(w > 0 && h > 0) {
+		gScene->box.size = Vec(w, h);
+		gScene->box.pos  = Vec(x, y);
+	}
 }
 
 

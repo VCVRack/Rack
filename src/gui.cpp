@@ -43,6 +43,10 @@ void windowSizeCallback(GLFWwindow* window, int width, int height) {
 	gScene->box.size = Vec(width, height);
 }
 
+void windowPosCallback(GLFWwindow* window, int width, int height) {
+	gScene->box.pos = Vec(width, height);
+}
+
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 #ifdef ARCH_MAC
 	// Ctrl-left click --> right click
@@ -317,7 +321,8 @@ void guiInit() {
 	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	lastWindowTitle = "";
 	gWindow = glfwCreateWindow(640, 480, lastWindowTitle.c_str(), NULL, NULL);
@@ -331,6 +336,7 @@ void guiInit() {
 	glfwSwapInterval(1);
 
 	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
+	glfwSetWindowPosCallback(gWindow, windowPosCallback);
 	glfwSetMouseButtonCallback(gWindow, mouseButtonStickyCallback);
 	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
 	glfwSetCursorEnterCallback(gWindow, cursorEnterCallback);
@@ -377,6 +383,23 @@ void guiDestroy() {
 
 void guiRun() {
 	assert(gWindow);
+	{
+		// check if we have a valid window size from settings and apply it
+		int width  = (int)gScene->box.size.x;
+		int height = (int)gScene->box.size.y;
+		int x      = (int)gScene->box.pos.x;
+		int y      = (int)gScene->box.pos.y;
+		if( width > 0  && height > 0 && x >= 0 && y >= 0 ) {
+			glfwSetWindowSize(gWindow, width, height);
+			glfwSetWindowPos(gWindow, x, y);
+		} else {
+			glfwMaximizeWindow(gWindow);
+			// help me Obi Wan: if we do not do this, widgets are not correclty drawn
+			int width, height;
+			glfwGetWindowSize(gWindow, &width, &height);
+			glfwSetWindowSize(gWindow, width, height);
+		}
+	}
 	{
 		int width, height;
 		glfwGetWindowSize(gWindow, &width, &height);
