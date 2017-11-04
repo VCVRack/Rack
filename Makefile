@@ -25,6 +25,7 @@ ifeq ($(ARCH), mac)
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
 		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
 	TARGET = Rack
+	BUNDLE = dist/$(TARGET).app
 endif
 
 ifeq ($(ARCH), win)
@@ -81,7 +82,6 @@ endif
 	$(MAKE) -C plugins/Fundamental dist
 
 ifeq ($(ARCH), mac)
-	$(eval BUNDLE := dist/$(TARGET).app)
 	mkdir -p $(BUNDLE)
 	mkdir -p $(BUNDLE)/Contents
 	mkdir -p $(BUNDLE)/Contents/Resources
