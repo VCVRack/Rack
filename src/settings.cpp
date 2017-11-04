@@ -17,6 +17,18 @@ static json_t *settingsToJson() {
 	json_t *tokenJ = json_string(gToken.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
+	if (!guiIsMaximized()) {
+		// windowSize
+		Vec windowSize = guiGetWindowSize();
+		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
+		json_object_set_new(rootJ, "windowSize", windowSizeJ);
+
+		// windowPos
+		Vec windowPos = guiGetWindowPos();
+		json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
+		json_object_set_new(rootJ, "windowPos", windowPosJ);
+	}
+
 	// opacity
 	float opacity = gToolbar->wireOpacitySlider->value;
 	json_t *opacityJ = json_real(opacity);
@@ -56,6 +68,22 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
 		gToken = json_string_value(tokenJ);
+
+	// windowSize
+	json_t *windowSizeJ = json_object_get(rootJ, "windowSize");
+	if (windowSizeJ) {
+		double width, height;
+		json_unpack(windowSizeJ, "[F, F]", &width, &height);
+		guiSetWindowSize(Vec(width, height));
+	}
+
+	// windowPos
+	json_t *windowPosJ = json_object_get(rootJ, "windowPos");
+	if (windowPosJ) {
+		double x, y;
+		json_unpack(windowPosJ, "[F, F]", &x, &y);
+		guiSetWindowPos(Vec(x, y));
+	}
 
 	// opacity
 	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");

@@ -404,6 +404,35 @@ bool guiIsShiftPressed() {
 	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
+Vec guiGetWindowSize() {
+	int width, height;
+	glfwGetWindowSize(gWindow, &width, &height);
+	return Vec(width, height);
+}
+
+void guiSetWindowSize(Vec size) {
+	int width = size.x;
+	int height = size.y;
+	glfwSetWindowSize(gWindow, width, height);
+}
+
+Vec guiGetWindowPos() {
+	int x, y;
+	glfwGetWindowPos(gWindow, &x, &y);
+	return Vec(x, y);
+}
+
+void guiSetWindowPos(Vec pos) {
+	int x = pos.x;
+	int y = pos.y;
+	glfwSetWindowPos(gWindow, x, y);
+}
+
+bool guiIsMaximized() {
+	return glfwGetWindowAttrib(gWindow, GLFW_MAXIMIZED);
+}
+
+
 
 ////////////////////
 // resources

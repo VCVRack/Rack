@@ -32,6 +32,11 @@ void guiCursorLock();
 void guiCursorUnlock();
 bool guiIsModPressed();
 bool guiIsShiftPressed();
+Vec guiGetWindowSize();
+void guiSetWindowSize(Vec size);
+Vec guiGetWindowPos();
+void guiSetWindowPos(Vec pos);
+bool guiIsMaximized();
 
 
 } // namespace rack
