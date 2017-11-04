@@ -52,12 +52,12 @@ void Menu::draw(NVGcontext *vg) {
 }
 
 
-bool Menu::onScrollOpaque(Vec scrollRel) {
+void Menu::onScroll(EventScroll &e) {
 	if (!parent)
-		return true;
+		return;
 	if (!parent->box.contains(box))
-		box.pos = box.pos.plus(scrollRel);
-	return true;
+		box.pos = box.pos.plus(e.scrollRel);
+	e.consumed = true;
 }
 
 

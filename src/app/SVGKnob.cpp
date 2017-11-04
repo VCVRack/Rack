@@ -35,9 +35,9 @@ void SVGKnob::step() {
 	FramebufferWidget::step();
 }
 
-void SVGKnob::onChange() {
+void SVGKnob::onChange(EventChange &e) {
 	dirty = true;
-	Knob::onChange();
+	Knob::onChange(e);
 }
 
 

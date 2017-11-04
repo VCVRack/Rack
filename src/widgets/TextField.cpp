@@ -24,21 +24,25 @@ void TextField::draw(NVGcontext *vg) {
 	}
 }
 
-Widget *TextField::onMouseDown(Vec pos, int button) {
-	end = begin = bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), pos.x, pos.y);
-	return OpaqueWidget::onMouseDown(pos, button);
+void TextField::onMouseDown(EventMouseDown &e) {
+	end = begin = bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), e.pos.x, e.pos.y);
+	OpaqueWidget::onMouseDown(e);
 }
 
+void TextField::onFocus(EventFocus &e) {
+	begin = 0;
+	end = text.size();
+	e.consumed = true;
+}
 
-bool TextField::onFocusText(int codepoint) {
-	char c = codepoint;
-	std::string newText(1, c);
+void TextField::onText(EventText &e) {
+	std::string newText(1, (char) e.codepoint);
 	insertText(newText);
-	return true;
+	e.consumed = true;
 }
 
-bool TextField::onFocusKey(int key) {
-	switch (key) {
+void TextField::onKey(EventKey &e) {
+	switch (e.key) {
 		case GLFW_KEY_BACKSPACE:
 			if (begin < end) {
 				text.erase(begin, end - begin);
@@ -107,20 +111,15 @@ bool TextField::onFocusKey(int key) {
 				insertText("\n");
 			}
 			else {
-				onAction();
+				EventAction e;
+				onAction(e);
 			}
 			break;
 	}
 
 	begin = mini(maxi(begin, 0), text.size());
 	end = mini(maxi(end, 0), text.size());
-	return true;
-}
-
-bool TextField::onFocus() {
-	begin = 0;
-	end = text.size();
-	return true;
+	e.consumed = true;
 }
 
 void TextField::insertText(std::string newText) {

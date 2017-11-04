@@ -82,39 +82,55 @@ void RackScene::draw(NVGcontext *vg) {
 	Scene::draw(vg);
 }
 
-Widget *RackScene::onHoverKey(Vec pos, int key) {
-	switch (key) {
+void RackScene::onHoverKey(EventHoverKey &e) {
+	switch (e.key) {
 		case GLFW_KEY_N:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				gRackWidget->reset();
-				return this;
+				e.consumed = true;
+				return;
 			}
 			break;
 		case GLFW_KEY_Q:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				guiClose();
-				return this;
+				e.consumed = true;
+				return;
 			}
 			break;
 		case GLFW_KEY_O:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				gRackWidget->openDialog();
-				return this;
+				e.consumed = true;
+				return;
 			}
 			break;
 		case GLFW_KEY_S:
 			if (guiIsModPressed() && !guiIsShiftPressed()) {
 				gRackWidget->saveDialog();
-				return this;
+				e.consumed = true;
+				return;
 			}
 			if (guiIsModPressed() && guiIsShiftPressed()) {
 				gRackWidget->saveAsDialog();
-				return this;
+				e.consumed = true;
+				return;
 			}
 			break;
 	}
 
-	return Widget::onHoverKey(pos, key);
+	Widget::onHoverKey(e);
+}
+
+
+void RackScene::onPathDrop(EventPathDrop &e) {
+	if (e.paths.size() >= 1) {
+		const std::string& firstPath = e.paths.front();
+		if (extractExtension(firstPath) == "vcv") {
+			gRackWidget->loadPatch(firstPath);
+			e.consumed = true;
+		}
+	}
 }
 
 

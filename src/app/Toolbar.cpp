@@ -7,37 +7,37 @@ namespace rack {
 
 
 struct NewItem : MenuItem {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		gRackWidget->reset();
 	}
 };
 
 struct OpenItem : MenuItem {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		gRackWidget->openDialog();
 	}
 };
 
 struct SaveItem : MenuItem {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		gRackWidget->saveDialog();
 	}
 };
 
 struct SaveAsItem : MenuItem {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		gRackWidget->saveAsDialog();
 	}
 };
 
 struct QuitItem : MenuItem {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		guiClose();
 	}
 };
 
 struct FileChoice : ChoiceButton {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -54,21 +54,21 @@ struct FileChoice : ChoiceButton {
 
 
 struct PauseItem : MenuItem {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		gPaused = !gPaused;
 	}
 };
 
 struct SampleRateItem : MenuItem {
 	float sampleRate;
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		engineSetSampleRate(sampleRate);
 		gPaused = false;
 	}
 };
 
 struct SampleRateChoice : ChoiceButton {
-	void onAction() override {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -149,8 +149,8 @@ Toolbar::Toolbar() {
 	xPos += margin;
 	{
 		struct ZoomSlider : Slider {
-			void onAction() override {
-				Slider::onAction();
+			void onAction(EventAction &e) override {
+				Slider::onAction(e);
 				gRackScene->zoomWidget->setZoom(value / 100.0);
 			}
 		};

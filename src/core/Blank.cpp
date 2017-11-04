@@ -10,20 +10,21 @@ struct ModuleResizeHandle : Widget {
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
-	Widget *onMouseDown(Vec pos, int button) override {
-		if (button == 0)
-			return this;
-		return NULL;
+	void onMouseDown(EventMouseDown &e) override {
+		if (e.button == 0) {
+			e.consumed = true;
+			e.target = this;
+		}
 	}
-	void onDragStart() override {
+	void onDragStart(EventDragStart &e) override {
 		assert(parent);
 		originalWidth = parent->box.size.x;
 		totalX = 0.0;
 	}
-	void onDragMove(Vec mouseRel) override {
+	void onDragMove(EventDragMove &e) override {
 		ModuleWidget *m = dynamic_cast<ModuleWidget*>(parent);
 		assert(m);
-		totalX += mouseRel.x;
+		totalX += e.mouseRel.x;
 		float targetWidth = originalWidth;
 		if (right)
 			targetWidth += totalX;

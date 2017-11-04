@@ -22,7 +22,7 @@ void MenuItem::draw(NVGcontext *vg) {
 	bndIconLabelValue(vg, x, 0.0, box.size.x, box.size.y, -1, rightColor, BND_LEFT, BND_LABEL_FONT_SIZE, rightText.c_str(), NULL);
 }
 
-void MenuItem::onMouseEnter() {
+void MenuItem::onMouseEnter(EventMouseEnter &e) {
 	Menu *parentMenu = dynamic_cast<Menu*>(parent);
 	if (!parentMenu)
 		return;
@@ -38,11 +38,12 @@ void MenuItem::onMouseEnter() {
 	parentMenu->setChildMenu(childMenu);
 }
 
-void MenuItem::onDragDrop(Widget *origin) {
-	if (origin != this)
+void MenuItem::onDragDrop(EventDragDrop &e) {
+	if (e.origin != this)
 		return;
 
-	onAction();
+	EventAction eAction;
+	onAction(eAction);
 	// deletes `this`
 	gScene->setOverlay(NULL);
 }

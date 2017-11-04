@@ -9,6 +9,11 @@
 	#include <pwd.h>
 #endif
 
+#if ARCH_WIN
+	#include <Windows.h>
+	#include <Shlobj.h>
+#endif
+
 
 namespace rack {
 
@@ -76,9 +81,14 @@ std::string assetLocal(std::string filename) {
 	path += "/" + filename;
 #endif
 #if ARCH_WIN
-	// TODO
-	// Use ~/My Documents/Rack or something
-	path = "./" + filename;
+	// Get My Documents folder
+	char buf[MAX_PATH];
+	HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, buf);
+	assert(result == S_OK);
+	path = buf;
+	path += "/Rack";
+	CreateDirectory(path.c_str(), NULL);
+	path += "/" + filename;
 #endif
 #if ARCH_LIN
 	// TODO

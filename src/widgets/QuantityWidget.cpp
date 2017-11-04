@@ -4,12 +4,14 @@
 namespace rack {
 
 QuantityWidget::QuantityWidget() {
-	onChange();
+	EventChange e;
+	onChange(e);
 }
 
 void QuantityWidget::setValue(float value) {
 	this->value = clampf(value, fminf(minValue, maxValue), fmaxf(minValue, maxValue));
-	onChange();
+	EventChange e;
+	onChange(e);
 }
 
 void QuantityWidget::setLimits(float minValue, float maxValue) {
