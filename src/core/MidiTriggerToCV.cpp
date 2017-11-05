@@ -189,13 +189,14 @@ void TriggerTextField::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		*onFocus = true;
 	}
+	e.consumed = true;
 }
 
 void TriggerTextField::onMouseUp(EventMouseUp &e) {
 	if (e.button == 1) {
 		*onFocus = false;
 	}
-
+	e.consumed = true;
 }
 
 void TriggerTextField::onMouseLeave(EventMouseLeave &e) {
@@ -280,6 +281,5 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 }
 
 void MIDITriggerToCVWidget::step() {
-
 	ModuleWidget::step();
 }

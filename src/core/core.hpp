@@ -12,6 +12,32 @@ struct AudioInterfaceWidget : ModuleWidget {
 	AudioInterfaceWidget();
 };
 
+struct MidiToCVWidget : ModuleWidget {
+	MidiToCVWidget();
+	void step() override;
+};
+
+struct MIDICCToCVWidget : ModuleWidget {
+	MIDICCToCVWidget();
+	void step() override;
+};
+
+struct MIDIClockToCVWidget : ModuleWidget {
+	MIDIClockToCVWidget();
+	void step() override;
+};
+
+struct MIDITriggerToCVWidget : ModuleWidget {
+	MIDITriggerToCVWidget();
+	void step() override;
+};
+
+struct QuadMidiToCVWidget : ModuleWidget {
+	QuadMidiToCVWidget();
+	void step() override;
+};
+
+
 struct BridgeWidget : ModuleWidget {
 	BridgeWidget();
 };

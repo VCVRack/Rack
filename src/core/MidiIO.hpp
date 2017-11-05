@@ -88,10 +88,10 @@ public:
 	void close();
 
 	/* called when midi port is set */
-	virtual void resetMidi()=0;
+	virtual void resetMidi() {}
 
 	/* called if a user switches or sets the deivce (and after this device is initialised)*/
-	virtual void onDeviceChange(){};
+	virtual void onDeviceChange() {}
 };
 
 //////////////////////
@@ -107,9 +107,8 @@ struct MidiItem : MenuItem {
 struct MidiChoice : ChoiceButton {
 	MidiIO *midiModule;
 
-	void onAction(EventAction &e) override;
-
 	void step() override;
+	void onAction(EventAction &e) override;
 };
 
 struct ChannelItem : MenuItem {
@@ -122,38 +121,6 @@ struct ChannelItem : MenuItem {
 struct ChannelChoice : ChoiceButton {
 	MidiIO *midiModule;
 
+	void step() override;
 	void onAction(EventAction &e) override;
-
-	void step() override;
-};
-
-
-struct MidiToCVWidget : ModuleWidget {
-	MidiToCVWidget();
-
-	void step() override;
-};
-
-struct MIDICCToCVWidget : ModuleWidget {
-	MIDICCToCVWidget();
-
-	void step() override;
-};
-
-struct MIDIClockToCVWidget : ModuleWidget {
-	MIDIClockToCVWidget();
-
-	void step() override;
-};
-
-struct MIDITriggerToCVWidget : ModuleWidget {
-	MIDITriggerToCVWidget();
-
-	void step() override;
-};
-
-struct QuadMidiToCVWidget : ModuleWidget {
-	QuadMidiToCVWidget();
-
-	void step() override;
 };

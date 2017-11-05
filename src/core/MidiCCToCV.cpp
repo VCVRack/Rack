@@ -189,13 +189,14 @@ void CCTextField::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		module->onFocus[num] = true;
 	}
+	e.consumed = true;
 }
 
 void CCTextField::onMouseUp(EventMouseUp &e) {
 	if (e.button == 1) {
 		module->onFocus[num] = false;
 	}
-
+	e.consumed = true;
 }
 
 void CCTextField::onMouseLeave(EventMouseLeave &e) {
