@@ -49,14 +49,27 @@ void MidiIO::baseFromJson(json_t *rootJ) {
 }
 
 std::vector<std::string> MidiIO::getDevices() {
-	/* Note: we could also use an existing interface if one exists */
-	static RtMidiIn *m = new RtMidiIn();
-
 	std::vector<std::string> names = {};
+
+	if (isOut) {
+		// TODO
+		return names;
+	}
+
+	RtMidiIn *m;
+	try {
+		m = new RtMidiIn();
+	} catch (RtMidiError &error) {
+		fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
+		return names;
+	}
 
 	for (unsigned int i = 0; i < m->getPortCount(); i++) {
 		names.push_back(m->getPortName(i));
 	}
+
+	if (!isPortOpen())
+		delete (m);
 
 	return names;
 }
@@ -81,6 +94,13 @@ void MidiIO::openDevice(std::string deviceName) {
 					break;
 				}
 			}
+
+			if (!mw->isPortOpen()) {
+				fprintf(stderr, "Failed to create RtMidiIn: No such device %s\n", deviceName.c_str());
+				this->deviceName = "";
+				this->id = -1;
+				return;
+			}
 		}
 		catch (RtMidiError &error) {
 			fprintf(stderr, "Failed to create RtMidiIn: %s\n", error.getMessage().c_str());
@@ -99,17 +119,17 @@ void MidiIO::openDevice(std::string deviceName) {
 void MidiIO::setIgnores(bool ignoreSysex, bool ignoreTime, bool ignoreSense) {
 	bool sy = true, ti = true, se = true;
 
-	midiInMap[deviceName]->ignoresMap[id][0] = ignoreSysex;
-	midiInMap[deviceName]->ignoresMap[id][1] = ignoreTime;
-	midiInMap[deviceName]->ignoresMap[id][2] = ignoreSense;
+	midiInMap[deviceName]->ignoresMap[id].midiSysex = ignoreSysex;
+	midiInMap[deviceName]->ignoresMap[id].midiTime = ignoreTime;
+	midiInMap[deviceName]->ignoresMap[id].midiSense = ignoreSense;
 
 	for (auto kv : midiInMap[deviceName]->ignoresMap) {
-		sy = sy &&  kv.second[0];
-		ti = ti  &&  kv.second[1];
-		se = se &&  kv.second[2];
+		sy = sy && kv.second.midiSysex;
+		ti = ti && kv.second.midiTime;
+		se = se && kv.second.midiSense;
 	}
 
-	midiInMap[deviceName]->ignoreTypes(se,ti,se);
+	midiInMap[deviceName]->ignoreTypes(se, ti, se);
 
 
 }
@@ -119,7 +139,7 @@ std::string MidiIO::getDeviceName() {
 }
 
 double MidiIO::getMessage(std::vector<unsigned char> *msg) {
-	std::vector<unsigned char> next_msg;
+	MidiMessage next_msg = MidiMessage();
 
 	MidiInWrapper *mw = midiInMap[deviceName];
 
@@ -128,24 +148,23 @@ double MidiIO::getMessage(std::vector<unsigned char> *msg) {
 		return 0;
 	}
 
-	double stamp = midiInMap[deviceName]->getMessage(&next_msg);
+	next_msg.timeStamp = mw->getMessage(&next_msg.bytes);
+	if (next_msg.bytes.size() > 0) {
+		for (auto &kv : mw->idMessagesMap) {
 
-	if (next_msg.size() > 0) {
-		for (auto kv : mw->idMessagesMap) {
-			mw->idMessagesMap[kv.first].push_back(next_msg);
-			mw->idStampsMap[kv.first].push_back(stamp);
+			kv.second.push_back(next_msg);
 		}
 	}
 
-	if (mw->idMessagesMap[id].size() <= 0) {
-		*msg = next_msg;
-		return stamp;
+
+	if (mw->idMessagesMap[id].size() > 0) {
+		next_msg = mw->idMessagesMap[id].front();
+		mw->idMessagesMap[id].pop_front();
 	}
 
-	*msg = mw->idMessagesMap[id].front();
-	stamp = mw->idStampsMap[id].front();
-	mw->idMessagesMap[id].pop_front();
-	return stamp;
+	*msg = next_msg.bytes;
+
+	return next_msg.timeStamp;
 }
 
 bool MidiIO::isPortOpen() {
@@ -165,9 +184,10 @@ void MidiIO::close() {
 
 	mw->erase(id);
 
-	if (mw->subscribers == 0) {
+	if (mw->idMessagesMap.size() == 0) {
 		mw->closePort();
 		midiInMap.erase(deviceName);
+		delete (mw);
 	}
 
 	id = -1;
