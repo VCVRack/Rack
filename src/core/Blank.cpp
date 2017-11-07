@@ -5,8 +5,8 @@ using namespace rack;
 
 struct ModuleResizeHandle : Widget {
 	bool right = false;
-	float originalWidth;
-	float totalX;
+	float dragX;
+	Rect originalBox;
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
@@ -17,25 +17,28 @@ struct ModuleResizeHandle : Widget {
 		}
 	}
 	void onDragStart(EventDragStart &e) override {
-		assert(parent);
-		originalWidth = parent->box.size.x;
-		totalX = 0.0;
+		dragX = gRackWidget->lastMousePos.x;
+		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
+		originalBox = m->box;
 	}
 	void onDragMove(EventDragMove &e) override {
-		ModuleWidget *m = dynamic_cast<ModuleWidget*>(parent);
-		assert(m);
-		totalX += e.mouseRel.x;
-		float targetWidth = originalWidth;
-		if (right)
-			targetWidth += totalX;
-		else
-			targetWidth -= totalX;
-		targetWidth = RACK_GRID_WIDTH * roundf(targetWidth / RACK_GRID_WIDTH);
-		targetWidth = fmaxf(targetWidth, RACK_GRID_WIDTH * 3);
-		Rect newBox = m->box;
-		newBox.size.x = targetWidth;
-		if (!right) {
-			newBox.pos.x = m->box.pos.x + m->box.size.x - newBox.size.x;
+		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
+
+		float newDragX = gRackWidget->lastMousePos.x;
+		float deltaX = newDragX - dragX;
+
+		Rect newBox = originalBox;
+		const float minWidth = 3 * RACK_GRID_WIDTH;
+		if (right) {
+			newBox.size.x += deltaX;
+			newBox.size.x = fmaxf(newBox.size.x, minWidth);
+			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+		}
+		else {
+			newBox.size.x -= deltaX;
+			newBox.size.x = fmaxf(newBox.size.x, minWidth);
+			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
 		gRackWidget->requestModuleBox(m, newBox);
 	}
