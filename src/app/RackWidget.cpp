@@ -398,30 +398,22 @@ struct AddManufacturerMenuItem : MenuItem {
 	std::string manufacturerName;
 	Vec modulePos;
 	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
+
 		// Collect models which have this manufacturer name
-		std::set<Model*> models;
 		for (Plugin *plugin : gPlugins) {
 			for (Model *model : plugin->models) {
 				if (model->manufacturerName == manufacturerName) {
-					models.insert(model);
+					AddModuleMenuItem *item = new AddModuleMenuItem();
+					item->text = model->name;
+					// item->rightText = model->plugin->slug;
+					// if (!model->plugin->version.empty())
+					// 	item->rightText += " v" + model->plugin->version;
+					item->model = model;
+					item->modulePos = modulePos;
+					menu->pushChild(item);
 				}
 			}
-		}
-
-		if (models.empty())
-			return NULL;
-
-		// Model items
-		Menu *menu = new Menu();
-		for (Model *model : models) {
-			AddModuleMenuItem *item = new AddModuleMenuItem();
-			item->text = model->name;
-			// item->rightText = model->plugin->slug;
-			// if (!model->plugin->version.empty())
-			// 	item->rightText += " v" + model->plugin->version;
-			item->model = model;
-			item->modulePos = modulePos;
-			menu->pushChild(item);
 		}
 
 		// Metadata items
