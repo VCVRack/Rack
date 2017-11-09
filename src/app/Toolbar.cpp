@@ -99,8 +99,8 @@ Toolbar::Toolbar() {
 	float margin = 5;
 	box.size.y = BND_WIDGET_HEIGHT + 2*margin;
 	float xPos = 0;
-
 	xPos += margin;
+
 	{
 		ChoiceButton *fileChoice = new FileChoice();
 		fileChoice->box.pos = Vec(xPos, margin);
@@ -109,8 +109,8 @@ Toolbar::Toolbar() {
 		addChild(fileChoice);
 		xPos += fileChoice->box.size.x;
 	}
-
 	xPos += margin;
+
 	{
 		SampleRateChoice *srChoice = new SampleRateChoice();
 		srChoice->box.pos = Vec(xPos, margin);
@@ -118,8 +118,8 @@ Toolbar::Toolbar() {
 		addChild(srChoice);
 		xPos += srChoice->box.size.x;
 	}
-
 	xPos += margin;
+
 	{
 		wireOpacitySlider = new Slider();
 		wireOpacitySlider->box.pos = Vec(xPos, margin);
@@ -132,8 +132,8 @@ Toolbar::Toolbar() {
 		addChild(wireOpacitySlider);
 		xPos += wireOpacitySlider->box.size.x;
 	}
-
 	xPos += margin;
+
 	{
 		wireTensionSlider = new Slider();
 		wireTensionSlider->box.pos = Vec(xPos, margin);
@@ -145,8 +145,8 @@ Toolbar::Toolbar() {
 		addChild(wireTensionSlider);
 		xPos += wireTensionSlider->box.size.x;
 	}
-
 	xPos += margin;
+
 	{
 		struct ZoomSlider : Slider {
 			void onAction(EventAction &e) override {
@@ -164,8 +164,8 @@ Toolbar::Toolbar() {
 		addChild(zoomSlider);
 		xPos += zoomSlider->box.size.x;
 	}
-
 	xPos += margin;
+
 	{
 		plugLightButton = new RadioButton();
 		plugLightButton->box.pos = Vec(xPos, margin);
@@ -174,9 +174,9 @@ Toolbar::Toolbar() {
 		addChild(plugLightButton);
 		xPos += plugLightButton->box.size.x;
 	}
+	xPos += margin;
 
 	/*
-	xPos += margin;
 	{
 		cpuUsageButton = new RadioButton();
 		cpuUsageButton->box.pos = Vec(xPos, margin);
@@ -185,15 +185,17 @@ Toolbar::Toolbar() {
 		addChild(cpuUsageButton);
 		xPos += cpuUsageButton->box.size.x;
 	}
+	xPos += margin;
 	*/
 
-	xPos += margin;
+#ifdef VERSION
 	{
 		Widget *pluginManager = new PluginManagerWidget();
 		pluginManager->box.pos = Vec(xPos, margin);
 		addChild(pluginManager);
 		xPos += pluginManager->box.size.x;
 	}
+#endif
 }
 
 void Toolbar::draw(NVGcontext *vg) {
