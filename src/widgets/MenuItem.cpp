@@ -43,9 +43,13 @@ void MenuItem::onDragDrop(EventDragDrop &e) {
 		return;
 
 	EventAction eAction;
+	// TODO Perhaps remove this? It would require all onAction() methods to call this explicitly, which might be too annoying to change.
+	eAction.consumed = true;
 	onAction(eAction);
-	// deletes `this`
-	gScene->setOverlay(NULL);
+	if (eAction.consumed) {
+		// deletes `this`
+		gScene->setOverlay(NULL);
+	}
 }
 
 
