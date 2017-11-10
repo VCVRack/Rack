@@ -5,104 +5,94 @@
 #include "../ext/osdialog/osdialog.h"
 
 #if ARCH_MAC
-	#include <CoreFoundation/CoreFoundation.h>
-	#include <pwd.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <pwd.h>
 #endif
 
 #if ARCH_WIN
-	#include <Windows.h>
-	#include <Shlobj.h>
+#include <Windows.h>
+#include <Shlobj.h>
+#endif
+
+#if ARCH_LIN
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 #endif
 
 
 namespace rack {
 
 
-#if ARCH_MAC
-/** Is it actually difficult to determine whether we are running in a Mac bundle or not.
-This heuristically guesses based on the existence of a Resources directory
-*/
-static bool isBundle() {
-	CFBundleRef bundle = CFBundleGetMainBundle();
-	if (bundle) {
-		CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
-		char buf[PATH_MAX];
-		Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
-		assert(success);
-		CFRelease(resourcesUrl);
-		if (extractFilename(buf) == "Resources")
-			return true;
-	}
-	return false;
-}
-#endif
-
-
 std::string assetGlobal(std::string filename) {
-	std::string path;
+	std::string dir;
+#ifdef VERSION
 #if ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
-	if (bundle && isBundle()) {
-		CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
-		char buf[PATH_MAX];
-		Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
-		assert(success);
-		CFRelease(resourcesUrl);
-		path = buf;
-	}
-	else {
-		path = ".";
-	}
-	path += "/" + filename;
+	assert(bundle);
+	CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
+	char buf[PATH_MAX];
+	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
+	assert(success);
+	CFRelease(resourcesUrl);
+	dir = buf;
 #endif
 #if ARCH_WIN
-	path = "./" + filename;
+	// Must launch Rack with the "Start In" directory as the global directory
+	dir = ".";
 #endif
 #if ARCH_LIN
-	path = "./" + filename;
+	// TODO For now, users should launch Rack from their terminal in the global directory
+	dir = ".";
 #endif
-	return path;
+#else // VERSION
+	dir = ".";
+#endif // VERSION
+	return dir + "/" + filename;
 }
 
+
 std::string assetLocal(std::string filename) {
-	std::string path;
+	std::string dir;
+#ifdef VERSION
 #if ARCH_MAC
-	if (isBundle()) {
-		// Get home directory
-		struct passwd *pw = getpwuid(getuid());
-		assert(pw);
-		path = pw->pw_dir;
-		path += "/Documents/Rack";
-		mkdir(path.c_str(), 0755);
-	}
-	else {
-		path = ".";
-	}
-	path += "/" + filename;
+	// Get home directory
+	struct passwd *pw = getpwuid(getuid());
+	assert(pw);
+	dir = pw->pw_dir;
+	dir += "/Documents/Rack";
+	mkdir(dir.c_str(), 0755);
 #endif
 #if ARCH_WIN
-	// Get My Documents folder
+	// Get "My Documents" folder
 	char buf[MAX_PATH];
 	HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, buf);
 	assert(result == S_OK);
-	path = buf;
-	path += "/Rack";
-	CreateDirectory(path.c_str(), NULL);
-	path += "/" + filename;
+	dir = buf;
+	dir += "/Rack";
+	CreateDirectory(dir.c_str(), NULL);
 #endif
 #if ARCH_LIN
-	// TODO
-	// If Rack is "installed" (however that may be defined), look in ~/.Rack or something instead
-	path = "./" + filename;
+	const char *home = getenv("HOME");
+	if (!home) {
+		struct passwd *pw = getpwuid(getuid());
+		assert(pw);
+		home = pw->pw_dir;
+	}
+	dir = home;
+	dir += "/.Rack";
+	mkdir(dir.c_str(), 0755);
 #endif
-	return path;
+#else // VERSION
+	dir = ".";
+#endif // VERSION
+	return dir + "/" + filename;
 }
+
 
 std::string assetPlugin(Plugin *plugin, std::string filename) {
 	assert(plugin);
-	std::string path;
-	path = plugin->path + "/" + filename;
-	return path;
+	return plugin->path + "/" + filename;
 }
 
 
