@@ -83,7 +83,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		nvgScale(gFramebufferVg, gPixelRatio * oversample, gPixelRatio * oversample);
 		// Use local scaling
 		nvgTranslate(gFramebufferVg, bf.x, bf.y);
-		nvgTranslate(gFramebufferVg, internal->box.pos.x, internal->box.pos.y);
+		nvgTranslate(gFramebufferVg, -internal->box.pos.x, -internal->box.pos.y);
 		nvgScale(gFramebufferVg, s.x, s.y);
 		Widget::draw(gFramebufferVg);
 
