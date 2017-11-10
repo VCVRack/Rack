@@ -348,7 +348,6 @@ void RackWidget::step() {
 		Vec cellMargin = Vec(20, 1);
 		rails->box.pos = bound.pos.div(RACK_GRID_SIZE).floor().minus(cellMargin).mult(RACK_GRID_SIZE);
 		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
-		printf("%f %f %f %f\n", rails->box.pos.x, rails->box.pos.y, rails->box.size.x, rails->box.size.y);
 		rails->dirty = true;
 
 		rail->box.size = rails->box.size;

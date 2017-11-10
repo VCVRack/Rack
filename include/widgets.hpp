@@ -69,7 +69,7 @@ struct Widget {
 
 	virtual ~Widget();
 
-	Rect getChildrenBoundingBox();
+	virtual Rect getChildrenBoundingBox();
 	/**  Returns `v` transformed into the coordinate system of `relative` */
 	virtual Vec getRelativeOffset(Vec v, Widget *relative);
 	/** Returns `v` transformed into world coordinates */
@@ -159,6 +159,7 @@ struct TransformWidget : Widget {
 	/** The transformation matrix */
 	float transform[6];
 	TransformWidget();
+	Rect getChildrenBoundingBox() override;
 	void identity();
 	void translate(Vec delta);
 	void rotate(float angle);

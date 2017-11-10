@@ -8,6 +8,16 @@ TransformWidget::TransformWidget() {
 	identity();
 }
 
+Rect TransformWidget::getChildrenBoundingBox() {
+	Rect bound = Widget::getChildrenBoundingBox();
+	Vec topLeft = bound.pos;
+	Vec bottomRight = bound.getBottomRight();
+	nvgTransformPoint(&topLeft.x, &topLeft.y, transform, topLeft.x, topLeft.y);
+	nvgTransformPoint(&bottomRight.x, &bottomRight.y, transform, bottomRight.x, bottomRight.y);
+	printf("%f\n", 42.1);
+	return Rect(topLeft, bottomRight.minus(topLeft));
+}
+
 void TransformWidget::identity() {
 	nvgTransformIdentity(transform);
 }
