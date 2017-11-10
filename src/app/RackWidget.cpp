@@ -345,18 +345,13 @@ void RackWidget::step() {
 	Widget *rail = rails->children.front();
 	Rect bound = getViewport(Rect(Vec(), box.size));
 	if (!rails->box.contains(bound)) {
-		// Add a margin around the otherwise tight bound, so that scrolling slightly will not require a re-render of rails.
-		Vec margin = Vec(100, 100);
-		bound.pos = bound.pos.minus(margin);
-		bound.size = bound.size.plus(margin.mult(2));
-		rails->box = bound;
-		// Compute offset of rail within rails framebuffer
-		Vec grid = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
-		Vec gridPos = bound.pos.div(grid).floor().mult(grid);
-		bound.pos = gridPos.minus(bound.pos);
-		bound.size = bound.size.minus(bound.pos);
-		rail->box = bound;
+		Vec cellMargin = Vec(20, 1);
+		rails->box.pos = bound.pos.div(RACK_GRID_SIZE).floor().minus(cellMargin).mult(RACK_GRID_SIZE);
+		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
+		printf("%f %f %f %f\n", rails->box.pos.x, rails->box.pos.y, rails->box.size.x, rails->box.size.y);
 		rails->dirty = true;
+
+		rail->box.size = rails->box.size;
 	}
 
 	// Autosave every 15 seconds

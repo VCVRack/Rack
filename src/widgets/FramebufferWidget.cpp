@@ -53,13 +53,15 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	if (dirty) {
 		dirty = false;
 
-		internal->box.pos = Vec(0, 0);
-		internal->box.size = box.size.mult(s).ceil().plus(Vec(1, 1));
+		internal->box = getChildrenBoundingBox();
+		internal->box.pos = internal->box.pos.mult(s).floor();
+		internal->box.size = internal->box.size.mult(s).ceil().plus(Vec(1, 1));
+
 		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
 
-		// assert(fbSize.isFinite());
-		// Reject zero area size
-		if (fbSize.x <= 0.0 || fbSize.y <= 0.0)
+		if (!fbSize.isFinite())
+			return;
+		if (fbSize.isZero())
 			return;
 
 		// printf("rendering framebuffer %f %f\n", fbSize.x, fbSize.y);
@@ -81,6 +83,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		nvgScale(gFramebufferVg, gPixelRatio * oversample, gPixelRatio * oversample);
 		// Use local scaling
 		nvgTranslate(gFramebufferVg, bf.x, bf.y);
+		nvgTranslate(gFramebufferVg, internal->box.pos.x, internal->box.pos.y);
 		nvgScale(gFramebufferVg, s.x, s.y);
 		Widget::draw(gFramebufferVg);
 
