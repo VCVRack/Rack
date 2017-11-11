@@ -6,6 +6,54 @@
 namespace rack {
 
 
+enum ModelTag {
+	AMPLIFIER_TAG,
+	ATTENUATOR_TAG,
+	BLANK_TAG,
+	CLOCK_TAG,
+	CONTROLLER_TAG,
+	DELAY_TAG,
+	DIGITAL_TAG,
+	DISTORTION_TAG,
+	DRUM_TAG,
+	DUAL_TAG,
+	DYNAMICS_TAG,
+	EFFECT_TAG,
+	ENVELOPE_FOLLOWER_TAG,
+	ENVELOPE_GENERATOR_TAG,
+	EQUALIZER_TAG,
+	EXTERNAL_TAG,
+	FILTER_TAG,
+	FUNCTION_GENERATOR_TAG,
+	GRANULAR_TAG,
+	LFO_TAG,
+	LOGIC_TAG,
+	LOW_PASS_GATE_TAG,
+	MIDI_TAG,
+	MIXER_TAG,
+	MULTIPLE_TAG,
+	NOISE_TAG,
+	OSCILLATOR_TAG,
+	PANNING_TAG,
+	QUAD_TAG,
+	QUANTIZER_TAG,
+	RANDOM_TAG,
+	REVERB_TAG,
+	RING_MODULATOR_TAG,
+	SAMPLE_AND_HOLD_TAG,
+	SAMPLER_TAG,
+	SEQUENCER_TAG,
+	SLEW_LIMITER_TAG,
+	SWITCH_TAG,
+	SYNTH_VOICE_TAG,
+	TUNER_TAG,
+	UTILITY_TAG,
+	VISUAL_TAG,
+	WAVESHAPER_TAG,
+	NUM_TAGS
+};
+
+
 struct ModuleWidget;
 struct Model;
 
@@ -40,13 +88,12 @@ struct Model {
 	std::string manufacturerSlug;
 	/** Human readable name for the manufacturer, e.g. "Foo Modular" */
 	std::string manufacturerName;
+	/** List of tags representing the function(s) of the module */
+	std::list<ModelTag> tags;
 
 	virtual ~Model() {}
 	virtual ModuleWidget *createModuleWidget() { return NULL; }
 };
-
-extern std::list<Plugin*> gPlugins;
-extern std::string gToken;
 
 void pluginInit();
 void pluginDestroy();
@@ -59,6 +106,12 @@ bool pluginIsDownloading();
 float pluginGetDownloadProgress();
 std::string pluginGetDownloadName();
 std::string pluginGetLoginStatus();
+
+
+extern std::list<Plugin*> gPlugins;
+extern std::string gToken;
+extern std::string gTagNames[NUM_TAGS];
+
 
 } // namespace rack
 

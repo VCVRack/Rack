@@ -31,11 +31,57 @@ namespace rack {
 std::list<Plugin*> gPlugins;
 std::string gToken;
 
+std::string gTagNames[NUM_TAGS] = {
+	"Amplifier/VCA",
+	"Attenuator",
+	"Blank",
+	"Clock",
+	"Controller",
+	"Delay",
+	"Digital",
+	"Distortion",
+	"Drum",
+	"Dual/Stereo",
+	"Dynamics",
+	"Effect",
+	"Envelope Follower",
+	"Envelope Generator",
+	"Equalizer",
+	"External",
+	"Filter/VCF",
+	"Function Generator",
+	"Granular",
+	"LFO",
+	"Logic",
+	"Low Pass Gate",
+	"MIDI",
+	"Mixer",
+	"Multiple",
+	"Noise",
+	"Oscillator/VCO",
+	"Panning",
+	"Quad",
+	"Quantizer",
+	"Random",
+	"Reverb",
+	"Ring Modulator",
+	"Sample and Hold",
+	"Sampler",
+	"Sequencer",
+	"Slew Limiter",
+	"Switch",
+	"Synth Voice",
+	"Tuner",
+	"Utility",
+	"Visual",
+	"Waveshaper",
+};
+
+
 static bool isDownloading = false;
 static float downloadProgress = 0.0;
 static std::string downloadName;
 static std::string loginStatus;
-
 
 
 Plugin::~Plugin() {

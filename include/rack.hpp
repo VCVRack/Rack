@@ -18,8 +18,8 @@ namespace rack {
 ////////////////////
 
 
-template <class TModuleWidget>
-Model *createModel(std::string manufacturerSlug, std::string manufacturerName, std::string slug, std::string name) {
+template <class TModuleWidget, typename... Tags>
+Model *createModel(std::string manufacturerSlug, std::string manufacturerName, std::string slug, std::string name, Tags... tags) {
 	struct TModel : Model {
 		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
@@ -32,6 +32,7 @@ Model *createModel(std::string manufacturerSlug, std::string manufacturerName, s
 	model->name = name;
 	model->manufacturerSlug = manufacturerSlug;
 	model->manufacturerName = manufacturerName;
+	model->tags = {tags...};
 	return model;
 }
 
