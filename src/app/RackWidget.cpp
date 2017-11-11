@@ -247,8 +247,8 @@ void RackWidget::fromJson(json_t *rootJ) {
 		int outputModuleId, outputId;
 		int inputModuleId, inputId;
 		int err = json_unpack(wireJ, "{s:i, s:i, s:i, s:i}",
-			"outputModuleId", &outputModuleId, "outputId", &outputId,
-			"inputModuleId", &inputModuleId, "inputId", &inputId);
+		                      "outputModuleId", &outputModuleId, "outputId", &outputId,
+		                      "inputModuleId", &inputModuleId, "inputId", &inputId);
 		if (err) continue;
 		// Get ports
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
@@ -354,7 +354,7 @@ void RackWidget::step() {
 	}
 
 	// Autosave every 15 seconds
-	if (gGuiFrame % (60*15) == 0) {
+	if (gGuiFrame % (60 * 15) == 0) {
 		savePatch(assetLocal("autosave.vcv"));
 		settingsSave(assetLocal("settings.json"));
 	}
@@ -365,6 +365,16 @@ void RackWidget::step() {
 void RackWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
+
+
+struct UrlItem : MenuItem {
+	std::string url;
+	void onAction(EventAction &e) override {
+		std::thread t(openBrowser, url);
+		t.detach();
+	}
+};
+
 
 struct AddModuleMenuItem : MenuItem {
 	Model *model;
@@ -378,19 +388,47 @@ struct AddModuleMenuItem : MenuItem {
 		box.pos = modulePos.minus(box.getCenter());
 		gRackWidget->requestModuleBoxNearest(moduleWidget, box);
 	}
-};
 
-struct UrlItem : MenuItem {
-	std::string url;
-	void onAction(EventAction &e) override {
-		std::thread t(openBrowser, url);
-		t.detach();
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
+
+		// Tag list
+		if (!model->tags.empty()) {
+			for (ModelTag tag : model->tags) {
+				menu->addChild(construct<MenuLabel>(&MenuEntry::text, gTagNames[tag]));
+			}
+			menu->addChild(construct<MenuEntry>());
+		}
+
+		// Plugin name
+		std::string pluginName = model->plugin->slug;
+		if (!model->plugin->version.empty()) {
+			pluginName += " v";
+			pluginName += model->plugin->version;
+		}
+		menu->addChild(construct<MenuLabel>(&MenuEntry::text, pluginName));
+
+		// Plugin metadata
+		if (!model->plugin->website.empty()) {
+			menu->addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->path));
+		}
+		if (!model->plugin->manual.empty()) {
+			menu->addChild(construct<UrlItem>(&MenuEntry::text, "Manual", &UrlItem::url, model->plugin->manual));
+		}
+		if (!model->plugin->path.empty()) {
+			menu->addChild(construct<UrlItem>(&MenuEntry::text, "Browse directory", &UrlItem::url, model->plugin->path));
+		}
+
+		return menu;
 	}
 };
 
 struct AddManufacturerMenuItem : MenuItem {
 	std::string manufacturerName;
 	Vec modulePos;
+	void onAction(EventAction &e) override {
+		e.consumed = false;
+	}
 	Menu *createChildMenu() override {
 		Menu *menu = new Menu();
 
@@ -405,50 +443,10 @@ struct AddManufacturerMenuItem : MenuItem {
 					// 	item->rightText += " v" + model->plugin->version;
 					item->model = model;
 					item->modulePos = modulePos;
-					menu->pushChild(item);
+					menu->addChild(item);
 				}
 			}
 		}
-
-		// Metadata items
-		/*
-		{
-			MenuLabel *label = new MenuLabel();
-			menu->pushChild(label);
-		}
-		{
-			MenuLabel *label = new MenuLabel();
-			label->text = plugin->name;
-			menu->pushChild(label);
-		}
-
-		if (!plugin->homepageUrl.empty()) {
-			UrlItem *item = new UrlItem();
-			item->text = "Homepage";
-			item->url = plugin->homepageUrl;
-			menu->pushChild(item);
-		}
-
-		if (!plugin->manualUrl.empty()) {
-			UrlItem *item = new UrlItem();
-			item->text = "Manual";
-			item->url = plugin->manualUrl;
-			menu->pushChild(item);
-		}
-
-		if (!plugin->path.empty()) {
-			UrlItem *item = new UrlItem();
-			item->text = "Browse directory";
-			item->url = plugin->path;
-			menu->pushChild(item);
-		}
-
-		if (!plugin->version.empty()) {
-			MenuLabel *item = new MenuLabel();
-			item->text = "Version: v" + plugin->version;
-			menu->pushChild(item);
-		}
-		*/
 
 		return menu;
 	}
@@ -486,16 +484,11 @@ void RackWidget::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		Menu *menu = gScene->createMenu();
 
-		menu->pushChild(construct<MenuLabel>(&MenuLabel::text, "Add module"));
-
-		/*
-		// TODO make functional
 		TextField *searchField = construct<SearchModuleField>();
 		searchField->box.size.x = 100.0;
-		menu->pushChild(searchField);
+		menu->addChild(searchField);
 		// Focus search field
 		gFocusedWidget = searchField;
-		*/
 
 		// Collect manufacturer names
 		std::set<std::string> manufacturerNames;
@@ -510,7 +503,7 @@ void RackWidget::onMouseDown(EventMouseDown &e) {
 			item->text = manufacturerName;
 			item->manufacturerName = manufacturerName;
 			item->modulePos = e.pos;
-			menu->pushChild(item);
+			menu->addChild(item);
 		}
 	}
 	e.consumed = true;

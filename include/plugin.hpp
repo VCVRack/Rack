@@ -68,11 +68,18 @@ struct Plugin {
 
 	/** Used when syncing plugins with the API */
 	std::string slug;
+
+	// Optional plugin metadata
+
 	/** The version of your plugin
 	Plugins should follow the versioning scheme described at https://github.com/VCVRack/Rack/issues/266
 	Do not include the "v" in "v1.0" for example.
 	*/
 	std::string version;
+	/** URL for plugin homepage */
+	std::string website;
+	/** URL for plugin manual */
+	std::string manual;
 
 	virtual ~Plugin();
 	void addModel(Model *model);

@@ -312,7 +312,9 @@ struct Menu : OpaqueWidget {
 	}
 	~Menu();
 	// Resizes menu and calls addChild()
-	void pushChild(Widget *child);
+	void pushChild(Widget *child) DEPRECATED {
+		addChild(child);
+	}
 	void setChildMenu(Menu *menu);
 	void step() override;
 	void draw(NVGcontext *vg) override;

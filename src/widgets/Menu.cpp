@@ -7,12 +7,6 @@ Menu::~Menu() {
 	setChildMenu(NULL);
 }
 
-void Menu::pushChild(Widget *child) {
-	child->box.pos = Vec(0, box.size.y);
-	addChild(child);
-	box.size.y += child->box.size.y;
-}
-
 void Menu::setChildMenu(Menu *menu) {
 	if (childMenu) {
 		if (childMenu->parent)
@@ -28,22 +22,30 @@ void Menu::setChildMenu(Menu *menu) {
 }
 
 void Menu::step() {
-	// Try to fit into the parent's box
-	if (parent)
-		box = box.nudge(Rect(Vec(0, 0), parent->box.size));
-
 	Widget::step();
 
-	// Resize the width to the widest child
+	// Set positions of children
+	box.size = Vec(0, 0);
 	for (Widget *child : children) {
+		if (!child->visible)
+			continue;
+		// Increase height, set position of child
+		child->box.pos = Vec(0, box.size.y);
+		box.size.y += child->box.size.y;
+		// Increase width based on maximum width of child
 		if (child->box.size.x > box.size.x) {
 			box.size.x = child->box.size.x;
 		}
 	}
+
 	// Resize widths of children
 	for (Widget *child : children) {
 		child->box.size.x = box.size.x;
 	}
+
+	// Try to fit into the parent's box
+	if (parent)
+		box = box.nudge(Rect(Vec(0, 0), parent->box.size));
 }
 
 void Menu::draw(NVGcontext *vg) {

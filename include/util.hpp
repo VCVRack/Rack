@@ -30,6 +30,9 @@ will expand to
 
 #define LENGTHOF(arr) (sizeof(arr) / sizeof((arr)[0]))
 
+/** Deprecation notice for GCC */
+#define DEPRECATED __attribute__ ((deprecated))
+
 
 namespace rack {
 

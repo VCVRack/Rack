@@ -3,6 +3,10 @@
 
 void init(rack::Plugin *p) {
 	p->slug = "Core";
+#ifdef VERSION
+	p->version = TOSTRING(VERSION);
+#endif
+
 	p->addModel(createModel<AudioInterfaceWidget>("Core", "Core", "AudioInterface", "Audio Interface", EXTERNAL_TAG));
 	p->addModel(createModel<MidiToCVWidget>("Core", "Core", "MIDIToCVInterface", "MIDI-to-CV Interface", MIDI_TAG, EXTERNAL_TAG));
 
