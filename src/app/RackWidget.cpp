@@ -493,11 +493,11 @@ void RackWidget::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		Menu *menu = gScene->createMenu();
 
-		TextField *searchField = construct<SearchModuleField>();
-		searchField->box.size.x = 100.0;
-		menu->addChild(searchField);
-		// Focus search field
-		gFocusedWidget = searchField;
+		// TextField *searchField = construct<SearchModuleField>();
+		// searchField->box.size.x = 100.0;
+		// menu->addChild(searchField);
+		// // Focus search field
+		// gFocusedWidget = searchField;
 
 		// Collect manufacturer names
 		std::set<std::string> manufacturers;
