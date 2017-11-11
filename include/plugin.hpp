@@ -66,19 +66,19 @@ struct Plugin {
 	/** OS-dependent library handle */
 	void *handle = NULL;
 
-	/** Used when syncing plugins with the API */
+	/** Must be unique. Used for patch files and the VCV store API.
+	To guarantee uniqueness, it is a good idea to prefix the slug by your "company name" if available, e.g. "MyCompany-MyPlugin"
+	*/
 	std::string slug;
 
-	// Optional plugin metadata
-
-	/** The version of your plugin
+	/** The version of your plugin (optional)
 	Plugins should follow the versioning scheme described at https://github.com/VCVRack/Rack/issues/266
 	Do not include the "v" in "v1.0" for example.
 	*/
 	std::string version;
-	/** URL for plugin homepage */
+	/** URL for plugin homepage (optional) */
 	std::string website;
-	/** URL for plugin manual */
+	/** URL for plugin manual (optional) */
 	std::string manual;
 
 	virtual ~Plugin();
@@ -91,11 +91,12 @@ struct Model {
 	std::string slug;
 	/** Human readable name for your model, e.g. "Voltage Controlled Oscillator" */
 	std::string name;
-	/** An identifier for the manufacturer, e.g. "foo". Used for saving patches. */
-	std::string manufacturerSlug;
-	/** Human readable name for the manufacturer, e.g. "Foo Modular" */
-	std::string manufacturerName;
-	/** List of tags representing the function(s) of the module */
+	/** The name of the manufacturer group of the module.
+	This might be different than the plugin slug. For example, if you create multiple plugins but want them to be branded similarly, you may use the same manufacturer name in multiple plugins.
+	You may even have multiple manufacturers in one plugin, although this would be unusual.
+	*/
+	std::string manufacturer;
+	/** List of tags representing the function(s) of the module (optional) */
 	std::list<ModelTag> tags;
 
 	virtual ~Model() {}

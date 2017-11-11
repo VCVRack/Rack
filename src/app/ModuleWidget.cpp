@@ -61,7 +61,7 @@ json_t *ModuleWidget::toJson() {
 	json_t *rootJ = json_object();
 
 	// manufacturer
-	json_object_set_new(rootJ, "manufacturer", json_string(model->manufacturerSlug.c_str()));
+	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// pos
@@ -278,7 +278,7 @@ Menu *ModuleWidget::createContextMenu() {
 	Menu *menu = gScene->createMenu();
 
 	MenuLabel *menuLabel = new MenuLabel();
-	menuLabel->text = model->manufacturerName + " " + model->name;
+	menuLabel->text = model->manufacturer + " " + model->name;
 	menu->pushChild(menuLabel);
 
 	ResetMenuItem *resetItem = new ResetMenuItem();
