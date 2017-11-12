@@ -10,6 +10,8 @@
 using namespace rack;
 
 int main(int argc, char* argv[]) {
+	randomSeedTime();
+
 	{
 		char *cwd = getcwd(NULL, 0);
 		printf("Current working directory: %s\n", cwd);
