@@ -72,6 +72,8 @@ float randomNormal();
 
 /** Converts a printf format string and optional arguments into a std::string */
 std::string stringf(const char *format, ...);
+std::string tolower(std::string s);
+std::string toupper(std::string s);
 
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
 std::string ellipsize(std::string s, size_t len);

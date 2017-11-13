@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <random>
+#include <algorithm>
 #include <libgen.h> // for dirname and basename
 #include <sys/time.h>
 
@@ -94,6 +95,16 @@ std::string stringf(const char *format, ...) {
 	va_start(args, format);
 	vsnprintf(&s[0], size + 1, format, args);
 	va_end(args);
+	return s;
+}
+
+std::string tolower(std::string s) {
+	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+	return s;
+}
+
+std::string toupper(std::string s) {
+	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 	return s;
 }
 

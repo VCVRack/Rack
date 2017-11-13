@@ -31,6 +31,7 @@ Menu *Scene::createMenu() {
 
 void Scene::step() {
 	if (overlay) {
+		overlay->box.pos = Vec(0, 0);
 		overlay->box.size = box.size;
 	}
 

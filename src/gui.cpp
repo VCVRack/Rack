@@ -364,6 +364,12 @@ void guiInit() {
 	gGuiFont = Font::load(assetGlobal("res/DejaVuSans.ttf"));
 	bndSetFont(gGuiFont->handle);
 	// bndSetIconImage(loadImage(assetGlobal("res/icons.png")));
+
+	// Blendish style
+	BNDtheme theme;
+	theme = *bndGetTheme();
+	theme.nodeTheme.nodeBackdropColor = theme.menuTheme.innerColor;
+	bndSetTheme(theme);
 }
 
 void guiDestroy() {

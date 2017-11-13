@@ -42,10 +42,6 @@ void Menu::step() {
 	for (Widget *child : children) {
 		child->box.size.x = box.size.x;
 	}
-
-	// Try to fit into the parent's box
-	if (parent)
-		box = box.nudge(Rect(Vec(0, 0), parent->box.size));
 }
 
 void Menu::draw(NVGcontext *vg) {

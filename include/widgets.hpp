@@ -292,10 +292,10 @@ struct Label : Widget {
 	void draw(NVGcontext *vg) override;
 };
 
-// Deletes itself from parent when clicked
+/** Deletes itself from parent when clicked */
 struct MenuOverlay : OpaqueWidget {
+	void step() override;
 	void onDragDrop(EventDragDrop &e) override;
-	void onScroll(EventScroll &e) override;
 	void onHoverKey(EventHoverKey &e) override;
 };
 
@@ -323,22 +323,32 @@ struct Menu : OpaqueWidget {
 
 struct MenuEntry : OpaqueWidget {
 	std::string text;
-	std::string rightText;
 	MenuEntry() {
 		box.size = Vec(0, BND_WIDGET_HEIGHT);
 	}
-	void step() override;
 };
 
 struct MenuLabel : MenuEntry {
 	void draw(NVGcontext *vg) override;
+	void step() override;
 };
 
 struct MenuItem : MenuEntry {
+	std::string rightText;
 	void draw(NVGcontext *vg) override;
+	void step() override;
 	virtual Menu *createChildMenu() {return NULL;}
 	void onMouseEnter(EventMouseEnter &e) override;
 	void onDragDrop(EventDragDrop &e) override;
+};
+
+struct WindowOverlay : OpaqueWidget {
+};
+
+struct Window : OpaqueWidget {
+	std::string title;
+	void draw(NVGcontext *vg) override;
+	void onDragMove(EventDragMove &e) override;
 };
 
 struct Button : OpaqueWidget {
@@ -389,6 +399,8 @@ struct Slider : OpaqueWidget, QuantityWidget {
 struct ScrollBar : OpaqueWidget {
 	enum { VERTICAL, HORIZONTAL } orientation;
 	BNDwidgetState state = BND_DEFAULT;
+	float offset = 0.0;
+	float size = 0.0;
 
 	ScrollBar() {
 		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
@@ -407,7 +419,9 @@ struct ScrollWidget : OpaqueWidget {
 	Vec offset;
 
 	ScrollWidget();
+	void draw(NVGcontext *vg) override;
 	void step() override;
+	void onMouseMove(EventMouseMove &e) override;
 	void onScroll(EventScroll &e) override;
 };
 

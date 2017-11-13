@@ -6,8 +6,6 @@
 #include "asset.hpp"
 #include <map>
 #include <algorithm>
-#include <thread>
-#include <set>
 #include "../ext/osdialog/osdialog.h"
 
 
@@ -375,111 +373,6 @@ void RackWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
 
-
-struct UrlItem : MenuItem {
-	std::string url;
-	void onAction(EventAction &e) override {
-		std::thread t(openBrowser, url);
-		t.detach();
-	}
-};
-
-
-struct AddModuleMenuItem : MenuItem {
-	Model *model;
-	Vec modulePos;
-	void onAction(EventAction &e) override {
-		ModuleWidget *moduleWidget = model->createModuleWidget();
-		gRackWidget->moduleContainer->addChild(moduleWidget);
-		// Move module nearest to the mouse position
-		Rect box;
-		box.size = moduleWidget->box.size;
-		box.pos = modulePos.minus(box.getCenter());
-		gRackWidget->requestModuleBoxNearest(moduleWidget, box);
-	}
-
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-
-		// Tag list
-		if (!model->tags.empty()) {
-			for (ModelTag tag : model->tags) {
-				menu->addChild(construct<MenuLabel>(&MenuEntry::text, gTagNames[tag]));
-			}
-			menu->addChild(construct<MenuEntry>());
-		}
-
-		// Plugin name
-		std::string pluginName = model->plugin->slug;
-		if (!model->plugin->version.empty()) {
-			pluginName += " v";
-			pluginName += model->plugin->version;
-		}
-		menu->addChild(construct<MenuLabel>(&MenuEntry::text, pluginName));
-
-		// Plugin metadata
-		if (!model->plugin->website.empty()) {
-			menu->addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->path));
-		}
-		if (!model->plugin->manual.empty()) {
-			menu->addChild(construct<UrlItem>(&MenuEntry::text, "Manual", &UrlItem::url, model->plugin->manual));
-		}
-		if (!model->plugin->path.empty()) {
-			menu->addChild(construct<UrlItem>(&MenuEntry::text, "Browse directory", &UrlItem::url, model->plugin->path));
-		}
-
-		return menu;
-	}
-};
-
-struct AddManufacturerMenuItem : MenuItem {
-	std::string manufacturer;
-	Vec modulePos;
-	void onAction(EventAction &e) override {
-		e.consumed = false;
-	}
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-
-		// Collect models which have this manufacturer name
-		for (Plugin *plugin : gPlugins) {
-			for (Model *model : plugin->models) {
-				if (model->manufacturer == manufacturer) {
-					AddModuleMenuItem *item = new AddModuleMenuItem();
-					item->text = model->name;
-					// item->rightText = model->plugin->slug;
-					// if (!model->plugin->version.empty())
-					// 	item->rightText += " v" + model->plugin->version;
-					item->model = model;
-					item->modulePos = modulePos;
-					menu->addChild(item);
-				}
-			}
-		}
-
-		return menu;
-	}
-};
-
-struct SearchModuleField : TextField {
-	void onTextChange() override {
-		Menu *parentMenu = getAncestorOfType<Menu>();
-		assert(parentMenu);
-
-		for (Widget *w : parentMenu->children) {
-			AddManufacturerMenuItem *a = dynamic_cast<AddManufacturerMenuItem*>(w);
-			if (!a)
-				continue;
-			if (a->manufacturer == text) {
-				a->visible = true;
-			}
-			else {
-				a->visible = false;
-			}
-		}
-	}
-};
-
 void RackWidget::onMouseMove(EventMouseMove &e) {
 	OpaqueWidget::onMouseMove(e);
 	lastMousePos = e.pos;
@@ -491,29 +384,15 @@ void RackWidget::onMouseDown(EventMouseDown &e) {
 		return;
 
 	if (e.button == 1) {
-		Menu *menu = gScene->createMenu();
+		MenuOverlay *overlay = new MenuOverlay();
 
-		// TextField *searchField = construct<SearchModuleField>();
-		// searchField->box.size.x = 100.0;
-		// menu->addChild(searchField);
-		// // Focus search field
-		// gFocusedWidget = searchField;
+		AddModuleWindow *window = new AddModuleWindow();
+		// Set center position
+		window->box.pos = gMousePos.minus(window->box.getCenter());
+		window->modulePos = lastMousePos;
 
-		// Collect manufacturer names
-		std::set<std::string> manufacturers;
-		for (Plugin *plugin : gPlugins) {
-			for (Model *model : plugin->models) {
-				manufacturers.insert(model->manufacturer);
-			}
-		}
-		// Add menu item for each manufacturer name
-		for (std::string manufacturer : manufacturers) {
-			AddManufacturerMenuItem *item = new AddManufacturerMenuItem();
-			item->text = manufacturer;
-			item->manufacturer = manufacturer;
-			item->modulePos = e.pos;
-			menu->addChild(item);
-		}
+		overlay->addChild(window);
+		gScene->setOverlay(overlay);
 	}
 	e.consumed = true;
 	e.target = this;

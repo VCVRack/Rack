@@ -66,10 +66,10 @@ inline float nearf(float a, float b, float epsilon = 1e-6) {
 }
 
 /** Limits a value between a minimum and maximum
-If min > max, the limits are switched
+If min > max, returns min
 */
 inline float clampf(float x, float min, float max) {
-	return fmaxf(fminf(x, fmaxf(min, max)), fminf(min, max));
+	return fmaxf(fminf(x, max), min);
 }
 
 /** If the magnitude of x if less than eps, return 0 */

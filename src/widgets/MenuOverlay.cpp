@@ -3,16 +3,21 @@
 
 namespace rack {
 
+
+void MenuOverlay::step() {
+	Widget::step();
+
+	// Fit all children in the box
+	for (Widget *child : children) {
+		child->box = child->box.nudge(Rect(Vec(0, 0), parent->box.size));
+	}
+}
+
 void MenuOverlay::onDragDrop(EventDragDrop &e) {
 	if (e.origin == this) {
 		// deletes `this`
 		gScene->setOverlay(NULL);
 	}
-}
-
-void MenuOverlay::onScroll(EventScroll &e) {
-	// Don't recurse children, consume the event
-	e.consumed = true;
 }
 
 void MenuOverlay::onHoverKey(EventHoverKey &e) {

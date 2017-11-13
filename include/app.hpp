@@ -153,6 +153,13 @@ struct RackRail : TransparentWidget {
 	void draw(NVGcontext *vg) override;
 };
 
+struct AddModuleWindow : Window {
+	Vec modulePos;
+
+	AddModuleWindow();
+	void step() override;
+};
+
 struct Panel : TransparentWidget {
 	NVGcolor backgroundColor;
 	std::shared_ptr<Image> backgroundImage;
