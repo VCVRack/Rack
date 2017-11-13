@@ -369,6 +369,7 @@ void guiInit() {
 	BNDtheme theme;
 	theme = *bndGetTheme();
 	theme.nodeTheme.nodeBackdropColor = theme.menuTheme.innerColor;
+	theme.nodeTheme.nodeBackdropColor.a = 1.0;
 	bndSetTheme(theme);
 }
 
