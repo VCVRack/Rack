@@ -120,6 +120,10 @@ struct ModelItem : MenuItem {
 		sModel = model;
 		MenuItem::onMouseEnter(e);
 	}
+	void onMouseLeave(EventMouseLeave &e) override {
+		sModel = NULL;
+		MenuItem::onMouseLeave(e);
+	}
 };
 
 
@@ -283,7 +287,6 @@ AddModuleWindow::AddModuleWindow() {
 
 	// NVGcolor c = bndTransparent(nvgRGB(0, 0, 0));
 	NVGcolor c = bndGetTheme()->nodeTheme.nodeBackdropColor;
-	printf("%f %f %f %f\n", c.r, c.g, c.b, c.a);
 }
 
 
