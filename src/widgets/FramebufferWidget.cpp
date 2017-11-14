@@ -122,6 +122,7 @@ int FramebufferWidget::getImageHandle() {
 
 void FramebufferWidget::onZoom(EventZoom &e) {
 	dirty = true;
+	Widget::onZoom(e);
 }
 
 

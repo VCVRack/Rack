@@ -422,7 +422,12 @@ void guiRun() {
 		glfwGetFramebufferSize(gWindow, &width, &height);
 		int windowWidth, windowHeight;
 		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
-		gPixelRatio = (float)width / windowWidth;
+		float pixelRatio = (float)width / windowWidth;
+		if (pixelRatio != gPixelRatio) {
+			EventZoom eZoom;
+			gScene->onZoom(eZoom);
+			gPixelRatio = pixelRatio;
+		}
 
 		// Step scene
 		gScene->step();
