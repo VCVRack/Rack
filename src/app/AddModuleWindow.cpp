@@ -172,11 +172,8 @@ struct ModelMenu : ListMenu {
 struct ManufacturerItem : MenuItem {
 	Model *model;
 	void onAction(EventAction &e) override {
-		e.consumed = false;
-	}
-	void onMouseEnter(EventMouseEnter &e) override {
 		sManufacturer = text;
-		MenuItem::onMouseEnter(e);
+		e.consumed = false;
 	}
 };
 
