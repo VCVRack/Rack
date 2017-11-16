@@ -161,6 +161,15 @@ void openBrowser(std::string url) {
 
 FILE *gLogFile = stderr;
 
+void debug(const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	fprintf(gLogFile, "[debug] ");
+	vfprintf(gLogFile, format, args);
+	fprintf(gLogFile, "\n");
+	va_end(args);
+}
+
 void info(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
@@ -173,7 +182,7 @@ void info(const char *format, ...) {
 void warn(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
-	fprintf(gLogFile, "[warn] ");
+	fprintf(gLogFile, "[warning] ");
 	vfprintf(gLogFile, format, args);
 	fprintf(gLogFile, "\n");
 	va_end(args);
