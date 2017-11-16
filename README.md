@@ -39,7 +39,7 @@ With your distro's package manager, make sure you have installed `gcc`, `make`, 
 
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
 
-Clone this repository and `cd` into it.
+Clone this repository with `git clone https://github.com/VCVRack/Rack.git` and `cd Rack`.
 If you would like to build a previous version of Rack instead of the master branch, check out the desired tag with `git checkout v0.4.0` for example.
 
 Clone submodules.
