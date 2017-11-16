@@ -12,6 +12,10 @@ using namespace rack;
 int main(int argc, char* argv[]) {
 	randomSeedTime();
 
+	if (!gApplicationVersion.empty()) {
+		printf("Rack v%s\n", gApplicationVersion.c_str());
+	}
+
 	{
 		char *cwd = getcwd(NULL, 0);
 		printf("Current working directory: %s\n", cwd);
