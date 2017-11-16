@@ -48,37 +48,37 @@ struct MetadataMenu : ListMenu {
 
 	void step() override {
 		if (model != sModel) {
+			model = sModel;
 			clearChildren();
 
-			if (sModel) {
+			if (model) {
 				// Tag list
-				if (!sModel->tags.empty()) {
-					for (ModelTag tag : sModel->tags) {
+				if (!model->tags.empty()) {
+					for (ModelTag tag : model->tags) {
 						addChild(construct<MenuLabel>(&MenuEntry::text, gTagNames[tag]));
 					}
 					addChild(construct<MenuEntry>());
 				}
 
 				// Plugin name
-				std::string pluginName = sModel->plugin->slug;
-				if (!sModel->plugin->version.empty()) {
+				std::string pluginName = model->plugin->slug;
+				if (!model->plugin->version.empty()) {
 					pluginName += " v";
-					pluginName += sModel->plugin->version;
+					pluginName += model->plugin->version;
 				}
 				addChild(construct<MenuLabel>(&MenuEntry::text, pluginName));
 
 				// Plugin metadata
-				if (!sModel->plugin->website.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, sModel->plugin->path));
+				if (!model->plugin->website.empty()) {
+					addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->path));
 				}
-				if (!sModel->plugin->manual.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Manual", &UrlItem::url, sModel->plugin->manual));
+				if (!model->plugin->manual.empty()) {
+					addChild(construct<UrlItem>(&MenuEntry::text, "Manual", &UrlItem::url, model->plugin->manual));
 				}
-				if (!sModel->plugin->path.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Browse directory", &UrlItem::url, sModel->plugin->path));
+				if (!model->plugin->path.empty()) {
+					addChild(construct<UrlItem>(&MenuEntry::text, "Browse directory", &UrlItem::url, model->plugin->path));
 				}
 			}
-			model = sModel;
 		}
 
 		ListMenu::step();
@@ -133,20 +133,22 @@ struct ModelMenu : ListMenu {
 
 	void step() override {
 		if (manufacturer != sManufacturer) {
+			manufacturer = sManufacturer;
+			filter = "";
 			clearChildren();
+			addChild(construct<MenuLabel>(&MenuLabel::text, manufacturer));
 			// Add models for the selected manufacturer
 			for (Plugin *plugin : gPlugins) {
 				for (Model *model : plugin->models) {
-					if (model->manufacturer == sManufacturer) {
+					if (model->manufacturer == manufacturer) {
 						addChild(construct<ModelItem>(&MenuEntry::text, model->name, &ModelItem::model, model));
 					}
 				}
 			}
-			manufacturer = sManufacturer;
-			filter = "";
 		}
 
 		if (filter != sFilter) {
+			filter = sFilter;
 			// Make all children invisible
 			for (Widget *child : children) {
 				child->visible = false;
@@ -157,11 +159,10 @@ struct ModelMenu : ListMenu {
 				if (!item)
 					continue;
 
-				if (isModelMatch(item->model, sFilter)) {
+				if (isModelMatch(item->model, filter)) {
 					item->visible = true;
 				}
 			}
-			filter = sFilter;
 		}
 
 		ListMenu::step();
