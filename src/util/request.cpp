@@ -143,5 +143,15 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 	return res == CURLE_OK;
 }
 
+std::string requestEscape(std::string s) {
+	CURL *curl = curl_easy_init();
+	assert(curl);
+	char *escaped = curl_easy_escape(curl, s.c_str(), s.size());
+	std::string ret = escaped;
+	curl_free(escaped);
+	curl_easy_cleanup(curl);
+	return ret;
+}
+
 
 } // namespace rack

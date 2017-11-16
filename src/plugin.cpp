@@ -237,9 +237,9 @@ static void refreshPurchase(json_t *pluginJ) {
 	url += "?product=";
 	url += slug;
 	url += "&version=";
-	url += gApplicationVersion;
+	url += requestEscape(gApplicationVersion);
 	url += "&token=";
-	url += gToken;
+	url += requestEscape(gToken);
 
 	// If plugin is not loaded, download the zip file to /plugins
 	downloadName = name;
