@@ -179,7 +179,7 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 
 		if (zs.name[nameLen - 1] == '/') {
 			err = mkdir(path, 0755);
-			if (err)
+			if (err && errno != EEXIST)
 				return err;
 		}
 		else {
