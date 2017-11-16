@@ -35,10 +35,14 @@ struct MIDICCToCVInterface : MidiIO, Module {
 	};
 
 	CCValue cc[NUM_OUTPUTS];
+	bool rowIsBipol[NUM_OUTPUTS/4] = {}; //-5V:5V when true, 0V:10V when false. 4 columns of CCs is hardcoded, same as in MIDICCToCVWidget()
 
 	MIDICCToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			cc[i].num = i;
+		}
+		for (int i = 0; i < (NUM_OUTPUTS/4); i++) {
+			rowIsBipol[i] = false;
 		}
 	}
 
@@ -59,6 +63,15 @@ struct MIDICCToCVInterface : MidiIO, Module {
 				json_object_set_new(rootJ, ("ccVal" + std::to_string(i)).c_str(), json_integer(cc[i].val));
 			}
 		}
+		
+		// rowIsBipol
+		json_t *rowIsBipolsJ = json_array();
+		for (int i = 0; i < (NUM_OUTPUTS/4); i++) {
+			json_t *rowIsBipolJ = json_boolean(rowIsBipol[i]);
+			json_array_append_new(rowIsBipolsJ, rowIsBipolJ);
+		}
+		json_object_set_new(rootJ, "rowIsBipol", rowIsBipolsJ);
+
 		return rootJ;
 	}
 
@@ -71,13 +84,22 @@ struct MIDICCToCVInterface : MidiIO, Module {
 				cc[i].numInited = true;
 			}
 
+			// rowIsBipol (must be done before getting ccVal)
+			json_t *rowIsBipolsJ = json_object_get(rootJ, "rowIsBipol");
+			if (rowIsBipolsJ) {
+				for (int i = 0; i < (NUM_OUTPUTS/4); i++) {
+					json_t *rowIsBipolJ = json_array_get(rowIsBipolsJ, i);
+					if (rowIsBipolJ)
+						rowIsBipol[i] = json_boolean_value(rowIsBipolJ);
+				}
+			}
+
 			json_t *ccValJ = json_object_get(rootJ, ("ccVal" + std::to_string(i)).c_str());
 			if (ccValJ) {
 				cc[i].val = json_integer_value(ccValJ);
-				cc[i].tSmooth.set((cc[i].val / 127.0 * 10.0), (cc[i].val / 127.0 * 10.0));
+				cc[i].tSmooth.set((cc[i].val / 127.0 * 10.0)-(rowIsBipol[i/4]?5.0:0.0), (cc[i].val / 127.0 * 10.0)-(rowIsBipol[i/4]?5.0:0.0));
 				cc[i].resetSync();
 			}
-
 		}
 	}
 
@@ -105,7 +127,7 @@ void MIDICCToCVInterface::step() {
 		lights[i].setBrightness(cc[i].sync / 127.0);
 
 		if (cc[i].changed) {
-			cc[i].tSmooth.set(outputs[i].value, (cc[i].val / 127.0 * 10.0), int(engineGetSampleRate() / 32));
+			cc[i].tSmooth.set(outputs[i].value, (cc[i].val / 127.0 * 10.0)-(rowIsBipol[i/4]?5.0:0.0), int(engineGetSampleRate() / 32));
 			cc[i].changed = false;
 		}
 
@@ -318,4 +340,37 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 void MIDICCToCVWidget::step() {
 
 	ModuleWidget::step();
+}
+
+struct MIDICCToCVRowBipolModeItem : MenuItem {
+	bool *rowIsBipol;
+	void onAction(EventAction &e) override {
+		*rowIsBipol = (*rowIsBipol) ? false : true; // Toggle bi-pol setting
+	}
+	void step() override {
+		rightText = (*rowIsBipol) ? "✔" : "";
+	}
+};
+
+Menu *MIDICCToCVWidget::createContextMenu() {
+	Menu *menu = ModuleWidget::createContextMenu();
+
+	MIDICCToCVInterface *midiCCToCV = dynamic_cast<MIDICCToCVInterface*>(module);
+	assert(midiCCToCV);
+
+	MenuLabel *spacerLabel = new MenuLabel();
+	menu->pushChild(spacerLabel);
+	
+	MenuLabel *bipolarLabel = new MenuLabel();
+	bipolarLabel->text = "Bi-polar CVs";
+	menu->pushChild(bipolarLabel);
+
+	for (int i = 0; i < (MIDICCToCVInterface::NUM_OUTPUTS/4); i++) {
+		MIDICCToCVRowBipolModeItem *rowIsBipolItem = new MIDICCToCVRowBipolModeItem();
+		rowIsBipolItem->text = ("Row " + std::to_string(i)).c_str();
+		rowIsBipolItem->rowIsBipol = &(midiCCToCV->rowIsBipol[i]);
+		menu->pushChild(rowIsBipolItem);
+	}
+
+	return menu;
 }
