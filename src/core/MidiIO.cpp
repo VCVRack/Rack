@@ -60,7 +60,7 @@ std::vector<std::string> MidiIO::getDevices() {
 	try {
 		m = new RtMidiIn();
 	} catch (RtMidiError &error) {
-		log(WARN, "Failed to create RtMidiIn: %s", error.getMessage().c_str());
+		warn("Failed to create RtMidiIn: %s", error.getMessage().c_str());
 		return names;
 	}
 
@@ -96,14 +96,14 @@ void MidiIO::openDevice(std::string deviceName) {
 			}
 
 			if (!mw->isPortOpen()) {
-				log(WARN, "Failed to create RtMidiIn: No such device %s", deviceName.c_str());
+				warn("Failed to create RtMidiIn: No such device %s", deviceName.c_str());
 				this->deviceName = "";
 				this->id = -1;
 				return;
 			}
 		}
 		catch (RtMidiError &error) {
-			log(WARN, "Failed to create RtMidiIn: %s", error.getMessage().c_str());
+			warn("Failed to create RtMidiIn: %s", error.getMessage().c_str());
 			this->deviceName = "";
 			this->id = -1;
 			return;
@@ -144,7 +144,7 @@ double MidiIO::getMessage(std::vector<unsigned char> *msg) {
 	MidiInWrapper *mw = midiInMap[deviceName];
 
 	if (!mw) {
-		log(WARN, "Device not opened!: %s", deviceName.c_str());
+		warn("Device not opened!: %s", deviceName.c_str());
 		return 0;
 	}
 
@@ -176,7 +176,7 @@ void MidiIO::close() {
 	MidiInWrapper *mw = midiInMap[deviceName];
 
 	if (!mw || id < 0) {
-		//log(WARN, "Trying to close already closed device!");
+		//warn("Trying to close already closed device!");
 		return;
 	}
 

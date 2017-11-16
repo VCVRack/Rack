@@ -279,7 +279,7 @@ void dropCallback(GLFWwindow *window, int count, const char **paths) {
 }
 
 void errorCallback(int error, const char *description) {
-	log(WARN, "GLFW error %d: %s", error, description);
+	warn("GLFW error %d: %s", error, description);
 }
 
 void renderGui() {
@@ -446,7 +446,7 @@ void guiRun() {
 			std::this_thread::sleep_for(std::chrono::duration<double>(minTime - frameTime));
 		}
 		endTime = glfwGetTime();
-		// log(INFO, "%lf fps", 1.0 / (endTime - startTime));
+		// info("%lf fps", 1.0 / (endTime - startTime));
 	}
 }
 
@@ -519,10 +519,10 @@ bool guiIsMaximized() {
 Font::Font(const std::string &filename) {
 	handle = nvgCreateFont(gVg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
-		log(INFO, "Loaded font %s", filename.c_str());
+		info("Loaded font %s", filename.c_str());
 	}
 	else {
-		log(WARN, "Failed to load font %s", filename.c_str());
+		warn("Failed to load font %s", filename.c_str());
 	}
 }
 
@@ -545,10 +545,10 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 Image::Image(const std::string &filename) {
 	handle = nvgCreateImage(gVg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
-		log(INFO, "Loaded image %s", filename.c_str());
+		info("Loaded image %s", filename.c_str());
 	}
 	else {
-		log(WARN, "Failed to load image %s", filename.c_str());
+		warn("Failed to load image %s", filename.c_str());
 	}
 }
 
@@ -572,10 +572,10 @@ std::shared_ptr<Image> Image::load(const std::string &filename) {
 SVG::SVG(const std::string &filename) {
 	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
 	if (handle) {
-		log(INFO, "Loaded SVG %s", filename.c_str());
+		info("Loaded SVG %s", filename.c_str());
 	}
 	else {
-		log(WARN, "Failed to load SVG %s", filename.c_str());
+		warn("Failed to load SVG %s", filename.c_str());
 	}
 }
 

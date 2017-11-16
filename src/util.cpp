@@ -161,22 +161,28 @@ void openBrowser(std::string url) {
 
 FILE *gLogFile = stderr;
 
-void log(LogLevel level, const char *format, ...) {
+void info(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
-	switch (level) {
-		case INFO:
-			fprintf(gLogFile, "[info] ");
-			break;
-		case WARN:
-			fprintf(gLogFile, "[warning] ");
-			break;
-		case ERROR:
-			fprintf(gLogFile, "[error] ");
-			break;
-		default:
-			break;
-	}
+	fprintf(gLogFile, "[info] ");
+	vfprintf(gLogFile, format, args);
+	fprintf(gLogFile, "\n");
+	va_end(args);
+}
+
+void warn(const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	fprintf(gLogFile, "[warn] ");
+	vfprintf(gLogFile, format, args);
+	fprintf(gLogFile, "\n");
+	va_end(args);
+}
+
+void fatal(const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	fprintf(gLogFile, "[fatal] ");
 	vfprintf(gLogFile, format, args);
 	fprintf(gLogFile, "\n");
 	va_end(args);

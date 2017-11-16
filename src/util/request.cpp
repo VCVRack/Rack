@@ -83,7 +83,7 @@ json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
 
 	// Perform request
-	log(INFO, "Requesting %s", url.c_str());
+	info("Requesting %s", url.c_str());
 	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	CURLcode res = curl_easy_perform(curl);
 
@@ -131,7 +131,7 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferInfoCallback);
 	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, progress);
 
-	log(INFO, "Downloading %s", url.c_str());
+	info("Downloading %s", url.c_str());
 	CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 

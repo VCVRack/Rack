@@ -18,17 +18,17 @@ int main(int argc, char* argv[]) {
 #endif
 
 	if (!gApplicationVersion.empty()) {
-		log(INFO, "Rack v%s", gApplicationVersion.c_str());
+		info("Rack v%s", gApplicationVersion.c_str());
 	}
 
 	{
 		char *cwd = getcwd(NULL, 0);
-		log(INFO, "Current working directory: %s", cwd);
+		info("Current working directory: %s", cwd);
 		free(cwd);
 		std::string globalDir = assetGlobal("");
 		std::string localDir = assetLocal("");
-		log(INFO, "Global directory: %s", globalDir.c_str());
-		log(INFO, "Local directory: %s", localDir.c_str());
+		info("Global directory: %s", globalDir.c_str());
+		info("Local directory: %s", localDir.c_str());
 	}
 
 	pluginInit();

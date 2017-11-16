@@ -131,14 +131,10 @@ struct VIPLock {
 // logger
 ////////////////////
 
-enum LogLevel {
-	INFO,
-	WARN,
-	ERROR,
-};
-
 extern FILE *gLogFile;
-void log(LogLevel level, const char *format, ...);
+void info(const char *format, ...);
+void warn(const char *format, ...);
+void fatal(const char *format, ...);
 
 
 } // namespace rack
