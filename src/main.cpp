@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 
 #ifdef VERSION
 	std::string logFilename = assetLocal("log.txt");
-	gLogFile = fopen(logFilename.c_str());
+	gLogFile = fopen(logFilename.c_str(), "w");
 #endif
 
 	if (!gApplicationVersion.empty()) {
