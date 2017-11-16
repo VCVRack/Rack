@@ -112,13 +112,13 @@ static int loadPlugin(std::string path) {
 	HINSTANCE handle = LoadLibrary(libraryFilename.c_str());
 	if (!handle) {
 		int error = GetLastError();
-		fprintf(stderr, "Failed to load library %s: %d\n", libraryFilename.c_str(), error);
+		log(WARN, "Failed to load library %s: %d", libraryFilename.c_str(), error);
 		return -1;
 	}
 #elif ARCH_LIN || ARCH_MAC
 	void *handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
 	if (!handle) {
-		fprintf(stderr, "Failed to load library %s: %s\n", libraryFilename.c_str(), dlerror());
+		log(WARN, "Failed to load library %s: %s", libraryFilename.c_str(), dlerror());
 		return -1;
 	}
 #endif
@@ -132,7 +132,7 @@ static int loadPlugin(std::string path) {
 	initCallback = (InitCallback) dlsym(handle, "init");
 #endif
 	if (!initCallback) {
-		fprintf(stderr, "Failed to read init() symbol in %s\n", libraryFilename.c_str());
+		log(WARN, "Failed to read init() symbol in %s", libraryFilename.c_str());
 		return -2;
 	}
 
@@ -144,7 +144,7 @@ static int loadPlugin(std::string path) {
 
 	// Add plugin to list
 	gPlugins.push_back(plugin);
-	fprintf(stderr, "Loaded plugin %s\n", libraryFilename.c_str());
+	log(INFO, "Loaded plugin %s", libraryFilename.c_str());
 	return 0;
 }
 
@@ -277,14 +277,14 @@ void pluginInit() {
 
 	// Load plugins from global directory
 	std::string globalPlugins = assetGlobal("plugins");
-	printf("Loading plugins from %s\n", globalPlugins.c_str());
+	log(INFO, "Loading plugins from %s", globalPlugins.c_str());
 	loadPlugins(globalPlugins);
 
 	// Load plugins from local directory
 	std::string localPlugins = assetLocal("plugins");
 	if (globalPlugins != localPlugins) {
 		mkdir(localPlugins.c_str(), 0755);
-		printf("Loading plugins from %s\n", localPlugins.c_str());
+		log(INFO, "Loading plugins from %s", localPlugins.c_str());
 		loadPlugins(localPlugins);
 	}
 }
@@ -353,7 +353,7 @@ void pluginRefresh() {
 		json_t *errorJ = json_object_get(resJ, "error");
 		if (errorJ) {
 			const char *errorStr = json_string_value(errorJ);
-			fprintf(stderr, "Plugin refresh error: %s\n", errorStr);
+			log(WARN, "Plugin refresh error: %s", errorStr);
 		}
 		else {
 			json_t *purchasesJ = json_object_get(resJ, "purchases");

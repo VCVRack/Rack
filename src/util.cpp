@@ -1,5 +1,4 @@
 #include "util.hpp"
-#include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include <random>
@@ -14,6 +13,10 @@
 
 namespace rack {
 
+
+////////////////////
+// RNG
+////////////////////
 
 // xoroshiro128+
 // from http://xoroshiro.di.unimi.it/xoroshiro128plus.c
@@ -35,11 +38,6 @@ static uint64_t xoroshiro128plus_next(void) {
 
 	return result;
 }
-
-static std::random_device rd;
-static std::mt19937 rng(rd());
-static std::normal_distribution<float> normalDist;
-
 
 void randomSeedTime() {
 	struct timeval tv;
@@ -80,6 +78,9 @@ float randomNormal() {
 	// return (sum - n / 2.f) / sqrtf(n / 12.f);
 }
 
+////////////////////
+// String functions
+////////////////////
 
 std::string stringf(const char *format, ...) {
 	va_list args;
@@ -136,6 +137,10 @@ std::string extractExtension(std::string path) {
 	return ext + 1;
 }
 
+////////////////////
+// Operating system functions
+////////////////////
+
 void openBrowser(std::string url) {
 #if ARCH_LIN
 	std::string command = "xdg-open " + url;
@@ -148,6 +153,33 @@ void openBrowser(std::string url) {
 #if ARCH_WIN
 	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
+}
+
+////////////////////
+// logger
+////////////////////
+
+FILE *gLogFile = stderr;
+
+void log(LogLevel level, const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	switch (level) {
+		case INFO:
+			fprintf(gLogFile, "[info] ");
+			break;
+		case WARN:
+			fprintf(gLogFile, "[warning] ");
+			break;
+		case ERROR:
+			fprintf(gLogFile, "[error] ");
+			break;
+		default:
+			break;
+	}
+	vfprintf(gLogFile, format, args);
+	fprintf(gLogFile, "\n");
+	va_end(args);
 }
 
 

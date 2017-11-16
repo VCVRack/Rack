@@ -14,7 +14,6 @@ Rect TransformWidget::getChildrenBoundingBox() {
 	Vec bottomRight = bound.getBottomRight();
 	nvgTransformPoint(&topLeft.x, &topLeft.y, transform, topLeft.x, topLeft.y);
 	nvgTransformPoint(&bottomRight.x, &bottomRight.y, transform, bottomRight.x, bottomRight.y);
-	printf("%f\n", 42.1);
 	return Rect(topLeft, bottomRight.minus(topLeft));
 }
 

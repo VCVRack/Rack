@@ -17,7 +17,7 @@ void audioInit() {
 
 	PaError err = Pa_Initialize();
 	if (err) {
-		fprintf(stderr, "Failed to initialize PortAudio: %s\n", Pa_GetErrorText(err));
+		log(WARN, "Failed to initialize PortAudio: %s", Pa_GetErrorText(err));
 		return;
 	}
 	initialized = true;
@@ -244,7 +244,7 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		PaError err;
 		const PaDeviceInfo *deviceInfo = Pa_GetDeviceInfo(deviceId);
 		if (!deviceInfo) {
-			fprintf(stderr, "Failed to query audio device\n");
+			log(WARN, "Failed to query audio device");
 			return;
 		}
 
@@ -271,13 +271,13 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 			numOutputs == 0 ? NULL : &outputParameters,
 			sampleRate, blockSize, paNoFlag, paCallback, this);
 		if (err) {
-			fprintf(stderr, "Failed to open audio stream: %s\n", Pa_GetErrorText(err));
+			log(WARN, "Failed to open audio stream: %s", Pa_GetErrorText(err));
 			return;
 		}
 
 		err = Pa_StartStream(stream);
 		if (err) {
-			fprintf(stderr, "Failed to start audio stream: %s\n", Pa_GetErrorText(err));
+			log(WARN, "Failed to start audio stream: %s", Pa_GetErrorText(err));
 			return;
 		}
 		// This should go after Pa_StartStream because sometimes it will call the callback once synchronously, and that time it should return early
@@ -299,12 +299,12 @@ void AudioInterface::closeDevice() {
 		err = Pa_AbortStream(stream);
 		// err = Pa_StopStream(stream);
 		if (err) {
-			fprintf(stderr, "Failed to stop audio stream: %s\n", Pa_GetErrorText(err));
+			log(WARN, "Failed to stop audio stream: %s", Pa_GetErrorText(err));
 		}
 
 		err = Pa_CloseStream(stream);
 		if (err) {
-			fprintf(stderr, "Failed to close audio stream: %s\n", Pa_GetErrorText(err));
+			log(WARN, "Failed to close audio stream: %s", Pa_GetErrorText(err));
 		}
 	}
 

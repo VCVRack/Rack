@@ -58,6 +58,7 @@ T *construct(F f, V v, Args... args) {
 // RNG
 ////////////////////
 
+/** Seeds the RNG with the current time */
 void randomSeedTime();
 uint32_t randomu32();
 uint64_t randomu64();
@@ -125,6 +126,19 @@ struct VIPLock {
 		m.cv.notify_all();
 	}
 };
+
+////////////////////
+// logger
+////////////////////
+
+enum LogLevel {
+	INFO,
+	WARN,
+	ERROR,
+};
+
+extern FILE *gLogFile;
+void log(LogLevel level, const char *format, ...);
 
 
 } // namespace rack

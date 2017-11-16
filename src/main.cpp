@@ -12,18 +12,23 @@ using namespace rack;
 int main(int argc, char* argv[]) {
 	randomSeedTime();
 
+#ifdef VERSION
+	std::string logFilename = assetLocal("log.txt");
+	gLogFile = fopen(logFilename.c_str());
+#endif
+
 	if (!gApplicationVersion.empty()) {
-		printf("Rack v%s\n", gApplicationVersion.c_str());
+		log(INFO, "Rack v%s", gApplicationVersion.c_str());
 	}
 
 	{
 		char *cwd = getcwd(NULL, 0);
-		printf("Current working directory: %s\n", cwd);
+		log(INFO, "Current working directory: %s", cwd);
 		free(cwd);
 		std::string globalDir = assetGlobal("");
 		std::string localDir = assetLocal("");
-		printf("Global directory: %s\n", globalDir.c_str());
-		printf("Local directory: %s\n", localDir.c_str());
+		log(INFO, "Global directory: %s", globalDir.c_str());
+		log(INFO, "Local directory: %s", localDir.c_str());
 	}
 
 	pluginInit();
@@ -49,5 +54,10 @@ int main(int argc, char* argv[]) {
 	guiDestroy();
 	engineDestroy();
 	pluginDestroy();
+
+#ifdef VERSION
+	fclose(gLogFile);
+#endif
+
 	return 0;
 }
