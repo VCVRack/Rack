@@ -14,7 +14,7 @@ ifeq ($(ARCH), lin)
 	LDFLAGS += -rdynamic \
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi
 	TARGET = Rack
 endif
 

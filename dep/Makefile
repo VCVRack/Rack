@@ -30,7 +30,7 @@ ifeq ($(ARCH),lin)
 	libcurl = lib/libcurl.so
 	libzip = lib/libzip.so
 	rtmidi = lib/librtmidi.so
-	portaudio = lib/libportaudio.so
+	rtaudio = lib/librtaudio.so
 endif
 
 ifeq ($(ARCH),mac)
@@ -41,7 +41,6 @@ ifeq ($(ARCH),mac)
 	libcurl = lib/libcurl.dylib
 	libzip = lib/libzip.dylib
 	rtmidi = lib/librtmidi.dylib
-	portaudio = lib/libportaudio.dylib
 endif
 
 ifeq ($(ARCH),win)
@@ -52,13 +51,12 @@ ifeq ($(ARCH),win)
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
 	rtmidi = bin/librtmidi-4.dll
-	portaudio = bin/portaudio_x64.dll
 endif
 
 
 .NOTPARALLEL:
 
-all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(rtmidi) $(portaudio)
+all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(rtmidi) $(rtaudio)
 	@echo ""
 	@echo "#######################################"
 	@echo "# Built all dependencies successfully #"
@@ -122,21 +120,12 @@ $(rtmidi):
 	$(MAKE) -C rtmidi-3.0.0
 	$(MAKE) -C rtmidi-3.0.0 install
 
-$(portaudio):
-ifeq ($(ARCH),win)
-	$(WGET) https://github.com/adfernandes/precompiled-portaudio-windows/raw/master/portaudio-r1891-build.zip
-	$(UNZIP) portaudio-r1891-build.zip
-	mv portaudio-r1891-build portaudio
-	cp portaudio/lib/x64/ReleaseMinDependency/portaudio_x64.lib "$(LOCAL)/lib"
-	cp portaudio/lib/x64/ReleaseMinDependency/portaudio_x64.dll "$(LOCAL)/bin"
-	cp portaudio/include/*.h "$(LOCAL)/include"
-else
-	$(WGET) http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz
-	$(UNTAR) pa_stable_v190600_20161030.tgz
-	cd portaudio && ./configure --prefix="$(LOCAL)" --disable-debug --disable-dependency-tracking --enable-mac-universal=no
-	$(MAKE) -C portaudio
-	$(MAKE) -C portaudio install
-endif
+$(rtaudio):
+	$(WGET) http://www.music.mcgill.ca/~gary/rtaudio/release/rtaudio-5.0.0.tar.gz
+	$(UNTAR) rtaudio-5.0.0.tar.gz
+	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)"
+	$(MAKE) -C rtaudio-5.0.0
+	$(MAKE) -C rtaudio-5.0.0 install
 
 clean:
 	git clean -ffdxi
