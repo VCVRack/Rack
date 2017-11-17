@@ -52,6 +52,7 @@ ifeq ($(ARCH),win)
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
 	rtmidi = bin/librtmidi-4.dll
+	rtaudio = bin/librtaudio-6.dll
 endif
 
 
@@ -124,7 +125,9 @@ $(rtmidi):
 $(rtaudio):
 	$(WGET) http://www.music.mcgill.ca/~gary/rtaudio/release/rtaudio-5.0.0.tar.gz
 	$(UNTAR) rtaudio-5.0.0.tar.gz
-	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)"
+ifeq ($(ARCH),win)
+	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)" --with-asio --with-wasapi --with-ds
+endif
 	$(MAKE) -C rtaudio-5.0.0
 	$(MAKE) -C rtaudio-5.0.0 install
 

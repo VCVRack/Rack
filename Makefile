@@ -33,7 +33,7 @@ ifeq ($(ARCH), win)
 	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lportaudio_x64 -lrtmidi \
+		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi \
 		-Wl,-Bstatic -ljansson -lsamplerate
 	TARGET = Rack.exe
 	OBJECTS = Rack.res
@@ -135,7 +135,7 @@ ifeq ($(ARCH), win)
 	cp dep/bin/librtmidi-4.dll dist/Rack/
 	cp dep/bin/libsamplerate-0.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
-	cp dep/bin/portaudio_x64.dll dist/Rack/
+	cp dep/bin/librtaudio-6.dll dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 	# Make ZIP
