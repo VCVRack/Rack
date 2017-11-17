@@ -2,6 +2,7 @@
 #include <string>
 #include <list>
 
+#include <ossia/network/network.hpp>
 
 namespace rack {
 
@@ -101,6 +102,8 @@ struct Model {
 
 	virtual ~Model() {}
 	virtual ModuleWidget *createModuleWidget() { return NULL; }
+    
+    ossia::net::node_base* node;
 };
 
 void pluginInit();

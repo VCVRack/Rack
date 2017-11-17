@@ -14,7 +14,7 @@ ifeq ($(ARCH), lin)
 	LDFLAGS += -rdynamic \
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lossia
 	TARGET = Rack
 endif
 
@@ -154,11 +154,13 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libglfw.so.3 dist/Rack/
 	cp dep/lib/libcurl.so.4 dist/Rack/
 	cp dep/lib/libzip.so.5 dist/Rack/
-	cp dep/lib/libportaudio.so.2 dist/Rack/
+	cp dep/lib/librtaudio.so.6 dist/Rack/
 	cp dep/lib/librtmidi.so.4 dist/Rack/
+	cp /usr/local/lib/libossia.so dist/Rack/
 	mkdir -p dist/Rack/plugins
 	# Make ZIP
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+	cp -R plugins/Tutorial/dist/Template dist/Rack/plugins/	
 endif
 
 

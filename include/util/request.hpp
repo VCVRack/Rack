@@ -18,5 +18,6 @@ enum RequestMethod {
 json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ);
 /** Returns the filename, blank if unsuccessful */
 bool requestDownload(std::string url, std::string filename, float *progress);
+std::string requestEscape(std::string s);
 
 } // namespace rack

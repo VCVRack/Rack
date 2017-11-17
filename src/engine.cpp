@@ -37,7 +37,7 @@ float Light::getBrightness() {
 }
 
 void Light::setBrightnessSmooth(float brightness) {
-	float v = brightness * brightness;
+	float v = (brightness > 0.0) ? brightness * brightness : 0.0;
 	if (v < value) {
 		// Fade out light with lambda = 2 * framerate
 		value += (v - value) * sampleTime * (60.0 * 2.0);
@@ -87,6 +87,23 @@ static void engineStep() {
 	// Step modules
 	for (Module *module : modules) {
 		module->step();
+
+		// TODO skip this step when plug lights are disabled
+		// Step ports
+		for (Input &input : module->inputs) {
+			if (input.active) {
+				float value = input.value / 10.0;
+				input.plugLights[0].setBrightnessSmooth(value);
+				input.plugLights[1].setBrightnessSmooth(-value);
+			}
+		}
+		for (Output &output : module->outputs) {
+			if (output.active) {
+				float value = output.value / 10.0;
+				output.plugLights[0].setBrightnessSmooth(value);
+				output.plugLights[1].setBrightnessSmooth(-value);
+			}
+		}
 	}
 
 	// Step cables by moving their output values to inputs
@@ -259,18 +276,13 @@ float engineGetSampleTime() {
 	return sampleTime;
 }
 
-Module::Module(){
-    node = &ossia::net::create_node(rack::root_dev(),"module");        
-}
+Module::Module(){}
 
 Module::Module(int numParams, int numInputs, int numOutputs, int numLights) {
     params.resize(numParams);
     inputs.resize(numInputs);
     outputs.resize(numOutputs);
     lights.resize(numLights);
-    
-    std::cout << "create node" << std::endl;
-    node = &ossia::net::create_node(rack::root_dev(),"module");
 }
 
 ossia::net::generic_device& root_dev(){

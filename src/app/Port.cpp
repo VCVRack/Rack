@@ -1,11 +1,43 @@
 #include "app.hpp"
 #include "gui.hpp"
+#include "components.hpp"
+#include "engine.hpp"
 
 
 namespace rack {
 
+
+struct PlugLight : MultiLightWidget {
+	PlugLight() {
+		addBaseColor(COLOR_GREEN);
+		addBaseColor(COLOR_RED);
+		box.size = Vec(8, 8);
+		bgColor = COLOR_BLACK_TRANSPARENT;
+	}
+};
+
+
+Port::Port() {
+	plugLight = new PlugLight();
+}
+
 Port::~Port() {
+	// plugLight is not a child and is thus owned by the Port, so we need to delete it here
+	delete plugLight;
 	gRackWidget->wireContainer->removeAllWires(this);
+}
+
+void Port::step() {
+	std::vector<float> values(2);
+	if (type == INPUT) {
+		values[0] = module->inputs[portId].plugLights[0].getBrightness();
+		values[1] = module->inputs[portId].plugLights[1].getBrightness();
+	}
+	else {
+		values[0] = module->outputs[portId].plugLights[0].getBrightness();
+		values[1] = module->outputs[portId].plugLights[1].getBrightness();
+	}
+	plugLight->setValues(values);
 }
 
 void Port::draw(NVGcontext *vg) {
@@ -33,11 +65,8 @@ void Port::onMouseDown(EventMouseDown &e) {
 void Port::onDragStart(EventDragStart &e) {
 	// Try to grab wire on top of stack
 	WireWidget *wire = gRackWidget->wireContainer->getTopWire(this);
-	if (guiIsModPressed()) {
-		if (type == INPUT)
-			return;
-		else
-			wire = NULL;
+	if (type == OUTPUT && guiIsModPressed()) {
+		wire = NULL;
 	}
 
 	if (wire) {

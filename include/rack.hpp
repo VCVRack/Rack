@@ -8,7 +8,7 @@
 #include "gui.hpp"
 #include "app.hpp"
 #include "components.hpp"
-
+#include <iostream>
 
 namespace rack {
 
@@ -24,6 +24,10 @@ Model *createModel(std::string manufacturer, std::string slug, std::string name,
 		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
 			moduleWidget->model = this;
+            
+            // TODO move node creation here
+            
+            node = &ossia::net::create_node(rack::root_dev(),name);
 			return moduleWidget;
 		}
 	};
@@ -92,11 +96,11 @@ Port *createOutput(Vec pos, Module *module, int outputId) {
 }
 
 template<class TModuleLightWidget>
-ModuleLightWidget *createLight(Vec pos, Module *module, int lightId) {
+ModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
 	ModuleLightWidget *light = new TModuleLightWidget();
 	light->box.pos = pos;
 	light->module = module;
-	light->lightId = lightId;
+	light->firstLightId = firstLightId;
 	return light;
 }
 

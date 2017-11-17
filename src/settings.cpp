@@ -52,10 +52,6 @@ static json_t *settingsToJson() {
 	json_t *sampleRateJ = json_real(engineGetSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
-	// plugLight
-	json_t *plugLightJ = json_boolean(gToolbar->plugLightButton->value > 0.0);
-	json_object_set_new(rootJ, "plugLight", plugLightJ);
-
 	// lastPath
 	json_t *lastPathJ = json_string(gRackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
@@ -114,11 +110,6 @@ static void settingsFromJson(json_t *rootJ) {
 		engineSetSampleRate(sampleRate);
 	}
 
-	// plugLight
-	json_t *plugLightJ = json_object_get(rootJ, "plugLight");
-	if (plugLightJ)
-		gToolbar->plugLightButton->setValue(json_is_true(plugLightJ) ? 1.0 : 0.0);
-
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
 	if (lastPathJ)
@@ -127,7 +118,7 @@ static void settingsFromJson(json_t *rootJ) {
 
 
 void settingsSave(std::string filename) {
-	printf("Saving settings %s\n", filename.c_str());
+	info("Saving settings %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "w");
 	if (!file)
 		return;
@@ -142,7 +133,7 @@ void settingsSave(std::string filename) {
 }
 
 void settingsLoad(std::string filename) {
-	printf("Loading settings %s\n", filename.c_str());
+	info("Loading settings %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file)
 		return;
@@ -154,7 +145,7 @@ void settingsLoad(std::string filename) {
 		json_decref(rootJ);
 	}
 	else {
-		printf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
+		warn("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	}
 
 	fclose(file);

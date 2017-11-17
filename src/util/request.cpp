@@ -1,4 +1,5 @@
 #include "util/request.hpp"
+#include "util.hpp"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -82,7 +83,7 @@ json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
 
 	// Perform request
-	printf("Requesting %s\n", url.c_str());
+	info("Requesting %s", url.c_str());
 	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	CURLcode res = curl_easy_perform(curl);
 
@@ -130,7 +131,7 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferInfoCallback);
 	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, progress);
 
-	printf("Downloading %s\n", url.c_str());
+	info("Downloading %s", url.c_str());
 	CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 
@@ -140,6 +141,16 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 		remove(filename.c_str());
 
 	return res == CURLE_OK;
+}
+
+std::string requestEscape(std::string s) {
+	CURL *curl = curl_easy_init();
+	assert(curl);
+	char *escaped = curl_easy_escape(curl, s.c_str(), s.size());
+	std::string ret = escaped;
+	curl_free(escaped);
+	curl_easy_cleanup(curl);
+	return ret;
 }
 
 

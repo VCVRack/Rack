@@ -64,7 +64,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		if (fbSize.isZero())
 			return;
 
-		// printf("rendering framebuffer %f %f\n", fbSize.x, fbSize.y);
+		// info("rendering framebuffer %f %f", fbSize.x, fbSize.y);
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
@@ -122,6 +122,7 @@ int FramebufferWidget::getImageHandle() {
 
 void FramebufferWidget::onZoom(EventZoom &e) {
 	dirty = true;
+	Widget::onZoom(e);
 }
 
 

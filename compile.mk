@@ -11,7 +11,7 @@ FLAGS += -Wall -Wextra -Wno-unused-parameter
 ifneq ($(ARCH), mac)
 CXXFLAGS += -Wsuggest-override
 endif
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++14
 
 
 ifeq ($(ARCH), lin)

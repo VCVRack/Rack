@@ -1,27 +1,18 @@
 #include <assert.h>
 #include <mutex>
 #include <thread>
-#include <portaudio.h>
 #include "core.hpp"
 #include "dsp/samplerate.hpp"
 #include "dsp/ringbuffer.hpp"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-override"
+#include <rtaudio/RtAudio.h>
+#pragma GCC diagnostic pop
+
+
 
 using namespace rack;
-
-static bool initialized = false;
-
-void audioInit() {
-	if (initialized)
-		return;
-
-	PaError err = Pa_Initialize();
-	if (err) {
-		fprintf(stderr, "Failed to initialize PortAudio: %s\n", Pa_GetErrorText(err));
-		return;
-	}
-	initialized = true;
-}
 
 
 struct AudioInterface : Module {
@@ -37,7 +28,7 @@ struct AudioInterface : Module {
 		NUM_OUTPUTS = AUDIO1_OUTPUT + 8
 	};
 
-	PaStream *stream = NULL;
+	RtAudio stream;
 	// Stream properties
 	int deviceId = -1;
 	float sampleRate = 44100.0;
@@ -58,9 +49,7 @@ struct AudioInterface : Module {
 	// in device's sample rate
 	DoubleRingBuffer<Frame<8>, (1<<15)> inputSrcBuffer;
 
-	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
-		audioInit();
-	}
+	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {}
 	~AudioInterface() {
 		closeDevice();
 	}
@@ -125,9 +114,6 @@ struct AudioInterface : Module {
 
 
 void AudioInterface::step() {
-	if (!stream)
-		return;
-
 	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
 	if (numOutputs > 0) {
 		while (inputSrcBuffer.size() >= blockSize && streamRunning) {
@@ -215,21 +201,29 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 }
 
 int AudioInterface::getDeviceCount() {
-	return Pa_GetDeviceCount();
+	return stream.getDeviceCount();
 }
 
 std::string AudioInterface::getDeviceName(int deviceId) {
-	const PaDeviceInfo *info = Pa_GetDeviceInfo(deviceId);
-	if (!info)
+	if (deviceId < 0)
 		return "";
-	const PaHostApiInfo *apiInfo = Pa_GetHostApiInfo(info->hostApi);
-	return stringf("%s: %s (%d in, %d out)", apiInfo->name, info->name, info->maxInputChannels, info->maxOutputChannels);
+
+	std::lock_guard<std::mutex> lock(bufferMutex);
+	try {
+		RtAudio::DeviceInfo deviceInfo = stream.getDeviceInfo(deviceId);
+		return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
+	}
+	catch (RtAudioError &e) {
+		warn("Failed to query audio device: %s", e.what());
+		return "";
+	}
 }
 
-static int paCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
-	AudioInterface *p = (AudioInterface *) userData;
-	p->stepStream((const float *) inputBuffer, (float *) outputBuffer, framesPerBuffer);
-	return paContinue;
+static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
+	AudioInterface *audioInterface = (AudioInterface *) userData;
+	assert(audioInterface);
+	audioInterface->stepStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
+	return 0;
 }
 
 void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
@@ -241,51 +235,52 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 
 	// Open new device
 	if (deviceId >= 0) {
-		PaError err;
-		const PaDeviceInfo *deviceInfo = Pa_GetDeviceInfo(deviceId);
-		if (!deviceInfo) {
-			fprintf(stderr, "Failed to query audio device\n");
+		RtAudio::DeviceInfo deviceInfo;
+		try {
+			deviceInfo = stream.getDeviceInfo(deviceId);
+		}
+		catch (RtAudioError &e) {
+			warn("Failed to query audio device: %s", e.what());
 			return;
 		}
 
-		numOutputs = mini(deviceInfo->maxOutputChannels, 8);
-		numInputs = mini(deviceInfo->maxInputChannels, 8);
+		numOutputs = mini(deviceInfo.outputChannels, 8);
+		numInputs = mini(deviceInfo.inputChannels, 8);
 
-		PaStreamParameters outputParameters;
-		outputParameters.device = deviceId;
-		outputParameters.channelCount = numOutputs;
-		outputParameters.sampleFormat = paFloat32;
-		outputParameters.suggestedLatency = deviceInfo->defaultLowOutputLatency;
-		outputParameters.hostApiSpecificStreamInfo = NULL;
+		RtAudio::StreamParameters outParameters;
+		outParameters.deviceId = deviceId;
+		outParameters.nChannels = numOutputs;
 
-		PaStreamParameters inputParameters;
-		inputParameters.device = deviceId;
-		inputParameters.channelCount = numInputs;
-		inputParameters.sampleFormat = paFloat32;
-		inputParameters.suggestedLatency = deviceInfo->defaultLowInputLatency;
-		inputParameters.hostApiSpecificStreamInfo = NULL;
+		RtAudio::StreamParameters inParameters;
+		inParameters.deviceId = deviceId;
+		inParameters.nChannels = numInputs;
 
-		// Don't use stream parameters if 0 input or output channels
-		err = Pa_OpenStream(&stream,
-			numInputs == 0 ? NULL : &inputParameters,
-			numOutputs == 0 ? NULL : &outputParameters,
-			sampleRate, blockSize, paNoFlag, paCallback, this);
-		if (err) {
-			fprintf(stderr, "Failed to open audio stream: %s\n", Pa_GetErrorText(err));
+		RtAudio::StreamOptions options;
+		options.flags |= RTAUDIO_MINIMIZE_LATENCY;
+
+		try {
+			// Don't use stream parameters if 0 input or output channels
+			stream.openStream(
+				numOutputs == 0 ? NULL : &outParameters,
+				numInputs == 0 ? NULL : &inParameters,
+				RTAUDIO_FLOAT32, sampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
+		}
+		catch (RtAudioError &e) {
+			warn("Failed to open audio stream: %s", e.what());
 			return;
 		}
 
-		err = Pa_StartStream(stream);
-		if (err) {
-			fprintf(stderr, "Failed to start audio stream: %s\n", Pa_GetErrorText(err));
+		try {
+			stream.startStream();
+		}
+		catch (RtAudioError &e) {
+			warn("Failed to start audio stream: %s", e.what());
 			return;
 		}
-		// This should go after Pa_StartStream because sometimes it will call the callback once synchronously, and that time it should return early
+
 		streamRunning = true;
 
-		// Correct sample rate
-		const PaStreamInfo *streamInfo = Pa_GetStreamInfo(stream);
-		this->sampleRate = streamInfo->sampleRate;
+		this->sampleRate = stream.getStreamSampleRate();
 		this->deviceId = deviceId;
 	}
 }
@@ -293,23 +288,19 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 void AudioInterface::closeDevice() {
 	std::lock_guard<std::mutex> lock(bufferMutex);
 
-	if (stream) {
-		PaError err;
+	if (stream.isStreamOpen()) {
 		streamRunning = false;
-		err = Pa_AbortStream(stream);
-		// err = Pa_StopStream(stream);
-		if (err) {
-			fprintf(stderr, "Failed to stop audio stream: %s\n", Pa_GetErrorText(err));
+		try {
+			stream.abortStream();
+			stream.closeStream();
 		}
-
-		err = Pa_CloseStream(stream);
-		if (err) {
-			fprintf(stderr, "Failed to close audio stream: %s\n", Pa_GetErrorText(err));
+		catch (RtAudioError &e) {
+			warn("Failed to abort stream %s", e.what());
+			return;
 		}
 	}
 
 	// Reset stream settings
-	stream = NULL;
 	deviceId = -1;
 	numOutputs = 0;
 	numInputs = 0;
@@ -427,7 +418,6 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	AudioInterface *module = new AudioInterface();
 	setModule(module);
 	box.size = Vec(15*12, 380);
-
 	{
 		Panel *panel = new LightPanel();
 		panel->box.size = box.size;

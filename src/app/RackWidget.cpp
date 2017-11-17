@@ -83,7 +83,7 @@ void RackWidget::saveAsDialog() {
 
 
 void RackWidget::savePatch(std::string path) {
-	printf("Saving patch %s\n", path.c_str());
+	info("Saving patch %s", path.c_str());
 	FILE *file = fopen(path.c_str(), "w");
 	if (!file)
 		return;
@@ -98,7 +98,7 @@ void RackWidget::savePatch(std::string path) {
 }
 
 void RackWidget::loadPatch(std::string path) {
-	printf("Loading patch %s\n", path.c_str());
+	info("Loading patch %s", path.c_str());
 	FILE *file = fopen(path.c_str(), "r");
 	if (!file) {
 		// Exit silently

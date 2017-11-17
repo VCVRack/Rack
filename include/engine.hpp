@@ -8,28 +8,11 @@
 
 namespace rack {
 
+
 struct Param {
 	float value = 0.0;
 	std::string name = "param.1";
 	ossia::net::parameter_base* ossia_param;
-};
-
-struct Input {
-	/** Voltage of the port, zero if not plugged in. Read-only by Module */
-	float value = 0.0;
-	/** Whether a wire is plugged in */
-	bool active = false;
-	/** Returns the value if a wire is plugged in, otherwise returns the given default value */
-	float normalize(float normalValue) {
-		return active ? value : normalValue;
-	}
-};
-
-struct Output {
-	/** Voltage of the port. Write-only by Module */
-	float value = 0.0;
-	/** Whether a wire is plugged in */
-	bool active = false;
 };
 
 struct Light {
@@ -42,6 +25,26 @@ struct Light {
 	void setBrightnessSmooth(float brightness);
 };
 
+struct Input {
+	/** Voltage of the port, zero if not plugged in. Read-only by Module */
+	float value = 0.0;
+	/** Whether a wire is plugged in */
+	bool active = false;
+	Light plugLights[2];
+	/** Returns the value if a wire is plugged in, otherwise returns the given default value */
+	float normalize(float normalValue) {
+		return active ? value : normalValue;
+	}
+};
+
+struct Output {
+	/** Voltage of the port. Write-only by Module */
+	float value = 0.0;
+	/** Whether a wire is plugged in */
+	bool active = false;
+	Light plugLights[2];
+};
+
 static ossia::net::generic_device& root_dev();
 
 struct Module {
@@ -51,19 +54,17 @@ struct Module {
 	std::vector<Light> lights;
 	/** For CPU usage meter */
 	float cpuTime = 0.0;
-    
-    ossia::net::node_base* node{};
 
 	/** Deprecated, use constructor below this one */
-	Module();
-    
+	Module() DEPRECATED {}
 	/** Constructs Module with a fixed number of params, inputs, and outputs */
-	Module(int numParams, int numInputs, int numOutputs, int numLights = 0);
-	~Module()
-    {
-        if (node)
-            node->get_parent()->remove_child(*node);            
-    }
+	Module(int numParams, int numInputs, int numOutputs, int numLights = 0) {
+		params.resize(numParams);
+		inputs.resize(numInputs);
+		outputs.resize(numOutputs);
+		lights.resize(numLights);
+	}
+	virtual ~Module() {}
 
 	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate */
 	virtual void step() {}
