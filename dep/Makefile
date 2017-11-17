@@ -55,6 +55,19 @@ ifeq ($(ARCH),win)
 	rtaudio = bin/librtaudio-6.dll
 endif
 
+# Library configuration
+ifdef RTAUDIO_ALL_APIS
+ifeq ($(ARCH),mac)
+	RTAUDIO_FLAGS = --with-core --with-jack
+endif
+ifeq ($(ARCH),win)
+	RTAUDIO_FLAGS = --with-asio --with-wasapi --with-ds
+endif
+ifeq ($(ARCH),lin)
+	RTAUDIO_FLAGS = --with-alsa --with-pulse --with-jack
+endif
+endif
+
 
 .NOTPARALLEL:
 
@@ -125,15 +138,7 @@ $(rtmidi):
 $(rtaudio):
 	$(WGET) http://www.music.mcgill.ca/~gary/rtaudio/release/rtaudio-5.0.0.tar.gz
 	$(UNTAR) rtaudio-5.0.0.tar.gz
-ifeq ($(ARCH),mac)
-	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)" --with-core --with-jack
-endif
-ifeq ($(ARCH),win)
-	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)" --with-asio --with-wasapi --with-ds
-endif
-ifeq ($(ARCH),lin)
-	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)" --with-alsa --with-pulse --with-jack
-endif
+	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)" $(RTAUDIO_FLAGS)
 	$(MAKE) -C rtaudio-5.0.0
 	$(MAKE) -C rtaudio-5.0.0 install
 
