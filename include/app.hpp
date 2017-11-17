@@ -278,6 +278,33 @@ struct MomentarySwitch : virtual Switch {
 };
 
 ////////////////////
+// lights
+////////////////////
+
+struct LightWidget : TransparentWidget {
+	NVGcolor bgColor = nvgRGBf(0, 0, 0);
+	NVGcolor color = nvgRGBf(1, 1, 1);
+	void draw(NVGcontext *vg) override;
+};
+
+/** Mixes a list of colors based on a list of brightness values */
+struct MultiLightWidget : LightWidget {
+	std::vector<NVGcolor> baseColors;
+	void addBaseColor(NVGcolor baseColor);
+	/** Sets the color to a linear combination of the baseColors with the given weights */
+	void setValues(const std::vector<float> &values);
+};
+
+/** A MultiLightWidget that points to a module's Light or a range of lights
+Will access firstLightId, firstLightId + 1, etc. for each added color
+*/
+struct ModuleLightWidget : MultiLightWidget {
+	Module *module = NULL;
+	int firstLightId;
+	void step() override;
+};
+
+////////////////////
 // ports
 ////////////////////
 
@@ -290,8 +317,11 @@ struct Port : OpaqueWidget {
 	Module *module = NULL;
 	PortType type = INPUT;
 	int portId;
+	MultiLightWidget *plugLight;
 
+	Port();
 	~Port();
+	void step() override;
 	void draw(NVGcontext *vg) override;
 	void onMouseDown(EventMouseDown &e) override;
 	void onDragStart(EventDragStart &e) override;
@@ -316,29 +346,6 @@ struct SVGScrew : FramebufferWidget {
 };
 
 ////////////////////
-// lights
-////////////////////
-
-struct LightWidget : TransparentWidget {
-	NVGcolor bgColor = nvgRGBf(0, 0, 0);
-	NVGcolor color = nvgRGBf(1, 1, 1);
-	void draw(NVGcontext *vg) override;
-};
-
-/** A LightWidget that points to a module's Light or a range of lights */
-struct ModuleLightWidget : LightWidget {
-	Module *module = NULL;
-	int lightId;
-};
-
-/** Mixes colors based on the brightness of the module light at lightId, lightId + 1, etc */
-struct ColorLightWidget : ModuleLightWidget {
-	std::vector<NVGcolor> colors;
-	void addColor(NVGcolor c);
-	void step() override;
-};
-
-////////////////////
 // scene
 ////////////////////
 
@@ -347,7 +354,6 @@ struct Toolbar : OpaqueWidget {
 	Slider *wireTensionSlider;
 	Slider *zoomSlider;
 	RadioButton *cpuUsageButton;
-	RadioButton *plugLightButton;
 
 	Toolbar();
 	void draw(NVGcontext *vg) override;

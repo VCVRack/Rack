@@ -52,10 +52,6 @@ static json_t *settingsToJson() {
 	json_t *sampleRateJ = json_real(engineGetSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
-	// plugLight
-	json_t *plugLightJ = json_boolean(gToolbar->plugLightButton->value > 0.0);
-	json_object_set_new(rootJ, "plugLight", plugLightJ);
-
 	// lastPath
 	json_t *lastPathJ = json_string(gRackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
@@ -113,11 +109,6 @@ static void settingsFromJson(json_t *rootJ) {
 		float sampleRate = json_number_value(sampleRateJ);
 		engineSetSampleRate(sampleRate);
 	}
-
-	// plugLight
-	json_t *plugLightJ = json_object_get(rootJ, "plugLight");
-	if (plugLightJ)
-		gToolbar->plugLightButton->setValue(json_is_true(plugLightJ) ? 1.0 : 0.0);
 
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");

@@ -166,16 +166,6 @@ Toolbar::Toolbar() {
 	}
 	xPos += margin;
 
-	{
-		plugLightButton = new RadioButton();
-		plugLightButton->box.pos = Vec(xPos, margin);
-		plugLightButton->box.size.x = 100;
-		plugLightButton->label = "Plug lights";
-		addChild(plugLightButton);
-		xPos += plugLightButton->box.size.x;
-	}
-	xPos += margin;
-
 	/*
 	{
 		cpuUsageButton = new RadioButton();

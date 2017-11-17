@@ -11,11 +11,22 @@ struct Param {
 	float value = 0.0;
 };
 
+struct Light {
+	/** The square of the brightness value */
+	float value = 0.0;
+	float getBrightness();
+	void setBrightness(float brightness) {
+		value = brightness * brightness;
+	}
+	void setBrightnessSmooth(float brightness);
+};
+
 struct Input {
 	/** Voltage of the port, zero if not plugged in. Read-only by Module */
 	float value = 0.0;
 	/** Whether a wire is plugged in */
 	bool active = false;
+	Light plugLights[2];
 	/** Returns the value if a wire is plugged in, otherwise returns the given default value */
 	float normalize(float normalValue) {
 		return active ? value : normalValue;
@@ -27,16 +38,7 @@ struct Output {
 	float value = 0.0;
 	/** Whether a wire is plugged in */
 	bool active = false;
-};
-
-struct Light {
-	/** The square of the brightness value */
-	float value = 0.0;
-	float getBrightness();
-	void setBrightness(float brightness) {
-		value = brightness * brightness;
-	}
-	void setBrightnessSmooth(float brightness);
+	Light plugLights[2];
 };
 
 
@@ -49,7 +51,7 @@ struct Module {
 	float cpuTime = 0.0;
 
 	/** Deprecated, use constructor below this one */
-	Module() {}
+	Module() DEPRECATED {}
 	/** Constructs Module with a fixed number of params, inputs, and outputs */
 	Module(int numParams, int numInputs, int numOutputs, int numLights = 0) {
 		params.resize(numParams);

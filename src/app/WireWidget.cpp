@@ -155,7 +155,9 @@ void WireWidget::draw(NVGcontext *vg) {
 	if (!(inputPort && outputPort))
 		opacity = 1.0;
 
-	drawWire(vg, getOutputPos(), getInputPos(), color, tension, opacity);
+	Vec outputPos = getOutputPos();
+	Vec inputPos = getInputPos();
+	drawWire(vg, outputPos, inputPos, color, tension, opacity);
 }
 
 void WireWidget::drawPlugs(NVGcontext *vg) {
@@ -166,31 +168,20 @@ void WireWidget::drawPlugs(NVGcontext *vg) {
 	drawPlug(vg, inputPos, color);
 
 	// Draw plug light
-	/*
-	if (gToolbar->plugLightButton->value > 0.0) {
-		if (wire) {
-			Output &output = wire->outputModule->outputs[wire->outputId];
-			float value = output.value / 8.0;
-			outputLight->box.size = Vec(10, 10);
-			inputLight->box.size = Vec(10, 10);
-			outputLight->box.pos = outputPos.minus(Vec(5, 5));
-			inputLight->box.pos = inputPos.minus(Vec(5, 5));
-			outputLight->setValue(value);
-			inputLight->setValue(value);
-		}
-		else {
-			outputLight->setValue(0.0);
-			inputLight->setValue(0.0);
-		}
-		outputLight->visible = true;
-		inputLight->visible = true;
+	// TODO
+	// Only draw this when light is on top of the plug stack
+	if (outputPort) {
+		nvgSave(vg);
+		nvgTranslate(vg, outputPos.x - 4, outputPos.y - 4);
+		outputPort->plugLight->draw(vg);
+		nvgRestore(vg);
 	}
-	else {
-		outputLight->visible = false;
-		inputLight->visible = false;
+	if (inputPort) {
+		nvgSave(vg);
+		nvgTranslate(vg, inputPos.x - 4, inputPos.y - 4);
+		inputPort->plugLight->draw(vg);
+		nvgRestore(vg);
 	}
-	*/
-	Widget::draw(vg);
 }
 
 

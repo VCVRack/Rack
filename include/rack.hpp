@@ -74,11 +74,11 @@ Port *createOutput(Vec pos, Module *module, int outputId) {
 }
 
 template<class TModuleLightWidget>
-ModuleLightWidget *createLight(Vec pos, Module *module, int lightId) {
+ModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
 	ModuleLightWidget *light = new TModuleLightWidget();
 	light->box.pos = pos;
 	light->module = module;
-	light->lightId = lightId;
+	light->firstLightId = firstLightId;
 	return light;
 }
 
