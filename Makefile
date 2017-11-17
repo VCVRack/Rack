@@ -154,7 +154,7 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libglfw.so.3 dist/Rack/
 	cp dep/lib/libcurl.so.4 dist/Rack/
 	cp dep/lib/libzip.so.5 dist/Rack/
-	cp dep/lib/libportaudio.so.2 dist/Rack/
+	cp dep/lib/librtaudio.so.6 dist/Rack/
 	cp dep/lib/librtmidi.so.4 dist/Rack/
 	mkdir -p dist/Rack/plugins
 	# Make ZIP
