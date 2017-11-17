@@ -41,6 +41,7 @@ ifeq ($(ARCH),mac)
 	libcurl = lib/libcurl.dylib
 	libzip = lib/libzip.dylib
 	rtmidi = lib/librtmidi.dylib
+	rtaudio = lib/librtaudio.dylib
 endif
 
 ifeq ($(ARCH),win)

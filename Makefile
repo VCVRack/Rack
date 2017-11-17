@@ -23,7 +23,7 @@ ifeq ($(ARCH), mac)
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi
 	TARGET = Rack
 	BUNDLE = dist/$(TARGET).app
 endif
@@ -59,7 +59,7 @@ endif
 
 debug: $(TARGET)
 ifeq ($(ARCH), mac)
-	lldb ./Rack
+	DYLD_FALLBACK_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
 else
 	LD_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
 endif

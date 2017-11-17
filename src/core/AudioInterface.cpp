@@ -208,7 +208,6 @@ std::string AudioInterface::getDeviceName(int deviceId) {
 	if (deviceId < 0)
 		return "";
 
-	std::lock_guard<std::mutex> lock(bufferMutex);
 	try {
 		RtAudio::DeviceInfo deviceInfo = stream.getDeviceInfo(deviceId);
 		return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
@@ -256,7 +255,7 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		inParameters.nChannels = numInputs;
 
 		RtAudio::StreamOptions options;
-		options.flags |= RTAUDIO_MINIMIZE_LATENCY;
+		// options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 
 		try {
 			// Don't use stream parameters if 0 input or output channels
