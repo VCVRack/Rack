@@ -38,7 +38,6 @@ struct AudioInterface : Module {
 
 	// Used because the GUI thread and Rack thread can both interact with this class
 	std::mutex bufferMutex;
-	bool streamRunning;
 
 	SampleRateConverter<8> inputSrc;
 	SampleRateConverter<8> outputSrc;
@@ -116,12 +115,12 @@ struct AudioInterface : Module {
 void AudioInterface::step() {
 	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
 	if (numOutputs > 0) {
-		while (inputSrcBuffer.size() >= blockSize && streamRunning) {
+		while (inputSrcBuffer.size() >= blockSize && stream.isStreamRunning()) {
 			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
 		}
 	}
 	else if (numInputs > 0) {
-		while (outputBuffer.empty() && streamRunning) {
+		while (outputBuffer.empty() && stream.isStreamRunning()) {
 			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
 		}
 	}
@@ -163,7 +162,7 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 	if (numOutputs > 0) {
 		// Wait for enough input before proceeding
 		while (inputSrcBuffer.size() < numFrames) {
-			if (!streamRunning)
+			if (!stream.isStreamRunning())
 				return;
 			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
 		}
@@ -277,8 +276,6 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 			return;
 		}
 
-		streamRunning = true;
-
 		this->sampleRate = stream.getStreamSampleRate();
 		this->deviceId = deviceId;
 	}
@@ -288,7 +285,6 @@ void AudioInterface::closeDevice() {
 	std::lock_guard<std::mutex> lock(bufferMutex);
 
 	if (stream.isStreamOpen()) {
-		streamRunning = false;
 		try {
 			stream.abortStream();
 			stream.closeStream();
