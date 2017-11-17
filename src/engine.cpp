@@ -11,7 +11,6 @@
 #include "engine.hpp"
 #include "util.hpp"
 
-
 namespace rack {
 
 float sampleRate;
@@ -32,7 +31,6 @@ static std::vector<Wire*> wires;
 static Module *smoothModule = NULL;
 static int smoothParamId;
 static float smoothValue;
-
 
 float Light::getBrightness() {
 	return sqrtf(fmaxf(0.0, value));
@@ -76,11 +74,13 @@ static void engineStep() {
 		float delta = smoothValue - value;
 		if (fabsf(delta) < snap) {
 			smoothModule->params[smoothParamId].value = smoothValue;
+			smoothModule->params[smoothParamId].ossia_param->push_value(smoothValue);
 			smoothModule = NULL;
 		}
 		else {
 			value += delta * lambda * sampleTime;
 			smoothModule->params[smoothParamId].value = value;
+			smoothModule->params[smoothParamId].ossia_param->push_value(value);
 		}
 	}
 
@@ -223,6 +223,7 @@ void engineRemoveWire(Wire *wire) {
 
 void engineSetParam(Module *module, int paramId, float value) {
 	module->params[paramId].value = value;
+	module->params[paramId].ossia_param->push_value(value);
 }
 
 void engineSetParamSmooth(Module *module, int paramId, float value) {
@@ -231,10 +232,12 @@ void engineSetParamSmooth(Module *module, int paramId, float value) {
 	// Since only one param can be smoothed at a time, if another param is currently being smoothed, skip to its final state
 	if (smoothModule && !(smoothModule == module && smoothParamId == paramId)) {
 		smoothModule->params[smoothParamId].value = smoothValue;
+		smoothModule->params[smoothParamId].ossia_param->push_value(smoothValue);
 	}
 	smoothModule = module;
 	smoothParamId = paramId;
 	smoothValue = value;
+	module->params[paramId].ossia_param->push_value(smoothValue);
 }
 
 void engineSetSampleRate(float newSampleRate) {
@@ -255,5 +258,28 @@ float engineGetSampleRate() {
 float engineGetSampleTime() {
 	return sampleTime;
 }
+
+Module::Module(){
+    node = &ossia::net::create_node(rack::root_dev(),"module");        
+}
+
+Module::Module(int numParams, int numInputs, int numOutputs, int numLights) {
+    params.resize(numParams);
+    inputs.resize(numInputs);
+    outputs.resize(numOutputs);
+    lights.resize(numLights);
+    
+    std::cout << "create node" << std::endl;
+    node = &ossia::net::create_node(rack::root_dev(),"module");
+}
+
+ossia::net::generic_device& root_dev(){
+    static ossia::net::generic_device dev{
+        std::make_unique<ossia::oscquery::oscquery_server_protocol>(1234, 5678),
+        "VCV-Rack"};
+
+    return dev;
+}
+
 
 } // namespace rack

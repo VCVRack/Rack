@@ -48,8 +48,26 @@ ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, f
 	param->box.pos = pos;
 	param->module = module;
 	param->paramId = paramId;
-	param->setLimits(minValue, maxValue);
+    
+    auto& p = module->params[paramId];
+    auto& p_node = ossia::net::create_node(*module->node,p.name);
+    p.ossia_param = p_node.create_parameter(ossia::val_type::FLOAT);
+    p.ossia_param->set_domain(ossia::make_domain(minValue,maxValue));
+    p.ossia_param->set_bounding(ossia::bounding_mode::CLIP);
+    p.ossia_param->push_value(defaultValue);
+    p.ossia_param->set_default_value(defaultValue);
+    
+    p.ossia_param->add_callback([param] (const ossia::value& v) {
+        auto& p = param->module->params[param->paramId];
+        param->value = v.get<float>();
+        p.value = param->value;
+        if ( auto fbw = dynamic_cast<FramebufferWidget*>(param))
+            fbw->dirty = true;
+    });
+    
+    param->setLimits(minValue, maxValue);
 	param->setDefaultValue(defaultValue);
+    
 	return param;
 }
 
