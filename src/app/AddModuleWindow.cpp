@@ -183,6 +183,8 @@ struct ManufacturerMenu : ListMenu {
 	std::string filter;
 
 	ManufacturerMenu() {
+		addChild(construct<MenuLabel>(&MenuLabel::text, "Manufacturers"));
+
 		// Collect manufacturer names
 		std::set<std::string> manufacturers;
 		for (Plugin *plugin : gPlugins) {
@@ -205,7 +207,8 @@ struct ManufacturerMenu : ListMenu {
 			// Make children with a matching model visible
 			for (Widget *child : children) {
 				MenuItem *item = dynamic_cast<MenuItem*>(child);
-				assert(item);
+				if (!item)
+					continue;
 
 				std::string manufacturer = item->text;
 				for (Plugin *plugin : gPlugins) {
@@ -282,9 +285,6 @@ AddModuleWindow::AddModuleWindow() {
 	metadataScroll->box.pos = Vec(400, posY);
 	metadataScroll->box.size = Vec(200, box.size.y - posY);
 	addChild(metadataScroll);
-
-	// NVGcolor c = bndTransparent(nvgRGB(0, 0, 0));
-	NVGcolor c = bndGetTheme()->nodeTheme.nodeBackdropColor;
 }
 
 
