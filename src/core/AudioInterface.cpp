@@ -208,6 +208,7 @@ std::string AudioInterface::getDeviceName(int deviceId) {
 	if (deviceId < 0)
 		return "";
 
+	std::lock_guard<std::mutex> lock(bufferMutex);
 	try {
 		RtAudio::DeviceInfo deviceInfo = stream.getDeviceInfo(deviceId);
 		return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
