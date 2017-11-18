@@ -81,6 +81,8 @@ Build plugin.
 
 ## License
 
-Rack source code by [Andrew Belt](https://andrewbelt.name/) licensed under [BSD-3-Clause](LICENSE.txt)
+Source code licensed under [BSD-3-Clause](LICENSE.txt) by [Andrew Belt](https://andrewbelt.name/)
 
-Component Library graphics by [Grayscale](http://grayscale.info/) licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+Component Library graphics in `res/ComponentLibrary` licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) by [Grayscale](http://grayscale.info/)
+
+VCV logo is © 2017
