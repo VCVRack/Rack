@@ -318,6 +318,7 @@ struct AudioItem : MenuItem {
 };
 
 struct AudioChoice : ChoiceButton {
+	int lastDeviceId = -1;
 	AudioInterface *audioInterface;
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
@@ -341,8 +342,11 @@ struct AudioChoice : ChoiceButton {
 		}
 	}
 	void step() override {
-		std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
-		text = ellipsize(name, 24);
+		if (lastDeviceId != audioInterface->deviceId) {
+			std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
+			text = ellipsize(name, 24);
+			lastDeviceId = audioInterface->deviceId;
+		}
 	}
 };
 
