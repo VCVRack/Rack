@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <mutex>
 #include <thread>
+#include <algorithm>
 #include "core.hpp"
 #include "dsp/samplerate.hpp"
 #include "dsp/ringbuffer.hpp"
@@ -71,6 +72,7 @@ struct AudioInterface : Module {
 	void setBlockSize(int blockSize) {
 		openDevice(deviceId, sampleRate, blockSize);
 	}
+	std::vector<float> getSampleRates();
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
@@ -308,6 +310,30 @@ void AudioInterface::closeDevice() {
 	outputSrc.reset();
 }
 
+std::vector<float> AudioInterface::getSampleRates() {
+	std::vector<float> allowedSampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
+	if (deviceId < 0)
+		return allowedSampleRates;
+
+	try {
+		std::vector<float> sampleRates;
+		RtAudio::DeviceInfo deviceInfo = stream.getDeviceInfo(deviceId);
+		for (int sr : deviceInfo.sampleRates) {
+			float sampleRate = sr;
+			auto allowedIt = std::find(allowedSampleRates.begin(), allowedSampleRates.end(), sampleRate);
+			if (allowedIt != allowedSampleRates.end()) {
+				sampleRates.push_back(sampleRate);
+			}
+		}
+		return sampleRates;
+	}
+	catch (RtAudioError &e) {
+		warn("Failed to query audio device: %s", e.what());
+		return {};
+	}
+}
+
+
 
 struct AudioItem : MenuItem {
 	AudioInterface *audioInterface;
@@ -366,13 +392,11 @@ struct SampleRateChoice : ChoiceButton {
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
 
-		const float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
-		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
-		for (int i = 0; i < sampleRatesLen; i++) {
+		for (float sampleRate : audioInterface->getSampleRates()) {
 			SampleRateItem *item = new SampleRateItem();
 			item->audioInterface = audioInterface;
-			item->sampleRate = sampleRates[i];
-			item->text = stringf("%.0f Hz", sampleRates[i]);
+			item->sampleRate = sampleRate;
+			item->text = stringf("%.0f Hz", sampleRate);
 			menu->pushChild(item);
 		}
 	}
