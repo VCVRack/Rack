@@ -167,6 +167,7 @@ void debug(const char *format, ...) {
 	fprintf(gLogFile, "[debug] ");
 	vfprintf(gLogFile, format, args);
 	fprintf(gLogFile, "\n");
+	fflush(gLogFile);
 	va_end(args);
 }
 
@@ -176,6 +177,7 @@ void info(const char *format, ...) {
 	fprintf(gLogFile, "[info] ");
 	vfprintf(gLogFile, format, args);
 	fprintf(gLogFile, "\n");
+	fflush(gLogFile);
 	va_end(args);
 }
 
@@ -185,6 +187,7 @@ void warn(const char *format, ...) {
 	fprintf(gLogFile, "[warning] ");
 	vfprintf(gLogFile, format, args);
 	fprintf(gLogFile, "\n");
+	fflush(gLogFile);
 	va_end(args);
 }
 
@@ -194,6 +197,7 @@ void fatal(const char *format, ...) {
 	fprintf(gLogFile, "[fatal] ");
 	vfprintf(gLogFile, format, args);
 	fprintf(gLogFile, "\n");
+	fflush(gLogFile);
 	va_end(args);
 }
 
