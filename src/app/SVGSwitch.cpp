@@ -24,7 +24,8 @@ void SVGSwitch::step() {
 
 void SVGSwitch::onChange(EventChange &e) {
 	assert(frames.size() > 0);
-	int index = clampi((int) roundf(value), 0, frames.size() - 1);
+	float valueScaled = rescalef(value, minValue, maxValue, 0, frames.size() - 1);
+	int index = clampi((int) roundf(valueScaled), 0, frames.size() - 1);
 	sw->setSVG(frames[index]);
 	dirty = true;
 	Switch::onChange(e);

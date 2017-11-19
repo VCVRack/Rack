@@ -41,8 +41,10 @@ void RackWidget::clear() {
 }
 
 void RackWidget::reset() {
-	clear();
-	loadPatch(assetLocal("template.vcv"));
+	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear your patch and start over?")) {
+		clear();
+		loadPatch(assetLocal("template.vcv"));
+	}
 }
 
 void RackWidget::openDialog() {
