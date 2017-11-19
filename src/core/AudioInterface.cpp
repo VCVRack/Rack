@@ -159,6 +159,11 @@ void AudioInterface::step() {
 }
 
 void AudioInterface::stepStream(const float *input, float *output, int numFrames) {
+	if (gPaused) {
+		memset(output, 0, sizeof(float) * numOutputs * numFrames);
+		return;
+	}
+
 	if (numOutputs > 0) {
 		// Wait for enough input before proceeding
 		while (inputSrcBuffer.size() < numFrames) {
