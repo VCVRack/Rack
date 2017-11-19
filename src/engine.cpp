@@ -276,22 +276,4 @@ float engineGetSampleTime() {
 	return sampleTime;
 }
 
-Module::Module(){}
-
-Module::Module(int numParams, int numInputs, int numOutputs, int numLights) {
-    params.resize(numParams);
-    inputs.resize(numInputs);
-    outputs.resize(numOutputs);
-    lights.resize(numLights);
-}
-
-ossia::net::generic_device& root_dev(){
-    static ossia::net::generic_device dev{
-        std::make_unique<ossia::oscquery::oscquery_server_protocol>(1234, 5678),
-        "VCV-Rack"};
-
-    return dev;
-}
-
-
 } // namespace rack

@@ -1,5 +1,7 @@
 #include "app.hpp"
 
+#include <ossia/network/network.hpp>
+#include <ossia/network/oscquery/oscquery_server.hpp>
 
 namespace rack {
 
@@ -27,5 +29,12 @@ void sceneDestroy() {
 	gScene = NULL;
 }
 
+ossia::net::generic_device& root_dev(){
+    static ossia::net::generic_device dev{
+        std::make_unique<ossia::oscquery::oscquery_server_protocol>(1234, 5678),
+        "VCV-Rack"};
+
+    return dev;
+}
 
 } // namespace rack

@@ -9,6 +9,7 @@
 #include "app.hpp"
 #include "components.hpp"
 #include <iostream>
+#include <sstream>
 
 namespace rack {
 
@@ -24,10 +25,8 @@ Model *createModel(std::string manufacturer, std::string slug, std::string name,
 		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
 			moduleWidget->model = this;
-            
-            // TODO move node creation here
-            
-            node = &ossia::net::create_node(rack::root_dev(),name);
+                        
+            moduleWidget->module->node->set_name(name);
 			return moduleWidget;
 		}
 	};
@@ -47,14 +46,21 @@ Widget *createScrew(Vec pos) {
 }
 
 template <class TParamWidget>
-ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue, std::string name = std::string("")) {
 	ParamWidget *param = new TParamWidget();
 	param->box.pos = pos;
 	param->module = module;
 	param->paramId = paramId;
     
     auto& p = module->params[paramId];
-    auto& p_node = ossia::net::create_node(*module->node,p.name);
+
+    if (name == "")
+    {
+        std::stringstream ss;
+        ss << "param." << paramId;
+        name = ss.str();
+    }
+    auto& p_node = ossia::net::create_node(*module->node, name);
     p.ossia_param = p_node.create_parameter(ossia::val_type::FLOAT);
     p.ossia_param->set_domain(ossia::make_domain(minValue,maxValue));
     p.ossia_param->set_bounding(ossia::bounding_mode::CLIP);
