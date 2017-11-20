@@ -55,9 +55,7 @@ struct MetadataMenu : ListMenu {
 				// Tag list
 				if (!model->tags.empty()) {
 					for (ModelTag tag : model->tags) {
-						if (0 <= tag && tag < NUM_TAGS) {
-							addChild(construct<MenuLabel>(&MenuEntry::text, gTagNames[tag]));
-						}
+						addChild(construct<MenuLabel>(&MenuEntry::text, gTagNames[tag]));
 					}
 					addChild(construct<MenuEntry>());
 				}
@@ -97,10 +95,8 @@ static bool isModelMatch(Model *model, std::string search) {
 	str += " ";
 	str += model->slug;
 	for (ModelTag tag : model->tags) {
-		if (0 <= tag && tag < NUM_TAGS) {
-			str += " ";
-			str += gTagNames[tag];
-		}
+		str += " ";
+		str += gTagNames[tag];
 	}
 	str = tolower(str);
 	search = tolower(search);
