@@ -226,11 +226,22 @@ static int extractZip(const char *filename, const char *dir) {
 static void refreshPurchase(json_t *pluginJ) {
 	json_t *slugJ = json_object_get(pluginJ, "slug");
 	if (!slugJ) return;
-	const char *slug = json_string_value(slugJ);
+	std::string slug = json_string_value(slugJ);
 
 	json_t *nameJ = json_object_get(pluginJ, "name");
 	if (!nameJ) return;
-	const char *name = json_string_value(nameJ);
+	std::string name = json_string_value(nameJ);
+
+	json_t *versionJ = json_object_get(pluginJ, "version");
+	if (!versionJ) return;
+	std::string version = json_string_value(versionJ);
+
+	// Check whether the plugin is already loaded
+	for (Plugin *plugin : gPlugins) {
+		if (plugin->slug == slug && plugin->version == version) {
+			return;
+		}
+	}
 
 	// Append token and version to download URL
 	std::string url = gApiHost;
