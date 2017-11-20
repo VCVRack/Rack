@@ -265,6 +265,7 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 
 		try {
 			// Don't use stream parameters if 0 input or output channels
+			debug("Opening audio stream %d", deviceId);
 			stream.openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
@@ -276,6 +277,7 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		}
 
 		try {
+			debug("Starting audio stream %d", deviceId);
 			stream.startStream();
 		}
 		catch (RtAudioError &e) {
@@ -293,7 +295,9 @@ void AudioInterface::closeDevice() {
 
 	if (stream.isStreamOpen()) {
 		try {
+			debug("Aborting audio stream %d", deviceId);
 			stream.abortStream();
+			debug("Closing audio stream %d", deviceId);
 			stream.closeStream();
 		}
 		catch (RtAudioError &e) {
