@@ -58,11 +58,17 @@ ifeq ($(ARCH), win)
 endif
 
 debug: $(TARGET)
-ifeq ($(ARCH), mac)
-	DYLD_FALLBACK_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
-else
+ifeq ($(ARCH), lin)
 	LD_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
 endif
+ifeq ($(ARCH), mac)
+	DYLD_FALLBACK_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
+endif
+ifeq ($(ARCH), win)
+	# TODO get rid of the mingw64 path
+	env PATH=dep/bin:/mingw64/bin gdb -ex run ./Rack
+endif
+
 
 clean:
 	rm -rfv $(TARGET) build dist
@@ -137,7 +143,7 @@ ifeq ($(ARCH), win)
 	cp dep/bin/librtmidi-4.dll dist/Rack/
 	cp dep/bin/libsamplerate-0.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
-	cp dep/bin/librtaudio-6.dll dist/Rack/
+	cp dep/bin/librtaudio.dll dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 	# Make ZIP
