@@ -109,8 +109,9 @@ static int loadPlugin(std::string path) {
 
 	// Load dynamic/shared library
 #if ARCH_WIN
-	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
 	HINSTANCE handle = LoadLibrary(libraryFilename.c_str());
+	SetErrorMode(0);
 	if (!handle) {
 		int error = GetLastError();
 		warn("Failed to load library %s: %d", libraryFilename.c_str(), error);
