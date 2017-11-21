@@ -58,13 +58,15 @@ endif
 # Library configuration
 ifdef RTAUDIO_ALL_APIS
 ifeq ($(ARCH),mac)
-	RTAUDIO_FLAGS = --with-core --with-jack
+	RTAUDIO_FLAGS = --with-core
+	#--with-jack
 endif
 ifeq ($(ARCH),win)
 	RTAUDIO_FLAGS = --with-asio --with-wasapi --with-ds
 endif
 ifeq ($(ARCH),lin)
-	RTAUDIO_FLAGS = --with-alsa --with-pulse --with-jack
+	RTAUDIO_FLAGS = --with-alsa --with-pulse
+	#--with-jack
 endif
 endif
 
