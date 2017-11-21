@@ -31,7 +31,7 @@ struct AudioInterface : Module {
 
 	RtAudio *stream = NULL;
 	// Stream properties
-	int deviceId = -1;
+	int device = -1;
 	float sampleRate = 44100.0;
 	int blockSize = 256;
 	int numOutputs = 0;
@@ -57,7 +57,7 @@ struct AudioInterface : Module {
 	void stepStream(const float *input, float *output, int numFrames);
 
 	int getDeviceCount();
-	std::string getDeviceName(int deviceId);
+	std::string getDeviceName(int device);
 
 	void openStream();
 	void closeStream();
@@ -101,36 +101,29 @@ struct AudioInterface : Module {
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		if (deviceId >= 0) {
-			std::string deviceName = getDeviceName(deviceId);
-			json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
-			json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
-			json_object_set_new(rootJ, "blockSize", json_integer(blockSize));
-		}
+		json_object_set_new(rootJ, "driver", json_integer(getDriver()));
+		json_object_set_new(rootJ, "device", json_integer(device));
+		json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
+		json_object_set_new(rootJ, "blockSize", json_integer(blockSize));
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
-		json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
-		if (deviceNameJ) {
-			std::string deviceName = json_string_value(deviceNameJ);
-			for (int i = 0; i < getDeviceCount(); i++) {
-				if (deviceName == getDeviceName(i)) {
-					deviceId = i;
-					break;
-				}
-			}
-		}
+		json_t *driverJ = json_object_get(rootJ, "driver");
+		if (driverJ)
+			setDriver(json_number_value(driverJ));
+
+		json_t *deviceJ = json_object_get(rootJ, "device");
+		if (deviceJ)
+			device = json_number_value(deviceJ);
 
 		json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
-		if (sampleRateJ) {
+		if (sampleRateJ)
 			sampleRate = json_number_value(sampleRateJ);
-		}
 
 		json_t *blockSizeJ = json_object_get(rootJ, "blockSize");
-		if (blockSizeJ) {
+		if (blockSizeJ)
 			blockSize = json_integer_value(blockSizeJ);
-		}
 
 		openStream();
 	}
@@ -154,6 +147,7 @@ struct AudioInterface : Module {
 
 
 void AudioInterface::step() {
+	// debug("inputBuffer %d inputSrcBuffer %d outputBuffer %d", inputBuffer.size(), inputSrcBuffer.size(), outputBuffer.size());
 	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
 	if (numOutputs > 0) {
 		TIMED_SLEEP_LOCK(inputSrcBuffer.size() < blockSize, 100e-6, 0.2);
@@ -203,6 +197,9 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 		// Wait for enough input before proceeding
 		TIMED_SLEEP_LOCK(inputSrcBuffer.size() >= numFrames, 100e-6, 0.2);
 	}
+	else if (numInputs > 0) {
+		TIMED_SLEEP_LOCK(outputBuffer.empty(), 100e-6, 0.2);
+	}
 
 	// input stream -> output buffer
 	if (numInputs > 0) {
@@ -244,12 +241,12 @@ int AudioInterface::getDeviceCount() {
 	return stream->getDeviceCount();
 }
 
-std::string AudioInterface::getDeviceName(int deviceId) {
-	if (!stream || deviceId < 0)
+std::string AudioInterface::getDeviceName(int device) {
+	if (!stream || device < 0)
 		return "";
 
 	try {
-		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(deviceId);
+		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(device);
 		return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
 	}
 	catch (RtAudioError &e) {
@@ -266,16 +263,16 @@ static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrame
 }
 
 void AudioInterface::openStream() {
-	int deviceId = this->deviceId;
+	int device = this->device;
 	closeStream();
 	if (!stream)
 		return;
 
 	// Open new device
-	if (deviceId >= 0) {
+	if (device >= 0) {
 		RtAudio::DeviceInfo deviceInfo;
 		try {
-			deviceInfo = stream->getDeviceInfo(deviceId);
+			deviceInfo = stream->getDeviceInfo(device);
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to query audio device: %s", e.what());
@@ -291,11 +288,11 @@ void AudioInterface::openStream() {
 		}
 
 		RtAudio::StreamParameters outParameters;
-		outParameters.deviceId = deviceId;
+		outParameters.deviceId = device;
 		outParameters.nChannels = numOutputs;
 
 		RtAudio::StreamParameters inParameters;
-		inParameters.deviceId = deviceId;
+		inParameters.deviceId = device;
 		inParameters.nChannels = numInputs;
 
 		RtAudio::StreamOptions options;
@@ -311,7 +308,7 @@ void AudioInterface::openStream() {
 
 		try {
 			// Don't use stream parameters if 0 input or output channels
-			debug("Opening audio stream %d", deviceId);
+			debug("Opening audio stream %d", device);
 			stream->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
@@ -323,7 +320,7 @@ void AudioInterface::openStream() {
 		}
 
 		try {
-			debug("Starting audio stream %d", deviceId);
+			debug("Starting audio stream %d", device);
 			stream->startStream();
 		}
 		catch (RtAudioError &e) {
@@ -333,14 +330,14 @@ void AudioInterface::openStream() {
 
 		// Update sample rate because this may have changed
 		this->sampleRate = stream->getStreamSampleRate();
-		this->deviceId = deviceId;
+		this->device = device;
 	}
 }
 
 void AudioInterface::closeStream() {
 	if (stream) {
 		if (stream->isStreamRunning()) {
-			debug("Aborting audio stream %d", deviceId);
+			debug("Aborting audio stream %d", device);
 			try {
 				stream->abortStream();
 			}
@@ -349,7 +346,7 @@ void AudioInterface::closeStream() {
 			}
 		}
 		if (stream->isStreamOpen()) {
-			debug("Closing audio stream %d", deviceId);
+			debug("Closing audio stream %d", device);
 			try {
 				stream->closeStream();
 			}
@@ -360,7 +357,7 @@ void AudioInterface::closeStream() {
 	}
 
 	// Reset stream settings
-	deviceId = -1;
+	device = -1;
 	numOutputs = 0;
 	numInputs = 0;
 
@@ -374,12 +371,12 @@ void AudioInterface::closeStream() {
 
 std::vector<float> AudioInterface::getSampleRates() {
 	std::vector<float> allowedSampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
-	if (!stream || deviceId < 0)
+	if (!stream || device < 0)
 		return allowedSampleRates;
 
 	try {
 		std::vector<float> sampleRates;
-		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(deviceId);
+		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(device);
 		for (int sr : deviceInfo.sampleRates) {
 			float sampleRate = sr;
 			auto allowedIt = std::find(allowedSampleRates.begin(), allowedSampleRates.end(), sampleRate);
@@ -428,9 +425,9 @@ struct AudioDriverChoice : ChoiceButton {
 
 struct AudioDeviceItem : MenuItem {
 	AudioInterface *audioInterface;
-	int deviceId;
+	int device;
 	void onAction(EventAction &e) override {
-		audioInterface->deviceId = deviceId;
+		audioInterface->device = device;
 		audioInterface->openStream();
 	}
 };
@@ -447,23 +444,23 @@ struct AudioDeviceChoice : ChoiceButton {
 		{
 			AudioDeviceItem *audioItem = new AudioDeviceItem();
 			audioItem->audioInterface = audioInterface;
-			audioItem->deviceId = -1;
+			audioItem->device = -1;
 			audioItem->text = "No device";
 			menu->pushChild(audioItem);
 		}
-		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
+		for (int device = 0; device < deviceCount; device++) {
 			AudioDeviceItem *audioItem = new AudioDeviceItem();
 			audioItem->audioInterface = audioInterface;
-			audioItem->deviceId = deviceId;
-			audioItem->text = audioInterface->getDeviceName(deviceId);
+			audioItem->device = device;
+			audioItem->text = audioInterface->getDeviceName(device);
 			menu->pushChild(audioItem);
 		}
 	}
 	void step() override {
-		if (lastDeviceId != audioInterface->deviceId) {
-			std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
+		if (lastDeviceId != audioInterface->device) {
+			std::string name = audioInterface->getDeviceName(audioInterface->device);
 			text = ellipsize(name, 24);
-			lastDeviceId = audioInterface->deviceId;
+			lastDeviceId = audioInterface->device;
 		}
 	}
 };
@@ -546,77 +543,77 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	// addChild(createScrew<ScrewSilver>(Vec(15, 365)));
 	// addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 365)));
 
-	float margin = 5;
+	Vec margin = Vec(5, 2);
 	float labelHeight = 15;
-	float yPos = margin;
+	float yPos = margin.y;
 	float xPos;
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Audio driver";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 
 		AudioDriverChoice *choice = new AudioDriverChoice();
 		choice->audioInterface = module;
-		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 2*margin;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
 		addChild(choice);
-		yPos += choice->box.size.y + margin;
+		yPos += choice->box.size.y + margin.y;
 	}
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Audio device";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 
 		AudioDeviceChoice *choice = new AudioDeviceChoice();
 		choice->audioInterface = module;
-		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 2*margin;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
 		addChild(choice);
-		yPos += choice->box.size.y + margin;
+		yPos += choice->box.size.y + margin.y;
 	}
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Sample rate";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 
 		SampleRateChoice *choice = new SampleRateChoice();
 		choice->audioInterface = module;
-		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 2*margin;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
 		addChild(choice);
-		yPos += choice->box.size.y + margin;
+		yPos += choice->box.size.y + margin.y;
 	}
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Block size";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 
 		BlockSizeChoice *choice = new BlockSizeChoice();
 		choice->audioInterface = module;
-		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 2*margin;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
 		addChild(choice);
-		yPos += choice->box.size.y + margin;
+		yPos += choice->box.size.y + margin.y;
 	}
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Outputs";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 	}
 
 	yPos += 5;
@@ -628,9 +625,9 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 
 	yPos += 5;
 	xPos = 10;
@@ -641,16 +638,16 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Inputs";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 	}
 
 	yPos += 5;
@@ -662,9 +659,9 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 
 	yPos += 5;
 	xPos = 10;
@@ -675,7 +672,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 }
