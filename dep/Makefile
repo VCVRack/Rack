@@ -58,15 +58,13 @@ endif
 # Library configuration
 ifdef RTAUDIO_ALL_APIS
 ifeq ($(ARCH),mac)
-	RTAUDIO_FLAGS = --with-core
-	#--with-jack
+	RTAUDIO_FLAGS = -DAUDIO_OSX_CORE=ON
 endif
 ifeq ($(ARCH),win)
-	RTAUDIO_FLAGS = --with-asio --with-wasapi --with-ds
+	RTAUDIO_FLAGS = -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
 endif
 ifeq ($(ARCH),lin)
-	RTAUDIO_FLAGS = --with-alsa --with-pulse
-	#--with-jack
+	RTAUDIO_FLAGS = -DAUDIO_LINUX_ALSA=ON
 endif
 endif
 
@@ -138,11 +136,11 @@ $(rtmidi):
 	$(MAKE) -C rtmidi-3.0.0 install
 
 $(rtaudio):
-	$(WGET) http://www.music.mcgill.ca/~gary/rtaudio/release/rtaudio-5.0.0.tar.gz
-	$(UNTAR) rtaudio-5.0.0.tar.gz
-	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)" $(RTAUDIO_FLAGS)
-	$(MAKE) -C rtaudio-5.0.0
-	$(MAKE) -C rtaudio-5.0.0 install
+	git clone https://github.com/thestk/rtaudio.git
+	cd rtaudio && mkdir -p cmakebuild
+	cd rtaudio/cmakebuild && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
+	$(MAKE) -C rtaudio/cmakebuild
+	$(MAKE) -C rtaudio/cmakebuild install
 
 clean:
 	git clean -ffdxi
