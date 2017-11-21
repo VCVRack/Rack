@@ -157,8 +157,9 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/librtaudio.so.6 dist/Rack/
 	cp dep/lib/librtmidi.so.4 dist/Rack/
 	mkdir -p dist/Rack/plugins
-	# Make ZIP
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+	# Make ZIP
+	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 
 
