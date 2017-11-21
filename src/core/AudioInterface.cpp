@@ -36,10 +36,6 @@ struct AudioInterface : Module {
 	int blockSize = 256;
 	int numOutputs = 0;
 	int numInputs = 0;
-	bool streamRunning = false;
-
-	// Used because the GUI thread and Rack thread can both interact with this class
-	std::timed_mutex bufferMutex;
 
 	SampleRateConverter<8> inputSrc;
 	SampleRateConverter<8> outputSrc;
@@ -118,18 +114,23 @@ struct AudioInterface : Module {
 void AudioInterface::step() {
 	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
 	if (numOutputs > 0) {
-		while (inputSrcBuffer.size() >= blockSize && streamRunning) {
-			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
+		const float maxTime = 10e-3;
+		const float spinTime = 100e-6;
+		for (float time = 0.0; time < maxTime; time += spinTime) {
+			if (inputSrcBuffer.size() < blockSize)
+				break;
+			std::this_thread::sleep_for(std::chrono::duration<float>(spinTime));
 		}
 	}
 	else if (numInputs > 0) {
-		while (outputBuffer.empty() && streamRunning) {
-			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
+		const float maxTime = 10e-3;
+		const float spinTime = 100e-6;
+		for (float time = 0.0; time < maxTime; time += spinTime) {
+			if (!outputBuffer.empty())
+				break;
+			std::this_thread::sleep_for(std::chrono::duration<float>(spinTime));
 		}
 	}
-
-	if (!bufferMutex.try_lock_for(std::chrono::duration<float>(10e-3)))
-		return;
 
 	// Get input and pass it through the sample rate converter
 	if (numOutputs > 0) {
@@ -160,25 +161,24 @@ void AudioInterface::step() {
 			outputs[AUDIO1_OUTPUT + i].value = 10.0 * f.samples[i];
 		}
 	}
-
-	bufferMutex.unlock();
 }
 
 void AudioInterface::stepStream(const float *input, float *output, int numFrames) {
-	if (gPaused) {
-		memset(output, 0, sizeof(float) * numOutputs * numFrames);
-		return;
-	}
+	// if (gPaused) {
+	// 	memset(output, 0, sizeof(float) * numOutputs * numFrames);
+	// 	return;
+	// }
 
 	if (numOutputs > 0) {
 		// Wait for enough input before proceeding
-		while (inputSrcBuffer.size() < numFrames && streamRunning) {
-			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
+		const float maxTime = 10e-3;
+		const float spinTime = 100e-6;
+		for (float time = 0.0; time < maxTime; time += spinTime) {
+			if (inputSrcBuffer.size() >= numFrames)
+				break;
+			std::this_thread::sleep_for(std::chrono::duration<float>(spinTime));
 		}
 	}
-
-	if (!bufferMutex.try_lock_for(std::chrono::duration<float>(10e-3)))
-		return;
 
 	// input stream -> output buffer
 	if (numInputs > 0) {
@@ -200,15 +200,18 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 	// input buffer -> output stream
 	if (numOutputs > 0) {
 		for (int i = 0; i < numFrames; i++) {
-			if (inputSrcBuffer.empty())
-				break;
-			Frame<8> f = inputSrcBuffer.shift();
+			Frame<8> f;
+			if (inputSrcBuffer.empty()) {
+				memset(&f, 0, sizeof(f));
+			}
+			else {
+				f = inputSrcBuffer.shift();
+			}
 			for (int c = 0; c < numOutputs; c++) {
-				output[i*numOutputs + c] = (c < 8) ? clampf(f.samples[c], -1.0, 1.0) : 0.0;
+				output[i*numOutputs + c] = clampf(f.samples[c], -1.0, 1.0);
 			}
 		}
 	}
-	bufferMutex.unlock();
 }
 
 int AudioInterface::getDeviceCount() {
@@ -238,7 +241,6 @@ static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrame
 
 void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 	closeDevice();
-	std::lock_guard<std::timed_mutex> lock(bufferMutex);
 
 	this->sampleRate = sampleRate;
 	this->blockSize = blockSize;
@@ -266,7 +268,7 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		inParameters.nChannels = numInputs;
 
 		RtAudio::StreamOptions options;
-		// options.flags |= RTAUDIO_SCHEDULE_REALTIME;
+		options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 
 		try {
 			// Don't use stream parameters if 0 input or output channels
@@ -280,8 +282,6 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 			warn("Failed to open audio stream: %s", e.what());
 			return;
 		}
-
-		streamRunning = true;
 
 		try {
 			debug("Starting audio stream %d", deviceId);
@@ -298,10 +298,7 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 }
 
 void AudioInterface::closeDevice() {
-	std::lock_guard<std::timed_mutex> lock(bufferMutex);
-
 	if (stream.isStreamOpen()) {
-		streamRunning = false;
 		try {
 			debug("Aborting audio stream %d", deviceId);
 			stream.abortStream();
