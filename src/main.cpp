@@ -35,13 +35,7 @@ int main(int argc, char* argv[]) {
 	engineInit();
 	guiInit();
 	sceneInit();
-	if (argc >= 2) {
-		// TODO Set gRackWidget->lastPath
-		gRackWidget->loadPatch(argv[1]);
-	}
-	else {
-		gRackWidget->loadPatch(assetLocal("autosave.vcv"));
-	}
+	gRackWidget->loadPatch(assetLocal("autosave.vcv"));
 	settingsLoad(assetLocal("settings.json"));
 
 	engineStart();
