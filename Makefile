@@ -132,6 +132,7 @@ ifeq ($(ARCH), win)
 	mkdir -p dist/Rack
 	cp -R LICENSE* res dist/Rack/
 	cp Rack.exe dist/Rack/
+	strip dist/Rack/Rack.exe
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/zlib1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
