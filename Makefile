@@ -172,6 +172,22 @@ ifeq ($(ARCH), lin)
 endif
 
 
+# Obviously this will only work if you have the private keys to my server
+UPLOAD_URL = vortico@vcvrack.com:files/
+upload: dist distplugins
+ifeq ($(ARCH), mac)
+	rsync dist/*.dmg $(UPLOAD_URL) -zP
+endif
+ifeq ($(ARCH), win)
+	rsync dist/*.exe $(UPLOAD_URL) -P
+	rsync dist/*.zip $(UPLOAD_URL) -P
+endif
+ifeq ($(ARCH), lin)
+	rsync dist/*.zip $(UPLOAD_URL) -zP
+endif
+	rsync plugins/*/dist/*.zip $(UPLOAD_URL) -zP
+
+
 # Plugin helpers
 
 allplugins:
