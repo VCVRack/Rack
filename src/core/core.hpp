@@ -20,6 +20,7 @@ struct MidiToCVWidget : ModuleWidget {
 struct MIDICCToCVWidget : ModuleWidget {
 	MIDICCToCVWidget();
 	void step() override;
+	Menu *createContextMenu() override;
 };
 
 struct MIDIClockToCVWidget : ModuleWidget {
