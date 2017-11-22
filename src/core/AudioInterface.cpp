@@ -8,7 +8,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsuggest-override"
-#include <rtaudio/RtAudio.h>
+#include <RtAudio.h>
 #pragma GCC diagnostic pop
 
 
