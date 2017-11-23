@@ -110,7 +110,7 @@ void MIDITriggerToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	if (status == 0x8) { // note off
 		for (int i = 0; i < NUM_OUTPUTS; i++) {
 			if (data1 == trigger[i].num) {
-				trigger[i].val = data2;
+				trigger[i].val = 0;
 			}
 		}
 		return;
