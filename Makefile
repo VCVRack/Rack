@@ -71,6 +71,7 @@ endif
 
 
 clean:
+	rm -fv libRack.a
 	rm -rfv $(TARGET) build dist
 
 # For Windows resources
