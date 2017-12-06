@@ -86,13 +86,12 @@ $(glew):
 	$(MAKE) -C glew-2.1.0 GLEW_DEST="$(LOCAL)" LIBDIR="$(LOCAL)/lib" install
 
 $(glfw):
-	$(WGET) https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.zip
-	$(UNZIP) glfw-3.2.1.zip
-	cd glfw-3.2.1 && $(CMAKE) . \
+	git clone https://github.com/glfw/glfw.git
+	cd glfw && $(CMAKE) . \
 		-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DBUILD_SHARED_LIBS=ON \
-		-DGLFW_USE_CHDIR=OFF -DGLFW_USE_MENUBAR=ON -DGLFW_USE_RETINA=ON
-	$(MAKE) -C glfw-3.2.1
-	$(MAKE) -C glfw-3.2.1 install
+		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
+	$(MAKE) -C glfw
+	$(MAKE) -C glfw install
 ifeq ($(ARCH),win)
 	# Not sure why the GLFW build system puts a .dll in the lib directory
 	mv "$(LOCAL)/lib/glfw3.dll" "$(LOCAL)/bin/"
