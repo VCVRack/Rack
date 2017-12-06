@@ -86,7 +86,6 @@ $(glew):
 	$(MAKE) -C glew-2.1.0 GLEW_DEST="$(LOCAL)" LIBDIR="$(LOCAL)/lib" install
 
 $(glfw):
-	git clone https://github.com/glfw/glfw.git
 	cd glfw && $(CMAKE) . \
 		-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DBUILD_SHARED_LIBS=ON \
 		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
@@ -131,7 +130,6 @@ $(rtmidi):
 	$(MAKE) -C rtmidi-3.0.0 install
 
 $(rtaudio):
-	git clone https://github.com/thestk/rtaudio.git
 	cd rtaudio && mkdir -p cmakebuild
 	cd rtaudio/cmakebuild && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/cmakebuild
