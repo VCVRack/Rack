@@ -14,7 +14,7 @@
 #define NANOVG_GL_IMPLEMENTATION 1
 #include "../ext/nanovg/src/nanovg_gl.h"
 // Hack to get framebuffer objects working on OpenGL 2 (we blindly assume the extension is supported)
-// #define NANOVG_FBO_VALID 1
+#define NANOVG_FBO_VALID 1
 #include "../ext/nanovg/src/nanovg_gl_utils.h"
 #define BLENDISH_IMPLEMENTATION
 #include "../ext/oui-blendish/blendish.h"
