@@ -60,8 +60,11 @@ void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 json_t *ModuleWidget::toJson() {
 	json_t *rootJ = json_object();
 
-	// manufacturer
+	// plugin
 	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
+	// version (of plugin)
+	if (!model->plugin->version.empty())
+		json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// pos

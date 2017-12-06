@@ -144,6 +144,16 @@ static int loadPlugin(std::string path) {
 	plugin->handle = handle;
 	initCallback(plugin);
 
+	// Reject plugin if slug already exists
+	for (Plugin *p : gPlugins) {
+		if (plugin->slug == p->slug) {
+			warn("Plugin \"%s\" is already loaded, not attempting to load it again");
+			// TODO
+			// Fix memory leak with `plugin` here
+			return -1;
+		}
+	}
+
 	// Add plugin to list
 	gPlugins.push_back(plugin);
 	info("Loaded plugin %s", libraryFilename.c_str());

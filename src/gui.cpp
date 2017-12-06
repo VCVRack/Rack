@@ -8,8 +8,10 @@
 
 #include "../ext/osdialog/osdialog.h"
 
-#define NANOVG_GL2_IMPLEMENTATION
-// #define NANOVG_GL3_IMPLEMENTATION
+#define NANOVG_GL2 1
+// #define NANOVG_GL3 1
+// #define NANOVG_GLES2 1
+#define NANOVG_GL_IMPLEMENTATION 1
 #include "../ext/nanovg/src/nanovg_gl.h"
 // Hack to get framebuffer objects working on OpenGL 2 (we blindly assume the extension is supported)
 #define NANOVG_FBO_VALID 1
@@ -31,7 +33,8 @@ GLFWwindow *gWindow = NULL;
 NVGcontext *gVg = NULL;
 NVGcontext *gFramebufferVg = NULL;
 std::shared_ptr<Font> gGuiFont;
-float gPixelRatio = 0.0;
+float gPixelRatio = 1.0;
+float gWindowRatio = 1.0;
 bool gAllowCursorLock = true;
 int gGuiFrame;
 Vec gMousePos;
@@ -40,7 +43,6 @@ std::string lastWindowTitle;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
-	gScene->box.size = Vec(width, height);
 }
 
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
@@ -143,7 +145,7 @@ void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int m
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	Vec mousePos = Vec(xpos, ypos).round();
+	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
 	Vec mouseRel = mousePos.minus(gMousePos);
 
 #ifdef ARCH_MAC
@@ -353,11 +355,22 @@ void guiInit() {
 	glfwSetWindowSizeLimits(gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
+#if defined NANOVG_GL2
 	gVg = nvgCreateGL2(NVG_ANTIALIAS);
-	// gVg = nvgCreateGL3(NVG_ANTIALIAS);
+#elif defined NANOVG_GL3
+	gVg = nvgCreateGL3(NVG_ANTIALIAS);
+#elif defined NANOVG_GLES2
+	gVg = nvgCreateGLES2(NVG_ANTIALIAS);
+#endif
 	assert(gVg);
 
+#if defined NANOVG_GL2
 	gFramebufferVg = nvgCreateGL2(NVG_ANTIALIAS);
+#elif defined NANOVG_GL3
+	gFramebufferVg = nvgCreateGL3(NVG_ANTIALIAS);
+#elif defined NANOVG_GLES2
+	gFramebufferVg = nvgCreateGLES2(NVG_ANTIALIAS);
+#endif
 	assert(gFramebufferVg);
 
 	// Set up Blendish
@@ -375,20 +388,29 @@ void guiInit() {
 
 void guiDestroy() {
 	gGuiFont.reset();
+
+#if defined NANOVG_GL2
 	nvgDeleteGL2(gVg);
-	// nvgDeleteGL3(gVg);
+#elif defined NANOVG_GL3
+	nvgDeleteGL3(gVg);
+#elif defined NANOVG_GLES2
+	nvgDeleteGLES2(gVg);
+#endif
+
+#if defined NANOVG_GL2
 	nvgDeleteGL2(gFramebufferVg);
+#elif defined NANOVG_GL3
+	nvgDeleteGL3(gFramebufferVg);
+#elif defined NANOVG_GLES2
+	nvgDeleteGLES2(gFramebufferVg);
+#endif
+
 	glfwDestroyWindow(gWindow);
 	glfwTerminate();
 }
 
 void guiRun() {
 	assert(gWindow);
-	{
-		int width, height;
-		glfwGetWindowSize(gWindow, &width, &height);
-		windowSizeCallback(gWindow, width, height);
-	}
 	gGuiFrame = 0;
 	while(!glfwWindowShouldClose(gWindow)) {
 		double startTime = glfwGetTime();
@@ -417,17 +439,24 @@ void guiRun() {
 			lastWindowTitle = windowTitle;
 		}
 
-		// Get framebuffer size
-		int width, height;
-		glfwGetFramebufferSize(gWindow, &width, &height);
-		int windowWidth, windowHeight;
-		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
-		float pixelRatio = (float)width / windowWidth;
+		// Get desired scaling
+		float pixelRatio;
+		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
+		pixelRatio = roundf(pixelRatio);
 		if (pixelRatio != gPixelRatio) {
 			EventZoom eZoom;
 			gScene->onZoom(eZoom);
 			gPixelRatio = pixelRatio;
 		}
+
+		// Get framebuffer/window ratio
+		int width, height;
+		glfwGetFramebufferSize(gWindow, &width, &height);
+		int windowWidth, windowHeight;
+		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
+		gWindowRatio = (float)width / windowWidth;
+
+		gScene->box.size = Vec(width, height).div(gPixelRatio / gWindowRatio);
 
 		// Step scene
 		gScene->step();

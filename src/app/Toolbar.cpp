@@ -151,12 +151,13 @@ Toolbar::Toolbar() {
 		struct ZoomSlider : Slider {
 			void onAction(EventAction &e) override {
 				Slider::onAction(e);
-				gRackScene->zoomWidget->setZoom(value / 100.0);
+				gRackScene->zoomWidget->setZoom(roundf(value) / 100.0);
 			}
 		};
 		zoomSlider = new ZoomSlider();
 		zoomSlider->box.pos = Vec(xPos, margin);
 		zoomSlider->box.size.x = 150;
+		zoomSlider->precision = 0;
 		zoomSlider->label = "Zoom";
 		zoomSlider->unit = "%";
 		zoomSlider->setLimits(25.0, 200.0);

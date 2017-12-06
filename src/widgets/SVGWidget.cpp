@@ -59,16 +59,19 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 	for (NSVGshape *shape = svg->shapes; shape; shape = shape->next, shapeIndex++) {
 		DEBUG_ONLY(printf("	new shape: %d id \"%s\", fillrule %d, from (%f, %f) to (%f, %f)\n", shapeIndex, shape->id, shape->fillRule, shape->bounds[0], shape->bounds[1], shape->bounds[2], shape->bounds[3]);)
 
+		// Visibility
 		if (!(shape->flags & NSVG_FLAGS_VISIBLE))
 			continue;
 
 		nvgSave(vg);
 
+		// Opacity
 		if (shape->opacity < 1.0)
 			nvgGlobalAlpha(vg, shape->opacity);
 
 		// Build path
 		nvgBeginPath(vg);
+
 		// Iterate path linked list
 		for (NSVGpath *path = shape->paths; path; path = path->next) {
 			DEBUG_ONLY(printf("		new path: %d points, %s, from (%f, %f) to (%f, %f)\n", path->npts, path->closed ? "closed" : "open", path->bounds[0], path->bounds[1], path->bounds[2], path->bounds[3]);)
@@ -81,6 +84,7 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 				DEBUG_ONLY(printf("			bezier (%f, %f) to (%f, %f)\n", p[-2], p[-1], p[4], p[5]);)
 			}
 
+			// Close path
 			if (path->closed)
 				nvgClosePath(vg);
 
@@ -161,11 +165,12 @@ static void drawSVG(NVGcontext *vg, NSVGimage *svg) {
 		}
 
 		// Stroke shape
-		nvgStrokeWidth(vg, shape->strokeWidth);
-		// strokeDashOffset, strokeDashArray, strokeDashCount not yet supported
-		// strokeLineJoin, strokeLineCap not yet supported
-
 		if (shape->stroke.type) {
+			nvgStrokeWidth(vg, shape->strokeWidth);
+			// strokeDashOffset, strokeDashArray, strokeDashCount not yet supported
+			nvgLineCap(vg, (NVGlineCap) shape->strokeLineCap);
+			nvgLineJoin(vg, (int) shape->strokeLineJoin);
+
 			switch (shape->stroke.type) {
 				case NSVG_PAINT_COLOR: {
 					NVGcolor color = getNVGColor(shape->stroke.color);

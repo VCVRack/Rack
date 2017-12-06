@@ -86,17 +86,11 @@ $(glew):
 	$(MAKE) -C glew-2.1.0 GLEW_DEST="$(LOCAL)" LIBDIR="$(LOCAL)/lib" install
 
 $(glfw):
-	$(WGET) https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.zip
-	$(UNZIP) glfw-3.2.1.zip
-	cd glfw-3.2.1 && $(CMAKE) . \
+	cd glfw && $(CMAKE) . \
 		-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DBUILD_SHARED_LIBS=ON \
-		-DGLFW_USE_CHDIR=OFF -DGLFW_USE_MENUBAR=ON -DGLFW_USE_RETINA=ON
-	$(MAKE) -C glfw-3.2.1
-	$(MAKE) -C glfw-3.2.1 install
-ifeq ($(ARCH),win)
-	# Not sure why the GLFW build system puts a .dll in the lib directory
-	mv "$(LOCAL)/lib/glfw3.dll" "$(LOCAL)/bin/"
-endif
+		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
+	$(MAKE) -C glfw
+	$(MAKE) -C glfw install
 
 $(jansson):
 	$(WGET) http://www.digip.org/jansson/releases/jansson-2.10.tar.gz
@@ -136,7 +130,6 @@ $(rtmidi):
 	$(MAKE) -C rtmidi-3.0.0 install
 
 $(rtaudio):
-	git clone https://github.com/thestk/rtaudio.git
 	cd rtaudio && mkdir -p cmakebuild
 	cd rtaudio/cmakebuild && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/cmakebuild
