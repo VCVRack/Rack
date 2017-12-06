@@ -33,7 +33,8 @@ GLFWwindow *gWindow = NULL;
 NVGcontext *gVg = NULL;
 NVGcontext *gFramebufferVg = NULL;
 std::shared_ptr<Font> gGuiFont;
-float gPixelRatio = 0.0;
+float gPixelRatio = 1.0;
+float gWindowRatio = 1.0;
 bool gAllowCursorLock = true;
 int gGuiFrame;
 Vec gMousePos;
@@ -42,7 +43,6 @@ std::string lastWindowTitle;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
-	gScene->box.size = Vec(width, height);
 }
 
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
@@ -145,7 +145,7 @@ void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int m
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	Vec mousePos = Vec(xpos, ypos).round();
+	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
 	Vec mouseRel = mousePos.minus(gMousePos);
 
 #ifdef ARCH_MAC
@@ -411,11 +411,6 @@ void guiDestroy() {
 
 void guiRun() {
 	assert(gWindow);
-	{
-		int width, height;
-		glfwGetWindowSize(gWindow, &width, &height);
-		windowSizeCallback(gWindow, width, height);
-	}
 	gGuiFrame = 0;
 	while(!glfwWindowShouldClose(gWindow)) {
 		double startTime = glfwGetTime();
@@ -444,7 +439,7 @@ void guiRun() {
 			lastWindowTitle = windowTitle;
 		}
 
-		// Get framebuffer size
+		// Get desired scaling
 		float pixelRatio;
 		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
 		pixelRatio = roundf(pixelRatio);
@@ -453,6 +448,15 @@ void guiRun() {
 			gScene->onZoom(eZoom);
 			gPixelRatio = pixelRatio;
 		}
+
+		// Get framebuffer/window ratio
+		int width, height;
+		glfwGetFramebufferSize(gWindow, &width, &height);
+		int windowWidth, windowHeight;
+		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
+		gWindowRatio = (float)width / windowWidth;
+
+		gScene->box.size = Vec(width, height).div(gPixelRatio / gWindowRatio);
 
 		// Step scene
 		gScene->step();
