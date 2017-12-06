@@ -69,8 +69,14 @@ ifeq ($(ARCH), win)
 	env PATH=dep/bin:/mingw64/bin gdb -ex run ./Rack
 endif
 
+perf: $(TARGET)
+ifeq ($(ARCH), lin)
+	LD_LIBRARY_PATH=dep/lib perf record --call-graph dwarf ./Rack
+endif
+
 
 clean:
+	rm -fv libRack.a
 	rm -rfv $(TARGET) build dist
 
 # For Windows resources
@@ -106,7 +112,6 @@ ifeq ($(ARCH), mac)
 	cp dep/lib/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libzip.5.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/librtaudio.dylib $(BUNDLE)/Contents/MacOS/
 
@@ -116,7 +121,6 @@ ifeq ($(ARCH), mac)
 	install_name_tool -change $(PWD)/dep/lib/libsamplerate.0.dylib @executable_path/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libcurl.4.dylib @executable_path/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libzip.5.dylib @executable_path/libzip.5.dylib $(BUNDLE)/Contents/MacOS/Rack
-	install_name_tool -change $(PWD)/dep/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/librtmidi.4.dylib @executable_path/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change librtaudio.dylib @executable_path/librtaudio.dylib $(BUNDLE)/Contents/MacOS/Rack
 

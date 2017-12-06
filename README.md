@@ -51,6 +51,8 @@ You may use make's `-j$(nproc)` flag to parallelize builds across all your CPU c
 
 	make dep
 
+You may use `make dep RTAUDIO_ALL_APIS=1` to attempt to build with all audio driver APIs enabled for your operating system.
+
 You should see a message that all dependencies built successfully.
 
 Build Rack.

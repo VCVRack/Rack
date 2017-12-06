@@ -445,11 +445,9 @@ void guiRun() {
 		}
 
 		// Get framebuffer size
-		int width, height;
-		glfwGetFramebufferSize(gWindow, &width, &height);
-		int windowWidth, windowHeight;
-		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
-		float pixelRatio = (float)width / windowWidth;
+		float pixelRatio;
+		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
+		pixelRatio = roundf(pixelRatio);
 		if (pixelRatio != gPixelRatio) {
 			EventZoom eZoom;
 			gScene->onZoom(eZoom);

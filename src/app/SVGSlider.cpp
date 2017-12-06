@@ -23,7 +23,7 @@ void SVGSlider::step() {
 
 void SVGSlider::onChange(EventChange &e) {
 	dirty = true;
-	ParamWidget::onChange(e);
+	Knob::onChange(e);
 }
 
 

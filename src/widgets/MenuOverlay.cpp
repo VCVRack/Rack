@@ -13,10 +13,12 @@ void MenuOverlay::step() {
 	}
 }
 
-void MenuOverlay::onDragDrop(EventDragDrop &e) {
-	if (e.origin == this) {
+void MenuOverlay::onMouseDown(EventMouseDown &e) {
+	Widget::onMouseDown(e);
+	if (!e.consumed) {
 		// deletes `this`
 		gScene->setOverlay(NULL);
+		e.consumed = true;
 	}
 }
 
