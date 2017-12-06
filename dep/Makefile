@@ -92,10 +92,6 @@ $(glfw):
 		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
 	$(MAKE) -C glfw
 	$(MAKE) -C glfw install
-ifeq ($(ARCH),win)
-	# Not sure why the GLFW build system puts a .dll in the lib directory
-	mv "$(LOCAL)/lib/glfw3.dll" "$(LOCAL)/bin/"
-endif
 
 $(jansson):
 	$(WGET) http://www.digip.org/jansson/releases/jansson-2.10.tar.gz
