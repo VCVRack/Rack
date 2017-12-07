@@ -148,11 +148,13 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
 	Vec mouseRel = mousePos.minus(gMousePos);
 
+	int cursorMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
+	(void) cursorMode;
+
 #ifdef ARCH_MAC
 	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
-	int mouseMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
-	if (mouseMode == GLFW_CURSOR_HIDDEN) {
+	if (cursorMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
 		glfwSetCursorPos(gWindow, gMousePos.x, gMousePos.y);
 		CGAssociateMouseAndMouseCursorPosition(true);
@@ -313,12 +315,15 @@ void guiInit() {
 		exit(1);
 	}
 
+#if defined NANOVG_GL2
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#elif defined NANOVG_GL3
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	lastWindowTitle = "";
@@ -334,6 +339,7 @@ void guiInit() {
 
 	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
 	glfwSetMouseButtonCallback(gWindow, mouseButtonStickyCallback);
+	// Call this ourselves, but on every frame instead of only when the mouse moves
 	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
 	glfwSetCursorEnterCallback(gWindow, cursorEnterCallback);
 	glfwSetScrollCallback(gWindow, scrollCallback);
