@@ -23,7 +23,6 @@ struct SVGPanel;
 // A 1U module should be 15x380. Thus the width of a module should be a factor of 15.
 #define RACK_GRID_WIDTH 15
 #define RACK_GRID_HEIGHT 380
-
 static const Vec RACK_GRID_SIZE = Vec(15, 380);
 
 
