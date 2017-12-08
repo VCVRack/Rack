@@ -178,6 +178,7 @@ struct ZoomWidget : Widget {
 	void onMouseMove(EventMouseMove &e) override;
 	void onHoverKey(EventHoverKey &e) override;
 	void onScroll(EventScroll &e) override;
+	void onPathDrop(EventPathDrop &e) override;
 };
 
 ////////////////////
