@@ -117,7 +117,7 @@ void MIDICCToCVInterface::resetMidi() {
 	for (int i = 0; i < NUM_OUTPUTS; i++) {
 		cc[i].val = 0;
 		cc[i].resetSync();
-		cc[i].tSmooth.set(0,0);
+		cc[i].tSmooth.set(0, 0);
 	}
 };
 
@@ -147,7 +147,8 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 					cc[i].syncFirst = false;
 					if (data2 < cc[i].val + 2 && data2 > cc[i].val - 2) {
 						cc[i].sync = 0;
-					}else {
+					}
+					else {
 						cc[i].sync = absi(data2 - cc[i].val);
 					}
 					return;
@@ -156,7 +157,8 @@ void MIDICCToCVInterface::processMidi(std::vector<unsigned char> msg) {
 				if (cc[i].sync == 0) {
 					cc[i].val = data2;
 					cc[i].changed = true;
-				} else {
+				}
+				else {
 					cc[i].sync = absi(data2 - cc[i].val);
 				}
 			}
@@ -225,12 +227,14 @@ void CCTextField::onTextChange() {
 				text = "";
 				begin = end = 0;
 				module->cc[outNum].num = -1;
-			} else {
+			}
+			else {
 				module->cc[outNum].num = num;
 				module->cc[outNum].resetSync();
 			}
 
-		} catch (...) {
+		}
+		catch (...) {
 			text = "";
 			begin = end = 0;
 			module->cc[outNum].num = -1;
@@ -309,7 +313,8 @@ MIDICCToCVWidget::MIDICCToCVWidget() {
 
 		if ((i + 1) % 4 == 0) {
 			yPos += 47 + margin;
-		} else {
+		}
+		else {
 			yPos -= labelHeight + margin;
 		}
 	}

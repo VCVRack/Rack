@@ -9,6 +9,7 @@
 
 using namespace rack;
 
+
 struct IgnoreFlags {
 	bool midiSysex = true;
 	bool midiTime = true;
@@ -20,7 +21,6 @@ struct MidiMessage {
 	double timeStamp;
 
 	MidiMessage() : bytes(0), timeStamp(0.0) {};
-
 };
 
 /**
@@ -135,10 +135,10 @@ struct TransitionSmoother {
 		switch (m) {
 		case DELTA:
 			/* If the change is smaller, the transition phase is longer */
-			this->step = delta > 0 ?  delta/l :  -delta/l;
+			this->step = delta > 0 ?  delta / l :  -delta / l;
 			break;
 		case CONST:
-			this->step = 1.0/l;
+			this->step = 1.0 / l;
 			break;
 		}
 
@@ -153,13 +153,13 @@ struct TransitionSmoother {
 
 		switch (t) {
 		case SMOOTHSTEP:
-			next += delta*x*x*(3-2*x);
+			next += delta * x * x * (3 - 2 * x);
 			break;
 		case EXP:
-			next += delta*x*x;
+			next += delta * x * x;
 			break;
 		case LIN:
-			next += delta*x;
+			next += delta * x;
 			break;
 		}
 

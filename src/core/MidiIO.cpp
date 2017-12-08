@@ -59,7 +59,8 @@ std::vector<std::string> MidiIO::getDevices() {
 	RtMidiIn *m;
 	try {
 		m = new RtMidiIn();
-	} catch (RtMidiError &error) {
+	}
+	catch (RtMidiError &error) {
 		warn("Failed to create RtMidiIn: %s", error.getMessage().c_str());
 		return names;
 	}

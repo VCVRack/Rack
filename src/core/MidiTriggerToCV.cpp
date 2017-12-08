@@ -169,10 +169,12 @@ void TriggerTextField::onTextChange() {
 				text = "";
 				begin = end = 0;
 				module->trigger[outNum].num = -1;
-			}else {
+			}
+			else {
 				module->trigger[outNum].num = num;
 			}
-		} catch (...) {
+		}
+		catch (...) {
 			text = "";
 			begin = end = 0;
 			module->trigger[outNum].num = -1;
@@ -271,7 +273,8 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 
 		if ((i + 1) % 4 == 0) {
 			yPos += 47 + margin;
-		} else {
+		}
+		else {
 			yPos -= labelHeight + margin;
 		}
 	}

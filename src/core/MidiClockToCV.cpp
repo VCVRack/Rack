@@ -71,7 +71,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 
 	void resetMidi() override;
 
-	json_t *toJson()  override{
+	json_t *toJson()  override {
 		json_t *rootJ = json_object();
 		addBaseJson(rootJ);
 		json_object_set_new(rootJ, "clock1ratio", json_integer(clock1ratio));
@@ -79,7 +79,7 @@ struct MIDIClockToCVInterface : MidiIO, Module {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ)  override{
+	void fromJson(json_t *rootJ)  override {
 		baseFromJson(rootJ);
 		json_t *c1rJ = json_object_get(rootJ, "clock1ratio");
 		if (c1rJ) {
@@ -185,18 +185,18 @@ void MIDIClockToCVInterface::resetMidi() {
 void MIDIClockToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	switch (msg[0]) {
-		case 0xfa:
-			start = true;
-			break;
-		case 0xfb:
-			cont = true;
-			break;
-		case 0xfc:
-			stop = true;
-			break;
-		case 0xf8:
-			tick = true;
-			break;
+	case 0xfa:
+		start = true;
+		break;
+	case 0xfb:
+		cont = true;
+		break;
+	case 0xfc:
+		stop = true;
+		break;
+	case 0xf8:
+		tick = true;
+		break;
 	}
 
 
@@ -218,13 +218,15 @@ struct ClockRatioItem : MenuItem {
 struct ClockRatioChoice : ChoiceButton {
 	int *clockRatio;
 	const std::vector<std::string> ratioNames = {"Sixteenth note (1:4 ratio)", "Eighth note triplet (1:3 ratio)",
-												 "Eighth note (1:2 ratio)", "Quarter note triplet (2:3 ratio)",
-												 "Quarter note (tap speed)", "Half note triplet (4:3 ratio)",
-												 "Half note (2:1 ratio)", "Whole note (4:1 ratio)",
-												 "Two whole notes (8:1 ratio)"};
+	                                             "Eighth note (1:2 ratio)", "Quarter note triplet (2:3 ratio)",
+	                                             "Quarter note (tap speed)", "Half note triplet (4:3 ratio)",
+	                                             "Half note (2:1 ratio)", "Whole note (4:1 ratio)",
+	                                             "Two whole notes (8:1 ratio)"
+	                                            };
 
 	const std::vector<std::string> ratioNames_short = {"1:4 ratio", "1:3 ratio", "1:2 ratio", "2:3 ratio", "1:1 ratio",
-													   "4:3", "2:1 ratio", "4:1 ratio", "8:1 ratio"};
+	                                                   "4:3", "2:1 ratio", "4:1 ratio", "8:1 ratio"
+	                                                  };
 
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
@@ -270,7 +272,7 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		label->box.pos = Vec(box.size.x - margin - 7 * 15, margin);
 		label->text = "MIDI Clk-CV";
 		addChild(label);
-		yPos = labelHeight*2;
+		yPos = labelHeight * 2;
 	}
 
 	{
@@ -320,8 +322,8 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		addInput(createInput<PJ3410Port>(Vec(margin, yPos - 5), module, MIDIClockToCVInterface::CLOCK1_RATIO));
 		ClockRatioChoice *ratioChoice = new ClockRatioChoice();
 		ratioChoice->clockRatio = &module->clock1ratio;
-		ratioChoice->box.pos = Vec(int(box.size.x/3), yPos);
-		ratioChoice->box.size.x = int(box.size.x/1.5 - margin);
+		ratioChoice->box.pos = Vec(int(box.size.x / 3), yPos);
+		ratioChoice->box.size.x = int(box.size.x / 1.5 - margin);
 
 		addChild(ratioChoice);
 		yPos += ratioChoice->box.size.y + margin * 3;
@@ -344,8 +346,8 @@ MIDIClockToCVWidget::MIDIClockToCVWidget() {
 		addInput(createInput<PJ3410Port>(Vec(margin, yPos - 5), module, MIDIClockToCVInterface::CLOCK2_RATIO));
 		ClockRatioChoice *ratioChoice = new ClockRatioChoice();
 		ratioChoice->clockRatio = &module->clock2ratio;
-		ratioChoice->box.pos = Vec(int(box.size.x/3), yPos);
-		ratioChoice->box.size.x = int(box.size.x/1.5 - margin);
+		ratioChoice->box.pos = Vec(int(box.size.x / 3), yPos);
+		ratioChoice->box.size.x = int(box.size.x / 1.5 - margin);
 
 		addChild(ratioChoice);
 		yPos += ratioChoice->box.size.y + margin * 3;
