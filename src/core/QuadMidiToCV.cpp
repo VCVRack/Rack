@@ -1,9 +1,9 @@
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
+
 
 struct MidiKey {
 	int pitch = 60;
@@ -254,7 +254,7 @@ struct ModeItem : MenuItem {
 	int mode;
 	QuadMIDIToCVInterface *module;
 
-	void onAction(EventAction &e) {
+	void onAction(EventAction &e) override {
 		module->setMode(mode);
 	}
 };
@@ -264,7 +264,7 @@ struct ModeChoice : ChoiceButton {
 	const std::vector<std::string> modeNames = {"ROTATE", "RESET", "REASSIGN"};
 
 
-	void onAction(EventAction &e) {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
@@ -274,11 +274,11 @@ struct ModeChoice : ChoiceButton {
 			modeItem->mode = i;
 			modeItem->module = module;
 			modeItem->text = modeNames[i];
-			menu->pushChild(modeItem);
+			menu->addChild(modeItem);
 		}
 	}
 
-	void step() {
+	void step() override {
 		text = modeNames[module->getMode()];
 	}
 };

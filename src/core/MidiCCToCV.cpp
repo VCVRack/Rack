@@ -1,8 +1,8 @@
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
+
 
 struct CCValue {
 	int val = 0; // Controller value

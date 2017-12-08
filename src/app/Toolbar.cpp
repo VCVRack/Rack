@@ -43,11 +43,11 @@ struct FileChoice : ChoiceButton {
 		menu->box.size.x = box.size.x;
 
 		{
-			menu->pushChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, GUI_MOD_KEY_NAME "+N"));
-			menu->pushChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, GUI_MOD_KEY_NAME "+O"));
-			menu->pushChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, GUI_MOD_KEY_NAME "+S"));
-			menu->pushChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Shift+S"));
-			menu->pushChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Q"));
+			menu->addChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, GUI_MOD_KEY_NAME "+N"));
+			menu->addChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, GUI_MOD_KEY_NAME "+O"));
+			menu->addChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, GUI_MOD_KEY_NAME "+S"));
+			menu->addChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Shift+S"));
+			menu->addChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Q"));
 		}
 	}
 };
@@ -75,7 +75,7 @@ struct SampleRateChoice : ChoiceButton {
 
 		PauseItem *pauseItem = new PauseItem();
 		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
-		menu->pushChild(pauseItem);
+		menu->addChild(pauseItem);
 
 		float sampleRates[] = {44100, 48000, 88200, 96000, 176400, 192000};
 		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
@@ -83,7 +83,7 @@ struct SampleRateChoice : ChoiceButton {
 			SampleRateItem *item = new SampleRateItem();
 			item->text = stringf("%.0f Hz", sampleRates[i]);
 			item->sampleRate = sampleRates[i];
-			menu->pushChild(item);
+			menu->addChild(item);
 		}
 	}
 	void step() override {
