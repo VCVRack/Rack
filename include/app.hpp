@@ -74,14 +74,11 @@ struct ModuleWidget : OpaqueWidget {
 	void onDragMove(EventDragMove &e) override;
 };
 
-struct ValueLight;
 struct WireWidget : OpaqueWidget {
 	Port *outputPort = NULL;
 	Port *inputPort = NULL;
 	Port *hoveredOutputPort = NULL;
 	Port *hoveredInputPort = NULL;
-	ValueLight *inputLight;
-	ValueLight *outputLight;
 	Wire *wire = NULL;
 	NVGcolor color;
 
@@ -227,14 +224,14 @@ struct SVGKnob : virtual Knob, FramebufferWidget {
 	void onChange(EventChange &e) override;
 };
 
-struct SVGSlider : Knob, FramebufferWidget {
+struct SVGFader : Knob, FramebufferWidget {
 	/** Intermediate positions will be interpolated between these positions */
 	Vec minHandlePos, maxHandlePos;
 	/** Not owned */
 	SVGWidget *background;
 	SVGWidget *handle;
 
-	SVGSlider();
+	SVGFader();
 	void step() override;
 	void onChange(EventChange &e) override;
 };
@@ -271,6 +268,8 @@ struct MomentarySwitch : virtual Switch {
 	void randomize() override {}
 	void onDragStart(EventDragStart &e) override {
 		setValue(maxValue);
+		EventAction eAction;
+		onAction(eAction);
 	}
 	void onDragEnd(EventDragEnd &e) override {
 		setValue(minValue);
@@ -285,6 +284,8 @@ struct LightWidget : TransparentWidget {
 	NVGcolor bgColor = nvgRGBf(0, 0, 0);
 	NVGcolor color = nvgRGBf(1, 1, 1);
 	void draw(NVGcontext *vg) override;
+	virtual void drawLight(NVGcontext *vg);
+	virtual void drawHalo(NVGcontext *vg);
 };
 
 /** Mixes a list of colors based on a list of brightness values */
