@@ -1,9 +1,9 @@
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
+
 
 using namespace rack;
 

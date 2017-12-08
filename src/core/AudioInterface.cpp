@@ -414,7 +414,7 @@ struct AudioDriverChoice : ChoiceButton {
 			audioItem->audioInterface = audioInterface;
 			audioItem->driver = driver;
 			audioItem->text = audioInterface->getDriverName(driver);
-			menu->pushChild(audioItem);
+			menu->addChild(audioItem);
 		}
 	}
 	void step() override {
@@ -446,14 +446,14 @@ struct AudioDeviceChoice : ChoiceButton {
 			audioItem->audioInterface = audioInterface;
 			audioItem->device = -1;
 			audioItem->text = "No device";
-			menu->pushChild(audioItem);
+			menu->addChild(audioItem);
 		}
 		for (int device = 0; device < deviceCount; device++) {
 			AudioDeviceItem *audioItem = new AudioDeviceItem();
 			audioItem->audioInterface = audioInterface;
 			audioItem->device = device;
 			audioItem->text = audioInterface->getDeviceName(device);
-			menu->pushChild(audioItem);
+			menu->addChild(audioItem);
 		}
 	}
 	void step() override {
@@ -487,7 +487,7 @@ struct SampleRateChoice : ChoiceButton {
 			item->audioInterface = audioInterface;
 			item->sampleRate = sampleRate;
 			item->text = stringf("%.0f Hz", sampleRate);
-			menu->pushChild(item);
+			menu->addChild(item);
 		}
 	}
 	void step() override {
@@ -519,7 +519,7 @@ struct BlockSizeChoice : ChoiceButton {
 			item->audioInterface = audioInterface;
 			item->blockSize = blockSizes[i];
 			item->text = stringf("%d", blockSizes[i]);
-			menu->pushChild(item);
+			menu->addChild(item);
 		}
 	}
 	void step() override {

@@ -1,6 +1,10 @@
 #include <unordered_map>
 #include "rack.hpp"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsuggest-override"
 #include "rtmidi/RtMidi.h"
+#pragma GCC diagnostic pop
 
 
 using namespace rack;

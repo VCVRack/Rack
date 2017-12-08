@@ -282,36 +282,36 @@ Menu *ModuleWidget::createContextMenu() {
 
 	MenuLabel *menuLabel = new MenuLabel();
 	menuLabel->text = model->manufacturer + " " + model->name;
-	menu->pushChild(menuLabel);
+	menu->addChild(menuLabel);
 
 	ResetMenuItem *resetItem = new ResetMenuItem();
 	resetItem->text = "Initialize";
 	resetItem->rightText = GUI_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;
-	menu->pushChild(resetItem);
+	menu->addChild(resetItem);
 
 	RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
 	randomizeItem->text = "Randomize";
 	randomizeItem->rightText = GUI_MOD_KEY_NAME "+R";
 	randomizeItem->moduleWidget = this;
-	menu->pushChild(randomizeItem);
+	menu->addChild(randomizeItem);
 
 	DisconnectMenuItem *disconnectItem = new DisconnectMenuItem();
 	disconnectItem->text = "Disconnect cables";
 	disconnectItem->moduleWidget = this;
-	menu->pushChild(disconnectItem);
+	menu->addChild(disconnectItem);
 
 	CloneMenuItem *cloneItem = new CloneMenuItem();
 	cloneItem->text = "Duplicate";
 	cloneItem->rightText = GUI_MOD_KEY_NAME "+D";
 	cloneItem->moduleWidget = this;
-	menu->pushChild(cloneItem);
+	menu->addChild(cloneItem);
 
 	DeleteMenuItem *deleteItem = new DeleteMenuItem();
 	deleteItem->text = "Delete";
 	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;
-	menu->pushChild(deleteItem);
+	menu->addChild(deleteItem);
 
 	return menu;
 }

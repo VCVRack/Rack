@@ -1,9 +1,9 @@
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
+
 
 using namespace rack;
 
@@ -236,7 +236,7 @@ struct ClockRatioChoice : ChoiceButton {
 			clockRatioItem->ratio = ratio;
 			clockRatioItem->clockRatio = clockRatio;
 			clockRatioItem->text = ratioNames[ratio];
-			menu->pushChild(clockRatioItem);
+			menu->addChild(clockRatioItem);
 		}
 	}
 

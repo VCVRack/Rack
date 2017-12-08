@@ -1,8 +1,8 @@
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
+
 
 using namespace rack;
 
@@ -209,7 +209,7 @@ void MidiChoice::onAction(EventAction &e) {
 		MidiItem *midiItem = new MidiItem();
 		midiItem->midiModule = midiModule;
 		midiItem->text = "";
-		menu->pushChild(midiItem);
+		menu->addChild(midiItem);
 	}
 
 	std::vector<std::string> deviceNames = midiModule->getDevices();
@@ -217,7 +217,7 @@ void MidiChoice::onAction(EventAction &e) {
 		MidiItem *midiItem = new MidiItem();
 		midiItem->midiModule = midiModule;
 		midiItem->text = deviceNames[i];
-		menu->pushChild(midiItem);
+		menu->addChild(midiItem);
 	}
 }
 
@@ -245,14 +245,14 @@ void ChannelChoice::onAction(EventAction &e) {
 		channelItem->midiModule = midiModule;
 		channelItem->channel = -1;
 		channelItem->text = "All";
-		menu->pushChild(channelItem);
+		menu->addChild(channelItem);
 	}
 	for (int channel = 0; channel < 16; channel++) {
 		ChannelItem *channelItem = new ChannelItem();
 		channelItem->midiModule = midiModule;
 		channelItem->channel = channel;
 		channelItem->text = stringf("%d", channel + 1);
-		menu->pushChild(channelItem);
+		menu->addChild(channelItem);
 	}
 }
 
