@@ -65,5 +65,12 @@ void ZoomWidget::onScroll(EventScroll &e) {
 	e.pos = pos;
 }
 
+void ZoomWidget::onPathDrop(EventPathDrop &e) {
+	Vec pos = e.pos;
+	e.pos = e.pos.div(zoom);
+	Widget::onPathDrop(e);
+	e.pos = pos;
+}
+
 
 } // namespace rack
