@@ -4,7 +4,7 @@
 namespace rack {
 
 
-SVGSlider::SVGSlider() {
+SVGFader::SVGFader() {
 	background = new SVGWidget();
 	addChild(background);
 
@@ -12,7 +12,7 @@ SVGSlider::SVGSlider() {
 	addChild(handle);
 }
 
-void SVGSlider::step() {
+void SVGFader::step() {
 	if (dirty) {
 		// Update handle position
 		Vec handlePos = Vec(rescalef(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), rescalef(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
@@ -21,7 +21,7 @@ void SVGSlider::step() {
 	FramebufferWidget::step();
 }
 
-void SVGSlider::onChange(EventChange &e) {
+void SVGFader::onChange(EventChange &e) {
 	dirty = true;
 	Knob::onChange(e);
 }
