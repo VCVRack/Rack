@@ -18,7 +18,7 @@ void Knob::onDragStart(EventDragStart &e) {
 
 void Knob::onDragMove(EventDragMove &e) {
 	// Drag slower if Mod
-	float delta = KNOB_SENSITIVITY * (maxValue - minValue) * -e.mouseRel.y;
+	float delta = KNOB_SENSITIVITY * (maxValue - minValue) * -e.mouseRel.y * speed;
 	if (guiIsModPressed())
 		delta /= 16.0;
 	dragValue += delta;

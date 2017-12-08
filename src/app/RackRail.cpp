@@ -46,6 +46,15 @@ void RackRail::draw(NVGcontext *vg) {
 		nvgLineTo(vg, box.size.x, railY + RACK_GRID_HEIGHT - 0.5);
 		nvgStroke(vg);
 	}
+
+
+	// Useful for screenshots
+	if (0) {
+		nvgBeginPath(vg);
+		nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
+		nvgFillColor(vg, nvgRGBf(1.0, 1.0, 1.0));
+		nvgFill(vg);
+	}
 }
 
 

@@ -18,10 +18,6 @@ void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 	}
 }
 
-void SVGSwitch::step() {
-	FramebufferWidget::step();
-}
-
 void SVGSwitch::onChange(EventChange &e) {
 	assert(frames.size() > 0);
 	float valueScaled = rescalef(value, minValue, maxValue, 0, frames.size() - 1);

@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <samplerate.h>
+#include <string.h>
 #include "frame.hpp"
 
 
@@ -33,6 +34,15 @@ struct SampleRateConverter {
 	}
 	/** `in` and `out` are interlaced with the number of channels */
 	void process(const Frame<CHANNELS> *in, int *inFrames, Frame<CHANNELS> *out, int *outFrames) {
+		/*
+		if (nearf(data.src_ratio, 1.0)) {
+			int len = mini(*inFrames, *outFrames);
+			memcpy(out, in, len * sizeof(Frame<CHANNELS>));
+			*inFrames = len;
+			*outFrames = len;
+			return;
+		}
+		*/
 		// Old versions of libsamplerate use float* here instead of const float*
 		data.data_in = (float*) in;
 		data.input_frames = *inFrames;
