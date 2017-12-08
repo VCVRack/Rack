@@ -140,40 +140,41 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 		return;
 
 	switch (status) {
-		// note off
-		case 0x8: {
+	// note off
+	case 0x8: {
+		gate = false;
+	}
+	break;
+	case 0x9: // note on
+		if (data2 > 0) {
+			gate = true;
+		}
+		else {
+			// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
 			gate = false;
 		}
-			break;
-		case 0x9: // note on
-			if (data2 > 0) {
-				gate = true;
-			} else {
-				// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
-				gate = false;
+		break;
+	case 0xa: // channel aftertouch
+		for (int i = 0; i < 4; i++) {
+			if (activeKeys[i].pitch == data1) {
+				activeKeys[i].at = data2;
 			}
-			break;
-		case 0xa: // channel aftertouch
-			for (int i = 0; i < 4; i++) {
-				if (activeKeys[i].pitch == data1) {
-					activeKeys[i].at = data2;
+		}
+		return;
+	case 0xb: // cc
+		if (data1 == 0x40) { // pedal
+			pedal = (data2 >= 64);
+			if (!pedal) {
+				open.clear();
+				for (int i = 0; i < 4; i++) {
+					activeKeys[i].gate = false;
+					open.push_back(i);
 				}
 			}
-			return;
-		case 0xb: // cc
-			if (data1 == 0x40) { // pedal
-				pedal = (data2 >= 64);
-				if (!pedal) {
-					open.clear();
-					for (int i = 0; i < 4; i++) {
-						activeKeys[i].gate = false;
-						open.push_back(i);
-					}
-				}
-			}
-			return;
-		default:
-			return;
+		}
+		return;
+	default:
+		return;
 	}
 
 	if (pedal && !gate) {
@@ -201,25 +202,25 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	}
 
 	if (!activeKeys[0].gate && !activeKeys[1].gate &&
-		!activeKeys[2].gate && !activeKeys[3].gate) {
+	        !activeKeys[2].gate && !activeKeys[3].gate) {
 		open.sort();
 	}
 
 
 	switch (mode) {
-		case RESET:
-			if (open.size() >= 4) {
-				for (int i = 0; i < 4; i++) {
-					activeKeys[i].gate = false;
-					open.push_back(i);
-				}
+	case RESET:
+		if (open.size() >= 4) {
+			for (int i = 0; i < 4; i++) {
+				activeKeys[i].gate = false;
+				open.push_back(i);
 			}
-			break;
-		case REASSIGN:
-			open.push_back(open.front());
-			break;
-		case ROTATE:
-			break;
+		}
+		break;
+	case REASSIGN:
+		open.push_back(open.front());
+		break;
+	case ROTATE:
+		break;
 	}
 
 	int next = open.front();
@@ -313,7 +314,7 @@ QuadMidiToCVWidget::QuadMidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(12 * 15, labelHeight), module, QuadMIDIToCVInterface::RESET_PARAM, 0.0, 1.0,
-									0.0));
+	                                0.0));
 	addChild(createLight<SmallLight<RedLight>>(Vec(12 * 15 + 5, labelHeight + 5), module, QuadMIDIToCVInterface::RESET_LIGHT));
 	{
 		Label *label = new Label();
