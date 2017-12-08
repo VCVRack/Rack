@@ -16,7 +16,7 @@ struct Light {
 	float value = 0.0;
 	float getBrightness();
 	void setBrightness(float brightness) {
-		value = brightness * brightness;
+		value = (brightness > 0.f) ? brightness * brightness : 0.f;
 	}
 	void setBrightnessSmooth(float brightness);
 };

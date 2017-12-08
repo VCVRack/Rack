@@ -199,6 +199,8 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 struct Knob : ParamWidget {
 	/** Snap to nearest integer while dragging */
 	bool snap = false;
+	/** Multiplier for mouse movement to adjust knob value */
+	float speed = 1.0;
 	float dragValue;
 	void onDragStart(EventDragStart &e) override;
 	void onDragMove(EventDragMove &e) override;
@@ -249,7 +251,6 @@ struct SVGSwitch : virtual Switch, FramebufferWidget {
 	SVGSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<SVG> svg);
-	void step() override;
 	void onChange(EventChange &e) override;
 };
 

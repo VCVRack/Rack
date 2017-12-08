@@ -38,6 +38,25 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 	lastPath = "";
+
+/*
+	// Add all modules to rack
+	Vec pos;
+	for (Plugin *plugin : gPlugins) {
+		for (Model *model : plugin->models) {
+			ModuleWidget *moduleWidget = model->createModuleWidget();
+			moduleContainer->addChild(moduleWidget);
+			// Move module nearest to the mouse position
+			Rect box;
+			box.size = moduleWidget->box.size;
+			box.pos = pos;
+			requestModuleBoxNearest(moduleWidget, box);
+			pos.x += box.size.x;
+		}
+		pos.y += RACK_GRID_HEIGHT;
+		pos.x = 0;
+	}
+*/
 }
 
 void RackWidget::reset() {
@@ -127,8 +146,10 @@ json_t *RackWidget::toJson() {
 	json_t *rootJ = json_object();
 
 	// version
-	json_t *versionJ = json_string(gApplicationVersion.c_str());
-	json_object_set_new(rootJ, "version", versionJ);
+	if (!gApplicationVersion.empty()) {
+		json_t *versionJ = json_string(gApplicationVersion.c_str());
+		json_object_set_new(rootJ, "version", versionJ);
+	}
 
 	// modules
 	json_t *modulesJ = json_array();
@@ -323,8 +344,8 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, Rect box) {
 	int x0 = roundf(box.pos.x / RACK_GRID_WIDTH);
 	int y0 = roundf(box.pos.y / RACK_GRID_HEIGHT);
 	std::vector<Vec> positions;
-	for (int y = maxi(0, y0 - 4); y < y0 + 4; y++) {
-		for (int x = maxi(0, x0 - 200); x < x0 + 200; x++) {
+	for (int y = maxi(0, y0 - 8); y < y0 + 8; y++) {
+		for (int x = maxi(0, x0 - 400); x < x0 + 400; x++) {
 			positions.push_back(Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
 		}
 	}
