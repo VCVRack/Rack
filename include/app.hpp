@@ -20,7 +20,7 @@ struct SVGPanel;
 // module
 ////////////////////
 
-// A 1HP 3U module should be 15x380. Thus the width of a module should be a factor of 15.
+// A 1HPx3U module should be 15x380. Thus the width of a module should be a factor of 15.
 #define RACK_GRID_WIDTH 15
 #define RACK_GRID_HEIGHT 380
 
