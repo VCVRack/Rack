@@ -359,6 +359,7 @@ void pluginRefresh() {
 	downloadName = "";
 
 	json_t *reqJ = json_object();
+	json_object_set(reqJ, "version", json_string(gApplicationVersion.c_str()));
 	json_object_set(reqJ, "token", json_string(gToken.c_str()));
 	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/purchases", reqJ);
 	json_decref(reqJ);
