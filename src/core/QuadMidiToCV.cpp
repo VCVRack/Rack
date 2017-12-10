@@ -72,7 +72,7 @@ struct QuadMIDIToCVInterface : MidiIO, Module {
 		baseFromJson(rootJ);
 	}
 
-	void reset() override {
+	void onReset() override {
 		resetMidi();
 	}
 

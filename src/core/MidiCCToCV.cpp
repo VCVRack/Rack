@@ -81,7 +81,7 @@ struct MIDICCToCVInterface : MidiIO, Module {
 		}
 	}
 
-	void reset() override {
+	void onReset() override {
 		resetMidi();
 	}
 

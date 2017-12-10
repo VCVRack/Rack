@@ -47,6 +47,8 @@ struct ModuleWidget : OpaqueWidget {
 	virtual json_t *toJson();
 	virtual void fromJson(json_t *rootJ);
 
+	virtual void create();
+	virtual void _delete();
 	/** Disconnects cables from all ports
 	Called when the user clicks Disconnect Cables in the context menu.
 	*/

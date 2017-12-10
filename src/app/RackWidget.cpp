@@ -306,9 +306,11 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 void RackWidget::addModule(ModuleWidget *m) {
 	moduleContainer->addChild(m);
+	m->create();
 }
 
 void RackWidget::deleteModule(ModuleWidget *m) {
+	m->_delete();
 	moduleContainer->removeChild(m);
 }
 
