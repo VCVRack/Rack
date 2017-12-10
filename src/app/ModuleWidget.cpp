@@ -121,12 +121,24 @@ void ModuleWidget::disconnect() {
 	}
 }
 
+void ModuleWidget::create() {
+	if (module) {
+		module->onCreate();
+	}
+}
+
+void ModuleWidget::_delete() {
+	if (module) {
+		module->onDelete();
+	}
+}
+
 void ModuleWidget::reset() {
 	for (ParamWidget *param : params) {
 		param->setValue(param->defaultValue);
 	}
 	if (module) {
-		module->reset();
+		module->onReset();
 	}
 }
 
@@ -135,7 +147,7 @@ void ModuleWidget::randomize() {
 		param->randomize();
 	}
 	if (module) {
-		module->randomize();
+		module->onRandomize();
 	}
 }
 
@@ -191,7 +203,7 @@ void ModuleWidget::onMouseMove(EventMouseMove &e) {
 				gRackWidget->deleteModule(this);
 				this->finalizeEvents();
 				delete this;
-				// Kinda sketchy because events will be passed further down the tree
+				e.consumed = true;
 				return;
 			}
 		}

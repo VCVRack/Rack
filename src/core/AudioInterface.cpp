@@ -128,7 +128,7 @@ struct AudioInterface : Module {
 		openStream();
 	}
 
-	void reset() override {
+	void onReset() override {
 		closeStream();
 	}
 };
