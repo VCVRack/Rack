@@ -5,6 +5,13 @@ FLAGS += \
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
 
+CORE_LDFLAGS = -lrtaudio -lrtmidi
+
+ifdef WITHOUT_CORE
+	SOURCES := $(filter-out src/core/%,$(SOURCES))
+	FLAGS += -DWITHOUT_CORE
+	CORE_LDFLAGS =
+endif
 
 include arch.mk
 
@@ -14,7 +21,7 @@ ifeq ($(ARCH), lin)
 	LDFLAGS += -rdynamic \
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip $(CORE_LDFLAGS)
 	TARGET = Rack
 endif
 
@@ -23,7 +30,7 @@ ifeq ($(ARCH), mac)
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip $(CORE_LDFLAGS)
 	TARGET = Rack
 	BUNDLE = dist/$(TARGET).app
 endif
@@ -33,7 +40,7 @@ ifeq ($(ARCH), win)
 	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi \
+		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip $(CORE_LDFLAGS) \
 		-Wl,-Bstatic -ljansson -lsamplerate
 	TARGET = Rack.exe
 	OBJECTS = Rack.res

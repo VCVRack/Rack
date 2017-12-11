@@ -248,11 +248,14 @@ static void refreshPurchase(json_t *pluginJ) {
 
 void pluginInit() {
 	tagsInit();
+
+#ifndef WITHOUT_CORE
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *coreManufacturer = new Plugin();
 	init(coreManufacturer);
 	gPlugins.push_back(coreManufacturer);
+#endif
 
 	// Load plugins from global directory
 	std::string globalPlugins = assetGlobal("plugins");
