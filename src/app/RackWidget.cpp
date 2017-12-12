@@ -102,20 +102,19 @@ void RackWidget::saveAsDialog() {
 	}
 }
 
-
 void RackWidget::savePatch(std::string path) {
 	info("Saving patch %s", path.c_str());
-	FILE *file = fopen(path.c_str(), "w");
-	if (!file)
+	json_t *rootJ = toJson();
+	if (!rootJ)
 		return;
 
-	json_t *rootJ = toJson();
-	if (rootJ) {
+	FILE *file = fopen(path.c_str(), "w");
+	if (file) {
 		json_dumpf(rootJ, file, JSON_INDENT(2));
-		json_decref(rootJ);
+		fclose(file);
 	}
 
-	fclose(file);
+	json_decref(rootJ);
 }
 
 void RackWidget::loadPatch(std::string path) {
