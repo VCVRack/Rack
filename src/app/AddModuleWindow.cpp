@@ -88,7 +88,7 @@ struct MetadataMenu : ListMenu {
 
 static bool isModelMatch(Model *model, std::string search) {
 	// Build content string
-	std::string str;
+	std::string str = "";
 	str += model->manufacturer;
 	str += " ";
 	str += model->name;
