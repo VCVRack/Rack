@@ -30,6 +30,16 @@ will expand to
 
 #define LENGTHOF(arr) (sizeof(arr) / sizeof((arr)[0]))
 
+/** Reserve space for _count enums starting with _name.
+Example:
+	enum Foo {
+		ENUMS(BAR, 14)
+	};
+
+	BAR + 0 to BAR + 11 is reserved
+*/
+#define ENUMS(_name, _count) _name, _name ## _LAST = _name + (_count) - 1
+
 /** Deprecation notice for GCC */
 #define DEPRECATED __attribute__ ((deprecated))
 

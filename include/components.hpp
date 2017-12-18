@@ -461,6 +461,14 @@ struct CKSS : SVGSwitch, ToggleSwitch {
 	}
 };
 
+struct CKSSThree : SVGSwitch, ToggleSwitch {
+	CKSSThree() {
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSSThree_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSSThree_1.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSSThree_2.svg")));
+	}
+};
+
 struct CKD6 : SVGSwitch, MomentarySwitch {
 	CKD6() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKD6_0.svg")));
