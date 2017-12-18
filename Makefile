@@ -23,7 +23,7 @@ ifeq ($(ARCH), mac)
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto
 	TARGET = Rack
 	BUNDLE = dist/$(TARGET).app
 endif
@@ -34,7 +34,7 @@ ifeq ($(ARCH), win)
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
 		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi \
-		-Wl,-Bstatic -ljansson -lsamplerate
+		-Wl,-Bstatic -ljansson -lsamplerate -lcrypto
 	TARGET = Rack.exe
 	OBJECTS = Rack.res
 endif
