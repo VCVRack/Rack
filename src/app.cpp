@@ -11,6 +11,7 @@ std::string gApplicationVersion =
 	"";
 #endif
 std::string gApiHost = "https://api.vcvrack.com";
+// std::string gApiHost = "http://localhost:8081";
 
 RackWidget *gRackWidget = NULL;
 Toolbar *gToolbar = NULL;
