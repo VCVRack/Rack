@@ -42,6 +42,7 @@ ifeq ($(ARCH),mac)
 	libzip = lib/libzip.dylib
 	rtmidi = lib/librtmidi.dylib
 	rtaudio = lib/librtaudio.dylib
+	openssl = lib/libssl.dylib
 endif
 
 ifeq ($(ARCH),win)
@@ -112,12 +113,19 @@ $(libsamplerate):
 	$(MAKE) -C libsamplerate-0.1.9/src
 	$(MAKE) -C libsamplerate-0.1.9/src install
 
-$(libcurl):
+$(openssl):
+	$(WGET) https://www.openssl.org/source/openssl-1.1.0g.tar.gz
+	$(UNTAR) openssl-1.1.0g.tar.gz
+	cd openssl-1.1.0g && ./config --prefix="$(LOCAL)"
+	$(MAKE) -C openssl-1.1.0g
+	$(MAKE) -C openssl-1.1.0g install
+
+$(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
 	$(UNTAR) curl-7.56.0.tar.gz
 	cd curl-7.56.0 && ./configure --prefix="$(LOCAL)" \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
-		--without-zlib --without-ca-bundle --without-ca-fallback --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2
+		--without-zlib --without-ca-bundle --without-ca-fallback --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --with-ssl="$(LOCAL)"
 	$(MAKE) -C curl-7.56.0
 	$(MAKE) -C curl-7.56.0 install
 
