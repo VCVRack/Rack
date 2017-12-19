@@ -145,6 +145,8 @@ ifeq ($(ARCH), win)
 	cp dep/bin/libsamplerate-0.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
 	cp dep/bin/librtaudio.dll dist/Rack/
+	cp dep/bin/libcrypto-1_1-x64.dll dist/Rack/
+	cp dep/bin/libssl-1_1-x64.dll dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 	# Make ZIP
