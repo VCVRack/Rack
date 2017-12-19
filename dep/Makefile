@@ -53,7 +53,8 @@ ifeq ($(ARCH),win)
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
 	rtmidi = bin/librtmidi-4.dll
-	rtaudio = bin/librtaudio-6.dll
+	rtaudio = bin/librtaudio.dll
+	openssl = bin/libssl-1_1-x64.dll
 endif
 
 # Library configuration
