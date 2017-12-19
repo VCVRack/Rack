@@ -31,6 +31,7 @@ ifeq ($(ARCH),lin)
 	libzip = lib/libzip.so
 	rtmidi = lib/librtmidi.so
 	rtaudio = lib/librtaudio.so
+	openssl = lib/libssl.so
 endif
 
 ifeq ($(ARCH),mac)
