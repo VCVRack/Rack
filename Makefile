@@ -165,6 +165,8 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libzip.so.5 dist/Rack/
 	cp dep/lib/librtaudio.so dist/Rack/
 	cp dep/lib/librtmidi.so.4 dist/Rack/
+	cp dep/lib/libssl.so.1.1 dist/Rack/
+	cp dep/lib/libcrypto.so.1.1 dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 	# Make ZIP
