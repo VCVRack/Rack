@@ -106,9 +106,9 @@ ifeq ($(ARCH), mac)
 	cp dep/lib/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libzip.5.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/librtaudio.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/librtaudio.6.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libcrypto.1.1.dylib $(BUNDLE)/Contents/MacOS/
 
 	install_name_tool -change /usr/local/lib/libGLEW.2.1.0.dylib @executable_path/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change lib/libglfw.3.dylib @executable_path/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/Rack
@@ -116,9 +116,9 @@ ifeq ($(ARCH), mac)
 	install_name_tool -change $(PWD)/dep/lib/libsamplerate.0.dylib @executable_path/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libcurl.4.dylib @executable_path/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libzip.5.dylib @executable_path/libzip.5.dylib $(BUNDLE)/Contents/MacOS/Rack
-	install_name_tool -change $(PWD)/dep/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change librtaudio.dylib @executable_path/librtaudio.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/librtmidi.4.dylib @executable_path/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/Rack
-	install_name_tool -change $(PWD)/dep/lib/librtaudio.6.dylib @executable_path/librtaudio.6.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib $(BUNDLE)/Contents/MacOS/Rack
 
 	otool -L $(BUNDLE)/Contents/MacOS/Rack
 
