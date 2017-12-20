@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <string.h>
 #include <speex/speex_resampler.h>
 #include "frame.hpp"
 
