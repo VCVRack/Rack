@@ -12,20 +12,26 @@ template<int CHANNELS>
 struct SampleRateConverter {
 	SpeexResamplerState *state = NULL;
 	bool noConversion = true;
+	int inRate = 44100;
+	int outRate = 44100;
 
 	SampleRateConverter() {
 		int error;
-		state = speex_resampler_init(CHANNELS, 44100, 44100, SPEEX_RESAMPLER_QUALITY_DEFAULT, &error);
+		state = speex_resampler_init(CHANNELS, inRate, outRate, SPEEX_RESAMPLER_QUALITY_DEFAULT, &error);
 		assert(error == RESAMPLER_ERR_SUCCESS);
 	}
 	~SampleRateConverter() {
 		speex_resampler_destroy(state);
 	}
 
-	void setRates(float inRate, float outRate) {
-		int error = speex_resampler_set_rate(state, inRate, outRate);
-		assert(error == RESAMPLER_ERR_SUCCESS);
-		noConversion = inRate == outRate;
+	void setRates(int in, int out) {
+		if (in != inRate || out != outRate) { // speex doesn't optimize setting the rates to the existing values.
+			int error = speex_resampler_set_rate(state, in, out);
+			assert(error == RESAMPLER_ERR_SUCCESS);
+			inRate = in;
+			outRate = out;
+			noConversion = in == out;
+		}
 	}
 
 	void setRatioSmooth(float ratio) DEPRECATED {
