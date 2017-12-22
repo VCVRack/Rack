@@ -169,7 +169,7 @@ void AudioInterface::step() {
 		// Once full, sample rate convert the input
 		// inputBuffer -> SRC -> inputSrcBuffer
 		if (inputBuffer.full()) {
-			inputSrc.setRatio(sampleRate / engineGetSampleRate());
+			inputSrc.setRates(engineGetSampleRate(), sampleRate);
 			int inLen = inputBuffer.size();
 			int outLen = inputSrcBuffer.capacity();
 			inputSrc.process(inputBuffer.startData(), &inLen, inputSrcBuffer.endData(), &outLen);
@@ -211,7 +211,7 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 		}
 
 		// Pass output through sample rate converter
-		outputSrc.setRatio(engineGetSampleRate() / sampleRate);
+		outputSrc.setRates(sampleRate, engineGetSampleRate());
 		int inLen = numFrames;
 		int outLen = outputBuffer.capacity();
 		outputSrc.process(inputFrames, &inLen, outputBuffer.endData(), &outLen);
