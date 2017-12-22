@@ -26,7 +26,7 @@ ifeq ($(ARCH),lin)
 	glew = lib/libGLEW.so
 	glfw = lib/libglfw.so
 	jansson = lib/libjansson.so
-	libsamplerate = lib/libsamplerate.so
+	libspeexdsp = lib/libspeexdsp.so
 	libcurl = lib/libcurl.so
 	libzip = lib/libzip.so
 	rtmidi = lib/librtmidi.so
@@ -37,7 +37,7 @@ ifeq ($(ARCH),mac)
 	glew = lib/libGLEW.dylib
 	glfw = lib/libglfw.dylib
 	jansson = lib/libjansson.dylib
-	libsamplerate = lib/libsamplerate.dylib
+	libspeexdsp = lib/libspeexdsp.dylib
 	libcurl = lib/libcurl.dylib
 	libzip = lib/libzip.dylib
 	rtmidi = lib/librtmidi.dylib
@@ -48,7 +48,7 @@ ifeq ($(ARCH),win)
 	glew = bin/glew32.dll
 	glfw = bin/glfw3.dll
 	jansson = bin/libjansson-4.dll
-	libsamplerate = bin/libsamplerate-0.dll
+	libspeexdsp = bin/libspeexdsp.dll
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
 	rtmidi = bin/librtmidi-4.dll
@@ -71,7 +71,7 @@ endif
 
 .NOTPARALLEL:
 
-all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(rtmidi) $(rtaudio)
+all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio)
 	@echo ""
 	@echo "#######################################"
 	@echo "# Built all dependencies successfully #"
@@ -99,12 +99,12 @@ $(jansson):
 	$(MAKE) -C jansson-2.10
 	$(MAKE) -C jansson-2.10 install
 
-$(libsamplerate):
-	$(WGET) http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz
-	$(UNTAR) libsamplerate-0.1.9.tar.gz
-	cd libsamplerate-0.1.9 && ./configure --prefix="$(LOCAL)" --disable-fftw --disable-sndfile
-	$(MAKE) -C libsamplerate-0.1.9/src
-	$(MAKE) -C libsamplerate-0.1.9/src install
+$(libspeexdsp):
+	$(WGET) https://github.com/xiph/speexdsp/archive/SpeexDSP-1.2rc3.tar.gz
+	$(UNTAR) SpeexDSP-1.2rc3.tar.gz
+	cd speexdsp-SpeexDSP-1.2rc3 && ./autogen.sh && ./configure --prefix="$(LOCAL)"
+	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
+	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
 $(libcurl):
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
