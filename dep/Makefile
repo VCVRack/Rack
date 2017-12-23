@@ -31,6 +31,7 @@ ifeq ($(ARCH),lin)
 	libzip = lib/libzip.so
 	rtmidi = lib/librtmidi.so
 	rtaudio = lib/librtaudio.so
+	openssl = lib/libssl.so
 endif
 
 ifeq ($(ARCH),mac)
@@ -42,6 +43,7 @@ ifeq ($(ARCH),mac)
 	libzip = lib/libzip.dylib
 	rtmidi = lib/librtmidi.dylib
 	rtaudio = lib/librtaudio.dylib
+	openssl = lib/libssl.dylib
 endif
 
 ifeq ($(ARCH),win)
@@ -52,7 +54,8 @@ ifeq ($(ARCH),win)
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
 	rtmidi = bin/librtmidi-4.dll
-	rtaudio = bin/librtaudio-6.dll
+	rtaudio = bin/librtaudio.dll
+	openssl = bin/libssl-1_1-x64.dll
 endif
 
 # Library configuration
@@ -106,12 +109,20 @@ $(libspeexdsp):
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
-$(libcurl):
+$(openssl):
+	$(WGET) https://www.openssl.org/source/openssl-1.1.0g.tar.gz
+	$(UNTAR) openssl-1.1.0g.tar.gz
+	cd openssl-1.1.0g && ./config --prefix="$(LOCAL)"
+	$(MAKE) -C openssl-1.1.0g
+	$(MAKE) -C openssl-1.1.0g install
+
+$(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
 	$(UNTAR) curl-7.56.0.tar.gz
 	cd curl-7.56.0 && ./configure --prefix="$(LOCAL)" \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
-		--without-zlib --without-ssl --without-ca-bundle --without-ca-path --without-ca-fallback --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2
+		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 \
+		--without-ca-bundle --with-ca-fallback --with-ssl="$(LOCAL)"
 	$(MAKE) -C curl-7.56.0
 	$(MAKE) -C curl-7.56.0 install
 
