@@ -131,12 +131,13 @@ $(rtaudio):
 	$(MAKE) -C rtaudio-5.0.0 install
 
 $(ossia):
-        # TODO use release tarball instead of building it locally
-        git clone https://github.com/OSSIA/libossia --recursive
-	cd libossia && $(CMAKE) . \
-		-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DOSSIA_PD=OFF \
-		-DOSSIA_COTIRE=OFF -DOSSIA_PROTOCOL_MIDI=OFF .
-	$(MAKE) -j4
+    # TODO use release tarball instead of building it locally
+	git clone https://github.com/OSSIA/libossia --depth=1
+	mkdir -p build-libossia && cd build-libossia && $(CMAKE) \
+	-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DOSSIA_PD=OFF \
+	-DOSSIA_COTIRE=OFF -DOSSIA_PROTOCOL_MIDI=OFF \
+	-DOSSIA_EDITOR=OFF -DBUILD_TYPE=Release ../libossia && \
+	$(MAKE) -j4 && \
 	$(MAKE) install
 
 clean:
