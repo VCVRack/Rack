@@ -11,38 +11,33 @@ namespace rack {
 template<int CHANNELS>
 struct SampleRateConverter {
 	SpeexResamplerState *state = NULL;
-	bool noConversion = true;
-	int inRate = 44100;
-	int outRate = 44100;
+	bool bypass = false;
 
 	SampleRateConverter() {
 		int error;
-		state = speex_resampler_init(CHANNELS, inRate, outRate, SPEEX_RESAMPLER_QUALITY_DEFAULT, &error);
+		state = speex_resampler_init(CHANNELS, 44100, 44100, SPEEX_RESAMPLER_QUALITY_DEFAULT, &error);
 		assert(error == RESAMPLER_ERR_SUCCESS);
 	}
 	~SampleRateConverter() {
 		speex_resampler_destroy(state);
 	}
 
-	void setRates(int in, int out) {
-		if (in != inRate || out != outRate) { // speex doesn't optimize setting the rates to the existing values.
-			int error = speex_resampler_set_rate(state, in, out);
-			assert(error == RESAMPLER_ERR_SUCCESS);
-			inRate = in;
-			outRate = out;
-			noConversion = in == out;
-		}
+	void setQuality(int quality) {
+		speex_resampler_set_quality(state, quality);
 	}
 
-	void setRatioSmooth(float ratio) DEPRECATED {
-		// FIXME: this doesn't do a smooth change -- speex doesn't appear to support that.
-		const int base = 1000;
-		setRates(base, ratio * base);
+	void setRates(int inRate, int outRate) {
+		spx_uint32_t oldInRate, oldOutRate;
+		speex_resampler_get_rate(state, &oldInRate, &oldOutRate);
+		if (inRate == (int) oldInRate && outRate == (int) oldOutRate)
+			return;
+		int error = speex_resampler_set_rate(state, inRate, outRate);
+		assert(error == RESAMPLER_ERR_SUCCESS);
 	}
 
 	/** `in` and `out` are interlaced with the number of channels */
 	void process(const Frame<CHANNELS> *in, int *inFrames, Frame<CHANNELS> *out, int *outFrames) {
-		if (noConversion) {
+		if (bypass) {
 			int len = std::min(*inFrames, *outFrames);
 			memcpy(out, in, len * sizeof(Frame<CHANNELS>));
 			*inFrames = len;
