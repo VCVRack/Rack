@@ -1,6 +1,15 @@
 Tip: Use `git checkout v0.4.0` for example to check out any previous version mentioned here.
 
 
+### v0.5.1 (2017-12-19)
+
+- Added Plugin Manager support
+- Fixed metadata panel in the Add Module window
+
+- Fundamental
+	- Added Sequential Switch 1 & 2
+
+
 ### v0.5.0 (2017-11-21)
 
 - Added zoom scaling from 25% to 200%
@@ -27,6 +36,7 @@ Tip: Use `git checkout v0.4.0` for example to check out any previous version men
 
 
 ### v0.4.0 (2017-10-13)
+
 - Cables can now stack on output ports
 - Added sub-menus for each plugin, includes optional plugin metadata like URLs
 - Added MIDI CC-to-CV Interface, updated MIDI-to-CV Interface
@@ -49,6 +59,7 @@ Tip: Use `git checkout v0.4.0` for example to check out any previous version men
 
 
 ### v0.3.2 (2017-09-25)
+
 - Added key commands
 - Fixed "invisible knobs/ports" rendering bug for ~2010 Macs
 - Added "allowCursorLock" to settings.json (set to "false" for touch screen support)
@@ -73,4 +84,5 @@ Tip: Use `git checkout v0.4.0` for example to check out any previous version men
 
 
 ### v0.3.0 (2017-09-10)
+
 - Knobcon public Beta release
