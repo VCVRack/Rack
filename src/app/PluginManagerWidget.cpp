@@ -1,9 +1,55 @@
 #include <thread>
 #include "app.hpp"
 #include "plugin.hpp"
+#include "gui.hpp"
+#include "../ext/osdialog/osdialog.h"
 
 
 namespace rack {
+
+
+struct SyncButton : Button {
+	bool checked = false;
+	bool available = false;
+	bool completed = false;
+
+	void step() override {
+		if (!checked) {
+			std::thread t([this]() {
+				if (pluginSync(true))
+					available = true;
+			});
+			t.detach();
+			checked = true;
+		}
+		if (completed) {
+			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
+				guiClose();
+			}
+			completed = false;
+		}
+	}
+	void draw(NVGcontext *vg) override {
+		Button::draw(vg);
+		if (available) {
+			// Notification circle
+			nvgBeginPath(vg);
+			nvgCircle(vg, 3, 3, 4.0);
+			nvgFillColor(vg, nvgRGBf(1.0, 0.0, 0.0));
+			nvgFill(vg);
+			nvgStrokeColor(vg, nvgRGBf(0.5, 0.0, 0.0));
+			nvgStroke(vg);
+		}
+	}
+	void onAction(EventAction &e) override {
+		available = false;
+		std::thread t([this]() {
+			if (pluginSync(false))
+				completed = true;
+		});
+		t.detach();
+	}
+};
 
 
 PluginManagerWidget::PluginManagerWidget() {
@@ -91,19 +137,13 @@ PluginManagerWidget::PluginManagerWidget() {
 		manageWidget->addChild(manageButton);
 		pos.x += manageButton->box.size.x;
 
-		struct RefreshButton : Button {
-			void onAction(EventAction &e) override {
-				std::thread t(pluginRefresh);
-				t.detach();
-			}
-		};
 		pos.x += margin;
-		Button *refreshButton = new RefreshButton();
-		refreshButton->box.pos = pos;
-		refreshButton->box.size.x = 125;
-		refreshButton->text = "Refresh plugins";
-		manageWidget->addChild(refreshButton);
-		pos.x += refreshButton->box.size.x;
+		Button *syncButton = new SyncButton();
+		syncButton->box.pos = pos;
+		syncButton->box.size.x = 125;
+		syncButton->text = "Update plugins";
+		manageWidget->addChild(syncButton);
+		pos.x += syncButton->box.size.x;
 
 		struct LogOutButton : Button {
 			void onAction(EventAction &e) override {

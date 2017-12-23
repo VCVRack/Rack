@@ -60,7 +60,8 @@ void pluginInit();
 void pluginDestroy();
 void pluginLogIn(std::string email, std::string password);
 void pluginLogOut();
-void pluginRefresh();
+/** Returns whether a new plugin is available, and downloads it unless doing a dry run */
+bool pluginSync(bool dryRun);
 void pluginCancelDownload();
 bool pluginIsLoggedIn();
 bool pluginIsDownloading();

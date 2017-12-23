@@ -70,7 +70,7 @@ struct MetadataMenu : ListMenu {
 
 				// Plugin metadata
 				if (!model->plugin->website.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->path));
+					addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->website));
 				}
 				if (!model->plugin->manual.empty()) {
 					addChild(construct<UrlItem>(&MenuEntry::text, "Manual", &UrlItem::url, model->plugin->manual));
@@ -119,10 +119,6 @@ struct ModelItem : MenuItem {
 	void onMouseEnter(EventMouseEnter &e) override {
 		sModel = model;
 		MenuItem::onMouseEnter(e);
-	}
-	void onMouseLeave(EventMouseLeave &e) override {
-		sModel = NULL;
-		MenuItem::onMouseLeave(e);
 	}
 };
 
