@@ -10,6 +10,7 @@ struct MidiKey {
 	int at = 0; // aftertouch
 	int vel = 0; // velocity
 	bool gate = false;
+	bool pedal_gate_released = false;
 };
 
 struct QuadMIDIToCVInterface : MidiIO, Module {
@@ -162,6 +163,10 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 			if (!pedal) {
 				open.clear();
 				for (int i = 0; i < 4; i++) {
+					if (activeKeys[i].pedal_gate_released) {
+							activeKeys[i].pedal_gate_released = false;
+							continue;
+					}
 					activeKeys[i].gate = false;
 					open.push_back(i);
 				}
@@ -173,7 +178,12 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	}
 
 	if (pedal && !gate) {
-		return;
+		for (int i = 0; i < 4; i++) {
+			if (activeKeys[i].pitch == data1) {
+				activeKeys[i].pedal_gate_released = true;
+				return;
+			}
+		}
 	}
 
 	if (!gate) {
@@ -197,7 +207,7 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	}
 
 	if (!activeKeys[0].gate && !activeKeys[1].gate &&
-	        !activeKeys[2].gate && !activeKeys[3].gate) {
+					!activeKeys[2].gate && !activeKeys[3].gate) {
 		open.sort();
 	}
 
@@ -310,7 +320,7 @@ QuadMidiToCVWidget::QuadMidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(12 * 15, labelHeight), module, QuadMIDIToCVInterface::RESET_PARAM, 0.0, 1.0,
-	                                0.0));
+																	0.0));
 	addChild(createLight<SmallLight<RedLight>>(Vec(12 * 15 + 5, labelHeight + 5), module, QuadMIDIToCVInterface::RESET_LIGHT));
 	{
 		Label *label = new Label();
