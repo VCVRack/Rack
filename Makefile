@@ -14,7 +14,7 @@ ifeq ($(ARCH), lin)
 	LDFLAGS += -rdynamic \
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
 	TARGET = Rack
 endif
 
@@ -169,6 +169,8 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/libzip.so.5 dist/Rack/
 	cp dep/lib/librtaudio.so dist/Rack/
 	cp dep/lib/librtmidi.so.4 dist/Rack/
+	cp dep/lib/libssl.so.1.1 dist/Rack/
+	cp dep/lib/libcrypto.so.1.1 dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 	# Make ZIP
