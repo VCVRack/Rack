@@ -1,5 +1,5 @@
 ifdef VERSION
-FLAGS += -DVERSION=$(VERSION)
+	FLAGS += -DVERSION=$(VERSION)
 endif
 
 # Generate dependency files alongside the object files
@@ -9,7 +9,7 @@ FLAGS += -g
 FLAGS += -O3 -march=nocona -ffast-math -fno-finite-math-only
 FLAGS += -Wall -Wextra -Wno-unused-parameter
 ifneq ($(ARCH), mac)
-CXXFLAGS += -Wsuggest-override
+	CXXFLAGS += -Wsuggest-override
 endif
 CXXFLAGS += -std=c++11
 
@@ -32,6 +32,9 @@ ifeq ($(ARCH), win)
 	FLAGS += -D_USE_MATH_DEFINES
 endif
 
+CFLAGS += $(FLAGS)
+CXXFLAGS += $(FLAGS)
+
 
 OBJECTS += $(patsubst %, build/%.o, $(SOURCES))
 DEPS = $(patsubst %, build/%.d, $(SOURCES))
@@ -47,16 +50,16 @@ $(TARGET): $(OBJECTS)
 
 build/%.c.o: %.c
 	@mkdir -p $(@D)
-	$(CC) $(FLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/%.cpp.o: %.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(FLAGS) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/%.cc.o: %.cc
 	@mkdir -p $(@D)
-	$(CXX) $(FLAGS) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/%.m.o: %.m
 	@mkdir -p $(@D)
-	$(CC) $(FLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<

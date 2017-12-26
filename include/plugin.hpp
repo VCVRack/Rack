@@ -24,11 +24,12 @@ struct Plugin {
 	*/
 	std::string slug;
 
-	/** The version of your plugin (optional)
+	/** The version of your plugin
 	Plugins should follow the versioning scheme described at https://github.com/VCVRack/Rack/issues/266
 	Do not include the "v" in "v1.0" for example.
 	*/
 	std::string version;
+
 	/** URL for plugin homepage (optional) */
 	std::string website;
 	/** URL for plugin manual (optional) */
