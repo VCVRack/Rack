@@ -3,13 +3,19 @@ LOCAL = $(shell pwd)
 # Arch-specifics
 include ../arch.mk
 
+FLAGS += -g -O3 -march=nocona
+
 ifeq ($(ARCH),mac)
-	MACOS_FLAGS = -mmacosx-version-min=10.7 -stdlib=libc++
-	export CFLAGS = $(MACOS_FLAGS)
-	export CXXFLAGS = $(MACOS_FLAGS)
-	export CPPFLAGS = $(MACOS_FLAGS)
-	export LDFLAGS = $(MACOS_FLAGS)
+	FLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
+	LDFLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
 endif
+
+CFLAGS += $(FLAGS)
+CXXFLAGS += $(FLAGS)
+export CFLAGS
+export CXXFLAGS
+export LDFLAGS
+
 
 # Commands
 WGET = wget -nc
