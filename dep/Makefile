@@ -147,4 +147,4 @@ $(rtaudio):
 	$(MAKE) -C rtaudio/cmakebuild install
 
 clean:
-	git clean -ffdxi
+	git clean -ffdx
