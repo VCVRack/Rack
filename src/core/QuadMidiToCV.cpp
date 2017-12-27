@@ -161,14 +161,15 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 		if (data1 == 0x40) { // pedal
 			pedal = (data2 >= 64);
 			if (!pedal) {
-				open.clear();
 				for (int i = 0; i < 4; i++) {
 					if (activeKeys[i].pedal_gate_released) {
-							activeKeys[i].pedal_gate_released = false;
-							continue;
+						activeKeys[i].gate = false;
+						activeKeys[i].pedal_gate_released = false;
+						if (std::find(open.begin(), open.end(), i) != open.end()) {
+							open.remove(i);
+						}
+						open.push_front(i);
 					}
-					activeKeys[i].gate = false;
-					open.push_back(i);
 				}
 			}
 		}
@@ -179,11 +180,11 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 	if (pedal && !gate) {
 		for (int i = 0; i < 4; i++) {
-			if (activeKeys[i].pitch == data1) {
+			if (activeKeys[i].pitch == data1 && activeKeys[i].gate) {
 				activeKeys[i].pedal_gate_released = true;
-				return;
 			}
 		}
+		return;
 	}
 
 	if (!gate) {
@@ -240,10 +241,12 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 			open.push_front(i);
 			activeKeys[i].gate = false;
+			activeKeys[i].pedal_gate_released = false;
 		}
 	}
 
 	activeKeys[next].gate = true;
+	activeKeys[next].pedal_gate_released = false;
 	activeKeys[next].pitch = data1;
 	activeKeys[next].vel = data2;
 }
