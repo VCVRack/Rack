@@ -322,7 +322,7 @@ struct BefacoTinyKnob : SVGKnob {
 	}
 };
 
-struct BefacoSlidePot : SVGSlider {
+struct BefacoSlidePot : SVGFader {
 	BefacoSlidePot() {
 		Vec margin = Vec(3.5, 3.5);
 		maxHandlePos = Vec(-1, -2).plus(margin);
@@ -458,6 +458,14 @@ struct CKSS : SVGSwitch, ToggleSwitch {
 	CKSS() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSS_0.svg")));
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSS_1.svg")));
+	}
+};
+
+struct CKSSThree : SVGSwitch, ToggleSwitch {
+	CKSSThree() {
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSSThree_0.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSSThree_1.svg")));
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/CKSSThree_2.svg")));
 	}
 };
 

@@ -51,6 +51,8 @@ You may use make's `-j$(nproc)` flag to parallelize builds across all your CPU c
 
 	make dep
 
+You may use `make dep RTAUDIO_ALL_APIS=1` to attempt to build with all audio driver APIs enabled for your operating system.
+
 You should see a message that all dependencies built successfully.
 
 Build Rack.
@@ -81,6 +83,8 @@ Build plugin.
 
 ## License
 
-Rack source code by [Andrew Belt](https://andrewbelt.name/) licensed under [BSD-3-Clause](LICENSE.txt)
+Source code licensed under [BSD-3-Clause](LICENSE.txt) by [Andrew Belt](https://andrewbelt.name/)
 
-Component Library graphics by [Grayscale](http://grayscale.info/) licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
+Component Library graphics in `res/ComponentLibrary` licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) by [Grayscale](http://grayscale.info/)
+
+VCV logo is © 2017

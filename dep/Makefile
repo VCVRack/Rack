@@ -26,11 +26,12 @@ ifeq ($(ARCH),lin)
 	glew = lib/libGLEW.so
 	glfw = lib/libglfw.so
 	jansson = lib/libjansson.so
-	libsamplerate = lib/libsamplerate.so
+	libspeexdsp = lib/libspeexdsp.so
 	libcurl = lib/libcurl.so
 	libzip = lib/libzip.so
 	rtmidi = lib/librtmidi.so
 	rtaudio = lib/librtaudio.so
+	openssl = lib/libssl.so
 	ossia = lib/libossia.so
 endif
 
@@ -38,10 +39,12 @@ ifeq ($(ARCH),mac)
 	glew = lib/libGLEW.dylib
 	glfw = lib/libglfw.dylib
 	jansson = lib/libjansson.dylib
-	libsamplerate = lib/libsamplerate.dylib
+	libspeexdsp = lib/libspeexdsp.dylib
 	libcurl = lib/libcurl.dylib
 	libzip = lib/libzip.dylib
 	rtmidi = lib/librtmidi.dylib
+	rtaudio = lib/librtaudio.dylib
+	openssl = lib/libssl.dylib
 	ossia = lib/libossia.so
 endif
 
@@ -49,17 +52,31 @@ ifeq ($(ARCH),win)
 	glew = bin/glew32.dll
 	glfw = bin/glfw3.dll
 	jansson = bin/libjansson-4.dll
-	libsamplerate = bin/libsamplerate-0.dll
+	libspeexdsp = bin/libspeexdsp.dll
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
 	rtmidi = bin/librtmidi-4.dll
-	ossia = lib/libossia.dll
+	rtaudio = bin/librtaudio.dll
+	openssl = bin/libssl-1_1-x64.dll
+endif
+
+# Library configuration
+ifdef RTAUDIO_ALL_APIS
+ifeq ($(ARCH),mac)
+	RTAUDIO_FLAGS = -DAUDIO_OSX_CORE=ON
+endif
+ifeq ($(ARCH),win)
+	RTAUDIO_FLAGS = -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
+endif
+ifeq ($(ARCH),lin)
+	RTAUDIO_FLAGS = -DAUDIO_LINUX_ALSA=ON
+endif
 endif
 
 
 .NOTPARALLEL:
 
-all: $(glew) $(glfw) $(jansson) $(libsamplerate) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(ossia)
+all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio)
 	@echo ""
 	@echo "#######################################"
 	@echo "# Built all dependencies successfully #"
@@ -74,17 +91,11 @@ $(glew):
 	$(MAKE) -C glew-2.1.0 GLEW_DEST="$(LOCAL)" LIBDIR="$(LOCAL)/lib" install
 
 $(glfw):
-	$(WGET) https://github.com/glfw/glfw/releases/download/3.2.1/glfw-3.2.1.zip
-	$(UNZIP) glfw-3.2.1.zip
-	cd glfw-3.2.1 && $(CMAKE) . \
+	cd glfw && $(CMAKE) . \
 		-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DBUILD_SHARED_LIBS=ON \
-		-DGLFW_USE_CHDIR=OFF -DGLFW_USE_MENUBAR=ON -DGLFW_USE_RETINA=ON
-	$(MAKE) -C glfw-3.2.1
-	$(MAKE) -C glfw-3.2.1 install
-ifeq ($(ARCH),win)
-	# Not sure why the GLFW build system puts a .dll in the lib directory
-	mv "$(LOCAL)/lib/glfw3.dll" "$(LOCAL)/bin/"
-endif
+		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
+	$(MAKE) -C glfw
+	$(MAKE) -C glfw install
 
 $(jansson):
 	$(WGET) http://www.digip.org/jansson/releases/jansson-2.10.tar.gz
@@ -93,19 +104,27 @@ $(jansson):
 	$(MAKE) -C jansson-2.10
 	$(MAKE) -C jansson-2.10 install
 
-$(libsamplerate):
-	$(WGET) http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz
-	$(UNTAR) libsamplerate-0.1.9.tar.gz
-	cd libsamplerate-0.1.9 && ./configure --prefix="$(LOCAL)" --disable-fftw --disable-sndfile
-	$(MAKE) -C libsamplerate-0.1.9/src
-	$(MAKE) -C libsamplerate-0.1.9/src install
+$(libspeexdsp):
+	$(WGET) https://github.com/xiph/speexdsp/archive/SpeexDSP-1.2rc3.tar.gz
+	$(UNTAR) SpeexDSP-1.2rc3.tar.gz
+	cd speexdsp-SpeexDSP-1.2rc3 && ./autogen.sh && ./configure --prefix="$(LOCAL)"
+	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
+	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
-$(libcurl):
+$(openssl):
+	$(WGET) https://www.openssl.org/source/openssl-1.1.0g.tar.gz
+	$(UNTAR) openssl-1.1.0g.tar.gz
+	cd openssl-1.1.0g && ./config --prefix="$(LOCAL)"
+	$(MAKE) -C openssl-1.1.0g
+	$(MAKE) -C openssl-1.1.0g install
+
+$(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
 	$(UNTAR) curl-7.56.0.tar.gz
 	cd curl-7.56.0 && ./configure --prefix="$(LOCAL)" \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
-		--without-zlib --without-ssl --without-ca-bundle --without-ca-path --without-ca-fallback --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2
+		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 \
+		--without-ca-bundle --with-ca-fallback --with-ssl="$(LOCAL)"
 	$(MAKE) -C curl-7.56.0
 	$(MAKE) -C curl-7.56.0 install
 
@@ -117,19 +136,16 @@ $(libzip):
 	$(MAKE) -C libzip-1.2.0 install
 
 $(rtmidi):
-	$(WGET) http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-3.0.0.tar.gz
-	$(UNTAR) rtmidi-3.0.0.tar.gz
-	cd rtmidi-3.0.0 && ./configure --prefix="$(LOCAL)"
-	$(MAKE) -C rtmidi-3.0.0
-	$(MAKE) -C rtmidi-3.0.0 install
+	git clone https://github.com/thestk/rtmidi.git
+	cd rtmidi && ./autogen.sh --no-configure && ./configure --prefix="$(LOCAL)"
+	$(MAKE) -C rtmidi
+	$(MAKE) -C rtmidi install
 
 $(rtaudio):
-	$(WGET) http://www.music.mcgill.ca/~gary/rtaudio/release/rtaudio-5.0.0.tar.gz
-	$(UNTAR) rtaudio-5.0.0.tar.gz
-	cd rtaudio-5.0.0 && ./configure --prefix="$(LOCAL)"
-	$(MAKE) -C rtaudio-5.0.0
-	$(MAKE) -C rtaudio-5.0.0 install
-
+	cd rtaudio && mkdir -p cmakebuild
+	cd rtaudio/cmakebuild && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
+	$(MAKE) -C rtaudio/cmakebuild
+	$(MAKE) -C rtaudio/cmakebuild install
 $(ossia):
     # TODO use release tarball instead of building it locally
 	git clone https://github.com/OSSIA/libossia --depth=1
@@ -141,4 +157,4 @@ $(ossia):
 	$(MAKE) install
 
 clean:
-	git clean -ffdxi
+	git clean -ffdx

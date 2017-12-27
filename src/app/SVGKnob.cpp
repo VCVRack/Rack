@@ -23,7 +23,9 @@ void SVGKnob::step() {
 	// Re-transform TransformWidget if dirty
 	if (dirty) {
 		tw->box.size = box.size;
-		float angle = rescalef(value, minValue, maxValue, minAngle, maxAngle);
+		float angle = 0.0;
+		if (std::isfinite(minValue) && std::isfinite(maxValue))
+			angle = rescalef(value, minValue, maxValue, minAngle, maxAngle);
 		tw->identity();
 		// Scale SVG to box
 		tw->scale(box.size.div(sw->box.size));

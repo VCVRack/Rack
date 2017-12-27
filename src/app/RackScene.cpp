@@ -122,7 +122,6 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 	Widget::onHoverKey(e);
 }
 
-
 void RackScene::onPathDrop(EventPathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string& firstPath = e.paths.front();
@@ -131,8 +130,10 @@ void RackScene::onPathDrop(EventPathDrop &e) {
 			e.consumed = true;
 		}
 	}
-}
 
+	if (!e.consumed)
+		Scene::onPathDrop(e);
+}
 
 
 } // namespace rack

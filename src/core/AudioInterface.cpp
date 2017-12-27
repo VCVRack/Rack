@@ -1,13 +1,14 @@
 #include <assert.h>
 #include <mutex>
 #include <thread>
+#include <algorithm>
 #include "core.hpp"
 #include "dsp/samplerate.hpp"
 #include "dsp/ringbuffer.hpp"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsuggest-override"
-#include <rtaudio/RtAudio.h>
+#include <RtAudio.h>
 #pragma GCC diagnostic pop
 
 
@@ -28,17 +29,13 @@ struct AudioInterface : Module {
 		NUM_OUTPUTS = AUDIO1_OUTPUT + 8
 	};
 
-	RtAudio stream;
+	RtAudio *stream = NULL;
 	// Stream properties
-	int deviceId = -1;
+	int device = -1;
 	float sampleRate = 44100.0;
 	int blockSize = 256;
 	int numOutputs = 0;
 	int numInputs = 0;
-
-	// Used because the GUI thread and Rack thread can both interact with this class
-	std::mutex bufferMutex;
-	bool streamRunning;
 
 	SampleRateConverter<8> inputSrc;
 	SampleRateConverter<8> outputSrc;
@@ -49,84 +46,115 @@ struct AudioInterface : Module {
 	// in device's sample rate
 	DoubleRingBuffer<Frame<8>, (1<<15)> inputSrcBuffer;
 
-	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {}
+	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+		setDriver(RtAudio::UNSPECIFIED);
+	}
 	~AudioInterface() {
-		closeDevice();
+		closeStream();
 	}
 
 	void step() override;
 	void stepStream(const float *input, float *output, int numFrames);
 
 	int getDeviceCount();
-	std::string getDeviceName(int deviceId);
+	std::string getDeviceName(int device);
 
-	void openDevice(int deviceId, float sampleRate, int blockSize);
-	void closeDevice();
+	void openStream();
+	void closeStream();
 
-	void setDeviceId(int deviceId) {
-		openDevice(deviceId, sampleRate, blockSize);
+	void setDriver(int driver) {
+		closeStream();
+		if (stream)
+			delete stream;
+		stream = new RtAudio((RtAudio::Api) driver);
 	}
-	void setSampleRate(float sampleRate) {
-		openDevice(deviceId, sampleRate, blockSize);
+	int getDriver() {
+		if (!stream)
+			return RtAudio::UNSPECIFIED;
+		return stream->getCurrentApi();
 	}
-	void setBlockSize(int blockSize) {
-		openDevice(deviceId, sampleRate, blockSize);
+	std::vector<int> getAvailableDrivers() {
+		std::vector<RtAudio::Api> apis;
+		RtAudio::getCompiledApi(apis);
+		std::vector<int> drivers;
+		for (RtAudio::Api api : apis)
+			drivers.push_back(api);
+		return drivers;
 	}
+	std::string getDriverName(int driver) {
+		switch (driver) {
+			case RtAudio::UNSPECIFIED: return "Unspecified";
+			case RtAudio::LINUX_ALSA: return "ALSA";
+			case RtAudio::LINUX_PULSE: return "PulseAudio";
+			case RtAudio::LINUX_OSS: return "OSS";
+			case RtAudio::UNIX_JACK: return "JACK";
+			case RtAudio::MACOSX_CORE: return "Core Audio";
+			case RtAudio::WINDOWS_WASAPI: return "WASAPI";
+			case RtAudio::WINDOWS_ASIO: return "ASIO";
+			case RtAudio::WINDOWS_DS: return "DirectSound";
+			case RtAudio::RTAUDIO_DUMMY: return "Dummy";
+			default: return "Unknown";
+		}
+	}
+
+	std::vector<float> getSampleRates();
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		if (deviceId >= 0) {
-			std::string deviceName = getDeviceName(deviceId);
-			json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
-			json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
-			json_object_set_new(rootJ, "blockSize", json_integer(blockSize));
-		}
+		json_object_set_new(rootJ, "driver", json_integer(getDriver()));
+		json_object_set_new(rootJ, "device", json_integer(device));
+		json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
+		json_object_set_new(rootJ, "blockSize", json_integer(blockSize));
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
-		json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
-		if (deviceNameJ) {
-			std::string deviceName = json_string_value(deviceNameJ);
-			for (int i = 0; i < getDeviceCount(); i++) {
-				if (deviceName == getDeviceName(i)) {
-					setDeviceId(i);
-					break;
-				}
-			}
-		}
+		json_t *driverJ = json_object_get(rootJ, "driver");
+		if (driverJ)
+			setDriver(json_number_value(driverJ));
+
+		json_t *deviceJ = json_object_get(rootJ, "device");
+		if (deviceJ)
+			device = json_number_value(deviceJ);
 
 		json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
-		if (sampleRateJ) {
-			setSampleRate(json_number_value(sampleRateJ));
-		}
+		if (sampleRateJ)
+			sampleRate = json_number_value(sampleRateJ);
 
 		json_t *blockSizeJ = json_object_get(rootJ, "blockSize");
-		if (blockSizeJ) {
-			setBlockSize(json_integer_value(blockSizeJ));
-		}
+		if (blockSizeJ)
+			blockSize = json_integer_value(blockSizeJ);
+
+		openStream();
 	}
 
-	void reset() override {
-		closeDevice();
+	void onReset() override {
+		closeStream();
 	}
 };
 
 
+#define TIMED_SLEEP_LOCK(_cond, _spinTime, _totalTime) { \
+	auto startTime = std::chrono::high_resolution_clock::now(); \
+	while (!(_cond)) { \
+		std::this_thread::sleep_for(std::chrono::duration<float>(_spinTime)); \
+		auto currTime = std::chrono::high_resolution_clock::now(); \
+		float totalTime = std::chrono::duration<float>(currTime - startTime).count(); \
+		if (totalTime > (_totalTime)) \
+			break; \
+	} \
+}
+
+
 void AudioInterface::step() {
+	// debug("inputBuffer %d inputSrcBuffer %d outputBuffer %d", inputBuffer.size(), inputSrcBuffer.size(), outputBuffer.size());
 	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
 	if (numOutputs > 0) {
-		while (inputSrcBuffer.size() >= blockSize && streamRunning) {
-			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
-		}
+		TIMED_SLEEP_LOCK(inputSrcBuffer.size() < blockSize, 100e-6, 0.2);
 	}
 	else if (numInputs > 0) {
-		while (outputBuffer.empty() && streamRunning) {
-			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
-		}
+		TIMED_SLEEP_LOCK(!outputBuffer.empty(), 100e-6, 0.2);
 	}
-
-	std::lock_guard<std::mutex> lock(bufferMutex);
 
 	// Get input and pass it through the sample rate converter
 	if (numOutputs > 0) {
@@ -141,7 +169,7 @@ void AudioInterface::step() {
 		// Once full, sample rate convert the input
 		// inputBuffer -> SRC -> inputSrcBuffer
 		if (inputBuffer.full()) {
-			inputSrc.setRatio(sampleRate / engineGetSampleRate());
+			inputSrc.setRates(engineGetSampleRate(), sampleRate);
 			int inLen = inputBuffer.size();
 			int outLen = inputSrcBuffer.capacity();
 			inputSrc.process(inputBuffer.startData(), &inLen, inputSrcBuffer.endData(), &outLen);
@@ -160,16 +188,19 @@ void AudioInterface::step() {
 }
 
 void AudioInterface::stepStream(const float *input, float *output, int numFrames) {
-	if (numOutputs > 0) {
-		// Wait for enough input before proceeding
-		while (inputSrcBuffer.size() < numFrames) {
-			if (!streamRunning)
-				return;
-			std::this_thread::sleep_for(std::chrono::duration<float>(100e-6));
-		}
+	if (gPaused) {
+		memset(output, 0, sizeof(float) * numOutputs * numFrames);
+		return;
 	}
 
-	std::lock_guard<std::mutex> lock(bufferMutex);
+	if (numOutputs > 0) {
+		// Wait for enough input before proceeding
+		TIMED_SLEEP_LOCK(inputSrcBuffer.size() >= numFrames, 100e-6, 0.2);
+	}
+	else if (numInputs > 0) {
+		TIMED_SLEEP_LOCK(outputBuffer.empty(), 100e-6, 0.2);
+	}
+
 	// input stream -> output buffer
 	if (numInputs > 0) {
 		Frame<8> inputFrames[numFrames];
@@ -180,7 +211,7 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 		}
 
 		// Pass output through sample rate converter
-		outputSrc.setRatio(engineGetSampleRate() / sampleRate);
+		outputSrc.setRates(sampleRate, engineGetSampleRate());
 		int inLen = numFrames;
 		int outLen = outputBuffer.capacity();
 		outputSrc.process(inputFrames, &inLen, outputBuffer.endData(), &outLen);
@@ -190,27 +221,32 @@ void AudioInterface::stepStream(const float *input, float *output, int numFrames
 	// input buffer -> output stream
 	if (numOutputs > 0) {
 		for (int i = 0; i < numFrames; i++) {
-			if (inputSrcBuffer.empty())
-				break;
-			Frame<8> f = inputSrcBuffer.shift();
+			Frame<8> f;
+			if (inputSrcBuffer.empty()) {
+				memset(&f, 0, sizeof(f));
+			}
+			else {
+				f = inputSrcBuffer.shift();
+			}
 			for (int c = 0; c < numOutputs; c++) {
-				output[i*numOutputs + c] = (c < 8) ? clampf(f.samples[c], -1.0, 1.0) : 0.0;
+				output[i*numOutputs + c] = clampf(f.samples[c], -1.0, 1.0);
 			}
 		}
 	}
 }
 
 int AudioInterface::getDeviceCount() {
-	return stream.getDeviceCount();
+	if (!stream)
+		return 0;
+	return stream->getDeviceCount();
 }
 
-std::string AudioInterface::getDeviceName(int deviceId) {
-	if (deviceId < 0)
+std::string AudioInterface::getDeviceName(int device) {
+	if (!stream || device < 0)
 		return "";
 
-	std::lock_guard<std::mutex> lock(bufferMutex);
 	try {
-		RtAudio::DeviceInfo deviceInfo = stream.getDeviceInfo(deviceId);
+		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(device);
 		return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
 	}
 	catch (RtAudioError &e) {
@@ -226,18 +262,17 @@ static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrame
 	return 0;
 }
 
-void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
-	closeDevice();
-	std::lock_guard<std::mutex> lock(bufferMutex);
-
-	this->sampleRate = sampleRate;
-	this->blockSize = blockSize;
+void AudioInterface::openStream() {
+	int device = this->device;
+	closeStream();
+	if (!stream)
+		return;
 
 	// Open new device
-	if (deviceId >= 0) {
+	if (device >= 0) {
 		RtAudio::DeviceInfo deviceInfo;
 		try {
-			deviceInfo = stream.getDeviceInfo(deviceId);
+			deviceInfo = stream->getDeviceInfo(device);
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to query audio device: %s", e.what());
@@ -247,23 +282,37 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		numOutputs = mini(deviceInfo.outputChannels, 8);
 		numInputs = mini(deviceInfo.inputChannels, 8);
 
+		if (numOutputs == 0 && numInputs == 0) {
+			warn("Audio device %d has 0 inputs and 0 outputs");
+			return;
+		}
+
 		RtAudio::StreamParameters outParameters;
-		outParameters.deviceId = deviceId;
+		outParameters.deviceId = device;
 		outParameters.nChannels = numOutputs;
 
 		RtAudio::StreamParameters inParameters;
-		inParameters.deviceId = deviceId;
+		inParameters.deviceId = device;
 		inParameters.nChannels = numInputs;
 
 		RtAudio::StreamOptions options;
-		options.flags |= RTAUDIO_MINIMIZE_LATENCY;
+		// options.flags |= RTAUDIO_SCHEDULE_REALTIME;
+
+		// Find closest sample rate
+		unsigned int closestSampleRate = 0;
+		for (unsigned int sr : deviceInfo.sampleRates) {
+			if (fabsf(sr - sampleRate) < fabsf(closestSampleRate - sampleRate)) {
+				closestSampleRate = sr;
+			}
+		}
 
 		try {
 			// Don't use stream parameters if 0 input or output channels
-			stream.openStream(
+			debug("Opening audio stream %d", device);
+			stream->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
-				RTAUDIO_FLOAT32, sampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
+				RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to open audio stream: %s", e.what());
@@ -271,37 +320,44 @@ void AudioInterface::openDevice(int deviceId, float sampleRate, int blockSize) {
 		}
 
 		try {
-			stream.startStream();
+			debug("Starting audio stream %d", device);
+			stream->startStream();
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to start audio stream: %s", e.what());
 			return;
 		}
 
-		streamRunning = true;
-
-		this->sampleRate = stream.getStreamSampleRate();
-		this->deviceId = deviceId;
+		// Update sample rate because this may have changed
+		this->sampleRate = stream->getStreamSampleRate();
+		this->device = device;
 	}
 }
 
-void AudioInterface::closeDevice() {
-	std::lock_guard<std::mutex> lock(bufferMutex);
-
-	if (stream.isStreamOpen()) {
-		streamRunning = false;
-		try {
-			stream.abortStream();
-			stream.closeStream();
+void AudioInterface::closeStream() {
+	if (stream) {
+		if (stream->isStreamRunning()) {
+			debug("Aborting audio stream %d", device);
+			try {
+				stream->abortStream();
+			}
+			catch (RtAudioError &e) {
+				warn("Failed to abort stream %s", e.what());
+			}
 		}
-		catch (RtAudioError &e) {
-			warn("Failed to abort stream %s", e.what());
-			return;
+		if (stream->isStreamOpen()) {
+			debug("Closing audio stream %d", device);
+			try {
+				stream->closeStream();
+			}
+			catch (RtAudioError &e) {
+				warn("Failed to close stream %s", e.what());
+			}
 		}
 	}
 
 	// Reset stream settings
-	deviceId = -1;
+	device = -1;
 	numOutputs = 0;
 	numInputs = 0;
 
@@ -313,16 +369,71 @@ void AudioInterface::closeDevice() {
 	outputSrc.reset();
 }
 
+std::vector<float> AudioInterface::getSampleRates() {
+	std::vector<float> allowedSampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
+	if (!stream || device < 0)
+		return allowedSampleRates;
 
-struct AudioItem : MenuItem {
+	try {
+		std::vector<float> sampleRates;
+		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(device);
+		for (int sr : deviceInfo.sampleRates) {
+			float sampleRate = sr;
+			auto allowedIt = std::find(allowedSampleRates.begin(), allowedSampleRates.end(), sampleRate);
+			if (allowedIt != allowedSampleRates.end()) {
+				sampleRates.push_back(sampleRate);
+			}
+		}
+		return sampleRates;
+	}
+	catch (RtAudioError &e) {
+		warn("Failed to query audio device: %s", e.what());
+		return {};
+	}
+}
+
+
+
+struct AudioDriverItem : MenuItem {
 	AudioInterface *audioInterface;
-	int deviceId;
+	int driver;
 	void onAction(EventAction &e) override {
-		audioInterface->setDeviceId(deviceId);
+		audioInterface->setDriver(driver);
 	}
 };
 
-struct AudioChoice : ChoiceButton {
+struct AudioDriverChoice : ChoiceButton {
+	AudioInterface *audioInterface;
+	void onAction(EventAction &e) override {
+		Menu *menu = gScene->createMenu();
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
+		menu->box.size.x = box.size.x;
+
+		for (int driver : audioInterface->getAvailableDrivers()) {
+			AudioDriverItem *audioItem = new AudioDriverItem();
+			audioItem->audioInterface = audioInterface;
+			audioItem->driver = driver;
+			audioItem->text = audioInterface->getDriverName(driver);
+			menu->addChild(audioItem);
+		}
+	}
+	void step() override {
+		text = audioInterface->getDriverName(audioInterface->getDriver());
+	}
+};
+
+
+struct AudioDeviceItem : MenuItem {
+	AudioInterface *audioInterface;
+	int device;
+	void onAction(EventAction &e) override {
+		audioInterface->device = device;
+		audioInterface->openStream();
+	}
+};
+
+struct AudioDeviceChoice : ChoiceButton {
+	int lastDeviceId = -1;
 	AudioInterface *audioInterface;
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
@@ -331,23 +442,26 @@ struct AudioChoice : ChoiceButton {
 
 		int deviceCount = audioInterface->getDeviceCount();
 		{
-			AudioItem *audioItem = new AudioItem();
+			AudioDeviceItem *audioItem = new AudioDeviceItem();
 			audioItem->audioInterface = audioInterface;
-			audioItem->deviceId = -1;
+			audioItem->device = -1;
 			audioItem->text = "No device";
-			menu->pushChild(audioItem);
+			menu->addChild(audioItem);
 		}
-		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
-			AudioItem *audioItem = new AudioItem();
+		for (int device = 0; device < deviceCount; device++) {
+			AudioDeviceItem *audioItem = new AudioDeviceItem();
 			audioItem->audioInterface = audioInterface;
-			audioItem->deviceId = deviceId;
-			audioItem->text = audioInterface->getDeviceName(deviceId);
-			menu->pushChild(audioItem);
+			audioItem->device = device;
+			audioItem->text = audioInterface->getDeviceName(device);
+			menu->addChild(audioItem);
 		}
 	}
 	void step() override {
-		std::string name = audioInterface->getDeviceName(audioInterface->deviceId);
-		text = ellipsize(name, 24);
+		if (lastDeviceId != audioInterface->device) {
+			std::string name = audioInterface->getDeviceName(audioInterface->device);
+			text = ellipsize(name, 24);
+			lastDeviceId = audioInterface->device;
+		}
 	}
 };
 
@@ -356,7 +470,8 @@ struct SampleRateItem : MenuItem {
 	AudioInterface *audioInterface;
 	float sampleRate;
 	void onAction(EventAction &e) override {
-		audioInterface->setSampleRate(sampleRate);
+		audioInterface->sampleRate = sampleRate;
+		audioInterface->openStream();
 	}
 };
 
@@ -367,14 +482,12 @@ struct SampleRateChoice : ChoiceButton {
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
 
-		const float sampleRates[6] = {44100, 48000, 88200, 96000, 176400, 192000};
-		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
-		for (int i = 0; i < sampleRatesLen; i++) {
+		for (float sampleRate : audioInterface->getSampleRates()) {
 			SampleRateItem *item = new SampleRateItem();
 			item->audioInterface = audioInterface;
-			item->sampleRate = sampleRates[i];
-			item->text = stringf("%.0f Hz", sampleRates[i]);
-			menu->pushChild(item);
+			item->sampleRate = sampleRate;
+			item->text = stringf("%.0f Hz", sampleRate);
+			menu->addChild(item);
 		}
 	}
 	void step() override {
@@ -387,7 +500,8 @@ struct BlockSizeItem : MenuItem {
 	AudioInterface *audioInterface;
 	int blockSize;
 	void onAction(EventAction &e) override {
-		audioInterface->setBlockSize(blockSize);
+		audioInterface->blockSize = blockSize;
+		audioInterface->openStream();
 	}
 };
 
@@ -405,7 +519,7 @@ struct BlockSizeChoice : ChoiceButton {
 			item->audioInterface = audioInterface;
 			item->blockSize = blockSizes[i];
 			item->text = stringf("%d", blockSizes[i]);
-			menu->pushChild(item);
+			menu->addChild(item);
 		}
 	}
 	void step() override {
@@ -429,62 +543,77 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	// addChild(createScrew<ScrewSilver>(Vec(15, 365)));
 	// addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 365)));
 
-	float margin = 5;
+	Vec margin = Vec(5, 2);
 	float labelHeight = 15;
-	float yPos = margin;
+	float yPos = margin.y;
 	float xPos;
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
+		label->text = "Audio driver";
+		addChild(label);
+		yPos += labelHeight + margin.y;
+
+		AudioDriverChoice *choice = new AudioDriverChoice();
+		choice->audioInterface = module;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
+		addChild(choice);
+		yPos += choice->box.size.y + margin.y;
+	}
+
+	{
+		Label *label = new Label();
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Audio device";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 
-		AudioChoice *choice = new AudioChoice();
-		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
-		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 2*margin;
+		AudioDeviceChoice *choice = new AudioDeviceChoice();
+		choice->audioInterface = module;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
 		addChild(choice);
-		yPos += choice->box.size.y + margin;
+		yPos += choice->box.size.y + margin.y;
 	}
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Sample rate";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 
 		SampleRateChoice *choice = new SampleRateChoice();
-		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
-		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 2*margin;
+		choice->audioInterface = module;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
 		addChild(choice);
-		yPos += choice->box.size.y + margin;
+		yPos += choice->box.size.y + margin.y;
 	}
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Block size";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 
 		BlockSizeChoice *choice = new BlockSizeChoice();
-		choice->audioInterface = dynamic_cast<AudioInterface*>(module);
-		choice->box.pos = Vec(margin, yPos);
-		choice->box.size.x = box.size.x - 2*margin;
+		choice->audioInterface = module;
+		choice->box.pos = Vec(margin.x, yPos);
+		choice->box.size.x = box.size.x - 2*margin.x;
 		addChild(choice);
-		yPos += choice->box.size.y + margin;
+		yPos += choice->box.size.y + margin.y;
 	}
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Outputs";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 	}
 
 	yPos += 5;
@@ -496,9 +625,9 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 
 	yPos += 5;
 	xPos = 10;
@@ -509,16 +638,16 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 
 	{
 		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
+		label->box.pos = Vec(margin.x, yPos);
 		label->text = "Inputs";
 		addChild(label);
-		yPos += labelHeight + margin;
+		yPos += labelHeight + margin.y;
 	}
 
 	yPos += 5;
@@ -530,9 +659,9 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 
 	yPos += 5;
 	xPos = 10;
@@ -543,7 +672,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		label->text = stringf("%d", i + 1);
 		addChild(label);
 
-		xPos += 37 + margin;
+		xPos += 37 + margin.x;
 	}
-	yPos += 35 + margin;
+	yPos += 35 + margin.y;
 }

@@ -120,15 +120,6 @@ inline float sincf(float x) {
 	return sinf(x) / x;
 }
 
-inline float getf(const float *p, float v = 0.0) {
-	return p ? *p : v;
-}
-
-inline void setf(float *p, float v) {
-	if (p)
-		*p = v;
-}
-
 /** Linearly interpolate an array `p` with index `x`
 Assumes that the array at `p` is of length at least floor(x)+1.
 */
@@ -139,7 +130,7 @@ inline float interpf(const float *p, float x) {
 }
 
 /** Complex multiply c = a * b
-It is of course acceptable to reuse arguments
+Arguments may be the same pointers
 i.e. cmultf(&ar, &ai, ar, ai, br, bi)
 */
 inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {

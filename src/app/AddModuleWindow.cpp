@@ -70,7 +70,7 @@ struct MetadataMenu : ListMenu {
 
 				// Plugin metadata
 				if (!model->plugin->website.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->path));
+					addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->website));
 				}
 				if (!model->plugin->manual.empty()) {
 					addChild(construct<UrlItem>(&MenuEntry::text, "Manual", &UrlItem::url, model->plugin->manual));
@@ -119,10 +119,6 @@ struct ModelItem : MenuItem {
 	void onMouseEnter(EventMouseEnter &e) override {
 		sModel = model;
 		MenuItem::onMouseEnter(e);
-	}
-	void onMouseLeave(EventMouseLeave &e) override {
-		sModel = NULL;
-		MenuItem::onMouseLeave(e);
 	}
 };
 
@@ -183,6 +179,8 @@ struct ManufacturerMenu : ListMenu {
 	std::string filter;
 
 	ManufacturerMenu() {
+		addChild(construct<MenuLabel>(&MenuLabel::text, "Manufacturers"));
+
 		// Collect manufacturer names
 		std::set<std::string> manufacturers;
 		for (Plugin *plugin : gPlugins) {
@@ -205,7 +203,8 @@ struct ManufacturerMenu : ListMenu {
 			// Make children with a matching model visible
 			for (Widget *child : children) {
 				MenuItem *item = dynamic_cast<MenuItem*>(child);
-				assert(item);
+				if (!item)
+					continue;
 
 				std::string manufacturer = item->text;
 				for (Plugin *plugin : gPlugins) {
@@ -282,9 +281,6 @@ AddModuleWindow::AddModuleWindow() {
 	metadataScroll->box.pos = Vec(400, posY);
 	metadataScroll->box.size = Vec(200, box.size.y - posY);
 	addChild(metadataScroll);
-
-	// NVGcolor c = bndTransparent(nvgRGB(0, 0, 0));
-	NVGcolor c = bndGetTheme()->nodeTheme.nodeBackdropColor;
 }
 
 

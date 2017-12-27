@@ -14,7 +14,7 @@ ifeq ($(ARCH), lin)
 	LDFLAGS += -rdynamic \
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lossia
+		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl -lossia
 	TARGET = Rack
 endif
 
@@ -23,7 +23,7 @@ ifeq ($(ARCH), mac)
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lportaudio -lrtmidi -lossia
+		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl -lossia
 	TARGET = Rack
 	BUNDLE = dist/$(TARGET).app
 endif
@@ -33,8 +33,8 @@ ifeq ($(ARCH), win)
 	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lportaudio_x64 -lrtmidi \
-		-Wl,-Bstatic -ljansson -lsamplerate -lossia
+		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl \
+		-Wl,-Bstatic -ljansson -lspeexdsp -lossia
 	TARGET = Rack.exe
 	OBJECTS = Rack.res
 endif
@@ -58,13 +58,25 @@ ifeq ($(ARCH), win)
 endif
 
 debug: $(TARGET)
-ifeq ($(ARCH), mac)
-	lldb ./Rack
-else
+ifeq ($(ARCH), lin)
 	LD_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
 endif
+ifeq ($(ARCH), mac)
+	DYLD_FALLBACK_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
+endif
+ifeq ($(ARCH), win)
+	# TODO get rid of the mingw64 path
+	env PATH=dep/bin:/mingw64/bin gdb -ex run ./Rack
+endif
+
+perf: $(TARGET)
+ifeq ($(ARCH), lin)
+	LD_LIBRARY_PATH=dep/lib perf record --call-graph dwarf ./Rack
+endif
+
 
 clean:
+	rm -fv libRack.a
 	rm -rfv $(TARGET) build dist
 
 # For Windows resources
@@ -97,20 +109,22 @@ ifeq ($(ARCH), mac)
 	cp dep/lib/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libspeexdsp.1.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libzip.5.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/librtaudio.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libcrypto.1.1.dylib $(BUNDLE)/Contents/MacOS/
 
 	install_name_tool -change /usr/local/lib/libGLEW.2.1.0.dylib @executable_path/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change lib/libglfw.3.dylib @executable_path/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libjansson.4.dylib @executable_path/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/Rack
-	install_name_tool -change $(PWD)/dep/lib/libsamplerate.0.dylib @executable_path/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libspeexdsp.1.dylib @executable_path/libspeexdsp.1.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libcurl.4.dylib @executable_path/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libzip.5.dylib @executable_path/libzip.5.dylib $(BUNDLE)/Contents/MacOS/Rack
-	install_name_tool -change $(PWD)/dep/lib/libportaudio.2.dylib @executable_path/libportaudio.2.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change librtaudio.dylib @executable_path/librtaudio.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/librtmidi.4.dylib @executable_path/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib $(BUNDLE)/Contents/MacOS/Rack
 
 	otool -L $(BUNDLE)/Contents/MacOS/Rack
 
@@ -124,6 +138,7 @@ ifeq ($(ARCH), win)
 	mkdir -p dist/Rack
 	cp -R LICENSE* res dist/Rack/
 	cp Rack.exe dist/Rack/
+	strip dist/Rack/Rack.exe
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/zlib1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
@@ -133,9 +148,11 @@ ifeq ($(ARCH), win)
 	cp dep/bin/libcurl-4.dll dist/Rack/
 	cp dep/bin/libjansson-4.dll dist/Rack/
 	cp dep/bin/librtmidi-4.dll dist/Rack/
-	cp dep/bin/libsamplerate-0.dll dist/Rack/
+	cp dep/bin/libspeexdsp-1.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
-	cp dep/bin/portaudio_x64.dll dist/Rack/
+	cp dep/bin/librtaudio.dll dist/Rack/
+	cp dep/bin/libcrypto-1_1-x64.dll dist/Rack/
+	cp dep/bin/libssl-1_1-x64.dll dist/Rack/
 	mkdir -p dist/Rack/plugins
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
 	# Make ZIP
@@ -148,20 +165,37 @@ ifeq ($(ARCH), lin)
 	mkdir -p dist/Rack
 	cp -R LICENSE* res dist/Rack/
 	cp Rack Rack.sh dist/Rack/
-	cp dep/lib/libsamplerate.so.0 dist/Rack/
+	cp dep/lib/libspeexdsp.so dist/Rack/
 	cp dep/lib/libjansson.so.4 dist/Rack/
 	cp dep/lib/libGLEW.so.2.1 dist/Rack/
 	cp dep/lib/libglfw.so.3 dist/Rack/
 	cp dep/lib/libcurl.so.4 dist/Rack/
 	cp dep/lib/libzip.so.5 dist/Rack/
-	cp dep/lib/librtaudio.so.6 dist/Rack/
+	cp dep/lib/librtaudio.so dist/Rack/
 	cp dep/lib/librtmidi.so.4 dist/Rack/
-	cp /usr/local/lib/libossia.so dist/Rack/
+	cp dep/lib/libssl.so.1.1 dist/Rack/
+	cp dep/lib/libcrypto.so.1.1 dist/Rack/
 	mkdir -p dist/Rack/plugins
-	# Make ZIP
 	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
-	cp -R plugins/Tutorial/dist/Template dist/Rack/plugins/	
+	# Make ZIP
+	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
+
+
+# Obviously this will only work if you have the private keys to my server
+UPLOAD_URL = vortico@vcvrack.com:files/
+upload: dist distplugins
+ifeq ($(ARCH), mac)
+	rsync dist/*.dmg $(UPLOAD_URL) -zP
+endif
+ifeq ($(ARCH), win)
+	rsync dist/*.exe $(UPLOAD_URL) -P
+	rsync dist/*.zip $(UPLOAD_URL) -P
+endif
+ifeq ($(ARCH), lin)
+	rsync dist/*.zip $(UPLOAD_URL) -zP
+endif
+	rsync plugins/*/dist/*.zip $(UPLOAD_URL) -zP
 
 
 # Plugin helpers
