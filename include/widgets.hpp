@@ -178,6 +178,7 @@ struct ZoomWidget : Widget {
 	void onMouseMove(EventMouseMove &e) override;
 	void onHoverKey(EventHoverKey &e) override;
 	void onScroll(EventScroll &e) override;
+	void onPathDrop(EventPathDrop &e) override;
 };
 
 ////////////////////
@@ -295,7 +296,7 @@ struct Label : Widget {
 /** Deletes itself from parent when clicked */
 struct MenuOverlay : OpaqueWidget {
 	void step() override;
-	void onDragDrop(EventDragDrop &e) override;
+	void onMouseDown(EventMouseDown &e) override;
 	void onHoverKey(EventHoverKey &e) override;
 };
 

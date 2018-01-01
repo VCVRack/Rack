@@ -322,7 +322,7 @@ struct BefacoTinyKnob : SVGKnob {
 	}
 };
 
-struct BefacoSlidePot : SVGSlider {
+struct BefacoSlidePot : SVGFader {
 	BefacoSlidePot() {
 		Vec margin = Vec(3.5, 3.5);
 		maxHandlePos = Vec(-1, -2).plus(margin);

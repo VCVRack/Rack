@@ -51,6 +51,11 @@ struct SlewLimiter {
 	float rise = 1.0;
 	float fall = 1.0;
 	float out = 0.0;
+
+	void setRiseFall(float _rise, float _fall) {
+		rise = _rise;
+		fall = _fall;
+	}
 	float process(float in) {
 		float delta = clampf(in - out, -fall, rise);
 		out += delta;

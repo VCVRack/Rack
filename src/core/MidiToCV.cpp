@@ -1,9 +1,9 @@
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
+
 
 /*
  * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
@@ -74,7 +74,7 @@ struct MIDIToCVInterface : MidiIO, Module {
 		baseFromJson(rootJ);
 	}
 
-	void reset() override {
+	void onReset() override {
 		resetMidi();
 	}
 
@@ -100,9 +100,8 @@ void MIDIToCVInterface::step() {
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
 		getMessage(&message);
-		while (message.size() > 0) {
+		if (message.size() > 0) {
 			processMidi(message);
-			getMessage(&message);
 		}
 	}
 

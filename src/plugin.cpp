@@ -32,52 +32,6 @@ namespace rack {
 std::list<Plugin*> gPlugins;
 std::string gToken;
 
-std::string gTagNames[NUM_TAGS] = {
-	"Amplifier/VCA",
-	"Attenuator",
-	"Blank",
-	"Clock",
-	"Controller",
-	"Delay",
-	"Digital",
-	"Distortion",
-	"Drum",
-	"Dual/Stereo",
-	"Dynamics",
-	"Effect",
-	"Envelope Follower",
-	"Envelope Generator",
-	"Equalizer",
-	"External",
-	"Filter/VCF",
-	"Function Generator",
-	"Granular",
-	"LFO",
-	"Logic",
-	"Low Pass Gate",
-	"MIDI",
-	"Mixer",
-	"Multiple",
-	"Noise",
-	"Oscillator/VCO",
-	"Panning",
-	"Quad",
-	"Quantizer",
-	"Random",
-	"Reverb",
-	"Ring Modulator",
-	"Sample and Hold",
-	"Sampler",
-	"Sequencer",
-	"Slew Limiter",
-	"Switch",
-	"Synth Voice",
-	"Tuner",
-	"Utility",
-	"Visual",
-	"Waveshaper",
-};
-
 
 static bool isDownloading = false;
 static float downloadProgress = 0.0;
@@ -144,6 +98,16 @@ static int loadPlugin(std::string path) {
 	plugin->path = path;
 	plugin->handle = handle;
 	initCallback(plugin);
+
+	// Reject plugin if slug already exists
+	for (Plugin *p : gPlugins) {
+		if (plugin->slug == p->slug) {
+			warn("Plugin \"%s\" is already loaded, not attempting to load it again");
+			// TODO
+			// Fix memory leak with `plugin` here
+			return -1;
+		}
+	}
 
 	// Add plugin to list
 	gPlugins.push_back(plugin);
@@ -410,6 +374,7 @@ bool pluginSync(bool dryRun) {
 ////////////////////
 
 void pluginInit() {
+	tagsInit();
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *coreManufacturer = new Plugin();

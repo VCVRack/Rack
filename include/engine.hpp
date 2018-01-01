@@ -3,12 +3,17 @@
 #include "util.hpp"
 #include <jansson.h>
 
+#include <ossia/network/network.hpp>
+#include <ossia/network/oscquery/oscquery_server.hpp>
 
 namespace rack {
 
+extern ossia::net::generic_device& root_dev();
 
 struct Param {
 	float value = 0.0;
+	std::string name = "param.1";
+	ossia::net::parameter_base* ossia_param;
 };
 
 struct Light {
@@ -16,7 +21,7 @@ struct Light {
 	float value = 0.0;
 	float getBrightness();
 	void setBrightness(float brightness) {
-		value = brightness * brightness;
+		value = (brightness > 0.f) ? brightness * brightness : 0.f;
 	}
 	void setBrightnessSmooth(float brightness);
 };
@@ -41,7 +46,6 @@ struct Output {
 	Light plugLights[2];
 };
 
-
 struct Module {
 	std::vector<Param> params;
 	std::vector<Input> inputs;
@@ -49,6 +53,8 @@ struct Module {
 	std::vector<Light> lights;
 	/** For CPU usage meter */
 	float cpuTime = 0.0;
+    
+    ossia::net::node_base* node{};
 
 	/** Deprecated, use constructor below this one */
 	Module() DEPRECATED {}
@@ -58,6 +64,8 @@ struct Module {
 		inputs.resize(numInputs);
 		outputs.resize(numOutputs);
 		lights.resize(numLights);
+        
+        node = &ossia::net::create_node(rack::root_dev(),"module");
 	}
 	virtual ~Module() {}
 
@@ -65,11 +73,14 @@ struct Module {
 	virtual void step() {}
 	virtual void onSampleRateChange() {}
 
-	/** Override these to implement spacial behavior when user clicks Initialize and Randomize */
-	virtual void reset() {}
-	virtual void randomize() {}
-	/** Deprecated */
-	virtual void initialize() final {}
+	/** Called when module is created by the Add Module popup, cloning, or when loading a patch or autosave */
+	virtual void onCreate() {}
+	/** Called when user explicitly deletes the module, not when Rack is closed or a new patch is loaded */
+	virtual void onDelete() {}
+	/** Called when user clicks Initialize in the module context menu */
+	virtual void onReset() {}
+	/** Called when user clicks Randomize in the module context menu */
+	virtual void onRandomize() {}
 
 	/** Override these to store extra internal data in the "data" property */
 	virtual json_t *toJson() { return NULL; }

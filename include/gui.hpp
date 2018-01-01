@@ -17,8 +17,14 @@ namespace rack {
 extern GLFWwindow *gWindow;
 extern NVGcontext *gVg;
 extern NVGcontext *gFramebufferVg;
+/** The default font to use for GUI elements */
 extern std::shared_ptr<Font> gGuiFont;
+/** The scaling ratio */
 extern float gPixelRatio;
+/* The ratio between the framebuffer size and the window size reported by the OS.
+This is not equal to gPixelRatio in general.
+*/
+extern float gWindowRatio;
 extern bool gAllowCursorLock;
 extern int gGuiFrame;
 extern Vec gMousePos;
