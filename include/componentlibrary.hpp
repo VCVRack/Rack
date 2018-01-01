@@ -337,6 +337,22 @@ struct BefacoSlidePot : SVGFader {
 };
 
 ////////////////////
+// IO widgets
+////////////////////
+
+struct USB_B_AudioWidget : AudioWidget, SVGWidget {
+	USB_B_AudioWidget() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/USB-B.svg")));
+	}
+};
+
+struct DIN_MIDIWidget : MIDIWidget, SVGWidget {
+	DIN_MIDIWidget() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/MIDI_DIN.svg")));
+	}
+};
+
+////////////////////
 // Jacks
 ////////////////////
 

@@ -53,13 +53,13 @@ struct FileChoice : ChoiceButton {
 };
 
 
-struct PauseItem : MenuItem {
+struct EnginePauseItem : MenuItem {
 	void onAction(EventAction &e) override {
 		gPaused = !gPaused;
 	}
 };
 
-struct SampleRateItem : MenuItem {
+struct EngineSampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction(EventAction &e) override {
 		engineSetSampleRate(sampleRate);
@@ -67,22 +67,21 @@ struct SampleRateItem : MenuItem {
 	}
 };
 
-struct SampleRateChoice : ChoiceButton {
+struct EngineSampleRateChoice : ChoiceButton {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		PauseItem *pauseItem = new PauseItem();
+		EnginePauseItem *pauseItem = new EnginePauseItem();
 		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
 		menu->addChild(pauseItem);
 
-		float sampleRates[] = {44100, 48000, 88200, 96000, 176400, 192000};
-		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
-		for (int i = 0; i < sampleRatesLen; i++) {
-			SampleRateItem *item = new SampleRateItem();
-			item->text = stringf("%.0f Hz", sampleRates[i]);
-			item->sampleRate = sampleRates[i];
+		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
+		for (float sampleRate : sampleRates) {
+			EngineSampleRateItem *item = new EngineSampleRateItem();
+			item->text = stringf("%.0f Hz", sampleRate);
+			item->sampleRate = sampleRate;
 			menu->addChild(item);
 		}
 	}
@@ -112,7 +111,7 @@ Toolbar::Toolbar() {
 	xPos += margin;
 
 	{
-		SampleRateChoice *srChoice = new SampleRateChoice();
+		EngineSampleRateChoice *srChoice = new EngineSampleRateChoice();
 		srChoice->box.pos = Vec(xPos, margin);
 		srChoice->box.size.x = 100;
 		addChild(srChoice);
