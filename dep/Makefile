@@ -58,6 +58,7 @@ ifeq ($(ARCH),win)
 	rtmidi = bin/librtmidi-4.dll
 	rtaudio = bin/librtaudio.dll
 	openssl = bin/libssl-1_1-x64.dll
+	ossia = bin/ossia.dll
 endif
 
 # Library configuration
@@ -76,7 +77,7 @@ endif
 
 .NOTPARALLEL:
 
-all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio)
+all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(ossia)
 	@echo ""
 	@echo "#######################################"
 	@echo "# Built all dependencies successfully #"
@@ -146,8 +147,8 @@ $(rtaudio):
 	cd rtaudio/cmakebuild && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/cmakebuild
 	$(MAKE) -C rtaudio/cmakebuild install
+
 $(ossia):
-    # TODO use release tarball instead of building it locally
 	git clone https://github.com/OSSIA/libossia --depth=1
 	mkdir -p build-libossia && cd build-libossia && $(CMAKE) \
 	-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DOSSIA_PD=OFF \
