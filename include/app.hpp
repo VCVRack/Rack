@@ -279,6 +279,21 @@ struct MomentarySwitch : virtual Switch {
 };
 
 ////////////////////
+// IO widgets
+////////////////////
+
+struct AudioIO;
+
+struct AudioWidget : OpaqueWidget {
+	/** Not owned */
+	AudioIO *audioIO = NULL;
+	void onMouseDown(EventMouseDown &e) override;
+};
+
+struct MIDIWidget : OpaqueWidget {
+};
+
+////////////////////
 // lights
 ////////////////////
 
