@@ -8,7 +8,8 @@
 #include "gui.hpp"
 #include "app.hpp"
 #include "components.hpp"
-
+#include <iostream>
+#include <sstream>
 
 namespace rack {
 
@@ -24,6 +25,8 @@ Model *createModel(std::string manufacturer, std::string slug, std::string name,
 		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
 			moduleWidget->model = this;
+                        
+            moduleWidget->module->node->set_name(name);
 			return moduleWidget;
 		}
 	};
@@ -43,13 +46,38 @@ Widget *createScrew(Vec pos) {
 }
 
 template <class TParamWidget>
-ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue, std::string name = std::string("")) {
 	ParamWidget *param = new TParamWidget();
 	param->box.pos = pos;
 	param->module = module;
 	param->paramId = paramId;
-	param->setLimits(minValue, maxValue);
+    
+    auto& p = module->params[paramId];
+
+    if (name == "")
+    {
+        std::stringstream ss;
+        ss << "param." << paramId;
+        name = ss.str();
+    }
+    auto& p_node = ossia::net::create_node(*module->node, name);
+    p.ossia_param = p_node.create_parameter(ossia::val_type::FLOAT);
+    p.ossia_param->set_domain(ossia::make_domain(minValue,maxValue));
+    p.ossia_param->set_bounding(ossia::bounding_mode::CLIP);
+    p.ossia_param->push_value(defaultValue);
+    p.ossia_param->set_default_value(defaultValue);
+    
+    p.ossia_param->add_callback([param] (const ossia::value& v) {
+        auto& p = param->module->params[param->paramId];
+        param->value = v.get<float>();
+        p.value = param->value;
+        if ( auto fbw = dynamic_cast<FramebufferWidget*>(param))
+            fbw->dirty = true;
+    });
+    
+    param->setLimits(minValue, maxValue);
 	param->setDefaultValue(defaultValue);
+    
 	return param;
 }
 

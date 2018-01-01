@@ -3,12 +3,17 @@
 #include "util.hpp"
 #include <jansson.h>
 
+#include <ossia/network/network.hpp>
+#include <ossia/network/oscquery/oscquery_server.hpp>
 
 namespace rack {
 
+extern ossia::net::generic_device& root_dev();
 
 struct Param {
 	float value = 0.0;
+	std::string name = "param.1";
+	ossia::net::parameter_base* ossia_param;
 };
 
 struct Light {
@@ -41,7 +46,6 @@ struct Output {
 	Light plugLights[2];
 };
 
-
 struct Module {
 	std::vector<Param> params;
 	std::vector<Input> inputs;
@@ -49,6 +53,8 @@ struct Module {
 	std::vector<Light> lights;
 	/** For CPU usage meter */
 	float cpuTime = 0.0;
+    
+    ossia::net::node_base* node{};
 
 	/** Deprecated, use constructor below this one */
 	Module() DEPRECATED {}
@@ -58,6 +64,8 @@ struct Module {
 		inputs.resize(numInputs);
 		outputs.resize(numOutputs);
 		lights.resize(numLights);
+        
+        node = &ossia::net::create_node(rack::root_dev(),"module");
 	}
 	virtual ~Module() {}
 

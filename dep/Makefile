@@ -3,19 +3,13 @@ LOCAL = $(shell pwd)
 # Arch-specifics
 include ../arch.mk
 
-FLAGS += -g -O3 -march=nocona
-
 ifeq ($(ARCH),mac)
-	FLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
-	LDFLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
+	MACOS_FLAGS = -mmacosx-version-min=10.7 -stdlib=libc++
+	export CFLAGS = $(MACOS_FLAGS)
+	export CXXFLAGS = $(MACOS_FLAGS)
+	export CPPFLAGS = $(MACOS_FLAGS)
+	export LDFLAGS = $(MACOS_FLAGS)
 endif
-
-CFLAGS += $(FLAGS)
-CXXFLAGS += $(FLAGS)
-export CFLAGS
-export CXXFLAGS
-export LDFLAGS
-
 
 # Commands
 WGET = wget -nc
@@ -38,6 +32,7 @@ ifeq ($(ARCH),lin)
 	rtmidi = lib/librtmidi.so
 	rtaudio = lib/librtaudio.so
 	openssl = lib/libssl.so
+	ossia = lib/libossia.so
 endif
 
 ifeq ($(ARCH),mac)
@@ -50,6 +45,7 @@ ifeq ($(ARCH),mac)
 	rtmidi = lib/librtmidi.dylib
 	rtaudio = lib/librtaudio.dylib
 	openssl = lib/libssl.dylib
+	ossia = lib/libossia.so
 endif
 
 ifeq ($(ARCH),win)
@@ -62,6 +58,7 @@ ifeq ($(ARCH),win)
 	rtmidi = bin/librtmidi-4.dll
 	rtaudio = bin/librtaudio.dll
 	openssl = bin/libssl-1_1-x64.dll
+	ossia = bin/ossia.dll
 endif
 
 # Library configuration
@@ -80,7 +77,7 @@ endif
 
 .NOTPARALLEL:
 
-all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio)
+all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(ossia)
 	@echo ""
 	@echo "#######################################"
 	@echo "# Built all dependencies successfully #"
@@ -150,6 +147,15 @@ $(rtaudio):
 	cd rtaudio/cmakebuild && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/cmakebuild
 	$(MAKE) -C rtaudio/cmakebuild install
+
+$(ossia):
+	git clone https://github.com/OSSIA/libossia --depth=1
+	mkdir -p build-libossia && cd build-libossia && $(CMAKE) \
+	-DCMAKE_INSTALL_PREFIX="$(LOCAL)" -DOSSIA_PD=OFF \
+	-DOSSIA_COTIRE=OFF -DOSSIA_PROTOCOL_MIDI=OFF \
+	-DOSSIA_EDITOR=OFF -DBUILD_TYPE=Release ../libossia && \
+	$(MAKE) -j4 && \
+	$(MAKE) install
 
 clean:
 	git clean -ffdx
