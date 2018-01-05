@@ -101,9 +101,8 @@ void MIDIClockToCVInterface::step() {
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
 		getMessage(&message);
-		while (message.size() > 0) {
+		if (message.size() > 0) {
 			processMidi(message);
-			getMessage(&message);
 		}
 	}
 
