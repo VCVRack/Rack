@@ -22,6 +22,9 @@ ifeq ($(ARCH), win)
 endif
 
 
+DISTRIBUTABLES += $(TARGET)
+
+
 all: $(TARGET)
 
 include ../../compile.mk
