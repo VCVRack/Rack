@@ -130,20 +130,12 @@ void AudioIO::openStream() {
 		RtAudio::StreamOptions options;
 		// options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 
-		// Find closest sample rate
-		unsigned int closestSampleRate = 0;
-		for (unsigned int sr : deviceInfo.sampleRates) {
-			if (fabsf(sr - sampleRate) < fabsf(closestSampleRate - sampleRate)) {
-				closestSampleRate = sr;
-			}
-		}
-
 		try {
 			debug("Opening audio stream %d", device);
 			stream->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
-				RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
+				RTAUDIO_FLOAT32, sampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to open audio stream: %s", e.what());
@@ -169,12 +161,12 @@ void AudioIO::openStream() {
 void AudioIO::closeStream() {
 	if (stream) {
 		if (stream->isStreamRunning()) {
-			debug("Aborting audio stream %d", device);
+			debug("Stopping audio stream %d", device);
 			try {
-				stream->abortStream();
+				stream->stopStream();
 			}
 			catch (RtAudioError &e) {
-				warn("Failed to abort stream %s", e.what());
+				warn("Failed to stop stream %s", e.what());
 			}
 		}
 		if (stream->isStreamOpen()) {
