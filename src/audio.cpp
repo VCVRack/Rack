@@ -46,7 +46,7 @@ int AudioIO::getDriver() {
 }
 
 void AudioIO::setDriver(int driver) {
-	// closeStream();
+	closeStream();
 	if (stream)
 		delete stream;
 	stream = new RtAudio((RtAudio::Api) driver);
@@ -89,7 +89,7 @@ std::string AudioIO::getDeviceDetail(int device) {
 static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
 	AudioIO *audioIO = (AudioIO*) userData;
 	assert(audioIO);
-	// audioInterface->stepStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
+	audioIO->processStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
 	return 0;
 }
 
@@ -162,6 +162,7 @@ void AudioIO::openStream() {
 		// Update sample rate because this may have changed
 		this->sampleRate = stream->getStreamSampleRate();
 		this->device = device;
+		onOpenStream();
 	}
 }
 
@@ -191,6 +192,7 @@ void AudioIO::closeStream() {
 	device = -1;
 	numOutputs = 0;
 	numInputs = 0;
+	onCloseStream();
 }
 
 std::vector<int> AudioIO::listSampleRates() {

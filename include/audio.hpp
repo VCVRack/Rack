@@ -22,7 +22,7 @@ struct AudioIO {
 	int numInputs = 0;
 
 	AudioIO();
-	~AudioIO();
+	virtual ~AudioIO();
 
 	std::vector<int> listDrivers();
 	std::string getDriverName(int driver);
@@ -36,6 +36,10 @@ struct AudioIO {
 	void closeStream();
 
 	std::vector<int> listSampleRates();
+
+	virtual void processStream(const float *input, float *output, int length) {}
+	virtual void onCloseStream() {}
+	virtual void onOpenStream() {}
 };
 
 

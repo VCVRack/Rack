@@ -1,6 +1,9 @@
 #include <assert.h>
 #include <mutex>
+#include <chrono>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include "core.hpp"
 #include "audio.hpp"
 #include "dsp/samplerate.hpp"
@@ -12,8 +15,70 @@
 #pragma GCC diagnostic pop
 
 
+#define MAX_OUTPUTS 8
+#define MAX_INPUTS 8
+
+static auto audioTimeout = std::chrono::milliseconds(100);
+
 
 using namespace rack;
+
+
+struct AudioInterfaceIO : AudioIO {
+	std::mutex engineMutex;
+	std::condition_variable engineCv;
+	std::mutex audioMutex;
+	std::condition_variable audioCv;
+	// Audio thread produces, engine thread consumes
+	DoubleRingBuffer<Frame<MAX_INPUTS>, (1<<15)> inputBuffer;
+	// Audio thread consumes, engine thread produces
+	DoubleRingBuffer<Frame<MAX_OUTPUTS>, (1<<15)> outputBuffer;
+
+	AudioInterfaceIO() {
+		maxOutputs = MAX_OUTPUTS;
+		maxInputs = MAX_INPUTS;
+	}
+
+	void processStream(const float *input, float *output, int length) override {
+		if (numInputs > 0) {
+			// TODO Do we need to wait on the input to be consumed here?
+			for (int i = 0; i < length; i++) {
+				if (inputBuffer.full())
+					break;
+				Frame<MAX_INPUTS> f;
+				memset(&f, 0, sizeof(f));
+				memcpy(&f, &input[numInputs * i], numInputs * sizeof(float));
+				inputBuffer.push(f);
+			}
+		}
+
+		if (numOutputs > 0) {
+			std::unique_lock<std::mutex> lock(audioMutex);
+			auto cond = [&] {
+				return outputBuffer.size() >= length;
+			};
+			if (audioCv.wait_for(lock, audioTimeout, cond)) {
+				// Consume audio block
+				for (int i = 0; i < length; i++) {
+					Frame<MAX_OUTPUTS> f = outputBuffer.shift();
+					memcpy(&output[numOutputs * i], &f, numOutputs * sizeof(float));
+				}
+			}
+			else {
+				// Timed out, fill output with zeros
+				memset(output, 0, length * numOutputs * sizeof(float));
+			}
+		}
+
+		// Notify engine when finished processing
+		engineCv.notify_all();
+	}
+
+	void onCloseStream() override {
+		inputBuffer.clear();
+		outputBuffer.clear();
+	}
+};
 
 
 struct AudioInterface : Module {
@@ -21,24 +86,22 @@ struct AudioInterface : Module {
 		NUM_PARAMS
 	};
 	enum InputIds {
-		AUDIO1_INPUT,
-		NUM_INPUTS = AUDIO1_INPUT + 8
+		ENUMS(AUDIO_INPUT, MAX_INPUTS),
+		NUM_INPUTS
 	};
 	enum OutputIds {
-		AUDIO1_OUTPUT,
-		NUM_OUTPUTS = AUDIO1_OUTPUT + 8
+		ENUMS(AUDIO_OUTPUT, MAX_OUTPUTS),
+		NUM_OUTPUTS
 	};
 
-	AudioIO audioIO;
+	AudioInterfaceIO audioIO;
 
 	SampleRateConverter<8> inputSrc;
 	SampleRateConverter<8> outputSrc;
 
 	// in rack's sample rate
-	DoubleRingBuffer<Frame<8>, 16> inputBuffer;
-	DoubleRingBuffer<Frame<8>, (1<<15)> outputBuffer;
-	// in device's sample rate
-	DoubleRingBuffer<Frame<8>, (1<<15)> inputSrcBuffer;
+	DoubleRingBuffer<Frame<MAX_INPUTS>, 16> inputBuffer;
+	DoubleRingBuffer<Frame<MAX_OUTPUTS>, 16> outputBuffer;
 
 	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 	}
@@ -49,31 +112,40 @@ struct AudioInterface : Module {
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		// json_object_set_new(rootJ, "driver", json_integer(getDriver()));
-		// json_object_set_new(rootJ, "device", json_integer(device));
-		// json_object_set_new(rootJ, "audioIO.sampleRate", json_real(audioIO.sampleRate));
-		// json_object_set_new(rootJ, "audioIO.blockSize", json_integer(audioIO.blockSize));
+		json_object_set_new(rootJ, "driver", json_integer(audioIO.getDriver()));
+		std::string deviceName = audioIO.getDeviceName(audioIO.device);
+		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+		json_object_set_new(rootJ, "sampleRate", json_integer(audioIO.sampleRate));
+		json_object_set_new(rootJ, "blockSize", json_integer(audioIO.blockSize));
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
-		// json_t *driverJ = json_object_get(rootJ, "driver");
-		// if (driverJ)
-		// 	setDriver(json_number_value(driverJ));
+		json_t *driverJ = json_object_get(rootJ, "driver");
+		if (driverJ)
+			audioIO.setDriver(json_number_value(driverJ));
 
-		// json_t *deviceJ = json_object_get(rootJ, "device");
-		// if (deviceJ)
-		// 	device = json_number_value(deviceJ);
+		json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
+		if (deviceNameJ) {
+			std::string deviceName = json_string_value(deviceNameJ);
+			// Search for device ID with equal name
+			for (int device = 0; device < audioIO.getDeviceCount(); device++) {
+				if (audioIO.getDeviceName(device) == deviceName) {
+					audioIO.device = device;
+					break;
+				}
+			}
+		}
 
-		// json_t *sampleRateJ = json_object_get(rootJ, "audioIO.sampleRate");
-		// if (sampleRateJ)
-		// 	audioIO.sampleRate = json_number_value(sampleRateJ);
+		json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
+		if (sampleRateJ)
+			audioIO.sampleRate = json_integer_value(sampleRateJ);
 
-		// json_t *blockSizeJ = json_object_get(rootJ, "audioIO.blockSize");
-		// if (blockSizeJ)
-		// 	audioIO.blockSize = json_integer_value(blockSizeJ);
+		json_t *blockSizeJ = json_object_get(rootJ, "blockSize");
+		if (blockSizeJ)
+			audioIO.blockSize = json_integer_value(blockSizeJ);
 
-		// openStream();
+		audioIO.openStream();
 	}
 
 	void onReset() override {
@@ -82,117 +154,61 @@ struct AudioInterface : Module {
 };
 
 
-#define TIMED_SLEEP_LOCK(_cond, _spinTime, _totalTime) { \
-	auto startTime = std::chrono::high_resolution_clock::now(); \
-	while (!(_cond)) { \
-		std::this_thread::sleep_for(std::chrono::duration<float>(_spinTime)); \
-		auto currTime = std::chrono::high_resolution_clock::now(); \
-		float totalTime = std::chrono::duration<float>(currTime - startTime).count(); \
-		if (totalTime > (_totalTime)) \
-			break; \
-	} \
-}
-
-
 void AudioInterface::step() {
-	// debug("inputBuffer %d inputSrcBuffer %d outputBuffer %d", inputBuffer.size(), inputSrcBuffer.size(), outputBuffer.size());
-	// Read/write stream if we have enough input, OR the output buffer is empty if we have no input
-	if (audioIO.numOutputs > 0) {
-		TIMED_SLEEP_LOCK(inputSrcBuffer.size() < audioIO.blockSize, 100e-6, 0.2);
-	}
-	else if (audioIO.numInputs > 0) {
-		TIMED_SLEEP_LOCK(!outputBuffer.empty(), 100e-6, 0.2);
-	}
+	Frame<MAX_INPUTS> inputFrame;
+	memset(&inputFrame, 0, sizeof(inputFrame));
 
-	// Get input and pass it through the sample rate converter
-	if (audioIO.numOutputs > 0) {
-		if (!inputBuffer.full()) {
-			Frame<8> f;
-			for (int i = 0; i < 8; i++) {
-				f.samples[i] = inputs[AUDIO1_INPUT + i].value / 10.0;
-			}
-			inputBuffer.push(f);
-		}
-
-		// Once full, sample rate convert the input
-		// inputBuffer -> SRC -> inputSrcBuffer
-		if (inputBuffer.full()) {
-			inputSrc.setRates(engineGetSampleRate(), audioIO.sampleRate);
-			int inLen = inputBuffer.size();
-			int outLen = inputSrcBuffer.capacity();
-			inputSrc.process(inputBuffer.startData(), &inLen, inputSrcBuffer.endData(), &outLen);
-			inputBuffer.startIncr(inLen);
-			inputSrcBuffer.endIncr(outLen);
-		}
-	}
-
-	// Set output
-	if (!outputBuffer.empty()) {
-		Frame<8> f = outputBuffer.shift();
-		for (int i = 0; i < 8; i++) {
-			outputs[AUDIO1_OUTPUT + i].value = 10.0 * f.samples[i];
-		}
-	}
-}
-
-void AudioInterface::stepStream(const float *input, float *output, int numFrames) {
-	if (gPaused) {
-		memset(output, 0, sizeof(float) * audioIO.numOutputs * numFrames);
-		return;
-	}
-
-	if (audioIO.numOutputs > 0) {
-		// Wait for enough input before proceeding
-		TIMED_SLEEP_LOCK(inputSrcBuffer.size() >= numFrames, 100e-6, 0.2);
-	}
-	else if (audioIO.numInputs > 0) {
-		TIMED_SLEEP_LOCK(outputBuffer.empty(), 100e-6, 0.2);
-	}
-
-	// input stream -> output buffer
 	if (audioIO.numInputs > 0) {
-		Frame<8> inputFrames[numFrames];
-		for (int i = 0; i < numFrames; i++) {
-			for (int c = 0; c < 8; c++) {
-				inputFrames[i].samples[c] = (c < audioIO.numInputs) ? input[i*audioIO.numInputs + c] : 0.0;
-			}
+		if (inputBuffer.empty()) {
+			inputSrc.setRates(audioIO.sampleRate, engineGetSampleRate());
+			int inLen = audioIO.inputBuffer.size();
+			int outLen = inputBuffer.capacity();
+			inputSrc.process(audioIO.inputBuffer.startData(), &inLen, inputBuffer.endData(), &outLen);
+			audioIO.inputBuffer.startIncr(inLen);
+			inputBuffer.endIncr(outLen);
 		}
-
-		// Pass output through sample rate converter
-		outputSrc.setRates(audioIO.sampleRate, engineGetSampleRate());
-		int inLen = numFrames;
-		int outLen = outputBuffer.capacity();
-		outputSrc.process(inputFrames, &inLen, outputBuffer.endData(), &outLen);
-		outputBuffer.endIncr(outLen);
 	}
 
-	// input buffer -> output stream
+	if (!inputBuffer.empty()) {
+		inputFrame = inputBuffer.shift();
+	}
+	for (int i = 0; i < MAX_INPUTS; i++) {
+		outputs[AUDIO_OUTPUT + i].value = 10.0 * inputFrame.samples[i];
+	}
+
 	if (audioIO.numOutputs > 0) {
-		for (int i = 0; i < numFrames; i++) {
-			Frame<8> f;
-			if (inputSrcBuffer.empty()) {
-				memset(&f, 0, sizeof(f));
+		// Get and push output SRC frame
+		if (!outputBuffer.full()) {
+			Frame<MAX_OUTPUTS> f;
+			for (int i = 0; i < audioIO.numOutputs; i++) {
+				f.samples[i] = inputs[AUDIO_INPUT + i].value / 10.0;
+			}
+			outputBuffer.push(f);
+		}
+
+		if (outputBuffer.full()) {
+			// Wait until outputs are needed
+			std::unique_lock<std::mutex> lock(audioIO.engineMutex);
+			auto cond = [&] {
+				return audioIO.outputBuffer.size() < audioIO.blockSize;
+			};
+			if (audioIO.engineCv.wait_for(lock, audioTimeout, cond)) {
+				// Push converted output
+				outputSrc.setRates(engineGetSampleRate(), audioIO.sampleRate);
+				int inLen = outputBuffer.size();
+				int outLen = audioIO.outputBuffer.capacity();
+				outputSrc.process(outputBuffer.startData(), &inLen, audioIO.outputBuffer.endData(), &outLen);
+				outputBuffer.startIncr(inLen);
+				audioIO.outputBuffer.endIncr(outLen);
 			}
 			else {
-				f = inputSrcBuffer.shift();
-			}
-			for (int c = 0; c < audioIO.numOutputs; c++) {
-				output[i*audioIO.numOutputs + c] = clampf(f.samples[c], -1.0, 1.0);
+				// Give up on pushing output
 			}
 		}
 	}
+
+	audioIO.audioCv.notify_all();
 }
-
-
-// void AudioInterface::closeStream() {
-// 	// Clear buffers
-// 	inputBuffer.clear();
-// 	outputBuffer.clear();
-// 	inputSrcBuffer.clear();
-// 	inputSrc.reset();
-// 	outputSrc.reset();
-// }
-
 
 
 AudioInterfaceWidget::AudioInterfaceWidget() {
@@ -226,7 +242,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	yPos += 5;
 	xPos = 10;
 	for (int i = 0; i < 4; i++) {
-		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_INPUT + i));
+		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO_INPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
 		label->text = stringf("%d", i + 1);
@@ -239,7 +255,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	yPos += 5;
 	xPos = 10;
 	for (int i = 4; i < 8; i++) {
-		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_INPUT + i));
+		addInput(createInput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO_INPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
 		label->text = stringf("%d", i + 1);
@@ -260,7 +276,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	yPos += 5;
 	xPos = 10;
 	for (int i = 0; i < 4; i++) {
-		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_OUTPUT + i));
+		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO_OUTPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
 		label->text = stringf("%d", i + 1);
@@ -273,7 +289,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	yPos += 5;
 	xPos = 10;
 	for (int i = 4; i < 8; i++) {
-		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO1_OUTPUT + i));
+		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO_OUTPUT + i));
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
 		label->text = stringf("%d", i + 1);
