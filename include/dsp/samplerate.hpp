@@ -10,7 +10,7 @@ namespace rack {
 
 template<int CHANNELS>
 struct SampleRateConverter {
-	SpeexResamplerState *state = NULL;
+	SpeexResamplerState *state;
 	bool bypass = false;
 
 	SampleRateConverter() {
@@ -27,12 +27,19 @@ struct SampleRateConverter {
 	}
 
 	void setRates(int inRate, int outRate) {
-		spx_uint32_t oldInRate, oldOutRate;
-		speex_resampler_get_rate(state, &oldInRate, &oldOutRate);
-		if (inRate == (int) oldInRate && outRate == (int) oldOutRate)
+		int oldInRate, oldOutRate;
+		getRates(&oldInRate, &oldOutRate);
+		if (inRate == oldInRate && outRate == oldOutRate)
 			return;
 		int error = speex_resampler_set_rate(state, inRate, outRate);
 		assert(error == RESAMPLER_ERR_SUCCESS);
+	}
+
+	void getRates(int *inRate, int *outRate) {
+		spx_uint32_t inRate32, outRate32;
+		speex_resampler_get_rate(state, &inRate32, &outRate32);
+		if (inRate) *inRate = inRate32;
+		if (outRate) *outRate = outRate32;
 	}
 
 	/** `in` and `out` are interlaced with the number of channels */
