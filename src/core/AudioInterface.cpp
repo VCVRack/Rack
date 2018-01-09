@@ -96,8 +96,8 @@ struct AudioInterface : Module {
 
 	AudioInterfaceIO audioIO;
 
-	SampleRateConverter<8> inputSrc;
-	SampleRateConverter<8> outputSrc;
+	SampleRateConverter<MAX_INPUTS> inputSrc;
+	SampleRateConverter<MAX_OUTPUTS> outputSrc;
 
 	// in rack's sample rate
 	DoubleRingBuffer<Frame<MAX_INPUTS>, 16> inputBuffer;
@@ -107,8 +107,6 @@ struct AudioInterface : Module {
 	}
 
 	void step() override;
-	void stepStream(const float *input, float *output, int numFrames);
-
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
