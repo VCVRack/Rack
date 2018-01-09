@@ -130,12 +130,19 @@ void AudioIO::openStream() {
 		RtAudio::StreamOptions options;
 		// options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 
+		int closestSampleRate = deviceInfo.preferredSampleRate;
+		for (int sr : deviceInfo.sampleRates) {
+			if (abs(sr - sampleRate) < abs(closestSampleRate - sampleRate)) {
+				closestSampleRate = sr;
+			}
+		}
+
 		try {
 			debug("Opening audio stream %d", device);
 			stream->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
-				RTAUDIO_FLOAT32, sampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
+				RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to open audio stream: %s", e.what());
