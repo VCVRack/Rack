@@ -106,10 +106,6 @@ struct AudioInterface : Module {
 	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 	}
 
-	~AudioInterface() {
-		audioIO.closeStream();
-	}
-
 	void step() override;
 
 	json_t *toJson() override {
