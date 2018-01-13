@@ -39,11 +39,6 @@ struct AudioInterfaceIO : AudioIO {
 		maxInputs = MAX_INPUTS;
 	}
 
-	~AudioInterfaceIO() {
-		// Wait until processStream() is finished
-		std::lock_guard<std::mutex> lock(audioMutex);
-	}
-
 	void processStream(const float *input, float *output, int length) override {
 		if (numInputs > 0) {
 			// TODO Do we need to wait on the input to be consumed here?
@@ -109,6 +104,10 @@ struct AudioInterface : Module {
 	DoubleRingBuffer<Frame<MAX_OUTPUTS>, 16> outputBuffer;
 
 	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+	}
+
+	~AudioInterface() {
+		audioIO.closeStream();
 	}
 
 	void step() override;
