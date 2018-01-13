@@ -1,3 +1,4 @@
+#if 0
 #include <list>
 #include <algorithm>
 #include "core.hpp"
@@ -416,3 +417,4 @@ void QuadMidiToCVWidget::step() {
 
 	ModuleWidget::step();
 }
+#endif

@@ -1,3 +1,4 @@
+#if 0
 #include <list>
 #include <algorithm>
 #include "core.hpp"
@@ -260,3 +261,4 @@ void ChannelChoice::onAction(EventAction &e) {
 void ChannelChoice::step() {
 	text = (midiModule->channel >= 0) ? stringf("%d", midiModule->channel + 1) : "All";
 }
+#endif

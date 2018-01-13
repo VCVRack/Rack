@@ -1,3 +1,4 @@
+#if 0
 #include <list>
 #include <algorithm>
 #include "core.hpp"
@@ -303,3 +304,4 @@ void MidiToCVWidget::step() {
 
 	ModuleWidget::step();
 }
+#endif

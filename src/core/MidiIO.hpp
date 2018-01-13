@@ -1,3 +1,4 @@
+#if 0
 #include <unordered_map>
 #include "rack.hpp"
 
@@ -201,3 +202,5 @@ struct ChannelChoice : ChoiceButton {
 	void step() override;
 	void onAction(EventAction &e) override;
 };
+
+#endif
