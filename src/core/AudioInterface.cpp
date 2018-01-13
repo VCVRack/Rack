@@ -39,6 +39,11 @@ struct AudioInterfaceIO : AudioIO {
 		maxInputs = MAX_INPUTS;
 	}
 
+	~AudioInterfaceIO() {
+		// Wait until processStream() is finished
+		std::lock_guard<std::mutex> lock(audioMutex);
+	}
+
 	void processStream(const float *input, float *output, int length) override {
 		if (numInputs > 0) {
 			// TODO Do we need to wait on the input to be consumed here?
@@ -300,7 +305,4 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	AudioWidget *audioWidget = construct<USB_B_AudioWidget>();
 	audioWidget->audioIO = &module->audioIO;
 	addChild(audioWidget);
-	// Widget *w = construct<DIN_MIDIWidget>();
-	// w->box.pos = Vec(100, 0);
-	// addChild(w);
 }

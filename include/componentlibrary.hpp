@@ -346,8 +346,8 @@ struct USB_B_AudioWidget : AudioWidget, SVGWidget {
 	}
 };
 
-struct DIN_MIDIWidget : MIDIWidget, SVGWidget {
-	DIN_MIDIWidget() {
+struct MIDI_DIN_MidiWidget : MidiWidget, SVGWidget {
+	MIDI_DIN_MidiWidget() {
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/MIDI_DIN.svg")));
 	}
 };

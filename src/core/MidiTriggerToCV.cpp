@@ -1,3 +1,4 @@
+#if 0
 #include <list>
 #include <algorithm>
 #include "core.hpp"
@@ -282,3 +283,4 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 void MIDITriggerToCVWidget::step() {
 	ModuleWidget::step();
 }
+#endif

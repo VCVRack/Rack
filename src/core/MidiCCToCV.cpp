@@ -1,3 +1,4 @@
+#if 0
 #include <list>
 #include <algorithm>
 #include "core.hpp"
@@ -324,3 +325,4 @@ void MIDICCToCVWidget::step() {
 
 	ModuleWidget::step();
 }
+#endif
