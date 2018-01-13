@@ -8,6 +8,7 @@
 #include <sys/param.h> // for MAXPATHLEN
 #include <fcntl.h>
 #include <thread>
+#include <stdexcept>
 
 #include <zip.h>
 #include <jansson.h>
@@ -190,14 +191,31 @@ static int extractZip(const char *filename, const char *dir) {
 	return err;
 }
 
-static void syncPlugin(json_t *pluginJ) {
+static bool syncPlugin(json_t *pluginJ, bool dryRun) {
 	json_t *slugJ = json_object_get(pluginJ, "slug");
-	if (!slugJ) return;
+	if (!slugJ)
+		return false;
 	std::string slug = json_string_value(slugJ);
-	info("Syncing plugin %s", slug.c_str());
+
+	// Get community version
+	std::string version;
+	json_t *versionJ = json_object_get(pluginJ, "version");
+	if (versionJ) {
+		version = json_string_value(versionJ);
+	}
+
+	// Check whether we already have a plugin with the same slug and version
+	for (Plugin *plugin : gPlugins) {
+		if (plugin->slug == slug) {
+			// plugin->version might be blank, so adding a version of the manifest will update the plugin
+			if (plugin->version == version)
+				return false;
+		}
+	}
 
 	json_t *nameJ = json_object_get(pluginJ, "name");
-	if (!nameJ) return;
+	if (!nameJ)
+		return false;
 	std::string name = json_string_value(nameJ);
 
 	std::string download;
@@ -237,7 +255,7 @@ static void syncPlugin(json_t *pluginJ) {
 
 	if (download.empty()) {
 		warn("Could not get download URL for plugin %s", slug.c_str());
-		return;
+		return false;
 	}
 
 	// If plugin is not loaded, download the zip file to /plugins
@@ -249,66 +267,30 @@ static void syncPlugin(json_t *pluginJ) {
 	std::string pluginPath = pluginsDir + "/" + slug;
 	std::string zipPath = pluginPath + ".zip";
 	bool success = requestDownload(download, zipPath, &downloadProgress);
-	if (success) {
-		if (!sha256.empty()) {
-			// Check SHA256 hash
-			std::string actualSha256 = requestSHA256File(zipPath);
-			if (actualSha256 != sha256) {
-				warn("Plugin %s does not match expected SHA256 checksum", slug.c_str());
-				return;
-			}
-		}
-
-		// Unzip file
-		int err = extractZip(zipPath.c_str(), pluginsDir.c_str());
-		if (!err) {
-			// Delete zip
-			remove(zipPath.c_str());
-			// Load plugin
-			// loadPlugin(pluginPath);
-		}
-	}
-
-	downloadName = "";
-}
-
-static bool trySyncPlugin(json_t *pluginJ, json_t *communityPluginsJ, bool dryRun) {
-	std::string slug = json_string_value(pluginJ);
-
-	// Find community plugin
-	size_t communityIndex;
-	json_t *communityPluginJ = NULL;
-	json_array_foreach(communityPluginsJ, communityIndex, communityPluginJ) {
-		json_t *communitySlugJ = json_object_get(communityPluginJ, "slug");
-		if (communitySlugJ) {
-			std::string communitySlug = json_string_value(communitySlugJ);
-			if (slug == communitySlug)
-				break;
-		}
-	}
-	if (communityIndex == json_array_size(communityPluginsJ)) {
-		warn("Plugin sync error: %s not found in community", slug.c_str());
+	if (!success) {
+		warn("Plugin %s download was unsuccessful");
 		return false;
 	}
 
-	// Get community version
-	std::string version;
-	json_t *versionJ = json_object_get(communityPluginJ, "version");
-	if (versionJ) {
-		version = json_string_value(versionJ);
-	}
-
-	// Check whether we already have a plugin with the same slug and version
-	for (Plugin *plugin : gPlugins) {
-		if (plugin->slug == slug) {
-			// plugin->version might be blank, so adding a version of the manifest will update the plugin
-			if (plugin->version == version)
-				return false;
+	if (!sha256.empty()) {
+		// Check SHA256 hash
+		std::string actualSha256 = requestSHA256File(zipPath);
+		if (actualSha256 != sha256) {
+			warn("Plugin %s does not match expected SHA256 checksum", slug.c_str());
+			return false;
 		}
 	}
 
-	if (!dryRun)
-		syncPlugin(communityPluginJ);
+	// Unzip file
+	int err = extractZip(zipPath.c_str(), pluginsDir.c_str());
+	if (!err) {
+		// Delete zip
+		remove(zipPath.c_str());
+		// Load plugin
+		// loadPlugin(pluginPath);
+	}
+
+	downloadName = "";
 	return true;
 }
 
@@ -318,49 +300,76 @@ bool pluginSync(bool dryRun) {
 
 	bool available = false;
 
-	// Download my plugins
-	json_t *reqJ = json_object();
-	json_object_set(reqJ, "version", json_string(gApplicationVersion.c_str()));
-	json_object_set(reqJ, "token", json_string(gToken.c_str()));
-	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/plugins", reqJ);
-	json_decref(reqJ);
-
-	// Download community plugins
-	json_t *communityResJ = requestJson(METHOD_GET, gApiHost + "/community/plugins", NULL);
-
 	if (!dryRun) {
 		isDownloading = true;
 		downloadProgress = 0.0;
-		downloadName = "";
+		downloadName = "Updating plugins...";
 	}
 
-	if (resJ && communityResJ) {
+	json_t *resJ = NULL;
+	json_t *communityResJ = NULL;
+
+	try {
+		// Download plugin slugs
+		json_t *reqJ = json_object();
+		json_object_set(reqJ, "version", json_string(gApplicationVersion.c_str()));
+		json_object_set(reqJ, "token", json_string(gToken.c_str()));
+		resJ = requestJson(METHOD_GET, gApiHost + "/plugins", reqJ);
+		json_decref(reqJ);
+		if (!resJ)
+			throw std::runtime_error("No response from server");
+
 		json_t *errorJ = json_object_get(resJ, "error");
-		json_t *communityErrorJ = json_object_get(resJ, "error");
-		if (errorJ) {
-			warn("Plugin sync error: %s", json_string_value(errorJ));
-		}
-		else if (communityErrorJ) {
-			warn("Plugin sync error: %s", json_string_value(communityErrorJ));
-		}
-		else {
-			// Check each plugin in list of my plugins
-			json_t *pluginsJ = json_object_get(resJ, "plugins");
-			json_t *communityPluginsJ = json_object_get(communityResJ, "plugins");
-			size_t index;
-			json_t *pluginJ;
-			json_array_foreach(pluginsJ, index, pluginJ) {
-				if (trySyncPlugin(pluginJ, communityPluginsJ, dryRun))
-					available = true;
+		if (errorJ)
+			throw std::runtime_error(json_string_value(errorJ));
+
+		// Download community plugins
+		communityResJ = requestJson(METHOD_GET, gApiHost + "/community/plugins", NULL);
+		if (!communityResJ)
+			throw std::runtime_error("No response from server");
+
+		json_t *communityErrorJ = json_object_get(communityResJ, "error");
+		if (communityErrorJ)
+			throw std::runtime_error(json_string_value(communityErrorJ));
+
+		// Check each plugin in list of plugin slugs
+		json_t *pluginSlugsJ = json_object_get(resJ, "plugins");
+		json_t *communityPluginsJ = json_object_get(communityResJ, "plugins");
+
+		size_t index;
+		json_t *pluginSlugJ;
+		json_array_foreach(pluginSlugsJ, index, pluginSlugJ) {
+			std::string slug = json_string_value(pluginSlugJ);
+			// Search for plugin slug in community
+			size_t communityIndex;
+			json_t *communityPluginJ = NULL;
+			json_array_foreach(communityPluginsJ, communityIndex, communityPluginJ) {
+				json_t *communitySlugJ = json_object_get(communityPluginJ, "slug");
+				if (!communitySlugJ)
+					continue;
+				std::string communitySlug = json_string_value(communitySlugJ);
+				if (slug == communitySlug)
+					break;
+			}
+
+			// Sync plugin
+			if (syncPlugin(communityPluginJ, dryRun)) {
+				available = true;
+			}
+			else {
+				warn("Plugin %s not found in community", slug.c_str());
 			}
 		}
 	}
-
-	if (resJ)
-		json_decref(resJ);
+	catch (std::runtime_error &e) {
+		warn("Plugin sync error: %s", e.what());
+	}
 
 	if (communityResJ)
 		json_decref(communityResJ);
+
+	if (resJ)
+		json_decref(resJ);
 
 	if (!dryRun) {
 		isDownloading = false;
