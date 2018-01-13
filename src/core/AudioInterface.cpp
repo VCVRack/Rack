@@ -39,6 +39,10 @@ struct AudioInterfaceIO : AudioIO {
 		maxInputs = MAX_INPUTS;
 	}
 
+	~AudioInterfaceIO() {
+		closeStream();
+	}
+
 	void processStream(const float *input, float *output, int length) override {
 		if (numInputs > 0) {
 			// TODO Do we need to wait on the input to be consumed here?
