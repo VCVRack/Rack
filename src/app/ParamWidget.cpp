@@ -6,12 +6,16 @@ namespace rack {
 
 
 json_t *ParamWidget::toJson() {
-	json_t *paramJ = json_real(value);
-	return paramJ;
+	json_t *rootJ = json_object();
+	json_object_set_new(rootJ, "paramId", json_integer(paramId));
+	json_object_set_new(rootJ, "value", json_real(value));
+	return rootJ;
 }
 
 void ParamWidget::fromJson(json_t *rootJ) {
-	setValue(json_number_value(rootJ));
+	json_t *valueJ = json_object_get(rootJ, "value");
+	if (valueJ)
+		setValue(json_number_value(valueJ));
 }
 
 void ParamWidget::randomize() {
