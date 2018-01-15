@@ -45,10 +45,10 @@ RackScene::RackScene() {
 	scrollWidget->box.pos.y = gToolbar->box.size.y;
 
 	// Check for new version
-	if (!gApplicationVersion.empty()) {
-		std::thread versionThread(checkVersion);
-		versionThread.detach();
-	}
+#if defined(RELEASE)
+	std::thread versionThread(checkVersion);
+	versionThread.detach();
+#endif
 }
 
 void RackScene::step() {
@@ -68,7 +68,7 @@ void RackScene::step() {
 
 	// Version popup message
 	if (!newVersion.empty()) {
-		std::string versionMessage = stringf("Rack %s is available.\n\nYou have Rack %s.\n\nWould you like to download the new version on the website?", newVersion.c_str(), gApplicationVersion.c_str());
+		std::string versionMessage = stringf("Rack v%s is available.\n\nYou have Rack v%s.\n\nWould you like to download the new version on the website?", newVersion.c_str(), gApplicationVersion.c_str());
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, versionMessage.c_str())) {
 			std::thread t(openBrowser, "https://vcvrack.com/");
 			t.detach();

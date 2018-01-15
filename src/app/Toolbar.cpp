@@ -178,7 +178,7 @@ Toolbar::Toolbar() {
 	xPos += margin;
 	*/
 
-#ifdef VERSION
+#if defined(RELEASE)
 	{
 		Widget *pluginManager = new PluginManagerWidget();
 		pluginManager->box.pos = Vec(xPos, margin);

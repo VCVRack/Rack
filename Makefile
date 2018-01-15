@@ -1,6 +1,12 @@
+VERSION = 0.6.0dev
+
 FLAGS += \
 	-Iinclude \
 	-Idep/include -Idep/lib/libzip/include
+
+ifdef RELEASE
+	FLAGS += -DRELEASE=$(RELEASE)
+endif
 
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
@@ -87,9 +93,6 @@ include compile.mk
 
 
 dist: all
-ifndef VERSION
-	$(error VERSION must be defined when making distributables)
-endif
 	rm -rf dist
 	$(MAKE) -C plugins/Fundamental dist
 

@@ -26,7 +26,7 @@ namespace rack {
 
 std::string assetGlobal(std::string filename) {
 	std::string dir;
-#ifdef VERSION
+#if defined(RELEASE)
 #if ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
 	assert(bundle);
@@ -45,16 +45,16 @@ std::string assetGlobal(std::string filename) {
 	// TODO For now, users should launch Rack from their terminal in the global directory
 	dir = ".";
 #endif
-#else // VERSION
+#else // RELEASE
 	dir = ".";
-#endif // VERSION
+#endif // RELEASE
 	return dir + "/" + filename;
 }
 
 
 std::string assetLocal(std::string filename) {
 	std::string dir;
-#ifdef VERSION
+#if defined(RELEASE)
 #if ARCH_MAC
 	// Get home directory
 	struct passwd *pw = getpwuid(getuid());
@@ -83,9 +83,9 @@ std::string assetLocal(std::string filename) {
 	dir += "/.Rack";
 	mkdir(dir.c_str(), 0755);
 #endif
-#else // VERSION
+#else // RELEASE
 	dir = ".";
-#endif // VERSION
+#endif // RELEASE
 	return dir + "/" + filename;
 }
 

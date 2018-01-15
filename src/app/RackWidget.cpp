@@ -145,10 +145,8 @@ json_t *RackWidget::toJson() {
 	json_t *rootJ = json_object();
 
 	// version
-	if (!gApplicationVersion.empty()) {
-		json_t *versionJ = json_string(gApplicationVersion.c_str());
-		json_object_set_new(rootJ, "version", versionJ);
-	}
+	json_t *versionJ = json_string(gApplicationVersion.c_str());
+	json_object_set_new(rootJ, "version", versionJ);
 
 	// modules
 	json_t *modulesJ = json_array();
@@ -210,11 +208,19 @@ void RackWidget::fromJson(json_t *rootJ) {
 	std::string message;
 
 	// version
+	std::string version;
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
-		std::string version = json_string_value(versionJ);
+		version = json_string_value(versionJ);
 		if (!version.empty() && gApplicationVersion != version)
-			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version.c_str(), gApplicationVersion.empty() ? "dev" : gApplicationVersion.c_str());
+			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version.c_str(), gApplicationVersion.c_str());
+	}
+
+	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
+	// (We now use Module::params/inputs/outputs indices.)
+	bool legacy1 = (startsWith(version, "0.3.") || startsWith(version, "0.4.") || startsWith(version, "0.5.") || version == "" || version == "dev");
+	if (legacy1) {
+		info("Converting patch using legacy1 loader");
 	}
 
 	// modules

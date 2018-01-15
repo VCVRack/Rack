@@ -98,8 +98,8 @@ static bool isModelMatch(Model *model, std::string search) {
 		str += " ";
 		str += gTagNames[tag];
 	}
-	str = tolower(str);
-	search = tolower(search);
+	str = lowercase(str);
+	search = lowercase(search);
 	return (str.find(search) != std::string::npos);
 }
 
