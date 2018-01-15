@@ -158,9 +158,17 @@ void WireWidget::draw(NVGcontext *vg) {
 	float opacity = gToolbar->wireOpacitySlider->value / 100.0;
 	float tension = gToolbar->wireTensionSlider->value;
 
-	// Draw as opaque if an "incomplete" wire
-	if (!(inputPort && outputPort))
-		opacity = 1.0;
+	WireWidget *activeWire = gRackWidget->wireContainer->activeWire;
+	if (activeWire) {
+		// Draw as opaque if the wire is active
+		if (activeWire == this)
+			opacity = 1.0;
+	}
+	else {
+		Port *hoveredPort = dynamic_cast<Port*>(gHoveredWidget);
+		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
+			opacity = 1.0;
+	}
 
 	Vec outputPos = getOutputPos();
 	Vec inputPos = getInputPos();
