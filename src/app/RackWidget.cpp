@@ -184,13 +184,8 @@ json_t *RackWidget::toJson() {
 			int inputModuleId = moduleIds[inputModuleWidget];
 
 			// Get output/input ports
-			auto outputIt = std::find(outputModuleWidget->outputs.begin(), outputModuleWidget->outputs.end(), wireWidget->outputPort);
-			assert(outputIt != outputModuleWidget->outputs.end());
-			int outputId = outputIt - outputModuleWidget->outputs.begin();
-
-			auto inputIt = std::find(inputModuleWidget->inputs.begin(), inputModuleWidget->inputs.end(), wireWidget->inputPort);
-			assert(inputIt != inputModuleWidget->inputs.end());
-			int inputId = inputIt - inputModuleWidget->inputs.begin();
+			int outputId = wireWidget->outputPort->portId;
+			int inputId = wireWidget->inputPort->portId;
 
 			json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
 			json_object_set_new(wire, "outputId", json_integer(outputId));
@@ -218,9 +213,12 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
 	// (We now use Module::params/inputs/outputs indices.)
-	bool legacy1 = (startsWith(version, "0.3.") || startsWith(version, "0.4.") || startsWith(version, "0.5.") || version == "" || version == "dev");
-	if (legacy1) {
-		info("Converting patch using legacy1 loader");
+	int legacy = 0;
+	if (startsWith(version, "0.3.") || startsWith(version, "0.4.") || startsWith(version, "0.5.") || version == "" || version == "dev") {
+		legacy = 1;
+	}
+	if (legacy) {
+		info("Loading patch using legacy mode %d", legacy);
 	}
 
 	// modules
@@ -230,6 +228,10 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t moduleId;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
+		// Set legacy property
+		if (legacy)
+			json_object_set_new(moduleJ, "legacy", json_integer(legacy));
+
 		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
 		if (!pluginSlugJ) continue;
 		json_t *modelSlugJ = json_object_get(moduleJ, "model");
@@ -285,15 +287,37 @@ void RackWidget::fromJson(json_t *rootJ) {
 		                      "outputModuleId", &outputModuleId, "outputId", &outputId,
 		                      "inputModuleId", &inputModuleId, "inputId", &inputId);
 		if (err) continue;
-		// Get ports
+
+		// Get module widgets
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
 		if (!outputModuleWidget) continue;
-		Port *outputPort = outputModuleWidget->outputs[outputId];
-		if (!outputPort) continue;
 		ModuleWidget *inputModuleWidget = moduleWidgets[inputModuleId];
 		if (!inputModuleWidget) continue;
-		Port *inputPort = inputModuleWidget->inputs[inputId];
-		if (!inputPort) continue;
+
+		// Get port widgets
+		Port *outputPort = NULL;
+		Port *inputPort = NULL;
+		if (legacy && legacy <= 1) {
+			outputPort = outputModuleWidget->outputs[outputId];
+			inputPort = inputModuleWidget->inputs[inputId];
+		}
+		else {
+			for (Port *port : outputModuleWidget->outputs) {
+				if (port->portId == outputId) {
+					outputPort = port;
+					break;
+				}
+			}
+			for (Port *port : inputModuleWidget->inputs) {
+				if (port->portId == inputId) {
+					inputPort = port;
+					break;
+				}
+			}
+		}
+		if (!outputPort || !inputPort)
+			continue;
+
 		// Create WireWidget
 		WireWidget *wireWidget = new WireWidget();
 		wireWidget->outputPort = outputPort;
