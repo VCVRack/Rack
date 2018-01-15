@@ -68,7 +68,8 @@ json_t *ModuleWidget::toJson() {
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// pos
-	json_t *posJ = json_pack("[f, f]", (double) box.pos.x, (double) box.pos.y);
+	Vec pos = box.pos.div(RACK_GRID_SIZE).round();
+	json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
 	json_object_set_new(rootJ, "pos", posJ);
 	// params
 	json_t *paramsJ = json_array();
@@ -99,7 +100,13 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	json_t *posJ = json_object_get(rootJ, "pos");
 	double x, y;
 	json_unpack(posJ, "[F, F]", &x, &y);
-	box.pos = Vec(x, y);
+	Vec pos = Vec(x, y);
+	if (legacy && legacy <= 1) {
+		box.pos = pos;
+	}
+	else {
+		box.pos = pos.mult(RACK_GRID_SIZE);
+	}
 
 	// params
 	json_t *paramsJ = json_object_get(rootJ, "params");

@@ -27,6 +27,7 @@
 	#include <ApplicationServices/ApplicationServices.h>
 #endif
 
+
 namespace rack {
 
 GLFWwindow *gWindow = NULL;
