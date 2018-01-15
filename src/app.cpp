@@ -4,12 +4,7 @@
 namespace rack {
 
 std::string gApplicationName = "VCV Rack";
-std::string gApplicationVersion =
-#ifdef VERSION
-	TOSTRING(VERSION);
-#else
-	"";
-#endif
+std::string gApplicationVersion = TOSTRING(VERSION);
 std::string gApiHost = "https://api.vcvrack.com";
 // std::string gApiHost = "http://localhost:8081";
 

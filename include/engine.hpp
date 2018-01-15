@@ -70,13 +70,24 @@ struct Module {
 	/** Called when user explicitly deletes the module, not when Rack is closed or a new patch is loaded */
 	virtual void onDelete() {}
 	/** Called when user clicks Initialize in the module context menu */
-	virtual void onReset() {}
+	virtual void onReset() {
+		// Call deprecated method
+		reset();
+	}
 	/** Called when user clicks Randomize in the module context menu */
-	virtual void onRandomize() {}
+	virtual void onRandomize() {
+		// Call deprecated method
+		randomize();
+	}
 
 	/** Override these to store extra internal data in the "data" property */
 	virtual json_t *toJson() { return NULL; }
 	virtual void fromJson(json_t *root) {}
+
+	/** Deprecated */
+	virtual void reset() {}
+	/** Deprecated */
+	virtual void randomize() {}
 };
 
 struct Wire {

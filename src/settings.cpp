@@ -9,6 +9,9 @@
 namespace rack {
 
 
+bool skipAutosaveOnLaunch = false;
+
+
 static json_t *settingsToJson() {
 	// root
 	json_t *rootJ = json_object();
@@ -55,6 +58,11 @@ static json_t *settingsToJson() {
 	// lastPath
 	json_t *lastPathJ = json_string(gRackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
+
+	// skipAutosaveOnLaunch
+	if (skipAutosaveOnLaunch) {
+		json_object_set_new(rootJ, "skipAutosaveOnLaunch", json_true());
+	}
 
 	return rootJ;
 }
@@ -114,22 +122,25 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
 	if (lastPathJ)
 		gRackWidget->lastPath = json_string_value(lastPathJ);
+
+	json_t *skipAutosaveOnLaunchJ = json_object_get(rootJ, "skipAutosaveOnLaunch");
+	if (skipAutosaveOnLaunchJ)
+		skipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
 }
 
 
 void settingsSave(std::string filename) {
 	info("Saving settings %s", filename.c_str());
-	FILE *file = fopen(filename.c_str(), "w");
-	if (!file)
-		return;
-
 	json_t *rootJ = settingsToJson();
 	if (rootJ) {
+		FILE *file = fopen(filename.c_str(), "w");
+		if (!file)
+			return;
+
 		json_dumpf(rootJ, file, JSON_INDENT(2));
 		json_decref(rootJ);
+		fclose(file);
 	}
-
-	fclose(file);
 }
 
 void settingsLoad(std::string filename) {

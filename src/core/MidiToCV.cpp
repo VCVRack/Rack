@@ -2,7 +2,7 @@
 #include <list>
 #include <algorithm>
 #include "core.hpp"
-#include "MidiIO.hpp"
+#include "midi.hpp"
 #include "dsp/digital.hpp"
 
 
@@ -16,7 +16,7 @@ struct MidiValue {
 	bool changed = false; // Value has been changed by midi message (only if it is in sync!)
 };
 
-struct MIDIToCVInterface : MidiIO, Module {
+struct MIDIToCVInterface : Module {
 	enum ParamIds {
 		RESET_PARAM,
 		NUM_PARAMS
@@ -49,7 +49,7 @@ struct MIDIToCVInterface : MidiIO, Module {
 
 	SchmittTrigger resetTrigger;
 
-	MIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		pitchWheel.val = 64;
 		pitchWheel.tSmooth.set(0, 0);
 	}
@@ -253,8 +253,7 @@ MidiToCVWidget::MidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
-	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module,
-											   MIDIToCVInterface::RESET_LIGHT));
+	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module, MIDIToCVInterface::RESET_LIGHT));
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin, yPos);
@@ -285,8 +284,7 @@ MidiToCVWidget::MidiToCVWidget() {
 		yPos += channelChoice->box.size.y + margin + 15;
 	}
 
-	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel",
-														  "Aftertouch"};
+	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel", "Aftertouch"};
 
 	for (int i = 0; i < MIDIToCVInterface::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
@@ -298,10 +296,5 @@ MidiToCVWidget::MidiToCVWidget() {
 
 		yPos += yGap + margin;
 	}
-}
-
-void MidiToCVWidget::step() {
-
-	ModuleWidget::step();
 }
 #endif
