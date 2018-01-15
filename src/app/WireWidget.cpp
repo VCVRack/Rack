@@ -142,6 +142,18 @@ Vec WireWidget::getInputPos() {
 	}
 }
 
+json_t *WireWidget::toJson() {
+	json_t *rootJ = json_object();
+	json_object_set_new(rootJ, "color", colorToJson(color));
+	return rootJ;
+}
+
+void WireWidget::fromJson(json_t *rootJ) {
+	json_t *colorJ = json_object_get(rootJ, "color");
+	if (colorJ)
+		color = jsonToColor(colorJ);
+}
+
 void WireWidget::draw(NVGcontext *vg) {
 	float opacity = gToolbar->wireOpacitySlider->value / 100.0;
 	float tension = gToolbar->wireTensionSlider->value;

@@ -9,4 +9,5 @@ Widget *gFocusedWidget = NULL;
 
 Scene *gScene = NULL;
 
+
 } // namespace rack

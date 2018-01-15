@@ -7,6 +7,10 @@
 namespace rack {
 
 
+#define CHECKMARK_STRING "✔"
+#define CHECKMARK(_cond) ((_cond) ? CHECKMARK_STRING : "")
+
+
 struct Model;
 struct Module;
 struct Wire;
@@ -90,6 +94,8 @@ struct WireWidget : OpaqueWidget {
 	void updateWire();
 	Vec getOutputPos();
 	Vec getInputPos();
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
 	void draw(NVGcontext *vg) override;
 	void drawPlugs(NVGcontext *vg);
 };
@@ -132,7 +138,7 @@ struct RackWidget : OpaqueWidget {
 	void fromJson(json_t *rootJ);
 
 	void addModule(ModuleWidget *m);
-	/** Transfers ownership to the caller so they must `delete` it if that is the intension */
+	/** Removes the module and transfers ownership to the caller */
 	void deleteModule(ModuleWidget *m);
 	void cloneModule(ModuleWidget *m);
 	/** Sets a module's box if non-colliding. Returns true if set */
@@ -419,5 +425,9 @@ extern Toolbar *gToolbar;
 
 void sceneInit();
 void sceneDestroy();
+
+json_t *colorToJson(NVGcolor color);
+NVGcolor jsonToColor(json_t *colorJ);
+
 
 } // namespace rack
