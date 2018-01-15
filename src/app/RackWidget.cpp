@@ -172,26 +172,26 @@ json_t *RackWidget::toJson() {
 		if (!(wireWidget->outputPort && wireWidget->inputPort))
 			continue;
 		// wire
-		json_t *wire = json_object();
-		{
-			// Get the modules at each end of the wire
-			ModuleWidget *outputModuleWidget = wireWidget->outputPort->getAncestorOfType<ModuleWidget>();
-			assert(outputModuleWidget);
-			int outputModuleId = moduleIds[outputModuleWidget];
+		json_t *wire = wireWidget->toJson();
 
-			ModuleWidget *inputModuleWidget = wireWidget->inputPort->getAncestorOfType<ModuleWidget>();
-			assert(inputModuleWidget);
-			int inputModuleId = moduleIds[inputModuleWidget];
+		// Get the modules at each end of the wire
+		ModuleWidget *outputModuleWidget = wireWidget->outputPort->getAncestorOfType<ModuleWidget>();
+		assert(outputModuleWidget);
+		int outputModuleId = moduleIds[outputModuleWidget];
 
-			// Get output/input ports
-			int outputId = wireWidget->outputPort->portId;
-			int inputId = wireWidget->inputPort->portId;
+		ModuleWidget *inputModuleWidget = wireWidget->inputPort->getAncestorOfType<ModuleWidget>();
+		assert(inputModuleWidget);
+		int inputModuleId = moduleIds[inputModuleWidget];
 
-			json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
-			json_object_set_new(wire, "outputId", json_integer(outputId));
-			json_object_set_new(wire, "inputModuleId", json_integer(inputModuleId));
-			json_object_set_new(wire, "inputId", json_integer(inputId));
-		}
+		// Get output/input ports
+		int outputId = wireWidget->outputPort->portId;
+		int inputId = wireWidget->inputPort->portId;
+
+		json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
+		json_object_set_new(wire, "outputId", json_integer(outputId));
+		json_object_set_new(wire, "inputModuleId", json_integer(inputModuleId));
+		json_object_set_new(wire, "inputId", json_integer(inputId));
+
 		json_array_append_new(wires, wire);
 	}
 	json_object_set_new(rootJ, "wires", wires);
@@ -281,12 +281,10 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t wireId;
 	json_t *wireJ;
 	json_array_foreach(wiresJ, wireId, wireJ) {
-		int outputModuleId, outputId;
-		int inputModuleId, inputId;
-		int err = json_unpack(wireJ, "{s:i, s:i, s:i, s:i}",
-		                      "outputModuleId", &outputModuleId, "outputId", &outputId,
-		                      "inputModuleId", &inputModuleId, "inputId", &inputId);
-		if (err) continue;
+		int outputModuleId = json_integer_value(json_object_get(wireJ, "outputModuleId"));
+		int outputId = json_integer_value(json_object_get(wireJ, "outputId"));
+		int inputModuleId = json_integer_value(json_object_get(wireJ, "inputModuleId"));
+		int inputId = json_integer_value(json_object_get(wireJ, "inputId"));
 
 		// Get module widgets
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
@@ -320,6 +318,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 		// Create WireWidget
 		WireWidget *wireWidget = new WireWidget();
+		wireWidget->fromJson(wireJ);
 		wireWidget->outputPort = outputPort;
 		wireWidget->inputPort = inputPort;
 		wireWidget->updateWire();
