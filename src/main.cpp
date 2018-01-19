@@ -5,6 +5,7 @@
 #include "settings.hpp"
 #include "asset.hpp"
 #include <unistd.h>
+#include "../ext/osdialog/osdialog.h"
 
 
 using namespace rack;
@@ -40,8 +41,12 @@ int main(int argc, char* argv[]) {
 	skipAutosaveOnLaunch = true;
 	settingsSave(assetLocal("settings.json"));
 	skipAutosaveOnLaunch = false;
-	if (!oldSkipAutosaveOnLaunch)
+	if (oldSkipAutosaveOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, likely caused by a faulty module in your patch. Would you like to clear your patch and start over?")) {
+		// Do nothing. Empty patch is already loaded.
+	}
+	else {
 		gRackWidget->loadPatch(assetLocal("autosave.vcv"));
+	}
 
 	engineStart();
 	guiRun();

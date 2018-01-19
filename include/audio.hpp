@@ -1,5 +1,7 @@
 #pragma once
 
+#include <jansson.h>
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #include <RtAudio.h>
@@ -13,20 +15,20 @@ struct AudioIO {
 	int maxOutputs = 8;
 	int maxInputs = 8;
 
-	RtAudio *stream = NULL;
 	// Stream properties
+	int driver = 0;
 	int device = -1;
 	int sampleRate = 44100;
 	int blockSize = 256;
 	int numOutputs = 0;
 	int numInputs = 0;
+	RtAudio *rtAudio = NULL;
 
 	AudioIO();
 	virtual ~AudioIO();
 
 	std::vector<int> listDrivers();
 	std::string getDriverName(int driver);
-	int getDriver();
 	void setDriver(int driver);
 
 	int getDeviceCount();
@@ -40,6 +42,8 @@ struct AudioIO {
 	virtual void processStream(const float *input, float *output, int length) {}
 	virtual void onCloseStream() {}
 	virtual void onOpenStream() {}
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
 };
 
 

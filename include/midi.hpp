@@ -1,5 +1,11 @@
 #pragma once
 
+#include "util.hpp"
+#include <queue>
+#include <vector>
+#include <jansson.h>
+
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #include "rtmidi/RtMidi.h"
@@ -9,8 +15,13 @@
 namespace rack {
 
 
+struct MidiMessage {
+	double time;
+	std::vector<uint8_t> data;
+};
+
+
 struct MidiIO {
-	RtMidi *midi;
 	int port = -1;
 	/* For MIDI output, the channel to output messages.
 	For MIDI input, the channel to filter.
@@ -18,17 +29,27 @@ struct MidiIO {
 	Zero indexed.
 	*/
 	int channel = -1;
+	RtMidi *rtMidi = NULL;
 
 	virtual ~MidiIO() {}
-	virtual int getPortCount();
-	virtual std::string getPortName(int port);
-	virtual void openPort(int port);
+	int getPortCount();
+	std::string getPortName(int port);
+	void openPort(int port);
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
 };
 
 
 struct MidiInput : MidiIO {
 	MidiInput();
 	~MidiInput();
+	virtual void onMessage(const MidiMessage &message) {}
+};
+
+
+struct MidiInputQueue : MidiInput {
+	std::queue<MidiMessage> messageQueue;
+	void onMessage(const MidiMessage &message) override;
 };
 
 

@@ -137,7 +137,7 @@ void settingsSave(std::string filename) {
 		if (!file)
 			return;
 
-		json_dumpf(rootJ, file, JSON_INDENT(2));
+		json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 		json_decref(rootJ);
 		fclose(file);
 	}

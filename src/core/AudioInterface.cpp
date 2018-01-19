@@ -114,40 +114,13 @@ struct AudioInterface : Module {
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "driver", json_integer(audioIO.getDriver()));
-		std::string deviceName = audioIO.getDeviceName(audioIO.device);
-		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
-		json_object_set_new(rootJ, "sampleRate", json_integer(audioIO.sampleRate));
-		json_object_set_new(rootJ, "blockSize", json_integer(audioIO.blockSize));
+		json_object_set_new(rootJ, "audio", audioIO.toJson());
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
-		json_t *driverJ = json_object_get(rootJ, "driver");
-		if (driverJ)
-			audioIO.setDriver(json_number_value(driverJ));
-
-		json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
-		if (deviceNameJ) {
-			std::string deviceName = json_string_value(deviceNameJ);
-			// Search for device ID with equal name
-			for (int device = 0; device < audioIO.getDeviceCount(); device++) {
-				if (audioIO.getDeviceName(device) == deviceName) {
-					audioIO.device = device;
-					break;
-				}
-			}
-		}
-
-		json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
-		if (sampleRateJ)
-			audioIO.sampleRate = json_integer_value(sampleRateJ);
-
-		json_t *blockSizeJ = json_object_get(rootJ, "blockSize");
-		if (blockSizeJ)
-			audioIO.blockSize = json_integer_value(blockSizeJ);
-
-		audioIO.openStream();
+		json_t *audioJ = json_object_get(rootJ, "audio");
+		audioIO.fromJson(audioJ);
 	}
 
 	void onReset() override {
@@ -236,7 +209,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin.x, yPos);
-		label->text = "Outputs";
+		label->text = "Outputs (DACs)";
 		addChild(label);
 		yPos += labelHeight + margin.y;
 	}
@@ -270,7 +243,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	{
 		Label *label = new Label();
 		label->box.pos = Vec(margin.x, yPos);
-		label->text = "Inputs";
+		label->text = "Inputs (ADCs)";
 		addChild(label);
 		yPos += labelHeight + margin.y;
 	}
