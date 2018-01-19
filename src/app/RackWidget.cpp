@@ -110,7 +110,7 @@ void RackWidget::savePatch(std::string path) {
 
 	FILE *file = fopen(path.c_str(), "w");
 	if (file) {
-		json_dumpf(rootJ, file, JSON_INDENT(2));
+		json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 		fclose(file);
 	}
 

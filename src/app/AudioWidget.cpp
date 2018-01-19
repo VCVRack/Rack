@@ -59,7 +59,7 @@ void AudioWidget::onMouseDown(EventMouseDown &e) {
 		item->audioIO = audioIO;
 		item->driver = driver;
 		item->text = audioIO->getDriverName(driver);
-		item->rightText = CHECKMARK(item->driver == audioIO->getDriver());
+		item->rightText = CHECKMARK(item->driver == audioIO->driver);
 		menu->addChild(item);
 	}
 	menu->addChild(construct<MenuEntry>());

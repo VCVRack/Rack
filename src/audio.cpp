@@ -3,6 +3,9 @@
 #include "audio.hpp"
 
 
+#define DRIVER_BRIDGE -1
+
+
 namespace rack {
 
 
@@ -20,6 +23,8 @@ std::vector<int> AudioIO::listDrivers() {
 	std::vector<int> drivers;
 	for (RtAudio::Api api : apis)
 		drivers.push_back((int) api);
+	// Add Bridge fake driver
+	// drivers.push_back(DRIVER_BRIDGE);
 	return drivers;
 }
 
@@ -35,55 +40,71 @@ std::string AudioIO::getDriverName(int driver) {
 		case RtAudio::WINDOWS_ASIO: return "ASIO";
 		case RtAudio::WINDOWS_DS: return "DirectSound";
 		case RtAudio::RTAUDIO_DUMMY: return "Dummy";
+		case DRIVER_BRIDGE: return "VCV Bridge";
 		default: return "Unknown";
 	}
 }
 
-int AudioIO::getDriver() {
-	if (!stream)
-		return RtAudio::UNSPECIFIED;
-	return stream->getCurrentApi();
-}
-
 void AudioIO::setDriver(int driver) {
+	// Close driver
 	closeStream();
-	if (stream)
-		delete stream;
-	stream = new RtAudio((RtAudio::Api) driver);
+	if (rtAudio) {
+		delete rtAudio;
+		rtAudio = NULL;
+	}
+	this->driver = 0;
+
+	// Open driver
+	if (driver >= 0) {
+		rtAudio = new RtAudio((RtAudio::Api) driver);
+		this->driver = (int) rtAudio->getCurrentApi();
+	}
+	else if (driver == DRIVER_BRIDGE) {
+		// TODO Connect to Bridge
+		this->driver = DRIVER_BRIDGE;
+	}
 }
 
 int AudioIO::getDeviceCount() {
-	if (!stream)
-		return 0;
-	return stream->getDeviceCount();
+	if (rtAudio) {
+		return rtAudio->getDeviceCount();
+	}
+	if (driver == DRIVER_BRIDGE) {
+		return 16;
+	}
+	return 0;
 }
 
 std::string AudioIO::getDeviceName(int device) {
-	if (!stream || device < 0)
-		return "";
-
-	try {
-		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(device);
-		return deviceInfo.name;
+	if (rtAudio) {
+		try {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
+			return deviceInfo.name;
+		}
+		catch (RtAudioError &e) {
+			warn("Failed to query RtAudio device: %s", e.what());
+		}
 	}
-	catch (RtAudioError &e) {
-		warn("Failed to query audio device: %s", e.what());
-		return "";
+	if (driver == DRIVER_BRIDGE) {
+		return stringf("%d", device + 1);
 	}
+	return "";
 }
 
 std::string AudioIO::getDeviceDetail(int device) {
-	if (!stream || device < 0)
-		return "";
-
-	try {
-		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(device);
-		return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
+	if (rtAudio) {
+		try {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
+			return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
+		}
+		catch (RtAudioError &e) {
+			warn("Failed to query RtAudio device: %s", e.what());
+		}
 	}
-	catch (RtAudioError &e) {
-		warn("Failed to query audio device: %s", e.what());
-		return "";
+	if (driver == DRIVER_BRIDGE) {
+		return stringf("Channel %d", device + 1);
 	}
+	return "";
 }
 
 static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
@@ -97,17 +118,18 @@ void AudioIO::openStream() {
 	// Close device but remember the current device number
 	int device = this->device;
 	closeStream();
-	if (!stream)
+
+	if (device < 0)
 		return;
 
-	// Open new device
-	if (device >= 0) {
+	if (rtAudio) {
+		// Open new device
 		RtAudio::DeviceInfo deviceInfo;
 		try {
-			deviceInfo = stream->getDeviceInfo(device);
+			deviceInfo = rtAudio->getDeviceInfo(device);
 		}
 		catch (RtAudioError &e) {
-			warn("Failed to query audio device: %s", e.what());
+			warn("Failed to query RtAudio device: %s", e.what());
 			return;
 		}
 
@@ -115,7 +137,7 @@ void AudioIO::openStream() {
 		numInputs = mini(deviceInfo.inputChannels, maxInputs);
 
 		if (numOutputs == 0 && numInputs == 0) {
-			warn("Audio device %d has 0 inputs and 0 outputs");
+			warn("RtAudio device %d has 0 inputs and 0 outputs");
 			return;
 		}
 
@@ -138,56 +160,56 @@ void AudioIO::openStream() {
 		}
 
 		try {
-			debug("Opening audio stream %d", device);
-			stream->openStream(
+			debug("Opening audio RtAudio device %d", device);
+			rtAudio->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
 				RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize, &rtCallback, this, &options, NULL);
 		}
 		catch (RtAudioError &e) {
-			warn("Failed to open audio stream: %s", e.what());
+			warn("Failed to open RtAudio stream: %s", e.what());
 			return;
 		}
 
 		try {
-			debug("Starting audio stream %d", device);
-			stream->startStream();
+			debug("Starting RtAudio stream %d", device);
+			rtAudio->startStream();
 		}
 		catch (RtAudioError &e) {
-			warn("Failed to start audio stream: %s", e.what());
+			warn("Failed to start RtAudio stream: %s", e.what());
 			return;
 		}
 
 		// Update sample rate because this may have changed
-		this->sampleRate = stream->getStreamSampleRate();
+		this->sampleRate = rtAudio->getStreamSampleRate();
 		this->device = device;
 		onOpenStream();
 	}
 }
 
 void AudioIO::closeStream() {
-	if (stream) {
-		if (stream->isStreamRunning()) {
-			debug("Stopping audio stream %d", device);
+	if (rtAudio) {
+		if (rtAudio->isStreamRunning()) {
+			debug("Stopping RtAudio stream %d", device);
 			try {
-				stream->stopStream();
+				rtAudio->stopStream();
 			}
 			catch (RtAudioError &e) {
-				warn("Failed to stop stream %s", e.what());
+				warn("Failed to stop RtAudio stream %s", e.what());
 			}
 		}
-		if (stream->isStreamOpen()) {
-			debug("Closing audio stream %d", device);
+		if (rtAudio->isStreamOpen()) {
+			debug("Closing RtAudio stream %d", device);
 			try {
-				stream->closeStream();
+				rtAudio->closeStream();
 			}
 			catch (RtAudioError &e) {
-				warn("Failed to close stream %s", e.what());
+				warn("Failed to close RtAudio stream %s", e.what());
 			}
 		}
 	}
 
-	// Reset stream settings
+	// Reset rtAudio settings
 	device = -1;
 	numOutputs = 0;
 	numInputs = 0;
@@ -195,18 +217,59 @@ void AudioIO::closeStream() {
 }
 
 std::vector<int> AudioIO::listSampleRates() {
-	if (!stream || device < 0)
-		return {};
+	if (rtAudio) {
+		try {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
+			std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
+			return sampleRates;
+		}
+		catch (RtAudioError &e) {
+			warn("Failed to query RtAudio device: %s", e.what());
+		}
+	}
+	if (driver == DRIVER_BRIDGE) {
+		return {44100, 48000, 88200, 96000, 176400, 192000};
+	}
 
-	try {
-		RtAudio::DeviceInfo deviceInfo = stream->getDeviceInfo(device);
-		std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
-		return sampleRates;
+	return {};
+}
+
+json_t *AudioIO::toJson() {
+	json_t *rootJ = json_object();
+	json_object_set_new(rootJ, "driver", json_integer(driver));
+	std::string deviceName = getDeviceName(device);
+	json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+	json_object_set_new(rootJ, "sampleRate", json_integer(sampleRate));
+	json_object_set_new(rootJ, "blockSize", json_integer(blockSize));
+	return rootJ;
+}
+
+void AudioIO::fromJson(json_t *rootJ) {
+	json_t *driverJ = json_object_get(rootJ, "driver");
+	if (driverJ)
+		setDriver(json_number_value(driverJ));
+
+	json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
+	if (deviceNameJ) {
+		std::string deviceName = json_string_value(deviceNameJ);
+		// Search for device ID with equal name
+		for (int device = 0; device < getDeviceCount(); device++) {
+			if (getDeviceName(device) == deviceName) {
+				this->device = device;
+				break;
+			}
+		}
 	}
-	catch (RtAudioError &e) {
-		warn("Failed to query audio device: %s", e.what());
-		return {};
-	}
+
+	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
+	if (sampleRateJ)
+		sampleRate = json_integer_value(sampleRateJ);
+
+	json_t *blockSizeJ = json_object_get(rootJ, "blockSize");
+	if (blockSizeJ)
+		blockSize = json_integer_value(blockSizeJ);
+
+	openStream();
 }
 
 
