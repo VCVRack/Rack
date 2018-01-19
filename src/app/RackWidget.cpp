@@ -263,7 +263,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 		}
 
 		if (!model) {
-			message += stringf("Could not find module \"%s\" in plugin \"%s\"\n", pluginSlug.c_str(), modelSlug.c_str());
+			message += stringf("Could not find module \"%s\" in plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 			continue;
 		}
 
