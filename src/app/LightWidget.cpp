@@ -14,7 +14,6 @@ void LightWidget::draw(NVGcontext *vg) {
 	drawHalo(vg);
 }
 
-
 void LightWidget::drawLight(NVGcontext *vg) {
 	float radius = box.size.x / 2.0;
 
@@ -25,18 +24,18 @@ void LightWidget::drawLight(NVGcontext *vg) {
 	nvgFillColor(vg, bgColor);
 	nvgFill(vg);
 
-	// // Border
-	// nvgStrokeWidth(vg, 1.0);
-	// NVGcolor borderColor = bgColor;
-	// borderColor.a *= 0.5;
-	// nvgStrokeColor(vg, borderColor);
-	// nvgStroke(vg);
+	// Border
+	nvgStrokeWidth(vg, 1.0);
+	NVGcolor borderColor = bgColor;
+	borderColor.a *= 0.5;
+	nvgStrokeColor(vg, borderColor);
+	nvgStroke(vg);
 
 	// Inner glow
 	nvgFillColor(vg, color);
+	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 	nvgFill(vg);
 }
-
 
 void LightWidget::drawHalo(NVGcontext *vg) {
 	float radius = box.size.x / 2.0;
@@ -55,8 +54,6 @@ void LightWidget::drawHalo(NVGcontext *vg) {
 	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 	nvgFill(vg);
 }
-
-
 
 
 } // namespace rack
