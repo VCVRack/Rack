@@ -72,7 +72,7 @@ ifeq ($(ARCH), mac)
 endif
 ifeq ($(ARCH), win)
 	# TODO get rid of the mingw64 path
-	env PATH=dep/bin:/mingw64/bin gdb -ex run ./Rack
+	env PATH="$(PATH)":dep/bin:/mingw64/bin gdb -ex run ./Rack
 endif
 
 perf: $(TARGET)
