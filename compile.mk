@@ -6,7 +6,14 @@ endif
 FLAGS += -MMD
 FLAGS += -g
 # Optimization
-FLAGS += -O3 -march=nocona -ffast-math -fno-finite-math-only
+FLAGS += -O3
+# Native compile flag will be used unless COMMON=true is passed as a parameter to make
+ifeq ($(COMMON), true)
+	FLAGS += -march=nocona
+else
+	FLAGS += -march=native
+endif
+FLAGS += -ffast-math -fno-finite-math-only
 FLAGS += -Wall -Wextra -Wno-unused-parameter
 ifneq ($(ARCH), mac)
 	CXXFLAGS += -Wsuggest-override
