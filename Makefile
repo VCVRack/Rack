@@ -5,7 +5,6 @@ FLAGS += \
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
 
-
 include arch.mk
 
 ifeq ($(ARCH), lin)
@@ -55,6 +54,11 @@ endif
 ifeq ($(ARCH), win)
 	# TODO get rid of the mingw64 path
 	env PATH=dep/bin:/mingw64/bin ./$<
+endif
+
+sandbox-run: $(TARGET)
+ifeq ($(ARCH), mac)
+	sandbox-exec -f ./Rack.sb `which sh` -c 'DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<'                                                                      2 ↵  ✹ ✭sandbox ‹2.4.2›
 endif
 
 debug: $(TARGET)
