@@ -58,7 +58,7 @@ endif
 
 sandbox-run: $(TARGET)
 ifeq ($(ARCH), mac)
-	sandbox-exec -f ./Rack.sb `which sh` -c 'DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<'                                                                      2 ↵  ✹ ✭sandbox ‹2.4.2›
+	sandbox-exec -D RACK_HOME=$(PWD) -f ./Rack.sb `which sh` -c 'DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<'                                                                      2 ↵  ✹ ✭sandbox ‹2.4.2›
 endif
 
 debug: $(TARGET)

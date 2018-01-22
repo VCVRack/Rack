@@ -2,6 +2,8 @@
 (version 1)
 (debug allow)
 
+(define rack-home "RACK_HOME")
+
 ; This is needed for IPC on OSX >= 10.6
 (allow ipc-posix-shm)
 
@@ -26,6 +28,8 @@
 (allow mach-lookup)
 
 (allow system-socket)
+
+(allow file-read* file-write* (subpath (param rack-home)))
 
 ; Allow file reading
 (allow file-read*
