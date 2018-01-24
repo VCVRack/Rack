@@ -51,14 +51,18 @@ inline bool ispow2i(int n) {
 // float functions
 ////////////////////
 
+inline float absf(float x) {
+	return (x < 0.f) ? -x : x;
+}
+
 /** Returns 1.0 for positive numbers and -1.0 for negative numbers (including positive/negative zero) */
 inline float sgnf(float x) {
-	return copysignf(1.0, x);
+	return copysignf(1.f, x);
 }
 
 inline float eucmodf(float a, float base) {
 	float mod = fmodf(a, base);
-	return mod < 0.0 ? mod + base : mod;
+	return (mod < 0.f) ? mod + base : mod;
 }
 
 inline float nearf(float a, float b, float epsilon = 1e-6) {
