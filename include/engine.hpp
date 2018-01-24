@@ -63,8 +63,9 @@ struct Module {
 
 	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate */
 	virtual void step() {}
-	virtual void onSampleRateChange() {}
 
+	/** Called when the engine sample rate is changed */
+	virtual void onSampleRateChange() {}
 	/** Called when module is created by the Add Module popup, cloning, or when loading a patch or autosave */
 	virtual void onCreate() {}
 	/** Called when user explicitly deletes the module, not when Rack is closed or a new patch is loaded */

@@ -36,6 +36,8 @@ struct AudioIO {
 	std::string getDeviceDetail(int device);
 	void openStream();
 	void closeStream();
+	/** Returns whether the audio stream is open and running */
+	bool isActive();
 
 	std::vector<int> listSampleRates();
 

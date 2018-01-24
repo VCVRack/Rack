@@ -18,7 +18,7 @@
 #define MAX_OUTPUTS 8
 #define MAX_INPUTS 8
 
-static auto audioTimeout = std::chrono::milliseconds(100);
+static const auto audioTimeout = std::chrono::milliseconds(100);
 
 
 using namespace rack;
@@ -45,7 +45,7 @@ struct AudioInterfaceIO : AudioIO {
 
 	void processStream(const float *input, float *output, int length) override {
 		if (numInputs > 0) {
-			// TODO Do we need to wait on the input to be consumed here?
+			// TODO Do we need to wait on the input to be consumed here? Experimentally, it works fine if we don't.
 			for (int i = 0; i < length; i++) {
 				if (inputBuffer.full())
 					break;
@@ -97,8 +97,13 @@ struct AudioInterface : Module {
 		ENUMS(AUDIO_OUTPUT, MAX_OUTPUTS),
 		NUM_OUTPUTS
 	};
+	enum LightIds {
+		ACTIVE_LIGHT,
+		NUM_LIGHTS
+	};
 
 	AudioInterfaceIO audioIO;
+	int lastSampleRate = 0;
 
 	SampleRateConverter<MAX_INPUTS> inputSrc;
 	SampleRateConverter<MAX_OUTPUTS> outputSrc;
@@ -107,7 +112,8 @@ struct AudioInterface : Module {
 	DoubleRingBuffer<Frame<MAX_INPUTS>, 16> inputBuffer;
 	DoubleRingBuffer<Frame<MAX_OUTPUTS>, 16> outputBuffer;
 
-	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
+	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		onSampleRateChange();
 	}
 
 	void step() override;
@@ -123,6 +129,17 @@ struct AudioInterface : Module {
 		audioIO.fromJson(audioJ);
 	}
 
+	void onSampleRateChange() override {
+		// for (int i = 0; i < MAX_INPUTS; i++) {
+		// 	inputSrc[i].setRates(audioIO.sampleRate, engineGetSampleRate());
+		// }
+		// for (int i = 0; i < MAX_OUTPUTS; i++) {
+		// 	outputSrc[i].setRates(engineGetSampleRate(), audioIO.sampleRate);
+		// }
+		inputSrc.setRates(audioIO.sampleRate, engineGetSampleRate());
+		outputSrc.setRates(engineGetSampleRate(), audioIO.sampleRate);
+	}
+
 	void onReset() override {
 		audioIO.closeStream();
 	}
@@ -133,9 +150,14 @@ void AudioInterface::step() {
 	Frame<MAX_INPUTS> inputFrame;
 	memset(&inputFrame, 0, sizeof(inputFrame));
 
+	// Update sample rate if changed by audio driver
+	if (audioIO.sampleRate != lastSampleRate) {
+		onSampleRateChange();
+		lastSampleRate = audioIO.sampleRate;
+	}
+
 	if (audioIO.numInputs > 0) {
 		if (inputBuffer.empty()) {
-			inputSrc.setRates(audioIO.sampleRate, engineGetSampleRate());
 			int inLen = audioIO.inputBuffer.size();
 			int outLen = inputBuffer.capacity();
 			inputSrc.process(audioIO.inputBuffer.startData(), &inLen, inputBuffer.endData(), &outLen);
@@ -169,7 +191,6 @@ void AudioInterface::step() {
 			};
 			if (audioIO.engineCv.wait_for(lock, audioTimeout, cond)) {
 				// Push converted output
-				outputSrc.setRates(engineGetSampleRate(), audioIO.sampleRate);
 				int inLen = outputBuffer.size();
 				int outLen = audioIO.outputBuffer.capacity();
 				outputSrc.process(outputBuffer.startData(), &inLen, audioIO.outputBuffer.endData(), &outLen);
@@ -183,6 +204,9 @@ void AudioInterface::step() {
 	}
 
 	audioIO.audioCv.notify_all();
+
+	// Lights
+	lights[ACTIVE_LIGHT].value = audioIO.isActive() ? 1.0 : 0.0;
 }
 
 
@@ -196,10 +220,10 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 		addChild(panel);
 	}
 
-	// addChild(createScrew<ScrewSilver>(Vec(15, 0)));
-	// addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 0)));
-	// addChild(createScrew<ScrewSilver>(Vec(15, 365)));
-	// addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(15, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 0)));
+	addChild(createScrew<ScrewSilver>(Vec(15, 365)));
+	addChild(createScrew<ScrewSilver>(Vec(box.size.x-30, 365)));
 
 	Vec margin = Vec(5, 2);
 	float labelHeight = 15;
@@ -251,7 +275,8 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	yPos += 5;
 	xPos = 10;
 	for (int i = 0; i < 4; i++) {
-		addOutput(createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO_OUTPUT + i));
+		Port *port = createOutput<PJ3410Port>(Vec(xPos, yPos), module, AudioInterface::AUDIO_OUTPUT + i);
+		addOutput(port);
 		Label *label = new Label();
 		label->box.pos = Vec(xPos + 4, yPos + 28);
 		label->text = stringf("%d", i + 1);
@@ -277,4 +302,7 @@ AudioInterfaceWidget::AudioInterfaceWidget() {
 	AudioWidget *audioWidget = construct<USB_B_AudioWidget>();
 	audioWidget->audioIO = &module->audioIO;
 	addChild(audioWidget);
+
+	// Lights
+	addChild(createLight<SmallLight<GreenLight>>(Vec(40, 20), module, AudioInterface::ACTIVE_LIGHT));
 }
