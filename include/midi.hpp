@@ -43,6 +43,7 @@ struct MidiIO {
 
 
 struct MidiInput : MidiIO {
+	RtMidiIn *rtMidiIn = NULL;
 	MidiInput();
 	~MidiInput();
 	virtual void onMessage(const MidiMessage &message) {}
@@ -56,6 +57,7 @@ struct MidiInputQueue : MidiInput {
 
 
 struct MidiOutput : MidiIO {
+	RtMidiOut *rtMidiOut = NULL;
 	MidiOutput();
 	~MidiOutput();
 };
