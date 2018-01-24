@@ -11,6 +11,8 @@ namespace rack {
 
 static std::string newVersion = "";
 
+
+#if defined(RELEASE)
 static void checkVersion() {
 	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/version", NULL);
 
@@ -25,6 +27,7 @@ static void checkVersion() {
 		json_decref(resJ);
 	}
 }
+#endif
 
 
 RackScene::RackScene() {

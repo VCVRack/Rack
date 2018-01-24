@@ -54,7 +54,7 @@ void Menu::onScroll(EventScroll &e) {
 	if (!parent)
 		return;
 	if (!parent->box.contains(box))
-		box.pos = box.pos.plus(e.scrollRel);
+		box.pos.y += e.scrollRel.y;
 	e.consumed = true;
 }
 

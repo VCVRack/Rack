@@ -43,13 +43,13 @@ bool MidiIO::isActive() {
 json_t *MidiIO::toJson() {
 	json_t *rootJ = json_object();
 	std::string deviceName = getDeviceName(device);
-	json_object_set_new(rootJ, "device", json_string(deviceName.c_str()));
+	json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
 	json_object_set_new(rootJ, "channel", json_integer(channel));
 	return rootJ;
 }
 
 void MidiIO::fromJson(json_t *rootJ) {
-	json_t *deviceNameJ = json_object_get(rootJ, "device");
+	json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
 	if (deviceNameJ) {
 		std::string deviceName = json_string_value(deviceNameJ);
 		// Search for device with equal name
@@ -83,13 +83,13 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 }
 
 MidiInput::MidiInput() {
-	RtMidiIn *rtMidiIn = new RtMidiIn();
+	rtMidiIn = new RtMidiIn();
 	rtMidi = rtMidiIn;
 	rtMidiIn->setCallback(midiInputCallback, this);
 }
 
 MidiInput::~MidiInput() {
-	delete dynamic_cast<RtMidiIn*>(rtMidi);
+	delete rtMidiIn;
 }
 
 void MidiInputQueue::onMessage(const MidiMessage &message) {
@@ -107,11 +107,12 @@ void MidiInputQueue::onMessage(const MidiMessage &message) {
 ////////////////////
 
 MidiOutput::MidiOutput() {
-	rtMidi = new RtMidiOut();
+	rtMidiOut = new RtMidiOut();
+	rtMidi = rtMidiOut;
 }
 
 MidiOutput::~MidiOutput() {
-	delete dynamic_cast<RtMidiOut*>(rtMidi);
+	delete rtMidiOut;
 }
 
 

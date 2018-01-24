@@ -9,7 +9,7 @@ void MenuOverlay::step() {
 
 	// Fit all children in the box
 	for (Widget *child : children) {
-		child->box = child->box.nudge(Rect(Vec(0, 0), parent->box.size));
+		child->box = child->box.nudge(box.zeroPos());
 	}
 }
 
