@@ -8,41 +8,54 @@ namespace rack {
 // MidiIO
 ////////////////////
 
-int MidiIO::getPortCount() {
-	return rtMidi->getPortCount();
+int MidiIO::getDeviceCount() {
+	if (rtMidi)
+		return rtMidi->getPortCount();
+	return 0;
 }
 
-std::string MidiIO::getPortName(int port) {
-	if (port < 0)
-		return "";
-	return rtMidi->getPortName(port);
-}
-
-void MidiIO::openPort(int port) {
-	rtMidi->closePort();
-
-	if (port >= 0) {
-		rtMidi->openPort(port);
+std::string MidiIO::getDeviceName(int device) {
+	if (rtMidi) {
+		if (device < 0)
+			return "";
+		return rtMidi->getPortName(device);
 	}
-	this->port = port;
+	return "";
+}
+
+void MidiIO::openDevice(int device) {
+	if (rtMidi) {
+		rtMidi->closePort();
+
+		if (device >= 0) {
+			rtMidi->openPort(device);
+		}
+		this->device = device;
+	}
+}
+
+bool MidiIO::isActive() {
+	if (rtMidi)
+		return rtMidi->isPortOpen();
+	return false;
 }
 
 json_t *MidiIO::toJson() {
 	json_t *rootJ = json_object();
-	std::string portName = getPortName(port);
-	json_object_set_new(rootJ, "port", json_string(portName.c_str()));
+	std::string deviceName = getDeviceName(device);
+	json_object_set_new(rootJ, "device", json_string(deviceName.c_str()));
 	json_object_set_new(rootJ, "channel", json_integer(channel));
 	return rootJ;
 }
 
 void MidiIO::fromJson(json_t *rootJ) {
-	json_t *portNameJ = json_object_get(rootJ, "port");
-	if (portNameJ) {
-		std::string portName = json_string_value(portNameJ);
-		// Search for port with equal name
-		for (int port = 0; port < getPortCount(); port++) {
-			if (getPortName(port) == portName) {
-				openPort(port);
+	json_t *deviceNameJ = json_object_get(rootJ, "device");
+	if (deviceNameJ) {
+		std::string deviceName = json_string_value(deviceNameJ);
+		// Search for device with equal name
+		for (int device = 0; device < getDeviceCount(); device++) {
+			if (getDeviceName(device) == deviceName) {
+				openDevice(device);
 				break;
 			}
 		}

@@ -15,6 +15,7 @@ struct MidiValue {
 	bool changed = false; // Value has been changed by midi message (only if it is in sync!)
 };
 
+
 struct MIDIToCVInterface : Module {
 	enum ParamIds {
 		RESET_PARAM,
@@ -33,6 +34,7 @@ struct MIDIToCVInterface : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		ACTIVE_LIGHT,
 		RESET_LIGHT,
 		NUM_LIGHTS
 	};
@@ -136,6 +138,9 @@ void MIDIToCVInterface::step() {
 
 	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch.val / 127.0 * 10.0;
 	*/
+
+	// Lights
+	lights[ACTIVE_LIGHT].value = midiInput.isActive() ? 1.0 : 0.0;
 }
 
 void MIDIToCVInterface::pressNote(int note) {
@@ -272,4 +277,7 @@ MidiToCVWidget::MidiToCVWidget() {
 	MidiWidget *midiWidget = construct<MIDI_DIN_MidiWidget>();
 	midiWidget->midiIO = &module->midiInput;
 	addChild(midiWidget);
+
+	// Lights
+	addChild(createLight<SmallLight<GreenLight>>(Vec(40, 20), module, MIDIToCVInterface::ACTIVE_LIGHT));
 }

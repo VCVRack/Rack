@@ -5,11 +5,11 @@
 namespace rack {
 
 
-struct MidiPortItem : MenuItem {
+struct MidiDeviceItem : MenuItem {
 	MidiIO *midiIO;
-	int port;
+	int device;
 	void onAction(EventAction &e) override {
-		midiIO->openPort(port);
+		midiIO->openDevice(device);
 	}
 };
 
@@ -31,13 +31,21 @@ void MidiWidget::onMouseDown(EventMouseDown &e) {
 
 	Menu *menu = gScene->createMenu();
 
-	menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI port"));
-	for (int port = 0; port < midiIO->getPortCount(); port++) {
-		MidiPortItem *item = new MidiPortItem();
+	menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI device"));
+	{
+		MidiDeviceItem *item = new MidiDeviceItem();
 		item->midiIO = midiIO;
-		item->port = port;
-		item->text = midiIO->getPortName(port);
-		item->rightText = CHECKMARK(item->port == midiIO->port);
+		item->device = -1;
+		item->text = "No device";
+		item->rightText = CHECKMARK(item->device == midiIO->device);
+		menu->addChild(item);
+	}
+	for (int device = 0; device < midiIO->getDeviceCount(); device++) {
+		MidiDeviceItem *item = new MidiDeviceItem();
+		item->midiIO = midiIO;
+		item->device = device;
+		item->text = midiIO->getDeviceName(device);
+		item->rightText = CHECKMARK(item->device == midiIO->device);
 		menu->addChild(item);
 	}
 	menu->addChild(construct<MenuEntry>());

@@ -216,6 +216,14 @@ void AudioIO::closeStream() {
 	onCloseStream();
 }
 
+bool AudioIO::isActive() {
+	if (rtAudio)
+		return rtAudio->isStreamRunning();
+	// TODO Bridge
+	return false;
+}
+
+
 std::vector<int> AudioIO::listSampleRates() {
 	if (rtAudio) {
 		try {
