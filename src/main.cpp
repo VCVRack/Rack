@@ -11,7 +11,7 @@
 using namespace rack;
 
 int main(int argc, char* argv[]) {
-	randomSeedTime();
+	randomInit();
 
 #ifdef RELEASE
 	std::string logFilename = assetLocal("log.txt");

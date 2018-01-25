@@ -69,7 +69,7 @@ T *construct(F f, V v, Args... args) {
 ////////////////////
 
 /** Seeds the RNG with the current time */
-void randomSeedTime();
+void randomInit();
 uint32_t randomu32();
 uint64_t randomu64();
 /** Returns a uniform random float in the interval [0.0, 1.0) */
