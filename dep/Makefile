@@ -18,7 +18,7 @@ export LDFLAGS
 
 
 # Commands
-WGET = wget -nc
+WGET = curl -O
 UNTAR = tar xf
 UNZIP = unzip
 ifeq ($(ARCH),win)
