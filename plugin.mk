@@ -3,6 +3,10 @@
 FLAGS += -fPIC \
 	-I../../include -I../../dep/include
 
+ifdef SLUG
+	FLAGS += -DSLUG=$(SLUG)
+endif
+
 
 include ../../arch.mk
 
