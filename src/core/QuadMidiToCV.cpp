@@ -1,15 +1,17 @@
+#if 0
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
+
 
 struct MidiKey {
 	int pitch = 60;
 	int at = 0; // aftertouch
 	int vel = 0; // velocity
 	bool gate = false;
+	bool pedal_gate_released = false;
 };
 
 struct QuadMIDIToCVInterface : MidiIO, Module {
@@ -72,7 +74,7 @@ struct QuadMIDIToCVInterface : MidiIO, Module {
 		baseFromJson(rootJ);
 	}
 
-	void reset() override {
+	void onReset() override {
 		resetMidi();
 	}
 
@@ -98,16 +100,11 @@ void QuadMIDIToCVInterface::resetMidi() {
 void QuadMIDIToCVInterface::step() {
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
-		int msgsProcessed = 0;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
-		// NOTE: For the quadmidi we will process max 4 midi messages per step to avoid
-		// problems with parallel input.
 		getMessage(&message);
-		while (msgsProcessed < 4 && message.size() > 0) {
+		if (message.size() > 0) {
 			processMidi(message);
-			getMessage(&message);
-			msgsProcessed++;
 		}
 	}
 
@@ -140,49 +137,60 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 		return;
 
 	switch (status) {
-		// note off
-		case 0x8: {
+	// note off
+	case 0x8: {
+		gate = false;
+	}
+	break;
+	case 0x9: // note on
+		if (data2 > 0) {
+			gate = true;
+		}
+		else {
+			// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
 			gate = false;
 		}
-			break;
-		case 0x9: // note on
-			if (data2 > 0) {
-				gate = true;
-			} else {
-				// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
-				gate = false;
+		break;
+	case 0xa: // channel aftertouch
+		for (int i = 0; i < 4; i++) {
+			if (activeKeys[i].pitch == data1) {
+				activeKeys[i].at = data2;
 			}
-			break;
-		case 0xa: // channel aftertouch
-			for (int i = 0; i < 4; i++) {
-				if (activeKeys[i].pitch == data1) {
-					activeKeys[i].at = data2;
-				}
-			}
-			return;
-		case 0xb: // cc
-			if (data1 == 0x40) { // pedal
-				pedal = (data2 >= 64);
-				if (!pedal) {
-					open.clear();
-					for (int i = 0; i < 4; i++) {
+		}
+		return;
+	case 0xb: // cc
+		if (data1 == 0x40) { // pedal
+			pedal = (data2 >= 64);
+			if (!pedal) {
+				for (int i = 0; i < 4; i++) {
+					if (activeKeys[i].pedal_gate_released) {
 						activeKeys[i].gate = false;
-						open.push_back(i);
+						activeKeys[i].pedal_gate_released = false;
+						if (std::find(open.begin(), open.end(), i) != open.end()) {
+							open.remove(i);
+						}
+						open.push_front(i);
 					}
 				}
 			}
-			return;
-		default:
-			return;
+		}
+		return;
+	default:
+		return;
 	}
 
 	if (pedal && !gate) {
+		for (int i = 0; i < 4; i++) {
+			if (activeKeys[i].pitch == data1 && activeKeys[i].gate) {
+				activeKeys[i].pedal_gate_released = true;
+			}
+		}
 		return;
 	}
 
 	if (!gate) {
 		for (int i = 0; i < 4; i++) {
-			if (activeKeys[i].pitch == data1) {
+			if (activeKeys[i].pitch == data1 && activeKeys[i].gate) {
 				activeKeys[i].gate = false;
 				activeKeys[i].vel = data2;
 				if (std::find(open.begin(), open.end(), i) != open.end()) {
@@ -201,25 +209,26 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	}
 
 	if (!activeKeys[0].gate && !activeKeys[1].gate &&
-		!activeKeys[2].gate && !activeKeys[3].gate) {
+					!activeKeys[2].gate && !activeKeys[3].gate) {
 		open.sort();
 	}
 
 
 	switch (mode) {
-		case RESET:
-			if (open.size() >= 4) {
-				for (int i = 0; i < 4; i++) {
-					activeKeys[i].gate = false;
-					open.push_back(i);
-				}
+	case RESET:
+		if (open.size() >= 4) {
+			open.clear();
+			for (int i = 0; i < 4; i++) {
+				activeKeys[i].gate = false;
+				open.push_back(i);
 			}
-			break;
-		case REASSIGN:
-			open.push_back(open.front());
-			break;
-		case ROTATE:
-			break;
+		}
+		break;
+	case REASSIGN:
+		open.push_back(open.front());
+		break;
+	case ROTATE:
+		break;
 	}
 
 	int next = open.front();
@@ -233,10 +242,12 @@ void QuadMIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 
 			open.push_front(i);
 			activeKeys[i].gate = false;
+			activeKeys[i].pedal_gate_released = false;
 		}
 	}
 
 	activeKeys[next].gate = true;
+	activeKeys[next].pedal_gate_released = false;
 	activeKeys[next].pitch = data1;
 	activeKeys[next].vel = data2;
 }
@@ -254,7 +265,7 @@ struct ModeItem : MenuItem {
 	int mode;
 	QuadMIDIToCVInterface *module;
 
-	void onAction(EventAction &e) {
+	void onAction(EventAction &e) override {
 		module->setMode(mode);
 	}
 };
@@ -264,7 +275,7 @@ struct ModeChoice : ChoiceButton {
 	const std::vector<std::string> modeNames = {"ROTATE", "RESET", "REASSIGN"};
 
 
-	void onAction(EventAction &e) {
+	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y)).round();
 		menu->box.size.x = box.size.x;
@@ -274,11 +285,11 @@ struct ModeChoice : ChoiceButton {
 			modeItem->mode = i;
 			modeItem->module = module;
 			modeItem->text = modeNames[i];
-			menu->pushChild(modeItem);
+			menu->addChild(modeItem);
 		}
 	}
 
-	void step() {
+	void step() override {
 		text = modeNames[module->getMode()];
 	}
 };
@@ -313,7 +324,7 @@ QuadMidiToCVWidget::QuadMidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(12 * 15, labelHeight), module, QuadMIDIToCVInterface::RESET_PARAM, 0.0, 1.0,
-									0.0));
+																	0.0));
 	addChild(createLight<SmallLight<RedLight>>(Vec(12 * 15 + 5, labelHeight + 5), module, QuadMIDIToCVInterface::RESET_LIGHT));
 	{
 		Label *label = new Label();
@@ -406,3 +417,4 @@ void QuadMidiToCVWidget::step() {
 
 	ModuleWidget::step();
 }
+#endif

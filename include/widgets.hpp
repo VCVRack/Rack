@@ -11,20 +11,7 @@
 #include "events.hpp"
 
 
-#define SVG_DPI 75.0
-
-
 namespace rack {
-
-
-inline Vec in2px(Vec inches) {
-	return inches.mult(SVG_DPI);
-}
-
-inline Vec mm2px(Vec millimeters) {
-	return millimeters.mult(SVG_DPI / 25.4);
-}
-
 
 ////////////////////
 // resources
@@ -178,6 +165,7 @@ struct ZoomWidget : Widget {
 	void onMouseMove(EventMouseMove &e) override;
 	void onHoverKey(EventHoverKey &e) override;
 	void onScroll(EventScroll &e) override;
+	void onPathDrop(EventPathDrop &e) override;
 };
 
 ////////////////////
@@ -295,7 +283,7 @@ struct Label : Widget {
 /** Deletes itself from parent when clicked */
 struct MenuOverlay : OpaqueWidget {
 	void step() override;
-	void onDragDrop(EventDragDrop &e) override;
+	void onMouseDown(EventMouseDown &e) override;
 	void onHoverKey(EventHoverKey &e) override;
 };
 

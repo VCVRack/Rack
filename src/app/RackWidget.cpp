@@ -38,6 +38,25 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 	lastPath = "";
+
+/*
+	// Add all modules to rack
+	Vec pos;
+	for (Plugin *plugin : gPlugins) {
+		for (Model *model : plugin->models) {
+			ModuleWidget *moduleWidget = model->createModuleWidget();
+			moduleContainer->addChild(moduleWidget);
+			// Move module nearest to the mouse position
+			Rect box;
+			box.size = moduleWidget->box.size;
+			box.pos = pos;
+			requestModuleBoxNearest(moduleWidget, box);
+			pos.x += box.size.x;
+		}
+		pos.y += RACK_GRID_HEIGHT;
+		pos.x = 0;
+	}
+*/
 }
 
 void RackWidget::reset() {
@@ -83,20 +102,19 @@ void RackWidget::saveAsDialog() {
 	}
 }
 
-
 void RackWidget::savePatch(std::string path) {
 	info("Saving patch %s", path.c_str());
-	FILE *file = fopen(path.c_str(), "w");
-	if (!file)
+	json_t *rootJ = toJson();
+	if (!rootJ)
 		return;
 
-	json_t *rootJ = toJson();
-	if (rootJ) {
-		json_dumpf(rootJ, file, JSON_INDENT(2));
-		json_decref(rootJ);
+	FILE *file = fopen(path.c_str(), "w");
+	if (file) {
+		json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+		fclose(file);
 	}
 
-	fclose(file);
+	json_decref(rootJ);
 }
 
 void RackWidget::loadPatch(std::string path) {
@@ -154,31 +172,26 @@ json_t *RackWidget::toJson() {
 		if (!(wireWidget->outputPort && wireWidget->inputPort))
 			continue;
 		// wire
-		json_t *wire = json_object();
-		{
-			// Get the modules at each end of the wire
-			ModuleWidget *outputModuleWidget = wireWidget->outputPort->getAncestorOfType<ModuleWidget>();
-			assert(outputModuleWidget);
-			int outputModuleId = moduleIds[outputModuleWidget];
+		json_t *wire = wireWidget->toJson();
 
-			ModuleWidget *inputModuleWidget = wireWidget->inputPort->getAncestorOfType<ModuleWidget>();
-			assert(inputModuleWidget);
-			int inputModuleId = moduleIds[inputModuleWidget];
+		// Get the modules at each end of the wire
+		ModuleWidget *outputModuleWidget = wireWidget->outputPort->getAncestorOfType<ModuleWidget>();
+		assert(outputModuleWidget);
+		int outputModuleId = moduleIds[outputModuleWidget];
 
-			// Get output/input ports
-			auto outputIt = std::find(outputModuleWidget->outputs.begin(), outputModuleWidget->outputs.end(), wireWidget->outputPort);
-			assert(outputIt != outputModuleWidget->outputs.end());
-			int outputId = outputIt - outputModuleWidget->outputs.begin();
+		ModuleWidget *inputModuleWidget = wireWidget->inputPort->getAncestorOfType<ModuleWidget>();
+		assert(inputModuleWidget);
+		int inputModuleId = moduleIds[inputModuleWidget];
 
-			auto inputIt = std::find(inputModuleWidget->inputs.begin(), inputModuleWidget->inputs.end(), wireWidget->inputPort);
-			assert(inputIt != inputModuleWidget->inputs.end());
-			int inputId = inputIt - inputModuleWidget->inputs.begin();
+		// Get output/input ports
+		int outputId = wireWidget->outputPort->portId;
+		int inputId = wireWidget->inputPort->portId;
 
-			json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
-			json_object_set_new(wire, "outputId", json_integer(outputId));
-			json_object_set_new(wire, "inputModuleId", json_integer(inputModuleId));
-			json_object_set_new(wire, "inputId", json_integer(inputId));
-		}
+		json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
+		json_object_set_new(wire, "outputId", json_integer(outputId));
+		json_object_set_new(wire, "inputModuleId", json_integer(inputModuleId));
+		json_object_set_new(wire, "inputId", json_integer(inputId));
+
 		json_array_append_new(wires, wire);
 	}
 	json_object_set_new(rootJ, "wires", wires);
@@ -190,11 +203,22 @@ void RackWidget::fromJson(json_t *rootJ) {
 	std::string message;
 
 	// version
+	std::string version;
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
-		std::string version = json_string_value(versionJ);
+		version = json_string_value(versionJ);
 		if (!version.empty() && gApplicationVersion != version)
-			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version.c_str(), gApplicationVersion.empty() ? "dev" : gApplicationVersion.c_str());
+			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version.c_str(), gApplicationVersion.c_str());
+	}
+
+	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
+	// (We now use Module::params/inputs/outputs indices.)
+	int legacy = 0;
+	if (startsWith(version, "0.3.") || startsWith(version, "0.4.") || startsWith(version, "0.5.") || version == "" || version == "dev") {
+		legacy = 1;
+	}
+	if (legacy) {
+		info("Loading patch using legacy mode %d", legacy);
 	}
 
 	// modules
@@ -204,6 +228,10 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t moduleId;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
+		// Set legacy property
+		if (legacy)
+			json_object_set_new(moduleJ, "legacy", json_integer(legacy));
+
 		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
 		if (!pluginSlugJ) continue;
 		json_t *modelSlugJ = json_object_get(moduleJ, "model");
@@ -235,7 +263,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 		}
 
 		if (!model) {
-			message += stringf("Could not find module \"%s\" in plugin \"%s\"\n", pluginSlug.c_str(), modelSlug.c_str());
+			message += stringf("Could not find module \"%s\" in plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 			continue;
 		}
 
@@ -253,23 +281,44 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t wireId;
 	json_t *wireJ;
 	json_array_foreach(wiresJ, wireId, wireJ) {
-		int outputModuleId, outputId;
-		int inputModuleId, inputId;
-		int err = json_unpack(wireJ, "{s:i, s:i, s:i, s:i}",
-		                      "outputModuleId", &outputModuleId, "outputId", &outputId,
-		                      "inputModuleId", &inputModuleId, "inputId", &inputId);
-		if (err) continue;
-		// Get ports
+		int outputModuleId = json_integer_value(json_object_get(wireJ, "outputModuleId"));
+		int outputId = json_integer_value(json_object_get(wireJ, "outputId"));
+		int inputModuleId = json_integer_value(json_object_get(wireJ, "inputModuleId"));
+		int inputId = json_integer_value(json_object_get(wireJ, "inputId"));
+
+		// Get module widgets
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
 		if (!outputModuleWidget) continue;
-		Port *outputPort = outputModuleWidget->outputs[outputId];
-		if (!outputPort) continue;
 		ModuleWidget *inputModuleWidget = moduleWidgets[inputModuleId];
 		if (!inputModuleWidget) continue;
-		Port *inputPort = inputModuleWidget->inputs[inputId];
-		if (!inputPort) continue;
+
+		// Get port widgets
+		Port *outputPort = NULL;
+		Port *inputPort = NULL;
+		if (legacy && legacy <= 1) {
+			outputPort = outputModuleWidget->outputs[outputId];
+			inputPort = inputModuleWidget->inputs[inputId];
+		}
+		else {
+			for (Port *port : outputModuleWidget->outputs) {
+				if (port->portId == outputId) {
+					outputPort = port;
+					break;
+				}
+			}
+			for (Port *port : inputModuleWidget->inputs) {
+				if (port->portId == inputId) {
+					inputPort = port;
+					break;
+				}
+			}
+		}
+		if (!outputPort || !inputPort)
+			continue;
+
 		// Create WireWidget
 		WireWidget *wireWidget = new WireWidget();
+		wireWidget->fromJson(wireJ);
 		wireWidget->outputPort = outputPort;
 		wireWidget->inputPort = inputPort;
 		wireWidget->updateWire();
@@ -285,9 +334,11 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 void RackWidget::addModule(ModuleWidget *m) {
 	moduleContainer->addChild(m);
+	m->create();
 }
 
 void RackWidget::deleteModule(ModuleWidget *m) {
+	m->_delete();
 	moduleContainer->removeChild(m);
 }
 
@@ -323,8 +374,8 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, Rect box) {
 	int x0 = roundf(box.pos.x / RACK_GRID_WIDTH);
 	int y0 = roundf(box.pos.y / RACK_GRID_HEIGHT);
 	std::vector<Vec> positions;
-	for (int y = maxi(0, y0 - 4); y < y0 + 4; y++) {
-		for (int x = maxi(0, x0 - 200); x < x0 + 200; x++) {
+	for (int y = maxi(0, y0 - 8); y < y0 + 8; y++) {
+		for (int x = maxi(0, x0 - 400); x < x0 + 400; x++) {
 			positions.push_back(Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
 		}
 	}

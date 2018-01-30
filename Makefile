@@ -1,6 +1,12 @@
+VERSION = 0.6.0dev
+
 FLAGS += \
 	-Iinclude \
 	-Idep/include -Idep/lib/libzip/include
+
+ifdef RELEASE
+	FLAGS += -DRELEASE=$(RELEASE)
+endif
 
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
@@ -14,7 +20,7 @@ ifeq ($(ARCH), lin)
 	LDFLAGS += -rdynamic \
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
+		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
 	TARGET = Rack
 endif
 
@@ -23,7 +29,7 @@ ifeq ($(ARCH), mac)
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto
+		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
 	TARGET = Rack
 	BUNDLE = dist/$(TARGET).app
 endif
@@ -33,8 +39,8 @@ ifeq ($(ARCH), win)
 	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi \
-		-Wl,-Bstatic -ljansson -lsamplerate -lcrypto
+		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl \
+		-Wl,-Bstatic -ljansson -lspeexdsp
 	TARGET = Rack.exe
 	OBJECTS = Rack.res
 endif
@@ -69,8 +75,14 @@ ifeq ($(ARCH), win)
 	env PATH=dep/bin:/mingw64/bin gdb -ex run ./Rack
 endif
 
+perf: $(TARGET)
+ifeq ($(ARCH), lin)
+	LD_LIBRARY_PATH=dep/lib perf record --call-graph dwarf ./Rack
+endif
+
 
 clean:
+	rm -fv libRack.a
 	rm -rfv $(TARGET) build dist
 
 # For Windows resources
@@ -81,9 +93,6 @@ include compile.mk
 
 
 dist: all
-ifndef VERSION
-	$(error VERSION must be defined when making distributables)
-endif
 	rm -rf dist
 	$(MAKE) -C plugins/Fundamental dist
 
@@ -103,7 +112,7 @@ ifeq ($(ARCH), mac)
 	cp dep/lib/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/
+	cp dep/lib/libspeexdsp.1.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/libzip.5.dylib $(BUNDLE)/Contents/MacOS/
 	cp dep/lib/librtaudio.dylib $(BUNDLE)/Contents/MacOS/
@@ -114,7 +123,7 @@ ifeq ($(ARCH), mac)
 	install_name_tool -change /usr/local/lib/libGLEW.2.1.0.dylib @executable_path/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change lib/libglfw.3.dylib @executable_path/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libjansson.4.dylib @executable_path/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/Rack
-	install_name_tool -change $(PWD)/dep/lib/libsamplerate.0.dylib @executable_path/libsamplerate.0.dylib $(BUNDLE)/Contents/MacOS/Rack
+	install_name_tool -change $(PWD)/dep/lib/libspeexdsp.1.dylib @executable_path/libspeexdsp.1.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libcurl.4.dylib @executable_path/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change $(PWD)/dep/lib/libzip.5.dylib @executable_path/libzip.5.dylib $(BUNDLE)/Contents/MacOS/Rack
 	install_name_tool -change librtaudio.dylib @executable_path/librtaudio.dylib $(BUNDLE)/Contents/MacOS/Rack
@@ -144,7 +153,7 @@ ifeq ($(ARCH), win)
 	cp dep/bin/libcurl-4.dll dist/Rack/
 	cp dep/bin/libjansson-4.dll dist/Rack/
 	cp dep/bin/librtmidi-4.dll dist/Rack/
-	cp dep/bin/libsamplerate-0.dll dist/Rack/
+	cp dep/bin/libspeexdsp-1.dll dist/Rack/
 	cp dep/bin/libzip-5.dll dist/Rack/
 	cp dep/bin/librtaudio.dll dist/Rack/
 	cp dep/bin/libcrypto-1_1-x64.dll dist/Rack/
@@ -161,7 +170,7 @@ ifeq ($(ARCH), lin)
 	mkdir -p dist/Rack
 	cp -R LICENSE* res dist/Rack/
 	cp Rack Rack.sh dist/Rack/
-	cp dep/lib/libsamplerate.so.0 dist/Rack/
+	cp dep/lib/libspeexdsp.so dist/Rack/
 	cp dep/lib/libjansson.so.4 dist/Rack/
 	cp dep/lib/libGLEW.so.2.1 dist/Rack/
 	cp dep/lib/libglfw.so.3 dist/Rack/

@@ -322,7 +322,7 @@ struct BefacoTinyKnob : SVGKnob {
 	}
 };
 
-struct BefacoSlidePot : SVGSlider {
+struct BefacoSlidePot : SVGFader {
 	BefacoSlidePot() {
 		Vec margin = Vec(3.5, 3.5);
 		maxHandlePos = Vec(-1, -2).plus(margin);
@@ -333,6 +333,22 @@ struct BefacoSlidePot : SVGSlider {
 		box.size = background->box.size.plus(margin.mult(2));
 		handle->svg = SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePotHandle.svg"));
 		handle->wrap();
+	}
+};
+
+////////////////////
+// IO widgets
+////////////////////
+
+struct USB_B_AudioWidget : AudioWidget, SVGWidget {
+	USB_B_AudioWidget() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/USB-B.svg")));
+	}
+};
+
+struct MIDI_DIN_MidiWidget : MidiWidget, SVGWidget {
+	MIDI_DIN_MidiWidget() {
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/MIDI_DIN.svg")));
 	}
 };
 

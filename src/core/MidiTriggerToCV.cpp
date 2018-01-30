@@ -1,9 +1,10 @@
+#if 0
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
 #include "MidiIO.hpp"
 #include "dsp/digital.hpp"
+
 
 using namespace rack;
 
@@ -63,7 +64,7 @@ struct MIDITriggerToCVInterface : MidiIO, Module {
 		}
 	}
 
-	void reset() override {
+	void onReset() override {
 		resetMidi();
 	}
 };
@@ -75,9 +76,8 @@ void MIDITriggerToCVInterface::step() {
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
 		getMessage(&message);
-		while (message.size() > 0) {
+		if (message.size() > 0) {
 			processMidi(message);
-			getMessage(&message);
 		}
 	}
 
@@ -169,10 +169,12 @@ void TriggerTextField::onTextChange() {
 				text = "";
 				begin = end = 0;
 				module->trigger[outNum].num = -1;
-			}else {
+			}
+			else {
 				module->trigger[outNum].num = num;
 			}
-		} catch (...) {
+		}
+		catch (...) {
 			text = "";
 			begin = end = 0;
 			module->trigger[outNum].num = -1;
@@ -271,7 +273,8 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 
 		if ((i + 1) % 4 == 0) {
 			yPos += 47 + margin;
-		} else {
+		}
+		else {
 			yPos -= labelHeight + margin;
 		}
 	}
@@ -280,3 +283,4 @@ MIDITriggerToCVWidget::MIDITriggerToCVWidget() {
 void MIDITriggerToCVWidget::step() {
 	ModuleWidget::step();
 }
+#endif

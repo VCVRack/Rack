@@ -43,23 +43,23 @@ struct FileChoice : ChoiceButton {
 		menu->box.size.x = box.size.x;
 
 		{
-			menu->pushChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, GUI_MOD_KEY_NAME "+N"));
-			menu->pushChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, GUI_MOD_KEY_NAME "+O"));
-			menu->pushChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, GUI_MOD_KEY_NAME "+S"));
-			menu->pushChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Shift+S"));
-			menu->pushChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Q"));
+			menu->addChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, GUI_MOD_KEY_NAME "+N"));
+			menu->addChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, GUI_MOD_KEY_NAME "+O"));
+			menu->addChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, GUI_MOD_KEY_NAME "+S"));
+			menu->addChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Shift+S"));
+			menu->addChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, GUI_MOD_KEY_NAME "+Q"));
 		}
 	}
 };
 
 
-struct PauseItem : MenuItem {
+struct EnginePauseItem : MenuItem {
 	void onAction(EventAction &e) override {
 		gPaused = !gPaused;
 	}
 };
 
-struct SampleRateItem : MenuItem {
+struct EngineSampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction(EventAction &e) override {
 		engineSetSampleRate(sampleRate);
@@ -67,23 +67,22 @@ struct SampleRateItem : MenuItem {
 	}
 };
 
-struct SampleRateChoice : ChoiceButton {
+struct EngineSampleRateChoice : ChoiceButton {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		PauseItem *pauseItem = new PauseItem();
+		EnginePauseItem *pauseItem = new EnginePauseItem();
 		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
-		menu->pushChild(pauseItem);
+		menu->addChild(pauseItem);
 
-		float sampleRates[] = {44100, 48000, 88200, 96000, 176400, 192000};
-		int sampleRatesLen = sizeof(sampleRates) / sizeof(sampleRates[0]);
-		for (int i = 0; i < sampleRatesLen; i++) {
-			SampleRateItem *item = new SampleRateItem();
-			item->text = stringf("%.0f Hz", sampleRates[i]);
-			item->sampleRate = sampleRates[i];
-			menu->pushChild(item);
+		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
+		for (float sampleRate : sampleRates) {
+			EngineSampleRateItem *item = new EngineSampleRateItem();
+			item->text = stringf("%.0f Hz", sampleRate);
+			item->sampleRate = sampleRate;
+			menu->addChild(item);
 		}
 	}
 	void step() override {
@@ -112,7 +111,7 @@ Toolbar::Toolbar() {
 	xPos += margin;
 
 	{
-		SampleRateChoice *srChoice = new SampleRateChoice();
+		EngineSampleRateChoice *srChoice = new EngineSampleRateChoice();
 		srChoice->box.pos = Vec(xPos, margin);
 		srChoice->box.size.x = 100;
 		addChild(srChoice);
@@ -151,12 +150,13 @@ Toolbar::Toolbar() {
 		struct ZoomSlider : Slider {
 			void onAction(EventAction &e) override {
 				Slider::onAction(e);
-				gRackScene->zoomWidget->setZoom(value / 100.0);
+				gRackScene->zoomWidget->setZoom(roundf(value) / 100.0);
 			}
 		};
 		zoomSlider = new ZoomSlider();
 		zoomSlider->box.pos = Vec(xPos, margin);
 		zoomSlider->box.size.x = 150;
+		zoomSlider->precision = 0;
 		zoomSlider->label = "Zoom";
 		zoomSlider->unit = "%";
 		zoomSlider->setLimits(25.0, 200.0);
@@ -178,7 +178,7 @@ Toolbar::Toolbar() {
 	xPos += margin;
 	*/
 
-#ifdef VERSION
+#if defined(RELEASE)
 	{
 		Widget *pluginManager = new PluginManagerWidget();
 		pluginManager->box.pos = Vec(xPos, margin);

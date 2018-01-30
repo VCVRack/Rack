@@ -7,7 +7,7 @@
 #include "engine.hpp"
 #include "gui.hpp"
 #include "app.hpp"
-#include "components.hpp"
+#include "componentlibrary.hpp"
 
 
 namespace rack {
@@ -36,15 +36,15 @@ Model *createModel(std::string manufacturer, std::string slug, std::string name,
 }
 
 template <class TScrew>
-Widget *createScrew(Vec pos) {
-	Widget *screw = new TScrew();
+TScrew *createScrew(Vec pos) {
+	TScrew *screw = new TScrew();
 	screw->box.pos = pos;
 	return screw;
 }
 
 template <class TParamWidget>
-ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
-	ParamWidget *param = new TParamWidget();
+TParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+	TParamWidget *param = new TParamWidget();
 	param->box.pos = pos;
 	param->module = module;
 	param->paramId = paramId;
@@ -54,8 +54,8 @@ ParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, f
 }
 
 template <class TPort>
-Port *createInput(Vec pos, Module *module, int inputId) {
-	Port *port = new TPort();
+TPort *createInput(Vec pos, Module *module, int inputId) {
+	TPort *port = new TPort();
 	port->box.pos = pos;
 	port->module = module;
 	port->type = Port::INPUT;
@@ -64,8 +64,8 @@ Port *createInput(Vec pos, Module *module, int inputId) {
 }
 
 template <class TPort>
-Port *createOutput(Vec pos, Module *module, int outputId) {
-	Port *port = new TPort();
+TPort *createOutput(Vec pos, Module *module, int outputId) {
+	TPort *port = new TPort();
 	port->box.pos = pos;
 	port->module = module;
 	port->type = Port::OUTPUT;
@@ -74,8 +74,8 @@ Port *createOutput(Vec pos, Module *module, int outputId) {
 }
 
 template<class TModuleLightWidget>
-ModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
-	ModuleLightWidget *light = new TModuleLightWidget();
+TModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
+	TModuleLightWidget *light = new TModuleLightWidget();
 	light->box.pos = pos;
 	light->module = module;
 	light->firstLightId = firstLightId;

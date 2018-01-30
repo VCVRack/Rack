@@ -4,7 +4,21 @@
 #include "widgets.hpp"
 
 
+#define SVG_DPI 75.0
+
+#define CHECKMARK_STRING "✔"
+#define CHECKMARK(_cond) ((_cond) ? CHECKMARK_STRING : "")
+
+
 namespace rack {
+
+inline Vec in2px(Vec inches) {
+	return inches.mult(SVG_DPI);
+}
+
+inline Vec mm2px(Vec millimeters) {
+	return millimeters.mult(SVG_DPI / 25.4);
+}
 
 
 struct Model;
@@ -20,10 +34,9 @@ struct SVGPanel;
 // module
 ////////////////////
 
-// A 1U module should be 15x380. Thus the width of a module should be a factor of 15.
+// A 1HPx3U module should be 15x380. Thus the width of a module should be a factor of 15.
 #define RACK_GRID_WIDTH 15
 #define RACK_GRID_HEIGHT 380
-
 static const Vec RACK_GRID_SIZE = Vec(15, 380);
 
 
@@ -48,6 +61,8 @@ struct ModuleWidget : OpaqueWidget {
 	virtual json_t *toJson();
 	virtual void fromJson(json_t *rootJ);
 
+	virtual void create();
+	virtual void _delete();
 	/** Disconnects cables from all ports
 	Called when the user clicks Disconnect Cables in the context menu.
 	*/
@@ -75,14 +90,11 @@ struct ModuleWidget : OpaqueWidget {
 	void onDragMove(EventDragMove &e) override;
 };
 
-struct ValueLight;
 struct WireWidget : OpaqueWidget {
 	Port *outputPort = NULL;
 	Port *inputPort = NULL;
 	Port *hoveredOutputPort = NULL;
 	Port *hoveredInputPort = NULL;
-	ValueLight *inputLight;
-	ValueLight *outputLight;
 	Wire *wire = NULL;
 	NVGcolor color;
 
@@ -92,6 +104,8 @@ struct WireWidget : OpaqueWidget {
 	void updateWire();
 	Vec getOutputPos();
 	Vec getInputPos();
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
 	void draw(NVGcontext *vg) override;
 	void drawPlugs(NVGcontext *vg);
 };
@@ -134,7 +148,7 @@ struct RackWidget : OpaqueWidget {
 	void fromJson(json_t *rootJ);
 
 	void addModule(ModuleWidget *m);
-	/** Transfers ownership to the caller so they must `delete` it if that is the intension */
+	/** Removes the module and transfers ownership to the caller */
 	void deleteModule(ModuleWidget *m);
 	void cloneModule(ModuleWidget *m);
 	/** Sets a module's box if non-colliding. Returns true if set */
@@ -199,6 +213,8 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 struct Knob : ParamWidget {
 	/** Snap to nearest integer while dragging */
 	bool snap = false;
+	/** Multiplier for mouse movement to adjust knob value */
+	float speed = 1.0;
 	float dragValue;
 	void onDragStart(EventDragStart &e) override;
 	void onDragMove(EventDragMove &e) override;
@@ -226,14 +242,14 @@ struct SVGKnob : virtual Knob, FramebufferWidget {
 	void onChange(EventChange &e) override;
 };
 
-struct SVGSlider : Knob, FramebufferWidget {
+struct SVGFader : Knob, FramebufferWidget {
 	/** Intermediate positions will be interpolated between these positions */
 	Vec minHandlePos, maxHandlePos;
 	/** Not owned */
 	SVGWidget *background;
 	SVGWidget *handle;
 
-	SVGSlider();
+	SVGFader();
 	void step() override;
 	void onChange(EventChange &e) override;
 };
@@ -249,7 +265,6 @@ struct SVGSwitch : virtual Switch, FramebufferWidget {
 	SVGSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<SVG> svg);
-	void step() override;
 	void onChange(EventChange &e) override;
 };
 
@@ -271,10 +286,31 @@ struct MomentarySwitch : virtual Switch {
 	void randomize() override {}
 	void onDragStart(EventDragStart &e) override {
 		setValue(maxValue);
+		EventAction eAction;
+		onAction(eAction);
 	}
 	void onDragEnd(EventDragEnd &e) override {
 		setValue(minValue);
 	}
+};
+
+////////////////////
+// IO widgets
+////////////////////
+
+struct AudioIO;
+struct MidiIO;
+
+struct AudioWidget : OpaqueWidget {
+	/** Not owned */
+	AudioIO *audioIO = NULL;
+	void onMouseDown(EventMouseDown &e) override;
+};
+
+struct MidiWidget : OpaqueWidget {
+	/** Not owned */
+	MidiIO *midiIO = NULL;
+	void onMouseDown(EventMouseDown &e) override;
 };
 
 ////////////////////
@@ -285,6 +321,8 @@ struct LightWidget : TransparentWidget {
 	NVGcolor bgColor = nvgRGBf(0, 0, 0);
 	NVGcolor color = nvgRGBf(1, 1, 1);
 	void draw(NVGcontext *vg) override;
+	virtual void drawLight(NVGcontext *vg);
+	virtual void drawHalo(NVGcontext *vg);
 };
 
 /** Mixes a list of colors based on a list of brightness values */
@@ -397,5 +435,9 @@ extern Toolbar *gToolbar;
 
 void sceneInit();
 void sceneDestroy();
+
+json_t *colorToJson(NVGcolor color);
+NVGcolor jsonToColor(json_t *colorJ);
+
 
 } // namespace rack

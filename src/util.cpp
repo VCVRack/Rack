@@ -99,12 +99,12 @@ std::string stringf(const char *format, ...) {
 	return s;
 }
 
-std::string tolower(std::string s) {
+std::string lowercase(std::string s) {
 	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 	return s;
 }
 
-std::string toupper(std::string s) {
+std::string uppercase(std::string s) {
 	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 	return s;
 }
@@ -114,6 +114,10 @@ std::string ellipsize(std::string s, size_t len) {
 		return s;
 	else
 		return s.substr(0, len - 3) + "...";
+}
+
+bool startsWith(std::string str, std::string prefix) {
+	return str.substr(0, prefix.size()) == prefix;
 }
 
 std::string extractDirectory(std::string path) {

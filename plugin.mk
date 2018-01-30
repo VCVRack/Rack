@@ -25,6 +25,8 @@ ifeq ($(ARCH), win)
 	TARGET = plugin.dll
 endif
 
+DISTRIBUTABLES += $(TARGET)
+
 
 DISTRIBUTABLES += $(TARGET)
 

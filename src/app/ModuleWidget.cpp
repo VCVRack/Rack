@@ -60,12 +60,16 @@ void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 json_t *ModuleWidget::toJson() {
 	json_t *rootJ = json_object();
 
-	// manufacturer
+	// plugin
 	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
+	// version (of plugin)
+	if (!model->plugin->version.empty())
+		json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// pos
-	json_t *posJ = json_pack("[f, f]", (double) box.pos.x, (double) box.pos.y);
+	Vec pos = box.pos.div(RACK_GRID_SIZE).round();
+	json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
 	json_object_set_new(rootJ, "pos", posJ);
 	// params
 	json_t *paramsJ = json_array();
@@ -86,19 +90,50 @@ json_t *ModuleWidget::toJson() {
 }
 
 void ModuleWidget::fromJson(json_t *rootJ) {
+	// legacy
+	int legacy = 0;
+	json_t *legacyJ = json_object_get(rootJ, "legacy");
+	if (legacyJ)
+		legacy = json_integer_value(legacyJ);
+
 	// pos
 	json_t *posJ = json_object_get(rootJ, "pos");
 	double x, y;
 	json_unpack(posJ, "[F, F]", &x, &y);
-	box.pos = Vec(x, y);
+	Vec pos = Vec(x, y);
+	if (legacy && legacy <= 1) {
+		box.pos = pos;
+	}
+	else {
+		box.pos = pos.mult(RACK_GRID_SIZE);
+	}
 
 	// params
 	json_t *paramsJ = json_object_get(rootJ, "params");
-	size_t paramId;
+	size_t i;
 	json_t *paramJ;
-	json_array_foreach(paramsJ, paramId, paramJ) {
-		if (paramId < params.size()) {
-			params[paramId]->fromJson(paramJ);
+	json_array_foreach(paramsJ, i, paramJ) {
+		if (legacy && legacy <= 1) {
+			// The index in the array we're iterating is the index of the ParamWidget in the params vector.
+			if (i < params.size()) {
+				// Create upgraded version of param JSON object
+				json_t *newParamJ = json_object();
+				json_object_set(newParamJ, "value", paramJ);
+				params[i]->fromJson(newParamJ);
+				json_decref(newParamJ);
+			}
+		}
+		else {
+			// Get paramId
+			json_t *paramIdJ = json_object_get(paramJ, "paramId");
+			if (!paramIdJ)
+				continue;
+			int paramId = json_integer_value(paramIdJ);
+			// Find ParamWidget(s) with paramId
+			for (ParamWidget *paramWidget : params) {
+				if (paramWidget->paramId == paramId)
+					paramWidget->fromJson(paramJ);
+			}
 		}
 	}
 
@@ -118,12 +153,24 @@ void ModuleWidget::disconnect() {
 	}
 }
 
+void ModuleWidget::create() {
+	if (module) {
+		module->onCreate();
+	}
+}
+
+void ModuleWidget::_delete() {
+	if (module) {
+		module->onDelete();
+	}
+}
+
 void ModuleWidget::reset() {
 	for (ParamWidget *param : params) {
 		param->setValue(param->defaultValue);
 	}
 	if (module) {
-		module->reset();
+		module->onReset();
 	}
 }
 
@@ -132,7 +179,7 @@ void ModuleWidget::randomize() {
 		param->randomize();
 	}
 	if (module) {
-		module->randomize();
+		module->onRandomize();
 	}
 }
 
@@ -188,7 +235,7 @@ void ModuleWidget::onMouseMove(EventMouseMove &e) {
 				gRackWidget->deleteModule(this);
 				this->finalizeEvents();
 				delete this;
-				// Kinda sketchy because events will be passed further down the tree
+				e.consumed = true;
 				return;
 			}
 		}
@@ -279,36 +326,36 @@ Menu *ModuleWidget::createContextMenu() {
 
 	MenuLabel *menuLabel = new MenuLabel();
 	menuLabel->text = model->manufacturer + " " + model->name;
-	menu->pushChild(menuLabel);
+	menu->addChild(menuLabel);
 
 	ResetMenuItem *resetItem = new ResetMenuItem();
 	resetItem->text = "Initialize";
 	resetItem->rightText = GUI_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;
-	menu->pushChild(resetItem);
+	menu->addChild(resetItem);
 
 	RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
 	randomizeItem->text = "Randomize";
 	randomizeItem->rightText = GUI_MOD_KEY_NAME "+R";
 	randomizeItem->moduleWidget = this;
-	menu->pushChild(randomizeItem);
+	menu->addChild(randomizeItem);
 
 	DisconnectMenuItem *disconnectItem = new DisconnectMenuItem();
 	disconnectItem->text = "Disconnect cables";
 	disconnectItem->moduleWidget = this;
-	menu->pushChild(disconnectItem);
+	menu->addChild(disconnectItem);
 
 	CloneMenuItem *cloneItem = new CloneMenuItem();
 	cloneItem->text = "Duplicate";
 	cloneItem->rightText = GUI_MOD_KEY_NAME "+D";
 	cloneItem->moduleWidget = this;
-	menu->pushChild(cloneItem);
+	menu->addChild(cloneItem);
 
 	DeleteMenuItem *deleteItem = new DeleteMenuItem();
 	deleteItem->text = "Delete";
 	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;
-	menu->pushChild(deleteItem);
+	menu->addChild(deleteItem);
 
 	return menu;
 }

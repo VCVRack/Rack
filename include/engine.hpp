@@ -16,7 +16,7 @@ struct Light {
 	float value = 0.0;
 	float getBrightness();
 	void setBrightness(float brightness) {
-		value = brightness * brightness;
+		value = (brightness > 0.f) ? brightness * brightness : 0.f;
 	}
 	void setBrightnessSmooth(float brightness);
 };
@@ -65,15 +65,29 @@ struct Module {
 	virtual void step() {}
 	virtual void onSampleRateChange() {}
 
-	/** Override these to implement spacial behavior when user clicks Initialize and Randomize */
-	virtual void reset() {}
-	virtual void randomize() {}
-	/** Deprecated */
-	virtual void initialize() final {}
+	/** Called when module is created by the Add Module popup, cloning, or when loading a patch or autosave */
+	virtual void onCreate() {}
+	/** Called when user explicitly deletes the module, not when Rack is closed or a new patch is loaded */
+	virtual void onDelete() {}
+	/** Called when user clicks Initialize in the module context menu */
+	virtual void onReset() {
+		// Call deprecated method
+		reset();
+	}
+	/** Called when user clicks Randomize in the module context menu */
+	virtual void onRandomize() {
+		// Call deprecated method
+		randomize();
+	}
 
 	/** Override these to store extra internal data in the "data" property */
 	virtual json_t *toJson() { return NULL; }
 	virtual void fromJson(json_t *root) {}
+
+	/** Deprecated */
+	virtual void reset() {}
+	/** Deprecated */
+	virtual void randomize() {}
 };
 
 struct Wire {

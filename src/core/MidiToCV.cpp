@@ -1,9 +1,9 @@
 #include <list>
 #include <algorithm>
-#include "rtmidi/RtMidi.h"
 #include "core.hpp"
-#include "MidiIO.hpp"
+#include "midi.hpp"
 #include "dsp/digital.hpp"
+
 
 /*
  * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
@@ -11,11 +11,11 @@
  */
 struct MidiValue {
 	int val = 0; // Controller value
-	TransitionSmoother tSmooth;
+	// TransitionSmoother tSmooth;
 	bool changed = false; // Value has been changed by midi message (only if it is in sync!)
 };
 
-struct MIDIToCVInterface : MidiIO, Module {
+struct MIDIToCVInterface : Module {
 	enum ParamIds {
 		RESET_PARAM,
 		NUM_PARAMS
@@ -37,6 +37,7 @@ struct MIDIToCVInterface : MidiIO, Module {
 		NUM_LIGHTS
 	};
 
+	MidiInputQueue midiInput;
 	std::list<int> notes;
 	bool pedal = false;
 	int note = 60; // C4, most modules should use 261.626 Hz
@@ -48,9 +49,9 @@ struct MIDIToCVInterface : MidiIO, Module {
 
 	SchmittTrigger resetTrigger;
 
-	MIDIToCVInterface() : MidiIO(), Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		pitchWheel.val = 64;
-		pitchWheel.tSmooth.set(0, 0);
+		// pitchWheel.tSmooth.set(0, 0);
 	}
 
 	~MIDIToCVInterface() {
@@ -66,22 +67,22 @@ struct MIDIToCVInterface : MidiIO, Module {
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		addBaseJson(rootJ);
+		// addBaseJson(rootJ);
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
-		baseFromJson(rootJ);
+		// baseFromJson(rootJ);
 	}
 
-	void reset() override {
-		resetMidi();
+	void onReset() override {
+		// resetMidi();
 	}
 
-	void resetMidi() override;
-
+	// void resetMidi() override;
 };
 
+/*
 void MIDIToCVInterface::resetMidi() {
 	mod.val = 0;
 	mod.tSmooth.set(0, 0);
@@ -93,16 +94,17 @@ void MIDIToCVInterface::resetMidi() {
 	gate = false;
 	notes.clear();
 }
+*/
 
 void MIDIToCVInterface::step() {
+	/*
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
 
 		// midiIn->getMessage returns empty vector if there are no messages in the queue
 		getMessage(&message);
-		while (message.size() > 0) {
+		if (message.size() > 0) {
 			processMidi(message);
-			getMessage(&message);
 		}
 	}
 
@@ -132,11 +134,8 @@ void MIDIToCVInterface::step() {
 	}
 	outputs[PITCHWHEEL_OUTPUT].value = pitchWheel.tSmooth.next();
 
-
-	/* NOTE: I'll leave out value smoothing for after touch for now. I currently don't
-	 * have an after touch capable device around and I assume it would require different
-	 * smoothing*/
 	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch.val / 127.0 * 10.0;
+	*/
 }
 
 void MIDIToCVInterface::pressNote(int note) {
@@ -171,6 +170,7 @@ void MIDIToCVInterface::releaseNote(int note) {
 }
 
 void MIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
+	/*
 	int channel = msg[0] & 0xf;
 	int status = (msg[0] >> 4) & 0xf;
 	int data1 = msg[1];
@@ -220,6 +220,7 @@ void MIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 			afterTouch.changed = true;
 			break;
 	}
+	*/
 }
 
 
@@ -253,40 +254,9 @@ MidiToCVWidget::MidiToCVWidget() {
 	}
 
 	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
-	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module,
-											   MIDIToCVInterface::RESET_LIGHT));
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "MIDI Interface";
-		addChild(label);
-		yPos += labelHeight + margin;
+	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module, MIDIToCVInterface::RESET_LIGHT));
 
-		MidiChoice *midiChoice = new MidiChoice();
-		midiChoice->midiModule = dynamic_cast<MidiIO *>(module);
-		midiChoice->box.pos = Vec(margin, yPos);
-		midiChoice->box.size.x = box.size.x - 10;
-		addChild(midiChoice);
-		yPos += midiChoice->box.size.y + margin;
-	}
-
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin, yPos);
-		label->text = "Channel";
-		addChild(label);
-		yPos += labelHeight + margin;
-
-		ChannelChoice *channelChoice = new ChannelChoice();
-		channelChoice->midiModule = dynamic_cast<MidiIO *>(module);
-		channelChoice->box.pos = Vec(margin, yPos);
-		channelChoice->box.size.x = box.size.x - 10;
-		addChild(channelChoice);
-		yPos += channelChoice->box.size.y + margin + 15;
-	}
-
-	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel",
-														  "Aftertouch"};
+	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel", "Aftertouch"};
 
 	for (int i = 0; i < MIDIToCVInterface::NUM_OUTPUTS; i++) {
 		Label *label = new Label();
@@ -298,9 +268,8 @@ MidiToCVWidget::MidiToCVWidget() {
 
 		yPos += yGap + margin;
 	}
-}
 
-void MidiToCVWidget::step() {
-
-	ModuleWidget::step();
+	MidiWidget *midiWidget = construct<MIDI_DIN_MidiWidget>();
+	midiWidget->midiIO = &module->midiInput;
+	addChild(midiWidget);
 }
