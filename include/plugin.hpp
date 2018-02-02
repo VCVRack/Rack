@@ -8,6 +8,7 @@ namespace rack {
 
 
 struct ModuleWidget;
+struct Module;
 struct Model;
 
 // Subclass this and return a pointer to a new one when init() is called
@@ -54,6 +55,7 @@ struct Model {
 	std::list<ModelTag> tags;
 
 	virtual ~Model() {}
+	virtual Module *createModule() { return NULL; }
 	virtual ModuleWidget *createModuleWidget() { return NULL; }
 };
 
