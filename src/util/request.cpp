@@ -1,8 +1,5 @@
+#include "util/util.hpp"
 #include "util/request.hpp"
-#include "util.hpp"
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
 #include <curl/curl.h>
 #include <openssl/sha.h>
 
