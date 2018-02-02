@@ -34,10 +34,10 @@ struct SVGPanel;
 // module
 ////////////////////
 
-// A 1HPx3U module should be 15x380. Thus the width of a module should be a factor of 15.
-#define RACK_GRID_WIDTH 15
-#define RACK_GRID_HEIGHT 380
-static const Vec RACK_GRID_SIZE = Vec(15, 380);
+// A 1HPx3U module should be 15x380 pixels. Thus the width of a module should be a factor of 15.
+static const float RACK_GRID_WIDTH = 15;
+static const float RACK_GRID_HEIGHT = 380;
+static const Vec RACK_GRID_SIZE = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
 
 
 struct ModuleWidget : OpaqueWidget {
