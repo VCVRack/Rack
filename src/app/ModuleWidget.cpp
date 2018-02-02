@@ -185,30 +185,7 @@ void ModuleWidget::randomize() {
 
 void ModuleWidget::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
-
 	Widget::draw(vg);
-
-	// CPU usage text
-	if (0) {
-		float cpuTime = module ? module->cpuTime : 0.0;
-		std::string text = stringf("%.1f%%", cpuTime * 100.0);
-
-		nvgSave(vg);
-		nvgBeginPath(vg);
-		nvgRect(vg, 0.0, 0.0, box.size.x, BND_WIDGET_HEIGHT);
-		nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
-		nvgFill(vg);
-
-		nvgBeginPath(vg);
-		cpuTime = clampf(cpuTime, 0.0, 1.0);
-		nvgRect(vg, 0.0, 0.0, box.size.x * cpuTime, BND_WIDGET_HEIGHT);
-		nvgFillColor(vg, nvgHSL(0.33 * cubic(1.0 - cpuTime), 1.0, 0.4));
-		nvgFill(vg);
-
-		bndMenuItem(vg, 0.0, 0.0, box.size.x, BND_WIDGET_HEIGHT, BND_DEFAULT, -1, text.c_str());
-		nvgRestore(vg);
-	}
-
 	nvgResetScissor(vg);
 }
 

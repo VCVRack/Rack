@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 
-#include "math.hpp"
+#include "util/math.hpp"
 
 
 namespace rack {

@@ -8,7 +8,7 @@
 namespace rack {
 
 ////////////////////
-// integer functions
+// basic integer functions (suffixed with "i")
 ////////////////////
 
 inline int mini(int a, int b) {
@@ -19,22 +19,28 @@ inline int maxi(int a, int b) {
 	return a > b ? a : b;
 }
 
-/** Limits a value between a minimum and maximum */
+/** Limits a value between a minimum and maximum
+*/
 inline int clampi(int x, int min, int max) {
-	return x > max ? max : x < min ? min : x;
+	if (min <= max)
+		return maxi(mini(x, max), min);
+	else
+		return maxi(mini(x, min), max);
 }
 
 inline int absi(int a) {
-	return a >= 0 ? a : -a;
+	return (a >= 0) ? a : -a;
 }
 
-// Euclidean modulus, always returns 0 <= mod < base for positive base
-// Assumes this architecture's division is non-Euclidean
+/** Euclidean modulus, always returns 0 <= mod < base for positive base.
+*/
 inline int eucmodi(int a, int base) {
 	int mod = a % base;
-	return mod < 0 ? mod + base : mod;
+	return (mod >= 0) ? mod + base : mod;
 }
 
+/** Returns floor(log_2(n)), or 0 if n == 1.
+*/
 inline int log2i(int n) {
 	int i = 0;
 	while (n >>= 1) {
@@ -48,21 +54,21 @@ inline bool ispow2i(int n) {
 }
 
 ////////////////////
-// float functions
+// basic float functions (suffixed with "f")
 ////////////////////
 
 inline float absf(float x) {
 	return (x < 0.f) ? -x : x;
 }
 
-/** Returns 1.0 for positive numbers and -1.0 for negative numbers (including positive/negative zero) */
+/** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
 inline float sgnf(float x) {
 	return copysignf(1.f, x);
 }
 
 inline float eucmodf(float a, float base) {
 	float mod = fmodf(a, base);
-	return (mod < 0.f) ? mod + base : mod;
+	return (mod < 0.f) ? mod : mod + base;
 }
 
 inline float nearf(float a, float b, float epsilon = 1e-6) {
@@ -81,7 +87,7 @@ inline float clampf(float x, float min, float max) {
 
 /** If the magnitude of x if less than eps, return 0 */
 inline float chopf(float x, float eps) {
-	return -eps < x && x < eps ? 0.0 : x;
+	return (-eps < x && x < eps) ? 0.f : x;
 }
 
 inline float rescalef(float x, float xMin, float xMax, float yMin, float yMax) {
@@ -90,41 +96,6 @@ inline float rescalef(float x, float xMin, float xMax, float yMin, float yMax) {
 
 inline float crossf(float a, float b, float frac) {
 	return a + frac * (b - a);
-}
-
-inline float quadraticBipolar(float x) {
-	float x2 = x*x;
-	return x >= 0.0 ? x2 : -x2;
-}
-
-inline float cubic(float x) {
-	return x*x*x;
-}
-
-inline float quarticBipolar(float x) {
-	return x >= 0.0 ? x*x*x*x : -x*x*x*x;
-}
-
-inline float quintic(float x) {
-	// optimal with --fast-math
-	return x*x*x*x*x;
-}
-
-inline float sqrtBipolar(float x) {
-	return x >= 0.0 ? sqrtf(x) : -sqrtf(-x);
-}
-
-/** This is pretty much a scaled sinh */
-inline float exponentialBipolar(float b, float x) {
-	const float a = b - 1.0 / b;
-	return (powf(b, x) - powf(b, -x)) / a;
-}
-
-inline float sincf(float x) {
-	if (x == 0.0)
-		return 1.0;
-	x *= M_PI;
-	return sinf(x) / x;
 }
 
 /** Linearly interpolate an array `p` with index `x`
@@ -146,7 +117,7 @@ inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi)
 }
 
 ////////////////////
-// 2D float vector
+// 2D vector and rectangle
 ////////////////////
 
 struct Rect;
@@ -154,7 +125,7 @@ struct Rect;
 struct Vec {
 	float x, y;
 
-	Vec() : x(0.0), y(0.0) {}
+	Vec() : x(0.f), y(0.f) {}
 	Vec(float x, float y) : x(x), y(y) {}
 
 	Vec neg() {
@@ -203,7 +174,7 @@ struct Vec {
 		return x == b.x && y == b.y;
 	}
 	bool isZero() {
-		return x == 0.0 && y == 0.0;
+		return x == 0.f && y == 0.f;
 	}
 	bool isFinite() {
 		return std::isfinite(x) && std::isfinite(y);
@@ -241,13 +212,13 @@ struct Rect {
 		return pos.isEqual(r.pos) && size.isEqual(r.size);
 	}
 	Vec getCenter() {
-		return pos.plus(size.mult(0.5));
+		return pos.plus(size.mult(0.5f));
 	}
 	Vec getTopRight() {
-		return pos.plus(Vec(size.x, 0.0));
+		return pos.plus(Vec(size.x, 0.f));
 	}
 	Vec getBottomLeft() {
-		return pos.plus(Vec(0.0, size.y));
+		return pos.plus(Vec(0.f, size.y));
 	}
 	Vec getBottomRight() {
 		return pos.plus(size);
