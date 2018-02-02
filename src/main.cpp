@@ -1,6 +1,7 @@
 #include "engine.hpp"
 #include "gui.hpp"
 #include "app.hpp"
+#include "sandbox.hpp"
 #include "plugin.hpp"
 #include "settings.hpp"
 #include "asset.hpp"
@@ -31,6 +32,7 @@ int main(int argc, char* argv[]) {
 		info("Local directory: %s", localDir.c_str());
 	}
 
+	sandboxInit();
 	pluginInit();
 	engineInit();
 	guiInit();
