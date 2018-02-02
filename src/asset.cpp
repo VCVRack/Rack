@@ -1,6 +1,5 @@
 #include "asset.hpp"
-#include "util/util.hpp"
-#include <assert.h>
+#include "util/common.hpp"
 #include <sys/stat.h> // for mkdir
 #include "../ext/osdialog/osdialog.h"
 
