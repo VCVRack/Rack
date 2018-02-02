@@ -22,7 +22,7 @@ ifeq ($(ARCH), mac)
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lsandbox
 	TARGET = Rack
 	BUNDLE = dist/$(TARGET).app
 endif
@@ -54,11 +54,6 @@ endif
 ifeq ($(ARCH), win)
 	# TODO get rid of the mingw64 path
 	env PATH=dep/bin:/mingw64/bin ./$<
-endif
-
-sandbox-run: $(TARGET)
-ifeq ($(ARCH), mac)
-	sandbox-exec -D RACK_HOME=$(PWD) -f ./Rack.sb `which sh` -c 'DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<'                                                                      2 ↵  ✹ ✭sandbox ‹2.4.2›
 endif
 
 debug: $(TARGET)
@@ -97,6 +92,7 @@ ifeq ($(ARCH), mac)
 	mkdir -p $(BUNDLE)/Contents/Resources
 	cp Info.plist $(BUNDLE)/Contents/
 	cp -R LICENSE* res $(BUNDLE)/Contents/Resources
+	cp Rack.sb $(BUNDLE)/Contents/Resources
 
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp Rack $(BUNDLE)/Contents/MacOS/

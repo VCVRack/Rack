@@ -32,7 +32,10 @@ int main(int argc, char* argv[]) {
 		info("Local directory: %s", localDir.c_str());
 	}
 
-	sandboxInit();
+	if(!sandboxInit()) {
+		info("Refusing to run without sandbox");
+		exit(1);
+	}
 	pluginInit();
 	engineInit();
 	guiInit();

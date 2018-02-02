@@ -1,26 +1,15 @@
-
 (version 1)
-(debug allow)
+(import "system.sb")
 
-(define rack-home "RACK_HOME")
-
-; This is needed for IPC on OSX >= 10.6
 (allow ipc-posix-shm)
 
-; Allow inbound and outbound connections
 (allow network-outbound)
 (allow network-inbound)
 
-; Allow reading with sysctl
 (allow sysctl-read)
 
-; Allow it to read metadata
 (allow file-read-metadata)
 
-; Allow it to run processes and fork
-(allow process*)
-
-; Allow it to signal self
 (allow signal)
 
 (allow iokit-open)
@@ -29,34 +18,8 @@
 
 (allow system-socket)
 
-(allow file-read* file-write* (subpath (param rack-home)))
-
-; Allow file reading
-(allow file-read*
-    (regex
-        #"^/Applications/Rack.app"
-        #"^/Library/*"
-        #"^/System/Library/*"
-        #"^/usr/*"
-        #"^/dev/*"
-        #"/Users/jon/Projects/Rack"
-        #"/Users/[^.]+/Library/Saved Application State/com.vcvrack.rack.savedState"
-    )
-)
-
-; Allow write access to a subset of the above
-(allow file-write*
-    (regex
-        #"^/private/var/*"
-        #"^/private/tmp/*"
-        #"^/var/folders/th/*"
-    )
-)
-
-(allow file-issue-extension
-    (regex
-        #"^/private/var/*"
-    )
-)
+(allow file-read* (subpath (param "rackLocal")))
+(allow file-write* (subpath (param "rackLocal")))
+(allow file-read* (subpath (param "rackGlobal")))
 
 (deny default)
