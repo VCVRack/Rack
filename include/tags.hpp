@@ -14,6 +14,7 @@ enum ModelTag {
 	BLANK_TAG,
 	CHORUS_TAG,
 	CLOCK_TAG,
+	CLOCK_MODULATOR_TAG, // Clock dividers, multipliers, etc.
 	COMPRESSOR_TAG,
 	CONTROLLER_TAG, // Use only if the artist "performs" with this module. Knobs are not sufficient. Examples: on-screen keyboard, XY pad.
 	DELAY_TAG,

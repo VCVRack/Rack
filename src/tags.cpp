@@ -13,6 +13,7 @@ void tagsInit() {
 	gTagNames[BLANK_TAG] = "Blank";
 	gTagNames[CHORUS_TAG] = "Chorus";
 	gTagNames[CLOCK_TAG] = "Clock";
+	gTagNames[CLOCK_MODULATOR_TAG] = "Clock Modulator";
 	gTagNames[COMPRESSOR_TAG] = "Compressor";
 	gTagNames[CONTROLLER_TAG] = "Controller";
 	gTagNames[DELAY_TAG] = "Delay";
