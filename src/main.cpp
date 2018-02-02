@@ -1,3 +1,4 @@
+#include "util/util.hpp"
 #include "engine.hpp"
 #include "gui.hpp"
 #include "app.hpp"

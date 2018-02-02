@@ -4,11 +4,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <assert.h>
 
 #include <string>
 #include <condition_variable>
 #include <mutex>
+
+#include "util/math.hpp"
 
 
 /** Surrounds raw text with quotes
@@ -63,6 +66,55 @@ T *construct(F f, V v, Args... args) {
 	return o;
 }
 
+////////////////////
+// random.cpp
+////////////////////
+
+/** Seeds the RNG with the current time */
+void randomInit();
+uint32_t randomu32();
+uint64_t randomu64();
+/** Returns a uniform random float in the interval [0.0, 1.0) */
+float randomf();
+/** Returns a normal random number with mean 0 and std dev 1 */
+float randomNormal();
+
+////////////////////
+// string.cpp
+////////////////////
+
+/** Converts a printf format string and optional arguments into a std::string */
+std::string stringf(const char *format, ...);
+std::string lowercase(std::string s);
+std::string uppercase(std::string s);
+
+/** Truncates and adds "..." to a string, not exceeding `len` characters */
+std::string ellipsize(std::string s, size_t len);
+bool startsWith(std::string str, std::string prefix);
+
+std::string extractDirectory(std::string path);
+std::string extractFilename(std::string path);
+std::string extractExtension(std::string path);
+
+////////////////////
+// system.cpp
+////////////////////
+
+/** Opens a URL, also happens to work with PDFs and folders.
+Shell injection is possible, so make sure the URL is trusted or hard coded.
+May block, so open in a new thread.
+*/
+void openBrowser(std::string url);
+
+////////////////////
+// logger.cpp
+////////////////////
+
+extern FILE *gLogFile;
+void debug(const char *format, ...);
+void info(const char *format, ...);
+void warn(const char *format, ...);
+void fatal(const char *format, ...);
 
 ////////////////////
 // Thread functions
@@ -97,16 +149,6 @@ struct VIPLock {
 		m.cv.notify_all();
 	}
 };
-
-////////////////////
-// logger
-////////////////////
-
-extern FILE *gLogFile;
-void debug(const char *format, ...);
-void info(const char *format, ...);
-void warn(const char *format, ...);
-void fatal(const char *format, ...);
 
 
 } // namespace rack

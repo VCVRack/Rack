@@ -10,7 +10,6 @@
 #include <pmmintrin.h>
 
 #include "engine.hpp"
-#include "util.hpp"
 
 
 namespace rack {

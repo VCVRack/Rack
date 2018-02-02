@@ -6,9 +6,7 @@
 #include "../ext/oui-blendish/blendish.h"
 #include "../ext/nanosvg/src/nanosvg.h"
 
-#include "util/math.hpp"
-#include "util/vec.hpp"
-#include "util.hpp"
+#include "util/util.hpp"
 #include "events.hpp"
 
 

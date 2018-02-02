@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util.hpp"
+#include "util/util.hpp"
 #include <queue>
 #include <vector>
 #include <jansson.h>

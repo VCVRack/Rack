@@ -1,7 +1,6 @@
 #pragma once
 
-#include "util.hpp"
-#include "util/math.hpp"
+#include "util/util.hpp"
 #include "asset.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
