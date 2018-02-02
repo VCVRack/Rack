@@ -1,4 +1,5 @@
 #pragma once
+#include "dsp/functions.hpp"
 
 
 namespace rack {
@@ -30,7 +31,7 @@ inline void blackmanHarrisWindow(float *x, int n) {
 inline void boxcarFIR(float *x, int n, float cutoff) {
 	for (int i = 0; i < n; i++) {
 		float t = (float)i / (n - 1) * 2.0 - 1.0;
-		x[i] = sincf(t * n * cutoff);
+		x[i] = sinc(t * n * cutoff);
 	}
 }
 

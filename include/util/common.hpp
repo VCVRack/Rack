@@ -11,6 +11,7 @@
 #include <condition_variable>
 #include <mutex>
 
+// Include math utilities for convenience
 #include "util/math.hpp"
 
 
@@ -67,6 +68,7 @@ T *construct(F f, V v, Args... args) {
 }
 
 ////////////////////
+// Random number generator
 // random.cpp
 ////////////////////
 
@@ -80,6 +82,7 @@ float randomf();
 float randomNormal();
 
 ////////////////////
+// String utilities
 // string.cpp
 ////////////////////
 
@@ -97,6 +100,7 @@ std::string extractFilename(std::string path);
 std::string extractExtension(std::string path);
 
 ////////////////////
+// Operating-system specific utilities
 // system.cpp
 ////////////////////
 
@@ -107,6 +111,7 @@ May block, so open in a new thread.
 void openBrowser(std::string url);
 
 ////////////////////
+// Debug logger
 // logger.cpp
 ////////////////////
 

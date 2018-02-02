@@ -1,10 +1,10 @@
 #pragma once
 
-#include "util/util.hpp"
+// Include headers that plugins will likely use, for convenience
+#include "util/common.hpp"
 #include "asset.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
-#include "gui.hpp"
 #include "app.hpp"
 #include "componentlibrary.hpp"
 
@@ -15,7 +15,6 @@ namespace rack {
 ////////////////////
 // helpers
 ////////////////////
-
 
 template <class TModuleWidget, typename... Tags>
 Model *createModel(std::string manufacturer, std::string slug, std::string name, Tags... tags) {
