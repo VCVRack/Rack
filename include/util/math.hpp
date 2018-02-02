@@ -37,7 +37,7 @@ inline int absi(int a) {
 */
 inline int eucmodi(int a, int base) {
 	int mod = a % base;
-	return (mod >= 0) ? mod + base : mod;
+	return (mod >= 0) ? mod : mod + base;
 }
 
 /** Returns floor(log_2(n)), or 0 if n == 1.
@@ -69,7 +69,7 @@ inline float sgnf(float x) {
 
 inline float eucmodf(float a, float base) {
 	float mod = fmodf(a, base);
-	return (mod < 0.f) ? mod : mod + base;
+	return (mod >= 0.f) ? mod : mod + base;
 }
 
 inline float nearf(float a, float b, float epsilon = 1e-6) {
