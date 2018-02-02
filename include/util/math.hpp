@@ -19,12 +19,14 @@ inline int maxi(int a, int b) {
 }
 
 /** Limits a value between a minimum and maximum
+Assumes min <= max
 */
 inline int clampi(int x, int min, int max) {
-	if (min <= max)
-		return maxi(mini(x, max), min);
-	else
-		return maxi(mini(x, min), max);
+	if (x < min)
+		return min;
+	if (x > max)
+		return max;
+	return x;
 }
 
 inline int absi(int a) {
@@ -75,13 +77,21 @@ inline float nearf(float a, float b, float epsilon = 1e-6) {
 }
 
 /** Limits a value between a minimum and maximum
-If min > max, clamps the range to [max, min]
+Assumes min <= max
 */
 inline float clampf(float x, float min, float max) {
-	if (min <= max)
-		return fmaxf(fminf(x, max), min);
-	else
-		return fmaxf(fminf(x, min), max);
+	if (x < min)
+		return min;
+	if (x > max)
+		return max;
+	return x;
+}
+
+/** Limits a value between a minimum and maximum
+If min > max, switches the two values
+*/
+inline float clamp2f(float x, float min, float max) {
+	return clampf(x, fminf(min, max), fmaxf(min, max));
 }
 
 /** If the magnitude of x if less than eps, return 0 */
@@ -225,8 +235,8 @@ struct Rect {
 	/** Clamps the edges of the rectangle to fit within a bound */
 	Rect clamp(Rect bound) {
 		Rect r;
-		r.pos.x = clampf(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
-		r.pos.y = clampf(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
+		r.pos.x = clamp2f(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
+		r.pos.y = clamp2f(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
 		r.size.x = clampf(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
 		r.size.y = clampf(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
 		return r;
@@ -235,8 +245,8 @@ struct Rect {
 	Rect nudge(Rect bound) {
 		Rect r;
 		r.size = size;
-		r.pos.x = clampf(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
-		r.pos.y = clampf(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
+		r.pos.x = clamp2f(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
+		r.pos.y = clamp2f(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
 	/** Expands this Rect to contain `other` */
@@ -259,8 +269,8 @@ struct Rect {
 
 inline Vec Vec::clamp(Rect bound) {
 	return Vec(
-		clampf(x, bound.pos.x, bound.pos.x + bound.size.x),
-		clampf(y, bound.pos.y, bound.pos.y + bound.size.y));
+		clamp2f(x, bound.pos.x, bound.pos.x + bound.size.x),
+		clamp2f(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 
