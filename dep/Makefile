@@ -18,7 +18,7 @@ export LDFLAGS
 
 
 # Commands
-WGET = curl -O
+WGET = curl -OL
 UNTAR = tar xf
 UNZIP = unzip
 ifeq ($(ARCH),win)
@@ -109,9 +109,9 @@ $(jansson):
 	$(MAKE) -C jansson-2.10 install
 
 $(libspeexdsp):
-	$(WGET) https://github.com/xiph/speexdsp/archive/SpeexDSP-1.2rc3.tar.gz
-	$(UNTAR) SpeexDSP-1.2rc3.tar.gz
-	cd speexdsp-SpeexDSP-1.2rc3 && ./autogen.sh && ./configure --prefix="$(LOCAL)"
+	$(WGET) https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz
+	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
+	cd speexdsp-SpeexDSP-1.2rc3 && ./configure --prefix="$(LOCAL)"
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 

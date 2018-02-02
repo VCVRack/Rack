@@ -22,18 +22,18 @@ Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system
 ### Mac
 
 Install [Xcode](https://developer.apple.com/xcode/).
-Install [CMake](https://cmake.org/) (for some of Rack's dependencies) and wget, preferably from [Homebrew](https://brew.sh/).
+Install [CMake](https://cmake.org/) (for some of Rack's dependencies).
 
 ### Windows
 
 Install [MSYS2](http://www.msys2.org/) and launch the mingw64 shell (not the default msys2 shell).
 Install build dependencies with the pacman package manger.
 
-	pacman -S git make tar unzip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
+	pacman -S git make tar unzip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool
 
 ### Linux
 
-With your distro's package manager, make sure you have installed `gcc`, `make`, `cmake`, `tar`, and `unzip`.
+With your distro's package manager, make sure you have installed `git`, `gcc`, `make`, `cmake`, `tar`, and `unzip`.
 
 ## Building
 
