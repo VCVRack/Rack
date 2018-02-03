@@ -1,0 +1,25 @@
+(version 1)
+(import "system.sb")
+
+(allow ipc-posix-shm)
+
+(allow network-outbound)
+(allow network-inbound)
+
+(allow sysctl-read)
+
+(allow file-read-metadata)
+
+(allow signal)
+
+(allow iokit-open)
+
+(allow mach-lookup)
+
+(allow system-socket)
+
+(allow file-read* (subpath (param "rackLocal")))
+(allow file-write* (subpath (param "rackLocal")))
+(allow file-read* (subpath (param "rackGlobal")))
+
+(deny default)

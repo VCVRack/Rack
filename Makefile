@@ -5,7 +5,6 @@ FLAGS += \
 SOURCES = $(wildcard src/*.cpp src/*/*.cpp) \
 	ext/nanovg/src/nanovg.c
 
-
 include arch.mk
 
 ifeq ($(ARCH), lin)
@@ -23,7 +22,7 @@ ifeq ($(ARCH), mac)
 	CXXFLAGS += -DAPPLE -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto
+		-Ldep/lib -lGLEW -lglfw -ljansson -lsamplerate -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lsandbox
 	TARGET = Rack
 	BUNDLE = dist/$(TARGET).app
 endif
@@ -93,6 +92,7 @@ ifeq ($(ARCH), mac)
 	mkdir -p $(BUNDLE)/Contents/Resources
 	cp Info.plist $(BUNDLE)/Contents/
 	cp -R LICENSE* res $(BUNDLE)/Contents/Resources
+	cp Rack.sb $(BUNDLE)/Contents/Resources
 
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp Rack $(BUNDLE)/Contents/MacOS/
