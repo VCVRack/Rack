@@ -73,12 +73,6 @@ bool sandboxInit() {
     info("Sandbox initialized!");
   }
   sandbox_free_error(error_buff);
-
-  FILE *file2 = fopen("/Users/jon/Documents/mg.txt", "rb");
-  if(!file2) {
-    info("Couldn't read private file");
-  }
-
   return success;
 }
 
