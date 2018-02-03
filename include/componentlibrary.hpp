@@ -10,16 +10,18 @@ namespace rack {
 // Colors
 ////////////////////
 
-#define COLOR_BLACK_TRANSPARENT nvgRGBA(0x00, 0x00, 0x00, 0x00)
-#define COLOR_BLACK nvgRGB(0x00, 0x00, 0x00)
-#define COLOR_WHITE nvgRGB(0xff, 0xff, 0xff)
-#define COLOR_RED nvgRGB(0xed, 0x2c, 0x24)
-#define COLOR_ORANGE nvgRGB(0xf2, 0xb1, 0x20)
-#define COLOR_YELLOW nvgRGB(0xf9, 0xdf, 0x1c)
-#define COLOR_GREEN nvgRGB(0x90, 0xc7, 0x3e)
-#define COLOR_CYAN nvgRGB(0x22, 0xe6, 0xef)
-#define COLOR_BLUE nvgRGB(0x29, 0xb2, 0xef)
-#define COLOR_PURPLE nvgRGB(0xd5, 0x2b, 0xed)
+static const NVGcolor COLOR_BLACK_TRANSPARENT = nvgRGBA(0x00, 0x00, 0x00, 0x00);
+static const NVGcolor COLOR_BLACK = nvgRGB(0x00, 0x00, 0x00);
+static const NVGcolor COLOR_WHITE = nvgRGB(0xff, 0xff, 0xff);
+static const NVGcolor COLOR_RED = nvgRGB(0xed, 0x2c, 0x24);
+static const NVGcolor COLOR_ORANGE = nvgRGB(0xf2, 0xb1, 0x20);
+static const NVGcolor COLOR_YELLOW = nvgRGB(0xf9, 0xdf, 0x1c);
+static const NVGcolor COLOR_GREEN = nvgRGB(0x90, 0xc7, 0x3e);
+static const NVGcolor COLOR_CYAN = nvgRGB(0x22, 0xe6, 0xef);
+static const NVGcolor COLOR_BLUE = nvgRGB(0x29, 0xb2, 0xef);
+static const NVGcolor COLOR_PURPLE = nvgRGB(0xd5, 0x2b, 0xed);
+static const NVGcolor COLOR_LIGHT_PANEL = nvgRGB(0xe6, 0xe6, 0xe6);
+static const NVGcolor COLOR_DARK_PANEL = nvgRGB(0x17, 0x17, 0x17);
 
 ////////////////////
 // Knobs
@@ -553,13 +555,13 @@ struct ScrewBlack : SVGScrew {
 
 struct LightPanel : Panel {
 	LightPanel() {
-		backgroundColor = nvgRGB(0xe6, 0xe6, 0xe6);
+		backgroundColor = COLOR_LIGHT_PANEL;
 	}
 };
 
 struct DarkPanel : Panel {
 	DarkPanel() {
-		backgroundColor = nvgRGB(0x17, 0x17, 0x17);
+		backgroundColor = COLOR_DARK_PANEL;
 	}
 };
 

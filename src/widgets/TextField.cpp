@@ -117,8 +117,8 @@ void TextField::onKey(EventKey &e) {
 			break;
 	}
 
-	begin = mini(maxi(begin, 0), text.size());
-	end = mini(maxi(end, 0), text.size());
+	begin = clamp(begin, 0, text.size());
+	end = clamp(end, 0, text.size());
 	e.consumed = true;
 }
 

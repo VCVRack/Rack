@@ -15,7 +15,7 @@ SVGFader::SVGFader() {
 void SVGFader::step() {
 	if (dirty) {
 		// Update handle position
-		Vec handlePos = Vec(rescalef(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), rescalef(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
+		Vec handlePos = Vec(rescale(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), rescale(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
 		handle->box.pos = handlePos;
 	}
 	FramebufferWidget::step();

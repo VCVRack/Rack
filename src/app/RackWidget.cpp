@@ -374,8 +374,8 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, Rect box) {
 	int x0 = roundf(box.pos.x / RACK_GRID_WIDTH);
 	int y0 = roundf(box.pos.y / RACK_GRID_HEIGHT);
 	std::vector<Vec> positions;
-	for (int y = maxi(0, y0 - 8); y < y0 + 8; y++) {
-		for (int x = maxi(0, x0 - 400); x < x0 + 400; x++) {
+	for (int y = max(0, y0 - 8); y < y0 + 8; y++) {
+		for (int x = max(0, x0 - 400); x < x0 + 400; x++) {
 			positions.push_back(Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
 		}
 	}

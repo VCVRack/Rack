@@ -12,7 +12,7 @@ void ModuleLightWidget::step() {
 
 	for (size_t i = 0; i < baseColors.size(); i++) {
 		float value = module->lights[firstLightId + i].getBrightness();
-		value = clampf(value, 0.0, 1.0);
+		value = clamp(value, 0.0, 1.0);
 		values[i] = value;
 	}
 	setValues(values);

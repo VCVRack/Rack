@@ -57,7 +57,7 @@ struct SlewLimiter {
 		fall = _fall;
 	}
 	float process(float in) {
-		float delta = clampf(in - out, -fall, rise);
+		float delta = clamp(in - out, -fall, rise);
 		out += delta;
 		return out;
 	}

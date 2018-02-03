@@ -108,11 +108,11 @@ void MIDIClockToCVInterface::step() {
 	}
 
 	if (inputs[CLOCK1_RATIO].active) {
-		clock1ratio = int(clampf(inputs[CLOCK1_RATIO].value, 0.0, 10.0) * (numratios - 1) / 10);
+		clock1ratio = int(clamp(inputs[CLOCK1_RATIO].value, 0.0, 10.0) * (numratios - 1) / 10);
 	}
 
 	if (inputs[CLOCK2_RATIO].active) {
-		clock2ratio = int(clampf(inputs[CLOCK2_RATIO].value, 0.0, 10.0) * (numratios - 1) / 10);
+		clock2ratio = int(clamp(inputs[CLOCK2_RATIO].value, 0.0, 10.0) * (numratios - 1) / 10);
 	}
 
 	if (start) {

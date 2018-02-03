@@ -4,7 +4,8 @@
 #include "widgets.hpp"
 
 
-#define SVG_DPI 75.0
+static const float SVG_DPI = 75.0;
+static const float MM_PER_IN = 25.4;
 
 #define CHECKMARK_STRING "✔"
 #define CHECKMARK(_cond) ((_cond) ? CHECKMARK_STRING : "")
@@ -12,12 +13,20 @@
 
 namespace rack {
 
+inline float in2px(float inches) {
+	return inches * SVG_DPI;
+}
+
 inline Vec in2px(Vec inches) {
 	return inches.mult(SVG_DPI);
 }
 
+inline float mm2px(float millimeters) {
+	return millimeters * (SVG_DPI / MM_PER_IN);
+}
+
 inline Vec mm2px(Vec millimeters) {
-	return millimeters.mult(SVG_DPI / 25.4);
+	return millimeters.mult(SVG_DPI / MM_PER_IN);
 }
 
 

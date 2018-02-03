@@ -9,7 +9,7 @@ QuantityWidget::QuantityWidget() {
 }
 
 void QuantityWidget::setValue(float value) {
-	this->value = clampf(value, fminf(minValue, maxValue), fmaxf(minValue, maxValue));
+	this->value = clamp(value, fminf(minValue, maxValue), fmaxf(minValue, maxValue));
 	EventChange e;
 	onChange(e);
 }
