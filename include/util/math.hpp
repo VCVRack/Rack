@@ -56,20 +56,20 @@ inline bool ispow2(int n) {
 ////////////////////
 
 inline float abs(float x) {
-	return (x >= 0.f) ? x : -x;
+	return (x >= 0.0f) ? x : -x;
 }
 
 /** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
 inline float sgn(float x) {
-	return copysignf(1.f, x);
+	return copysignf(1.0f, x);
 }
 
 inline float eucmod(float a, float base) {
 	float mod = fmodf(a, base);
-	return (mod >= 0.f) ? mod : mod + base;
+	return (mod >= 0.0f) ? mod : mod + base;
 }
 
-inline float near(float a, float b, float epsilon = 1e-6) {
+inline bool isNear(float a, float b, float epsilon = 1.0e-6f) {
 	return fabsf(a - b) <= epsilon;
 }
 
@@ -89,7 +89,7 @@ inline float clamp2(float x, float min, float max) {
 
 /** If the magnitude of x if less than eps, return 0 */
 inline float chop(float x, float eps) {
-	return (-eps < x && x < eps) ? 0.f : x;
+	return (-eps < x && x < eps) ? 0.0f : x;
 }
 
 inline float rescale(float x, float xMin, float xMax, float yMin, float yMax) {
@@ -127,7 +127,7 @@ struct Rect;
 struct Vec {
 	float x, y;
 
-	Vec() : x(0.f), y(0.f) {}
+	Vec() : x(0.0f), y(0.0f) {}
 	Vec(float x, float y) : x(x), y(y) {}
 
 	Vec neg() {
@@ -176,7 +176,7 @@ struct Vec {
 		return x == b.x && y == b.y;
 	}
 	bool isZero() {
-		return x == 0.f && y == 0.f;
+		return x == 0.0f && y == 0.0f;
 	}
 	bool isFinite() {
 		return std::isfinite(x) && std::isfinite(y);
@@ -217,10 +217,10 @@ struct Rect {
 		return pos.plus(size.mult(0.5f));
 	}
 	Vec getTopRight() {
-		return pos.plus(Vec(size.x, 0.f));
+		return pos.plus(Vec(size.x, 0.0f));
 	}
 	Vec getBottomLeft() {
-		return pos.plus(Vec(0.f, size.y));
+		return pos.plus(Vec(0.0f, size.y));
 	}
 	Vec getBottomRight() {
 		return pos.plus(size);
@@ -268,7 +268,7 @@ inline Vec Vec::clamp(Rect bound) {
 
 
 ////////////////////
-// Deprecated functions, will by removed in Rack 1.0
+// Deprecated functions
 ////////////////////
 
 inline int DEPRECATED mini(int a, int b) {return min(a, b);}
@@ -281,7 +281,7 @@ inline bool DEPRECATED ispow2i(int n) {return ispow2(n);}
 inline float DEPRECATED absf(float x) {return abs(x);}
 inline float DEPRECATED sgnf(float x) {return sgn(x);}
 inline float DEPRECATED eucmodf(float a, float base) {return eucmod(a, base);}
-inline float DEPRECATED nearf(float a, float b, float epsilon = 1e-6) {return near(a, b, epsilon);}
+inline bool DEPRECATED nearf(float a, float b, float epsilon = 1.0e-6f) {return isNear(a, b, epsilon);}
 inline float DEPRECATED clampf(float x, float min, float max) {return clamp(x, min, max);}
 inline float DEPRECATED clamp2f(float x, float min, float max) {return clamp2(x, min, max);}
 inline float DEPRECATED chopf(float x, float eps) {return chop(x, eps);}
