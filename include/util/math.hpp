@@ -103,7 +103,7 @@ inline float crossfade(float a, float b, float frac) {
 /** Linearly interpolate an array `p` with index `x`
 Assumes that the array at `p` is of length at least floor(x)+1.
 */
-inline float interp(const float *p, float x) {
+inline float interpolateLinear(const float *p, float x) {
 	int xi = x;
 	float xf = x - xi;
 	return crossfade(p[xi], p[xi+1], xf);
@@ -287,7 +287,7 @@ inline float DEPRECATED clamp2f(float x, float min, float max) {return clamp2(x,
 inline float DEPRECATED chopf(float x, float eps) {return chop(x, eps);}
 inline float DEPRECATED rescalef(float x, float xMin, float xMax, float yMin, float yMax) {return rescale(x, xMin, xMax, yMin, yMax);}
 inline float DEPRECATED crossf(float a, float b, float frac) {return crossfade(a, b, frac);}
-inline float DEPRECATED interpf(const float *p, float x) {return interp(p, x);}
+inline float DEPRECATED interpf(const float *p, float x) {return interpolateLinear(p, x);}
 inline void DEPRECATED cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {return cmult(cr, ci, ar, ai, br, bi);}
 
 
