@@ -20,8 +20,8 @@ void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 
 void SVGSwitch::onChange(EventChange &e) {
 	assert(frames.size() > 0);
-	float valueScaled = rescalef(value, minValue, maxValue, 0, frames.size() - 1);
-	int index = clampi((int) roundf(valueScaled), 0, frames.size() - 1);
+	float valueScaled = rescale(value, minValue, maxValue, 0, frames.size() - 1);
+	int index = clamp((int) roundf(valueScaled), 0, frames.size() - 1);
 	sw->setSVG(frames[index]);
 	dirty = true;
 	Switch::onChange(e);

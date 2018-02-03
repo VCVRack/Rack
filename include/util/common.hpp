@@ -7,12 +7,10 @@
 #include <string.h>
 #include <assert.h>
 
+#include <cmath>
 #include <string>
 #include <condition_variable>
 #include <mutex>
-
-// Include math utilities for convenience
-#include "util/math.hpp"
 
 
 /** Surrounds raw text with quotes
@@ -34,18 +32,22 @@ will expand to
 
 #define LENGTHOF(arr) (sizeof(arr) / sizeof((arr)[0]))
 
-/** Reserve space for _count enums starting with _name.
+/** Reserve space for `count` enums starting with `name`.
 Example:
 	enum Foo {
-		ENUMS(BAR, 14)
+		ENUMS(BAR, 14),
+		BAZ
 	};
 
-	BAR + 0 to BAR + 11 is reserved
+	BAR + 0 to BAR + 13 is reserved. BAZ has a value of 14.
 */
-#define ENUMS(_name, _count) _name, _name ## _LAST = _name + (_count) - 1
+#define ENUMS(name, count) name, name ## _LAST = name + (count) - 1
 
 /** Deprecation notice for GCC */
 #define DEPRECATED __attribute__ ((deprecated))
+
+
+#include "util/math.hpp"
 
 
 namespace rack {

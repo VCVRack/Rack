@@ -89,7 +89,7 @@ struct DoubleRingBuffer {
 	void endIncr(int n) {
 		int e = mask(end);
 		int e1 = e + n;
-		int e2 = mini(e1, S);
+		int e2 = min(e1, S);
 		// Copy data forward
 		memcpy(data + S + e, data + e, sizeof(T) * (e2 - e));
 

@@ -25,7 +25,7 @@ void SVGKnob::step() {
 		tw->box.size = box.size;
 		float angle = 0.0;
 		if (std::isfinite(minValue) && std::isfinite(maxValue))
-			angle = rescalef(value, minValue, maxValue, minAngle, maxAngle);
+			angle = rescale(value, minValue, maxValue, minAngle, maxAngle);
 		tw->identity();
 		// Scale SVG to box
 		tw->scale(box.size.div(sw->box.size));

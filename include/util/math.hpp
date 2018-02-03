@@ -1,7 +1,5 @@
 #pragma once
-#include <stdint.h>
-#include <stdlib.h>
-#include <cmath>
+#include "util/common.hpp"
 
 
 namespace rack {
@@ -10,39 +8,38 @@ namespace rack {
 // basic integer functions (suffixed with "i")
 ////////////////////
 
-inline int mini(int a, int b) {
-	return a < b ? a : b;
+inline int min(int a, int b) {
+	return (a < b) ? a : b;
 }
 
-inline int maxi(int a, int b) {
-	return a > b ? a : b;
+inline int max(int a, int b) {
+	return (a > b) ? a : b;
 }
 
 /** Limits a value between a minimum and maximum
 Assumes min <= max
 */
-inline int clampi(int x, int min, int max) {
-	if (x < min)
-		return min;
-	if (x > max)
-		return max;
-	return x;
+inline int clamp(int x, int minimum, int maximum) {
+	return min(max(x, minimum), maximum);
 }
 
-inline int absi(int a) {
+/** Absolute value of a
+Undefined for a == INT_MIN
+*/
+inline int abs(int a) {
 	return (a >= 0) ? a : -a;
 }
 
 /** Euclidean modulus, always returns 0 <= mod < base for positive base.
 */
-inline int eucmodi(int a, int base) {
+inline int eucmod(int a, int base) {
 	int mod = a % base;
 	return (mod >= 0) ? mod : mod + base;
 }
 
 /** Returns floor(log_2(n)), or 0 if n == 1.
 */
-inline int log2i(int n) {
+inline int log2(int n) {
 	int i = 0;
 	while (n >>= 1) {
 		i++;
@@ -50,7 +47,7 @@ inline int log2i(int n) {
 	return i;
 }
 
-inline bool ispow2i(int n) {
+inline bool ispow2(int n) {
 	return n > 0 && (n & (n - 1)) == 0;
 }
 
@@ -58,69 +55,65 @@ inline bool ispow2i(int n) {
 // basic float functions (suffixed with "f")
 ////////////////////
 
-inline float absf(float x) {
-	return (x < 0.f) ? -x : x;
+inline float abs(float x) {
+	return (x >= 0.f) ? x : -x;
 }
 
 /** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
-inline float sgnf(float x) {
+inline float sgn(float x) {
 	return copysignf(1.f, x);
 }
 
-inline float eucmodf(float a, float base) {
+inline float eucmod(float a, float base) {
 	float mod = fmodf(a, base);
 	return (mod >= 0.f) ? mod : mod + base;
 }
 
-inline float nearf(float a, float b, float epsilon = 1e-6) {
+inline float near(float a, float b, float epsilon = 1e-6) {
 	return fabsf(a - b) <= epsilon;
 }
 
 /** Limits a value between a minimum and maximum
 Assumes min <= max
 */
-inline float clampf(float x, float min, float max) {
-	if (x < min)
-		return min;
-	if (x > max)
-		return max;
-	return x;
+inline float clamp(float x, float minimum, float maximum) {
+	return fminf(fmaxf(x, minimum), maximum);
 }
 
 /** Limits a value between a minimum and maximum
 If min > max, switches the two values
 */
-inline float clamp2f(float x, float min, float max) {
-	return clampf(x, fminf(min, max), fmaxf(min, max));
+inline float clamp2(float x, float min, float max) {
+	return clamp(x, fminf(min, max), fmaxf(min, max));
 }
 
 /** If the magnitude of x if less than eps, return 0 */
-inline float chopf(float x, float eps) {
+inline float chop(float x, float eps) {
 	return (-eps < x && x < eps) ? 0.f : x;
 }
 
-inline float rescalef(float x, float xMin, float xMax, float yMin, float yMax) {
+inline float rescale(float x, float xMin, float xMax, float yMin, float yMax) {
 	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
-inline float crossf(float a, float b, float frac) {
+inline float crossfade(float a, float b, float frac) {
 	return a + frac * (b - a);
 }
 
 /** Linearly interpolate an array `p` with index `x`
 Assumes that the array at `p` is of length at least floor(x)+1.
 */
-inline float interpf(const float *p, float x) {
+inline float interp(const float *p, float x) {
 	int xi = x;
 	float xf = x - xi;
-	return crossf(p[xi], p[xi+1], xf);
+	return crossfade(p[xi], p[xi+1], xf);
 }
 
 /** Complex multiply c = a * b
 Arguments may be the same pointers
 i.e. cmultf(&ar, &ai, ar, ai, br, bi)
 */
-inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {
+inline void cmult(float *cr, float *ci, float ar, float ai, float br, float bi) {
 	*cr = ar * br - ai * bi;
 	*ci = ar * bi + ai * br;
 }
@@ -235,18 +228,18 @@ struct Rect {
 	/** Clamps the edges of the rectangle to fit within a bound */
 	Rect clamp(Rect bound) {
 		Rect r;
-		r.pos.x = clamp2f(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
-		r.pos.y = clamp2f(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
-		r.size.x = clampf(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
-		r.size.y = clampf(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
+		r.pos.x = clamp2(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
+		r.pos.y = clamp2(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
+		r.size.x = rack::clamp(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
+		r.size.y = rack::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
 		return r;
 	}
 	/** Nudges the position to fix inside a bounding box */
 	Rect nudge(Rect bound) {
 		Rect r;
 		r.size = size;
-		r.pos.x = clamp2f(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
-		r.pos.y = clamp2f(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
+		r.pos.x = clamp2(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
+		r.pos.y = clamp2(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
 	/** Expands this Rect to contain `other` */
@@ -269,9 +262,33 @@ struct Rect {
 
 inline Vec Vec::clamp(Rect bound) {
 	return Vec(
-		clamp2f(x, bound.pos.x, bound.pos.x + bound.size.x),
-		clamp2f(y, bound.pos.y, bound.pos.y + bound.size.y));
+		clamp2(x, bound.pos.x, bound.pos.x + bound.size.x),
+		clamp2(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
+
+
+////////////////////
+// Deprecated functions, will by removed in Rack 1.0
+////////////////////
+
+inline int DEPRECATED mini(int a, int b) {return min(a, b);}
+inline int DEPRECATED maxi(int a, int b) {return max(a, b);}
+inline int DEPRECATED clampi(int x, int min, int max) {return clamp(x, min, max);}
+inline int DEPRECATED absi(int a) {return abs(a);}
+inline int DEPRECATED eucmodi(int a, int base) {return eucmod(a, base);}
+inline int DEPRECATED log2i(int n) {return log2(n);}
+inline bool DEPRECATED ispow2i(int n) {return ispow2(n);}
+inline float DEPRECATED absf(float x) {return abs(x);}
+inline float DEPRECATED sgnf(float x) {return sgn(x);}
+inline float DEPRECATED eucmodf(float a, float base) {return eucmod(a, base);}
+inline float DEPRECATED nearf(float a, float b, float epsilon = 1e-6) {return near(a, b, epsilon);}
+inline float DEPRECATED clampf(float x, float min, float max) {return clamp(x, min, max);}
+inline float DEPRECATED clamp2f(float x, float min, float max) {return clamp2(x, min, max);}
+inline float DEPRECATED chopf(float x, float eps) {return chop(x, eps);}
+inline float DEPRECATED rescalef(float x, float xMin, float xMax, float yMin, float yMax) {return rescale(x, xMin, xMax, yMin, yMax);}
+inline float DEPRECATED crossf(float a, float b, float frac) {return crossfade(a, b, frac);}
+inline float DEPRECATED interpf(const float *p, float x) {return interp(p, x);}
+inline void DEPRECATED cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {return cmult(cr, ci, ar, ai, br, bi);}
 
 
 } // namespace rack

@@ -5,10 +5,10 @@ namespace rack {
 
 
 void LightWidget::draw(NVGcontext *vg) {
-	color.r = clampf(color.r, 0.0, 1.0);
-	color.g = clampf(color.g, 0.0, 1.0);
-	color.b = clampf(color.b, 0.0, 1.0);
-	color.a = clampf(color.a, 0.0, 1.0);
+	color.r = clamp(color.r, 0.0, 1.0);
+	color.g = clamp(color.g, 0.0, 1.0);
+	color.b = clamp(color.b, 0.0, 1.0);
+	color.a = clamp(color.a, 0.0, 1.0);
 
 	drawLight(vg);
 	drawHalo(vg);
