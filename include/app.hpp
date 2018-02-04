@@ -23,6 +23,7 @@ struct SVGPanel;
 // A 1U module should be 15x380. Thus the width of a module should be a factor of 15.
 #define RACK_GRID_WIDTH 15
 #define RACK_GRID_HEIGHT 380
+#define KNOB_SENSITIVITY 0.0015
 
 static const Vec RACK_GRID_SIZE = Vec(15, 380);
 
@@ -200,6 +201,7 @@ struct Knob : ParamWidget {
 	/** Snap to nearest integer while dragging */
 	bool snap = false;
 	float dragValue;
+	float sensitivity = KNOB_SENSITIVITY;
 	void onDragStart(EventDragStart &e) override;
 	void onDragMove(EventDragMove &e) override;
 	void onDragEnd(EventDragEnd &e) override;

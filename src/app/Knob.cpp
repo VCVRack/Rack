@@ -7,7 +7,6 @@
 
 namespace rack {
 
-#define KNOB_SENSITIVITY 0.0015
 
 
 void Knob::onDragStart(EventDragStart &e) {
@@ -18,7 +17,7 @@ void Knob::onDragStart(EventDragStart &e) {
 
 void Knob::onDragMove(EventDragMove &e) {
 	// Drag slower if Mod
-	float delta = KNOB_SENSITIVITY * (maxValue - minValue) * -e.mouseRel.y;
+	float delta = sensitivity * (maxValue - minValue) * -e.mouseRel.y;
 	if (guiIsModPressed())
 		delta /= 16.0;
 	dragValue += delta;
