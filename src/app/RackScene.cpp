@@ -86,43 +86,45 @@ void RackScene::draw(NVGcontext *vg) {
 }
 
 void RackScene::onHoverKey(EventHoverKey &e) {
-	switch (e.key) {
-		case GLFW_KEY_N:
-			if (guiIsModPressed() && !guiIsShiftPressed()) {
-				gRackWidget->reset();
-				e.consumed = true;
-				return;
-			}
-			break;
-		case GLFW_KEY_Q:
-			if (guiIsModPressed() && !guiIsShiftPressed()) {
-				guiClose();
-				e.consumed = true;
-				return;
-			}
-			break;
-		case GLFW_KEY_O:
-			if (guiIsModPressed() && !guiIsShiftPressed()) {
-				gRackWidget->openDialog();
-				e.consumed = true;
-				return;
-			}
-			break;
-		case GLFW_KEY_S:
-			if (guiIsModPressed() && !guiIsShiftPressed()) {
-				gRackWidget->saveDialog();
-				e.consumed = true;
-				return;
-			}
-			if (guiIsModPressed() && guiIsShiftPressed()) {
-				gRackWidget->saveAsDialog();
-				e.consumed = true;
-				return;
-			}
-			break;
-	}
-
 	Widget::onHoverKey(e);
+
+	if (!e.consumed) {
+		switch (e.key) {
+			case GLFW_KEY_N: {
+				if (guiIsModPressed() && !guiIsShiftPressed()) {
+					gRackWidget->reset();
+					e.consumed = true;
+					return;
+				}
+			} break;
+			case GLFW_KEY_Q: {
+				if (guiIsModPressed() && !guiIsShiftPressed()) {
+					guiClose();
+					e.consumed = true;
+					return;
+				}
+			} break;
+			case GLFW_KEY_O: {
+				if (guiIsModPressed() && !guiIsShiftPressed()) {
+					gRackWidget->openDialog();
+					e.consumed = true;
+					return;
+				}
+			} break;
+			case GLFW_KEY_S: {
+				if (guiIsModPressed() && !guiIsShiftPressed()) {
+					gRackWidget->saveDialog();
+					e.consumed = true;
+					return;
+				}
+				if (guiIsModPressed() && guiIsShiftPressed()) {
+					gRackWidget->saveAsDialog();
+					e.consumed = true;
+					return;
+				}
+			} break;
+		}
+	}
 }
 
 void RackScene::onPathDrop(EventPathDrop &e) {
