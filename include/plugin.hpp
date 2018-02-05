@@ -31,9 +31,8 @@ struct Plugin {
 	*/
 	std::string version;
 
-	/** URL for plugin homepage (optional) */
+	/** Deprecated, do not use. */
 	std::string website;
-	/** URL for plugin manual (optional) */
 	std::string manual;
 
 	virtual ~Plugin();
