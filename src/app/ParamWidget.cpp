@@ -20,7 +20,7 @@ void ParamWidget::fromJson(json_t *rootJ) {
 
 void ParamWidget::randomize() {
 	if (randomizable)
-		setValue(rescale(randomf(), 0.0, 1.0, minValue, maxValue));
+		setValue(rescale(randomUniform(), 0.0, 1.0, minValue, maxValue));
 }
 
 void ParamWidget::onMouseDown(EventMouseDown &e) {
