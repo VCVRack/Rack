@@ -200,6 +200,7 @@ struct Knob : ParamWidget {
 	/** Snap to nearest integer while dragging */
 	bool snap = false;
 	float dragValue;
+	float sensitivity = 0.0;
 	void onDragStart(EventDragStart &e) override;
 	void onDragMove(EventDragMove &e) override;
 	void onDragEnd(EventDragEnd &e) override;
