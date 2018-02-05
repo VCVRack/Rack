@@ -80,9 +80,11 @@ void randomInit();
 uint32_t randomu32();
 uint64_t randomu64();
 /** Returns a uniform random float in the interval [0.0, 1.0) */
-float randomf();
+float randomUniform();
 /** Returns a normal random number with mean 0 and std dev 1 */
 float randomNormal();
+
+inline float DEPRECATED randomf() {return randomUniform();}
 
 ////////////////////
 // String utilities

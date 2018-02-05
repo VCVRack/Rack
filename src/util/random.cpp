@@ -48,22 +48,22 @@ uint64_t randomu64() {
 	return xoroshiro128plus_next();
 }
 
-float randomf() {
+float randomUniform() {
 	// 24 bits of granularity is the best that can be done with floats while ensuring that the return value lies in [0.0, 1.0).
 	return (xoroshiro128plus_next() >> (64 - 24)) / powf(2, 24);
 }
 
 float randomNormal() {
 	// Box-Muller transform
-	float radius = sqrtf(-2.f * logf(1.f - randomf()));
-	float theta = 2.f * M_PI * randomf();
+	float radius = sqrtf(-2.f * logf(1.f - randomUniform()));
+	float theta = 2.f * M_PI * randomUniform();
 	return radius * sinf(theta);
 
 	// // Central Limit Theorem
 	// const int n = 8;
 	// float sum = 0.0;
 	// for (int i = 0; i < n; i++) {
-	// 	sum += randomf();
+	// 	sum += randomUniform();
 	// }
 	// return (sum - n / 2.f) / sqrtf(n / 12.f);
 }
