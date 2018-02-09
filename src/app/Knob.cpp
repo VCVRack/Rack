@@ -1,5 +1,5 @@
 #include "app.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 #include "engine.hpp"
 // For GLFW_KEY_LEFT_CONTROL, etc.
 #include <GLFW/glfw3.h>
@@ -11,7 +11,7 @@ namespace rack {
 
 
 void Knob::onDragStart(EventDragStart &e) {
-	guiCursorLock();
+	windowCursorLock();
 	dragValue = value;
 	randomizable = false;
 }
@@ -23,7 +23,7 @@ void Knob::onDragMove(EventDragMove &e) {
 		delta *= range;
 
 	// Drag slower if Mod is held
-	if (guiIsModPressed())
+	if (windowIsModPressed())
 		delta /= 16.0;
 	dragValue += delta;
 	if (snap)
@@ -33,7 +33,7 @@ void Knob::onDragMove(EventDragMove &e) {
 }
 
 void Knob::onDragEnd(EventDragEnd &e) {
-	guiCursorUnlock();
+	windowCursorUnlock();
 	randomizable = true;
 }
 

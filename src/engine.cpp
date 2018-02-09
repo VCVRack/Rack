@@ -62,7 +62,7 @@ void engineInit() {
 }
 
 void engineDestroy() {
-	// Make sure there are no wires or modules in the rack on destruction. This suggests that a module failed to remove itself before the GUI was destroyed.
+	// Make sure there are no wires or modules in the rack on destruction. This suggests that a module failed to remove itself before the WINDOW was destroyed.
 	assert(wires.empty());
 	assert(modules.empty());
 }

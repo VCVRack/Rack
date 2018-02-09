@@ -16,7 +16,7 @@ namespace rack {
 ////////////////////
 
 // Constructing these directly will load from the disk each time. Use the load() functions to load from disk and cache them as long as the shared_ptr is held.
-// Implemented in gui.cpp
+// Implemented in window.cpp
 
 struct Font {
 	int handle;

@@ -5,9 +5,9 @@
 
 
 #ifdef ARCH_MAC
-	#define GUI_MOD_KEY_NAME "Cmd"
+	#define WINDOW_MOD_KEY_NAME "Cmd"
 #else
-	#define GUI_MOD_KEY_NAME "Ctrl"
+	#define WINDOW_MOD_KEY_NAME "Ctrl"
 #endif
 
 
@@ -30,19 +30,19 @@ extern int gGuiFrame;
 extern Vec gMousePos;
 
 
-void guiInit();
-void guiDestroy();
-void guiRun();
-void guiClose();
-void guiCursorLock();
-void guiCursorUnlock();
-bool guiIsModPressed();
-bool guiIsShiftPressed();
-Vec guiGetWindowSize();
-void guiSetWindowSize(Vec size);
-Vec guiGetWindowPos();
-void guiSetWindowPos(Vec pos);
-bool guiIsMaximized();
+void windowInit();
+void windowDestroy();
+void windowRun();
+void windowClose();
+void windowCursorLock();
+void windowCursorUnlock();
+bool windowIsModPressed();
+bool windowIsShiftPressed();
+Vec windowGetWindowSize();
+void windowSetWindowSize(Vec size);
+Vec windowGetWindowPos();
+void windowSetWindowPos(Vec pos);
+bool windowIsMaximized();
 
 
 } // namespace rack

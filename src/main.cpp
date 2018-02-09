@@ -1,6 +1,6 @@
 #include "util/common.hpp"
 #include "engine.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 #include "app.hpp"
 #include "plugin.hpp"
 #include "settings.hpp"
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
 	pluginInit();
 	engineInit();
-	guiInit();
+	windowInit();
 	sceneInit();
 	settingsLoad(assetLocal("settings.json"));
 
@@ -50,13 +50,13 @@ int main(int argc, char* argv[]) {
 	}
 
 	engineStart();
-	guiRun();
+	windowRun();
 	engineStop();
 
 	gRackWidget->savePatch(assetLocal("autosave.vcv"));
 	settingsSave(assetLocal("settings.json"));
 	sceneDestroy();
-	guiDestroy();
+	windowDestroy();
 	engineDestroy();
 	pluginDestroy();
 

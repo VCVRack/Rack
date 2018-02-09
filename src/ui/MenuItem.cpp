@@ -1,5 +1,5 @@
 #include "ui.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -26,7 +26,7 @@ void MenuItem::draw(NVGcontext *vg) {
 void MenuItem::step() {
 	// Add 10 more pixels because Retina measurements are sometimes too small
 	const float rightPadding = 10.0;
-	// HACK use gVg from the gui.
+	// HACK use gVg from the window.
 	// All this does is inspect the font, so it shouldn't modify gVg and should work when called from a FramebufferWidget for example.
 	box.size.x = bndLabelWidth(gVg, -1, text.c_str()) + bndLabelWidth(gVg, -1, rightText.c_str()) + rightPadding;
 	Widget::step();

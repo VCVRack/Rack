@@ -1,5 +1,5 @@
 #include "widgets.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 #include <GL/glew.h>
 #include "../ext/nanovg/src/nanovg_gl.h"
 #include "../ext/nanovg/src/nanovg_gl_utils.h"

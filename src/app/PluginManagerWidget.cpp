@@ -1,7 +1,7 @@
 #include <thread>
 #include "app.hpp"
 #include "plugin.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 #include "../ext/osdialog/osdialog.h"
 
 
@@ -24,7 +24,7 @@ struct SyncButton : Button {
 		}
 		if (completed) {
 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
-				guiClose();
+				windowClose();
 			}
 			completed = false;
 		}
