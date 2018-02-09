@@ -218,6 +218,16 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	virtual void randomize();
 	void onMouseDown(EventMouseDown &e) override;
 	void onChange(EventChange &e) override;
+
+	template <typename T = ParamWidget>
+	static T *create(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+		T *o = Widget::create<T>(pos);
+		o->module = module;
+		o->paramId = paramId;
+		o->setLimits(minValue, maxValue);
+		o->setDefaultValue(defaultValue);
+		return o;
+	}
 };
 
 /** Implements vertical dragging behavior for ParamWidgets */
@@ -351,6 +361,14 @@ struct ModuleLightWidget : MultiLightWidget {
 	Module *module = NULL;
 	int firstLightId;
 	void step() override;
+
+	template <typename T = ModuleLightWidget>
+	static T *create(Vec pos, Module *module, int firstLightId) {
+		T *o = Widget::create<T>(pos);
+		o->module = module;
+		o->firstLightId = firstLightId;
+		return o;
+	}
 };
 
 ////////////////////
@@ -378,6 +396,24 @@ struct Port : OpaqueWidget {
 	void onDragDrop(EventDragDrop &e) override;
 	void onDragEnter(EventDragEnter &e) override;
 	void onDragLeave(EventDragEnter &e) override;
+
+	template <typename T = Port>
+	static T *createInput(Vec pos, Module *module, int portId) {
+		T *o = Widget::create<T>(pos);
+		o->type = INPUT;
+		o->module = module;
+		o->portId = portId;
+		return o;
+	}
+
+	template <typename T = Port>
+	static T *createOutput(Vec pos, Module *module, int portId) {
+		T *o = Widget::create<T>(pos);
+		o->type = OUTPUT;
+		o->module = module;
+		o->portId = portId;
+		return o;
+	}
 };
 
 struct SVGPort : Port, FramebufferWidget {

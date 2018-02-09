@@ -72,10 +72,10 @@ BlankWidget::BlankWidget() {
 	addChild(leftHandle);
 	addChild(rightHandle);
 
-	addChild(createScrew<ScrewSilver>(Vec(15, 0)));
-	addChild(createScrew<ScrewSilver>(Vec(15, 365)));
-	topRightScrew = createScrew<ScrewSilver>(Vec(box.size.x - 30, 0));
-	bottomRightScrew = createScrew<ScrewSilver>(Vec(box.size.x - 30, 365));
+	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
+	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
+	topRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0));
+	bottomRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365));
 	addChild(topRightScrew);
 	addChild(bottomRightScrew);
 }

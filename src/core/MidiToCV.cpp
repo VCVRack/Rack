@@ -245,10 +245,10 @@ MidiToCVWidget::MidiToCVWidget() {
 	float yPos = margin;
 	float yGap = 35;
 
-	addChild(createScrew<ScrewSilver>(Vec(15, 0)));
-	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 30, 0)));
-	addChild(createScrew<ScrewSilver>(Vec(15, 365)));
-	addChild(createScrew<ScrewSilver>(Vec(box.size.x - 30, 365)));
+	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
+	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0)));
+	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
+	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
 
 	{
 		Label *label = new Label();
@@ -258,8 +258,8 @@ MidiToCVWidget::MidiToCVWidget() {
 		yPos = labelHeight * 2;
 	}
 
-	addParam(createParam<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
-	addChild(createLight<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module, MIDIToCVInterface::RESET_LIGHT));
+	addParam(ParamWidget::create<LEDButton>(Vec(7 * 15, labelHeight), module, MIDIToCVInterface::RESET_PARAM, 0.0, 1.0, 0.0));
+	addChild(ModuleLightWidget::create<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module, MIDIToCVInterface::RESET_LIGHT));
 
 	std::string labels[MIDIToCVInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel", "Aftertouch"};
 
@@ -269,7 +269,7 @@ MidiToCVWidget::MidiToCVWidget() {
 		label->text = labels[i];
 		addChild(label);
 
-		addOutput(createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, i));
+		addOutput(Port::createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, i));
 
 		yPos += yGap + margin;
 	}
@@ -279,5 +279,5 @@ MidiToCVWidget::MidiToCVWidget() {
 	addChild(midiWidget);
 
 	// Lights
-	addChild(createLight<SmallLight<GreenLight>>(Vec(40, 20), module, MIDIToCVInterface::ACTIVE_LIGHT));
+	addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(40, 20), module, MIDIToCVInterface::ACTIVE_LIGHT));
 }
