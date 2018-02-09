@@ -18,6 +18,10 @@ void ParamWidget::fromJson(json_t *rootJ) {
 		setValue(json_number_value(valueJ));
 }
 
+void ParamWidget::reset() {
+	setValue(defaultValue);
+}
+
 void ParamWidget::randomize() {
 	if (randomizable)
 		setValue(rescale(randomUniform(), 0.0, 1.0, minValue, maxValue));
