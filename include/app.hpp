@@ -398,18 +398,9 @@ struct Port : OpaqueWidget {
 	void onDragLeave(EventDragEnter &e) override;
 
 	template <typename T = Port>
-	static T *createInput(Vec pos, Module *module, int portId) {
+	static T *create(Vec pos, PortType type, Module *module, int portId) {
 		T *o = Widget::create<T>(pos);
-		o->type = INPUT;
-		o->module = module;
-		o->portId = portId;
-		return o;
-	}
-
-	template <typename T = Port>
-	static T *createOutput(Vec pos, Module *module, int portId) {
-		T *o = Widget::create<T>(pos);
-		o->type = OUTPUT;
+		o->type = type;
 		o->module = module;
 		o->portId = portId;
 		return o;
