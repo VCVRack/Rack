@@ -53,7 +53,7 @@ DEPRECATED TParamWidget *createParam(Vec pos, Module *module, int paramId, float
 	return param;
 }
 
-/** Deprecated, use Port::createInput<TPort>() instead */
+/** Deprecated, use Port::create<TPort>(..., Port::INPUT, ...) instead */
 template <class TPort>
 DEPRECATED TPort *createInput(Vec pos, Module *module, int inputId) {
 	TPort *port = new TPort();
@@ -64,7 +64,7 @@ DEPRECATED TPort *createInput(Vec pos, Module *module, int inputId) {
 	return port;
 }
 
-/** Deprecated, use Port::createInput<TPort>() instead */
+/** Deprecated, use Port::create<TPort>(..., Port::OUTPUT, ...) instead */
 template <class TPort>
 DEPRECATED TPort *createOutput(Vec pos, Module *module, int outputId) {
 	TPort *port = new TPort();

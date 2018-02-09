@@ -269,7 +269,7 @@ MidiToCVWidget::MidiToCVWidget() {
 		label->text = labels[i];
 		addChild(label);
 
-		addOutput(Port::createOutput<PJ3410Port>(Vec(15 * 6, yPos - 5), module, i));
+		addOutput(Port::create<PJ3410Port>(Vec(15 * 6, yPos - 5), Port::OUTPUT, module, i));
 
 		yPos += yGap + margin;
 	}
