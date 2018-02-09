@@ -167,7 +167,7 @@ void ModuleWidget::_delete() {
 
 void ModuleWidget::reset() {
 	for (ParamWidget *param : params) {
-		param->setValue(param->defaultValue);
+		param->reset();
 	}
 	if (module) {
 		module->onReset();
@@ -187,6 +187,18 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(vg);
 	nvgResetScissor(vg);
+}
+
+void ModuleWidget::drawShadow(NVGcontext *vg) {
+	nvgBeginPath(vg);
+	float r = 20; // Blur radius
+	float c = 20; // Corner radius
+	Vec b = Vec(-10, 30); // Offset from each corner
+	nvgRect(vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
+	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
+	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
+	nvgFillPaint(vg, nvgBoxGradient(vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
+	nvgFill(vg);
 }
 
 void ModuleWidget::onMouseDown(EventMouseDown &e) {

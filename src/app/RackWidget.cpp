@@ -12,6 +12,24 @@
 namespace rack {
 
 
+struct ModuleContainer : Widget {
+	void draw(NVGcontext *vg) override {
+		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front.
+		for (Widget *child : children) {
+			if (!child->visible)
+				continue;
+			nvgSave(vg);
+			nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
+			ModuleWidget *w = dynamic_cast<ModuleWidget*>(child);
+			w->drawShadow(vg);
+			nvgRestore(vg);
+		}
+
+		Widget::draw(vg);
+	}
+};
+
+
 RackWidget::RackWidget() {
 	rails = new FramebufferWidget();
 	rails->box.size = Vec();
@@ -23,7 +41,7 @@ RackWidget::RackWidget() {
 	}
 	addChild(rails);
 
-	moduleContainer = new Widget();
+	moduleContainer = new ModuleContainer();
 	addChild(moduleContainer);
 
 	wireContainer = new WireContainer();

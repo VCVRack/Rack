@@ -89,6 +89,7 @@ struct ModuleWidget : OpaqueWidget {
 	virtual Menu *createContextMenu();
 
 	void draw(NVGcontext *vg) override;
+	void drawShadow(NVGcontext *vg);
 
 	Vec dragPos;
 	void onMouseDown(EventMouseDown &e) override;
@@ -213,6 +214,7 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
+	virtual void reset();
 	virtual void randomize();
 	void onMouseDown(EventMouseDown &e) override;
 	void onChange(EventChange &e) override;

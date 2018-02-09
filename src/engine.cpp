@@ -35,14 +35,14 @@ static float smoothValue;
 
 
 float Light::getBrightness() {
-	return sqrtf(fmaxf(0.0, value));
+	return sqrtf(fmaxf(0.f, value));
 }
 
 void Light::setBrightnessSmooth(float brightness) {
-	float v = (brightness > 0.0) ? brightness * brightness : 0.0;
+	float v = (brightness > 0.f) ? brightness * brightness : 0.f;
 	if (v < value) {
-		// Fade out light with lambda = 2 * framerate
-		value += (v - value) * sampleTime * (60.0 * 2.0);
+		// Fade out light with lambda = framerate
+		value += (v - value) * sampleTime * (60.f * 1.f);
 	}
 	else {
 		// Immediately illuminate light
