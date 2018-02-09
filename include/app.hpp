@@ -2,6 +2,7 @@
 #include <vector>
 #include <jansson.h>
 #include "widgets.hpp"
+#include "ui.hpp"
 
 
 static const float SVG_DPI = 75.0;
