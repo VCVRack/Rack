@@ -139,6 +139,18 @@ struct Widget {
 	virtual void onAction(EventAction &e) {}
 	virtual void onChange(EventChange &e) {}
 	virtual void onZoom(EventZoom &e);
+
+	/** Helper function for creating and initializing a Widget with certain arguments (in this case just the position).
+	In this project, you will find this idiom everywhere, as an easier alternative to constructor arguments, for building a Widget (or a subclass) with a one-liner.
+	Example:
+		addChild(Widget::create<SVGWidget>(Vec(0, 0)))
+	*/
+	template <typename T = Widget>
+	static T *create(Vec pos) {
+		T *o = new T();
+		o->box.pos = pos;
+		return o;
+	}
 };
 
 struct TransformWidget : Widget {

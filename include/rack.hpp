@@ -33,15 +33,17 @@ Model *createModel(std::string manufacturer, std::string slug, std::string name,
 	return model;
 }
 
+/** Deprecated, use Widget::create<TScrew>() instead */
 template <class TScrew>
-TScrew *createScrew(Vec pos) {
+DEPRECATED TScrew *createScrew(Vec pos) {
 	TScrew *screw = new TScrew();
 	screw->box.pos = pos;
 	return screw;
 }
 
+/** Deprecated, use ParamWidget::create<TParamWidget>() instead */
 template <class TParamWidget>
-TParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+DEPRECATED TParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *param = new TParamWidget();
 	param->box.pos = pos;
 	param->module = module;
@@ -51,8 +53,9 @@ TParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, 
 	return param;
 }
 
+/** Deprecated, use Port::createInput<TPort>() instead */
 template <class TPort>
-TPort *createInput(Vec pos, Module *module, int inputId) {
+DEPRECATED TPort *createInput(Vec pos, Module *module, int inputId) {
 	TPort *port = new TPort();
 	port->box.pos = pos;
 	port->module = module;
@@ -61,8 +64,9 @@ TPort *createInput(Vec pos, Module *module, int inputId) {
 	return port;
 }
 
+/** Deprecated, use Port::createInput<TPort>() instead */
 template <class TPort>
-TPort *createOutput(Vec pos, Module *module, int outputId) {
+DEPRECATED TPort *createOutput(Vec pos, Module *module, int outputId) {
 	TPort *port = new TPort();
 	port->box.pos = pos;
 	port->module = module;
@@ -71,8 +75,9 @@ TPort *createOutput(Vec pos, Module *module, int outputId) {
 	return port;
 }
 
+/** Deprecated, use ModuleLightWidget::create<TModuleLightWidget>() instead */
 template<class TModuleLightWidget>
-TModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
+DEPRECATED TModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
 	TModuleLightWidget *light = new TModuleLightWidget();
 	light->box.pos = pos;
 	light->module = module;
