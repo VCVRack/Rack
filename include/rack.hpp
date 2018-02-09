@@ -5,7 +5,9 @@
 #include "asset.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
+#include "widgets.hpp"
 #include "app.hpp"
+#include "ui.hpp"
 #include "componentlibrary.hpp"
 
 
