@@ -1,5 +1,5 @@
 #include "ui.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -11,7 +11,7 @@ void ScrollBar::draw(NVGcontext *vg) {
 
 void ScrollBar::onDragStart(EventDragStart &e) {
 	state = BND_ACTIVE;
-	guiCursorLock();
+	windowCursorLock();
 }
 
 void ScrollBar::onDragMove(EventDragMove &e) {
@@ -25,7 +25,7 @@ void ScrollBar::onDragMove(EventDragMove &e) {
 
 void ScrollBar::onDragEnd(EventDragEnd &e) {
 	state = BND_DEFAULT;
-	guiCursorUnlock();
+	windowCursorUnlock();
 }
 
 

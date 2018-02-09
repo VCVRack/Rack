@@ -1,6 +1,6 @@
 #include "settings.hpp"
 #include "app.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
 #include <jansson.h>
@@ -20,14 +20,14 @@ static json_t *settingsToJson() {
 	json_t *tokenJ = json_string(gToken.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
-	if (!guiIsMaximized()) {
+	if (!windowIsMaximized()) {
 		// windowSize
-		Vec windowSize = guiGetWindowSize();
+		Vec windowSize = windowGetWindowSize();
 		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
 		json_object_set_new(rootJ, "windowSize", windowSizeJ);
 
 		// windowPos
-		Vec windowPos = guiGetWindowPos();
+		Vec windowPos = windowGetWindowPos();
 		json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
 		json_object_set_new(rootJ, "windowPos", windowPosJ);
 	}
@@ -78,7 +78,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowSizeJ) {
 		double width, height;
 		json_unpack(windowSizeJ, "[F, F]", &width, &height);
-		guiSetWindowSize(Vec(width, height));
+		windowSetWindowSize(Vec(width, height));
 	}
 
 	// windowPos
@@ -86,7 +86,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
-		guiSetWindowPos(Vec(x, y));
+		windowSetWindowPos(Vec(x, y));
 	}
 
 	// opacity

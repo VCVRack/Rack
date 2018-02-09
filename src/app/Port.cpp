@@ -1,5 +1,5 @@
 #include "app.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 #include "engine.hpp"
 #include "componentlibrary.hpp"
 
@@ -65,7 +65,7 @@ void Port::onMouseDown(EventMouseDown &e) {
 void Port::onDragStart(EventDragStart &e) {
 	// Try to grab wire on top of stack
 	WireWidget *wire = gRackWidget->wireContainer->getTopWire(this);
-	if (type == OUTPUT && guiIsModPressed()) {
+	if (type == OUTPUT && windowIsModPressed()) {
 		wire = NULL;
 	}
 

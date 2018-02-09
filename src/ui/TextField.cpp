@@ -1,6 +1,6 @@
 #include "ui.hpp"
 // for gVg
-#include "gui.hpp"
+#include "window.hpp"
 // for key codes
 #include <GLFW/glfw3.h>
 
@@ -92,14 +92,14 @@ void TextField::onKey(EventKey &e) {
 			end = begin = text.size();
 			break;
 		case GLFW_KEY_V:
-			if (guiIsModPressed()) {
+			if (windowIsModPressed()) {
 				const char *newText = glfwGetClipboardString(gWindow);
 				if (newText)
 					insertText(newText);
 			}
 			break;
 		case GLFW_KEY_C:
-			if (guiIsModPressed()) {
+			if (windowIsModPressed()) {
 				if (begin < end) {
 					std::string selectedText = text.substr(begin, end - begin);
 					glfwSetClipboardString(gWindow, selectedText.c_str());

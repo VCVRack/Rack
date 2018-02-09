@@ -1,7 +1,7 @@
 #include "app.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -220,7 +220,7 @@ void ModuleWidget::onMouseMove(EventMouseMove &e) {
 	if (!gFocusedWidget) {
 		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 		if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-			if (!guiIsModPressed() && !guiIsShiftPressed()) {
+			if (!windowIsModPressed() && !windowIsShiftPressed()) {
 				gRackWidget->deleteModule(this);
 				this->finalizeEvents();
 				delete this;
@@ -234,21 +234,21 @@ void ModuleWidget::onMouseMove(EventMouseMove &e) {
 void ModuleWidget::onHoverKey(EventHoverKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_I:
-			if (guiIsModPressed() && !guiIsShiftPressed()) {
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				reset();
 				e.consumed = true;
 				return;
 			}
 			break;
 		case GLFW_KEY_R:
-			if (guiIsModPressed() && !guiIsShiftPressed()) {
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				randomize();
 				e.consumed = true;
 				return;
 			}
 			break;
 		case GLFW_KEY_D:
-			if (guiIsModPressed() && !guiIsShiftPressed()) {
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				gRackWidget->cloneModule(this);
 				e.consumed = true;
 				return;
@@ -319,13 +319,13 @@ Menu *ModuleWidget::createContextMenu() {
 
 	ResetMenuItem *resetItem = new ResetMenuItem();
 	resetItem->text = "Initialize";
-	resetItem->rightText = GUI_MOD_KEY_NAME "+I";
+	resetItem->rightText = WINDOW_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->addChild(resetItem);
 
 	RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
 	randomizeItem->text = "Randomize";
-	randomizeItem->rightText = GUI_MOD_KEY_NAME "+R";
+	randomizeItem->rightText = WINDOW_MOD_KEY_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->addChild(randomizeItem);
 
@@ -336,7 +336,7 @@ Menu *ModuleWidget::createContextMenu() {
 
 	CloneMenuItem *cloneItem = new CloneMenuItem();
 	cloneItem->text = "Duplicate";
-	cloneItem->rightText = GUI_MOD_KEY_NAME "+D";
+	cloneItem->rightText = WINDOW_MOD_KEY_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 

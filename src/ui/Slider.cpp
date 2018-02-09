@@ -1,5 +1,5 @@
 #include "ui.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -13,7 +13,7 @@ void Slider::draw(NVGcontext *vg) {
 
 void Slider::onDragStart(EventDragStart &e) {
 	state = BND_ACTIVE;
-	guiCursorLock();
+	windowCursorLock();
 }
 
 void Slider::onDragMove(EventDragMove &e) {
@@ -22,7 +22,7 @@ void Slider::onDragMove(EventDragMove &e) {
 
 void Slider::onDragEnd(EventDragEnd &e) {
 	state = BND_DEFAULT;
-	guiCursorUnlock();
+	windowCursorUnlock();
 	EventAction eAction;
 	onAction(eAction);
 }

@@ -1,5 +1,5 @@
 #include "ui.hpp"
-#include "gui.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -61,11 +61,11 @@ void ScrollWidget::onMouseMove(EventMouseMove &e) {
 	// Scroll with arrow keys
 	if (!gFocusedWidget) {
 		float arrowSpeed = 30.0;
-		if (guiIsShiftPressed() && guiIsModPressed())
+		if (windowIsShiftPressed() && windowIsModPressed())
 			arrowSpeed /= 16.0;
-		else if (guiIsShiftPressed())
+		else if (windowIsShiftPressed())
 			arrowSpeed *= 4.0;
-		else if (guiIsModPressed())
+		else if (windowIsModPressed())
 			arrowSpeed /= 4.0;
 
 		if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) {

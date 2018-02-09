@@ -1,4 +1,4 @@
-#include "gui.hpp"
+#include "window.hpp"
 #include "app.hpp"
 #include "asset.hpp"
 
@@ -29,6 +29,7 @@
 
 
 namespace rack {
+
 
 GLFWwindow *gWindow = NULL;
 NVGcontext *gVg = NULL;
@@ -236,7 +237,7 @@ void cursorEnterCallback(GLFWwindow* window, int entered) {
 void scrollCallback(GLFWwindow *window, double x, double y) {
 	Vec scrollRel = Vec(x, y);
 #if ARCH_LIN || ARCH_WIN
-	if (guiIsShiftPressed())
+	if (windowIsShiftPressed())
 		scrollRel = Vec(y, x);
 #endif
 	// onScroll
@@ -305,7 +306,7 @@ void renderGui() {
 	glfwSwapBuffers(gWindow);
 }
 
-void guiInit() {
+void windowInit() {
 	int err;
 
 	// Set up GLFW
@@ -393,7 +394,7 @@ void guiInit() {
 	bndSetTheme(theme);
 }
 
-void guiDestroy() {
+void windowDestroy() {
 	gGuiFont.reset();
 
 #if defined NANOVG_GL2
@@ -416,7 +417,7 @@ void guiDestroy() {
 	glfwTerminate();
 }
 
-void guiRun() {
+void windowRun() {
 	assert(gWindow);
 	gGuiFrame = 0;
 	while(!glfwWindowShouldClose(gWindow)) {
@@ -483,11 +484,11 @@ void guiRun() {
 	}
 }
 
-void guiClose() {
+void windowClose() {
 	glfwSetWindowShouldClose(gWindow, GLFW_TRUE);
 }
 
-void guiCursorLock() {
+void windowCursorLock() {
 	if (gAllowCursorLock) {
 #ifdef ARCH_MAC
 		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -497,13 +498,13 @@ void guiCursorLock() {
 	}
 }
 
-void guiCursorUnlock() {
+void windowCursorUnlock() {
 	if (gAllowCursorLock) {
 		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
 
-bool guiIsModPressed() {
+bool windowIsModPressed() {
 #ifdef ARCH_MAC
 	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
 #else
@@ -511,35 +512,35 @@ bool guiIsModPressed() {
 #endif
 }
 
-bool guiIsShiftPressed() {
+bool windowIsShiftPressed() {
 	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
-Vec guiGetWindowSize() {
+Vec windowGetWindowSize() {
 	int width, height;
 	glfwGetWindowSize(gWindow, &width, &height);
 	return Vec(width, height);
 }
 
-void guiSetWindowSize(Vec size) {
+void windowSetWindowSize(Vec size) {
 	int width = size.x;
 	int height = size.y;
 	glfwSetWindowSize(gWindow, width, height);
 }
 
-Vec guiGetWindowPos() {
+Vec windowGetWindowPos() {
 	int x, y;
 	glfwGetWindowPos(gWindow, &x, &y);
 	return Vec(x, y);
 }
 
-void guiSetWindowPos(Vec pos) {
+void windowSetWindowPos(Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
 	glfwSetWindowPos(gWindow, x, y);
 }
 
-bool guiIsMaximized() {
+bool windowIsMaximized() {
 	return glfwGetWindowAttrib(gWindow, GLFW_MAXIMIZED);
 }
 
