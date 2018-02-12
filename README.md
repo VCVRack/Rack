@@ -27,7 +27,7 @@ Install [CMake](https://cmake.org/) (for some of Rack's dependencies).
 ### Windows
 
 Install [MSYS2](http://www.msys2.org/) and launch the mingw64 shell (not the default msys2 shell).
-Install build dependencies with the pacman package manger.
+Install build dependencies with the pacman package manager.
 
 	pacman -S git make tar unzip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool
 
