@@ -57,24 +57,7 @@ void RackWidget::clear() {
 	moduleContainer->clearChildren();
 	lastPath = "";
 
-/*
-	// Add all modules to rack
-	Vec pos;
-	for (Plugin *plugin : gPlugins) {
-		for (Model *model : plugin->models) {
-			ModuleWidget *moduleWidget = model->createModuleWidget();
-			moduleContainer->addChild(moduleWidget);
-			// Move module nearest to the mouse position
-			Rect box;
-			box.size = moduleWidget->box.size;
-			box.pos = pos;
-			requestModuleBoxNearest(moduleWidget, box);
-			pos.x += box.size.x;
-		}
-		pos.y += RACK_GRID_HEIGHT;
-		pos.x = 0;
-	}
-*/
+	gRackScene->scrollWidget->offset = Vec(0, 0);
 }
 
 void RackWidget::reset() {
