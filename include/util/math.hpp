@@ -23,13 +23,6 @@ inline int clamp(int x, int minimum, int maximum) {
 	return min(max(x, minimum), maximum);
 }
 
-/** Absolute value of a
-Undefined for a == INT_MIN
-*/
-inline int abs(int a) {
-	return (a >= 0) ? a : -a;
-}
-
 /** Euclidean modulus, always returns 0 <= mod < base for positive base.
 */
 inline int eucmod(int a, int base) {
@@ -54,10 +47,6 @@ inline bool ispow2(int n) {
 ////////////////////
 // basic float functions (suffixed with "f")
 ////////////////////
-
-inline float abs(float x) {
-	return (x >= 0.0f) ? x : -x;
-}
 
 /** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
 inline float sgn(float x) {
