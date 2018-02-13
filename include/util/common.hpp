@@ -8,7 +8,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include <cmath>
 #include <string>
 #include <condition_variable>
 #include <mutex>
