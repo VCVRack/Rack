@@ -267,7 +267,7 @@ DEPRECATED inline int absi(int a) {return abs(a);}
 DEPRECATED inline int eucmodi(int a, int base) {return eucmod(a, base);}
 DEPRECATED inline int log2i(int n) {return log2(n);}
 DEPRECATED inline bool ispow2i(int n) {return ispow2(n);}
-DEPRECATED inline float absf(float x) {return abs(x);}
+DEPRECATED inline float absf(float x) {return fabsf(x);}
 DEPRECATED inline float sgnf(float x) {return sgn(x);}
 DEPRECATED inline float eucmodf(float a, float base) {return eucmod(a, base);}
 DEPRECATED inline bool nearf(float a, float b, float epsilon = 1.0e-6f) {return isNear(a, b, epsilon);}
