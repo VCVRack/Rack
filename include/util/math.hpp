@@ -168,7 +168,7 @@ struct Vec {
 		return x == 0.0f && y == 0.0f;
 	}
 	bool isFinite() {
-		return std::isfinite(x) && std::isfinite(y);
+		return isfinite(x) && isfinite(y);
 	}
 	Vec clamp(Rect bound);
 };
