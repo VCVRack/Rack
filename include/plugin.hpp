@@ -11,6 +11,7 @@ struct ModuleWidget;
 struct Module;
 struct Model;
 
+
 // Subclass this and return a pointer to a new one when init() is called
 struct Plugin {
 	/** A list of the models available by this plugin, add with addModel() */
@@ -39,6 +40,7 @@ struct Plugin {
 	void addModel(Model *model);
 };
 
+
 struct Model {
 	Plugin *plugin = NULL;
 	/** An identifier for the model, e.g. "VCO". Used for saving patches. The slug, manufacturerSlug pair must be unique. */
@@ -54,9 +56,42 @@ struct Model {
 	std::list<ModelTag> tags;
 
 	virtual ~Model() {}
+	/** Creates a headless Module */
 	virtual Module *createModule() { return NULL; }
+	/** Creates a ModuleWidget with a Module attached */
 	virtual ModuleWidget *createModuleWidget() { return NULL; }
+	/** Creates a ModuleWidget with no Module, useful for previews */
+	virtual ModuleWidget *createModuleWidgetNull() { return NULL; }
+
+	/** Create Model subclass which constructs a specific Module and ModuleWidget subclass */
+	template <typename TModule, typename TModuleWidget, typename... Tags>
+	static Model *create(std::string manufacturer, std::string slug, std::string name, Tags... tags) {
+		struct TModel : Model {
+			Module *createModule() override {
+				TModule *module = new TModule();
+				return module;
+			}
+			ModuleWidget *createModuleWidget() override {
+				TModule *module = new TModule();
+				TModuleWidget *moduleWidget = new TModuleWidget(module);
+				moduleWidget->model = this;
+				return moduleWidget;
+			}
+			ModuleWidget *createModuleWidgetNull() override {
+				TModuleWidget *moduleWidget = new TModuleWidget(NULL);
+				moduleWidget->model = this;
+				return moduleWidget;
+			}
+		};
+		TModel *o = new TModel();
+		o->manufacturer = manufacturer;
+		o->slug = slug;
+		o->name = name;
+		o->tags = {tags...};
+		return o;
+	}
 };
+
 
 void pluginInit();
 void pluginDestroy();

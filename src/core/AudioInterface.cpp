@@ -210,99 +210,102 @@ void AudioInterface::step() {
 }
 
 
-AudioInterfaceWidget::AudioInterfaceWidget() {
-	AudioInterface *module = new AudioInterface();
-	setModule(module);
-	box.size = Vec(15*12, 380);
-	{
-		Panel *panel = new LightPanel();
-		panel->box.size = box.size;
-		addChild(panel);
+struct AudioInterfaceWidget : ModuleWidget {
+	AudioInterfaceWidget(AudioInterface *module) : ModuleWidget(module) {
+		box.size = Vec(15*12, 380);
+		{
+			Panel *panel = new LightPanel();
+			panel->box.size = box.size;
+			addChild(panel);
+		}
+
+		addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 365)));
+
+		Vec margin = Vec(5, 2);
+		float labelHeight = 15;
+		float yPos = margin.y + 100;
+		float xPos;
+
+		{
+			Label *label = new Label();
+			label->box.pos = Vec(margin.x, yPos);
+			label->text = "Outputs (DACs)";
+			addChild(label);
+			yPos += labelHeight + margin.y;
+		}
+
+		yPos += 5;
+		xPos = 10;
+		for (int i = 0; i < 4; i++) {
+			addInput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::INPUT, module, AudioInterface::AUDIO_INPUT + i));
+			Label *label = new Label();
+			label->box.pos = Vec(xPos + 4, yPos + 28);
+			label->text = stringf("%d", i + 1);
+			addChild(label);
+
+			xPos += 37 + margin.x;
+		}
+		yPos += 35 + margin.y;
+
+		yPos += 5;
+		xPos = 10;
+		for (int i = 4; i < 8; i++) {
+			addInput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::INPUT, module, AudioInterface::AUDIO_INPUT + i));
+			Label *label = new Label();
+			label->box.pos = Vec(xPos + 4, yPos + 28);
+			label->text = stringf("%d", i + 1);
+			addChild(label);
+
+			xPos += 37 + margin.x;
+		}
+		yPos += 35 + margin.y;
+
+		{
+			Label *label = new Label();
+			label->box.pos = Vec(margin.x, yPos);
+			label->text = "Inputs (ADCs)";
+			addChild(label);
+			yPos += labelHeight + margin.y;
+		}
+
+		yPos += 5;
+		xPos = 10;
+		for (int i = 0; i < 4; i++) {
+			Port *port = Port::create<PJ3410Port>(Vec(xPos, yPos), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + i);
+			addOutput(port);
+			Label *label = new Label();
+			label->box.pos = Vec(xPos + 4, yPos + 28);
+			label->text = stringf("%d", i + 1);
+			addChild(label);
+
+			xPos += 37 + margin.x;
+		}
+		yPos += 35 + margin.y;
+
+		yPos += 5;
+		xPos = 10;
+		for (int i = 4; i < 8; i++) {
+			addOutput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + i));
+			Label *label = new Label();
+			label->box.pos = Vec(xPos + 4, yPos + 28);
+			label->text = stringf("%d", i + 1);
+			addChild(label);
+
+			xPos += 37 + margin.x;
+		}
+		yPos += 35 + margin.y;
+
+		AudioWidget *audioWidget = construct<USB_B_AudioWidget>();
+		audioWidget->audioIO = &module->audioIO;
+		addChild(audioWidget);
+
+		// Lights
+		addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(40, 20), module, AudioInterface::ACTIVE_LIGHT));
 	}
+};
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 365)));
 
-	Vec margin = Vec(5, 2);
-	float labelHeight = 15;
-	float yPos = margin.y + 100;
-	float xPos;
-
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin.x, yPos);
-		label->text = "Outputs (DACs)";
-		addChild(label);
-		yPos += labelHeight + margin.y;
-	}
-
-	yPos += 5;
-	xPos = 10;
-	for (int i = 0; i < 4; i++) {
-		addInput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::INPUT, module, AudioInterface::AUDIO_INPUT + i));
-		Label *label = new Label();
-		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i + 1);
-		addChild(label);
-
-		xPos += 37 + margin.x;
-	}
-	yPos += 35 + margin.y;
-
-	yPos += 5;
-	xPos = 10;
-	for (int i = 4; i < 8; i++) {
-		addInput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::INPUT, module, AudioInterface::AUDIO_INPUT + i));
-		Label *label = new Label();
-		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i + 1);
-		addChild(label);
-
-		xPos += 37 + margin.x;
-	}
-	yPos += 35 + margin.y;
-
-	{
-		Label *label = new Label();
-		label->box.pos = Vec(margin.x, yPos);
-		label->text = "Inputs (ADCs)";
-		addChild(label);
-		yPos += labelHeight + margin.y;
-	}
-
-	yPos += 5;
-	xPos = 10;
-	for (int i = 0; i < 4; i++) {
-		Port *port = Port::create<PJ3410Port>(Vec(xPos, yPos), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + i);
-		addOutput(port);
-		Label *label = new Label();
-		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i + 1);
-		addChild(label);
-
-		xPos += 37 + margin.x;
-	}
-	yPos += 35 + margin.y;
-
-	yPos += 5;
-	xPos = 10;
-	for (int i = 4; i < 8; i++) {
-		addOutput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + i));
-		Label *label = new Label();
-		label->box.pos = Vec(xPos + 4, yPos + 28);
-		label->text = stringf("%d", i + 1);
-		addChild(label);
-
-		xPos += 37 + margin.x;
-	}
-	yPos += 35 + margin.y;
-
-	AudioWidget *audioWidget = construct<USB_B_AudioWidget>();
-	audioWidget->audioIO = &module->audioIO;
-	addChild(audioWidget);
-
-	// Lights
-	addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(40, 20), module, AudioInterface::ACTIVE_LIGHT));
-}
+Model *modelAudioInterface = Model::create<AudioInterface, AudioInterfaceWidget>("Core", "AudioInterface", "Audio Interface", EXTERNAL_TAG);

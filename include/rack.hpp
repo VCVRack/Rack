@@ -18,8 +18,9 @@ namespace rack {
 // helpers
 ////////////////////
 
+/** Deprecated, use Model::create<TModule, TModuleWidget>(...) instead */
 template <class TModuleWidget, typename... Tags>
-Model *createModel(std::string manufacturer, std::string slug, std::string name, Tags... tags) {
+DEPRECATED Model *createModel(std::string manufacturer, std::string slug, std::string name, Tags... tags) {
 	struct TModel : Model {
 		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
