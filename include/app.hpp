@@ -60,8 +60,8 @@ struct ModuleWidget : OpaqueWidget {
 	std::vector<Port*> outputs;
 	std::vector<ParamWidget*> params;
 
+	ModuleWidget(Module *module);
 	~ModuleWidget();
-	void setModule(Module *module);
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addInput(Port *input);
 	void addOutput(Port *output);

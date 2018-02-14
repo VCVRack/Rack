@@ -56,58 +56,68 @@ struct ModuleResizeHandle : Widget {
 };
 
 
-BlankWidget::BlankWidget() {
-	box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
+struct BlankWidget : ModuleWidget {
+	Panel *panel;
+	Widget *topRightScrew;
+	Widget *bottomRightScrew;
+	Widget *rightHandle;
 
-	{
-		panel = new LightPanel();
+	BlankWidget(Module *module) : ModuleWidget(module) {
+		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
+
+		{
+			panel = new LightPanel();
+			panel->box.size = box.size;
+			addChild(panel);
+		}
+
+		ModuleResizeHandle *leftHandle = new ModuleResizeHandle();
+		ModuleResizeHandle *rightHandle = new ModuleResizeHandle();
+		rightHandle->right = true;
+		this->rightHandle = rightHandle;
+		addChild(leftHandle);
+		addChild(rightHandle);
+
+		addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
+		topRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0));
+		bottomRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365));
+		addChild(topRightScrew);
+		addChild(bottomRightScrew);
+	}
+
+	void step() override {
 		panel->box.size = box.size;
-		addChild(panel);
+		topRightScrew->box.pos.x = box.size.x - 30;
+		bottomRightScrew->box.pos.x = box.size.x - 30;
+		if (box.size.x < RACK_GRID_WIDTH * 6) {
+			topRightScrew->visible = bottomRightScrew->visible = false;
+		}
+		else {
+			topRightScrew->visible = bottomRightScrew->visible = true;
+		}
+		rightHandle->box.pos.x = box.size.x - rightHandle->box.size.x;
+		ModuleWidget::step();
 	}
 
-	ModuleResizeHandle *leftHandle = new ModuleResizeHandle();
-	ModuleResizeHandle *rightHandle = new ModuleResizeHandle();
-	rightHandle->right = true;
-	this->rightHandle = rightHandle;
-	addChild(leftHandle);
-	addChild(rightHandle);
+	json_t *toJson() override {
+		json_t *rootJ = ModuleWidget::toJson();
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	topRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0));
-	bottomRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365));
-	addChild(topRightScrew);
-	addChild(bottomRightScrew);
-}
+		// // width
+		json_object_set_new(rootJ, "width", json_real(box.size.x));
 
-void BlankWidget::step() {
-	panel->box.size = box.size;
-	topRightScrew->box.pos.x = box.size.x - 30;
-	bottomRightScrew->box.pos.x = box.size.x - 30;
-	if (box.size.x < RACK_GRID_WIDTH * 6) {
-		topRightScrew->visible = bottomRightScrew->visible = false;
+		return rootJ;
 	}
-	else {
-		topRightScrew->visible = bottomRightScrew->visible = true;
+
+	void fromJson(json_t *rootJ) override {
+		ModuleWidget::fromJson(rootJ);
+
+		// width
+		json_t *widthJ = json_object_get(rootJ, "width");
+		if (widthJ)
+			box.size.x = json_number_value(widthJ);
 	}
-	rightHandle->box.pos.x = box.size.x - rightHandle->box.size.x;
-	ModuleWidget::step();
-}
+};
 
-json_t *BlankWidget::toJson() {
-	json_t *rootJ = ModuleWidget::toJson();
 
-	// // width
-	json_object_set_new(rootJ, "width", json_real(box.size.x));
-
-	return rootJ;
-}
-
-void BlankWidget::fromJson(json_t *rootJ) {
-	ModuleWidget::fromJson(rootJ);
-
-	// width
-	json_t *widthJ = json_object_get(rootJ, "width");
-	if (widthJ)
-		box.size.x = json_number_value(widthJ);
-}
+Model *modelBlank = Model::create<Module, BlankWidget>("Core", "Blank", "Blank", BLANK_TAG);

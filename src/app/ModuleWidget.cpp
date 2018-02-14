@@ -7,22 +7,22 @@
 namespace rack {
 
 
-ModuleWidget::~ModuleWidget() {
-	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
-	disconnect();
-	// Remove and delete the Module instance
-	setModule(NULL);
-}
-
-void ModuleWidget::setModule(Module *module) {
-	if (this->module) {
-		engineRemoveModule(this->module);
-		delete this->module;
-	}
+ModuleWidget::ModuleWidget(Module *module) {
 	if (module) {
 		engineAddModule(module);
 	}
 	this->module = module;
+}
+
+ModuleWidget::~ModuleWidget() {
+	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
+	disconnect();
+	// Remove and delete the Module instance
+	if (module) {
+		engineRemoveModule(module);
+		delete module;
+		module = NULL;
+	}
 }
 
 void ModuleWidget::addInput(Port *input) {

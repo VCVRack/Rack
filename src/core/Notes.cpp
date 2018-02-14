@@ -4,41 +4,48 @@ using namespace rack;
 
 
 
-NotesWidget::NotesWidget() {
-	box.size = Vec(RACK_GRID_WIDTH * 18, RACK_GRID_HEIGHT);
+struct NotesWidget : ModuleWidget {
+	TextField *textField;
 
-	{
-		Panel *panel = new LightPanel();
-		panel->box.size = box.size;
-		addChild(panel);
+	NotesWidget(Module *module) : ModuleWidget(module) {
+		box.size = Vec(RACK_GRID_WIDTH * 18, RACK_GRID_HEIGHT);
+
+		{
+			Panel *panel = new LightPanel();
+			panel->box.size = box.size;
+			addChild(panel);
+		}
+
+		addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
+
+		textField = new TextField();
+		textField->box.pos = Vec(15, 15);
+		textField->box.size = box.size.minus(Vec(30, 30));
+		textField->multiline = true;
+		addChild(textField);
 	}
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
+	json_t *toJson() override {
+		json_t *rootJ = ModuleWidget::toJson();
 
-	textField = new TextField();
-	textField->box.pos = Vec(15, 15);
-	textField->box.size = box.size.minus(Vec(30, 30));
-	textField->multiline = true;
-	addChild(textField);
-}
+		// text
+		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
 
-json_t *NotesWidget::toJson() {
-	json_t *rootJ = ModuleWidget::toJson();
+		return rootJ;
+	}
 
-	// text
-	json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
+	void fromJson(json_t *rootJ) override {
+		ModuleWidget::fromJson(rootJ);
 
-	return rootJ;
-}
+		// text
+		json_t *textJ = json_object_get(rootJ, "text");
+		if (textJ)
+			textField->text = json_string_value(textJ);
+	}
+};
 
-void NotesWidget::fromJson(json_t *rootJ) {
-	ModuleWidget::fromJson(rootJ);
 
-	// text
-	json_t *textJ = json_object_get(rootJ, "text");
-	if (textJ)
-		textField->text = json_string_value(textJ);
-}
+Model *modelNotes = Model::create<Module, NotesWidget>("Core", "Notes", "Notes", BLANK_TAG);
