@@ -1,5 +1,9 @@
 #pragma once
 #include "util/common.hpp"
+#ifndef _GLIBCXX_USE_C99_MATH
+	#define _GLIBCXX_USE_C99_MATH
+#endif
+#include <math.h>
 
 
 namespace rack {
