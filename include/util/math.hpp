@@ -1,10 +1,14 @@
 #pragma once
 #include "util/common.hpp"
-#include <cmath>
+#include <math.h> // for global namespace functions
+#include <cmath> // for std::isfinite, etc
 
 
 // Use a few standard math functions without std::
 using std::isfinite;
+using std::isinf;
+using std::isnan;
+using std::isnormal;
 
 
 namespace rack {
