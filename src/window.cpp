@@ -516,6 +516,10 @@ bool windowIsShiftPressed() {
 	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
+bool windowIsKeyPressed(int key) {
+	return glfwGetKey(gWindow, key) == GLFW_PRESS;
+}
+
 Vec windowGetWindowSize() {
 	int width, height;
 	glfwGetWindowSize(gWindow, &width, &height);

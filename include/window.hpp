@@ -38,6 +38,7 @@ void windowCursorLock();
 void windowCursorUnlock();
 bool windowIsModPressed();
 bool windowIsShiftPressed();
+bool windowIsKeyPressed(int key);
 Vec windowGetWindowSize();
 void windowSetWindowSize(Vec size);
 Vec windowGetWindowPos();

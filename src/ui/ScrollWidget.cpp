@@ -68,16 +68,16 @@ void ScrollWidget::onMouseMove(EventMouseMove &e) {
 		else if (windowIsModPressed())
 			arrowSpeed /= 4.0;
 
-		if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		if (windowIsKeyPressed(GLFW_KEY_LEFT)) {
 			offset.x -= arrowSpeed;
 		}
-		if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		if (windowIsKeyPressed(GLFW_KEY_RIGHT)) {
 			offset.x += arrowSpeed;
 		}
-		if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) {
+		if (windowIsKeyPressed(GLFW_KEY_UP)) {
 			offset.y -= arrowSpeed;
 		}
-		if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		if (windowIsKeyPressed(GLFW_KEY_DOWN)) {
 			offset.y += arrowSpeed;
 		}
 	}

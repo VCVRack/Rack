@@ -1,8 +1,6 @@
 #include "app.hpp"
 #include "window.hpp"
 #include "engine.hpp"
-// For GLFW_KEY_LEFT_CONTROL, etc.
-#include <GLFW/glfw3.h>
 
 
 namespace rack {

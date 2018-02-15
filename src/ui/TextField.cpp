@@ -1,8 +1,6 @@
 #include "ui.hpp"
 // for gVg
 #include "window.hpp"
-// for key codes
-#include <GLFW/glfw3.h>
 
 
 namespace rack {
