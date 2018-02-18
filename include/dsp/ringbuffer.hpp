@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string.h>
-#include "util/math.hpp"
+#include "util/common.hpp"
 
 
 namespace rack {
@@ -115,20 +115,25 @@ The linear array of S elements are moved back to the start of the block once it 
 This happens every N - S pushes, so the push() time is O(1 + S / (N - S)).
 For example, a float buffer of size 64 in a block of size 1024 is nearly as efficient as RingBuffer.
 */
-template <typename T, size_t S, size_t N>
+template <typename T, int S, int N>
 struct AppleRingBuffer {
 	T data[N];
-	size_t start = 0;
-	size_t end = 0;
+	int start = 0;
+	int end = 0;
 
+	void returnBuffer() {
+		// move end block to beginning
+		// may overlap, but that's okay
+		int s = size();
+		memmove(data, &data[start], sizeof(T) * s);
+		start = 0;
+		end = s;
+	}
 	void push(T t) {
-		data[end++] = t;
-		if (end >= N) {
-			// move end block to beginning
-			memmove(data, &data[N - S], sizeof(T) * S);
-			start -= N - S;
-			end = S;
+		if (end + 1 > N) {
+			returnBuffer();
 		}
+		data[end++] = t;
 	}
 	T shift() {
 		return data[start++];
@@ -139,14 +144,25 @@ struct AppleRingBuffer {
 	bool full() const {
 		return end - start >= S;
 	}
-	size_t size() const {
+	int size() const {
 		return end - start;
+	}
+	int capacity() const {
+		return S - size();
 	}
 	/** Returns a pointer to S consecutive elements for appending, requesting to append n elements.
 	*/
-	T *endData(size_t n) {
-		// TODO
+	T *endData(int n) {
+		if (end + n > N) {
+			returnBuffer();
+		}
 		return &data[end];
+	}
+	/** Actually increments the end position
+	Must be called after endData(), and `n` must be at most the `n` passed to endData()
+	*/
+	void endIncr(int n) {
+		end += n;
 	}
 	/** Returns a pointer to S consecutive elements for consumption
 	If any data is consumed, call startIncr afterwards.
@@ -154,7 +170,7 @@ struct AppleRingBuffer {
 	const T *startData() const {
 		return &data[start];
 	}
-	void startIncr(size_t n) {
+	void startIncr(int n) {
 		// This is valid as long as n < S
 		start += n;
 	}
