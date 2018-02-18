@@ -140,8 +140,9 @@ $(libzip):
 	$(MAKE) -C libzip-1.2.0 install
 
 $(rtmidi):
-	git clone https://github.com/thestk/rtmidi.git
-	cd rtmidi && ./autogen.sh --no-configure && ./configure --prefix="$(LOCAL)"
+	$(WGET) https://vcvrack.com/downloads/dep/rtmidi.tgz
+	$(UNTAR) rtmidi.tgz
+	cd rtmidi && ./configure --prefix="$(LOCAL)"
 	$(MAKE) -C rtmidi
 	$(MAKE) -C rtmidi install
 
