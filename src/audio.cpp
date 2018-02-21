@@ -149,7 +149,7 @@ void AudioIO::openStream() {
 		inParameters.nChannels = numInputs;
 
 		RtAudio::StreamOptions options;
-		// options.flags |= RTAUDIO_SCHEDULE_REALTIME;
+		options.flags |= RTAUDIO_JACK_DONT_CONNECT;
 
 		int closestSampleRate = deviceInfo.preferredSampleRate;
 		for (int sr : deviceInfo.sampleRates) {
