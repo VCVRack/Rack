@@ -2,7 +2,8 @@
 #include "audio.hpp"
 
 
-#define DRIVER_BRIDGE -1
+#define BRIDGE_DRIVER -1
+#define BRIDGE_CHANNELS 16
 
 
 namespace rack {
@@ -23,7 +24,7 @@ std::vector<int> AudioIO::listDrivers() {
 	for (RtAudio::Api api : apis)
 		drivers.push_back((int) api);
 	// Add Bridge fake driver
-	// drivers.push_back(DRIVER_BRIDGE);
+	drivers.push_back(BRIDGE_DRIVER);
 	return drivers;
 }
 
@@ -39,7 +40,7 @@ std::string AudioIO::getDriverName(int driver) {
 		case RtAudio::WINDOWS_ASIO: return "ASIO";
 		case RtAudio::WINDOWS_DS: return "DirectSound";
 		case RtAudio::RTAUDIO_DUMMY: return "Dummy";
-		case DRIVER_BRIDGE: return "VCV Bridge";
+		case BRIDGE_DRIVER: return "Bridge";
 		default: return "Unknown";
 	}
 }
@@ -58,9 +59,9 @@ void AudioIO::setDriver(int driver) {
 		rtAudio = new RtAudio((RtAudio::Api) driver);
 		this->driver = (int) rtAudio->getCurrentApi();
 	}
-	else if (driver == DRIVER_BRIDGE) {
+	else if (driver == BRIDGE_DRIVER) {
 		// TODO Connect to Bridge
-		this->driver = DRIVER_BRIDGE;
+		this->driver = BRIDGE_DRIVER;
 	}
 }
 
@@ -68,40 +69,56 @@ int AudioIO::getDeviceCount() {
 	if (rtAudio) {
 		return rtAudio->getDeviceCount();
 	}
-	if (driver == DRIVER_BRIDGE) {
-		return 16;
+	if (driver == BRIDGE_DRIVER) {
+		return BRIDGE_CHANNELS;
 	}
 	return 0;
 }
 
 std::string AudioIO::getDeviceName(int device) {
+	if (device < 0)
+		return "";
+
 	if (rtAudio) {
 		try {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
+			RtAudio::DeviceInfo deviceInfo;
+			if (device == this->device)
+				deviceInfo = this->deviceInfo;
+			else
+				deviceInfo = rtAudio->getDeviceInfo(device);
 			return deviceInfo.name;
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to query RtAudio device: %s", e.what());
 		}
 	}
-	if (driver == DRIVER_BRIDGE) {
-		return stringf("%d", device + 1);
+	if (driver == BRIDGE_DRIVER) {
+		if (device >= 0)
+			return stringf("%d", device + 1);
 	}
 	return "";
 }
 
 std::string AudioIO::getDeviceDetail(int device) {
+	if (device < 0)
+		return "";
+
 	if (rtAudio) {
 		try {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
+			RtAudio::DeviceInfo deviceInfo;
+			if (device == this->device)
+				deviceInfo = this->deviceInfo;
+			else
+				deviceInfo = rtAudio->getDeviceInfo(device);
 			return stringf("%s (%d in, %d out)", deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
 		}
 		catch (RtAudioError &e) {
 			warn("Failed to query RtAudio device: %s", e.what());
 		}
 	}
-	if (driver == DRIVER_BRIDGE) {
-		return stringf("Channel %d", device + 1);
+	if (driver == BRIDGE_DRIVER) {
+		if (device >= 0)
+			return stringf("Channel %d", device + 1);
 	}
 	return "";
 }
@@ -123,7 +140,6 @@ void AudioIO::openStream() {
 
 	if (rtAudio) {
 		// Open new device
-		RtAudio::DeviceInfo deviceInfo;
 		try {
 			deviceInfo = rtAudio->getDeviceInfo(device);
 		}
@@ -184,6 +200,11 @@ void AudioIO::openStream() {
 		this->device = device;
 		onOpenStream();
 	}
+	if (driver == BRIDGE_DRIVER) {
+		if (device < BRIDGE_CHANNELS) {
+			this->device = device;
+		}
+	}
 }
 
 void AudioIO::closeStream() {
@@ -206,6 +227,7 @@ void AudioIO::closeStream() {
 				warn("Failed to close RtAudio stream %s", e.what());
 			}
 		}
+		deviceInfo = RtAudio::DeviceInfo();
 	}
 
 	// Reset rtAudio settings
@@ -234,7 +256,7 @@ std::vector<int> AudioIO::listSampleRates() {
 			warn("Failed to query RtAudio device: %s", e.what());
 		}
 	}
-	if (driver == DRIVER_BRIDGE) {
+	if (driver == BRIDGE_DRIVER) {
 		return {44100, 48000, 88200, 96000, 176400, 192000};
 	}
 

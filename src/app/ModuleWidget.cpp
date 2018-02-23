@@ -346,6 +346,8 @@ Menu *ModuleWidget::createContextMenu() {
 	deleteItem->moduleWidget = this;
 	menu->addChild(deleteItem);
 
+	appendContextMenu(menu);
+
 	return menu;
 }
 

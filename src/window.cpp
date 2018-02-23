@@ -382,7 +382,7 @@ void windowInit() {
 	assert(gFramebufferVg);
 
 	// Set up Blendish
-	gGuiFont = Font::load(assetGlobal("res/DejaVuSans.ttf"));
+	gGuiFont = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	bndSetFont(gGuiFont->handle);
 	// bndSetIconImage(loadImage(assetGlobal("res/icons.png")));
 

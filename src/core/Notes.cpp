@@ -8,22 +8,15 @@ struct NotesWidget : ModuleWidget {
 	TextField *textField;
 
 	NotesWidget(Module *module) : ModuleWidget(module) {
-		box.size = Vec(RACK_GRID_WIDTH * 18, RACK_GRID_HEIGHT);
+		setPanel(SVG::load(assetGlobal("res/Core/Notes.svg")));
 
-		{
-			Panel *panel = new LightPanel();
-			panel->box.size = box.size;
-			addChild(panel);
-		}
+		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
-
-		textField = new TextField();
-		textField->box.pos = Vec(15, 15);
-		textField->box.size = box.size.minus(Vec(30, 30));
+		textField = Widget::create<LedDisplayTextField>(mm2px(Vec(3.39962, 14.8373)));
+		textField->box.size = mm2px(Vec(74.480, 102.753));
 		textField->multiline = true;
 		addChild(textField);
 	}

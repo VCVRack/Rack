@@ -23,6 +23,7 @@ struct AudioIO {
 	int numOutputs = 0;
 	int numInputs = 0;
 	RtAudio *rtAudio = NULL;
+	RtAudio::DeviceInfo deviceInfo;
 
 	AudioIO();
 	virtual ~AudioIO();

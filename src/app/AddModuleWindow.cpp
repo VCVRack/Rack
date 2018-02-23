@@ -55,7 +55,7 @@ struct MetadataMenu : ListMenu {
 				// Tag list
 				if (!model->tags.empty()) {
 					for (ModelTag tag : model->tags) {
-						addChild(construct<MenuLabel>(&MenuEntry::text, gTagNames[tag]));
+						addChild(construct<MenuLabel>(&MenuLabel::text, gTagNames[tag]));
 					}
 					addChild(construct<MenuEntry>());
 				}
@@ -66,17 +66,17 @@ struct MetadataMenu : ListMenu {
 					pluginName += " v";
 					pluginName += model->plugin->version;
 				}
-				addChild(construct<MenuLabel>(&MenuEntry::text, pluginName));
+				addChild(construct<MenuLabel>(&MenuLabel::text, pluginName));
 
 				// Plugin metadata
 				if (!model->plugin->website.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Website", &UrlItem::url, model->plugin->website));
+					addChild(construct<UrlItem>(&MenuItem::text, "Website", &UrlItem::url, model->plugin->website));
 				}
 				if (!model->plugin->manual.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Manual", &UrlItem::url, model->plugin->manual));
+					addChild(construct<UrlItem>(&MenuItem::text, "Manual", &UrlItem::url, model->plugin->manual));
 				}
 				if (!model->plugin->path.empty()) {
-					addChild(construct<UrlItem>(&MenuEntry::text, "Browse directory", &UrlItem::url, model->plugin->path));
+					addChild(construct<UrlItem>(&MenuItem::text, "Browse directory", &UrlItem::url, model->plugin->path));
 				}
 			}
 		}
@@ -137,7 +137,7 @@ struct ModelMenu : ListMenu {
 			for (Plugin *plugin : gPlugins) {
 				for (Model *model : plugin->models) {
 					if (model->manufacturer == manufacturer) {
-						addChild(construct<ModelItem>(&MenuEntry::text, model->name, &ModelItem::model, model));
+						addChild(construct<ModelItem>(&MenuItem::text, model->name, &ModelItem::model, model));
 					}
 				}
 			}
@@ -190,7 +190,7 @@ struct ManufacturerMenu : ListMenu {
 		}
 		// Add menu item for each manufacturer name
 		for (std::string manufacturer : manufacturers) {
-			addChild(construct<ManufacturerItem>(&MenuEntry::text, manufacturer));
+			addChild(construct<ManufacturerItem>(&MenuItem::text, manufacturer));
 		}
 	}
 

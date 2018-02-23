@@ -25,8 +25,20 @@ void TextField::draw(NVGcontext *vg) {
 }
 
 void TextField::onMouseDown(EventMouseDown &e) {
-	end = begin = bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), e.pos.x, e.pos.y);
+	dragPos = getTextPosition(e.pos);
+	begin = end = dragPos;
 	OpaqueWidget::onMouseDown(e);
+}
+
+void TextField::onMouseMove(EventMouseMove &e) {
+	if (this == gDraggedWidget) {
+		int pos = getTextPosition(e.pos);
+		if (pos != dragPos) {
+			begin = min(dragPos, pos);
+			end = max(dragPos, pos);
+		}
+	}
+	OpaqueWidget::onMouseMove(e);
 }
 
 void TextField::onFocus(EventFocus &e) {
@@ -129,6 +141,10 @@ void TextField::insertText(std::string newText) {
 	begin += newText.size();
 	end = begin;
 	onTextChange();
+}
+
+int TextField::getTextPosition(Vec mousePos) {
+	return bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
 }
 
 
