@@ -18,7 +18,7 @@ struct AudioDriverChoice : LedDisplayChoice {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Audio driver"));
-		for (int driver : audioWidget->audioIO->listDrivers()) {
+		for (int driver : audioWidget->audioIO->getDrivers()) {
 			AudioDriverItem *item = new AudioDriverItem();
 			item->audioIO = audioWidget->audioIO;
 			item->driver = driver;
@@ -93,7 +93,7 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Sample rate"));
-		for (int sampleRate : audioWidget->audioIO->listSampleRates()) {
+		for (int sampleRate : audioWidget->audioIO->getSampleRates()) {
 			AudioSampleRateItem *item = new AudioSampleRateItem();
 			item->audioIO = audioWidget->audioIO;
 			item->sampleRate = sampleRate;
@@ -139,18 +139,7 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 };
 
 
-struct AudioWidget::Internal {
-	LedDisplayChoice *driverChoice;
-	LedDisplaySeparator *driverSeparator;
-	LedDisplayChoice *deviceChoice;
-	LedDisplaySeparator *deviceSeparator;
-	LedDisplayChoice *sampleRateChoice;
-	LedDisplaySeparator *sampleRateSeparator;
-	LedDisplayChoice *bufferSizeChoice;
-};
-
 AudioWidget::AudioWidget() {
-	internal = new Internal();
 	box.size = mm2px(Vec(44, 28));
 
 	Vec pos = Vec();
@@ -159,48 +148,44 @@ AudioWidget::AudioWidget() {
 	driverChoice->audioWidget = this;
 	addChild(driverChoice);
 	pos = driverChoice->box.getBottomLeft();
-	internal->driverChoice = driverChoice;
+	this->driverChoice = driverChoice;
 
-	internal->driverSeparator = Widget::create<LedDisplaySeparator>(pos);
-	addChild(internal->driverSeparator);
+	this->driverSeparator = Widget::create<LedDisplaySeparator>(pos);
+	addChild(this->driverSeparator);
 
 	AudioDeviceChoice *deviceChoice = Widget::create<AudioDeviceChoice>(pos);
 	deviceChoice->audioWidget = this;
 	addChild(deviceChoice);
 	pos = deviceChoice->box.getBottomLeft();
-	internal->deviceChoice = deviceChoice;
+	this->deviceChoice = deviceChoice;
 
-	internal->deviceSeparator = Widget::create<LedDisplaySeparator>(pos);
-	addChild(internal->deviceSeparator);
+	this->deviceSeparator = Widget::create<LedDisplaySeparator>(pos);
+	addChild(this->deviceSeparator);
 
 	AudioSampleRateChoice *sampleRateChoice = Widget::create<AudioSampleRateChoice>(pos);
 	sampleRateChoice->audioWidget = this;
 	addChild(sampleRateChoice);
-	internal->sampleRateChoice = sampleRateChoice;
+	this->sampleRateChoice = sampleRateChoice;
 
-	internal->sampleRateSeparator = Widget::create<LedDisplaySeparator>(pos);
-	internal->sampleRateSeparator->box.size.y = internal->sampleRateChoice->box.size.y;
-	addChild(internal->sampleRateSeparator);
+	this->sampleRateSeparator = Widget::create<LedDisplaySeparator>(pos);
+	this->sampleRateSeparator->box.size.y = this->sampleRateChoice->box.size.y;
+	addChild(this->sampleRateSeparator);
 
 	AudioBlockSizeChoice *bufferSizeChoice = Widget::create<AudioBlockSizeChoice>(pos);
 	bufferSizeChoice->audioWidget = this;
 	addChild(bufferSizeChoice);
-	internal->bufferSizeChoice = bufferSizeChoice;
-}
-
-AudioWidget::~AudioWidget() {
-	delete internal;
+	this->bufferSizeChoice = bufferSizeChoice;
 }
 
 void AudioWidget::step() {
-	internal->driverChoice->box.size.x = box.size.x;
-	internal->driverSeparator->box.size.x = box.size.x;
-	internal->deviceChoice->box.size.x = box.size.x;
-	internal->deviceSeparator->box.size.x = box.size.x;
-	internal->sampleRateChoice->box.size.x = box.size.x / 2;
-	internal->sampleRateSeparator->box.pos.x = box.size.x / 2;
-	internal->bufferSizeChoice->box.pos.x = box.size.x / 2;
-	internal->bufferSizeChoice->box.size.x = box.size.x / 2;
+	this->driverChoice->box.size.x = box.size.x;
+	this->driverSeparator->box.size.x = box.size.x;
+	this->deviceChoice->box.size.x = box.size.x;
+	this->deviceSeparator->box.size.x = box.size.x;
+	this->sampleRateChoice->box.size.x = box.size.x / 2;
+	this->sampleRateSeparator->box.pos.x = box.size.x / 2;
+	this->bufferSizeChoice->box.pos.x = box.size.x / 2;
+	this->bufferSizeChoice->box.size.x = box.size.x / 2;
 	LedDisplay::step();
 }
 

@@ -6,7 +6,8 @@ void init(rack::Plugin *p) {
 	p->version = TOSTRING(VERSION);
 
 	p->addModel(modelAudioInterface);
-	p->addModel(modelMidiToCvInterface);
+	p->addModel(modelMIDIToCVInterface);
+	p->addModel(modelMIDICCToCVInterface);
 	p->addModel(modelBlank);
 	p->addModel(modelNotes);
 

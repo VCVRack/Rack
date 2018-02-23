@@ -23,12 +23,13 @@ struct AudioIO {
 	int numOutputs = 0;
 	int numInputs = 0;
 	RtAudio *rtAudio = NULL;
+	/** Cached */
 	RtAudio::DeviceInfo deviceInfo;
 
 	AudioIO();
 	virtual ~AudioIO();
 
-	std::vector<int> listDrivers();
+	std::vector<int> getDrivers();
 	std::string getDriverName(int driver);
 	void setDriver(int driver);
 
@@ -40,7 +41,7 @@ struct AudioIO {
 	/** Returns whether the audio stream is open and running */
 	bool isActive();
 
-	std::vector<int> listSampleRates();
+	std::vector<int> getSampleRates();
 
 	virtual void processStream(const float *input, float *output, int length) {}
 	virtual void onCloseStream() {}

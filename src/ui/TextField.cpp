@@ -48,8 +48,10 @@ void TextField::onFocus(EventFocus &e) {
 }
 
 void TextField::onText(EventText &e) {
-	std::string newText(1, (char) e.codepoint);
-	insertText(newText);
+	if (e.codepoint < 128) {
+		std::string newText(1, (char) e.codepoint);
+		insertText(newText);
+	}
 	e.consumed = true;
 }
 
@@ -110,12 +112,27 @@ void TextField::onKey(EventKey &e) {
 					insertText(newText);
 			}
 			break;
+		case GLFW_KEY_X:
+			if (windowIsModPressed()) {
+				if (begin < end) {
+					std::string selectedText = text.substr(begin, end - begin);
+					glfwSetClipboardString(gWindow, selectedText.c_str());
+					insertText("");
+				}
+			}
+			break;
 		case GLFW_KEY_C:
 			if (windowIsModPressed()) {
 				if (begin < end) {
 					std::string selectedText = text.substr(begin, end - begin);
 					glfwSetClipboardString(gWindow, selectedText.c_str());
 				}
+			}
+			break;
+		case GLFW_KEY_A:
+			if (windowIsModPressed()) {
+				begin = 0;
+				end = text.size();
 			}
 			break;
 		case GLFW_KEY_ENTER:

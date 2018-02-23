@@ -5,7 +5,8 @@ using namespace rack;
 
 
 extern Model *modelAudioInterface;
-extern Model *modelMidiToCvInterface;
+extern Model *modelMIDIToCVInterface;
+extern Model *modelMIDICCToCVInterface;
 extern Model *modelBlank;
 extern Model *modelNotes;
 

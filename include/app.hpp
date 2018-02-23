@@ -337,6 +337,7 @@ struct LedDisplaySeparator : TransparentWidget {
 struct LedDisplayChoice : TransparentWidget {
 	std::string text;
 	std::shared_ptr<Font> font;
+	Vec textOffset;
 	NVGcolor color;
 	LedDisplayChoice();
 	void draw(NVGcontext *vg) override;
@@ -345,6 +346,7 @@ struct LedDisplayChoice : TransparentWidget {
 
 struct LedDisplayTextField : TextField {
 	std::shared_ptr<Font> font;
+	Vec textOffset;
 	NVGcolor color;
 	LedDisplayTextField();
 	void draw(NVGcontext *vg) override;
@@ -358,20 +360,26 @@ struct MidiIO;
 struct AudioWidget : LedDisplay {
 	/** Not owned */
 	AudioIO *audioIO = NULL;
-	struct Internal;
-	Internal *internal;
+	LedDisplayChoice *driverChoice;
+	LedDisplaySeparator *driverSeparator;
+	LedDisplayChoice *deviceChoice;
+	LedDisplaySeparator *deviceSeparator;
+	LedDisplayChoice *sampleRateChoice;
+	LedDisplaySeparator *sampleRateSeparator;
+	LedDisplayChoice *bufferSizeChoice;
 	AudioWidget();
-	~AudioWidget();
 	void step() override;
 };
 
 struct MidiWidget : LedDisplay {
 	/** Not owned */
 	MidiIO *midiIO = NULL;
-	struct Internal;
-	Internal *internal;
+	LedDisplayChoice *driverChoice;
+	LedDisplaySeparator *driverSeparator;
+	LedDisplayChoice *deviceChoice;
+	LedDisplaySeparator *deviceSeparator;
+	LedDisplayChoice *channelChoice;
 	MidiWidget();
-	~MidiWidget();
 	void step() override;
 };
 
