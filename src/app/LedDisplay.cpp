@@ -34,6 +34,7 @@ LedDisplayChoice::LedDisplayChoice() {
 	box.size = mm2px(Vec(0, 28.0 / 3));
 	font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
+	textOffset = Vec(10, 18);
 }
 
 void LedDisplayChoice::draw(NVGcontext *vg) {
@@ -44,13 +45,12 @@ void LedDisplayChoice::draw(NVGcontext *vg) {
 	nvgFontFaceId(vg, font->handle);
 	nvgTextLetterSpacing(vg, 0.0);
 
-	Vec textPos = Vec(10, 18);
 	nvgFontSize(vg, 12);
-	nvgText(vg, textPos.x, textPos.y, text.c_str(), NULL);
+	nvgText(vg, textOffset.x, textOffset.y, text.c_str(), NULL);
 }
 
 void LedDisplayChoice::onMouseDown(EventMouseDown &e) {
-	if (e.button == 1) {
+	if (e.button == 0 || e.button == 1) {
 		EventAction eAction;
 		onAction(eAction);
 		e.consumed = true;
@@ -62,9 +62,9 @@ void LedDisplayChoice::onMouseDown(EventMouseDown &e) {
 LedDisplayTextField::LedDisplayTextField() {
 	font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
+	textOffset = Vec(5, 5);
 }
 
-static const Vec textFieldPos = Vec(5, 5);
 
 void LedDisplayTextField::draw(NVGcontext *vg) {
 	// Background
@@ -82,8 +82,8 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 	NVGcolor highlightColor = color;
 	highlightColor.a = 0.5;
 	int cend = (this == gFocusedWidget) ? end : -1;
-	bndIconLabelCaret(vg, textFieldPos.x, textFieldPos.y,
-		box.size.x - 2*textFieldPos.x, box.size.y - 2*textFieldPos.y,
+	bndIconLabelCaret(vg, textOffset.x, textOffset.y,
+		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 		-1, color, 12, text.c_str(), highlightColor, begin, cend);
 
 	bndSetFont(gGuiFont->handle);
@@ -91,8 +91,8 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 
 int LedDisplayTextField::getTextPosition(Vec mousePos) {
 	bndSetFont(font->handle);
-	int textPos = bndIconLabelTextPosition(gVg, textFieldPos.x, textFieldPos.y,
-		box.size.x - 2*textFieldPos.x, box.size.y - 2*textFieldPos.y,
+	int textPos = bndIconLabelTextPosition(gVg, textOffset.x, textOffset.y,
+		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 		-1, 12, text.c_str(), mousePos.x, mousePos.y);
 	bndSetFont(gGuiFont->handle);
 	return textPos;

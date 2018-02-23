@@ -17,7 +17,7 @@ AudioIO::~AudioIO() {
 	closeStream();
 }
 
-std::vector<int> AudioIO::listDrivers() {
+std::vector<int> AudioIO::getDrivers() {
 	std::vector<RtAudio::Api> apis;
 	RtAudio::getCompiledApi(apis);
 	std::vector<int> drivers;
@@ -39,7 +39,7 @@ std::string AudioIO::getDriverName(int driver) {
 		case RtAudio::WINDOWS_WASAPI: return "WASAPI";
 		case RtAudio::WINDOWS_ASIO: return "ASIO";
 		case RtAudio::WINDOWS_DS: return "DirectSound";
-		case RtAudio::RTAUDIO_DUMMY: return "Dummy";
+		case RtAudio::RTAUDIO_DUMMY: return "Dummy Audio";
 		case BRIDGE_DRIVER: return "Bridge";
 		default: return "Unknown";
 	}
@@ -245,7 +245,7 @@ bool AudioIO::isActive() {
 }
 
 
-std::vector<int> AudioIO::listSampleRates() {
+std::vector<int> AudioIO::getSampleRates() {
 	if (rtAudio) {
 		try {
 			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
