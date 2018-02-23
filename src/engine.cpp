@@ -72,15 +72,15 @@ static void engineStep() {
 	if (smoothModule) {
 		float value = smoothModule->params[smoothParamId].value;
 		const float lambda = 60.0; // decay rate is 1 graphics frame
-		const float snap = 0.0001;
 		float delta = smoothValue - value;
-		if (fabsf(delta) < snap) {
+		float newValue = value + delta * lambda * sampleTime;
+		if (value == newValue) {
+			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
 			smoothModule->params[smoothParamId].value = smoothValue;
 			smoothModule = NULL;
 		}
 		else {
-			value += delta * lambda * sampleTime;
-			smoothModule->params[smoothParamId].value = value;
+			smoothModule->params[smoothParamId].value = newValue;
 		}
 	}
 

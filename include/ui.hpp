@@ -44,24 +44,46 @@ struct Menu : OpaqueWidget {
 };
 
 struct MenuEntry : OpaqueWidget {
-	std::string text;
 	MenuEntry() {
 		box.size = Vec(0, BND_WIDGET_HEIGHT);
+	}
+
+	template <typename T = MenuEntry>
+	static T *create() {
+		T *o = Widget::create<T>(Vec());
+		return o;
 	}
 };
 
 struct MenuLabel : MenuEntry {
+	std::string text;
 	void draw(NVGcontext *vg) override;
 	void step() override;
+
+	template <typename T = MenuLabel>
+	static T *create(std::string text) {
+		T *o = MenuEntry::create<T>();
+		o->text = text;
+		return o;
+	}
 };
 
 struct MenuItem : MenuEntry {
+	std::string text;
 	std::string rightText;
 	void draw(NVGcontext *vg) override;
 	void step() override;
 	virtual Menu *createChildMenu() {return NULL;}
 	void onMouseEnter(EventMouseEnter &e) override;
 	void onDragDrop(EventDragDrop &e) override;
+
+	template <typename T = MenuItem>
+	static T *create(std::string text, std::string rightText = "") {
+		T *o = MenuEntry::create<T>();
+		o->text = text;
+		o->rightText = rightText;
+		return o;
+	}
 };
 
 struct WindowOverlay : OpaqueWidget {
@@ -153,16 +175,19 @@ struct TextField : OpaqueWidget {
 	bool multiline = false;
 	int begin = 0;
 	int end = 0;
+	int dragPos = 0;
 
 	TextField() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 	void draw(NVGcontext *vg) override;
 	void onMouseDown(EventMouseDown &e) override;
+	void onMouseMove(EventMouseMove &e) override;
 	void onFocus(EventFocus &e) override;
 	void onText(EventText &e) override;
 	void onKey(EventKey &e) override;
 	void insertText(std::string newText);
+	virtual int getTextPosition(Vec mousePos);
 	virtual void onTextChange() {}
 };
 
@@ -170,7 +195,7 @@ struct PasswordField : TextField {
 	void draw(NVGcontext *vg) override;
 };
 
-struct ProgressBar : TransparentWidget, QuantityWidget {
+struct ProgressBar : QuantityWidget {
 	ProgressBar() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}

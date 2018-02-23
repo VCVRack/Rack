@@ -15,8 +15,8 @@
 #pragma GCC diagnostic pop
 
 
-#define MAX_OUTPUTS 8
-#define MAX_INPUTS 8
+#define OUTPUTS 8
+#define INPUTS 8
 
 static const auto audioTimeout = std::chrono::milliseconds(100);
 
@@ -30,13 +30,13 @@ struct AudioInterfaceIO : AudioIO {
 	std::mutex audioMutex;
 	std::condition_variable audioCv;
 	// Audio thread produces, engine thread consumes
-	DoubleRingBuffer<Frame<MAX_INPUTS>, (1<<15)> inputBuffer;
+	DoubleRingBuffer<Frame<INPUTS>, (1<<15)> inputBuffer;
 	// Audio thread consumes, engine thread produces
-	DoubleRingBuffer<Frame<MAX_OUTPUTS>, (1<<15)> outputBuffer;
+	DoubleRingBuffer<Frame<OUTPUTS>, (1<<15)> outputBuffer;
 
 	AudioInterfaceIO() {
-		maxOutputs = MAX_OUTPUTS;
-		maxInputs = MAX_INPUTS;
+		maxOutputs = OUTPUTS;
+		maxInputs = INPUTS;
 	}
 
 	~AudioInterfaceIO() {
@@ -49,7 +49,7 @@ struct AudioInterfaceIO : AudioIO {
 			for (int i = 0; i < length; i++) {
 				if (inputBuffer.full())
 					break;
-				Frame<MAX_INPUTS> f;
+				Frame<INPUTS> f;
 				memset(&f, 0, sizeof(f));
 				memcpy(&f, &input[numInputs * i], numInputs * sizeof(float));
 				inputBuffer.push(f);
@@ -64,7 +64,7 @@ struct AudioInterfaceIO : AudioIO {
 			if (audioCv.wait_for(lock, audioTimeout, cond)) {
 				// Consume audio block
 				for (int i = 0; i < length; i++) {
-					Frame<MAX_OUTPUTS> f = outputBuffer.shift();
+					Frame<OUTPUTS> f = outputBuffer.shift();
 					memcpy(&output[numOutputs * i], &f, numOutputs * sizeof(float));
 				}
 			}
@@ -90,27 +90,28 @@ struct AudioInterface : Module {
 		NUM_PARAMS
 	};
 	enum InputIds {
-		ENUMS(AUDIO_INPUT, MAX_INPUTS),
+		ENUMS(AUDIO_INPUT, INPUTS),
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		ENUMS(AUDIO_OUTPUT, MAX_OUTPUTS),
+		ENUMS(AUDIO_OUTPUT, OUTPUTS),
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ACTIVE_LIGHT,
+		ENUMS(INPUT_LIGHT, INPUTS),
+		ENUMS(OUTPUT_LIGHT, OUTPUTS),
 		NUM_LIGHTS
 	};
 
 	AudioInterfaceIO audioIO;
 	int lastSampleRate = 0;
 
-	SampleRateConverter<MAX_INPUTS> inputSrc;
-	SampleRateConverter<MAX_OUTPUTS> outputSrc;
+	SampleRateConverter<INPUTS> inputSrc;
+	SampleRateConverter<OUTPUTS> outputSrc;
 
 	// in rack's sample rate
-	DoubleRingBuffer<Frame<MAX_INPUTS>, 16> inputBuffer;
-	DoubleRingBuffer<Frame<MAX_OUTPUTS>, 16> outputBuffer;
+	DoubleRingBuffer<Frame<INPUTS>, 16> inputBuffer;
+	DoubleRingBuffer<Frame<OUTPUTS>, 16> outputBuffer;
 
 	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onSampleRateChange();
@@ -130,10 +131,10 @@ struct AudioInterface : Module {
 	}
 
 	void onSampleRateChange() override {
-		// for (int i = 0; i < MAX_INPUTS; i++) {
+		// for (int i = 0; i < INPUTS; i++) {
 		// 	inputSrc[i].setRates(audioIO.sampleRate, engineGetSampleRate());
 		// }
-		// for (int i = 0; i < MAX_OUTPUTS; i++) {
+		// for (int i = 0; i < OUTPUTS; i++) {
 		// 	outputSrc[i].setRates(engineGetSampleRate(), audioIO.sampleRate);
 		// }
 		inputSrc.setRates(audioIO.sampleRate, engineGetSampleRate());
@@ -147,7 +148,7 @@ struct AudioInterface : Module {
 
 
 void AudioInterface::step() {
-	Frame<MAX_INPUTS> inputFrame;
+	Frame<INPUTS> inputFrame;
 	memset(&inputFrame, 0, sizeof(inputFrame));
 
 	// Update sample rate if changed by audio driver
@@ -169,14 +170,14 @@ void AudioInterface::step() {
 	if (!inputBuffer.empty()) {
 		inputFrame = inputBuffer.shift();
 	}
-	for (int i = 0; i < MAX_INPUTS; i++) {
+	for (int i = 0; i < INPUTS; i++) {
 		outputs[AUDIO_OUTPUT + i].value = 10.0 * inputFrame.samples[i];
 	}
 
 	if (audioIO.numOutputs > 0) {
 		// Get and push output SRC frame
 		if (!outputBuffer.full()) {
-			Frame<MAX_OUTPUTS> f;
+			Frame<OUTPUTS> f;
 			for (int i = 0; i < audioIO.numOutputs; i++) {
 				f.samples[i] = inputs[AUDIO_INPUT + i].value / 10.0;
 			}
@@ -203,109 +204,72 @@ void AudioInterface::step() {
 		}
 	}
 
-	audioIO.audioCv.notify_all();
+	for (int i = 0; i < INPUTS; i++)
+		lights[INPUT_LIGHT + i].value = (audioIO.numInputs > i);
+	for (int i = 0; i < OUTPUTS; i++)
+		lights[OUTPUT_LIGHT + i].value = (audioIO.numOutputs > i);
 
-	// Lights
-	lights[ACTIVE_LIGHT].value = audioIO.isActive() ? 1.0 : 0.0;
+	audioIO.audioCv.notify_all();
 }
 
 
 struct AudioInterfaceWidget : ModuleWidget {
-	AudioInterfaceWidget(AudioInterface *module) : ModuleWidget(module) {
-		box.size = Vec(15*12, 380);
-		{
-			Panel *panel = new LightPanel();
-			panel->box.size = box.size;
-			addChild(panel);
-		}
-
-		addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 365)));
-
-		Vec margin = Vec(5, 2);
-		float labelHeight = 15;
-		float yPos = margin.y + 100;
-		float xPos;
-
-		{
-			Label *label = new Label();
-			label->box.pos = Vec(margin.x, yPos);
-			label->text = "Outputs (DACs)";
-			addChild(label);
-			yPos += labelHeight + margin.y;
-		}
-
-		yPos += 5;
-		xPos = 10;
-		for (int i = 0; i < 4; i++) {
-			addInput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::INPUT, module, AudioInterface::AUDIO_INPUT + i));
-			Label *label = new Label();
-			label->box.pos = Vec(xPos + 4, yPos + 28);
-			label->text = stringf("%d", i + 1);
-			addChild(label);
-
-			xPos += 37 + margin.x;
-		}
-		yPos += 35 + margin.y;
-
-		yPos += 5;
-		xPos = 10;
-		for (int i = 4; i < 8; i++) {
-			addInput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::INPUT, module, AudioInterface::AUDIO_INPUT + i));
-			Label *label = new Label();
-			label->box.pos = Vec(xPos + 4, yPos + 28);
-			label->text = stringf("%d", i + 1);
-			addChild(label);
-
-			xPos += 37 + margin.x;
-		}
-		yPos += 35 + margin.y;
-
-		{
-			Label *label = new Label();
-			label->box.pos = Vec(margin.x, yPos);
-			label->text = "Inputs (ADCs)";
-			addChild(label);
-			yPos += labelHeight + margin.y;
-		}
-
-		yPos += 5;
-		xPos = 10;
-		for (int i = 0; i < 4; i++) {
-			Port *port = Port::create<PJ3410Port>(Vec(xPos, yPos), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + i);
-			addOutput(port);
-			Label *label = new Label();
-			label->box.pos = Vec(xPos + 4, yPos + 28);
-			label->text = stringf("%d", i + 1);
-			addChild(label);
-
-			xPos += 37 + margin.x;
-		}
-		yPos += 35 + margin.y;
-
-		yPos += 5;
-		xPos = 10;
-		for (int i = 4; i < 8; i++) {
-			addOutput(Port::create<PJ3410Port>(Vec(xPos, yPos), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + i));
-			Label *label = new Label();
-			label->box.pos = Vec(xPos + 4, yPos + 28);
-			label->text = stringf("%d", i + 1);
-			addChild(label);
-
-			xPos += 37 + margin.x;
-		}
-		yPos += 35 + margin.y;
-
-		AudioWidget *audioWidget = construct<USB_B_AudioWidget>();
-		audioWidget->audioIO = &module->audioIO;
-		addChild(audioWidget);
-
-		// Lights
-		addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(40, 20), module, AudioInterface::ACTIVE_LIGHT));
-	}
+	AudioInterfaceWidget(AudioInterface *module);
 };
 
 
-Model *modelAudioInterface = Model::create<AudioInterface, AudioInterfaceWidget>("Core", "AudioInterface", "Audio Interface", EXTERNAL_TAG);
+AudioInterfaceWidget::AudioInterfaceWidget(AudioInterface *module) : ModuleWidget(module) {
+	setPanel(SVG::load(assetGlobal("res/Core/AudioInterface.svg")));
+
+	addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+	addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(3.89433, 55.5308)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 0));
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(15.4947, 55.5308)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 1));
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(27.095, 55.5308)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 2));
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(38.6953, 55.5308)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 3));
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(3.89433, 70.1449)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 4));
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(15.4947, 70.1449)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 5));
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(27.095, 70.1449)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 6));
+	addInput(Port::create<PJ301MPort>(mm2px(Vec(38.6953, 70.1449)), Port::INPUT, module, AudioInterface::AUDIO_INPUT + 7));
+
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.89295, 92.1439)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 0));
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.4933, 92.1439)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 1));
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.0936, 92.1439)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 2));
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.6939, 92.1439)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 3));
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.89433, 108.144)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 4));
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.4947, 108.144)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 5));
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.095, 108.144)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 6));
+	addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.6953, 108.144)), Port::OUTPUT, module, AudioInterface::AUDIO_OUTPUT + 7));
+
+	Vec lightOffset = mm2px(Vec(7.21812, -0.1833));
+
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(3.89433, 55.5308)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 0));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(15.4947, 55.5308)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 1));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(27.095, 55.5308)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 2));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(38.6953, 55.5308)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 3));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(3.89433, 70.1449)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 4));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(15.4947, 70.1449)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 5));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(27.095, 70.1449)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 6));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(38.6953, 70.1449)).plus(lightOffset), module, AudioInterface::INPUT_LIGHT + 7));
+
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(3.89295, 92.1439)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 0));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(15.4933, 92.1439)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 1));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(27.0936, 92.1439)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 2));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(38.6939, 92.1439)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 3));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(3.89433, 108.144)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 4));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(15.4947, 108.144)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 5));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(27.095, 108.144)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 6));
+	addChild(ModuleLightWidget::create<TinyLight<YellowLight>>(mm2px(Vec(38.6953, 108.144)).plus(lightOffset), module, AudioInterface::OUTPUT_LIGHT + 7));
+
+
+	AudioWidget *audioWidget = Widget::create<AudioWidget>(mm2px(Vec(3.401, 14.8373)));
+	audioWidget->box.size = mm2px(Vec(44, 28));
+	audioWidget->audioIO = &module->audioIO;
+	addChild(audioWidget);
+}
+
+
+Model *modelAudioInterface = Model::create<AudioInterface, AudioInterfaceWidget>("Core", "AudioInterface", "Audio", EXTERNAL_TAG);

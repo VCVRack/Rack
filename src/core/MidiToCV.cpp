@@ -6,7 +6,7 @@
 
 
 /*
- * MidiToCvInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
+ * MIDIToCVInterface converts midi note on/off events, velocity , channel aftertouch, pitch wheel and mod wheel to
  * CV
  */
 struct MidiValue {
@@ -16,28 +16,33 @@ struct MidiValue {
 };
 
 
-struct MidiToCvInterface : Module {
+struct MIDIToCVInterface : Module {
 	enum ParamIds {
-		RESET_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		PITCH_OUTPUT = 0,
+		CV_OUTPUT,
 		GATE_OUTPUT,
 		VELOCITY_OUTPUT,
 		MOD_OUTPUT,
-		PITCHWHEEL_OUTPUT,
-		CHANNEL_AFTERTOUCH_OUTPUT,
+		PITCH_OUTPUT,
+		AFTERTOUCH_OUTPUT,
+		START_OUTPUT,
+		STOP_OUTPUT,
+		CONTINUE_OUTPUT,
+		CLOCK_OUTPUT,
+		CLOCK_2_OUTPUT,
+		CLOCK_HALF_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ACTIVE_LIGHT,
-		RESET_LIGHT,
 		NUM_LIGHTS
 	};
+
+	MidiInput midiIO;
 
 	MidiInputQueue midiInput;
 	std::list<int> notes;
@@ -51,12 +56,12 @@ struct MidiToCvInterface : Module {
 
 	SchmittTrigger resetTrigger;
 
-	MidiToCvInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		pitchWheel.val = 64;
 		// pitchWheel.tSmooth.set(0, 0);
 	}
 
-	~MidiToCvInterface() {
+	~MIDIToCVInterface() {
 	};
 
 	void step() override;
@@ -85,7 +90,7 @@ struct MidiToCvInterface : Module {
 };
 
 /*
-void MidiToCvInterface::resetMidi() {
+void MIDIToCVInterface::resetMidi() {
 	mod.val = 0;
 	mod.tSmooth.set(0, 0);
 	pitchWheel.val = 64;
@@ -98,7 +103,7 @@ void MidiToCvInterface::resetMidi() {
 }
 */
 
-void MidiToCvInterface::step() {
+void MIDIToCVInterface::step() {
 	/*
 	if (isPortOpen()) {
 		std::vector<unsigned char> message;
@@ -138,12 +143,9 @@ void MidiToCvInterface::step() {
 
 	outputs[CHANNEL_AFTERTOUCH_OUTPUT].value = afterTouch.val / 127.0 * 10.0;
 	*/
-
-	// Lights
-	lights[ACTIVE_LIGHT].value = midiInput.isActive() ? 1.0 : 0.0;
 }
 
-void MidiToCvInterface::pressNote(int note) {
+void MIDIToCVInterface::pressNote(int note) {
 	// Remove existing similar note
 	auto it = std::find(notes.begin(), notes.end(), note);
 	if (it != notes.end())
@@ -154,7 +156,7 @@ void MidiToCvInterface::pressNote(int note) {
 	gate = true;
 }
 
-void MidiToCvInterface::releaseNote(int note) {
+void MIDIToCVInterface::releaseNote(int note) {
 	// Remove the note
 	auto it = std::find(notes.begin(), notes.end(), note);
 	if (it != notes.end())
@@ -174,7 +176,7 @@ void MidiToCvInterface::releaseNote(int note) {
 	}
 }
 
-void MidiToCvInterface::processMidi(std::vector<unsigned char> msg) {
+void MIDIToCVInterface::processMidi(std::vector<unsigned char> msg) {
 	/*
 	int channel = msg[0] & 0xf;
 	int status = (msg[0] >> 4) & 0xf;
@@ -229,58 +231,34 @@ void MidiToCvInterface::processMidi(std::vector<unsigned char> msg) {
 }
 
 
-struct MidiToCvInterfaceWidget : ModuleWidget {
-	MidiToCvInterfaceWidget(MidiToCvInterface *module) : ModuleWidget(module) {
-		box.size = Vec(15 * 9, 380);
+struct MIDIToCVInterfaceWidget : ModuleWidget {
+	MIDIToCVInterfaceWidget(MIDIToCVInterface *module) : ModuleWidget(module) {
+		setPanel(SVG::load(assetGlobal("res/Core/MIDIToCVInterface.svg")));
 
-		{
-			Panel *panel = new LightPanel();
-			panel->box.size = box.size;
-			addChild(panel);
-		}
+		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		float margin = 5;
-		float labelHeight = 15;
-		float yPos = margin;
-		float yGap = 35;
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 60.1445)), Port::OUTPUT, module, MIDIToCVInterface::CV_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 60.1445)), Port::OUTPUT, module, MIDIToCVInterface::GATE_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 60.1445)), Port::OUTPUT, module, MIDIToCVInterface::VELOCITY_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 76.1449)), Port::OUTPUT, module, MIDIToCVInterface::MOD_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 76.1449)), Port::OUTPUT, module, MIDIToCVInterface::PITCH_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 76.1449)), Port::OUTPUT, module, MIDIToCVInterface::AFTERTOUCH_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 92.1439)), Port::OUTPUT, module, MIDIToCVInterface::START_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 92.1439)), Port::OUTPUT, module, MIDIToCVInterface::STOP_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 92.1439)), Port::OUTPUT, module, MIDIToCVInterface::CONTINUE_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 108.144)), Port::OUTPUT, module, MIDIToCVInterface::CLOCK_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 108.144)), Port::OUTPUT, module, MIDIToCVInterface::CLOCK_2_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 108.144)), Port::OUTPUT, module, MIDIToCVInterface::CLOCK_HALF_OUTPUT));
 
-		addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
-
-		{
-			Label *label = new Label();
-			label->box.pos = Vec(box.size.x - margin - 7 * 15, margin);
-			label->text = "MIDI to CV";
-			addChild(label);
-			yPos = labelHeight * 2;
-		}
-
-		addParam(ParamWidget::create<LEDButton>(Vec(7 * 15, labelHeight), module, MidiToCvInterface::RESET_PARAM, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<SmallLight<RedLight>>(Vec(7 * 15 + 5, labelHeight + 5), module, MidiToCvInterface::RESET_LIGHT));
-
-		std::string labels[MidiToCvInterface::NUM_OUTPUTS] = {"1V/oct", "Gate", "Velocity", "Mod Wheel", "Pitch Wheel", "Aftertouch"};
-
-		for (int i = 0; i < MidiToCvInterface::NUM_OUTPUTS; i++) {
-			Label *label = new Label();
-			label->box.pos = Vec(margin, yPos);
-			label->text = labels[i];
-			addChild(label);
-
-			addOutput(Port::create<PJ3410Port>(Vec(15 * 6, yPos - 5), Port::OUTPUT, module, i));
-
-			yPos += yGap + margin;
-		}
-
-		MidiWidget *midiWidget = construct<MIDI_DIN_MidiWidget>();
-		midiWidget->midiIO = &module->midiInput;
+		MidiWidget *midiWidget = Widget::create<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
+		midiWidget->box.size = mm2px(Vec(33.840, 28));
+		midiWidget->midiIO = &module->midiIO;
 		addChild(midiWidget);
-
-		// Lights
-		addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(40, 20), module, MidiToCvInterface::ACTIVE_LIGHT));
 	}
 };
 
 
-Model *modelMidiToCvInterface = Model::create<MidiToCvInterface, MidiToCvInterfaceWidget>("Core", "MIDIToCVInterface", "MIDI-to-CV Interface", MIDI_TAG, EXTERNAL_TAG);
+Model *modelMidiToCvInterface = Model::create<MIDIToCVInterface, MIDIToCVInterfaceWidget>("Core", "MIDIToCVInterface", "MIDI-1", MIDI_TAG, EXTERNAL_TAG);

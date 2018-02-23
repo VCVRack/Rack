@@ -87,7 +87,12 @@ struct ModuleWidget : OpaqueWidget {
 	Called when the user clicks Randomize in the context menu.
 	*/
 	virtual void randomize();
+	/** Do not subclass this to add context menu entries. Use appendContextMenu() instead */
 	virtual Menu *createContextMenu();
+	/** Override to add context menu entries to your subclass.
+	It is recommended to add a blank MenuEntry first for spacing.
+	*/
+	virtual void appendContextMenu(Menu *menu) {}
 
 	void draw(NVGcontext *vg) override;
 	void drawShadow(NVGcontext *vg);
@@ -320,19 +325,54 @@ struct MomentarySwitch : virtual Switch {
 // IO widgets
 ////////////////////
 
-struct AudioIO;
-struct MidiIO;
+struct LedDisplay : Widget {
+	void draw(NVGcontext *vg) override;
+};
 
-struct AudioWidget : OpaqueWidget {
-	/** Not owned */
-	AudioIO *audioIO = NULL;
+struct LedDisplaySeparator : TransparentWidget {
+	LedDisplaySeparator();
+	void draw(NVGcontext *vg) override;
+};
+
+struct LedDisplayChoice : TransparentWidget {
+	std::string text;
+	std::shared_ptr<Font> font;
+	NVGcolor color;
+	LedDisplayChoice();
+	void draw(NVGcontext *vg) override;
 	void onMouseDown(EventMouseDown &e) override;
 };
 
-struct MidiWidget : OpaqueWidget {
+struct LedDisplayTextField : TextField {
+	std::shared_ptr<Font> font;
+	NVGcolor color;
+	LedDisplayTextField();
+	void draw(NVGcontext *vg) override;
+	int getTextPosition(Vec mousePos) override;
+};
+
+
+struct AudioIO;
+struct MidiIO;
+
+struct AudioWidget : LedDisplay {
+	/** Not owned */
+	AudioIO *audioIO = NULL;
+	struct Internal;
+	Internal *internal;
+	AudioWidget();
+	~AudioWidget();
+	void step() override;
+};
+
+struct MidiWidget : LedDisplay {
 	/** Not owned */
 	MidiIO *midiIO = NULL;
-	void onMouseDown(EventMouseDown &e) override;
+	struct Internal;
+	Internal *internal;
+	MidiWidget();
+	~MidiWidget();
+	void step() override;
 };
 
 ////////////////////
