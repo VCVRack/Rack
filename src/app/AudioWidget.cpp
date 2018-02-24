@@ -36,14 +36,17 @@ struct AudioDriverChoice : LedDisplayChoice {
 struct AudioDeviceItem : MenuItem {
 	AudioIO *audioIO;
 	int device;
+	int offset;
+	int maxChannels;
 	void onAction(EventAction &e) override {
-		audioIO->device = device;
-		audioIO->openStream();
+		audioIO->setDevice(device, offset, maxChannels);
 	}
 };
 
 struct AudioDeviceChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
+	int groupChannels = 8;
+	int maxTotalChannels = 64;
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Audio device"));
@@ -57,16 +60,21 @@ struct AudioDeviceChoice : LedDisplayChoice {
 			menu->addChild(item);
 		}
 		for (int device = 0; device < deviceCount; device++) {
-			AudioDeviceItem *item = new AudioDeviceItem();
-			item->audioIO = audioWidget->audioIO;
-			item->device = device;
-			item->text = audioWidget->audioIO->getDeviceDetail(device);
-			item->rightText = CHECKMARK(item->device == audioWidget->audioIO->device);
-			menu->addChild(item);
+			int maxChannels = min(maxTotalChannels, audioWidget->audioIO->getDeviceMaxChannels(device));
+			for (int offset = 0; offset < maxChannels; offset += groupChannels) {
+				AudioDeviceItem *item = new AudioDeviceItem();
+				item->audioIO = audioWidget->audioIO;
+				item->device = device;
+				item->offset = offset;
+				item->maxChannels = groupChannels;
+				item->text = audioWidget->audioIO->getDeviceDetail(device, offset, groupChannels);
+				item->rightText = CHECKMARK(item->device == audioWidget->audioIO->device && item->offset == audioWidget->audioIO->offset);
+				menu->addChild(item);
+			}
 		}
 	}
 	void step() override {
-		text = audioWidget->audioIO->getDeviceDetail(audioWidget->audioIO->device);
+		text = audioWidget->audioIO->getDeviceDetail(audioWidget->audioIO->device, audioWidget->audioIO->offset, groupChannels);
 		if (text.empty()) {
 			text = "(No device)";
 			color.a = 0.5f;
@@ -83,8 +91,7 @@ struct AudioSampleRateItem : MenuItem {
 	AudioIO *audioIO;
 	int sampleRate;
 	void onAction(EventAction &e) override {
-		audioIO->sampleRate = sampleRate;
-		audioIO->openStream();
+		audioIO->setSampleRate(sampleRate);
 	}
 };
 
@@ -112,8 +119,7 @@ struct AudioBlockSizeItem : MenuItem {
 	AudioIO *audioIO;
 	int blockSize;
 	void onAction(EventAction &e) override {
-		audioIO->blockSize = blockSize;
-		audioIO->openStream();
+		audioIO->setBlockSize(blockSize);
 	}
 };
 

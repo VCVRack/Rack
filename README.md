@@ -1,19 +1,19 @@
 # Rack
 
-*Rack* is the engine for the VCV open-source virtual Eurorack DAW.
+*Rack* is the engine for the VCV open-source virtual modular synthesizer.
 
 ![Rack screenshot](https://vcvrack.com/images/screenshot.png)
 
 This README includes instructions for building Rack from source. For information about the software, go to https://vcvrack.com/.
 
-## The [Issue Tracker](https://github.com/VCVRack/Rack/issues) *is* the official developer's forum
+## The [Issue Tracker](https://github.com/VCVRack/Rack/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) *is* the official developer's forum
 
 Bug reports, feature requests, and even *questions/discussions* are welcome on the GitHub Issue Tracker for all VCVRack repos.
 However, please search before posting to avoid duplicates, and limit to one issue per post.
 
-You may vote on feature requests by using the Thumbs Up/Down reaction on the first post.
+Please vote on feature requests by using the Thumbs Up/Down reaction on the first post.
 
-I rarely accept Pull Requests, so please notify me in advance to plan your contribution before writing code.
+I rarely accept code contributions to Rack itself, so please notify me in advance if you wish to send a pull request.
 
 ## Setting up your development environment
 
@@ -33,14 +33,16 @@ Install build dependencies with the pacman package manger.
 
 ### Linux
 
-With your distro's package manager, make sure you have installed `git`, `gcc`, `make`, `cmake`, `tar`, and `unzip`.
+With your distro's package manager, make sure you have installed `git`, `gcc`, `make`, `cmake`, `tar`, `unzip`, and `curl`.
 
 ## Building
 
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
 
 Clone this repository with `git clone https://github.com/VCVRack/Rack.git` and `cd Rack`.
-If you would like to build a previous version of Rack instead of the master branch, check out the desired tag with `git checkout v0.4.0` for example.
+
+The `master` branch contains the latest public code and breaks its plugin [API](https://en.wikipedia.org/wiki/Application_programming_interface) and [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) frequently.
+If you wish to build a previous version of Rack which is API/ABI-compatible with an official Rack release, check out the desired branch with `git checkout v0.5` for example.
 
 Clone submodules.
 
@@ -51,7 +53,7 @@ You may use make's `-j$(nproc)` flag to parallelize builds across all your CPU c
 
 	make dep
 
-You may use `make dep RTAUDIO_ALL_APIS=1` to attempt to build with all audio driver APIs enabled for your operating system.
+You may use `make dep RTAUDIO_ALL_APIS=1` to attempt to build with all audio driver APIs enabled for your operating system, although this is unsupported.
 
 You should see a message that all dependencies built successfully.
 

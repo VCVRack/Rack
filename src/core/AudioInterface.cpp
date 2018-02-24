@@ -35,11 +35,10 @@ struct AudioInterfaceIO : AudioIO {
 	DoubleRingBuffer<Frame<OUTPUTS>, (1<<15)> outputBuffer;
 
 	AudioInterfaceIO() {
-		maxOutputs = OUTPUTS;
-		maxInputs = INPUTS;
 	}
 
 	~AudioInterfaceIO() {
+		// Close stream here before destructing AudioInterfaceIO, so the mutexes are still valid when waiting to close.
 		closeStream();
 	}
 
