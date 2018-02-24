@@ -38,6 +38,8 @@ LedDisplayChoice::LedDisplayChoice() {
 }
 
 void LedDisplayChoice::draw(NVGcontext *vg) {
+	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+
 	if (font->handle < 0)
 		return;
 
@@ -47,6 +49,8 @@ void LedDisplayChoice::draw(NVGcontext *vg) {
 
 	nvgFontSize(vg, 12);
 	nvgText(vg, textOffset.x, textOffset.y, text.c_str(), NULL);
+
+	nvgResetScissor(vg);
 }
 
 void LedDisplayChoice::onMouseDown(EventMouseDown &e) {

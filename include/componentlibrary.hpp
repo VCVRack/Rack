@@ -370,39 +370,46 @@ struct CL1362Port : SVGPort {
 // Lights
 ////////////////////
 
-struct RedLight : ModuleLightWidget {
+struct GrayModuleLightWidget : ModuleLightWidget {
+	GrayModuleLightWidget() {
+		bgColor = nvgRGB(0x5a, 0x5a, 0x5a);
+		borderColor = nvgRGBA(0, 0, 0, 0x60);
+	}
+};
+
+struct RedLight : GrayModuleLightWidget {
 	RedLight() {
 		addBaseColor(COLOR_RED);
 	}
 };
 
-struct GreenLight : ModuleLightWidget {
+struct GreenLight : GrayModuleLightWidget {
 	GreenLight() {
 		addBaseColor(COLOR_GREEN);
 	}
 };
 
-struct YellowLight : ModuleLightWidget {
+struct YellowLight : GrayModuleLightWidget {
 	YellowLight() {
 		addBaseColor(COLOR_YELLOW);
 	}
 };
 
-struct BlueLight : ModuleLightWidget {
+struct BlueLight : GrayModuleLightWidget {
 	BlueLight() {
 		addBaseColor(COLOR_BLUE);
 	}
 };
 
 /** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
-struct GreenRedLight : ModuleLightWidget {
+struct GreenRedLight : GrayModuleLightWidget {
 	GreenRedLight() {
 		addBaseColor(COLOR_GREEN);
 		addBaseColor(COLOR_RED);
 	}
 };
 
-struct RedGreenBlueLight : ModuleLightWidget {
+struct RedGreenBlueLight : GrayModuleLightWidget {
 	RedGreenBlueLight() {
 		addBaseColor(COLOR_RED);
 		addBaseColor(COLOR_GREEN);

@@ -37,16 +37,16 @@ struct AudioDeviceItem : MenuItem {
 	AudioIO *audioIO;
 	int device;
 	int offset;
-	int maxChannels;
 	void onAction(EventAction &e) override {
-		audioIO->setDevice(device, offset, maxChannels);
+		audioIO->setDevice(device, offset);
 	}
 };
 
 struct AudioDeviceChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
-	int groupChannels = 8;
+	/** Prevents devices with a ridiculous number of channels from being displayed */
 	int maxTotalChannels = 64;
+
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Audio device"));
@@ -60,21 +60,20 @@ struct AudioDeviceChoice : LedDisplayChoice {
 			menu->addChild(item);
 		}
 		for (int device = 0; device < deviceCount; device++) {
-			int maxChannels = min(maxTotalChannels, audioWidget->audioIO->getDeviceMaxChannels(device));
-			for (int offset = 0; offset < maxChannels; offset += groupChannels) {
+			int channels = min(maxTotalChannels, audioWidget->audioIO->getDeviceChannels(device));
+			for (int offset = 0; offset < channels; offset += audioWidget->audioIO->maxChannels) {
 				AudioDeviceItem *item = new AudioDeviceItem();
 				item->audioIO = audioWidget->audioIO;
 				item->device = device;
 				item->offset = offset;
-				item->maxChannels = groupChannels;
-				item->text = audioWidget->audioIO->getDeviceDetail(device, offset, groupChannels);
+				item->text = audioWidget->audioIO->getDeviceDetail(device, offset);
 				item->rightText = CHECKMARK(item->device == audioWidget->audioIO->device && item->offset == audioWidget->audioIO->offset);
 				menu->addChild(item);
 			}
 		}
 	}
 	void step() override {
-		text = audioWidget->audioIO->getDeviceDetail(audioWidget->audioIO->device, audioWidget->audioIO->offset, groupChannels);
+		text = audioWidget->audioIO->getDeviceDetail(audioWidget->audioIO->device, audioWidget->audioIO->offset);
 		if (text.empty()) {
 			text = "(No device)";
 			color.a = 0.5f;
@@ -82,7 +81,6 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		else {
 			color.a = 1.f;
 		}
-		text = ellipsize(text, 18);
 	}
 };
 

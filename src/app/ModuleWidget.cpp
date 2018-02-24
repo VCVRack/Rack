@@ -233,27 +233,34 @@ void ModuleWidget::onMouseMove(EventMouseMove &e) {
 
 void ModuleWidget::onHoverKey(EventHoverKey &e) {
 	switch (e.key) {
-		case GLFW_KEY_I:
+		case GLFW_KEY_I: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				reset();
 				e.consumed = true;
 				return;
 			}
-			break;
-		case GLFW_KEY_R:
+		} break;
+		case GLFW_KEY_R: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				randomize();
 				e.consumed = true;
 				return;
 			}
-			break;
-		case GLFW_KEY_D:
+		} break;
+		case GLFW_KEY_D: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				gRackWidget->cloneModule(this);
 				e.consumed = true;
 				return;
 			}
-			break;
+		} break;
+		case GLFW_KEY_U: {
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
+				disconnect();
+				e.consumed = true;
+				return;
+			}
+		} break;
 	}
 
 	Widget::onHoverKey(e);
@@ -331,6 +338,7 @@ Menu *ModuleWidget::createContextMenu() {
 
 	DisconnectMenuItem *disconnectItem = new DisconnectMenuItem();
 	disconnectItem->text = "Disconnect cables";
+	disconnectItem->rightText = WINDOW_MOD_KEY_NAME "+U";
 	disconnectItem->moduleWidget = this;
 	menu->addChild(disconnectItem);
 
