@@ -1,15 +1,11 @@
 #include "app.hpp"
+#include "util/color.hpp"
 
 
 namespace rack {
 
 
 void LightWidget::draw(NVGcontext *vg) {
-	color.r = clamp(color.r, 0.0, 1.0);
-	color.g = clamp(color.g, 0.0, 1.0);
-	color.b = clamp(color.b, 0.0, 1.0);
-	color.a = clamp(color.a, 0.0, 1.0);
-
 	drawLight(vg);
 	drawHalo(vg);
 }
@@ -20,21 +16,14 @@ void LightWidget::drawLight(NVGcontext *vg) {
 	nvgBeginPath(vg);
 	nvgCircle(vg, radius, radius, radius);
 
-	// Background
-	nvgFillColor(vg, bgColor);
+	// Solid color
+	nvgFillColor(vg, color);
 	nvgFill(vg);
 
 	// Border
-	nvgStrokeWidth(vg, 1.0);
-	NVGcolor borderColor = bgColor;
-	borderColor.a *= 0.5;
+	nvgStrokeWidth(vg, 0.5);
 	nvgStrokeColor(vg, borderColor);
 	nvgStroke(vg);
-
-	// Inner glow
-	nvgFillColor(vg, color);
-	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-	nvgFill(vg);
 }
 
 void LightWidget::drawHalo(NVGcontext *vg) {
@@ -45,10 +34,8 @@ void LightWidget::drawHalo(NVGcontext *vg) {
 	nvgRect(vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
 
 	NVGpaint paint;
-	NVGcolor icol = color;
-	icol.a *= 0.10;
-	NVGcolor ocol = color;
-	ocol.a = 0.0;
+	NVGcolor icol = colorMult(color, 0.15);
+	NVGcolor ocol = nvgRGB(0, 0, 0);
 	paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
 	nvgFillPaint(vg, paint);
 	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);

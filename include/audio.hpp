@@ -16,6 +16,7 @@ struct AudioIO {
 	int driver = 0;
 	int device = -1;
 	int offset = 0;
+	int maxChannels = 8;
 	int sampleRate = 44100;
 	int blockSize = 256;
 	int numOutputs = 0;
@@ -33,10 +34,11 @@ struct AudioIO {
 
 	int getDeviceCount();
 	bool getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo);
-	int getDeviceMaxChannels(int device);
+	/** Returns the number of inputs or outputs, whichever is greater */
+	int getDeviceChannels(int device);
 	std::string getDeviceName(int device);
-	std::string getDeviceDetail(int device, int offset, int maxChannels);
-	void setDevice(int device, int offset, int maxChannels);
+	std::string getDeviceDetail(int device, int offset);
+	void setDevice(int device, int offset);
 
 	void setSampleRate(int sampleRate);
 	void setBlockSize(int blockSize);

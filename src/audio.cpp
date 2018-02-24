@@ -46,8 +46,8 @@ std::string AudioIO::getDriverName(int driver) {
 }
 
 void AudioIO::setDriver(int driver) {
-	// Close driver
-	closeStream();
+	setDevice(-1, 0);
+
 	if (rtAudio) {
 		delete rtAudio;
 		rtAudio = NULL;
@@ -100,7 +100,7 @@ bool AudioIO::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
 	}
 }
 
-int AudioIO::getDeviceMaxChannels(int device) {
+int AudioIO::getDeviceChannels(int device) {
 	if (device < 0)
 		return 0;
 
@@ -130,7 +130,7 @@ std::string AudioIO::getDeviceName(int device) {
 	return "";
 }
 
-std::string AudioIO::getDeviceDetail(int device, int offset, int maxChannels) {
+std::string AudioIO::getDeviceDetail(int device, int offset) {
 	if (device < 0)
 		return "";
 
@@ -154,12 +154,10 @@ std::string AudioIO::getDeviceDetail(int device, int offset, int maxChannels) {
 	return "";
 }
 
-void AudioIO::setDevice(int device, int offset, int maxChannels) {
+void AudioIO::setDevice(int device, int offset) {
 	closeStream();
 	this->device = device;
 	this->offset = offset;
-	this->numOutputs = maxChannels;
-	this->numInputs = maxChannels;
 	openStream();
 }
 
@@ -200,8 +198,8 @@ void AudioIO::openStream() {
 		if (rtAudio->isStreamOpen())
 			return;
 
-		numOutputs = clamp((int) deviceInfo.outputChannels - offset, 0, numOutputs);
-		numInputs = clamp((int) deviceInfo.inputChannels - offset, 0, numInputs);
+		numOutputs = clamp((int) deviceInfo.outputChannels - offset, 0, maxChannels);
+		numInputs = clamp((int) deviceInfo.inputChannels - offset, 0, maxChannels);
 
 		if (numOutputs == 0 && numInputs == 0) {
 			warn("RtAudio device %d has 0 inputs and 0 outputs");
@@ -318,6 +316,8 @@ json_t *AudioIO::toJson() {
 	json_object_set_new(rootJ, "driver", json_integer(driver));
 	std::string deviceName = getDeviceName(device);
 	json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+	json_object_set_new(rootJ, "offset", json_integer(offset));
+	json_object_set_new(rootJ, "maxChannels", json_integer(maxChannels));
 	json_object_set_new(rootJ, "sampleRate", json_integer(sampleRate));
 	json_object_set_new(rootJ, "blockSize", json_integer(blockSize));
 	return rootJ;
@@ -341,6 +341,14 @@ void AudioIO::fromJson(json_t *rootJ) {
 			}
 		}
 	}
+
+	json_t *offsetJ = json_object_get(rootJ, "offset");
+	if (offsetJ)
+		offset = json_integer_value(offsetJ);
+
+	json_t *maxChannelsJ = json_object_get(rootJ, "maxChannels");
+	if (maxChannelsJ)
+		maxChannels = json_integer_value(maxChannelsJ);
 
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ)

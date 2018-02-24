@@ -45,6 +45,14 @@ struct MidiDeviceChoice : LedDisplayChoice {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI device"));
+		{
+			MidiDeviceItem *item = new MidiDeviceItem();
+			item->midiIO = midiWidget->midiIO;
+			item->device = -1;
+			item->text = "(No device)";
+			item->rightText = CHECKMARK(item->device == midiWidget->midiIO->device);
+			menu->addChild(item);
+		}
 		int driverCount = midiWidget->midiIO->getDeviceCount();
 		for (int device = 0; device < driverCount; device++) {
 			MidiDeviceItem *item = new MidiDeviceItem();
@@ -57,7 +65,13 @@ struct MidiDeviceChoice : LedDisplayChoice {
 	}
 	void step() override {
 		text = midiWidget->midiIO->getDeviceName(midiWidget->midiIO->device);
-		text = ellipsize(text, 14);
+		if (text.empty()) {
+			text = "(No device)";
+			color.a = 0.5f;
+		}
+		else {
+			color.a = 1.f;
+		}
 	}
 };
 

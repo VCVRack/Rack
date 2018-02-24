@@ -388,8 +388,8 @@ struct MidiWidget : LedDisplay {
 ////////////////////
 
 struct LightWidget : TransparentWidget {
-	NVGcolor bgColor = nvgRGBf(0, 0, 0);
-	NVGcolor color = nvgRGBf(1, 1, 1);
+	NVGcolor borderColor = nvgRGBA(0, 0, 0, 0);
+	NVGcolor color = nvgRGBA(0, 0, 0, 0);
 	void draw(NVGcontext *vg) override;
 	virtual void drawLight(NVGcontext *vg);
 	virtual void drawHalo(NVGcontext *vg);
@@ -397,6 +397,9 @@ struct LightWidget : TransparentWidget {
 
 /** Mixes a list of colors based on a list of brightness values */
 struct MultiLightWidget : LightWidget {
+	/** Color of the "off" state */
+	NVGcolor bgColor = nvgRGBA(0, 0, 0, 0);
+	/** Colors of each value state */
 	std::vector<NVGcolor> baseColors;
 	void addBaseColor(NVGcolor baseColor);
 	/** Sets the color to a linear combination of the baseColors with the given weights */
