@@ -204,9 +204,9 @@ void AudioInterface::step() {
 	}
 
 	for (int i = 0; i < INPUTS / 2; i++)
-		lights[INPUT_LIGHT + i].value = (audioIO.numInputs >= 2*i+1);
+		lights[INPUT_LIGHT + i].value = (audioIO.numOutputs >= 2*i+1);
 	for (int i = 0; i < OUTPUTS / 2; i++)
-		lights[OUTPUT_LIGHT + i].value = (audioIO.numOutputs >= 2*i+1);
+		lights[OUTPUT_LIGHT + i].value = (audioIO.numInputs >= 2*i+1);
 
 	audioIO.audioCv.notify_all();
 }
