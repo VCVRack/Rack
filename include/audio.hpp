@@ -12,12 +12,10 @@ namespace rack {
 
 
 struct AudioIO {
-	int maxOutputs = 8;
-	int maxInputs = 8;
-
 	// Stream properties
 	int driver = 0;
 	int device = -1;
+	int offset = 0;
 	int sampleRate = 44100;
 	int blockSize = 256;
 	int numOutputs = 0;
@@ -34,8 +32,16 @@ struct AudioIO {
 	void setDriver(int driver);
 
 	int getDeviceCount();
+	bool getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo);
+	int getDeviceMaxChannels(int device);
 	std::string getDeviceName(int device);
-	std::string getDeviceDetail(int device);
+	std::string getDeviceDetail(int device, int offset, int maxChannels);
+	void setDevice(int device, int offset, int maxChannels);
+
+	void setSampleRate(int sampleRate);
+	void setBlockSize(int blockSize);
+
+	/** Must close the stream before opening */
 	void openStream();
 	void closeStream();
 	/** Returns whether the audio stream is open and running */
