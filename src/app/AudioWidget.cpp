@@ -45,7 +45,7 @@ struct AudioDeviceItem : MenuItem {
 struct AudioDeviceChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	/** Prevents devices with a ridiculous number of channels from being displayed */
-	int maxTotalChannels = 64;
+	int maxTotalChannels = 128;
 
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
