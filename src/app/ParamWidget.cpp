@@ -39,7 +39,10 @@ void ParamWidget::onChange(EventChange &e) {
 	if (!module)
 		return;
 
-	engineSetParam(module, paramId, value);
+	if (smooth)
+		engineSetParamSmooth(module, paramId, value);
+	else
+		engineSetParam(module, paramId, value);
 }
 
 

@@ -10,6 +10,10 @@ namespace rack {
 #define KNOB_SENSITIVITY 0.0015
 
 
+Knob::Knob() {
+	smooth = true;
+}
+
 void Knob::onDragStart(EventDragStart &e) {
 	windowCursorLock();
 	dragValue = value;
@@ -35,16 +39,6 @@ void Knob::onDragMove(EventDragMove &e) {
 void Knob::onDragEnd(EventDragEnd &e) {
 	windowCursorUnlock();
 	randomizable = true;
-}
-
-void Knob::onChange(EventChange &e) {
-	if (!module)
-		return;
-
-	if (snap)
-		engineSetParam(module, paramId, value);
-	else
-		engineSetParamSmooth(module, paramId, value);
 }
 
 
