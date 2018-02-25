@@ -40,15 +40,14 @@ LedDisplayChoice::LedDisplayChoice() {
 void LedDisplayChoice::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
-	if (font->handle < 0)
-		return;
+	if (font->handle >= 0) {
+		nvgFillColor(vg, color);
+		nvgFontFaceId(vg, font->handle);
+		nvgTextLetterSpacing(vg, 0.0);
 
-	nvgFillColor(vg, color);
-	nvgFontFaceId(vg, font->handle);
-	nvgTextLetterSpacing(vg, 0.0);
-
-	nvgFontSize(vg, 12);
-	nvgText(vg, textOffset.x, textOffset.y, text.c_str(), NULL);
+		nvgFontSize(vg, 12);
+		nvgText(vg, textOffset.x, textOffset.y, text.c_str(), NULL);
+	}
 
 	nvgResetScissor(vg);
 }
@@ -71,6 +70,8 @@ LedDisplayTextField::LedDisplayTextField() {
 
 
 void LedDisplayTextField::draw(NVGcontext *vg) {
+	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+
 	// Background
 	nvgBeginPath(vg);
 	nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 5.0);
@@ -78,19 +79,20 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 	nvgFill(vg);
 
 	// Text
-	if (font->handle < 0)
-		return;
+	if (font->handle >= 0) {
+		bndSetFont(font->handle);
 
-	bndSetFont(font->handle);
+		NVGcolor highlightColor = color;
+		highlightColor.a = 0.5;
+		int cend = (this == gFocusedWidget) ? end : -1;
+		bndIconLabelCaret(vg, textOffset.x, textOffset.y,
+			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
+			-1, color, 12, text.c_str(), highlightColor, begin, cend);
 
-	NVGcolor highlightColor = color;
-	highlightColor.a = 0.5;
-	int cend = (this == gFocusedWidget) ? end : -1;
-	bndIconLabelCaret(vg, textOffset.x, textOffset.y,
-		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-		-1, color, 12, text.c_str(), highlightColor, begin, cend);
+		bndSetFont(gGuiFont->handle);
+	}
 
-	bndSetFont(gGuiFont->handle);
+	nvgResetScissor(vg);
 }
 
 int LedDisplayTextField::getTextPosition(Vec mousePos) {

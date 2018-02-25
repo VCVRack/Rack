@@ -9,6 +9,8 @@ namespace rack {
 
 
 void TextField::draw(NVGcontext *vg) {
+	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+
 	BNDwidgetState state;
 	if (this == gFocusedWidget)
 		state = BND_ACTIVE;
@@ -22,6 +24,8 @@ void TextField::draw(NVGcontext *vg) {
 	if (text.empty() && state != BND_ACTIVE) {
 		bndIconLabelCaret(vg, 0.0, 0.0, box.size.x, box.size.y, -1, bndGetTheme()->textFieldTheme.itemColor, 13, placeholder.c_str(), bndGetTheme()->textFieldTheme.itemColor, 0, -1);
 	}
+
+	nvgResetScissor(vg);
 }
 
 void TextField::onMouseDown(EventMouseDown &e) {
