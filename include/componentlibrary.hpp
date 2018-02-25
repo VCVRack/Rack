@@ -62,6 +62,7 @@ struct RoundHugeBlackKnob : RoundBlackKnob {
 struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob {
 	RoundSmallBlackSnapKnob() {
 		snap = true;
+		smooth = false;
 	}
 };
 
@@ -312,6 +313,7 @@ struct BefacoBigKnob : SVGKnob {
 struct BefacoBigSnapKnob : BefacoBigKnob {
 	BefacoBigSnapKnob() {
 		snap = true;
+		smooth = false;
 	}
 };
 

@@ -217,6 +217,8 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	To permanently disable or change randomization behavior, override the randomize() method instead of changing this.
 	*/
 	bool randomizable = true;
+	/** Apply per-sample smoothing in the engine */
+	bool smooth = false;
 
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
@@ -243,11 +245,10 @@ struct Knob : ParamWidget {
 	/** Multiplier for mouse movement to adjust knob value */
 	float speed = 1.0;
 	float dragValue;
+	Knob();
 	void onDragStart(EventDragStart &e) override;
 	void onDragMove(EventDragMove &e) override;
 	void onDragEnd(EventDragEnd &e) override;
-	/** Tell engine to smoothly vary this parameter */
-	void onChange(EventChange &e) override;
 };
 
 struct SpriteKnob : virtual Knob, SpriteWidget {
