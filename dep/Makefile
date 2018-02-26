@@ -64,19 +64,6 @@ ifeq ($(ARCH),win)
 	openssl = bin/libssl-1_1-x64.dll
 endif
 
-# Library configuration
-ifdef RTAUDIO_ALL_APIS
-ifeq ($(ARCH),mac)
-	RTAUDIO_FLAGS = -DAUDIO_OSX_CORE=ON
-endif
-ifeq ($(ARCH),win)
-	RTAUDIO_FLAGS = -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
-endif
-ifeq ($(ARCH),lin)
-	RTAUDIO_FLAGS = -DAUDIO_LINUX_ALSA=ON
-endif
-endif
-
 
 .NOTPARALLEL:
 
@@ -146,11 +133,21 @@ $(rtmidi):
 	$(MAKE) -C rtmidi
 	$(MAKE) -C rtmidi install
 
+ifeq ($(ARCH),mac)
+	RTAUDIO_FLAGS += -DAUDIO_OSX_CORE=ON -DAUDIO_UNIX_JACK=ON
+endif
+ifeq ($(ARCH),win)
+	RTAUDIO_FLAGS += -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
+endif
+ifeq ($(ARCH),lin)
+	RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_LINUX_PULSE=ON -DAUDIO_LINUX_JACK=ON
+endif
+
 $(rtaudio):
-	cd rtaudio && mkdir -p cmakebuild
-	cd rtaudio/cmakebuild && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
-	$(MAKE) -C rtaudio/cmakebuild
-	$(MAKE) -C rtaudio/cmakebuild install
+	cd rtaudio && mkdir -p build
+	cd rtaudio/build && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
+	$(MAKE) -C rtaudio/build
+	$(MAKE) -C rtaudio/build install
 
 clean:
 	git clean -ffdx
