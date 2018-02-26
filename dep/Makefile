@@ -56,7 +56,7 @@ ifeq ($(ARCH),win)
 	glew = bin/glew32.dll
 	glfw = bin/glfw3.dll
 	jansson = bin/libjansson-4.dll
-	libspeexdsp = bin/libspeexdsp.dll
+	libspeexdsp = bin/libspeexdsp-1.dll
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
 	rtmidi = bin/librtmidi-4.dll
@@ -134,13 +134,13 @@ $(rtmidi):
 	$(MAKE) -C rtmidi install
 
 ifeq ($(ARCH),mac)
-	RTAUDIO_FLAGS += -DAUDIO_OSX_CORE=ON -DAUDIO_UNIX_JACK=ON
+RTAUDIO_FLAGS += -DAUDIO_OSX_CORE=ON -DAUDIO_UNIX_JACK=ON
 endif
 ifeq ($(ARCH),win)
-	RTAUDIO_FLAGS += -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
+RTAUDIO_FLAGS += -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
 endif
 ifeq ($(ARCH),lin)
-	RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_LINUX_PULSE=ON -DAUDIO_LINUX_JACK=ON
+RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_LINUX_PULSE=ON -DAUDIO_LINUX_JACK=ON
 endif
 
 $(rtaudio):
