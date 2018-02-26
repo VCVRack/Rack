@@ -2,8 +2,8 @@
 #include <list>
 #include <memory>
 
-#include "../ext/nanovg/src/nanovg.h"
-#include "../ext/nanosvg/src/nanosvg.h"
+#include "nanovg.h"
+#include "nanosvg.h"
 
 #include "util/common.hpp"
 #include "events.hpp"

@@ -6,21 +6,21 @@
 #include <queue>
 #include <thread>
 
-#include "../ext/osdialog/osdialog.h"
+#include "osdialog.h"
 
 #define NANOVG_GL2 1
 // #define NANOVG_GL3 1
 // #define NANOVG_GLES2 1
 #define NANOVG_GL_IMPLEMENTATION 1
-#include "../ext/nanovg/src/nanovg_gl.h"
+#include "nanovg_gl.h"
 // Hack to get framebuffer objects working on OpenGL 2 (we blindly assume the extension is supported)
 #define NANOVG_FBO_VALID 1
-#include "../ext/nanovg/src/nanovg_gl_utils.h"
+#include "nanovg_gl_utils.h"
 #define BLENDISH_IMPLEMENTATION
-#include "../ext/oui-blendish/blendish.h"
+#include "blendish.h"
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVG_ALL_COLOR_KEYWORDS
-#include "../ext/nanosvg/src/nanosvg.h"
+#include "nanosvg.h"
 
 #ifdef ARCH_MAC
 	// For CGAssociateMouseAndMouseCursorPosition

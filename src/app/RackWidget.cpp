@@ -6,7 +6,7 @@
 #include "asset.hpp"
 #include <map>
 #include <algorithm>
-#include "../ext/osdialog/osdialog.h"
+#include "osdialog.h"
 
 
 namespace rack {

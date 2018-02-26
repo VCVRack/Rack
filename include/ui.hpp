@@ -1,6 +1,6 @@
 #pragma once
 #include "widgets.hpp"
-#include "../ext/oui-blendish/blendish.h"
+#include "blendish.h"
 
 
 namespace rack {

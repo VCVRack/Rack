@@ -1,7 +1,7 @@
 #include "app.hpp"
 #include "window.hpp"
 #include "util/request.hpp"
-#include "../ext/osdialog/osdialog.h"
+#include "osdialog.h"
 #include <string.h>
 #include <thread>
 

@@ -64,10 +64,15 @@ ifeq ($(ARCH),win)
 	openssl = bin/libssl-1_1-x64.dll
 endif
 
+nanovg = include/nanovg.h
+nanosvg = include/nanosvg.h
+oui-blendish = include/blendish.h
+osdialog = include/osdialog.h
+
 
 .NOTPARALLEL:
 
-all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio)
+all: $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(nanovg) $(nanosvg) $(oui-blendish) $(osdialog)
 	@echo ""
 	@echo "#######################################"
 	@echo "# Built all dependencies successfully #"
@@ -148,6 +153,18 @@ $(rtaudio):
 	cd rtaudio/build && cmake -G 'Unix Makefiles' -DCMAKE_INSTALL_PREFIX="$(LOCAL)" $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/build
 	$(MAKE) -C rtaudio/build install
+
+$(nanovg):
+	cp nanovg/src/*.h include/
+
+$(nanosvg):
+	cp nanosvg/src/*.h include/
+
+$(oui-blendish):
+	cp oui-blendish/*.h include/
+
+$(osdialog):
+	cp osdialog/*.h include/
 
 clean:
 	git clean -ffdx
