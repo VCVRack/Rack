@@ -2,7 +2,7 @@
 #include "app.hpp"
 #include "plugin.hpp"
 #include "window.hpp"
-#include "../ext/osdialog/osdialog.h"
+#include "osdialog.h"
 
 
 namespace rack {

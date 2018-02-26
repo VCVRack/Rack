@@ -1,9 +1,8 @@
 #include "widgets.hpp"
 #include "window.hpp"
 #include <GL/glew.h>
-#include "../ext/nanovg/src/nanovg_gl.h"
-#include "../ext/nanovg/src/nanovg_gl_utils.h"
-#include "../ext/osdialog/osdialog.h"
+#include "nanovg_gl.h"
+#include "nanovg_gl_utils.h"
 
 
 namespace rack {

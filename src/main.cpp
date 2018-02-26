@@ -6,7 +6,7 @@
 #include "settings.hpp"
 #include "asset.hpp"
 #include <unistd.h>
-#include "../ext/osdialog/osdialog.h"
+#include "osdialog.h"
 
 
 using namespace rack;

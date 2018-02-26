@@ -2,7 +2,7 @@
 
 
 #include "util/math.hpp"
-#include "../ext/nanovg/src/nanovg.h"
+#include "nanovg.h"
 
 
 namespace rack {
