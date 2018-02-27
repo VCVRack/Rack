@@ -112,7 +112,7 @@ $(openssl):
 	$(UNTAR) openssl-1.1.0g.tar.gz
 	cd openssl-1.1.0g && ./config --prefix="$(LOCAL)"
 	$(MAKE) -C openssl-1.1.0g
-	$(MAKE) -C openssl-1.1.0g install
+	$(MAKE) -C openssl-1.1.0g install_sw
 
 $(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
