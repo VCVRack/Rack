@@ -92,14 +92,14 @@ static void engineStep() {
 		// Step ports
 		for (Input &input : module->inputs) {
 			if (input.active) {
-				float value = input.value / 10.0;
+				float value = input.value / 10.f;
 				input.plugLights[0].setBrightnessSmooth(value);
 				input.plugLights[1].setBrightnessSmooth(-value);
 			}
 		}
 		for (Output &output : module->outputs) {
 			if (output.active) {
-				float value = output.value / 10.0;
+				float value = output.value / 10.f;
 				output.plugLights[0].setBrightnessSmooth(value);
 				output.plugLights[1].setBrightnessSmooth(-value);
 			}

@@ -5,6 +5,9 @@
 namespace rack {
 
 
+static const float SCROLL_SPEED = 1.2;
+
+
 /** Parent must be a ScrollWidget */
 struct ScrollBar : OpaqueWidget {
 	enum Orientation {
@@ -33,9 +36,9 @@ struct ScrollBar : OpaqueWidget {
 		ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
 		assert(scrollWidget);
 		if (orientation == HORIZONTAL)
-			scrollWidget->offset.x += e.mouseRel.x;
+			scrollWidget->offset.x += SCROLL_SPEED * e.mouseRel.x;
 		else
-			scrollWidget->offset.y += e.mouseRel.y;
+			scrollWidget->offset.y += SCROLL_SPEED * e.mouseRel.y;
 	}
 
 	void onDragEnd(EventDragEnd &e) override {
@@ -69,7 +72,13 @@ void ScrollWidget::draw(NVGcontext *vg) {
 void ScrollWidget::step() {
 	// Clamp scroll offset
 	Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
-	offset = offset.clamp(Rect(Vec(0, 0), containerCorner.minus(box.size)));
+	Rect containerBox = Rect(Vec(0, 0), containerCorner.minus(box.size));
+	offset = offset.clamp(containerBox);
+	// Lock offset to top/left if no scrollbar will display
+	if (containerBox.size.x < 0.0)
+		offset.x = 0.0;
+	if (containerBox.size.y < 0.0)
+		offset.y = 0.0;
 
 	// Update the container's positions from the offset
 	container->box.pos = offset.neg().round();

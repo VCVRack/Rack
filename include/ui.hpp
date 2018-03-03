@@ -8,6 +8,12 @@ namespace rack {
 
 struct Label : Widget {
 	std::string text;
+	enum Align {
+		LEFT_ALIGN,
+		CENTER_ALIGN,
+		RIGHT_ALIGN
+	};
+	Align align = LEFT_ALIGN;
 	Label() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}

@@ -28,8 +28,8 @@ inline int max(int a, int b) {
 /** Limits a value between a minimum and maximum
 Assumes min <= max
 */
-inline int clamp(int x, int minimum, int maximum) {
-	return min(max(x, minimum), maximum);
+inline int clamp(int x, int min, int max) {
+	return rack::min(rack::max(x, min), max);
 }
 
 /** Euclidean modulus, always returns 0 <= mod < base for positive base.
@@ -74,11 +74,11 @@ inline bool isNear(float a, float b, float epsilon = 1.0e-6f) {
 /** Limits a value between a minimum and maximum
 Assumes min <= max
 */
-inline float clamp(float x, float minimum, float maximum) {
-	return fminf(fmaxf(x, minimum), maximum);
+inline float clamp(float x, float min, float max) {
+	return fminf(fmaxf(x, min), max);
 }
 
-/** Limits a value between a minimum and maximum
+/** Limits a value between a min and max
 If min > max, switches the two values
 */
 inline float clamp2(float x, float min, float max) {
@@ -180,6 +180,7 @@ struct Vec {
 		return isfinite(x) && isfinite(y);
 	}
 	Vec clamp(Rect bound);
+	Vec clamp2(Rect bound);
 };
 
 
@@ -260,8 +261,14 @@ struct Rect {
 
 inline Vec Vec::clamp(Rect bound) {
 	return Vec(
-		clamp2(x, bound.pos.x, bound.pos.x + bound.size.x),
-		clamp2(y, bound.pos.y, bound.pos.y + bound.size.y));
+		rack::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
+		rack::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
+}
+
+inline Vec Vec::clamp2(Rect bound) {
+	return Vec(
+		rack::clamp2(x, bound.pos.x, bound.pos.x + bound.size.x),
+		rack::clamp2(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 
