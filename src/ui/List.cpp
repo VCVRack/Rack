@@ -16,7 +16,7 @@ void List::step() {
 		child->box.pos = Vec(0.0, box.size.y);
 		box.size.y += child->box.size.y;
 		// Resize width of child
-		child->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
+		child->box.size.x = box.size.x;
 	}
 }
 
