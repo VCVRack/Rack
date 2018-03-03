@@ -141,6 +141,14 @@ void RackWidget::loadPatch(std::string path) {
 	fclose(file);
 }
 
+void RackWidget::revert() {
+	if (lastPath.empty())
+		return;
+	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert your patch to the last saved state?")) {
+		loadPatch(lastPath);
+	}
+}
+
 json_t *RackWidget::toJson() {
 	// root
 	json_t *rootJ = json_object();
@@ -438,15 +446,7 @@ void RackWidget::onMouseDown(EventMouseDown &e) {
 		return;
 
 	if (e.button == 1) {
-		MenuOverlay *overlay = new MenuOverlay();
-
-		AddModuleWindow *window = new AddModuleWindow();
-		// Set center position
-		window->box.pos = gMousePos.minus(window->box.getCenter());
-		window->modulePos = lastMousePos;
-
-		overlay->addChild(window);
-		gScene->setOverlay(overlay);
+		appModuleBrowserCreate();
 	}
 	e.consumed = true;
 	e.target = this;

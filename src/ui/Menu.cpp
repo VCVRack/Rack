@@ -29,7 +29,7 @@ void Menu::step() {
 	for (Widget *child : children) {
 		if (!child->visible)
 			continue;
-		// Increase height, set position of child
+		// Increment height, set position of child
 		child->box.pos = Vec(0, box.size.y);
 		box.size.y += child->box.size.y;
 		// Increase width based on maximum width of child

@@ -24,7 +24,7 @@ void MenuItem::draw(NVGcontext *vg) {
 }
 
 void MenuItem::step() {
-	// Add 10 more pixels because Retina measurements are sometimes too small
+	// Add 10 more pixels because measurements on high-DPI screens are sometimes too small for some reason
 	const float rightPadding = 10.0;
 	// HACK use gVg from the window.
 	// All this does is inspect the font, so it shouldn't modify gVg and should work when called from a FramebufferWidget for example.
@@ -53,7 +53,7 @@ void MenuItem::onDragDrop(EventDragDrop &e) {
 		return;
 
 	EventAction eAction;
-	// TODO Perhaps remove this? It would require all onAction() methods to call this explicitly, which might be too annoying to change.
+	// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.
 	eAction.consumed = true;
 	onAction(eAction);
 	if (eAction.consumed) {

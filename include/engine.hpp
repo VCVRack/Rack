@@ -18,7 +18,10 @@ struct Light {
 	void setBrightness(float brightness) {
 		value = (brightness > 0.f) ? brightness * brightness : 0.f;
 	}
-	void setBrightnessSmooth(float brightness);
+	/** Emulates slow fall (but immediate rise) of LED brightness.
+	`frames` rescales the timestep. For example, if your module calls this method every 16 frames, use 16.0.
+	*/
+	void setBrightnessSmooth(float brightness, float frames = 1.f);
 };
 
 struct Input {
