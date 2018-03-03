@@ -68,12 +68,15 @@ void engineDestroy() {
 }
 
 static void engineStep() {
-	// Param interpolation
+    
+    const float lambda = 60.f; // decay rate is 1 graphics frame
+    float dt = lambda * sampleTime;
+    
+    // Param interpolation
 	if (smoothModule) {
 		float value = smoothModule->params[smoothParamId].value;
-		const float lambda = 60.0; // decay rate is 1 graphics frame
 		float delta = smoothValue - value;
-		float newValue = value + delta * lambda * sampleTime;
+		float newValue = value + delta * dt;
 		if (value == newValue) {
 			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
 			smoothModule->params[smoothParamId].value = smoothValue;
@@ -92,16 +95,12 @@ static void engineStep() {
 		// Step ports
 		for (Input &input : module->inputs) {
 			if (input.active) {
-				float value = input.value / 10.0;
-				input.plugLights[0].setBrightnessSmooth(value);
-				input.plugLights[1].setBrightnessSmooth(-value);
+				input.plugLight.setSignedBrightnessSmooth(input.value / 10.f, dt);
 			}
 		}
 		for (Output &output : module->outputs) {
 			if (output.active) {
-				float value = output.value / 10.0;
-				output.plugLights[0].setBrightnessSmooth(value);
-				output.plugLights[1].setBrightnessSmooth(-value);
+				output.plugLight.setSignedBrightnessSmooth(output.value / 10.f, dt);
 			}
 		}
 	}
