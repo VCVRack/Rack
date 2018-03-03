@@ -21,12 +21,41 @@ struct Light {
 	void setBrightnessSmooth(float brightness);
 };
 
+struct DualLight {
+	/** The square of the brightness value */
+	float value = 0.0;
+
+	float getPositiveBrightness() {
+		return sqrtf(fmaxf(0.f, value));
+	}
+	float getNegativeBrightness() {
+		return sqrtf(fmaxf(0.f, -value));
+	}
+	void setSignedBrightness(float brightness) {
+		value = ((brightness < 0.f) ? -1.f : 1.f) * (brightness * brightness);
+	}
+	void setSignedBrightnessSmooth(float brightness, float dt) {
+		float v = brightness * brightness;
+		float abs_value = fabsf(value);
+		if (v < abs_value) {
+			// Fade out light with lambda = framerate
+			abs_value += (v - abs_value) * dt;
+
+		}
+		else {
+			// Immediately illuminate light
+			abs_value = v;
+		}
+		value = ((brightness < 0.f) ? -1.f : 1.f) * abs_value;
+	}
+};
+
 struct Input {
 	/** Voltage of the port, zero if not plugged in. Read-only by Module */
 	float value = 0.0;
 	/** Whether a wire is plugged in */
 	bool active = false;
-	Light plugLights[2];
+	DualLight plugLight;
 	/** Returns the value if a wire is plugged in, otherwise returns the given default value */
 	float normalize(float normalValue) {
 		return active ? value : normalValue;
@@ -38,7 +67,7 @@ struct Output {
 	float value = 0.0;
 	/** Whether a wire is plugged in */
 	bool active = false;
-	Light plugLights[2];
+	DualLight plugLight;
 };
 
 
