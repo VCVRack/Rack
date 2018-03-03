@@ -4,7 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include "core.hpp"
+#include "Core.hpp"
 #include "audio.hpp"
 #include "dsp/samplerate.hpp"
 #include "dsp/ringbuffer.hpp"

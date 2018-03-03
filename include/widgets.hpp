@@ -257,6 +257,7 @@ struct FramebufferWidget : virtual Widget {
 	void onZoom(EventZoom &e) override;
 };
 
+/** A Widget representing a float value */
 struct QuantityWidget : virtual Widget {
 	float value = 0.0;
 	float minValue = 0.0;

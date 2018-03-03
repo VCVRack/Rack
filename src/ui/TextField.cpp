@@ -155,12 +155,17 @@ void TextField::onKey(EventKey &e) {
 	e.consumed = true;
 }
 
-void TextField::insertText(std::string newText) {
+void TextField::insertText(std::string text) {
 	if (begin < end)
-		text.erase(begin, end - begin);
-	text.insert(begin, newText);
-	begin += newText.size();
+		this->text.erase(begin, end - begin);
+	this->text.insert(begin, text);
+	begin += text.size();
 	end = begin;
+	onTextChange();
+}
+
+void TextField::setText(std::string text) {
+	this->text = text;
 	onTextChange();
 }
 

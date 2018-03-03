@@ -30,6 +30,12 @@ struct SaveAsItem : MenuItem {
 	}
 };
 
+struct RevertItem : MenuItem {
+	void onAction(EventAction &e) override {
+		gRackWidget->revert();
+	}
+};
+
 struct QuitItem : MenuItem {
 	void onAction(EventAction &e) override {
 		windowClose();
@@ -42,13 +48,12 @@ struct FileChoice : ChoiceButton {
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		{
-			menu->addChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+N"));
-			menu->addChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+O"));
-			menu->addChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+S"));
-			menu->addChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+Shift+S"));
-			menu->addChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+Q"));
-		}
+		menu->addChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+N"));
+		menu->addChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+O"));
+		menu->addChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+S"));
+		menu->addChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+Shift+S"));
+		menu->addChild(construct<RevertItem>(&MenuItem::text, "Revert", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+R"));
+		menu->addChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+Q"));
 	}
 };
 

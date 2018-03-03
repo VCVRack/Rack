@@ -1,4 +1,5 @@
 #include "ui.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -23,9 +24,19 @@ void MenuOverlay::onMouseDown(EventMouseDown &e) {
 }
 
 void MenuOverlay::onHoverKey(EventHoverKey &e) {
-	// Recurse children but consume the event
-	Widget::onHoverKey(e);
-	e.consumed = true;
+	switch (e.key) {
+		case GLFW_KEY_ESCAPE: {
+			gScene->setOverlay(NULL);
+			e.consumed = true;
+			return;
+		} break;
+	}
+
+	if (!e.consumed) {
+		// Recurse children but consume the event
+		Widget::onHoverKey(e);
+		e.consumed = true;
+	}
 }
 
 

@@ -17,10 +17,10 @@ void RadioButton::onMouseLeave(EventMouseLeave &e) {
 
 void RadioButton::onDragDrop(EventDragDrop &e) {
 	if (e.origin == this) {
-		if (value == 0.0)
-			value = 1.0;
+		if (value)
+			setValue(0.0);
 		else
-			value = 0.0;
+			setValue(1.0);
 
 		EventAction eAction;
 		onAction(eAction);

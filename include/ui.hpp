@@ -14,6 +14,11 @@ struct Label : Widget {
 	void draw(NVGcontext *vg) override;
 };
 
+struct List : OpaqueWidget {
+	void step() override;
+	void draw(NVGcontext *vg) override;
+};
+
 /** Deletes itself from parent when clicked */
 struct MenuOverlay : OpaqueWidget {
 	void step() override;
@@ -33,7 +38,7 @@ struct Menu : OpaqueWidget {
 		box.size = Vec(0, 0);
 	}
 	~Menu();
-	// Resizes menu and calls addChild()
+	/** Deprecated. Just use addChild(child) instead */
 	void pushChild(Widget *child) DEPRECATED {
 		addChild(child);
 	}
@@ -44,10 +49,6 @@ struct Menu : OpaqueWidget {
 };
 
 struct MenuEntry : OpaqueWidget {
-	MenuEntry() {
-		box.size = Vec(0, BND_WIDGET_HEIGHT);
-	}
-
 	template <typename T = MenuEntry>
 	static T *create() {
 		T *o = Widget::create<T>(Vec());
@@ -57,6 +58,9 @@ struct MenuEntry : OpaqueWidget {
 
 struct MenuLabel : MenuEntry {
 	std::string text;
+	MenuLabel() {
+		box.size = Vec(0, BND_WIDGET_HEIGHT);
+	}
 	void draw(NVGcontext *vg) override;
 	void step() override;
 
@@ -71,6 +75,9 @@ struct MenuLabel : MenuEntry {
 struct MenuItem : MenuEntry {
 	std::string text;
 	std::string rightText;
+	MenuItem() {
+		box.size = Vec(0, BND_WIDGET_HEIGHT);
+	}
 	void draw(NVGcontext *vg) override;
 	void step() override;
 	virtual Menu *createChildMenu() {return NULL;}
@@ -89,7 +96,7 @@ struct MenuItem : MenuEntry {
 struct WindowOverlay : OpaqueWidget {
 };
 
-struct Window : OpaqueWidget {
+struct WindowWidget : OpaqueWidget {
 	std::string title;
 	void draw(NVGcontext *vg) override;
 	void onDragMove(EventDragMove &e) override;
@@ -139,22 +146,7 @@ struct Slider : OpaqueWidget, QuantityWidget {
 	void onMouseDown(EventMouseDown &e) override;
 };
 
-/** Parent must be a ScrollWidget */
-struct ScrollBar : OpaqueWidget {
-	enum { VERTICAL, HORIZONTAL } orientation;
-	BNDwidgetState state = BND_DEFAULT;
-	float offset = 0.0;
-	float size = 0.0;
-
-	ScrollBar() {
-		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
-	}
-	void draw(NVGcontext *vg) override;
-	void onDragStart(EventDragStart &e) override;
-	void onDragMove(EventDragMove &e) override;
-	void onDragEnd(EventDragEnd &e) override;
-};
-
+struct ScrollBar;
 /** Handles a container with ScrollBar */
 struct ScrollWidget : OpaqueWidget {
 	Widget *container;
@@ -186,7 +178,10 @@ struct TextField : OpaqueWidget {
 	void onFocus(EventFocus &e) override;
 	void onText(EventText &e) override;
 	void onKey(EventKey &e) override;
-	void insertText(std::string newText);
+	/** Inserts text at the cursor, replacing the selection if necessary */
+	void insertText(std::string text);
+	/** Replaces the entire text */
+	void setText(std::string text);
 	virtual int getTextPosition(Vec mousePos);
 	virtual void onTextChange() {}
 };

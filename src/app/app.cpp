@@ -13,14 +13,13 @@ Toolbar *gToolbar = NULL;
 RackScene *gRackScene = NULL;
 
 
-void sceneInit() {
+void appInit() {
 	gRackScene = new RackScene();
 	gScene = gRackScene;
 }
 
-void sceneDestroy() {
-	delete gScene;
-	gScene = NULL;
+void appDestroy() {
+	delete gRackScene;
 }
 
 
