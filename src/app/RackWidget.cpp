@@ -248,29 +248,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 		std::string pluginSlug = json_string_value(pluginSlugJ);
 		std::string modelSlug = json_string_value(modelSlugJ);
 
-		// Search for plugin
-		Plugin *plugin = NULL;
-		for (Plugin *p : gPlugins) {
-			if (p->slug == pluginSlug) {
-				plugin = p;
-				break;
-			}
-		}
-
-		if (!plugin) {
-			message += stringf("Could not find plugin \"%s\" for module \"%s\"\n", pluginSlug.c_str(), modelSlug.c_str());
-			continue;
-		}
-
-		// Search for model
-		Model *model = NULL;
-		for (Model *m : plugin->models) {
-			if (m->slug == modelSlug) {
-				model = m;
-				break;
-			}
-		}
-
+		Model *model = pluginGetModel(pluginSlug, modelSlug);
 		if (!model) {
 			message += stringf("Could not find module \"%s\" in plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 			continue;

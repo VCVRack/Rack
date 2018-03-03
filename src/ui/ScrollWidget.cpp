@@ -5,7 +5,7 @@
 namespace rack {
 
 
-static const float SCROLL_SPEED = 1.2;
+static const float SCROLL_SPEED = 1.3;
 
 
 /** Parent must be a ScrollWidget */

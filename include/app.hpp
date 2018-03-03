@@ -524,7 +524,7 @@ void appInit();
 void appDestroy();
 void appModuleBrowserCreate();
 json_t *appModuleBrowserToJson();
-void appModuleBrowserFromJson(json_t *root);
+void appModuleBrowserFromJson(json_t *rootJ);
 
 
 json_t *colorToJson(NVGcolor color);
