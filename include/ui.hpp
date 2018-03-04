@@ -5,15 +5,39 @@
 
 namespace rack {
 
+////////////////////
+// Layouts
+////////////////////
 
-struct Label : Widget {
-	std::string text;
-	enum Align {
-		LEFT_ALIGN,
-		CENTER_ALIGN,
-		RIGHT_ALIGN
+/** Positions children in a row/column based on their widths/heights */
+struct SequentialLayout : virtual Widget {
+	enum Orientation {
+		HORIZONTAL_ORIENTATION,
+		VERTICAL_ORIENTATION,
 	};
-	Align align = LEFT_ALIGN;
+	Orientation orientation = HORIZONTAL_ORIENTATION;
+	enum Alignment {
+		LEFT_ALIGNMENT,
+		CENTER_ALIGNMENT,
+		RIGHT_ALIGNMENT,
+	};
+	Alignment alignment = LEFT_ALIGNMENT;
+	float margin = 0.0;
+	void step() override;
+};
+
+////////////////////
+// Blendish UI elements
+////////////////////
+
+struct Label : VirtualWidget {
+	std::string text;
+	enum Alignment {
+		LEFT_ALIGNMENT,
+		CENTER_ALIGNMENT,
+		RIGHT_ALIGNMENT,
+	};
+	Alignment alignment = LEFT_ALIGNMENT;
 	Label() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
@@ -200,7 +224,7 @@ struct ProgressBar : QuantityWidget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct Tooltip : Widget {
+struct Tooltip : VirtualWidget {
 	void step() override;
 	void draw(NVGcontext *vg) override;
 };

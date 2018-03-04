@@ -95,7 +95,7 @@ struct ModelItem : BrowserListItem {
 		nameLabel = Widget::create<Label>(Vec(0, 0));
 		addChild(nameLabel);
 		manufacturerLabel = Widget::create<Label>(Vec(0, 0));
-		manufacturerLabel->align = Label::RIGHT_ALIGN;
+		manufacturerLabel->alignment = Label::RIGHT_ALIGNMENT;
 		addChild(manufacturerLabel);
 		tagsLabel = Widget::create<Label>(Vec(26, BND_WIDGET_HEIGHT));
 		addChild(tagsLabel);

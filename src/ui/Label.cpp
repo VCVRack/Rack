@@ -7,10 +7,10 @@ namespace rack {
 
 void Label::draw(NVGcontext *vg) {
 	float x = 0.0;
-	if (align == RIGHT_ALIGN) {
+	if (alignment == RIGHT_ALIGNMENT) {
 		x = box.size.x - bndLabelWidth(vg, -1, text.c_str());
 	}
-	else if (align == CENTER_ALIGN) {
+	else if (alignment == CENTER_ALIGNMENT) {
 		x = (box.size.x - bndLabelWidth(vg, -1, text.c_str())) / 2.0;
 	}
 
