@@ -19,6 +19,8 @@ void TextField::draw(NVGcontext *vg) {
 	else
 		state = BND_DEFAULT;
 
+	int begin = min(cursor, selection);
+	int end = max(cursor, selection);
 	bndTextField(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str(), begin, end);
 	// Draw placeholder text
 	if (text.empty() && state != BND_ACTIVE) {
@@ -29,25 +31,24 @@ void TextField::draw(NVGcontext *vg) {
 }
 
 void TextField::onMouseDown(EventMouseDown &e) {
-	dragPos = getTextPosition(e.pos);
-	begin = end = dragPos;
+	debug("%d", this == gFocusedWidget);
+	if (e.button == 0) {
+		cursor = selection = getTextPosition(e.pos);
+	}
 	OpaqueWidget::onMouseDown(e);
 }
 
 void TextField::onMouseMove(EventMouseMove &e) {
 	if (this == gDraggedWidget) {
 		int pos = getTextPosition(e.pos);
-		if (pos != dragPos) {
-			begin = min(dragPos, pos);
-			end = max(dragPos, pos);
+		if (pos != selection) {
+			cursor = pos;
 		}
 	}
 	OpaqueWidget::onMouseMove(e);
 }
 
 void TextField::onFocus(EventFocus &e) {
-	begin = 0;
-	end = text.size();
 	e.consumed = true;
 }
 
@@ -61,85 +62,101 @@ void TextField::onText(EventText &e) {
 
 void TextField::onKey(EventKey &e) {
 	switch (e.key) {
-		case GLFW_KEY_BACKSPACE:
-			if (begin < end) {
-				text.erase(begin, end - begin);
-				onTextChange();
-			}
-			else {
-				begin--;
-				if (begin >= 0) {
-					text.erase(begin, 1);
+		case GLFW_KEY_BACKSPACE: {
+			if (cursor == selection) {
+				cursor--;
+				if (cursor >= 0) {
+					text.erase(cursor, 1);
 					onTextChange();
 				}
+				selection = cursor;
 			}
-			end = begin;
-			break;
-		case GLFW_KEY_DELETE:
-			if (begin < end) {
-				text.erase(begin, end - begin);
+			else {
+				int begin = min(cursor, selection);
+				text.erase(begin, std::abs(selection - cursor));
+				onTextChange();
+				cursor = selection = begin;
+			}
+		} break;
+		case GLFW_KEY_DELETE: {
+			if (cursor == selection) {
+				text.erase(cursor, 1);
 				onTextChange();
 			}
 			else {
-				text.erase(begin, 1);
+				int begin = min(cursor, selection);
+				text.erase(begin, std::abs(selection - cursor));
 				onTextChange();
+				cursor = selection = begin;
 			}
-			end = begin;
-			break;
-		case GLFW_KEY_LEFT:
-			if (begin < end) {
-			}
-			else {
-				begin--;
-			}
-			end = begin;
-			break;
-		case GLFW_KEY_RIGHT:
-			if (begin < end) {
-				begin = end;
+		} break;
+		case GLFW_KEY_LEFT: {
+			if (windowIsModPressed()) {
+				while (--cursor > 0) {
+					if (text[cursor] == ' ')
+						break;
+				}
 			}
 			else {
-				begin++;
+				cursor--;
 			}
-			end = begin;
-			break;
-		case GLFW_KEY_HOME:
-			end = begin = 0;
-			break;
-		case GLFW_KEY_END:
-			end = begin = text.size();
-			break;
-		case GLFW_KEY_V:
+			if (!windowIsShiftPressed()) {
+				selection = cursor;
+			}
+		} break;
+		case GLFW_KEY_RIGHT: {
+			if (windowIsModPressed()) {
+				while (++cursor < (int) text.size()) {
+					if (text[cursor] == ' ')
+						break;
+				}
+			}
+			else {
+				cursor++;
+			}
+			if (!windowIsShiftPressed()) {
+				selection = cursor;
+			}
+		} break;
+		case GLFW_KEY_HOME: {
+			selection = cursor = 0;
+		} break;
+		case GLFW_KEY_END: {
+			selection = cursor = text.size();
+		} break;
+		case GLFW_KEY_V: {
 			if (windowIsModPressed()) {
 				const char *newText = glfwGetClipboardString(gWindow);
 				if (newText)
 					insertText(newText);
 			}
-			break;
-		case GLFW_KEY_X:
+		} break;
+		case GLFW_KEY_X: {
 			if (windowIsModPressed()) {
-				if (begin < end) {
-					std::string selectedText = text.substr(begin, end - begin);
+				if (cursor != selection) {
+					int begin = min(cursor, selection);
+					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
 					glfwSetClipboardString(gWindow, selectedText.c_str());
 					insertText("");
 				}
 			}
-			break;
-		case GLFW_KEY_C:
+		} break;
+		case GLFW_KEY_C: {
 			if (windowIsModPressed()) {
-				if (begin < end) {
-					std::string selectedText = text.substr(begin, end - begin);
+				if (cursor != selection) {
+					int begin = min(cursor, selection);
+					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
 					glfwSetClipboardString(gWindow, selectedText.c_str());
 				}
 			}
-			break;
-		case GLFW_KEY_A:
+		} break;
+		case GLFW_KEY_A: {
 			if (windowIsModPressed()) {
-				begin = 0;
-				end = text.size();
+				selection = 0;
+				cursor = text.size();
 			}
-			break;
-		case GLFW_KEY_ENTER:
+		} break;
+		case GLFW_KEY_ENTER: {
 			if (multiline) {
 				insertText("\n");
 			}
@@ -147,27 +164,29 @@ void TextField::onKey(EventKey &e) {
 				EventAction e;
 				onAction(e);
 			}
-			break;
+		} break;
 	}
 
-	begin = clamp(begin, 0, text.size());
-	end = clamp(end, 0, text.size());
+	cursor = clamp(cursor, 0, text.size());
+	selection = clamp(selection, 0, text.size());
 	e.consumed = true;
 }
 
 void TextField::insertText(std::string text) {
-	if (begin < end)
-		this->text.erase(begin, end - begin);
-	this->text.insert(begin, text);
-	begin += text.size();
-	end = begin;
+	if (cursor != selection) {
+		int begin = min(cursor, selection);
+		this->text.erase(begin, std::abs(selection - cursor));
+		cursor = selection = begin;
+	}
+	this->text.insert(cursor, text);
+	cursor += text.size();
+	selection = cursor;
 	onTextChange();
 }
 
 void TextField::setText(std::string text) {
 	this->text = text;
-	begin = clamp(begin, 0, text.size());
-	end = clamp(end, 0, text.size());
+	selection = cursor = text.size();
 	onTextChange();
 }
 

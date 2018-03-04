@@ -14,7 +14,7 @@ using std::isnormal;
 namespace rack {
 
 ////////////////////
-// basic integer functions (suffixed with "i")
+// basic integer functions
 ////////////////////
 
 inline int min(int a, int b) {
@@ -54,7 +54,7 @@ inline bool ispow2(int n) {
 }
 
 ////////////////////
-// basic float functions (suffixed with "f")
+// basic float functions
 ////////////////////
 
 /** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
