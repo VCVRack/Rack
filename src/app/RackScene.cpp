@@ -118,12 +118,6 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 					e.consumed = true;
 				}
 			} break;
-			case GLFW_KEY_R: {
-				if (windowIsModPressed() && !windowIsShiftPressed()) {
-					gRackWidget->revert();
-					e.consumed = true;
-				}
-			} break;
 			case GLFW_KEY_ENTER: {
 				appModuleBrowserCreate();
 				e.consumed = true;

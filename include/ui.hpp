@@ -22,10 +22,8 @@ struct SequentialLayout : virtual Widget {
 		RIGHT_ALIGNMENT,
 	};
 	Alignment alignment = LEFT_ALIGNMENT;
-	/** Space outside elements */
-	float margin = 0.0;
 	/** Space between adjacent elements */
-	float padding = 0.0;
+	float spacing = 0.0;
 	void step() override;
 };
 
