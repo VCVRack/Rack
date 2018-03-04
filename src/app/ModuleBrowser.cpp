@@ -45,6 +45,20 @@ struct FavoriteRadioButton : RadioButton {
 };
 
 
+struct SeparatorItem : OpaqueWidget {
+	SeparatorItem() {
+		box.size.y = BND_WIDGET_HEIGHT;
+	}
+
+	void setText(std::string text) {
+		clearChildren();
+		Label *label = Widget::create<Label>(Vec(0, 0));
+		label->text = text;
+		addChild(label);
+	}
+};
+
+
 struct BrowserListItem : OpaqueWidget {
 	bool selected = false;
 
@@ -78,11 +92,13 @@ struct BrowserListItem : OpaqueWidget {
 };
 
 
+
 struct ModelItem : BrowserListItem {
 	Model *model;
 	Label *manufacturerLabel;
 
 	void setModel(Model *model) {
+		clearChildren();
 		assert(model);
 		this->model = model;
 
@@ -95,9 +111,8 @@ struct ModelItem : BrowserListItem {
 		manufacturerLabel->text = model->manufacturer;
 		addChild(manufacturerLabel);
 
-		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(0, BND_WIDGET_HEIGHT));
-		layout2->margin = 7;
-		layout2->padding = 10;
+		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(7, BND_WIDGET_HEIGHT));
+		layout2->spacing = 10;
 		addChild(layout2);
 
 		FavoriteRadioButton *favoriteButton = new FavoriteRadioButton();
@@ -138,14 +153,17 @@ struct ManufacturerItem : BrowserListItem {
 	Label *manufacturerLabel;
 
 	ManufacturerItem() {
-		manufacturerLabel = Widget::create<Label>(Vec(0, 0));
-		manufacturerLabel->text = "Show all modules";
-		addChild(manufacturerLabel);
 	}
 
 	void setManufacturer(std::string manufacturer) {
+		clearChildren();
 		this->manufacturer = manufacturer;
-		manufacturerLabel->text = manufacturer;
+		manufacturerLabel = Widget::create<Label>(Vec(0, 0));
+		if (manufacturer.empty())
+			manufacturerLabel->text = "Show all modules";
+		else
+			manufacturerLabel->text = manufacturer;
+		addChild(manufacturerLabel);
 	}
 
 	void step() override {
@@ -163,34 +181,40 @@ struct BrowserList : List {
 		// If we have zero children, this result doesn't matter anyway.
 		selected = clamp(selected, 0, children.size() - 1);
 		int i = 0;
-		for (Widget *w : children) {
-			BrowserListItem *item = dynamic_cast<BrowserListItem*>(w);
+		for (Widget *child : children) {
+			BrowserListItem *item = dynamic_cast<BrowserListItem*>(child);
 			if (item) {
 				item->selected = (i == selected);
+				i++;
 			}
-			i++;
 		}
 		List::step();
 	}
 
-	void selectChild(Widget *child) {
+	void selectItem(Widget *w) {
 		int i = 0;
-		for (Widget *w : children) {
-			if (w == child) {
-				selected = i;
-				break;
+		for (Widget *child : children) {
+			BrowserListItem *item = dynamic_cast<BrowserListItem*>(child);
+			if (item) {
+				if (child == w) {
+					selected = i;
+					break;
+				}
+				i++;
 			}
-			i++;
 		}
 	}
 
-	Widget *getSelectedChild() {
+	BrowserListItem *getSelectedItem() {
 		int i = 0;
-		for (Widget *w : children) {
-			if (i == selected) {
-				return w;
+		for (Widget *child : children) {
+			BrowserListItem *item = dynamic_cast<BrowserListItem*>(child);
+			if (item) {
+				if (i == selected) {
+					return item;
+				}
+				i++;
 			}
-			i++;
 		}
 		return NULL;
 	}
@@ -241,6 +265,11 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleList->selected = 0;
 
 		// Favorites
+		{
+			SeparatorItem *item = new SeparatorItem();
+			item->setText("Favorites");
+			moduleList->addChild(item);
+		}
 		for (Model *model : sFavoriteModels) {
 			if ((manufacturerFilter.empty() || manufacturerFilter == model->manufacturer) && isModelMatch(model, search)) {
 				ModelItem *item = new ModelItem();
@@ -250,6 +279,11 @@ struct ModuleBrowser : OpaqueWidget {
 		}
 
 		// Manufacturers
+		{
+			SeparatorItem *item = new SeparatorItem();
+			item->setText("Manufacturers");
+			moduleList->addChild(item);
+		}
 		if (manufacturerFilter.empty()) {
 			// Collect all manufacturers
 			std::set<std::string> manufacturers;
@@ -272,10 +306,16 @@ struct ModuleBrowser : OpaqueWidget {
 		else {
 			// Dummy manufacturer for clearing manufacturer filter
 			ManufacturerItem *item = new ManufacturerItem();
+				item->setManufacturer("");
 			moduleList->addChild(item);
 		}
 
 		// Models
+		{
+			SeparatorItem *item = new SeparatorItem();
+			item->setText("Modules");
+			moduleList->addChild(item);
+		}
 		for (Plugin *plugin : gPlugins) {
 			for (Model *model : plugin->models) {
 				if ((manufacturerFilter.empty() || manufacturerFilter == model->manufacturer) && isModelMatch(model, search)) {
@@ -327,7 +367,7 @@ void FavoriteRadioButton::onAction(EventAction &e) {
 
 void BrowserListItem::onMouseEnter(EventMouseEnter &e) {
 	BrowserList *list = getAncestorOfType<BrowserList>();
-	list->selectChild(this);
+	list->selectItem(this);
 }
 
 void SearchModuleField::onTextChange() {
@@ -350,8 +390,7 @@ void SearchModuleField::onKey(EventKey &e) {
 			e.consumed = true;
 		} break;
 		case GLFW_KEY_ENTER: {
-			Widget *w = moduleBrowser->moduleList->getSelectedChild();
-			BrowserListItem *item = dynamic_cast<BrowserListItem*>(w);
+			BrowserListItem *item = moduleBrowser->moduleList->getSelectedItem();
 			if (item) {
 				item->doAction();
 				e.consumed = true;
