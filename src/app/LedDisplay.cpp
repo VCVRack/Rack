@@ -84,10 +84,11 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 
 		NVGcolor highlightColor = color;
 		highlightColor.a = 0.5;
-		int cend = (this == gFocusedWidget) ? end : -1;
+		int begin = min(cursor, selection);
+		int end = (this == gFocusedWidget) ? max(cursor, selection) : -1;
 		bndIconLabelCaret(vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-			-1, color, 12, text.c_str(), highlightColor, begin, cend);
+			-1, color, 12, text.c_str(), highlightColor, begin, end);
 
 		bndSetFont(gGuiFont->handle);
 	}
