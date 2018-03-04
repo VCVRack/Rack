@@ -1,6 +1,7 @@
 ifdef VERSION
 	FLAGS += -DVERSION=$(VERSION)
 endif
+RACK_DIR ?= .
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD
@@ -13,6 +14,8 @@ ifneq ($(ARCH), mac)
 endif
 CXXFLAGS += -std=c++11
 
+
+include $(RACK_DIR)/arch.mk
 
 ifeq ($(ARCH), lin)
 	FLAGS += -DARCH_LIN
