@@ -49,7 +49,7 @@ struct BrowserListItem : OpaqueWidget {
 	bool selected = false;
 
 	BrowserListItem() {
-		box.size.y = 3 * BND_WIDGET_HEIGHT;
+		box.size.y = 2 * BND_WIDGET_HEIGHT + 7;
 	}
 
 	void draw(NVGcontext *vg) override {
@@ -80,43 +80,42 @@ struct BrowserListItem : OpaqueWidget {
 
 struct ModelItem : BrowserListItem {
 	Model *model;
-	FavoriteRadioButton *favoriteButton;
-	Label *nameLabel;
 	Label *manufacturerLabel;
-	Label *tagsLabel;
-
-	ModelItem() {
-		favoriteButton = new FavoriteRadioButton();
-		favoriteButton->box.pos = Vec(7, BND_WIDGET_HEIGHT);
-		favoriteButton->box.size.x = 20;
-		favoriteButton->label = "★";
-		addChild(favoriteButton);
-
-		nameLabel = Widget::create<Label>(Vec(0, 0));
-		addChild(nameLabel);
-		manufacturerLabel = Widget::create<Label>(Vec(0, 0));
-		manufacturerLabel->alignment = Label::RIGHT_ALIGNMENT;
-		addChild(manufacturerLabel);
-		tagsLabel = Widget::create<Label>(Vec(26, BND_WIDGET_HEIGHT));
-		addChild(tagsLabel);
-	}
 
 	void setModel(Model *model) {
 		assert(model);
 		this->model = model;
+
+		Label *nameLabel = Widget::create<Label>(Vec(0, 0));
+		nameLabel->text = model->name;
+		addChild(nameLabel);
+
+		manufacturerLabel = Widget::create<Label>(Vec(0, 0));
+		manufacturerLabel->alignment = Label::RIGHT_ALIGNMENT;
+		manufacturerLabel->text = model->manufacturer;
+		addChild(manufacturerLabel);
+
+		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(0, BND_WIDGET_HEIGHT));
+		layout2->margin = 7;
+		layout2->padding = 10;
+		addChild(layout2);
+
+		FavoriteRadioButton *favoriteButton = new FavoriteRadioButton();
+		favoriteButton->box.size.x = 20;
+		favoriteButton->label = "★";
+		layout2->addChild(favoriteButton);
+
 		auto it = sFavoriteModels.find(model);
 		if (it != sFavoriteModels.end())
 			favoriteButton->setValue(1);
 		favoriteButton->model = model;
 
-		nameLabel->text = model->name;
-		manufacturerLabel->text = model->manufacturer;
-		int i = 0;
-		for (ModelTag tag : model->tags) {
-			if (i++ > 0)
-				tagsLabel->text += ", ";
-			tagsLabel->text += gTagNames[tag];
-		}
+		// for (ModelTag tag : model->tags) {
+		// 	Button *tagButton = new Button();
+		// 	tagButton->box.size.x = 120;
+		// 	tagButton->text = gTagNames[tag];
+		// 	layout2->addChild(tagButton);
+		// }
 	}
 
 	void step() override {
@@ -290,7 +289,7 @@ struct ModuleBrowser : OpaqueWidget {
 
 	void step() override {
 		box.pos = parent->box.size.minus(box.size).div(2).round();
-		box.pos.y = 40;
+		box.pos.y = 60;
 		box.size.y = parent->box.size.y - 2 * box.pos.y;
 
 		moduleScroll->box.size.y = box.size.y - moduleScroll->box.pos.y;
