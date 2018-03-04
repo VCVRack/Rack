@@ -9,6 +9,7 @@ namespace rack {
 To see comments, turn word wrap on. I'm using inline comments so I can automatically sort the list when more tags are added.
 */
 enum ModelTag {
+	NO_TAG, // Don't use this in `Model::create(...)`. Instead, just omit the tags entirely.
 	AMPLIFIER_TAG,
 	ATTENUATOR_TAG,
 	BLANK_TAG,
