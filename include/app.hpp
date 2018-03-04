@@ -322,7 +322,7 @@ struct MomentarySwitch : virtual Switch {
 // IO widgets
 ////////////////////
 
-struct LedDisplay : Widget {
+struct LedDisplay : VirtualWidget {
 	void draw(NVGcontext *vg) override;
 };
 
@@ -484,7 +484,7 @@ struct Toolbar : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct PluginManagerWidget : Widget {
+struct PluginManagerWidget : VirtualWidget {
 	Widget *loginWidget;
 	Widget *manageWidget;
 	Widget *downloadWidget;

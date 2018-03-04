@@ -44,7 +44,9 @@ struct SVG {
 // Base widget
 ////////////////////
 
-/** A node in the 2D scene graph */
+/** A node in the 2D scene graph
+Never inherit from Widget directly. Instead, inherit from VirtualWidget declared below.
+*/
 struct Widget {
 	/** Stores position and size */
 	Rect box = Rect(Vec(), Vec(INFINITY, INFINITY));
@@ -152,7 +154,11 @@ struct Widget {
 	}
 };
 
-struct TransformWidget : Widget {
+/** Instead of inheriting from Widget directly, inherit from VirtualWidget to guarantee that only one copy of Widget's member variables are used by each instance of the Widget hierarchy.
+*/
+struct VirtualWidget : virtual Widget {};
+
+struct TransformWidget : VirtualWidget {
 	/** The transformation matrix */
 	float transform[6];
 	TransformWidget();
@@ -164,7 +170,7 @@ struct TransformWidget : Widget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct ZoomWidget : Widget {
+struct ZoomWidget : VirtualWidget {
 	float zoom = 1.0;
 	Vec getRelativeOffset(Vec v, Widget *relative) override;
 	Rect getViewport(Rect r) override;
@@ -183,7 +189,7 @@ struct ZoomWidget : Widget {
 ////////////////////
 
 /** Widget that does not respond to events */
-struct TransparentWidget : virtual Widget {
+struct TransparentWidget : VirtualWidget {
 	void onMouseDown(EventMouseDown &e) override {}
 	void onMouseUp(EventMouseUp &e) override {}
 	void onMouseMove(EventMouseMove &e) override {}
@@ -191,7 +197,7 @@ struct TransparentWidget : virtual Widget {
 };
 
 /** Widget that automatically responds to all mouse events but gives a chance for children to respond instead */
-struct OpaqueWidget : virtual Widget {
+struct OpaqueWidget : VirtualWidget {
 	void onMouseDown(EventMouseDown &e) override {
 		Widget::onMouseDown(e);
 		if (!e.target)
@@ -216,7 +222,7 @@ struct OpaqueWidget : virtual Widget {
 	}
 };
 
-struct SpriteWidget : virtual Widget {
+struct SpriteWidget : VirtualWidget {
 	Vec spriteOffset;
 	Vec spriteSize;
 	std::shared_ptr<Image> spriteImage;
@@ -224,7 +230,7 @@ struct SpriteWidget : virtual Widget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct SVGWidget : virtual Widget {
+struct SVGWidget : VirtualWidget {
 	std::shared_ptr<SVG> svg;
 	/** Sets the box size to the svg image size */
 	void wrap();
@@ -237,7 +243,7 @@ struct SVGWidget : virtual Widget {
 When `dirty` is true, its children will be re-rendered on the next call to step() override.
 Events are not passed to the underlying scene.
 */
-struct FramebufferWidget : virtual Widget {
+struct FramebufferWidget : VirtualWidget {
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
 	/** A margin in pixels around the children in the framebuffer
@@ -258,7 +264,7 @@ struct FramebufferWidget : virtual Widget {
 };
 
 /** A Widget representing a float value */
-struct QuantityWidget : virtual Widget {
+struct QuantityWidget : VirtualWidget {
 	float value = 0.0;
 	float minValue = 0.0;
 	float maxValue = 1.0;
