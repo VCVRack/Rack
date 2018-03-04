@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "window.hpp"
 #include <set>
+#include <algorithm>
 
 
 #define BND_LABEL_FONT_SIZE 13
@@ -150,15 +151,11 @@ struct ModelItem : BrowserListItem {
 
 struct ManufacturerItem : BrowserListItem {
 	std::string manufacturer;
-	Label *manufacturerLabel;
-
-	ManufacturerItem() {
-	}
 
 	void setManufacturer(std::string manufacturer) {
 		clearChildren();
 		this->manufacturer = manufacturer;
-		manufacturerLabel = Widget::create<Label>(Vec(0, 0));
+		Label *manufacturerLabel = Widget::create<Label>(Vec(0, 0));
 		if (manufacturer.empty())
 			manufacturerLabel->text = "Show all modules";
 		else
@@ -166,8 +163,33 @@ struct ManufacturerItem : BrowserListItem {
 		addChild(manufacturerLabel);
 	}
 
-	void step() override {
-		BrowserListItem::step();
+	void onAction(EventAction &e) override;
+};
+
+
+struct TagItem : BrowserListItem {
+	ModelTag tag;
+
+	void setTag(ModelTag tag) {
+		clearChildren();
+		this->tag = tag;
+		Label *tagLabel = Widget::create<Label>(Vec(0, 0));
+		if (tag == NO_TAG)
+			tagLabel->text = "Show all tags";
+		else
+			tagLabel->text = gTagNames[tag];
+		addChild(tagLabel);
+	}
+
+	void onAction(EventAction &e) override;
+};
+
+
+struct ClearFilterItem : BrowserListItem {
+	ClearFilterItem() {
+		Label *label = Widget::create<Label>(Vec(0, 0));
+		label->text = "Clear filter";
+		addChild(label);
 	}
 
 	void onAction(EventAction &e) override;
@@ -235,6 +257,9 @@ struct ModuleBrowser : OpaqueWidget {
 	ScrollWidget *moduleScroll;
 	BrowserList *moduleList;
 	std::string manufacturerFilter;
+	ModelTag tagFilter = NO_TAG;
+	std::set<std::string> availableManufacturers;
+	std::set<ModelTag> availableTags;
 
 	ModuleBrowser() {
 		box.size.x = 400;
@@ -255,8 +280,37 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleScroll->container->addChild(moduleList);
 		addChild(moduleScroll);
 
+		// Collect manufacturers
+		for (Plugin *plugin : gPlugins) {
+			for (Model *model : plugin->models) {
+				// Insert manufacturer
+				if (!model->manufacturer.empty())
+					availableManufacturers.insert(model->manufacturer);
+				// Insert tag
+				for (ModelTag tag : model->tags) {
+					if (tag != NO_TAG)
+						availableTags.insert(tag);
+				}
+			}
+		}
+
 		// Trigger search update
+		clearSearch();
+	}
+
+	void clearSearch() {
 		searchField->setText("");
+	}
+
+	bool isModelFiltered(Model *model) {
+		if (!manufacturerFilter.empty() && model->manufacturer != manufacturerFilter)
+			return false;
+		if (tagFilter != NO_TAG) {
+			auto it = std::find(model->tags.begin(), model->tags.end(), tagFilter);
+			if (it == model->tags.end())
+				return false;
+		}
+		return true;
 	}
 
 	void refreshSearch() {
@@ -271,7 +325,7 @@ struct ModuleBrowser : OpaqueWidget {
 			moduleList->addChild(item);
 		}
 		for (Model *model : sFavoriteModels) {
-			if ((manufacturerFilter.empty() || manufacturerFilter == model->manufacturer) && isModelMatch(model, search)) {
+			if (isModelFiltered(model) && isModelMatch(model, search)) {
 				ModelItem *item = new ModelItem();
 				item->setModel(model);
 				moduleList->addChild(item);
@@ -279,49 +333,53 @@ struct ModuleBrowser : OpaqueWidget {
 		}
 
 		// Manufacturers
-		{
-			SeparatorItem *item = new SeparatorItem();
-			item->setText("Manufacturers");
-			moduleList->addChild(item);
-		}
-		if (manufacturerFilter.empty()) {
-			// Collect all manufacturers
-			std::set<std::string> manufacturers;
-			for (Plugin *plugin : gPlugins) {
-				for (Model *model : plugin->models) {
-					if (model->manufacturer.empty())
-						continue;
-					manufacturers.insert(model->manufacturer);
-				}
-			}
+		if (manufacturerFilter.empty() && tagFilter == NO_TAG) {
 			// Manufacturer items
-			for (std::string manufacturer : manufacturers) {
+			{
+				SeparatorItem *item = new SeparatorItem();
+				item->setText("Manufacturers");
+				moduleList->addChild(item);
+			}
+			for (std::string manufacturer : availableManufacturers) {
 				if (isMatch(manufacturer, search)) {
 					ManufacturerItem *item = new ManufacturerItem();
 					item->setManufacturer(manufacturer);
 					moduleList->addChild(item);
 				}
 			}
+			// Tag items
+			{
+				SeparatorItem *item = new SeparatorItem();
+				item->setText("Tags");
+				moduleList->addChild(item);
+			}
+			for (ModelTag tag : availableTags) {
+				if (isMatch(gTagNames[tag], search)) {
+					TagItem *item = new TagItem();
+					item->setTag(tag);
+					moduleList->addChild(item);
+				}
+			}
 		}
 		else {
-			// Dummy manufacturer for clearing manufacturer filter
-			ManufacturerItem *item = new ManufacturerItem();
-				item->setManufacturer("");
+			ClearFilterItem *item = new ClearFilterItem();
 			moduleList->addChild(item);
 		}
 
 		// Models
-		{
-			SeparatorItem *item = new SeparatorItem();
-			item->setText("Modules");
-			moduleList->addChild(item);
-		}
-		for (Plugin *plugin : gPlugins) {
-			for (Model *model : plugin->models) {
-				if ((manufacturerFilter.empty() || manufacturerFilter == model->manufacturer) && isModelMatch(model, search)) {
-					ModelItem *item = new ModelItem();
-					item->setModel(model);
-					moduleList->addChild(item);
+		if (!manufacturerFilter.empty() || tagFilter != NO_TAG || !search.empty()) {
+			{
+				SeparatorItem *item = new SeparatorItem();
+				item->setText("Modules");
+				moduleList->addChild(item);
+			}
+			for (Plugin *plugin : gPlugins) {
+				for (Model *model : plugin->models) {
+					if (isModelFiltered(model) && isModelMatch(model, search)) {
+						ModelItem *item = new ModelItem();
+						item->setModel(model);
+						moduleList->addChild(item);
+					}
 				}
 			}
 		}
@@ -344,6 +402,24 @@ struct ModuleBrowser : OpaqueWidget {
 void ManufacturerItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	moduleBrowser->manufacturerFilter = manufacturer;
+	moduleBrowser->clearSearch();
+	moduleBrowser->refreshSearch();
+	e.consumed = false;
+}
+
+void TagItem::onAction(EventAction &e) {
+	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
+	moduleBrowser->tagFilter = tag;
+	moduleBrowser->clearSearch();
+	moduleBrowser->refreshSearch();
+	e.consumed = false;
+}
+
+void ClearFilterItem::onAction(EventAction &e) {
+	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
+	moduleBrowser->manufacturerFilter = "";
+	moduleBrowser->tagFilter = NO_TAG;
+	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
 }

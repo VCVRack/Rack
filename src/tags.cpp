@@ -42,6 +42,7 @@ void tagsInit() {
 	gTagNames[OSCILLATOR_TAG] = "Oscillator/VCO";
 	gTagNames[PANNING_TAG] = "Panning";
 	gTagNames[PHASER_TAG] = "Phaser";
+	gTagNames[PHYSICAL_MODELING_TAG] = "Physical Modeling";
 	gTagNames[QUAD_TAG] = "Quad";
 	gTagNames[QUANTIZER_TAG] = "Quantizer";
 	gTagNames[RANDOM_TAG] = "Random";

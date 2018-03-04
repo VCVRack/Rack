@@ -166,6 +166,8 @@ void TextField::insertText(std::string text) {
 
 void TextField::setText(std::string text) {
 	this->text = text;
+	begin = clamp(begin, 0, text.size());
+	end = clamp(end, 0, text.size());
 	onTextChange();
 }
 
