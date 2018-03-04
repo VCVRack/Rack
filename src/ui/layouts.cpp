@@ -7,7 +7,7 @@ namespace rack {
 void SequentialLayout::step() {
 	Widget::step();
 
-	float offset = 0.0;
+	float offset = margin;
 	for (Widget *child : children) {
 		if (!child->visible)
 			continue;
@@ -15,7 +15,7 @@ void SequentialLayout::step() {
 		(orientation == HORIZONTAL_ORIENTATION ? child->box.pos.x : child->box.pos.y) = offset;
 		// Increment by size
 		offset += (orientation == HORIZONTAL_ORIENTATION ? child->box.size.x : child->box.size.y);
-		offset += margin;
+		offset += padding;
 	}
 
 	// We're done if left aligned
@@ -23,7 +23,8 @@ void SequentialLayout::step() {
 		return;
 
 	// Adjust positions based on width of the layout itself
-	offset -= margin;
+	offset -= padding;
+	offset += margin;
 	if (alignment == RIGHT_ALIGNMENT)
 		offset -= (orientation == HORIZONTAL_ORIENTATION ? box.size.x : box.size.y);
 	else if (alignment == CENTER_ALIGNMENT)
