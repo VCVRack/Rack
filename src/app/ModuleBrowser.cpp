@@ -113,7 +113,7 @@ struct ModelItem : BrowserListItem {
 		addChild(manufacturerLabel);
 
 		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(7, BND_WIDGET_HEIGHT));
-		layout2->spacing = 10;
+		layout2->spacing = 0;
 		addChild(layout2);
 
 		FavoriteRadioButton *favoriteButton = new FavoriteRadioButton();
@@ -132,6 +132,15 @@ struct ModelItem : BrowserListItem {
 		// 	tagButton->text = gTagNames[tag];
 		// 	layout2->addChild(tagButton);
 		// }
+
+		Label *tagsLabel = new Label();
+		int i = 0;
+		for (ModelTag tag : model->tags) {
+			if (i++ > 0)
+				tagsLabel->text += ", ";
+			tagsLabel->text += gTagNames[tag];
+		}
+		layout2->addChild(tagsLabel);
 	}
 
 	void step() override {
