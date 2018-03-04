@@ -70,6 +70,8 @@ void ScrollWidget::draw(NVGcontext *vg) {
 }
 
 void ScrollWidget::step() {
+	Widget::step();
+
 	// Clamp scroll offset
 	Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
 	Rect containerBox = Rect(Vec(0, 0), containerCorner.minus(box.size));
@@ -101,8 +103,6 @@ void ScrollWidget::step() {
 	verticalScrollBar->box.pos.x = inner.x;
 	horizontalScrollBar->box.size.x = verticalScrollBar->visible ? inner.x : box.size.x;
 	verticalScrollBar->box.size.y = horizontalScrollBar->visible ? inner.y : box.size.y;
-
-	Widget::step();
 }
 
 void ScrollWidget::onMouseMove(EventMouseMove &e) {

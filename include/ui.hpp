@@ -55,6 +55,9 @@ struct Menu : OpaqueWidget {
 };
 
 struct MenuEntry : OpaqueWidget {
+	MenuEntry() {
+		box.size = Vec(0, BND_WIDGET_HEIGHT);
+	}
 	template <typename T = MenuEntry>
 	static T *create() {
 		T *o = Widget::create<T>(Vec());
@@ -64,9 +67,6 @@ struct MenuEntry : OpaqueWidget {
 
 struct MenuLabel : MenuEntry {
 	std::string text;
-	MenuLabel() {
-		box.size = Vec(0, BND_WIDGET_HEIGHT);
-	}
 	void draw(NVGcontext *vg) override;
 	void step() override;
 
@@ -81,9 +81,6 @@ struct MenuLabel : MenuEntry {
 struct MenuItem : MenuEntry {
 	std::string text;
 	std::string rightText;
-	MenuItem() {
-		box.size = Vec(0, BND_WIDGET_HEIGHT);
-	}
 	void draw(NVGcontext *vg) override;
 	void step() override;
 	virtual Menu *createChildMenu() {return NULL;}
