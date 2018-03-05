@@ -209,8 +209,17 @@ struct BrowserList : List {
 	int selected = 0;
 
 	void step() override {
+		// Count items
+		int n = 0;
+		for (Widget *child : children) {
+			BrowserListItem *item = dynamic_cast<BrowserListItem*>(child);
+			if (item) {
+				n++;
+			}
+		}
 		// If we have zero children, this result doesn't matter anyway.
-		selected = clamp(selected, 0, children.size() - 1);
+		selected = clamp(selected, 0, n - 1);
+		// Find and select item
 		int i = 0;
 		for (Widget *child : children) {
 			BrowserListItem *item = dynamic_cast<BrowserListItem*>(child);
