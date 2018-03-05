@@ -1,4 +1,4 @@
-#include "tags.hpp"
+v#include "tags.hpp"
 
 
 namespace rack {
@@ -10,6 +10,7 @@ std::string gTagNames[NUM_TAGS];
 void tagsInit() {
 	gTagNames[AMPLIFIER_TAG] = "Amplifier/VCA";
 	gTagNames[ATTENUATOR_TAG] = "Attenuator";
+	gTagNames[ARPEGGIATOR_TAG] = "Arpeggiator";
 	gTagNames[BLANK_TAG] = "Blank";
 	gTagNames[CHORUS_TAG] = "Chorus";
 	gTagNames[CLOCK_TAG] = "Clock";
