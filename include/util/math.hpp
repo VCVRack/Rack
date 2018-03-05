@@ -2,6 +2,7 @@
 #include "util/common.hpp"
 #include <math.h> // for global namespace functions
 #include <cmath> // for std::isfinite, etc
+#include <cstdlib> // for std::abs, etc
 
 
 // Use a few standard math functions without std::
