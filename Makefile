@@ -192,6 +192,9 @@ endif
 	cp *.mk dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
+ifeq ($(ARCH), win)
+	cp libRack.a dist/Rack-SDK/
+endif
 	cd dist && zip -5 -r Rack-SDK-$(VERSION)-$(ARCH).zip Rack-SDK
 
 
