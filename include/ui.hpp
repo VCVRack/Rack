@@ -188,6 +188,7 @@ struct ScrollWidget : OpaqueWidget {
 	void step() override;
 	void onMouseMove(EventMouseMove &e) override;
 	void onScroll(EventScroll &e) override;
+	void onHoverKey(EventHoverKey &e) override;
 };
 
 struct TextField : OpaqueWidget {
