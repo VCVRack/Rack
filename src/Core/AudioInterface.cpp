@@ -58,7 +58,7 @@ struct AudioInterfaceIO : AudioIO {
 		if (numOutputs > 0) {
 			std::unique_lock<std::mutex> lock(audioMutex);
 			auto cond = [&] {
-				return outputBuffer.size() >= length;
+				return (outputBuffer.size() >= (size_t) length);
 			};
 			if (audioCv.wait_for(lock, audioTimeout, cond)) {
 				// Consume audio block
@@ -187,7 +187,7 @@ void AudioInterface::step() {
 			// Wait until outputs are needed
 			std::unique_lock<std::mutex> lock(audioIO.engineMutex);
 			auto cond = [&] {
-				return audioIO.outputBuffer.size() < audioIO.blockSize;
+				return (audioIO.outputBuffer.size() < (size_t) audioIO.blockSize);
 			};
 			if (audioIO.engineCv.wait_for(lock, audioTimeout, cond)) {
 				// Push converted output
