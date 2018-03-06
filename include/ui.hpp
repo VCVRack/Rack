@@ -5,12 +5,48 @@
 
 namespace rack {
 
+////////////////////
+// Layouts (layouts.cpp)
+////////////////////
 
-struct Label : Widget {
+/** Positions children in a row/column based on their widths/heights */
+struct SequentialLayout : virtual Widget {
+	enum Orientation {
+		HORIZONTAL_ORIENTATION,
+		VERTICAL_ORIENTATION,
+	};
+	Orientation orientation = HORIZONTAL_ORIENTATION;
+	enum Alignment {
+		LEFT_ALIGNMENT,
+		CENTER_ALIGNMENT,
+		RIGHT_ALIGNMENT,
+	};
+	Alignment alignment = LEFT_ALIGNMENT;
+	/** Space between adjacent elements */
+	float spacing = 0.0;
+	void step() override;
+};
+
+////////////////////
+// Blendish UI elements
+////////////////////
+
+struct Label : VirtualWidget {
 	std::string text;
+	enum Alignment {
+		LEFT_ALIGNMENT,
+		CENTER_ALIGNMENT,
+		RIGHT_ALIGNMENT,
+	};
+	Alignment alignment = LEFT_ALIGNMENT;
 	Label() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
+	void draw(NVGcontext *vg) override;
+};
+
+struct List : OpaqueWidget {
+	void step() override;
 	void draw(NVGcontext *vg) override;
 };
 
@@ -33,7 +69,7 @@ struct Menu : OpaqueWidget {
 		box.size = Vec(0, 0);
 	}
 	~Menu();
-	// Resizes menu and calls addChild()
+	/** Deprecated. Just use addChild(child) instead */
 	void pushChild(Widget *child) DEPRECATED {
 		addChild(child);
 	}
@@ -47,7 +83,6 @@ struct MenuEntry : OpaqueWidget {
 	MenuEntry() {
 		box.size = Vec(0, BND_WIDGET_HEIGHT);
 	}
-
 	template <typename T = MenuEntry>
 	static T *create() {
 		T *o = Widget::create<T>(Vec());
@@ -89,7 +124,7 @@ struct MenuItem : MenuEntry {
 struct WindowOverlay : OpaqueWidget {
 };
 
-struct Window : OpaqueWidget {
+struct WindowWidget : OpaqueWidget {
 	std::string title;
 	void draw(NVGcontext *vg) override;
 	void onDragMove(EventDragMove &e) override;
@@ -139,22 +174,7 @@ struct Slider : OpaqueWidget, QuantityWidget {
 	void onMouseDown(EventMouseDown &e) override;
 };
 
-/** Parent must be a ScrollWidget */
-struct ScrollBar : OpaqueWidget {
-	enum { VERTICAL, HORIZONTAL } orientation;
-	BNDwidgetState state = BND_DEFAULT;
-	float offset = 0.0;
-	float size = 0.0;
-
-	ScrollBar() {
-		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
-	}
-	void draw(NVGcontext *vg) override;
-	void onDragStart(EventDragStart &e) override;
-	void onDragMove(EventDragMove &e) override;
-	void onDragEnd(EventDragEnd &e) override;
-};
-
+struct ScrollBar;
 /** Handles a container with ScrollBar */
 struct ScrollWidget : OpaqueWidget {
 	Widget *container;
@@ -163,19 +183,24 @@ struct ScrollWidget : OpaqueWidget {
 	Vec offset;
 
 	ScrollWidget();
+	void scrollTo(Rect r);
 	void draw(NVGcontext *vg) override;
 	void step() override;
 	void onMouseMove(EventMouseMove &e) override;
 	void onScroll(EventScroll &e) override;
+	void onHoverKey(EventHoverKey &e) override;
 };
 
 struct TextField : OpaqueWidget {
 	std::string text;
 	std::string placeholder;
 	bool multiline = false;
-	int begin = 0;
-	int end = 0;
-	int dragPos = 0;
+	/** The index of the text cursor */
+	int cursor = 0;
+	/** The index of the other end of the selection.
+	If nothing is selected, this is equal to `cursor`.
+	*/
+	int selection = 0;
 
 	TextField() {
 		box.size.y = BND_WIDGET_HEIGHT;
@@ -186,7 +211,10 @@ struct TextField : OpaqueWidget {
 	void onFocus(EventFocus &e) override;
 	void onText(EventText &e) override;
 	void onKey(EventKey &e) override;
-	void insertText(std::string newText);
+	/** Inserts text at the cursor, replacing the selection if necessary */
+	void insertText(std::string text);
+	/** Replaces the entire text */
+	void setText(std::string text);
 	virtual int getTextPosition(Vec mousePos);
 	virtual void onTextChange() {}
 };
@@ -202,7 +230,7 @@ struct ProgressBar : QuantityWidget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct Tooltip : Widget {
+struct Tooltip : VirtualWidget {
 	void step() override;
 	void draw(NVGcontext *vg) override;
 };

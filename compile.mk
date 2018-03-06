@@ -2,8 +2,11 @@ ifdef VERSION
 	FLAGS += -DVERSION=$(VERSION)
 endif
 
+RACK_DIR ?= .
+include $(RACK_DIR)/arch.mk
+
 # Generate dependency files alongside the object files
-FLAGS += -MMD
+FLAGS += -MMD -MP
 FLAGS += -g
 # Optimization
 FLAGS += -O3 -march=nocona -ffast-math -fno-finite-math-only
@@ -17,7 +20,6 @@ CXXFLAGS += -std=c++11
 ifeq ($(ARCH), lin)
 	FLAGS += -DARCH_LIN
 endif
-
 ifeq ($(ARCH), mac)
 	FLAGS += -DARCH_MAC
 	CXXFLAGS += -stdlib=libc++
@@ -26,7 +28,6 @@ ifeq ($(ARCH), mac)
 	FLAGS += $(MAC_SDK_FLAGS)
 	LDFLAGS += $(MAC_SDK_FLAGS)
 endif
-
 ifeq ($(ARCH), win)
 	FLAGS += -DARCH_WIN
 	FLAGS += -D_USE_MATH_DEFINES

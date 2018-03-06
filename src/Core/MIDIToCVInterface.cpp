@@ -1,4 +1,4 @@
-#include "core.hpp"
+#include "Core.hpp"
 #include "midi.hpp"
 #include "dsp/filter.hpp"
 

@@ -460,8 +460,9 @@ void windowRun() {
 		int windowWidth, windowHeight;
 		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 		gWindowRatio = (float)width / windowWidth;
+		debug("%d %d %f %f", windowWidth, windowHeight, gWindowRatio, gPixelRatio);
 
-		gScene->box.size = Vec(width, height).div(gPixelRatio / gWindowRatio);
+		gScene->box.size = Vec(windowWidth, windowHeight);
 
 		// Step scene
 		gScene->step();

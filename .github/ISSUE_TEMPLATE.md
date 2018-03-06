@@ -2,7 +2,7 @@ Search before opening an issue to make sure your topic is not a duplicate. Delet
 
 ## For bug reports:
 
-Operating system, or "all" if known to exist on all three:
+Operating system(s):
 Version if official Rack release, commit hash and/or branch if from source:
 
 ## For feature requests:

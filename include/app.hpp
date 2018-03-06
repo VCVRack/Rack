@@ -158,6 +158,8 @@ struct RackWidget : OpaqueWidget {
 	void openDialog();
 	void saveDialog();
 	void saveAsDialog();
+	/** If `lastPath` is defined, ask the user to reload it */
+	void revert();
 	void savePatch(std::string filename);
 	void loadPatch(std::string filename);
 	json_t *toJson();
@@ -171,6 +173,7 @@ struct RackWidget : OpaqueWidget {
 	bool requestModuleBox(ModuleWidget *m, Rect box);
 	/** Moves a module to the closest non-colliding position */
 	bool requestModuleBoxNearest(ModuleWidget *m, Rect box);
+
 	void step() override;
 	void draw(NVGcontext *vg) override;
 
@@ -181,13 +184,6 @@ struct RackWidget : OpaqueWidget {
 
 struct RackRail : TransparentWidget {
 	void draw(NVGcontext *vg) override;
-};
-
-struct AddModuleWindow : Window {
-	Vec modulePos;
-
-	AddModuleWindow();
-	void step() override;
 };
 
 struct Panel : TransparentWidget {
@@ -326,7 +322,7 @@ struct MomentarySwitch : virtual Switch {
 // IO widgets
 ////////////////////
 
-struct LedDisplay : Widget {
+struct LedDisplay : VirtualWidget {
 	void draw(NVGcontext *vg) override;
 };
 
@@ -488,7 +484,7 @@ struct Toolbar : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct PluginManagerWidget : Widget {
+struct PluginManagerWidget : VirtualWidget {
 	Widget *loginWidget;
 	Widget *manageWidget;
 	Widget *downloadWidget;
@@ -524,8 +520,12 @@ extern RackScene *gRackScene;
 extern RackWidget *gRackWidget;
 extern Toolbar *gToolbar;
 
-void sceneInit();
-void sceneDestroy();
+void appInit();
+void appDestroy();
+void appModuleBrowserCreate();
+json_t *appModuleBrowserToJson();
+void appModuleBrowserFromJson(json_t *rootJ);
+
 
 json_t *colorToJson(NVGcolor color);
 NVGcolor jsonToColor(json_t *colorJ);

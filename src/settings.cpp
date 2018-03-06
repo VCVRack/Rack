@@ -64,6 +64,9 @@ static json_t *settingsToJson() {
 		json_object_set_new(rootJ, "skipAutosaveOnLaunch", json_true());
 	}
 
+	// moduleBrowser
+	json_object_set_new(rootJ, "moduleBrowser", appModuleBrowserToJson());
+
 	return rootJ;
 }
 
@@ -123,9 +126,15 @@ static void settingsFromJson(json_t *rootJ) {
 	if (lastPathJ)
 		gRackWidget->lastPath = json_string_value(lastPathJ);
 
+	// skipAutosaveOnLaunch
 	json_t *skipAutosaveOnLaunchJ = json_object_get(rootJ, "skipAutosaveOnLaunch");
 	if (skipAutosaveOnLaunchJ)
 		skipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
+
+	// moduleBrowser
+	json_t * moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
+	if (moduleBrowserJ)
+		appModuleBrowserFromJson(moduleBrowserJ);
 }
 
 

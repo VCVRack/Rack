@@ -105,6 +105,8 @@ bool pluginIsDownloading();
 float pluginGetDownloadProgress();
 std::string pluginGetDownloadName();
 std::string pluginGetLoginStatus();
+Plugin *pluginGetPlugin(std::string pluginSlug);
+Model *pluginGetModel(std::string pluginSlug, std::string modelSlug);
 
 
 extern std::list<Plugin*> gPlugins;
