@@ -209,16 +209,7 @@ struct BrowserList : List {
 	int selected = 0;
 
 	void step() override {
-		// Count items
-		int n = 0;
-		for (Widget *child : children) {
-			BrowserListItem *item = dynamic_cast<BrowserListItem*>(child);
-			if (item) {
-				n++;
-			}
-		}
-		// If we have zero children, this result doesn't matter anyway.
-		selected = clamp(selected, 0, n - 1);
+		incrementSelection(0);
 		// Find and select item
 		int i = 0;
 		for (Widget *child : children) {
@@ -229,6 +220,22 @@ struct BrowserList : List {
 			}
 		}
 		List::step();
+	}
+
+	void incrementSelection(int delta) {
+		selected += delta;
+		selected = clamp(selected, 0, countItems() - 1);
+	}
+
+	int countItems() {
+		int n = 0;
+		for (Widget *child : children) {
+			BrowserListItem *item = dynamic_cast<BrowserListItem*>(child);
+			if (item) {
+				n++;
+			}
+		}
+		return n;
 	}
 
 	void selectItem(Widget *w) {
@@ -469,8 +476,8 @@ void FavoriteRadioButton::onAction(EventAction &e) {
 }
 
 void BrowserListItem::onMouseEnter(EventMouseEnter &e) {
-	BrowserList *list = getAncestorOfType<BrowserList>();
-	list->selectItem(this);
+	// BrowserList *list = getAncestorOfType<BrowserList>();
+	// list->selectItem(this);
 }
 
 void SearchModuleField::onTextChange() {
@@ -485,12 +492,22 @@ void SearchModuleField::onKey(EventKey &e) {
 			return;
 		} break;
 		case GLFW_KEY_UP: {
-			moduleBrowser->moduleList->selected--;
+			moduleBrowser->moduleList->incrementSelection(-1);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
 		case GLFW_KEY_DOWN: {
-			moduleBrowser->moduleList->selected++;
+			moduleBrowser->moduleList->incrementSelection(1);
+			moduleBrowser->moduleList->scrollSelected();
+			e.consumed = true;
+		} break;
+		case GLFW_KEY_PAGE_UP: {
+			moduleBrowser->moduleList->incrementSelection(-5);
+			moduleBrowser->moduleList->scrollSelected();
+			e.consumed = true;
+		} break;
+		case GLFW_KEY_PAGE_DOWN: {
+			moduleBrowser->moduleList->incrementSelection(5);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
