@@ -140,5 +140,9 @@ void ScrollWidget::onScroll(EventScroll &e) {
 	e.consumed = true;
 }
 
+void ScrollWidget::onHoverKey(EventHoverKey &e) {
+	Widget::onHoverKey(e);
+}
+
 
 } // namespace rack

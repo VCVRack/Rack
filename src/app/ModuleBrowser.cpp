@@ -413,7 +413,6 @@ struct ModuleBrowser : OpaqueWidget {
 	}
 
 	void step() override {
-		box.pos = parent->box.size.minus(box.size).div(2).round();
 		box.pos.y = 60;
 		box.size.y = parent->box.size.y - 2 * box.pos.y;
 
@@ -516,6 +515,8 @@ void appModuleBrowserCreate() {
 
 	ModuleBrowser *moduleBrowser = new ModuleBrowser();
 	overlay->addChild(moduleBrowser);
+	moduleBrowser->box.pos = gMousePos.minus(moduleBrowser->box.getCenter());
+
 	gScene->setOverlay(overlay);
 }
 
