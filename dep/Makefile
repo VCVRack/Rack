@@ -112,7 +112,7 @@ $(openssl):
 	$(UNTAR) openssl-1.1.0g.tar.gz
 	cd openssl-1.1.0g && ./config --prefix="$(LOCAL)"
 	$(MAKE) -C openssl-1.1.0g
-	$(MAKE) -C openssl-1.1.0g install
+	$(MAKE) -C openssl-1.1.0g install_sw
 
 $(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
@@ -145,7 +145,7 @@ ifeq ($(ARCH),win)
 RTAUDIO_FLAGS += -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
 endif
 ifeq ($(ARCH),lin)
-RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_LINUX_PULSE=ON
+RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON
 endif
 
 ifdef RTAUDIO_ALL_APIS
@@ -153,7 +153,7 @@ ifeq ($(ARCH),mac)
 RTAUDIO_FLAGS += -DAUDIO_UNIX_JACK=ON
 endif
 ifeq ($(ARCH),lin)
-RTAUDIO_FLAGS += -DAUDIO_LINUX_JACK=ON
+RTAUDIO_FLAGS += -DAUDIO_LINUX_PULSE=ON -DAUDIO_UNIX_JACK=ON
 endif
 endif
 

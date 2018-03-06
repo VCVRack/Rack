@@ -10,6 +10,7 @@ std::string gTagNames[NUM_TAGS];
 void tagsInit() {
 	gTagNames[AMPLIFIER_TAG] = "Amplifier/VCA";
 	gTagNames[ATTENUATOR_TAG] = "Attenuator";
+	gTagNames[ARPEGGIATOR_TAG] = "Arpeggiator";
 	gTagNames[BLANK_TAG] = "Blank";
 	gTagNames[CHORUS_TAG] = "Chorus";
 	gTagNames[CLOCK_TAG] = "Clock";
@@ -42,6 +43,7 @@ void tagsInit() {
 	gTagNames[OSCILLATOR_TAG] = "Oscillator/VCO";
 	gTagNames[PANNING_TAG] = "Panning";
 	gTagNames[PHASER_TAG] = "Phaser";
+	gTagNames[PHYSICAL_MODELING_TAG] = "Physical Modeling";
 	gTagNames[QUAD_TAG] = "Quad";
 	gTagNames[QUANTIZER_TAG] = "Quantizer";
 	gTagNames[RANDOM_TAG] = "Random";

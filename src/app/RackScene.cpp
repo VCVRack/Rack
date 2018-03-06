@@ -94,34 +94,33 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->reset();
 					e.consumed = true;
-					return;
 				}
 			} break;
 			case GLFW_KEY_Q: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					windowClose();
 					e.consumed = true;
-					return;
 				}
 			} break;
 			case GLFW_KEY_O: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->openDialog();
 					e.consumed = true;
-					return;
 				}
 			} break;
 			case GLFW_KEY_S: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->saveDialog();
 					e.consumed = true;
-					return;
 				}
 				if (windowIsModPressed() && windowIsShiftPressed()) {
 					gRackWidget->saveAsDialog();
 					e.consumed = true;
-					return;
 				}
+			} break;
+			case GLFW_KEY_ENTER: {
+				appModuleBrowserCreate();
+				e.consumed = true;
 			} break;
 		}
 	}

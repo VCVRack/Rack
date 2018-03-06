@@ -38,11 +38,11 @@ float Light::getBrightness() {
 	return sqrtf(fmaxf(0.f, value));
 }
 
-void Light::setBrightnessSmooth(float brightness) {
+void Light::setBrightnessSmooth(float brightness, float frames) {
 	float v = (brightness > 0.f) ? brightness * brightness : 0.f;
 	if (v < value) {
 		// Fade out light with lambda = framerate
-		value += (v - value) * sampleTime * (60.f * 1.f);
+		value += (v - value) * sampleTime * frames * 60.f;
 	}
 	else {
 		// Immediately illuminate light
@@ -92,14 +92,14 @@ static void engineStep() {
 		// Step ports
 		for (Input &input : module->inputs) {
 			if (input.active) {
-				float value = input.value / 10.0;
+				float value = input.value / 10.f;
 				input.plugLights[0].setBrightnessSmooth(value);
 				input.plugLights[1].setBrightnessSmooth(-value);
 			}
 		}
 		for (Output &output : module->outputs) {
 			if (output.active) {
-				float value = output.value / 10.0;
+				float value = output.value / 10.f;
 				output.plugLights[0].setBrightnessSmooth(value);
 				output.plugLights[1].setBrightnessSmooth(-value);
 			}

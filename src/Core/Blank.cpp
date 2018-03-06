@@ -1,4 +1,4 @@
-#include "core.hpp"
+#include "Core.hpp"
 
 using namespace rack;
 

@@ -9,12 +9,14 @@ namespace rack {
 To see comments, turn word wrap on. I'm using inline comments so I can automatically sort the list when more tags are added.
 */
 enum ModelTag {
+	NO_TAG, // Don't use this in `Model::create(...)`. Instead, just omit the tags entirely.
 	AMPLIFIER_TAG,
+	ARPEGGIATOR_TAG,
 	ATTENUATOR_TAG,
 	BLANK_TAG,
 	CHORUS_TAG,
-	CLOCK_TAG,
 	CLOCK_MODULATOR_TAG, // Clock dividers, multipliers, etc.
+	CLOCK_TAG,
 	COMPRESSOR_TAG,
 	CONTROLLER_TAG, // Use only if the artist "performs" with this module. Knobs are not sufficient. Examples: on-screen keyboard, XY pad.
 	DELAY_TAG,

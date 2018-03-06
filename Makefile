@@ -1,4 +1,5 @@
 VERSION = 0.6.0dev
+RACK_DIR = .
 
 FLAGS += \
 	-Iinclude \

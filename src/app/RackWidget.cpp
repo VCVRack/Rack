@@ -141,6 +141,14 @@ void RackWidget::loadPatch(std::string path) {
 	fclose(file);
 }
 
+void RackWidget::revert() {
+	if (lastPath.empty())
+		return;
+	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert your patch to the last saved state?")) {
+		loadPatch(lastPath);
+	}
+}
+
 json_t *RackWidget::toJson() {
 	// root
 	json_t *rootJ = json_object();
@@ -240,29 +248,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 		std::string pluginSlug = json_string_value(pluginSlugJ);
 		std::string modelSlug = json_string_value(modelSlugJ);
 
-		// Search for plugin
-		Plugin *plugin = NULL;
-		for (Plugin *p : gPlugins) {
-			if (p->slug == pluginSlug) {
-				plugin = p;
-				break;
-			}
-		}
-
-		if (!plugin) {
-			message += stringf("Could not find plugin \"%s\" for module \"%s\"\n", pluginSlug.c_str(), modelSlug.c_str());
-			continue;
-		}
-
-		// Search for model
-		Model *model = NULL;
-		for (Model *m : plugin->models) {
-			if (m->slug == modelSlug) {
-				model = m;
-				break;
-			}
-		}
-
+		Model *model = pluginGetModel(pluginSlug, modelSlug);
 		if (!model) {
 			message += stringf("Could not find module \"%s\" in plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 			continue;
@@ -438,15 +424,7 @@ void RackWidget::onMouseDown(EventMouseDown &e) {
 		return;
 
 	if (e.button == 1) {
-		MenuOverlay *overlay = new MenuOverlay();
-
-		AddModuleWindow *window = new AddModuleWindow();
-		// Set center position
-		window->box.pos = gMousePos.minus(window->box.getCenter());
-		window->modulePos = lastMousePos;
-
-		overlay->addChild(window);
-		gScene->setOverlay(overlay);
+		appModuleBrowserCreate();
 	}
 	e.consumed = true;
 	e.target = this;

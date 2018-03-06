@@ -475,5 +475,28 @@ std::string pluginGetLoginStatus() {
 	return loginStatus;
 }
 
+Plugin *pluginGetPlugin(std::string pluginSlug) {
+	for (Plugin *plugin : gPlugins) {
+		if (plugin->slug == pluginSlug) {
+			return plugin;
+		}
+	}
+	return NULL;
+}
+
+Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
+	Plugin *plugin = pluginGetPlugin(pluginSlug);
+	if (plugin) {
+		for (Model *model : plugin->models) {
+			if (model->slug == modelSlug) {
+				return model;
+			}
+		}
+	}
+	return NULL;
+}
+
+
+
 
 } // namespace rack
