@@ -183,6 +183,7 @@ struct ScrollWidget : OpaqueWidget {
 	Vec offset;
 
 	ScrollWidget();
+	void scrollTo(Rect r);
 	void draw(NVGcontext *vg) override;
 	void step() override;
 	void onMouseMove(EventMouseMove &e) override;

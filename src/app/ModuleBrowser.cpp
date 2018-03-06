@@ -258,6 +258,15 @@ struct BrowserList : List {
 		}
 		return NULL;
 	}
+
+	void scrollSelected() {
+		BrowserListItem *item = getSelectedItem();
+		if (item) {
+			ScrollWidget *parentScroll = dynamic_cast<ScrollWidget*>(parent->parent);
+			if (parentScroll)
+				parentScroll->scrollTo(item->box);
+		}
+	}
 };
 
 
@@ -477,10 +486,12 @@ void SearchModuleField::onKey(EventKey &e) {
 		} break;
 		case GLFW_KEY_UP: {
 			moduleBrowser->moduleList->selected--;
+			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
 		case GLFW_KEY_DOWN: {
 			moduleBrowser->moduleList->selected++;
+			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
 		case GLFW_KEY_ENTER: {
