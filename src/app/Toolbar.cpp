@@ -12,6 +12,12 @@ struct NewItem : MenuItem {
 	}
 };
 
+struct DisconnectItem : MenuItem {
+	void onAction(EventAction &e) override {
+		gRackWidget->disconnect();
+	}
+};
+
 struct OpenItem : MenuItem {
 	void onAction(EventAction &e) override {
 		gRackWidget->openDialog();
@@ -48,12 +54,13 @@ struct FileChoice : ChoiceButton {
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(construct<NewItem>(&MenuItem::text, "New", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+N"));
-		menu->addChild(construct<OpenItem>(&MenuItem::text, "Open", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+O"));
-		menu->addChild(construct<SaveItem>(&MenuItem::text, "Save", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+S"));
-		menu->addChild(construct<SaveAsItem>(&MenuItem::text, "Save as", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+Shift+S"));
-		menu->addChild(construct<RevertItem>(&MenuItem::text, "Revert", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+R"));
-		menu->addChild(construct<QuitItem>(&MenuItem::text, "Quit", &MenuItem::rightText, WINDOW_MOD_KEY_NAME "+Q"));
+		menu->addChild(MenuItem::create<NewItem>("New", WINDOW_MOD_KEY_NAME "+N"));
+		menu->addChild(MenuItem::create<DisconnectItem>("Disconnect cables"));
+		menu->addChild(MenuItem::create<OpenItem>("Open", WINDOW_MOD_KEY_NAME "+O"));
+		menu->addChild(MenuItem::create<SaveItem>("Save", WINDOW_MOD_KEY_NAME "+S"));
+		menu->addChild(MenuItem::create<SaveAsItem>("Save as", WINDOW_MOD_KEY_NAME "+Shift+S"));
+		menu->addChild(MenuItem::create<RevertItem>("Revert", WINDOW_MOD_KEY_NAME "+R"));
+		menu->addChild(MenuItem::create<QuitItem>("Quit", WINDOW_MOD_KEY_NAME "+Q"));
 	}
 };
 
