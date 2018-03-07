@@ -160,6 +160,8 @@ struct RackWidget : OpaqueWidget {
 	void saveAsDialog();
 	/** If `lastPath` is defined, ask the user to reload it */
 	void revert();
+	/** Disconnects all wires */
+	void disconnect();
 	void savePatch(std::string filename);
 	void loadPatch(std::string filename);
 	json_t *toJson();

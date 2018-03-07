@@ -149,6 +149,14 @@ void RackWidget::revert() {
 	}
 }
 
+void RackWidget::disconnect() {
+	for (Widget *w : moduleContainer->children) {
+		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
+		assert(moduleWidget);
+		moduleWidget->disconnect();
+	}
+}
+
 json_t *RackWidget::toJson() {
 	// root
 	json_t *rootJ = json_object();
