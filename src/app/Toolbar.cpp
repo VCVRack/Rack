@@ -59,7 +59,7 @@ struct FileChoice : ChoiceButton {
 		menu->addChild(MenuItem::create<OpenItem>("Open", WINDOW_MOD_KEY_NAME "+O"));
 		menu->addChild(MenuItem::create<SaveItem>("Save", WINDOW_MOD_KEY_NAME "+S"));
 		menu->addChild(MenuItem::create<SaveAsItem>("Save as", WINDOW_MOD_KEY_NAME "+Shift+S"));
-		menu->addChild(MenuItem::create<RevertItem>("Revert", WINDOW_MOD_KEY_NAME "+R"));
+		menu->addChild(MenuItem::create<RevertItem>("Revert"));
 		menu->addChild(MenuItem::create<QuitItem>("Quit", WINDOW_MOD_KEY_NAME "+Q"));
 	}
 };
