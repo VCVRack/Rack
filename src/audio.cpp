@@ -1,9 +1,9 @@
-#include "util/common.hpp"
 #include "audio.hpp"
+#include "util/common.hpp"
+#include "bridge.hpp"
 
 
 #define BRIDGE_DRIVER -1
-#define BRIDGE_CHANNELS 16
 
 
 namespace rack {
@@ -227,7 +227,7 @@ void AudioIO::openStream() {
 		}
 
 		try {
-			debug("Opening audio RtAudio device %d with %d in %d out", device, numInputs, numOutputs);
+			info("Opening audio RtAudio device %d with %d in %d out", device, numInputs, numOutputs);
 			rtAudio->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
@@ -240,7 +240,7 @@ void AudioIO::openStream() {
 		}
 
 		try {
-			debug("Starting RtAudio stream %d", device);
+			info("Starting RtAudio stream %d", device);
 			rtAudio->startStream();
 		}
 		catch (RtAudioError &e) {
@@ -262,7 +262,7 @@ void AudioIO::openStream() {
 void AudioIO::closeStream() {
 	if (rtAudio) {
 		if (rtAudio->isStreamRunning()) {
-			debug("Stopping RtAudio stream %d", device);
+			info("Stopping RtAudio stream %d", device);
 			try {
 				rtAudio->stopStream();
 			}
@@ -271,7 +271,7 @@ void AudioIO::closeStream() {
 			}
 		}
 		if (rtAudio->isStreamOpen()) {
-			debug("Closing RtAudio stream %d", device);
+			info("Closing RtAudio stream %d", device);
 			try {
 				rtAudio->closeStream();
 			}
