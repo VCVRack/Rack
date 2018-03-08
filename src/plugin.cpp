@@ -384,24 +384,25 @@ bool pluginSync(bool dryRun) {
 
 void pluginInit() {
 	tagsInit();
+
+	// TODO
+	// If `<local>/plugins/Fundamental` doesn't exist, unzip global Fundamental.zip package into `<local>/plugins`
+
+	// TODO
+	// Find all ZIP packages in `<local>/plugins` and unzip them.
+	// Display error if failure
+
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *coreManufacturer = new Plugin();
 	init(coreManufacturer);
 	gPlugins.push_back(coreManufacturer);
 
-	// Load plugins from global directory
-	std::string globalPlugins = assetGlobal("plugins");
-	info("Loading plugins from %s", globalPlugins.c_str());
-	loadPlugins(globalPlugins);
-
 	// Load plugins from local directory
 	std::string localPlugins = assetLocal("plugins");
-	if (globalPlugins != localPlugins) {
-		mkdir(localPlugins.c_str(), 0755);
-		info("Loading plugins from %s", localPlugins.c_str());
-		loadPlugins(localPlugins);
-	}
+	mkdir(localPlugins.c_str(), 0755);
+	info("Loading plugins from %s", localPlugins.c_str());
+	loadPlugins(localPlugins);
 }
 
 void pluginDestroy() {
