@@ -37,7 +37,7 @@ endif
 
 ifeq ($(ARCH), win)
 	SOURCES += dep/osdialog/osdialog_win.c
-	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread \
+	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread -lws2_32 \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
 		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl \
@@ -61,7 +61,7 @@ ifeq ($(ARCH), mac)
 endif
 ifeq ($(ARCH), win)
 	# TODO get rid of the mingw64 path
-	env PATH=dep/bin:/mingw64/bin ./$<
+	env PATH=${PATH}:dep/bin ./$<
 endif
 
 debug: $(TARGET)
@@ -72,8 +72,7 @@ ifeq ($(ARCH), mac)
 	DYLD_FALLBACK_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
 endif
 ifeq ($(ARCH), win)
-	# TODO get rid of the mingw64 path
-	env PATH=dep/bin:/mingw64/bin gdb -ex run ./Rack
+	env PATH=${PATH}:dep/bin gdb -ex run ./Rack
 endif
 
 perf: $(TARGET)

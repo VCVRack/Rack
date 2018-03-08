@@ -2,12 +2,18 @@
 #include "util/common.hpp"
 #include "dsp/ringbuffer.hpp"
 
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netinet/tcp.h>
+// #include <unistd.h>
 #include <fcntl.h>
+#ifdef ARCH_WIN
+	#include <winsock2.h>
+	#include <ws2tcpip.h>
+#else
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+	#include <netinet/tcp.h>
+#endif
+
 
 #include <thread>
 
@@ -195,7 +201,7 @@ static void clientRun(int client) {
 	// info("Bridge client %s connected", ipBuffer);
 	info("Bridge client connected");
 
-#ifndef ARCH_LIN
+#ifdef ARCH_MAC
 	// Avoid SIGPIPE
 	int flag = 1;
 	setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int));
@@ -206,9 +212,9 @@ static void clientRun(int client) {
 	while (!connection.closeRequested) {
 		uint8_t buffer[RECV_BUFFER_SIZE];
 #ifdef ARCH_LIN
-		ssize_t received = recv(client, buffer, sizeof(buffer), MSG_NOSIGNAL);
+		ssize_t received = recv(client, (char*) buffer, sizeof(buffer), MSG_NOSIGNAL);
 #else
-		ssize_t received = recv(client, buffer, sizeof(buffer), 0);
+		ssize_t received = recv(client, (char*) buffer, sizeof(buffer), 0);
 #endif
 		if (received <= 0)
 			break;
@@ -224,20 +230,56 @@ static void clientRun(int client) {
 static void serverRun() {
 	int err;
 
-	// Open socket
-	int server = socket(AF_INET, SOCK_STREAM, 0);
-	if (server < 0)
+	// Initialize sockets
+#ifdef ARCH_WIN
+	WSADATA wsaData;
+	err = WSAStartup(MAKEWORD(2,2), &wsaData);
+	if (err) {
+		warn("Could not initialize Winsock");
 		return;
+	}
+#endif
 
-	// Bind to 127.0.0.1
-	const std::string host = "127.0.0.1";
-	const int port = 5000;
-	struct sockaddr_in serverAddr;
-	memset(&serverAddr, 0, sizeof(serverAddr));
-	serverAddr.sin_family = AF_INET;
-	inet_pton(AF_INET, host.c_str(), &serverAddr.sin_addr);
-	serverAddr.sin_port = htons(port);
-	err = bind(server, (struct sockaddr*) &serverAddr, sizeof(serverAddr));
+	// Get address
+#ifdef ARCH_WIN
+	struct addrinfo hints;
+	struct addrinfo *result = NULL;
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+	err = getaddrinfo(NULL, "5000", &hints, &result);
+#else
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+	addr.sin_port = htons(5000);
+#endif
+	if (err) {
+		warn("Could not get Bridge server address");
+		return;
+	}
+
+	// Open socket
+#ifdef ARCH_WIN
+	SOCKET server = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+	if (server == INVALID_SOCKET) {
+#else
+	int server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (server < 0) {
+#endif
+		warn("Bridge server socket() failed");
+		return;
+	}
+
+	// Bind socket to address
+#ifdef ARCH_WIN
+	err = bind(server, result->ai_addr, (int)result->ai_addrlen);
+#else
+	err = bind(server, (struct sockaddr*) &addr, sizeof(addr));
+#endif
 	if (err) {
 		warn("Bridge server bind() failed");
 		goto serverRun_cleanup;
@@ -252,9 +294,16 @@ static void serverRun() {
 	info("Bridge server started");
 
 	// Make server non-blocking
+#ifdef ARCH_WIN
+	{
+		unsigned long mode = 1;
+		ioctlsocket(server, FIONBIO, &mode);
+	}
+#else
 	err = fcntl(server, F_SETFL, fcntl(server, F_GETFL, 0) | O_NONBLOCK);
-	serverQuit = false;
+#endif
 
+	serverQuit = false;
 	while (!serverQuit) {
 		// Accept client socket
 
@@ -275,6 +324,10 @@ serverRun_cleanup:
 	err = close(server);
 	(void) err;
 	info("Bridge server closed");
+#ifdef ARCH_WIN
+	freeaddrinfo(result);
+	WSACleanup();
+#endif
 }
 
 
