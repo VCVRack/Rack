@@ -3,7 +3,7 @@
 #include "bridge.hpp"
 
 
-#define BRIDGE_DRIVER -1
+#define BRIDGE_DRIVER -5000
 
 
 namespace rack {
@@ -60,7 +60,6 @@ void AudioIO::setDriver(int driver) {
 		this->driver = (int) rtAudio->getCurrentApi();
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		// TODO Connect to Bridge
 		this->driver = BRIDGE_DRIVER;
 	}
 }
@@ -253,13 +252,19 @@ void AudioIO::openStream() {
 		onOpenStream();
 	}
 	if (driver == BRIDGE_DRIVER) {
-		if (device < BRIDGE_CHANNELS) {
-			// TODO
-		}
+		numOutputs = 2;
+		numInputs = 2;
+		// TEMP
+		sampleRate = 44100;
+		blockSize = 256;
+		bridgeAudioSubscribe(device, this);
 	}
 }
 
 void AudioIO::closeStream() {
+	numOutputs = 0;
+	numInputs = 0;
+
 	if (rtAudio) {
 		if (rtAudio->isStreamRunning()) {
 			info("Stopping RtAudio stream %d", device);
@@ -281,14 +286,20 @@ void AudioIO::closeStream() {
 		}
 		deviceInfo = RtAudio::DeviceInfo();
 	}
+	if (driver == BRIDGE_DRIVER) {
+		bridgeAudioUnsubscribe(device, this);
+	}
 
 	onCloseStream();
 }
 
 bool AudioIO::isActive() {
-	if (rtAudio)
+	if (rtAudio) {
 		return rtAudio->isStreamRunning();
-	// TODO Bridge
+	}
+	if (driver == BRIDGE_DRIVER) {
+		bridgeAudioIsSubscribed(device, this);
+	}
 	return false;
 }
 
