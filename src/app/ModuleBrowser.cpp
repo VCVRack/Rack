@@ -12,6 +12,9 @@ namespace rack {
 
 
 static std::set<Model*> sFavoriteModels;
+static std::string sManufacturerFilter;
+static ModelTag sTagFilter = NO_TAG;
+
 
 
 bool isMatch(std::string s, std::string search) {
@@ -73,6 +76,8 @@ struct BrowserListItem : OpaqueWidget {
 		Widget::draw(vg);
 	}
 
+	void onDragStart(EventDragStart &e) override;
+
 	void onDragDrop(EventDragDrop &e) override {
 		if (e.origin != this)
 			return;
@@ -88,10 +93,7 @@ struct BrowserListItem : OpaqueWidget {
 			gScene->setOverlay(NULL);
 		}
 	}
-
-	void onMouseEnter(EventMouseEnter &e) override;
 };
-
 
 
 struct ModelItem : BrowserListItem {
@@ -286,12 +288,10 @@ struct SearchModuleField : TextField {
 };
 
 
-struct ModuleBrowser : OpaqueWidget {
+struct ModuleBrowser : VirtualWidget {
 	SearchModuleField *searchField;
 	ScrollWidget *moduleScroll;
 	BrowserList *moduleList;
-	std::string manufacturerFilter;
-	ModelTag tagFilter = NO_TAG;
 	std::set<std::string> availableManufacturers;
 	std::set<ModelTag> availableTags;
 
@@ -337,10 +337,10 @@ struct ModuleBrowser : OpaqueWidget {
 	}
 
 	bool isModelFiltered(Model *model) {
-		if (!manufacturerFilter.empty() && model->manufacturer != manufacturerFilter)
+		if (!sManufacturerFilter.empty() && model->manufacturer != sManufacturerFilter)
 			return false;
-		if (tagFilter != NO_TAG) {
-			auto it = std::find(model->tags.begin(), model->tags.end(), tagFilter);
+		if (sTagFilter != NO_TAG) {
+			auto it = std::find(model->tags.begin(), model->tags.end(), sTagFilter);
 			if (it == model->tags.end())
 				return false;
 		}
@@ -367,7 +367,7 @@ struct ModuleBrowser : OpaqueWidget {
 		}
 
 		// Manufacturers
-		if (manufacturerFilter.empty() && tagFilter == NO_TAG) {
+		if (sManufacturerFilter.empty() && sTagFilter == NO_TAG) {
 			// Manufacturer items
 			{
 				SeparatorItem *item = new SeparatorItem();
@@ -401,7 +401,7 @@ struct ModuleBrowser : OpaqueWidget {
 		}
 
 		// Models
-		if (!manufacturerFilter.empty() || tagFilter != NO_TAG || !search.empty()) {
+		if (!sManufacturerFilter.empty() || sTagFilter != NO_TAG || !search.empty()) {
 			{
 				SeparatorItem *item = new SeparatorItem();
 				item->setText("Modules");
@@ -424,7 +424,7 @@ struct ModuleBrowser : OpaqueWidget {
 		box.pos.y = 60;
 		box.size.y = parent->box.size.y - 2 * box.pos.y;
 
-		moduleScroll->box.size.y = box.size.y - moduleScroll->box.pos.y;
+		moduleScroll->box.size.y = min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
 		gFocusedWidget = searchField;
 		Widget::step();
 	}
@@ -435,7 +435,7 @@ struct ModuleBrowser : OpaqueWidget {
 
 void ManufacturerItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	moduleBrowser->manufacturerFilter = manufacturer;
+	sManufacturerFilter = manufacturer;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
@@ -443,7 +443,7 @@ void ManufacturerItem::onAction(EventAction &e) {
 
 void TagItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	moduleBrowser->tagFilter = tag;
+	sTagFilter = tag;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
@@ -451,8 +451,8 @@ void TagItem::onAction(EventAction &e) {
 
 void ClearFilterItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	moduleBrowser->manufacturerFilter = "";
-	moduleBrowser->tagFilter = NO_TAG;
+	sManufacturerFilter = "";
+	sTagFilter = NO_TAG;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
@@ -475,9 +475,11 @@ void FavoriteRadioButton::onAction(EventAction &e) {
 		moduleBrowser->refreshSearch();
 }
 
-void BrowserListItem::onMouseEnter(EventMouseEnter &e) {
-	// BrowserList *list = getAncestorOfType<BrowserList>();
-	// list->selectItem(this);
+void BrowserListItem::onDragStart(EventDragStart &e) {
+	BrowserList *list = dynamic_cast<BrowserList*>(parent);
+	if (list) {
+		list->selectItem(this);
+	}
 }
 
 void SearchModuleField::onTextChange() {
