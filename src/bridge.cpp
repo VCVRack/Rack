@@ -2,8 +2,6 @@
 #include "util/common.hpp"
 #include "dsp/ringbuffer.hpp"
 
-#include <thread>
-
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -11,10 +9,10 @@
 #include <netinet/tcp.h>
 #include <fcntl.h>
 
+#include <thread>
 
 
 namespace rack {
-
 
 
 enum BridgeCommand {
@@ -30,12 +28,12 @@ enum BridgeCommand {
 };
 
 
+static const int RECV_BUFFER_SIZE = (1<<13);
+static const int RECV_QUEUE_SIZE = (1<<17);
+
+static AudioIO *audioListeners[BRIDGE_CHANNELS];
 static std::thread serverThread;
 static bool serverQuit;
-
-
-#define RECV_BUFFER_SIZE (1<<13)
-#define RECV_QUEUE_SIZE (1<<17)
 
 
 struct BridgeClientConnection {
@@ -46,19 +44,10 @@ struct BridgeClientConnection {
 	int sampleRate = -1;
 	int audioChannels = 0;
 	int audioBufferLength = -1;
-	// TEMP
-	// FILE *audioOutputFile;
 
-	BridgeClientConnection() {
-		// audioOutputFile = fopen("out.f32", "w");
-		// assert(audioOutputFile);
-	}
-
-	~BridgeClientConnection() {
-		// fclose(audioOutputFile);
-	}
-
-	/** Does not check if the queue has enough data. You must do that yourself. */
+	/** Does not check if the queue has enough data.
+	You must do that yourself before calling this method.
+	*/
 	template <typename T>
 	T shift() {
 		T x;
@@ -173,7 +162,7 @@ struct BridgeClientConnection {
 	}
 
 	void recv(uint8_t *buffer, int length) {
-		// Make sure we can fill the buffer before filling it
+		// Make sure we can fill the buffer
 		if (recvQueue.capacity() < (size_t) length) {
 			// If we can't accept it, future messages will be incomplete
 			closeRequested = true;
@@ -272,7 +261,7 @@ static void serverRun() {
 		int client = accept(server, NULL, NULL);
 		if (client < 0) {
 			// Wait a bit before attempting to accept another client
-			std::this_thread::sleep_for(std::chrono::duration<double>(0.1));
+			std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
 			continue;
 		}
 
@@ -298,6 +287,27 @@ void bridgeDestroy() {
 	serverThread.join();
 }
 
+void bridgeAudioSubscribe(int channel, AudioIO *audio) {
+	if (!(0 <= channel && channel < BRIDGE_CHANNELS))
+		return;
+	if (audioListeners[channel])
+		return;
+	audioListeners[channel] = audio;
+}
+
+void bridgeAudioUnsubscribe(int channel, AudioIO *audio) {
+	if (!(0 <= channel && channel < BRIDGE_CHANNELS))
+		return;
+	if (audioListeners[channel] != audio)
+		return;
+	audioListeners[channel] = NULL;
+}
+
+bool bridgeAudioIsSubscribed(int channel, AudioIO *audio) {
+	if (!(0 <= channel && channel < BRIDGE_CHANNELS))
+		return false;
+	return (audioListeners[channel] == audio);
+}
 
 
 } // namespace rack

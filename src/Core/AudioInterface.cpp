@@ -18,8 +18,6 @@
 #define OUTPUTS 8
 #define INPUTS 8
 
-static const auto audioTimeout = std::chrono::milliseconds(100);
-
 
 using namespace rack;
 
@@ -60,7 +58,8 @@ struct AudioInterfaceIO : AudioIO {
 			auto cond = [&] {
 				return (outputBuffer.size() >= (size_t) length);
 			};
-			if (audioCv.wait_for(lock, audioTimeout, cond)) {
+			auto timeout = std::chrono::duration<float>(0.1);
+			if (audioCv.wait_for(lock, timeout, cond)) {
 				// Consume audio block
 				for (int i = 0; i < length; i++) {
 					Frame<OUTPUTS> f = outputBuffer.shift();
@@ -189,7 +188,8 @@ void AudioInterface::step() {
 			auto cond = [&] {
 				return (audioIO.outputBuffer.size() < (size_t) audioIO.blockSize);
 			};
-			if (audioIO.engineCv.wait_for(lock, audioTimeout, cond)) {
+			auto timeout = std::chrono::duration<float>(0.1);
+			if (audioIO.engineCv.wait_for(lock, timeout, cond)) {
 				// Push converted output
 				int inLen = outputBuffer.size();
 				int outLen = audioIO.outputBuffer.capacity();
