@@ -40,10 +40,10 @@ struct AudioInterfaceIO : AudioIO {
 		setDevice(-1, 0);
 	}
 
-	void processStream(const float *input, float *output, int length) override {
+	void processStream(const float *input, float *output, int frames) override {
 		if (numInputs > 0) {
 			// TODO Do we need to wait on the input to be consumed here? Experimentally, it works fine if we don't.
-			for (int i = 0; i < length; i++) {
+			for (int i = 0; i < frames; i++) {
 				if (inputBuffer.full())
 					break;
 				Frame<INPUTS> f;
@@ -56,19 +56,19 @@ struct AudioInterfaceIO : AudioIO {
 		if (numOutputs > 0) {
 			std::unique_lock<std::mutex> lock(audioMutex);
 			auto cond = [&] {
-				return (outputBuffer.size() >= (size_t) length);
+				return (outputBuffer.size() >= (size_t) frames);
 			};
 			auto timeout = std::chrono::milliseconds(100);
 			if (audioCv.wait_for(lock, timeout, cond)) {
 				// Consume audio block
-				for (int i = 0; i < length; i++) {
+				for (int i = 0; i < frames; i++) {
 					Frame<OUTPUTS> f = outputBuffer.shift();
 					memcpy(&output[numOutputs * i], &f, numOutputs * sizeof(float));
 				}
 			}
 			else {
 				// Timed out, fill output with zeros
-				memset(output, 0, length * numOutputs * sizeof(float));
+				memset(output, 0, frames * numOutputs * sizeof(float));
 			}
 		}
 

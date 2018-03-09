@@ -139,9 +139,12 @@ struct BridgeClientConnection {
 				}
 				else {
 					if (recvQueue.size() >= (size_t) audioBufferLength) {
-						// TODO Do something with the data
-						recvQueue.start += audioBufferLength;
 						debug("Received %d audio samples", audioBufferLength);
+						float input[audioBufferLength];
+						float output[audioBufferLength] = {};
+						recvQueue.shiftBuffer((uint8_t*) input, sizeof(float) * audioBufferLength);
+						int frames = audioBufferLength / 2;
+						processStream(input, output, frames);
 						audioBufferLength = -1;
 						currentCommand = NO_COMMAND;
 						return true;
@@ -179,6 +182,14 @@ struct BridgeClientConnection {
 
 		// Loop the state machine until it returns false
 		while (step()) {}
+	}
+
+	void processStream(const float *input, float *output, int length) {
+		if (!(0 <= channel && channel < BRIDGE_CHANNELS))
+			return;
+		if (!audioListeners[channel])
+			return;
+		audioListeners[channel]->processStream(input, output, length);
 	}
 };
 
