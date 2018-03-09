@@ -234,6 +234,9 @@ static void serverRun() {
 #ifdef ARCH_WIN
 	WSADATA wsaData;
 	err = WSAStartup(MAKEWORD(2,2), &wsaData);
+	defer({
+		WSACleanup();
+	});
 	if (err) {
 		warn("Could not initialize Winsock");
 		return;
@@ -250,6 +253,9 @@ static void serverRun() {
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	err = getaddrinfo(NULL, "5000", &hints, &result);
+	defer({
+		freeaddrinfo(result);
+	});
 #else
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
@@ -273,6 +279,10 @@ static void serverRun() {
 		warn("Bridge server socket() failed");
 		return;
 	}
+	defer({
+		close(server);
+	});
+
 
 	// Bind socket to address
 #ifdef ARCH_WIN
@@ -282,14 +292,14 @@ static void serverRun() {
 #endif
 	if (err) {
 		warn("Bridge server bind() failed");
-		goto serverRun_cleanup;
+		return;
 	}
 
 	// Listen for clients
 	err = listen(server, 20);
 	if (err) {
 		warn("Bridge server listen() failed");
-		goto serverRun_cleanup;
+		return;
 	}
 	info("Bridge server started");
 
@@ -319,15 +329,7 @@ static void serverRun() {
 		clientThread.detach();
 	}
 
-	// Cleanup
-serverRun_cleanup:
-	err = close(server);
-	(void) err;
 	info("Bridge server closed");
-#ifdef ARCH_WIN
-	freeaddrinfo(result);
-	WSACleanup();
-#endif
 }
 
 

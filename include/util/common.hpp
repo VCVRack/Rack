@@ -11,6 +11,9 @@
 #include <condition_variable>
 #include <mutex>
 
+////////////////////
+// Handy macros
+////////////////////
 
 /** Surrounds raw text with quotes
 Example:
@@ -51,6 +54,9 @@ Example:
 
 namespace rack {
 
+////////////////////
+// Template hacks
+////////////////////
 
 /** C#-style property constructor
 Example:
@@ -67,6 +73,32 @@ T *construct(F f, V v, Args... args) {
 	o->*f = v;
 	return o;
 }
+
+/** Delays code until the scope is destructed
+From http://www.gingerbill.org/article/defer-in-cpp.html
+
+Example:
+	file = fopen(...);
+	defer({
+		fclose(file);
+	});
+*/
+template <typename F>
+struct DeferWrapper {
+	F f;
+	DeferWrapper(F f) : f(f) {}
+	~DeferWrapper() { f(); }
+};
+
+template <typename F>
+DeferWrapper<F> deferWrapper(F f) {
+	return DeferWrapper<F>(f);
+}
+
+#define DEFER_1(x, y) x##y
+#define DEFER_2(x, y) DEFER_1(x, y)
+#define DEFER_3(x)    DEFER_2(x, __COUNTER__)
+#define defer(code) auto DEFER_3(_defer_) = deferWrapper([&]() code)
 
 ////////////////////
 // Random number generator
