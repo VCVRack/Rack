@@ -141,7 +141,8 @@ struct BridgeClientConnection {
 					if (recvQueue.size() >= (size_t) audioBufferLength) {
 						debug("Received %d audio samples", audioBufferLength);
 						float input[audioBufferLength];
-						float output[audioBufferLength] = {};
+						float output[audioBufferLength];
+						memset(output, 0, sizeof(output));
 						recvQueue.shiftBuffer((uint8_t*) input, sizeof(float) * audioBufferLength);
 						int frames = audioBufferLength / 2;
 						processStream(input, output, frames);
