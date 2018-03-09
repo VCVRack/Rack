@@ -2,11 +2,11 @@
 #include "util/common.hpp"
 #include "dsp/ringbuffer.hpp"
 
+#include <unistd.h>
 #ifdef ARCH_WIN
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 #else
-	#include <unistd.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <arpa/inet.h>
