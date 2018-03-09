@@ -138,8 +138,7 @@ struct BridgeClientConnection {
 					}
 				}
 				else {
-					if (recvQueue.size() >= (size_t) audioBufferLength) {
-						debug("Received %d audio samples", audioBufferLength);
+					if (recvQueue.size() >= (size_t) (sizeof(float) * audioBufferLength)) {
 						float input[audioBufferLength];
 						float output[audioBufferLength];
 						memset(output, 0, sizeof(output));
@@ -185,12 +184,12 @@ struct BridgeClientConnection {
 		while (step()) {}
 	}
 
-	void processStream(const float *input, float *output, int length) {
+	void processStream(const float *input, float *output, int frames) {
 		if (!(0 <= channel && channel < BRIDGE_CHANNELS))
 			return;
 		if (!audioListeners[channel])
 			return;
-		audioListeners[channel]->processStream(input, output, length);
+		audioListeners[channel]->processStream(input, output, frames);
 	}
 };
 
@@ -198,6 +197,7 @@ struct BridgeClientConnection {
 
 static void clientRun(int client) {
 	int err;
+	BridgeClientConnection connection;
 
 	// // Get client address
 	// struct sockaddr_in addr;
@@ -219,7 +219,12 @@ static void clientRun(int client) {
 	setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int));
 #endif
 
-	BridgeClientConnection connection;
+#ifdef ARCH_WIN
+	unsigned long blockingMode = 1;
+	ioctlsocket(client, FIONBIO, &blockingMode);
+#else
+	err = fcntl(client, F_SETFL, fcntl(client, F_GETFL, 0) & ~O_NONBLOCK);
+#endif
 
 	while (!connection.closeRequested) {
 		uint8_t buffer[RECV_BUFFER_SIZE];
@@ -234,10 +239,11 @@ static void clientRun(int client) {
 		connection.recv(buffer, received);
 	}
 
-	info("Bridge client closed");
 	err = close(client);
 	(void) err;
+	info("Bridge client closed");
 }
+
 
 static void serverRun() {
 	int err;
@@ -265,6 +271,10 @@ static void serverRun() {
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	err = getaddrinfo(NULL, "5000", &hints, &result);
+	if (err) {
+		warn("Could not get Bridge server address");
+		return;
+	}
 	defer({
 		freeaddrinfo(result);
 	});
@@ -272,13 +282,9 @@ static void serverRun() {
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	err = inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
 	addr.sin_port = htons(5000);
 #endif
-	if (err) {
-		warn("Could not get Bridge server address");
-		return;
-	}
 
 	// Open socket
 #ifdef ARCH_WIN
@@ -317,18 +323,15 @@ static void serverRun() {
 
 	// Make server non-blocking
 #ifdef ARCH_WIN
-	{
-		unsigned long mode = 1;
-		ioctlsocket(server, FIONBIO, &mode);
-	}
+	unsigned long blockingMode = 1;
+	ioctlsocket(server, FIONBIO, &blockingMode);
 #else
 	err = fcntl(server, F_SETFL, fcntl(server, F_GETFL, 0) | O_NONBLOCK);
 #endif
 
+	// Accept clients
 	serverQuit = false;
 	while (!serverQuit) {
-		// Accept client socket
-
 		int client = accept(server, NULL, NULL);
 		if (client < 0) {
 			// Wait a bit before attempting to accept another client
