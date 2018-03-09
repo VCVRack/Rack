@@ -51,7 +51,7 @@ struct AudioIO {
 
 	std::vector<int> getSampleRates();
 
-	virtual void processStream(const float *input, float *output, int length) {}
+	virtual void processStream(const float *input, float *output, int frames) {}
 	virtual void onCloseStream() {}
 	virtual void onOpenStream() {}
 	json_t *toJson();
