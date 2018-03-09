@@ -2,16 +2,16 @@
 #include "util/common.hpp"
 #include "dsp/ringbuffer.hpp"
 
-// #include <unistd.h>
-#include <fcntl.h>
 #ifdef ARCH_WIN
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 #else
+	#include <unistd.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <arpa/inet.h>
 	#include <netinet/tcp.h>
+	#include <fcntl.h>
 #endif
 
 
@@ -260,7 +260,7 @@ static void serverRun() {
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+	err = inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
 	addr.sin_port = htons(5000);
 #endif
 	if (err) {
