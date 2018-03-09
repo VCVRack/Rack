@@ -58,7 +58,7 @@ struct AudioInterfaceIO : AudioIO {
 			auto cond = [&] {
 				return (outputBuffer.size() >= (size_t) length);
 			};
-			auto timeout = std::chrono::duration<float>(0.1);
+			auto timeout = std::chrono::milliseconds(100);
 			if (audioCv.wait_for(lock, timeout, cond)) {
 				// Consume audio block
 				for (int i = 0; i < length; i++) {
@@ -188,7 +188,7 @@ void AudioInterface::step() {
 			auto cond = [&] {
 				return (audioIO.outputBuffer.size() < (size_t) audioIO.blockSize);
 			};
-			auto timeout = std::chrono::duration<float>(0.1);
+			auto timeout = std::chrono::milliseconds(100);
 			if (audioIO.engineCv.wait_for(lock, timeout, cond)) {
 				// Push converted output
 				int inLen = outputBuffer.size();
