@@ -32,9 +32,6 @@ struct AudioInterfaceIO : AudioIO {
 	// Audio thread consumes, engine thread produces
 	DoubleRingBuffer<Frame<OUTPUTS>, (1<<15)> outputBuffer;
 
-	AudioInterfaceIO() {
-	}
-
 	~AudioInterfaceIO() {
 		// Close stream here before destructing AudioInterfaceIO, so the mutexes are still valid when waiting to close.
 		setDevice(-1, 0);
@@ -69,6 +66,7 @@ struct AudioInterfaceIO : AudioIO {
 			else {
 				// Timed out, fill output with zeros
 				memset(output, 0, frames * numOutputs * sizeof(float));
+				debug("Audio Interface IO underflow");
 			}
 		}
 
@@ -199,6 +197,7 @@ void AudioInterface::step() {
 			}
 			else {
 				// Give up on pushing output
+				debug("Audio Interface underflow");
 			}
 		}
 	}
