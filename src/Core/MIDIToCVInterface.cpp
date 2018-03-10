@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "midi.hpp"
+#include "dsp/digital.hpp"
 #include "dsp/filter.hpp"
 
 #include <algorithm>
@@ -43,6 +44,10 @@ struct MIDIToCVInterface : Module {
 	ExponentialFilter modFilter;
 	uint16_t pitch = 0;
 	ExponentialFilter pitchFilter;
+	PulseGenerator startPulse;
+	PulseGenerator stopPulse;
+	PulseGenerator continuePulse;
+	PulseGenerator clockPulse;
 
 	MidiNoteData noteData[128];
 	std::list<uint8_t> heldNotes;
@@ -102,21 +107,28 @@ struct MIDIToCVInterface : Module {
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
+		float deltaTime = engineGetSampleTime();
 
 		outputs[CV_OUTPUT].value = (lastNote - 60) / 12.f;
 		outputs[GATE_OUTPUT].value = gate ? 10.f : 0.f;
 		outputs[VELOCITY_OUTPUT].value = rescale(noteData[lastNote].velocity, 0, 127, 0.f, 10.f);
-		modFilter.lambda = 100.f * engineGetSampleTime();
+		modFilter.lambda = 100.f * deltaTime;
 		outputs[MOD_OUTPUT].value = modFilter.process(rescale(mod, 0, 127, 0.f, 10.f));
 
-		pitchFilter.lambda = 100.f * engineGetSampleTime();
+		pitchFilter.lambda = 100.f * deltaTime;
 		outputs[PITCH_OUTPUT].value = pitchFilter.process(rescale(pitch, 0, 16384, -5.f, 5.f));
 
 		outputs[AFTERTOUCH_OUTPUT].value = rescale(noteData[lastNote].aftertouch, 0, 127, 0.f, 10.f);
+
+		outputs[START_OUTPUT].value = startPulse.process(deltaTime) ? 10.f : 0.f;
+		outputs[STOP_OUTPUT].value = stopPulse.process(deltaTime) ? 10.f : 0.f;
+		outputs[CONTINUE_OUTPUT].value = continuePulse.process(deltaTime) ? 10.f : 0.f;
+
+		outputs[CLOCK_OUTPUT].value = clockPulse.process(deltaTime) ? 10.f : 0.f;
 	}
 
 	void processMessage(MidiMessage msg) {
-		debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
+		// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
 
 		switch (msg.status()) {
 			// note off
@@ -174,17 +186,21 @@ struct MIDIToCVInterface : Module {
 
 	void processSystem(MidiMessage msg) {
 		switch (msg.channel()) {
+			// Timing
 			case 0x8: {
-				debug("timing clock");
+				clockPulse.trigger(1e-3);
 			} break;
+			// Start
 			case 0xa: {
-				debug("start");
+				startPulse.trigger(1e-3);
 			} break;
+			// Continue
 			case 0xb: {
-				debug("continue");
+				continuePulse.trigger(1e-3);
 			} break;
+			// Stop
 			case 0xc: {
-				debug("stop");
+				stopPulse.trigger(1e-3);
 			} break;
 			default: break;
 		}
