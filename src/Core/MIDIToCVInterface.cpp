@@ -51,6 +51,7 @@ struct MIDIToCVInterface : Module {
 	bool gate;
 
 	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		midiInput.enableTime = true;
 		onReset();
 	}
 
@@ -115,6 +116,8 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processMessage(MidiMessage msg) {
+		debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
+
 		switch (msg.status()) {
 			// note off
 			case 0x8: {
