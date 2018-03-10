@@ -6,8 +6,8 @@
 
 
 struct MidiNoteData {
-	uint8_t velocity;
-	uint8_t aftertouch;
+	uint8_t velocity = 0;
+	uint8_t aftertouch = 0;
 };
 
 
@@ -43,18 +43,21 @@ struct MIDIToCVInterface : Module {
 	ExponentialFilter modFilter;
 	uint16_t pitch = 0;
 	ExponentialFilter pitchFilter;
-	bool pedal = false;
 
 	MidiNoteData noteData[128];
 	std::list<uint8_t> heldNotes;
-	uint8_t lastNote = 60;
-	bool gate = false;
+	uint8_t lastNote;
+	bool pedal;
+	bool gate;
 
-	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		onReset();
+	}
 
 	void onReset() override {
 		heldNotes.clear();
 		pedal = false;
+		lastNote = 60;
 	}
 
 	void pressNote(uint8_t note) {
@@ -118,8 +121,6 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processMessage(MidiMessage msg) {
-		debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
-
 		switch (msg.status()) {
 			// note off
 			case 0x8: {
