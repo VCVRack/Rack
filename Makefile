@@ -1,4 +1,4 @@
-VERSION = 0.6.0dev
+VERSION = master
 RACK_DIR = .
 
 FLAGS += \
