@@ -12,10 +12,6 @@ namespace rack {
 // MidiIO
 ////////////////////
 
-MidiIO::~MidiIO() {
-	setDriver(-1);
-}
-
 std::vector<int> MidiIO::getDrivers() {
 	std::vector<RtMidi::Api> rtApis;
 	RtMidi::getCompiledApi(rtApis);
@@ -149,6 +145,10 @@ MidiInput::MidiInput() {
 	setDriver(RtMidi::UNSPECIFIED);
 }
 
+MidiInput::~MidiInput() {
+	setDriver(-1);
+}
+
 void MidiInput::setDriver(int driver) {
 	setDevice(-1);
 	if (rtMidiIn) {
@@ -159,7 +159,7 @@ void MidiInput::setDriver(int driver) {
 	if (driver >= 0) {
 		rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
 		rtMidiIn->setCallback(midiInputCallback, this);
-		rtMidiIn->ignoreTypes(!enableSysEx, !enableTime, !enableSense);
+		rtMidiIn->ignoreTypes(false, false, false);
 		rtMidi = rtMidiIn;
 		this->driver = rtMidiIn->getCurrentApi();
 	}
@@ -187,6 +187,10 @@ bool MidiInputQueue::shift(MidiMessage *message) {
 
 MidiOutput::MidiOutput() {
 	setDriver(RtMidi::UNSPECIFIED);
+}
+
+MidiOutput::~MidiOutput() {
+	setDriver(-1);
 }
 
 void MidiOutput::setDriver(int driver) {

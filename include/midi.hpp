@@ -42,7 +42,7 @@ struct MidiIO {
 	/** Cached */
 	std::string deviceName;
 
-	virtual ~MidiIO();
+	virtual ~MidiIO() {}
 	std::vector<int> getDrivers();
 	std::string getDriverName(int driver);
 	virtual void setDriver(int driver) {}
@@ -61,11 +61,8 @@ struct MidiIO {
 
 struct MidiInput : MidiIO {
 	RtMidiIn *rtMidiIn = NULL;
-	/** These flags must be set before the driver and device is set */
-	bool enableSysEx = false;
-	bool enableTime = false;
-	bool enableSense = false;
 	MidiInput();
+	~MidiInput();
 	void setDriver(int driver) override;
 	virtual void onMessage(const MidiMessage &message) {}
 };
@@ -83,6 +80,7 @@ struct MidiInputQueue : MidiInput {
 struct MidiOutput : MidiIO {
 	RtMidiOut *rtMidiOut = NULL;
 	MidiOutput();
+	~MidiOutput();
 	void setDriver(int driver) override;
 };
 
