@@ -56,7 +56,6 @@ struct MIDIToCVInterface : Module {
 	bool gate;
 
 	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		midiInput.enableTime = true;
 		onReset();
 	}
 
