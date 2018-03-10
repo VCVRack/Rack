@@ -83,10 +83,14 @@ Build plugin.
 
 	make
 
-## License
+## Licenses
 
-Source code licensed under [BSD-3-Clause](LICENSE.txt) by [Andrew Belt](https://andrewbelt.name/)
+All **source code** in this repository is licensed under [BSD-3-Clause](LICENSE.txt) by [Andrew Belt](https://andrewbelt.name/).
 
-Component Library graphics in `res/ComponentLibrary` licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) by [Grayscale](http://grayscale.info/)
+**Component Library graphics** in `res/ComponentLibrary` are licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) by [Grayscale](http://grayscale.info/). Commercial plugins must request a commercial license to use Component Library graphics.
 
-VCV logo is © 2017
+**Core** panel graphics in `res/Core` are copyright © 2017 by Grayscale. You may not create derivative works of Core panels.
+
+The **VCV logo and icon** are copyright © 2017 by Grayscale and may not be used in derivative works.
+
+The **"VCV" brand name** is trademarked and may not be used for unofficial products. However, it is acceptable to use the phrase "for VCV Rack" for promotion of your plugin.
