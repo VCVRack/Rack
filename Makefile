@@ -60,8 +60,7 @@ ifeq ($(ARCH), mac)
 	DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<
 endif
 ifeq ($(ARCH), win)
-	# TODO get rid of the mingw64 path
-	env PATH=${PATH}:dep/bin ./$<
+	env PATH="$(PATH)":dep/bin ./$<
 endif
 
 debug: $(TARGET)
@@ -72,7 +71,7 @@ ifeq ($(ARCH), mac)
 	DYLD_FALLBACK_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
 endif
 ifeq ($(ARCH), win)
-	env PATH=${PATH}:dep/bin gdb -ex run ./Rack
+	env PATH="$(PATH)":dep/bin gdb -ex run ./Rack
 endif
 
 perf: $(TARGET)
