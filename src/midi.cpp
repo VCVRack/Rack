@@ -129,18 +129,20 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 
 	MidiInput *midiInput = (MidiInput*) userData;
 	if (!midiInput) return;
-	MidiMessage midiMessage;
+	MidiMessage msg;
 	if (message->size() >= 1)
-		midiMessage.cmd = (*message)[0];
+		msg.cmd = (*message)[0];
 	if (message->size() >= 2)
-		midiMessage.data1 = (*message)[1];
+		msg.data1 = (*message)[1];
 	if (message->size() >= 3)
-		midiMessage.data2 = (*message)[2];
+		msg.data2 = (*message)[2];
 
 	// Filter channel
-	if (midiInput->channel >= 0 && (midiMessage.channel() != midiInput->channel))
-		return;
-	midiInput->onMessage(midiMessage);
+	if (midiInput->channel >= 0) {
+		if (msg.status() != 0xf && msg.channel() != midiInput->channel)
+			return;
+	}
+	midiInput->onMessage(msg);
 }
 
 MidiInput::MidiInput() {
@@ -157,7 +159,7 @@ void MidiInput::setDriver(int driver) {
 	if (driver >= 0) {
 		rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
 		rtMidiIn->setCallback(midiInputCallback, this);
-		rtMidiIn->ignoreTypes(enableSysEx, enableTime, enableSense);
+		rtMidiIn->ignoreTypes(!enableSysEx, !enableTime, !enableSense);
 		rtMidi = rtMidiIn;
 		this->driver = rtMidiIn->getCurrentApi();
 	}
