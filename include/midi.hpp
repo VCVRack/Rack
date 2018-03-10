@@ -61,6 +61,10 @@ struct MidiIO {
 
 struct MidiInput : MidiIO {
 	RtMidiIn *rtMidiIn = NULL;
+	/** These flags must be set before the driver and device is set */
+	bool enableSysEx = false;
+	bool enableTime = false;
+	bool enableSense = false;
 	MidiInput();
 	void setDriver(int driver) override;
 	virtual void onMessage(const MidiMessage &message) {}

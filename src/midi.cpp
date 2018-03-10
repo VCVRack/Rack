@@ -157,6 +157,7 @@ void MidiInput::setDriver(int driver) {
 	if (driver >= 0) {
 		rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
 		rtMidiIn->setCallback(midiInputCallback, this);
+		rtMidiIn->ignoreTypes(enableSysEx, enableTime, enableSense);
 		rtMidi = rtMidiIn;
 		this->driver = rtMidiIn->getCurrentApi();
 	}
