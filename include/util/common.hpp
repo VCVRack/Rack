@@ -74,7 +74,7 @@ T *construct(F f, V v, Args... args) {
 	return o;
 }
 
-/** Delays code until the scope is destructed
+/** Defers code until the scope is destructed
 From http://www.gingerbill.org/article/defer-in-cpp.html
 
 Example:

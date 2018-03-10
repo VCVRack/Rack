@@ -23,7 +23,7 @@ std::vector<int> AudioIO::getDrivers() {
 	std::vector<int> drivers;
 	for (RtAudio::Api api : apis)
 		drivers.push_back((int) api);
-	// Add Bridge fake driver
+	// Add fake Bridge driver
 	drivers.push_back(BRIDGE_DRIVER);
 	return drivers;
 }

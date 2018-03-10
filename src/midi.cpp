@@ -1,4 +1,8 @@
 #include "midi.hpp"
+#include "bridge.hpp"
+
+
+#define BRIDGE_DRIVER -5000
 
 
 namespace rack {
@@ -20,7 +24,8 @@ std::vector<int> MidiIO::getDrivers() {
 	for (RtMidi::Api api : rtApis) {
 		drivers.push_back((int) api);
 	}
-	// drivers.push_back(BRIDGE_DRIVER)
+	// Add fake Bridge driver
+	drivers.push_back(BRIDGE_DRIVER);
 	return drivers;
 }
 
@@ -32,7 +37,7 @@ std::string MidiIO::getDriverName(int driver) {
 		case RtMidi::UNIX_JACK: return "JACK";
 		case RtMidi::WINDOWS_MM: return "Windows MIDI";
 		case RtMidi::RTMIDI_DUMMY: return "Dummy MIDI";
-		// case BRIDGE_DRIVER: return "Bridge";
+		case BRIDGE_DRIVER: return "Bridge";
 		default: return "Unknown";
 	}
 }
@@ -131,6 +136,10 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 		midiMessage.data1 = (*message)[1];
 	if (message->size() >= 3)
 		midiMessage.data2 = (*message)[2];
+
+	// Filter channel
+	if (midiInput->channel >= 0 && (midiMessage.channel() != midiInput->channel))
+		return;
 	midiInput->onMessage(midiMessage);
 }
 
