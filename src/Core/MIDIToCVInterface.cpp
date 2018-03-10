@@ -62,9 +62,7 @@ struct MIDIToCVInterface : Module {
 
 	void pressNote(uint8_t note) {
 		// Remove existing similar note
-		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
-		if (it != heldNotes.end())
-			heldNotes.erase(it);
+		heldNotes.remove(note);
 		// Push note
 		heldNotes.push_back(note);
 		lastNote = note;
@@ -73,11 +71,7 @@ struct MIDIToCVInterface : Module {
 
 	void releaseNote(uint8_t note) {
 		// Remove the note
-		if (note < 128) {
-			auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
-			if (it != heldNotes.end())
-				heldNotes.erase(it);
-		}
+		heldNotes.remove(note);
 		// Hold note if pedal is pressed
 		if (pedal)
 			return;
