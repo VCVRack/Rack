@@ -12,7 +12,7 @@ namespace rack {
 
 
 static std::set<Model*> sFavoriteModels;
-static std::string sManufacturerFilter;
+static std::string sAuthorFilter;
 static ModelTag sTagFilter = NO_TAG;
 
 
@@ -29,7 +29,7 @@ static bool isModelMatch(Model *model, std::string search) {
 	std::string s;
 	s += model->plugin->slug;
 	s += " ";
-	s += model->manufacturer;
+	s += model->author;
 	s += " ";
 	s += model->name;
 	s += " ";
@@ -98,7 +98,7 @@ struct BrowserListItem : OpaqueWidget {
 
 struct ModelItem : BrowserListItem {
 	Model *model;
-	Label *manufacturerLabel;
+	Label *authorLabel;
 
 	void setModel(Model *model) {
 		clearChildren();
@@ -109,10 +109,10 @@ struct ModelItem : BrowserListItem {
 		nameLabel->text = model->name;
 		addChild(nameLabel);
 
-		manufacturerLabel = Widget::create<Label>(Vec(0, 0));
-		manufacturerLabel->alignment = Label::RIGHT_ALIGNMENT;
-		manufacturerLabel->text = model->manufacturer;
-		addChild(manufacturerLabel);
+		authorLabel = Widget::create<Label>(Vec(0, 0));
+		authorLabel->alignment = Label::RIGHT_ALIGNMENT;
+		authorLabel->text = model->author;
+		addChild(authorLabel);
 
 		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(7, BND_WIDGET_HEIGHT));
 		layout2->spacing = 0;
@@ -147,7 +147,7 @@ struct ModelItem : BrowserListItem {
 
 	void step() override {
 		BrowserListItem::step();
-		manufacturerLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
+		authorLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
 	}
 
 	void onAction(EventAction &e) override {
@@ -160,18 +160,18 @@ struct ModelItem : BrowserListItem {
 };
 
 
-struct ManufacturerItem : BrowserListItem {
-	std::string manufacturer;
+struct AuthorItem : BrowserListItem {
+	std::string author;
 
-	void setManufacturer(std::string manufacturer) {
+	void setAuthor(std::string author) {
 		clearChildren();
-		this->manufacturer = manufacturer;
-		Label *manufacturerLabel = Widget::create<Label>(Vec(0, 0));
-		if (manufacturer.empty())
-			manufacturerLabel->text = "Show all modules";
+		this->author = author;
+		Label *authorLabel = Widget::create<Label>(Vec(0, 0));
+		if (author.empty())
+			authorLabel->text = "Show all modules";
 		else
-			manufacturerLabel->text = manufacturer;
-		addChild(manufacturerLabel);
+			authorLabel->text = author;
+		addChild(authorLabel);
 	}
 
 	void onAction(EventAction &e) override;
@@ -292,7 +292,7 @@ struct ModuleBrowser : VirtualWidget {
 	SearchModuleField *searchField;
 	ScrollWidget *moduleScroll;
 	BrowserList *moduleList;
-	std::set<std::string> availableManufacturers;
+	std::set<std::string> availableAuthors;
 	std::set<ModelTag> availableTags;
 
 	ModuleBrowser() {
@@ -314,12 +314,12 @@ struct ModuleBrowser : VirtualWidget {
 		moduleScroll->container->addChild(moduleList);
 		addChild(moduleScroll);
 
-		// Collect manufacturers
+		// Collect authors
 		for (Plugin *plugin : gPlugins) {
 			for (Model *model : plugin->models) {
-				// Insert manufacturer
-				if (!model->manufacturer.empty())
-					availableManufacturers.insert(model->manufacturer);
+				// Insert author
+				if (!model->author.empty())
+					availableAuthors.insert(model->author);
 				// Insert tag
 				for (ModelTag tag : model->tags) {
 					if (tag != NO_TAG)
@@ -337,7 +337,7 @@ struct ModuleBrowser : VirtualWidget {
 	}
 
 	bool isModelFiltered(Model *model) {
-		if (!sManufacturerFilter.empty() && model->manufacturer != sManufacturerFilter)
+		if (!sAuthorFilter.empty() && model->author != sAuthorFilter)
 			return false;
 		if (sTagFilter != NO_TAG) {
 			auto it = std::find(model->tags.begin(), model->tags.end(), sTagFilter);
@@ -366,18 +366,18 @@ struct ModuleBrowser : VirtualWidget {
 			}
 		}
 
-		// Manufacturers
-		if (sManufacturerFilter.empty() && sTagFilter == NO_TAG) {
-			// Manufacturer items
+		// Authors
+		if (sAuthorFilter.empty() && sTagFilter == NO_TAG) {
+			// Author items
 			{
 				SeparatorItem *item = new SeparatorItem();
-				item->setText("Manufacturers");
+				item->setText("Authors");
 				moduleList->addChild(item);
 			}
-			for (std::string manufacturer : availableManufacturers) {
-				if (isMatch(manufacturer, search)) {
-					ManufacturerItem *item = new ManufacturerItem();
-					item->setManufacturer(manufacturer);
+			for (std::string author : availableAuthors) {
+				if (isMatch(author, search)) {
+					AuthorItem *item = new AuthorItem();
+					item->setAuthor(author);
 					moduleList->addChild(item);
 				}
 			}
@@ -401,7 +401,7 @@ struct ModuleBrowser : VirtualWidget {
 		}
 
 		// Models
-		if (!sManufacturerFilter.empty() || sTagFilter != NO_TAG || !search.empty()) {
+		if (!sAuthorFilter.empty() || sTagFilter != NO_TAG || !search.empty()) {
 			{
 				SeparatorItem *item = new SeparatorItem();
 				item->setText("Modules");
@@ -433,9 +433,9 @@ struct ModuleBrowser : VirtualWidget {
 
 // Implementations of inline methods above
 
-void ManufacturerItem::onAction(EventAction &e) {
+void AuthorItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	sManufacturerFilter = manufacturer;
+	sAuthorFilter = author;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
@@ -451,7 +451,7 @@ void TagItem::onAction(EventAction &e) {
 
 void ClearFilterItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	sManufacturerFilter = "";
+	sAuthorFilter = "";
 	sTagFilter = NO_TAG;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
