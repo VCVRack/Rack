@@ -41,6 +41,7 @@ struct MIDITriggerToCVInterface : Module {
 		// Learn
 		if (learningId >= 0) {
 			learnedNotes[learningId] = note;
+			learningId = -1;
 		}
 		// Find id
 		for (int i = 0; i < 16; i++) {
@@ -142,6 +143,9 @@ struct MidiTrigChoice : GridChoice {
 			int semi = note % 12;
 			text = stringf("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
+
+			if (gFocusedWidget == this)
+				gFocusedWidget = NULL;
 		}
 	}
 
