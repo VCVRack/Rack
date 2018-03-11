@@ -35,7 +35,9 @@ static float smoothValue;
 
 
 float Light::getBrightness() {
-	return sqrtf(fmaxf(0.f, value));
+	// LEDs are diodes, so don't allow reverse current.
+	// For some reason, instead of the RMS, the sqrt of RMS looks better
+	return powf(fmaxf(0.f, value), 0.25f);
 }
 
 void Light::setBrightnessSmooth(float brightness, float frames) {
@@ -92,14 +94,14 @@ static void engineStep() {
 		// Step ports
 		for (Input &input : module->inputs) {
 			if (input.active) {
-				float value = input.value / 10.f;
+				float value = input.value / 5.f;
 				input.plugLights[0].setBrightnessSmooth(value);
 				input.plugLights[1].setBrightnessSmooth(-value);
 			}
 		}
 		for (Output &output : module->outputs) {
 			if (output.active) {
-				float value = output.value / 10.f;
+				float value = output.value / 5.f;
 				output.plugLights[0].setBrightnessSmooth(value);
 				output.plugLights[1].setBrightnessSmooth(-value);
 			}
