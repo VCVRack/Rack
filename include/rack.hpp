@@ -20,7 +20,7 @@ namespace rack {
 
 /** Deprecated, use Model::create<TModule, TModuleWidget>(...) instead */
 template <class TModuleWidget, typename... Tags>
-DEPRECATED Model *createModel(std::string manufacturer, std::string slug, std::string name, Tags... tags) {
+DEPRECATED Model *createModel(std::string author, std::string slug, std::string name, Tags... tags) {
 	struct TModel : Model {
 		ModuleWidget *createModuleWidget() override {
 			ModuleWidget *moduleWidget = new TModuleWidget();
@@ -29,7 +29,7 @@ DEPRECATED Model *createModel(std::string manufacturer, std::string slug, std::s
 		}
 	};
 	Model *model = new TModel();
-	model->manufacturer = manufacturer;
+	model->author = author;
 	model->slug = slug;
 	model->name = name;
 	model->tags = {tags...};

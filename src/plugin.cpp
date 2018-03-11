@@ -394,9 +394,9 @@ void pluginInit() {
 
 	// Load core
 	// This function is defined in core.cpp
-	Plugin *coreManufacturer = new Plugin();
-	init(coreManufacturer);
-	gPlugins.push_back(coreManufacturer);
+	Plugin *corePlugin = new Plugin();
+	init(corePlugin);
+	gPlugins.push_back(corePlugin);
 
 	// Load plugins from local directory
 	std::string localPlugins = assetLocal("plugins");

@@ -43,15 +43,17 @@ struct Plugin {
 
 struct Model {
 	Plugin *plugin = NULL;
-	/** An identifier for the model, e.g. "VCO". Used for saving patches. The slug, manufacturerSlug pair must be unique. */
+	/** An identifier for the model, e.g. "VCO". Used for saving patches.
+	The model slug must be unique in your plugin, but it doesn't need to be unique among different plugins.
+	*/
 	std::string slug;
 	/** Human readable name for your model, e.g. "Voltage Controlled Oscillator" */
 	std::string name;
-	/** The name of the manufacturer group of the module.
-	This might be different than the plugin slug. For example, if you create multiple plugins but want them to be branded similarly, you may use the same manufacturer name in multiple plugins.
-	You may even have multiple manufacturers in one plugin, although this would be unusual.
+	/** The author name of the module.
+	This might be different than the plugin slug. For example, if you create multiple plugins but want them to be branded similarly, you may use the same author in multiple plugins.
+	You may even have multiple authors in one plugin, although this property will be moved to Plugin for Rack 1.0.
 	*/
-	std::string manufacturer;
+	std::string author;
 	/** List of tags representing the function(s) of the module (optional) */
 	std::list<ModelTag> tags;
 
@@ -65,7 +67,7 @@ struct Model {
 
 	/** Create Model subclass which constructs a specific Module and ModuleWidget subclass */
 	template <typename TModule, typename TModuleWidget, typename... Tags>
-	static Model *create(std::string manufacturer, std::string slug, std::string name, Tags... tags) {
+	static Model *create(std::string author, std::string slug, std::string name, Tags... tags) {
 		struct TModel : Model {
 			Module *createModule() override {
 				TModule *module = new TModule();
@@ -84,7 +86,7 @@ struct Model {
 			}
 		};
 		TModel *o = new TModel();
-		o->manufacturer = manufacturer;
+		o->author = author;
 		o->slug = slug;
 		o->name = name;
 		o->tags = {tags...};
