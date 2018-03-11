@@ -59,6 +59,7 @@ struct MIDICCToCVInterface : Module {
 				// Learn
 				if (learningId >= 0) {
 					learnedCcs[learningId] = cc;
+					learningId = -1;
 				}
 				// Set CV
 				for (int i = 0; i < 16; i++) {
@@ -103,8 +104,10 @@ struct MidiCcChoice : GridChoice {
 			color.a = 0.5;
 		}
 		else {
-			text = stringf("%d", id);
+			text = stringf("%d", module->learnedCcs[id]);
 			color.a = 1.0;
+			if (gFocusedWidget == this)
+				gFocusedWidget = NULL;
 		}
 	}
 
