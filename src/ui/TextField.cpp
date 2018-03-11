@@ -31,7 +31,6 @@ void TextField::draw(NVGcontext *vg) {
 }
 
 void TextField::onMouseDown(EventMouseDown &e) {
-	debug("%d", this == gFocusedWidget);
 	if (e.button == 0) {
 		cursor = selection = getTextPosition(e.pos);
 	}

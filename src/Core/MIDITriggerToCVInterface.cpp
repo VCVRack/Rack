@@ -1,57 +1,5 @@
 #include "Core.hpp"
 #include "midi.hpp"
-#include "dsp/filter.hpp"
-
-
-
-struct CcChoice : LedDisplayChoice {
-	CcChoice() {
-		box.size.y = mm2px(6.666);
-		textOffset.y -= 4;
-	}
-};
-
-
-struct CcMidiWidget : MidiWidget {
-	LedDisplaySeparator *hSeparators[4];
-	LedDisplaySeparator *vSeparators[4];
-	LedDisplayChoice *ccChoices[4][4];
-
-	CcMidiWidget() {
-		Vec pos = channelChoice->box.getBottomLeft();
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
-			addChild(vSeparators[x]);
-		}
-		for (int y = 0; y < 4; y++) {
-			hSeparators[y] = Widget::create<LedDisplaySeparator>(pos);
-			addChild(hSeparators[y]);
-			for (int x = 0; x < 4; x++) {
-				CcChoice *ccChoice = Widget::create<CcChoice>(pos);
-				ccChoice->text = stringf("%d", x*4+y);
-				ccChoices[x][y] = ccChoice;
-				addChild(ccChoice);
-			}
-			pos = ccChoices[0][y]->box.getBottomLeft();
-		}
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x]->box.size.y = pos.y - vSeparators[x]->box.pos.y;
-		}
-	}
-	void step() override {
-		MidiWidget::step();
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
-		}
-		for (int y = 0; y < 4; y++) {
-			hSeparators[y]->box.size.x = box.size.x;
-			for (int x = 0; x < 4; x++) {
-				ccChoices[x][y]->box.size.x = box.size.x / 4;
-				ccChoices[x][y]->box.pos.x = box.size.x / 4 * x;
-			}
-		}
-	}
-};
 
 
 struct MIDITriggerToCVInterface : Module {
@@ -73,6 +21,8 @@ struct MIDITriggerToCVInterface : Module {
 
 	bool gates[16];
 	float gateTimes[16];
+	int learningId = -1;
+	uint8_t learnedNotes[16] = {};
 
 	MIDITriggerToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();
@@ -82,26 +32,32 @@ struct MIDITriggerToCVInterface : Module {
 		for (int i = 0; i < 16; i++) {
 			gates[i] = false;
 			gateTimes[i] = 0.f;
+			learnedNotes[i] = i + 36;
 		}
+		learningId = -1;
 	}
 
 	void pressNote(uint8_t note) {
-		// TEMP
-		if (note >= 16)
-			return;
-		int i = note;
-
-		gates[i] = true;
-		gateTimes[i] = 1e-3f;
+		// Learn
+		if (learningId >= 0) {
+			learnedNotes[learningId] = note;
+		}
+		// Find id
+		for (int i = 0; i < 16; i++) {
+			if (learnedNotes[i] == note) {
+				gates[i] = true;
+				gateTimes[i] = 1e-3f;
+			}
+		}
 	}
 
 	void releaseNote(uint8_t note) {
-		// TEMP
-		if (note >= 16)
-			return;
-		int i = note;
-
-		gates[i] = false;
+		// Find id
+		for (int i = 0; i < 16; i++) {
+			if (learnedNotes[i] == note) {
+				gates[i] = false;
+			}
+		}
 	}
 
 	void step() override {
@@ -158,6 +114,58 @@ struct MIDITriggerToCVInterface : Module {
 };
 
 
+struct MidiTrigChoice : GridChoice {
+	MIDITriggerToCVInterface *module;
+	int id;
+
+	MidiTrigChoice() {
+		box.size.y = mm2px(6.666);
+		textOffset.y -= 4;
+		textOffset.x -= 4;
+	}
+
+	void setId(int id) override {
+		this->id = id;
+	}
+
+	void step() override {
+		if (module->learningId == id) {
+			text = "LRN";
+			color.a = 0.5;
+		}
+		else {
+			uint8_t note = module->learnedNotes[id];
+			static const char *noteNames[] = {
+				"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
+			};
+			int oct = note / 12 - 1;
+			int semi = note % 12;
+			text = stringf("%s%d", noteNames[semi], oct);
+			color.a = 1.0;
+		}
+	}
+
+	void onFocus(EventFocus &e) override {
+		e.consumed = true;
+		module->learningId = id;
+	}
+
+	void onDefocus(EventDefocus &e) override {
+		module->learningId = -1;
+	}
+};
+
+
+struct MidiTrigWidget : Grid16MidiWidget {
+	MIDITriggerToCVInterface *module;
+	GridChoice *createGridChoice() override {
+		MidiTrigChoice *gridChoice = new MidiTrigChoice();
+		gridChoice->module = module;
+		return gridChoice;
+	}
+};
+
+
 struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 	MIDITriggerToCVInterfaceWidget(MIDITriggerToCVInterface *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetGlobal("res/Core/MIDITriggerToCVInterface.svg")));
@@ -184,9 +192,11 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 14));
 		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 15));
 
-		MidiWidget *midiWidget = Widget::create<CcMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
+		MidiTrigWidget *midiWidget = Widget::create<MidiTrigWidget>(mm2px(Vec(3.399621, 14.837339)));
+		midiWidget->module = module;
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		midiWidget->midiIO = &module->midiInput;
+		midiWidget->createGridChoices();
 		addChild(midiWidget);
 
 	}
