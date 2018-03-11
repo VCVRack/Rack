@@ -26,6 +26,12 @@ struct MidiMessage {
 	uint8_t status() {
 		return (cmd >> 4) & 0xf;
 	}
+	uint8_t note() {
+		return data1 & 0x7f;
+	}
+	uint8_t value() {
+		return data2 & 0x7f;
+	}
 };
 
 

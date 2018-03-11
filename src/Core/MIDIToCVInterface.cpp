@@ -144,29 +144,28 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processMessage(MidiMessage msg) {
-		// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
+		// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.note(), msg.value());
 
 		switch (msg.status()) {
 			// note off
 			case 0x8: {
-				releaseNote(msg.data1);
+				releaseNote(msg.note());
 			} break;
 			// note on
 			case 0x9: {
-				if (msg.data2 > 0) {
-					uint8_t note = msg.data1 & 0x7f;
-					noteData[note].velocity = msg.data2;
-					pressNote(msg.data1);
+				if (msg.value() > 0) {
+					noteData[msg.note()].velocity = msg.value();
+					pressNote(msg.note());
 				}
 				else {
 					// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
-					releaseNote(msg.data1);
+					releaseNote(msg.note());
 				}
 			} break;
 			// channel aftertouch
 			case 0xa: {
-				uint8_t note = msg.data1 & 0x7f;
-				noteData[note].aftertouch = msg.data2;
+				uint8_t note = msg.note();
+				noteData[note].aftertouch = msg.value();
 			} break;
 			// cc
 			case 0xb: {
@@ -174,7 +173,7 @@ struct MIDIToCVInterface : Module {
 			} break;
 			// pitch wheel
 			case 0xe: {
-				pitch = msg.data2 * 128 + msg.data1;
+				pitch = msg.value() * 128 + msg.note();
 			} break;
 			case 0xf: {
 				processSystem(msg);
@@ -184,14 +183,14 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processCC(MidiMessage msg) {
-		switch (msg.data1) {
+		switch (msg.note()) {
 			// mod
 			case 0x01: {
-				mod = msg.data2;
+				mod = msg.value();
 			} break;
 			// sustain
 			case 0x40: {
-				if (msg.data2 >= 64)
+				if (msg.value() >= 64)
 					pressPedal();
 				else
 					releasePedal();
