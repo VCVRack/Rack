@@ -6,12 +6,6 @@
 #include <algorithm>
 
 
-struct MidiNoteData {
-	uint8_t velocity = 0;
-	uint8_t aftertouch = 0;
-};
-
-
 struct MIDIToCVInterface : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -49,25 +43,45 @@ struct MIDIToCVInterface : Module {
 	PulseGenerator continuePulse;
 	PulseGenerator clockPulse;
 
-	MidiNoteData noteData[128];
-	std::list<uint8_t> heldNotes;
+	struct NoteData {
+		uint8_t velocity = 0;
+		uint8_t aftertouch = 0;
+	};
+
+	NoteData noteData[128];
+	std::vector<uint8_t> heldNotes;
 	uint8_t lastNote;
 	bool pedal;
 	bool gate;
 
-	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	MIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS), heldNotes(128) {
 		onReset();
+	}
+
+	json_t *toJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "midi", midiInput.toJson());
+		return rootJ;
+	}
+
+	void fromJson(json_t *rootJ) override {
+		json_t *midiJ = json_object_get(rootJ, "midi");
+		if (midiJ)
+			midiInput.fromJson(midiJ);
 	}
 
 	void onReset() override {
 		heldNotes.clear();
-		pedal = false;
 		lastNote = 60;
+		pedal = false;
+		gate = false;
 	}
 
 	void pressNote(uint8_t note) {
 		// Remove existing similar note
-		heldNotes.remove(note);
+		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
+		if (it != heldNotes.end())
+			heldNotes.erase(it);
 		// Push note
 		heldNotes.push_back(note);
 		lastNote = note;
@@ -76,15 +90,15 @@ struct MIDIToCVInterface : Module {
 
 	void releaseNote(uint8_t note) {
 		// Remove the note
-		heldNotes.remove(note);
+		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
+		if (it != heldNotes.end())
+			heldNotes.erase(it);
 		// Hold note if pedal is pressed
 		if (pedal)
 			return;
 		// Set last note
 		if (!heldNotes.empty()) {
-			auto it2 = heldNotes.end();
-			it2--;
-			lastNote = *it2;
+			lastNote = heldNotes[heldNotes.size() - 1];
 			gate = true;
 		}
 		else {
@@ -124,6 +138,9 @@ struct MIDIToCVInterface : Module {
 		outputs[CONTINUE_OUTPUT].value = continuePulse.process(deltaTime) ? 10.f : 0.f;
 
 		outputs[CLOCK_OUTPUT].value = clockPulse.process(deltaTime) ? 10.f : 0.f;
+		// TODO
+		outputs[CLOCK_2_OUTPUT].value = 0.f;
+		outputs[CLOCK_HALF_OUTPUT].value = 0.f;
 	}
 
 	void processMessage(MidiMessage msg) {
@@ -203,17 +220,6 @@ struct MIDIToCVInterface : Module {
 			} break;
 			default: break;
 		}
-	}
-
-	json_t *toJson() override {
-		json_t *rootJ = json_object();
-		json_object_set_new(rootJ, "midi", midiInput.toJson());
-		return rootJ;
-	}
-
-	void fromJson(json_t *rootJ) override {
-		json_t *midiJ = json_object_get(rootJ, "midi");
-		midiInput.fromJson(midiJ);
 	}
 };
 
