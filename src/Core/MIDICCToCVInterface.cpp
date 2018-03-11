@@ -90,14 +90,11 @@ struct MIDICCToCVInterface : Module {
 	}
 
 	void processMessage(MidiMessage msg) {
-		// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
-
+		debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
 		switch (msg.status()) {
 			// cc
 			case 0xb: {
-				uint8_t cc = msg.data1 & 0x7f;
-				uint8_t cv = msg.data2 & 0x7f;
-				cvs[cc] = cv;
+				cvs[msg.note()] = msg.value();
 			} break;
 			default: break;
 		}
