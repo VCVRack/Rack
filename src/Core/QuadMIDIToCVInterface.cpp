@@ -147,24 +147,21 @@ struct QuadMIDIToCVInterface : Module {
 		switch (msg.status()) {
 			// note off
 			case 0x8: {
-				// releaseNote(msg.data1);
+				releaseNote(msg.note());
 			} break;
 			// note on
 			case 0x9: {
-				if (msg.data2 > 0) {
-					uint8_t note = msg.data1 & 0x7f;
-					noteData[note].velocity = msg.data2;
-					// pressNote(msg.data1);
+				if (msg.value() > 0) {
+					noteData[msg.note()].velocity = msg.value();
+					pressNote(msg.note());
 				}
 				else {
-					// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
-					// releaseNote(msg.data1);
+					releaseNote(msg.note());
 				}
 			} break;
 			// channel aftertouch
 			case 0xa: {
-				uint8_t note = msg.data1 & 0x7f;
-				noteData[note].aftertouch = msg.data2;
+				noteData[msg.note()].aftertouch = msg.value();
 			} break;
 			// cc
 			case 0xb: {
@@ -175,10 +172,10 @@ struct QuadMIDIToCVInterface : Module {
 	}
 
 	void processCC(MidiMessage msg) {
-		switch (msg.data1) {
+		switch (msg.note()) {
 			// sustain
 			case 0x40: {
-				if (msg.data2 >= 64)
+				if (msg.value() >= 64)
 					pressPedal();
 				else
 					releasePedal();

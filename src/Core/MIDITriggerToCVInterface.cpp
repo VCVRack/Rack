@@ -71,23 +71,76 @@ struct MIDITriggerToCVInterface : Module {
 
 	MidiInputQueue midiInput;
 
-	MIDITriggerToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	bool gates[16];
+	float gateTimes[16];
+
+	MIDITriggerToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		onReset();
+	}
+
+	void onReset() override {
+		for (int i = 0; i < 16; i++) {
+			gates[i] = false;
+			gateTimes[i] = 0.f;
+		}
+	}
+
+	void pressNote(uint8_t note) {
+		// TEMP
+		if (note >= 16)
+			return;
+		int i = note;
+
+		gates[i] = true;
+		gateTimes[i] = 1e-3f;
+	}
+
+	void releaseNote(uint8_t note) {
+		// TEMP
+		if (note >= 16)
+			return;
+		int i = note;
+
+		gates[i] = false;
+	}
 
 	void step() override {
 		MidiMessage msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
+		float deltaTime = engineGetSampleTime();
 
 		for (int i = 0; i < 16; i++) {
-			outputs[TRIG_OUTPUT + i].value = 0.f;
+			if (gateTimes[i] > 0.f) {
+				outputs[TRIG_OUTPUT + i].value = 10.f;
+				// If the gate is off, wait 1 ms before turning the pulse off.
+				// This avoids drum controllers sending a pulse with 0 ms duration.
+				if (!gates[i]) {
+					gateTimes[i] -= deltaTime;
+				}
+			}
+			else {
+				outputs[TRIG_OUTPUT + i].value = 0.f;
+			}
 		}
 	}
 
 	void processMessage(MidiMessage msg) {
-		// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
-
 		switch (msg.status()) {
+			// note off
+			case 0x8: {
+				releaseNote(msg.note());
+			} break;
+			// note on
+			case 0x9: {
+				if (msg.value() > 0) {
+					pressNote(msg.note());
+				}
+				else {
+					releaseNote(msg.note());
+				}
+			} break;
 			default: break;
 		}
 	}
