@@ -74,11 +74,28 @@ struct MIDICCToCVInterface : Module {
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
+
+		json_t *ccsJ = json_array();
+		for (int i = 0; i < 16; i++) {
+			json_t *ccJ = json_integer(learnedCcs[i]);
+			json_array_append_new(ccsJ, ccJ);
+		}
+		json_object_set_new(rootJ, "ccs", ccsJ);
+
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
+		json_t *ccsJ = json_object_get(rootJ, "ccs");
+		if (ccsJ) {
+			for (int i = 0; i < 16; i++) {
+				json_t *ccJ = json_array_get(ccsJ, i);
+				if (ccJ)
+					learnedCcs[i] = json_integer_value(ccJ);
+			}
+		}
+
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		midiInput.fromJson(midiJ);
 	}

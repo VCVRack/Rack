@@ -104,11 +104,28 @@ struct MIDITriggerToCVInterface : Module {
 
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
+
+		json_t *notesJ = json_array();
+		for (int i = 0; i < 16; i++) {
+			json_t *noteJ = json_integer(learnedNotes[i]);
+			json_array_append_new(notesJ, noteJ);
+		}
+		json_object_set_new(rootJ, "notes", notesJ);
+
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
+		json_t *notesJ = json_object_get(rootJ, "notes");
+		if (notesJ) {
+			for (int i = 0; i < 16; i++) {
+				json_t *noteJ = json_array_get(notesJ, i);
+				if (noteJ)
+					learnedNotes[i] = json_integer_value(noteJ) & 0x7f;
+			}
+		}
+
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		midiInput.fromJson(midiJ);
 	}
