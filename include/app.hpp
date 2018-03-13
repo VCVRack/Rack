@@ -36,7 +36,7 @@ struct Module;
 struct Wire;
 
 struct RackWidget;
-struct ParamWidget;
+struct Parameter;
 struct Port;
 struct SVGPanel;
 
@@ -58,14 +58,14 @@ struct ModuleWidget : OpaqueWidget {
 	SVGPanel *panel = NULL;
 	std::vector<Port*> inputs;
 	std::vector<Port*> outputs;
-	std::vector<ParamWidget*> params;
+	std::vector<Parameter*> params;
 
 	ModuleWidget(Module *module);
 	~ModuleWidget();
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addInput(Port *input);
 	void addOutput(Port *output);
-	void addParam(ParamWidget *param);
+	void addParam(Parameter *param);
 	void setPanel(std::shared_ptr<SVG> svg);
 
 	virtual json_t *toJson();
@@ -200,16 +200,29 @@ struct SVGPanel : FramebufferWidget {
 };
 
 ////////////////////
-// params
+// ParamWidgets and other components
 ////////////////////
+
+/** A Widget that exists on a Panel and interacts with a Module */
+struct Component : OpaqueWidget {
+	Module *module = NULL;
+
+	template <typename T = Component>
+	static T *create(Vec pos, Module *module) {
+		T *o = new T();
+		o->box.pos = pos;
+		o->module = module;
+		return o;
+	}
+};
 
 struct CircularShadow : TransparentWidget {
 	float blur = 0.0;
 	void draw(NVGcontext *vg) override;
 };
 
-struct ParamWidget : OpaqueWidget, QuantityWidget {
-	Module *module = NULL;
+/** A Component which has control over a Param (defined in engine.hpp) */
+struct Parameter : Component, QuantityWidget {
 	int paramId;
 	/** Used to momentarily disable value randomization
 	To permanently disable or change randomization behavior, override the randomize() method instead of changing this.
@@ -225,10 +238,9 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	void onMouseDown(EventMouseDown &e) override;
 	void onChange(EventChange &e) override;
 
-	template <typename T = ParamWidget>
+	template <typename T = Parameter>
 	static T *create(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
-		T *o = Widget::create<T>(pos);
-		o->module = module;
+		T *o = Component::create<T>(pos, module);
 		o->paramId = paramId;
 		o->setLimits(minValue, maxValue);
 		o->setDefaultValue(defaultValue);
@@ -236,8 +248,11 @@ struct ParamWidget : OpaqueWidget, QuantityWidget {
 	}
 };
 
+/** Deprecated name of Parameter */
+typedef Parameter ParamWidget;
+
 /** Implements vertical dragging behavior for ParamWidgets */
-struct Knob : ParamWidget {
+struct Knob : Parameter {
 	/** Snap to nearest integer while dragging */
 	bool snap = false;
 	/** Multiplier for mouse movement to adjust knob value */
@@ -249,16 +264,16 @@ struct Knob : ParamWidget {
 	void onDragEnd(EventDragEnd &e) override;
 };
 
-struct SpriteKnob : virtual Knob, SpriteWidget {
+/** Deprecated */
+struct SpriteKnob : Knob, SpriteWidget {
 	int minIndex, maxIndex, spriteCount;
 	void step() override;
 };
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
-struct SVGKnob : virtual Knob, FramebufferWidget {
+struct SVGKnob : Knob, FramebufferWidget {
 	/** Angles in radians */
 	float minAngle, maxAngle;
-	/** Not owned */
 	TransformWidget *tw;
 	SVGWidget *sw;
 
@@ -268,6 +283,9 @@ struct SVGKnob : virtual Knob, FramebufferWidget {
 	void onChange(EventChange &e) override;
 };
 
+/** Behaves like a knob but linearly moves an SVGWidget between two points.
+Can be used for horizontal or vertical linear faders.
+*/
 struct SVGFader : Knob, FramebufferWidget {
 	/** Intermediate positions will be interpolated between these positions */
 	Vec minHandlePos, maxHandlePos;
@@ -280,14 +298,9 @@ struct SVGFader : Knob, FramebufferWidget {
 	void onChange(EventChange &e) override;
 };
 
-struct Switch : ParamWidget {
-};
-
-struct SVGSwitch : virtual Switch, FramebufferWidget {
+struct SVGSwitch : virtual Parameter, FramebufferWidget {
 	std::vector<std::shared_ptr<SVG>> frames;
-	/** Not owned */
 	SVGWidget *sw;
-
 	SVGSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<SVG> svg);
@@ -295,29 +308,33 @@ struct SVGSwitch : virtual Switch, FramebufferWidget {
 };
 
 /** A switch that cycles through each mechanical position */
-struct ToggleSwitch : virtual Switch {
-	void onDragStart(EventDragStart &e) override {
-		// Cycle through values
-		// e.g. a range of [0.0, 3.0] would have modes 0, 1, 2, and 3.
-		if (value >= maxValue)
-			setValue(minValue);
-		else
-			setValue(value + 1.0);
-	}
+struct ToggleSwitch : virtual Parameter {
+	void onDragStart(EventDragStart &e) override;
 };
 
-/** A switch that is turned on when held */
-struct MomentarySwitch : virtual Switch {
+/** A switch that is turned on when held and turned off when released.
+Consider using SVGButton if the switch simply changes the state of your Module when clicked.
+*/
+struct MomentarySwitch : virtual Parameter {
 	/** Don't randomize state */
 	void randomize() override {}
-	void onDragStart(EventDragStart &e) override {
-		setValue(maxValue);
-		EventAction eAction;
-		onAction(eAction);
-	}
-	void onDragEnd(EventDragEnd &e) override {
-		setValue(minValue);
-	}
+	void onDragStart(EventDragStart &e) override;
+	void onDragEnd(EventDragEnd &e) override;
+};
+
+/** A Component with a default (up) and active (down) state when clicked.
+Does not modify a Param, simply calls onAction() of a subclass.
+*/
+struct SVGButton : Component, FramebufferWidget {
+	Module *module = NULL;
+	std::shared_ptr<SVG> defaultSVG;
+	std::shared_ptr<SVG> activeSVG;
+	SVGWidget *sw;
+	SVGButton();
+	/** If `activeSVG` is NULL, `defaultSVG` is used as the active state instead. */
+	void setSVGs(std::shared_ptr<SVG> defaultSVG, std::shared_ptr<SVG> activeSVG);
+	void onDragStart(EventDragStart &e) override;
+	void onDragEnd(EventDragEnd &e) override;
 };
 
 ////////////////////

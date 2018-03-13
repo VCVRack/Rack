@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	gLogFile = fopen(logFilename.c_str(), "w");
 #endif
 
-	info("Rack v%s", gApplicationVersion.c_str());
+	info("Rack %s", gApplicationVersion.c_str());
 
 	{
 		char *cwd = getcwd(NULL, 0);
