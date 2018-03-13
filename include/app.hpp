@@ -217,7 +217,9 @@ struct Component : OpaqueWidget {
 };
 
 struct CircularShadow : TransparentWidget {
-	float blur = 0.0;
+	float blurRadius;
+	float opacity;
+	CircularShadow();
 	void draw(NVGcontext *vg) override;
 };
 
@@ -276,6 +278,7 @@ struct SVGKnob : Knob, FramebufferWidget {
 	float minAngle, maxAngle;
 	TransformWidget *tw;
 	SVGWidget *sw;
+	CircularShadow *shadow;
 
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
