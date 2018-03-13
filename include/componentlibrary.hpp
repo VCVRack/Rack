@@ -452,6 +452,26 @@ struct TinyLight : BASE {
 	}
 };
 
+/** A light to displayed over PB61303. Must add a color by subclassing or templating. */
+template <typename BASE>
+struct LEDBezelLight : BASE {
+	LEDBezelLight() {
+		this->bgColor = COLOR_BLACK_TRANSPARENT;
+		this->box.size = mm2px(Vec(6.0, 6.0));
+	}
+};
+
+/** A light to displayed over PB61303. Must add a color by subclassing or templating.
+Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by mm2px(Vec(0.5, 0.5)).
+*/
+template <typename BASE>
+struct PB61303Light : BASE {
+	PB61303Light() {
+		this->bgColor = COLOR_BLACK_TRANSPARENT;
+		this->box.size = mm2px(Vec(9.0, 9.0));
+	}
+};
+
 
 ////////////////////
 // Switches and Buttons
@@ -515,18 +535,29 @@ struct BefacoPush : SVGSwitch, MomentarySwitch {
 	}
 };
 
-struct PB61303 : SVGSwitch, MomentarySwitch {
-	PB61303() {
-		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")));
-	}
-};
-
 struct LEDBezel : SVGSwitch, MomentarySwitch {
 	LEDBezel() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/LEDBezel.svg")));
 	}
 };
 
+struct PB61303 : SVGSwitch, MomentarySwitch {
+	PB61303() {
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")));
+	}
+};
+
+struct PB61303Button : SVGButton {
+	PB61303Button() {
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")), NULL);
+	}
+};
+
+struct LEDBezelButton : SVGButton {
+	LEDBezelButton() {
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/LEDBezel.svg")), NULL);
+	}
+};
 
 ////////////////////
 // Misc

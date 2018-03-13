@@ -24,7 +24,7 @@ void SVGSwitch::onChange(EventChange &e) {
 	int index = clamp((int) roundf(valueScaled), 0, frames.size() - 1);
 	sw->setSVG(frames[index]);
 	dirty = true;
-	Switch::onChange(e);
+	ParamWidget::onChange(e);
 }
 
 
