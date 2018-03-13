@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="6.2990298mm"
-   height="6.3003922mm"
-   viewBox="0 0 6.2990294 6.3003921"
+   width="19.000362mm"
+   height="19.000389mm"
+   viewBox="0 0 19.000362 19.000389"
    version="1.1"
    id="svg111794"
    inkscape:version="0.92.2 5c3e80d, 2017-08-06"
-   sodipodi:docname="Trimpot.svg">
+   sodipodi:docname="RoundHugeBlackKnob.svg">
   <defs
      id="defs111788" />
   <sodipodi:namedview
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="-118.16736"
-     inkscape:cy="0.15014965"
+     inkscape:cx="-18.065819"
+     inkscape:cy="35.516889"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -56,16 +56,16 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-183.93691,-77.348595)">
+     transform="translate(-98.209438,-77.425955)">
     <path
        inkscape:connector-curvature="0"
        style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775"
-       d="m 183.93691,80.498791 c 0,1.740461 1.40974,3.150196 3.1502,3.150196 1.73909,0 3.14883,-1.409735 3.14883,-3.150196 0,-1.739085 -1.40974,-3.150196 -3.14883,-3.150196 -1.74046,0 -3.1502,1.411111 -3.1502,3.150196"
-       id="path108214" />
+       d="m 117.2098,86.92615 c 0,5.247569 -4.25397,9.500195 -9.50016,9.500195 -5.24757,0 -9.500202,-4.252626 -9.500202,-9.500195 0,-5.24619 4.252632,-9.500193 9.500202,-9.500193 5.24619,0 9.50016,4.254003 9.50016,9.500193"
+       id="path110586" />
     <path
        inkscape:connector-curvature="0"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775"
-       d="m 187.29109,77.359619 c -0.0675,-0.0055 -0.13508,-0.01101 -0.20398,-0.01101 -0.0689,0 -0.13779,0.0055 -0.20531,0.01101 v 3.139172 h 0.40929 z m 0,0"
-       id="path108216" />
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35277775"
+       d="m 108.0252,77.463165 c -0.10337,-0.02343 -0.2067,-0.03721 -0.31556,-0.03721 -0.10887,0 -0.21361,0.01379 -0.3156,0.03721 v 9.582876 h 0.63116 z m 0,0"
+       id="path110588" />
   </g>
 </svg>

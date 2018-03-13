@@ -36,31 +36,30 @@ struct RoundKnob : SVGKnob {
 
 struct RoundBlackKnob : RoundKnob {
 	RoundBlackKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundBlack.svg")));
-		box.size = Vec(38, 38);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundBlackKnob.svg")));
 	}
 };
 
-struct RoundSmallBlackKnob : RoundBlackKnob {
+struct RoundSmallBlackKnob : RoundKnob {
 	RoundSmallBlackKnob() {
-		box.size = Vec(28, 28);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundSmallBlackKnob.svg")));
 	}
 };
 
-struct RoundLargeBlackKnob : RoundBlackKnob {
+struct RoundLargeBlackKnob : RoundKnob {
 	RoundLargeBlackKnob() {
-		box.size = Vec(46, 46);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundLargeBlackKnob.svg")));
 	}
 };
 
-struct RoundHugeBlackKnob : RoundBlackKnob {
+struct RoundHugeBlackKnob : RoundKnob {
 	RoundHugeBlackKnob() {
-		box.size = Vec(56, 56);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundHugeBlackKnob.svg")));
 	}
 };
 
-struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob {
-	RoundSmallBlackSnapKnob() {
+struct RoundBlackSnapKnob : RoundBlackKnob {
+	RoundBlackSnapKnob() {
 		snap = true;
 		smooth = false;
 	}
@@ -294,7 +293,6 @@ struct SynthTechAlco : SVGKnob {
 
 struct Trimpot : SVGKnob {
 	Trimpot() {
-		box.size = Vec(17, 17);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Trimpot.svg")));
@@ -303,7 +301,6 @@ struct Trimpot : SVGKnob {
 
 struct BefacoBigKnob : SVGKnob {
 	BefacoBigKnob() {
-		box.size = Vec(75, 75);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoBigKnob.svg")));
@@ -319,7 +316,6 @@ struct BefacoBigSnapKnob : BefacoBigKnob {
 
 struct BefacoTinyKnob : SVGKnob {
 	BefacoTinyKnob() {
-		box.size = Vec(26, 26);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoTinyKnob.svg")));
