@@ -20,7 +20,7 @@ void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
 	tw->box.size = sw->box.size;
 	box.size = sw->box.size;
 	shadow->box.size = sw->box.size;
-	shadow->box.pos = Vec(0, 4);
+	shadow->box.pos = Vec(0, sw->box.size.y * 0.1);
 	// shadow->box = shadow->box.grow(Vec(2, 2));
 }
 
