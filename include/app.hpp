@@ -274,11 +274,11 @@ struct SpriteKnob : Knob, SpriteWidget {
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
 struct SVGKnob : Knob, FramebufferWidget {
-	/** Angles in radians */
-	float minAngle, maxAngle;
 	TransformWidget *tw;
 	SVGWidget *sw;
 	CircularShadow *shadow;
+	/** Angles in radians */
+	float minAngle, maxAngle;
 
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
@@ -289,18 +289,22 @@ struct SVGKnob : Knob, FramebufferWidget {
 /** Behaves like a knob but linearly moves an SVGWidget between two points.
 Can be used for horizontal or vertical linear faders.
 */
-struct SVGFader : Knob, FramebufferWidget {
-	/** Intermediate positions will be interpolated between these positions */
-	Vec minHandlePos, maxHandlePos;
-	/** Not owned */
+struct SVGSlider : Knob, FramebufferWidget {
 	SVGWidget *background;
 	SVGWidget *handle;
+	/** Intermediate positions will be interpolated between these positions */
+	Vec minHandlePos, maxHandlePos;
 
-	SVGFader();
+	SVGSlider();
+	void setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG> handleSVG);
 	void step() override;
 	void onChange(EventChange &e) override;
 };
 
+/** Deprecated name for SVGSlider */
+typedef SVGSlider SVGFader;
+
+/** A Parameter with multiple frames corresponding to its value */
 struct SVGSwitch : virtual Parameter, FramebufferWidget {
 	std::vector<std::shared_ptr<SVG>> frames;
 	SVGWidget *sw;
@@ -446,13 +450,11 @@ struct ModuleLightWidget : MultiLightWidget {
 // ports
 ////////////////////
 
-struct Port : OpaqueWidget {
+struct Port : Component {
 	enum PortType {
 		INPUT,
 		OUTPUT
 	};
-
-	Module *module = NULL;
 	PortType type = INPUT;
 	int portId;
 	MultiLightWidget *plugLight;
@@ -470,9 +472,8 @@ struct Port : OpaqueWidget {
 
 	template <typename T = Port>
 	static T *create(Vec pos, PortType type, Module *module, int portId) {
-		T *o = Widget::create<T>(pos);
+		T *o = Component::create<T>(pos, module);
 		o->type = type;
-		o->module = module;
 		o->portId = portId;
 		return o;
 	}
@@ -480,8 +481,10 @@ struct Port : OpaqueWidget {
 
 struct SVGPort : Port, FramebufferWidget {
 	SVGWidget *background;
+	CircularShadow *shadow;
 
 	SVGPort();
+	void setSVG(std::shared_ptr<SVG> svg);
 	void draw(NVGcontext *vg) override;
 };
 
