@@ -7,8 +7,6 @@ namespace rack {
 CircularShadow::CircularShadow() {
 	blurRadius = 0;
 	opacity = 0.15;
-	// blurRadius = 0;
-	// opacity = 0.15;
 }
 
 void CircularShadow::draw(NVGcontext *vg) {

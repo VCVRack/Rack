@@ -322,45 +322,75 @@ struct BefacoTinyKnob : SVGKnob {
 	}
 };
 
-struct BefacoSlidePot : SVGFader {
+struct BefacoSlidePot : SVGSlider {
 	BefacoSlidePot() {
 		Vec margin = Vec(3.5, 3.5);
 		maxHandlePos = Vec(-1, -2).plus(margin);
 		minHandlePos = Vec(-1, 87).plus(margin);
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePot.svg"));
-		background->wrap();
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePot.svg")), SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePotHandle.svg")));
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
-		handle->svg = SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePotHandle.svg"));
-		handle->wrap();
+	}
+};
+
+struct LEDSlider : SVGSlider {
+	LEDSlider() {
+		maxHandlePos = mm2px(Vec(0.738, 0.738).plus(Vec(2, 0)));
+		minHandlePos = mm2px(Vec(0.738, 22.078).plus(Vec(2, 0)));
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/LEDSlider.svg")), NULL);
+	}
+};
+
+/** API is unstable for LEDSlider. Will add a LightWidget later. */
+struct LEDSliderGreen : LEDSlider {
+	LEDSliderGreen() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderGreenHandle.svg")));
+	}
+};
+
+struct LEDSliderRed : LEDSlider {
+	LEDSliderRed() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderRedHandle.svg")));
+	}
+};
+
+struct LEDSliderYellow : LEDSlider {
+	LEDSliderYellow() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderYellowHandle.svg")));
+	}
+};
+
+struct LEDSliderBlue : LEDSlider {
+	LEDSliderBlue() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderBlueHandle.svg")));
+	}
+};
+
+struct LEDSliderWhite : LEDSlider {
+	LEDSliderWhite() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderWhiteHandle.svg")));
 	}
 };
 
 ////////////////////
-// Jacks
+// Ports
 ////////////////////
 
 struct PJ301MPort : SVGPort {
 	PJ301MPort() {
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/PJ301M.svg"));
-		background->wrap();
-		box.size = background->box.size;
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/PJ301M.svg")));
 	}
 };
 
 struct PJ3410Port : SVGPort {
 	PJ3410Port() {
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/PJ3410.svg"));
-		background->wrap();
-		box.size = background->box.size;
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/PJ3410.svg")));
 	}
 };
 
 struct CL1362Port : SVGPort {
 	CL1362Port() {
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/CL1362.svg"));
-		background->wrap();
-		box.size = background->box.size;
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/CL1362.svg")));
 	}
 };
 
