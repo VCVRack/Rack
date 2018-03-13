@@ -7,6 +7,7 @@ namespace rack {
 SVGKnob::SVGKnob() {
 	shadow = new CircularShadow();
 	addChild(shadow);
+	shadow->box.size = Vec();
 
 	tw = new TransformWidget();
 	addChild(tw);
