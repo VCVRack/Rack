@@ -78,6 +78,10 @@ struct AudioInterfaceIO : AudioIO {
 		inputBuffer.clear();
 		outputBuffer.clear();
 	}
+
+	void onChannelsChange() override {
+		debug("Channels changed %d %d", numOutputs, numInputs);
+	}
 };
 
 
