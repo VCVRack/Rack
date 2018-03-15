@@ -43,17 +43,18 @@ struct AudioIO {
 	void setSampleRate(int sampleRate);
 	void setBlockSize(int blockSize);
 
+	void setChannels(int numOutputs, int numInputs);
+
 	/** Must close the stream before opening */
 	void openStream();
 	void closeStream();
-	/** Returns whether the audio stream is open and running */
-	bool isActive();
 
 	std::vector<int> getSampleRates();
 
 	virtual void processStream(const float *input, float *output, int frames) {}
 	virtual void onCloseStream() {}
 	virtual void onOpenStream() {}
+	virtual void onChannelsChange() {}
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 };

@@ -5,14 +5,13 @@
 namespace rack {
 
 
-static const int BRIDGE_CHANNELS = 16;
+static const int BRIDGE_NUM_PORTS = 16;
 
 
 void bridgeInit();
 void bridgeDestroy();
 void bridgeAudioSubscribe(int channel, AudioIO *audio);
 void bridgeAudioUnsubscribe(int channel, AudioIO *audio);
-bool bridgeAudioIsActive(int channel, AudioIO *audio);
 
 
 } // namespace rack
