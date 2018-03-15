@@ -298,7 +298,7 @@ bool AudioIO::isActive() {
 		return rtAudio->isStreamRunning();
 	}
 	if (driver == BRIDGE_DRIVER) {
-		bridgeAudioIsSubscribed(device, this);
+		bridgeAudioIsActive(device, this);
 	}
 	return false;
 }
