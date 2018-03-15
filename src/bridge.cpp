@@ -65,7 +65,7 @@ struct BridgeClientConnection {
 #else
 		int sendFlags = 0;
 #endif
-		ssize_t written = ::send(client, buffer, length, sendFlags);
+		ssize_t written = ::send(client, (const char*) buffer, length, sendFlags);
 		if (written < 0)
 			closeRequested = true;
 	}
@@ -289,6 +289,7 @@ static void clientRun(int client) {
 		close(client);
 	});
 	int err;
+	(void) err;
 
 #ifdef ARCH_MAC
 	// Avoid SIGPIPE
@@ -302,7 +303,6 @@ static void clientRun(int client) {
 	ioctlsocket(client, FIONBIO, &blockingMode);
 #else
 	err = fcntl(client, F_SETFL, fcntl(client, F_GETFL, 0) & ~O_NONBLOCK);
-	(void) err;
 #endif
 
 	BridgeClientConnection connection;
