@@ -12,7 +12,7 @@ void bridgeInit();
 void bridgeDestroy();
 void bridgeAudioSubscribe(int channel, AudioIO *audio);
 void bridgeAudioUnsubscribe(int channel, AudioIO *audio);
-bool bridgeAudioIsSubscribed(int channel, AudioIO *audio);
+bool bridgeAudioIsActive(int channel, AudioIO *audio);
 
 
 } // namespace rack
