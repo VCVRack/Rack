@@ -138,11 +138,11 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 		if (getDeviceInfo(device, &deviceInfo)) {
 			std::string deviceDetail = stringf("%s (", deviceInfo.name.c_str());
 			if (offset < (int) deviceInfo.inputChannels)
-				deviceDetail += stringf("%d-%d in", offset + 1, min(offset + maxChannels, deviceInfo.inputChannels));
+				deviceDetail += stringf("%d-%d in", offset + 1, min(offset + maxChannels, (int) deviceInfo.inputChannels));
 			if (offset < (int) deviceInfo.inputChannels && offset < (int) deviceInfo.outputChannels)
 				deviceDetail += ", ";
 			if (offset < (int) deviceInfo.outputChannels)
-				deviceDetail += stringf("%d-%d out", offset + 1, min(offset + maxChannels, deviceInfo.outputChannels));
+				deviceDetail += stringf("%d-%d out", offset + 1, min(offset + maxChannels, (int) deviceInfo.outputChannels));
 			deviceDetail += ")";
 			return deviceDetail;
 		}
