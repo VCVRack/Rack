@@ -5,9 +5,12 @@ include ../arch.mk
 
 FLAGS += -g -O3 -march=nocona
 
+CURLFLAGS = --with-ca-fallback --with-ssl="$(LOCAL)"
+
 ifeq ($(ARCH),mac)
-	FLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
-	LDFLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
+	FLAGS += -mmacosx-version-min=10.8 -stdlib=libc++
+	LDFLAGS += -mmacosx-version-min=10.8 -stdlib=libc++
+	CURLFLAGS = --without-ssl --with-darwinssl
 endif
 
 CFLAGS += $(FLAGS)
@@ -23,6 +26,7 @@ UNTAR = tar xf
 UNZIP = unzip
 ifeq ($(ARCH),win)
 	CMAKE = cmake -G 'MSYS Makefiles'
+	CURLFLAGS = --without-ssl --with-winssl
 else
 	CMAKE = cmake
 endif
@@ -120,7 +124,7 @@ $(libcurl): $(openssl)
 	cd curl-7.56.0 && ./configure --prefix="$(LOCAL)" \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
 		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 \
-		--without-ca-bundle --with-ca-fallback --with-ssl="$(LOCAL)"
+		--without-ca-bundle $(CURLFLAGS)
 	$(MAKE) -C curl-7.56.0
 	$(MAKE) -C curl-7.56.0 install
 
