@@ -5,7 +5,7 @@
 #include <algorithm>
 
 
-#define BND_LABEL_FONT_SIZE 13
+static const float itemMargin = 2.0;
 
 
 namespace rack {
@@ -51,13 +51,15 @@ struct FavoriteRadioButton : RadioButton {
 
 struct SeparatorItem : OpaqueWidget {
 	SeparatorItem() {
-		box.size.y = BND_WIDGET_HEIGHT;
+		box.size.y = 2*BND_WIDGET_HEIGHT + 2*itemMargin;
 	}
 
 	void setText(std::string text) {
 		clearChildren();
-		Label *label = Widget::create<Label>(Vec(0, 0));
+		Label *label = Widget::create<Label>(Vec(0, 12 + itemMargin));
 		label->text = text;
+		label->fontSize = 20;
+		label->color.a *= 0.25;
 		addChild(label);
 	}
 };
@@ -67,7 +69,7 @@ struct BrowserListItem : OpaqueWidget {
 	bool selected = false;
 
 	BrowserListItem() {
-		box.size.y = 2 * BND_WIDGET_HEIGHT + 7;
+		box.size.y = BND_WIDGET_HEIGHT + 2*itemMargin;
 	}
 
 	void draw(NVGcontext *vg) override {
@@ -100,21 +102,26 @@ struct ModelItem : BrowserListItem {
 	Model *model;
 	Label *authorLabel;
 
+	ModelItem() {
+		box.size.y = 2*BND_WIDGET_HEIGHT + 3*itemMargin;
+	}
+
 	void setModel(Model *model) {
 		clearChildren();
 		assert(model);
 		this->model = model;
 
-		Label *nameLabel = Widget::create<Label>(Vec(0, 0));
+		Label *nameLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
 		nameLabel->text = model->name;
 		addChild(nameLabel);
 
-		authorLabel = Widget::create<Label>(Vec(0, 0));
+		authorLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
 		authorLabel->alignment = Label::RIGHT_ALIGNMENT;
 		authorLabel->text = model->author;
+		authorLabel->color.a = 0.5;
 		addChild(authorLabel);
 
-		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(7, BND_WIDGET_HEIGHT));
+		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(7, BND_WIDGET_HEIGHT + itemMargin));
 		layout2->spacing = 0;
 		addChild(layout2);
 
@@ -136,6 +143,7 @@ struct ModelItem : BrowserListItem {
 		// }
 
 		Label *tagsLabel = new Label();
+		tagsLabel->color.a = 0.5;
 		int i = 0;
 		for (ModelTag tag : model->tags) {
 			if (i++ > 0)
@@ -166,7 +174,7 @@ struct AuthorItem : BrowserListItem {
 	void setAuthor(std::string author) {
 		clearChildren();
 		this->author = author;
-		Label *authorLabel = Widget::create<Label>(Vec(0, 0));
+		Label *authorLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
 		if (author.empty())
 			authorLabel->text = "Show all modules";
 		else
@@ -184,7 +192,7 @@ struct TagItem : BrowserListItem {
 	void setTag(ModelTag tag) {
 		clearChildren();
 		this->tag = tag;
-		Label *tagLabel = Widget::create<Label>(Vec(0, 0));
+		Label *tagLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
 		if (tag == NO_TAG)
 			tagLabel->text = "Show all tags";
 		else
@@ -198,7 +206,7 @@ struct TagItem : BrowserListItem {
 
 struct ClearFilterItem : BrowserListItem {
 	ClearFilterItem() {
-		Label *label = Widget::create<Label>(Vec(0, 0));
+		Label *label = Widget::create<Label>(Vec(0, 0 + itemMargin));
 		label->text = "Clear filter";
 		addChild(label);
 	}
@@ -332,6 +340,11 @@ struct ModuleBrowser : VirtualWidget {
 		clearSearch();
 	}
 
+	void draw(NVGcontext *vg) override {
+		bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
+		Widget::draw(vg);
+	}
+
 	void clearSearch() {
 		searchField->setText("");
 	}
@@ -353,7 +366,7 @@ struct ModuleBrowser : VirtualWidget {
 		moduleList->selected = 0;
 
 		// Favorites
-		{
+		if (!sFavoriteModels.empty()) {
 			SeparatorItem *item = new SeparatorItem();
 			item->setText("Favorites");
 			moduleList->addChild(item);
@@ -423,8 +436,9 @@ struct ModuleBrowser : VirtualWidget {
 		box.pos = parent->box.size.minus(box.size).div(2).round();
 		box.pos.y = 60;
 		box.size.y = parent->box.size.y - 2 * box.pos.y;
-
 		moduleScroll->box.size.y = min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
+		box.size.y = min(box.size.y, moduleScroll->box.getBottomRight().y);
+
 		gFocusedWidget = searchField;
 		Widget::step();
 	}

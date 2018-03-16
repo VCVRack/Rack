@@ -28,7 +28,7 @@ static void drawPlug(NVGcontext *vg, Vec pos, NVGcolor color) {
 }
 
 static void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color, float tension, float opacity) {
-	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.08);
+	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Wire

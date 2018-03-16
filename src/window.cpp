@@ -387,7 +387,7 @@ void windowInit() {
 	bndSetFont(gGuiFont->handle);
 	// bndSetIconImage(loadImage(assetGlobal("res/icons.png")));
 
-	windowSetTheme(nvgRGB(0x40, 0x40, 0x40), nvgRGB(0xf0, 0xf0, 0xf0));
+	windowSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
 }
 
 void windowDestroy() {
@@ -556,33 +556,33 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	w.shadeTop = 0;
 	w.shadeDown = 0;
 
-	BNDwidgetTheme sliderW = w;
-	sliderW.itemColor = bg;
-	sliderW.innerColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
-	sliderW.innerSelectedColor = colorPlus(bg, nvgRGB(0x60, 0x60, 0x60));
-
-	BNDwidgetTheme textW = sliderW;
-	textW.textColor = colorMinus(bg, nvgRGB(0x20, 0x20, 0x20));
-	textW.textSelectedColor = colorMinus(bg, nvgRGB(0x20, 0x20, 0x20));
-
-	BNDwidgetTheme scrollW = w;
-	scrollW.itemColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
-	scrollW.innerColor = bg;
-
 	BNDtheme t;
 	t.backgroundColor = colorPlus(bg, nvgRGB(0x30, 0x30, 0x30));
 	t.regularTheme = w;
 	t.toolTheme = w;
 	t.radioTheme = w;
-	t.textFieldTheme = textW;
+	t.textFieldTheme = w;
 	t.optionTheme = w;
 	t.choiceTheme = w;
 	t.numberFieldTheme = w;
-	t.sliderTheme = sliderW;
-	t.scrollBarTheme = scrollW;
+	t.sliderTheme = w;
+	t.scrollBarTheme = w;
 	t.tooltipTheme = w;
 	t.menuTheme = w;
 	t.menuItemTheme = w;
+
+	t.sliderTheme.itemColor = bg;
+	t.sliderTheme.innerColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
+	t.sliderTheme.innerSelectedColor = colorPlus(bg, nvgRGB(0x60, 0x60, 0x60));
+
+	t.textFieldTheme.textColor = colorMinus(bg, nvgRGB(0x20, 0x20, 0x20));
+	t.textFieldTheme.textSelectedColor = t.textFieldTheme.textColor;
+
+	t.scrollBarTheme.itemColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
+	t.scrollBarTheme.innerColor = bg;
+
+	t.menuTheme.textColor = colorMinus(fg, nvgRGB(0x50, 0x50, 0x50));
+	t.menuTheme.textSelectedColor = t.menuTheme.textColor;
 
 	bndSetTheme(t);
 }
