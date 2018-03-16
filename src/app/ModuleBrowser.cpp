@@ -100,7 +100,7 @@ struct BrowserListItem : OpaqueWidget {
 
 struct ModelItem : BrowserListItem {
 	Model *model;
-	Label *authorLabel;
+	Label *authorLabel = NULL;
 
 	ModelItem() {
 		box.size.y = 2*BND_WIDGET_HEIGHT + 3*itemMargin;
@@ -115,11 +115,14 @@ struct ModelItem : BrowserListItem {
 		nameLabel->text = model->name;
 		addChild(nameLabel);
 
-		authorLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
-		authorLabel->alignment = Label::RIGHT_ALIGNMENT;
-		authorLabel->text = model->author;
-		authorLabel->color.a = 0.5;
-		addChild(authorLabel);
+		// Hide author label if filtering by author
+		if (sAuthorFilter.empty()) {
+			authorLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
+			authorLabel->alignment = Label::RIGHT_ALIGNMENT;
+			authorLabel->text = model->author;
+			authorLabel->color.a = 0.5;
+			addChild(authorLabel);
+		}
 
 		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(7, BND_WIDGET_HEIGHT + itemMargin));
 		layout2->spacing = 0;
@@ -155,7 +158,8 @@ struct ModelItem : BrowserListItem {
 
 	void step() override {
 		BrowserListItem::step();
-		authorLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
+		if (authorLabel)
+			authorLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
 	}
 
 	void onAction(EventAction &e) override {
@@ -364,29 +368,22 @@ struct ModuleBrowser : OpaqueWidget {
 		std::string search = searchField->text;
 		moduleList->clearChildren();
 		moduleList->selected = 0;
+		bool filterPage = !(sAuthorFilter.empty() && sTagFilter == NO_TAG);
 
-		// Clear filter
-		if (!(sAuthorFilter.empty() && sTagFilter == NO_TAG)) {
-			ClearFilterItem *item = new ClearFilterItem();
-			moduleList->addChild(item);
-		}
-
-		// Favorites
-		if (!sFavoriteModels.empty()) {
-			SeparatorItem *item = new SeparatorItem();
-			item->setText("Favorites");
-			moduleList->addChild(item);
-		}
-		for (Model *model : sFavoriteModels) {
-			if (isModelFiltered(model) && isModelMatch(model, search)) {
-				ModelItem *item = new ModelItem();
-				item->setModel(model);
+		if (!filterPage) {
+			// Favorites
+			if (!sFavoriteModels.empty()) {
+				SeparatorItem *item = new SeparatorItem();
+				item->setText("Favorites");
 				moduleList->addChild(item);
 			}
-		}
-
-		// Author/tag subpage
-		if (sAuthorFilter.empty() && sTagFilter == NO_TAG) {
+			for (Model *model : sFavoriteModels) {
+				if (isModelFiltered(model) && isModelMatch(model, search)) {
+					ModelItem *item = new ModelItem();
+					item->setModel(model);
+					moduleList->addChild(item);
+				}
+			}
 			// Author items
 			{
 				SeparatorItem *item = new SeparatorItem();
@@ -414,14 +411,27 @@ struct ModuleBrowser : OpaqueWidget {
 				}
 			}
 		}
+		else {
+			// Clear filter
+			ClearFilterItem *item = new ClearFilterItem();
+			moduleList->addChild(item);
+		}
 
-		// Models
-		if (!sAuthorFilter.empty() || sTagFilter != NO_TAG || !search.empty()) {
-			{
+		if (filterPage || !search.empty()) {
+			if (!search.empty()) {
 				SeparatorItem *item = new SeparatorItem();
 				item->setText("Modules");
 				moduleList->addChild(item);
 			}
+			else if (filterPage) {
+				SeparatorItem *item = new SeparatorItem();
+				if (!sAuthorFilter.empty())
+					item->setText(sAuthorFilter);
+				else if (sTagFilter != NO_TAG)
+					item->setText("Tag: " + gTagNames[sTagFilter]);
+				moduleList->addChild(item);
+			}
+			// Modules
 			for (Plugin *plugin : gPlugins) {
 				for (Model *model : plugin->models) {
 					if (isModelFiltered(model) && isModelMatch(model, search)) {
