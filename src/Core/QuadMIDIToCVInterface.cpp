@@ -43,6 +43,7 @@ struct QuadMIDIToCVInterface : Module {
 	uint8_t notes[4];
 	bool gates[4];
 	bool pedal;
+	int rotateIndex;
 
 	QuadMIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS), heldNotes(128) {
 		onReset();
@@ -71,6 +72,7 @@ struct QuadMIDIToCVInterface : Module {
 			gates[i] = false;
 		}
 		pedal = false;
+		rotateIndex = 0;
 	}
 
 	void pressNote(uint8_t note) {
@@ -84,17 +86,23 @@ struct QuadMIDIToCVInterface : Module {
 		// Set notes and gates
 		switch (polyMode) {
 			case ROTATE_MODE: {
-
 			} break;
+
 			case RESET_MODE: {
 
 			} break;
+
 			case REASSIGN_MODE: {
 
 			} break;
-			case UNISON_MODE: {
 
+			case UNISON_MODE: {
+				for (int i = 0; i < 4; i++) {
+					notes[i] = note;
+					gates[i] = true;
+				}
 			} break;
+
 			default: break;
 		}
 	}
@@ -105,18 +113,41 @@ struct QuadMIDIToCVInterface : Module {
 		if (it != heldNotes.end())
 			heldNotes.erase(it);
 		// Hold note if pedal is pressed
-		// if (pedal)
-		// 	return;
-		// // Set last note
-		// if (!heldNotes.empty()) {
-		// 	auto it2 = heldNotes.end();
-		// 	it2--;
-		// 	lastNote = *it2;
-		// 	gate = true;
-		// }
-		// else {
-		// 	gate = false;
-		// }
+		if (pedal)
+			return;
+		// Set last note
+		switch (polyMode) {
+			case ROTATE_MODE: {
+
+			} break;
+
+			case RESET_MODE: {
+
+			} break;
+
+			case REASSIGN_MODE: {
+
+			} break;
+
+			case UNISON_MODE: {
+				if (!heldNotes.empty()) {
+					auto it2 = heldNotes.end();
+					it2--;
+					for (int i = 0; i < 4; i++) {
+						notes[i] = *it2;
+						gates[i] = true;
+					}
+				}
+				else {
+					for (int i = 0; i < 4; i++) {
+						gates[i] = false;
+					}
+				}
+			} break;
+
+			default: break;
+		}
+
 	}
 
 	void pressPedal() {

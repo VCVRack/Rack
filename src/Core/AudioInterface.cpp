@@ -43,10 +43,10 @@ struct AudioInterfaceIO : AudioIO {
 			for (int i = 0; i < frames; i++) {
 				if (inputBuffer.full())
 					break;
-				Frame<INPUTS> f;
-				memset(&f, 0, sizeof(f));
-				memcpy(&f, &input[numInputs * i], numInputs * sizeof(float));
-				inputBuffer.push(f);
+				Frame<INPUTS> inputFrame;
+				memset(&inputFrame, 0, sizeof(inputFrame));
+				memcpy(&inputFrame, &input[numInputs * i], numInputs * sizeof(float));
+				inputBuffer.push(inputFrame);
 			}
 		}
 
@@ -71,12 +71,16 @@ struct AudioInterfaceIO : AudioIO {
 		}
 
 		// Notify engine when finished processing
-		engineCv.notify_all();
+		engineCv.notify_one();
 	}
 
 	void onCloseStream() override {
 		inputBuffer.clear();
 		outputBuffer.clear();
+	}
+
+	void onChannelsChange() override {
+		debug("Channels changed %d %d", numOutputs, numInputs);
 	}
 };
 
@@ -127,12 +131,6 @@ struct AudioInterface : Module {
 	}
 
 	void onSampleRateChange() override {
-		// for (int i = 0; i < INPUTS; i++) {
-		// 	inputSrc[i].setRates(audioIO.sampleRate, engineGetSampleRate());
-		// }
-		// for (int i = 0; i < OUTPUTS; i++) {
-		// 	outputSrc[i].setRates(engineGetSampleRate(), audioIO.sampleRate);
-		// }
 		inputSrc.setRates(audioIO.sampleRate, engineGetSampleRate());
 		outputSrc.setRates(engineGetSampleRate(), audioIO.sampleRate);
 	}
@@ -154,6 +152,7 @@ void AudioInterface::step() {
 	}
 
 	if (audioIO.numInputs > 0) {
+		// Convert inputs if needed
 		if (inputBuffer.empty()) {
 			int inLen = audioIO.inputBuffer.size();
 			int outLen = inputBuffer.capacity();
@@ -163,25 +162,27 @@ void AudioInterface::step() {
 		}
 	}
 
+	// Take input from buffer
 	if (!inputBuffer.empty()) {
 		inputFrame = inputBuffer.shift();
 	}
 	for (int i = 0; i < INPUTS; i++) {
-		outputs[AUDIO_OUTPUT + i].value = 10.0 * inputFrame.samples[i];
+		outputs[AUDIO_OUTPUT + i].value = 10.f * inputFrame.samples[i];
 	}
 
 	if (audioIO.numOutputs > 0) {
 		// Get and push output SRC frame
 		if (!outputBuffer.full()) {
-			Frame<OUTPUTS> f;
-			for (int i = 0; i < audioIO.numOutputs; i++) {
-				f.samples[i] = inputs[AUDIO_INPUT + i].value / 10.0;
+			Frame<OUTPUTS> outputFrame;
+			for (int i = 0; i < OUTPUTS; i++) {
+				outputFrame.samples[i] = inputs[AUDIO_INPUT + i].value / 10.f;
 			}
-			outputBuffer.push(f);
+			outputBuffer.push(outputFrame);
 		}
 
 		if (outputBuffer.full()) {
-			// Wait until outputs are needed
+			// Wait until outputs are needed.
+			// Give up after a timeout in case the audio device is being unresponsive.
 			std::unique_lock<std::mutex> lock(audioIO.engineMutex);
 			auto cond = [&] {
 				return (audioIO.outputBuffer.size() < (size_t) audioIO.blockSize);
@@ -200,14 +201,16 @@ void AudioInterface::step() {
 				debug("Audio Interface underflow");
 			}
 		}
+
+		// Notify audio thread that an output is potentially ready
+		audioIO.audioCv.notify_one();
 	}
 
+	// Turn on light if at least one port is enabled in the nearby pair
 	for (int i = 0; i < INPUTS / 2; i++)
 		lights[INPUT_LIGHT + i].value = (audioIO.numOutputs >= 2*i+1);
 	for (int i = 0; i < OUTPUTS / 2; i++)
 		lights[OUTPUT_LIGHT + i].value = (audioIO.numInputs >= 2*i+1);
-
-	audioIO.audioCv.notify_all();
 }
 
 

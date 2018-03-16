@@ -5,29 +5,29 @@
 namespace rack {
 
 
-json_t *ParamWidget::toJson() {
+json_t *Parameter::toJson() {
 	json_t *rootJ = json_object();
 	json_object_set_new(rootJ, "paramId", json_integer(paramId));
 	json_object_set_new(rootJ, "value", json_real(value));
 	return rootJ;
 }
 
-void ParamWidget::fromJson(json_t *rootJ) {
+void Parameter::fromJson(json_t *rootJ) {
 	json_t *valueJ = json_object_get(rootJ, "value");
 	if (valueJ)
 		setValue(json_number_value(valueJ));
 }
 
-void ParamWidget::reset() {
+void Parameter::reset() {
 	setValue(defaultValue);
 }
 
-void ParamWidget::randomize() {
-	if (randomizable)
+void Parameter::randomize() {
+	if (randomizable && isfinite(minValue) && isfinite(maxValue))
 		setValue(rescale(randomUniform(), 0.0, 1.0, minValue, maxValue));
 }
 
-void ParamWidget::onMouseDown(EventMouseDown &e) {
+void Parameter::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		setValue(defaultValue);
 	}
@@ -35,7 +35,7 @@ void ParamWidget::onMouseDown(EventMouseDown &e) {
 	e.target = this;
 }
 
-void ParamWidget::onChange(EventChange &e) {
+void Parameter::onChange(EventChange &e) {
 	if (!module)
 		return;
 

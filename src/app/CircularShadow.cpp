@@ -4,15 +4,22 @@
 namespace rack {
 
 
+CircularShadow::CircularShadow() {
+	blurRadius = 0;
+	opacity = 0.15;
+}
+
 void CircularShadow::draw(NVGcontext *vg) {
+	if (opacity < 0.0)
+		return;
+
 	nvgBeginPath(vg);
-	nvgRect(vg, -blur, -blur, box.size.x + 2*blur, box.size.y + 2*blur);
-	nvgFillColor(vg, nvgRGBAf(0.0, 0.0, 0.0, 0.25));
-	Vec c = box.size.div(2.0);
-	float radius = c.x;
-	NVGcolor icol = nvgRGBAf(0.0, 0.0, 0.0, 0.25);
+	nvgRect(vg, -blurRadius, -blurRadius, box.size.x + 2*blurRadius, box.size.y + 2*blurRadius);
+	Vec center = box.size.div(2.0);
+	float radius = center.x;
+	NVGcolor icol = nvgRGBAf(0.0, 0.0, 0.0, opacity);
 	NVGcolor ocol = nvgRGBAf(0.0, 0.0, 0.0, 0.0);
-	NVGpaint paint = nvgRadialGradient(vg, c.x, c.y, radius - blur/2, radius + blur/2, icol, ocol);
+	NVGpaint paint = nvgRadialGradient(vg, center.x, center.y, radius - blurRadius, radius, icol, ocol);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
 }

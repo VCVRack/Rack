@@ -36,31 +36,30 @@ struct RoundKnob : SVGKnob {
 
 struct RoundBlackKnob : RoundKnob {
 	RoundBlackKnob() {
-		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundBlack.svg")));
-		box.size = Vec(38, 38);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundBlackKnob.svg")));
 	}
 };
 
-struct RoundSmallBlackKnob : RoundBlackKnob {
+struct RoundSmallBlackKnob : RoundKnob {
 	RoundSmallBlackKnob() {
-		box.size = Vec(28, 28);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundSmallBlackKnob.svg")));
 	}
 };
 
-struct RoundLargeBlackKnob : RoundBlackKnob {
+struct RoundLargeBlackKnob : RoundKnob {
 	RoundLargeBlackKnob() {
-		box.size = Vec(46, 46);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundLargeBlackKnob.svg")));
 	}
 };
 
-struct RoundHugeBlackKnob : RoundBlackKnob {
+struct RoundHugeBlackKnob : RoundKnob {
 	RoundHugeBlackKnob() {
-		box.size = Vec(56, 56);
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/RoundHugeBlackKnob.svg")));
 	}
 };
 
-struct RoundSmallBlackSnapKnob : RoundSmallBlackKnob {
-	RoundSmallBlackSnapKnob() {
+struct RoundBlackSnapKnob : RoundBlackKnob {
+	RoundBlackSnapKnob() {
 		snap = true;
 		smooth = false;
 	}
@@ -294,7 +293,6 @@ struct SynthTechAlco : SVGKnob {
 
 struct Trimpot : SVGKnob {
 	Trimpot() {
-		box.size = Vec(17, 17);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Trimpot.svg")));
@@ -303,7 +301,6 @@ struct Trimpot : SVGKnob {
 
 struct BefacoBigKnob : SVGKnob {
 	BefacoBigKnob() {
-		box.size = Vec(75, 75);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoBigKnob.svg")));
@@ -319,52 +316,81 @@ struct BefacoBigSnapKnob : BefacoBigKnob {
 
 struct BefacoTinyKnob : SVGKnob {
 	BefacoTinyKnob() {
-		box.size = Vec(26, 26);
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoTinyKnob.svg")));
 	}
 };
 
-struct BefacoSlidePot : SVGFader {
+struct BefacoSlidePot : SVGSlider {
 	BefacoSlidePot() {
 		Vec margin = Vec(3.5, 3.5);
 		maxHandlePos = Vec(-1, -2).plus(margin);
 		minHandlePos = Vec(-1, 87).plus(margin);
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePot.svg"));
-		background->wrap();
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePot.svg")), SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePotHandle.svg")));
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
-		handle->svg = SVG::load(assetGlobal("res/ComponentLibrary/BefacoSlidePotHandle.svg"));
-		handle->wrap();
+	}
+};
+
+struct LEDSlider : SVGSlider {
+	LEDSlider() {
+		maxHandlePos = mm2px(Vec(0.738, 0.738).plus(Vec(2, 0)));
+		minHandlePos = mm2px(Vec(0.738, 22.078).plus(Vec(2, 0)));
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/LEDSlider.svg")), NULL);
+	}
+};
+
+/** API is unstable for LEDSlider. Will add a LightWidget later. */
+struct LEDSliderGreen : LEDSlider {
+	LEDSliderGreen() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderGreenHandle.svg")));
+	}
+};
+
+struct LEDSliderRed : LEDSlider {
+	LEDSliderRed() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderRedHandle.svg")));
+	}
+};
+
+struct LEDSliderYellow : LEDSlider {
+	LEDSliderYellow() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderYellowHandle.svg")));
+	}
+};
+
+struct LEDSliderBlue : LEDSlider {
+	LEDSliderBlue() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderBlueHandle.svg")));
+	}
+};
+
+struct LEDSliderWhite : LEDSlider {
+	LEDSliderWhite() {
+		handle->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/LEDSliderWhiteHandle.svg")));
 	}
 };
 
 ////////////////////
-// Jacks
+// Ports
 ////////////////////
 
 struct PJ301MPort : SVGPort {
 	PJ301MPort() {
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/PJ301M.svg"));
-		background->wrap();
-		box.size = background->box.size;
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/PJ301M.svg")));
 	}
 };
 
 struct PJ3410Port : SVGPort {
 	PJ3410Port() {
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/PJ3410.svg"));
-		background->wrap();
-		box.size = background->box.size;
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/PJ3410.svg")));
 	}
 };
 
 struct CL1362Port : SVGPort {
 	CL1362Port() {
-		background->svg = SVG::load(assetGlobal("res/ComponentLibrary/CL1362.svg"));
-		background->wrap();
-		box.size = background->box.size;
+		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/CL1362.svg")));
 	}
 };
 
@@ -452,6 +478,26 @@ struct TinyLight : BASE {
 	}
 };
 
+/** A light to displayed over PB61303. Must add a color by subclassing or templating. */
+template <typename BASE>
+struct LEDBezelLight : BASE {
+	LEDBezelLight() {
+		this->bgColor = COLOR_BLACK_TRANSPARENT;
+		this->box.size = mm2px(Vec(6.0, 6.0));
+	}
+};
+
+/** A light to displayed over PB61303. Must add a color by subclassing or templating.
+Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by mm2px(Vec(0.5, 0.5)).
+*/
+template <typename BASE>
+struct PB61303Light : BASE {
+	PB61303Light() {
+		this->bgColor = COLOR_BLACK_TRANSPARENT;
+		this->box.size = mm2px(Vec(9.0, 9.0));
+	}
+};
+
 
 ////////////////////
 // Switches and Buttons
@@ -515,18 +561,29 @@ struct BefacoPush : SVGSwitch, MomentarySwitch {
 	}
 };
 
-struct PB61303 : SVGSwitch, MomentarySwitch {
-	PB61303() {
-		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")));
-	}
-};
-
 struct LEDBezel : SVGSwitch, MomentarySwitch {
 	LEDBezel() {
 		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/LEDBezel.svg")));
 	}
 };
 
+struct PB61303 : SVGSwitch, MomentarySwitch {
+	PB61303() {
+		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")));
+	}
+};
+
+struct PB61303Button : SVGButton {
+	PB61303Button() {
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/PB61303.svg")), NULL);
+	}
+};
+
+struct LEDBezelButton : SVGButton {
+	LEDBezelButton() {
+		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/LEDBezel.svg")), NULL);
+	}
+};
 
 ////////////////////
 // Misc

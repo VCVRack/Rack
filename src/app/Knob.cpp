@@ -21,15 +21,20 @@ void Knob::onDragStart(EventDragStart &e) {
 }
 
 void Knob::onDragMove(EventDragMove &e) {
-	float range = maxValue - minValue;
-	float delta = KNOB_SENSITIVITY * -e.mouseRel.y * speed;
-	if (isfinite(range))
-		delta *= range;
+	float range;
+	if (isfinite(minValue) && isfinite(maxValue)) {
+		range = maxValue - minValue;
+	}
+	else {
+		range = 1.0 - (-1.0);
+	}
+	float delta = KNOB_SENSITIVITY * -e.mouseRel.y * speed * range;
 
 	// Drag slower if Mod is held
 	if (windowIsModPressed())
 		delta /= 16.0;
 	dragValue += delta;
+	dragValue = clamp2(dragValue, minValue, maxValue);
 	if (snap)
 		setValue(roundf(dragValue));
 	else

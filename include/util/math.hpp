@@ -257,6 +257,12 @@ struct Rect {
 		r.size = size;
 		return r;
 	}
+	Rect grow(Vec delta) {
+		Rect r;
+		r.pos = pos.minus(delta);
+		r.size = size.plus(delta.mult(2.f));
+		return r;
+	}
 };
 
 

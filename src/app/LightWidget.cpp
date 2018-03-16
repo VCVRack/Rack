@@ -34,7 +34,7 @@ void LightWidget::drawHalo(NVGcontext *vg) {
 	nvgRect(vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
 
 	NVGpaint paint;
-	NVGcolor icol = colorMult(color, 0.15);
+	NVGcolor icol = colorMult(color, 0.25);
 	NVGcolor ocol = nvgRGB(0, 0, 0);
 	paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
 	nvgFillPaint(vg, paint);

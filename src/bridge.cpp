@@ -25,11 +25,13 @@ enum BridgeCommand {
 	NO_COMMAND = 0,
 	START_COMMAND,
 	QUIT_COMMAND,
-	CHANNEL_SET_COMMAND,
+	PORT_SET_COMMAND,
+	MIDI_MESSAGE_SEND_COMMAND,
 	AUDIO_SAMPLE_RATE_SET_COMMAND,
 	AUDIO_CHANNELS_SET_COMMAND,
 	AUDIO_BUFFER_SEND_COMMAND,
-	MIDI_MESSAGE_SEND_COMMAND,
+	AUDIO_ACTIVATE,
+	AUDIO_DEACTIVATE,
 	NUM_COMMANDS
 };
 
@@ -37,19 +39,46 @@ enum BridgeCommand {
 static const int RECV_BUFFER_SIZE = (1<<13);
 static const int RECV_QUEUE_SIZE = (1<<17);
 
-static AudioIO *audioListeners[BRIDGE_CHANNELS];
+struct BridgeClientConnection;
+static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
+static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverQuit;
 
 
 struct BridgeClientConnection {
+	int client;
 	RingBuffer<uint8_t, RECV_QUEUE_SIZE> recvQueue;
 	BridgeCommand currentCommand = START_COMMAND;
 	bool closeRequested = false;
-	int channel = -1;
+	int port = -1;
 	int sampleRate = -1;
 	int audioChannels = 0;
 	int audioBufferLength = -1;
+	bool audioActive = false;
+
+	~BridgeClientConnection() {
+		setPort(-1);
+	}
+
+	void send(const uint8_t *buffer, int length) {
+		if (length <= 0)
+			return;
+#ifdef ARCH_LIN
+		int sendFlags = MSG_NOSIGNAL;
+#else
+		int sendFlags = 0;
+#endif
+		ssize_t written = ::send(client, (const char*) buffer, length, sendFlags);
+		// We must write the entire buffer
+		if (written < length)
+			closeRequested = true;
+	}
+
+	template <typename T>
+	void send(T x) {
+		send((uint8_t*) &x, sizeof(x));
+	}
 
 	/** Does not check if the queue has enough data.
 	You must do that yourself before calling this method.
@@ -59,6 +88,35 @@ struct BridgeClientConnection {
 		T x;
 		recvQueue.shiftBuffer((uint8_t*) &x, sizeof(x));
 		return x;
+	}
+
+	void run() {
+		info("Bridge client connected");
+
+		while (!closeRequested) {
+			uint8_t buffer[RECV_BUFFER_SIZE];
+#ifdef ARCH_LIN
+			int recvFlags = MSG_NOSIGNAL;
+#else
+			int recvFlags = 0;
+#endif
+			ssize_t received = ::recv(client, (char*) buffer, sizeof(buffer), recvFlags);
+			if (received <= 0)
+				break;
+
+			// Make sure we can fill the buffer
+			if (recvQueue.capacity() < (size_t) received) {
+				// If we can't accept it, future messages will be incomplete
+				break;
+			}
+
+			recvQueue.pushBuffer(buffer, received);
+
+			// Loop the state machine until it returns false
+			while (step()) {}
+		}
+
+		info("Bridge client closed");
 	}
 
 	/** Steps the state machine
@@ -96,10 +154,21 @@ struct BridgeClientConnection {
 				debug("Quitting!");
 			} break;
 
-			case CHANNEL_SET_COMMAND: {
+			case PORT_SET_COMMAND: {
 				if (recvQueue.size() >= 1) {
-					channel = shift<uint8_t>();
-					debug("Set channel %d", channel);
+					int port = shift<uint8_t>();
+					setPort(port);
+					debug("Set port %d", port);
+					currentCommand = NO_COMMAND;
+					return true;
+				}
+			} break;
+
+			case MIDI_MESSAGE_SEND_COMMAND: {
+				if (recvQueue.size() >= 3) {
+					uint8_t midiBuffer[3];
+					recvQueue.shiftBuffer(midiBuffer, 3);
+					// debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
 					currentCommand = NO_COMMAND;
 					return true;
 				}
@@ -117,7 +186,7 @@ struct BridgeClientConnection {
 			case AUDIO_CHANNELS_SET_COMMAND: {
 				if (recvQueue.size() >= 1) {
 					audioChannels = shift<uint8_t>();
-					debug("Set audio channels %d", channel);
+					debug("Set audio channels %d", audioChannels);
 					currentCommand = NO_COMMAND;
 					return true;
 				}
@@ -139,12 +208,18 @@ struct BridgeClientConnection {
 				}
 				else {
 					if (recvQueue.size() >= (size_t) (sizeof(float) * audioBufferLength)) {
-						float input[audioBufferLength];
-						float output[audioBufferLength];
-						memset(output, 0, sizeof(output));
-						recvQueue.shiftBuffer((uint8_t*) input, sizeof(float) * audioBufferLength);
+						// Get input buffer
 						int frames = audioBufferLength / 2;
+						float input[audioBufferLength];
+						recvQueue.shiftBuffer((uint8_t*) input, sizeof(float) * audioBufferLength);
+						// Process stream
+						float output[audioBufferLength];
 						processStream(input, output, frames);
+						// Send output buffer
+						send<uint8_t>(AUDIO_BUFFER_SEND_COMMAND);
+						send<uint32_t>(audioBufferLength);
+						send((uint8_t*) output, audioBufferLength * sizeof(float));
+
 						audioBufferLength = -1;
 						currentCommand = NO_COMMAND;
 						return true;
@@ -152,14 +227,18 @@ struct BridgeClientConnection {
 				}
 			} break;
 
-			case MIDI_MESSAGE_SEND_COMMAND: {
-				if (recvQueue.size() >= 3) {
-					uint8_t midiBuffer[3];
-					recvQueue.shiftBuffer(midiBuffer, 3);
-					debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
-					currentCommand = NO_COMMAND;
-					return true;
-				}
+			case AUDIO_ACTIVATE: {
+				audioActive = true;
+				refreshAudioActive();
+				currentCommand = NO_COMMAND;
+				return true;
+			} break;
+
+			case AUDIO_DEACTIVATE: {
+				audioActive = false;
+				refreshAudioActive();
+				currentCommand = NO_COMMAND;
+				return true;
 			} break;
 
 			default: {
@@ -167,51 +246,58 @@ struct BridgeClientConnection {
 				closeRequested = true;
 			} break;
 		}
+
+		// Stop looping the state machine
 		return false;
 	}
 
-	void recv(uint8_t *buffer, int length) {
-		// Make sure we can fill the buffer
-		if (recvQueue.capacity() < (size_t) length) {
-			// If we can't accept it, future messages will be incomplete
-			closeRequested = true;
-			return;
+	void setPort(int newPort) {
+		// Unbind from existing port
+		if (port >= 0 && connections[port] == this) {
+			if (audioListeners[port])
+				audioListeners[port]->setChannels(0, 0);
+			connections[port] = NULL;
 		}
 
-		recvQueue.pushBuffer(buffer, length);
-
-		// Loop the state machine until it returns false
-		while (step()) {}
+		// Bind to new port
+		if (newPort >= 0 && !connections[newPort]) {
+			connections[newPort] = this;
+			refreshAudioActive();
+			port = newPort;
+		}
+		else {
+			port = -1;
+		}
 	}
 
 	void processStream(const float *input, float *output, int frames) {
-		if (!(0 <= channel && channel < BRIDGE_CHANNELS))
+		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 			return;
-		if (!audioListeners[channel])
+		if (!audioListeners[port])
 			return;
-		audioListeners[channel]->processStream(input, output, frames);
+		audioListeners[port]->processStream(input, output, frames);
+		debug("%d frames", frames);
+	}
+
+	void refreshAudioActive() {
+		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
+			return;
+		if (!audioListeners[port])
+			return;
+		if (audioActive)
+			audioListeners[port]->setChannels(2, 2);
+		else
+			audioListeners[port]->setChannels(0, 0);
 	}
 };
 
 
-
 static void clientRun(int client) {
+	defer({
+		close(client);
+	});
 	int err;
-	BridgeClientConnection connection;
-
-	// // Get client address
-	// struct sockaddr_in addr;
-	// socklen_t clientAddrLen = sizeof(addr);
-	// err = getpeername(client, (struct sockaddr*) &addr, &clientAddrLen);
-	// assert(!err);
-
-	// // Get client IP address
-	// struct in_addr ipAddr = addr.sin_addr;
-	// char ipBuffer[INET_ADDRSTRLEN];
-	// inet_ntop(AF_INET, &ipAddr, ipBuffer, INET_ADDRSTRLEN);
-
-	// info("Bridge client %s connected", ipBuffer);
-	info("Bridge client connected");
+	(void) err;
 
 #ifdef ARCH_MAC
 	// Avoid SIGPIPE
@@ -219,29 +305,17 @@ static void clientRun(int client) {
 	setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int));
 #endif
 
+	// Disable non-blocking
 #ifdef ARCH_WIN
-	unsigned long blockingMode = 1;
+	unsigned long blockingMode = 0;
 	ioctlsocket(client, FIONBIO, &blockingMode);
 #else
 	err = fcntl(client, F_SETFL, fcntl(client, F_GETFL, 0) & ~O_NONBLOCK);
 #endif
 
-	while (!connection.closeRequested) {
-		uint8_t buffer[RECV_BUFFER_SIZE];
-#ifdef ARCH_LIN
-		ssize_t received = recv(client, (char*) buffer, sizeof(buffer), MSG_NOSIGNAL);
-#else
-		ssize_t received = recv(client, (char*) buffer, sizeof(buffer), 0);
-#endif
-		if (received <= 0)
-			break;
-
-		connection.recv(buffer, received);
-	}
-
-	err = close(client);
-	(void) err;
-	info("Bridge client closed");
+	BridgeClientConnection connection;
+	connection.client = client;
+	connection.run();
 }
 
 
@@ -270,7 +344,7 @@ static void serverRun() {
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
-	err = getaddrinfo(NULL, "5000", &hints, &result);
+	err = getaddrinfo("127.0.0.1", "5000", &hints, &result);
 	if (err) {
 		warn("Could not get Bridge server address");
 		return;
@@ -301,7 +375,6 @@ static void serverRun() {
 		close(server);
 	});
 
-
 	// Bind socket to address
 #ifdef ARCH_WIN
 	err = bind(server, result->ai_addr, (int)result->ai_addrlen);
@@ -321,12 +394,13 @@ static void serverRun() {
 	}
 	info("Bridge server started");
 
-	// Make server non-blocking
+	// Enable non-blocking
 #ifdef ARCH_WIN
 	unsigned long blockingMode = 1;
 	ioctlsocket(server, FIONBIO, &blockingMode);
 #else
-	err = fcntl(server, F_SETFL, fcntl(server, F_GETFL, 0) | O_NONBLOCK);
+	int flags = fcntl(server, F_GETFL, 0);
+	err = fcntl(server, F_SETFL, flags | O_NONBLOCK);
 #endif
 
 	// Accept clients
@@ -357,26 +431,24 @@ void bridgeDestroy() {
 	serverThread.join();
 }
 
-void bridgeAudioSubscribe(int channel, AudioIO *audio) {
-	if (!(0 <= channel && channel < BRIDGE_CHANNELS))
+void bridgeAudioSubscribe(int port, AudioIO *audio) {
+	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
-	if (audioListeners[channel])
+	// Check if an Audio is already subscribed on the port
+	if (audioListeners[port])
 		return;
-	audioListeners[channel] = audio;
+	audioListeners[port] = audio;
+	if (connections[port])
+		connections[port]->refreshAudioActive();
 }
 
-void bridgeAudioUnsubscribe(int channel, AudioIO *audio) {
-	if (!(0 <= channel && channel < BRIDGE_CHANNELS))
+void bridgeAudioUnsubscribe(int port, AudioIO *audio) {
+	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
-	if (audioListeners[channel] != audio)
+	if (audioListeners[port] != audio)
 		return;
-	audioListeners[channel] = NULL;
-}
-
-bool bridgeAudioIsSubscribed(int channel, AudioIO *audio) {
-	if (!(0 <= channel && channel < BRIDGE_CHANNELS))
-		return false;
-	return (audioListeners[channel] == audio);
+	audioListeners[port] = NULL;
+	audio->setChannels(0, 0);
 }
 
 

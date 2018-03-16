@@ -9,15 +9,15 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="10.000438mm"
-   height="10.000403mm"
-   viewBox="0 0 10.000438 10.000403"
+   width="19.000362mm"
+   height="19.000389mm"
+   viewBox="0 0 19.000362 19.000389"
    version="1.1"
-   id="svg27765"
+   id="svg111794"
    inkscape:version="0.92.2 5c3e80d, 2017-08-06"
-   sodipodi:docname="PB61303.svg">
+   sodipodi:docname="RoundHugeBlackKnob.svg">
   <defs
-     id="defs27759" />
+     id="defs111788" />
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="-41.967543"
-     inkscape:cy="-16.198567"
+     inkscape:cx="-18.065819"
+     inkscape:cy="35.516889"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -41,7 +41,7 @@
      inkscape:window-y="18"
      inkscape:window-maximized="0" />
   <metadata
-     id="metadata27762">
+     id="metadata111791">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -56,11 +56,16 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-52.452162,-82.600989)">
+     transform="translate(-98.209438,-77.425955)">
     <path
        inkscape:connector-curvature="0"
-       style="fill:#211e1e;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775"
-       d="m 62.4526,87.601896 c 0,2.760204 -2.239327,4.999496 -4.999531,4.999496 -2.76158,0 -5.000907,-2.239292 -5.000907,-4.999496 0,-2.761615 2.239327,-5.000907 5.000907,-5.000907 2.760204,0 4.999531,2.239292 4.999531,5.000907"
-       id="path26168" />
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277775"
+       d="m 117.2098,86.92615 c 0,5.247569 -4.25397,9.500195 -9.50016,9.500195 -5.24757,0 -9.500202,-4.252626 -9.500202,-9.500195 0,-5.24619 4.252632,-9.500193 9.500202,-9.500193 5.24619,0 9.50016,4.254003 9.50016,9.500193"
+       id="path110586" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35277775"
+       d="m 108.0252,77.463165 c -0.10337,-0.02343 -0.2067,-0.03721 -0.31556,-0.03721 -0.10887,0 -0.21361,0.01379 -0.3156,0.03721 v 9.582876 h 0.63116 z m 0,0"
+       id="path110588" />
   </g>
 </svg>
