@@ -203,8 +203,7 @@ void AudioIO::openStream() {
 		if (rtAudio->isStreamOpen())
 			return;
 
-		numOutputs = clamp((int) deviceInfo.outputChannels - offset, 0, maxChannels);
-		numInputs = clamp((int) deviceInfo.inputChannels - offset, 0, maxChannels);
+		setChannels(clamp((int) deviceInfo.outputChannels - offset, 0, maxChannels), clamp((int) deviceInfo.inputChannels - offset, 0, maxChannels));
 
 		if (numOutputs == 0 && numInputs == 0) {
 			warn("RtAudio device %d has 0 inputs and 0 outputs");
@@ -258,8 +257,7 @@ void AudioIO::openStream() {
 		onOpenStream();
 	}
 	if (driver == BRIDGE_DRIVER) {
-		numOutputs = 0;
-		numInputs = 0;
+		setChannels(0, 0);
 		// TEMP
 		sampleRate = 44100;
 		blockSize = 256;
@@ -268,8 +266,7 @@ void AudioIO::openStream() {
 }
 
 void AudioIO::closeStream() {
-	numOutputs = 0;
-	numInputs = 0;
+	setChannels(0, 0);
 
 	if (rtAudio) {
 		if (rtAudio->isStreamRunning()) {
