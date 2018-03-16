@@ -60,7 +60,9 @@ struct AudioInterfaceIO : AudioIO {
 				// Consume audio block
 				for (int i = 0; i < frames; i++) {
 					Frame<OUTPUTS> f = outputBuffer.shift();
-					memcpy(&output[numOutputs * i], &f, numOutputs * sizeof(float));
+					for (int j = 0; j < numOutputs; j++) {
+						output[numOutputs*i + j] = clamp(f.samples[j], -1.f, 1.f);
+					}
 				}
 			}
 			else {
