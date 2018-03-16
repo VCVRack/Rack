@@ -365,6 +365,12 @@ struct ModuleBrowser : VirtualWidget {
 		moduleList->clearChildren();
 		moduleList->selected = 0;
 
+		// Clear filter
+		if (!(sAuthorFilter.empty() && sTagFilter == NO_TAG)) {
+			ClearFilterItem *item = new ClearFilterItem();
+			moduleList->addChild(item);
+		}
+
 		// Favorites
 		if (!sFavoriteModels.empty()) {
 			SeparatorItem *item = new SeparatorItem();
@@ -379,7 +385,7 @@ struct ModuleBrowser : VirtualWidget {
 			}
 		}
 
-		// Authors
+		// Author/tag subpage
 		if (sAuthorFilter.empty() && sTagFilter == NO_TAG) {
 			// Author items
 			{
@@ -407,10 +413,6 @@ struct ModuleBrowser : VirtualWidget {
 					moduleList->addChild(item);
 				}
 			}
-		}
-		else {
-			ClearFilterItem *item = new ClearFilterItem();
-			moduleList->addChild(item);
 		}
 
 		// Models
