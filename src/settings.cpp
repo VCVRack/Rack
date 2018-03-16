@@ -105,7 +105,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ) {
-		gRackScene->zoomWidget->setZoom(clamp(json_number_value(zoomJ), 0.25f, 4.0f));
+		gRackScene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
 		gToolbar->zoomSlider->setValue(json_number_value(zoomJ) * 100.0);
 	}
 

@@ -15,23 +15,41 @@ using std::isnormal;
 namespace rack {
 
 ////////////////////
-// basic integer functions
+// generic functions
 ////////////////////
 
-inline int min(int a, int b) {
+/** Returns the minimum of `a` and `b` */
+template <typename T>
+inline T min(T a, T b) {
 	return (a < b) ? a : b;
 }
 
-inline int max(int a, int b) {
+/** Returns the maximum of `a` and `b` */
+template <typename T>
+inline T max(T a, T b) {
 	return (a > b) ? a : b;
 }
 
 /** Limits `x` between `a` and `b`
 Assumes a <= b
 */
-inline int clamp(int x, int a, int b) {
+template <typename T>
+inline T clamp(T x, T a, T b) {
 	return min(max(x, a), b);
 }
+
+/** Limits `x` between `a` and `b`
+If a > b, switches the two values
+*/
+template <typename T>
+inline T clamp2(T x, T a, T b) {
+	return clamp(x, min(a, b), max(a, b));
+}
+
+////////////////////
+// basic integer functions
+////////////////////
+
 
 /** Euclidean modulus, always returns 0 <= mod < base for positive base.
 */
@@ -58,14 +76,6 @@ inline bool ispow2(int n) {
 // basic float functions
 ////////////////////
 
-inline float min(float a, float b) {
-	return (a < b) ? a : b;
-}
-
-inline float max(float a, float b) {
-	return (a > b) ? a : b;
-}
-
 /** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
 inline float sgn(float x) {
 	return copysignf(1.0f, x);
@@ -78,20 +88,6 @@ inline float eucmod(float a, float base) {
 
 inline bool isNear(float a, float b, float epsilon = 1.0e-6f) {
 	return fabsf(a - b) <= epsilon;
-}
-
-/** Limits `x` between `a` and `b`
-Assumes a <= b
-*/
-inline float clamp(float x, float a, float b) {
-	return min(max(x, a), b);
-}
-
-/** Limits `x` between `a` and `b`
-If a > b, switches the two values
-*/
-inline float clamp2(float x, float a, float b) {
-	return clamp(x, min(a, b), max(a, b));
 }
 
 /** If the magnitude of x if less than eps, return 0 */

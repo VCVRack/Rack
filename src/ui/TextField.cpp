@@ -166,8 +166,8 @@ void TextField::onKey(EventKey &e) {
 		} break;
 	}
 
-	cursor = clamp(cursor, 0, text.size());
-	selection = clamp(selection, 0, text.size());
+	cursor = clamp(cursor, 0, (int) text.size());
+	selection = clamp(selection, 0, (int) text.size());
 	e.consumed = true;
 }
 
