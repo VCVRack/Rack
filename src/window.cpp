@@ -1,6 +1,7 @@
 #include "window.hpp"
 #include "app.hpp"
 #include "asset.hpp"
+#include "util/color.hpp"
 
 #include <map>
 #include <queue>
@@ -386,12 +387,7 @@ void windowInit() {
 	bndSetFont(gGuiFont->handle);
 	// bndSetIconImage(loadImage(assetGlobal("res/icons.png")));
 
-	// Blendish style
-	BNDtheme theme;
-	theme = *bndGetTheme();
-	theme.nodeTheme.nodeBackdropColor = theme.menuTheme.innerColor;
-	theme.nodeTheme.nodeBackdropColor.a = 1.0;
-	bndSetTheme(theme);
+	windowSetTheme(nvgRGB(0x40, 0x40, 0x40), nvgRGB(0xf0, 0xf0, 0xf0));
 }
 
 void windowDestroy() {
@@ -547,6 +543,49 @@ bool windowIsMaximized() {
 	return glfwGetWindowAttrib(gWindow, GLFW_MAXIMIZED);
 }
 
+void windowSetTheme(NVGcolor bg, NVGcolor fg) {
+	// Assume dark background and light foreground
+
+	BNDwidgetTheme w;
+	w.outlineColor = bg;
+	w.itemColor = fg;
+	w.innerColor = bg;
+	w.innerSelectedColor = colorPlus(bg, nvgRGB(0x30, 0x30, 0x30));
+	w.textColor = fg;
+	w.textSelectedColor = fg;
+	w.shadeTop = 0;
+	w.shadeDown = 0;
+
+	BNDwidgetTheme sliderW = w;
+	sliderW.itemColor = bg;
+	sliderW.innerColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
+	sliderW.innerSelectedColor = colorPlus(bg, nvgRGB(0x60, 0x60, 0x60));
+
+	BNDwidgetTheme textW = sliderW;
+	textW.textColor = colorMinus(bg, nvgRGB(0x20, 0x20, 0x20));
+	textW.textSelectedColor = colorMinus(bg, nvgRGB(0x20, 0x20, 0x20));
+
+	BNDwidgetTheme scrollW = w;
+	scrollW.itemColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
+	scrollW.innerColor = bg;
+
+	BNDtheme t;
+	t.backgroundColor = colorPlus(bg, nvgRGB(0x30, 0x30, 0x30));
+	t.regularTheme = w;
+	t.toolTheme = w;
+	t.radioTheme = w;
+	t.textFieldTheme = textW;
+	t.optionTheme = w;
+	t.choiceTheme = w;
+	t.numberFieldTheme = w;
+	t.sliderTheme = sliderW;
+	t.scrollBarTheme = scrollW;
+	t.tooltipTheme = w;
+	t.menuTheme = w;
+	t.menuItemTheme = w;
+
+	bndSetTheme(t);
+}
 
 
 ////////////////////

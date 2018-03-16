@@ -15,19 +15,19 @@ inline NVGcolor colorClip(NVGcolor a) {
 }
 
 inline NVGcolor colorMinus(NVGcolor a, NVGcolor b) {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 		a.rgba[i] -= b.rgba[i];
 	return a;
 }
 
 inline NVGcolor colorPlus(NVGcolor a, NVGcolor b) {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 		a.rgba[i] += b.rgba[i];
 	return a;
 }
 
 inline NVGcolor colorMult(NVGcolor a, float x) {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 		a.rgba[i] *= x;
 	return a;
 }
