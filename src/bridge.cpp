@@ -57,6 +57,10 @@ struct BridgeClientConnection {
 	int audioBufferLength = -1;
 	bool audioActive = false;
 
+	~BridgeClientConnection() {
+		setPort(-1);
+	}
+
 	void send(const uint8_t *buffer, int length) {
 		if (length <= 0)
 			return;
@@ -66,7 +70,8 @@ struct BridgeClientConnection {
 		int sendFlags = 0;
 #endif
 		ssize_t written = ::send(client, (const char*) buffer, length, sendFlags);
-		if (written < 0)
+		// We must write the entire buffer
+		if (written < length)
 			closeRequested = true;
 	}
 
@@ -163,7 +168,7 @@ struct BridgeClientConnection {
 				if (recvQueue.size() >= 3) {
 					uint8_t midiBuffer[3];
 					recvQueue.shiftBuffer(midiBuffer, 3);
-					debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
+					// debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
 					currentCommand = NO_COMMAND;
 					return true;
 				}
@@ -225,12 +230,14 @@ struct BridgeClientConnection {
 			case AUDIO_ACTIVATE: {
 				audioActive = true;
 				refreshAudioActive();
+				currentCommand = NO_COMMAND;
 				return true;
 			} break;
 
 			case AUDIO_DEACTIVATE: {
 				audioActive = false;
 				refreshAudioActive();
+				currentCommand = NO_COMMAND;
 				return true;
 			} break;
 
@@ -245,20 +252,18 @@ struct BridgeClientConnection {
 	}
 
 	void setPort(int newPort) {
-		if (!(0 <= newPort && newPort < BRIDGE_NUM_PORTS))
-			return;
 		// Unbind from existing port
-		if (connections[port] == this) {
+		if (port >= 0 && connections[port] == this) {
 			if (audioListeners[port])
 				audioListeners[port]->setChannels(0, 0);
 			connections[port] = NULL;
 		}
 
-		port = newPort;
 		// Bind to new port
-		if (!connections[port]) {
-			connections[port] = this;
+		if (newPort >= 0 && !connections[newPort]) {
+			connections[newPort] = this;
 			refreshAudioActive();
+			port = newPort;
 		}
 		else {
 			port = -1;
@@ -271,9 +276,12 @@ struct BridgeClientConnection {
 		if (!audioListeners[port])
 			return;
 		audioListeners[port]->processStream(input, output, frames);
+		debug("%d frames", frames);
 	}
 
 	void refreshAudioActive() {
+		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
+			return;
 		if (!audioListeners[port])
 			return;
 		if (audioActive)
@@ -426,6 +434,7 @@ void bridgeDestroy() {
 void bridgeAudioSubscribe(int port, AudioIO *audio) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
+	// Check if an Audio is already subscribed on the port
 	if (audioListeners[port])
 		return;
 	audioListeners[port] = audio;
