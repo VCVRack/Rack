@@ -296,7 +296,7 @@ struct SearchModuleField : TextField {
 };
 
 
-struct ModuleBrowser : VirtualWidget {
+struct ModuleBrowser : OpaqueWidget {
 	SearchModuleField *searchField;
 	ScrollWidget *moduleScroll;
 	BrowserList *moduleList;
