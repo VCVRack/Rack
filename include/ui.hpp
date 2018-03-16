@@ -33,21 +33,21 @@ struct SequentialLayout : virtual Widget {
 
 struct Label : VirtualWidget {
 	std::string text;
+	float fontSize;
+	NVGcolor color;
 	enum Alignment {
 		LEFT_ALIGNMENT,
 		CENTER_ALIGNMENT,
 		RIGHT_ALIGNMENT,
 	};
 	Alignment alignment = LEFT_ALIGNMENT;
-	Label() {
-		box.size.y = BND_WIDGET_HEIGHT;
-	}
+
+	Label();
 	void draw(NVGcontext *vg) override;
 };
 
 struct List : OpaqueWidget {
 	void step() override;
-	void draw(NVGcontext *vg) override;
 };
 
 /** Deletes itself from parent when clicked */

@@ -20,11 +20,5 @@ void List::step() {
 	}
 }
 
-void List::draw(NVGcontext *vg) {
-	bndBackground(vg, 0.0, 0.0, box.size.x, box.size.y);
-	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
-	Widget::draw(vg);
-}
-
 
 } // namespace rack
