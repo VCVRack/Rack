@@ -121,6 +121,11 @@ float engineGetSampleRate();
 float engineGetSampleTime();
 
 extern bool gPaused;
+/** If plugins begin using this in harmful ways, I will remove it and break your API.
+To avoid spoiling the fun for everyone, make sure your plugins demonstrate good behavior by not being "surprising" to the user. Your plugin needs to have a clear purpose for manipulating other modules and wires and must be done with a good UX.
+*/
+extern std::vector<Module*> gModules;
+extern std::vector<Wire*> gWires;
 
 
 } // namespace rack
