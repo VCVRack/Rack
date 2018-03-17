@@ -547,9 +547,9 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	// Assume dark background and light foreground
 
 	BNDwidgetTheme w;
-	w.outlineColor = bg;
+	w.outlineColor = colorMinus(bg, nvgRGB(0x10, 0x10, 0x10));
 	w.itemColor = fg;
-	w.innerColor = bg;
+	w.innerColor = colorMinus(bg, nvgRGB(0x10, 0x10, 0x10));
 	w.innerSelectedColor = colorPlus(bg, nvgRGB(0x30, 0x30, 0x30));
 	w.textColor = fg;
 	w.textSelectedColor = fg;
@@ -571,7 +571,7 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	t.menuTheme = w;
 	t.menuItemTheme = w;
 
-	t.sliderTheme.itemColor = bg;
+	t.sliderTheme.itemColor = colorMinus(bg, nvgRGB(0x10, 0x10, 0x10));
 	t.sliderTheme.innerColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
 	t.sliderTheme.innerSelectedColor = colorPlus(bg, nvgRGB(0x60, 0x60, 0x60));
 

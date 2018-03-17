@@ -1,11 +1,9 @@
 #pragma once
+#include "bridgeprotocol.hpp"
 #include "audio.hpp"
 
 
 namespace rack {
-
-
-static const int BRIDGE_NUM_PORTS = 16;
 
 
 void bridgeInit();
