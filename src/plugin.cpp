@@ -103,7 +103,7 @@ static int loadPlugin(std::string path) {
 	// Reject plugin if slug already exists
 	for (Plugin *p : gPlugins) {
 		if (plugin->slug == p->slug) {
-			warn("Plugin \"%s\" is already loaded, not attempting to load it again");
+			warn("Plugin \"%s\" is already loaded, not attempting to load it again", p->slug.c_str());
 			// TODO
 			// Fix memory leak with `plugin` here
 			return -1;
