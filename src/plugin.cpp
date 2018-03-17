@@ -268,7 +268,7 @@ static bool syncPlugin(json_t *pluginJ, bool dryRun) {
 	std::string zipPath = pluginPath + ".zip";
 	bool success = requestDownload(download, zipPath, &downloadProgress);
 	if (!success) {
-		warn("Plugin %s download was unsuccessful");
+		warn("Plugin %s download was unsuccessful", slug.c_str());
 		return false;
 	}
 

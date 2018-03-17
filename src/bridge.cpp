@@ -21,21 +21,6 @@
 namespace rack {
 
 
-enum BridgeCommand {
-	NO_COMMAND = 0,
-	START_COMMAND,
-	QUIT_COMMAND,
-	PORT_SET_COMMAND,
-	MIDI_MESSAGE_SEND_COMMAND,
-	AUDIO_SAMPLE_RATE_SET_COMMAND,
-	AUDIO_CHANNELS_SET_COMMAND,
-	AUDIO_BUFFER_SEND_COMMAND,
-	AUDIO_ACTIVATE,
-	AUDIO_DEACTIVATE,
-	NUM_COMMANDS
-};
-
-
 static const int RECV_BUFFER_SIZE = (1<<13);
 static const int RECV_QUEUE_SIZE = (1<<17);
 
@@ -192,7 +177,7 @@ struct BridgeClientConnection {
 				}
 			} break;
 
-			case AUDIO_BUFFER_SEND_COMMAND: {
+			case AUDIO_PROCESS_COMMAND: {
 				if (audioBufferLength < 0) {
 					// Get audio buffer size
 					if (recvQueue.size() >= 4) {
@@ -216,8 +201,6 @@ struct BridgeClientConnection {
 						float output[audioBufferLength];
 						processStream(input, output, frames);
 						// Send output buffer
-						send<uint8_t>(AUDIO_BUFFER_SEND_COMMAND);
-						send<uint32_t>(audioBufferLength);
 						send((uint8_t*) output, audioBufferLength * sizeof(float));
 
 						audioBufferLength = -1;
