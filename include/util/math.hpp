@@ -15,41 +15,32 @@ using std::isnormal;
 namespace rack {
 
 ////////////////////
-// generic functions
+// basic integer functions
 ////////////////////
 
 /** Returns the minimum of `a` and `b` */
-template <typename T>
-inline T min(T a, T b) {
+inline int min(int a, int b) {
 	return (a < b) ? a : b;
 }
 
 /** Returns the maximum of `a` and `b` */
-template <typename T>
-inline T max(T a, T b) {
+inline int max(int a, int b) {
 	return (a > b) ? a : b;
 }
 
 /** Limits `x` between `a` and `b`
 Assumes a <= b
 */
-template <typename T>
-inline T clamp(T x, T a, T b) {
+inline int clamp(int x, int a, int b) {
 	return min(max(x, a), b);
 }
 
 /** Limits `x` between `a` and `b`
 If a > b, switches the two values
 */
-template <typename T>
-inline T clamp2(T x, T a, T b) {
+inline int clamp2(int x, int a, int b) {
 	return clamp(x, min(a, b), max(a, b));
 }
-
-////////////////////
-// basic integer functions
-////////////////////
-
 
 /** Euclidean modulus, always returns 0 <= mod < base for positive base.
 */
@@ -75,6 +66,30 @@ inline bool ispow2(int n) {
 ////////////////////
 // basic float functions
 ////////////////////
+
+/** Returns the minimum of `a` and `b` */
+inline float min(float a, float b) {
+	return (a < b) ? a : b;
+}
+
+/** Returns the maximum of `a` and `b` */
+inline float max(float a, float b) {
+	return (a > b) ? a : b;
+}
+
+/** Limits `x` between `a` and `b`
+Assumes a <= b
+*/
+inline float clamp(float x, float a, float b) {
+	return min(max(x, a), b);
+}
+
+/** Limits `x` between `a` and `b`
+If a > b, switches the two values
+*/
+inline float clamp2(float x, float a, float b) {
+	return clamp(x, min(a, b), max(a, b));
+}
 
 /** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
 inline float sgn(float x) {
