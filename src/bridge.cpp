@@ -28,12 +28,12 @@ struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
-static bool serverRunning;
+static bool running;
 
 
 struct BridgeClientConnection {
 	int client;
-	bool running = false;
+	bool ready = false;
 
 	int port = -1;
 	int sampleRate = 0;
@@ -56,7 +56,7 @@ struct BridgeClientConnection {
 #endif
 		ssize_t actual = ::send(client, buffer, length, flags);
 		if (actual != length) {
-			running = false;
+			ready = false;
 			return false;
 		}
 		return true;
@@ -79,7 +79,7 @@ struct BridgeClientConnection {
 #endif
 		ssize_t actual = ::recv(client, buffer, length, flags);
 		if (actual != length) {
-			running = false;
+			ready = false;
 			return false;
 		}
 		return true;
@@ -90,20 +90,31 @@ struct BridgeClientConnection {
 		return recv(x, sizeof(*x));
 	}
 
+	void flush() {
+		int err;
+		// Turn off Nagle
+		int flag = 1;
+		err = setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int));
+		// Turn on Nagle
+		flag = 0;
+		err = setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int));
+		(void) err;
+	}
+
 	void run() {
 		info("Bridge client connected");
 
 		// Check hello key
-		uint32_t hello;
-		recv(&hello);
+		uint32_t hello = -1;
+		recv<uint32_t>(&hello);
 		if (hello != BRIDGE_HELLO) {
-			info("Bridge client protocol mismatch");
+			info("Bridge client protocol mismatch %x %x", hello, BRIDGE_HELLO);
 			return;
 		}
 
-		// Process commands until no longer running
-		running = true;
-		while (running) {
+		// Process commands until no longer ready
+		ready = true;
+		while (ready) {
 			step();
 		}
 
@@ -113,49 +124,52 @@ struct BridgeClientConnection {
 	/** Accepts a command from the client */
 	void step() {
 		uint8_t command = NO_COMMAND;
-		recv(&command);
+		if (!recv<uint8_t>(&command)) {
+			ready = false;
+			return;
+		}
 
 		switch (command) {
 			default:
 			case NO_COMMAND: {
-				warn("Bridge client: bad command detected, closing");
-				running = false;
+				warn("Bridge client: bad command %d detected, closing", command);
+				ready = false;
 			} break;
 
 			case QUIT_COMMAND: {
 				debug("Bridge client quitting");
-				running = true;
+				ready = true;
 			} break;
 
 			case PORT_SET_COMMAND: {
-				uint32_t port = -1;
-				recv(&port);
+				uint8_t port = -1;
+				recv<uint8_t>(&port);
 				setPort(port);
 			} break;
 
 			case MIDI_MESSAGE_SEND_COMMAND: {
 				uint8_t midiBuffer[3];
-				recv(&midiBuffer);
-				debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
+				recv(&midiBuffer, 3);
+				// debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
 			} break;
 
 			case AUDIO_SAMPLE_RATE_SET_COMMAND: {
 				uint32_t sampleRate = 0;
-				recv(&sampleRate);
+				recv<uint32_t>(&sampleRate);
 				setSampleRate(sampleRate);
 			} break;
 
 			case AUDIO_CHANNELS_SET_COMMAND: {
 				uint8_t channels = 0;
-				recv(&channels);
+				recv<uint8_t>(&channels);
 				// TODO
 			} break;
 
 			case AUDIO_PROCESS_COMMAND: {
 				uint32_t length = 0;
-				recv(&length);
+				recv<uint32_t>(&length);
 				if (length == 0) {
-					running = false;
+					ready = false;
 					return;
 				}
 
@@ -165,6 +179,7 @@ struct BridgeClientConnection {
 				int frames = length / 2;
 				processStream(input, output, frames);
 				send(&output, length * sizeof(float));
+				flush();
 			} break;
 
 			case AUDIO_ACTIVATE: {
@@ -188,7 +203,7 @@ struct BridgeClientConnection {
 		}
 
 		// Bind to new port
-		if (port >= 0 && !connections[port]) {
+		if ((0 <= port && port < BRIDGE_NUM_PORTS) && !connections[port]) {
 			this->port = port;
 			connections[this->port] = this;
 			refreshAudioActive();
@@ -337,8 +352,8 @@ static void serverRun() {
 #endif
 
 	// Accept clients
-	serverRunning = true;
-	while (serverRunning) {
+	running = true;
+	while (running) {
 		int client = accept(server, NULL, NULL);
 		if (client < 0) {
 			// Wait a bit before attempting to accept another client
@@ -360,7 +375,7 @@ void bridgeInit() {
 }
 
 void bridgeDestroy() {
-	serverRunning = false;
+	running = false;
 	serverThread.join();
 }
 
