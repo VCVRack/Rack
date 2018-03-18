@@ -100,7 +100,7 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Sample rate"));
 		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
 		if (sampleRates.empty()) {
-			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(None available)"));
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(Locked by device)"));
 		}
 		for (int sampleRate : sampleRates) {
 			AudioSampleRateItem *item = new AudioSampleRateItem();
@@ -132,7 +132,7 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Block size"));
 		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
 		if (blockSizes.empty()) {
-			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(None available)"));
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(Locked by device)"));
 		}
 		for (int blockSize : blockSizes) {
 			AudioBlockSizeItem *item = new AudioBlockSizeItem();

@@ -5,7 +5,6 @@
 #include <unistd.h>
 #ifdef ARCH_WIN
 	#include <winsock2.h>
-	#include <ws2tcpip.h>
 #else
 	#include <sys/socket.h>
 	#include <netinet/in.h>
@@ -303,21 +302,16 @@ static void serverConnect() {
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
+	addr.sin_port = htons(BRIDGE_PORT);
 #ifdef ARCH_WIN
-	InetPton(AF_INET, BRIDGE_HOST, &addr.sin_addr);
+	addr.sin_addr.s_addr = inet_addr(BRIDGE_HOST);
 #else
 	inet_pton(AF_INET, BRIDGE_HOST, &addr.sin_addr);
 #endif
-	addr.sin_port = htons(BRIDGE_PORT);
 
 	// Open socket
-#ifdef ARCH_WIN
-	SOCKET server = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (server == INVALID_SOCKET) {
-#else
 	int server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (server < 0) {
-#endif
 		warn("Bridge server socket() failed");
 		return;
 	}
@@ -326,11 +320,7 @@ static void serverConnect() {
 	});
 
 	// Bind socket to address
-#ifdef ARCH_WIN
-	err = bind(server, result->ai_addr, (int)result->ai_addrlen);
-#else
 	err = bind(server, (struct sockaddr*) &addr, sizeof(addr));
-#endif
 	if (err) {
 		warn("Bridge server bind() failed");
 		return;
