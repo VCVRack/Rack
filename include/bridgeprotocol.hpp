@@ -15,6 +15,8 @@ namespace rack {
 #define BRIDGE_NUM_PARAMS 16
 /** An arbitrary number which prevents connection from other protocols (like WebSockets) and old Bridge versions */
 #define BRIDGE_HELLO 0xff00fefd
+#define BRIDGE_INPUTS 8
+#define BRIDGE_OUTPUTS 8
 
 
 /** All commands are called from the client and served by the server
@@ -40,18 +42,12 @@ enum BridgeCommand {
 	- uint32_t sampleRate
 	*/
 	AUDIO_SAMPLE_RATE_SET_COMMAND,
-	/** Sets the number of audio channels
-	Currently not supported, hard-coded at 2.
-	send
-	- uint8_t channels
-	*/
-	AUDIO_CHANNELS_SET_COMMAND,
 	/** Sends and receives an audio buffer
 	send
-	- uint32_t length
-	- float input[length]
+	- uint32_t frames
+	- float input[BRIDGE_INPUTS * frames]
 	recv
-	- float output[length]
+	- float output[BRIDGE_OUTPUTS * frames]
 	*/
 	AUDIO_PROCESS_COMMAND,
 	/** Resumes the audio buffer, forcing Rack to wait on an audio buffer */

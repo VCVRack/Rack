@@ -34,7 +34,6 @@ struct BridgeClientConnection {
 
 	int port = -1;
 	int sampleRate = 0;
-	int audioChannels = 0;
 	bool audioActive = false;
 
 	~BridgeClientConnection() {
@@ -159,30 +158,23 @@ struct BridgeClientConnection {
 				setSampleRate(sampleRate);
 			} break;
 
-			case AUDIO_CHANNELS_SET_COMMAND: {
-				uint8_t channels = 0;
-				recv<uint8_t>(&channels);
-				// TODO
-			} break;
-
 			case AUDIO_PROCESS_COMMAND: {
-				uint32_t length = 0;
-				recv<uint32_t>(&length);
-				if (length == 0 || length > (1<<16)) {
+				uint32_t frames = 0;
+				recv<uint32_t>(&frames);
+				if (frames == 0 || frames > (1<<16)) {
 					ready = false;
 					return;
 				}
 
-				float input[length];
-				if (!recv(&input, length * sizeof(float))) {
+				float input[BRIDGE_INPUTS * frames];
+				if (!recv(&input, BRIDGE_INPUTS * frames * sizeof(float))) {
 					ready = false;
 					return;
 				}
-				float output[length];
-				int frames = length / 2;
+				float output[BRIDGE_OUTPUTS * frames];
 				memset(&output, 0, sizeof(output));
 				processStream(input, output, frames);
-				send(&output, length * sizeof(float));
+				send(&output, BRIDGE_OUTPUTS * frames * sizeof(float));
 				// flush();
 			} break;
 
@@ -247,7 +239,7 @@ struct BridgeClientConnection {
 		if (!audioListeners[port])
 			return;
 		if (audioActive)
-			audioListeners[port]->setChannels(2, 2);
+			audioListeners[port]->setChannels(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
 		else
 			audioListeners[port]->setChannels(0, 0);
 		audioListeners[port]->setSampleRate(sampleRate);
