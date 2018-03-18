@@ -6,6 +6,7 @@ namespace rack {
 
 
 static const int BRIDGE_NUM_PORTS = 16;
+static const int BRIDGE_NUM_PARAMS = 16;
 // A random number which prevents connection from other protocols and old Bridge versions
 const uint32_t BRIDGE_HELLO = 0xff00fefd;
 
@@ -42,9 +43,9 @@ enum BridgeCommand {
 	/** Sends and receives an audio buffer
 	send
 	- uint32_t length
-	- float input[n]
+	- float input[length]
 	recv
-	- float output[n]
+	- float output[length]
 	*/
 	AUDIO_PROCESS_COMMAND,
 	/** Resumes the audio buffer, forcing Rack to wait on an audio buffer */
