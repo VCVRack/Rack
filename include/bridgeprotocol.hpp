@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 
 namespace rack {
@@ -6,7 +7,7 @@ namespace rack {
 
 static const int BRIDGE_NUM_PORTS = 16;
 // A random number which prevents connection from other protocols and old Bridge versions
-const int BRIDGE_HELLO = 0xff00fefd;
+const uint32_t BRIDGE_HELLO = 0xff00fefd;
 
 
 /** All commands are called from the client and served by the server
@@ -15,11 +16,6 @@ send
 */
 enum BridgeCommand {
 	NO_COMMAND = 0,
-	/** Initial state of the state machine. The client should not send the command number itself, just its arguments.
-	send
-	- uint32_t hello
-	*/
-	START_COMMAND,
 	/** Requests the server to shut down the client */
 	QUIT_COMMAND,
 	/** Sets the port
