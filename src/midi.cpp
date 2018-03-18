@@ -39,17 +39,24 @@ int MidiIO::getDeviceCount() {
 	if (rtMidi) {
 		return rtMidi->getPortCount();
 	}
+	else if (driver == BRIDGE_DRIVER) {
+		return BRIDGE_NUM_PORTS;
+	}
 	return 0;
 }
 
 std::string MidiIO::getDeviceName(int device) {
+	if (device < 0)
+		return "";
+
 	if (rtMidi) {
-		if (device < 0)
-			return "";
 		if (device == this->device)
 			return deviceName;
 		else
 			return rtMidi->getPortName(device);
+	}
+	else if (driver == BRIDGE_DRIVER) {
+		return stringf("Port %d", device + 1);
 	}
 	return "";
 }
@@ -64,6 +71,15 @@ void MidiIO::setDevice(int device) {
 		}
 		this->device = device;
 	}
+	else if (driver == BRIDGE_DRIVER) {
+		if (device >= 0) {
+			bridgeMidiSubscribe(device, this);
+		}
+		else {
+			bridgeMidiUnsubscribe(device, this);
+		}
+		this->device = device;
+	}
 }
 
 std::string MidiIO::getChannelName(int channel) {
@@ -71,12 +87,6 @@ std::string MidiIO::getChannelName(int channel) {
 		return "All channels";
 	else
 		return stringf("Channel %d", channel + 1);
-}
-
-bool MidiIO::isActive() {
-	if (rtMidi)
-		return rtMidi->isPortOpen();
-	return false;
 }
 
 json_t *MidiIO::toJson() {
@@ -156,7 +166,7 @@ void MidiInput::setDriver(int driver) {
 		this->driver = rtMidiIn->getCurrentApi();
 	}
 	else if (driver == BRIDGE_DRIVER) {
-
+		this->driver = BRIDGE_DRIVER;
 	}
 }
 
