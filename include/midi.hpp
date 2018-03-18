@@ -58,10 +58,9 @@ struct MidiIO {
 	void setDevice(int device);
 
 	std::string getChannelName(int channel);
-	/** Returns whether the audio stream is open and running */
-	bool isActive();
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
+	virtual void onMessage(MidiMessage message) {}
 };
 
 
@@ -70,7 +69,6 @@ struct MidiInput : MidiIO {
 	MidiInput();
 	~MidiInput();
 	void setDriver(int driver) override;
-	virtual void onMessage(MidiMessage message) {}
 };
 
 

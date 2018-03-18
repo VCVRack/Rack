@@ -23,7 +23,7 @@ namespace rack {
 struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
-static MidiInput *midiListeners[BRIDGE_NUM_PORTS] = {};
+static MidiIO *midiListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverRunning = false;
 
@@ -377,7 +377,7 @@ void bridgeDestroy() {
 	serverThread.join();
 }
 
-void bridgeMidiSubscribe(int port, MidiInput *midi) {
+void bridgeMidiSubscribe(int port, MidiIO *midi) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	// Check if a Midi is already subscribed on the port
@@ -388,7 +388,7 @@ void bridgeMidiSubscribe(int port, MidiInput *midi) {
 		connections[port]->refreshAudio();
 }
 
-void bridgeMidiUnsubscribe(int port, MidiInput *midi) {
+void bridgeMidiUnsubscribe(int port, MidiIO *midi) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	if (midiListeners[port] != midi)
