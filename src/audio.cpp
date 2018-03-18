@@ -106,7 +106,7 @@ int AudioIO::getDeviceChannels(int device) {
 			return max((int) deviceInfo.inputChannels, (int) deviceInfo.outputChannels);
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		return 2;
+		return max(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
 	}
 	return 0;
 }
