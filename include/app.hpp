@@ -36,7 +36,7 @@ struct Module;
 struct Wire;
 
 struct RackWidget;
-struct Parameter;
+struct ParamWidget;
 struct Port;
 struct SVGPanel;
 
@@ -58,14 +58,14 @@ struct ModuleWidget : OpaqueWidget {
 	SVGPanel *panel = NULL;
 	std::vector<Port*> inputs;
 	std::vector<Port*> outputs;
-	std::vector<Parameter*> params;
+	std::vector<ParamWidget*> params;
 
 	ModuleWidget(Module *module);
 	~ModuleWidget();
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addInput(Port *input);
 	void addOutput(Port *output);
-	void addParam(Parameter *param);
+	void addParam(ParamWidget *param);
 	void setPanel(std::shared_ptr<SVG> svg);
 
 	virtual json_t *toJson();
@@ -224,7 +224,7 @@ struct CircularShadow : TransparentWidget {
 };
 
 /** A Component which has control over a Param (defined in engine.hpp) */
-struct Parameter : Component, QuantityWidget {
+struct ParamWidget : Component, QuantityWidget {
 	int paramId;
 	/** Used to momentarily disable value randomization
 	To permanently disable or change randomization behavior, override the randomize() method instead of changing this.
@@ -240,7 +240,7 @@ struct Parameter : Component, QuantityWidget {
 	void onMouseDown(EventMouseDown &e) override;
 	void onChange(EventChange &e) override;
 
-	template <typename T = Parameter>
+	template <typename T = ParamWidget>
 	static T *create(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 		T *o = Component::create<T>(pos, module);
 		o->paramId = paramId;
@@ -250,11 +250,8 @@ struct Parameter : Component, QuantityWidget {
 	}
 };
 
-/** Deprecated name of Parameter */
-typedef Parameter ParamWidget;
-
 /** Implements vertical dragging behavior for ParamWidgets */
-struct Knob : Parameter {
+struct Knob : ParamWidget {
 	/** Snap to nearest integer while dragging */
 	bool snap = false;
 	/** Multiplier for mouse movement to adjust knob value */
@@ -304,8 +301,8 @@ struct SVGSlider : Knob, FramebufferWidget {
 /** Deprecated name for SVGSlider */
 typedef SVGSlider SVGFader;
 
-/** A Parameter with multiple frames corresponding to its value */
-struct SVGSwitch : virtual Parameter, FramebufferWidget {
+/** A ParamWidget with multiple frames corresponding to its value */
+struct SVGSwitch : virtual ParamWidget, FramebufferWidget {
 	std::vector<std::shared_ptr<SVG>> frames;
 	SVGWidget *sw;
 	SVGSwitch();
@@ -315,14 +312,14 @@ struct SVGSwitch : virtual Parameter, FramebufferWidget {
 };
 
 /** A switch that cycles through each mechanical position */
-struct ToggleSwitch : virtual Parameter {
+struct ToggleSwitch : virtual ParamWidget {
 	void onDragStart(EventDragStart &e) override;
 };
 
 /** A switch that is turned on when held and turned off when released.
 Consider using SVGButton if the switch simply changes the state of your Module when clicked.
 */
-struct MomentarySwitch : virtual Parameter {
+struct MomentarySwitch : virtual ParamWidget {
 	/** Don't randomize state */
 	void randomize() override {}
 	void onDragStart(EventDragStart &e) override;
