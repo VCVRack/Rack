@@ -168,7 +168,7 @@ struct BridgeClientConnection {
 			case AUDIO_PROCESS_COMMAND: {
 				uint32_t length = 0;
 				recv<uint32_t>(&length);
-				if (length == 0) {
+				if (length == 0 || length > (1<<16)) {
 					ready = false;
 					return;
 				}
@@ -183,7 +183,7 @@ struct BridgeClientConnection {
 				memset(&output, 0, sizeof(output));
 				processStream(input, output, frames);
 				send(&output, length * sizeof(float));
-				flush();
+				// flush();
 			} break;
 
 			case AUDIO_ACTIVATE: {
