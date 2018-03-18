@@ -40,7 +40,9 @@ struct AudioIO {
 	std::string getDeviceDetail(int device, int offset);
 	void setDevice(int device, int offset);
 
+	std::vector<int> getSampleRates();
 	void setSampleRate(int sampleRate);
+	std::vector<int> getBlockSizes();
 	void setBlockSize(int blockSize);
 
 	void setChannels(int numOutputs, int numInputs);
@@ -48,8 +50,6 @@ struct AudioIO {
 	/** Must close the stream before opening */
 	void openStream();
 	void closeStream();
-
-	std::vector<int> getSampleRates();
 
 	virtual void processStream(const float *input, float *output, int frames) {}
 	virtual void onCloseStream() {}

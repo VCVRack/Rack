@@ -70,7 +70,7 @@ int AudioIO::getDeviceCount() {
 	if (rtAudio) {
 		return rtAudio->getDeviceCount();
 	}
-	if (driver == BRIDGE_DRIVER) {
+	else if (driver == BRIDGE_DRIVER) {
 		return BRIDGE_NUM_PORTS;
 	}
 	return 0;
@@ -108,7 +108,7 @@ int AudioIO::getDeviceChannels(int device) {
 		if (getDeviceInfo(device, &deviceInfo))
 			return max((int) deviceInfo.inputChannels, (int) deviceInfo.outputChannels);
 	}
-	if (driver == BRIDGE_DRIVER) {
+	else if (driver == BRIDGE_DRIVER) {
 		return 2;
 	}
 	return 0;
@@ -123,7 +123,7 @@ std::string AudioIO::getDeviceName(int device) {
 		if (getDeviceInfo(device, &deviceInfo))
 			return deviceInfo.name;
 	}
-	if (driver == BRIDGE_DRIVER) {
+	else if (driver == BRIDGE_DRIVER) {
 		return stringf("%d", device + 1);
 	}
 	return "";
@@ -147,7 +147,7 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 			return deviceDetail;
 		}
 	}
-	if (driver == BRIDGE_DRIVER) {
+	else if (driver == BRIDGE_DRIVER) {
 		return stringf("Port %d", device + 1);
 	}
 	return "";
@@ -160,13 +160,38 @@ void AudioIO::setDevice(int device, int offset) {
 	openStream();
 }
 
+std::vector<int> AudioIO::getSampleRates() {
+	if (rtAudio) {
+		try {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
+			std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
+			return sampleRates;
+		}
+		catch (RtAudioError &e) {
+			warn("Failed to query RtAudio device: %s", e.what());
+		}
+	}
+	return {};
+}
+
 void AudioIO::setSampleRate(int sampleRate) {
+	if (sampleRate == this->sampleRate)
+		return;
 	closeStream();
 	this->sampleRate = sampleRate;
 	openStream();
 }
 
+std::vector<int> AudioIO::getBlockSizes() {
+	if (rtAudio) {
+		return {64, 128, 256, 512, 1024, 2048, 4096};
+	}
+	return {};
+}
+
 void AudioIO::setBlockSize(int blockSize) {
+	if (blockSize == this->blockSize)
+		return;
 	closeStream();
 	this->blockSize = blockSize;
 	openStream();
@@ -256,11 +281,8 @@ void AudioIO::openStream() {
 		this->sampleRate = rtAudio->getStreamSampleRate();
 		onOpenStream();
 	}
-	if (driver == BRIDGE_DRIVER) {
+	else if (driver == BRIDGE_DRIVER) {
 		setChannels(0, 0);
-		// TEMP
-		sampleRate = 44100;
-		blockSize = 256;
 		bridgeAudioSubscribe(device, this);
 	}
 }
@@ -289,29 +311,11 @@ void AudioIO::closeStream() {
 		}
 		deviceInfo = RtAudio::DeviceInfo();
 	}
-	if (driver == BRIDGE_DRIVER) {
+	else if (driver == BRIDGE_DRIVER) {
 		bridgeAudioUnsubscribe(device, this);
 	}
 
 	onCloseStream();
-}
-
-std::vector<int> AudioIO::getSampleRates() {
-	if (rtAudio) {
-		try {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
-			std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
-			return sampleRates;
-		}
-		catch (RtAudioError &e) {
-			warn("Failed to query RtAudio device: %s", e.what());
-		}
-	}
-	if (driver == BRIDGE_DRIVER) {
-		return {44100, 48000, 88200, 96000, 176400, 192000};
-	}
-
-	return {};
 }
 
 json_t *AudioIO::toJson() {
