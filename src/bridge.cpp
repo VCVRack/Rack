@@ -24,6 +24,7 @@ namespace rack {
 struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
+static MidiInput *midiListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverRunning = false;
 
@@ -51,7 +52,7 @@ struct BridgeClientConnection {
 #else
 		int flags = 0;
 #endif
-		ssize_t actual = ::send(client, buffer, length, flags);
+		ssize_t actual = ::send(client, (const char*) buffer, length, flags);
 		if (actual != length) {
 			ready = false;
 			return false;
@@ -74,7 +75,7 @@ struct BridgeClientConnection {
 #else
 		int flags = 0;
 #endif
-		ssize_t actual = ::recv(client, buffer, length, flags);
+		ssize_t actual = ::recv(client, (char*) buffer, length, flags);
 		if (actual != length) {
 			ready = false;
 			return false;
@@ -145,9 +146,12 @@ struct BridgeClientConnection {
 			} break;
 
 			case MIDI_MESSAGE_SEND_COMMAND: {
-				uint8_t midiBuffer[3];
-				recv(&midiBuffer, 3);
-				debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
+				MidiMessage message;
+				if (!recv(&message, 3)) {
+					ready = false;
+					return;
+				}
+				processMidi(message);
 			} break;
 
 			case AUDIO_SAMPLE_RATE_SET_COMMAND: {
@@ -212,6 +216,14 @@ struct BridgeClientConnection {
 		else {
 			this->port = -1;
 		}
+	}
+
+	void processMidi(MidiMessage message) {
+		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
+			return;
+		if (!midiListeners[port])
+			return;
+		midiListeners[port]->onMessage(message);
 	}
 
 	void setSampleRate(int sampleRate) {
@@ -288,29 +300,15 @@ static void serverConnect() {
 #endif
 
 	// Get address
-#ifdef ARCH_WIN
-	struct addrinfo hints;
-	struct addrinfo *result = NULL;
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
-	err = getaddrinfo("127.0.0.1", "5000", &hints, &result);
-	if (err) {
-		warn("Could not get Bridge server address");
-		return;
-	}
-	defer({
-		freeaddrinfo(result);
-	});
-#else
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
-	addr.sin_port = htons(5000);
+#ifdef ARCH_WIN
+	InetPton(AF_INET, BRIDGE_HOST, &addr.sin_addr);
+#else
+	inet_pton(AF_INET, BRIDGE_HOST, &addr.sin_addr);
 #endif
+	addr.sin_port = htons(BRIDGE_PORT);
 
 	// Open socket
 #ifdef ARCH_WIN
@@ -387,6 +385,25 @@ void bridgeInit() {
 void bridgeDestroy() {
 	serverRunning = false;
 	serverThread.join();
+}
+
+void bridgeMidiSubscribe(int port, MidiInput *midi) {
+	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
+		return;
+	// Check if a Midi is already subscribed on the port
+	if (midiListeners[port])
+		return;
+	midiListeners[port] = midi;
+	if (connections[port])
+		connections[port]->refreshAudio();
+}
+
+void bridgeMidiUnsubscribe(int port, MidiInput *midi) {
+	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
+		return;
+	if (midiListeners[port] != midi)
+		return;
+	midiListeners[port] = NULL;
 }
 
 void bridgeAudioSubscribe(int port, AudioIO *audio) {

@@ -2,9 +2,6 @@
 #include "bridge.hpp"
 
 
-#define BRIDGE_DRIVER -5000
-
-
 namespace rack {
 
 
@@ -133,11 +130,6 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 	if (message->size() >= 3)
 		msg.data2 = (*message)[2];
 
-	// Filter channel
-	if (midiInput->channel >= 0) {
-		if (msg.status() != 0xf && msg.channel() != midiInput->channel)
-			return;
-	}
 	midiInput->onMessage(msg);
 }
 
@@ -163,9 +155,18 @@ void MidiInput::setDriver(int driver) {
 		rtMidi = rtMidiIn;
 		this->driver = rtMidiIn->getCurrentApi();
 	}
+	else if (driver == BRIDGE_DRIVER) {
+
+	}
 }
 
-void MidiInputQueue::onMessage(const MidiMessage &message) {
+void MidiInputQueue::onMessage(MidiMessage message) {
+	// Filter channel
+	if (channel >= 0) {
+		if (message.status() != 0xf && message.channel() != channel)
+			return;
+	}
+
 	if ((int) queue.size() < queueSize)
 		queue.push(message);
 }
