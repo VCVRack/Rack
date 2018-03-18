@@ -21,14 +21,11 @@
 namespace rack {
 
 
-static const int RECV_BUFFER_SIZE = (1<<13);
-static const int RECV_QUEUE_SIZE = (1<<17);
-
 struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
-static bool running;
+static bool serverRunning = false;
 
 
 struct BridgeClientConnection {
@@ -138,7 +135,7 @@ struct BridgeClientConnection {
 
 			case QUIT_COMMAND: {
 				debug("Bridge client quitting");
-				ready = true;
+				ready = false;
 			} break;
 
 			case PORT_SET_COMMAND: {
@@ -150,7 +147,7 @@ struct BridgeClientConnection {
 			case MIDI_MESSAGE_SEND_COMMAND: {
 				uint8_t midiBuffer[3];
 				recv(&midiBuffer, 3);
-				// debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
+				debug("MIDI: %02x %02x %02x", midiBuffer[0], midiBuffer[1], midiBuffer[2]);
 			} break;
 
 			case AUDIO_SAMPLE_RATE_SET_COMMAND: {
@@ -174,9 +171,13 @@ struct BridgeClientConnection {
 				}
 
 				float input[length];
-				recv(&input, length * sizeof(float));
+				if (!recv(&input, length * sizeof(float))) {
+					ready = false;
+					return;
+				}
 				float output[length];
 				int frames = length / 2;
+				memset(&output, 0, sizeof(output));
 				processStream(input, output, frames);
 				send(&output, length * sizeof(float));
 				flush();
@@ -184,12 +185,12 @@ struct BridgeClientConnection {
 
 			case AUDIO_ACTIVATE: {
 				audioActive = true;
-				refreshAudioActive();
+				refreshAudio();
 			} break;
 
 			case AUDIO_DEACTIVATE: {
 				audioActive = false;
-				refreshAudioActive();
+				refreshAudio();
 			} break;
 		}
 	}
@@ -206,7 +207,7 @@ struct BridgeClientConnection {
 		if ((0 <= port && port < BRIDGE_NUM_PORTS) && !connections[port]) {
 			this->port = port;
 			connections[this->port] = this;
-			refreshAudioActive();
+			refreshAudio();
 		}
 		else {
 			this->port = -1;
@@ -214,8 +215,8 @@ struct BridgeClientConnection {
 	}
 
 	void setSampleRate(int sampleRate) {
-		// TODO
 		this->sampleRate = sampleRate;
+		refreshAudio();
 	}
 
 	void processStream(const float *input, float *output, int frames) {
@@ -223,12 +224,14 @@ struct BridgeClientConnection {
 			return;
 		if (!audioListeners[port])
 			return;
+		audioListeners[port]->setBlockSize(frames);
 		audioListeners[port]->processStream(input, output, frames);
-		debug("%d frames", frames);
 	}
 
-	void refreshAudioActive() {
+	void refreshAudio() {
 		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
+			return;
+		if (connections[port] != this)
 			return;
 		if (!audioListeners[port])
 			return;
@@ -236,6 +239,7 @@ struct BridgeClientConnection {
 			audioListeners[port]->setChannels(2, 2);
 		else
 			audioListeners[port]->setChannels(0, 0);
+		audioListeners[port]->setSampleRate(sampleRate);
 	}
 };
 
@@ -267,13 +271,13 @@ static void clientRun(int client) {
 }
 
 
-static void serverRun() {
+static void serverConnect() {
 	int err;
 
 	// Initialize sockets
 #ifdef ARCH_WIN
 	WSADATA wsaData;
-	err = WSAStartup(MAKEWORD(2,2), &wsaData);
+	err = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	defer({
 		WSACleanup();
 	});
@@ -352,8 +356,7 @@ static void serverRun() {
 #endif
 
 	// Accept clients
-	running = true;
-	while (running) {
+	while (serverRunning) {
 		int client = accept(server, NULL, NULL);
 		if (client < 0) {
 			// Wait a bit before attempting to accept another client
@@ -369,13 +372,20 @@ static void serverRun() {
 	info("Bridge server closed");
 }
 
+static void serverRun() {
+	while (serverRunning) {
+		std::this_thread::sleep_for(std::chrono::duration<double>(0.1));
+		serverConnect();
+	}
+}
 
 void bridgeInit() {
+	serverRunning = true;
 	serverThread = std::thread(serverRun);
 }
 
 void bridgeDestroy() {
-	running = false;
+	serverRunning = false;
 	serverThread.join();
 }
 
@@ -387,7 +397,7 @@ void bridgeAudioSubscribe(int port, AudioIO *audio) {
 		return;
 	audioListeners[port] = audio;
 	if (connections[port])
-		connections[port]->refreshAudioActive();
+		connections[port]->refreshAudio();
 }
 
 void bridgeAudioUnsubscribe(int port, AudioIO *audio) {

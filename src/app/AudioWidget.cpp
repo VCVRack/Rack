@@ -98,7 +98,11 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Sample rate"));
-		for (int sampleRate : audioWidget->audioIO->getSampleRates()) {
+		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
+		if (sampleRates.empty()) {
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(None available)"));
+		}
+		for (int sampleRate : sampleRates) {
 			AudioSampleRateItem *item = new AudioSampleRateItem();
 			item->audioIO = audioWidget->audioIO;
 			item->sampleRate = sampleRate;
@@ -126,7 +130,10 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Block size"));
-		std::vector<int> blockSizes = {64, 128, 256, 512, 1024, 2048, 4096};
+		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
+		if (blockSizes.empty()) {
+			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(None available)"));
+		}
 		for (int blockSize : blockSizes) {
 			AudioBlockSizeItem *item = new AudioBlockSizeItem();
 			item->audioIO = audioWidget->audioIO;
