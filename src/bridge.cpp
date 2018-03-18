@@ -28,7 +28,7 @@ struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
-static bool serverQuit;
+static bool serverRunning;
 
 
 struct BridgeClientConnection {
@@ -387,8 +387,8 @@ static void serverRun() {
 #endif
 
 	// Accept clients
-	serverQuit = false;
-	while (!serverQuit) {
+	serverRunning = true;
+	while (serverRunning) {
 		int client = accept(server, NULL, NULL);
 		if (client < 0) {
 			// Wait a bit before attempting to accept another client
@@ -410,7 +410,7 @@ void bridgeInit() {
 }
 
 void bridgeDestroy() {
-	serverQuit = true;
+	serverRunning = false;
 	serverThread.join();
 }
 
