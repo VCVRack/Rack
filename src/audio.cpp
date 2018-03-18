@@ -3,9 +3,6 @@
 #include "bridge.hpp"
 
 
-#define BRIDGE_DRIVER -5000
-
-
 namespace rack {
 
 

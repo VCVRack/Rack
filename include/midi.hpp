@@ -70,14 +70,14 @@ struct MidiInput : MidiIO {
 	MidiInput();
 	~MidiInput();
 	void setDriver(int driver) override;
-	virtual void onMessage(const MidiMessage &message) {}
+	virtual void onMessage(MidiMessage message) {}
 };
 
 
 struct MidiInputQueue : MidiInput {
 	int queueSize = 8192;
 	std::queue<MidiMessage> queue;
-	void onMessage(const MidiMessage &message) override;
+	void onMessage(MidiMessage message) override;
 	/** If a MidiMessage is available, writes `message` and return true */
 	bool shift(MidiMessage *message);
 };

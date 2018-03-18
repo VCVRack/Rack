@@ -5,10 +5,16 @@
 namespace rack {
 
 
-static const int BRIDGE_NUM_PORTS = 16;
-static const int BRIDGE_NUM_PARAMS = 16;
-// A random number which prevents connection from other protocols and old Bridge versions
-const uint32_t BRIDGE_HELLO = 0xff00fefd;
+// TODO Change driver and port number to something less common
+/** Driver ID in AudioIO and MidiIO */
+#define BRIDGE_DRIVER -5000
+#define BRIDGE_HOST "127.0.0.1"
+#define BRIDGE_PORT 5000
+#define BRIDGE_NUM_PORTS 16
+/** Number of VST/AU automation parameters */
+#define BRIDGE_NUM_PARAMS 16
+/** An arbitrary number which prevents connection from other protocols (like WebSockets) and old Bridge versions */
+#define BRIDGE_HELLO 0xff00fefd
 
 
 /** All commands are called from the client and served by the server
