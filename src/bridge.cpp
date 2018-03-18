@@ -392,7 +392,7 @@ static void serverRun() {
 		int client = accept(server, NULL, NULL);
 		if (client < 0) {
 			// Wait a bit before attempting to accept another client
-			std::this_thread::sleep_for(std::chrono::duration<float>(0.1));
+			std::this_thread::sleep_for(std::chrono::duration<double>(0.1));
 			continue;
 		}
 
