@@ -59,7 +59,7 @@ struct SeparatorItem : OpaqueWidget {
 		Label *label = Widget::create<Label>(Vec(0, 12 + itemMargin));
 		label->text = text;
 		label->fontSize = 20;
-		label->color.a *= 0.25;
+		label->color.a *= 0.5;
 		addChild(label);
 	}
 };
