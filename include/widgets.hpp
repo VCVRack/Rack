@@ -294,6 +294,7 @@ extern Widget *gHoveredWidget;
 extern Widget *gDraggedWidget;
 extern Widget *gDragHoveredWidget;
 extern Widget *gFocusedWidget;
+extern Widget *gTempWidget;
 
 
 } // namespace rack

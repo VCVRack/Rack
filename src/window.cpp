@@ -59,37 +59,37 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 #endif
 
 	if (action == GLFW_PRESS) {
-		Widget *w = NULL;
+		gTempWidget = NULL;
 		// onMouseDown
 		{
 			EventMouseDown e;
 			e.pos = gMousePos;
 			e.button = button;
 			gScene->onMouseDown(e);
-			w = e.target;
+			gTempWidget = e.target;
 		}
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			if (w) {
+			if (gTempWidget) {
 				// onDragStart
 				EventDragStart e;
-				w->onDragStart(e);
+				gTempWidget->onDragStart(e);
 			}
-			gDraggedWidget = w;
+			gDraggedWidget = gTempWidget;
 
-			if (w != gFocusedWidget) {
+			if (gTempWidget != gFocusedWidget) {
 				if (gFocusedWidget) {
 					// onDefocus
 					EventDefocus e;
 					gFocusedWidget->onDefocus(e);
 				}
 				gFocusedWidget = NULL;
-				if (w) {
+				if (gTempWidget) {
 					// onFocus
 					EventFocus e;
-					w->onFocus(e);
+					gTempWidget->onFocus(e);
 					if (e.consumed) {
-						gFocusedWidget = w;
+						gFocusedWidget = gTempWidget;
 					}
 				}
 			}
@@ -97,13 +97,13 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 	}
 	else if (action == GLFW_RELEASE) {
 		// onMouseUp
-		Widget *w = NULL;
+		gTempWidget = NULL;
 		{
 			EventMouseUp e;
 			e.pos = gMousePos;
 			e.button = button;
 			gScene->onMouseUp(e);
-			w = e.target;
+			gTempWidget = e.target;
 		}
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -111,7 +111,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 				// onDragDrop
 				EventDragDrop e;
 				e.origin = gDraggedWidget;
-				w->onDragDrop(e);
+				gTempWidget->onDragDrop(e);
 			}
 			// gDraggedWidget might have been set to null in the last event, recheck here
 			if (gDraggedWidget) {
@@ -169,14 +169,14 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 	gMousePos = mousePos;
 
-	Widget *hovered = NULL;
+	gTempWidget = NULL;
 	// onMouseMove
 	{
 		EventMouseMove e;
 		e.pos = mousePos;
 		e.mouseRel = mouseRel;
 		gScene->onMouseMove(e);
-		hovered = e.target;
+		gTempWidget = e.target;
 	}
 
 	if (gDraggedWidget) {
@@ -185,33 +185,33 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 		e.mouseRel = mouseRel;
 		gDraggedWidget->onDragMove(e);
 
-		if (hovered != gDragHoveredWidget) {
+		if (gTempWidget != gDragHoveredWidget) {
 			if (gDragHoveredWidget) {
 				EventDragEnter e;
 				e.origin = gDraggedWidget;
 				gDragHoveredWidget->onDragLeave(e);
 			}
-			if (hovered) {
+			gDragHoveredWidget = gTempWidget;
+			if (gDragHoveredWidget) {
 				EventDragEnter e;
 				e.origin = gDraggedWidget;
-				hovered->onDragEnter(e);
+				gDragHoveredWidget->onDragEnter(e);
 			}
-			gDragHoveredWidget = hovered;
 		}
 	}
 	else {
-		if (hovered != gHoveredWidget) {
+		if (gTempWidget != gHoveredWidget) {
 			if (gHoveredWidget) {
 				// onMouseLeave
 				EventMouseLeave e;
 				gHoveredWidget->onMouseLeave(e);
 			}
-			if (hovered) {
+			gHoveredWidget = gTempWidget;
+			if (gHoveredWidget) {
 				// onMouseEnter
 				EventMouseEnter e;
-				hovered->onMouseEnter(e);
+				gHoveredWidget->onMouseEnter(e);
 			}
-			gHoveredWidget = hovered;
 		}
 	}
 	if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
