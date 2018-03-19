@@ -127,7 +127,8 @@ struct MIDITriggerToCVInterface : Module {
 		}
 
 		json_t *midiJ = json_object_get(rootJ, "midi");
-		midiInput.fromJson(midiJ);
+		if (midiJ)
+			midiInput.fromJson(midiJ);
 	}
 };
 
