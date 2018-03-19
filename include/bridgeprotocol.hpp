@@ -50,10 +50,6 @@ enum BridgeCommand {
 	- float output[BRIDGE_OUTPUTS * frames]
 	*/
 	AUDIO_PROCESS_COMMAND,
-	/** Resumes the audio buffer, forcing Rack to wait on an audio buffer */
-	AUDIO_ACTIVATE,
-	/** Pauses the audio buffer, allowing Rack to not wait on an audio buffer */
-	AUDIO_DEACTIVATE,
 	NUM_COMMANDS
 };
 

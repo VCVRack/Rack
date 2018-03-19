@@ -34,7 +34,6 @@ struct BridgeClientConnection {
 
 	int port = -1;
 	int sampleRate = 0;
-	bool audioActive = false;
 
 	~BridgeClientConnection() {
 		setPort(-1);
@@ -177,24 +176,12 @@ struct BridgeClientConnection {
 				send(&output, BRIDGE_OUTPUTS * frames * sizeof(float));
 				// flush();
 			} break;
-
-			case AUDIO_ACTIVATE: {
-				audioActive = true;
-				refreshAudio();
-			} break;
-
-			case AUDIO_DEACTIVATE: {
-				audioActive = false;
-				refreshAudio();
-			} break;
 		}
 	}
 
 	void setPort(int port) {
 		// Unbind from existing port
 		if (this->port >= 0 && connections[this->port] == this) {
-			if (audioListeners[this->port])
-				audioListeners[this->port]->setChannels(0, 0);
 			connections[this->port] = NULL;
 		}
 
@@ -238,10 +225,6 @@ struct BridgeClientConnection {
 			return;
 		if (!audioListeners[port])
 			return;
-		if (audioActive)
-			audioListeners[port]->setChannels(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
-		else
-			audioListeners[port]->setChannels(0, 0);
 		audioListeners[port]->setSampleRate(sampleRate);
 	}
 };
@@ -405,7 +388,6 @@ void bridgeAudioUnsubscribe(int port, AudioIO *audio) {
 	if (audioListeners[port] != audio)
 		return;
 	audioListeners[port] = NULL;
-	audio->setChannels(0, 0);
 }
 
 

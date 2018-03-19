@@ -279,7 +279,7 @@ void AudioIO::openStream() {
 		onOpenStream();
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		setChannels(0, 0);
+		setChannels(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
 		bridgeAudioSubscribe(device, this);
 	}
 }
