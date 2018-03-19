@@ -13,6 +13,7 @@ Widget::~Widget() {
 	if (gDraggedWidget == this) gDraggedWidget = NULL;
 	if (gDragHoveredWidget == this) gDragHoveredWidget = NULL;
 	if (gFocusedWidget == this) gFocusedWidget = NULL;
+	if (gTempWidget == this) gTempWidget = NULL;
 	clearChildren();
 }
 
