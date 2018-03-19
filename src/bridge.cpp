@@ -49,10 +49,14 @@ struct BridgeClientConnection {
 #else
 		int flags = 0;
 #endif
-		ssize_t actual = ::send(client, (const char*) buffer, length, flags);
-		if (actual != length) {
-			ready = false;
-			return false;
+		ssize_t remaining = 0;
+		while (remaining < length) {
+			ssize_t actual = ::send(client, (const char*) buffer, length, flags);
+			if (actual <= 0) {
+				ready = false;
+				return false;
+			}
+			remaining += actual;
 		}
 		return true;
 	}
@@ -72,10 +76,14 @@ struct BridgeClientConnection {
 #else
 		int flags = 0;
 #endif
-		ssize_t actual = ::recv(client, (char*) buffer, length, flags);
-		if (actual != length) {
-			ready = false;
-			return false;
+		ssize_t remaining = 0;
+		while (remaining < length) {
+			ssize_t actual = ::recv(client, (char*) buffer + remaining, length - remaining, flags);
+			if (actual <= 0) {
+				ready = false;
+				return false;
+			}
+			remaining += actual;
 		}
 		return true;
 	}
@@ -86,14 +94,12 @@ struct BridgeClientConnection {
 	}
 
 	void flush() {
-		int err;
 		// Turn off Nagle
 		int flag = 1;
-		err = setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int));
+		setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int));
 		// Turn on Nagle
 		flag = 0;
-		err = setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int));
-		(void) err;
+		setsockopt(client, IPPROTO_TCP, TCP_NODELAY, (char*) &flag, sizeof(int));
 	}
 
 	void run() {
@@ -118,9 +124,8 @@ struct BridgeClientConnection {
 
 	/** Accepts a command from the client */
 	void step() {
-		uint8_t command = NO_COMMAND;
+		uint8_t command;
 		if (!recv<uint8_t>(&command)) {
-			ready = false;
 			return;
 		}
 
@@ -132,7 +137,6 @@ struct BridgeClientConnection {
 			} break;
 
 			case QUIT_COMMAND: {
-				debug("Bridge client quitting");
 				ready = false;
 			} break;
 
@@ -142,10 +146,9 @@ struct BridgeClientConnection {
 				setPort(port);
 			} break;
 
-			case MIDI_MESSAGE_SEND_COMMAND: {
+			case MIDI_MESSAGE_COMMAND: {
 				MidiMessage message;
 				if (!recv(&message, 3)) {
-					ready = false;
 					return;
 				}
 				processMidi(message);
@@ -167,13 +170,17 @@ struct BridgeClientConnection {
 
 				float input[BRIDGE_INPUTS * frames];
 				if (!recv(&input, BRIDGE_INPUTS * frames * sizeof(float))) {
-					ready = false;
+					debug("Failed to receive");
 					return;
 				}
+
 				float output[BRIDGE_OUTPUTS * frames];
 				memset(&output, 0, sizeof(output));
 				processStream(input, output, frames);
-				send(&output, BRIDGE_OUTPUTS * frames * sizeof(float));
+				if (!send(&output, BRIDGE_OUTPUTS * frames * sizeof(float))) {
+					debug("Failed to send");
+					return;
+				}
 				// flush();
 			} break;
 		}
@@ -232,23 +239,41 @@ struct BridgeClientConnection {
 
 static void clientRun(int client) {
 	defer({
-		close(client);
+#ifdef ARCH_WIN
+		if (shutdown(client, SD_SEND)) {
+			warn("Bridge client shutdown() failed");
+		}
+		if (closesocket(client)) {
+			warn("Bridge client closesocket() failed");
+		}
+#else
+		if (close(client)) {
+			warn("Bridge client close() failed");
+		}
+#endif
 	});
-	int err;
-	(void) err;
 
 #ifdef ARCH_MAC
 	// Avoid SIGPIPE
 	int flag = 1;
-	setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int));
+	if (setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int))) {
+		warn("Bridge client setsockopt() failed");
+		return;
+	}
 #endif
 
 	// Disable non-blocking
 #ifdef ARCH_WIN
 	unsigned long blockingMode = 0;
-	ioctlsocket(client, FIONBIO, &blockingMode);
+	if (ioctlsocket(client, FIONBIO, &blockingMode)) {
+		warn("Bridge client ioctlsocket() failed");
+		return;
+	}
 #else
-	err = fcntl(client, F_SETFL, fcntl(client, F_GETFL, 0) & ~O_NONBLOCK);
+	if (fcntl(client, F_SETFL, fcntl(client, F_GETFL, 0) & ~O_NONBLOCK)) {
+		warn("Bridge client fcntl() failed");
+		return;
+	}
 #endif
 
 	BridgeClientConnection connection;
@@ -258,19 +283,16 @@ static void clientRun(int client) {
 
 
 static void serverConnect() {
-	int err;
-
 	// Initialize sockets
 #ifdef ARCH_WIN
 	WSADATA wsaData;
-	err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
+		warn("Bridge server WSAStartup() failed");
+		return;
+	}
 	defer({
 		WSACleanup();
 	});
-	if (err) {
-		warn("Could not initialize Winsock");
-		return;
-	}
 #endif
 
 	// Get address
@@ -295,15 +317,13 @@ static void serverConnect() {
 	});
 
 	// Bind socket to address
-	err = bind(server, (struct sockaddr*) &addr, sizeof(addr));
-	if (err) {
+	if (bind(server, (struct sockaddr*) &addr, sizeof(addr))) {
 		warn("Bridge server bind() failed");
 		return;
 	}
 
 	// Listen for clients
-	err = listen(server, 20);
-	if (err) {
+	if (listen(server, 20)) {
 		warn("Bridge server listen() failed");
 		return;
 	}
@@ -312,10 +332,13 @@ static void serverConnect() {
 	// Enable non-blocking
 #ifdef ARCH_WIN
 	unsigned long blockingMode = 1;
-	ioctlsocket(server, FIONBIO, &blockingMode);
+	if (ioctlsocket(server, FIONBIO, &blockingMode)) {
+		warn("Bridge server ioctlsocket() failed");
+		return;
+	}
 #else
 	int flags = fcntl(server, F_GETFL, 0);
-	err = fcntl(server, F_SETFL, flags | O_NONBLOCK);
+	fcntl(server, F_SETFL, flags | O_NONBLOCK);
 #endif
 
 	// Accept clients
