@@ -8,9 +8,6 @@
 static const float SVG_DPI = 75.0;
 static const float MM_PER_IN = 25.4;
 
-#define CHECKMARK_STRING "✔"
-#define CHECKMARK(_cond) ((_cond) ? CHECKMARK_STRING : "")
-
 
 namespace rack {
 
