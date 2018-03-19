@@ -36,7 +36,7 @@ enum BridgeCommand {
 	send
 	- uint8_t msg[3]
 	*/
-	MIDI_MESSAGE_SEND_COMMAND,
+	MIDI_MESSAGE_COMMAND,
 	/** Sets the audio sample rate
 	send
 	- uint32_t sampleRate
