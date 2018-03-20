@@ -25,8 +25,6 @@ ifeq ($(ARCH), win)
 	TARGET = plugin.dll
 endif
 
-DISTRIBUTABLES += $(TARGET)
-
 
 all: $(TARGET)
 
@@ -38,7 +36,12 @@ clean:
 dist: all
 	rm -rf dist
 	mkdir -p dist/$(SLUG)
+	# Strip and copy plugin binary
+	cp $(TARGET) dist/$(SLUG)/
+	strip -s dist/$(SLUG)/$(TARGET)
+	# Copy distributables
 	cp -R $(DISTRIBUTABLES) dist/$(SLUG)/
+	# Create ZIP package
 	cd dist && zip -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
 
 .PHONY: clean dist

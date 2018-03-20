@@ -164,6 +164,8 @@ struct ModelItem : BrowserListItem {
 
 	void onAction(EventAction &e) override {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
+		if (!moduleWidget)
+			return;
 		gRackWidget->moduleContainer->addChild(moduleWidget);
 		// Move module nearest to the mouse position
 		moduleWidget->box.pos = gRackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
