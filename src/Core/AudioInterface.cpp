@@ -141,16 +141,6 @@ struct AudioInterface : Module {
 		audioIO.fromJson(audioJ);
 	}
 
-	void onSampleRateChange() override {
-		inputSrc.setRates(audioIO.sampleRate, (int) engineGetSampleRate());
-		outputSrc.setRates((int) engineGetSampleRate(), audioIO.sampleRate);
-	}
-
-	void onChannelsChange() {
-		inputSrc.setChannels(audioIO.numInputs);
-		outputSrc.setChannels(audioIO.numOutputs);
-	}
-
 	void onReset() override {
 		audioIO.setDevice(-1, 0);
 	}
@@ -158,18 +148,13 @@ struct AudioInterface : Module {
 
 
 void AudioInterface::step() {
-	// Update sample rate if changed by audio driver
-	if (audioIO.sampleRate != lastSampleRate) {
-		onSampleRateChange();
-		lastSampleRate = audioIO.sampleRate;
-	}
+	// Update SRC states
+	int sampleRate = (int) engineGetSampleRate();
+	inputSrc.setRates(audioIO.sampleRate, sampleRate);
+	outputSrc.setRates(sampleRate, audioIO.sampleRate);
 
-	// Update number of channels if changed by audio driver
-	if (audioIO.numOutputs != lastNumOutputs || audioIO.numInputs != lastNumInputs) {
-		lastNumOutputs = audioIO.numOutputs;
-		lastNumInputs = audioIO.numInputs;
-		onChannelsChange();
-	}
+	inputSrc.setChannels(audioIO.numInputs);
+	outputSrc.setChannels(audioIO.numOutputs);
 
 	// Inputs: audio engine -> rack engine
 	if (audioIO.active && audioIO.numInputs > 0) {
