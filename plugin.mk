@@ -45,3 +45,4 @@ dist: all
 	cd dist && zip -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
 
 .PHONY: clean dist
+.DEFAULT_GOAL := all
