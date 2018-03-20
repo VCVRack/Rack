@@ -28,16 +28,22 @@ struct SampleRateConverter {
 	/** Sets the number of channels to actually process. This can be at most CHANNELS. */
 	void setChannels(int channels) {
 		assert(channels <= CHANNELS);
+		if (channels == this->channels)
+			return;
 		this->channels = channels;
 		refreshState();
 	}
 
 	void setQuality(int quality) {
+		if (quality == this->quality)
+			return;
 		this->quality = quality;
 		refreshState();
 	}
 
 	void setRates(int inRate, int outRate) {
+		if (inRate == this->inRate && outRate == this->outRate)
+			return;
 		this->inRate = inRate;
 		this->outRate = outRate;
 		refreshState();
