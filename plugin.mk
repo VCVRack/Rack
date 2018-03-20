@@ -26,7 +26,7 @@ ifeq ($(ARCH), win)
 endif
 
 
-all: $(TARGET)
+all: $(RESOURCES) $(TARGET)
 
 include $(RACK_DIR)/compile.mk
 
