@@ -248,6 +248,28 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 		midiWidget->midiIO = &module->midiInput;
 		addChild(midiWidget);
 	}
+
+	void appendContextMenu(Menu *menu) override {
+		QuadMIDIToCVInterface *module = dynamic_cast<QuadMIDIToCVInterface*>(this->module);
+
+		struct PolyphonyItem : MenuItem {
+			QuadMIDIToCVInterface *module;
+			QuadMIDIToCVInterface::PolyMode polyMode;
+			void onAction(EventAction &e) override {
+				module->polyMode = polyMode;
+			}
+		};
+
+		menu->addChild(MenuEntry::create());
+		menu->addChild(MenuLabel::create("Polyphony mode"));
+		std::vector<std::string> polyModeNames = {"Rotate", "Reset", "Reassign", "Unison"};
+		for (int i = 0; i < QuadMIDIToCVInterface::NUM_MODES; i++) {
+			PolyphonyItem *item = MenuItem::create<PolyphonyItem>(polyModeNames[i], CHECKMARK(module->polyMode == i));
+			item->module = module;
+			item->polyMode = (QuadMIDIToCVInterface::PolyMode) i;
+			menu->addChild(item);
+		}
+	}
 };
 
 
