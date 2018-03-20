@@ -15,8 +15,8 @@
 #pragma GCC diagnostic pop
 
 
-#define OUTPUTS 8
-#define INPUTS 8
+#define AUDIO_OUTPUTS 8
+#define AUDIO_INPUTS 8
 
 
 using namespace rack;
@@ -28,9 +28,9 @@ struct AudioInterfaceIO : AudioIO {
 	std::mutex audioMutex;
 	std::condition_variable audioCv;
 	// Audio thread produces, engine thread consumes
-	DoubleRingBuffer<Frame<INPUTS>, (1<<15)> inputBuffer;
+	DoubleRingBuffer<Frame<AUDIO_INPUTS>, (1<<15)> inputBuffer;
 	// Audio thread consumes, engine thread produces
-	DoubleRingBuffer<Frame<OUTPUTS>, (1<<15)> outputBuffer;
+	DoubleRingBuffer<Frame<AUDIO_OUTPUTS>, (1<<15)> outputBuffer;
 	bool active = false;
 
 	~AudioInterfaceIO() {
@@ -51,7 +51,7 @@ struct AudioInterfaceIO : AudioIO {
 			for (int i = 0; i < frames; i++) {
 				if (inputBuffer.full())
 					break;
-				Frame<INPUTS> inputFrame;
+				Frame<AUDIO_INPUTS> inputFrame;
 				memset(&inputFrame, 0, sizeof(inputFrame));
 				memcpy(&inputFrame, &input[numInputs * i], numInputs * sizeof(float));
 				inputBuffer.push(inputFrame);
@@ -67,7 +67,7 @@ struct AudioInterfaceIO : AudioIO {
 			if (audioCv.wait_for(lock, timeout, cond)) {
 				// Consume audio block
 				for (int i = 0; i < frames; i++) {
-					Frame<OUTPUTS> f = outputBuffer.shift();
+					Frame<AUDIO_OUTPUTS> f = outputBuffer.shift();
 					for (int j = 0; j < numOutputs; j++) {
 						output[numOutputs*i + j] = clamp(f.samples[j], -1.f, 1.f);
 					}
@@ -99,28 +99,30 @@ struct AudioInterface : Module {
 		NUM_PARAMS
 	};
 	enum InputIds {
-		ENUMS(AUDIO_INPUT, INPUTS),
+		ENUMS(AUDIO_INPUT, AUDIO_INPUTS),
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		ENUMS(AUDIO_OUTPUT, OUTPUTS),
+		ENUMS(AUDIO_OUTPUT, AUDIO_OUTPUTS),
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ENUMS(INPUT_LIGHT, INPUTS / 2),
-		ENUMS(OUTPUT_LIGHT, OUTPUTS / 2),
+		ENUMS(INPUT_LIGHT, AUDIO_INPUTS / 2),
+		ENUMS(OUTPUT_LIGHT, AUDIO_OUTPUTS / 2),
 		NUM_LIGHTS
 	};
 
 	AudioInterfaceIO audioIO;
 	int lastSampleRate = 0;
+	int lastNumOutputs = -1;
+	int lastNumInputs = -1;
 
-	SampleRateConverter<INPUTS> inputSrc;
-	SampleRateConverter<OUTPUTS> outputSrc;
+	SampleRateConverter<AUDIO_INPUTS> inputSrc;
+	SampleRateConverter<AUDIO_OUTPUTS> outputSrc;
 
 	// in rack's sample rate
-	DoubleRingBuffer<Frame<INPUTS>, 16> inputBuffer;
-	DoubleRingBuffer<Frame<OUTPUTS>, 16> outputBuffer;
+	DoubleRingBuffer<Frame<AUDIO_INPUTS>, 16> inputBuffer;
+	DoubleRingBuffer<Frame<AUDIO_OUTPUTS>, 16> outputBuffer;
 
 	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onSampleRateChange();
@@ -140,8 +142,13 @@ struct AudioInterface : Module {
 	}
 
 	void onSampleRateChange() override {
-		inputSrc.setRates(audioIO.sampleRate, engineGetSampleRate());
-		outputSrc.setRates(engineGetSampleRate(), audioIO.sampleRate);
+		inputSrc.setRates(audioIO.sampleRate, (int) engineGetSampleRate());
+		outputSrc.setRates((int) engineGetSampleRate(), audioIO.sampleRate);
+	}
+
+	void onChannelsChange() {
+		inputSrc.setChannels(audioIO.numInputs);
+		outputSrc.setChannels(audioIO.numOutputs);
 	}
 
 	void onReset() override {
@@ -155,6 +162,13 @@ void AudioInterface::step() {
 	if (audioIO.sampleRate != lastSampleRate) {
 		onSampleRateChange();
 		lastSampleRate = audioIO.sampleRate;
+	}
+
+	// Update number of channels if changed by audio driver
+	if (audioIO.numOutputs != lastNumOutputs || audioIO.numInputs != lastNumInputs) {
+		lastNumOutputs = audioIO.numOutputs;
+		lastNumInputs = audioIO.numInputs;
+		onChannelsChange();
 	}
 
 	// Inputs: audio engine -> rack engine
@@ -182,23 +196,26 @@ void AudioInterface::step() {
 	}
 
 	// Take input from buffer
-	Frame<INPUTS> inputFrame;
+	Frame<AUDIO_INPUTS> inputFrame;
 	if (!inputBuffer.empty()) {
 		inputFrame = inputBuffer.shift();
 	}
 	else {
 		memset(&inputFrame, 0, sizeof(inputFrame));
 	}
-	for (int i = 0; i < INPUTS; i++) {
+	for (int i = 0; i < audioIO.numInputs; i++) {
 		outputs[AUDIO_OUTPUT + i].value = 10.f * inputFrame.samples[i];
+	}
+	for (int i = audioIO.numInputs; i < AUDIO_INPUTS; i++) {
+		outputs[AUDIO_OUTPUT + i].value = 0.f;
 	}
 
 	// Outputs: rack engine -> audio engine
 	if (audioIO.active && audioIO.numOutputs > 0) {
 		// Get and push output SRC frame
 		if (!outputBuffer.full()) {
-			Frame<OUTPUTS> outputFrame;
-			for (int i = 0; i < OUTPUTS; i++) {
+			Frame<AUDIO_OUTPUTS> outputFrame;
+			for (int i = 0; i < AUDIO_OUTPUTS; i++) {
 				outputFrame.samples[i] = inputs[AUDIO_INPUT + i].value / 10.f;
 			}
 			outputBuffer.push(outputFrame);
@@ -233,9 +250,9 @@ void AudioInterface::step() {
 	}
 
 	// Turn on light if at least one port is enabled in the nearby pair
-	for (int i = 0; i < INPUTS / 2; i++)
+	for (int i = 0; i < AUDIO_INPUTS / 2; i++)
 		lights[INPUT_LIGHT + i].value = (audioIO.active && audioIO.numOutputs >= 2*i+1);
-	for (int i = 0; i < OUTPUTS / 2; i++)
+	for (int i = 0; i < AUDIO_OUTPUTS / 2; i++)
 		lights[OUTPUT_LIGHT + i].value = (audioIO.active && audioIO.numInputs >= 2*i+1);
 }
 
