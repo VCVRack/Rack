@@ -575,6 +575,7 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	t.sliderTheme.innerColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
 	t.sliderTheme.innerSelectedColor = colorPlus(bg, nvgRGB(0x60, 0x60, 0x60));
 
+	t.textFieldTheme = t.sliderTheme;
 	t.textFieldTheme.textColor = colorMinus(bg, nvgRGB(0x20, 0x20, 0x20));
 	t.textFieldTheme.textSelectedColor = t.textFieldTheme.textColor;
 
