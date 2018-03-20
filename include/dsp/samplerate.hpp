@@ -10,53 +10,82 @@ namespace rack {
 
 template<int CHANNELS>
 struct SampleRateConverter {
-	SpeexResamplerState *state;
-	bool bypass = false;
+	SpeexResamplerState *st = NULL;
+	int channels = CHANNELS;
+	int quality = SPEEX_RESAMPLER_QUALITY_DEFAULT;
+	int inRate = 44100;
+	int outRate = 44100;
 
 	SampleRateConverter() {
-		int error;
-		state = speex_resampler_init(CHANNELS, 44100, 44100, SPEEX_RESAMPLER_QUALITY_DEFAULT, &error);
-		assert(error == RESAMPLER_ERR_SUCCESS);
+		refreshState();
 	}
 	~SampleRateConverter() {
-		speex_resampler_destroy(state);
+		if (st) {
+			speex_resampler_destroy(st);
+		}
+	}
+
+	/** Sets the number of channels to actually process. This can be at most CHANNELS. */
+	void setChannels(int channels) {
+		assert(channels <= CHANNELS);
+		this->channels = channels;
+		refreshState();
 	}
 
 	void setQuality(int quality) {
-		speex_resampler_set_quality(state, quality);
+		this->quality = quality;
+		refreshState();
 	}
 
 	void setRates(int inRate, int outRate) {
-		int oldInRate, oldOutRate;
-		getRates(&oldInRate, &oldOutRate);
-		if (inRate == oldInRate && outRate == oldOutRate)
-			return;
-		int error = speex_resampler_set_rate(state, inRate, outRate);
-		assert(error == RESAMPLER_ERR_SUCCESS);
+		this->inRate = inRate;
+		this->outRate = outRate;
+		refreshState();
 	}
 
-	void getRates(int *inRate, int *outRate) {
-		spx_uint32_t inRate32, outRate32;
-		speex_resampler_get_rate(state, &inRate32, &outRate32);
-		if (inRate) *inRate = inRate32;
-		if (outRate) *outRate = outRate32;
+	void refreshState() {
+		if (st) {
+			speex_resampler_destroy(st);
+			st = NULL;
+		}
+
+		if (channels > 0 && inRate != outRate) {
+			int err;
+			st = speex_resampler_init(channels, inRate, outRate, quality, &err);
+			assert(st);
+			assert(err == RESAMPLER_ERR_SUCCESS);
+
+			speex_resampler_set_input_stride(st, CHANNELS);
+			speex_resampler_set_output_stride(st, CHANNELS);
+		}
 	}
 
 	/** `in` and `out` are interlaced with the number of channels */
 	void process(const Frame<CHANNELS> *in, int *inFrames, Frame<CHANNELS> *out, int *outFrames) {
-		if (bypass) {
-			int len = std::min(*inFrames, *outFrames);
-			memcpy(out, in, len * sizeof(Frame<CHANNELS>));
-			*inFrames = len;
-			*outFrames = len;
-			return;
+		assert(in);
+		assert(inFrames);
+		assert(out);
+		assert(outFrames);
+		if (st) {
+			// Resample each channel at a time
+			spx_uint32_t inLen;
+			spx_uint32_t outLen;
+			for (int i = 0; i < channels; i++) {
+				inLen = *inFrames;
+				outLen = *outFrames;
+				int err = speex_resampler_process_float(st, i, ((const float*) in) + i, &inLen, ((float*) out) + i, &outLen);
+				assert(err == RESAMPLER_ERR_SUCCESS);
+			}
+			*inFrames = inLen;
+			*outFrames = outLen;
 		}
-		speex_resampler_process_interleaved_float(state, (const float*)in, (unsigned int*)inFrames, (float*)out, (unsigned int*)outFrames);
-	}
-
-	void reset() {
-		int error = speex_resampler_reset_mem(state);
-		assert(error == RESAMPLER_ERR_SUCCESS);
+		else {
+			// Simply copy the buffer without conversion
+			int frames = min(*inFrames, *outFrames);
+			memcpy(out, in, frames * sizeof(Frame<CHANNELS>));
+			*inFrames = frames;
+			*outFrames = frames;
+		}
 	}
 };
 
