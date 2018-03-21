@@ -41,7 +41,11 @@ dist: all
 	mkdir -p dist/$(SLUG)
 	# Strip and copy plugin binary
 	cp $(TARGET) dist/$(SLUG)/
-	strip dist/$(SLUG)/$(TARGET)
+ifeq ($(ARCH), mac)
+	strip -x dist/$(SLUG)/$(TARGET)
+else
+	strip -s dist/$(SLUG)/$(TARGET)
+endif
 	# Copy distributables
 	cp -R $(DISTRIBUTABLES) dist/$(SLUG)/
 	# Create ZIP package
