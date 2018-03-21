@@ -188,6 +188,7 @@ endif
 
 	# Rack SDK distribution
 	mkdir -p dist/Rack-SDK
+	cp -R LICENSE* res dist/Rack-SDK/
 	cp -R include dist/Rack-SDK/
 	cp *.mk dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
