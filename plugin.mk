@@ -1,11 +1,14 @@
-RACK_DIR ?= ../..
-
-FLAGS += -fPIC \
-	-I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
-
-ifdef SLUG
-	FLAGS += -DSLUG=$(SLUG)
+ifndef RACK_DIR
+$(error RACK_DIR is not defined in Makefile)
 endif
+
+ifndef SLUG
+$(error SLUG is not defined in Makefile)
+endif
+
+FLAGS += -DSLUG=$(SLUG)
+FLAGS += -fPIC
+FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 
 
 include $(RACK_DIR)/arch.mk

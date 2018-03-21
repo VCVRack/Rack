@@ -1,16 +1,21 @@
-ifdef VERSION
-	FLAGS += -DVERSION=$(VERSION)
+ifndef RACK_DIR
+$(error RACK_DIR is not defined in Makefile)
 endif
 
-RACK_DIR ?= .
+ifndef VERSION
+$(error VERSION is not defined in Makefile)
+endif
+
 include $(RACK_DIR)/arch.mk
 
+FLAGS += -DVERSION=$(VERSION)
 # Generate dependency files alongside the object files
 FLAGS += -MMD -MP
 FLAGS += -g
 # Optimization
 FLAGS += -O3 -march=nocona -ffast-math -fno-finite-math-only
 FLAGS += -Wall -Wextra -Wno-unused-parameter
+
 ifneq ($(ARCH), mac)
 	CXXFLAGS += -Wsuggest-override
 endif

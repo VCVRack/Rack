@@ -1,31 +1,6 @@
-LOCAL = $(shell pwd)
+RACK_DIR ?= ..
 
-# Arch-specifics
-include ../arch.mk
-
-FLAGS += -g -O3 -march=nocona
-
-ifeq ($(ARCH),mac)
-	FLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
-	LDFLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
-endif
-
-CFLAGS += $(FLAGS)
-CXXFLAGS += $(FLAGS)
-export CFLAGS
-export CXXFLAGS
-export LDFLAGS
-
-
-# Commands
-WGET = curl -OL
-UNTAR = tar xf
-UNZIP = unzip
-ifeq ($(ARCH),win)
-	CMAKE = cmake -G 'MSYS Makefiles'
-else
-	CMAKE = cmake
-endif
+include $(RACK_DIR)/dep.mk
 
 # Libraries
 ifeq ($(ARCH),lin)
@@ -96,14 +71,14 @@ $(glfw):
 $(jansson):
 	$(WGET) http://www.digip.org/jansson/releases/jansson-2.10.tar.gz
 	$(UNTAR) jansson-2.10.tar.gz
-	cd jansson-2.10 && ./configure --prefix="$(LOCAL)"
+	cd jansson-2.10 && $(CONFIGURE)
 	$(MAKE) -C jansson-2.10
 	$(MAKE) -C jansson-2.10 install
 
 $(libspeexdsp):
 	$(WGET) https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz
 	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
-	cd speexdsp-SpeexDSP-1.2rc3 && ./configure --prefix="$(LOCAL)"
+	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
@@ -117,7 +92,7 @@ $(openssl):
 $(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
 	$(UNTAR) curl-7.56.0.tar.gz
-	cd curl-7.56.0 && ./configure --prefix="$(LOCAL)" \
+	cd curl-7.56.0 && $(CONFIGURE) \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
 		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 \
 		--without-ca-bundle --with-ca-fallback --with-ssl="$(LOCAL)"
@@ -127,14 +102,14 @@ $(libcurl): $(openssl)
 $(libzip):
 	$(WGET) https://nih.at/libzip/libzip-1.2.0.tar.gz
 	$(UNTAR) libzip-1.2.0.tar.gz
-	cd libzip-1.2.0 && ./configure --prefix="$(LOCAL)"
+	cd libzip-1.2.0 && $(CONFIGURE)
 	$(MAKE) -C libzip-1.2.0
 	$(MAKE) -C libzip-1.2.0 install
 
 $(rtmidi):
 	$(WGET) https://vcvrack.com/downloads/dep/rtmidi.tgz
 	$(UNTAR) rtmidi.tgz
-	cd rtmidi && ./configure --prefix="$(LOCAL)"
+	cd rtmidi && $(CONFIGURE)
 	$(MAKE) -C rtmidi
 	$(MAKE) -C rtmidi install
 
