@@ -81,8 +81,7 @@ endif
 
 
 clean:
-	rm -fv libRack.a
-	rm -rfv $(TARGET) build dist
+	rm -rfv $(TARGET) libRack.a Rack.res build dist
 
 # For Windows resources
 %.res: %.rc
