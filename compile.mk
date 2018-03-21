@@ -43,8 +43,8 @@ CXXFLAGS += $(FLAGS)
 
 
 # Derive object files from sources and place them before user-defined objects
-OBJECTS := $(patsubst %, build/%.o, $(SOURCES)) $(OBJECTS)
-DEPS := $(patsubst %, build/%.d, $(SOURCES))
+OBJECTS += $(patsubst %, build/%.o, $(SOURCES))
+DEPENDENCIES := $(patsubst %, build/%.d, $(SOURCES))
 
 
 # Final targets
@@ -52,7 +52,7 @@ DEPS := $(patsubst %, build/%.d, $(SOURCES))
 $(TARGET): $(RESOURCES) $(OBJECTS)
 	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
 
--include $(DEPS)
+-include $(DEPENDENCIES)
 
 build/%.c.o: %.c
 	@mkdir -p $(@D)
