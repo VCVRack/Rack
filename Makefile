@@ -1,5 +1,5 @@
+RACK_DIR ?= .
 VERSION = master
-RACK_DIR = .
 
 FLAGS += \
 	-Iinclude \
