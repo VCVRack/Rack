@@ -37,9 +37,9 @@ CFLAGS += $(FLAGS)
 CXXFLAGS += $(FLAGS)
 
 
-OBJECTS += $(patsubst %, build/%.o, $(SOURCES))
-DEPS = $(patsubst %, build/%.d, $(SOURCES))
-RESOURCES +=
+# Derive object files from sources and place them before user-defined objects
+OBJECTS := $(patsubst %, build/%.o, $(SOURCES)) $(OBJECTS)
+DEPS := $(patsubst %, build/%.d, $(SOURCES))
 
 
 # Final targets
