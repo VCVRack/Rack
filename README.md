@@ -22,24 +22,33 @@ Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system
 ### Mac
 
 Install [Xcode](https://developer.apple.com/xcode/).
-Install [CMake](https://cmake.org/) (for some of Rack's dependencies).
+Using [Homebrew](https://brew.sh/), install the build dependencies.
+```
+brew install git cmake autoconf automake libtool
+```
 
 ### Windows
 
-Install [MSYS2](http://www.msys2.org/) and launch the mingw64 shell (not the default msys2 shell).
-Install build dependencies with the pacman package manger.
-
-	pacman -S git make tar unzip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool
+Install [MSYS2](http://www.msys2.org/) and launch the MinGW 64-bit shell (not the default MSYS shell).
+```
+pacman -S git make tar unzip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool
+```
 
 ### Linux
 
-With your distro's package manager, make sure you have installed `git`, `gcc`, `make`, `cmake`, `tar`, `unzip`, and `curl`.
+On Arch Linux:
+```
+pacman -S git gcc make cmake tar unzip curl
+```
+
+Other distro build instructions coming soon.
 
 ## Building
 
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
 
 Clone this repository with `git clone https://github.com/VCVRack/Rack.git` and `cd Rack`.
+Make sure there are no spaces in your path, as this breaks many build systems.
 
 The `master` branch contains the latest public code and breaks its plugin [API](https://en.wikipedia.org/wiki/Application_programming_interface) and [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) frequently.
 If you wish to build a previous version of Rack which is API/ABI-compatible with an official Rack release, check out the desired branch with `git checkout v0.5` for example.
