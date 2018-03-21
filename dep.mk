@@ -1,27 +1,33 @@
 include $(RACK_DIR)/arch.mk
 
-LOCAL ?= .
-FLAGS += -g -O3 -march=nocona
+DEP_LOCAL ?= .
+DEP_FLAGS += -g -O3 -march=nocona
 
 ifeq ($(ARCH), mac)
-	FLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
-	LDFLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
+	DEP_FLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
+	DEP_LDFLAGS += -mmacosx-version-min=10.7 -stdlib=libc++
 endif
 
-CFLAGS += $(FLAGS)
-CXXFLAGS += $(FLAGS)
-export CFLAGS
-export CXXFLAGS
-export LDFLAGS
+DEP_CFLAGS += $(DEP_FLAGS)
+DEP_CXXFLAGS += $(DEP_FLAGS)
 
 # Commands
 WGET := curl -OL
 UNTAR := tar xf
 UNZIP := unzip
-MAKE := make
-CONFIGURE := ./configure --prefix="$(realpath $(LOCAL))"
+CONFIGURE := ./configure --prefix="$(realpath $(DEP_LOCAL))"
 ifeq ($(ARCH), win)
-	CMAKE := cmake -G 'MSYS Makefiles'
+	CMAKE := cmake -G 'MSYS Makefiles' -DCMAKE_INSTALL_PREFIX="$(realpath $(DEP_LOCAL))"
 else
-	CMAKE := cmake
+	CMAKE := cmake -DCMAKE_INSTALL_PREFIX="$(realpath $(DEP_LOCAL))"
 endif
+
+
+# Export environment for all dependency targets
+$(DEPS): export CFLAGS = $(DEP_CFLAGS)
+$(DEPS): export CXXFLAGS = $(DEP_CXXFLAGS)
+$(DEPS): export LDFLAGS = $(DEP_LDFLAGS)
+
+dep: $(DEPS)
+
+.PHONY: dep

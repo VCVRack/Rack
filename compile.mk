@@ -1,9 +1,9 @@
 ifndef RACK_DIR
-$(error RACK_DIR is not defined in Makefile)
+$(error RACK_DIR is not defined)
 endif
 
 ifndef VERSION
-$(error VERSION is not defined in Makefile)
+$(error VERSION is not defined)
 endif
 
 include $(RACK_DIR)/arch.mk
@@ -51,7 +51,6 @@ DEPS := $(patsubst %, build/%.d, $(SOURCES))
 
 $(TARGET): $(RESOURCES) $(OBJECTS)
 	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
-
 
 -include $(DEPS)
 

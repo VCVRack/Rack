@@ -1,9 +1,9 @@
 ifndef RACK_DIR
-$(error RACK_DIR is not defined in Makefile)
+$(error RACK_DIR is not defined)
 endif
 
 ifndef SLUG
-$(error SLUG is not defined in Makefile)
+$(error SLUG is not defined)
 endif
 
 FLAGS += -DSLUG=$(SLUG)
