@@ -22,7 +22,6 @@ else
 	CMAKE := cmake -DCMAKE_INSTALL_PREFIX="$(realpath $(DEP_LOCAL))"
 endif
 
-
 # Export environment for all dependency targets
 $(DEPS): export CFLAGS = $(DEP_CFLAGS)
 $(DEPS): export CXXFLAGS = $(DEP_CXXFLAGS)
