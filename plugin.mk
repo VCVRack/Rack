@@ -26,7 +26,7 @@ ifeq ($(ARCH), win)
 endif
 
 
-all: $(RESOURCES) $(TARGET)
+all: $(TARGET)
 
 include $(RACK_DIR)/compile.mk
 
@@ -38,11 +38,12 @@ dist: all
 	mkdir -p dist/$(SLUG)
 	# Strip and copy plugin binary
 	cp $(TARGET) dist/$(SLUG)/
-	strip -s dist/$(SLUG)/$(TARGET)
+	strip dist/$(SLUG)/$(TARGET)
 	# Copy distributables
 	cp -R $(DISTRIBUTABLES) dist/$(SLUG)/
 	# Create ZIP package
 	cd dist && zip -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
+
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all

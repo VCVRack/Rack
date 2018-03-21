@@ -39,12 +39,13 @@ CXXFLAGS += $(FLAGS)
 
 OBJECTS += $(patsubst %, build/%.o, $(SOURCES))
 DEPS = $(patsubst %, build/%.d, $(SOURCES))
+RESOURCES +=
 
 
 # Final targets
 
-$(TARGET): $(OBJECTS)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+$(TARGET): $(RESOURCES) $(OBJECTS)
+	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
 
 
 -include $(DEPS)
