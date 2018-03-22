@@ -14,11 +14,7 @@ using namespace rack;
 
 int main(int argc, char* argv[]) {
 	randomInit();
-
-#ifdef RELEASE
-	std::string logFilename = assetLocal("log.txt");
-	gLogFile = fopen(logFilename.c_str(), "w");
-#endif
+	loggerInit();
 
 	info("Rack %s", gApplicationVersion.c_str());
 
@@ -64,10 +60,7 @@ int main(int argc, char* argv[]) {
 	bridgeDestroy();
 	engineDestroy();
 	pluginDestroy();
-
-#ifdef RELEASE
-	fclose(gLogFile);
-#endif
+	loggerDestroy();
 
 	return 0;
 }

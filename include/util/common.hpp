@@ -150,7 +150,8 @@ void openBrowser(std::string url);
 // logger.cpp
 ////////////////////
 
-extern FILE *gLogFile;
+void loggerInit();
+void loggerDestroy();
 void debug(const char *format, ...);
 void info(const char *format, ...);
 void warn(const char *format, ...);
