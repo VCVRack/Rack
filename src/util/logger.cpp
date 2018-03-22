@@ -30,7 +30,7 @@ static void printLog(const char *type, const char *format, va_list args) {
 	auto nowTime = std::chrono::high_resolution_clock::now();
 	int duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime).count();
 	printTimestamp();
-	fprintf(logFile, "[%s %.03f] ", duration / 1000.0, type);
+	fprintf(logFile, "[%.03f %s] ", duration / 1000.0, type);
 	vfprintf(logFile, format, args);
 	fprintf(logFile, "\n");
 	fflush(logFile);
