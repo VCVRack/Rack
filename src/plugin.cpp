@@ -53,8 +53,11 @@ void Plugin::addModel(Model *model) {
 	models.push_back(model);
 }
 
+////////////////////
+// private API
+////////////////////
 
-static int loadPlugin(std::string path) {
+static bool loadPlugin(std::string path) {
 	std::string libraryFilename;
 #if ARCH_LIN
 	libraryFilename = path + "/" + "plugin.so";
@@ -64,6 +67,12 @@ static int loadPlugin(std::string path) {
 	libraryFilename = path + "/" + "plugin.dylib";
 #endif
 
+	// Check file existence
+	if (!systemIsFile(libraryFilename)) {
+		warn("Plugin file %s does not exist", libraryFilename.c_str());
+		return false;
+	}
+
 	// Load dynamic/shared library
 #if ARCH_WIN
 	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
@@ -71,14 +80,14 @@ static int loadPlugin(std::string path) {
 	SetErrorMode(0);
 	if (!handle) {
 		int error = GetLastError();
-		warn("Failed to load library %s: %d", libraryFilename.c_str(), error);
-		return -1;
+		warn("Failed to load library %s: code %d", libraryFilename.c_str(), error);
+		return false;
 	}
 #else
 	void *handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
 	if (!handle) {
 		warn("Failed to load library %s: %s", libraryFilename.c_str(), dlerror());
-		return -1;
+		return false;
 	}
 #endif
 
@@ -92,7 +101,7 @@ static int loadPlugin(std::string path) {
 #endif
 	if (!initCallback) {
 		warn("Failed to read init() symbol in %s", libraryFilename.c_str());
-		return -2;
+		return false;
 	}
 
 	// Construct and initialize Plugin instance
@@ -102,20 +111,19 @@ static int loadPlugin(std::string path) {
 	initCallback(plugin);
 
 	// Reject plugin if slug already exists
-	for (Plugin *p : gPlugins) {
-		if (plugin->slug == p->slug) {
-			warn("Plugin \"%s\" is already loaded, not attempting to load it again", p->slug.c_str());
-			// TODO
-			// Fix memory leak with `plugin` here
-			return -1;
-		}
+	Plugin *oldPlugin = pluginGetPlugin(plugin->slug);
+	if (oldPlugin) {
+		warn("Plugin \"%s\" is already loaded, not attempting to load it again", plugin->slug.c_str());
+		// TODO
+		// Fix memory leak with `plugin` here
+		return false;
 	}
 
 	// Add plugin to list
 	gPlugins.push_back(plugin);
 	info("Loaded plugin %s", libraryFilename.c_str());
 
-	return 0;
+	return true;
 }
 
 static bool syncPlugin(json_t *pluginJ, bool dryRun) {
@@ -212,6 +220,147 @@ static bool syncPlugin(json_t *pluginJ, bool dryRun) {
 	return true;
 }
 
+static void loadPlugins(std::string path) {
+	std::string message;
+	for (std::string pluginPath : systemListEntries(path)) {
+		if (!systemIsDirectory(pluginPath))
+			continue;
+		if (!loadPlugin(pluginPath)) {
+			message += stringf("Could not load plugin %s\n", pluginPath.c_str());
+		}
+	}
+	if (!message.empty()) {
+		message += "See log for details.";
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+	}
+}
+
+static int extractZipHandle(zip_t *za, const char *dir) {
+	int err = 0;
+	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
+		zip_stat_t zs;
+		err = zip_stat_index(za, i, 0, &zs);
+		if (err)
+			return err;
+		int nameLen = strlen(zs.name);
+
+		char path[MAXPATHLEN];
+		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
+
+		if (zs.name[nameLen - 1] == '/') {
+			err = mkdir(path, 0755);
+			if (err && errno != EEXIST)
+				return err;
+		}
+		else {
+			zip_file_t *zf = zip_fopen_index(za, i, 0);
+			if (!zf)
+				return 1;
+
+			FILE *outFile = fopen(path, "wb");
+			if (!outFile)
+				continue;
+
+			while (1) {
+				char buffer[1<<15];
+				int len = zip_fread(zf, buffer, sizeof(buffer));
+				if (len <= 0)
+					break;
+				fwrite(buffer, 1, len, outFile);
+			}
+
+			err = zip_fclose(zf);
+			if (err)
+				return err;
+			fclose(outFile);
+		}
+	}
+	return 0;
+}
+
+static int extractZip(const char *filename, const char *path) {
+	int err = 0;
+	zip_t *za = zip_open(filename, 0, &err);
+	if (!za)
+		return 1;
+	defer({
+		zip_close(za);
+	});
+	if (err)
+		return err;
+
+	err = extractZipHandle(za, path);
+	return err;
+}
+
+static void extractPackages(std::string path) {
+	std::string message;
+
+	for (std::string packagePath : systemListEntries(path)) {
+		if (stringExtension(packagePath) == "zip") {
+			info("Extracting package %s", packagePath.c_str());
+			// Extract package
+			if (extractZip(packagePath.c_str(), path.c_str())) {
+				message += stringf("Could not extract package %s\n", packagePath.c_str());
+				continue;
+			}
+			// Remove package
+			remove(packagePath.c_str());
+		}
+	}
+	if (!message.empty()) {
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+	}
+}
+
+////////////////////
+// public API
+////////////////////
+
+void pluginInit() {
+	tagsInit();
+
+	// Load core
+	// This function is defined in core.cpp
+	Plugin *corePlugin = new Plugin();
+	init(corePlugin);
+	gPlugins.push_back(corePlugin);
+
+	// Get local plugins directory
+	std::string localPlugins = assetLocal("plugins");
+	mkdir(localPlugins.c_str(), 0755);
+
+#if RELEASE
+	// Copy Fundamental package to plugins directory if folder does not exist
+	std::string fundamentalDest = localPlugins + "/Fundamental.zip";
+	if (!systemIsDirectory(localPlugins + "/Fundamental") && !systemIsFile(fundamentalDest)) {
+		systemCopy(assetGlobal("Fundamental.zip"), fundamentalDest);
+	}
+#endif
+
+	// Extract packages and load plugins
+	extractPackages(localPlugins);
+	loadPlugins(localPlugins);
+}
+
+void pluginDestroy() {
+	for (Plugin *plugin : gPlugins) {
+		// Free library handle
+#if ARCH_WIN
+		if (plugin->handle)
+			FreeLibrary((HINSTANCE)plugin->handle);
+#else
+		if (plugin->handle)
+			dlclose(plugin->handle);
+#endif
+
+		// For some reason this segfaults.
+		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
+		// delete plugin;
+	}
+	gPlugins.clear();
+}
+
 bool pluginSync(bool dryRun) {
 	if (gToken.empty())
 		return false;
@@ -296,142 +445,6 @@ bool pluginSync(bool dryRun) {
 	return available;
 }
 
-static void loadPlugins(std::string path) {
-	DIR *dir = opendir(path.c_str());
-	if (dir) {
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			if (d->d_name[0] == '.')
-				continue;
-			loadPlugin(path + "/" + d->d_name);
-		}
-		closedir(dir);
-	}
-}
-
-static int extractZipHandle(zip_t *za, const char *dir) {
-	int err = 0;
-	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
-		zip_stat_t zs;
-		err = zip_stat_index(za, i, 0, &zs);
-		if (err)
-			return err;
-		int nameLen = strlen(zs.name);
-
-		char path[MAXPATHLEN];
-		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
-
-		if (zs.name[nameLen - 1] == '/') {
-			err = mkdir(path, 0755);
-			if (err && errno != EEXIST)
-				return err;
-		}
-		else {
-			zip_file_t *zf = zip_fopen_index(za, i, 0);
-			if (!zf)
-				return 1;
-
-			FILE *outFile = fopen(path, "wb");
-			if (!outFile)
-				continue;
-
-			while (1) {
-				char buffer[4096];
-				int len = zip_fread(zf, buffer, sizeof(buffer));
-				if (len <= 0)
-					break;
-				fwrite(buffer, 1, len, outFile);
-			}
-
-			err = zip_fclose(zf);
-			if (err)
-				return err;
-			fclose(outFile);
-		}
-	}
-	return 0;
-}
-
-static int extractZip(const char *filename, const char *dir) {
-	int err = 0;
-	zip_t *za = zip_open(filename, 0, &err);
-	if (!za)
-		return 1;
-
-	if (!err) {
-		err = extractZipHandle(za, dir);
-	}
-
-	zip_close(za);
-	return err;
-}
-
-static void extractPackages(std::string path) {
-	std::string message;
-
-	for (std::string packagePath : systemListDirectory(path)) {
-		if (stringExtension(packagePath) == "zip") {
-			// Extract package
-			if (!extractZip(packagePath.c_str(), path.c_str())) {
-				message += stringf("Could not extract package %s\n", path);
-				continue;
-			}
-			// Remove package
-			remove(packagePath.c_str());
-		}
-	}
-	if (!message.empty()) {
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
-	}
-}
-
-////////////////////
-// plugin API
-////////////////////
-
-void pluginInit() {
-	tagsInit();
-
-	// TODO
-	// If `<local>/plugins/Fundamental` doesn't exist, unzip global Fundamental.zip package into `<local>/plugins`
-
-	// TODO
-	// Find all ZIP packages in `<local>/plugins` and unzip them.
-	// Display error if failure
-
-	// Load core
-	// This function is defined in core.cpp
-	Plugin *corePlugin = new Plugin();
-	init(corePlugin);
-	gPlugins.push_back(corePlugin);
-
-	// Load plugins from local directory
-	std::string localPlugins = assetLocal("plugins");
-	mkdir(localPlugins.c_str(), 0755);
-	info("Unzipping plugins from %s", localPlugins.c_str());
-	extractPackages(localPlugins);
-	info("Loading plugins from %s", localPlugins.c_str());
-	loadPlugins(localPlugins);
-}
-
-void pluginDestroy() {
-	for (Plugin *plugin : gPlugins) {
-		// Free library handle
-#if ARCH_WIN
-		if (plugin->handle)
-			FreeLibrary((HINSTANCE)plugin->handle);
-#else
-		if (plugin->handle)
-			dlclose(plugin->handle);
-#endif
-
-		// For some reason this segfaults.
-		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
-		// delete plugin;
-	}
-	gPlugins.clear();
-}
-
 void pluginLogIn(std::string email, std::string password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
@@ -505,8 +518,6 @@ Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
 	}
 	return NULL;
 }
-
-
 
 
 } // namespace rack
