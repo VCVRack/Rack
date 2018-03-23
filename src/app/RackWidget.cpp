@@ -69,7 +69,7 @@ void RackWidget::reset() {
 }
 
 void RackWidget::openDialog() {
-	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
+	std::string dir = lastPath.empty() ? assetLocal("") : stringDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
 	if (path) {
 		loadPatch(path);
@@ -88,13 +88,13 @@ void RackWidget::saveDialog() {
 }
 
 void RackWidget::saveAsDialog() {
-	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
+	std::string dir = lastPath.empty() ? assetLocal("") : stringDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcv", NULL);
 
 	if (path) {
 		std::string pathStr = path;
 		free(path);
-		std::string extension = extractExtension(pathStr);
+		std::string extension = stringExtension(pathStr);
 		if (extension.empty()) {
 			pathStr += ".vcv";
 		}
@@ -230,7 +230,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
 	// (We now use Module::params/inputs/outputs indices.)
 	int legacy = 0;
-	if (startsWith(version, "0.3.") || startsWith(version, "0.4.") || startsWith(version, "0.5.") || version == "" || version == "dev") {
+	if (stringStartsWith(version, "0.3.") || stringStartsWith(version, "0.4.") || stringStartsWith(version, "0.5.") || version == "" || version == "dev") {
 		legacy = 1;
 		message += "This patch was created with Rack 0.5 or earlier. Saving it will convert it to a Rack 0.6+ patch.\n\n";
 	}
