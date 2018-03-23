@@ -53,6 +53,7 @@ struct SyncButton : Button {
 
 
 PluginManagerWidget::PluginManagerWidget() {
+	
 	box.size.y = BND_WIDGET_HEIGHT;
 	float margin = 5;
 

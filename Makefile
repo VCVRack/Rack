@@ -132,8 +132,7 @@ ifeq ($(ARCH), mac)
 
 	otool -L $(BUNDLE)/Contents/MacOS/$(TARGET)
 
-	mkdir -p $(BUNDLE)/Contents/Resources/plugins
-	cp -R plugins/Fundamental/dist/Fundamental $(BUNDLE)/Contents/Resources/plugins
+	cp plugins/Fundamental/dist/Fundamental-*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
 	# Make DMG image
 	cd dist && ln -s /Applications Applications
 	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack-$(VERSION)-$(ARCH).dmg
@@ -157,8 +156,7 @@ ifeq ($(ARCH), win)
 	cp dep/bin/librtaudio.dll dist/Rack/
 	cp dep/bin/libcrypto-1_1-x64.dll dist/Rack/
 	cp dep/bin/libssl-1_1-x64.dll dist/Rack/
-	mkdir -p dist/Rack/plugins
-	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 	# Make NSIS installer
@@ -179,8 +177,7 @@ ifeq ($(ARCH), lin)
 	cp dep/lib/librtmidi.so.4 dist/Rack/
 	cp dep/lib/libssl.so.1.1 dist/Rack/
 	cp dep/lib/libcrypto.so.1.1 dist/Rack/
-	mkdir -p dist/Rack/plugins
-	cp -R plugins/Fundamental/dist/Fundamental dist/Rack/plugins/
+	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
