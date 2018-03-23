@@ -326,7 +326,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 	// Display a message if we have something to say
 	if (!message.empty()) {
-		osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 }
 
