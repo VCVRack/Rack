@@ -126,17 +126,18 @@ inline float DEPRECATED randomf() {return randomUniform();}
 
 /** Converts a printf format string and optional arguments into a std::string */
 std::string stringf(const char *format, ...);
-std::string lowercase(std::string s);
-std::string uppercase(std::string s);
+std::string stringLowercase(std::string s);
+std::string stringUppercase(std::string s);
 
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
-std::string ellipsize(std::string s, size_t len);
-bool startsWith(std::string str, std::string prefix);
-bool endsWith(std::string str, std::string suffix);
+std::string stringEllipsize(std::string s, size_t len);
+bool stringStartsWith(std::string str, std::string prefix);
+bool stringEndsWith(std::string str, std::string suffix);
 
-std::string extractDirectory(std::string path);
-std::string extractFilename(std::string path);
-std::string extractExtension(std::string path);
+/** Extracts portions of a path */
+std::string stringDirectory(std::string path);
+std::string stringFilename(std::string path);
+std::string stringExtension(std::string path);
 
 ////////////////////
 // Operating-system specific utilities

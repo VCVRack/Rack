@@ -90,7 +90,7 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 void RackScene::onPathDrop(EventPathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string& firstPath = e.paths.front();
-		if (extractExtension(firstPath) == "vcv") {
+		if (stringExtension(firstPath) == "vcv") {
 			gRackWidget->loadPatch(firstPath);
 			e.consumed = true;
 		}

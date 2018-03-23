@@ -24,47 +24,47 @@ std::string stringf(const char *format, ...) {
 	return s;
 }
 
-std::string lowercase(std::string s) {
+std::string stringLowercase(std::string s) {
 	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 	return s;
 }
 
-std::string uppercase(std::string s) {
+std::string stringUppercase(std::string s) {
 	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 	return s;
 }
 
-std::string ellipsize(std::string s, size_t len) {
+std::string stringEllipsize(std::string s, size_t len) {
 	if (s.size() <= len)
 		return s;
 	else
 		return s.substr(0, len - 3) + "...";
 }
 
-bool startsWith(std::string str, std::string prefix) {
+bool stringStartsWith(std::string str, std::string prefix) {
 	return str.substr(0, prefix.size()) == prefix;
 }
 
-bool endsWith(std::string str, std::string suffix) {
+bool stringEndsWith(std::string str, std::string suffix) {
 	return str.substr(str.size() - suffix.size(), suffix.size()) == suffix;
 }
 
-std::string extractDirectory(std::string path) {
+std::string stringDirectory(std::string path) {
 	char *pathDup = strdup(path.c_str());
 	std::string directory = dirname(pathDup);
 	free(pathDup);
 	return directory;
 }
 
-std::string extractFilename(std::string path) {
+std::string stringFilename(std::string path) {
 	char *pathDup = strdup(path.c_str());
 	std::string filename = basename(pathDup);
 	free(pathDup);
 	return filename;
 }
 
-std::string extractExtension(std::string path) {
-	const char *ext = strrchr(path.c_str(), '.');
+std::string stringExtension(std::string path) {
+	const char *ext = strrchr(stringFilename(path).c_str(), '.');
 	if (!ext)
 		return "";
 	return ext + 1;

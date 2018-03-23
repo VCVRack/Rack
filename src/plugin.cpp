@@ -370,7 +370,7 @@ static void extractPackages(std::string path) {
 	std::string message;
 
 	for (std::string packagePath : systemListDirectory(path)) {
-		if (endsWith(packagePath, ".zip")) {
+		if (stringExtension(packagePath) == "zip") {
 			// Extract package
 			if (!extractZip(packagePath.c_str(), path.c_str())) {
 				message += stringf("Could not extract package %s\n", path);
