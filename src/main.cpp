@@ -10,11 +10,7 @@
 
 #include <unistd.h>
 
-#if defined(ARCH_WIN)
-	#include <windows.h>
-#else
-	#include <glob.h>
-#endif
+#include <dirent.h>
 
 
 using namespace rack;
@@ -22,31 +18,17 @@ using namespace rack;
 
 std::vector<std::string> filesystemListDirectory(std::string path) {
 	std::vector<std::string> filenames;
-#if defined(ARCH_WIN)
-	WIN32_FIND_DATA findData;
-	HANDLE findHandle = FindFirstFile((path + "/*").c_str(), &findData);
-	if (findHandle != INVALID_HANDLE_VALUE) {
-		do {
-			std::string filename = findData.cFileName;
-			if (filename == "." || filename == "..")
-				continue;
-			filenames.push_back(path + "/" + filename);
-		} while (FindNextFile(findHandle, &findData));
-		FindClose(findHandle);
-	}
-#else
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
 		struct dirent *d;
 		while ((d = readdir(dir))) {
-			std::string filename = d->f_name;
+			std::string filename = d->d_name;
 			if (filename == "." || filename == "..")
 				continue;
 			filenames.push_back(path + "/" + filename);
 		}
 		closedir(dir);
 	}
-#endif
 	return filenames;
 }
 
