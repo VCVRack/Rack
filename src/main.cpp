@@ -10,35 +10,11 @@
 
 #include <unistd.h>
 
-#include <dirent.h>
-
 
 using namespace rack;
 
 
-std::vector<std::string> filesystemListDirectory(std::string path) {
-	std::vector<std::string> filenames;
-	DIR *dir = opendir(path.c_str());
-	if (dir) {
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			std::string filename = d->d_name;
-			if (filename == "." || filename == "..")
-				continue;
-			filenames.push_back(path + "/" + filename);
-		}
-		closedir(dir);
-	}
-	return filenames;
-}
-
 int main(int argc, char* argv[]) {
-
-	for (std::string filename : filesystemListDirectory("plugins")) {
-		debug("%s", filename.c_str());
-	}
-	return 0;
-
 	randomInit();
 	loggerInit();
 

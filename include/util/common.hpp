@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #include <string>
+#include <vector>
 #include <condition_variable>
 #include <mutex>
 
@@ -15,23 +16,28 @@
 // Handy macros
 ////////////////////
 
-/** Surrounds raw text with quotes
+/** Concatenates two literals or two macros
 Example:
-	printf("Hello " STRINGIFY(world))
-will expand to
-	printf("Hello " "world")
-and of course the C++ lexer/parser will then concatenate the string literals
+	#define COUNT 42
+	CONCAT(myVariable, COUNT)
+expands to
+	myVariable42
 */
-#define STRINGIFY(x) #x
-/** Converts a macro to a string literal
+#define CONCAT_LITERAL(x, y) x ## y
+#define CONCAT(x, y) CONCAT_LITERAL(x, y)
+
+/** Surrounds raw text with quotes
 Example:
 	#define NAME "world"
 	printf("Hello " TOSTRING(NAME))
-will expand to
+expands to
 	printf("Hello " "world")
+and of course the C++ lexer/parser then concatenates the string literals.
 */
-#define TOSTRING(x) STRINGIFY(x)
+#define TOSTRING_LITERAL(x) #x
+#define TOSTRING(x) TOSTRING_LITERAL(x)
 
+/** Produces the length of a static array in number of elements */
 #define LENGTHOF(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 /** Reserve space for `count` enums starting with `name`.
@@ -95,10 +101,7 @@ DeferWrapper<F> deferWrapper(F f) {
 	return DeferWrapper<F>(f);
 }
 
-#define DEFER_1(x, y) x##y
-#define DEFER_2(x, y) DEFER_1(x, y)
-#define DEFER_3(x)    DEFER_2(x, __COUNTER__)
-#define defer(code) auto DEFER_3(_defer_) = deferWrapper([&]() code)
+#define defer(code) auto CONCAT(x, __COUNTER__) = deferWrapper([&]() code)
 
 ////////////////////
 // Random number generator
@@ -129,6 +132,7 @@ std::string uppercase(std::string s);
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
 std::string ellipsize(std::string s, size_t len);
 bool startsWith(std::string str, std::string prefix);
+bool endsWith(std::string str, std::string suffix);
 
 std::string extractDirectory(std::string path);
 std::string extractFilename(std::string path);
@@ -139,11 +143,13 @@ std::string extractExtension(std::string path);
 // system.cpp
 ////////////////////
 
+std::vector<std::string> systemListDirectory(std::string path);
+
 /** Opens a URL, also happens to work with PDFs and folders.
 Shell injection is possible, so make sure the URL is trusted or hard coded.
 May block, so open in a new thread.
 */
-void openBrowser(std::string url);
+void systemOpenBrowser(std::string url);
 
 ////////////////////
 // Debug logger
