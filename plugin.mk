@@ -15,17 +15,17 @@ include $(RACK_DIR)/arch.mk
 
 ifeq ($(ARCH), lin)
 	LDFLAGS += -shared
-	TARGET = plugin.so
+	TARGET := plugin.so
 endif
 
 ifeq ($(ARCH), mac)
 	LDFLAGS += -shared -undefined dynamic_lookup
-	TARGET = plugin.dylib
+	TARGET := plugin.dylib
 endif
 
 ifeq ($(ARCH), win)
 	LDFLAGS += -shared -L$(RACK_DIR) -lRack
-	TARGET = plugin.dll
+	TARGET := plugin.dll
 endif
 
 

@@ -22,7 +22,7 @@ ifeq ($(ARCH), lin)
 		-lpthread -lGL -ldl \
 		$(shell pkg-config --libs gtk+-2.0) \
 		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
-	TARGET = Rack
+	TARGET := Rack
 endif
 
 ifeq ($(ARCH), mac)
@@ -31,8 +31,8 @@ ifeq ($(ARCH), mac)
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
 		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
-	TARGET = Rack
-	BUNDLE = dist/$(TARGET).app
+	TARGET := Rack
+	BUNDLE := dist/$(TARGET).app
 endif
 
 ifeq ($(ARCH), win)
@@ -42,8 +42,8 @@ ifeq ($(ARCH), win)
 		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
 		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl \
 		-Wl,-Bstatic -ljansson -lspeexdsp
-	TARGET = Rack.exe
-	OBJECTS = Rack.res
+	TARGET := Rack.exe
+	OBJECTS += Rack.res
 endif
 
 
@@ -184,9 +184,9 @@ endif
 
 	# Rack SDK distribution
 	mkdir -p dist/Rack-SDK
-	cp -R LICENSE* res dist/Rack-SDK/
-	cp -R include dist/Rack-SDK/
+	cp LICENSE* dist/Rack-SDK/
 	cp *.mk dist/Rack-SDK/
+	cp -R include dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
 ifeq ($(ARCH), win)
@@ -196,7 +196,7 @@ endif
 
 
 # Obviously this will only work if you have the private keys to my server
-UPLOAD_URL = vortico@vcvrack.com:files/
+UPLOAD_URL := vortico@vcvrack.com:files/
 upload: dist distplugins
 ifeq ($(ARCH), mac)
 	rsync dist/*.dmg $(UPLOAD_URL) -zP
