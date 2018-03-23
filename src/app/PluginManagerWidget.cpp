@@ -62,7 +62,9 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct RegisterButton : Button {
 			void onAction(EventAction &e) override {
-				std::thread t(openBrowser, "https://vcvrack.com/");
+				std::thread t([&]() {
+					systemOpenBrowser("https://vcvrack.com/");
+				});
 				t.detach();
 			}
 		};
@@ -126,7 +128,9 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct ManageButton : Button {
 			void onAction(EventAction &e) override {
-				std::thread t(openBrowser, "https://vcvrack.com/");
+				std::thread t([&]() {
+					systemOpenBrowser("https://vcvrack.com/");
+				});
 				t.detach();
 			}
 		};

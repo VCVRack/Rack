@@ -1,5 +1,10 @@
-#include <stdio.h>
+#include "plugin.hpp"
+#include "app.hpp"
+#include "asset.hpp"
+#include "util/request.hpp"
+#include "osdialog.h"
 
+#include <stdio.h>
 #include <assert.h>
 #include <string.h>
 #include <unistd.h>
@@ -13,7 +18,7 @@
 #include <zip.h>
 #include <jansson.h>
 
-#if defined(ARCH_WIN)
+#if ARCH_WIN
 	#include <windows.h>
 	#include <direct.h>
 	#define mkdir(_dir, _perms) _mkdir(_dir)
@@ -22,13 +27,9 @@
 #endif
 #include <dirent.h>
 
-#include "plugin.hpp"
-#include "app.hpp"
-#include "asset.hpp"
-#include "util/request.hpp"
-
 
 namespace rack {
+
 
 std::list<Plugin*> gPlugins;
 std::string gToken;
@@ -73,7 +74,7 @@ static int loadPlugin(std::string path) {
 		warn("Failed to load library %s: %d", libraryFilename.c_str(), error);
 		return -1;
 	}
-#elif ARCH_LIN || ARCH_MAC
+#else
 	void *handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
 	if (!handle) {
 		warn("Failed to load library %s: %s", libraryFilename.c_str(), dlerror());
@@ -86,7 +87,7 @@ static int loadPlugin(std::string path) {
 	InitCallback initCallback;
 #if ARCH_WIN
 	initCallback = (InitCallback) GetProcAddress(handle, "init");
-#elif ARCH_LIN || ARCH_MAC
+#else
 	initCallback = (InitCallback) dlsym(handle, "init");
 #endif
 	if (!initCallback) {
@@ -115,80 +116,6 @@ static int loadPlugin(std::string path) {
 	info("Loaded plugin %s", libraryFilename.c_str());
 
 	return 0;
-}
-
-static void loadPlugins(std::string path) {
-	DIR *dir = opendir(path.c_str());
-	if (dir) {
-		struct dirent *d;
-		while ((d = readdir(dir))) {
-			if (d->d_name[0] == '.')
-				continue;
-			loadPlugin(path + "/" + d->d_name);
-		}
-		closedir(dir);
-	}
-}
-
-////////////////////
-// plugin helpers
-////////////////////
-
-static int extractZipHandle(zip_t *za, const char *dir) {
-	int err = 0;
-	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
-		zip_stat_t zs;
-		err = zip_stat_index(za, i, 0, &zs);
-		if (err)
-			return err;
-		int nameLen = strlen(zs.name);
-
-		char path[MAXPATHLEN];
-		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
-
-		if (zs.name[nameLen - 1] == '/') {
-			err = mkdir(path, 0755);
-			if (err && errno != EEXIST)
-				return err;
-		}
-		else {
-			zip_file_t *zf = zip_fopen_index(za, i, 0);
-			if (!zf)
-				return 1;
-
-			FILE *outFile = fopen(path, "wb");
-			if (!outFile)
-				continue;
-
-			while (1) {
-				char buffer[4096];
-				int len = zip_fread(zf, buffer, sizeof(buffer));
-				if (len <= 0)
-					break;
-				fwrite(buffer, 1, len, outFile);
-			}
-
-			err = zip_fclose(zf);
-			if (err)
-				return err;
-			fclose(outFile);
-		}
-	}
-	return 0;
-}
-
-static int extractZip(const char *filename, const char *dir) {
-	int err = 0;
-	zip_t *za = zip_open(filename, 0, &err);
-	if (!za)
-		return 1;
-
-	if (!err) {
-		err = extractZipHandle(za, dir);
-	}
-
-	zip_close(za);
-	return err;
 }
 
 static bool syncPlugin(json_t *pluginJ, bool dryRun) {
@@ -223,11 +150,11 @@ static bool syncPlugin(json_t *pluginJ, bool dryRun) {
 
 	json_t *downloadsJ = json_object_get(pluginJ, "downloads");
 	if (downloadsJ) {
-#if defined(ARCH_WIN)
+#if ARCH_WIN
 	#define DOWNLOADS_ARCH "win"
-#elif defined(ARCH_MAC)
+#elif ARCH_MAC
 	#define DOWNLOADS_ARCH "mac"
-#elif defined(ARCH_LIN)
+#elif ARCH_LIN
 	#define DOWNLOADS_ARCH "lin"
 #endif
 		json_t *archJ = json_object_get(downloadsJ, DOWNLOADS_ARCH);
@@ -279,15 +206,6 @@ static bool syncPlugin(json_t *pluginJ, bool dryRun) {
 			warn("Plugin %s does not match expected SHA256 checksum", slug.c_str());
 			return false;
 		}
-	}
-
-	// Unzip file
-	int err = extractZip(zipPath.c_str(), pluginsDir.c_str());
-	if (!err) {
-		// Delete zip
-		remove(zipPath.c_str());
-		// Load plugin
-		// loadPlugin(pluginPath);
 	}
 
 	downloadName = "";
@@ -378,6 +296,95 @@ bool pluginSync(bool dryRun) {
 	return available;
 }
 
+static void loadPlugins(std::string path) {
+	DIR *dir = opendir(path.c_str());
+	if (dir) {
+		struct dirent *d;
+		while ((d = readdir(dir))) {
+			if (d->d_name[0] == '.')
+				continue;
+			loadPlugin(path + "/" + d->d_name);
+		}
+		closedir(dir);
+	}
+}
+
+static int extractZipHandle(zip_t *za, const char *dir) {
+	int err = 0;
+	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
+		zip_stat_t zs;
+		err = zip_stat_index(za, i, 0, &zs);
+		if (err)
+			return err;
+		int nameLen = strlen(zs.name);
+
+		char path[MAXPATHLEN];
+		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
+
+		if (zs.name[nameLen - 1] == '/') {
+			err = mkdir(path, 0755);
+			if (err && errno != EEXIST)
+				return err;
+		}
+		else {
+			zip_file_t *zf = zip_fopen_index(za, i, 0);
+			if (!zf)
+				return 1;
+
+			FILE *outFile = fopen(path, "wb");
+			if (!outFile)
+				continue;
+
+			while (1) {
+				char buffer[4096];
+				int len = zip_fread(zf, buffer, sizeof(buffer));
+				if (len <= 0)
+					break;
+				fwrite(buffer, 1, len, outFile);
+			}
+
+			err = zip_fclose(zf);
+			if (err)
+				return err;
+			fclose(outFile);
+		}
+	}
+	return 0;
+}
+
+static int extractZip(const char *filename, const char *dir) {
+	int err = 0;
+	zip_t *za = zip_open(filename, 0, &err);
+	if (!za)
+		return 1;
+
+	if (!err) {
+		err = extractZipHandle(za, dir);
+	}
+
+	zip_close(za);
+	return err;
+}
+
+static void extractPackages(std::string path) {
+	std::string message;
+
+	for (std::string packagePath : systemListDirectory(path)) {
+		if (endsWith(packagePath, ".zip")) {
+			// Extract package
+			if (!extractZip(packagePath.c_str(), path.c_str())) {
+				message += stringf("Could not extract package %s\n", path);
+				continue;
+			}
+			// Remove package
+			remove(packagePath.c_str());
+		}
+	}
+	if (!message.empty()) {
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+	}
+}
+
 ////////////////////
 // plugin API
 ////////////////////
@@ -401,6 +408,8 @@ void pluginInit() {
 	// Load plugins from local directory
 	std::string localPlugins = assetLocal("plugins");
 	mkdir(localPlugins.c_str(), 0755);
+	info("Unzipping plugins from %s", localPlugins.c_str());
+	extractPackages(localPlugins);
 	info("Loading plugins from %s", localPlugins.c_str());
 	loadPlugins(localPlugins);
 }
@@ -408,10 +417,10 @@ void pluginInit() {
 void pluginDestroy() {
 	for (Plugin *plugin : gPlugins) {
 		// Free library handle
-#if defined(ARCH_WIN)
+#if ARCH_WIN
 		if (plugin->handle)
 			FreeLibrary((HINSTANCE)plugin->handle);
-#elif defined(ARCH_LIN) || defined(ARCH_MAC)
+#else
 		if (plugin->handle)
 			dlclose(plugin->handle);
 #endif

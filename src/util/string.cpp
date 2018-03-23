@@ -45,6 +45,10 @@ bool startsWith(std::string str, std::string prefix) {
 	return str.substr(0, prefix.size()) == prefix;
 }
 
+bool endsWith(std::string str, std::string suffix) {
+	return str.substr(str.size() - suffix.size(), suffix.size()) == suffix;
+}
+
 std::string extractDirectory(std::string path) {
 	char *pathDup = strdup(path.c_str());
 	std::string directory = dirname(pathDup);

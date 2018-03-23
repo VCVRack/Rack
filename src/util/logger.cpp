@@ -11,16 +11,16 @@ static auto startTime = std::chrono::high_resolution_clock::now();
 
 
 void loggerInit() {
-	#ifdef RELEASE
-		std::string logFilename = assetLocal("log.txt");
-		gLogFile = fopen(logFilename.c_str(), "w");
-	#endif
+#ifdef RELEASE
+	std::string logFilename = assetLocal("log.txt");
+	logFile = fopen(logFilename.c_str(), "w");
+#endif
 }
 
 void loggerDestroy() {
-	#ifdef RELEASE
-		fclose(gLogFile);
-	#endif
+#ifdef RELEASE
+	fclose(logFile);
+#endif
 }
 
 static void printTimestamp() {
