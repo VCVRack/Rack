@@ -1,33 +1,11 @@
 #include "app.hpp"
 #include "window.hpp"
 #include "util/request.hpp"
-#include "osdialog.h"
 #include <string.h>
 #include <thread>
 
 
 namespace rack {
-
-
-static std::string newVersion = "";
-
-
-#if defined(RELEASE)
-static void checkVersion() {
-	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/version", NULL);
-
-	if (resJ) {
-		json_t *versionJ = json_object_get(resJ, "version");
-		if (versionJ) {
-			const char *version = json_string_value(versionJ);
-			if (version && strlen(version) > 0 && version != gApplicationVersion) {
-				newVersion = version;
-			}
-		}
-		json_decref(resJ);
-	}
-}
-#endif
 
 
 RackScene::RackScene() {
@@ -46,12 +24,6 @@ RackScene::RackScene() {
 	gToolbar = new Toolbar();
 	addChild(gToolbar);
 	scrollWidget->box.pos.y = gToolbar->box.size.y;
-
-	// Check for new version
-#if defined(RELEASE)
-	std::thread versionThread(checkVersion);
-	versionThread.detach();
-#endif
 }
 
 void RackScene::step() {
@@ -68,17 +40,6 @@ void RackScene::step() {
 	Scene::step();
 
 	zoomWidget->box.size = gRackWidget->box.size.mult(zoomWidget->zoom);
-
-	// Version popup message
-	if (!newVersion.empty()) {
-		std::string versionMessage = stringf("Rack %s is available.\n\nYou have Rack %s.\n\nWould you like to download the new version on the website?", newVersion.c_str(), gApplicationVersion.c_str());
-		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, versionMessage.c_str())) {
-			std::thread t(openBrowser, "https://vcvrack.com/");
-			t.detach();
-			windowClose();
-		}
-		newVersion = "";
-	}
 }
 
 void RackScene::draw(NVGcontext *vg) {
@@ -129,7 +90,7 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 void RackScene::onPathDrop(EventPathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string& firstPath = e.paths.front();
-		if (extractExtension(firstPath) == "vcv") {
+		if (stringExtension(firstPath) == "vcv") {
 			gRackWidget->loadPatch(firstPath);
 			e.consumed = true;
 		}

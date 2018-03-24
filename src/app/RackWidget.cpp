@@ -69,7 +69,7 @@ void RackWidget::reset() {
 }
 
 void RackWidget::openDialog() {
-	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
+	std::string dir = lastPath.empty() ? assetLocal("") : stringDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
 	if (path) {
 		loadPatch(path);
@@ -88,13 +88,13 @@ void RackWidget::saveDialog() {
 }
 
 void RackWidget::saveAsDialog() {
-	std::string dir = lastPath.empty() ? assetLocal("") : extractDirectory(lastPath);
+	std::string dir = lastPath.empty() ? assetLocal("") : stringDirectory(lastPath);
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcv", NULL);
 
 	if (path) {
 		std::string pathStr = path;
 		free(path);
-		std::string extension = extractExtension(pathStr);
+		std::string extension = stringExtension(pathStr);
 		if (extension.empty()) {
 			pathStr += ".vcv";
 		}
@@ -225,15 +225,14 @@ void RackWidget::fromJson(json_t *rootJ) {
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
 		version = json_string_value(versionJ);
-		if (!version.empty() && gApplicationVersion != version)
-			message += stringf("This patch was created with Rack %s. Saving it will convert it to a Rack %s patch.\n\n", version.c_str(), gApplicationVersion.c_str());
 	}
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
 	// (We now use Module::params/inputs/outputs indices.)
 	int legacy = 0;
-	if (startsWith(version, "0.3.") || startsWith(version, "0.4.") || startsWith(version, "0.5.") || version == "" || version == "dev") {
+	if (stringStartsWith(version, "0.3.") || stringStartsWith(version, "0.4.") || stringStartsWith(version, "0.5.") || version == "" || version == "dev") {
 		legacy = 1;
+		message += "This patch was created with Rack 0.5 or earlier. Saving it will convert it to a Rack 0.6+ patch.\n\n";
 	}
 	if (legacy) {
 		info("Loading patch using legacy mode %d", legacy);
@@ -246,9 +245,10 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t moduleId;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
-		// Set legacy property
-		if (legacy)
-			json_object_set_new(moduleJ, "legacy", json_integer(legacy));
+		// Add "legacy" property if in legacy mode
+		if (legacy) {
+			json_object_set(moduleJ, "legacy", json_integer(legacy));
+		}
 
 		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
 		if (!pluginSlugJ) continue;
@@ -259,7 +259,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 		Model *model = pluginGetModel(pluginSlug, modelSlug);
 		if (!model) {
-			message += stringf("Could not find module \"%s\" in plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
+			message += stringf("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 			continue;
 		}
 
@@ -292,6 +292,8 @@ void RackWidget::fromJson(json_t *rootJ) {
 		Port *outputPort = NULL;
 		Port *inputPort = NULL;
 		if (legacy && legacy <= 1) {
+			// Legacy 1 mode
+			// The index of the "ports" array is the index of the Port in the `outputs` and `inputs` vector.
 			outputPort = outputModuleWidget->outputs[outputId];
 			inputPort = inputModuleWidget->inputs[inputId];
 		}
@@ -324,7 +326,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 	// Display a message if we have something to say
 	if (!message.empty()) {
-		osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 }
 

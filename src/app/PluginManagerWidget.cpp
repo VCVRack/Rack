@@ -53,6 +53,7 @@ struct SyncButton : Button {
 
 
 PluginManagerWidget::PluginManagerWidget() {
+	
 	box.size.y = BND_WIDGET_HEIGHT;
 	float margin = 5;
 
@@ -62,7 +63,9 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct RegisterButton : Button {
 			void onAction(EventAction &e) override {
-				std::thread t(openBrowser, "https://vcvrack.com/");
+				std::thread t([&]() {
+					systemOpenBrowser("https://vcvrack.com/");
+				});
 				t.detach();
 			}
 		};
@@ -126,7 +129,9 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		struct ManageButton : Button {
 			void onAction(EventAction &e) override {
-				std::thread t(openBrowser, "https://vcvrack.com/");
+				std::thread t([&]() {
+					systemOpenBrowser("https://vcvrack.com/");
+				});
 				t.detach();
 			}
 		};
