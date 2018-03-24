@@ -25,7 +25,7 @@ namespace rack {
 
 std::string assetGlobal(std::string filename) {
 	std::string dir;
-#if defined(RELEASE)
+#if RELEASE
 #if ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
 	assert(bundle);
@@ -53,7 +53,7 @@ std::string assetGlobal(std::string filename) {
 
 std::string assetLocal(std::string filename) {
 	std::string dir;
-#if defined(RELEASE)
+#if RELEASE
 #if ARCH_MAC
 	// Get home directory
 	struct passwd *pw = getpwuid(getuid());

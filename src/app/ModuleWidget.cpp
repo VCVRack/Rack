@@ -114,6 +114,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	json_t *paramJ;
 	json_array_foreach(paramsJ, i, paramJ) {
 		if (legacy && legacy <= 1) {
+			// Legacy 1 mode
 			// The index in the array we're iterating is the index of the ParamWidget in the params vector.
 			if (i < params.size()) {
 				// Create upgraded version of param JSON object

@@ -18,8 +18,8 @@ static ModelTag sTagFilter = NO_TAG;
 
 
 bool isMatch(std::string s, std::string search) {
-	s = lowercase(s);
-	search = lowercase(search);
+	s = stringLowercase(s);
+	search = stringLowercase(search);
 	return (s.find(search) != std::string::npos);
 }
 
