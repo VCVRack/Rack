@@ -28,5 +28,10 @@ $(DEPS): export CXXFLAGS = $(DEP_CXXFLAGS)
 $(DEPS): export LDFLAGS = $(DEP_LDFLAGS)
 
 dep: $(DEPS)
+	@echo
+	@echo "#######################################"
+	@echo "# All dependencies built successfully #"
+	@echo "#######################################"
+	@echo
 
 .PHONY: dep
