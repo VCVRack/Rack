@@ -94,6 +94,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 				}
 			}
 		}
+		gTempWidget = NULL;
 	}
 	else if (action == GLFW_RELEASE) {
 		// onMouseUp
@@ -122,6 +123,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 			gDraggedWidget = NULL;
 			gDragHoveredWidget = NULL;
 		}
+		gTempWidget = NULL;
 	}
 }
 
@@ -214,6 +216,7 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 			}
 		}
 	}
+	gTempWidget = NULL;
 	if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
 		// TODO
 		// Define a new global called gScrollWidget, which remembers the widget where middle-click was first pressed
