@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "midi.hpp"
+#include "dsp/digital.hpp"
 
 #include <algorithm>
 
@@ -26,10 +27,10 @@ struct QuadMIDIToCVInterface : Module {
 
 	enum PolyMode {
 		ROTATE_MODE,
-        /* Added REUSE option that reuses a channel when receiving the same note.
-        Good when using sustain pedal so it doesn't "stack" unisons ... not sure this is the best name but it is descriptive...*/
+		// Added REUSE option that reuses a channel when receiving the same note.
+		// Good when using sustain pedal so it doesn't "stack" unisons ... not sure this is the best name but it is descriptive...
 		REUSE_MODE,
-        	RESET_MODE,
+		RESET_MODE,
 		REASSIGN_MODE,
 		UNISON_MODE,
 		NUM_MODES
@@ -42,18 +43,15 @@ struct QuadMIDIToCVInterface : Module {
 	};
 
 	NoteData noteData[128];
-    // cachedNotes : UNISON_MODE and REASSIGN_MODE cache all played notes. The other polyModes cache stealed notes (after 4th one).
-    	std::vector<uint8_t> cachedNotes;
+	// cachedNotes : UNISON_MODE and REASSIGN_MODE cache all played notes. The other polyModes cache stolen notes (after the 4th one).
+	std::vector<uint8_t> cachedNotes;
 	uint8_t notes[4];
 	bool gates[4];
-    // gates set to TRUE by pedal and current gate. FALSE by pedal.
-    	bool pedalgates[4];
+	// gates set to TRUE by pedal and current gate. FALSE by pedal.
+	bool pedalgates[4];
 	bool pedal;
 	int rotateIndex;
-    	int stealIndex;
-    
-    // retrigger for stolen notes (when gates already open)
-    	PulseGenerator reTrigger[4];
+	int stealIndex;
 
 	QuadMIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS), cachedNotes(128) {
 		onReset();
@@ -80,34 +78,34 @@ struct QuadMIDIToCVInterface : Module {
 		for (int i = 0; i < 4; i++) {
 			notes[i] = 60;
 			gates[i] = false;
-            		pedalgates[i] = false;
+			pedalgates[i] = false;
 		}
 		pedal = false;
 		rotateIndex = -1;
-        	cachedNotes.clear();
+		cachedNotes.clear();
 	}
-    
-    	int getPolyIndex (int nowIndex) {
-        	for (int i = 0; i < 4; i++) {
-            		nowIndex ++;
-		    	if (nowIndex > 3)
+
+	int getPolyIndex(int nowIndex) {
+		for (int i = 0; i < 4; i++) {
+			nowIndex++;
+			if (nowIndex > 3)
 				nowIndex = 0;
-		    	if (!(gates[nowIndex] || pedalgates[nowIndex])) {
+			if (!(gates[nowIndex] || pedalgates[nowIndex])) {
 				stealIndex = nowIndex;
 				return nowIndex;
-		    	}
+			}
 		}
-		// All taken = steal (stealIndex always rotate)
-		stealIndex ++;
+		// All taken = steal (stealIndex always rotates)
+		stealIndex++;
 		if (stealIndex > 3)
-		    	stealIndex = 0;
+			stealIndex = 0;
 		if ((polyMode < REASSIGN_MODE) && (gates[stealIndex]))
 			cachedNotes.push_back(notes[stealIndex]);
 		return stealIndex;
 	}
 
 	void pressNote(uint8_t note) {
-        	// Set notes and gates
+		// Set notes and gates
 		switch (polyMode) {
 			case ROTATE_MODE: {
 				rotateIndex = getPolyIndex(rotateIndex);
@@ -141,8 +139,7 @@ struct QuadMIDIToCVInterface : Module {
 					notes[i] = note;
 					gates[i] = true;
 					pedalgates[i] = pedal;
-					//...it could be just "legato" for Unison mode without  this...
-					reTrigger[i].trigger(1e-3);
+					// reTrigger[i].trigger(1e-3);
 				}
 				return;
 			} break;
@@ -150,104 +147,99 @@ struct QuadMIDIToCVInterface : Module {
 			default: break;
 		}
 		// Set notes and gates
-		if (gates[rotateIndex] || pedalgates[rotateIndex])
-			reTrigger[rotateIndex].trigger(1e-3);
+		// if (gates[rotateIndex] || pedalgates[rotateIndex])
+		// 	reTrigger[rotateIndex].trigger(1e-3);
 		notes[rotateIndex] = note;
 		gates[rotateIndex] = true;
 		pedalgates[rotateIndex] = pedal;
-    	}
+	}
 
 	void releaseNote(uint8_t note) {
-        	// Remove the note
-        	auto it = std::find(cachedNotes.begin(), cachedNotes.end(), note);
-        	if (it != cachedNotes.end())
-        		cachedNotes.erase(it);
-        
+		// Remove the note
+		auto it = std::find(cachedNotes.begin(), cachedNotes.end(), note);
+		if (it != cachedNotes.end())
+			cachedNotes.erase(it);
+
 		switch (polyMode) {
-            		case REASSIGN_MODE: {
-                		int held = static_cast<int>(cachedNotes.size());
-                		if (held > 4)
-                    			held = 4;
-                		for (int i = 0; i < held; i++) {
-                    			if (!pedalgates[i])
-                        			notes[i] = cachedNotes.at(i);
-                    			pedalgates[i] = pedal;
-                		}
-                		for (int i = held; i < 4; i++) {
-                    			gates[i] = false;
-                		}
-            		} break;
-                
-			case UNISON_MODE: {
-                		if (!cachedNotes.empty()) {
-                    			uint8_t backnote = cachedNotes.back();
-                    			for (int i = 0; i < 4; i++) {
-                        			notes[i] = backnote;
-                        			gates[i] = true;
-                    			}
-                		}
-                		else {
-                    			for (int i = 0; i < 4; i++) {
-                        			gates[i] = false;
-                    			}
-                		}
+			case REASSIGN_MODE: {
+				for (int i = 0; i < 4; i++) {
+					if (i < (int) cachedNotes.size()) {
+						if (!pedalgates[i])
+							notes[i] = cachedNotes[i];
+						pedalgates[i] = pedal;
+					}
+					else {
+						gates[i] = false;
+					}
+				}
 			} break;
-                
-            		// default ROTATE_MODE REUSE_MODE RESET_MODE
-            		default: {
-                		for (int i = 0; i < 4; i++) {
-                    			if (notes[i] == note) {
-                        			if (pedalgates[i]){
-                            				gates[i] = false;
-                        			}
-                        			else if (!cachedNotes.empty()) {
-                            				notes[i] = cachedNotes.back();
-                            				cachedNotes.pop_back();
-                        			}
-                        			else {
-                            				gates[i] = false;
-                        			}
-                    			}
-                		}
-            		} break;
+
+			case UNISON_MODE: {
+				if (!cachedNotes.empty()) {
+					uint8_t backnote = cachedNotes.back();
+					for (int i = 0; i < 4; i++) {
+						notes[i] = backnote;
+						gates[i] = true;
+					}
+				}
+				else {
+					for (int i = 0; i < 4; i++) {
+						gates[i] = false;
+					}
+				}
+			} break;
+
+			// default ROTATE_MODE REUSE_MODE RESET_MODE
+			default: {
+				for (int i = 0; i < 4; i++) {
+					if (notes[i] == note) {
+						if (pedalgates[i]) {
+							gates[i] = false;
+						}
+						else if (!cachedNotes.empty()) {
+							notes[i] = cachedNotes.back();
+							cachedNotes.pop_back();
+						}
+						else {
+							gates[i] = false;
+						}
+					}
+				}
+			} break;
 		}
-    	}
-    
+	}
+
 	void pressPedal() {
 		pedal = true;
-        	for (int i = 0; i < 4; i++) {
-            		pedalgates[i] = gates[i];
-        	}
+		for (int i = 0; i < 4; i++) {
+			pedalgates[i] = gates[i];
+		}
 	}
 
 	void releasePedal() {
-        	pedal = false;
-        	/* When pedal is off: Recover notes for still-pressed keys (if any), 
-		...after they were already being "cycled" out by pedal-sustained notes
-         	*/
-        
-        	for (int i = 0; i < 4; i++) {
-            		pedalgates[i] = false;
-            		if (!cachedNotes.empty()) {
-                		if (polyMode < REASSIGN_MODE) {
-                    			notes[i] = cachedNotes.back();
-                    			cachedNotes.pop_back();
-                    			gates[i] = true;
-                		}
-            		}
-        	}
-        	if (polyMode == REASSIGN_MODE) {
-        		int held = static_cast<int>(cachedNotes.size());
-        		if (held > 4)
-            			held = 4;
-        		for (int i = 0; i < held; i++) {
-            			notes[i] = cachedNotes.at(i);
-            			gates[i] = true;
-        		}
-            		for (int i = held; i < 4; i++) {
-                		gates[i] = false;
-            		}
-        	}
+		pedal = false;
+		// When pedal is off, recover notes for pressed keys (if any) after they were already being "cycled" out by pedal-sustained notes.
+		for (int i = 0; i < 4; i++) {
+			pedalgates[i] = false;
+			if (!cachedNotes.empty()) {
+				if (polyMode < REASSIGN_MODE) {
+					notes[i] = cachedNotes.back();
+					cachedNotes.pop_back();
+					gates[i] = true;
+				}
+			}
+		}
+		if (polyMode == REASSIGN_MODE) {
+			for (int i = 0; i < 4; i++) {
+				if (i < (int) cachedNotes.size()) {
+					notes[i] = cachedNotes[i];
+					gates[i] = true;
+				}
+				else {
+					gates[i] = false;
+				}
+			}
+		}
 	}
 
 	void step() override {
@@ -258,7 +250,7 @@ struct QuadMIDIToCVInterface : Module {
 
 		for (int i = 0; i < 4; i++) {
 			uint8_t lastNote = notes[i];
-           		uint8_t lastGate = ((gates[i] || pedalgates[i]) && (!(reTrigger[i].process(engineGetSampleTime()))));
+			uint8_t lastGate = (gates[i] || pedalgates[i]);
 			outputs[CV_OUTPUT + i].value = (lastNote - 60) / 12.f;
 			outputs[GATE_OUTPUT + i].value = lastGate ? 10.f : 0.f;
 			outputs[VELOCITY_OUTPUT + i].value = rescale(noteData[lastNote].velocity, 0, 127, 0.f, 10.f);
@@ -268,9 +260,9 @@ struct QuadMIDIToCVInterface : Module {
 
 	void processMessage(MidiMessage msg) {
 		// filter MIDI channel
-        	if ((midiInput.channel > -1) && (midiInput.channel != msg.channel()))
-            		return;
-            
+		if ((midiInput.channel > -1) && (midiInput.channel != msg.channel()))
+			return;
+
 		switch (msg.status()) {
 			// note off
 			case 0x8: {
@@ -358,7 +350,13 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 
 		menu->addChild(MenuEntry::create());
 		menu->addChild(MenuLabel::create("Polyphony mode"));
-		std::vector<std::string> polyModeNames = {"Rotate", "Reset", "Reassign", "Unison"};
+		std::vector<std::string> polyModeNames = {
+			"Rotate",
+			"Reuse",
+			"Reset",
+			"Reassign",
+			"Unison"
+		};
 		for (int i = 0; i < QuadMIDIToCVInterface::NUM_MODES; i++) {
 			PolyphonyItem *item = MenuItem::create<PolyphonyItem>(polyModeNames[i], CHECKMARK(module->polyMode == i));
 			item->module = module;
