@@ -9,8 +9,8 @@ namespace rack {
 
 void bridgeInit();
 void bridgeDestroy();
-void bridgeMidiSubscribe(int channel, MidiIO *midi);
-void bridgeMidiUnsubscribe(int channel, MidiIO *midi);
+void bridgeMidiSubscribe(int channel, MidiInput *midi);
+void bridgeMidiUnsubscribe(int channel, MidiInput *midi);
 void bridgeAudioSubscribe(int channel, AudioIO *audio);
 void bridgeAudioUnsubscribe(int channel, AudioIO *audio);
 

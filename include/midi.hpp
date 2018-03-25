@@ -55,12 +55,11 @@ struct MidiIO {
 
 	int getDeviceCount();
 	std::string getDeviceName(int device);
-	void setDevice(int device);
+	virtual void setDevice(int device) {}
 
 	std::string getChannelName(int channel);
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
-	virtual void onMessage(MidiMessage message) {}
 };
 
 
@@ -69,6 +68,8 @@ struct MidiInput : MidiIO {
 	MidiInput();
 	~MidiInput();
 	void setDriver(int driver) override;
+	void setDevice(int device) override;
+	virtual void onMessage(MidiMessage message) {}
 };
 
 
@@ -86,6 +87,7 @@ struct MidiOutput : MidiIO {
 	MidiOutput();
 	~MidiOutput();
 	void setDriver(int driver) override;
+	void setDevice(int device) override;
 };
 
 

@@ -3,7 +3,7 @@
 #include "dsp/ringbuffer.hpp"
 
 #include <unistd.h>
-#ifdef ARCH_WIN
+#if ARCH_WIN
 	#include <winsock2.h>
 #else
 	#include <sys/socket.h>
@@ -23,7 +23,7 @@ namespace rack {
 struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
-static MidiIO *midiListeners[BRIDGE_NUM_PORTS] = {};
+static MidiInput *midiListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverRunning = false;
 
@@ -44,7 +44,7 @@ struct BridgeClientConnection {
 		if (length <= 0)
 			return false;
 
-#ifdef ARCH_LIN
+#if ARCH_LIN
 		int flags = MSG_NOSIGNAL;
 #else
 		int flags = 0;
@@ -71,7 +71,7 @@ struct BridgeClientConnection {
 		if (length <= 0)
 			return false;
 
-#ifdef ARCH_LIN
+#if ARCH_LIN
 		int flags = MSG_NOSIGNAL;
 #else
 		int flags = 0;
@@ -188,7 +188,7 @@ struct BridgeClientConnection {
 
 	void setPort(int port) {
 		// Unbind from existing port
-		if (this->port >= 0 && connections[this->port] == this) {
+		if (0 <= this->port && connections[this->port] == this) {
 			connections[this->port] = NULL;
 		}
 
@@ -239,7 +239,7 @@ struct BridgeClientConnection {
 
 static void clientRun(int client) {
 	defer({
-#ifdef ARCH_WIN
+#if ARCH_WIN
 		if (shutdown(client, SD_SEND)) {
 			warn("Bridge client shutdown() failed");
 		}
@@ -253,7 +253,7 @@ static void clientRun(int client) {
 #endif
 	});
 
-#ifdef ARCH_MAC
+#if ARCH_MAC
 	// Avoid SIGPIPE
 	int flag = 1;
 	if (setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int))) {
@@ -263,7 +263,7 @@ static void clientRun(int client) {
 #endif
 
 	// Disable non-blocking
-#ifdef ARCH_WIN
+#if ARCH_WIN
 	unsigned long blockingMode = 0;
 	if (ioctlsocket(client, FIONBIO, &blockingMode)) {
 		warn("Bridge client ioctlsocket() failed");
@@ -284,7 +284,7 @@ static void clientRun(int client) {
 
 static void serverConnect() {
 	// Initialize sockets
-#ifdef ARCH_WIN
+#if ARCH_WIN
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
 		warn("Bridge server WSAStartup() failed");
@@ -300,7 +300,7 @@ static void serverConnect() {
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(BRIDGE_PORT);
-#ifdef ARCH_WIN
+#if ARCH_WIN
 	addr.sin_addr.s_addr = inet_addr(BRIDGE_HOST);
 #else
 	inet_pton(AF_INET, BRIDGE_HOST, &addr.sin_addr);
@@ -313,8 +313,17 @@ static void serverConnect() {
 		return;
 	}
 	defer({
-		close(server);
+		if (close(server)) {
+			warn("Bridge server close() failed");
+			return;
+		}
+		info("Bridge server closed");
 	});
+
+#if ARCH_MAC || ARCH_LIN
+	int reuseAddrFlag = 1;
+	setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &reuseAddrFlag, sizeof(reuseAddrFlag));
+#endif
 
 	// Bind socket to address
 	if (bind(server, (struct sockaddr*) &addr, sizeof(addr))) {
@@ -330,7 +339,7 @@ static void serverConnect() {
 	info("Bridge server started");
 
 	// Enable non-blocking
-#ifdef ARCH_WIN
+#if ARCH_WIN
 	unsigned long blockingMode = 1;
 	if (ioctlsocket(server, FIONBIO, &blockingMode)) {
 		warn("Bridge server ioctlsocket() failed");
@@ -354,8 +363,6 @@ static void serverConnect() {
 		std::thread clientThread(clientRun, client);
 		clientThread.detach();
 	}
-
-	info("Bridge server closed");
 }
 
 static void serverRun() {
@@ -375,18 +382,16 @@ void bridgeDestroy() {
 	serverThread.join();
 }
 
-void bridgeMidiSubscribe(int port, MidiIO *midi) {
+void bridgeMidiSubscribe(int port, MidiInput *midi) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	// Check if a Midi is already subscribed on the port
 	if (midiListeners[port])
 		return;
 	midiListeners[port] = midi;
-	if (connections[port])
-		connections[port]->refreshAudio();
 }
 
-void bridgeMidiUnsubscribe(int port, MidiIO *midi) {
+void bridgeMidiUnsubscribe(int port, MidiInput *midi) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	if (midiListeners[port] != midi)
