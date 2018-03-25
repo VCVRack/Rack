@@ -69,7 +69,7 @@ build/%.m.o: %.m | dep
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Do nothing by default
+# Dummy target
 dep:
 
 .PHONY: dep

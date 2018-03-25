@@ -9,11 +9,13 @@ ifdef RELEASE
 	FLAGS += -DRELEASE=$(RELEASE)
 endif
 
+include arch.mk
+
+
+# Sources and build flags
+
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 SOURCES += dep/nanovg/src/nanovg.c
-
-
-include arch.mk
 
 ifeq ($(ARCH), lin)
 	SOURCES += dep/osdialog/osdialog_gtk2.c
@@ -47,7 +49,9 @@ ifeq ($(ARCH), win)
 endif
 
 
-all: $(TARGET)
+# Convenience targets
+
+all: dep $(TARGET)
 
 dep:
 	$(MAKE) -C dep
@@ -79,20 +83,18 @@ ifeq ($(ARCH), lin)
 	LD_LIBRARY_PATH=dep/lib perf record --call-graph dwarf ./Rack
 endif
 
-
 clean:
 	rm -rfv $(TARGET) libRack.a Rack.res build dist
 
+ifeq ($(ARCH), win)
 # For Windows resources
 %.res: %.rc
 	windres $^ -O coff -o $@
-
-include compile.mk
+endif
 
 
 dist: all
 	rm -rf dist
-
 	# Rack distribution
 	$(MAKE) -C plugins/Fundamental dist
 
@@ -225,6 +227,11 @@ distplugins:
 
 plugins:
 	for f in plugins/*; do (cd "$$f" && ${CMD}); done
+
+
+# Includes
+
+include compile.mk
 
 .PHONY: all dep run debug clean dist allplugins cleanplugins distplugins plugins
 .DEFAULT_GOAL := all
