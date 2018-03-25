@@ -345,6 +345,7 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 			QuadMIDIToCVInterface::PolyMode polyMode;
 			void onAction(EventAction &e) override {
 				module->polyMode = polyMode;
+				module->onReset();
 			}
 		};
 
