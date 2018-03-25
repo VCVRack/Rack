@@ -6,7 +6,7 @@ FLAGS += \
 	-Idep/include -Idep/lib/libzip/include
 
 ifdef RELEASE
-	FLAGS += -DRELEASE=$(RELEASE)
+	FLAGS += -DRELEASE
 endif
 
 include arch.mk
@@ -29,7 +29,7 @@ endif
 
 ifeq ($(ARCH), mac)
 	SOURCES += dep/osdialog/osdialog_mac.m
-	CXXFLAGS += -DAPPLE -stdlib=libc++
+	CXXFLAGS += -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
 		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
