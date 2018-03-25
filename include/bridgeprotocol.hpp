@@ -7,9 +7,9 @@ namespace rack {
 
 // TODO Change driver and port number to something less common
 /** Driver ID in AudioIO and MidiIO */
-#define BRIDGE_DRIVER -5000
+#define BRIDGE_DRIVER -12512
 #define BRIDGE_HOST "127.0.0.1"
-#define BRIDGE_PORT 5000
+#define BRIDGE_PORT 12512
 #define BRIDGE_NUM_PORTS 16
 /** Number of VST/AU automation parameters */
 #define BRIDGE_NUM_PARAMS 16
