@@ -227,3 +227,4 @@ plugins:
 	for f in plugins/*; do (cd "$$f" && ${CMD}); done
 
 .PHONY: all dep run debug clean dist allplugins cleanplugins distplugins plugins
+.DEFAULT_GOAL := all

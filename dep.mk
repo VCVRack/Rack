@@ -1,5 +1,6 @@
 include $(RACK_DIR)/arch.mk
 
+# The install location for `make install`
 DEP_LOCAL ?= .
 DEP_FLAGS += -g -O3 -march=nocona
 
@@ -28,10 +29,5 @@ $(DEPS): export CXXFLAGS = $(DEP_CXXFLAGS)
 $(DEPS): export LDFLAGS = $(DEP_LDFLAGS)
 
 dep: $(DEPS)
-	@echo
-	@echo "#######################################"
-	@echo "# All dependencies built successfully #"
-	@echo "#######################################"
-	@echo
 
 .PHONY: dep
