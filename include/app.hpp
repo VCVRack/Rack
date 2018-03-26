@@ -11,6 +11,7 @@ static const float MM_PER_IN = 25.4;
 
 namespace rack {
 
+
 inline float in2px(float inches) {
 	return inches * SVG_DPI;
 }
