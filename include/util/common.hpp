@@ -101,7 +101,7 @@ DeferWrapper<F> deferWrapper(F f) {
 	return DeferWrapper<F>(f);
 }
 
-#define defer(code) auto CONCAT(x, __COUNTER__) = deferWrapper([&]() code)
+#define defer(code) auto CONCAT(_defer_, __COUNTER__) = deferWrapper([&]() code)
 
 ////////////////////
 // Random number generator
