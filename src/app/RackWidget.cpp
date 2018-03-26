@@ -232,7 +232,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 	int legacy = 0;
 	if (stringStartsWith(version, "0.3.") || stringStartsWith(version, "0.4.") || stringStartsWith(version, "0.5.") || version == "" || version == "dev") {
 		legacy = 1;
-		message += "This patch was created with Rack 0.5 or earlier. Saving it will convert it to a Rack 0.6+ patch.\n\n";
 	}
 	if (legacy) {
 		info("Loading patch using legacy mode %d", legacy);
