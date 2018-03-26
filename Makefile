@@ -94,6 +94,9 @@ endif
 
 
 dist: all
+ifndef RELEASE
+	exit 1 # Must enable RELEASE for dist target
+endif
 	rm -rf dist
 	# Rack distribution
 	$(MAKE) -C plugins/Fundamental dist
@@ -141,6 +144,9 @@ ifeq ($(ARCH), mac)
 endif
 ifeq ($(ARCH), win)
 	mkdir -p dist/Rack
+	mkdir -p dist/Rack/Bridge
+	cp Bridge/vst/dist/VCV-Bridge-64.dll dist/Rack/Bridge/
+	cp Bridge/vst/dist/VCV-Bridge-32.dll dist/Rack/Bridge/
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	strip dist/Rack/$(TARGET)

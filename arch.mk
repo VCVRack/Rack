@@ -3,17 +3,22 @@
 ifndef ARCH
 
 MACHINE = $(shell gcc -dumpmachine)
-ifneq (,$(findstring linux,$(MACHINE)))
+ifneq (, $(findstring linux, $(MACHINE)))
 	# Linux
 	ARCH = lin
-else ifneq (,$(findstring apple,$(MACHINE)))
+else ifneq (, $(findstring apple, $(MACHINE)))
 	# Mac
 	ARCH = mac
-else ifneq (,$(findstring mingw,$(MACHINE)))
+else ifneq (, $(findstring mingw, $(MACHINE)))
 	# Windows
 	ARCH = win
+ifneq ( ,$(findstring x86_64, $(MACHINE)))
+	BITS = 64
+else ifneq (, $(findstring i686, $(MACHINE)))
+	BITS = 32
+endif
 else
-	$(error Could not determine machine type. Try hacking around in arch.mk)
+$(error Could not determine machine type. Try hacking around in arch.mk)
 endif
 
 endif
