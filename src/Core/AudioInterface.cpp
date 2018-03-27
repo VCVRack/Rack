@@ -9,11 +9,6 @@
 #include "dsp/samplerate.hpp"
 #include "dsp/ringbuffer.hpp"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsuggest-override"
-#include <RtAudio.h>
-#pragma GCC diagnostic pop
-
 
 #define AUDIO_OUTPUTS 8
 #define AUDIO_INPUTS 8
