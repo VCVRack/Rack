@@ -3,7 +3,9 @@
 #include <jansson.h>
 
 #pragma GCC diagnostic push
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wsuggest-override"
+#endif
 #include <RtAudio.h>
 #pragma GCC diagnostic pop
 
