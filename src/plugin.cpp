@@ -235,27 +235,35 @@ static void loadPlugins(std::string path) {
 	}
 }
 
+/** Returns 0 if successful */
 static int extractZipHandle(zip_t *za, const char *dir) {
-	int err = 0;
+	int err;
 	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
 		zip_stat_t zs;
 		err = zip_stat_index(za, i, 0, &zs);
-		if (err)
+		if (err) {
+			warn("zip_stat_index() failed: error %d", err);
 			return err;
+		}
 		int nameLen = strlen(zs.name);
 
 		char path[MAXPATHLEN];
 		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
 
 		if (zs.name[nameLen - 1] == '/') {
-			err = mkdir(path, 0755);
-			if (err && errno != EEXIST)
-				return err;
+			if (mkdir(path, 0755)) {
+				if (errno != EEXIST) {
+					warn("mkdir(%s) failed: error %d", path, errno);
+					return errno;
+				}
+			}
 		}
 		else {
 			zip_file_t *zf = zip_fopen_index(za, i, 0);
-			if (!zf)
-				return 1;
+			if (!zf) {
+				warn("zip_fopen_index() failed");
+				return -1;
+			}
 
 			FILE *outFile = fopen(path, "wb");
 			if (!outFile)
@@ -270,24 +278,27 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 			}
 
 			err = zip_fclose(zf);
-			if (err)
+			if (err) {
+				warn("zip_fclose() failed: error %d", err);
 				return err;
+			}
 			fclose(outFile);
 		}
 	}
 	return 0;
 }
 
+/** Returns 0 if successful */
 static int extractZip(const char *filename, const char *path) {
-	int err = 0;
+	int err;
 	zip_t *za = zip_open(filename, 0, &err);
-	if (!za)
-		return 1;
+	if (!za) {
+		warn("Could not open zip %s: error %d", filename, err);
+		return err;
+	}
 	defer({
 		zip_close(za);
 	});
-	if (err)
-		return err;
 
 	err = extractZipHandle(za, path);
 	return err;
@@ -297,15 +308,18 @@ static void extractPackages(std::string path) {
 	std::string message;
 
 	for (std::string packagePath : systemListEntries(path)) {
-		if (stringExtension(packagePath) == "zip") {
-			info("Extracting package %s", packagePath.c_str());
-			// Extract package
-			if (extractZip(packagePath.c_str(), path.c_str())) {
-				message += stringf("Could not extract package %s\n", packagePath.c_str());
-				continue;
-			}
-			// Remove package
-			remove(packagePath.c_str());
+		if (stringExtension(packagePath) != "zip")
+			continue;
+		info("Extracting package %s", packagePath.c_str());
+		// Extract package
+		if (extractZip(packagePath.c_str(), path.c_str())) {
+			warn("Package %s failed to extract", packagePath.c_str());
+			message += stringf("Could not extract package %s\n", packagePath.c_str());
+			continue;
+		}
+		// Remove package
+		if (remove(packagePath.c_str())) {
+			warn("Could not delete file %s: error %d", packagePath.c_str(), errno);
 		}
 	}
 	if (!message.empty()) {
@@ -332,9 +346,11 @@ void pluginInit() {
 
 #if RELEASE
 	// Copy Fundamental package to plugins directory if folder does not exist
-	std::string fundamentalDest = localPlugins + "/Fundamental.zip";
-	if (!systemIsDirectory(localPlugins + "/Fundamental") && !systemIsFile(fundamentalDest)) {
-		systemCopy(assetGlobal("Fundamental.zip"), fundamentalDest);
+	std::string fundamentalSrc = assetGlobal("Fundamental.zip");
+	std::string fundamentalDest = assetLocal("plugins/Fundamental.zip");
+	std::string fundamentalDir = assetLocal("plugins/Fundamental");
+	if (!systemIsDirectory(fundamentalDir) && !systemIsFile(fundamentalDest)) {
+		systemCopy(fundamentalSrc, fundamentalDest);
 	}
 #endif
 
@@ -362,6 +378,7 @@ void pluginDestroy() {
 }
 
 bool pluginSync(bool dryRun) {
+	return false;
 	if (gToken.empty())
 		return false;
 
