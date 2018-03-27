@@ -5,7 +5,6 @@
 #include <vector>
 #include <jansson.h>
 
-
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wsuggest-override"
