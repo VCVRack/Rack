@@ -220,7 +220,7 @@ void ModuleWidget::onMouseMove(EventMouseMove &e) {
 	// Don't delete the ModuleWidget if a TextField is focused
 	if (!gFocusedWidget) {
 		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-		if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+		if (windowIsKeyPressed(GLFW_KEY_DELETE) || windowIsKeyPressed(GLFW_KEY_BACKSPACE)) {
 			if (!windowIsModPressed() && !windowIsShiftPressed()) {
 				gRackWidget->deleteModule(this);
 				this->finalizeEvents();
