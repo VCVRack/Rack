@@ -127,6 +127,16 @@ static bool loadPlugin(std::string path) {
 }
 
 static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
+	// Check that "status" is "available"
+	json_t *statusJ = json_object_get(manifestJ, "status");
+	if (!statusJ) {
+		return false;
+	}
+	std::string status = json_string_value(statusJ);
+	if (status != "available") {
+		return false;
+	}
+
 	// Get latest version
 	json_t *latestVersionJ = json_object_get(manifestJ, "latestVersion");
 	if (!latestVersionJ) {
