@@ -131,8 +131,9 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, progress);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+	// Fail on 4xx and 5xx HTTP codes
+	curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 
-	info("Downloading %s", url.c_str());
 	CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 
