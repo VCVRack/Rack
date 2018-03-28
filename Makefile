@@ -206,7 +206,7 @@ endif
 
 # Obviously this will only work if you have the private keys to my server
 UPLOAD_URL := vortico@vcvrack.com:files/
-upload: dist distplugins
+upload:
 ifeq ($(ARCH), mac)
 	rsync dist/*.dmg $(UPLOAD_URL) -zP
 endif
