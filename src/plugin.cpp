@@ -126,98 +126,77 @@ static bool loadPlugin(std::string path) {
 	return true;
 }
 
-static bool syncPlugin(json_t *pluginJ, bool dryRun) {
-	json_t *slugJ = json_object_get(pluginJ, "slug");
-	if (!slugJ)
+static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
+	// Get latest version
+	json_t *latestVersionJ = json_object_get(manifestJ, "latestVersion");
+	if (!latestVersionJ) {
+		warn("Could not get latest version of plugin %s", slug.c_str());
 		return false;
-	std::string slug = json_string_value(slugJ);
-
-	// Get community version
-	std::string version;
-	json_t *versionJ = json_object_get(pluginJ, "version");
-	if (versionJ) {
-		version = json_string_value(versionJ);
 	}
+	std::string latestVersion = json_string_value(latestVersionJ);
 
 	// Check whether we already have a plugin with the same slug and version
-	for (Plugin *plugin : gPlugins) {
-		if (plugin->slug == slug) {
-			// plugin->version might be blank, so adding a version of the manifest will update the plugin
-			if (plugin->version == version)
-				return false;
-		}
+	Plugin *plugin = pluginGetPlugin(slug);
+	if (plugin && plugin->version == latestVersion) {
+		return false;
 	}
 
-	json_t *nameJ = json_object_get(pluginJ, "name");
-	if (!nameJ)
-		return false;
-	std::string name = json_string_value(nameJ);
+	json_t *nameJ = json_object_get(manifestJ, "name");
+	std::string name;
+	if (nameJ) {
+		name = json_string_value(nameJ);
+	}
+	else {
+		name = slug;
+	}
 
-	std::string download;
-	std::string sha256;
-
-	json_t *downloadsJ = json_object_get(pluginJ, "downloads");
-	if (downloadsJ) {
 #if ARCH_WIN
-	#define DOWNLOADS_ARCH "win"
+	std::string arch = "win";
 #elif ARCH_MAC
-	#define DOWNLOADS_ARCH "mac"
+	std::string arch = "mac";
 #elif ARCH_LIN
-	#define DOWNLOADS_ARCH "lin"
+	std::string arch = "lin";
 #endif
-		json_t *archJ = json_object_get(downloadsJ, DOWNLOADS_ARCH);
-		if (archJ) {
-			// Get download URL
-			json_t *downloadJ = json_object_get(archJ, "download");
-			if (downloadJ)
-				download = json_string_value(downloadJ);
-			// Get SHA256 hash
-			json_t *sha256J = json_object_get(archJ, "sha256");
-			if (sha256J)
-				sha256 = json_string_value(sha256J);
-		}
+
+	std::string downloadUrl;
+	downloadUrl = gApiHost;
+	downloadUrl += "/download";
+	if (dryRun) {
+		downloadUrl += "/available";
 	}
+	downloadUrl += "?token=" + requestEscape(gToken);
+	downloadUrl += "&slug=" + requestEscape(slug);
+	downloadUrl += "&version=" + requestEscape(latestVersion);
+	downloadUrl += "&arch=" + requestEscape(arch);
 
-	json_t *productIdJ = json_object_get(pluginJ, "productId");
-	if (productIdJ) {
-		download = gApiHost;
-		download += "/download";
-		download += "?slug=";
-		download += slug;
-		download += "&token=";
-		download += requestEscape(gToken);
-	}
-
-	if (download.empty()) {
-		warn("Could not get download URL for plugin %s", slug.c_str());
-		return false;
-	}
-
-	// If plugin is not loaded, download the zip file to /plugins
-	downloadName = name;
-	downloadProgress = 0.0;
-
-	// Download zip
-	std::string pluginsDir = assetLocal("plugins");
-	std::string pluginPath = pluginsDir + "/" + slug;
-	std::string zipPath = pluginPath + ".zip";
-	bool success = requestDownload(download, zipPath, &downloadProgress);
-	if (!success) {
-		warn("Plugin %s download was unsuccessful", slug.c_str());
-		return false;
-	}
-
-	if (!sha256.empty()) {
-		// Check SHA256 hash
-		std::string actualSha256 = requestSHA256File(zipPath);
-		if (actualSha256 != sha256) {
-			warn("Plugin %s does not match expected SHA256 checksum", slug.c_str());
+	if (dryRun) {
+		// Check if available
+		json_t *availableResJ = requestJson(METHOD_GET, downloadUrl, NULL);
+		if (!availableResJ) {
+			warn("Could not check whether download is available");
 			return false;
 		}
+		defer({
+			json_decref(availableResJ);
+		});
+		json_t *successJ = json_object_get(availableResJ, "success");
+		return json_boolean_value(successJ);
 	}
+	else {
+		downloadName = name;
+		downloadProgress = 0.0;
+		info("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
 
-	downloadName = "";
-	return true;
+		// Download zip
+		std::string pluginDest = assetLocal("plugins/" + slug + ".zip");
+		if (!requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
+			warn("Plugin %s download was unsuccessful", slug.c_str());
+			return false;
+		}
+
+		downloadName = "";
+		return true;
+	}
 }
 
 static void loadPlugins(std::string path) {
@@ -378,7 +357,6 @@ void pluginDestroy() {
 }
 
 bool pluginSync(bool dryRun) {
-	return false;
 	if (gToken.empty())
 		return false;
 
@@ -389,74 +367,69 @@ bool pluginSync(bool dryRun) {
 		downloadProgress = 0.0;
 		downloadName = "Updating plugins...";
 	}
-
-	json_t *resJ = NULL;
-	json_t *communityResJ = NULL;
-
-	try {
-		// Download plugin slugs
-		json_t *reqJ = json_object();
-		json_object_set(reqJ, "version", json_string(gApplicationVersion.c_str()));
-		json_object_set(reqJ, "token", json_string(gToken.c_str()));
-		resJ = requestJson(METHOD_GET, gApiHost + "/plugins", reqJ);
-		json_decref(reqJ);
-		if (!resJ)
-			throw std::runtime_error("No response from server");
-
-		json_t *errorJ = json_object_get(resJ, "error");
-		if (errorJ)
-			throw std::runtime_error(json_string_value(errorJ));
-
-		// Download community plugins
-		communityResJ = requestJson(METHOD_GET, gApiHost + "/community/plugins", NULL);
-		if (!communityResJ)
-			throw std::runtime_error("No response from server");
-
-		json_t *communityErrorJ = json_object_get(communityResJ, "error");
-		if (communityErrorJ)
-			throw std::runtime_error(json_string_value(communityErrorJ));
-
-		// Check each plugin in list of plugin slugs
-		json_t *pluginSlugsJ = json_object_get(resJ, "plugins");
-		json_t *communityPluginsJ = json_object_get(communityResJ, "plugins");
-
-		size_t index;
-		json_t *pluginSlugJ;
-		json_array_foreach(pluginSlugsJ, index, pluginSlugJ) {
-			std::string slug = json_string_value(pluginSlugJ);
-			// Search for plugin slug in community
-			size_t communityIndex;
-			json_t *communityPluginJ = NULL;
-			json_array_foreach(communityPluginsJ, communityIndex, communityPluginJ) {
-				json_t *communitySlugJ = json_object_get(communityPluginJ, "slug");
-				if (!communitySlugJ)
-					continue;
-				std::string communitySlug = json_string_value(communitySlugJ);
-				if (slug == communitySlug)
-					break;
-			}
-
-			// Sync plugin
-			if (syncPlugin(communityPluginJ, dryRun)) {
-				available = true;
-			}
-			else {
-				warn("Plugin %s not found in community", slug.c_str());
-			}
-		}
-	}
-	catch (std::runtime_error &e) {
-		warn("Plugin sync error: %s", e.what());
-	}
-
-	if (communityResJ)
-		json_decref(communityResJ);
-
-	if (resJ)
-		json_decref(resJ);
-
-	if (!dryRun) {
+	defer({
 		isDownloading = false;
+	});
+
+	// Get user's plugins list
+	json_t *pluginsReqJ = json_object();
+	json_object_set(pluginsReqJ, "token", json_string(gToken.c_str()));
+	json_t *pluginsResJ = requestJson(METHOD_GET, gApiHost + "/plugins", pluginsReqJ);
+	json_decref(pluginsReqJ);
+	if (!pluginsResJ) {
+		warn("Request for user's plugins failed");
+		return false;
+	}
+	defer({
+		json_decref(pluginsResJ);
+	});
+
+	json_t *errorJ = json_object_get(pluginsResJ, "error");
+	if (errorJ) {
+		warn("Request for user's plugins returned an error: %s", json_string_value(errorJ));
+		return false;
+	}
+
+	// Get community manifests
+	json_t *manifestsResJ = requestJson(METHOD_GET, gApiHost + "/community/manifests", NULL);
+	if (!manifestsResJ) {
+		warn("Request for community manifests failed");
+		return false;
+	}
+	defer({
+		json_decref(manifestsResJ);
+	});
+
+	// Check each plugin in list of plugin slugs
+	json_t *pluginsJ = json_object_get(pluginsResJ, "plugins");
+	if (!pluginsJ) {
+		warn("No plugins array");
+		return false;
+	}
+	json_t *manifestsJ = json_object_get(manifestsResJ, "manifests");
+	if (!manifestsJ) {
+		warn("No manifests object");
+		return false;
+	}
+
+	size_t slugIndex;
+	json_t *slugJ;
+	json_array_foreach(pluginsJ, slugIndex, slugJ) {
+		std::string slug = json_string_value(slugJ);
+		// Search for slug in manifests
+		const char *manifestSlug;
+		json_t *manifestJ = NULL;
+		json_object_foreach(manifestsJ, manifestSlug, manifestJ) {
+			if (slug == std::string(manifestSlug))
+				break;
+		}
+
+		if (!manifestJ)
+			continue;
+
+		if (syncPlugin(slug, manifestJ, dryRun)) {
+			available = true;
+		}
 	}
 
 	return available;
