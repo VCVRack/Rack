@@ -46,7 +46,7 @@ dist: all
 	# Strip and copy plugin binary
 	cp $(TARGET) dist/$(SLUG)/
 ifeq ($(ARCH), mac)
-	strip -x dist/$(SLUG)/$(TARGET)
+	strip -S dist/$(SLUG)/$(TARGET)
 else
 	strip -s dist/$(SLUG)/$(TARGET)
 endif
