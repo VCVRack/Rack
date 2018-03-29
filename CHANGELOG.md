@@ -1,5 +1,5 @@
 
-### 0.6.0 (2018.03-29)
+### 0.6.0 (2018-03-29)
 
 - Released [*VCV Bridge*](https://vcvrack.com/manual/Core.html#Bridge) for interfacing Rack with your DAW
 	- VST/AU effect plugins (Mac and 32/64-bit Windows) for using Rack as a send/return on a DAW track
@@ -9,14 +9,14 @@
 - New *Module Browser* for adding modules to the rack
 	- Launch by right-clicking on the rack or pressing <enter>
 	- Add "favorite" modules by clicking on the star button
-	- Navigate modules with arrow keys
+	- Navigate modules with arrow keys or mouse
 - Redesigned [Core](https://vcvrack.com/manual/Core.html) modules
 	- Access to audio channels beyond the first 8 inputs/outputs
 	- Improved AUDIO stability
 	- Added retrigger output to MIDI-1
 	- Merged MIDI clock module with MIDI-1
 	- Fixed MIDI-4 sustain pedal in polyphonic modes
-- Improved sample rate conversion performance, disable entirely when not needed
+- Improved sample rate conversion performance, is disabled entirely when not needed
 - Patch cable colors are saved to patch files
 - Added highlighting for active patch cables when hovering mouse over port
 - Added shadows to knobs and ports
