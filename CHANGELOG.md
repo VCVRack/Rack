@@ -3,7 +3,7 @@
 
 - Released [*VCV Bridge*](https://vcvrack.com/manual/Core.html#Bridge) for interfacing Rack with your DAW
 	- VST/AU effect plugins (Mac and 32/64-bit Windows) for using Rack as a send/return on a DAW track
-	- VSTi/AUi and DAW clock transport coming soon in a later Rack 0.6 update
+	- VSTi/AU instrument, MIDI, and DAW clock transport coming soon in a later Rack 0.6.* update
 - New *Module Browser* for adding modules to the rack
 	- Launch by right-clicking on the rack or pressing <enter>
 	- Add "favorite" modules by clicking on the star button

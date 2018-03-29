@@ -156,7 +156,7 @@ ifeq ($(ARCH), win)
 	cp Bridge/vst/dist/VCV-Bridge-32.dll dist/Rack/Bridge/
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
-	strip dist/Rack/$(TARGET)
+	strip -s dist/Rack/$(TARGET)
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/zlib1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
@@ -182,7 +182,7 @@ ifeq ($(ARCH), lin)
 	mkdir -p dist/Rack
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) Rack.sh dist/Rack/
-	strip dist/Rack/$(TARGET)
+	strip -s dist/Rack/$(TARGET)
 	cp dep/lib/libspeexdsp.so dist/Rack/
 	cp dep/lib/libjansson.so.4 dist/Rack/
 	cp dep/lib/libGLEW.so.2.1 dist/Rack/
