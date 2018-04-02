@@ -6,6 +6,8 @@ ifndef SLUG
 $(error SLUG is not defined)
 endif
 
+STRIP ?= strip
+
 FLAGS += -DSLUG=$(SLUG)
 FLAGS += -fPIC
 FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
@@ -46,9 +48,9 @@ dist: all
 	# Strip and copy plugin binary
 	cp $(TARGET) dist/$(SLUG)/
 ifeq ($(ARCH), mac)
-	strip -S dist/$(SLUG)/$(TARGET)
+	$(STRIP) -S dist/$(SLUG)/$(TARGET)
 else
-	strip -s dist/$(SLUG)/$(TARGET)
+	$(STRIP) -s dist/$(SLUG)/$(TARGET)
 endif
 	# Copy distributables
 	cp -R $(DISTRIBUTABLES) dist/$(SLUG)/
