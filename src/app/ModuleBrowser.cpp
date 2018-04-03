@@ -100,66 +100,39 @@ struct BrowserListItem : OpaqueWidget {
 
 struct ModelItem : BrowserListItem {
 	Model *model;
-	Label *authorLabel = NULL;
-
-	ModelItem() {
-		box.size.y = 2*BND_WIDGET_HEIGHT + 3*itemMargin;
-	}
+	Label *pluginLabel = NULL;
 
 	void setModel(Model *model) {
 		clearChildren();
 		assert(model);
 		this->model = model;
 
-		Label *nameLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
-		nameLabel->text = model->name;
-		addChild(nameLabel);
-
-		// Hide author label if filtering by author
-		if (sAuthorFilter.empty()) {
-			authorLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
-			authorLabel->alignment = Label::RIGHT_ALIGNMENT;
-			authorLabel->text = model->author;
-			authorLabel->color.a = 0.5;
-			addChild(authorLabel);
-		}
-
-		SequentialLayout *layout2 = Widget::create<SequentialLayout>(Vec(7, BND_WIDGET_HEIGHT + itemMargin));
-		layout2->spacing = 0;
-		addChild(layout2);
-
-		FavoriteRadioButton *favoriteButton = new FavoriteRadioButton();
+		FavoriteRadioButton *favoriteButton = Widget::create<FavoriteRadioButton>(Vec(8, itemMargin));
 		favoriteButton->box.size.x = 20;
 		favoriteButton->label = "★";
-		layout2->addChild(favoriteButton);
+		addChild(favoriteButton);
 
+		// Set favorite button initial state
 		auto it = sFavoriteModels.find(model);
 		if (it != sFavoriteModels.end())
 			favoriteButton->setValue(1);
 		favoriteButton->model = model;
 
-		// for (ModelTag tag : model->tags) {
-		// 	Button *tagButton = new Button();
-		// 	tagButton->box.size.x = 120;
-		// 	tagButton->text = gTagNames[tag];
-		// 	layout2->addChild(tagButton);
-		// }
+		Label *nameLabel = Widget::create<Label>(favoriteButton->box.getTopRight());
+		nameLabel->text = model->name;
+		addChild(nameLabel);
 
-		Label *tagsLabel = new Label();
-		tagsLabel->color.a = 0.5;
-		int i = 0;
-		for (ModelTag tag : model->tags) {
-			if (i++ > 0)
-				tagsLabel->text += ", ";
-			tagsLabel->text += gTagNames[tag];
-		}
-		layout2->addChild(tagsLabel);
+		pluginLabel = Widget::create<Label>(Vec(0, itemMargin));
+		pluginLabel->alignment = Label::RIGHT_ALIGNMENT;
+		pluginLabel->text = model->plugin->slug + " " + model->plugin->version;
+		pluginLabel->color.a = 0.5;
+		addChild(pluginLabel);
 	}
 
 	void step() override {
 		BrowserListItem::step();
-		if (authorLabel)
-			authorLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
+		if (pluginLabel)
+			pluginLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
 	}
 
 	void onAction(EventAction &e) override {
@@ -213,7 +186,7 @@ struct TagItem : BrowserListItem {
 struct ClearFilterItem : BrowserListItem {
 	ClearFilterItem() {
 		Label *label = Widget::create<Label>(Vec(0, 0 + itemMargin));
-		label->text = "Clear filter";
+		label->text = "Back";
 		addChild(label);
 	}
 
@@ -310,7 +283,9 @@ struct ModuleBrowser : OpaqueWidget {
 	std::set<ModelTag> availableTags;
 
 	ModuleBrowser() {
-		box.size.x = 400;
+		box.size.x = 450;
+		sAuthorFilter = "";
+		sTagFilter = NO_TAG;
 
 		// Search
 		searchField	= new SearchModuleField();
@@ -481,7 +456,6 @@ void ClearFilterItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sAuthorFilter = "";
 	sTagFilter = NO_TAG;
-	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
 }

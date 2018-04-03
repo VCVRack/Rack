@@ -2,7 +2,7 @@
 
 ifndef ARCH
 
-MACHINE = $(shell gcc -dumpmachine)
+MACHINE = $(shell $(CC) -dumpmachine)
 ifneq (, $(findstring linux, $(MACHINE)))
 	# Linux
 	ARCH = lin
