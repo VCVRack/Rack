@@ -7,15 +7,16 @@ RACK_DIR ?= ..
 include $(RACK_DIR)/arch.mk
 
 ifeq ($(ARCH), lin)
-	glew = lib/libGLEW.so
-	glfw = lib/libglfw.so
-	jansson = lib/libjansson.so
-	libspeexdsp = lib/libspeexdsp.so
-	libcurl = lib/libcurl.so
-	libzip = lib/libzip.so
-	rtmidi = lib/librtmidi.so
-	rtaudio = lib/librtaudio.so
-	openssl = lib/libssl.so
+	glew = lib/libGLEW.a
+	glfw = lib/libglfw3.a
+	jansson = lib/libjansson.a
+	libspeexdsp = lib/libspeexdsp.a
+	libcurl = lib/libcurl.a
+	libzip = lib/libzip.a
+	zlib = lib/libz.a
+	rtmidi = lib/librtmidi.a
+	rtaudio = lib/librtaudio.a
+	openssl = lib/libssl.a
 endif
 
 ifeq ($(ARCH), mac)
@@ -62,7 +63,6 @@ $(glew):
 
 $(glfw):
 	cd glfw && $(CMAKE) . \
-		-DBUILD_SHARED_LIBS=ON \
 		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
 	$(MAKE) -C glfw
 	$(MAKE) -C glfw install
@@ -98,12 +98,19 @@ $(libcurl): $(openssl)
 	$(MAKE) -C curl-7.56.0
 	$(MAKE) -C curl-7.56.0 install
 
-$(libzip):
+$(libzip): $(zlib)
 	$(WGET) https://nih.at/libzip/libzip-1.2.0.tar.gz
 	$(UNTAR) libzip-1.2.0.tar.gz
 	cd libzip-1.2.0 && $(CONFIGURE)
 	$(MAKE) -C libzip-1.2.0
 	$(MAKE) -C libzip-1.2.0 install
+
+$(zlib):
+	$(WGET) https://www.zlib.net/zlib-1.2.11.tar.gz
+	$(UNTAR) zlib-1.2.11.tar.gz
+	cd zlib-1.2.11 && $(CONFIGURE)
+	$(MAKE) -C zlib-1.2.11
+	$(MAKE) -C zlib-1.2.11 install
 
 $(rtmidi):
 	$(WGET) https://vcvrack.com/downloads/dep/rtmidi.tgz
@@ -136,6 +143,8 @@ $(rtaudio):
 	cd rtaudio/build && $(CMAKE) $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/build
 	$(MAKE) -C rtaudio/build install
+	# For some reason, it doesn't install the static library
+	cp rtaudio/build/librtaudio_static.a lib/librtaudio.a
 
 $(nanovg):
 	cp nanovg/src/*.h include/

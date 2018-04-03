@@ -22,9 +22,11 @@ ifeq ($(ARCH), lin)
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
 	LDFLAGS += -rdynamic \
-		-lpthread -lGL -ldl \
+		-lpthread -lGL -ldl -lX11 -lasound \
 		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
+		-Ldep/lib \
+		-Wl,-Bstatic -lglfw3 -lGLEW -ljansson -lspeexdsp -lzip -lz -lrtmidi -lrtaudio -lcurl -lssl -lcrypto \
+		-Wl,-Bdynamic
 	TARGET := Rack
 endif
 
@@ -182,18 +184,8 @@ endif
 ifeq ($(ARCH), lin)
 	mkdir -p dist/Rack
 	cp -R LICENSE* res dist/Rack/
-	cp $(TARGET) Rack.sh dist/Rack/
+	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp dep/lib/libspeexdsp.so dist/Rack/
-	cp dep/lib/libjansson.so.4 dist/Rack/
-	cp dep/lib/libGLEW.so.2.1 dist/Rack/
-	cp dep/lib/libglfw.so.3 dist/Rack/
-	cp dep/lib/libcurl.so.4 dist/Rack/
-	cp dep/lib/libzip.so.5 dist/Rack/
-	cp dep/lib/librtaudio.so dist/Rack/
-	cp dep/lib/librtmidi.so.4 dist/Rack/
-	cp dep/lib/libssl.so.1.1 dist/Rack/
-	cp dep/lib/libcrypto.so.1.1 dist/Rack/
 	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
