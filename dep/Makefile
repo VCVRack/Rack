@@ -87,6 +87,11 @@ $(openssl):
 	cd openssl-1.1.0g && ./config --prefix="$(realpath $(DEP_LOCAL))"
 	$(MAKE) -C openssl-1.1.0g
 	$(MAKE) -C openssl-1.1.0g install_sw
+ifeq ($(ARCH),mac)
+	otool -L $@
+	install_name_tool -change $(PWD)/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib $@
+	otool -L $@
+endif
 
 $(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
@@ -97,6 +102,12 @@ $(libcurl): $(openssl)
 		--without-ca-bundle --with-ca-fallback --with-ssl="$(realpath $(DEP_LOCAL))"
 	$(MAKE) -C curl-7.56.0
 	$(MAKE) -C curl-7.56.0 install
+ifeq ($(ARCH),mac)
+	otool -L $@
+	install_name_tool -change $(PWD)/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib $@
+	install_name_tool -change $(PWD)/lib/libssl.1.1.dylib @loader_path/libssl.1.1.dylib $@
+	otool -L $@
+endif
 
 $(libzip):
 	$(WGET) https://nih.at/libzip/libzip-1.2.0.tar.gz
