@@ -18,18 +18,6 @@ STRIP ?= strip
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 SOURCES += dep/nanovg/src/nanovg.c
 
-ifeq ($(ARCH), lin)
-	SOURCES += dep/osdialog/osdialog_gtk2.c
-	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
-	LDFLAGS += -rdynamic \
-		-lpthread -lGL -ldl -lX11 -lasound \
-		$(shell pkg-config --libs gtk+-2.0) \
-		-Ldep/lib \
-		-Wl,-Bstatic -lglfw3 -lGLEW -ljansson -lspeexdsp -lzip -lz -lrtmidi -lrtaudio -lcurl -lssl -lcrypto \
-		-Wl,-Bdynamic
-	TARGET := Rack
-endif
-
 ifeq ($(ARCH), mac)
 	SOURCES += dep/osdialog/osdialog_mac.m
 	CXXFLAGS += -stdlib=libc++
@@ -49,6 +37,18 @@ ifeq ($(ARCH), win)
 		-Wl,-Bstatic -ljansson -lspeexdsp
 	TARGET := Rack.exe
 	OBJECTS += Rack.res
+endif
+
+ifeq ($(ARCH), lin)
+	SOURCES += dep/osdialog/osdialog_gtk2.c
+	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
+	LDFLAGS += -rdynamic \
+		-lpthread -lGL -ldl -lX11 -lasound -ljack \
+		$(shell pkg-config --libs gtk+-2.0) \
+		-Ldep/lib \
+		-Wl,-Bstatic -lglfw3 -lGLEW -ljansson -lspeexdsp -lzip -lz -lrtmidi -lrtaudio -lcurl -lssl -lcrypto \
+		-Wl,-Bdynamic
+	TARGET := Rack
 endif
 
 
