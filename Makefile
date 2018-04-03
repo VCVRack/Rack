@@ -22,8 +22,8 @@ ifeq ($(ARCH), mac)
 	SOURCES += dep/osdialog/osdialog_mac.m
 	CXXFLAGS += -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
-		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
-		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
+		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
+		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a
 	TARGET := Rack
 	BUNDLE := dist/$(TARGET).app
 endif
@@ -110,36 +110,11 @@ ifeq ($(ARCH), mac)
 	mkdir -p $(BUNDLE)/Contents
 	mkdir -p $(BUNDLE)/Contents/Resources
 	cp Info.plist $(BUNDLE)/Contents/
-	cp -R LICENSE* res $(BUNDLE)/Contents/Resources
+	cp -R LICENSE* icon.icns res $(BUNDLE)/Contents/Resources
 
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp $(TARGET) $(BUNDLE)/Contents/MacOS/
 	$(STRIP) -S $(BUNDLE)/Contents/MacOS/$(TARGET)
-	cp icon.icns $(BUNDLE)/Contents/Resources/
-
-	otool -L $(BUNDLE)/Contents/MacOS/$(TARGET)
-
-	cp dep/lib/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libspeexdsp.1.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libzip.5.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/librtaudio.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libcrypto.1.1.dylib $(BUNDLE)/Contents/MacOS/
-	cp dep/lib/libssl.1.1.dylib $(BUNDLE)/Contents/MacOS/
-
-	install_name_tool -change /usr/local/lib/libGLEW.2.1.0.dylib @executable_path/libGLEW.2.1.0.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change lib/libglfw.3.dylib @executable_path/libglfw.3.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change $(PWD)/dep/lib/libjansson.4.dylib @executable_path/libjansson.4.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change $(PWD)/dep/lib/libspeexdsp.1.dylib @executable_path/libspeexdsp.1.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change $(PWD)/dep/lib/libcurl.4.dylib @executable_path/libcurl.4.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change $(PWD)/dep/lib/libzip.5.dylib @executable_path/libzip.5.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change librtaudio.dylib @executable_path/librtaudio.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change $(PWD)/dep/lib/librtmidi.4.dylib @executable_path/librtmidi.4.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change $(PWD)/dep/lib/libcrypto.1.1.dylib @executable_path/libcrypto.1.1.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
-	install_name_tool -change $(PWD)/dep/lib/libssl.1.1.dylib @executable_path/libssl.1.1.dylib $(BUNDLE)/Contents/MacOS/$(TARGET)
 
 	otool -L $(BUNDLE)/Contents/MacOS/$(TARGET)
 
@@ -186,6 +161,7 @@ ifeq ($(ARCH), lin)
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
+	ldd dist/Rack/$(TARGET)
 	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack

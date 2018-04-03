@@ -20,15 +20,16 @@ ifeq ($(ARCH), lin)
 endif
 
 ifeq ($(ARCH), mac)
-	glew = lib/libGLEW.dylib
-	glfw = lib/libglfw.dylib
-	jansson = lib/libjansson.dylib
-	libspeexdsp = lib/libspeexdsp.dylib
-	libcurl = lib/libcurl.dylib
-	libzip = lib/libzip.dylib
-	rtmidi = lib/librtmidi.dylib
-	rtaudio = lib/librtaudio.dylib
-	openssl = lib/libssl.dylib
+	glew = lib/libGLEW.a
+	glfw = lib/libglfw3.a
+	jansson = lib/libjansson.a
+	libspeexdsp = lib/libspeexdsp.a
+	libcurl = lib/libcurl.a
+	libzip = lib/libzip.a
+	zlib = lib/libz.a
+	rtmidi = lib/librtmidi.a
+	rtaudio = lib/librtaudio.a
+	openssl = lib/libssl.a
 endif
 
 ifeq ($(ARCH), win)
@@ -38,6 +39,7 @@ ifeq ($(ARCH), win)
 	libspeexdsp = bin/libspeexdsp-1.dll
 	libcurl = bin/libcurl-4.dll
 	libzip = bin/libzip-5.dll
+	zlib = lib/libz.a
 	rtmidi = bin/librtmidi-4.dll
 	rtaudio = bin/librtaudio.dll
 	openssl = bin/libssl-1_1-x64.dll
@@ -57,9 +59,7 @@ include $(RACK_DIR)/dep.mk
 $(glew):
 	$(WGET) https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz
 	$(UNTAR) glew-2.1.0.tgz
-	$(MAKE) -C glew-2.1.0 glew.lib
-	# On Linux, default lib path is lib64, so change it back to lib.
-	$(MAKE) -C glew-2.1.0 GLEW_DEST="$(realpath $(DEP_LOCAL))" LIBDIR="$(realpath $(DEP_LOCAL))/lib" install
+	$(MAKE) -C glew-2.1.0 CFLAGS.EXTRA="$(CFLAGS)" LDFLAGS.EXTRA="$(LDFLAGS)" GLEW_DEST="$(realpath $(DEP_LOCAL))" LIBDIR="$(realpath $(DEP_LOCAL))/lib" install
 
 $(glfw):
 	cd glfw && $(CMAKE) . \
@@ -84,14 +84,10 @@ $(libspeexdsp):
 $(openssl):
 	$(WGET) https://www.openssl.org/source/openssl-1.1.0g.tar.gz
 	$(UNTAR) openssl-1.1.0g.tar.gz
-	cd openssl-1.1.0g && ./config --prefix="$(realpath $(DEP_LOCAL))"
+	# ./config ignores CFLAGS, so hack it in with CC
+	cd openssl-1.1.0g && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
 	$(MAKE) -C openssl-1.1.0g
 	$(MAKE) -C openssl-1.1.0g install_sw
-ifeq ($(ARCH),mac)
-	otool -L $@
-	install_name_tool -change $(PWD)/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib $@
-	otool -L $@
-endif
 
 $(libcurl): $(openssl)
 	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
@@ -102,12 +98,6 @@ $(libcurl): $(openssl)
 		--without-ca-bundle --with-ca-fallback --with-ssl="$(realpath $(DEP_LOCAL))"
 	$(MAKE) -C curl-7.56.0
 	$(MAKE) -C curl-7.56.0 install
-ifeq ($(ARCH),mac)
-	otool -L $@
-	install_name_tool -change $(PWD)/lib/libcrypto.1.1.dylib @loader_path/libcrypto.1.1.dylib $@
-	install_name_tool -change $(PWD)/lib/libssl.1.1.dylib @loader_path/libssl.1.1.dylib $@
-	otool -L $@
-endif
 
 $(libzip): $(zlib)
 	$(WGET) https://nih.at/libzip/libzip-1.2.0.tar.gz
