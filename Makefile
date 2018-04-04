@@ -60,30 +60,22 @@ dep:
 	$(MAKE) -C dep
 
 run: $(TARGET)
-ifeq ($(ARCH), lin)
-	LD_LIBRARY_PATH=dep/lib ./$<
-endif
-ifeq ($(ARCH), mac)
-	DYLD_FALLBACK_LIBRARY_PATH=dep/lib ./$<
-endif
-ifeq ($(ARCH), win)
-	env PATH="$(PATH)":dep/bin ./$<
-endif
+	./$<
 
 debug: $(TARGET)
-ifeq ($(ARCH), lin)
-	LD_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
-endif
 ifeq ($(ARCH), mac)
-	DYLD_FALLBACK_LIBRARY_PATH=dep/lib gdb -ex run ./Rack
+	lldb -ex run ./$<
 endif
 ifeq ($(ARCH), win)
-	env PATH="$(PATH)":dep/bin gdb -ex run ./Rack
+	gdb -ex run ./$<
+endif
+ifeq ($(ARCH), lin)
+	gdb -ex run ./$<
 endif
 
 perf: $(TARGET)
 ifeq ($(ARCH), lin)
-	LD_LIBRARY_PATH=dep/lib perf record --call-graph dwarf ./Rack
+	perf record --call-graph dwarf ./Rack
 endif
 
 clean:
