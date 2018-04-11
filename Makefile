@@ -30,10 +30,10 @@ endif
 
 ifeq ($(ARCH), win)
 	SOURCES += dep/osdialog/osdialog_win.c
-	LDFLAGS += -static-libgcc -static-libstdc++ \
+	LDFLAGS += -static \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		-Ldep/lib -Wl,-Bstatic -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto -lrtaudio -lrtmidi \
-		-Wl,-Bdynamic -lopengl32 -lpthread -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser
+		-Ldep/lib -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto -lrtaudio -lrtmidi \
+		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser
 	TARGET := Rack.exe
 	OBJECTS += Rack.res
 endif
@@ -127,19 +127,8 @@ ifeq ($(ARCH), win)
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
-	cp /mingw64/bin/zlib1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
-	cp dep/bin/glew32.dll dist/Rack/
-	cp dep/bin/glfw3.dll dist/Rack/
-	cp dep/bin/libcurl-4.dll dist/Rack/
-	cp dep/bin/libjansson-4.dll dist/Rack/
-	cp dep/bin/librtmidi-4.dll dist/Rack/
-	cp dep/bin/libspeexdsp-1.dll dist/Rack/
-	cp dep/bin/libzip-5.dll dist/Rack/
-	cp dep/bin/librtaudio.dll dist/Rack/
-	cp dep/bin/libcrypto-1_1-x64.dll dist/Rack/
-	cp dep/bin/libssl-1_1-x64.dll dist/Rack/
 	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
