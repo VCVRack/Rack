@@ -15,6 +15,7 @@
 #include <thread>
 #include <stdexcept>
 
+#define ZIP_STATIC
 #include <zip.h>
 #include <jansson.h>
 
