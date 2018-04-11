@@ -33,16 +33,16 @@ ifeq ($(ARCH), mac)
 endif
 
 ifeq ($(ARCH), win)
-	glew = bin/glew32.dll
-	glfw = bin/glfw3.dll
-	jansson = bin/libjansson-4.dll
-	libspeexdsp = bin/libspeexdsp-1.dll
-	libcurl = bin/libcurl-4.dll
-	libzip = bin/libzip-5.dll
+	glew = lib/libglew32.a
+	glfw = lib/libglfw3.a
+	jansson = lib/libjansson.a
+	libspeexdsp = lib/libspeexdsp.a
+	libcurl = lib/libcurl.a
+	libzip = lib/libzip.a
 	zlib = lib/libz.a
-	rtmidi = bin/librtmidi-4.dll
-	rtaudio = bin/librtaudio.dll
-	openssl = bin/libssl-1_1-x64.dll
+	rtmidi = lib/librtmidi.a
+	rtaudio = lib/librtaudio.a
+	openssl = lib/libssl.a
 endif
 
 nanovg = include/nanovg.h
@@ -59,6 +59,8 @@ include $(RACK_DIR)/dep.mk
 $(glew):
 	$(WGET) https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz
 	$(UNTAR) glew-2.1.0.tgz
+	# For some unknown reason, defining LDFLAGS.EXTRA when building glew.lib on Windows makes linking fail.
+	$(MAKE) -C glew-2.1.0 CFLAGS.EXTRA="$(CFLAGS)" glew.lib
 	$(MAKE) -C glew-2.1.0 CFLAGS.EXTRA="$(CFLAGS)" LDFLAGS.EXTRA="$(LDFLAGS)" GLEW_DEST="$(realpath $(DEP_LOCAL))" LIBDIR="$(realpath $(DEP_LOCAL))/lib" install
 
 $(glfw):
@@ -109,9 +111,14 @@ $(libzip): $(zlib)
 $(zlib):
 	$(WGET) https://www.zlib.net/zlib-1.2.11.tar.gz
 	$(UNTAR) zlib-1.2.11.tar.gz
+ifeq ($(ARCH), win)
+	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
+	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(realpath $(DEP_LOCAL))/bin" INCLUDE_PATH="$(realpath $(DEP_LOCAL))/include" LIBRARY_PATH="$(realpath $(DEP_LOCAL))/lib" install
+else
 	cd zlib-1.2.11 && $(CONFIGURE)
 	$(MAKE) -C zlib-1.2.11
 	$(MAKE) -C zlib-1.2.11 install
+endif
 
 $(rtmidi):
 	$(WGET) https://vcvrack.com/downloads/dep/rtmidi.tgz
@@ -120,21 +127,21 @@ $(rtmidi):
 	$(MAKE) -C rtmidi
 	$(MAKE) -C rtmidi install
 
-ifeq ($(ARCH),mac)
+ifeq ($(ARCH), mac)
 RTAUDIO_FLAGS += -DAUDIO_OSX_CORE=ON
 endif
-ifeq ($(ARCH),win)
+ifeq ($(ARCH), win)
 RTAUDIO_FLAGS += -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
 endif
-ifeq ($(ARCH),lin)
+ifeq ($(ARCH), lin)
 RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_UNIX_JACK=ON
 endif
 
 ifdef RTAUDIO_ALL_APIS
-ifeq ($(ARCH),mac)
+ifeq ($(ARCH), mac)
 RTAUDIO_FLAGS += -DAUDIO_UNIX_JACK=ON
 endif
-ifeq ($(ARCH),lin)
+ifeq ($(ARCH), lin)
 RTAUDIO_FLAGS += -DAUDIO_LINUX_PULSE=ON
 endif
 endif
@@ -160,4 +167,5 @@ $(osdialog):
 	cp osdialog/*.h include/
 
 clean:
-	git clean -ffdx
+	git clean -fdx
+	git submodule foreach git clean -fdx
