@@ -24,21 +24,21 @@ Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system
 Install [Xcode](https://developer.apple.com/xcode/).
 Using [Homebrew](https://brew.sh/), install the build dependencies.
 ```
-brew install git cmake autoconf automake libtool
+brew install git wget cmake autoconf automake libtool
 ```
 
 ### Windows
 
 Install [MSYS2](http://www.msys2.org/) and launch the MinGW 64-bit shell (not the default MSYS shell).
 ```
-pacman -S git make tar unzip zip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool
+pacman -S git wget make tar unzip zip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool
 ```
 
 ### Linux
 
 On Arch Linux:
 ```
-pacman -S git gcc make cmake tar unzip zip curl
+pacman -S git wget gcc make cmake tar unzip zip curl
 ```
 
 Other distro build instructions coming soon.
