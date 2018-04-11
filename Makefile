@@ -15,8 +15,8 @@ STRIP ?= strip
 
 # Sources and build flags
 
-SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 SOURCES += dep/nanovg/src/nanovg.c
+SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifeq ($(ARCH), mac)
 	SOURCES += dep/osdialog/osdialog_mac.m
@@ -30,11 +30,11 @@ endif
 
 ifeq ($(ARCH), win)
 	SOURCES += dep/osdialog/osdialog_win.c
-	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread -lws2_32 \
+	LDFLAGS += -static-libgcc -static-libstdc++ \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl \
-		-Wl,-Bstatic -ljansson -lspeexdsp
+		-Ldep/lib -Wl,-Bstatic -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto \
+		-Wl,-Bdynamic -lopengl32 -lpthread -lgdi32 -lws2_32 -lcomdlg32 -lole32 \
+		-lrtaudio -lrtmidi
 	TARGET := Rack.exe
 	OBJECTS += Rack.res
 endif

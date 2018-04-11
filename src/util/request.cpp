@@ -1,5 +1,6 @@
 #include "util/common.hpp"
 #include "util/request.hpp"
+#define CURL_STATICLIB
 #include <curl/curl.h>
 #include <openssl/sha.h>
 
