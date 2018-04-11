@@ -32,9 +32,8 @@ ifeq ($(ARCH), win)
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -static-libgcc -static-libstdc++ \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		-Ldep/lib -Wl,-Bstatic -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto \
-		-Wl,-Bdynamic -lopengl32 -lpthread -lgdi32 -lws2_32 -lcomdlg32 -lole32 \
-		-lrtaudio -lrtmidi
+		-Ldep/lib -Wl,-Bstatic -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto -lrtaudio -lrtmidi \
+		-Wl,-Bdynamic -lopengl32 -lpthread -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser
 	TARGET := Rack.exe
 	OBJECTS += Rack.res
 endif
