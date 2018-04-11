@@ -1,6 +1,5 @@
 #include "widgets.hpp"
 #include "window.hpp"
-#include <GL/glew.h>
 #include "nanovg_gl.h"
 #include "nanovg_gl_utils.h"
 
