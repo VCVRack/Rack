@@ -13,7 +13,7 @@ DEP_CFLAGS += $(DEP_FLAGS)
 DEP_CXXFLAGS += $(DEP_FLAGS)
 
 # Commands
-WGET := curl -OL
+WGET := wget -c
 UNTAR := tar xf
 UNZIP := unzip
 CONFIGURE := ./configure --prefix="$(realpath $(DEP_LOCAL))"
