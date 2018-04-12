@@ -57,11 +57,12 @@ include $(RACK_DIR)/dep.mk
 # Targets
 
 $(glew):
-	$(WGET) https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz
+	$(WGET) "https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz"
 	$(UNTAR) glew-2.1.0.tgz
-	# For some unknown reason, defining LDFLAGS.EXTRA when building glew.lib on Windows makes linking fail.
-	$(MAKE) -C glew-2.1.0 CFLAGS.EXTRA="$(CFLAGS)" glew.lib
-	$(MAKE) -C glew-2.1.0 CFLAGS.EXTRA="$(CFLAGS)" LDFLAGS.EXTRA="$(LDFLAGS)" GLEW_DEST="$(realpath $(DEP_LOCAL))" LIBDIR="$(realpath $(DEP_LOCAL))/lib" install
+	cd glew-2.1.0 && mkdir -p build
+	cd glew-2.1.0/build && $(CMAKE) -DCMAKE_INSTALL_LIBDIR=lib ./cmake
+	$(MAKE) -C glew-2.1.0/build
+	$(MAKE) -C glew-2.1.0/build install
 
 $(glfw):
 	cd glfw && $(CMAKE) . \
@@ -70,21 +71,21 @@ $(glfw):
 	$(MAKE) -C glfw install
 
 $(jansson):
-	$(WGET) http://www.digip.org/jansson/releases/jansson-2.10.tar.gz
+	$(WGET) "http://www.digip.org/jansson/releases/jansson-2.10.tar.gz"
 	$(UNTAR) jansson-2.10.tar.gz
 	cd jansson-2.10 && $(CONFIGURE)
 	$(MAKE) -C jansson-2.10
 	$(MAKE) -C jansson-2.10 install
 
 $(libspeexdsp):
-	$(WGET) https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz
+	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
 	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
 	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
 $(openssl):
-	$(WGET) https://www.openssl.org/source/openssl-1.1.0g.tar.gz
+	$(WGET) "https://www.openssl.org/source/openssl-1.1.0g.tar.gz"
 	$(UNTAR) openssl-1.1.0g.tar.gz
 	# ./config ignores CFLAGS, so hack it in with CC
 	cd openssl-1.1.0g && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
@@ -92,7 +93,7 @@ $(openssl):
 	$(MAKE) -C openssl-1.1.0g install_sw
 
 $(libcurl): $(openssl)
-	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
+	$(WGET) "https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz"
 	$(UNTAR) curl-7.56.0.tar.gz
 	cd curl-7.56.0 && $(CONFIGURE) \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
@@ -102,14 +103,14 @@ $(libcurl): $(openssl)
 	$(MAKE) -C curl-7.56.0 install
 
 $(libzip): $(zlib)
-	$(WGET) https://nih.at/libzip/libzip-1.2.0.tar.gz
+	$(WGET) "https://nih.at/libzip/libzip-1.2.0.tar.gz"
 	$(UNTAR) libzip-1.2.0.tar.gz
 	cd libzip-1.2.0 && $(CONFIGURE)
 	$(MAKE) -C libzip-1.2.0
 	$(MAKE) -C libzip-1.2.0 install
 
 $(zlib):
-	$(WGET) https://www.zlib.net/zlib-1.2.11.tar.gz
+	$(WGET) "https://www.zlib.net/zlib-1.2.11.tar.gz"
 	$(UNTAR) zlib-1.2.11.tar.gz
 ifeq ($(ARCH), win)
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
@@ -121,7 +122,7 @@ else
 endif
 
 $(rtmidi):
-	$(WGET) https://vcvrack.com/downloads/dep/rtmidi.tgz
+	$(WGET) "https://vcvrack.com/downloads/dep/rtmidi.tgz"
 	$(UNTAR) rtmidi.tgz
 	cd rtmidi && $(CONFIGURE)
 	$(MAKE) -C rtmidi
