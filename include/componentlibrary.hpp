@@ -445,6 +445,14 @@ struct RedGreenBlueLight : GrayModuleLightWidget {
 	}
 };
 
+struct RGBLight : ModuleLightWidget {
+	RGBLight() {
+		addBaseColor(nvgRGBf(1, 0, 0));
+		addBaseColor(nvgRGBf(0, 1, 0));
+		addBaseColor(nvgRGBf(0, 0, 1));
+	}
+};
+
 
 /** Based on the size of 5mm LEDs */
 template <typename BASE>
