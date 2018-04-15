@@ -36,7 +36,7 @@ struct MIDIToCVInterface : Module {
 
 	uint8_t mod = 0;
 	ExponentialFilter modFilter;
-	uint16_t pitch = 0;
+	uint16_t pitch = 8192;
 	ExponentialFilter pitchFilter;
 	PulseGenerator retriggerPulse;
 	PulseGenerator clockPulses[2];
