@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cmath>
+#include "util/math.hpp"
 
 
 namespace rack {
@@ -40,6 +40,14 @@ inline float sqrtBipolar(float x) {
 inline float exponentialBipolar(float b, float x) {
 	const float a = b - 1.f / b;
 	return (powf(b, x) - powf(b, -x)) / a;
+}
+
+inline float gainToDb(float gain) {
+	return log10f(gain) * 20.f;
+}
+
+inline float dbToGain(float db) {
+	return powf(10.f, db / 20.f);
 }
 
 

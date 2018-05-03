@@ -7,6 +7,7 @@
 
 #include "util/common.hpp"
 #include "events.hpp"
+#include "util/color.hpp"
 
 
 namespace rack {
@@ -144,10 +145,10 @@ struct Widget {
 	/** Helper function for creating and initializing a Widget with certain arguments (in this case just the position).
 	In this project, you will find this idiom everywhere, as an easier alternative to constructor arguments, for building a Widget (or a subclass) with a one-liner.
 	Example:
-		addChild(Widget::create<SVGWidget>(Vec(0, 0)))
+		addChild(Widget::create<SVGWidget>(Vec(10, 10)))
 	*/
 	template <typename T = Widget>
-	static T *create(Vec pos) {
+	static T *create(Vec pos = Vec()) {
 		T *o = new T();
 		o->box.pos = pos;
 		return o;
