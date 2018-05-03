@@ -54,5 +54,10 @@ inline NVGcolor colorScreen(NVGcolor a, NVGcolor b) {
 	return c;
 }
 
+inline NVGcolor colorAlpha(NVGcolor a, float alpha) {
+	a.a *= alpha;
+	return a;
+}
+
 
 } // namespace rack
