@@ -9,8 +9,6 @@ namespace rack {
 template <size_t CHANNELS>
 struct Frame {
 	float samples[CHANNELS];
-
-	Frame() {}
 };
 
 } // namespace rack

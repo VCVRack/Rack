@@ -143,9 +143,10 @@ inline void cmult(float *cr, float *ci, float ar, float ai, float br, float bi) 
 struct Rect;
 
 struct Vec {
-	float x, y;
+	float x = 0.f;
+	float y = 0.f;
 
-	Vec() : x(0.0f), y(0.0f) {}
+	Vec() {}
 	Vec(float x, float y) : x(x), y(y) {}
 
 	Vec neg() {
@@ -174,6 +175,9 @@ struct Vec {
 	}
 	float norm() {
 		return hypotf(x, y);
+	}
+	Vec flip() {
+		return Vec(y, x);
 	}
 	Vec min(Vec b) {
 		return Vec(rack::min(x, b.x), rack::min(y, b.y));
