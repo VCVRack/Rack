@@ -39,7 +39,7 @@ struct StatusLabel : Label {
 struct ManageButton : Button {
 	void onAction(EventAction &e) override {
 		std::thread t([&]() {
-			systemOpenBrowser("https://vcvrack.com/");
+			systemOpenBrowser("https://vcvrack.com/plugins.html");
 		});
 		t.detach();
 	}
