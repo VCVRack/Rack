@@ -138,7 +138,7 @@ void MidiInput::setDriver(int driver) {
 	}
 
 	if (driver >= 0) {
-		rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
+		rtMidiIn = new RtMidiIn((RtMidi::Api) driver, "VCV Rack");
 		rtMidiIn->setCallback(midiInputCallback, this);
 		rtMidiIn->ignoreTypes(false, false, false);
 		rtMidi = rtMidiIn;
@@ -212,7 +212,7 @@ void MidiOutput::setDriver(int driver) {
 	}
 
 	if (driver >= 0) {
-		rtMidiOut = new RtMidiOut((RtMidi::Api) driver);
+		rtMidiOut = new RtMidiOut((RtMidi::Api) driver, "VCV Rack");
 		rtMidi = rtMidiOut;
 		this->driver = rtMidiOut->getCurrentApi();
 	}
