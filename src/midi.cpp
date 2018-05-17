@@ -8,6 +8,35 @@ namespace rack {
 
 
 ////////////////////
+// MidiIODevice
+////////////////////
+
+void MidiInputDevice::subscribe(MidiInput *midiInput) {
+	subscribed.insert(midiInput);
+}
+
+void MidiInputDevice::unsubscribe(MidiInput *midiInput) {
+	auto it = subscribed.find(midiInput);
+	if (it != subscribed.end())
+		subscribed.erase(it);
+
+	if (subscribed.size() == 0) {
+		warn("TODO: Fix memory leak");
+	}
+}
+
+void MidiInputDevice::onMessage(MidiMessage message) {
+	for (MidiInput *midiInput : subscribed) {
+		midiInput->onMessage(message);
+	}
+}
+
+////////////////////
+// MidiIODriver
+////////////////////
+
+
+////////////////////
 // MidiIO
 ////////////////////
 
@@ -94,6 +123,12 @@ void MidiInput::setDriver(int driver) {
 	if (driver >= 0) {
 		midiInputDriver = rtmidiGetInputDriver(driver);
 	}
+	else if (driver == BRIDGE_DRIVER) {
+		// TODO
+	}
+	else if (driver == GAMEPAD_DRIVER) {
+		midiInputDriver = gamepadGetInputDriver();
+	}
 	this->driver = driver;
 }
 
@@ -163,31 +198,6 @@ void MidiOutput::setDriver(int driver) {
 
 void MidiOutput::setDevice(int device) {
 	// TODO
-}
-
-////////////////////
-// MidiIODevice
-////////////////////
-
-void MidiInputDevice::subscribe(MidiInput *midiInput) {
-	subscribed.insert(midiInput);
-}
-
-void MidiInputDevice::unsubscribe(MidiInput *midiInput) {
-	auto it = subscribed.find(midiInput);
-	if (it != subscribed.end())
-		subscribed.erase(it);
-
-	// Delete self if nothing is subscribed
-	if (subscribed.size() == 0) {
-		delete this;
-	}
-}
-
-void MidiInputDevice::onMessage(MidiMessage message) {
-	for (MidiInput *midiInput : subscribed) {
-		midiInput->onMessage(message);
-	}
 }
 
 

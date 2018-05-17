@@ -30,14 +30,47 @@ struct MidiMessage {
 };
 
 ////////////////////
-// MidiIO
+// MidiIODevice
 ////////////////////
 
-struct MidiInputDriver;
-struct MidiOutputDriver;
-struct MidiInputDevice;
-struct MidiOutputDevice;
+struct MidiIODevice {
+	virtual ~MidiIODevice() {}
+};
 
+struct MidiInput;
+
+struct MidiInputDevice : MidiIODevice {
+	std::set<MidiInput*> subscribed;
+	void subscribe(MidiInput *midiInput);
+	void unsubscribe(MidiInput *midiInput);
+	void onMessage(MidiMessage message);
+};
+
+struct MidiOutputDevice : MidiIODevice {
+	// TODO
+};
+
+////////////////////
+// MidiIODriver
+////////////////////
+
+struct MidiIODriver {
+	virtual ~MidiIODriver() {}
+	virtual int getDeviceCount() = 0;
+	virtual std::string getDeviceName(int device) = 0;
+};
+
+struct MidiInputDriver : MidiIODriver {
+	virtual MidiInputDevice *getDevice(int device) = 0;
+};
+
+struct MidiOutputDriver : MidiIODriver {
+	virtual MidiOutputDevice *getDevice(int device) = 0;
+};
+
+////////////////////
+// MidiIO
+////////////////////
 
 struct MidiIO {
 	int driver = -1;
@@ -102,44 +135,6 @@ struct MidiOutput : MidiIO {
 	~MidiOutput();
 	void setDriver(int driver) override;
 	void setDevice(int device) override;
-};
-
-////////////////////
-// MidiIODriver
-////////////////////
-
-struct MidiIODriver {
-	virtual ~MidiIODriver() {}
-	virtual int getDeviceCount() = 0;
-	virtual std::string getDeviceName(int device) = 0;
-};
-
-struct MidiInputDriver : MidiIODriver {
-	virtual MidiInputDevice *getDevice(int device) = 0;
-};
-
-struct MidiOutputDriver : MidiIODriver {
-	virtual MidiOutputDevice *getDevice(int device) = 0;
-};
-
-////////////////////
-// MidiIODevice
-////////////////////
-
-struct MidiIODevice {
-	virtual ~MidiIODevice() {}
-};
-
-struct MidiInputDevice : MidiIODevice {
-	std::set<MidiInput*> subscribed;
-	void subscribe(MidiInput *midiInput);
-	/** Deletes itself if nothing is subscribed */
-	void unsubscribe(MidiInput *midiInput);
-	void onMessage(MidiMessage message);
-};
-
-struct MidiOutputDevice : MidiIODevice {
-	// TODO
 };
 
 

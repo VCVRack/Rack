@@ -162,10 +162,17 @@ void systemOpenBrowser(std::string url);
 
 void loggerInit();
 void loggerDestroy();
-void debug(const char *format, ...);
-void info(const char *format, ...);
-void warn(const char *format, ...);
-void fatal(const char *format, ...);
+/** Do not use this function directly. Use the macros below. */
+void loggerLog(const char *level, const char *file, int line, const char *format, ...);
+/** Example usage:
+	debug("error: %d", errno);
+will print something like
+	[0.123 debug myfile.cpp:45] error: 67
+*/
+#define debug(format, ...) loggerLog("debug", __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define info(format, ...) loggerLog("info", __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define warn(format, ...) loggerLog("warn", __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define fatal(format, ...) loggerLog("fatal", __FILE__, __LINE__, format, ##__VA_ARGS__)
 
 ////////////////////
 // Thread functions
