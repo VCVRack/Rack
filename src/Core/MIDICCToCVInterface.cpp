@@ -19,7 +19,7 @@ struct MIDICCToCVInterface : Module {
 	};
 
 	MidiInputQueue midiInput;
-	uint8_t cvs[16];
+	int8_t cvs[16];
 	ExponentialFilter ccFilters[16];
 
 	int learningId = -1;
@@ -64,7 +64,8 @@ struct MIDICCToCVInterface : Module {
 				// Set CV
 				for (int i = 0; i < 16; i++) {
 					if (learnedCcs[i] == cc) {
-						cvs[i] = msg.value();
+						// Allow CC to be negative if the 8th bit is set
+						cvs[i] = msg.data2;
 					}
 				}
 			} break;

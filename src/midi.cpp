@@ -50,6 +50,7 @@ std::vector<int> MidiIO::getDriverIds() {
 
 std::string MidiIO::getDriverName(int driverId) {
 	switch (driverId) {
+		case -1: return "None";
 		case RtMidi::UNSPECIFIED: return "Unspecified";
 		case RtMidi::MACOSX_CORE: return "Core MIDI";
 		case RtMidi::LINUX_ALSA: return "ALSA";
@@ -179,6 +180,7 @@ void MidiInputQueue::onMessage(MidiMessage message) {
 			return;
 	}
 
+	// Push to queue
 	if ((int) queue.size() < queueSize)
 		queue.push(message);
 }
