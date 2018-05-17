@@ -12,11 +12,14 @@ const int GAMEPAD_DRIVER = -10;
 
 struct GamepadInputDevice : MidiInputDevice {
 	int deviceId;
+	std::vector<uint8_t> ccs;
+	void step();
+	void updateCc(int index, uint8_t cc);
 };
 
 
 struct GamepadInputDriver : MidiInputDriver {
-	GamepadInputDevice gamepadInputDevices[16];
+	GamepadInputDevice devices[16];
 
 	GamepadInputDriver();
 	std::vector<int> getDeviceIds() override;
