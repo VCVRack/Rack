@@ -17,6 +17,7 @@ namespace rack {
 bool gPaused = false;
 std::vector<Module*> gModules;
 std::vector<Wire*> gWires;
+bool gCpuMeters = true;
 
 static bool running = false;
 static float sampleRate;
@@ -86,7 +87,15 @@ static void engineStep() {
 
 	// Step modules
 	for (Module *module : gModules) {
+		auto startTime = std::chrono::high_resolution_clock::now();
+
 		module->step();
+
+		if (gCpuMeters) {
+			auto stopTime = std::chrono::high_resolution_clock::now();
+			float cpuTime = std::chrono::duration<float>(stopTime - startTime).count() * sampleRate;
+			module->cpuTime += (cpuTime - module->cpuTime) * sampleTime * 10.f;
+		}
 
 		// TODO skip this step when plug lights are disabled
 		// Step ports

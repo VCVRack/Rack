@@ -5,18 +5,17 @@
 namespace rack {
 
 
-// TODO Change driver and port number to something less common
 /** Driver ID in AudioIO and MidiIO */
-#define BRIDGE_DRIVER -12512
-#define BRIDGE_HOST "127.0.0.1"
-#define BRIDGE_PORT 12512
-#define BRIDGE_NUM_PORTS 16
+const int BRIDGE_DRIVER = -12512;
+const char* const BRIDGE_HOST = "127.0.0.1";
+const int BRIDGE_PORT = 12512;
+const int BRIDGE_NUM_PORTS = 16;
 /** Number of VST/AU automation parameters */
-#define BRIDGE_NUM_PARAMS 16
+const int BRIDGE_NUM_PARAMS = 16;
 /** An arbitrary number which prevents connection from other protocols (like WebSockets) and old Bridge versions */
-#define BRIDGE_HELLO 0xff00fefd
-#define BRIDGE_INPUTS 8
-#define BRIDGE_OUTPUTS 8
+const uint32_t BRIDGE_HELLO = 0xff00fefd;
+const int BRIDGE_INPUTS = 8;
+const int BRIDGE_OUTPUTS = 8;
 
 
 /** All commands are called from the client and served by the server

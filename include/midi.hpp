@@ -1,16 +1,10 @@
 #pragma once
 
 #include "util/common.hpp"
-#include <queue>
 #include <vector>
+#include <queue>
+#include <set>
 #include <jansson.h>
-
-#pragma GCC diagnostic push
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wsuggest-override"
-#endif
-#include "rtmidi/RtMidi.h"
-#pragma GCC diagnostic pop
 
 
 namespace rack {
@@ -35,6 +29,13 @@ struct MidiMessage {
 	}
 };
 
+////////////////////
+// MidiIO
+////////////////////
+
+struct MidiInputDevice;
+struct MidiOutputDevice;
+
 
 struct MidiIO {
 	int driver = -1;
@@ -45,18 +46,16 @@ struct MidiIO {
 	Zero indexed.
 	*/
 	int channel = -1;
-	RtMidi *rtMidi = NULL;
-	/** Cached */
-	std::string deviceName;
 
 	virtual ~MidiIO() {}
+
 	std::vector<int> getDrivers();
 	std::string getDriverName(int driver);
-	virtual void setDriver(int driver) {}
+	void setDriver(int driver);
 
-	int getDeviceCount();
-	std::string getDeviceName(int device);
-	virtual void setDevice(int device) {}
+	virtual int getDeviceCount() = 0;
+	virtual std::string getDeviceName(int device) = 0;
+	virtual void setDevice(int device) = 0;
 
 	std::string getChannelName(int channel);
 	json_t *toJson();
@@ -65,17 +64,22 @@ struct MidiIO {
 
 
 struct MidiInput : MidiIO {
-	RtMidiIn *rtMidiIn = NULL;
+	MidiInputDevice *midiInputDevice = NULL;
+
 	MidiInput();
 	~MidiInput();
-	void setDriver(int driver) override;
+
+	int getDeviceCount() override;
+	std::string getDeviceName(int device) override;
 	void setDevice(int device) override;
+
 	virtual void onMessage(MidiMessage message) {}
 };
 
 
 struct MidiInputQueue : MidiInput {
 	int queueSize = 8192;
+	// TODO Switch to RingBuffer
 	std::queue<MidiMessage> queue;
 	void onMessage(MidiMessage message) override;
 	/** If a MidiMessage is available, writes `message` and return true */
@@ -84,11 +88,30 @@ struct MidiInputQueue : MidiInput {
 
 
 struct MidiOutput : MidiIO {
-	RtMidiOut *rtMidiOut = NULL;
+	MidiOutputDevice *midiOutputDevice = NULL;
 	MidiOutput();
 	~MidiOutput();
-	void setDriver(int driver) override;
 	void setDevice(int device) override;
+};
+
+////////////////////
+// MidiIODevice
+////////////////////
+
+struct MidiIODevice {
+	virtual ~MidiIODevice() {}
+};
+
+struct MidiInputDevice : MidiIODevice {
+	std::set<MidiInput*> subscribed;
+	void subscribe(MidiInput *midiInput);
+	/** Deletes itself if nothing is subscribed */
+	void unsubscribe(MidiInput *midiInput);
+	void onMessage(MidiMessage message);
+};
+
+struct MidiOutputDevice : MidiIODevice {
+	// TODO
 };
 
 
