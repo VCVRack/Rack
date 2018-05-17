@@ -13,8 +13,8 @@ const int GAMEPAD_DRIVER = -10;
 struct GamepadInputDevice : MidiInputDevice {
 	int deviceId;
 	std::vector<uint8_t> ccs;
+	std::vector<bool> notes;
 	void step();
-	void updateCc(int index, uint8_t cc);
 };
 
 

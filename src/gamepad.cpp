@@ -14,31 +14,38 @@ void GamepadInputDevice::step() {
 	const float *axes = glfwGetJoystickAxes(deviceId, &numAxes);
 	int numButtons;
 	const unsigned char *buttons = glfwGetJoystickButtons(deviceId, &numButtons);
-	// Update state
-	ccs.resize(numAxes + numButtons);
+
+	// Convert axes to MIDI CC
+	ccs.resize(numAxes);
 	for (int i = 0; i < numAxes; i++) {
 		// Allow CC value to go negative, but clamp at -127 instead of -128 for symmetry
-		updateCc(i, clamp((int) (axes[i] * 127), -127, 127));
+		int8_t cc = clamp((int) (axes[i] * 127), -127, 127);
+		if (cc != ccs[i]) {
+			ccs[i] = cc;
+
+			// Send MIDI message
+			MidiMessage msg;
+			// MIDI channel 1
+			msg.cmd = (0xb << 4) | 0;
+			msg.data1 = i;
+			msg.data2 = ccs[i];
+			onMessage(msg);
+		}
 	}
+
+	// Convert buttons to MIDI notes
+	notes.resize(numButtons);
 	for (int i = 0; i < numButtons; i++) {
-		updateCc(numAxes + i, buttons[i] ? 127 : 0);
-	}
-}
+		bool note = !!buttons[i];
+		if (note != notes[i]) {
+			notes[i] = note;
 
-void GamepadInputDevice::updateCc(int index, uint8_t cc) {
-	if ((int) ccs.size() < index)
-		return;
-
-	if (cc != ccs[index]) {
-		ccs[index] = cc;
-
-		// Send MIDI message
-		MidiMessage msg;
-		// MIDI channel 1
-		msg.cmd = (0xb << 4) | 0;
-		msg.data1 = index;
-		msg.data2 = ccs[index];
-		onMessage(msg);
+			MidiMessage msg;
+			msg.cmd = ((note ? 0x9 : 0x8) << 4);
+			msg.data1 = i;
+			msg.data2 = 127;
+			onMessage(msg);
+		}
 	}
 }
 
