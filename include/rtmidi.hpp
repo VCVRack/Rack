@@ -14,6 +14,18 @@
 namespace rack {
 
 
+struct RtMidiInputDriver : MidiInputDriver {
+	/** Just for querying MIDI driver information */
+	RtMidiIn *rtMidiIn;
+
+	RtMidiInputDriver(int driver);
+	~RtMidiInputDriver();
+	int getDeviceCount() override;
+	std::string getDeviceName(int device) override;
+	MidiInputDevice *getDevice(int device) override;
+};
+
+
 struct RtMidiInputDevice : MidiInputDevice {
 	RtMidiIn *rtMidiIn;
 	/** Cached */
@@ -25,9 +37,7 @@ struct RtMidiInputDevice : MidiInputDevice {
 
 
 std::vector<int> rtmidiGetDrivers();
-int rtmidiGetDeviceCount(int driver);
-std::string rtmidiGetDeviceName(int driver, int device);
-RtMidiInputDevice *rtmidiGetDevice(int driver, int device);
+MidiInputDriver *rtmidiGetInputDriver(int driver);
 
 
 } // namespace rack

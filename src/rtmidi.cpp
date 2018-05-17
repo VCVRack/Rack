@@ -1,7 +1,34 @@
 #include "rtmidi.hpp"
+#include <map>
 
 
 namespace rack {
+
+
+RtMidiInputDriver::RtMidiInputDriver(int driver) {
+	rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
+	assert(rtMidiIn);
+}
+
+RtMidiInputDriver::~RtMidiInputDriver() {
+	delete rtMidiIn;
+}
+
+int RtMidiInputDriver::getDeviceCount() {
+	return rtMidiIn->getPortCount();
+}
+
+std::string RtMidiInputDriver::getDeviceName(int device) {
+	if (device >= 0) {
+		return rtMidiIn->getPortName(device);
+	}
+	return "";
+}
+
+MidiInputDevice *RtMidiInputDriver::getDevice(int device) {
+	// TODO Get from cache
+	return new RtMidiInputDevice(rtMidiIn->getCurrentApi(), device);
+}
 
 
 static void midiInputCallback(double timeStamp, std::vector<unsigned char> *message, void *userData) {
@@ -21,13 +48,11 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 	midiInputDevice->onMessage(msg);
 }
 
-
 RtMidiInputDevice::RtMidiInputDevice(int driver, int device) {
 	rtMidiIn = new RtMidiIn((RtMidi::Api) driver, "VCV Rack");
 	rtMidiIn->ignoreTypes(false, false, false);
 	rtMidiIn->setCallback(midiInputCallback, this);
 }
-
 
 RtMidiInputDevice::~RtMidiInputDevice() {
 	rtMidiIn->closePort();
@@ -46,23 +71,15 @@ std::vector<int> rtmidiGetDrivers() {
 	return drivers;
 }
 
-int rtmidiGetDeviceCount(int driver) {
-	RtMidiIn *rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
-	int count = rtMidiIn->getPortCount();
-	delete rtMidiIn;
-	return count;
-}
+static std::map<int, RtMidiInputDriver*> rtmidiInputDrivers;
 
-std::string rtmidiGetDeviceName(int driver, int device) {
-	RtMidiIn *rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
-	std::string name = rtMidiIn->getPortName(device);
-	delete rtMidiIn;
-	return name;
-}
-
-RtMidiInputDevice *rtmidiGetDevice(int driver, int device) {
-	// TODO Pull from cache
-	return new RtMidiInputDevice(driver, device);
+MidiInputDriver *rtmidiGetInputDriver(int driver) {
+	// Lazily create RtMidiInputDriver
+	RtMidiInputDriver *d = rtmidiInputDrivers[driver];
+	if (!d) {
+		rtmidiInputDrivers[driver] = d = new RtMidiInputDriver(driver);
+	}
+	return d;
 }
 
 
