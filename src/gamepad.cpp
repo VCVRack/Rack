@@ -8,26 +8,36 @@ namespace rack {
 
 GamepadInputDriver::GamepadInputDriver() {
 	for (int i = 0; i < 16; i++) {
-		gamepadInputDevices[i].device = i;
+		gamepadInputDevices[i].deviceId = i;
 	}
 }
 
-int GamepadInputDriver::getDeviceCount() {
-	return 16;
+std::vector<int> GamepadInputDriver::getDeviceIds() {
+	std::vector<int> deviceIds;
+	for (int i = 0; i < 16; i++) {
+		if (glfwJoystickPresent(i)) {
+			deviceIds.push_back(i);
+		}
+	}
+	return deviceIds;
 }
 
-std::string GamepadInputDriver::getDeviceName(int device) {
-	assert(0 <= device && device < 16);
-	const char *name = glfwGetJoystickName(device);
+std::string GamepadInputDriver::getDeviceName(int deviceId) {
+	if (!(0 <= deviceId && deviceId < 16))
+		return "";
+
+	const char *name = glfwGetJoystickName(deviceId);
 	if (name) {
 		return name;
 	}
-	return stringf("Gamepad %d (unavailable)", device + 1);
+	return stringf("Gamepad %d (unavailable)", deviceId + 1);
 }
 
-MidiInputDevice *GamepadInputDriver::getDevice(int device) {
-	assert(0 <= device && device < 16);
-	return &gamepadInputDevices[device];
+MidiInputDevice *GamepadInputDriver::getDevice(int deviceId) {
+	if (!(0 <= deviceId && deviceId < 16))
+		return NULL;
+
+	return &gamepadInputDevices[deviceId];
 }
 
 
