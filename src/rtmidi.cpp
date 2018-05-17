@@ -5,8 +5,8 @@
 namespace rack {
 
 
-RtMidiInputDriver::RtMidiInputDriver(int driver) {
-	rtMidiIn = new RtMidiIn((RtMidi::Api) driver);
+RtMidiInputDriver::RtMidiInputDriver(int driverId) {
+	rtMidiIn = new RtMidiIn((RtMidi::Api) driverId);
 	assert(rtMidiIn);
 }
 
@@ -14,20 +14,24 @@ RtMidiInputDriver::~RtMidiInputDriver() {
 	delete rtMidiIn;
 }
 
-int RtMidiInputDriver::getDeviceCount() {
-	return rtMidiIn->getPortCount();
+std::vector<int> RtMidiInputDriver::getDeviceIds() {
+	int count = rtMidiIn->getPortCount();;
+	std::vector<int> deviceIds;
+	for (int i = 0; i < count; i++)
+		deviceIds.push_back(i);
+	return deviceIds;
 }
 
-std::string RtMidiInputDriver::getDeviceName(int device) {
-	if (device >= 0) {
-		return rtMidiIn->getPortName(device);
+std::string RtMidiInputDriver::getDeviceName(int deviceId) {
+	if (deviceId >= 0) {
+		return rtMidiIn->getPortName(deviceId);
 	}
 	return "";
 }
 
-MidiInputDevice *RtMidiInputDriver::getDevice(int device) {
+MidiInputDevice *RtMidiInputDriver::getDevice(int deviceId) {
 	// TODO Get from cache
-	return new RtMidiInputDevice(rtMidiIn->getCurrentApi(), device);
+	return new RtMidiInputDevice(rtMidiIn->getCurrentApi(), deviceId);
 }
 
 
@@ -48,8 +52,8 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 	midiInputDevice->onMessage(msg);
 }
 
-RtMidiInputDevice::RtMidiInputDevice(int driver, int device) {
-	rtMidiIn = new RtMidiIn((RtMidi::Api) driver, "VCV Rack");
+RtMidiInputDevice::RtMidiInputDevice(int driverId, int deviceId) {
+	rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
 	rtMidiIn->ignoreTypes(false, false, false);
 	rtMidiIn->setCallback(midiInputCallback, this);
 }
@@ -73,11 +77,11 @@ std::vector<int> rtmidiGetDrivers() {
 
 static std::map<int, RtMidiInputDriver*> rtmidiInputDrivers;
 
-MidiInputDriver *rtmidiGetInputDriver(int driver) {
+MidiInputDriver *rtmidiGetInputDriver(int driverId) {
 	// Lazily create RtMidiInputDriver
-	RtMidiInputDriver *d = rtmidiInputDrivers[driver];
+	RtMidiInputDriver *d = rtmidiInputDrivers[driverId];
 	if (!d) {
-		rtmidiInputDrivers[driver] = d = new RtMidiInputDriver(driver);
+		rtmidiInputDrivers[driverId] = d = new RtMidiInputDriver(driverId);
 	}
 	return d;
 }

@@ -56,16 +56,16 @@ struct MidiOutputDevice : MidiIODevice {
 
 struct MidiIODriver {
 	virtual ~MidiIODriver() {}
-	virtual int getDeviceCount() = 0;
-	virtual std::string getDeviceName(int device) = 0;
+	virtual std::vector<int> getDeviceIds() = 0;
+	virtual std::string getDeviceName(int deviceId) = 0;
 };
 
 struct MidiInputDriver : MidiIODriver {
-	virtual MidiInputDevice *getDevice(int device) = 0;
+	virtual MidiInputDevice *getDevice(int deviceId) = 0;
 };
 
 struct MidiOutputDriver : MidiIODriver {
-	virtual MidiOutputDevice *getDevice(int device) = 0;
+	virtual MidiOutputDevice *getDevice(int deviceId) = 0;
 };
 
 ////////////////////
@@ -73,8 +73,8 @@ struct MidiOutputDriver : MidiIODriver {
 ////////////////////
 
 struct MidiIO {
-	int driver = -1;
-	int device = -1;
+	int driverId = -1;
+	int deviceId = -1;
 	/* For MIDI output, the channel to output messages.
 	For MIDI input, the channel to filter.
 	Set to -1 to allow all MIDI channels (for input).
@@ -84,13 +84,13 @@ struct MidiIO {
 
 	virtual ~MidiIO() {}
 
-	std::vector<int> getDrivers();
-	std::string getDriverName(int driver);
-	virtual void setDriver(int driver) = 0;
+	std::vector<int> getDriverIds();
+	std::string getDriverName(int driverId);
+	virtual void setDriverId(int driverId) = 0;
 
-	virtual int getDeviceCount() = 0;
-	virtual std::string getDeviceName(int device) = 0;
-	virtual void setDevice(int device) = 0;
+	virtual std::vector<int> getDeviceIds() = 0;
+	virtual std::string getDeviceName(int deviceId) = 0;
+	virtual void setDeviceId(int deviceId) = 0;
 
 	std::string getChannelName(int channel);
 	json_t *toJson();
@@ -100,17 +100,17 @@ struct MidiIO {
 
 struct MidiInput : MidiIO {
 	/** Not owned */
-	MidiInputDriver *midiInputDriver = NULL;
+	MidiInputDriver *driver = NULL;
 	/** Not owned, must unsubscribe when destructed */
-	MidiInputDevice *midiInputDevice = NULL;
+	MidiInputDevice *device = NULL;
 
 	MidiInput();
 	~MidiInput();
 
-	void setDriver(int driver) override;
-	int getDeviceCount() override;
-	std::string getDeviceName(int device) override;
-	void setDevice(int device) override;
+	void setDriverId(int driverId) override;
+	std::vector<int> getDeviceIds() override;
+	std::string getDeviceName(int deviceId) override;
+	void setDeviceId(int deviceId) override;
 
 	virtual void onMessage(MidiMessage message) {}
 };
@@ -128,13 +128,13 @@ struct MidiInputQueue : MidiInput {
 
 struct MidiOutput : MidiIO {
 	/** Not owned */
-	MidiOutputDriver *midiOutputDriver = NULL;
+	MidiOutputDriver *driver = NULL;
 	/** Not owned, must unsubscribe when destructed */
-	MidiOutputDevice *midiOutputDevice = NULL;
+	MidiOutputDevice *device = NULL;
 	MidiOutput();
 	~MidiOutput();
-	void setDriver(int driver) override;
-	void setDevice(int device) override;
+	void setDriverId(int driverId) override;
+	void setDeviceId(int deviceId) override;
 };
 
 

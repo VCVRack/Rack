@@ -40,16 +40,16 @@ void MidiInputDevice::onMessage(MidiMessage message) {
 // MidiIO
 ////////////////////
 
-std::vector<int> MidiIO::getDrivers() {
-	std::vector<int> drivers = rtmidiGetDrivers();
-	// Add custom drivers
-	drivers.push_back(BRIDGE_DRIVER);
-	drivers.push_back(GAMEPAD_DRIVER);
-	return drivers;
+std::vector<int> MidiIO::getDriverIds() {
+	std::vector<int> driverIds = rtmidiGetDrivers();
+	// Add custom driverIds
+	driverIds.push_back(BRIDGE_DRIVER);
+	driverIds.push_back(GAMEPAD_DRIVER);
+	return driverIds;
 }
 
-std::string MidiIO::getDriverName(int driver) {
-	switch (driver) {
+std::string MidiIO::getDriverName(int driverId) {
+	switch (driverId) {
 		case RtMidi::UNSPECIFIED: return "Unspecified";
 		case RtMidi::MACOSX_CORE: return "Core MIDI";
 		case RtMidi::LINUX_ALSA: return "ALSA";
@@ -71,8 +71,8 @@ std::string MidiIO::getChannelName(int channel) {
 
 json_t *MidiIO::toJson() {
 	json_t *rootJ = json_object();
-	json_object_set_new(rootJ, "driver", json_integer(driver));
-	std::string deviceName = getDeviceName(device);
+	json_object_set_new(rootJ, "driver", json_integer(driverId));
+	std::string deviceName = getDeviceName(deviceId);
 	if (!deviceName.empty())
 		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
 	json_object_set_new(rootJ, "channel", json_integer(channel));
@@ -82,16 +82,15 @@ json_t *MidiIO::toJson() {
 void MidiIO::fromJson(json_t *rootJ) {
 	json_t *driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
-		setDriver(json_integer_value(driverJ));
+		setDriverId(json_integer_value(driverJ));
 
 	json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
 	if (deviceNameJ) {
 		std::string deviceName = json_string_value(deviceNameJ);
 		// Search for device with equal name
-		int deviceCount = getDeviceCount();
-		for (int device = 0; device < deviceCount; device++) {
-			if (getDeviceName(device) == deviceName) {
-				setDevice(device);
+		for (int deviceId : getDeviceIds()) {
+			if (getDeviceName(deviceId) == deviceName) {
+				setDeviceId(deviceId);
 				break;
 			}
 		}
@@ -111,52 +110,66 @@ MidiInput::MidiInput() {
 }
 
 MidiInput::~MidiInput() {
-	setDriver(-1);
+	setDriverId(-1);
 }
 
-void MidiInput::setDriver(int driver) {
-	setDevice(-1);
-	if (midiInputDriver) {
-		midiInputDriver = NULL;
+void MidiInput::setDriverId(int driverId) {
+	// Destroy driver
+	setDeviceId(-1);
+	if (driver) {
+		driver = NULL;
 	}
+	this->driverId = -1;
 
-	if (driver >= 0) {
-		midiInputDriver = rtmidiGetInputDriver(driver);
+	// Create driver
+	if (driverId >= 0) {
+		driver = rtmidiGetInputDriver(driverId);
 	}
-	else if (driver == BRIDGE_DRIVER) {
+	else if (driverId == BRIDGE_DRIVER) {
 		// TODO
 	}
-	else if (driver == GAMEPAD_DRIVER) {
-		midiInputDriver = gamepadGetInputDriver();
+	else if (driverId == GAMEPAD_DRIVER) {
+		driver = gamepadGetInputDriver();
 	}
-	this->driver = driver;
+
+	// Set driverId
+	if (driver) {
+		this->driverId = driverId;
+	}
 }
 
-int MidiInput::getDeviceCount() {
-	if (midiInputDriver) {
-		return midiInputDriver->getDeviceCount();
+std::vector<int> MidiInput::getDeviceIds() {
+	if (driver) {
+		return driver->getDeviceIds();
 	}
-	return 0;
+	return {};
 }
 
-std::string MidiInput::getDeviceName(int device) {
-	if (midiInputDriver) {
-		return midiInputDriver->getDeviceName(device);
+std::string MidiInput::getDeviceName(int deviceId) {
+	if (driver) {
+		return driver->getDeviceName(deviceId);
 	}
 	return "";
 }
 
-void MidiInput::setDevice(int device) {
-	if (midiInputDevice) {
-		midiInputDevice->unsubscribe(this);
-		midiInputDevice = NULL;
+void MidiInput::setDeviceId(int deviceId) {
+	// Destroy device
+	if (device) {
+		device->unsubscribe(this);
+		device = NULL;
+	}
+	this->deviceId = -1;
+
+	// Create device
+	if (driver && deviceId >= 0) {
+		device = driver->getDevice(deviceId);
+		device->subscribe(this);
 	}
 
-	if (midiInputDriver && device >= 0) {
-		midiInputDevice = midiInputDriver->getDevice(device);
-		midiInputDevice->subscribe(this);
+	// Set deviceId
+	if (device) {
+		this->deviceId = deviceId;
 	}
-	this->device = device;
 }
 
 void MidiInputQueue::onMessage(MidiMessage message) {
@@ -192,11 +205,11 @@ MidiOutput::~MidiOutput() {
 	// TODO
 }
 
-void MidiOutput::setDriver(int driver) {
+void MidiOutput::setDriverId(int driverId) {
 	// TODO
 }
 
-void MidiOutput::setDevice(int device) {
+void MidiOutput::setDeviceId(int deviceId) {
 	// TODO
 }
 

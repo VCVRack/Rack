@@ -7,9 +7,9 @@ namespace rack {
 
 struct MidiDriverItem : MenuItem {
 	MidiIO *midiIO;
-	int driver;
+	int driverId;
 	void onAction(EventAction &e) override {
-		midiIO->setDriver(driver);
+		midiIO->setDriverId(driverId);
 	}
 };
 
@@ -18,25 +18,25 @@ struct MidiDriverChoice : LedDisplayChoice {
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI driver"));
-		for (int driver : midiWidget->midiIO->getDrivers()) {
+		for (int driverId : midiWidget->midiIO->getDriverIds()) {
 			MidiDriverItem *item = new MidiDriverItem();
 			item->midiIO = midiWidget->midiIO;
-			item->driver = driver;
-			item->text = midiWidget->midiIO->getDriverName(driver);
-			item->rightText = CHECKMARK(item->driver == midiWidget->midiIO->driver);
+			item->driverId = driverId;
+			item->text = midiWidget->midiIO->getDriverName(driverId);
+			item->rightText = CHECKMARK(item->driverId == midiWidget->midiIO->driverId);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		text = midiWidget->midiIO->getDriverName(midiWidget->midiIO->driver);
+		text = midiWidget->midiIO->getDriverName(midiWidget->midiIO->driverId);
 	}
 };
 
 struct MidiDeviceItem : MenuItem {
 	MidiIO *midiIO;
-	int device;
+	int deviceId;
 	void onAction(EventAction &e) override {
-		midiIO->setDevice(device);
+		midiIO->setDeviceId(deviceId);
 	}
 };
 
@@ -48,23 +48,22 @@ struct MidiDeviceChoice : LedDisplayChoice {
 		{
 			MidiDeviceItem *item = new MidiDeviceItem();
 			item->midiIO = midiWidget->midiIO;
-			item->device = -1;
+			item->deviceId = -1;
 			item->text = "(No device)";
-			item->rightText = CHECKMARK(item->device == midiWidget->midiIO->device);
+			item->rightText = CHECKMARK(item->deviceId == midiWidget->midiIO->deviceId);
 			menu->addChild(item);
 		}
-		int driverCount = midiWidget->midiIO->getDeviceCount();
-		for (int device = 0; device < driverCount; device++) {
+		for (int deviceId : midiWidget->midiIO->getDeviceIds()) {
 			MidiDeviceItem *item = new MidiDeviceItem();
 			item->midiIO = midiWidget->midiIO;
-			item->device = device;
-			item->text = midiWidget->midiIO->getDeviceName(device);
-			item->rightText = CHECKMARK(item->device == midiWidget->midiIO->device);
+			item->deviceId = deviceId;
+			item->text = midiWidget->midiIO->getDeviceName(deviceId);
+			item->rightText = CHECKMARK(item->deviceId == midiWidget->midiIO->deviceId);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		text = midiWidget->midiIO->getDeviceName(midiWidget->midiIO->device);
+		text = midiWidget->midiIO->getDeviceName(midiWidget->midiIO->deviceId);
 		if (text.empty()) {
 			text = "(No device)";
 			color.a = 0.5f;
