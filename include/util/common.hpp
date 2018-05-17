@@ -160,19 +160,26 @@ void systemOpenBrowser(std::string url);
 // logger.cpp
 ////////////////////
 
+enum LoggerLevel {
+	DEBUG_LEVEL = 0,
+	INFO_LEVEL,
+	WARN_LEVEL,
+	FATAL_LEVEL
+};
+
 void loggerInit();
 void loggerDestroy();
 /** Do not use this function directly. Use the macros below. */
-void loggerLog(const char *level, const char *file, int line, const char *format, ...);
+void loggerLog(LoggerLevel level, const char *file, int line, const char *format, ...);
 /** Example usage:
 	debug("error: %d", errno);
 will print something like
 	[0.123 debug myfile.cpp:45] error: 67
 */
-#define debug(format, ...) loggerLog("debug", __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define info(format, ...) loggerLog("info", __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define warn(format, ...) loggerLog("warn", __FILE__, __LINE__, format, ##__VA_ARGS__)
-#define fatal(format, ...) loggerLog("fatal", __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define debug(format, ...) loggerLog(DEBUG_LEVEL, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define info(format, ...) loggerLog(INFO_LEVEL, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define warn(format, ...) loggerLog(WARN_LEVEL, __FILE__, __LINE__, format, ##__VA_ARGS__)
+#define fatal(format, ...) loggerLog(FATAL_LEVEL, __FILE__, __LINE__, format, ##__VA_ARGS__)
 
 ////////////////////
 // Thread functions

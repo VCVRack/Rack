@@ -95,6 +95,7 @@ struct MIDITriggerToCVInterface : Module {
 					pressNote(msg.note());
 				}
 				else {
+					// Many stupid keyboards send a "note on" command with 0 velocity to mean "note release"
 					releaseNote(msg.note());
 				}
 			} break;
