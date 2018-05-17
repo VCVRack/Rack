@@ -187,6 +187,18 @@ void ModuleWidget::randomize() {
 void ModuleWidget::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(vg);
+
+	// CPU meter
+	if (gCpuMeters && module) {
+		float p = clamp(module->cpuTime, 0.f, 1.f);
+		nvgBeginPath(vg);
+		nvgRect(vg,
+			0, (1.f - p) * box.size.y,
+			5, p * box.size.y);
+		nvgFillColor(vg, nvgRGBAf(1, 0, 0, 1.0));
+		nvgFill(vg);
+	}
+
 	nvgResetScissor(vg);
 }
 

@@ -1,5 +1,7 @@
 #include "midi.hpp"
+#include "rtmidi.hpp"
 #include "bridge.hpp"
+#include "gamepad.hpp"
 
 
 namespace rack {
@@ -10,15 +12,10 @@ namespace rack {
 ////////////////////
 
 std::vector<int> MidiIO::getDrivers() {
-	std::vector<RtMidi::Api> rtApis;
-	RtMidi::getCompiledApi(rtApis);
-
-	std::vector<int> drivers;
-	for (RtMidi::Api api : rtApis) {
-		drivers.push_back((int) api);
-	}
-	// Add fake Bridge driver
+	std::vector<int> drivers = rtmidiGetDrivers();
+	// Add custom drivers
 	drivers.push_back(BRIDGE_DRIVER);
+	drivers.push_back(GAMEPAD_DRIVER);
 	return drivers;
 }
 
@@ -31,34 +28,14 @@ std::string MidiIO::getDriverName(int driver) {
 		case RtMidi::WINDOWS_MM: return "Windows MIDI";
 		case RtMidi::RTMIDI_DUMMY: return "Dummy MIDI";
 		case BRIDGE_DRIVER: return "Bridge";
+		case GAMEPAD_DRIVER: return "Gamepad";
 		default: return "Unknown";
 	}
 }
 
-int MidiIO::getDeviceCount() {
-	if (rtMidi) {
-		return rtMidi->getPortCount();
-	}
-	else if (driver == BRIDGE_DRIVER) {
-		return BRIDGE_NUM_PORTS;
-	}
-	return 0;
-}
-
-std::string MidiIO::getDeviceName(int device) {
-	if (device < 0)
-		return "";
-
-	if (rtMidi) {
-		if (device == this->device)
-			return deviceName;
-		else
-			return rtMidi->getPortName(device);
-	}
-	else if (driver == BRIDGE_DRIVER) {
-		return stringf("Port %d", device + 1);
-	}
-	return "";
+void MidiIO::setDriver(int driver) {
+	setDevice(-1);
+	this->driver = driver;
 }
 
 std::string MidiIO::getChannelName(int channel) {
@@ -105,68 +82,55 @@ void MidiIO::fromJson(json_t *rootJ) {
 // MidiInput
 ////////////////////
 
-static void midiInputCallback(double timeStamp, std::vector<unsigned char> *message, void *userData) {
-	if (!message) return;
-	if (!userData) return;
-
-	MidiInput *midiInput = (MidiInput*) userData;
-	if (!midiInput) return;
-	MidiMessage msg;
-	if (message->size() >= 1)
-		msg.cmd = (*message)[0];
-	if (message->size() >= 2)
-		msg.data1 = (*message)[1];
-	if (message->size() >= 3)
-		msg.data2 = (*message)[2];
-
-	midiInput->onMessage(msg);
-}
 
 MidiInput::MidiInput() {
-	setDriver(RtMidi::UNSPECIFIED);
 }
 
 MidiInput::~MidiInput() {
 	setDriver(-1);
 }
 
-void MidiInput::setDriver(int driver) {
-	setDevice(-1);
-	if (rtMidiIn) {
-		delete rtMidiIn;
-		rtMidi = rtMidiIn = NULL;
-	}
-
+int MidiInput::getDeviceCount() {
 	if (driver >= 0) {
-		rtMidiIn = new RtMidiIn((RtMidi::Api) driver, "VCV Rack");
-		rtMidiIn->setCallback(midiInputCallback, this);
-		rtMidiIn->ignoreTypes(false, false, false);
-		rtMidi = rtMidiIn;
-		this->driver = rtMidiIn->getCurrentApi();
+		return rtmidiGetDeviceCount(driver);
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		this->driver = BRIDGE_DRIVER;
+		// TODO
 	}
+	else if (driver == GAMEPAD_DRIVER) {
+		// TODO
+	}
+	return 0;
+}
+
+std::string MidiInput::getDeviceName(int device) {
+	if (driver >= 0) {
+		return rtmidiGetDeviceName(driver, device);
+	}
+	else if (driver == BRIDGE_DRIVER) {
+		// TODO
+	}
+	else if (driver == GAMEPAD_DRIVER) {
+		// TODO
+	}
+	return "";
 }
 
 void MidiInput::setDevice(int device) {
-	if (rtMidi) {
-		rtMidi->closePort();
+	if (midiInputDevice) {
+		midiInputDevice->unsubscribe(this);
+		midiInputDevice = NULL;
+	}
 
-		if (device >= 0) {
-			rtMidi->openPort(device);
-			deviceName = rtMidi->getPortName(device);
-		}
-		this->device = device;
+	if (driver >= 0) {
+		midiInputDevice = rtmidiGetDevice(driver, device);
+		midiInputDevice->subscribe(this);
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		if (device >= 0) {
-			bridgeMidiSubscribe(device, this);
-		}
-		else {
-			bridgeMidiUnsubscribe(device, this);
-		}
-		this->device = device;
+		// TODO
+	}
+	else if (driver == GAMEPAD_DRIVER) {
+		// TODO
 	}
 }
 
@@ -197,38 +161,36 @@ bool MidiInputQueue::shift(MidiMessage *message) {
 ////////////////////
 
 MidiOutput::MidiOutput() {
-	setDriver(RtMidi::UNSPECIFIED);
 }
 
 MidiOutput::~MidiOutput() {
-	setDriver(-1);
-}
-
-void MidiOutput::setDriver(int driver) {
-	setDevice(-1);
-	if (rtMidiOut) {
-		delete rtMidiOut;
-		rtMidi = rtMidiOut = NULL;
-	}
-
-	if (driver >= 0) {
-		rtMidiOut = new RtMidiOut((RtMidi::Api) driver, "VCV Rack");
-		rtMidi = rtMidiOut;
-		this->driver = rtMidiOut->getCurrentApi();
-	}
+	// TODO
 }
 
 void MidiOutput::setDevice(int device) {
-	if (rtMidi) {
-		rtMidi->closePort();
+	// TODO
+}
 
-		if (device >= 0) {
-			rtMidi->openPort(device);
-			deviceName = rtMidi->getPortName(device);
-		}
-		this->device = device;
+// MidiIODevice
+
+void MidiInputDevice::subscribe(MidiInput *midiInput) {
+	subscribed.insert(midiInput);
+}
+
+void MidiInputDevice::unsubscribe(MidiInput *midiInput) {
+	auto it = subscribed.find(midiInput);
+	if (it != subscribed.end())
+		subscribed.erase(it);
+
+	// Delete self if nothing is subscribed
+	if (subscribed.size() == 0) {
+		delete this;
 	}
-	else if (driver == BRIDGE_DRIVER) {
+}
+
+void MidiInputDevice::onMessage(MidiMessage message) {
+	for (MidiInput *midiInput : subscribed) {
+		midiInput->onMessage(message);
 	}
 }
 

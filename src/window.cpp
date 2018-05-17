@@ -1,6 +1,7 @@
 #include "window.hpp"
 #include "app.hpp"
 #include "asset.hpp"
+#include "gamepad.hpp"
 #include "util/color.hpp"
 
 #include <map>
@@ -431,6 +432,7 @@ void windowRun() {
 			cursorPosCallback(gWindow, xpos, ypos);
 		}
 		mouseButtonStickyPop();
+		gamepadStep();
 
 		// Set window title
 		std::string windowTitle;
