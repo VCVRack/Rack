@@ -6,6 +6,7 @@
 #include "settings.hpp"
 #include "asset.hpp"
 #include "bridge.hpp"
+#include "midi.hpp"
 #include "osdialog.h"
 
 #include <unistd.h>
@@ -36,6 +37,7 @@ int main(int argc, char* argv[]) {
 
 	pluginInit();
 	engineInit();
+	midiInit();
 	bridgeInit();
 	windowInit();
 	appInit();

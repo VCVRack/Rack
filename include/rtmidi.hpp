@@ -2,6 +2,7 @@
 
 #include "util/common.hpp"
 #include "midi.hpp"
+#include <map>
 
 #pragma GCC diagnostic push
 #ifndef __clang__
@@ -14,30 +15,33 @@
 namespace rack {
 
 
-struct RtMidiInputDriver : MidiInputDriver {
-	/** Just for querying MIDI driver information */
-	RtMidiIn *rtMidiIn;
-
-	RtMidiInputDriver(int driverId);
-	~RtMidiInputDriver();
-	std::vector<int> getDeviceIds() override;
-	std::string getDeviceName(int deviceId) override;
-	MidiInputDevice *getDevice(int deviceId) override;
-};
-
-
 struct RtMidiInputDevice : MidiInputDevice {
 	RtMidiIn *rtMidiIn;
-	/** Cached */
-	std::string deviceName;
 
 	RtMidiInputDevice(int driverId, int deviceId);
 	~RtMidiInputDevice();
 };
 
 
+struct RtMidiDriver : MidiDriver {
+	int driverId;
+	/** Just for querying MIDI driver information */
+	RtMidiIn *rtMidiIn;
+	RtMidiOut *rtMidiOut;
+	std::map<int, RtMidiInputDevice*> devices;
+
+	RtMidiDriver(int driverId);
+	~RtMidiDriver();
+	std::string getName() override;
+	std::vector<int> getInputDeviceIds() override;
+	std::string getInputDeviceName(int deviceId) override;
+	MidiInputDevice *subscribeInputDevice(int deviceId, MidiInput *midiInput) override;
+	void unsubscribeInputDevice(int deviceId, MidiInput *midiInput) override;
+};
+
+
 std::vector<int> rtmidiGetDrivers();
-MidiInputDriver *rtmidiGetInputDriver(int driverId);
+RtMidiDriver *rtmidiCreateDriver(int driverId);
 
 
 } // namespace rack

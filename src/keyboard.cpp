@@ -74,41 +74,44 @@ void KeyboardInputDevice::processKey(int key, bool released) {
 }
 
 
-std::vector<int> KeyboardInputDriver::getDeviceIds() {
+std::vector<int> KeyboardDriver::getInputDeviceIds() {
 	return {0};
 }
 
-std::string KeyboardInputDriver::getDeviceName(int deviceId) {
+std::string KeyboardDriver::getInputDeviceName(int deviceId) {
 	if (deviceId == 0)
 		return "QWERTY keyboard (US)";
 	return "";
 }
 
-MidiInputDevice *KeyboardInputDriver::getDevice(int deviceId) {
+MidiInputDevice *KeyboardDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+	if (deviceId != 0)
+		return NULL;
+
+	device.subscribe(midiInput);
 	return &device;
 }
 
+void KeyboardDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+	if (deviceId != 0)
+		return;
 
-static KeyboardInputDriver *driver = NULL;
+	device.unsubscribe(midiInput);
+}
+
+
+static KeyboardDriver driver;
 
 void keyboardPress(int key) {
-	if (!driver)
-		return;
-	driver->device.processKey(key, false);
+	driver.device.processKey(key, false);
 }
 
 void keyboardRelease(int key) {
-	if (!driver)
-		return;
-	driver->device.processKey(key, true);
+	driver.device.processKey(key, true);
 }
 
-KeyboardInputDriver *keyboardGetInputDriver() {
-	// Lazily create driver
-	if (!driver) {
-		driver = new KeyboardInputDriver();
-	}
-	return driver;
+KeyboardDriver *keyboardGetDriver() {
+	return &driver;
 }
 
 

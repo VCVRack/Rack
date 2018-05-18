@@ -8,8 +8,11 @@
 namespace rack {
 
 
+static std::map<int, MidiDriver*> drivers;
+
+
 ////////////////////
-// MidiIODevice
+// MidiDevice
 ////////////////////
 
 void MidiInputDevice::subscribe(MidiInput *midiInput) {
@@ -17,13 +20,10 @@ void MidiInputDevice::subscribe(MidiInput *midiInput) {
 }
 
 void MidiInputDevice::unsubscribe(MidiInput *midiInput) {
+	// Remove MidiInput from subscriptions
 	auto it = subscribed.find(midiInput);
 	if (it != subscribed.end())
 		subscribed.erase(it);
-
-	if (subscribed.size() == 0) {
-		warn("TODO: Fix memory leak");
-	}
 }
 
 void MidiInputDevice::onMessage(MidiMessage message) {
@@ -33,7 +33,7 @@ void MidiInputDevice::onMessage(MidiMessage message) {
 }
 
 ////////////////////
-// MidiIODriver
+// MidiDriver
 ////////////////////
 
 
@@ -41,28 +41,40 @@ void MidiInputDevice::onMessage(MidiMessage message) {
 // MidiIO
 ////////////////////
 
+MidiIO::~MidiIO() {
+	// Because of polymorphic destruction, descendants must call this in their own destructor
+	// setDriverId(-1);
+}
+
 std::vector<int> MidiIO::getDriverIds() {
-	std::vector<int> driverIds = rtmidiGetDrivers();
-	// Add custom driverIds
-	driverIds.push_back(BRIDGE_DRIVER);
-	driverIds.push_back(GAMEPAD_DRIVER);
-	driverIds.push_back(KEYBOARD_DRIVER);
+	std::vector<int> driverIds;
+	for (auto pair : drivers) {
+		driverIds.push_back(pair.first);
+	}
 	return driverIds;
 }
 
 std::string MidiIO::getDriverName(int driverId) {
-	switch (driverId) {
-		case -1: return "None";
-		case RtMidi::UNSPECIFIED: return "Unspecified";
-		case RtMidi::MACOSX_CORE: return "Core MIDI";
-		case RtMidi::LINUX_ALSA: return "ALSA";
-		case RtMidi::UNIX_JACK: return "JACK";
-		case RtMidi::WINDOWS_MM: return "Windows MIDI";
-		case RtMidi::RTMIDI_DUMMY: return "Dummy MIDI";
-		case BRIDGE_DRIVER: return "Bridge";
-		case GAMEPAD_DRIVER: return "Gamepad";
-		case KEYBOARD_DRIVER: return "Computer keyboard";
-		default: return "Unknown";
+	MidiDriver *driver = drivers[driverId];
+	if (driver) {
+		return driver->getName();
+	}
+	return "";
+}
+
+void MidiIO::setDriverId(int driverId) {
+	// Destroy driver
+	setDeviceId(-1);
+	if (driver) {
+		driver = NULL;
+	}
+	this->driverId = -1;
+
+	// Set driver
+	auto it = drivers.find(driverId);
+	if (it != drivers.end()) {
+		driver = it->second;
+		this->driverId = driverId;
 	}
 }
 
@@ -109,72 +121,34 @@ void MidiIO::fromJson(json_t *rootJ) {
 // MidiInput
 ////////////////////
 
-
-MidiInput::MidiInput() {
-}
-
 MidiInput::~MidiInput() {
 	setDriverId(-1);
 }
 
-void MidiInput::setDriverId(int driverId) {
-	// Destroy driver
-	setDeviceId(-1);
-	if (driver) {
-		driver = NULL;
-	}
-	this->driverId = -1;
-
-	// Create driver
-	if (driverId >= 0) {
-		driver = rtmidiGetInputDriver(driverId);
-	}
-	else if (driverId == BRIDGE_DRIVER) {
-		// TODO
-	}
-	else if (driverId == GAMEPAD_DRIVER) {
-		driver = gamepadGetInputDriver();
-	}
-	else if (driverId == KEYBOARD_DRIVER) {
-		driver = keyboardGetInputDriver();
-	}
-
-	// Set driverId
-	if (driver) {
-		this->driverId = driverId;
-	}
-}
-
 std::vector<int> MidiInput::getDeviceIds() {
 	if (driver) {
-		return driver->getDeviceIds();
+		return driver->getInputDeviceIds();
 	}
 	return {};
 }
 
 std::string MidiInput::getDeviceName(int deviceId) {
 	if (driver) {
-		return driver->getDeviceName(deviceId);
+		return driver->getInputDeviceName(deviceId);
 	}
 	return "";
 }
 
 void MidiInput::setDeviceId(int deviceId) {
 	// Destroy device
-	if (device) {
-		device->unsubscribe(this);
-		device = NULL;
+	if (driver && deviceId >= 0) {
+		driver->unsubscribeInputDevice(deviceId, this);
 	}
 	this->deviceId = -1;
 
 	// Create device
 	if (driver && deviceId >= 0) {
-		device = driver->getDevice(deviceId);
-		device->subscribe(this);
-	}
-
-	// Set deviceId
-	if (device) {
+		driver->subscribeInputDevice(deviceId, this);
 		this->deviceId = deviceId;
 	}
 }
@@ -187,12 +161,13 @@ void MidiInputQueue::onMessage(MidiMessage message) {
 	}
 
 	// Push to queue
-	if ((int) queue.size() < queueSize)
+	if ((int) queue.size() < queueMaxSize)
 		queue.push(message);
 }
 
 bool MidiInputQueue::shift(MidiMessage *message) {
-	if (!message) return false;
+	if (!message)
+		return false;
 	if (!queue.empty()) {
 		*message = queue.front();
 		queue.pop();
@@ -200,7 +175,6 @@ bool MidiInputQueue::shift(MidiMessage *message) {
 	}
 	return false;
 }
-
 
 ////////////////////
 // MidiOutput
@@ -210,15 +184,24 @@ MidiOutput::MidiOutput() {
 }
 
 MidiOutput::~MidiOutput() {
-	// TODO
-}
-
-void MidiOutput::setDriverId(int driverId) {
-	// TODO
+	setDriverId(-1);
 }
 
 void MidiOutput::setDeviceId(int deviceId) {
 	// TODO
+}
+
+////////////////////
+// midi
+////////////////////
+
+void midiInit() {
+	for (int driverId : rtmidiGetDrivers()) {
+		drivers[driverId] = rtmidiCreateDriver(driverId);
+	}
+	// drivers[BRIDGE_DRIVER] = bridgeCreateDriver();
+	drivers[GAMEPAD_DRIVER] = gamepadGetDriver();
+	drivers[KEYBOARD_DRIVER] = keyboardGetDriver();
 }
 
 
