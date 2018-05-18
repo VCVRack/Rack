@@ -55,11 +55,11 @@ std::vector<int> MidiIO::getDriverIds() {
 }
 
 std::string MidiIO::getDriverName(int driverId) {
-	MidiDriver *driver = drivers[driverId];
-	if (driver) {
-		return driver->getName();
-	}
-	return "";
+	auto it = drivers.find(driverId);
+	if (it == drivers.end())
+		return "";
+
+	return it->second->getName();
 }
 
 void MidiIO::setDriverId(int driverId) {
