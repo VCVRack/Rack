@@ -5,36 +5,6 @@
 namespace rack {
 
 
-RtMidiInputDriver::RtMidiInputDriver(int driverId) {
-	rtMidiIn = new RtMidiIn((RtMidi::Api) driverId);
-	assert(rtMidiIn);
-}
-
-RtMidiInputDriver::~RtMidiInputDriver() {
-	delete rtMidiIn;
-}
-
-std::vector<int> RtMidiInputDriver::getDeviceIds() {
-	int count = rtMidiIn->getPortCount();;
-	std::vector<int> deviceIds;
-	for (int i = 0; i < count; i++)
-		deviceIds.push_back(i);
-	return deviceIds;
-}
-
-std::string RtMidiInputDriver::getDeviceName(int deviceId) {
-	if (deviceId >= 0) {
-		return rtMidiIn->getPortName(deviceId);
-	}
-	return "";
-}
-
-MidiInputDevice *RtMidiInputDriver::getDevice(int deviceId) {
-	// TODO Get from cache
-	return new RtMidiInputDevice(rtMidiIn->getCurrentApi(), deviceId);
-}
-
-
 static void midiInputCallback(double timeStamp, std::vector<unsigned char> *message, void *userData) {
 	if (!message) return;
 	if (!userData) return;
@@ -54,6 +24,7 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 
 RtMidiInputDevice::RtMidiInputDevice(int driverId, int deviceId) {
 	rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
+	assert(rtMidiIn);
 	rtMidiIn->ignoreTypes(false, false, false);
 	rtMidiIn->setCallback(midiInputCallback, this);
 }
@@ -61,6 +32,72 @@ RtMidiInputDevice::RtMidiInputDevice(int driverId, int deviceId) {
 RtMidiInputDevice::~RtMidiInputDevice() {
 	rtMidiIn->closePort();
 	delete rtMidiIn;
+}
+
+
+RtMidiDriver::RtMidiDriver(int driverId) {
+	this->driverId = driverId;
+	rtMidiIn = new RtMidiIn((RtMidi::Api) driverId);
+	assert(rtMidiIn);
+	rtMidiOut = new RtMidiOut((RtMidi::Api) driverId);
+	assert(rtMidiOut);
+}
+
+RtMidiDriver::~RtMidiDriver() {
+	delete rtMidiIn;
+	delete rtMidiOut;
+}
+
+std::string RtMidiDriver::getName() {
+	switch (driverId) {
+		case RtMidi::UNSPECIFIED: return "Unspecified";
+		case RtMidi::MACOSX_CORE: return "Core MIDI";
+		case RtMidi::LINUX_ALSA: return "ALSA";
+		case RtMidi::UNIX_JACK: return "JACK";
+		case RtMidi::WINDOWS_MM: return "Windows MIDI";
+		case RtMidi::RTMIDI_DUMMY: return "Dummy MIDI";
+		default: return "";
+	}
+}
+
+std::vector<int> RtMidiDriver::getInputDeviceIds() {
+	// TODO The IDs unfortunately jump around in RtMidi. Is there a way to keep them constant when a MIDI device is added/removed?
+	int count = rtMidiIn->getPortCount();
+	std::vector<int> deviceIds;
+	for (int i = 0; i < count; i++)
+		deviceIds.push_back(i);
+	return deviceIds;
+}
+
+std::string RtMidiDriver::getInputDeviceName(int deviceId) {
+	if (deviceId >= 0) {
+		return rtMidiIn->getPortName(deviceId);
+	}
+	return "";
+}
+
+MidiInputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+	RtMidiInputDevice *device = devices[deviceId];
+	if (!device) {
+		devices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
+	}
+
+	device->subscribe(midiInput);
+	return device;
+}
+
+void RtMidiDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+	RtMidiInputDevice *device = devices[deviceId];
+	assert(device);
+	device->unsubscribe(midiInput);
+
+	// Destroy device if nothing else is subscribed
+	if (device->subscribed.empty()) {
+		auto it = devices.find(deviceId);
+		assert(it != devices.end());
+		devices.erase(it);
+		delete device;
+	}
 }
 
 
@@ -75,15 +112,8 @@ std::vector<int> rtmidiGetDrivers() {
 	return drivers;
 }
 
-static std::map<int, RtMidiInputDriver*> rtmidiInputDrivers;
-
-MidiInputDriver *rtmidiGetInputDriver(int driverId) {
-	// Lazily create RtMidiInputDriver
-	RtMidiInputDriver *d = rtmidiInputDrivers[driverId];
-	if (!d) {
-		rtmidiInputDrivers[driverId] = d = new RtMidiInputDriver(driverId);
-	}
-	return d;
+RtMidiDriver *rtmidiCreateDriver(int driverId) {
+	return new RtMidiDriver(driverId);
 }
 
 

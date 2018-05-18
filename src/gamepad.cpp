@@ -49,13 +49,13 @@ void GamepadInputDevice::step() {
 }
 
 
-GamepadInputDriver::GamepadInputDriver() {
+GamepadDriver::GamepadDriver() {
 	for (int i = 0; i < 16; i++) {
 		devices[i].deviceId = i;
 	}
 }
 
-std::vector<int> GamepadInputDriver::getDeviceIds() {
+std::vector<int> GamepadDriver::getInputDeviceIds() {
 	std::vector<int> deviceIds;
 	for (int i = 0; i < 16; i++) {
 		if (glfwJoystickPresent(i)) {
@@ -65,7 +65,7 @@ std::vector<int> GamepadInputDriver::getDeviceIds() {
 	return deviceIds;
 }
 
-std::string GamepadInputDriver::getDeviceName(int deviceId) {
+std::string GamepadDriver::getInputDeviceName(int deviceId) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return "";
 
@@ -76,34 +76,35 @@ std::string GamepadInputDriver::getDeviceName(int deviceId) {
 	return stringf("Gamepad %d (unavailable)", deviceId + 1);
 }
 
-MidiInputDevice *GamepadInputDriver::getDevice(int deviceId) {
+MidiInputDevice *GamepadDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return NULL;
 
+	devices[deviceId].subscribe(midiInput);
 	return &devices[deviceId];
 }
 
+void GamepadDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+	if (!(0 <= deviceId && deviceId < 16))
+		return;
 
-static GamepadInputDriver *driver = NULL;
+	devices[deviceId].unsubscribe(midiInput);
+}
+
+
+static GamepadDriver driver;
 
 
 void gamepadStep() {
-	// Check if the driver has been instantiated
-	if (!driver)
-		return;
-
 	for (int i = 0; i < 16; i++) {
 		if (glfwJoystickPresent(i)) {
-			driver->devices[i].step();
+			driver.devices[i].step();
 		}
 	}
 }
 
-MidiInputDriver *gamepadGetInputDriver() {
-	if (!driver) {
-		driver = new GamepadInputDriver();
-	}
-	return driver;
+GamepadDriver *gamepadGetDriver() {
+	return &driver;
 }
 
 

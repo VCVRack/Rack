@@ -30,42 +30,43 @@ struct MidiMessage {
 };
 
 ////////////////////
-// MidiIODevice
+// MidiDevice
 ////////////////////
 
-struct MidiIODevice {
-	virtual ~MidiIODevice() {}
+struct MidiDevice {
+	virtual ~MidiDevice() {}
 };
 
 struct MidiInput;
 
-struct MidiInputDevice : MidiIODevice {
+struct MidiInputDevice : MidiDevice {
 	std::set<MidiInput*> subscribed;
 	void subscribe(MidiInput *midiInput);
 	void unsubscribe(MidiInput *midiInput);
 	void onMessage(MidiMessage message);
 };
 
-struct MidiOutputDevice : MidiIODevice {
+struct MidiOutputDevice : MidiDevice {
 	// TODO
 };
 
 ////////////////////
-// MidiIODriver
+// MidiDriver
 ////////////////////
 
-struct MidiIODriver {
-	virtual ~MidiIODriver() {}
-	virtual std::vector<int> getDeviceIds() = 0;
-	virtual std::string getDeviceName(int deviceId) = 0;
-};
+struct MidiDriver {
+	virtual ~MidiDriver() {}
+	virtual std::string getName() {return "";}
 
-struct MidiInputDriver : MidiIODriver {
-	virtual MidiInputDevice *getDevice(int deviceId) = 0;
-};
+	virtual std::vector<int> getInputDeviceIds() {return {};}
+	virtual std::string getInputDeviceName(int deviceId) {return "";}
+	virtual MidiInputDevice *subscribeInputDevice(int deviceId, MidiInput *midiInput) {return NULL;}
+	virtual void unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {}
 
-struct MidiOutputDriver : MidiIODriver {
-	virtual MidiOutputDevice *getDevice(int deviceId) = 0;
+	// virtual std::vector<int> getOutputDeviceIds() = 0;
+	// virtual std::string getOutputDeviceName(int deviceId) = 0;
+	// virtual MidiOutputDevice *subscribeOutputDevice(int deviceId, MidiOutput *midiOutput) = 0;
+	// virtual void unsubscribeOutputDevice(int deviceId, MidiOutput *midiOutput) = 0;
 };
 
 ////////////////////
@@ -81,12 +82,14 @@ struct MidiIO {
 	Zero indexed.
 	*/
 	int channel = -1;
+	/** Not owned */
+	MidiDriver *driver = NULL;
 
-	virtual ~MidiIO() {}
+	virtual ~MidiIO();
 
 	std::vector<int> getDriverIds();
 	std::string getDriverName(int driverId);
-	virtual void setDriverId(int driverId) = 0;
+	void setDriverId(int driverId);
 
 	virtual std::vector<int> getDeviceIds() = 0;
 	virtual std::string getDeviceName(int deviceId) = 0;
@@ -99,26 +102,17 @@ struct MidiIO {
 
 
 struct MidiInput : MidiIO {
-	/** Not owned */
-	MidiInputDriver *driver = NULL;
-	/** Not owned, must unsubscribe when destructed */
-	MidiInputDevice *device = NULL;
-
-	MidiInput();
 	~MidiInput();
 
-	void setDriverId(int driverId) override;
 	std::vector<int> getDeviceIds() override;
 	std::string getDeviceName(int deviceId) override;
 	void setDeviceId(int deviceId) override;
-
 	virtual void onMessage(MidiMessage message) {}
 };
 
 
 struct MidiInputQueue : MidiInput {
-	int queueSize = 8192;
-	// TODO Switch to RingBuffer
+	int queueMaxSize = 8192;
 	std::queue<MidiMessage> queue;
 	void onMessage(MidiMessage message) override;
 	/** If a MidiMessage is available, writes `message` and return true */
@@ -127,15 +121,13 @@ struct MidiInputQueue : MidiInput {
 
 
 struct MidiOutput : MidiIO {
-	/** Not owned */
-	MidiOutputDriver *driver = NULL;
-	/** Not owned, must unsubscribe when destructed */
-	MidiOutputDevice *device = NULL;
 	MidiOutput();
 	~MidiOutput();
-	void setDriverId(int driverId) override;
 	void setDeviceId(int deviceId) override;
 };
+
+
+void midiInit();
 
 
 } // namespace rack

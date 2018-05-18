@@ -16,18 +16,20 @@ struct KeyboardInputDevice : MidiInputDevice {
 };
 
 
-struct KeyboardInputDriver : MidiInputDriver {
+struct KeyboardDriver : MidiDriver {
 	KeyboardInputDevice device;
+	std::string getName() override {return "Computer keyboard";}
 
-	std::vector<int> getDeviceIds() override;
-	std::string getDeviceName(int deviceId) override;
-	MidiInputDevice *getDevice(int deviceId) override;
+	std::vector<int> getInputDeviceIds() override;
+	std::string getInputDeviceName(int deviceId) override;
+	MidiInputDevice *subscribeInputDevice(int deviceId, MidiInput *midiInput) override;
+	void unsubscribeInputDevice(int deviceId, MidiInput *midiInput) override;
 };
 
 
 void keyboardPress(int key);
 void keyboardRelease(int key);
-KeyboardInputDriver *keyboardGetInputDriver();
+KeyboardDriver *keyboardGetDriver();
 
 
 } // namespace rack
