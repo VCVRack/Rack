@@ -77,6 +77,8 @@ std::string RtMidiDriver::getInputDeviceName(int deviceId) {
 }
 
 MidiInputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+	if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()))
+		return NULL;
 	RtMidiInputDevice *device = devices[deviceId];
 	if (!device) {
 		devices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
@@ -87,14 +89,14 @@ MidiInputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, MidiInput *mid
 }
 
 void RtMidiDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
-	RtMidiInputDevice *device = devices[deviceId];
-	assert(device);
+	auto it = devices.find(deviceId);
+	if (it == devices.end())
+		return;
+	RtMidiInputDevice *device = it->second;
 	device->unsubscribe(midiInput);
 
-	// Destroy device if nothing else is subscribed
+	// Destroy device if nothing is subscribed anymore
 	if (device->subscribed.empty()) {
-		auto it = devices.find(deviceId);
-		assert(it != devices.end());
 		devices.erase(it);
 		delete device;
 	}

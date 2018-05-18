@@ -18,10 +18,6 @@ using namespace rack;
 int main(int argc, char* argv[]) {
 	randomInit();
 	loggerInit();
-	debug("Hello world!");
-	info("Hello world!");
-	warn("Hello world!");
-	fatal("Hello world!");
 
 	info("Rack %s", gApplicationVersion.c_str());
 
