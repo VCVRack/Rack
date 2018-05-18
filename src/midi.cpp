@@ -2,6 +2,7 @@
 #include "rtmidi.hpp"
 #include "bridge.hpp"
 #include "gamepad.hpp"
+#include "keyboard.hpp"
 
 
 namespace rack {
@@ -45,6 +46,7 @@ std::vector<int> MidiIO::getDriverIds() {
 	// Add custom driverIds
 	driverIds.push_back(BRIDGE_DRIVER);
 	driverIds.push_back(GAMEPAD_DRIVER);
+	driverIds.push_back(KEYBOARD_DRIVER);
 	return driverIds;
 }
 
@@ -59,6 +61,7 @@ std::string MidiIO::getDriverName(int driverId) {
 		case RtMidi::RTMIDI_DUMMY: return "Dummy MIDI";
 		case BRIDGE_DRIVER: return "Bridge";
 		case GAMEPAD_DRIVER: return "Gamepad";
+		case KEYBOARD_DRIVER: return "Computer keyboard";
 		default: return "Unknown";
 	}
 }
@@ -131,6 +134,9 @@ void MidiInput::setDriverId(int driverId) {
 	}
 	else if (driverId == GAMEPAD_DRIVER) {
 		driver = gamepadGetInputDriver();
+	}
+	else if (driverId == KEYBOARD_DRIVER) {
+		driver = keyboardGetInputDriver();
 	}
 
 	// Set driverId
