@@ -2,6 +2,7 @@
 #include "app.hpp"
 #include "asset.hpp"
 #include "gamepad.hpp"
+#include "keyboard.hpp"
 #include "util/color.hpp"
 
 #include <map>
@@ -262,6 +263,16 @@ void charCallback(GLFWwindow *window, unsigned int codepoint) {
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+	// Keyboard MIDI driver
+	if (1 || glfwGetInputMode(gWindow, GLFW_LOCK_KEY_MODS) & GLFW_MOD_CAPS_LOCK) {
+		if (action == GLFW_PRESS) {
+			keyboardPress(key);
+		}
+		else if (action == GLFW_RELEASE) {
+			keyboardRelease(key);
+		}
+	}
+
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		if (gFocusedWidget) {
 			// onKey

@@ -1,5 +1,4 @@
 #include "gamepad.hpp"
-#include "util/common.hpp"
 #include <GLFW/glfw3.h>
 
 
@@ -34,14 +33,14 @@ void GamepadInputDevice::step() {
 	}
 
 	// Convert buttons to MIDI notes
-	notes.resize(numButtons);
+	states.resize(numButtons);
 	for (int i = 0; i < numButtons; i++) {
-		bool note = !!buttons[i];
-		if (note != notes[i]) {
-			notes[i] = note;
+		bool state = !!buttons[i];
+		if (state != states[i]) {
+			states[i] = state;
 
 			MidiMessage msg;
-			msg.cmd = ((note ? 0x9 : 0x8) << 4);
+			msg.cmd = ((state ? 0x9 : 0x8) << 4);
 			msg.data1 = i;
 			msg.data2 = 127;
 			onMessage(msg);
