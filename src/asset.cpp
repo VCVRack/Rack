@@ -11,6 +11,7 @@
 #if ARCH_WIN
 #include <Windows.h>
 #include <Shlobj.h>
+#include <Shlwapi.h>
 #endif
 
 #if ARCH_LIN
@@ -37,8 +38,11 @@ std::string assetGlobal(std::string filename) {
 	dir = buf;
 #endif
 #if ARCH_WIN
-	// Must launch Rack with the "Start In" directory as the global directory
-	dir = ".";
+	char buf[MAX_PATH];
+	DWORD length = GetModuleFileName(NULL, buf, sizeof(buf));
+	assert(length > 0);
+	PathRemoveFileSpec(buf);
+	dir = buf;
 #endif
 #if ARCH_LIN
 	// TODO For now, users should launch Rack from their terminal in the global directory
