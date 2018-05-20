@@ -79,7 +79,8 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 					e.consumed = true;
 				}
 			} break;
-			case GLFW_KEY_ENTER: {
+			case GLFW_KEY_ENTER:
+			case GLFW_KEY_KP_ENTER: {
 				appModuleBrowserCreate();
 				e.consumed = true;
 			} break;
