@@ -46,6 +46,7 @@ void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 	// Remove old panel
 	if (panel) {
 		removeChild(panel);
+		delete panel;
 		panel = NULL;
 	}
 

@@ -546,7 +546,9 @@ json_t *appModuleBrowserToJson();
 void appModuleBrowserFromJson(json_t *rootJ);
 
 
+/** Deprecated. Will be removed in v1 */
 json_t *colorToJson(NVGcolor color);
+/** Deprecated. Will be removed in v1 */
 NVGcolor jsonToColor(json_t *colorJ);
 
 

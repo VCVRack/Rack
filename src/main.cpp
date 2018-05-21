@@ -8,6 +8,7 @@
 #include "bridge.hpp"
 #include "midi.hpp"
 #include "osdialog.h"
+#include "util/color.hpp"
 
 #include <unistd.h>
 

@@ -144,14 +144,20 @@ Vec WireWidget::getInputPos() {
 
 json_t *WireWidget::toJson() {
 	json_t *rootJ = json_object();
-	json_object_set_new(rootJ, "color", colorToJson(color));
+	std::string s = colorToHexString(color);
+	json_object_set_new(rootJ, "color", json_string(s.c_str()));
 	return rootJ;
 }
 
 void WireWidget::fromJson(json_t *rootJ) {
 	json_t *colorJ = json_object_get(rootJ, "color");
-	if (colorJ)
-		color = jsonToColor(colorJ);
+	if (colorJ) {
+		// Legacy v0.6.0 and earlier
+		if (json_is_object(colorJ))
+			color = jsonToColor(colorJ);
+		else
+			color = colorFromHexString(json_string_value(colorJ));
+	}
 }
 
 void WireWidget::draw(NVGcontext *vg) {
