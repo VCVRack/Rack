@@ -41,7 +41,10 @@ On Arch Linux:
 pacman -S git wget gcc make cmake tar unzip zip curl
 ```
 
-Other distro build instructions coming soon.
+On Ubuntu 16.04:
+```
+sudo apt install git curl cmake libx11-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev zlib1g-dev libasound2-dev libgtk2.0-dev
+```
 
 ## Building
 
