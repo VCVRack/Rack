@@ -53,9 +53,6 @@ sudo apt install git curl cmake libx11-dev libglu1-mesa-dev libxrandr-dev libxin
 Clone this repository with `git clone https://github.com/VCVRack/Rack.git` and `cd Rack`.
 Make sure there are no spaces in your path, as this breaks many build systems.
 
-The `master` branch contains the latest public code and breaks its plugin [API](https://en.wikipedia.org/wiki/Application_programming_interface) and [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) frequently.
-If you wish to build a version of Rack which is API/ABI-compatible with an official Rack release, check out the desired branch with `git checkout v0.5` for example.
-
 Clone submodules.
 
 	git submodule update --init --recursive
