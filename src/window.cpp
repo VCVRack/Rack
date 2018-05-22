@@ -264,7 +264,7 @@ void charCallback(GLFWwindow *window, unsigned int codepoint) {
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	// Keyboard MIDI driver
-	if (glfwGetInputMode(gWindow, GLFW_LOCK_KEY_MODS) & GLFW_MOD_CAPS_LOCK) {
+	if (mods & GLFW_MOD_CAPS_LOCK) {
 		if (action == GLFW_PRESS) {
 			keyboardPress(key);
 		}
@@ -354,6 +354,8 @@ void windowInit() {
 	glfwMakeContextCurrent(gWindow);
 
 	glfwSwapInterval(1);
+
+	glfwSetInputMode(gWindow, GLFW_LOCK_KEY_MODS, 1);
 
 	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
 	glfwSetMouseButtonCallback(gWindow, mouseButtonStickyCallback);
