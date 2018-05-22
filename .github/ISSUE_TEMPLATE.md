@@ -7,8 +7,8 @@ Version if official Rack release, commit hash and/or branch if from source:
 
 ## For feature requests:
 
-No form, but please consider that the `time saved by the user` must be much greater than the `time to develop the feature`, otherwise it will be closed.
+Clear everything and start writing. Please consider that the `total time saved by all users` must be greater than the `time to develop the feature`, otherwise it will be closed.
 
 ## For discussions:
 
-Clear everything here and start writing. :)
+Clear everything and start writing.
