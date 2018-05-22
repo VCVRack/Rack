@@ -127,7 +127,9 @@ struct MidiOutput : MidiIO {
 };
 
 
-void midiInit();
+void midiDestroy();
+/** Registers a new MIDI driver. Takes pointer ownership. */
+void midiDriverAdd(int driverId, MidiDriver *driver);
 
 
 } // namespace rack

@@ -192,19 +192,18 @@ void MidiOutput::setDeviceId(int deviceId) {
 // midi
 ////////////////////
 
-static void midiAddDriver(int driverId, MidiDriver *driver) {
+void midiDestroy() {
+	driverIds.clear();
+	for (auto &pair : drivers) {
+		delete pair.second;
+	}
+	drivers.clear();
+}
+
+void midiDriverAdd(int driverId, MidiDriver *driver) {
 	assert(driver);
 	driverIds.push_back(driverId);
 	drivers[driverId] = driver;
-}
-
-void midiInit() {
-	for (int driverId : rtmidiGetDrivers()) {
-		midiAddDriver(driverId, rtmidiCreateDriver(driverId));
-	}
-	midiAddDriver(BRIDGE_DRIVER, bridgeGetMidiDriver());
-	midiAddDriver(KEYBOARD_DRIVER, keyboardGetDriver());
-	midiAddDriver(GAMEPAD_DRIVER, gamepadGetDriver());
 }
 
 

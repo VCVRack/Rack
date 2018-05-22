@@ -1,6 +1,5 @@
 #pragma once
 
-#include "util/common.hpp"
 #include "midi.hpp"
 #include <map>
 
@@ -40,8 +39,7 @@ struct RtMidiDriver : MidiDriver {
 };
 
 
-std::vector<int> rtmidiGetDrivers();
-RtMidiDriver *rtmidiCreateDriver(int driverId);
+void rtmidiInit();
 
 
 } // namespace rack
