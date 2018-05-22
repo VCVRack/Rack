@@ -8,6 +8,7 @@
 namespace rack {
 
 
+static std::vector<int> driverIds;
 static std::map<int, MidiDriver*> drivers;
 
 
@@ -47,10 +48,6 @@ MidiIO::~MidiIO() {
 }
 
 std::vector<int> MidiIO::getDriverIds() {
-	std::vector<int> driverIds;
-	for (auto pair : drivers) {
-		driverIds.push_back(pair.first);
-	}
 	return driverIds;
 }
 
@@ -195,13 +192,19 @@ void MidiOutput::setDeviceId(int deviceId) {
 // midi
 ////////////////////
 
+static void midiAddDriver(int driverId, MidiDriver *driver) {
+	assert(driver);
+	driverIds.push_back(driverId);
+	drivers[driverId] = driver;
+}
+
 void midiInit() {
 	for (int driverId : rtmidiGetDrivers()) {
-		drivers[driverId] = rtmidiCreateDriver(driverId);
+		midiAddDriver(driverId, rtmidiCreateDriver(driverId));
 	}
-	// drivers[BRIDGE_DRIVER] = bridgeCreateDriver();
-	drivers[GAMEPAD_DRIVER] = gamepadGetDriver();
-	drivers[KEYBOARD_DRIVER] = keyboardGetDriver();
+	midiAddDriver(BRIDGE_DRIVER, bridgeGetMidiDriver());
+	midiAddDriver(KEYBOARD_DRIVER, keyboardGetDriver());
+	midiAddDriver(GAMEPAD_DRIVER, gamepadGetDriver());
 }
 
 

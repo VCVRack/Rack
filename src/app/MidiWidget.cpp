@@ -29,6 +29,13 @@ struct MidiDriverChoice : LedDisplayChoice {
 	}
 	void step() override {
 		text = midiWidget->midiIO->getDriverName(midiWidget->midiIO->driverId);
+		if (text.empty()) {
+			text = "(No driver)";
+			color.a = 0.5f;
+		}
+		else {
+			color.a = 1.f;
+		}
 	}
 };
 
