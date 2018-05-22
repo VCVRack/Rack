@@ -5,6 +5,10 @@
 namespace rack {
 
 
+static const int KEYBOARD_DRIVER = -11;
+static KeyboardDriver *driver = NULL;
+
+
 void KeyboardInputDevice::processKey(int key, bool released) {
 	int note = -1;
 	switch (key) {
@@ -100,18 +104,21 @@ void KeyboardDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) 
 }
 
 
-static KeyboardDriver driver;
+void keyboardInit() {
+	driver = new KeyboardDriver();
+	midiDriverAdd(KEYBOARD_DRIVER, driver);
+}
 
 void keyboardPress(int key) {
-	driver.device.processKey(key, false);
+	if (!driver)
+		return;
+	driver->device.processKey(key, false);
 }
 
 void keyboardRelease(int key) {
-	driver.device.processKey(key, true);
-}
-
-KeyboardDriver *keyboardGetDriver() {
-	return &driver;
+	if (!driver)
+		return;
+	driver->device.processKey(key, true);
 }
 
 

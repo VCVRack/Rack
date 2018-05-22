@@ -7,9 +7,6 @@
 namespace rack {
 
 
-const int GAMEPAD_DRIVER = -10;
-
-
 struct GamepadInputDevice : MidiInputDevice {
 	int deviceId;
 	std::vector<uint8_t> ccs;
@@ -30,8 +27,8 @@ struct GamepadDriver : MidiDriver {
 };
 
 
+void gamepadInit();
 void gamepadStep();
-GamepadDriver *gamepadGetDriver();
 
 
 } // namespace rack

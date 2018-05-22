@@ -7,9 +7,12 @@
 #include "asset.hpp"
 #include "bridge.hpp"
 #include "midi.hpp"
-#include "osdialog.h"
+#include "rtmidi.hpp"
+#include "keyboard.hpp"
+#include "gamepad.hpp"
 #include "util/color.hpp"
 
+#include "osdialog.h"
 #include <unistd.h>
 
 
@@ -35,8 +38,10 @@ int main(int argc, char* argv[]) {
 	// Initialize namespaces
 	pluginInit();
 	engineInit();
-	midiInit();
+	rtmidiInit();
 	bridgeInit();
+	keyboardInit();
+	gamepadInit();
 	windowInit();
 	appInit();
 	settingsLoad(assetLocal("settings.json"));
@@ -73,6 +78,7 @@ int main(int argc, char* argv[]) {
 	windowDestroy();
 	bridgeDestroy();
 	engineDestroy();
+	midiDestroy();
 	pluginDestroy();
 	loggerDestroy();
 

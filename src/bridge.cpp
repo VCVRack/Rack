@@ -25,7 +25,7 @@ static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverRunning = false;
-static BridgeMidiDriver driver;
+static BridgeMidiDriver *driver = NULL;
 
 
 struct BridgeClientConnection {
@@ -206,7 +206,9 @@ struct BridgeClientConnection {
 	void processMidi(MidiMessage message) {
 		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 			return;
-		driver.devices[port].onMessage(message);
+		if (!driver)
+			return;
+		driver->devices[port].onMessage(message);
 	}
 
 	void setSampleRate(int sampleRate) {
@@ -402,6 +404,9 @@ void BridgeMidiDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput
 void bridgeInit() {
 	serverRunning = true;
 	serverThread = std::thread(serverRun);
+
+	driver = new BridgeMidiDriver();
+	midiDriverAdd(BRIDGE_DRIVER, driver);
 }
 
 void bridgeDestroy() {
@@ -426,10 +431,6 @@ void bridgeAudioUnsubscribe(int port, AudioIO *audio) {
 	if (audioListeners[port] != audio)
 		return;
 	audioListeners[port] = NULL;
-}
-
-BridgeMidiDriver *bridgeGetMidiDriver() {
-	return &driver;
 }
 
 

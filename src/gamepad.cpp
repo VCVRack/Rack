@@ -5,6 +5,10 @@
 namespace rack {
 
 
+static const int GAMEPAD_DRIVER = -10;
+static GamepadDriver *driver = NULL;
+
+
 void GamepadInputDevice::step() {
 	if (!glfwJoystickPresent(deviceId))
 		return;
@@ -92,19 +96,19 @@ void GamepadDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
 }
 
 
-static GamepadDriver driver;
-
-
-void gamepadStep() {
-	for (int i = 0; i < 16; i++) {
-		if (glfwJoystickPresent(i)) {
-			driver.devices[i].step();
-		}
-	}
+void gamepadInit() {
+	driver = new GamepadDriver();
+	midiDriverAdd(GAMEPAD_DRIVER, driver);
 }
 
-GamepadDriver *gamepadGetDriver() {
-	return &driver;
+void gamepadStep() {
+	if (!driver)
+		return;
+	for (int i = 0; i < 16; i++) {
+		if (glfwJoystickPresent(i)) {
+			driver->devices[i].step();
+		}
+	}
 }
 
 

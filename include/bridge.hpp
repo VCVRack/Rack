@@ -26,7 +26,6 @@ void bridgeInit();
 void bridgeDestroy();
 void bridgeAudioSubscribe(int channel, AudioIO *audio);
 void bridgeAudioUnsubscribe(int channel, AudioIO *audio);
-BridgeMidiDriver *bridgeGetMidiDriver();
 
 
 } // namespace rack

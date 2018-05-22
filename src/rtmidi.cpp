@@ -103,19 +103,14 @@ void RtMidiDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
 }
 
 
-std::vector<int> rtmidiGetDrivers() {
+void rtmidiInit() {
 	std::vector<RtMidi::Api> rtApis;
 	RtMidi::getCompiledApi(rtApis);
-
-	std::vector<int> drivers;
 	for (RtMidi::Api api : rtApis) {
-		drivers.push_back((int) api);
+		int driverId = (int) api;
+		MidiDriver *driver = new RtMidiDriver(driverId);
+		midiDriverAdd(driverId, driver);
 	}
-	return drivers;
-}
-
-RtMidiDriver *rtmidiCreateDriver(int driverId) {
-	return new RtMidiDriver(driverId);
 }
 
 
