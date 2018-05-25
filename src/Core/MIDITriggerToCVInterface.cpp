@@ -21,8 +21,10 @@ struct MIDITriggerToCVInterface : Module {
 
 	bool gates[16];
 	float gateTimes[16];
+	uint8_t velocities[16];
 	int learningId = -1;
 	uint8_t learnedNotes[16] = {};
+	bool velocity = false;
 
 	MIDITriggerToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();
@@ -37,7 +39,7 @@ struct MIDITriggerToCVInterface : Module {
 		learningId = -1;
 	}
 
-	void pressNote(uint8_t note) {
+	void pressNote(uint8_t note, uint8_t vel) {
 		// Learn
 		if (learningId >= 0) {
 			learnedNotes[learningId] = note;
@@ -48,6 +50,7 @@ struct MIDITriggerToCVInterface : Module {
 			if (learnedNotes[i] == note) {
 				gates[i] = true;
 				gateTimes[i] = 1e-3f;
+				velocities[i] = vel;
 			}
 		}
 	}
@@ -70,7 +73,7 @@ struct MIDITriggerToCVInterface : Module {
 
 		for (int i = 0; i < 16; i++) {
 			if (gateTimes[i] > 0.f) {
-				outputs[TRIG_OUTPUT + i].value = 10.f;
+				outputs[TRIG_OUTPUT + i].value = velocities ? rescale(velocities[i], 0, 127, 0.f, 10.f) : 10.f;
 				// If the gate is off, wait 1 ms before turning the pulse off.
 				// This avoids drum controllers sending a pulse with 0 ms duration.
 				if (!gates[i]) {
@@ -92,7 +95,7 @@ struct MIDITriggerToCVInterface : Module {
 			// note on
 			case 0x9: {
 				if (msg.value() > 0) {
-					pressNote(msg.note());
+					pressNote(msg.note(), msg.value());
 				}
 				else {
 					// Many stupid keyboards send a "note on" command with 0 velocity to mean "note release"
@@ -114,6 +117,7 @@ struct MIDITriggerToCVInterface : Module {
 		json_object_set_new(rootJ, "notes", notesJ);
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
+		json_object_set_new(rootJ, "velocity", json_boolean(velocity));
 		return rootJ;
 	}
 
@@ -123,13 +127,17 @@ struct MIDITriggerToCVInterface : Module {
 			for (int i = 0; i < 16; i++) {
 				json_t *noteJ = json_array_get(notesJ, i);
 				if (noteJ)
-					learnedNotes[i] = json_integer_value(noteJ) & 0x7f;
+					learnedNotes[i] = json_integer_value(noteJ);
 			}
 		}
 
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
+
+		json_t *velocityJ = json_object_get(rootJ, "velocity");
+		if (velocityJ)
+			velocity = json_boolean_value(velocityJ);
 	}
 };
 
@@ -221,9 +229,24 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 		midiWidget->midiIO = &module->midiInput;
 		midiWidget->createGridChoices();
 		addChild(midiWidget);
+	}
 
+	void appendContextMenu(Menu *menu) override {
+		MIDITriggerToCVInterface *module = dynamic_cast<MIDITriggerToCVInterface*>(this->module);
+
+		struct VelocityItem : MenuItem {
+			MIDITriggerToCVInterface *module;
+			void onAction(EventAction &e) override {
+				module->velocity ^= true;
+			}
+		};
+
+		menu->addChild(MenuEntry::create());
+		VelocityItem *velocityItem = MenuItem::create<VelocityItem>("Velocity", CHECKMARK(module->velocity));
+		velocityItem->module = module;
+		menu->addChild(velocityItem);
 	}
 };
 
 
-Model *modelMIDITriggerToCVInterface = Model::create<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("Core", "MIDITriggerToCVInterface", "MIDI-TRIG", MIDI_TAG, EXTERNAL_TAG);
+Model *modelMIDITriggerToCVInterface = Model::create<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("Core", "MIDITriggerToCVInterface", "MIDI-Trig", MIDI_TAG, EXTERNAL_TAG);
