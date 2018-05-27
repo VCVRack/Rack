@@ -18,16 +18,19 @@ include $(RACK_DIR)/arch.mk
 ifeq ($(ARCH), lin)
 	LDFLAGS += -shared
 	TARGET := plugin.so
+	RACK_USER_DIR ?= $(HOME)/.Rack
 endif
 
 ifeq ($(ARCH), mac)
 	LDFLAGS += -shared -undefined dynamic_lookup
 	TARGET := plugin.dylib
+	RACK_USER_DIR ?= $(HOME)/Documents/Rack
 endif
 
 ifeq ($(ARCH), win)
 	LDFLAGS += -shared -L$(RACK_DIR) -lRack
 	TARGET := plugin.dll
+	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack
 endif
 
 
@@ -57,6 +60,8 @@ endif
 	# Create ZIP package
 	cd dist && zip -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
 
+install: dist
+	cp dist/$(SLUG)-$(VERSION)-$(ARCH).zip $(RACK_USER_DIR)/plugins/
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all
