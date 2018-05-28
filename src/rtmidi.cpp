@@ -27,6 +27,7 @@ RtMidiInputDevice::RtMidiInputDevice(int driverId, int deviceId) {
 	assert(rtMidiIn);
 	rtMidiIn->ignoreTypes(false, false, false);
 	rtMidiIn->setCallback(midiInputCallback, this);
+	rtMidiIn->openPort(deviceId, "VCV Rack input");
 }
 
 RtMidiInputDevice::~RtMidiInputDevice() {

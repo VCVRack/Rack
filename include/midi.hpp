@@ -102,6 +102,7 @@ struct MidiIO {
 
 
 struct MidiInput : MidiIO {
+	MidiInput();
 	~MidiInput();
 
 	std::vector<int> getDeviceIds() override;

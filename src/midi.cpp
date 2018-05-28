@@ -118,6 +118,12 @@ void MidiIO::fromJson(json_t *rootJ) {
 // MidiInput
 ////////////////////
 
+MidiInput::MidiInput() {
+	if (driverIds.size() >= 1) {
+		setDriverId(driverIds[0]);
+	}
+}
+
 MidiInput::~MidiInput() {
 	setDriverId(-1);
 }
@@ -138,8 +144,8 @@ std::string MidiInput::getDeviceName(int deviceId) {
 
 void MidiInput::setDeviceId(int deviceId) {
 	// Destroy device
-	if (driver && deviceId >= 0) {
-		driver->unsubscribeInputDevice(deviceId, this);
+	if (driver && this->deviceId >= 0) {
+		driver->unsubscribeInputDevice(this->deviceId, this);
 	}
 	this->deviceId = -1;
 
