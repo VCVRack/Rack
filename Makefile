@@ -42,11 +42,10 @@ ifeq ($(ARCH), lin)
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
 	LDFLAGS += -rdynamic \
-		-lpthread -lGL -ldl -lX11 -lasound -ljack \
-		$(shell pkg-config --libs gtk+-2.0) \
 		-Ldep/lib \
 		-Wl,-Bstatic -lglfw3 -lGLEW -ljansson -lspeexdsp -lzip -lz -lrtmidi -lrtaudio -lcurl -lssl -lcrypto \
-		-Wl,-Bdynamic
+		-Wl,-Bdynamic -lpthread -lGL -ldl -lX11 -lasound -ljack \
+		$(shell pkg-config --libs gtk+-2.0)
 	TARGET := Rack
 endif
 
