@@ -122,7 +122,7 @@ static bool loadPlugin(std::string path) {
 
 	// Add plugin to list
 	gPlugins.push_back(plugin);
-	info("Loaded plugin %s", libraryFilename.c_str());
+	info("Loaded plugin %s %s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
 
 	return true;
 }
