@@ -263,16 +263,6 @@ void charCallback(GLFWwindow *window, unsigned int codepoint) {
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-	// Keyboard MIDI driver
-	if (mods & GLFW_MOD_CAPS_LOCK) {
-		if (action == GLFW_PRESS) {
-			keyboardPress(key);
-		}
-		else if (action == GLFW_RELEASE) {
-			keyboardRelease(key);
-		}
-	}
-
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 		if (gFocusedWidget) {
 			// onKey
@@ -287,6 +277,14 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 		e.pos = gMousePos;
 		e.key = key;
 		gScene->onHoverKey(e);
+	}
+
+	// Keyboard MIDI driver
+	if (action == GLFW_PRESS) {
+		keyboardPress(key);
+	}
+	else if (action == GLFW_RELEASE) {
+		keyboardRelease(key);
 	}
 }
 
