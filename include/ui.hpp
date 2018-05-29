@@ -94,6 +94,11 @@ struct MenuEntry : OpaqueWidget {
 	}
 };
 
+struct MenuSeparator : MenuEntry {
+	MenuSeparator();
+	void draw(NVGcontext *vg) override;
+};
+
 struct MenuLabel : MenuEntry {
 	std::string text;
 	void draw(NVGcontext *vg) override;
