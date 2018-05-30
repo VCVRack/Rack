@@ -382,6 +382,8 @@ std::vector<int> BridgeMidiDriver::getInputDeviceIds() {
 }
 
 std::string BridgeMidiDriver::getInputDeviceName(int deviceId) {
+	if (deviceId < 0)
+		return "";
 	return stringf("Port %d", deviceId + 1);
 }
 
