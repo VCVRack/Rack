@@ -73,7 +73,7 @@ struct MIDITriggerToCVInterface : Module {
 
 		for (int i = 0; i < 16; i++) {
 			if (gateTimes[i] > 0.f) {
-				outputs[TRIG_OUTPUT + i].value = velocities ? rescale(velocities[i], 0, 127, 0.f, 10.f) : 10.f;
+				outputs[TRIG_OUTPUT + i].value = velocity ? rescale(velocities[i], 0, 127, 0.f, 10.f) : 10.f;
 				// If the gate is off, wait 1 ms before turning the pulse off.
 				// This avoids drum controllers sending a pulse with 0 ms duration.
 				if (!gates[i]) {
