@@ -8,3 +8,4 @@ Please read https://github.com/VCVRack/Rack/issues/730 before posting any code o
 
 Operating system(s):
 Version of Rack if using official binary, or commit hash and branch if compiling from source:
+All hardware relevant to your issue (e.g. graphic card model, audio/MIDI device):
