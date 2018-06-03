@@ -1,6 +1,6 @@
 ---
 name: Discussion
-about: Discussion
+about: Discussions, questions, feedback
 
 ---
 

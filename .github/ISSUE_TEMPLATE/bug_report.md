@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Bug report
+about: Bugs, build errors, compatibility/stability issues
 
 ---
 
