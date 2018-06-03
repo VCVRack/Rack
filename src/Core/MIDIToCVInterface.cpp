@@ -233,6 +233,7 @@ struct MIDIToCVInterface : Module {
 					clockPulses[1].trigger(1e-3);
 				}
 				if (++clock >= (24*16*16)) {
+					// Avoid overflowing the integer
 					clock = 0;
 				}
 			} break;
@@ -248,6 +249,8 @@ struct MIDIToCVInterface : Module {
 			// Stop
 			case 0xc: {
 				stopPulse.trigger(1e-3);
+				// Reset timing
+				clock = 0;
 			} break;
 			default: break;
 		}
