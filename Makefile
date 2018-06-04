@@ -18,7 +18,7 @@ STRIP ?= strip
 SOURCES += dep/nanovg/src/nanovg.c
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	SOURCES += dep/osdialog/osdialog_mac.m
 	CXXFLAGS += -stdlib=libc++
 	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
@@ -28,7 +28,7 @@ ifeq ($(ARCH), mac)
 	BUNDLE := dist/$(TARGET).app
 endif
 
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -static \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
@@ -38,7 +38,7 @@ ifeq ($(ARCH), win)
 	OBJECTS += Rack.res
 endif
 
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
 	LDFLAGS += -rdynamic \
@@ -61,25 +61,25 @@ run: $(TARGET)
 	./$<
 
 debug: $(TARGET)
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	lldb -ex run ./$<
 endif
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	gdb -ex run ./$<
 endif
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	gdb -ex run ./$<
 endif
 
 perf: $(TARGET)
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	perf record --call-graph dwarf ./Rack
 endif
 
 clean:
 	rm -rfv $(TARGET) libRack.a Rack.res build dist
 
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 # For Windows resources
 %.res: %.rc
 	windres $^ -O coff -o $@
@@ -95,7 +95,7 @@ endif
 	# Rack distribution
 	$(MAKE) -C plugins/Fundamental dist
 
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	mkdir -p $(BUNDLE)
 	mkdir -p $(BUNDLE)/Contents
 	mkdir -p $(BUNDLE)/Contents/Resources
@@ -117,7 +117,7 @@ ifeq ($(ARCH), mac)
 	cd dist && ln -s /Library/Audio/Plug-Ins/VST VST
 	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack-$(VERSION)-$(ARCH).dmg
 endif
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	mkdir -p dist/Rack
 	mkdir -p dist/Rack/Bridge
 	cp Bridge/vst/dist/VCV-Bridge-64.dll dist/Rack/Bridge/
@@ -135,7 +135,7 @@ ifeq ($(ARCH), win)
 	makensis installer.nsi
 	mv Rack-setup.exe dist/Rack-$(VERSION)-$(ARCH).exe
 endif
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	mkdir -p dist/Rack
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
@@ -153,7 +153,7 @@ endif
 	cp -R include dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	cp libRack.a dist/Rack-SDK/
 endif
 	cd dist && zip -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
@@ -162,14 +162,14 @@ endif
 # Obviously this will only work if you have the private keys to my server
 UPLOAD_URL := vortico@vcvrack.com:files/
 upload:
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	rsync dist/*.dmg $(UPLOAD_URL) -zP
 endif
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	rsync dist/*.exe $(UPLOAD_URL) -P
 	rsync dist/*.zip $(UPLOAD_URL) -P
 endif
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	rsync dist/*.zip $(UPLOAD_URL) -zP
 endif
 	rsync plugins/*/dist/*.zip $(UPLOAD_URL) -zP

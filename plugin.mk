@@ -15,19 +15,19 @@ FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 
 include $(RACK_DIR)/arch.mk
 
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	LDFLAGS += -shared
 	TARGET := plugin.so
 	RACK_USER_DIR ?= $(HOME)/.Rack
 endif
 
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	LDFLAGS += -shared -undefined dynamic_lookup
 	TARGET := plugin.dylib
 	RACK_USER_DIR ?= $(HOME)/Documents/Rack
 endif
 
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	LDFLAGS += -shared -L$(RACK_DIR) -lRack
 	TARGET := plugin.dll
 	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack
@@ -50,7 +50,7 @@ dist: all
 	mkdir -p dist/$(SLUG)
 	# Strip and copy plugin binary
 	cp $(TARGET) dist/$(SLUG)/
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	$(STRIP) -S dist/$(SLUG)/$(TARGET)
 else
 	$(STRIP) -s dist/$(SLUG)/$(TARGET)

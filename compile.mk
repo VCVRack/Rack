@@ -22,10 +22,10 @@ endif
 CXXFLAGS += -std=c++11
 
 
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	FLAGS += -DARCH_LIN
 endif
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	FLAGS += -DARCH_MAC
 	CXXFLAGS += -stdlib=libc++
 	LDFLAGS += -stdlib=libc++
@@ -33,7 +33,7 @@ ifeq ($(ARCH), mac)
 	FLAGS += $(MAC_SDK_FLAGS)
 	LDFLAGS += $(MAC_SDK_FLAGS)
 endif
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	FLAGS += -DARCH_WIN
 	FLAGS += -D_USE_MATH_DEFINES
 endif

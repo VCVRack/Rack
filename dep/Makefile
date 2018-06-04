@@ -6,7 +6,7 @@ RACK_DIR ?= ..
 
 include $(RACK_DIR)/arch.mk
 
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 	glew = lib/libGLEW.a
 	glfw = lib/libglfw3.a
 	jansson = lib/libjansson.a
@@ -19,7 +19,7 @@ ifeq ($(ARCH), lin)
 	openssl = lib/libssl.a
 endif
 
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 	glew = lib/libGLEW.a
 	glfw = lib/libglfw3.a
 	jansson = lib/libjansson.a
@@ -32,7 +32,7 @@ ifeq ($(ARCH), mac)
 	openssl = lib/libssl.a
 endif
 
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	glew = lib/libglew32.a
 	glfw = lib/libglfw3.a
 	jansson = lib/libjansson.a
@@ -112,7 +112,7 @@ $(libzip): $(zlib)
 $(zlib):
 	$(WGET) "https://www.zlib.net/zlib-1.2.11.tar.gz"
 	$(UNTAR) zlib-1.2.11.tar.gz
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(realpath $(DEP_LOCAL))/bin" INCLUDE_PATH="$(realpath $(DEP_LOCAL))/include" LIBRARY_PATH="$(realpath $(DEP_LOCAL))/lib" install
 else
@@ -128,21 +128,21 @@ $(rtmidi):
 	$(MAKE) -C rtmidi
 	$(MAKE) -C rtmidi install
 
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 RTAUDIO_FLAGS += -DAUDIO_OSX_CORE=ON
 endif
-ifeq ($(ARCH), win)
+ifdef ARCH_WIN
 RTAUDIO_FLAGS += -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
 endif
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_UNIX_JACK=ON
 endif
 
 ifdef RTAUDIO_ALL_APIS
-ifeq ($(ARCH), mac)
+ifdef ARCH_MAC
 RTAUDIO_FLAGS += -DAUDIO_UNIX_JACK=ON
 endif
-ifeq ($(ARCH), lin)
+ifdef ARCH_LIN
 RTAUDIO_FLAGS += -DAUDIO_LINUX_PULSE=ON
 endif
 endif
