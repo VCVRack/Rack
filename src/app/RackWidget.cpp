@@ -69,7 +69,14 @@ void RackWidget::reset() {
 }
 
 void RackWidget::openDialog() {
-	std::string dir = lastPath.empty() ? assetLocal("") : stringDirectory(lastPath);
+	std::string dir;
+	if (lastPath.empty()) {
+		dir = assetLocal("patches");
+		systemCreateDirectory(dir);
+	}
+	else {
+		dir = stringDirectory(lastPath);
+	}
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
 	if (path) {
 		loadPatch(path);
@@ -88,7 +95,14 @@ void RackWidget::saveDialog() {
 }
 
 void RackWidget::saveAsDialog() {
-	std::string dir = lastPath.empty() ? assetLocal("") : stringDirectory(lastPath);
+	std::string dir;
+	if (lastPath.empty()) {
+		dir = assetLocal("patches");
+		systemCreateDirectory(dir);
+	}
+	else {
+		dir = stringDirectory(lastPath);
+	}
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcv", NULL);
 
 	if (path) {

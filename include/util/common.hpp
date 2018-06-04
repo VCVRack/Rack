@@ -148,6 +148,7 @@ std::vector<std::string> systemListEntries(std::string path);
 bool systemIsFile(std::string path);
 bool systemIsDirectory(std::string path);
 void systemCopy(std::string srcPath, std::string destPath);
+void systemCreateDirectory(std::string path);
 
 /** Opens a URL, also happens to work with PDFs and folders.
 Shell injection is possible, so make sure the URL is trusted or hard coded.

@@ -64,7 +64,6 @@ std::string assetLocal(std::string filename) {
 	assert(pw);
 	dir = pw->pw_dir;
 	dir += "/Documents/Rack";
-	mkdir(dir.c_str(), 0755);
 #endif
 #if ARCH_WIN
 	// Get "My Documents" folder
@@ -73,7 +72,6 @@ std::string assetLocal(std::string filename) {
 	assert(result == S_OK);
 	dir = buf;
 	dir += "/Rack";
-	CreateDirectory(dir.c_str(), NULL);
 #endif
 #if ARCH_LIN
 	const char *home = getenv("HOME");
@@ -84,8 +82,8 @@ std::string assetLocal(std::string filename) {
 	}
 	dir = home;
 	dir += "/.Rack";
-	mkdir(dir.c_str(), 0755);
 #endif
+	systemCreateDirectory(dir);
 #else // RELEASE
 	dir = ".";
 #endif // RELEASE
