@@ -11,6 +11,7 @@ struct Param {
 	float value = 0.0;
 };
 
+
 struct Light {
 	/** The square of the brightness value */
 	float value = 0.0;
@@ -24,6 +25,7 @@ struct Light {
 	void setBrightnessSmooth(float brightness, float frames = 1.f);
 };
 
+
 struct Input {
 	/** Voltage of the port, zero if not plugged in. Read-only by Module */
 	float value = 0.0;
@@ -35,6 +37,7 @@ struct Input {
 		return active ? value : normalValue;
 	}
 };
+
 
 struct Output {
 	/** Voltage of the port. Write-only by Module */
@@ -64,7 +67,9 @@ struct Module {
 	}
 	virtual ~Module() {}
 
-	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate */
+	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate
+	Override this method to read inputs and params, and to write outputs and lights.
+	*/
 	virtual void step() {}
 
 	/** Called when the engine sample rate is changed
@@ -85,7 +90,7 @@ struct Module {
 		randomize();
 	}
 
-	/** Override these to store extra internal data in the "data" property */
+	/** Override these to store extra internal data in the "data" property of the module's JSON object */
 	virtual json_t *toJson() { return NULL; }
 	virtual void fromJson(json_t *root) {}
 
@@ -95,6 +100,7 @@ struct Module {
 	virtual void randomize() {}
 };
 
+
 struct Wire {
 	Module *outputModule = NULL;
 	int outputId;
@@ -102,6 +108,7 @@ struct Wire {
 	int inputId;
 	void step();
 };
+
 
 void engineInit();
 void engineDestroy();
@@ -120,6 +127,7 @@ void engineSetSampleRate(float sampleRate);
 float engineGetSampleRate();
 /** Returns the inverse of the current sample rate */
 float engineGetSampleTime();
+
 
 extern bool gPaused;
 /** Plugins should not manipulate other modules or wires unless that is the entire purpose of the module.
