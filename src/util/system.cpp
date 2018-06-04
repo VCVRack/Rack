@@ -72,6 +72,14 @@ void systemCopy(std::string srcPath, std::string destPath) {
 	}
 }
 
+void systemCreateDirectory(std::string path) {
+#if ARCH_WIN
+	CreateDirectory(path.c_str(), NULL);
+#else
+	mkdir(path.c_str(), 0755);
+#endif
+}
+
 void systemOpenBrowser(std::string url) {
 #if ARCH_LIN
 	std::string command = "xdg-open " + url;
