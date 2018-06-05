@@ -11,10 +11,10 @@
 
 #include "osdialog.h"
 
-#define NANOVG_GL2 1
-// #define NANOVG_GL3 1
-// #define NANOVG_GLES2 1
-#define NANOVG_GL_IMPLEMENTATION 1
+#define NANOVG_GL2_IMPLEMENTATION 1
+// #define NANOVG_GL3_IMPLEMENTATION 1
+// #define NANOVG_GLES2_IMPLEMENTATION 1
+// #define NANOVG_GLES3_IMPLEMENTATION 1
 #include "nanovg_gl.h"
 // Hack to get framebuffer objects working on OpenGL 2 (we blindly assume the extension is supported)
 #define NANOVG_FBO_VALID 1
@@ -379,28 +379,28 @@ void windowInit() {
 	glfwSetWindowSizeLimits(gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
+	int nvgFlags = 0;//NVG_ANTIALIAS;
 #if defined NANOVG_GL2
-	gVg = nvgCreateGL2(NVG_ANTIALIAS);
+	gVg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
-	gVg = nvgCreateGL3(NVG_ANTIALIAS);
+	gVg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
-	gVg = nvgCreateGLES2(NVG_ANTIALIAS);
+	gVg = nvgCreateGLES2(nvgFlags);
 #endif
 	assert(gVg);
 
 #if defined NANOVG_GL2
-	gFramebufferVg = nvgCreateGL2(NVG_ANTIALIAS);
+	gFramebufferVg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
-	gFramebufferVg = nvgCreateGL3(NVG_ANTIALIAS);
+	gFramebufferVg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
-	gFramebufferVg = nvgCreateGLES2(NVG_ANTIALIAS);
+	gFramebufferVg = nvgCreateGLES2(nvgFlags);
 #endif
 	assert(gFramebufferVg);
 
 	// Set up Blendish
 	gGuiFont = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	bndSetFont(gGuiFont->handle);
-	// bndSetIconImage(loadImage(assetGlobal("res/icons.png")));
 
 	windowSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
 }
