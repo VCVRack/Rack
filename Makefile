@@ -73,7 +73,7 @@ endif
 
 perf: $(TARGET)
 ifdef ARCH_LIN
-	perf record --call-graph dwarf ./Rack
+	perf record --call-graph dwarf ./$<
 endif
 
 clean:

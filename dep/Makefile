@@ -138,15 +138,6 @@ ifdef ARCH_LIN
 RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_UNIX_JACK=ON
 endif
 
-ifdef RTAUDIO_ALL_APIS
-ifdef ARCH_MAC
-RTAUDIO_FLAGS += -DAUDIO_UNIX_JACK=ON
-endif
-ifdef ARCH_LIN
-RTAUDIO_FLAGS += -DAUDIO_LINUX_PULSE=ON
-endif
-endif
-
 $(rtaudio):
 	cd rtaudio && mkdir -p build
 	cd rtaudio/build && $(CMAKE) $(RTAUDIO_FLAGS) ..
