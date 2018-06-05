@@ -1,7 +1,20 @@
 
+### 0.6.1 (in development)
+
+- Added gamepad MIDI driver
+- Added computer keyboard MIDI driver
+- Added JACK support on Linux
+- Added velocity mode to MIDI-Trig
+- Added MIDI multiplexing so multiple MIDI modules can use the same MIDI device on Windows
+- Make Module Browser layout more compact
+- [VCV Bridge](https://vcvrack.com/manual/Bridge.html) 0.6.1
+	- Replaced VST effect plugin with VST instrument plugin with audio inputs
+	- Added MIDI support
+	- Added DAW transport and clock
+
 ### 0.6.0 (2018-03-29)
 
-- Released [*VCV Bridge*](https://vcvrack.com/manual/Core.html#Bridge) for interfacing Rack with your DAW
+- Released [*VCV Bridge*](https://vcvrack.com/manual/Bridge.html) for interfacing Rack with your DAW
 	- VST/AU effect plugins (Mac and 32/64-bit Windows) for using Rack as a send/return on a DAW track
 	- Enables future VSTi/AU instrument plugins with MIDI and DAW clock transport to be added in a later Rack 0.6.* update
 - Updated [*Plugin Manager*](https://vcvrack.com/plugins.html) to handle open-source plugins
