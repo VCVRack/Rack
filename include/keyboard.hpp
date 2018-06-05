@@ -2,6 +2,7 @@
 
 #include "util/common.hpp"
 #include "midi.hpp"
+#include <map>
 
 
 namespace rack {
@@ -9,7 +10,9 @@ namespace rack {
 
 struct KeyboardInputDevice : MidiInputDevice {
 	int octave = 5;
-	void processKey(int key, bool released);
+	std::map<int, int> pressedNotes;
+	void onKeyPress(int key);
+	void onKeyRelease(int key);
 };
 
 

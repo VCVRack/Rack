@@ -9,7 +9,7 @@ static const int KEYBOARD_DRIVER = -11;
 static KeyboardDriver *driver = NULL;
 
 
-void KeyboardInputDevice::processKey(int key, bool released) {
+void KeyboardInputDevice::onKeyPress(int key) {
 	int note = -1;
 	switch (key) {
 		case GLFW_KEY_Z: note = 0; break;
@@ -52,12 +52,10 @@ void KeyboardInputDevice::processKey(int key, bool released) {
 		case GLFW_KEY_RIGHT_BRACKET: note = 31; break;
 
 		case GLFW_KEY_GRAVE_ACCENT: {
-			if (!released)
-				octave--;
+			octave--;
 		} break;
 		case GLFW_KEY_1: {
-			if (!released)
-				octave++;
+			octave++;
 		} break;
 		default: break;
 	}
@@ -65,16 +63,32 @@ void KeyboardInputDevice::processKey(int key, bool released) {
 	octave = clamp(octave, 0, 9);
 	if (note < 0)
 		return;
-	note += 12 * octave;
 
+	note += 12 * octave;
 	if (note > 127)
 		return;
 
 	MidiMessage msg;
-	msg.cmd = ((!released ? 0x9 : 0x8) << 4);
+	msg.cmd = 0x9 << 4;
 	msg.data1 = note;
 	msg.data2 = 127;
 	onMessage(msg);
+
+	pressedNotes[key] = note;
+}
+
+void KeyboardInputDevice::onKeyRelease(int key) {
+	auto it = pressedNotes.find(key);
+	if (it != pressedNotes.end()) {
+		int note = it->second;
+		MidiMessage msg;
+		msg.cmd = 0x8 << 4;
+		msg.data1 = note;
+		msg.data2 = 127;
+		onMessage(msg);
+
+		pressedNotes.erase(it);
+	}
 }
 
 
@@ -112,13 +126,13 @@ void keyboardInit() {
 void keyboardPress(int key) {
 	if (!driver)
 		return;
-	driver->device.processKey(key, false);
+	driver->device.onKeyPress(key);
 }
 
 void keyboardRelease(int key) {
 	if (!driver)
 		return;
-	driver->device.processKey(key, true);
+	driver->device.onKeyRelease(key);
 }
 
 
