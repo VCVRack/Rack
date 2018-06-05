@@ -379,7 +379,7 @@ void windowInit() {
 	glfwSetWindowSizeLimits(gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
-	int nvgFlags = 0;//NVG_ANTIALIAS;
+	int nvgFlags = NVG_ANTIALIAS;
 #if defined NANOVG_GL2
 	gVg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
