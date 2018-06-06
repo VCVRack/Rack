@@ -154,6 +154,12 @@ struct Button : OpaqueWidget {
 	void onDragDrop(EventDragDrop &e) override;
 };
 
+struct IconButton : Button {
+	SVGWidget *sw;
+	IconButton();
+	void setSVG(std::shared_ptr<SVG> svg);
+};
+
 struct ChoiceButton : Button {
 	void draw(NVGcontext *vg) override;
 };

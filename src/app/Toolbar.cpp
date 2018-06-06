@@ -1,9 +1,20 @@
 #include "app.hpp"
 #include "window.hpp"
 #include "engine.hpp"
+#include "asset.hpp"
 
 
 namespace rack {
+
+
+struct NewButton : IconButton {
+	NewButton() {
+		setSVG(SVG::load(assetGlobal("res/icons/file.svg")));
+	}
+	void onAction(EventAction &e) override {
+		gRackWidget->reset();
+	}
+};
 
 
 struct NewItem : MenuItem {
@@ -113,6 +124,9 @@ Toolbar::Toolbar() {
 	layout->box.pos = Vec(5, 5);
 	layout->spacing = 5;
 	addChild(layout);
+
+	NewButton *newButton = new NewButton();
+	layout->addChild(newButton);
 
 	ChoiceButton *fileChoice = new FileChoice();
 	fileChoice->box.size.x = 100;
