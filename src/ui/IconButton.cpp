@@ -5,9 +5,9 @@ namespace rack {
 
 
 IconButton::IconButton() {
-	box.size.x = BND_WIDGET_HEIGHT;
+	box.size.x = BND_TOOL_WIDTH;
 	sw = new SVGWidget();
-	sw->box.pos = Vec(2.75, 1.75);
+	sw->box.pos = Vec(2, 2);
 	addChild(sw);
 }
 
