@@ -129,6 +129,28 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 	}
 }
 
+struct MouseButtonArguments {
+	GLFWwindow *window;
+	int button;
+	int action;
+	int mods;
+};
+
+static std::queue<MouseButtonArguments> mouseButtonQueue;
+void mouseButtonStickyPop() {
+	if (!mouseButtonQueue.empty()) {
+		MouseButtonArguments args = mouseButtonQueue.front();
+		mouseButtonQueue.pop();
+		mouseButtonCallback(args.window, args.button, args.action, args.mods);
+	}
+}
+
+void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int mods) {
+	// Defer multiple clicks per frame to future frames
+	MouseButtonArguments args = {window, button, action, mods};
+	mouseButtonQueue.push(args);
+}
+
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
 	Vec mouseRel = mousePos.minus(gMousePos);
@@ -333,12 +355,10 @@ void windowInit() {
 
 	glfwSwapInterval(1);
 
-	glfwSetInputMode(gWindow, GLFW_STICKY_MOUSE_BUTTONS, 1);
-	glfwSetInputMode(gWindow, GLFW_STICKY_KEYS, 1);
 	glfwSetInputMode(gWindow, GLFW_LOCK_KEY_MODS, 1);
 
 	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
-	glfwSetMouseButtonCallback(gWindow, mouseButtonCallback);
+	glfwSetMouseButtonCallback(gWindow, mouseButtonStickyCallback);
 	// Call this ourselves, but on every frame instead of only when the mouse moves
 	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
 	glfwSetCursorEnterCallback(gWindow, cursorEnterCallback);
@@ -424,6 +444,7 @@ void windowRun() {
 			glfwGetCursorPos(gWindow, &xpos, &ypos);
 			cursorPosCallback(gWindow, xpos, ypos);
 		}
+		mouseButtonStickyPop();
 		gamepadStep();
 
 		// Set window title
