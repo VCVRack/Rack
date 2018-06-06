@@ -130,6 +130,9 @@ struct MenuItem : MenuEntry {
 	}
 };
 
+struct TooltipOverlay : TransparentWidget {
+};
+
 struct WindowOverlay : OpaqueWidget {
 };
 
@@ -246,12 +249,14 @@ struct ProgressBar : QuantityWidget {
 };
 
 struct Tooltip : VirtualWidget {
-	void step() override;
+	std::string text;
+	Tooltip();
 	void draw(NVGcontext *vg) override;
 };
 
 struct Scene : OpaqueWidget {
 	Widget *overlay = NULL;
+	/** Takes ownership of `w` */
 	void setOverlay(Widget *w);
 	Menu *createMenu();
 	void step() override;
