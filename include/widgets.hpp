@@ -92,9 +92,9 @@ struct Widget {
 	void addChild(Widget *widget);
 	/** Removes widget from list of children if it exists.
 	Does not delete widget but transfers ownership to caller
-	Silently fails if widget is not a child
 	*/
 	void removeChild(Widget *widget);
+	/** Removes and deletes all children */
 	void clearChildren();
 	/** Recursively finalizes event start/end pairs as needed */
 	void finalizeEvents();
@@ -106,24 +106,28 @@ struct Widget {
 
 	// Events
 
-	/** Called when a mouse button is pressed over this widget
-	0 for left, 1 for right, 2 for middle.
-	Return `this` to accept the event.
-	Return NULL to reject the event and pass it to the widget behind this one.
-	*/
+	/** Called when a mouse button is pressed over this widget */
 	virtual void onMouseDown(EventMouseDown &e);
+	/** Called when a mouse button is released over this widget */
 	virtual void onMouseUp(EventMouseUp &e);
-	/** Called on every frame, even if mouseRel = Vec(0, 0) */
+	/** Called when the mouse moves over this widget.
+	Called on every frame, even if `mouseRel = Vec(0, 0)`.
+	*/
 	virtual void onMouseMove(EventMouseMove &e);
+	/** Called when a key is pressed while hovering over this widget */
 	virtual void onHoverKey(EventHoverKey &e);
 	/** Called when this widget begins responding to `onMouseMove` events */
 	virtual void onMouseEnter(EventMouseEnter &e) {}
-	/** Called when another widget begins responding to `onMouseMove` events */
+	/** Called when this widget no longer responds to `onMouseMove` events */
 	virtual void onMouseLeave(EventMouseLeave &e) {}
+	/** Called when this widget gains focus by responding to the `onMouseDown` event */
 	virtual void onFocus(EventFocus &e) {}
 	virtual void onDefocus(EventDefocus &e) {}
+	/** Called when a printable character is received while this widget is focused */
 	virtual void onText(EventText &e) {}
+	/** Called when a key is pressed while this widget is focused */
 	virtual void onKey(EventKey &e) {}
+	/** Called when the scroll wheel is moved while the mouse is hovering over this widget */
 	virtual void onScroll(EventScroll &e);
 
 	/** Called when a widget responds to `onMouseDown` for a left button press */
@@ -135,11 +139,16 @@ struct Widget {
 	/** Called when a widget responds to `onMouseUp` for a left button release and a widget is being dragged */
 	virtual void onDragEnter(EventDragEnter &e) {}
 	virtual void onDragLeave(EventDragEnter &e) {}
+	/** Called when a drag action ends while hovering this widget */
 	virtual void onDragDrop(EventDragDrop &e) {}
+	/** Called when an OS selection of files is dragged-and-dropped on this widget */
 	virtual void onPathDrop(EventPathDrop &e);
 
+	/** Called when an event triggers an action */
 	virtual void onAction(EventAction &e) {}
+	/** For widgets with some concept of values, called when the value is changed */
 	virtual void onChange(EventChange &e) {}
+	/** Called when the zoom level is changed of this widget */
 	virtual void onZoom(EventZoom &e);
 
 	/** Helper function for creating and initializing a Widget with certain arguments (in this case just the position).
