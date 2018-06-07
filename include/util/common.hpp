@@ -146,7 +146,6 @@ struct StringCaseInsensitiveCompare {
 	}
 };
 
-
 ////////////////////
 // Operating-system specific utilities
 // system.cpp
