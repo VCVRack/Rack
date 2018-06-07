@@ -62,10 +62,9 @@ void Widget::addChild(Widget *widget) {
 void Widget::removeChild(Widget *widget) {
 	assert(widget->parent == this);
 	auto it = std::find(children.begin(), children.end(), widget);
-	if (it != children.end()) {
-		children.erase(it);
-		widget->parent = NULL;
-	}
+	assert(it != children.end());
+	children.erase(it);
+	widget->parent = NULL;
 }
 
 void Widget::clearChildren() {

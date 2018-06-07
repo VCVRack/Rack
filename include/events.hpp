@@ -28,6 +28,7 @@ struct EventMouseDown : EventPosition {
 };
 
 struct EventMouseUp : EventPosition {
+	/** 0 for left mouse button, 1 for right, 2 for middle */
 	int button;
 	Widget *target = NULL;
 };

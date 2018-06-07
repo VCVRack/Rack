@@ -607,6 +607,29 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	bndSetTheme(t);
 }
 
+static int windowX = 0;
+static int windowY = 0;
+static int windowWidth = 0;
+static int windowHeight = 0;
+
+void windowSetFullScreen(bool fullScreen) {
+	if (windowGetFullScreen()) {
+		glfwSetWindowMonitor(gWindow, NULL, windowX, windowY, windowWidth, windowHeight, GLFW_DONT_CARE);
+	}
+	else {
+		glfwGetWindowPos(gWindow, &windowX, &windowY);
+		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
+		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+	}
+}
+
+bool windowGetFullScreen() {
+	GLFWmonitor *monitor = glfwGetWindowMonitor(gWindow);
+	return monitor != NULL;
+}
+
 
 ////////////////////
 // resources
