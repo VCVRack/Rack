@@ -110,11 +110,12 @@ DeferWrapper<F> deferWrapper(F f) {
 
 /** Seeds the RNG with the current time */
 void randomInit();
+/** Returns a uniform random uint32_t from 0 to UINT32_MAX */
 uint32_t randomu32();
 uint64_t randomu64();
 /** Returns a uniform random float in the interval [0.0, 1.0) */
 float randomUniform();
-/** Returns a normal random number with mean 0 and std dev 1 */
+/** Returns a normal random number with mean 0 and standard deviation 1 */
 float randomNormal();
 
 inline float DEPRECATED randomf() {return randomUniform();}
@@ -138,6 +139,13 @@ bool stringEndsWith(std::string str, std::string suffix);
 std::string stringDirectory(std::string path);
 std::string stringFilename(std::string path);
 std::string stringExtension(std::string path);
+
+struct StringCaseInsensitiveCompare {
+	bool operator()(const std::string &a, const std::string &b) const {
+		return stringLowercase(a) < stringLowercase(b);
+	}
+};
+
 
 ////////////////////
 // Operating-system specific utilities

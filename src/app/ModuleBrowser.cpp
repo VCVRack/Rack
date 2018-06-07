@@ -279,7 +279,7 @@ struct ModuleBrowser : OpaqueWidget {
 	SearchModuleField *searchField;
 	ScrollWidget *moduleScroll;
 	BrowserList *moduleList;
-	std::set<std::string> availableAuthors;
+	std::set<std::string, StringCaseInsensitiveCompare> availableAuthors;
 	std::set<ModelTag> availableTags;
 
 	ModuleBrowser() {
