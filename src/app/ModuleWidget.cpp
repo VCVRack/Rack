@@ -190,7 +190,20 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 
 	// CPU meter
-	if (gCpuMeters && module) {
+	if (module && gCpuMeters) {
+		nvgBeginPath(vg);
+		nvgRect(vg,
+			0, box.size.y - 20,
+			55, 20);
+		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.5));
+		nvgFill(vg);
+
+		std::string cpuText = stringf("%.0f mS", module->cpuTime * 1000.f);
+		nvgFontFaceId(vg, gGuiFont->handle);
+		nvgFontSize(vg, 12);
+		nvgFillColor(vg, nvgRGBf(1, 1, 1));
+		nvgText(vg, 10.0, box.size.y - 6.0, cpuText.c_str(), NULL);
+
 		float p = clamp(module->cpuTime, 0.f, 1.f);
 		nvgBeginPath(vg);
 		nvgRect(vg,

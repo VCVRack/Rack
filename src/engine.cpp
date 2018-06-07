@@ -20,7 +20,7 @@ std::vector<Wire*> gWires;
 bool gCpuMeters = false;
 
 static bool running = false;
-static float sampleRate;
+static float sampleRate = 44100.f;
 static float sampleTime;
 
 static std::mutex mutex;
@@ -92,17 +92,17 @@ static void engineStep() {
 		std::chrono::high_resolution_clock::time_point startTime;
 		if (gCpuMeters) {
 			startTime = std::chrono::high_resolution_clock::now();
-		}
 
-		module->step();
+			module->step();
 
-		if (gCpuMeters) {
 			auto stopTime = std::chrono::high_resolution_clock::now();
 			float cpuTime = std::chrono::duration<float>(stopTime - startTime).count() * sampleRate;
-			module->cpuTime += (cpuTime - module->cpuTime) * sampleTime * 10.f;
+			module->cpuTime += (cpuTime - module->cpuTime) * sampleTime / 0.25f;
+		}
+		else {
+			module->step();
 		}
 
-		// TODO skip this step when plug lights are disabled
 		// Step ports
 		for (Input &input : module->inputs) {
 			if (input.active) {
