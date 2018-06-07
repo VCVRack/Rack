@@ -165,6 +165,9 @@ void RackWidget::revert() {
 }
 
 void RackWidget::disconnect() {
+	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Clear all patch cables?"))
+		return;
+
 	for (Widget *w : moduleContainer->children) {
 		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
 		assert(moduleWidget);
