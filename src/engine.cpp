@@ -17,7 +17,7 @@ namespace rack {
 bool gPaused = false;
 std::vector<Module*> gModules;
 std::vector<Wire*> gWires;
-bool gCpuMeters = false;
+bool gPowerMeter = false;
 
 static bool running = false;
 static float sampleRate = 44100.f;
@@ -90,7 +90,7 @@ static void engineStep() {
 	// Step modules
 	for (Module *module : gModules) {
 		std::chrono::high_resolution_clock::time_point startTime;
-		if (gCpuMeters) {
+		if (gPowerMeter) {
 			startTime = std::chrono::high_resolution_clock::now();
 
 			module->step();

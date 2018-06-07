@@ -67,6 +67,9 @@ static json_t *settingsToJson() {
 	// moduleBrowser
 	json_object_set_new(rootJ, "moduleBrowser", appModuleBrowserToJson());
 
+	// powerMeter
+	json_object_set_new(rootJ, "powerMeter", json_boolean(gPowerMeter));
+
 	return rootJ;
 }
 
@@ -132,9 +135,14 @@ static void settingsFromJson(json_t *rootJ) {
 		skipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
 
 	// moduleBrowser
-	json_t * moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
+	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
 	if (moduleBrowserJ)
 		appModuleBrowserFromJson(moduleBrowserJ);
+
+	// powerMeter
+	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
+	if (powerMeterJ)
+		gPowerMeter = json_boolean_value(powerMeterJ);
 }
 
 

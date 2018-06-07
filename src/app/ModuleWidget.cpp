@@ -190,7 +190,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 
 	// CPU meter
-	if (module && gCpuMeters) {
+	if (module && gPowerMeter) {
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, box.size.y - 20,

@@ -135,7 +135,7 @@ Your plugin needs to have a clear purpose for manipulating other modules and wir
 */
 extern std::vector<Module*> gModules;
 extern std::vector<Wire*> gWires;
-extern bool gCpuMeters;
+extern bool gPowerMeter;
 
 
 } // namespace rack

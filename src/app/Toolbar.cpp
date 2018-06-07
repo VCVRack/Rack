@@ -89,13 +89,13 @@ struct DisconnectCablesButton : TooltipIconButton {
 	}
 };
 
-struct MeterButton : TooltipIconButton {
-	MeterButton() {
+struct PowerMeterButton : TooltipIconButton {
+	PowerMeterButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_305536_cc.svg")));
 		tooltipText = "Toggle power meter (see manual for explanation)";
 	}
 	void onAction(EventAction &e) override {
-		gCpuMeters ^= true;
+		gPowerMeter ^= true;
 	}
 };
 
@@ -175,7 +175,7 @@ Toolbar::Toolbar() {
 	layout->addChild(wireTensionSlider);
 
 	layout->addChild(new SampleRateButton());
-	layout->addChild(new MeterButton());
+	layout->addChild(new PowerMeterButton());
 
 	struct ZoomSlider : Slider {
 		void onAction(EventAction &e) override {
