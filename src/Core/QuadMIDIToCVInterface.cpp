@@ -27,15 +27,13 @@ struct QuadMIDIToCVInterface : Module {
 
 	enum PolyMode {
 		ROTATE_MODE,
-		// Added REUSE option that reuses a channel when receiving the same note.
-		// Good when using sustain pedal so it doesn't "stack" unisons ... not sure this is the best name but it is descriptive...
 		REUSE_MODE,
 		RESET_MODE,
 		REASSIGN_MODE,
 		UNISON_MODE,
 		NUM_MODES
 	};
-	PolyMode polyMode = ROTATE_MODE;
+	PolyMode polyMode = RESET_MODE;
 
 	struct NoteData {
 		uint8_t velocity = 0;
@@ -351,19 +349,19 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 
 		menu->addChild(MenuEntry::create());
 		menu->addChild(MenuLabel::create("Polyphony mode"));
-		std::vector<std::string> polyModeNames = {
-			"Rotate",
-			"Reuse",
-			"Reset",
-			"Reassign",
-			"Unison"
-		};
-		for (int i = 0; i < QuadMIDIToCVInterface::NUM_MODES; i++) {
-			PolyphonyItem *item = MenuItem::create<PolyphonyItem>(polyModeNames[i], CHECKMARK(module->polyMode == i));
+
+		auto addPolyphonyItem = [&](QuadMIDIToCVInterface::PolyMode polyMode, std::string name) {
+			PolyphonyItem *item = MenuItem::create<PolyphonyItem>(name, CHECKMARK(module->polyMode == polyMode));
 			item->module = module;
-			item->polyMode = (QuadMIDIToCVInterface::PolyMode) i;
+			item->polyMode = polyMode;
 			menu->addChild(item);
-		}
+		};
+
+		addPolyphonyItem(QuadMIDIToCVInterface::RESET_MODE, "Reset");
+		addPolyphonyItem(QuadMIDIToCVInterface::ROTATE_MODE, "Rotate");
+		addPolyphonyItem(QuadMIDIToCVInterface::REUSE_MODE, "Reuse");
+		addPolyphonyItem(QuadMIDIToCVInterface::REASSIGN_MODE, "Reassign");
+		addPolyphonyItem(QuadMIDIToCVInterface::UNISON_MODE, "Unison");
 	}
 };
 

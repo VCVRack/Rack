@@ -10,6 +10,8 @@ SVGSlider::SVGSlider() {
 
 	handle = new SVGWidget();
 	addChild(handle);
+
+	speed = 2.0;
 }
 
 void SVGSlider::setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG> handleSVG) {

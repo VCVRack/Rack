@@ -97,7 +97,7 @@ static void engineStep() {
 
 			auto stopTime = std::chrono::high_resolution_clock::now();
 			float cpuTime = std::chrono::duration<float>(stopTime - startTime).count() * sampleRate;
-			module->cpuTime += (cpuTime - module->cpuTime) * sampleTime / 0.25f;
+			module->cpuTime += (cpuTime - module->cpuTime) * sampleTime / 0.5f;
 		}
 		else {
 			module->step();
