@@ -158,6 +158,7 @@ struct Button : OpaqueWidget {
 };
 
 struct IconButton : Button {
+	FramebufferWidget *fw;
 	SVGWidget *sw;
 	IconButton();
 	void setSVG(std::shared_ptr<SVG> svg);
