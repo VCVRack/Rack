@@ -84,6 +84,9 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 				appModuleBrowserCreate();
 				e.consumed = true;
 			} break;
+			case GLFW_KEY_F11: {
+				windowSetFullScreen(!windowGetFullScreen());
+			}
 		}
 	}
 }

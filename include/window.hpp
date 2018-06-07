@@ -45,6 +45,8 @@ Vec windowGetWindowPos();
 void windowSetWindowPos(Vec pos);
 bool windowIsMaximized();
 void windowSetTheme(NVGcolor bg, NVGcolor fg);
+void windowSetFullScreen(bool fullScreen);
+bool windowGetFullScreen();
 
 
 } // namespace rack
