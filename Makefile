@@ -5,10 +5,6 @@ FLAGS += \
 	-Iinclude \
 	-Idep/include -Idep/lib/libzip/include
 
-ifdef RELEASE
-	FLAGS += -DRELEASE
-endif
-
 include arch.mk
 
 STRIP ?= strip
@@ -58,22 +54,25 @@ dep:
 	$(MAKE) -C dep
 
 run: $(TARGET)
+	./$< -d
+
+runr: $(TARGET)
 	./$<
 
 debug: $(TARGET)
 ifdef ARCH_MAC
-	lldb -ex run ./$<
+	lldb -ex run ./$< -d
 endif
 ifdef ARCH_WIN
-	gdb -ex run ./$<
+	gdb -ex run ./$< -d
 endif
 ifdef ARCH_LIN
-	gdb -ex run ./$<
+	gdb -ex run ./$< -d
 endif
 
 perf: $(TARGET)
 ifdef ARCH_LIN
-	perf record --call-graph dwarf ./$<
+	perf record --call-graph dwarf ./$< -d
 endif
 
 clean:
@@ -88,9 +87,6 @@ endif
 
 # This target is not intended for public use
 dist: all
-ifndef RELEASE
-	exit 1 # Must enable RELEASE for dist target
-endif
 	rm -rf dist
 	# Rack distribution
 	$(MAKE) -C plugins/Fundamental dist

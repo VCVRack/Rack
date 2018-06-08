@@ -209,10 +209,11 @@ Toolbar::Toolbar() {
 	layout->addChild(cpuUsageButton);
 */
 
-#if defined(RELEASE)
-	Widget *pluginManager = new PluginManagerWidget();
-	layout->addChild(pluginManager);
-#endif
+	// Kind of hacky, but display the PluginManagerWidget only if the local directory is not the development directory
+	if (assetLocal("") != "./") {
+		Widget *pluginManager = new PluginManagerWidget();
+		layout->addChild(pluginManager);
+	}
 }
 
 void Toolbar::draw(NVGcontext *vg) {

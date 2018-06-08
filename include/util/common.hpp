@@ -175,7 +175,7 @@ enum LoggerLevel {
 	FATAL_LEVEL
 };
 
-void loggerInit();
+void loggerInit(bool devMode);
 void loggerDestroy();
 /** Do not use this function directly. Use the macros below. */
 void loggerLog(LoggerLevel level, const char *file, int line, const char *format, ...);

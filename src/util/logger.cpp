@@ -6,22 +6,25 @@
 namespace rack {
 
 
-static FILE *logFile = stderr;
+static FILE *logFile = NULL;
 static std::chrono::high_resolution_clock::time_point startTime;
 
 
-void loggerInit() {
+void loggerInit(bool devMode) {
 	startTime = std::chrono::high_resolution_clock::now();
-#ifdef RELEASE
-	std::string logFilename = assetLocal("log.txt");
-	logFile = fopen(logFilename.c_str(), "w");
-#endif
+	if (devMode) {
+		logFile = stderr;
+	}
+	else {
+		std::string logFilename = assetLocal("log.txt");
+		logFile = fopen(logFilename.c_str(), "w");
+	}
 }
 
 void loggerDestroy() {
-#ifdef RELEASE
-	fclose(logFile);
-#endif
+	if (logFile != stderr) {
+		fclose(logFile);
+	}
 }
 
 static const char* const loggerText[] = {
