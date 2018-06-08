@@ -20,23 +20,38 @@ using namespace rack;
 
 
 int main(int argc, char* argv[]) {
-	randomInit();
-	loggerInit();
+	bool devMode = false;
+	std::string patchFile;
 
 	// Parse command line arguments
-	std::string patchFile;
-	if (argc >= 2) {
-		patchFile = argv[1];
+	int c;
+	opterr = 0;
+	while ((c = getopt(argc, argv, "d")) != -1) {
+		switch (c) {
+			case 'd': {
+				devMode = true;
+			} break;
+			default: break;
+		}
+	}
+	if (optind < argc) {
+		patchFile = argv[optind];
 	}
 
-	info("Rack %s", gApplicationVersion.c_str());
+	// Initialize environment
+	randomInit();
+	assetInit(devMode);
+	loggerInit(devMode);
 
-	// Log directories
+	// Log environment
+	info("Rack %s", gApplicationVersion.c_str());
+	if (devMode)
+		info("Development mode");
 	info("Global directory: %s", assetGlobal("").c_str());
 	info("Local directory: %s", assetLocal("").c_str());
 
-	// Initialize namespaces
-	pluginInit();
+	// Initialize app
+	pluginInit(devMode);
 	engineInit();
 	rtmidiInit();
 	bridgeInit();

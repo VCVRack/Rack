@@ -321,7 +321,7 @@ static void extractPackages(std::string path) {
 // public API
 ////////////////////
 
-void pluginInit() {
+void pluginInit(bool devMode) {
 	tagsInit();
 
 	// Load core
@@ -334,15 +334,15 @@ void pluginInit() {
 	std::string localPlugins = assetLocal("plugins");
 	mkdir(localPlugins.c_str(), 0755);
 
-#if RELEASE
-	// Copy Fundamental package to plugins directory if folder does not exist
-	std::string fundamentalSrc = assetGlobal("Fundamental.zip");
-	std::string fundamentalDest = assetLocal("plugins/Fundamental.zip");
-	std::string fundamentalDir = assetLocal("plugins/Fundamental");
-	if (!systemIsDirectory(fundamentalDir) && !systemIsFile(fundamentalDest)) {
-		systemCopy(fundamentalSrc, fundamentalDest);
+	if (!devMode) {
+		// Copy Fundamental package to plugins directory if folder does not exist
+		std::string fundamentalSrc = assetGlobal("Fundamental.zip");
+		std::string fundamentalDest = assetLocal("plugins/Fundamental.zip");
+		std::string fundamentalDir = assetLocal("plugins/Fundamental");
+		if (systemIsFile(fundamentalSrc) && !systemIsFile(fundamentalDest) && !systemIsDirectory(fundamentalDir)) {
+			systemCopy(fundamentalSrc, fundamentalDest);
+		}
 	}
-#endif
 
 	// Extract packages and load plugins
 	extractPackages(localPlugins);

@@ -1,93 +1,94 @@
 #include "asset.hpp"
 #include "util/common.hpp"
-#include <sys/stat.h> // for mkdir
 #include "osdialog.h"
 
 #if ARCH_MAC
-#include <CoreFoundation/CoreFoundation.h>
-#include <pwd.h>
+	#include <CoreFoundation/CoreFoundation.h>
+	#include <pwd.h>
 #endif
 
 #if ARCH_WIN
-#include <Windows.h>
-#include <Shlobj.h>
-#include <Shlwapi.h>
+	#include <Windows.h>
+	#include <Shlobj.h>
+	#include <Shlwapi.h>
 #endif
 
 #if ARCH_LIN
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
+	#include <unistd.h>
+	#include <sys/types.h>
+	#include <pwd.h>
 #endif
 
 
 namespace rack {
 
 
-std::string assetGlobal(std::string filename) {
-	std::string dir;
-#if RELEASE
+static std::string globalDir;
+static std::string localDir;
+
+
+void assetInit(bool devMode) {
+	if (devMode) {
+		// Use current working directory if running in development mode
+		globalDir = ".";
+		localDir = ".";
+		return;
+	}
+
 #if ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
 	assert(bundle);
 	CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
 	char buf[PATH_MAX];
-	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8 *)buf, sizeof(buf));
+	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) buf, sizeof(buf));
 	assert(success);
 	CFRelease(resourcesUrl);
-	dir = buf;
+	globalDir = buf;
+
+	// Get home directory
+	struct passwd *pw = getpwuid(getuid());
+	assert(pw);
+	localDir = pw->pw_dir;
+	localDir += "/Documents/Rack";
 #endif
 #if ARCH_WIN
 	char buf[MAX_PATH];
 	DWORD length = GetModuleFileName(NULL, buf, sizeof(buf));
 	assert(length > 0);
 	PathRemoveFileSpec(buf);
-	dir = buf;
-#endif
-#if ARCH_LIN
-	// TODO For now, users should launch Rack from their terminal in the global directory
-	dir = ".";
-#endif
-#else // RELEASE
-	dir = ".";
-#endif // RELEASE
-	return dir + "/" + filename;
-}
+	globalDir = buf;
 
-
-std::string assetLocal(std::string filename) {
-	std::string dir;
-#if RELEASE
-#if ARCH_MAC
-	// Get home directory
-	struct passwd *pw = getpwuid(getuid());
-	assert(pw);
-	dir = pw->pw_dir;
-	dir += "/Documents/Rack";
-#endif
-#if ARCH_WIN
 	// Get "My Documents" folder
 	char buf[MAX_PATH];
 	HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, buf);
 	assert(result == S_OK);
-	dir = buf;
-	dir += "/Rack";
+	localDir = buf;
+	localDir += "/Rack";
 #endif
 #if ARCH_LIN
+	// TODO For now, users should launch Rack from their terminal in the global directory
+	globalDir = ".";
+
+	// Get home directory
 	const char *home = getenv("HOME");
 	if (!home) {
 		struct passwd *pw = getpwuid(getuid());
 		assert(pw);
 		home = pw->pw_dir;
 	}
-	dir = home;
-	dir += "/.Rack";
+	localDir = home;
+	localDir += "/.Rack";
 #endif
-	systemCreateDirectory(dir);
-#else // RELEASE
-	dir = ".";
-#endif // RELEASE
-	return dir + "/" + filename;
+}
+
+
+std::string assetGlobal(std::string filename) {
+	return globalDir + "/" + filename;
+}
+
+
+std::string assetLocal(std::string filename) {
+	return localDir + "/" + filename;
 }
 
 

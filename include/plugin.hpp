@@ -95,7 +95,7 @@ struct Model {
 };
 
 
-void pluginInit();
+void pluginInit(bool devMode);
 void pluginDestroy();
 void pluginLogIn(std::string email, std::string password);
 void pluginLogOut();
