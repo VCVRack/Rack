@@ -145,6 +145,7 @@ struct RackWidget : OpaqueWidget {
 	WireContainer *wireContainer;
 	std::string lastPath;
 	Vec lastMousePos;
+	bool lockModules = false;
 
 	RackWidget();
 	~RackWidget();

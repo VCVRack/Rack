@@ -9,3 +9,4 @@ Cat by Nabilauzwa from the Noun Project
 Stopwatch by Arthur Shlain from the Noun Project
 Sound by Gregor Cresnar from the Noun Project
 Refresh by un·delivered from the Noun Project
+Lock by Andres Gleixner from the Noun Project
