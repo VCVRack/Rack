@@ -140,6 +140,15 @@ struct SampleRateButton : TooltipIconButton {
 	}
 };
 
+struct RackLockButton : TooltipIconButton {
+	RackLockButton() {
+		setSVG(SVG::load(assetGlobal("res/icons/noun_468341_cc.svg")));
+		tooltipText = "Lock modules";
+	}
+	void onAction(EventAction &e) override {
+		gRackWidget->lockModules ^= true;
+	}
+};
 
 
 Toolbar::Toolbar() {
@@ -176,6 +185,7 @@ Toolbar::Toolbar() {
 
 	layout->addChild(new SampleRateButton());
 	layout->addChild(new PowerMeterButton());
+	layout->addChild(new RackLockButton());
 
 	struct ZoomSlider : Slider {
 		void onAction(EventAction &e) override {

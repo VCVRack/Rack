@@ -301,9 +301,11 @@ void ModuleWidget::onDragEnd(EventDragEnd &e) {
 }
 
 void ModuleWidget::onDragMove(EventDragMove &e) {
-	Rect newBox = box;
-	newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
-	gRackWidget->requestModuleBoxNearest(this, newBox);
+	if (!gRackWidget->lockModules) {
+		Rect newBox = box;
+		newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
+		gRackWidget->requestModuleBoxNearest(this, newBox);
+	}
 }
 
 
