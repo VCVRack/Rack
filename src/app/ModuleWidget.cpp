@@ -156,15 +156,9 @@ void ModuleWidget::disconnect() {
 }
 
 void ModuleWidget::create() {
-	if (module) {
-		module->onCreate();
-	}
 }
 
 void ModuleWidget::_delete() {
-	if (module) {
-		module->onDelete();
-	}
 }
 
 void ModuleWidget::reset() {

@@ -75,9 +75,9 @@ struct Module {
 	/** Called when the engine sample rate is changed
 	*/
 	virtual void onSampleRateChange() {}
-	/** Called when module is created by the Module Browser or by cloning, NOT when a patch is loaded */
+	/** Deprecated */
 	virtual void onCreate() {}
-	/** Called when user explicitly deletes the module, NOT when Rack is closed or a new patch is loaded */
+	/** Deprecated */
 	virtual void onDelete() {}
 	/** Called when user clicks Initialize in the module context menu */
 	virtual void onReset() {
