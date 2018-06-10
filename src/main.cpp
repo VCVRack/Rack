@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 	loggerInit(devMode);
 
 	// Log environment
-	info("Rack %s", gApplicationVersion.c_str());
+	info("%s %s", gApplicationName.c_str(), gApplicationVersion.c_str());
 	if (devMode)
 		info("Development mode");
 	info("Global directory: %s", assetGlobal("").c_str());
