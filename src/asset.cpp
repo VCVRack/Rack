@@ -39,11 +39,11 @@ void assetInit(bool devMode) {
 	CFBundleRef bundle = CFBundleGetMainBundle();
 	assert(bundle);
 	CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
-	char buf[PATH_MAX];
-	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) buf, sizeof(buf));
+	char resourcesBuf[PATH_MAX];
+	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
 	assert(success);
 	CFRelease(resourcesUrl);
-	globalDir = buf;
+	globalDir = resourcesBuf;
 
 	// Get home directory
 	struct passwd *pw = getpwuid(getuid());
@@ -52,17 +52,17 @@ void assetInit(bool devMode) {
 	localDir += "/Documents/Rack";
 #endif
 #if ARCH_WIN
-	char buf[MAX_PATH];
-	DWORD length = GetModuleFileName(NULL, buf, sizeof(buf));
+	char moduleBuf[MAX_PATH];
+	DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
 	assert(length > 0);
-	PathRemoveFileSpec(buf);
-	globalDir = buf;
+	PathRemoveFileSpec(moduleBuf);
+	globalDir = moduleBuf;
 
 	// Get "My Documents" folder
-	char buf[MAX_PATH];
-	HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, buf);
+	char documentsBuf[MAX_PATH];
+	HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
 	assert(result == S_OK);
-	localDir = buf;
+	localDir = documentsBuf;
 	localDir += "/Rack";
 #endif
 #if ARCH_LIN
@@ -70,13 +70,13 @@ void assetInit(bool devMode) {
 	globalDir = ".";
 
 	// Get home directory
-	const char *home = getenv("HOME");
-	if (!home) {
+	const char *homeBuf = getenv("HOME");
+	if (!homeBuf) {
 		struct passwd *pw = getpwuid(getuid());
 		assert(pw);
-		home = pw->pw_dir;
+		homeBuf = pw->pw_dir;
 	}
-	localDir = home;
+	localDir = homeBuf;
 	localDir += "/.Rack";
 #endif
 }
