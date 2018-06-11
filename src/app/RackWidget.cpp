@@ -60,7 +60,7 @@ void RackWidget::clear() {
 }
 
 void RackWidget::reset() {
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear your patch and start over?")) {
+	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear patch and start over?")) {
 		clear();
 		// Fails silently if file does not exist
 		loadPatch(assetLocal("template.vcv"));
@@ -159,7 +159,7 @@ void RackWidget::loadPatch(std::string path) {
 void RackWidget::revert() {
 	if (lastPath.empty())
 		return;
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert your patch to the last saved state?")) {
+	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert patch to the last saved state?")) {
 		loadPatch(lastPath);
 	}
 }

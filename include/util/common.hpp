@@ -118,7 +118,7 @@ float randomUniform();
 /** Returns a normal random number with mean 0 and standard deviation 1 */
 float randomNormal();
 
-inline float DEPRECATED randomf() {return randomUniform();}
+DEPRECATED inline float randomf() {return randomUniform();}
 
 ////////////////////
 // String utilities
