@@ -74,7 +74,7 @@ struct Menu : OpaqueWidget {
 	}
 	~Menu();
 	/** Deprecated. Just use addChild(child) instead */
-	void pushChild(Widget *child) DEPRECATED {
+	DEPRECATED void pushChild(Widget *child) {
 		addChild(child);
 	}
 	void setChildMenu(Menu *menu);
