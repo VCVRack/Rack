@@ -13,6 +13,7 @@ STRIP ?= strip
 
 SOURCES += dep/nanovg/src/nanovg.c
 SOURCES += dep/osdialog/osdialog.c
+SOURCES += $(wildcard dep/jpommier-pffft-*/pffft.c) $(wildcard dep/jpommier-pffft-*/fftpack.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifdef ARCH_MAC
