@@ -150,6 +150,13 @@ struct RackLockButton : TooltipIconButton {
 	}
 };
 
+struct ZoomSlider : Slider {
+	void onAction(EventAction &e) override {
+		Slider::onAction(e);
+		gRackScene->zoomWidget->setZoom(roundf(value) / 100.0);
+	}
+};
+
 
 Toolbar::Toolbar() {
 	box.size.y = BND_WIDGET_HEIGHT + 2*5;
@@ -165,6 +172,10 @@ Toolbar::Toolbar() {
 	layout->addChild(new SaveAsButton());
 	layout->addChild(new RevertButton());
 	layout->addChild(new DisconnectCablesButton());
+
+	layout->addChild(new SampleRateButton());
+	layout->addChild(new PowerMeterButton());
+	layout->addChild(new RackLockButton());
 
 	wireOpacitySlider = new Slider();
 	wireOpacitySlider->box.size.x = 150;
@@ -183,16 +194,6 @@ Toolbar::Toolbar() {
 	wireTensionSlider->setDefaultValue(0.5);
 	layout->addChild(wireTensionSlider);
 
-	layout->addChild(new SampleRateButton());
-	layout->addChild(new PowerMeterButton());
-	layout->addChild(new RackLockButton());
-
-	struct ZoomSlider : Slider {
-		void onAction(EventAction &e) override {
-			Slider::onAction(e);
-			gRackScene->zoomWidget->setZoom(roundf(value) / 100.0);
-		}
-	};
 	zoomSlider = new ZoomSlider();
 	zoomSlider->box.size.x = 150;
 	zoomSlider->precision = 0;
@@ -201,13 +202,6 @@ Toolbar::Toolbar() {
 	zoomSlider->setLimits(25.0, 200.0);
 	zoomSlider->setDefaultValue(100.0);
 	layout->addChild(zoomSlider);
-
-/*
-	cpuUsageButton = new RadioButton();
-	cpuUsageButton->box.size.x = 100;
-	cpuUsageButton->label = "CPU usage";
-	layout->addChild(cpuUsageButton);
-*/
 
 	// Kind of hacky, but display the PluginManagerWidget only if the local directory is not the development directory
 	if (assetLocal("") != "./") {

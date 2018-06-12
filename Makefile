@@ -12,6 +12,7 @@ STRIP ?= strip
 # Sources and build flags
 
 SOURCES += dep/nanovg/src/nanovg.c
+SOURCES += dep/osdialog/osdialog.c
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifdef ARCH_MAC
@@ -105,8 +106,8 @@ ifdef ARCH_MAC
 	otool -L $(BUNDLE)/Contents/MacOS/$(TARGET)
 
 	cp plugins/Fundamental/dist/Fundamental-*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
-	cp -R Bridge/au/dist/VCV-Bridge.component dist/
-	cp -R Bridge/vst/dist/VCV-Bridge.vst dist/
+	cp -R Bridge/AU/dist/VCV-Bridge.component dist/
+	cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
 	# Make DMG image
 	cd dist && ln -s /Applications Applications
 	cd dist && ln -s /Library/Audio/Plug-Ins/Components Components
@@ -116,8 +117,8 @@ endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
 	mkdir -p dist/Rack/Bridge
-	cp Bridge/vst/dist/VCV-Bridge-64.dll dist/Rack/Bridge/
-	cp Bridge/vst/dist/VCV-Bridge-32.dll dist/Rack/Bridge/
+	cp Bridge/VST/dist/VCV-Bridge-64.dll dist/Rack/Bridge/
+	cp Bridge/VST/dist/VCV-Bridge-32.dll dist/Rack/Bridge/
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
@@ -133,6 +134,8 @@ ifdef ARCH_WIN
 endif
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
+	mkdir -p dist/Rack/Bridge
+	cp Bridge/VST/dist/VCV-Bridge.so dist/Rack/Bridge/
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
