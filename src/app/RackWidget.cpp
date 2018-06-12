@@ -12,6 +12,9 @@
 namespace rack {
 
 
+static const char *FILTERS = "VCV Rack patch (.vcv):*.vcv";
+
+
 struct ModuleContainer : Widget {
 	void draw(NVGcontext *vg) override {
 		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front.
@@ -77,12 +80,14 @@ void RackWidget::openDialog() {
 	else {
 		dir = stringDirectory(lastPath);
 	}
-	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
+	osdialog_filters *filters = osdialog_filters_parse(FILTERS);
+	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
 	if (path) {
 		loadPatch(path);
 		lastPath = path;
 		free(path);
 	}
+	osdialog_filters_free(filters);
 }
 
 void RackWidget::saveDialog() {
@@ -96,14 +101,17 @@ void RackWidget::saveDialog() {
 
 void RackWidget::saveAsDialog() {
 	std::string dir;
+	std::string filename;
 	if (lastPath.empty()) {
 		dir = assetLocal("patches");
 		systemCreateDirectory(dir);
 	}
 	else {
 		dir = stringDirectory(lastPath);
+		filename = stringFilename(lastPath);
 	}
-	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcv", NULL);
+	osdialog_filters *filters = osdialog_filters_parse(FILTERS);
+	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
 
 	if (path) {
 		std::string pathStr = path;
@@ -116,6 +124,7 @@ void RackWidget::saveAsDialog() {
 		savePatch(pathStr);
 		lastPath = pathStr;
 	}
+	osdialog_filters_free(filters);
 }
 
 void RackWidget::savePatch(std::string path) {

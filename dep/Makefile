@@ -146,17 +146,17 @@ $(rtaudio):
 	# For some reason, it doesn't install the static library
 	cp rtaudio/build/librtaudio_static.a lib/librtaudio.a
 
-$(nanovg):
-	cp nanovg/src/*.h include/
+$(nanovg): $(wildcard nanovg/src/*.h)
+	cp $^ include/
 
-$(nanosvg):
-	cp nanosvg/src/*.h include/
+$(nanosvg): $(wildcard nanosvg/src/*.h)
+	cp $^ include/
 
-$(oui-blendish):
-	cp oui-blendish/*.h include/
+$(oui-blendish): $(wildcard blendish/*.h)
+	cp $^ include/
 
-$(osdialog):
-	cp osdialog/*.h include/
+$(osdialog): $(wildcard osdialog/*.h)
+	cp $^ include/
 
 clean:
 	git clean -fdx
