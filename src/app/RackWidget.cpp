@@ -12,7 +12,7 @@
 namespace rack {
 
 
-static const char *FILTERS = "VCV Rack patch (.vcv):*.vcv";
+static const char *FILTERS = "VCV Rack patch (.vcv):vcv";
 
 
 struct ModuleContainer : Widget {
