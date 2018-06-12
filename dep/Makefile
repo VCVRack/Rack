@@ -49,8 +49,9 @@ nanovg = include/nanovg.h
 nanosvg = include/nanosvg.h
 oui-blendish = include/blendish.h
 osdialog = include/osdialog.h
+pffft = include/pffft.h
 
-DEPS += $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(nanovg) $(nanosvg) $(oui-blendish) $(osdialog)
+DEPS += $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(nanovg) $(nanosvg) $(oui-blendish) $(osdialog) $(pffft)
 include $(RACK_DIR)/dep.mk
 
 
@@ -157,6 +158,11 @@ $(oui-blendish): $(wildcard oui-blendish/*.h)
 
 $(osdialog): $(wildcard osdialog/*.h)
 	cp $^ include/
+
+$(pffft):
+	$(WGET) "https://bitbucket.org/jpommier/pffft/get/29e4f76ac53b.zip"
+	$(UNZIP) 29e4f76ac53b.zip
+	cp jpommier-pffft-29e4f76ac53b/*.h include/
 
 clean:
 	git clean -fdx
