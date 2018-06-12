@@ -16,5 +16,5 @@ else ifneq (, $(findstring linux, $(MACHINE)))
 	ARCH_LIN := 1
 	ARCH := lin
 else
-$(error Could not determine architecture. Try hacking around in arch.mk)
+$(error Could not determine architecture of $(MACHINE). Try hacking around in arch.mk)
 endif
