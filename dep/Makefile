@@ -152,7 +152,7 @@ $(nanovg): $(wildcard nanovg/src/*.h)
 $(nanosvg): $(wildcard nanosvg/src/*.h)
 	cp $^ include/
 
-$(oui-blendish): $(wildcard blendish/*.h)
+$(oui-blendish): $(wildcard oui-blendish/*.h)
 	cp $^ include/
 
 $(osdialog): $(wildcard osdialog/*.h)
