@@ -124,7 +124,6 @@ struct MIDIToCVInterface : Module {
 		if (!heldNotes.empty()) {
 			lastNote = heldNotes[heldNotes.size() - 1];
 			gate = true;
-			retriggerPulse.trigger(1e-3);
 		}
 		else {
 			gate = false;
