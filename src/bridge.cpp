@@ -282,7 +282,7 @@ static void clientRun(int client) {
 }
 
 
-static void serverConnect() {
+static void serverConnect(int customPort) {
 	// Initialize sockets
 #if ARCH_WIN
 	WSADATA wsaData;
@@ -299,7 +299,8 @@ static void serverConnect() {
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(BRIDGE_PORT);
+        warn("Bridge server port: %i", customPort);
+	addr.sin_port = htons(customPort);
 #if ARCH_WIN
 	addr.sin_addr.s_addr = inet_addr(BRIDGE_HOST);
 #else
@@ -365,10 +366,10 @@ static void serverConnect() {
 	}
 }
 
-static void serverRun() {
+static void serverRun(int customPort) {
 	while (serverRunning) {
 		std::this_thread::sleep_for(std::chrono::duration<double>(0.1));
-		serverConnect();
+		serverConnect(customPort);
 	}
 }
 
@@ -403,9 +404,9 @@ void BridgeMidiDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput
 }
 
 
-void bridgeInit() {
+void bridgeInit(int customPort) {
 	serverRunning = true;
-	serverThread = std::thread(serverRun);
+	serverThread = std::thread(serverRun, customPort);
 
 	driver = new BridgeMidiDriver();
 	midiDriverAdd(BRIDGE_DRIVER, driver);

@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
 	std::string patchFile;
 	std::string customLocalDir;
 	std::string customGlobalDir;
+	int customBridgePort = -1;
 
 	// Parse command line arguments
 	argagg::parser argparser {{
@@ -33,6 +34,7 @@ int main(int argc, char* argv[]) {
 	    { "devmod", {"-d", "--devmod"}, "enables dev mode (supersedes local/global folders)", 0},
 	    { "global", {"-g", "--globaldir"}, "set golbalDir", 1},
 	    { "local", {"-l", "--localdir"}, "set localDir", 1},
+	    { "port", {"-p", "--port"}, "Bridge port number", 1},
 	}};
 
 	argagg::parser_results args;
@@ -62,6 +64,10 @@ int main(int argc, char* argv[]) {
 	  customLocalDir = args["local"].as<std::string>();
 	}
 
+	if (args["port"]) {
+	  customBridgePort = args["port"].as<int>();
+	}
+
 	// Filename as first positional argument
 	if (args.pos.size() > 0) {
 	  patchFile = args.as<std::string>(0);
@@ -83,7 +89,12 @@ int main(int argc, char* argv[]) {
 	pluginInit(devMode);
 	engineInit();
 	rtmidiInit();
-	bridgeInit();
+	if (customBridgePort > 0) {
+	  bridgeInit(customBridgePort);
+	}
+	else {
+	  bridgeInit();
+	}
 	keyboardInit();
 	gamepadInit();
 	windowInit();
