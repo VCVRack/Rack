@@ -16,3 +16,6 @@
 [submodule "dep/rtaudio"]
 	path = dep/rtaudio
 	url = https://github.com/thestk/rtaudio.git
+[submodule "dep/argagg"]
+	path = dep/argagg
+	url = https://github.com/vietjtnguyen/argagg.git
