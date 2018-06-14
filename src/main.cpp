@@ -24,11 +24,15 @@ using namespace rack;
 int main(int argc, char* argv[]) {
 	bool devMode = false;
 	std::string patchFile;
+	std::string customLocalDir;
+	std::string customGlobalDir;
 
 	// Parse command line arguments
 	argagg::parser argparser {{
 	    { "help", {"-h", "--help"}, "shows this help message", 0},
-	    { "devmod", {"-d", "--devmod"}, "enable dev mode", 0},
+	    { "devmod", {"-d", "--devmod"}, "enables dev mode (supersedes local/global folders)", 0},
+	    { "global", {"-g", "--globaldir"}, "set golbalDir", 1},
+	    { "local", {"-l", "--localdir"}, "set localDir", 1},
 	}};
 
 	argagg::parser_results args;
@@ -50,6 +54,14 @@ int main(int argc, char* argv[]) {
 	  devMode = true;
 	}
 
+	if (args["global"]) {
+	  customGlobalDir = args["global"].as<std::string>();
+	}
+
+	if (args["local"]) {
+	  customLocalDir = args["local"].as<std::string>();
+	}
+
 	// Filename as first positional argument
 	if (args.pos.size() > 0) {
 	  patchFile = args.as<std::string>(0);
@@ -57,7 +69,7 @@ int main(int argc, char* argv[]) {
 
 	// Initialize environment
 	randomInit();
-	assetInit(devMode);
+	assetInit(devMode, customGlobalDir, customLocalDir);
 	loggerInit(devMode);
 
 	// Log environment

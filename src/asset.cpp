@@ -27,7 +27,7 @@ static std::string globalDir;
 static std::string localDir;
 
 
-void assetInit(bool devMode) {
+void assetInit(bool devMode, std::string customGlobalDir, std::string customLocalDir) {
 	if (devMode) {
 		// Use current working directory if running in development mode
 		globalDir = ".";
@@ -35,50 +35,65 @@ void assetInit(bool devMode) {
 		return;
 	}
 
-#if ARCH_MAC
-	CFBundleRef bundle = CFBundleGetMainBundle();
-	assert(bundle);
-	CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
-	char resourcesBuf[PATH_MAX];
-	Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
-	assert(success);
-	CFRelease(resourcesUrl);
-	globalDir = resourcesBuf;
+	if (customGlobalDir.empty()) {
 
-	// Get home directory
-	struct passwd *pw = getpwuid(getuid());
-	assert(pw);
-	localDir = pw->pw_dir;
-	localDir += "/Documents/Rack";
+#if ARCH_MAC
+	  CFBundleRef bundle = CFBundleGetMainBundle();
+	  assert(bundle);
+	  CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
+	  char resourcesBuf[PATH_MAX];
+	  Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
+	  assert(success);
+	  CFRelease(resourcesUrl);
+	  globalDir = resourcesBuf;
 #endif
 #if ARCH_WIN
-	char moduleBuf[MAX_PATH];
-	DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
-	assert(length > 0);
-	PathRemoveFileSpec(moduleBuf);
-	globalDir = moduleBuf;
-
-	// Get "My Documents" folder
-	char documentsBuf[MAX_PATH];
-	HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
-	assert(result == S_OK);
-	localDir = documentsBuf;
-	localDir += "/Rack";
+	  char moduleBuf[MAX_PATH];
+	  DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
+	  assert(length > 0);
+	  PathRemoveFileSpec(moduleBuf);
+	  globalDir = moduleBuf;
 #endif
 #if ARCH_LIN
-	// TODO For now, users should launch Rack from their terminal in the global directory
-	globalDir = ".";
-
-	// Get home directory
-	const char *homeBuf = getenv("HOME");
-	if (!homeBuf) {
-		struct passwd *pw = getpwuid(getuid());
-		assert(pw);
-		homeBuf = pw->pw_dir;
-	}
-	localDir = homeBuf;
-	localDir += "/.Rack";
+	  // TODO For now, users should launch Rack from their terminal in the global directory
+	  globalDir = ".";
 #endif
+	}
+	else {
+	  globalDir = customGlobalDir;
+	}
+
+	if (customGlobalDir.empty()) {
+#if ARCH_MAC
+	  // Get home directory
+	  struct passwd *pw = getpwuid(getuid());
+	  assert(pw);
+	  localDir = pw->pw_dir;
+	  localDir += "/Documents/Rack";
+#endif
+#if ARCH_WIN
+	  // Get "My Documents" folder
+	  char documentsBuf[MAX_PATH];
+	  HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
+	  assert(result == S_OK);
+	  localDir = documentsBuf;
+	  localDir += "/Rack";
+#endif
+#if ARCH_LIN
+	  // Get home directory
+	  const char *homeBuf = getenv("HOME");
+	  if (!homeBuf) {
+	    struct passwd *pw = getpwuid(getuid());
+	    assert(pw);
+	    homeBuf = pw->pw_dir;
+	  }
+	  localDir = homeBuf;
+	  localDir += "/.Rack";
+#endif
+	}
+	else {
+	  localDir = customLocalDir;
+	}
 }
 
 
