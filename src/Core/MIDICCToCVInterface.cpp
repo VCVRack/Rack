@@ -1,6 +1,7 @@
 #include "Core.hpp"
 #include "midi.hpp"
 #include "dsp/filter.hpp"
+#include "window.hpp"
 
 
 struct MIDICCToCVInterface : Module {
@@ -106,6 +107,7 @@ struct MIDICCToCVInterface : Module {
 struct MidiCcChoice : GridChoice {
 	MIDICCToCVInterface *module;
 	int id;
+	int focusCc;
 
 	MidiCcChoice() {
 		box.size.y = mm2px(6.666);
@@ -118,7 +120,10 @@ struct MidiCcChoice : GridChoice {
 
 	void step() override {
 		if (module->learningId == id) {
-			text = "LRN";
+			if (0 <= focusCc)
+				text = stringf("%d", focusCc);
+			else
+				text = "LRN";
 			color.a = 0.5;
 		}
 		else {
@@ -132,10 +137,35 @@ struct MidiCcChoice : GridChoice {
 	void onFocus(EventFocus &e) override {
 		e.consumed = true;
 		module->learningId = id;
+		focusCc = -1;
 	}
 
 	void onDefocus(EventDefocus &e) override {
+		if (0 <= focusCc && focusCc < 128) {
+			module->learnedCcs[id] = focusCc;
+		}
 		module->learningId = -1;
+	}
+
+	void onText(EventText &e) override {
+		char c = e.codepoint;
+		if ('0' <= c && c <= '9') {
+			if (focusCc < 0)
+				focusCc = 0;
+			focusCc = focusCc * 10 + (c - '0');
+		}
+		e.consumed = true;
+	}
+
+	void onKey(EventKey &e) override {
+		if (gFocusedWidget == this) {
+			if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
+				EventDefocus eDefocus;
+				onDefocus(eDefocus);
+				gFocusedWidget = NULL;
+				e.consumed = true;
+			}
+		}
 	}
 };
 
