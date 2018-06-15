@@ -28,10 +28,13 @@ static std::string localDir;
 
 void assetInit(bool devMode, std::string customGlobalDir, std::string customLocalDir) {
 	if (devMode) {
-		// Use current working directory if running in development mode
-		globalDir = ".";
-		localDir = ".";
-		return;
+		// Use current working directory by default if running in development mode
+		if (customGlobalDir.empty()) {
+			customGlobalDir = ".";
+		}
+		if (customLocalDir.empty()) {
+			customLocalDir = ".";
+		}
 	}
 
 	if (customGlobalDir.empty()) {

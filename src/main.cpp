@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 	// Parse command line arguments
 	argagg::parser argparser {{
 		{ "help", {"-h", "--help"}, "shows this help message", 0},
-		{ "devmod", {"-d", "--devmod"}, "enables dev mode (supersedes local/global folders)", 0},
+		{ "devmod", {"-d", "--devmod"}, "enables dev mode (will default local/global folders to current folder)", 0},
 		{ "global", {"-g", "--globaldir"}, "set golbalDir", 1},
 		{ "local", {"-l", "--localdir"}, "set localDir", 1},
 		{ "port", {"-p", "--port"}, "Bridge port number", 1},
