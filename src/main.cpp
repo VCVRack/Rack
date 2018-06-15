@@ -13,6 +13,8 @@
 #include "util/color.hpp"
 
 #include "osdialog.h"
+#include "argagg.hpp"
+
 #include <unistd.h>
 
 
@@ -22,25 +24,58 @@ using namespace rack;
 int main(int argc, char* argv[]) {
 	bool devMode = false;
 	std::string patchFile;
+	std::string customLocalDir;
+	std::string customGlobalDir;
+	int customBridgePort = -1;
 
 	// Parse command line arguments
-	int c;
-	opterr = 0;
-	while ((c = getopt(argc, argv, "d")) != -1) {
-		switch (c) {
-			case 'd': {
-				devMode = true;
-			} break;
-			default: break;
-		}
+	argagg::parser argparser {{
+		{ "help", {"-h", "--help"}, "shows this help message", 0},
+		{ "devmod", {"-d", "--devmod"}, "enables dev mode (will default local/global folders to current folder)", 0},
+		{ "global", {"-g", "--globaldir"}, "set golbalDir", 1},
+		{ "local", {"-l", "--localdir"}, "set localDir", 1},
+		{ "port", {"-p", "--port"}, "Bridge port number", 1},
+	}};
+
+	argagg::parser_results args;
+
+	try {
+		args = argparser.parse(argc, argv);
+	} catch (const std::exception& e) {
+		std::cerr << "Encountered exception while parsing arguments: " << e.what() << std::endl;
+		return EXIT_FAILURE;
 	}
-	if (optind < argc) {
-		patchFile = argv[optind];
+
+	if (args["help"]) {
+		std::cerr << "Usage: program [options] [FILENAME]" << std::endl;
+		std::cerr << argparser;
+		return EXIT_SUCCESS;
+	}
+
+	if (args["devmod"]) {
+		devMode = true;
+	}
+
+	if (args["global"]) {
+		customGlobalDir = args["global"].as<std::string>();
+	}
+
+	if (args["local"]) {
+		customLocalDir = args["local"].as<std::string>();
+	}
+
+	if (args["port"]) {
+		customBridgePort = args["port"].as<int>();
+	}
+
+	// Filename as first positional argument
+	if (args.pos.size() > 0) {
+		patchFile = args.as<std::string>(0);
 	}
 
 	// Initialize environment
 	randomInit();
-	assetInit(devMode);
+	assetInit(devMode, customGlobalDir, customLocalDir);
 	loggerInit(devMode);
 
 	// Log environment
@@ -54,7 +89,12 @@ int main(int argc, char* argv[]) {
 	pluginInit(devMode);
 	engineInit();
 	rtmidiInit();
-	bridgeInit();
+	if (customBridgePort > 0) {
+		bridgeInit(customBridgePort);
+	}
+	else {
+		bridgeInit();
+	}
 	keyboardInit();
 	gamepadInit();
 	windowInit();

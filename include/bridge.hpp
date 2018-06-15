@@ -22,7 +22,7 @@ struct BridgeMidiDriver : MidiDriver {
 };
 
 
-void bridgeInit();
+void bridgeInit(int customPort = BRIDGE_PORT);
 void bridgeDestroy();
 void bridgeAudioSubscribe(int channel, AudioIO *audio);
 void bridgeAudioUnsubscribe(int channel, AudioIO *audio);

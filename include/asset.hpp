@@ -7,7 +7,7 @@
 namespace rack {
 
 
-void assetInit(bool devMode);
+void assetInit(bool devMode, std::string customGlobalDir = std::string(), std::string customLocalDir = std::string());
 /** Returns the path of a global resource. Should only read files from this location. */
 std::string assetGlobal(std::string filename);
 /** Returns the path of a local resource. Can read and write files to this location. */
