@@ -30,47 +30,47 @@ int main(int argc, char* argv[]) {
 
 	// Parse command line arguments
 	argagg::parser argparser {{
-	    { "help", {"-h", "--help"}, "shows this help message", 0},
-	    { "devmod", {"-d", "--devmod"}, "enables dev mode (supersedes local/global folders)", 0},
-	    { "global", {"-g", "--globaldir"}, "set golbalDir", 1},
-	    { "local", {"-l", "--localdir"}, "set localDir", 1},
-	    { "port", {"-p", "--port"}, "Bridge port number", 1},
+		{ "help", {"-h", "--help"}, "shows this help message", 0},
+		{ "devmod", {"-d", "--devmod"}, "enables dev mode (supersedes local/global folders)", 0},
+		{ "global", {"-g", "--globaldir"}, "set golbalDir", 1},
+		{ "local", {"-l", "--localdir"}, "set localDir", 1},
+		{ "port", {"-p", "--port"}, "Bridge port number", 1},
 	}};
 
 	argagg::parser_results args;
 
 	try {
-	  args = argparser.parse(argc, argv);
+		args = argparser.parse(argc, argv);
 	} catch (const std::exception& e) {
-	  std::cerr << "Encountered exception while parsing arguments: " << e.what() << std::endl;
-	  return EXIT_FAILURE;
+		std::cerr << "Encountered exception while parsing arguments: " << e.what() << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	if (args["help"]) {
-	  std::cerr << "Usage: program [options] [FILENAME]" << std::endl;
-	  std::cerr << argparser;
-	  return EXIT_SUCCESS;
+		std::cerr << "Usage: program [options] [FILENAME]" << std::endl;
+		std::cerr << argparser;
+		return EXIT_SUCCESS;
 	}
 
 	if (args["devmod"]) {
-	  devMode = true;
+		devMode = true;
 	}
 
 	if (args["global"]) {
-	  customGlobalDir = args["global"].as<std::string>();
+		customGlobalDir = args["global"].as<std::string>();
 	}
 
 	if (args["local"]) {
-	  customLocalDir = args["local"].as<std::string>();
+		customLocalDir = args["local"].as<std::string>();
 	}
 
 	if (args["port"]) {
-	  customBridgePort = args["port"].as<int>();
+		customBridgePort = args["port"].as<int>();
 	}
 
 	// Filename as first positional argument
 	if (args.pos.size() > 0) {
-	  patchFile = args.as<std::string>(0);
+		patchFile = args.as<std::string>(0);
 	}
 
 	// Initialize environment
@@ -90,10 +90,10 @@ int main(int argc, char* argv[]) {
 	engineInit();
 	rtmidiInit();
 	if (customBridgePort > 0) {
-	  bridgeInit(customBridgePort);
+		bridgeInit(customBridgePort);
 	}
 	else {
-	  bridgeInit();
+		bridgeInit();
 	}
 	keyboardInit();
 	gamepadInit();
