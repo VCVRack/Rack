@@ -19,6 +19,8 @@
 	#include <pwd.h>
 #endif
 
+#include <iostream>
+
 namespace rack {
 
 
@@ -62,7 +64,13 @@ void assetInit(bool devMode, std::string customGlobalDir, std::string customLoca
 #endif
 	}
 	else {
-		globalDir = customGlobalDir;
+		if (!systemIsDirectory(customGlobalDir)) {
+			std::cerr << "Selected global directory \"" <<  customGlobalDir << "\" does not exist or is not a directory, default to current directory." << std::endl;
+			globalDir = ".";
+		}
+		else {
+			globalDir = customGlobalDir;
+		}
 	}
 
 	if (customLocalDir.empty()) {
@@ -94,7 +102,13 @@ void assetInit(bool devMode, std::string customGlobalDir, std::string customLoca
 #endif
 	}
 	else {
-		localDir = customLocalDir;
+		if (!systemIsDirectory(customLocalDir)) {
+			std::cerr << "Selected local directory \"" <<  customLocalDir << "\" does not exist or is not a directory, default to current directory." << std::endl;
+			localDir = ".";
+		}
+		else {
+			localDir = customLocalDir;
+		}
 	}
 }
 
