@@ -19,7 +19,6 @@
 	#include <pwd.h>
 #endif
 
-
 namespace rack {
 
 
@@ -63,7 +62,7 @@ void assetInit(bool devMode, std::string customGlobalDir, std::string customLoca
 	  globalDir = customGlobalDir;
 	}
 
-	if (customGlobalDir.empty()) {
+	if (customLocalDir.empty()) {
 #if ARCH_MAC
 	  // Get home directory
 	  struct passwd *pw = getpwuid(getuid());
