@@ -89,7 +89,21 @@ endif
 # This target is not intended for public use
 dist: all
 	rm -rf dist
-	# Rack distribution
+	mkdir -p dist
+
+	# Rack SDK
+	mkdir -p dist/Rack-SDK
+	cp LICENSE* dist/Rack-SDK/
+	cp *.mk dist/Rack-SDK/
+	cp -R include dist/Rack-SDK/
+	mkdir -p dist/Rack-SDK/dep/
+	cp -R dep/include dist/Rack-SDK/dep/
+ifdef ARCH_WIN
+	cp libRack.a dist/Rack-SDK/
+endif
+	cd dist && zip -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
+
+	# Rack
 	$(MAKE) -C plugins/Fundamental dist
 
 ifdef ARCH_MAC
@@ -144,18 +158,6 @@ ifdef ARCH_LIN
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
-
-	# Rack SDK distribution
-	mkdir -p dist/Rack-SDK
-	cp LICENSE* dist/Rack-SDK/
-	cp *.mk dist/Rack-SDK/
-	cp -R include dist/Rack-SDK/
-	mkdir -p dist/Rack-SDK/dep/
-	cp -R dep/include dist/Rack-SDK/dep/
-ifdef ARCH_WIN
-	cp libRack.a dist/Rack-SDK/
-endif
-	cd dist && zip -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
 
 
 # Obviously this will only work if you have the private keys to my server
