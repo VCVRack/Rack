@@ -54,8 +54,6 @@ void Light::setBrightnessSmooth(float brightness, float frames) {
 
 void Wire::step() {
 	float value = outputModule->outputs[outputId].value;
-	// Assume a +/-12V power supply (like Eurorack), and prevent voltages outside the power range.
-	value = clamp(value, -12.f, 12.f);
 	inputModule->inputs[inputId].value = value;
 }
 

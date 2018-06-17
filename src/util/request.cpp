@@ -115,6 +115,9 @@ static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 }
 
 bool requestDownload(std::string url, std::string filename, float *progress) {
+	if (progress)
+		*progress = 0.f;
+
 	CURL *curl = curl_easy_init();
 	if (!curl)
 		return false;

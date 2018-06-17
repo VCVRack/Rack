@@ -1,6 +1,7 @@
 #include "Core.hpp"
 #include "midi.hpp"
 #include "dsp/filter.hpp"
+#include "window.hpp"
 
 
 struct MIDICCToCVInterface : Module {
@@ -19,19 +20,21 @@ struct MIDICCToCVInterface : Module {
 	};
 
 	MidiInputQueue midiInput;
-	int8_t cvs[16];
+	int8_t ccs[128];
 	ExponentialFilter ccFilters[16];
 
 	int learningId = -1;
-	uint8_t learnedCcs[16] = {};
+	int learnedCcs[16] = {};
 
 	MIDICCToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();
 	}
 
 	void onReset() override {
+		for (int i = 0; i < 128; i++) {
+			ccs[i] = 0;
+		}
 		for (int i = 0; i < 16; i++) {
-			cvs[i] = 0;
 			learnedCcs[i] = i;
 		}
 		learningId = -1;
@@ -45,7 +48,8 @@ struct MIDICCToCVInterface : Module {
 
 		float lambda = 100.f * engineGetSampleTime();
 		for (int i = 0; i < 16; i++) {
-			float value = rescale(cvs[i], 0, 127, 0.f, 10.f);
+			int learnedCc = learnedCcs[i];
+			float value = rescale(clamp(ccs[learnedCc], -127, 127), 0, 127, 0.f, 10.f);
 			ccFilters[i].lambda = lambda;
 			outputs[CC_OUTPUT + i].value = ccFilters[i].process(value);
 		}
@@ -57,17 +61,13 @@ struct MIDICCToCVInterface : Module {
 			case 0xb: {
 				uint8_t cc = msg.note();
 				// Learn
-				if (learningId >= 0) {
+				if (learningId >= 0 && ccs[cc] != msg.data2) {
 					learnedCcs[learningId] = cc;
 					learningId = -1;
 				}
 				// Set CV
-				for (int i = 0; i < 16; i++) {
-					if (learnedCcs[i] == cc) {
-						// Allow CC to be negative if the 8th bit is set
-						cvs[i] = msg.data2;
-					}
-				}
+				// Allow CC to be negative if the 8th bit is set
+				ccs[cc] = msg.data2;
 			} break;
 			default: break;
 		}
@@ -107,6 +107,7 @@ struct MIDICCToCVInterface : Module {
 struct MidiCcChoice : GridChoice {
 	MIDICCToCVInterface *module;
 	int id;
+	int focusCc;
 
 	MidiCcChoice() {
 		box.size.y = mm2px(6.666);
@@ -119,7 +120,10 @@ struct MidiCcChoice : GridChoice {
 
 	void step() override {
 		if (module->learningId == id) {
-			text = "LRN";
+			if (0 <= focusCc)
+				text = stringf("%d", focusCc);
+			else
+				text = "LRN";
 			color.a = 0.5;
 		}
 		else {
@@ -133,10 +137,35 @@ struct MidiCcChoice : GridChoice {
 	void onFocus(EventFocus &e) override {
 		e.consumed = true;
 		module->learningId = id;
+		focusCc = -1;
 	}
 
 	void onDefocus(EventDefocus &e) override {
+		if (0 <= focusCc && focusCc < 128) {
+			module->learnedCcs[id] = focusCc;
+		}
 		module->learningId = -1;
+	}
+
+	void onText(EventText &e) override {
+		char c = e.codepoint;
+		if ('0' <= c && c <= '9') {
+			if (focusCc < 0)
+				focusCc = 0;
+			focusCc = focusCc * 10 + (c - '0');
+		}
+		e.consumed = true;
+	}
+
+	void onKey(EventKey &e) override {
+		if (gFocusedWidget == this) {
+			if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
+				EventDefocus eDefocus;
+				onDefocus(eDefocus);
+				gFocusedWidget = NULL;
+				e.consumed = true;
+			}
+		}
 	}
 };
 
