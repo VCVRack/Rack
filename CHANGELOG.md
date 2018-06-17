@@ -1,12 +1,12 @@
 
-### 0.6.1 (in development)
+### 0.6.1 (2018-06-17)
 
 - Added gamepad MIDI driver
 - Added computer keyboard MIDI driver
 - Added JACK support on Linux
 - Added velocity mode to MIDI-Trig
 - Added MIDI multiplexing so multiple MIDI modules can use the same MIDI device on Windows
-- Make Module Browser layout more compact
+- Made Module Browser layout more compact
 - Add power meter
 - Add icons to toolbar
 - [VCV Bridge](https://vcvrack.com/manual/Bridge.html) 0.6.1

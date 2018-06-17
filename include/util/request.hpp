@@ -13,9 +13,11 @@ enum RequestMethod {
 	METHOD_DELETE,
 };
 
-/** Requests a JSON API URL over HTTP(S), using the data as the query (GET) or the body (POST, etc) */
+/** Requests a JSON API URL over HTTP(S), using the data as the query (GET) or the body (POST, etc)
+Caller must json_decref().
+*/
 json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ);
-/** Returns the filename, blank if unsuccessful */
+/** Returns true if downloaded successfully */
 bool requestDownload(std::string url, std::string filename, float *progress);
 /** URL-encodes `s` */
 std::string requestEscape(std::string s);

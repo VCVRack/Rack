@@ -534,13 +534,15 @@ struct RackScene : Scene {
 extern std::string gApplicationName;
 extern std::string gApplicationVersion;
 extern std::string gApiHost;
+extern std::string gLatestVersion;
+extern bool gCheckVersion;
 
 // Easy access to "singleton" widgets
 extern RackScene *gRackScene;
 extern RackWidget *gRackWidget;
 extern Toolbar *gToolbar;
 
-void appInit();
+void appInit(bool devMode);
 void appDestroy();
 void appModuleBrowserCreate();
 json_t *appModuleBrowserToJson();

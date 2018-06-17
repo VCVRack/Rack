@@ -1,23 +1,49 @@
 #include "app.hpp"
+#include "util/request.hpp"
+#include <thread>
 
 
 namespace rack {
 
 
-bool gDev = false;
 std::string gApplicationName = "VCV Rack";
 std::string gApplicationVersion = TOSTRING(VERSION);
 std::string gApiHost = "https://api.vcvrack.com";
 // std::string gApiHost = "http://localhost:8081";
+std::string gLatestVersion;
+bool gCheckVersion = true;
+
 
 RackWidget *gRackWidget = NULL;
 Toolbar *gToolbar = NULL;
 RackScene *gRackScene = NULL;
 
 
-void appInit() {
+static void checkVersion() {
+	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/version", NULL);
+
+	if (resJ) {
+		json_t *versionJ = json_object_get(resJ, "version");
+		if (versionJ) {
+			const char *version = json_string_value(versionJ);
+			if (version && version != gApplicationVersion) {
+				gLatestVersion = version;
+			}
+		}
+		json_decref(resJ);
+	}
+}
+
+
+void appInit(bool devMode) {
 	gRackScene = new RackScene();
 	gScene = gRackScene;
+
+	// Request latest version from server
+	if (!devMode && gCheckVersion) {
+		std::thread t(checkVersion);
+		t.detach();
+	}
 }
 
 void appDestroy() {
