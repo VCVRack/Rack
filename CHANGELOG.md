@@ -1,5 +1,5 @@
 
-### 0.6.1 (in development)
+### 0.6.1 (2018-06-17)
 
 - Added gamepad MIDI driver
 - Added computer keyboard MIDI driver
