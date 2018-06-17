@@ -174,7 +174,6 @@ endif
 ifdef ARCH_LIN
 	rsync dist/*.zip $(UPLOAD_URL) -zP
 endif
-	rsync plugins/*/dist/*.zip $(UPLOAD_URL) -zP
 
 
 # Plugin helpers
