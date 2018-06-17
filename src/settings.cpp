@@ -9,7 +9,7 @@
 namespace rack {
 
 
-bool skipAutosaveOnLaunch = false;
+bool gSkipAutosaveOnLaunch = false;
 
 
 static json_t *settingsToJson() {
@@ -60,7 +60,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
 	// skipAutosaveOnLaunch
-	if (skipAutosaveOnLaunch) {
+	if (gSkipAutosaveOnLaunch) {
 		json_object_set_new(rootJ, "skipAutosaveOnLaunch", json_true());
 	}
 
@@ -69,6 +69,9 @@ static json_t *settingsToJson() {
 
 	// powerMeter
 	json_object_set_new(rootJ, "powerMeter", json_boolean(gPowerMeter));
+
+	// checkVersion
+	json_object_set_new(rootJ, "checkVersion", json_boolean(gCheckVersion));
 
 	return rootJ;
 }
@@ -132,7 +135,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// skipAutosaveOnLaunch
 	json_t *skipAutosaveOnLaunchJ = json_object_get(rootJ, "skipAutosaveOnLaunch");
 	if (skipAutosaveOnLaunchJ)
-		skipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
+		gSkipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
 
 	// moduleBrowser
 	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
@@ -143,6 +146,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
 	if (powerMeterJ)
 		gPowerMeter = json_boolean_value(powerMeterJ);
+
+	// checkVersion
+	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
+	if (checkVersionJ)
+		gCheckVersion = json_boolean_value(checkVersionJ);
 }
 
 
