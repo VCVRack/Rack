@@ -82,5 +82,5 @@ ifdef ARCH_WIN
 endif
 ifdef ARCH_MAC
 	# Apple makes this needlessly complicated, so just generate a C file with an array.
-	xxd -i $< | $(CC) -c -o $@ -xc -
+	xxd -i $< | $(CC) $(MAC_SDK_FLAGS) -c -o $@ -xc -
 endif
