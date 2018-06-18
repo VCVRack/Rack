@@ -8,7 +8,6 @@ endif
 
 include $(RACK_DIR)/arch.mk
 
-LD ?= ld
 OBJCOPY ?= objcopy
 
 FLAGS += -DVERSION=$(VERSION)
@@ -75,5 +74,6 @@ build/%.m.o: %.m
 
 build/%.bin.o: %
 	@mkdir -p $(@D)
-	$(LD) -r -b binary -o $@ $<
-	$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@ $@
+ifdef ARCH_LIN
+	$(OBJCOPY) -I binary -O elf64-x86-64 -B i386:x86-64 --rename-section .data=.rodata,alloc,load,readonly,data,contents $< $@
+endif
