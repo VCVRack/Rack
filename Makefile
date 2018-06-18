@@ -50,7 +50,7 @@ endif
 
 # Convenience targets
 
-all: dep $(TARGET)
+all: $(TARGET)
 
 dep:
 	$(MAKE) -C dep
