@@ -63,7 +63,7 @@ to your Makefile and declare
 at the root of a .c or .cpp source file. Note that special characters are replaced with "_". Then use
 	BINARY_START(Test_dat)
 	BINARY_END(Test_dat)
-to reference the data as a char array and
+to reference the data beginning and end as a void* array, and
 	BINARY_SIZE(Test_dat)
 to get its size in bytes.
 */
