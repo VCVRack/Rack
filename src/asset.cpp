@@ -79,6 +79,7 @@ void assetInit(bool devMode) {
 	localDir = homeBuf;
 	localDir += "/.Rack";
 #endif
+	systemCreateDirectory(localDir);
 }
 
 
