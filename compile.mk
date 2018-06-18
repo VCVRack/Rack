@@ -8,6 +8,9 @@ endif
 
 include $(RACK_DIR)/arch.mk
 
+LD ?= ld
+OBJCOPY ?= objcopy
+
 FLAGS += -DVERSION=$(VERSION)
 # Generate dependency files alongside the object files
 FLAGS += -MMD -MP
@@ -44,6 +47,7 @@ CXXFLAGS += $(FLAGS)
 
 # Derive object files from sources and place them before user-defined objects
 OBJECTS := $(patsubst %, build/%.o, $(SOURCES)) $(OBJECTS)
+OBJECTS += $(patsubst %, build/%.bin.o, $(BINARIES))
 DEPENDENCIES := $(patsubst %, build/%.d, $(SOURCES))
 
 # Final targets
@@ -53,23 +57,23 @@ $(TARGET): $(OBJECTS)
 
 -include $(DEPENDENCIES)
 
-build/%.c.o: %.c | dep
+build/%.c.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-build/%.cpp.o: %.cpp | dep
+build/%.cpp.o: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/%.cc.o: %.cc | dep
+build/%.cc.o: %.cc
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/%.m.o: %.m | dep
+build/%.m.o: %.m
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-# Dummy target
-dep:
-
-.PHONY: dep
+build/%.bin.o: %
+	@mkdir -p $(@D)
+	$(LD) -r -b binary -o $@ $<
+	$(OBJCOPY) --rename-section .data=.rodata,alloc,load,readonly,data,contents $@ $@
