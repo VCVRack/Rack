@@ -90,6 +90,7 @@ Clone submodules.
 
 Build plugin.
 
+	make dep
 	make
 
 ## Licenses
