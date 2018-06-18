@@ -71,7 +71,7 @@ to get its size in bytes.
 	// Use output from `xxd -i`
 	#define BINARY(sym) extern unsigned char sym[]; extern unsigned int sym##len
 	#define BINARY_START(sym) ((void*) sym)
-	#define BINARY_END(sym) ((void*) sym + sym##len)
+	#define BINARY_END(sym) ((void*) sym + sym##_len)
 	#define BINARY_SIZE(sym) (sym##len)
 #else
 	#define BINARY(sym) extern char _binary_##sym##_start, _binary_##sym##_end, _binary_##sym##_size
