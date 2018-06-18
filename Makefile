@@ -63,13 +63,13 @@ runr: $(TARGET)
 
 debug: $(TARGET)
 ifdef ARCH_MAC
-	lldb -ex run ./$< -d
+	lldb --args ./$< -d
 endif
 ifdef ARCH_WIN
-	gdb -ex run ./$< -d
+	gdb --args ./$< -d
 endif
 ifdef ARCH_LIN
-	gdb -ex run ./$< -d
+	gdb --args ./$< -d
 endif
 
 perf: $(TARGET)
