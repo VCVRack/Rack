@@ -77,3 +77,10 @@ build/%.bin.o: %
 ifdef ARCH_LIN
 	$(OBJCOPY) -I binary -O elf64-x86-64 -B i386:x86-64 --rename-section .data=.rodata,alloc,load,readonly,data,contents $< $@
 endif
+ifdef ARCH_WIN
+	$(OBJCOPY) -I binary -O pe-x86-64 -B i386:x86-64 --rename-section .data=.rodata,alloc,load,readonly,data,contents $< $@
+endif
+ifdef ARCH_MAC
+	# Apple makes this needlessly complicated, so just generate a C file with an array.
+	xxd -i $< | $(CC) -c -o $@ -xc -
+endif
