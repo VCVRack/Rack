@@ -102,7 +102,7 @@ dist: all
 ifdef ARCH_WIN
 	cp libRack.a dist/Rack-SDK/
 endif
-	cd dist && zip -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
+	cd dist && zip -5 -r Rack-SDK-$(VERSION)-$(ARCH).zip Rack-SDK
 
 	# Rack
 	$(MAKE) -C plugins/Fundamental dist
@@ -165,11 +165,10 @@ endif
 UPLOAD_URL := vortico@vcvrack.com:files/
 upload:
 ifdef ARCH_MAC
-	rsync dist/*.dmg $(UPLOAD_URL) -zP
+	rsync dist/*.{dmg,zip} $(UPLOAD_URL) -zP
 endif
 ifdef ARCH_WIN
-	rsync dist/*.exe $(UPLOAD_URL) -P
-	rsync dist/*.zip $(UPLOAD_URL) -P
+	rsync dist/*.{exe,zip} $(UPLOAD_URL) -P
 endif
 ifdef ARCH_LIN
 	rsync dist/*.zip $(UPLOAD_URL) -zP
