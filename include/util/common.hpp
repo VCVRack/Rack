@@ -70,13 +70,13 @@ to get its size in bytes.
 #ifdef ARCH_MAC
 	// Use output from `xxd -i`
 	#define BINARY(sym) extern unsigned char sym[]; extern unsigned int sym##len
-	#define BINARY_START(sym) ((void*) sym)
-	#define BINARY_END(sym) ((void*) sym + sym##_len)
+	#define BINARY_START(sym) ((const void*) sym)
+	#define BINARY_END(sym) ((const void*) sym + sym##_len)
 	#define BINARY_SIZE(sym) (sym##len)
 #else
 	#define BINARY(sym) extern char _binary_##sym##_start, _binary_##sym##_end, _binary_##sym##_size
-	#define BINARY_START(sym) ((void*) &_binary_##sym##_start)
-	#define BINARY_END(sym) ((void*) &_binary_##sym##_end)
+	#define BINARY_START(sym) ((const void*) &_binary_##sym##_start)
+	#define BINARY_END(sym) ((const void*) &_binary_##sym##_end)
 	// The symbol "_binary_##sym##_size" doesn't seem to be valid after a plugin is dynamically loaded, so simply take the difference between the two addresses.
 	#define BINARY_SIZE(sym) ((size_t) (&_binary_##sym##_end - &_binary_##sym##_start))
 #endif
