@@ -17,7 +17,9 @@ I rarely accept code contributions to Rack itself, so please notify me in advanc
 
 ## Setting up your development environment
 
-Rack's dependencies (GLEW, glfw, etc) do not need to be installed on your system, since specific versions are compiled locally during the build process. However, you need proper tools to build these dependencies.
+Before building Rack, you must install build dependencies provided by your system's package manager.
+Rack's own dependencies (GLEW, glfw, etc) do not need to be installed on your system, since specific versions are compiled locally during the build process.
+However, you need proper tools to build Rack and these dependencies.
 
 ### Mac
 
