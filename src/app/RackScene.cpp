@@ -80,6 +80,10 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 					gRackWidget->openDialog();
 					e.consumed = true;
 				}
+				if (windowIsModPressed() && windowIsShiftPressed()) {
+					gRackWidget->revert();
+					e.consumed = true;
+				}
 			} break;
 			case GLFW_KEY_S: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
