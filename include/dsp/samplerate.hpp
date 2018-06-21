@@ -34,6 +34,7 @@ struct SampleRateConverter {
 		refreshState();
 	}
 
+	/** From 0 (worst, fastest) to 10 (best, slowest) */
 	void setQuality(int quality) {
 		if (quality == this->quality)
 			return;

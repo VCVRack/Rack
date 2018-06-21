@@ -102,7 +102,7 @@ struct RealTimeConvolver {
 	}
 
 	/** Applies reverb to input
-	input and output must be size blockSize
+	input and output must be of size `blockSize`
 	*/
 	void processBlock(const float *input, float *output) {
 		if (kernelBlocks == 0) {
