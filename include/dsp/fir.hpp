@@ -123,7 +123,7 @@ struct RealTimeConvolver {
 		// Note: This is the CPU bottleneck loop
 		for (size_t i = 0; i < kernelBlocks; i++) {
 			size_t pos = (inputPos - i + kernelBlocks) % kernelBlocks;
-			pffft_zconvolve_accumulate(pffft, &kernelFfts[blockSize*2 * i], &inputFfts[blockSize*2 * pos], tmpBlock, 1.0);
+			pffft_zconvolve_accumulate(pffft, &kernelFfts[blockSize*2 * i], &inputFfts[blockSize*2 * pos], tmpBlock, 1.f);
 		}
 		// Compute output
 		pffft_transform(pffft, tmpBlock, tmpBlock, NULL, PFFFT_BACKWARD);
@@ -132,9 +132,10 @@ struct RealTimeConvolver {
 			tmpBlock[i] += outputTail[i];
 		}
 		// Copy output block to output
+		float scale = 1.f / (blockSize*2);
 		for (size_t i = 0; i < blockSize; i++) {
 			// Scale based on FFT
-			output[i] = tmpBlock[i] / blockSize;
+			output[i] = tmpBlock[i] * scale;
 		}
 		// Set tail
 		for (size_t i = 0; i < blockSize; i++) {
