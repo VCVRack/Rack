@@ -28,7 +28,7 @@ ifdef ARCH_MAC
 endif
 
 ifdef ARCH_WIN
-	LDFLAGS += -shared -L$(RACK_DIR) -lRack
+	LDFLAGS += -shared
 	TARGET := plugin.dll
 	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack
 endif
