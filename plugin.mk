@@ -48,16 +48,16 @@ clean:
 dist: all
 	rm -rf dist
 	mkdir -p dist/$(SLUG)
-	# Strip and copy plugin binary
+	@# Strip and copy plugin binary
 	cp $(TARGET) dist/$(SLUG)/
 ifdef ARCH_MAC
 	$(STRIP) -S dist/$(SLUG)/$(TARGET)
 else
 	$(STRIP) -s dist/$(SLUG)/$(TARGET)
 endif
-	# Copy distributables
+	@# Copy distributables
 	cp -R $(DISTRIBUTABLES) dist/$(SLUG)/
-	# Create ZIP package
+	@# Create ZIP package
 	cd dist && zip -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
 
 install: dist

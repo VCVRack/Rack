@@ -88,7 +88,7 @@ $(libspeexdsp):
 $(openssl):
 	$(WGET) "https://www.openssl.org/source/openssl-1.1.0h.tar.gz"
 	$(UNTAR) openssl-1.1.0h.tar.gz
-	# ./config ignores CFLAGS, so hack it in with CC
+	@# ./config ignores CFLAGS, so hack it in with CC
 	cd openssl-1.1.0h && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
 	$(MAKE) -C openssl-1.1.0h
 	$(MAKE) -C openssl-1.1.0h install_sw
@@ -144,7 +144,7 @@ $(rtaudio):
 	cd rtaudio/build && $(CMAKE) $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/build
 	$(MAKE) -C rtaudio/build install
-	# For some reason, it doesn't install the static library
+	@# For some reason, it doesn't install the static library
 	cp rtaudio/build/librtaudio_static.a lib/librtaudio.a
 
 $(nanovg): $(wildcard nanovg/src/*.h)
