@@ -155,7 +155,10 @@ endif
 	cp -R include dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
-	cd dist && zip -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
+ifdef ARCH_WIN
+	cp libRack.a dist/Rack-SDK/
+endif
+	cd dist && zip -5 -r Rack-SDK-$(VERSION)-$(ARCH).zip Rack-SDK
 
 
 # Obviously this will only work if you have the private keys to my server
