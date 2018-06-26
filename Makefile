@@ -92,7 +92,7 @@ dist: all
 	rm -rf dist
 	mkdir -p dist
 
-	# Rack
+	@# Rack
 	$(MAKE) -C plugins/Fundamental dist
 
 ifdef ARCH_MAC
@@ -111,7 +111,7 @@ ifdef ARCH_MAC
 	cp plugins/Fundamental/dist/Fundamental-*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
 	cp -R Bridge/AU/dist/VCV-Bridge.component dist/
 	cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
-	# Make DMG image
+	@# Make DMG image
 	cd dist && ln -s /Applications Applications
 	cd dist && ln -s /Library/Audio/Plug-Ins/Components Components
 	cd dist && ln -s /Library/Audio/Plug-Ins/VST VST
@@ -129,9 +129,9 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
 	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
-	# Make ZIP
+	@# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
-	# Make NSIS installer
+	@# Make NSIS installer
 	makensis installer.nsi
 	mv Rack-setup.exe dist/Rack-$(VERSION)-$(ARCH).exe
 endif
@@ -144,11 +144,11 @@ ifdef ARCH_LIN
 	$(STRIP) -s dist/Rack/$(TARGET)
 	ldd dist/Rack/$(TARGET)
 	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
-	# Make ZIP
+	@# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 
-	# Rack SDK
+	@# Rack SDK
 	mkdir -p dist/Rack-SDK
 	cp LICENSE* dist/Rack-SDK/
 	cp *.mk dist/Rack-SDK/
