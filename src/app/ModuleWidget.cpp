@@ -166,7 +166,7 @@ void ModuleWidget::reset() {
 		param->reset();
 	}
 	if (module) {
-		module->onReset();
+		engineResetModule(module);
 	}
 }
 
@@ -175,7 +175,7 @@ void ModuleWidget::randomize() {
 		param->randomize();
 	}
 	if (module) {
-		module->onRandomize();
+		engineRandomizeModule(module);
 	}
 }
 

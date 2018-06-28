@@ -118,6 +118,8 @@ void engineStop();
 /** Does not transfer pointer ownership */
 void engineAddModule(Module *module);
 void engineRemoveModule(Module *module);
+void engineResetModule(Module *module);
+void engineRandomizeModule(Module *module);
 /** Does not transfer pointer ownership */
 void engineAddWire(Wire *wire);
 void engineRemoveWire(Wire *wire);
