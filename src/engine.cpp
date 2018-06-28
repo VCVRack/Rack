@@ -21,7 +21,11 @@ bool gPowerMeter = false;
 
 static bool running = false;
 static float sampleRate = 44100.f;
-static float sampleTime;
+static float sampleTime = 1.f / sampleRate;
+static float sampleRateRequested = sampleRate;
+
+static Module *resetModule;
+static Module *randomizeModule;
 
 static std::mutex mutex;
 static std::thread thread;
@@ -59,17 +63,35 @@ void Wire::step() {
 
 
 void engineInit() {
-	engineSetSampleRate(44100.0);
 }
 
 void engineDestroy() {
-	// Make sure there are no wires or modules in the rack on destruction. This suggests that a module failed to remove itself before the WINDOW was destroyed.
+	// Make sure there are no wires or modules in the rack on destruction. This suggests that a module failed to remove itself before the RackWidget was destroyed.
 	assert(gWires.empty());
 	assert(gModules.empty());
 }
 
 static void engineStep() {
-	// Param interpolation
+	// Sample rate
+	if (sampleRateRequested != sampleRate) {
+		sampleRate = sampleRateRequested;
+		sampleTime = 1.f / sampleRate;
+		for (Module *module : gModules) {
+			module->onSampleRateChange();
+		}
+	}
+
+	// Events
+	if (resetModule) {
+		resetModule->onReset();
+		resetModule = NULL;
+	}
+	if (randomizeModule) {
+		randomizeModule->onRandomize();
+		randomizeModule = NULL;
+	}
+
+	// Param smoothing
 	if (smoothModule) {
 		float value = smoothModule->params[smoothParamId].value;
 		const float lambda = 60.0; // decay rate is 1 graphics frame
@@ -203,6 +225,14 @@ void engineRemoveModule(Module *module) {
 	gModules.erase(it);
 }
 
+void engineResetModule(Module *module) {
+	resetModule = module;
+}
+
+void engineRandomizeModule(Module *module) {
+	randomizeModule = module;
+}
+
 static void updateActive() {
 	// Set everything to inactive
 	for (Module *module : gModules) {
@@ -256,9 +286,7 @@ void engineSetParam(Module *module, int paramId, float value) {
 }
 
 void engineSetParamSmooth(Module *module, int paramId, float value) {
-	VIPLock vipLock(vipMutex);
-	std::lock_guard<std::mutex> lock(mutex);
-	// Since only one param can be smoothed at a time, if another param is currently being smoothed, skip to its final state
+	// If another param is being smoothed, jump value
 	if (smoothModule && !(smoothModule == module && smoothParamId == paramId)) {
 		smoothModule->params[smoothParamId].value = smoothValue;
 	}
@@ -268,14 +296,7 @@ void engineSetParamSmooth(Module *module, int paramId, float value) {
 }
 
 void engineSetSampleRate(float newSampleRate) {
-	VIPLock vipLock(vipMutex);
-	std::lock_guard<std::mutex> lock(mutex);
-	sampleRate = newSampleRate;
-	sampleTime = 1.0 / sampleRate;
-	// onSampleRateChange
-	for (Module *module : gModules) {
-		module->onSampleRateChange();
-	}
+	sampleRateRequested = newSampleRate;
 }
 
 float engineGetSampleRate() {
