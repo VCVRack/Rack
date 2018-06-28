@@ -24,8 +24,8 @@ static float sampleRate = 44100.f;
 static float sampleTime = 1.f / sampleRate;
 static float sampleRateRequested = sampleRate;
 
-static Module *resetModule;
-static Module *randomizeModule;
+static Module *resetModule = NULL;
+static Module *randomizeModule = NULL;
 
 static std::mutex mutex;
 static std::thread thread;
