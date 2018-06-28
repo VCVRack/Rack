@@ -74,7 +74,7 @@ endif
 
 perf: $(TARGET)
 ifdef ARCH_LIN
-	perf record --call-graph dwarf ./$< -d
+	perf record --call-graph dwarf -o perf.data ./$< -d
 endif
 
 clean:
@@ -120,8 +120,7 @@ endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
 	mkdir -p dist/Rack/Bridge
-	cp Bridge/VST/dist/VCV-Bridge-64.dll dist/Rack/Bridge/
-	cp Bridge/VST/dist/VCV-Bridge-32.dll dist/Rack/Bridge/
+	cp Bridge/VST/dist/VCV-Bridge-{32,64,-fx-32,-fx-64}.dll dist/Rack/Bridge/
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
@@ -138,7 +137,7 @@ endif
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
 	mkdir -p dist/Rack/Bridge
-	cp Bridge/VST/dist/VCV-Bridge.so dist/Rack/Bridge/
+	cp Bridge/VST/dist/VCV-Bridge{,-fx}.so dist/Rack/Bridge/
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
