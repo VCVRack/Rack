@@ -92,18 +92,23 @@ static void engineStep() {
 	}
 
 	// Param smoothing
-	if (smoothModule) {
-		float value = smoothModule->params[smoothParamId].value;
-		const float lambda = 60.0; // decay rate is 1 graphics frame
-		float delta = smoothValue - value;
-		float newValue = value + delta * lambda * sampleTime;
-		if (value == newValue) {
-			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
-			smoothModule->params[smoothParamId].value = smoothValue;
-			smoothModule = NULL;
-		}
-		else {
-			smoothModule->params[smoothParamId].value = newValue;
+	{
+		Module *localSmoothModule = smoothModule;
+		int localSmoothParamId = smoothParamId;
+		float localSmoothValue = smoothValue;
+		if (localSmoothModule) {
+			float value = localSmoothModule->params[localSmoothParamId].value;
+			const float lambda = 60.0; // decay rate is 1 graphics frame
+			float delta = localSmoothValue - value;
+			float newValue = value + delta * lambda * sampleTime;
+			if (value == newValue) {
+				// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
+				localSmoothModule->params[localSmoothParamId].value = localSmoothValue;
+				smoothModule = NULL;
+			}
+			else {
+				localSmoothModule->params[localSmoothParamId].value = newValue;
+			}
 		}
 	}
 
