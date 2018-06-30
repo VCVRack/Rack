@@ -120,7 +120,7 @@ endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
 	mkdir -p dist/Rack/Bridge
-	cp Bridge/VST/dist/VCV-Bridge-{32,64,-fx-32,-fx-64}.dll dist/Rack/Bridge/
+	cp Bridge/VST/dist/VCV-Bridge-{32,64,fx-32,fx-64}.dll dist/Rack/Bridge/
 	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
