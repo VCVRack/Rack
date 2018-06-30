@@ -6,9 +6,9 @@
 
 This README includes instructions for building Rack from source. For information about the software, go to https://vcvrack.com/.
 
-## The [Issue Tracker](https://github.com/VCVRack/Rack/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) *is* the official developer's forum
+## The [Issue Tracker](https://github.com/VCVRack/Rack/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) is the official developer's forum
 
-Bug reports, feature requests, and even *questions/discussions* are welcome on the GitHub Issue Tracker for all VCVRack repos.
+Bug reports, feature requests, questions, and discussions are welcome on the GitHub Issue Tracker for all repos under the VCVRack organization.
 However, please search before posting to avoid duplicates, and limit to one issue per post.
 
 Please vote on feature requests by using the Thumbs Up/Down reaction on the first post.
@@ -38,14 +38,14 @@ pacman -S git wget make tar unzip zip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmak
 
 ### Linux
 
-On Arch Linux:
-```
-pacman -S git wget gcc make cmake tar unzip zip curl
-```
-
 On Ubuntu 16.04:
 ```
 sudo apt install git curl cmake libx11-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev zlib1g-dev libasound2-dev libgtk2.0-dev libjack-jackd2-dev
+```
+
+On Arch Linux:
+```
+pacman -S git wget gcc make cmake tar unzip zip curl
 ```
 
 ## Building
@@ -53,20 +53,16 @@ sudo apt install git curl cmake libx11-dev libglu1-mesa-dev libxrandr-dev libxin
 *If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
 
 Clone this repository with `git clone https://github.com/VCVRack/Rack.git` and `cd Rack`.
-Make sure there are no spaces in your path, as this breaks many build systems.
+Make sure there are no spaces in your absolute path, as this breaks many build systems.
 
 Clone submodules.
 
 	git submodule update --init --recursive
 
 Build dependencies locally.
-You may use make's `-j$(nproc)` flag to parallelize builds across all your CPU cores.
+You may add `-j$(nproc)` to your make commands to parallelize builds across all CPU cores.
 
 	make dep
-
-You may use `make dep RTAUDIO_ALL_APIS=1` to attempt to build with all audio driver APIs enabled for your operating system, although this is unsupported.
-
-You should see a message that all dependencies built successfully.
 
 Build Rack.
 
