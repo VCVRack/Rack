@@ -45,7 +45,7 @@ struct OpenButton : TooltipIconButton {
 		tooltipText = "Open  (" WINDOW_MOD_KEY_NAME "+O)";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->openDialog();
+		gRackWidget->loadDialog();
 	}
 };
 

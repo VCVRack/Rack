@@ -46,6 +46,8 @@ struct SVGPanel;
 static const float RACK_GRID_WIDTH = 15;
 static const float RACK_GRID_HEIGHT = 380;
 static const Vec RACK_GRID_SIZE = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+static const std::string PRESET_FILTERS = "VCV Rack module preset (.vcvm):vcvm";
+static const std::string PATCH_FILTERS = "VCV Rack patch (.vcv):vcv";
 
 
 struct ModuleWidget : OpaqueWidget {
@@ -68,6 +70,12 @@ struct ModuleWidget : OpaqueWidget {
 
 	virtual json_t *toJson();
 	virtual void fromJson(json_t *rootJ);
+	void copyClipboard();
+	void pasteClipboard();
+	void save(std::string filename);
+	void load(std::string filename);
+	void loadDialog();
+	void saveDialog();
 
 	virtual void create();
 	virtual void _delete();
@@ -154,17 +162,20 @@ struct RackWidget : OpaqueWidget {
 	void clear();
 	/** Clears the rack and loads the template patch */
 	void reset();
-	void openDialog();
+	void loadDialog();
 	void saveDialog();
 	void saveAsDialog();
 	/** If `lastPath` is defined, ask the user to reload it */
 	void revert();
 	/** Disconnects all wires */
 	void disconnect();
-	void savePatch(std::string filename);
-	void loadPatch(std::string filename);
+	void save(std::string filename);
+	void load(std::string filename);
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
+	/** Creates a module and adds it to the rack */
+	ModuleWidget *moduleFromJson(json_t *moduleJ);
+	void pastePresetClipboard();
 
 	void addModule(ModuleWidget *m);
 	/** Removes the module and transfers ownership to the caller */

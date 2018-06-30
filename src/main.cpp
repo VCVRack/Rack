@@ -73,13 +73,13 @@ int main(int argc, char* argv[]) {
 		else {
 			// Load autosave
 			std::string oldLastPath = gRackWidget->lastPath;
-			gRackWidget->loadPatch(assetLocal("autosave.vcv"));
+			gRackWidget->load(assetLocal("autosave.vcv"));
 			gRackWidget->lastPath = oldLastPath;
 		}
 	}
 	else {
 		// Load patch
-		gRackWidget->loadPatch(patchFile);
+		gRackWidget->load(patchFile);
 	}
 
 	engineStart();
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 	engineStop();
 
 	// Destroy namespaces
-	gRackWidget->savePatch(assetLocal("autosave.vcv"));
+	gRackWidget->save(assetLocal("autosave.vcv"));
 	settingsSave(assetLocal("settings.json"));
 	appDestroy();
 	windowDestroy();

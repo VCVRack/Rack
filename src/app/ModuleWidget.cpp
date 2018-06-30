@@ -2,6 +2,8 @@
 #include "engine.hpp"
 #include "plugin.hpp"
 #include "window.hpp"
+#include "asset.hpp"
+#include "osdialog.h"
 
 
 namespace rack {
@@ -68,10 +70,6 @@ json_t *ModuleWidget::toJson() {
 		json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
-	// pos
-	Vec pos = box.pos.div(RACK_GRID_SIZE).round();
-	json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
-	json_object_set_new(rootJ, "pos", posJ);
 	// params
 	json_t *paramsJ = json_array();
 	for (ParamWidget *paramWidget : params) {
@@ -91,23 +89,41 @@ json_t *ModuleWidget::toJson() {
 }
 
 void ModuleWidget::fromJson(json_t *rootJ) {
+	// Check if plugin and model are incorrect
+	json_t *pluginJ = json_object_get(rootJ, "plugin");
+	std::string pluginSlug;
+	if (pluginJ) {
+		pluginSlug = json_string_value(pluginJ);
+		if (pluginSlug != model->plugin->slug) {
+			warn("Plugin %s does not match ModuleWidget's plugin %s.", pluginSlug.c_str(), model->plugin->slug.c_str());
+			return;
+		}
+	}
+
+	json_t *modelJ = json_object_get(rootJ, "model");
+	std::string modelSlug;
+	if (modelJ) {
+		modelSlug = json_string_value(modelJ);
+		if (modelSlug != model->slug) {
+			warn("Model %s does not match ModuleWidget's model %s.", modelSlug.c_str(), model->slug.c_str());
+			return;
+		}
+	}
+
+	// Check plugin version
+	json_t *versionJ = json_object_get(rootJ, "version");
+	if (versionJ) {
+		std::string version = json_string_value(versionJ);
+		if (version != model->plugin->version) {
+			info("Patch created with %s version %s, using version %s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
+		}
+	}
+
 	// legacy
 	int legacy = 0;
 	json_t *legacyJ = json_object_get(rootJ, "legacy");
 	if (legacyJ)
 		legacy = json_integer_value(legacyJ);
-
-	// pos
-	json_t *posJ = json_object_get(rootJ, "pos");
-	double x, y;
-	json_unpack(posJ, "[F, F]", &x, &y);
-	Vec pos = Vec(x, y);
-	if (legacy && legacy <= 1) {
-		box.pos = pos;
-	}
-	else {
-		box.pos = pos.mult(RACK_GRID_SIZE);
-	}
 
 	// params
 	json_t *paramsJ = json_object_get(rootJ, "params");
@@ -144,6 +160,102 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	if (dataJ && module) {
 		module->fromJson(dataJ);
 	}
+}
+
+void ModuleWidget::copyClipboard() {
+	json_t *moduleJ = toJson();
+	char *moduleJson = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	glfwSetClipboardString(gWindow, moduleJson);
+	free(moduleJson);
+	json_decref(moduleJ);
+}
+
+void ModuleWidget::pasteClipboard() {
+	const char *moduleJson = glfwGetClipboardString(gWindow);
+	if (!moduleJson) {
+		warn("Could not get text from clipboard.");
+		return;
+	}
+
+	json_error_t error;
+	json_t *moduleJ = json_loads(moduleJson, 0, &error);
+	if (moduleJ) {
+		fromJson(moduleJ);
+		json_decref(moduleJ);
+	}
+	else {
+		warn("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+	}
+}
+
+void ModuleWidget::load(std::string filename) {
+	info("Loading preset %s", filename.c_str());
+	FILE *file = fopen(filename.c_str(), "r");
+	if (!file) {
+		// Exit silently
+		return;
+	}
+
+	json_error_t error;
+	json_t *moduleJ = json_loadf(file, 0, &error);
+	if (moduleJ) {
+		fromJson(moduleJ);
+		json_decref(moduleJ);
+	}
+	else {
+		std::string message = stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+	}
+
+	fclose(file);
+}
+
+void ModuleWidget::save(std::string filename) {
+	info("Saving preset %s", filename.c_str());
+	json_t *moduleJ = toJson();
+	if (!moduleJ)
+		return;
+
+	FILE *file = fopen(filename.c_str(), "w");
+	if (file) {
+		json_dumpf(moduleJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+		fclose(file);
+	}
+
+	json_decref(moduleJ);
+}
+
+void ModuleWidget::loadDialog() {
+	std::string dir = assetLocal("presets");
+	systemCreateDirectory(dir);
+
+	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
+	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
+	if (path) {
+		load(path);
+		free(path);
+	}
+	osdialog_filters_free(filters);
+}
+
+void ModuleWidget::saveDialog() {
+	std::string dir = assetLocal("presets");
+	systemCreateDirectory(dir);
+
+	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
+	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcvm", filters);
+
+	if (path) {
+		std::string pathStr = path;
+		free(path);
+		std::string extension = stringExtension(pathStr);
+		if (extension.empty()) {
+			pathStr += ".vcvm";
+		}
+
+		save(pathStr);
+	}
+	osdialog_filters_free(filters);
 }
 
 void ModuleWidget::disconnect() {
@@ -268,6 +380,20 @@ void ModuleWidget::onHoverKey(EventHoverKey &e) {
 				return;
 			}
 		} break;
+		case GLFW_KEY_C: {
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
+				copyClipboard();
+				e.consumed = true;
+				return;
+			}
+		} break;
+		case GLFW_KEY_V: {
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
+				pasteClipboard();
+				e.consumed = true;
+				return;
+			}
+		} break;
 		case GLFW_KEY_D: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				gRackWidget->cloneModule(this);
@@ -303,35 +429,63 @@ void ModuleWidget::onDragMove(EventDragMove &e) {
 }
 
 
-struct DisconnectMenuItem : MenuItem {
+struct ModuleDisconnectItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(EventAction &e) override {
 		moduleWidget->disconnect();
 	}
 };
 
-struct ResetMenuItem : MenuItem {
+struct ModuleResetItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(EventAction &e) override {
 		moduleWidget->reset();
 	}
 };
 
-struct RandomizeMenuItem : MenuItem {
+struct ModuleRandomizeItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(EventAction &e) override {
 		moduleWidget->randomize();
 	}
 };
 
-struct CloneMenuItem : MenuItem {
+struct ModuleCopyItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	void onAction(EventAction &e) override {
+		moduleWidget->copyClipboard();
+	}
+};
+
+struct ModulePasteItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	void onAction(EventAction &e) override {
+		moduleWidget->pasteClipboard();
+	}
+};
+
+struct ModuleSaveItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	void onAction(EventAction &e) override {
+		moduleWidget->saveDialog();
+	}
+};
+
+struct ModuleLoadItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	void onAction(EventAction &e) override {
+		moduleWidget->loadDialog();
+	}
+};
+
+struct ModuleCloneItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(EventAction &e) override {
 		gRackWidget->cloneModule(moduleWidget);
 	}
 };
 
-struct DeleteMenuItem : MenuItem {
+struct ModuleDeleteItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(EventAction &e) override {
 		gRackWidget->deleteModule(moduleWidget);
@@ -347,31 +501,53 @@ Menu *ModuleWidget::createContextMenu() {
 	menuLabel->text = model->author + " " + model->name + " " + model->plugin->version;
 	menu->addChild(menuLabel);
 
-	ResetMenuItem *resetItem = new ResetMenuItem();
+	ModuleResetItem *resetItem = new ModuleResetItem();
 	resetItem->text = "Initialize";
 	resetItem->rightText = WINDOW_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->addChild(resetItem);
 
-	RandomizeMenuItem *randomizeItem = new RandomizeMenuItem();
+	ModuleRandomizeItem *randomizeItem = new ModuleRandomizeItem();
 	randomizeItem->text = "Randomize";
 	randomizeItem->rightText = WINDOW_MOD_KEY_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->addChild(randomizeItem);
 
-	DisconnectMenuItem *disconnectItem = new DisconnectMenuItem();
+	ModuleDisconnectItem *disconnectItem = new ModuleDisconnectItem();
 	disconnectItem->text = "Disconnect cables";
 	disconnectItem->rightText = WINDOW_MOD_KEY_NAME "+U";
 	disconnectItem->moduleWidget = this;
 	menu->addChild(disconnectItem);
 
-	CloneMenuItem *cloneItem = new CloneMenuItem();
+	ModuleCloneItem *cloneItem = new ModuleCloneItem();
 	cloneItem->text = "Duplicate";
 	cloneItem->rightText = WINDOW_MOD_KEY_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
-	DeleteMenuItem *deleteItem = new DeleteMenuItem();
+	ModuleCopyItem *copyItem = new ModuleCopyItem();
+	copyItem->text = "Copy preset";
+	copyItem->rightText = WINDOW_MOD_KEY_NAME "+C";
+	copyItem->moduleWidget = this;
+	menu->addChild(copyItem);
+
+	ModulePasteItem *pasteItem = new ModulePasteItem();
+	pasteItem->text = "Paste preset";
+	pasteItem->rightText = WINDOW_MOD_KEY_NAME "+V";
+	pasteItem->moduleWidget = this;
+	menu->addChild(pasteItem);
+
+	ModuleLoadItem *loadItem = new ModuleLoadItem();
+	loadItem->text = "Load preset";
+	loadItem->moduleWidget = this;
+	menu->addChild(loadItem);
+
+	ModuleSaveItem *saveItem = new ModuleSaveItem();
+	saveItem->text = "Save preset";
+	saveItem->moduleWidget = this;
+	menu->addChild(saveItem);
+
+	ModuleDeleteItem *deleteItem = new ModuleDeleteItem();
 	deleteItem->text = "Delete";
 	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;
