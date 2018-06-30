@@ -77,7 +77,7 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 			} break;
 			case GLFW_KEY_O: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
-					gRackWidget->openDialog();
+					gRackWidget->loadDialog();
 					e.consumed = true;
 				}
 				if (windowIsModPressed() && windowIsShiftPressed()) {
@@ -95,6 +95,12 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 					e.consumed = true;
 				}
 			} break;
+			case GLFW_KEY_V: {
+				if (windowIsModPressed() && !windowIsShiftPressed()) {
+					gRackWidget->pastePresetClipboard();
+					e.consumed = true;
+				}
+			} break;
 			case GLFW_KEY_ENTER:
 			case GLFW_KEY_KP_ENTER: {
 				appModuleBrowserCreate();
@@ -109,9 +115,9 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 
 void RackScene::onPathDrop(EventPathDrop &e) {
 	if (e.paths.size() >= 1) {
-		const std::string& firstPath = e.paths.front();
+		const std::string &firstPath = e.paths.front();
 		if (stringExtension(firstPath) == "vcv") {
-			gRackWidget->loadPatch(firstPath);
+			gRackWidget->load(firstPath);
 			e.consumed = true;
 		}
 	}

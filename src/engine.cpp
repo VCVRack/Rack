@@ -295,9 +295,9 @@ void engineSetParamSmooth(Module *module, int paramId, float value) {
 	if (smoothModule && !(smoothModule == module && smoothParamId == paramId)) {
 		smoothModule->params[smoothParamId].value = smoothValue;
 	}
-	smoothModule = module;
 	smoothParamId = paramId;
 	smoothValue = value;
+	smoothModule = module;
 }
 
 void engineSetSampleRate(float newSampleRate) {
