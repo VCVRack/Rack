@@ -58,8 +58,9 @@ struct ModuleWidget : OpaqueWidget {
 	std::vector<Port*> outputs;
 	std::vector<ParamWidget*> params;
 
-	ModuleWidget(Module *module);
+	ModuleWidget(Module *module = 0);
 	~ModuleWidget();
+   void setModule__deprecated__(Module *module); // for VultModules  // (todo) fix the plugin
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addInput(Port *input);
 	void addOutput(Port *output);

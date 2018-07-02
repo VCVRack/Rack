@@ -1106,18 +1106,18 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 
       case effGetEffectName:
 #ifdef VST2_EFFECT
-         ::strncpy((char*)ptr, "VST Rack 0.6.1", kVstMaxEffectNameLen);
+         ::strncpy((char*)ptr, "VeeSeeVST Rack 0.6.1", kVstMaxEffectNameLen);
 #else
-         ::strncpy((char*)ptr, "VST Rack 0.6.1 I", kVstMaxEffectNameLen);
+         ::strncpy((char*)ptr, "VeeSeeVST Rack 0.6.1 I", kVstMaxEffectNameLen);
 #endif // VST2_EFFECT
          r = 1;
          break;
 
       case effGetProductString:
 #ifdef VST2_EFFECT
-         ::strncpy((char*)ptr, "VST Rack 0.6.1 VST2 Plugin v0.4", kVstMaxProductStrLen);
+         ::strncpy((char*)ptr, "VeeSeeVST Rack 0.6.1 VST2 Plugin v0.4", kVstMaxProductStrLen);
 #else
-         ::strncpy((char*)ptr, "VST Rack 0.6.1 I VST2 Plugin v0.4", kVstMaxProductStrLen);
+         ::strncpy((char*)ptr, "VeeSeeVST Rack 0.6.1 I VST2 Plugin v0.4", kVstMaxProductStrLen);
 #endif // VST2_EFFECT
          r = 1;
          break;

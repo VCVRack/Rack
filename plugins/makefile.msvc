@@ -27,6 +27,7 @@ bin:
 	$(call run_make,SubmarineFree,bin)
 	$(call run_make,Template,bin)
 	$(call run_make,Valley,bin)
+	$(call run_make,VultModules,bin)
 
 .PHONY:
 clean:
@@ -48,3 +49,4 @@ clean:
 	$(call run_make,SubmarineFree,clean)
 	$(call run_make,Template,clean)
 	$(call run_make,Valley,clean)
+	$(call run_make,VultModules,clean)

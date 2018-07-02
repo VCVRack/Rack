@@ -4,6 +4,14 @@
 - remove logos from Fundamental.* modules (as requested by the VCV Rack author)
 - add module Template.MyModule
 - clean up for GitHub release
+- add module VultModules.Debriatus
+- add module VultModules.Lateralus
+- add module VultModules.Rescomb
+- add module VultModules.Splie
+- add module VultModules.Stabile
+- add module VultModules.Tangents
+- add module VultModules.Tohe
+- add module VultModules.Trummor
 
 
 ** July 1st, 2018

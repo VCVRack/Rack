@@ -28,6 +28,13 @@ ModuleWidget::~ModuleWidget() {
 	}
 }
 
+void ModuleWidget::setModule__deprecated__(Module *module) {
+	if (module) {
+		engineAddModule(module);
+	}
+	this->module = module;
+}
+
 void ModuleWidget::addInput(Port *input) {
 	assert(input->type == Port::INPUT);
 	inputs.push_back(input);

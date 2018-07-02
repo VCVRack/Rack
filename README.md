@@ -269,6 +269,14 @@ The following add-on modules are statically linked with the VST plugin:
  - Valley.UGraph
  - Valley.Dexter
  - Valley.Plateau
+ - VultModules.Debriatus
+ - VultModules.Lateralus
+ - VultModules.Rescomb
+ - VultModules.Splie
+ - VultModules.Stabile
+ - VultModules.Tangents
+ - VultModules.Tohe
+ - VultModules.Trummor
 
 Please notice that the Audible/Mutable Instruments modules appear under a different name in the UI.
 For example, "Clouds" is listed as "Texture Synthesizer".

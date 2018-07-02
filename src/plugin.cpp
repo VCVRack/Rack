@@ -584,6 +584,7 @@ extern void init_plugin_SonusModular       (rack::Plugin *p);
 extern void init_plugin_SubmarineFree      (rack::Plugin *p);
 extern void init_plugin_Template           (rack::Plugin *p);
 extern void init_plugin_Valley             (rack::Plugin *p);
+extern void init_plugin_VultModules        (rack::Plugin *p);
 }
 
 static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCallback) {
@@ -629,6 +630,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("SubmarineFree",      &init_plugin_SubmarineFree);
    vst2_load_static_rack_plugin("Template",           &init_plugin_Template);
    vst2_load_static_rack_plugin("Valley",             &init_plugin_Valley);
+   vst2_load_static_rack_plugin("VultModules",        &init_plugin_VultModules);
 }
 #endif // USE_VST2
 

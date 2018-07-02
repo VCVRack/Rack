@@ -10,3 +10,8 @@
 /patches
 /design
 .DS_Store
+*~
+.emacs*
+*.exp
+*.lib
+*.map
