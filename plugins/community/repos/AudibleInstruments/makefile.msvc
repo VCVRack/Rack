@@ -1,0 +1,10 @@
+
+SLUG=AudibleInstruments
+
+include ../../../../dep/yac/install_msvc.mk
+
+EXTRAFLAGS+= -Ieurorack/ -DTEST -Ieurorack/stmlib/third_party/STM -Ieurorack/stmlib/third_party/STM/STM32F0xx_StdPeriph_Driver/inc/
+
+include make.objects
+
+include ../../../build_plugin.mk

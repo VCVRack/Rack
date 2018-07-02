@@ -1,0 +1,10 @@
+{
+  "name": "mtsch",
+  "author": "mtsch",
+  "license": "MIT",
+  "manualUrl": "https://github.com/mtsch/mtsch-vcvrack-plugins/blob/master/README.md",
+  "sourceUrl": "https://github.com/mtsch/mtsch-vcvrack-plugins",
+  "donateUrl": "https://www.paypal.me/matcuf",
+  "latestVersion": "0.6.0",
+  "status": "available"
+}

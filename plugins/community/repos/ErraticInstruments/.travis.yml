@@ -1,0 +1,56 @@
+language: cpp
+cache:
+  directories:
+  - /tmp/Rack
+#before_cache:
+#- rm -fr /tmp/Rack/plugins/sdr
+osx_image: xcode9.2
+os:
+- linux
+- osx
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-7
+install:
+- if [ $TRAVIS_OS_NAME == linux ]; then sudo apt install git curl cmake libx11-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev zlib1g-dev libasound2-dev libgtk2.0-dev libjack-jackd2-dev ;
+  fi
+#- if [ $TRAVIS_OS_NAME == osx ]; then brew install librtlsdr libusb; fi
+before_script:
+- git clone --branch=v0.6 https://github.com/VCVRack/Rack.git /tmp/Rack || cd /tmp/Rack && git pull
+- cd /tmp/Rack
+- git submodule update --init --recursive
+- if [ $TRAVIS_OS_NAME == linux ]; then export CC=gcc-7 && CXX=g++-7; fi
+- make dep -j4 #> /dev/null
+- make clean
+- make -j4
+- rm -rf /tmp/Rack/plugins/sdr || true
+- cp -r $TRAVIS_BUILD_DIR /tmp/Rack/plugins/sdr
+script:
+- cd /tmp/Rack/plugins/sdr && VERSION=0.0.0 make dist
+before_deploy:
+  - export RELEASE_PKG_FILE=$(ls dist/*.zip)
+  - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
+deploy:
+  provider: releases
+  api_key:
+    secure: sPGzUIBIW0M+yNLG9cBkLxCz04GqC5CO2OHiNDgHjWKqTiYB1iqBkIAYwCh+d5WrytpIjVI4X8K2S4lVROd5cOTXhpAC+/+68cbZM2Nc9YGGg+rbNcHwdTdQPuFTxW+w1AOQzKJT/mw3k2Qntie3KImkE8aEt+nIM+Nyuhhs9HPtn96jaIVp2jXePawMy88G92yGnz0eCXiFvyjWNqVLu+e7gTgH37o1S3v6AYgpes9bHtr4FNWsxtlq17D9XQbZpcsfvgCgvZAR+lL51/nrA7AqbRLjADPYESCJM8P1KebD68NFdi863ICWLirL/TOj4JDX/dOiEcaV7toEU5eBj6Fzzp7qzGTzukbtr9goj2IjF+GuNz/XSHCWgivp1neH3Z1J4yjkK2MPw/1O+xDschk+3dJafEXpN1NsH3Q0Yias5L54zaMiBIMAvUIovanYLFiI/TyTfQW0Y3vE/fWPXgoVCHWsWZljQd6ecddCt9qjChbZbM4rAxyuzFzf7SgflrTiWF3uwdm8lLduVhnd4Agi8qmGphLZAtmEPipvRALYN9IP2lXcTtJzDeZJYvGEsV3dehQNdjyl1hayDvTp+lCwmI+Eaf/WZLj7UsAN7Xus8O4yZRi9DF3tCxoVP7OnTGYscpav2ROwIg7UHunMMGb+0t85sg//8nxKBg7R9nk=
+  file_glob: true
+  file: "${RELEASE_PKG_FILE}"
+  #file: "dist/MPE-0.5.1-mac.zip"
+  #name: Draft #{TRAVIS_REPO_SLUG} ${TRAVIS_TAG}
+  on:
+    tags: true
+    all_branches: true
+    #repo: bafonso/MPE
+    #branch: v0.5
+  overwrite: true
+  skip_cleanup: true
+  #tag_name: ${TRAVIS_TAG}
+  #target_commitish: ${TRAVIS_COMMIT}
+  
+cache:
+  directories:
+  - /tmp/Rack

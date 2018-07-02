@@ -1,0 +1,23 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="14"
+  height="24"
+  viewBox="0 0 14 24"
+>
+  <path d="
+    M 7 0.5
+    a 6.5 6.5 0 0 1 6.5 6.5
+    v 10
+    a 6.5 6.5 0 0 1 -6.5 6.5
+    a 6.5 6.5 0 0 1 -6.5 -6.5
+    v -10
+    a 6.5 6.5 0 0 1 6.5 -6.5
+    z
+  " stroke-width="1" stroke="#888" fill="#222" />
+
+  <g transform="translate(7 17)">
+    <circle r="4.5" stroke-width="1" stroke="#777" fill="#ccc" />
+  </g>
+</svg>

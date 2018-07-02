@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>POSIX Directory Browsing API for Win32</title>
+<meta name="Author" content="Kevlin Henney">
+<meta name="Generator" content="Kevlin Henney"><!-- ;-) -->
+<meta name="Classification" content="Documentation">
+</head>
+
+<body>
+<h1>POSIX Directory Browsing API for Windows</h1>
+The functions and types specified in POSIX for iterating over directory
+entries have been defined here as wrappers for porting to and common use on
+Windows platforms. The values of <tt>errno</tt> set in the event of errors
+are the most significant difference between the POSIX definition and the
+wrapper API.
+<p>
+In addition to this documentation file, the software is provided in the
+<a href="http://www.two-sdg.demon.co.uk/curbralan/code/dirent/dirent.h"><tt>dirent.h</tt></a> header file and the
+<a href="http://www.two-sdg.demon.co.uk/curbralan/code/dirent/dirent.c"><tt>dirent.c</tt></a> C source file. To use the API
+ensure that the path to the <tt>dirent.h</tt> header is either somewhere
+standard or is provided to the compiler as an additional option. Ensure also
+that the <tt>dirent.c</tt> file is compiled and the object file is either
+referenced explicitly in the link or included in a referenced library. The
+source code also compiles cleanly as C++, but it retains C linkage.
+</p><p>
+
+</p><hr>
+<h2><tt>&lt;dirent.h&gt;</tt></h2>
+<font size="+1">
+<ul>
+<pre>typedef ... DIR;
+
+struct dirent
+{
+    char *d_name;
+};
+
+DIR           *<a href="#opendir">opendir</a>(const char *name);
+int            <a href="#closedir">closedir</a>(DIR *dir);
+struct dirent *<a href="#readdir">readdir</a>(DIR *dir);
+void           <a href="#rewinddir">rewinddir</a>(DIR *dir);
+</pre>
+</ul>
+</font>
+
+<hr>
+<a name="opendir"><h2><tt>DIR *opendir(const char *name);</tt></h2></a>
+<h4>Description</h4>
+	<ul>
+	The <tt>opendir</tt> function opens the directory specified by
+	<tt>name</tt>, which may use either <tt>/</tt> or <tt>\</tt> as a
+	directory separator but should not contain any wildcards. On success
+	it associates a <tt>DIR</tt> stream with the open directory. A non-null
+	<tt>DIR</tt> stream may be used in subsequent calls to
+	<a href="#readdir">readdir</a>,	<a href="#rewinddir">rewinddir</a> and
+	<a href="#closedir">closedir</a>.
+	<p>
+	A successful result will position the <tt>DIR</tt> stream at the first
+	directory entry, ready for reading. Note that a truly empty	directory
+	(one without even <tt>.</tt> or <tt>..</tt> entries) will not open
+	successfully.
+	</p></ul>
+<h4>Returns</h4>
+	<ul>
+	A pointer to the <tt>DIR</tt> structure for the opened directory on
+	success, otherwise null on failure.
+	</ul>
+<h4>Errors</h4>
+	<ul>
+	<tt>ENOENT&nbsp;&nbsp;&nbsp;</tt>No such directory.<br>
+	<tt>EINVAL&nbsp;&nbsp;&nbsp;</tt>Invalid argument or directory name.<br>
+	<tt>ENOMEM&nbsp;&nbsp;&nbsp;</tt>Not enough memory to perform the operation.
+	</ul>
+
+<hr>
+<a name="closedir"><h2><tt>int closedir(DIR *dir);</tt></h2></a>
+<h4>Description</h4>
+	<ul>
+	The <tt>closedir</tt> function closes the directory stream associated with
+	<tt>dir</tt>, freeing resources as necessary and invalidating the
+	<tt>dir</tt> pointer.
+	</ul>
+<h4>Returns</h4>
+	<ul>
+	Returns <tt>0</tt> on successful completion, otherwise <tt>-1</tt>.
+	</ul>
+<h4>Errors</h4>
+	<ul>
+	<tt>EBADF&nbsp;&nbsp;&nbsp;&nbsp;</tt>Invalid directory stream.
+	</ul>
+
+<hr>
+<a name="readdir"><h2><tt>struct dirent *readdir(DIR *dir);</tt></h2></a>
+<h4>Description</h4>
+	<ul>
+	The <tt>readdir</tt> function is used to iterate through the directory
+	stream <tt>dir</tt>. It advances it one entry at a time, details of which
+	it returns as its result.
+	<p>
+	On NTFS and FAT file systems, except for drive root directories, the caller
+	is guaranteed that the <tt>.</tt> and <tt>..</tt> entries will be included
+	in the directory stream. On FATX file systems the <tt>.</tt> and
+	<tt>..</tt> entries are not included.
+	</p></ul>
+<h4>Returns</h4>
+	<ul>
+	Returns a pointer to the directory details on success, in which
+	<tt>d_name</tt> is the file name of the current entry, otherwise null
+	on error or end of stream.
+	</ul>
+<h4>Errors</h4>
+	<ul>
+	<tt>ENOENT&nbsp;&nbsp;&nbsp;</tt>No more entries.<br>
+	<tt>EBADF&nbsp;&nbsp;&nbsp;&nbsp;</tt>Invalid directory stream.
+	</ul>
+
+<hr>
+<a name="rewinddir"><h2><tt>void rewinddir(DIR *dir);</tt></h2></a>
+<h4>Description</h4>
+	<ul>
+	The <tt>rewindir</tt> function can be used to reset the directory stream
+	<tt>dir</tt> to the start. Sensible results cannot be guaranteed if the
+	directory name used in the initial call to <tt>opendir</tt> was a
+	relative path name and the program has since changed its current working
+	directory.
+	</ul>
+<h4>Returns</h4>
+	<ul>
+	No error status is returned.
+	</ul>
+<h4>Errors</h4>
+	<ul>
+	<tt>EBADF&nbsp;&nbsp;&nbsp;&nbsp;</tt>Invalid directory stream.
+	</ul>
+
+<hr><p>
+</p><div align="right"><i><font size="-1">
+© Copyright <a href="mailto:kevlin@acm.org">Kevlin Henney</a>
+</font></i></div>
+
+
+</body></html>

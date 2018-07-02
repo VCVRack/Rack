@@ -1,0 +1,10 @@
+ALL_OBJ= \
+	src/Beatovnik/Beatovnik.o \
+	src/Mixovnik/Mixovnik.o \
+	src/Nullovnik/Nullovnik4.o \
+	src/Nullovnik/Nullovnik6.o \
+	src/Presetovnik/Presetovnik.o \
+	src/Quantovnik/Quantovnik.o \
+	src/Scorovnik/Scorovnik.o \
+	src/DynamicPanelWidget.o \
+	src/Koralfx-Modules.o

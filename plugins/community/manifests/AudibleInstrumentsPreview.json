@@ -1,0 +1,14 @@
+{
+  "name": "Audible Instruments Preview",
+  "author": "VCV",
+  "license": "proprietary",
+  "pluginUrl": "https://vcvrack.com/AudibleInstruments.html",
+  "authorUrl": "https://vcvrack.com/",
+  "authorEmail": "contact@vcvrack.com",
+  "manualUrl": "https://vcvrack.com/AudibleInstruments.html#preview",
+  "repoVersion": "0.6.0",
+  "productId": "1288416624683",
+  "buildTimestamp": 1527593840,
+  "status": "available",
+  "latestVersion": "0.6.0"
+}

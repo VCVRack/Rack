@@ -1,0 +1,76 @@
+html, body, div, span, applet, object, iframe, 
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, 
+a, abbr, acronym, address, big, cite, code, 
+del, dfn, em, font, img, ins, kbd, q, s, samp, 
+small, strike, strong, sub, sup, tt, var, 
+b, u, i, center, 
+dl, dt, dd, ol, ul, li, 
+fieldset, form, label, legend, 
+table, caption, tbody, tfoot, thead, tr, th, td { background: transparent; border: 0; margin: 0; padding: 0; vertical-align: baseline; } 
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 0.9em;
+  background: url("bg_main.jpg") top left;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 { clear: both; font-weight: normal; } 
+h1 { margin: 10px 90px 20px 90px; padding-left: 50px; font-size: 36px; font-weight: 100; background: url("db_yarns.png") left 0 no-repeat; } 
+h2 { margin: 20px 90px 20px 90px; font-size: 24px; color: #b31748; font-weight: 100; } 
+h3 { margin: 20px 90px 10px 90px; font-size: 18px; font-weight: 100; } 
+#content p, #content ul, #content ol, #content pre { margin: 0 90px 10px 90px; line-height: 150%; } 
+
+a { color: #1a7877; font-weight: bold; } 
+a:hover { color: #b31748; } 
+
+
+#wrapper {
+  width: 100%;
+  margin-left: 20px;
+  padding: 0;
+  width: 960px;
+} 
+
+#content {
+  width: 720px;
+  box-shadow: 0 0 20px #706c64;
+  background-color: #fff;
+  float: right;
+  margin: 0;
+  min-height:100%;
+} 
+
+#sidebar { width: 240px; padding: 0; float: left; margin: 0; } 
+#sidebar #logo { background: url("logo.jpg") no-repeat center; display:block; width:100%; height:177px; overflow:hidden; text-indent:-420em; padding:11px 0 30px; } 
+#credits { margin: 10px 10px; color: #998f85; font-style: oblique; } 
+.divider_big{ width: 100%; height: 60px; background: url("divider_big.jpg") repeat-x center; } 
+
+ul.mappings li {
+  padding: 8px;
+  border: 1px;
+  background-color: #b31748;
+  border-color: #b31748;
+  border-style: solid;
+  color: #fff;
+  line-height: 2;
+}
+
+ul.notes li {
+  padding: 4px;
+  border: 1px;
+  background-color: #1a7877;
+  border-color: #1a7877;
+  border-style: solid;
+  color: #fff;
+  display: inline;
+  line-height: 2.2;
+}
+
+p.error {
+  padding: 8px;
+  background-color: #b31748;
+  color: #fff;
+  font-weight: bold;
+}
+

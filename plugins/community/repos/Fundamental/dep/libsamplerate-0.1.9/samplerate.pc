@@ -1,0 +1,11 @@
+prefix=/f/git/Rack/plugins/Fundamental/dep
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: samplerate
+Description: An audio Sample Rate Conversion library
+Requires: 
+Version: 0.1.9
+Libs: -L${libdir} -lsamplerate
+Cflags: -I${includedir} 

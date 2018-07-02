@@ -1,0 +1,3 @@
+ALL_OBJ= \
+	src/MyModule.o \
+	src/Template.o

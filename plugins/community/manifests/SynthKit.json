@@ -1,0 +1,11 @@
+{
+  "name": "SynthKit",
+  "author": "Jerry Sievert",
+  "license": "BSD-3-Clause",
+  "pluginUrl": "https://github.com/JerrySievert/SynthKit/blob/master/README.md",
+  "manualUrl": "https://github.com/JerrySievert/SynthKit/tree/master/docs",
+  "sourceUrl": "https://github.com/JerrySievert/SynthKit",
+  "donateUrl": "https://paypal.me/JerrySievert",
+  "latestVersion": "0.6.0",
+  "status": "available"
+}

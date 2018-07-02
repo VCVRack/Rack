@@ -1,0 +1,20 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="38"
+  height="38"
+  viewBox="0 0 38 38"
+>
+  <!-- <radialGradient id="inner" cx="0.50" cy="0.50" r="1.0">
+    <stop offset="0%" stop-color="#eee"/>
+    <stop offset="100%" stop-color="#000"/>
+  </radialGradient> -->
+  <g transform="translate(19 19)">
+    <circle cx="0" cy="0" r="18.7" fill="#333" />
+  </g>
+  <g transform="translate(19 19)">
+    <circle cx="0" cy="0" r="14" fill="#eee" />
+  </g>
+  <circle cx="19" cy="2.7" r="1.8" fill="#fff" />
+</svg>

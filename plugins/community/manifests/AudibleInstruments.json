@@ -1,0 +1,12 @@
+{
+  "name": "Audible Instruments",
+  "author": "VCV",
+  "license": "BSD-3-Clause",
+  "pluginUrl": "https://vcvrack.com/AudibleInstruments.html",
+  "authorUrl": "https://vcvrack.com/",
+  "authorEmail": "contact@vcvrack.com",
+  "manualUrl": "https://vcvrack.com/AudibleInstruments.html#manual",
+  "sourceUrl": "https://github.com/VCVRack/AudibleInstruments",
+  "latestVersion": "0.6.0",
+  "status": "available"
+}

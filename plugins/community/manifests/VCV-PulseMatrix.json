@@ -1,0 +1,12 @@
+{
+  "name": "Pulse Matrix",
+  "author": "VCV",
+  "license": "proprietary",
+  "pluginUrl": "https://vcvrack.com/PulseMatrix.html",
+  "authorUrl": "https://vcvrack.com/",
+  "authorEmail": "contact@vcvrack.com",
+  "manualUrl": "https://vcvrack.com/PulseMatrix.html#manual",
+  "latestVersion": "0.6.0",
+  "productId": "449821147179",
+  "status": "available"
+}

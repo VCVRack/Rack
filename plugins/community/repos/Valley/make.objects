@@ -1,0 +1,21 @@
+ALL_OBJ= \
+	src/Common/Metronome.o \
+	src/Common/Oneshot.o \
+	src/Dexter/Dexter.o \
+	src/Dexter/FreqLUT.o \
+	src/Dexter/Osc4Core_SIMD.o \
+	src/Dexter/QuadOsc.o \
+	src/Dexter/RoutingMatrix.o \
+	src/Plateau/Dattorro.o \
+	src/Plateau/OnePoleFilters.o \
+	src/Plateau/Plateau.o \
+	src/Topograph/Topograph.o \
+	src/Topograph/TopographPatternGenerator.o \
+	src/uGraph/uGraph.o \
+	src/DynamicChoices.o \
+	src/DynamicKnob.o \
+	src/DynamicLight.o \
+	src/DynamicPanelWidget.o \
+	src/DynamicSVGSwitch.o \
+	src/DynamicText.o \
+	src/Valley.o

@@ -1,0 +1,12 @@
+{
+  "name": "Fundamental",
+  "author": "VCV",
+  "license": "BSD-3-Clause",
+  "pluginUrl": "https://vcvrack.com/Fundamental.html",
+  "authorUrl": "https://vcvrack.com/",
+  "authorEmail": "contact@vcvrack.com",
+  "manualUrl": "https://vcvrack.com/Fundamental.html#manual",
+  "sourceUrl": "https://github.com/VCVRack/Fundamental",
+  "latestVersion": "0.6.0",
+  "status": "available"
+}

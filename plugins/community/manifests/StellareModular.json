@@ -1,0 +1,10 @@
+{
+  "name": "Turing Machine + Blank",
+  "author": "Stellare Modular",
+  "license": "MIT",
+  "authorUrl": "https://www.facebook.com/stellaremodular",
+  "manualUrl": "https://github.com/stellare-modular/vcv-rack/blob/master/README.md",
+  "pluginUrl": "https://github.com/stellare-modular/vcv-rack/releases/tag/0.6.0",
+  "donateUrl": "https://paypal.me/stellaremodular",
+  "latestVersion": "0.6.0"
+}

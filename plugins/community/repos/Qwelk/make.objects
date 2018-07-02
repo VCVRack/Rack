@@ -1,0 +1,16 @@
+ALL_OBJ= \
+	src/Byte.o \
+	src/Chaos.o \
+	src/Column.o \
+	src/Gate.o \
+	src/Mix.o \
+	src/NEWS.o \
+	src/Not.o \
+	src/Or.o \
+	src/Wrap.o \
+	src/XFade.o \
+	src/Xor.o \
+	src/automaton.o \
+	src/qwelk.o \
+	src/qwelk_common.o \
+	src/scaler.o

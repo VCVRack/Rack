@@ -1,0 +1,13 @@
+{
+  "name": "trowaSoft",
+  "author": "j4s0n-c",
+  "license": "CC0-1.0",
+  "pluginUrl": "http://www.geekasaurusrex.net/page/trowaSoft-Sequencer-Modules-for-VCV-Rack.aspx",
+  "manualUrl": "https://github.com/j4s0n-c/trowaSoft-VCV/blob/master/README.md",
+  "sourceUrl": "https://github.com/j4s0n-c/trowaSoft-VCV",
+  "donateUrl": "https://paypal.me/j4s0n",
+  "latestVersion": "0.6.3",
+  "repoVersion": "0.6.3",
+  "status": "available",
+  "buildTimestamp": 1530067207
+}

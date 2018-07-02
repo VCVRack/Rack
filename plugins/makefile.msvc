@@ -1,0 +1,50 @@
+NUM_JOBS=20
+
+PLUGINS:= Fundamental AudibleInstruments
+
+# "never, ever, build a make system that relies on recursive make invocations."
+
+define run_make
+	make -C "community/repos/$(1)" -f makefile.msvc $(2) -j $(NUM_JOBS)
+endef
+
+.PHONY:
+bin:
+#	$(foreach pname,$(PLUGINS),$(eval ($(call run_make,$(pname),bin))))
+	$(call run_make,AS,bin)
+	$(call run_make,AudibleInstruments,bin)
+	$(call run_make,Befaco,bin)
+	$(call run_make,Bogaudio,bin)
+	$(call run_make,cf,bin)
+	$(call run_make,ESeries,bin)
+	$(call run_make,ErraticInstruments,bin)
+	$(call run_make,Fundamental,bin)
+	$(call run_make,HetrickCV,bin)
+	$(call run_make,Koralfx-Modules,bin)
+	$(call run_make,LindenbergResearch,bin)
+	$(call run_make,Qwelk,bin)
+	$(call run_make,SonusModular,bin)
+	$(call run_make,SubmarineFree,bin)
+	$(call run_make,Template,bin)
+	$(call run_make,Valley,bin)
+
+.PHONY:
+clean:
+#	$(foreach pname,$(PLUGINS),$(eval $(call run_make,$(pname),clean)))
+#	$(foreach pname,$(PLUGINS),$(eval echo $(pname)))
+	$(call run_make,AS,clean)
+	$(call run_make,AudibleInstruments,clean)
+	$(call run_make,Befaco,clean)
+	$(call run_make,Bogaudio,clean)
+	$(call run_make,cf,clean)
+	$(call run_make,ESeries,clean)
+	$(call run_make,ErraticInstruments,clean)
+	$(call run_make,Fundamental,clean)
+	$(call run_make,HetrickCV,clean)
+	$(call run_make,Koralfx-Modules,clean)
+	$(call run_make,LindenbergResearch,clean)
+	$(call run_make,Qwelk,clean)
+	$(call run_make,SonusModular,clean)
+	$(call run_make,SubmarineFree,clean)
+	$(call run_make,Template,clean)
+	$(call run_make,Valley,clean)

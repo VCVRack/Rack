@@ -1,0 +1,153 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="45"
+  height="380"
+  viewBox="0 0 45 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="knob" viewBox="0 0 45px 45px">
+      <g transform="translate(22.5 22.5)">
+        <polyline points="-5,0 5,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-5 0,5" stroke-width="1" stroke="#00f" />
+        <circle cx="0" cy="0" r="14" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knob-smallest" viewBox="0 0 16px 16px">
+      <g transform="translate(8 8)">
+        <polyline points="-3,0 3,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-3 0,3" stroke-width="1" stroke="#00f" />
+        <circle r="7.5" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-time" viewBox="0 0 45px 45px">
+      <g transform="translate(22.5 22.5)">
+        <text font-size="5.0pt" transform="rotate(-240) translate(20 0) rotate(240) translate(-2 2)">0</text>
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-210) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-180) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-150) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-120) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-90) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-60) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-30) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(0) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(30) translate(17 0)" />
+        <text font-size="5.0pt" transform="rotate(60) translate(20 0) rotate(-60) translate(-2 2)">1</text>
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-scale" viewBox="0 0 45px 45px">
+      <g transform="translate(22.5 22.5)">
+        <text font-size="5.0pt" transform="rotate(-135) translate(15 0) rotate(135) translate(-8 2)">0.1</text>
+        <polyline points="0,0 2,0" stroke-width="1" stroke="#333" transform="rotate(-135) translate(9.5 0)" />
+        <text font-size="5.0pt" transform="rotate(-90) translate(15 0) rotate(90) translate(-2 2)">1</text>
+        <polyline points="0,0 2,0" stroke-width="1" stroke="#333" transform="rotate(-90) translate(9.5 0)" />
+        <text font-size="5.0pt" transform="rotate(-45) translate(15 0) rotate(45) translate(-2 2)">10</text>
+        <polyline points="0,0 2,0" stroke-width="1" stroke="#333" transform="rotate(-45) translate(9.5 0)" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-shape" viewBox="0 0 45px 45px">
+      <g transform="translate(22.5 22.5)">
+        <text font-size="5.0pt" transform="rotate(-240) translate(20 0) rotate(240) translate(-10 2)">LOG</text>
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-210) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-180) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-150) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-120) translate(17 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="1" stroke="#333" transform="rotate(-90) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-60) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-30) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(0) translate(17 0)" />
+        <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="rotate(30) translate(17 0)" />
+        <text font-size="5.0pt" transform="rotate(60) translate(20 0) rotate(-60) translate(-2.5 2)">EXP</text>
+      </g>
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 44,1 44,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 44.5,0.5 44.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 45,0 45,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <!-- <polyline points="0,0 0,300" stroke="#0f0" stroke-width="1" fill="none" transform="translate(22.5 0)" /> -->
+
+  <g transform="rotate(-90) translate(-376 13)">
+    <text class="title" font-size="7pt" letter-spacing="2.5px">LAG</text>
+    <g transform="translate(0 12)">
+      <text class="brand" font-size="7pt" letter-spacing="2px">BGA</text>
+      <rect width="3.0" height="3" fill="#ddd" transform="translate(11.5 -5)" />
+    </g>
+  </g>
+
+  <g transform="translate(0 25)">
+    <text font-size="6pt" letter-spacing="2.0px" transform="translate(9.5 0)">TIME</text>
+    <use id="TIME_PARAM" xlink:href="#knob" transform="translate(0 3)" />
+    <use xlink:href="#knobguide-time" transform="translate(0 3)" />
+    <use id="TIME_SCALE_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 59)" />
+    <use xlink:href="#knobguide-scale" transform="translate(0 44.5)" />
+    <g transform="translate(5.5 79)">
+      <rect width="34" height="39" rx="5" fill="#fafafa" />
+      <use id="TIME_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(11 35)">CV</text>
+    </g>
+  </g>
+
+  <g transform="translate(0 165)">
+    <text font-size="6pt" letter-spacing="1px" transform="translate(7.5 0)">SHAPE</text>
+    <use id="SHAPE_PARAM" xlink:href="#knob" transform="translate(0 3)" />
+    <use xlink:href="#knobguide-shape" transform="translate(0 3)" />
+    <g transform="translate(5.5 49)">
+      <rect width="34" height="38" rx="5" fill="#fafafa" />
+      <use id="SHAPE_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(11 35)">CV</text>
+    </g>
+  </g>
+
+  <g transform="translate(0 264)">
+    <g transform="translate(5.5 0)">
+      <rect width="34" height="10" fill="#fafafa" transform="translate(0 28)" />
+      <rect width="34" height="35" rx="5" fill="#fafafa" />
+      <use id="IN_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 35)">IN</text>
+    </g>
+    <g transform="translate(5.5 41)">
+      <rect width="34" height="10" fill="#bbb" transform="translate(0 -3)" />
+      <rect width="34" height="35" rx="5" fill="#bbb" />
+      <use id="OUT_OUTPUT" xlink:href="#output" transform="translate(5 0)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.3 32)">OUT</text>
+    </g>
+  </g>
+</svg>

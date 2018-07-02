@@ -1,0 +1,155 @@
+# MinGW specific Makefile for libsamplerate.
+
+
+
+PROGRAMS = sndfile-resample.exe
+TARGETS = libsamplerate.dll $(PROGRAMS) varispeed-play.exe samplerate.pc
+
+AR = ar
+CC = gcc
+CFLAGS = -fPIC -g -O3 -march=nocona -std=gnu99 -W -Wstrict-prototypes -Wmissing-prototypes -Wall -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wpointer-arith -pipe -Isrc
+COMPILER_IS_GCC = 
+CPP = gcc -E
+CPPFLAGS = 
+CXX = g++
+DLLTOOL = dlltool
+DLLWRAP = dllwrap
+FFTW3_CFLAGS = 
+FFTW3_LIBS = 
+INSTALL = /usr/bin/install -c
+INSTALL_DATA = ${INSTALL} -m 644
+install_sh = ${SHELL} /f/git/Rack/plugins/Fundamental/dep/libsamplerate-0.1.9/Cfg/install-sh
+LDFLAGS = 
+LN_S = cp -pR
+PEXPORTS = 
+PACKAGE = libsamplerate
+PACKAGE_BUGREPORT = erikd@mega-nerd.com
+PACKAGE_NAME = libsamplerate
+PACKAGE_STRING = libsamplerate 0.1.9
+PACKAGE_TARNAME = libsamplerate
+PACKAGE_VERSION = 0.1.9
+RANLIB = ranlib
+SNDFILE_CFLAGS = -std=c99 
+SNDFILE_LIBS = 
+STRIP = strip
+
+#====================================================================
+# Target directories.
+
+bindir = ${exec_prefix}/bin
+exec_prefix = ${prefix}
+htmldocdir = /f/git/Rack/plugins/Fundamental/dep/share/doc/libsamplerate0-dev/html
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+pkgconfigdir = ${exec_prefix}/lib/pkgconfig
+prefix = /f/git/Rack/plugins/Fundamental/dep
+
+#====================================================================
+# Targets
+
+all : $(TARGETS)
+
+clean :
+	rm -f  $(TARGETS) *.del *.lib src/*.o tests/*.o tests/*.exe
+
+install : $(TARGETS)
+	$(install_sh) -c libsamplerate.dll $(libdir)
+	$(install_sh) -c samplerate.pc $(pkgconfigdir)
+	@for prog in $(PROGRAMS); do \
+		echo "installing ... $$prog" ; \
+		$(install_sh) -c "$$prog" $(bindir) ; \
+		done;
+	$(install_sh) -c src/samplerate.h $(includedir)
+ 
+uninstall :
+	rm -f $(libdir)/libsamplerate.dll
+	rm -f $(pkgconfigdir)/samplerate.pc
+	@for prog in $(PROGRAMS); do \
+		echo "removing ... $(bindir)/$$prog" ; \
+		rm -f $(bindir)/"$$prog" ; \
+		done;
+	rm -f $(includedir)/samplerate.h
+
+#====================================================================
+
+LINK_OBJS = \
+	src/src_linear.o \
+	src/src_sinc.o \
+	src/src_zoh.o \
+	src/samplerate.o
+
+libsamplerate.dll libsamplerate.lib : $(LINK_OBJS)
+	$(DLLWRAP) --def Win32/libsamplerate.def $(LINK_OBJS) --output-lib libsamplerate.lib -o libsamplerate.dll
+	$(STRIP) libsamplerate.dll
+
+sndfile-resample.exe : examples/sndfile-resample.c libsamplerate.lib
+	$(CC) $(CFLAGS) $(SNDFILE_CFLAGS) $+ $(SNDFILE_LIBS) -o $@
+
+varispeed-play.exe : examples/varispeed-play.c examples/audio_out.o libsamplerate.lib
+	$(CC) $(CFLAGS) $(SNDFILE_CFLAGS) $+ $(SNDFILE_LIBS) -lwinmm -o $@
+
+examples/audio_out.o : examples/audio_out.c
+	$(CC) $(CFLAGS) $(SNDFILE_CFLAGS) -c $+ -o $@
+
+samplerate.pc : samplerate.pc.in config.status
+	@./config.status $@
+
+config.status :
+	./configure
+
+#====================================================================
+# Testing programs.
+
+TEST_PROGS = \
+     tests/misc_test.exe \
+     tests/termination_test.exe \
+     tests/simple_test.exe \
+	 tests/callback_test.exe \
+     tests/reset_test.exe \
+     tests/multi_channel_test.exe \
+	 tests/float_short_test.exe \
+     tests/snr_bw_test.exe
+
+
+check : $(TEST_PROGS)
+	tests/misc_test.exe
+	tests/termination_test.exe
+	tests/simple_test.exe
+	tests/callback_test.exe
+	tests/reset_test.exe
+	tests/multi_channel_test.exe
+	tests/float_short_test.exe
+	tests/snr_bw_test.exe
+	@echo ----------------------------------------------------------------------
+	@echo libsamplerate passed all tests
+	@echo ----------------------------------------------------------------------
+
+#====================================================================
+# Test programs.
+
+tests/misc_test.exe : tests/misc_test.c tests/util.c libsamplerate.lib
+	$(CC) $(CFLAGS) $+ -o $@
+
+tests/termination_test.exe : tests/termination_test.c tests/util.c libsamplerate.lib
+	$(CC) $(CFLAGS) $+ -o $@
+
+tests/simple_test.exe : tests/simple_test.c tests/util.c libsamplerate.lib
+	$(CC) $(CFLAGS) $+ -o $@
+
+tests/callback_test.exe : tests/callback_test.c tests/util.c libsamplerate.lib
+	$(CC) $(CFLAGS) $+ -o $@
+
+tests/reset_test.exe : tests/reset_test.c tests/util.c libsamplerate.lib
+	$(CC) $(CFLAGS) $+ -o $@
+
+tests/float_short_test.exe : tests/float_short_test.c tests/util.c libsamplerate.lib
+	$(CC) $(CFLAGS) $+ -o $@
+
+tests/multi_channel_test.exe : tests/multi_channel_test.c tests/util.c tests/calc_snr.c libsamplerate.lib
+	$(CC) $(CFLAGS) $(FFTW3_CFLAGS) $+ $(FFTW3_LIBS) -o $@
+
+tests/snr_bw_test.exe : tests/snr_bw_test.c tests/util.c tests/calc_snr.c libsamplerate.lib
+	$(CC) $(CFLAGS) $(FFTW3_CFLAGS) $+ $(FFTW3_LIBS) -o $@
+
+# End of Makefile
+#====================================================================

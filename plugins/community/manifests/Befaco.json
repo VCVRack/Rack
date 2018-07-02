@@ -1,0 +1,12 @@
+{
+  "name": "Befaco",
+  "author": "VCV",
+  "license": "BSD-3-Clause",
+  "pluginUrl": "https://vcvrack.com/Befaco.html",
+  "authorUrl": "https://vcvrack.com/",
+  "authorEmail": "contact@vcvrack.com",
+  "manualUrl": "https://vcvrack.com/Befaco.html#manual",
+  "sourceUrl": "https://github.com/VCVRack/Befaco",
+  "latestVersion": "0.6.0",
+  "status": "available"
+}

@@ -1,0 +1,75 @@
+EURORACK_OBJ= \
+	eurorack/frames/keyframer.o \
+	eurorack/stmlib/utils/random.o \
+	eurorack/stmlib/dsp/atan.o \
+	eurorack/stmlib/dsp/units.o \
+	eurorack/braids/macro_oscillator.o \
+	eurorack/braids/analog_oscillator.o \
+	eurorack/braids/digital_oscillator.o \
+	eurorack/braids/quantizer.o \
+	eurorack/braids/resources.o \
+	eurorack/clouds/dsp/correlator.o \
+	eurorack/clouds/dsp/granular_processor.o \
+	eurorack/clouds/dsp/mu_law.o \
+	eurorack/clouds/dsp/pvoc/frame_transformation.o \
+	eurorack/clouds/dsp/pvoc/phase_vocoder.o \
+	eurorack/clouds/dsp/pvoc/stft.o \
+	eurorack/clouds/resources.o \
+	eurorack/elements/dsp/exciter.o \
+	eurorack/elements/dsp/ominous_voice.o \
+	eurorack/elements/dsp/resonator.o \
+	eurorack/elements/dsp/tube.o \
+	eurorack/elements/dsp/multistage_envelope.o \
+	eurorack/elements/dsp/part.o \
+	eurorack/elements/dsp/string.o \
+	eurorack/elements/dsp/voice.o \
+	eurorack/elements/resources.o \
+	eurorack/rings/dsp/fm_voice.o \
+	eurorack/rings/dsp/part.o \
+	eurorack/rings/dsp/string_synth_part.o \
+	eurorack/rings/dsp/string.o \
+	eurorack/rings/dsp/resonator.o \
+	eurorack/rings/resources.o \
+	eurorack/tides/generator.o \
+	eurorack/tides/resources.o \
+	eurorack/warps/dsp/modulator.o \
+	eurorack/warps/dsp/oscillator.o \
+	eurorack/warps/dsp/vocoder.o \
+	eurorack/warps/dsp/filter_bank.o \
+	eurorack/warps/resources.o \
+	eurorack/frames/keyframer.o \
+	eurorack/frames/resources.o \
+	eurorack/frames/poly_lfo.o \
+	eurorack/peaks/processors.o \
+	eurorack/peaks/resources.o \
+	eurorack/peaks/drums/bass_drum.o \
+	eurorack/peaks/drums/fm_drum.o \
+	eurorack/peaks/drums/high_hat.o \
+	eurorack/peaks/drums/snare_drum.o \
+	eurorack/peaks/modulations/lfo.o \
+	eurorack/peaks/modulations/multistage_envelope.o \
+	eurorack/peaks/pulse_processor/pulse_shaper.o \
+	eurorack/peaks/pulse_processor/pulse_randomizer.o \
+	eurorack/peaks/number_station/number_station.o
+
+
+
+PLUGIN_OBJ= \
+	src/AudibleInstruments.o \
+	src/Blinds.o \
+	src/Braids.o \
+	src/Branches.o \
+	src/Clouds.o \
+	src/Elements.o \
+	src/Frames.o \
+	src/Kinks.o \
+	src/Links.o \
+	src/Peaks.o \
+	src/Rings.o \
+	src/Shades.o \
+	src/Tides.o \
+	src/Veils.o \
+	src/Warps.o
+
+
+ALL_OBJ= $(EURORACK_OBJ) $(PLUGIN_OBJ)

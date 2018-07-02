@@ -1,0 +1,25 @@
+ALL_OBJ= \
+	src/AG-106.o \
+	src/BB-120.o \
+	src/BP.o \
+	src/DS.o \
+	src/FF-110.o \
+	src/FF-120.o \
+	src/FF-212.o \
+	src/LA-108.o \
+	src/LD-106.o \
+	src/NG-112.o \
+	src/OG-106.o \
+	src/PG-112.o \
+	src/PO.o \
+	src/SubmarineFree.o \
+	src/WK-101.o \
+	src/XF-101.o \
+	src/XF-102.o \
+	src/XF-104.o \
+	src/XF-201.o \
+	src/XF-202.o \
+	src/XF.o \
+	src/XG-106.o \
+	src/torpedo.o \
+	src/ComponentLibrary/LightKnob.o

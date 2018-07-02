@@ -1,0 +1,13 @@
+{
+  "name": "JW-Modules",
+  "author": "Jeremy Wentworth",
+  "license": "BSD-3-Clause",
+  "authorUrl": "http://jeremywentworth.com",
+  "manualUrl": "https://github.com/jeremywen/JW-Modules/blob/master/README.md",
+  "sourceUrl": "https://github.com/jeremywen/JW-Modules",
+  "donateUrl": "https://www.paypal.me/jeremywen",
+  "latestVersion": "0.6.1",
+  "repoVersion": "0.6.1",
+  "status": "available",
+  "buildTimestamp": 1526514262
+}

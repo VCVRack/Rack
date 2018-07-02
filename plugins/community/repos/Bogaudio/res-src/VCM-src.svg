@@ -1,0 +1,197 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="150"
+  height="380"
+  viewBox="0 0 150 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="knob" viewBox="0 0 40px 40px">
+      <g transform="translate(20 20)">
+        <polyline points="-5,0 5,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-5 0,5" stroke-width="1" stroke="#00f" />
+        <circle cx="0" cy="0" r="18.5" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide" viewBox="0 0 60px 60px">
+      <g transform="translate(30 30)">
+        <text font-size="6.0pt" transform="rotate(-240) translate(25 0) rotate(240) translate(-2.3 2.5)">0</text>
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-210) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-180) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-150) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-120) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-90) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-60) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-30) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(0) translate(22 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(30) translate(22 0)" />
+        <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="rotate(60) translate(22 0)" />
+      </g>
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="button-small" viewBox="0 0 9px 9px">
+      <g transform="translate(4.5 4.5)">
+        <circle r="4" stroke-width="1" stroke="#00f" fill="#f00" />
+      </g>
+    </symbol>
+
+    <symbol id="light-small" viewBox="0 0 6.4px 6.4px">
+      <rect width="6.4" height="6.4" fill="#0f0" />
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 149,1 149,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 149.5,0.5 149.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 150,0 150,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <!-- <rect width="50" height="20" fill="#0f0" transform="translate(0 0)" /> -->
+  <!-- <rect width="50" height="20" fill="#0f0" transform="translate(100 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(8.5 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(41.5 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(75 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(108.5 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(141.5 0)" /> -->
+
+  <text class="title" x="52" y="19" font-size="12pt" letter-spacing="4px">VCM</text>
+  <g transform="translate(35.5 374)">
+    <text class="brand" font-size="8pt" letter-spacing="2px">BOGAUDIO</text>
+    <rect width="3.0" height="3" fill="#ddd" transform="translate(24 -5)" />
+  </g>
+
+  <g transform="translate(0 32)">
+    <g transform="translate(10 1)">
+      <rect width="63" height="43" rx="5" fill="#fafafa" />
+      <g transform="translate(1 0)">
+        <use id="IN1_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(10 39)">IN</text>
+      </g>
+      <g transform="translate(32 0)">
+        <use id="CV1_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(8.5 39)">CV</text>
+      </g>
+    </g>
+    <!-- <polyline points="0,0 150,0" stroke="#0f0" stroke-width="1" fill="none" transform="translate(0 22.5)" /> -->
+    <use id="LEVEL1_PARAM" xlink:href="#knob" transform="translate(88.5 2.5)" />
+    <use xlink:href="#knobguide" transform="translate(78.5 -7.5)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(139 13.8) rotate(90)">CH1</text>
+  </g>
+
+  <g transform="translate(0 96)">
+    <g transform="translate(10 1)">
+      <rect width="63" height="43" rx="5" fill="#fafafa" />
+      <g transform="translate(1 0)">
+        <use id="IN2_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(10 39)">IN</text>
+      </g>
+      <g transform="translate(32 0)">
+        <use id="CV2_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(8.5 39)">CV</text>
+      </g>
+    </g>
+    <!-- <polyline points="0,0 150,0" stroke="#0f0" stroke-width="1" fill="none" transform="translate(0 22.5)" /> -->
+    <use id="LEVEL2_PARAM" xlink:href="#knob" transform="translate(88.5 2.5)" />
+    <use xlink:href="#knobguide" transform="translate(78.5 -7.5)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(139 13.8) rotate(90)">CH2</text>
+  </g>
+
+  <g transform="translate(0 160)">
+    <g transform="translate(10 1)">
+      <rect width="63" height="43" rx="5" fill="#fafafa" />
+      <g transform="translate(1 0)">
+        <use id="IN3_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(10 39)">IN</text>
+      </g>
+      <g transform="translate(32 0)">
+        <use id="CV3_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(8.5 39)">CV</text>
+      </g>
+    </g>
+    <!-- <polyline points="0,0 150,0" stroke="#0f0" stroke-width="1" fill="none" transform="translate(0 22.5)" /> -->
+    <use id="LEVEL3_PARAM" xlink:href="#knob" transform="translate(88.5 2.5)" />
+    <use xlink:href="#knobguide" transform="translate(78.5 -7.5)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(139 13.8) rotate(90)">CH3</text>
+  </g>
+
+  <g transform="translate(0 225)">
+    <g transform="translate(10 1)">
+      <rect width="63" height="43" rx="5" fill="#fafafa" />
+      <g transform="translate(1 0)">
+        <use id="IN4_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(10 39)">IN</text>
+      </g>
+      <g transform="translate(32 0)">
+        <use id="CV4_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(8.5 39)">CV</text>
+      </g>
+    </g>
+    <!-- <polyline points="0,0 150,0" stroke="#0f0" stroke-width="1" fill="none" transform="translate(0 22.5)" /> -->
+    <use id="LEVEL4_PARAM" xlink:href="#knob" transform="translate(88.5 2.5)" />
+    <use xlink:href="#knobguide" transform="translate(78.5 -7.5)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(139 13.8) rotate(90)">CH4</text>
+  </g>
+
+  <g transform="translate(0 290)">
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 30.5) rotate(-90)">MIX</text>
+    <use id="MIX_PARAM" xlink:href="#knob" transform="translate(21.5 2.5)" />
+    <use xlink:href="#knobguide" transform="translate(11.5 -7.5)" />
+    <g transform="translate(77 0)">
+      <rect width="63" height="43" rx="5" fill="#bbb" />
+      <rect width="31.5" height="43" rx="5" fill="#fafafa" />
+      <rect width="5" height="43" fill="#fafafa" transform="translate(26.5 0)" />
+      <g transform="translate(1 0)">
+        <use id="MIX_CV_INPUT" xlink:href="#input" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(8.5 39)">CV</text>
+      </g>
+      <g transform="translate(32 0)">
+        <use id="MIX_OUTPUT" xlink:href="#output" transform="translate(3 4)" />
+        <text font-size="6pt" letter-spacing="2px" transform="translate(5 39)">OUT</text>
+      </g>
+    </g>
+
+    <g transform="translate(46 54)">
+      <!-- <rect width="58" height="10" fill="#f0f" transform="translate(0 0)" /> -->
+      <use id="LINEAR_PARAM" xlink:href="#button-small" transform="translate(49 -1.3)" />
+      <use id="LINEAR_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">LINEAR</text>
+    </g>
+  </g>
+
+  <!-- <rect width="150" height="20" fill="#0f0" transform="translate(0 77)" /> -->
+  <!-- <rect width="150" height="20" fill="#0f0" transform="translate(0 142)" /> -->
+  <!-- <rect width="150" height="20" fill="#0f0" transform="translate(0 207)" /> -->
+  <!-- <rect width="150" height="20" fill="#0f0" transform="translate(0 274)" /> -->
+  <!-- <rect width="150" height="20" fill="#0f0" transform="translate(0 342)" /> -->
+</svg>

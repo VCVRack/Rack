@@ -1,0 +1,24 @@
+ALL_OBJ= \
+	src/addiction.o \
+	src/bitter.o \
+	src/bymidside.o \
+	src/campione.o \
+	src/chainsaw.o \
+	src/ctrl.o \
+	src/deathcrush.o \
+	src/harmony.o \
+	src/ladrone.o \
+	src/luppolo.o \
+	src/luppolo3.o \
+	src/micromacro.o \
+	src/multimulti.o \
+	src/oktagon.o \
+	src/osculum.o \
+	src/paramath.o \
+	src/piconoise.o \
+	src/pusher.o \
+	src/ringo.o \
+	src/scramblase.o \
+	src/sonusmodular.o \
+	src/twoff.o \
+	src/yabp.o

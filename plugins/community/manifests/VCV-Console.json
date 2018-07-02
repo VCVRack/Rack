@@ -1,0 +1,12 @@
+{
+  "name": "Console",
+  "author": "VCV",
+  "license": "proprietary",
+  "pluginUrl": "https://vcvrack.com/Console.html",
+  "authorUrl": "https://vcvrack.com/",
+  "authorEmail": "contact@vcvrack.com",
+  "manualUrl": "https://vcvrack.com/Console.html#manual",
+  "latestVersion": "0.6.0",
+  "productId": "521624682539",
+  "status": "available"
+}

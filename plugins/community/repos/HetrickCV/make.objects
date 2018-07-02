@@ -1,0 +1,24 @@
+ALL_OBJ= \
+	src/ASR.o \
+	src/AToD.o \
+	src/Bitshift.o \
+	src/BlankPanel.o \
+	src/Boolean3.o \
+	src/Comparator.o \
+	src/Contrast.o \
+	src/Crackle.o \
+	src/DToA.o \
+	src/Delta.o \
+	src/Dust.o \
+	src/Exponent.o \
+	src/FlipFlop.o \
+	src/FlipPan.o \
+	src/GateJunction.o \
+	src/HetrickCV.o \
+	src/HetrickUtilities.o \
+	src/LogicCombine.o \
+	src/RandomGates.o \
+	src/Rotator.o \
+	src/Scanner.o \
+	src/TwoToFour.o \
+	src/Waveshape.o

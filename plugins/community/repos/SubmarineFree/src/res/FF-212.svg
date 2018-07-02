@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="90px"
+   height="380px">
+  <g
+     inkscape:label="Background"
+     inkscape:groupmode="layer"
+     id="background">
+    <rect
+       x="0"
+       y="0"
+       width="90"
+       height="380"
+       style="fill:#294f77;stroke:none;"
+       id="rect4255" />
+    <path
+       style="fill:#3a6ea5;fill-rule:nonzero;stroke:none"
+       d="m 0 380 v -380 h 90 l -1 1 h -88 v 378 z"
+       id="path4656" />
+    <path
+       style="fill:#182d44;fill-rule:nonzero;stroke:none"
+       d="m 0 380 h 90 v -380 l -1 1 v 378 h -88 z"
+       id="path4658" />
+  </g>
+  <g
+     inkscape:label="Logo"
+     inkscape:groupmode="layer"
+     id="logo"
+     fill="#719fcf"
+     font-family="DejaVu Sans"
+     font-size="12">
+    <path
+       d="m 79.35391,366 a 1.9846094,2.2519786 0 0 0 -1.98465,2.25192 1.9846094,2.2519786 0 0 0 0.0588,0.53167 A 8.1692063,5.1693144 0 0 0 71,373.83071 8.1692063,5.1693144 0 0 0 79.16915,379 8.1692063,5.1693144 0 0 0 86.48278,376.11985 3.0461447,4.2480502 0 0 0 89,377.97641 l 0,-2.35772 A 1.3384576,1.9448905 0 0 1 87.7077,373.67718 1.3384576,1.9448905 0 0 1 89,371.73455 l 0,-2.25416 a 3.0461447,4.2480502 0 0 0 -2.57413,1.97944 8.1692063,5.1693144 0 0 0 -7.25672,-2.79842 8.1692063,5.1693144 0 0 0 -0.37318,0.0119 1.7538409,2.0472531 0 0 1 0.69638,-1.00162 l 0,-1.66609 A 1.9846094,2.2519786 0 0 0 79.35391,366 Z m -3.27707,5.83461 a 1.6615335,1.8425278 0 0 1 1.66156,1.84257 1.6615335,1.8425278 0 0 1 -1.66156,1.84257 1.6615335,1.8425278 0 0 1 -1.66145,-1.84257 1.6615335,1.8425278 0 0 1 1.66145,-1.84257 z m 3.78465,0.40949 a 1.2923038,1.4330772 0 0 1 1.29231,1.43308 1.2923038,1.4330772 0 0 1 -1.29231,1.43308 1.2923038,1.4330772 0 0 1 -1.2923,-1.43308 1.2923038,1.4330772 0 0 1 1.2923,-1.43308 z m 3.00928,0.38892 a 0.92307415,1.0236265 0 0 1 0.92304,1.02373 0.92307415,1.0236265 0 0 1 -0.92304,1.02359 0.92307415,1.0236265 0 0 1 -0.92317,-1.02359 0.92307415,1.0236265 0 0 1 0.92317,-1.02373 z"
+       id="path4136"
+       inkscape:connector-curvature="0" />
+    <text
+       x="3"
+       y="377"
+       id="text4662">submarine</text>
+    <text x="45" y="12" text-anchor="middle">FF-212</text>
+  </g>
+  <g
+     inkscape:label="Group"
+     inkscape:groupmode="layer"
+     id="group1"
+     font-family="DejaVu Sans"
+     font-size="6"
+     stroke="#ffffff"
+     stroke-width="1"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     fill="none">
+    <path d="M 16 31.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 60.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 89.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 118.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 147.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 176.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 205.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 234.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 263.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 292.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 321.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <path d="M 16 350.5 l 19 0 m 0 5 l 3 0 l 0 -10 l 7 0 l 0 10 l 7 0 l 0 -10 l 3 0 m 0 5 l 19 0 m"/>
+    <g
+       stroke="#719fcf">
+      <path d="M 74 31.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 60.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 89.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 118.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 147.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 176.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 205.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 234.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 263.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 292.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <path d="M 74 321.5 l -26 13 m -12 6 l -20 10 m 24 -12 l 6 -8 l 4 8 z" />
+      <circle cx="38" cy="49.5" r="2" />
+      <circle cx="38" cy="78.5" r="2" />
+      <circle cx="38" cy="107.5" r="2" />
+      <circle cx="38" cy="136.5" r="2" />
+      <circle cx="38" cy="165.5" r="2" />
+      <circle cx="38" cy="194.5" r="2" />
+      <circle cx="38" cy="223.5" r="2" />
+      <circle cx="38" cy="252.5" r="2" />
+      <circle cx="38" cy="281.5" r="2" />
+      <circle cx="38" cy="310.5" r="2" />
+      <circle cx="38" cy="339.5" r="2" />
+    </g>
+  </g>
+</svg>

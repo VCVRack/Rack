@@ -1,0 +1,9 @@
+ALL_OBJ= \
+	src/ABC.o \
+	src/Befaco.o \
+	src/DualAtenuverter.o \
+	src/EvenVCO.o \
+	src/Mixer.o \
+	src/Rampage.o \
+	src/SlewLimiter.o \
+	src/SpringReverb.o

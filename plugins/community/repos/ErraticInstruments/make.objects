@@ -1,0 +1,5 @@
+ALL_OBJ= \
+	src/Erratic.o \
+	src/MPEBaseWidget.o \
+	src/MPEToCV.o \
+	src/QuadMPEToCV.o

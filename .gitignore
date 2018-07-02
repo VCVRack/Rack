@@ -4,7 +4,6 @@
 /libRack.a
 /autosave.json
 /settings.json
-/plugins
 /build
 /dep
 *.vcv

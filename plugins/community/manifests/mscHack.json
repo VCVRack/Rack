@@ -1,0 +1,11 @@
+{
+  "name": "mscHack",
+  "author": "Mark Schack",
+  "license": "MIT",
+  "manualUrl": "https://github.com/mschack/VCV-Rack-Plugins/blob/master/README.md#demo-vids",
+  "sourceUrl": "https://github.com/mschack/VCV-Rack-Plugins",
+  "repoVersion": "0.6.2",
+  "latestVersion": "0.6.2",
+  "buildTimestamp": 1526514415,
+  "status": "available"
+}

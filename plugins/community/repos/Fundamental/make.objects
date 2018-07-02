@@ -1,0 +1,26 @@
+PLUGIN_OBJ = \
+	src/8vert.o \
+	src/ADSR.o \
+	src/Delay.o \
+	src/Fundamental.o \
+	src/LFO.o \
+	src/Mutes.o \
+	src/SEQ3.o \
+	src/Scope.o \
+	src/SequentialSwitch.o \
+	src/Unity.o \
+	src/VCA.o \
+	src/VCF.o \
+	src/VCMixer.o \
+	src/VCO.o
+
+SAMPLERATE_OBJ= \
+	dep/libsamplerate-0.1.9/src/samplerate.o \
+	dep/libsamplerate-0.1.9/src/src_linear.o \
+	dep/libsamplerate-0.1.9/src/src_sinc.o \
+	dep/libsamplerate-0.1.9/src/src_zoh.o
+
+ALL_OBJ= \
+	$(PLUGIN_OBJ) \
+	$(SAMPLERATE_OBJ)
+

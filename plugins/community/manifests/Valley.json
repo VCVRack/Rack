@@ -1,0 +1,12 @@
+{
+  "name": "Valley",
+  "author": "ValleyAudio",
+  "license": "GPL-3.0 and BSD-3-Clause",
+  "manualUrl": "https://github.com/ValleyAudio/ValleyRackFree/blob/master/README.md",
+  "sourceUrl": "https://github.com/ValleyAudio/ValleyRackFree/",
+  "donateUrl": "https://www.paypal.me/valleyvcv",
+  "latestVersion": "0.6.4",
+  "repoVersion": "0.6.4",
+  "status": "available",
+  "buildTimestamp": 1529891654
+}

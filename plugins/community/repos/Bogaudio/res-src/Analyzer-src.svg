@@ -1,0 +1,245 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="300"
+  height="380"
+  viewBox="0 0 300 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="display" viewBox="0 0 280px 230px">
+      <rect cx="0" cy="0" width="280" height="230" fill="#222" />
+    </symbol>
+
+    <symbol id="knob" viewBox="0 0 100px 100px">
+      <g transform="translate(50.5 50.5)">
+        <polyline points="-20,0 20,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-20 0,20" stroke-width="1" stroke="#00f" />
+        <circle cx="0" cy="0" r="49.8" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-range" viewBox="0 0 100px 100px">
+      <g transform="translate(50.5 50.5)">
+        <g transform="rotate(-210) translate(30 0)">
+          <g transform="translate(2 0) rotate(210)">
+            <text font-size="7pt" transform="translate(-10 4)">0.1</text>
+          </g>
+        </g>
+        <g transform="rotate(-180) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-150) translate(30 0)">
+          <polyline points="0,0 5,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-120) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-90) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-60) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-30) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(0) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(30) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(60) translate(30 0)">
+          <g transform="translate(2 0) rotate(-60)">
+            <text font-size="7pt" transform="translate(-5 4.5)">1.0</text>
+          </g>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-smooth" viewBox="0 0 100px 100px">
+      <g transform="translate(50.5 50.5)">
+        <g transform="rotate(-240) translate(30 0)">
+          <g transform="translate(2 0) rotate(240)">
+            <text font-size="7pt" transform="translate(-3.2 4)">0</text>
+          </g>
+        </g>
+        <g transform="rotate(-210) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-180) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-150) translate(30 0)">
+          <polyline points="0,0 5,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-120) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-90) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-60) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(-30) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(0) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(30) translate(30 0)">
+          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
+        </g>
+        <g transform="rotate(60) translate(30 0)">
+          <g transform="translate(2 0) rotate(-60)">
+            <text font-size="7pt" transform="translate(-7 4.3)">0.5s</text>
+          </g>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="button" viewBox="0 0 100px 100px">
+      <g transform="translate(50.5 50.5)">
+        <circle cx="0" cy="0" r="49.8" stroke-width="1" stroke="#00f" fill="#f00" />
+      </g>
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="light-small" viewBox="0 0 6.4px 6.4px">
+      <rect width="6.4" height="6.4" fill="#0f0" />
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 299,1 299,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 299.5,0.5 299.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 300,0 300,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <text class="title" x="92.5" y="19" font-size="12pt" letter-spacing="4px">ANALYZER</text>
+  <g transform="translate(110 374)">
+    <text class="brand" font-size="8pt" letter-spacing="2px">BOGAUDIO</text>
+    <rect width="3.0" height="3" fill="#ddd" transform="translate(24 -5)" />
+  </g>
+
+  <g transform="translate(10 25)">
+    <use id="DISPLAY_WIDGET" xlink:href="#display" />
+  </g>
+
+  <g transform="translate(0 320)">
+    <g transform="translate(11 0)">
+      <rect width="58" height="40" rx="5" fill="#fafafa" />
+      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
+      <use id="SIGNALA_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
+      <use id="SIGNALA_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    </g>
+
+    <g transform="translate(84 0)">
+      <rect width="58" height="40" rx="5" fill="#fafafa" />
+      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
+      <use id="SIGNALB_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
+      <use id="SIGNALB_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    </g>
+
+    <g transform="translate(158 0)">
+      <rect width="58" height="40" rx="5" fill="#fafafa" />
+      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
+      <use id="SIGNALC_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
+      <use id="SIGNALC_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    </g>
+
+    <g transform="translate(231 0)">
+      <rect width="58" height="40" rx="5" fill="#fafafa" />
+      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
+      <use id="SIGNALD_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
+      <use id="SIGNALD_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    </g>
+  </g>
+
+  <g transform="translate(0 271)">
+    <g transform="translate(35 0)">
+      <use id="RANGE_PARAM" xlink:href="#knob" transform="translate(0 0) scale(0.38)" />
+      <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-38 -11)">RANGE</text>
+    </g>
+
+    <g transform="translate(109 0)">
+      <use id="SMOOTH_PARAM" xlink:href="#knob" transform="translate(0 0) scale(0.38)" />
+      <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-44 -11)">SMOOTH</text>
+    </g>
+
+    <g transform="translate(182 0)">
+      <g transform="translate(-3 -1)">
+        <g transform="translate(0 3)">
+          <use id="QUALITY_HIGH_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+          <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">HIGH</text>
+        </g>
+        <g transform="translate(0 18)">
+          <use id="QUALITY_GOOD_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+          <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">GOOD</text>
+        </g>
+        <g transform="translate(9 30)">
+          <use id="QUALITY_PARAM" xlink:href="#button" transform="scale(0.1)" />
+        </g>
+      </g>
+      <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-45 -11)">QUALITY</text>
+    </g>
+
+    <g transform="translate(255 0)">
+      <g transform="translate(-3 -1)">
+        <g transform="translate(0 18)">
+          <use id="POWER_ON_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+          <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">ON</text>
+        </g>
+        <g transform="translate(9 30)">
+          <use id="POWER_PARAM" xlink:href="#button" transform="scale(0.1)" />
+        </g>
+      </g>
+      <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-40 -11)">POWER</text>
+    </g>
+  </g>
+
+  <use xlink:href="#knobguide-range" transform=" translate(16.3 252) scale(0.75)" />
+  <use xlink:href="#knobguide-smooth" transform=" translate(90.3 252) scale(0.75)" />
+</svg>

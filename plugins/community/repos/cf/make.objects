@@ -1,0 +1,22 @@
+ALL_OBJ= \
+	src/dirent_win32/dirent.o \
+	src/AudioFile.o \
+	src/CUBE.o \
+	src/DAVE.o \
+	src/EACH.o \
+	src/FOUR.o \
+	src/L3DS3Q.o \
+	src/LEDS.o \
+	src/LEDSEQ.o \
+	src/MASTER.o \
+	src/METRO.o \
+	src/MONO.o \
+	src/PATCH.o \
+	src/PEAK.o \
+	src/PLAYER.o \
+	src/SLIDERSEQ.o \
+	src/STEPS.o \
+	src/STEREO.o \
+	src/SUB.o \
+	src/cf.o \
+	src/trSEQ.o

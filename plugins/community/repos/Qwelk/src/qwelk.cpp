@@ -1,0 +1,36 @@
+#include "qwelk.hpp"
+
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Automaton);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Byte);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Chaos);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Column);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Gate);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Or);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Not);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Xor);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Mix);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, News);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Scaler);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, Wrap);
+RACK_PLUGIN_MODEL_DECLARE(Qwelk, XFade);
+
+RACK_PLUGIN_INIT(Qwelk) {
+   RACK_PLUGIN_INIT_ID();
+
+   // RACK_PLUGIN_INIT_WEBSITE("https://github.com/raincheque/qwelk");
+   // RACK_PLUGIN_INIT_MANUAL("https://github.com/VCVRack/Tutorial/blob/master/README.md");
+
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Automaton);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Byte);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Chaos);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Column);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Gate);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Or);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Not);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Xor);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Mix);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, News);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Scaler);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, Wrap);
+   RACK_PLUGIN_MODEL_ADD(Qwelk, XFade);
+}

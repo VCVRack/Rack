@@ -1,0 +1,7 @@
+SLUG=ESeries
+
+include ../../../../dep/yac/install_msvc.mk
+
+include make.objects
+
+include ../../../build_plugin.mk

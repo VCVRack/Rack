@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="29"
+   height="29"
+   viewBox="0 0 29 29"
+   id="svg14"
+   sodipodi:docname="svg_render_tmp.svg"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
+  <metadata
+     id="metadata20">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs18" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="468"
+     inkscape:window-height="449"
+     id="namedview16"
+     showgrid="false"
+     inkscape:zoom="8.137931"
+     inkscape:cx="14.5"
+     inkscape:cy="14.5"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg14" />
+  <path
+     style="fill:#333333"
+     d="M 28.8,14.5 A 14.3,14.3 0 0 1 14.5,28.8 14.3,14.3 0 0 1 0.19999981,14.5 14.3,14.3 0 0 1 14.5,0.19999981 14.3,14.3 0 0 1 28.8,14.5 Z"
+     id="circle2" />
+  <path
+     style="fill:#eeeeee"
+     d="M 25.4,14.5 A 10.9,10.9 0 0 1 14.5,25.4 10.9,10.9 0 0 1 3.6000004,14.5 10.9,10.9 0 0 1 14.5,3.6000004 10.9,10.9 0 0 1 25.4,14.5 Z"
+     id="circle4" />
+  <path
+     style="fill:#ffffff"
+     d="M 15.8,1.6 A 1.3,1.3 0 0 1 14.5,2.9 1.3,1.3 0 0 1 13.2,1.6 1.3,1.3 0 0 1 14.5,0.30000007 1.3,1.3 0 0 1 15.8,1.6 Z"
+     id="circle8" />
+  <path
+     style="fill:#ffffff"
+     d="M 15.8,1.9 A 1.3,1.3 0 0 1 14.5,3.1999999 1.3,1.3 0 0 1 13.2,1.9 1.3,1.3 0 0 1 14.5,0.60000002 1.3,1.3 0 0 1 15.8,1.9 Z"
+     id="circle10" />
+  <path
+     style="fill:#ffffff"
+     d="M 15.8,2.2 A 1.3,1.3 0 0 1 14.5,3.5 1.3,1.3 0 0 1 13.2,2.2 1.3,1.3 0 0 1 14.5,0.9000001 1.3,1.3 0 0 1 15.8,2.2 Z"
+     id="circle12" />
+</svg>

@@ -1,0 +1,324 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="405"
+  height="380"
+  viewBox="0 0 405 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="slider" viewBox="0 0 18px 151x">
+      <rect width="18" height="151" fill="none" />
+      <rect width="6" height="145" x="6" y="3" rx="2" stroke-width="1" stroke="#888" fill="#222" />
+      <g transform="translate(0 40)">
+        <rect width="18" height="13" rx="1.5" fill="#777" />
+        <rect width="18" height="9" x="0" y="2" fill="#444" />
+        <polyline points="0,6.5 18,6.5" stroke="#fafafa" stroke-width="1" fill="none" />
+        <rect width="14" height="5" x="2" y="4" rx="1.0" fill="#ddd" transform="translate(0 0)" />
+      </g>
+    </symbol>
+
+    <symbol id="sliderguide-db" viewBox="0 0 20px 151px">
+      <g transform="translate(0 6.5)">
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(10.5 0)" />
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(28 0)" />
+      </g>
+      <g transform="translate(0 19.05)">
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(10.5 0)" />
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(28 0)" />
+        <text font-size="6.0pt" transform="translate(7 0) rotate(0) translate(-2.5 2.6)">0</text>
+      </g>
+      <g transform="translate(0 32.86)">
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(10.5 0)" />
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(28 0)" />
+        <text font-size="6.0pt" transform="translate(7 0) rotate(-90) translate(-4 2.2)">-6</text>
+      </g>
+      <g transform="translate(0 46.05)">
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(10.5 0)" />
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(28 0)" />
+        <text font-size="6.0pt" transform="translate(7 0) rotate(-90) translate(-7 2.2)">-12</text>
+      </g>
+      <g transform="translate(0 72.41)">
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(10.5 0)" />
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(28 0)" />
+        <text font-size="6.0pt" transform="translate(7 0) rotate(-90) translate(-7 2.2)">-24</text>
+      </g>
+      <g transform="translate(0 125.14)">
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(10.5 0)" />
+        <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(28 0)" />
+        <text font-size="6.0pt" transform="translate(7 0) rotate(-90) translate(-7 2.2)">-48</text>
+      </g>
+      <g transform="translate(0 151.5)">
+        <!-- <polyline points="0,0 6.5,0" stroke="#333" fill="none" transform="translate(10.5 0)" /> -->
+        <text font-size="6.0pt" transform="translate(7 -10) rotate(-90) translate(-9 4)">dB</text>
+      </g>
+    </symbol>
+
+    <symbol id="knob-smallest" viewBox="0 0 16px 16px">
+      <g transform="translate(8 8)">
+        <polyline points="-3,0 3,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-3 0,3" stroke-width="1" stroke="#00f" />
+        <circle r="7.5" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-centertick" viewBox="0 0 40px 40px">
+      <g transform="translate(20 20)">
+        <g transform="rotate(-90) translate(10 0)">
+          <polyline points="0,0 4,0" stroke-width="1" stroke="#333" />
+        </g>
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 1 12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(20)" />
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 1 12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(43)" />
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 0 -12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(-20)" />
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 0 -12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(-43)" />
+      </g>
+    </symbol>
+
+    <symbol id="button" viewBox="0 0 20px 20px">
+      <g transform="translate(10 10)">
+        <circle cx="0" cy="0" r="8.8" stroke-width="1" stroke="#00f" fill="#f00" />
+      </g>
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 404,1 404,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 404.5,0.5 404.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 405,0 405,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <!-- <rect width="175" height="20" fill="#0f0" transform="translate(0 0)" /> -->
+  <!-- <rect width="175" height="20" fill="#0f0" transform="translate(230 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(10 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(395 0)" /> -->
+
+  <text class="title" x="175" y="19" font-size="12pt" letter-spacing="4px">MIX8</text>
+  <g transform="translate(162.5 374)">
+    <text class="brand" font-size="8pt" letter-spacing="2px">BOGAUDIO</text>
+    <rect width="3.0" height="3" fill="#ddd" transform="translate(24 -5)" />
+  </g>
+
+  <g transform="translate(4 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH1</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL1_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE1_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN1_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV1_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN1_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN1_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(48 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH2</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL2_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE2_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN2_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV2_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN2_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN2_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(92 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH3</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL3_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE3_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN3_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV3_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN3_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN3_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(136 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH4</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL4_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE4_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN4_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV4_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN4_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN4_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(180 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH5</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL5_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE5_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN5_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV5_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN5_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN5_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(224 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH6</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL6_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE6_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN6_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV6_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN6_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN6_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(268 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH7</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL7_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE7_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN7_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV7_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN7_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN7_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(312 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">CH8</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="LEVEL8_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <use id="MUTE8_PARAM" xlink:href="#button" transform="translate(12.5 165)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(10 192)">MUTE</text>
+    <use id="PAN8_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 203)" />
+    <use xlink:href="#knobguide-centertick" transform="translate(2.5 191)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(14 228)">PAN</text>
+    <g transform="translate(5.5 232)">
+      <rect width="34" height="108" rx="5" fill="#fafafa" />
+      <use id="CV8_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <use id="PAN8_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 70)">PAN</text>
+      <use id="IN8_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 105)">IN</text>
+    </g>
+    <!-- <rect width="9" height="40" fill="#f00" transform="translate(39.5 300)" /> -->
+  </g>
+
+  <g transform="translate(356 20)">
+    <!-- <rect width="39" height="344" fill="#ccc" transform="translate(3 0)" /> -->
+    <text font-size="5pt" letter-spacing="2px" transform="translate(13.7 9)">MIX</text>
+    <use xlink:href="#sliderguide-db" transform="translate(0 12)" />
+    <use id="MIX_PARAM" xlink:href="#slider" transform="translate(13.5 12)" />
+    <g transform="translate(5.5 229)">
+      <rect width="34" height="50" rx="5" fill="#fafafa" />
+      <use id="MIX_CV_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(3.5 35)">LEVEL</text>
+      <rect width="34" height="73" rx="5" fill="#bbb" transform="translate(0 38)" />
+      <rect width="34" height="5" fill="#bbb" transform="translate(0 38)" />
+      <use id="L_OUTPUT" xlink:href="#output" transform="translate(5 41)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(15.5 73)">L</text>
+      <use id="R_OUTPUT" xlink:href="#output" transform="translate(5 76)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(15 108)">R</text>
+    </g>
+  </g>
+  <!-- <polyline points="0,0 225,0" stroke="#0f0" stroke-width="1" fill="none" transform="translate(0 360)" /> -->
+</svg>

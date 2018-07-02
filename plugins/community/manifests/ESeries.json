@@ -1,0 +1,12 @@
+{
+  "name": "E-Series",
+  "author": "VCV",
+  "license": "BSD-3-Clause",
+  "pluginUrl": "https://vcvrack.com/ESeries.html",
+  "authorUrl": "https://vcvrack.com/",
+  "authorEmail": "contact@vcvrack.com",
+  "manualUrl": "https://vcvrack.com/ESeries.html#manual",
+  "sourceUrl": "https://github.com/VCVRack/ESeries",
+  "latestVersion": "0.6.0",
+  "status": "available"
+}

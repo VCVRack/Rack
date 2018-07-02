@@ -1,0 +1,9 @@
+SLUG=Bogaudio
+
+include ../../../../dep/yac/install_msvc.mk
+
+EXTRAFLAGS+= -Isrc/dsp/
+
+include make.objects
+
+include ../../../build_plugin.mk

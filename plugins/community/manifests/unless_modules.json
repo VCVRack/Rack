@@ -1,0 +1,14 @@
+{
+  "name": "unless modules",
+  "author": "unless games",
+  "license": "BSD-3-Clause",
+  "authorEmail": "unlessgames@gmail.com",
+  "pluginUrl": "https://gitlab.com/unlessgames/unless_modules",
+  "authorUrl": "http://unlessgames.com",
+  "manualUrl": "https://gitlab.com/unlessgames/unless_modules/blob/master/README.md",
+  "sourceUrl": "https://gitlab.com/unlessgames/unless_modules",
+  "repoVersion": "0.6.2",
+  "latestVersion": "0.6.2",
+  "buildTimestamp": 1530067220,
+  "status": "available"
+}
