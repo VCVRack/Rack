@@ -17,6 +17,8 @@ Tested in
   - Cockos Reaper
   - Propellerhead Reason 10
 
+# Add-on modules
+
 The following add-on modules are statically linked with the VST plugin:
  - AS.ADSR
  - AS.AtNuVrTr
@@ -271,7 +273,41 @@ The following add-on modules are statically linked with the VST plugin:
 Please notice that the Audible/Mutable Instruments modules appear under a different name in the UI.
 For example, "Clouds" is listed as "Texture Synthesizer".
 
+# How to build
+
+Prerequisites:
+- Microsoft Visual Studio C++ compiler toolchain
+- Steinberg VST2.4 SDK
+
+$ git clone https://github.com/bsp2/VeeSeeVSTRack.git
+$ cd VeeSeeVSTRack/
+<unpack dep/dep.7z>
+(contains the source codes and MSVC-precompiled libraries)
+
+Edit dep/yac/install_msvc.mk and adjust the LIB_INSTALL_PREFIX, WINDDK_PATH, VCTK, W32API_INC, W32API_LIB as required.
+
+$ alias m="make -j 20 makefile.msvc"
+$ m lib
+$ cd plugins
+$ m bin
+$ cd ..
+
+Edit vst2_common_msvc_pre.mk and adjust the VST2 SDK path
+
+$ m bin
+
+If the build succeeded, the effect and instrument plugin DLLs can now be found in the vst2_bin/ folder.
+
+Last but not least, please don't ask me for the VST2 SDK.
+It is not permitted to redistribute it and Steinberg has discontinued it.
+I heard that the aeffect.h / aeffectx.h files are still included in the VST3.
+
+
+# VCV Rack
+
 For more info about VCV rack, see https://vcvrack.com/
+
+# Support
 
 Keep in mind that this is NOT AN OFFICIAL VCV RACK RELEASE.
 Please DO NOT contact the VCV Rack team if you need any support.
