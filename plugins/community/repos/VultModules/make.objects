@@ -1,0 +1,13 @@
+ALL_OBJ= \
+	src/Debriatus.o \
+	src/Lateralus.o \
+	src/Rescomb.o \
+	src/Splie.o \
+	src/Stabile.o \
+	src/Tangents.o \
+	src/Tohe.o \
+	src/Trummor.o \
+	src/VultEngine.o \
+	src/VultModules.o \
+	src/vultin.o
+
