@@ -276,8 +276,13 @@ For example, "Clouds" is listed as "Texture Synthesizer".
 # How to build
 
 Prerequisites:
-- Microsoft Visual Studio C++ compiler toolchain
+- GNU Bash (tested with MSYS1.0 / bash v2.04.0(1))
+- GNU make (tested with v3.79.1)
+- Microsoft Visual Studio C++ compiler toolchain (tested with v19.00.24225.1)
 - Steinberg VST2.4 SDK
+
+If you want to build the dependent libraries, you may need additional SDKs.
+Precompiled libs can be found in the `dep/lib/msvc/` folder.
 
 ```
 $ git clone https://github.com/bsp2/VeeSeeVSTRack.git
