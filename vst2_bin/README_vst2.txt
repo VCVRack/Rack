@@ -238,6 +238,13 @@ The VST2 plugin includes the following add-on modules:
  - SonusModular.Scramblase
  - SonusModular.Twoff
  - SonusModular.Yabp
+ - squinkylabs-plug1.Booty
+ - squinkylabs-plug1.Vocal
+ - squinkylabs-plug1.VocalFilter
+ - squinkylabs-plug1.ColoredNoise
+ - squinkylabs-plug1.Tremolo
+ - squinkylabs-plug1.CPU_Hog
+ - squinkylabs-plug1.ThreadBoost
  - SubmarineFree.AG106
  - SubmarineFree.BB120
  - SubmarineFree.FF110
@@ -274,6 +281,14 @@ The VST2 plugin includes the following add-on modules:
  - Valley.UGraph
  - Valley.Dexter
  - Valley.Plateau
+ - VultModules.Debriatus
+ - VultModules.Lateralus
+ - VultModules.Rescomb
+ - VultModules.Splie
+ - VultModules.Stabile
+ - VultModules.Tangents
+ - VultModules.Tohe
+ - VultModules.Trummor
 
 Please notice that the Audible/Mutable Instruments modules appear under a different name in the UI.
 For example, "Clouds" is listed as "Texture Synthesizer".

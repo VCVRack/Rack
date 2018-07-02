@@ -12,6 +12,13 @@
 - add module VultModules.Tangents
 - add module VultModules.Tohe
 - add module VultModules.Trummor
+- add module squinkylabs-plug1.Booty
+- add module squinkylabs-plug1.Vocal
+- add module squinkylabs-plug1.VocalFilter
+- add module squinkylabs-plug1.ColoredNoise
+- add module squinkylabs-plug1.Tremolo
+- add module squinkylabs-plug1.CPU_Hog
+- add module squinkylabs-plug1.ThreadBoost
 
 
 ** July 1st, 2018

@@ -1,0 +1,9 @@
+SLUG=squinkylabs-plug1
+
+include ../../../../dep/yac/install_msvc.mk
+
+EXTRAFLAGS += -Icomposites/ -Idsp/utils/ -Idsp/third-party/kiss_fft130/ -Idsp/third-party/kiss_fft130/tools/ -Isqsrc/util/ -Isqsrc/thread/ -Idsp/third-party/falco/ -Idsp/generators/ -Idsp/filters/ -Idsp/fft/ -Isqsrc/clock/
+
+include make.objects
+
+include ../../../build_plugin.mk

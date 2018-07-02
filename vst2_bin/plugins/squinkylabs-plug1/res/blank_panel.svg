@@ -1,0 +1,17 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="210" height="380" viewBox="0 0 150 380">
+  <defs>
+    <clipPath id="clip-path">
+      <rect width="210" height="380" style="fill: none"/>
+    </clipPath>
+  </defs>
+  <title>panel-6b-flat</title>
+  <g style="clip-path: url(#clip-path)">
+    <g id="panel">
+      <rect width="210" height="380" style="fill: #fff"/>
+      <g id="background_fill" data-name="background fill">
+        <rect width="210" height="380" style="fill: #e6e6e6"/>
+        <rect x="0.5" y="0.5" width="209" height="379" style="fill: none;stroke: #707070"/>
+      </g>
+    </g>
+  </g>
+</svg>

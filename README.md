@@ -233,6 +233,13 @@ The following add-on modules are statically linked with the VST plugin:
  - SonusModular.Scramblase
  - SonusModular.Twoff
  - SonusModular.Yabp
+ - squinkylabs-plug1.Booty
+ - squinkylabs-plug1.Vocal
+ - squinkylabs-plug1.VocalFilter
+ - squinkylabs-plug1.ColoredNoise
+ - squinkylabs-plug1.Tremolo
+ - squinkylabs-plug1.CPU_Hog
+ - squinkylabs-plug1.ThreadBoost
  - SubmarineFree.AG106
  - SubmarineFree.BB120
  - SubmarineFree.FF110

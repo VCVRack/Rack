@@ -1,0 +1,336 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source Files\test">
+      <UniqueIdentifier>{f5dea203-4bd6-45b8-ac87-b6b9a4877380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp">
+      <UniqueIdentifier>{6cd4392e-16ed-4f15-9196-dbe57a9f5472}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dsp">
+      <UniqueIdentifier>{4ff35a32-d2ce-4426-aaad-d9ef70138cf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dsp\third-party">
+      <UniqueIdentifier>{f5a31e57-cc6b-443c-abf4-46970f118fe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp\filters">
+      <UniqueIdentifier>{c2b8cfc5-30d0-4c94-9424-75409757ee7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dsp\filters">
+      <UniqueIdentifier>{0ab36cfd-9f38-416a-b356-59180724dbf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp\third-party">
+      <UniqueIdentifier>{095df52d-c60a-44cb-9e6f-ff148b9f2730}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp\third-party\falco">
+      <UniqueIdentifier>{95f83ea1-2663-4fa7-86e2-5bb532d82198}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp\utils">
+      <UniqueIdentifier>{c53ee123-95ef-4304-8445-69048886956b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp\generators">
+      <UniqueIdentifier>{4f96103b-8d78-4aec-b054-b4f72c382195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dsp\utils">
+      <UniqueIdentifier>{20dd77d1-e20f-4a4f-8086-472afb19d4e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\test">
+      <UniqueIdentifier>{d358068d-664e-470d-93b2-2bb5db2b41e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\composites">
+      <UniqueIdentifier>{6f955dd1-2a2c-4506-bfc2-4bb55734eb72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sqsrc">
+      <UniqueIdentifier>{69f82fd1-904a-40e1-8a26-c2cd63f1e979}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sqsrc">
+      <UniqueIdentifier>{dde575bc-41ce-4770-9fd3-411c945a262b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp\fft">
+      <UniqueIdentifier>{09a864b6-3479-4e18-b9de-499c30b220a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dsp\fft">
+      <UniqueIdentifier>{53848339-2c75-4ddc-8933-607d2353adee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dsp\third-party\kiss_fft">
+      <UniqueIdentifier>{80fd0025-498b-4fd2-98ac-cdae460339fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dsp\third-party\kiss_fft">
+      <UniqueIdentifier>{ea30d980-17c6-4bf8-91a7-847e331330c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sqsrc\thread">
+      <UniqueIdentifier>{19f721d6-97d9-4952-a547-52e6e418fbf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sqsrc\thread">
+      <UniqueIdentifier>{98bc8bb8-3835-46b9-be11-d534f001cac5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sqsrc\util">
+      <UniqueIdentifier>{d88fef08-3b09-4979-98d0-41863e55201d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sqsrc\clock">
+      <UniqueIdentifier>{2919976b-3c5e-48c7-9bc1-70b34d905594}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sqsrc\clock">
+      <UniqueIdentifier>{6c381890-e472-4d98-a18a-8c768ec7a670}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\dsp\third-party\falco\DspFilter.cpp">
+      <Filter>Source Files\dsp\third-party</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\main.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testBiquad.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testLookupTable.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testSaw.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testSinOscillator.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\filters\ButterworthFilterDesigner.cpp">
+      <Filter>Source Files\dsp\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\utils\AudioMath.cpp">
+      <Filter>Source Files\dsp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testHilbert.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\filters\HilbertFilterDesigner.cpp">
+      <Filter>Source Files\dsp\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testAudioMath.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\perfTest.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testFrequencyShifter.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testStateVariable.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testTestSignal.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testVocalAnimator.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\filters\FormantTables2.cpp">
+      <Filter>Source Files\dsp\filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\utils\ObjectCache.cpp">
+      <Filter>Source Files\dsp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testObjectCache.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testFFT.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\fft\FFTData.cpp">
+      <Filter>Source Files\dsp\fft</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\third-party\kiss_fft130\tools\kiss_fftr.c">
+      <Filter>Source Files\dsp\third-party\kiss_fft</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\third-party\kiss_fft130\kiss_fft.c">
+      <Filter>Source Files\dsp\third-party\kiss_fft</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sqsrc\thread\ThreadClient.cpp">
+      <Filter>Source Files\sqsrc\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sqsrc\thread\ThreadServer.cpp">
+      <Filter>Source Files\sqsrc\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sqsrc\thread\ThreadSharedState.cpp">
+      <Filter>Source Files\sqsrc\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testThread.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\fft\FFT.cpp">
+      <Filter>Source Files\dsp\fft</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testRingBuffer.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testColoredNoise.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testFFTCrossFader.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\fft\FFTCrossFader.cpp">
+      <Filter>Source Files\dsp\fft</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testFinalLeaks.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testClockMult.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sqsrc\clock\ClockMult.cpp">
+      <Filter>Source Files\sqsrc\clock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testTremolo.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testGateTrigger.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dsp\third-party\falco\DspFilter.h">
+      <Filter>Header Files\dsp\third-party\falco</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\BiquadFilter.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\BiquadParams.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\BiquadState.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\ButterworthFilterDesigner.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\generators\SawOscillator.h">
+      <Filter>Header Files\dsp\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\generators\SinOscillator.h">
+      <Filter>Header Files\dsp\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\utils\AudioMath.h">
+      <Filter>Header Files\dsp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\utils\LookupTable.h">
+      <Filter>Header Files\dsp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\HilbertFilterDesigner.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\MeasureTime.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\FrequencyShifter.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\TestComposite.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\WidgetComposite.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\TimeStatsCollector.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\SqTime.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\StateVariableFilter.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\TestSignal.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\generators\MultiModOsc.h">
+      <Filter>Header Files\dsp\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\VocalAnimator.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\VocalFilter.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\FormantTables2.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\asserts.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\test\ExtremeTester.h">
+      <Filter>Header Files\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\utils\LookupTableFactory.h">
+      <Filter>Header Files\dsp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\utils\ObjectCache.h">
+      <Filter>Header Files\dsp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\fft\FFTData.h">
+      <Filter>Header Files\dsp\fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\fft\FFT.h">
+      <Filter>Header Files\dsp\fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\third-party\kiss_fft130\kiss_fft.h">
+      <Filter>Header Files\dsp\third-party\kiss_fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\third-party\kiss_fft130\tools\kiss_fftr.h">
+      <Filter>Header Files\dsp\third-party\kiss_fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\thread\ThreadClient.h">
+      <Filter>Header Files\sqsrc\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\thread\ThreadServer.h">
+      <Filter>Header Files\sqsrc\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\thread\ThreadSharedState.h">
+      <Filter>Header Files\sqsrc\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\util\RingBuffer.h">
+      <Filter>Header Files\sqsrc\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\util\ManagedPool.h">
+      <Filter>Header Files\sqsrc\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\ColoredNoise.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\fft\FFTCrossFader.h">
+      <Filter>Header Files\dsp\fft</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\clock\ClockMult.h">
+      <Filter>Header Files\sqsrc\clock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\utils\AsymRampShaper.h">
+      <Filter>Header Files\dsp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\Tremolo.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\util\GateTrigger.h">
+      <Filter>Header Files\sqsrc\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\util\SchmidtTrigger.h">
+      <Filter>Header Files\sqsrc\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\util\Constants.h">
+      <Filter>Header Files\sqsrc\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\thread\ThreadPriority.h">
+      <Filter>Header Files\sqsrc\thread</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

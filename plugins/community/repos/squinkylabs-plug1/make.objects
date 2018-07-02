@@ -1,0 +1,24 @@
+ALL_OBJ= \
+	dsp/fft/FFT.o \
+	dsp/fft/FFTCrossFader.o \
+	dsp/fft/FFTData.o \
+	dsp/filters/ButterworthFilterDesigner.o \
+	dsp/filters/FormantTables2.o \
+	dsp/filters/HilbertFilterDesigner.o \
+	dsp/third-party/falco/DspFilter.o \
+	dsp/utils/AudioMath.o \
+	dsp/utils/ObjectCache.o \
+	sqsrc/clock/ClockMult.o \
+	sqsrc/thread/ThreadClient.o \
+	sqsrc/thread/ThreadServer.o \
+	sqsrc/thread/ThreadSharedState.o \
+	src/BootyModule.o \
+	src/CPU_Hog.o \
+	src/ColoredNoiseModule.o \
+	src/Squinky.o \
+	src/ThreadBoost.o \
+	src/TremoloModule.o \
+	src/VocalFilterModule.o \
+	src/VocalModule.o
+
+#	pboost/pboost.o 

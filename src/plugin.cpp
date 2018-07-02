@@ -581,6 +581,7 @@ extern void init_plugin_Koralfx            (rack::Plugin *p);
 extern void init_plugin_LindenbergResearch (rack::Plugin *p);
 extern void init_plugin_Qwelk              (rack::Plugin *p);
 extern void init_plugin_SonusModular       (rack::Plugin *p);
+extern void init_plugin_squinkylabs_plug1  (rack::Plugin *p);
 extern void init_plugin_SubmarineFree      (rack::Plugin *p);
 extern void init_plugin_Template           (rack::Plugin *p);
 extern void init_plugin_Valley             (rack::Plugin *p);
@@ -627,6 +628,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("LindenbergResearch", &init_plugin_LindenbergResearch);
    vst2_load_static_rack_plugin("Qwelk",              &init_plugin_Qwelk);
    vst2_load_static_rack_plugin("SonusModular",       &init_plugin_SonusModular);
+   vst2_load_static_rack_plugin("squinkylabs-plug1",  &init_plugin_squinkylabs_plug1);
    vst2_load_static_rack_plugin("SubmarineFree",      &init_plugin_SubmarineFree);
    vst2_load_static_rack_plugin("Template",           &init_plugin_Template);
    vst2_load_static_rack_plugin("Valley",             &init_plugin_Valley);
