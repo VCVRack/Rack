@@ -1,6 +1,7 @@
 
 ** July 2nd, 2018
-- add module Template.MyModule
+- remove assertions in Bogaudio oscillator (were triggered when LindenbergResearch.AlmaFilter was connected)
+- add module Template.MyModulea
 - clean up for GITHub release
 
 

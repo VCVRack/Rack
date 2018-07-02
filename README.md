@@ -309,6 +309,9 @@ It is not permitted to redistribute it and Steinberg has discontinued it.
 I heard that the `aeffect.h` / `aeffectx.h` files are still included in the VST3.
 
 
+# Changelog
+see [vst2_bin/CHANGELOG_VST.txt]
+
 # VCV Rack
 
 For more info about VCV rack, see https://vcvrack.com/
