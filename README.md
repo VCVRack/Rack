@@ -310,7 +310,7 @@ I heard that the `aeffect.h` / `aeffectx.h` files are still included in the VST3
 
 
 # Changelog
-see [vst2_bin/CHANGELOG_VST.txt]
+see [vst2_bin/CHANGELOG_VST.txt](vst2_bin/CHANGELOG_VST.txt)
 
 # VCV Rack
 
