@@ -280,16 +280,22 @@ Prerequisites:
 - Steinberg VST2.4 SDK
 
 $ git clone https://github.com/bsp2/VeeSeeVSTRack.git
+
 $ cd VeeSeeVSTRack/
+
 <unpack dep/dep.7z>
 (contains the source codes and MSVC-precompiled libraries)
 
 Edit dep/yac/install_msvc.mk and adjust the LIB_INSTALL_PREFIX, WINDDK_PATH, VCTK, W32API_INC, W32API_LIB as required.
 
 $ alias m="make -j 20 makefile.msvc"
+
 $ m lib
+
 $ cd plugins
+
 $ m bin
+
 $ cd ..
 
 Edit vst2_common_msvc_pre.mk and adjust the VST2 SDK path
