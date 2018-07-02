@@ -10,12 +10,22 @@
 - does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
    - future releases may contain additional (open source) add-ons modules
 
-Here's a demo video of it: https://vimeo.com/277703414
-
 Tested in 
   - Eureka (my own work-in-progress VST host)
   - Cockos Reaper
   - Propellerhead Reason 10
+
+
+# Downloads
+The current release can be found in the [vst_bin2/](vst_bin2/) folder.
+
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-02Jul2018c.7z](dist/veeseevstrack_0_6_1_win64_bin-02Jul2018c.7z)
+
+
+# Demo Video
+
+Here's a demo video of it: https://vimeo.com/277703414
+
 
 # Add-on modules
 

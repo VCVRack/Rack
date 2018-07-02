@@ -1201,11 +1201,12 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          break;
 
       case effSetProgramName:
-         r = 0;
+         r = 1;
          break;
 
       case effGetProgramNameIndexed:
-         r = 0;
+         ::sprintf((char*)ptr, "default");
+         r = 1;
          break;
 
       case effGetParamName:
@@ -1226,15 +1227,15 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //  value: 0
          //    ptr: buffer address
          //      r: buffer size
-         printf("xxx effGetChunk ptr=%p\n", ptr);
-         if(0 == index)
-         {
-            r = wrapper->getBankChunk((uint8_t**)ptr);
-         }
-         else
-         {
+         printf("xxx effGetChunk index=%d ptr=%p\n", index, ptr);
+         // if(0 == index)
+         // {
+         //    r = wrapper->getBankChunk((uint8_t**)ptr);
+         // }
+         // else
+         // {
             r = wrapper->getProgramChunk((uint8_t**)ptr);
-         }
+         // }
          break;
 
       case effSetChunk:
@@ -1242,15 +1243,15 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //  value: buffer size
          //    ptr: buffer address
          //      r: 1
-         printf("xxx effSetChunk size=%lld ptr=%p\n", value, ptr);
-         if(0 == index)
-         {
-            r = wrapper->setBankChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
-         }
-         else
-         {
+         printf("xxx effSetChunk index=%d size=%lld ptr=%p\n", index, value, ptr);
+         // if(0 == index)
+         // {
+         //    r = wrapper->setBankChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
+         // }
+         // else
+         // {
             r = wrapper->setProgramChunk_Async(size_t(value), (uint8_t*)ptr) ? 1 : 0;
-         }
+         // }
          break;
 
       case effShellGetNextPlugin:

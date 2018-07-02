@@ -19,6 +19,7 @@
 - add module squinkylabs-plug1.Tremolo
 - add module squinkylabs-plug1.CPU_Hog
 - add module squinkylabs-plug1.ThreadBoost
+- fix program/bank chunk save/restore in Reaper and Reason (and maybe others)
 
 
 ** July 1st, 2018
