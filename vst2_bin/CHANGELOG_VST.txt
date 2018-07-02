@@ -1,8 +1,9 @@
 
 ** July 2nd, 2018
 - remove assertions in Bogaudio oscillator (were triggered when LindenbergResearch.AlmaFilter was connected)
-- add module Template.MyModulea
-- clean up for GITHub release
+- remove logos from Fundamental.* modules (as requested by the VCV Rack author)
+- add module Template.MyModule
+- clean up for GitHub release
 
 
 ** July 1st, 2018
