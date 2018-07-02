@@ -88,5 +88,9 @@ DEPRECATED TModuleLightWidget *createLight(Vec pos, Module *module, int firstLig
 	return light;
 }
 
+// Rack instance, stores global states
+struct Rack {
+};
+
 
 } // namespace rack

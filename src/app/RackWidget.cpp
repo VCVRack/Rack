@@ -1,3 +1,4 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
@@ -7,9 +8,14 @@
 #include <map>
 #include <algorithm>
 #include "osdialog.h"
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
+
+
+static const char *FILTERS = "VeeSeeVST Rack patch (.vcv):vcv";
 
 
 struct ModuleContainer : Widget {
@@ -56,19 +62,22 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 
-	gRackScene->scrollWidget->offset = Vec(0, 0);
+	global_ui->app.gRackScene->scrollWidget->offset = Vec(0, 0);
+#ifdef USE_VST2
+   global->vst2.next_unique_param_base_id = 1;
+#endif // USE_VST2
 }
 
 void RackWidget::reset() {
 	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear patch and start over?")) {
 		clear();
 		// Fails silently if file does not exist
-		load(assetLocal("template.vcv"));
+		loadPatch(assetLocal("template.vcv"));
 		lastPath = "";
 	}
 }
 
-void RackWidget::loadDialog() {
+void RackWidget::openDialog() {
 	std::string dir;
 	if (lastPath.empty()) {
 		dir = assetLocal("patches");
@@ -77,10 +86,10 @@ void RackWidget::loadDialog() {
 	else {
 		dir = stringDirectory(lastPath);
 	}
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
+	osdialog_filters *filters = osdialog_filters_parse(FILTERS);
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
 	if (path) {
-		load(path);
+		loadPatch(path);
 		lastPath = path;
 		free(path);
 	}
@@ -89,7 +98,7 @@ void RackWidget::loadDialog() {
 
 void RackWidget::saveDialog() {
 	if (!lastPath.empty()) {
-		save(lastPath);
+		savePatch(lastPath);
 	}
 	else {
 		saveAsDialog();
@@ -107,7 +116,7 @@ void RackWidget::saveAsDialog() {
 		dir = stringDirectory(lastPath);
 		filename = stringFilename(lastPath);
 	}
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
+	osdialog_filters *filters = osdialog_filters_parse(FILTERS);
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
 
 	if (path) {
@@ -118,19 +127,19 @@ void RackWidget::saveAsDialog() {
 			pathStr += ".vcv";
 		}
 
-		save(pathStr);
+		savePatch(pathStr);
 		lastPath = pathStr;
 	}
 	osdialog_filters_free(filters);
 }
 
-void RackWidget::save(std::string filename) {
-	info("Saving patch %s", filename.c_str());
+void RackWidget::savePatch(std::string path) {
+	info("Saving patch %s", path.c_str());
 	json_t *rootJ = toJson();
 	if (!rootJ)
 		return;
 
-	FILE *file = fopen(filename.c_str(), "w");
+	FILE *file = fopen(path.c_str(), "w");
 	if (file) {
 		json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 		fclose(file);
@@ -139,9 +148,25 @@ void RackWidget::save(std::string filename) {
 	json_decref(rootJ);
 }
 
-void RackWidget::load(std::string filename) {
-	info("Loading patch %s", filename.c_str());
-	FILE *file = fopen(filename.c_str(), "r");
+#ifdef USE_VST2
+char *RackWidget::savePatchToString(void) {
+   // (note) caller must free() returned string
+   info("Saving patch to string");
+   char *r = NULL;
+
+	json_t *rootJ = toJson();
+	if (!rootJ)
+		return NULL;
+
+   r = json_dumps(rootJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	json_decref(rootJ);
+   return r;
+}
+#endif // USE_VST2
+
+void RackWidget::loadPatch(std::string path) {
+	info("Loading patch %s", path.c_str());
+	FILE *file = fopen(path.c_str(), "r");
 	if (!file) {
 		// Exit silently
 		return;
@@ -155,18 +180,50 @@ void RackWidget::load(std::string filename) {
 		json_decref(rootJ);
 	}
 	else {
-		std::string message = stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = stringf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 
 	fclose(file);
 }
 
+#ifdef USE_VST2
+bool RackWidget::loadPatchFromString(const char *_string) {
+   info("Loading patch from string");
+
+	if (NULL == _string) {
+		// Exit silently
+		return false;
+	}
+   
+	json_error_t error;
+	json_t *rootJ = json_loads(_string, 0/*flags*/, &error);
+	if (rootJ) {
+		clear();
+#ifdef USE_VST2
+      global->vst2.b_patch_loading = true;
+#endif
+		fromJson(rootJ);
+#ifdef USE_VST2
+      global->vst2.b_patch_loading = false;
+#endif // USE_VST2
+		json_decref(rootJ);
+      return true;
+	}
+	else {
+		std::string message = stringf("JSON parsing error at %s %d:%d %s\n", error.source, error.line, error.column, error.text);
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+	}
+
+	return false;
+}
+#endif // USE_VST2
+
 void RackWidget::revert() {
 	if (lastPath.empty())
 		return;
 	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert patch to the last saved state?")) {
-		load(lastPath);
+		loadPatch(lastPath);
 	}
 }
 
@@ -186,7 +243,7 @@ json_t *RackWidget::toJson() {
 	json_t *rootJ = json_object();
 
 	// version
-	json_t *versionJ = json_string(gApplicationVersion.c_str());
+	json_t *versionJ = json_string(global_ui->app.gApplicationVersion.c_str());
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// modules
@@ -200,12 +257,6 @@ json_t *RackWidget::toJson() {
 		moduleId++;
 		// module
 		json_t *moduleJ = moduleWidget->toJson();
-		{
-			// pos
-			Vec pos = moduleWidget->box.pos.div(RACK_GRID_SIZE).round();
-			json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
-			json_object_set_new(moduleJ, "pos", posJ);
-		}
 		json_array_append_new(modulesJ, moduleJ);
 	}
 	json_object_set_new(rootJ, "modules", modulesJ);
@@ -278,30 +329,25 @@ void RackWidget::fromJson(json_t *rootJ) {
 			json_object_set(moduleJ, "legacy", json_integer(legacy));
 		}
 
-		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
+		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
+		if (!pluginSlugJ) continue;
+		json_t *modelSlugJ = json_object_get(moduleJ, "model");
+		if (!modelSlugJ) continue;
+		std::string pluginSlug = json_string_value(pluginSlugJ);
+		std::string modelSlug = json_string_value(modelSlugJ);
 
-		if (moduleWidget) {
-			// pos
-			json_t *posJ = json_object_get(moduleJ, "pos");
-			double x, y;
-			json_unpack(posJ, "[F, F]", &x, &y);
-			Vec pos = Vec(x, y);
-			if (legacy && legacy <= 1) {
-				moduleWidget->box.pos = pos;
-			}
-			else {
-				moduleWidget->box.pos = pos.mult(RACK_GRID_SIZE);
-			}
-
-			moduleWidgets[moduleId] = moduleWidget;
-		}
-		else {
-			json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
-			json_t *modelSlugJ = json_object_get(moduleJ, "model");
-			std::string pluginSlug = json_string_value(pluginSlugJ);
-			std::string modelSlug = json_string_value(modelSlugJ);
+		Model *model = pluginGetModel(pluginSlug, modelSlug);
+		if (!model) {
 			message += stringf("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
+			continue;
 		}
+
+		// Create ModuleWidget
+		ModuleWidget *moduleWidget = model->createModuleWidget();
+		assert(moduleWidget);
+		moduleWidget->fromJson(moduleJ);
+		moduleContainer->addChild(moduleWidget);
+		moduleWidgets[moduleId] = moduleWidget;
 	}
 
 	// wires
@@ -363,53 +409,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
-	// Get slugs
-	json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
-	if (!pluginSlugJ)
-		return NULL;
-	json_t *modelSlugJ = json_object_get(moduleJ, "model");
-	if (!modelSlugJ)
-		return NULL;
-	std::string pluginSlug = json_string_value(pluginSlugJ);
-	std::string modelSlug = json_string_value(modelSlugJ);
-
-	// Get Model
-	Model *model = pluginGetModel(pluginSlug, modelSlug);
-	if (!model)
-		return NULL;
-
-	// Create ModuleWidget
-	ModuleWidget *moduleWidget = model->createModuleWidget();
-	assert(moduleWidget);
-	moduleWidget->fromJson(moduleJ);
-	moduleContainer->addChild(moduleWidget);
-	return moduleWidget;
-}
-
-void RackWidget::pastePresetClipboard() {
-	const char *moduleJson = glfwGetClipboardString(gWindow);
-	if (!moduleJson) {
-		warn("Could not get text from clipboard.");
-		return;
-	}
-
-	json_error_t error;
-	json_t *moduleJ = json_loads(moduleJson, 0, &error);
-	if (moduleJ) {
-		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
-		// Set moduleWidget position
-		Rect newBox = moduleWidget->box;
-		newBox.pos = lastMousePos.minus(newBox.size.div(2));
-		requestModuleBoxNearest(moduleWidget, newBox);
-
-		json_decref(moduleJ);
-	}
-	else {
-		warn("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-	}
-}
-
 void RackWidget::addModule(ModuleWidget *m) {
 	moduleContainer->addChild(m);
 	m->create();
@@ -421,13 +420,16 @@ void RackWidget::deleteModule(ModuleWidget *m) {
 }
 
 void RackWidget::cloneModule(ModuleWidget *m) {
+	// Create new module from model
+	ModuleWidget *clonedModuleWidget = m->model->createModuleWidget();
 	// JSON serialization is the most straightforward way to do this
 	json_t *moduleJ = m->toJson();
-	ModuleWidget *clonedModuleWidget = moduleFromJson(moduleJ);
+	clonedModuleWidget->fromJson(moduleJ);
 	json_decref(moduleJ);
 	Rect clonedBox = clonedModuleWidget->box;
 	clonedBox.pos = m->box.pos;
 	requestModuleBoxNearest(clonedModuleWidget, clonedBox);
+	addModule(clonedModuleWidget);
 }
 
 bool RackWidget::requestModuleBox(ModuleWidget *m, Rect box) {
@@ -488,11 +490,13 @@ void RackWidget::step() {
 		rail->box.size = rails->box.size;
 	}
 
+#ifndef USE_VST2
 	// Autosave every 15 seconds
-	if (gGuiFrame % (60 * 15) == 0) {
-		save(assetLocal("autosave.vcv"));
+	if (global_ui->window.gGuiFrame % (60 * 15) == 0) {
+		savePatch(assetLocal("autosave.vcv"));
 		settingsSave(assetLocal("settings.json"));
 	}
+#endif // USE_VST2
 
 	Widget::step();
 }

@@ -1,0 +1,22 @@
+{
+  "token": "",
+  "windowSize": [
+    640.0,
+    480.0
+  ],
+  "windowPos": [
+    60.0,
+    83.0
+  ],
+  "wireOpacity": 50.0,
+  "wireTension": 0.5,
+  "zoom": 1.0,
+  "allowCursorLock": true,
+  "sampleRate": 44100.0,
+  "lastPath": "",
+  "moduleBrowser": {
+    "favorites": []
+  },
+  "powerMeter": false,
+  "checkVersion": true
+}

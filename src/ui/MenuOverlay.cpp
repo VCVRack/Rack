@@ -1,5 +1,7 @@
+#include "global_pre.hpp"
 #include "ui.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -18,7 +20,7 @@ void MenuOverlay::onMouseDown(EventMouseDown &e) {
 	Widget::onMouseDown(e);
 	if (!e.consumed) {
 		// deletes `this`
-		gScene->setOverlay(NULL);
+		global_ui->ui.gScene->setOverlay(NULL);
 		e.consumed = true;
 	}
 }
@@ -26,7 +28,7 @@ void MenuOverlay::onMouseDown(EventMouseDown &e) {
 void MenuOverlay::onHoverKey(EventHoverKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_ESCAPE: {
-			gScene->setOverlay(NULL);
+			global_ui->ui.gScene->setOverlay(NULL);
 			e.consumed = true;
 			return;
 		} break;

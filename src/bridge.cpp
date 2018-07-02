@@ -1,6 +1,8 @@
+#include "global_pre.hpp"
 #include "bridge.hpp"
 #include "util/common.hpp"
 #include "dsp/ringbuffer.hpp"
+#include "global.hpp"
 
 #include <unistd.h>
 #if ARCH_WIN

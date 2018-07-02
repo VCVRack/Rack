@@ -1,5 +1,8 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "midi.hpp"
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -16,7 +19,7 @@ struct MidiDriverItem : MenuItem {
 struct MidiDriverChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI driver"));
 		for (int driverId : midiWidget->midiIO->getDriverIds()) {
 			MidiDriverItem *item = new MidiDriverItem();
@@ -50,7 +53,7 @@ struct MidiDeviceItem : MenuItem {
 struct MidiDeviceChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI device"));
 		{
 			MidiDeviceItem *item = new MidiDeviceItem();
@@ -92,7 +95,7 @@ struct MidiChannelItem : MenuItem {
 struct MidiChannelChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI channel"));
 		for (int channel = -1; channel < 16; channel++) {
 			MidiChannelItem *item = new MidiChannelItem();

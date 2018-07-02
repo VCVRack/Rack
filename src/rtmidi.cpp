@@ -1,5 +1,7 @@
+#include "global_pre.hpp"
 #include "rtmidi.hpp"
 #include <map>
+#include "global.hpp"
 
 
 namespace rack {

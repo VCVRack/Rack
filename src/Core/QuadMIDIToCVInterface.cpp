@@ -1,6 +1,8 @@
+#include "global_pre.hpp"
 #include "Core.hpp"
 #include "midi.hpp"
 #include "dsp/digital.hpp"
+#include "global.hpp"
 
 #include <algorithm>
 
@@ -366,5 +368,7 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelQuadMIDIToCVInterface = Model::create<QuadMIDIToCVInterface, QuadMIDIToCVInterfaceWidget>("Core", "QuadMIDIToCVInterface", "MIDI-4", MIDI_TAG, EXTERNAL_TAG, QUAD_TAG);
-
+RACK_PLUGIN_MODEL_INIT(Core, QuadMIDIToCVInterface) {
+   Model *modelQuadMIDIToCVInterface = Model::create<QuadMIDIToCVInterface, QuadMIDIToCVInterfaceWidget>("Core", "QuadMIDIToCVInterface", "MIDI-4", MIDI_TAG, EXTERNAL_TAG, QUAD_TAG);
+   return modelQuadMIDIToCVInterface;
+}

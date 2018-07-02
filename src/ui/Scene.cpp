@@ -1,5 +1,7 @@
+#include "global_pre.hpp"
 #include "ui.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -21,10 +23,10 @@ Menu *Scene::createMenu() {
 	// Get relative position of the click
 	MenuOverlay *overlay = new MenuOverlay();
 	Menu *menu = new Menu();
-	menu->box.pos = gMousePos;
+	menu->box.pos = global_ui->window.gMousePos;
 
 	overlay->addChild(menu);
-	gScene->setOverlay(overlay);
+	global_ui->ui.gScene->setOverlay(overlay);
 
 	return menu;
 }

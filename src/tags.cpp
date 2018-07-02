@@ -4,10 +4,16 @@
 namespace rack {
 
 
+static bool b_tags_init = false;
 std::string gTagNames[NUM_TAGS];
 
 
 void tagsInit() {
+   // (todo) protect with mutex in case of (unlikely) parallel/threaded instantation
+   if(b_tags_init)
+      return;
+   b_tags_init = true;
+
 	gTagNames[AMPLIFIER_TAG] = "Amplifier/VCA";
 	gTagNames[ATTENUATOR_TAG] = "Attenuator";
 	gTagNames[ARPEGGIATOR_TAG] = "Arpeggiator";

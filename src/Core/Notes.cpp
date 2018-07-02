@@ -1,4 +1,6 @@
+#include "global_pre.hpp"
 #include "Core.hpp"
+#include "global.hpp"
 
 using namespace rack;
 
@@ -41,4 +43,7 @@ struct NotesWidget : ModuleWidget {
 };
 
 
-Model *modelNotes = Model::create<Module, NotesWidget>("Core", "Notes", "Notes", BLANK_TAG);
+RACK_PLUGIN_MODEL_INIT(Core, Notes) {
+   Model *modelNotes = Model::create<Module, NotesWidget>("Core", "Notes", "Notes", BLANK_TAG);
+   return modelNotes;
+}

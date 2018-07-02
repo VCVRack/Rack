@@ -1,9 +1,11 @@
+#include "global_pre.hpp"
 #include "Core.hpp"
 #include "midi.hpp"
 #include "dsp/digital.hpp"
 #include "dsp/filter.hpp"
 
 #include <algorithm>
+#include "global.hpp"
 
 
 struct MIDIToCVInterface : Module {
@@ -326,4 +328,7 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelMIDIToCVInterface = Model::create<MIDIToCVInterface, MIDIToCVInterfaceWidget>("Core", "MIDIToCVInterface", "MIDI-1", MIDI_TAG, EXTERNAL_TAG);
+RACK_PLUGIN_MODEL_INIT(Core, MIDIToCVInterface) {
+   Model *modelMIDIToCVInterface = Model::create<MIDIToCVInterface, MIDIToCVInterfaceWidget>("Core", "MIDIToCVInterface", "MIDI-1", MIDI_TAG, EXTERNAL_TAG);
+   return modelMIDIToCVInterface;
+}

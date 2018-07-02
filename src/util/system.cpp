@@ -1,7 +1,10 @@
+#include "global_pre.hpp"
 #include "util/common.hpp"
 
+#ifdef YAC_POSIX
 #include <dirent.h>
 #include <sys/stat.h>
+#endif // YAC_POSIX
 
 #if ARCH_WIN
 	#include <windows.h>
@@ -9,11 +12,16 @@
 #endif
 
 
+#ifdef USE_VST2
+#define SKIP_SYSTEM_FXNS defined
+#endif // USE_VST2
+
 namespace rack {
 
 
 std::vector<std::string> systemListEntries(std::string path) {
 	std::vector<std::string> filenames;
+#ifndef SKIP_SYSTEM_FXNS
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
 		struct dirent *d;
@@ -25,29 +33,43 @@ std::vector<std::string> systemListEntries(std::string path) {
 		}
 		closedir(dir);
 	}
+#endif
 	return filenames;
 }
 
 bool systemExists(std::string path) {
+#ifndef SKIP_SYSTEM_FXNS
 	struct stat statbuf;
 	return (stat(path.c_str(), &statbuf) == 0);
+#else
+   return false;
+#endif // SKIP_SYSTEM_FXNS
 }
 
 bool systemIsFile(std::string path) {
+#ifndef SKIP_SYSTEM_FXNS
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISREG(statbuf.st_mode);
+#else
+   return false;
+#endif // SKIP_SYSTEM_FXNS
 }
 
 bool systemIsDirectory(std::string path) {
+#ifndef SKIP_SYSTEM_FXNS
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISDIR(statbuf.st_mode);
+#else
+   return false;
+#endif // SKIP_SYSTEM_FXNS
 }
 
 void systemCopy(std::string srcPath, std::string destPath) {
+#ifndef SKIP_SYSTEM_FXNS
 	// Open files
 	FILE *source = fopen(srcPath.c_str(), "rb");
 	if (!source) return;
@@ -70,17 +92,23 @@ void systemCopy(std::string srcPath, std::string destPath) {
 		if (size == 0)
 			break;
 	}
+#else
+#endif // SKIP_SYSTEM_FXNS
 }
 
 void systemCreateDirectory(std::string path) {
+#ifndef SKIP_SYSTEM_FXNS
 #if ARCH_WIN
 	CreateDirectory(path.c_str(), NULL);
 #else
 	mkdir(path.c_str(), 0755);
 #endif
+#else
+#endif // SKIP_SYSTEM_FXNS
 }
 
 void systemOpenBrowser(std::string url) {
+#ifndef SKIP_SYSTEM_FXNS
 #if ARCH_LIN
 	std::string command = "xdg-open " + url;
 	(void) system(command.c_str());
@@ -92,6 +120,8 @@ void systemOpenBrowser(std::string url) {
 #if ARCH_WIN
 	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
+#else
+#endif // SKIP_SYSTEM_FXNS
 }
 
 

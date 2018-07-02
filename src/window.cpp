@@ -1,3 +1,4 @@
+#include "global_pre.hpp"
 #include "window.hpp"
 #include "app.hpp"
 #include "asset.hpp"
@@ -30,21 +31,15 @@
 	#include <ApplicationServices/ApplicationServices.h>
 #endif
 
+#include "global.hpp"
+#include "global_ui.hpp"
+
+
+#ifdef USE_VST2
+extern void vst2_handle_queued_set_program_chunk (void);
+#endif // USE_VST2
 
 namespace rack {
-
-
-GLFWwindow *gWindow = NULL;
-NVGcontext *gVg = NULL;
-NVGcontext *gFramebufferVg = NULL;
-std::shared_ptr<Font> gGuiFont;
-float gPixelRatio = 1.0;
-float gWindowRatio = 1.0;
-bool gAllowCursorLock = true;
-int gGuiFrame;
-Vec gMousePos;
-
-std::string lastWindowTitle;
 
 
 void windowSizeCallback(GLFWwindow* window, int width, int height) {
@@ -54,78 +49,78 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 #ifdef ARCH_MAC
 	// Ctrl-left click --> right click
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
+		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
 			button = GLFW_MOUSE_BUTTON_RIGHT;
 		}
 	}
 #endif
 
 	if (action == GLFW_PRESS) {
-		gTempWidget = NULL;
+		global_ui->widgets.gTempWidget = NULL;
 		// onMouseDown
 		{
 			EventMouseDown e;
-			e.pos = gMousePos;
+			e.pos = global_ui->window.gMousePos;
 			e.button = button;
-			gScene->onMouseDown(e);
-			gTempWidget = e.target;
+			global_ui->ui.gScene->onMouseDown(e);
+			global_ui->widgets.gTempWidget = e.target;
 		}
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			if (gTempWidget) {
+			if (global_ui->widgets.gTempWidget) {
 				// onDragStart
 				EventDragStart e;
-				gTempWidget->onDragStart(e);
+				global_ui->widgets.gTempWidget->onDragStart(e);
 			}
-			gDraggedWidget = gTempWidget;
+			global_ui->widgets.gDraggedWidget = global_ui->widgets.gTempWidget;
 
-			if (gTempWidget != gFocusedWidget) {
-				if (gFocusedWidget) {
+			if (global_ui->widgets.gTempWidget != global_ui->widgets.gFocusedWidget) {
+				if (global_ui->widgets.gFocusedWidget) {
 					// onDefocus
 					EventDefocus e;
-					gFocusedWidget->onDefocus(e);
+					global_ui->widgets.gFocusedWidget->onDefocus(e);
 				}
-				gFocusedWidget = NULL;
-				if (gTempWidget) {
+				global_ui->widgets.gFocusedWidget = NULL;
+				if (global_ui->widgets.gTempWidget) {
 					// onFocus
 					EventFocus e;
-					gTempWidget->onFocus(e);
+					global_ui->widgets.gTempWidget->onFocus(e);
 					if (e.consumed) {
-						gFocusedWidget = gTempWidget;
+						global_ui->widgets.gFocusedWidget = global_ui->widgets.gTempWidget;
 					}
 				}
 			}
 		}
-		gTempWidget = NULL;
+		global_ui->widgets.gTempWidget = NULL;
 	}
 	else if (action == GLFW_RELEASE) {
 		// onMouseUp
-		gTempWidget = NULL;
+		global_ui->widgets.gTempWidget = NULL;
 		{
 			EventMouseUp e;
-			e.pos = gMousePos;
+			e.pos = global_ui->window.gMousePos;
 			e.button = button;
-			gScene->onMouseUp(e);
-			gTempWidget = e.target;
+			global_ui->ui.gScene->onMouseUp(e);
+			global_ui->widgets.gTempWidget = e.target;
 		}
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			if (gDraggedWidget) {
+			if (global_ui->widgets.gDraggedWidget) {
 				// onDragDrop
 				EventDragDrop e;
-				e.origin = gDraggedWidget;
-				gTempWidget->onDragDrop(e);
+				e.origin = global_ui->widgets.gDraggedWidget;
+				global_ui->widgets.gTempWidget->onDragDrop(e);
 			}
 			// gDraggedWidget might have been set to null in the last event, recheck here
-			if (gDraggedWidget) {
+			if (global_ui->widgets.gDraggedWidget) {
 				// onDragEnd
 				EventDragEnd e;
-				gDraggedWidget->onDragEnd(e);
+				global_ui->widgets.gDraggedWidget->onDragEnd(e);
 			}
-			gDraggedWidget = NULL;
-			gDragHoveredWidget = NULL;
+			global_ui->widgets.gDraggedWidget = NULL;
+			global_ui->widgets.gDragHoveredWidget = NULL;
 		}
-		gTempWidget = NULL;
+		global_ui->widgets.gTempWidget = NULL;
 	}
 }
 
@@ -152,10 +147,10 @@ void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int m
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
-	Vec mouseRel = mousePos.minus(gMousePos);
+	Vec mousePos = Vec(xpos, ypos).div(global_ui->window.gPixelRatio / global_ui->window.gWindowRatio).round();
+	Vec mouseRel = mousePos.minus(global_ui->window.gMousePos);
 
-	int cursorMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
+	int cursorMode = glfwGetInputMode(global_ui->window.gWindow, GLFW_CURSOR);
 	(void) cursorMode;
 
 #ifdef ARCH_MAC
@@ -163,80 +158,80 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
-		glfwSetCursorPos(gWindow, gMousePos.x, gMousePos.y);
+		glfwSetCursorPos(global_ui->window.gWindow, global_ui->window.gMousePos.x, global_ui->window.gMousePos.y);
 		CGAssociateMouseAndMouseCursorPosition(true);
-		mousePos = gMousePos;
+		mousePos = global_ui->window.gMousePos;
 	}
 	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
-	glfwSetCursor(gWindow, NULL);
+	glfwSetCursor(global_ui->window.gWindow, NULL);
 #endif
 
-	gMousePos = mousePos;
+	global_ui->window.gMousePos = mousePos;
 
-	gTempWidget = NULL;
+	global_ui->widgets.gTempWidget = NULL;
 	// onMouseMove
 	{
 		EventMouseMove e;
 		e.pos = mousePos;
 		e.mouseRel = mouseRel;
-		gScene->onMouseMove(e);
-		gTempWidget = e.target;
+		global_ui->ui.gScene->onMouseMove(e);
+		global_ui->widgets.gTempWidget = e.target;
 	}
 
-	if (gDraggedWidget) {
+	if (global_ui->widgets.gDraggedWidget) {
 		// onDragMove
 		EventDragMove e;
 		e.mouseRel = mouseRel;
-		gDraggedWidget->onDragMove(e);
+		global_ui->widgets.gDraggedWidget->onDragMove(e);
 
-		if (gTempWidget != gDragHoveredWidget) {
-			if (gDragHoveredWidget) {
+		if (global_ui->widgets.gTempWidget != global_ui->widgets.gDragHoveredWidget) {
+			if (global_ui->widgets.gDragHoveredWidget) {
 				EventDragEnter e;
-				e.origin = gDraggedWidget;
-				gDragHoveredWidget->onDragLeave(e);
+				e.origin = global_ui->widgets.gDraggedWidget;
+				global_ui->widgets.gDragHoveredWidget->onDragLeave(e);
 			}
-			gDragHoveredWidget = gTempWidget;
-			if (gDragHoveredWidget) {
+			global_ui->widgets.gDragHoveredWidget = global_ui->widgets.gTempWidget;
+			if (global_ui->widgets.gDragHoveredWidget) {
 				EventDragEnter e;
-				e.origin = gDraggedWidget;
-				gDragHoveredWidget->onDragEnter(e);
+				e.origin = global_ui->widgets.gDraggedWidget;
+				global_ui->widgets.gDragHoveredWidget->onDragEnter(e);
 			}
 		}
 	}
 	else {
-		if (gTempWidget != gHoveredWidget) {
-			if (gHoveredWidget) {
+		if (global_ui->widgets.gTempWidget != global_ui->widgets.gHoveredWidget) {
+			if (global_ui->widgets.gHoveredWidget) {
 				// onMouseLeave
 				EventMouseLeave e;
-				gHoveredWidget->onMouseLeave(e);
+				global_ui->widgets.gHoveredWidget->onMouseLeave(e);
 			}
-			gHoveredWidget = gTempWidget;
-			if (gHoveredWidget) {
+			global_ui->widgets.gHoveredWidget = global_ui->widgets.gTempWidget;
+			if (global_ui->widgets.gHoveredWidget) {
 				// onMouseEnter
 				EventMouseEnter e;
-				gHoveredWidget->onMouseEnter(e);
+				global_ui->widgets.gHoveredWidget->onMouseEnter(e);
 			}
 		}
 	}
-	gTempWidget = NULL;
-	if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+	global_ui->widgets.gTempWidget = NULL;
+	if (glfwGetMouseButton(global_ui->window.gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
 		// TODO
 		// Define a new global called gScrollWidget, which remembers the widget where middle-click was first pressed
 		EventScroll e;
 		e.pos = mousePos;
 		e.scrollRel = mouseRel;
-		gScene->onScroll(e);
+		global_ui->ui.gScene->onScroll(e);
 	}
 }
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {
 	if (!entered) {
-		if (gHoveredWidget) {
+		if (global_ui->widgets.gHoveredWidget) {
 			// onMouseLeave
 			EventMouseLeave e;
-			gHoveredWidget->onMouseLeave(e);
+			global_ui->widgets.gHoveredWidget->onMouseLeave(e);
 		}
-		gHoveredWidget = NULL;
+		global_ui->widgets.gHoveredWidget = NULL;
 	}
 }
 
@@ -248,35 +243,35 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 #endif
 	// onScroll
 	EventScroll e;
-	e.pos = gMousePos;
+	e.pos = global_ui->window.gMousePos;
 	e.scrollRel = scrollRel.mult(50.0);
-	gScene->onScroll(e);
+	global_ui->ui.gScene->onScroll(e);
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	if (gFocusedWidget) {
+	if (global_ui->widgets.gFocusedWidget) {
 		// onText
 		EventText e;
 		e.codepoint = codepoint;
-		gFocusedWidget->onText(e);
+		global_ui->widgets.gFocusedWidget->onText(e);
 	}
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		if (gFocusedWidget) {
+		if (global_ui->widgets.gFocusedWidget) {
 			// onKey
 			EventKey e;
 			e.key = key;
-			gFocusedWidget->onKey(e);
+			global_ui->widgets.gFocusedWidget->onKey(e);
 			if (e.consumed)
 				return;
 		}
 		// onHoverKey
 		EventHoverKey e;
-		e.pos = gMousePos;
+		e.pos = global_ui->window.gMousePos;
 		e.key = key;
-		gScene->onHoverKey(e);
+		global_ui->ui.gScene->onHoverKey(e);
 	}
 
 	// Keyboard MIDI driver
@@ -293,11 +288,11 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 void dropCallback(GLFWwindow *window, int count, const char **paths) {
 	// onPathDrop
 	EventPathDrop e;
-	e.pos = gMousePos;
+	e.pos = global_ui->window.gMousePos;
 	for (int i = 0; i < count; i++) {
 		e.paths.push_back(paths[i]);
 	}
-	gScene->onPathDrop(e);
+	global_ui->ui.gScene->onPathDrop(e);
 }
 
 void errorCallback(int error, const char *description) {
@@ -306,32 +301,47 @@ void errorCallback(int error, const char *description) {
 
 void renderGui() {
 	int width, height;
-	glfwGetFramebufferSize(gWindow, &width, &height);
+	glfwGetFramebufferSize(global_ui->window.gWindow, &width, &height);
 
 	// Update and render
-	nvgBeginFrame(gVg, width, height, gPixelRatio);
+	nvgBeginFrame(global_ui->window.gVg, width, height, global_ui->window.gPixelRatio);
 
-	nvgReset(gVg);
-	nvgScale(gVg, gPixelRatio, gPixelRatio);
-	gScene->draw(gVg);
+	nvgReset(global_ui->window.gVg);
+	nvgScale(global_ui->window.gVg, global_ui->window.gPixelRatio, global_ui->window.gPixelRatio);
+	global_ui->ui.gScene->draw(global_ui->window.gVg);
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	nvgEndFrame(gVg);
-	glfwSwapBuffers(gWindow);
+	nvgEndFrame(global_ui->window.gVg);
+	glfwSwapBuffers(global_ui->window.gWindow);
 }
 
 void windowInit() {
 	int err;
+   bool bInitGLFW = true;
 
-	// Set up GLFW
-	glfwSetErrorCallback(errorCallback);
-	err = glfwInit();
-	if (err != GLFW_TRUE) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
-		exit(1);
-	}
+#ifdef USE_VST2
+   // (note) GLFW uses global vars. hmmmmm. multiple init seems to work, though (and opening multiple windows)
+   // (note) just don't terminate until last instance is closed
+   // (note) (this will probably result in memleaks..?!)
+   bInitGLFW = (1 == global->vst2.last_seen_instance_count);
+#endif // USE_VST2
+
+#if 0
+   if(bInitGLFW)
+   {
+      // Set up GLFW
+      glfwSetErrorCallback(errorCallback);
+      err = glfwInit();
+      if (err != GLFW_TRUE) {
+         osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
+         exit(1);
+      }
+   }
+#else
+   glfwSetErrorCallback(errorCallback);
+#endif
 
 #if defined NANOVG_GL2
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -344,28 +354,28 @@ void windowInit() {
 #endif
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	lastWindowTitle = "";
-	gWindow = glfwCreateWindow(640, 480, lastWindowTitle.c_str(), NULL, NULL);
-	if (!gWindow) {
+	global_ui->window.lastWindowTitle = "";
+	global_ui->window.gWindow = glfwCreateWindow(640, 480, global_ui->window.lastWindowTitle.c_str(), NULL, NULL);
+	if (!global_ui->window.gWindow) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
 
-	glfwMakeContextCurrent(gWindow);
+	glfwMakeContextCurrent(global_ui->window.gWindow);
 
 	glfwSwapInterval(1);
 
-	glfwSetInputMode(gWindow, GLFW_LOCK_KEY_MODS, 1);
+	glfwSetInputMode(global_ui->window.gWindow, GLFW_LOCK_KEY_MODS, 1);
 
-	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
-	glfwSetMouseButtonCallback(gWindow, mouseButtonStickyCallback);
+	glfwSetWindowSizeCallback(global_ui->window.gWindow, windowSizeCallback);
+	glfwSetMouseButtonCallback(global_ui->window.gWindow, mouseButtonStickyCallback);
 	// Call this ourselves, but on every frame instead of only when the mouse moves
 	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
-	glfwSetCursorEnterCallback(gWindow, cursorEnterCallback);
-	glfwSetScrollCallback(gWindow, scrollCallback);
-	glfwSetCharCallback(gWindow, charCallback);
-	glfwSetKeyCallback(gWindow, keyCallback);
-	glfwSetDropCallback(gWindow, dropCallback);
+	glfwSetCursorEnterCallback(global_ui->window.gWindow, cursorEnterCallback);
+	glfwSetScrollCallback(global_ui->window.gWindow, scrollCallback);
+	glfwSetCharCallback(global_ui->window.gWindow, charCallback);
+	glfwSetKeyCallback(global_ui->window.gWindow, keyCallback);
+	glfwSetDropCallback(global_ui->window.gWindow, dropCallback);
 
 	// Set up GLEW
 	glewExperimental = GL_TRUE;
@@ -378,113 +388,139 @@ void windowInit() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
-	glfwSetWindowSizeLimits(gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(global_ui->window.gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
 	int nvgFlags = NVG_ANTIALIAS;
 #if defined NANOVG_GL2
-	gVg = nvgCreateGL2(nvgFlags);
+	global_ui->window.gVg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
-	gVg = nvgCreateGL3(nvgFlags);
+	global_ui->window.gVg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
-	gVg = nvgCreateGLES2(nvgFlags);
+	global_ui->window.gVg = nvgCreateGLES2(nvgFlags);
 #endif
-	assert(gVg);
+	assert(global_ui->window.gVg);
 
 #if defined NANOVG_GL2
-	gFramebufferVg = nvgCreateGL2(nvgFlags);
+	global_ui->window.gFramebufferVg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
-	gFramebufferVg = nvgCreateGL3(nvgFlags);
+	global_ui->window.gFramebufferVg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
-	gFramebufferVg = nvgCreateGLES2(nvgFlags);
+	global_ui->window.gFramebufferVg = nvgCreateGLES2(nvgFlags);
 #endif
-	assert(gFramebufferVg);
+	assert(global_ui->window.gFramebufferVg);
 
 	// Set up Blendish
-	gGuiFont = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
-	bndSetFont(gGuiFont->handle);
+	global_ui->window.gGuiFont = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
+	bndSetFont(global_ui->window.gGuiFont->handle);
 
 	windowSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
+
+#ifdef USE_VST2
+   // (note) the patch loader requires an initialized window system (widgets etc)
+   ::glfwHideWindow(global_ui->window.gWindow);
+#endif // USE_VST2
 }
 
 void windowDestroy() {
-	gGuiFont.reset();
+	global_ui->window.gGuiFont.reset();
 
 #if defined NANOVG_GL2
-	nvgDeleteGL2(gVg);
+	nvgDeleteGL2(global_ui->window.gVg);
 #elif defined NANOVG_GL3
-	nvgDeleteGL3(gVg);
+	nvgDeleteGL3(global_ui->window.gVg);
 #elif defined NANOVG_GLES2
-	nvgDeleteGLES2(gVg);
+	nvgDeleteGLES2(global_ui->window.gVg);
 #endif
 
 #if defined NANOVG_GL2
-	nvgDeleteGL2(gFramebufferVg);
+	nvgDeleteGL2(global_ui->window.gFramebufferVg);
 #elif defined NANOVG_GL3
-	nvgDeleteGL3(gFramebufferVg);
+	nvgDeleteGL3(global_ui->window.gFramebufferVg);
 #elif defined NANOVG_GLES2
-	nvgDeleteGLES2(gFramebufferVg);
+	nvgDeleteGLES2(global_ui->window.gFramebufferVg);
 #endif
 
-	glfwDestroyWindow(gWindow);
-	glfwTerminate();
+	glfwDestroyWindow(global_ui->window.gWindow);
+   global_ui->window.gWindow = 0;
+
+#if 0
+   bool bTerminateGLFW = true;
+#ifdef USE_VST2
+   bTerminateGLFW = (1 == global->vst2.last_seen_instance_count);
+#endif // USE_VST2
+   if(bTerminateGLFW)
+      glfwTerminate();
+#endif
 }
 
 void windowRun() {
-	assert(gWindow);
-	gGuiFrame = 0;
-	while(!glfwWindowShouldClose(gWindow)) {
+   printf("xxx vcvrack: windowRun() ENTER\n");
+	assert(global_ui->window.gWindow);
+	global_ui->window.gGuiFrame = 0;
+	while(!glfwWindowShouldClose(global_ui->window.gWindow)
+#ifdef USE_VST2
+         && !global_ui->vst2.b_close_window
+#endif // USE_VST2
+         ) {
+
+      vst2_handle_queued_set_program_chunk();
+
 		double startTime = glfwGetTime();
-		gGuiFrame++;
+		global_ui->window.gGuiFrame++;
+      // printf("xxx vcvrack: windowRun(): startTime=%g\n", startTime);
 
 		// Poll events
 		glfwPollEvents();
 		{
 			double xpos, ypos;
-			glfwGetCursorPos(gWindow, &xpos, &ypos);
-			cursorPosCallback(gWindow, xpos, ypos);
+			glfwGetCursorPos(global_ui->window.gWindow, &xpos, &ypos);
+			cursorPosCallback(global_ui->window.gWindow, xpos, ypos);
 		}
 		mouseButtonStickyPop();
+
+#ifndef USE_VST2
 		gamepadStep();
+#endif // !USE_VST2
 
 		// Set window title
 		std::string windowTitle;
-		windowTitle = gApplicationName;
+		windowTitle = global_ui->app.gApplicationName;
 		windowTitle += " ";
-		windowTitle += gApplicationVersion;
-		if (!gRackWidget->lastPath.empty()) {
+		windowTitle += global_ui->app.gApplicationVersion;
+		if (!global_ui->app.gRackWidget->lastPath.empty()) {
 			windowTitle += " - ";
-			windowTitle += stringFilename(gRackWidget->lastPath);
+			windowTitle += stringFilename(global_ui->app.gRackWidget->lastPath);
 		}
-		if (windowTitle != lastWindowTitle) {
-			glfwSetWindowTitle(gWindow, windowTitle.c_str());
-			lastWindowTitle = windowTitle;
+		if (windowTitle != global_ui->window.lastWindowTitle) {
+			glfwSetWindowTitle(global_ui->window.gWindow, windowTitle.c_str());
+			global_ui->window.lastWindowTitle = windowTitle;
 		}
 
 		// Get desired scaling
 		float pixelRatio;
-		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
+		glfwGetWindowContentScale(global_ui->window.gWindow, &pixelRatio, NULL);
 		pixelRatio = roundf(pixelRatio);
-		if (pixelRatio != gPixelRatio) {
+		if (pixelRatio != global_ui->window.gPixelRatio) {
 			EventZoom eZoom;
-			gScene->onZoom(eZoom);
-			gPixelRatio = pixelRatio;
+			global_ui->ui.gScene->onZoom(eZoom);
+			global_ui->window.gPixelRatio = pixelRatio;
 		}
 
 		// Get framebuffer/window ratio
 		int width, height;
-		glfwGetFramebufferSize(gWindow, &width, &height);
+		glfwGetFramebufferSize(global_ui->window.gWindow, &width, &height);
 		int windowWidth, windowHeight;
-		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
-		gWindowRatio = (float)width / windowWidth;
+		glfwGetWindowSize(global_ui->window.gWindow, &windowWidth, &windowHeight);
+		global_ui->window.gWindowRatio = (float)width / windowWidth;
 
-		gScene->box.size = Vec(width, height).div(gPixelRatio);
+		global_ui->ui.gScene->box.size = Vec(width, height).div(global_ui->window.gPixelRatio);
 
 		// Step scene
-		gScene->step();
+		global_ui->ui.gScene->step();
 
 		// Render
-		bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);
+		bool visible = glfwGetWindowAttrib(global_ui->window.gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(global_ui->window.gWindow, GLFW_ICONIFIED);
 		if (visible) {
 			renderGui();
 		}
@@ -498,67 +534,85 @@ void windowRun() {
 		}
 		endTime = glfwGetTime();
 		// info("%lf fps", 1.0 / (endTime - startTime));
+
+#ifdef USE_VST2
+      if(global_ui->vst2.b_hide_window)
+      {
+         global_ui->vst2.b_hide_window = 0;
+         break;
+      }
+#endif // USE_VST2
 	}
+
+#ifdef USE_VST2
+   ::glfwSetWindowShouldClose(global_ui->window.gWindow, 0);
+   ::glfwHideWindow(global_ui->window.gWindow);
+#endif
+
+   printf("xxx vcvrack: windowRun() LEAVE\n");
 }
 
 void windowClose() {
-	glfwSetWindowShouldClose(gWindow, GLFW_TRUE);
+	glfwSetWindowShouldClose(global_ui->window.gWindow, GLFW_TRUE);
 }
 
 void windowCursorLock() {
-	if (gAllowCursorLock) {
+	if (global_ui->window.gAllowCursorLock) {
 #ifdef ARCH_MAC
-		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(global_ui->window.gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
-		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(global_ui->window.gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
 	}
 }
 
 void windowCursorUnlock() {
-	if (gAllowCursorLock) {
-		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	if (global_ui->window.gAllowCursorLock) {
+		glfwSetInputMode(global_ui->window.gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
 
 bool windowIsModPressed() {
 #ifdef ARCH_MAC
-	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
+	return glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
 #else
-	return glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+	return glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
 #endif
 }
 
 bool windowIsShiftPressed() {
-	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
+	return glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
 Vec windowGetWindowSize() {
 	int width, height;
-	glfwGetWindowSize(gWindow, &width, &height);
+	glfwGetWindowSize(global_ui->window.gWindow, &width, &height);
 	return Vec(width, height);
 }
 
 void windowSetWindowSize(Vec size) {
 	int width = size.x;
 	int height = size.y;
-	glfwSetWindowSize(gWindow, width, height);
+	glfwSetWindowSize(global_ui->window.gWindow, width, height);
 }
 
 Vec windowGetWindowPos() {
 	int x, y;
-	glfwGetWindowPos(gWindow, &x, &y);
+	glfwGetWindowPos(global_ui->window.gWindow, &x, &y);
 	return Vec(x, y);
 }
 
 void windowSetWindowPos(Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
-	glfwSetWindowPos(gWindow, x, y);
+	glfwSetWindowPos(global_ui->window.gWindow, x, y);
 }
 
 bool windowIsMaximized() {
-	return glfwGetWindowAttrib(gWindow, GLFW_MAXIMIZED);
+   if(global_ui->window.gWindow)
+      return glfwGetWindowAttrib(global_ui->window.gWindow, GLFW_MAXIMIZED);
+   else
+      return false;
 }
 
 void windowSetTheme(NVGcolor bg, NVGcolor fg) {
@@ -607,26 +661,21 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	bndSetTheme(t);
 }
 
-static int windowX = 0;
-static int windowY = 0;
-static int windowWidth = 0;
-static int windowHeight = 0;
-
 void windowSetFullScreen(bool fullScreen) {
 	if (windowGetFullScreen()) {
-		glfwSetWindowMonitor(gWindow, NULL, windowX, windowY, windowWidth, windowHeight, GLFW_DONT_CARE);
+		glfwSetWindowMonitor(global_ui->window.gWindow, NULL, global_ui->window.windowX, global_ui->window.windowY, global_ui->window.windowWidth, global_ui->window.windowHeight, GLFW_DONT_CARE);
 	}
 	else {
-		glfwGetWindowPos(gWindow, &windowX, &windowY);
-		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
+		glfwGetWindowPos(global_ui->window.gWindow, &global_ui->window.windowX, &global_ui->window.windowY);
+		glfwGetWindowSize(global_ui->window.gWindow, &global_ui->window.windowWidth, &global_ui->window.windowHeight);
 		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		glfwSetWindowMonitor(gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+		glfwSetWindowMonitor(global_ui->window.gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 	}
 }
 
 bool windowGetFullScreen() {
-	GLFWmonitor *monitor = glfwGetWindowMonitor(gWindow);
+	GLFWmonitor *monitor = glfwGetWindowMonitor(global_ui->window.gWindow);
 	return monitor != NULL;
 }
 
@@ -636,7 +685,7 @@ bool windowGetFullScreen() {
 ////////////////////
 
 Font::Font(const std::string &filename) {
-	handle = nvgCreateFont(gVg, filename.c_str(), filename.c_str());
+	handle = nvgCreateFont(global_ui->window.gVg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		info("Loaded font %s", filename.c_str());
 	}
@@ -650,10 +699,9 @@ Font::~Font() {
 }
 
 std::shared_ptr<Font> Font::load(const std::string &filename) {
-	static std::map<std::string, std::weak_ptr<Font>> cache;
-	auto sp = cache[filename].lock();
+	auto sp = global_ui->window.font_cache[filename].lock();
 	if (!sp)
-		cache[filename] = sp = std::make_shared<Font>(filename);
+		global_ui->window.font_cache[filename] = sp = std::make_shared<Font>(filename);
 	return sp;
 }
 
@@ -662,7 +710,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 ////////////////////
 
 Image::Image(const std::string &filename) {
-	handle = nvgCreateImage(gVg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+	handle = nvgCreateImage(global_ui->window.gVg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		info("Loaded image %s", filename.c_str());
 	}
@@ -673,14 +721,13 @@ Image::Image(const std::string &filename) {
 
 Image::~Image() {
 	// TODO What if handle is invalid?
-	nvgDeleteImage(gVg, handle);
+	nvgDeleteImage(global_ui->window.gVg, handle);
 }
 
 std::shared_ptr<Image> Image::load(const std::string &filename) {
-	static std::map<std::string, std::weak_ptr<Image>> cache;
-	auto sp = cache[filename].lock();
+	auto sp = global_ui->window.image_cache[filename].lock();
 	if (!sp)
-		cache[filename] = sp = std::make_shared<Image>(filename);
+		global_ui->window.image_cache[filename] = sp = std::make_shared<Image>(filename);
 	return sp;
 }
 
@@ -703,10 +750,9 @@ SVG::~SVG() {
 }
 
 std::shared_ptr<SVG> SVG::load(const std::string &filename) {
-	static std::map<std::string, std::weak_ptr<SVG>> cache;
-	auto sp = cache[filename].lock();
+	auto sp = global_ui->window.svg_cache[filename].lock();
 	if (!sp)
-		cache[filename] = sp = std::make_shared<SVG>(filename);
+		global_ui->window.svg_cache[filename] = sp = std::make_shared<SVG>(filename);
 	return sp;
 }
 

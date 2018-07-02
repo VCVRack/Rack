@@ -1,15 +1,15 @@
+#include "global_pre.hpp"
 #include "settings.hpp"
 #include "app.hpp"
 #include "window.hpp"
 #include "engine.hpp"
 #include "plugin.hpp"
 #include <jansson.h>
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
-
-
-bool gSkipAutosaveOnLaunch = false;
 
 
 static json_t *settingsToJson() {
@@ -17,7 +17,7 @@ static json_t *settingsToJson() {
 	json_t *rootJ = json_object();
 
 	// token
-	json_t *tokenJ = json_string(gToken.c_str());
+	json_t *tokenJ = json_string(global->plugin.gToken.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
 	if (!windowIsMaximized()) {
@@ -33,22 +33,22 @@ static json_t *settingsToJson() {
 	}
 
 	// opacity
-	float opacity = gToolbar->wireOpacitySlider->value;
+	float opacity = global_ui->app.gToolbar->wireOpacitySlider->value;
 	json_t *opacityJ = json_real(opacity);
 	json_object_set_new(rootJ, "wireOpacity", opacityJ);
 
 	// tension
-	float tension = gToolbar->wireTensionSlider->value;
+	float tension = global_ui->app.gToolbar->wireTensionSlider->value;
 	json_t *tensionJ = json_real(tension);
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
 	// zoom
-	float zoom = gRackScene->zoomWidget->zoom;
+	float zoom = global_ui->app.gRackScene->zoomWidget->zoom;
 	json_t *zoomJ = json_real(zoom);
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
 	// allowCursorLock
-	json_t *allowCursorLockJ = json_boolean(gAllowCursorLock);
+	json_t *allowCursorLockJ = json_boolean(global_ui->window.gAllowCursorLock);
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
 	// sampleRate
@@ -56,11 +56,11 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// lastPath
-	json_t *lastPathJ = json_string(gRackWidget->lastPath.c_str());
+	json_t *lastPathJ = json_string(global_ui->app.gRackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
 	// skipAutosaveOnLaunch
-	if (gSkipAutosaveOnLaunch) {
+	if (global->settings.gSkipAutosaveOnLaunch) {
 		json_object_set_new(rootJ, "skipAutosaveOnLaunch", json_true());
 	}
 
@@ -68,10 +68,10 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "moduleBrowser", appModuleBrowserToJson());
 
 	// powerMeter
-	json_object_set_new(rootJ, "powerMeter", json_boolean(gPowerMeter));
+	json_object_set_new(rootJ, "powerMeter", json_boolean(global->gPowerMeter));
 
 	// checkVersion
-	json_object_set_new(rootJ, "checkVersion", json_boolean(gCheckVersion));
+	json_object_set_new(rootJ, "checkVersion", json_boolean(global_ui->app.gCheckVersion));
 
 	return rootJ;
 }
@@ -80,7 +80,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// token
 	json_t *tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
-		gToken = json_string_value(tokenJ);
+		global->plugin.gToken = json_string_value(tokenJ);
 
 	// windowSize
 	json_t *windowSizeJ = json_object_get(rootJ, "windowSize");
@@ -101,24 +101,29 @@ static void settingsFromJson(json_t *rootJ) {
 	// opacity
 	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");
 	if (opacityJ)
-		gToolbar->wireOpacitySlider->value = json_number_value(opacityJ);
+		global_ui->app.gToolbar->wireOpacitySlider->value = json_number_value(opacityJ);
 
 	// tension
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
-		gToolbar->wireTensionSlider->value = json_number_value(tensionJ);
+		global_ui->app.gToolbar->wireTensionSlider->value = json_number_value(tensionJ);
 
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ) {
-		gRackScene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
-		gToolbar->zoomSlider->setValue(json_number_value(zoomJ) * 100.0);
+		global_ui->app.gRackScene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
+		global_ui->app.gToolbar->zoomSlider->setValue(json_number_value(zoomJ) * 100.0);
 	}
 
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
-		gAllowCursorLock = json_is_true(allowCursorLockJ);
+   {
+		global_ui->window.gAllowCursorLock = json_is_true(allowCursorLockJ);
+#ifdef USE_VST2
+      global_ui->window.gAllowCursorLock = 0;
+#endif // USE_VST2
+   }
 
 	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
@@ -130,12 +135,12 @@ static void settingsFromJson(json_t *rootJ) {
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
 	if (lastPathJ)
-		gRackWidget->lastPath = json_string_value(lastPathJ);
+		global_ui->app.gRackWidget->lastPath = json_string_value(lastPathJ);
 
 	// skipAutosaveOnLaunch
 	json_t *skipAutosaveOnLaunchJ = json_object_get(rootJ, "skipAutosaveOnLaunch");
 	if (skipAutosaveOnLaunchJ)
-		gSkipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
+		global->settings.gSkipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
 
 	// moduleBrowser
 	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
@@ -145,12 +150,12 @@ static void settingsFromJson(json_t *rootJ) {
 	// powerMeter
 	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
 	if (powerMeterJ)
-		gPowerMeter = json_boolean_value(powerMeterJ);
+		global->gPowerMeter = json_boolean_value(powerMeterJ);
 
 	// checkVersion
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
 	if (checkVersionJ)
-		gCheckVersion = json_boolean_value(checkVersionJ);
+		global_ui->app.gCheckVersion = json_boolean_value(checkVersionJ);
 }
 
 

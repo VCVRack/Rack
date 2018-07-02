@@ -1,0 +1,264 @@
+
+** July 2nd, 2018
+- add module Template.MyModule
+- clean up for GITHub release
+
+
+** July 1st, 2018
+- add VST parameter support (set/get/query name)
+   - added "vst2_unique_param_base_id" JSON module parameter
+   - the plugin always reports 9999 parameters
+   - known issue: does not work in Reason since it bails out when a plugin has more than 128 params (IIRC)
+- add module Bogaudio.VCO
+- add module Bogaudio.XCO
+- add module Bogaudio.Additator
+- add module Bogaudio.FMOp
+- add module Bogaudio.LFO
+- add module Bogaudio.EightFO
+- add module Bogaudio.DADSRH
+- add module Bogaudio.DADSRHPlus
+- add module Bogaudio.DGate
+- add module Bogaudio.Shaper
+- add module Bogaudio.ShaperPlus
+- add module Bogaudio.ADSR
+- add module Bogaudio.Follow
+- add module Bogaudio.Mix4
+- add module Bogaudio.Mix8
+- add module Bogaudio.VCM
+- add module Bogaudio.Pan
+- add module Bogaudio.XFade
+- add module Bogaudio.VCA
+- add module Bogaudio.VCAmp
+- add module Bogaudio.Analyzer
+- add module Bogaudio.VU
+- add module Bogaudio.Detune
+- add module Bogaudio.Stack
+- add module Bogaudio.Reftone
+- add module Bogaudio.Bool
+- add module Bogaudio.CVD
+- add module Bogaudio.FlipFlop
+- add module Bogaudio.Manual
+- add module Bogaudio.Mult
+- add module Bogaudio.Noise
+- add module Bogaudio.Offset
+- add module Bogaudio.SampleHold
+- add module Bogaudio.Sums
+- add module Bogaudio.Switch
+- add module Bogaudio.Lag
+- add module Bogaudio.RM
+- add module Bogaudio.Test
+- add module Bogaudio.Test2
+- add module Bogaudio.ThreeHP
+- add module Bogaudio.SixHP
+- add module Bogaudio.EightHP
+- add module Bogaudio.TenHP
+- add module Bogaudio.TwelveHP
+- add module Bogaudio.ThirteenHP
+- add module Bogaudio.FifteenHP
+- add module Bogaudio.EighteenHP
+- add module Bogaudio.TwentyHP
+- add module Bogaudio.TwentyTwoHP
+- add module Bogaudio.TwentyFiveHP
+- add module Bogaudio.ThirtyHP
+- add module cf.trSEQ
+- add module cf.LEDSEQ
+- add module cf.L3DS3Q
+- add module cf.SLIDERSEQ
+- add module cf.PLAYER
+- add module cf.STEPS
+- add module cf.METRO
+- add module cf.EACH
+- add module cf.FOUR
+- add module cf.PEAK
+- add module cf.MONO
+- add module cf.STEREO
+- add module cf.MASTER
+- add module cf.SUB
+- add module cf.CUBE
+- add module cf.PATCH
+- add module cf.LEDS
+- add module cf.DAVE
+- add module Koralfx.Beatovnik
+- add module Koralfx.Mixovnik
+- add module Koralfx.Nullovnik4
+- add module Koralfx.Nullovnik6
+- add module Koralfx.Presetovnik
+- add module Koralfx.Quantovnik
+- add module Koralfx.Scorovnik
+- add module LindenbergResearch.SimpleFilter
+- add module LindenbergResearch.MS20Filter
+- add module LindenbergResearch.AlmaFilter
+- add module LindenbergResearch.ReShaper
+- add module LindenbergResearch.BlankPanel
+- add module LindenbergResearch.BlankPanelM1
+- add module Qwelk.Automaton
+- add module Qwelk.Byte
+- add module Qwelk.Chaos
+- add module Qwelk.Column
+- add module Qwelk.Gate
+- add module Qwelk.Or
+- add module Qwelk.Not
+- add module Qwelk.Xor
+- add module Qwelk.Mix
+- add module Qwelk.News
+- add module Qwelk.Scaler
+- add module Qwelk.Wrap
+- add module Qwelk.XFade
+- add module SubmarineFree.AG106
+- add module SubmarineFree.BB120
+- add module SubmarineFree.FF110
+- add module SubmarineFree.FF120
+- add module SubmarineFree.FF212
+- add module SubmarineFree.LA108
+- add module SubmarineFree.LD106
+- add module SubmarineFree.NG112
+- add module SubmarineFree.OG106
+- add module SubmarineFree.PG112
+- add module SubmarineFree.PO101
+- add module SubmarineFree.PO102
+- add module SubmarineFree.PO204
+- add module SubmarineFree.WK101
+- add module SubmarineFree.WK205
+- add module SubmarineFree.XF101
+- add module SubmarineFree.XF102
+- add module SubmarineFree.XF104
+- add module SubmarineFree.XF201
+- add module SubmarineFree.XF202
+- add module SubmarineFree.XG106
+- add module SubmarineFree.BP101
+- add module SubmarineFree.BP102
+- add module SubmarineFree.BP104
+- add module SubmarineFree.BP108
+- add module SubmarineFree.BP110
+- add module SubmarineFree.BP112
+- add module SubmarineFree.BP116
+- add module SubmarineFree.BP120
+- add module SubmarineFree.BP124
+- add module SubmarineFree.BP132
+
+
+** June 30th, 2018
+- add module AS.ADSR
+- add module AS.AtNuVrTr
+- add module AS.BPMCalc
+- add module AS.BPMClock
+- add module AS.BlankPanel4
+- add module AS.BlankPanel6
+- add module AS.BlankPanel8
+- add module AS.BlankPanelSpecial
+- add module AS.Cv2T
+- add module AS.DelayPlusFx
+- add module AS.DelayPlusStereoFx
+- add module AS.Flow
+- add module AS.KillGate
+- add module AS.LaunchGate
+- add module AS.Merge2.5
+- add module AS.Mixer8ch
+- add module AS.MonoVUmeter
+- add module AS.Multiple2.5
+- add module AS.PhaserFx
+- add module AS.QuadVCA
+- add module AS.ReverbFx
+- add module AS.ReverbStereoFx
+- add module AS.SEQ16
+- add module AS.SawOsc
+- add module AS.SignalDelay
+- add module AS.SineOsc
+- add module AS.Steps
+- add module AS.SuperDriveFx
+- add module AS.TremoloFx
+- add module AS.TremoloStereoFx
+- add module AS.TriLFO
+- add module AS.TriggersMKI
+- add module AS.TriggersMKII
+- add module AS.VCA
+- add module AS.WaveShaper
+- add module AS.StereoVUmeter
+- add module Befaco.ABC
+- add module Befaco.DualAtenuverter
+- add module Befaco.EvenVCO
+- add module Befaco.Mixer
+- add module Befaco.Rampage
+- add module Befaco.SlewLimiter
+- add module Befaco.SpringReverb
+- add module ESeries.E340
+- add module ErraticInstruments.MPEToCV
+- add module ErraticInstruments.QuadMPEToCV
+- add module HetrickCV.TwoToFour
+- add module HetrickCV.AnalogToDigital
+- add module HetrickCV.ASR
+- add module HetrickCV.Bitshift
+- add module HetrickCV.BlankPanel
+- add module HetrickCV.Boolean3
+- add module HetrickCV.Comparator
+- add module HetrickCV.Contrast
+- add module HetrickCV.Crackle
+- add module HetrickCV.Delta
+- add module HetrickCV.DigitalToAnalog
+- add module HetrickCV.Dust
+- add module HetrickCV.Exponent
+- add module HetrickCV.FlipFlop
+- add module HetrickCV.FlipPan
+- add module HetrickCV.GateJunction
+- add module HetrickCV.LogicCombine
+- add module HetrickCV.RandomGates
+- add module HetrickCV.Rotator
+- add module HetrickCV.Scanner
+- add module HetrickCV.Waveshape
+- add module SonusModular.Addiction
+- add module SonusModular.Bitter
+- add module SonusModular.Bymidside
+- add module SonusModular.Campione
+- add module SonusModular.Chainsaw
+- add module SonusModular.Ctrl
+- add module SonusModular.Deathcrush
+- add module SonusModular.Harmony
+- add module SonusModular.Ladrone
+- add module SonusModular.Luppolo
+- add module SonusModular.Luppolo3
+- add module SonusModular.Micromacro
+- add module SonusModular.Multimulti
+- add module SonusModular.Oktagon
+- add module SonusModular.Osculum
+- add module SonusModular.Paramath
+- add module SonusModular.Piconoise
+- add module SonusModular.Pusher
+- add module SonusModular.Ringo
+- add module SonusModular.Scramblase
+- add module SonusModular.Twoff
+- add module SonusModular.Yabp
+- add module Valley.Topograph
+- add module Valley.UGraph
+- add module Valley.Dexter
+- add module Valley.Plateau
+
+
+** June 29th, 2018
+- add VSTi version of the plugin (the only difference is that it is reported as an instrument instead of an effect)
+- forward host samplerate to VCV
+- report last seen processing buffer size
+- disable mouse focus lock (can result in non-responding UI)
+- prevent windows from being closed
+- load patches in UI thread
+- add AudibleInstruments modules (Mutable Instruments Clouds, Elements, ..)
+
+
+** June 28th, 2018
+- replaced all (700+) static+global var references by TLS instance pointer
+- added MSVC+GNU make based build system
+- added support for multiple instantion (reentrant + thread safe)
+- added MIDI input support (VSTMidiDriver)
+- comes with one (statically linke) plugin ("Fundamental")
+- the plugin now also works in other DAWs (tested with Reaper and Reason 10)
+
+
+** June 25th, 2018
+- initial release
+- registered VST2 uid ('gvgy') at http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm
+- built using mingw64
+- only one instance supported
+- no program chunks
+- no MIDI
+- audio input is broken
+- comes with one (dynamically loaded) plugin ("Fundamental")
+- the VST plugin does not work in some DAWs (neither in Reaper, nor in Reason. It does work in Eureka)

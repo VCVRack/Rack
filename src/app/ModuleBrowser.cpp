@@ -1,20 +1,17 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "plugin.hpp"
 #include "window.hpp"
 #include <set>
 #include <algorithm>
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 static const float itemMargin = 2.0;
 
 
 namespace rack {
-
-
-static std::set<Model*> sFavoriteModels;
-static std::string sAuthorFilter;
-static ModelTag sTagFilter = NO_TAG;
-
 
 
 bool isMatch(std::string s, std::string search) {
@@ -92,7 +89,7 @@ struct BrowserListItem : OpaqueWidget {
 		onAction(eAction);
 		if (eAction.consumed) {
 			// deletes `this`
-			gScene->setOverlay(NULL);
+			global_ui->ui.gScene->setOverlay(NULL);
 		}
 	}
 };
@@ -113,8 +110,8 @@ struct ModelItem : BrowserListItem {
 		addChild(favoriteButton);
 
 		// Set favorite button initial state
-		auto it = sFavoriteModels.find(model);
-		if (it != sFavoriteModels.end())
+		auto it = global_ui->module_browser.sFavoriteModels.find(model);
+		if (it != global_ui->module_browser.sFavoriteModels.end())
 			favoriteButton->setValue(1);
 		favoriteButton->model = model;
 
@@ -139,10 +136,10 @@ struct ModelItem : BrowserListItem {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		if (!moduleWidget)
 			return;
-		gRackWidget->addModule(moduleWidget);
+		global_ui->app.gRackWidget->addModule(moduleWidget);
 		// Move module nearest to the mouse position
-		moduleWidget->box.pos = gRackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
-		gRackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
+		moduleWidget->box.pos = global_ui->app.gRackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
+		global_ui->app.gRackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
 	}
 };
 
@@ -284,8 +281,8 @@ struct ModuleBrowser : OpaqueWidget {
 
 	ModuleBrowser() {
 		box.size.x = 450;
-		sAuthorFilter = "";
-		sTagFilter = NO_TAG;
+		global_ui->module_browser.sAuthorFilter = "";
+		global_ui->module_browser.sTagFilter = NO_TAG;
 
 		// Search
 		searchField	= new SearchModuleField();
@@ -304,7 +301,7 @@ struct ModuleBrowser : OpaqueWidget {
 		addChild(moduleScroll);
 
 		// Collect authors
-		for (Plugin *plugin : gPlugins) {
+		for (Plugin *plugin : global->plugin.gPlugins) {
 			for (Model *model : plugin->models) {
 				// Insert author
 				if (!model->author.empty())
@@ -331,10 +328,10 @@ struct ModuleBrowser : OpaqueWidget {
 	}
 
 	bool isModelFiltered(Model *model) {
-		if (!sAuthorFilter.empty() && model->author != sAuthorFilter)
+		if (!global_ui->module_browser.sAuthorFilter.empty() && model->author != global_ui->module_browser.sAuthorFilter)
 			return false;
-		if (sTagFilter != NO_TAG) {
-			auto it = std::find(model->tags.begin(), model->tags.end(), sTagFilter);
+		if (global_ui->module_browser.sTagFilter != NO_TAG) {
+			auto it = std::find(model->tags.begin(), model->tags.end(), global_ui->module_browser.sTagFilter);
 			if (it == model->tags.end())
 				return false;
 		}
@@ -345,16 +342,16 @@ struct ModuleBrowser : OpaqueWidget {
 		std::string search = searchField->text;
 		moduleList->clearChildren();
 		moduleList->selected = 0;
-		bool filterPage = !(sAuthorFilter.empty() && sTagFilter == NO_TAG);
+		bool filterPage = !(global_ui->module_browser.sAuthorFilter.empty() && global_ui->module_browser.sTagFilter == NO_TAG);
 
 		if (!filterPage) {
 			// Favorites
-			if (!sFavoriteModels.empty()) {
+			if (!global_ui->module_browser.sFavoriteModels.empty()) {
 				SeparatorItem *item = new SeparatorItem();
 				item->setText("Favorites");
 				moduleList->addChild(item);
 			}
-			for (Model *model : sFavoriteModels) {
+			for (Model *model : global_ui->module_browser.sFavoriteModels) {
 				if (isModelFiltered(model) && isModelMatch(model, search)) {
 					ModelItem *item = new ModelItem();
 					item->setModel(model);
@@ -402,14 +399,14 @@ struct ModuleBrowser : OpaqueWidget {
 			}
 			else if (filterPage) {
 				SeparatorItem *item = new SeparatorItem();
-				if (!sAuthorFilter.empty())
-					item->setText(sAuthorFilter);
-				else if (sTagFilter != NO_TAG)
-					item->setText("Tag: " + gTagNames[sTagFilter]);
+				if (!global_ui->module_browser.sAuthorFilter.empty())
+					item->setText(global_ui->module_browser.sAuthorFilter);
+				else if (global_ui->module_browser.sTagFilter != NO_TAG)
+					item->setText("Tag: " + gTagNames[global_ui->module_browser.sTagFilter]);
 				moduleList->addChild(item);
 			}
 			// Modules
-			for (Plugin *plugin : gPlugins) {
+			for (Plugin *plugin : global->plugin.gPlugins) {
 				for (Model *model : plugin->models) {
 					if (isModelFiltered(model) && isModelMatch(model, search)) {
 						ModelItem *item = new ModelItem();
@@ -428,7 +425,7 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleScroll->box.size.y = min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
 		box.size.y = min(box.size.y, moduleScroll->box.getBottomRight().y);
 
-		gFocusedWidget = searchField;
+		global_ui->widgets.gFocusedWidget = searchField;
 		Widget::step();
 	}
 };
@@ -438,7 +435,7 @@ struct ModuleBrowser : OpaqueWidget {
 
 void AuthorItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	sAuthorFilter = author;
+	global_ui->module_browser.sAuthorFilter = author;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
@@ -446,7 +443,7 @@ void AuthorItem::onAction(EventAction &e) {
 
 void TagItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	sTagFilter = tag;
+	global_ui->module_browser.sTagFilter = tag;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
@@ -454,8 +451,8 @@ void TagItem::onAction(EventAction &e) {
 
 void ClearFilterItem::onAction(EventAction &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-	sAuthorFilter = "";
-	sTagFilter = NO_TAG;
+	global_ui->module_browser.sAuthorFilter = "";
+	global_ui->module_browser.sTagFilter = NO_TAG;
 	moduleBrowser->refreshSearch();
 	e.consumed = false;
 }
@@ -464,12 +461,12 @@ void FavoriteRadioButton::onAction(EventAction &e) {
 	if (!model)
 		return;
 	if (value) {
-		sFavoriteModels.insert(model);
+		global_ui->module_browser.sFavoriteModels.insert(model);
 	}
 	else {
-		auto it = sFavoriteModels.find(model);
-		if (it != sFavoriteModels.end())
-			sFavoriteModels.erase(it);
+		auto it = global_ui->module_browser.sFavoriteModels.find(model);
+		if (it != global_ui->module_browser.sFavoriteModels.end())
+			global_ui->module_browser.sFavoriteModels.erase(it);
 	}
 
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
@@ -491,7 +488,7 @@ void SearchModuleField::onTextChange() {
 void SearchModuleField::onKey(EventKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_ESCAPE: {
-			gScene->setOverlay(NULL);
+			global_ui->ui.gScene->setOverlay(NULL);
 			e.consumed = true;
 			return;
 		} break;
@@ -538,14 +535,14 @@ void appModuleBrowserCreate() {
 	ModuleBrowser *moduleBrowser = new ModuleBrowser();
 	overlay->addChild(moduleBrowser);
 
-	gScene->setOverlay(overlay);
+	global_ui->ui.gScene->setOverlay(overlay);
 }
 
 json_t *appModuleBrowserToJson() {
 	json_t *rootJ = json_object();
 
 	json_t *favoritesJ = json_array();
-	for (Model *model : sFavoriteModels) {
+	for (Model *model : global_ui->module_browser.sFavoriteModels) {
 		json_t *modelJ = json_object();
 		json_object_set_new(modelJ, "plugin", json_string(model->plugin->slug.c_str()));
 		json_object_set_new(modelJ, "model", json_string(model->slug.c_str()));
@@ -571,7 +568,7 @@ void appModuleBrowserFromJson(json_t *rootJ) {
 			Model *model = pluginGetModel(pluginSlug, modelSlug);
 			if (!model)
 				continue;
-			sFavoriteModels.insert(model);
+			global_ui->module_browser.sFavoriteModels.insert(model);
 		}
 	}
 }

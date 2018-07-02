@@ -1,5 +1,7 @@
+#include "global_pre.hpp"
 #include "ui.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -109,7 +111,7 @@ void ScrollWidget::step() {
 
 void ScrollWidget::onMouseMove(EventMouseMove &e) {
 	// Scroll with arrow keys
-	if (!gFocusedWidget) {
+	if (!global_ui->widgets.gFocusedWidget) {
 		float arrowSpeed = 30.0;
 		if (windowIsShiftPressed() && windowIsModPressed())
 			arrowSpeed /= 16.0;
@@ -118,16 +120,16 @@ void ScrollWidget::onMouseMove(EventMouseMove &e) {
 		else if (windowIsModPressed())
 			arrowSpeed /= 4.0;
 
-		if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			offset.x -= arrowSpeed;
 		}
-		if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 			offset.x += arrowSpeed;
 		}
-		if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) {
+		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_UP) == GLFW_PRESS) {
 			offset.y -= arrowSpeed;
 		}
-		if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) {
 			offset.y += arrowSpeed;
 		}
 	}

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="26.000004mm"
+   height="26.001146mm"
+   viewBox="0 0 26.000004 26.001146"
+   version="1.1"
+   id="svg113936"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   sodipodi:docname="BefacoBigKnob.svg">
+  <defs
+     id="defs113930" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.6"
+     inkscape:cx="14.009349"
+     inkscape:cy="28.754907"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="2560"
+     inkscape:window-height="1422"
+     inkscape:window-x="0"
+     inkscape:window-y="18"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata113933">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-80.833177,-85.089003)">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#d4d4d4;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2879144"
+       d="m 106.83318,98.089007 c 0,7.179863 -5.82014,13.001143 -13.000007,13.001143 -7.179864,0 -12.999996,-5.82128 -12.999996,-13.001143 0,-7.178735 5.820132,-13.000004 12.999996,-13.000004 7.179867,0 13.000007,5.821269 13.000007,13.000004"
+       id="path109718" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2879144"
+       d="m 103.36809,92.943667 c -0.6377,-1.189896 -1.49355,-2.244833 -2.51139,-3.115323 -1.962536,0.275543 -3.99481,-0.701791 -5.009247,-2.403411 -0.652299,-0.123713 -1.32599,-0.190069 -2.01428,-0.190069 -0.688287,0 -1.360855,0.06636 -2.014277,0.190069 -1.014438,1.70162 -3.045587,2.678954 -5.00925,2.403411 -1.017835,0.87049 -1.873689,1.925427 -2.51139,3.115323 0.726523,1.878194 0.208076,4.120774 -1.270883,5.489499 0.04838,1.363087 0.345295,2.662074 0.851391,3.850844 1.968154,0.59045 3.433609,2.43604 3.561817,4.48854 1.042568,0.76591 2.227968,1.34736 3.507834,1.7005 1.694867,-1.19327 4.074651,-1.19327 5.769516,0 1.279864,-0.35314 2.465268,-0.93459 3.508959,-1.7005 0.12709,-2.0525 1.59254,-3.89809 3.56182,-4.48854 0.50609,-1.18877 0.80302,-2.487757 0.85024,-3.850844 -1.47894,-1.368725 -1.99626,-3.611305 -1.27086,-5.489499"
+       id="path109720" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2879144"
+       d="m 94.2909,86.161932 c 0,0.253052 -0.205801,0.456617 -0.457727,0.456617 -0.251924,0 -0.456603,-0.203565 -0.456603,-0.456617 0,-0.253046 0.204679,-0.456614 0.456603,-0.456614 0.251926,0 0.457727,0.203568 0.457727,0.456614"
+       id="path109722" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2879144"
+       d="m 94.2909,98.090134 h -0.91433 v -9.861065 h 0.91433 z m 0,0"
+       id="path109724" />
+  </g>
+</svg>

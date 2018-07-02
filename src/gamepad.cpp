@@ -1,3 +1,4 @@
+#ifndef USE_VST2
 #include "gamepad.hpp"
 #include <GLFW/glfw3.h>
 
@@ -113,3 +114,4 @@ void gamepadStep() {
 
 
 } // namespace rack
+#endif // USE_VST2

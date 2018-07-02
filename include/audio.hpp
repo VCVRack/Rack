@@ -2,12 +2,16 @@
 
 #include <jansson.h>
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
 #include <RtAudio.h>
 #pragma GCC diagnostic pop
+#else
+#include <RtAudio.h>
+#endif // __GNUC__
 
 
 namespace rack {

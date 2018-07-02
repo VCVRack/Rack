@@ -1,6 +1,8 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "asset.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -85,12 +87,12 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 		NVGcolor highlightColor = color;
 		highlightColor.a = 0.5;
 		int begin = min(cursor, selection);
-		int end = (this == gFocusedWidget) ? max(cursor, selection) : -1;
+		int end = (this == global_ui->widgets.gFocusedWidget) ? max(cursor, selection) : -1;
 		bndIconLabelCaret(vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, 12, text.c_str(), highlightColor, begin, end);
 
-		bndSetFont(gGuiFont->handle);
+		bndSetFont(global_ui->window.gGuiFont->handle);
 	}
 
 	nvgResetScissor(vg);
@@ -98,10 +100,10 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 
 int LedDisplayTextField::getTextPosition(Vec mousePos) {
 	bndSetFont(font->handle);
-	int textPos = bndIconLabelTextPosition(gVg, textOffset.x, textOffset.y,
+	int textPos = bndIconLabelTextPosition(global_ui->window.gVg, textOffset.x, textOffset.y,
 		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 		-1, 12, text.c_str(), mousePos.x, mousePos.y);
-	bndSetFont(gGuiFont->handle);
+	bndSetFont(global_ui->window.gGuiFont->handle);
 	return textPos;
 }
 

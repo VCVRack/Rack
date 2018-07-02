@@ -3,12 +3,17 @@
 #include "midi.hpp"
 #include <map>
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
 #include "rtmidi/RtMidi.h"
 #pragma GCC diagnostic pop
+#else
+#include "rtmidi/RtMidi.h"
+#endif // __GNUC__
+
 
 
 namespace rack {

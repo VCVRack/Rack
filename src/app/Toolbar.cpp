@@ -1,7 +1,10 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "window.hpp"
 #include "engine.hpp"
 #include "asset.hpp"
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -15,13 +18,13 @@ struct TooltipIconButton : IconButton {
 			tooltip = new Tooltip();
 			tooltip->box.pos = getAbsoluteOffset(Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = tooltipText;
-			gScene->addChild(tooltip);
+			global_ui->ui.gScene->addChild(tooltip);
 		}
 		IconButton::onMouseEnter(e);
 	}
 	void onMouseLeave(EventMouseLeave &e) override {
 		if (tooltip) {
-			gScene->removeChild(tooltip);
+			global_ui->ui.gScene->removeChild(tooltip);
 			delete tooltip;
 			tooltip = NULL;
 		}
@@ -35,7 +38,7 @@ struct NewButton : TooltipIconButton {
 		tooltipText = "New (" WINDOW_MOD_KEY_NAME "+N)";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->reset();
+		global_ui->app.gRackWidget->reset();
 	}
 };
 
@@ -45,7 +48,7 @@ struct OpenButton : TooltipIconButton {
 		tooltipText = "Open  (" WINDOW_MOD_KEY_NAME "+O)";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->loadDialog();
+		global_ui->app.gRackWidget->openDialog();
 	}
 };
 
@@ -55,7 +58,7 @@ struct SaveButton : TooltipIconButton {
 		tooltipText = "Save (" WINDOW_MOD_KEY_NAME "+S)";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->saveDialog();
+		global_ui->app.gRackWidget->saveDialog();
 	}
 };
 
@@ -65,7 +68,7 @@ struct SaveAsButton : TooltipIconButton {
 		tooltipText = "Save as (" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->saveAsDialog();
+		global_ui->app.gRackWidget->saveAsDialog();
 	}
 };
 
@@ -75,7 +78,7 @@ struct RevertButton : TooltipIconButton {
 		tooltipText = "Revert";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->revert();
+		global_ui->app.gRackWidget->revert();
 	}
 };
 
@@ -85,7 +88,7 @@ struct DisconnectCablesButton : TooltipIconButton {
 		tooltipText = "Disconnect cables";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->disconnect();
+		global_ui->app.gRackWidget->disconnect();
 	}
 };
 
@@ -95,13 +98,13 @@ struct PowerMeterButton : TooltipIconButton {
 		tooltipText = "Toggle power meter (see manual for explanation)";
 	}
 	void onAction(EventAction &e) override {
-		gPowerMeter ^= true;
+		global->gPowerMeter ^= true;
 	}
 };
 
 struct EnginePauseItem : MenuItem {
 	void onAction(EventAction &e) override {
-		gPaused ^= true;
+		global->gPaused ^= true;
 	}
 };
 
@@ -109,7 +112,7 @@ struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction(EventAction &e) override {
 		engineSetSampleRate(sampleRate);
-		gPaused = false;
+		global->gPaused = false;
 	}
 };
 
@@ -119,14 +122,14 @@ struct SampleRateButton : TooltipIconButton {
 		tooltipText = "Internal sample rate";
 	}
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		menu->addChild(MenuLabel::create("Internal sample rate"));
 
 		EnginePauseItem *pauseItem = new EnginePauseItem();
-		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
+		pauseItem->text = global->gPaused ? "Resume engine" : "Pause engine";
 		menu->addChild(pauseItem);
 
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
@@ -146,14 +149,14 @@ struct RackLockButton : TooltipIconButton {
 		tooltipText = "Lock modules";
 	}
 	void onAction(EventAction &e) override {
-		gRackWidget->lockModules ^= true;
+		global_ui->app.gRackWidget->lockModules ^= true;
 	}
 };
 
 struct ZoomSlider : Slider {
 	void onAction(EventAction &e) override {
 		Slider::onAction(e);
-		gRackScene->zoomWidget->setZoom(roundf(value) / 100.0);
+		global_ui->app.gRackScene->zoomWidget->setZoom(roundf(value) / 100.0);
 	}
 };
 

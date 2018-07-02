@@ -1,5 +1,7 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -18,7 +20,7 @@ struct PanelBorder : TransparentWidget {
 
 
 void SVGPanel::step() {
-	if (isNear(gPixelRatio, 1.0)) {
+	if (isNear(global_ui->window.gPixelRatio, 1.0)) {
 		// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 		oversample = 2.0;
 	}

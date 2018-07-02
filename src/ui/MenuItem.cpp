@@ -1,5 +1,7 @@
+#include "global_pre.hpp"
 #include "ui.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -10,7 +12,7 @@ namespace rack {
 
 void MenuItem::draw(NVGcontext *vg) {
 	// Get state
-	BNDwidgetState state = (gHoveredWidget == this) ? BND_HOVER : BND_DEFAULT;
+	BNDwidgetState state = (global_ui->widgets.gHoveredWidget == this) ? BND_HOVER : BND_DEFAULT;
 	Menu *parentMenu = dynamic_cast<Menu*>(parent);
 	if (parentMenu && parentMenu->activeEntry == this) {
 		state = BND_ACTIVE;
@@ -28,7 +30,7 @@ void MenuItem::step() {
 	const float rightPadding = 10.0;
 	// HACK use gVg from the window.
 	// All this does is inspect the font, so it shouldn't modify gVg and should work when called from a FramebufferWidget for example.
-	box.size.x = bndLabelWidth(gVg, -1, text.c_str()) + bndLabelWidth(gVg, -1, rightText.c_str()) + rightPadding;
+	box.size.x = bndLabelWidth(global_ui->window.gVg, -1, text.c_str()) + bndLabelWidth(global_ui->window.gVg, -1, rightText.c_str()) + rightPadding;
 	Widget::step();
 }
 
@@ -58,7 +60,7 @@ void MenuItem::onDragDrop(EventDragDrop &e) {
 	onAction(eAction);
 	if (eAction.consumed) {
 		// deletes `this`
-		gScene->setOverlay(NULL);
+		global_ui->ui.gScene->setOverlay(NULL);
 	}
 }
 

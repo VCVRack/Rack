@@ -1,4 +1,6 @@
+#include "global_pre.hpp"
 #include "Core.hpp"
+#include "global_ui.hpp"
 
 using namespace rack;
 
@@ -17,14 +19,14 @@ struct ModuleResizeHandle : Widget {
 		}
 	}
 	void onDragStart(EventDragStart &e) override {
-		dragX = gRackWidget->lastMousePos.x;
+		dragX = global_ui->app.gRackWidget->lastMousePos.x;
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 		originalBox = m->box;
 	}
 	void onDragMove(EventDragMove &e) override {
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
-		float newDragX = gRackWidget->lastMousePos.x;
+		float newDragX = global_ui->app.gRackWidget->lastMousePos.x;
 		float deltaX = newDragX - dragX;
 
 		Rect newBox = originalBox;
@@ -40,7 +42,7 @@ struct ModuleResizeHandle : Widget {
 			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
-		gRackWidget->requestModuleBox(m, newBox);
+		global_ui->app.gRackWidget->requestModuleBox(m, newBox);
 	}
 	void draw(NVGcontext *vg) override {
 		for (float x = 5.0; x <= 10.0; x += 5.0) {
@@ -120,4 +122,8 @@ struct BlankWidget : ModuleWidget {
 };
 
 
-Model *modelBlank = Model::create<Module, BlankWidget>("Core", "Blank", "Blank", BLANK_TAG);
+RACK_PLUGIN_MODEL_INIT(Core, Blank) {
+   Model *modelBlank = Model::create<Module, BlankWidget>("Core", "Blank", "Blank", BLANK_TAG);
+   return modelBlank;
+}
+

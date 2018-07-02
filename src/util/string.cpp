@@ -1,7 +1,10 @@
+#include "global_pre.hpp"
 #include "util/common.hpp"
 #include <stdarg.h>
 #include <algorithm>
+#ifdef YAC_GCC
 #include <libgen.h> // for dirname and basename
+#endif
 
 
 namespace rack {
@@ -50,16 +53,44 @@ bool stringEndsWith(std::string str, std::string suffix) {
 }
 
 std::string stringDirectory(std::string path) {
+#ifdef YAC_POSIX
 	char *pathDup = strdup(path.c_str());
 	std::string directory = dirname(pathDup);
 	free(pathDup);
+#elif defined(YAC_WIN32)
+   char drive[_MAX_DRIVE];
+   char dir  [_MAX_DIR];
+   char file [_MAX_FNAME];
+   char ext  [_MAX_EXT];
+   char dirName [_MAX_DRIVE + _MAX_DIR + _MAX_EXT];
+   _splitpath(path.c_str(), drive, dir, file, ext);
+   sprintf(dirName, "%s%s", drive, dir);
+   printf("xxx dirName=\"%s\"\n", dirName);
+   std::string directory = dirName;
+#else
+#error dirname not implemented
+#endif
 	return directory;
 }
 
 std::string stringFilename(std::string path) {
+#ifdef YAC_POSIX
 	char *pathDup = strdup(path.c_str());
 	std::string filename = basename(pathDup);
 	free(pathDup);
+#elif defined(YAC_WIN32)
+   char drive[_MAX_DRIVE];
+   char dir  [_MAX_DIR];
+   char file [_MAX_FNAME];
+   char ext  [_MAX_EXT];
+   char fileName [_MAX_FNAME + _MAX_EXT];
+   _splitpath(path.c_str(), drive, dir, file, ext);
+   sprintf(fileName, "%s%s", file, ext);
+   // printf("xxx fileName=\"%s\"\n", fileName);
+   std::string filename = fileName;
+#else
+#error basename not implemented
+#endif
 	return filename;
 }
 

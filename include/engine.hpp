@@ -49,6 +49,10 @@ struct Output {
 
 
 struct Module {
+#ifdef USE_VST2
+   // assigned when module is added to engine (see engine.cpp:engineAddModule())
+   int vst2_unique_param_base_id;
+#endif // USE_VST2
 	std::vector<Param> params;
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;
@@ -118,26 +122,19 @@ void engineStop();
 /** Does not transfer pointer ownership */
 void engineAddModule(Module *module);
 void engineRemoveModule(Module *module);
-void engineResetModule(Module *module);
-void engineRandomizeModule(Module *module);
 /** Does not transfer pointer ownership */
 void engineAddWire(Wire *wire);
 void engineRemoveWire(Wire *wire);
+#ifdef USE_VST2
+void engineSetParam(Module *module, int paramId, float value, bool bVSTAutomate = true);
+#else
 void engineSetParam(Module *module, int paramId, float value);
+#endif
 void engineSetParamSmooth(Module *module, int paramId, float value);
 void engineSetSampleRate(float sampleRate);
 float engineGetSampleRate();
 /** Returns the inverse of the current sample rate */
 float engineGetSampleTime();
-
-
-extern bool gPaused;
-/** Plugins should not manipulate other modules or wires unless that is the entire purpose of the module.
-Your plugin needs to have a clear purpose for manipulating other modules and wires and must be done with a good UX.
-*/
-extern std::vector<Module*> gModules;
-extern std::vector<Wire*> gWires;
-extern bool gPowerMeter;
 
 
 } // namespace rack

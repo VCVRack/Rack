@@ -1,4 +1,6 @@
+#include "global_pre.hpp"
 #include "plugin.hpp"
+#include "Core/Core.hpp"
 #include "app.hpp"
 #include "asset.hpp"
 #include "util/request.hpp"
@@ -7,16 +9,26 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+
+#ifdef YAC_POSIX
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/param.h> // for MAXPATHLEN
 #include <fcntl.h>
+#include <dirent.h>
+#endif
+
 #include <thread>
 #include <stdexcept>
 
+#include "global.hpp"
+#include "global_ui.hpp"
+
+#ifndef USE_VST2
 #define ZIP_STATIC
 #include <zip.h>
+#endif // USE_VST2
 #include <jansson.h>
 
 #if ARCH_WIN
@@ -26,20 +38,16 @@
 #else
 	#include <dlfcn.h>
 #endif
-#include <dirent.h>
 
 
 namespace rack {
 
 
-std::list<Plugin*> gPlugins;
-std::string gToken;
+typedef void (*InitCallback)(Plugin *);
 
-
-static bool isDownloading = false;
-static float downloadProgress = 0.0;
-static std::string downloadName;
-static std::string loginStatus;
+#ifdef USE_VST2
+static void vst2_load_static_rack_plugins(void);
+#endif // USE_VST2
 
 
 Plugin::~Plugin() {
@@ -77,7 +85,13 @@ static bool loadPlugin(std::string path) {
 	// Load dynamic/shared library
 #if ARCH_WIN
 	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
+// #ifdef USE_VST2
+//    std::wstring libNameW = std::wstring(libraryFilename.begin(), libraryFilename.end());
+//    HINSTANCE handle = LoadLibraryW(libNameW.c_str());
+ 
+// #else
 	HINSTANCE handle = LoadLibrary(libraryFilename.c_str());
+// #endif
 	SetErrorMode(0);
 	if (!handle) {
 		int error = GetLastError();
@@ -93,7 +107,6 @@ static bool loadPlugin(std::string path) {
 #endif
 
 	// Call plugin's init() function
-	typedef void (*InitCallback)(Plugin *);
 	InitCallback initCallback;
 #if ARCH_WIN
 	initCallback = (InitCallback) GetProcAddress(handle, "init");
@@ -121,13 +134,14 @@ static bool loadPlugin(std::string path) {
 	}
 
 	// Add plugin to list
-	gPlugins.push_back(plugin);
+	global->plugin.gPlugins.push_back(plugin);
 	info("Loaded plugin %s %s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
 
 	return true;
 }
 
 static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
+#ifndef USE_VST2
 	// Check that "status" is "available"
 	json_t *statusJ = json_object_get(manifestJ, "status");
 	if (!statusJ) {
@@ -170,15 +184,18 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 #endif
 
 	std::string downloadUrl;
-	downloadUrl = gApiHost;
+	downloadUrl = global_ui->app.gApiHost;
 	downloadUrl += "/download";
 	if (dryRun) {
 		downloadUrl += "/available";
 	}
-	downloadUrl += "?token=" + requestEscape(gToken);
+	downloadUrl += "?token=" + requestEscape(global->plugin.gToken);
 	downloadUrl += "&slug=" + requestEscape(slug);
 	downloadUrl += "&version=" + requestEscape(latestVersion);
 	downloadUrl += "&arch=" + requestEscape(arch);
+#ifdef USE_VST2
+	downloadUrl += "&format=vst2";
+#endif // USE_VST2
 
 	if (dryRun) {
 		// Check if available
@@ -194,20 +211,23 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 		return json_boolean_value(successJ);
 	}
 	else {
-		downloadName = name;
-		downloadProgress = 0.0;
+		global->plugin.downloadName = name;
+		global->plugin.downloadProgress = 0.0;
 		info("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
 
 		// Download zip
 		std::string pluginDest = assetLocal("plugins/" + slug + ".zip");
-		if (!requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
+		if (!requestDownload(downloadUrl, pluginDest, &global->plugin.downloadProgress)) {
 			warn("Plugin %s download was unsuccessful", slug.c_str());
 			return false;
 		}
 
-		downloadName = "";
+		global->plugin.downloadName = "";
 		return true;
 	}
+#else
+   return false;
+#endif // USE_VST2
 }
 
 static void loadPlugins(std::string path) {
@@ -225,6 +245,7 @@ static void loadPlugins(std::string path) {
 	}
 }
 
+#ifndef USE_VST2
 /** Returns 0 if successful */
 static int extractZipHandle(zip_t *za, const char *dir) {
 	int err;
@@ -277,7 +298,9 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 	}
 	return 0;
 }
+#endif // USE_VST2
 
+#ifndef USE_VST2
 /** Returns 0 if successful */
 static int extractZip(const char *filename, const char *path) {
 	int err;
@@ -293,7 +316,9 @@ static int extractZip(const char *filename, const char *path) {
 	err = extractZipHandle(za, path);
 	return err;
 }
+#endif // USE_VST2
 
+#ifndef USE_VST2
 static void extractPackages(std::string path) {
 	std::string message;
 
@@ -316,6 +341,7 @@ static void extractPackages(std::string path) {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 }
+#endif // USE_VST2
 
 ////////////////////
 // public API
@@ -327,9 +353,10 @@ void pluginInit(bool devMode) {
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *corePlugin = new Plugin();
-	init(corePlugin);
-	gPlugins.push_back(corePlugin);
+	init_plugin_Core(corePlugin);
+	global->plugin.gPlugins.push_back(corePlugin);
 
+#ifndef USE_VST2
 	// Get local plugins directory
 	std::string localPlugins = assetLocal("plugins");
 	mkdir(localPlugins.c_str(), 0755);
@@ -345,12 +372,19 @@ void pluginInit(bool devMode) {
 	}
 
 	// Extract packages and load plugins
+#ifndef USE_VST2
 	extractPackages(localPlugins);
+#endif // USE_VST2
 	loadPlugins(localPlugins);
+
+#else
+   vst2_load_static_rack_plugins();
+#endif // USE_VST2
 }
 
 void pluginDestroy() {
-	for (Plugin *plugin : gPlugins) {
+#ifndef USE_VST2
+	for (Plugin *plugin : global->plugin.gPlugins) {
 		// Free library handle
 #if ARCH_WIN
 		if (plugin->handle)
@@ -364,28 +398,30 @@ void pluginDestroy() {
 		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
 		// delete plugin;
 	}
-	gPlugins.clear();
+#endif // USE_VST2
+	global->plugin.gPlugins.clear();
 }
 
 bool pluginSync(bool dryRun) {
-	if (gToken.empty())
+#ifndef USE_VST2
+	if (global->plugin.gToken.empty())
 		return false;
 
 	bool available = false;
 
 	if (!dryRun) {
-		isDownloading = true;
-		downloadProgress = 0.0;
-		downloadName = "Updating plugins...";
+		global->plugin.isDownloading = true;
+		global->plugin.downloadProgress = 0.0;
+		global->plugin.downloadName = "Updating plugins...";
 	}
 	defer({
-		isDownloading = false;
+      global->plugin.isDownloading = false;
 	});
 
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
-	json_object_set(pluginsReqJ, "token", json_string(gToken.c_str()));
-	json_t *pluginsResJ = requestJson(METHOD_GET, gApiHost + "/plugins", pluginsReqJ);
+	json_object_set(pluginsReqJ, "token", json_string(global->plugin.gToken.c_str()));
+	json_t *pluginsResJ = requestJson(METHOD_GET, global_ui->app.gApiHost + "/plugins", pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		warn("Request for user's plugins failed");
@@ -402,7 +438,7 @@ bool pluginSync(bool dryRun) {
 	}
 
 	// Get community manifests
-	json_t *manifestsResJ = requestJson(METHOD_GET, gApiHost + "/community/manifests", NULL);
+	json_t *manifestsResJ = requestJson(METHOD_GET, global_ui->app.gApiHost + "/community/manifests", NULL);
 	if (!manifestsResJ) {
 		warn("Request for community manifests failed");
 		return false;
@@ -444,35 +480,40 @@ bool pluginSync(bool dryRun) {
 	}
 
 	return available;
+#else
+   return false;
+#endif // USE_VST2
 }
 
 void pluginLogIn(std::string email, std::string password) {
+#ifndef USE_VST2
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	json_t *resJ = requestJson(METHOD_POST, gApiHost + "/token", reqJ);
+	json_t *resJ = requestJson(METHOD_POST, global_ui->app.gApiHost + "/token", reqJ);
 	json_decref(reqJ);
 
 	if (resJ) {
 		json_t *errorJ = json_object_get(resJ, "error");
 		if (errorJ) {
 			const char *errorStr = json_string_value(errorJ);
-			loginStatus = errorStr;
+			global->plugin.loginStatus = errorStr;
 		}
 		else {
 			json_t *tokenJ = json_object_get(resJ, "token");
 			if (tokenJ) {
 				const char *tokenStr = json_string_value(tokenJ);
-				gToken = tokenStr;
-				loginStatus = "";
+				global->plugin.gToken = tokenStr;
+				global->plugin.loginStatus = "";
 			}
 		}
 		json_decref(resJ);
 	}
+#endif
 }
 
 void pluginLogOut() {
-	gToken = "";
+	global->plugin.gToken = "";
 }
 
 void pluginCancelDownload() {
@@ -480,27 +521,28 @@ void pluginCancelDownload() {
 }
 
 bool pluginIsLoggedIn() {
-	return gToken != "";
+	return global->plugin.gToken != "";
 }
 
 bool pluginIsDownloading() {
-	return isDownloading;
+	return global->plugin.isDownloading;
 }
 
 float pluginGetDownloadProgress() {
-	return downloadProgress;
+	return global->plugin.downloadProgress;
 }
 
 std::string pluginGetDownloadName() {
-	return downloadName;
+	return global->plugin.downloadName;
 }
 
 std::string pluginGetLoginStatus() {
-	return loginStatus;
+	return global->plugin.loginStatus;
 }
 
 Plugin *pluginGetPlugin(std::string pluginSlug) {
-	for (Plugin *plugin : gPlugins) {
+	for (Plugin *plugin : global->plugin.gPlugins) {
+      // printf("xxx pluginGetPlugin: find pluginSlug=\"%s\" current=\"%s\"\n", pluginSlug.c_str(), plugin->slug.c_str());
 		if (plugin->slug == pluginSlug) {
 			return plugin;
 		}
@@ -510,15 +552,85 @@ Plugin *pluginGetPlugin(std::string pluginSlug) {
 
 Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
 	Plugin *plugin = pluginGetPlugin(pluginSlug);
+   // printf("xxx vstrack_plugin: plugSlug=\"%s\" modelSlug=\"%s\" => plugin=%p\n", pluginSlug.c_str(), modelSlug.c_str(), plugin);
 	if (plugin) {
 		for (Model *model : plugin->models) {
 			if (model->slug == modelSlug) {
+            // printf("xxx vstrack_plugin: plugSlug=\"%s\" modelSlug=\"%s\" => plugin=%p model=%p\n", pluginSlug.c_str(), modelSlug.c_str(), plugin, model);
 				return model;
 			}
 		}
 	}
 	return NULL;
 }
+
+
+
+#ifdef USE_VST2
+extern "C" {
+extern void init_plugin_AS                 (rack::Plugin *p);
+extern void init_plugin_AudibleInstruments (rack::Plugin *p);
+extern void init_plugin_Befaco             (rack::Plugin *p);
+extern void init_plugin_Bogaudio           (rack::Plugin *p);
+extern void init_plugin_cf                 (rack::Plugin *p);
+extern void init_plugin_ErraticInstruments (rack::Plugin *p);
+extern void init_plugin_ESeries            (rack::Plugin *p);
+extern void init_plugin_Fundamental        (rack::Plugin *p);
+extern void init_plugin_HetrickCV          (rack::Plugin *p);
+extern void init_plugin_Koralfx            (rack::Plugin *p);
+extern void init_plugin_LindenbergResearch (rack::Plugin *p);
+extern void init_plugin_Qwelk              (rack::Plugin *p);
+extern void init_plugin_SonusModular       (rack::Plugin *p);
+extern void init_plugin_SubmarineFree      (rack::Plugin *p);
+extern void init_plugin_Template           (rack::Plugin *p);
+extern void init_plugin_Valley             (rack::Plugin *p);
+}
+
+static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCallback) {
+
+   std::string path = assetStaticPlugin(_name);
+   
+	// Construct and initialize Plugin instance
+	Plugin *plugin = new Plugin();
+	plugin->path = path;
+	plugin->handle = NULL;
+	_initCallback(plugin);
+
+#if 0
+	// Reject plugin if slug already exists
+	Plugin *oldPlugin = pluginGetPlugin(plugin->slug);
+	if (oldPlugin) {
+		warn("Plugin \"%s\" is already loaded, not attempting to load it again", plugin->slug.c_str());
+		// TODO
+		// Fix memory leak with `plugin` here
+		return false;
+	}
+#endif
+
+	// Add plugin to list
+	global->plugin.gPlugins.push_back(plugin);
+	info("vcvrack: Loaded static plugin %s %s", plugin->slug.c_str(), plugin->version.c_str());
+}
+
+void vst2_load_static_rack_plugins(void) {
+   vst2_load_static_rack_plugin("AS",                 &init_plugin_AS);
+   vst2_load_static_rack_plugin("AudibleInstruments", &init_plugin_AudibleInstruments);
+   vst2_load_static_rack_plugin("Befaco",             &init_plugin_Befaco);
+   vst2_load_static_rack_plugin("Bogaudio",           &init_plugin_Bogaudio);
+   vst2_load_static_rack_plugin("cf",                 &init_plugin_cf);
+   vst2_load_static_rack_plugin("ErraticInstruments", &init_plugin_ErraticInstruments);
+   vst2_load_static_rack_plugin("ESeries",            &init_plugin_ESeries);
+   vst2_load_static_rack_plugin("Fundamental",        &init_plugin_Fundamental);
+   vst2_load_static_rack_plugin("HetrickCV",          &init_plugin_HetrickCV);
+   vst2_load_static_rack_plugin("Koralfx-Modules",    &init_plugin_Koralfx);
+   vst2_load_static_rack_plugin("LindenbergResearch", &init_plugin_LindenbergResearch);
+   vst2_load_static_rack_plugin("Qwelk",              &init_plugin_Qwelk);
+   vst2_load_static_rack_plugin("SonusModular",       &init_plugin_SonusModular);
+   vst2_load_static_rack_plugin("SubmarineFree",      &init_plugin_SubmarineFree);
+   vst2_load_static_rack_plugin("Template",           &init_plugin_Template);
+   vst2_load_static_rack_plugin("Valley",             &init_plugin_Valley);
+}
+#endif // USE_VST2
 
 
 } // namespace rack

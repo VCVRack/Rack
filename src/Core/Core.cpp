@@ -1,15 +1,25 @@
+#include "global_pre.hpp"
 #include "Core.hpp"
+#include "global.hpp"
 
+RACK_PLUGIN_MODEL_DECLARE(Core, AudioInterface);
+RACK_PLUGIN_MODEL_DECLARE(Core, MIDIToCVInterface);
+RACK_PLUGIN_MODEL_DECLARE(Core, QuadMIDIToCVInterface);
+RACK_PLUGIN_MODEL_DECLARE(Core, MIDICCToCVInterface);
+RACK_PLUGIN_MODEL_DECLARE(Core, MIDITriggerToCVInterface);
+RACK_PLUGIN_MODEL_DECLARE(Core, Blank);
+RACK_PLUGIN_MODEL_DECLARE(Core, Notes);
 
-void init(rack::Plugin *p) {
-	p->slug = "Core";
-	p->version = TOSTRING(VERSION);
+#undef SLUG
+#define SLUG Core
+RACK_PLUGIN_INIT(Core) {
+   RACK_PLUGIN_INIT_ID_INTERNAL;
 
-	p->addModel(modelAudioInterface);
-	p->addModel(modelMIDIToCVInterface);
-	p->addModel(modelQuadMIDIToCVInterface);
-	p->addModel(modelMIDICCToCVInterface);
-	p->addModel(modelMIDITriggerToCVInterface);
-	p->addModel(modelBlank);
-	p->addModel(modelNotes);
+	RACK_PLUGIN_MODEL_ADD(Core, AudioInterface);
+	RACK_PLUGIN_MODEL_ADD(Core, MIDIToCVInterface);
+	RACK_PLUGIN_MODEL_ADD(Core, QuadMIDIToCVInterface);
+	RACK_PLUGIN_MODEL_ADD(Core, MIDICCToCVInterface);
+	RACK_PLUGIN_MODEL_ADD(Core, MIDITriggerToCVInterface);
+	RACK_PLUGIN_MODEL_ADD(Core, Blank);
+	RACK_PLUGIN_MODEL_ADD(Core, Notes);
 }

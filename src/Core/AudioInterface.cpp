@@ -1,3 +1,4 @@
+#include "global_pre.hpp"
 #include <assert.h>
 #include <mutex>
 #include <chrono>
@@ -8,6 +9,7 @@
 #include "audio.hpp"
 #include "dsp/samplerate.hpp"
 #include "dsp/ringbuffer.hpp"
+#include "global.hpp"
 
 
 #define AUDIO_OUTPUTS 8
@@ -112,12 +114,14 @@ struct AudioInterface : Module {
 	int lastNumOutputs = -1;
 	int lastNumInputs = -1;
 
+#ifndef USE_VST2
 	SampleRateConverter<AUDIO_INPUTS> inputSrc;
 	SampleRateConverter<AUDIO_OUTPUTS> outputSrc;
 
 	// in rack's sample rate
 	DoubleRingBuffer<Frame<AUDIO_INPUTS>, 16> inputBuffer;
 	DoubleRingBuffer<Frame<AUDIO_OUTPUTS>, 16> outputBuffer;
+#endif // USE_VST2
 
 	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onSampleRateChange();
@@ -143,6 +147,7 @@ struct AudioInterface : Module {
 
 
 void AudioInterface::step() {
+#ifndef USE_VST2
 	// Update SRC states
 	int sampleRate = (int) engineGetSampleRate();
 	inputSrc.setRates(audioIO.sampleRate, sampleRate);
@@ -229,6 +234,17 @@ void AudioInterface::step() {
 		audioIO.audioCv.notify_one();
 	}
 
+#else
+	// Outputs: rack engine -> VST out
+	for(int i = 0; i < AUDIO_INPUTS; i++) {
+		outputs[AUDIO_OUTPUT + i].value = global->vst2.inputs[i][global->vst2.frame_idx];
+	}
+   for(int i = 0; i < AUDIO_OUTPUTS; i++) {
+      global->vst2.outputs[i][global->vst2.frame_idx] += inputs[AUDIO_INPUT + i].value;
+   }
+#endif // USE_VST2
+
+
 	// Turn on light if at least one port is enabled in the nearby pair
 	for (int i = 0; i < AUDIO_INPUTS / 2; i++)
 		lights[INPUT_LIGHT + i].value = (audioIO.active && audioIO.numOutputs >= 2*i+1);
@@ -281,4 +297,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelAudioInterface = Model::create<AudioInterface, AudioInterfaceWidget>("Core", "AudioInterface", "Audio", EXTERNAL_TAG);
+RACK_PLUGIN_MODEL_INIT(Core, AudioInterface) {
+   Model *modelAudioInterface = Model::create<AudioInterface, AudioInterfaceWidget>("Core", "AudioInterface", "Audio", EXTERNAL_TAG);
+   return modelAudioInterface;
+}

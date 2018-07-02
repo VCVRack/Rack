@@ -1,0 +1,21 @@
+#
+# Makefile for VCV rack lib + Microsoft Visual C++ 2003 / 2005 / 2008 ToolKit
+# 
+#
+
+include dep/yac/install_msvc.mk
+
+TARGET_BASENAME=Rack
+
+EXTRAFLAGS= -DVERSION=0.6.1 -DARCH_WIN -D_USE_MATH_DEFINES -DRACK_HOST -DUSE_VST2 -Iinclude/ -Idep/include 
+
+EXTRALIBS= -LIBPATH:dep/lib/msvc/ jansson.lib
+# glew.lib glfw.lib gdi32.lib user32.lib kernel32.lib
+
+PLAF_OBJ= 
+
+include make.objects
+
+ALL_OBJ=$(LIB_OBJ)
+
+include dep/yac/staticlib_msvc.mk

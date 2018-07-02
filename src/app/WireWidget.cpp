@@ -1,7 +1,9 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "engine.hpp"
 #include "componentlibrary.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -120,25 +122,25 @@ void WireWidget::updateWire() {
 
 Vec WireWidget::getOutputPos() {
 	if (outputPort) {
-		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), gRackWidget);
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), global_ui->app.gRackWidget);
 	}
 	else if (hoveredOutputPort) {
-		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), gRackWidget);
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), global_ui->app.gRackWidget);
 	}
 	else {
-		return gRackWidget->lastMousePos;
+		return global_ui->app.gRackWidget->lastMousePos;
 	}
 }
 
 Vec WireWidget::getInputPos() {
 	if (inputPort) {
-		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), gRackWidget);
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), global_ui->app.gRackWidget);
 	}
 	else if (hoveredInputPort) {
-		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), gRackWidget);
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), global_ui->app.gRackWidget);
 	}
 	else {
-		return gRackWidget->lastMousePos;
+		return global_ui->app.gRackWidget->lastMousePos;
 	}
 }
 
@@ -161,17 +163,17 @@ void WireWidget::fromJson(json_t *rootJ) {
 }
 
 void WireWidget::draw(NVGcontext *vg) {
-	float opacity = gToolbar->wireOpacitySlider->value / 100.0;
-	float tension = gToolbar->wireTensionSlider->value;
+	float opacity = global_ui->app.gToolbar->wireOpacitySlider->value / 100.0;
+	float tension = global_ui->app.gToolbar->wireTensionSlider->value;
 
-	WireWidget *activeWire = gRackWidget->wireContainer->activeWire;
+	WireWidget *activeWire = global_ui->app.gRackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		// Draw as opaque if the wire is active
 		if (activeWire == this)
 			opacity = 1.0;
 	}
 	else {
-		Port *hoveredPort = dynamic_cast<Port*>(gHoveredWidget);
+		Port *hoveredPort = dynamic_cast<Port*>(global_ui->widgets.gHoveredWidget);
 		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
 			opacity = 1.0;
 	}

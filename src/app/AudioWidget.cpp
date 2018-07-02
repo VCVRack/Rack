@@ -1,5 +1,8 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "audio.hpp"
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -16,7 +19,7 @@ struct AudioDriverItem : MenuItem {
 struct AudioDriverChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Audio driver"));
 		for (int driver : audioWidget->audioIO->getDrivers()) {
 			AudioDriverItem *item = new AudioDriverItem();
@@ -48,7 +51,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 	int maxTotalChannels = 128;
 
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Audio device"));
 		int deviceCount = audioWidget->audioIO->getDeviceCount();
 		{
@@ -73,6 +76,10 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
+#ifdef USE_VST2
+      text = "VST Audio I/O";
+      color.a = 1.f;
+#else
 		text = audioWidget->audioIO->getDeviceDetail(audioWidget->audioIO->device, audioWidget->audioIO->offset);
 		if (text.empty()) {
 			text = "(No device)";
@@ -81,6 +88,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		else {
 			color.a = 1.f;
 		}
+#endif // USE_VST2
 	}
 };
 
@@ -96,7 +104,7 @@ struct AudioSampleRateItem : MenuItem {
 struct AudioSampleRateChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Sample rate"));
 		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
 		if (sampleRates.empty()) {
@@ -112,7 +120,11 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
+#ifdef USE_VST2
+		text = stringf("%g kHz", global->engine.sampleRate / 1000.f);
+#else
 		text = stringf("%g kHz", audioWidget->audioIO->sampleRate / 1000.f);
+#endif
 	}
 };
 
@@ -128,7 +140,7 @@ struct AudioBlockSizeItem : MenuItem {
 struct AudioBlockSizeChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void onAction(EventAction &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = global_ui->ui.gScene->createMenu();
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Block size"));
 		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
 		if (blockSizes.empty()) {
@@ -145,7 +157,11 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
+#ifdef USE_VST2
+      text = stringf("%u", global->vst2.last_seen_num_frames);
+#else
 		text = stringf("%d", audioWidget->audioIO->blockSize);
+#endif // USE_VST2
 	}
 };
 

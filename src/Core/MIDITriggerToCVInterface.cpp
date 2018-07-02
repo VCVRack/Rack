@@ -1,5 +1,8 @@
+#include "global_pre.hpp"
 #include "Core.hpp"
 #include "midi.hpp"
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 struct MIDITriggerToCVInterface : Module {
@@ -171,8 +174,8 @@ struct MidiTrigChoice : GridChoice {
 			text = stringf("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
 
-			if (gFocusedWidget == this)
-				gFocusedWidget = NULL;
+			if (global_ui->widgets.gFocusedWidget == this)
+				global_ui->widgets.gFocusedWidget = NULL;
 		}
 	}
 
@@ -249,4 +252,7 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelMIDITriggerToCVInterface = Model::create<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("Core", "MIDITriggerToCVInterface", "MIDI-Trig", MIDI_TAG, EXTERNAL_TAG);
+RACK_PLUGIN_MODEL_INIT(Core, MIDITriggerToCVInterface) {
+   Model *modelMIDITriggerToCVInterface = Model::create<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("Core", "MIDITriggerToCVInterface", "MIDI-Trig", MIDI_TAG, EXTERNAL_TAG);
+   return modelMIDITriggerToCVInterface;
+}

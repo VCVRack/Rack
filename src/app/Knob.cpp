@@ -12,7 +12,8 @@ static const float KNOB_SENSITIVITY = 0.0015f;
 
 
 Knob::Knob() {
-	smooth = true;
+	// smooth = true;
+	smooth = false;  // xxx
 }
 
 void Knob::onDragStart(EventDragStart &e) {

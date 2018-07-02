@@ -1,7 +1,9 @@
+#include "global_pre.hpp"
 #include "widgets.hpp"
 #include "window.hpp"
 #include "nanovg_gl.h"
 #include "nanovg_gl_utils.h"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -55,7 +57,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		internal->box.pos = internal->box.pos.mult(s).floor();
 		internal->box.size = internal->box.size.mult(s).ceil().plus(Vec(1, 1));
 
-		Vec fbSize = internal->box.size.mult(gPixelRatio * oversample);
+		Vec fbSize = internal->box.size.mult(global_ui->window.gPixelRatio * oversample);
 
 		if (!fbSize.isFinite())
 			return;
@@ -66,7 +68,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
-		NVGLUframebuffer *fb = nvgluCreateFramebuffer(gVg, fbSize.x, fbSize.y, 0);
+		NVGLUframebuffer *fb = nvgluCreateFramebuffer(global_ui->window.gVg, fbSize.x, fbSize.y, 0);
 		if (!fb)
 			return;
 		internal->setFramebuffer(fb);
@@ -76,16 +78,16 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		nvgBeginFrame(gFramebufferVg, fbSize.x, fbSize.y, gPixelRatio * oversample);
+		nvgBeginFrame(global_ui->window.gFramebufferVg, fbSize.x, fbSize.y, global_ui->window.gPixelRatio * oversample);
 
-		nvgScale(gFramebufferVg, gPixelRatio * oversample, gPixelRatio * oversample);
+		nvgScale(global_ui->window.gFramebufferVg, global_ui->window.gPixelRatio * oversample, global_ui->window.gPixelRatio * oversample);
 		// Use local scaling
-		nvgTranslate(gFramebufferVg, bf.x, bf.y);
-		nvgTranslate(gFramebufferVg, -internal->box.pos.x, -internal->box.pos.y);
-		nvgScale(gFramebufferVg, s.x, s.y);
-		Widget::draw(gFramebufferVg);
+		nvgTranslate(global_ui->window.gFramebufferVg, bf.x, bf.y);
+		nvgTranslate(global_ui->window.gFramebufferVg, -internal->box.pos.x, -internal->box.pos.y);
+		nvgScale(global_ui->window.gFramebufferVg, s.x, s.y);
+		Widget::draw(global_ui->window.gFramebufferVg);
 
-		nvgEndFrame(gFramebufferVg);
+		nvgEndFrame(global_ui->window.gFramebufferVg);
 		nvgluBindFramebuffer(NULL);
 	}
 

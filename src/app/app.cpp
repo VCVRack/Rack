@@ -1,53 +1,46 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "util/request.hpp"
 #include <thread>
+#include "global_ui.hpp"
 
 
 namespace rack {
 
 
-std::string gApplicationName = "VCV Rack";
-std::string gApplicationVersion = TOSTRING(VERSION);
-std::string gApiHost = "https://api.vcvrack.com";
-// std::string gApiHost = "http://localhost:8081";
-std::string gLatestVersion;
-bool gCheckVersion = true;
-
-
-RackWidget *gRackWidget = NULL;
-Toolbar *gToolbar = NULL;
-RackScene *gRackScene = NULL;
-
-
+#ifndef USE_VST2
 static void checkVersion() {
-	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/version", NULL);
+	json_t *resJ = requestJson(METHOD_GET, global_ui->app.gApiHost + "/version", NULL);
 
 	if (resJ) {
 		json_t *versionJ = json_object_get(resJ, "version");
 		if (versionJ) {
 			const char *version = json_string_value(versionJ);
-			if (version && version != gApplicationVersion) {
-				gLatestVersion = version;
+			if (version && version != global_ui->app.gApplicationVersion) {
+				global_ui->app.gLatestVersion = version;
 			}
 		}
 		json_decref(resJ);
 	}
 }
+#endif // USE_VST2
 
 
 void appInit(bool devMode) {
-	gRackScene = new RackScene();
-	gScene = gRackScene;
+	global_ui->app.gRackScene = new RackScene();
+	global_ui->ui.gScene = global_ui->app.gRackScene;
 
+#ifndef USE_VST2
 	// Request latest version from server
-	if (!devMode && gCheckVersion) {
+	if (!devMode && global_ui->app.gCheckVersion) {
 		std::thread t(checkVersion);
 		t.detach();
 	}
+#endif // USE_VST2
 }
 
 void appDestroy() {
-	delete gRackScene;
+	delete global_ui->app.gRackScene;
 }
 
 

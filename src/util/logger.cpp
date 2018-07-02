@@ -1,29 +1,27 @@
+#include "global_pre.hpp"
 #include "util/common.hpp"
 #include "asset.hpp"
 #include <stdarg.h>
+#include "global.hpp"
 
 
 namespace rack {
 
 
-static FILE *logFile = NULL;
-static std::chrono::high_resolution_clock::time_point startTime;
-
-
 void loggerInit(bool devMode) {
-	startTime = std::chrono::high_resolution_clock::now();
+	global->logger.startTime = std::chrono::high_resolution_clock::now();
 	if (devMode) {
-		logFile = stderr;
+		global->logger.logFile = stderr;
 	}
 	else {
 		std::string logFilename = assetLocal("log.txt");
-		logFile = fopen(logFilename.c_str(), "w");
+		global->logger.logFile = fopen(logFilename.c_str(), "w");
 	}
 }
 
 void loggerDestroy() {
-	if (logFile != stderr) {
-		fclose(logFile);
+	if (global->logger.logFile != stderr) {
+		fclose(global->logger.logFile);
 	}
 }
 
@@ -43,15 +41,17 @@ static const int loggerColor[] = {
 
 static void loggerLogVa(LoggerLevel level, const char *file, int line, const char *format, va_list args) {
 	auto nowTime = std::chrono::high_resolution_clock::now();
-	int duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime).count();
-	if (logFile == stderr)
-		fprintf(logFile, "\x1B[%dm", loggerColor[level]);
-	fprintf(logFile, "[%.03f %s %s:%d] ", duration / 1000.0, loggerText[level], file, line);
-	if (logFile == stderr)
-		fprintf(logFile, "\x1B[0m");
-	vfprintf(logFile, format, args);
-	fprintf(logFile, "\n");
-	fflush(logFile);
+	int duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - global->logger.startTime).count();
+	if (global->logger.logFile == stderr)
+		fprintf(global->logger.logFile, "\x1B[%dm", loggerColor[level]);
+	fprintf(global->logger.logFile, "[%.03f %s %s:%d] ", duration / 1000.0, loggerText[level], file, line);
+	if (global->logger.logFile == stderr)
+		fprintf(global->logger.logFile, "\x1B[0m");
+	vfprintf(global->logger.logFile, format, args);
+   vprintf(format, args); // xxx
+   printf("\n"); // xxx
+	fprintf(global->logger.logFile, "\n");
+	fflush(global->logger.logFile);
 }
 
 void loggerLog(LoggerLevel level, const char *file, int line, const char *format, ...) {

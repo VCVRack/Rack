@@ -1,8 +1,10 @@
+#include "global_pre.hpp"
 #include "ui.hpp"
 // for gVg
 #include "window.hpp"
 // for key codes
 #include <GLFW/glfw3.h>
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -12,9 +14,9 @@ void TextField::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
 	BNDwidgetState state;
-	if (this == gFocusedWidget)
+	if (this == global_ui->widgets.gFocusedWidget)
 		state = BND_ACTIVE;
-	else if (this == gHoveredWidget)
+	else if (this == global_ui->widgets.gHoveredWidget)
 		state = BND_HOVER;
 	else
 		state = BND_DEFAULT;
@@ -38,7 +40,7 @@ void TextField::onMouseDown(EventMouseDown &e) {
 }
 
 void TextField::onMouseMove(EventMouseMove &e) {
-	if (this == gDraggedWidget) {
+	if (this == global_ui->widgets.gDraggedWidget) {
 		int pos = getTextPosition(e.pos);
 		if (pos != selection) {
 			cursor = pos;
@@ -125,7 +127,7 @@ void TextField::onKey(EventKey &e) {
 		} break;
 		case GLFW_KEY_V: {
 			if (windowIsModPressed()) {
-				const char *newText = glfwGetClipboardString(gWindow);
+				const char *newText = glfwGetClipboardString(global_ui->window.gWindow);
 				if (newText)
 					insertText(newText);
 			}
@@ -135,7 +137,7 @@ void TextField::onKey(EventKey &e) {
 				if (cursor != selection) {
 					int begin = min(cursor, selection);
 					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-					glfwSetClipboardString(gWindow, selectedText.c_str());
+					glfwSetClipboardString(global_ui->window.gWindow, selectedText.c_str());
 					insertText("");
 				}
 			}
@@ -145,7 +147,7 @@ void TextField::onKey(EventKey &e) {
 				if (cursor != selection) {
 					int begin = min(cursor, selection);
 					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-					glfwSetClipboardString(gWindow, selectedText.c_str());
+					glfwSetClipboardString(global_ui->window.gWindow, selectedText.c_str());
 				}
 			}
 		} break;
@@ -190,7 +192,7 @@ void TextField::setText(std::string text) {
 }
 
 int TextField::getTextPosition(Vec mousePos) {
-	return bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
+	return bndTextFieldTextPosition(global_ui->window.gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
 }
 
 

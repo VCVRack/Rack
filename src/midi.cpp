@@ -1,15 +1,13 @@
+#include "global_pre.hpp"
 #include "midi.hpp"
 #include "rtmidi.hpp"
 #include "bridge.hpp"
 #include "gamepad.hpp"
 #include "keyboard.hpp"
+#include "global.hpp"
 
 
 namespace rack {
-
-
-static std::vector<int> driverIds;
-static std::map<int, MidiDriver*> drivers;
 
 
 ////////////////////
@@ -48,12 +46,12 @@ MidiIO::~MidiIO() {
 }
 
 std::vector<int> MidiIO::getDriverIds() {
-	return driverIds;
+	return global->midi.driverIds;
 }
 
 std::string MidiIO::getDriverName(int driverId) {
-	auto it = drivers.find(driverId);
-	if (it == drivers.end())
+	auto it = global->midi.drivers.find(driverId);
+	if (it == global->midi.drivers.end())
 		return "";
 
 	return it->second->getName();
@@ -68,8 +66,8 @@ void MidiIO::setDriverId(int driverId) {
 	this->driverId = -1;
 
 	// Set driver
-	auto it = drivers.find(driverId);
-	if (it != drivers.end()) {
+	auto it = global->midi.drivers.find(driverId);
+	if (it != global->midi.drivers.end()) {
 		driver = it->second;
 		this->driverId = driverId;
 	}
@@ -119,8 +117,8 @@ void MidiIO::fromJson(json_t *rootJ) {
 ////////////////////
 
 MidiInput::MidiInput() {
-	if (driverIds.size() >= 1) {
-		setDriverId(driverIds[0]);
+	if (global->midi.driverIds.size() >= 1) {
+		setDriverId(global->midi.driverIds[0]);
 	}
 }
 
@@ -199,17 +197,17 @@ void MidiOutput::setDeviceId(int deviceId) {
 ////////////////////
 
 void midiDestroy() {
-	driverIds.clear();
-	for (auto &pair : drivers) {
+	global->midi.driverIds.clear();
+	for (auto &pair : global->midi.drivers) {
 		delete pair.second;
 	}
-	drivers.clear();
+	global->midi.drivers.clear();
 }
 
 void midiDriverAdd(int driverId, MidiDriver *driver) {
 	assert(driver);
-	driverIds.push_back(driverId);
-	drivers[driverId] = driver;
+	global->midi.driverIds.push_back(driverId);
+	global->midi.drivers[driverId] = driver;
 }
 
 

@@ -52,7 +52,11 @@ Example:
 #define ENUMS(name, count) name, name ## _LAST = name + (count) - 1
 
 /** Deprecation notice for GCC */
+#ifdef _MSC_VER
+#define DEPRECATED
+#else
 #define DEPRECATED __attribute__ ((deprecated))
+#endif
 
 
 /** References binary files compiled into the program.

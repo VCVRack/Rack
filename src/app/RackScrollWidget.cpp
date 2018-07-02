@@ -1,15 +1,17 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "window.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
 
 
 void RackScrollWidget::step() {
-	Vec pos = gMousePos;
+	Vec pos = global_ui->window.gMousePos;
 	Rect viewport = getViewport(box.zeroPos());
 	// Scroll rack if dragging cable near the edge of the screen
-	if (gRackWidget->wireContainer->activeWire) {
+	if (global_ui->app.gRackWidget->wireContainer->activeWire) {
 		float margin = 20.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)

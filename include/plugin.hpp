@@ -125,5 +125,29 @@ extern std::string gToken;
 /** Called once to initialize and return the Plugin instance.
 You must implement this in your plugin
 */
-extern "C"
-void init(rack::Plugin *plugin);
+#ifdef _MSC_VER
+// (note) turns out that VCV plugins don't work when the VCV engine itself is a DLL
+// #define RACK_PLUGIN_EXPORT __declspec(dllexport)
+#define RACK_PLUGIN_EXPORT
+#else
+#define RACK_PLUGIN_EXPORT
+#endif
+
+#define RACK_PLUGIN_INIT_ID_INTERNAL p->slug = TOSTRING(SLUG); p->version = TOSTRING(VERSION)
+
+#ifdef USE_VST2
+#define RACK_PLUGIN_DECLARE(pluginname) 
+#define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
+#define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
+#else
+#define RACK_PLUGIN_DECLARE(pluginname) extern Plugin *plugin
+#define RACK_PLUGIN_INIT(pluginname)  extern "C" RACK_PLUGIN_EXPORT void init(rack::Plugin *p)
+#define RACK_PLUGIN_INIT_ID() plugin = p; RACK_PLUGIN_INIT_ID_INTERNAL
+#endif // USE_VST2
+
+#define RACK_PLUGIN_INIT_WEBSITE(url) p->website = url
+#define RACK_PLUGIN_INIT_MANUAL(url) p->manual = url
+
+#define RACK_PLUGIN_MODEL_DECLARE(pluginname, modelname) extern Model *create_model_##pluginname##_##modelname##(void)
+#define RACK_PLUGIN_MODEL_INIT(pluginname, modelname) Model *create_model_##pluginname##_##modelname##(void)
+#define RACK_PLUGIN_MODEL_ADD(pluginname, modelname) p->addModel(create_model_##pluginname##_##modelname##())

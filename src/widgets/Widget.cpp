@@ -1,6 +1,8 @@
+#include "global_pre.hpp"
 #include "widgets.hpp"
 #include "app.hpp"
 #include <algorithm>
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -9,11 +11,11 @@ Widget::~Widget() {
 	// You should only delete orphaned widgets
 	assert(!parent);
 	// Stop dragging and hovering this widget
-	if (gHoveredWidget == this) gHoveredWidget = NULL;
-	if (gDraggedWidget == this) gDraggedWidget = NULL;
-	if (gDragHoveredWidget == this) gDragHoveredWidget = NULL;
-	if (gFocusedWidget == this) gFocusedWidget = NULL;
-	if (gTempWidget == this) gTempWidget = NULL;
+	if (global_ui->widgets.gHoveredWidget == this) global_ui->widgets.gHoveredWidget = NULL;
+	if (global_ui->widgets.gDraggedWidget == this) global_ui->widgets.gDraggedWidget = NULL;
+	if (global_ui->widgets.gDragHoveredWidget == this) global_ui->widgets.gDragHoveredWidget = NULL;
+	if (global_ui->widgets.gFocusedWidget == this) global_ui->widgets.gFocusedWidget = NULL;
+	if (global_ui->widgets.gTempWidget == this) global_ui->widgets.gTempWidget = NULL;
 	clearChildren();
 }
 
@@ -77,23 +79,23 @@ void Widget::clearChildren() {
 
 void Widget::finalizeEvents() {
 	// Stop dragging and hovering this widget
-	if (gHoveredWidget == this) {
+	if (global_ui->widgets.gHoveredWidget == this) {
 		EventMouseLeave e;
-		gHoveredWidget->onMouseLeave(e);
-		gHoveredWidget = NULL;
+		global_ui->widgets.gHoveredWidget->onMouseLeave(e);
+		global_ui->widgets.gHoveredWidget = NULL;
 	}
-	if (gDraggedWidget == this) {
+	if (global_ui->widgets.gDraggedWidget == this) {
 		EventDragEnd e;
-		gDraggedWidget->onDragEnd(e);
-		gDraggedWidget = NULL;
+		global_ui->widgets.gDraggedWidget->onDragEnd(e);
+		global_ui->widgets.gDraggedWidget = NULL;
 	}
-	if (gDragHoveredWidget == this) {
-		gDragHoveredWidget = NULL;
+	if (global_ui->widgets.gDragHoveredWidget == this) {
+		global_ui->widgets.gDragHoveredWidget = NULL;
 	}
-	if (gFocusedWidget == this) {
+	if (global_ui->widgets.gFocusedWidget == this) {
 		EventDefocus e;
-		gFocusedWidget->onDefocus(e);
-		gFocusedWidget = NULL;
+		global_ui->widgets.gFocusedWidget->onDefocus(e);
+		global_ui->widgets.gFocusedWidget = NULL;
 	}
 	for (Widget *child : children) {
 		child->finalizeEvents();

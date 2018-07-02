@@ -54,6 +54,7 @@ struct SyncButton : Button {
 	bool completed = false;
 
 	void step() override {
+#ifndef USE_VST2
 		// Check for plugin update on first step()
 		if (!checked) {
 			std::thread t([this]() {
@@ -63,6 +64,7 @@ struct SyncButton : Button {
 			t.detach();
 			checked = true;
 		}
+#endif // USE_VST2
 		// Display message if we've completed updates
 		if (completed) {
 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
@@ -85,11 +87,13 @@ struct SyncButton : Button {
 	}
 	void onAction(EventAction &e) override {
 		available = false;
+#ifndef USE_VST2
 		std::thread t([this]() {
 			if (pluginSync(false))
 				completed = true;
 		});
 		t.detach();
+#endif // USE_VST2
 	}
 };
 

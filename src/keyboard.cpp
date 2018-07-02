@@ -1,12 +1,13 @@
+#include "global_pre.hpp"
 #include "keyboard.hpp"
 #include <GLFW/glfw3.h>
+#include "global.hpp"
 
 
 namespace rack {
 
 
 static const int KEYBOARD_DRIVER = -11;
-static KeyboardDriver *driver = NULL;
 
 
 void KeyboardInputDevice::onKeyPress(int key) {
@@ -119,20 +120,20 @@ void KeyboardDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) 
 
 
 void keyboardInit() {
-	driver = new KeyboardDriver();
-	midiDriverAdd(KEYBOARD_DRIVER, driver);
+	global->keyboard.driver = new KeyboardDriver();
+	midiDriverAdd(KEYBOARD_DRIVER, global->keyboard.driver);
 }
 
 void keyboardPress(int key) {
-	if (!driver)
+	if (!global->keyboard.driver)
 		return;
-	driver->device.onKeyPress(key);
+	global->keyboard.driver->device.onKeyPress(key);
 }
 
 void keyboardRelease(int key) {
-	if (!driver)
+	if (!global->keyboard.driver)
 		return;
-	driver->device.onKeyRelease(key);
+	global->keyboard.driver->device.onKeyRelease(key);
 }
 
 

@@ -12,6 +12,8 @@
 #endif
 
 
+extern const char *g_program_dir;
+
 namespace rack {
 
 

@@ -1,13 +1,19 @@
+#include "global_pre.hpp"
 #include "audio.hpp"
 #include "util/common.hpp"
 #include "bridge.hpp"
+#include "global.hpp"
 
 
 namespace rack {
 
 
 AudioIO::AudioIO() {
+#ifdef USE_VST2
+	setDriver(-1);
+#else
 	setDriver(RtAudio::UNSPECIFIED);
+#endif
 }
 
 AudioIO::~AudioIO() {
@@ -15,44 +21,54 @@ AudioIO::~AudioIO() {
 }
 
 std::vector<int> AudioIO::getDrivers() {
+	std::vector<int> drivers;
+#ifndef USE_VST2
 	std::vector<RtAudio::Api> apis;
 	RtAudio::getCompiledApi(apis);
-	std::vector<int> drivers;
 	for (RtAudio::Api api : apis)
 		drivers.push_back((int) api);
 	// Add fake Bridge driver
 	drivers.push_back(BRIDGE_DRIVER);
+#endif // !USE_VST2
 	return drivers;
 }
 
 std::string AudioIO::getDriverName(int driver) {
+#ifndef USE_VST2
 	switch (driver) {
-		case RtAudio::UNSPECIFIED: return "Unspecified";
-		case RtAudio::LINUX_ALSA: return "ALSA";
-		case RtAudio::LINUX_PULSE: return "PulseAudio";
-		case RtAudio::LINUX_OSS: return "OSS";
-		case RtAudio::UNIX_JACK: return "JACK";
-		case RtAudio::MACOSX_CORE: return "Core Audio";
+		case RtAudio::UNSPECIFIED:    return "Unspecified";
+		case RtAudio::LINUX_ALSA:     return "ALSA";
+		case RtAudio::LINUX_PULSE:    return "PulseAudio";
+		case RtAudio::LINUX_OSS:      return "OSS";
+		case RtAudio::UNIX_JACK:      return "JACK";
+		case RtAudio::MACOSX_CORE:    return "Core Audio";
 		case RtAudio::WINDOWS_WASAPI: return "WASAPI";
-		case RtAudio::WINDOWS_ASIO: return "ASIO";
-		case RtAudio::WINDOWS_DS: return "DirectSound";
-		case RtAudio::RTAUDIO_DUMMY: return "Dummy Audio";
-		case BRIDGE_DRIVER: return "Bridge";
+		case RtAudio::WINDOWS_ASIO:   return "ASIO";
+		case RtAudio::WINDOWS_DS:     return "DirectSound";
+		case RtAudio::RTAUDIO_DUMMY:  return "Dummy Audio";
+		case BRIDGE_DRIVER:           return "Bridge";
 		default: return "Unknown";
 	}
+#else
+   return "VST";
+#endif // !USE_VST2
 }
 
 void AudioIO::setDriver(int driver) {
 	// Close device
 	setDevice(-1, 0);
 
+#ifndef USE_VST2
 	// Close driver
 	if (rtAudio) {
 		delete rtAudio;
 		rtAudio = NULL;
 	}
+#endif // !USE_VST2
+
 	this->driver = 0;
 
+#ifndef USE_VST2
 	// Open driver
 	if (driver >= 0) {
 		rtAudio = new RtAudio((RtAudio::Api) driver);
@@ -61,15 +77,18 @@ void AudioIO::setDriver(int driver) {
 	else if (driver == BRIDGE_DRIVER) {
 		this->driver = BRIDGE_DRIVER;
 	}
+#endif // !USE_VST2
 }
 
 int AudioIO::getDeviceCount() {
+#ifndef USE_VST2
 	if (rtAudio) {
 		return rtAudio->getDeviceCount();
 	}
 	else if (driver == BRIDGE_DRIVER) {
 		return BRIDGE_NUM_PORTS;
 	}
+#endif // !USE_VST2
 	return 0;
 }
 
@@ -77,6 +96,7 @@ bool AudioIO::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
 	if (!deviceInfo)
 		return false;
 
+#ifndef USE_VST2
 	if (rtAudio) {
 		if (device == this->device) {
 			*deviceInfo = this->deviceInfo;
@@ -92,6 +112,7 @@ bool AudioIO::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
 			}
 		}
 	}
+#endif // !USE_VST2
 
 	return false;
 }
@@ -100,6 +121,7 @@ int AudioIO::getDeviceChannels(int device) {
 	if (device < 0)
 		return 0;
 
+#ifndef USE_VST2
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
 		if (getDeviceInfo(device, &deviceInfo))
@@ -108,6 +130,8 @@ int AudioIO::getDeviceChannels(int device) {
 	else if (driver == BRIDGE_DRIVER) {
 		return max(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
 	}
+#endif // !USE_VST2
+
 	return 0;
 }
 
@@ -115,6 +139,7 @@ std::string AudioIO::getDeviceName(int device) {
 	if (device < 0)
 		return "";
 
+#ifndef USE_VST2
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
 		if (getDeviceInfo(device, &deviceInfo))
@@ -123,6 +148,8 @@ std::string AudioIO::getDeviceName(int device) {
 	else if (driver == BRIDGE_DRIVER) {
 		return stringf("%d", device + 1);
 	}
+#endif // !USE_VST2
+
 	return "";
 }
 
@@ -130,6 +157,7 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 	if (device < 0)
 		return "";
 
+#ifndef USE_VST2
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
 		if (getDeviceInfo(device, &deviceInfo)) {
@@ -147,6 +175,8 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 	else if (driver == BRIDGE_DRIVER) {
 		return stringf("Port %d", device + 1);
 	}
+#endif // !USE_VST2
+
 	return "";
 }
 
@@ -158,6 +188,7 @@ void AudioIO::setDevice(int device, int offset) {
 }
 
 std::vector<int> AudioIO::getSampleRates() {
+#ifndef USE_VST2
 	if (rtAudio) {
 		try {
 			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
@@ -168,6 +199,7 @@ std::vector<int> AudioIO::getSampleRates() {
 			warn("Failed to query RtAudio device: %s", e.what());
 		}
 	}
+#endif // !USE_VST2
 	return {};
 }
 
@@ -180,10 +212,14 @@ void AudioIO::setSampleRate(int sampleRate) {
 }
 
 std::vector<int> AudioIO::getBlockSizes() {
+#ifdef USE_VST2
+   return {};
+#else
 	if (rtAudio) {
 		return {64, 128, 256, 512, 1024, 2048, 4096};
 	}
 	return {};
+#endif
 }
 
 void AudioIO::setBlockSize(int blockSize) {
@@ -201,17 +237,20 @@ void AudioIO::setChannels(int numOutputs, int numInputs) {
 }
 
 
+#ifndef USE_VST2
 static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
 	AudioIO *audioIO = (AudioIO*) userData;
 	assert(audioIO);
 	audioIO->processStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
 	return 0;
 }
+#endif // !USE_VST2
 
 void AudioIO::openStream() {
 	if (device < 0)
 		return;
 
+#ifndef USE_VST2
 	if (rtAudio) {
 		// Open new device
 		try {
@@ -283,11 +322,13 @@ void AudioIO::openStream() {
 		setChannels(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
 		bridgeAudioSubscribe(device, this);
 	}
+#endif // !USE_VST2
 }
 
 void AudioIO::closeStream() {
 	setChannels(0, 0);
 
+#ifndef USE_VST2
 	if (rtAudio) {
 		if (rtAudio->isStreamRunning()) {
 			info("Stopping RtAudio stream %d", device);
@@ -312,6 +353,7 @@ void AudioIO::closeStream() {
 	else if (driver == BRIDGE_DRIVER) {
 		bridgeAudioUnsubscribe(device, this);
 	}
+#endif // !USE_VST2
 
 	onCloseStream();
 }

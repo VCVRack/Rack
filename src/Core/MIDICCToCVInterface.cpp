@@ -1,7 +1,10 @@
+#include "global_pre.hpp"
 #include "Core.hpp"
 #include "midi.hpp"
 #include "dsp/filter.hpp"
 #include "window.hpp"
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 struct MIDICCToCVInterface : Module {
@@ -129,8 +132,8 @@ struct MidiCcChoice : GridChoice {
 		else {
 			text = stringf("%d", module->learnedCcs[id]);
 			color.a = 1.0;
-			if (gFocusedWidget == this)
-				gFocusedWidget = NULL;
+			if (global_ui->widgets.gFocusedWidget == this)
+				global_ui->widgets.gFocusedWidget = NULL;
 		}
 	}
 
@@ -158,11 +161,11 @@ struct MidiCcChoice : GridChoice {
 	}
 
 	void onKey(EventKey &e) override {
-		if (gFocusedWidget == this) {
+		if (global_ui->widgets.gFocusedWidget == this) {
 			if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
 				EventDefocus eDefocus;
 				onDefocus(eDefocus);
-				gFocusedWidget = NULL;
+				global_ui->widgets.gFocusedWidget = NULL;
 				e.consumed = true;
 			}
 		}
@@ -215,5 +218,7 @@ struct MIDICCToCVInterfaceWidget : ModuleWidget {
 	}
 };
 
-
-Model *modelMIDICCToCVInterface = Model::create<MIDICCToCVInterface, MIDICCToCVInterfaceWidget>("Core", "MIDICCToCVInterface", "MIDI-CC", MIDI_TAG, EXTERNAL_TAG);
+RACK_PLUGIN_MODEL_INIT(Core, MIDICCToCVInterface) {
+   Model *modelMIDICCToCVInterface = Model::create<MIDICCToCVInterface, MIDICCToCVInterfaceWidget>("Core", "MIDICCToCVInterface", "MIDI-CC", MIDI_TAG, EXTERNAL_TAG);
+   return modelMIDICCToCVInterface;
+}

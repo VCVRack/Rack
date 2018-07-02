@@ -1,6 +1,14 @@
+#include "global_pre.hpp"
 #include "util/common.hpp"
+#ifdef YAC_POSIX
 #include <time.h>
 #include <sys/time.h>
+#endif // YAC_POSIX
+#ifdef YAC_WIN32
+#define WIN32_LEAN_AND_MEAN defined
+#include <windows.h>
+#endif // YAC_WIN32
+#include "global.hpp"
 
 
 namespace rack {
@@ -9,31 +17,36 @@ namespace rack {
 // xoroshiro128+
 // from http://xoroshiro.di.unimi.it/xoroshiro128plus.c
 
-static uint64_t xoroshiro128plus_state[2] = {};
-
 static uint64_t rotl(const uint64_t x, int k) {
 	return (x << k) | (x >> (64 - k));
 }
 
 static uint64_t xoroshiro128plus_next(void) {
-	const uint64_t s0 = xoroshiro128plus_state[0];
-	uint64_t s1 = xoroshiro128plus_state[1];
+	const uint64_t s0 = global->random.xoroshiro128plus_state[0];
+	uint64_t s1 = global->random.xoroshiro128plus_state[1];
 	const uint64_t result = s0 + s1;
 
 	s1 ^= s0;
-	xoroshiro128plus_state[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); // a, b
-	xoroshiro128plus_state[1] = rotl(s1, 36); // c
+	global->random.xoroshiro128plus_state[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); // a, b
+	global->random.xoroshiro128plus_state[1] = rotl(s1, 36); // c
 
 	return result;
 }
 
 void randomInit() {
 	// Only allow the seed to be initialized once during the lifetime of the program.
-	assert(xoroshiro128plus_state[0] == 0 && xoroshiro128plus_state[1] == 0);
+	assert(global->random.xoroshiro128plus_state[0] == 0 && global->random.xoroshiro128plus_state[1] == 0);
+#ifdef YAC_WIN32
+   LARGE_INTEGER pfcCurrent;
+   ::QueryPerformanceCounter(&pfcCurrent);
+   global->random.xoroshiro128plus_state[0] = pfcCurrent.QuadPart;
+   global->random.xoroshiro128plus_state[1] = pfcCurrent.QuadPart;
+#else
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	xoroshiro128plus_state[0] = tv.tv_sec;
-	xoroshiro128plus_state[1] = tv.tv_usec;
+	global->random.xoroshiro128plus_state[0] = tv.tv_sec;
+	global->random.xoroshiro128plus_state[1] = tv.tv_usec;
+#endif // USE_VST2
 	// Generate a few times to fix the fact that the time is not a uniform u64
 	for (int i = 0; i < 10; i++) {
 		xoroshiro128plus_next();

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1"
+	 id="svg164153" inkscape:version="0.92.2 5c3e80d, 2017-08-06" sodipodi:docname="LEDSliderBlueHandle.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 4.3 11.7"
+	 enable-background="new 0 0 4.3 11.7" xml:space="preserve">
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="layer1" inkscape:cx="-27.821283" inkscape:cy="-9.1133715" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="1422" inkscape:window-maximized="0" inkscape:window-width="2560" inkscape:window-x="0" inkscape:window-y="18" inkscape:zoom="7.9195959" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<g id="layer1" transform="translate(-120.21393,-92.817187)" inkscape:groupmode="layer" inkscape:label="Layer 1">
+	<path id="path162658" inkscape:connector-curvature="0" fill="#5C5C5C" d="M124.5,92.8v11.7h-4.3V92.8H124.5z"/>
+</g>
+<g>
+	
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-1645.5895" y1="-548.1914" x2="-1640.438" y2="-548.1914" gradientTransform="matrix(6.123234e-17 -1 -1 -6.123234e-17 -546.0312 -1639.7037)">
+		<stop  offset="0" style="stop-color:#00FFF2"/>
+		<stop  offset="1" style="stop-color:#004182"/>
+	</linearGradient>
+	<path fill="url(#SVGID_1_)" d="M0,5.9V2c0-0.7,0.5-1.3,1.2-1.3h2c0.6,0,1.2,0.6,1.2,1.3v3.9H0z"/>
+</g>
+<g>
+	
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="-1644.9052" y1="-561.483" x2="-1639.7538" y2="-561.483" gradientTransform="matrix(-6.123234e-17 1 1 6.123234e-17 563.6432 1650.7656)">
+		<stop  offset="0" style="stop-color:#00FFF2"/>
+		<stop  offset="1" style="stop-color:#004182"/>
+	</linearGradient>
+	<path fill="url(#SVGID_2_)" d="M4.3,5.9v3.9c0,0.7-0.5,1.3-1.2,1.3h-2C0.6,11,0,10.4,0,9.7V5.9H4.3z"/>
+</g>
+<rect y="5.6" fill="#B0FBFF" width="4.3" height="0.7"/>
+</svg>
