@@ -1,11 +1,5 @@
 # VeeSeeVSTRack
 
-!!!------------------------------------------------------------------------------
-!!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
-!!! Please DO NOT contact the VCV Rack team if you need any support           !!!
-!!! Instead, go to https://www.kvraudio.com/forum/viewtopic.php?f=23&t=507216 !!!
----------------------------------------------------------------------------------
-
 *VeeSeeVSTRack* is an adaption of VCV Rack for the VST2.4 format.
 
 + supports multiple instances
@@ -279,8 +273,8 @@ For example, "Clouds" is listed as "Texture Synthesizer".
 
 For more info about VCV rack, see https://vcvrack.com/
 
-!!!------------------------------------------------------------------------------
-!!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
-!!! Please DO NOT contact the VCV Rack team if you need any support           !!!
-!!! Instead, go to https://www.kvraudio.com/forum/viewtopic.php?f=23&t=507216 !!!
----------------------------------------------------------------------------------
+Keep in mind that this is NOT AN OFFICIAL VCV RACK RELEASE.
+Please DO NOT contact the VCV Rack team if you need any support.
+You may get some support at https://www.kvraudio.com/forum/viewtopic.php?f=23&t=507216
+
+~bsp
