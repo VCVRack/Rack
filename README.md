@@ -1,104 +1,286 @@
-# Rack
+# VeeSeeVSTRack
 
-*Rack* is the engine for the VCV open-source virtual modular synthesizer.
+!!!------------------------------------------------------------------------------
+!!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
+!!! Please DO NOT contact the VCV Rack team if you need any support           !!!
+!!! Instead, go to https://www.kvraudio.com/forum/viewtopic.php?f=23&t=507216 !!!
+---------------------------------------------------------------------------------
 
-![Rack screenshot](https://vcvrack.com/images/screenshot.png)
+*VeeSeeVSTRack* is an adaption of VCV Rack for the VST2.4 format.
 
-This README includes instructions for building Rack from source. For information about the software, go to https://vcvrack.com/.
++ supports multiple instances
++ supports VST MIDI input 
++ supports up to 8 audio outputs
++ supports up to 8 audio inputs
++ support VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
+- does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
+   - future releases may contain additional (open source) add-ons modules
 
-## The [Issue Tracker](https://github.com/VCVRack/Rack/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) is the official developer's forum
+Here's a demo video of it: https://vimeo.com/277703414
 
-Bug reports, feature requests, questions, and discussions are welcome on the GitHub Issue Tracker for all repos under the VCVRack organization.
-However, please search before posting to avoid duplicates, and limit to one issue per post.
+Tested in 
+  - Eureka (my own work-in-progress VST host)
+  - Cockos Reaper
+  - Propellerhead Reason 10
 
-Please vote on feature requests by using the Thumbs Up/Down reaction on the first post.
+The following add-on modules are statically linked with the VST plugin:
+ - AS.ADSR
+ - AS.AtNuVrTr
+ - AS.BPMCalc
+ - AS.BPMClock
+ - AS.BlankPanel4
+ - AS.BlankPanel6
+ - AS.BlankPanel8
+ - AS.BlankPanelSpecial
+ - AS.Cv2T
+ - AS.DelayPlusFx
+ - AS.DelayPlusStereoFx
+ - AS.Flow
+ - AS.KillGate
+ - AS.LaunchGate
+ - AS.Merge2.5
+ - AS.Mixer8ch
+ - AS.MonoVUmeter
+ - AS.Multiple2.5
+ - AS.PhaserFx
+ - AS.QuadVCA
+ - AS.ReverbFx
+ - AS.ReverbStereoFx
+ - AS.SEQ16
+ - AS.SawOsc
+ - AS.SignalDelay
+ - AS.SineOsc
+ - AS.Steps
+ - AS.SuperDriveFx
+ - AS.TremoloFx
+ - AS.TremoloStereoFx
+ - AS.TriLFO
+ - AS.TriggersMKI
+ - AS.TriggersMKII
+ - AS.VCA
+ - AS.WaveShaper
+ - AS.StereoVUmeter
+ - AudibleInstruments.Braids
+ - AudibleInstruments.Elements
+ - AudibleInstruments.Tides
+ - AudibleInstruments.Clouds
+ - AudibleInstruments.Warps
+ - AudibleInstruments.Rings
+ - AudibleInstruments.Links
+ - AudibleInstruments.Kinks
+ - AudibleInstruments.Shades
+ - AudibleInstruments.Branches
+ - AudibleInstruments.Blinds
+ - AudibleInstruments.Veils
+ - AudibleInstruments.Frames
+ - Befaco.ABC
+ - Befaco.DualAtenuverter
+ - Befaco.EvenVCO
+ - Befaco.Mixer
+ - Befaco.Rampage
+ - Befaco.SlewLimiter
+ - Befaco.SpringReverb
+ - Bogaudio.VCO
+ - Bogaudio.XCO
+ - Bogaudio.Additator
+ - Bogaudio.FMOp
+ - Bogaudio.LFO
+ - Bogaudio.EightFO
+ - Bogaudio.DADSRH
+ - Bogaudio.DADSRHPlus
+ - Bogaudio.DGate
+ - Bogaudio.Shaper
+ - Bogaudio.ShaperPlus
+ - Bogaudio.ADSR
+ - Bogaudio.Follow
+ - Bogaudio.Mix4
+ - Bogaudio.Mix8
+ - Bogaudio.VCM
+ - Bogaudio.Pan
+ - Bogaudio.XFade
+ - Bogaudio.VCA
+ - Bogaudio.VCAmp
+ - Bogaudio.Analyzer
+ - Bogaudio.VU
+ - Bogaudio.Detune
+ - Bogaudio.Stack
+ - Bogaudio.Reftone
+ - Bogaudio.Bool
+ - Bogaudio.CVD
+ - Bogaudio.FlipFlop
+ - Bogaudio.Manual
+ - Bogaudio.Mult
+ - Bogaudio.Noise
+ - Bogaudio.Offset
+ - Bogaudio.SampleHold
+ - Bogaudio.Sums
+ - Bogaudio.Switch
+ - Bogaudio.Lag
+ - Bogaudio.RM
+ - Bogaudio.Test
+ - Bogaudio.Test2
+ - Bogaudio.ThreeHP
+ - Bogaudio.SixHP
+ - Bogaudio.EightHP
+ - Bogaudio.TenHP
+ - Bogaudio.TwelveHP
+ - Bogaudio.ThirteenHP
+ - Bogaudio.FifteenHP
+ - Bogaudio.EighteenHP
+ - Bogaudio.TwentyHP
+ - Bogaudio.TwentyTwoHP
+ - Bogaudio.TwentyFiveHP
+ - Bogaudio.ThirtyHP
+ - cf.trSEQ
+ - cf.LEDSEQ
+ - cf.L3DS3Q
+ - cf.SLIDERSEQ
+ - cf.PLAYER
+ - cf.STEPS
+ - cf.METRO
+ - cf.EACH
+ - cf.FOUR
+ - cf.PEAK
+ - cf.MONO
+ - cf.STEREO
+ - cf.MASTER
+ - cf.SUB
+ - cf.CUBE
+ - cf.PATCH
+ - cf.LEDS
+ - cf.DAVE
+ - ESeries.E340
+ - ErraticInstruments.MPEToCV
+ - ErraticInstruments.QuadMPEToCV
+ - Fundamentals.8vert
+ - Fundamentals.ADSR
+ - Fundamentals.Delay
+ - Fundamentals.LFO
+ - Fundamentals.LFO2
+ - Fundamentals.Mutes
+ - Fundamentals.SEQ3
+ - Fundamentals.SequentialSwitch1
+ - Fundamentals.SequentialSwitch2
+ - Fundamentals.Scope
+ - Fundamentals.Unity
+ - Fundamentals.VCA
+ - Fundamentals.VCF
+ - Fundamentals.VCMixer
+ - Fundamentals.VCO
+ - Fundamentals.VCO2
+ - HetrickCV.TwoToFour
+ - HetrickCV.AnalogToDigital
+ - HetrickCV.ASR
+ - HetrickCV.Bitshift
+ - HetrickCV.BlankPanel
+ - HetrickCV.Boolean3
+ - HetrickCV.Comparator
+ - HetrickCV.Contrast
+ - HetrickCV.Crackle
+ - HetrickCV.Delta
+ - HetrickCV.DigitalToAnalog
+ - HetrickCV.Dust
+ - HetrickCV.Exponent
+ - HetrickCV.FlipFlop
+ - HetrickCV.FlipPan
+ - HetrickCV.GateJunction
+ - HetrickCV.LogicCombine
+ - HetrickCV.RandomGates
+ - HetrickCV.Rotator
+ - HetrickCV.Scanner
+ - HetrickCV.Waveshape
+ - Koralfx.Beatovnik
+ - Koralfx.Mixovnik
+ - Koralfx.Nullovnik4
+ - Koralfx.Nullovnik6
+ - Koralfx.Presetovnik
+ - Koralfx.Quantovnik
+ - Koralfx.Scorovnik
+ - LindenbergResearch.SimpleFilter
+ - LindenbergResearch.MS20Filter
+ - LindenbergResearch.AlmaFilter
+ - LindenbergResearch.ReShaper
+ - LindenbergResearch.BlankPanel
+ - LindenbergResearch.BlankPanelM1
+ - Qwelk.Automaton
+ - Qwelk.Byte
+ - Qwelk.Chaos
+ - Qwelk.Column
+ - Qwelk.Gate
+ - Qwelk.Or
+ - Qwelk.Not
+ - Qwelk.Xor
+ - Qwelk.Mix
+ - Qwelk.News
+ - Qwelk.Scaler
+ - Qwelk.Wrap
+ - Qwelk.XFade
+ - SonusModular.Addiction
+ - SonusModular.Bitter
+ - SonusModular.Bymidside
+ - SonusModular.Campione
+ - SonusModular.Chainsaw
+ - SonusModular.Ctrl
+ - SonusModular.Deathcrush
+ - SonusModular.Harmony
+ - SonusModular.Ladrone
+ - SonusModular.Luppolo
+ - SonusModular.Luppolo3
+ - SonusModular.Micromacro
+ - SonusModular.Multimulti
+ - SonusModular.Oktagon
+ - SonusModular.Osculum
+ - SonusModular.Paramath
+ - SonusModular.Piconoise
+ - SonusModular.Pusher
+ - SonusModular.Ringo
+ - SonusModular.Scramblase
+ - SonusModular.Twoff
+ - SonusModular.Yabp
+ - SubmarineFree.AG106
+ - SubmarineFree.BB120
+ - SubmarineFree.FF110
+ - SubmarineFree.FF120
+ - SubmarineFree.FF212
+ - SubmarineFree.LA108
+ - SubmarineFree.LD106
+ - SubmarineFree.NG112
+ - SubmarineFree.OG106
+ - SubmarineFree.PG112
+ - SubmarineFree.PO101
+ - SubmarineFree.PO102
+ - SubmarineFree.PO204
+ - SubmarineFree.WK101
+ - SubmarineFree.WK205
+ - SubmarineFree.XF101
+ - SubmarineFree.XF102
+ - SubmarineFree.XF104
+ - SubmarineFree.XF201
+ - SubmarineFree.XF202
+ - SubmarineFree.XG106
+ - SubmarineFree.BP101
+ - SubmarineFree.BP102
+ - SubmarineFree.BP104
+ - SubmarineFree.BP108
+ - SubmarineFree.BP110
+ - SubmarineFree.BP112
+ - SubmarineFree.BP116
+ - SubmarineFree.BP120
+ - SubmarineFree.BP124
+ - SubmarineFree.BP132
+ - Template.MyModule
+ - Valley.Topograph
+ - Valley.UGraph
+ - Valley.Dexter
+ - Valley.Plateau
 
-I rarely accept code contributions to Rack itself, so please notify me in advance if you wish to send a pull request.
+Please notice that the Audible/Mutable Instruments modules appear under a different name in the UI.
+For example, "Clouds" is listed as "Texture Synthesizer".
 
-## Setting up your development environment
+For more info about VCV rack, see https://vcvrack.com/
 
-Before building Rack, you must install build dependencies provided by your system's package manager.
-Rack's own dependencies (GLEW, glfw, etc) do not need to be installed on your system, since specific versions are compiled locally during the build process.
-However, you need proper tools to build Rack and these dependencies.
-
-### Mac
-
-Install [Xcode](https://developer.apple.com/xcode/).
-Using [Homebrew](https://brew.sh/), install the build dependencies.
-```
-brew install git wget cmake autoconf automake libtool
-```
-
-### Windows
-
-Install [MSYS2](http://www.msys2.org/) and launch the MinGW 64-bit shell (not the default MSYS shell).
-```
-pacman -S git wget make tar unzip zip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool
-```
-
-### Linux
-
-On Ubuntu 16.04:
-```
-sudo apt install git curl cmake libx11-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev zlib1g-dev libasound2-dev libgtk2.0-dev libjack-jackd2-dev
-```
-
-On Arch Linux:
-```
-pacman -S git wget gcc make cmake tar unzip zip curl
-```
-
-## Building
-
-*If the build fails for you, please report the issue with a detailed error message to help the portability of Rack.*
-
-Clone this repository with `git clone https://github.com/VCVRack/Rack.git` and `cd Rack`.
-Make sure there are no spaces in your absolute path, as this breaks many build systems.
-
-Clone submodules.
-
-	git submodule update --init --recursive
-
-Build dependencies locally.
-You may add `-j$(nproc)` to your make commands to parallelize builds across all CPU cores.
-
-	make dep
-
-Build Rack.
-
-	make
-
-Run Rack.
-
-	make run
-
-## Building plugins
-
-Be sure to check out and build the version of Rack you wish to build your plugins against.
-
-You must clone the plugin in Rack's `plugins/` directory, e.g.
-
-	cd plugins
-	git clone https://github.com/VCVRack/Fundamental.git
-
-Clone submodules.
-
-	cd Fundamental
-	git submodule update --init --recursive
-
-Build plugin.
-
-	make dep
-	make
-
-## Licenses
-
-All **source code** in this repository is licensed under [BSD-3-Clause](LICENSE.txt) by [Andrew Belt](https://andrewbelt.name/).
-
-**Component Library graphics** in `res/ComponentLibrary` are licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) by [Grayscale](http://grayscale.info/). Commercial plugins must request a commercial license to use Component Library graphics by emailing contact@vcvrack.com.
-
-**Core** panel graphics in `res/Core` are copyright © 2017 Grayscale. You may not create derivative works of Core panels.
-
-The **VCV logo and icon** are copyright © 2017 Andrew Belt and may not be used in derivative works.
-
-The **"VCV" name** is trademarked and may not be used for unofficial products. However, it is acceptable to use the phrase "for VCV Rack" for promotion of your plugin. For all other purposes, email contact@vcvrack.com.
+!!!------------------------------------------------------------------------------
+!!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
+!!! Please DO NOT contact the VCV Rack team if you need any support           !!!
+!!! Instead, go to https://www.kvraudio.com/forum/viewtopic.php?f=23&t=507216 !!!
+---------------------------------------------------------------------------------
