@@ -16,4 +16,8 @@ std::string assetLocal(std::string filename);
 std::string assetPlugin(Plugin *plugin, std::string filename);
 
 
+extern std::string assetGlobalDir;
+extern std::string assetLocalDir;
+
+
 } // namespace rack
