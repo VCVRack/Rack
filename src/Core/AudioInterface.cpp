@@ -278,6 +278,11 @@ struct AudioInterfaceWidget : ModuleWidget {
 		audioWidget->audioIO = &module->audioIO;
 		addChild(audioWidget);
 	}
+
+	void draw(NVGcontext *vg) override {
+		// HACK Bypass ModuleWidget::draw() as it currently only contains scissoring and power meters. This effectively disables drawing the power meter.
+		Widget::draw(vg);
+	}
 };
 
 
