@@ -297,6 +297,12 @@ struct Rect {
 		r.size = size.plus(delta.mult(2.f));
 		return r;
 	}
+	Rect shrink(Vec delta) {
+		Rect r;
+		r.pos = pos.plus(delta);
+		r.size = size.minus(delta.mult(2.f));
+		return r;
+	}
 };
 
 
