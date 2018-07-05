@@ -73,8 +73,8 @@ extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
-// // HWND g_glfw_vst2_parent_hwnd;  // read by modified version of GLFW (see glfw/src/win32_window.c)
-
+extern "C" extern HWND g_glfw_vst2_parent_hwnd;  // read by modified version of GLFW (see glfw/src/win32_window.c)
+extern "C" extern HWND __hack__glfwGetHWND (GLFWwindow *window);
 
 
 // Windows:
@@ -577,12 +577,18 @@ public:
 
 #ifdef YAC_WIN32
    void openEditor(HWND _hwnd) {
-      // // g_glfw_vst2_parent_hwnd = _hwnd;
+      //g_glfw_vst2_parent_hwnd = _hwnd;
+      g_glfw_vst2_parent_hwnd = 0;
 #else
 #error implement me (openEditor)
 #endif
       printf("xxx vstrack_plugin: openEditor()\n");
       b_queued_open_editor = true;
+
+#ifdef YAC_WIN32
+      rack::global_ui->vst2.parent_hwnd = (void*)_hwnd;
+      printf("xxx vstrack_plugin: DAW parent hwnd=%p\n", rack::global_ui->vst2.parent_hwnd);
+#endif // YAC_WIN32
 
       int iter = 0;
       while(iter++ < 50)
@@ -803,10 +809,30 @@ static DWORD WINAPI vst2_ui_thread_entry(VSTPluginWrapper *_wrapper) {
       // printf("xxx vstrack_plugin<ui>: idle loop\n");
       if(_wrapper->b_queued_open_editor && !_wrapper->b_editor_open)
       {
+         if(!_wrapper->b_editor_created)
+         {
+         }
+
          _wrapper->b_queued_open_editor = YAC_FALSE;
 
          // Show previously hidden window
+#if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
+#if 0
+         HWND glfwHWND = __hack__glfwGetHWND(rack::global_ui->window.gWindow);
+         ::SetParent(glfwHWND,
+                     (HWND)rack::global_ui->vst2.parent_hwnd
+                     );
+         printf("xxx vstrack: SetParent(glfwHWND=%p, dawParentHWND=%p)\n", (void*)glfwHWND, rack::global_ui->vst2.parent_hwnd);
+#endif
+#endif // YAC_WIN32
+
          glfwShowWindow(rack::global_ui->window.gWindow);
+
+#ifdef VST2_REPARENT_WINDOW_HACK
+         // maximize window once it starts to receive events (see window.cpp)
+         rack::global_ui->vst2.b_queued_maximize_window = true;
+#endif // VST2_REPARENT_WINDOW_HACK
+
          _wrapper->b_editor_open = YAC_TRUE;
 
          rack::global_ui->vst2.b_close_window = 0;
@@ -827,8 +853,14 @@ static DWORD WINAPI vst2_ui_thread_entry(VSTPluginWrapper *_wrapper) {
       }
       else if(_wrapper->b_queued_destroy_editor)
       {
+         printf("xxx vstrack<ui>: _wrapper->b_queued_destroy_editor is 1, b_editor_created=%d\n", _wrapper->b_editor_created);
          if(_wrapper->b_editor_created)
          {
+#if 0
+#if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
+            ::SetParent(__hack__glfwGetHWND(rack::global_ui->window.gWindow), NULL);  // [bsp 04Jul2018] reparent hack (fix hang up when DAW editor is closed)
+#endif // VST2_REPARENT_WINDOW_HACK
+#endif
             vst2_editor_destroy();
             _wrapper->b_editor_created = YAC_FALSE;
          }
@@ -1370,10 +1402,16 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          if(NULL != ptr) // yeah, this should never be NULL
          {
             // ...
-            wrapper->editor_rect.top    = 20;
-            wrapper->editor_rect.left   = 20;
-            wrapper->editor_rect.bottom = 50;
-            wrapper->editor_rect.right  = 80;
+#define EDITWIN_X 20
+#define EDITWIN_Y 20
+// #define EDITWIN_W 1200
+// #define EDITWIN_H 800
+#define EDITWIN_W 60
+#define EDITWIN_H 21
+            wrapper->editor_rect.left   = EDITWIN_X;
+            wrapper->editor_rect.top    = EDITWIN_Y;
+            wrapper->editor_rect.right  = EDITWIN_X + EDITWIN_W;
+            wrapper->editor_rect.bottom = EDITWIN_Y + EDITWIN_H;
             *(void**)ptr = (void*) &wrapper->editor_rect;
             r = 1;
          }
@@ -1548,6 +1586,25 @@ void vst2_handle_ui_param(int uniqueParamId, float normValue) {
    // Called by engineSetParam()
    rack::global->vst2.wrapper->handleUIParam(uniqueParamId, normValue);
 }
+
+#ifdef VST2_REPARENT_WINDOW_HACK
+#ifdef YAC_WIN32
+void vst2_maximize_reparented_window(void) {
+#if 0
+   HWND glfwHWND = __hack__glfwGetHWND(rack::global_ui->window.gWindow);
+   HWND parentHWND = (HWND)rack::global_ui->vst2.parent_hwnd;
+   printf("xxx vstrack_plugin:vst2_maximize_reparented_window: hwnd=%p\n", (void*)glfwHWND);
+   RECT rect;
+   (void)::GetClientRect(parentHWND, &rect);
+   ///(void)::AdjustWindowRect(..)
+   printf("xxx vstrack_plugin:vst2_maximize_reparented_window: new size=(%d; %d)\n", rect.right-rect.left, rect.bottom-rect.top);
+   ::MoveWindow(glfwHWND, 0, 0, rect.right-rect.left, rect.bottom-rect.top, TRUE/*bRepaint*/);
+   // ::ShowWindow(glfwHWND, SW_MAXIMIZE);
+   // // ::ShowWindow(glfwHWND, SW_SHOWMAXIMIZED);
+#endif // 0
+}
+#endif // YAC_WIN32
+#endif // VST2_REPARENT_WINDOW_HACK
 
 /**
  * Implementation of the main entry point of the plugin

@@ -21,6 +21,11 @@
 #include "global.hpp"
 #include "global_ui.hpp"
 
+// #if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
+// #include <windows.h>
+// extern "C" extern HWND __hack__glfwGetHWND (GLFWwindow *window);
+// #endif
+
 
 using namespace rack;
 

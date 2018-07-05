@@ -14,12 +14,14 @@ Tested in
   - Eureka (my own work-in-progress VST host)
   - Cockos Reaper
   - Propellerhead Reason 10
+  - according to users: works in Cubase
+  - according to users: works in Bitwig
 
 
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-02Jul2018c.7z](dist/veeseevstrack_0_6_1_win64_bin-02Jul2018c.7z)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-05Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-05Jul2018.7z)
 
 
 # Demo Video
@@ -158,6 +160,23 @@ The following add-on modules are statically linked with the VST plugin:
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
+ - FrozenWasteland.BPMLFO
+ - FrozenWasteland.BPMLFO2
+ - FrozenWasteland.DamianLillard
+ - FrozenWasteland.EverlastingGlottalStopper
+ - FrozenWasteland.HairPick
+ - FrozenWasteland.LissajousLFO
+ - FrozenWasteland.MrBlueSky
+ - FrozenWasteland.TheOneRingModulator
+ - FrozenWasteland.PhasedLockedLoop
+ - FrozenWasteland.PortlandWeather
+ - FrozenWasteland.QuadEuclideanRhythm
+ - FrozenWasteland.QuadGolombRulerRhythm
+ - FrozenWasteland.QuantussyCell
+ - FrozenWasteland.RouletteLFO
+ - FrozenWasteland.SeriouslySlowLFO
+ - FrozenWasteland.VoxInhumana
+ - FrozenWasteland.CDCSeriouslySlowLFO
  - Fundamentals.8vert
  - Fundamentals.ADSR
  - Fundamentals.Delay
@@ -195,6 +214,8 @@ The following add-on modules are statically linked with the VST plugin:
  - HetrickCV.Rotator
  - HetrickCV.Scanner
  - HetrickCV.Waveshape
+ - huaba.EQ3
+ - huaba.ABBus
  - Koralfx.Beatovnik
  - Koralfx.Mixovnik
  - Koralfx.Nullovnik4
@@ -208,6 +229,29 @@ The following add-on modules are statically linked with the VST plugin:
  - LindenbergResearch.ReShaper
  - LindenbergResearch.BlankPanel
  - LindenbergResearch.BlankPanelM1
+ - ML_modules.Quantizer
+ - ML_modules.Quantum
+ - ML_modules.TrigBuf
+ - ML_modules.SeqSwitch
+ - ML_modules.SeqSwitch2
+ - ML_modules.ShiftRegister
+ - ML_modules.ShiftRegister2
+ - ML_modules.FreeVerb
+ - ML_modules.Sum8
+ - ML_modules.Sum8mk2
+ - ML_modules.SH8
+ - ML_modules.Constants
+ - ML_modules.Counter
+ - ML_modules.TrigDelay
+ - ML_modules.BPMdetect
+ - ML_modules.VoltMeter
+ - ML_modules.OctaFlop
+ - ML_modules.OctaTrig
+ - ML_modules.OctaSwitch
+ - ML_modules.TrigSwitch
+ - ML_modules.TrigSwitch2
+ - ML_modules.TrigSwitch3
+ - ML_modules.TrigSwitch3_2
  - Qwelk.Automaton
  - Qwelk.Byte
  - Qwelk.Chaos
@@ -282,6 +326,12 @@ The following add-on modules are statically linked with the VST plugin:
  - SubmarineFree.BP124
  - SubmarineFree.BP132
  - Template.MyModule
+ - trowaSoft.TrigSeq
+ - trowaSoft.TrigSeq64
+ - trowaSoft.VoltSeq
+ - trowaSoft.OscCV
+ - trowaSoft.MultiScope
+ - trowaSoft.MultiOscillator
  - Valley.Topograph
  - Valley.UGraph
  - Valley.Dexter

@@ -153,6 +153,23 @@ The VST2 plugin includes the following add-on modules:
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
+ - FrozenWasteland.BPMLFO
+ - FrozenWasteland.BPMLFO2
+ - FrozenWasteland.DamianLillard
+ - FrozenWasteland.EverlastingGlottalStopper
+ - FrozenWasteland.HairPick
+ - FrozenWasteland.LissajousLFO
+ - FrozenWasteland.MrBlueSky
+ - FrozenWasteland.TheOneRingModulator
+ - FrozenWasteland.PhasedLockedLoop
+ - FrozenWasteland.PortlandWeather
+ - FrozenWasteland.QuadEuclideanRhythm
+ - FrozenWasteland.QuadGolombRulerRhythm
+ - FrozenWasteland.QuantussyCell
+ - FrozenWasteland.RouletteLFO
+ - FrozenWasteland.SeriouslySlowLFO
+ - FrozenWasteland.VoxInhumana
+ - FrozenWasteland.CDCSeriouslySlowLFO
  - Fundamentals.8vert
  - Fundamentals.ADSR
  - Fundamentals.Delay
@@ -203,6 +220,29 @@ The VST2 plugin includes the following add-on modules:
  - LindenbergResearch.ReShaper
  - LindenbergResearch.BlankPanel
  - LindenbergResearch.BlankPanelM1
+ - ML_modules.Quantizer
+ - ML_modules.Quantum
+ - ML_modules.TrigBuf
+ - ML_modules.SeqSwitch
+ - ML_modules.SeqSwitch2
+ - ML_modules.ShiftRegister
+ - ML_modules.ShiftRegister2
+ - ML_modules.FreeVerb
+ - ML_modules.Sum8
+ - ML_modules.Sum8mk2
+ - ML_modules.SH8
+ - ML_modules.Constants
+ - ML_modules.Counter
+ - ML_modules.TrigDelay
+ - ML_modules.BPMdetect
+ - ML_modules.VoltMeter
+ - ML_modules.OctaFlop
+ - ML_modules.OctaTrig
+ - ML_modules.OctaSwitch
+ - ML_modules.TrigSwitch
+ - ML_modules.TrigSwitch2
+ - ML_modules.TrigSwitch3
+ - ML_modules.TrigSwitch3_2
  - Qwelk.Automaton
  - Qwelk.Byte
  - Qwelk.Chaos
@@ -277,6 +317,12 @@ The VST2 plugin includes the following add-on modules:
  - SubmarineFree.BP124
  - SubmarineFree.BP132
  - Template.MyModule
+ - trowaSoft.TrigSeq
+ - trowaSoft.TrigSeq64
+ - trowaSoft.VoltSeq
+ - trowaSoft.OscCV
+ - trowaSoft.MultiScope
+ - trowaSoft.MultiOscillator
  - Valley.Topograph
  - Valley.UGraph
  - Valley.Dexter

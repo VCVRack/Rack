@@ -576,14 +576,18 @@ extern void init_plugin_cf                 (rack::Plugin *p);
 extern void init_plugin_ErraticInstruments (rack::Plugin *p);
 extern void init_plugin_ESeries            (rack::Plugin *p);
 extern void init_plugin_Fundamental        (rack::Plugin *p);
+extern void init_plugin_FrozenWasteland    (rack::Plugin *p);
 extern void init_plugin_HetrickCV          (rack::Plugin *p);
+extern void init_plugin_huaba              (rack::Plugin *p);
 extern void init_plugin_Koralfx            (rack::Plugin *p);
 extern void init_plugin_LindenbergResearch (rack::Plugin *p);
+extern void init_plugin_ML_modules         (rack::Plugin *p);
 extern void init_plugin_Qwelk              (rack::Plugin *p);
 extern void init_plugin_SonusModular       (rack::Plugin *p);
 extern void init_plugin_squinkylabs_plug1  (rack::Plugin *p);
 extern void init_plugin_SubmarineFree      (rack::Plugin *p);
 extern void init_plugin_Template           (rack::Plugin *p);
+extern void init_plugin_trowaSoft          (rack::Plugin *p);
 extern void init_plugin_Valley             (rack::Plugin *p);
 extern void init_plugin_VultModules        (rack::Plugin *p);
 }
@@ -623,18 +627,21 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("ErraticInstruments", &init_plugin_ErraticInstruments);
    vst2_load_static_rack_plugin("ESeries",            &init_plugin_ESeries);
    vst2_load_static_rack_plugin("Fundamental",        &init_plugin_Fundamental);
+   vst2_load_static_rack_plugin("FrozenWasteland",    &init_plugin_FrozenWasteland);
    vst2_load_static_rack_plugin("HetrickCV",          &init_plugin_HetrickCV);
+   vst2_load_static_rack_plugin("huaba",              &init_plugin_huaba);
    vst2_load_static_rack_plugin("Koralfx-Modules",    &init_plugin_Koralfx);
    vst2_load_static_rack_plugin("LindenbergResearch", &init_plugin_LindenbergResearch);
+   vst2_load_static_rack_plugin("ML_modules",         &init_plugin_ML_modules);
    vst2_load_static_rack_plugin("Qwelk",              &init_plugin_Qwelk);
    vst2_load_static_rack_plugin("SonusModular",       &init_plugin_SonusModular);
    vst2_load_static_rack_plugin("squinkylabs-plug1",  &init_plugin_squinkylabs_plug1);
    vst2_load_static_rack_plugin("SubmarineFree",      &init_plugin_SubmarineFree);
    vst2_load_static_rack_plugin("Template",           &init_plugin_Template);
+   vst2_load_static_rack_plugin("trowaSoft",          &init_plugin_trowaSoft);
    vst2_load_static_rack_plugin("Valley",             &init_plugin_Valley);
    vst2_load_static_rack_plugin("VultModules",        &init_plugin_VultModules);
 }
 #endif // USE_VST2
-
 
 } // namespace rack

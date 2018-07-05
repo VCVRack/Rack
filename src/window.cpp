@@ -37,6 +37,11 @@
 
 #ifdef USE_VST2
 extern void vst2_handle_queued_set_program_chunk (void);
+
+#if defined(VST2_REPARENT_WINDOW_HACK)
+extern void vst2_maximize_reparented_window(void);
+extern "C" extern int  __glfw_hack__b_queued_maximize_window;
+#endif // VST2_REPARENT_WINDOW_HACK
 #endif // USE_VST2
 
 namespace rack {
@@ -541,6 +546,14 @@ void windowRun() {
          global_ui->vst2.b_hide_window = 0;
          break;
       }
+#if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
+      else if(rack::global_ui->vst2.b_queued_maximize_window || __glfw_hack__b_queued_maximize_window)
+      {
+         rack::global_ui->vst2.b_queued_maximize_window = false;
+         __glfw_hack__b_queued_maximize_window = false;
+         vst2_maximize_reparented_window();
+      }
+#endif // VST2_REPARENT_WINDOW_HACK
 #endif // USE_VST2
 	}
 

@@ -87,6 +87,10 @@ struct GlobalUI {
    struct {
       volatile int b_close_window;
       volatile int b_hide_window;
+#ifdef WIN32
+      void *parent_hwnd;
+      bool b_queued_maximize_window;
+#endif // WIN32
    } vst2;
 #endif // USE_VST2
 
@@ -129,6 +133,10 @@ struct GlobalUI {
 #ifdef USE_VST2
       vst2.b_close_window = 0;
       vst2.b_hide_window = 0;
+#ifdef WIN32
+      vst2.parent_hwnd = 0;
+      vst2.b_queued_maximize_window = false;
+#endif
 #endif // USE_VST2
    } 
 
