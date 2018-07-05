@@ -1,0 +1,25 @@
+ALL_OBJ= \
+	src/BPMLFO.o \
+	src/BPMLFO2.o \
+	src/CDCSeriouslySlowLFO.o \
+	src/DamianLillard.o \
+	src/dsp/noise.o \
+	src/dsp-filter/third-party/falco/DspFilter.o \
+	src/dsp-filter/utils/AudioMath.o \
+	src/dsp-noise/noise.o \
+	src/EverlastingGlottalStopper.o \
+	src/filters/biquad.o \
+	src/FrozenWasteland.o \
+	src/HairPick.o \
+	src/LissajousLFO.o \
+	src/MrBlueSky.o \
+	src/PhasedLockedLoop.o \
+	src/PortlandWeather.o \
+	src/QuadEuclideanRhythm.o \
+	src/QuadGolombRulerRhythm.o \
+	src/QuantussyCell.o \
+	src/RouletteLFO.o \
+	src/Sabonis.o \
+	src/SeriouslySlowLFO.o \
+	src/TheOneRingModulator.o \
+	src/VoxInhumana.o

@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	./src/abbus.o \
+	./src/eq3.o \
+	./src/huaba.o

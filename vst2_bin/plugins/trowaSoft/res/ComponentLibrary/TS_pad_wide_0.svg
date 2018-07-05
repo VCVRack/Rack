@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="50"
+   height="22"
+   viewBox="0 0 13.229166 5.820833"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="TS_pad_wide_0.svg">
+  <defs
+     id="defs2">
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lstart"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path5976"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <linearGradient
+       id="linearGradient5929"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#88c8ff;stop-opacity:1;"
+         offset="0"
+         id="stop5927" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4489"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#88c8ff;stop-opacity:1;"
+         offset="0"
+         id="stop4487" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="29.452553"
+     inkscape:cy="25.710424"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-291.17916)">
+    <path
+       style="fill:#c8fafa;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.26458323;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.70588235"
+       d="M 0.83893154,291.17918 H 12.390231 c 0.46476,0 0.838935,0.1868 0.838935,0.41879 v 4.98321 c 0,0.23204 -0.374175,0.41883 -0.838935,0.41883 H 0.83893154 C 0.37418919,297.00001 0,296.81322 0,296.58118 v -4.98321 c 0,-0.23199 0.37418919,-0.41879 0.83893154,-0.41879 z"
+       id="rect4485"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#dcdcdc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.26458317;stroke-linejoin:miter;stroke-miterlimit:2;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.70588235"
+       d="M 1.0699533,291.44375 H 12.159204 c 0.44617,0 0.805379,0.16981 0.805379,0.38069 v 4.53017 c 0,0.211 -0.359209,0.38081 -0.805379,0.38081 H 1.0699533 c -0.446149,0 -0.80536995,-0.16981 -0.80536995,-0.38081 v -4.53017 c 0,-0.21088 0.35922095,-0.38069 0.80536995,-0.38069 z"
+       id="rect4485-1"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.26458332;"
+       x="2.5664587"
+       y="295.58395"
+       id="text4498"><tspan
+         sodipodi:role="line"
+         id="tspan4496"
+         x="2.5664587"
+         y="295.58395"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;font-family:'DestructoBeam BB';-inkscape-font-specification:'DestructoBeam BB';stroke-width:0.26458332;fill:#4d4d4d;">RUN</tspan></text>
+  </g>
+</svg>

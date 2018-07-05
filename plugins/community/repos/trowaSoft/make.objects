@@ -1,0 +1,38 @@
+POSIX_OBJ= \
+	lib/oscpack/ip/posix/NetworkingUtils.o \
+	lib/oscpack/ip/posix/UdpSocket.o
+
+WIN32_OBJ= \
+	lib/oscpack/ip/win32/NetworkingUtils.o \
+	lib/oscpack/ip/win32/UdpSocket.o
+
+RACK_OBJ= \
+	lib/oscpack/ip/IpEndpointName.o \
+	lib/oscpack/osc/OscOutboundPacketStream.o \
+	lib/oscpack/osc/OscPrintReceivedElements.o \
+	lib/oscpack/osc/OscReceivedElements.o \
+	lib/oscpack/osc/OscTypes.o \
+	src/Module_multiOscillator.o \
+	src/Module_multiScope.o \
+	src/Module_oscCV.o \
+	src/Module_trigSeq.o \
+	src/Module_voltSeq.o \
+	src/trowaSoft.o \
+	src/trowaSoftUtilities.o \
+	src/TSOSCCommon.o \
+	src/TSOSCCommunicator.o \
+	src/TSOSCConfigWidget.o \
+	src/TSOSCSequencerListener.o \
+	src/TSParamTextField.o \
+	src/TSScopeBase.o \
+	src/TSSequencerModuleBase.o \
+	src/TSSequencerWidgetBase.o \
+	src/TSTempoBPM.o \
+	src/TSTextField.o \
+	src/Widget_multiOscillator.o \
+	src/Widget_multiScope.o \
+	src/Widget_oscCV.o \
+	src/Widget_trigSeq64.o
+
+#	src/Module_multiScope_Old.o
+#	src/Widget_multiScope_Old.o

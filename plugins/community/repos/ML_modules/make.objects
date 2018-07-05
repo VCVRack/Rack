@@ -1,0 +1,27 @@
+ALL_OBJ= \
+	freeverb/revmodel.o \
+	src/BPMdetect.o \
+	src/Constants.o \
+	src/Counter.o \
+	src/FreeVerb.o \
+	src/ML_components.o \
+	src/ML_modules.o \
+	src/OctaFlop.o \
+	src/OctaSwitch.o \
+	src/OctaTrig.o \
+	src/Quant.o \
+	src/Quantum.o \
+	src/SeqSwitch.o \
+	src/SeqSwitch2.o \
+	src/SH8.o \
+	src/ShiftRegister.o \
+	src/ShiftRegister2.o \
+	src/Sum8-MkII.o \
+	src/Sum8.o \
+	src/TrigBuf.o \
+	src/TrigDelay.o \
+	src/TrigSwitch.o \
+	src/TrigSwitch2.o \
+	src/TrigSwitch3.o \
+	src/TrigSwitch3_2.o \
+	src/VoltMeter.o
