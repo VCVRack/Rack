@@ -1,3 +1,8 @@
+
+#ifdef USE_VST2
+extern void vst2_get_timing_info (int *_retPlaying, float *_retBPM, float *_retSongPosPPQ);
+#endif // USE_VST2
+
 #include "global_pre.hpp"
 #include "Core.hpp"
 #include "midi.hpp"
@@ -47,6 +52,10 @@ struct MIDIToCVInterface : Module {
 	PulseGenerator continuePulse;
 	int clock = 0;
 	int divisions[2];
+#ifdef USE_VST2
+   int b_vst_transport_playing = 0;
+   float vst_timing_clock_samples = 0.0f;
+#endif // USE_VST2
 
 	struct NoteData {
 		uint8_t velocity = 0;
@@ -100,6 +109,10 @@ struct MIDIToCVInterface : Module {
 		clock = 0;
 		divisions[0] = 24;
 		divisions[1] = 6;
+#ifdef USE_VST2
+      b_vst_transport_playing = 0;
+      vst_timing_clock_samples = 0.0f;
+#endif // USE_VST2
 	}
 
 	void pressNote(uint8_t note) {
@@ -141,12 +154,74 @@ struct MIDIToCVInterface : Module {
 		releaseNote(255);
 	}
 
+#ifdef USE_VST2
+   void handleVSTClock(void) {
+      // (note) calling this _per sample_ is quite excessive (but should not be a problem)
+      // (note) the VST host might not update this per sample, though
+      float songPosPPQ = -1.0f;
+      float bpm = -1.0f;
+      int bPlaying = 0;
+      vst2_get_timing_info(&bPlaying, &bpm, &songPosPPQ);
+      // printf("xxx songPosPPQ=%f bpm=%f bPlaying=%d\n", songPosPPQ, bpm, bPlaying);
+
+      if(b_vst_transport_playing ^ bPlaying)
+      {
+         if(bPlaying)
+         {
+            startPulse.trigger(1e-3);
+            clock = 0;
+            vst_timing_clock_samples = 0.0f;
+         }
+         else
+         {
+            stopPulse.trigger(1e-3);
+            // Reset timing
+            clock = 0;
+         }
+         b_vst_transport_playing = bPlaying;
+      }
+
+      if(bPlaying && (bpm > 0.0f))
+      {
+         float secondsPerQuarter = 60.0f / bpm;
+         // 24 clock ticks per quarter note (MIDI timing clock)
+         float samplesPerTimingClockTick = (engineGetSampleRate() * secondsPerQuarter) / 24.0f;
+
+         if (clock % divisions[0] == 0) {
+            clockPulses[0].trigger(1e-3);
+         }
+         if (clock % divisions[1] == 0) {
+            clockPulses[1].trigger(1e-3);
+         }
+
+         vst_timing_clock_samples += 1.0f;
+         if(vst_timing_clock_samples >= samplesPerTimingClockTick)
+         {
+            vst_timing_clock_samples -= samplesPerTimingClockTick;
+
+            // if(++clock < 0) clock = 0  (may be optimized away by a C compiler)
+            union {
+               int s;
+               unsigned int u;
+            } uclock;
+            uclock.s = clock;
+            uclock.u++;
+            clock = (uclock.s < 0) ? 0 : uclock.s;
+         }
+      } // if bPlaying
+   }
+#endif // USE_VST2
+
 	void step() override {
 		MidiMessage msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
 		float deltaTime = engineGetSampleTime();
+
+#ifdef USE_VST2
+      handleVSTClock();
+#endif // USE_VST2
 
 		outputs[CV_OUTPUT].value = (lastNote - 60) / 12.f;
 		outputs[GATE_OUTPUT].value = gate ? 10.f : 0.f;
@@ -224,6 +299,7 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processSystem(MidiMessage msg) {
+#ifndef USE_VST2
 		switch (msg.channel()) {
 			// Timing
 			case 0x8: {
@@ -255,6 +331,9 @@ struct MIDIToCVInterface : Module {
 			} break;
 			default: break;
 		}
+#else
+      (void)msg;
+#endif // USE_VST2
 	}
 };
 

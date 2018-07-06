@@ -6,7 +6,8 @@
 + supports VST MIDI input 
 + supports up to 8 audio outputs
 + supports up to 8 audio inputs
-+ support VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
++ supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
++ supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 - does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
    - future releases may contain additional (open source) add-ons modules
 
@@ -21,7 +22,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-05Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-05Jul2018.7z)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-06Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-06Jul2018.7z)
 
 
 # Demo Video

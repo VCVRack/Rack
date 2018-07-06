@@ -16,7 +16,7 @@
 ///   limitations under the License.
 ///
 /// created: 25Jun2018
-/// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018
+/// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018
 ///
 ///
 ///
@@ -771,7 +771,32 @@ public:
 
    void handleUIParam(int uniqueParamId, float normValue) {
       if(NULL != _vstHostCallback)
-         _vstHostCallback(&_vstPlugin, audioMasterAutomate, uniqueParamId, 0/*value*/, NULL/*ptr*/, normValue/*opt*/);
+         (void)_vstHostCallback(&_vstPlugin, audioMasterAutomate, uniqueParamId, 0/*value*/, NULL/*ptr*/, normValue/*opt*/);
+   }
+
+   void getTimingInfo(int *_retPlaying, float *_retBPM, float *_retSongPosPPQ) {
+      *_retPlaying = 0;
+
+      if(NULL != _vstHostCallback)
+      {
+         VstIntPtr result = _vstHostCallback(&_vstPlugin, audioMasterGetTime, 0, 0/*value*/, NULL/*ptr*/, 0.0f/*opt*/);
+         if(NULL != result)
+         {
+            const struct VstTimeInfo *timeInfo = (const struct VstTimeInfo *)result;
+
+            *_retPlaying = (0 != (timeInfo->flags & kVstTransportPlaying));
+
+            if(0 != (timeInfo->flags & kVstTempoValid))
+            {
+               *_retBPM = float(timeInfo->tempo);
+            }
+
+            if(0 != (timeInfo->flags & kVstPpqPosValid))
+            {
+               *_retSongPosPPQ = timeInfo->ppqPos;
+            }
+         }
+      }
    }
 
 private:
@@ -1585,6 +1610,11 @@ void vst2_handle_queued_set_program_chunk(void) {
 void vst2_handle_ui_param(int uniqueParamId, float normValue) {
    // Called by engineSetParam()
    rack::global->vst2.wrapper->handleUIParam(uniqueParamId, normValue);
+}
+
+void vst2_get_timing_info(int *_retPlaying, float *_retBPM, float *_retSongPosPPQ) {
+   // updates the requested fields when query was successful
+   rack::global->vst2.wrapper->getTimingInfo(_retPlaying, _retBPM, _retSongPosPPQ);
 }
 
 #ifdef VST2_REPARENT_WINDOW_HACK

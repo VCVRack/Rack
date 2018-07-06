@@ -13,7 +13,8 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
 + supports VST MIDI input 
 + supports up to 8 audio outputs
 + supports up to 8 audio inputs
-+ support VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
++ supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
++ supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 - does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
    - future releases will contain additional (open source) add-ons modules
 

@@ -1,3 +1,8 @@
+** July 6th, 2018
+- Core.MIDI-1: support clock and start, stop signals
+   (host must implement audioMasterGetTime(7) and support kVstTempoValid + kVstTransportPlaying)
+
+
 ** July 5th, 2018
 - add module huaba.EQ3
 - add module huaba.ABBus
