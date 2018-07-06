@@ -103,7 +103,7 @@ template<int OVERSAMPLE, int QUALITY>
 struct Decimator {
 	float inBuffer[OVERSAMPLE*QUALITY];
 	float kernel[OVERSAMPLE*QUALITY];
-	int inIndex = 0;
+	int inIndex;
 
 	Decimator(float cutoff = 0.9f) {
 		boxcarLowpassIR(kernel, OVERSAMPLE*QUALITY, cutoff * 0.5f / OVERSAMPLE);
@@ -111,16 +111,16 @@ struct Decimator {
 		reset();
 	}
 	void reset() {
-		// Zero input buffer
+		inIndex = 0;
 		memset(inBuffer, 0, sizeof(inBuffer));
 	}
 	/** `in` must be length OVERSAMPLE */
 	float process(float *in) {
 		// Copy input to buffer
 		memcpy(&inBuffer[inIndex], in, OVERSAMPLE*sizeof(float));
+		// Advance index
 		inIndex += OVERSAMPLE;
 		inIndex %= OVERSAMPLE*QUALITY;
-
 		// Perform naive convolution
 		float out = 0.f;
 		for (int i = 0; i < OVERSAMPLE*QUALITY; i++) {
@@ -135,9 +135,38 @@ struct Decimator {
 
 template<int OVERSAMPLE, int QUALITY>
 struct Upsampler {
+	float inBuffer[QUALITY];
+	float kernel[OVERSAMPLE*QUALITY];
+	int inIndex;
+
+	Upsampler(float cutoff = 0.9f) {
+		boxcarLowpassIR(kernel, OVERSAMPLE*QUALITY, cutoff * 0.5f / OVERSAMPLE);
+		blackmanHarrisWindow(kernel, OVERSAMPLE*QUALITY);
+		reset();
+	}
+	void reset() {
+		inIndex = 0;
+		memset(inBuffer, 0, sizeof(inBuffer));
+	}
 	/** `out` must be length OVERSAMPLE */
 	void process(float in, float *out) {
-		// TODO
+		// Zero-stuff input buffer
+		inBuffer[inIndex] = OVERSAMPLE * in;
+		// Advance index
+		inIndex++;
+		inIndex %= QUALITY;
+		// Naively convolve each sample
+		// TODO replace with polyphase filter hierarchy
+		for (int i = 0; i < OVERSAMPLE; i++) {
+			float y = 0.f;
+			for (int j = 0; j < QUALITY; j++) {
+				int index = inIndex - 1 - j;
+				index = (index + QUALITY) % QUALITY;
+				int kernelIndex = OVERSAMPLE * j + i;
+				y += kernel[kernelIndex] * inBuffer[index];
+			}
+			out[i] = y;
+		}
 	}
 };
 
