@@ -6,7 +6,7 @@
 #include <condition_variable>
 #include "Core.hpp"
 #include "audio.hpp"
-#include "dsp/samplerate.hpp"
+#include "dsp/resampler.hpp"
 #include "dsp/ringbuffer.hpp"
 
 
