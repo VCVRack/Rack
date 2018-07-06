@@ -2,6 +2,8 @@ SLUG=Valley
 
 include ../../../../dep/yac/install_msvc.mk
 
+EXTRAFLAGS+= -wo4838 -wo4305
+
 include make.objects
 
 include ../../../build_plugin.mk
