@@ -39,6 +39,8 @@
 - add module NauModular.Osc
 - add module Southpole-parasites.Annuli
 - add module Southpole-parasites.Splash
+- fix denormalized float performance issue
+- add (optional) AVX2-optimized binaries
 
 
 ** July 6th, 2018

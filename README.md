@@ -22,7 +22,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-07Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-07Jul2018.7z)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-07Jul2018b.7z](dist/veeseevstrack_0_6_1_win64_bin-07Jul2018b.7z)
 
 
 # Demo Video

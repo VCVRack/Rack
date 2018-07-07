@@ -34,7 +34,9 @@ static void stepChannel(Input &in, Param &level, Input &lin, Input &exp, Output 
 	const float expBase = 50.0f;
 	if (exp.active)
 		v *= rescale(powf(expBase, clamp(exp.value / 10.0f, 0.0f, 1.0f)), 1.0f, expBase, 0.0f, 1.0f);
-	out.value = v;
+   v += 100.0f;
+   v -= 100.0f;
+   out.value = v;
 }
 
 void VCA::step() {

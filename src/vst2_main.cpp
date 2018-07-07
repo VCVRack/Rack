@@ -70,6 +70,7 @@ extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
 
 #define WIN32_LEAN_AND_MEAN defined
 #include <windows.h>
+#include <xmmintrin.h>
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
@@ -1024,6 +1025,10 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
             outputs[chIdx][i] = 0.0f;
          }
       }
+
+#ifdef HAVE_WINDOWS
+      _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+#endif // HAVE_WINDOWS
 
       vst2_engine_process(inputs, outputs, sampleFrames);
    }
