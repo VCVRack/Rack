@@ -1,0 +1,21 @@
+
+EURORACK_OBJ= \
+	parasites/stmlib/utils/random.o \
+	parasites/stmlib/dsp/atan.o \
+	parasites/stmlib/dsp/units.o \
+	parasites/clouds/dsp/correlator.o \
+	parasites/clouds/dsp/granular_processor.o \
+	parasites/clouds/dsp/mu_law.o \
+	parasites/clouds/dsp/pvoc/frame_transformation.o \
+	parasites/clouds/dsp/pvoc/phase_vocoder.o \
+	parasites/clouds/dsp/pvoc/stft.o \
+	parasites/clouds/resources.o \
+	parasites/tides/generator.o \
+	parasites/tides/resources.o
+
+
+ALL_OBJ= $(EURORACK_OBJ) \
+	src/Annuli.o \
+	src/Smoke.o \
+	src/Southpole.o \
+	src/Splash.o

@@ -1,3 +1,46 @@
+** July 7th, 2018
+- add module Bidoo.DTROY
+- add module Bidoo.BORDL
+- add module Bidoo.MU
+- add module Bidoo.TOCANTE
+- add module Bidoo.CHUTE
+- add module Bidoo.LATE
+- add module Bidoo.LOURDE
+- add module Bidoo.ACNE
+- add module Bidoo.DUKE
+- add module Bidoo.MOIRE
+- add module Bidoo.FORK
+- add module Bidoo.TIARE
+- add module Bidoo.CLACOS
+- add module Bidoo.ANTN
+- add module Bidoo.LIMBO
+- add module Bidoo.PERCO
+- add module Bidoo.BAR
+- add module Bidoo.ZINC
+- add module Bidoo.VOID
+- add module Bidoo.SIGMA
+- add module LOGinstruments.constant
+- add module LOGinstruments.constant2
+- add module LOGinstruments.Speck
+- add module LOGinstruments.Britix
+- add module LOGinstruments.Compa
+- add module LOGinstruments.LessMess
+- add module LOGinstruments.Velvet
+- add module LOGinstruments.Crystal
+- add module modular80.Logistiker
+- add module mtsch_plugins.Sum
+- add module mtsch_plugins.Rationals
+- add module mtsch_plugins.TriggerPanic
+- add module NauModular.Tension
+- add module NauModular.Function
+- add module NauModular.Perlin
+- add module NauModular.S_h_it
+- add module NauModular.BitHammer
+- add module NauModular.Osc
+- add module Southpole-parasites.Annuli
+- add module Southpole-parasites.Splash
+
+
 ** July 6th, 2018
 - Core.MIDI-1: support clock and start, stop signals
    (host must implement audioMasterGetTime(7) and support kVstTempoValid + kVstTransportPlaying)

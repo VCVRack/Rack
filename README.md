@@ -89,6 +89,26 @@ The following add-on modules are statically linked with the VST plugin:
  - Befaco.Rampage
  - Befaco.SlewLimiter
  - Befaco.SpringReverb
+ - Bidoo.DTROY
+ - Bidoo.BORDL
+ - Bidoo.MU
+ - Bidoo.TOCANTE
+ - Bidoo.CHUTE
+ - Bidoo.LATE
+ - Bidoo.LOURDE
+ - Bidoo.ACNE
+ - Bidoo.DUKE
+ - Bidoo.MOIRE
+ - Bidoo.FORK
+ - Bidoo.TIARE
+ - Bidoo.CLACOS
+ - Bidoo.ANTN
+ - Bidoo.LIMBO
+ - Bidoo.PERCO
+ - Bidoo.BAR
+ - Bidoo.ZINC
+ - Bidoo.VOID
+ - Bidoo.SIGMA
  - Bogaudio.VCO
  - Bogaudio.XCO
  - Bogaudio.Additator
@@ -230,8 +250,28 @@ The following add-on modules are statically linked with the VST plugin:
  - LindenbergResearch.ReShaper
  - LindenbergResearch.BlankPanel
  - LindenbergResearch.BlankPanelM1
+ - LOGinstruments.constant
+ - LOGinstruments.constant2
+ - LOGinstruments.Speck
+ - LOGinstruments.Britix
+ - LOGinstruments.Compa
+ - LOGinstruments.LessMess
+ - LOGinstruments.Velvet
+ - LOGinstruments.Crystal
+ - modular80.Logistiker
+ - mtsch_plugins.Sum
+ - mtsch_plugins.Rationals
+ - mtsch_plugins.TriggerPanic
+ - NauModular.Tension
+ - NauModular.Function
+ - NauModular.Perlin
+ - NauModular.S_h_it
+ - NauModular.BitHammer
+ - NauModular.Osc
  - ML_modules.Quantizer
  - ML_modules.Quantum
+ - Southpole-parasites.Annuli
+ - Southpole-parasites.Splash
  - ML_modules.TrigBuf
  - ML_modules.SeqSwitch
  - ML_modules.SeqSwitch2

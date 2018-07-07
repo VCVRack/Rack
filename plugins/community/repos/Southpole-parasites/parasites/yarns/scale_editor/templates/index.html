@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Scala to SysEx conversion</h1>
+
+<h2>Scale editor</h2>
+
+<p>Upload an existing Scala file:</p>
+
+<form action="/" method="post" enctype="multipart/form-data">
+<p><input type="file" name="scl"> <input type="submit" value="Convert" /></p>
+</form>
+
+<p>Or input a scale using Scala's syntax (<a href="http://www.huygens-fokker.org/scala/scl_format.html">reference here</a>):</p>
+
+<form action="/" method="post" enctype="multipart/form-data">
+  <p><textarea rows="24" cols="60" name="source">{{ source }}</textarea></p>
+  <p><input type="submit" value="Convert" /></p>
+</form>
+
+{% if error_message %}
+
+<h2>Parse error!</h2>
+
+<p class="error">{{ error_message }}</p>
+
+{% endif %}
+
+{% if notes %}
+
+<h2>Result</h2>
+
+<p><a href="/syx?data={{ link }}">Download .syx file</a></p>
+
+<p>The scale contains the following notes (in cents):</p>
+
+<ul class="notes">
+
+{% for note in notes %}
+
+<li>{{ note|floatformat:2 }}</li>
+
+{% endfor %}
+
+</ul>
+
+<p>The note mapping (for a root note of C) is as follows:</p>
+
+<ul class="mappings">
+
+{% for mapping in mappings %}
+
+<li>{{ mapping }}</li>
+
+{% endfor %}
+
+</ul>
+
+{% endif %}
+
+
+{% endblock %}

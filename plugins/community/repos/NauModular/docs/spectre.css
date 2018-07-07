@@ -1,0 +1,207 @@
+* {margin: 0; padding: 0;}
+
+body {
+	text-align: center;
+}
+
+#ascii{
+	font-family: monospace;
+	font-size: 10px;
+	line-height: 70%;
+}
+
+#tentacleSprite{
+	display: none;
+}
+
+#wrapper{
+	margin-left:auto;
+    	margin-right:auto;
+    	height:auto;
+    	width:auto;
+}
+
+#container{
+	overflow: hidden;
+	display: inline-block;
+}
+
+#propaganda{
+	display: inline-block;
+}
+
+#propaganda h1{
+	font-family: monospace;
+	font-weight: normal;
+	font-size: 30px;
+}
+
+#propaganda h2{
+	font-family: monospace;
+	font-weight: normal;
+	font-size: 20px;
+}
+
+#contacts{
+	width: 450px;
+	height: auto;
+	font-family: monospace;
+	font-size: 14px;
+}
+
+#bio{
+	width: 500px;
+	height: auto;
+	font-family: monospace;
+	font-size: 14px;
+	text-align: left;
+}
+
+#artworks{
+	width: 500px;
+	height: auto;
+	font-family: monospace;
+	font-size: 14px;
+}
+
+#exhibitions{
+	display: none;
+	width: 500px;
+	height: auto;
+	font-family: monospace;
+	font-size: 14px;
+}
+
+.asciiCode{
+	display:block;
+	letter-spacing: 0px;
+	line-height:70%;
+	font-size: 5px;
+	font-weight:bold;
+	white-space:pre;
+	font-family: monospace;
+	color: black;
+}
+
+a:link {
+    color: black;
+    text-decoration: none;
+}
+
+a:visited {
+    color: gray;
+    text-decoration: none;
+}
+
+a:hover {
+    color: red;
+    text-decoration: none;
+}
+
+a:active {
+    color: red;
+    text-decoration: none;
+}
+
+.asciiTable{
+	font-family: monospace;
+	font-size: 14px;
+	margin: 1em;
+	display: inline-block;
+	position: relative;
+}
+
+.asciiTable table{
+	border-collapse: collapse;
+}
+
+.asciiTable td{
+	border: 1px dashed #000;
+	padding: .5em;
+	position: relative;
+}
+
+.asciiTable td:before{
+	position: absolute;
+	width: 15px;
+	height: 15px;
+	content: "+";
+	top: -9px;
+	left: -8px;
+}
+
+.asciiTable tr td:last-child:after, .asciiTable tr:last-child td:after {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    content: "+";
+    bottom: -9px;
+    right: -8px;
+}
+
+.asciiTable tr td:last-child:after, .asciiTable tr:last-child td:after {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    content: "+";
+    bottom: -9px;
+    right: -8px;
+}
+.asciiTable:before {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    content: "+";
+    top: -8px;
+    right: -7px;
+}
+
+.asciiTable:after {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    content: "+";
+    bottom: -8px;
+    left: -7px;
+}
+
+.menuTable td{
+	width: 100px;
+}
+
+.awTable table{
+	width: 500px;
+}
+
+.awTable tr{
+	width: 500px;
+}
+
+.awTitle td{
+	width: 500px;
+}
+
+.awSection td{
+	width: 80px;
+}
+
+.awField td{
+	width: 420px;
+	text-align: left;
+}
+
+.exRow table{
+	width: 500px;
+}
+
+.exYear td{
+	width: 50px;
+}
+
+.exPlace td{
+	width: 100px;
+}
+
+.exEvent td{
+	width: 350px;
+}

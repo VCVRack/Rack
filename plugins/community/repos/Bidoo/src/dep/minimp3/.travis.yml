@@ -1,0 +1,29 @@
+language: c
+addons:
+  apt:
+    packages:
+      - libc6-dev-i386
+      - gcc-arm-none-eabi
+      - libnewlib-arm-none-eabi
+      - gcc-4.8-multilib
+      - gcc-4.8-aarch64-linux-gnu
+      - gcc-4.8-powerpc-linux-gnu
+      - gcc-aarch64-linux-gnu
+      - gcc-powerpc-linux-gnu
+      - libc6-arm64-cross
+      - libc6-powerpc-cross
+      - libc6-dev-arm64-cross
+      - libc6-dev-powerpc-cross
+      - qemu
+
+os:
+    - linux
+
+compiler:
+    - gcc
+
+script:
+    - scripts/build.sh
+
+after_success:
+    - bash <(curl -s https://codecov.io/bash)

@@ -1,0 +1,6 @@
+ALL_OBJ= \
+	./src/DigitDisplay.o \
+	./src/mtsch.o \
+	./src/Rationals.o \
+	./src/Sum.o \
+	./src/TriggerPanic.o

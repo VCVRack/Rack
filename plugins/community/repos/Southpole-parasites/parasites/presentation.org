@@ -1,0 +1,207 @@
+* Clouds changelog
+
+v1.3:
+- Oliverb:
+  - fixed a bug causing a "swooping" sound when reducing quickly
+    reverb size.
+  - fixed a bug causing clicks when Size was fully CCW.
+  - replace soft-clipping by a limiter in the feedback loop. There is
+    no distortion anymore when the reverb is self-oscillating.
+  - made the reverb tail a bit smoother (less "muddy"?)
+  - made wet signal significantly louder
+- Looping delay:
+  - reduced drastically the slew on the delay time setting. Delay time
+    changes are almost instantaneous now.
+  - adjusted delay time knob response for more accurate dialing of
+    short delays.
+  - enhanced the quality of pitch shifting.
+- Resonestor: adjusted the Texture knob response for more useful
+  range.
+- Granular: lowered grain polyphony a bit to cope with inceased memory
+  need.
+- hardware support for Clouds bought after July 2015. Merged minor
+  changes from the last official Clouds firmware.
+- Misc: adjusted HP filter on feedback a bit, to keep more low
+  frequencies.
+
+* Oliverb
+
+Clouds Parasite is an alternative firmware for Clouds. It adds several
+features and enhancements to the stock firmware provided by Mutable
+Instruments.
+
+Today, I will demonstrate an additional mode, that turns the whole
+module into a reverb. I like to call it the OliVerb.
+
+To access it, first download the .wav file on the Parasites' website
+linked below, and play it to your module as described in the
+manual. Once this is done, long-press on the *Blend button*, then press
+it again until only the first LED is unlit.
+
+This is the dry sound we will be working with. The *Dry/Wet* control
+crossfades between the dry sound and the reverberated sound.
+
+The *Size* knob controls the size of the room, from a tiny room... to
+a huge hall.
+
+The *Density* knob controls the decay, or the length of the reverb
+tail. Past a certain value, the decay is infinite, the reverb even
+amplifies the sound, which means that it will sustains forever, even
+if we pull out the input.
+
+Whatever the density is, the *Freeze* knob will try to sustain the
+current sound as long as possible.
+
+The *Position* knob sets the length of the pre-delay, which simulates
+the time it take for the sound to first hit the wall. It gives the ear
+a good sense of distance. Feeding a clock to the *Trig* input will
+synchronize this pre-delay time to a multiple or divisor of the clock,
+set by the *Position* knob.
+
+The *Texture* knob modifies the quality of the the reverb tail, from a
+full, diffuse texture to a simpler echo-like sound, akin to a
+multi-tap delay. In this case, the *Density* knob acts roughly as a
+feedback control.
+
+Optionally, each time the sound hits a wall, it can be pitch-shifted
+by a certain amount of semitones. The *Pitch* knob controls this
+amount. The longer the decay, the stronger the effect: here we can
+clearly hear the raising pitches. Setting the pitch to the maximum,
++12 semitones, we recreate an approximation of the classic shimmer
+reverb effect. Note that the *Size* affects the quality of the
+pitch-shifting.
+
+The second blend mode, called *Stereo spread* in the manual, controls
+the color of the reverb: at 12 o'clock, it is bright and
+neutral. Counter-clockwise, it becomes more and more dampened,
+simulating non-refecting wall materials, like wood. Clockwise, low
+frequency are more and more discarded, simulating... nothing.
+
+The OliVerb finally features an internal random modulation section: 12
+internal random LFOs modulate all the internal delay times, for weird
+effects and ghost notes.
+
+The rate of the modulations is controlled by the 3rd blend mode,
+called *Feedback* in the manual. It has no effect until we increase
+the amount of modulation, which is controlled by the 4th blend mode,
+called *Reverb* in the manual.
+
+At slow rates and high amounts of modulation, the OliVerb will produce
+uncommon, sustained pitched sounds. Let me try to chase them to
+conclude this demonstration.
+
+* Resonestor
+
+Clouds Parasite is an alternative firmware for Clouds. It adds several
+features and enhancements to the stock firmware provided by Mutable
+Instruments.
+
+Version 1.2 has a new mode: Resonestor. It is a polyphonic
+resonator effect, with support for synthesis of plucked strings, and
+more.
+
+To access it, first download the .wav file on the Parasites' website
+linked below, and play it to your module as described in the
+manual. Once this is done, long-press on the *Blend button*, then press
+it again until only the second LED is unlit.
+
+This is the dry sound we will be working with. If we set the *Dry/Wet*
+all the way to wet, and increase the decay (controlled by the
+*Density* knob), we will start to hear it resonate, up to infinite
+decay.
+
+The *Pitch* knob sets the pitch of the resonance. You can play
+tuned melodies through the *1V/Oct* input.
+
+Because the sound such comb filters is very metallic and raw, there
+are filters into the feedback loop to attenuate extreme
+frequencies. The *Texture* knob sets this attenuation. At noon, no
+filtering is applied. Counter-clockwise is an increasingly low-pass
+filter, and clockwise is an increasingly resonant band-pass filter.
+
+This setup is the basis of a well-known synthesis technique for
+plucked strings, the Karplus-Strong algorithm, where a short burst of
+noise "excites" the resonator. In Resonestor, the short burst can be
+produced internally; in this case, an input is not necessary. Feed a
+trigger to the *Trig* input. The *Position* knob determines the timbre
+of the burst: from long and dampened to short and bright. It
+more-or-less simulates the plucking position on the string.
+
+The third *Blend* mode can allow only some of the overtones to
+ring, simulating the effect of playing harmonics, say, on a guitar.
+
+Actually, there are four parts playing in unison at the moment. With
+the *Size* knob, you can detune them... and make them play various
+chords.
+
+On a string instrument, it is rare that the strings are struck at the
+very same time: there is always a small delay between each
+striking. The fourth *Blend* mode sets the amount of random delay
+before each of the resonators are excited. With this, you can
+make Nestor sound like a sloppy guitar player.
+
+The acute listener will have noticed that two strings resonate
+simultaneously here. In fact, the mode comprises two identical voices,
+only one of which is active at any time. Each time a trigger is
+received, the active voice changes. All the parameters control only
+the currently active voice.
+
+When you enable *Freeze*, this voice switching is inhibited. Together
+with infinite decay, this allows you to make long drones on one
+channel, and use the other one for plucked melodies.
+
+The second *Blend* mode sets how the resonators are mapped to the
+outputs. At noon, it is monophonic. CCW, each voice is assigned a
+separate output, for separate processing. CW, the four parts of each
+voices are spread on both output, for a pleasant stereo effect.
+
+Note that at any time, the inputs are still fed to the resonators, so
+you can combine techniques.
+
+Thanks for watching!
+* Frames
+
+Frames Parasite v1.0: an alternative firmware for MI Frames
+
+Hi,
+
+Here is a proper announcement for the release of [b]Frames Parasite[/b]. A parasite is an organism living in or on another, benefiting unilaterally from its host. [b]Parasites[/b] is a series of free alternative firmwares for MI modules. Their purpose is to enhance existing features, add new function and hidden modes, retaining as much as possible factory functionality. You might have heard of [url=https://www.muffwiggler.com/forum/viewtopic.php?t=136287]Clouds Parasite[/url].
+
+Frames Parasite [url=https://www.muffwiggler.com/forum/viewtopic.php?t=128684]was announced before[/url]. This is basically the same version, with only a few changes. It adds the following features to the module:
+[*] a new Sequencer step edition mode to easily enter sequences in sequencer mode.
+[*] a new Shift Register sequencer mode that turns Frames into an advanced random canon generator.
+
+All features of the official firmware are left untouched and still accessible as before.
+
+You can download it and read the full documentation here:
+
+[url]http://mqtthiqs.github.io/parasites/[/url]
+
+Version 
+Version 1.0 
+* Tides changelog
+
+v0.9beta3
+=========
+
+- No more timeout for choosing a scale: one exits quantizer mode via a
+  long press on the Mode button.
+- Fixed a bug inhibiting permanent saving of the state of the module
+- Fixed a bug causing the level to be maxed out when switching
+  scales/mode
+- Reduced the size of internal parabola tables, which generate
+  saw/trianges at audio rate, to make space for new code. It should
+  be unnoticeable.
+- Function generator: When Smoothness is fully CCW, outputs are now
+  completely muted.
+- Quantizer: fixed glitches appearing when exactly in between two notes
+- Two-bumps: when not in PLL mode, clock randomizes both quality and
+  harmonics choice parameters.
+- Two-bumps: better gain computation. Should result in louder and more
+  consistent volumes.
+- Two-bumps: reduced slew on Pitch in PLL mode
+- Two-bumps: Change the order of decimation choices. It now goes: low
+  quality (green), medium (black), high (red), which respects the
+- Two-drunks: Fixed a bug causing discontinuities in the Bi output
+- Two-drunks: when not in PLL mode, clock randomizes the Range parameter.
+

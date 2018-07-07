@@ -1,0 +1,14 @@
+
+SLUG=Southpole-parasites
+
+include ../../../../dep/yac/install_msvc.mk
+
+EXTRAFLAGS= \
+	-DTEST \
+	-DPARASITES \
+	-I./parasites -Ieurorack/ \
+	-Dstmlib=stmlib_parasites
+
+include make.objects
+
+include ../../../build_plugin.mk

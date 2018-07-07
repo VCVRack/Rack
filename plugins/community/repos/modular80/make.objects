@@ -1,0 +1,3 @@
+ALL_OBJ= \
+	./src/Logistiker.o \
+	./src/modular80.o

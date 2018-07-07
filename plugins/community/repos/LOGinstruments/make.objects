@@ -1,0 +1,9 @@
+ALL_OBJ= \
+	./src/Britix.o \
+	./src/Compa.o \
+	./src/constant.o \
+	./src/crystal.o \
+	./src/LessMess.o \
+	./src/LOGinstruments.o \
+	./src/Speck.o \
+	./src/Velvet.o

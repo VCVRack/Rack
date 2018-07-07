@@ -1,0 +1,9 @@
+SLUG=NauModular
+
+include ../../../../dep/yac/install_msvc.mk
+
+EXTRAFLAGS += -DARCH_WIN
+
+include make.objects
+
+include ../../../build_plugin.mk

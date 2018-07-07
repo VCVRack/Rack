@@ -1,0 +1,9 @@
+ALL_OBJ= \
+	./src/BitHammer.o \
+	./src/Function.o \
+	./src/NauModular.o \
+	./src/Osc.o \
+	./src/Perlin.o \
+	./src/S_h_it.o \
+	./src/Tension.o \
+	./src/tinyosc.o
