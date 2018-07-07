@@ -430,6 +430,10 @@ It is not permitted to redistribute it and Steinberg has discontinued it.
 I heard that the `aeffect.h` / `aeffectx.h` files are still included in the VST3 SDK.
 
 
+# License
+All additional source code added by me is placed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license.
+
+
 # Changelog
 see [vst2_bin/CHANGELOG_VST.txt](vst2_bin/CHANGELOG_VST.txt)
 
