@@ -389,6 +389,11 @@ The following add-on modules are statically linked with the VST plugin:
 Please notice that the Audible/Mutable Instruments modules appear under a different name in the UI.
 For example, "Clouds" is listed as "Texture Synthesizer".
 
+
+# License
+All additional source code added by me is placed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license.
+
+
 # How to build
 
 Prerequisites:
@@ -428,10 +433,6 @@ If the build succeeded, the effect and instrument plugin DLLs can now be found i
 Last but not least, please don't ask me for the VST2 SDK.
 It is not permitted to redistribute it and Steinberg has discontinued it.
 I heard that the `aeffect.h` / `aeffectx.h` files are still included in the VST3 SDK.
-
-
-# License
-All additional source code added by me is placed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license.
 
 
 # Changelog
