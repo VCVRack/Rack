@@ -22,7 +22,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-07Jul2018b.7z](dist/veeseevstrack_0_6_1_win64_bin-07Jul2018b.7z)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-08Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-08Jul2018.7z) (64bit)
 
 
 # Demo Video
@@ -178,6 +178,12 @@ The following add-on modules are statically linked with the VST plugin:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
+ - DHE-Modules.BoosterStage
+ - DHE-Modules.Cubic
+ - DHE-Modules.Hostage
+ - DHE-Modules.Stage
+ - DHE-Modules.Swave
+ - DHE-Modules.Upstage
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
@@ -259,6 +265,23 @@ The following add-on modules are statically linked with the VST plugin:
  - LOGinstruments.Velvet
  - LOGinstruments.Crystal
  - modular80.Logistiker
+ - mscHack.MasterClockx4
+ - mscHack.Seq_3x16x16
+ - mscHack.SEQ_6x32x16
+ - mscHack.Seq_Triad2
+ - mscHack.SEQ_Envelope_8
+ - mscHack.Maude_221
+ - mscHack.ARP700
+ - mscHack.SynthDrums
+ - mscHack.XFade
+ - mscHack.Mix_1x4_Stereo
+ - mscHack.Mix_2x4_Stereo
+ - mscHack.Mix_4x4_Stereo
+ - mscHack.Mix_24_4_4
+ - mscHack.StepDelay
+ - mscHack.PingPong
+ - mscHack.Osc_3Ch
+ - mscHack.Compressor
  - mtsch_plugins.Sum
  - mtsch_plugins.Rationals
  - mtsch_plugins.TriggerPanic

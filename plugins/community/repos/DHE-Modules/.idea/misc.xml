@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
+  <component name="CidrRootsConfiguration">
+    <sourceRoots>
+      <file path="$PROJECT_DIR$/catch" />
+      <file path="$PROJECT_DIR$/src" />
+      <file path="$PROJECT_DIR$/src/gui" />
+      <file path="$PROJECT_DIR$/src/plugin" />
+      <file path="$PROJECT_DIR$/src/util" />
+      <file path="$PROJECT_DIR$/test" />
+    </sourceRoots>
+  </component>
+</project>

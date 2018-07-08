@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="56"
+   height="56"
+   viewBox="0 0 14.816666 14.816666"
+   version="1.1"
+   id="svg992"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="mschack_Blue2_big.svg">
+  <defs
+     id="defs986" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="22.4"
+     inkscape:cx="52.222031"
+     inkscape:cy="42.847596"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1858"
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata989">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-282.18334)"
+     style="display:inline">
+    <ellipse
+       style="opacity:1;fill:#00255e;fill-opacity:0.98895024;stroke:none;stroke-width:0.20947044;stroke-opacity:1"
+       id="path1551"
+       cx="7.4090929"
+       cy="289.61981"
+       rx="7.4061041"
+       ry="7.4056921" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:0.98895024;stroke:none;stroke-width:0.10857303;stroke-opacity:1"
+       id="rect1561"
+       width="0.67740273"
+       height="5.8331909"
+       x="7.0172386"
+       y="281.90726" />
+  </g>
+</svg>

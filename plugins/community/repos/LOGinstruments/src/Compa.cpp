@@ -83,5 +83,6 @@ using namespace rack_plugin_LOGinstruments;
 
 RACK_PLUGIN_MODEL_INIT(LOGinstruments, Compa) {
    Model *modelCompa = Model::create<Compa, CompaWidget>("LOGinstruments", "Compa", "Comparator", DIGITAL_TAG, QUANTIZER_TAG);
+   return modelCompa;
 }
 

@@ -1,0 +1,19 @@
+---
+layout: panel
+width: 4
+title: SWAVE
+color: [16,100,50]
+controls:
+  knobs: []
+  ports: []
+  switches: [2]
+---
+{% assign width = page.width | hp_to_mm %}
+{% assign center_x = width | divided_by:2.0 %}
+
+{{ page | shape_switch: center_x, 25 }}
+{{ page | large_knob: center_x, 43.5, 'CURVE' }}
+{{ page | cv: center_x, 62 }}
+
+{{ page | in_port: center_x, 97.0, 'IN' }}
+{{ page | out_port: center_x, 112.0, 'OUT' }}

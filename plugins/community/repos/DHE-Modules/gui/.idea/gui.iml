@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RUBY_MODULE" version="4">
+  <component name="ModuleRunConfigurationManager">
+    <shared />
+  </component>
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="jdk" jdkName="ruby-2.5.0-p0" jdkType="RUBY_SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="addressable (v2.5.2, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bundler (v1.16.1, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="color (v1.8, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="colorator (v1.1.0, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="concurrent-ruby (v1.0.5, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="em-websocket (v0.5.1, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="eventmachine (v1.2.5, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ffi (v1.9.23, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="forwardable-extended (v2.6.0, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="http_parser.rb (v0.6.0, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="i18n (v0.9.5, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="jekyll (v3.7.3, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="jekyll-sass-converter (v1.5.2, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="jekyll-watch (v2.0.0, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="kramdown (v1.16.2, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="liquid (v4.0.0, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="listen (v3.1.5, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="mercenary (v0.3.6, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="pathutil (v0.16.1, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="public_suffix (v3.0.2, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rake (v12.3.0, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rb-fsevent (v0.10.3, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rb-inotify (v0.9.10, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rouge (v3.1.1, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ruby_dep (v1.5.0, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="safe_yaml (v1.0.4, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="sass (v3.5.5, ruby-2.5.0-p0) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="sass-listen (v4.0.0, ruby-2.5.0-p0) [gem]" level="application" />
+  </component>
+</module>

@@ -574,6 +574,7 @@ extern void init_plugin_Befaco             (rack::Plugin *p);
 extern void init_plugin_Bidoo              (rack::Plugin *p);
 extern void init_plugin_Bogaudio           (rack::Plugin *p);
 extern void init_plugin_cf                 (rack::Plugin *p);
+extern void init_plugin_DHE_Modules        (rack::Plugin *p);
 extern void init_plugin_ErraticInstruments (rack::Plugin *p);
 extern void init_plugin_ESeries            (rack::Plugin *p);
 extern void init_plugin_FrozenWasteland    (rack::Plugin *p);
@@ -585,6 +586,7 @@ extern void init_plugin_LindenbergResearch (rack::Plugin *p);
 extern void init_plugin_LOGinstruments     (rack::Plugin *p);
 extern void init_plugin_ML_modules         (rack::Plugin *p);
 extern void init_plugin_modular80          (rack::Plugin *p);
+extern void init_plugin_mscHack            (rack::Plugin *p);
 extern void init_plugin_mtsch_plugins      (rack::Plugin *p);
 extern void init_plugin_NauModular         (rack::Plugin *p);
 // extern void init_plugin_ParableInstruments (rack::Plugin *p); // alternative "Clouds" module (crashes)
@@ -632,6 +634,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Bidoo",              &init_plugin_Bidoo);
    vst2_load_static_rack_plugin("Bogaudio",           &init_plugin_Bogaudio);
    vst2_load_static_rack_plugin("cf",                 &init_plugin_cf);
+   vst2_load_static_rack_plugin("DHE-Modules",        &init_plugin_DHE_Modules);
    vst2_load_static_rack_plugin("ErraticInstruments", &init_plugin_ErraticInstruments);
    vst2_load_static_rack_plugin("ESeries",            &init_plugin_ESeries);
    vst2_load_static_rack_plugin("FrozenWasteland",    &init_plugin_FrozenWasteland);
@@ -643,6 +646,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("LOGinstruments",     &init_plugin_LOGinstruments);
    vst2_load_static_rack_plugin("ML_modules",         &init_plugin_ML_modules);
    vst2_load_static_rack_plugin("modular80",          &init_plugin_modular80);
+   vst2_load_static_rack_plugin("mscHack",            &init_plugin_mscHack);
    vst2_load_static_rack_plugin("mtsch_plugins",      &init_plugin_mtsch_plugins);
    vst2_load_static_rack_plugin("NauModular",         &init_plugin_NauModular);
    // vst2_load_static_rack_plugin("ParableInstruments", &init_plugin_ParableInstruments);

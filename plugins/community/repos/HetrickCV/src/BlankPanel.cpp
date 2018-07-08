@@ -189,4 +189,5 @@ using namespace rack_plugin_HetrickCV;
 
 RACK_PLUGIN_MODEL_INIT(HetrickCV, BlankPanel) {
    Model *modelBlankPanel = Model::create<BlankPanel, BlankPanelWidget>("HetrickCV", "BlankPanel", "Blank Panel");
+   return modelBlankPanel;
 }

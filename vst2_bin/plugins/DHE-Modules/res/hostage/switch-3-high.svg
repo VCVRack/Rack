@@ -1,0 +1,19 @@
+
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+width="3.0mm" height="9.0mm" viewBox="0 0 3.0 9.0">
+  <g transform="translate(1.5 4.5)">
+    
+      <g transform="translate(0.0 0.0)" fill="#fff0ff" stroke="#990099">
+        <rect x="-1.3125" y="-4.3125" width="2.625" height="8.625"
+              rx="0.1875" ry="0.1875"
+              stroke-width="0.375"/>
+        <line x1="-0.875" x2="0.875" y1="-3.75" y2="-3.75" stroke-width="0.25" stroke-linecap="round"/>
+<line x1="-0.875" x2="0.875" y1="-3.25" y2="-3.25" stroke-width="0.25" stroke-linecap="round"/>
+<line x1="-0.875" x2="0.875" y1="-2.75" y2="-2.75" stroke-width="0.25" stroke-linecap="round"/>
+<line x1="-0.875" x2="0.875" y1="-2.25" y2="-2.25" stroke-width="0.25" stroke-linecap="round"/>
+<line x1="-0.875" x2="0.875" y1="-1.75" y2="-1.75" stroke-width="0.25" stroke-linecap="round"/>
+      </g>
+    
+  </g>
+</svg>

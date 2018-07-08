@@ -69,4 +69,5 @@ using namespace rack_plugin_Qwelk;
 RACK_PLUGIN_MODEL_INIT(Qwelk, Gate) {
    Model *modelGate = Model::create<ModuleGate, WidgetGate>(
       TOSTRING(SLUG), "Gate", "Gate", UTILITY_TAG, ATTENUATOR_TAG);
+   return modelGate;
 }

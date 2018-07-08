@@ -1,0 +1,8 @@
+{% assign height = 128.5 %}
+{% assign width = page.width | hp_to_mm %}
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="{{ width | mm_to_px }}" height="{{ height | mm_to_px }}">
+  <g transform="scale({{ 1.0 | mm_to_px }})">
+    {{ page | panel }}
+    {{ content }}
+  </g>
+</svg>

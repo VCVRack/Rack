@@ -618,7 +618,7 @@ Vec windowGetWindowPos() {
 void windowSetWindowPos(Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
-	glfwSetWindowPos(global_ui->window.gWindow, x, y);
+   glfwSetWindowPos(global_ui->window.gWindow, x, y);
 }
 
 bool windowIsMaximized() {

@@ -171,6 +171,12 @@ The VST2 plugin includes the following add-on modules:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
+ - DHE-Modules.BoosterStage
+ - DHE-Modules.Cubic
+ - DHE-Modules.Hostage
+ - DHE-Modules.Stage
+ - DHE-Modules.Swave
+ - DHE-Modules.Upstage
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
@@ -252,6 +258,23 @@ The VST2 plugin includes the following add-on modules:
  - LOGinstruments.Velvet
  - LOGinstruments.Crystal
  - modular80.Logistiker
+ - mscHack.MasterClockx4
+ - mscHack.Seq_3x16x16
+ - mscHack.SEQ_6x32x16
+ - mscHack.Seq_Triad2
+ - mscHack.SEQ_Envelope_8
+ - mscHack.Maude_221
+ - mscHack.ARP700
+ - mscHack.SynthDrums
+ - mscHack.XFade
+ - mscHack.Mix_1x4_Stereo
+ - mscHack.Mix_2x4_Stereo
+ - mscHack.Mix_4x4_Stereo
+ - mscHack.Mix_24_4_4
+ - mscHack.StepDelay
+ - mscHack.PingPong
+ - mscHack.Osc_3Ch
+ - mscHack.Compressor
  - mtsch_plugins.Sum
  - mtsch_plugins.Rationals
  - mtsch_plugins.TriggerPanic

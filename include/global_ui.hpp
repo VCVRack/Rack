@@ -100,11 +100,11 @@ struct GlobalUI {
       window.gFramebufferVg = NULL;
       window.gPixelRatio = 1.0;
       window.gWindowRatio = 1.0;
-#ifdef USE_VST2
-      window.gAllowCursorLock = false;
-#else
+// #ifdef USE_VST2
+//       window.gAllowCursorLock = false;
+// #else
       window.gAllowCursorLock = true;
-#endif // USE_VST2
+// #endif // USE_VST2
       window.windowX = 0;
       window.windowY = 0;
       window.windowWidth = 0;

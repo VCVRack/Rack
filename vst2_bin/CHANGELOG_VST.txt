@@ -1,3 +1,33 @@
+** July 8th, 2018
+- add module DHE-Modules.BoosterStage
+- add module DHE-Modules.Cubic
+- add module DHE-Modules.Hostage
+- add module DHE-Modules.Stage
+- add module DHE-Modules.Swave
+- add module DHE-Modules.Upstage
+- add module mscHack.MasterClockx4
+- add module mscHack.Seq_3x16x16
+- add module mscHack.SEQ_6x32x16
+- add module mscHack.Seq_Triad2
+- add module mscHack.SEQ_Envelope_8
+- add module mscHack.Maude_221
+- add module mscHack.ARP700
+- add module mscHack.SynthDrums
+- add module mscHack.XFade
+- add module mscHack.Mix_1x4_Stereo
+- add module mscHack.Mix_2x4_Stereo
+- add module mscHack.Mix_4x4_Stereo
+- add module mscHack.Mix_24_4_4
+- add module mscHack.StepDelay
+- add module mscHack.PingPong
+- add module mscHack.Osc_3Ch
+- add module mscHack.Compressor
+- add x86/32bit build (you are completely on your own this this -- please upgrade to x64!)
+- fix: load "settings.json" when plugin is initialized
+   (note: the windowSize/windowPos and sampleRate are ignored)
+- change: "allowCursorLock" is now enabled by default
+
+
 ** July 7th, 2018
 - add module Bidoo.DTROY
 - add module Bidoo.BORDL

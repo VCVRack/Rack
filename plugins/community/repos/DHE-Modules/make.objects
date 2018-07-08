@@ -1,0 +1,9 @@
+ALL_OBJ= \
+	src/gui/booster-stage-widget.o \
+	src/gui/cubic-widget.o \
+	src/gui/hostage-widget.o \
+	src/gui/module-widget.o \
+	src/gui/stage-widget.o \
+	src/gui/swave-widget.o \
+	src/gui/upstage-widget.o \
+	src/plugin/dhe-modules.o

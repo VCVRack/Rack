@@ -1,0 +1,67 @@
+require 'rake'
+require 'rake/clean'
+require 'pathname'
+
+build_dir = Pathname('_build')
+module_dest_dir = Pathname('../res')
+image_dest_dir = Pathname('../images')
+
+directory module_dest_dir
+directory image_dest_dir
+
+control_build_dir = build_dir / 'controls'
+control_build_files = "#{control_build_dir}/**/*.svg"
+control_build_file_to_dest_file = "%{^#{control_build_dir}/,#{module_dest_dir}/}p"
+
+image_build_dir = build_dir / 'images'
+image_build_files = "#{image_build_dir}/**/*.svg"
+image_build_file_to_dest_file = "%{^#{image_build_dir}/,#{image_dest_dir}/}p"
+
+panel_build_dir = build_dir / 'panels'
+panel_build_files = "#{panel_build_dir}/**/*.svg"
+panel_build_file_to_dest_file = "%{^#{panel_build_dir}/,#{module_dest_dir}/}X/panel.svg"
+
+module_source_dir = 'panels'
+module_source_files = FileList["#{module_source_dir}/**/*.svg"]
+module_source_file_to_dest_dir = "%{^#{module_source_dir}/,#{module_dest_dir}/}X"
+module_dest_dirs = module_source_files.pathmap(module_source_file_to_dest_dir)
+module_dest_dirs.each { |dir| directory dir }
+
+desc 'Compile the SVG images'
+task :compile do
+  sh 'bundle exec jekyll b --trace'
+end
+
+task controls: [:compile] + module_dest_dirs do
+  FileList[control_build_files].each do |build_file|
+    dest_file = build_file.pathmap(control_build_file_to_dest_file)
+    sh "xmllint --format #{build_file} > #{dest_file}"
+  end
+end
+
+task panels: [:compile] + module_dest_dirs do
+  FileList[panel_build_files].each do |build_file|
+    dest_file = build_file.pathmap(panel_build_file_to_dest_file)
+    convert_text_to_paths(build_file, dest_file)
+  end
+end
+
+task images: [:compile, image_dest_dir] do
+  FileList[image_build_files].each do |build_file|
+    dest_file = build_file.pathmap(image_build_file_to_dest_file)
+    convert_text_to_paths(build_file, dest_file)
+  end
+end
+
+task all: [:controls, :panels, :images]
+task default: :all
+
+CLEAN.include build_dir
+CLOBBER.include module_dest_dir, image_dest_dir
+
+def convert_text_to_paths(source, dest)
+  source = Pathname(source).expand_path.to_s
+  dest = Pathname(dest).expand_path.to_s
+  sh "/Applications/Inkscape.app/Contents/Resources/script --export-text-to-path --export-plain-svg=#{dest} #{source}"
+end
+

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="10"
+   height="33"
+   viewBox="0 0 2.6458333 8.7312497"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="mschack_3p_vert_simple_03.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="4.0595981"
+     inkscape:cy="21.771974"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1858"
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-288.26874)">
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke-width:0.27340624"
+       id="rect1366"
+       width="2.6340218"
+       height="8.8666954"
+       x="0.01181173"
+       y="288.20706" />
+    <circle
+       style="fill:#666666;fill-opacity:1;stroke-width:0.26458332"
+       id="path1375"
+       cx="1.3121183"
+       cy="289.82425"
+       r="1.1752697" />
+    <circle
+       style="fill:#666666;fill-opacity:1;stroke-width:0.26458332"
+       id="path1375-2"
+       cx="1.3121183"
+       cy="292.61511"
+       r="1.1752697" />
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke-width:0.26458332"
+       id="path1375-2-5"
+       cx="1.3121183"
+       cy="295.45255"
+       r="1.1752697" />
+  </g>
+</svg>

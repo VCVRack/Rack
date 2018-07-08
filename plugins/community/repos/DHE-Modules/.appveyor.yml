@@ -1,0 +1,19 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+test: off
+
+environment:
+  MSYSTEM: MINGW64
+
+artifacts:
+  - path: dist\*.zip
+
+cache:
+  - c:\tmp\Rack
+
+install:
+- set PATH=C:\msys64\usr\bin;%PATH%
+- pacman -S --noconfirm zip unzip mingw-w64-x86_64-cmake
+
+build_script:
+- bash -l %APPVEYOR_BUILD_FOLDER%\script\appveyor-build.sh

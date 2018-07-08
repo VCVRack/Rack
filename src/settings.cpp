@@ -87,7 +87,11 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowSizeJ) {
 		double width, height;
 		json_unpack(windowSizeJ, "[F, F]", &width, &height);
+#ifdef USE_VST2
+      // (note) calling windowSetWindowSize() causes the window to be not resizable initially, and when it is moved, it reverts to a default size (TBI)
+#else
 		windowSetWindowSize(Vec(width, height));
+#endif // USE_VST2
 	}
 
 	// windowPos
@@ -95,7 +99,9 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
+#ifndef USE_VST2
 		windowSetWindowPos(Vec(x, y));
+#endif // USE_VST2
 	}
 
 	// opacity
@@ -120,17 +126,19 @@ static void settingsFromJson(json_t *rootJ) {
 	if (allowCursorLockJ)
    {
 		global_ui->window.gAllowCursorLock = json_is_true(allowCursorLockJ);
-#ifdef USE_VST2
-      global_ui->window.gAllowCursorLock = 0;
-#endif // USE_VST2
+// #ifdef USE_VST2
+//       global_ui->window.gAllowCursorLock = 0;
+// #endif // USE_VST2
    }
 
+#ifndef USE_VST2
 	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ) {
 		float sampleRate = json_number_value(sampleRateJ);
 		engineSetSampleRate(sampleRate);
 	}
+#endif // USE_VST2
 
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");

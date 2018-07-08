@@ -1,0 +1,21 @@
+ALL_OBJ= \
+	src/3Ch_Osc.o \
+	src/ARP700.o \
+	src/CLog.o \
+	src/Compressor.o \
+	src/MasterClockx4.o \
+	src/Maude221.o \
+	src/Mixer_1x4_Stereo.o \
+	src/Mixer_24_4_4.o \
+	src/Mixer_2x4_Stereo.o \
+	src/Mixer_4x4_Stereo.o \
+	src/mscHack.o \
+	src/mscHack_Control_EnvelopeEdit.o \
+	src/PingPong.o \
+	src/Seq_3x16x16.o \
+	src/SEQ_6x32x16.o \
+	src/SEQ_Envelope_8.o \
+	src/Seq_Triad2.o \
+	src/StepDelay.o \
+	src/SynthDrums.o \
+	src/XFade.o

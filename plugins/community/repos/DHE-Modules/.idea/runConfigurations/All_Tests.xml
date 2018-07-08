@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="All Tests" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" singleton="true" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DHE_Modules" TARGET_NAME="tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="DHE_Modules" RUN_TARGET_NAME="tests" TEST_MODE="SUITE_TEST">
+    <envs />
+    <method />
+  </configuration>
+</component>

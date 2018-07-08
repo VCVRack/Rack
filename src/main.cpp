@@ -110,7 +110,7 @@ int vst2_init(int argc, char* argv[]) {
 
 void vst2_editor_create(void) {
 	windowInit();
-	// settingsLoad(assetLocal("settings.json"));
+   settingsLoad(assetLocal("settings.json"));
    glfwHideWindow(rack::global_ui->window.gWindow);
 }
 

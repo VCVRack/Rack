@@ -1,0 +1,26 @@
+---
+layout: panel
+width: 5
+title: STAGE
+color: [120,100,30]
+controls:
+  knobs: []
+  ports: []
+---
+{% assign width = page.width | hp_to_mm %}
+{% assign left_x = width | divided_by:4.0 | plus:0.33333 %}
+{% assign right_x = width | minus:left_x %}
+{% assign center_x = width | divided_by:2.0 %}
+
+{{ page | large_knob: center_x, 25.0, 'LEVEL' }}
+{{ page | large_knob: center_x, 43.5, 'CURVE' }}
+{{ page | large_knob: center_x, 62.0, 'DURATION' }}
+
+{{ page | in_port: left_x, 82.0, 'DEFER' }}
+{{ page | out_port: right_x, 82.0, 'ACTIVE' }}
+
+{{ page | in_port: left_x, 97.0, 'TRIG' }}
+{{ page | out_port: right_x, 97.0, 'EOC' }}
+
+{{ page | in_port: left_x, 112.0, 'IN' }}
+{{ page | out_port: right_x, 112.0, 'OUT' }}
