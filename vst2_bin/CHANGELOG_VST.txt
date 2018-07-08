@@ -26,6 +26,7 @@
 - fix: load "settings.json" when plugin is initialized
    (note: the windowSize/windowPos and sampleRate are ignored)
 - change: "allowCursorLock" is now enabled by default
+- update VST parameter handling (now uses UI widget min/max info for VST parameter range translation)
 
 
 ** July 7th, 2018

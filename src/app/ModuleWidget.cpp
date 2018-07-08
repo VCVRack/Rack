@@ -207,6 +207,14 @@ void ModuleWidget::randomize() {
 	}
 }
 
+ParamWidget *ModuleWidget::findParamWidgetByParamId(int _paramId) {
+	for (ParamWidget *param : params) {
+      if(param->paramId == _paramId)
+         return param;
+   }
+   return NULL;
+}
+
 void ModuleWidget::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(vg);

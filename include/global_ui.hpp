@@ -81,6 +81,8 @@ struct GlobalUI {
       RackWidget *gRackWidget;
       Toolbar *gToolbar;
       RackScene *gRackScene;
+
+      std::mutex mtx_param;
    } app;
 
 #ifdef USE_VST2

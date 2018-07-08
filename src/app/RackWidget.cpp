@@ -410,13 +410,26 @@ void RackWidget::fromJson(json_t *rootJ) {
 }
 
 void RackWidget::addModule(ModuleWidget *m) {
+   rack::global_ui->app.mtx_param.lock();
 	moduleContainer->addChild(m);
 	m->create();
+   rack::global_ui->app.mtx_param.unlock();
 }
 
 void RackWidget::deleteModule(ModuleWidget *m) {
+   rack::global_ui->app.mtx_param.lock();
 	m->_delete();
 	moduleContainer->removeChild(m);
+   rack::global_ui->app.mtx_param.unlock();
+}
+
+ModuleWidget *RackWidget::findModuleWidgetByModule(Module *_module) {
+	for (Widget *w : moduleContainer->children) {
+		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
+      if(moduleWidget->module == _module)
+         return moduleWidget;
+   }
+   return NULL;   
 }
 
 void RackWidget::cloneModule(ModuleWidget *m) {

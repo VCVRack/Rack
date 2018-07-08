@@ -10,8 +10,12 @@
 #include <pmmintrin.h>
 
 #include "global_pre.hpp"
+#include "app.hpp"
 #include "engine.hpp"
+#include "plugin.hpp"
+#include "window.hpp"
 #include "global.hpp"
+#include "global_ui.hpp"
 
 
 #ifdef USE_VST2
@@ -286,18 +290,40 @@ void engineSetParam(Module *module, int paramId, float value) {
       // (note) [bsp] this is usually called from the UI thread (see ParamWidget.cpp)
       // (note) [bsp] VST requires all parameters to be in the normalized 0..1 range
       // (note) [bsp] VCV Rack parameters however are arbitrary floats
-      // (note) [bsp] this scale+bias hack should work for most parameters, though
-      // (note) [bsp]  => automation curves will look a bit strange, though
-      // (note) [bsp]  => this may potentially crash modules which cannot deal with params outside the expected range
-      // (todo) add min/max query methods to each module
-      float normValue = value / 2.0f;
-      normValue += 0.5f;
       // printf("xxx vcvrack: paramId=%d value=%f (=> %f)\n", paramId, value, normValue);
       int uniqueParamId = loc_vst2_find_unique_param_by_module_and_paramid(module, paramId);
       if(-1 != uniqueParamId)
       {
-         // Call host audioMasterAutomate
-         vst2_handle_ui_param(uniqueParamId, normValue);
+         ModuleWidget *moduleWidget = global_ui->app.gRackWidget->findModuleWidgetByModule(module);
+         if(NULL != moduleWidget)
+         {
+            // Find 
+            ParamWidget *paramWidget = moduleWidget->findParamWidgetByParamId(paramId);
+            if(NULL != paramWidget)
+            {
+               // Normalize parameter
+               float paramRange = (paramWidget->maxValue - paramWidget->minValue);
+               if(paramRange > 0.0f)
+               {
+                  float normValue = (value - paramWidget->minValue) / paramRange;
+                  // printf("xxx paramId=%d normValue=%f\n", paramId, normValue);
+
+                  // Call host audioMasterAutomate
+                  vst2_handle_ui_param(uniqueParamId, normValue);
+               }
+            }
+         }
+         // else
+         // {
+         //    // Should not be reachable
+         //    // (note) [bsp] this scale+bias hack should work for most parameters, though
+         //    // (note) [bsp]  => automation curves will look a bit strange, though
+         //    // (note) [bsp]  => this may potentially crash modules which cannot deal with params outside the expected range
+         //    float normValue = value / 2.0f;
+         //    normValue += 0.5f;
+         //    // Call host audioMasterAutomate
+         //    vst2_handle_ui_param(uniqueParamId, normValue);
+         // }
       }
    }
 #endif // USE_VST2
@@ -318,19 +344,37 @@ void vst2_queue_param(int uniqueParamId, float normValue) {
 void vst2_handle_queued_params(void) {
    // Called in processReplacing()
    //  (note) protected by caller mutex
-   // vector<VST2QueuedParam>::iterator it;
-   // for(it = global->vst2.queued_params.begin(); it != global->vst2.queued_params.end(); it++)
+   global_ui->app.mtx_param.lock();
    for(VST2QueuedParam qp : global->vst2.queued_params)
    {
       Module *module;
       int paramId;
       if(loc_vst2_find_module_and_paramid_by_unique_paramid(qp.unique_id, &module, &paramId))
       {
-         float value = qp.norm_value - 0.5f;
-         value *= 2.0f;
-         engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
+         ModuleWidget *moduleWidget = global_ui->app.gRackWidget->findModuleWidgetByModule(module);
+         if(NULL != moduleWidget)
+         {
+            // Find 
+            ParamWidget *paramWidget = moduleWidget->findParamWidgetByParamId(paramId);
+            if(NULL != paramWidget)
+            {
+               // Normalize parameter
+               float paramRange = (paramWidget->maxValue - paramWidget->minValue);
+               if(paramRange > 0.0f)
+               {
+                  // float value = qp.norm_value - 0.5f;
+                  // value *= 2.0f;
+                  float value = (qp.norm_value * paramRange) + paramWidget->minValue;
+                  engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
+
+                  // Update UI widget
+                  paramWidget->setValue(value);
+               }
+            }
+         }
       }
    }
+   global_ui->app.mtx_param.unlock();
    global->vst2.queued_params.clear();
 }
 

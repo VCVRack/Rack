@@ -93,6 +93,8 @@ struct ModuleWidget : OpaqueWidget {
 	*/
 	virtual void appendContextMenu(Menu *menu) {}
 
+   ParamWidget *findParamWidgetByParamId(int _paramId);
+
 	void draw(NVGcontext *vg) override;
 	void drawShadow(NVGcontext *vg);
 
@@ -174,6 +176,7 @@ struct RackWidget : OpaqueWidget {
 	void addModule(ModuleWidget *m);
 	/** Removes the module and transfers ownership to the caller */
 	void deleteModule(ModuleWidget *m);
+   ModuleWidget *findModuleWidgetByModule(Module *_module);
 	void cloneModule(ModuleWidget *m);
 	/** Sets a module's box if non-colliding. Returns true if set */
 	bool requestModuleBox(ModuleWidget *m, Rect box);
