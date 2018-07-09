@@ -9,7 +9,7 @@ namespace ode {
 	void f(float t, const float x[], float dxdt[])
 
 A capturing lambda is ideal for this.
-For example,
+For example, the following solves the system x''(t) = -x(t) using a fixed timestep of 0.01 and initial conditions x(0) = 1, x'(0) = 0.
 
 	float x[2] = {1.f, 0.f};
 	float dt = 0.01f;
