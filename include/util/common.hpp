@@ -116,14 +116,14 @@ Example:
 		fclose(file);
 	});
 */
-template <typename F>
+template<typename F>
 struct DeferWrapper {
 	F f;
 	DeferWrapper(F f) : f(f) {}
 	~DeferWrapper() { f(); }
 };
 
-template <typename F>
+template<typename F>
 DeferWrapper<F> deferWrapper(F f) {
 	return DeferWrapper<F>(f);
 }
