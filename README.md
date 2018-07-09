@@ -26,7 +26,7 @@ Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-09Jul2018.7z](dist/veese
 
 **WARNING: DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
 
-The effect plugin can used be as an instrument, too. you just have to send it MIDI events !
+The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
 
 # Changelog
