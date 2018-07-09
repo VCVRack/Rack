@@ -59,11 +59,11 @@ struct SchmittTrigger {
 
 
 /** When triggered, holds a high value for a specified time before going low again */
-struct TriggerGenerator {
+struct PulseGenerator {
 	float time;
 	float triggerDuration;
 
-	TriggerGenerator() {
+	PulseGenerator() {
 		reset();
 	}
 	/** Immediately resets the state to LOW */
@@ -85,9 +85,6 @@ struct TriggerGenerator {
 		}
 	}
 };
-
-/** Deprecated name for TriggerGenerator */
-typedef TriggerGenerator PulseGenerator;
 
 
 } // namespace rack
