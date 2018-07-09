@@ -1,0 +1,203 @@
+plugin ideas:
+- Mult with labels
+  - so I can route a distance output to mult and label
+    it as 'main seq gate output' to avoid tracing cables
+- seq with start/stop/reset triggers (ie, one shot sequencer)
+  (or 'play', 'pause', 'go to begin')
+  - solve 'how do I run a sequence once?' FAQ
+- event log
+  - visualization of past triggers/gates
+  - time series or sparkline-ish
+  - more or less a scope but without y values and
+    a very long time
+  - could do diff colors for gates/triggers
+    - or gates up and triggers down
+  - wide module
+  - multiple time view zooms
+    - 1x, 2x, 5x, 10, 20x, 50x, etc
+  - mostly for appearance or troubleshooting/debugging event stuff
+  - could evolve to supporting playing the the history back
+    - 1x speed or faster/slower
+    - scrubbing?
+  - multiple channels of events
+- table module
+  - "an oscillator is a phasor and a table"
+  - phasor input  (0.0 -> 1.0) or other scaled
+  - value output
+  - on step, read phasor value, look for a match
+    in the table, output the value
+  - ui
+    - just a scrollable list?
+    - columns
+        - phasor
+            - start range
+            - end range
+        - output value
+    - buttons to add delete entry
+  - load table from json in context menu
+  - uses:
+    - feed a sawtooth osc output into it to
+      create rudimentary wave table
+    - arbitrary quantizer
+    - building block
+  - fancy options
+    - entries that map a range of phasor input
+      values to a range of output values
+      - map ranges could be linear/log etc
+        - linear
+            - slope
+            - offset
+        - sub ranges could be cos/sine/exp/some distribution etc
+    - (similar to the old GIMP color gradient editor)
+        - likely could use gimp gradient (ggr) files as a type of table
+    - modulating the table offset or value amplitudes
+- credits module
+  - widget that shows author, create/mod date, urls, license, other metainfo
+  - would save into vcv file as module json data
+  - use a rack_credits.json in ~/ or rack doc root to set the default
+  - list of author/credit metadata
+    - would get appended to if modified by new author
+  - how to only update on 'save' or 'save as' ?
+    - don't want to append on every autosave.vcv write
+    - track a single 'last_edit' to persist on every toJson
+      - then on load/fromJSON, add last_edit to author list
+    - if there is a way for plugin to distinquish a 'real save' vs
+      an 'autosave', then could use that.
+   - how to tell when a patch has been 'modified'?
+     - needed to avoid adding info on every save or autosave
+     - slightly klugey way:
+        - if plugin knows the patch it is in, could load patch .vcv/json
+          data and compare to 'previous'.
+          - chksum would be simplest
+          - but could do a smarter/deeper compare diving into the data
+   - uses:
+     - a patch with the module includes the author info
+     - if patch is shared (via patchstorage for ex), and modified
+       by a different author, the module json would include info
+       for the original author and modification author
+     - just as a display widget when sharing a screen capture
+   - concerns:
+    - could probably be better implemented as a feature of the core vcv serialization
+- 'Equal and opposite'
+  - two eqs with 'opposite' settings and an effects loop in between
+  - before eq, after eq
+    - same bands and q's, but opposite gain
+        - ie, if 'before eq' boosts bass and treble by 10db and cuts mids by 12db
+          then the 'after eq' would cut bass and treble by 10db and boost mids by 12db
+  - an effects send and return in between
+    - munge audio signal, send it to effect (a distortion for ex) and unmunge on the way out
+  - the before/after transforms would automatically mirror each other
+    - otherwise pointless since it could be done with other modules
+  - other variations could exist for other reversible-ish transforms
+    - dont have to be perfect or lossless
+    - compress/expand
+    - bitcrush /  'bit extropalate' (is that a thing?)
+    - forward/reverse delay?
+    - pitch shift (probably most interesting, but
+- transport gui module
+  - play/stop/pause/fast forward/reverse/record buttons
+  - gate and trig outputs for them
+  - just buttons, but with a explicit purpose
+  - uses
+    - generative patches that need a 'press play to start'
+- specific values
+  - module with just text entrie fields for entering a float value
+    and an output for that value
+  - possibly with text widget in combo with a dial or inc/dec
+    buttons (spinbox widget)
+    - or 'click and drag to change value'
+      - up/down for small value
+      - left/right for multiplier (middle = 1x, left = 0..1.0x, right >1.0x multi)
+      - 'up and to the left' for fine grained adjustments
+  - fancy
+    - maybe automatically also show CV v/oct freq or note equiv
+  - maybe gate out and button to click to send value and gate output together
+- Seq with per step gate length and rest length between steps
+ - 'rest' steps basically
+- A cv 1v/oct display -> freq hz -> period secs -> bpm.
+  - ( could display v passed through and/or let you specify as text)
+  - CV out
+  - button to send gate
+  - basically a keyboard with text/entry widgets to let you specify
+    CV voltage/hz/period/note name
+  - other possible things to display/select
+    - midi note number
+    - # of steps from a root
+    - interval from a root ( third, flat fifth, etc)
+    - staff / note
+    - bpm (for a LFO or general nerdery)
+- generic voltage quantizer
+  - based on 'table' module
+  - except input CV is 'rounded' to edge of maps
+  - see 'fancy options' for table module above
+- 'Attached file' module.
+  - GUI file picker
+  - add base64 of file to data to store in plugin Json.
+  - Could be a list
+- 'Maze Table'
+  - wave table, but with a maze
+  - instead of phasor indexing an array, would "index" into
+    a path along the maze graph
+  - could have breath first and depth first paths as options
+  - use DAG style mazes (one and only one path out, no loops or cycles)
+  - though cycles in maze could be analog for loops in waveform playback
+  - maybe something hilbert curve esque?
+- scmhidtt trigger / pulse generator banks
+  - just ui to a set of SchmittTriggers
+  - each strip
+    - input
+    - attentuator for process()'ed value
+    - output trigger
+  - for generator strip
+    - trigger input
+    - knob/cv in/param for duration
+    - gate output
+- Matrix clock
+  - N x N matrix
+  - each row defaults to a clock division
+  - each column defaults to clock multiply
+  - 0,0 defaults to 1x1 quarter note for tempo
+  - rows default to 1,2,3,4,6,8,12,16, division
+  - ditto for columns multi
+  - but row/columns mult/div could be changed to anything
+- XY pad matrix mixer
+  - matrix mixer with a JL-Modules/kaosspad/reactor style XY pad
+    at each cross point
+  - 1,1 -> top output and right output
+  - 1,0 -> just top output
+  - -1,-1 -> inverted output to top and right output
+- Matrix Mixer with multiple scenes that morph/interpolate
+  - more or less like Bidoo ACNE except values morph
+    between scenes insted of
+- 2.5 dimension matrix / mixer
+  - 8x8 matrix but with an output at
+    each crossing point
+  - possibly with knob/param for output level
+    of each output
+  - maybe a per cross mute/solo
+  - Much like the movies, the first one was the best.
+- Notes module with CV/trigger control and multiple messages
+  - like a plain notes module, but can react to input from
+    patch
+  - use case would be describing stages of a generative patch
+  - or for adding info to screencast videos
+- Gate Divider
+  - like gate length, but instead of generating one gate, it
+    generates multiple gates that add up to gate length
+  - how to seperate?
+    - some fixed inbetween interval ("kerf")
+    - divide into on and off gates
+        - divide a 1s gate by 1 -> one .5s gate then a .5s 'rest'
+          (and vice versa / inverse  10 or 01)
+        - divide by 3 -> one .3333s gate, one .3333s rest, one .3333 gate
+          ( ie, 101 or 010)
+        - divide by 4 -> .25 gate, .25 rest, .25 gate, .25rest
+          (1010, 0101)
+        - divide by 5 -> .20 on, .20 off, .20 on, .20 off, .20 on
+          (10101, 01010)
+  - kind of similar to Walsh codes
+    " Experimental Electronic Music Devices Employing Walsh Functions",
+    "BERNARD A. HUTCHINS, JR"
+    "JOURNAL OF THE AUDIO ENGINEERING SOCIETY, October 1973"
+    (https://pdfs.semanticscholar.org/6b9c/30f94551aaf05f077aa491f31b196898cd90.pdf)
+  - "Sequency" - theres a module name if I ever heard one.

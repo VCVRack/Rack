@@ -1,0 +1,16 @@
+ALL_OBJ= \
+	src/ALingADing.o \
+	src/BaconPlugs.o \
+	src/Bitulator.o \
+	src/BlankWidget.o \
+	src/ChipNoise.o \
+	src/ChipWaves.o \
+	src/ChipYourWave.o \
+	src/Components.o \
+	src/Glissinator.o \
+	src/HarMoNee.o \
+	src/KarplusStrongPoly.o \
+	src/PolyGnome.o \
+	src/QuantEyes.o \
+	src/SampleDelay.o \
+	src/SortaChorus.o

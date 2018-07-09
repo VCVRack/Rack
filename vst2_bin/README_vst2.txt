@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- July 2nd, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- July 9th, 2018
 ===============================================
 
 !!!------------------------------------------------------------------------------
@@ -15,6 +15,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
 + supports up to 8 audio inputs
 + supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
++ supports VST parameters (send / recv)
 - does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
    - future releases will contain additional (open source) add-ons modules
 
@@ -26,6 +27,12 @@ Tested in
   - Propellerhead Reason 10
 
 The VST2 plugin includes the following add-on modules:
+ - Alikins.IdleSwitch
+ - Alikins.MomentaryOnButtons
+ - Alikins.BigMuteButton
+ - Alikins.ColorPanel
+ - Alikins.GateLength
+ - Alikins.SpecificValue
  - AS.ADSR
  - AS.AtNuVrTr
  - AS.BPMCalc
@@ -75,6 +82,17 @@ The VST2 plugin includes the following add-on modules:
  - AudibleInstruments.Blinds
  - AudibleInstruments.Veils
  - AudibleInstruments.Frames
+ - BaconMusic.Glissinator
+ - BaconMusic.PolyGnome
+ - BaconMusic.QuantEyes
+ - BaconMusic.SampleDelay
+ - BaconMusic.SortaChorus
+ - BaconMusic.ChipNoise
+ - BaconMusic.ChipWaves
+ - BaconMusic.ChipYourWave
+ - BaconMusic.KarplusStrongPoly
+ - BaconMusic.ALingADing
+ - BaconMusic.Bitulator
  - Befaco.ABC
  - Befaco.DualAtenuverter
  - Befaco.EvenVCO

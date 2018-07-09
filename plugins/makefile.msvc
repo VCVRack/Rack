@@ -11,8 +11,10 @@ endef
 .PHONY:
 bin:
 #	$(foreach pname,$(PLUGINS),$(eval ($(call run_make,$(pname),bin))))
+	$(call run_make,Alikins,bin)
 	$(call run_make,AS,bin)
 	$(call run_make,AudibleInstruments,bin)
+	$(call run_make,BaconMusic,bin)
 	$(call run_make,Befaco,bin)
 	$(call run_make,Bidoo,bin)
 	$(call run_make,Bogaudio,bin)
@@ -47,8 +49,10 @@ bin:
 clean:
 #	$(foreach pname,$(PLUGINS),$(eval $(call run_make,$(pname),clean)))
 #	$(foreach pname,$(PLUGINS),$(eval echo $(pname)))
+	$(call run_make,Alikins,clean)
 	$(call run_make,AS,clean)
 	$(call run_make,AudibleInstruments,clean)
+	$(call run_make,BaconMusic,clean)
 	$(call run_make,Befaco,clean)
 	$(call run_make,Bidoo,clean)
 	$(call run_make,Bogaudio,clean)

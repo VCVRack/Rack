@@ -1,6 +1,8 @@
 # statically linked plugins (note: dynamic linking won't work due to VCV Rack's architecture (global vars!))
+EXTRALIBS+= $(call plugin_lib,Alikins)
 EXTRALIBS+= $(call plugin_lib,AS)
 EXTRALIBS+= $(call plugin_lib,AudibleInstruments)
+EXTRALIBS+= $(call plugin_lib,BaconMusic)
 EXTRALIBS+= $(call plugin_lib,Befaco)
 EXTRALIBS+= $(call plugin_lib,Bidoo)
 EXTRALIBS+= $(call plugin_lib,Bogaudio)

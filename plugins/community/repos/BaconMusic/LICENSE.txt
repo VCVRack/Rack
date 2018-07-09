@@ -1,0 +1,26 @@
+Copyright 2017-2018, Paul Walker
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+---------------------------------------------------------------------
+
+The file "res/Keypunch029.json" which implements the KeyPunch029 font
+used in the dot matrix widget is Copyright (c) 2017 Stewart C. Russell
+and is released under the SIL Open Font License 1.1
+
+http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
+
+The original work can be found at the below location:
+
+http://scruss.com/blog/2017/03/21/keypunch029-for-all-your-punched-card-font-needs/.

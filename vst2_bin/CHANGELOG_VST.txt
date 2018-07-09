@@ -1,3 +1,23 @@
+** July 9th, 2018
+- add module Alikins.IdleSwitch
+- add module Alikins.MomentaryOnButtons
+- add module Alikins.BigMuteButton
+- add module Alikins.ColorPanel
+- add module Alikins.GateLength
+- add module Alikins.SpecificValue
+- add module BaconMusic.Glissinator
+- add module BaconMusic.PolyGnome
+- add module BaconMusic.QuantEyes
+- add module BaconMusic.SampleDelay
+- add module BaconMusic.SortaChorus
+- add module BaconMusic.ChipNoise
+- add module BaconMusic.ChipWaves
+- add module BaconMusic.ChipYourWave
+- add module BaconMusic.KarplusStrongPoly
+- add module BaconMusic.ALingADing
+- add module BaconMusic.Bitulator
+
+
 ** July 8th, 2018
 - add module DHE-Modules.BoosterStage
 - add module DHE-Modules.Cubic

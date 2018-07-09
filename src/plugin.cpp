@@ -568,8 +568,10 @@ Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
 
 #ifdef USE_VST2
 extern "C" {
+extern void init_plugin_Alikins            (rack::Plugin *p);
 extern void init_plugin_AS                 (rack::Plugin *p);
 extern void init_plugin_AudibleInstruments (rack::Plugin *p);
+extern void init_plugin_BaconMusic         (rack::Plugin *p);
 extern void init_plugin_Befaco             (rack::Plugin *p);
 extern void init_plugin_Bidoo              (rack::Plugin *p);
 extern void init_plugin_Bogaudio           (rack::Plugin *p);
@@ -628,8 +630,10 @@ static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCa
 }
 
 void vst2_load_static_rack_plugins(void) {
+   vst2_load_static_rack_plugin("Alikins",            &init_plugin_Alikins);
    vst2_load_static_rack_plugin("AS",                 &init_plugin_AS);
    vst2_load_static_rack_plugin("AudibleInstruments", &init_plugin_AudibleInstruments);
+   vst2_load_static_rack_plugin("BaconMusic",         &init_plugin_BaconMusic);
    vst2_load_static_rack_plugin("Befaco",             &init_plugin_Befaco);
    vst2_load_static_rack_plugin("Bidoo",              &init_plugin_Bidoo);
    vst2_load_static_rack_plugin("Bogaudio",           &init_plugin_Bogaudio);

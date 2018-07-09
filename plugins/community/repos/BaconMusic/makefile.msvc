@@ -1,0 +1,9 @@
+SLUG=BaconMusic
+
+include ../../../../dep/yac/install_msvc.mk
+
+EXTRAFLAGS+= -DBUILD_SORTACHORUS
+
+include make.objects
+
+include ../../../build_plugin.mk

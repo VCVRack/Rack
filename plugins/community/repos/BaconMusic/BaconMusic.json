@@ -1,0 +1,20 @@
+{
+    "slug": "BaconMusic",
+    "name": "Bacon Music",
+    "author": "@baconpaul",
+    "license": "Apache-2.0",
+    "version": "0.5.0",
+    "homepage": "https://github.com/baconpaul/BaconPlugs",
+    "manual": "https://github.com/baconpaul/BaconPlugs/blob/master/README.md",
+    "source": "https://github.com/baconpaul/BaconPlugs",
+    "downloads": {
+        "lin": {
+            "download": "https://github.com/baconpaul/BaconPlugs/files/1611795/BaconMusic-0.5.0-lin.zip",
+            "sha256": "89338dda1f75b3dfc0044df2177a93e397b35ac41e7dabd9d4c382502bcf8c78"
+        },
+        "mac": {
+            "download": "https://github.com/baconpaul/BaconPlugs/files/1611780/BaconMusic-0.5.0-mac.zip",
+            "sha256": "67a2b6c5f9f9a8974ffdfac359f8d2ceed639afb18373302e6e952379c18f171"
+        }
+    }
+}

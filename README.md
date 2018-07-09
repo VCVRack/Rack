@@ -22,7 +22,13 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-08Jul2018b.7z](dist/veeseevstrack_0_6_1_win64_bin-08Jul2018b.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-09Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-09Jul2018.7z) (64bit)
+**WARNING** DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
+(the effect plugin can used be as an instrument, you just have to send it MIDI events)
+
+
+# Changelog
+see [vst2_bin/CHANGELOG_VST.txt](vst2_bin/CHANGELOG_VST.txt)
 
 
 # Demo Video
@@ -33,6 +39,12 @@ Here's a demo video of it: https://vimeo.com/277703414
 # Add-on modules
 
 The following add-on modules are statically linked with the VST plugin:
+ - Alikins.IdleSwitch
+ - Alikins.MomentaryOnButtons
+ - Alikins.BigMuteButton
+ - Alikins.ColorPanel
+ - Alikins.GateLength
+ - Alikins.SpecificValue
  - AS.ADSR
  - AS.AtNuVrTr
  - AS.BPMCalc
@@ -82,6 +94,17 @@ The following add-on modules are statically linked with the VST plugin:
  - AudibleInstruments.Blinds
  - AudibleInstruments.Veils
  - AudibleInstruments.Frames
+ - BaconMusic.Glissinator
+ - BaconMusic.PolyGnome
+ - BaconMusic.QuantEyes
+ - BaconMusic.SampleDelay
+ - BaconMusic.SortaChorus
+ - BaconMusic.ChipNoise
+ - BaconMusic.ChipWaves
+ - BaconMusic.ChipYourWave
+ - BaconMusic.KarplusStrongPoly
+ - BaconMusic.ALingADing
+ - BaconMusic.Bitulator
  - Befaco.ABC
  - Befaco.DualAtenuverter
  - Befaco.EvenVCO
@@ -457,9 +480,6 @@ Last but not least, please don't ask me for the VST2 SDK.
 It is not permitted to redistribute it and Steinberg has discontinued it.
 I heard that the `aeffect.h` / `aeffectx.h` files are still included in the VST3 SDK.
 
-
-# Changelog
-see [vst2_bin/CHANGELOG_VST.txt](vst2_bin/CHANGELOG_VST.txt)
 
 # VCV Rack
 

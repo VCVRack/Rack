@@ -1,0 +1,8 @@
+ALL_OBJ= \
+	./src/alikins.o \
+	./src/BigMuteButton.o \
+	./src/ColorPanel.o \
+	./src/GateLength.o \
+	./src/IdleSwitch.o \
+	./src/MomentaryOnButtons.o \
+	./src/SpecificValue.o
