@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="26px" height="26px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <g id="moDllzKnob26">
+        <rect x="0" y="0" width="26" height="26" style="fill:#ebebeb;fill-opacity:0;"/>
+        <path id="Tear" d="M13,21.667C17.786,21.667 21.667,17.786 21.667,13C21.667,11.324 20.984,9.614 20,8C18.369,5.323 15.872,2.872 14,1C13.75,0.75 13.333,0.5 13,0.5C12.667,0.5 12.244,0.756 12,1C10.129,2.871 7.631,5.323 6,8C5.016,9.614 4.333,11.321 4.333,13C4.333,17.786 8.214,21.667 13,21.667Z" style="fill:#333;"/>
+        <path id="Paint" d="M13,20.8C17.467,20.8 20.15,18.2 20.8,14.342C20.851,14.04 20.8,13 20.15,12.675C19.5,12.35 18.85,12.35 13,12.35C7.15,12.35 6.5,12.35 5.85,12.675C5.244,12.978 5.232,13.912 5.284,14.342C5.75,18.2 8.678,20.8 13,20.8Z" style="fill:#434c4c;"/>
+        <path id="mark" d="M13.667,1.667C13.667,1.299 13.368,1 13,1C12.632,1 12.333,1.299 12.333,1.667L12.333,6.333C12.333,6.701 12.632,7 13,7C13.368,7 13.667,6.701 13.667,6.333L13.667,1.667Z" style="fill:#ddd;"/>
+    </g>
+</svg>

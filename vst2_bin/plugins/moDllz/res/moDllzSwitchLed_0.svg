@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="18px" viewBox="0 0 10 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+            <rect id="hole" fill="#222222" x="0" y="0" width="10" height="18" rx="5"></rect>
+            <circle id="led" stroke="#555555" stroke-width="1" fill="#444444" cx="50%" cy="72%" r="29%"></circle>
+            <circle id="hi" fill="#555555" cx="50%" cy="65%" r="10%" opacity="0.7"></circle>
+            <circle id="hi" fill="#777777" cx="50%" cy="61.5%" r="3%" opacity="1"></circle>
+
+</svg>

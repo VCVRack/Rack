@@ -1,0 +1,33 @@
+ALL_OBJ= \
+	src/BigButton.o \
+	src/BitCrush.o \
+	src/BPM.o \
+	src/Buttons.o \
+	src/common.o \
+	src/Displays.o \
+	src/DSPUtilities.o \
+	src/FFTuner.o \
+	src/Filter.o \
+	src/FilterDelay.o \
+	src/Filters.o \
+	src/Floats.o \
+	src/Integers.o \
+	src/LRMixer.o \
+	src/Mono.o \
+	src/Noise.o \
+	src/Notch.o \
+	src/Panner.o \
+	src/Panners.o \
+	src/Randoms.o \
+	src/Range.o \
+	src/RangeLFO.o \
+	src/RJModules.o \
+	src/Sidechain.o \
+	src/Splitter.o \
+	src/Splitters.o \
+	src/Stutter.o \
+	src/Supersaw.o \
+	src/TwinLFO.o \
+	src/VAStateVariableFilter.o \
+	src/Volumes.o \
+	src/Widener.o

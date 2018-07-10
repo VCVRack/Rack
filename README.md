@@ -8,6 +8,7 @@
 + supports up to 8 audio inputs
 + supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
++ supports VST parameters (send / recv)
 - does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
    - future releases may contain additional (open source) add-ons modules
 
@@ -22,7 +23,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-09Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-09Jul2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-10Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-10Jul2018.7z) (64bit)
 
 **WARNING: DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
 
@@ -40,7 +41,7 @@ Here's a demo video of it: https://vimeo.com/277703414
 
 # Add-on modules
 
-The following add-on modules are statically linked with the VST plugin:
+The following (441) add-on modules are statically linked with the VST plugin:
  - Alikins.IdleSwitch
  - Alikins.MomentaryOnButtons
  - Alikins.BigMuteButton
@@ -245,6 +246,23 @@ The following add-on modules are statically linked with the VST plugin:
  - Fundamentals.VCMixer
  - Fundamentals.VCO
  - Fundamentals.VCO2
+ - Gratrix.VCO_F1
+ - Gratrix.VCO_F2
+ - Gratrix.VCF_F1
+ - Gratrix.VCA_F1
+ - Gratrix.ADSR_F1
+ - Gratrix.Chord_G1
+ - Gratrix.Octave_G1
+ - Gratrix.Fade_G1
+ - Gratrix.Fade_G2
+ - Gratrix.Binary_G1
+ - Gratrix.Seq_G1
+ - Gratrix.Keys_G1
+ - Gratrix.VU_G1
+ - Gratrix.Blank_03
+ - Gratrix.Blank_06
+ - Gratrix.Blank_09
+ - Gratrix.Blank_12
  - HetrickCV.TwoToFour
  - HetrickCV.AnalogToDigital
  - HetrickCV.ASR
@@ -289,6 +307,10 @@ The following add-on modules are statically linked with the VST plugin:
  - LOGinstruments.LessMess
  - LOGinstruments.Velvet
  - LOGinstruments.Crystal
+ - moDllz.MIDIPoly
+ - moDllz.TwinGlider
+ - moDllz.MIDIdualCV
+ - moDllz.XBender
  - modular80.Logistiker
  - mscHack.MasterClockx4
  - mscHack.Seq_3x16x16
@@ -318,8 +340,6 @@ The following add-on modules are statically linked with the VST plugin:
  - NauModular.Osc
  - ML_modules.Quantizer
  - ML_modules.Quantum
- - Southpole-parasites.Annuli
- - Southpole-parasites.Splash
  - ML_modules.TrigBuf
  - ML_modules.SeqSwitch
  - ML_modules.SeqSwitch2
@@ -354,6 +374,34 @@ The following add-on modules are statically linked with the VST plugin:
  - Qwelk.Scaler
  - Qwelk.Wrap
  - Qwelk.XFade
+ - RJModules.Supersaw
+ - RJModules.TwinLFO
+ - RJModules.Noise
+ - RJModules.RangeLFO
+ - RJModules.BitCrush
+ - RJModules.Widener
+ - RJModules.FilterDelay
+ - RJModules.Sidechain
+ - RJModules.Stutter
+ - RJModules.Filter
+ - RJModules.Filters
+ - RJModules.Notch
+ - RJModules.Integers
+ - RJModules.Floats
+ - RJModules.Randoms
+ - RJModules.LRMixer
+ - RJModules.Mono
+ - RJModules.Volumes
+ - RJModules.Panner
+ - RJModules.Panners
+ - RJModules.BPM
+ - RJModules.Button
+ - RJModules.Buttons
+ - RJModules.Splitter
+ - RJModules.Splitters
+ - RJModules.Displays
+ - RJModules.Range
+ - SerialRacker.MidiMultiplexer
  - SonusModular.Addiction
  - SonusModular.Bitter
  - SonusModular.Bymidside
@@ -376,6 +424,8 @@ The following add-on modules are statically linked with the VST plugin:
  - SonusModular.Scramblase
  - SonusModular.Twoff
  - SonusModular.Yabp
+ - Southpole-parasites.Annuli
+ - Southpole-parasites.Splash
  - squinkylabs-plug1.Booty
  - squinkylabs-plug1.Vocal
  - squinkylabs-plug1.VocalFilter

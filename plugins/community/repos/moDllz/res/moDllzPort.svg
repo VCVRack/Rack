@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="8.3556204mm"
+   height="8.3556299mm"
+   viewBox="0 0 8.3556203 8.3556298" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">	  
+<circle id="ring" stroke="#636363" stroke-width="3%" fill="#EEEEEE" cx="50%" cy="50%" r="35%"></circle>
+<circle id="hole" fill="#000000" cx="50%" cy="50%" r="21%"></circle>
+
+</svg>

@@ -1,5 +1,5 @@
-VeeSeeVST Rack VST 2.4 Plugin -- July 9th, 2018
-===============================================
+VeeSeeVST Rack VST 2.4 Plugin -- July 10th, 2018
+================================================
 
 !!!------------------------------------------------------------------------------
 !!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
@@ -231,6 +231,23 @@ The VST2 plugin includes the following add-on modules:
  - Fundamentals.VCMixer
  - Fundamentals.VCO
  - Fundamentals.VCO2
+ - Gratrix.VCO_F1
+ - Gratrix.VCO_F2
+ - Gratrix.VCF_F1
+ - Gratrix.VCA_F1
+ - Gratrix.ADSR_F1
+ - Gratrix.Chord_G1
+ - Gratrix.Octave_G1
+ - Gratrix.Fade_G1
+ - Gratrix.Fade_G2
+ - Gratrix.Binary_G1
+ - Gratrix.Seq_G1
+ - Gratrix.Keys_G1
+ - Gratrix.VU_G1
+ - Gratrix.Blank_03
+ - Gratrix.Blank_06
+ - Gratrix.Blank_09
+ - Gratrix.Blank_12
  - HetrickCV.TwoToFour
  - HetrickCV.AnalogToDigital
  - HetrickCV.ASR
@@ -275,6 +292,10 @@ The VST2 plugin includes the following add-on modules:
  - LOGinstruments.LessMess
  - LOGinstruments.Velvet
  - LOGinstruments.Crystal
+ - moDllz.MIDIPoly
+ - moDllz.TwinGlider
+ - moDllz.MIDIdualCV
+ - moDllz.XBender
  - modular80.Logistiker
  - mscHack.MasterClockx4
  - mscHack.Seq_3x16x16
@@ -304,8 +325,6 @@ The VST2 plugin includes the following add-on modules:
  - NauModular.Osc
  - ML_modules.Quantizer
  - ML_modules.Quantum
- - Southpole-parasites.Annuli
- - Southpole-parasites.Splash
  - ML_modules.TrigBuf
  - ML_modules.SeqSwitch
  - ML_modules.SeqSwitch2
@@ -340,6 +359,34 @@ The VST2 plugin includes the following add-on modules:
  - Qwelk.Scaler
  - Qwelk.Wrap
  - Qwelk.XFade
+ - RJModules.Supersaw
+ - RJModules.TwinLFO
+ - RJModules.Noise
+ - RJModules.RangeLFO
+ - RJModules.BitCrush
+ - RJModules.Widener
+ - RJModules.FilterDelay
+ - RJModules.Sidechain
+ - RJModules.Stutter
+ - RJModules.Filter
+ - RJModules.Filters
+ - RJModules.Notch
+ - RJModules.Integers
+ - RJModules.Floats
+ - RJModules.Randoms
+ - RJModules.LRMixer
+ - RJModules.Mono
+ - RJModules.Volumes
+ - RJModules.Panner
+ - RJModules.Panners
+ - RJModules.BPM
+ - RJModules.Button
+ - RJModules.Buttons
+ - RJModules.Splitter
+ - RJModules.Splitters
+ - RJModules.Displays
+ - RJModules.Range
+ - SerialRacker.MidiMultiplexer
  - SonusModular.Addiction
  - SonusModular.Bitter
  - SonusModular.Bymidside
@@ -362,6 +409,8 @@ The VST2 plugin includes the following add-on modules:
  - SonusModular.Scramblase
  - SonusModular.Twoff
  - SonusModular.Yabp
+ - Southpole-parasites.Annuli
+ - Southpole-parasites.Splash
  - squinkylabs-plug1.Booty
  - squinkylabs-plug1.Vocal
  - squinkylabs-plug1.VocalFilter

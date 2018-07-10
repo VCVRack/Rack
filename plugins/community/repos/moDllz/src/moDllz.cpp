@@ -1,0 +1,15 @@
+#include "moDllz.hpp"
+
+RACK_PLUGIN_MODEL_DECLARE(moDllz, MIDIPoly);
+RACK_PLUGIN_MODEL_DECLARE(moDllz, TwinGlider);
+RACK_PLUGIN_MODEL_DECLARE(moDllz, MIDIdualCV);
+RACK_PLUGIN_MODEL_DECLARE(moDllz, XBender);
+
+RACK_PLUGIN_INIT(moDllz) {
+   RACK_PLUGIN_INIT_ID();
+
+   RACK_PLUGIN_MODEL_ADD(moDllz, MIDIPoly);
+   RACK_PLUGIN_MODEL_ADD(moDllz, TwinGlider);
+   RACK_PLUGIN_MODEL_ADD(moDllz, MIDIdualCV);
+   RACK_PLUGIN_MODEL_ADD(moDllz, XBender);
+}

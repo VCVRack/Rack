@@ -1,0 +1,6 @@
+ALL_OBJ= \
+	src/MIDIdualCV.o \
+	src/MIDIPoly.o \
+	src/moDllz.o \
+	src/TwinGlider.o \
+	src/XBender.o

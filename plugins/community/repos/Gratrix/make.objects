@@ -1,0 +1,22 @@
+ALL_OBJ= \
+	src/ADSR.o \
+	src/Binary-G1.o \
+	src/Blank03.o \
+	src/Blank06.o \
+	src/Blank09.o \
+	src/Blank12.o \
+	src/Chord-G1.o \
+	src/Fade-G1.o \
+	src/Fade-G2.o \
+	src/Gratrix.o \
+	src/Keys-G1.o \
+	src/MIDI-C1.o \
+	src/MIDI-G1.o \
+	src/Octave-G1.o \
+	src/Scope-G1.o \
+	src/Seq-G1.o \
+	src/Seq-G2.o \
+	src/VCA.o \
+	src/VCF.o \
+	src/VCO.o \
+	src/VU-G1.o

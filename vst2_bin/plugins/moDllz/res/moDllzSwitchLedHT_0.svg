@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="10px" viewBox="0 0 24 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+            <rect id="hole" fill="#222222" x="0" y="0" width="24" height="10" rx="5"></rect>
+            
+            <circle id="led" stroke="#555555" stroke-width="1" fill="#444444" cx="5" cy="5" r="4.2"></circle>
+                     <circle id="hi" fill="#555555" cx="5" cy="4" r="1.5" opacity="0.8"></circle> 
+          <circle id="hi" fill="#777777" cx="5" cy="3.5" r="0.6" opacity="1"></circle>
+           
+
+          
+
+</svg>

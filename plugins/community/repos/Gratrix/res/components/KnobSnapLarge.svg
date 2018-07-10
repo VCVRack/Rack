@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-23 -23 46 46" version="1.1">
+
+<circle cx="0" cy="0" r="22.3" style="fill:#333333;stroke:#000000;stroke-width:1.0" />
+<path d="M-22.3,0 A1,1 0,0,0 22.3,0" style="fill:#000000;stroke:#000000;stroke-width:1.0" />
+<line x1="0" y1="0" x2="0" y2="-23" style="fill:none; stroke:#eeeeee;stroke-width:1.5" />
+
+</svg>

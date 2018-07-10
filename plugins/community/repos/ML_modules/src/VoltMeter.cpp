@@ -152,6 +152,6 @@ VoltMeterWidget::VoltMeterWidget(VoltMeter *module) : ModuleWidget(module) {
 using namespace rack_plugin_ML_modules;
 
 RACK_PLUGIN_MODEL_INIT(ML_modules, VoltMeter) {
-   Model *modelVoltMeter = Model::create<VoltMeter, VoltMeterWidget>("ML modules", "VoltMeter", "Volt Meter", UTILITY_TAG);
+   Model *modelVoltMeter = Model::create<VoltMeter, VoltMeterWidget>("ML modules", "VoltMeter", "Volt Meter", VISUAL_TAG, UTILITY_TAG);
    return modelVoltMeter;
 }

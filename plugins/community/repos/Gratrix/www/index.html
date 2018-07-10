@@ -1,0 +1,300 @@
+<html lang="en-GB">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+<head>
+<title>Gratrix.net - Gratrix Modules for VCV Rack</title>
+<style type="text/css">
+body {
+	font-family: Cambria;  font-size: 15px;
+}
+p {
+	max-width: 960px;
+/*	text-align: justify; */
+	line-height: 133%;
+}
+ul {
+	padding-left: 15px;
+/*	text-align: justify; */
+	line-height: 150%;
+}
+li {
+	padding:5px 0px 5px 0px;
+}
+img {
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+}
+
+table {
+	margin: 0px;
+	padding: 0xp;
+    border-collapse: collapse;
+}
+td {
+	margin: 0px;
+	padding: 0px;
+}
+.content {
+    max-width: 990px;
+    margin: auto;
+/*  border: 1px solid red;  */
+
+}
+.wrapper {
+  display: grid;
+  grid-template-columns: 500px 480px;
+  grid-gap: 10px;
+  color: #444;
+}
+
+.box {
+  background-color: #eee;
+  color: #000;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.soon {
+  color: #900;
+  font-style: italic;
+}
+
+</style>
+</head>
+<body style="background-color: #FCFCFC;">
+<div class="content">
+
+<h1>Gratrix Modules for VCV Rack</h1>
+<i>by Sam Gratrix</i></i>
+
+<h2>Introduction</h2>
+
+<p>I've been a fan of polysynths for a while and recently I've had an itch to develop one of my own in software.
+And then came along VCV Rack with all it's open source VCOs, VCFs and VCAs. So here I am, creating a
+polyphonic modular synth!</p>
+
+<table>
+<tr>
+<td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td>
+<td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td>
+<td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td>
+</tr><tr>
+<td width="360" colspan="4"><img src="res/VCO-F1.png"></td>
+<td width="180" colspan="2"><img src="res/VCO-F2.png"></td>
+<td width="270" colspan="3"><img src="res/VCF-F1.png"></td>
+<td width="180" colspan="2"><img src="res/VCA-F1.png"></td>
+</tr><tr>
+<td width="180" colspan="2"><img src="res/Env-F1.png"></td>
+<td width="180" colspan="2"><img src="res/MIDI-C1.png"></td>
+<td width="90"  colspan="1"><img src="res/MIDI-G1.png"></td>
+<td width="90"  colspan="1"><img src="res/Blank06.png"></td>
+<td width="180" colspan="2"><img src="res/Fade-G1.png"></td>
+<td width="270" colspan="3"><img src="res/Fade-G2.png"></td>
+</tr><tr>
+<td width="180" colspan="2"><img src="res/Octave-G1.png"></td>
+<td width="270" colspan="3"><img src="res/Chord-G1.png"></td>
+<td width="90"  colspan="1"><img src="res/Blank06.png"></td>
+<td width="450" colspan="5"><img src="res/Seq-G1.png"></td>
+</tr><tr>
+<td width="180" colspan="2"><img src="res/Binary-G1.png"></td>
+<td width="810" colspan="9"><img src="res/Seq-G2.png"></td>
+</tr><tr>
+<td width="90"  colspan="1"><img src="res/VU-G1.png"></td>
+<td width="360" colspan="4"><img src="res/Scope-G1.png"></td>
+<td width="540" colspan="6"><img src="res/Keys-G1.png"></td>
+</tr><tr>
+<td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td>
+<td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td>
+<td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td><td width="90">&nbsp;</td>
+</tr>
+</table>
+
+<h2>Design Philosophy</h2>
+<p>When designing these modules I'm working along the following lines:</p>
+<ul>
+<li>It should look like and feel like a real Eurorack module.</li>
+<li>If possible generalize to six voice polyphony, even at the expense of lots of wires!</li>
+<li>Build on the work of others, especially if I can turn a monosynth into a polysynth.</li>
+<li>Learn some stuff along the way. (I'm starting with very little music, synthesis and Eurorack knowledge.)</li>
+<li>Try out daft things and have some fun...</li>
+</ul>
+
+<h2>Inputs and Outputs</h2>
+
+<p>Polyphonic inputs and outputs are arranged in a circle. There wasn't a particularity strong reason to do
+thus other than I felt it looks like a socket for a six prong plug and I quite like it. Port number one
+is at 12 o'clock and then they count up in a clockwise fashion.</p>
+
+<p>In a lot of cases the inputs have an additional seventh port in the centre. Should an outer input not be
+connected, then it will inherit the center input (if it's connected). In other words, it's just a time-saving
+fanout option resulting in less wiring should you want all inputs to work in the same way.</p>
+
+<h2>Modules</h2>
+
+<p>I would like to mention that in a lot of these modules I have simply duplicated the work of others to
+create a poly module out of a mono module.</p>
+<ul>
+<li>A module ending with <tt>-C</tt> is based heavily on a <i>VCV Rack Core</i> module.</li>
+<li>A module ending with <tt>-F</tt> is based heavily on a <i>VCV Rack Fundamental</i> module.</li>
+<li>Modules ending with <tt>-G</tt> vary on how much they use the work of others. Sometimes they may be a modification
+of something else, or, it may be entirely original design on my part.</li>
+</ul>
+
+<h4>Oscillators and Filters</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/VCO-F1.png">
+<img height="190px" src="res/VCO-F2.png">
+<img height="190px" src="res/VCF-F1.png">
+</div>
+<div class="box b">
+<ul>
+<li><tt>VCO-F1</tt> is a six voice straight clone of <i>Fundamental VCO-1</i>.</li>
+<li><tt>VCO-F2</tt> is a six voice straight clone of <i>Fundamental VCO-2</i>.</li>
+<li><tt>VCF-F1</tt> is a six voice straight clone of <i>Fundamental VCF</i>.</li>
+</div>
+</div>
+
+<h4>Amplifiers and Envelopes</h4>
+
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/VCA-F1.png">
+<img height="190px" src="res/Env-F1.png">
+</div>
+<div class="box b">
+<ul>
+<li><tt>VCA-F1</tt> is a six voice straight clone of the <i>Fundamental VCA</i> with a basic mixer to combine
+the voices to single outputs.</li>
+<li><tt>ENV-F1</tt> is a six voice straight clone of the <i>Fundamental ADSR</i> with an additional inverted
+output.</li>
+</div>
+</div>
+
+<h4>Faders and Logic</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/Fade-G1.png">
+<img height="190px" src="res/Fade-G2.png">
+<img height="190px" src="res/Binary-G1.png">
+</div>
+<div class="box b">
+<ul>
+<li><tt>FADE-G1</tt> is a two input six voice one-dimensional fader.</li>
+<li><tt>FADE-G2</tt> is a four input six voice two-dimensional fader.</li>
+<li><tt>BINARY-G1</tt> is a configurable binary logic gate. <span class="soon">Coming soon!</span></li>
+</li>
+</div>
+</div>
+
+<h4>Sequencers</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/Seq-G1.png">
+<img height="190px" src="res/Seq-G2.png">
+</div>
+<div class="box b">
+<ul>
+<li><tt>SEQ-G1</tt> is a sequencer. <span class="soon">Coming soon!</span></li>
+<li><tt>SEQ-G2</tt> is a sequencer. <span class="soon">Coming soon!</span></li>
+</li>
+</div>
+</div>
+
+<h4>Generators</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/Octave-G1.png" >
+<img height="190px" src="res/Chord-G1.png">
+</div>
+<div class="box b">
+<ul>
+<li><tt>OCTAVE</tt> quantises the input to 12-ET and provides an octaves-worth of output with the input value
+used as the fundamental. Additionally, several whole-octave transpositions of the input are also provided at output.
+<br><i>TODO: I am probably going to redesign this.</i></li>
+<li><tt>CHORD-G1</tt> genearates chords via a CV program selection and a fundamental bass note V/octave input.
+Upto 12 different chords can be programmed, each with up to six voices.</li>
+</div>
+</div>
+
+<h4>Interfaces</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/MIDI-C1.png" >
+<img height="190px" src="res/MIDI-G1.png" >
+</div>
+<div class="box b">
+<ul>
+<li><tt>MIDI-C1</tt> is a six voice straight clone of the <i>Core Quad MIDI-to-CV Interface</i>.</li>
+<li><tt>MIDI-G1</tt> is a simplified version <i>MIDI-C1</i> for those tight on rack space.</li>
+</div>
+</div>
+
+<!--
+<h4>Utilities</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/Mux.png" >
+</div>
+<div class="box b">
+<ul>
+<li><tt>...</tt> is a ...</li>
+</div>
+</div>
+-->
+
+<h4>Diagnostics</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/VU-G1.png" >
+<img height="190px" src="res/Scope-G1.png" >
+<img height="190px" src="res/Keys-G1.png" >
+</div>
+<div class="box b">
+<ul>
+<li><tt>VU-G1</tt> is a simple six input volume monitoring module.</li>
+<li><tt>SCOPE-G1</tt> is based on the <i>Fundamental Scope</i> module.</li>
+<li><tt>KEYS-G1</tt> is a six input times six voice note monitoring module.</li>
+</div>
+</div>
+
+<h4>Blanks</h4>
+<div class="wrapper">
+<div class="box a">
+<img height="190px" src="res/Blank03.png">
+<img height="190px" src="res/Blank06.png">
+<img height="190px" src="res/Blank09.png">
+<img height="190px" src="res/Blank12.png">
+</div>
+<div class="box b">
+<ul>
+<li>Simple do nothing  3-hole high quality blank.</li>
+<li>Simple do nothing  6-hole high quality blank.</li>
+<li>Simple do nothing  9-hole high quality blank.</li>
+<li>Simple do nothing 12-hole high quality blank.</li>
+</div>
+</div>
+
+
+<h2>Download</h2>
+
+<p>Current release is 0.5.0 and requires VCV Rack 0.5.x:</p>
+
+<ul>
+<li>Mac:     <a href="downloads/Gratrix-0.5.0-mac.zip">Gratrix-0.5.0-mac.zip</a> [670,913 bytes]</li>
+<li>Windows: <a href="downloads/Gratrix-0.5.0-win.zip">Gratrix-0.5.0-win.zip</a> [3,844,673 bytes]</li>
+</ul>
+
+<p>I hope to add a build for Linux soon. Older releases can be found <a href="downloads">here</a>.
+
+<h2>Source</h2>
+
+<p>The source code is avaliable on <a href="https://github.com/gratrix/vcv-gratrix">GitHub</a>.</p>
+
+</div>
+
+<hr>
+<p>&copy; Sam Gratrix, <a href="http://gratrix.net">Gratrix.net</a>.</p>
+</body>
+</html>
