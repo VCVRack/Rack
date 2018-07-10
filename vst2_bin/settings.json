@@ -9,13 +9,110 @@
     83.0
   ],
   "wireOpacity": 50.0,
-  "wireTension": 0.5,
+  "wireTension": 1.0,
   "zoom": 1.0,
   "allowCursorLock": true,
   "sampleRate": 44100.0,
   "lastPath": "",
   "moduleBrowser": {
-    "favorites": []
+    "favorites": [
+      {
+        "plugin": "Alikins",
+        "model": "SpecificValue"
+      },
+      {
+        "plugin": "AS",
+        "model": "AtNuVrTr"
+      },
+      {
+        "plugin": "AS",
+        "model": "TriLFO"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Clouds"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Braids"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Elements"
+      },
+      {
+        "plugin": "Befaco",
+        "model": "Mixer"
+      },
+      {
+        "plugin": "Befaco",
+        "model": "SlewLimiter"
+      },
+      {
+        "plugin": "Bidoo",
+        "model": "Σ"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Noise"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-VCAmp"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-XCO"
+      },
+      {
+        "plugin": "DHE-Modules",
+        "model": "Cubic"
+      },
+      {
+        "plugin": "ErraticInstruments",
+        "model": "MPEToCV"
+      },
+      {
+        "plugin": "FrozenWasteland",
+        "model": "TheOneRingModulator"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCA"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCF"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCMixer"
+      },
+      {
+        "plugin": "huaba",
+        "model": "EQ3"
+      },
+      {
+        "plugin": "ML_modules",
+        "model": "VoltMeter"
+      },
+      {
+        "plugin": "mscHack",
+        "model": "Maude221"
+      },
+      {
+        "plugin": "Valley",
+        "model": "Dexter"
+      },
+      {
+        "plugin": "VultModules",
+        "model": "Debriatus"
+      },
+      {
+        "plugin": "VultModules",
+        "model": "Tohe"
+      }
+    ]
   },
   "powerMeter": false,
   "checkVersion": true
