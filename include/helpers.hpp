@@ -6,7 +6,7 @@
 namespace rack {
 
 
-template <class TModuleWidget, typename... Tags>
+template <class TModule, class TModuleWidget, typename... Tags>
 Model *createModel(std::string author, std::string slug, std::string name, Tags... tags) {
 	struct TModel : Model {
 		Module *createModule() override {
@@ -14,7 +14,8 @@ Model *createModel(std::string author, std::string slug, std::string name, Tags.
 			return module;
 		}
 		ModuleWidget *createModuleWidget() override {
-			TModuleWidget *moduleWidget = new TModuleWidget(createModule());
+			TModule *module = new TModule();
+			TModuleWidget *moduleWidget = new TModuleWidget(module);
 			moduleWidget->model = this;
 			return moduleWidget;
 		}
@@ -107,7 +108,7 @@ TPort *createOutputCentered(Vec pos, Module *module, int outputId) {
 	return port;
 }
 
-template<class TModuleLightWidget>
+template <class TModuleLightWidget>
 TModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
 	TModuleLightWidget *light = new TModuleLightWidget();
 	light->box.pos = pos;
@@ -116,7 +117,7 @@ TModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
 	return light;
 }
 
-template<class TModuleLightWidget>
+template <class TModuleLightWidget>
 TModuleLightWidget *createLightCentered(Vec pos, Module *module, int firstLightId) {
 	TModuleLightWidget *light = new TModuleLightWidget();
 	light->box.pos = pos.minus(light->box.size.div(2));
