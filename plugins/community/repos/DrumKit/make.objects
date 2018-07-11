@@ -1,0 +1,10 @@
+ALL_OBJ= \
+	deps/SynthDevKit/src/Clock.o \
+	deps/SynthDevKit/src/CV.o \
+	src/BD9.o \
+	src/ClosedHH.o \
+	src/DMX.o \
+	src/DrumKit.o \
+	src/DrumModule.o \
+	src/OpenHH.o \
+	src/Snare.o

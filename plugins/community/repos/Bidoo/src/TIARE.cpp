@@ -286,14 +286,14 @@ struct TIAREDisplay : TransparentWidget {
 TIAREDisplay() {}
 
 void onDragStart(EventDragStart &e) override {
-	dragX = rack::global_ui->app.gRackWidget->lastMousePos.x;
-	dragY = rack::global_ui->app.gRackWidget->lastMousePos.y;
+	dragX = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.x;
+	dragY = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.y;
 }
 
 void onDragMove(EventDragMove &e) override {
 	if ((!module->inputs[TIARE::DIST_X_INPUT].active) && (!module->inputs[TIARE::DIST_X_INPUT].active)) {
-		float newDragX = rack::global_ui->app.gRackWidget->lastMousePos.x;
-		float newDragY = rack::global_ui->app.gRackWidget->lastMousePos.y;
+		float newDragX = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.x;
+		float newDragY = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.y;
 		module->phaseDistX = rescale(clamp(initX+(newDragX-dragX),0.0f,140.0f), 0.0f, 140.0f, 0.01f,0.98f);
 		module->phaseDistY = rescale(clamp(initY-(newDragY-dragY),0.0f,140.0f), 0.0f, 140.0f, 0.01f,1.0f);
 	}

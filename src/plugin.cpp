@@ -577,6 +577,7 @@ extern void init_plugin_Bidoo              (rack::Plugin *p);
 extern void init_plugin_Bogaudio           (rack::Plugin *p);
 extern void init_plugin_cf                 (rack::Plugin *p);
 extern void init_plugin_DHE_Modules        (rack::Plugin *p);
+extern void init_plugin_DrumKit            (rack::Plugin *p);
 extern void init_plugin_ErraticInstruments (rack::Plugin *p);
 extern void init_plugin_ESeries            (rack::Plugin *p);
 extern void init_plugin_FrozenWasteland    (rack::Plugin *p);
@@ -584,6 +585,7 @@ extern void init_plugin_Fundamental        (rack::Plugin *p);
 extern void init_plugin_Gratrix            (rack::Plugin *p);
 extern void init_plugin_HetrickCV          (rack::Plugin *p);
 extern void init_plugin_huaba              (rack::Plugin *p);
+extern void init_plugin_JW_Modules         (rack::Plugin *p);
 extern void init_plugin_Koralfx            (rack::Plugin *p);
 extern void init_plugin_LindenbergResearch (rack::Plugin *p);
 extern void init_plugin_LOGinstruments     (rack::Plugin *p);
@@ -603,6 +605,7 @@ extern void init_plugin_squinkylabs_plug1  (rack::Plugin *p);
 extern void init_plugin_SubmarineFree      (rack::Plugin *p);
 extern void init_plugin_Template           (rack::Plugin *p);
 extern void init_plugin_trowaSoft          (rack::Plugin *p);
+extern void init_plugin_unless_modules     (rack::Plugin *p);
 extern void init_plugin_Valley             (rack::Plugin *p);
 extern void init_plugin_VultModules        (rack::Plugin *p);
 }
@@ -643,6 +646,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Bogaudio",           &init_plugin_Bogaudio);
    vst2_load_static_rack_plugin("cf",                 &init_plugin_cf);
    vst2_load_static_rack_plugin("DHE-Modules",        &init_plugin_DHE_Modules);
+   vst2_load_static_rack_plugin("DrumKit",            &init_plugin_DrumKit);
    vst2_load_static_rack_plugin("ErraticInstruments", &init_plugin_ErraticInstruments);
    vst2_load_static_rack_plugin("ESeries",            &init_plugin_ESeries);
    vst2_load_static_rack_plugin("FrozenWasteland",    &init_plugin_FrozenWasteland);
@@ -650,6 +654,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Gratrix",            &init_plugin_Gratrix);
    vst2_load_static_rack_plugin("HetrickCV",          &init_plugin_HetrickCV);
    vst2_load_static_rack_plugin("huaba",              &init_plugin_huaba);
+   vst2_load_static_rack_plugin("JW_Modules",         &init_plugin_JW_Modules);
    vst2_load_static_rack_plugin("Koralfx-Modules",    &init_plugin_Koralfx);
    vst2_load_static_rack_plugin("LindenbergResearch", &init_plugin_LindenbergResearch);
    vst2_load_static_rack_plugin("LOGinstruments",     &init_plugin_LOGinstruments);
@@ -669,9 +674,84 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("SubmarineFree",      &init_plugin_SubmarineFree);
    vst2_load_static_rack_plugin("Template",           &init_plugin_Template);
    vst2_load_static_rack_plugin("trowaSoft",          &init_plugin_trowaSoft);
+   vst2_load_static_rack_plugin("unless_modules",     &init_plugin_unless_modules);
    vst2_load_static_rack_plugin("Valley",             &init_plugin_Valley);
    vst2_load_static_rack_plugin("VultModules",        &init_plugin_VultModules);
 }
 #endif // USE_VST2
 
 } // namespace rack
+
+using namespace rack;
+
+RackScene *rack_plugin_ui_get_rackscene(void) {
+#ifdef USE_VST2
+   return rack::global_ui->app.gRackScene;
+#else
+   return gRackScene;
+#endif // USE_VST2
+}
+
+RackWidget *rack_plugin_ui_get_rackwidget(void) {
+#ifdef USE_VST2
+   return rack::global_ui->app.gRackWidget;
+#else
+   return gRackWidget;
+#endif // USE_VST2
+}
+
+Toolbar *rack_plugin_ui_get_toolbar(void) {
+#ifdef USE_VST2
+   return rack::global_ui->app.gToolbar;
+#else
+   return gToolbar;
+#endif // USE_VST2
+}
+
+Widget *rack_plugin_ui_get_hovered_widget(void) {
+#ifdef USE_VST2
+   return rack::global_ui->widgets.gHoveredWidget;
+#else
+   return gHoveredWidget;
+#endif // USE_VST2
+}
+
+Widget *rack_plugin_ui_get_dragged_widget(void) {
+#ifdef USE_VST2
+   return rack::global_ui->widgets.gDraggedWidget;
+#else
+   return gDraggedWidget;
+#endif // USE_VST2
+}
+
+void rack_plugin_ui_set_dragged_widget(Widget *w) {
+#ifdef USE_VST2
+   rack::global_ui->widgets.gDraggedWidget = w;
+#else
+   gDraggedWidget = w;
+#endif // USE_VST2
+}
+
+Widget *rack_plugin_ui_get_draghovered_widget(void) {
+#ifdef USE_VST2
+   return rack::global_ui->widgets.gDragHoveredWidget;
+#else
+   return gDragHovered;
+#endif // USE_VST2
+}
+
+Widget *rack_plugin_ui_get_focused_widget(void) {
+#ifdef USE_VST2
+   return rack::global_ui->widgets.gFocusedWidget;
+#else
+   return gFocusedWidget;
+#endif // USE_VST2
+}
+
+void rack_plugin_ui_set_focused_widget(Widget *w) {
+#ifdef USE_VST2
+   rack::global_ui->widgets.gFocusedWidget = w;
+#else
+   gFocusedWidget = w;
+#endif // USE_VST2
+}

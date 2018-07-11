@@ -1274,14 +1274,14 @@ struct RandomizeMenuItem : MenuItem {
 struct CloneMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(EventAction &e) override {
-		rack::global_ui->app.gRackWidget->cloneModule(moduleWidget);
+		RACK_PLUGIN_UI_RACKWIDGET->cloneModule(moduleWidget);
 	}
 };
 
 struct DeleteMenuItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(EventAction &e) override {
-		rack::global_ui->app.gRackWidget->deleteModule(moduleWidget);
+		RACK_PLUGIN_UI_RACKWIDGET->deleteModule(moduleWidget);
 		moduleWidget->finalizeEvents();
 		delete moduleWidget;
 	}

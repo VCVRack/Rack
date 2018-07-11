@@ -11,7 +11,7 @@ MPEToCV::MPEToCV() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {
 void MPEToCV::step() {
 	MidiMessage msg;
 	while (midiInput.shift(&msg)) {
-		debug("Processmsg");
+		Ddebug("Processmsg");
 		processMessage(msg);
 	}
 	
@@ -65,9 +65,9 @@ void MPEToCV::step() {
 	// 1/V incorporates pitch wheel changes
 	if (pitchWheel.changed && gate) {
 		outputs[PITCH_OUTPUT].value = (((note - 60)) / 12.0) + ((pitchWheel.val - 8192 ) / 8192.0 / 12.0 * (float)bendRange ) ;
-		debug("%d",(pitchWheel.val - 8192 ));
-		debug("note=%d, pitchWheel.val=%d, bendRange=%d",note, pitchWheel.val, bendRange );
-		debug("outputs[PITCH_OUTPUT].value is %f",outputs[PITCH_OUTPUT].value);
+		Ddebug("%d",(pitchWheel.val - 8192 ));
+		Ddebug("note=%d, pitchWheel.val=%d, bendRange=%d",note, pitchWheel.val, bendRange );
+		Ddebug("outputs[PITCH_OUTPUT].value is %f",outputs[PITCH_OUTPUT].value);
 		pitchWheel.changed = false;
 		this->newNote = false;
 	}
@@ -97,7 +97,7 @@ void MPEToCV::releaseNote(int note) {
 	gate = false;
 
 	if (noteOffReset) {					
-		debug("We execute the note off reset");
+		Ddebug("We execute the note off reset");
 		resetNoteNow = true;
 		afterTouch.val = 0;
 		afterTouch.changed = true;
@@ -126,7 +126,7 @@ void MPEToCV::releaseNote(int note) {
 }
 
 void MPEToCV::processMessage(MidiMessage msg) {
-	//debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
+	//Ddebug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.data1, msg.data2);
 	int8_t channel = msg.channel();
 	int8_t status = msg.status();
 	int8_t data1 = msg.data1;
@@ -203,7 +203,7 @@ void MPEToCV::processMessage(MidiMessage msg) {
 				// we don't need to shift the first byte because it's 7 bit (always starts with 0)
 				twoBytes = ( (uint16_t)msg.data2 << 7) | ( (uint16_t)msg.data1 ) ;
 				pitchWheel.val = twoBytes;
-				debug("pitchWheel.val=%d",pitchWheel.val);
+				Ddebug("pitchWheel.val=%d",pitchWheel.val);
 				pitchWheel.changed = true;
 				}
 				break;
@@ -235,7 +235,7 @@ struct MPEToCVWidget : ModuleWidget {
 			MPEToCV *module;
 			bool resetNoteBool;
 			void onAction(EventAction &e) override {
-				//debug("Set resetNoteBool to %d",!resetNoteBool);
+				//Ddebug("Set resetNoteBool to %d",!resetNoteBool);
 				module->noteOffReset = ! resetNoteBool;
 			}
 		};

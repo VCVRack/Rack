@@ -1,6 +1,6 @@
 SLUG=FrozenWasteland
 
-include ../../../../dep/yac/install_msvc.mk
+include ../../../build_plugin_pre.mk
 
 EXTRAFLAGS+= \
 	-DTEST \
@@ -10,4 +10,4 @@ EXTRAFLAGS+= \
 
 include make.objects
 
-include ../../../build_plugin.mk
+include ../../../build_plugin_post.mk

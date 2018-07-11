@@ -136,13 +136,17 @@ You must implement this in your plugin
 #define RACK_PLUGIN_INIT_ID_INTERNAL p->slug = TOSTRING(SLUG); p->version = TOSTRING(VERSION)
 
 #ifdef USE_VST2
+
 #define RACK_PLUGIN_DECLARE(pluginname) 
 #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
 #define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
+
 #else
+
 #define RACK_PLUGIN_DECLARE(pluginname) extern Plugin *plugin
 #define RACK_PLUGIN_INIT(pluginname)  extern "C" RACK_PLUGIN_EXPORT void init(rack::Plugin *p)
 #define RACK_PLUGIN_INIT_ID() plugin = p; RACK_PLUGIN_INIT_ID_INTERNAL
+
 #endif // USE_VST2
 
 #define RACK_PLUGIN_INIT_WEBSITE(url) p->website = url
@@ -151,3 +155,40 @@ You must implement this in your plugin
 #define RACK_PLUGIN_MODEL_DECLARE(pluginname, modelname) extern Model *create_model_##pluginname##_##modelname##(void)
 #define RACK_PLUGIN_MODEL_INIT(pluginname, modelname) Model *create_model_##pluginname##_##modelname##(void)
 #define RACK_PLUGIN_MODEL_ADD(pluginname, modelname) p->addModel(create_model_##pluginname##_##modelname##())
+
+// Access helpers for global UI vars
+//
+//  (note) these avoid accessing the global rack vars directly 
+//          (global TLS vars cannot be exported to dynamically loaded plugins)
+//
+//  (note) please use the macros and do _not_ call the functions directly!
+//
+#include "global_pre.hpp"
+#include "global_ui.hpp"
+
+extern rack::RackScene *rack_plugin_ui_get_rackscene(void);
+#define RACK_PLUGIN_UI_RACKSCENE rack_plugin_ui_get_rackscene()
+
+extern rack::RackWidget *rack_plugin_ui_get_rackwidget(void);
+#define RACK_PLUGIN_UI_RACKWIDGET rack_plugin_ui_get_rackwidget()
+
+extern rack::Toolbar *rack_plugin_ui_get_toolbar(void);
+#define RACK_PLUGIN_UI_TOOLBAR rack_plugin_ui_get_toolbar()
+
+extern rack::Widget *rack_plugin_ui_get_hovered_widget(void);
+#define RACK_PLUGIN_UI_HOVERED_WIDGET rack_plugin_ui_get_hovered_widget()
+
+extern rack::Widget *rack_plugin_ui_get_dragged_widget(void);
+#define RACK_PLUGIN_UI_DRAGGED_WIDGET rack_plugin_ui_get_dragged_widget()
+
+extern void rack_plugin_ui_set_dragged_widget(rack::Widget *);
+#define RACK_PLUGIN_UI_DRAGGED_WIDGET_SET(a) rack_plugin_ui_set_dragged_widget(a)
+
+extern rack::Widget *rack_plugin_ui_get_draghovered_widget(void);
+#define RACK_PLUGIN_UI_DRAGHOVERED_WIDGET rack_plugin_ui_get_draghovered_widget()
+
+extern rack::Widget *rack_plugin_ui_get_focused_widget(void);
+#define RACK_PLUGIN_UI_FOCUSED_WIDGET rack_plugin_ui_get_focused_widget()
+
+extern void rack_plugin_ui_set_focused_widget(rack::Widget *);
+#define RACK_PLUGIN_UI_FOCUSED_WIDGET_SET(a) rack_plugin_ui_set_focused_widget(a)

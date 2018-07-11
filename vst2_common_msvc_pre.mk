@@ -2,7 +2,7 @@ EXTRAFLAGS+= -DARCH_WIN
 EXTRAFLAGS+= -DVST2_REPARENT_WINDOW_HACK 
 EXTRAFLAGS+= -I../../dev/vstsdk2.4/pluginterfaces/vst2.x/
 
-EXTRALIBS= Rack.lib
+EXTRALIBS= 
 
 ifeq ($(BUILD_64),y)
 EXTRALIBS+= -LIBPATH:dep/lib/msvc/x64

@@ -216,11 +216,7 @@ struct AnalyzerDisplay : TransparentWidget {
 void AnalyzerDisplay::draw(NVGcontext* vg) {
 	drawBackground(vg);
 	if (_module->_running) {
-#ifdef USE_VST2
-		float strokeWidth = std::max(1.0f, 3 - rack::global_ui->app.gRackScene->zoomWidget->zoom);
-#else
-		float strokeWidth = std::max(1.0f, 3 - gRackScene->zoomWidget->zoom);
-#endif // USE_VST2
+		float strokeWidth = std::max(1.0f, 3 - RACK_PLUGIN_UI_RACKSCENE->zoomWidget->zoom);
 		nvgSave(vg);
 		nvgScissor(vg, _insetAround, _insetAround, _size.x - _insetAround, _size.y - _insetAround);
 		drawHeader(vg);

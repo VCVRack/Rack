@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="24"
+   height="24"
+   viewBox="0 0 6.3499999 6.3500001"
+   version="1.1"
+   id="svg12484"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   sodipodi:docname="SmallButtonDown.svg">
+  <defs
+     id="defs12478" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="22.4"
+     inkscape:cx="-1.3959553"
+     inkscape:cy="11.264181"
+     inkscape:document-units="px"
+     inkscape:current-layer="g12476"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1265"
+     inkscape:window-height="870"
+     inkscape:window-x="113"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     units="px"
+     inkscape:pagecheckerboard="true" />
+  <metadata
+     id="metadata12481">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-155.97001,-112.75596)">
+    <g
+       id="g12476"
+       transform="matrix(0.27270608,0,0,-0.27270608,81.038799,439.90948)"
+       style="stroke-width:1.29361904">
+      <g
+         id="g12468"
+         transform="matrix(0.85714285,0,0,0.85726908,298.05427,1188.0127)"
+         style="fill:#1996fc;fill-opacity:1;stroke-width:2.58704758">
+        <path
+           d="m 0,0 c 0,-7.5 -6.083,-13.58 -13.584,-13.58 -7.5,0 -13.582,6.08 -13.582,13.58 0,7.503 6.082,13.582 13.582,13.582 C -6.083,13.582 0,7.503 0,0"
+           style="fill:#1996fc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.58704758"
+           id="path12466"
+           inkscape:connector-curvature="0" />
+      </g>
+      <ellipse
+         transform="scale(1,-1)"
+         cy="-1187.4016"
+         cx="286.41171"
+         id="circle12472"
+         style="opacity:1;vector-effect:none;fill:#676967;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.21763253;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         rx="9.6661177"
+         ry="9.6675415" />
+      <ellipse
+         style="opacity:1;vector-effect:none;fill:#1996fc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.21763253;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="circle12474"
+         cx="286.41171"
+         cy="-1188.0135"
+         transform="scale(1,-1)"
+         rx="9.6661177"
+         ry="9.6675415" />
+    </g>
+  </g>
+</svg>

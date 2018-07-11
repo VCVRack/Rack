@@ -344,38 +344,41 @@ void vst2_queue_param(int uniqueParamId, float normValue) {
 void vst2_handle_queued_params(void) {
    // Called in processReplacing()
    //  (note) protected by caller mutex
-   global_ui->app.mtx_param.lock();
-   for(VST2QueuedParam qp : global->vst2.queued_params)
+   if(global->vst2.queued_params.size() > 0)
    {
-      Module *module;
-      int paramId;
-      if(loc_vst2_find_module_and_paramid_by_unique_paramid(qp.unique_id, &module, &paramId))
+      global_ui->app.mtx_param.lock();
+      for(VST2QueuedParam qp : global->vst2.queued_params)
       {
-         ModuleWidget *moduleWidget = global_ui->app.gRackWidget->findModuleWidgetByModule(module);
-         if(NULL != moduleWidget)
+         Module *module;
+         int paramId;
+         if(loc_vst2_find_module_and_paramid_by_unique_paramid(qp.unique_id, &module, &paramId))
          {
-            // Find 
-            ParamWidget *paramWidget = moduleWidget->findParamWidgetByParamId(paramId);
-            if(NULL != paramWidget)
+            ModuleWidget *moduleWidget = global_ui->app.gRackWidget->findModuleWidgetByModule(module);
+            if(NULL != moduleWidget)
             {
-               // Normalize parameter
-               float paramRange = (paramWidget->maxValue - paramWidget->minValue);
-               if(paramRange > 0.0f)
+               // Find 
+               ParamWidget *paramWidget = moduleWidget->findParamWidgetByParamId(paramId);
+               if(NULL != paramWidget)
                {
-                  // float value = qp.norm_value - 0.5f;
-                  // value *= 2.0f;
-                  float value = (qp.norm_value * paramRange) + paramWidget->minValue;
-                  engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
+                  // Normalize parameter
+                  float paramRange = (paramWidget->maxValue - paramWidget->minValue);
+                  if(paramRange > 0.0f)
+                  {
+                     // float value = qp.norm_value - 0.5f;
+                     // value *= 2.0f;
+                     float value = (qp.norm_value * paramRange) + paramWidget->minValue;
+                     engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
 
-                  // Update UI widget
-                  paramWidget->setValue(value);
+                     // Update UI widget
+                     paramWidget->setValue(value);
+                  }
                }
             }
          }
       }
+      global->vst2.queued_params.clear();
+      global_ui->app.mtx_param.unlock();
    }
-   global_ui->app.mtx_param.unlock();
-   global->vst2.queued_params.clear();
 }
 
 float vst2_get_param(int uniqueParamId) {

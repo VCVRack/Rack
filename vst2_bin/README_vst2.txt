@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- July 10th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- July 11th, 2018
 ================================================
 
 !!!------------------------------------------------------------------------------
@@ -195,6 +195,11 @@ The VST2 plugin includes the following add-on modules:
  - DHE-Modules.Stage
  - DHE-Modules.Swave
  - DHE-Modules.Upstage
+ - DrumKit.BD9
+ - DrumKit.Snare
+ - DrumKit.ClosedHH
+ - DrumKit.OpenHH
+ - DrumKit.DMX
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
@@ -271,6 +276,17 @@ The VST2 plugin includes the following add-on modules:
  - HetrickCV.Waveshape
  - huaba.EQ3
  - huaba.ABBus
+ - JW_Modules.Cat
+ - JW_Modules.BouncyBalls
+ - JW_Modules.FullScope
+ - JW_Modules.GridSeq
+ - JW_Modules.Quantizer
+ - JW_Modules.MinMax
+ - JW_Modules.NoteSeq
+ - JW_Modules.SimpleClock
+ - JW_Modules.ThingThing
+ - JW_Modules.WavHead
+ - JW_Modules.XYPad
  - Koralfx.Beatovnik
  - Koralfx.Mixovnik
  - Koralfx.Nullovnik4
@@ -456,6 +472,8 @@ The VST2 plugin includes the following add-on modules:
  - trowaSoft.OscCV
  - trowaSoft.MultiScope
  - trowaSoft.MultiOscillator
+ - unless_modules.Piong
+ - unless_modules.Markov
  - Valley.Topograph
  - Valley.UGraph
  - Valley.Dexter

@@ -1,0 +1,5 @@
+ALL_OBJ= \
+	src/markov.o \
+	src/piong.o \
+	src/unless.o
+

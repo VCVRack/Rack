@@ -68,7 +68,7 @@ void TSTextField::draw(NVGcontext *vg) {
 			//NVGcolor highlightColor = color;
 			//highlightColor.a = 0.5;
 			int begin = min(cursor, selection);
-			int end = (this == rack::global_ui->widgets.gFocusedWidget) ? max(cursor, selection) : -1;
+			int end = (this == RACK_PLUGIN_UI_FOCUSED_WIDGET) ? max(cursor, selection) : -1;
 
 			// Calculate overflow and the displayed text (based on bounding box)
 			// Currently the scrolling should work for any font, **BUT** the width calculation is only really good for monospace.
@@ -86,7 +86,7 @@ void TSTextField::draw(NVGcontext *vg) {
 				if (nChars < 1)
 					nChars = 1;
 
-				if (this == rack::global_ui->widgets.gFocusedWidget) {
+				if (this == RACK_PLUGIN_UI_FOCUSED_WIDGET) {
 					int lastIx = (cursor > nChars) ? cursor : nChars;
 					int startIx = clamp(lastIx - nChars, 0, lastIx);
 					displayStr = text.substr(startIx, nChars);
@@ -121,12 +121,12 @@ void TSTextField::draw(NVGcontext *vg) {
 
 // Request focus on this field.
 void TSTextField::requestFocus() {
-	if (rack::global_ui->widgets.gFocusedWidget) {
+	if (RACK_PLUGIN_UI_FOCUSED_WIDGET) {
 		EventDefocus evt;
-		rack::global_ui->widgets.gFocusedWidget->onDefocus(evt);
-		rack::global_ui->widgets.gFocusedWidget = NULL;
+		RACK_PLUGIN_UI_FOCUSED_WIDGET->onDefocus(evt);
+		RACK_PLUGIN_UI_FOCUSED_WIDGET_SET(NULL);
 	}
-	rack::global_ui->widgets.gFocusedWidget = this;	
+	RACK_PLUGIN_UI_FOCUSED_WIDGET_SET(this);
 	{
 		EventFocus eFocus;
 		onFocus(eFocus);

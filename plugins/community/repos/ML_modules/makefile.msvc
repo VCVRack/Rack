@@ -1,9 +1,9 @@
 SLUG=ML_modules
 
-include ../../../../dep/yac/install_msvc.mk
+include ../../../build_plugin_pre.mk
 
 EXTRAFLAGS += -Dv_dev
 
 include make.objects
 
-include ../../../build_plugin.mk
+include ../../../build_plugin_post.mk

@@ -177,7 +177,7 @@ std::string FloatField::voltsToText(float param_volts){
 void FloatField::onChange(EventChange &e) {
     //debug("FloatField onChange  text=%s param=%f", text.c_str(), module->params[SpecificValue::VALUE1_PARAM].value);
 
-     if (this != rack::global_ui->widgets.gFocusedWidget) {
+     if (this != RACK_PLUGIN_UI_FOCUSED_WIDGET) {
         std::string new_text = voltsToText(module->params[SpecificValue::VALUE1_PARAM].value);
         setText(new_text);
      }
@@ -236,7 +236,7 @@ void HZFloatField::onChange(EventChange &e) {
 
      //TextField::onChange(e);
 
-     if (this != rack::global_ui->widgets.gFocusedWidget)
+     if (this != RACK_PLUGIN_UI_FOCUSED_WIDGET)
      {
          std::string new_text = voltsToText(module->params[SpecificValue::VALUE1_PARAM].value);
          setText(new_text);
@@ -292,7 +292,7 @@ void SecondsFloatField::onChange(EventChange &e) {
 
      //TextField::onChange(e);
 
-     if (this != rack::global_ui->widgets.gFocusedWidget)
+     if (this != RACK_PLUGIN_UI_FOCUSED_WIDGET)
      {
          std::string new_text = voltsToText(module->params[SpecificValue::VALUE1_PARAM].value);
          setText(new_text);
@@ -332,7 +332,7 @@ void CentsField::onChange(EventChange &e) {
                                      module->params[SpecificValue::OCTAVE_PARAM].value);
 
     // debug("CentsField onChange cents: %f", cents);
-    if (this != rack::global_ui->widgets.gFocusedWidget || fabs(cents) >= 0.50f)
+    if (this != RACK_PLUGIN_UI_FOCUSED_WIDGET || fabs(cents) >= 0.50f)
     {
         float cents = volts_to_note_cents(module->params[SpecificValue::VALUE1_PARAM].value,
                                           module->params[SpecificValue::OCTAVE_PARAM].value);
@@ -379,7 +379,7 @@ void NoteNameField::onChange(EventChange &e) {
 
      //TextField::onChange(e);
 
-     if (this != rack::global_ui->widgets.gFocusedWidget)
+     if (this != RACK_PLUGIN_UI_FOCUSED_WIDGET)
      {
         float cv_volts = module->params[SpecificValue::VALUE1_PARAM].value;
         int octave = volts_to_octave(cv_volts, module->params[SpecificValue::OCTAVE_PARAM].value);
@@ -454,7 +454,7 @@ void PurpleTrimpot::step() {
      // paramId,  this->initialized, initialized, this->value, value, module->params[paramId].value);
 
     if (this->value != module->params[paramId].value) {
-       if (this != rack::global_ui->widgets.gHoveredWidget && this->initialized) {
+       if (this != RACK_PLUGIN_UI_HOVERED_WIDGET && this->initialized) {
 			// this->value = module->params[paramId].value;
 			setValue(module->params[paramId].value);
 		} else {

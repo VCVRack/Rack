@@ -310,14 +310,14 @@ struct CLACOSDisplay : TransparentWidget {
 CLACOSDisplay() {}
 
 void onDragStart(EventDragStart &e) override {
-	dragX = rack::global_ui->app.gRackWidget->lastMousePos.x;
-	dragY = rack::global_ui->app.gRackWidget->lastMousePos.y;
+	dragX = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.x;
+	dragY = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.y;
 }
 
 void onDragMove(EventDragMove &e) override {
 	if ((!module->inputs[CLACOS::DIST_X_INPUT + segmentNumber].active) && (!module->inputs[CLACOS::DIST_X_INPUT + segmentNumber].active)) {
-		float newDragX = rack::global_ui->app.gRackWidget->lastMousePos.x;
-		float newDragY = rack::global_ui->app.gRackWidget->lastMousePos.y;
+		float newDragX = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.x;
+		float newDragY = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.y;
 		module->phaseDistX[segmentNumber] = rescale(clamp(initX+(newDragX-dragX),0.0f,70.0f), 0.0f, 70.0f, 0.01f,0.99f);
 		module->phaseDistY[segmentNumber]  = rescale(clamp(initY-(newDragY-dragY),0.0f,70.0f), 0.0f, 70.0f, 0.01f,0.99f);
 	}

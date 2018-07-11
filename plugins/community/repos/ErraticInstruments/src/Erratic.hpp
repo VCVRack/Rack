@@ -1,5 +1,7 @@
 #include "rack.hpp"
 
+// #define Ddebug if(0);else debug
+#define Ddebug if(1);else debug
 
 using namespace rack;
 

@@ -1,0 +1,14 @@
+ALL_OBJ= \
+	src/BouncyBalls.o \
+	src/Cat.o \
+	src/FullScope.o \
+	src/GridSeq.o \
+	src/JWModules.o \
+	src/MinMax.o \
+	src/NoteSeq.o \
+	src/Quantizer.o \
+	src/QuantizeUtils.o \
+	src/SimpleClock.o \
+	src/ThingThing.o \
+	src/WavHead.o \
+	src/XYPad.o

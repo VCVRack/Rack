@@ -1,3 +1,29 @@
+** July 11th, 2018
+- ErraticInstruments.MPEToCV: remove (excessive) debug output
+- remove direct references to gRackScene, gRackWidget, gFocusedWidget, 
+   gHoveredWidget, gDraggedWidget, gDragHoveredWidget from all plugins and
+   replace them by RACK_PLUGIN_UI_* macro calls
+- Valley.Dexter: remove duplicate wavetable set
+- add module DrumKit.BD9
+- add module DrumKit.Snare
+- add module DrumKit.ClosedHH
+- add module DrumKit.OpenHH
+- add module DrumKit.DMX
+- add module JW_Modules.Cat
+- add module JW_Modules.BouncyBalls
+- add module JW_Modules.FullScope
+- add module JW_Modules.GridSeq
+- add module JW_Modules.Quantizer
+- add module JW_Modules.MinMax
+- add module JW_Modules.NoteSeq
+- add module JW_Modules.SimpleClock
+- add module JW_Modules.ThingThing
+- add module JW_Modules.WavHead
+- add module JW_Modules.XYPad
+- add module unless_modules.Piong
+- add module unless_modules.Markov
+
+
 ** July 10th, 2018
 - add module Gratrix.VCO_F1
 - add module Gratrix.VCO_F2

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="18"
+   height="18"
+   viewBox="0 0 4.7624999 4.7624998"
+   version="1.1"
+   id="svg7595"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   sodipodi:docname="RepButton.svg">
+  <defs
+     id="defs7589">
+    <clipPath
+       id="clip444">
+      <path
+         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
+         id="path24586"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="8.4174052"
+     inkscape:cy="17.479609"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1210"
+     inkscape:window-height="798"
+     inkscape:window-x="933"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     units="px"
+     inkscape:pagecheckerboard="true"
+     inkscape:snap-grids="false" />
+  <metadata
+     id="metadata7592">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-46.755712,-67.833036)">
+    <g
+       aria-label="REP"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.60581565px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#1996fc;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       id="text4789"
+       transform="translate(0,0.52916665)">
+      <path
+         d="m 47.805488,70.234334 q 0.09925,0.02545 0.169225,0.0967 0.06998,0.06998 0.174315,0.281194 l 0.258291,0.519127 h -0.276104 l -0.226482,-0.479684 q -0.09797,-0.204851 -0.17686,-0.26338 -0.07762,-0.0598 -0.203579,-0.0598 h -0.245568 v 0.802866 h -0.258291 v -1.89965 h 0.529306 q 0.313003,0 0.479684,0.141234 0.16668,0.141233 0.16668,0.408431 0,0.188311 -0.103062,0.307914 -0.101789,0.11833 -0.287555,0.14505 z m -0.526762,-0.791415 v 0.674357 h 0.281194 q 0.184494,0 0.274832,-0.0827 0.09034,-0.08271 0.09034,-0.253202 0,-0.164136 -0.0967,-0.250657 -0.09543,-0.08779 -0.278649,-0.08779 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.60581565px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1996fc;fill-opacity:1;stroke-width:0.26458332"
+         id="path4810"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 48.656704,69.231705 h 1.12732 v 0.216304 h -0.870301 v 0.562388 h 0.83213 V 70.2267 h -0.83213 v 0.688352 H 49.8082 v 0.216303 h -1.151496 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.60581565px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1996fc;fill-opacity:1;stroke-width:0.26458332"
+         id="path4812"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 50.481284,69.442919 v 0.7138 h 0.297735 q 0.178132,0 0.277376,-0.09416 0.100518,-0.09416 0.100518,-0.263381 0,-0.169225 -0.09925,-0.262108 -0.09924,-0.09416 -0.278649,-0.09416 z m -0.257019,-0.211214 h 0.554754 q 0.318092,0 0.482228,0.145051 0.164136,0.143778 0.164136,0.422427 0,0.281194 -0.164136,0.424972 -0.162863,0.143778 -0.482228,0.143778 h -0.297735 v 0.763422 h -0.257019 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.60581565px;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#1996fc;fill-opacity:1;stroke-width:0.26458332"
+         id="path4814"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

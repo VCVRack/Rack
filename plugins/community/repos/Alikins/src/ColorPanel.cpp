@@ -110,7 +110,7 @@ struct ColorPanelModuleResizeHandle : Widget {
     }
 
     void onDragStart(EventDragStart &e) override {
-        dragX = rack::global_ui->app.gRackWidget->lastMousePos.x;
+        dragX = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.x;
         ModuleWidget *m = getAncestorOfType<ModuleWidget>();
         originalBox = m->box;
     }
@@ -118,7 +118,7 @@ struct ColorPanelModuleResizeHandle : Widget {
     void onDragMove(EventDragMove &e) override {
         ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
-        float newDragX = rack::global_ui->app.gRackWidget->lastMousePos.x;
+        float newDragX = RACK_PLUGIN_UI_RACKWIDGET->lastMousePos.x;
         float deltaX = newDragX - dragX;
 
         Rect newBox = originalBox;
@@ -135,7 +135,7 @@ struct ColorPanelModuleResizeHandle : Widget {
             newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
             newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
         }
-        rack::global_ui->app.gRackWidget->requestModuleBox(m, newBox);
+        RACK_PLUGIN_UI_RACKWIDGET->requestModuleBox(m, newBox);
     }
 };
 

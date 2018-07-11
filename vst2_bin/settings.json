@@ -22,6 +22,10 @@
       },
       {
         "plugin": "AS",
+        "model": "ADSR"
+      },
+      {
+        "plugin": "AS",
         "model": "AtNuVrTr"
       },
       {

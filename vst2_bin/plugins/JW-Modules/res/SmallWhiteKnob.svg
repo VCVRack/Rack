@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="26"
+   height="26"
+   viewBox="0 0 6.8791669 6.8791665"
+   version="1.1"
+   id="svg6414"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   sodipodi:docname="SmallWhiteKnob.svg">
+  <defs
+     id="defs6408">
+    <clipPath
+       id="clip82">
+      <path
+         d="m 979.55859,272.09375 h 26.63281 v 27.13281 h -26.63281 z m 0,0"
+         id="path22604"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       id="clip83">
+      <path
+         d="m 992,272.09375 h 2 V 287 h -2 z m 0,0"
+         id="path22607"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="10.267236"
+     inkscape:cy="13.095719"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1090"
+     inkscape:window-height="864"
+     inkscape:window-x="626"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:pagecheckerboard="true"
+     units="px" />
+  <metadata
+     id="metadata6411">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-36.542344,-107.74599)">
+    <path
+       inkscape:connector-curvature="0"
+       id="path28547"
+       d="m 42.964642,111.86853 c -0.377046,1.64612 -2.018011,2.67649 -3.665272,2.29953 -1.647259,-0.37694 -2.67691,-2.01771 -2.299879,-3.66472 0.377029,-1.64702 2.018005,-2.67649 3.665265,-2.29955 1.647252,0.37697 2.676013,2.01772 2.299886,3.66474"
+       style="clip-rule:nonzero;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#1996fc;stroke-width:0.22979134;stroke-opacity:1" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path28549"
+       d="m 42.964644,111.86796 c -0.377046,1.64611 -2.018012,2.67651 -3.665273,2.29955 -1.647257,-0.37698 -2.67691,-2.01772 -2.299878,-3.66473 0.377029,-1.64702 2.018005,-2.67651 3.665264,-2.29953 1.647253,0.37696 2.676015,2.01769 2.299887,3.66471"
+       style="clip-rule:nonzero;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#1996fc;stroke-width:0.22979134;stroke-opacity:1" />
+    <g
+       transform="matrix(0.22980834,0,0,0.22977429,-188.18936,45.490677)"
+       clip-path="url(#clip83)"
+       id="g28555"
+       style="clip-rule:nonzero;stroke:#1996fc;stroke-opacity:1">
+      <path
+         style="fill:none;stroke:#1996fc;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1"
+         d="M -0.0011146,-0.0015175 V 13.314889"
+         transform="translate(992.87612,272.59527)"
+         id="path28553"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

@@ -23,7 +23,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-10Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-10Jul2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-11Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-11Jul2018.7z) (64bit)
 
 **WARNING: DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
 
@@ -41,7 +41,7 @@ Here's a demo video of it: https://vimeo.com/277703414
 
 # Add-on modules
 
-The following (441) add-on modules are statically linked with the VST plugin:
+The following (459) add-on modules are statically linked with the VST plugin:
  - Alikins.IdleSwitch
  - Alikins.MomentaryOnButtons
  - Alikins.BigMuteButton
@@ -210,6 +210,11 @@ The following (441) add-on modules are statically linked with the VST plugin:
  - DHE-Modules.Stage
  - DHE-Modules.Swave
  - DHE-Modules.Upstage
+ - DrumKit.BD9
+ - DrumKit.Snare
+ - DrumKit.ClosedHH
+ - DrumKit.OpenHH
+ - DrumKit.DMX
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
@@ -286,6 +291,17 @@ The following (441) add-on modules are statically linked with the VST plugin:
  - HetrickCV.Waveshape
  - huaba.EQ3
  - huaba.ABBus
+ - JW_Modules.Cat
+ - JW_Modules.BouncyBalls
+ - JW_Modules.FullScope
+ - JW_Modules.GridSeq
+ - JW_Modules.Quantizer
+ - JW_Modules.MinMax
+ - JW_Modules.NoteSeq
+ - JW_Modules.SimpleClock
+ - JW_Modules.ThingThing
+ - JW_Modules.WavHead
+ - JW_Modules.XYPad
  - Koralfx.Beatovnik
  - Koralfx.Mixovnik
  - Koralfx.Nullovnik4
@@ -471,6 +487,8 @@ The following (441) add-on modules are statically linked with the VST plugin:
  - trowaSoft.OscCV
  - trowaSoft.MultiScope
  - trowaSoft.MultiOscillator
+ - unless_modules.Piong
+ - unless_modules.Markov
  - Valley.Topograph
  - Valley.UGraph
  - Valley.Dexter
