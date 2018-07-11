@@ -74,8 +74,7 @@ struct Model {
 				return module;
 			}
 			ModuleWidget *createModuleWidget() override {
-				TModule *module = new TModule();
-				TModuleWidget *moduleWidget = new TModuleWidget(module);
+				TModuleWidget *moduleWidget = new TModuleWidget(createModule());
 				moduleWidget->model = this;
 				return moduleWidget;
 			}
