@@ -1,0 +1,13 @@
+ALL_OBJ= \
+	src/BlankPanel16HP.o \
+	src/BlankPanel1HP.o \
+	src/BlankPanel2HP.o \
+	src/BlankPanel32HP.o \
+	src/BlankPanel4HP.o \
+	src/BlankPanel8HP.o \
+	src/KlokSpid.o \
+	src/Metriks.o \
+	src/Ohmer.o \
+	src/RKD.o \
+	src/RKDBRK.o \
+	src/Splitter1x9.o

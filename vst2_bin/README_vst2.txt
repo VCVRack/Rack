@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- July 11th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- July 12th, 2018
 ================================================
 
 !!!------------------------------------------------------------------------------
@@ -189,6 +189,22 @@ The VST2 plugin includes the following add-on modules:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
+ - dBiz.dBizBlank
+ - dBiz.Multiple
+ - dBiz.Contorno
+ - dBiz.Chord
+ - dBiz.Utility
+ - dBiz.Transpose
+ - dBiz.Bene
+ - dBiz.Bene2
+ - dBiz.BenePads
+ - dBiz.SubMix
+ - dBiz.Remix
+ - dBiz.PerfMixer
+ - dBiz.VCA530
+ - dBiz.Verbo
+ - dBiz.DVCO
+ - dBiz.DAOSC
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage
@@ -362,6 +378,17 @@ The VST2 plugin includes the following add-on modules:
  - ML_modules.TrigSwitch2
  - ML_modules.TrigSwitch3
  - ML_modules.TrigSwitch3_2
+ - Ohmer.KlokSpid
+ - Ohmer.RKD
+ - Ohmer.RKDBRK
+ - Ohmer.Metriks
+ - Ohmer.Splitter1x9
+ - Ohmer.BlankPanel1
+ - Ohmer.BlankPanel2
+ - Ohmer.BlankPanel4
+ - Ohmer.BlankPanel8
+ - Ohmer.BlankPanel16
+ - Ohmer.BlankPanel32
  - Qwelk.Automaton
  - Qwelk.Byte
  - Qwelk.Chaos
@@ -478,17 +505,7 @@ The VST2 plugin includes the following add-on modules:
  - Valley.UGraph
  - Valley.Dexter
  - Valley.Plateau
- - VultModules.Debriatus
- - VultModules.Lateralus
- - VultModules.Rescomb
- - VultModules.Splie
- - VultModules.Stabile
- - VultModules.Tangents
- - VultModules.Tohe
- - VultModules.Trummor
 
-Please notice that the Audible/Mutable Instruments modules appear under a different name in the UI.
-For example, "Clouds" is listed as "Texture Synthesizer".
 
 For more info about VCV rack, see https://vcvrack.com/
 

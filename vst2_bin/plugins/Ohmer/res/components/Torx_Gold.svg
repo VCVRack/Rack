@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="15"
+   height="15"
+   id="svg3295"
+   sodipodi:version="0.32"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   version="1.0"
+   sodipodi:docname="TorxScrewDarkEd.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <title
+     id="title3711">Custom Torx screw VCV Rack</title>
+  <defs
+     id="defs3297">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective3303" />
+    <inkscape:perspective
+       id="perspective3647"
+       inkscape:persp3d-origin="25 : 16.666667 : 1"
+       inkscape:vp_z="50 : 25 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 25 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3303-9"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.999999"
+     inkscape:cx="-32.312504"
+     inkscape:cy="18.968498"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1058"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3305"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata3300">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Custom Torx screw VCV Rack</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="TorxScrew"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-25)">
+    <circle
+       style="opacity:1;fill:#4e4a1e;fill-opacity:1;stroke:#8e8637;stroke-width:0.34999999;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="roundedscrew"
+       cx="7.5"
+       cy="32.5"
+       r="7.125"
+       inkscape:label="#roundedscrew" />
+    <g
+       id="star"
+       transform="matrix(0.70635633,0,0,0.62092463,6.2638775,-0.09854047)"
+       style="opacity:1;fill:#676228;fill-opacity:1;stroke:none"
+       inkscape:label="#star">
+      <g
+         transform="matrix(0.068827,0,0,0.06882715,-22.051007,-11.923865)"
+         id="g2325"
+         style="fill:#676228;fill-opacity:1;stroke:none">
+        <path
+           d="m 456.62321,1000.2128 c -10.61732,18.3294 -55.46391,-10.47338 -73.82349,0.092 -18.35957,10.5651 -15.99057,63.8116 -37.17296,63.7815 -21.18238,-0.03 -18.66175,-53.2698 -36.99115,-63.8871 -18.32939,-10.61735 -63.25785,18.0576 -73.82292,-0.30199 -10.56506,-18.35957 36.80217,-42.79648 36.83234,-63.97886 0.0302,-21.18239 -47.26728,-45.7541 -36.64996,-64.0835 10.61731,-18.32939 55.46391,10.47337 73.82348,-0.0917 18.35957,-10.56507 15.99057,-63.81171 37.17296,-63.78155 21.18238,0.0302 18.66175,53.26984 36.99115,63.88716 18.3294,10.61732 63.25785,-18.0576 73.82292,0.30196 10.56507,18.35957 -36.80217,42.79648 -36.83234,63.97886 -0.0301,21.18239 47.26728,45.7541 36.64997,64.08352 z"
+           style="fill:#676228;fill-opacity:1;stroke:none;stroke-width:1.21246648;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="path7856"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+    <circle
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="center"
+       cx="7.5"
+       cy="32.5"
+       r="2.5"
+       inkscape:label="#center" />
+  </g>
+</svg>

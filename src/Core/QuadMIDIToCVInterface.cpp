@@ -6,6 +6,10 @@
 
 #include <algorithm>
 
+#ifdef USE_VST2
+#include "vstmidi.hpp"
+#endif // USE_VST2
+
 
 struct QuadMIDIToCVInterface : Module {
 	enum ParamIds {
@@ -334,6 +338,12 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 		MidiWidget *midiWidget = Widget::create<MidiWidget>(mm2px(Vec(3.4009969, 14.837336)));
 		midiWidget->box.size = mm2px(Vec(44, 28));
 		midiWidget->midiIO = &module->midiInput;
+
+#ifdef USE_VST2
+      midiWidget->midiIO->setDriverId(VST_DRIVER);
+      midiWidget->midiIO->setDeviceId(0);
+#endif // USE_VST2
+
 		addChild(midiWidget);
 	}
 

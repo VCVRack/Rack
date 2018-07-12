@@ -1,0 +1,25 @@
+ALL_OBJ= \
+	src/Bene.o \
+	src/Bene2.o \
+	src/BenePads.o \
+	src/blank.o \
+	src/Chord.o \
+	src/Contorno.o \
+	src/DAOSC.o \
+	src/dBiz.o \
+	src/DVCO.o \
+	src/Multiple.o \
+	src/PerfMixer.o \
+	src/Remix.o \
+	src/SubMixer.o \
+	src/Transpose.o \
+	src/Utility.o \
+	src/VCA530.o \
+	src/Verbo.o
+
+REMOVED_OBJ= \
+	src/Filter_Wip/Biquad.o \
+	src/Filter_Wip/blank.o \
+	src/Filter_Wip/DSPUtilities.o \
+	src/Filter_Wip/MultiModeFilter.o \
+	src/Filter_Wip/VAStateVariableFilter.o

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg8"
+   width="89.99999"
+   height="380.00004"
+   viewBox="0 0 89.99999 380.00004"
+   version="1.1"
+   sodipodi:docname="dBizBlank2.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+  <metadata
+     id="metadata29">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>BlankPanel1</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs27" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="978"
+     inkscape:window-height="774"
+     id="namedview25"
+     showgrid="false"
+     inkscape:zoom="2.9827695"
+     inkscape:cx="36.653306"
+     inkscape:cy="140.73103"
+     inkscape:window-x="2613"
+     inkscape:window-y="80"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg8" />
+  <title
+     id="title2">BlankPanel1</title>
+  <g
+     id="layer1"
+     style="fill:#d1dede;fill-opacity:1">
+    <path
+       id="rect817"
+       d="M0,0H90V380H0Z"
+       transform="translate(0 0.00002)"
+       style="fill:#d1dede;fill-opacity:1" />
+  </g>
+  <g
+     aria-label="dBiz"
+     transform="rotate(-90)"
+     inkscape:transform-center-x="80.156175"
+     inkscape:transform-center-y="22.54397"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:132.04801941px;line-height:1.25;font-family:'DejaVu Math TeX Gyre';-inkscape-font-specification:'DejaVu Math TeX Gyre';letter-spacing:0px;word-spacing:0px;fill:#248e9a;fill-opacity:1;stroke:none;stroke-width:8.25300121"
+     id="text4528">
+    <path
+       d="M -345.55386,74.831825 V 41.81982 h -4.1265 v 33.012005 z m -20.6325,12.379502 -8.253,-8.253002 V 37.693319 l 8.253,-8.253001 h 20.6325 V 4.6813145 h 24.75901 V 87.211327 Z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'High Volume';-inkscape-font-specification:'High Volume';fill:#248e9a;fill-opacity:1;stroke-width:8.25300121"
+       id="path825" />
+    <path
+       d="M -279.52985,37.693319 V 21.187317 h -4.1265 v 16.506002 z m -33.012,49.518008 V 62.452323 h -4.1265 V 4.6813145 h 61.89751 l 8.253,8.2530015 v 24.759003 l -8.253,8.253002 8.253,8.253001 v 4.1265 h -2.06325 v 22.695754 l -2.06325,2.06325 V 66.578824 h -4.1265 v 20.632503 h -2.06326 V 41.81982 h -4.1265 v 45.391507 h -2.06325 V 58.325822 h -4.1265 v 28.885505 h -2.06325 V 50.072821 h -4.1265 v 37.138506 h -2.06325 V 62.452323 h -4.1265 v -8.253001 h -4.1265 v 16.506002 h 4.1265 v 16.506003 h -2.06325 v -8.253002 h -4.1265 v 8.253002 h -2.06325 v -8.253002 h -4.1265 v 8.253002 h -2.06325 V 58.325822 h -4.1265 v 28.885505 h -2.06325 V 45.946321 h -4.1265 v 41.265006 h -2.06325 V 70.705324 h -4.1265 v 16.506003 z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'High Volume';-inkscape-font-specification:'High Volume';fill:#248e9a;fill-opacity:1;stroke-width:8.25300121"
+       id="path827" />
+    <path
+       d="M -242.39134,87.211327 V 29.440318 h 24.759 v 57.771009 z m 0,-61.897509 V 4.6813145 h 24.759 V 25.313818 Z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'High Volume';-inkscape-font-specification:'High Volume';fill:#248e9a;fill-opacity:1;stroke-width:8.25300121"
+       id="path829" />
+    <path
+       d="M -213.50584,87.211327 V 58.325822 l 8.253,-8.253001 h 20.6325 V 41.81982 h -4.1265 v 4.126501 h -24.759 v -8.253002 l 8.253,-8.253001 h 45.3915 v 24.759004 l -8.253,8.253001 h -20.6325 v 12.379502 h 4.1265 v -8.253001 h 24.759 v 12.379501 l -8.253,8.253002 z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'High Volume';-inkscape-font-specification:'High Volume';fill:#248e9a;fill-opacity:1;stroke-width:8.25300121"
+       id="path831" />
+  </g>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:1.25;font-family:'DejaVu Math TeX Gyre';-inkscape-font-specification:'DejaVu Math TeX Gyre';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+     x="119.60796"
+     y="348.64648"
+     id="text4536"><tspan
+       sodipodi:role="line"
+       id="tspan4534"
+       x="119.60796"
+       y="348.64648" /></text>
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot4538"
+     style="fill:black;fill-opacity:1;stroke:none;font-family:'DejaVu Math TeX Gyre';font-style:normal;font-weight:normal;font-size:16px;line-height:1.25;letter-spacing:0px;word-spacing:0px;-inkscape-font-specification:'DejaVu Math TeX Gyre';font-stretch:normal;font-variant:normal"><flowRegion
+       id="flowRegion4540"><rect
+         id="rect4542"
+         width="36.579136"
+         height="73.158272"
+         x="100.44746"
+         y="309.16425" /></flowRegion><flowPara
+       id="flowPara4544" /></flowRoot></svg>

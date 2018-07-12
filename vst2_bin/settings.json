@@ -69,6 +69,14 @@
         "model": "Bogaudio-XCO"
       },
       {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Switch"
+      },
+      {
+        "plugin": "HetrickCV",
+        "model": "Exponent"
+      },
+      {
         "plugin": "DHE-Modules",
         "model": "Cubic"
       },
@@ -97,6 +105,10 @@
         "model": "EQ3"
       },
       {
+        "plugin": "HetrickCV",
+        "model": "Exponent"
+      },
+      {
         "plugin": "ML_modules",
         "model": "VoltMeter"
       },
@@ -105,16 +117,16 @@
         "model": "Maude221"
       },
       {
+        "plugin": "RJModules",
+        "model": "Noise"
+      },
+      {
         "plugin": "Valley",
         "model": "Dexter"
       },
       {
-        "plugin": "VultModules",
-        "model": "Debriatus"
-      },
-      {
-        "plugin": "VultModules",
-        "model": "Tohe"
+        "plugin": "Valley",
+        "model": "Plateau"
       }
     ]
   },

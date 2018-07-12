@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="18"
+   height="18"
+   viewBox="0 0 4.7624999 4.7624998"
+   version="1.1"
+   id="svg7595"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="ButtonUp_Classic_MASTER.svg">
+  <title
+     id="title839">Push Button</title>
+  <defs
+     id="defs7589">
+    <clipPath
+       id="clip444">
+      <path
+         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
+         id="path24586"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       id="clip444-4">
+      <path
+         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
+         id="path24586-6"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       id="clip444-4-6">
+      <path
+         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
+         id="path24586-6-8"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       id="clip444-4-6-5">
+      <path
+         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
+         id="path24586-6-8-8"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       id="clip444-4-6-5-6">
+      <path
+         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
+         id="path24586-6-8-8-5"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       id="clip444-4-6-5-6-0">
+      <path
+         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
+         id="path24586-6-8-8-5-2"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="31.678384"
+     inkscape:cx="2.6509554"
+     inkscape:cy="11.263893"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1058"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata7592">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Push Button</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-46.755712,-67.833036)">
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-271.16291,-21.64884)"
+       clip-path="url(#clip444)"
+       id="g31387"
+       style="clip-rule:nonzero;fill:#a2a2a2;fill-opacity:1;stroke:none;stroke-opacity:1">
+      <path
+         style="fill:#a2a2a2;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-opacity:1"
+         d="m 1202.125,344.12109 c -1.6953,4.66797 0.7148,9.83594 5.3789,11.53516 4.6719,1.69531 9.8359,-0.71094 11.5352,-5.37891 1.6992,-4.67187 -0.7071,-9.83203 -5.3789,-11.53515 -4.668,-1.69532 -9.8282,0.70703 -11.5352,5.3789"
+         id="path31385"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="matrix(0.24045483,0,0,0.24045483,-241.95333,-13.271443)"
+       clip-path="url(#clip444-4)"
+       id="g31387-9"
+       style="clip-rule:nonzero;fill:#6d6d6d;fill-opacity:1;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
+      <path
+         style="fill:#6d6d6d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 1202.125,344.12109 c -1.6953,4.66797 0.7148,9.83594 5.3789,11.53516 4.6719,1.69531 9.8359,-0.71094 11.5352,-5.37891 1.6992,-4.67187 -0.7071,-9.83203 -5.3789,-11.53515 -4.668,-1.69532 -9.8282,0.70703 -11.5352,5.3789"
+         id="path31385-1"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="matrix(0.22746227,0,0,0.22746227,-226.22482,-8.7604367)"
+       clip-path="url(#clip444-4-6)"
+       id="g31387-9-9"
+       style="clip-rule:nonzero;fill:#9ba23e;fill-opacity:1;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
+      <path
+         style="fill:#9ba23e;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 1202.125,344.12109 c -1.6953,4.66797 0.7148,9.83594 5.3789,11.53516 4.6719,1.69531 9.8359,-0.71094 11.5352,-5.37891 1.6992,-4.67187 -0.7071,-9.83203 -5.3789,-11.53515 -4.668,-1.69532 -9.8282,0.70703 -11.5352,5.3789"
+         id="path31385-1-3"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="matrix(0.22746227,0,0,0.22746227,-226.22482,-8.7604367)"
+       clip-path="url(#clip444-4-6-5)"
+       id="g31387-9-9-9"
+       style="clip-rule:nonzero;fill:#848484;fill-opacity:1;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
+      <path
+         style="fill:#848484;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 1202.125,344.12109 c -1.6953,4.66797 0.7148,9.83594 5.3789,11.53516 4.6719,1.69531 9.8359,-0.71094 11.5352,-5.37891 1.6992,-4.67187 -0.7071,-9.83203 -5.3789,-11.53515 -4.668,-1.69532 -9.8282,0.70703 -11.5352,5.3789"
+         id="path31385-1-3-5"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="matrix(0.1920948,0,0,0.19034151,-183.40959,4.1278622)"
+       clip-path="url(#clip444-4-6-5-6-0)"
+       id="g31387-9-9-9-2-2"
+       style="clip-rule:nonzero;fill:#666666;fill-opacity:1;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
+      <path
+         style="fill:#666666;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.40042442;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 1202.125,344.12109 c -1.6953,4.66797 0.7148,9.83594 5.3789,11.53516 4.6719,1.69531 9.8359,-0.71094 11.5352,-5.37891 1.6992,-4.67187 -0.7071,-9.83203 -5.3789,-11.53515 -4.668,-1.69532 -9.8282,0.70703 -11.5352,5.3789"
+         id="path31385-1-3-5-3-0"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:none;fill-opacity:1;stroke:#373737;stroke-width:0.2;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="path945"
+       sodipodi:type="arc"
+       sodipodi:cx="3.3818154"
+       sodipodi:cy="-85.547028"
+       sodipodi:rx="1.6704346"
+       sodipodi:ry="1.5367998"
+       sodipodi:start="4.6076692"
+       sodipodi:end="0"
+       sodipodi:open="true"
+       d="m 3.2072074,-87.075409 a 1.6704346,1.5367998 0 0 1 1.2923469,0.386317 1.6704346,1.5367998 0 0 1 0.5526957,1.142064"
+       transform="rotate(142.6)" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#373737;stroke-width:0.2;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+       id="path945-2"
+       sodipodi:type="arc"
+       sodipodi:cx="-3.8534219"
+       sodipodi:cy="85.717079"
+       sodipodi:rx="1.6704346"
+       sodipodi:ry="1.5367998"
+       sodipodi:start="4.6076692"
+       sodipodi:end="0"
+       sodipodi:open="true"
+       d="m -4.0280299,84.188698 a 1.6704346,1.5367998 0 0 1 1.2923469,0.386316 1.6704346,1.5367998 0 0 1 0.5526957,1.142065"
+       transform="rotate(-37.4)" />
+  </g>
+</svg>

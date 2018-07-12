@@ -85,6 +85,7 @@ struct MidiIO {
 	/** Not owned */
 	MidiDriver *driver = NULL;
 
+   MidiIO(void);
 	virtual ~MidiIO();
 
 	std::vector<int> getDriverIds();

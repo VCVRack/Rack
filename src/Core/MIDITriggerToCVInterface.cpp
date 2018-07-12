@@ -4,6 +4,10 @@
 #include "global.hpp"
 #include "global_ui.hpp"
 
+#ifdef USE_VST2
+#include "vstmidi.hpp"
+#endif // USE_VST2
+
 
 struct MIDITriggerToCVInterface : Module {
 	enum ParamIds {
@@ -230,6 +234,12 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 		midiWidget->module = module;
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		midiWidget->midiIO = &module->midiInput;
+
+#ifdef USE_VST2
+      midiWidget->midiIO->setDriverId(VST_DRIVER);
+      midiWidget->midiIO->setDeviceId(0);
+#endif // USE_VST2
+
 		midiWidget->createGridChoices();
 		addChild(midiWidget);
 	}

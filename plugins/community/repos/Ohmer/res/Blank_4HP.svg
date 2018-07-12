@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg8"
+   viewBox="0 0 60 380"
+   version="1.1"
+   sodipodi:docname="OhmerBlank4White.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   width="60"
+   height="380">
+  <metadata
+     id="metadata39">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Blank Panel for VCV Rack</dc:title>
+        <cc:license
+           rdf:resource="" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1058"
+     id="namedview37"
+     showgrid="false"
+     inkscape:zoom="1.9612909"
+     inkscape:cx="-333.77878"
+     inkscape:cy="161.1575"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#ab2d2d;}.cls-2{fill:#952d2d;}.cls-3{fill:#251e1e;}.cls-4{fill:#fff7d4;}.cls-5{fill:#202020;}</style>
+  </defs>
+  <title
+     id="title6">Blank Panel for VCV Rack</title>
+  <rect
+     style="opacity:1;vector-effect:none;fill:#d2d2cd;fill-opacity:1;stroke:none;stroke-width:0.68849927;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     id="ModuleLayer"
+     width="60"
+     height="380"
+     x="0"
+     y="0" />
+</svg>

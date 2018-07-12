@@ -83,6 +83,8 @@ struct GlobalUI {
       RackScene *gRackScene;
 
       std::mutex mtx_param;
+
+      bool bLoadVSTUniqueParamBaseId;  // temp. false while cloning ModuleWidget
    } app;
 
 #ifdef USE_VST2
@@ -131,6 +133,8 @@ struct GlobalUI {
       app.gRackWidget = NULL;
       app.gToolbar = NULL;
       app.gRackScene = NULL;
+  
+      app.bLoadVSTUniqueParamBaseId = true;
 
 #ifdef USE_VST2
       vst2.b_close_window = 0;

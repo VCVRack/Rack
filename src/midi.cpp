@@ -40,6 +40,9 @@ void MidiInputDevice::onMessage(MidiMessage message) {
 // MidiIO
 ////////////////////
 
+MidiIO::MidiIO(void) {
+}
+
 MidiIO::~MidiIO() {
 	// Because of polymorphic destruction, descendants must call this in their own destructor
 	// setDriverId(-1);

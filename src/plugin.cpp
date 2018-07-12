@@ -575,7 +575,9 @@ extern void init_plugin_BaconMusic         (rack::Plugin *p);
 extern void init_plugin_Befaco             (rack::Plugin *p);
 extern void init_plugin_Bidoo              (rack::Plugin *p);
 extern void init_plugin_Bogaudio           (rack::Plugin *p);
+// extern void init_plugin_BOKONTEPByteBeatMachine (rack::Plugin *p);  // unstable
 extern void init_plugin_cf                 (rack::Plugin *p);
+extern void init_plugin_dBiz               (rack::Plugin *p);
 extern void init_plugin_DHE_Modules        (rack::Plugin *p);
 extern void init_plugin_DrumKit            (rack::Plugin *p);
 extern void init_plugin_ErraticInstruments (rack::Plugin *p);
@@ -595,6 +597,7 @@ extern void init_plugin_modular80          (rack::Plugin *p);
 extern void init_plugin_mscHack            (rack::Plugin *p);
 extern void init_plugin_mtsch_plugins      (rack::Plugin *p);
 extern void init_plugin_NauModular         (rack::Plugin *p);
+extern void init_plugin_Ohmer              (rack::Plugin *p);
 // extern void init_plugin_ParableInstruments (rack::Plugin *p); // alternative "Clouds" module (crashes)
 extern void init_plugin_Qwelk              (rack::Plugin *p);
 extern void init_plugin_RJModules          (rack::Plugin *p);
@@ -607,7 +610,7 @@ extern void init_plugin_Template           (rack::Plugin *p);
 extern void init_plugin_trowaSoft          (rack::Plugin *p);
 extern void init_plugin_unless_modules     (rack::Plugin *p);
 extern void init_plugin_Valley             (rack::Plugin *p);
-extern void init_plugin_VultModules        (rack::Plugin *p);
+// extern void init_plugin_VultModules        (rack::Plugin *p);
 }
 
 static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCallback) {
@@ -644,7 +647,9 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Befaco",             &init_plugin_Befaco);
    vst2_load_static_rack_plugin("Bidoo",              &init_plugin_Bidoo);
    vst2_load_static_rack_plugin("Bogaudio",           &init_plugin_Bogaudio);
+   // vst2_load_static_rack_plugin("BOKONTEPByteBeatMachine", &init_plugin_BOKONTEPByteBeatMachine);
    vst2_load_static_rack_plugin("cf",                 &init_plugin_cf);
+   vst2_load_static_rack_plugin("dBiz",               &init_plugin_dBiz);
    vst2_load_static_rack_plugin("DHE-Modules",        &init_plugin_DHE_Modules);
    vst2_load_static_rack_plugin("DrumKit",            &init_plugin_DrumKit);
    vst2_load_static_rack_plugin("ErraticInstruments", &init_plugin_ErraticInstruments);
@@ -664,6 +669,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("mscHack",            &init_plugin_mscHack);
    vst2_load_static_rack_plugin("mtsch_plugins",      &init_plugin_mtsch_plugins);
    vst2_load_static_rack_plugin("NauModular",         &init_plugin_NauModular);
+   vst2_load_static_rack_plugin("Ohmer",              &init_plugin_Ohmer);
    // vst2_load_static_rack_plugin("ParableInstruments", &init_plugin_ParableInstruments);
    vst2_load_static_rack_plugin("Qwelk",              &init_plugin_Qwelk);
    vst2_load_static_rack_plugin("RJModules",          &init_plugin_RJModules);
@@ -676,7 +682,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("trowaSoft",          &init_plugin_trowaSoft);
    vst2_load_static_rack_plugin("unless_modules",     &init_plugin_unless_modules);
    vst2_load_static_rack_plugin("Valley",             &init_plugin_Valley);
-   vst2_load_static_rack_plugin("VultModules",        &init_plugin_VultModules);
+   // vst2_load_static_rack_plugin("VultModules",        &init_plugin_VultModules);
 }
 #endif // USE_VST2
 

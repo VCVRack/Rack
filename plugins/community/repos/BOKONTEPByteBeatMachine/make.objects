@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	src/duktape.o \
+	src/MyModule.o \
+	src/Template.o

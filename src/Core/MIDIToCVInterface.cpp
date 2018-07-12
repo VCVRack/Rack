@@ -12,6 +12,10 @@ extern void vst2_get_timing_info (int *_retPlaying, float *_retBPM, float *_retS
 #include <algorithm>
 #include "global.hpp"
 
+#ifdef USE_VST2
+#include "vstmidi.hpp"
+#endif // USE_VST2
+
 
 struct MIDIToCVInterface : Module {
 	enum ParamIds {
@@ -363,6 +367,12 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 		MidiWidget *midiWidget = Widget::create<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(33.840, 28));
 		midiWidget->midiIO = &module->midiInput;
+
+#ifdef USE_VST2
+      midiWidget->midiIO->setDriverId(VST_DRIVER);
+      midiWidget->midiIO->setDeviceId(0);
+#endif // USE_VST2
+
 		addChild(midiWidget);
 	}
 

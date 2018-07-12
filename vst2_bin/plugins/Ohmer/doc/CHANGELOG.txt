@@ -1,0 +1,125 @@
+==============================================================================================================================
+CHANGELOG
+==============================================================================================================================
+
+Release v0.6.4 (April 28th, 2018):
+
+- KlokSpid: added individual ratios (per output jack) while running as BPM-clock generator (changed via SETUP). When running
+  as clock modulator, for now individual ratios remain as x1 (all identical).
+- KlokSpid: additional display is added between output jacks, to display ratio (and LFO on jack #4 if applicable).
+- KlokSpid: LFO on jack #4 is enabled only if its ratio is x1 (otherwise priority is given to ratio).
+- KlokSpid: enhanced afterglow for red LED (CLK).
+- KlokSpid, Metriks: background DMD (dot matrix display) now is more dark for Deepblue Signature models.
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.3 (April 8th, 2018):
+
+- KlokSpid: added new feature: optional LFO to jack #4 (BPM-clock generator only). Can be enabled via SETUP.
+- KlokSpid, Metriks: added initialization blinking (fake "Calibrating...") message on DMD, while encoder isn't stable.
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.2 (April 2st, 2018):
+
+- KlokSpid: reworked encoder routine, better but not perfect, really a pain because knobs & encoders are badly implemented
+  (why as modified knob ? why no auto rescale to "0.0" - neutral - on mouse release for an encoder?, why it uses - like knobs
+  the stupid transient values during instanciation?). Hey, the goal of an encoder is to work AS RELATIVE (aka + or -), not
+  as absolute like knobs do! an another unfinished stuff => WTF?
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.1 (April 1st, 2018):
+
+- KlokSpid: knob is replaced by a continuous encoder.
+- KlokSpid: redesigned dot-matrix display, same frame of mind than Metriks.
+- KlokSpid: new ratios (when set ky know, duh'... by encoder): 12, 15, and 24 (as divider and multiplier).
+- KlokSpid: fixed model selection from context-menu.
+
+NOTE: developments/maintenances around previous v0.5.x (for VCV Rack v0.5.1) are cancelled!
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.0 (March 28th, 2018):
+
+- KlokSpid: fixed BPM-clock generator sometimes is very long to start (was due to smooth knob moves during initialization).
+- RKD modules: fixed issue concerning Max Div, when 8 (default J3/J4 On), and Spread On (J5), Max Div now is fixed to 16
+  (required for auto-reset sequence, when enabled/On by jumper J6).
+- New module (0.6 only): Metriks (voltmeter and peak counter operatioal, frequency meter stays in development).
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.0.7-beta (March 25th, 2018):
+
+- KlokSpid: fixed BPM-clock generator sometimes is very long to start (was due to knob/encoder initialization).
+- KlokSpid: default (factory) waveform now is square wave ("Square W." from Setup), instead of "Gate 1/4" previously.
+- RKD modules: added counting down feature for trigger mode.
+- RKD modules: reworked RESET jack routine behavior (buffered).
+- RKD modules: RESET LED was replaced by... tri-colored (red, orange, blue), red for module timeout (aka no source CLK),
+  orange for incoming trigger on RESET jack, and blue when "Auto-Reset" is fired (if enabled via JP6 or switch on BRK panel).
+- RKD modules: Max Div forced to 64 for all extra tables (required for "Auto-Reset" on these tables, too).
+- RKD modules: "Auto-Reset" sequence is fully optimized.
+- RKD modules: Added 5th table: "Triplet & 16ths": 1, 2, 3, 4, 8, 16, 32, and 64. Having 8 possible rotations.
+- RKD modules: implemented adaptative "Max Div" for "Prime numbers" table, may be 32 or 64 (based on highest current divider).
+- RKD module only (not applicable for RKD with "Break"): state of PCB view is saved/recalled.
+- RKD module only (not applicable for RKD with "Break"): jumpers are always read at begining of module's step() method, to
+  avoid issues on some dividers when cloning RKD module while its PCB isn't visible.
+- New (experimental) module: Metriks (WIP) - for continuous encoder training... working as voltmeter for now...
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.0.6-beta (March 19th, 2018):
+
+- RKD modules: pulsing engine entirely redesigned.
+- RKD modules: RESET jack and Auto-Reset features are operational.
+- RKD modules: added a bi-colored LED near RESET jack: red on full module reset (or disabled/idle), cyan during "Auto-Reset"
+  (if configured by jumper J6 ON, or via switch on BRK panel).
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.0.5-beta (March 17th, 2018):
+
+- Introduced two new modules: RKD (Rotate Klok Divider), and RKD with "Break". Both inspired by 4ms' RCD and RCDBO modules.
+  With limited permission allowed by 4ms Company (thanks!).
+- KlokSpid: fixed issue when "Signature" module was choosen from context-menu, then the module was cloned, resulting bad text
+  color in DMD instead of "plasma-like" color (white, orange or cyan).
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.0.4-beta (March 8th, 2018):
+
+- KlokSpid: single green/red LED replaces two separate green & red LEDs, as SYNC indicator.
+- KlokSpid: during SETUP operations, SYNC LED continues to report synchronization status.
+- KlokSpid: added +2V as possible output voltage. Appears from "Out Voltg." setting, in module's SETUP.
+- KlokSpid: fixed issue when knob affects pulse duration (clock multiplier only) when editing any setting from SETUP.
+- KlokSpid: 2s hold button to enter/quick exit module's SETUP, is fixed.
+- KlokSpid: Fixed SVG cosmetic, for all panels, concerning two serigraphy lines above CV-RATIO/TRIG. port. Now both lines are
+  correctly aligned on the port edge!
+- KlokSpid: now default factory for CV-RATIO/TRIG. input port, TRIG. is BPM-clocking reset, instead of BPM start/stop toggle.
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Release v0.6.0.3-beta (February 28th, 2018):
+
+- Source code initially designed for Rack v0.5.1 was migrated against Rack v0.6 API.
+- Merged KlokSpid sources, now once KlokSpid as "common base", model (GUI variation) can be changed anytime via context-menu.
+- Now KlokSpid family is six models (panl theme & DMD variations), befault is Classic (beige, like blank panels & splitter).
+- Maximum possible voltage on outputs can be delivered is +11.7V (displayed +12V from SETUP menu), due to protection diodes.
+  More infos: https://vcvrack.com/manual/VoltageStandards.html
+- Trigger voltage thresholds are set +1.7V for high state, +0.2V for low state.
+- Limited context-menus are removed (Andrew recommendation, in order to keep a standard for every Rack module).
+- KlokSpid: "Initialize" (Ctrl+I, Command+I) and "Randomize" (Ctrl+R, Command+R) - context-menu - are (actually) bypassed!
+- KlokSpid: long press/hold on button during SETUP does an "immediate Save/Exit".
+- KlokSpid: CV-RATIO now covers all possible ratios from 1 to 64 (both divider and multiplier).
+- Splitter 1x9: added a "clipping" red LED, near input port.
+- Splitter 1x9: reworked port positions.
+- 2 HP Blank Panel have a context-menu to change its screws setting (three settings).
+
+------------------------------------------------------------------------------------------------------------------------------
+TODO LIST / PLANNED:
+------------------------------------------------------------------------------------------------------------------------------
+
+- RKD modules: LED are off on small duration pulses.
+- RKD modules: PDF manual still under construction, YT video later.
+- KlokSpid: PDF manual (under consideration), YT video tutorial (redo a separate dedicated video).
+- Metriks: add thresold (V) for pulse counter, freq counter and note tuner must be (re)designed/enhanced.

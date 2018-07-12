@@ -23,7 +23,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-11Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-11Jul2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-12Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-12Jul2018.7z) (64bit)
 
 **WARNING: DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
 
@@ -41,7 +41,7 @@ Here's a demo video of it: https://vimeo.com/277703414
 
 # Add-on modules
 
-The following (459) add-on modules are statically linked with the VST plugin:
+The following (478) add-on modules are statically linked with the VST plugin:
  - Alikins.IdleSwitch
  - Alikins.MomentaryOnButtons
  - Alikins.BigMuteButton
@@ -204,6 +204,22 @@ The following (459) add-on modules are statically linked with the VST plugin:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
+ - dBiz.dBizBlank
+ - dBiz.Multiple
+ - dBiz.Contorno
+ - dBiz.Chord
+ - dBiz.Utility
+ - dBiz.Transpose
+ - dBiz.Bene
+ - dBiz.Bene2
+ - dBiz.BenePads
+ - dBiz.SubMix
+ - dBiz.Remix
+ - dBiz.PerfMixer
+ - dBiz.VCA530
+ - dBiz.Verbo
+ - dBiz.DVCO
+ - dBiz.DAOSC
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage
@@ -377,6 +393,17 @@ The following (459) add-on modules are statically linked with the VST plugin:
  - ML_modules.TrigSwitch2
  - ML_modules.TrigSwitch3
  - ML_modules.TrigSwitch3_2
+ - Ohmer.KlokSpid
+ - Ohmer.RKD
+ - Ohmer.RKDBRK
+ - Ohmer.Metriks
+ - Ohmer.Splitter1x9
+ - Ohmer.BlankPanel1
+ - Ohmer.BlankPanel2
+ - Ohmer.BlankPanel4
+ - Ohmer.BlankPanel8
+ - Ohmer.BlankPanel16
+ - Ohmer.BlankPanel32
  - Qwelk.Automaton
  - Qwelk.Byte
  - Qwelk.Chaos
@@ -493,17 +520,7 @@ The following (459) add-on modules are statically linked with the VST plugin:
  - Valley.UGraph
  - Valley.Dexter
  - Valley.Plateau
- - VultModules.Debriatus
- - VultModules.Lateralus
- - VultModules.Rescomb
- - VultModules.Splie
- - VultModules.Stabile
- - VultModules.Tangents
- - VultModules.Tohe
- - VultModules.Trummor
 
-Please notice that the Audible/Mutable Instruments modules appear under a different name in the UI.
-For example, "Clouds" is listed as "Texture Synthesizer".
 
 
 # License

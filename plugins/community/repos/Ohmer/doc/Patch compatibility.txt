@@ -1,0 +1,19 @@
+Hi,
+
+Since release v0.5.4, KlokSpid internal modules IDs are changed (due to source merge).
+
+In case you get an error message while you're opening .vcv patch file, open the .vcv file by using any
+text editor (like Notepad on Windows, or Text Edit on MacOS).
+
+Search any occurences of following (include first quote in your search criteria), exactly like this:
+
+"KlokSpid
+
+Per found occurence, remove trailings such Classic, Stage, Dark or DBlue - BUT DON'T REMOVE quotation
+marks surrounding "KlokSpid" word, it's very important!
+
+Save file, close text editor, then you'll can repoen .vcv file: all KlokSpid modules will come back,
+correctly configured, but as Classic (beige). So you'll can change model you'd like, via its right-click
+menu (context-menu).
+
+Selected model will be saved along .vcv patch files (don't forget to re-save it).

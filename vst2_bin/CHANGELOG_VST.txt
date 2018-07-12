@@ -1,3 +1,48 @@
+** July 12th, 2018
+- fix: assign unique VST param base id when duplicating modules
+- change: Core.MIDI*: pre-select default VST MIDI input device
+- remove module VultModules.Debriatus
+- remove module VultModules.Lateralus
+- remove module VultModules.Rescomb
+- remove module VultModules.Splie
+- remove module VultModules.Stabile
+- remove module VultModules.Tangents
+- remove module VultModules.Tohe
+- remove module VultModules.Trummor
+!  (note) the author of the Vult modules has requested me to remove them
+           (he also removed them from GitHub)
+          the modules also required non-open source graphics assets (.svg)
+           without which the otherwise BSD-3 licensed modules are unusable.
+- skip module BOKONTEPByteBeatMachine.BokontepByteBeatMachine (unstable)
+- add module dBiz.dBizBlank
+- add module dBiz.Multiple
+- add module dBiz.Contorno
+- add module dBiz.Chord
+- add module dBiz.Utility
+- add module dBiz.Transpose
+- add module dBiz.Bene
+- add module dBiz.Bene2
+- add module dBiz.BenePads
+- add module dBiz.SubMix
+- add module dBiz.Remix
+- add module dBiz.PerfMixer
+- add module dBiz.VCA530
+- add module dBiz.Verbo
+- add module dBiz.DVCO
+- add module dBiz.DAOSC
+- add module Ohmer.KlokSpid
+- add module Ohmer.RKD
+- add module Ohmer.RKDBRK
+- add module Ohmer.Metriks
+- add module Ohmer.Splitter1x9
+- add module Ohmer.BlankPanel1
+- add module Ohmer.BlankPanel2
+- add module Ohmer.BlankPanel4
+- add module Ohmer.BlankPanel8
+- add module Ohmer.BlankPanel16
+- add module Ohmer.BlankPanel32
+
+
 ** July 11th, 2018
 - ErraticInstruments.MPEToCV: remove (excessive) debug output
 - remove direct references to gRackScene, gRackWidget, gFocusedWidget, 

@@ -437,7 +437,9 @@ void RackWidget::cloneModule(ModuleWidget *m) {
 	ModuleWidget *clonedModuleWidget = m->model->createModuleWidget();
 	// JSON serialization is the most straightforward way to do this
 	json_t *moduleJ = m->toJson();
+   global_ui->app.bLoadVSTUniqueParamBaseId = false;
 	clonedModuleWidget->fromJson(moduleJ);
+   global_ui->app.bLoadVSTUniqueParamBaseId = true;
 	json_decref(moduleJ);
 	Rect clonedBox = clonedModuleWidget->box;
 	clonedBox.pos = m->box.pos;
