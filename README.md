@@ -571,6 +571,20 @@ Last but not least, please don't ask me for the VST2 SDK.
 It is not permitted to redistribute it and Steinberg has discontinued it.
 I heard that the `aeffect.h` / `aeffectx.h` files are still included in the VST3 SDK.
 
+## Dynamically loaded plugins
+```
+$ m clean
+$ m shared_lib
+```
+(creates plugins/Rack_shared.lib)
+
+```
+$ cd plugins/community/repos/<yourplugin>
+$ m bin
+$ mv <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll
+```
+(and don't forget to copy the 'res' directory to vst2_bin/plugins/!)
+
 
 # VCV Rack
 
