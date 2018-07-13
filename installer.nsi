@@ -33,13 +33,13 @@ RequestExecutionLevel admin
 
 Var VST_64_DIR
 !define MUI_DIRECTORYPAGE_VARIABLE $VST_64_DIR
-!define MUI_DIRECTORYPAGE_TEXT_TOP "Bridge VST 64-bit plugin install directory"
+!define MUI_DIRECTORYPAGE_TEXT_TOP "Bridge 64-bit VST plugin install directory"
 !define MUI_PAGE_CUSTOMFUNCTION_PRE VST_64_DIR_PRE
 !insertmacro MUI_PAGE_DIRECTORY
 
 Var VST_32_DIR
 !define MUI_DIRECTORYPAGE_VARIABLE $VST_32_DIR
-!define MUI_DIRECTORYPAGE_TEXT_TOP "Bridge VST 32-bit plugin install directory"
+!define MUI_DIRECTORYPAGE_TEXT_TOP "Bridge 32-bit VST plugin install directory"
 !define MUI_PAGE_CUSTOMFUNCTION_PRE VST_32_DIR_PRE
 !insertmacro MUI_PAGE_DIRECTORY
 
@@ -79,17 +79,19 @@ Section "VCV Rack" VCVRACK
 SectionEnd
 
 
-Section "Bridge VST 64-bit plugin" VST_64
+Section "Bridge 64-bit VST plugin" VST_64
 	StrCpy $OUTDIR $VST_64_DIR
 	CreateDirectory $OUTDIR
 	File "dist\Rack\Bridge\VCV-Bridge-64.dll"
+	File "dist\Rack\Bridge\VCV-Bridge-fx-64.dll"
 SectionEnd
 
 
-Section "Bridge VST 32-bit plugin" VST_32
+Section "Bridge 32-bit VST plugin" VST_32
 	StrCpy $OUTDIR $VST_32_DIR
 	CreateDirectory $OUTDIR
 	File "dist\Rack\Bridge\VCV-Bridge-32.dll"
+	File "dist\Rack\Bridge\VCV-Bridge-fx-32.dll"
 SectionEnd
 
 

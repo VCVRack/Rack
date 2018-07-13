@@ -6,6 +6,7 @@
 namespace rack {
 
 
+/** The normalized sinc function. https://en.wikipedia.org/wiki/Sinc_function */
 inline float sinc(float x) {
 	if (x == 0.f)
 		return 1.f;

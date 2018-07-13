@@ -295,7 +295,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(vg);
 
-	// CPU meter
+	// Power meter
 	if (module && gPowerMeter) {
 		nvgBeginPath(vg);
 		nvgRect(vg,

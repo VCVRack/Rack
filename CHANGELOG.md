@@ -1,4 +1,12 @@
 
+### 0.6.2 (2018-07-13)
+
+- Added module presets
+- Added [command line arguments](https://vcvrack.com/manual/Installing.html#command-line-usage) for setting Rack directories
+- Improved UI/engine communication stability
+- [VCV Bridge](https://vcvrack.com/manual/Bridge.html) 0.6.2
+	- Added VST FX plugin
+
 ### 0.6.1 (2018-06-17)
 
 - Added gamepad MIDI driver

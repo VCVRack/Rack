@@ -2,47 +2,87 @@
 
 
 namespace rack {
+namespace ode {
 
-typedef void (*stepCallback)(float x, const float y[], float dydt[]);
+/** The callback function `f` in each of these stepping functions must have the signature
 
-/** Solve an ODE system using the 1st order Euler method */
-inline void stepEuler(stepCallback f, float x, float dx, float y[], int len) {
+	void f(float t, const float x[], float dxdt[])
+
+A capturing lambda is ideal for this.
+For example, the following solves the system x''(t) = -x(t) using a fixed timestep of 0.01 and initial conditions x(0) = 1, x'(0) = 0.
+
+	float x[2] = {1.f, 0.f};
+	float dt = 0.01f;
+	for (float t = 0.f; t < 1.f; t += dt) {
+		rack::ode::stepRK4(t, dt, x, 2, [&](float t, const float x[], float dxdt[]) {
+			dxdt[0] = x[1];
+			dxdt[1] = -x[0];
+		});
+		printf("%f\n", x[0]);
+	}
+
+*/
+
+/** Solves an ODE system using the 1st order Euler method */
+template<typename F>
+void stepEuler(float t, float dt, float x[], int len, F f) {
 	float k[len];
 
-	f(x, y, k);
+	f(t, x, k);
 	for (int i = 0; i < len; i++) {
-		y[i] += dx * k[i];
+		x[i] += dt * k[i];
 	}
 }
 
-/** Solve an ODE system using the 4th order Runge-Kutta method */
-inline void stepRK4(stepCallback f, float x, float dx, float y[], int len) {
+/** Solves an ODE system using the 2nd order Runge-Kutta method */
+template<typename F>
+void stepRK2(float t, float dt, float x[], int len, F f) {
+	float k1[len];
+	float k2[len];
+	float yi[len];
+
+	f(t, x, k1);
+
+	for (int i = 0; i < len; i++) {
+		yi[i] = x[i] + k1[i] * dt / 2.f;
+	}
+	f(t + dt / 2.f, yi, k2);
+
+	for (int i = 0; i < len; i++) {
+		x[i] += dt * k2[i];
+	}
+}
+
+/** Solves an ODE system using the 4th order Runge-Kutta method */
+template<typename F>
+void stepRK4(float t, float dt, float x[], int len, F f) {
 	float k1[len];
 	float k2[len];
 	float k3[len];
 	float k4[len];
 	float yi[len];
 
-	f(x, y, k1);
+	f(t, x, k1);
 
 	for (int i = 0; i < len; i++) {
-		yi[i] = y[i] + k1[i] * dx / 2.0;
+		yi[i] = x[i] + k1[i] * dt / 2.f;
 	}
-	f(x + dx / 2.0, yi, k2);
+	f(t + dt / 2.f, yi, k2);
 
 	for (int i = 0; i < len; i++) {
-		yi[i] = y[i] + k2[i] * dx / 2.0;
+		yi[i] = x[i] + k2[i] * dt / 2.f;
 	}
-	f(x + dx / 2.0, yi, k3);
+	f(t + dt / 2.f, yi, k3);
 
 	for (int i = 0; i < len; i++) {
-		yi[i] = y[i] + k3[i] * dx;
+		yi[i] = x[i] + k3[i] * dt;
 	}
-	f(x + dx, yi, k4);
+	f(t + dt, yi, k4);
 
 	for (int i = 0; i < len; i++) {
-		y[i] += dx * (k1[i] + 2.0 * k2[i] + 2.0 * k3[i] + k4[i]) / 6.0;
+		x[i] += dt * (k1[i] + 2.f * k2[i] + 2.f * k3[i] + k4[i]) / 6.f;
 	}
 }
 
+} // namespace ode
 } // namespace rack

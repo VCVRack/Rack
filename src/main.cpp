@@ -26,10 +26,16 @@ int main(int argc, char* argv[]) {
 	// Parse command line arguments
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "d")) != -1) {
+	while ((c = getopt(argc, argv, "dg:l:")) != -1) {
 		switch (c) {
 			case 'd': {
 				devMode = true;
+			} break;
+			case 'g': {
+				assetGlobalDir = optarg;
+			} break;
+			case 'l': {
+				assetLocalDir = optarg;
 			} break;
 			default: break;
 		}
