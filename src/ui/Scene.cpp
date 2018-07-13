@@ -24,6 +24,7 @@ Menu *Scene::createMenu() {
 	MenuOverlay *overlay = new MenuOverlay();
 	Menu *menu = new Menu();
 	menu->box.pos = global_ui->window.gMousePos;
+   printf("xxx Scene::createMenu: box.size=(%f; %f)\n", box.size.x, box.size.y);
 
 	overlay->addChild(menu);
 	global_ui->ui.gScene->setOverlay(overlay);

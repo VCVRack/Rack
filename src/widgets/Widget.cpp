@@ -110,12 +110,18 @@ void Widget::step() {
 
 void Widget::draw(NVGcontext *vg) {
 	for (Widget *child : children) {
+      // printf("xxx Widget::draw: 1 child=%p vg=%p\n", child, vg);
 		if (!child->visible)
 			continue;
+      // printf("xxx Widget::draw: 2 child=%p\n", child);
 		nvgSave(vg);
+      // printf("xxx Widget::draw: 3 child=%p\n", child);
 		nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
+      // printf("xxx Widget::draw: 4 child=%p\n", child);
 		child->draw(vg);
+      // printf("xxx Widget::draw: 5 child=%p\n", child);
 		nvgRestore(vg);
+      // printf("xxx Widget::draw: 6 child=%p\n", child);
 	}
 }
 

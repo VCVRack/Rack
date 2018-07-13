@@ -4,6 +4,8 @@
 #ifdef YAC_POSIX
 #include <dirent.h>
 #include <sys/stat.h>
+#else
+#include "dirent_win32/dirent.h"
 #endif // YAC_POSIX
 
 #if ARCH_WIN
@@ -21,7 +23,6 @@ namespace rack {
 
 std::vector<std::string> systemListEntries(std::string path) {
 	std::vector<std::string> filenames;
-#ifndef SKIP_SYSTEM_FXNS
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
 		struct dirent *d;
@@ -33,7 +34,6 @@ std::vector<std::string> systemListEntries(std::string path) {
 		}
 		closedir(dir);
 	}
-#endif
 	return filenames;
 }
 
@@ -47,25 +47,31 @@ bool systemExists(std::string path) {
 }
 
 bool systemIsFile(std::string path) {
-#ifndef SKIP_SYSTEM_FXNS
+#ifdef ARCH_WIN
+   DWORD dwAttrib = ::GetFileAttributes(path.c_str());
+   return
+      (dwAttrib != INVALID_FILE_ATTRIBUTES)        && 
+      (0 == (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) ;
+#else
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISREG(statbuf.st_mode);
-#else
-   return false;
-#endif // SKIP_SYSTEM_FXNS
+#endif // ARCH_WIN
 }
 
 bool systemIsDirectory(std::string path) {
-#ifndef SKIP_SYSTEM_FXNS
+#ifdef ARCH_WIN
+   DWORD dwAttrib = ::GetFileAttributes(path.c_str());
+   return
+      (dwAttrib != INVALID_FILE_ATTRIBUTES)        && 
+      (0 != (dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) ;
+#else
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISDIR(statbuf.st_mode);
-#else
-   return false;
-#endif // SKIP_SYSTEM_FXNS
+#endif // ARCH_WIN
 }
 
 void systemCopy(std::string srcPath, std::string destPath) {

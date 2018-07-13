@@ -9,8 +9,8 @@
 + supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 + supports VST parameters (send / recv)
-- does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
-   - future releases may contain additional (open source) add-ons modules
++ supports dynamically loaded plugin DLLs
+   - the plugin.dll files are _not_ binary compatible with the VCV Rack plugins !
 
 Tested in 
   - Eureka (my own work-in-progress VST host)
@@ -23,7 +23,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-12Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-12Jul2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-13Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-13Jul2018.7z) (64bit)
 
 **WARNING: DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
 
@@ -41,7 +41,27 @@ Here's a demo video of it: https://vimeo.com/277703414
 
 # Add-on modules
 
-The following (478) add-on modules are statically linked with the VST plugin:
+The binary distribution contains the following dynamically loaded add-on modules:
+ - dBiz.dBizBlank
+ - dBiz.Multiple
+ - dBiz.Contorno
+ - dBiz.Chord
+ - dBiz.Utility
+ - dBiz.Transpose
+ - dBiz.Bene
+ - dBiz.Bene2
+ - dBiz.BenePads
+ - dBiz.SubMix
+ - dBiz.Remix
+ - dBiz.PerfMixer
+ - dBiz.VCA530
+ - dBiz.Verbo
+ - dBiz.DVCO
+ - dBiz.DAOSC
+ - Template_shared.MyModule
+
+
+The following (462) add-on modules are statically linked with the VST plugin:
  - Alikins.IdleSwitch
  - Alikins.MomentaryOnButtons
  - Alikins.BigMuteButton
@@ -204,22 +224,6 @@ The following (478) add-on modules are statically linked with the VST plugin:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
- - dBiz.dBizBlank
- - dBiz.Multiple
- - dBiz.Contorno
- - dBiz.Chord
- - dBiz.Utility
- - dBiz.Transpose
- - dBiz.Bene
- - dBiz.Bene2
- - dBiz.BenePads
- - dBiz.SubMix
- - dBiz.Remix
- - dBiz.PerfMixer
- - dBiz.VCA530
- - dBiz.Verbo
- - dBiz.DVCO
- - dBiz.DAOSC
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage

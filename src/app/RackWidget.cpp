@@ -12,6 +12,10 @@
 #include "global_ui.hpp"
 
 
+#ifdef USE_VST2
+extern void vst2_set_shared_plugin_tls_globals(void);
+#endif // USE_VST2
+
 namespace rack {
 
 
@@ -300,6 +304,8 @@ json_t *RackWidget::toJson() {
 void RackWidget::fromJson(json_t *rootJ) {
 	std::string message;
 
+   vst2_set_shared_plugin_tls_globals();  // update JSON hashtable seed
+
 	// version
 	std::string version;
 	json_t *versionJ = json_object_get(rootJ, "version");
@@ -343,6 +349,11 @@ void RackWidget::fromJson(json_t *rootJ) {
 		}
 
 		// Create ModuleWidget
+// // #ifdef USE_VST2
+// //       if(NULL != model->plugin->set_tls_globals_fxn) {
+// //          model->plugin->set_tls_globals_fxn(model->plugin);
+// //       }
+// // #endif // USE_VST2
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		assert(moduleWidget);
 		moduleWidget->fromJson(moduleJ);

@@ -133,13 +133,23 @@ struct ModelItem : BrowserListItem {
 	}
 
 	void onAction(EventAction &e) override {
+      printf("xxx vcvrack::ModuleBrowser: model=%p, calling createModuleWidget()\n", model);
+#ifdef USE_VST2
+      if(NULL != model->plugin->set_tls_globals_fxn) {
+         model->plugin->set_tls_globals_fxn(model->plugin);
+      }
+#endif // USE_VST2
 		ModuleWidget *moduleWidget = model->createModuleWidget();
+      printf("xxx vcvrack::ModuleBrowser: moduleWidget=%p\n", moduleWidget);
 		if (!moduleWidget)
 			return;
 		global_ui->app.gRackWidget->addModule(moduleWidget);
+      printf("xxx vcvrack::ModuleBrowser: addModule() OK\n");
 		// Move module nearest to the mouse position
 		moduleWidget->box.pos = global_ui->app.gRackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
+      printf("xxx vcvrack::ModuleBrowser: box.pos OK\n");
 		global_ui->app.gRackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
+      printf("xxx vcvrack::ModuleBrowser: requestModuleBoxNearest() OK\n");
 	}
 };
 

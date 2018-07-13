@@ -87,6 +87,11 @@ struct GlobalUI {
       bool bLoadVSTUniqueParamBaseId;  // temp. false while cloning ModuleWidget
    } app;
 
+   struct {
+      int bnd_icon_image;
+      int bnd_font;
+   } blendish;
+
 #ifdef USE_VST2
    struct {
       volatile int b_close_window;
@@ -135,6 +140,9 @@ struct GlobalUI {
       app.gRackScene = NULL;
   
       app.bLoadVSTUniqueParamBaseId = true;
+
+      blendish.bnd_icon_image = -1;
+      blendish.bnd_font = -1;
 
 #ifdef USE_VST2
       vst2.b_close_window = 0;

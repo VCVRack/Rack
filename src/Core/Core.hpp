@@ -1,6 +1,6 @@
 #include "rack.hpp"
 
-
+#ifndef RACK_PLUGIN_SHARED
 using namespace rack;
 
 RACK_PLUGIN_INIT(Core);
@@ -53,3 +53,4 @@ struct Grid16MidiWidget : MidiWidget {
 	}
 	virtual GridChoice *createGridChoice() {return NULL;}
 };
+#endif // RACK_PLUGIN_SHARED

@@ -97,6 +97,8 @@ std::string assetLocal(std::string filename) {
 
 
 std::string assetPlugin(Plugin *plugin, std::string filename) {
+   printf("xxx assetPlugin(plugin=%p)\n");
+   printf("xxx assetPlugin: filename=\"%s\"\n", filename.c_str());
 	assert(plugin);
 	return plugin->path + "/" + filename;
 }

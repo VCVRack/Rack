@@ -29,8 +29,8 @@ static const NVGcolor COLOR_DARK_PANEL = nvgRGB(0x17, 0x17, 0x17);
 
 struct RoundKnob : SVGKnob {
 	RoundKnob() {
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
+		minAngle = float(-0.83*M_PI);
+		maxAngle = float(0.83*M_PI);
 	}
 };
 
@@ -68,8 +68,8 @@ struct RoundBlackSnapKnob : RoundBlackKnob {
 
 struct Davies1900hKnob : SVGKnob {
 	Davies1900hKnob() {
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
+		minAngle = float(-0.83*M_PI);
+		maxAngle = float(0.83*M_PI);
 	}
 };
 
@@ -112,8 +112,8 @@ struct Davies1900hLargeRedKnob : Davies1900hKnob {
 
 struct Rogan : SVGKnob {
 	Rogan() {
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
+		minAngle = float(-0.83*M_PI);
+		maxAngle = float(0.83*M_PI);
 	}
 };
 
@@ -282,8 +282,8 @@ struct Rogan1PWhite : Rogan {
 
 struct SynthTechAlco : SVGKnob {
 	SynthTechAlco() {
-		minAngle = -0.82*M_PI;
-		maxAngle = 0.82*M_PI;
+		minAngle = float(-0.82*M_PI);
+		maxAngle = float(0.82*M_PI);
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco.svg")));
 		SVGWidget *cap = new SVGWidget();
 		cap->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/SynthTechAlco_cap.svg")));
@@ -293,16 +293,16 @@ struct SynthTechAlco : SVGKnob {
 
 struct Trimpot : SVGKnob {
 	Trimpot() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = float(-0.75*M_PI);
+		maxAngle = float(0.75*M_PI);
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/Trimpot.svg")));
 	}
 };
 
 struct BefacoBigKnob : SVGKnob {
 	BefacoBigKnob() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = float(-0.75*M_PI);
+		maxAngle = float(0.75*M_PI);
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoBigKnob.svg")));
 	}
 };
@@ -316,8 +316,8 @@ struct BefacoBigSnapKnob : BefacoBigKnob {
 
 struct BefacoTinyKnob : SVGKnob {
 	BefacoTinyKnob() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = float(-0.75*M_PI);
+		maxAngle = float(0.75*M_PI);
 		setSVG(SVG::load(assetGlobal("res/ComponentLibrary/BefacoTinyKnob.svg")));
 	}
 };
@@ -335,8 +335,8 @@ struct BefacoSlidePot : SVGSlider {
 
 struct LEDSlider : SVGSlider {
 	LEDSlider() {
-		maxHandlePos = mm2px(Vec(0.738, 0.738).plus(Vec(2, 0)));
-		minHandlePos = mm2px(Vec(0.738, 22.078).plus(Vec(2, 0)));
+		maxHandlePos = mm2px(Vec(0.738f, 0.738f).plus(Vec(2, 0)));
+		minHandlePos = mm2px(Vec(0.738f, 22.078f).plus(Vec(2, 0)));
 		setSVGs(SVG::load(assetGlobal("res/ComponentLibrary/LEDSlider.svg")), NULL);
 	}
 };
@@ -458,7 +458,7 @@ struct RGBLight : ModuleLightWidget {
 template <typename BASE>
 struct LargeLight : BASE {
 	LargeLight() {
-		this->box.size = mm2px(Vec(5.179, 5.179));
+		this->box.size = mm2px(Vec(5.179f, 5.179f));
 	}
 };
 
@@ -466,7 +466,7 @@ struct LargeLight : BASE {
 template <typename BASE>
 struct MediumLight : BASE {
 	MediumLight() {
-		this->box.size = mm2px(Vec(3.176, 3.176));
+		this->box.size = mm2px(Vec(3.176f, 3.176f));
 	}
 };
 
@@ -474,7 +474,7 @@ struct MediumLight : BASE {
 template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
-		this->box.size = mm2px(Vec(2.176, 2.176));
+		this->box.size = mm2px(Vec(2.176f, 2.176f));
 	}
 };
 
@@ -491,7 +491,7 @@ template <typename BASE>
 struct LEDBezelLight : BASE {
 	LEDBezelLight() {
 		this->bgColor = COLOR_BLACK_TRANSPARENT;
-		this->box.size = mm2px(Vec(6.0, 6.0));
+		this->box.size = mm2px(Vec(6.0f, 6.0f));
 	}
 };
 

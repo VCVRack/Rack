@@ -1,4 +1,4 @@
-LIB_OBJ= \
+COMMON_OBJ= \
 	dep/jpommier-pffft-29e4f76ac53b/fftpack.o \
 	dep/jpommier-pffft-29e4f76ac53b/pffft.o \
 	dep/nanovg/src/nanovg.o \
@@ -38,14 +38,6 @@ LIB_OBJ= \
 	src/app/WireWidget.o \
 	src/asset.o \
 	src/audio.o \
-	src/Core/AudioInterface.o \
-	src/Core/Blank.o \
-	src/Core/Core.o \
-	src/Core/MIDICCToCVInterface.o \
-	src/Core/MIDIToCVInterface.o \
-	src/Core/MIDITriggerToCVInterface.o \
-	src/Core/Notes.o \
-	src/Core/QuadMIDIToCVInterface.o \
 	src/dsp/minblep.o \
 	src/engine.o \
 	src/keyboard.o \
@@ -90,6 +82,26 @@ LIB_OBJ= \
 	src/widgets/ZoomWidget.o \
 	src/window.o \
 	src/vstmidi.o
+
+HOST_OBJ= \
+	src/Core/AudioInterface.o \
+	src/Core/Blank.o \
+	src/Core/Core.o \
+	src/Core/MIDICCToCVInterface.o \
+	src/Core/MIDIToCVInterface.o \
+	src/Core/MIDITriggerToCVInterface.o \
+	src/Core/Notes.o \
+	src/Core/QuadMIDIToCVInterface.o
+
+LIB_OBJ= \
+	$(COMMON_OBJ) \
+	$(HOST_OBJ)
+
+LIB_OBJ_WIN= \
+	src/util/dirent_win32/dirent.o
+
+SHARED_LIB_OBJ= \
+	$(COMMON_OBJ)
 
 MAIN_OBJ= \
 	src/vst2_main.o \

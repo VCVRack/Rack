@@ -9,6 +9,7 @@ namespace rack {
 
 
 void loggerInit(bool devMode) {
+#ifdef RACK_HOST
 	global->logger.startTime = std::chrono::high_resolution_clock::now();
 	if (devMode) {
 		global->logger.logFile = stderr;
@@ -17,12 +18,15 @@ void loggerInit(bool devMode) {
 		std::string logFilename = assetLocal("log.txt");
 		global->logger.logFile = fopen(logFilename.c_str(), "w");
 	}
+#endif // RACK_HOST
 }
 
 void loggerDestroy() {
+#ifdef RACK_HOST
 	if (global->logger.logFile != stderr) {
 		fclose(global->logger.logFile);
 	}
+#endif // RACK_HOST
 }
 
 static const char* const loggerText[] = {
@@ -40,6 +44,7 @@ static const int loggerColor[] = {
 };
 
 static void loggerLogVa(LoggerLevel level, const char *file, int line, const char *format, va_list args) {
+#ifdef RACK_HOST
 	auto nowTime = std::chrono::high_resolution_clock::now();
 	int duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - global->logger.startTime).count();
 	if (global->logger.logFile == stderr)
@@ -52,13 +57,16 @@ static void loggerLogVa(LoggerLevel level, const char *file, int line, const cha
    printf("\n"); // xxx
 	fprintf(global->logger.logFile, "\n");
 	fflush(global->logger.logFile);
+#endif // RACK_HOST
 }
 
 void loggerLog(LoggerLevel level, const char *file, int line, const char *format, ...) {
+#ifdef RACK_HOST
 	va_list args;
 	va_start(args, format);
 	loggerLogVa(level, file, line, format, args);
 	va_end(args);
+#endif // RACK_HOST
 }
 
 /** Deprecated. Included for ABI compatibility */

@@ -1,0 +1,7 @@
+SLUG=Template_shared
+
+include ../../../build_shared_plugin_pre.mk
+
+include make.objects
+
+include ../../../build_shared_plugin_post.mk

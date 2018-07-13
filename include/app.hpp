@@ -5,8 +5,8 @@
 #include "ui.hpp"
 
 
-static const float SVG_DPI = 75.0;
-static const float MM_PER_IN = 25.4;
+static const float SVG_DPI = 75.0f;
+static const float MM_PER_IN = 25.4f;
 
 
 namespace rack {

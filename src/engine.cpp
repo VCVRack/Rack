@@ -18,10 +18,6 @@
 #include "global_ui.hpp"
 
 
-#ifdef USE_VST2
-extern void vst2_handle_ui_param (int uniqueParamId, float normValue);
-#endif // USE_VST2
-
 namespace rack {
 
 

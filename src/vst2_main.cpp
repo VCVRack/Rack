@@ -16,7 +16,7 @@
 ///   limitations under the License.
 ///
 /// created: 25Jun2018
-/// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018
+/// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///
 ///
 ///
@@ -56,6 +56,7 @@ extern void vst2_queue_param (int uniqueParamId, float normValue);
 extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
+extern void vst2_set_shared_plugin_tls_globals (void);
 
 
 #include "../include/window.hpp"
@@ -830,6 +831,8 @@ static DWORD WINAPI vst2_ui_thread_entry(VSTPluginWrapper *_wrapper) {
 
    _wrapper->b_thread_started = YAC_TRUE;
 
+   vst2_set_shared_plugin_tls_globals();
+
    while(_wrapper->b_thread_running || _wrapper->b_queued_destroy_editor || _wrapper->queued_load_patch.addr)
    {
       // printf("xxx vstrack_plugin<ui>: idle loop\n");
@@ -1001,6 +1004,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    
    wrapper->lockAudio();
    wrapper->setGlobals();
+   vst2_set_shared_plugin_tls_globals();
    // // rack::global->engine.vipMutex.lock();
    rack::global->engine.mutex.lock();
    rack::global->vst2.last_seen_num_frames = sUI(sampleFrames);
@@ -1014,35 +1018,24 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    sUI i;
    sUI k = 0u;
 
-   if(wrapper->b_processing)
+   // Clear output buffers
+   //  (note) AudioInterface instances accumulate samples in the output buffer
+   for(i = 0u; i < uint32_t(sampleFrames); i++)
    {
-      // Clear output buffers
-      //  (note) AudioInterface instances accumulate samples in the output buffer
-      for(i = 0u; i < uint32_t(sampleFrames); i++)
+      for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
       {
-         for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
-         {
-            outputs[chIdx][i] = 0.0f;
-         }
+         outputs[chIdx][i] = 0.0f;
       }
+   }
+
+   if(1 && wrapper->b_processing)
+   {
 
 #ifdef HAVE_WINDOWS
       _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 #endif // HAVE_WINDOWS
 
       vst2_engine_process(inputs, outputs, sampleFrames);
-   }
-   else
-   {
-      // Not processing, output silence
-      // printf("xxx vstrack_plugin: output silence\n");
-      for(i = 0u; i < uint32_t(sampleFrames); i++)
-      {
-         for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
-         {
-            outputs[chIdx][i] = 0.0f;
-         }
-      }
    }
 
    // // rack::global->engine.vipMutex.unlock();

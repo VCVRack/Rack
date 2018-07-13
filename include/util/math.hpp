@@ -132,7 +132,7 @@ inline float crossfade(float a, float b, float frac) {
 Assumes that the array at `p` is of length at least floor(x)+1.
 */
 inline float interpolateLinear(const float *p, float x) {
-	int xi = x;
+	int xi = int(x);
 	float xf = x - xi;
 	return crossfade(p[xi], p[xi+1], xf);
 }

@@ -1,3 +1,9 @@
+** July 13th, 2018
+- add support for dynamically loaded plugins ("plugin.dll")
+- add module Template_shared.MyModule
+- change: the dBiz.* modules are now linked dynamically
+
+
 ** July 12th, 2018
 - fix: assign unique VST param base id when duplicating modules
 - change: Core.MIDI*: pre-select default VST MIDI input device

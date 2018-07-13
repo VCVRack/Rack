@@ -13,6 +13,6 @@ PLAF_OBJ=
 
 include make.objects
 
-ALL_OBJ=$(MAIN_OBJ)
+ALL_OBJ= $(MAIN_OBJ) 
 
 include vst2_common_msvc_post.mk

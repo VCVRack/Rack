@@ -306,6 +306,7 @@ void errorCallback(int error, const char *description) {
 
 void renderGui() {
 	int width, height;
+   // printf("xxx renderGui: ENTER\n");
 	glfwGetFramebufferSize(global_ui->window.gWindow, &width, &height);
 
 	// Update and render
@@ -313,13 +314,16 @@ void renderGui() {
 
 	nvgReset(global_ui->window.gVg);
 	nvgScale(global_ui->window.gVg, global_ui->window.gPixelRatio, global_ui->window.gPixelRatio);
+   // printf("xxx renderGui: gScene->draw() BEGIN\n");
 	global_ui->ui.gScene->draw(global_ui->window.gVg);
+   // printf("xxx renderGui: gScene->draw() END\n");
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgEndFrame(global_ui->window.gVg);
 	glfwSwapBuffers(global_ui->window.gWindow);
+   // printf("xxx renderGui: LEAVE\n");
 }
 
 void windowInit() {
@@ -469,7 +473,9 @@ void windowRun() {
 #endif // USE_VST2
          ) {
 
+#ifndef RACK_PLUGIN
       vst2_handle_queued_set_program_chunk();
+#endif // RACK_PLUGIN
 
 		double startTime = glfwGetTime();
 		global_ui->window.gGuiFrame++;
@@ -547,6 +553,7 @@ void windowRun() {
          break;
       }
 #if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
+#ifndef RACK_PLUGIN
       else if(rack::global_ui->vst2.b_queued_maximize_window || __glfw_hack__b_queued_maximize_window)
       {
          rack::global_ui->vst2.b_queued_maximize_window = false;
@@ -554,6 +561,7 @@ void windowRun() {
          vst2_maximize_reparented_window();
       }
 #endif // VST2_REPARENT_WINDOW_HACK
+#endif // RACK_PLUGIN
 #endif // USE_VST2
 	}
 
@@ -749,13 +757,16 @@ std::shared_ptr<Image> Image::load(const std::string &filename) {
 ////////////////////
 
 SVG::SVG(const std::string &filename) {
+   // printf("xxx SVG::SVG: ENTER\n");
 	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
+   // printf("xxx SVG::SVG: handle=%p\n");
 	if (handle) {
 		info("Loaded SVG %s", filename.c_str());
 	}
 	else {
 		warn("Failed to load SVG %s", filename.c_str());
 	}
+   // printf("xxx SVG::SVG: LEAVE\n");
 }
 
 SVG::~SVG() {
@@ -763,9 +774,12 @@ SVG::~SVG() {
 }
 
 std::shared_ptr<SVG> SVG::load(const std::string &filename) {
+   // printf("xxx SVG::load: ENTER\n");
 	auto sp = global_ui->window.svg_cache[filename].lock();
+   // printf("xxx SVG::load: cache locked OK\n");
 	if (!sp)
 		global_ui->window.svg_cache[filename] = sp = std::make_shared<SVG>(filename);
+   // printf("xxx SVG::load: RETURN\n");
 	return sp;
 }
 

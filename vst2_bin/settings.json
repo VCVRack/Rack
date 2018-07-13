@@ -17,6 +17,10 @@
   "moduleBrowser": {
     "favorites": [
       {
+        "plugin": "Template_shared",
+        "model": "MyModule"
+      },
+      {
         "plugin": "Alikins",
         "model": "SpecificValue"
       },

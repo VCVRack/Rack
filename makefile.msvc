@@ -13,6 +13,10 @@ lib:
 	make -f makefile_lib.msvc bin -j $(NUM_JOBS)
 
 .PHONY:
+shared_lib:
+	make -f makefile_shared_lib.msvc bin -j $(NUM_JOBS) && mv Rack_shared.lib plugins/
+
+.PHONY:
 vst: lib
 	rm -f src/vst2_main.o
 	make -f makefile_vst_instr.msvc bin -j $(NUM_JOBS)
@@ -26,6 +30,7 @@ vst: lib
 
 clean:
 	make -f makefile_lib.msvc clean
+	make -f makefile_shared_lib.msvc clean
 	make -f makefile_vst_instr.msvc clean
 	make -f makefile_vst_effect.msvc clean
 

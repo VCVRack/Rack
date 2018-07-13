@@ -5,6 +5,7 @@ namespace rack {
 
 
 void Panel::draw(NVGcontext *vg) {
+   // printf("xxx Panel::draw: ENTER\n");
 	nvgBeginPath(vg);
 	nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
 
@@ -31,7 +32,9 @@ void Panel::draw(NVGcontext *vg) {
 	nvgStrokeWidth(vg, 1.0);
 	nvgStroke(vg);
 
+   // printf("xxx Panel::draw: call Widget::draw\n");
 	Widget::draw(vg);
+   // printf("xxx Panel::draw: LEAVE\n");
 }
 
 } // namespace rack

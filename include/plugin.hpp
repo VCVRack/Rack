@@ -1,7 +1,108 @@
 #pragma once
+#include "global_pre.hpp"
 #include <string>
+#include <stdio.h> // debug
 #include <list>
 #include "tags.hpp"
+
+
+#define RACK_PLUGIN_INIT_ID_INTERNAL p->slug = TOSTRING(SLUG); p->version = TOSTRING(VERSION)
+
+#ifdef USE_VST2
+
+namespace rack {
+   struct Plugin;
+}
+
+typedef void (*vst2_handle_ui_param_fxn_t) (int uniqueParamId, float normValue);
+typedef void (*rack_set_tls_globals_fxn_t) (rack::Plugin *p);
+
+#ifdef RACK_HOST
+
+// Rack host build:
+
+extern void vst2_handle_ui_param (int uniqueParamId, float normValue);
+
+#define RACK_PLUGIN_DECLARE(pluginname) 
+#define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
+#define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
+
+#else
+
+// Plugin build:
+
+#ifdef _MSC_VER
+#ifdef RACK_PLUGIN_SHARED
+ #define RACK_PLUGIN_EXPORT extern "C" __declspec(dllexport)
+#else
+ #define RACK_PLUGIN_EXPORT extern "C"
+#endif // RACK_PLUGIN_SHARED
+ #define RACK_TLS __declspec(thread)
+#else
+ #define RACK_PLUGIN_EXPORT extern "C"
+ #define RACK_TLS __thread
+#endif // _MSC_VER
+
+extern vst2_handle_ui_param_fxn_t vst2_handle_ui_param;
+
+#ifndef RACK_PLUGIN_SHARED_LIB_BUILD
+#ifdef RACK_PLUGIN_SHARED
+ // Dynamically loaded plugin build
+ #define RACK_PLUGIN_DECLARE(pluginname)  namespace rack { extern RACK_TLS Plugin *plugin; } extern void __rack_unused_symbol(void)
+#ifdef ARCH_WIN
+#define JSON_SEED_INIT_EXTERNAL extern "C" extern long seed_initialized;
+#else
+#define JSON_SEED_INIT_EXTERNAL extern "C" extern volatile char seed_initialized;
+#endif
+ #define RACK_PLUGIN_INIT(pluginname)                   \
+vst2_handle_ui_param_fxn_t vst2_handle_ui_param;        \
+JSON_SEED_INIT_EXTERNAL                                 \
+extern "C" extern volatile uint32_t hashtable_seed;     \
+namespace rack {                                        \
+   RACK_TLS Plugin *plugin;                             \
+   RACK_TLS Global *global;                             \
+   RACK_TLS GlobalUI *global_ui;                        \
+   static void loc_set_tls_globals(rack::Plugin *p) {   \
+      plugin = p; \
+      global = plugin->global;                          \
+      global_ui = plugin->global_ui;                    \
+      hashtable_seed = p->json.hashtable_seed;          \
+      seed_initialized = p->json.seed_initialized;      \
+   }                                                    \
+}                                                       \
+RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p)
+ #define RACK_PLUGIN_INIT_ID() \
+   rack::plugin = p;                                                 \
+   rack::plugin->set_tls_globals_fxn = &rack::loc_set_tls_globals;   \
+   vst2_handle_ui_param = p->vst2_handle_ui_param_fxn;               \
+   rack::global = p->global;                                         \
+   rack::global_ui = p->global_ui;                                   \
+   RACK_PLUGIN_INIT_ID_INTERNAL
+#else
+ // Statically linked plugin build
+ #define RACK_PLUGIN_DECLARE(pluginname) 
+ #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
+ #define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
+#endif // RACK_PLUGIN_SHARED
+#endif // RACK_PLUGIN_SHARED_LIB_BUILD
+
+#endif // RACK_HOST
+
+
+#else
+
+#define RACK_PLUGIN_DECLARE(pluginname) extern Plugin *plugin
+#define RACK_PLUGIN_INIT(pluginname)  extern "C" RACK_PLUGIN_EXPORT void init(rack::Plugin *p)
+#define RACK_PLUGIN_INIT_ID() plugin = p; RACK_PLUGIN_INIT_ID_INTERNAL
+
+#endif // USE_VST2
+
+#define RACK_PLUGIN_INIT_WEBSITE(url) p->website = url
+#define RACK_PLUGIN_INIT_MANUAL(url) p->manual = url
+
+#define RACK_PLUGIN_MODEL_DECLARE(pluginname, modelname) extern Model *create_model_##pluginname##_##modelname##(void)
+#define RACK_PLUGIN_MODEL_INIT(pluginname, modelname) Model *create_model_##pluginname##_##modelname##(void)
+#define RACK_PLUGIN_MODEL_ADD(pluginname, modelname) p->addModel(create_model_##pluginname##_##modelname##())
 
 
 namespace rack {
@@ -35,6 +136,34 @@ struct Plugin {
 	/** Deprecated, do not use. */
 	std::string website;
 	std::string manual;
+
+#ifdef USE_VST2
+   //
+   // Set by Rack host (before init_plugin()):
+   //
+   vst2_handle_ui_param_fxn_t vst2_handle_ui_param_fxn = NULL;
+   Global *global = NULL;
+   GlobalUI *global_ui = NULL;
+
+   // Set by Rack host immediately before set_tls_globals_fxn is called:
+   //  (note) must be copied by the plugin or json import won't function properly
+   struct {
+      uint32_t hashtable_seed;
+#ifdef ARCH_WIN
+      long seed_initialized;
+#else
+      char seed_initialized;
+#endif
+   } json;
+
+   //
+   // Set by plugin:
+   //  - in init_plugin()
+   //  - called by Rack host in audio thread
+   //  - NULL if this is a statically linked add-on
+   //
+   rack_set_tls_globals_fxn_t set_tls_globals_fxn = NULL;
+#endif // USE_VST2
 
 	virtual ~Plugin();
 	void addModel(Model *model);
@@ -74,9 +203,13 @@ struct Model {
 				return module;
 			}
 			ModuleWidget *createModuleWidget() override {
+            printf("xxx createModuleWidget: ENTER\n");
 				TModule *module = new TModule();
+            printf("xxx createModuleWidget: module=%p\n", module);
 				TModuleWidget *moduleWidget = new TModuleWidget(module);
+            printf("xxx createModuleWidget: moduleWidget=%p\n", moduleWidget);
 				moduleWidget->model = this;
+            printf("xxx createModuleWidget: LEAVE\n");
 				return moduleWidget;
 			}
 			ModuleWidget *createModuleWidgetNull() override {
@@ -118,43 +251,6 @@ extern std::string gToken;
 } // namespace rack
 
 
-////////////////////
-// Implemented by plugin
-////////////////////
-
-/** Called once to initialize and return the Plugin instance.
-You must implement this in your plugin
-*/
-#ifdef _MSC_VER
-// (note) turns out that VCV plugins don't work when the VCV engine itself is a DLL
-// #define RACK_PLUGIN_EXPORT __declspec(dllexport)
-#define RACK_PLUGIN_EXPORT
-#else
-#define RACK_PLUGIN_EXPORT
-#endif
-
-#define RACK_PLUGIN_INIT_ID_INTERNAL p->slug = TOSTRING(SLUG); p->version = TOSTRING(VERSION)
-
-#ifdef USE_VST2
-
-#define RACK_PLUGIN_DECLARE(pluginname) 
-#define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
-#define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
-
-#else
-
-#define RACK_PLUGIN_DECLARE(pluginname) extern Plugin *plugin
-#define RACK_PLUGIN_INIT(pluginname)  extern "C" RACK_PLUGIN_EXPORT void init(rack::Plugin *p)
-#define RACK_PLUGIN_INIT_ID() plugin = p; RACK_PLUGIN_INIT_ID_INTERNAL
-
-#endif // USE_VST2
-
-#define RACK_PLUGIN_INIT_WEBSITE(url) p->website = url
-#define RACK_PLUGIN_INIT_MANUAL(url) p->manual = url
-
-#define RACK_PLUGIN_MODEL_DECLARE(pluginname, modelname) extern Model *create_model_##pluginname##_##modelname##(void)
-#define RACK_PLUGIN_MODEL_INIT(pluginname, modelname) Model *create_model_##pluginname##_##modelname##(void)
-#define RACK_PLUGIN_MODEL_ADD(pluginname, modelname) p->addModel(create_model_##pluginname##_##modelname##())
 
 // Access helpers for global UI vars
 //

@@ -210,10 +210,12 @@ void SVGWidget::setSVG(std::shared_ptr<SVG> svg) {
 }
 
 void SVGWidget::draw(NVGcontext *vg) {
+   // printf("xxx SVGWidget::draw: ENTER\n");
 	if (svg && svg->handle) {
 		// printf("drawing svg %f %f\n", box.size.x, box.size.y);
 		drawSVG(vg, svg->handle);
 	}
+   // printf("xxx SVGWidget::draw: LEAVE\n");
 }
 
 

@@ -22,6 +22,6 @@ PLAF_OBJ=
 
 include make.objects
 
-ALL_OBJ=$(LIB_OBJ)
+ALL_OBJ=$(LIB_OBJ) $(LIB_OBJ_WIN)
 
 include dep/yac/staticlib_msvc.mk

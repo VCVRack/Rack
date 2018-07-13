@@ -4,9 +4,9 @@ using namespace rack;
 
 RACK_PLUGIN_DECLARE(dBiz);
 
-#ifdef USE_VST2
-#define plugin "dBiz"
-#endif // USE_VST2
+// // #ifdef USE_VST2
+// // #define plugin "dBiz"
+// // #endif // USE_VST2
 
 namespace rack_plugin_dBiz {
 

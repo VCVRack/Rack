@@ -17,7 +17,9 @@
 #include <sys/param.h> // for MAXPATHLEN
 #include <fcntl.h>
 #include <dirent.h>
-#endif
+#else
+#include "util/dirent_win32/dirent.h"
+#endif // YAC_POSIX
 
 #include <thread>
 #include <stdexcept>
@@ -46,7 +48,9 @@ namespace rack {
 typedef void (*InitCallback)(Plugin *);
 
 #ifdef USE_VST2
+#ifndef RACK_PLUGIN
 static void vst2_load_static_rack_plugins(void);
+#endif // RACK_PLUGIN
 #endif // USE_VST2
 
 
@@ -67,6 +71,7 @@ void Plugin::addModel(Model *model) {
 ////////////////////
 
 static bool loadPlugin(std::string path) {
+#ifdef RACK_HOST
 	std::string libraryFilename;
 #if ARCH_LIN
 	libraryFilename = path + "/" + "plugin.so";
@@ -108,10 +113,15 @@ static bool loadPlugin(std::string path) {
 
 	// Call plugin's init() function
 	InitCallback initCallback;
-#if ARCH_WIN
-	initCallback = (InitCallback) GetProcAddress(handle, "init");
+#ifdef USE_VST2
+#define init_symbol_name "init_plugin"
 #else
-	initCallback = (InitCallback) dlsym(handle, "init");
+#define init_symbol_name "init"
+#endif // USE_VST2
+#if ARCH_WIN
+	initCallback = (InitCallback) GetProcAddress(handle, init_symbol_name);
+#else
+	initCallback = (InitCallback) dlsym(handle, init_symbol_name);
 #endif
 	if (!initCallback) {
 		warn("Failed to read init() symbol in %s", libraryFilename.c_str());
@@ -122,6 +132,13 @@ static bool loadPlugin(std::string path) {
 	Plugin *plugin = new Plugin();
 	plugin->path = path;
 	plugin->handle = handle;
+#ifdef USE_VST2
+#ifdef RACK_HOST
+   plugin->vst2_handle_ui_param_fxn = &vst2_handle_ui_param;
+   plugin->global = global;
+   plugin->global_ui = global_ui;
+#endif // RACK_HOST
+#endif // USE_VST2
 	initCallback(plugin);
 
 	// Reject plugin if slug already exists
@@ -136,6 +153,10 @@ static bool loadPlugin(std::string path) {
 	// Add plugin to list
 	global->plugin.gPlugins.push_back(plugin);
 	info("Loaded plugin %s %s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
+
+#else
+   (void)path;
+#endif // RACK_HOST
 
 	return true;
 }
@@ -231,18 +252,25 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 }
 
 static void loadPlugins(std::string path) {
+#ifdef RACK_HOST
 	std::string message;
 	for (std::string pluginPath : systemListEntries(path)) {
 		if (!systemIsDirectory(pluginPath))
 			continue;
 		if (!loadPlugin(pluginPath)) {
+#ifndef USE_VST2
+         // (note) skip message (some plugins are linked statically in VST2 build)
 			message += stringf("Could not load plugin %s\n", pluginPath.c_str());
+#endif // USE_VST2
 		}
 	}
 	if (!message.empty()) {
 		message += "See log for details.";
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
+#else
+   (void)path;
+#endif // RACK_HOST
 }
 
 #ifndef USE_VST2
@@ -349,6 +377,7 @@ static void extractPackages(std::string path) {
 
 void pluginInit(bool devMode) {
 	tagsInit();
+#ifdef RACK_HOST
 
 	// Load core
 	// This function is defined in core.cpp
@@ -356,11 +385,14 @@ void pluginInit(bool devMode) {
 	init_plugin_Core(corePlugin);
 	global->plugin.gPlugins.push_back(corePlugin);
 
-#ifndef USE_VST2
+   // Init statically linked plugins
+   vst2_load_static_rack_plugins();
+
 	// Get local plugins directory
 	std::string localPlugins = assetLocal("plugins");
 	mkdir(localPlugins.c_str(), 0755);
 
+#ifndef USE_VST2
 	if (!devMode) {
 		// Copy Fundamental package to plugins directory if folder does not exist
 		std::string fundamentalSrc = assetGlobal("Fundamental.zip");
@@ -370,16 +402,17 @@ void pluginInit(bool devMode) {
 			systemCopy(fundamentalSrc, fundamentalDest);
 		}
 	}
+#endif // USE_VST2
 
 	// Extract packages and load plugins
 #ifndef USE_VST2
 	extractPackages(localPlugins);
 #endif // USE_VST2
+
+   // Load/init dynamically loaded plugins
 	loadPlugins(localPlugins);
 
-#else
-   vst2_load_static_rack_plugins();
-#endif // USE_VST2
+#endif // RACK_HOST
 }
 
 void pluginDestroy() {
@@ -567,6 +600,7 @@ Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
 
 
 #ifdef USE_VST2
+#ifndef RACK_PLUGIN
 extern "C" {
 extern void init_plugin_Alikins            (rack::Plugin *p);
 extern void init_plugin_AS                 (rack::Plugin *p);
@@ -577,7 +611,7 @@ extern void init_plugin_Bidoo              (rack::Plugin *p);
 extern void init_plugin_Bogaudio           (rack::Plugin *p);
 // extern void init_plugin_BOKONTEPByteBeatMachine (rack::Plugin *p);  // unstable
 extern void init_plugin_cf                 (rack::Plugin *p);
-extern void init_plugin_dBiz               (rack::Plugin *p);
+//extern void init_plugin_dBiz               (rack::Plugin *p);  // now a DLL (13Jul2018)
 extern void init_plugin_DHE_Modules        (rack::Plugin *p);
 extern void init_plugin_DrumKit            (rack::Plugin *p);
 extern void init_plugin_ErraticInstruments (rack::Plugin *p);
@@ -649,7 +683,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Bogaudio",           &init_plugin_Bogaudio);
    // vst2_load_static_rack_plugin("BOKONTEPByteBeatMachine", &init_plugin_BOKONTEPByteBeatMachine);
    vst2_load_static_rack_plugin("cf",                 &init_plugin_cf);
-   vst2_load_static_rack_plugin("dBiz",               &init_plugin_dBiz);
+   // vst2_load_static_rack_plugin("dBiz",               &init_plugin_dBiz);  // now a DLL (13Jul2018)
    vst2_load_static_rack_plugin("DHE-Modules",        &init_plugin_DHE_Modules);
    vst2_load_static_rack_plugin("DrumKit",            &init_plugin_DrumKit);
    vst2_load_static_rack_plugin("ErraticInstruments", &init_plugin_ErraticInstruments);
@@ -684,11 +718,33 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Valley",             &init_plugin_Valley);
    // vst2_load_static_rack_plugin("VultModules",        &init_plugin_VultModules);
 }
+#endif // RACK_PLUGIN
 #endif // USE_VST2
 
 } // namespace rack
 
 using namespace rack;
+
+#ifdef USE_VST2
+#ifdef ARCH_WIN
+extern "C" extern long seed_initialized;
+#else
+extern "C" extern volatile char seed_initialized;
+#endif // ARCH_WIN
+extern "C" extern volatile uint32_t hashtable_seed;
+void vst2_set_shared_plugin_tls_globals(void) {
+   // Called in audio thread (see vst2_main.cpp:VSTPluginProcessReplacingFloat32())
+   for(Plugin *p : global->plugin.gPlugins) {
+      if(NULL != p->set_tls_globals_fxn) {
+         // printf("xxx vcvrack: calling p->set_tls_globals_fxn() global=%p\n", p->global);
+         p->json.hashtable_seed = hashtable_seed;
+         p->json.seed_initialized = seed_initialized;
+         p->set_tls_globals_fxn(p);
+         // printf("xxx vcvrack: calling p->set_tls_globals_fxn() OK\n");
+      }
+   }
+}
+#endif // USE_VST2
 
 RackScene *rack_plugin_ui_get_rackscene(void) {
 #ifdef USE_VST2

@@ -45,6 +45,7 @@ void Menu::step() {
 }
 
 void Menu::draw(NVGcontext *vg) {
+   // printf("xxx Menu::draw: box.size=(%f; %f)\n", box.size.x, box.size.y);
 	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
 	Widget::draw(vg);
 }

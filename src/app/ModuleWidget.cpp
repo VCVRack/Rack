@@ -7,14 +7,27 @@
 #include "global_ui.hpp"
 
 
+#ifdef USE_VST2
+extern "C" void glfw_hack_makeContextCurrent(GLFWwindow *handle);
+// #include <windows.h>
+#endif // USE_VST2
+
+
 namespace rack {
 
 
 ModuleWidget::ModuleWidget(Module *module) {
+   printf("xxx ModuleWidget::ModuleWidget(module=%p) global=%p\n", module, global);
+   // printf("xxx ModuleWidget::ModuleWidget: GetCurrentThreadId=%d\n", GetCurrentThreadId());
 	if (module) {
 		engineAddModule(module);
+      printf("xxx ModuleWidget::ModuleWidget: engineAddModule OK\n");
 	}
 	this->module = module;
+   // printf("xxx ModuleWidget::ModuleWidget(): bind GL context global_ui->window.gWindow=%p\n", global_ui->window.gWindow);
+   // glfwMakeContextCurrent(global_ui->window.gWindow);
+   // // glfw_hack_makeContextCurrent(global_ui->window.gWindow);
+   printf("xxx ModuleWidget::ModuleWidget(): RETURN\n");
 }
 
 ModuleWidget::~ModuleWidget() {
@@ -54,17 +67,27 @@ void ModuleWidget::addParam(ParamWidget *param) {
 
 void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 	// Remove old panel
+#ifdef RACK_PLUGIN_SHARED
+   printf("xxx ModuleWidget::setPanel<shared>: 1\n");
+#else
+   printf("xxx ModuleWidget::setPanel<host>: 1\n");
+#endif
 	if (panel) {
 		removeChild(panel);
 		delete panel;
 		panel = NULL;
 	}
+   // printf("xxx ModuleWidget::setPanel: 2\n");
 
 	panel = new SVGPanel();
+   // printf("xxx ModuleWidget::setPanel: 3\n");
 	panel->setBackground(svg);
+   // printf("xxx ModuleWidget::setPanel: 4\n");
 	addChild(panel);
+   // printf("xxx ModuleWidget::setPanel: 5\n");
 
 	box.size = panel->box.size;
+   // printf("xxx ModuleWidget::setPanel: 6\n");
 }
 
 
@@ -132,6 +155,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	double x, y;
 	json_unpack(posJ, "[F, F]", &x, &y);
 	Vec pos = Vec(x, y);
+   printf("xxx ModuleWidget::fromJson: pos=(%f, %f) posJ=%p rootJ=%p\n", x, y, posJ, rootJ);
 	if (legacy && legacy <= 1) {
 		box.pos = pos;
 	}
@@ -218,23 +242,31 @@ ParamWidget *ModuleWidget::findParamWidgetByParamId(int _paramId) {
 }
 
 void ModuleWidget::draw(NVGcontext *vg) {
+   // printf("xxx ModuleWidget::draw: ENTER this=%p global=%p global_ui=%p\n", this, global, global_ui);
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+   // printf("xxx ModuleWidget::draw: 2\n");
 	Widget::draw(vg);
+   // printf("xxx ModuleWidget::draw: 3\n");
 
 	// CPU meter
 	if (module && global->gPowerMeter) {
+      // printf("xxx ModuleWidget::draw: 4b\n");
 		nvgBeginPath(vg);
+      // printf("xxx ModuleWidget::draw: 5b\n");
 		nvgRect(vg,
 			0, box.size.y - 20,
 			55, 20);
 		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.5));
 		nvgFill(vg);
 
+      // printf("xxx ModuleWidget::draw: 6b module=%p\n", module);
 		std::string cpuText = stringf("%.0f mS", module->cpuTime * 1000.f);
+      // printf("xxx ModuleWidget::draw: 7b\n");
 		nvgFontFaceId(vg, global_ui->window.gGuiFont->handle);
 		nvgFontSize(vg, 12);
 		nvgFillColor(vg, nvgRGBf(1, 1, 1));
 		nvgText(vg, 10.0, box.size.y - 6.0, cpuText.c_str(), NULL);
+      // printf("xxx ModuleWidget::draw: 8b\n");
 
 		float p = clamp(module->cpuTime, 0.f, 1.f);
 		nvgBeginPath(vg);
@@ -245,7 +277,10 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgFill(vg);
 	}
 
+   // printf("xxx ModuleWidget::draw: 4\n");
+
 	nvgResetScissor(vg);
+   // printf("xxx ModuleWidget::draw: LEAVE\n");
 }
 
 void ModuleWidget::drawShadow(NVGcontext *vg) {
@@ -379,9 +414,12 @@ struct DeleteMenuItem : MenuItem {
 };
 
 Menu *ModuleWidget::createContextMenu() {
+   printf("xxx ModuleWidget::createContextMenu: ENTER\n");
 	Menu *menu = global_ui->ui.gScene->createMenu();
 
 	MenuLabel *menuLabel = new MenuLabel();
+   printf("xxx ModuleWidget::createContextMenu: model->author=\"%s\"\n", model->author.c_str());
+   printf("xxx ModuleWidget::createContextMenu: model->name=\"%s\"\n", model->name.c_str());
 	menuLabel->text = model->author + " " + model->name + " " + model->plugin->version;
 	menu->addChild(menuLabel);
 

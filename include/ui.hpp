@@ -263,12 +263,4 @@ struct Scene : OpaqueWidget {
 	void step() override;
 };
 
-
-////////////////////
-// globals
-////////////////////
-
-extern Scene *gScene;
-
-
 } // namespace rack

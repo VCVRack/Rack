@@ -2,6 +2,8 @@
 #include "Core.hpp"
 #include "global.hpp"
 
+#ifdef RACK_HOST
+
 RACK_PLUGIN_MODEL_DECLARE(Core, AudioInterface);
 RACK_PLUGIN_MODEL_DECLARE(Core, MIDIToCVInterface);
 RACK_PLUGIN_MODEL_DECLARE(Core, QuadMIDIToCVInterface);
@@ -23,3 +25,5 @@ RACK_PLUGIN_INIT(Core) {
 	RACK_PLUGIN_MODEL_ADD(Core, Blank);
 	RACK_PLUGIN_MODEL_ADD(Core, Notes);
 }
+
+#endif // RACK_HOST
