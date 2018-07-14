@@ -1,5 +1,5 @@
 RACK_DIR ?= .
-VERSION = 0.6.2
+VERSION = 0.6.2b
 
 FLAGS += \
 	-Iinclude \
