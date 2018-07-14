@@ -11,7 +11,7 @@
 + supports VST parameters (send / recv)
 + supports dynamically loaded plugin DLLs
    - the plugin.dll files are _not_ binary compatible with the VCV Rack plugins !
-   - there's a [plugin SDK](#Dynamically loaded plugins (via plugin SDK)) (for Microsoft Visual Studio 2017 Community Edition) which can be used to build new plugins without checking out this entire GIT repository
+   - there's a [plugin SDK](#dynamically-loaded-plugins-(via-plugin-SDK)) (for Microsoft Visual Studio 2017 Community Edition) which can be used to build new plugins without checking out this entire GIT repository
 
 Tested in 
   - Eureka (my own work-in-progress VST host)
