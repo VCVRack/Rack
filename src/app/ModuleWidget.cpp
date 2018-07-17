@@ -424,7 +424,22 @@ void ModuleWidget::onDragMove(EventDragMove &e) {
 	if (!gRackWidget->lockModules) {
 		Rect newBox = box;
 		newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
-		gRackWidget->requestModuleBoxNearest(this, newBox);
+		if (windowIsShiftPressed()) {
+			// push left or right in grid steps
+			float dx = newBox.pos.x - box.pos.x;
+			int steps = int(dx / RACK_GRID_WIDTH);
+			while (steps) {
+				if (steps < 0) {
+					gRackWidget->pushModule(this, true);
+					steps++;
+				} else {
+					gRackWidget->pushModule(this, false);
+					steps--;
+				}
+			}
+		} else {
+			gRackWidget->requestModuleBoxNearest(this, newBox);
+		}
 	}
 }
 

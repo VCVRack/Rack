@@ -185,6 +185,8 @@ struct RackWidget : OpaqueWidget {
 	bool requestModuleBox(ModuleWidget *m, Rect box);
 	/** Moves a module to the closest non-colliding position */
 	bool requestModuleBoxNearest(ModuleWidget *m, Rect box);
+	/** Moves a module by one grid unit, pushing other modules recursively. If pushLeft is true, the push direction is left, otherwise right */
+	bool pushModule(ModuleWidget *m, bool pushLeft);
 
 	void step() override;
 	void draw(NVGcontext *vg) override;

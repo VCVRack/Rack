@@ -470,6 +470,50 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, Rect box) {
 	return false;
 }
 
+bool RackWidget::pushModule(ModuleWidget *m, bool pushLeft) {
+	// calculate desired position
+	Rect newBox = m->box;
+	if (pushLeft) {
+		newBox.pos.x -= RACK_GRID_WIDTH;
+	} else {
+		newBox.pos.x += RACK_GRID_WIDTH;
+	}
+	
+	// can't be pushed over the left border
+	if (newBox.pos.x < 0.0f) return false;
+	
+	// get intersection widget after moving
+	Widget *iw = NULL;
+	int count = 0;
+	for (Widget *child2 : moduleContainer->children) {
+		if (m == child2) continue;
+		if (newBox.intersects(child2->box)) {
+			iw = child2;
+			count++;
+		}
+	}
+	
+	// if a module is higher than one grid unit, it can push only one module, otherwise we would need a rollback,
+	// if e.g. one of two modules can't be pushed
+	if (count > 1) return false;
+	
+	// if there is any intersected widget, try to push it recursively
+	if (iw) {
+		ModuleWidget *w2 = dynamic_cast<ModuleWidget*>(iw);
+		if (pushModule(w2, pushLeft)) {
+			// if successful, set new position for this widget
+			m->box = newBox;
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		// no intersection, just set the new position
+		m->box = newBox;
+		return true;
+	}
+}
+
 void RackWidget::step() {
 	// Expand size to fit modules
 	Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
