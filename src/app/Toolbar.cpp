@@ -32,7 +32,7 @@ struct TooltipIconButton : IconButton {
 struct NewButton : TooltipIconButton {
 	NewButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_146097_cc.svg")));
-		tooltipText = "New (" WINDOW_MOD_KEY_NAME "+N)";
+		tooltipText = "New patch (" WINDOW_MOD_KEY_NAME "+N)";
 	}
 	void onAction(EventAction &e) override {
 		gRackWidget->reset();
@@ -42,7 +42,7 @@ struct NewButton : TooltipIconButton {
 struct OpenButton : TooltipIconButton {
 	OpenButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_31859_cc.svg")));
-		tooltipText = "Open  (" WINDOW_MOD_KEY_NAME "+O)";
+		tooltipText = "Open patch (" WINDOW_MOD_KEY_NAME "+O)";
 	}
 	void onAction(EventAction &e) override {
 		gRackWidget->loadDialog();
@@ -52,7 +52,7 @@ struct OpenButton : TooltipIconButton {
 struct SaveButton : TooltipIconButton {
 	SaveButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_1343816_cc.svg")));
-		tooltipText = "Save (" WINDOW_MOD_KEY_NAME "+S)";
+		tooltipText = "Save patch (" WINDOW_MOD_KEY_NAME "+S)";
 	}
 	void onAction(EventAction &e) override {
 		gRackWidget->saveDialog();
@@ -62,7 +62,7 @@ struct SaveButton : TooltipIconButton {
 struct SaveAsButton : TooltipIconButton {
 	SaveAsButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_1343811_cc.svg")));
-		tooltipText = "Save as (" WINDOW_MOD_KEY_NAME "+Shift+S)";
+		tooltipText = "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
 	void onAction(EventAction &e) override {
 		gRackWidget->saveAsDialog();
@@ -72,7 +72,7 @@ struct SaveAsButton : TooltipIconButton {
 struct RevertButton : TooltipIconButton {
 	RevertButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_1084369_cc.svg")));
-		tooltipText = "Revert";
+		tooltipText = "Revert patch";
 	}
 	void onAction(EventAction &e) override {
 		gRackWidget->revert();
@@ -116,14 +116,14 @@ struct SampleRateItem : MenuItem {
 struct SampleRateButton : TooltipIconButton {
 	SampleRateButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_1240789_cc.svg")));
-		tooltipText = "Internal sample rate";
+		tooltipText = "Engine sample rate";
 	}
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(MenuLabel::create("Internal sample rate"));
+		menu->addChild(MenuLabel::create("Engine sample rate"));
 
 		EnginePauseItem *pauseItem = new EnginePauseItem();
 		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";

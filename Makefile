@@ -111,6 +111,7 @@ ifdef ARCH_MAC
 	cp plugins/Fundamental/dist/Fundamental-*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
 	cp -R Bridge/AU/dist/VCV-Bridge.component dist/
 	cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
+	cp -R Bridge/VST/dist/VCV-Bridge-fx.vst dist/
 	@# Make DMG image
 	cd dist && ln -s /Applications Applications
 	cd dist && ln -s /Library/Audio/Plug-Ins/Components Components

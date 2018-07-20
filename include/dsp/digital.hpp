@@ -8,7 +8,6 @@ namespace rack {
 
 /** Turns HIGH when value reaches 1.f, turns LOW when value reaches 0.f. */
 struct SchmittTrigger {
-	// UNKNOWN is used to represent a stable state when the previous state is not yet set
 	enum State {
 		UNKNOWN,
 		LOW,
@@ -54,6 +53,23 @@ struct SchmittTrigger {
 	}
 	bool isHigh() {
 		return state == HIGH;
+	}
+};
+
+
+struct BooleanTrigger {
+	bool lastState;
+
+	BooleanTrigger() {
+		reset();
+	}
+	void reset() {
+		lastState = true;
+	}
+	bool process(bool state) {
+		bool triggered = (state && !lastState);
+		lastState = state;
+		return triggered;
 	}
 };
 
