@@ -19,8 +19,8 @@ void TextField::draw(NVGcontext *vg) {
 	else
 		state = BND_DEFAULT;
 
-	int begin = min(cursor, selection);
-	int end = max(cursor, selection);
+	int begin = std::min(cursor, selection);
+	int end = std::max(cursor, selection);
 	bndTextField(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str(), begin, end);
 	// Draw placeholder text
 	if (text.empty() && state != BND_ACTIVE) {
@@ -71,7 +71,7 @@ void TextField::onKey(EventKey &e) {
 				selection = cursor;
 			}
 			else {
-				int begin = min(cursor, selection);
+				int begin = std::min(cursor, selection);
 				text.erase(begin, std::abs(selection - cursor));
 				onTextChange();
 				cursor = selection = begin;
@@ -83,7 +83,7 @@ void TextField::onKey(EventKey &e) {
 				onTextChange();
 			}
 			else {
-				int begin = min(cursor, selection);
+				int begin = std::min(cursor, selection);
 				text.erase(begin, std::abs(selection - cursor));
 				onTextChange();
 				cursor = selection = begin;
@@ -133,7 +133,7 @@ void TextField::onKey(EventKey &e) {
 		case GLFW_KEY_X: {
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
-					int begin = min(cursor, selection);
+					int begin = std::min(cursor, selection);
 					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
 					glfwSetClipboardString(gWindow, selectedText.c_str());
 					insertText("");
@@ -143,7 +143,7 @@ void TextField::onKey(EventKey &e) {
 		case GLFW_KEY_C: {
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
-					int begin = min(cursor, selection);
+					int begin = std::min(cursor, selection);
 					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
 					glfwSetClipboardString(gWindow, selectedText.c_str());
 				}
@@ -173,7 +173,7 @@ void TextField::onKey(EventKey &e) {
 
 void TextField::insertText(std::string text) {
 	if (cursor != selection) {
-		int begin = min(cursor, selection);
+		int begin = std::min(cursor, selection);
 		this->text.erase(begin, std::abs(selection - cursor));
 		cursor = selection = begin;
 	}

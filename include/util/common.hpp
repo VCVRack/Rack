@@ -1,11 +1,11 @@
 #pragma once
 
 // Include most of the C standard library for convenience
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstdint>
+#include <cstring>
+#include <cassert>
 
 #include <string>
 #include <vector>

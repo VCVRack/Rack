@@ -10,7 +10,7 @@ json_t *ParamWidget::toJson() {
 	json_object_set_new(rootJ, "paramId", json_integer(paramId));
 
 	// Infinite params should serialize to 0
-	float v = (isfinite(minValue) && isfinite(maxValue)) ? value : 0.f;
+	float v = (std::isfinite(minValue) && std::isfinite(maxValue)) ? value : 0.f;
 	json_object_set_new(rootJ, "value", json_real(v));
 	return rootJ;
 }
@@ -23,14 +23,14 @@ void ParamWidget::fromJson(json_t *rootJ) {
 
 void ParamWidget::reset() {
 	// Infinite params should not be reset
-	if (isfinite(minValue) && isfinite(maxValue)) {
+	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
 		setValue(defaultValue);
 	}
 }
 
 void ParamWidget::randomize() {
 	// Infinite params should not be randomized
-	if (randomizable && isfinite(minValue) && isfinite(maxValue)) {
+	if (randomizable && std::isfinite(minValue) && std::isfinite(maxValue)) {
 		setValue(rescale(randomUniform(), 0.f, 1.f, minValue, maxValue));
 	}
 }

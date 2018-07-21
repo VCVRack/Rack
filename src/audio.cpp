@@ -103,10 +103,10 @@ int AudioIO::getDeviceChannels(int device) {
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
 		if (getDeviceInfo(device, &deviceInfo))
-			return max((int) deviceInfo.inputChannels, (int) deviceInfo.outputChannels);
+			return std::max((int) deviceInfo.inputChannels, (int) deviceInfo.outputChannels);
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		return max(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
+		return std::max(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
 	}
 	return 0;
 }
@@ -135,11 +135,11 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 		if (getDeviceInfo(device, &deviceInfo)) {
 			std::string deviceDetail = stringf("%s (", deviceInfo.name.c_str());
 			if (offset < (int) deviceInfo.inputChannels)
-				deviceDetail += stringf("%d-%d in", offset + 1, min(offset + maxChannels, (int) deviceInfo.inputChannels));
+				deviceDetail += stringf("%d-%d in", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.inputChannels));
 			if (offset < (int) deviceInfo.inputChannels && offset < (int) deviceInfo.outputChannels)
 				deviceDetail += ", ";
 			if (offset < (int) deviceInfo.outputChannels)
-				deviceDetail += stringf("%d-%d out", offset + 1, min(offset + maxChannels, (int) deviceInfo.outputChannels));
+				deviceDetail += stringf("%d-%d out", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.outputChannels));
 			deviceDetail += ")";
 			return deviceDetail;
 		}
@@ -248,7 +248,7 @@ void AudioIO::openStream() {
 
 		int closestSampleRate = deviceInfo.preferredSampleRate;
 		for (int sr : deviceInfo.sampleRates) {
-			if (abs(sr - sampleRate) < abs(closestSampleRate - sampleRate)) {
+			if (std::abs(sr - sampleRate) < std::abs(closestSampleRate - sampleRate)) {
 				closestSampleRate = sr;
 			}
 		}

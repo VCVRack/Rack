@@ -40,8 +40,8 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	float xform[6];
 	nvgCurrentTransform(vg, xform);
 	// Skew and rotate is not supported
-	assert(fabsf(xform[1]) < 1e-6);
-	assert(fabsf(xform[2]) < 1e-6);
+	assert(std::abs(xform[1]) < 1e-6);
+	assert(std::abs(xform[2]) < 1e-6);
 	Vec s = Vec(xform[0], xform[3]);
 	Vec b = Vec(xform[4], xform[5]);
 	Vec bi = b.floor();

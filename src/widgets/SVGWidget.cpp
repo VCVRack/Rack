@@ -47,7 +47,7 @@ static float getLineCrossing(Vec p0, Vec p1, Vec p2, Vec p3) {
 	Vec e = p3.minus(p2);
 	float m = d.x * e.y - d.y * e.x;
 	// Check if lines are parallel, or if either pair of points are equal
-	if (fabsf(m) < 1e-6)
+	if (std::abs(m) < 1e-6)
 		return NAN;
 	return -(d.x * b.y - d.y * b.x) / m;
 }

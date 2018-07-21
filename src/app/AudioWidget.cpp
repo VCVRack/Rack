@@ -60,7 +60,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 			menu->addChild(item);
 		}
 		for (int device = 0; device < deviceCount; device++) {
-			int channels = min(maxTotalChannels, audioWidget->audioIO->getDeviceChannels(device));
+			int channels = std::min(maxTotalChannels, audioWidget->audioIO->getDeviceChannels(device));
 			for (int offset = 0; offset < channels; offset += audioWidget->audioIO->maxChannels) {
 				AudioDeviceItem *item = new AudioDeviceItem();
 				item->audioIO = audioWidget->audioIO;

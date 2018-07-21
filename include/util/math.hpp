@@ -1,15 +1,8 @@
 #pragma once
 #include "util/common.hpp"
-#include <math.h> // for global namespace functions
-#include <cmath> // for std::isfinite, etc
-#include <cstdlib> // for std::abs, etc
-
-
-// Use a few standard math functions without std::
-using std::isfinite;
-using std::isinf;
-using std::isnan;
-using std::isnormal;
+#include <cmath>
+#include <cstdlib>
+#include <algorithm> // for std::min, max
 
 
 namespace rack {
@@ -19,42 +12,32 @@ namespace rack {
 ////////////////////
 
 /** Returns true if x is odd */
-inline bool isOdd(int x) {
-	return x % 2 != 0;
-}
-
-/** Returns true if x is odd */
 inline bool isEven(int x) {
 	return x % 2 == 0;
 }
 
-/** Returns the minimum of `a` and `b` */
-inline int min(int a, int b) {
-	return (a < b) ? a : b;
-}
-
-/** Returns the maximum of `a` and `b` */
-inline int max(int a, int b) {
-	return (a > b) ? a : b;
+/** Returns true if x is odd */
+inline bool isOdd(int x) {
+	return x % 2 != 0;
 }
 
 /** Limits `x` between `a` and `b`
 Assumes a <= b
 */
 inline int clamp(int x, int a, int b) {
-	return min(max(x, a), b);
+	return std::min(std::max(x, a), b);
 }
 
 /** Limits `x` between `a` and `b`
 If a > b, switches the two values
 */
-inline int clamp2(int x, int a, int b) {
-	return clamp(x, min(a, b), max(a, b));
+inline int clampBetween(int x, int a, int b) {
+	return clamp(x, std::min(a, b), std::max(a, b));
 }
 
 /** Euclidean modulus, always returns 0 <= mod < base for positive base.
 */
-inline int eucmod(int a, int base) {
+inline int eucMod(int a, int base) {
 	int mod = a % base;
 	return (mod >= 0) ? mod : mod + base;
 }
@@ -69,7 +52,7 @@ inline int log2(int n) {
 	return i;
 }
 
-inline bool ispow2(int n) {
+inline bool isPow2(int n) {
 	return n > 0 && (n & (n - 1)) == 0;
 }
 
@@ -77,47 +60,37 @@ inline bool ispow2(int n) {
 // basic float functions
 ////////////////////
 
-/** Returns the minimum of `a` and `b` */
-inline float min(float a, float b) {
-	return (a < b) ? a : b;
-}
-
-/** Returns the maximum of `a` and `b` */
-inline float max(float a, float b) {
-	return (a > b) ? a : b;
-}
-
 /** Limits `x` between `a` and `b`
 Assumes a <= b
 */
 inline float clamp(float x, float a, float b) {
-	return min(max(x, a), b);
+	return std::min(std::max(x, a), b);
 }
 
 /** Limits `x` between `a` and `b`
 If a > b, switches the two values
 */
-inline float clamp2(float x, float a, float b) {
-	return clamp(x, min(a, b), max(a, b));
+inline float clampBetween(float x, float a, float b) {
+	return clamp(x, std::min(a, b), std::max(a, b));
 }
 
-/** Returns 1.f for positive numbers and -1.f for negative numbers (including positive/negative zero) */
+/** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero */
 inline float sgn(float x) {
-	return copysignf(1.0f, x);
+	return x > 0.f ? 1.f : x < 0.f ? -1.f : 0.f;
 }
 
-inline float eucmod(float a, float base) {
-	float mod = fmodf(a, base);
+inline float eucMod(float a, float base) {
+	float mod = std::fmod(a, base);
 	return (mod >= 0.0f) ? mod : mod + base;
 }
 
 inline bool isNear(float a, float b, float epsilon = 1.0e-6f) {
-	return fabsf(a - b) <= epsilon;
+	return std::abs(a - b) <= epsilon;
 }
 
-/** If the magnitude of x if less than eps, return 0 */
-inline float chop(float x, float eps) {
-	return (-eps < x && x < eps) ? 0.0f : x;
+/** If the magnitude of x if less than epsilon, return 0 */
+inline float chop(float x, float epsilon = 1.0e-6f) {
+	return isNear(x, 0.f, epsilon) ? 0.f : x;
 }
 
 inline float rescale(float x, float a, float b, float yMin, float yMax) {
@@ -184,25 +157,25 @@ struct Vec {
 		return x * b.x + y * b.y;
 	}
 	float norm() {
-		return hypotf(x, y);
+		return std::hypotf(x, y);
 	}
 	Vec flip() {
 		return Vec(y, x);
 	}
 	Vec min(Vec b) {
-		return Vec(rack::min(x, b.x), rack::min(y, b.y));
+		return Vec(std::min(x, b.x), std::min(y, b.y));
 	}
 	Vec max(Vec b) {
-		return Vec(rack::max(x, b.x), rack::max(y, b.y));
+		return Vec(std::max(x, b.x), std::max(y, b.y));
 	}
 	Vec round() {
-		return Vec(roundf(x), roundf(y));
+		return Vec(std::round(x), std::round(y));
 	}
 	Vec floor() {
-		return Vec(floorf(x), floorf(y));
+		return Vec(std::floor(x), std::floor(y));
 	}
 	Vec ceil() {
-		return Vec(ceilf(x), ceilf(y));
+		return Vec(std::ceil(x), std::ceil(y));
 	}
 	bool isEqual(Vec b) {
 		return x == b.x && y == b.y;
@@ -211,10 +184,11 @@ struct Vec {
 		return x == 0.0f && y == 0.0f;
 	}
 	bool isFinite() {
-		return isfinite(x) && isfinite(y);
+		return std::isfinite(x) && std::isfinite(y);
 	}
 	Vec clamp(Rect bound);
-	Vec clamp2(Rect bound);
+	Vec clampBetween(Rect bound);
+	DEPRECATED Vec clamp2(Rect bound);
 };
 
 
@@ -262,8 +236,8 @@ struct Rect {
 	/** Clamps the edges of the rectangle to fit within a bound */
 	Rect clamp(Rect bound) {
 		Rect r;
-		r.pos.x = clamp2(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
-		r.pos.y = clamp2(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
+		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
+		r.pos.y = clampBetween(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
 		r.size.x = rack::clamp(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
 		r.size.y = rack::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
 		return r;
@@ -272,17 +246,17 @@ struct Rect {
 	Rect nudge(Rect bound) {
 		Rect r;
 		r.size = size;
-		r.pos.x = clamp2(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
-		r.pos.y = clamp2(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
+		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
+		r.pos.y = clampBetween(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
 	/** Expands this Rect to contain `other` */
 	Rect expand(Rect other) {
 		Rect r;
-		r.pos.x = min(pos.x, other.pos.x);
-		r.pos.y = min(pos.y, other.pos.y);
-		r.size.x = max(pos.x + size.x, other.pos.x + other.size.x) - r.pos.x;
-		r.size.y = max(pos.y + size.y, other.pos.y + other.size.y) - r.pos.y;
+		r.pos.x = std::min(pos.x, other.pos.x);
+		r.pos.y = std::min(pos.y, other.pos.y);
+		r.size.x = std::max(pos.x + size.x, other.pos.x + other.size.x) - r.pos.x;
+		r.size.y = std::max(pos.y + size.y, other.pos.y + other.size.y) - r.pos.y;
 		return r;
 	}
 	/** Returns a Rect with its position set to zero */
@@ -312,30 +286,42 @@ inline Vec Vec::clamp(Rect bound) {
 		rack::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
-inline Vec Vec::clamp2(Rect bound) {
+inline Vec Vec::clampBetween(Rect bound) {
 	return Vec(
-		rack::clamp2(x, bound.pos.x, bound.pos.x + bound.size.x),
-		rack::clamp2(y, bound.pos.y, bound.pos.y + bound.size.y));
+		rack::clampBetween(x, bound.pos.x, bound.pos.x + bound.size.x),
+		rack::clampBetween(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
+
+inline Vec Vec::clamp2(Rect bound) {return clampBetween(bound);}
 
 
 ////////////////////
 // Deprecated functions
 ////////////////////
 
-DEPRECATED inline int mini(int a, int b) {return min(a, b);}
-DEPRECATED inline int maxi(int a, int b) {return max(a, b);}
+DEPRECATED inline int min(int a, int b) {return std::min(a, b);}
+DEPRECATED inline int max(int a, int b) {return std::max(a, b);}
+DEPRECATED inline int eucmod(int a, int base) {return eucMod(a, base);}
+DEPRECATED inline bool ispow2(int n) {return isPow2(n);}
+DEPRECATED inline int clamp2(int x, int a, int b) {return clampBetween(x, a, b);}
+DEPRECATED inline float min(float a, float b) {return std::min(a, b);}
+DEPRECATED inline float max(float a, float b) {return std::max(a, b);}
+DEPRECATED inline float eucmod(float a, float base) {return eucMod(a, base);}
+DEPRECATED inline float clamp2(float x, float a, float b) {return clampBetween(x, a, b);}
+
+DEPRECATED inline int mini(int a, int b) {return std::min(a, b);}
+DEPRECATED inline int maxi(int a, int b) {return std::max(a, b);}
 DEPRECATED inline int clampi(int x, int min, int max) {return clamp(x, min, max);}
-DEPRECATED inline int absi(int a) {return abs(a);}
-DEPRECATED inline int eucmodi(int a, int base) {return eucmod(a, base);}
+DEPRECATED inline int absi(int a) {return std::abs(a);}
+DEPRECATED inline int eucmodi(int a, int base) {return eucMod(a, base);}
 DEPRECATED inline int log2i(int n) {return log2(n);}
-DEPRECATED inline bool ispow2i(int n) {return ispow2(n);}
-DEPRECATED inline float absf(float x) {return fabsf(x);}
+DEPRECATED inline bool ispow2i(int n) {return isPow2(n);}
+DEPRECATED inline float absf(float x) {return std::abs(x);}
 DEPRECATED inline float sgnf(float x) {return sgn(x);}
-DEPRECATED inline float eucmodf(float a, float base) {return eucmod(a, base);}
+DEPRECATED inline float eucmodf(float a, float base) {return eucMod(a, base);}
 DEPRECATED inline bool nearf(float a, float b, float epsilon = 1.0e-6f) {return isNear(a, b, epsilon);}
 DEPRECATED inline float clampf(float x, float min, float max) {return clamp(x, min, max);}
-DEPRECATED inline float clamp2f(float x, float min, float max) {return clamp2(x, min, max);}
+DEPRECATED inline float clamp2f(float x, float min, float max) {return clampBetween(x, min, max);}
 DEPRECATED inline float chopf(float x, float eps) {return chop(x, eps);}
 DEPRECATED inline float rescalef(float x, float a, float b, float yMin, float yMax) {return rescale(x, a, b, yMin, yMax);}
 DEPRECATED inline float crossf(float a, float b, float frac) {return crossfade(a, b, frac);}

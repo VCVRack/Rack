@@ -23,7 +23,7 @@ void Knob::onDragStart(EventDragStart &e) {
 
 void Knob::onDragMove(EventDragMove &e) {
 	float range;
-	if (isfinite(minValue) && isfinite(maxValue)) {
+	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
 		range = maxValue - minValue;
 	}
 	else {
@@ -36,9 +36,9 @@ void Knob::onDragMove(EventDragMove &e) {
 	if (windowIsModPressed())
 		delta /= 16.f;
 	dragValue += delta;
-	dragValue = clamp2(dragValue, minValue, maxValue);
+	dragValue = clampBetween(dragValue, minValue, maxValue);
 	if (snap)
-		setValue(roundf(dragValue));
+		setValue(std::round(dragValue));
 	else
 		setValue(dragValue);
 }

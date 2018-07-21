@@ -90,7 +90,7 @@ struct SampleRateConverter {
 		}
 		else {
 			// Simply copy the buffer without conversion
-			int frames = min(*inFrames, *outFrames);
+			int frames = std::min(*inFrames, *outFrames);
 			memcpy(out, in, frames * sizeof(Frame<CHANNELS>));
 			*inFrames = frames;
 			*outFrames = frames;

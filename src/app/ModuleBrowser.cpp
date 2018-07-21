@@ -425,8 +425,8 @@ struct ModuleBrowser : OpaqueWidget {
 		box.pos = parent->box.size.minus(box.size).div(2).round();
 		box.pos.y = 60;
 		box.size.y = parent->box.size.y - 2 * box.pos.y;
-		moduleScroll->box.size.y = min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
-		box.size.y = min(box.size.y, moduleScroll->box.getBottomRight().y);
+		moduleScroll->box.size.y = std::min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
+		box.size.y = std::min(box.size.y, moduleScroll->box.getBottomRight().y);
 
 		gFocusedWidget = searchField;
 		Widget::step();

@@ -11,7 +11,7 @@ inline float sinc(float x) {
 	if (x == 0.f)
 		return 1.f;
 	x *= M_PI;
-	return sinf(x) / x;
+	return std::sin(x) / x;
 }
 
 inline float quadraticBipolar(float x) {
@@ -34,21 +34,21 @@ inline float quintic(float x) {
 }
 
 inline float sqrtBipolar(float x) {
-	return (x >= 0.f) ? sqrtf(x) : -sqrtf(-x);
+	return (x >= 0.f) ? std::sqrt(x) : -std::sqrt(-x);
 }
 
 /** This is pretty much a scaled sinh */
 inline float exponentialBipolar(float b, float x) {
 	const float a = b - 1.f / b;
-	return (powf(b, x) - powf(b, -x)) / a;
+	return (std::pow(b, x) - std::pow(b, -x)) / a;
 }
 
 inline float gainToDb(float gain) {
-	return log10f(gain) * 20.f;
+	return std::log10(gain) * 20.f;
 }
 
 inline float dbToGain(float db) {
-	return powf(10.f, db / 20.f);
+	return std::pow(10.f, db / 20.f);
 }
 
 

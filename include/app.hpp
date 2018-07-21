@@ -273,12 +273,6 @@ struct Knob : ParamWidget {
 	void onDragEnd(EventDragEnd &e) override;
 };
 
-/** Deprecated */
-struct SpriteKnob : Knob, SpriteWidget {
-	int minIndex, maxIndex, spriteCount;
-	void step() override;
-};
-
 /** A knob which rotates an SVG and caches it in a framebuffer */
 struct SVGKnob : Knob, FramebufferWidget {
 	TransformWidget *tw;
