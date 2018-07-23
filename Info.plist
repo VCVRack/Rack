@@ -22,8 +22,8 @@
 	<string>icon</string>
 	<key>CFBundleShortVersionString</key>
 	<string>{VERSION}</string>
-	<key>CFBundleGetInfoString</key>
-	<string>{VERSION}, VCV</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © VCV</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHighResolutionCapable</key>
