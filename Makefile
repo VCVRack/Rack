@@ -8,6 +8,8 @@ FLAGS += \
 include arch.mk
 
 STRIP ?= strip
+SED := perl -p -i -e
+# SED := sed -i
 
 # Sources and build flags
 
@@ -100,6 +102,7 @@ ifdef ARCH_MAC
 	mkdir -p $(BUNDLE)/Contents
 	mkdir -p $(BUNDLE)/Contents/Resources
 	cp Info.plist $(BUNDLE)/Contents/
+	$(SED) 's/{VERSION}/$(VERSION)/g' $(BUNDLE)/Contents/Info.plist
 	cp -R LICENSE* icon.icns res $(BUNDLE)/Contents/Resources
 
 	mkdir -p $(BUNDLE)/Contents/MacOS
