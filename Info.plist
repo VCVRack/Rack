@@ -20,10 +20,10 @@
 	<string>Rack</string>
 	<key>CFBundleIconFile</key>
 	<string>icon</string>
-	<key>CFBundleLongVersionString</key>
-	<string></string>
 	<key>CFBundleShortVersionString</key>
-	<string></string>
+	<string>{VERSION}</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © VCV</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSHighResolutionCapable</key>
