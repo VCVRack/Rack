@@ -17,14 +17,14 @@ Tested in
   - Eureka (my own work-in-progress VST host)
   - Cockos Reaper
   - Propellerhead Reason 10
-  - according to users: works in Cubase
+  - Steinberg Cubase Pro 9.5.30
   - according to users: works in Bitwig
 
 
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-13Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-13Jul2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-26Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-26Jul2018.7z) (64bit)
 
 **WARNING: DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
 

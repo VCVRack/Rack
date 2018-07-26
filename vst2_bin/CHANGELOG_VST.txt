@@ -1,3 +1,7 @@
+** July 26th, 2018
+- fix effect processing in Cubase 9.5.30
+
+
 ** July 13th, 2018
 - add support for dynamically loaded plugins ("plugin.dll")
 - add module Template_shared.MyModule

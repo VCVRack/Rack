@@ -17,6 +17,7 @@
 ///
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
+///          26Jul2018
 ///
 ///
 ///
@@ -376,6 +377,7 @@ const VstInt32 PLUGIN_VERSION = 1000;
  * be accessed when the host calls the plugin back (for example in `processDoubleReplacing`).
  */
 class VSTPluginWrapper {
+public:
    static const uint32_t MIN_SAMPLE_RATE = 8192u;  // (note) cannot be float in C++
    static const uint32_t MAX_SAMPLE_RATE = 384000u;
    static const uint32_t MIN_BLOCK_SIZE  = 64u;
@@ -433,6 +435,8 @@ public:
       volatile uint8_t *addr;
       volatile bool b_ret;
    } queued_load_patch;
+
+   sF32 tmp_input_buffers[NUM_INPUTS * MAX_BLOCK_SIZE];
 
 public:
    VSTPluginWrapper(VSTHostCallback vstHostCallback,
@@ -994,10 +998,13 @@ void VSTPluginWrapper::stopUIThread(void) {
  * @param sampleFrames the number of samples (second dimension in both arrays)
  */
 void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
-                                      float    **inputs,
+                                      float    **_inputs,
                                       float    **outputs,
                                       VstInt32   sampleFrames
                                       ) {
+   if(sUI(sampleFrames) > VSTPluginWrapper::MAX_BLOCK_SIZE)
+      return;  // should not be reachable
+
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
    VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
    // printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: ENTER\n");
@@ -1016,16 +1023,23 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
    sUI chIdx;
    sUI i;
+
+   //  (note) Cubase (tested with 9.5.30) uses the same buffer(s) for both input&output
+   //           => back up the inputs before clearing the outputs
+   sF32 *inputs[NUM_INPUTS];
    sUI k = 0u;
+   for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
+   {
+      inputs[chIdx] = &wrapper->tmp_input_buffers[k];
+      ::memcpy((void*)inputs[chIdx], _inputs[chIdx], sizeof(sF32)*sampleFrames);
+      k += sampleFrames;
+   }
 
    // Clear output buffers
    //  (note) AudioInterface instances accumulate samples in the output buffer
-   for(i = 0u; i < uint32_t(sampleFrames); i++)
+   for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
    {
-      for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
-      {
-         outputs[chIdx][i] = 0.0f;
-      }
+      ::memset((void*)outputs[chIdx], 0, sizeof(sF32)*sampleFrames);
    }
 
    if(1 && wrapper->b_processing)
@@ -1640,32 +1654,23 @@ void vst2_maximize_reparented_window(void) {
 VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback) {
    printf("vstrack_plugin: called VSTPluginMain... \n");
 
-   // // if(0 == VSTPluginWrapper::instance_count)
-   {
-      // simply create our plugin C++ class
-      VSTPluginWrapper *plugin =
-         new VSTPluginWrapper(vstHostCallback,
-                              // registered with Steinberg (http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm)
+   // simply create our plugin C++ class
+   VSTPluginWrapper *plugin =
+      new VSTPluginWrapper(vstHostCallback,
+                           // registered with Steinberg (http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm)
 #ifdef VST2_EFFECT
-                              CCONST('g', 'v', 'g', 'y'),
+                           CCONST('g', 'v', 'g', 'y'),
 #else
-                              CCONST('v', '5', 'k', 'v'),
+                           CCONST('v', '5', 'k', 'v'),
 #endif
-                              PLUGIN_VERSION, // version
-                              VST2_MAX_UNIQUE_PARAM_IDS,    // num params
-                              0,    // no programs
-                              NUM_INPUTS,
-                              NUM_OUTPUTS
-                              );
+                           PLUGIN_VERSION, // version
+                           VST2_MAX_UNIQUE_PARAM_IDS,    // num params
+                           0,    // no programs
+                           NUM_INPUTS,
+                           NUM_OUTPUTS
+                           );
 
-      // return the plugin per the contract of the API
-      return plugin->getVSTPlugin();
-   }
-   // // else
-   // // {
-   // //    // Can only instantiate once
-   // //    //  (global/static vars in VCV rack)
-   // //    return NULL;
-   // // }
+   // return the plugin per the contract of the API
+   return plugin->getVSTPlugin();
 }
 #endif // USE_VST2
