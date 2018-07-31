@@ -100,6 +100,7 @@ int main(int argc, char* argv[]) {
 	else {
 		// Load patch
 		gRackWidget->load(patchFile);
+		gRackWidget->lastPath = patchFile;
 	}
 
 	engineStart();
