@@ -1,11 +1,14 @@
-#include "util/common.hpp"
-#include "util/request.hpp"
 #define CURL_STATICLIB
 #include <curl/curl.h>
 #include <openssl/sha.h>
 
+#include "util/common.hpp"
+#include "network.hpp"
+
 
 namespace rack {
+namespace network {
+
 
 static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	std::string *str = (std::string*) userdata;
@@ -15,7 +18,7 @@ static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *us
 }
 
 
-json_t *requestJson(RequestMethod method, std::string url, json_t *dataJ) {
+json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 	CURL *curl = curl_easy_init();
 	assert(curl);
 
@@ -149,7 +152,7 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 	return res == CURLE_OK;
 }
 
-std::string requestEscape(std::string s) {
+std::string encodeUrl(std::string s) {
 	CURL *curl = curl_easy_init();
 	assert(curl);
 	char *escaped = curl_easy_escape(curl, s.c_str(), s.size());
@@ -159,7 +162,7 @@ std::string requestEscape(std::string s) {
 	return ret;
 }
 
-std::string requestSHA256File(std::string filename) {
+std::string computeSHA256File(std::string filename) {
 	FILE *f = fopen(filename.c_str(), "rb");
 	if (!f)
 		return "";
@@ -191,4 +194,5 @@ std::string requestSHA256File(std::string filename) {
 }
 
 
+} // namespace network
 } // namespace rack

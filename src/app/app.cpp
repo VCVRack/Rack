@@ -1,5 +1,5 @@
 #include "app.hpp"
-#include "util/request.hpp"
+#include "network.hpp"
 #include <thread>
 
 
@@ -20,7 +20,7 @@ RackScene *gRackScene = NULL;
 
 
 static void checkVersion() {
-	json_t *resJ = requestJson(METHOD_GET, gApiHost + "/version", NULL);
+	json_t *resJ = network::requestJson(network::METHOD_GET, gApiHost + "/version", NULL);
 
 	if (resJ) {
 		json_t *versionJ = json_object_get(resJ, "version");

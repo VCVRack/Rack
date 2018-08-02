@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 #include "app.hpp"
 #include "asset.hpp"
-#include "util/request.hpp"
+#include "network.hpp"
 #include "osdialog.h"
 
 #include <stdio.h>
@@ -175,14 +175,14 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	if (dryRun) {
 		downloadUrl += "/available";
 	}
-	downloadUrl += "?token=" + requestEscape(gToken);
-	downloadUrl += "&slug=" + requestEscape(slug);
-	downloadUrl += "&version=" + requestEscape(latestVersion);
-	downloadUrl += "&arch=" + requestEscape(arch);
+	downloadUrl += "?token=" + network::encodeUrl(gToken);
+	downloadUrl += "&slug=" + network::encodeUrl(slug);
+	downloadUrl += "&version=" + network::encodeUrl(latestVersion);
+	downloadUrl += "&arch=" + network::encodeUrl(arch);
 
 	if (dryRun) {
 		// Check if available
-		json_t *availableResJ = requestJson(METHOD_GET, downloadUrl, NULL);
+		json_t *availableResJ = network::requestJson(network::METHOD_GET, downloadUrl, NULL);
 		if (!availableResJ) {
 			warn("Could not check whether download is available");
 			return false;
@@ -200,7 +200,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 
 		// Download zip
 		std::string pluginDest = asset::local("plugins/" + slug + ".zip");
-		if (!requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
+		if (!network::requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
 			warn("Plugin %s download was unsuccessful", slug.c_str());
 			return false;
 		}
@@ -385,7 +385,7 @@ bool pluginSync(bool dryRun) {
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
 	json_object_set(pluginsReqJ, "token", json_string(gToken.c_str()));
-	json_t *pluginsResJ = requestJson(METHOD_GET, gApiHost + "/plugins", pluginsReqJ);
+	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, gApiHost + "/plugins", pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		warn("Request for user's plugins failed");
@@ -402,7 +402,7 @@ bool pluginSync(bool dryRun) {
 	}
 
 	// Get community manifests
-	json_t *manifestsResJ = requestJson(METHOD_GET, gApiHost + "/community/manifests", NULL);
+	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, gApiHost + "/community/manifests", NULL);
 	if (!manifestsResJ) {
 		warn("Request for community manifests failed");
 		return false;
@@ -450,7 +450,7 @@ void pluginLogIn(std::string email, std::string password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	json_t *resJ = requestJson(METHOD_POST, gApiHost + "/token", reqJ);
+	json_t *resJ = network::requestJson(network::METHOD_POST, gApiHost + "/token", reqJ);
 	json_decref(reqJ);
 
 	if (resJ) {
