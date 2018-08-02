@@ -301,7 +301,7 @@ struct QuadMIDIToCVInterface : Module {
 
 struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 	QuadMIDIToCVInterfaceWidget(QuadMIDIToCVInterface *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetGlobal("res/Core/QuadMIDIToCVInterface.svg")));
+		setPanel(SVG::load(asset::global("res/Core/QuadMIDIToCVInterface.svg")));
 
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

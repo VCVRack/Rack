@@ -199,7 +199,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 		info("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
 
 		// Download zip
-		std::string pluginDest = assetLocal("plugins/" + slug + ".zip");
+		std::string pluginDest = asset::local("plugins/" + slug + ".zip");
 		if (!requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
 			warn("Plugin %s download was unsuccessful", slug.c_str());
 			return false;
@@ -331,14 +331,14 @@ void pluginInit(bool devMode) {
 	gPlugins.push_back(corePlugin);
 
 	// Get local plugins directory
-	std::string localPlugins = assetLocal("plugins");
+	std::string localPlugins = asset::local("plugins");
 	mkdir(localPlugins.c_str(), 0755);
 
 	if (!devMode) {
 		// Copy Fundamental package to plugins directory if folder does not exist
-		std::string fundamentalSrc = assetGlobal("Fundamental.zip");
-		std::string fundamentalDest = assetLocal("plugins/Fundamental.zip");
-		std::string fundamentalDir = assetLocal("plugins/Fundamental");
+		std::string fundamentalSrc = asset::global("Fundamental.zip");
+		std::string fundamentalDest = asset::local("plugins/Fundamental.zip");
+		std::string fundamentalDir = asset::local("plugins/Fundamental");
 		if (systemIsFile(fundamentalSrc) && !systemIsFile(fundamentalDest) && !systemIsDirectory(fundamentalDir)) {
 			systemCopy(fundamentalSrc, fundamentalDest);
 		}

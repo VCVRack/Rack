@@ -31,7 +31,7 @@ struct TooltipIconButton : IconButton {
 
 struct NewButton : TooltipIconButton {
 	NewButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_146097_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_146097_cc.svg")));
 		tooltipText = "New patch (" WINDOW_MOD_KEY_NAME "+N)";
 	}
 	void onAction(EventAction &e) override {
@@ -41,7 +41,7 @@ struct NewButton : TooltipIconButton {
 
 struct OpenButton : TooltipIconButton {
 	OpenButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_31859_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_31859_cc.svg")));
 		tooltipText = "Open patch (" WINDOW_MOD_KEY_NAME "+O)";
 	}
 	void onAction(EventAction &e) override {
@@ -51,7 +51,7 @@ struct OpenButton : TooltipIconButton {
 
 struct SaveButton : TooltipIconButton {
 	SaveButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_1343816_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_1343816_cc.svg")));
 		tooltipText = "Save patch (" WINDOW_MOD_KEY_NAME "+S)";
 	}
 	void onAction(EventAction &e) override {
@@ -61,7 +61,7 @@ struct SaveButton : TooltipIconButton {
 
 struct SaveAsButton : TooltipIconButton {
 	SaveAsButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_1343811_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_1343811_cc.svg")));
 		tooltipText = "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
 	void onAction(EventAction &e) override {
@@ -71,7 +71,7 @@ struct SaveAsButton : TooltipIconButton {
 
 struct RevertButton : TooltipIconButton {
 	RevertButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_1084369_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_1084369_cc.svg")));
 		tooltipText = "Revert patch";
 	}
 	void onAction(EventAction &e) override {
@@ -81,7 +81,7 @@ struct RevertButton : TooltipIconButton {
 
 struct DisconnectCablesButton : TooltipIconButton {
 	DisconnectCablesButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_1745061_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_1745061_cc.svg")));
 		tooltipText = "Disconnect cables";
 	}
 	void onAction(EventAction &e) override {
@@ -91,7 +91,7 @@ struct DisconnectCablesButton : TooltipIconButton {
 
 struct PowerMeterButton : TooltipIconButton {
 	PowerMeterButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_305536_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_305536_cc.svg")));
 		tooltipText = "Toggle power meter (see manual for explanation)";
 	}
 	void onAction(EventAction &e) override {
@@ -115,7 +115,7 @@ struct SampleRateItem : MenuItem {
 
 struct SampleRateButton : TooltipIconButton {
 	SampleRateButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_1240789_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_1240789_cc.svg")));
 		tooltipText = "Engine sample rate";
 	}
 	void onAction(EventAction &e) override {
@@ -142,7 +142,7 @@ struct SampleRateButton : TooltipIconButton {
 
 struct RackLockButton : TooltipIconButton {
 	RackLockButton() {
-		setSVG(SVG::load(assetGlobal("res/icons/noun_468341_cc.svg")));
+		setSVG(SVG::load(asset::global("res/icons/noun_468341_cc.svg")));
 		tooltipText = "Lock modules";
 	}
 	void onAction(EventAction &e) override {
@@ -204,7 +204,7 @@ Toolbar::Toolbar() {
 	layout->addChild(zoomSlider);
 
 	// Kind of hacky, but display the PluginManagerWidget only if the local directory is not the development directory
-	if (assetLocal("") != "./") {
+	if (asset::local("") != "./") {
 		Widget *pluginManager = new PluginManagerWidget();
 		layout->addChild(pluginManager);
 	}

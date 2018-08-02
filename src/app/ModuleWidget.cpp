@@ -226,7 +226,7 @@ void ModuleWidget::save(std::string filename) {
 }
 
 void ModuleWidget::loadDialog() {
-	std::string dir = assetLocal("presets");
+	std::string dir = asset::local("presets");
 	systemCreateDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
@@ -239,7 +239,7 @@ void ModuleWidget::loadDialog() {
 }
 
 void ModuleWidget::saveDialog() {
-	std::string dir = assetLocal("presets");
+	std::string dir = asset::local("presets");
 	systemCreateDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());

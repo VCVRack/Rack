@@ -21,16 +21,17 @@
 
 
 namespace rack {
+namespace asset {
 
 
-std::string assetGlobalDir;
-std::string assetLocalDir;
+std::string globalDir;
+std::string localDir;
 
 
-void assetInit(bool devMode) {
-	if (assetGlobalDir.empty()) {
+void init(bool devMode) {
+	if (globalDir.empty()) {
 		if (devMode) {
-			assetGlobalDir = ".";
+			globalDir = ".";
 		}
 		else {
 #if ARCH_MAC
@@ -41,25 +42,25 @@ void assetInit(bool devMode) {
 			Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
 			assert(success);
 			CFRelease(resourcesUrl);
-			assetGlobalDir = resourcesBuf;
+			globalDir = resourcesBuf;
 #endif
 #if ARCH_WIN
 			char moduleBuf[MAX_PATH];
 			DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
 			assert(length > 0);
 			PathRemoveFileSpec(moduleBuf);
-			assetGlobalDir = moduleBuf;
+			globalDir = moduleBuf;
 #endif
 #if ARCH_LIN
 			// TODO For now, users should launch Rack from their terminal in the global directory
-			assetGlobalDir = ".";
+			globalDir = ".";
 #endif
 		}
 	}
 
-	if (assetLocalDir.empty()) {
+	if (localDir.empty()) {
 		if (devMode) {
-			assetLocalDir = ".";
+			localDir = ".";
 		}
 		else {
 #if ARCH_WIN
@@ -67,15 +68,15 @@ void assetInit(bool devMode) {
 			char documentsBuf[MAX_PATH];
 			HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
 			assert(result == S_OK);
-			assetLocalDir = documentsBuf;
-			assetLocalDir += "/Rack";
+			localDir = documentsBuf;
+			localDir += "/Rack";
 #endif
 #if ARCH_MAC
 			// Get home directory
 			struct passwd *pw = getpwuid(getuid());
 			assert(pw);
-			assetLocalDir = pw->pw_dir;
-			assetLocalDir += "/Documents/Rack";
+			localDir = pw->pw_dir;
+			localDir += "/Documents/Rack";
 #endif
 #if ARCH_LIN
 			// Get home directory
@@ -85,31 +86,32 @@ void assetInit(bool devMode) {
 				assert(pw);
 				homeBuf = pw->pw_dir;
 			}
-			assetLocalDir = homeBuf;
-			assetLocalDir += "/.Rack";
+			localDir = homeBuf;
+			localDir += "/.Rack";
 #endif
 		}
 	}
 
-	systemCreateDirectory(assetGlobalDir);
-	systemCreateDirectory(assetLocalDir);
+	systemCreateDirectory(globalDir);
+	systemCreateDirectory(localDir);
 }
 
 
-std::string assetGlobal(std::string filename) {
-	return assetGlobalDir + "/" + filename;
+std::string global(std::string filename) {
+	return globalDir + "/" + filename;
 }
 
 
-std::string assetLocal(std::string filename) {
-	return assetLocalDir + "/" + filename;
+std::string local(std::string filename) {
+	return localDir + "/" + filename;
 }
 
 
-std::string assetPlugin(Plugin *plugin, std::string filename) {
+std::string plugin(Plugin *plugin, std::string filename) {
 	assert(plugin);
 	return plugin->path + "/" + filename;
 }
 
 
+} // namespace asset
 } // namespace rack

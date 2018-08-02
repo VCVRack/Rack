@@ -5,19 +5,21 @@
 
 
 namespace rack {
+namespace asset {
 
 
-void assetInit(bool devMode);
+void init(bool devMode);
 /** Returns the path of a global resource. Should only read files from this location. */
-std::string assetGlobal(std::string filename);
+std::string global(std::string filename);
 /** Returns the path of a local resource. Can read and write files to this location. */
-std::string assetLocal(std::string filename);
+std::string local(std::string filename);
 /** Returns the path of a resource in the plugin's folder. Should only read files from this location. */
-std::string assetPlugin(Plugin *plugin, std::string filename);
+std::string plugin(Plugin *plugin, std::string filename);
 
 
-extern std::string assetGlobalDir;
-extern std::string assetLocalDir;
+extern std::string globalDir;
+extern std::string localDir;
 
 
+} // namespace asset
 } // namespace rack

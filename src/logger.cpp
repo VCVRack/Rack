@@ -18,7 +18,7 @@ void init(bool devMode) {
 		outputFile = stderr;
 	}
 	else {
-		std::string logFilename = assetLocal("log.txt");
+		std::string logFilename = asset::local("log.txt");
 		outputFile = fopen(logFilename.c_str(), "w");
 	}
 }

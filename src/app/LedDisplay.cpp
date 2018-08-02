@@ -32,7 +32,7 @@ void LedDisplaySeparator::draw(NVGcontext *vg) {
 
 LedDisplayChoice::LedDisplayChoice() {
 	box.size = mm2px(math::Vec(0, 28.0 / 3));
-	font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
+	font = Font::load(asset::global("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = math::Vec(10, 18);
 }
@@ -63,7 +63,7 @@ void LedDisplayChoice::onMouseDown(EventMouseDown &e) {
 
 
 LedDisplayTextField::LedDisplayTextField() {
-	font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
+	font = Font::load(asset::global("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = math::Vec(5, 5);
 }
