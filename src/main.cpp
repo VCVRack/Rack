@@ -10,7 +10,7 @@
 #include "rtmidi.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 #include "osdialog.h"
 #include <unistd.h>
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 	// Initialize environment
 	randomInit();
 	assetInit(devMode);
-	loggerInit(devMode);
+	logger::init(devMode);
 
 	// Log environment
 	info("%s %s", gApplicationName.c_str(), gApplicationVersion.c_str());
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 	engineDestroy();
 	midiDestroy();
 	pluginDestroy();
-	loggerDestroy();
+	logger::destroy();
 
 	return 0;
 }

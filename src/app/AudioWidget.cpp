@@ -106,13 +106,13 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 			AudioSampleRateItem *item = new AudioSampleRateItem();
 			item->audioIO = audioWidget->audioIO;
 			item->sampleRate = sampleRate;
-			item->text = stringf("%d Hz", sampleRate);
+			item->text = string::stringf("%d Hz", sampleRate);
 			item->rightText = CHECKMARK(item->sampleRate == audioWidget->audioIO->sampleRate);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		text = stringf("%g kHz", audioWidget->audioIO->sampleRate / 1000.f);
+		text = string::stringf("%g kHz", audioWidget->audioIO->sampleRate / 1000.f);
 	}
 };
 
@@ -139,13 +139,13 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 			item->audioIO = audioWidget->audioIO;
 			item->blockSize = blockSize;
 			float latency = (float) blockSize / audioWidget->audioIO->sampleRate * 1000.0;
-			item->text = stringf("%d (%.1f ms)", blockSize, latency);
+			item->text = string::stringf("%d (%.1f ms)", blockSize, latency);
 			item->rightText = CHECKMARK(item->blockSize == audioWidget->audioIO->blockSize);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		text = stringf("%d", audioWidget->audioIO->blockSize);
+		text = string::stringf("%d", audioWidget->audioIO->blockSize);
 	}
 };
 

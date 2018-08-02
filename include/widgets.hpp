@@ -7,7 +7,7 @@
 
 #include "util/common.hpp"
 #include "events.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 
 namespace rack {

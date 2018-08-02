@@ -168,7 +168,7 @@ struct MidiTrigChoice : GridChoice {
 			};
 			int oct = note / 12 - 1;
 			int semi = note % 12;
-			text = stringf("%s%d", noteNames[semi], oct);
+			text = string::stringf("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
 
 			if (gFocusedWidget == this)

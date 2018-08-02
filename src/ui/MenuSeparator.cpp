@@ -1,6 +1,6 @@
 #include "ui.hpp"
 #include "window.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 
 namespace rack {

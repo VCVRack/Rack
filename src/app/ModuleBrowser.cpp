@@ -18,8 +18,8 @@ static ModelTag sTagFilter = NO_TAG;
 
 
 bool isMatch(std::string s, std::string search) {
-	s = stringLowercase(s);
-	search = stringLowercase(search);
+	s = string::lowercase(s);
+	search = string::lowercase(search);
 	return (s.find(search) != std::string::npos);
 }
 
@@ -279,7 +279,7 @@ struct ModuleBrowser : OpaqueWidget {
 	SearchModuleField *searchField;
 	ScrollWidget *moduleScroll;
 	BrowserList *moduleList;
-	std::set<std::string, StringCaseInsensitiveCompare> availableAuthors;
+	std::set<std::string, string::CaseInsensitiveCompare> availableAuthors;
 	std::set<ModelTag> availableTags;
 
 	ModuleBrowser() {

@@ -1,5 +1,5 @@
-#include "gamepad.hpp"
 #include <GLFW/glfw3.h>
+#include "gamepad.hpp"
 
 
 namespace rack {
@@ -22,7 +22,7 @@ void GamepadInputDevice::step() {
 	ccs.resize(numAxes);
 	for (int i = 0; i < numAxes; i++) {
 		// Allow CC value to go negative, but math::clamp at -127 instead of -128 for symmetry
-		int8_t cc = math::clamp((int) roundf(axes[i] * 127), -127, 127);
+		int8_t cc = math::clamp((int) std::round(axes[i] * 127), -127, 127);
 		if (cc != ccs[i]) {
 			ccs[i] = cc;
 
@@ -77,7 +77,7 @@ std::string GamepadDriver::getInputDeviceName(int deviceId) {
 	if (name) {
 		return name;
 	}
-	return stringf("Gamepad %d (unavailable)", deviceId + 1);
+	return string::stringf("Gamepad %d (unavailable)", deviceId + 1);
 }
 
 MidiInputDevice *GamepadDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {

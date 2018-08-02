@@ -75,7 +75,7 @@ void RackWidget::loadDialog() {
 		systemCreateDirectory(dir);
 	}
 	else {
-		dir = stringDirectory(lastPath);
+		dir = string::directory(lastPath);
 	}
 	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
@@ -104,8 +104,8 @@ void RackWidget::saveAsDialog() {
 		systemCreateDirectory(dir);
 	}
 	else {
-		dir = stringDirectory(lastPath);
-		filename = stringFilename(lastPath);
+		dir = string::directory(lastPath);
+		filename = string::filename(lastPath);
 	}
 	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
@@ -113,7 +113,7 @@ void RackWidget::saveAsDialog() {
 	if (path) {
 		std::string pathStr = path;
 		free(path);
-		std::string extension = stringExtension(pathStr);
+		std::string extension = string::extension(pathStr);
 		if (extension.empty()) {
 			pathStr += ".vcv";
 		}
@@ -155,7 +155,7 @@ void RackWidget::load(std::string filename) {
 		json_decref(rootJ);
 	}
 	else {
-		std::string message = stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = string::stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 
@@ -259,7 +259,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
 	// (We now use Module::params/inputs/outputs indices.)
 	int legacy = 0;
-	if (stringStartsWith(version, "0.3.") || stringStartsWith(version, "0.4.") || stringStartsWith(version, "0.5.") || version == "" || version == "dev") {
+	if (string::startsWith(version, "0.3.") || string::startsWith(version, "0.4.") || string::startsWith(version, "0.5.") || version == "" || version == "dev") {
 		legacy = 1;
 	}
 	if (legacy) {
@@ -300,7 +300,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			json_t *modelSlugJ = json_object_get(moduleJ, "model");
 			std::string pluginSlug = json_string_value(pluginSlugJ);
 			std::string modelSlug = json_string_value(modelSlugJ);
-			message += stringf("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
+			message += string::stringf("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 		}
 	}
 

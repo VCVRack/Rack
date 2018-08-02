@@ -1,5 +1,5 @@
 #include "app.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 
 namespace rack {

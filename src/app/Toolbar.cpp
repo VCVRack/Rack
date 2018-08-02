@@ -132,7 +132,7 @@ struct SampleRateButton : TooltipIconButton {
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (float sampleRate : sampleRates) {
 			SampleRateItem *item = new SampleRateItem();
-			item->text = stringf("%.0f Hz", sampleRate);
+			item->text = string::stringf("%.0f Hz", sampleRate);
 			item->rightText = CHECKMARK(engineGetSampleRate() == sampleRate);
 			item->sampleRate = sampleRate;
 			menu->addChild(item);

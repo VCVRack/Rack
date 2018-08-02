@@ -79,7 +79,7 @@ std::string MidiIO::getChannelName(int channel) {
 	if (channel == -1)
 		return "All channels";
 	else
-		return stringf("Channel %d", channel + 1);
+		return string::stringf("Channel %d", channel + 1);
 }
 
 json_t *MidiIO::toJson() {

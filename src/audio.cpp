@@ -18,8 +18,9 @@ std::vector<int> AudioIO::getDrivers() {
 	std::vector<RtAudio::Api> apis;
 	RtAudio::getCompiledApi(apis);
 	std::vector<int> drivers;
-	for (RtAudio::Api api : apis)
+	for (RtAudio::Api api : apis) {
 		drivers.push_back((int) api);
+	}
 	// Add fake Bridge driver
 	drivers.push_back(BRIDGE_DRIVER);
 	return drivers;
@@ -121,7 +122,7 @@ std::string AudioIO::getDeviceName(int device) {
 			return deviceInfo.name;
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		return stringf("%d", device + 1);
+		return string::stringf("%d", device + 1);
 	}
 	return "";
 }
@@ -133,19 +134,19 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
 		if (getDeviceInfo(device, &deviceInfo)) {
-			std::string deviceDetail = stringf("%s (", deviceInfo.name.c_str());
+			std::string deviceDetail = string::stringf("%s (", deviceInfo.name.c_str());
 			if (offset < (int) deviceInfo.inputChannels)
-				deviceDetail += stringf("%d-%d in", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.inputChannels));
+				deviceDetail += string::stringf("%d-%d in", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.inputChannels));
 			if (offset < (int) deviceInfo.inputChannels && offset < (int) deviceInfo.outputChannels)
 				deviceDetail += ", ";
 			if (offset < (int) deviceInfo.outputChannels)
-				deviceDetail += stringf("%d-%d out", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.outputChannels));
+				deviceDetail += string::stringf("%d-%d out", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.outputChannels));
 			deviceDetail += ")";
 			return deviceDetail;
 		}
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		return stringf("Port %d", device + 1);
+		return string::stringf("Port %d", device + 1);
 	}
 	return "";
 }

@@ -44,7 +44,7 @@ void RackScene::step() {
 
 	// Version popup message
 	if (!gLatestVersion.empty()) {
-		std::string versionMessage = stringf("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", gLatestVersion.c_str(), gApplicationVersion.c_str());
+		std::string versionMessage = string::stringf("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", gLatestVersion.c_str(), gApplicationVersion.c_str());
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
 			std::thread t(systemOpenBrowser, "https://vcvrack.com/");
 			t.detach();
@@ -116,7 +116,7 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 void RackScene::onPathDrop(EventPathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string &firstPath = e.paths.front();
-		if (stringExtension(firstPath) == "vcv") {
+		if (string::extension(firstPath) == "vcv") {
 			gRackWidget->load(firstPath);
 			e.consumed = true;
 		}

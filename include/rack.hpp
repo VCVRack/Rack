@@ -15,6 +15,8 @@ namespace rack {
 
 
 using namespace math;
+using namespace string;
+using namespace logger;
 
 
 } // namespace rack

@@ -1,7 +1,7 @@
 #pragma once
 
-
 #include "util/common.hpp"
+#include "string.hpp"
 #include "nanovg.h"
 
 
@@ -87,9 +87,9 @@ inline std::string toHexString(NVGcolor c) {
 	uint8_t b = std::round(c.b * 255);
 	uint8_t a = std::round(c.a * 255);
 	if (a == 255)
-		return stringf("#%02x%02x%02x", r, g, b);
+		return string::stringf("#%02x%02x%02x", r, g, b);
 	else
-		return stringf("#%02x%02x%02x%02x", r, g, b, a);
+		return string::stringf("#%02x%02x%02x%02x", r, g, b, a);
 }
 
 

@@ -3,7 +3,7 @@
 #include "asset.hpp"
 #include "gamepad.hpp"
 #include "keyboard.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 #include <map>
 #include <queue>
@@ -454,7 +454,7 @@ void windowRun() {
 		windowTitle += gApplicationVersion;
 		if (!gRackWidget->lastPath.empty()) {
 			windowTitle += " - ";
-			windowTitle += stringFilename(gRackWidget->lastPath);
+			windowTitle += string::filename(gRackWidget->lastPath);
 		}
 		if (windowTitle != lastWindowTitle) {
 			glfwSetWindowTitle(gWindow, windowTitle.c_str());

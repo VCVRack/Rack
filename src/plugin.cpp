@@ -216,7 +216,7 @@ static void loadPlugins(std::string path) {
 		if (!systemIsDirectory(pluginPath))
 			continue;
 		if (!loadPlugin(pluginPath)) {
-			message += stringf("Could not load plugin %s\n", pluginPath.c_str());
+			message += string::stringf("Could not load plugin %s\n", pluginPath.c_str());
 		}
 	}
 	if (!message.empty()) {
@@ -298,13 +298,13 @@ static void extractPackages(std::string path) {
 	std::string message;
 
 	for (std::string packagePath : systemListEntries(path)) {
-		if (stringExtension(packagePath) != "zip")
+		if (string::extension(packagePath) != "zip")
 			continue;
 		info("Extracting package %s", packagePath.c_str());
 		// Extract package
 		if (extractZip(packagePath.c_str(), path.c_str())) {
 			warn("Package %s failed to extract", packagePath.c_str());
-			message += stringf("Could not extract package %s\n", packagePath.c_str());
+			message += string::stringf("Could not extract package %s\n", packagePath.c_str());
 			continue;
 		}
 		// Remove package

@@ -384,7 +384,7 @@ std::vector<int> BridgeMidiDriver::getInputDeviceIds() {
 std::string BridgeMidiDriver::getInputDeviceName(int deviceId) {
 	if (deviceId < 0)
 		return "";
-	return stringf("Port %d", deviceId + 1);
+	return string::stringf("Port %d", deviceId + 1);
 }
 
 MidiInputDevice *BridgeMidiDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {

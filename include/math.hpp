@@ -1,8 +1,8 @@
 #pragma once
-#include "util/common.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <algorithm> // for std::min, max
+#include "macros.hpp"
 
 
 namespace rack {

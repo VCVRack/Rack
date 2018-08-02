@@ -203,7 +203,7 @@ void ModuleWidget::load(std::string filename) {
 		json_decref(moduleJ);
 	}
 	else {
-		std::string message = stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = string::stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 
@@ -248,7 +248,7 @@ void ModuleWidget::saveDialog() {
 	if (path) {
 		std::string pathStr = path;
 		free(path);
-		std::string extension = stringExtension(pathStr);
+		std::string extension = string::extension(pathStr);
 		if (extension.empty()) {
 			pathStr += ".vcvm";
 		}
@@ -304,7 +304,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.5));
 		nvgFill(vg);
 
-		std::string cpuText = stringf("%.0f mS", module->cpuTime * 1000.f);
+		std::string cpuText = string::stringf("%.0f mS", module->cpuTime * 1000.f);
 		nvgFontFaceId(vg, gGuiFont->handle);
 		nvgFontSize(vg, 12);
 		nvgFillColor(vg, nvgRGBf(1, 1, 1));
