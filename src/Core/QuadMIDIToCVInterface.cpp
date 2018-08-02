@@ -257,10 +257,6 @@ struct QuadMIDIToCVInterface : Module {
 	}
 
 	void processMessage(MidiMessage msg) {
-		// filter MIDI channel
-		if ((midiInput.channel > -1) && (midiInput.channel != msg.channel()))
-			return;
-
 		switch (msg.status()) {
 			// note off
 			case 0x8: {

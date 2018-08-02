@@ -15,6 +15,9 @@
 #include "osdialog.h"
 #include <unistd.h>
 
+#ifdef ARCH_WIN
+	#include <Windows.h>
+#endif
 
 using namespace rack;
 
@@ -43,6 +46,17 @@ int main(int argc, char* argv[]) {
 	if (optind < argc) {
 		patchFile = argv[optind];
 	}
+
+#ifdef ARCH_WIN
+	// Windows global mutex to prevent multiple instances
+	// Handle will be closed by Windows when the process ends
+	HANDLE instanceMutex = CreateMutex(NULL, true, gApplicationName.c_str());
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
+		exit(1);
+	}
+	(void) instanceMutex;
+#endif
 
 	// Initialize environment
 	randomInit();
@@ -86,6 +100,7 @@ int main(int argc, char* argv[]) {
 	else {
 		// Load patch
 		gRackWidget->load(patchFile);
+		gRackWidget->lastPath = patchFile;
 	}
 
 	engineStart();
