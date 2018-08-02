@@ -92,8 +92,8 @@ void init(bool devMode) {
 		}
 	}
 
-	systemCreateDirectory(globalDir);
-	systemCreateDirectory(localDir);
+	system::createDirectory(globalDir);
+	system::createDirectory(localDir);
 }
 
 

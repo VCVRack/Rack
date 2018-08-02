@@ -45,7 +45,7 @@ void RackScene::step() {
 	if (!gLatestVersion.empty()) {
 		std::string versionMessage = string::stringf("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", gLatestVersion.c_str(), gApplicationVersion.c_str());
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
-			std::thread t(systemOpenBrowser, "https://vcvrack.com/");
+			std::thread t(system::openBrowser, "https://vcvrack.com/");
 			t.detach();
 			windowClose();
 		}

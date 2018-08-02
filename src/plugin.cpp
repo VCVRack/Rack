@@ -69,7 +69,7 @@ static bool loadPlugin(std::string path) {
 #endif
 
 	// Check file existence
-	if (!systemIsFile(libraryFilename)) {
+	if (!system::isFile(libraryFilename)) {
 		warn("Plugin file %s does not exist", libraryFilename.c_str());
 		return false;
 	}
@@ -212,8 +212,8 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 
 static void loadPlugins(std::string path) {
 	std::string message;
-	for (std::string pluginPath : systemListEntries(path)) {
-		if (!systemIsDirectory(pluginPath))
+	for (std::string pluginPath : system::listEntries(path)) {
+		if (!system::isDirectory(pluginPath))
 			continue;
 		if (!loadPlugin(pluginPath)) {
 			message += string::stringf("Could not load plugin %s\n", pluginPath.c_str());
@@ -297,7 +297,7 @@ static int extractZip(const char *filename, const char *path) {
 static void extractPackages(std::string path) {
 	std::string message;
 
-	for (std::string packagePath : systemListEntries(path)) {
+	for (std::string packagePath : system::listEntries(path)) {
 		if (string::extension(packagePath) != "zip")
 			continue;
 		info("Extracting package %s", packagePath.c_str());
@@ -339,8 +339,8 @@ void pluginInit(bool devMode) {
 		std::string fundamentalSrc = asset::global("Fundamental.zip");
 		std::string fundamentalDest = asset::local("plugins/Fundamental.zip");
 		std::string fundamentalDir = asset::local("plugins/Fundamental");
-		if (systemIsFile(fundamentalSrc) && !systemIsFile(fundamentalDest) && !systemIsDirectory(fundamentalDir)) {
-			systemCopy(fundamentalSrc, fundamentalDest);
+		if (system::isFile(fundamentalSrc) && !system::isFile(fundamentalDest) && !system::isDirectory(fundamentalDir)) {
+			system::copyFile(fundamentalSrc, fundamentalDest);
 		}
 	}
 

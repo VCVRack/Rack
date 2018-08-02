@@ -227,7 +227,7 @@ void ModuleWidget::save(std::string filename) {
 
 void ModuleWidget::loadDialog() {
 	std::string dir = asset::local("presets");
-	systemCreateDirectory(dir);
+	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
@@ -240,7 +240,7 @@ void ModuleWidget::loadDialog() {
 
 void ModuleWidget::saveDialog() {
 	std::string dir = asset::local("presets");
-	systemCreateDirectory(dir);
+	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcvm", filters);

@@ -11,7 +11,7 @@ namespace rack {
 struct RegisterButton : Button {
 	void onAction(EventAction &e) override {
 		std::thread t([&]() {
-			systemOpenBrowser("https://vcvrack.com/");
+			system::openBrowser("https://vcvrack.com/");
 		});
 		t.detach();
 	}
@@ -39,7 +39,7 @@ struct StatusLabel : Label {
 struct ManageButton : Button {
 	void onAction(EventAction &e) override {
 		std::thread t([&]() {
-			systemOpenBrowser("https://vcvrack.com/plugins.html");
+			system::openBrowser("https://vcvrack.com/plugins.html");
 		});
 		t.detach();
 	}

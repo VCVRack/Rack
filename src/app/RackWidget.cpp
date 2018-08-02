@@ -72,7 +72,7 @@ void RackWidget::loadDialog() {
 	std::string dir;
 	if (lastPath.empty()) {
 		dir = asset::local("patches");
-		systemCreateDirectory(dir);
+		system::createDirectory(dir);
 	}
 	else {
 		dir = string::directory(lastPath);
@@ -101,7 +101,7 @@ void RackWidget::saveAsDialog() {
 	std::string filename;
 	if (lastPath.empty()) {
 		dir = asset::local("patches");
-		systemCreateDirectory(dir);
+		system::createDirectory(dir);
 	}
 	else {
 		dir = string::directory(lastPath);

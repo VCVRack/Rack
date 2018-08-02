@@ -1,5 +1,3 @@
-#include "util/common.hpp"
-
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -8,11 +6,15 @@
 	#include <shellapi.h>
 #endif
 
+#include "system.hpp"
+#include "util/common.hpp"
+
 
 namespace rack {
+namespace system {
 
 
-std::vector<std::string> systemListEntries(std::string path) {
+std::vector<std::string> listEntries(std::string path) {
 	std::vector<std::string> filenames;
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
@@ -28,34 +30,31 @@ std::vector<std::string> systemListEntries(std::string path) {
 	return filenames;
 }
 
-bool systemExists(std::string path) {
-	struct stat statbuf;
-	return (stat(path.c_str(), &statbuf) == 0);
-}
-
-bool systemIsFile(std::string path) {
+bool isFile(std::string path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISREG(statbuf.st_mode);
 }
 
-bool systemIsDirectory(std::string path) {
+bool isDirectory(std::string path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISDIR(statbuf.st_mode);
 }
 
-void systemCopy(std::string srcPath, std::string destPath) {
+void copyFile(std::string srcPath, std::string destPath) {
 	// Open files
 	FILE *source = fopen(srcPath.c_str(), "rb");
-	if (!source) return;
+	if (!source)
+		return;
 	defer({
 		fclose(source);
 	});
 	FILE *dest = fopen(destPath.c_str(), "wb");
-	if (!dest) return;
+	if (!dest)
+		return;
 	defer({
 		fclose(dest);
 	});
@@ -72,7 +71,7 @@ void systemCopy(std::string srcPath, std::string destPath) {
 	}
 }
 
-void systemCreateDirectory(std::string path) {
+void createDirectory(std::string path) {
 #if ARCH_WIN
 	CreateDirectory(path.c_str(), NULL);
 #else
@@ -80,14 +79,14 @@ void systemCreateDirectory(std::string path) {
 #endif
 }
 
-void systemOpenBrowser(std::string url) {
+void openBrowser(std::string url) {
 #if ARCH_LIN
 	std::string command = "xdg-open " + url;
-	(void) system(command.c_str());
+	(void) std::system(command.c_str());
 #endif
 #if ARCH_MAC
 	std::string command = "open " + url;
-	system(command.c_str());
+	std::system(command.c_str());
 #endif
 #if ARCH_WIN
 	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
@@ -95,4 +94,5 @@ void systemOpenBrowser(std::string url) {
 }
 
 
+} // namespace system
 } // namespace rack
