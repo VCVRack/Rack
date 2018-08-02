@@ -13,7 +13,7 @@ void Scene::setOverlay(Widget *w) {
 	if (w) {
 		addChild(w);
 		overlay = w;
-		overlay->box.pos = Vec();
+		overlay->box.pos = math::Vec();
 	}
 }
 
@@ -31,7 +31,7 @@ Menu *Scene::createMenu() {
 
 void Scene::step() {
 	if (overlay) {
-		overlay->box.pos = Vec(0, 0);
+		overlay->box.pos = math::Vec(0, 0);
 		overlay->box.size = box.size;
 	}
 

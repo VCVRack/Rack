@@ -57,7 +57,7 @@ struct ModuleResizeHandle : Widget {
 
 
 struct BlankWidget : ModuleWidget {
-	Panel *panel;
+	// Panel *panel;
 	Widget *topRightScrew;
 	Widget *bottomRightScrew;
 	Widget *rightHandle;
@@ -65,11 +65,11 @@ struct BlankWidget : ModuleWidget {
 	BlankWidget(Module *module) : ModuleWidget(module) {
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
-		{
-			panel = new LightPanel();
-			panel->box.size = box.size;
-			addChild(panel);
-		}
+		// {
+		// 	panel = new LightPanel();
+		// 	panel->box.size = box.size;
+		// 	addChild(panel);
+		// }
 
 		ModuleResizeHandle *leftHandle = new ModuleResizeHandle();
 		ModuleResizeHandle *rightHandle = new ModuleResizeHandle();
@@ -87,7 +87,7 @@ struct BlankWidget : ModuleWidget {
 	}
 
 	void step() override {
-		panel->box.size = box.size;
+		// panel->box.size = box.size;
 		topRightScrew->box.pos.x = box.size.x - 30;
 		bottomRightScrew->box.pos.x = box.size.x - 30;
 		if (box.size.x < RACK_GRID_WIDTH * 6) {

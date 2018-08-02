@@ -6,6 +6,7 @@
 
 
 namespace rack {
+namespace math {
 
 ////////////////////
 // basic integer functions
@@ -35,11 +36,21 @@ inline int clampBetween(int x, int a, int b) {
 	return clamp(x, std::min(a, b), std::max(a, b));
 }
 
-/** Euclidean modulus, always returns 0 <= mod < base for positive base.
+/** Euclidean modulus. Always returns 0 <= mod < b.
+b must be positive.
 */
-inline int eucMod(int a, int base) {
-	int mod = a % base;
-	return (mod >= 0) ? mod : mod + base;
+inline int eucMod(int a, int b) {
+	int mod = a % b;
+	return (mod >= 0) ? mod : mod + b;
+}
+
+/** Euclidean division.
+b must be positive.
+*/
+inline int eucDiv(int a, int b) {
+	int mod = a % b;
+	int div = a / b;
+	return (mod >= 0) ? div : div - 1;
 }
 
 /** Returns floor(log_2(n)), or 0 if n == 1.
@@ -224,11 +235,14 @@ struct Rect {
 	Vec getCenter() {
 		return pos.plus(size.mult(0.5f));
 	}
+	Vec getTopLeft() {
+		return pos;
+	}
 	Vec getTopRight() {
-		return pos.plus(Vec(size.x, 0.0f));
+		return pos.plus(Vec(size.x, 0.f));
 	}
 	Vec getBottomLeft() {
-		return pos.plus(Vec(0.0f, size.y));
+		return pos.plus(Vec(0.f, size.y));
 	}
 	Vec getBottomRight() {
 		return pos.plus(size);
@@ -238,8 +252,8 @@ struct Rect {
 		Rect r;
 		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
 		r.pos.y = clampBetween(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
-		r.size.x = rack::clamp(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
-		r.size.y = rack::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
+		r.size.x = rack::math::clamp(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
+		r.size.y = rack::math::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
 		return r;
 	}
 	/** Nudges the position to fix inside a bounding box */
@@ -261,9 +275,7 @@ struct Rect {
 	}
 	/** Returns a Rect with its position set to zero */
 	Rect zeroPos() {
-		Rect r;
-		r.size = size;
-		return r;
+		return Rect(Vec(), size);
 	}
 	Rect grow(Vec delta) {
 		Rect r;
@@ -282,14 +294,14 @@ struct Rect {
 
 inline Vec Vec::clamp(Rect bound) {
 	return Vec(
-		rack::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
-		rack::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
+		rack::math::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
+		rack::math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 inline Vec Vec::clampBetween(Rect bound) {
 	return Vec(
-		rack::clampBetween(x, bound.pos.x, bound.pos.x + bound.size.x),
-		rack::clampBetween(y, bound.pos.y, bound.pos.y + bound.size.y));
+		rack::math::clampBetween(x, bound.pos.x, bound.pos.x + bound.size.x),
+		rack::math::clampBetween(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 inline Vec Vec::clamp2(Rect bound) {return clampBetween(bound);}
@@ -329,4 +341,5 @@ DEPRECATED inline float interpf(const float *p, float x) {return interpolateLine
 DEPRECATED inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {return cmult(cr, ci, ar, ai, br, bi);}
 
 
+} // namespace math
 } // namespace rack

@@ -17,7 +17,7 @@ void LedDisplay::draw(NVGcontext *vg) {
 
 
 LedDisplaySeparator::LedDisplaySeparator() {
-	box.size = Vec();
+	box.size = math::Vec();
 }
 
 void LedDisplaySeparator::draw(NVGcontext *vg) {
@@ -31,10 +31,10 @@ void LedDisplaySeparator::draw(NVGcontext *vg) {
 
 
 LedDisplayChoice::LedDisplayChoice() {
-	box.size = mm2px(Vec(0, 28.0 / 3));
+	box.size = mm2px(math::Vec(0, 28.0 / 3));
 	font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
-	textOffset = Vec(10, 18);
+	textOffset = math::Vec(10, 18);
 }
 
 void LedDisplayChoice::draw(NVGcontext *vg) {
@@ -65,7 +65,7 @@ void LedDisplayChoice::onMouseDown(EventMouseDown &e) {
 LedDisplayTextField::LedDisplayTextField() {
 	font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
-	textOffset = Vec(5, 5);
+	textOffset = math::Vec(5, 5);
 }
 
 
@@ -96,7 +96,7 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 	nvgResetScissor(vg);
 }
 
-int LedDisplayTextField::getTextPosition(Vec mousePos) {
+int LedDisplayTextField::getTextPosition(math::Vec mousePos) {
 	bndSetFont(font->handle);
 	int textPos = bndIconLabelTextPosition(gVg, textOffset.x, textOffset.y,
 		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,

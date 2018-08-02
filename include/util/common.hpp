@@ -1,11 +1,12 @@
 #pragma once
 
-// Include most of the C standard library for convenience
+// Include most of the C++ standard library for convenience
 #include <cstdlib>
 #include <cstdio>
 #include <cstdint>
 #include <cstring>
 #include <cassert>
+#include <climits>
 
 #include <string>
 #include <vector>
@@ -82,7 +83,7 @@ to get its size in bytes.
 #endif
 
 
-#include "util/math.hpp"
+#include "math.hpp"
 
 
 namespace rack {

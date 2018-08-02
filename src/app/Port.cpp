@@ -9,10 +9,10 @@ namespace rack {
 
 struct PlugLight : MultiLightWidget {
 	PlugLight() {
-		addBaseColor(COLOR_GREEN);
-		addBaseColor(COLOR_RED);
-		box.size = Vec(8, 8);
-		bgColor = COLOR_BLACK_TRANSPARENT;
+		addBaseColor(color::GREEN);
+		addBaseColor(color::RED);
+		box.size = math::Vec(8, 8);
+		bgColor = color::BLACK_TRANSPARENT;
 	}
 };
 

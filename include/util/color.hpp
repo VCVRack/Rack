@@ -6,64 +6,92 @@
 
 
 namespace rack {
+namespace color {
 
 
-// TODO Make these non-inline in Rack v1
+static const NVGcolor BLACK_TRANSPARENT = nvgRGBA(0x00, 0x00, 0x00, 0x00);
+static const NVGcolor BLACK = nvgRGB(0x00, 0x00, 0x00);
+static const NVGcolor WHITE = nvgRGB(0xff, 0xff, 0xff);
+static const NVGcolor WHITE_TRANSPARENT = nvgRGB(0xff, 0xff, 0xff);
+static const NVGcolor RED = nvgRGB(0xff, 0x00, 0x00);
+static const NVGcolor GREEN = nvgRGB(0x00, 0xff, 0x00);
+static const NVGcolor BLUE = nvgRGB(0x00, 0x00, 0xff);
+static const NVGcolor YELLOW = nvgRGB(0xff, 0xff, 0x00);
+static const NVGcolor MAGENTA = nvgRGB(0xff, 0x00, 0xff);
+static const NVGcolor CYAN = nvgRGB(0x00, 0xff, 0xff);
 
 
-inline NVGcolor colorClip(NVGcolor a) {
+inline NVGcolor clip(NVGcolor a) {
 	for (int i = 0; i < 4; i++)
-		a.rgba[i] = clamp(a.rgba[i], 0.f, 1.f);
+		a.rgba[i] = math::clamp(a.rgba[i], 0.f, 1.f);
 	return a;
 }
 
-inline NVGcolor colorMinus(NVGcolor a, NVGcolor b) {
+inline NVGcolor minus(NVGcolor a, NVGcolor b) {
 	for (int i = 0; i < 3; i++)
 		a.rgba[i] -= b.rgba[i];
 	return a;
 }
 
-inline NVGcolor colorPlus(NVGcolor a, NVGcolor b) {
+inline NVGcolor plus(NVGcolor a, NVGcolor b) {
 	for (int i = 0; i < 3; i++)
 		a.rgba[i] += b.rgba[i];
 	return a;
 }
 
-inline NVGcolor colorMult(NVGcolor a, NVGcolor b) {
+inline NVGcolor mult(NVGcolor a, NVGcolor b) {
 	for (int i = 0; i < 3; i++)
 		a.rgba[i] *= b.rgba[i];
 	return a;
 }
 
-inline NVGcolor colorMult(NVGcolor a, float x) {
+inline NVGcolor mult(NVGcolor a, float x) {
 	for (int i = 0; i < 3; i++)
 		a.rgba[i] *= x;
 	return a;
 }
 
 /** Screen blending with alpha compositing */
-inline NVGcolor colorScreen(NVGcolor a, NVGcolor b) {
+inline NVGcolor screen(NVGcolor a, NVGcolor b) {
 	if (a.a == 0.0)
 		return b;
 	if (b.a == 0.0)
 		return a;
 
-	a = colorMult(a, a.a);
-	b = colorMult(b, b.a);
-	NVGcolor c = colorMinus(colorPlus(a, b), colorMult(a, b));
+	a = mult(a, a.a);
+	b = mult(b, b.a);
+	NVGcolor c = minus(plus(a, b), mult(a, b));
 	c.a = a.a + b.a - a.a * b.a;
-	c = colorMult(c, 1.f / c.a);
-	c = colorClip(c);
+	c = mult(c, 1.f / c.a);
+	c = clip(c);
 	return c;
 }
 
-inline NVGcolor colorAlpha(NVGcolor a, float alpha) {
+inline NVGcolor alpha(NVGcolor a, float alpha) {
 	a.a *= alpha;
 	return a;
 }
 
-NVGcolor colorFromHexString(std::string s);
-std::string colorToHexString(NVGcolor c);
+inline NVGcolor fromHexString(std::string s) {
+	uint8_t r = 0;
+	uint8_t g = 0;
+	uint8_t b = 0;
+	uint8_t a = 255;
+	sscanf(s.c_str(), "#%2hhx%2hhx%2hhx%2hhx", &r, &g, &b, &a);
+	return nvgRGBA(r, g, b, a);
+}
+
+inline std::string toHexString(NVGcolor c) {
+	uint8_t r = std::round(c.r * 255);
+	uint8_t g = std::round(c.g * 255);
+	uint8_t b = std::round(c.b * 255);
+	uint8_t a = std::round(c.a * 255);
+	if (a == 255)
+		return stringf("#%02x%02x%02x", r, g, b);
+	else
+		return stringf("#%02x%02x%02x%02x", r, g, b, a);
+}
 
 
+} // namespace color
 } // namespace rack

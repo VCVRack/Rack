@@ -42,7 +42,7 @@ float gPixelRatio = 1.0;
 float gWindowRatio = 1.0;
 bool gAllowCursorLock = true;
 int gGuiFrame;
-Vec gMousePos;
+math::Vec gMousePos;
 
 std::string lastWindowTitle;
 
@@ -152,15 +152,15 @@ void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int m
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
-	Vec mouseRel = mousePos.minus(gMousePos);
+	math::Vec mousePos = math::Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
+	math::Vec mouseRel = mousePos.minus(gMousePos);
 
 	int cursorMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
 	(void) cursorMode;
 
 #ifdef ARCH_MAC
 	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
-	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
+	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be math::clamped.
 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
 		glfwSetCursorPos(gWindow, gMousePos.x, gMousePos.y);
@@ -241,10 +241,10 @@ void cursorEnterCallback(GLFWwindow* window, int entered) {
 }
 
 void scrollCallback(GLFWwindow *window, double x, double y) {
-	Vec scrollRel = Vec(x, y);
+	math::Vec scrollRel = math::Vec(x, y);
 #if ARCH_LIN || ARCH_WIN
 	if (windowIsShiftPressed())
-		scrollRel = Vec(y, x);
+		scrollRel = math::Vec(y, x);
 #endif
 	// onScroll
 	EventScroll e;
@@ -478,7 +478,7 @@ void windowRun() {
 		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 		gWindowRatio = (float)width / windowWidth;
 
-		gScene->box.size = Vec(width, height).div(gPixelRatio);
+		gScene->box.size = math::Vec(width, height).div(gPixelRatio);
 
 		// Step scene
 		gScene->step();
@@ -533,25 +533,25 @@ bool windowIsShiftPressed() {
 	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
-Vec windowGetWindowSize() {
+math::Vec windowGetWindowSize() {
 	int width, height;
 	glfwGetWindowSize(gWindow, &width, &height);
-	return Vec(width, height);
+	return math::Vec(width, height);
 }
 
-void windowSetWindowSize(Vec size) {
+void windowSetWindowSize(math::Vec size) {
 	int width = size.x;
 	int height = size.y;
 	glfwSetWindowSize(gWindow, width, height);
 }
 
-Vec windowGetWindowPos() {
+math::Vec windowGetWindowPos() {
 	int x, y;
 	glfwGetWindowPos(gWindow, &x, &y);
-	return Vec(x, y);
+	return math::Vec(x, y);
 }
 
-void windowSetWindowPos(Vec pos) {
+void windowSetWindowPos(math::Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
 	glfwSetWindowPos(gWindow, x, y);
@@ -568,14 +568,14 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	w.outlineColor = bg;
 	w.itemColor = fg;
 	w.innerColor = bg;
-	w.innerSelectedColor = colorPlus(bg, nvgRGB(0x30, 0x30, 0x30));
+	w.innerSelectedColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
 	w.textColor = fg;
 	w.textSelectedColor = fg;
 	w.shadeTop = 0;
 	w.shadeDown = 0;
 
 	BNDtheme t;
-	t.backgroundColor = colorPlus(bg, nvgRGB(0x30, 0x30, 0x30));
+	t.backgroundColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
 	t.regularTheme = w;
 	t.toolTheme = w;
 	t.radioTheme = w;
@@ -590,18 +590,18 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 	t.menuItemTheme = w;
 
 	t.sliderTheme.itemColor = bg;
-	t.sliderTheme.innerColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
-	t.sliderTheme.innerSelectedColor = colorPlus(bg, nvgRGB(0x60, 0x60, 0x60));
+	t.sliderTheme.innerColor = color::plus(bg, nvgRGB(0x50, 0x50, 0x50));
+	t.sliderTheme.innerSelectedColor = color::plus(bg, nvgRGB(0x60, 0x60, 0x60));
 
 	t.textFieldTheme = t.sliderTheme;
-	t.textFieldTheme.textColor = colorMinus(bg, nvgRGB(0x20, 0x20, 0x20));
+	t.textFieldTheme.textColor = color::minus(bg, nvgRGB(0x20, 0x20, 0x20));
 	t.textFieldTheme.textSelectedColor = t.textFieldTheme.textColor;
 
-	t.scrollBarTheme.itemColor = colorPlus(bg, nvgRGB(0x50, 0x50, 0x50));
+	t.scrollBarTheme.itemColor = color::plus(bg, nvgRGB(0x50, 0x50, 0x50));
 	t.scrollBarTheme.innerColor = bg;
 
-	t.menuTheme.innerColor = colorMinus(bg, nvgRGB(0x10, 0x10, 0x10));
-	t.menuTheme.textColor = colorMinus(fg, nvgRGB(0x50, 0x50, 0x50));
+	t.menuTheme.innerColor = color::minus(bg, nvgRGB(0x10, 0x10, 0x10));
+	t.menuTheme.textColor = color::minus(fg, nvgRGB(0x50, 0x50, 0x50));
 	t.menuTheme.textSelectedColor = t.menuTheme.textColor;
 
 	bndSetTheme(t);

@@ -8,20 +8,20 @@ TransformWidget::TransformWidget() {
 	identity();
 }
 
-Rect TransformWidget::getChildrenBoundingBox() {
-	Rect bound = Widget::getChildrenBoundingBox();
-	Vec topLeft = bound.pos;
-	Vec bottomRight = bound.getBottomRight();
+math::Rect TransformWidget::getChildrenBoundingBox() {
+	math::Rect bound = Widget::getChildrenBoundingBox();
+	math::Vec topLeft = bound.pos;
+	math::Vec bottomRight = bound.getBottomRight();
 	nvgTransformPoint(&topLeft.x, &topLeft.y, transform, topLeft.x, topLeft.y);
 	nvgTransformPoint(&bottomRight.x, &bottomRight.y, transform, bottomRight.x, bottomRight.y);
-	return Rect(topLeft, bottomRight.minus(topLeft));
+	return math::Rect(topLeft, bottomRight.minus(topLeft));
 }
 
 void TransformWidget::identity() {
 	nvgTransformIdentity(transform);
 }
 
-void TransformWidget::translate(Vec delta) {
+void TransformWidget::translate(math::Vec delta) {
 	float t[6];
 	nvgTransformTranslate(t, delta.x, delta.y);
 	nvgTransformPremultiply(transform, t);
@@ -33,7 +33,7 @@ void TransformWidget::rotate(float angle) {
 	nvgTransformPremultiply(transform, t);
 }
 
-void TransformWidget::scale(Vec s) {
+void TransformWidget::scale(math::Vec s) {
 	float t[6];
 	nvgTransformScale(t, s.x, s.y);
 	nvgTransformPremultiply(transform, t);

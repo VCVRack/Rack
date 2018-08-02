@@ -1,27 +1,26 @@
 #pragma once
-#include "app.hpp"
-#include "asset.hpp"
+#include "rack.hpp"
 
 
 namespace rack {
 
 
 ////////////////////
-// Colors
+// Color scheme
 ////////////////////
 
-static const NVGcolor COLOR_BLACK_TRANSPARENT = nvgRGBA(0x00, 0x00, 0x00, 0x00);
-static const NVGcolor COLOR_BLACK = nvgRGB(0x00, 0x00, 0x00);
-static const NVGcolor COLOR_WHITE = nvgRGB(0xff, 0xff, 0xff);
-static const NVGcolor COLOR_RED = nvgRGB(0xed, 0x2c, 0x24);
-static const NVGcolor COLOR_ORANGE = nvgRGB(0xf2, 0xb1, 0x20);
-static const NVGcolor COLOR_YELLOW = nvgRGB(0xf9, 0xdf, 0x1c);
-static const NVGcolor COLOR_GREEN = nvgRGB(0x90, 0xc7, 0x3e);
-static const NVGcolor COLOR_CYAN = nvgRGB(0x22, 0xe6, 0xef);
-static const NVGcolor COLOR_BLUE = nvgRGB(0x29, 0xb2, 0xef);
-static const NVGcolor COLOR_PURPLE = nvgRGB(0xd5, 0x2b, 0xed);
-static const NVGcolor COLOR_LIGHT_PANEL = nvgRGB(0xe6, 0xe6, 0xe6);
-static const NVGcolor COLOR_DARK_PANEL = nvgRGB(0x17, 0x17, 0x17);
+static const NVGcolor SCHEME_BLACK_TRANSPARENT = nvgRGBA(0x00, 0x00, 0x00, 0x00);
+static const NVGcolor SCHEME_BLACK = nvgRGB(0x00, 0x00, 0x00);
+static const NVGcolor SCHEME_WHITE = nvgRGB(0xff, 0xff, 0xff);
+static const NVGcolor SCHEME_RED = nvgRGB(0xed, 0x2c, 0x24);
+static const NVGcolor SCHEME_ORANGE = nvgRGB(0xf2, 0xb1, 0x20);
+static const NVGcolor SCHEME_YELLOW = nvgRGB(0xf9, 0xdf, 0x1c);
+static const NVGcolor SCHEME_GREEN = nvgRGB(0x90, 0xc7, 0x3e);
+static const NVGcolor SCHEME_CYAN = nvgRGB(0x22, 0xe6, 0xef);
+static const NVGcolor SCHEME_BLUE = nvgRGB(0x29, 0xb2, 0xef);
+static const NVGcolor SCHEME_PURPLE = nvgRGB(0xd5, 0x2b, 0xed);
+static const NVGcolor SCHEME_LIGHT_PANEL = nvgRGB(0xe6, 0xe6, 0xe6);
+static const NVGcolor SCHEME_DARK_PANEL = nvgRGB(0x17, 0x17, 0x17);
 
 ////////////////////
 // Knobs
@@ -407,41 +406,41 @@ struct GrayModuleLightWidget : ModuleLightWidget {
 
 struct RedLight : GrayModuleLightWidget {
 	RedLight() {
-		addBaseColor(COLOR_RED);
+		addBaseColor(SCHEME_RED);
 	}
 };
 
 struct GreenLight : GrayModuleLightWidget {
 	GreenLight() {
-		addBaseColor(COLOR_GREEN);
+		addBaseColor(SCHEME_GREEN);
 	}
 };
 
 struct YellowLight : GrayModuleLightWidget {
 	YellowLight() {
-		addBaseColor(COLOR_YELLOW);
+		addBaseColor(SCHEME_YELLOW);
 	}
 };
 
 struct BlueLight : GrayModuleLightWidget {
 	BlueLight() {
-		addBaseColor(COLOR_BLUE);
+		addBaseColor(SCHEME_BLUE);
 	}
 };
 
 /** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
 struct GreenRedLight : GrayModuleLightWidget {
 	GreenRedLight() {
-		addBaseColor(COLOR_GREEN);
-		addBaseColor(COLOR_RED);
+		addBaseColor(SCHEME_GREEN);
+		addBaseColor(SCHEME_RED);
 	}
 };
 
 struct RedGreenBlueLight : GrayModuleLightWidget {
 	RedGreenBlueLight() {
-		addBaseColor(COLOR_RED);
-		addBaseColor(COLOR_GREEN);
-		addBaseColor(COLOR_BLUE);
+		addBaseColor(SCHEME_RED);
+		addBaseColor(SCHEME_GREEN);
+		addBaseColor(SCHEME_BLUE);
 	}
 };
 
@@ -490,7 +489,7 @@ struct TinyLight : BASE {
 template <typename BASE>
 struct LEDBezelLight : BASE {
 	LEDBezelLight() {
-		this->bgColor = COLOR_BLACK_TRANSPARENT;
+		this->bgColor = color::BLACK_TRANSPARENT;
 		this->box.size = mm2px(Vec(6.0, 6.0));
 	}
 };
@@ -501,7 +500,7 @@ Don't add this as a child of the PB61303 itself. Instead, just place it over it 
 template <typename BASE>
 struct PB61303Light : BASE {
 	PB61303Light() {
-		this->bgColor = COLOR_BLACK_TRANSPARENT;
+		this->bgColor = color::BLACK_TRANSPARENT;
 		this->box.size = mm2px(Vec(9.0, 9.0));
 	}
 };
@@ -608,18 +607,6 @@ struct ScrewBlack : SVGScrew {
 	ScrewBlack() {
 		sw->setSVG(SVG::load(assetGlobal("res/ComponentLibrary/ScrewBlack.svg")));
 		box.size = sw->box.size;
-	}
-};
-
-struct LightPanel : Panel {
-	LightPanel() {
-		backgroundColor = COLOR_LIGHT_PANEL;
-	}
-};
-
-struct DarkPanel : Panel {
-	DarkPanel() {
-		backgroundColor = COLOR_DARK_PANEL;
 	}
 };
 

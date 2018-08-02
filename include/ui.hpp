@@ -70,7 +70,7 @@ struct Menu : OpaqueWidget {
 	MenuEntry *activeEntry = NULL;
 
 	Menu() {
-		box.size = Vec(0, 0);
+		box.size = math::Vec(0, 0);
 	}
 	~Menu();
 	/** Deprecated. Just use addChild(child) instead */
@@ -85,11 +85,11 @@ struct Menu : OpaqueWidget {
 
 struct MenuEntry : OpaqueWidget {
 	MenuEntry() {
-		box.size = Vec(0, BND_WIDGET_HEIGHT);
+		box.size = math::Vec(0, BND_WIDGET_HEIGHT);
 	}
 	template <typename T = MenuEntry>
 	static T *create() {
-		T *o = Widget::create<T>(Vec());
+		T *o = Widget::create<T>(math::Vec());
 		return o;
 	}
 };
@@ -199,10 +199,10 @@ struct ScrollWidget : OpaqueWidget {
 	Widget *container;
 	ScrollBar *horizontalScrollBar;
 	ScrollBar *verticalScrollBar;
-	Vec offset;
+	math::Vec offset;
 
 	ScrollWidget();
-	void scrollTo(Rect r);
+	void scrollTo(math::Rect r);
 	void draw(NVGcontext *vg) override;
 	void step() override;
 	void onMouseMove(EventMouseMove &e) override;
@@ -234,7 +234,7 @@ struct TextField : OpaqueWidget {
 	void insertText(std::string text);
 	/** Replaces the entire text */
 	void setText(std::string text);
-	virtual int getTextPosition(Vec mousePos);
+	virtual int getTextPosition(math::Vec mousePos);
 	virtual void onTextChange() {}
 };
 

@@ -166,8 +166,8 @@ void TextField::onKey(EventKey &e) {
 		} break;
 	}
 
-	cursor = clamp(cursor, 0, (int) text.size());
-	selection = clamp(selection, 0, (int) text.size());
+	cursor = math::clamp(cursor, 0, (int) text.size());
+	selection = math::clamp(selection, 0, (int) text.size());
 	e.consumed = true;
 }
 
@@ -189,7 +189,7 @@ void TextField::setText(std::string text) {
 	onTextChange();
 }
 
-int TextField::getTextPosition(Vec mousePos) {
+int TextField::getTextPosition(math::Vec mousePos) {
 	return bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
 }
 

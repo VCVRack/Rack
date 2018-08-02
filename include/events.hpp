@@ -1,7 +1,7 @@
 #pragma once
 #include <list>
 
-#include "util/math.hpp"
+#include "math.hpp"
 
 
 namespace rack {
@@ -16,7 +16,7 @@ struct Event {
 };
 
 struct EventPosition : Event {
-	Vec pos;
+	math::Vec pos;
 };
 
 ///////////
@@ -34,7 +34,7 @@ struct EventMouseUp : EventPosition {
 };
 
 struct EventMouseMove : EventPosition {
-	Vec mouseRel;
+	math::Vec mouseRel;
 	Widget *target = NULL;
 };
 
@@ -64,7 +64,7 @@ struct EventKey : Event {
 };
 
 struct EventScroll : EventPosition {
-	Vec scrollRel;
+	math::Vec scrollRel;
 };
 
 /////////////
@@ -76,7 +76,7 @@ struct EventDragEnd : Event {
 };
 
 struct EventDragMove : Event {
-	Vec mouseRel;
+	math::Vec mouseRel;
 };
 
 struct EventDragEnter : Event {

@@ -18,7 +18,7 @@ struct PanelBorder : TransparentWidget {
 
 
 void SVGPanel::step() {
-	if (isNear(gPixelRatio, 1.0)) {
+	if (math::isNear(gPixelRatio, 1.0)) {
 		// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 		oversample = 2.0;
 	}

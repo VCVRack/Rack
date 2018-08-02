@@ -56,7 +56,7 @@ struct SeparatorItem : OpaqueWidget {
 
 	void setText(std::string text) {
 		clearChildren();
-		Label *label = Widget::create<Label>(Vec(0, 12 + itemMargin));
+		Label *label = Widget::create<Label>(math::Vec(0, 12 + itemMargin));
 		label->text = text;
 		label->fontSize = 20;
 		label->color.a *= 0.5;
@@ -107,7 +107,7 @@ struct ModelItem : BrowserListItem {
 		assert(model);
 		this->model = model;
 
-		FavoriteRadioButton *favoriteButton = Widget::create<FavoriteRadioButton>(Vec(8, itemMargin));
+		FavoriteRadioButton *favoriteButton = Widget::create<FavoriteRadioButton>(math::Vec(8, itemMargin));
 		favoriteButton->box.size.x = 20;
 		favoriteButton->label = "★";
 		addChild(favoriteButton);
@@ -122,7 +122,7 @@ struct ModelItem : BrowserListItem {
 		nameLabel->text = model->name;
 		addChild(nameLabel);
 
-		pluginLabel = Widget::create<Label>(Vec(0, itemMargin));
+		pluginLabel = Widget::create<Label>(math::Vec(0, itemMargin));
 		pluginLabel->alignment = Label::RIGHT_ALIGNMENT;
 		pluginLabel->text = model->plugin->slug + " " + model->plugin->version;
 		pluginLabel->color.a = 0.5;
@@ -153,7 +153,7 @@ struct AuthorItem : BrowserListItem {
 	void setAuthor(std::string author) {
 		clearChildren();
 		this->author = author;
-		Label *authorLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
+		Label *authorLabel = Widget::create<Label>(math::Vec(0, 0 + itemMargin));
 		if (author.empty())
 			authorLabel->text = "Show all modules";
 		else
@@ -171,7 +171,7 @@ struct TagItem : BrowserListItem {
 	void setTag(ModelTag tag) {
 		clearChildren();
 		this->tag = tag;
-		Label *tagLabel = Widget::create<Label>(Vec(0, 0 + itemMargin));
+		Label *tagLabel = Widget::create<Label>(math::Vec(0, 0 + itemMargin));
 		if (tag == NO_TAG)
 			tagLabel->text = "Show all tags";
 		else
@@ -185,7 +185,7 @@ struct TagItem : BrowserListItem {
 
 struct ClearFilterItem : BrowserListItem {
 	ClearFilterItem() {
-		Label *label = Widget::create<Label>(Vec(0, 0 + itemMargin));
+		Label *label = Widget::create<Label>(math::Vec(0, 0 + itemMargin));
 		label->text = "Back";
 		addChild(label);
 	}
@@ -213,7 +213,7 @@ struct BrowserList : List {
 
 	void incrementSelection(int delta) {
 		selected += delta;
-		selected = clamp(selected, 0, countItems() - 1);
+		selected = math::clamp(selected, 0, countItems() - 1);
 	}
 
 	int countItems() {
@@ -294,7 +294,7 @@ struct ModuleBrowser : OpaqueWidget {
 		addChild(searchField);
 
 		moduleList = new BrowserList();
-		moduleList->box.size = Vec(box.size.x, 0.0);
+		moduleList->box.size = math::Vec(box.size.x, 0.0);
 
 		// Module Scroll
 		moduleScroll = new ScrollWidget();

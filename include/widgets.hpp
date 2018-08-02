@@ -50,22 +50,22 @@ Never inherit from Widget directly. Instead, inherit from VirtualWidget declared
 */
 struct Widget {
 	/** Stores position and size */
-	Rect box = Rect(Vec(), Vec(INFINITY, INFINITY));
+	math::Rect box = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
 	Widget *parent = NULL;
 	std::list<Widget*> children;
 	bool visible = true;
 
 	virtual ~Widget();
 
-	virtual Rect getChildrenBoundingBox();
+	virtual math::Rect getChildrenBoundingBox();
 	/**  Returns `v` transformed into the coordinate system of `relative` */
-	virtual Vec getRelativeOffset(Vec v, Widget *relative);
+	virtual math::Vec getRelativeOffset(math::Vec v, Widget *relative);
 	/** Returns `v` transformed into world coordinates */
-	Vec getAbsoluteOffset(Vec v) {
+	math::Vec getAbsoluteOffset(math::Vec v) {
 		return getRelativeOffset(v, NULL);
 	}
-	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors */
-	virtual Rect getViewport(Rect r);
+	/** Returns a subset of the given math::Rect bounded by the box of this widget and all ancestors */
+	virtual math::Rect getViewport(math::Rect r);
 
 	template <class T>
 	T *getAncestorOfType() {
@@ -111,7 +111,7 @@ struct Widget {
 	/** Called when a mouse button is released over this widget */
 	virtual void onMouseUp(EventMouseUp &e);
 	/** Called when the mouse moves over this widget.
-	Called on every frame, even if `mouseRel = Vec(0, 0)`.
+	Called on every frame, even if `mouseRel = math::Vec(0, 0)`.
 	*/
 	virtual void onMouseMove(EventMouseMove &e);
 	/** Called when a key is pressed while hovering over this widget */
@@ -154,10 +154,10 @@ struct Widget {
 	/** Helper function for creating and initializing a Widget with certain arguments (in this case just the position).
 	In this project, you will find this idiom everywhere, as an easier alternative to constructor arguments, for building a Widget (or a subclass) with a one-liner.
 	Example:
-		addChild(Widget::create<SVGWidget>(Vec(10, 10)))
+		addChild(Widget::create<SVGWidget>(math::Vec(10, 10)))
 	*/
 	template <typename T = Widget>
-	static T *create(Vec pos = Vec()) {
+	static T *create(math::Vec pos = math::Vec()) {
 		T *o = new T();
 		o->box.pos = pos;
 		return o;
@@ -172,18 +172,18 @@ struct TransformWidget : VirtualWidget {
 	/** The transformation matrix */
 	float transform[6];
 	TransformWidget();
-	Rect getChildrenBoundingBox() override;
+	math::Rect getChildrenBoundingBox() override;
 	void identity();
-	void translate(Vec delta);
+	void translate(math::Vec delta);
 	void rotate(float angle);
-	void scale(Vec s);
+	void scale(math::Vec s);
 	void draw(NVGcontext *vg) override;
 };
 
 struct ZoomWidget : VirtualWidget {
 	float zoom = 1.0;
-	Vec getRelativeOffset(Vec v, Widget *relative) override;
-	Rect getViewport(Rect r) override;
+	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override;
+	math::Rect getViewport(math::Rect r) override;
 	void setZoom(float zoom);
 	void draw(NVGcontext *vg) override;
 	void onMouseDown(EventMouseDown &e) override;
@@ -230,14 +230,6 @@ struct OpaqueWidget : VirtualWidget {
 		Widget::onScroll(e);
 		e.consumed = true;
 	}
-};
-
-struct SpriteWidget : VirtualWidget {
-	Vec spriteOffset;
-	Vec spriteSize;
-	std::shared_ptr<Image> spriteImage;
-	int index = 0;
-	void draw(NVGcontext *vg) override;
 };
 
 struct SVGWidget : VirtualWidget {

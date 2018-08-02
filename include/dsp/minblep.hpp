@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/math.hpp"
+#include "math.hpp"
 
 
 namespace rack {
@@ -23,7 +23,7 @@ struct MinBLEP {
 		for (int j = 0; j < 2*ZERO_CROSSINGS; j++) {
 			float minblepIndex = ((float)j - p) * oversample;
 			int index = (pos + j) % (2*ZERO_CROSSINGS);
-			buf[index] += dx * (-1.0 + interpolateLinear(minblep, minblepIndex));
+			buf[index] += dx * (-1.0 + math::interpolateLinear(minblep, minblepIndex));
 		}
 	}
 	float shift() {

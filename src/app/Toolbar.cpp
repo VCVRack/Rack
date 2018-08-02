@@ -13,7 +13,7 @@ struct TooltipIconButton : IconButton {
 	void onMouseEnter(EventMouseEnter &e) override {
 		if (!tooltip) {
 			tooltip = new Tooltip();
-			tooltip->box.pos = getAbsoluteOffset(Vec(0, BND_WIDGET_HEIGHT));
+			tooltip->box.pos = getAbsoluteOffset(math::Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = tooltipText;
 			gScene->addChild(tooltip);
 		}
@@ -120,7 +120,7 @@ struct SampleRateButton : TooltipIconButton {
 	}
 	void onAction(EventAction &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		menu->addChild(MenuLabel::create("Engine sample rate"));
@@ -162,7 +162,7 @@ Toolbar::Toolbar() {
 	box.size.y = BND_WIDGET_HEIGHT + 2*5;
 
 	SequentialLayout *layout = new SequentialLayout();
-	layout->box.pos = Vec(5, 5);
+	layout->box.pos = math::Vec(5, 5);
 	layout->spacing = 5;
 	addChild(layout);
 

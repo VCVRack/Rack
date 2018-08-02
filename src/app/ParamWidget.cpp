@@ -31,7 +31,7 @@ void ParamWidget::reset() {
 void ParamWidget::randomize() {
 	// Infinite params should not be randomized
 	if (randomizable && std::isfinite(minValue) && std::isfinite(maxValue)) {
-		setValue(rescale(randomUniform(), 0.f, 1.f, minValue, maxValue));
+		setValue(math::rescale(randomUniform(), 0.f, 1.f, minValue, maxValue));
 	}
 }
 

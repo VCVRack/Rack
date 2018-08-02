@@ -151,9 +151,9 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 
 
 AudioWidget::AudioWidget() {
-	box.size = mm2px(Vec(44, 28));
+	box.size = mm2px(math::Vec(44, 28));
 
-	Vec pos = Vec();
+	math::Vec pos = math::Vec();
 
 	AudioDriverChoice *driverChoice = Widget::create<AudioDriverChoice>(pos);
 	driverChoice->audioWidget = this;

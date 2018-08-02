@@ -16,7 +16,7 @@ inline float in2px(float inches) {
 	return inches * SVG_DPI;
 }
 
-inline Vec in2px(Vec inches) {
+inline math::Vec in2px(math::Vec inches) {
 	return inches.mult(SVG_DPI);
 }
 
@@ -24,7 +24,7 @@ inline float mm2px(float millimeters) {
 	return millimeters * (SVG_DPI / MM_PER_IN);
 }
 
-inline Vec mm2px(Vec millimeters) {
+inline math::Vec mm2px(math::Vec millimeters) {
 	return millimeters.mult(SVG_DPI / MM_PER_IN);
 }
 
@@ -45,7 +45,7 @@ struct SVGPanel;
 // A 1HPx3U module should be 15x380 pixels. Thus the width of a module should be a factor of 15.
 static const float RACK_GRID_WIDTH = 15;
 static const float RACK_GRID_HEIGHT = 380;
-static const Vec RACK_GRID_SIZE = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+static const math::Vec RACK_GRID_SIZE = math::Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
 static const std::string PRESET_FILTERS = "VCV Rack module preset (.vcvm):vcvm";
 static const std::string PATCH_FILTERS = "VCV Rack patch (.vcv):vcv";
 
@@ -103,7 +103,7 @@ struct ModuleWidget : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 	void drawShadow(NVGcontext *vg);
 
-	Vec dragPos;
+	math::Vec dragPos;
 	void onMouseDown(EventMouseDown &e) override;
 	void onMouseMove(EventMouseMove &e) override;
 	void onHoverKey(EventHoverKey &e) override;
@@ -124,8 +124,8 @@ struct WireWidget : OpaqueWidget {
 	~WireWidget();
 	/** Synchronizes the plugged state of the widget to the owned wire */
 	void updateWire();
-	Vec getOutputPos();
-	Vec getInputPos();
+	math::Vec getOutputPos();
+	math::Vec getInputPos();
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 	void draw(NVGcontext *vg) override;
@@ -152,7 +152,7 @@ struct RackWidget : OpaqueWidget {
 	// Only put WireWidgets in here
 	WireContainer *wireContainer;
 	std::string lastPath;
-	Vec lastMousePos;
+	math::Vec lastMousePos;
 	bool lockModules = false;
 
 	RackWidget();
@@ -182,9 +182,9 @@ struct RackWidget : OpaqueWidget {
 	void deleteModule(ModuleWidget *m);
 	void cloneModule(ModuleWidget *m);
 	/** Sets a module's box if non-colliding. Returns true if set */
-	bool requestModuleBox(ModuleWidget *m, Rect box);
+	bool requestModuleBox(ModuleWidget *m, math::Rect box);
 	/** Moves a module to the closest non-colliding position */
-	bool requestModuleBoxNearest(ModuleWidget *m, Rect box);
+	bool requestModuleBoxNearest(ModuleWidget *m, math::Rect box);
 
 	void step() override;
 	void draw(NVGcontext *vg) override;
@@ -195,12 +195,6 @@ struct RackWidget : OpaqueWidget {
 };
 
 struct RackRail : TransparentWidget {
-	void draw(NVGcontext *vg) override;
-};
-
-struct Panel : TransparentWidget {
-	NVGcolor backgroundColor;
-	std::shared_ptr<Image> backgroundImage;
 	void draw(NVGcontext *vg) override;
 };
 
@@ -218,7 +212,7 @@ struct Component : OpaqueWidget {
 	Module *module = NULL;
 
 	template <typename T = Component>
-	static T *create(Vec pos, Module *module) {
+	static T *create(math::Vec pos, Module *module) {
 		T *o = new T();
 		o->box.pos = pos;
 		o->module = module;
@@ -251,7 +245,7 @@ struct ParamWidget : Component, QuantityWidget {
 	void onChange(EventChange &e) override;
 
 	template <typename T = ParamWidget>
-	static T *create(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+	static T *create(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 		T *o = Component::create<T>(pos, module);
 		o->paramId = paramId;
 		o->setLimits(minValue, maxValue);
@@ -294,7 +288,7 @@ struct SVGSlider : Knob, FramebufferWidget {
 	SVGWidget *background;
 	SVGWidget *handle;
 	/** Intermediate positions will be interpolated between these positions */
-	Vec minHandlePos, maxHandlePos;
+	math::Vec minHandlePos, maxHandlePos;
 
 	SVGSlider();
 	void setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG> handleSVG);
@@ -361,7 +355,7 @@ struct LedDisplaySeparator : TransparentWidget {
 struct LedDisplayChoice : TransparentWidget {
 	std::string text;
 	std::shared_ptr<Font> font;
-	Vec textOffset;
+	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayChoice();
 	void draw(NVGcontext *vg) override;
@@ -370,11 +364,11 @@ struct LedDisplayChoice : TransparentWidget {
 
 struct LedDisplayTextField : TextField {
 	std::shared_ptr<Font> font;
-	Vec textOffset;
+	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayTextField();
 	void draw(NVGcontext *vg) override;
-	int getTextPosition(Vec mousePos) override;
+	int getTextPosition(math::Vec mousePos) override;
 };
 
 
@@ -438,7 +432,7 @@ struct ModuleLightWidget : MultiLightWidget {
 	void step() override;
 
 	template <typename T = ModuleLightWidget>
-	static T *create(Vec pos, Module *module, int firstLightId) {
+	static T *create(math::Vec pos, Module *module, int firstLightId) {
 		T *o = Widget::create<T>(pos);
 		o->module = module;
 		o->firstLightId = firstLightId;
@@ -471,7 +465,7 @@ struct Port : Component {
 	void onDragLeave(EventDragEnter &e) override;
 
 	template <typename T = Port>
-	static T *create(Vec pos, PortType type, Module *module, int portId) {
+	static T *create(math::Vec pos, PortType type, Module *module, int portId) {
 		T *o = Component::create<T>(pos, module);
 		o->type = type;
 		o->portId = portId;

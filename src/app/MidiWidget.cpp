@@ -110,9 +110,9 @@ struct MidiChannelChoice : LedDisplayChoice {
 
 
 MidiWidget::MidiWidget() {
-	box.size = mm2px(Vec(44, 28));
+	box.size = mm2px(math::Vec(44, 28));
 
-	Vec pos = Vec();
+	math::Vec pos = math::Vec();
 
 	MidiDriverChoice *driverChoice = Widget::create<MidiDriverChoice>(pos);
 	driverChoice->midiWidget = this;

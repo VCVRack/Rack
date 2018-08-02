@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/math.hpp"
+#include "math.hpp"
 
 
 namespace rack {

@@ -16,7 +16,7 @@ void MenuSeparator::draw(NVGcontext *vg) {
 	nvgMoveTo(vg, margin, box.size.y / 2.0);
 	nvgLineTo(vg, box.size.x - margin, box.size.y / 2.0);
 	nvgStrokeWidth(vg, 1.0);
-	nvgStrokeColor(vg, colorAlpha(bndGetTheme()->menuTheme.textColor, 0.25));
+	nvgStrokeColor(vg, color::alpha(bndGetTheme()->menuTheme.textColor, 0.25));
 	nvgStroke(vg);
 }
 

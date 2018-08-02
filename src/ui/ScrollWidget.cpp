@@ -17,7 +17,7 @@ struct ScrollBar : OpaqueWidget {
 	float size = 0.0;
 
 	ScrollBar() {
-		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
+		box.size = math::Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 	}
 
 	void draw(NVGcontext *vg) override {
@@ -60,8 +60,8 @@ ScrollWidget::ScrollWidget() {
 	addChild(verticalScrollBar);
 }
 
-void ScrollWidget::scrollTo(Rect r) {
-	Rect bound = Rect::fromMinMax(r.getBottomRight().minus(box.size), r.pos);
+void ScrollWidget::scrollTo(math::Rect r) {
+	math::Rect bound = math::Rect::fromMinMax(r.getBottomRight().minus(box.size), r.pos);
 	offset = offset.clampBetween(bound);
 }
 
@@ -75,8 +75,8 @@ void ScrollWidget::step() {
 	Widget::step();
 
 	// Clamp scroll offset
-	Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
-	Rect containerBox = Rect(Vec(0, 0), containerCorner.minus(box.size));
+	math::Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
+	math::Rect containerBox = math::Rect(math::Vec(0, 0), containerCorner.minus(box.size));
 	offset = offset.clamp(containerBox);
 	// Lock offset to top/left if no scrollbar will display
 	if (containerBox.size.x < 0.0)
@@ -88,9 +88,9 @@ void ScrollWidget::step() {
 	container->box.pos = offset.neg().round();
 
 	// Update scrollbar offsets and sizes
-	Vec viewportSize = container->getChildrenBoundingBox().getBottomRight();
-	Vec scrollbarOffset = offset.div(viewportSize.minus(box.size));
-	Vec scrollbarSize = box.size.div(viewportSize);
+	math::Vec viewportSize = container->getChildrenBoundingBox().getBottomRight();
+	math::Vec scrollbarOffset = offset.div(viewportSize.minus(box.size));
+	math::Vec scrollbarSize = box.size.div(viewportSize);
 
 	horizontalScrollBar->visible = (0.0 < scrollbarSize.x && scrollbarSize.x < 1.0);
 	verticalScrollBar->visible = (0.0 < scrollbarSize.y && scrollbarSize.y < 1.0);
@@ -100,7 +100,7 @@ void ScrollWidget::step() {
 	verticalScrollBar->size = scrollbarSize.y;
 
 	// Resize scroll bars
-	Vec inner = Vec(box.size.x - verticalScrollBar->box.size.x, box.size.y - horizontalScrollBar->box.size.y);
+	math::Vec inner = math::Vec(box.size.x - verticalScrollBar->box.size.x, box.size.y - horizontalScrollBar->box.size.y);
 	horizontalScrollBar->box.pos.y = inner.y;
 	verticalScrollBar->box.pos.x = inner.x;
 	horizontalScrollBar->box.size.x = verticalScrollBar->visible ? inner.x : box.size.x;

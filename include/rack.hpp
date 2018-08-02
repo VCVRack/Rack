@@ -8,5 +8,13 @@
 #include "widgets.hpp"
 #include "app.hpp"
 #include "ui.hpp"
-#include "componentlibrary.hpp"
 #include "helpers.hpp"
+
+
+namespace rack {
+
+
+using namespace math;
+
+
+} // namespace rack
