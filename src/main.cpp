@@ -1,19 +1,11 @@
-#include "util/common.hpp"
-#include "engine.hpp"
-#include "window.hpp"
-#include "app.hpp"
-#include "plugin.hpp"
-#include "settings.hpp"
-#include "asset.hpp"
-#include "bridge.hpp"
-#include "midi.hpp"
+#include <unistd.h>
+#include "osdialog.h"
+#include "rack.hpp"
 #include "rtmidi.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
-#include "color.hpp"
-
-#include "osdialog.h"
-#include <unistd.h>
+#include "bridge.hpp"
+#include "settings.hpp"
 
 #ifdef ARCH_WIN
 	#include <Windows.h>
@@ -59,7 +51,7 @@ int main(int argc, char* argv[]) {
 #endif
 
 	// Initialize environment
-	randomInit();
+	random::init();
 	asset::init(devMode);
 	logger::init(devMode);
 

@@ -1,14 +1,14 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <math.h>
 #include <vector>
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include <condition_variable>
+#include <mutex>
+
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 
+#include "rack.hpp"
 #include "engine.hpp"
 
 

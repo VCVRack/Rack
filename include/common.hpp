@@ -1,5 +1,20 @@
 #pragma once
 
+// Include some of the C++ standard library for convenience
+#include <cstdlib>
+#include <cstdio>
+#include <cstdint>
+#include <cstdarg>
+#include <climits>
+#include <cmath>
+#include <cstring>
+#include <cassert>
+#include <string>
+
+
+/** Deprecation notice for GCC */
+#define DEPRECATED __attribute__ ((deprecated))
+
 
 /** Concatenates two literals or two macros
 Example:
@@ -10,6 +25,7 @@ expands to
 */
 #define CONCAT_LITERAL(x, y) x ## y
 #define CONCAT(x, y) CONCAT_LITERAL(x, y)
+
 
 /** Surrounds raw text with quotes
 Example:
@@ -22,8 +38,10 @@ and of course the C++ lexer/parser then concatenates the string literals.
 #define TOSTRING_LITERAL(x) #x
 #define TOSTRING(x) TOSTRING_LITERAL(x)
 
+
 /** Produces the length of a static array in number of elements */
 #define LENGTHOF(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 
 /** Reserve space for `count` enums starting with `name`.
 Example:
@@ -35,9 +53,6 @@ Example:
 	BAR + 0 to BAR + 13 is reserved. BAZ has a value of 14.
 */
 #define ENUMS(name, count) name, name ## _LAST = name + (count) - 1
-
-/** Deprecation notice for GCC */
-#define DEPRECATED __attribute__ ((deprecated))
 
 
 /** References binary files compiled into the program.
@@ -65,3 +80,46 @@ to get its size in bytes.
 	// The symbol "_binary_##sym##_size" doesn't seem to be valid after a plugin is dynamically loaded, so simply take the difference between the two addresses.
 	#define BINARY_SIZE(sym) ((size_t) (&_binary_##sym##_end - &_binary_##sym##_start))
 #endif
+
+
+/** C#-style property constructor
+Example:
+	Foo *foo = construct<Foo>(&Foo::greeting, "Hello world");
+*/
+template<typename T>
+T *construct() {
+	return new T();
+}
+
+template<typename T, typename F, typename V, typename... Args>
+T *construct(F f, V v, Args... args) {
+	T *o = construct<T>(args...);
+	o->*f = v;
+	return o;
+}
+
+/** Defers code until the scope is destructed
+From http://www.gingerbill.org/article/defer-in-cpp.html
+
+Example:
+	file = fopen(...);
+	DEFER({
+		fclose(file);
+	});
+*/
+template<typename F>
+struct DeferWrapper {
+	F f;
+	DeferWrapper(F f) : f(f) {}
+	~DeferWrapper() { f(); }
+};
+
+template<typename F>
+DeferWrapper<F> deferWrapper(F f) {
+	return DeferWrapper<F>(f);
+}
+
+#define DEFER(code) auto CONCAT(_defer_, __COUNTER__) = deferWrapper([&]() code)
+
+/** Deprecated lowercase macro */
+#define defer(...) DEFER(__VA_ARGS__)

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "util/common.hpp"
+#include "common.hpp"
 #include <jansson.h>
 
 

@@ -1,10 +1,17 @@
 #pragma once
 
 // Include headers that plugins will likely use, for convenience
-#include "util/common.hpp"
+#include "common.hpp"
+#include "math.hpp"
+#include "string.hpp"
+#include "logger.hpp"
+#include "system.hpp"
+#include "random.hpp"
+#include "network.hpp"
 #include "asset.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
+#include "window.hpp"
 #include "widgets.hpp"
 #include "app.hpp"
 #include "ui.hpp"
@@ -16,7 +23,6 @@ namespace rack {
 
 using namespace math;
 using namespace string;
-using namespace logger;
 
 
 } // namespace rack

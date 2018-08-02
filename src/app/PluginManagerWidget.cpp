@@ -1,4 +1,5 @@
 #include <thread>
+#include "system.hpp"
 #include "app.hpp"
 #include "plugin.hpp"
 #include "window.hpp"

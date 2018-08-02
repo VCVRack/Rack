@@ -1,6 +1,5 @@
 #pragma once
-
-#include "util/common.hpp"
+#include "common.hpp"
 #include "midi.hpp"
 
 

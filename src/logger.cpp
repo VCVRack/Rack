@@ -1,4 +1,3 @@
-#include <cstdarg>
 #include <chrono>
 #include "logger.hpp"
 #include "asset.hpp"

@@ -1,5 +1,5 @@
+#include "rack.hpp"
 #include "audio.hpp"
-#include "util/common.hpp"
 #include "bridge.hpp"
 
 

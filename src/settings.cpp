@@ -1,9 +1,6 @@
-#include "settings.hpp"
-#include "app.hpp"
-#include "window.hpp"
-#include "engine.hpp"
-#include "plugin.hpp"
 #include <jansson.h>
+#include "rack.hpp"
+#include "settings.hpp"
 
 
 namespace rack {

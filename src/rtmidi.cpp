@@ -1,5 +1,6 @@
-#include "rtmidi.hpp"
 #include <map>
+#include "rack.hpp"
+#include "rtmidi.hpp"
 
 
 namespace rack {

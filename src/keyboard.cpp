@@ -1,5 +1,5 @@
+#include "rack.hpp"
 #include "keyboard.hpp"
-#include <GLFW/glfw3.h>
 
 
 namespace rack {

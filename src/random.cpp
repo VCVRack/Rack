@@ -1,9 +1,11 @@
-#include "util/common.hpp"
 #include <time.h>
 #include <sys/time.h>
+#include "random.hpp"
+#include "math.hpp"
 
 
 namespace rack {
+namespace random {
 
 
 // xoroshiro128+
@@ -27,7 +29,7 @@ static uint64_t xoroshiro128plus_next(void) {
 	return result;
 }
 
-void randomInit() {
+void init() {
 	// Only allow the seed to be initialized once during the lifetime of the program.
 	assert(xoroshiro128plus_state[0] == 0 && xoroshiro128plus_state[1] == 0);
 	struct timeval tv;
@@ -40,33 +42,34 @@ void randomInit() {
 	}
 }
 
-uint32_t randomu32() {
+uint32_t u32() {
 	return xoroshiro128plus_next() >> 32;
 }
 
-uint64_t randomu64() {
+uint64_t u64() {
 	return xoroshiro128plus_next();
 }
 
-float randomUniform() {
+float uniform() {
 	// 24 bits of granularity is the best that can be done with floats while ensuring that the return value lies in [0.0, 1.0).
 	return (xoroshiro128plus_next() >> (64 - 24)) / powf(2, 24);
 }
 
-float randomNormal() {
+float normal() {
 	// Box-Muller transform
-	float radius = sqrtf(-2.f * logf(1.f - randomUniform()));
-	float theta = 2.f * M_PI * randomUniform();
+	float radius = sqrtf(-2.f * logf(1.f - uniform()));
+	float theta = 2.f * M_PI * uniform();
 	return radius * sinf(theta);
 
 	// // Central Limit Theorem
 	// const int n = 8;
 	// float sum = 0.0;
 	// for (int i = 0; i < n; i++) {
-	// 	sum += randomUniform();
+	// 	sum += uniform();
 	// }
 	// return (sum - n / 2.f) / sqrtf(n / 12.f);
 }
 
 
+} // namespace random
 } // namespace rack

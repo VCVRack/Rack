@@ -1,12 +1,8 @@
-#include "app.hpp"
-#include "engine.hpp"
-#include "plugin.hpp"
-#include "window.hpp"
-#include "settings.hpp"
-#include "asset.hpp"
 #include <map>
 #include <algorithm>
 #include "osdialog.h"
+#include "rack.hpp"
+#include "settings.hpp"
 
 
 namespace rack {

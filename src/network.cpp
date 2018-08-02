@@ -2,7 +2,6 @@
 #include <curl/curl.h>
 #include <openssl/sha.h>
 
-#include "util/common.hpp"
 #include "network.hpp"
 
 

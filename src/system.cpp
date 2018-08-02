@@ -7,7 +7,6 @@
 #endif
 
 #include "system.hpp"
-#include "util/common.hpp"
 
 
 namespace rack {

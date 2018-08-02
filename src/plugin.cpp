@@ -1,12 +1,3 @@
-#include "plugin.hpp"
-#include "app.hpp"
-#include "asset.hpp"
-#include "network.hpp"
-#include "osdialog.h"
-
-#include <stdio.h>
-#include <assert.h>
-#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -27,6 +18,9 @@
 	#include <dlfcn.h>
 #endif
 #include <dirent.h>
+
+#include "rack.hpp"
+#include "osdialog.h"
 
 
 namespace rack {

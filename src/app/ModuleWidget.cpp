@@ -1,9 +1,5 @@
-#include "app.hpp"
-#include "engine.hpp"
-#include "plugin.hpp"
-#include "window.hpp"
-#include "asset.hpp"
 #include "osdialog.h"
+#include "rack.hpp"
 
 
 namespace rack {

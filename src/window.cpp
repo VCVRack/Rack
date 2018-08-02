@@ -1,15 +1,19 @@
-#include "window.hpp"
-#include "app.hpp"
-#include "asset.hpp"
-#include "gamepad.hpp"
-#include "keyboard.hpp"
-#include "color.hpp"
-
 #include <map>
 #include <queue>
 #include <thread>
 
+#ifdef ARCH_MAC
+	// For CGAssociateMouseAndMouseCursorPosition
+	#include <ApplicationServices/ApplicationServices.h>
+#endif
+
+
 #include "osdialog.h"
+
+#include "rack.hpp"
+#include "window.hpp"
+#include "keyboard.hpp"
+#include "gamepad.hpp"
 
 #define NANOVG_GL2_IMPLEMENTATION 1
 // #define NANOVG_GL3_IMPLEMENTATION 1
@@ -24,11 +28,6 @@
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVG_ALL_COLOR_KEYWORDS
 #include "nanosvg.h"
-
-#ifdef ARCH_MAC
-	// For CGAssociateMouseAndMouseCursorPosition
-	#include <ApplicationServices/ApplicationServices.h>
-#endif
 
 
 namespace rack {

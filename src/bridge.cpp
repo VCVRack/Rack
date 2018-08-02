@@ -1,7 +1,3 @@
-#include "bridge.hpp"
-#include "util/common.hpp"
-#include "dsp/ringbuffer.hpp"
-
 #include <unistd.h>
 #if ARCH_WIN
 	#include <winsock2.h>
@@ -13,8 +9,11 @@
 	#include <fcntl.h>
 #endif
 
-
 #include <thread>
+
+#include "rack.hpp"
+#include "bridge.hpp"
+#include "dsp/ringbuffer.hpp"
 
 
 namespace rack {

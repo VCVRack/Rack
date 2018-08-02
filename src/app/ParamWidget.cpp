@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "engine.hpp"
+#include "random.hpp"
 
 
 namespace rack {
@@ -31,7 +32,7 @@ void ParamWidget::reset() {
 void ParamWidget::randomize() {
 	// Infinite params should not be randomized
 	if (randomizable && std::isfinite(minValue) && std::isfinite(maxValue)) {
-		setValue(math::rescale(randomUniform(), 0.f, 1.f, minValue, maxValue));
+		setValue(math::rescale(random::uniform(), 0.f, 1.f, minValue, maxValue));
 	}
 }
 

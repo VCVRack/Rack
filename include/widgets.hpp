@@ -5,7 +5,7 @@
 #include "nanovg.h"
 #include "nanosvg.h"
 
-#include "util/common.hpp"
+#include "common.hpp"
 #include "events.hpp"
 #include "color.hpp"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "util/common.hpp"
-#include <cstdarg>
+#include "common.hpp"
+#include <algorithm> // for transform
 #include <libgen.h> // for dirname and basename
 
 

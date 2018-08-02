@@ -1,7 +1,3 @@
-#include "asset.hpp"
-#include "util/common.hpp"
-#include "osdialog.h"
-
 #if ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
 	#include <pwd.h>
@@ -18,6 +14,9 @@
 	#include <sys/types.h>
 	#include <pwd.h>
 #endif
+
+#include "rack.hpp"
+#include "osdialog.h"
 
 
 namespace rack {

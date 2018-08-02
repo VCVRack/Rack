@@ -1,10 +1,9 @@
 #pragma once
-
-#include "util/common.hpp"
 #include <vector>
 #include <queue>
 #include <set>
 #include <jansson.h>
+#include "common.hpp"
 
 
 namespace rack {

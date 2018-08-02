@@ -1,3 +1,4 @@
+#include "rack.hpp"
 #include "midi.hpp"
 #include "rtmidi.hpp"
 #include "bridge.hpp"

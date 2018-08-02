@@ -1,8 +1,6 @@
-#include "app.hpp"
-#include "window.hpp"
-#include "osdialog.h"
-#include <string.h>
 #include <thread>
+#include "osdialog.h"
+#include "rack.hpp"
 
 
 namespace rack {
