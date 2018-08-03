@@ -3,13 +3,14 @@
 
 
 namespace rack {
+namespace keyboard {
 
 
-static const int KEYBOARD_DRIVER = -11;
-static KeyboardDriver *driver = NULL;
+static const int DRIVER = -11;
+static Driver *driver = NULL;
 
 
-void KeyboardInputDevice::onKeyPress(int key) {
+void InputDevice::onKeyPress(int key) {
 	int note = -1;
 	switch (key) {
 		case GLFW_KEY_Z: note = 0; break;
@@ -77,7 +78,7 @@ void KeyboardInputDevice::onKeyPress(int key) {
 	pressedNotes[key] = note;
 }
 
-void KeyboardInputDevice::onKeyRelease(int key) {
+void InputDevice::onKeyRelease(int key) {
 	auto it = pressedNotes.find(key);
 	if (it != pressedNotes.end()) {
 		int note = it->second;
@@ -92,17 +93,17 @@ void KeyboardInputDevice::onKeyRelease(int key) {
 }
 
 
-std::vector<int> KeyboardDriver::getInputDeviceIds() {
+std::vector<int> Driver::getInputDeviceIds() {
 	return {0};
 }
 
-std::string KeyboardDriver::getInputDeviceName(int deviceId) {
+std::string Driver::getInputDeviceName(int deviceId) {
 	if (deviceId == 0)
 		return "QWERTY keyboard (US)";
 	return "";
 }
 
-MidiInputDevice *KeyboardDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+MidiInputDevice *Driver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
 	if (deviceId != 0)
 		return NULL;
 
@@ -110,7 +111,7 @@ MidiInputDevice *KeyboardDriver::subscribeInputDevice(int deviceId, MidiInput *m
 	return &device;
 }
 
-void KeyboardDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+void Driver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
 	if (deviceId != 0)
 		return;
 
@@ -118,22 +119,23 @@ void KeyboardDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) 
 }
 
 
-void keyboardInit() {
-	driver = new KeyboardDriver();
-	midiDriverAdd(KEYBOARD_DRIVER, driver);
+void init() {
+	driver = new Driver();
+	midiDriverAdd(DRIVER, driver);
 }
 
-void keyboardPress(int key) {
+void press(int key) {
 	if (!driver)
 		return;
 	driver->device.onKeyPress(key);
 }
 
-void keyboardRelease(int key) {
+void release(int key) {
 	if (!driver)
 		return;
 	driver->device.onKeyRelease(key);
 }
 
 
+} // namespace keyboard
 } // namespace rack

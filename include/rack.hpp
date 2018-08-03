@@ -21,6 +21,7 @@
 namespace rack {
 
 
+// Adopt some sub-namespaces into the main namespace for convenience
 using namespace math;
 using namespace string;
 

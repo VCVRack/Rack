@@ -3,13 +3,14 @@
 
 
 namespace rack {
+namespace gamepad {
 
 
-static const int GAMEPAD_DRIVER = -10;
-static GamepadDriver *driver = NULL;
+static const int DRIVER = -10;
+static Driver *driver = NULL;
 
 
-void GamepadInputDevice::step() {
+void InputDevice::step() {
 	if (!glfwJoystickPresent(deviceId))
 		return;
 	// Get gamepad state
@@ -53,13 +54,13 @@ void GamepadInputDevice::step() {
 }
 
 
-GamepadDriver::GamepadDriver() {
+Driver::Driver() {
 	for (int i = 0; i < 16; i++) {
 		devices[i].deviceId = i;
 	}
 }
 
-std::vector<int> GamepadDriver::getInputDeviceIds() {
+std::vector<int> Driver::getInputDeviceIds() {
 	std::vector<int> deviceIds;
 	for (int i = 0; i < 16; i++) {
 		if (glfwJoystickPresent(i)) {
@@ -69,7 +70,7 @@ std::vector<int> GamepadDriver::getInputDeviceIds() {
 	return deviceIds;
 }
 
-std::string GamepadDriver::getInputDeviceName(int deviceId) {
+std::string Driver::getInputDeviceName(int deviceId) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return "";
 
@@ -77,10 +78,10 @@ std::string GamepadDriver::getInputDeviceName(int deviceId) {
 	if (name) {
 		return name;
 	}
-	return string::stringf("Gamepad %d (unavailable)", deviceId + 1);
+	return string::stringf(" %d (unavailable)", deviceId + 1);
 }
 
-MidiInputDevice *GamepadDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+MidiInputDevice *Driver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return NULL;
 
@@ -88,7 +89,7 @@ MidiInputDevice *GamepadDriver::subscribeInputDevice(int deviceId, MidiInput *mi
 	return &devices[deviceId];
 }
 
-void GamepadDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+void Driver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return;
 
@@ -96,12 +97,12 @@ void GamepadDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
 }
 
 
-void gamepadInit() {
-	driver = new GamepadDriver();
-	midiDriverAdd(GAMEPAD_DRIVER, driver);
+void init() {
+	driver = new Driver();
+	midiDriverAdd(DRIVER, driver);
 }
 
-void gamepadStep() {
+void step() {
 	if (!driver)
 		return;
 	for (int i = 0; i < 16; i++) {
@@ -112,4 +113,5 @@ void gamepadStep() {
 }
 
 
+} // namespace gamepad
 } // namespace rack

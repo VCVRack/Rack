@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace settings {
 
 
 bool gSkipAutosaveOnLaunch = false;
@@ -151,7 +152,7 @@ static void settingsFromJson(json_t *rootJ) {
 }
 
 
-void settingsSave(std::string filename) {
+void save(std::string filename) {
 	INFO("Saving settings %s", filename.c_str());
 	json_t *rootJ = settingsToJson();
 	if (rootJ) {
@@ -165,7 +166,7 @@ void settingsSave(std::string filename) {
 	}
 }
 
-void settingsLoad(std::string filename) {
+void load(std::string filename) {
 	INFO("Loading settings %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file)
@@ -185,4 +186,5 @@ void settingsLoad(std::string filename) {
 }
 
 
+} // namespace settings
 } // namespace rack

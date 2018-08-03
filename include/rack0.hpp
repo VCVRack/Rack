@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rack.hpp"
+#include "componentlibrary.hpp"
 
 
 namespace rack {
@@ -70,6 +71,54 @@ using string::stringf;
 #define info(...) INFO(__VA_ARGS__)
 #define warn(...) WARN(__VA_ARGS__)
 #define fatal(...) FATAL(__VA_ARGS__)
+
+////////////////////
+// asset
+////////////////////
+
+DEPRECATED inline std::string assetGlobal(std::string filename) {return asset::global(filename);}
+DEPRECATED inline std::string assetLocal(std::string filename) {return asset::local(filename);}
+DEPRECATED inline std::string assetPlugin(Plugin *plugin, std::string filename) {return asset::plugin(plugin, filename);}
+
+////////////////////
+// color
+////////////////////
+
+DEPRECATED inline NVGcolor colorClip(NVGcolor a) {return color::clip(a);}
+DEPRECATED inline NVGcolor colorMinus(NVGcolor a, NVGcolor b) {return color::minus(a, b);}
+DEPRECATED inline NVGcolor colorPlus(NVGcolor a, NVGcolor b) {return color::plus(a, b);}
+DEPRECATED inline NVGcolor colorMult(NVGcolor a, NVGcolor b) {return color::mult(a, b);}
+DEPRECATED inline NVGcolor colorMult(NVGcolor a, float x) {return color::mult(a, x);}
+DEPRECATED inline NVGcolor colorScreen(NVGcolor a, NVGcolor b) {return color::screen(a, b);}
+DEPRECATED inline NVGcolor colorAlpha(NVGcolor a, float alpha) {return color::alpha(a, alpha);}
+DEPRECATED inline NVGcolor colorFromHexString(std::string s) {return color::fromHexString(s);}
+DEPRECATED inline std::string colorToHexString(NVGcolor c) {return color::toHexString(c);}
+
+////////////////////
+// componentlibrary
+////////////////////
+
+DEPRECATED static const NVGcolor COLOR_BLACK_TRANSPARENT = SCHEME_BLACK_TRANSPARENT;
+DEPRECATED static const NVGcolor COLOR_BLACK = SCHEME_BLACK;
+DEPRECATED static const NVGcolor COLOR_WHITE = SCHEME_WHITE;
+DEPRECATED static const NVGcolor COLOR_RED = SCHEME_RED;
+DEPRECATED static const NVGcolor COLOR_ORANGE = SCHEME_ORANGE;
+DEPRECATED static const NVGcolor COLOR_YELLOW = SCHEME_YELLOW;
+DEPRECATED static const NVGcolor COLOR_GREEN = SCHEME_GREEN;
+DEPRECATED static const NVGcolor COLOR_CYAN = SCHEME_CYAN;
+DEPRECATED static const NVGcolor COLOR_BLUE = SCHEME_BLUE;
+DEPRECATED static const NVGcolor COLOR_PURPLE = SCHEME_PURPLE;
+DEPRECATED static const NVGcolor COLOR_LIGHT_PANEL = SCHEME_LIGHT_PANEL;
+DEPRECATED static const NVGcolor COLOR_DARK_PANEL = SCHEME_DARK_PANEL;
+
+////////////////////
+// helpers
+////////////////////
+
+template <class TScrew>
+DEPRECATED TScrew *createScrew(math::Vec pos) {
+	return createWidget<TScrew>(pos);
+}
 
 
 } // namespace rack

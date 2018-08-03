@@ -11,7 +11,6 @@
 #include "osdialog.h"
 
 #include "rack.hpp"
-#include "window.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
 
@@ -281,10 +280,10 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 	// Keyboard MIDI driver
 	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
 		if (action == GLFW_PRESS) {
-			keyboardPress(key);
+			keyboard::press(key);
 		}
 		else if (action == GLFW_RELEASE) {
-			keyboardRelease(key);
+			keyboard::release(key);
 		}
 	}
 }
@@ -444,7 +443,7 @@ void windowRun() {
 			cursorPosCallback(gWindow, xpos, ypos);
 		}
 		mouseButtonStickyPop();
-		gamepadStep();
+		gamepad::step();
 
 		// Set window title
 		std::string windowTitle;

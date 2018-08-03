@@ -39,16 +39,31 @@ b must be positive.
 */
 inline int eucMod(int a, int b) {
 	int mod = a % b;
-	return (mod >= 0) ? mod : mod + b;
+	if (mod < 0) {
+		mod += b;
+	}
+	return mod;
 }
 
 /** Euclidean division.
 b must be positive.
 */
 inline int eucDiv(int a, int b) {
-	int mod = a % b;
 	int div = a / b;
-	return (mod >= 0) ? div : div - 1;
+	int mod = a % b;
+	if (mod < 0) {
+		div -= 1;
+	}
+	return div;
+}
+
+inline void eucDivMod(int a, int b, int *div, int *mod) {
+	*div = a / b;
+	*mod = a % b;
+	if (*mod < 0) {
+		*div -= 1;
+		*mod += b;
+	}
 }
 
 /** Returns floor(log_2(n)), or 0 if n == 1.

@@ -40,12 +40,6 @@ TWidget *createWidget(math::Vec pos) {
 	return w;
 }
 
-/** Deprecated. Use createWidget<TScrew>() instead */
-template <class TScrew>
-DEPRECATED TScrew *createScrew(math::Vec pos) {
-	return createWidget<TScrew>(pos);
-}
-
 template <class TParamWidget>
 TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *param = new TParamWidget();

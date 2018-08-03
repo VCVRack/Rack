@@ -4,9 +4,10 @@
 
 
 namespace rack {
+namespace gamepad {
 
 
-struct GamepadInputDevice : MidiInputDevice {
+struct InputDevice : MidiInputDevice {
 	int deviceId;
 	std::vector<uint8_t> ccs;
 	std::vector<bool> states;
@@ -14,10 +15,10 @@ struct GamepadInputDevice : MidiInputDevice {
 };
 
 
-struct GamepadDriver : MidiDriver {
-	GamepadInputDevice devices[16];
+struct Driver : MidiDriver {
+	InputDevice devices[16];
 
-	GamepadDriver();
+	Driver();
 	std::string getName() override {return "Gamepad";}
 	std::vector<int> getInputDeviceIds() override;
 	std::string getInputDeviceName(int deviceId) override;
@@ -26,8 +27,9 @@ struct GamepadDriver : MidiDriver {
 };
 
 
-void gamepadInit();
-void gamepadStep();
+void init();
+void step();
 
 
+} // namespace gamepad
 } // namespace rack

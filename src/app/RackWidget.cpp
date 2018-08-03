@@ -487,7 +487,7 @@ void RackWidget::step() {
 	// Autosave every 15 seconds
 	if (gGuiFrame % (60 * 15) == 0) {
 		save(asset::local("autosave.vcv"));
-		settingsSave(asset::local("settings.json"));
+		settings::save(asset::local("settings.json"));
 	}
 
 	Widget::step();
