@@ -89,7 +89,7 @@ bool AudioIO::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
 				return true;
 			}
 			catch (RtAudioError &e) {
-				warn("Failed to query RtAudio device: %s", e.what());
+				WARN("Failed to query RtAudio device: %s", e.what());
 			}
 		}
 	}
@@ -166,7 +166,7 @@ std::vector<int> AudioIO::getSampleRates() {
 			return sampleRates;
 		}
 		catch (RtAudioError &e) {
-			warn("Failed to query RtAudio device: %s", e.what());
+			WARN("Failed to query RtAudio device: %s", e.what());
 		}
 	}
 	return {};
@@ -219,7 +219,7 @@ void AudioIO::openStream() {
 			deviceInfo = rtAudio->getDeviceInfo(device);
 		}
 		catch (RtAudioError &e) {
-			warn("Failed to query RtAudio device: %s", e.what());
+			WARN("Failed to query RtAudio device: %s", e.what());
 			return;
 		}
 
@@ -229,7 +229,7 @@ void AudioIO::openStream() {
 		setChannels(math::clamp((int) deviceInfo.outputChannels - offset, 0, maxChannels), math::clamp((int) deviceInfo.inputChannels - offset, 0, maxChannels));
 
 		if (numOutputs == 0 && numInputs == 0) {
-			warn("RtAudio device %d has 0 inputs and 0 outputs", device);
+			WARN("RtAudio device %d has 0 inputs and 0 outputs", device);
 			return;
 		}
 
@@ -255,7 +255,7 @@ void AudioIO::openStream() {
 		}
 
 		try {
-			info("Opening audio RtAudio device %d with %d in %d out", device, numInputs, numOutputs);
+			INFO("Opening audio RtAudio device %d with %d in %d out", device, numInputs, numOutputs);
 			rtAudio->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
@@ -263,16 +263,16 @@ void AudioIO::openStream() {
 				&rtCallback, this, &options, NULL);
 		}
 		catch (RtAudioError &e) {
-			warn("Failed to open RtAudio stream: %s", e.what());
+			WARN("Failed to open RtAudio stream: %s", e.what());
 			return;
 		}
 
 		try {
-			info("Starting RtAudio stream %d", device);
+			INFO("Starting RtAudio stream %d", device);
 			rtAudio->startStream();
 		}
 		catch (RtAudioError &e) {
-			warn("Failed to start RtAudio stream: %s", e.what());
+			WARN("Failed to start RtAudio stream: %s", e.what());
 			return;
 		}
 
@@ -291,21 +291,21 @@ void AudioIO::closeStream() {
 
 	if (rtAudio) {
 		if (rtAudio->isStreamRunning()) {
-			info("Stopping RtAudio stream %d", device);
+			INFO("Stopping RtAudio stream %d", device);
 			try {
 				rtAudio->stopStream();
 			}
 			catch (RtAudioError &e) {
-				warn("Failed to stop RtAudio stream %s", e.what());
+				WARN("Failed to stop RtAudio stream %s", e.what());
 			}
 		}
 		if (rtAudio->isStreamOpen()) {
-			info("Closing RtAudio stream %d", device);
+			INFO("Closing RtAudio stream %d", device);
 			try {
 				rtAudio->closeStream();
 			}
 			catch (RtAudioError &e) {
-				warn("Failed to close RtAudio stream %s", e.what());
+				WARN("Failed to close RtAudio stream %s", e.what());
 			}
 		}
 		deviceInfo = RtAudio::DeviceInfo();

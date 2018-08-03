@@ -166,7 +166,7 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processMessage(MidiMessage msg) {
-		// debug("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.note(), msg.value());
+		// DEBUG("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.note(), msg.value());
 
 		switch (msg.status()) {
 			// note off

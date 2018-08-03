@@ -48,13 +48,13 @@ void copyFile(std::string srcPath, std::string destPath) {
 	FILE *source = fopen(srcPath.c_str(), "rb");
 	if (!source)
 		return;
-	defer({
+	DEFER({
 		fclose(source);
 	});
 	FILE *dest = fopen(destPath.c_str(), "wb");
 	if (!dest)
 		return;
-	defer({
+	DEFER({
 		fclose(dest);
 	});
 	// Copy buffer

@@ -102,13 +102,13 @@ struct BridgeClientConnection {
 	}
 
 	void run() {
-		info("Bridge client connected");
+		INFO("Bridge client connected");
 
 		// Check hello key
 		uint32_t hello = -1;
 		recv<uint32_t>(&hello);
 		if (hello != BRIDGE_HELLO) {
-			info("Bridge client protocol mismatch %x %x", hello, BRIDGE_HELLO);
+			INFO("Bridge client protocol mismatch %x %x", hello, BRIDGE_HELLO);
 			return;
 		}
 
@@ -118,7 +118,7 @@ struct BridgeClientConnection {
 			step();
 		}
 
-		info("Bridge client closed");
+		INFO("Bridge client closed");
 	}
 
 	/** Accepts a command from the client */
@@ -131,7 +131,7 @@ struct BridgeClientConnection {
 		switch (command) {
 			default:
 			case NO_COMMAND: {
-				warn("Bridge client: bad command %d detected, closing", command);
+				WARN("Bridge client: bad command %d detected, closing", command);
 				ready = false;
 			} break;
 
@@ -169,7 +169,7 @@ struct BridgeClientConnection {
 
 				float input[BRIDGE_INPUTS * frames];
 				if (!recv(&input, BRIDGE_INPUTS * frames * sizeof(float))) {
-					debug("Failed to receive");
+					DEBUG("Failed to receive");
 					return;
 				}
 
@@ -177,7 +177,7 @@ struct BridgeClientConnection {
 				memset(&output, 0, sizeof(output));
 				processStream(input, output, frames);
 				if (!send(&output, BRIDGE_OUTPUTS * frames * sizeof(float))) {
-					debug("Failed to send");
+					DEBUG("Failed to send");
 					return;
 				}
 				// flush();
@@ -237,17 +237,17 @@ struct BridgeClientConnection {
 
 
 static void clientRun(int client) {
-	defer({
+	DEFER({
 #if ARCH_WIN
 		if (shutdown(client, SD_SEND)) {
-			warn("Bridge client shutdown() failed");
+			WARN("Bridge client shutdown() failed");
 		}
 		if (closesocket(client)) {
-			warn("Bridge client closesocket() failed");
+			WARN("Bridge client closesocket() failed");
 		}
 #else
 		if (close(client)) {
-			warn("Bridge client close() failed");
+			WARN("Bridge client close() failed");
 		}
 #endif
 	});
@@ -256,7 +256,7 @@ static void clientRun(int client) {
 	// Avoid SIGPIPE
 	int flag = 1;
 	if (setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int))) {
-		warn("Bridge client setsockopt() failed");
+		WARN("Bridge client setsockopt() failed");
 		return;
 	}
 #endif
@@ -265,12 +265,12 @@ static void clientRun(int client) {
 #if ARCH_WIN
 	unsigned long blockingMode = 0;
 	if (ioctlsocket(client, FIONBIO, &blockingMode)) {
-		warn("Bridge client ioctlsocket() failed");
+		WARN("Bridge client ioctlsocket() failed");
 		return;
 	}
 #else
 	if (fcntl(client, F_SETFL, fcntl(client, F_GETFL, 0) & ~O_NONBLOCK)) {
-		warn("Bridge client fcntl() failed");
+		WARN("Bridge client fcntl() failed");
 		return;
 	}
 #endif
@@ -286,10 +286,10 @@ static void serverConnect() {
 #if ARCH_WIN
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
-		warn("Bridge server WSAStartup() failed");
+		WARN("Bridge server WSAStartup() failed");
 		return;
 	}
-	defer({
+	DEFER({
 		WSACleanup();
 	});
 #endif
@@ -308,15 +308,15 @@ static void serverConnect() {
 	// Open socket
 	int server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (server < 0) {
-		warn("Bridge server socket() failed");
+		WARN("Bridge server socket() failed");
 		return;
 	}
-	defer({
+	DEFER({
 		if (close(server)) {
-			warn("Bridge server close() failed");
+			WARN("Bridge server close() failed");
 			return;
 		}
-		info("Bridge server closed");
+		INFO("Bridge server closed");
 	});
 
 #if ARCH_MAC || ARCH_LIN
@@ -326,22 +326,22 @@ static void serverConnect() {
 
 	// Bind socket to address
 	if (bind(server, (struct sockaddr*) &addr, sizeof(addr))) {
-		warn("Bridge server bind() failed");
+		WARN("Bridge server bind() failed");
 		return;
 	}
 
 	// Listen for clients
 	if (listen(server, 20)) {
-		warn("Bridge server listen() failed");
+		WARN("Bridge server listen() failed");
 		return;
 	}
-	info("Bridge server started");
+	INFO("Bridge server started");
 
 	// Enable non-blocking
 #if ARCH_WIN
 	unsigned long blockingMode = 1;
 	if (ioctlsocket(server, FIONBIO, &blockingMode)) {
-		warn("Bridge server ioctlsocket() failed");
+		WARN("Bridge server ioctlsocket() failed");
 		return;
 	}
 #else

@@ -152,7 +152,7 @@ static void settingsFromJson(json_t *rootJ) {
 
 
 void settingsSave(std::string filename) {
-	info("Saving settings %s", filename.c_str());
+	INFO("Saving settings %s", filename.c_str());
 	json_t *rootJ = settingsToJson();
 	if (rootJ) {
 		FILE *file = fopen(filename.c_str(), "w");
@@ -166,7 +166,7 @@ void settingsSave(std::string filename) {
 }
 
 void settingsLoad(std::string filename) {
-	info("Loading settings %s", filename.c_str());
+	INFO("Loading settings %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file)
 		return;
@@ -178,7 +178,7 @@ void settingsLoad(std::string filename) {
 		json_decref(rootJ);
 	}
 	else {
-		warn("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	}
 
 	fclose(file);

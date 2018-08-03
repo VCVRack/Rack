@@ -91,7 +91,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	if (pluginJ) {
 		pluginSlug = json_string_value(pluginJ);
 		if (pluginSlug != model->plugin->slug) {
-			warn("Plugin %s does not match ModuleWidget's plugin %s.", pluginSlug.c_str(), model->plugin->slug.c_str());
+			WARN("Plugin %s does not match ModuleWidget's plugin %s.", pluginSlug.c_str(), model->plugin->slug.c_str());
 			return;
 		}
 	}
@@ -101,7 +101,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	if (modelJ) {
 		modelSlug = json_string_value(modelJ);
 		if (modelSlug != model->slug) {
-			warn("Model %s does not match ModuleWidget's model %s.", modelSlug.c_str(), model->slug.c_str());
+			WARN("Model %s does not match ModuleWidget's model %s.", modelSlug.c_str(), model->slug.c_str());
 			return;
 		}
 	}
@@ -111,7 +111,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	if (versionJ) {
 		std::string version = json_string_value(versionJ);
 		if (version != model->plugin->version) {
-			info("Patch created with %s version %s, using version %s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
+			INFO("Patch created with %s version %s, using version %s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
 		}
 	}
 
@@ -169,7 +169,7 @@ void ModuleWidget::copyClipboard() {
 void ModuleWidget::pasteClipboard() {
 	const char *moduleJson = glfwGetClipboardString(gWindow);
 	if (!moduleJson) {
-		warn("Could not get text from clipboard.");
+		WARN("Could not get text from clipboard.");
 		return;
 	}
 
@@ -180,12 +180,12 @@ void ModuleWidget::pasteClipboard() {
 		json_decref(moduleJ);
 	}
 	else {
-		warn("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	}
 }
 
 void ModuleWidget::load(std::string filename) {
-	info("Loading preset %s", filename.c_str());
+	INFO("Loading preset %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file) {
 		// Exit silently
@@ -207,7 +207,7 @@ void ModuleWidget::load(std::string filename) {
 }
 
 void ModuleWidget::save(std::string filename) {
-	info("Saving preset %s", filename.c_str());
+	INFO("Saving preset %s", filename.c_str());
 	json_t *moduleJ = toJson();
 	if (!moduleJ)
 		return;

@@ -64,7 +64,7 @@ static bool loadPlugin(std::string path) {
 
 	// Check file existence
 	if (!system::isFile(libraryFilename)) {
-		warn("Plugin file %s does not exist", libraryFilename.c_str());
+		WARN("Plugin file %s does not exist", libraryFilename.c_str());
 		return false;
 	}
 
@@ -75,13 +75,13 @@ static bool loadPlugin(std::string path) {
 	SetErrorMode(0);
 	if (!handle) {
 		int error = GetLastError();
-		warn("Failed to load library %s: code %d", libraryFilename.c_str(), error);
+		WARN("Failed to load library %s: code %d", libraryFilename.c_str(), error);
 		return false;
 	}
 #else
 	void *handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
 	if (!handle) {
-		warn("Failed to load library %s: %s", libraryFilename.c_str(), dlerror());
+		WARN("Failed to load library %s: %s", libraryFilename.c_str(), dlerror());
 		return false;
 	}
 #endif
@@ -95,7 +95,7 @@ static bool loadPlugin(std::string path) {
 	initCallback = (InitCallback) dlsym(handle, "init");
 #endif
 	if (!initCallback) {
-		warn("Failed to read init() symbol in %s", libraryFilename.c_str());
+		WARN("Failed to read init() symbol in %s", libraryFilename.c_str());
 		return false;
 	}
 
@@ -108,7 +108,7 @@ static bool loadPlugin(std::string path) {
 	// Reject plugin if slug already exists
 	Plugin *oldPlugin = pluginGetPlugin(plugin->slug);
 	if (oldPlugin) {
-		warn("Plugin \"%s\" is already loaded, not attempting to load it again", plugin->slug.c_str());
+		WARN("Plugin \"%s\" is already loaded, not attempting to load it again", plugin->slug.c_str());
 		// TODO
 		// Fix memory leak with `plugin` here
 		return false;
@@ -116,7 +116,7 @@ static bool loadPlugin(std::string path) {
 
 	// Add plugin to list
 	gPlugins.push_back(plugin);
-	info("Loaded plugin %s %s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
+	INFO("Loaded plugin %s %s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
 
 	return true;
 }
@@ -135,7 +135,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	// Get latest version
 	json_t *latestVersionJ = json_object_get(manifestJ, "latestVersion");
 	if (!latestVersionJ) {
-		warn("Could not get latest version of plugin %s", slug.c_str());
+		WARN("Could not get latest version of plugin %s", slug.c_str());
 		return false;
 	}
 	std::string latestVersion = json_string_value(latestVersionJ);
@@ -178,10 +178,10 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 		// Check if available
 		json_t *availableResJ = network::requestJson(network::METHOD_GET, downloadUrl, NULL);
 		if (!availableResJ) {
-			warn("Could not check whether download is available");
+			WARN("Could not check whether download is available");
 			return false;
 		}
-		defer({
+		DEFER({
 			json_decref(availableResJ);
 		});
 		json_t *successJ = json_object_get(availableResJ, "success");
@@ -190,12 +190,12 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	else {
 		downloadName = name;
 		downloadProgress = 0.0;
-		info("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
+		INFO("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
 
 		// Download zip
 		std::string pluginDest = asset::local("plugins/" + slug + ".zip");
 		if (!network::requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
-			warn("Plugin %s download was unsuccessful", slug.c_str());
+			WARN("Plugin %s download was unsuccessful", slug.c_str());
 			return false;
 		}
 
@@ -226,7 +226,7 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 		zip_stat_t zs;
 		err = zip_stat_index(za, i, 0, &zs);
 		if (err) {
-			warn("zip_stat_index() failed: error %d", err);
+			WARN("zip_stat_index() failed: error %d", err);
 			return err;
 		}
 		int nameLen = strlen(zs.name);
@@ -237,7 +237,7 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 		if (zs.name[nameLen - 1] == '/') {
 			if (mkdir(path, 0755)) {
 				if (errno != EEXIST) {
-					warn("mkdir(%s) failed: error %d", path, errno);
+					WARN("mkdir(%s) failed: error %d", path, errno);
 					return errno;
 				}
 			}
@@ -245,7 +245,7 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 		else {
 			zip_file_t *zf = zip_fopen_index(za, i, 0);
 			if (!zf) {
-				warn("zip_fopen_index() failed");
+				WARN("zip_fopen_index() failed");
 				return -1;
 			}
 
@@ -263,7 +263,7 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 
 			err = zip_fclose(zf);
 			if (err) {
-				warn("zip_fclose() failed: error %d", err);
+				WARN("zip_fclose() failed: error %d", err);
 				return err;
 			}
 			fclose(outFile);
@@ -277,10 +277,10 @@ static int extractZip(const char *filename, const char *path) {
 	int err;
 	zip_t *za = zip_open(filename, 0, &err);
 	if (!za) {
-		warn("Could not open zip %s: error %d", filename, err);
+		WARN("Could not open zip %s: error %d", filename, err);
 		return err;
 	}
-	defer({
+	DEFER({
 		zip_close(za);
 	});
 
@@ -294,16 +294,16 @@ static void extractPackages(std::string path) {
 	for (std::string packagePath : system::listEntries(path)) {
 		if (string::extension(packagePath) != "zip")
 			continue;
-		info("Extracting package %s", packagePath.c_str());
+		INFO("Extracting package %s", packagePath.c_str());
 		// Extract package
 		if (extractZip(packagePath.c_str(), path.c_str())) {
-			warn("Package %s failed to extract", packagePath.c_str());
+			WARN("Package %s failed to extract", packagePath.c_str());
 			message += string::stringf("Could not extract package %s\n", packagePath.c_str());
 			continue;
 		}
 		// Remove package
 		if (remove(packagePath.c_str())) {
-			warn("Could not delete file %s: error %d", packagePath.c_str(), errno);
+			WARN("Could not delete file %s: error %d", packagePath.c_str(), errno);
 		}
 	}
 	if (!message.empty()) {
@@ -372,7 +372,7 @@ bool pluginSync(bool dryRun) {
 		downloadProgress = 0.0;
 		downloadName = "Updating plugins...";
 	}
-	defer({
+	DEFER({
 		isDownloading = false;
 	});
 
@@ -382,38 +382,38 @@ bool pluginSync(bool dryRun) {
 	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, gApiHost + "/plugins", pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
-		warn("Request for user's plugins failed");
+		WARN("Request for user's plugins failed");
 		return false;
 	}
-	defer({
+	DEFER({
 		json_decref(pluginsResJ);
 	});
 
 	json_t *errorJ = json_object_get(pluginsResJ, "error");
 	if (errorJ) {
-		warn("Request for user's plugins returned an error: %s", json_string_value(errorJ));
+		WARN("Request for user's plugins returned an error: %s", json_string_value(errorJ));
 		return false;
 	}
 
 	// Get community manifests
 	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, gApiHost + "/community/manifests", NULL);
 	if (!manifestsResJ) {
-		warn("Request for community manifests failed");
+		WARN("Request for community manifests failed");
 		return false;
 	}
-	defer({
+	DEFER({
 		json_decref(manifestsResJ);
 	});
 
 	// Check each plugin in list of plugin slugs
 	json_t *pluginsJ = json_object_get(pluginsResJ, "plugins");
 	if (!pluginsJ) {
-		warn("No plugins array");
+		WARN("No plugins array");
 		return false;
 	}
 	json_t *manifestsJ = json_object_get(manifestsResJ, "manifests");
 	if (!manifestsJ) {
-		warn("No manifests object");
+		WARN("No manifests object");
 		return false;
 	}
 

@@ -121,7 +121,7 @@ void RackWidget::saveAsDialog() {
 }
 
 void RackWidget::save(std::string filename) {
-	info("Saving patch %s", filename.c_str());
+	INFO("Saving patch %s", filename.c_str());
 	json_t *rootJ = toJson();
 	if (!rootJ)
 		return;
@@ -136,7 +136,7 @@ void RackWidget::save(std::string filename) {
 }
 
 void RackWidget::load(std::string filename) {
-	info("Loading patch %s", filename.c_str());
+	INFO("Loading patch %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file) {
 		// Exit silently
@@ -259,7 +259,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 		legacy = 1;
 	}
 	if (legacy) {
-		info("Loading patch using legacy mode %d", legacy);
+		INFO("Loading patch using legacy mode %d", legacy);
 	}
 
 	// modules
@@ -386,7 +386,7 @@ ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
 void RackWidget::pastePresetClipboard() {
 	const char *moduleJson = glfwGetClipboardString(gWindow);
 	if (!moduleJson) {
-		warn("Could not get text from clipboard.");
+		WARN("Could not get text from clipboard.");
 		return;
 	}
 
@@ -402,7 +402,7 @@ void RackWidget::pastePresetClipboard() {
 		json_decref(moduleJ);
 	}
 	else {
-		warn("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	}
 }
 

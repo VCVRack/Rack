@@ -56,11 +56,11 @@ int main(int argc, char* argv[]) {
 	logger::init(devMode);
 
 	// Log environment
-	info("%s %s", gApplicationName.c_str(), gApplicationVersion.c_str());
+	INFO("%s %s", gApplicationName.c_str(), gApplicationVersion.c_str());
 	if (devMode)
-		info("Development mode");
-	info("Global directory: %s", asset::global("").c_str());
-	info("Local directory: %s", asset::local("").c_str());
+		INFO("Development mode");
+	INFO("Global directory: %s", asset::global("").c_str());
+	INFO("Local directory: %s", asset::local("").c_str());
 
 	// Initialize app
 	pluginInit(devMode);

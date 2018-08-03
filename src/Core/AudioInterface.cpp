@@ -71,7 +71,7 @@ struct AudioInterfaceIO : AudioIO {
 			else {
 				// Timed out, fill output with zeros
 				memset(output, 0, frames * numOutputs * sizeof(float));
-				debug("Audio Interface IO underflow");
+				DEBUG("Audio Interface IO underflow");
 			}
 		}
 
@@ -171,7 +171,7 @@ void AudioInterface::step() {
 		else {
 			// Give up on pulling input
 			audioIO.active = false;
-			debug("Audio Interface underflow");
+			DEBUG("Audio Interface underflow");
 		}
 	}
 
@@ -221,7 +221,7 @@ void AudioInterface::step() {
 				// Give up on pushing output
 				audioIO.active = false;
 				outputBuffer.clear();
-				debug("Audio Interface underflow");
+				DEBUG("Audio Interface underflow");
 			}
 		}
 

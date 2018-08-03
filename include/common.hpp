@@ -84,7 +84,7 @@ to get its size in bytes.
 
 /** C#-style property constructor
 Example:
-	Foo *foo = construct<Foo>(&Foo::greeting, "Hello world");
+	Foo *foo = construct<Foo>(&Foo::greeting, "Hello world", &Foo::legs, 2);
 */
 template<typename T>
 T *construct() {
@@ -120,6 +120,3 @@ DeferWrapper<F> deferWrapper(F f) {
 }
 
 #define DEFER(code) auto CONCAT(_defer_, __COUNTER__) = deferWrapper([&]() code)
-
-/** Deprecated lowercase macro */
-#define defer(...) DEFER(__VA_ARGS__)
