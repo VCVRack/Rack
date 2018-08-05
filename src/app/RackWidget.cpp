@@ -139,6 +139,11 @@ void RackWidget::save(std::string filename) {
 	json_decref(rootJ);
 }
 
+void RackWidget::setAsDefaultPatch() {
+	info("Saving current patch as default one in 'tempalte.vcv'");
+	save(assetLocal("template.vcv"));
+}
+
 void RackWidget::load(std::string filename) {
 	info("Loading patch %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");

@@ -69,6 +69,16 @@ struct SaveAsButton : TooltipIconButton {
 	}
 };
 
+struct SetAsDefaultPatchButton : TooltipIconButton {
+	SetAsDefaultPatchButton() {
+		setSVG(SVG::load(assetGlobal("res/icons/noun_1343811_cc.svg")));
+		tooltipText = "Set patch as default (" WINDOW_MOD_KEY_NAME "+Shift+D)";
+	}
+	void onAction(EventAction &e) override {
+		gRackWidget->setAsDefaultPatch();
+	}
+};
+
 struct RevertButton : TooltipIconButton {
 	RevertButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_1084369_cc.svg")));
@@ -170,6 +180,7 @@ Toolbar::Toolbar() {
 	layout->addChild(new OpenButton());
 	layout->addChild(new SaveButton());
 	layout->addChild(new SaveAsButton());
+	layout->addChild(new SetAsDefaultPatchButton());
 	layout->addChild(new RevertButton());
 	layout->addChild(new DisconnectCablesButton());
 

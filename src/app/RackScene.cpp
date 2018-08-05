@@ -95,6 +95,12 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 					e.consumed = true;
 				}
 			} break;
+			case GLFW_KEY_D: {
+				if (windowIsModPressed() && windowIsShiftPressed()) {
+					gRackWidget->setAsDefaultPatch();
+					e.consumed = true;
+				}
+			} break;
 			case GLFW_KEY_V: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->pastePresetClipboard();
