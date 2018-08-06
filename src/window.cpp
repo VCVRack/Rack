@@ -36,6 +36,7 @@
 #include "global_ui.hpp"
 
 extern void vst2_set_globals (void *_wrapper);
+extern "C" extern void lglw_timer_cbk (lglw_t _lglw);
 
 namespace rack {
 
@@ -612,7 +613,7 @@ void windowInit() {
 	// // glfwMakeContextCurrent(global_ui->window.gWindow);
 	// // glfwSwapInterval(1);
    lglw_glcontext_push(global_ui->window.lglw);
-   lglw_swap_interval(global_ui->window.lglw, 1);
+   lglw_swap_interval(global_ui->window.lglw, 1);  // can be overridden via settings.json:"vsync" property
 
 	// // glfwSetInputMode(global_ui->window.gWindow, GLFW_LOCK_KEY_MODS, 1);
 
@@ -621,6 +622,7 @@ void windowInit() {
    lglw_mouse_callback_set(global_ui->window.lglw, &lglw_mouse_cbk);
    lglw_focus_callback_set(global_ui->window.lglw, &lglw_focus_cbk);
    lglw_keyboard_callback_set(global_ui->window.lglw, &lglw_keyboard_cbk);
+   lglw_timer_callback_set(global_ui->window.lglw, &lglw_timer_cbk);
 
 	// Call this ourselves, but on every frame instead of only when the mouse moves
 	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);

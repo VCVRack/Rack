@@ -17,7 +17,7 @@
 ///
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
-///          26Jul2018, 04Aug2018, 05Aug2018
+///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018
 ///
 ///
 ///
@@ -419,6 +419,8 @@ public:
 
    sF32 tmp_input_buffers[NUM_INPUTS * MAX_BLOCK_SIZE];
 
+   sUI redraw_ival_ms;  // 0=use DAW timer (effEditIdle)
+
 public:
    VSTPluginWrapper(VSTHostCallback vstHostCallback,
                     VstInt32 vendorUniqueID,
@@ -508,6 +510,13 @@ public:
       editor_rect.bottom = EDITWIN_Y + _height;
    }
 
+   void setRefreshRate(float _hz) {
+      if(_hz < 15.0f)
+         redraw_ival_ms = 0u;
+      else
+         redraw_ival_ms = sUI(1000.0f / _hz);
+   }
+
    void openEditor(void *_hwnd) {
       printf("xxx vstrack_plugin: openEditor() parentHWND=%p\n", _hwnd);
       setGlobals();
@@ -517,6 +526,12 @@ public:
                              (editor_rect.right - editor_rect.left),
                              (editor_rect.bottom - editor_rect.top)
                              );
+
+      if(0u != redraw_ival_ms)
+      {
+         lglw_timer_start(rack_global_ui.window.lglw, redraw_ival_ms);
+      }
+
       b_editor_open = true;
    }
 
@@ -525,6 +540,7 @@ public:
       if(b_editor_open)
       {
          setGlobals();
+         lglw_timer_stop(rack_global_ui.window.lglw);
          lglw_window_close(rack_global_ui.window.lglw);
          b_editor_open = false;
       }      
@@ -705,6 +721,23 @@ public:
                *_retSongPosPPQ = (float)timeInfo->ppqPos;
             }
          }
+      }
+   }
+
+   void redraw(void) {
+      setGlobals();
+
+      if(lglw_window_is_visible(rack::global_ui->window.lglw))
+      {
+         vst2_set_shared_plugin_tls_globals();
+
+         // Save DAW GL context and bind our own
+         lglw_glcontext_push(rack::global_ui->window.lglw);
+
+         rack::vst2_editor_redraw();
+
+         // Restore the DAW's GL context
+         lglw_glcontext_pop(rack::global_ui->window.lglw);
       }
    }
 
@@ -1128,25 +1161,16 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 #endif
 
       case effEditIdle:
-         wrapper->setGlobals();
-         if(lglw_window_is_visible(rack::global_ui->window.lglw))
+         if(0 == wrapper->redraw_ival_ms)
          {
-            vst2_set_shared_plugin_tls_globals();
-
-            // Save DAW GL context and bind our own
-            lglw_glcontext_push(rack::global_ui->window.lglw);
-
-            rack::vst2_editor_redraw();
-
-            // Restore the DAW's GL context
-            lglw_glcontext_pop(rack::global_ui->window.lglw);
+            wrapper->redraw();
          }
          break;
 
       case effEditGetRect:
          // Query editor window geometry
          // ptr: ERect* (on Windows)
-         if(NULL != ptr) // yeah, this should never be NULL
+         if(NULL != ptr)
          {
             // ...
             *(void**)ptr = (void*) &wrapper->editor_rect;
@@ -1295,6 +1319,8 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    editor_rect.top    = EDITWIN_Y;
    editor_rect.right  = EDITWIN_X + EDITWIN_W;
    editor_rect.bottom = EDITWIN_Y + EDITWIN_H;
+
+   redraw_ival_ms = 0;
 }
 
 /**
@@ -1337,6 +1363,15 @@ void vst2_set_globals(void *_wrapper) {
 
 void vst2_window_size_set(int _width, int _height) {
    rack::global->vst2.wrapper->setWindowSize(_width, _height);
+}
+
+void vst2_refresh_rate_set (float _hz) {
+   rack::global->vst2.wrapper->setRefreshRate(_hz);
+}
+
+extern "C" void lglw_timer_cbk(lglw_t _lglw) {
+   VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
+   wrapper->redraw();
 }
 
 

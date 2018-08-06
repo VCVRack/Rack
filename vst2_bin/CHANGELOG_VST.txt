@@ -1,3 +1,10 @@
+** August 6th, 2018
+- add settings.json "refreshRate" property
+   - <15: use VST host timer
+   - >=15: custom refresh rate in Hz
+- add settings.json "vsync" property
+
+
 ** August 5th, 2018
 - replace GLFW window / input event handling by LGLW library
    => no more "dummy" windows

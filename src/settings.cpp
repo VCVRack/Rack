@@ -10,6 +10,7 @@
 
 
 extern void vst2_window_size_set (int _width, int _height);
+extern void vst2_refresh_rate_set (float _hz);
 
 namespace rack {
 
@@ -130,14 +131,30 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
 		global_ui->app.gToolbar->zoomSlider->setValue(json_number_value(zoomJ) * 100.0);
 	}
 
+	// refresh rate (Hz)
+   //  (note) <15: use DAW timer (effEditIdle)
+	json_t *refreshJ = json_object_get(rootJ, "refreshRate");
+	if (refreshJ) {
+		vst2_refresh_rate_set(clamp((float) json_number_value(refreshJ), 0.0f, 200.0f));
+	}
+
+	// vsync
+   if(!bWindowSizeOnly)
+   {
+      json_t *vsyncJ = json_object_get(rootJ, "vsync");
+      if (vsyncJ)
+      {
+         lglw_glcontext_push(global_ui->window.lglw);
+         lglw_swap_interval(global_ui->window.lglw, json_is_true(vsyncJ));
+         lglw_glcontext_pop(global_ui->window.lglw);
+      }
+   }
+
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
    {
 		global_ui->window.gAllowCursorLock = json_is_true(allowCursorLockJ);
-// #ifdef USE_VST2
-//       global_ui->window.gAllowCursorLock = 0;
-// #endif // USE_VST2
    }
 
 #ifndef USE_VST2
