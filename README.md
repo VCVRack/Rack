@@ -18,17 +18,18 @@ Tested in
   - Cockos Reaper
   - Propellerhead Reason 10
   - Steinberg Cubase Pro 9.5.30
-  - according to users: works in Bitwig
+  - LMMS 1.2.0-rc6
+  - according to users: works in Bitwig Studio
+  - according to users: works in Nuendo
+  - according to users: works in Ableton Live
 
 
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-26Jul2018.7z](dist/veeseevstrack_0_6_1_win64_bin-26Jul2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-05Aug2018.7z](dist/veeseevstrack_0_6_1_win64_bin-05Aug2018.7z) (64bit)
 
-**WARNING: DON'T TRY TO USE THE INSTRUMENT AND EFFECT PLUGINS IN THE SAME PROJECT OR YOUR DAW WILL CRASH.**
-
-The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
+Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
 
 # Changelog
