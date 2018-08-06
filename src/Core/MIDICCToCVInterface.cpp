@@ -166,7 +166,8 @@ struct MidiCcChoice : GridChoice {
 
 	void onKey(EventKey &e) override {
 		if (global_ui->widgets.gFocusedWidget == this) {
-			if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
+			// if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
+         if(LGLW_VKEY_RETURN == e.key) {
 				EventDefocus eDefocus;
 				onDefocus(eDefocus);
 				global_ui->widgets.gFocusedWidget = NULL;

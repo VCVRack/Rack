@@ -111,6 +111,7 @@ void ScrollWidget::step() {
 
 void ScrollWidget::onMouseMove(EventMouseMove &e) {
 	// Scroll with arrow keys
+#if 0
 	if (!global_ui->widgets.gFocusedWidget) {
 		float arrowSpeed = 30.0;
 		if (windowIsShiftPressed() && windowIsModPressed())
@@ -133,7 +134,7 @@ void ScrollWidget::onMouseMove(EventMouseMove &e) {
 			offset.y += arrowSpeed;
 		}
 	}
-
+#endif
 	Widget::onMouseMove(e);
 }
 

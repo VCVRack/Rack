@@ -9,6 +9,8 @@
 #include "global_ui.hpp"
 
 
+extern void vst2_window_size_set (int _width, int _height);
+
 namespace rack {
 
 
@@ -76,7 +78,7 @@ static json_t *settingsToJson() {
 	return rootJ;
 }
 
-static void settingsFromJson(json_t *rootJ) {
+static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
 	// token
 	json_t *tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
@@ -89,6 +91,13 @@ static void settingsFromJson(json_t *rootJ) {
 		json_unpack(windowSizeJ, "[F, F]", &width, &height);
 #ifdef USE_VST2
       // (note) calling windowSetWindowSize() causes the window to be not resizable initially, and when it is moved, it reverts to a default size (TBI)
+      if(bWindowSizeOnly)
+      {
+         global_ui->window.windowWidth = int(width);
+         global_ui->window.windowHeight = int(height);
+         vst2_window_size_set((int)width, (int)height);
+         return;
+      }
 #else
 		windowSetWindowSize(Vec(width, height));
 #endif // USE_VST2
@@ -181,7 +190,7 @@ void settingsSave(std::string filename) {
 	}
 }
 
-void settingsLoad(std::string filename) {
+void settingsLoad(std::string filename, bool bWindowSizeOnly) {
 	info("Loading settings %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file)
@@ -190,7 +199,7 @@ void settingsLoad(std::string filename) {
 	json_error_t error;
 	json_t *rootJ = json_loadf(file, 0, &error);
 	if (rootJ) {
-		settingsFromJson(rootJ);
+		settingsFromJson(rootJ, bWindowSizeOnly);
 		json_decref(rootJ);
 	}
 	else {

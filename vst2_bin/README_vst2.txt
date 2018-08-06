@@ -1,5 +1,5 @@
-VeeSeeVST Rack VST 2.4 Plugin -- July 26th, 2018
-================================================
+VeeSeeVST Rack VST 2.4 Plugin -- August 5th, 2018
+=================================================
 
 !!!------------------------------------------------------------------------------
 !!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
@@ -16,8 +16,6 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
 + supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 + supports VST parameters (send / recv)
-- does not support plugin DLLs due to VCV Rack's architecture which prevents this when it is run as a plugin itself
-   - future releases will contain additional (open source) add-ons modules
 
 Here's a demo video of it: https://vimeo.com/277703414
 
@@ -25,6 +23,8 @@ Tested in
   - Eureka (my own work-in-progress VST host)
   - Cockos Reaper
   - Propellerhead Reason 10
+  - Steinberg Cubase Pro 9.5.30
+  - LMMS 1.2.0-rc6
 
 The VST2 plugin includes the following add-on modules:
  - Alikins.IdleSwitch

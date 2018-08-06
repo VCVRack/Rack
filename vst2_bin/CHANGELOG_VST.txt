@@ -1,3 +1,11 @@
+** August 5th, 2018
+- replace GLFW window / input event handling by LGLW library
+   => no more "dummy" windows
+   => automation should now work in all DAWs
+   => effect and instrument plugins may now be used in the same DAW project
+- window size can now be configured via settings.json "windowSize" property
+   
+
 ** July 26th, 2018
 - fix effect processing in Cubase 9.5.30
 

@@ -21,16 +21,12 @@
 #include "global.hpp"
 #include "global_ui.hpp"
 
-// #if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
-// #include <windows.h>
-// extern "C" extern HWND __hack__glfwGetHWND (GLFWwindow *window);
-// #endif
-
 
 using namespace rack;
 
-/*__declspec(dllexport) won't link*/ YAC_TLS rack::Global *rack::global;
-/*__declspec(dllexport) won't link*/ YAC_TLS rack::GlobalUI *rack::global_ui;
+YAC_TLS rack::Global *rack::global;
+YAC_TLS rack::GlobalUI *rack::global_ui;
+
 
 #ifdef USE_VST2
 int vst2_init(int argc, char* argv[]) {
@@ -74,12 +70,13 @@ int vst2_init(int argc, char* argv[]) {
 	bridgeInit();
 #endif // USE_VST2
    vstmidiInit();
-	keyboardInit();
 #ifndef USE_VST2
+	keyboardInit();
 	gamepadInit();
-	windowInit();  // must be done in vst2 ui thread
 #endif // USE_VST2
+	windowInit();
 	appInit(devMode);
+   settingsLoad(assetLocal("settings.json"), false/*bWindowSizeOnly*/);
 
 #if 0
 	if (patchFile.empty()) {
@@ -108,20 +105,6 @@ int vst2_init(int argc, char* argv[]) {
    return 0;
 }
 
-void vst2_editor_create(void) {
-	windowInit();
-   settingsLoad(assetLocal("settings.json"));
-   glfwHideWindow(rack::global_ui->window.gWindow);
-}
-
-void vst2_editor_destroy(void) {
-	windowDestroy();
-}
-
-void vst2_editor_loop(void) {
-	windowRun();
-}
-
 void vst2_exit(void) {
 	// Destroy namespaces
 	// // engineStop();
@@ -129,26 +112,36 @@ void vst2_exit(void) {
 	// global_ui->app.gRackWidget->savePatch(assetLocal("autosave.vcv"));
 	// settingsSave(assetLocal("settings.json"));
    printf("xxx vst2_exit 2\n");
-#if 0 // (note) setting this to 1 seems to work fine (and it fixes the obvious mem leaks)
+
+#if 1
+   lglw_glcontext_push(global_ui->window.lglw);
 	appDestroy();
+   lglw_glcontext_pop(global_ui->window.lglw);
+#endif
+
    printf("xxx vst2_exit 3\n");
+   windowDestroy();
+
+#if 0
 #ifndef USE_VST2
-	windowDestroy();
 	bridgeDestroy();
 #endif // USE_VST2
    printf("xxx vst2_exit 4\n");
 	engineDestroy();
    printf("xxx vst2_exit 5\n");
 #endif
+
    printf("xxx vst2_exit destroy midi\n");
 	midiDestroy();
    printf("xxx vst2_exit destroy midi done\n");
-#if 0
+
+#if 1
    printf("xxx vst2_exit 6\n");
 	pluginDestroy();
    printf("xxx vst2_exit 7\n");
 	loggerDestroy();
 #endif
+
    printf("xxx vst2_exit 8 (leave)\n");
 }
 

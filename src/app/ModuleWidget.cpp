@@ -8,7 +8,7 @@
 
 
 #ifdef USE_VST2
-extern "C" void glfw_hack_makeContextCurrent(GLFWwindow *handle);
+// // extern "C" void glfw_hack_makeContextCurrent(GLFWwindow *handle);
 // #include <windows.h>
 #endif // USE_VST2
 
@@ -310,51 +310,81 @@ void ModuleWidget::onMouseDown(EventMouseDown &e) {
 void ModuleWidget::onMouseMove(EventMouseMove &e) {
 	OpaqueWidget::onMouseMove(e);
 
-	// Don't delete the ModuleWidget if a TextField is focused
-	if (!global_ui->widgets.gFocusedWidget) {
-		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-			if (!windowIsModPressed() && !windowIsShiftPressed()) {
-				global_ui->app.gRackWidget->deleteModule(this);
-				this->finalizeEvents();
-				delete this;
-				e.consumed = true;
-				return;
-			}
-		}
-	}
+// // #if 0
+// // 	// Don't delete the ModuleWidget if a TextField is focused
+// // 	if (!global_ui->widgets.gFocusedWidget) {
+// // 		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
+// // 		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+// // 			if (!windowIsModPressed() && !windowIsShiftPressed()) {
+// // 				global_ui->app.gRackWidget->deleteModule(this);
+// // 				this->finalizeEvents();
+// // 				delete this;
+// // 				e.consumed = true;
+// // 				return;
+// // 			}
+// // 		}
+// // 	}
+// // #endif
 }
 
 void ModuleWidget::onHoverKey(EventHoverKey &e) {
 	switch (e.key) {
-		case GLFW_KEY_I: {
+
+		case 'i'/*GLFW_KEY_I*/:
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				reset();
 				e.consumed = true;
 				return;
 			}
-		} break;
-		case GLFW_KEY_R: {
+         break;
+
+		case 'r'/*GLFW_KEY_R*/:
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				randomize();
 				e.consumed = true;
 				return;
 			}
-		} break;
-		case GLFW_KEY_D: {
+         break;
+
+		case 'd'/*GLFW_KEY_D*/:
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				global_ui->app.gRackWidget->cloneModule(this);
 				e.consumed = true;
 				return;
 			}
-		} break;
-		case GLFW_KEY_U: {
+         break;
+
+		case 'u'/*GLFW_KEY_U*/:
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				disconnect();
 				e.consumed = true;
 				return;
 			}
-		} break;
+         break;
+
+      case LGLW_VKEY_DELETE:
+      case LGLW_VKEY_BACKSPACE:
+         if (!global_ui->widgets.gFocusedWidget) {
+            if (!windowIsModPressed() && !windowIsShiftPressed()) {
+               global_ui->app.gRackWidget->deleteModule(this);
+               this->finalizeEvents();
+               delete this;
+               e.consumed = true;
+               return;
+            }
+         }
+         break;
+
+		case 'w':
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
+            global_ui->app.gRackWidget->deleteModule(this);
+            this->finalizeEvents();
+            delete this;
+            e.consumed = true;
+            return;
+			}
+         break;
+
 	}
 
 	Widget::onHoverKey(e);

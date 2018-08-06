@@ -27,11 +27,13 @@ void MenuOverlay::onMouseDown(EventMouseDown &e) {
 
 void MenuOverlay::onHoverKey(EventHoverKey &e) {
 	switch (e.key) {
-		case GLFW_KEY_ESCAPE: {
+      default:
+         break;
+
+		case LGLW_VKEY_ESCAPE/*GLFW_KEY_ESCAPE*/:
 			global_ui->ui.gScene->setOverlay(NULL);
 			e.consumed = true;
 			return;
-		} break;
 	}
 
 	if (!e.consumed) {

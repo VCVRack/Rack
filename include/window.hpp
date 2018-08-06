@@ -2,7 +2,8 @@
 #include "widgets.hpp"
 #define GLEW_STATIC
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
+////#include <GLFW/glfw3.h>
+#include <lglw/lglw.h>
 
 
 #ifdef ARCH_MAC
@@ -12,12 +13,19 @@
 #endif
 
 
+// backwards compatibility:
+//   (note) currently only used by Bidoo.ACNE module
+#define RACK_MOUSE_BUTTON_LEFT   0
+#define RACK_MOUSE_BUTTON_RIGHT  1
+#define RACK_MOUSE_BUTTON_MIDDLE 2
+
+
 extern const char *g_program_dir;
 
 namespace rack {
 
 
-extern GLFWwindow *gWindow;
+// extern GLFWwindow *gWindow;
 extern NVGcontext *gVg;
 extern NVGcontext *gFramebufferVg;
 /** The default font to use for GUI elements */

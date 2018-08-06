@@ -8,7 +8,6 @@
 #include "widgets.hpp"
 
 
-struct GLFWwindow;
 struct NVGcontext;
 
 
@@ -31,7 +30,7 @@ struct Model;
 struct GlobalUI {
 
    struct {
-      GLFWwindow *gWindow;
+      void *lglw; // lglw_t
       NVGcontext *gVg;
       NVGcontext *gFramebufferVg;
       std::shared_ptr<Font> gGuiFont;
@@ -92,28 +91,16 @@ struct GlobalUI {
       int bnd_font;
    } blendish;
 
-#ifdef USE_VST2
-   struct {
-      volatile int b_close_window;
-      volatile int b_hide_window;
-#ifdef WIN32
-      void *parent_hwnd;
-      bool b_queued_maximize_window;
-#endif // WIN32
-   } vst2;
-#endif // USE_VST2
 
    void init(void) {
-      window.gWindow = NULL;
+      
+      window.lglw = NULL;
       window.gVg = NULL;
       window.gFramebufferVg = NULL;
       window.gPixelRatio = 1.0;
       window.gWindowRatio = 1.0;
-// #ifdef USE_VST2
-//       window.gAllowCursorLock = false;
-// #else
       window.gAllowCursorLock = true;
-// #endif // USE_VST2
+      window.gGuiFrame = 0;
       window.windowX = 0;
       window.windowY = 0;
       window.windowWidth = 0;
@@ -143,15 +130,6 @@ struct GlobalUI {
 
       blendish.bnd_icon_image = -1;
       blendish.bnd_font = -1;
-
-#ifdef USE_VST2
-      vst2.b_close_window = 0;
-      vst2.b_hide_window = 0;
-#ifdef WIN32
-      vst2.parent_hwnd = 0;
-      vst2.b_queued_maximize_window = false;
-#endif
-#endif // USE_VST2
    } 
 
 };

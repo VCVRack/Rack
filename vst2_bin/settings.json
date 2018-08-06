@@ -2,14 +2,14 @@
   "token": "",
   "windowSize": [
     1240.0,
-    810.0
+    820.0
   ],
   "windowPos": [
     60.0,
     83.0
   ],
   "wireOpacity": 50.0,
-  "wireTension": 1.0,
+  "wireTension": 0.97,
   "zoom": 1.0,
   "allowCursorLock": true,
   "sampleRate": 44100.0,

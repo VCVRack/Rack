@@ -12,7 +12,7 @@
 
 
 #ifdef USE_VST2
-struct VSTPluginWrapper;
+class VSTPluginWrapper;
 #endif // USE_VST2
 
 

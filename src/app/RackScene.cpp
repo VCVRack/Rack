@@ -65,19 +65,19 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 
 	if (!e.consumed) {
 		switch (e.key) {
-			case GLFW_KEY_N: {
+			case 'n'/*GLFW_KEY_N*/:
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					global_ui->app.gRackWidget->reset();
 					e.consumed = true;
 				}
-			} break;
-			case GLFW_KEY_Q: {
+            break;
+			case 'q'/*GLFW_KEY_Q*/:
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					windowClose();
 					e.consumed = true;
 				}
-			} break;
-			case GLFW_KEY_O: {
+            break;
+			case 'o'/*GLFW_KEY_O*/:
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					global_ui->app.gRackWidget->openDialog();
 					e.consumed = true;
@@ -86,8 +86,8 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 					global_ui->app.gRackWidget->revert();
 					e.consumed = true;
 				}
-			} break;
-			case GLFW_KEY_S: {
+            break;
+			case 's'/*GLFW_KEY_S*/:
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					global_ui->app.gRackWidget->saveDialog();
 					e.consumed = true;
@@ -96,15 +96,15 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 					global_ui->app.gRackWidget->saveAsDialog();
 					e.consumed = true;
 				}
-			} break;
-			case GLFW_KEY_ENTER:
-			case GLFW_KEY_KP_ENTER: {
+            break;
+			case LGLW_VKEY_RETURN/*GLFW_KEY_ENTER*/:
+			// case GLFW_KEY_KP_ENTER:
 				appModuleBrowserCreate();
 				e.consumed = true;
-			} break;
-			case GLFW_KEY_F11: {
+            break;
+			case LGLW_VKEY_F11/*GLFW_KEY_F11*/:
 				windowSetFullScreen(!windowGetFullScreen());
-			}
+            break;
 		}
 	}
 }

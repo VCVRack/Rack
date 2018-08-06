@@ -63,7 +63,8 @@ void TextField::onText(EventText &e) {
 
 void TextField::onKey(EventKey &e) {
 	switch (e.key) {
-		case GLFW_KEY_BACKSPACE: {
+
+		case LGLW_VKEY_BACKSPACE/*GLFW_KEY_BACKSPACE*/:
 			if (cursor == selection) {
 				cursor--;
 				if (cursor >= 0) {
@@ -78,8 +79,9 @@ void TextField::onKey(EventKey &e) {
 				onTextChange();
 				cursor = selection = begin;
 			}
-		} break;
-		case GLFW_KEY_DELETE: {
+         break;
+
+		case LGLW_VKEY_DELETE/*GLFW_KEY_DELETE*/:
 			if (cursor == selection) {
 				text.erase(cursor, 1);
 				onTextChange();
@@ -90,8 +92,9 @@ void TextField::onKey(EventKey &e) {
 				onTextChange();
 				cursor = selection = begin;
 			}
-		} break;
-		case GLFW_KEY_LEFT: {
+         break;
+
+		case LGLW_VKEY_LEFT/*GLFW_KEY_LEFT*/:
 			if (windowIsModPressed()) {
 				while (--cursor > 0) {
 					if (text[cursor] == ' ')
@@ -104,8 +107,9 @@ void TextField::onKey(EventKey &e) {
 			if (!windowIsShiftPressed()) {
 				selection = cursor;
 			}
-		} break;
-		case GLFW_KEY_RIGHT: {
+         break;
+
+		case LGLW_VKEY_RIGHT/*GLFW_KEY_RIGHT*/:
 			if (windowIsModPressed()) {
 				while (++cursor < (int) text.size()) {
 					if (text[cursor] == ' ')
@@ -118,21 +122,28 @@ void TextField::onKey(EventKey &e) {
 			if (!windowIsShiftPressed()) {
 				selection = cursor;
 			}
-		} break;
-		case GLFW_KEY_HOME: {
+         break;
+
+		case LGLW_VKEY_HOME/*GLFW_KEY_HOME*/:
 			selection = cursor = 0;
-		} break;
-		case GLFW_KEY_END: {
+         break;
+
+		case LGLW_VKEY_END/*GLFW_KEY_END*/:
 			selection = cursor = text.size();
-		} break;
-		case GLFW_KEY_V: {
+         break;
+
+		case 'v'/*GLFW_KEY_V*/:
+#if 0
 			if (windowIsModPressed()) {
 				const char *newText = glfwGetClipboardString(global_ui->window.gWindow);
 				if (newText)
 					insertText(newText);
 			}
-		} break;
-		case GLFW_KEY_X: {
+#endif
+         break;
+
+		case 'x'/*GLFW_KEY_X*/:
+#if 0
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
 					int begin = min(cursor, selection);
@@ -141,8 +152,11 @@ void TextField::onKey(EventKey &e) {
 					insertText("");
 				}
 			}
-		} break;
-		case GLFW_KEY_C: {
+#endif
+         break;
+
+		case 'c'/*GLFW_KEY_C*/:
+#if 0
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
 					int begin = min(cursor, selection);
@@ -150,14 +164,18 @@ void TextField::onKey(EventKey &e) {
 					glfwSetClipboardString(global_ui->window.gWindow, selectedText.c_str());
 				}
 			}
-		} break;
-		case GLFW_KEY_A: {
+#endif
+         break;
+
+		case 'a'/*GLFW_KEY_A*/:
 			if (windowIsModPressed()) {
 				selection = 0;
 				cursor = text.size();
 			}
-		} break;
-		case GLFW_KEY_ENTER: {
+         break;
+
+		case LGLW_VKEY_RETURN/*GLFW_KEY_ENTER*/:
+         // printf("xxx TextField::onKey: RETURN\n");
 			if (multiline) {
 				insertText("\n");
 			}
@@ -165,7 +183,7 @@ void TextField::onKey(EventKey &e) {
 				EventAction e;
 				onAction(e);
 			}
-		} break;
+         break;
 	}
 
 	cursor = clamp(cursor, 0, (int) text.size());

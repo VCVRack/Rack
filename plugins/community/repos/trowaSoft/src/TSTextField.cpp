@@ -5,7 +5,7 @@
 // for gVg
 #include "window.hpp"
 // for key codes
-#include <GLFW/glfw3.h>
+// // #include <GLFW/glfw3.h>
 #include "global_ui.hpp"
 using namespace rack;
 
@@ -217,7 +217,7 @@ void TSTextField::onKey(EventKey &e) {
 	//// Flag if we need to validate/cleanse this character (only if printable and if we are doing validation).
 	//bool checkKey = (this->allowedTextType != TextType::Any) && isPrintableKey(e.key);
 	switch (e.key) {
-		case GLFW_KEY_TAB:
+		case LGLW_VKEY_TAB/*GLFW_KEY_TAB*/:
 			// If we have an event to fire, then do it
 			if (windowIsShiftPressed())//(guiIsShiftPressed())
 			{
@@ -297,13 +297,13 @@ void TSTextField::onKey(EventKey &e) {
 				}
 			} // end if next field
 			break;
-		case GLFW_KEY_KP_ENTER:
-		{
-			// Key pad enter should also trigger event action
-			EventAction evt;
-			onAction(evt);
-		}
-			break;
+		// case GLFW_KEY_KP_ENTER:
+		// {
+		// 	// Key pad enter should also trigger event action
+		// 	EventAction evt;
+		// 	onAction(evt);
+		// }
+		// 	break;
 		default:
 			// Call base method
 			TextField::onKey(e);
@@ -324,58 +324,58 @@ bool isPrintableKey(int key)
 	bool isPrintable = false;
 	switch (key)
 	{
-	case GLFW_KEY_SPACE:
-	case GLFW_KEY_APOSTROPHE:
-	case GLFW_KEY_COMMA:
-	case GLFW_KEY_MINUS:
-	case GLFW_KEY_PERIOD:
-	case GLFW_KEY_SLASH:
-	case GLFW_KEY_0:
-	case GLFW_KEY_1:
-	case GLFW_KEY_2:
-	case GLFW_KEY_3:
-	case GLFW_KEY_4:
-	case GLFW_KEY_5:
-	case GLFW_KEY_6:
-	case GLFW_KEY_7:
-	case GLFW_KEY_8:
-	case GLFW_KEY_9:
-	case GLFW_KEY_SEMICOLON:
-	case GLFW_KEY_EQUAL:
-	case GLFW_KEY_A:
-	case GLFW_KEY_B:
-	case GLFW_KEY_C:
-	case GLFW_KEY_D:
-	case GLFW_KEY_E:
-	case GLFW_KEY_F:
-	case GLFW_KEY_G:
-	case GLFW_KEY_H:
-	case GLFW_KEY_I:
-	case GLFW_KEY_J:
-	case GLFW_KEY_K:
-	case GLFW_KEY_L:
-	case GLFW_KEY_M:
-	case GLFW_KEY_N:
-	case GLFW_KEY_O:
-	case GLFW_KEY_P:
-	case GLFW_KEY_Q:
-	case GLFW_KEY_R:
-	case GLFW_KEY_S:
-	case GLFW_KEY_T:
-	case GLFW_KEY_U:
-	case GLFW_KEY_V:
-	case GLFW_KEY_W:
-	case GLFW_KEY_X:
-	case GLFW_KEY_Y:
-	case GLFW_KEY_Z:
-	case GLFW_KEY_LEFT_BRACKET:
-	case GLFW_KEY_BACKSLASH:
-	case GLFW_KEY_RIGHT_BRACKET:
-	case GLFW_KEY_GRAVE_ACCENT:
-	case GLFW_KEY_WORLD_1:
-	case GLFW_KEY_WORLD_2:
-		isPrintable = true;
-		break;
+      case ' '/*GLFW_KEY_SPACE*/:
+      case '\''/*GLFW_KEY_APOSTROPHE*/:
+      case ','/*GLFW_KEY_COMMA*/:
+      case '-'/*GLFW_KEY_MINUS*/:
+      case '.'/*GLFW_KEY_PERIOD*/:
+      case '/'/*GLFW_KEY_SLASH*/:
+      case '0'/*GLFW_KEY_0*/:
+      case '1'/*GLFW_KEY_1*/:
+      case '2'/*GLFW_KEY_2*/:
+      case '3'/*GLFW_KEY_3*/:
+      case '4'/*GLFW_KEY_4*/:
+      case '5'/*GLFW_KEY_5*/:
+      case '6'/*GLFW_KEY_6*/:
+      case '7'/*GLFW_KEY_7*/:
+      case '8'/*GLFW_KEY_8*/:
+      case '9'/*GLFW_KEY_9*/:
+      case ';'/*GLFW_KEY_SEMICOLON*/:
+      case '='/*GLFW_KEY_EQUAL*/:
+      case 'a'/*GLFW_KEY_A*/:
+      case 'b'/*GLFW_KEY_B*/:
+      case 'c'/*GLFW_KEY_C*/:
+      case 'd'/*GLFW_KEY_D*/:
+      case 'e'/*GLFW_KEY_E*/:
+      case 'f'/*GLFW_KEY_F*/:
+      case 'g'/*GLFW_KEY_G*/:
+      case 'h'/*GLFW_KEY_H*/:
+      case 'i'/*GLFW_KEY_I*/:
+      case 'j'/*GLFW_KEY_J*/:
+      case 'k'/*GLFW_KEY_K*/:
+      case 'l'/*GLFW_KEY_L*/:
+      case 'm'/*GLFW_KEY_M*/:
+      case 'n'/*GLFW_KEY_N*/:
+      case 'o'/*GLFW_KEY_O*/:
+      case 'p'/*GLFW_KEY_P*/:
+      case 'q'/*GLFW_KEY_Q*/:
+      case 'r'/*GLFW_KEY_R*/:
+      case 's'/*GLFW_KEY_S*/:
+      case 't'/*GLFW_KEY_T*/:
+      case 'u'/*GLFW_KEY_U*/:
+      case 'v'/*GLFW_KEY_V*/:
+      case 'w'/*GLFW_KEY_W*/:
+      case 'x'/*GLFW_KEY_X*/:
+      case 'y'/*GLFW_KEY_Y*/:
+      case 'z'/*GLFW_KEY_Z*/:
+      case '['/*GLFW_KEY_LEFT_BRACKET*/:
+      case '\\'/*GLFW_KEY_BACKSLASH*/:
+      case ']'/*GLFW_KEY_RIGHT_BRACKET*/:
+      case '^'/*GLFW_KEY_GRAVE_ACCENT*/:
+      // case GLFW_KEY_WORLD_1:
+      // case GLFW_KEY_WORLD_2:
+         isPrintable = true;
+         break;
 	}
 	return isPrintable;
 } // end isPrintableKey()

@@ -23,9 +23,9 @@ vst: lib
 	rm -f src/vst2_main.o
 	make -f makefile_vst_effect.msvc bin -j $(NUM_JOBS)
 # (note) cannot use both instrument and effect plugin at the same time!
-	mv veeseevstrack_instr.dll vst2_bin/veeseevstrack_instr.dll__
+	mv veeseevstrack_instr.dll vst2_bin/
 	mv veeseevstrack_effect.dll vst2_bin/
-	@ls -l vst2_bin/veeseevstrack_instr.dll__
+	@ls -l vst2_bin/veeseevstrack_instr.dll
 	@ls -l vst2_bin/veeseevstrack_effect.dll
 
 clean:

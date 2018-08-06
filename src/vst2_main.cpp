@@ -17,7 +17,7 @@
 ///
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
-///          26Jul2018
+///          26Jul2018, 04Aug2018, 05Aug2018
 ///
 ///
 ///
@@ -45,11 +45,16 @@ YAC_Host *yac_host;  // not actually used, just to satisfy the linker
 #include "global.hpp"
 #include "global_ui.hpp"
 
+#define EDITWIN_X 0
+#define EDITWIN_Y 0
+#define EDITWIN_W 1200
+#define EDITWIN_H 800
+
 extern int  vst2_init (int argc, char* argv[]);
 extern void vst2_exit (void);
-extern void vst2_editor_create (void);
-extern void vst2_editor_loop (void);
-extern void vst2_editor_destroy (void);
+namespace rack {
+extern void vst2_editor_redraw (void);
+}
 extern void vst2_set_samplerate (sF32 _rate);
 extern void vst2_engine_process (float *const*_in, float **_out, unsigned int _numFrames);
 extern void vst2_process_midi_input_event (sU8 _a, sU8 _b, sU8 _c);
@@ -58,6 +63,10 @@ extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
 extern void vst2_set_shared_plugin_tls_globals (void);
+
+namespace rack {
+   extern void settingsLoad(std::string filename, bool bWindowSizeOnly);
+}
 
 
 #include "../include/window.hpp"
@@ -75,9 +84,6 @@ extern void vst2_set_shared_plugin_tls_globals (void);
 #include <xmmintrin.h>
 
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
-
-extern "C" extern HWND g_glfw_vst2_parent_hwnd;  // read by modified version of GLFW (see glfw/src/win32_window.c)
-extern "C" extern HWND __hack__glfwGetHWND (GLFWwindow *window);
 
 
 // Windows:
@@ -378,7 +384,7 @@ const VstInt32 PLUGIN_VERSION = 1000;
  */
 class VSTPluginWrapper {
 public:
-   static const uint32_t MIN_SAMPLE_RATE = 8192u;  // (note) cannot be float in C++
+   static const uint32_t MIN_SAMPLE_RATE = 8192u;
    static const uint32_t MAX_SAMPLE_RATE = 384000u;
    static const uint32_t MIN_BLOCK_SIZE  = 64u;
    static const uint32_t MAX_BLOCK_SIZE  = 65536u;
@@ -404,37 +410,12 @@ public:
    bool b_processing;  // true=generate output, false=suspended
 
    ERect editor_rect;
+   sBool b_editor_open;
 
    char *last_program_chunk_str;
 
    static sSI instance_count;
    sSI instance_id;
-
-   // // sU8 glfw_internal[64*1024];  // far larger than it needs to be, must be >=sizeof(_GLFWlibrary)
-
-public:
-#ifdef YAC_LINUX
-   pthread_t pthread_id;
-#endif
-#ifdef YAC_WIN32
-   HANDLE hThread;
-   DWORD  dwThreadId;
-#endif
-   sBool b_thread_created;
-   volatile sBool b_thread_started;
-   volatile sBool b_thread_running;
-   volatile sBool b_thread_done;
-
-   volatile sBool b_queued_open_editor;
-   volatile sBool b_queued_destroy_editor;
-   volatile sBool b_editor_open;
-   volatile sBool b_editor_created;
-
-   struct {
-      volatile uint32_t size;
-      volatile uint8_t *addr;
-      volatile bool b_ret;
-   } queued_load_patch;
 
    sF32 tmp_input_buffers[NUM_INPUTS * MAX_BLOCK_SIZE];
 
@@ -454,13 +435,9 @@ public:
       return &_vstPlugin;
    }
 
-   void startUIThread (void);
-   void stopUIThread (void);
-
    void setGlobals(void) {
       rack::global = &rack_global;
       rack::global_ui = &rack_global_ui;
-      // // glfwSetInstance((void*)glfw_internal);
    }
 
    sSI openEffect(void) {
@@ -468,16 +445,6 @@ public:
       printf("xxx vstrack_plugin::openEffect\n");
 
       // (todo) use mutex 
-
-      if(1 == instance_count)
-      {
-         int err = glfwInit();
-         if (err != GLFW_TRUE) {
-            osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
-            return 0;
-         }
-      }
-
       instance_id = instance_count;
       printf("xxx vstrack_plugin::openEffect: instance_id=%d\n", instance_id);
 
@@ -494,7 +461,6 @@ public:
       rack_global.init();
       rack_global_ui.init();
       rack::global->vst2.last_seen_instance_count = instance_count;
-      // // ::memset((void*)glfw_internal, 0, sizeof(glfw_internal));
 
       char oldCWD[1024];
       char dllnameraw[1024];
@@ -518,23 +484,55 @@ public:
       (void)vst2_init(argc, argv);
       printf("xxx vstrack_plugin::openEffect: vst2_init() done\n");
 
-      queued_load_patch.size = 0u;
-      queued_load_patch.addr = NULL;
-      queued_load_patch.b_ret = false;
-
-      startUIThread();
+      vst2_set_shared_plugin_tls_globals();
 
       printf("xxx vstrack_plugin::openEffect: restore cwd=\"%s\"\n", oldCWD);      
       ::SetCurrentDirectory(oldCWD);
 
       setSampleRate(sample_rate);
 
-      b_open = 1;
+      b_open = true;
+      b_editor_open = false;
+
       printf("xxx vstrack_plugin::openEffect: LEAVE\n");
       return 1;
    }
 
+   void setWindowSize(int _width, int _height) {
+      if(_width < 640)
+         _width = 640;
+      if(_height < 480)
+         _height = 480;
+
+      editor_rect.right  = EDITWIN_X + _width;
+      editor_rect.bottom = EDITWIN_Y + _height;
+   }
+
+   void openEditor(void *_hwnd) {
+      printf("xxx vstrack_plugin: openEditor() parentHWND=%p\n", _hwnd);
+      setGlobals();
+      (void)lglw_window_open(rack_global_ui.window.lglw,
+                             _hwnd,
+                             0/*x*/, 0/*y*/,
+                             (editor_rect.right - editor_rect.left),
+                             (editor_rect.bottom - editor_rect.top)
+                             );
+      b_editor_open = true;
+   }
+
+   void closeEditor(void) {
+      printf("xxx vstrack_plugin: closeEditor() b_editor_open=%d\n", b_editor_open);
+      if(b_editor_open)
+      {
+         setGlobals();
+         lglw_window_close(rack_global_ui.window.lglw);
+         b_editor_open = false;
+      }      
+   }
+
    void closeEffect(void) {
+
+      closeEditor();
 
       // (todo) use mutex
       printf("xxx vstrack_plugin::closeEffect: last_program_chunk_str=%p\n", last_program_chunk_str);
@@ -548,20 +546,10 @@ public:
 
       if(b_open)
       {
-         b_open = 0;
+         b_open = false;
 
          setGlobals();
          rack::global->vst2.last_seen_instance_count = instance_count;
-
-         b_queued_destroy_editor = true;
-         rack::global_ui->vst2.b_close_window = 1;
-         while(b_queued_destroy_editor)
-         {
-            printf("[dbg] vstrack_plugin: wait until editor's been destroyed\n");
-            sleepMillisecs(100); // (todo) condition
-         }
-
-         stopUIThread();
 
          printf("xxx vstrack_plugin: call vst2_exit()\n");
 
@@ -569,64 +557,11 @@ public:
 
          printf("xxx vstrack_plugin: vst2_exit() done\n");
 
-         if(1 == instance_count)
-         {
-            glfwTerminate();
-         }
-
 #ifdef USE_CONSOLE
          // FreeConsole();
 #endif // USE_CONSOLE
       }
 
-   }
-
-#ifdef YAC_WIN32
-   void openEditor(HWND _hwnd) {
-      //g_glfw_vst2_parent_hwnd = _hwnd;
-      g_glfw_vst2_parent_hwnd = 0;
-#else
-#error implement me (openEditor)
-#endif
-      printf("xxx vstrack_plugin: openEditor()\n");
-      b_queued_open_editor = true;
-
-#ifdef YAC_WIN32
-      rack::global_ui->vst2.parent_hwnd = (void*)_hwnd;
-      printf("xxx vstrack_plugin: DAW parent hwnd=%p\n", rack::global_ui->vst2.parent_hwnd);
-#endif // YAC_WIN32
-
-      int iter = 0;
-      while(iter++ < 50)
-      {
-         if(b_editor_open)
-            break;
-         sleepMillisecs(100); // (todo) condition
-      }
-
-      if(100 == iter)
-         printf("xxx vstrack_plugin: failed to show editor after %d milliseconds!!\n", (iter*100));
-      else
-         printf("xxx vstrack_plugin: editor opened after %d milliseconds\n", (iter*100));
-      // // vst2_show_editor();     
-   }
-
-   void hideEditor(void) {
-      printf("xxx vstrack_plugin: hideEditor() b_editor_open=%d\n", b_editor_open);
-      if(b_editor_open)
-      {
-         setGlobals();
-         rack::global_ui->vst2.b_hide_window = 1;
-      }      
-   }
-
-   void closeEditor(void) {
-      printf("xxx vstrack_plugin: closeEditor() b_editor_open=%d\n", b_editor_open);
-      if(b_editor_open)
-      {
-         setGlobals();
-         rack::global_ui->vst2.b_close_window = 1;
-      }
    }
 
    void lockAudio(void) {
@@ -686,7 +621,7 @@ public:
       return 0;
    }
 
-   sUI getProgramChunk(uint8_t **_addr) {
+   sUI getProgramChunk(uint8_t**_addr) {
       setGlobals();
       if(NULL != last_program_chunk_str)
       {
@@ -696,61 +631,29 @@ public:
       if(NULL != last_program_chunk_str)
       {
          *_addr = (uint8_t*)last_program_chunk_str;
-         return strlen(last_program_chunk_str) + 1/*ASCIIZ*/;
+         return (sUI)strlen(last_program_chunk_str) + 1/*ASCIIZ*/;
       }
       return 0;
    }
 
-   bool setBankChunk(size_t _size, uint8_t*_addr) {
+   bool setBankChunk(size_t _size, uint8_t *_addr) {
       bool r = false;
       return r;
    }
 
-   bool setProgramChunk_Async(size_t _size, uint8_t*_addr) {
-      bool r = false;
+   bool setProgramChunk(size_t _size, uint8_t *_addr) {
       setGlobals();
-
-      if(NULL != _addr)
-      {
-         queued_load_patch.b_ret = false;
-         queued_load_patch.size = _size;
-         queued_load_patch.addr = _addr; // triggers loader in UI thread
-
-         int iter = 0;
-         for(;;)
-         {
-            if(NULL == queued_load_patch.addr)
-            {
-               queued_load_patch.b_ret = r;
-               break;
-            }
-            else if(++iter > 500)
-            {
-               printf("[---] vstrack_plugin:queueSetProgramChunk: timeout while waiting for UI thread.\n");
-               break;
-            }
-            sleepMillisecs(10);
-         }
-      }
-      return r;
-   }
-
-   void handleSetQueuedProgramChunk(void) {
-      if(NULL != queued_load_patch.addr)
-      {
-         setGlobals();
-         lockAudio();
+      lockAudio();
 #if 0
-         printf("xxx vstrack_plugin:setProgramChunk: size=%u str=\n-------------------%s\n------------------\n", queued_load_patch.size, (const char*)queued_load_patch.addr);
-#else
-         printf("xxx vstrack_plugin:setProgramChunk: size=%u\n", queued_load_patch.size);
+      printf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
 #endif
-         bool r = rack::global_ui->app.gRackWidget->loadPatchFromString((const char*)queued_load_patch.addr);
-         printf("xxx vstrack_plugin:setProgramChunk: r=%d\n", r);
-         queued_load_patch.b_ret = r;
-         queued_load_patch.addr = NULL;
-         unlockAudio();
-      }
+      lglw_glcontext_push(rack::global_ui->window.lglw);
+      bool r = rack::global_ui->app.gRackWidget->loadPatchFromString((const char*)_addr);
+      rack::global_ui->ui.gScene->step();  // w/o this the patch is bypassed
+      lglw_glcontext_pop(rack::global_ui->window.lglw);
+      printf("xxx vstrack_plugin:setProgramChunk: r=%d\n", r);
+      unlockAudio();
+      return r;
    }
 
 #ifdef HAVE_WINDOWS
@@ -799,7 +702,7 @@ public:
 
             if(0 != (timeInfo->flags & kVstPpqPosValid))
             {
-               *_retSongPosPPQ = timeInfo->ppqPos;
+               *_retSongPosPPQ = (float)timeInfo->ppqPos;
             }
          }
       }
@@ -815,171 +718,6 @@ private:
 
 sSI VSTPluginWrapper::instance_count = 0;
 
-
-#ifdef YAC_LINUX
-static void        *vst2_ui_thread_entry(VSTPluginWrapper *_wrapper) {
-#elif defined(YAC_WIN32)
-static DWORD WINAPI vst2_ui_thread_entry(VSTPluginWrapper *_wrapper) {
-#endif
-
-   printf("xxx vstrack_plugin: UI thread started\n");
-   _wrapper->setGlobals();
-   printf("xxx vstrack_plugin<ui>: global=%p global_ui=%p\n", rack::global, rack::global_ui);
-
-   printf("xxx vstrack_plugin<ui>: call vst2_editor_create()\n");
-   _wrapper->lockAudio();
-   vst2_editor_create();
-   printf("xxx vstrack_plugin<ui>: vst2_editor_create() done\n");
-   _wrapper->b_editor_created = YAC_TRUE;
-   _wrapper->unlockAudio();
-
-   _wrapper->b_thread_started = YAC_TRUE;
-
-   vst2_set_shared_plugin_tls_globals();
-
-   while(_wrapper->b_thread_running || _wrapper->b_queued_destroy_editor || _wrapper->queued_load_patch.addr)
-   {
-      // printf("xxx vstrack_plugin<ui>: idle loop\n");
-      if(_wrapper->b_queued_open_editor && !_wrapper->b_editor_open)
-      {
-         if(!_wrapper->b_editor_created)
-         {
-         }
-
-         _wrapper->b_queued_open_editor = YAC_FALSE;
-
-         // Show previously hidden window
-#if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
-#if 0
-         HWND glfwHWND = __hack__glfwGetHWND(rack::global_ui->window.gWindow);
-         ::SetParent(glfwHWND,
-                     (HWND)rack::global_ui->vst2.parent_hwnd
-                     );
-         printf("xxx vstrack: SetParent(glfwHWND=%p, dawParentHWND=%p)\n", (void*)glfwHWND, rack::global_ui->vst2.parent_hwnd);
-#endif
-#endif // YAC_WIN32
-
-         glfwShowWindow(rack::global_ui->window.gWindow);
-
-#ifdef VST2_REPARENT_WINDOW_HACK
-         // maximize window once it starts to receive events (see window.cpp)
-         rack::global_ui->vst2.b_queued_maximize_window = true;
-#endif // VST2_REPARENT_WINDOW_HACK
-
-         _wrapper->b_editor_open = YAC_TRUE;
-
-         rack::global_ui->vst2.b_close_window = 0;
-         printf("xxx vstrack_plugin[%d]: entering editor_loop\n", _wrapper->instance_id);
-         vst2_editor_loop();  // sets b_editor_open=true and b_queued_open_editor=false (must be delayed until window is actually visible or window create/focus tracking will not work)
-         _wrapper->b_editor_open = YAC_FALSE;
-         printf("xxx vstrack_plugin[%d]: editor_loop finished\n", _wrapper->instance_id);
-         // if(!_wrapper->b_window_created)
-         // {
-            // ShowUIWindow();
-            // use metahost_onTimer for SDL.onTimer;
-            // b_window_created = true;
-
-            // trace "[dbg] eureka: entering eventloop 2";
-            // b_editor_open = true;
-            // UI.Run();
-         // }
-      }
-      else if(_wrapper->b_queued_destroy_editor)
-      {
-         printf("xxx vstrack<ui>: _wrapper->b_queued_destroy_editor is 1, b_editor_created=%d\n", _wrapper->b_editor_created);
-         if(_wrapper->b_editor_created)
-         {
-#if 0
-#if defined(YAC_WIN32) && defined(VST2_REPARENT_WINDOW_HACK)
-            ::SetParent(__hack__glfwGetHWND(rack::global_ui->window.gWindow), NULL);  // [bsp 04Jul2018] reparent hack (fix hang up when DAW editor is closed)
-#endif // VST2_REPARENT_WINDOW_HACK
-#endif
-            vst2_editor_destroy();
-            _wrapper->b_editor_created = YAC_FALSE;
-         }
-         _wrapper->b_queued_destroy_editor = YAC_FALSE;
-      }
-      else if(NULL != _wrapper->queued_load_patch.addr)
-      {
-         _wrapper->handleSetQueuedProgramChunk();
-      }
-      else
-      {
-         _wrapper->sleepMillisecs(100);
-      }
-   }
-
-   printf("xxx vstrack_plugin: UI thread finished\n");
-   _wrapper->b_thread_done = YAC_TRUE;
-   return 0;
-}
-
-void VSTPluginWrapper::startUIThread(void) {
-   b_queued_open_editor = false;
-   b_queued_destroy_editor = false;
-   b_editor_open = false;
-   b_editor_created = false;
-   queued_load_patch.b_ret = false;
-   queued_load_patch.size = 0u;
-   queued_load_patch.addr = NULL;
-
-   b_thread_created = YAC_FALSE;
-   b_thread_running = YAC_TRUE;
-   b_thread_done = YAC_FALSE;
-
-#ifdef YAC_LINUX
-   b_thread_created = (pthread_create( &pthread_id, NULL, vst2_ui_thread_entry, (void*) this ) == 0);
-
-   if(b_thread_created)
-   {
-      /* wait for lwp_id field to become valid */
-      while(!b_thread_started)
-      {
-         pthread_yield();
-      }
-   }
-#endif // YAC_POSIX
-
-#ifdef YAC_WIN32
-   hThread = CreateThread( 
-      NULL,                // default security attributes
-      0,                   // use default stack size  
-      (LPTHREAD_START_ROUTINE)vst2_ui_thread_entry,// thread function 
-      (LPVOID)this,        // argument to thread function 
-      0,                   // use default creation flags 
-      &dwThreadId);        // returns the thread identifier
-   b_thread_created = (hThread != NULL);
-
-   while(!b_thread_started)
-      sleepMillisecs(10); // (todo) use condition
-      
-#endif
-}
-
-void VSTPluginWrapper::stopUIThread(void) {
-   b_thread_running = YAC_FALSE;
-
-   while(!b_thread_done)
-   {
-      sleepMillisecs(10); // (todo) use condition
-   }
-
-#ifdef YAC_LINUX
-   ///pthread_join( pthread_id, NULL);
-   pthread_detach( pthread_id );
-   pthread_cancel( pthread_id );
-   pthread_id = 0;
-#endif
-   
-#ifdef YAC_WIN32
-   SuspendThread( hThread );
-   TerminateThread( hThread, 10 ); // 10 = exit code
-   WaitForMultipleObjects(1, &hThread, TRUE, 5000 /*INFINITE*/); // wait max. 5sec
-   CloseHandle(hThread);
-   hThread = NULL;
-#endif
-
-}
 
 
 /*******************************************
@@ -1022,7 +760,6 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    //printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: wrapper=%p\n", wrapper);
 
    sUI chIdx;
-   sUI i;
 
    //  (note) Cubase (tested with 9.5.30) uses the same buffer(s) for both input&output
    //           => back up the inputs before clearing the outputs
@@ -1060,46 +797,6 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    // // glfwSetInstance(NULL); // xxxx test TLS (=> not working in mingw64!)
 }
 
-
-#if 0
-/**
- * This is the callback that will be called to process the samples in the case of double precision. This is where the
- * meat of the logic happens!
- *
- * @param vstPlugin the object returned by VSTPluginMain
- * @param inputs an array of array of input samples. You read from it. First dimension is for inputs, second dimension is for samples: inputs[numInputs][sampleFrames]
- * @param outputs an array of array of output samples. You write to it. First dimension is for outputs, second dimension is for samples: outputs[numOuputs][sampleFrames]
- * @param sampleFrames the number of samples (second dimension in both arrays)
- */
-void VSTPluginProcessReplacingFloat64(VSTPlugin *vstPlugin, 
-                                      double   **inputs, 
-                                      double   **outputs, 
-                                      VstInt32   sampleFrames
-                                      ) {
-   // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
-   VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
-
-   wrapper->lockAudio();
-
-   if(wrapper->b_processing)
-   {
-      // code speaks for itself: for each input (2 when stereo input), iterating over every sample and writing the
-      // result in the outputs array after multiplying by 0.5 (which result in a 3dB attenuation of the sound)
-      for(int i = 0; i < wrapper->getNumInputs(); i++)
-      {
-         auto inputSamples = inputs[i];
-         auto outputSamples = outputs[i];
-
-         for(int j = 0; j < sampleFrames; j++)
-         {
-            outputSamples[j] = inputSamples[j] * 0.5;
-         }
-      }
-   }
-
-   wrapper->unlockAudio();
-}
-#endif // 0
 
 
 /**
@@ -1297,14 +994,14 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //    ptr: buffer address
          //      r: buffer size
          printf("xxx effGetChunk index=%d ptr=%p\n", index, ptr);
-         // if(0 == index)
-         // {
-         //    r = wrapper->getBankChunk((uint8_t**)ptr);
-         // }
-         // else
-         // {
+         // // if(0 == index)
+         // // {
+         // //    r = wrapper->getBankChunk((uint8_t**)ptr);
+         // // }
+         // // else
+         // // {
             r = wrapper->getProgramChunk((uint8_t**)ptr);
-         // }
+         // // }
          break;
 
       case effSetChunk:
@@ -1313,14 +1010,14 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //    ptr: buffer address
          //      r: 1
          printf("xxx effSetChunk index=%d size=%lld ptr=%p\n", index, value, ptr);
-         // if(0 == index)
-         // {
-         //    r = wrapper->setBankChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
-         // }
-         // else
-         // {
-            r = wrapper->setProgramChunk_Async(size_t(value), (uint8_t*)ptr) ? 1 : 0;
-         // }
+         // // if(0 == index)
+         // // {
+         // //    r = wrapper->setBankChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
+         // // }
+         // // else
+         // // {
+            r = wrapper->setProgramChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
+         // // }
          break;
 
       case effShellGetNextPlugin:
@@ -1431,6 +1128,19 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 #endif
 
       case effEditIdle:
+         wrapper->setGlobals();
+         if(lglw_window_is_visible(rack::global_ui->window.lglw))
+         {
+            vst2_set_shared_plugin_tls_globals();
+
+            // Save DAW GL context and bind our own
+            lglw_glcontext_push(rack::global_ui->window.lglw);
+
+            rack::vst2_editor_redraw();
+
+            // Restore the DAW's GL context
+            lglw_glcontext_pop(rack::global_ui->window.lglw);
+         }
          break;
 
       case effEditGetRect:
@@ -1439,16 +1149,6 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          if(NULL != ptr) // yeah, this should never be NULL
          {
             // ...
-#define EDITWIN_X 20
-#define EDITWIN_Y 20
-// #define EDITWIN_W 1200
-// #define EDITWIN_H 800
-#define EDITWIN_W 60
-#define EDITWIN_H 21
-            wrapper->editor_rect.left   = EDITWIN_X;
-            wrapper->editor_rect.top    = EDITWIN_Y;
-            wrapper->editor_rect.right  = EDITWIN_X + EDITWIN_W;
-            wrapper->editor_rect.bottom = EDITWIN_Y + EDITWIN_H;
             *(void**)ptr = (void*) &wrapper->editor_rect;
             r = 1;
          }
@@ -1468,16 +1168,13 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
       case effEditOpen:
          // Show editor window
          // ptr: native window handle (hWnd on Windows)
-#ifdef YAC_WIN32
-         wrapper->openEditor((HWND)ptr);
-#endif
+         wrapper->openEditor(ptr);
          r = 1;
          break;
 
       case effEditClose:
-         // Hide editor window
-         // // wrapper->closeEditor();
-         wrapper->hideEditor();
+         // Close editor window
+         wrapper->closeEditor();
          r = 1;
          break;
 
@@ -1563,7 +1260,7 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
       effFlagsIsSynth                  |
 #endif
       effFlagsCanReplacing             | 
-      (effFlagsCanDoubleReplacing & 0) |
+      // (effFlagsCanDoubleReplacing & 0) |
       effFlagsProgramChunks            |
       effFlagsHasEditor                ;
 
@@ -1592,8 +1289,12 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    last_program_chunk_str = NULL;
 
    b_open = false;
+   b_editor_open = false;
 
-   // script_context = NULL;
+   editor_rect.left   = EDITWIN_X;
+   editor_rect.top    = EDITWIN_Y;
+   editor_rect.right  = EDITWIN_X + EDITWIN_W;
+   editor_rect.bottom = EDITWIN_Y + EDITWIN_H;
 }
 
 /**
@@ -1615,9 +1316,9 @@ void vst2_unlock_midi_device() {
    rack::global->vst2.wrapper->mtx_mididev.unlock();
 }
 
-void vst2_handle_queued_set_program_chunk(void) {
-   (void)rack::global->vst2.wrapper->handleSetQueuedProgramChunk();
-}
+// void vst2_handle_queued_set_program_chunk(void) {
+//    (void)rack::global->vst2.wrapper->handleSetQueuedProgramChunk();
+// }
 
 void vst2_handle_ui_param(int uniqueParamId, float normValue) {
    // Called by engineSetParam()
@@ -1629,24 +1330,15 @@ void vst2_get_timing_info(int *_retPlaying, float *_retBPM, float *_retSongPosPP
    rack::global->vst2.wrapper->getTimingInfo(_retPlaying, _retBPM, _retSongPosPPQ);
 }
 
-#ifdef VST2_REPARENT_WINDOW_HACK
-#ifdef YAC_WIN32
-void vst2_maximize_reparented_window(void) {
-#if 0
-   HWND glfwHWND = __hack__glfwGetHWND(rack::global_ui->window.gWindow);
-   HWND parentHWND = (HWND)rack::global_ui->vst2.parent_hwnd;
-   printf("xxx vstrack_plugin:vst2_maximize_reparented_window: hwnd=%p\n", (void*)glfwHWND);
-   RECT rect;
-   (void)::GetClientRect(parentHWND, &rect);
-   ///(void)::AdjustWindowRect(..)
-   printf("xxx vstrack_plugin:vst2_maximize_reparented_window: new size=(%d; %d)\n", rect.right-rect.left, rect.bottom-rect.top);
-   ::MoveWindow(glfwHWND, 0, 0, rect.right-rect.left, rect.bottom-rect.top, TRUE/*bRepaint*/);
-   // ::ShowWindow(glfwHWND, SW_MAXIMIZE);
-   // // ::ShowWindow(glfwHWND, SW_SHOWMAXIMIZED);
-#endif // 0
+void vst2_set_globals(void *_wrapper) {
+   VSTPluginWrapper *wrapper = (VSTPluginWrapper *)_wrapper;
+   wrapper->setGlobals();
 }
-#endif // YAC_WIN32
-#endif // VST2_REPARENT_WINDOW_HACK
+
+void vst2_window_size_set(int _width, int _height) {
+   rack::global->vst2.wrapper->setWindowSize(_width, _height);
+}
+
 
 /**
  * Implementation of the main entry point of the plugin

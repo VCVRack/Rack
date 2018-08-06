@@ -497,32 +497,32 @@ void SearchModuleField::onTextChange() {
 
 void SearchModuleField::onKey(EventKey &e) {
 	switch (e.key) {
-		case GLFW_KEY_ESCAPE: {
+		case LGLW_VKEY_ESCAPE/*GLFW_KEY_ESCAPE*/: {
 			global_ui->ui.gScene->setOverlay(NULL);
 			e.consumed = true;
 			return;
 		} break;
-		case GLFW_KEY_UP: {
+		case LGLW_VKEY_UP/*GLFW_KEY_UP*/: {
 			moduleBrowser->moduleList->incrementSelection(-1);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
-		case GLFW_KEY_DOWN: {
+		case LGLW_VKEY_DOWN/*GLFW_KEY_DOWN*/: {
 			moduleBrowser->moduleList->incrementSelection(1);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
-		case GLFW_KEY_PAGE_UP: {
+		case LGLW_VKEY_PAGEUP/*GLFW_KEY_PAGE_UP*/: {
 			moduleBrowser->moduleList->incrementSelection(-5);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
-		case GLFW_KEY_PAGE_DOWN: {
+		case LGLW_VKEY_PAGEDOWN/*GLFW_KEY_PAGE_DOWN*/: {
 			moduleBrowser->moduleList->incrementSelection(5);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
 		} break;
-		case GLFW_KEY_ENTER: {
+		case LGLW_VKEY_RETURN/*GLFW_KEY_ENTER*/: {
 			BrowserListItem *item = moduleBrowser->moduleList->getSelectedItem();
 			if (item) {
 				item->doAction();

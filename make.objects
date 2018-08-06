@@ -40,7 +40,6 @@ COMMON_OBJ= \
 	src/audio.o \
 	src/dsp/minblep.o \
 	src/engine.o \
-	src/keyboard.o \
 	src/midi.o \
 	src/plugin.o \
 	src/settings.o \
@@ -83,6 +82,8 @@ COMMON_OBJ= \
 	src/window.o \
 	src/vstmidi.o
 
+#	src/keyboard.o
+
 HOST_OBJ= \
 	src/Core/AudioInterface.o \
 	src/Core/Blank.o \
@@ -98,7 +99,8 @@ LIB_OBJ= \
 	$(HOST_OBJ)
 
 LIB_OBJ_WIN= \
-	src/util/dirent_win32/dirent.o
+	src/util/dirent_win32/dirent.o \
+	dep/lglw/lglw_windows.o
 
 SHARED_LIB_OBJ= \
 	$(COMMON_OBJ)

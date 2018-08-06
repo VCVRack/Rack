@@ -23,8 +23,9 @@ ALL_OBJ= \
 	src/TOCANTE.o \
 	src/VOID.o \
 	src/ZINC.o \
-	src/dep/kiss_fft130/kiss_fft.o \
-	src/dep/minimp3/minimp3_test.o
+	src/dep/kiss_fft130/kiss_fft.o
+
+#	src/dep/minimp3/minimp3_test.o
 
 
 # already used in AS modules
