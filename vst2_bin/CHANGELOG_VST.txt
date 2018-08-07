@@ -586,3 +586,4 @@
 - audio input is broken
 - comes with one (dynamically loaded) plugin ("Fundamental")
 - the VST plugin does not work in some DAWs (neither in Reaper, nor in Reason. It does work in Eureka)
+

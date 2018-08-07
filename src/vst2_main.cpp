@@ -999,7 +999,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // "conformsToWindowRules"
          if(!strcmp((char*)ptr, "receiveVstEvents"))
             r = 1;
-         else if(!strcmp((char*)ptr, "receiveVstMidiEvent"))
+         else if(!strcmp((char*)ptr, "receiveVstMidiEvent"))  // (note) required by Jeskola Buzz
             r = 1;
          else
             r = 0;

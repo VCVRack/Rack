@@ -33,6 +33,11 @@ Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-07Aug2018.7z](dist/veese
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
 
+# Installation
+Extract the 7zip archive and move the `vst2_bin/` folder to a VST2 plugin directory.
+Alternatively, add the folder to your DAW's plugin directory list.
+
+
 # Changelog
 see [vst2_bin/CHANGELOG_VST.txt](vst2_bin/CHANGELOG_VST.txt)
 
