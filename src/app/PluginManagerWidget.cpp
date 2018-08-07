@@ -64,7 +64,6 @@ struct SyncButton : Button {
 			t.detach();
 			checked = true;
 		}
-#endif // USE_VST2
 		// Display message if we've completed updates
 		if (completed) {
 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
@@ -72,6 +71,7 @@ struct SyncButton : Button {
 			}
 			completed = false;
 		}
+#endif // USE_VST2
 	}
 	void draw(NVGcontext *vg) override {
 		Button::draw(vg);

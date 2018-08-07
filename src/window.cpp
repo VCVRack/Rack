@@ -36,267 +36,11 @@
 #include "global_ui.hpp"
 
 extern void vst2_set_globals (void *_wrapper);
-extern "C" extern void lglw_timer_cbk (lglw_t _lglw);
+extern "C" extern void lglw_timer_cbk (lglw_t _lglw);   // implemented in vst2_main.cpp
+extern "C" extern void lglw_redraw_cbk (lglw_t _lglw);  // implemented in vst2_main.cpp
 
 namespace rack {
 
-
-// void windowSizeCallback(GLFWwindow* window, int width, int height) {
-// }
-
-// void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
-// #ifdef ARCH_MAC
-// 	// Ctrl-left click --> right click
-// 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-// 		if (glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
-// 			button = GLFW_MOUSE_BUTTON_RIGHT;
-// 		}
-// 	}
-// #endif
-
-// 	if (action == GLFW_PRESS) {
-// 		global_ui->widgets.gTempWidget = NULL;
-// 		// onMouseDown
-// 		{
-// 			EventMouseDown e;
-// 			e.pos = global_ui->window.gMousePos;
-// 			e.button = button;
-// 			global_ui->ui.gScene->onMouseDown(e);
-// 			global_ui->widgets.gTempWidget = e.target;
-// 		}
-
-// 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-// 			if (global_ui->widgets.gTempWidget) {
-// 				// onDragStart
-// 				EventDragStart e;
-// 				global_ui->widgets.gTempWidget->onDragStart(e);
-// 			}
-// 			global_ui->widgets.gDraggedWidget = global_ui->widgets.gTempWidget;
-
-// 			if (global_ui->widgets.gTempWidget != global_ui->widgets.gFocusedWidget) {
-// 				if (global_ui->widgets.gFocusedWidget) {
-// 					// onDefocus
-// 					EventDefocus e;
-// 					global_ui->widgets.gFocusedWidget->onDefocus(e);
-// 				}
-// 				global_ui->widgets.gFocusedWidget = NULL;
-// 				if (global_ui->widgets.gTempWidget) {
-// 					// onFocus
-// 					EventFocus e;
-// 					global_ui->widgets.gTempWidget->onFocus(e);
-// 					if (e.consumed) {
-// 						global_ui->widgets.gFocusedWidget = global_ui->widgets.gTempWidget;
-// 					}
-// 				}
-// 			}
-// 		}
-// 		global_ui->widgets.gTempWidget = NULL;
-// 	}
-// 	else if (action == GLFW_RELEASE) {
-// 		// onMouseUp
-// 		global_ui->widgets.gTempWidget = NULL;
-// 		{
-// 			EventMouseUp e;
-// 			e.pos = global_ui->window.gMousePos;
-// 			e.button = button;
-// 			global_ui->ui.gScene->onMouseUp(e);
-// 			global_ui->widgets.gTempWidget = e.target;
-// 		}
-
-// 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-// 			if (global_ui->widgets.gDraggedWidget) {
-// 				// onDragDrop
-// 				EventDragDrop e;
-// 				e.origin = global_ui->widgets.gDraggedWidget;
-// 				global_ui->widgets.gTempWidget->onDragDrop(e);
-// 			}
-// 			// gDraggedWidget might have been set to null in the last event, recheck here
-// 			if (global_ui->widgets.gDraggedWidget) {
-// 				// onDragEnd
-// 				EventDragEnd e;
-// 				global_ui->widgets.gDraggedWidget->onDragEnd(e);
-// 			}
-// 			global_ui->widgets.gDraggedWidget = NULL;
-// 			global_ui->widgets.gDragHoveredWidget = NULL;
-// 		}
-// 		global_ui->widgets.gTempWidget = NULL;
-// 	}
-// }
-
-// struct MouseButtonArguments {
-// 	GLFWwindow *window;
-// 	int button;
-// 	int action;
-// 	int mods;
-// };
-
-// static std::queue<MouseButtonArguments> mouseButtonQueue;
-// void mouseButtonStickyPop() {
-// 	if (!mouseButtonQueue.empty()) {
-// 		MouseButtonArguments args = mouseButtonQueue.front();
-// 		mouseButtonQueue.pop();
-// 		mouseButtonCallback(args.window, args.button, args.action, args.mods);
-// 	}
-// }
-
-// void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int mods) {
-// 	// Defer multiple clicks per frame to future frames
-// 	MouseButtonArguments args = {window, button, action, mods};
-// 	mouseButtonQueue.push(args);
-// }
-
-// void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-// 	Vec mousePos = Vec(xpos, ypos).div(global_ui->window.gPixelRatio / global_ui->window.gWindowRatio).round();
-// 	Vec mouseRel = mousePos.minus(global_ui->window.gMousePos);
-
-// 	int cursorMode = glfwGetInputMode(global_ui->window.gWindow, GLFW_CURSOR);
-// 	(void) cursorMode;
-
-// #ifdef ARCH_MAC
-// 	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
-// 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
-// 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
-// 		// CGSetLocalEventsSuppressionInterval(0.0);
-// 		glfwSetCursorPos(global_ui->window.gWindow, global_ui->window.gMousePos.x, global_ui->window.gMousePos.y);
-// 		CGAssociateMouseAndMouseCursorPosition(true);
-// 		mousePos = global_ui->window.gMousePos;
-// 	}
-// 	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
-// 	glfwSetCursor(global_ui->window.gWindow, NULL);
-// #endif
-
-// 	global_ui->window.gMousePos = mousePos;
-
-// 	global_ui->widgets.gTempWidget = NULL;
-// 	// onMouseMove
-// 	{
-// 		EventMouseMove e;
-// 		e.pos = mousePos;
-// 		e.mouseRel = mouseRel;
-// 		global_ui->ui.gScene->onMouseMove(e);
-// 		global_ui->widgets.gTempWidget = e.target;
-// 	}
-
-// 	if (global_ui->widgets.gDraggedWidget) {
-// 		// onDragMove
-// 		EventDragMove e;
-// 		e.mouseRel = mouseRel;
-// 		global_ui->widgets.gDraggedWidget->onDragMove(e);
-
-// 		if (global_ui->widgets.gTempWidget != global_ui->widgets.gDragHoveredWidget) {
-// 			if (global_ui->widgets.gDragHoveredWidget) {
-// 				EventDragEnter e;
-// 				e.origin = global_ui->widgets.gDraggedWidget;
-// 				global_ui->widgets.gDragHoveredWidget->onDragLeave(e);
-// 			}
-// 			global_ui->widgets.gDragHoveredWidget = global_ui->widgets.gTempWidget;
-// 			if (global_ui->widgets.gDragHoveredWidget) {
-// 				EventDragEnter e;
-// 				e.origin = global_ui->widgets.gDraggedWidget;
-// 				global_ui->widgets.gDragHoveredWidget->onDragEnter(e);
-// 			}
-// 		}
-// 	}
-// 	else {
-// 		if (global_ui->widgets.gTempWidget != global_ui->widgets.gHoveredWidget) {
-// 			if (global_ui->widgets.gHoveredWidget) {
-// 				// onMouseLeave
-// 				EventMouseLeave e;
-// 				global_ui->widgets.gHoveredWidget->onMouseLeave(e);
-// 			}
-// 			global_ui->widgets.gHoveredWidget = global_ui->widgets.gTempWidget;
-// 			if (global_ui->widgets.gHoveredWidget) {
-// 				// onMouseEnter
-// 				EventMouseEnter e;
-// 				global_ui->widgets.gHoveredWidget->onMouseEnter(e);
-// 			}
-// 		}
-// 	}
-// 	global_ui->widgets.gTempWidget = NULL;
-// 	if (glfwGetMouseButton(global_ui->window.gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-// 		// TODO
-// 		// Define a new global called gScrollWidget, which remembers the widget where middle-click was first pressed
-// 		EventScroll e;
-// 		e.pos = mousePos;
-// 		e.scrollRel = mouseRel;
-// 		global_ui->ui.gScene->onScroll(e);
-// 	}
-// }
-
-// void cursorEnterCallback(GLFWwindow* window, int entered) {
-// 	if (!entered) {
-// 		if (global_ui->widgets.gHoveredWidget) {
-// 			// onMouseLeave
-// 			EventMouseLeave e;
-// 			global_ui->widgets.gHoveredWidget->onMouseLeave(e);
-// 		}
-// 		global_ui->widgets.gHoveredWidget = NULL;
-// 	}
-// }
-
-// void scrollCallback(GLFWwindow *window, double x, double y) {
-// 	Vec scrollRel = Vec(x, y);
-// #if ARCH_LIN || ARCH_WIN
-// 	if (windowIsShiftPressed())
-// 		scrollRel = Vec(y, x);
-// #endif
-// 	// onScroll
-// 	EventScroll e;
-// 	e.pos = global_ui->window.gMousePos;
-// 	e.scrollRel = scrollRel.mult(50.0);
-// 	global_ui->ui.gScene->onScroll(e);
-// }
-
-// // void charCallback(GLFWwindow *window, unsigned int codepoint) {
-// // 	if (global_ui->widgets.gFocusedWidget) {
-// // 		// onText
-// // 		EventText e;
-// // 		e.codepoint = codepoint;
-// // 		global_ui->widgets.gFocusedWidget->onText(e);
-// // 	}
-// // }
-
-// void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-// 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-// 		if (global_ui->widgets.gFocusedWidget) {
-// 			// onKey
-// 			EventKey e;
-// 			e.key = key;
-// 			global_ui->widgets.gFocusedWidget->onKey(e);
-// 			if (e.consumed)
-// 				return;
-// 		}
-// 		// onHoverKey
-// 		EventHoverKey e;
-// 		e.pos = global_ui->window.gMousePos;
-// 		e.key = key;
-// 		global_ui->ui.gScene->onHoverKey(e);
-// 	}
-
-// 	// Keyboard MIDI driver
-// 	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
-// 		if (action == GLFW_PRESS) {
-// 			keyboardPress(key);
-// 		}
-// 		else if (action == GLFW_RELEASE) {
-// 			keyboardRelease(key);
-// 		}
-// 	}
-// }
-
-// // void dropCallback(GLFWwindow *window, int count, const char **paths) {
-// // 	// onPathDrop
-// // 	EventPathDrop e;
-// // 	e.pos = global_ui->window.gMousePos;
-// // 	for (int i = 0; i < count; i++) {
-// // 		e.paths.push_back(paths[i]);
-// // 	}
-// // 	global_ui->ui.gScene->onPathDrop(e);
-// // }
-
-// // void errorCallback(int error, const char *description) {
-// // 	warn("GLFW error %d: %s", error, description);
-// // }
 
 extern "C" {
 
@@ -328,9 +72,6 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
       Vec mousePos = Vec(_x, _y);//.div(global_ui->window.gPixelRatio / global_ui->window.gWindowRatio).round();
       Vec mouseRel = mousePos.minus(global_ui->window.gMousePos);
 
-      // int cursorMode = glfwGetInputMode(global_ui->window.gWindow, GLFW_CURSOR);
-      // (void) cursorMode;
-
 // #ifdef ARCH_MAC
 //       // Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
 //       // This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
@@ -347,6 +88,7 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
       global_ui->window.gMousePos = mousePos;
 
       global_ui->widgets.gTempWidget = NULL;
+
       // onMouseMove
       {
          EventMouseMove e;
@@ -392,7 +134,7 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
          }
       }
       global_ui->widgets.gTempWidget = NULL;
-      // // if (glfwGetMouseButton(global_ui->window.gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+
       if(0u != (_buttonState & LGLW_MOUSE_MBUTTON)) {
          // TODO
          // Define a new global called gScrollWidget, which remembers the widget where middle-click was first pressed
@@ -415,9 +157,9 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
 //       }
 // #endif
       int button =
-         (0u != (_changedButtonState & LGLW_MOUSE_LBUTTON)) ? 0 :
-         (0u != (_changedButtonState & LGLW_MOUSE_RBUTTON)) ? 1 :
-         (0u != (_changedButtonState & LGLW_MOUSE_MBUTTON)) ? 2 :
+         (0u != (_changedButtonState & LGLW_MOUSE_LBUTTON)) ? RACK_MOUSE_BUTTON_LEFT/*0*/ :
+         (0u != (_changedButtonState & LGLW_MOUSE_RBUTTON)) ? RACK_MOUSE_BUTTON_RIGHT/*1*/ :
+         (0u != (_changedButtonState & LGLW_MOUSE_MBUTTON)) ? RACK_MOUSE_BUTTON_MIDDLE/*2*/ :
          -1;
 
       bool bPressed = (0u != (_changedButtonState & _buttonState));
@@ -433,7 +175,7 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
             global_ui->widgets.gTempWidget = e.target;
          }
 
-         if (button == 0/*GLFW_MOUSE_BUTTON_LEFT*/) {
+         if (RACK_MOUSE_BUTTON_LEFT/*0*/ == button) {
             if (global_ui->widgets.gTempWidget) {
                // onDragStart
                EventDragStart e;
@@ -460,7 +202,7 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
          }
          global_ui->widgets.gTempWidget = NULL;
       }
-      else { ///if (action == GLFW_RELEASE) {
+      else {
          // onMouseUp
          global_ui->widgets.gTempWidget = NULL;
          {
@@ -471,7 +213,7 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
             global_ui->widgets.gTempWidget = e.target;
          }
 
-         if (button == 0/*GLFW_MOUSE_BUTTON_LEFT*/) {
+         if (RACK_MOUSE_BUTTON_LEFT/*0*/ == button) {
             if (global_ui->widgets.gDraggedWidget) {
                // onDragDrop
                EventDragDrop e;
@@ -489,7 +231,6 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
          }
          global_ui->widgets.gTempWidget = NULL;
       }
-
    }
 
 }
@@ -518,7 +259,7 @@ static void lglw_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changed
 }
 
 static void lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw_bool_t _bPressed) {
-   printf("xxx lglw_keyboard_cbk: lglw=%p vkey=0x%08x (\'%c\') kmod=0x%08x bPressed=%d\n", _lglw, _vkey, (char)_vkey, _kmod, _bPressed);
+   // printf("xxx lglw_keyboard_cbk: lglw=%p vkey=0x%08x (\'%c\') kmod=0x%08x bPressed=%d\n", _lglw, _vkey, (char)_vkey, _kmod, _bPressed);
 
    vst2_set_globals(lglw_userdata_get(_lglw));
 
@@ -557,12 +298,21 @@ static void lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw
    }
 }
 
+void lglw_dropfiles_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _numFiles, const char **_pathNames) {
+	// onPathDrop
+	EventPathDrop e;
+	e.pos = Vec(_x, _y);
+	for(uint32_t i = 0u; i < _numFiles; i++) {
+		e.paths.push_back(_pathNames[i]);
+	}
+	global_ui->ui.gScene->onPathDrop(e);
+}
+
 } // extern C
 
 void renderGui() {
 	int width, height;
    // printf("xxx renderGui: ENTER\n");
-	// glfwGetFramebufferSize(global_ui->window.gWindow, &width, &height);
    lglw_window_size_get(global_ui->window.lglw, &width, &height);
 
 	// Update and render
@@ -578,7 +328,6 @@ void renderGui() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgEndFrame(global_ui->window.gVg);
-	// // glfwSwapBuffers(global_ui->window.gWindow);
    // printf("xxx renderGui: LEAVE\n");
 }
 
@@ -592,45 +341,17 @@ void windowInit() {
 
    lglw_userdata_set(global_ui->window.lglw, global->vst2.wrapper);
 
-// #if defined NANOVG_GL2
-// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-// #elif defined NANOVG_GL3
-// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-// 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-// 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-// 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-// #endif
-	// glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-	// glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	global_ui->window.lastWindowTitle = "";
-	// global_ui->window.gWindow = glfwCreateWindow(640, 480, global_ui->window.lastWindowTitle.c_str(), NULL, NULL);
-	// if (!global_ui->window.gWindow) {
-	// 	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
-	// 	exit(1);
-	// }
 
-	// // glfwMakeContextCurrent(global_ui->window.gWindow);
-	// // glfwSwapInterval(1);
    lglw_glcontext_push(global_ui->window.lglw);
    lglw_swap_interval(global_ui->window.lglw, 1);  // can be overridden via settings.json:"vsync" property
 
-	// // glfwSetInputMode(global_ui->window.gWindow, GLFW_LOCK_KEY_MODS, 1);
-
-	// // glfwSetWindowSizeCallback(global_ui->window.gWindow, windowSizeCallback);
-	// // glfwSetMouseButtonCallback(global_ui->window.gWindow, mouseButtonStickyCallback);
-   lglw_mouse_callback_set(global_ui->window.lglw, &lglw_mouse_cbk);
-   lglw_focus_callback_set(global_ui->window.lglw, &lglw_focus_cbk);
-   lglw_keyboard_callback_set(global_ui->window.lglw, &lglw_keyboard_cbk);
-   lglw_timer_callback_set(global_ui->window.lglw, &lglw_timer_cbk);
-
-	// Call this ourselves, but on every frame instead of only when the mouse moves
-	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
-	// glfwSetCursorEnterCallback(global_ui->window.gWindow, cursorEnterCallback);
-	// glfwSetScrollCallback(global_ui->window.gWindow, scrollCallback);
-	// glfwSetCharCallback(global_ui->window.gWindow, charCallback);
-	// glfwSetKeyCallback(global_ui->window.gWindow, keyCallback);
-	// glfwSetDropCallback(global_ui->window.gWindow, dropCallback);
+   lglw_mouse_callback_set     (global_ui->window.lglw, &lglw_mouse_cbk);
+   lglw_focus_callback_set     (global_ui->window.lglw, &lglw_focus_cbk);
+   lglw_keyboard_callback_set  (global_ui->window.lglw, &lglw_keyboard_cbk);
+   lglw_timer_callback_set     (global_ui->window.lglw, &lglw_timer_cbk);
+   lglw_dropfiles_callback_set (global_ui->window.lglw, &lglw_dropfiles_cbk);
+   lglw_redraw_callback_set    (global_ui->window.lglw, &lglw_redraw_cbk);
 
 	// Set up GLEW
 	glewExperimental = GL_TRUE;
@@ -643,8 +364,6 @@ void windowInit() {
 
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
-
-	// glfwSetWindowSizeLimits(global_ui->window.gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
 	int nvgFlags = NVG_ANTIALIAS;
@@ -710,6 +429,7 @@ void vst2_editor_redraw(void) {
 
 #if 0
    // Set window title
+   //  (note) the VST plugin editor window title is set by the VST host
    std::string windowTitle;
    windowTitle = global_ui->app.gApplicationName;
    windowTitle += " ";
@@ -741,144 +461,39 @@ void vst2_editor_redraw(void) {
    lglw_swap_buffers(global_ui->window.lglw);
 }
 
-// #if 0
-// void windowRun() {
-//    printf("xxx vcvrack: windowRun() ENTER\n");
-// 	assert(global_ui->window.gWindow);
-// 	global_ui->window.gGuiFrame = 0;
-// 	while(!glfwWindowShouldClose(global_ui->window.gWindow)
-// #ifdef USE_VST2
-//          && !global_ui->vst2.b_close_window
-// #endif // USE_VST2
-//          ) {
-
-// 		double startTime = glfwGetTime();
-// 		global_ui->window.gGuiFrame++;
-//       // printf("xxx vcvrack: windowRun(): startTime=%g\n", startTime);
-
-// 		// Poll events
-// 		glfwPollEvents();
-// 		{
-// 			double xpos, ypos;
-// 			glfwGetCursorPos(global_ui->window.gWindow, &xpos, &ypos);
-// 			cursorPosCallback(global_ui->window.gWindow, xpos, ypos);
-// 		}
-// 		mouseButtonStickyPop();
-
-// #ifndef USE_VST2
-// 		gamepadStep();
-// #endif // !USE_VST2
-
-// 		// Set window title
-// 		std::string windowTitle;
-// 		windowTitle = global_ui->app.gApplicationName;
-// 		windowTitle += " ";
-// 		windowTitle += global_ui->app.gApplicationVersion;
-// 		if (!global_ui->app.gRackWidget->lastPath.empty()) {
-// 			windowTitle += " - ";
-// 			windowTitle += stringFilename(global_ui->app.gRackWidget->lastPath);
-// 		}
-// 		if (windowTitle != global_ui->window.lastWindowTitle) {
-// 			// // glfwSetWindowTitle(global_ui->window.gWindow, windowTitle.c_str());
-// 			global_ui->window.lastWindowTitle = windowTitle;
-// 		}
-
-// 		// Get desired scaling
-// 		// // float pixelRatio;
-// 		// // glfwGetWindowContentScale(global_ui->window.gWindow, &pixelRatio, NULL);
-// 		// // pixelRatio = roundf(pixelRatio);
-// 		// // if (pixelRatio != global_ui->window.gPixelRatio) {
-// 		// // 	EventZoom eZoom;
-// 		// // 	global_ui->ui.gScene->onZoom(eZoom);
-// 		// // 	global_ui->window.gPixelRatio = pixelRatio;
-// 		// // }
-
-// 		// Get framebuffer/window ratio
-// 		int width, height;
-// 		glfwGetFramebufferSize(global_ui->window.gWindow, &width, &height);
-// 		int windowWidth, windowHeight;
-// 		glfwGetWindowSize(global_ui->window.gWindow, &windowWidth, &windowHeight);
-// 		global_ui->window.gWindowRatio = (float)width / windowWidth;
-
-// 		global_ui->ui.gScene->box.size = Vec(width, height).div(global_ui->window.gPixelRatio);
-
-// 		// Step scene
-// 		global_ui->ui.gScene->step();
-
-// 		// Render
-// 		bool visible = glfwGetWindowAttrib(global_ui->window.gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(global_ui->window.gWindow, GLFW_ICONIFIED);
-// 		if (visible) {
-// 			renderGui();
-// 		}
-
-// 		// Limit framerate manually if vsync isn't working
-// 		double endTime = glfwGetTime();
-// 		double frameTime = endTime - startTime;
-// 		double minTime = 1.0 / 90.0;
-// 		if (frameTime < minTime) {
-// 			std::this_thread::sleep_for(std::chrono::duration<double>(minTime - frameTime));
-// 		}
-// 		endTime = glfwGetTime();
-// 		// info("%lf fps", 1.0 / (endTime - startTime));
-// 	}
-
-//    printf("xxx vcvrack: windowRun() LEAVE\n");
-// }
-// #endif
-
-void windowClose() {
-	// // glfwSetWindowShouldClose(global_ui->window.gWindow, GLFW_TRUE);
-}
-
 void windowCursorLock() {
  	if (global_ui->window.gAllowCursorLock) {
-// #ifdef ARCH_MAC
-// 		glfwSetInputMode(global_ui->window.gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-// #else
-// 		glfwSetInputMode(global_ui->window.gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-// #endif
       lglw_mouse_grab(global_ui->window.lglw, LGLW_MOUSE_GRAB_WARP);
  	}
-   
 }
 
 void windowCursorUnlock() {
    if (global_ui->window.gAllowCursorLock) {
-	// 	glfwSetInputMode(global_ui->window.gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
       lglw_mouse_ungrab(global_ui->window.lglw);
    }
 }
 
 bool windowIsModPressed() {
-// #ifdef ARCH_MAC
-// 	return glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
-// #else
-// 	return glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
-// #endif
    return (0u != (lglw_keyboard_get_modifiers(global_ui->window.lglw) & (LGLW_KMOD_LCTRL | LGLW_KMOD_RCTRL))); 
 }
 
 bool windowIsShiftPressed() {
-	// return glfwGetKey(global_ui->window.gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(global_ui->window.gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
    return (0u != (lglw_keyboard_get_modifiers(global_ui->window.lglw) & (LGLW_KMOD_LSHIFT | LGLW_KMOD_RSHIFT))); 
 }
 
 Vec windowGetWindowSize() {
 	int width, height;
    lglw_window_size_get(global_ui->window.lglw, &width, &height);
-	// glfwGetWindowSize(global_ui->window.gWindow, &width, &height);
 	return Vec(width, height);
 }
 
 void windowSetWindowSize(Vec size) {
-	int width = size.x;
-	int height = size.y;
-	// glfwSetWindowSize(global_ui->window.gWindow, width, height);
+   (void)size;
+   // (note) not supported
 }
 
 Vec windowGetWindowPos() {
 	int x, y;
-	// glfwGetWindowPos(global_ui->window.gWindow, &x, &y);
    x = 0;
    y = 0;
 	return Vec(x, y);
@@ -887,14 +502,10 @@ Vec windowGetWindowPos() {
 void windowSetWindowPos(Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
-   // glfwSetWindowPos(global_ui->window.gWindow, x, y);
+   // (note) not supported
 }
 
 bool windowIsMaximized() {
-   // if(global_ui->window.gWindow)
-   //    return glfwGetWindowAttrib(global_ui->window.gWindow, GLFW_MAXIMIZED);
-   // else
-   //    return false;
    return true;
 }
 
@@ -945,24 +556,17 @@ void windowSetTheme(NVGcolor bg, NVGcolor fg) {
 }
 
 void windowSetFullScreen(bool fullScreen) {
-	// if (windowGetFullScreen()) {
-	// 	glfwSetWindowMonitor(global_ui->window.gWindow, NULL, global_ui->window.windowX, global_ui->window.windowY, global_ui->window.windowWidth, global_ui->window.windowHeight, GLFW_DONT_CARE);
-	// }
-	// else {
-	// 	glfwGetWindowPos(global_ui->window.gWindow, &global_ui->window.windowX, &global_ui->window.windowY);
-	// 	glfwGetWindowSize(global_ui->window.gWindow, &global_ui->window.windowWidth, &global_ui->window.windowHeight);
-	// 	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
-	// 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	// 	glfwSetWindowMonitor(global_ui->window.gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-	// }
+   (void)fullScreen;
+   // (note) not supported
 }
 
 bool windowGetFullScreen() {
-	// GLFWmonitor *monitor = glfwGetWindowMonitor(global_ui->window.gWindow);
-	// return monitor != NULL;
    return false;
 }
 
+void windowClose(void) {
+   // (note) not supported
+}
 
 ////////////////////
 // resources

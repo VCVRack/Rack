@@ -1,3 +1,9 @@
+** August 7th, 2018
+- fix Windows 7 mouse lock issue (no redraw while mouse is locked)
+- fix / re-add file drag'n'drop support
+- modulebrowser: sort favorite modules by name
+
+
 ** August 6th, 2018
 - add settings.json "refreshRate" property
    - <15: use VST host timer

@@ -724,6 +724,15 @@ public:
       }
    }
 
+   void queueRedraw(void) {
+      setGlobals();
+
+      if(lglw_window_is_visible(rack::global_ui->window.lglw))
+      {
+         lglw_redraw(rack::global_ui->window.lglw);
+      }
+   }
+
    void redraw(void) {
       setGlobals();
 
@@ -1163,7 +1172,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
       case effEditIdle:
          if(0 == wrapper->redraw_ival_ms)
          {
-            wrapper->redraw();
+            wrapper->queueRedraw();
          }
          break;
 
@@ -1370,6 +1379,11 @@ void vst2_refresh_rate_set (float _hz) {
 }
 
 extern "C" void lglw_timer_cbk(lglw_t _lglw) {
+   VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
+   wrapper->queueRedraw();
+}
+
+extern "C" void lglw_redraw_cbk(lglw_t _lglw) {
    VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
    wrapper->redraw();
 }

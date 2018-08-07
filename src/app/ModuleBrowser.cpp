@@ -349,6 +349,7 @@ struct ModuleBrowser : OpaqueWidget {
 	}
 
 	void refreshSearch() {
+      printf("xxx ModuleBrowser::refreshSearch\n");
 		std::string search = searchField->text;
 		moduleList->clearChildren();
 		moduleList->selected = 0;
@@ -361,13 +362,31 @@ struct ModuleBrowser : OpaqueWidget {
 				item->setText("Favorites");
 				moduleList->addChild(item);
 			}
-			for (Model *model : global_ui->module_browser.sFavoriteModels) {
-				if (isModelFiltered(model) && isModelMatch(model, search)) {
-					ModelItem *item = new ModelItem();
-					item->setModel(model);
-					moduleList->addChild(item);
-				}
-			}
+         {
+            std::vector<Model*> sortedModels;
+
+            for (Model *model : global_ui->module_browser.sFavoriteModels) {
+               if (isModelFiltered(model) && isModelMatch(model, search)) {
+                  uint32_t i = 0u;
+                  for(Model *sortedModel : sortedModels) {
+                     if(model->name < sortedModel->name) {
+                        sortedModels.insert(sortedModels.begin() + i, model);
+                        break;
+                     }
+                     i++;
+                  }
+                  if(i == sortedModels.size()) {
+                     sortedModels.push_back(model);
+                  }
+               }
+            }
+
+            for(Model *model : sortedModels) {
+               ModelItem *item = new ModelItem();
+               item->setModel(model);
+               moduleList->addChild(item);
+            }
+         }
 			// Author items
 			{
 				SeparatorItem *item = new SeparatorItem();
@@ -497,32 +516,38 @@ void SearchModuleField::onTextChange() {
 
 void SearchModuleField::onKey(EventKey &e) {
 	switch (e.key) {
-		case LGLW_VKEY_ESCAPE/*GLFW_KEY_ESCAPE*/: {
+
+		case LGLW_VKEY_ESCAPE:
 			global_ui->ui.gScene->setOverlay(NULL);
 			e.consumed = true;
 			return;
-		} break;
-		case LGLW_VKEY_UP/*GLFW_KEY_UP*/: {
+         break;
+
+		case LGLW_VKEY_UP:
 			moduleBrowser->moduleList->incrementSelection(-1);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
-		} break;
-		case LGLW_VKEY_DOWN/*GLFW_KEY_DOWN*/: {
+         break;
+
+		case LGLW_VKEY_DOWN:
 			moduleBrowser->moduleList->incrementSelection(1);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
-		} break;
-		case LGLW_VKEY_PAGEUP/*GLFW_KEY_PAGE_UP*/: {
+         break;
+
+		case LGLW_VKEY_PAGEUP:
 			moduleBrowser->moduleList->incrementSelection(-5);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
-		} break;
-		case LGLW_VKEY_PAGEDOWN/*GLFW_KEY_PAGE_DOWN*/: {
+         break;
+
+		case LGLW_VKEY_PAGEDOWN:
 			moduleBrowser->moduleList->incrementSelection(5);
 			moduleBrowser->moduleList->scrollSelected();
 			e.consumed = true;
-		} break;
-		case LGLW_VKEY_RETURN/*GLFW_KEY_ENTER*/: {
+         break;
+
+		case LGLW_VKEY_RETURN: {
 			BrowserListItem *item = moduleBrowser->moduleList->getSelectedItem();
 			if (item) {
 				item->doAction();
