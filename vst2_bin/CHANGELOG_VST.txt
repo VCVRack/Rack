@@ -2,6 +2,7 @@
 - fix Windows 7 mouse lock issue (no redraw while mouse is locked)
 - fix / re-add file drag'n'drop support
 - modulebrowser: sort favorite modules by name
+- fix MIDI input in Jeskola Buzz
 
 
 ** August 6th, 2018

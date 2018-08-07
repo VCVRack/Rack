@@ -17,7 +17,7 @@
 ///
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
-///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018
+///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018
 ///
 ///
 ///
@@ -29,7 +29,7 @@
 #define NUM_OUTPUTS   (   8)  // must match AudioInterface.cpp:AUDIO_OUTPUTS
 
 // (note) causes reason to shut down when console is freed (when plugin is deleted)
-//#define USE_CONSOLE  defined
+// #define USE_CONSOLE  defined
 
 #undef RACK_HOST
 
@@ -999,6 +999,8 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // "conformsToWindowRules"
          if(!strcmp((char*)ptr, "receiveVstEvents"))
             r = 1;
+         else if(!strcmp((char*)ptr, "receiveVstMidiEvent"))
+            r = 1;
          else
             r = 0;
          break;
@@ -1090,7 +1092,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // ptr: VstEvents*
          {
             VstEvents *events = (VstEvents*)ptr;
-            //printf("vstrack_plugin:effProcessEvents: recvd %d events", events->numEvents);
+            // printf("vstrack_plugin:effProcessEvents: recvd %d events", events->numEvents);
             VstEvent**evAddr = &events->events[0];
 
             if(events->numEvents > 0)
