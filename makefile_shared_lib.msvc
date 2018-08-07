@@ -8,7 +8,7 @@ include dep/yac/install_msvc.mk
 
 TARGET_BASENAME=Rack_shared
 
-EXTRAFLAGS= -DVERSION=0.6.1 -DARCH_WIN -D_USE_MATH_DEFINES -DRACK_PLUGIN -DRACK_PLUGIN_SHARED -DUSE_VST2 -DVST2_REPARENT_WINDOW_HACK -Iinclude/ -Idep/include 
+EXTRAFLAGS= -DVERSION=0.6.1 -DARCH_WIN -D_USE_MATH_DEFINES -DRACK_PLUGIN -DRACK_PLUGIN_SHARED -DUSE_VST2 -DVST2_REPARENT_WINDOW_HACK -Iinclude/ -Idep/include -Idep/
 EXTRAFLAGS+= -DRACK_PLUGIN_SHARED_LIB_BUILD
 
 ifeq ($(BUILD_64),y)
@@ -17,7 +17,8 @@ else
 EXTRALIBS= -LIBPATH:dep/lib/msvc/x86
 endif
 
-EXTRALIBS+= jansson.lib glew.lib glfw.lib gdi32.lib opengl32.lib gdi32.lib user32.lib kernel32.lib Comdlg32.lib Shell32.lib ws2_32.lib winmm.lib
+EXTRALIBS+= jansson.lib glew.lib gdi32.lib opengl32.lib gdi32.lib user32.lib kernel32.lib Comdlg32.lib Shell32.lib ws2_32.lib winmm.lib
+#glfw.lib
 
 PLAF_OBJ= 
 

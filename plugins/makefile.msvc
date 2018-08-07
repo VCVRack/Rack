@@ -8,7 +8,7 @@ define run_make
 	make -C "community/repos/$(1)" -f makefile.msvc $(2) -j $(NUM_JOBS)
 endef
 
-.PHONY:
+.PHONY: bin
 bin:
 #	$(foreach pname,$(PLUGINS),$(eval ($(call run_make,$(pname),bin))))
 	$(call run_make,Alikins,bin)
@@ -50,12 +50,13 @@ bin:
 	$(call run_make,squinkylabs-plug1,bin)
 	$(call run_make,SubmarineFree,bin)
 	$(call run_make,Template,bin)
+	$(call run_make,Template_shared,bin)
 	$(call run_make,trowaSoft,bin)
 	$(call run_make,unless_modules,bin)
 	$(call run_make,Valley,bin)
 #	$(call run_make,VultModules,bin)
 
-.PHONY:
+.PHONY: clean
 clean:
 #	$(foreach pname,$(PLUGINS),$(eval $(call run_make,$(pname),clean)))
 #	$(foreach pname,$(PLUGINS),$(eval echo $(pname)))
@@ -98,6 +99,7 @@ clean:
 	$(call run_make,squinkylabs-plug1,clean)
 	$(call run_make,SubmarineFree,clean)
 	$(call run_make,Template,clean)
+	$(call run_make,Template_shared,clean)
 	$(call run_make,trowaSoft,clean)
 	$(call run_make,unless_modules,clean)
 	$(call run_make,Valley,clean)

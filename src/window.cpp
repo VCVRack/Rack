@@ -35,9 +35,18 @@
 #include "global.hpp"
 #include "global_ui.hpp"
 
+
+#ifndef RACK_PLUGIN_SHARED_LIB_BUILD
 extern void vst2_set_globals (void *_wrapper);
 extern "C" extern void lglw_timer_cbk (lglw_t _lglw);   // implemented in vst2_main.cpp
 extern "C" extern void lglw_redraw_cbk (lglw_t _lglw);  // implemented in vst2_main.cpp
+#else
+void vst2_set_globals(void *) { }
+void vst2_window_size_set(int, int) { }
+void vst2_refresh_rate_set(float) { }
+void lglw_timer_cbk(lglw_t) { }
+void lglw_redraw_cbk(lglw_t) { }
+#endif // RACK_PLUGIN_SHARED_LIB_BUILD
 
 namespace rack {
 
