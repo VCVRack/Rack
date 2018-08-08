@@ -1,3 +1,9 @@
+** August 8th, 2018
+- support Windows 8 touch API and add settings.json:"touchInput" configuration item
+   - RMB is emulated via ctrl-LMB or LMB-hold
+- don't forward keyboard events to next listener when they have been consumed by the plugin UI
+
+
 ** August 7th, 2018
 - fix Windows 7 mouse lock issue (no redraw while mouse is locked)
 - fix / re-add file drag'n'drop support

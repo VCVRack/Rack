@@ -28,7 +28,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-07Aug2018.7z](dist/veeseevstrack_0_6_1_win64_bin-07Aug2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-08Aug2018.7z](dist/veeseevstrack_0_6_1_win64_bin-08Aug2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 

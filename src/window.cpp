@@ -267,8 +267,9 @@ static void lglw_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changed
    }
 }
 
-static void lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw_bool_t _bPressed) {
+static lglw_bool_t lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw_bool_t _bPressed) {
    // printf("xxx lglw_keyboard_cbk: lglw=%p vkey=0x%08x (\'%c\') kmod=0x%08x bPressed=%d\n", _lglw, _vkey, (char)_vkey, _kmod, _bPressed);
+   lglw_bool_t bHandled = LGLW_FALSE;
 
    vst2_set_globals(lglw_userdata_get(_lglw));
 
@@ -283,7 +284,7 @@ static void lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw
             e.codepoint = _vkey;
             global_ui->widgets.gFocusedWidget->onText(e);
             if(e.consumed)
-               return;
+               return LGLW_TRUE;
          }
       }
    }
@@ -296,7 +297,7 @@ static void lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw
          e.key = _vkey;
          global_ui->widgets.gFocusedWidget->onKey(e);
          if (e.consumed)
-            return;
+            return LGLW_TRUE;
       }
 
       // onHoverKey
@@ -305,6 +306,8 @@ static void lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw
       e.key = _vkey;
       global_ui->ui.gScene->onHoverKey(e);
    }
+
+   return bHandled;
 }
 
 void lglw_dropfiles_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _numFiles, const char **_pathNames) {

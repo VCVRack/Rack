@@ -157,6 +157,19 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
 		global_ui->window.gAllowCursorLock = json_is_true(allowCursorLockJ);
    }
 
+	// touchInput
+   if(!bWindowSizeOnly)
+   {
+      json_t *touchJ = json_object_get(rootJ, "touchInput");
+      if (touchJ)
+      {
+         if(json_is_true(touchJ)) 
+         {
+            lglw_touchinput_set(global_ui->window.lglw, LGLW_TRUE);
+         }
+      }
+   }
+
 #ifndef USE_VST2
 	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");

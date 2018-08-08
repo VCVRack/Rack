@@ -14,6 +14,7 @@
   "refreshRate": 30,
   "vsync": true,
   "allowCursorLock": true,
+  "touchInput": false,
   "sampleRate": 44100.0,
   "lastPath": "",
   "moduleBrowser": {
