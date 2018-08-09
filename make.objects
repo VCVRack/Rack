@@ -100,7 +100,8 @@ LIB_OBJ= \
 
 LIB_OBJ_WIN= \
 	src/util/dirent_win32/dirent.o \
-	dep/lglw/lglw_windows.o
+	dep/lglw/lglw_windows.o \
+	dep/lglw/lglw_windows_cpp.o
 
 SHARED_LIB_OBJ= \
 	$(COMMON_OBJ)

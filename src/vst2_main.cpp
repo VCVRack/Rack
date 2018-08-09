@@ -17,7 +17,7 @@
 ///
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
-///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018
+///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018
 ///
 ///
 ///
@@ -63,9 +63,11 @@ extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
 extern void vst2_set_shared_plugin_tls_globals (void);
+extern "C" extern int vst2_handle_effeditkeydown (unsigned int _vkey);
 
 namespace rack {
    extern void settingsLoad(std::string filename, bool bWindowSizeOnly);
+   bool b_touchkeyboard_enable = false;  // true=support effEditKey*
 }
 
 
@@ -1211,6 +1213,61 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // Close editor window
          wrapper->closeEditor();
          r = 1;
+         break;
+
+      case effEditKeyDown:
+         // [index]: ASCII character [value]: virtual key [opt]: modifiers [return value]: 1 if key used  @see AEffEditor::onKeyDown
+         // (note) only used for touch input
+         printf("xxx effEditKeyDown: ascii=%d (\'%c\') vkey=0x%08x mod=0x%08x\n", index, index, value, opt);
+         if(rack::b_touchkeyboard_enable)
+         {
+            wrapper->setGlobals();
+            {
+               uint32_t vkey = 0u;
+
+               switch(uint32_t(value))
+               {
+                  // see aeffectx.h
+                  case VKEY_BACK:      vkey = LGLW_VKEY_BACKSPACE; break;
+                  case VKEY_TAB:       vkey = LGLW_VKEY_TAB;       break;
+                  case VKEY_RETURN:    vkey = LGLW_VKEY_RETURN;    break;
+                  case VKEY_ESCAPE:    vkey = LGLW_VKEY_ESCAPE;    break;
+                  case VKEY_END:       vkey = LGLW_VKEY_END;       break;
+                  case VKEY_HOME:      vkey = LGLW_VKEY_HOME;      break;
+                  case VKEY_LEFT:      vkey = LGLW_VKEY_LEFT;      break;
+                  case VKEY_UP:        vkey = LGLW_VKEY_UP;        break;
+                  case VKEY_RIGHT:     vkey = LGLW_VKEY_RIGHT;     break;
+                  case VKEY_DOWN:      vkey = LGLW_VKEY_DOWN;      break;
+                  case VKEY_PAGEUP:    vkey = LGLW_VKEY_PAGEUP;    break;
+                  case VKEY_PAGEDOWN:  vkey = LGLW_VKEY_PAGEDOWN;  break;
+                  case VKEY_ENTER:     vkey = LGLW_VKEY_RETURN;    break;
+                  case VKEY_INSERT:    vkey = LGLW_VKEY_INSERT;    break;
+                  case VKEY_DELETE:    vkey = LGLW_VKEY_DELETE;    break;
+                     break;
+
+                  default:
+                     vkey = (char)index;
+                     // (note) some(most?) DAWs don't send the correct VKEY_xxx values for all special keys
+                     switch(vkey)
+                     {
+                        case 8:  vkey = LGLW_VKEY_BACKSPACE;  break;
+                           //    case 13: vkey = LGLW_VKEY_RETURN;     break;
+                           //    case 9:  vkey = LGLW_VKEY_TAB;        break;
+                           //    case 27: vkey = LGLW_VKEY_ESCAPE;     break;
+                        default:
+                           if(vkey >= 128)
+                              vkey = 0u;
+                           break;
+                     }
+                     break;
+               }
+            
+               if(vkey > 0u)
+               {
+                  r = vst2_handle_effeditkeydown(vkey);
+               }
+            }
+         }
          break;
 
       default:

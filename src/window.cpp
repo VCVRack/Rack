@@ -310,6 +310,14 @@ static lglw_bool_t lglw_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmo
    return bHandled;
 }
 
+int vst2_handle_effeditkeydown(unsigned int _vkey) {
+   // (note) only used for touch keyboard input
+   lglw_bool_t bHandled = lglw_keyboard_cbk(rack::global_ui->window.lglw, _vkey, 0u/*kmod*/, LGLW_TRUE/*bPressed*/);
+   lglw_keyboard_cbk(rack::global_ui->window.lglw, _vkey, 0u/*kmod*/, LGLW_FALSE/*bPressed*/);
+   return bHandled;
+}
+
+
 void lglw_dropfiles_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _numFiles, const char **_pathNames) {
 	// onPathDrop
 	EventPathDrop e;

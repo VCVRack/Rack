@@ -14,6 +14,7 @@ extern void vst2_refresh_rate_set (float _hz);
 
 namespace rack {
 
+extern bool b_touchkeyboard_enable;
 
 static json_t *settingsToJson() {
 	// root
@@ -167,6 +168,16 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
          {
             lglw_touchinput_set(global_ui->window.lglw, LGLW_TRUE);
          }
+      }
+   }
+
+	// touchKbd
+   if(!bWindowSizeOnly)
+   {
+      json_t *touchJ = json_object_get(rootJ, "touchKbd");
+      if (touchJ)
+      {
+         b_touchkeyboard_enable = json_is_true(touchJ);
       }
    }
 

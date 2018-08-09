@@ -5,8 +5,8 @@
     820.0
   ],
   "windowPos": [
-    60.0,
-    83.0
+    0.0,
+    0.0
   ],
   "wireOpacity": 50.0,
   "wireTension": 0.97,
@@ -15,6 +15,7 @@
   "vsync": true,
   "allowCursorLock": true,
   "touchInput": false,
+  "touchKbd": false,
   "sampleRate": 44100.0,
   "lastPath": "",
   "moduleBrowser": {

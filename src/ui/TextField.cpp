@@ -9,6 +9,7 @@
 
 namespace rack {
 
+extern bool b_touchkeyboard_enable;
 
 void TextField::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
@@ -37,6 +38,11 @@ void TextField::onMouseDown(EventMouseDown &e) {
 		cursor = selection = getTextPosition(e.pos);
 	}
 	OpaqueWidget::onMouseDown(e);
+
+   if(b_touchkeyboard_enable)
+   {
+      lglw_touchkeyboard_show(rack::global_ui->window.lglw, LGLW_TRUE);
+   }
 }
 
 void TextField::onMouseMove(EventMouseMove &e) {
@@ -64,7 +70,7 @@ void TextField::onText(EventText &e) {
 void TextField::onKey(EventKey &e) {
 	switch (e.key) {
 
-		case LGLW_VKEY_BACKSPACE/*GLFW_KEY_BACKSPACE*/:
+		case LGLW_VKEY_BACKSPACE:
 			if (cursor == selection) {
 				cursor--;
 				if (cursor >= 0) {
@@ -81,7 +87,7 @@ void TextField::onKey(EventKey &e) {
 			}
          break;
 
-		case LGLW_VKEY_DELETE/*GLFW_KEY_DELETE*/:
+		case LGLW_VKEY_DELETE:
 			if (cursor == selection) {
 				text.erase(cursor, 1);
 				onTextChange();
@@ -94,7 +100,7 @@ void TextField::onKey(EventKey &e) {
 			}
          break;
 
-		case LGLW_VKEY_LEFT/*GLFW_KEY_LEFT*/:
+		case LGLW_VKEY_LEFT:
 			if (windowIsModPressed()) {
 				while (--cursor > 0) {
 					if (text[cursor] == ' ')
@@ -109,7 +115,7 @@ void TextField::onKey(EventKey &e) {
 			}
          break;
 
-		case LGLW_VKEY_RIGHT/*GLFW_KEY_RIGHT*/:
+		case LGLW_VKEY_RIGHT:
 			if (windowIsModPressed()) {
 				while (++cursor < (int) text.size()) {
 					if (text[cursor] == ' ')
@@ -124,15 +130,15 @@ void TextField::onKey(EventKey &e) {
 			}
          break;
 
-		case LGLW_VKEY_HOME/*GLFW_KEY_HOME*/:
+		case LGLW_VKEY_HOME:
 			selection = cursor = 0;
          break;
 
-		case LGLW_VKEY_END/*GLFW_KEY_END*/:
+		case LGLW_VKEY_END:
 			selection = cursor = text.size();
          break;
 
-		case 'v'/*GLFW_KEY_V*/:
+		case 'v':
 #if 0
 			if (windowIsModPressed()) {
 				const char *newText = glfwGetClipboardString(global_ui->window.gWindow);
@@ -142,7 +148,7 @@ void TextField::onKey(EventKey &e) {
 #endif
          break;
 
-		case 'x'/*GLFW_KEY_X*/:
+		case 'x':
 #if 0
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
@@ -155,7 +161,7 @@ void TextField::onKey(EventKey &e) {
 #endif
          break;
 
-		case 'c'/*GLFW_KEY_C*/:
+		case 'c':
 #if 0
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
@@ -167,20 +173,24 @@ void TextField::onKey(EventKey &e) {
 #endif
          break;
 
-		case 'a'/*GLFW_KEY_A*/:
+		case 'a':
 			if (windowIsModPressed()) {
 				selection = 0;
 				cursor = text.size();
 			}
          break;
 
-		case LGLW_VKEY_RETURN/*GLFW_KEY_ENTER*/:
+		case LGLW_VKEY_RETURN:
          // printf("xxx TextField::onKey: RETURN\n");
 			if (multiline) {
 				insertText("\n");
 			}
 			else {
 				EventAction e;
+            if(b_touchkeyboard_enable)
+            {
+               lglw_touchkeyboard_show(rack::global_ui->window.lglw, LGLW_FALSE);
+            }
 				onAction(e);
 			}
          break;

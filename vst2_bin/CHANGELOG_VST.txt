@@ -1,3 +1,9 @@
+** August 9th, 2018
+- add settings.json:"touchKbd" option
+   - show / hide virtual keyboard when textfield is clicked
+   - support virtual keyboard input via effEditKeyDown
+
+
 ** August 8th, 2018
 - support Windows 8 touch API and add settings.json:"touchInput" configuration item
    - RMB is emulated via ctrl-LMB or LMB-hold
