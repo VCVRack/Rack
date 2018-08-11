@@ -1,5 +1,5 @@
 ** August 11th, 2018
-- add settings.json:"oversampleFactor" option (1..16)
+- add settings.json:"oversampleFactor" option (0,25..16)
 - add settings.json:"oversampleQuality" option (0..10)
 - add settings.json:"oversampleNumIn" option (0..8)
 - add settings.json:"oversampleNumOut" option (1..8)

@@ -13,7 +13,7 @@ extern void vst2_window_size_set (int _width, int _height);
 extern void vst2_refresh_rate_set (float _hz);
 
 #ifdef RACK_HOST
-extern void vst2_oversample_set (int _factor, int _quality);
+extern void vst2_oversample_set (float _factor, int _quality);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 #endif // RACK_HOST
 
@@ -197,14 +197,14 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
 
 #ifdef RACK_HOST
    // Oversample factor and quality
-   int oversampleFactor = -1;
+   float oversampleFactor = -1.0f;
    int oversampleQuality = -1;
 
 	// Oversample factor
    {
       json_t *oversampleJ = json_object_get(rootJ, "oversampleFactor");
       if (oversampleJ) {
-         oversampleFactor = int(json_number_value(oversampleJ));
+         oversampleFactor = float(json_number_value(oversampleJ));
       }
    }
 

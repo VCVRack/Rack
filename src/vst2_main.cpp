@@ -50,6 +50,8 @@ YAC_Host *yac_host;  // not actually used, just to satisfy the linker
 #define EDITWIN_W 1200
 #define EDITWIN_H 800
 
+#define Dfltequal(a, b)  ( (((a)-(b)) < 0.0f) ? (((a)-(b)) > -0.0001f) : (((a)-(b)) < 0.0001f) )
+
 extern int  vst2_init (int argc, char* argv[]);
 extern void vst2_exit (void);
 namespace rack {
@@ -403,10 +405,10 @@ protected:
 
 public:
    struct {
-      sSI factor;    // 1=no SR conversion, 2=oversample x2, 4=oversample x4, ..
-      int quality;   // SPEEX_RESAMPLER_QUALITY_xxx
-      sUI num_in;    // hack that limits oversampling to "n" input channels. default = NUM_INPUTS
-      sUI num_out;   // hack that limits oversampling to "n" input channels. default = NUM_OUTPUTS
+      float factor;    // 1=no SR conversion, 2=oversample x2, 4=oversample x4, 0.5=undersample /2, ..
+      int   quality;   // SPEEX_RESAMPLER_QUALITY_xxx
+      sUI   num_in;    // hack that limits oversampling to "n" input channels. default = NUM_INPUTS
+      sUI   num_out;   // hack that limits oversampling to "n" input channels. default = NUM_OUTPUTS
       SpeexResamplerState *srs_in;
       SpeexResamplerState *srs_out;
       sF32 in_buffers[NUM_INPUTS * MAX_BLOCK_SIZE * MAX_OVERSAMPLE_FACTOR];
@@ -631,24 +633,24 @@ public:
       return _vstPlugin.numOutputs;
    }
 
-   void setOversample(int _factor, int _quality) {
-      if(_factor < 0)
+   void setOversample(float _factor, int _quality) {
+      if(_factor < 0.0f)
          _factor = oversample.factor;  // keep
 
       if(_quality < 0)
          _quality = oversample.quality;  // keep
 
-      if(_factor < 1)
-         _factor = 1;
-      else if(_factor > MAX_OVERSAMPLE_FACTOR)
-         _factor = MAX_OVERSAMPLE_FACTOR;
+      if(_factor < 0.001f)
+         _factor = 1.0f;
+      else if(_factor > float(MAX_OVERSAMPLE_FACTOR))
+         _factor = float(MAX_OVERSAMPLE_FACTOR);
 
       if(_quality < SPEEX_RESAMPLER_QUALITY_MIN/*0*/)
          _quality = SPEEX_RESAMPLER_QUALITY_MIN;
       else if(_quality > SPEEX_RESAMPLER_QUALITY_MAX/*10*/)
          _quality = SPEEX_RESAMPLER_QUALITY_MAX;
 
-      oversample.factor  = sUI(_factor);
+      oversample.factor  = _factor;
       oversample.quality = _quality;
 
       setSampleRate(sample_rate);
@@ -690,7 +692,7 @@ public:
          destroyResamplerStates();
 
          // Lazy-alloc resampler state
-         if(oversample.factor > 1u)
+         if(!Dfltequal(oversample.factor, 1.0f))
          {
             int err;
 
@@ -708,6 +710,8 @@ public:
                                                       oversample.quality,
                                                       &err
                                                       );
+
+            printf("xxx vstrack: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
          }
 
          unlockAudio();
@@ -912,8 +916,8 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
    sUI chIdx;
 
-   if( (wrapper->oversample.factor > 1u)     && 
-       (NULL != wrapper->oversample.srs_in)  &&
+   if( !Dfltequal(wrapper->oversample.factor, 1.0f) && 
+       (NULL != wrapper->oversample.srs_in)         &&
        (NULL != wrapper->oversample.srs_out)
        )
    {
@@ -921,7 +925,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
       sF32 *outputs[NUM_INPUTS];
       
       sUI hostNumFrames = sampleFrames;
-      sUI overNumFrames = sampleFrames * wrapper->oversample.factor;
+      sUI overNumFrames = sUI((sampleFrames * wrapper->oversample.factor) + 0.5f);
 
       // Up-sample inputs
       {
@@ -1576,7 +1580,7 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    // report latency
    _vstPlugin.initialDelay = 0;
 
-   oversample.factor  = 1;
+   oversample.factor  = 1.0f;
    oversample.quality = SPEEX_RESAMPLER_QUALITY_DEFAULT;
    oversample.srs_in  = NULL;
    oversample.srs_out = NULL;
@@ -1656,12 +1660,12 @@ extern "C" void lglw_redraw_cbk(lglw_t _lglw) {
    wrapper->redraw();
 }
 
-void vst2_oversample_set(int _factor, int _quality) {
+void vst2_oversample_set(float _factor, int _quality) {
    rack::global->vst2.wrapper->setOversample(_factor, _quality);
 }
 
-void vst2_oversample_get(int *_factor, int *_quality) {
-   *_factor  = int(rack::global->vst2.wrapper->oversample.factor);
+void vst2_oversample_get(float *_factor, int *_quality) {
+   *_factor  = rack::global->vst2.wrapper->oversample.factor;
    *_quality = int(rack::global->vst2.wrapper->oversample.quality);
 }
 

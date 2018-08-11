@@ -16,8 +16,8 @@
 extern void vst2_set_shared_plugin_tls_globals(void);
 
 #ifdef RACK_HOST
-extern void vst2_oversample_set (int _factor, int _quality);
-extern void vst2_oversample_get (int *_factor, int *_quality);
+extern void vst2_oversample_set (float _factor, int _quality);
+extern void vst2_oversample_get (float *_factor, int *_quality);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 #endif // RACK_HOST
@@ -262,7 +262,7 @@ json_t *RackWidget::toJson() {
 #ifdef USE_VST2
 #ifdef RACK_HOST
    {
-      int oversampleFactor;
+      float oversampleFactor;
       int oversampleQuality;
       vst2_oversample_get(&oversampleFactor, &oversampleQuality);
       
@@ -372,14 +372,14 @@ void RackWidget::fromJson(json_t *rootJ) {
 	}
 
 #ifdef RACK_HOST
-   int oversampleFactor = -1;
+   float oversampleFactor = -1.0f;
    int oversampleQuality = -1;
 
 	// Oversample factor
    {
       json_t *oversampleJ = json_object_get(rootJ, "oversampleFactor");
       if (oversampleJ) {
-         oversampleFactor = int(json_number_value(oversampleJ));
+         oversampleFactor = float(json_number_value(oversampleJ));
       }
    }
 

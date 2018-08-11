@@ -7,8 +7,9 @@
 #include "global_ui.hpp"
 
 #ifdef RACK_HOST
-extern void vst2_oversample_set (int _factor, int _quality);
-extern void vst2_oversample_get (int *_factor, int *_quality);
+#define Dfltequal(a, b)  ( (((a)-(b)) < 0.0f) ? (((a)-(b)) > -0.0001f) : (((a)-(b)) < 0.0001f) )
+extern void vst2_oversample_set (float _factor, int _quality);
+extern void vst2_oversample_get (float *_factor, int *_quality);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 #endif // RACK_HOST
@@ -125,30 +126,39 @@ struct SampleRateItem : MenuItem {
 #ifdef RACK_HOST
 struct OversampleSetting {
    const char *name;
-   int factor;
+   float factor;
    int quality;
 };
 
 static OversampleSetting oversample_settings[] = {
-   /*  0 */ { "No oversampling",          1,  0 },
-   /*  1 */ { "Oversample x2 (low)",      2,  4 },
-   /*  2 */ { "Oversample x2 (medium)",   2,  7 },
-   /*  3 */ { "Oversample x2 (high)",     2, 10 },
-   /*  4 */ { "Oversample x4 (low)",      4,  4 },
-   /*  5 */ { "Oversample x4 (medium)",   4,  7 },
-   /*  6 */ { "Oversample x4 (high)",     4, 10 },
-   /*  7 */ { "Oversample x6 (low)",      6,  4 },
-   /*  8 */ { "Oversample x6 (medium)",   6,  7 },
-   /*  9 */ { "Oversample x6 (high)",     6, 10 },
-   /* 10 */ { "Oversample x8 (low)",      8,  4 },
-   /* 11 */ { "Oversample x8 (medium)",   8,  7 },
-   /* 12 */ { "Oversample x8 (high)",     8, 10 },
-   /* 13 */ { "Oversample x12 (low)",    12,  4 },
-   /* 14 */ { "Oversample x12 (medium)", 12,  7 },
-   /* 15 */ { "Oversample x12 (high)",   12, 10 },
-   /* 16 */ { "Oversample x16 (low)",    16,  4 },
-   /* 17 */ { "Oversample x16 (medium)", 16,  7 },
-   /* 18 */ { "Oversample x16 (high)",   16, 10 },
+   /*  0 */ { "No resampling",            1.0f,  0 },
+   // /*  1 */ { "Undersample /6 (low)",     0.166666666667f,  4 },
+   // /*  2 */ { "Undersample /6 (medium)",  0.166666666667f,  7 },
+   // /*  3 */ { "Undersample /6 (high)",    0.166666666667f, 10 },
+   /*  4 */ { "Undersample /4 (low)",     0.25f,  4 },
+   /*  5 */ { "Undersample /4 (medium)",  0.25f,  7 },
+   /*  6 */ { "Undersample /4 (high)",    0.25f, 10 },
+   /*  7 */ { "Undersample /2 (low)",     0.5f,  4 },
+   /*  8 */ { "Undersample /2 (medium)",  0.5f,  7 },
+   /*  9 */ { "Undersample /2 (high)",    0.5f, 10 },
+   /* 10 */ { "Oversample x2 (low)",      2.0f,  4 },
+   /* 11 */ { "Oversample x2 (medium)",   2.0f,  7 },
+   /* 12 */ { "Oversample x2 (high)",     2.0f, 10 },
+   /* 13 */ { "Oversample x4 (low)",      4.0f,  4 },
+   /* 14 */ { "Oversample x4 (medium)",   4.0f,  7 },
+   /* 15 */ { "Oversample x4 (high)",     4.0f, 10 },
+   /* 16 */ { "Oversample x6 (low)",      6.0f,  4 },
+   /* 17 */ { "Oversample x6 (medium)",   6.0f,  7 },
+   /* 18 */ { "Oversample x6 (high)",     6.0f, 10 },
+   /* 19 */ { "Oversample x8 (low)",      8.0f,  4 },
+   /* 20 */ { "Oversample x8 (medium)",   8.0f,  7 },
+   /* 21 */ { "Oversample x8 (high)",     8.0f, 10 },
+   /* 22 */ { "Oversample x12 (low)",    12.0f,  4 },
+   /* 23 */ { "Oversample x12 (medium)", 12.0f,  7 },
+   /* 24 */ { "Oversample x12 (high)",   12.0f, 10 },
+   /* 25 */ { "Oversample x16 (low)",    16.0f,  4 },
+   /* 26 */ { "Oversample x16 (medium)", 16.0f,  7 },
+   /* 27 */ { "Oversample x16 (high)",   16.0f, 10 },
 };
 #define NUM_OVERSAMPLE_SETTINGS  (sizeof(oversample_settings) / sizeof(OversampleSetting))
 
@@ -208,22 +218,6 @@ struct SampleRateButton : TooltipIconButton {
 
 #ifdef USE_VST2
       {
-         int factor;
-         int quality;
-         vst2_oversample_get(&factor, &quality);
-
-         for(unsigned int overIdx = 0u; overIdx < NUM_OVERSAMPLE_SETTINGS; overIdx++)
-         {
-            const OversampleSetting *setting = &oversample_settings[overIdx];
-
-            OversampleItem *item = new OversampleItem();
-            item->text = setting->name;
-            item->rightText = CHECKMARK( (setting->factor == factor) && (setting->quality == quality) );
-            item->setting = setting;
-            menu->addChild(item);
-         }
-      }
-      {
          int numIn;
          int numOut;
          vst2_oversample_channels_get(&numIn, &numOut);
@@ -235,6 +229,22 @@ struct SampleRateButton : TooltipIconButton {
             OversampleChannelItem *item = new OversampleChannelItem();
             item->text = setting->name;
             item->rightText = CHECKMARK( (setting->num_in == numIn) && (setting->num_out == numOut) );
+            item->setting = setting;
+            menu->addChild(item);
+         }
+      }
+      {
+         float factor;
+         int quality;
+         vst2_oversample_get(&factor, &quality);
+
+         for(unsigned int overIdx = 0u; overIdx < NUM_OVERSAMPLE_SETTINGS; overIdx++)
+         {
+            const OversampleSetting *setting = &oversample_settings[overIdx];
+
+            OversampleItem *item = new OversampleItem();
+            item->text = setting->name;
+            item->rightText = CHECKMARK( Dfltequal(setting->factor, factor) && (setting->quality == quality) );
             item->setting = setting;
             menu->addChild(item);
          }

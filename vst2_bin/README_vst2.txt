@@ -16,7 +16,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
 + supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 + supports VST parameters (send / recv)
-+ supports internal oversampling (up to 16x with configurable quality)
++ supports internal resampling (up to 16x with configurable quality)
 
 Here's a demo video of it: https://vimeo.com/277703414
 
