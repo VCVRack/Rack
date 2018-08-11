@@ -18,6 +18,8 @@ extern void vst2_set_shared_plugin_tls_globals(void);
 #ifdef RACK_HOST
 extern void vst2_oversample_set (int _factor, int _quality);
 extern void vst2_oversample_get (int *_factor, int *_quality);
+extern void vst2_oversample_channels_set (int _numIn, int _numOut);
+extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 #endif // RACK_HOST
 
 #endif // USE_VST2
@@ -276,6 +278,23 @@ json_t *RackWidget::toJson() {
          json_object_set_new(rootJ, "oversampleQuality", oversampleJ);
       }
    }
+   {
+      int oversampleNumIn;
+      int oversampleNumOut;
+      vst2_oversample_channels_get(&oversampleNumIn, &oversampleNumOut);
+      
+      // Oversample input channel limit
+      {
+         json_t *oversampleJ = json_real(oversampleNumIn);
+         json_object_set_new(rootJ, "oversampleNumIn", oversampleJ);
+      }
+
+      // Oversample output channel limit
+      {
+         json_t *oversampleJ = json_real(oversampleNumOut);
+         json_object_set_new(rootJ, "oversampleNumOut", oversampleJ);
+      }
+   }
 #endif // RACK_HOST
 #endif // USE_VST2
 
@@ -373,6 +392,28 @@ void RackWidget::fromJson(json_t *rootJ) {
    }
 
    vst2_oversample_set(oversampleFactor, oversampleQuality);
+
+   // Oversample channel limit
+   int oversampleNumIn = -1;
+   int oversampleNumOut = -1;
+
+	// Oversample input channel limit
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleNumIn");
+      if (oversampleJ) {
+         oversampleNumIn = int(json_number_value(oversampleJ));
+      }
+   }
+
+	// Oversample output channel limit
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleNumOut");
+      if (oversampleJ) {
+         oversampleNumOut = int(json_number_value(oversampleJ));
+      }
+   }
+
+   vst2_oversample_channels_set(oversampleNumIn, oversampleNumOut);
 #endif // RACK_HOST
 
 	// modules

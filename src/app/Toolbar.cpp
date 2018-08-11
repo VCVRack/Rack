@@ -9,6 +9,8 @@
 #ifdef RACK_HOST
 extern void vst2_oversample_set (int _factor, int _quality);
 extern void vst2_oversample_get (int *_factor, int *_quality);
+extern void vst2_oversample_channels_set (int _numIn, int _numOut);
+extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 #endif // RACK_HOST
 
 namespace rack {
@@ -158,6 +160,33 @@ struct OversampleItem : MenuItem {
 		global->gPaused = false;
 	}
 };
+
+struct OversampleChannelSetting {
+   const char *name;
+   int num_in;
+   int num_out;
+};
+
+static OversampleChannelSetting oversample_channel_settings[] = {
+   /*  0 */ { "Oversample: 0 in, 1 out",  0,  1 },
+   /*  1 */ { "Oversample: 0 in, 2 out",  0,  2 },
+   /*  2 */ { "Oversample: 0 in, 4 out",  0,  4 },
+   /*  3 */ { "Oversample: 0 in, 8 out",  8,  8 },
+   /*  4 */ { "Oversample: 2 in, 2 out",  2,  2 },
+   /*  5 */ { "Oversample: 2 in, 4 out",  2,  4 },
+   /*  6 */ { "Oversample: 4 in, 8 out",  4,  8 },
+   /*  7 */ { "Oversample: 8 in, 8 out",  8,  8 },
+};
+#define NUM_OVERSAMPLE_CHANNEL_SETTINGS  (sizeof(oversample_channel_settings) / sizeof(OversampleChannelSetting))
+
+struct OversampleChannelItem : MenuItem {
+	const OversampleChannelSetting *setting;
+
+	void onAction(EventAction &e) override {
+		vst2_oversample_channels_set(setting->num_in, setting->num_out);
+		global->gPaused = false;
+	}
+};
 #endif // RACK_HOST
 
 
@@ -185,12 +214,28 @@ struct SampleRateButton : TooltipIconButton {
 
          for(unsigned int overIdx = 0u; overIdx < NUM_OVERSAMPLE_SETTINGS; overIdx++)
          {
-            const OversampleSetting *overSetting = &oversample_settings[overIdx];
+            const OversampleSetting *setting = &oversample_settings[overIdx];
 
             OversampleItem *item = new OversampleItem();
-            item->text = overSetting->name;
-            item->rightText = CHECKMARK( (overSetting->factor == factor) && (overSetting->quality == quality) );
-            item->setting = overSetting;
+            item->text = setting->name;
+            item->rightText = CHECKMARK( (setting->factor == factor) && (setting->quality == quality) );
+            item->setting = setting;
+            menu->addChild(item);
+         }
+      }
+      {
+         int numIn;
+         int numOut;
+         vst2_oversample_channels_get(&numIn, &numOut);
+
+         for(unsigned int overIdx = 0u; overIdx < NUM_OVERSAMPLE_CHANNEL_SETTINGS; overIdx++)
+         {
+            const OversampleChannelSetting *setting = &oversample_channel_settings[overIdx];
+
+            OversampleChannelItem *item = new OversampleChannelItem();
+            item->text = setting->name;
+            item->rightText = CHECKMARK( (setting->num_in == numIn) && (setting->num_out == numOut) );
+            item->setting = setting;
             menu->addChild(item);
          }
       }

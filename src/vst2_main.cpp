@@ -405,6 +405,8 @@ public:
    struct {
       sSI factor;    // 1=no SR conversion, 2=oversample x2, 4=oversample x4, ..
       int quality;   // SPEEX_RESAMPLER_QUALITY_xxx
+      sUI num_in;    // hack that limits oversampling to "n" input channels. default = NUM_INPUTS
+      sUI num_out;   // hack that limits oversampling to "n" input channels. default = NUM_OUTPUTS
       SpeexResamplerState *srs_in;
       SpeexResamplerState *srs_out;
       sF32 in_buffers[NUM_INPUTS * MAX_BLOCK_SIZE * MAX_OVERSAMPLE_FACTOR];
@@ -650,6 +652,29 @@ public:
       oversample.quality = _quality;
 
       setSampleRate(sample_rate);
+   }
+
+   void setOversampleChannels(int _numIn, int _numOut) {
+      if(_numIn < 0)
+         _numIn = int(oversample.num_in);  // keep
+
+      if(_numOut < 0)
+         _numOut = int(oversample.num_out);  // keep
+
+      if(_numIn < 0)
+         _numIn = 0;
+      else if(_numIn > NUM_INPUTS)
+         _numIn = NUM_INPUTS;
+
+      if(_numOut < 1)
+         _numOut = 1;
+      else if(_numOut > NUM_OUTPUTS)
+         _numOut = NUM_OUTPUTS;
+
+      lockAudio();
+      oversample.num_in  = sUI(_numIn);
+      oversample.num_out = sUI(_numOut);
+      unlockAudio();
    }
 
    bool setSampleRate(float _rate) {
@@ -907,15 +932,23 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
          for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
          {
-            sF32 *s = _inputs[chIdx];
+            if(chIdx < wrapper->oversample.num_in)
+            {
+               sF32 *s = _inputs[chIdx];
 
-            int err = speex_resampler_process_float(wrapper->oversample.srs_in,
-                                                    chIdx,
-                                                    s,
-                                                    &inNumFrames,
-                                                    d,
-                                                    &outNumFrames
-                                                    );
+               int err = speex_resampler_process_float(wrapper->oversample.srs_in,
+                                                       chIdx,
+                                                       s,
+                                                       &inNumFrames,
+                                                       d,
+                                                       &outNumFrames
+                                                       );
+            }
+            else
+            {
+               // Skip channel
+               ::memset(d, 0, sizeof(sF32) * outNumFrames);
+            }
 
             inputs[chIdx] = d;
 
@@ -928,7 +961,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
       //  (note) AudioInterface instances accumulate samples in the output buffer
       {
          sF32 *d = wrapper->oversample.out_buffers;
-         ::memset((void*)d, 0, (sizeof(sF32) * NUM_OUTPUTS * overNumFrames));
+         ::memset((void*)d, 0, (sizeof(sF32) * wrapper->oversample.num_out * overNumFrames));
 
          for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
          {
@@ -950,20 +983,28 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
          sUI inNumFrames = overNumFrames;
          sUI outNumFrames = hostNumFrames;
 
-         for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
+         for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
          {
             sF32 *d = _outputs[chIdx];
 
-            int err = speex_resampler_process_float(wrapper->oversample.srs_out,
-                                                    chIdx,
-                                                    s,
-                                                    &inNumFrames,
-                                                    d,
-                                                    &outNumFrames
-                                                    );
+            if(chIdx < wrapper->oversample.num_out)
+            {
+               int err = speex_resampler_process_float(wrapper->oversample.srs_out,
+                                                       chIdx,
+                                                       s,
+                                                       &inNumFrames,
+                                                       d,
+                                                       &outNumFrames
+                                                       );
 
-            // Next output channel
-            s += inNumFrames;
+               // Next output channel
+               s += inNumFrames;
+            }
+            else
+            {
+               // Skip output
+               ::memset((void*)d, 0, sizeof(sF32) * outNumFrames);
+            }
          }
       }
    }
@@ -1535,10 +1576,13 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    // report latency
    _vstPlugin.initialDelay = 0;
 
-   oversample.factor = 1;
+   oversample.factor  = 1;
    oversample.quality = SPEEX_RESAMPLER_QUALITY_DEFAULT;
-   oversample.srs_in = NULL;
+   oversample.srs_in  = NULL;
    oversample.srs_out = NULL;
+   oversample.num_in  = NUM_INPUTS;
+   oversample.num_out = NUM_OUTPUTS;
+
    sample_rate  = 44100.0f;
    block_size   = 64u;
    b_processing = true;
@@ -1619,6 +1663,15 @@ void vst2_oversample_set(int _factor, int _quality) {
 void vst2_oversample_get(int *_factor, int *_quality) {
    *_factor  = int(rack::global->vst2.wrapper->oversample.factor);
    *_quality = int(rack::global->vst2.wrapper->oversample.quality);
+}
+
+void vst2_oversample_channels_set(int _numIn, int _numOut) {
+   rack::global->vst2.wrapper->setOversampleChannels(_numIn, _numOut);
+}
+
+void vst2_oversample_channels_get(int *_numIn, int *_numOut) {
+   *_numIn  = int(rack::global->vst2.wrapper->oversample.num_in);
+   *_numOut = int(rack::global->vst2.wrapper->oversample.num_out);
 }
 
 

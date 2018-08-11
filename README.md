@@ -13,6 +13,7 @@
    - the plugin.dll files are _not_ binary compatible with the VCV Rack plugins !
    - there's a [plugin SDK](#dynamically-loaded-plugins-via-plugin-sdk) (for Microsoft Visual Studio 2017 Community Edition) which can be used to build new plugins without checking out this entire GIT repository
 + supports internal oversampling (up to 16x with configurable quality)
+   - the number of oversampled I/O channels can be limited to save CPU time
 
 Tested in 
   - Eureka (my own work-in-progress VST host)

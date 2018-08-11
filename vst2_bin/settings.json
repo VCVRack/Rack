@@ -19,6 +19,8 @@
   "sampleRate": 44100.0,
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
+  "oversampleNumIn": 8.0,
+  "oversampleNumOut": 8.0,
   "lastPath": "",
   "moduleBrowser": {
     "favorites": [

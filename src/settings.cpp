@@ -14,6 +14,7 @@ extern void vst2_refresh_rate_set (float _hz);
 
 #ifdef RACK_HOST
 extern void vst2_oversample_set (int _factor, int _quality);
+extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 #endif // RACK_HOST
 
 namespace rack {
@@ -195,6 +196,7 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
 #endif // USE_VST2
 
 #ifdef RACK_HOST
+   // Oversample factor and quality
    int oversampleFactor = -1;
    int oversampleQuality = -1;
 
@@ -215,6 +217,28 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
    }
 
    vst2_oversample_set(oversampleFactor, oversampleQuality);
+
+   // Oversample channel limit
+   int oversampleNumIn = -1;
+   int oversampleNumOut = -1;
+
+	// Oversample input channel limit
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleNumIn");
+      if (oversampleJ) {
+         oversampleNumIn = int(json_number_value(oversampleJ));
+      }
+   }
+
+	// Oversample output channel limit
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleNumOut");
+      if (oversampleJ) {
+         oversampleNumOut = int(json_number_value(oversampleJ));
+      }
+   }
+
+   vst2_oversample_channels_set(oversampleNumIn, oversampleNumOut);
 #endif // RACK_HOST
 
 	// lastPath
