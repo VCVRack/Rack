@@ -12,6 +12,10 @@
 extern void vst2_window_size_set (int _width, int _height);
 extern void vst2_refresh_rate_set (float _hz);
 
+#ifdef RACK_HOST
+extern void vst2_oversample_set (int _factor, int _quality);
+#endif // RACK_HOST
+
 namespace rack {
 
 extern bool b_touchkeyboard_enable;
@@ -189,6 +193,29 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
 		engineSetSampleRate(sampleRate);
 	}
 #endif // USE_VST2
+
+#ifdef RACK_HOST
+   int oversampleFactor = -1;
+   int oversampleQuality = -1;
+
+	// Oversample factor
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleFactor");
+      if (oversampleJ) {
+         oversampleFactor = int(json_number_value(oversampleJ));
+      }
+   }
+
+	// Oversample quality (0..10)
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleQuality");
+      if (oversampleJ) {
+         oversampleQuality = int(json_number_value(oversampleJ));
+      }
+   }
+
+   vst2_oversample_set(oversampleFactor, oversampleQuality);
+#endif // RACK_HOST
 
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");

@@ -17,6 +17,8 @@
   "touchInput": false,
   "touchKbd": false,
   "sampleRate": 44100.0,
+  "oversampleFactor": 1.0,
+  "oversampleQuality": 7.0,
   "lastPath": "",
   "moduleBrowser": {
     "favorites": [
@@ -98,11 +100,15 @@
       },
       {
         "plugin": "Fundamental",
-        "model": "VCA"
+        "model": "VCO-1"
       },
       {
         "plugin": "Fundamental",
         "model": "VCF"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCA"
       },
       {
         "plugin": "Fundamental",

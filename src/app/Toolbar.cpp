@@ -6,6 +6,10 @@
 #include "global.hpp"
 #include "global_ui.hpp"
 
+#ifdef RACK_HOST
+extern void vst2_oversample_set (int _factor, int _quality);
+extern void vst2_oversample_get (int *_factor, int *_quality);
+#endif // RACK_HOST
 
 namespace rack {
 
@@ -116,6 +120,41 @@ struct SampleRateItem : MenuItem {
 	}
 };
 
+#ifdef RACK_HOST
+struct OversampleSetting {
+   const char *name;
+   int factor;
+   int quality;
+};
+
+static OversampleSetting oversample_settings[] = {
+   /*  0 */ { "No oversampling",        1,  0 },
+   /*  1 */ { "Oversample x2 (low)",    2,  4 },
+   /*  2 */ { "Oversample x2 (medium)", 2,  7 },
+   /*  3 */ { "Oversample x2 (high)",   2, 10 },
+   /*  4 */ { "Oversample x4 (low)",    4,  4 },
+   /*  5 */ { "Oversample x4 (medium)", 4,  7 },
+   /*  6 */ { "Oversample x4 (high)",   4, 10 },
+   /*  7 */ { "Oversample x6 (low)",    6,  4 },
+   /*  8 */ { "Oversample x6 (medium)", 6,  7 },
+   /*  9 */ { "Oversample x6 (high)",   6, 10 },
+   /* 10 */ { "Oversample x8 (low)",    8,  4 },
+   /* 11 */ { "Oversample x8 (medium)", 8,  7 },
+   /* 12 */ { "Oversample x8 (high)",   8, 10 },
+};
+#define NUM_OVERSAMPLE_SETTINGS  (sizeof(oversample_settings) / sizeof(OversampleSetting))
+
+struct OversampleItem : MenuItem {
+	const OversampleSetting *setting;
+
+	void onAction(EventAction &e) override {
+		vst2_oversample_set(setting->factor, setting->quality);
+		global->gPaused = false;
+	}
+};
+#endif // RACK_HOST
+
+
 struct SampleRateButton : TooltipIconButton {
 	SampleRateButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_1240789_cc.svg")));
@@ -132,6 +171,24 @@ struct SampleRateButton : TooltipIconButton {
 		pauseItem->text = global->gPaused ? "Resume engine" : "Pause engine";
 		menu->addChild(pauseItem);
 
+#ifdef USE_VST2
+      {
+         int factor;
+         int quality;
+         vst2_oversample_get(&factor, &quality);
+
+         for(unsigned int overIdx = 0u; overIdx < NUM_OVERSAMPLE_SETTINGS; overIdx++)
+         {
+            const OversampleSetting *overSetting = &oversample_settings[overIdx];
+
+            OversampleItem *item = new OversampleItem();
+            item->text = overSetting->name;
+            item->rightText = CHECKMARK( (overSetting->factor == factor) && (overSetting->quality == quality) );
+            item->setting = overSetting;
+            menu->addChild(item);
+         }
+      }
+#else
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (float sampleRate : sampleRates) {
 			SampleRateItem *item = new SampleRateItem();
@@ -140,6 +197,7 @@ struct SampleRateButton : TooltipIconButton {
 			item->sampleRate = sampleRate;
 			menu->addChild(item);
 		}
+#endif // USE_VST2
 	}
 };
 

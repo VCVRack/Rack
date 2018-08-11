@@ -17,7 +17,7 @@
 ///
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
-///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018
+///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
 ///
 ///
 ///
@@ -74,6 +74,7 @@ namespace rack {
 #include "../include/window.hpp"
 #include "../dep/include/osdialog.h"
 #include "../include/app.hpp"
+#include <speex/speex_resampler.h>
 
 // using namespace rack;
 // extern void rack::windowRun(void);
@@ -389,7 +390,8 @@ public:
    static const uint32_t MIN_SAMPLE_RATE = 8192u;
    static const uint32_t MAX_SAMPLE_RATE = 384000u;
    static const uint32_t MIN_BLOCK_SIZE  = 64u;
-   static const uint32_t MAX_BLOCK_SIZE  = 65536u;
+   static const uint32_t MAX_BLOCK_SIZE  = 16384u;
+   static const uint32_t MAX_OVERSAMPLE_FACTOR  = 16u;
 
 public:
    rack::Global rack_global;
@@ -399,8 +401,19 @@ protected:
    PluginString dllname;
    PluginString cwd;
 
+public:
+   struct {
+      sSI factor;    // 1=no SR conversion, 2=oversample x2, 4=oversample x4, ..
+      int quality;   // SPEEX_RESAMPLER_QUALITY_xxx
+      SpeexResamplerState *srs_in;
+      SpeexResamplerState *srs_out;
+      sF32 in_buffers[NUM_INPUTS * MAX_BLOCK_SIZE * MAX_OVERSAMPLE_FACTOR];
+      sF32 out_buffers[NUM_OUTPUTS * MAX_BLOCK_SIZE];
+   } oversample;
+
+protected:
    float    sample_rate;   // e.g. 44100.0
-   uint32_t block_size;    // e.g. 64
+   uint32_t block_size;    // e.g. 64   
 
    PluginMutex mtx_audio;
 public:
@@ -519,6 +532,20 @@ public:
          redraw_ival_ms = sUI(1000.0f / _hz);
    }
 
+   void destroyResamplerStates(void) {
+      if(NULL != oversample.srs_in)
+      {
+         speex_resampler_destroy(oversample.srs_in);
+         oversample.srs_in = NULL;
+      }
+
+      if(NULL != oversample.srs_out)
+      {
+         speex_resampler_destroy(oversample.srs_out);
+         oversample.srs_out = NULL;
+      }
+   }
+
    void openEditor(void *_hwnd) {
       printf("xxx vstrack_plugin: openEditor() parentHWND=%p\n", _hwnd);
       setGlobals();
@@ -575,6 +602,10 @@ public:
 
          printf("xxx vstrack_plugin: vst2_exit() done\n");
 
+         destroyResamplerStates();
+
+         printf("xxx vstrack_plugin: destroyResamplerStates() done\n");
+
 #ifdef USE_CONSOLE
          // FreeConsole();
 #endif // USE_CONSOLE
@@ -598,6 +629,29 @@ public:
       return _vstPlugin.numOutputs;
    }
 
+   void setOversample(int _factor, int _quality) {
+      if(_factor < 0)
+         _factor = oversample.factor;  // keep
+
+      if(_quality < 0)
+         _quality = oversample.quality;  // keep
+
+      if(_factor < 1)
+         _factor = 1;
+      else if(_factor > MAX_OVERSAMPLE_FACTOR)
+         _factor = MAX_OVERSAMPLE_FACTOR;
+
+      if(_quality < SPEEX_RESAMPLER_QUALITY_MIN/*0*/)
+         _quality = SPEEX_RESAMPLER_QUALITY_MIN;
+      else if(_quality > SPEEX_RESAMPLER_QUALITY_MAX/*10*/)
+         _quality = SPEEX_RESAMPLER_QUALITY_MAX;
+
+      oversample.factor  = sUI(_factor);
+      oversample.quality = _quality;
+
+      setSampleRate(sample_rate);
+   }
+
    bool setSampleRate(float _rate) {
       bool r = false;
 
@@ -606,7 +660,31 @@ public:
          setGlobals();
          lockAudio();
          sample_rate = _rate;
-         vst2_set_samplerate(sample_rate);
+         vst2_set_samplerate(sample_rate * oversample.factor);  // see engine.cpp
+
+         destroyResamplerStates();
+
+         // Lazy-alloc resampler state
+         if(oversample.factor > 1u)
+         {
+            int err;
+
+            oversample.srs_in = speex_resampler_init(NUM_INPUTS,
+                                                     sUI(sample_rate),  // in rate
+                                                     sUI(sample_rate * oversample.factor),  // out rate
+                                                     oversample.quality,
+                                                     &err
+                                                     );
+
+
+            oversample.srs_out = speex_resampler_init(NUM_OUTPUTS,
+                                                      sUI(sample_rate * oversample.factor),  // in rate
+                                                      sUI(sample_rate),  // out rate
+                                                      oversample.quality,
+                                                      &err
+                                                      );
+         }
+
          unlockAudio();
          r = true;
       }
@@ -781,7 +859,7 @@ sSI VSTPluginWrapper::instance_count = 0;
  */
 void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
                                       float    **_inputs,
-                                      float    **outputs,
+                                      float    **_outputs,
                                       VstInt32   sampleFrames
                                       ) {
    if(sUI(sampleFrames) > VSTPluginWrapper::MAX_BLOCK_SIZE)
@@ -803,34 +881,118 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
    //printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: wrapper=%p\n", wrapper);
 
-   sUI chIdx;
-
-   //  (note) Cubase (tested with 9.5.30) uses the same buffer(s) for both input&output
-   //           => back up the inputs before clearing the outputs
-   sF32 *inputs[NUM_INPUTS];
-   sUI k = 0u;
-   for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
-   {
-      inputs[chIdx] = &wrapper->tmp_input_buffers[k];
-      ::memcpy((void*)inputs[chIdx], _inputs[chIdx], sizeof(sF32)*sampleFrames);
-      k += sampleFrames;
-   }
-
-   // Clear output buffers
-   //  (note) AudioInterface instances accumulate samples in the output buffer
-   for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
-   {
-      ::memset((void*)outputs[chIdx], 0, sizeof(sF32)*sampleFrames);
-   }
-
-   if(1 && wrapper->b_processing)
-   {
-
 #ifdef HAVE_WINDOWS
-      _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+   _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 #endif // HAVE_WINDOWS
 
-      vst2_engine_process(inputs, outputs, sampleFrames);
+   sUI chIdx;
+
+   if( (wrapper->oversample.factor > 1u)     && 
+       (NULL != wrapper->oversample.srs_in)  &&
+       (NULL != wrapper->oversample.srs_out)
+       )
+   {
+      sF32 *inputs[NUM_INPUTS];
+      sF32 *outputs[NUM_INPUTS];
+      
+      sUI hostNumFrames = sampleFrames;
+      sUI overNumFrames = sampleFrames * wrapper->oversample.factor;
+
+      // Up-sample inputs
+      {
+         sUI inNumFrames = hostNumFrames;
+         sUI outNumFrames = overNumFrames;
+
+         sF32 *d = wrapper->oversample.in_buffers;
+
+         for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
+         {
+            sF32 *s = _inputs[chIdx];
+
+            int err = speex_resampler_process_float(wrapper->oversample.srs_in,
+                                                    chIdx,
+                                                    s,
+                                                    &inNumFrames,
+                                                    d,
+                                                    &outNumFrames
+                                                    );
+
+            inputs[chIdx] = d;
+
+            // Next input channel
+            d += outNumFrames;
+         }
+      }
+
+      // Clear output buffers
+      //  (note) AudioInterface instances accumulate samples in the output buffer
+      {
+         sF32 *d = wrapper->oversample.out_buffers;
+         ::memset((void*)d, 0, (sizeof(sF32) * NUM_OUTPUTS * overNumFrames));
+
+         for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
+         {
+            outputs[chIdx] = d;
+            d += overNumFrames;
+         }
+      }
+
+      // Process rack modules
+      if(wrapper->b_processing)
+      {
+         vst2_engine_process(inputs, outputs, overNumFrames);
+      }
+
+      // Down-sample outputs
+      {
+         sF32 *s = wrapper->oversample.out_buffers;
+
+         sUI inNumFrames = overNumFrames;
+         sUI outNumFrames = hostNumFrames;
+
+         for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
+         {
+            sF32 *d = _outputs[chIdx];
+
+            int err = speex_resampler_process_float(wrapper->oversample.srs_out,
+                                                    chIdx,
+                                                    s,
+                                                    &inNumFrames,
+                                                    d,
+                                                    &outNumFrames
+                                                    );
+
+            // Next output channel
+            s += inNumFrames;
+         }
+      }
+   }
+   else
+   {
+      // No oversampling
+
+      //  (note) Cubase (tested with 9.5.30) uses the same buffer(s) for both input&output
+      //           => back up the inputs before clearing the outputs
+      sF32 *inputs[NUM_INPUTS];
+      sUI k = 0u;
+      for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
+      {
+         inputs[chIdx] = &wrapper->tmp_input_buffers[k];
+         ::memcpy((void*)inputs[chIdx], _inputs[chIdx], sizeof(sF32)*sampleFrames);
+         k += sampleFrames;
+      }
+
+      // Clear output buffers
+      //  (note) AudioInterface instances accumulate samples in the output buffer
+      for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
+      {
+         ::memset((void*)_outputs[chIdx], 0, sizeof(sF32)*sampleFrames);
+      }
+
+      if(wrapper->b_processing)
+      {
+         vst2_engine_process(inputs, _outputs, sampleFrames);
+      }
    }
 
    // // rack::global->engine.vipMutex.unlock();
@@ -838,7 +1000,6 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    wrapper->unlockAudio();
 
    //printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: LEAVE\n");
-   // // glfwSetInstance(NULL); // xxxx test TLS (=> not working in mingw64!)
 }
 
 
@@ -1374,6 +1535,10 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    // report latency
    _vstPlugin.initialDelay = 0;
 
+   oversample.factor = 1;
+   oversample.quality = SPEEX_RESAMPLER_QUALITY_DEFAULT;
+   oversample.srs_in = NULL;
+   oversample.srs_out = NULL;
    sample_rate  = 44100.0f;
    block_size   = 64u;
    b_processing = true;
@@ -1433,7 +1598,7 @@ void vst2_window_size_set(int _width, int _height) {
    rack::global->vst2.wrapper->setWindowSize(_width, _height);
 }
 
-void vst2_refresh_rate_set (float _hz) {
+void vst2_refresh_rate_set(float _hz) {
    rack::global->vst2.wrapper->setRefreshRate(_hz);
 }
 
@@ -1445,6 +1610,15 @@ extern "C" void lglw_timer_cbk(lglw_t _lglw) {
 extern "C" void lglw_redraw_cbk(lglw_t _lglw) {
    VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
    wrapper->redraw();
+}
+
+void vst2_oversample_set(int _factor, int _quality) {
+   rack::global->vst2.wrapper->setOversample(_factor, _quality);
+}
+
+void vst2_oversample_get(int *_factor, int *_quality) {
+   *_factor  = int(rack::global->vst2.wrapper->oversample.factor);
+   *_quality = int(rack::global->vst2.wrapper->oversample.quality);
 }
 
 

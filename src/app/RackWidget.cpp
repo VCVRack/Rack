@@ -14,7 +14,14 @@
 
 #ifdef USE_VST2
 extern void vst2_set_shared_plugin_tls_globals(void);
+
+#ifdef RACK_HOST
+extern void vst2_oversample_set (int _factor, int _quality);
+extern void vst2_oversample_get (int *_factor, int *_quality);
+#endif // RACK_HOST
+
 #endif // USE_VST2
+
 
 namespace rack {
 
@@ -250,6 +257,28 @@ json_t *RackWidget::toJson() {
 	json_t *versionJ = json_string(global_ui->app.gApplicationVersion.c_str());
 	json_object_set_new(rootJ, "version", versionJ);
 
+#ifdef USE_VST2
+#ifdef RACK_HOST
+   {
+      int oversampleFactor;
+      int oversampleQuality;
+      vst2_oversample_get(&oversampleFactor, &oversampleQuality);
+      
+      // Oversample factor
+      {
+         json_t *oversampleJ = json_real(oversampleFactor);
+         json_object_set_new(rootJ, "oversampleFactor", oversampleJ);
+      }
+
+      // Oversample quality (0..10)
+      {
+         json_t *oversampleJ = json_real(oversampleQuality);
+         json_object_set_new(rootJ, "oversampleQuality", oversampleJ);
+      }
+   }
+#endif // RACK_HOST
+#endif // USE_VST2
+
 	// modules
 	json_t *modulesJ = json_array();
 	std::map<ModuleWidget*, int> moduleIds;
@@ -322,6 +351,29 @@ void RackWidget::fromJson(json_t *rootJ) {
 	if (legacy) {
 		info("Loading patch using legacy mode %d", legacy);
 	}
+
+#ifdef RACK_HOST
+   int oversampleFactor = -1;
+   int oversampleQuality = -1;
+
+	// Oversample factor
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleFactor");
+      if (oversampleJ) {
+         oversampleFactor = int(json_number_value(oversampleJ));
+      }
+   }
+
+	// Oversample quality (0..10)
+   {
+      json_t *oversampleJ = json_object_get(rootJ, "oversampleQuality");
+      if (oversampleJ) {
+         oversampleQuality = int(json_number_value(oversampleJ));
+      }
+   }
+
+   vst2_oversample_set(oversampleFactor, oversampleQuality);
+#endif // RACK_HOST
 
 	// modules
 	std::map<int, ModuleWidget*> moduleWidgets;

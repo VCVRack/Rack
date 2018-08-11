@@ -1,3 +1,10 @@
+** August 11th, 2018
+- add settings.json:"oversampleFactor" option (1..16)
+- add settings.json:"oversampleQuality" option (0..10)
+- oversample settings are also saved / restored with the patch
+- oversample settings can be configured via toolbar button menu
+
+
 ** August 9th, 2018
 - add settings.json:"touchKbd" option
    - show / hide virtual keyboard when textfield is clicked
