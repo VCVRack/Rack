@@ -128,19 +128,25 @@ struct OversampleSetting {
 };
 
 static OversampleSetting oversample_settings[] = {
-   /*  0 */ { "No oversampling",        1,  0 },
-   /*  1 */ { "Oversample x2 (low)",    2,  4 },
-   /*  2 */ { "Oversample x2 (medium)", 2,  7 },
-   /*  3 */ { "Oversample x2 (high)",   2, 10 },
-   /*  4 */ { "Oversample x4 (low)",    4,  4 },
-   /*  5 */ { "Oversample x4 (medium)", 4,  7 },
-   /*  6 */ { "Oversample x4 (high)",   4, 10 },
-   /*  7 */ { "Oversample x6 (low)",    6,  4 },
-   /*  8 */ { "Oversample x6 (medium)", 6,  7 },
-   /*  9 */ { "Oversample x6 (high)",   6, 10 },
-   /* 10 */ { "Oversample x8 (low)",    8,  4 },
-   /* 11 */ { "Oversample x8 (medium)", 8,  7 },
-   /* 12 */ { "Oversample x8 (high)",   8, 10 },
+   /*  0 */ { "No oversampling",          1,  0 },
+   /*  1 */ { "Oversample x2 (low)",      2,  4 },
+   /*  2 */ { "Oversample x2 (medium)",   2,  7 },
+   /*  3 */ { "Oversample x2 (high)",     2, 10 },
+   /*  4 */ { "Oversample x4 (low)",      4,  4 },
+   /*  5 */ { "Oversample x4 (medium)",   4,  7 },
+   /*  6 */ { "Oversample x4 (high)",     4, 10 },
+   /*  7 */ { "Oversample x6 (low)",      6,  4 },
+   /*  8 */ { "Oversample x6 (medium)",   6,  7 },
+   /*  9 */ { "Oversample x6 (high)",     6, 10 },
+   /* 10 */ { "Oversample x8 (low)",      8,  4 },
+   /* 11 */ { "Oversample x8 (medium)",   8,  7 },
+   /* 12 */ { "Oversample x8 (high)",     8, 10 },
+   /* 13 */ { "Oversample x12 (low)",    12,  4 },
+   /* 14 */ { "Oversample x12 (medium)", 12,  7 },
+   /* 15 */ { "Oversample x12 (high)",   12, 10 },
+   /* 16 */ { "Oversample x16 (low)",    16,  4 },
+   /* 17 */ { "Oversample x16 (medium)", 16,  7 },
+   /* 18 */ { "Oversample x16 (high)",   16, 10 },
 };
 #define NUM_OVERSAMPLE_SETTINGS  (sizeof(oversample_settings) / sizeof(OversampleSetting))
 

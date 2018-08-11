@@ -3,122 +3,122 @@
 [0.000 info src/main.cpp:63] Local directory: f:\git\VeeSeeVSTRack\vst2_bin\/
 [0.000 info src/plugin.cpp:673] vcvrack: Loaded static plugin Alikins 0.6.1
 [0.000 info src/plugin.cpp:673] vcvrack: Loaded static plugin AS 0.6.1
-[0.000 info src/plugin.cpp:673] vcvrack: Loaded static plugin AudibleInstruments 0.6.1
+[0.001 info src/plugin.cpp:673] vcvrack: Loaded static plugin AudibleInstruments 0.6.1
 [0.001 info src/plugin.cpp:673] vcvrack: Loaded static plugin BaconMusic 0.6.1
-[0.001 info src/plugin.cpp:673] vcvrack: Loaded static plugin Befaco 0.6.1
-[0.001 info src/plugin.cpp:673] vcvrack: Loaded static plugin Bidoo 0.6.1
+[0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin Befaco 0.6.1
+[0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin Bidoo 0.6.1
 [0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin Bogaudio 0.6.1
-[0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin cf 0.6.1
-[0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin DHE-Modules 0.6.1
-[0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin DrumKit 0.6.1
-[0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin ErraticInstruments 0.6.1
-[0.002 info src/plugin.cpp:673] vcvrack: Loaded static plugin ESeries 0.6.1
+[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin cf 0.6.1
+[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin DHE-Modules 0.6.1
+[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin DrumKit 0.6.1
+[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin ErraticInstruments 0.6.1
+[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin ESeries 0.6.1
 [0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin FrozenWasteland 0.6.1
-[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin Fundamental 0.6.1
-[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin Gratrix 0.6.1
-[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin HetrickCV 0.6.1
-[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin huaba 0.6.1
-[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin JW-Modules 0.6.1
-[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin Koralfx-Modules 0.6.1
-[0.003 info src/plugin.cpp:673] vcvrack: Loaded static plugin LindenbergResearch 0.6.1
-[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin LOGinstruments 0.6.1
-[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin ML_modules 0.6.1
-[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin moDllz 0.6.1
-[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin modular80 0.6.1
-[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin mscHack 0.6.1
-[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin mtsch-plugins 0.6.1
-[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin NauModular 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin Ohmer 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin Qwelk 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin RJModules 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin SerialRacker 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin SonusModular 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin Southpole-parasites 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin squinkylabs-plug1 0.6.1
-[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin SubmarineFree 0.6.1
-[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin Template 0.6.1
-[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin trowaSoft 0.6.1
-[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin unless_modules 0.6.1
-[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin Valley 0.6.1
-[0.006 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Alikins/plugin.dll does not exist
-[0.007 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/AS/plugin.dll does not exist
-[0.007 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/AudibleInstruments/plugin.dll does not exist
-[0.007 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/BaconMusic/plugin.dll does not exist
-[0.007 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Befaco/plugin.dll does not exist
-[0.007 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Bidoo/plugin.dll does not exist
-[0.007 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Bogaudio/plugin.dll does not exist
-[0.007 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/BOKONTEPByteBeatMachine/plugin.dll does not exist
-[0.008 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/cf/plugin.dll does not exist
-[0.008 info src/plugin.cpp:155] Loaded plugin dBiz 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/dBiz/plugin.dll
-[0.008 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/DHE-Modules/plugin.dll does not exist
-[0.008 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/DrumKit/plugin.dll does not exist
-[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/ErraticInstruments/plugin.dll does not exist
-[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/ESeries/plugin.dll does not exist
-[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/FrozenWasteland/plugin.dll does not exist
-[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Fundamental/plugin.dll does not exist
-[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Gratrix/plugin.dll does not exist
-[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/HetrickCV/plugin.dll does not exist
-[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/huaba/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/JW-Modules/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Koralfx-Modules/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/LindenbergResearch/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/LOGinstruments/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/ML_modules/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/moDllz/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/modular80/plugin.dll does not exist
-[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/mscHack/plugin.dll does not exist
-[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/mtsch-plugins/plugin.dll does not exist
-[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/NauModular/plugin.dll does not exist
-[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Ohmer/plugin.dll does not exist
-[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Qwelk/plugin.dll does not exist
-[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/RJModules/plugin.dll does not exist
-[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/SerialRacker/plugin.dll does not exist
-[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/SonusModular/plugin.dll does not exist
-[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Southpole-parasites/plugin.dll does not exist
-[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/squinkylabs-plug1/plugin.dll does not exist
-[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/SubmarineFree/plugin.dll does not exist
-[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Template/plugin.dll does not exist
-[0.013 info src/plugin.cpp:155] Loaded plugin Template_shared 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Template_shared/plugin.dll
-[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/trowaSoft/plugin.dll does not exist
-[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/unless_modules/plugin.dll does not exist
-[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Valley/plugin.dll does not exist
-[0.013 info src/settings.cpp:262] Loading settings f:\git\VeeSeeVSTRack\vst2_bin\/settings.json
-[0.030 info src/window.cpp:599] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\/res/fonts/DejaVuSans.ttf
-[0.030 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_146097_cc.svg
-[0.030 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_31859_cc.svg
-[0.031 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1343816_cc.svg
-[0.031 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1343811_cc.svg
-[0.031 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1084369_cc.svg
-[0.031 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1745061_cc.svg
-[0.032 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1240789_cc.svg
-[0.032 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_305536_cc.svg
-[0.032 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_468341_cc.svg
-[0.032 info src/settings.cpp:262] Loading settings f:\git\VeeSeeVSTRack\vst2_bin\/settings.json
-[0.034 info src/app/RackWidget.cpp:203] Loading patch from string
-[0.036 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/AudioInterface.svg
-[0.037 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/ScrewSilver.svg
-[0.037 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/PJ301M.svg
-[0.037 info src/window.cpp:599] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\/res/fonts/ShareTechMono-Regular.ttf
-[0.039 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/MIDIToCVInterface.svg
-[0.042 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/XCO.svg
-[0.043 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_68px.svg
-[0.043 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_16px.svg
-[0.043 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_0.svg
-[0.044 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_1.svg
-[0.044 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_38px.svg
-[0.044 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/slider_switch_2_14px_0.svg
-[0.045 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/slider_switch_2_14px_1.svg
-[0.045 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/port.svg
-[0.046 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCA.svg
-[0.047 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundLargeBlackKnob.svg
-[0.048 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCF.svg
-[0.049 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundHugeBlackKnob.svg
-[0.051 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/ADSR.svg
-[0.051 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-hexscrew.svg
-[0.051 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePot.svg
-[0.052 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePotHandle.svg
-[0.052 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-PJ301M.svg
-[0.055 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCO-1.svg
-[0.055 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSS_0.svg
-[0.056 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSS_1.svg
-[15.988 info src/app/RackWidget.cpp:165] Saving patch to string
+[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin Fundamental 0.6.1
+[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin Gratrix 0.6.1
+[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin HetrickCV 0.6.1
+[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin huaba 0.6.1
+[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin JW-Modules 0.6.1
+[0.004 info src/plugin.cpp:673] vcvrack: Loaded static plugin Koralfx-Modules 0.6.1
+[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin LindenbergResearch 0.6.1
+[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin LOGinstruments 0.6.1
+[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin ML_modules 0.6.1
+[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin moDllz 0.6.1
+[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin modular80 0.6.1
+[0.005 info src/plugin.cpp:673] vcvrack: Loaded static plugin mscHack 0.6.1
+[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin mtsch-plugins 0.6.1
+[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin NauModular 0.6.1
+[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin Ohmer 0.6.1
+[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin Qwelk 0.6.1
+[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin RJModules 0.6.1
+[0.006 info src/plugin.cpp:673] vcvrack: Loaded static plugin SerialRacker 0.6.1
+[0.007 info src/plugin.cpp:673] vcvrack: Loaded static plugin SonusModular 0.6.1
+[0.007 info src/plugin.cpp:673] vcvrack: Loaded static plugin Southpole-parasites 0.6.1
+[0.007 info src/plugin.cpp:673] vcvrack: Loaded static plugin squinkylabs-plug1 0.6.1
+[0.007 info src/plugin.cpp:673] vcvrack: Loaded static plugin SubmarineFree 0.6.1
+[0.007 info src/plugin.cpp:673] vcvrack: Loaded static plugin Template 0.6.1
+[0.007 info src/plugin.cpp:673] vcvrack: Loaded static plugin trowaSoft 0.6.1
+[0.008 info src/plugin.cpp:673] vcvrack: Loaded static plugin unless_modules 0.6.1
+[0.008 info src/plugin.cpp:673] vcvrack: Loaded static plugin Valley 0.6.1
+[0.008 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Alikins/plugin.dll does not exist
+[0.008 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/AS/plugin.dll does not exist
+[0.008 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/AudibleInstruments/plugin.dll does not exist
+[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/BaconMusic/plugin.dll does not exist
+[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Befaco/plugin.dll does not exist
+[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Bidoo/plugin.dll does not exist
+[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Bogaudio/plugin.dll does not exist
+[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/BOKONTEPByteBeatMachine/plugin.dll does not exist
+[0.009 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/cf/plugin.dll does not exist
+[0.010 info src/plugin.cpp:155] Loaded plugin dBiz 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/dBiz/plugin.dll
+[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/DHE-Modules/plugin.dll does not exist
+[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/DrumKit/plugin.dll does not exist
+[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/ErraticInstruments/plugin.dll does not exist
+[0.010 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/ESeries/plugin.dll does not exist
+[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/FrozenWasteland/plugin.dll does not exist
+[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Fundamental/plugin.dll does not exist
+[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Gratrix/plugin.dll does not exist
+[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/HetrickCV/plugin.dll does not exist
+[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/huaba/plugin.dll does not exist
+[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/JW-Modules/plugin.dll does not exist
+[0.011 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Koralfx-Modules/plugin.dll does not exist
+[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/LindenbergResearch/plugin.dll does not exist
+[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/LOGinstruments/plugin.dll does not exist
+[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/ML_modules/plugin.dll does not exist
+[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/moDllz/plugin.dll does not exist
+[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/modular80/plugin.dll does not exist
+[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/mscHack/plugin.dll does not exist
+[0.012 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/mtsch-plugins/plugin.dll does not exist
+[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/NauModular/plugin.dll does not exist
+[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Ohmer/plugin.dll does not exist
+[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Qwelk/plugin.dll does not exist
+[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/RJModules/plugin.dll does not exist
+[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/SerialRacker/plugin.dll does not exist
+[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/SonusModular/plugin.dll does not exist
+[0.013 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Southpole-parasites/plugin.dll does not exist
+[0.014 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/squinkylabs-plug1/plugin.dll does not exist
+[0.014 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/SubmarineFree/plugin.dll does not exist
+[0.014 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Template/plugin.dll does not exist
+[0.015 info src/plugin.cpp:155] Loaded plugin Template_shared 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Template_shared/plugin.dll
+[0.015 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/trowaSoft/plugin.dll does not exist
+[0.015 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/unless_modules/plugin.dll does not exist
+[0.015 warn src/plugin.cpp:86] Plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Valley/plugin.dll does not exist
+[0.015 info src/settings.cpp:262] Loading settings f:\git\VeeSeeVSTRack\vst2_bin\/settings.json
+[0.033 info src/window.cpp:599] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\/res/fonts/DejaVuSans.ttf
+[0.033 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_146097_cc.svg
+[0.033 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_31859_cc.svg
+[0.034 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1343816_cc.svg
+[0.034 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1343811_cc.svg
+[0.034 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1084369_cc.svg
+[0.035 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1745061_cc.svg
+[0.035 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_1240789_cc.svg
+[0.035 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_305536_cc.svg
+[0.035 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/icons/noun_468341_cc.svg
+[0.035 info src/settings.cpp:262] Loading settings f:\git\VeeSeeVSTRack\vst2_bin\/settings.json
+[0.038 info src/app/RackWidget.cpp:203] Loading patch from string
+[0.039 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/AudioInterface.svg
+[0.040 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/ScrewSilver.svg
+[0.040 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/PJ301M.svg
+[0.040 info src/window.cpp:599] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\/res/fonts/ShareTechMono-Regular.ttf
+[0.042 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/MIDIToCVInterface.svg
+[0.046 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/XCO.svg
+[0.046 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_68px.svg
+[0.046 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_16px.svg
+[0.047 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_0.svg
+[0.047 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_1.svg
+[0.047 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_38px.svg
+[0.047 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/slider_switch_2_14px_0.svg
+[0.048 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/slider_switch_2_14px_1.svg
+[0.048 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/port.svg
+[0.050 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCA.svg
+[0.050 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundLargeBlackKnob.svg
+[0.052 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCF.svg
+[0.052 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundHugeBlackKnob.svg
+[0.054 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/ADSR.svg
+[0.054 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-hexscrew.svg
+[0.054 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePot.svg
+[0.055 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePotHandle.svg
+[0.055 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-PJ301M.svg
+[0.058 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCO-1.svg
+[0.058 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSS_0.svg
+[0.059 info src/window.cpp:654] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSS_1.svg
+[32.846 info src/app/RackWidget.cpp:165] Saving patch to string
