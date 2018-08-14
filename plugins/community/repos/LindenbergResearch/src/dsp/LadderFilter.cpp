@@ -1,12 +1,7 @@
+
 #include "LadderFilter.hpp"
 
-using namespace rack;
-
-
-/**
- * @brief Constructor
- */
-LadderFilter::LadderFilter() {}
+using namespace dsp;
 
 
 /**
@@ -26,11 +21,10 @@ void LadderFilter::invalidate() {
  * @return
  */
 void LadderFilter::process() {
-    os.next(LOWPASS, in);
-    os.doUpsample(LOWPASS);
+    rs->doUpsample(LOWPASS, in);
 
-    for (int i = 0; i < os.factor; i++) {
-        float x = os.up[LOWPASS][i];
+    for (int i = 0; i < rs->getFactor(); i++) {
+        float x = rs->getUpsampled(LOWPASS)[i];
 
         // non linear feedback with nice saturation
         x -= fastatan(bx * q);
@@ -65,10 +59,10 @@ void LadderFilter::process() {
 
 
         // overdrive with fast atan, which folds back the waves at high input and creates a noisy bright sound
-        os.data[LOWPASS][i] = fastatan(y);
+        rs->data[LOWPASS][i] = fastatan(y);
     }
 
-    lpOut = os.getDownsampled(LOWPASS) * (INPUT_GAIN / (drive * 20 + 1) * (quadraticBipolar(drive * 3) + 1));
+    lpOut = rs->getDownsampled(LOWPASS) * (INPUT_GAIN / (drive * 20 + 1) * (quadraticBipolar(drive * 3) + 1));
 }
 
 
@@ -90,7 +84,7 @@ void LadderFilter::setFrequency(float frequency) {
         LadderFilter::frequency = frequency;
         // translate frequency to logarithmic scale
         freqHz = 20.f * powf(1000.f, frequency);
-        freqExp = clamp(freqHz * (1.f / (engineGetSampleRate() * OVERSAMPLE / 2.f)), 0.f, 1.f);
+        freqExp = clamp(freqHz * (1.f / (sr * OVERSAMPLE / 2.f)), 0.f, 1.f);
 
         updateResExp();
         invalidate();
@@ -214,4 +208,9 @@ float LadderFilter::getLightValue() const {
  */
 void LadderFilter::setLightValue(float lightValue) {
     LadderFilter::lightValue = lightValue;
+}
+
+
+LadderFilter::LadderFilter(float sr) : DSPEffect(sr) {
+    rs = new Resampler<1>(OVERSAMPLE);
 }

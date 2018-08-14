@@ -181,7 +181,7 @@ static OversampleChannelSetting oversample_channel_settings[] = {
    /*  0 */ { "Oversample: 0 in, 1 out",  0,  1 },
    /*  1 */ { "Oversample: 0 in, 2 out",  0,  2 },
    /*  2 */ { "Oversample: 0 in, 4 out",  0,  4 },
-   /*  3 */ { "Oversample: 0 in, 8 out",  8,  8 },
+   /*  3 */ { "Oversample: 0 in, 8 out",  0,  8 },
    /*  4 */ { "Oversample: 2 in, 2 out",  2,  2 },
    /*  5 */ { "Oversample: 2 in, 4 out",  2,  4 },
    /*  6 */ { "Oversample: 4 in, 8 out",  4,  8 },
@@ -216,7 +216,7 @@ struct SampleRateButton : TooltipIconButton {
 		pauseItem->text = global->gPaused ? "Resume engine" : "Pause engine";
 		menu->addChild(pauseItem);
 
-#ifdef USE_VST2
+#if defined(USE_VST2) && defined(RACK_HOST)
       {
          int numIn;
          int numOut;
@@ -258,7 +258,7 @@ struct SampleRateButton : TooltipIconButton {
 			item->sampleRate = sampleRate;
 			menu->addChild(item);
 		}
-#endif // USE_VST2
+#endif // USE_VST2 && RACK_HOST
 	}
 };
 
@@ -338,6 +338,5 @@ void Toolbar::draw(NVGcontext *vg) {
 
 	Widget::draw(vg);
 }
-
 
 } // namespace rack

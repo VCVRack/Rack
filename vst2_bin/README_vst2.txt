@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- August 11th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- August 14th, 2018
 ==================================================
 
 !!!------------------------------------------------------------------------------
@@ -32,7 +32,29 @@ Tested in
   - according to users: works in Ableton Live
 
 
-The VST2 plugin includes the following add-on modules:
+The binary distribution contains the following dynamically loaded add-on modules:
+ - dBiz.dBizBlank
+ - dBiz.Multiple
+ - dBiz.Contorno
+ - dBiz.Chord
+ - dBiz.Utility
+ - dBiz.Transpose
+ - dBiz.Bene
+ - dBiz.Bene2
+ - dBiz.BenePads
+ - dBiz.SubMix
+ - dBiz.Remix
+ - dBiz.PerfMixer
+ - dBiz.VCA530
+ - dBiz.Verbo
+ - dBiz.DVCO
+ - dBiz.DAOSC
+ - Template_shared.MyModule
+
+
+The following (478) add-on modules are statically linked with the VST plugin:
+ - 21kHz.D_Inf
+ - 21kHz.PalmLoop
  - Alikins.IdleSwitch
  - Alikins.MomentaryOnButtons
  - Alikins.BigMuteButton
@@ -195,22 +217,6 @@ The VST2 plugin includes the following add-on modules:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
- - dBiz.dBizBlank
- - dBiz.Multiple
- - dBiz.Contorno
- - dBiz.Chord
- - dBiz.Utility
- - dBiz.Transpose
- - dBiz.Bene
- - dBiz.Bene2
- - dBiz.BenePads
- - dBiz.SubMix
- - dBiz.Remix
- - dBiz.PerfMixer
- - dBiz.VCA530
- - dBiz.Verbo
- - dBiz.DVCO
- - dBiz.DAOSC
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage
@@ -298,6 +304,18 @@ The VST2 plugin includes the following add-on modules:
  - HetrickCV.Waveshape
  - huaba.EQ3
  - huaba.ABBus
+ - ImpromptuModular.Tact
+ - ImpromptuModular.TwelveKey
+ - ImpromptuModular.Clocked
+ - ImpromptuModular.MidiFile
+ - ImpromptuModular.PhraseSeq16
+ - ImpromptuModular.PhraseSeq32
+ - ImpromptuModular.GateSeq64
+ - ImpromptuModular.WriteSeq32
+ - ImpromptuModular.WriteSeq64
+ - ImpromptuModular.BigButtonSeq
+ - ImpromptuModular.SemiModularSynth
+ - ImpromptuModular.BlankPanel
  - JW_Modules.Cat
  - JW_Modules.BouncyBalls
  - JW_Modules.FullScope
@@ -322,6 +340,8 @@ The VST2 plugin includes the following add-on modules:
  - LindenbergResearch.ReShaper
  - LindenbergResearch.BlankPanel
  - LindenbergResearch.BlankPanelM1
+ - LindenbergResearch.VCO
+ - LindenbergResearch.Westcoast (preview)
  - LOGinstruments.constant
  - LOGinstruments.constant2
  - LOGinstruments.Speck

@@ -24,16 +24,16 @@ void MS20zdf::invalidate() {
  * @brief Proccess one sample of filter
  */
 void MS20zdf::process() {
-    os.next(IN, input[IN].value);
-    os.doUpsample(IN);
+    //rs.next(IN, input[IN].value);
+    rs->doUpsample(IN, input[IN].value);
 
     float s1, s2;
     float gain = quadraticBipolar(param[DRIVE].value) * DRIVE_GAIN + 1.f;
     float type = param[TYPE].value;
     float x = 0;
 
-    for (int i = 0; i < os.factor; i++) {
-        x = os.up[IN][i];
+    for (int i = 0; i < rs->getFactor(); i++) {
+        x = rs->getUpsampled(IN)[i];
 
         zdf1.set(x - ky, g);
         s1 = zdf1.s;
@@ -43,17 +43,17 @@ void MS20zdf::process() {
 
         y = 1.f / (g2 * k - g * k + 1.f) * (g2 * x + g * s1 + s2);
 
-        ky = k * atanf(y / 70.f) * 70.f;
+        ky = k * fastatan(y / 70.f) * 70.f;
 
         if (type > 0) {
-            os.data[IN][i] = atanShaper(gain * y / 10.f) * 10.f;
+            rs->data[IN][i] = atanShaper(gain * y / 10.f) * 10.f;
         } else {
-            os.data[IN][i] = atanf(gain * y / 10.f) * 10.f;
+            rs->data[IN][i] = fastatan(gain * y / 10.f) * 10.f;
 
         }
     }
 
-    float out = os.getDownsampled(IN);
+    float out = rs->getDownsampled(IN);
 
     output[OUT].value = out;
 }
@@ -63,5 +63,7 @@ void MS20zdf::process() {
  * @brief Inherit constructor
  * @param sr sample rate
  */
-MS20zdf::MS20zdf(float sr) : DSPSystem(sr) {}
+MS20zdf::MS20zdf(float sr) : DSPSystem(sr) {
+    rs = new Resampler<1>(OVERSAMPLE);
+}
 

@@ -5,13 +5,13 @@
 #include "engine.hpp"
 #include "DSPMath.hpp"
 
-namespace rack {
+namespace dsp {
 
     struct LadderFilter : DSPEffect {
 
         static const int OVERSAMPLE = 8;                // factor of internal oversampling
         static constexpr float NOISE_GAIN = 10e-10f;    // internal noise gain used for self-oscillation
-        static constexpr float INPUT_GAIN = 20.f;            // input level
+        static constexpr float INPUT_GAIN = 20.f;       // input level
 
         enum FXChannel {
             LOWPASS
@@ -25,16 +25,34 @@ namespace rack {
         float in, lpOut;
         float lightValue;
 
-        OverSampler<OVERSAMPLE, 1> os;
+        Resampler<1> *rs;
         Noise noise;
 
         void updateResExp();
 
     public:
-        LadderFilter();
+
+        LadderFilter(float sr);
+
+
+        void init() override {
+            f = 0;
+            p = 0;
+            q = 0;
+            b0 = 0;
+            b1 = 0;
+            b2 = 0;
+            b3 = 0;
+            b4 = 0;
+            b5 = 0;
+            bx = 0;
+            t1 = 0;
+            t2 = 0;
+            lightValue = 0.0f;
+        }
+
 
         void invalidate() override;
-
         void process() override;
 
         float getFrequency() const;

@@ -17,7 +17,7 @@ else
 EXTRALIBS= -LIBPATH:dep/lib/msvc/x86
 endif
 
-EXTRALIBS+= jansson.lib glew.lib gdi32.lib opengl32.lib gdi32.lib user32.lib kernel32.lib Comdlg32.lib Shell32.lib ws2_32.lib winmm.lib
+EXTRALIBS+= jansson.lib glew.lib gdi32.lib opengl32.lib gdi32.lib user32.lib kernel32.lib Comdlg32.lib Shell32.lib ws2_32.lib winmm.lib ole32.lib
 #glfw.lib
 
 PLAF_OBJ= 

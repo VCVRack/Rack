@@ -1,3 +1,5 @@
+#define RACK_SKIP_RINGBUFFER
+// #define RACK_SKIP_RESAMPLER
 #include "rack.hpp"
 
 using namespace rack;

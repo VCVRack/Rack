@@ -19,7 +19,8 @@ extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 
 namespace rack {
 
-extern bool b_touchkeyboard_enable;
+bool b_touchkeyboard_enable = false;  // true=support effEditKey*
+
 
 static json_t *settingsToJson() {
 	// root

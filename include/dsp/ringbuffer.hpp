@@ -1,4 +1,5 @@
 #pragma once
+#ifndef RACK_SKIP_RINGBUFFER
 
 #include <string.h>
 #include "util/common.hpp"
@@ -198,3 +199,4 @@ struct AppleRingBuffer {
 };
 
 } // namespace rack
+#endif // RACK_SKIP_RINGBUFFER

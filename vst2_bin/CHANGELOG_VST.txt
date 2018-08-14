@@ -1,3 +1,27 @@
+** August 14th, 2018
+- fix shared_lib build
+- add module 21kHz.D_Inf
+- add module 21kHz.PalmLoop
+- add module ImpromptuModular.Tact
+- add module ImpromptuModular.TwelveKey
+- add module ImpromptuModular.Clocked
+- add module ImpromptuModular.MidiFile
+- add module ImpromptuModular.PhraseSeq16
+- add module ImpromptuModular.PhraseSeq32
+- add module ImpromptuModular.GateSeq64
+- add module ImpromptuModular.WriteSeq32
+- add module ImpromptuModular.WriteSeq64
+- add module ImpromptuModular.BigButtonSeq
+- add module ImpromptuModular.SemiModularSynth
+- add module ImpromptuModular.BlankPanel
+- update module LindenbergResearch.SimpleFilter
+- update module LindenbergResearch.MS20Filter
+- update module LindenbergResearch.AlmaFilter
+- update module LindenbergResearch.ReShaper
+- add module LindenbergResearch.VCO
+- add module LindenbergResearch.Westcoast (preview)
+
+
 ** August 11th, 2018
 - add settings.json:"oversampleFactor" option (0,25..16)
 - add settings.json:"oversampleQuality" option (0..10)

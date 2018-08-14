@@ -39,10 +39,12 @@ void TextField::onMouseDown(EventMouseDown &e) {
 	}
 	OpaqueWidget::onMouseDown(e);
 
+#ifdef RACK_HOST
    if(b_touchkeyboard_enable)
    {
       lglw_touchkeyboard_show(rack::global_ui->window.lglw, LGLW_TRUE);
    }
+#endif // RACK_HOST
 }
 
 void TextField::onMouseMove(EventMouseMove &e) {
@@ -187,10 +189,12 @@ void TextField::onKey(EventKey &e) {
 			}
 			else {
 				EventAction e;
+#ifdef RACK_HOST
             if(b_touchkeyboard_enable)
             {
                lglw_touchkeyboard_show(rack::global_ui->window.lglw, LGLW_FALSE);
             }
+#endif // RACK_HOST
 				onAction(e);
 			}
          break;

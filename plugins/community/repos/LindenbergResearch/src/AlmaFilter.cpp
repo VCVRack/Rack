@@ -34,7 +34,7 @@ struct AlmaFilter : LRModule {
         NUM_LIGHTS
     };
 
-    LadderFilter filter;
+    dsp::LadderFilter *filter = new dsp::LadderFilter(engineGetSampleRate());
 
     LRBigKnob *frqKnob = NULL;
     LRMiddleKnob *peakKnob = NULL;
@@ -45,6 +45,7 @@ struct AlmaFilter : LRModule {
 
 
     void step() override;
+    void onSampleRateChange() override;
 };
 
 
@@ -53,10 +54,10 @@ void AlmaFilter::step() {
     float rescv = inputs[RESONANCE_CV_INPUT].value * 0.1f * quadraticBipolar(params[RESONANCE_CV_PARAM].value);
     float drvcv = inputs[DRIVE_CV_INPUT].value * 0.1f * quadraticBipolar(params[DRIVE_CV_PARAM].value);
 
-    filter.setFrequency(params[CUTOFF_PARAM].value + frqcv);
-    filter.setResonance(params[RESONANCE_PARAM].value + rescv);
-    filter.setDrive(params[DRIVE_PARAM].value + drvcv);
-    filter.setSlope(params[SLOPE_PARAM].value);
+    filter->setFrequency(params[CUTOFF_PARAM].value + frqcv);
+    filter->setResonance(params[RESONANCE_PARAM].value + rescv);
+    filter->setDrive(params[DRIVE_PARAM].value + drvcv);
+    filter->setSlope(params[SLOPE_PARAM].value);
 
 
     /* pass modulated parameter to knob widget for cv indicator */
@@ -73,13 +74,19 @@ void AlmaFilter::step() {
 
     float y = inputs[FILTER_INPUT].value;
 
-    filter.setIn(y);
-    filter.process();
+    filter->setIn(y);
+    filter->process();
 
-    outputs[LP_OUTPUT].value = filter.getLpOut();
+    outputs[LP_OUTPUT].value = filter->getLpOut();
 
 
-    lights[OVERLOAD_LIGHT].value = filter.getLightValue();
+    lights[OVERLOAD_LIGHT].value = filter->getLightValue();
+}
+
+
+void AlmaFilter::onSampleRateChange() {
+    Module::onSampleRateChange();
+    filter->setSamplerate(engineGetSampleRate());
 }
 
 
@@ -92,9 +99,6 @@ struct AlmaFilterWidget : LRModuleWidget {
 
 
 AlmaFilterWidget::AlmaFilterWidget(AlmaFilter *module) : LRModuleWidget(module) {
-    //setPanel(SVG::load(assetPlugin(plugin, "res/VCF.svg")));
-
-
     panel = new LRPanel();
     panel->setBackground(SVG::load(assetPlugin(plugin, "res/VCF.svg")));
     addChild(panel);
@@ -125,21 +129,21 @@ AlmaFilterWidget::AlmaFilterWidget(AlmaFilter *module) : LRModuleWidget(module) 
     addParam(ParamWidget::create<LRSmallKnob>(Vec(78, 106), module, AlmaFilter::CUTOFF_CV_PARAM, -1.f, 1.f, 0.f));
     addParam(ParamWidget::create<LRSmallKnob>(Vec(127.1, 106), module, AlmaFilter::DRIVE_CV_PARAM, -1.f, 1.f, 0.f));
 
-    addInput(Port::create<IOPort>(Vec(26, 50), Port::INPUT, module, AlmaFilter::RESONANCE_CV_INPUT));
-    addInput(Port::create<IOPort>(Vec(76, 50), Port::INPUT, module, AlmaFilter::CUTOFF_CV_INPUT));
-    addInput(Port::create<IOPort>(Vec(125, 50), Port::INPUT, module, AlmaFilter::DRIVE_CV_INPUT));
+    addInput(Port::create<LRIOPort>(Vec(26, 50), Port::INPUT, module, AlmaFilter::RESONANCE_CV_INPUT));
+    addInput(Port::create<LRIOPort>(Vec(76, 50), Port::INPUT, module, AlmaFilter::CUTOFF_CV_INPUT));
+    addInput(Port::create<LRIOPort>(Vec(125, 50), Port::INPUT, module, AlmaFilter::DRIVE_CV_INPUT));
     // ***** CV INPUTS *******
 
     // ***** INPUTS **********
-    addInput(Port::create<IOPort>(Vec(25, 326.5), Port::INPUT, module, AlmaFilter::FILTER_INPUT));
+    addInput(Port::create<LRIOPort>(Vec(25, 326.5), Port::INPUT, module, AlmaFilter::FILTER_INPUT));
     // ***** INPUTS **********
 
     // ***** OUTPUTS *********
-    addOutput(Port::create<IOPort>(Vec(124.5, 326.5), Port::OUTPUT, module, AlmaFilter::LP_OUTPUT));
+    addOutput(Port::create<LRIOPort>(Vec(124.5, 326.5), Port::OUTPUT, module, AlmaFilter::LP_OUTPUT));
     // ***** OUTPUTS *********
 
     // ***** LIGHTS **********
-    addChild(ModuleLightWidget::create<LRRedLight>(Vec(85, 247), module, AlmaFilter::OVERLOAD_LIGHT));
+    addChild(ModuleLightWidget::create<LRLight>(Vec(85, 247), module, AlmaFilter::OVERLOAD_LIGHT));
     // ***** LIGHTS **********
 }
 

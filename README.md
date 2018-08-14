@@ -71,7 +71,9 @@ The binary distribution contains the following dynamically loaded add-on modules
  - Template_shared.MyModule
 
 
-The following (462) add-on modules are statically linked with the VST plugin:
+The following (478) add-on modules are statically linked with the VST plugin:
+ - 21kHz.D_Inf
+ - 21kHz.PalmLoop
  - Alikins.IdleSwitch
  - Alikins.MomentaryOnButtons
  - Alikins.BigMuteButton
@@ -321,6 +323,18 @@ The following (462) add-on modules are statically linked with the VST plugin:
  - HetrickCV.Waveshape
  - huaba.EQ3
  - huaba.ABBus
+ - ImpromptuModular.Tact
+ - ImpromptuModular.TwelveKey
+ - ImpromptuModular.Clocked
+ - ImpromptuModular.MidiFile
+ - ImpromptuModular.PhraseSeq16
+ - ImpromptuModular.PhraseSeq32
+ - ImpromptuModular.GateSeq64
+ - ImpromptuModular.WriteSeq32
+ - ImpromptuModular.WriteSeq64
+ - ImpromptuModular.BigButtonSeq
+ - ImpromptuModular.SemiModularSynth
+ - ImpromptuModular.BlankPanel
  - JW_Modules.Cat
  - JW_Modules.BouncyBalls
  - JW_Modules.FullScope
@@ -345,6 +359,8 @@ The following (462) add-on modules are statically linked with the VST plugin:
  - LindenbergResearch.ReShaper
  - LindenbergResearch.BlankPanel
  - LindenbergResearch.BlankPanelM1
+ - LindenbergResearch.VCO
+ - LindenbergResearch.Westcoast (preview)
  - LOGinstruments.constant
  - LOGinstruments.constant2
  - LOGinstruments.Speck

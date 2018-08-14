@@ -1331,7 +1331,7 @@ void KlokSpidModule::step() {
 				}
 			}
 			// Sending pulse, using pulse generator.
-			sendPulse[i].pulseTime = pulseDuration[i];
+			sendPulse[i].triggerDuration = pulseDuration[i];
 	  	sendPulse[i].trigger(pulseDuration[i]);
 			canPulse[i] = false;
 		}

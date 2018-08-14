@@ -1,7 +1,7 @@
 #include "FrozenWasteland.hpp"
 #include "dsp/samplerate.hpp"
 #include "dsp/digital.hpp"
-#include "ringbuffer.hpp"
+#include "dsp-delay/ringbuffer.hpp"
 #include <iostream>
 
 #define HISTORY_SIZE (1<<22)
@@ -102,10 +102,9 @@ struct HairPick : Module {
 	bool combActive[NUM_TAPS];
 	float combLevel[NUM_TAPS];
 
-
-	MultiTapDoubleRingBuffer<float, HISTORY_SIZE,NUM_TAPS> historyBuffer[CHANNELS];
-	DoubleRingBuffer<float, 16> outBuffer[NUM_TAPS][CHANNELS]; 
-	SampleRateConverter<1> src;
+   rack_plugin_FrozenWasteland::MultiTapDoubleRingBuffer<float, HISTORY_SIZE,NUM_TAPS> historyBuffer[CHANNELS];
+   rack_plugin_FrozenWasteland::DoubleRingBuffer<float, 16> outBuffer[NUM_TAPS][CHANNELS]; 
+   SampleRateConverter<1> src;
 	float lastFeedback[CHANNELS] = {0.0f,0.0f};
 
 	float lerp(float v0, float v1, float t) {

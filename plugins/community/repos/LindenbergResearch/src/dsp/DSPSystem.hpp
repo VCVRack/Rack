@@ -50,8 +50,8 @@ namespace dsp {
 
     protected:
 #ifdef _MSC_VER
-        DSPPort input[NUM_IN];
-        DSPPort output[NUM_OUT];
+        DSPPort input[NUM_IN + 1];
+        DSPPort output[NUM_OUT + 1];
         DSPParam param[NUM_PARAM + 1];
 #else
         DSPPort input[NUM_IN] = {};
@@ -78,7 +78,7 @@ namespace dsp {
         explicit DSPSystem(float sr) : sr(sr) {}
 
 
-        /**
+        virtual /**
          * @brief Update sample rate on change
          * @param sr
          */
@@ -138,16 +138,6 @@ namespace dsp {
             if (proccess) {
                 process();
             }
-        }
-
-
-        /**
-         * @brief Get current output value
-         * @param id Output ID
-         * @return
-         */
-        float getOut(int id) {
-            return output[id].value;
         }
 
 

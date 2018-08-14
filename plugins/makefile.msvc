@@ -11,6 +11,7 @@ endef
 .PHONY: bin
 bin:
 #	$(foreach pname,$(PLUGINS),$(eval ($(call run_make,$(pname),bin))))
+	$(call run_make,21kHz,bin)
 	$(call run_make,Alikins,bin)
 	$(call run_make,AS,bin)
 	$(call run_make,AudibleInstruments,bin)
@@ -30,6 +31,7 @@ bin:
 	$(call run_make,Gratrix,bin)
 	$(call run_make,HetrickCV,bin)
 	$(call run_make,huaba,bin)
+	$(call run_make,ImpromptuModular,bin)
 	$(call run_make,JW-Modules,bin)
 	$(call run_make,Koralfx-Modules,bin)
 	$(call run_make,LindenbergResearch,bin)
@@ -60,6 +62,7 @@ bin:
 clean:
 #	$(foreach pname,$(PLUGINS),$(eval $(call run_make,$(pname),clean)))
 #	$(foreach pname,$(PLUGINS),$(eval echo $(pname)))
+	$(call run_make,21kHz,clean)
 	$(call run_make,Alikins,clean)
 	$(call run_make,AS,clean)
 	$(call run_make,AudibleInstruments,clean)
@@ -79,6 +82,7 @@ clean:
 	$(call run_make,Gratrix,clean)
 	$(call run_make,HetrickCV,clean)
 	$(call run_make,huaba,clean)
+	$(call run_make,ImpromptuModular,clean)
 	$(call run_make,JW-Modules,clean)
 	$(call run_make,Koralfx-Modules,clean)
 	$(call run_make,LindenbergResearch,clean)

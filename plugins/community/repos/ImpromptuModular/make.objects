@@ -1,0 +1,23 @@
+ALL_OBJ= \
+	src/BigButtonSeq.o \
+	src/BlankPanel.o \
+	src/Clocked.o \
+	src/FundamentalUtil.o \
+	src/GateSeq64.o \
+	src/ImpromptuModular.o \
+	src/IMWidgets.o \
+	src/midifile/Binasc.o \
+	src/midifile/MidiEvent.o \
+	src/midifile/MidiEventList.o \
+	src/midifile/MidiFile.o \
+	src/midifile/MidiMessage.o \
+	src/MidiFileModule.o \
+	src/PhraseSeq16.o \
+	src/PhraseSeq32.o \
+	src/SemiModularSynth.o \
+	src/Tact.o \
+	src/TwelveKey.o \
+	src/WriteSeq32.o \
+	src/WriteSeq64.o
+
+#	src/EngTest1.o

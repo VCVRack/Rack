@@ -1,8 +1,11 @@
 ALL_OBJ= \
 	src/dsp/DSPMath.o \
 	src/dsp/LadderFilter.o \
+	src/dsp/Lockhart.o \
 	src/dsp/MS20zdf.o \
 	src/dsp/Oscillator.o \
+	src/dsp/SergeWavefolder.o \
+	src/dsp/WaveShaper.o \
 	src/AlmaFilter.o \
 	src/BlankPanel.o \
 	src/BlankPanelM1.o \
@@ -10,7 +13,6 @@ ALL_OBJ= \
 	src/LindenbergResearch.o \
 	src/MS20Filter.o \
 	src/ReShaper.o \
-	src/SimpleFilter.o
-
-#	src/VCO.o
-
+	src/SimpleFilter.o \
+	src/VCO.o \
+	src/Westcoast.o

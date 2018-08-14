@@ -602,6 +602,7 @@ Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
 #ifdef USE_VST2
 #ifndef RACK_PLUGIN
 extern "C" {
+extern void init_plugin_21kHz              (rack::Plugin *p);
 extern void init_plugin_Alikins            (rack::Plugin *p);
 extern void init_plugin_AS                 (rack::Plugin *p);
 extern void init_plugin_AudibleInstruments (rack::Plugin *p);
@@ -621,6 +622,7 @@ extern void init_plugin_Fundamental        (rack::Plugin *p);
 extern void init_plugin_Gratrix            (rack::Plugin *p);
 extern void init_plugin_HetrickCV          (rack::Plugin *p);
 extern void init_plugin_huaba              (rack::Plugin *p);
+extern void init_plugin_ImpromptuModular   (rack::Plugin *p);
 extern void init_plugin_JW_Modules         (rack::Plugin *p);
 extern void init_plugin_Koralfx            (rack::Plugin *p);
 extern void init_plugin_LindenbergResearch (rack::Plugin *p);
@@ -674,6 +676,7 @@ static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCa
 }
 
 void vst2_load_static_rack_plugins(void) {
+   vst2_load_static_rack_plugin("21kHz",              &init_plugin_21kHz);
    vst2_load_static_rack_plugin("Alikins",            &init_plugin_Alikins);
    vst2_load_static_rack_plugin("AS",                 &init_plugin_AS);
    vst2_load_static_rack_plugin("AudibleInstruments", &init_plugin_AudibleInstruments);
@@ -693,6 +696,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Gratrix",            &init_plugin_Gratrix);
    vst2_load_static_rack_plugin("HetrickCV",          &init_plugin_HetrickCV);
    vst2_load_static_rack_plugin("huaba",              &init_plugin_huaba);
+   vst2_load_static_rack_plugin("ImpromptuModular",   &init_plugin_ImpromptuModular);
    vst2_load_static_rack_plugin("JW_Modules",         &init_plugin_JW_Modules);
    vst2_load_static_rack_plugin("Koralfx-Modules",    &init_plugin_Koralfx);
    vst2_load_static_rack_plugin("LindenbergResearch", &init_plugin_LindenbergResearch);

@@ -70,7 +70,7 @@ namespace dsp {
         float freqHz = 0;
 
         MS20ZDF zdf1, zdf2;
-        OverSampler<OVERSAMPLE, 1> os;
+        Resampler<1> *rs;
 
     public:
         explicit MS20zdf(float sr);

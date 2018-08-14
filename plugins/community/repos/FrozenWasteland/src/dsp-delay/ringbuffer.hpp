@@ -3,8 +3,7 @@
 #include <string.h>
 #include "util/common.hpp"
 
-
-namespace rack {
+namespace rack_plugin_FrozenWasteland {
 
 /** A simple cyclic buffer.
 S must be a power of 2.
@@ -353,4 +352,4 @@ struct AppleRingBuffer {
 	}
 };
 
-} // namespace rack
+} // namespace rack_plugin_FrozenWasteland

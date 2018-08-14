@@ -77,12 +77,12 @@ ReShaperWidget::ReShaperWidget(ReShaper *module) : LRModuleWidget(module) {
 
 
     // ***** INPUTS **********
-    addInput(Port::create<IOPort>(Vec(21, 60), Port::INPUT, module, ReShaper::RESHAPER_INPUT));
-    addInput(Port::create<IOPort>(Vec(71, 60), Port::INPUT, module, ReShaper::RESHAPER_CV_INPUT));
+    addInput(Port::create<LRIOPort>(Vec(21, 60), Port::INPUT, module, ReShaper::RESHAPER_INPUT));
+    addInput(Port::create<LRIOPort>(Vec(71, 60), Port::INPUT, module, ReShaper::RESHAPER_CV_INPUT));
     // ***** INPUTS **********
 
     // ***** OUTPUTS *********
-    addOutput(Port::create<IOPort>(Vec(46, 320), Port::OUTPUT, module, ReShaper::RESHAPER_OUTPUT));
+    addOutput(Port::create<LRIOPort>(Vec(46, 320), Port::OUTPUT, module, ReShaper::RESHAPER_OUTPUT));
     // ***** OUTPUTS *********
 }
 

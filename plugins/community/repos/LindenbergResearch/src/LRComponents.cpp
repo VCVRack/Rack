@@ -4,22 +4,23 @@
 /**
  * @brief Constructor of LCD Widget
  */
-LCDWidget::LCDWidget(NVGcolor fg, unsigned char length) {
+LCDWidget::LCDWidget(NVGcolor fg, unsigned char length, std::string format, LCDType type, float fontsize) {
     /** load LCD ttf font */
-    gLCDFont_DIG7 = Font::load(assetPlugin(plugin, LCD_FONT_DIG7));
+    ttfLCDDig7 = Font::load(assetPlugin(plugin, LCD_FONT_DIG7));
+    LCDWidget::fontsize = fontsize;
 
-    auto r = (unsigned char) (fg.r * 0xFF);
-    auto g = (unsigned char) (fg.g * 0xFF);
-    auto b = (unsigned char) (fg.b * 0xFF);
+    LCDWidget::type = type;
 
     LCDWidget::length = length;
+    LCDWidget::format = format;
 
     LCDWidget::fg = fg;
-    LCDWidget::bg = nvgRGBA(r - 0x40, g - 0x40, b - 0x40, 0x40);
-}
+    LCDWidget::bg = nvgRGBAf(fg.r, fg.g, fg.b, 0.15f);
 
-
-LRModuleWidget::LRModuleWidget(Module *module) : ModuleWidget(module) {
+    for (int i = 0; i < LCDWidget::length; ++i) {
+        s1.append("O");
+        s2.append("X");
+    }
 }
 
 
@@ -28,38 +29,58 @@ LRModuleWidget::LRModuleWidget(Module *module) : ModuleWidget(module) {
  * @param vg
  */
 void LCDWidget::draw(NVGcontext *vg) {
-    nvgFontSize(vg, LCD_FONTSIZE);
-    nvgFontFaceId(vg, gLCDFont_DIG7->handle);
+    nvgFontSize(vg, fontsize);
+    nvgFontFaceId(vg, ttfLCDDig7->handle);
     nvgTextLetterSpacing(vg, LCD_LETTER_SPACING);
 
     nvgFillColor(vg, bg);
-
-    std::string s1;
-    std::string s2;
-
-    for (int i = 0; i < LCDWidget::length; ++i) {
-        s1.append("8");
-        s2.append(":");
-    }
+    std::string str;
 
     nvgTextBox(vg, 0, 0, 220, s1.c_str(), nullptr);
     nvgTextBox(vg, 0, 0, 220, s2.c_str(), nullptr);
 
+    /** if set to inactive just draw the background segments */
+    if (!active) return;
+
+
+    // if set to numeric, do some formatting
+    if (type == NUMERIC) {
+        str = stringf(format.c_str(), value);
+
+        // quick and dirty, urgs
+        if (value < 10)
+            text = "0" + text;
+    }
+
+    // on text mode just format
+    if (type == TEXT) {
+        str = stringf(format.c_str(), text.c_str());
+    }
+
+    // on list mode get current item out of the current value
+    if (type == LIST) {
+        unsigned long index;
+        long current = lround(value);
+
+        if (current < 0) {
+            index = 0;
+        } else if ((unsigned long) current >= items.size()) {
+            index = items.size() - 1;
+        } else {
+            index = (unsigned long) current;
+        }
+
+        str = stringf(format.c_str(), items[index].c_str());
+    }
+
     nvgFillColor(vg, fg);
-    nvgTextBox(vg, 0, 0, 220, text.c_str(), nullptr);
+    nvgTextBox(vg, 0, 0, 220, str.c_str(), nullptr);
 }
 
 
-void LRRedLight::draw(NVGcontext *vg) {
-    //LightWidget::draw(vg);
-
+void LRLight::draw(NVGcontext *vg) {
     float radius = box.size.x / 1.5f;
-    float oradius = radius + 10.0f;
-
-    /* color.r = clampf(color.r, 0.0f, 1.0f);
-     color.g = clampf(color.g, 0.0f, 1.0f);
-     color.b = clampf(color.b, 0.0f, 1.0f);
-     color.a = clampf(color.a, 0.0f, 1.0f);*/
+    float oradius = radius + 14.0f;
 
     // Solid
     nvgBeginPath(vg);
@@ -84,7 +105,7 @@ void LRRedLight::draw(NVGcontext *vg) {
     nvgRect(vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
     NVGpaint paint;
     NVGcolor icol = color;
-    icol.a *= 0.40f;
+    icol.a *= 0.30f;
     NVGcolor ocol = color;
     ocol.a = 0.00f;
     paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
@@ -96,8 +117,8 @@ void LRRedLight::draw(NVGcontext *vg) {
 /**
  * @brief Constructor
  */
-LRRedLight::LRRedLight() {
-    addBaseColor(COLOR_RED);
+LRLight::LRLight() {
+    addBaseColor(nvgRGBAf(0.1, 0.3, 0.9, 0.99));
 }
 
 
@@ -236,6 +257,16 @@ void LRPanel::setOuter(const NVGcolor &outer) {
 LRPanel::LRPanel() {}
 
 
+const NVGcolor &LRPanel::getInner() const {
+    return inner;
+}
+
+
+const NVGcolor &LRPanel::getOuter() const {
+    return outer;
+}
+
+
 SVGRotator::SVGRotator() : FramebufferWidget() {
     tw = new TransformWidget();
     addChild(tw);
@@ -272,4 +303,12 @@ void SVGRotator::step() {
     dirty = true;
 
     FramebufferWidget::step();
+}
+
+
+/**
+ * @brief
+ * @param module
+ */
+LRModuleWidget::LRModuleWidget(Module *module) : ModuleWidget(module) {
 }

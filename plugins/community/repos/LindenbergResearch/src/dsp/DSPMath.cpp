@@ -1,5 +1,7 @@
 #include "DSPMath.hpp"
 
+namespace dsp {
+
 /**
  * @brief Clip signal at bottom by value
  * @param in Sample input
@@ -87,13 +89,16 @@ float Integrator::add(float x, float Fn) {
  * @param x Input sample
  * @return Filtered sample
  */
-float DCBlocker::filter(float x) {
-    float y = x - xm1 + R * ym1;
+double DCBlocker::filter(double x) {
+    double y = x - xm1 + r * ym1;
     xm1 = x;
     ym1 = y;
 
     return y;
 }
+
+
+DCBlocker::DCBlocker(double r) : r(r) {}
 
 
 /**
@@ -183,3 +188,5 @@ double overdrive(double input) {
     const double a = 1 + exp(sqrt(fabs(x)) * -0.75);
     return (exp(x) - exp(-x * a)) / (exp(x) + exp(-x));
 }
+
+} // namespace rack_plugin_LindenbergResearch

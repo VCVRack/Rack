@@ -3,11 +3,15 @@
 #include <cmath>
 #include <random>
 #include "rack.hpp"
-#include "dsp/decimator.hpp"
+#include "dsp/resampler.hpp"
+#include "DSPEffect.hpp"
 
+#define LAMBERT_W_THRESHOLD 10e-10
 using namespace rack;
 
 const static float TWOPI = (float) M_PI * 2;
+
+namespace dsp {
 
 
 /**
@@ -31,15 +35,17 @@ struct Integrator {
  * @brief Filter out DC offset / 1-Pole HP Filter
  */
 struct DCBlocker {
-    const float R = 0.999;
-    float xm1 = 0.f, ym1 = 0.f;
+    double r = 0.999;
+    double xm1 = 0.f, ym1 = 0.f;
+
+    DCBlocker(double r);
 
     /**
      * @brief Filter signal
      * @param x Input sample
      * @return Filtered output
      */
-    float filter(float x);
+    double filter(double x);
 };
 
 
@@ -87,9 +93,7 @@ public:
  */
 struct Noise {
 
-    Noise() {
-
-    }
+    Noise() {}
 
 
     float nextFloat(float gain) {
@@ -102,6 +106,7 @@ struct Noise {
 
 /**
  * @brief Simple oversampling class
+ * @deprecated Use resampler instead
  */
 template<int OVERSAMPLE, int CHANNELS>
 struct OverSampler {
@@ -113,7 +118,7 @@ struct OverSampler {
     Vector y[CHANNELS] = {};
     float up[CHANNELS][OVERSAMPLE] = {};
     float data[CHANNELS][OVERSAMPLE] = {};
-    Decimator<OVERSAMPLE, OVERSAMPLE> decimator[CHANNELS];
+    rack::Decimator<OVERSAMPLE, OVERSAMPLE> decimator[CHANNELS];
     int factor = OVERSAMPLE;
 
 
@@ -312,3 +317,136 @@ inline float cubicShape(float x) {
 inline float atanShaper(float x) {
     return x / (1.f + (0.28f * x * x));
 }
+
+
+/** Generate chebyshev polynoms
+ * @brief
+ * @param x Input sample
+ * @param A ?
+ * @param order Polynom order
+ * @return
+ */
+inline float chebyshev(float x, float A[], int order) {
+    // To = 1
+    // T1 = x
+    // Tn = 2.x.Tn-1 - Tn-2
+    // out = sum(Ai*Ti(x)) , i C {1,..,order}
+    float Tn_2 = 1.0f;
+    float Tn_1 = x;
+    float Tn;
+    float out = A[0] * Tn_1;
+
+    for (int n = 2; n <= order; n++) {
+        Tn = 2.0f * x * Tn_1 - Tn_2;
+        out += A[n - 1] * Tn;
+        Tn_2 = Tn_1;
+        Tn_1 = Tn;
+    }
+    return out;
+}
+
+
+/**
+ * @brief Signum function
+ * @param x
+ * @return
+ */
+inline double sign(double x) {
+    if (x > 0) return 1;
+    if (x < 0) return -1;
+    return 0;
+}
+
+
+/**
+ * @brief Lambert-W function using Halley's method
+ *        see: http://smc2017.aalto.fi/media/materials/proceedings/SMC17_p336.pdf
+ * @param x
+ * @param ln1
+ * @return
+ */
+inline double lambert_W(double x, double ln1) {
+    double w;
+    double p, r, s, err;
+    double expw;
+
+    // if (!isnan(ln1) || !isfinite(ln1)) ln1 = 0.;
+
+    // initial guess, previous value
+    w = ln1;
+
+//    debug("x: %f  ln1: %f", x, ln1);
+
+    // Haley's method (Sec. 4.2 of the paper)
+    for (int i = 0; i < 100; i++) {
+        expw = pow(M_E, w);
+
+        p = w * expw - x;
+        r = (w + 1.) * expw;
+        s = (w + 2.) / (2. * (w + 1.));
+        err = (p / (r - (p * s)));
+
+        if (abs(err) < 10e-12) {
+            break;
+        }
+
+        w = w - err;
+    }
+
+    return w;
+}
+
+
+/**
+ * @brief
+ *
+ * This function evaluates the upper branch of the Lambert-W function for
+ * real input x.
+ *
+ * Function written by F. Esqueda 2/10/17 based on implementation presented
+ * by Darko Veberic - "Lambert W Function for Applications in Physics"
+ * Available at https://arxiv.org/pdf/1209.0735.pdf
+ *
+ * @param x input
+ * @return W(x)
+ */
+inline double lambert_W_Fritsch(double x) {
+    double num, den;
+    double w, w1, a, b, ia;
+    double z, q, e;
+
+    if (x < 0.14546954290661823) {
+        num = 1 + 5.931375839364438 * x + 11.39220550532913 * x * x + 7.33888339911111 * x * x * x + 0.653449016991959 * x * x * x * x;
+        den = 1 + 6.931373689597704 * x + 16.82349461388016 * x * x + 16.43072324143226 * x * x * x + 5.115235195211697 * x * x * x * x;
+
+        w = x * num / den;
+    } else if (x < 8.706658967856612) {
+        num = 1 + 2.4450530707265568 * x + 1.3436642259582265 * x * x + 0.14844005539759195 * x * x * x +
+              0.0008047501729130 * x * x * x * x;
+        den = 1 + 3.4447089864860025 * x + 3.2924898573719523 * x * x + 0.9164600188031222 * x * x * x +
+              0.05306864044833221 * x * x * x * x;
+
+        w = x * num / den;
+    } else {
+        a = log(x);
+        b = log(a);
+        ia = 1. / a;
+        w = a - b + (b * ia) * 0.5 * b * (b - 2.) * (ia * ia) + (1. / 6.) * (2. * b * b - 9. * b + 6.) * (ia * ia * ia);
+    }
+
+
+    for (int i = 0; i < 20; i++) {
+        w1 = w + 1.;
+        z = log(x) - log(w) - w;
+        q = 2. * w1 * (w1 + (2. / 3.) * z);
+        e = (z / w1) * ((q - z) / (q - 2. * z));
+
+        if (abs(e) < 10e-12) {
+            break;
+        }
+    }
+
+    return w;
+}
+
+} // namespace dsp

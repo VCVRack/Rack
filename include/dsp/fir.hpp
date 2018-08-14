@@ -5,34 +5,36 @@
 
 namespace rack {
 
-/** Perform a direct convolution
-x[-len + 1] to x[0] must be defined
-*/
-inline float convolve(const float *x, const float *kernel, int len) {
-	float y = 0.0;
+/** Performs a direct sum convolution */
+inline float convolveNaive(const float *in, const float *kernel, int len) {
+	float y = 0.f;
 	for (int i = 0; i < len; i++) {
-		y += x[-i] * kernel[i];
+		y += in[len - 1 - i] * kernel[i];
 	}
 	return y;
 }
 
-inline void blackmanHarrisWindow(float *x, int n) {
-	const float a0 = 0.35875;
-	const float a1 = 0.48829;
-	const float a2 = 0.14128;
-	const float a3 = 0.01168;
-	for (int i = 0; i < n; i++) {
-		x[i] *= a0
-			- a1 * cosf(2 * M_PI * i / (n - 1))
-			+ a2 * cosf(4 * M_PI * i / (n - 1))
-			- a3 * cosf(6 * M_PI * i / (n - 1));
+/** Computes the impulse response of a boxcar lowpass filter */
+inline void boxcarLowpassIR(float *out, int len, float cutoff = 0.5f) {
+	for (int i = 0; i < len; i++) {
+		float t = i - (len - 1) / 2.f;
+		out[i] = 2 * cutoff * sinc(2 * cutoff * t);
 	}
 }
 
-inline void boxcarFIR(float *x, int n, float cutoff) {
-	for (int i = 0; i < n; i++) {
-		float t = (float)i / (n - 1) * 2.0 - 1.0;
-		x[i] = sinc(t * n * cutoff);
+inline void blackmanHarrisWindow(float *x, int len) {
+	// Constants from https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Harris_window
+	const float a0 = 0.35875f;
+	const float a1 = 0.48829f;
+	const float a2 = 0.14128f;
+	const float a3 = 0.01168f;
+	float factor = 2*M_PI / (len - 1);
+	for (int i = 0; i < len; i++) {
+		x[i] *=
+			+ a0
+			- a1 * cosf(1*factor * i)
+			+ a2 * cosf(2*factor * i)
+			- a3 * cosf(3*factor * i);
 	}
 }
 
@@ -53,18 +55,21 @@ struct RealTimeConvolver {
 	RealTimeConvolver(size_t blockSize) {
 		this->blockSize = blockSize;
 		pffft = pffft_new_setup(blockSize*2, PFFFT_REAL);
-		outputTail = new float[blockSize]();
-		tmpBlock = new float[blockSize*2]();
+		outputTail = new float[blockSize];
+		memset(outputTail, 0, blockSize * sizeof(float));
+		tmpBlock = new float[blockSize*2];
+		memset(tmpBlock, 0, blockSize*2 * sizeof(float));
 	}
 
 	~RealTimeConvolver() {
-		clear();
+		setKernel(NULL, 0);
 		delete[] outputTail;
 		delete[] tmpBlock;
 		pffft_destroy_setup(pffft);
 	}
 
-	void clear() {
+	void setKernel(const float *kernel, size_t length) {
+		// Clear existing kernel
 		if (kernelFfts) {
 			pffft_aligned_free(kernelFfts);
 			kernelFfts = NULL;
@@ -75,29 +80,24 @@ struct RealTimeConvolver {
 		}
 		kernelBlocks = 0;
 		inputPos = 0;
-	}
 
-	void setKernel(const float *kernel, size_t length) {
-		clear();
+		if (kernel && length > 0) {
+			// Round up to the nearest factor of `blockSize`
+			kernelBlocks = (length - 1) / blockSize + 1;
 
-		assert(kernel);
-		assert(length > 0);
+			// Allocate blocks
+			kernelFfts = (float*) pffft_aligned_malloc(sizeof(float) * blockSize*2 * kernelBlocks);
+			inputFfts = (float*) pffft_aligned_malloc(sizeof(float) * blockSize*2 * kernelBlocks);
+			memset(inputFfts, 0, sizeof(float) * blockSize*2 * kernelBlocks);
 
-		// Round up to the nearest factor of `blockSize`
-		kernelBlocks = (length - 1) / blockSize + 1;
-
-		// Allocate blocks
-		kernelFfts = (float*) pffft_aligned_malloc(sizeof(float) * blockSize*2 * kernelBlocks);
-		inputFfts = (float*) pffft_aligned_malloc(sizeof(float) * blockSize*2 * kernelBlocks);
-		memset(inputFfts, 0, sizeof(float) * blockSize*2 * kernelBlocks);
-
-		for (size_t i = 0; i < kernelBlocks; i++) {
-			// Pad each block with zeros
-			memset(tmpBlock, 0, sizeof(float) * blockSize*2);
-			size_t len = min((int) blockSize, (int) (length - i*blockSize));
-			memcpy(tmpBlock, &kernel[i*blockSize], sizeof(float)*len);
-			// Compute fft
-			pffft_transform(pffft, tmpBlock, &kernelFfts[blockSize*2 * i], NULL, PFFFT_FORWARD);
+			for (size_t i = 0; i < kernelBlocks; i++) {
+				// Pad each block with zeros
+				memset(tmpBlock, 0, sizeof(float) * blockSize*2);
+				size_t len = min((int) blockSize, (int) (length - i*blockSize));
+				memcpy(tmpBlock, &kernel[i*blockSize], sizeof(float)*len);
+				// Compute fft
+				pffft_transform(pffft, tmpBlock, &kernelFfts[blockSize*2 * i], NULL, PFFFT_FORWARD);
+			}
 		}
 	}
 
@@ -123,7 +123,7 @@ struct RealTimeConvolver {
 		// Note: This is the CPU bottleneck loop
 		for (size_t i = 0; i < kernelBlocks; i++) {
 			size_t pos = (inputPos - i + kernelBlocks) % kernelBlocks;
-			pffft_zconvolve_accumulate(pffft, &kernelFfts[blockSize*2 * i], &inputFfts[blockSize*2 * pos], tmpBlock, 1.0);
+			pffft_zconvolve_accumulate(pffft, &kernelFfts[blockSize*2 * i], &inputFfts[blockSize*2 * pos], tmpBlock, 1.f);
 		}
 		// Compute output
 		pffft_transform(pffft, tmpBlock, tmpBlock, NULL, PFFFT_BACKWARD);
@@ -132,9 +132,10 @@ struct RealTimeConvolver {
 			tmpBlock[i] += outputTail[i];
 		}
 		// Copy output block to output
+		float scale = 1.f / (blockSize*2);
 		for (size_t i = 0; i < blockSize; i++) {
 			// Scale based on FFT
-			output[i] = tmpBlock[i] / blockSize;
+			output[i] = tmpBlock[i] * scale;
 		}
 		// Set tail
 		for (size_t i = 0; i < blockSize; i++) {

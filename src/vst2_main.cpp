@@ -68,8 +68,8 @@ extern void vst2_set_shared_plugin_tls_globals (void);
 extern "C" extern int vst2_handle_effeditkeydown (unsigned int _vkey);
 
 namespace rack {
+   extern bool b_touchkeyboard_enable;
    extern void settingsLoad(std::string filename, bool bWindowSizeOnly);
-   bool b_touchkeyboard_enable = false;  // true=support effEditKey*
 }
 
 

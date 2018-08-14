@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="28px" height="28px" version="1.1" xmlns="http://www.w3.org/2000/svg"  xml:space="preserve"  style="fill-rule:evenodd;clip-rule:evenodd;stroke-miterlimit:10;">
+    <g id="IOPortB_3_">
+        <g>
+            <circle cx="14" cy="14" r="14" style="fill:#979797;stroke:#313131;stroke-width:3px;"/>
+            <g transform="matrix(1.14225,0,0,1,0.958098,0.0571711)">
+                <rect x="0.304" y="13.174" width="2.917" height="1.537" style="fill:#1c1c1c;"/>
+            </g>
+            <g transform="matrix(1.14225,0,0,1,22.9581,0.0571711)">
+                <rect x="0.304" y="13.174" width="2.917" height="1.537" style="fill:#1c1c1c;"/>
+            </g>
+            <circle cx="13.982" cy="14.085" r="9.333" style="fill:#444;stroke:#1a1a1a;stroke-width:2px;stroke-linejoin:round;stroke-miterlimit:1.41421;"/>
+            <circle cx="14.001" cy="14.084" r="6.458"/>
+        </g>
+    </g>
+</svg>

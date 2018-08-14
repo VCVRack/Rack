@@ -17,5 +17,6 @@
 *.map
 *.o
 __ATTIC
+__INCOMING
 
 

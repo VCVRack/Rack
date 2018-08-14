@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	./src/21kHz.o \
+	./src/D_Inf.o \
+	./src/PalmLoop.o

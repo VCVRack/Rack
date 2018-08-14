@@ -5,10 +5,13 @@
 #include "widgets.hpp"
 
 #define LCD_FONT_DIG7 "res/digital-7.ttf"
-#define LCD_COLOR_FG nvgRGBA(0x00, 0xE1, 0xE4, 0xFF)
-#define LCD_FONTSIZE 8
+#define LCD_FONTSIZE 11
 #define LCD_LETTER_SPACING 0
 
+/* show values of all knobs */
+#define DEBUG_VALUES false
+
+typedef std::shared_ptr<rack::Font> TrueType;
 using namespace rack;
 
 #ifdef USE_VST2
@@ -57,23 +60,45 @@ struct LRModuleWidget : ModuleWidget {
  * @brief Emulation of a LCD monochrome display
  */
 struct LCDWidget : Label {
-    std::shared_ptr<Font> gLCDFont_DIG7;
+
+    enum LCDType {
+        NUMERIC,
+        TEXT,
+        LIST
+    };
+
+    TrueType ttfLCDDig7;
+    float fontsize;
+
+    LCDType type;
+
     NVGcolor fg;
     NVGcolor bg;
-    unsigned char length = 0;
 
+    bool active = true;
+    float value = 0.0;
+    unsigned char length = 0;
+    std::string format;
+    std::vector<std::string> items;
+
+    std::string s1;
+    std::string s2;
 
     /**
      * @brief Constructor
      */
-    LCDWidget(NVGcolor fg, unsigned char length);
-
+    LCDWidget(NVGcolor fg, unsigned char length, std::string format, LCDType type, float fontsize = LCD_FONTSIZE);
 
     /**
      * @brief Draw LCD display
      * @param vg
      */
     void draw(NVGcontext *vg) override;
+
+
+    inline void addItem(std::string name) {
+        items.push_back(name);
+    }
 };
 
 
@@ -175,7 +200,9 @@ private:
 
     /** setup indicator with default values */
     Indicator idc = Indicator(15.f, ANGLE);
-    LRShadow shadow = LRShadow();
+
+    bool debug = DEBUG_VALUES;
+    TrueType font;
 
     /** snap mode */
     bool snap = false;
@@ -184,6 +211,11 @@ private:
     /** snap sensitivity */
     float snapSens = 0.1;
 
+protected:
+    /** shader */
+    LRShadow shadow = LRShadow();
+
+
 public:
     /**
      * @brief Default constructor
@@ -191,6 +223,8 @@ public:
     LRKnob() {
         minAngle = -ANGLE * (float) M_PI;
         maxAngle = ANGLE * (float) M_PI;
+
+        font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
     }
 
 
@@ -244,16 +278,6 @@ public:
 
 
     /**
-     * @brief Route setter to shadow
-     * @param x
-     * @param y
-     */
-    void setShadowPosition(float x, float y) {
-        shadow.setShadowPosition(x, y);
-    }
-
-
-    /**
      * @brief Creates a new instance of a LRKnob child
      * @tparam TParamWidget Subclass of LRKnob
      * @param pos Position
@@ -287,8 +311,31 @@ public:
         /** component */
         FramebufferWidget::draw(vg);
 
+/*
+        nvgBeginPath(vg);
+        nvgRect(vg, -30, -30, box.size.x + 60, box.size.y + 60);
+
+        NVGcolor icol = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.3f);
+        NVGcolor ocol = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.0f);;
+
+        NVGpaint paint = nvgRadialGradient(vg, box.size.x / 2, box.size.y / 2,
+                                           0.f, box.size.x /2.f * 0.9f, icol, ocol);
+        nvgFillPaint(vg, paint);
+        nvgFill(vg);*/
+
         /** indicator */
         idc.draw(vg);
+
+        if (debug) {
+            auto text = stringf("%4.2f", value);
+            nvgFontSize(vg, 15);
+            nvgFontFaceId(vg, font->handle);
+
+            nvgFillColor(vg, nvgRGBAf(1.f, 1.f, 1.0f, 1.0f));
+            nvgText(vg, box.size.x - 5, box.size.y + 10, text.c_str(), NULL);
+        }
+
+
     }
 
 
@@ -317,6 +364,7 @@ public:
      * @param e
      */
     void onChange(EventChange &e) override {
+        // if the value still inside snap-tolerance keep the value zero
         if (snap && value > -snapSens + snapAt && value < snapSens + snapAt) value = 0;
         SVGKnob::onChange(e);
     }
@@ -328,11 +376,15 @@ public:
  */
 struct LRToggleKnob : LRKnob {
     LRToggleKnob(float length = 0.5f) {
-        minAngle = -length * (float) M_PI;
+        //TODO: parametrize start and end angle
+        minAngle = -0.666666f * (float) M_PI;
         maxAngle = length * (float) M_PI;
 
         setSVG(SVG::load(assetPlugin(plugin, "res/ToggleKnob.svg")));
-        setShadowPosition(2, 2);
+        shadow.setShadowPosition(3, 4);
+
+        shadow.setStrength(1.2f);
+        shadow.setSize(0.7f);
 
         speed = 2.f;
     }
@@ -346,13 +398,41 @@ struct LRToggleKnob : LRKnob {
 
 
 /**
+ * @brief Quantize position to odd numbers to simulate a toggle switch
+ */
+struct LRMiddleIncremental : LRKnob {
+    LRMiddleIncremental(float length = 0.5f) {
+        minAngle = -length * (float) M_PI;
+        maxAngle = length * (float) M_PI;
+
+        setSVG(SVG::load(assetPlugin(plugin, "res/MiddleIncremental.svg")));
+        shadow.setShadowPosition(3, 4);
+
+        shadow.setStrength(1.2f);
+        shadow.setSize(0.7f);
+
+        speed = 3.f;
+    }
+
+
+    void onChange(EventChange &e) override {
+
+        value = lround(value);
+
+        //value = round(value);
+        SVGKnob::onChange(e);
+    }
+};
+
+
+/**
  * @brief LR Big Knob
  */
 struct LRBigKnob : LRKnob {
     LRBigKnob() {
         setSVG(SVG::load(assetPlugin(plugin, "res/BigKnob.svg")));
         setIndicatorDistance(15);
-        setShadowPosition(5, 6);
+        shadow.setShadowPosition(5, 6);
     }
 };
 
@@ -364,7 +444,7 @@ struct LRMiddleKnob : LRKnob {
     LRMiddleKnob() {
         setSVG(SVG::load(assetPlugin(plugin, "res/MiddleKnob.svg")));
         setIndicatorDistance(12);
-        setShadowPosition(4, 4);
+        shadow.setShadowPosition(4, 4);
     }
 };
 
@@ -375,11 +455,49 @@ struct LRMiddleKnob : LRKnob {
 struct LRSmallKnob : LRKnob {
     LRSmallKnob() {
         setSVG(SVG::load(assetPlugin(plugin, "res/SmallKnob.svg")));
-        setShadowPosition(3, 3);
+        shadow.setShadowPosition(3, 3);
         setSnap(0.0f, 0.03f);
 
 
-        speed = 0.7f;
+        speed = 0.9f;
+    }
+};
+
+
+/**
+ * @brief LR Alternate Small Knob
+ */
+struct LRAlternateSmallKnob : LRKnob {
+    LRAlternateSmallKnob() {
+        setSVG(SVG::load(assetPlugin(plugin, "res/AlternateSmallKnob.svg")));
+        shadow.setShadowPosition(3, 3);
+        setSnap(0.0f, 0.03f);
+
+
+        speed = 0.9f;
+    }
+};
+
+/**
+ * @brief LR Middle Knob
+ */
+struct LRAlternateMiddleKnob : LRKnob {
+    LRAlternateMiddleKnob() {
+        setSVG(SVG::load(assetPlugin(plugin, "res/AlternateMiddleKnob.svg")));
+        setIndicatorDistance(12);
+        shadow.setShadowPosition(4, 4);
+    }
+};
+
+
+/**
+ * @brief LR Big Knob
+ */
+struct LRAlternateBigKnob : LRKnob {
+    LRAlternateBigKnob() {
+        setSVG(SVG::load(assetPlugin(plugin, "res/AlternateBigKnob.svg")));
+        setIndicatorDistance(15);
+        shadow.setShadowPosition(5, 6);
     }
 };
 
@@ -387,12 +505,12 @@ struct LRSmallKnob : LRKnob {
 /**
  * @brief Alternative IO Port
  */
-struct IOPort : SVGPort {
+struct LRIOPort : SVGPort {
 private:
     LRShadow shadow = LRShadow();
 
 public:
-    IOPort() {
+    LRIOPort() {
         background->svg = SVG::load(assetPlugin(plugin, "res/IOPortB.svg"));
         background->wrap();
         box.size = background->box.size;
@@ -400,7 +518,7 @@ public:
         /** inherit dimensions */
         shadow.setBox(box);
         shadow.setSize(0.50);
-        shadow.setShadowPosition(2, 2);
+        shadow.setShadowPosition(2, 1);
     }
 
 
@@ -416,6 +534,36 @@ public:
 
 
 /**
+ * @brief Alternative IO Port
+ */
+struct LRIOPortC : SVGPort {
+private:
+    LRShadow shadow = LRShadow();
+
+public:
+    LRIOPortC() {
+        background->svg = SVG::load(assetPlugin(plugin, "res/IOPortC.svg"));
+        background->wrap();
+        box.size = background->box.size;
+
+        /** inherit dimensions */
+        shadow.setBox(box);
+        shadow.setSize(0.50);
+        shadow.setShadowPosition(2, 1);
+    }
+
+
+    /**
+     * @brief Hook into draw method
+     * @param vg
+     */
+    void draw(NVGcontext *vg) override {
+        shadow.draw(vg);
+        SVGPort::draw(vg);
+    }
+};
+
+/**
  * @brief Alternative screw head A
  */
 struct ScrewDarkA : SVGScrew {
@@ -426,6 +574,17 @@ struct ScrewDarkA : SVGScrew {
     }
 };
 
+
+/**
+ * @brief Alternative screw head A
+ */
+struct ScrewLight : SVGScrew {
+    ScrewLight() {
+        sw->svg = SVG::load(assetPlugin(plugin, "res/ScrewLight.svg"));
+        sw->wrap();
+        box.size = sw->box.size;
+    }
+};
 
 /**
  * @brief Custom switch based on original Rack files
@@ -441,8 +600,8 @@ struct LRSwitch : SVGSwitch, ToggleSwitch {
 /**
  * @brief Standard LED Redlight
  */
-struct LRRedLight : SmallLight<ModuleLightWidget> {
-    LRRedLight();
+struct LRLight : SmallLight<ModuleLightWidget> {
+    LRLight();
 
     void draw(NVGcontext *vg) override;
 };
@@ -454,17 +613,16 @@ struct LRRedLight : SmallLight<ModuleLightWidget> {
 struct LRPanel : SVGPanel {
 private:
     /** margin of gradient box */
-    static constexpr float MARGIN = 20;
+    static constexpr float MARGIN = 10;
 
     /** gradient colors */
-    NVGcolor inner = nvgRGBAf(.6f, 0.7f, 0.9f, 0.12f);
-    NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.0f);;
+    NVGcolor inner = nvgRGBAf(1.5f * .369f, 1.5f * 0.357f, 1.5f * 0.3333f, 0.25f);
+    NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.34f);;
 
     /** gradient offset */
-    Vec offset = Vec(-40, -50);
+    Vec offset = Vec(30, -50);
 
-    void setInner(const NVGcolor &inner);
-    void setOuter(const NVGcolor &outer);
+
 public:
     LRPanel();
 
@@ -474,6 +632,11 @@ public:
         offset.y = y;
     }
 
+
+    void setInner(const NVGcolor &inner);
+    void setOuter(const NVGcolor &outer);
+    const NVGcolor &getInner() const;
+    const NVGcolor &getOuter() const;
 
     void draw(NVGcontext *vg) override;
 };

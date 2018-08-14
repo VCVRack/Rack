@@ -29,7 +29,8 @@ void springReverbInit() {
    }
 }
 
-
+namespace rack_plugin_Befaco {
+// clashes with rack/include/dsp/fir.h
 struct RealTimeConvolver {
 	// `kernelBlocks` number of contiguous FFT blocks of size `blockSize`
 	// indexed by [i * blockSize*2 + j]
@@ -137,6 +138,7 @@ struct RealTimeConvolver {
 		}
 	}
 };
+} // namespace rack_plugin_Befaco
 
 
 #define BLOCKSIZE 1024
@@ -168,7 +170,7 @@ struct SpringReverb : Module {
 		NUM_LIGHTS = VU1_LIGHT + 7
 	};
 
-	RealTimeConvolver *convolver = NULL;
+   rack_plugin_Befaco::RealTimeConvolver *convolver = NULL;
 	SampleRateConverter<1> inputSrc;
 	SampleRateConverter<1> outputSrc;
 	DoubleRingBuffer<Frame<1>, 16*BLOCKSIZE> inputBuffer;
@@ -185,7 +187,7 @@ struct SpringReverb : Module {
 
 
 SpringReverb::SpringReverb() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-	convolver = new RealTimeConvolver(BLOCKSIZE);
+	convolver = new rack_plugin_Befaco::RealTimeConvolver(BLOCKSIZE);
 	convolver->setKernel(springReverbIR, springReverbIRLen);
 }
 
