@@ -803,6 +803,30 @@ public:
       return r;
    }
 
+   sBool getParameterProperties(sUI _index, struct VstParameterProperties *_ret) {
+      sBool r = 0;
+
+      ::memset((void*)_ret, 0, sizeof(struct VstParameterProperties));
+
+      if(_index < VST2_MAX_UNIQUE_PARAM_IDS)
+      {
+         _ret->stepFloat = 0.001f;
+         _ret->smallStepFloat = 0.001f;
+         _ret->largeStepFloat = 0.01f;
+         _ret->flags = 0;
+         _ret->displayIndex = VstInt16(_index);
+         _ret->category = 0; // 0=no category
+         _ret->numParametersInCategory = 0;
+
+         vst2_get_param_name(_index, _ret->label, kVstMaxLabelLen);
+         vst2_get_param_name(_index, _ret->shortLabel, kVstMaxShortLabelLen);
+
+         r = 1;
+      }
+
+      return r;
+   }
+
    void handleUIParam(int uniqueParamId, float normValue) {
       if(NULL != _vstHostCallback)
          (void)_vstHostCallback(&_vstPlugin, audioMasterAutomate, uniqueParamId, 0/*value*/, NULL/*ptr*/, normValue/*opt*/);
@@ -1228,7 +1252,6 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          break;
 
       case effGetParamName:
-      case effGetParamLabel:
          // kVstMaxParamStrLen(8), much longer in other plugins
          // printf("xxx vstrack_plugin: effGetParamName: ptr=%p\n", ptr);
          wrapper->setGlobals();
@@ -1236,9 +1259,26 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          r = 1;
          break;
 
-      case effGetParameterProperties:
-         r = 0;
+      case effCanBeAutomated:
+         // fix Propellerhead Reason VST parameter support
+         r = 1;
          break;
+
+      case effGetParamLabel:
+         // e.g. "dB"
+         break;
+
+      case effGetParamDisplay:
+         // e.g. "-20"
+         break;
+
+#if 0
+      case effGetParameterProperties:
+         // [index]: parameter index [ptr]: #VstParameterProperties* [return value]: 1 if supported
+         wrapper->setGlobals();
+         r = wrapper->getParameterProperties(sUI(index), (struct VstParameterProperties*)ptr);
+         break;
+#endif
 
       case effGetChunk:
          // Query bank (index=0) or program (index=1) state
@@ -1623,10 +1663,6 @@ void vst2_unlock_midi_device() {
    rack::global->vst2.wrapper->mtx_mididev.unlock();
 }
 
-// void vst2_handle_queued_set_program_chunk(void) {
-//    (void)rack::global->vst2.wrapper->handleSetQueuedProgramChunk();
-// }
-
 void vst2_handle_ui_param(int uniqueParamId, float normValue) {
    // Called by engineSetParam()
    rack::global->vst2.wrapper->handleUIParam(uniqueParamId, normValue);
@@ -1685,6 +1721,13 @@ void vst2_oversample_channels_get(int *_numIn, int *_numOut) {
 VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback) {
    printf("vstrack_plugin: called VSTPluginMain... \n");
 
+#if 0
+   if(!vstHostCallback(0, audioMasterVersion, 0, 0, 0, 0))
+   {
+		return 0;  // old version
+   }
+#endif
+
    // simply create our plugin C++ class
    VSTPluginWrapper *plugin =
       new VSTPluginWrapper(vstHostCallback,
@@ -1696,7 +1739,7 @@ VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback) {
 #endif
                            PLUGIN_VERSION, // version
                            VST2_MAX_UNIQUE_PARAM_IDS,    // num params
-                           0,    // no programs
+                           1,    // one program
                            NUM_INPUTS,
                            NUM_OUTPUTS
                            );

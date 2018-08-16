@@ -1,3 +1,8 @@
+** August 17th, 2018
+- fix VST parameter automation in Propellerhead Reason
+- add module Fundamental.VCA-1 (for real this time)
+
+
 ** August 16th, 2018
 - fix: amplify input channels *10, attenuate output channels /10
    => for VCV Rack patch compatibility
