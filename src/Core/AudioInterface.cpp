@@ -237,10 +237,10 @@ void AudioInterface::step() {
 #else
 	// Outputs: rack engine -> VST out
 	for(int i = 0; i < AUDIO_INPUTS; i++) {
-		outputs[AUDIO_OUTPUT + i].value = global->vst2.inputs[i][global->vst2.frame_idx];
+		outputs[AUDIO_OUTPUT + i].value = global->vst2.inputs[i][global->vst2.frame_idx] * 10.0f;
 	}
    for(int i = 0; i < AUDIO_OUTPUTS; i++) {
-      global->vst2.outputs[i][global->vst2.frame_idx] += inputs[AUDIO_INPUT + i].value;
+      global->vst2.outputs[i][global->vst2.frame_idx] += inputs[AUDIO_INPUT + i].value * 0.1f;
    }
 #endif // USE_VST2
 

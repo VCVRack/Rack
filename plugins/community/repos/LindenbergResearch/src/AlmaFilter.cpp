@@ -2,6 +2,7 @@
 #include "LindenbergResearch.hpp"
 
 namespace rack_plugin_LindenbergResearch {
+using namespace lrt;
 
 struct AlmaFilter : LRModule {
 

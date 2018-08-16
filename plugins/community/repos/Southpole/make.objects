@@ -1,0 +1,53 @@
+ALL_OBJ= \
+	src/Abr.o \
+	src/Annuli.o \
+	eurorack/rings/dsp/fm_voice.o \
+	eurorack/rings/dsp/string_synth_part.o \
+	eurorack/rings/dsp/string.o \
+	eurorack/rings/dsp/resonator.o \
+	eurorack/rings/resources.o \
+	eurorack/rings/dsp/part.o \
+	src/Aux_.o \
+	src/Balaclava.o \
+	src/Bandana.o \
+	src/Blanks.o \
+	src/But.o \
+	src/CornrowsX.o \
+	eurorack/braids/macro_oscillator.o \
+	eurorack/braids/analog_oscillator.o \
+	eurorack/braids/digital_oscillator.o \
+	eurorack/braids/resources.o \
+	eurorack/braids/quantizer.o \
+	src/DeuxEtageres.o \
+	src/DSPUtilities.o \
+	src/Etagere.o \
+	src/Falls.o \
+	src/Ftagn.o \
+	src/Fuse.o \
+	src/Gnome.o \
+	src/Piste.o \
+	src/Pulse.o \
+	src/Rakes.o \
+	src/Riemann.o \
+	src/Smoke.o \
+	eurorack/clouds/dsp/correlator.o \
+	eurorack/clouds/dsp/granular_processor.o \
+	eurorack/clouds/dsp/mu_law.o \
+	eurorack/clouds/dsp/pvoc/frame_transformation.o \
+	eurorack/clouds/dsp/pvoc/phase_vocoder.o \
+	eurorack/clouds/dsp/pvoc/stft.o \
+	eurorack/clouds/resources.o \
+	src/Snake.o \
+	src/Sns.o \
+	src/Southpole.o \
+	src/Splash.o \
+	eurorack/stmlib/utils/random.o \
+	eurorack/stmlib/dsp/atan.o \
+	eurorack/stmlib/dsp/units.o \
+	eurorack/tides/generator.o \
+	eurorack/tides/resources.o \
+	src/Sssh.o \
+	src/VAStateVariableFilter.o \
+	src/Wriggle.o
+
+#	src/SplashParasite.o

@@ -2,6 +2,7 @@
 #include "LindenbergResearch.hpp"
 
 namespace rack_plugin_LindenbergResearch {
+using namespace lrt;
 
 struct VCO : LRModule {
     enum ParamIds {
@@ -37,7 +38,7 @@ struct VCO : LRModule {
     };
 
     dsp::DSPBLOscillator *osc = new dsp::DSPBLOscillator(engineGetSampleRate());
-    LCDWidget *lcd = new LCDWidget(nvgRGBAf(0.9, 0.2, 0.1, 1.0), 9, "%00004.3f Hz", LCDWidget::NUMERIC);
+    LRLCDWidget *lcd = new LRLCDWidget(nvgRGBAf(0.9, 0.2, 0.1, 1.0), 9, "%00004.3f Hz", LRLCDWidget::NUMERIC);
     LRBigKnob *frqKnob = NULL;
 
 

@@ -1,3 +1,49 @@
+** August 16th, 2018
+- fix: amplify input channels *10, attenuate output channels /10
+   => for VCV Rack patch compatibility
+- update module Fundamental.LFO (increase max rate)
+- add module Fundamental.VCA-1
+- update module LindenbergResearch.*
+- add module PG-Instruments.PGSEQ3
+- add module PG-Instruments.PGPanner
+- add module PG-Instruments.PGQuadPanner
+- add module PG-Instruments.PGOctPanner
+- add module PG-Instruments.PGVCF
+- add module PG-Instruments.PGStereoVCF
+- add module PG-Instruments.PGEcho
+- add module PG-Instruments.PGStereoEcho
+- add module PG-Instruments.PGStereoPingPongEcho
+- add module Southpole.Abr
+- add module Southpole.Annuli
+- add module Southpole.Aux
+- add module Southpole.Balaclava
+- add module Southpole.Bandana
+- add module Southpole.Blank1HP
+- add module Southpole.Blank2HP
+- add module Southpole.Blank4HP
+- add module Southpole.Blank8HP
+- add module Southpole.Blank16HP
+- add module Southpole.Blank42HP
+- add module Southpole.But
+- add module Southpole.CornrowsX
+- add module Southpole.DeuxEtageres
+- add module Southpole.Etagere
+- add module Southpole.Falls
+- add module Southpole.Ftagn
+- add module Southpole.Fuse
+- add module Southpole.Gnome
+- add module Southpole.Piste
+- add module Southpole.Pulse
+- add module Southpole.Rakes
+- add module Southpole.Riemann
+- add module Southpole.Smoke
+- add module Southpole.Snake
+- add module Southpole.Sns
+- add module Southpole.Splash
+- add module Southpole.Sssh
+- add module Southpole.Wriggle
+
+
 ** August 14th, 2018
 - fix shared_lib build
 - add module 21kHz.D_Inf

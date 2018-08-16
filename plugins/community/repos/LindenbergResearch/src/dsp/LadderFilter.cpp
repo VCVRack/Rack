@@ -3,7 +3,6 @@
 
 using namespace dsp;
 
-
 /**
  * @brief Check parameter
  */

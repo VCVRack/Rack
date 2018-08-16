@@ -1,15 +1,22 @@
 ALL_OBJ= \
 	src/dsp/DSPMath.o \
 	src/dsp/LadderFilter.o \
+	src/dsp/LambertW.o \
 	src/dsp/Lockhart.o \
 	src/dsp/MS20zdf.o \
 	src/dsp/Oscillator.o \
-	src/dsp/SergeWavefolder.o \
+	src/dsp/Serge.o \
 	src/dsp/WaveShaper.o \
+	src/widgets/LRCVIndicator.o \
+	src/widgets/LRKnob.o \
+	src/widgets/LRLCDWidget.o \
+	src/widgets/LRLight.o \
+	src/widgets/LRPanel.o \
+	src/widgets/LRShadow.o \
+	src/widgets/LRSVGRotator.o \
 	src/AlmaFilter.o \
 	src/BlankPanel.o \
 	src/BlankPanelM1.o \
-	src/LRComponents.o \
 	src/LindenbergResearch.o \
 	src/MS20Filter.o \
 	src/ReShaper.o \

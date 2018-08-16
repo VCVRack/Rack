@@ -1,0 +1,29 @@
+language: cpp
+cache:
+  directories:
+    - /tmp/Rack
+before_cache:
+    - rm -fr /tmp/Rack/plugins/sdr
+osx_image: xcode9.2
+os:
+  - linux
+  - osx
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+install:
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install git libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev libglu1-mesa-dev zlib1g-dev libasound2-dev libgtk2.0-dev unzip cmake3 libudev-dev; fi
+before_script:
+  - git clone https://github.com/VCVRack/Rack.git /tmp/Rack || cd /tmp/Rack && git pull
+  - cd /tmp/Rack
+  - git submodule update --init --recursive
+  - if [ $TRAVIS_OS_NAME == linux ]; then export CC=gcc-7 && CXX=g++-7; fi
+  - make -j 8 dep > /dev/null
+  - make -j 8
+  - rm -rf /tmp/Rack/plugins/sdr || true
+  - cp -r $TRAVIS_BUILD_DIR /tmp/Rack/plugins/sdr
+script:
+  - cd /tmp/Rack/plugins/sdr && VERSION=0.0.0 make dist

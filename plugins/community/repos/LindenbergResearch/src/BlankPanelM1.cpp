@@ -1,6 +1,7 @@
 #include "LindenbergResearch.hpp"
 
 namespace rack_plugin_LindenbergResearch {
+using namespace lrt;
 
 struct BlankPanelM1 : Module {
     enum ParamIds {

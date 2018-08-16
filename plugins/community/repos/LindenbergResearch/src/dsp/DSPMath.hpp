@@ -365,7 +365,7 @@ inline double sign(double x) {
  * @param ln1
  * @return
  */
-inline double lambert_W(double x, double ln1) {
+inline double lambert_W_Halley(double x, double ln1) {
     double w;
     double p, r, s, err;
     double expw;

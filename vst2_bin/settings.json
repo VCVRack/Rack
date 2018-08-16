@@ -125,6 +125,10 @@
         "model": "Exponent"
       },
       {
+        "plugin": "LindenbergResearch",
+        "model": "VCO"
+      },
+      {
         "plugin": "ML_modules",
         "model": "VoltMeter"
       },

@@ -1,6 +1,7 @@
 #include "LindenbergResearch.hpp"
 
 namespace rack_plugin_LindenbergResearch {
+using namespace lrt;
 
 struct SimpleFilter : Module {
     enum ParamIds {

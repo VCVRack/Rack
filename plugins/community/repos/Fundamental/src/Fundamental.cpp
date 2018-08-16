@@ -11,6 +11,7 @@ RACK_PLUGIN_MODEL_DECLARE(Fundamental, SequentialSwitch1);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, SequentialSwitch2);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, Scope);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, Unity);
+RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCA_1);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCA);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCF);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCMixer);
@@ -23,6 +24,7 @@ RACK_PLUGIN_INIT(Fundamental) {
 	RACK_PLUGIN_MODEL_ADD(Fundamental, VCO);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, VCO2);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, VCF);
+	RACK_PLUGIN_MODEL_ADD(Fundamental, VCA_1);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, VCA);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, LFO);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, LFO2);

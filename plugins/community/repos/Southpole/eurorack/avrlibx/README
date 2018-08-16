@@ -1,0 +1,76 @@
+SYNOPSIS
+________
+
+avrilx is a collection of peripheral drivers and utility routines for the AVR
+XMega family. Contrary to many libraries out there, it is based on C++
+templates and policy-based design (vs run-time parameter
+passing to general purpose drivers ; and callbacks). The benefits are smaller
+and faster code - which is specialized and inlined at compile time  ; and a much
+smaller overhead when layering or glueing together layers of drivers.
+
+Supported peripherals:
+- GPIO, bit-level and parallel
+- SPI, slave and master
+- USART
+- USART in SPI mode, master
+- TWI master
+- ADC
+- DAC, single and dual channel
+- Timers, PWM
+- Various delay and timing functions (using RTC, timers, timed busy loops)
+
+Drivers and utility routines for:
+- DMA setups for background data reception into a FIFO, and background data
+writes from a FIFO (eg: waveform generation, audio playback)
+- ADC multichannel scanning and filtering
+- Input (165) and output (595) shift registers
+- LEDs arrays
+- HD44780 compatible LCDs
+- Rotary encoder decoder
+- Switch debouncing
+- TWI eeprom
+- MMC/SD/SDHC card on SPI port, FAT/FAT32 formated, 8.3 filenames,
+through two different drivers:
+  + A simple, read-only driver suitable for bootloaders (< 2kb of code).
+  + A complete interface based on ChaN's FatFS.
+
+Bells and whistles:
+- makefile template
+- Bootloader allowing firmware updates by MIDI ; and utilities for converting .hex files into .syx files
+- Resources system for generating string and lookup tables with python scripts
+- A collection of assembly-optimized code for arithmetic operations on fixed
+point numbers or unusually-sized integers (4 bit, 24 bits...)
+
+
+LICENCING
+_________
+
+This library is released under a GPL3.0 license. Developed by Olivier Gillet (olivier@mutable-instruments.net) for Mutable Instruments.
+
+Credits:
+
+* third_party/sp_driver contains the self-programming code provided by Atmel.
+* third_party/ff contains a slightly modified version of ChaN's FatFS library
+and MMC drivers.
+
+
+SETUP
+_____
+
+This code has been tested with Boston Android EVAL-USB-128
+(http://www.bostonandroid.com/EVAL-USB-128.html) and EVAL-04
+(http://www.bostonandroid.com/EVAL-04.html) boards. See the examples/README file
+for more information about the hardware setup used for some of the examples.
+
+The build system is configured for the following setup:
+- MCU: XMega 128a3
+- Programmer: AVR ISP mkII from Atmel.
+- Toolchain: avr-gcc 4.3.3 on Mac OS X (CrossPack-AVR).
+
+The toolchain and avrdude paths, along with the port/type of AVR programmer can
+be modified in avrlibx/config.mk.
+
+The MCU and crystal frequency can be modified on a per-project basis in the
+makefile.
+
+You can use examples/blink as a code and makefile skeleton for new projects!

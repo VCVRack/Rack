@@ -59,7 +59,7 @@ namespace dsp {
          * @param x
          * @return
          */
-        double computeAA(double x) {
+        inline double computeAA(double x) {
             double fn = log(cosh(x));
             double xn, out;
 
@@ -80,7 +80,7 @@ namespace dsp {
         /**
          * @brief Compute tanh
          */
-        void process() override {
+        inline void process() override {
             rs->doUpsample(STD_CHANNEL, in);
 
             for (int i = 0; i < rs->getFactor(); i++) {

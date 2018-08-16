@@ -1,10 +1,21 @@
-#include "dsp/SergeWavefolder.hpp"
+#include "dsp/Serge.hpp"
 #include "dsp/Lockhart.hpp"
 #include "LindenbergResearch.hpp"
 
 namespace rack_plugin_LindenbergResearch {
+using namespace lrt;
 
 struct Westcoast : LRModule {
+
+    enum RotaryStages {
+        OVERDRIVE = 1,
+        LOCKHART,
+        SERGE,
+        SATURATE,
+        POLYNOM,
+        SOFTCLIP,
+        HARDCLIP
+    };
 
     enum ParamIds {
         GAIN_PARAM,
@@ -25,7 +36,6 @@ struct Westcoast : LRModule {
 
     enum OutputIds {
         SHAPER_OUTPUT,
-        SG_OUTPUT,
         NUM_OUTPUTS
     };
 
@@ -34,11 +44,15 @@ struct Westcoast : LRModule {
     };
 
 
-    Westcoast() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+    Westcoast() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+       hs = new dsp::LockhartWavefolder(engineGetSampleRate());
+       sg = new dsp::SergeWavefolder(engineGetSampleRate());
+    }
 
-
-    dsp::LockhartWavefolder *hs = new dsp::LockhartWavefolder(engineGetSampleRate());
-    dsp::SergeWavefolder *sg = new dsp::SergeWavefolder(engineGetSampleRate());
+    dsp::LockhartWavefolder *hs;
+    dsp::SergeWavefolder *sg;
+    LRAlternateBigKnob *gain;
+    LRAlternateMiddleKnob *bias;
 
     void step() override;
     void onSampleRateChange() override;
@@ -46,46 +60,55 @@ struct Westcoast : LRModule {
 
 
 void Westcoast::step() {
-    hs->setGain((params[GAIN_PARAM].value));
-    hs->setBias(params[BIAS_PARAM].value);
-    hs->setIn(inputs[SHAPER_INPUT].value);
 
-    sg->setGain((params[GAIN_PARAM].value));
-    sg->setBias(params[BIAS_PARAM].value);
-    sg->setIn(inputs[SHAPER_INPUT].value);
+    outputs[SHAPER_OUTPUT].value = 0.0f;
 
+    float gaincv = 0;
+    float biascv = 0;
 
-    if (params[DCBLOCK_PARAM].value == 1)
-        hs->setBlockDC(true);
-    else
-        hs->setBlockDC(false);
-
-    hs->process();
-    sg->process();
-
-    // [bsp] let's hear what this sounds like :-)
-    //  (note) too much gain makes all following modules go quiet permanently
-    float hsOut = hs->getOut();
-    float sgOut = sg->getOut();
-
-    switch((int)params[TYPE_PARAM].value) {
-       default:
-       case -2:
-          if(params[GAIN_PARAM].value < 9.8f)
-             outputs[SHAPER_OUTPUT].value = hsOut;
-          else
-             outputs[SHAPER_OUTPUT].value = 0.0f;
-          break;
-
-       case -1:
-          if(params[GAIN_PARAM].value < 15.8f)
-             outputs[SHAPER_OUTPUT].value = sgOut;
-          else
-             outputs[SHAPER_OUTPUT].value = 0.0f;
-          break;
+    if (inputs[CV_GAIN_INPUT].active) {
+        gaincv = inputs[CV_GAIN_INPUT].value * quadraticBipolar(params[CV_GAIN_PARAM].value) * 4.0f;
     }
 
-    outputs[SG_OUTPUT].value = sgOut;
+    if (inputs[CV_BIAS_INPUT].active) {
+        biascv = inputs[CV_BIAS_INPUT].value * quadraticBipolar(params[CV_BIAS_PARAM].value) * 2.0f;
+    }
+
+    if (bias != nullptr && gain != nullptr) {
+        gain->setIndicatorActive(inputs[CV_GAIN_INPUT].active);
+        bias->setIndicatorActive(inputs[CV_BIAS_INPUT].active);
+
+        gain->setIndicatorValue((params[GAIN_PARAM].value + gaincv) / 20);
+        bias->setIndicatorValue((params[BIAS_PARAM].value + (biascv + 3)) / 6);
+    }
+
+    float out;
+
+    switch (lround(params[TYPE_PARAM].value)) {
+        case LOCKHART: // Lockhart Model
+            hs->setGain((params[GAIN_PARAM].value + gaincv));
+            hs->setBias(params[BIAS_PARAM].value + biascv);
+            hs->setIn(inputs[SHAPER_INPUT].value);
+            hs->setBlockDC(params[DCBLOCK_PARAM].value == 1);
+
+            hs->process();
+            out = (float) hs->getOut();
+            break;
+        case SERGE: // Serge Model
+            sg->setGain((params[GAIN_PARAM].value + gaincv));
+            sg->setBias(params[BIAS_PARAM].value + biascv);
+            sg->setIn(inputs[SHAPER_INPUT].value);
+            sg->setBlockDC(params[DCBLOCK_PARAM].value == 1);
+
+            sg->process();
+            out = (float) sg->getOut();
+            break;
+        default: // invalid state, should not happen
+            out = 0;
+            break;
+    }
+
+    outputs[SHAPER_OUTPUT].value = out;
 }
 
 
@@ -116,9 +139,13 @@ WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
     // ***** SCREWS **********
 
     // ***** MAIN KNOBS ******
-    addParam(LRKnob::create<LRAlternateBigKnob>(Vec(128.7, 63.0), module, Westcoast::GAIN_PARAM, 0.25, 20.f, 1.f));
-    addParam(LRKnob::create<LRAlternateMiddleKnob>(Vec(136.4, 153.3), module, Westcoast::BIAS_PARAM, -0.5f, 0.5f, 0.f));
-    addParam(LRKnob::create<LRMiddleIncremental>(Vec(85, 274.3), module, Westcoast::TYPE_PARAM, -3, 3, 0));
+    module->gain = LRKnob::create<LRAlternateBigKnob>(Vec(128.7, 63.0), module, Westcoast::GAIN_PARAM, 0.0, 20.f, 1.f);
+    module->bias = LRKnob::create<LRAlternateMiddleKnob>(Vec(136.4, 153.3), module, Westcoast::BIAS_PARAM, -6.f, 6.f, 0.f);
+
+    addParam(module->gain);
+    addParam(module->bias);
+
+    addParam(LRKnob::create<LRMiddleIncremental>(Vec(85, 274.3), module, Westcoast::TYPE_PARAM, 1, 6, 1));
 
     addParam(LRKnob::create<LRAlternateSmallKnob>(Vec(83.4, 101.00), module, Westcoast::CV_GAIN_PARAM, -1.f, 1.f, 0.f));
     addParam(LRKnob::create<LRAlternateSmallKnob>(Vec(83.4, 183.0), module, Westcoast::CV_BIAS_PARAM, -1.f, 1.f, 0.f));
@@ -135,11 +162,10 @@ WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
 
     // ***** OUTPUTS *********
     addOutput(Port::create<LRIOPortC>(Vec(159.4, 324.6), Port::OUTPUT, module, Westcoast::SHAPER_OUTPUT));
-    //  addOutput(Port::create<LRIOPortC>(Vec(159.4, 300.7), Port::OUTPUT, module, Westcoast::SG_OUTPUT));
     // ***** OUTPUTS *********
 
     // ***** SWITCH  *********
-    // addParam(ParamWidget::create<LRSwitch>(Vec(119, 331), module, Westcoast::DCBLOCK_PARAM, 0.0, 1.0, 1.0));
+    addParam(ParamWidget::create<LRSwitch>(Vec(119, 331), module, Westcoast::DCBLOCK_PARAM, 0.0, 1.0, 1.0));
     // ***** SWITCH  *********
 }
 

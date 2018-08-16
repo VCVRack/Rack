@@ -30,7 +30,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-14Aug2018.7z](dist/veeseevstrack_0_6_1_win64_bin-14Aug2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-16Aug2018.7z](dist/veeseevstrack_0_6_1_win64_bin-16Aug2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
@@ -51,7 +51,7 @@ Here's a demo video of it: https://vimeo.com/277703414
 
 # Add-on modules
 
-The binary distribution contains the following dynamically loaded add-on modules:
+The binary distribution contains the following (17) dynamically loaded add-on modules:
  - dBiz.dBizBlank
  - dBiz.Multiple
  - dBiz.Contorno
@@ -71,7 +71,7 @@ The binary distribution contains the following dynamically loaded add-on modules
  - Template_shared.MyModule
 
 
-The following (478) add-on modules are statically linked with the VST plugin:
+The following (517) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -267,22 +267,23 @@ The following (478) add-on modules are statically linked with the VST plugin:
  - FrozenWasteland.SeriouslySlowLFO
  - FrozenWasteland.VoxInhumana
  - FrozenWasteland.CDCSeriouslySlowLFO
- - Fundamentals.8vert
- - Fundamentals.ADSR
- - Fundamentals.Delay
- - Fundamentals.LFO
- - Fundamentals.LFO2
- - Fundamentals.Mutes
- - Fundamentals.SEQ3
- - Fundamentals.SequentialSwitch1
- - Fundamentals.SequentialSwitch2
- - Fundamentals.Scope
- - Fundamentals.Unity
- - Fundamentals.VCA
- - Fundamentals.VCF
- - Fundamentals.VCMixer
- - Fundamentals.VCO
- - Fundamentals.VCO2
+ - Fundamental.8vert
+ - Fundamental.ADSR
+ - Fundamental.Delay
+ - Fundamental.LFO
+ - Fundamental.LFO2
+ - Fundamental.Mutes
+ - Fundamental.SEQ3
+ - Fundamental.SequentialSwitch1
+ - Fundamental.SequentialSwitch2
+ - Fundamental.Scope
+ - Fundamental.Unity
+ - Fundamental.VCA
+ - Fundamental.VCA-1
+ - Fundamental.VCF
+ - Fundamental.VCMixer
+ - Fundamental.VCO
+ - Fundamental.VCO2
  - Gratrix.VCO_F1
  - Gratrix.VCO_F2
  - Gratrix.VCF_F1
@@ -434,6 +435,15 @@ The following (478) add-on modules are statically linked with the VST plugin:
  - Ohmer.BlankPanel8
  - Ohmer.BlankPanel16
  - Ohmer.BlankPanel32
+ - add PG-Instruments.PGSEQ3
+ - add PG-Instruments.PGPanner
+ - add PG-Instruments.PGQuadPanner
+ - add PG-Instruments.PGOctPanner
+ - add PG-Instruments.PGVCF
+ - add PG-Instruments.PGStereoVCF
+ - add PG-Instruments.PGEcho
+ - add PG-Instruments.PGStereoEcho
+ - add PG-Instruments.PGStereoPingPongEcho
  - Qwelk.Automaton
  - Qwelk.Byte
  - Qwelk.Chaos
@@ -497,6 +507,35 @@ The following (478) add-on modules are statically linked with the VST plugin:
  - SonusModular.Scramblase
  - SonusModular.Twoff
  - SonusModular.Yabp
+ - Southpole.Abr
+ - Southpole.Annuli
+ - Southpole.Aux
+ - Southpole.Balaclava
+ - Southpole.Bandana
+ - Southpole.Blank1HP
+ - Southpole.Blank2HP
+ - Southpole.Blank4HP
+ - Southpole.Blank8HP
+ - Southpole.Blank16HP
+ - Southpole.Blank42HP
+ - Southpole.But
+ - Southpole.CornrowsX
+ - Southpole.DeuxEtageres
+ - Southpole.Etagere
+ - Southpole.Falls
+ - Southpole.Ftagn
+ - Southpole.Fuse
+ - Southpole.Gnome
+ - Southpole.Piste
+ - Southpole.Pulse
+ - Southpole.Rakes
+ - Southpole.Riemann
+ - Southpole.Smoke
+ - Southpole.Snake
+ - Southpole.Sns
+ - Southpole.Splash
+ - Southpole.Sssh
+ - Southpole.Wriggle
  - Southpole-parasites.Annuli
  - Southpole-parasites.Splash
  - squinkylabs-plug1.Booty

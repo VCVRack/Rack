@@ -1,0 +1,11 @@
+ALL_OBJ= \
+	src/PGEcho.o \
+	src/PGOctPanner.o \
+	src/PGPanner.o \
+	src/PGQuadPanner.o \
+	src/PGSEQ3.o \
+	src/PGStereoEcho.o \
+	src/PGStereoPingPongEcho.o \
+	src/PGStereoVCF.o \
+	src/PGVCF.o \
+	src/Template.o

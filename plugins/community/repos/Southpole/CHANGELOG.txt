@@ -1,0 +1,137 @@
+
+
+-- 0.5.4 ----
+
+- Cornrows X
+ - As complete implementation of Braids / macro oscillator as possible
+ - so far not available features in the Audible Instruments version
+   have been activated and broken out as controls:
+   AD-envelope, bit crusher, scale quantizer, tuning
+ - or implemented as menu options: AUTO, VCA, FLAT, Paques
+ - old Cornrows has been deactivated for now at the cost of 2HP more (lmk if you want it back)
+ - i know Plaits is cooler now but this will get you quite far as stand-alone synth voice
+
+- Ftagn: No Filter
+  - transgressive module for your nihilistic no-input patches at the noise show
+  - stereo - neither left nor right channel do anything at all
+  - patch example: 
+    - pair with timing module set to 4'33 and reverb for a modular rendition of John Cage's 4'33
+  - (somebody had to do it)
+
+- Pulse: Pulse Generator
+  - inspired by standard lab pulse generators (minus offset function)
+  - main purpose is to convert triggers to gates
+  - clock through sends 1ms triggers - clean your clock
+  - range selectable (1s / 10s)
+  - when clocked, duration/delay are quantized to "musically relevant" intervals
+
+- Rakes: Stereo Resonator
+  - inspired by the Ableton Resonator effect
+  - 6 stereo comb filters
+  - V/OCT inputs quantized to SEMI tones or FREE
+  - FINE detuning works with opposite sign on L/R channels
+  - small values produce Haas effect (stereo widening)
+  - individual GAINs
+  - best used together with a chord generator patched into the V/OCT inputs
+  - looking forward to your dub techno tracks
+
+- Snake
+  - implemented persistency for buss
+  - cleaned up logic
+
+- Etagère
+  - selectable white panel (to better match cf modular mixer modules)
+
+- SNS
+  - New generative modes: 
+    - Fibonacci, Random, Linear
+    - change Fill to trigger generation of new pattern
+  - Turing Machine style output mode
+    - steps are interpreted as bits and converted to stepped voltage at the output.
+
+  
+
+-- 0.5.3 ----
+
+- Parasites skins + libary:
+  - access to Parasites firmwares by Matthias Puech https://mqtthiqs.github.io/parasites/
+  - based on Aepelzens Parasites / (P)arable Instruments
+  - indicated by more Lovecraftian font and logo to differentiate from original firmwares
+  - Smoke (Clouds): Smoke, Espectro, Ritardo, Camilla, Oliverb, Resonestor
+  - Splash: Splash, Two Bumps, Two Drunks
+
+- Mutable Instruments skins
+  - rename Humo back to Smoke 
+     (don't want too many new names - should be ok to use original names for alternative modes / parasites)
+  - skins for all modes
+  - add back VU meter
+
+  - Annuli
+    - add skin for Disastrous Peace easter egg mode
+
+- Riemann
+  - chord generator based on Neo-Riemannian Tonnetz analysis
+  - inspired by NE Tonnetz Sequent, Navichord app, o_C Automatonnetz 
+    (and my incapability to compose / improvise diatonic music)
+  - Traversal via perfect fifth (P5/V) per volt and major triad per volt (M3/V) inputs  
+  - Major/minor, Augmented/diminished chord groups
+  - 3 - 7 parts per chord (from standard triads to thirteenth chords)
+  - Parts mostly display for now, outputs after last part output root note
+  - Switch for suspensions (sus4) close to fifth-axis
+  - Transpose rotates within octave
+  - Outputs in V/oct
+  - Tonic output (T) for tonic drone
+  - Voicing inc/decreases octaves to the right/left sequentially by part 
+    (small settings to the right give chord inversions)
+
+- Etagère
+  - swap LP/HP position
+  - update cosmetics
+
+- Deux Etagères
+  - convenience stereo version of Etagère
+
+- Gnome
+  - improved internal gain staging and mixing behavior
+  - crossfading between oscillator and sub-oscillator
+  - improved range for PWM behavior
+  - VCF resonance gain-compensation
+  - updated skin cosmetics (closer to original color scheme...)
+
+- SNS
+  - CLK/RST thru added for easier chaining of multiple SNS
+
+- Snake
+  - introduce 16 internal busses 0-F with 10 lines per buss
+  - cosmetics, separate 2x5 lines
+  - fix muting on unplugging / buss change
+
+- Falls
+  - Attenumixverter, inspired by Fonitronik Cascade
+  - empty inputs provide offset voltages
+  - empty outputs mix into output below
+
+- Aux
+  - 2 stereo effect send/return loops 
+  - with cross feedback (same or swapped stereo channels)
+  - mute button for input (to listen to those sweet reverb tails)
+  - bypass button for fx (in case you went wild with the feedback pots)  
+
+-- 0.5.2 ----
+
+- Gnome: complete synth voice based on Fundamental modules
+
+- Snake: multicore (experimental!) introduces a small delay!
+  if in doubt check the difference signal of in and output.
+  a particular port is locked by the instance where the cable gets plugged first (green light).
+  this signal is then available at all other instances (red light).
+
+- Humo (standard Clouds): new skins for the alternate modes: Espectro, Ritardo, Camilla
+
+- Sssh: 4 copies of the noise/S+H section from Kinks, normalized
+
+- Fuse: fixes to gate/trigger behavior
+
+- Blank panels: 1HP, 2HP, 4HP, 8HP, 16HP, 42HP - nothing special for now but watch this space
+
+-- 0.5.1.1 ----

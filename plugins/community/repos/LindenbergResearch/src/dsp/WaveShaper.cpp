@@ -81,6 +81,14 @@ void WaveShaper::process() {
 WaveShaper::WaveShaper(float sr) : DSPEffect(sr) {}
 
 
+bool WaveShaper::isBlockDC() const {
+    return blockDC;
+}
+
+
+void WaveShaper::setBlockDC(bool blockDC) {
+    WaveShaper::blockDC = blockDC;
+}
 
 
 

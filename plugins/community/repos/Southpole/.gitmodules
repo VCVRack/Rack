@@ -1,0 +1,3 @@
+[submodule "eurorack"]
+	path = eurorack
+	url = https://github.com/AndrewBelt/eurorack

@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>{{ title }}</title>
+<link type="text/css" rel="stylesheet" href="/static/main.css" />
+</head>
+<body {{ extra_body_tags }} >
+  <div id='wrapper'>
+    <div id='content'>
+    {% block content %}
+    {% endblock %}
+    
+    <div class="divider_big"></div>
+    <div id="credits">
+      <p>Mutable Instruments, 2014. <a href="https://github.com/pichenettes/eurorack/tree/master/yarns">Source code</a>.</p>
+    </div>
+    
+    </div>
+    <div id='sidebar'>
+      <a id="logo" href="http://mutable-instruments.net">Mutable Instruments</a>
+    </div>
+  </div>
+</body>
+</html>

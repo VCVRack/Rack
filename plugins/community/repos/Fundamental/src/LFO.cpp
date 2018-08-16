@@ -12,7 +12,7 @@ struct LowFrequencyOscillator {
 
 	LowFrequencyOscillator() {}
 	void setPitch(float pitch) {
-		pitch = fminf(pitch, 8.0f);
+		pitch = fminf(pitch, 10.0f);
 		freq = powf(2.0f, pitch);
 	}
 	void setPulseWidth(float pw_) {
@@ -135,7 +135,7 @@ LFOWidget::LFOWidget(LFO *module) : ModuleWidget(module) {
 	addParam(ParamWidget::create<CKSS>(Vec(15, 77), module, LFO::OFFSET_PARAM, 0.0f, 1.0f, 1.0f));
 	addParam(ParamWidget::create<CKSS>(Vec(119, 77), module, LFO::INVERT_PARAM, 0.0f, 1.0f, 1.0f));
 
-	addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(47, 61), module, LFO::FREQ_PARAM, -8.0f, 6.0f, -1.0f));
+	addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(47, 61), module, LFO::FREQ_PARAM, -8.0f, 10.0f, 1.0f));
 	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(23, 143), module, LFO::FM1_PARAM, 0.0f, 1.0f, 0.0f));
 	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(91, 143), module, LFO::PW_PARAM, 0.0f, 1.0f, 0.5f));
 	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(23, 208), module, LFO::FM2_PARAM, 0.0f, 1.0f, 0.0f));
@@ -231,7 +231,7 @@ LFO2Widget::LFO2Widget(LFO2 *module) : ModuleWidget(module) {
 	addParam(ParamWidget::create<CKSS>(Vec(62, 150), module, LFO2::OFFSET_PARAM, 0.0f, 1.0f, 1.0f));
 	addParam(ParamWidget::create<CKSS>(Vec(62, 215), module, LFO2::INVERT_PARAM, 0.0f, 1.0f, 1.0f));
 
-	addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(18, 60), module, LFO2::FREQ_PARAM, -8.0f, 6.0f, -1.0f));
+	addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(18, 60), module, LFO2::FREQ_PARAM, -8.0f, 10.0f, 1.0f));
 	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(11, 142), module, LFO2::WAVE_PARAM, 0.0f, 3.0f, 1.5f));
 	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(11, 207), module, LFO2::FM_PARAM, 0.0f, 1.0f, 0.5f));
 

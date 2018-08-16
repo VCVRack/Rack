@@ -635,10 +635,12 @@ extern void init_plugin_mtsch_plugins      (rack::Plugin *p);
 extern void init_plugin_NauModular         (rack::Plugin *p);
 extern void init_plugin_Ohmer              (rack::Plugin *p);
 // extern void init_plugin_ParableInstruments (rack::Plugin *p); // alternative "Clouds" module (crashes)
+extern void init_plugin_PG_Instruments     (rack::Plugin *p);
 extern void init_plugin_Qwelk              (rack::Plugin *p);
 extern void init_plugin_RJModules          (rack::Plugin *p);
 extern void init_plugin_SerialRacker       (rack::Plugin *p);
 extern void init_plugin_SonusModular       (rack::Plugin *p);
+extern void init_plugin_Southpole          (rack::Plugin *p);
 extern void init_plugin_Southpole_parasites(rack::Plugin *p);
 extern void init_plugin_squinkylabs_plug1  (rack::Plugin *p);
 extern void init_plugin_SubmarineFree      (rack::Plugin *p);
@@ -709,10 +711,12 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("NauModular",         &init_plugin_NauModular);
    vst2_load_static_rack_plugin("Ohmer",              &init_plugin_Ohmer);
    // vst2_load_static_rack_plugin("ParableInstruments", &init_plugin_ParableInstruments);
+   vst2_load_static_rack_plugin("PG_Instruments",     &init_plugin_PG_Instruments);
    vst2_load_static_rack_plugin("Qwelk",              &init_plugin_Qwelk);
    vst2_load_static_rack_plugin("RJModules",          &init_plugin_RJModules);
    vst2_load_static_rack_plugin("SerialRacker",       &init_plugin_SerialRacker);
    vst2_load_static_rack_plugin("SonusModular",       &init_plugin_SonusModular);
+   vst2_load_static_rack_plugin("Southpole",          &init_plugin_Southpole);
    vst2_load_static_rack_plugin("Southpole_parasites",&init_plugin_Southpole_parasites);
    vst2_load_static_rack_plugin("squinkylabs-plug1",  &init_plugin_squinkylabs_plug1);
    vst2_load_static_rack_plugin("SubmarineFree",      &init_plugin_SubmarineFree);
