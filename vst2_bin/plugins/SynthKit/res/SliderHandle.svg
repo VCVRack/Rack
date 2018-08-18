@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="14"
+   height="16"
+   version="1.1"
+   viewBox="0 0 16 14"
+   id="svg10"
+   sodipodi:docname="SliderHandle.svg"
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
+  <metadata
+     id="metadata16">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs14" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1680"
+     inkscape:window-height="1006"
+     id="namedview12"
+     showgrid="false"
+     inkscape:zoom="28.962884"
+     inkscape:cx="4.0666222"
+     inkscape:cy="5.9595293"
+     inkscape:window-x="136"
+     inkscape:window-y="140"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg10" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#222222;stroke-width:0.94171566"
+     d="M 0.04862355,0.8810415 H 14.011535 V 14.88104 H 0.04862355 Z"
+     id="SvgjsRect1006" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#666666;stroke-width:0.9417156"
+     d="M 0.04862355,6.157256 H 14.011535 v 1 H 0.04862355 Z"
+     id="SvgjsRect1007" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#dedede;stroke-width:0.94171566"
+     d="M 0.04862355,7.157256 H 14.011535 v 3 H 0.04862355 Z"
+     id="SvgjsRect1008" />
+</svg>

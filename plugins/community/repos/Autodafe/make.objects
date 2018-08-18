@@ -1,0 +1,32 @@
+STK_OBJ= \
+	dep/stk/src/Chorus.o \
+	dep/stk/src/Delay.o \
+	dep/stk/src/DelayL.o \
+	dep/stk/src/NRev.o \
+	dep/stk/src/SineWave.o \
+	dep/stk/src/Stk.o
+
+ALL_OBJ= \
+	src/Autodafe.o \
+	src/Biquad.o \
+	src/BitCrusher.o \
+	src/BPMClock.o \
+	src/Chorus.o \
+	src/ClockDivider.o \
+	src/DSPUtilities.o \
+	src/FixedFilterBank.o \
+	src/FoldBack.o \
+	src/FormantFilter.o \
+	src/Keyboard.o \
+	src/LFO.o \
+	src/MultiModeFilter.o \
+	src/Multiple1x8.o \
+	src/Multiple2x8.o \
+	src/Phaser.o \
+	src/Reverb.o \
+	src/SEQ16.o \
+	src/SEQ8.o \
+	src/TriggerSeq.o \
+	src/VAStateVariableFilter.o \
+	$(STK_OBJ)
+

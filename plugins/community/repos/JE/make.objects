@@ -1,0 +1,7 @@
+ALL_OBJ= \
+	ext/LambertW/FukushimaLambertW.o \
+	ext/LambertW/LambertW.o \
+	src/JE.o \
+	src/RingModulator.o \
+	src/WaveFolder.o
+

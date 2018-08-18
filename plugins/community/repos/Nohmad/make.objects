@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	src/Nohmad.o \
+	src/Noise.o \
+	src/StrangeAttractors.o

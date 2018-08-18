@@ -1,0 +1,274 @@
+/*! \page download Download, Release Notes, and Bug Fixes
+
+\section down Download Version 4.6.0 (31 August 2017):
+
+- <A HREF="http://ccrma.stanford.edu/software/stk/release/stk-4.6.0.tar.gz">Source distribution</A>
+
+\section notes Release Notes:
+\subsection v4dot6dot0 Version 4.6.0
+- see github site for complete details (github.com/thestk/stk)
+- various build system updates
+- fixes in FileWvIn / FileLoop for normalisation and scaling, as well as file opening
+- bug fix for MAT-files in FileWrite
+- bug fix in MidiFileIn.cpp for timing and time-code formats
+- updated versions of RtAudio and RtMidi
+
+\subsection v4dot5dot1 Version 4.5.1
+- fix for FileWvIn / FileLoop classes to avoid keeping files open if not necessary
+- miscellaneous bug fixes, documented on GitHub site (github.com/thestk/stk)
+- update to play.cpp example to play mono files as stereo
+- bug fix in DelayL::setDelay() function
+- miscellanous build bug fixes
+
+\subsection v4dot5dot0 Version 4.5.0
+- Updated versions of RtAudio and RtMidi, with associated renaming of RtError class to either RtAudioError or RtMidiError
+- New iOS project files (thanks to Ariel Elkin)
+- Bug fix in FreeVerb that could cause crackling for stereo input
+- Various bug fixes and updates to minimize compiler warnings
+- ADSR fix for decay/release time calculations
+- Various updates to build system
+
+\subsection v4dot4dot4 Version 4.4.4
+- New FreeVerb class (thanks to Greg Burlet)
+- New Guitar class
+- New electric guitar project
+- Updated versions of RtAudio and RtMidi
+- Cleaned / revised Shakers class
+- Bug fix in LentPitShift
+- Bug fix in Echo constructor
+- Bug fix in FileWvIn (file size when chunking)
+- Bug fix in StkFrames copy constructor
+
+\subsection v4dot4dot3 Version 4.4.3
+- Changed SINT24 to be lower 3 bytes of 32-bit word.
+- Bug fixes to vectorized tick functions in Effects classes.
+- Updated versions of RtAudio and RtMidi.
+- Bug fixes in ADSR and Envelope classes.
+- Updates to the internal argument checking and reporting scheme.
+- Updates to Bowed class (thanks to Esteban Maestre!).
+- Fixes for 24-bit support in FileRead and FileWrite.
+- Added WAVE_FORMAT_EXTENSIBLE support in FileWrite.
+- Added sample rate variable reading and writing for MAT-files in FileRead and FileWrite.
+
+\subsection v4dot4dot2 Version 4.4.2
+- Added various header file includes for newer compilers.
+- Updates to RtAudio and RtMidi.
+- New LentPitShift class (thanks to Francois Germain).
+- Bug fixes in Voicer class (thanks Richard Dobson!).
+- Added Makefile.in to compile library and all projects, as well as clean and distclean.
+
+\subsection v4dot4dot1 Version 4.4.1
+- Added multi-channel/frame tick() virtual function to WvIn and WvOut abstract base classes (required update to RtWvOut class).
+- Updated configure script to select g++ compiler by default.
+- In demo.cpp: removed voicer grouping for messages, fixing polyphony when messages are on the same MIDI/SKINI channel.
+- Updates to RtAudio and RtMidi.
+
+\subsection v4dot4dot0 Version 4.4.0
+- All classes embedded in the "stk" namespace (except RtAudio, RtMidi, and RtError).
+- Class WaveLoop renamed FileLoop.
+- Significant efficiency improvements via code restructuring and inlining.
+- Some class source (.cpp) files deleted as part of inlining (Generator, Filter, Function, WvIn, WvOut, Effect, Instrmnt, BowTable, ReedTable, JetTable, Vector3D).
+- Updates to RtAudio and RtMidi.
+- Previous "tickFrame()" functions renamed "tick" for more consistent API.
+- More consistent and scalable approach to multichannel data and computations.
+- Multichannel support added to Granulate class.
+- Filter class made abstract.  New Iir and Fir classes made for non-order-specific filtering.
+- New TapDelay class.
+- SubNoise class deleted (same as sub-sampled "ticking" of Noise class).
+
+\subsection v4dot3dot1 Version 4.3.1
+- Further headerless file support in FileRead.
+- Bug fix in RtWvOut.cpp.
+- Added configure support for MinGW.
+- Updates to RtAudio and RtMidi for MinGW.
+- Changes to channel assignment in demo.cpp.
+
+\subsection v4dot3dot0 Version 4.3.0
+- An official MIT-like license.
+- New functionality to automatically update class data when the STK sample rate changes (partly implemented).
+- Updates for new RtAudio version 4.0.
+- Removed RtDuplex class, users should use RtAudio directly with a callback function.
+- Bug fix in interpolate() function in Stk.h for non-interleaved data.
+- Fixes / improvements to the Granulate class.
+- Fix in Whistle when doing animation.
+- Fixes in BlitSquare for frequency, harmonics, and dc offset.
+- Updates to Makefiles for non-realtime compile.
+- Fix in demo.cpp for voice channel assignment.
+- Updated versions of RtMidi and RtAudio.
+- Updated ASIO files for MinGW compiler.
+- New FAQ in documentation.
+- MAT-file bug fix in FileRead class.
+
+\subsection v4dot2dot1 Version 4.2.1
+- Greatly expanded StkFrames functionality (including interpolation and indexing by channel/frame).
+- New Blit, BlitSaw, and BlitSquare bandlimited waveform classes (thanks to Robin Davies!).
+- New Granulate granular synthesis class.
+- Removed Table class ... all functionality (including interpolation) now in StkFrames and FileRead classes.
+- Revised Socket class (now abstract) and added TcpServer, TcpClient, and UdpSocket subclasses.
+- Added Stk::showWarnings() and Stk::printErrors() functions to dis/enable warning and error printouts.
+- Extracted file I/O functionality to FileRead and FileWrite classes.
+- Revised WvIn / WvOut class structure (WvIn / WvOut now abstract and file I/O functionality in new FileWvIn / FileWvOut subclasses).
+- New SineWave class which calculates its own static table of variable length (no rawwave dependency).
+- New sinewave.raw file of length 1024 samples (used to be 256).
+- TcpWvIn and TcpWvOut renamed InetWvIn and InetWvOut, with added support for UDP sockets.
+- Fixed bug in WvOut tickFrame( const  StkFrames &frames ) function.
+- Fixed bug in demo.cpp when writing output soundfiles without realtime output.
+- Added "binary" open flag to MidiFileIn class for Windows.
+- Fixed oversized MAT-file header in WvOut.cpp
+- Fixed case statement bug in MidiFileIn.cpp for sysex.
+- Added missing getDelay() function to DelayA.cpp.
+- Fixed modDepth omission in Chorus.cpp.
+- Fixed DC blocker initialization bug in Flute.cpp.
+- Changed Filter class behavior so no default clearing of state when changing coefficients.
+- Fixes to RtAudio, especially for Windows DirectSound and ASIO (thanks to Robin Davies).
+
+\subsection v4dot2dot0 Version 4.2.0
+- Simultaneous multiple audio APIs supported at compile time.
+- Various changes to better conform to standard C++ programming practices.
+- Fixed hidden overloaded virtual functions.
+- New Asymp exponential envelope class.
+- <tt>MY_FLOAT</tt> type converted to <tt>StkFloat</tt> and changed throughout (use \c treesed utility to search/replace in old files).
+- Most example programs rewritten to use an audio callback paradigm (which works better in OS-X).
+- New StkFrames class for vectorized multichannel data and associated new tick() functions making use of StkFrames.
+- New RtMidi class with MIDI output capabilities (API changes).
+- New MidiFileIn class for reading MIDI files.
+- Revised Filter classes to use std::vectors for coefficients (API changes).
+- Revised Messager class (API changes).
+- New abstract parent Effect class for various effects.
+- New abstract parent Generator class for various signal sources.
+- New abstract parent Function class for tables and various non-linear functions.
+- Skini class completely rewritten (simplified) using the C++ STL (API changes).
+- WvOut classes now clip to -1.0 to +1.0 and report out of range.
+- New Mutex class.
+- Turned Nagle algorithm off by default in Socket class.
+- Error reporting standardized in all classes.
+
+\subsection v4dot1dot3 Version 4.1.3
+- Bug fix in RtAudio for Windows DirectSound output only support
+
+\subsection v4dot1dot2 Version 4.1.2
+- Added Linux JACK support to RtAudio.
+- Added optional doNormalize argument to WvIn to allow specification of data normalization or not.
+- Added volume control to demo program and various tcl scripts.
+- Added support for dynamic rawwavePath() setting.
+- WaveLoop bug fix.
+- Fixed bug in ADSR::setReleaseTime() method.
+- Fixed missing initialization of apInput in non-default constructor of DelayA class.
+- Added time seeding of random number generator to Noise constructor.
+- Update to the contentsAt() method of Delay class.
+- WAV file fixes (8-bit) in WvIn and WvOut classes.
+- Configure script changes.
+- Updated \<iostream\> include statements and appended "std::" as necessary throughout for compatibility with gcc 3.
+
+\subsection v4dot1dot1 Version 4.1.1
+- Bug fix in RtAudio for Macintosh OS X and Windows ASIO duplex operation.
+- Windows ASIO fix in Stk.h.
+- Documentation updates.
+- Expanded tutorial.
+- Fixed RtDuplex omission in src Makefile.
+
+\subsection v4dot1 Version 4.1
+- Macintosh OS X support added.
+- New Whistle class.
+- Added Voicer, SingWave, and VoicForm classes.
+- Improvements/fixes to the banded waveguide instruments.
+- Demo program now uses Voicer, allowing polyphony.
+- Demo tcl/tk scripts changed to use SKINI PitchChange instead of PitchBend.
+- Demo program response to PitchBend modified to octave up/down.
+- Several RtAudio fixes and improvements (OS X and Windows ASIO support added).
+- Added nextOut() method to Delay classes.
+- Documentation fixes for Reverb classes.
+- RAWWAVE_PATH changed to include the "rawwave" directory.
+- "configure" support added for unix systems.
+- Multivoice flag (-n NUMBER) added as command line option to demo program.
+- Sample rate flag added as command line option to example programs.
+- Socket port number added as command line option to example programs.
+
+\subsection v4 Version 4.0
+- New documentation and tutorial.
+- Several new instruments, including Saxofony, BlowBotl, and StifKarp.
+- New Stk base class, replacing Object class.
+- New Filter class structure and methods.
+- Extensive modifications to WvIn and WvOut class structures and methods.
+- Looping functionality moved to WaveLoop (subclass of WvIn).
+- Automatic file type detection in WvIn ... hosed WavWvIn, AifWvIn, RawWavIn, SndWavIn, and MatWvIn subclasses.
+- New file type specifier argument in WvOut ... hosed WavWvOut, AifWvOut, RawWavOut, SndWavOut, and MatWvOut subclasses.
+- Some simplifications of Messager class (was Controller).
+- New independent RtAudio class.
+- Extensive revisions in code and a significant number of API changes.
+
+\subsection v3dot2 Version 3.2
+- New input control handling class (Controller)
+- Added AIFF file input/output support.
+- New C++ error handling capabilities.
+- New input/output internet streaming support (StrmWvIn/StrmWvOut).
+- Added native ALSA support for linux.
+- Added optional "device" argument to all "Rt" classes (audio and MIDI) and printout of devices when argument is invalid.
+- WvIn classes rewritten to support very big files (incremental load from disk).
+- Changed WvIn/WvOut classes to work with sample frame buffers.
+- Fixed looping and negative rate calculations in WvIn classes.
+- Fixed interpolation bug in RtWvIn.
+- Windoze RtAudio code rewritten (thank Dave!).
+- Simplified byte-swapping functions (in-place swapping).
+- "Stereo-ized" RagaMatic.
+- Miscellaneous renamings.
+- Probably a bunch more fixes that I've long since forgotten about.
+
+\subsection v3dot1 Version 3.1
+- New RagaMatic project ... very cool!!!
+- Less clipping in the Shakers class.
+- Added "microphone position" to Mandolin in STKdemo.
+- Fixed MIDI system message exclusion under Irix.
+- Added a few bitmaps for the Shaker instruments.
+- Made destructors virtual for Reverb.h, WvIn.h and Simple.h.
+- Fixed bug setting delay length in DLineA when value too big.
+- Fixed bug in WinMM realtime code (RTSoundIO).
+- Added tick() method to BowTabl, JetTabl, and ReedTabl (same as lookup).
+- Switched to pthread API on SGI platforms.
+- Added some defines to Object.h for random number generation, FPU overflow checking, etc....
+- A few minor changes, some bug fixes ... can't remember all of them.
+
+\subsection v3 Version 3.0
+- New #define flags for OS and realtime dependencies (this will probably cause problems for old personal STK code, but it was necessary to make future ports easier).
+- Expanded and cleaned the Shakers class.
+- New BowedBar algorithm/class.
+- Fixed Linux MIDI input bug.
+- Fixed MIDI status masking problem in Windows.
+- OS type defines now in Makefile.
+- New RAWWAVE_PATH define in Object.h.
+- Syntmono project pulled out to separate directory and cleaned up.
+- Socketing capabilities under Unix, as well as Windoze.
+- Multiple simultaneous socket client connections to STK servers now possible.
+- MD2SKINI now can merge MIDI and piped messages under Irix and Linux (for TCL->MD2SKINI->syntmono control).
+- Defined INT16 and INT32 types and fixed various WvIn and WvOut classes.
+- Updated MatWvIn and MatWvOut for new MAT-file documentation from Matlab.
+- New demo Tcl/Tk GUI (TclDemo.tcl).
+- Minor fixes to FM behavior.
+- Added record/duplex capabilities to RTSoundIO (Linux, SGI, and Windoze).
+- Fixed bugs in WavWvOut and MatWvOut header specifications.
+- Added RawWvOut class.
+- New WvIn class with RawWvIn, SndWvIn, WavWvIn, MatWvIn, and RTWvIn subclasses.
+- Removed RawWave, RawShot, RawInterp, and RawLoop classes (supplanted by RawWvIn).
+- Multi-channel data support in WvIn and WvOut classes using MY_MULTI data type (pointer to StkFloat) and the methods mtick() and mlastOutput().
+- Now writing to primary buffer under Windoze when allowed by hardware.
+- Cleaned up Object.h a bit.
+- Pulled various utility and thread functions out of syntmono.cpp (to aid readability of the code).
+
+\subsection v2dot02 Version 2.02
+- Created RawWave abstract class, with subclasses of RawLoop (looping rawwave oscillator), RawShot (non-looping, non-interpolating rawwave player ... used to be RawWvIn), and RawInterp (looping or non-looping, interpolating rawwave player ... used to be RawWave).
+- Modified DrumSynt to correctly handle sample rates different than 22050 Hz.
+- Modified syntmono parsing vs. tick routine so that some ticking occurs between each message.  When multiple messages are waiting to be processed, the time between message updates is inversely proportional to the number of messages in the buffer.
+- Fixed DirectSound playback bug in WinXX distribution.  Sound was being played at 8-bit, 22 kHz in all cases.  Playback is now 16-bit and dependent on SRATE.
+- Fixed bug in MD2SKINI which prevented some NoteOff statements from being output.
+- This distribution includes an example STK project, mus151, which demonstrates a means for keeping a user's personal projects separate from the main distribution.  This is highly recommended, in order to simplify upgrades to future STK releases.
+
+\subsection v2 Version 2
+- Unification of the capabilities of STK across the various platforms.  All of the previous SGI functionality has been ported to Linux and Windows, including realtime sound output and MIDI input.
+- MIDI input (with optional time-stamping) supported on SGI, Linux (OSS device drivers only), and Windows operating systems.  Time stamping under IRIX and Windows is quantized to milliseconds and under Linux to hundredths of a second.
+- Various Sound Output Options - .wav, .snd, and .mat (Matlab MAT-file) soundfile outputs are supported on all operating systems.  I hacked out the MAT-file structure, so you don't have to include any platform-specific libraries.  Realtime sound output is provided as well, except under NeXTStep.
+- Multiple Reverberator Implementations - Reverb subclasses of JCRev and NRev (popular reverberator implementations from CCRMA) have been written.  Perry's original reverb implementation still exists as PRCRev.  All reverberators now take a T60 initializer argument.
+- MD2SKINI - A program which parses a MIDI input stream and spits out SKINI code.  The output of MD2SKINI is typically piped into an STK instrument executable (eg. <tt>MD2SKINI | syntmono Clarinet -r -i</tt>).  In addition, you can supply a filename argument to MD2SKINI and have it simultaneously record a SKINI score file for future reuse.
+- Modifications to <I>Object.h</I> for OS_TYPE compilation dependencies.  <I>Makefile</I> automatically determines OS_TYPE when invoked (if you have the GNU makefile utilities installed on your system).
+- A single distribution for all platforms.  The Unix and Windows versions have been merged into a single set of classes.  Makefiles and Visual C++ workspace/project files are provided for compiling.
+
+*/

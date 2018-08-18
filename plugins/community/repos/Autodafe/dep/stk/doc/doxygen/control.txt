@@ -1,0 +1,54 @@
+/*! \page controlin Control Input
+
+Each Synthesis ToolKit instrument exposes its relevant control parameters via public functions such as setFrequency() and controlChange().  Programmers are free to implement the control scheme of their choice in exposing those parameters to the user.
+
+A text-based control protocol called <A HREF="skini.html">SKINI</A> is provided with the Synthesis ToolKit.  SKINI extends the MIDI protocol in incremental ways, providing a text-based messaging scheme in human-readable format and making use of floating-point numbers wherever possible.  Each SKINI message consists  of a message type (e.g., NoteOn, PitchBend), a time specification (absolute or delta), a channel number (scanned as a long integer), and a maximum of two subsequent message-specific field values.  Knowing this, it should be relatively clear what the following SKINI "scorefile" specifies:
+
+\code
+NoteOn          0.000082  2  55.0  82.3
+NoteOff         1.000000  2  55.0  64.0
+NoteOn          0.000082  2  69.0  82.8
+StringDetune    0.100000  2  10.0
+StringDetune    0.100000  2  30.0
+StringDetune    0.100000  2  50.0
+StringDetune    0.100000  2  40.0
+StringDetune    0.100000  2  22.0
+StringDetune    0.100000  2  12.0
+NoteOff         1.000000  2  69.0  64.0
+\endcode
+
+MIDI messages are easily represented within the SKINI protocol.
+
+The class stk::Messager can be used to acquire and parse MIDI messages
+from a MIDI device and SKINI messages from STDIN and socket
+connections.  Incoming messages are acquired asynchronously and saved
+to an internal message queue of stk::Skini::Message types (MIDI
+messages are converted to the stk::Skini:Message format).  The user
+then uses the stk::Messager:popMessage() function to retrieve incoming
+control messages.  This function does not block, instead returning a
+message type of zero when no more messages are in the queue.  Many of
+the example programs included with the ToolKit distribution use a
+stk::Messager instance to accept control input from the accompanying tcl/tk
+graphical user interfaces, from external MIDI devices, or from SKINI
+scorefiles.
+
+In the following example, we'll modify the <TT>bethree.cpp</TT> program from the previous tutorial chapter and incorporate a stk::Messager class to allow control via SKINI messages read from a SKINI file.
+
+\include controlbee.cpp
+
+A realtime control message will usually have a delta time of zero, in which case it is processed as soon as possible.  Non-realtime messages, normally from a scorefile, will usually have non-zero delta times.  The scheme used in this example is designed to work for both scorefile and realtime input types.  When no message is available from the queue, the instrument is "ticked" for DELTA_CONTROL_TICKS and then the queue is checked again.  The value of DELTA_CONTROL_TICKS roughly defines the program "control rate" in a realtime context, though multiple available messages in the queue are processed in immediate succession when their delta time values are zero.
+
+The \c processMessage() function centralizes the handling of control messages.  Other control update schemes can be implemented, perhaps using a separate thread or in the \c main() function, and this function should work in any context.
+
+Assuming the program is compiled as <TT>controlbee</TT> and the SKINI scorefile <A HREF="tutorial/bookert.ski"><TT>bookert.ski</TT></A> is in the <TT>scores</TT> directory, the program can be run as:
+
+\code
+controlbee scores/bookert.ski
+\endcode
+
+Only a few basic SKINI message type case statements are included in this example.  It is easy to extend the program to support a much more elaborate set of instrument control parameters.
+
+This example could also be easily extended to accept "realtime" control input messages via pipe, socket or MIDI connections.  The stk::Messager class provides stk::Messager::startStdInput(), stk::Messager::startSocketInput(), and stk::Messager::startMidiInput() functions for this purpose.
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="multichannel.html">Next tutorial</A>]
+*/

@@ -1,0 +1,65 @@
+/*  Howdy!!!!   SKINI0.9 Test Score  ***********/
+
+PickPosition    0.0     2               64.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+PickPosition    0.0     2               56.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+PickPosition    0.0     2               48.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+PickPosition    0.0     2               40.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+PickPosition    0.0     2               32.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+PickPosition    0.0     2               24.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+PickPosition    0.0     2               16.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+PickPosition    0.0     2                8.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         1.25    2       55.0    64.0
+
+PickPosition    0.0     2               64.0
+BodySize        0.0     2                0.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2               16.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2               32.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2               48.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2               60.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2               80.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2               96.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2              127.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         0.25    2       55.0    64.0
+BodySize        0.0     2               64.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         1.25    2       55.0    64.0
+
+StringDamping   0.0     2                0.0
+PickPosition    0.0     2               64.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         1.25    2       55.0    64.0
+
+StringDamping   0.0     2              128.0
+NoteOn          0.0     2       55.0    64.0
+NoteOff         1.25    2       55.0    64.0
+

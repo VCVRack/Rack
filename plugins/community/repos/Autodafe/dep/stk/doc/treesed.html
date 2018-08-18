@@ -1,0 +1,175 @@
+<html>
+<head>
+<title>Treesed Usage</title>
+</head>
+<body>
+<table border="0" width="660" cellpadding="0" cellspacing="0">
+<tbody><tr valign="top"><td width="165">
+
+<h3>How to Use Treesed</h3>
+
+Go to the directory where you want to search or make changes.  
+
+<p>
+There are two choices you can make when using treesed:
+</p><ol>
+<li>Do I just want to search for a text, or do I want to search for a
+text and replace it with something else?  
+<br>
+If you are just searching you are using Treesed in "search mode", otherwise it is in
+"replace mode."
+</li><li>Do I want to search/replace only in files in my current directory,
+or should files in all subdirectories (and all directories below that)
+also be done?
+</li></ol>
+Some examples will make this clear.
+
+<h4>Searching</h4>
+Say you are faced with the situation that the author of a slew of web-pages, Nathan Brazil, has left and has been succeeded by Mavra Chang.  First, let us see which files are affected by this (what you type in is shown in <b><tt>bold</tt></b>):
+<blockquote>
+<pre>[localhost] <b>treesed "Nathan Brazil" -files *.html</b>
+search_pattern: Nathan\ Brazil
+replacement_pattern: 
+
+** Search mode
+
+.
+midnight.html: 1 lines on: 2
+..
+well.html: 1 lines on: 3
+</pre>
+</blockquote>
+We notice the following:
+<ul>
+<li>The search text <tt>"Nathan Brazil"</tt> is enclosed in
+double-quotes (<tt>"</tt>).
+</li><li>You specify which files to search with <tt>-files</tt> followed by a
+list of file names--in this case <tt>*.html</tt>.
+</li><li>Treesed reports the search pattern ("pattern" is just a fancy word
+for "text") you specified (you can ignore
+that \).
+</li><li>Treesed reports an empty <tt>replacement_pattern</tt>.  This is
+correct, because you haven't entered one.
+</li><li>It therefore deduces that is is in search mode.
+</li><li>It finds two files containing "Nathan Brazil", and reports on which
+lines of these files it found it; it does not show the lines themselves.
+</li></ul>
+Because you used <tt>-files</tt>, Treesed will search in the files you
+specify <i>in the current directory</i>.  You can also search files in
+the current directory <i>and</i> all directories below it.  However, in
+that case you can not specify which file names to use, all files will be
+searched:
+<blockquote>
+<pre>[localhost] <b>treesed "Nathan Brazil" -tree</b>
+search_pattern: Nathan\ Brazil
+replacement_pattern: 
+
+** Search mode
+
+.
+midnight.html: 1 lines on: 2
+...
+well.html: 1 lines on: 3
+.
+new/echoes.html: 1 lines on: 2
+</pre>
+</blockquote>
+We notice the following:
+<ul>
+<li>Instead of <tt>-files</tt> we now see <tt>-tree</tt>.
+</li><li>We do not see a specification of file names.
+</li><li>Treesed finds an occurence of "Nathan Brazil" in the file
+<tt>echoes.html</tt> in the subdirectory <tt>new</tt>; it did not
+find this file in the previous example (as it shouldn't).
+</li></ul>
+
+<h4>Replacing</h4>
+To replace a text you simply add the replacement text right after the
+search text:
+<blockquote>
+<pre>[localhost] <b>treesed "Nathan Brazil" "Mavra Change" -files *.html</b>
+search_pattern: Nathan\ Brazil
+replacement_pattern: Mavra Chang
+
+** EDIT MODE!
+
+.
+midnight.html: 1 lines on: 2
+
+Replaced Nathan\ Brazil by Mavra Chang on 1 lines in midnight.html
+..
+well.html: 1 lines on: 3
+
+Replaced Nathan\ Brazil by Mavra Chang on 1 lines in well.html
+</pre>
+</blockquote>
+We notice the following:
+<ul>
+<li>Right after the search text "Nathan Brazil" you specify the
+replacement text "Mavra Chang".
+</li><li>As a result, Treesed now reports a non-empty
+<tt>replacement_pattern</tt>.
+</li><li>Hence it concludes it is in "edit mode", which means replacment mode.
+</li><li>Treesed dutifully reports on which lines in which files it did the
+replacement.
+</li></ul>
+To replace a text in all files in the current directory and the ones
+below it, we do the following:
+<blockquote>
+<pre>[localhost] <b>treesed "Nathan Brazil" "Mavra Chang" -tree</b>
+search_pattern: Nathan\ Brazil
+replacement_pattern: Mavra Chang
+
+** EDIT MODE!
+
+.
+midnight.html: 1 lines on: 2
+
+Replaced Nathan\ Brazil by Mavra Chang on 1 lines in midnight.html
+
+....
+well.html: 1 lines on: 3
+
+Replaced Nathan\ Brazil by Mavra Chang on 1 lines in well.html
+.
+new/echoes.html: 1 lines on: 2
+
+Replaced Nathan\ Brazil by Mavra Chang on 1 lines in new/echoes.html
+</pre>
+</blockquote>
+and we get the expected results, including the replace in
+<tt>new/echoes.html</tt>.
+
+<h4>Old Versions</h4>
+Treesed leaves behind quite a mess of old versions of the files it
+changed (only in change-mode, of course).  These old files have the same
+name as the original file, with <tt>.ddddd</tt> appended to it.  For
+example, if treesed makes a change to <tt>midnight.html</tt> it will
+leave the original version as something like
+<tt>midnight.html.26299</tt>.  You'll have to remove these files lest
+your disk area clutters up.  Here is a command that does that, <b>but
+beware!</b>  This command removes all files in the current directory and
+all below it, that end in a period followed by one or more 
+digits:
+<blockquote>
+<pre>find . -name "*.[0-9]*" -exec rm {} \;
+</pre>
+</blockquote>
+
+It is interesting to note that if you use treesed again without cleaning
+up, you may get files like <tt>midnight.html.26299.27654</tt>.  These
+will also be cleaned up by the above slightly dangerous command.
+
+
+<h3>About Treesed</h3>
+<tt>treesed</tt> is public domain software developed
+and designed by Rick Jansen from Sara, Amsterdam, Netherlands, January
+1996.
+
+<p>
+
+<h3>About This Document</h3>
+This usage document was created by the Division of Information Technology Services at The
+University of Western Ontario.
+
+</body></html>

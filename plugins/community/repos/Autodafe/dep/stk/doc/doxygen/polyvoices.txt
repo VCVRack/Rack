@@ -1,0 +1,22 @@
+/*! \page polyvoices Voice Management
+
+The previous tutorial chapters were concerned only with monophonic ToolKit instrument playback and control.  At this point, it should be relatively clear that one can instantiate multiple instruments and perhaps sum together their outputs or even direct their outputs to separate channels.  It is less clear how one might go about controlling a group of instruments.  The stk::Voicer class is designed to serve just this purpose.
+
+The stk::Voicer class is a relatively simple voice manager.  The user can dynamically add and delete instruments to/from its "control", with the option of controlling specific instruments via unique note tags and/or grouping sets of instruments via a "group" number.  All sounding instrument outputs are summed and returned via the <TT>tick()</TT> function.  The stk::Voicer class responds to noteOn, noteOff, setFrequency, pitchBend, and controlChange messages, automatically assigning incoming messages to the voices in its control.  When all voices are sounding and a new noteOn is encountered, the stk::Voicer interrupts the oldest sounding voice.  The user is responsible for creating and deleting all instrument instances.
+
+In the following example, we modify the <TT>controlbee.cpp</TT> program to make use of three stk::BeeThree instruments, all controlled using a stk::Voicer.
+
+\include threebees.cpp
+
+We have written this program to accept control messages from \c STDIN.  Assuming the program is compiled as <TT>threebees</TT>, the three-voice SKINI scorefile <A HREF="tutorial/bachfugue.ski"><TT>bachfugue.ski</TT></A> (located in the <tt>scores</tt> directory with the examples) can be redirected to the program as:
+
+\code
+threebees < scores/bachfugue.ski
+\endcode
+
+For more fun, surf to <A HREF="http://kern.humdrum.net/">Kern Scores</A> for a huge assortment of other scorefiles that can be downloaded in the SKINI format.
+
+Another easy extension would be to add the \c stk::Messager::startMidiInput() function to the program and then play the instruments via a MIDI keyboard.
+
+[<A HREF="tutorial.html">Main tutorial page</A>]
+*/

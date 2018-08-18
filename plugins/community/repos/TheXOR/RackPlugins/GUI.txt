@@ -1,0 +1,18 @@
+Eurorack 1HP module size: 
+	128.5mm x 5.08mm
+	5.06" x 0.2"
+	380px x 15px @ 75DPI
+
+tinylight: 1.088
+smalllight: 2.176
+mediumlight: 3.176
+
+clockin: CL1362RPort [Red]
+clockout: CL1362OPort [ORANGE]
+reset: CL1362YPort [yellow]
+cv: CL1362GPort [green]
+cv_in: PJ301GRPort [gray]
+gate: CL1362WPort [white]
+modin:  CL1362BPort [black]
+
+trigger:  CL1362BLUPort  [BLU]

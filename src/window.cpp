@@ -415,7 +415,7 @@ void windowInit() {
 }
 
 void windowDestroy() {
-   printf("xxx vstrack: windowDestroy()\n");
+   printf("xxx vstrack_plugin: windowDestroy()\n");
    lglw_glcontext_push(global_ui->window.lglw);
 
 	global_ui->window.gGuiFont.reset();
@@ -593,7 +593,7 @@ void windowClose(void) {
 ////////////////////
 
 Font::Font(const std::string &filename) {
-   printf("xxx vstrack: Font::Font\n");
+   printf("xxx vstrack_plugin: Font::Font\n");
 	handle = nvgCreateFont(global_ui->window.gVg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		info("Loaded font %s", filename.c_str());
@@ -619,7 +619,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 ////////////////////
 
 Image::Image(const std::string &filename) {
-   printf("xxx vstrack: Image::Image\n");
+   printf("xxx vstrack_plugin: Image::Image\n");
 	handle = nvgCreateImage(global_ui->window.gVg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		info("Loaded image %s", filename.c_str());
@@ -666,7 +666,6 @@ SVG::~SVG() {
 std::shared_ptr<SVG> SVG::load(const std::string &filename) {
    // printf("xxx SVG::load: ENTER\n");
 	auto sp = global_ui->window.svg_cache[filename].lock();
-   // printf("xxx SVG::load: cache locked OK\n");
 	if (!sp)
 		global_ui->window.svg_cache[filename] = sp = std::make_shared<SVG>(filename);
    // printf("xxx SVG::load: RETURN\n");

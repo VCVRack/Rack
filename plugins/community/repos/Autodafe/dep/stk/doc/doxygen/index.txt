@@ -1,0 +1,40 @@
+/*! \mainpage The Synthesis ToolKit in C++ (STK)
+
+\htmlonly
+<BODY BGCOLOR="white">
+<h3><center><a href="http://www.cs.princeton.edu/~prc/">Perry R. Cook</a> & <a href="http://music.mcgill.ca/~gary/">Gary P. Scavone</a></center></h3>
+\endhtmlonly
+
+The <B>Synthesis ToolKit in C++ (STK)</B> is a set of open source
+audio signal processing and algorithmic synthesis classes written in
+the C++ programming language.  STK was designed to facilitate rapid
+development of music synthesis and audio processing software, with an
+emphasis on cross-platform functionality, realtime control, ease of
+use, and educational example code.  The Synthesis ToolKit is extremely
+portable (it's mostly platform-independent C and C++ code), and it's
+completely user-extensible (all source included, no unusual libraries,
+and no hidden drivers).  We like to think that this increases the
+chances that our programs will still work in another 5-10 years.  In
+fact, the ToolKit has been working continuously for nearly 20 years
+now.  STK currently runs with realtime support (audio and MIDI) on
+Linux, Macintosh OS X, and Windows computer platforms.  Generic,
+non-realtime support has been tested under NeXTStep, Sun, and other
+platforms and should work with any standard C++ compiler.
+
+- \ref information
+- \ref classes
+- \ref download
+- \ref usage
+- \ref maillist
+- \ref system
+- \ref links
+- \ref faq
+- \ref tutorial
+
+*/
+
+<P>
+<FONT SIZE=-1>
+STK is a registered trademark of Analytical Graphics, Inc., 40 General Warren Blvd., Malvern, PA 19355, the manufacturer of the Satellite Tool Kit® (STK®) family of satellite simulation software.  Although the term "STK" is used in this website, the content of this site is in no way related to Analytical Graphics, Inc, or its registered STK mark.  Nothing in this website should be construed to mean that a business relationship, either past or present, exists between Analytical Graphics, Inc. and the owners of this particular website.
+</FONT>
+

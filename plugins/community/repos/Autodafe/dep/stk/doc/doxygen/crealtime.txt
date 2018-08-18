@@ -1,0 +1,74 @@
+/*! \page crealtime Realtime Audio (callback)
+
+An alternative scheme for audio input/output is to define a specific
+function in which audio computations are performed and to let the
+audio system call this function when more input/output data can be
+accepted by the hardware (referred to as a callback scheme).  In this
+section, we show how the previous <TT>rtsine.cpp</TT> program can be
+modified to work in a callback scenario.  There is no "single-sample"
+interface for this functionality.  The callback function will be
+invoked automatically by the audio system controller (RtAudio) when
+new data is needed and it is necessary to compute a full audio buffer
+of samples at that time (see \ref callback for further information).
+
+The previous section described the use of the stk::RtWvOut class for
+realtime audio output. The stk::RtWvOut::tick() function writes data to a
+large ring-buffer, from which data is periodically written to the
+computer's audio hardware via an underlying callback routine.
+
+\include crtsine.cpp
+
+The sinusoidal oscillator is created as before.  The instantiation of
+RtAudio requires quite a few more parameters, including output/input
+device and channel specifiers, the data format, and the desired buffer
+length (in frames).  In this example, we request a single output
+channel using the default output device, zero channels of input, the
+RtAudio data format which corresponds to an <tt>StkFloat</tt>, and the
+RT_BUFFER_SIZE defined in Stk.h.  The \c bufferFrames argument is an
+API-dependent buffering parameter (see RtAudio for further
+information).
+
+We also provide the audio system controller with a pointer to our
+callback function and an optional pointer to data that will be made
+available in the callback.  In this example, we need to pass only the
+pointer to the oscillator.  In more complex programs, it is typically
+necessary to put all shared data in a <tt>struct</tt> (see the next
+tutorial program for an example) or make use of global variables.
+
+Our callback routine is the \c tick() function.  Function arguments
+include pointers to the audio input and output data buffers, the
+buffer size (in frames), a stream time argument, a status argument to
+test for over/underruns, and the data pointer passed in the
+openStream() function (if it exists).  It is necessary to cast these
+pointers to their corresponding data types before use.  Our tick()
+routine simply "ticks" the oscillator for \c nBufferFrames counts and
+writes the result into the audio data buffer before returning.
+
+The \c main() function blocks at the std::cin.get() call until the
+user hits the "enter" key, after which the audio controller is shut
+down and program execution ends.
+
+\section callback Blocking vs. Callbacks
+
+Prior to version 4.2.0, all STK example projects and programs used
+blocking audio input/output functionality (typically with the RtWvIn,
+RtWvOut, or RtDuplex classes).  In many instances, a blocking scheme
+results in a clearer and more straight-forward program structure.
+Within a graphical user interface (GUI) programming context, however,
+callback routines are often more natural.
+
+In order to allow all STK programs to function with equal proficiency
+on all supported computer platforms, a decision was made to modify the
+example projects to use audio callback routines.  The result is a more
+complicated code structure, which is unfortunate given that we
+generally strive to make STK code as clear as possible for educational
+purposes.  This was especially an issue with the demo program because
+it is designed to function in both realtime and non-realtime contexts.
+The use of global variables has been avoided by defining data
+structures to hold all variables that must be accessible to the
+callback routine and other functions.  Alternative schemes for making
+control updates could be designed depending on particular program
+needs and constraints.
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="instruments.html">Next tutorial</A>]
+*/

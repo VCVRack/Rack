@@ -1,0 +1,3 @@
+[submodule "ext/LambertW"]
+	path = ext/LambertW
+	url = https://github.com/DarkoVeberic/LambertW.git

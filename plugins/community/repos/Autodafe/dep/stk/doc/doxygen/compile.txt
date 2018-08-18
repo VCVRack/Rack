@@ -1,0 +1,127 @@
+/*! \page compile Compiling
+
+The Synthesis ToolKit can be used in a variety of ways, depending on your particular needs.  Some people choose the classes they need for a particular project and copy those to their working directory.  Others create <TT>Makefiles</TT> that compile project-specific class objects from common <TT>src</TT> and <TT>include</TT> directories.  And still others like to compile and link to a common library of object files.  STK was not designed with one particular style of use in mind.
+
+
+\section rtvsnonrt "Realtime" vs. "Non-Realtime"
+
+Most of the Synthesis ToolKit classes are platform independent.  That
+means that they should compile on any reasonably current C++ compiler.
+The functionality needed for realtime audio and MIDI input/output, as
+well as realtime control message acquistion, is inherently platform
+and operating-system (OS) <I>dependent</I>.  STK classes that require
+specific platform/OS support include RtAudio, RtWvOut, RtWvIn,
+RtDuplex, RtMidi, InetWvIn, InetWvOut, Socket, UdpSocket, TcpServer,
+TcpClient, Thread, and Mutex.  These classes currently can only be
+compiled on Linux, Macintosh OS X, and Windows systems.
+
+Without the "realtime" classes, it is still possible to read SKINI
+scorefiles for control input and to read and write to/from a variety
+of audio file formats (WAV, SND, AIFF, MAT-file, and RAW).  If
+compiling for a "little-endian" host processor, the
+<TT>__LITTLE_ENDIAN__</TT> preprocessor definition should be provided.
+
+
+\section unix Unix Systems:
+
+STK compiles with realtime support on the following flavors of the Unix operating system: Linux, Irix, and Macintosh OS X.  Aside from differences in compilers, audio/MIDI APIs, and host endianness, the steps necessary to compile STK programs and classes on these platforms are the same.  The following table summarizes these differences.
+
+<CENTER>
+<TABLE BORDER=2 COLS=5 WIDTH="100%">
+<TR BGCOLOR="beige">
+  <TD WIDTH="5%"><B>OS:</B></TD>
+  <TD WIDTH="5%"><B>Realtime Audio/MIDI API:</B></TD>
+  <TD WIDTH="5%"><B>Preprocessor Definition:</B></TD>
+  <TD WIDTH="5%"><B>Library or Framework:</B></TD>
+</TR>
+<TR>
+  <TD>Linux</TD>
+  <TD>ALSA</TD>
+  <TD>__LINUX_ALSA__, __LITTLE_ENDIAN__</TD>
+  <TD><TT>asound, pthread</TT></TD>
+</TR>
+<TR>
+  <TD>Linux</TD>
+  <TD>OSS (version 4.0 only, use ALSA for MIDI support)</TD>
+  <TD>__LINUX_OSS__, __LINUX_ALSA__, __LITTLE_ENDIAN__</TD>
+  <TD><TT>asound, pthread</TT></TD>
+</TR>
+<TR>
+  <TD>Linux and Macintosh OS-X</TD>
+  <TD>Jack</TD>
+  <TD>__UNIX_JACK__, __LITTLE_ENDIAN__</TD>
+  <TD><TT>asound, pthread, jack</TT></TD>
+</TR>
+<TR>
+  <TD>Macintosh OS X</TD>
+  <TD>CoreAudio</TD>
+  <TD>__MACOSX_CORE__</TD>
+  <TD><TT>pthread, CoreAudio, CoreMIDI, CoreFoundation</TT></TD>
+</TR>
+</TABLE>
+</CENTER>
+
+The available C++ compilers on any of these systems can vary.
+
+One approach in using STK is to simply copy the class files needed for
+a particular program into a project directory.  Taking the
+<TT>sineosc.cpp</TT> example from the previous tutorial chapter, it
+would be necessary to set up a directory that includes the files
+<TT>sineosc.cpp</TT>, the rawwave file <TT>sinewave.raw</TT> in a
+subdirectory called <TT>rawwaves</TT>, and the header and source files
+for the classes Stk, FileRead, FileWrite, FileWvIn, FileLoop, and
+FileWvOut.  The program could then be compiled on a little-endian
+system, such as a PC running Linux, using the GNU g++ compiler as
+follows:
+\code g++ -Wall -D__LITTLE_ENDIAN__ -o sineosc Stk.cpp FileRead.cpp FileWrite.cpp FileWvIn.cpp FileLoop.cpp FileWvOut.cpp sineosc.cpp \endcode
+
+Note that the <TT>sineosc.cpp</TT> example does not make use of realtime audio or MIDI input/output classes.  For programs using any of the STK realtime classes mentioned above, it is necessary to specify an audio/MIDI API preprocessor definition and link with the appropriate libraries or frameworks.
+
+When working with a number of different projects that make use of ToolKit classes, the above approach can become cumbersome (especially when trying to synchronize with new STK releases).  Most of the STK projects (e.g., demo, effects, ...) contain <TT>Makefiles</TT> (built by the configure script) that compile project-specific class objects from the distribution <TT>src</TT> and <TT>include</TT> directories.  This approach makes it relatively easy when upgrading to a new STK release (by making path substitutions in the <TT>Makefile</TT> or by moving the projects to a similar relative path within the new STK source tree).  A <TT>Makefile</TT> is provided in the <TT>projects/examples</TT> directory for compiling all the tutorial programs, as well as other example programs.  To compile the <TT>sineosc.cpp</TT> program, for example, one need only type <TT>make sineosc</TT> from within the <TT>projects/examples</TT> directory.
+
+
+\subsection library Library Use:
+
+The STK distribution provides a <TT>Makefile</TT> that can be used on Unix systems to build a static library.  After unpacking the distribution (<TT>tar -xzf stk-4.x.x.tar.gz</TT>), run the configure script by typing <TT>./configure</TT> from the top level distribution directory (see the INSTALL file in the same directory for more information).  Then from within the <TT>src</TT> directory, type <TT>make</TT>.  After a successful build, you may wish to move the library (<TT>libstk.a</TT>) and the contents of the <TT>include</TT> directory to standard library and include search paths on your system.  For example, the linux RPM distribution of STK puts the library in <TT>/usr/lib/</TT> and the STK header files in <TT>/usr/include/stk/</TT>.
+
+Assuming the library is located in a standard search path and the header files are located in <TT>/usr/include/stk/</TT>, the <TT>sineosc.cpp</TT> example from the previous tutorial chapter can be compiled on a little-endian system using the GNU g++ compiler as follows:
+
+\code
+g++ -Wall -D__LITTLE_ENDIAN__ -I/usr/include/stk -o sineosc sineosc.cpp -lstk
+\endcode
+
+With the header files in a standard search path, it is possible to modify the <TT>\#include</TT> statements in the <TT>sineosc.cpp</TT> program as follows:
+
+\code
+#include "stk/FileLoop.h"
+#include "stk/FileWvOut.h"
+\endcode
+
+and then compile without an explicit include path argument to the compiler:
+
+\code
+g++ -Wall -D__LITTLE_ENDIAN__ -o sineosc sineosc.cpp -lstk
+\endcode
+
+
+\section compileWin Windows:
+
+STK has been tested on Windows platforms using the Visual .NET compiler
+only.  It is assumed here that you're familiar with Visual C++ and its
+particular idiosyncrasies.  STK won't compile in Visual C++ 6.0 any more.
+
+The approach when using Visual C++ is to build a project that
+includes the necessary ToolKit files from the distribution
+<TT>src</TT> and <TT>include</TT> directories.  For the example
+program from the previous tutorial chapter, create a VC++ console
+application project, add the Stk, FileRead, FileWrite, WvIn, FileWvIn,
+FileLoop, WvOut, and FileWvOut class files, as well as
+<TT>sineosc.cpp</TT>, and make sure the <TT>sinewave.raw</TT> file is
+in the subdirectory <TT>rawwaves</TT>.
+
+For programs using any of the STK realtime classes mentioned above, it is necessary to link with the DirectSound (<TT>dsound.lib</TT>), <TT>winmm.lib</TT>, and <TT>Wsock32.lib</TT> libraries, select the multithreaded library, and provide the <TT>__LITTLE_ENDIAN__</TT>, <TT>__WINDOWS_DS__</TT>, and <TT>__WINDOWS_MM__</TT> preprocessor definitions.
+
+For Steinberg ASIO support, use the <TT>__WINDOWS_ASIO__</TT> preprocessor definition (and the <TT>__WINDOWS_MM__</TT> definition for RtMidi support), include all the files in the <TT>src/asio/</TT> directory (i.e., <TT>asio.h,cpp</TT>, <TT>asiodrivers.h,cpp</TT>, ...), and link with the <TT>winmm.lib</TT>, and <TT>Wsock32.lib</TT> libraries.
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="filtering.html">Next tutorial</A>]
+*/

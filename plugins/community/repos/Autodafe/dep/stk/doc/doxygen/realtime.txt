@@ -1,0 +1,49 @@
+/*! \page realtime Realtime Audio (blocking)
+
+In this section, we modify the <TT>sineosc.cpp</TT> program in order
+to send the output to the default audio playback device on your
+computer system.  We also make use of the stk::SineWave class as a
+sine-wave oscillator.  stk::SineWave computes an internal, static sine-wave
+table when its first instance is created.  Subsequent instances make
+use of the same table.  The default table length, specified in
+SineWave.h, is 2048 samples.
+
+\include rtsine.cpp
+
+The class stk::RtWvOut is a protected subclass of stk::WvOut.  A number of
+optional constructor arguments can be used to fine tune its
+performance for a given system.  stk::RtWvOut provides a "single-sample",
+blocking interface to the RtAudio class.  Note that stk::RtWvOut (as well
+as the stk::RtWvIn class described below) makes use of RtAudio's callback
+input/output functionality by creating a large ring-buffer into which
+data is written.  These classes should not be used when low-latency
+and robust performance is necessary
+
+Though not used here, an stk::RtWvIn class exists as well that can be used
+to read realtime audio data from an input device.  See the
+<TT>record.cpp</TT> example program in the <TT>examples</TT> project
+for more information.
+
+It may be possible to use an instance of stk::RtWvOut and an instance of
+stk::RtWvIn to simultaneously read and write realtime audio to and from a
+hardware device or devices.  However, it is recommended to instead use
+a single instance of RtAudio to achieve this behavior, as described in the next section.
+See the <TT>effects</TT> project or the <TT>duplex.cpp</TT> example
+program in the <TT>examples</TT> project for more information.
+
+When using any realtime STK class (RtAudio, stk::RtWvOut, stk::RtWvIn, RtMidi, stk::InetWvIn, stk::InetWvOut, stk::Socket, stk::UdpSocket, stk::TcpServer, stk::TcpClient, and stk::Thread), it is necessary to specify an audio/MIDI API preprocessor definition and link with the appropriate libraries or frameworks.  For example, the above program could be compiled on a Linux system using the GNU g++ compiler and the ALSA audio API as follows (assuming all necessary files exist in the project directory):
+
+\code
+g++ -Wall -D__LINUX_ALSA__ -D__LITTLE_ENDIAN__ -o rtsine Stk.cpp Generator.cpp SineWave.cpp WvOut.cpp \
+    RtWvOut.cpp RtAudio.cpp rtsine.cpp -lpthread -lasound
+\endcode
+
+On a Macintosh OS X system, the syntax would be:
+
+\code
+g++ -Wall -D__MACOSX_CORE__ -o rtsine Stk.cpp Generator.cpp SineWave.cpp WvOut.cpp RtWvOut.cpp RtAudio.cpp \
+   rtsine.cpp -lpthread -framework CoreAudio -framework CoreMIDI -framework CoreFoundation
+\endcode
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="crealtime.html">Next tutorial</A>]
+*/

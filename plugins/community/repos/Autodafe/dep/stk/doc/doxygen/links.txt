@@ -1,0 +1,25 @@
+/*! \page links Miscellaneous Links
+
+- <A HREF="http://www.music.mcgill.ca/~gary/rtaudio/">The %RtAudio WWW site</A>
+
+- <A HREF="http://www.music.mcgill.ca/~gary/rtmidi/">The %RtMidi WWW site</A>
+
+- <A HREF="http://momu.stanford.edu/stk/">MoMu-Stk: A lightly modified version of STK that supports the iPhone platform (iPhone, iPad, iPod Touches)</A>
+
+- <A HREF="http://ccrma.stanford.edu/~woony/software/stkx/">StkX: A Cocoa STK Framework for Mac OS X by Woon Seung Yeo</A>
+
+- <A HREF="http://sourceforge.net/projects/mobilestk">Mobile STK: A port of STK for mobile devices by Georg Essl and Michael Rohs</A>
+
+- <A HREF="http://chuck.cs.princeton.edu/">ChucK: Concurrent, On-the-fly Audio Programming Language</A> using STK unit generators
+
+- <A HREF="http://kern.ccarh.org">Kern Scores: A Library of Electronic Musical Scores</A> (with automatic conversion to SKINI format)
+
+- <A HREF="http://stk.sapp.org/midi2skini">MIDI to SKINI file converter</A> by Craig Sapp
+
+- <A HREF="http://extra.humdrum.org/example/kern2skini/">Kern Score to SKINI file converter</A> by Craig Sapp
+
+- <A HREF="http://www.music.columbia.edu/PeRColate/">PeRColate: A Port of STK for Max/MSP</A>
+
+- <a href="http://airy.andre.online.fr/AU/index.html">AUStk: a demo of integration of STK instruments into an AudioUnit</a> by Airy Andre
+
+*/

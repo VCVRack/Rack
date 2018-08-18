@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+# treesed
+# Written January 1996 by Rick Jansen (rick@sara.nl)
+# URL: http://www.sara.nl/rick
+
+# usage: treesed pattern1 pattern2 -tree 
+#        treesed pattern1 pattern2 -files file1 file2 ... 
+
+# example: treesed href HREF -files *.html
+
+# Treesed searches for pattern1 and replaces pattern1 by pattern2
+# if pattern2 supplied. If only pattern1 given treesed just searches.
+# Treesed will search in all files and subdirectories of the current
+# directory
+
+
+
+#--------------------------------------------------------
+# Parameters
+
+$DoEdit=0;
+$search_pattern = $ARGV[0];
+$search_pattern =~ s/(\W)/\\$1/g;  # escape regexp chars
+shift;
+
+while ($#ARGV >= 0) {
+  
+  if ($ARGV[0] eq '-files') {
+    @temp_ls = @ARGV[1 ..  $#ARGV];
+    # Get list of files, skip dirs
+    foreach $file (@ARGV[1 ..  $#ARGV]) {
+      if (-f $file) { 
+        push(@ls, $file); 
+      }
+    }
+    last;
+  }
+  elsif ($ARGV[0] eq '-tree') {
+    &Get_LS;
+    last;
+  }
+
+  if (! -f $ARGV[0]) {
+    if (defined($replacement_pattern)) {
+      print "usage: treesed pattern1 <pattern2> -tree/-files <files>\n";
+      exit(1);
+    }
+
+    $replacement_pattern = $ARGV[0];
+    #$replacement_pattern =~ s/(\W)/\\$1/g;  # escape regexp chars
+    $DoEdit=1;
+    shift;
+  }
+
+}
+
+# No files?
+if ($#ls < 0) {
+  print "xx No input files\n";
+  exit(1);
+}
+
+print "search_pattern: $search_pattern\n";
+print "replacement_pattern: $replacement_pattern\n";
+if ($DoEdit) {
+  print "\n** EDIT MODE!\n\n"; }
+else {
+  print "\n** Search mode\n\n";
+}
+
+#foreach $file (@ls) {
+#  print "$file \n";
+#}
+  
+
+#--------------------------------------------------------
+# Search list of files for pattern
+
+$linepos=0;
+
+$| = 1;  # Force flush after every write
+foreach $file (@ls) {
+  #print "$file\n";
+  print '.';
+  $linepos++;
+  if ($linepos > 50) {
+    $linepos=0;
+    print "\n";
+  }
+
+  if (!open(FILE, $file)) {
+    print "\nCould not open $file\n";
+    next;
+  }
+
+  $Found = 0;
+  $Count = 0;
+  $lineno = 0;
+  @lines = ();
+  while (<FILE>) {
+    $lineno++;
+    if (/$search_pattern/i) {
+      #print;
+      $Count++; 
+      $Found = 1;
+      push(@lines, $lineno);
+    }
+  }
+  close(FILE);
+  if ($Found) { 
+    print "\n$file: $Count lines on: @lines\n"; 
+  }
+
+  if ($Found && $DoEdit) { &Edit($file); }
+  
+}
+$| = 0;
+print "\n";
+
+
+exit(0);
+
+
+#--------------------------------------------------------
+# Edit file
+
+sub Edit {
+
+# Replace $ARGV[0] with $ARGV[1] in $file
+
+local($file) = @_;
+local($bakfile) = $file.'.'.$$;
+
+# First create backup
+open(FILE, $file) || die "Could not open $file for read\n";
+open(BAKFILE, ">$bakfile")  || die "Could not open $bakfile for backup\n";
+while (<FILE>) {
+  print BAKFILE;
+}
+close(BAKFILE);
+close(FILE);
+
+# Now replace $ARGV[0] by $ARGV[1] in the backupfile, 
+# result into $file
+open(BAKFILE, $bakfile) || die "Could not open $bakfile for read\n";
+open(FILE,">$file") || die "Could not open $file for write\n";
+$Count=0;
+while (<BAKFILE>) {
+  if (/$search_pattern/i) { $Count++; }
+  s/$search_pattern/$replacement_pattern/gi;
+  print FILE;
+}
+close(BAKFILE);
+close(FILE);
+
+print 
+"\nReplaced $search_pattern by $replacement_pattern on $Count lines in $file\n";
+
+}  #sub Edit
+
+#--------------------------------------------------------
+
+sub Get_LS {
+
+# Get a list of full path names into array @ls
+
+local(@localls)=`ls -R1`;
+local($item,$Dir);
+
+#print "localls: @localls\n";
+$Dir='';
+foreach $item (@localls) {
+  #print "$item\n";
+  if ($item =~ /:$/) { 
+    $Dir=$item; 
+    chop($Dir);
+    $Dir =~ s/:$/\//;
+  }
+  else {
+    chop($item);
+    $item = $Dir.$item;
+    if ($item !~ /^\s*$/) { push(@ls, $item); }
+  }
+}
+@localls=();
+
+}  # sub Get_LS
+

@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\M581Module.cpp" />
+    <ClCompile Include="..\..\src\oscImplementation.cpp" />
+    <ClCompile Include="..\..\src\oscTestModule.cpp" />
+    <ClCompile Include="..\..\src\pwmClock.cpp" />
+    <ClCompile Include="..\..\src\RenatoModule.cpp" />
+    <ClCompile Include="..\..\src\Sequencers.cpp" />
+    <ClCompile Include="..\..\src\SpiraloneModule.cpp" />
+    <ClCompile Include="..\..\src\sprlnSequencer.cpp" />
+    <ClCompile Include="..\..\src\Z8KModule.cpp" />
+    <ClCompile Include="..\..\src\KleeModule.cpp" />
+    <ClCompile Include="..\..\src\lpTestModule.cpp" />
+    <ClCompile Include="..\..\src\quantizer.cpp" />
+    <ClCompile Include="..\..\src\burst.cpp" />
+    <ClCompile Include="..\..\src\uncert.cpp" />
+    <ClCompile Include="..\..\src\attenuator.cpp" />
+    <ClCompile Include="..\..\src\boole.cpp" />
+    <ClCompile Include="..\..\src\switch.cpp" />
+    <ClCompile Include="..\..\src\mplex.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\digitalExt\communicator.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\digitalExt\driver_include.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Klee.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\digitalExt\launchpad.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\digitalExt\launchpadControls.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lpTestModule.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\M581.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z8kSequencer.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sprlnSequencer.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\SpiraloneModule.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Spiralone.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rntSequencer.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Renato.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pwmClock.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oscTestModule.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\digitalExt\osc\oscDriver.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\digitalExt\osc\oscControl.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\digitalExt\osc\oscCommunicator.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\digitalExt\osc\oscCircBuff.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\M581Types.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Z8K.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\quantizer.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\burst.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uncert.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\attenuator.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\boole.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\switch.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mplex.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\res\counterSwitchPot.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\counterSwitchPotHandle.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\counterSwitchShort.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\digitalLed_off.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\digitalLed_on.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\KleeModule.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\M581Module.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\Patternbtn_0.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\Patternbtn_1.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\PJ301G.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\PJ301R.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\PJ301W.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\PJ301Y.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\RenatoModule.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\SpiraloneModule.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\Z8KModule.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\Burst.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\res\uncert.svg">
+      <Filter>res</Filter>
+    </None>
+    <None Include="..\..\makefile_digital">
+      <Filter>makefile</Filter>
+    </None>
+    <None Include="..\..\Makefile">
+      <Filter>makefile</Filter>
+    </None>
+    <None Include="..\..\makefile_osc">
+      <Filter>makefile</Filter>
+    </None>
+    <None Include="..\..\makefile_lp">
+      <Filter>makefile</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{e93de1e4-d638-48bb-8bd6-f8f61822be5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{64188b20-3ca0-401b-a26b-79400811a771}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="makefile">
+      <UniqueIdentifier>{304b5b48-b31c-45eb-8946-c09bbba21d85}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

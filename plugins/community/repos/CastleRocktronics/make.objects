@@ -1,0 +1,5 @@
+ALL_OBJ= \
+	src/castle_rocktronics.o \
+	src/cubefader.o \
+	src/cubefader_widget.o \
+	src/shaded_knob.o

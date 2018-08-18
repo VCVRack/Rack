@@ -1,0 +1,44 @@
+Just the beginning of a manual for the FG8 and Psychtone plugins.
+
+FG8 Basics:
+
+The FG8 is a pseudo-random tone sequence generator. Its output is a regular control voltage.
+
+The FG8 is like a traditional sequencer, in fact out of the box it can basically function as such. Instead of only shifting an active channel along the stages, however, this sequencer provides multiple active stages.
+
+As the clock shifts the contents:
+
+1. In Fibonacci mode, the top bit is computed as the parity of the selected taps.
+
+OR
+
+2. In Galois mode, the shift register is broadside loaded according to the selected taps IF the bottom bit is 1.
+
+Set or clear any bit in the register by clicking the red LEDs.
+
+Select the tap (feedback) bits by clicking the blue LEDs. Different taps will result in pseudo-random sequences of various lengths.
+
+The gate select controls when gate signals are generated. If any shift register bit is ON and its corresponding gate control is on, a gate is generated.
+
+The gate mode can be used to suppress output voltage changes in cases where no gate signal would be generated.
+
+Lastly, the outputs are the sum of all active shift register stages. A single bit circulating (initial setting) just gives the row voltage just like a regular sequencer. If more 1s are shifting along, the active row pots contribute.
+
+The row knobs are snappy and so constrained to even tempered output voltages. This means that the random sequences will also be. A switch allows final note selection to be from all twelve semitones or just those of a major scale.
+
+This is just a sketch, as usual experimentation will reveal more. I'll try to put up a patch of something mildly interesting.
+
+Psychtone basics:
+
+The Psychtone is a re-creation of the note generating logic of Don Lancaster's 1971 Psychtone Music Composer-Synthesizer, which real device also include a rudimentary volume envelope and voice generator. Those functions are external to the re-creation and would normally be supplanted by a VCO-VCF-VCA chain.
+
+The basic sequencer is a 6-bit LFSR with four modes of feedback selected by the "rev/fwd" and "up/down" switches. Why they are labeled as such is a total mystery to me - I cannot hear anything particularly "up" and "fwd" about that setting, for example. But there you have it, I have studied the schematics of the original device and written logic to produce the same sequences.
+
+The three large knobs step through 12 settings and each also has a smaller "weight" knob atop it.
+
+Each knob selects one of the 12 bits available in the shift register (6 true and 6 inverted). When a selected bit is active, that knob's weight controller determines the control voltage difference fed to the sum of all three knobs. This sum becomes the output of the machine.
+
+It's not too hard to get it making "music". It is a bit trickier getting it to do much of interest, butI had a great deal of fun writing this plugin and I hope you have some amusement in case you didn't get one when you were 11 ($47.65 + postage and insurance) or missed that Ebay auction where one recently fetched $1550.
+
+
+

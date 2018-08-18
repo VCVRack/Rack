@@ -1,0 +1,9 @@
+ALL_OBJ= \
+	src/a7Utility.o \
+	src/Amuse.o \
+	src/cheapFX.o \
+	src/Divada.o \
+	src/FG8.o \
+	src/LFSR.o \
+	src/Psychtone.o \
+	src/YASeq3.o

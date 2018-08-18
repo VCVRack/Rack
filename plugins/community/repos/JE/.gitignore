@@ -1,0 +1,59 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Editors files
+*.swp
+*.user
+
+# Sed junks
+*--
+
+# Builds dirs
+[Bb]uild*
+
+# DSYM
+*.DSYM*
+
+# MacOS junks
+.DS_Store
+
+# Vim files
+*.swp
+.session*
+
+# kdiff3 files
+*.orig
+
+# Tests
+Testing/*
+
+profiling
+
+# QT creator
+*.autosave

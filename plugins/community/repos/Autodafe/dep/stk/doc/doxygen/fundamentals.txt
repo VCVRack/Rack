@@ -1,0 +1,65 @@
+/*! \page fundamentals STK Fundamentals
+
+The Synthesis ToolKit is implemented in the C++ programming language.  STK does not attempt to provide a new programming environment or paradigm but rather provides a set of objects that can be used within a normal C++ programming framework.  Therefore, it is expected that users of STK will have some familiarity with C/C++ programming concepts.  That said, the STK classes do have some particular idiosyncrasies that we will mention here.  Starting with STK version 4.4, all STK classes except RtAudio and RtMidi are defined within the stk namespace.
+
+\section Signal Computations:
+
+Audio and control signals throughout STK use a floating-point data type, <tt>StkFloat</tt>, the exact precision of which can be controlled via a typedef statement in Stk.h.  By default, an StkFloat is a double-precision floating-point value.  Thus, the ToolKit can use any normalization scheme desired. The base instruments and algorithms are implemented with a general audio sample dynamic maximum of +/-1.0.
+
+In general, the computation and/or passing of values is performed on a "single-sample" basis.  For example, the stk::Noise class outputs random floating-point numbers in the range +/-1.0.  The computation of such values occurs in the stk::Noise::tick() function.  The following program will generate 20 random floating-point (<tt>StkFloat</tt>) values in the range -1.0 to +1.0:
+
+\code
+#include "Noise.h"
+using namespace stk;
+
+int main()
+{
+  StkFloat output;
+  Noise noise;
+
+  for ( unsigned int i=0; i<20; i++ ) {
+    output = noise.tick();
+    std::cout << "i = " << i << " : output = " << output << std::endl;
+  }
+
+  return 0;
+}
+\endcode
+
+Nearly all STK classes implement <TT>tick()</TT> functions that take and/or return sample values. Within the <TT>tick()</TT> function, the fundamental sample calculations are performed for a given class.  Most STK classes consume/generate a single sample per operation and their <TT>tick()</TT> method takes/returns each sample "by value".  In addition, every class implementing a <TT>tick()</TT> function also provides one or more overloaded <TT>tick()</TT> functions that can be used for vectorized computations, as shown in the next example.
+
+\code
+#include "Noise.h"
+using namespace stk;
+
+int main()
+{
+  StkFrames output(20, 1);   // initialize StkFrames to 20 frames and 1 channel (default: interleaved)
+  Noise noise;
+
+  noise.tick( output );
+  for ( unsigned int i=0; i<output.size(); i++ ) {
+    std::cout << "i = " << i << " : output = " << output[i] << std::endl;
+  }
+
+  return 0;
+}
+\endcode
+
+In this way, it might be possible to achieve improved processing efficiency using vectorized computations.  The StkFrames class is a relatively new addition to the ToolKit to provide a general "mechanism" for handling and passing vectorized, multi-channel audio data.  The StkFrames "type" provides functions to set and/or determine the number of audio channels and sample frames it holds.  Further, the StkFrames class provides data interpolation and subscripting functionality by frame/channel values.
+
+\section STK Inheritance:
+
+Nearly all STK classes inherit from the Stk abstract base class, which provides common functionality related to error reporting, sample rate control, and byte swapping.  Several other base classes exist that roughly group many of the classes according to function as follows:
+
+- stk::Generator: source signal unit generator classes [stk::Envelope, stk::ADSR, stk::Asymp, stk::Noise, stk::SubNoise, stk::Modulate, stk::SingWave, stk::SineWave, stk::Blit, stk::BlitSaw, stk::BlitSquare, stk::Granulate]
+- stk::Filter: digital filtering classes [stk::OneZero, stk::OnePole, stk::PoleZero, stk::TwoZero, stk::TwoPole, stk::BiQuad, stk::FormSwep, stk::Delay, stk::DelayL, stk::DelayA, stk::TapDelay]
+- stk::Function: input to output function mappings [stk::BowTable, stk::JetTable, stk::ReedTable]
+- stk::Instrmnt: sound synthesis algorithms, including physical, FM, modal, and particle models
+- stk::Effect: sound processing effect classes [stk::Echo, stk::Chorus, stk::PitShift, stk::PRCRev, stk::JCRev, stk::NRev]
+- stk::WvOut: audio data output classes [stk::FileWvOut, stk::RtWvOut, stk::InetWvOut]
+- stk::WvIn: audio data input classes [stk::FileWvIn, stk::FileLoop, stk::RtWvIn, stk::InetWvIn]
+
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="hello.html">Next tutorial</A>] 
+*/

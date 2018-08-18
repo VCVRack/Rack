@@ -1,0 +1,30 @@
+/*! \page multichannel Multi-Channel I/O
+
+The ToolKit stk::WvIn and stk::WvOut classes (and their subclasses) support multi-channel audio data input and output.  Several other abstract base classes, such as stk::Instrmnt, stk::Generator, and stk::Effect, also support multi-channel computations though not all of their subclasses produce or take multi-channel data.  A set of interleaved audio samples representing a single time "slice" is referred to as a <I>sample frame</I>.  At a sample rate of 44.1 kHz, a four-channel audio stream will have 44100 sample frames per second and a total of 176400 individual samples per second.
+
+Most STK classes process single-sample data streams via their
+<TT>tick()</TT> function.  For classes supporting multi-channel data,
+one must distinguish the <TT>tick()</TT> functions taking or producing
+single \c StkFloat arguments from those taking stk::StkFrames& arguments.  If
+a single-sample version of the <TT>tick()</TT> function is called for
+these classes, a full sample frame is computed but only a single value
+is either input and/or output.  For example, if the single-sample
+<TT>tick()</TT> function is called for subclasses of WvOut, the sample
+argument is written to all channels in the one computed frame.  For
+classes returning values, an optional \c channel argument specifies
+which channel value is returned from the computed frame (the default
+is always channel 0). To input and/or output multichannel data to
+these classes, the overloaded <TT>tick()</TT> functions taking
+StkFrames reference arguments should be used.
+
+Multi-channel support for realtime audio input and output is dependent on the audio device(s) available on your system.
+
+The following example demonstrates the use of the stk::FileWvOut class for
+creating a four channel, 16-bit AIFF formatted audio file.  We will
+use four sinewaves of different frequencies for the first two seconds
+and then a single sinewave for the last two seconds.
+
+\include foursine.cpp
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="polyvoices.html">Next tutorial</A>]
+*/

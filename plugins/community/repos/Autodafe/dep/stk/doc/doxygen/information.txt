@@ -1,0 +1,133 @@
+/*! \page information General Information
+
+<H3>References</H3>
+<UL>
+<LI><A HREF="papers/stkupdate.pdf">ICMC2005 Paper</A></LI>
+<BR>
+A paper by Gary and Perry detailing recent updates to the Synthesis ToolKit in C++.
+<P>
+<LI><A HREF="papers/stkicmc99.pdf">ICMC99 Paper</A></LI>
+<BR>
+A not-so-recent paper by Perry and Gary about the Synthesis ToolKit in C++.
+<P>
+<LI>Book Chapter: <A HREF="http://www.akpeters.com/product.asp?ProdCode=1047">Audio Anecdotes</A></LI>
+<BR>
+Here's a link to a book that includes an chapter on STK.
+</UL>
+
+
+<H4>What is the <I>Synthesis ToolKit</I>?</H4>
+
+The Synthesis ToolKit in C++ (STK) is a set of open source audio signal processing and algorithmic synthesis classes written in the C++ programming language.  STK was designed to facilitate rapid development of music synthesis and audio processing software, with an emphasis on cross-platform functionality, realtime control, ease of use, and educational example code.  The Synthesis ToolKit is extremely portable (it's mostly platform-independent C and C++ code), and it's completely user-extensible (all source included, no unusual libraries, and no hidden drivers).  We like to think that this increases the chances that our programs will still work in another 5-10 years.  In fact, the ToolKit has been working continuously for nearly 20 years now.  STK currently runs with realtime support (audio and MIDI) on Linux, Macintosh OS X, and Windows computer platforms.  Generic, non-realtime support has been tested under NeXTStep, Sun, and other platforms and should work with any standard C++ compiler.
+
+The Synthesis ToolKit is free.  The only parts of the Synthesis ToolKit that are platform-dependent concern real-time audio and MIDI input and output, and that is taken care of with a few special classes.  The interface for MIDI input and the simple <A HREF="http://dev.scriptics.com">Tcl/Tk</A> graphical user interfaces (GUIs) provided is the same, so it's easy to experiment in real time using either the GUIs or MIDI.  The Synthesis ToolKit can generate simultaneous SND (AU), WAV, AIFF, and MAT-file output soundfile formats (as well as realtime sound output), so you can view your results using one of a large variety of sound/signal analysis tools already available (e.g. <A HREF="http://www-ccrma.stanford.edu/software/snd/">Snd</A>, Cool Edit, Matlab). 
+
+
+<H4>What the <I>Synthesis ToolKit</I> is not.</H4>
+
+The Synthesis Toolkit is not one particular program.  Rather, it is a set of C++ classes that you can use to create your own programs.  A few example applications are provided to demonstrate some of the ways to use the classes.  If you have specific needs, you will probably have to either modify the example programs or write a new program altogether. Further, the example programs don't have a fancy GUI wrapper.  It is easy to embed STK classes inside a GUI environment but we have chosen to focus our energy on the audio signal processing issues.  Spending hundreds of hours making platform-dependent graphical user interfaces would go against one of the fundamental design goals of the ToolKit - platform independence.
+
+For those instances where a simple GUI with sliders and buttons is helpful, we use <A HREF="http://dev.scriptics.com">Tcl/Tk</A> (that is freely distributed for all the supported ToolKit platforms). A number of Tcl/Tk GUI scripts are distributed with the ToolKit release.  For control, the Synthesis Toolkit uses raw MIDI (on supported platforms), and SKINI (Synthesis ToolKit Instrument Network Interface, a MIDI-like text message synthesis control format).
+
+<H4>A brief history of the <I>Synthesis ToolKit in C++.</I></H4>
+
+Perry Cook began developing a pre-cursor to the Synthesis ToolKit
+(also called STK) under NeXTStep at the Center for Computer Research
+in Music and Acoustics (CCRMA) at Stanford University in the
+early-1990s.  With his move to Princeton University in 1996, he ported
+everything to C++ on SGI hardware, added real-time capabilities, and
+greatly expanded the synthesis techniques available.  With the help of
+Bill Putnam, Perry also made a port of STK to Windows95.  Gary Scavone
+began using STK extensively in the summer of 1997 and completed a full
+port of STK to Linux early in 1998. He finished the fully compatable
+Windows port (using Direct Sound API) in June 1998.  Numerous
+improvements and extensions have been made since then.
+
+The Toolkit has been distributed continuously since 1996 via the <A
+HREF="http://www.music.princeton.edu/psk">Princeton Sound Kitchen</A>,
+<A HREF="http://www.cs.princeton.edu/~prc">Perry Cook's home page</A>
+at Princeton, <A HREF="http://www.music.mcgill.ca/~gary/">Gary
+Scavone's home page</A> at McGill University, and the <A HREF="http://ccrma.stanford.edu/software/stk">Synthesis ToolKit
+home page</A>.  The ToolKit has been included in various collections
+of software.  Much of it has also been ported to Max/MSP on Macintosh
+computers by Dan Trueman and Luke Dubois of Columbia University, and
+is distributed as <A
+HREF="http://music.columbia.edu/PeRColate">PeRColate</A>.  Help on
+real-time sound and MIDI has been provided over the years by Tim
+Stilson, Bill Putnam, and Gabriel Maldonado.
+
+<H4>Legal and Ethical Notes</H4>
+
+This software was designed and created to be made publicly available
+for free, primarily for academic purposes, so if you use it, pass it
+on with this documentation, and for free.  If you make a million
+dollars with it, it would be nice if you would share.  If you make
+compositions with it, put us in the program notes.
+
+Some of the concepts are covered by various patents, some known to us
+and likely others that are unknown.  Many of the ones known to us are
+administered by the Stanford Office of Technology and Licensing.  The
+good news is that large hunks of the techniques used here are public
+domain.  To avoid subtle legal issues, we will not state what's freely
+useable here, but we will try to note within the various classes where
+certain things are likely to be protected by patents.
+
+<H4>License</H4>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+Any person wishing to distribute modifications to the Software is
+asked to send the modifications to the original developer so that they
+can be incorporated into the canonical version.  This is, however, not
+a binding provision of this license.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+<H4>Disclaimer</H4>
+
+STK is free and we do not guarantee anything.  We've been hacking on this code for a while now and most of it seems to work pretty well.  But, there surely are some bugs floating around.  Sometimes things work fine on one computer platform but not so fine on another.  FPU overflows and underflows cause <I>very</I> weird behavior that also depends on the particular CPU and OS.  Let us know about bugs you find and we'll do our best to correct them.
+
+<H4>Perry's Notes From the Original Distribution of STK</H4>
+
+This whole world was created with no particular hardware in mind.  These examples are intended to be tutorial in nature, as a platform for the continuation of my research, and as a possible starting point for a software synthesis system.  The basic motivation was to create the necessary unit generators to do the synthesis, processing, and control that I want to do and teach about.  Little thought for optimization was given and therefore improvements, especially speed enhancements, should be possible with these classes.  It was written with some basic concepts in mind about how to let compilers optimize.
+
+Your question at this point might be, "But Perry, with CMix, CMusic, CSound, CShells, CMonkeys, etc. already cluttering the landscape, why a new set of stupid C functions for music synthesis and processing?"  The answers lie below.
+
+<ol>
+<li>I needed to port many of the things I've done into something that is generic enough to port further to different machines.</li>
+
+<li>I really plan to document this stuff, so that you don't have to be me to figure out what's going on. (I'll probably be sorry I said this in a couple of years, when even I can't figure out what I was thinking.)</li>
+
+<li>The classic difficulties most people have in trying to implement physical models are:
+
+<ul>
+<li>They have trouble understanding the papers, and/or in turning the theory into practice.</li>
+
+<li>The physical model instruments are a pain to get to oscillate, and coming up with stable and meaningful parameter values is required to get the models to work at all.</li>
+</ul>
+
+This set of C++ unit generators and instruments might help to diminish the scores of emails I get asking what to do with those block diagrams I put in my papers.</li>
+
+<li>I wanted to try some new stuff with modal synthesis, and implement some classic FM patches as well.</li>
+
+<li>I wanted to reimplement, and newly implement more of the intelligent and physical performer models I've talked about in some of my papers. But I wanted to do it in a portable way, and in such a way that I can hook up modules quickly.  I also wanted to make these instruments connectable to such player objects, so folks like Brad Garton who really think a lot about the players can connect them to my instruments, a lot about which I think.</li>
+
+<li>More rationalizations to follow ...</li>
+</ol>
+
+*/

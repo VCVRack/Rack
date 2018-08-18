@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{2A272680-AED9-4EA2-A04E-734331A8E70F}</ProjectGuid>
+    <RootNamespace>RackPlugins</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)..\..\..\include\util;$(SolutionDir)..\..\..\include\dsp;$(SolutionDir)..\..\..\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);OSC_ENABLE;OSCTEST_MODULE:LAUNCHPAD</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\digitalExt\communicator.hpp" />
+    <ClInclude Include="..\..\digitalExt\driver_include.hpp" />
+    <ClInclude Include="..\..\digitalExt\launchpad.hpp" />
+    <ClInclude Include="..\..\digitalExt\launchpadControls.hpp" />
+    <ClInclude Include="..\..\digitalExt\osc\oscCircBuff.hpp" />
+    <ClInclude Include="..\..\digitalExt\osc\oscCommunicator.hpp" />
+    <ClInclude Include="..\..\digitalExt\osc\oscControl.hpp" />
+    <ClInclude Include="..\..\digitalExt\osc\oscDriver.hpp" />
+    <ClInclude Include="..\..\src\attenuator.hpp" />
+    <ClInclude Include="..\..\src\burst.hpp" />
+    <ClInclude Include="..\..\src\common.hpp" />
+    <ClInclude Include="..\..\src\Klee.hpp" />
+    <ClInclude Include="..\..\src\boole.hpp" />
+    <ClInclude Include="..\..\src\lpTestModule.hpp" />
+    <ClInclude Include="..\..\src\M581.hpp" />
+    <ClInclude Include="..\..\src\M581Types.hpp" />
+    <ClInclude Include="..\..\src\mplex.hpp" />
+    <ClInclude Include="..\..\src\oscTestModule.hpp" />
+    <ClInclude Include="..\..\src\pwmClock.hpp" />
+    <ClInclude Include="..\..\src\quantizer.hpp" />
+    <ClInclude Include="..\..\src\Renato.hpp" />
+    <ClInclude Include="..\..\src\rntSequencer.hpp" />
+    <ClInclude Include="..\..\src\Spiralone.hpp" />
+    <ClInclude Include="..\..\src\SpiraloneModule.hpp" />
+    <ClInclude Include="..\..\src\sprlnSequencer.hpp" />
+    <ClInclude Include="..\..\src\switch.hpp" />
+    <ClInclude Include="..\..\src\uncert.hpp" />
+    <ClInclude Include="..\..\src\Z8K.hpp" />
+    <ClInclude Include="..\..\src\z8kSequencer.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\attenuator.cpp" />
+    <ClCompile Include="..\..\src\burst.cpp" />
+    <ClCompile Include="..\..\src\KleeModule.cpp" />
+    <ClCompile Include="..\..\src\boole.cpp" />
+    <ClCompile Include="..\..\src\lpTestModule.cpp" />
+    <ClCompile Include="..\..\src\M581Module.cpp" />
+    <ClCompile Include="..\..\src\mplex.cpp" />
+    <ClCompile Include="..\..\src\oscImplementation.cpp" />
+    <ClCompile Include="..\..\src\oscTestModule.cpp" />
+    <ClCompile Include="..\..\src\pwmClock.cpp" />
+    <ClCompile Include="..\..\src\quantizer.cpp" />
+    <ClCompile Include="..\..\src\RenatoModule.cpp" />
+    <ClCompile Include="..\..\src\Sequencers.cpp" />
+    <ClCompile Include="..\..\src\SpiraloneModule.cpp" />
+    <ClCompile Include="..\..\src\sprlnSequencer.cpp" />
+    <ClCompile Include="..\..\src\switch.cpp" />
+    <ClCompile Include="..\..\src\uncert.cpp" />
+    <ClCompile Include="..\..\src\Z8KModule.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Makefile" />
+    <None Include="..\..\makefile_digital" />
+    <None Include="..\..\makefile_lp" />
+    <None Include="..\..\makefile_osc" />
+    <None Include="..\..\res\Burst.svg" />
+    <None Include="..\..\res\counterSwitchPot.svg" />
+    <None Include="..\..\res\counterSwitchPotHandle.svg" />
+    <None Include="..\..\res\counterSwitchShort.svg" />
+    <None Include="..\..\res\digitalLed_off.svg" />
+    <None Include="..\..\res\digitalLed_on.svg" />
+    <None Include="..\..\res\KleeModule.svg" />
+    <None Include="..\..\res\M581Module.svg" />
+    <None Include="..\..\res\Patternbtn_0.svg" />
+    <None Include="..\..\res\Patternbtn_1.svg" />
+    <None Include="..\..\res\PJ301G.svg" />
+    <None Include="..\..\res\PJ301R.svg" />
+    <None Include="..\..\res\PJ301W.svg" />
+    <None Include="..\..\res\PJ301Y.svg" />
+    <None Include="..\..\res\RenatoModule.svg" />
+    <None Include="..\..\res\SpiraloneModule.svg" />
+    <None Include="..\..\res\uncert.svg" />
+    <None Include="..\..\res\Z8KModule.svg" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

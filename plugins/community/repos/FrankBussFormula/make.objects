@@ -1,0 +1,7 @@
+ALL_OBJ= \
+	src/formula/Evaluator.o \
+	src/formula/Formula.o \
+	src/formula/Parser.o \
+	src/formula/Token.o \
+	src/MyModule.o \
+	src/Template.o

@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{419E6FB8-7771-4D87-92B8-387D872E79BE}</ProjectGuid>
+    <RootNamespace>Rack</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Rack\src\app\app.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\AudioWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\CircularShadow.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\Knob.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\LedDisplay.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\LightWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\MidiWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\ModuleBrowser.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\ModuleLightWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\ModuleWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\MultiLightWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\Panel.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\ParamWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\PluginManagerWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\Port.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\RackRail.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\RackScene.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\RackScrollWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\RackWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\SpriteKnob.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\SVGFader.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\SVGKnob.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\SVGPanel.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\SVGPort.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\SVGScrew.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\SVGSwitch.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\Toolbar.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\WireContainer.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\app\WireWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\asset.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\audio.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\AudioInterface.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\Blank.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\Core.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\MIDICCToCVInterface.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\MidiClockToCV.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\MidiIO.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\MIDIToCVInterface.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\MIDITriggerToCVInterface.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\Notes.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\Core\QuadMIDIToCVInterface.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\dsp\minblep.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\engine.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\main.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\midi.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\plugin.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\settings.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\tags.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\Button.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\ChoiceButton.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\Label.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\layouts.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\List.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\Menu.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\MenuItem.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\MenuLabel.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\MenuOverlay.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\PasswordField.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\ProgressBar.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\RadioButton.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\Scene.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\ScrollWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\Slider.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\TextField.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\Tooltip.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\ui.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\ui\WindowWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\util\logger.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\util\random.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\util\request.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\util\string.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\util\system.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\FramebufferWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\QuantityWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\SpriteWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\SVGWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\TransformWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\Widget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\widgets.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\widgets\ZoomWidget.cpp" />
+    <ClCompile Include="..\..\..\Rack\src\window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Rack\include\app.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\asset.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\audio.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\componentlibrary.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\decimator.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\digital.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\fft.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\filter.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\fir.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\frame.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\functions.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\minblep.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\ode.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\ringbuffer.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\samplerate.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\dsp\vumeter.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\engine.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\events.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\midi.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\plugin.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\rack.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\settings.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\tags.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\ui.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\util\color.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\util\common.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\util\math.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\util\request.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\widgets.hpp" />
+    <ClInclude Include="..\..\..\Rack\include\window.hpp" />
+    <ClInclude Include="..\..\..\Rack\src\Core\Core.hpp" />
+    <ClInclude Include="..\..\..\Rack\src\Core\MidiIO.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

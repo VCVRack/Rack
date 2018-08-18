@@ -102,6 +102,10 @@
       },
       {
         "plugin": "Fundamental",
+        "model": "Scope"
+      },
+      {
+        "plugin": "Fundamental",
         "model": "VCO-1"
       },
       {
@@ -110,7 +114,11 @@
       },
       {
         "plugin": "Fundamental",
-        "model": "VCA"
+        "model": "VCA-1"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCA-2"
       },
       {
         "plugin": "Fundamental",
@@ -127,6 +135,14 @@
       {
         "plugin": "LindenbergResearch",
         "model": "VCO"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "VCF"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "MS20 VCF"
       },
       {
         "plugin": "ML_modules",

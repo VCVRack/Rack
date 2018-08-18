@@ -1,0 +1,35 @@
+/*! \page system System Requirements
+
+<B>General:</B>
+<UL>
+<LI>A MIDI interface to use MIDI input/output controls. (NOTE: This may be built into the soundcard on your computer.)</LI>
+<LI><A HREF="http://dev.scriptics.com">Tcl/Tk</A> version 8.0 or higher to use the simple Tcl/Tk GUIs provided with the STK distribution (available free over the WWW for all supported realtime platforms).</LI>
+</UL>
+
+<B>Linux (specific):</B>
+<UL>
+<LI>A soundcard to use realtime audio input/output capabilities.  In order to use the <I><B>effects</B></I> project, the soundcard and drivers must support full duplex mode.</LI>
+<LI><A HREF="http://www.alsa-project.org/">ALSA</A> device drivers and library for realtime sound and MIDI input/output.</LI>
+<LI><A HREF="http://www.opensound.com">OSS</A> device drivers (version 4.0 and higher only) can be used for audio input/output, but MIDI support requires the ALSA library to compile.</LI>
+</UL>
+
+<B>Macintosh OS X (specific):</B>
+<UL>
+<LI>A C++ compiler is not installed by default with OS X.  It is necessary to download the Developer Kit from the Apple WWW site in order to compile STK or load it from the installation CD-ROM.</LI>
+<LI>If you experience frequent audio input/output "glitches", try increasing the RT_BUFFER_SIZE specified in Stk.h.</LI>
+<LI>The tcl/tk interpreter does not ship by default with OS X and must be downloaded from the internet.  The latest Tcl/Tk Aqua distribution (http://www.apple.com/downloads/macosx/unix_open_source/tcltk.html) has been successfully tested on 10.2 and 10.3 systems.  The default installation will place a link to the wish interpretor at /usr/bin/wish.
+
+It appears that socket support in Tcl/Tk uses the Nagle algorithm, which produces poor response between changes made in the tcl/tk script and the resulting audio updates.  Note that this is only a problem when using a socket connection from a Tcl/Tk script.</LI>
+
+</UL>
+
+<B>Windows95/98/2000/XP/7 (specific):</B>
+<UL>
+<LI>A soundcard to use realtime audio input/output capabilities.  In order to use the <I><B>effects</B></I> project, the soundcard and drivers must support full duplex mode.</LI>
+<LI><A HREF="http://www.microsoft.com/directx/">DirectX</A> 5.0 (or higher) runtime libraries.</LI>
+<LI>For compiling the source (if not already in your system): <UL><LI><A HREF="Misc/dsound.h">dsound.h</A> header file (DirectX 6.1) - put somewhere in your header search path</LI><LI><A HREF="Misc/dsound.lib">dsound.lib</A> library file (DirectX 6.1) - put somewhere in your library search path</LI></UL></LI>
+</UL>
+
+<P>
+
+*/

@@ -1,0 +1,4 @@
+src/*.o
+tests/*.o
+testrunner
+.depend

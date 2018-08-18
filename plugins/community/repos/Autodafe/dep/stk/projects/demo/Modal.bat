@@ -1,0 +1,1 @@
+wish < tcl/Modal.tcl | stk-demo ModalBar -or -ip

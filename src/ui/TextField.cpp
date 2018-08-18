@@ -141,38 +141,52 @@ void TextField::onKey(EventKey &e) {
          break;
 
 		case 'v':
-#if 0
+#ifdef RACK_HOST
 			if (windowIsModPressed()) {
+#if 0
 				const char *newText = glfwGetClipboardString(global_ui->window.gWindow);
 				if (newText)
 					insertText(newText);
-			}
+#else
+            char newText[16384];
+            lglw_clipboard_text_get(global_ui->window.lglw, 16384u/*maxChars*/, NULL/*retNumChars*/, newText);
+            insertText(newText);
 #endif
+			}
+#endif // RACK_HOST
          break;
 
 		case 'x':
-#if 0
+#ifdef RACK_HOST
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
 					int begin = min(cursor, selection);
 					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
+#if 0
 					glfwSetClipboardString(global_ui->window.gWindow, selectedText.c_str());
+#else
+               lglw_clipboard_text_set(global_ui->window.lglw, 0u/*numChars=auto*/, selectedText.c_str());
+#endif
 					insertText("");
 				}
 			}
-#endif
+#endif // RACK_HOST
          break;
 
 		case 'c':
-#if 0
+#ifdef RACK_HOST
 			if (windowIsModPressed()) {
 				if (cursor != selection) {
 					int begin = min(cursor, selection);
 					std::string selectedText = text.substr(begin, std::abs(selection - cursor));
+#if 0
 					glfwSetClipboardString(global_ui->window.gWindow, selectedText.c_str());
+#else
+               lglw_clipboard_text_set(global_ui->window.lglw, 0u/*numChars=auto*/, selectedText.c_str());
+#endif
 				}
 			}
-#endif
+#endif // RACK_HOST
          break;
 
 		case 'a':

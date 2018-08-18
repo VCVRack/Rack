@@ -1,0 +1,112 @@
+/*   Howdy!!  ToolKit96cpp SKINI File, Perry Cook  */
+StringDamping	0.0 2 127
+Chord		0.0 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 C
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 C
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 D
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 D
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 C
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 C
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 D
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.2 2 32
+StringDamping	0.0 2 127
+ChordOff	0.0 2 100
+Chord		0.2 2 100 G
+StringDamping	0.1 2 32
+ChordOff	0.1 2 100
+
+StringDamping	0.0 2 120
+Strumming	0.0 2 127
+NoteOn		0.1 2 55 60
+NoteOff		0.7 2 55 60
+NoteOn		0.0 2 60 60
+NoteOff		0.4 2 60 60
+NoteOn		0.0 2 62 60
+NoteOff		0.2 2 62 60
+NoteOn		0.0 2 60 60
+NoteOff		0.2 2 60 60
+NoteOn		0.0 2 59 60
+NoteOff		0.4 2 59 60
+NoteOn		0.0 2 57 60
+NoteOff		0.2 2 57 60
+NoteOn		0.0 2 55 60
+NoteOff		0.2 2 55 60
+NoteOn		0.0 2 62 60
+NoteOff		0.8 2 62 60
+
+NoteOn		0.1 2 67 100
+NoteOff		0.7 2 67 100
+NoteOn		0.0 2 72 100
+NoteOff		0.4 2 72 100
+NoteOn		0.0 2 74 100
+NoteOff		0.2 2 74 100
+NoteOn		0.0 2 72 100
+NoteOff		0.2 2 72 100
+NotStrumming	0.0 2 0
+NoteOn		0.0 2 71 100
+NoteOff		0.1 2 71 100
+NoteOn		0.0 2 76 100
+NoteOff		0.1 2 76 100
+NoteOn		0.0 2 74 100
+NoteOff		0.1 2 74 100
+NoteOn		0.0 2 70 100
+NoteOff		0.1 2 70 100
+NoteOn		0.0 2 69 100
+NoteOff		0.1 2 69 100
+NoteOn		0.0 2 67 100
+NoteOff		0.1 2 67 100
+NoteOn		0.0 2 64 100
+NoteOff		0.1 2 64 100
+NoteOn		0.0 2 62 100
+NoteOff		0.1 2 62 100
+Chord		0.0 2 64 G
+ChordOff	2.0 2 64

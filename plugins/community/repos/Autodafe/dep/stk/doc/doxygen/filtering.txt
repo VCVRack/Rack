@@ -1,0 +1,91 @@
+/*! \page filtering Using Filters
+
+In this section, we demonstrate the use of a few of the STK filter classes.  The stk::Iir class provides functionality to implement a generalized infinite impulse response (IIR) digital filter, similar to the \c filter function in Matlab.  In this example, we create an stk::Iir instance and initialize it with specific numerator and denominator coefficients.  We then compute its impulse response for 20 samples.
+
+\code
+#include "Iir.h"
+using namespace stk;
+
+int main()
+{
+  StkFrames output( 20, 1 );   // initialize StkFrames to 20 frames and 1 channel (default: interleaved)
+  output[0] = 1.0;
+
+  std::vector<StkFloat> numerator( 5, 0.1 ); // create and initialize numerator coefficients
+  std::vector<StkFloat> denominator;         // create empty denominator coefficients
+  denominator.push_back( 1.0 );              // populate our denomintor values
+  denominator.push_back( 0.3 );
+  denominator.push_back( -0.5 );
+
+  Iir filter( numerator, denominator );
+
+  filter.tick( output );
+  for ( unsigned int i=0; i<output.size(); i++ ) {
+    std::cout << "i = " << i << " : output = " << output[i] << std::endl;
+  }
+
+  return 0;
+}
+\endcode
+
+The stk::Iir class implements the standard difference equation
+\code
+ a[0]*y[n] = b[0]*x[n] + ... + b[nb]*x[n-nb] - a[1]*y[n-1] - ... - a[na]*y[n-na],
+\endcode
+
+where "b" values are numerator coefficients and "a" values are denominator coefficients.  Note that if the first denominator coefficient is not 1.0, the Iir class automatically normalizes all filter coefficients by that value.  The coefficient values are passed to the Iir class via a C++ <a href="http://www.roguewave.com/support/docs/sourcepro/stdlibref/vector.html">vector</a>, a container object provided by the C++ Standard Library.
+
+Most STK classes use more specific types of digital filters, such as the stk::OneZero, stk::OnePole, stk::TwoPole, or stk::BiQuad varieties.  These classes inherit from the stk::Filter abstract base class and provide specific functionality particular to their use, as well as functions to independently control individual coefficient values.
+
+\section reson Resonances:
+
+The STK stk::BiQuad and stk::TwoPole classes provide functionality for creating resonance filters.  The following example demonstrates how to create a resonance centered at 440 Hz that is used to filter the output of a stk::Noise generator.
+
+\code
+#include "BiQuad.h"
+#include "Noise.h"
+using namespace stk;
+
+int main()
+{
+  StkFrames output( 20, 1 );   // initialize StkFrames to 20 frames and 1 channel (default: interleaved)
+  Noise noise;
+
+  BiQuad biquad;
+  biquad.setResonance( 440.0, 0.98, true ); // automatically normalize for unity peak gain
+
+  for ( unsigned int i=0; i<output.size(); i++ ) {
+    output[i] = biquad.tick( noise.tick() );  // single-sample computations
+    std::cout << "i = " << i << " : output = " << output[i] << std::endl;
+  }
+
+  return 0;
+}
+\endcode
+
+By passing a boolian value of \c true as the third argument to the stk::BiQuad::setResonance() function, the filter coefficients are automatically scaled to achieve unity gain at the resonance peak frequency.  The previous code could be easily modified for "vector-based" calculations:
+
+\code
+#include "BiQuad.h"
+#include "Noise.h"
+using namespace stk;
+
+int main()
+{
+  StkFrames output( 20, 1 );   // initialize StkFrames to 20 frames and 1 channel (default: interleaved)
+  Noise noise;
+
+  BiQuad biquad;
+  biquad.setResonance( 440.0, 0.98, true ); // automatically normalize for unity peak gain
+
+  biquad.tick( noise.tick( output ) );      // vector-based computations
+  for ( unsigned int i=0; i<output.size(); i++ ) {
+    std::cout << "i = " << i << " : output = " << output[i] << std::endl;
+  }
+
+  return 0;
+}
+\endcode
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="realtime.html">Next tutorial</A>]
+*/

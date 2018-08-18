@@ -1,0 +1,72 @@
+/*   Howdy!!  ToolKit96cpp SKINI File, Perry Cook  */
+PlayerSkill     0.0 2 100
+NoteOn          0.0 2 67 64
+NoteOff         0.5 2 67 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 74 64
+NoteOff         0.5 2 74 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+PlayerSkill     0.0 2 10
+NoteOn          0.0 2 67 64
+NoteOff         0.5 2 67 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 74 64
+NoteOff         0.5 2 74 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+Strumming	0.0 2 127
+PlayerSkill     0.0 2 127
+NoteOn          0.0 2 67 64
+NoteOff         0.5 2 67 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 74 64
+NoteOff         0.5 2 74 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+PlayerSkill     0.0 2 0
+NoteOn          0.0 2 67 64
+NoteOff         0.5 2 67 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 74 64
+NoteOff         0.5 2 74 0
+NoteOn          0.0 2 72 64
+NoteOff         0.5 2 72 0
+NoteOn          0.0 2 71 64
+NoteOff         0.5 2 71 0
+NoteOn          0.0 2 69 64
+NoteOff         0.5 2 69 0
+NoteOn          0.0 2 67 64
+NoteOff         2.0 2 67 0

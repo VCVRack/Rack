@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2024
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RackPlugins", "RackPlugins\RackPlugins.vcxproj", "{2A272680-AED9-4EA2-A04E-734331A8E70F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A272680-AED9-4EA2-A04E-734331A8E70F}.Release|x64.ActiveCfg = Release|x64
+		{2A272680-AED9-4EA2-A04E-734331A8E70F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F255815-3923-4C54-9C18-3DCDB69A17B6}
+	EndGlobalSection
+EndGlobal

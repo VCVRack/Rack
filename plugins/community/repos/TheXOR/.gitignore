@@ -1,0 +1,11 @@
+*.dll
+build/*
+dist/*
+RackPlugins/.vs/*
+*.log
+*.opensdf
+*.suo
+*.sdf
+*.suo
+*.db
+RackPlugins/RackPlugins.VC.VC.opendb

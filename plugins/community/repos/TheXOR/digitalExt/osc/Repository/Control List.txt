@@ -1,0 +1,111 @@
+Z8K Sequencer:
+	Voltage knobs:
+		/scene4/Knob1 to /scene4/Knob16 
+	Row Sequencer Led:
+		/scene4/LedR1 to /scene4/LedR16	
+	Col Sequencer Led:
+		/scene4/LedC1 to /scene4/LedC16
+	Vertical Sequencer Led:
+		/scene4/LedV1 to /scene4/LedV16
+	Horizontal Sequencer Led:
+		/scene4/LedH1 to /scene4/LedH16
+
+Spiralone Sequencer:
+	Voltage knobs:
+		/scene5/Knob1 to /scene5/Knob32
+	Sequence 1 leds:
+		/scene5/Led1_1 to /scene5/Led1_32
+	Sequence 2 leds:
+		/scene5/Led2_1 to /scene5/Led2_32
+	Sequence 3 leds:
+		/scene5/Led3_1 to /scene5/Led3_32
+	Sequence 4 leds:
+		/scene5/Led4_1 to /scene5/Led4_32
+	Sequence 5 leds:
+		/scene5/Led5_1 to /scene5/Led5_32
+	Sequence Mode:
+		/scene5/Mode1 to /scene5/Mode5
+	Sequence Length:
+		/scene5/Lenght1 to /scene5/Lenght5
+	Sequence Stride:
+		/scene5/Stride1 to /scene5/Stride5
+	Sequence Transpose:
+		/scene5/Transpose1 to /scene5/Transpose5
+
+Renato Sequencer:
+	Count mode X:
+		/scene3/ModeX
+	Count mode Y:
+		/scene3/ModeY
+	Seek or Sleep:
+		/scene3/Seek
+	Gate X led:
+		/scene3/LedGX
+	Gate Y led:
+		/scene3/LedGY
+	Voltage knobs:
+		/scene3/Knob1 to /scene3/Knob16
+	Access switch:
+		/scene3/Access1 to /scene3/Access16
+	Gate X switch:
+		/scene3/GateX1 to /scene3/GateX16
+	Gate Y switch:
+		/scene3/GateY1 to /scene3/GateY16
+	Sequence Led:
+		/scene3/Led1 to /scene3/Led16
+
+M581 Sequencer:
+	Step Enable:
+		/scene2/Enable1 to /scene2/Enable8
+	Gate Mode switches:
+		/scene2/GateMode1 to /scene2/GateMode8
+	Voltage Knob:
+		/scene2/Knob1 to /scene2/Knob8
+	Counter switch:
+		/scene2/Count1 to /scene2/Count8
+	Sequence Led:
+		/scene2/Led1 to /scene2/Led8
+	Counter (subdivision) led:
+		/scene2/SubLed1 to /scene2/SubLed8
+	Gate Time:
+		/scene2/GateTime
+	Gate Slide:
+		/scene2/SlideTime
+	Full scale voltage selector:
+		/scene2/Voltage
+	Step Division
+		/scene2/StepDiv
+
+Klee Sequencer:
+	Load switches:
+		/scene1/Load1 to /scene1/Load16
+	Bus Switches:
+		/scene1/Bus1 to /scene1/Bus16
+	Bus Merge switch:
+		/scene1/Merge1 to /scene1/Merge3
+	Bus Led:
+		/scene1/BusLed1 to /scene1/BusLed3
+	Bus2 mode:
+		/scene1/Bus2Mode
+	Load button:
+		/scene1/Load
+	Bus1 load button:
+		/scene1/Bus1Load
+	Step button:
+		/scene1/Step
+	Mode (2x8 or 1x16) button:
+		/scene1/Mode
+	Random/Pattern button:
+		/scene1/Random
+	Invert button:
+		/scene1/Invert
+	Range knob:
+		/scene1/Range
+	Random Threshold:
+		/scene1/RndTH
+	Voltage knobs:
+		/scene1/Knob1 to /scene1/Knob16
+	Sequence led:
+		/scene1/Led1 to /scene1/Led16
+
+

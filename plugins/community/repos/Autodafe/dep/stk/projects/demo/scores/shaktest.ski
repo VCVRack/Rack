@@ -1,0 +1,64 @@
+/*   Howdy!!  ToolKit96cpp SKINI File, Perry Cook  */
+
+Maraca		0.000000 1
+NoteOn          0.500000 1 80 10.000000
+NoteOn          0.500000 1 80 50.000000
+NoteOn          0.500000 1 80 90.000000
+NoteOn          0.500000 1 80 127.000000
+
+ControlChange   0.500000 1 1 1
+NoteOn          0.000000 1 80 64.000000
+ControlChange   0.500000 1 1 40
+NoteOn          0.000000 1 80 64.000000
+ControlChange   0.500000 1 1 80
+NoteOn          0.000000 1 80 64.000000
+ControlChange   0.500000 1 1 120
+NoteOn          0.000000 1 80 64.000000
+
+Maraca		0.500000 1
+ControlChange   0.000000 1 4 1
+NoteOn          0.000000 1 80 64.000000
+ControlChange   0.500000 1 4 40
+NoteOn          0.000000 1 80 64.000000
+ControlChange   0.500000 1 4 80
+NoteOn          0.000000 1 80 64.000000
+ControlChange   0.500000 1 4 120
+NoteOn          0.000000 1 80 64.000000
+
+Maraca		0.500000 1
+ControlChange   0.000000 1 11 1
+NoteOn          0.000000 1 80 64.000000
+ControlChange   1.000000 1 11 4
+NoteOn          0.000000 1 80 64.000000
+ControlChange   1.000000 1 11 16
+NoteOn          0.000000 1 80 64.000000
+ControlChange   1.000000 1 11 64
+NoteOn          0.000000 1 80 64.000000
+ControlChange   1.000000 1 11 128
+NoteOn          0.000000 1 80 64.000000
+
+Cabasa		0.500000 1
+NoteOn          0.000000 1 80 10.000000
+NoteOn          0.500000 1 80 50.000000
+NoteOn          0.500000 1 80 90.000000
+NoteOn          0.500000 1 80 127.000000
+
+Sekere		0.500000 1
+NoteOn          0.000000 1 80 10.000000
+NoteOn          0.500000 1 80 50.000000
+NoteOn          0.500000 1 80 90.000000
+NoteOn          0.500000 1 80 127.000000
+
+Tambourn	0.500000 1
+NoteOn          0.000000 1 80 10.000000
+NoteOn          0.500000 1 80 50.000000
+NoteOn          0.500000 1 80 90.000000
+NoteOn          0.500000 1 80 127.000000
+
+Sleighbl	0.500000 1
+NoteOn          0.000000 1 80 10.000000
+NoteOn          0.500000 1 80 50.000000
+NoteOn          0.500000 1 80 90.000000
+NoteOn          0.500000 1 80 127.000000
+
+Exit

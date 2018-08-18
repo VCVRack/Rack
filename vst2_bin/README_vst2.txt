@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- August 17th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- August 18th, 2018
 ==================================================
 
 !!!------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ The binary distribution contains the following (17) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (517) add-on modules are statically linked with the VST plugin:
+The following (575) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -61,6 +61,13 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - Alikins.ColorPanel
  - Alikins.GateLength
  - Alikins.SpecificValue
+ - alto777_LFSR.FG8
+ - alto777_LFSR.Psychtone
+ - alto777_LFSR.Amuse
+ - alto777_LFSR.a7Utility
+ - alto777_LFSR.cheapFX
+ - alto777_LFSR.Divada
+ - alto777_LFSR.YASeq3
  - AS.ADSR
  - AS.AtNuVrTr
  - AS.BPMCalc
@@ -110,6 +117,23 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - AudibleInstruments.Blinds
  - AudibleInstruments.Veils
  - AudibleInstruments.Frames
+ - Autodafe.Multiple18
+ - Autodafe.Multiple28
+ - Autodafe.LFOWidget
+ - Autodafe.Keyboard
+ - Autodafe.BPMClock
+ - Autodafe.ClockDivider
+ - Autodafe.SEQ8
+ - Autodafe.SEQ16
+ - Autodafe.TriggerSeq
+ - Autodafe.FixedFilter
+ - Autodafe.MultiModeFilter
+ - Autodafe.FormantFilter
+ - Autodafe.FoldBack
+ - Autodafe.BitCrusher
+ - Autodafe.PhaserFx
+ - Autodafe.ChorusFx
+ - Autodafe.ReverbFx
  - BaconMusic.Glissinator
  - BaconMusic.PolyGnome
  - BaconMusic.QuantEyes
@@ -199,6 +223,7 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - Bogaudio.TwentyTwoHP
  - Bogaudio.TwentyFiveHP
  - Bogaudio.ThirtyHP
+ - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ
  - cf.L3DS3Q
@@ -217,6 +242,8 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
+ - computerscare.ComputerscareDebug
+ - computerscare.ComputerscarePatchSequencer
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage
@@ -231,6 +258,7 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
+ - FrankBuss.Formula
  - FrozenWasteland.BPMLFO
  - FrozenWasteland.BPMLFO2
  - FrozenWasteland.DamianLillard
@@ -317,6 +345,8 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - ImpromptuModular.BigButtonSeq
  - ImpromptuModular.SemiModularSynth
  - ImpromptuModular.BlankPanel
+ - JE.SimpleWaveFolder
+ - JE.RingModulator
  - JW_Modules.Cat
  - JW_Modules.BouncyBalls
  - JW_Modules.FullScope
@@ -405,6 +435,8 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - ML_modules.TrigSwitch2
  - ML_modules.TrigSwitch3
  - ML_modules.TrigSwitch3_2
+ - Nohmad.Noise
+ - Nohmad.StrangeAttractors
  - Ohmer.KlokSpid
  - Ohmer.RKD
  - Ohmer.RKDBRK
@@ -557,7 +589,33 @@ The following (517) add-on modules are statically linked with the VST plugin:
  - SubmarineFree.BP120
  - SubmarineFree.BP124
  - SubmarineFree.BP132
+ - SynthKit.Addition
+ - SynthKit.Subtraction
+ - SynthKit.And
+ - SynthKit.Or
+ - SynthKit.M1x8
+ - SynthKit.M1x8CV
+ - SynthKit.ClockDivider
+ - SynthKit.RotatingClockDivider
+ - SynthKit.RotatingClockDivider2
+ - SynthKit.PrimeClockDivider
+ - SynthKit.FibonacciClockDivider
+ - SynthKit.Seq4
+ - SynthKit.Seq8
  - Template.MyModule
+ - TheXOR.Klee
+ - TheXOR.M581
+ - TheXOR.Z8K
+ - TheXOR.Renato
+ - TheXOR.Spiralone
+ - TheXOR.Burst
+ - TheXOR.Uncertain
+ - TheXOR.PwmClock
+ - TheXOR.Quantizer
+ - TheXOR.Attenuator
+ - TheXOR.Boole
+ - TheXOR.Switch
+ - TheXOR.Mplex
  - trowaSoft.TrigSeq
  - trowaSoft.TrigSeq64
  - trowaSoft.VoltSeq

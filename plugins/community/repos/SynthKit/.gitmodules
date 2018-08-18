@@ -1,0 +1,9 @@
+[submodule "deps/SynthDevKit"]
+	path = deps/SynthDevKit
+	url = https://github.com/JerrySievert/SynthDevKit.git
+[submodule "arptest"]
+	path = arptest
+	url = https://github.com/JerrySievert/arptest.git
+[submodule "deps/rack-components"]
+	path = deps/rack-components
+	url = https://github.com/JerrySievert/rack-components.git

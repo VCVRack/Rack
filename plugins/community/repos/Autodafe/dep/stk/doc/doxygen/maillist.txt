@@ -1,0 +1,14 @@
+/*! \page maillist The Mail List
+
+An <A HREF="mailto:stk-request@ccrma.stanford.edu">STK</A> mailing list has been set up to facilitate communication among STK users.  Subscribing to this list is your best way of keeping on top of new releases, bug fixes, and various user developments. 
+<P>
+For answers to frequently asked questions, check the list <A HREF="http://ccrma-mail.stanford.edu/pipermail/stk/">archives</A>.
+<P>
+To join send a message to <A HREF="mailto:stk-request@ccrma.stanford.edu">&lt;stk-request@ccrma.stanford.edu&gt;</A>
+with the contents:   <TT>subscribe</TT>
+
+<P>
+To be removed from the list send a message to <A HREF="mailto:stk-request@ccrma.stanford.edu">&lt;stk-request@ccrma.stanford.edu&gt;</A>
+with the contents:  <TT>unsubscribe</TT>
+
+*/

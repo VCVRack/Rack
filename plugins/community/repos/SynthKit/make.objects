@@ -1,0 +1,53 @@
+SYNTHDEVKIT_OBJ= \
+	deps/SynthDevKit/src/Bjorklund.o \
+	deps/SynthDevKit/src/Clock.o \
+	deps/SynthDevKit/src/CV.o \
+	deps/SynthDevKit/src/CVEvent.o \
+	deps/SynthDevKit/src/DistributedClock.o \
+	deps/SynthDevKit/src/DTMF.o \
+	deps/SynthDevKit/src/EventEmitter.o \
+	deps/SynthDevKit/src/FibonacciClock.o \
+	deps/SynthDevKit/src/PrimeClock.o \
+	deps/SynthDevKit/tests/Bjorklund.o \
+	deps/SynthDevKit/tests/Clock.o \
+	deps/SynthDevKit/tests/CV.o \
+	deps/SynthDevKit/tests/CVEvent.o \
+	deps/SynthDevKit/tests/DistributedClock.o \
+	deps/SynthDevKit/tests/EventEmitter.o \
+	deps/SynthDevKit/tests/FibonacciClock.o \
+	deps/SynthDevKit/tests/PrimeClock.o \
+	deps/SynthDevKit/tests/testrunner.o
+
+ALL_OBJ= \
+	src/controller/1x8.o \
+	src/controller/1x8CV.o \
+	src/controller/Addition.o \
+	src/controller/And.o \
+	src/controller/ClockDivider.o \
+	src/controller/DevKit.o \
+	src/controller/FibonacciClockDivider.o \
+	src/controller/Mixer4.o \
+	src/controller/Or.o \
+	src/controller/PrimeClockDivider.o \
+	src/controller/RotatingClockDivider.o \
+	src/controller/RotatingClockDivider2.o \
+	src/controller/Seq4.o \
+	src/controller/Seq8.o \
+	src/controller/Subtraction.o \
+	src/SynthKit.o \
+	src/view/1x8.o \
+	src/view/1x8CV.o \
+	src/view/Addition.o \
+	src/view/And.o \
+	src/view/ClockDivider.o \
+	src/view/DevKit.o \
+	src/view/FibonacciClockDivider.o \
+	src/view/Mixer4.o \
+	src/view/Or.o \
+	src/view/PrimeClockDivider.o \
+	src/view/RotatingClockDivider.o \
+	src/view/RotatingClockDivider2.o \
+	src/view/Seq4.o \
+	src/view/Seq8.o \
+	src/view/Subtraction.o \
+	$(SYNTHDEVKIT_OBJ)

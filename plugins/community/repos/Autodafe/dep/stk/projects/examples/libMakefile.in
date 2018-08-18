@@ -1,0 +1,90 @@
+### STK examples Makefile - for various flavors of unix
+
+PROGRAMS = sine sineosc foursine
+RM = /bin/rm
+
+INCLUDE = @include@
+ifeq ($(strip $(INCLUDE)), )
+	INCLUDE = ../../include
+endif
+vpath %.h $(INCLUDE)
+
+CC       = @CXX@
+DEFS     = @CPPFLAGS@
+DEFS    += @byte_order@
+CFLAGS   = @CXXFLAGS@
+CFLAGS  += -I$(INCLUDE) -Iinclude
+LIBRARY = @LIBS@
+
+REALTIME = @realtime@
+ifeq ($(REALTIME),yes)
+  PROGRAMS += audioprobe midiprobe duplex play record inetIn inetOut rtsine crtsine bethree controlbee threebees playsmf grains
+endif
+
+RAWWAVES = @rawwaves@
+ifeq ($(strip $(RAWWAVES)), )
+	RAWWAVES = ../../rawwaves/
+endif
+DEFS    += -DRAWWAVE_PATH=\"$(RAWWAVES)\"
+
+all : $(PROGRAMS)
+
+$(OBJECTS) : Stk.h
+
+clean : 
+	$(RM) -f $(PROGRAMS) *.exe
+
+strip : 
+	strip $(PROGRAMS)
+
+audioprobe: audioprobe.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o audioprobe audioprobe.cpp -L../../src -lstk $(LIBRARY)
+
+midiprobe: midiprobe.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o midiprobe midiprobe.cpp -L../../src -lstk $(LIBRARY)
+
+play: play.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o play play.cpp -L../../src -lstk $(LIBRARY)
+
+record: record.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o record record.cpp -L../../src -lstk $(LIBRARY)
+
+sine: sine.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o sine sine.cpp -L../../src -lstk $(LIBRARY)
+
+duplex: duplex.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o duplex duplex.cpp -L../../src -lstk $(LIBRARY)
+
+inetIn: inetIn.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o inetIn inetIn.cpp -L../../src -lstk $(LIBRARY)
+
+inetOut: inetOut.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o inetOut inetOut.cpp -L../../src -lstk $(LIBRARY)
+
+sineosc: sineosc.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o sineosc sineosc.cpp -L../../src -lstk $(LIBRARY)
+
+rtsine: rtsine.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o rtsine rtsine.cpp -L../../src -lstk $(LIBRARY)
+
+crtsine: crtsine.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o crtsine crtsine.cpp -L../../src -lstk $(LIBRARY)
+
+bethree: bethree.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o bethree bethree.cpp -L../../src -lstk $(LIBRARY)
+
+controlbee: controlbee.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o controlbee controlbee.cpp -L../../src -lstk $(LIBRARY)
+
+foursine: foursine.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o foursine foursine.cpp -L../../src -lstk $(LIBRARY)
+
+threebees: threebees.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o threebees threebees.cpp -L../../src -lstk $(LIBRARY)
+
+playsmf: playsmf.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o playsmf playsmf.cpp -L../../src -lstk $(LIBRARY)
+
+grains: grains.cpp
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o grains grains.cpp -L../../src -lstk $(LIBRARY)
+

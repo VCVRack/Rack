@@ -1,0 +1,388 @@
+This describes the latest (version 1.1) implementation of SKINI.
+
+Synthesis toolKit Instrument Network Interface
+
+for the Synthesis Toolkit in C++ by Perry R. Cook.
+
+*********************************
+*     Too good to be true?      *
+* Have control and read it too? *
+*       A SKINI Haiku.          *
+*********************************
+
+Profound thanks to Dan trueman, Brad Garton, and
+Gary Scavone for input on this revision.  Thanks
+also to MIDI, the NeXT MusicKit, ZIPI and all
+the creators and modifiers of these for good bases
+upon/from which to build and depart.
+
+1)  MIDI Compatibility
+
+    SKINI was designed to be MIDI compatible wherever possible,
+    and extend MIDI in incremental, then maybe profound ways.
+
+    Differences from MIDI, and motivations, include:
+
+        Text-based messages are used, with meaningful names
+        wherever possible.  This allows any language or system
+        capable of formatted printing to generate SKINI.
+        Similarly, any system capable of reading in a string
+        and turning delimited fields into strings, floats,
+        and ints can consume SKINI for control.  More importantly,
+        humans can actually read, and even write if they want,
+        SKINI files and streams.  Use an editor and search/
+        replace or macros to change a channel or control number.
+        Load a SKINI score into a spread sheet to apply
+        transformations to time, control parameters, MIDI
+        velocities, etc.  Put a monkey on a special typewriter
+        and get your next great work.  Life's too short to debug
+        bit/nybble packed variable length mumble messages.  Disk
+        space gets cheaper, available bandwidth increases, music
+        takes up so little space and bandwidth compared to video
+        and grapics.  Live a little.
+
+        Floating point numbers are used wherever possible.
+        Note Numbers, Velocities, Controller Values, and
+        Delta and Absolute Times are all represented and
+        scanned as ASCII double-precision floats.  MIDI byte
+        values are preserved, so that incoming MIDI bytes
+        from an interface can be put directly into SKINI
+        messages.  60.0 or 60 is middle C, 127.0 or 127 is
+        maximum velocity etc.  But, unlike MIDI, 60.5 can
+        cause a 50cent sharp middle C to be played.  As with
+        MIDI byte values like velocity, use of the integer and
+        SKINI-added fractional parts is up to the implementor
+        of the algorithm being controlled by SKINI messages.
+        But the extra precision is there to be used or ignored.
+
+2)  WHY SKINI?
+
+    SKINI was designed to be extensable and hackable for a number
+    of applications: imbedded synthesis in a game or VR simulation,
+    scoring and mixing tasks, real-time and non-real time applications
+    which could benefit from controllable sound synthesis,
+    JAVA controlled synthesis, or eventually maybe JAVA synthesis,
+    etc.  SKINI is not intended to be "the mother of scorefiles,"
+    but since the entire system is based on text representations
+    of names, floats, and ints, converters from one scorefile
+    language to SKINI, or back, should be easily created.
+
+    I am basically a bottom-up designer with an awareness of top-
+    down design ideas, so SKINI above all reflects the needs of my
+    particular research and creative projects as they have arisen and
+    developed.  SKINI 1.1 represents a profound advance beyond
+    versions 0.8 and 0.9 (the first versions), future SKINI's might
+    reflect some changes.  Compatibility with prior scorefiles
+    will be attempted, but there aren't that many scorefiles out
+    there yet.
+
+3)  SKINI MESSAGES
+
+    A basic SKINI message is a line of text.  There are only three
+    required fields, the message type (an ASCII name), the time (either
+    delta or absolute), and the channel number.  Don't freak out and
+    think that this is MIDI channel 0-15 (which is supported), because
+    the channel number is scanned as a long int.  Channels could be socket
+    numbers, machine IDs, serial numbers, or even unique tags for each
+    event in a synthesis.  Other fields might be used, as specified in the
+    SKINItbl.h file.  This is described in more detail later.
+
+    Fields in a SKINI line are delimited by spaces, commas, or
+    tabs.  The SKINI parser only operates on a line at a time,
+    so a newline means the message is over.  Multiple messages are
+    NOT allowed directly on a single line (by use of the ; for
+    example in C).  This could be supported, but it isn't in
+    version 1.1.
+
+    Message types include standard MIDI types like NoteOn, NoteOff,
+    ControlChange, etc.  MIDI extension message types (messages
+    which look better than MIDI but actually get turned into
+    MIDI-like messages) include LipTension, StringDamping, etc.
+    NonMIDI message types include SetPath (sets a path for file
+    use later), and OpenReadFile (for streaming, mixing, and applying
+    effects to soundfiles along with synthesis, for example).
+    Other non-MIDI message types include Trilling, HammerOn, etc. (these
+    translate to gestures, behaviors, and contexts for use by
+    intellegent players and instruments using SKINI).  Where possible
+    I will still use these as MIDI extension messages, so foot
+    switches, etc. can be used to control them in real time.
+
+    All fields other than type, time, and channel are optional, and the
+    types and useage of the additional fields is defined in the file
+    SKINItbl.h.
+
+    The other important file used by SKINI is SKINImsg.h, which is a
+    set of #defines to make C code more readable, and to allow reasonably
+    quick re-mapping of control numbers, etc..  All of these defined
+    symbols are assigned integer values.  For JAVA, the #defines could
+    be replaced by declaration and assignment statements, preserving
+    the look and behavior of the rest of the code.
+
+4)  C Files Used To Implement SKINI
+
+    Skini.cpp is an object which can either open a SKINI file, and
+    successively read and parse lines of text as SKINI strings, or
+    accept strings from another object and parse them.  The latter
+    functionality would be used by a socket, pipe, or other connection
+    receiving SKINI messages a line at a time, usually in real time,
+    but not restricted to real time.
+
+    SKINImsg.h should be included by anything wanting to use the
+    Skini.cpp object.  This is not mandatory, but use of the __SK_blah_
+    symbols which are defined in the .msg file will help to ensure
+    clarity and consistency when messages are added and changed.
+
+    SKINItbl.h is used only by the SKINI parser object (Skini.cpp).
+    In the file SKINItbl.h, an array of structures is declared and
+    assigned values which instruct the parser as to what the message
+    types are, and what the fields mean for those message types.
+    This table is compiled and linked into applications using SKINI, but
+    could be dynamically loaded and changed in a future version of
+    SKINI.
+
+5)  SKINI Messages and the SKINI Parser:
+
+    The parser isn't all that smart, but neither am I.  Here are the
+    basic rules governing a valid SKINI message:
+
+    a)  If the first (non-delimiter (see c)) character in a SKINI
+        string is '/' that line is treated as a comment and echoed
+        to stdout.
+
+    b)  If there are no characters on a line, that line is treated
+        as blank and echoed to stdout.  Tabs and spaces are treated
+        as non-characters.
+
+    c)  Spaces, commas, and tabs delimit the fields in a SKINI
+        message line.  (We might allow for multiple messages per
+        line later using the semicolon, but probably not.  A series
+        of lines with deltaTimes of 0.0 denotes simultaneous events.
+        For read-ability, multiple messages per line doesn't help much,
+        so it's unlikely to be supported later).
+
+    d)  The first field must be a SKINI message name.  (like NoteOn).
+        These might become case-insensitive in future versions, so don't
+        plan on exciting clever overloading of names (like noTeOn being
+        different from NoTeON).  There can be a number of leading
+        spaces or tabs, but don't exceed 32 or so.
+
+    e)  The second field must be a time specification in seconds.
+        A time field can be either delta-time (most common and the only one
+        supported in version 0.8), or absolute time.  Absolute time
+        messages have an '=' appended to the beginning of the floating
+        point number with no space.  So 0.10000 means delta time of
+        100 ms, while =0.10000 means absolute time of 100 ms.  Absolute
+        time messages make most sense in score files, but could also be
+        used for (loose) synchronization in a real-time context.  Real
+        time messages should be time-ordered AND time-correct.  That is,
+        if you've sent 100 total delta-time messages of 1.0 seconds, and
+        then send an absolute time message of =90.0 seconds, or if you
+        send two absolute time messages of =100.0 and =90.0 in that
+        order, things will get really fouled up.  The SKINI parser
+        doesn't know about time, however.  The WvOut device is the
+        master time keeper in the Synthesis Toolkit, so it should be
+        queried to see if absolute time messages are making sense.
+        There's an example of how to do that later in this document.
+        Absolute times are returned by the parser as negative numbers
+        (since negative deltaTimes are not allowed).
+
+    f)  The third field must be an integer channel number.  Don't go
+        crazy and think that this is just MIDI channel 0-15 (which is
+        supported).  The channel number is scanned as a long int.  Channels
+        0-15 are in general to be treated as MIDI channels.  After that
+        it's wide open.  Channels could be socket numbers, machine IDs,
+        serial numbers, or even unique tags for each event in a synthesis.
+        A -1 channel can be used as don't care, omni, or other functions
+        depending on your needs and taste.
+
+    g)  All remaining fields are specified in the SKINItbl.h file.
+        In general, there are maximum two more fields, which are either
+        SK_INT (long), SK_DBL (double float), or SK_STR (string).  The
+        latter is the mechanism by which more arguments can be specified
+        on the line, but the object using SKINI must take that string
+        apart (retrived by using getRemainderString()) and scan it.
+        Any excess fields are stashed in remainderString.
+
+6)  A Short SKINI File:
+
+        /*  Howdy!!! Welcome to SKINI, by P. Cook 1999
+
+        NoteOn          0.000082 2 55 82
+        NoteOff         1.000000 2 55 0
+        NoteOn          0.000082 2 69 82
+        StringDetune    0.100000 2    10
+        StringDetune    0.100000 2    30
+        StringDetune    0.100000 2    50
+        NoteOn          0.000000 2 69 82
+        StringDetune    0.100000 2    40
+        StringDetune    0.100000 2    22
+        StringDetune    0.100000 2    12
+        //
+        StringDamping   0.000100 2     0.0
+        NoteOn          0.000082 2 55 82
+        NoteOn          0.200000 2 62 82
+        NoteOn          0.100000 2 71 82
+        NoteOn          0.200000 2 79 82
+        NoteOff         1.000000 2 55 82
+        NoteOff         0.000000 2 62 82
+        NoteOff         0.000000 2 71 82
+        NoteOff         0.000000 2 79 82
+        StringDamping  =4.000000 2       0.0
+        NoteOn          0.000082 2 55 82
+        NoteOn          0.200000 2 62 82
+        NoteOn          0.100000 2 71 82
+        NoteOn          0.200000 2 79 82
+        NoteOff         1.000000 2 55 82
+        NoteOff         0.000000 2 62 82
+        NoteOff         0.000000 2 71 82
+        NoteOff         0.000000 2 79 82
+
+7)  The SKINItbl.h File, How Messages are Parsed:
+
+    The SKINItbl.h file contains an array of structures which
+    are accessed by the parser object Skini.cpp.  The struct is:
+
+        struct SKINISpec { char messageString[32];
+                   long  type;
+                   long data2;
+                   long data3;
+                 };
+
+    so an assignment of one of these structs looks like:
+
+        MessageStr$      ,type, data2, data3,
+
+            type is the message type sent back from the SKINI line parser.
+            data<n> is either
+                 NOPE    : field not used, specifically, there aren't going
+                           to be any more fields on this line.  So if there
+                           is is NOPE in data2, data3 won't even be checked
+                 SK_INT  : byte (actually scanned as 32 bit signed long int)
+                           If it's a MIDI data field which is required to
+                           be an integer, like a controller number, it's
+                           0-127.  Otherwise) get creative with SK_INTs
+                 SK_DBL  : double precision floating point.  SKINI uses these
+                           in the MIDI context for note numbers with micro
+                           tuning, velocities, controller values, etc.
+                 SK_STR  : only valid in final field.  This allows (nearly)
+                           arbitrary message types to be supported by simply
+                           scanning the string to EndOfLine and then passing
+                           it to a more intellegent handler.  For example,
+                           MIDI SYSEX (system exclusive) messages of up to
+                           256 bytes can be read as space-delimited integers
+                           into the 1K SK_STR buffer.  Longer bulk dumps,
+                           soundfiles, etc. should be handled as a new
+                           message type pointing to a FileName, Socket, or
+                           something else stored in the SK_STR field, or
+                           as a new type of multi-line message.
+
+    Here's a couple of lines from the SKINItbl.h file
+
+ {"NoteOff"          ,        __SK_NoteOff_,               SK_DBL,  SK_DBL},
+ {"NoteOn"           ,         __SK_NoteOn_,               SK_DBL,  SK_DBL},
+
+ {"ControlChange"    ,  __SK_ControlChange_,               SK_INT,  SK_DBL},
+ {"Volume"           ,  __SK_ControlChange_, __SK_Volume_        ,  SK_DBL},
+
+ {"StringDamping"    ,   __SK_ControlChange_, __SK_StringDamping_,  SK_DBL},
+ {"StringDetune"     ,    __SK_ControlChange_, __SK_StringDetune_,  SK_DBL},
+
+    The first three are basic MIDI messages.  The first two would cause the
+    parser, after recognizing a match of the string "NoteOff" or "NoteOn",
+    to set the message type to 128 or 144 (__SK_NoteOff_ and __SK_NoteOn_
+    are #defined in the file SKINImsg.h to be the MIDI byte value, without
+    channel, of the actual MIDI messages for NoteOn and NoteOff).  The parser
+    would then set the time or delta time (this is always done and is
+    therefore not described in the SKINI Message Struct).  The next two
+    fields would be scanned as double-precision floats and assigned to
+    the byteTwo and byteThree variables of the SKINI parser.  The remainder
+    of the line is stashed in the remainderString variable.
+
+    The ControlChange spec is basically the same as NoteOn and NoteOff, but
+    the second data byte is set to an integer (for checking later as to
+    what MIDI control is being changed).
+
+    The Volume spec is a MIDI Extension message, which behaves like a
+    ControlChange message with the controller number set explicitly to
+    the value for MIDI Volume (7).  Thus the following two lines would
+    accomplish the same changing of MIDI volume on channel 2:
+
+    ControlChange  0.000000 2 7 64.1
+    Volume         0.000000 2   64.1
+
+    I like the 2nd line better, thus my motivation for SKINI in the first
+    place.
+
+    The StringDamping and StringDetune messages behave the same as
+    the Volume message, but use Control Numbers which aren't specifically
+    nailed-down in MIDI.  Note that these Control Numbers are carried
+    around as long ints, so we're not limited to 0-127.  If, however,
+    you want to use a MIDI controller to play an instrument, using
+    controller numbers in the 0-127 range might make sense.
+
+8)  Objects using SKINI
+
+    Here's a simple example of code which uses the Skini object
+    to read a SKINI file and control a single instrument.
+
+        Skini score;
+        Skini::Message message;
+        instrument = new Mandolin(50.0);
+        score.setFile( argv[1] );
+        while ( score.nextMessage( message ) != 0 ) {
+          tempDouble = message.time;
+          if (tempDouble < 0)     {
+            tempDouble = - tempDouble;
+            tempDouble = tempDouble - output.getTime();
+            if (tempDouble < 0) {
+              printf("Bad News Here!!!  Backward Absolute Time Required.\n");
+              tempDouble = 0.0;
+            }
+          }
+          tempLong = (long) ( tempDouble * Stk::sampleRate() );
+          for ( i=0; i<tempLong; i++ ) {
+            output.tick( instrument->tick() );
+          }
+
+          tempDouble3 = message.floatValues[1] * NORM_MIDI;
+          if ( message.type == __SK_NoteOn_ ) {
+            if ( tempDouble3 == 0.0 ) {
+              tempDouble3 = 0.5;
+              instrument->noteOff( tempDouble3 );
+            }
+            else {
+              tempLong = message.intValues[0];
+              tempDouble2 = Midi2Pitch[tempLong];
+              instrument->noteOn( tempDouble2, tempDouble3 );
+            }
+          }
+          else if ( message.type == __SK_NoteOff_ ) {
+            instrument->noteOff( tempDouble3 );
+          }
+          else if ( message.type == __SK_ControlChange_ ) {
+            tempLong = message.intValues[0];
+            instrument->controlChange( tempLong, tempDouble3 );
+          }
+        }
+
+    When a SKINI score is passed to a Skini object using the
+    Skini::setFile() function, valid messages are read from
+    the file and returned using the Skini::nextMessage() function.
+
+    A Skini::Message structure contains all the information parsed
+    from a single SKINI message.  A returned message type of zero
+    indicates either an invalid message or the end of a scorefile.
+
+    The "time" member of a Skini::Message is the deltaTime until the
+    current message should occur.  If this is greater than 0,
+    synthesis occurs until the deltaTime has elapsed.  If deltaTime is
+    less than zero, the time is interpreted as absolute time and the
+    output device is queried as to what time it is now.  That is used
+    to form a deltaTime, and if it's positive we synthesize.  If it's
+    negative, we print an error, pretend this never happened and we
+    hang around hoping to eventually catch up.
+
+    The rest of the code sorts out message types NoteOn, NoteOff
+    (including NoteOn with velocity 0), and ControlChange.  The
+    code implicitly takes into account the integer type of the
+    control number, but all other data is treated as double float.

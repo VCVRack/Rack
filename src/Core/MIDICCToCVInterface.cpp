@@ -197,22 +197,22 @@ struct MIDICCToCVInterfaceWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 73.344704)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 0));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 73.344704)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 1));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094982, 73.344704)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 2));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 73.344704)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 3));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.8943355, 84.945023)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 4));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.49466, 84.945023)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 5));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094982, 84.945023)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 6));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 84.945023)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 7));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.8943343, 96.543976)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 8));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 96.543976)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 9));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.09498, 96.543976)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 10));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 96.543976)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 11));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 108.14429)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 12));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.49466, 108.14429)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 13));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 14));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 15));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335f, 73.344704f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 0));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659f, 73.344704f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 1));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094982f, 73.344704f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 2));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932f, 73.344704f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 3));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.8943355f, 84.945023f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 4));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.49466f, 84.945023f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 5));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094982f, 84.945023f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 6));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932f, 84.945023f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 7));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.8943343f, 96.543976f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 8));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659f, 96.543976f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 9));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.09498f, 96.543976f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 10));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932f, 96.543976f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 11));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335f, 108.14429f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 12));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.49466f, 108.14429f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 13));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.09498f, 108.14429f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 14));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932f, 108.14429f)), Port::OUTPUT, module, MIDICCToCVInterface::CC_OUTPUT + 15));
 
 		MidiCcWidget *midiWidget = Widget::create<MidiCcWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->module = module;

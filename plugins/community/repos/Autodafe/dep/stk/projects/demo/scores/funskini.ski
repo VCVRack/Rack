@@ -1,0 +1,105 @@
+/*  Howdy!!!!   SKINI0.9 Test Score  ***********/
+
+//  First a pretty good player
+PlayerSkill     0.000000 2 100
+NoteOn          0.000081 2 69 64
+NoteOff         0.220735 2 69 0
+Strumming       0.000000 2 127
+NoteOn          0.244988 2 74 69
+NoteOff         1.085355 2 74 0
+NotStrumming    0.000000 2 0
+NoteOn          0.133034 2 74 58
+NoteOff         0.121377 2 74 0
+NoteOn          0.025178 2 73 56
+NoteOff         0.204028 2 73 0
+NoteOn          0.070314 2 73 58
+NoteOff         0.150998 2 73 0
+NoteOn          0.029853 2 69 63
+NoteOff         0.152847 2 69 0
+NoteOn          0.097649 2 69 58
+NoteOff         0.140495 2 69 0
+NoteOn          0.052114 2 71 69
+NoteOff         0.177446 2 71 0
+NoteOn          0.084674 2 71 53
+NoteOff         0.084189 2 71 0
+NoteOn          0.107113 2 66 82
+NoteOff         0.345345 2 66 0
+Strumming       0.000000 2 127
+NoteOn          0.114209 2 66 69
+NoteOff         0.638118 2 66 0
+NotStrumming    0.000000 2 0
+NoteOn          0.096405 2 66 61
+NoteOff         0.134993 2 66 0
+NoteOn          0.028328 2 64 67
+NoteOff         0.251752 2 64 0
+NoteOn          0.052434 2 62 64
+NoteOff         0.077954 2 62 0
+Strumming       0.000000 2 127
+NoteOn          0.069474 2 62 69
+NoteOff         1.132502 2 62 0
+NotStrumming    0.000000 2 0
+NoteOn          0.043887 2 66 69
+NoteOff         0.096938 2 66 0
+NoteOn          0.046985 2 64 71
+NoteOff         0.085443 2 64 0
+NoteOn          0.055538 2 66 63
+NoteOff         0.105148 2 66 0
+NoteOn          0.021553 2 64 62
+NoteOff         0.103749 2 64 0
+Strumming       0.000000 2 127
+NoteOn          0.054633 2 62 67
+NoteOff         1.033837 2 62 0
+NotStrumming    0.000000 2 0
+
+// Now a really bad player
+PlayerSkill     0.000000 2 10
+NoteOn          0.235617 2 69 69
+NoteOff         0.316772 2 69 0
+Strumming       0.000000 2 127
+NoteOn          0.145871 2 74 64
+NoteOff         1.100060 2 74 0
+NotStrumming    0.000000 2 0
+NoteOn          0.115729 2 74 58
+NoteOff         0.166520 2 74 0
+NoteOn          0.007216 2 73 61
+NoteOff         0.192106 2 73 0
+NoteOn          0.067405 2 73 62
+NoteOff         0.160641 2 73 0
+NoteOn          0.015116 2 69 58
+NoteOff         0.176983 2 69 0
+NoteOn          0.083744 2 69 62
+NoteOff         0.155400 2 69 0
+NoteOn          0.020502 2 71 69
+NoteOff         0.187489 2 71 0
+NoteOn          0.076011 2 71 56
+NoteOff         0.094456 2 71 0
+NoteOn          0.094632 2 66 73
+NoteOff         0.303251 2 66 0
+Strumming       0.000000 2 127
+NoteOn          0.136058 2 66 69
+NoteOff         0.601147 2 66 0
+NotStrumming    0.000000 2 0
+NoteOn          0.073985 2 66 56
+NoteOff         0.145772 2 66 0
+NoteOn          0.028922 2 64 64
+NoteOff         0.082327 2 64 0
+NoteOn          0.047864 2 66 61
+NoteOff         0.099460 2 66 0
+NoteOn          0.020486 2 64 40
+NoteOff         0.131447 2 64 0
+Strumming       0.000000 2 127
+NoteOn          0.042691 2 62 71
+NoteOff         1.131626 2 62 0
+NotStrumming    0.000000 2 0
+NoteOn          0.040285 2 66 51
+NoteOff         0.141532 2 66 0
+NoteOn          0.016442 2 64 64
+NoteOff         0.195371 2 64 0
+NoteOn          0.073368 2 62 67
+NoteOff         0.098382 2 62 0
+Strumming       0.000000 2 127
+NoteOn          0.082045 2 62 69
+NoteOff         0.796526 2 62 0
+NotStrumming    0.000000 2 0
+NoteOn          0.079242 2 62 64
+NoteOff         0.473653 2 62 0

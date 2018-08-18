@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	src/Computerscare.o \
+	src/ComputerscareDebug.o \
+	src/ComputerscarePatchSequencer.o

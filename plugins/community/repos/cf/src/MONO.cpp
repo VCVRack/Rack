@@ -6,8 +6,8 @@ namespace rack_plugin_cf {
 struct MONO : Module {
 	enum ParamIds {
 		PAN_PARAM,
-	        GAIN_PARAM,
-	        SOLO_PARAM,
+      GAIN_PARAM,
+      SOLO_PARAM,
 		ON_PARAM,
 		NUM_PARAMS
 	};
@@ -30,7 +30,7 @@ struct MONO : Module {
 		OUT1_OUTPUT,
 		NUM_OUTPUTS
 	};
-    enum LightIds {
+   enum LightIds {
 		SOLO_LIGHT,
 		ON_LIGHT,
 		LEVEL_LIGHTS,
@@ -38,22 +38,22 @@ struct MONO : Module {
 	};
 
 
-float SIGNAL = 0.0 ;
-bool ON_STATE = false ;
-bool SOLO_STATE = false ;
-bool soloed = false;
-int lightState[11] = {};
-int cligno =0;
-int retard =0;
-int retard2 =0;
-SchmittTrigger onTrigger;
-SchmittTrigger oninTrigger;
-SchmittTrigger soloTrigger;
-SchmittTrigger soloinTrigger;
-float or_gain ;
-int or_affi ;
-float orp_gain ;
-int orp_affi ;
+   float SIGNAL = 0.0f;
+   bool ON_STATE = false ;
+   bool SOLO_STATE = false ;
+   bool soloed = false;
+   int lightState[11] = {};
+   int cligno =0;
+   int retard =0;
+   int retard2 =0;
+   SchmittTrigger onTrigger;
+   SchmittTrigger oninTrigger;
+   SchmittTrigger soloTrigger;
+   SchmittTrigger soloinTrigger;
+   float or_gain ;
+   int or_affi ;
+   float orp_gain ;
+   int orp_affi ;
 
 
 	MONO() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {onReset();}

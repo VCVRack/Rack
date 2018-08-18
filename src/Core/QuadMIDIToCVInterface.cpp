@@ -318,24 +318,24 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 60.144478)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 0));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 60.144478)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 0));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986, 60.144478)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 0));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935, 60.144478)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 0));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 76.144882)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 1));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 76.144882)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 1));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986, 76.144882)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 1));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935, 76.144882)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 1));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 92.143906)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 2));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 92.143906)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 2));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986, 92.143906)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 2));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935, 92.143906)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 2));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 108.1443)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 3));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 108.1443)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 3));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986, 108.1443)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 3));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935, 108.1443)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 3));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335f, 60.144478f)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 0));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659f, 60.144478f)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 0));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986f, 60.144478f)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 0));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935f, 60.144478f)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 0));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335f, 76.144882f)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 1));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659f, 76.144882f)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 1));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986f, 76.144882f)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 1));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935f, 76.144882f)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 1));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335f, 92.143906f)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 2));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659f, 92.143906f)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 2));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986f, 92.143906f)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 2));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935f, 92.143906f)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 2));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335f, 108.1443f)), Port::OUTPUT, module, QuadMIDIToCVInterface::CV_OUTPUT + 3));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659f, 108.1443f)), Port::OUTPUT, module, QuadMIDIToCVInterface::GATE_OUTPUT + 3));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094986f, 108.1443f)), Port::OUTPUT, module, QuadMIDIToCVInterface::VELOCITY_OUTPUT + 3));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693935f, 108.1443f)), Port::OUTPUT, module, QuadMIDIToCVInterface::AFTERTOUCH_OUTPUT + 3));
 
-		MidiWidget *midiWidget = Widget::create<MidiWidget>(mm2px(Vec(3.4009969, 14.837336)));
+		MidiWidget *midiWidget = Widget::create<MidiWidget>(mm2px(Vec(3.4009969f, 14.837336f)));
 		midiWidget->box.size = mm2px(Vec(44, 28));
 		midiWidget->midiIO = &module->midiInput;
 

@@ -1,0 +1,19 @@
+/*! \page instruments Instruments
+
+The ToolKit comes with a wide variety of synthesis algorithms, all of which inherit from the stk::Instrmnt class.  In this example, we'll fire up an instance of the stk::BeeThree FM synthesis class and show how its frequency can be modified over time.
+
+\include bethree.cpp
+
+We have used an Instrmnt pointer when referencing the BeeThree
+instance above, so it would be simple to replace the BeeThree class
+with any other STK instrument class.  It should be noted, however,
+that a few classes do not respond to the setFrequency() function
+(e.g., Shakers, Drummer).
+
+The noteOn() function initiates an instrument attack.  Instruments that are continuously excited (e.g., stk::Clarinet, stk::BeeThree) will continue to sound until stopped with a noteOff().  Impulsively excited instrument sounds (e.g., stk::Plucked, stk::Wurley) typically decay within a few seconds time, requiring subsequent noteOn() messages for re-attack.
+
+Instrument parameters can be precisely controlled as demonstrated above.  A more flexible approach to instrument control, allowing arbitrary scorefile or realtime updates, is described in the next tutorial chapter.
+
+[<A HREF="tutorial.html">Main tutorial page</A>] &nbsp; [<A HREF="controlin.html">Next tutorial</A>]
+*/
+

@@ -1,0 +1,20 @@
+ALL_OBJ= \
+	src/attenuator.o \
+	src/boole.o \
+	src/burst.o \
+	src/KleeModule.o \
+	src/M581Module.o \
+	src/mplex.o \
+	src/pwmClock.o \
+	src/quantizer.o \
+	src/RenatoModule.o \
+	src/Sequencers.o \
+	src/SpiraloneModule.o \
+	src/sprlnSequencer.o \
+	src/switch.o \
+	src/uncert.o \
+	src/Z8KModule.o
+
+#	src/lpTestModule.o
+#	src/oscImplementation.o
+#	src/oscTestModule.o

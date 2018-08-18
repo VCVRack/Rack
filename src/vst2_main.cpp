@@ -711,7 +711,7 @@ public:
                                                       &err
                                                       );
 
-            printf("xxx vstrack: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
+            printf("xxx vstrack_plugin: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
          }
 
          unlockAudio();
@@ -1285,7 +1285,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //  value: 0
          //    ptr: buffer address
          //      r: buffer size
-         printf("xxx effGetChunk index=%d ptr=%p\n", index, ptr);
+         printf("xxx vstrack_plugin: effGetChunk index=%d ptr=%p\n", index, ptr);
          // // if(0 == index)
          // // {
          // //    r = wrapper->getBankChunk((uint8_t**)ptr);
@@ -1301,7 +1301,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //  value: buffer size
          //    ptr: buffer address
          //      r: 1
-         printf("xxx effSetChunk index=%d size=%lld ptr=%p\n", index, value, ptr);
+         printf("xxx vstrack_plugin: effSetChunk index=%d size=%lld ptr=%p\n", index, value, ptr);
          // // if(0 == index)
          // // {
          // //    r = wrapper->setBankChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
@@ -1464,7 +1464,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
       case effEditKeyDown:
          // [index]: ASCII character [value]: virtual key [opt]: modifiers [return value]: 1 if key used  @see AEffEditor::onKeyDown
          // (note) only used for touch input
-         printf("xxx effEditKeyDown: ascii=%d (\'%c\') vkey=0x%08x mod=0x%08x\n", index, index, value, opt);
+         // printf("xxx effEditKeyDown: ascii=%d (\'%c\') vkey=0x%08x mod=0x%08x\n", index, index, value, opt);
          if(rack::b_touchkeyboard_enable)
          {
             wrapper->setGlobals();
