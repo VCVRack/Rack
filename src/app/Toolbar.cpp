@@ -8,8 +8,8 @@
 
 #ifdef RACK_HOST
 #define Dfltequal(a, b)  ( (((a)-(b)) < 0.0f) ? (((a)-(b)) > -0.0001f) : (((a)-(b)) < 0.0001f) )
-extern void vst2_oversample_set (float _factor, int _quality);
-extern void vst2_oversample_get (float *_factor, int *_quality);
+extern void vst2_oversample_realtime_set (float _factor, int _quality);
+extern void vst2_oversample_realtime_get (float *_factor, int *_quality);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 #endif // RACK_HOST
@@ -166,7 +166,7 @@ struct OversampleItem : MenuItem {
 	const OversampleSetting *setting;
 
 	void onAction(EventAction &e) override {
-		vst2_oversample_set(setting->factor, setting->quality);
+		vst2_oversample_realtime_set(setting->factor, setting->quality);
 		global->gPaused = false;
 	}
 };
@@ -236,7 +236,7 @@ struct SampleRateButton : TooltipIconButton {
       {
          float factor;
          int quality;
-         vst2_oversample_get(&factor, &quality);
+         vst2_oversample_realtime_get(&factor, &quality);
 
          for(unsigned int overIdx = 0u; overIdx < NUM_OVERSAMPLE_SETTINGS; overIdx++)
          {

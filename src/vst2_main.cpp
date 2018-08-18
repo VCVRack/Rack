@@ -18,7 +18,7 @@
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
-///
+///          18Aug2018
 ///
 ///
 
@@ -407,6 +407,10 @@ public:
    struct {
       float factor;    // 1=no SR conversion, 2=oversample x2, 4=oversample x4, 0.5=undersample /2, ..
       int   quality;   // SPEEX_RESAMPLER_QUALITY_xxx
+      float realtime_factor;   // used during realtime rendering
+      int   realtime_quality;
+      float offline_factor;    // used during offline rendering (bounce)
+      int   offline_quality;   // 
       sUI   num_in;    // hack that limits oversampling to "n" input channels. default = NUM_INPUTS
       sUI   num_out;   // hack that limits oversampling to "n" input channels. default = NUM_OUTPUTS
       SpeexResamplerState *srs_in;
@@ -427,6 +431,8 @@ public:
 
    bool b_open;
    bool b_processing;  // true=generate output, false=suspended
+   bool b_offline;  // true=offline rendering (HQ)
+   bool b_check_offline;  // true=ask host if it's in offline rendering mode
 
    ERect editor_rect;
    sBool b_editor_open;
@@ -633,12 +639,20 @@ public:
       return _vstPlugin.numOutputs;
    }
 
-   void setOversample(float _factor, int _quality) {
+   void setOversample(float _factor, int _quality, bool _bLock = true) {
+
+      oversample.factor  = _factor;
+      oversample.quality = _quality;
+
+      setSampleRate(sample_rate, _bLock);
+   }
+
+   void setOversampleRealtime(float _factor, int _quality) {
       if(_factor < 0.0f)
-         _factor = oversample.factor;  // keep
+         _factor = oversample.realtime_factor;  // keep
 
       if(_quality < 0)
-         _quality = oversample.quality;  // keep
+         _quality = oversample.realtime_quality;  // keep
 
       if(_factor < 0.001f)
          _factor = 1.0f;
@@ -650,10 +664,39 @@ public:
       else if(_quality > SPEEX_RESAMPLER_QUALITY_MAX/*10*/)
          _quality = SPEEX_RESAMPLER_QUALITY_MAX;
 
-      oversample.factor  = _factor;
-      oversample.quality = _quality;
+      oversample.realtime_factor = _factor;
+      oversample.realtime_quality = _quality;
 
-      setSampleRate(sample_rate);
+      if(!b_offline)
+      {
+         setOversample(oversample.realtime_factor, oversample.realtime_quality);
+      }
+   }
+
+   void setOversampleOffline(float _factor, int _quality) {
+      if(_factor < 0.0f)
+         _factor = oversample.offline_factor;  // keep
+
+      if(_quality < 0)
+         _quality = oversample.offline_quality;  // keep
+
+      if(_factor < 0.001f)
+         _factor = 1.0f;
+      else if(_factor > float(MAX_OVERSAMPLE_FACTOR))
+         _factor = float(MAX_OVERSAMPLE_FACTOR);
+
+      if(_quality < SPEEX_RESAMPLER_QUALITY_MIN/*0*/)
+         _quality = SPEEX_RESAMPLER_QUALITY_MIN;
+      else if(_quality > SPEEX_RESAMPLER_QUALITY_MAX/*10*/)
+         _quality = SPEEX_RESAMPLER_QUALITY_MAX;
+
+      oversample.offline_factor = _factor;
+      oversample.offline_quality = _quality;
+
+      if(b_offline)
+      {
+         setOversample(oversample.offline_factor, oversample.offline_quality);
+      }
    }
 
    void setOversampleChannels(int _numIn, int _numOut) {
@@ -679,14 +722,19 @@ public:
       unlockAudio();
    }
 
-   bool setSampleRate(float _rate) {
+   bool setSampleRate(float _rate, bool _bLock = true) {
       bool r = false;
 
       if((_rate >= float(MIN_SAMPLE_RATE)) && (_rate <= float(MAX_SAMPLE_RATE)))
       {
-         setGlobals();
-         lockAudio();
+         if(_bLock)
+         {
+            setGlobals();
+            lockAudio();
+         }
+
          sample_rate = _rate;
+
          vst2_set_samplerate(sample_rate * oversample.factor);  // see engine.cpp
 
          destroyResamplerStates();
@@ -703,7 +751,6 @@ public:
                                                      &err
                                                      );
 
-
             oversample.srs_out = speex_resampler_init(NUM_OUTPUTS,
                                                       sUI(sample_rate * oversample.factor),  // in rate
                                                       sUI(sample_rate),  // out rate
@@ -714,7 +761,10 @@ public:
             printf("xxx vstrack_plugin: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
          }
 
-         unlockAudio();
+         if(_bLock)
+         {
+            unlockAudio();
+         }
          r = true;
       }
 
@@ -740,6 +790,48 @@ public:
       b_processing = _bEnable;
 
       unlockAudio();
+   }
+
+   void checkOffline(void) {
+      // Called by VSTPluginProcessReplacingFloat32()
+      if(b_check_offline)
+      {
+         if(NULL != _vstHostCallback)
+         {
+            int level = (int)_vstHostCallback(&_vstPlugin, audioMasterGetCurrentProcessLevel, 0, 0/*value*/, NULL/*ptr*/, 0.0f/*opt*/);
+            // (note) Reason sets process level to kVstProcessLevelUser during "bounce in place"
+            bool bOffline = (kVstProcessLevelOffline == level) || (kVstProcessLevelUser == level);
+
+#if 0
+            {
+               static int i = 0;
+               if(0 == (++i & 127))
+               {
+                  printf("xxx vstrack_plugin: audioMasterGetCurrentProcessLevel: level=%d\n", level);
+               }
+            }
+#endif
+
+            if(b_offline ^ bOffline)
+            {
+               // Offline mode changed, update resampler
+               b_offline = bOffline;
+
+               if(bOffline)
+               {
+                  printf("xxx vstrack_plugin: enter OFFLINE mode. factor=%f quality=%d\n", oversample.offline_factor, oversample.offline_quality);
+                  setOversample(oversample.offline_factor, oversample.offline_quality, false/*bLock*/);
+               }
+               else
+               {
+                  printf("xxx vstrack_plugin: enter REALTIME mode. factor=%f quality=%d\n", oversample.realtime_factor, oversample.realtime_quality);
+                  setOversample(oversample.realtime_factor, oversample.realtime_quality, false/*bLock*/);
+               }
+
+               printf("xxx vstrack_plugin: mode changed to %d\n", int(bOffline));
+            }
+         }
+      }      
    }
 
    sUI getBankChunk(uint8_t **_addr) {
@@ -925,6 +1017,13 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    wrapper->lockAudio();
    wrapper->setGlobals();
    vst2_set_shared_plugin_tls_globals();
+
+   if(wrapper->b_check_offline)
+   {
+      // Check if offline rendering state changed and update resampler when necessary
+      wrapper->checkOffline();
+   }
+
    // // rack::global->engine.vipMutex.lock();
    rack::global->engine.mutex.lock();
    rack::global->vst2.last_seen_num_frames = sUI(sampleFrames);
@@ -1620,8 +1719,12 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    // report latency
    _vstPlugin.initialDelay = 0;
 
-   oversample.factor  = 1.0f;
-   oversample.quality = SPEEX_RESAMPLER_QUALITY_DEFAULT;
+   oversample.factor           = 1.0f;
+   oversample.quality          = SPEEX_RESAMPLER_QUALITY_DEFAULT;
+   oversample.realtime_factor  = 1.0f;
+   oversample.realtime_quality = SPEEX_RESAMPLER_QUALITY_DEFAULT;
+   oversample.offline_factor   = 1.0f;
+   oversample.offline_quality  = SPEEX_RESAMPLER_QUALITY_DEFAULT;
    oversample.srs_in  = NULL;
    oversample.srs_out = NULL;
    oversample.num_in  = NUM_INPUTS;
@@ -1630,6 +1733,8 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    sample_rate  = 44100.0f;
    block_size   = 64u;
    b_processing = true;
+   b_offline    = false;
+   b_check_offline = false;
 
    last_program_chunk_str = NULL;
 
@@ -1696,13 +1801,26 @@ extern "C" void lglw_redraw_cbk(lglw_t _lglw) {
    wrapper->redraw();
 }
 
-void vst2_oversample_set(float _factor, int _quality) {
-   rack::global->vst2.wrapper->setOversample(_factor, _quality);
+void vst2_oversample_realtime_set(float _factor, int _quality) {
+   rack::global->vst2.wrapper->setOversampleRealtime(_factor, _quality);
 }
 
-void vst2_oversample_get(float *_factor, int *_quality) {
-   *_factor  = rack::global->vst2.wrapper->oversample.factor;
-   *_quality = int(rack::global->vst2.wrapper->oversample.quality);
+void vst2_oversample_realtime_get(float *_factor, int *_quality) {
+   *_factor  = rack::global->vst2.wrapper->oversample.realtime_factor;
+   *_quality = int(rack::global->vst2.wrapper->oversample.realtime_quality);
+}
+
+void vst2_oversample_offline_set(float _factor, int _quality) {
+   rack::global->vst2.wrapper->setOversampleOffline(_factor, _quality);
+}
+
+void vst2_oversample_offline_get(float *_factor, int *_quality) {
+   *_factor  = rack::global->vst2.wrapper->oversample.offline_factor;
+   *_quality = int(rack::global->vst2.wrapper->oversample.offline_quality);
+}
+
+void vst2_oversample_offline_check_set(int _bEnable) {
+   rack::global->vst2.wrapper->b_check_offline = (0 != _bEnable);
 }
 
 void vst2_oversample_channels_set(int _numIn, int _numOut) {

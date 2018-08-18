@@ -59,6 +59,10 @@
 - add module TheXOR.Boole
 - add module TheXOR.Switch
 - add module TheXOR.Mplex
+- add offline rendering quality settings (in settings.json)
+   - "oversampleOffline": true=check host process level, false=use realtime settings
+   - "oversampleOfflineFactor": oversampling factor in offline rendering mode
+   - "oversampleOfflineQuality": oversampling quality in offline rendering mode
 
 
 ** August 17th, 2018

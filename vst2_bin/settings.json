@@ -21,6 +21,9 @@
   "oversampleQuality": 7.0,
   "oversampleNumIn": 8.0,
   "oversampleNumOut": 8.0,
+  "oversampleOffline": false,
+  "oversampleOfflineFactor": 16.0,
+  "oversampleOfflineQuality": 10.0,
   "lastPath": "",
   "moduleBrowser": {
     "favorites": [

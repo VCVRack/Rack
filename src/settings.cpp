@@ -13,7 +13,9 @@ extern void vst2_window_size_set (int _width, int _height);
 extern void vst2_refresh_rate_set (float _hz);
 
 #ifdef RACK_HOST
-extern void vst2_oversample_set (float _factor, int _quality);
+extern void vst2_oversample_realtime_set (float _factor, int _quality);
+extern void vst2_oversample_offline_set (float _factor, int _quality);
+extern void vst2_oversample_offline_check_set (int _bEnable);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 #endif // RACK_HOST
 
@@ -197,27 +199,59 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
 #endif // USE_VST2
 
 #ifdef RACK_HOST
-   // Oversample factor and quality
-   float oversampleFactor = -1.0f;
-   int oversampleQuality = -1;
-
-	// Oversample factor
+   // Realtime Oversample factor and quality
    {
-      json_t *oversampleJ = json_object_get(rootJ, "oversampleFactor");
-      if (oversampleJ) {
-         oversampleFactor = float(json_number_value(oversampleJ));
+      float oversampleFactor = -1.0f;
+      int oversampleQuality = -1;
+
+      // Realtime Oversample factor
+      {
+         json_t *oversampleJ = json_object_get(rootJ, "oversampleFactor");
+         if (oversampleJ) {
+            oversampleFactor = float(json_number_value(oversampleJ));
+         }
       }
+
+      // Realtime Oversample quality (0..10)
+      {
+         json_t *oversampleJ = json_object_get(rootJ, "oversampleQuality");
+         if (oversampleJ) {
+            oversampleQuality = int(json_number_value(oversampleJ));
+         }
+      }
+
+      vst2_oversample_realtime_set(oversampleFactor, oversampleQuality);
    }
 
-	// Oversample quality (0..10)
+   // Offline Oversample factor and quality
    {
-      json_t *oversampleJ = json_object_get(rootJ, "oversampleQuality");
-      if (oversampleJ) {
-         oversampleQuality = int(json_number_value(oversampleJ));
+      float oversampleFactor = -1.0f;
+      int oversampleQuality = -1;
+
+      // Offline Oversample factor
+      {
+         json_t *oversampleJ = json_object_get(rootJ, "oversampleOfflineFactor");
+         if (oversampleJ) {
+            oversampleFactor = float(json_number_value(oversampleJ));
+         }
       }
+
+      // Offline Oversample quality (0..10)
+      {
+         json_t *oversampleJ = json_object_get(rootJ, "oversampleOfflineQuality");
+         if (oversampleJ) {
+            oversampleQuality = int(json_number_value(oversampleJ));
+         }
+      }
+
+      vst2_oversample_offline_set(oversampleFactor, oversampleQuality);
    }
 
-   vst2_oversample_set(oversampleFactor, oversampleQuality);
+	json_t *checkOfflineJ = json_object_get(rootJ, "oversampleOffline");
+	if (checkOfflineJ)
+   {
+      vst2_oversample_offline_check_set(json_is_true(checkOfflineJ));
+   }
 
    // Oversample channel limit
    int oversampleNumIn = -1;
