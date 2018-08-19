@@ -128,6 +128,10 @@ namespace lrt {
         /** normalized control voltage. must between [0..1] */
         float cv = 0.f;
 
+        /** indicator distances */
+        float d1 = 4.f;
+        float d2 = 0.1f;
+
         /** draw angle */
         float angle;
         float angle2;
@@ -143,6 +147,13 @@ namespace lrt {
          */
         LRCVIndicator(float distance, float angle);
 
+
+        /**
+         * @brief Manipulate the indicator symbol
+         * @param d1 Height of the triangle
+         * @param d2 Half of the base width
+         */
+        void setDistances(float d1, float d2);
 
         /**
          * @brief Draw routine for cv indicator
@@ -232,6 +243,7 @@ namespace lrt {
          */
         void setIndicatorValue(float value) {
             indicator->cv = value;
+            dirty = true;
         }
 
 
@@ -241,6 +253,7 @@ namespace lrt {
          */
         void setIndicatorActive(bool active) {
             indicator->active = active;
+            dirty = true;
         }
 
 
@@ -259,6 +272,17 @@ namespace lrt {
          */
         void setIndicatorDistance(float distance) {
             indicator->distance = distance;
+            dirty = true;
+        }
+
+
+        /**
+         * @brief Setup distance of indicator from middle
+         * @param distance
+         */
+        void setIndicatorShape(float d1, float d2) {
+            indicator->setDistances(d1, d2);
+            dirty = true;
         }
 
 
@@ -353,7 +377,7 @@ namespace lrt {
             minAngle = -length * (float) M_PI;
             maxAngle = length * (float) M_PI;
 
-            setSVG(SVG::load(assetPlugin(plugin, "res/MiddleIncremental.svg")));
+            setSVG(SVG::load(assetPlugin(plugin, "res/AlternateMiddleKnob.svg")));
             shader->setShadowPosition(3, 4);
 
             shader->setStrength(1.2f);
@@ -380,6 +404,7 @@ namespace lrt {
         LRBigKnob() {
             setSVG(SVG::load(assetPlugin(plugin, "res/BigKnob.svg")));
             setIndicatorDistance(15);
+            setIndicatorShape(4.8, 0.12);
             shader->setShadowPosition(5, 6);
         }
     };
@@ -391,7 +416,8 @@ namespace lrt {
     struct LRMiddleKnob : LRKnob {
         LRMiddleKnob() {
             setSVG(SVG::load(assetPlugin(plugin, "res/MiddleKnob.svg")));
-            setIndicatorDistance(12);
+            setIndicatorDistance(13);
+            setIndicatorShape(5, 0.13);
             shader->setShadowPosition(4, 4);
         }
     };
@@ -433,8 +459,11 @@ namespace lrt {
     struct LRAlternateMiddleKnob : LRKnob {
         LRAlternateMiddleKnob() {
             setSVG(SVG::load(assetPlugin(plugin, "res/AlternateMiddleKnob.svg")));
-            setIndicatorDistance(12);
-            shader->setShadowPosition(4, 4);
+            setIndicatorDistance(11);
+            setIndicatorShape(6, 0.2);
+            shader->setShadowPosition(4, 5);
+
+            setSnap(0.0f, 0.12f);
         }
     };
 
@@ -446,6 +475,7 @@ namespace lrt {
         LRAlternateBigKnob() {
             setSVG(SVG::load(assetPlugin(plugin, "res/AlternateBigKnob.svg")));
             setIndicatorDistance(15);
+            setIndicatorShape(4.8, 0.12);
             shader->setShadowPosition(5, 6);
         }
     };
@@ -499,12 +529,12 @@ namespace lrt {
             box.size = background->box.size;
 
             shader = new LRShadow();
-            //  addChild(shader);
+           // addChild(shader);
 
             /** inherit dimensions */
             shader->setBox(box);
             shader->setSize(0.50);
-            shader->setShadowPosition(2, 1);
+            shader->setShadowPosition(3, 2);
         }
 
 

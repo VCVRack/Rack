@@ -71,7 +71,7 @@ double SergeWavefolder::compute(double x) {
     in = sg5.compute(in);
     in = sg6.compute(in);
 
-    in *= 2.f;
+    in *= 4.f;
     if (blockDC) in = dc->filter(in);
 
     out = tanh1->next(in);

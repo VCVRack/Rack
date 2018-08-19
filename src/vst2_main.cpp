@@ -1097,6 +1097,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
          case VSTPluginWrapper::IDLE_DETECT_NONE:
             // should not be reachable
             wrapper->b_idle = false;
+            wrapper->idle_output_framecount = 0u;
             break;
 
          case VSTPluginWrapper::IDLE_DETECT_MIDI:
@@ -1312,6 +1313,10 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
                wrapper->b_idle = true;
                Dprintf_idle("xxx vstrack_plugin: now idle\n");
             }
+         }
+         else
+         {
+            wrapper->idle_output_framecount = 0u;
          }
 
       }
@@ -1644,10 +1649,6 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                            Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].detune          = %d\n", evIdx, mev->detune); // -64..63
                            Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteOffVelocity = %d\n", evIdx, mev->noteOffVelocity); // 0..127
 #endif // DEBUG_PRINT_EVENTS
-                           vst2_process_midi_input_event(mev->midiData[0],
-                                                         mev->midiData[1],
-                                                         mev->midiData[2]
-                                                         );
 
                            if((VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode) && wrapper->b_idle)
                            {
@@ -1660,6 +1661,11 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                                  Dprintf_idle("xxx vstrack_plugin: become active after MIDI note on\n");
                               }
                            }
+
+                           vst2_process_midi_input_event(mev->midiData[0],
+                                                         mev->midiData[1],
+                                                         mev->midiData[2]
+                                                         );
 
                         }
                         break;
@@ -1917,7 +1923,7 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    b_idle                      = false;
    idle_input_level_threshold  = 0.00018f;//0.00007f;
    idle_output_level_threshold = 0.00018f;//0.00003f;
-   idle_output_sec_threshold   = 50.0f / 1000.0f;  // idle after 50ms of silence
+   idle_output_sec_threshold   = 120.0f / 1000.0f;  // idle after 120ms of silence
    idle_output_framecount      = 0u;
 
    last_program_chunk_str = NULL;

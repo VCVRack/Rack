@@ -6,6 +6,7 @@
       - "Wake on MIDI Note-On" (1): Detect idle output, wake up when MIDI note-on is received
       - "Wake on Audio Input" (2): Detect idle output, wake up when audio input level exceeds silence threshold
    - idle mode is also (re-)stored per patch
+- update module LindenbergResearch.Westcoast (preview)
 
 
 ** August 18th, 2018

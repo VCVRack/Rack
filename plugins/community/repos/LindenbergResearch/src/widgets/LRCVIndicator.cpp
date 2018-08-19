@@ -40,18 +40,18 @@ namespace lrt {
 
 
             float a = -angle + cv * angle2;
-            float d = distance - 4.f;
+            float d = distance - d1;
             Vec p1, p2, p3;
 
             /** compute correct point of indicator on circle */
             p1.x = middle.x - sin(-a * (float) M_PI) * distance;
             p1.y = middle.y - cos(-a * (float) M_PI) * distance;
 
-            p2.x = middle.x - sin(-(a + 0.1f) * (float) M_PI) * d;
-            p2.y = middle.y - cos(-(a + 0.1f) * (float) M_PI) * d;
+            p2.x = middle.x - sin(-(a + d2) * (float) M_PI) * d;
+            p2.y = middle.y - cos(-(a + d2) * (float) M_PI) * d;
 
-            p3.x = middle.x - sin(-(a - 0.1f) * (float) M_PI) * d;
-            p3.y = middle.y - cos(-(a - 0.1f) * (float) M_PI) * d;
+            p3.x = middle.x - sin(-(a - d2) * (float) M_PI) * d;
+            p3.y = middle.y - cos(-(a - d2) * (float) M_PI) * d;
 
             nvgBeginPath(vg);
             nvgMoveTo(vg, p1.x, p1.y);
@@ -63,6 +63,12 @@ namespace lrt {
             nvgFillColor(vg, current);
             nvgFill(vg);
         }
+    }
+
+
+    void LRCVIndicator::setDistances(float d1, float d2) {
+        LRCVIndicator::d1 = d1;
+        LRCVIndicator::d2 = d2;
     }
 
 

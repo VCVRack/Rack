@@ -13,7 +13,7 @@ namespace lrt {
         font = Font::load(assetGlobal("res/fonts/ShareTechMono-Regular.ttf"));
 
         indicator = new LRCVIndicator(15.f, ANGLE);
-        addChild(indicator);
+       // addChild(indicator);
     }
 
 
@@ -33,6 +33,8 @@ namespace lrt {
 
         /** component */
         FramebufferWidget::draw(vg);
+
+        indicator->draw(vg);
 
         /** debug numerical values */
         if (debug) {

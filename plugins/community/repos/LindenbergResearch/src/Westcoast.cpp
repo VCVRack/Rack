@@ -23,7 +23,6 @@ struct Westcoast : LRModule {
         CV_BIAS_PARAM,
         BIAS_PARAM,
         TYPE_PARAM,
-        DCBLOCK_PARAM,
         NUM_PARAMS
     };
 
@@ -54,15 +53,28 @@ struct Westcoast : LRModule {
     LRAlternateBigKnob *gain;
     LRAlternateMiddleKnob *bias;
 
+    LRPanel *patina;
+
     void step() override;
     void onSampleRateChange() override;
+
+
+    json_t *toJson() override {
+        json_t *rootJ = json_object();
+        json_object_set_new(rootJ, "agedmode", json_boolean(patina->visible));
+        return rootJ;
+    }
+
+
+    void fromJson(json_t *rootJ) override {
+        json_t *agedmodeJ = json_object_get(rootJ, "agedmode");
+        if (agedmodeJ)
+            patina->visible = json_boolean_value(agedmodeJ);
+    }
 };
 
 
 void Westcoast::step() {
-
-    outputs[SHAPER_OUTPUT].value = 0.0f;
-
     float gaincv = 0;
     float biascv = 0;
 
@@ -89,7 +101,6 @@ void Westcoast::step() {
             hs->setGain((params[GAIN_PARAM].value + gaincv));
             hs->setBias(params[BIAS_PARAM].value + biascv);
             hs->setIn(inputs[SHAPER_INPUT].value);
-            hs->setBlockDC(params[DCBLOCK_PARAM].value == 1);
 
             hs->process();
             out = (float) hs->getOut();
@@ -98,7 +109,6 @@ void Westcoast::step() {
             sg->setGain((params[GAIN_PARAM].value + gaincv));
             sg->setBias(params[BIAS_PARAM].value + biascv);
             sg->setIn(inputs[SHAPER_INPUT].value);
-            sg->setBlockDC(params[DCBLOCK_PARAM].value == 1);
 
             sg->process();
             out = (float) sg->getOut();
@@ -121,6 +131,7 @@ void Westcoast::onSampleRateChange() {
 
 struct WestcoastWidget : LRModuleWidget {
     WestcoastWidget(Westcoast *module);
+    void appendContextMenu(Menu *menu) override;
 };
 
 
@@ -128,6 +139,11 @@ WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
     panel = new LRPanel();
     panel->setBackground(SVG::load(assetPlugin(plugin, "res/Westcoast.svg")));
     addChild(panel);
+
+    module->patina = new LRPanel();
+    module->patina->setBackground(SVG::load(assetPlugin(plugin, "res/WestcoastAged.svg")));
+    module->patina->visible = false;
+    addChild(module->patina);
 
     box.size = panel->box.size;
 
@@ -145,7 +161,7 @@ WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
     addParam(module->gain);
     addParam(module->bias);
 
-    addParam(LRKnob::create<LRMiddleIncremental>(Vec(85, 274.3), module, Westcoast::TYPE_PARAM, 1, 6, 1));
+    addParam(LRKnob::create<LRMiddleIncremental>(Vec(85, 279.3), module, Westcoast::TYPE_PARAM, 1, 6, 1));
 
     addParam(LRKnob::create<LRAlternateSmallKnob>(Vec(83.4, 101.00), module, Westcoast::CV_GAIN_PARAM, -1.f, 1.f, 0.f));
     addParam(LRKnob::create<LRAlternateSmallKnob>(Vec(83.4, 183.0), module, Westcoast::CV_BIAS_PARAM, -1.f, 1.f, 0.f));
@@ -157,16 +173,43 @@ WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
     // ***** CV INPUTS *******
 
     // ***** INPUTS **********
-    addInput(Port::create<LRIOPortC>(Vec(22.4, 324.6), Port::INPUT, module, Westcoast::SHAPER_INPUT));
+    addInput(Port::create<LRIOPortC>(Vec(22.4, 332.6), Port::INPUT, module, Westcoast::SHAPER_INPUT));
     // ***** INPUTS **********
 
     // ***** OUTPUTS *********
-    addOutput(Port::create<LRIOPortC>(Vec(159.4, 324.6), Port::OUTPUT, module, Westcoast::SHAPER_OUTPUT));
+    addOutput(Port::create<LRIOPortC>(Vec(159.4, 332.6), Port::OUTPUT, module, Westcoast::SHAPER_OUTPUT));
     // ***** OUTPUTS *********
 
     // ***** SWITCH  *********
-    addParam(ParamWidget::create<LRSwitch>(Vec(119, 331), module, Westcoast::DCBLOCK_PARAM, 0.0, 1.0, 1.0));
+    //addParam(ParamWidget::create<LRSwitch>(Vec(119, 331), module, Westcoast::DCBLOCK_PARAM, 0.0, 1.0, 1.0));
     // ***** SWITCH  *********
+}
+
+
+struct WestcoastShowPatina : MenuItem {
+    Westcoast *westcoast;
+
+
+    void onAction(EventAction &e) override {
+        westcoast->patina->visible ^= true;
+    }
+
+
+    void step() override {
+        rightText = CHECKMARK(westcoast->patina->visible);
+    }
+};
+
+
+void WestcoastWidget::appendContextMenu(Menu *menu) {
+    menu->addChild(MenuEntry::create());
+
+    auto *westcoast = dynamic_cast<Westcoast *>(module);
+    assert(westcoast);
+
+    auto *mergeItem = MenuItem::create<WestcoastShowPatina>("use aged look");
+    mergeItem->westcoast = westcoast;
+    menu->addChild(mergeItem);
 }
 
 } // namespace rack_plugin_LindenbergResearch

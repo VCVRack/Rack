@@ -3,26 +3,33 @@ LRT Rack modules is a collection of modules made for [VCV Rack](https://vcvrack.
 
 Copyright (C) 2017-2018 by Lindenberg Research / Patrick Lindenberg
 
-![SCREENSHOT](doc/LRTRackModules_0.6.0.png)
+![SCREENSHOT](doc/LRTRackModules_0.6.1.png)
 
 
 ## 1. Installation
 
-You can find the latest release here: https://github.com/lindenbergresearch/LRTRack/releases
-Just download fpr you architecture and unzip in your _**Rack**_ folder located in your documents.
+You can obtain the latest release via the VCV Rack package manager, or download and install it manually:
+
+https://github.com/lindenbergresearch/LRTRack/releases
+
+
+Just download for you architecture and unzip in your _**Rack**_ folder located in your documents.
 
 
 ## 2. Build from source
 
 _**NOTE:**_
 
+You have to install a C++ environment including a compiler and other commandline tools.
+For further information about this, check the documentation found here: [VCV Rack GIT](https://github.com/VCVRack/Rack)
+
+
 The current master has been migrated to 0.6.0dev! So you have to install the correct version
 of Rack in order to get it running. I suggest to fetch a clean 0.6.xx version of Rack via git and build
 all from scratch.
 
-You can build build the latest release from source, to do so use the following steps:
-Note that you have to install a C++ environment with a compiler and other needed tools.
-For further information about this, check the documentation found here of: [VCV Rack GIT](https://github.com/VCVRack/Rack)
+You can build the latest release from source, to do so use the following steps:
+
 
 Clone git to local machine (into Rack/plugins):
 
