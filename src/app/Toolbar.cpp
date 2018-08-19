@@ -12,6 +12,8 @@ extern void vst2_oversample_realtime_set (float _factor, int _quality);
 extern void vst2_oversample_realtime_get (float *_factor, int *_quality);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
+extern void vst2_idle_detect_mode_set (int _mode);
+extern void vst2_idle_detect_mode_get (int *_mode);
 #endif // RACK_HOST
 
 namespace rack {
@@ -197,6 +199,14 @@ struct OversampleChannelItem : MenuItem {
 		global->gPaused = false;
 	}
 };
+
+struct IdleModeItem : MenuItem {
+   int idle_mode;
+
+	void onAction(EventAction &e) override {
+		vst2_idle_detect_mode_set(idle_mode);
+	}
+};
 #endif // RACK_HOST
 
 
@@ -272,6 +282,44 @@ struct RackLockButton : TooltipIconButton {
 	}
 };
 
+struct IdleModeButton : TooltipIconButton {
+	IdleModeButton() {
+		setSVG(SVG::load(assetGlobal("res/icons/idle_mode_icon_cc.svg")));
+		tooltipText = "Idle Mode";
+	}
+	void onAction(EventAction &e) override {
+#ifdef RACK_HOST
+		Menu *menu = global_ui->ui.gScene->createMenu();
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		menu->addChild(MenuLabel::create("Idle Mode"));
+
+      int idleMode; vst2_idle_detect_mode_get(&idleMode);
+
+      IdleModeItem *item;
+
+      item = new IdleModeItem();
+      item->text = "Always Active";
+      item->rightText = CHECKMARK(0/*IDLE_DETECT_NONE*/ == idleMode);
+      item->idle_mode = 0;
+      menu->addChild(item);
+
+      item = new IdleModeItem();
+      item->text = "Wake on MIDI Note-On";
+      item->rightText = CHECKMARK(1/*IDLE_DETECT_MIDI*/ == idleMode);
+      item->idle_mode = 1;
+      menu->addChild(item);
+
+      item = new IdleModeItem();
+      item->text = "Wake on Audio Input";
+      item->rightText = CHECKMARK(2/*IDLE_DETECT_AUDIO*/ == idleMode);
+      item->idle_mode = 2;
+      menu->addChild(item);
+#endif // RACK_HOST
+	}
+};
+
 struct ZoomSlider : Slider {
 	void onAction(EventAction &e) override {
 		Slider::onAction(e);
@@ -298,6 +346,7 @@ Toolbar::Toolbar() {
 	layout->addChild(new SampleRateButton());
 	layout->addChild(new PowerMeterButton());
 	layout->addChild(new RackLockButton());
+	layout->addChild(new IdleModeButton());
 
 	wireOpacitySlider = new Slider();
 	wireOpacitySlider->box.size.x = 150;

@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- August 18th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- August 19th, 2018
 ==================================================
 
 !!!------------------------------------------------------------------------------
@@ -17,6 +17,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 + supports VST parameters (send / recv)
 + supports internal resampling (up to 16x with configurable quality)
++ supports idle-detection (+wake up on MIDI note on or audio input)
 
 Here's a demo video of it: https://vimeo.com/277703414
 

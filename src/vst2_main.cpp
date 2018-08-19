@@ -18,7 +18,7 @@
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
-///          18Aug2018
+///          18Aug2018, 19Aug2018
 ///
 ///
 
@@ -32,6 +32,12 @@
 // #define USE_CONSOLE  defined
 
 #undef RACK_HOST
+
+#define Dprintf if(0);else printf
+// #define Dprintf if(1);else printf
+
+// #define Dprintf_idle if(0);else printf
+#define Dprintf_idle if(1);else printf
 
 #include <aeffect.h>
 #include <aeffectx.h>
@@ -51,6 +57,17 @@ YAC_Host *yac_host;  // not actually used, just to satisfy the linker
 #define EDITWIN_H 800
 
 #define Dfltequal(a, b)  ( (((a)-(b)) < 0.0f) ? (((a)-(b)) > -0.0001f) : (((a)-(b)) < 0.0001f) )
+
+typedef union cmemptr_u {
+   const sUI  *u32;
+   const sF32 *f32;
+   const void *any;
+} cmemptr_t;
+
+typedef union mem_u {
+   sUI  u32;
+   sF32 f32;
+} mem_t;
 
 extern int  vst2_init (int argc, char* argv[]);
 extern void vst2_exit (void);
@@ -395,6 +412,10 @@ public:
    static const uint32_t MAX_BLOCK_SIZE  = 16384u;
    static const uint32_t MAX_OVERSAMPLE_FACTOR  = 16u;
 
+   static const uint32_t IDLE_DETECT_NONE  = 0u;  // always active
+   static const uint32_t IDLE_DETECT_MIDI  = 1u;  // become idle when output is silence, reactivate when there's MIDI input activity
+   static const uint32_t IDLE_DETECT_AUDIO = 2u;  // become idle when output is silence, reactivate when there's audio input activity
+
 public:
    rack::Global rack_global;
    rack::GlobalUI rack_global_ui;
@@ -419,8 +440,10 @@ public:
       sF32 out_buffers[NUM_OUTPUTS * MAX_BLOCK_SIZE];
    } oversample;
 
-protected:
+public:
    float    sample_rate;   // e.g. 44100.0
+
+protected:
    uint32_t block_size;    // e.g. 64   
 
    PluginMutex mtx_audio;
@@ -433,6 +456,13 @@ public:
    bool b_processing;  // true=generate output, false=suspended
    bool b_offline;  // true=offline rendering (HQ)
    bool b_check_offline;  // true=ask host if it's in offline rendering mode
+
+   sUI idle_detect_mode;
+   sF32 idle_input_level_threshold;
+   sF32 idle_output_level_threshold;
+   sF32 idle_output_sec_threshold;
+   sUI idle_output_framecount;
+   bool b_idle;
 
    ERect editor_rect;
    sBool b_editor_open;
@@ -469,11 +499,11 @@ public:
 
    sSI openEffect(void) {
 
-      printf("xxx vstrack_plugin::openEffect\n");
+      Dprintf("xxx vstrack_plugin::openEffect\n");
 
       // (todo) use mutex 
       instance_id = instance_count;
-      printf("xxx vstrack_plugin::openEffect: instance_id=%d\n", instance_id);
+      Dprintf("xxx vstrack_plugin::openEffect: instance_id=%d\n", instance_id);
 
       rack_global.vst2.wrapper = this;
 
@@ -497,23 +527,23 @@ public:
       dllname.visit(dllnameraw);
       dllname.getDirName(&cwd);
       rack::global->vst2.program_dir = (const char*)cwd.chars;
-      printf("xxx vstrack_plugin::openEffect: cd to \"%s\"\n", (const char*)cwd.chars);
+      Dprintf("xxx vstrack_plugin::openEffect: cd to \"%s\"\n", (const char*)cwd.chars);
       // // ::SetCurrentDirectory("f:/vst_64bit/vstrack_plugin");
       ::SetCurrentDirectory((const char*)cwd.chars);
-      printf("xxx vstrack_plugin::openEffect: cwd change done\n");
+      Dprintf("xxx vstrack_plugin::openEffect: cwd change done\n");
       // cwd.replace('\\', '/');
 
       int argc = 1;
       char *argv[1];
       //argv[0] = (char*)cwd.chars;
       argv[0] = (char*)dllnameraw;
-      printf("xxx vstrack_plugin::openEffect: dllname=\"%s\"\n", argv[0]);
+      Dprintf("xxx vstrack_plugin::openEffect: dllname=\"%s\"\n", argv[0]);
       (void)vst2_init(argc, argv);
-      printf("xxx vstrack_plugin::openEffect: vst2_init() done\n");
+      Dprintf("xxx vstrack_plugin::openEffect: vst2_init() done\n");
 
       vst2_set_shared_plugin_tls_globals();
 
-      printf("xxx vstrack_plugin::openEffect: restore cwd=\"%s\"\n", oldCWD);      
+      Dprintf("xxx vstrack_plugin::openEffect: restore cwd=\"%s\"\n", oldCWD);      
       ::SetCurrentDirectory(oldCWD);
 
       setSampleRate(sample_rate);
@@ -521,7 +551,7 @@ public:
       b_open = true;
       b_editor_open = false;
 
-      printf("xxx vstrack_plugin::openEffect: LEAVE\n");
+      Dprintf("xxx vstrack_plugin::openEffect: LEAVE\n");
       return 1;
    }
 
@@ -557,7 +587,7 @@ public:
    }
 
    void openEditor(void *_hwnd) {
-      printf("xxx vstrack_plugin: openEditor() parentHWND=%p\n", _hwnd);
+      Dprintf("xxx vstrack_plugin: openEditor() parentHWND=%p\n", _hwnd);
       setGlobals();
       (void)lglw_window_open(rack_global_ui.window.lglw,
                              _hwnd,
@@ -575,7 +605,7 @@ public:
    }
 
    void closeEditor(void) {
-      printf("xxx vstrack_plugin: closeEditor() b_editor_open=%d\n", b_editor_open);
+      Dprintf("xxx vstrack_plugin: closeEditor() b_editor_open=%d\n", b_editor_open);
       if(b_editor_open)
       {
          setGlobals();
@@ -590,14 +620,14 @@ public:
       closeEditor();
 
       // (todo) use mutex
-      printf("xxx vstrack_plugin::closeEffect: last_program_chunk_str=%p\n", last_program_chunk_str);
+      Dprintf("xxx vstrack_plugin::closeEffect: last_program_chunk_str=%p\n", last_program_chunk_str);
       if(NULL != last_program_chunk_str)
       {
          ::free(last_program_chunk_str);
          last_program_chunk_str = NULL;
       }
 
-      printf("xxx vstrack_plugin::closeEffect: b_open=%d\n", b_open);
+      Dprintf("xxx vstrack_plugin::closeEffect: b_open=%d\n", b_open);
 
       if(b_open)
       {
@@ -606,15 +636,15 @@ public:
          setGlobals();
          rack::global->vst2.last_seen_instance_count = instance_count;
 
-         printf("xxx vstrack_plugin: call vst2_exit()\n");
+         Dprintf("xxx vstrack_plugin: call vst2_exit()\n");
 
          vst2_exit();
 
-         printf("xxx vstrack_plugin: vst2_exit() done\n");
+         Dprintf("xxx vstrack_plugin: vst2_exit() done\n");
 
          destroyResamplerStates();
 
-         printf("xxx vstrack_plugin: destroyResamplerStates() done\n");
+         Dprintf("xxx vstrack_plugin: destroyResamplerStates() done\n");
 
 #ifdef USE_CONSOLE
          // FreeConsole();
@@ -758,7 +788,7 @@ public:
                                                       &err
                                                       );
 
-            printf("xxx vstrack_plugin: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
+            Dprintf("xxx vstrack_plugin: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
          }
 
          if(_bLock)
@@ -807,7 +837,7 @@ public:
                static int i = 0;
                if(0 == (++i & 127))
                {
-                  printf("xxx vstrack_plugin: audioMasterGetCurrentProcessLevel: level=%d\n", level);
+                  Dprintf("xxx vstrack_plugin: audioMasterGetCurrentProcessLevel: level=%d\n", level);
                }
             }
 #endif
@@ -819,16 +849,16 @@ public:
 
                if(bOffline)
                {
-                  printf("xxx vstrack_plugin: enter OFFLINE mode. factor=%f quality=%d\n", oversample.offline_factor, oversample.offline_quality);
+                  Dprintf("xxx vstrack_plugin: enter OFFLINE mode. factor=%f quality=%d\n", oversample.offline_factor, oversample.offline_quality);
                   setOversample(oversample.offline_factor, oversample.offline_quality, false/*bLock*/);
                }
                else
                {
-                  printf("xxx vstrack_plugin: enter REALTIME mode. factor=%f quality=%d\n", oversample.realtime_factor, oversample.realtime_quality);
+                  Dprintf("xxx vstrack_plugin: enter REALTIME mode. factor=%f quality=%d\n", oversample.realtime_factor, oversample.realtime_quality);
                   setOversample(oversample.realtime_factor, oversample.realtime_quality, false/*bLock*/);
                }
 
-               printf("xxx vstrack_plugin: mode changed to %d\n", int(bOffline));
+               Dprintf("xxx vstrack_plugin: mode changed to %d\n", int(bOffline));
             }
          }
       }      
@@ -836,6 +866,26 @@ public:
 
    sUI getBankChunk(uint8_t **_addr) {
       return 0;
+   }
+
+   void setIdleDetectMode(uint32_t _mode) {
+      switch(_mode)
+      {
+         default:
+         case IDLE_DETECT_NONE:
+            idle_detect_mode = IDLE_DETECT_NONE;
+            break;
+
+         case IDLE_DETECT_MIDI:
+            idle_detect_mode = IDLE_DETECT_MIDI;
+            break;
+
+         case IDLE_DETECT_AUDIO:
+            idle_detect_mode = IDLE_DETECT_AUDIO;
+            break;
+      }
+      b_idle = false;
+      idle_output_framecount = 0u;
    }
 
    sUI getProgramChunk(uint8_t**_addr) {
@@ -862,13 +912,13 @@ public:
       setGlobals();
       lockAudio();
 #if 0
-      printf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
+      Dprintf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
 #endif
       lglw_glcontext_push(rack::global_ui->window.lglw);
       bool r = rack::global_ui->app.gRackWidget->loadPatchFromString((const char*)_addr);
       rack::global_ui->ui.gScene->step();  // w/o this the patch is bypassed
       lglw_glcontext_pop(rack::global_ui->window.lglw);
-      printf("xxx vstrack_plugin:setProgramChunk: r=%d\n", r);
+      Dprintf("xxx vstrack_plugin:setProgramChunk: r=%d\n", r);
       unlockAudio();
       return r;
    }
@@ -1012,7 +1062,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
    VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
-   // printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: ENTER\n");
+   // Dprintf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: ENTER\n");
    
    wrapper->lockAudio();
    wrapper->setGlobals();
@@ -1029,9 +1079,9 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    rack::global->vst2.last_seen_num_frames = sUI(sampleFrames);
    vst2_handle_queued_params();
 
-   //printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: lockAudio done\n");
+   //Dprintf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: lockAudio done\n");
 
-   //printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: wrapper=%p\n", wrapper);
+   //Dprintf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: wrapper=%p\n", wrapper);
 
 #ifdef HAVE_WINDOWS
    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
@@ -1039,127 +1089,239 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
    sUI chIdx;
 
-   if( !Dfltequal(wrapper->oversample.factor, 1.0f) && 
-       (NULL != wrapper->oversample.srs_in)         &&
-       (NULL != wrapper->oversample.srs_out)
-       )
+   if(wrapper->b_idle)
    {
-      sF32 *inputs[NUM_INPUTS];
-      sF32 *outputs[NUM_INPUTS];
-      
-      sUI hostNumFrames = sampleFrames;
-      sUI overNumFrames = sUI((sampleFrames * wrapper->oversample.factor) + 0.5f);
-
-      // Up-sample inputs
+      switch(wrapper->idle_detect_mode)
       {
-         sUI inNumFrames = hostNumFrames;
-         sUI outNumFrames = overNumFrames;
+         default:
+         case VSTPluginWrapper::IDLE_DETECT_NONE:
+            // should not be reachable
+            wrapper->b_idle = false;
+            break;
 
-         sF32 *d = wrapper->oversample.in_buffers;
+         case VSTPluginWrapper::IDLE_DETECT_MIDI:
+            break;
 
+         case VSTPluginWrapper::IDLE_DETECT_AUDIO:
+            {
+               wrapper->b_idle = true;
+
+               for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
+               {           
+                  if(chIdx < wrapper->oversample.num_in)
+                  {
+                     cmemptr_t s;
+                     s.f32 = _inputs[chIdx];
+                     sF32 sum = 0.0f;
+
+                     for(sUI i = 0u; i < sUI(sampleFrames); i++)
+                     {
+                        mem_t m;
+                        m.u32 = s.u32[i] & ~0x80000000u;  // abs
+                        sum += m.f32;
+                        // sum += (s.f32[i] * s.f32[i]);  // RMS
+                     }
+
+                     sum = (sum / float(sampleFrames));
+                     // sum = sqrtf(sum / float(sampleFrames));  // RMS
+
+                     if(sum >= wrapper->idle_input_level_threshold)
+                     {
+                        wrapper->b_idle = false;
+                        Dprintf_idle("xxx vstrack_plugin: become active after input (sum=%f, threshold=%f)\n", sum, wrapper->idle_input_level_threshold);
+                        wrapper->idle_output_framecount = 0u;
+                        break;
+                     }
+                  }
+               }
+            }
+            break;
+      } // switch idle_detect_mode
+   } // if idle
+
+   if(!wrapper->b_idle)
+   {
+      if( !Dfltequal(wrapper->oversample.factor, 1.0f) && 
+          (NULL != wrapper->oversample.srs_in)         &&
+          (NULL != wrapper->oversample.srs_out)
+          )
+      {
+         sF32 *inputs[NUM_INPUTS];
+         sF32 *outputs[NUM_INPUTS];
+      
+         sUI hostNumFrames = sampleFrames;
+         sUI overNumFrames = sUI((sampleFrames * wrapper->oversample.factor) + 0.5f);
+
+         // Up-sample inputs
+         {
+            sUI inNumFrames = hostNumFrames;
+            sUI outNumFrames = overNumFrames;
+
+            sF32 *d = wrapper->oversample.in_buffers;
+
+            for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
+            {
+               if(chIdx < wrapper->oversample.num_in)
+               {
+                  sF32 *s = _inputs[chIdx];
+
+                  int err = speex_resampler_process_float(wrapper->oversample.srs_in,
+                                                          chIdx,
+                                                          s,
+                                                          &inNumFrames,
+                                                          d,
+                                                          &outNumFrames
+                                                          );
+               }
+               else
+               {
+                  // Skip channel
+                  ::memset(d, 0, sizeof(sF32) * outNumFrames);
+               }
+
+               inputs[chIdx] = d;
+
+               // Next input channel
+               d += outNumFrames;
+            }
+         }
+
+         // Clear output buffers
+         //  (note) AudioInterface instances accumulate samples in the output buffer
+         {
+            sF32 *d = wrapper->oversample.out_buffers;
+            ::memset((void*)d, 0, (sizeof(sF32) * wrapper->oversample.num_out * overNumFrames));
+
+            for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
+            {
+               outputs[chIdx] = d;
+               d += overNumFrames;
+            }
+         }
+
+         // Process rack modules
+         if(wrapper->b_processing)
+         {
+            vst2_engine_process(inputs, outputs, overNumFrames);
+         }
+
+         // Down-sample outputs
+         {
+            sF32 *s = wrapper->oversample.out_buffers;
+
+            sUI inNumFrames = overNumFrames;
+            sUI outNumFrames = hostNumFrames;
+
+            for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
+            {
+               sF32 *d = _outputs[chIdx];
+
+               if(chIdx < wrapper->oversample.num_out)
+               {
+                  int err = speex_resampler_process_float(wrapper->oversample.srs_out,
+                                                          chIdx,
+                                                          s,
+                                                          &inNumFrames,
+                                                          d,
+                                                          &outNumFrames
+                                                          );
+
+                  // Next output channel
+                  s += inNumFrames;
+               }
+               else
+               {
+                  // Skip output
+                  ::memset((void*)d, 0, sizeof(sF32) * outNumFrames);
+               }
+            }
+         }
+      }
+      else
+      {
+         // No oversampling
+
+         //  (note) Cubase (tested with 9.5.30) uses the same buffer(s) for both input&output
+         //           => back up the inputs before clearing the outputs
+         sF32 *inputs[NUM_INPUTS];
+         sUI k = 0u;
          for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
          {
-            if(chIdx < wrapper->oversample.num_in)
-            {
-               sF32 *s = _inputs[chIdx];
+            inputs[chIdx] = &wrapper->tmp_input_buffers[k];
+            ::memcpy((void*)inputs[chIdx], _inputs[chIdx], sizeof(sF32)*sampleFrames);
+            k += sampleFrames;
+         }
 
-               int err = speex_resampler_process_float(wrapper->oversample.srs_in,
-                                                       chIdx,
-                                                       s,
-                                                       &inNumFrames,
-                                                       d,
-                                                       &outNumFrames
-                                                       );
-            }
-            else
-            {
-               // Skip channel
-               ::memset(d, 0, sizeof(sF32) * outNumFrames);
-            }
+         // Clear output buffers
+         //  (note) AudioInterface instances accumulate samples in the output buffer
+         for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
+         {
+            ::memset((void*)_outputs[chIdx], 0, sizeof(sF32)*sampleFrames);
+         }
 
-            inputs[chIdx] = d;
-
-            // Next input channel
-            d += outNumFrames;
+         if(wrapper->b_processing)
+         {
+            vst2_engine_process(inputs, _outputs, sampleFrames);
          }
       }
 
-      // Clear output buffers
-      //  (note) AudioInterface instances accumulate samples in the output buffer
+      if(VSTPluginWrapper::IDLE_DETECT_NONE != wrapper->idle_detect_mode)
       {
-         sF32 *d = wrapper->oversample.out_buffers;
-         ::memset((void*)d, 0, (sizeof(sF32) * wrapper->oversample.num_out * overNumFrames));
+         bool bSilence = true;
 
          for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
-         {
-            outputs[chIdx] = d;
-            d += overNumFrames;
-         }
-      }
-
-      // Process rack modules
-      if(wrapper->b_processing)
-      {
-         vst2_engine_process(inputs, outputs, overNumFrames);
-      }
-
-      // Down-sample outputs
-      {
-         sF32 *s = wrapper->oversample.out_buffers;
-
-         sUI inNumFrames = overNumFrames;
-         sUI outNumFrames = hostNumFrames;
-
-         for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
-         {
-            sF32 *d = _outputs[chIdx];
-
+         {           
             if(chIdx < wrapper->oversample.num_out)
             {
-               int err = speex_resampler_process_float(wrapper->oversample.srs_out,
-                                                       chIdx,
-                                                       s,
-                                                       &inNumFrames,
-                                                       d,
-                                                       &outNumFrames
-                                                       );
+               cmemptr_t d;
+               d.f32 = _outputs[chIdx];
+               sF32 sum = 0.0f;
 
-               // Next output channel
-               s += inNumFrames;
-            }
-            else
-            {
-               // Skip output
-               ::memset((void*)d, 0, sizeof(sF32) * outNumFrames);
+               for(sUI i = 0u; i < sUI(sampleFrames); i++)
+               {
+                  mem_t m;
+                  m.u32 = d.u32[i] & ~0x80000000u;  // abs
+                  sum += m.f32;
+                  // sum += d.f32[i] * d.f32[i];  // RMS
+               }
+
+               sum = (sum / float(sampleFrames));
+               // sum = sqrtf(sum / float(sampleFrames));  // RMS
+
+               {
+                  static int x = 0;
+                  if(0 == (++x & 127))
+                     Dprintf_idle("xxx vstrack_plugin: output avg is %f\n", sum);
+               }
+
+               if(sum >= wrapper->idle_output_level_threshold)
+               {
+                  bSilence = false;
+                  break;
+               }
             }
          }
+
+         if(bSilence)
+         {
+            wrapper->idle_output_framecount += sampleFrames;
+
+            if(wrapper->idle_output_framecount >= sUI(wrapper->idle_output_sec_threshold * wrapper->sample_rate))
+            {
+               // Frame threshold exceeded, become idle
+               wrapper->b_idle = true;
+               Dprintf_idle("xxx vstrack_plugin: now idle\n");
+            }
+         }
+
       }
-   }
+   } // if !wrapper->b_idle
    else
    {
-      // No oversampling
-
-      //  (note) Cubase (tested with 9.5.30) uses the same buffer(s) for both input&output
-      //           => back up the inputs before clearing the outputs
-      sF32 *inputs[NUM_INPUTS];
-      sUI k = 0u;
-      for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
-      {
-         inputs[chIdx] = &wrapper->tmp_input_buffers[k];
-         ::memcpy((void*)inputs[chIdx], _inputs[chIdx], sizeof(sF32)*sampleFrames);
-         k += sampleFrames;
-      }
-
-      // Clear output buffers
-      //  (note) AudioInterface instances accumulate samples in the output buffer
+      // Idle, clear output buffers
       for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
       {
          ::memset((void*)_outputs[chIdx], 0, sizeof(sF32)*sampleFrames);
-      }
-
-      if(wrapper->b_processing)
-      {
-         vst2_engine_process(inputs, _outputs, sampleFrames);
       }
    }
 
@@ -1167,7 +1329,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    rack::global->engine.mutex.unlock();
    wrapper->unlockAudio();
 
-   //printf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: LEAVE\n");
+   //Dprintf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: LEAVE\n");
 }
 
 
@@ -1192,7 +1354,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                               void      *ptr,
                               float      opt
                               ) {
-   // printf("vstrack_plugin: called VSTPluginDispatcher(%d)\n", opCode);
+   // Dprintf("vstrack_plugin: called VSTPluginDispatcher(%d)\n", opCode);
 
    VstIntPtr r = 0;
 
@@ -1214,7 +1376,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
       case effOpen:
          // called by the host after it has obtained the effect instance (but _not_ during plugin scans)
          //  (note) any heavy-lifting init code should go here
-         ::printf("vstrack_plugin<dispatcher>: effOpen\n");
+         Dprintf("vstrack_plugin<dispatcher>: effOpen\n");
          r = wrapper->openEffect();
          break;
 
@@ -1332,6 +1494,8 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
             r = 1;
          else if(!strcmp((char*)ptr, "receiveVstMidiEvent"))  // (note) required by Jeskola Buzz
             r = 1;
+         else if(!strcmp((char*)ptr, "noRealTime"))
+            r = 1;
          else
             r = 0;
          break;
@@ -1384,7 +1548,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //  value: 0
          //    ptr: buffer address
          //      r: buffer size
-         printf("xxx vstrack_plugin: effGetChunk index=%d ptr=%p\n", index, ptr);
+         Dprintf("xxx vstrack_plugin: effGetChunk index=%d ptr=%p\n", index, ptr);
          // // if(0 == index)
          // // {
          // //    r = wrapper->getBankChunk((uint8_t**)ptr);
@@ -1400,7 +1564,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //  value: buffer size
          //    ptr: buffer address
          //      r: 1
-         printf("xxx vstrack_plugin: effSetChunk index=%d size=%lld ptr=%p\n", index, value, ptr);
+         Dprintf("xxx vstrack_plugin: effSetChunk index=%d size=%lld ptr=%p\n", index, value, ptr);
          // // if(0 == index)
          // // {
          // //    r = wrapper->setBankChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
@@ -1439,7 +1603,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // ptr: VstEvents*
          {
             VstEvents *events = (VstEvents*)ptr;
-            // printf("vstrack_plugin:effProcessEvents: recvd %d events", events->numEvents);
+            // Dprintf("vstrack_plugin:effProcessEvents: recvd %d events", events->numEvents);
             VstEvent**evAddr = &events->events[0];
 
             if(events->numEvents > 0)
@@ -1454,8 +1618,8 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                   if(NULL != ev)  // paranoia
                   {
 #ifdef DEBUG_PRINT_EVENTS
-                     printf("vstrack_plugin:effProcessEvents: ev[%u].byteSize    = %u\n", evIdx, uint32_t(ev->byteSize));  // sizeof(VstMidiEvent) = 32
-                     printf("vstrack_plugin:effProcessEvents: ev[%u].deltaFrames = %u\n", evIdx, uint32_t(ev->deltaFrames));
+                     Dprintf("vstrack_plugin:effProcessEvents: ev[%u].byteSize    = %u\n", evIdx, uint32_t(ev->byteSize));  // sizeof(VstMidiEvent) = 32
+                     Dprintf("vstrack_plugin:effProcessEvents: ev[%u].deltaFrames = %u\n", evIdx, uint32_t(ev->deltaFrames));
 #endif // DEBUG_PRINT_EVENTS
 
                      switch(ev->type)
@@ -1474,16 +1638,29 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                         {
                            VstMidiEvent *mev = (VstMidiEvent *)ev;
 #ifdef DEBUG_PRINT_EVENTS
-                           printf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteLength      = %u\n", evIdx, uint32_t(mev->noteLength));  // #frames
-                           printf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteOffset      = %u\n", evIdx, uint32_t(mev->noteOffset));  // #frames
-                           printf("vstrack_plugin:effProcessEvents<midi>: ev[%u].midiData        = %02x %02x %02x %02x\n", evIdx, uint8_t(mev->midiData[0]), uint8_t(mev->midiData[1]), uint8_t(mev->midiData[2]), uint8_t(mev->midiData[3]));
-                           printf("vstrack_plugin:effProcessEvents<midi>: ev[%u].detune          = %d\n", evIdx, mev->detune); // -64..63
-                           printf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteOffVelocity = %d\n", evIdx, mev->noteOffVelocity); // 0..127
+                           Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteLength      = %u\n", evIdx, uint32_t(mev->noteLength));  // #frames
+                           Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteOffset      = %u\n", evIdx, uint32_t(mev->noteOffset));  // #frames
+                           Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].midiData        = %02x %02x %02x %02x\n", evIdx, uint8_t(mev->midiData[0]), uint8_t(mev->midiData[1]), uint8_t(mev->midiData[2]), uint8_t(mev->midiData[3]));
+                           Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].detune          = %d\n", evIdx, mev->detune); // -64..63
+                           Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteOffVelocity = %d\n", evIdx, mev->noteOffVelocity); // 0..127
 #endif // DEBUG_PRINT_EVENTS
                            vst2_process_midi_input_event(mev->midiData[0],
                                                          mev->midiData[1],
                                                          mev->midiData[2]
                                                          );
+
+                           if((VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode) && wrapper->b_idle)
+                           {
+                              if(0x90u == (mev->midiData[0] & 0xF0u)) // Note on ?
+                              {
+                                 wrapper->lockAudio();
+                                 wrapper->b_idle = false;
+                                 wrapper->idle_output_framecount = 0u;
+                                 wrapper->unlockAudio();
+                                 Dprintf_idle("xxx vstrack_plugin: become active after MIDI note on\n");
+                              }
+                           }
+
                         }
                         break;
 
@@ -1491,8 +1668,8 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                         {
                            VstMidiSysexEvent *xev = (VstMidiSysexEvent*)ev;
 #ifdef DEBUG_PRINT_EVENTS
-                           printf("vstrack_plugin:effProcessEvents<syx>: ev[%u].dumpBytes = %u\n", evIdx, uint32_t(xev->dumpBytes));  // size
-                           printf("vstrack_plugin:effProcessEvents<syx>: ev[%u].sysexDump = %p\n", evIdx, xev->sysexDump);            // buffer addr
+                           Dprintf("vstrack_plugin:effProcessEvents<syx>: ev[%u].dumpBytes = %u\n", evIdx, uint32_t(xev->dumpBytes));  // size
+                           Dprintf("vstrack_plugin:effProcessEvents<syx>: ev[%u].sysexDump = %p\n", evIdx, xev->sysexDump);            // buffer addr
 #endif // DEBUG_PRINT_EVENTS
 
                            // (note) don't forget to use a mutex (lockAudio(), unlockAudio()) when modifying the audio processor state!
@@ -1563,7 +1740,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
       case effEditKeyDown:
          // [index]: ASCII character [value]: virtual key [opt]: modifiers [return value]: 1 if key used  @see AEffEditor::onKeyDown
          // (note) only used for touch input
-         // printf("xxx effEditKeyDown: ascii=%d (\'%c\') vkey=0x%08x mod=0x%08x\n", index, index, value, opt);
+         // Dprintf("xxx effEditKeyDown: ascii=%d (\'%c\') vkey=0x%08x mod=0x%08x\n", index, index, value, opt);
          if(rack::b_touchkeyboard_enable)
          {
             wrapper->setGlobals();
@@ -1617,7 +1794,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 
       default:
          // ignoring all other opcodes
-         printf("vstrack_plugin:dispatcher: unhandled opCode %d [ignored] \n", opCode);
+         Dprintf("vstrack_plugin:dispatcher: unhandled opCode %d [ignored] \n", opCode);
          break;
 
    }
@@ -1634,7 +1811,7 @@ void VSTPluginSetParameter(VSTPlugin *vstPlugin,
                            float      parameter
                            ) {
 #ifdef DEBUG_PRINT_PARAMS
-   printf("vstrack_plugin: called VSTPluginSetParameter(%d, %f)\n", index, parameter);
+   Dprintf("vstrack_plugin: called VSTPluginSetParameter(%d, %f)\n", index, parameter);
 #endif // DEBUG_PRINT_PARAMS
 
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
@@ -1654,7 +1831,7 @@ float VSTPluginGetParameter(VSTPlugin *vstPlugin,
                             VstInt32   index
                             ) {
 #ifdef DEBUG_PRINT_PARAMS
-   printf("vstrack_plugin: called VSTPluginGetParameter(%d)\n", index);
+   Dprintf("vstrack_plugin: called VSTPluginGetParameter(%d)\n", index);
 #endif // DEBUG_PRINT_PARAMS
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
    VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
@@ -1735,6 +1912,13 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    b_processing = true;
    b_offline    = false;
    b_check_offline = false;
+
+   idle_detect_mode            = IDLE_DETECT_NONE;
+   b_idle                      = false;
+   idle_input_level_threshold  = 0.00018f;//0.00007f;
+   idle_output_level_threshold = 0.00018f;//0.00003f;
+   idle_output_sec_threshold   = 50.0f / 1000.0f;  // idle after 50ms of silence
+   idle_output_framecount      = 0u;
 
    last_program_chunk_str = NULL;
 
@@ -1832,12 +2016,32 @@ void vst2_oversample_channels_get(int *_numIn, int *_numOut) {
    *_numOut = int(rack::global->vst2.wrapper->oversample.num_out);
 }
 
+void vst2_idle_detect_mode_fx_set(int _mode) {
+#ifdef VST2_EFFECT
+   rack::global->vst2.wrapper->setIdleDetectMode(uint32_t(_mode));
+#endif // VST2_EFFECT
+}
+
+void vst2_idle_detect_mode_instr_set(int _mode) {
+#ifndef VST2_EFFECT
+   rack::global->vst2.wrapper->setIdleDetectMode(uint32_t(_mode));
+#endif // VST2_EFFECT
+}
+
+void vst2_idle_detect_mode_set(int _mode) {
+   rack::global->vst2.wrapper->setIdleDetectMode(uint32_t(_mode));
+}
+
+void vst2_idle_detect_mode_get(int *_mode) {
+   *_mode = int(rack::global->vst2.wrapper->idle_detect_mode);
+}
+
 
 /**
  * Implementation of the main entry point of the plugin
  */
 VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback) {
-   printf("vstrack_plugin: called VSTPluginMain... \n");
+   Dprintf("vstrack_plugin: called VSTPluginMain... \n");
 
 #if 0
    if(!vstHostCallback(0, audioMasterVersion, 0, 0, 0, 0))

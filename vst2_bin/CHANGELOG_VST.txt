@@ -1,3 +1,13 @@
+** August 19th, 2018
+- add idle detection support
+   - default detection settings are configured in settings.json ("idleDetectInstr", "idleDetectFx")
+   - modes:
+      - "Always Active" (0): Disables idle detection
+      - "Wake on MIDI Note-On" (1): Detect idle output, wake up when MIDI note-on is received
+      - "Wake on Audio Input" (2): Detect idle output, wake up when audio input level exceeds silence threshold
+   - idle mode is also (re-)stored per patch
+
+
 ** August 18th, 2018
 - lglw: add clipboard support (TextField)
 - fix Fundamental.VCA-2 layout

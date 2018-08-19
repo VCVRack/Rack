@@ -20,6 +20,8 @@ extern void vst2_oversample_realtime_set (float _factor, int _quality);
 extern void vst2_oversample_realtime_get (float *_factor, int *_quality);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
+extern void vst2_idle_detect_mode_set (int _mode);
+extern void vst2_idle_detect_mode_get (int *_mode);
 #endif // RACK_HOST
 
 #endif // USE_VST2
@@ -295,6 +297,15 @@ json_t *RackWidget::toJson() {
          json_object_set_new(rootJ, "oversampleNumOut", oversampleJ);
       }
    }
+
+   // Idle detection mode
+   {
+      int idleDetect;
+      vst2_idle_detect_mode_get(&idleDetect);
+      
+      json_t *idleJ = json_real(idleDetect);
+      json_object_set_new(rootJ, "idleDetect", idleJ);
+   }
 #endif // RACK_HOST
 #endif // USE_VST2
 
@@ -414,6 +425,14 @@ void RackWidget::fromJson(json_t *rootJ) {
    }
 
    vst2_oversample_channels_set(oversampleNumIn, oversampleNumOut);
+
+	// Idle detection mode
+   {
+      json_t *idleJ = json_object_get(rootJ, "idleDetect");
+      if (idleJ) {
+         vst2_idle_detect_mode_set(int(json_number_value(idleJ)));
+      }
+   }
 #endif // RACK_HOST
 
 	// modules

@@ -17,17 +17,17 @@ namespace rack {
 
 
 ModuleWidget::ModuleWidget(Module *module) {
-   printf("xxx ModuleWidget::ModuleWidget(module=%p) global=%p\n", module, global);
+   // printf("xxx ModuleWidget::ModuleWidget(module=%p) global=%p\n", module, global);
    // printf("xxx ModuleWidget::ModuleWidget: GetCurrentThreadId=%d\n", GetCurrentThreadId());
 	if (module) {
 		engineAddModule(module);
-      printf("xxx ModuleWidget::ModuleWidget: engineAddModule OK\n");
+      // printf("xxx ModuleWidget::ModuleWidget: engineAddModule OK\n");
 	}
 	this->module = module;
    // printf("xxx ModuleWidget::ModuleWidget(): bind GL context global_ui->window.gWindow=%p\n", global_ui->window.gWindow);
    // glfwMakeContextCurrent(global_ui->window.gWindow);
    // // glfw_hack_makeContextCurrent(global_ui->window.gWindow);
-   printf("xxx ModuleWidget::ModuleWidget(): RETURN\n");
+   // printf("xxx ModuleWidget::ModuleWidget(): RETURN\n");
 }
 
 ModuleWidget::~ModuleWidget() {
@@ -67,11 +67,11 @@ void ModuleWidget::addParam(ParamWidget *param) {
 
 void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 	// Remove old panel
-#ifdef RACK_PLUGIN_SHARED
-   printf("xxx ModuleWidget::setPanel<shared>: 1\n");
-#else
-   printf("xxx ModuleWidget::setPanel<host>: 1\n");
-#endif
+// #ifdef RACK_PLUGIN_SHARED
+//    printf("xxx ModuleWidget::setPanel<shared>: 1\n");
+// #else
+//    printf("xxx ModuleWidget::setPanel<host>: 1\n");
+// #endif
 	if (panel) {
 		removeChild(panel);
 		delete panel;
@@ -155,7 +155,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	double x, y;
 	json_unpack(posJ, "[F, F]", &x, &y);
 	Vec pos = Vec(x, y);
-   printf("xxx ModuleWidget::fromJson: pos=(%f, %f) posJ=%p rootJ=%p\n", x, y, posJ, rootJ);
+   // printf("xxx ModuleWidget::fromJson: pos=(%f, %f) posJ=%p rootJ=%p\n", x, y, posJ, rootJ);
 	if (legacy && legacy <= 1) {
 		box.pos = pos;
 	}
@@ -444,12 +444,12 @@ struct DeleteMenuItem : MenuItem {
 };
 
 Menu *ModuleWidget::createContextMenu() {
-   printf("xxx ModuleWidget::createContextMenu: ENTER\n");
+   // printf("xxx ModuleWidget::createContextMenu: ENTER\n");
 	Menu *menu = global_ui->ui.gScene->createMenu();
 
 	MenuLabel *menuLabel = new MenuLabel();
-   printf("xxx ModuleWidget::createContextMenu: model->author=\"%s\"\n", model->author.c_str());
-   printf("xxx ModuleWidget::createContextMenu: model->name=\"%s\"\n", model->name.c_str());
+   // printf("xxx ModuleWidget::createContextMenu: model->author=\"%s\"\n", model->author.c_str());
+   // printf("xxx ModuleWidget::createContextMenu: model->name=\"%s\"\n", model->name.c_str());
 	menuLabel->text = model->author + " " + model->name + " " + model->plugin->version;
 	menu->addChild(menuLabel);
 

@@ -17,6 +17,8 @@ extern void vst2_oversample_realtime_set (float _factor, int _quality);
 extern void vst2_oversample_offline_set (float _factor, int _quality);
 extern void vst2_oversample_offline_check_set (int _bEnable);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
+extern void vst2_idle_detect_mode_fx_set (int _mode);
+extern void vst2_idle_detect_mode_instr_set (int _mode);
 #endif // RACK_HOST
 
 namespace rack {
@@ -274,6 +276,22 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
    }
 
    vst2_oversample_channels_set(oversampleNumIn, oversampleNumOut);
+
+	// Idle detection mode (instrument build)
+   {
+      json_t *idleJ = json_object_get(rootJ, "idleDetectInstr");
+      if (idleJ) {
+         vst2_idle_detect_mode_instr_set(int(json_number_value(idleJ)));
+      }
+   }
+
+	// Idle detection mode (FX build)
+   {
+      json_t *idleJ = json_object_get(rootJ, "idleDetectFx");
+      if (idleJ) {
+         vst2_idle_detect_mode_fx_set(int(json_number_value(idleJ)));
+      }
+   }
 #endif // RACK_HOST
 
 	// lastPath
