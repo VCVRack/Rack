@@ -200,4 +200,5 @@ using namespace rack_plugin_Southpole;
 
 RACK_PLUGIN_MODEL_INIT(Southpole, Piste) {
    Model *modelPiste = Model::create<Piste,PisteWidget>(  "Southpole", "Piste",     "Piste - drum processor", ENVELOPE_GENERATOR_TAG, EFFECT_TAG);
+   return modelPiste;
 }
