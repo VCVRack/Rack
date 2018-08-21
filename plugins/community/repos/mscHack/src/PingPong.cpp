@@ -48,6 +48,7 @@ struct PingPong : Module
         INPUT_L,
         INPUT_R,
         INPUT_SYNC,
+		INPUT_GNIP_TOGGLE,
         nINPUTS
 	};
 
@@ -79,6 +80,7 @@ struct PingPong : Module
     int             m_DelayIn = 0;
     int             m_DelayOut[ 2 ] = {0};
 
+    SchmittTrigger  m_SchmittReverse;
     bool            m_bReverseState = false;
 
     // sync clock
@@ -210,7 +212,9 @@ PingPong_Widget::PingPong_Widget( PingPong *module ) : ModuleWidget(module)
     addParam(ParamWidget::create<Knob_Red1_20>( Vec( 49, 308 ), module, PingPong::PARAM_LEVEL_FB_RR, 0.0, 1.0, 0.0 ) );
 
     // reverse button
-    module->m_pButtonReverse = new MyLEDButton( 17, 343, 11, 11, 8.0, DWRGB( 180, 180, 180 ), DWRGB( 255, 255, 0 ), MyLEDButton::TYPE_SWITCH, 0, module, PingPong_Reverse );
+    addInput(Port::create<MyPortInSmall>( Vec( 3, 340 ), Port::INPUT, module, PingPong::INPUT_GNIP_TOGGLE ) );
+
+    module->m_pButtonReverse = new MyLEDButton( 24, 343, 11, 11, 8.0, DWRGB( 180, 180, 180 ), DWRGB( 255, 255, 0 ), MyLEDButton::TYPE_SWITCH, 0, module, PingPong_Reverse );
 	addChild( module->m_pButtonReverse );
 
     module->m_bInitialized = true;
@@ -372,6 +376,16 @@ void PingPong::step()
 
     dL = params[ PARAM_DELAYL ].value * MAC_DELAY_SECONDS * engineGetSampleRate();
     dR = params[ PARAM_DELAYR ].value * MAC_DELAY_SECONDS * engineGetSampleRate();
+
+	if( m_SchmittReverse.process( inputs[ INPUT_GNIP_TOGGLE ].value ) )
+	{
+		if( m_pButtonReverse->m_bOn )
+			m_pButtonReverse->Set( false );
+		else
+			m_pButtonReverse->Set( true );
+
+		m_bReverseState = m_pButtonReverse->m_bOn;
+	}
 
     // check right channel first for possible mono
     if( inputs[ INPUT_SYNC ].active )

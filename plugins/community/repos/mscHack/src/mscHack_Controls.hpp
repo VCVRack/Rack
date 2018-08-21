@@ -113,17 +113,109 @@ typedef struct
 }EE_CTRL;
 
 
+
+struct EnvelopeData
+{
+	enum EnvelopeData_Modes
+	{
+	    MODE_LOOP,
+	    MODE_REVERSE,
+	    MODE_PINGPONG,
+	    MODE_ONESHOT,
+	    MODE_TWOSHOT,
+	    nMODES
+	};
+
+	enum EnvelopeData_Ranges
+	{
+	    RANGE_0to5,
+	    RANGE_n5to5,
+	    RANGE_0to10,
+	    RANGE_n10to10,
+		RANGE_0to1,
+		RANGE_n1to1,
+		RANGE_Audio,
+	    nRANGES
+	};
+
+	enum EnvelopeData_States
+	{
+	    STATE_RUN,
+	    STATE_RUN_REV,
+	    STATE_WAIT_TRIG,
+	    STATE_WAIT_TRIG_REV,
+	    STATE_HOLD,
+	    nSTATES
+	};
+
+	enum EnvelopeData_Presets
+	{
+	    PRESET_CLEAR,
+		PRESET_HALF,
+		PRESET_SIN,
+		PRESET_COS,
+		PRESET_COS_HALF,
+		PRESET_TRI_FULL,
+		PRESET_TRI_HALF,
+		PRESET_SQR,
+		PRESET_SET,
+	    nPRESETS
+	};
+
+	bool            m_bInitialized=false;
+	bool            m_bGateMode = false;
+	int             m_Mode = MODE_LOOP;
+	int             m_Range= RANGE_0to5;
+	float           m_HandleVal[ ENVELOPE_HANDLES ]={};
+	fLine           m_Lines[ ENVELOPE_HANDLES ]={};
+	float           m_fsegsize = 1.0f;
+	float           m_fIndicator = 0.0f;
+
+	EE_CTRL         m_Clock = {};
+
+	EnvelopeData(){};
+
+	void Init( int mode, int range, bool bGate, float fsegsize );
+	void Preset( int preset );
+
+    void resetValAll( float val );
+    void setVal( int handle, float val );
+    void setMode( int Mode );
+
+    void setDataAll( int *pint );
+    void getDataAll( int *pint );
+
+    float getActualVal( float val );
+
+    void  line_from_points( float x1, float y1, float x2, float y2, fLine *L );
+    float valfromline ( int handle, float x );
+    void  recalcLine( int handle );
+
+    bool  process_state( bool bTrig, bool bHold );
+    float procStep( bool bTrig, bool bHold );
+};
+
+
 struct Widget_EnvelopeEdit : OpaqueWidget
 {
+	enum Widget_EnvelopeEdit_TimeDivs
+	{
+	    TIME_64th,
+	    TIME_32nd,
+	    TIME_16th,
+	    TIME_8th,
+	    TIME_4tr,
+	    TIME_Bar,
+	    nTIMEDIVS
+	};
+
     typedef void EnvelopeEditCALLBACK ( void *pClass, float val );
 
+    EnvelopeData    m_EnvData[ MAX_ENVELOPE_CHANNELS ] = {};
+
     bool            m_bInitialized=false;
-    bool            m_bGateMode[ MAX_ENVELOPE_CHANNELS ] = {false};
-    int             m_Mode[ MAX_ENVELOPE_CHANNELS ]={MODE_LOOP};
-    int             m_Range[ MAX_ENVELOPE_CHANNELS ]={RANGE_0to5};
+
     int             m_TimeDiv[ MAX_ENVELOPE_CHANNELS ]={TIME_64th};
-    float           m_HandleVal[ MAX_ENVELOPE_CHANNELS ][ ENVELOPE_HANDLES ]={};
-    fLine           m_Lines[ MAX_ENVELOPE_CHANNELS ][ ENVELOPE_HANDLES ]={};
 
     float           m_divw=0;
     float           m_handleSize=0, m_handleSizeD2;
@@ -131,6 +223,7 @@ struct Widget_EnvelopeEdit : OpaqueWidget
     int             m_Drag = -1;
     float           m_fband = 0.0f;
 
+    int             m_MaxChannels;
 
     bool            m_bDrag = false, m_bDraw = false;
     float           m_Drawy = 0.0f;
@@ -138,58 +231,14 @@ struct Widget_EnvelopeEdit : OpaqueWidget
     bool            m_bClkReset = false;
     int             m_BeatLen = 0;
 
-    float           m_fIndicator[ MAX_ENVELOPE_CHANNELS ] = {}; 
-
     RGB_STRUCT      m_HandleCol[ ENVELOPE_HANDLES ];
-    EE_CTRL         m_Clock[ MAX_ENVELOPE_CHANNELS ] ={};
-
 
     EnvelopeEditCALLBACK *m_pCallback = NULL;
     void            *m_pClass = NULL;
 
     bool            m_bClkd = false;
 
-	enum Widget_EnvelopeEdit_Modes 
-    {
-        MODE_LOOP,
-        MODE_REVERSE,
-        MODE_PINGPONG,
-        MODE_ONESHOT,
-        MODE_TWOSHOT,
-        nMODES
-	};
-
-	enum Widget_EnvelopeEdit_Ranges 
-    {
-        RANGE_0to5,
-        RANGE_n5to5,
-        RANGE_0to10,
-        RANGE_n10to10,
-        nRANGES
-	};
-
-	enum Widget_EnvelopeEdit_TimeDivs 
-    {
-        TIME_64th,
-        TIME_32nd,
-        TIME_16th,
-        TIME_8th,
-        TIME_4tr,
-        TIME_Bar,
-        nTIMEDIVS
-	};
-
-  	enum Widget_Envelope_States 
-    {
-        STATE_RUN,
-        STATE_RUN_REV,
-        STATE_WAIT_TRIG,
-        STATE_WAIT_TRIG_REV,
-        STATE_HOLD,
-        nSTATES
-	};   
-
-    Widget_EnvelopeEdit( int x, int y, int w, int h, int handleSize, void *pClass, EnvelopeEditCALLBACK *pCallback );
+    Widget_EnvelopeEdit( int x, int y, int w, int h, int handleSize, void *pClass, EnvelopeEditCALLBACK *pCallback, int nchannels );
 
     void setView( int ch );
     void resetValAll( int ch, float val );
@@ -214,8 +263,6 @@ struct Widget_EnvelopeEdit : OpaqueWidget
     float Val2y( float fval );
     float y2Val( float fy );
 
-    void  line_from_points( float x1, float y1, float x2, float y2, fLine *L );
-    float valfromline ( int ch, int handle, float x );
     void  recalcLine( int ch, int handle );
 
     // overrides

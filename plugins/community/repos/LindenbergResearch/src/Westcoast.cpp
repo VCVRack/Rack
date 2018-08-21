@@ -1,16 +1,18 @@
 #include "dsp/Serge.hpp"
 #include "dsp/Lockhart.hpp"
+#include "dsp/Saturator.hpp"
 #include "LindenbergResearch.hpp"
 
 namespace rack_plugin_LindenbergResearch {
 using namespace lrt;
 
+
 struct Westcoast : LRModule {
 
     enum RotaryStages {
-        OVERDRIVE = 1,
+        SERGE = 1,
         LOCKHART,
-        SERGE,
+        OVERDRIVE,
         SATURATE,
         POLYNOM,
         SOFTCLIP,
@@ -46,10 +48,12 @@ struct Westcoast : LRModule {
     Westcoast() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
        hs = new dsp::LockhartWavefolder(engineGetSampleRate());
        sg = new dsp::SergeWavefolder(engineGetSampleRate());
+       saturator = new dsp::Saturator(engineGetSampleRate());
     }
 
     dsp::LockhartWavefolder *hs;
     dsp::SergeWavefolder *sg;
+    dsp::Saturator *saturator;
     LRAlternateBigKnob *gain;
     LRAlternateMiddleKnob *bias;
 
@@ -95,24 +99,37 @@ void Westcoast::step() {
     }
 
     float out;
+    float gain = params[GAIN_PARAM].value + gaincv;
+    float bias = params[BIAS_PARAM].value + biascv;
 
     switch (lround(params[TYPE_PARAM].value)) {
-        case LOCKHART: // Lockhart Model
-            hs->setGain((params[GAIN_PARAM].value + gaincv));
-            hs->setBias(params[BIAS_PARAM].value + biascv);
+        case LOCKHART:  // Lockhart Model
+            hs->setGain(gain);
+            hs->setBias(bias);
             hs->setIn(inputs[SHAPER_INPUT].value);
 
             hs->process();
             out = (float) hs->getOut();
             break;
-        case SERGE: // Serge Model
-            sg->setGain((params[GAIN_PARAM].value + gaincv));
-            sg->setBias(params[BIAS_PARAM].value + biascv);
+
+        case SERGE:     // Serge Model
+            sg->setGain(gain);
+            sg->setBias(bias);
             sg->setIn(inputs[SHAPER_INPUT].value);
 
             sg->process();
             out = (float) sg->getOut();
             break;
+
+        case SATURATE: // Saturator
+            saturator->setGain(gain);
+            saturator->setBias(bias);
+            saturator->setIn(inputs[SHAPER_INPUT].value);
+
+            saturator->process();
+            out = (float) saturator->getOut();
+            break;
+
         default: // invalid state, should not happen
             out = 0;
             break;
@@ -124,8 +141,10 @@ void Westcoast::step() {
 
 void Westcoast::onSampleRateChange() {
     Module::onSampleRateChange();
+
     hs->setSamplerate(engineGetSampleRate());
     sg->setSamplerate(engineGetSampleRate());
+    saturator->setSamplerate(engineGetSampleRate());
 }
 
 
@@ -161,7 +180,7 @@ WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
     addParam(module->gain);
     addParam(module->bias);
 
-    addParam(LRKnob::create<LRMiddleIncremental>(Vec(85, 279.3), module, Westcoast::TYPE_PARAM, 1, 6, 1));
+    addParam(LRKnob::create<LRMiddleIncremental>(Vec(85, 279.3), module, Westcoast::TYPE_PARAM, 1, 7, 1));
 
     addParam(LRKnob::create<LRAlternateSmallKnob>(Vec(83.4, 101.00), module, Westcoast::CV_GAIN_PARAM, -1.f, 1.f, 0.f));
     addParam(LRKnob::create<LRAlternateSmallKnob>(Vec(83.4, 183.0), module, Westcoast::CV_BIAS_PARAM, -1.f, 1.f, 0.f));
@@ -207,7 +226,7 @@ void WestcoastWidget::appendContextMenu(Menu *menu) {
     auto *westcoast = dynamic_cast<Westcoast *>(module);
     assert(westcoast);
 
-    auto *mergeItem = MenuItem::create<WestcoastShowPatina>("use aged look");
+    auto *mergeItem = MenuItem::create<WestcoastShowPatina>("Aged Look");
     mergeItem->westcoast = westcoast;
     menu->addChild(mergeItem);
 }

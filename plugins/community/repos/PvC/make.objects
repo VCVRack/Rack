@@ -1,0 +1,19 @@
+ALL_OBJ= \
+	src/BangDaButton.o \
+	src/Compair.o \
+	src/CoSuOf.o \
+	src/FlipOLogic.o \
+	src/Geighths.o \
+	src/Heads.o \
+	src/PlainVoidCanvas.o \
+	src/pvc.o \
+	src/PvC64basic.o \
+	src/ShutIt.o \
+	src/SlimSeq.o \
+	src/SumIt.o \
+	src/TaHaSaHaN.o \
+	src/Tails.o \
+	src/Vamps.o \
+	src/Vubar.o
+
+

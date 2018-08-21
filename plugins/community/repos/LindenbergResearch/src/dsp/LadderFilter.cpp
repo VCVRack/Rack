@@ -1,4 +1,3 @@
-
 #include "LadderFilter.hpp"
 
 using namespace dsp;

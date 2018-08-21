@@ -4,6 +4,7 @@
 #include "dsp/ringbuffer.hpp"
 
 #define RS_BUFFER_SIZE 512
+#define UPSAMPLE_COMPENSATION 1.3
 
 
 namespace dsp {
@@ -12,9 +13,6 @@ namespace dsp {
      * @brief Base class for all signal processors
      */
     struct DSPEffect {
-
-    protected:
-
 
     public:
 
@@ -138,6 +136,7 @@ namespace dsp {
         int oversample, quality;
         double cutoff = 0.9;
 
+
         Upsampler(int oversample, int quality) {
             Upsampler::oversample = oversample;
             Upsampler::quality = quality;
@@ -195,12 +194,12 @@ namespace dsp {
          * @brief Constructor
          * @param factor Oversampling factor
          */
-        Resampler(int oversample) {
+        Resampler(int oversample, int quality = 4) {
             Resampler::oversample = oversample;
 
             for (int i = 0; i < CHANNELS; i++) {
-                decimator[i] = new Decimator(oversample, 1);
-                interpolator[i] = new Upsampler(oversample, 1);
+                decimator[i] = new Decimator(oversample, quality);
+                interpolator[i] = new Upsampler(oversample, quality);
             }
         }
 
@@ -214,7 +213,7 @@ namespace dsp {
          * @brief Create up-sampled data out of two basic values
          */
         void doUpsample(int channel, double in) {
-            interpolator[channel]->process(in, up[channel]);
+            interpolator[channel]->process(in * UPSAMPLE_COMPENSATION, up[channel]);
         }
 
 

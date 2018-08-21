@@ -32,7 +32,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-19Aug2018.7z](dist/veeseevstrack_0_6_1_win64_bin-19Aug2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-21Aug2018.7z](dist/veeseevstrack_0_6_1_win64_bin-21Aug2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
@@ -73,7 +73,7 @@ The binary distribution contains the following (17) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (575) add-on modules are statically linked with the VST plugin:
+The following (600) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -89,6 +89,16 @@ The following (575) add-on modules are statically linked with the VST plugin:
  - alto777_LFSR.cheapFX
  - alto777_LFSR.Divada
  - alto777_LFSR.YASeq3
+ - AmalgamatedHarmonics.Arpeggiator
+ - AmalgamatedHarmonics.Arpeggiator2
+ - AmalgamatedHarmonics.Circle
+ - AmalgamatedHarmonics.Imperfect
+ - AmalgamatedHarmonics.Imperfect2
+ - AmalgamatedHarmonics.Progress
+ - AmalgamatedHarmonics.Ruckus
+ - AmalgamatedHarmonics.ScaleQuantizer
+ - AmalgamatedHarmonics.ScaleQuantizer2
+ - AmalgamatedHarmonics.SLN
  - AS.ADSR
  - AS.AtNuVrTr
  - AS.BPMCalc
@@ -314,6 +324,12 @@ The following (575) add-on modules are statically linked with the VST plugin:
  - Fundamental.VCMixer
  - Fundamental.VCO
  - Fundamental.VCO2
+ - Geodesics.BlackHoles
+ - Geodesics.Pulsars
+ - Geodesics.Branes
+ - Geodesics.Ions
+ - Geodesics.BlankLogo
+ - Geodesics.BlankInfo
  - Gratrix.VCO_F1
  - Gratrix.VCO_F2
  - Gratrix.VCF_F1
@@ -424,6 +440,15 @@ The following (575) add-on modules are statically linked with the VST plugin:
  - mscHack.PingPong
  - mscHack.Osc_3Ch
  - mscHack.Compressor
+ - mscHack.Alienz
+ - mscHack.ASAF8
+ - mscHack.Dronez
+ - mscHack.Mixer_9_3_4
+ - mscHack.Mixer_16_4_4
+ - mscHack.Mixer_24_4_4
+ - mscHack.Morze
+ - mscHack.OSC_WaveMorph_3
+ - mscHack.Windz
  - mtsch_plugins.Sum
  - mtsch_plugins.Rationals
  - mtsch_plugins.TriggerPanic

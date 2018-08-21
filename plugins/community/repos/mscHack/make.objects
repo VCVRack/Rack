@@ -1,16 +1,24 @@
 ALL_OBJ= \
 	src/3Ch_Osc.o \
+	src/Alienz.o \
 	src/ARP700.o \
+	src/ASAF8.o \
 	src/CLog.o \
 	src/Compressor.o \
+	src/Dronez.o \
 	src/MasterClockx4.o \
 	src/Maude221.o \
 	src/Mixer_1x4_Stereo.o \
 	src/Mixer_24_4_4.o \
 	src/Mixer_2x4_Stereo.o \
 	src/Mixer_4x4_Stereo.o \
+	src/Mixer_9_3_4.o \
+	src/Mixer_16_4_4.o \
 	src/mscHack.o \
+	src/mscHack_Control_EnvelopeData.o \
 	src/mscHack_Control_EnvelopeEdit.o \
+	src/Morze.o \
+	src/OSC_WaveMorph_3.o \
 	src/PingPong.o \
 	src/Seq_3x16x16.o \
 	src/SEQ_6x32x16.o \
@@ -18,4 +26,5 @@ ALL_OBJ= \
 	src/Seq_Triad2.o \
 	src/StepDelay.o \
 	src/SynthDrums.o \
+   src/Windz.o \
 	src/XFade.o

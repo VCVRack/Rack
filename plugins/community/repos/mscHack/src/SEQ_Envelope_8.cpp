@@ -63,7 +63,7 @@ struct SEQ_Envelope_8 : Module
     int                 m_Ranges[ nCHANNELS ] = {};
     int                 m_TimeDivs[ nCHANNELS ] = {};
     bool                m_bHold[ nCHANNELS ] = {};
-    bool                m_bGateMode[ nCHANNELS ] = {true};
+    bool                m_bGateMode[ nCHANNELS ] = {};
     int                 m_HoldPos[ nCHANNELS ] = {};
     bool                m_bTrig[ nCHANNELS ] = {};
 
@@ -222,79 +222,21 @@ void SEQ_Envelope_8_Hold( void *pClass, int id, bool bOn )
 //-----------------------------------------------------
 void SEQ_Envelope_8_WaveSet( void *pClass, int id, bool bOn )
 {
-    int i;
-    float a, div;
     SEQ_Envelope_8 *mymodule;
     mymodule = (SEQ_Envelope_8*)pClass;
 
     if( id == 0 )
     {
-        if( ++mymodule->m_waveSet > 6 )
+        if( ++mymodule->m_waveSet >= EnvelopeData::nPRESETS )
             mymodule->m_waveSet = 0;
     }
     else
     {
         if( --mymodule->m_waveSet < 0 )
-            mymodule->m_waveSet = 6;
+            mymodule->m_waveSet = EnvelopeData::nPRESETS - 1;
     }
 
-    switch( mymodule->m_waveSet )
-    {
-    case 0:
-        mymodule->m_pEnvelope->resetValAll( mymodule->m_CurrentChannel, 0.0f );
-        break;
-    case 1:
-        mymodule->m_pEnvelope->resetValAll( mymodule->m_CurrentChannel, 0.5f );
-        break;
-    case 2: // sin
-        div = (float)(ENVELOPE_HANDLES - 1) / (PI * 2.0f);
-        for( i = 0; i < ENVELOPE_HANDLES; i++ )
-        {
-            a = ( 1.0f + sinf( (float)i / div ) ) / 2.0f;
-            mymodule->m_pEnvelope->setVal( mymodule->m_CurrentChannel, i, a );
-        }
-        break;
-    case 3: // cos
-        div = (float)(ENVELOPE_HANDLES - 1) / (PI * 2.0f);
-        for( i = 0; i < ENVELOPE_HANDLES; i++ )
-        {
-            a = ( 1.0f + cosf( (float)i / div ) ) / 2.0f;
-            mymodule->m_pEnvelope->setVal( mymodule->m_CurrentChannel, i, a );
-        }
-        break;
-    case 4: // cos half
-        div = (float)(ENVELOPE_HANDLES - 1) / (PI * 1.0f);
-        for( i = 0; i < ENVELOPE_HANDLES; i++ )
-        {
-            a = ( 1.0f + cosf( (float)i / div ) ) / 2.0f;
-            mymodule->m_pEnvelope->setVal( mymodule->m_CurrentChannel, i, a );
-        }
-        break;
-    case 5: // triangle full
-        div = 1.0f / 16.0f;
-        a = 0;
-        for( i = 0; i < ENVELOPE_HANDLES; i++ )
-        {
-            mymodule->m_pEnvelope->setVal( mymodule->m_CurrentChannel, i, a );
-            a += div;
-        }
-        break;
-    case 6: // triangle half
-        div = 1.0f / 8.0f;
-        a = 0;
-        for( i = 0; i < ENVELOPE_HANDLES; i++ )
-        {
-            mymodule->m_pEnvelope->setVal( mymodule->m_CurrentChannel, i, a );
-            a += div;
-
-            if( i == 8 )
-                a = 0.0f;
-        }
-        break;
-
-    default:
-        break;
-    }
+    mymodule->m_pEnvelope->m_EnvData[ mymodule->m_CurrentChannel ].Preset( mymodule->m_waveSet );
 }
 
 //-----------------------------------------------------
@@ -307,7 +249,7 @@ void SEQ_Envelope_8_WaveInvert( void *pClass, int id, bool bOn )
     mymodule = (SEQ_Envelope_8*)pClass;
 
     for( i = 0; i < ENVELOPE_HANDLES; i++ )
-        mymodule->m_pEnvelope->setVal( mymodule->m_CurrentChannel, i, 1.0f - mymodule->m_pEnvelope->m_HandleVal[ mymodule->m_CurrentChannel ][ i ] );
+        mymodule->m_pEnvelope->setVal( mymodule->m_CurrentChannel, i, 1.0f - mymodule->m_pEnvelope->m_EnvData[ mymodule->m_CurrentChannel ].m_HandleVal[ i ] );
 }
 
 //-----------------------------------------------------
@@ -392,7 +334,7 @@ SEQ_Envelope_8_Widget::SEQ_Envelope_8_Widget( SEQ_Envelope_8 *module ) : ModuleW
 	addChild( module->m_pButtonInvert );
 
     // envelope editor
-    module->m_pEnvelope = new Widget_EnvelopeEdit( 47, 42, 416, 192, 7, module, EnvelopeEditCALLBACK );
+    module->m_pEnvelope = new Widget_EnvelopeEdit( 47, 42, 416, 192, 7, module, EnvelopeEditCALLBACK, nCHANNELS );
 	addChild( module->m_pEnvelope );
 
     // envelope select buttons
@@ -426,15 +368,15 @@ SEQ_Envelope_8_Widget::SEQ_Envelope_8_Widget( SEQ_Envelope_8 *module ) : ModuleW
 	addChild( module->m_pButtonCopy );
 
     // mode select
-    module->m_pButtonModeSelect = new MyLEDButtonStrip( 109, 256, 11, 11, 8, 8.0, Widget_EnvelopeEdit::nMODES, true, DWRGB( 180, 180, 180 ), DWRGB( 0, 255, 255 ), MyLEDButtonStrip::TYPE_EXCLUSIVE, 0, module, SEQ_Envelope_8_ModeSelect );
+    module->m_pButtonModeSelect = new MyLEDButtonStrip( 109, 256, 11, 11, 8, 8.0, EnvelopeData::nMODES, true, DWRGB( 180, 180, 180 ), DWRGB( 0, 255, 255 ), MyLEDButtonStrip::TYPE_EXCLUSIVE, 0, module, SEQ_Envelope_8_ModeSelect );
     addChild( module->m_pButtonModeSelect );
 
     // time select
     module->m_pButtonTimeSelect = new MyLEDButtonStrip( 272, 256, 11, 11, 8, 8.0, nTIMESETS, true, DWRGB( 180, 180, 180 ), DWRGB( 0, 255, 255 ), MyLEDButtonStrip::TYPE_EXCLUSIVE, 0, module, SEQ_Envelope_8_TimeSelect );
     addChild( module->m_pButtonTimeSelect );
 
-    // rande select
-    module->m_pButtonRangeSelect = new MyLEDButtonStrip( 350, 256, 11, 11, 8, 8.0, Widget_EnvelopeEdit::nRANGES, true, DWRGB( 180, 180, 180 ), DWRGB( 0, 255, 255 ), MyLEDButtonStrip::TYPE_EXCLUSIVE, 0, module, SEQ_Envelope_8_RangeSelect );
+    // range select
+    module->m_pButtonRangeSelect = new MyLEDButtonStrip( 350, 256, 11, 11, 8, 8.0, EnvelopeData::nRANGES - 3, true, DWRGB( 180, 180, 180 ), DWRGB( 0, 255, 255 ), MyLEDButtonStrip::TYPE_EXCLUSIVE, 0, module, SEQ_Envelope_8_RangeSelect );
     addChild( module->m_pButtonRangeSelect );
 
     // draw mode
@@ -631,7 +573,7 @@ void SEQ_Envelope_8::ChangeChannel( int ch )
 
         for( i = 0; i < ENVELOPE_HANDLES; i++ )
         {
-            m_pEnvelope->setVal( ch, i, m_pEnvelope ->m_HandleVal[ m_CurrentChannel ][ i ] );
+            m_pEnvelope->setVal( ch, i, m_pEnvelope ->m_EnvData[ m_CurrentChannel ].m_HandleVal[ i ] );
         }
 
         m_TimeDivs[ ch ]  = m_TimeDivs[ m_CurrentChannel ];

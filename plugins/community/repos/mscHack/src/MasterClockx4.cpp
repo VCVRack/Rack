@@ -79,7 +79,7 @@ struct MasterClockx4 : Module
     ParamWidget        *m_pHumanKnob = NULL;
 
     // Contructor
-	MasterClockx4() : Module(nPARAMS, nINPUTS, nOUTPUTS, 0){}
+	MasterClockx4() : Module(nPARAMS, nINPUTS, nOUTPUTS){}
 
     //-----------------------------------------------------
     // MyHumanize_Knob
@@ -124,7 +124,7 @@ struct MasterClockx4 : Module
     struct MyMult_Knob : Knob_Yellow2_26_Snap
     {
         MasterClockx4 *mymodule;
-        int param, col;
+        int ch, col;
 
         void onChange( EventChange &e ) override 
         {
@@ -135,12 +135,12 @@ struct MasterClockx4 : Module
                 //if( !mymodule->m_bInitialized )
                     //return;
 
-                param = paramId - MasterClockx4::PARAM_MULT;
+                ch = paramId - MasterClockx4::PARAM_MULT;
 
-                if( mymodule->m_ChannelMultSelect[ param ] != (int)value )
-                {
-                    mymodule->SetDisplayLED( param, (int)value );
-                }
+                //if( ch >= 0 && ch <= 3 )
+                //{
+                    mymodule->SetDisplayLED( ch, (int)value );
+                //}
             }
 
 		    RoundKnob::onChange( e );
@@ -149,6 +149,7 @@ struct MasterClockx4 : Module
 
     // Overrides 
 	void    step() override;
+    void    JsonParams( bool bTo, json_t *root);
     json_t* toJson() override;
     void    fromJson(json_t *rootJ) override;
     void    onReset() override;
@@ -273,7 +274,7 @@ MasterClockx4_Widget::MasterClockx4_Widget( MasterClockx4 *module ) : ModuleWidg
 	    addChild( module->m_pButtonTimeX2[ ch ] );
 
         // clock mult knob
-        addParam(ParamWidget::create<MasterClockx4::MyMult_Knob>( Vec( x + 13, y + 13 ), module, MasterClockx4::PARAM_MULT + ch, 0, CLOCK_DIVS - 1, MID_INDEX ) );
+        addParam(ParamWidget::create<MasterClockx4::MyMult_Knob>( Vec( x + 13, y + 13 ), module, MasterClockx4::PARAM_MULT + ch, 0.0f, (float)(CLOCK_DIVS - 1), (float)(MID_INDEX) ) );
 
         // mult display
         module->m_pDigitDisplayMult[ ch ] = new MyLED7DigitDisplay( x + 10, y + 48, 0.07, DWRGB( 0, 0, 0 ), DWRGB( 0xFF, 0xFF, 0xFF ), MyLED7DigitDisplay::TYPE_INT, 2 );
@@ -312,93 +313,41 @@ MasterClockx4_Widget::MasterClockx4_Widget( MasterClockx4 *module ) : ModuleWidg
 }
 
 //-----------------------------------------------------
+// Procedure: JsonParams  
+//
+//-----------------------------------------------------
+void MasterClockx4::JsonParams( bool bTo, json_t *root) 
+{
+    JsonDataBool( bTo, "m_bGlobalStopState", root, &m_bGlobalStopState, 1 );
+    JsonDataBool( bTo, "m_bStopState", root, m_bStopState, nCHANNELS );
+    JsonDataBool( bTo, "m_bTimeX2", root, m_bTimeX2, nCHANNELS );
+    JsonDataInt ( bTo, "m_ChannelMultSelect", root, m_ChannelMultSelect, nCHANNELS );
+}
+
+//-----------------------------------------------------
 // Procedure:   
 //
 //-----------------------------------------------------
 json_t *MasterClockx4::toJson() 
 {
-    bool *pbool;
-	json_t *rootJ = json_object();
-    json_t *gateJ;
 
-    // m_bGlobalStopState
-    json_object_set_new( rootJ, "m_bGlobalStopState", json_boolean (m_bGlobalStopState) );
+	json_t *root = json_object();
 
-	// m_bStopState
-    pbool = &m_bStopState[ 0 ];
+    if( !root )
+        return NULL;
 
-	json_t *gatesJ = json_array();
-
-	for (int i = 0; i < nCHANNELS; i++)
-    {
-		gateJ = json_boolean( (int) pbool[ i ] );
-		json_array_append_new( gatesJ, gateJ );
-	}
-
-	json_object_set_new( rootJ, "m_bStopState", gatesJ );
-
-	// m_bTimeX2
-    pbool = &m_bTimeX2[ 0 ];
-
-	gatesJ = json_array();
-
-	for (int i = 0; i < nCHANNELS; i++)
-    {
-		gateJ = json_boolean( (int) pbool[ i ] );
-		json_array_append_new( gatesJ, gateJ );
-	}
-
-	json_object_set_new( rootJ, "m_bTimeX2", gatesJ );
-	return rootJ;
+    JsonParams( TOJSON, root );
+    
+	return root;
 }
 
 //-----------------------------------------------------
 // Procedure:   fromJson
 //
 //-----------------------------------------------------
-void MasterClockx4::fromJson(json_t *rootJ) 
+void MasterClockx4::fromJson(json_t *root) 
 {
-   bool *pbool;
-   json_t *gateJ;
-
-    // m_bGlobalStopState
-	json_t *revJ = json_object_get(rootJ, "m_bGlobalStopState");
-
-	if (revJ)
-		m_bGlobalStopState = json_is_true( revJ );
-
-	// m_bPauseState
-    pbool = &m_bStopState[ 0 ];
-
-	json_t *StepsJ = json_object_get(rootJ, "m_bStopState");
-
-	if (StepsJ) 
-    {
-		for (int i = 0; i < nCHANNELS; i++)
-        {
-			gateJ = json_array_get(StepsJ, i);
-
-			if (gateJ)
-				pbool[ i ] = json_boolean_value( gateJ );
-		}
-	}
-
-	// m_bTimeX2
-    pbool = &m_bTimeX2[ 0 ];
-
-	StepsJ = json_object_get(rootJ, "m_bTimeX2");
-
-	if (StepsJ) 
-    {
-		for (int i = 0; i < nCHANNELS; i++)
-        {
-			gateJ = json_array_get(StepsJ, i);
-
-			if (gateJ)
-				pbool[ i ] = json_boolean_value( gateJ );
-		}
-	}
-
+    JsonParams( FROMJSON, root );
 
     m_pButtonGlobalStop->Set( m_bGlobalStopState );
 
@@ -407,7 +356,7 @@ void MasterClockx4::fromJson(json_t *rootJ)
         m_pButtonStop[ ch ]->Set( m_bStopState[ ch ] );
         m_pButtonTimeX2[ ch ]->Set( m_bTimeX2[ ch ] );
         //lg.f( "value = %d\n", (int)params[ PARAM_MULT + ch ].value );
-        SetDisplayLED( ch, (int)params[ PARAM_MULT + ch ].value );
+        SetDisplayLED( ch, m_ChannelMultSelect[ ch ] );
     }
 
     m_fMainClockCount = 0;
@@ -438,7 +387,8 @@ void MasterClockx4::onReset()
     {
         m_bTimeX2[ ch ] = false;
         m_bStopState[ ch ] = false;
-        m_pButtonStop[ ch ]->Set( m_bStopState[ ch ] );
+        m_pButtonStop[ ch ]->Set( false );
+        m_pButtonTimeX2[ ch ]->Set( false );
         SetDisplayLED( ch, MID_INDEX );
     }
 
@@ -531,7 +481,7 @@ void MasterClockx4::CalcChannelClockRate( int ch )
     // for beat division just keep a count of beats
     if( m_ChannelMultSelect[ ch ] == MID_INDEX )
         m_ChannelDivBeatCount[ ch ] = 1;
-    if( m_ChannelMultSelect[ ch ] <= MID_INDEX )
+    else if( m_ChannelMultSelect[ ch ] < MID_INDEX )
         m_ChannelDivBeatCount[ ch ] = multdisplayval[ m_ChannelMultSelect[ ch ] ] * mult;
     else
         m_fChannelBeatsPers[ ch ] = m_fBeatsPers * (float)( multdisplayval[ m_ChannelMultSelect[ ch ] ] * mult );
@@ -544,6 +494,7 @@ void MasterClockx4::CalcChannelClockRate( int ch )
 void MasterClockx4::step() 
 {
     int ch, mult = 1;
+    unsigned int ival;
     float fSyncPulseOut, fClkPulseOut;
     bool bMainClockTrig = false, bChannelClockTrig;
 
@@ -562,9 +513,17 @@ void MasterClockx4::step()
         m_bWasChained = true;
 
         // value of less than zero is a trig
-        if( inputs[ INPUT_CHAIN ].value < 10.0 )
+        if( inputs[ INPUT_CHAIN ].value < 8.0 )
         {
-            bMainClockTrig = true;
+			ival = (unsigned int)inputs[ INPUT_CHAIN ].value;
+
+			bMainClockTrig = ( ival & 1 );
+
+			m_bGlobalSync = ( ival & 2 );
+
+			m_bGlobalStopState = ( ival & 4 );
+
+			m_pButtonGlobalStop->Set( m_bGlobalStopState );
         }
         // values greater than zero are the bpm
         else
@@ -581,13 +540,16 @@ void MasterClockx4::step()
             m_pBpmKnob->visible = true;
             m_bWasChained = false;
             BPMChange( params[ PARAM_BPM ].value, false );
+            m_pButtonGlobalStop->Set( m_bGlobalStopState );
         }
 
         // keep track of main bpm
         m_fMainClockCount += m_fBeatsPers;
-        if( ( m_fMainClockCount + m_fHumanize ) >= engineGetSampleRate() )
+        //if( ( m_fMainClockCount + m_fHumanize ) >= engineGetSampleRate() )
+        if( m_fMainClockCount >= (engineGetSampleRate()-1) )
         {
-            m_fMainClockCount = ( m_fMainClockCount + m_fHumanize ) - engineGetSampleRate();
+            //m_fMainClockCount = ( m_fMainClockCount + m_fHumanize ) - engineGetSampleRate();
+        	m_fMainClockCount = m_fMainClockCount - (engineGetSampleRate()-1);
 
             GetNewHumanizeVal();
 
@@ -598,8 +560,19 @@ void MasterClockx4::step()
     // send chain
     if( outputs[ OUTPUT_CHAIN ].active )
     {
+    	ival = 0;
+
         if( bMainClockTrig )
-            outputs[ OUTPUT_CHAIN ].value = -1.0;
+        	ival |= 1;
+
+        if( m_bGlobalSync )
+        	ival |= 2;
+
+        if( m_bGlobalStopState )
+        	ival |= 4;
+
+        if( ival )
+            outputs[ OUTPUT_CHAIN ].value = (float)ival;
         else
             outputs[ OUTPUT_CHAIN ].value = m_fBPM;
     }
@@ -635,7 +608,7 @@ void MasterClockx4::step()
             else
             {
                 // divisions of clock will count beats
-                if( m_ChannelMultSelect[ ch ] <= MID_INDEX )
+                if( m_ChannelMultSelect[ ch ] < MID_INDEX )
                 {
                     if( m_bTimeX2[ ch ] )
                         mult = 2;
@@ -666,7 +639,7 @@ void MasterClockx4::step()
         }
 
         if( bChannelClockTrig )
-            m_PulseClock[ ch ].trigger(1e-3);
+            m_PulseClock[ ch ].trigger( 0.050f );
 
         // syncs
         fSyncPulseOut = m_PulseSync[ ch ].process( 1.0 / engineGetSampleRate() ) ? CV_MAX : 0.0;

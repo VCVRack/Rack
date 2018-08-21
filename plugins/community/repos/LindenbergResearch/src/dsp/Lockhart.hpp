@@ -11,7 +11,6 @@
 #define LOCKHART_THRESHOLD 10e-10
 
 
-
 namespace dsp {
 
     /**
@@ -39,8 +38,6 @@ namespace dsp {
     private:
         LockhartWFStage lh1, lh2, lh3, lh4;
 
-
-
     public:
         explicit LockhartWavefolder(float sr);
 
@@ -48,10 +45,6 @@ namespace dsp {
         void invalidate() override;
         void process() override;
         double compute(double x) override;
-
-
-
-
     };
 
 }

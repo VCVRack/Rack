@@ -5,6 +5,7 @@ ALL_OBJ= \
 	src/dsp/Lockhart.o \
 	src/dsp/MS20zdf.o \
 	src/dsp/Oscillator.o \
+	src/dsp/Saturator.o \
 	src/dsp/Serge.o \
 	src/dsp/WaveShaper.o \
 	src/widgets/LRCVIndicator.o \
@@ -22,4 +23,5 @@ ALL_OBJ= \
 	src/ReShaper.o \
 	src/SimpleFilter.o \
 	src/VCO.o \
+	src/Westcoast_v1.o \
 	src/Westcoast.o

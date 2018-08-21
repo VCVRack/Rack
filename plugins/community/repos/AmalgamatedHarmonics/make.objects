@@ -1,0 +1,14 @@
+ALL_OBJ= \
+	src/AH.o \
+	src/Arpeggiator.o \
+	src/ArpeggiatorMkII.o \
+	src/Circle.o \
+	src/Core.o \
+	src/Imperfect.o \
+	src/Imperfect2.o \
+	src/Progress.o \
+	src/Ruckus.o \
+	src/ScaleQuantizer.o \
+	src/ScaleQuantizerMkII.o \
+	src/SLN.o \
+	src/UI.o

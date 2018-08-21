@@ -6,6 +6,7 @@ RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, SimpleFilter);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, MS20Filter);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, AlmaFilter);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, ReShaper);
+RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, Westcoast_v1);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, Westcoast);
 
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, VCO);
@@ -24,6 +25,7 @@ RACK_PLUGIN_INIT(LindenbergResearch) {
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, MS20Filter);
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, AlmaFilter);
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, ReShaper);
+   RACK_PLUGIN_MODEL_ADD(LindenbergResearch, Westcoast_v1);
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, Westcoast);
 
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, VCO);

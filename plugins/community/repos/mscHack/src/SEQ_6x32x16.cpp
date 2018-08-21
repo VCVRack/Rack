@@ -42,8 +42,9 @@ struct SEQ_6x32x16 : Module
         IN_GLOBAL_CLK_RESET,
         IN_GLOBAL_PAT_CHANGE,
         IN_CLK,
-        IN_PAT_TRIG     = IN_CLK + nCHANNELS,
-        nINPUTS         = IN_PAT_TRIG + nCHANNELS
+        IN_PAT_TRIG     	= IN_CLK + nCHANNELS,
+		IN_GLOBAL_TRIG_MUTE = IN_PAT_TRIG + nCHANNELS,
+        nINPUTS
 	};
 
 	enum OutputIds 
@@ -85,6 +86,10 @@ struct SEQ_6x32x16 : Module
 
     int                     m_CopySrc = NO_COPY;
 
+    // trig mute
+    bool            		m_bTrigMute = false;
+    MyLEDButton     		*m_pButtonTrigMute = NULL;
+
     // buttons    
     MyLEDButton             *m_pButtonPause[ nCHANNELS ] = {};
     MyLEDButton             *m_pButtonCopy[ nCHANNELS ] = {};
@@ -100,6 +105,8 @@ struct SEQ_6x32x16 : Module
     float                   m_fCVRanges[ 3 ] = { 15.0f, 10.0f, 5.0f};
     int                     m_RangeSelect = 0;
     char                    m_strRange[ 10 ] = {0};
+
+	 float flast[ nCHANNELS ];
 
     // Contructor
 	SEQ_6x32x16() : Module(nPARAMS, nINPUTS, nOUTPUTS, 0){}
@@ -118,6 +125,16 @@ struct SEQ_6x32x16 : Module
     void    SetPendingProg( int ch, int prog );
     void    Copy( int kb, bool bOn );
 };
+
+//-----------------------------------------------------
+// MyLEDButton_TrigMute
+//-----------------------------------------------------
+void MyLEDButton_TrigMute( void *pClass, int id, bool bOn )
+{
+	SEQ_6x32x16 *mymodule;
+    mymodule = (SEQ_6x32x16*)pClass;
+    mymodule->m_bTrigMute = bOn;
+}
 
 //-----------------------------------------------------
 // MyLEDButton_AutoPat
@@ -272,6 +289,12 @@ SEQ_6x32x16_Widget::SEQ_6x32x16_Widget( SEQ_6x32x16 *module ) : ModuleWidget(mod
     addInput(Port::create<MyPortInSmall>( Vec( 204, 357 ), Port::INPUT, module, SEQ_6x32x16::IN_GLOBAL_CLK_RESET ) );
     addInput(Port::create<MyPortInSmall>( Vec( 90, 357 ), Port::INPUT, module, SEQ_6x32x16::IN_GLOBAL_PAT_CHANGE ) );
 
+    // trig mute
+    module->m_pButtonTrigMute = new MyLEDButton( 491, 3, 15, 15, 13.0, DWRGB( 180, 180, 180 ), DWRGB( 255, 0, 0 ), MyLEDButton::TYPE_SWITCH, 0, module, MyLEDButton_TrigMute );
+    addChild( module->m_pButtonTrigMute );
+
+    addInput(Port::create<MyPortInSmall>( Vec( 466, 1 ), Port::INPUT, module, SEQ_6x32x16::IN_GLOBAL_TRIG_MUTE ) );
+
     for( int ch = 0; ch < nCHANNELS; ch++ )
     {
         // inputs
@@ -360,6 +383,7 @@ void SEQ_6x32x16::JsonParams( bool bTo, json_t *root)
     JsonDataBool    ( bTo, "m_bAutoPatChange",  root, &m_bAutoPatChange[ 0 ], nCHANNELS );
     JsonDataBool    ( bTo, "m_bHoldCVState",    root, &m_bHoldCVState[ 0 ], nCHANNELS );
     JsonDataInt     ( bTo, "m_RangeSelect",     root, &m_RangeSelect, 1 );
+    JsonDataBool    ( bTo, "m_bTrigMute",       root, &m_bTrigMute, 1 );
 }
 
 //-----------------------------------------------------
@@ -399,6 +423,9 @@ void SEQ_6x32x16::fromJson( json_t *root )
         m_pProgramDisplay[ ch ]->SetPat( m_CurrentProg[ ch ], false );
         m_pProgramDisplay[ ch ]->SetMax( m_MaxProg[ ch ] );
     }
+
+	if( m_bTrigMute )
+		m_pButtonTrigMute->Set( m_bTrigMute );
 
     sprintf( m_strRange, "%.1fV", m_fCVRanges[ m_RangeSelect ] );
 }
@@ -588,6 +615,20 @@ void SEQ_6x32x16::step()
     if( !m_bInitialized )
         return;
 
+    if( inputs[ IN_GLOBAL_TRIG_MUTE ].active )
+    {
+		if( inputs[ IN_GLOBAL_TRIG_MUTE ].value >= 0.00001 )
+		{
+			m_bTrigMute = true;
+			m_pButtonTrigMute->Set( true );
+		}
+		else if( inputs[ IN_GLOBAL_TRIG_MUTE ].value < 0.00001 )
+		{
+			m_bTrigMute = false;
+			m_pButtonTrigMute->Set( false );
+		}
+    }
+
     if( inputs[ IN_GLOBAL_CLK_RESET ].active )
         bGlobalClk = m_SchTrigGlobalClkReset.process( inputs[ IN_GLOBAL_CLK_RESET ].value );
 
@@ -684,7 +725,10 @@ void SEQ_6x32x16::step()
             m_gatePulse[ ch ].trigger(1e-3);
         }
 
-        outputs[ OUT_TRIG + ch ].value = m_gatePulse[ ch ].process( 1.0 / engineGetSampleRate() ) ? CV_MAX : 0.0;
+        if( !m_bTrigMute )
+        	outputs[ OUT_TRIG + ch ].value = m_gatePulse[ ch ].process( 1.0 / engineGetSampleRate() ) ? CV_MAX : 0.0;
+        else
+        	outputs[ OUT_TRIG + ch ].value = 0.0f;
 
         level = m_Pattern[ ch ][ m_CurrentProg[ ch ] ][ m_pPatternDisplay[ ch ]->m_PatClk ];
 
@@ -717,7 +761,13 @@ void SEQ_6x32x16::step()
         if( m_bBiLevelState[ ch ] )
             fout = ( fout * 2 ) - 1.0;
 
-        outputs[ OUT_LEVEL + ch ].value = m_fCVRanges[ m_RangeSelect ] * fout;
+        if( m_bTrigMute )
+        	outputs[ OUT_LEVEL + ch ].value = flast[ ch ];
+        else
+        {
+        	flast[ ch ] = m_fCVRanges[ m_RangeSelect ] * fout;
+        	outputs[ OUT_LEVEL + ch ].value = flast[ ch ];
+        }
     }
 }
 

@@ -57,12 +57,12 @@ void SergeWavefolder::process() {
 
 double SergeWavefolder::compute(double x) {
     double out;
-    double in = clampd(x / 5., -SHAPER_MAX_VOLTS, SHAPER_MAX_VOLTS);
+    double in = clampd(x, -SHAPER_MAX_VOLTS, SHAPER_MAX_VOLTS);
 
     in *= clampd(gain, 0., 20.); // add gain
-    in += clampd(bias, -3., 3.); // add bias
+    in += clampd(bias * 2, -12., 12.); // add bias
 
-    in *= 0.5;
+    in *= 0.07;
 
     in = sg1.compute(in);
     in = sg2.compute(in);
@@ -71,11 +71,11 @@ double SergeWavefolder::compute(double x) {
     in = sg5.compute(in);
     in = sg6.compute(in);
 
-    in *= 4.f;
+    in = tanh1->next(in) * 3.f;
     if (blockDC) in = dc->filter(in);
 
-    out = tanh1->next(in);
+    out = in * 10;
 
-    return out * 20.;
+    return out;
 }
 

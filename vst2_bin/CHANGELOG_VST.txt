@@ -1,3 +1,33 @@
+** August 21st, 2018
+- add module AmalgamatedHarmonics.Arpeggiator
+- add module AmalgamatedHarmonics.Arpeggiator2
+- add module AmalgamatedHarmonics.Circle
+- add module AmalgamatedHarmonics.Imperfect
+- add module AmalgamatedHarmonics.Imperfect2
+- add module AmalgamatedHarmonics.Progress
+- add module AmalgamatedHarmonics.Ruckus
+- add module AmalgamatedHarmonics.ScaleQuantizer
+- add module AmalgamatedHarmonics.ScaleQuantizer2
+- add module AmalgamatedHarmonics.SLN
+- add module Geodesics.BlackHoles
+- add module Geodesics.Pulsars
+- add module Geodesics.Branes
+- add module Geodesics.Ions
+- add module Geodesics.BlankLogo
+- add module Geodesics.BlankInfo
+- update module LindenbergResearch.Westcoast (preview)
+- add module mscHack.Alienz
+- add module mscHack.ASAF8
+- add module mscHack.Dronez
+- add module mscHack.Mixer_9_3_4
+- add module mscHack.Mixer_16_4_4
+- add module mscHack.Mixer_24_4_4
+- add module mscHack.Morze
+- add module mscHack.OSC_WaveMorph_3
+- update module mscHack.SEQ_6x32x16
+- add module mscHack.Windz
+
+
 ** August 19th, 2018
 - add idle detection support
    - default detection settings are configured in settings.json ("idleDetectInstr", "idleDetectFx")

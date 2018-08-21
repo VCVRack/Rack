@@ -460,7 +460,7 @@ namespace lrt {
         LRAlternateMiddleKnob() {
             setSVG(SVG::load(assetPlugin(plugin, "res/AlternateMiddleKnob.svg")));
             setIndicatorDistance(11);
-            setIndicatorShape(6, 0.2);
+            setIndicatorShape(5.0, 0.14);
             shader->setShadowPosition(4, 5);
 
             setSnap(0.0f, 0.12f);

@@ -103,8 +103,10 @@ struct Mixer_24_4_4 : Module
     int                     m_iRouteGroup[ nINCHANNELS ] = {nGROUPS};
     MyLEDButtonStrip       *m_pMultiButtonRoute[ nINCHANNELS ] = {0};
 
+    // menu
     bool                    m_bGroupPreMute = true;
     bool                    m_bGainLevelx2 = false;
+    bool                    m_bAuxIgnoreSolo = false;
 
     // Overrides 
 	void    step() override;
@@ -116,7 +118,7 @@ struct Mixer_24_4_4 : Module
     void    onCreate() override;
     void    onDelete() override;
     
-    void ProcessMuteSolo( int channel, bool bMute, bool bGroup, bool bOn );
+    void ProcessMuteSolo( int channel, bool bMute, bool bOn );
     void ProcessEQ( int ch, float *pL, float *pR );
     void SetControls( int ch );
 
@@ -195,7 +197,7 @@ void Button_ChSolo( void *pClass, int id, bool bOn )
 {
     Mixer_24_4_4 *mymodule;
     mymodule = (Mixer_24_4_4*)pClass;
-    mymodule->ProcessMuteSolo( id, false, false, bOn );
+    mymodule->ProcessMuteSolo( id, false, bOn );
 }
 
 //-----------------------------------------------------
@@ -205,7 +207,7 @@ void Button_ChMute( void *pClass, int id, bool bOn )
 {
     Mixer_24_4_4 *mymodule;
     mymodule = (Mixer_24_4_4*)pClass;
-    mymodule->ProcessMuteSolo( id, true, false, bOn );
+    mymodule->ProcessMuteSolo( id, true, bOn );
 }
 
 //-----------------------------------------------------
@@ -331,8 +333,8 @@ Mixer_24_4_4_Widget::Mixer_24_4_4_Widget( Mixer_24_4_4 *module ) : ModuleWidget(
                 break;
             }
 
-            addOutput(Port::create<MyPortOutSmall>( Vec( x2 - 1, y2 + 22), Port::OUTPUT, module, Mixer_24_4_4::OUT_AUXL + (ch - 28) ) );
-            addOutput(Port::create<MyPortOutSmall>( Vec( x2 - 1, y2 + 47), Port::OUTPUT, module, Mixer_24_4_4::OUT_AUXR + (ch - 28) ) );
+            addOutput(Port::create<MyPortOutSmall>( Vec( x2 - 1, y2 + 22), Port::OUTPUT, module, Mixer_24_4_4::OUT_AUXL + (ch - (nCHANNELS - nAUX)) ) );
+            addOutput(Port::create<MyPortOutSmall>( Vec( x2 - 1, y2 + 47), Port::OUTPUT, module, Mixer_24_4_4::OUT_AUXR + (ch - (nCHANNELS - nAUX)) ) );
 
             y2 += 75;
         }
@@ -369,7 +371,7 @@ Mixer_24_4_4_Widget::Mixer_24_4_4_Widget( Mixer_24_4_4 *module ) : ModuleWidget(
         y2 += 19;
 
         // mute/solo
-        if( bNormal )
+        if( bNormal || bGroup )
         {
             module->m_pButtonChannelMute[ ch ] = new MyLEDButton( x + 3, y2, 8, 8, 6.0f, DWRGB( 180, 180, 180 ), DWRGB( 255, 0, 0 ), MyLEDButton::TYPE_SWITCH, ch, module, Button_ChMute );
 	        addChild( module->m_pButtonChannelMute[ ch ] );
@@ -450,12 +452,13 @@ Mixer_24_4_4_Widget::Mixer_24_4_4_Widget( Mixer_24_4_4 *module ) : ModuleWidget(
 //-----------------------------------------------------
 void Mixer_24_4_4::JsonParams( bool bTo, json_t *root) 
 {
-    JsonDataBool( bTo, "m_bMuteStates", root, m_bMuteStates, 32 );
-    JsonDataBool( bTo, "m_bSoloStates", root, m_bSoloStates, 32 );
+    JsonDataBool( bTo, "m_bMuteStates", root, m_bMuteStates, nCHANNELS );
+    JsonDataBool( bTo, "m_bSoloStates", root, m_bSoloStates, nCHANNELS );
     JsonDataInt( bTo, "m_iRouteGroup", root, &m_iRouteGroup[ 0 ], nINCHANNELS );
     JsonDataBool( bTo, "m_bGroupPreMute", root, &m_bGroupPreMute, 1 );
     JsonDataBool( bTo, "m_bGainLevelx2", root, &m_bGainLevelx2, 1 );
     JsonDataBool( bTo, "m_bPreFader", root, m_bPreFader, nINCHANNELS + nGROUPS );
+    JsonDataBool( bTo, "m_bAuxIgnoreSolo", root, &m_bAuxIgnoreSolo, 1 );
 }
 
 //-----------------------------------------------------
@@ -481,32 +484,16 @@ json_t *Mixer_24_4_4::toJson()
 void Mixer_24_4_4::fromJson( json_t *root ) 
 {
     int ch;
-    bool bSolo = false;
 
     JsonParams( FROMJSON, root );
 
     // anybody soloing?
     for( ch = 0; ch < nCHANNELS; ch++ )
     {
-        if( m_bSoloStates[ ch ] )
-            bSolo = true;
-    }
-
-    for( ch = 0; ch < nCHANNELS; ch++ )
-    {
-        if( bSolo )
-        {
-            // only open soloing channels
-            if( m_bSoloStates[ ch ] )
-                m_fMuteFade[ ch ] = 1.0;
-            else
-                m_fMuteFade[ ch ] = 0.0;
-        }
-        else
-        {
-            // nobody is soloing so just open the non muted channels
-            m_fMuteFade[ ch ] = m_bMuteStates[ ch ] ? 0.0: 1.0;
-        }
+    	if( m_bMuteStates[ ch ] )
+    		ProcessMuteSolo( ch, true, m_bMuteStates[ ch ] );
+    	else if( m_bSoloStates[ ch ] )
+    		ProcessMuteSolo( ch, false, m_bSoloStates[ ch ] );
 
         SetControls( ch );
     }
@@ -640,10 +627,10 @@ void Mixer_24_4_4::ProcessEQ( int ch, float *pL, float *pR )
 // Procedure:   ProcessMuteSolo
 //
 //-----------------------------------------------------
-void Mixer_24_4_4::ProcessMuteSolo( int index, bool bMute, bool bGroup, bool bOn )
+void Mixer_24_4_4::ProcessMuteSolo( int index, bool bMute, bool bOn )
 {
-    int i;
-    bool bSoloEnabled = false, bSoloGroup[ nGROUPS ] = {};
+    int i, j;
+    bool bSoloing = false, bSoloGroup[ nGROUPS ] = {}, bSoloRoutedToGroup[ nGROUPS ] = {};
 
     if( bMute )
     {
@@ -691,68 +678,85 @@ void Mixer_24_4_4::ProcessMuteSolo( int index, bool bMute, bool bGroup, bool bOn
     }
 
     // is a track soloing?
-    for( i = 0; i < nINCHANNELS; i++ )
+    for( i = 0; i < nCHANNELS - nAUX; i++ )
     {
         if( m_bSoloStates[ i ] )
         {
-            bSoloEnabled = true;
+        	bSoloing = true;
 
-            if( m_iRouteGroup[ i ] != 4 )
-                bSoloGroup[ m_iRouteGroup[ i ] ] = true;
+        	if( i < nINCHANNELS )
+        	{
+				if( m_iRouteGroup[ i ] != nGROUPS )
+					bSoloRoutedToGroup[ m_iRouteGroup[ i ] ] = true;
+        	}
+        	else
+        	{
+        		bSoloGroup[ i - nINCHANNELS ] = true;
+        	}
         }
     }
 
     // somebody is soloing
-    if( bSoloEnabled )
+    if( bSoloing )
     {
-        // process solo
-        for( i = 0; i < nINCHANNELS; i++ )
+        // first shut down volume of all not in solo
+        for( i = 0; i < nCHANNELS; i++ )
         {
-            // shut down volume of all not in solo
-            if( !m_bSoloStates[ i ] )
-            {
-                m_FadeState[ i ] = MUTE_FADE_STATE_DEC;
-            }
-            else
-            {
-                m_FadeState[ i ] = MUTE_FADE_STATE_INC;
-            }
+        	// no aux mute on solo
+        	if( i >= ( nCHANNELS - nAUX ) )
+        	{
+        		if( m_bAuxIgnoreSolo && !m_bMuteStates[ i ] )
+        			m_FadeState[ i ] = MUTE_FADE_STATE_INC;
+        		else
+        			m_FadeState[ i ] = MUTE_FADE_STATE_DEC;
+        	}
+        	else
+        	{
+				if( !m_bSoloStates[ i ] )
+					m_FadeState[ i ] = MUTE_FADE_STATE_DEC;
+				else
+					m_FadeState[ i ] = MUTE_FADE_STATE_INC;
+        	}
         }
 
-        // process solo for groups if one of the routed inputs is soloing
-        for( i = nINCHANNELS; i < (nINCHANNELS + 4); i++ )
+        // second, re-enable all groups that are being soloed from an input channel
+        for( i = nINCHANNELS; i < (nINCHANNELS + nGROUPS); i++ )
         {
-            // shut down volume of all not in solo
-            if( !bSoloGroup[ i - nINCHANNELS ] )
-            {
-                m_FadeState[ i ] = MUTE_FADE_STATE_DEC;
-            }
-            else
-            {
+            if( bSoloRoutedToGroup[ i - nINCHANNELS ] && !m_bMuteStates[ i ] )
                 m_FadeState[ i ] = MUTE_FADE_STATE_INC;
+        }
+
+        // third solo any input channels that are routed to a soloing group
+        for( i = nINCHANNELS; i < (nINCHANNELS + nGROUPS); i++ )
+        {
+        	// if this group is soloing
+            if( bSoloGroup[ i - nINCHANNELS ] )
+            {
+            	// enable output for each input channel routed to this group
+                for( j = 0; j < nINCHANNELS; j++ )
+                {
+                	if( m_iRouteGroup[ j ] == ( i - nINCHANNELS ) && !m_bMuteStates[ j ] )
+                	{
+                		m_FadeState[ j ] = MUTE_FADE_STATE_INC;
+                	}
+                }
             }
         }
     }
     // nobody soloing and just turned solo off then enable all channels that aren't muted
     else //if( bSoloOff )
     {
-        // process solo
-        for( i = 0; i < nINCHANNELS; i++ )
+        // turn on everything except muted
+        for( i = 0; i < nCHANNELS; i++ )
         {
             // bring back if not muted
             if( !m_bMuteStates[ i ] )
             {
                 m_FadeState[ i ] = MUTE_FADE_STATE_INC;
             }
-        }
-
-        // process solo for groups if one of the routed inputs is soloing
-        for( i = nINCHANNELS; i < (nINCHANNELS + 4); i++ )
-        {
-            // bring back if not muted
-            if( !m_bMuteStates[ i ] )
+            else
             {
-                m_FadeState[ i ] = MUTE_FADE_STATE_INC;
+            	m_FadeState[ i ] = MUTE_FADE_STATE_DEC;
             }
         }
     }
@@ -974,7 +978,7 @@ void Mixer_24_4_4::step()
             else
             {
                 // normal channel direct out
-                if( m_iRouteGroup[ ch ] == 4 )
+                if( m_iRouteGroup[ ch ] == nGROUPS )
                 {
                     fMixOutL += inL;
                     fMixOutR += inR;
@@ -1056,6 +1060,28 @@ struct Mixer_24_4_4_Gainx2 : MenuItem
 };
 
 //-----------------------------------------------------
+// Procedure:   AuxIgnoreSolo menu item
+//
+//-----------------------------------------------------
+struct Mixer_24_4_4_AuxIgnoreSolo : MenuItem
+{
+	Mixer_24_4_4 *module;
+
+    void onAction(EventAction &e) override
+    {
+        module->m_bAuxIgnoreSolo = !module->m_bAuxIgnoreSolo;
+
+        // cause an update with a passive call
+        module->ProcessMuteSolo( nINCHANNELS - nAUX, false, false );
+    }
+
+    void step() override
+    {
+        rightText = (module->m_bAuxIgnoreSolo) ? "✔" : "";
+    }
+};
+
+//-----------------------------------------------------
 // Procedure:   createContextMenu
 //
 //-----------------------------------------------------
@@ -1074,6 +1100,9 @@ Menu *Mixer_24_4_4_Widget::createContextMenu()
 
     menu->addChild(construct<MenuLabel>(&MenuLabel::text, "---- Level Sliders ----"));
     menu->addChild(construct<Mixer_24_4_4_Gainx2>( &MenuItem::text, "Gain x1.5", &Mixer_24_4_4_Gainx2::module, mod ) );
+
+    menu->addChild(construct<MenuLabel>(&MenuLabel::text, "---- Aux Output ----"));
+    menu->addChild(construct<Mixer_24_4_4_AuxIgnoreSolo>( &MenuItem::text, "Do Not Mute AUX when SOLOing", &Mixer_24_4_4_AuxIgnoreSolo::module, mod ) );
 
     return menu;
 }

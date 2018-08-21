@@ -1,0 +1,9 @@
+ALL_OBJ=\
+	src/BlackHoles.o \
+	src/BlankInfo.o \
+	src/BlankLogo.o \
+	src/Branes.o \
+	src/Geodesics.o \
+	src/GeoWidgets.o \
+	src/Ions.o \
+	src/Pulsars.o

@@ -4,8 +4,8 @@
 #include "DSPEffect.hpp"
 #include "HQTrig.hpp"
 
-#define SHAPER_MAX_VOLTS 1.5
-#define DCBLOCK_ALPHA 0.998
+#define SHAPER_MAX_VOLTS 15.0
+#define DCBLOCK_ALPHA 0.999
 
 namespace dsp {
 
