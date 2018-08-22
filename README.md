@@ -739,7 +739,7 @@ $ mv <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll
 ## Dynamically loaded plugins (via plugin SDK)
 
 1. Install the `Microsoft Visual Studio 2017 Community Edition` IDE
-2. Download the [VeeSeeVSTRack plugin SDK](dist/VeeSeeVSTRack_SDK-14Jul2018.7z)
+2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-14Jul2018.7z)
 3. Open the solution file (`example\Template_shared\vs2017\Template_shared\Template_shared.sln`)
 4. Make sure that the `Release` / `x64` configuration is selected
 5. Rebuild the solution to create the "plugin.dll" file.
