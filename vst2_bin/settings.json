@@ -66,6 +66,10 @@
         "model": "Elements"
       },
       {
+        "plugin": "Autodafe",
+        "model": "Multiple 1x8"
+      },
+      {
         "plugin": "Befaco",
         "model": "Mixer"
       },
@@ -79,6 +83,10 @@
       },
       {
         "plugin": "Bogaudio",
+        "model": "Bogaudio-Mult"
+      },
+      {
+        "plugin": "Bogaudio",
         "model": "Bogaudio-Noise"
       },
       {
@@ -88,6 +96,10 @@
       {
         "plugin": "Bogaudio",
         "model": "Bogaudio-XCO"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-SampleHold"
       },
       {
         "plugin": "Bogaudio",

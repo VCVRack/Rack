@@ -18,5 +18,6 @@
 *.o
 __ATTIC
 __INCOMING
+dist/
 
 
