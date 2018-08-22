@@ -14,10 +14,11 @@
 .emacs*
 *.exp
 *.lib
+*.dll
 *.map
 *.o
+*.so
+*.a
 __ATTIC
 __INCOMING
 dist/
-
-
