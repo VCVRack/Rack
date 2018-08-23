@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- August 21st, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- August 23rd, 2018
 ==================================================
 
 !!!------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ The binary distribution contains the following (17) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (600) add-on modules are statically linked with the VST plugin:
+The following (601) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -234,6 +234,7 @@ The following (600) add-on modules are statically linked with the VST plugin:
  - Bogaudio.TwentyTwoHP
  - Bogaudio.TwentyFiveHP
  - Bogaudio.ThirtyHP
+ - bsp.Obxd_VCF
  - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ

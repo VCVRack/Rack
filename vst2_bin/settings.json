@@ -110,6 +110,10 @@
         "model": "Bogaudio-XFade"
       },
       {
+          "plugin": "bsp",
+          "model": "Obxd_VCF"
+      },
+      {
         "plugin": "HetrickCV",
         "model": "Exponent"
       },

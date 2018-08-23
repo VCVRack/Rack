@@ -3,7 +3,7 @@
 #include "WaveShaper.hpp"
 
 #define SATURATOR_NOISE 0.0017234327
-#define SATURATOR_GAIN 0.1
+#define SATURATOR_GAIN 0.05
 
 namespace dsp {
 

@@ -15,10 +15,10 @@ namespace dsp {
         Resampler<1> *rs;
 
 
-        HQTanh(float sr, int factor) : DSPEffect(sr) {
+        HQTanh(float sr, int factor, int quality = 4) : DSPEffect(sr) {
             HQTanh::factor = factor;
 
-            rs = new Resampler<1>(factor);
+            rs = new Resampler<1>(factor, factor * quality);
         }
 
 

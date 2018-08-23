@@ -1,3 +1,8 @@
+** August 23rd, 2018
+- update module LindenbergResearch.Westcoast
+- add module bsp.Obxd_VCF
+
+
 ** August 21st, 2018
 - add module AmalgamatedHarmonics.Arpeggiator
 - add module AmalgamatedHarmonics.Arpeggiator2

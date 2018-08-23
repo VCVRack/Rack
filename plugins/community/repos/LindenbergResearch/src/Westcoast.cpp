@@ -54,8 +54,8 @@ struct Westcoast : LRModule {
     dsp::LockhartWavefolder *hs;
     dsp::SergeWavefolder *sg;
     dsp::Saturator *saturator;
-    LRAlternateBigKnob *gain;
-    LRAlternateMiddleKnob *bias;
+    LRAlternateBigKnob *gainBtn = NULL;
+    LRAlternateMiddleKnob *biasBtn = NULL;
 
     LRPanel *patina;
 
@@ -82,6 +82,9 @@ void Westcoast::step() {
     float gaincv = 0;
     float biascv = 0;
 
+    if (!inputs[SHAPER_INPUT].active) return;
+
+
     if (inputs[CV_GAIN_INPUT].active) {
         gaincv = inputs[CV_GAIN_INPUT].value * quadraticBipolar(params[CV_GAIN_PARAM].value) * 4.0f;
     }
@@ -90,12 +93,12 @@ void Westcoast::step() {
         biascv = inputs[CV_BIAS_INPUT].value * quadraticBipolar(params[CV_BIAS_PARAM].value) * 2.0f;
     }
 
-    if (bias != nullptr && gain != nullptr) {
-        gain->setIndicatorActive(inputs[CV_GAIN_INPUT].active);
-        bias->setIndicatorActive(inputs[CV_BIAS_INPUT].active);
+    if (biasBtn != NULL && gainBtn != NULL) {
+        gainBtn->setIndicatorActive(inputs[CV_GAIN_INPUT].active);
+        biasBtn->setIndicatorActive(inputs[CV_BIAS_INPUT].active);
 
-        gain->setIndicatorValue((params[GAIN_PARAM].value + gaincv) / 20);
-        bias->setIndicatorValue((params[BIAS_PARAM].value + (biascv + 3)) / 6);
+        gainBtn->setIndicatorValue((params[GAIN_PARAM].value + gaincv) / 20);
+        biasBtn->setIndicatorValue((params[BIAS_PARAM].value + (biascv + 3)) / 6);
     }
 
     float out;
@@ -174,11 +177,11 @@ WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
     // ***** SCREWS **********
 
     // ***** MAIN KNOBS ******
-    module->gain = LRKnob::create<LRAlternateBigKnob>(Vec(128.7, 63.0), module, Westcoast::GAIN_PARAM, 0.0, 20.f, 1.f);
-    module->bias = LRKnob::create<LRAlternateMiddleKnob>(Vec(136.4, 153.3), module, Westcoast::BIAS_PARAM, -6.f, 6.f, 0.f);
+    module->gainBtn = LRKnob::create<LRAlternateBigKnob>(Vec(128.7, 63.0), module, Westcoast::GAIN_PARAM, 0.0, 20.f, 1.f);
+    module->biasBtn = LRKnob::create<LRAlternateMiddleKnob>(Vec(136.4, 153.3), module, Westcoast::BIAS_PARAM, -6.f, 6.f, 0.f);
 
-    addParam(module->gain);
-    addParam(module->bias);
+    addParam(module->gainBtn);
+    addParam(module->biasBtn);
 
     addParam(LRKnob::create<LRMiddleIncremental>(Vec(85, 279.3), module, Westcoast::TYPE_PARAM, 1, 7, 1));
 

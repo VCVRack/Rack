@@ -604,7 +604,7 @@ namespace lrt {
 
         /** gradient colors */
         NVGcolor inner = nvgRGBAf(1.5f * .369f, 1.5f * 0.357f, 1.5f * 0.3333f, 0.25f);
-        NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.34f);;
+        NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.0f);;
 
         /** gradient offset */
         Vec offset = Vec(30, -50);

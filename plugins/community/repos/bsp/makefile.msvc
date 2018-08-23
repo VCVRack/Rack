@@ -1,0 +1,7 @@
+SLUG=bsp
+
+include ../../../build_plugin_pre.mk
+
+include make.objects
+
+include ../../../build_plugin_post.mk

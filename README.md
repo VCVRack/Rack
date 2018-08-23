@@ -32,7 +32,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-21Aug2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-21Aug2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-23Aug2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-23Aug2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
@@ -73,7 +73,7 @@ The binary distribution contains the following (17) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (600) add-on modules are statically linked with the VST plugin:
+The following (601) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -254,6 +254,7 @@ The following (600) add-on modules are statically linked with the VST plugin:
  - Bogaudio.TwentyTwoHP
  - Bogaudio.TwentyFiveHP
  - Bogaudio.ThirtyHP
+ - bsp.Obxd_VCF
  - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ

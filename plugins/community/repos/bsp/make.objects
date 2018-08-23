@@ -1,0 +1,3 @@
+ALL_OBJ= \
+	src/bsp.o \
+	src/Obxd_VCF.o
