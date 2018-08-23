@@ -120,6 +120,9 @@ void Obxd_VCF::step() {
    //    , (flt.SampleRate*0.5f-120.0f));//for numerical stability purposes
    float cutoffcalc = cutoff * 2.0f;
 
+   if(cutoffcalc > (sampleRate*0.5f-120.0f))
+      cutoffcalc = (sampleRate*0.5f-120.0f);
+
 	// Filter
    float x1 = input - tptlpupw(c1, input, 12, sampleRateInv);
    x1 = tptpc(d2, x1, brightCoef);
