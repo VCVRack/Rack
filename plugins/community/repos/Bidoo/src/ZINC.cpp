@@ -158,6 +158,6 @@ void ZINCWidget::step() {
 using namespace rack_plugin_Bidoo;
 
 RACK_PLUGIN_MODEL_INIT(Bidoo, ZINC) {
-   Model *modelZINC = Model::create<ZINC, ZINCWidget>("Bidoo", "ziNC", "ziNC vocoder", EFFECT_TAG);
+   Model *modelZINC = Model::create<ZINC, ZINCWidget>("Bidoo", "ziNC", "ziNC vocoder", EFFECT_TAG, VOCODER_TAG);
    return modelZINC;
 }

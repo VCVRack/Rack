@@ -2,7 +2,8 @@
 #include "dsp/digital.hpp"
 #include "BidooComponents.hpp"
 #include "osdialog.h"
-#include "dep/audiofile/AudioFile.h"
+#define DR_WAV_IMPLEMENTATION
+#include "dep/dr_wav/dr_wav.h"
 #include <vector>
 #include "cmath"
 #include <iomanip> // setprecision
@@ -39,7 +40,10 @@ struct OUAIVE : Module {
 
 	bool play = false;
 	string lastPath;
-	AudioFile<double> audioFile;
+	unsigned int channels;
+  unsigned int sampleRate;
+  drwav_uint64 totalSampleCount;
+	float* pSampleData;
 	float samplePos = 0.0f;
 	vector<double> displayBuffL;
 	vector<double> displayBuffR;
@@ -55,10 +59,10 @@ struct OUAIVE : Module {
 	string displayReadMode = "";
 	string displaySlices = "";
 	string displaySpeed;
-
 	SchmittTrigger playTrigger;
 	SchmittTrigger trigModeTrigger;
 	SchmittTrigger readModeTrigger;
+	std::mutex mylock;
 
 
 	OUAIVE() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {	}
@@ -74,6 +78,7 @@ struct OUAIVE : Module {
 		// lastPath
 		json_object_set_new(rootJ, "lastPath", json_string(lastPath.c_str()));
 		json_object_set_new(rootJ, "trigMode", json_integer(trigMode));
+		json_object_set_new(rootJ, "readMode", json_integer(readMode));
 		return rootJ;
 	}
 
@@ -88,26 +93,34 @@ struct OUAIVE : Module {
 		if (trigModeJ) {
 			trigMode = json_integer_value(trigModeJ);
 		}
+		json_t *readModeJ = json_object_get(rootJ, "readMode");
+		if (readModeJ) {
+			readMode = json_integer_value(readModeJ);
+		}
 	}
 };
 
 void OUAIVE::loadSample(std::string path) {
-	if (audioFile.load (path.c_str())) {
-		fileLoaded = true;
+	mylock.lock();
+	fileLoaded = false;
+	drwav_free(pSampleData);
+  pSampleData = drwav_open_and_read_file_f32(path.c_str(), &channels, &sampleRate, &totalSampleCount);
+  if (pSampleData == NULL) {
+      fileLoaded = false;
+  }
+	else {
 		vector<double>().swap(displayBuffL);
 		vector<double>().swap(displayBuffR);
-		for (int i=0; i < audioFile.getNumSamplesPerChannel(); i = i + floor(audioFile.getNumSamplesPerChannel()/125)) {
-			displayBuffL.push_back(audioFile.samples[0][i]);
-			if (audioFile.getNumChannels() == 2)
-				displayBuffR.push_back(audioFile.samples[1][i]);
+		for (unsigned int i=0; i < totalSampleCount; i = i + floor(totalSampleCount/125)) {
+			displayBuffL.push_back(pSampleData[i]);
+			if (channels == 2)
+				displayBuffR.push_back(pSampleData[i+1]);
 		}
 		fileDesc = (stringFilename(path)).substr(0,20) + ((stringFilename(path)).length() >=20  ? "...\n" :  "\n");
-		fileDesc += std::to_string(audioFile.getSampleRate()) + " Hz " + std::to_string(audioFile.getBitDepth()) + " bit\n";
-		fileDesc += std::to_string(roundf(audioFile.getLengthInSeconds() * 100) / 100) + " s\n";
+		fileDesc += std::to_string(sampleRate) + " Hz\n";
+		fileLoaded = true;
 	}
-	else {
-		fileLoaded = false;
-	}
+	mylock.unlock();
 }
 
 void OUAIVE::step() {
@@ -152,14 +165,14 @@ void OUAIVE::step() {
 
 
 	if (fileLoaded) {
-		sliceLength = clamp(audioFile.getNumSamplesPerChannel() / nbSlices, 1, audioFile.getNumSamplesPerChannel());
+		sliceLength = clamp(totalSampleCount / nbSlices, 1, totalSampleCount);
 
 		if ((trigMode == 0) && (playTrigger.process(inputs[GATE_INPUT].value))) {
 			play = true;
-			samplePos = clamp((int)(inputs[POS_INPUT].value*audioFile.getNumSamplesPerChannel()/10), 0 , audioFile.getNumSamplesPerChannel() -1);
+			samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount / 10), 0 , totalSampleCount - 1);
 		}	else if (trigMode == 1) {
 			play = (inputs[GATE_INPUT].value > 0);
-			samplePos = clamp((int)(inputs[POS_INPUT].value*audioFile.getNumSamplesPerChannel()/10), 0 , audioFile.getNumSamplesPerChannel() -1);
+			samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount / 10), 0 , totalSampleCount - 1);
 		} else if ((trigMode == 2) && (playTrigger.process(inputs[GATE_INPUT].value))) {
 			play = true;
 			if (inputs[POS_INPUT].active)
@@ -167,61 +180,62 @@ void OUAIVE::step() {
 			 else
 				sliceIndex = (sliceIndex+1)%nbSlices;
 			if (readMode != 1)
-				samplePos = clamp(sliceIndex*sliceLength, 0, audioFile.getNumSamplesPerChannel());
+				samplePos = clamp(sliceIndex*sliceLength, 0, totalSampleCount);
 			else
-				samplePos = clamp((sliceIndex + 1) * sliceLength - 1, 0 , audioFile.getNumSamplesPerChannel());
+				samplePos = clamp((sliceIndex + 1) * sliceLength - 1, 0 , totalSampleCount);
 		}
 
-		if ((play) && (samplePos>=0) && (samplePos < audioFile.getNumSamplesPerChannel())) {
+		if ((play) && (samplePos>=0) && (samplePos < totalSampleCount)) {
+			mylock.lock();
 			//calulate outputs
-			if (audioFile.getNumChannels() == 1) {
-				outputs[OUTL_OUTPUT].value = 5.0f * audioFile.samples[0][floor(samplePos)];
-				outputs[OUTR_OUTPUT].value = 5.0f * audioFile.samples[0][floor(samplePos)];
+			if (channels == 1) {
+				outputs[OUTL_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)];
+				outputs[OUTR_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)];
 			}
-			else if (audioFile.getNumChannels() == 2) {
+			else if (channels == 2) {
 				if (outputs[OUTL_OUTPUT].active && outputs[OUTR_OUTPUT].active) {
-					outputs[OUTL_OUTPUT].value = 5.0f * audioFile.samples[0][floor(samplePos)];
-					outputs[OUTR_OUTPUT].value = 5.0f * audioFile.samples[1][floor(samplePos)];
+					outputs[OUTL_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)];
+					outputs[OUTR_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)+1];
 				}
 				else {
-					outputs[OUTL_OUTPUT].value = 5.0f * (audioFile.samples[0][floor(samplePos)] + audioFile.samples[1][floor(samplePos)]) / 2;
-					outputs[OUTR_OUTPUT].value = 5.0f * (audioFile.samples[0][floor(samplePos)] + audioFile.samples[1][floor(samplePos)]) / 2;
+					outputs[OUTL_OUTPUT].value = 10.0f * (pSampleData[(unsigned int)floor(samplePos)] + pSampleData[(unsigned int)floor(samplePos)+1]) / 2;
+					outputs[OUTR_OUTPUT].value = 10.0f * (pSampleData[(unsigned int)floor(samplePos)] + pSampleData[(unsigned int)floor(samplePos)+1]) / 2;
 				}
 			}
-
+			mylock.unlock();
 
 			//shift samplePos
 			if (trigMode == 0) {
 				if (readMode != 1)
-					samplePos = samplePos + speed;
+					samplePos = samplePos + speed * channels;
 				else
-					samplePos = samplePos - speed;
+					samplePos = samplePos - speed * channels;
 				//manage eof readMode
-				if ((readMode == 0) && (samplePos >= audioFile.getNumSamplesPerChannel()))
+				if ((readMode == 0) && (samplePos >= totalSampleCount))
 						play = false;
 				else if ((readMode == 1) && (samplePos <=0))
 						play = false;
-				else if ((readMode == 2) && (samplePos >= audioFile.getNumSamplesPerChannel()))
-					samplePos = clamp((int)(inputs[POS_INPUT].value*audioFile.getNumSamplesPerChannel()/10), 0 , audioFile.getNumSamplesPerChannel() -1);
+				else if ((readMode == 2) && (samplePos >= totalSampleCount))
+					samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount / 10), 0 , totalSampleCount -1);
 			}
 			else if (trigMode == 2)
 			{
 				if (readMode != 1)
-					samplePos = samplePos + speed;
+					samplePos = samplePos + speed * channels;
 				else
-					samplePos = samplePos - speed;
+					samplePos = samplePos - speed * channels;
 				//update diplay slices
 				displaySlices = "|" + std::to_string(nbSlices) + "|";
 				//manage eof readMode
-				if ((readMode == 0) && ((samplePos >= (sliceIndex+1) * sliceLength) || (samplePos >= audioFile.getNumSamplesPerChannel())))
+				if ((readMode == 0) && ((samplePos >= (sliceIndex+1) * sliceLength) || (samplePos >= totalSampleCount)))
 						play = false;
-				if ((readMode == 1) && ((samplePos <= (sliceIndex) * sliceLength) || (samplePos <=0)))
+				if ((readMode == 1) && ((samplePos <= (sliceIndex) * sliceLength) || (samplePos <= 0)))
 						play = false;
-				if ((readMode == 2) && ((samplePos >= (sliceIndex+1) * sliceLength) || (samplePos >= audioFile.getNumSamplesPerChannel())))
-					samplePos = clamp(sliceIndex*sliceLength, 0 , audioFile.getNumSamplesPerChannel());
+				if ((readMode == 2) && ((samplePos >= (sliceIndex+1) * sliceLength) || (samplePos >= totalSampleCount)))
+					samplePos = clamp(sliceIndex*sliceLength, 0 , totalSampleCount);
 			}
 		}
-		else if (samplePos == audioFile.getNumSamplesPerChannel())
+		else if (samplePos == totalSampleCount)
 			play = false;
 	}
 }
@@ -266,13 +280,13 @@ struct OUAIVEDisplay : TransparentWidget {
 				{
 					nvgBeginPath(vg);
 					nvgStrokeWidth(vg, 2);
-					nvgMoveTo(vg, (int)(module->samplePos * 125 / module->audioFile.getNumSamplesPerChannel()) , 70);
-					nvgLineTo(vg, (int)(module->samplePos * 125 / module->audioFile.getNumSamplesPerChannel()) , 150);
+					nvgMoveTo(vg, (int)(module->samplePos * 125 / module->totalSampleCount) , 70);
+					nvgLineTo(vg, (int)(module->samplePos * 125 / module->totalSampleCount) , 150);
 					nvgClosePath(vg);
 				}
 				nvgStroke(vg);
 
-				if (module->audioFile.getNumChannels() == 1) {
+				if (module->channels == 1) {
 					// Draw ref line
 					nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x30));
 					nvgStrokeWidth(vg, 1);
@@ -378,8 +392,8 @@ struct OUAIVEDisplay : TransparentWidget {
 					{
 						nvgBeginPath(vg);
 						nvgStrokeWidth(vg, 1);
-						nvgMoveTo(vg, (int)(i * module->sliceLength * 125 / module->audioFile.getNumSamplesPerChannel()) , 70);
-						nvgLineTo(vg, (int)(i * module->sliceLength * 125 / module->audioFile.getNumSamplesPerChannel()) , 150);
+						nvgMoveTo(vg, (int)(i * module->sliceLength * 125 / module->totalSampleCount) , 70);
+						nvgLineTo(vg, (int)(i * module->sliceLength * 125 / module->totalSampleCount) , 150);
 						nvgClosePath(vg);
 					}
 					nvgStroke(vg);
@@ -468,6 +482,6 @@ Menu *OUAIVEWidget::createContextMenu() {
 using namespace rack_plugin_Bidoo;
 
 RACK_PLUGIN_MODEL_INIT(Bidoo, OUAIVE) {
-   Model *modelOUAIVE = Model::create<OUAIVE, OUAIVEWidget>("Bidoo","OUAIve", "OUAIve player", SAMPLER_TAG);
+   Model *modelOUAIVE = Model::create<OUAIVE, OUAIVEWidget>("Bidoo","OUAIve", "OUAIve player", SAMPLER_TAG, GRANULAR_TAG);
    return modelOUAIVE;
 }

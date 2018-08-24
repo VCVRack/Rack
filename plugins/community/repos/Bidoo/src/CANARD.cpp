@@ -2,14 +2,13 @@
 #include "dsp/digital.hpp"
 #include "BidooComponents.hpp"
 #include "osdialog.h"
-#include "dep/audiofile/AudioFile.h"
+#include "dep/dr_wav/dr_wav.h"
 #include <vector>
 #include "cmath"
 #include <iomanip> // setprecision
 #include <sstream> // stringstream
 #include <algorithm>
 #include "window.hpp"
-#include "Gist.h"
 
 using namespace std;
 
@@ -57,7 +56,10 @@ struct CANARD : Module {
 
 	bool play = false;
 	bool record = false;
-	AudioFile<float> playBuffer, recordBuffer;
+	unsigned int channels = 2;
+  unsigned int sampleRate = 0;
+  drwav_uint64 totalSampleCount = 0;
+	vector<vector<float>> playBuffer, recordBuffer;
 	float samplePos = 0.0f, sampleStart = 0.0f, loopLength = 0.0f, fadeLenght = 0.0f, fadeCoeff = 1.0f, speedFactor = 1.0f;
 	size_t prevPlayedSlice = 0;
 	size_t playedSlice = 0;
@@ -86,16 +88,12 @@ struct CANARD : Module {
 	bool newStop = false;
 
 	CANARD() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		recordBuffer.setBitDepth(16);
-		recordBuffer.setSampleRate(engineGetSampleRate());
-		recordBuffer.setNumChannels(2);
-		recordBuffer.samples[0].resize(0);
-		recordBuffer.samples[1].resize(0);
-		playBuffer.setBitDepth(16);
-		playBuffer.setSampleRate(engineGetSampleRate());
-		playBuffer.setNumChannels(2);
-		playBuffer.samples[0].resize(0);
-		playBuffer.samples[1].resize(0);
+		playBuffer.resize(2);
+		playBuffer[0].resize(0);
+		playBuffer[1].resize(0);
+		recordBuffer.resize(2);
+		recordBuffer[0].resize(0);
+		recordBuffer[1].resize(0);
 	}
 
 	void step() override;
@@ -108,7 +106,6 @@ struct CANARD : Module {
 		json_t *rootJ = json_object();
 		// lastPath
 		json_object_set_new(rootJ, "lastPath", json_string(lastPath.c_str()));
-
 		json_t *slicesJ = json_array();
 		for (size_t i = 0; i<slices.size() ; i++) {
 			json_t *sliceJ = json_integer(slices[i]);
@@ -126,7 +123,7 @@ struct CANARD : Module {
 			waveFileName = stringFilename(lastPath);
 			waveExtension = stringExtension(lastPath);
 			loadSample(lastPath);
-			if (playBuffer.getNumSamplesPerChannel()>0) {
+			if (totalSampleCount>0) {
 				json_t *slicesJ = json_object_get(rootJ, "slices");
 				if (slicesJ) {
 					size_t i;
@@ -143,17 +140,30 @@ struct CANARD : Module {
 
 void CANARD::loadSample(std::string path) {
 	loading = true;
-	playBuffer.setNumChannels(1);
-	if (playBuffer.load(path.c_str())) {
+	unsigned int c;
+  unsigned int sr;
+  drwav_uint64 sc;
+	float* pSampleData;
+  pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &sc);
+  if (pSampleData != NULL)  {
 		lastPath = path;
 		waveFileName = stringFilename(path);
 		waveExtension = stringExtension(path);
+		channels = c;
+		sampleRate = sr;
 		slices.clear();
 		slices.push_back(0);
-		if (playBuffer.getNumChannels() == 1) {
-			playBuffer.setNumChannels(2);
-			playBuffer.samples[1] = playBuffer.samples[0];
+		playBuffer[0].clear();
+		playBuffer[1].clear();
+		for (unsigned int i=0; i < sc; i = i + c) {
+			playBuffer[0].push_back(pSampleData[i]);
+			if (channels == 2)
+				playBuffer[1].push_back((float)pSampleData[i+1]);
+			else
+				playBuffer[1].push_back((float)pSampleData[i]);
 		}
+		totalSampleCount = playBuffer[0].size();
+		drwav_free(pSampleData);
 	}
 	loading = false;
 }
@@ -162,15 +172,15 @@ void CANARD::calcLoop() {
 	prevPlayedSlice = index;
 	index = 0;
 	int sliceStart = 0;;
-	int sliceEnd = playBuffer.getNumSamplesPerChannel() > 0 ? playBuffer.getNumSamplesPerChannel() - 1 : 0;
+	int sliceEnd = totalSampleCount > 0 ? totalSampleCount - 1 : 0;
 	if ((params[MODE_PARAM].value == 1) && (slices.size()>0))
 	{
 		index = round(clamp(params[SLICE_PARAM].value + inputs[SLICE_INPUT].value, 0.0f,10.0f)*(slices.size()-1)/10);
 		sliceStart = slices[index];
-		sliceEnd = (index < (slices.size() - 1)) ? (slices[index+1] - 1) : (playBuffer.getNumSamplesPerChannel() - 1);
+		sliceEnd = (index < (slices.size() - 1)) ? (slices[index+1] - 1) : (totalSampleCount - 1);
 	}
 
-	if (playBuffer.getNumSamplesPerChannel() > 0) {
+	if (totalSampleCount > 0) {
 		sampleStart = rescale(clamp(inputs[SAMPLE_START_INPUT].value + params[SAMPLE_START_PARAM].value, 0.0f, 10.0f), 0.0f, 10.0f, sliceStart, sliceEnd);
 		loopLength = clamp(rescale(clamp(inputs[LOOP_LENGTH_INPUT].value + params[LOOP_LENGTH_PARAM].value, 0.0f, 10.0f), 0.0f, 10.0f, 0.0f, sliceEnd - sliceStart + 1),1.0f,sliceEnd-sampleStart+1);
 		fadeLenght = rescale(clamp(inputs[FADE_INPUT].value + params[FADE_PARAM].value, 0.0f, 10.0f), 0.0f, 10.0f,0.0f, floor(loopLength/2));
@@ -200,8 +210,8 @@ void CANARD::step() {
 		if (clearTrigger.process(inputs[CLEAR_INPUT].value + params[CLEAR_PARAM].value))
 		{
 			mylock.lock();
-			playBuffer.samples[0].clear();
-			playBuffer.samples[1].clear();
+			playBuffer[0].clear();
+			playBuffer[1].clear();
 			slices.clear();
 			mylock.unlock();
 			lastPath = "";
@@ -214,18 +224,19 @@ void CANARD::step() {
 			if ((size_t)selected<(slices.size()-1)) {
 				nbSample = slices[selected + 1] - slices[selected] - 1;
 				mylock.lock();
-				playBuffer.samples[0].erase(playBuffer.samples[0].begin() + slices[selected], playBuffer.samples[0].begin() + slices[selected + 1]-1);
-				playBuffer.samples[1].erase(playBuffer.samples[1].begin() + slices[selected], playBuffer.samples[1].begin() + slices[selected + 1]-1);
+				playBuffer[0].erase(playBuffer[0].begin() + slices[selected], playBuffer[0].begin() + slices[selected + 1]-1);
+				playBuffer[1].erase(playBuffer[1].begin() + slices[selected], playBuffer[1].begin() + slices[selected + 1]-1);
 				mylock.unlock();
 			}
 			else {
-				nbSample = playBuffer.getNumSamplesPerChannel() - slices[selected];
+				nbSample = totalSampleCount - slices[selected];
 				mylock.lock();
-				playBuffer.samples[0].erase(playBuffer.samples[0].begin() + slices[selected], playBuffer.samples[0].end());
-				playBuffer.samples[1].erase(playBuffer.samples[1].begin() + slices[selected], playBuffer.samples[1].end());
+				playBuffer[0].erase(playBuffer[0].begin() + slices[selected], playBuffer[0].end());
+				playBuffer[1].erase(playBuffer[1].begin() + slices[selected], playBuffer[1].end());
 				mylock.unlock();
 			}
 			slices.erase(slices.begin()+selected);
+			totalSampleCount = playBuffer[0].size();
 			for (size_t i = selected; i < slices.size(); i++)
 			{
 				slices[i] = slices[i]-nbSample;
@@ -270,7 +281,14 @@ void CANARD::step() {
 					mylock.lock();
 					slices.clear();
 					slices.push_back(0);
-					playBuffer.setAudioBuffer(recordBuffer.samples);
+					playBuffer.resize(2);
+					playBuffer[0].resize((int)recordBuffer[0].size());
+					playBuffer[1].resize((int)recordBuffer[0].size());
+					for (int i = 0; i < (int)recordBuffer[0].size(); i++) {
+						playBuffer[0][i] = recordBuffer[0][i];
+						playBuffer[1][i] = recordBuffer[1][i];
+					}
+					totalSampleCount = playBuffer[0].size();
 					mylock.unlock();
 					lastPath = "";
 					waveFileName = "";
@@ -278,14 +296,15 @@ void CANARD::step() {
 				}
 				else {
 					mylock.lock();
-					slices.push_back(playBuffer.getNumSamplesPerChannel() > 0 ? (playBuffer.getNumSamplesPerChannel()-1) : 0);
-					playBuffer.samples[0].insert(playBuffer.samples[0].end(), recordBuffer.samples[0].begin(), recordBuffer.samples[0].end());
-					playBuffer.samples[1].insert(playBuffer.samples[1].end(), recordBuffer.samples[1].begin(), recordBuffer.samples[1].end());
+					slices.push_back(totalSampleCount > 0 ? (totalSampleCount-1) : 0);
+					playBuffer[0].insert(playBuffer[0].end(), recordBuffer[0].begin(), recordBuffer[0].end());
+					playBuffer[1].insert(playBuffer[1].end(), recordBuffer[1].begin(), recordBuffer[1].end());
+					totalSampleCount = playBuffer[0].size();
 					mylock.unlock();
 				}
 				mylock.lock();
-				recordBuffer.samples[0].resize(0);
-				recordBuffer.samples[1].resize(0);
+				recordBuffer[0].resize(0);
+				recordBuffer[1].resize(0);
 				mylock.unlock();
 				lights[REC_LIGHT].value = 0.0f;
 			}
@@ -294,8 +313,8 @@ void CANARD::step() {
 
 		if (record) {
 			mylock.lock();
-			recordBuffer.samples[0].push_back(inputs[INL_INPUT].value/10);
-			recordBuffer.samples[1].push_back(inputs[INR_INPUT].value/10);
+			recordBuffer[0].push_back(inputs[INL_INPUT].value/10);
+			recordBuffer[1].push_back(inputs[INR_INPUT].value/10);
 			mylock.unlock();
 		}
 
@@ -389,7 +408,7 @@ void CANARD::step() {
 
 		if (play) {
 			newStop = true;
-			if (samplePos<playBuffer.getNumSamplesPerChannel()) {
+			if (samplePos<totalSampleCount) {
 				if (fadeLenght>1000) {
 					if ((samplePos-sampleStart)<fadeLenght)
 						fadeCoeff = rescale(samplePos-sampleStart,0.0f,fadeLenght,0.0f,1.0f);
@@ -401,8 +420,8 @@ void CANARD::step() {
 				else
 					fadeCoeff = 1.0f;
 
-				outputs[OUTL_OUTPUT].value = playBuffer.samples[0][floor(samplePos)]*fadeCoeff*10;
-				outputs[OUTR_OUTPUT].value = playBuffer.samples[1][floor(samplePos)]*fadeCoeff*10;
+				outputs[OUTL_OUTPUT].value = playBuffer[0][floor(samplePos)]*fadeCoeff*10;
+				outputs[OUTR_OUTPUT].value = playBuffer[1][floor(samplePos)]*fadeCoeff*10;
 			}
 		}
 		else {
@@ -439,7 +458,7 @@ struct CANARDDisplay : OpaqueWidget {
 	void onMouseDown(EventMouseDown &e) override {
 		if (module->slices.size()>0) {
 			refX = e.pos.x;
-			refIdx = ((e.pos.x - zoomLeftAnchor)/zoomWidth)*(float)module->playBuffer.getNumSamplesPerChannel();
+			refIdx = ((e.pos.x - zoomLeftAnchor)/zoomWidth)*(float)module->totalSampleCount;
 			module->addSliceMarker = refIdx;
 			auto lower = std::lower_bound(module->slices.begin(), module->slices.end(), refIdx);
 			module->selected = distance(module->slices.begin(),lower-1);
@@ -478,8 +497,8 @@ struct CANARDDisplay : OpaqueWidget {
 
 	void draw(NVGcontext *vg) override {
 		module->mylock.lock();
-		std::vector<float> vL(module->playBuffer.samples[0]);
-		std::vector<float> vR(module->playBuffer.samples[1]);
+		std::vector<float> vL(module->playBuffer[0]);
+		std::vector<float> vR(module->playBuffer[1]);
 		std::vector<int> s(module->slices);
 		module->mylock.unlock();
 		size_t nbSample = vL.size();
@@ -490,7 +509,7 @@ struct CANARDDisplay : OpaqueWidget {
 			{
 				nvgBeginPath(vg);
 				nvgStrokeWidth(vg, 2);
-				if (module->playBuffer.getNumSamplesPerChannel()>0) {
+				if (module->totalSampleCount>0) {
 					nvgMoveTo(vg, module->samplePos * zoomWidth / nbSample + zoomLeftAnchor, 0);
 					nvgLineTo(vg, module->samplePos * zoomWidth / nbSample + zoomLeftAnchor, 2*height+10);
 				}
@@ -674,7 +693,7 @@ CANARDWidget::CANARDWidget(CANARD *module) : ModuleWidget(module) {
 		addInput(Port::create<PJ301MPort>(Vec(portX0[1]-4, 277), Port::INPUT, module, CANARD::FADE_INPUT));
 		addInput(Port::create<PJ301MPort>(Vec(portX0[2]-4, 277), Port::INPUT, module, CANARD::SLICE_INPUT));
 		addInput(Port::create<PJ301MPort>(Vec(portX0[3]-4, 277), Port::INPUT, module, CANARD::CLEAR_INPUT));
-		addParam(ParamWidget::create<BidooBlueTrimpot>(Vec(portX0[4]-1, 280), module, CANARD::THRESHOLD_PARAM, 0.0001f, 0.05f, 0.05f));
+		addParam(ParamWidget::create<BidooBlueTrimpot>(Vec(portX0[4]-1, 280), module, CANARD::THRESHOLD_PARAM, 0.01f, 10.0f, 1.0f));
 
 		addParam(ParamWidget::create<CKSS>(Vec(90, 325), module, CANARD::MODE_PARAM, 0.0f, 1.0f, 0.0f));
 
@@ -714,22 +733,33 @@ struct CANARDTransientDetect : MenuItem {
 	void onAction(EventAction &e) override {
 		canardModule->slices.clear();
 		canardModule->slices.push_back(0);
-		int i = 0;
-		int size = 256;
-		Gist<float> gist = Gist<float>(size,engineGetSampleRate());
+		unsigned int i = 0;
+		unsigned int size = 256;
 		vector<float>::const_iterator first;
 		vector<float>::const_iterator last;
-		while (i+size<canardModule->playBuffer.getNumSamplesPerChannel()) {
-			first = canardModule->playBuffer.samples[0].begin() + i;
-			last = canardModule->playBuffer.samples[0].begin() + i + size;
+		float prevNrgy = 0.0f;
+		while (i+size<canardModule->totalSampleCount) {
+			first = canardModule->playBuffer[0].begin() + i;
+			last = canardModule->playBuffer[0].begin() + i + size;
 			vector<float> newVec(first, last);
-			gist.processAudioFrame(newVec);
-			if (((gist.energyDifference()/size)>canardModule->params[CANARD::THRESHOLD_PARAM].value)
-			&& ((gist.complexSpectralDifference()/size)>canardModule->params[CANARD::THRESHOLD_PARAM].value)
-			&& ((gist.zeroCrossingRate()/size)>canardModule->params[CANARD::THRESHOLD_PARAM].value)) {
-				canardModule->slices.push_back(i);
+			float nrgy = 0.0f;
+			float zcRate = 0.0f;
+			unsigned int zcIdx = 0;
+			bool first = true;
+			for (unsigned int k = 0; k < size; k++) {
+				nrgy += 100*newVec[k]*newVec[k]/size;
+				if (newVec[k]==0.0f) {
+					zcRate += 1;
+					if (first) {
+						zcIdx = k;
+						first = false;
+					}
+				}
 			}
+			if ((nrgy > canardModule->params[CANARD::THRESHOLD_PARAM].value) && (nrgy > 10*prevNrgy))
+				canardModule->slices.push_back(i+zcIdx);
 			i+=size;
+			prevNrgy = nrgy;
 		}
 	}
 };
@@ -748,20 +778,34 @@ struct CANARDLoadSample : MenuItem {
 };
 
 struct CANARDSaveSample : MenuItem {
-	CANARDWidget *canardWidget;
-	CANARD *canardModule;
-	void onAction(EventAction &e) override {
-		std::string dir = canardModule->lastPath.empty() ? assetLocal("") : stringDirectory(canardModule->lastPath);
-		char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), (canardModule->waveFileName).c_str(), NULL);
-		if (path) {
-			canardModule->lastPath = path;
-			canardModule->waveFileName = stringDirectory(path);
-			canardModule->waveExtension = stringExtension(path);
-			canardModule->playBuffer.setSampleRate(engineGetSampleRate());
-			canardModule->playBuffer.save(path);
-			free(path);
-		}
-	}
+   CANARDWidget *canardWidget;
+   CANARD *canardModule;
+   void onAction(EventAction &e) override {
+      std::string dir = canardModule->lastPath.empty() ? assetLocal("") : stringDirectory(canardModule->lastPath);
+      std::string fileName = canardModule->waveFileName.empty() ? "temp.wav" : canardModule->waveFileName;
+      char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), (fileName).c_str(), NULL);
+      if (path) {
+         canardModule->lastPath = path;
+         canardModule->waveFileName = stringDirectory(path);
+         canardModule->waveExtension = stringExtension(path);
+         drwav_data_format format;
+         format.container = drwav_container_riff;
+         format.format = DR_WAVE_FORMAT_PCM;
+         format.channels = 2;
+         format.sampleRate = engineGetSampleRate();
+         format.bitsPerSample = 32;
+         drwav* pWav = drwav_open_file_write(path, &format);
+         int *pSamples = new int[2*canardModule->totalSampleCount];
+         for (unsigned int i = 0; i < canardModule->totalSampleCount; i++) {
+            pSamples[2*i]= floor(canardModule->playBuffer[0][i]*2147483647);
+            pSamples[2*i+1]= floor(canardModule->playBuffer[1][i]*2147483647);
+         }
+         drwav_write(pWav, 2*canardModule->totalSampleCount, pSamples);
+         drwav_close(pWav);
+         free(path);
+         delete [] pSamples;
+      }
+   }
 };
 
 Menu *CANARDWidget::createContextMenu() {
@@ -775,7 +819,7 @@ Menu *CANARDWidget::createContextMenu() {
 
 	MenuLabel *spacerLabel;
 
-	if ((canardModule->selected>=0) || (canardModule->playBuffer.getNumSamplesPerChannel()>=0)) {
+	if ((canardModule->selected>=0) || (canardModule->totalSampleCount>0)) {
 		spacerLabel = new MenuLabel();
 		menu->addChild(spacerLabel);
 	}
@@ -788,7 +832,7 @@ Menu *CANARDWidget::createContextMenu() {
 		menu->addChild(deleteItem);
 	}
 
-	if (canardModule->playBuffer.getNumSamplesPerChannel()>=0) {
+	if (canardModule->totalSampleCount>0) {
 		CANARDAddSliceMarker *addSliceItem = new CANARDAddSliceMarker();
 		addSliceItem->text = "Add slice marker";
 		addSliceItem->canardWidget = this;
@@ -831,6 +875,6 @@ Menu *CANARDWidget::createContextMenu() {
 using namespace rack_plugin_Bidoo;
 
 RACK_PLUGIN_MODEL_INIT(Bidoo, CANARD) {
-   Model *modelCANARD = Model::create<CANARD, CANARDWidget>("Bidoo","cANARd", "cANARd sampler", SAMPLER_TAG);
+   Model *modelCANARD = Model::create<CANARD, CANARDWidget>("Bidoo","cANARd", "cANARd sampler", SAMPLER_TAG, GRANULAR_TAG, RECORDING_TAG);
    return modelCANARD;
 }

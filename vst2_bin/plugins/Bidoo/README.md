@@ -1,7 +1,7 @@
 # Bidoo's plugins for [VCVRack](https://vcvrack.com)
 
 <!-- Version and License Badges -->
-![Version](https://img.shields.io/badge/version-0.6.6-green.svg?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.6.10-green.svg?style=flat-square)
 ![License](https://img.shields.io/badge/license-BSD3-blue.svg?style=flat-square)
 ![Language](https://img.shields.io/badge/language-C++-yellow.svg?style=flat-square)
 
@@ -12,6 +12,20 @@
 You can find information on that plugins pack in the [wiki](https://github.com/sebastien-bouffier/Bidoo/wiki). When doing tests it happens that I record a video so you may find some ideas on how to use those modules [here](https://www.youtube.com/bidoo).
 
 ## Last changes
+
+21/08/2018 => 0.6.10
+
+rabBIT redesign
+
+20/08/2018 => 0.6.9
+
+rabBIT is a 8 bit reducer/reverser
+
+09/07/2018
+
+Changed the way wav files are loaded and saved => OUAIve and cANARd. Changed the way onsets are detected in cANARd. Fix play mode saving on close for OUAIve.
+
+This version is compliant with the last version I have of Rack SDK so maybe my pack will be available thru Rack again in 0.6.2.
 
 13/05/2018 => 0.6.6
 

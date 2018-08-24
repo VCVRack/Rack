@@ -4,41 +4,39 @@ ALL_OBJ= \
 	src/BAR.o \
 	src/Bidoo.o \
 	src/BORDL.o \
+	src/CANARD.o \
 	src/CHUTE.o \
 	src/CLACOS.o \
+	src/DFUZE.o \
 	src/dep/filters/biquad.o \
 	src/dep/filters/smbPitchShift.o \
 	src/DTROY.o \
 	src/DUKE.o \
 	src/FORK.o \
-	src/HORUS.o \
 	src/LATE.o \
 	src/LIMBO.o \
 	src/LOURDE.o \
 	src/MOIRE.o \
 	src/MU.o \
+	src/OUAIVE.o \
 	src/PERCO.o \
+	src/RABBIT.o \
 	src/SIGMA.o \
 	src/TIARE.o \
 	src/TOCANTE.o \
 	src/VOID.o \
 	src/ZINC.o \
-	src/dep/kiss_fft130/kiss_fft.o
-
-#	src/dep/minimp3/minimp3_test.o
-
-
-# already used in AS modules
-DUPLICATE_OBJ__REMOVED__= \
-	src/DFUZE.o \
 	src/dep/freeverb/allpass.o \
 	src/dep/freeverb/comb.o \
 	src/dep/freeverb/revmodel.o
 
+#	src/dep/minimp3/minimp3_test.o
+
+
+#	src/dep/kiss_fft130/kiss_fft.o
+
 
 GPL_OBJ__REMOVED__= \
-	src/CANARD.o \
-	src/OUAIVE.o \
 	src/dep/audiofile/AudioFile.o \
 	src/dep/gist/src/core/CoreFrequencyDomainFeatures.o \
 	src/dep/gist/src/core/CoreTimeDomainFeatures.o \
