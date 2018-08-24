@@ -82,6 +82,10 @@
         "model": "Σ"
       },
       {
+        "plugin": "Bidoo",
+        "model": "rabBIT"
+      },
+      {
         "plugin": "Bogaudio",
         "model": "Bogaudio-Mult"
       },

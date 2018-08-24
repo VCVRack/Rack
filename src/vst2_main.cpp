@@ -634,6 +634,7 @@ public:
          b_open = false;
 
          setGlobals();
+         vst2_set_shared_plugin_tls_globals();
          rack::global->vst2.last_seen_instance_count = instance_count;
 
          Dprintf("xxx vstrack_plugin: call vst2_exit()\n");

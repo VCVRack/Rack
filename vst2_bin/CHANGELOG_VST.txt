@@ -1,3 +1,14 @@
+** August 24th, 2018
+- fix failed assertion when destroying plugin instance with dynamically loaded modules
+- add module Bidoo.CANARD
+- add module Bidoo.DFUZE
+- add module Bidoo.OUAIVE
+- add module Bidoo.RABBIT
+- update module bsp.Obxd_VCF
+   - this is now an optional, dynamically loaded plugin
+- update module LindenbergResearch.Westcoast (preview)
+
+
 ** August 23rd, 2018
 - update module LindenbergResearch.Westcoast
 - add module bsp.Obxd_VCF
