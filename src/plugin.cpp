@@ -613,7 +613,7 @@ extern void init_plugin_BaconMusic           (rack::Plugin *p);
 extern void init_plugin_Befaco               (rack::Plugin *p);
 extern void init_plugin_Bidoo                (rack::Plugin *p);
 extern void init_plugin_Bogaudio             (rack::Plugin *p);
-extern void init_plugin_bsp                  (rack::Plugin *p);
+// extern void init_plugin_bsp                  (rack::Plugin *p);  // contains GPLv3 code from Ob-Xd (Obxd_VCF)
 // extern void init_plugin_BOKONTEPByteBeatMachine (rack::Plugin *p);  // unstable
 extern void init_plugin_CastleRocktronics    (rack::Plugin *p);
 extern void init_plugin_cf                   (rack::Plugin *p);
@@ -702,7 +702,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Befaco",               &init_plugin_Befaco);
    vst2_load_static_rack_plugin("Bidoo",                &init_plugin_Bidoo);
    vst2_load_static_rack_plugin("Bogaudio",             &init_plugin_Bogaudio);
-   vst2_load_static_rack_plugin("bsp",                  &init_plugin_bsp);
+   // vst2_load_static_rack_plugin("bsp",                  &init_plugin_bsp);  // contains GPLv3 code from Ob-Xd (Obxd_VCF)
    // vst2_load_static_rack_plugin("BOKONTEPByteBeatMachine",   &init_plugin_BOKONTEPByteBeatMachine);
    vst2_load_static_rack_plugin("CastleRocktronics",    &init_plugin_CastleRocktronics);
    vst2_load_static_rack_plugin("cf",                   &init_plugin_cf);
