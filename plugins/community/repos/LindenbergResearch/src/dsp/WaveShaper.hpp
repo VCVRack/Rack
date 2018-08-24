@@ -16,7 +16,7 @@ namespace dsp {
     struct WaveShaper : DSPEffect {
         /* oversampling channel */
         static const int STD_CHANNEL = 0;
-        static constexpr double MAX_BIAS_LEVEL = 5.0; // +/- 5V
+        static constexpr double SHAPER_MAX_BIAS = 12.0; // +/- 5V
 
     protected:
         Resampler<1> *rs;

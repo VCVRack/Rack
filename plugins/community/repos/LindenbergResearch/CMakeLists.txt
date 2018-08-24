@@ -14,13 +14,34 @@ set(SOURCE_FILES
         src/VCO.cpp
         src/dsp/DSPMath.cpp
         src/dsp/DSPMath.hpp
-        src/Release.h
         src/dsp/Oscillator.cpp
         src/dsp/Oscillator.hpp
         src/dsp/DSPSystem.hpp
         src/dsp/LadderFilter.hpp
         src/dsp/LadderFilter.cpp
-        src/dsp/MS20zdf.hpp src/dsp/MS20zdf.cpp src/MS20Filter.cpp src/LRComponents.cpp src/LRComponents.hpp)
+        src/dsp/MS20zdf.hpp
+        src/dsp/MS20zdf.cpp
+        src/MS20Filter.cpp
+        src/LRComponents.hpp
+        src/dsp/WaveShaper.cpp
+        src/dsp/WaveShaper.hpp
+        src/dsp/Lockhart.cpp
+        src/dsp/Lockhart.hpp
+        src/Westcoast.cpp
+        src/dsp/HQTrig.hpp
+        src/dsp/Serge.cpp
+        src/dsp/Serge.hpp
+        src/dsp/Horner.h
+        src/dsp/LambertW.h
+        src/dsp/LambertW.cpp
+        src/widgets/LRKnob.cpp
+        src/widgets/LRShadow.cpp
+        src/widgets/LRCVIndicator.cpp
+        src/widgets/LRCVIndicator.cpp
+        src/widgets/LRLCDWidget.cpp
+        src/widgets/LRLight.cpp
+        src/widgets/LRPanel.cpp
+        src/widgets/LRSVGRotator.cpp src/dsp/Saturator.cpp src/dsp/Saturator.hpp src/dsp/Hardclip.cpp src/dsp/Hardclip.hpp src/dsp/RShaper.cpp src/dsp/RShaper.hpp)
 
 include_directories(.)
 include_directories(src)
@@ -30,4 +51,4 @@ include_directories(../../include)
 include_directories(../../include/dsp)
 include_directories(../../dep/include)
 
-add_executable(LRT ${SOURCE_FILES} src/dsp/DSPMath.cpp src/dsp/DSPMath.hpp src/Release.h)
+add_executable(LRT ${SOURCE_FILES} src/dsp/DSPMath.cpp src/dsp/DSPMath.hpp)

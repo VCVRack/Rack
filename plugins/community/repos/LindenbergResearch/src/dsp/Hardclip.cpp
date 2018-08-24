@@ -1,43 +1,43 @@
-#include "Saturator.hpp"
+#include "Hardclip.hpp"
 
 using namespace dsp;
 
 
-Saturator::Saturator(float sr) : WaveShaper(sr) {
+Hardclip::Hardclip(float sr) : WaveShaper(sr) {
     init();
     noise = new Noise;
-    tanh1 = new HQTanh(sr, 4);
+    hqclip = new HQClip(sr, 4);
 }
 
 
-void Saturator::init() {
+void Hardclip::init() {
     WaveShaper::rs = new Resampler<1>(1);
 }
 
 
-void Saturator::process() {
+void Hardclip::process() {
     WaveShaper::process();
 }
 
 
-void Saturator::invalidate() {}
+void Hardclip::invalidate() {}
 
 
-double Saturator::compute(double x) {
+double Hardclip::compute(double x) {
     double out;
     double in = clampd(x, -SHAPER_MAX_VOLTS, SHAPER_MAX_VOLTS);
 
     in *= clampd(gain, 0., 20.); // add gain
     in += clampd(bias * 2, -SHAPER_MAX_BIAS, SHAPER_MAX_BIAS); // add bias
 
-    in *= SATURATOR_GAIN;
+    in *= HARDCLIP_GAIN;
 
-    in = tanh1->next(in);
+    in = hqclip->next(in);
 
-    in *= 1 / SATURATOR_GAIN * 0.3;
+    in *= 1 / HARDCLIP_GAIN * 0.3;
     if (blockDC) in = dc->filter(in);
 
-    out = in + noise->nextFloat(SATURATOR_NOISE);
+    out = in + noise->nextFloat(HARDCLIP_NOISE);
 
     return out;
 }

@@ -1,3 +1,5 @@
+#include "dsp/Hardclip.hpp"
+#include "dsp/RShaper.hpp"
 #include "dsp/Serge.hpp"
 #include "dsp/Lockhart.hpp"
 #include "dsp/Saturator.hpp"
@@ -14,8 +16,8 @@ struct Westcoast : LRModule {
         LOCKHART,
         OVERDRIVE,
         SATURATE,
-        POLYNOM,
-        SOFTCLIP,
+        RESHAPER,
+        VALERIE,
         HARDCLIP
     };
 
@@ -49,11 +51,15 @@ struct Westcoast : LRModule {
        hs = new dsp::LockhartWavefolder(engineGetSampleRate());
        sg = new dsp::SergeWavefolder(engineGetSampleRate());
        saturator = new dsp::Saturator(engineGetSampleRate());
+       hardclip = new dsp::Hardclip(engineGetSampleRate());
+       reshaper = new dsp::ReShaper(engineGetSampleRate());
     }
 
     dsp::LockhartWavefolder *hs;
     dsp::SergeWavefolder *sg;
     dsp::Saturator *saturator;
+    dsp::Hardclip *hardclip;
+    dsp::ReShaper *reshaper;
     LRAlternateBigKnob *gainBtn = NULL;
     LRAlternateMiddleKnob *biasBtn = NULL;
 
@@ -98,7 +104,7 @@ void Westcoast::step() {
         biasBtn->setIndicatorActive(inputs[CV_BIAS_INPUT].active);
 
         gainBtn->setIndicatorValue((params[GAIN_PARAM].value + gaincv) / 20);
-        biasBtn->setIndicatorValue((params[BIAS_PARAM].value + (biascv + 3)) / 6);
+        biasBtn->setIndicatorValue((params[BIAS_PARAM].value + (biascv + 6)) / 12);
     }
 
     float out;
@@ -131,6 +137,24 @@ void Westcoast::step() {
 
             saturator->process();
             out = (float) saturator->getOut();
+            break;
+
+        case HARDCLIP: // Hardclip
+            hardclip->setGain(gain);
+            hardclip->setBias(bias);
+            hardclip->setIn(inputs[SHAPER_INPUT].value);
+
+            hardclip->process();
+            out = (float) hardclip->getOut();
+            break;
+
+        case RESHAPER: // ReShaper
+            reshaper->setGain(gain);
+            reshaper->setBias(bias);
+            reshaper->setIn(inputs[SHAPER_INPUT].value);
+
+            reshaper->process();
+            out = (float) reshaper->getOut();
             break;
 
         default: // invalid state, should not happen

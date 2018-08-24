@@ -1,10 +1,12 @@
 ALL_OBJ= \
 	src/dsp/DSPMath.o \
+	src/dsp/Hardclip.o \
 	src/dsp/LadderFilter.o \
 	src/dsp/LambertW.o \
 	src/dsp/Lockhart.o \
 	src/dsp/MS20zdf.o \
 	src/dsp/Oscillator.o \
+	src/dsp/RShaper.o \
 	src/dsp/Saturator.o \
 	src/dsp/Serge.o \
 	src/dsp/WaveShaper.o \
