@@ -28,8 +28,6 @@ struct BlankPanel : Module {
 void BlankPanel::step() {
 
 }
-
-
 /**
  * @brief Blank Panel with Logo
  */

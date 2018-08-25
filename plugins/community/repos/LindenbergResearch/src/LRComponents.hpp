@@ -639,6 +639,7 @@ namespace lrt {
         /** angle to rotate per step */
         float angle = 0;
         float inc;
+        float scale;
 
 
         SVGRotator();
@@ -650,11 +651,12 @@ namespace lrt {
          * @param svg Pointer to SVG image
          * @param angle Increment angle per step
          */
-        SVGRotator static *create(Vec pos, std::shared_ptr<SVG> svg, float inc) {
+        SVGRotator static *create(Vec pos, std::shared_ptr<SVG> svg, float inc, float scale = 1.0f) {
             SVGRotator *rotator = FramebufferWidget::create<SVGRotator>(pos);
 
             rotator->setSVG(svg);
             rotator->inc = inc;
+            rotator->scale = scale;
 
             return rotator;
         }

@@ -1,3 +1,4 @@
+#include "dsp/Overdrive.hpp"
 #include "dsp/Hardclip.hpp"
 #include "dsp/RShaper.hpp"
 #include "dsp/Serge.hpp"
@@ -53,6 +54,7 @@ struct Westcoast : LRModule {
        saturator = new dsp::Saturator(engineGetSampleRate());
        hardclip = new dsp::Hardclip(engineGetSampleRate());
        reshaper = new dsp::ReShaper(engineGetSampleRate());
+       overdrive = new dsp::Overdrive(engineGetSampleRate());
     }
 
     dsp::LockhartWavefolder *hs;
@@ -60,6 +62,7 @@ struct Westcoast : LRModule {
     dsp::Saturator *saturator;
     dsp::Hardclip *hardclip;
     dsp::ReShaper *reshaper;
+    dsp::Overdrive *overdrive;
     LRAlternateBigKnob *gainBtn = NULL;
     LRAlternateMiddleKnob *biasBtn = NULL;
 
@@ -88,8 +91,12 @@ void Westcoast::step() {
     float gaincv = 0;
     float biascv = 0;
 
-    if (!inputs[SHAPER_INPUT].active) return;
+    /* not connected */
+    if (!inputs[SHAPER_INPUT].active) {
+        outputs[SHAPER_OUTPUT].value = 0.f;
 
+        return;
+    }
 
     if (inputs[CV_GAIN_INPUT].active) {
         gaincv = inputs[CV_GAIN_INPUT].value * quadraticBipolar(params[CV_GAIN_PARAM].value) * 4.0f;
@@ -157,10 +164,19 @@ void Westcoast::step() {
             out = (float) reshaper->getOut();
             break;
 
+        case OVERDRIVE: // ReShaper
+            overdrive->setGain(gain);
+            overdrive->setBias(bias);
+            overdrive->setIn(inputs[SHAPER_INPUT].value);
+
+            overdrive->process();
+            out = (float) overdrive->getOut();
+            break;
         default: // invalid state, should not happen
             out = 0;
             break;
     }
+
 
     outputs[SHAPER_OUTPUT].value = out;
 }

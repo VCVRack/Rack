@@ -617,6 +617,7 @@ extern void init_plugin_Bogaudio             (rack::Plugin *p);
 // extern void init_plugin_BOKONTEPByteBeatMachine (rack::Plugin *p);  // unstable
 extern void init_plugin_CastleRocktronics    (rack::Plugin *p);
 extern void init_plugin_cf                   (rack::Plugin *p);
+extern void init_plugin_com_soundchasing_stochasm (rack::Plugin *p);
 extern void init_plugin_computerscare        (rack::Plugin *p);
 //extern void init_plugin_dBiz                 (rack::Plugin *p);  // now a DLL (13Jul2018)
 extern void init_plugin_DHE_Modules          (rack::Plugin *p);
@@ -636,6 +637,7 @@ extern void init_plugin_JW_Modules           (rack::Plugin *p);
 extern void init_plugin_Koralfx              (rack::Plugin *p);
 extern void init_plugin_LindenbergResearch   (rack::Plugin *p);
 extern void init_plugin_LOGinstruments       (rack::Plugin *p);
+extern void init_plugin_mental               (rack::Plugin *p);
 extern void init_plugin_ML_modules           (rack::Plugin *p);
 extern void init_plugin_moDllz               (rack::Plugin *p);
 extern void init_plugin_modular80            (rack::Plugin *p);
@@ -706,6 +708,7 @@ void vst2_load_static_rack_plugins(void) {
    // vst2_load_static_rack_plugin("BOKONTEPByteBeatMachine",   &init_plugin_BOKONTEPByteBeatMachine);
    vst2_load_static_rack_plugin("CastleRocktronics",    &init_plugin_CastleRocktronics);
    vst2_load_static_rack_plugin("cf",                   &init_plugin_cf);
+   vst2_load_static_rack_plugin("com_soundchasing_stochasm", &init_plugin_com_soundchasing_stochasm);
    vst2_load_static_rack_plugin("computerscare",        &init_plugin_computerscare);
    // vst2_load_static_rack_plugin("dBiz",                 &init_plugin_dBiz);  // now a DLL (13Jul2018)
    vst2_load_static_rack_plugin("DHE-Modules",          &init_plugin_DHE_Modules);
@@ -725,6 +728,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Koralfx-Modules",      &init_plugin_Koralfx);
    vst2_load_static_rack_plugin("LindenbergResearch",   &init_plugin_LindenbergResearch);
    vst2_load_static_rack_plugin("LOGinstruments",       &init_plugin_LOGinstruments);
+   vst2_load_static_rack_plugin("mental",               &init_plugin_mental);
    vst2_load_static_rack_plugin("ML_modules",           &init_plugin_ML_modules);
    vst2_load_static_rack_plugin("moDllz",               &init_plugin_moDllz);
    vst2_load_static_rack_plugin("modular80",            &init_plugin_modular80);

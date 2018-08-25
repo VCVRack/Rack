@@ -1,3 +1,38 @@
+** August 25th, 2018
+- add module com-soundchasing-stochasm.Resonator
+- add module mental.MentalSubMixer
+- add module mental.MentalMults
+- add module mental.MentalMixer
+- add module mental.MentalFold
+- add module mental.MentalClip
+- add module mental.MentalGates
+- add module mental.MentalABSwitches
+- add module mental.MentalQuantiser
+- add module mental.MentalChord
+- add module mental.MentalMuxes
+- add module mental.MentalLogic
+- add module mental.MentalButtons
+- add module mental.MentalSums
+- add module mental.MentalPitchShift
+- add module mental.MentalClockDivider
+- add module mental.MentalCartesian
+- add module mental.MentalPatchMatrix
+- add module mental.MentalBinaryDecoder
+- add module mental.MentalSwitch8
+- add module mental.MentalMux8
+- add module mental.MentalCounters
+- add module mental.MentalKnobs
+- add module mental.MentalGateMaker
+- add module mental.MentalMasterClock
+- add module mental.MentalPatchNotes
+- add module mental.MentalQuadLFO
+- add module mental.MentalRadioButtons
+! (note) The UI handling in some of the mental modules, e.g. MentalPatchMatrix is 
+          tied to the audio engine which means that the UI will not work properly
+          while the plugin is idle.
+- update module LindenbergResearch.Westcoast (preview)
+
+
 ** August 24th, 2018
 - fix failed assertion when destroying plugin instance with dynamically loaded modules
 - add module Bidoo.CANARD

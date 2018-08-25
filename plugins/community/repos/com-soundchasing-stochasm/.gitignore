@@ -1,0 +1,9 @@
+/build
+/dist
+/plugin.dylib
+/plugin.dll
+/plugin.so
+.DS_Store
+
+# vim swap files
+*.swp

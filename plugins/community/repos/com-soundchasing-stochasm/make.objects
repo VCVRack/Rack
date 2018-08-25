@@ -1,0 +1,3 @@
+ALL_OBJ= \
+	src/Resonator.o \
+	src/Stochasm.o

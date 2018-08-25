@@ -55,7 +55,7 @@ struct BlankPanelSmall : Module {
     BlankPanelSmall() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {}
 
 
-    LRIOPort *ioports[8];
+    LRIOPort *ioports[8] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
     bool multiple = false;
 
     void step() override;
@@ -266,7 +266,7 @@ RACK_PLUGIN_MODEL_INIT(LindenbergResearch, BlankPanelM1) {
 
 RACK_PLUGIN_MODEL_INIT(LindenbergResearch, BlankPanelSmall) {
    Model *modelBlankPanelSmall = Model::create<BlankPanelSmall, BlankPanelWidgetSmall>("Lindenberg Research", "BlankPanel Small",
-                                                                                       "Blank Panel Small",
-                                                                                       BLANK_TAG);
+                                                                                    "Blank: Small / Multiple",
+                                                                                    BLANK_TAG, MULTIPLE_TAG);
    return modelBlankPanelSmall;
 }

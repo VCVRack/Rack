@@ -37,7 +37,7 @@ double Hardclip::compute(double x) {
     in *= 1 / HARDCLIP_GAIN * 0.3;
     if (blockDC) in = dc->filter(in);
 
-    out = in + noise->nextFloat(HARDCLIP_NOISE);
+    out = in;
 
     return out;
 }

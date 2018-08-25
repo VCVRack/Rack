@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- August 24th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- August 25th, 2018
 ==================================================
 
 !!!------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ The binary distribution contains the following (18) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (604) add-on modules are statically linked with the VST plugin:
+The following (632) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -258,6 +258,7 @@ The following (604) add-on modules are statically linked with the VST plugin:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
+ - com-soundchasing-stochasm.Resonator
  - computerscare.ComputerscareDebug
  - computerscare.ComputerscarePatchSequencer
  - DHE-Modules.BoosterStage
@@ -403,6 +404,33 @@ The following (604) add-on modules are statically linked with the VST plugin:
  - LOGinstruments.LessMess
  - LOGinstruments.Velvet
  - LOGinstruments.Crystal
+ - mental.MentalSubMixer
+ - mental.MentalMults
+ - mental.MentalMixer
+ - mental.MentalFold
+ - mental.MentalClip
+ - mental.MentalGates
+ - mental.MentalABSwitches
+ - mental.MentalQuantiser
+ - mental.MentalChord
+ - mental.MentalMuxes
+ - mental.MentalLogic
+ - mental.MentalButtons
+ - mental.MentalSums
+ - mental.MentalPitchShift
+ - mental.MentalClockDivider
+ - mental.MentalCartesian
+ - mental.MentalPatchMatrix
+ - mental.MentalBinaryDecoder
+ - mental.MentalSwitch8
+ - mental.MentalMux8
+ - mental.MentalCounters
+ - mental.MentalKnobs
+ - mental.MentalGateMaker
+ - mental.MentalMasterClock
+ - mental.MentalPatchNotes
+ - mental.MentalQuadLFO
+ - mental.MentalRadioButtons
  - moDllz.MIDIPoly
  - moDllz.TwinGlider
  - moDllz.MIDIdualCV

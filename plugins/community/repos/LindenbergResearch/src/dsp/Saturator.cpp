@@ -37,7 +37,7 @@ double Saturator::compute(double x) {
     in *= 1 / SATURATOR_GAIN * 0.3;
     if (blockDC) in = dc->filter(in);
 
-    out = in + noise->nextFloat(SATURATOR_NOISE);
+    out = in;
 
     return out;
 }

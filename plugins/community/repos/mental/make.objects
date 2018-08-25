@@ -1,0 +1,29 @@
+ALL_OBJ= \
+	src/MentalABSwitches.o \
+	src/MentalBinaryDecoder.o \
+	src/MentalButtons.o \
+	src/MentalCartesian.o \
+	src/MentalChord.o \
+	src/MentalClip.o \
+	src/MentalClockDivider.o \
+	src/MentalCounters.o \
+	src/MentalFold.o \
+	src/MentalGateMaker.o \
+	src/MentalGates.o \
+	src/MentalKnobs.o \
+	src/MentalLogic.o \
+	src/MentalMasterClock.o \
+	src/MentalMixer.o \
+	src/MentalMults.o \
+	src/MentalMux8.o \
+	src/MentalMuxes.o \
+	src/MentalPatchMatrix.o \
+	src/MentalPitchShift.o \
+	src/MentalQuadLFO.o \
+	src/MentalQuantiser.o \
+	src/MentalRadioButtons.o \
+	src/MentalSubMixer.o \
+	src/MentalSums.o \
+	src/MentalSwitch8.o \
+	src/mental.o
+

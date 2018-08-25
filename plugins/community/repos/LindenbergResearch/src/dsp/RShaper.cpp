@@ -36,7 +36,7 @@ double ReShaper::compute(double x) {
     in *= 1 / RSHAPER_GAIN * 0.5;
     if (blockDC) in = dc->filter(in);
 
-    out = in + noise->nextFloat(RSHAPER_NOISE);
+    out = in;
 
     return out;
 }

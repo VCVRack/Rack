@@ -6,6 +6,7 @@ ALL_OBJ= \
 	src/dsp/Lockhart.o \
 	src/dsp/MS20zdf.o \
 	src/dsp/Oscillator.o \
+	src/dsp/Overdrive.o \
 	src/dsp/RShaper.o \
 	src/dsp/Saturator.o \
 	src/dsp/Serge.o \

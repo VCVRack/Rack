@@ -41,7 +41,7 @@ set(SOURCE_FILES
         src/widgets/LRLCDWidget.cpp
         src/widgets/LRLight.cpp
         src/widgets/LRPanel.cpp
-        src/widgets/LRSVGRotator.cpp src/dsp/Saturator.cpp src/dsp/Saturator.hpp src/dsp/Hardclip.cpp src/dsp/Hardclip.hpp src/dsp/RShaper.cpp src/dsp/RShaper.hpp)
+        src/widgets/LRSVGRotator.cpp src/dsp/Saturator.cpp src/dsp/Saturator.hpp src/dsp/Hardclip.cpp src/dsp/Hardclip.hpp src/dsp/RShaper.cpp src/dsp/RShaper.hpp src/dsp/Overdrive.cpp src/dsp/Overdrive.hpp)
 
 include_directories(.)
 include_directories(src)
