@@ -6,20 +6,19 @@
 
 namespace dsp {
 
-    struct ReShaper : WaveShaper {
+   struct ReShaper : WaveShaper {
 
-        Noise *noise;
+      Noise *noise;
 
+   public:
 
-    public:
+      explicit ReShaper(float sr);
 
-        explicit ReShaper(float sr);
+      void init() override;
+      void invalidate() override;
+      void process() override;
+      double compute(double x) override;
 
-        void init() override;
-        void invalidate() override;
-        void process() override;
-        double compute(double x) override;
-
-    };
+   };
 
 }

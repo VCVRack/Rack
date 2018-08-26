@@ -6,20 +6,20 @@
 
 namespace dsp {
 
-    struct Saturator : WaveShaper {
+   struct Saturator : WaveShaper {
 
-        Noise *noise;
+      Noise *noise;
 
 
-    public:
+   public:
 
-        explicit Saturator(float sr);
+      explicit Saturator(float sr);
 
-        void init() override;
-        void invalidate() override;
-        void process() override;
-        double compute(double x) override;
+      void init() override;
+      void invalidate() override;
+      void process() override;
+      double compute(double x) override;
 
-    };
+   };
 
 }

@@ -23,8 +23,8 @@ ALL_OBJ= \
 	src/BlankPanelM1.o \
 	src/LindenbergResearch.o \
 	src/MS20Filter.o \
+	src/QuickMix.o \
 	src/ReShaper.o \
 	src/SimpleFilter.o \
 	src/VCO.o \
-	src/Westcoast_v1.o \
 	src/Westcoast.o

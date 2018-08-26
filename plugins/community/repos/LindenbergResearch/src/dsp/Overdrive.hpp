@@ -6,20 +6,19 @@
 
 namespace dsp {
 
-    struct Overdrive : WaveShaper {
+   struct Overdrive : WaveShaper {
 
-        Noise *noise;
+      Noise *noise;
 
+   public:
 
-    public:
+      explicit Overdrive(float sr);
 
-        explicit Overdrive(float sr);
+      void init() override;
+      void invalidate() override;
+      void process() override;
+      double compute(double x) override;
 
-        void init() override;
-        void invalidate() override;
-        void process() override;
-        double compute(double x) override;
-
-    };
+   };
 
 }
