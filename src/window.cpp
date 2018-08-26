@@ -57,6 +57,11 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
    // printf("xxx lglw_mouse_cbk: lglw=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, _x, _y, _buttonState, _changedButtonState);
    vst2_set_globals(lglw_userdata_get(_lglw));
 
+   // (note) assumes that GL context is never touched during regular mouse move
+   // (note) mouse clicks may cause new SVGs to be loaded, which in turn may cause new GL textures to be created
+   if(0u != _changedButtonState)
+      lglw_glcontext_push(global_ui->window.lglw);
+
    if(LGLW_MOUSE_WHEELUP == _buttonState)
    {
       // onScroll
@@ -242,6 +247,8 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
       }
    }
 
+   if(0u != _changedButtonState)
+      lglw_glcontext_pop(global_ui->window.lglw);
 }
 
 static void lglw_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changedFocusState) {
@@ -320,12 +327,15 @@ int vst2_handle_effeditkeydown(unsigned int _vkey) {
 
 void lglw_dropfiles_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _numFiles, const char **_pathNames) {
 	// onPathDrop
+   vst2_set_globals(lglw_userdata_get(_lglw));
+   lglw_glcontext_push(global_ui->window.lglw);
 	EventPathDrop e;
 	e.pos = Vec(_x, _y);
 	for(uint32_t i = 0u; i < _numFiles; i++) {
 		e.paths.push_back(_pathNames[i]);
 	}
 	global_ui->ui.gScene->onPathDrop(e);
+   lglw_glcontext_pop(global_ui->window.lglw);
 }
 
 } // extern C
