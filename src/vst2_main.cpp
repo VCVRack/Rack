@@ -891,6 +891,7 @@ public:
 
    sUI getProgramChunk(uint8_t**_addr) {
       setGlobals();
+      vst2_set_shared_plugin_tls_globals();
       if(NULL != last_program_chunk_str)
       {
          ::free(last_program_chunk_str);
@@ -912,6 +913,7 @@ public:
    bool setProgramChunk(size_t _size, uint8_t *_addr) {
       setGlobals();
       lockAudio();
+      vst2_set_shared_plugin_tls_globals();
 #if 0
       Dprintf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
 #endif
