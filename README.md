@@ -32,7 +32,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-25Aug2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-25Aug2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-26Aug2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-26Aug2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
@@ -55,8 +55,9 @@ Here's a demo video of it: https://vimeo.com/277703414
 
 # Add-on modules
 
-The binary distribution contains the following (18) dynamically loaded add-on modules:
+The binary distribution contains the following (19) dynamically loaded add-on modules:
  - bsp.Obxd_VCF
+ - bsp.Sway
  - dBiz.dBizBlank
  - dBiz.Multiple
  - dBiz.Contorno

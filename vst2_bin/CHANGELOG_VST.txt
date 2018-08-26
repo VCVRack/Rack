@@ -1,3 +1,11 @@
+** August 26th, 2018
+- fix: don't trash VST host GL context when loading .vcv patches via the plugin UI
+- fix: failed assertion when restoring dynamically loaded module state (program chunk)
+- add module bsp.Sway
+- update module LindenbergResearch.Westcast (preview)
+- add module LindenbergResearch.QuickMix (preview)
+
+
 ** August 25th, 2018
 - add module com-soundchasing-stochasm.Resonator
 - add module mental.MentalSubMixer
