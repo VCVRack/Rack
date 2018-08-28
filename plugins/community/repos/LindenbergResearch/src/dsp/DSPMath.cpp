@@ -150,6 +150,7 @@ float shape2(float a, float x) {
     return atanf(x * a);//x * (fabs(x) + a) / (x * x + (a - 1) * fabs(x) + 1);
 }
 
+
 /**
  * @brief Soft saturating with a clip of a. Works only with positive values so use 'b' as helper here.
  * @param x Input sample

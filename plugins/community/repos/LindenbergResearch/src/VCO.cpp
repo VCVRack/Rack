@@ -182,6 +182,6 @@ VCOWidget::VCOWidget(VCO *module) : LRModuleWidget(module) {
 using namespace rack_plugin_LindenbergResearch;
 
 RACK_PLUGIN_MODEL_INIT(LindenbergResearch, VCO) {
-   Model *modelVCO = Model::create<VCO, VCOWidget>("Lindenberg Research", "VCO", "Voltage Controlled Oscillator", OSCILLATOR_TAG);
+Model *modelVCO = Model::create<VCO, VCOWidget>("Lindenberg Research", "VCO", "Woldemar VCO", OSCILLATOR_TAG);
    return modelVCO;
 }

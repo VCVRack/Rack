@@ -50,23 +50,10 @@ namespace lrt {
    };
 
 
-   /**
-    * @brief Standard LRT ModuleWidget definition
-    */
-   struct LRModuleWidget : ModuleWidget {
-      /**
-       * @brief
-       * @param module
-       */
-      LRModuleWidget(Module *module) : ModuleWidget(module) {
-      }
-   };
-
-
-   /**
-    * @brief Emulation of a LCD monochrome display
-    */
-   struct LRLCDWidget : Label {
+/**
+ * @brief Emulation of a LCD monochrome display
+ */
+struct LRLCDWidget : Label {
 
       enum LCDType {
          NUMERIC,
@@ -603,8 +590,8 @@ namespace lrt {
       static constexpr float MARGIN = 10;
 
       /** gradient colors */
-      NVGcolor inner = nvgRGBAf(1.5f * .369f, 1.5f * 0.357f, 1.5f * 0.3333f, 0.25f);
-      NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.0f);;
+    NVGcolor inner = nvgRGBAf(1.4f * .369f, 1.5f * 0.357f, 1.5f * 0.3333f, 0.25f);
+    NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.15f);;
 
       /** gradient offset */
       Vec offset = Vec(30, -50);
@@ -629,7 +616,24 @@ namespace lrt {
    };
 
 
-   /**
+/**
+ * @brief Standard LRT ModuleWidget definition
+ */
+struct LRModuleWidget : ModuleWidget {
+
+    LRPanel *panel;
+
+
+    /**
+     * @brief
+     * @param module
+     */
+    LRModuleWidget(Module *module) : ModuleWidget(module) {
+    }
+};
+
+
+/**
     * @brief Passive rotating SVG image
     */
    struct SVGRotator : FramebufferWidget {

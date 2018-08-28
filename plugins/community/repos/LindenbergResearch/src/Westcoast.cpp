@@ -1,3 +1,4 @@
+#include "dsp/FastTanWF.hpp"
 #include "dsp/Overdrive.hpp"
 #include "dsp/Hardclip.hpp"
 #include "dsp/RShaper.hpp"
@@ -55,6 +56,7 @@ struct Westcoast : LRModule {
        hardclip = new dsp::Hardclip(engineGetSampleRate());
        reshaper = new dsp::ReShaper(engineGetSampleRate());
        overdrive = new dsp::Overdrive(engineGetSampleRate());
+       fastTan = new dsp::FastTan(engineGetSampleRate());
     }
 
     dsp::LockhartWavefolder *hs;
@@ -63,6 +65,7 @@ struct Westcoast : LRModule {
     dsp::Hardclip *hardclip;
     dsp::ReShaper *reshaper;
     dsp::Overdrive *overdrive;
+    dsp::FastTan *fastTan;
     LRAlternateBigKnob *gainBtn = NULL;
     LRAlternateMiddleKnob *biasBtn = NULL;
 
@@ -172,6 +175,14 @@ void Westcoast::step() {
             overdrive->process();
             out = (float) overdrive->getOut();
             break;
+        case VALERIE: // Overdrive
+            fastTan->setGain(gain);
+            fastTan->setBias(bias);
+            fastTan->setIn(inputs[SHAPER_INPUT].value);
+            fastTan->process();
+            out = (float) fastTan->getOut();
+            break;
+
         default: // invalid state, should not happen
             out = 0;
             break;
@@ -200,6 +211,10 @@ struct WestcoastWidget : LRModuleWidget {
 WestcoastWidget::WestcoastWidget(Westcoast *module) : LRModuleWidget(module) {
     panel = new LRPanel(-10, -100);
     panel->setBackground(SVG::load(assetPlugin(plugin, "res/Westcoast.svg")));
+
+    panel->setInner(nvgRGBAf(1.5f * .369f, 1.5f * 0.357f, 1.5f * 0.3333f, 0.45f));
+    panel->setOuter(nvgRGBAf(0.f, 0.f, 0.f, 0.25f));
+
     addChild(panel);
 
     module->patina = new LRPanel();

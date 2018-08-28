@@ -1,5 +1,6 @@
 ALL_OBJ= \
 	src/dsp/DSPMath.o \
+	src/dsp/FastTanWF.o \
 	src/dsp/Hardclip.o \
 	src/dsp/LadderFilter.o \
 	src/dsp/LambertW.o \
