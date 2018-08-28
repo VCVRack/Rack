@@ -99,6 +99,7 @@ RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p)
 
 #define RACK_PLUGIN_INIT_WEBSITE(url) p->website = url
 #define RACK_PLUGIN_INIT_MANUAL(url) p->manual = url
+#define RACK_PLUGIN_INIT_VERSION(ver) p->version = ver
 
 #define RACK_PLUGIN_MODEL_DECLARE(pluginname, modelname) extern Model *create_model_##pluginname##_##modelname##(void)
 #define RACK_PLUGIN_MODEL_INIT(pluginname, modelname) Model *create_model_##pluginname##_##modelname##(void)
