@@ -47,7 +47,7 @@ void ParamWidget::onChange(EventChange &e) {
 	if (!module)
 		return;
 
-   // printf("xxx ParamWidget::onChange: paramId=%d value=%f\n", paramId, value);
+   // printf("xxx ParamWidget::onChange: paramId=%d value=%f this=%p smooth=%d\n", paramId, value, this, smooth);
 
 	if (smooth)
 		engineSetParamSmooth(module, paramId, value);

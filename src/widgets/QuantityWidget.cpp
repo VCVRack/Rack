@@ -9,9 +9,21 @@ QuantityWidget::QuantityWidget() {
 }
 
 void QuantityWidget::setValue(float value) {
-	this->value = clamp(value, fminf(minValue, maxValue), fmaxf(minValue, maxValue));
-	EventChange e;
-	onChange(e);
+   // printf("xxx QuantityWidget::setValue: value=%f\n", value);
+   if(isfinite(minValue) && isfinite(maxValue))
+   {
+      this->value = clamp(value, fminf(minValue, maxValue), fmaxf(minValue, maxValue));
+      EventChange e;
+      onChange(e);
+   }
+   else
+   {
+      // Rotary knob
+      this->value = value;
+      EventChange e;
+      onChange(e);
+   }
+   // printf("xxx QuantityWidget::setValue: LEAVE value=%f\n", value);
 }
 
 void QuantityWidget::setLimits(float minValue, float maxValue) {

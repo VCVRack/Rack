@@ -297,15 +297,18 @@ void engineSetParam(Module *module, int paramId, float value) {
             ParamWidget *paramWidget = moduleWidget->findParamWidgetByParamId(paramId);
             if(NULL != paramWidget)
             {
-               // Normalize parameter
-               float paramRange = (paramWidget->maxValue - paramWidget->minValue);
-               if(paramRange > 0.0f)
+               if(isfinite(paramWidget->minValue) && isfinite(paramWidget->maxValue))
                {
-                  float normValue = (value - paramWidget->minValue) / paramRange;
-                  // printf("xxx paramId=%d normValue=%f\n", paramId, normValue);
+                  // Normalize parameter
+                  float paramRange = (paramWidget->maxValue - paramWidget->minValue);
+                  if(paramRange > 0.0f)
+                  {
+                     float normValue = (value - paramWidget->minValue) / paramRange;
+                     // printf("xxx paramId=%d normValue=%f\n", paramId, normValue);
 
-                  // Call host audioMasterAutomate
-                  vst2_handle_ui_param(uniqueParamId, normValue);
+                     // Call host audioMasterAutomate
+                     vst2_handle_ui_param(uniqueParamId, normValue);
+                  }
                }
             }
          }
@@ -357,16 +360,19 @@ void vst2_handle_queued_params(void) {
                if(NULL != paramWidget)
                {
                   // Normalize parameter
-                  float paramRange = (paramWidget->maxValue - paramWidget->minValue);
-                  if(paramRange > 0.0f)
+                  if(isfinite(paramWidget->minValue) && isfinite(paramWidget->maxValue))
                   {
-                     // float value = qp.norm_value - 0.5f;
-                     // value *= 2.0f;
-                     float value = (qp.norm_value * paramRange) + paramWidget->minValue;
-                     engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
+                     float paramRange = (paramWidget->maxValue - paramWidget->minValue);
+                     if(paramRange > 0.0f)
+                     {
+                        // float value = qp.norm_value - 0.5f;
+                        // value *= 2.0f;
+                        float value = (qp.norm_value * paramRange) + paramWidget->minValue;
+                        engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
 
-                     // Update UI widget
-                     paramWidget->setValue(value);
+                        // Update UI widget
+                        paramWidget->setValue(value);
+                     }
                   }
                }
             }
