@@ -59,7 +59,7 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
 
    // (note) assumes that GL context is never touched during regular mouse move
    // (note) mouse clicks may cause new SVGs to be loaded, which in turn may cause new GL textures to be created
-   if(0u != _changedButtonState)
+   // if(0u != _changedButtonState)
       lglw_glcontext_push(global_ui->window.lglw);
 
    if(LGLW_MOUSE_WHEELUP == _buttonState)
@@ -247,7 +247,7 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
       }
    }
 
-   if(0u != _changedButtonState)
+   // if(0u != _changedButtonState)
       lglw_glcontext_pop(global_ui->window.lglw);
 }
 
