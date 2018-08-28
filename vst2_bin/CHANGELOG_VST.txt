@@ -1,8 +1,15 @@
+** August 28th, 2018
+- fix rotary knobs (infinite min/max)
+   - fixes e.g. Ohmer.Metriks and ImpromptuModular modules
+- update ImpromptuModular modules to v0.6.11
+- update module LindenbergResearch.Westcoast (preview)
+
+
 ** August 26th, 2018
 - fix: don't trash VST host GL context when loading .vcv patches via the plugin UI
 - fix: failed assertion when restoring dynamically loaded module state (program chunk)
 - add module bsp.Sway
-- update module LindenbergResearch.Westcast (preview)
+- update module LindenbergResearch.Westcoast (preview)
 - add module LindenbergResearch.QuickMix (preview)
 
 

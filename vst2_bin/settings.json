@@ -118,16 +118,16 @@
           "model": "Obxd_VCF"
       },
       {
+          "plugin": "bsp",
+          "model": "Sway"
+      },
+      {
         "plugin": "HetrickCV",
         "model": "Exponent"
       },
       {
         "plugin": "DHE-Modules",
         "model": "Cubic"
-      },
-      {
-        "plugin": "ErraticInstruments",
-        "model": "MPEToCV"
       },
       {
         "plugin": "FrankBussFormula",
