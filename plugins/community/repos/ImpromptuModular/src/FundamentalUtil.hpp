@@ -48,8 +48,8 @@ struct LadderFilter {
 
 // From Fundamental VCO.cpp
 //template <int OVERSAMPLE, int QUALITY>
-static const int OVERSAMPLE = 16;
-static const int QUALITY = 16;
+static const int OVERSAMPLE = 8;
+static const int QUALITY = 8;
 struct VoltageControlledOscillator {
 	bool analog = false;
 	bool soft = false;

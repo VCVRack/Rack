@@ -26,7 +26,6 @@ https://github.com/IohannRabeson/VCVRack-Simple/commit/2d33e97d2e344d2926548a0b9
 
 
 #include "ImpromptuModular.hpp"
-#include "dsp/digital.hpp"
 #include "midifile/MidiFile.h"
 #include "osdialog.h"
 #include <iostream>

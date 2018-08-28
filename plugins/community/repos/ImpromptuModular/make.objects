@@ -14,6 +14,7 @@ ALL_OBJ= \
 	src/MidiFileModule.o \
 	src/PhraseSeq16.o \
 	src/PhraseSeq32.o \
+	src/PhraseSeqUtil.o \
 	src/SemiModularSynth.o \
 	src/Tact.o \
 	src/TwelveKey.o \

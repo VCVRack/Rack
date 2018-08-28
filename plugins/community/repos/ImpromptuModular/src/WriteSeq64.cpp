@@ -9,7 +9,7 @@
 
 
 #include "ImpromptuModular.hpp"
-#include "dsp/digital.hpp"
+#include "PhraseSeqUtil.hpp"
 
 namespace rack_plugin_ImpromptuModular {
 
@@ -82,6 +82,7 @@ struct WriteSeq64 : Module {
 	const float clockIgnoreOnResetDuration = 0.001f;// disable clock on powerup and reset for 1 ms (so that the first step plays)
 	int stepKnob = 0;
 	int stepsKnob = 0;
+	int lightRefreshCounter;
 
 	
 	SchmittTrigger clock12Trigger;
@@ -121,6 +122,7 @@ struct WriteSeq64 : Module {
 		pendingPaste = 0;
 		clockIgnoreOnReset = (long) (clockIgnoreOnResetDuration * engineGetSampleRate());
 		resetOnRun = false;
+		lightRefreshCounter = 0;
 	}
 
 	void onRandomize() override {
@@ -280,7 +282,7 @@ struct WriteSeq64 : Module {
 	
 		// Copy button
 		if (copyTrigger.process(params[COPY_PARAM].value)) {
-			infoCopyPaste = (long) (copyPasteInfoTime * engineGetSampleRate());
+			infoCopyPaste = (long) (copyPasteInfoTime * engineGetSampleRate() / displayRefreshStepSkips);
 			for (int s = 0; s < 64; s++) {
 				cvCPbuffer[s] = cv[indexChannel][s];
 				gateCPbuffer[s] = gates[indexChannel][s];
@@ -292,7 +294,7 @@ struct WriteSeq64 : Module {
 		if (pasteTrigger.process(params[PASTE_PARAM].value)) {
 			if (params[PASTESYNC_PARAM].value < 0.5f || indexChannel == 4) {
 				// Paste realtime, no pending to schedule
-				infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate());
+				infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate() / displayRefreshStepSkips);
 				for (int s = 0; s < 64; s++) {
 					cv[indexChannel][s] = cvCPbuffer[s];
 					gates[indexChannel][s] = gateCPbuffer[s];
@@ -395,7 +397,7 @@ struct WriteSeq64 : Module {
 			if ( ((pendingPaste&0x3) == 1) || ((pendingPaste&0x3) == 2 && indexStep[indexChannel] == 0) ) {
 				if ( (clk12step && (indexChannel == 0 || indexChannel == 1)) ||
 					 (clk34step && (indexChannel == 2 || indexChannel == 3)) ) {
-					infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate());
+					infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate() / displayRefreshStepSkips);
 					int pasteChannel = pendingPaste>>2;
 					for (int s = 0; s < 64; s++) {
 						cv[pasteChannel][s] = cvCPbuffer[s];
@@ -420,8 +422,6 @@ struct WriteSeq64 : Module {
 			clock34Trigger.reset();
 			clockIgnoreOnReset = (long) (clockIgnoreOnResetDuration * engineGetSampleRate());
 		}
-		else
-			resetLight -= (resetLight / lightLambda) * engineGetSampleTime();
 		
 		
 		//********** Outputs and lights **********
@@ -452,28 +452,35 @@ struct WriteSeq64 : Module {
 			}
 		}
 		
-		// Gate light
-		lights[GATE_LIGHT].value = gates[indexChannel][indexStep[indexChannel]] ? 1.0f : 0.0f;			
-		
-		// Reset light
-		lights[RESET_LIGHT].value =	resetLight;	
+		lightRefreshCounter++;
+		if (lightRefreshCounter > displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
 
-		// Run light
-		lights[RUN_LIGHT].value = running;
+			// Gate light
+			lights[GATE_LIGHT].value = gates[indexChannel][indexStep[indexChannel]] ? 1.0f : 0.0f;			
+			
+			// Reset light
+			lights[RESET_LIGHT].value =	resetLight;	
+			resetLight -= (resetLight / lightLambda) * engineGetSampleTime() * displayRefreshStepSkips;
+
+			// Run light
+			lights[RUN_LIGHT].value = running ? 1.0f : 0.0f;
+			
+			// Write allowed light
+			lights[WRITE_LIGHT + 0].value = (canEdit)?1.0f:0.0f;
+			lights[WRITE_LIGHT + 1].value = (canEdit)?0.0f:1.0f;
+			
+			// Pending paste light
+			lights[PENDING_LIGHT].value = (pendingPaste == 0 ? 0.0f : 1.0f);
+			
+			if (infoCopyPaste != 0l) {
+				if (infoCopyPaste > 0l)
+					infoCopyPaste --;
+				if (infoCopyPaste < 0l)
+					infoCopyPaste ++;
+			}
+		}// lightRefreshCounter
 		
-		// Write allowed light
-		lights[WRITE_LIGHT + 0].value = (canEdit)?1.0f:0.0f;
-		lights[WRITE_LIGHT + 1].value = (canEdit)?0.0f:1.0f;
-		
-		// Pending paste light
-		lights[PENDING_LIGHT].value = (pendingPaste == 0 ? 0.0f : 1.0f);
-		
-		if (infoCopyPaste != 0l) {
-			if (infoCopyPaste > 0l)
-				infoCopyPaste --;
-			if (infoCopyPaste < 0l)
-				infoCopyPaste ++;
-		}
 		if (clockIgnoreOnReset > 0l)
 			clockIgnoreOnReset--;
 	}

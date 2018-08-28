@@ -10,7 +10,6 @@
 
 
 #include "ImpromptuModular.hpp"
-#include "dsp/digital.hpp"
 
 namespace rack_plugin_ImpromptuModular {
 
@@ -70,7 +69,7 @@ struct Tact : Module {
 	SchmittTrigger recallTriggers[2];
 	PulseGenerator eocPulses[2];
 	float paramReadRequest[2]; 
-
+	int lightRefreshCounter;
 	
 	inline bool isLinked(void) {return params[LINK_PARAM].value > 0.5f;}
 	inline bool isExpSliding(void) {return params[EXP_PARAM].value > 0.5f;}
@@ -91,6 +90,7 @@ struct Tact : Module {
 			eocPulses[i].reset();
 			paramReadRequest[i] = -10.0f;// -10.0f when no request being made, value to read otherwize
 		}
+		lightRefreshCounter = 0;
 		
 		onReset();
 	}
@@ -186,7 +186,6 @@ struct Tact : Module {
 	void step() override {		
 		float sampleRate = engineGetSampleRate();
 		float sampleTime = engineGetSampleTime();
-		long initInfoStore = (long) (storeInfoTime * sampleRate);
 		
 		// Scheduled reset (just the parts that do not have a place below in rest of function)
 		if (scheduledReset) {
@@ -207,7 +206,7 @@ struct Tact : Module {
 			if (storeTriggers[i].process(params[STORE_PARAMS + i].value)) {
 				if ( !(i == 1 && isLinked()) ) {// ignore right channel store-button press when linked
 					storeCV[i] = cv[i];
-					infoStore = initInfoStore * (i == 0 ? 1l : -1l);
+					infoStore = (long) (storeInfoTime * sampleRate / displayRefreshStepSkips) * (i == 0 ? 1l : -1l);
 				}
 			}
 		}
@@ -288,31 +287,36 @@ struct Tact : Module {
 		}
 		
 		
-		// Tactile lights
-		if (infoStore > 0l)
-			setTLightsStore(0, infoStore, initInfoStore);
-		else
-			setTLights(0);
-		if (infoStore < 0l)
-			setTLightsStore(1, infoStore * -1l, initInfoStore);
-		else
-			setTLights(1);
-		
-		// CV input lights
-		for (int i = 0; i < 2; i++)
-			lights[CVIN_LIGHTS + i * 2].value = infoCVinLight[i];
-		
-		for (int i = 0; i < 2; i++) {
-			infoCVinLight[i] -= (infoCVinLight[i] / lightLambda) * engineGetSampleTime();
+		lightRefreshCounter++;
+		if (lightRefreshCounter > displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
+
+			// Tactile lights
+			if (infoStore > 0l)
+				setTLightsStore(0, infoStore, (long) (storeInfoTime * sampleRate / displayRefreshStepSkips) );
+			else
+				setTLights(0);
+			if (infoStore < 0l)
+				setTLightsStore(1, infoStore * -1l, (long) (storeInfoTime * sampleRate / displayRefreshStepSkips) );
+			else
+				setTLights(1);
+			if (infoStore != 0l) {
+				if (infoStore > 0l)
+					infoStore --;
+				if (infoStore < 0l)
+					infoStore ++;
+			}
+			// CV input lights
+			for (int i = 0; i < 2; i++)
+				lights[CVIN_LIGHTS + i * 2].value = infoCVinLight[i];
+			
+			for (int i = 0; i < 2; i++) {
+				infoCVinLight[i] -= (infoCVinLight[i] / lightLambda) * sampleTime * displayRefreshStepSkips;
+			}
 		}
+		
 		if (isLinked()) {
 			cv[1] = clamp(params[TACT_PARAMS + 1].value, 0.0f, 10.0f);
-		}
-		if (infoStore != 0l) {
-			if (infoStore > 0l)
-				infoStore --;
-			if (infoStore < 0l)
-				infoStore ++;
 		}
 		
 		scheduledReset = false;

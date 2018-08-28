@@ -7,6 +7,7 @@
 //See ./res/fonts/ for font licenses
 //***********************************************************************************************
 
+
 #include "ImpromptuModular.hpp"
 
 RACK_PLUGIN_MODEL_DECLARE(ImpromptuModular, Tact);
@@ -27,8 +28,8 @@ RACK_PLUGIN_INIT(ImpromptuModular) {
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/MarcBoule/ImpromptuModular");
    RACK_PLUGIN_INIT_MANUAL("https://github.com/MarcBoule/ImpromptuModular");
+   RACK_PLUGIN_INIT_VERSION("0.6.11");
 
-	//p->addModel(modelEngTest1);
    RACK_PLUGIN_MODEL_ADD(ImpromptuModular, Tact);
    RACK_PLUGIN_MODEL_ADD(ImpromptuModular, TwelveKey);
    RACK_PLUGIN_MODEL_ADD(ImpromptuModular, Clocked);
@@ -142,126 +143,12 @@ NVGcolor prepareDisplay(NVGcontext *vg, Rect *box) {
 	return textColor;
 }
 
-
-int moveIndex(int index, int indexNext, int numSteps) {
-	if (indexNext < 0)
-		index = numSteps - 1;
-	else
-	{
-		if (indexNext - index >= 0) { // if moving right or same place
-			if (indexNext >= numSteps)
-				index = 0;
-			else
-				index = indexNext;
-		}
-		else { // moving left 
-			if (indexNext >= numSteps)
-				index = numSteps - 1;
-			else
-				index = indexNext;
-		}
-	}
-	return index;
-}
-
-
-bool moveIndexRunMode(int* index, int numSteps, int runMode, int* history) {		
-	bool crossBoundary = false;
-	int numRuns;// for FWx
-	
-	switch (runMode) {
-	
-		case MODE_REV :// reverse; history base is 1000 (not needed)
-			(*history) = 1000;
-			(*index)--;
-			if ((*index) < 0) {
-				(*index) = numSteps - 1;
-				crossBoundary = true;
-			}
-		break;
-		
-		case MODE_PPG :// forward-reverse; history base is 2000
-			if ((*history) != 2000 && (*history) != 2001) // 2000 means going forward, 2001 means going reverse
-				(*history) = 2000;
-			if ((*history) == 2000) {// forward phase
-				(*index)++;
-				if ((*index) >= numSteps) {
-					(*index) = numSteps - 1;
-					(*history) = 2001;
-				}
-			}
-			else {// it is 2001; reverse phase
-				(*index)--;
-				if ((*index) < 0) {
-					(*index) = 0;
-					(*history) = 2000;
-					crossBoundary = true;
-				}
-			}
-		break;
-		
-		case MODE_BRN :// brownian random; history base is 3000
-			if ( (*history) < 3000 || ((*history) > (3000 + numSteps)) ) 
-				(*history) = 3000 + numSteps;
-			(*index) += (randomu32() % 3) - 1;
-			if ((*index) >= numSteps) {
-				(*index) = 0;
-			}
-			if ((*index) < 0) {
-				(*index) = numSteps - 1;
-			}
-			(*history)--;
-			if ((*history) <= 3000) {
-				(*history) = 3000 + numSteps;
-				crossBoundary = true;
-			}
-		break;
-		
-		case MODE_RND :// random; history base is 4000
-			if ( (*history) < 4000 || ((*history) > (4000 + numSteps)) ) 
-				(*history) = 4000 + numSteps;
-			(*index) = (randomu32() % numSteps) ;
-			(*history)--;
-			if ((*history) <= 4000) {
-				(*history) = 4000 + numSteps;
-				crossBoundary = true;
-			}
-		break;
-		
-		case MODE_FW2 :// forward twice
-		case MODE_FW3 :// forward three times
-		case MODE_FW4 :// forward four times
-			numRuns = 5002 + runMode - MODE_FW2;
-			if ( (*history) < 5000 || (*history) >= numRuns ) // 5000 means first pass, 5001 means 2nd pass, etc...
-				(*history) = 5000;
-			(*index)++;
-			if ((*index) >= numSteps) {
-				(*index) = 0;
-				(*history)++;
-				if ((*history) >= numRuns) {
-					(*history) = 5000;
-					crossBoundary = true;
-				}				
-			}
-		break;
-
-		default :// MODE_FWD  forward; history base is 0 (not needed)
-			(*history) = 0;
-			(*index)++;
-			if ((*index) >= numSteps) {
-				(*index) = 0;
-				crossBoundary = true;
-			}
-	}
-
-	return crossBoundary;
-}
-
 bool calcWarningFlash(long count, long countInit) {
-		bool warningFlashState = true;
-		if (count > (countInit * 2l / 4l) && count < (countInit * 3l / 4l))
-			warningFlashState = false;
-		else if (count < (countInit * 1l / 4l))
-			warningFlashState = false;
-		return warningFlashState;
-	}	
+	bool warningFlashState = true;
+	if (count > (countInit * 2l / 4l) && count < (countInit * 3l / 4l))
+		warningFlashState = false;
+	else if (count < (countInit * 1l / 4l))
+		warningFlashState = false;
+	return warningFlashState;
+}	
+

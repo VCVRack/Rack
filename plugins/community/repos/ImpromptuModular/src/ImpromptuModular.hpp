@@ -13,6 +13,7 @@
 
 #include "rack.hpp"
 #include "IMWidgets.hpp"
+#include "dsp/digital.hpp"
 
 using namespace rack;
 
@@ -23,12 +24,8 @@ static const float lightLambda = 0.075f;
 static const std::string lightPanelID = "Classic";
 static const std::string darkPanelID = "Dark-valor";
 static const std::string expansionMenuLabel = "Extra CVs (requires +4HP to the right!)";
-enum RunModeIds {MODE_FWD, MODE_REV, MODE_PPG, MODE_BRN, MODE_RND, MODE_FW2, MODE_FW3, MODE_FW4, NUM_MODES};
-static const std::string modeLabels[NUM_MODES]={"FWD","REV","PPG","BRN","RND","FW2","FW3","FW4"};
-enum GateModeIds {GATE_24, GATE_34, GATE_44, GATE_14, GATE_TRIG, GATE_DUO, GATE_DU1, GATE_DU2, 
-				  GATE_TRIPLET, GATE_TRIP1, GATE_TRIP2, GATE_TRIP3, GATE_TRIP4, GATE_TRIP5, GATE_TRIP6, NUM_GATES};
-static const std::string gateLabels[NUM_GATES]={"2/4","3/4","4/4","1/4","TRG","DUO","DU1","DU2",
-												"TRP","TR1","TR2","TR3","TR4","TR5","TR6"};
+static const int displayRefreshStepSkips = 200;
+
 
 // Constants for displaying notes
 
@@ -220,7 +217,7 @@ struct GiantLight2 : BASE {
 	}
 };
 
-// Other
+// Other widgets
 
 struct InvisibleKey : MomentarySwitch {
 	InvisibleKey() {
@@ -230,7 +227,7 @@ struct InvisibleKey : MomentarySwitch {
 
 struct InvisibleKeySmall : MomentarySwitch {
 	InvisibleKeySmall() {
-		box.size = Vec(23, 50);
+		box.size = Vec(23, 38);
 	}
 	void onMouseDown(EventMouseDown &e) override;
 	void onMouseUp(EventMouseUp &e) override;
@@ -249,9 +246,37 @@ struct ScrewHole : TransparentWidget {
 };	
 
 
+
+// Other
+
+struct HoldDetect {
+	long modeHoldDetect;// 0 when not detecting, downward counter when detecting
+	
+	void reset() {
+		modeHoldDetect = 0l;
+	}
+	
+	void start(long startValue) {
+		modeHoldDetect = startValue;
+	}
+
+	bool process(float paramValue) {
+		bool ret = false;
+		if (modeHoldDetect > 0l) {
+			if (paramValue < 0.5f)
+				modeHoldDetect = 0l;
+			else {
+				if (modeHoldDetect == 1l) {
+					ret = true;
+				}
+				modeHoldDetect--;
+			}
+		}
+		return ret;
+	}
+};
+
 NVGcolor prepareDisplay(NVGcontext *vg, Rect *box);
-int moveIndex(int index, int indexNext, int numSteps);
-bool moveIndexRunMode(int* index, int numSteps, int runMode, int* history);
 bool calcWarningFlash(long count, long countInit);
 
 #endif

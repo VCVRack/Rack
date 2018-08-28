@@ -15,7 +15,7 @@
 
 #include "ImpromptuModular.hpp"
 #include "FundamentalUtil.hpp"
-
+#include "PhraseSeqUtil.hpp"
 namespace rack_plugin_ImpromptuModular {
 
 struct SemiModularSynth : Module {
@@ -223,6 +223,7 @@ struct SemiModularSynth : Module {
 	long tiedWarning;// 0 when no warning, positive downward step counter timer when warning
 	int sequenceKnob = 0;
 	bool gate1RandomEnable;
+	int lightRefreshCounter;
 	
 	static constexpr float EDIT_PARAM_INIT_VALUE = 1.0f;// so that module constructor is coherent with widget initialization, since module created before widget
 	bool editingSequence;
@@ -320,6 +321,7 @@ struct SemiModularSynth : Module {
 		editingSequence = EDIT_PARAM_INIT_VALUE > 0.5f;
 		editingSequenceLast = editingSequence;
 		resetOnRun = false;
+		lightRefreshCounter = 0;
 		
 		// VCO
 		// none
@@ -577,14 +579,14 @@ struct SemiModularSynth : Module {
 
 	// Advances the module by 1 audio frame with duration 1.0 / engineGetSampleRate()
 	void step() override {
-
+		float sampleRate = engineGetSampleRate();
+	
 		// SEQUENCER
 
 		static const float gateTime = 0.4f;// seconds
 		static const float copyPasteInfoTime = 0.5f;// seconds
 		static const float editLengthTime = 2.0f;// seconds
 		static const float tiedWarningTime = 0.7f;// seconds
-		long tiedWarningInit = (long) (tiedWarningTime * engineGetSampleRate());
 		
 		
 		//********** Buttons, knobs, switches and inputs **********
@@ -635,7 +637,7 @@ struct SemiModularSynth : Module {
 		// Copy button
 		if (copyTrigger.process(params[COPY_PARAM].value)) {
 			if (editingSequence) {
-				infoCopyPaste = (long) (copyPasteInfoTime * engineGetSampleRate());
+				infoCopyPaste = (long) (copyPasteInfoTime * sampleRate / displayRefreshStepSkips);
 				//CPinfo must be set to 0 for copy/paste all, and 0x1ii for copy/paste 4 at pos ii, 0x2ii for copy/paste 8 at 0xii
 				int sStart = stepIndexEdit;
 				int sCount = 16;
@@ -661,7 +663,7 @@ struct SemiModularSynth : Module {
 		// Paste button
 		if (pasteTrigger.process(params[PASTE_PARAM].value)) {
 			if (editingSequence) {
-				infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate());
+				infoCopyPaste = (long) (-1 * copyPasteInfoTime * sampleRate / displayRefreshStepSkips);
 				int sStart = ((countCP == 16) ? 0 : stepIndexEdit);
 				int sCount = countCP;
 				for (int i = 0, s = sStart; i < countCP; i++, s++) {
@@ -685,7 +687,7 @@ struct SemiModularSynth : Module {
 			if (editingLength > 0ul)
 				editingLength = 0ul;// allow user to quickly leave editing mode when re-press
 			else
-				editingLength = (unsigned long) (editLengthTime * engineGetSampleRate());
+				editingLength = (unsigned long) (editLengthTime * sampleRate / displayRefreshStepSkips);
 			displayState = DISP_NORMAL;
 		}
 		
@@ -695,11 +697,11 @@ struct SemiModularSynth : Module {
 		if (writeTrig) {
 			if (editingSequence) {
 				if (getTied(sequence,stepIndexEdit))
-					tiedWarning = tiedWarningInit;
+					tiedWarning = (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips);
 				else {			
 					cv[sequence][stepIndexEdit] = inputs[CV_INPUT].value;
 					applyTiedStep(sequence, stepIndexEdit, lengths[sequence]);
-					editingGate = (unsigned long) (gateTime * engineGetSampleRate());
+					editingGate = (unsigned long) (gateTime * sampleRate / displayRefreshStepSkips);
 					editingGateCV = cv[sequence][stepIndexEdit];
 					editingGateKeyLight = -1;
 					// Autostep (after grab all active inputs)
@@ -721,7 +723,7 @@ struct SemiModularSynth : Module {
 		}
 		if (delta != 0) {
 			if (editingLength > 0ul) {
-				editingLength = (unsigned long) (editLengthTime * engineGetSampleRate());// restart editing length timer
+				editingLength = (unsigned long) (editLengthTime * sampleRate / displayRefreshStepSkips);// restart editing length timer
 				if (editingSequence) {
 					lengths[sequence] += delta;
 					if (lengths[sequence] > 16) lengths[sequence] = 16;
@@ -742,7 +744,7 @@ struct SemiModularSynth : Module {
 						stepIndexEdit = moveIndex(stepIndexEdit, stepIndexEdit + delta, 16);//lengths[sequence]);// Commented for full edit capabilities
 						if (!getTied(sequence,stepIndexEdit)) {// play if non-tied step
 							if (!writeTrig) {// in case autostep when simultaneous writeCV and stepCV (keep what was done in Write Input block above)
-								editingGate = (unsigned long) (gateTime * engineGetSampleRate());
+								editingGate = (unsigned long) (gateTime * sampleRate / displayRefreshStepSkips);
 								editingGateCV = cv[sequence][stepIndexEdit];
 								editingGateKeyLight = -1;
 							}
@@ -785,7 +787,7 @@ struct SemiModularSynth : Module {
 		if (deltaKnob != 0) {
 			if (abs(deltaKnob) <= 3) {// avoid discontinuous step (initialize for example)
 				 if (editingLength > 0ul) {
-					editingLength = (unsigned long) (editLengthTime * engineGetSampleRate());// restart editing length timer
+					editingLength = (unsigned long) (editLengthTime * sampleRate / displayRefreshStepSkips);// restart editing length timer
 					if (editingSequence) {
 						lengths[sequence] += deltaKnob;
 						if (lengths[sequence] > 16) lengths[sequence] = 16 ;
@@ -842,8 +844,6 @@ struct SemiModularSynth : Module {
 							sequence += deltaKnob;
 							if (sequence < 0) sequence = 0;
 							if (sequence >= 16) sequence = (16 - 1);
-							//if (stepIndexEdit >= lengths[sequence])// Commented for full edit capabilities
-								//stepIndexEdit = lengths[sequence] - 1;// Commented for full edit capabilities
 						}
 					}
 					else {
@@ -867,7 +867,7 @@ struct SemiModularSynth : Module {
 		if (newOct >= 0 && newOct <= 6) {
 			if (editingSequence) {
 				if (getTied(sequence,stepIndexEdit))
-					tiedWarning = tiedWarningInit;
+					tiedWarning = (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips);
 				else {			
 					float newCV = cv[sequence][stepIndexEdit] + 10.0f;//to properly handle negative note voltages
 					newCV = newCV - floor(newCV) + (float) (newOct - 3);
@@ -875,7 +875,7 @@ struct SemiModularSynth : Module {
 						cv[sequence][stepIndexEdit] = newCV;
 						applyTiedStep(sequence, stepIndexEdit, lengths[sequence]);
 					}
-					editingGate = (unsigned long) (gateTime * engineGetSampleRate());
+					editingGate = (unsigned long) (gateTime * sampleRate / displayRefreshStepSkips);
 					editingGateCV = cv[sequence][stepIndexEdit];
 					editingGateKeyLight = -1;
 				}
@@ -890,12 +890,12 @@ struct SemiModularSynth : Module {
 						if (params[KEY_PARAMS + i].value > 1.5f)
 							stepIndexEdit = moveIndex(stepIndexEdit, stepIndexEdit + 1, 16);
 						else
-							tiedWarning = tiedWarningInit;
+							tiedWarning = (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips);
 					}
 					else {			
 						cv[sequence][stepIndexEdit] = floor(cv[sequence][stepIndexEdit]) + ((float) i) / 12.0f;
 						applyTiedStep(sequence, stepIndexEdit, lengths[sequence]);
-						editingGate = (unsigned long) (gateTime * engineGetSampleRate());
+						editingGate = (unsigned long) (gateTime * sampleRate / displayRefreshStepSkips);
 						editingGateCV = cv[sequence][stepIndexEdit];
 						editingGateKeyLight = -1;
 						if (params[KEY_PARAMS + i].value > 1.5f) {
@@ -911,17 +911,14 @@ struct SemiModularSynth : Module {
 		// Gate1, Gate1Prob, Gate2, Slide and Tied buttons
 		if (gate1Trigger.process(params[GATE1_PARAM].value)) {
 			if (editingSequence) {
-				if (getTied(sequence,stepIndexEdit))
-					tiedWarning = tiedWarningInit;
-				else
-					attributes[sequence][stepIndexEdit] ^= ATT_MSK_GATE1;
+				attributes[sequence][stepIndexEdit] ^= ATT_MSK_GATE1;
 			}
 			displayState = DISP_NORMAL;
 		}		
 		if (gate1ProbTrigger.process(params[GATE1_PROB_PARAM].value)) {
 			if (editingSequence) {
 				if (getTied(sequence,stepIndexEdit))
-					tiedWarning = tiedWarningInit;
+					tiedWarning = (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips);
 				else
 					attributes[sequence][stepIndexEdit] ^= ATT_MSK_GATE1P;
 			}
@@ -929,17 +926,14 @@ struct SemiModularSynth : Module {
 		}		
 		if (gate2Trigger.process(params[GATE2_PARAM].value)) {
 			if (editingSequence) {
-				if (getTied(sequence,stepIndexEdit))
-					tiedWarning = tiedWarningInit;
-				else
-					attributes[sequence][stepIndexEdit] ^= ATT_MSK_GATE2;
+				attributes[sequence][stepIndexEdit] ^= ATT_MSK_GATE2;
 			}
 			displayState = DISP_NORMAL;
 		}		
 		if (slideTrigger.process(params[SLIDE_BTN_PARAM].value)) {
 			if (editingSequence) {
 				if (getTied(sequence,stepIndexEdit))
-					tiedWarning = tiedWarningInit;
+					tiedWarning = (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips);
 				else
 					attributes[sequence][stepIndexEdit] ^= ATT_MSK_SLIDE;
 			}
@@ -1005,8 +999,6 @@ struct SemiModularSynth : Module {
 			displayState = DISP_NORMAL;
 			clockTrigger.reset();
 		}
-		else
-			resetLight -= (resetLight / lightLambda) * engineGetSampleTime();
 		
 		
 		//********** Outputs and lights **********
@@ -1027,135 +1019,142 @@ struct SemiModularSynth : Module {
 			outputs[GATE1_OUTPUT].value = (editingGate > 0ul) ? 10.0f : 0.0f;
 			outputs[GATE2_OUTPUT].value = (editingGate > 0ul) ? 10.0f : 0.0f;
 		}
-		
-		// Step/phrase lights
-		if (infoCopyPaste != 0l) {
-			for (int i = 0; i < 16; i++) {
-				if ( (i >= stepIndexEdit && i < (stepIndexEdit + countCP)) || (countCP == 16) )
-					lights[STEP_PHRASE_LIGHTS + (i<<1)].value = 0.5f;// Green when copy interval
-				else
-					lights[STEP_PHRASE_LIGHTS + (i<<1)].value = 0.0f; // Green (nothing)
-				lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = 0.0f;// Red (nothing)
-			}
-		}
-		else {
-			for (int i = 0; i < 16; i++) {
-				if (editingLength > 0ul) {
-					// Length (green)
-					if (editingSequence)
-						lights[STEP_PHRASE_LIGHTS + (i<<1)].value = ((i < lengths[sequence]) ? 0.5f : 0.0f);
-					else
-						lights[STEP_PHRASE_LIGHTS + (i<<1)].value = ((i < phrases) ? 0.5f : 0.0f);
-					// Nothing (red)
-					lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = 0.0f;
-				}
-				else {
-					// Run cursor (green)
-					if (editingSequence)
-						lights[STEP_PHRASE_LIGHTS + (i<<1)].value = ((running && (i == stepIndexRun)) ? 1.0f : 0.0f);
-					else {
-						float green = ((running && (i == phraseIndexRun)) ? 1.0f : 0.0f);
-						green += ((running && (i == stepIndexRun) && i != phraseIndexEdit) ? 0.1f : 0.0f);
-						lights[STEP_PHRASE_LIGHTS + (i<<1)].value = clamp(green, 0.0f, 1.0f);
-					}
-					// Edit cursor (red)
-					if (editingSequence)
-						lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = (i == stepIndexEdit ? 1.0f : 0.0f);
-					else
-						lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = (i == phraseIndexEdit ? 1.0f : 0.0f);
-				}
-			}
-		}
-	
-		// Octave lights
-		float octCV = 0.0f;
-		if (editingSequence)
-			octCV = cv[sequence][stepIndexEdit];
-		else
-			octCV = cv[phrase[phraseIndexEdit]][stepIndexRun];
-		int octLightIndex = (int) floor(octCV + 3.0f);
-		for (int i = 0; i < 7; i++) {
-			if (!editingSequence && (!attached || !running))// no oct lights when song mode and either (detached [1] or stopped [2])
-											// [1] makes no sense, can't mod steps and stepping though seq that may not be playing
-											// [2] CV is set to 0V when not running and in song mode, so cv[][] makes no sense to display
-				lights[OCTAVE_LIGHTS + i].value = 0.0f;
-			else {
-				if (tiedWarning > 0l) {
-					bool warningFlashState = calcWarningFlash(tiedWarning, tiedWarningInit);
-					lights[OCTAVE_LIGHTS + i].value = (warningFlashState && (i == (6 - octLightIndex))) ? 1.0f : 0.0f;
-				}
-				else				
-					lights[OCTAVE_LIGHTS + i].value = (i == (6 - octLightIndex) ? 1.0f : 0.0f);
-			}
-		}
-		
-		// Keyboard lights
-		float cvValOffset;
-		if (editingSequence) 
-			cvValOffset = cv[sequence][stepIndexEdit] + 10.0f;//to properly handle negative note voltages
-		else	
-			cvValOffset = cv[phrase[phraseIndexEdit]][stepIndexRun] + 10.0f;//to properly handle negative note voltages
-		int keyLightIndex = (int) clamp(  roundf( (cvValOffset-floor(cvValOffset)) * 12.0f ),  0.0f,  11.0f);
-		for (int i = 0; i < 12; i++) {
-			if (!editingSequence && (!attached || !running))// no keyboard lights when song mode and either (detached [1] or stopped [2])
-											// [1] makes no sense, can't mod steps and stepping though seq that may not be playing
-											// [2] CV is set to 0V when not running and in song mode, so cv[][] makes no sense to display
-				lights[KEY_LIGHTS + i].value = 0.0f;
-			else {
-				if (tiedWarning > 0l) {
-					bool warningFlashState = calcWarningFlash(tiedWarning, tiedWarningInit);
-					lights[KEY_LIGHTS + i].value = (warningFlashState && i == keyLightIndex) ? 1.0f : 0.0f;
-				}
-				else {
-					if (editingGate > 0ul && editingGateKeyLight != -1)
-						lights[KEY_LIGHTS + i].value = (i == editingGateKeyLight ? ((float) editingGate / (float)(gateTime * engineGetSampleRate())) : 0.0f);
-					else
-						lights[KEY_LIGHTS + i].value = (i == keyLightIndex ? 1.0f : 0.0f);
-				}
-			}
-		}			
-		
-		// Gate1, Gate1Prob, Gate2, Slide and Tied lights
-		int attributesVal = attributes[sequence][stepIndexEdit];
-		if (!editingSequence)
-			attributesVal = attributes[phrase[phraseIndexEdit]][stepIndexRun];
-		//
-		lights[GATE1_LIGHT].value = ((attributesVal & ATT_MSK_GATE1) != 0) ? 1.0f : 0.0f;
-		lights[GATE1_PROB_LIGHT].value = ((attributesVal & ATT_MSK_GATE1P) != 0) ? 1.0f : 0.0f;
-		lights[GATE2_LIGHT].value = ((attributesVal & ATT_MSK_GATE2) != 0) ? 1.0f : 0.0f;
-		lights[SLIDE_LIGHT].value = ((attributesVal & ATT_MSK_SLIDE) != 0) ? 1.0f : 0.0f;
-		if (tiedWarning > 0l) {
-			bool warningFlashState = calcWarningFlash(tiedWarning, tiedWarningInit);
-			lights[TIE_LIGHT].value = (warningFlashState) ? 1.0f : 0.0f;
-		}
-		else
-			lights[TIE_LIGHT].value = ((attributesVal & ATT_MSK_TIED) != 0) ? 1.0f : 0.0f;
-
-		// Attach light
-		lights[ATTACH_LIGHT].value = (running && attached) ? 1.0f : 0.0f;
-		
-		// Reset light
-		lights[RESET_LIGHT].value =	resetLight;	
-		
-		// Run light
-		lights[RUN_LIGHT].value = lights[RUN_LIGHT].value = running ? 1.0f : 0.0f;
-
-		if (editingLength > 0ul)
-			editingLength--;
-		if (editingGate > 0ul)
-			editingGate--;
-		if (infoCopyPaste != 0l) {
-			if (infoCopyPaste > 0l)
-				infoCopyPaste --;
-			if (infoCopyPaste < 0l)
-				infoCopyPaste ++;
-		}
 		if (slideStepsRemain > 0ul)
 			slideStepsRemain--;
+		
+		lightRefreshCounter++;
+		if (lightRefreshCounter > displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
+
+			// Step/phrase lights
+			if (infoCopyPaste != 0l) {
+				for (int i = 0; i < 16; i++) {
+					if ( (i >= stepIndexEdit && i < (stepIndexEdit + countCP)) || (countCP == 16) )
+						lights[STEP_PHRASE_LIGHTS + (i<<1)].value = 0.5f;// Green when copy interval
+					else
+						lights[STEP_PHRASE_LIGHTS + (i<<1)].value = 0.0f; // Green (nothing)
+					lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = 0.0f;// Red (nothing)
+				}
+			}
+			else {
+				for (int i = 0; i < 16; i++) {
+					if (editingLength > 0ul) {
+						// Length (green)
+						if (editingSequence)
+							lights[STEP_PHRASE_LIGHTS + (i<<1)].value = ((i < lengths[sequence]) ? 0.5f : 0.0f);
+						else
+							lights[STEP_PHRASE_LIGHTS + (i<<1)].value = ((i < phrases) ? 0.5f : 0.0f);
+						// Nothing (red)
+						lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = 0.0f;
+					}
+					else {
+						// Run cursor (green)
+						if (editingSequence)
+							lights[STEP_PHRASE_LIGHTS + (i<<1)].value = ((running && (i == stepIndexRun)) ? 1.0f : 0.0f);
+						else {
+							float green = ((running && (i == phraseIndexRun)) ? 1.0f : 0.0f);
+							green += ((running && (i == stepIndexRun) && i != phraseIndexEdit) ? 0.1f : 0.0f);
+							lights[STEP_PHRASE_LIGHTS + (i<<1)].value = clamp(green, 0.0f, 1.0f);
+						}
+						// Edit cursor (red)
+						if (editingSequence)
+							lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = (i == stepIndexEdit ? 1.0f : 0.0f);
+						else
+							lights[STEP_PHRASE_LIGHTS + (i<<1) + 1].value = (i == phraseIndexEdit ? 1.0f : 0.0f);
+					}
+				}
+			}
+		
+			// Octave lights
+			float octCV = 0.0f;
+			if (editingSequence)
+				octCV = cv[sequence][stepIndexEdit];
+			else
+				octCV = cv[phrase[phraseIndexEdit]][stepIndexRun];
+			int octLightIndex = (int) floor(octCV + 3.0f);
+			for (int i = 0; i < 7; i++) {
+				if (!editingSequence && (!attached || !running))// no oct lights when song mode and either (detached [1] or stopped [2])
+												// [1] makes no sense, can't mod steps and stepping though seq that may not be playing
+												// [2] CV is set to 0V when not running and in song mode, so cv[][] makes no sense to display
+					lights[OCTAVE_LIGHTS + i].value = 0.0f;
+				else {
+					if (tiedWarning > 0l) {
+						bool warningFlashState = calcWarningFlash(tiedWarning, (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips));
+						lights[OCTAVE_LIGHTS + i].value = (warningFlashState && (i == (6 - octLightIndex))) ? 1.0f : 0.0f;
+					}
+					else				
+						lights[OCTAVE_LIGHTS + i].value = (i == (6 - octLightIndex) ? 1.0f : 0.0f);
+				}
+			}
+			
+			// Keyboard lights
+			float cvValOffset;
+			if (editingSequence) 
+				cvValOffset = cv[sequence][stepIndexEdit] + 10.0f;//to properly handle negative note voltages
+			else	
+				cvValOffset = cv[phrase[phraseIndexEdit]][stepIndexRun] + 10.0f;//to properly handle negative note voltages
+			int keyLightIndex = (int) clamp(  roundf( (cvValOffset-floor(cvValOffset)) * 12.0f ),  0.0f,  11.0f);
+			for (int i = 0; i < 12; i++) {
+				if (!editingSequence && (!attached || !running))// no keyboard lights when song mode and either (detached [1] or stopped [2])
+												// [1] makes no sense, can't mod steps and stepping though seq that may not be playing
+												// [2] CV is set to 0V when not running and in song mode, so cv[][] makes no sense to display
+					lights[KEY_LIGHTS + i].value = 0.0f;
+				else {
+					if (tiedWarning > 0l) {
+						bool warningFlashState = calcWarningFlash(tiedWarning, (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips));
+						lights[KEY_LIGHTS + i].value = (warningFlashState && i == keyLightIndex) ? 1.0f : 0.0f;
+					}
+					else {
+						if (editingGate > 0ul && editingGateKeyLight != -1)
+							lights[KEY_LIGHTS + i].value = (i == editingGateKeyLight ? ((float) editingGate / (float)(gateTime * sampleRate / displayRefreshStepSkips)) : 0.0f);
+						else
+							lights[KEY_LIGHTS + i].value = (i == keyLightIndex ? 1.0f : 0.0f);
+					}
+				}
+			}			
+			
+			// Gate1, Gate1Prob, Gate2, Slide and Tied lights
+			int attributesVal = attributes[sequence][stepIndexEdit];
+			if (!editingSequence)
+				attributesVal = attributes[phrase[phraseIndexEdit]][stepIndexRun];
+			//
+			lights[GATE1_LIGHT].value = ((attributesVal & ATT_MSK_GATE1) != 0) ? 1.0f : 0.0f;
+			lights[GATE1_PROB_LIGHT].value = ((attributesVal & ATT_MSK_GATE1P) != 0) ? 1.0f : 0.0f;
+			lights[GATE2_LIGHT].value = ((attributesVal & ATT_MSK_GATE2) != 0) ? 1.0f : 0.0f;
+			lights[SLIDE_LIGHT].value = ((attributesVal & ATT_MSK_SLIDE) != 0) ? 1.0f : 0.0f;
+			if (tiedWarning > 0l) {
+				bool warningFlashState = calcWarningFlash(tiedWarning, (long) (tiedWarningTime * sampleRate / displayRefreshStepSkips));
+				lights[TIE_LIGHT].value = (warningFlashState) ? 1.0f : 0.0f;
+			}
+			else
+				lights[TIE_LIGHT].value = ((attributesVal & ATT_MSK_TIED) != 0) ? 1.0f : 0.0f;
+
+			// Attach light
+			lights[ATTACH_LIGHT].value = (running && attached) ? 1.0f : 0.0f;
+			
+			// Reset light
+			lights[RESET_LIGHT].value =	resetLight;	
+			resetLight -= (resetLight / lightLambda) * engineGetSampleTime() * displayRefreshStepSkips;
+			
+			// Run light
+			lights[RUN_LIGHT].value = lights[RUN_LIGHT].value = running ? 1.0f : 0.0f;
+			
+			if (editingLength > 0ul)
+				editingLength--;
+			if (editingGate > 0ul)
+				editingGate--;
+			if (infoCopyPaste != 0l) {
+				if (infoCopyPaste > 0l)
+					infoCopyPaste --;
+				if (infoCopyPaste < 0l)
+					infoCopyPaste ++;
+			}
+			if (tiedWarning > 0l)
+				tiedWarning--;
+		}// lightRefreshCounter
+		
 		if (clockIgnoreOnReset > 0l)
 			clockIgnoreOnReset--;
-		if (tiedWarning > 0l)
-			tiedWarning--;
 
 		
 		// VCO
@@ -1346,42 +1345,37 @@ struct SemiModularSynthWidget : ModuleWidget {
 			nvgText(vg, textPos.x, textPos.y, "~~~", NULL);
 			nvgFillColor(vg, textColor);
 			if (module->infoCopyPaste != 0l) {
-				if (module->infoCopyPaste > 0l) {// if copy display "CPY"
+				if (module->infoCopyPaste > 0l)
 					snprintf(displayStr, 4, "CPY");
-				}
-				else {// if paste display "PST"
+				else
 					snprintf(displayStr, 4, "PST");
-				}
 			}
-			else {
-				if (module->displayState == SemiModularSynth::DISP_MODE) {
-					if (module->editingSequence)
-						runModeToStr(module->runModeSeq[module->sequence]);
-					else
-						runModeToStr(module->runModeSong);
-				}
-				else if (module->editingLength > 0ul) {
-					if (module->editingSequence)
-						snprintf(displayStr, 4, "L%2u", (unsigned) module->lengths[module->sequence]);
-					else
-						snprintf(displayStr, 4, "L%2u", (unsigned) module->phrases);
-				}
-				else if (module->displayState == SemiModularSynth::DISP_TRANSPOSE) {
-					snprintf(displayStr, 4, "+%2u", (unsigned) abs(module->transposeOffset));
-					if (module->transposeOffset < 0)
-						displayStr[0] = '-';
-				}
-				else if (module->displayState == SemiModularSynth::DISP_ROTATE) {
-					snprintf(displayStr, 4, ")%2u", (unsigned) abs(module->rotateOffset));
-					if (module->rotateOffset < 0)
-						displayStr[0] = '(';
-				}
-				else {// DISP_NORMAL
-					snprintf(displayStr, 4, " %2u", (unsigned) (module->editingSequence ? 
-						module->sequence : module->phrase[module->phraseIndexEdit]) + 1 );
-				}
+			else if (module->editingLength > 0ul) {
+				if (module->editingSequence)
+					snprintf(displayStr, 4, "L%2u", (unsigned) module->lengths[module->sequence]);
+				else
+					snprintf(displayStr, 4, "L%2u", (unsigned) module->phrases);
 			}
-			displayStr[3] = 0;// more safety
+			else if (module->displayState == SemiModularSynth::DISP_MODE) {
+				if (module->editingSequence)
+					runModeToStr(module->runModeSeq[module->sequence]);
+				else
+					runModeToStr(module->runModeSong);
+			}
+			else if (module->displayState == SemiModularSynth::DISP_TRANSPOSE) {
+				snprintf(displayStr, 4, "+%2u", (unsigned) abs(module->transposeOffset));
+				if (module->transposeOffset < 0)
+					displayStr[0] = '-';
+			}
+			else if (module->displayState == SemiModularSynth::DISP_ROTATE) {
+				snprintf(displayStr, 4, ")%2u", (unsigned) abs(module->rotateOffset));
+				if (module->rotateOffset < 0)
+					displayStr[0] = '(';
+			}
+			else {// DISP_NORMAL
+				snprintf(displayStr, 4, " %2u", (unsigned) (module->editingSequence ? 
+					module->sequence : module->phrase[module->phraseIndexEdit]) + 1 );
+			}
 			nvgText(vg, textPos.x, textPos.y, displayStr, NULL);
 		}
 	};		
@@ -1758,7 +1752,11 @@ RACK_PLUGIN_MODEL_INIT(ImpromptuModular, SemiModularSynth) {
 
 /*CHANGE LOG
 
+0.6.11:
+step optimization of lights refresh
+
 0.6.10:
+unlock gates when tied (turn off when press tied, but allow to be turned back on)
 allow main knob to also change length when length editing is active
 
 0.6.9:

@@ -12,7 +12,6 @@
 
 
 #include "ImpromptuModular.hpp"
-#include "dsp/digital.hpp"
 
 namespace rack_plugin_ImpromptuModular {
 
@@ -186,6 +185,8 @@ struct Clocked : Module {
 		RESET_PARAM,
 		RUN_PARAM,
 		ENUMS(DELAY_PARAMS, 4),// index 0 is unused
+		// -- 0.6.9 ^^
+		BPMMODE_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -206,7 +207,8 @@ struct Clocked : Module {
 	enum LightIds {
 		RESET_LIGHT,
 		RUN_LIGHT,
-		ENUMS(CLK_LIGHTS, 4),// master is index 0
+		ENUMS(CLK_LIGHTS, 4),// master is index 0 (not used)
+		ENUMS(BPMSYNC_LIGHT, 2),// room for GreenRed
 		NUM_LIGHTS
 	};
 	
@@ -256,6 +258,10 @@ struct Clocked : Module {
 	double extIntervalTime;
 	double timeoutTime;
 	long cantRunWarning;// 0 when no warning, positive downward step counter timer when warning
+	long editingBpmMode;// 0 when no edit bpmMode, downward step counter timer when edit, negative upward when show can't edit ("--") 
+	int lightRefreshCounter;
+	
+	SchmittTrigger bpmModeTrigger;
 
 	
 	// called from the main thread (step() can not be called until all modules created)
@@ -291,6 +297,8 @@ struct Clocked : Module {
 		extIntervalTime = 0.0;
 		timeoutTime = 2.0 / ppqn + 0.1;
 		cantRunWarning = 0ul;
+		bpmModeTrigger.reset();
+		lightRefreshCounter = 0;
 		
 		onReset();
 	}
@@ -441,7 +449,6 @@ struct Clocked : Module {
 	void step() override {		
 		double sampleRate = (double)engineGetSampleRate();
 		double sampleTime = 1.0 / sampleRate;// do this here since engineGetSampleRate() returns float
-		long cantRunWarningInit = (long) (0.7 * engineGetSampleRate());
 
 		// Scheduled reset (just the parts that do not have a place below in rest of function)
 		if (scheduledReset) {
@@ -453,6 +460,7 @@ struct Clocked : Module {
 			runPulse.reset();
 			bpmDetectTrigger.reset();
 			cantRunWarning = 0l;
+			editingBpmMode = 0l;
 		}
 		
 		// Run button
@@ -467,7 +475,7 @@ struct Clocked : Module {
 				}
 			}
 			else
-				cantRunWarning = cantRunWarningInit;
+				cantRunWarning = (long) (0.7 * sampleRate / displayRefreshStepSkips);
 		}
 
 		// Reset (has to be near top because it sets steps to 0, and 0 not a real step (clock section will move to 1 before reaching outputs)
@@ -475,10 +483,33 @@ struct Clocked : Module {
 			resetLight = 1.0f;
 			resetPulse.trigger(0.001f);
 			resetClocked();	
-		}
-		else
-			resetLight -= (resetLight / lightLambda) * (float)sampleTime;	
+		}	
 
+		// BPM mode
+		if (bpmModeTrigger.process(params[BPMMODE_PARAM].value)) {
+			if (inputs[BPM_INPUT].active) {
+				if (editingBpmMode != 0ul) {// force active before allow change
+					if (bpmDetectionMode == false) {
+						bpmDetectionMode = true;
+						ppqn = 4;
+					}
+					else {
+						if (ppqn == 4)
+							ppqn = 8;
+						else if (ppqn == 8)
+							ppqn = 12;
+						else if (ppqn == 12)
+							ppqn = 24;
+						else 
+							bpmDetectionMode = false;
+					}
+				}
+				editingBpmMode = (long) (3.0 * sampleRate / displayRefreshStepSkips);
+			}
+			else
+				editingBpmMode = (long) (-1.5 * sampleRate / displayRefreshStepSkips);
+		}
+		
 		// BPM input and knob
 		float newMasterLength = masterLength;
 		if (inputs[BPM_INPUT].active) { 
@@ -566,7 +597,7 @@ struct Clocked : Module {
 			}
 			if (newSwingVal != swingVal[i]) {
 				swingVal[i] = newSwingVal;
-				swingInfo[i] = (long) (swingInfoTime * (float)sampleRate);// trigger swing info on channel i
+				swingInfo[i] = (long) (swingInfoTime * (float)sampleRate / displayRefreshStepSkips);// trigger swing info on channel i
 				delayInfo[i] = 0l;// cancel delayed being displayed (if so)
 			}
 			if (i > 0) {
@@ -577,7 +608,7 @@ struct Clocked : Module {
 				}
 				if (newDelayKnobIndex != delayKnobIndexes[i]) {
 					delayKnobIndexes[i] = newDelayKnobIndex;
-					delayInfo[i] = (long) (delayInfoTime * (float)sampleRate);// trigger delay info on channel i
+					delayInfo[i] = (long) (delayInfoTime * (float)sampleRate / displayRefreshStepSkips);// trigger delay info on channel i
 					swingInfo[i] = 0l;// cancel swing being displayed (if so)
 				}
 			}
@@ -664,44 +695,60 @@ struct Clocked : Module {
 			for (int i = 0; i < 4; i++) 
 				outputs[CLK_OUTPUTS + i].value = 0.0f;
 		}
-		
+		for (int i = 0; i < 4; i++)
+			clk[i].stepClock();
+			
 		// Chaining outputs
 		outputs[RESET_OUTPUT].value = (resetPulse.process((float)sampleTime) ? 10.0f : 0.0f);
 		outputs[RUN_OUTPUT].value = (runPulse.process((float)sampleTime) ? 10.0f : 0.0f);
 		outputs[BPM_OUTPUT].value =  inputs[BPM_INPUT].active ? inputs[BPM_INPUT].value : log2f(1.0f / masterLength);
 			
-		// Reset light
-		lights[RESET_LIGHT].value =	resetLight;	
 		
-		// Run light
-		lights[RUN_LIGHT].value = running;
-		
-		// BPM light
-		if (cantRunWarning > 0l) {
-			bool warningFlashState = calcWarningFlash(cantRunWarning, cantRunWarningInit);
-			lights[CLK_LIGHTS + 0].value = (warningFlashState) ? 1.0f : 0.0f;
-		}
-		else
-			lights[CLK_LIGHTS + 0].value = (bpmDetectionMode && inputs[BPM_INPUT].active) ? 1.0f : 0.0f;
-		
-		// ratios synched lights
-		for (int i = 1; i < 4; i++) {
-			lights[CLK_LIGHTS + i].value = (syncRatios[i] && running) ? 1.0f: 0.0f;
-		}
+		lightRefreshCounter++;
+		if (lightRefreshCounter > displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
 
-		// Incr/decr all counters related to step()
-		for (int i = 0; i < 4; i++) {
-			clk[i].stepClock();
-			if (swingInfo[i] > 0)
-				swingInfo[i]--;
-			if (delayInfo[i] > 0)
-				delayInfo[i]--;
-		}
-		if (cantRunWarning > 0l)
-			cantRunWarning--;
+			// Reset light
+			lights[RESET_LIGHT].value =	resetLight;	
+			resetLight -= (resetLight / lightLambda) * (float)sampleTime * displayRefreshStepSkips;
+			
+			// Run light
+			lights[RUN_LIGHT].value = running ? 1.0f : 0.0f;
+			
+			// BPM light
+			bool warningFlashState = true;
+			if (cantRunWarning > 0l) 
+				warningFlashState = calcWarningFlash(cantRunWarning, (long) (0.7 * sampleRate / displayRefreshStepSkips));
+			lights[BPMSYNC_LIGHT + 0].value = (bpmDetectionMode && warningFlashState && inputs[BPM_INPUT].active) ? 1.0f : 0.0f;
+			if (editingBpmMode < 0l)
+				lights[BPMSYNC_LIGHT + 1].value = 1.0f;
+			else
+				lights[BPMSYNC_LIGHT + 1].value = (bpmDetectionMode && warningFlashState && inputs[BPM_INPUT].active) ? (float)((ppqn - 4)*(ppqn - 4))/400.0f : 0.0f;			
+			
+			// ratios synched lights
+			for (int i = 1; i < 4; i++) {
+				lights[CLK_LIGHTS + i].value = (syncRatios[i] && running) ? 1.0f: 0.0f;
+			}
+
+			// Incr/decr all counters related to step()
+			for (int i = 0; i < 4; i++) {
+				if (swingInfo[i] > 0)
+					swingInfo[i]--;
+				if (delayInfo[i] > 0)
+					delayInfo[i]--;
+			}
+			if (cantRunWarning > 0l)
+				cantRunWarning--;
+			if (editingBpmMode != 0l) {
+				if (editingBpmMode > 0l)
+					editingBpmMode--;
+				else
+					editingBpmMode++;
+			}
+		}// lightRefreshCounter
 		
 		scheduledReset = false;
-	}
+	}// step()
 };
 
 
@@ -710,7 +757,7 @@ struct ClockedWidget : ModuleWidget {
 	DynamicSVGPanel *panel;
 	int oldExpansion;
 	int expWidth = 60;
-	IMPort* expPorts[5];
+	IMPort* expPorts[6];
 
 
 	struct RatioDisplayWidget : TransparentWidget {
@@ -770,7 +817,18 @@ struct ClockedWidget : ModuleWidget {
 					}
 				}
 				else {// BPM to display
-					snprintf(displayStr, 4, "%3u", (unsigned) round(120.0f / module->masterLength));
+					if (module->editingBpmMode != 0l) {
+						if (module->editingBpmMode > 0l) {
+							if (!module->bpmDetectionMode)
+								snprintf(displayStr, 4, " CV");
+							else
+								snprintf(displayStr, 4, "P%2u", (unsigned) module->ppqn);
+						}
+						else
+							snprintf(displayStr, 4, " --");
+					}
+					else
+						snprintf(displayStr, 4, "%3u", (unsigned)((120.0f / module->masterLength) + 0.5f));
 				}
 			}
 			displayStr[3] = 0;// more safety
@@ -800,54 +858,10 @@ struct ClockedWidget : ModuleWidget {
 			module->displayDelayNoteMode = !module->displayDelayNoteMode;
 		}
 	};
-	struct BpmDetectionItem : MenuItem {
-		Clocked *module;
-		void onAction(EventAction &e) override {
-			module->bpmDetectionMode = !module->bpmDetectionMode;
-			if (module->bpmDetectionMode && module->running) {
-				module->running = false;
-				module->resetClocked();
-			}
-		}
-	};	
 	struct EmitResetItem : MenuItem {
 		Clocked *module;
 		void onAction(EventAction &e) override {
 			module->emitResetOnStopRun = !module->emitResetOnStopRun;
-		}
-	};	
-	struct BpmPpqnItem : MenuItem {
-		Clocked *module;
-		int oldPpqn = -1;
-		void onAction(EventAction &e) override {
-			if (module->ppqn == 4) {
-				module->ppqn = 8;
-			}
-			else if (module->ppqn == 8) {
-				module->ppqn = 24;
-			}
-			else {
-				module->ppqn = 4;
-			}	
-		}
-		void step() override {
-			if (oldPpqn != module->ppqn) {
-				oldPpqn = module->ppqn;
-			
-				if (oldPpqn == 4) {
-					text = "- BPM detection PPQN: <4>, 8, 24";
-				}
-				else if (module->ppqn == 8) {
-					text = "- BPM detection PPQN: 4, <8>, 24";
-				}
-				else if (module->ppqn == 24) {
-					text = "- BPM detection PPQN: 4, 8, <24>";
-				}
-				else {
-					text = "- BPM detection PPQN: *error*";
-				}	
-			}
-			MenuItem::step();
 		}
 	};	
 	Menu *createContextMenu() override {
@@ -889,14 +903,6 @@ struct ClockedWidget : ModuleWidget {
 		erItem->module = module;
 		menu->addChild(erItem);
 
-		BpmDetectionItem *detectItem = MenuItem::create<BpmDetectionItem>("Use BPM Detection (as opposed to BPM CV)", CHECKMARK(module->bpmDetectionMode));
-		detectItem->module = module;
-		menu->addChild(detectItem);
-
-		BpmPpqnItem *detect4Item = MenuItem::create<BpmPpqnItem>("PPQN", CHECKMARK(false));
-		detect4Item->module = module;
-		menu->addChild(detect4Item);
-
 		menu->addChild(new MenuLabel());// empty line
 		
 		MenuLabel *expansionLabel = new MenuLabel();
@@ -913,7 +919,7 @@ struct ClockedWidget : ModuleWidget {
 	void step() override {
 		if(module->expansion != oldExpansion) {
 			if (oldExpansion!= -1 && module->expansion == 0) {// if just removed expansion panel, disconnect wires to those jacks
-				for (int i = 0; i < 5; i++)
+				for (int i = 0; i < 6; i++)
                rack::global_ui->app.gRackWidget->wireContainer->removeAllWires(expPorts[i]);
 			}
 			oldExpansion = module->expansion;		
@@ -929,11 +935,11 @@ struct ClockedWidget : ModuleWidget {
 		// Main panel from Inkscape
         panel = new DynamicSVGPanel();
         panel->mode = &module->panelTheme;
-		panel->expWidth = &expWidth;
+        panel->expWidth = &expWidth;
         panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/Clocked.svg")));
         panel->addPanel(SVG::load(assetPlugin(plugin, "res/dark/Clocked_dark.svg")));
         box.size = panel->box.size;
-		box.size.x = box.size.x - (1 - module->expansion) * expWidth;
+        box.size.x = box.size.x - (1 - module->expansion) * expWidth;
         addChild(panel);		
 		
 		// Screws
@@ -986,8 +992,6 @@ struct ClockedWidget : ModuleWidget {
 		displayRatios[0]->module = module;
 		displayRatios[0]->knobIndex = 0;
 		addChild(displayRatios[0]);
-		// BPM external pulses lock light
-		addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(colRulerT4 + 11 + 62, rowRuler0 + 10), module, Clocked::CLK_LIGHTS + 0));		
 		
 		// Row 1
 		// Reset LED bezel and light
@@ -996,8 +1000,9 @@ struct ClockedWidget : ModuleWidget {
 		// Run LED bezel and light
 		addParam(ParamWidget::create<LEDBezel>(Vec(colRulerT1 + offsetLEDbezel, rowRuler1 + offsetLEDbezel), module, Clocked::RUN_PARAM, 0.0f, 1.0f, 0.0f));
 		addChild(ModuleLightWidget::create<MuteLight<GreenLight>>(Vec(colRulerT1 + offsetLEDbezel + offsetLEDbezelLight, rowRuler1 + offsetLEDbezel + offsetLEDbezelLight), module, Clocked::RUN_LIGHT));
-		// PW master input
-		addInput(createDynamicPort<IMPort>(Vec(colRulerT2, rowRuler1), Port::INPUT, module, Clocked::PW_INPUTS + 0, &module->panelTheme));
+		// BPM mode and light
+		addParam(ParamWidget::create<TL1105>(Vec(colRulerT2 + offsetTL1105, rowRuler1 + offsetTL1105), module, Clocked::BPMMODE_PARAM, 0.0f, 1.0f, 0.0f));
+		addChild(ModuleLightWidget::create<SmallLight<GreenRedLight>>(Vec(colRulerM1 + 62, rowRuler1 + offsetMediumLight), module, Clocked::BPMSYNC_LIGHT));		
 		// Swing master knob
 		addParam(createDynamicParam<IMSmallKnob>(Vec(colRulerT3 + offsetIMSmallKnob, rowRuler1 + offsetIMSmallKnob), module, Clocked::SWING_PARAMS + 0, -1.0f, 1.0f, 0.0f, &module->panelTheme));
 		// PW master knob
@@ -1040,15 +1045,15 @@ struct ClockedWidget : ModuleWidget {
 		addOutput(createDynamicPort<IMPort>(Vec(colRulerT5, rowRuler5), Port::OUTPUT, module, Clocked::CLK_OUTPUTS + 3, &module->panelTheme));	
 
 		// Expansion module
-		static const int rowRulerExpTop = 65;
-		static const int rowSpacingExp = 60;
+		static const int rowRulerExpTop = 60;
+		static const int rowSpacingExp = 50;
 		static const int colRulerExp = 497 - 30 -150;// Clocked is (2+10)HP less than PS32
-		addInput(expPorts[0] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 0), Port::INPUT, module, Clocked::PW_INPUTS + 1, &module->panelTheme));
-		addInput(expPorts[1] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 1), Port::INPUT, module, Clocked::PW_INPUTS + 2, &module->panelTheme));
-		addInput(expPorts[2] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 2), Port::INPUT, module, Clocked::SWING_INPUTS + 0, &module->panelTheme));
-		addInput(expPorts[3] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 3), Port::INPUT, module, Clocked::SWING_INPUTS + 1, &module->panelTheme));
-		addInput(expPorts[4] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 4), Port::INPUT, module, Clocked::SWING_INPUTS + 2, &module->panelTheme));
-
+		addInput(expPorts[0] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 0), Port::INPUT, module, Clocked::PW_INPUTS + 0, &module->panelTheme));
+		addInput(expPorts[1] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 1), Port::INPUT, module, Clocked::PW_INPUTS + 1, &module->panelTheme));
+		addInput(expPorts[2] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 2), Port::INPUT, module, Clocked::PW_INPUTS + 2, &module->panelTheme));
+		addInput(expPorts[3] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 3), Port::INPUT, module, Clocked::SWING_INPUTS + 0, &module->panelTheme));
+		addInput(expPorts[4] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 4), Port::INPUT, module, Clocked::SWING_INPUTS + 1, &module->panelTheme));
+		addInput(expPorts[5] = createDynamicPort<IMPort>(Vec(colRulerExp, rowRulerExpTop + rowSpacingExp * 5), Port::INPUT, module, Clocked::SWING_INPUTS + 2, &module->panelTheme));
 	}
 };
 
@@ -1062,6 +1067,10 @@ RACK_PLUGIN_MODEL_INIT(ImpromptuModular, Clocked) {
 }
 
 /*CHANGE LOG
+
+0.6.10:
+add ppqn setting of 12
+move master PW to expansion panel and move BPM mode from right-click menu to main pannel button
 
 0.6.9:
 new approach to BPM Detection (all slaves must enable Use BPM Detect if master does, and same ppqn)

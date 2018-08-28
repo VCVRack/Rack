@@ -9,7 +9,7 @@
 
 
 #include "ImpromptuModular.hpp"
-#include "dsp/digital.hpp"
+#include "PhraseSeqUtil.hpp"
 
 namespace rack_plugin_ImpromptuModular {
 
@@ -79,7 +79,7 @@ struct WriteSeq32 : Module {
 	int pendingPaste;// 0 = nothing to paste, 1 = paste on clk, 2 = paste on seq, destination channel in next msbits
 	long clockIgnoreOnReset;
 	const float clockIgnoreOnResetDuration = 0.001f;// disable clock on powerup and reset for 1 ms (so that the first step plays)
-
+	int lightRefreshCounter;
 	
 	SchmittTrigger clockTrigger;
 	SchmittTrigger resetTrigger;
@@ -115,6 +115,7 @@ struct WriteSeq32 : Module {
 		pendingPaste = 0;
 		clockIgnoreOnReset = (long) (clockIgnoreOnResetDuration * engineGetSampleRate());
 		resetOnRun = false;
+		lightRefreshCounter = 0;
 	}
 
 	void onRandomize() override {
@@ -258,7 +259,7 @@ struct WriteSeq32 : Module {
 		
 		// Copy button
 		if (copyTrigger.process(params[COPY_PARAM].value)) {
-			infoCopyPaste = (long) (copyPasteInfoTime * engineGetSampleRate());
+			infoCopyPaste = (long) (copyPasteInfoTime * engineGetSampleRate() / displayRefreshStepSkips);
 			for (int s = 0; s < 32; s++) {
 				cvCPbuffer[s] = cv[indexChannel][s];
 				gateCPbuffer[s] = gates[indexChannel][s];
@@ -269,7 +270,7 @@ struct WriteSeq32 : Module {
 		if (pasteTrigger.process(params[PASTE_PARAM].value)) {
 			if (params[PASTESYNC_PARAM].value < 0.5f || indexChannel == 3) {
 				// Paste realtime, no pending to schedule
-				infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate());
+				infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate() / displayRefreshStepSkips);
 				for (int s = 0; s < 32; s++) {
 					cv[indexChannel][s] = cvCPbuffer[s];
 					gates[indexChannel][s] = gateCPbuffer[s];
@@ -367,7 +368,7 @@ struct WriteSeq32 : Module {
 				// Pending paste on clock or end of seq
 				if ( ((pendingPaste&0x3) == 1) || ((pendingPaste&0x3) == 2 && indexStep == 0) ) {
 					int pasteChannel = pendingPaste>>2;
-					infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate());
+					infoCopyPaste = (long) (-1 * copyPasteInfoTime * engineGetSampleRate() / displayRefreshStepSkips);
 					for (int s = 0; s < 32; s++) {
 						cv[pasteChannel][s] = cvCPbuffer[s];
 						gates[pasteChannel][s] = gateCPbuffer[s];
@@ -411,40 +412,46 @@ struct WriteSeq32 : Module {
 			}
 		}
 
-		int index = (indexChannel == 3 ? indexStepStage : indexStep);
-		// Window lights
-		for (int i = 0; i < 4; i++) {
-			lights[WINDOW_LIGHTS + i].value = ((i == (index >> 3))?1.0f:0.0f);
-		}
-		// Step and gate lights
-		for (int index8 = 0, iGate = 0; index8 < 8; index8++) {
-			lights[STEP_LIGHTS + index8].value = (index8 == (index&0x7)) ? 1.0f : 0.0f;
-			iGate = (index&0x18) | index8;
-			lights[GATE_LIGHTS + index8].value = (gates[indexChannel][iGate] && iGate < numSteps) ? 1.0f : 0.0f;
-		}
+		lightRefreshCounter++;
+		if (lightRefreshCounter > displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
+
+			int index = (indexChannel == 3 ? indexStepStage : indexStep);
+			// Window lights
+			for (int i = 0; i < 4; i++) {
+				lights[WINDOW_LIGHTS + i].value = ((i == (index >> 3))?1.0f:0.0f);
+			}
+			// Step and gate lights
+			for (int index8 = 0, iGate = 0; index8 < 8; index8++) {
+				lights[STEP_LIGHTS + index8].value = (index8 == (index&0x7)) ? 1.0f : 0.0f;
+				iGate = (index&0x18) | index8;
+				lights[GATE_LIGHTS + index8].value = (gates[indexChannel][iGate] && iGate < numSteps) ? 1.0f : 0.0f;
+			}
+				
+			// Channel lights		
+			lights[CHANNEL_LIGHTS + 0].value = (indexChannel == 0) ? 1.0f : 0.0f;// green
+			lights[CHANNEL_LIGHTS + 1].value = (indexChannel == 1) ? 1.0f : 0.0f;// yellow
+			lights[CHANNEL_LIGHTS + 2].value = (indexChannel == 2) ? 1.0f : 0.0f;// orange
+			lights[CHANNEL_LIGHTS + 3].value = (indexChannel == 3) ? 1.0f : 0.0f;// blue
 			
-		// Channel lights		
-		lights[CHANNEL_LIGHTS + 0].value = (indexChannel == 0) ? 1.0f : 0.0f;// green
-		lights[CHANNEL_LIGHTS + 1].value = (indexChannel == 1) ? 1.0f : 0.0f;// yellow
-		lights[CHANNEL_LIGHTS + 2].value = (indexChannel == 2) ? 1.0f : 0.0f;// orange
-		lights[CHANNEL_LIGHTS + 3].value = (indexChannel == 3) ? 1.0f : 0.0f;// blue
+			// Run light
+			lights[RUN_LIGHT].value = running ? 1.0f : 0.0f;
+			
+			// Write allowed light
+			lights[WRITE_LIGHT + 0].value = (canEdit)?1.0f:0.0f;
+			lights[WRITE_LIGHT + 1].value = (canEdit)?0.0f:1.0f;
+			
+			// Pending paste light
+			lights[PENDING_LIGHT].value = (pendingPaste == 0 ? 0.0f : 1.0f);
+			
+			if (infoCopyPaste != 0l) {
+				if (infoCopyPaste > 0l)
+					infoCopyPaste --;
+				if (infoCopyPaste < 0l)
+					infoCopyPaste ++;
+			}
+		}// lightRefreshCounter
 		
-		// Run light
-		lights[RUN_LIGHT].value = running;
-		
-		// Write allowed light
-		lights[WRITE_LIGHT + 0].value = (canEdit)?1.0f:0.0f;
-		lights[WRITE_LIGHT + 1].value = (canEdit)?0.0f:1.0f;
-		
-		// Pending paste light
-		lights[PENDING_LIGHT].value = (pendingPaste == 0 ? 0.0f : 1.0f);
-		
-		if (infoCopyPaste != 0l) {
-			if (infoCopyPaste > 0l)
-				infoCopyPaste --;
-			if (infoCopyPaste < 0l)
-				infoCopyPaste ++;
-		}
 		if (clockIgnoreOnReset > 0l)
 			clockIgnoreOnReset--;
 	}

@@ -15,7 +15,6 @@
 
 
 #include "ImpromptuModular.hpp"
-#include "dsp/digital.hpp"
 
 namespace rack_plugin_ImpromptuModular {
 
@@ -54,6 +53,7 @@ struct TwelveKey : Module {
 	//float gateLight = 0.0f;
 	unsigned long noteLightCounter;// 0 when no key to light, downward step counter timer when key lit
 	int lastKeyPressed;// 0 to 11
+	int lightRefreshCounter;
 
 	
 	SchmittTrigger keyTriggers[12];
@@ -72,6 +72,7 @@ struct TwelveKey : Module {
 		stateInternal = inputs[GATE_INPUT].active ? false : true;
 		noteLightCounter = 0ul;
 		lastKeyPressed = 0;
+		lightRefreshCounter = 0;
 	}
 
 	void onRandomize() override {
@@ -145,7 +146,7 @@ struct TwelveKey : Module {
 			if (keyTriggers[i].process(params[KEY_PARAMS + i].value)) {
 				cv = ((float)(octaveNum - 4)) + ((float) i) / 12.0f;
 				stateInternal = true;
-				noteLightCounter = (unsigned long) (noteLightTime * engineGetSampleRate());
+				noteLightCounter = (unsigned long) (noteLightTime * engineGetSampleRate() / displayRefreshStepSkips);
 				lastKeyPressed = i;
 			}
 		}
@@ -182,12 +183,17 @@ struct TwelveKey : Module {
 		// Octave output
 		outputs[OCT_OUTPUT].value = round( (float)(octaveNum + 1) );
 		
-		// Key lights
-		for (int i = 0; i < 12; i++)
-			lights[KEY_LIGHTS + i].value = (( i == lastKeyPressed && (noteLightCounter > 0ul || params[KEY_PARAMS + i].value > 0.5f)) ? 1.0f : 0.0f);
-		
-		if (noteLightCounter > 0ul)
-			noteLightCounter--;
+		lightRefreshCounter++;
+		if (lightRefreshCounter > displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
+
+			// Key lights
+			for (int i = 0; i < 12; i++)
+				lights[KEY_LIGHTS + i].value = (( i == lastKeyPressed && (noteLightCounter > 0ul || params[KEY_PARAMS + i].value > 0.5f)) ? 1.0f : 0.0f);
+			
+			if (noteLightCounter > 0ul)
+				noteLightCounter--;
+		}
 	}
 };
 
