@@ -1,3 +1,8 @@
+** August 31th, 2018
+- add module bsp.Scanner
+- update module LindenbergResearch.Westcoast
+
+
 ** August 28th, 2018
 - fix rotary knobs (infinite min/max)
    - fixes e.g. Ohmer.Metriks and ImpromptuModular modules

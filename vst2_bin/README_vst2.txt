@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- August 28th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- August 31st, 2018
 ==================================================
 
 !!!------------------------------------------------------------------------------
@@ -33,8 +33,9 @@ Tested in
   - according to users: works in Ableton Live
 
 
-The binary distribution contains the following (19) dynamically loaded add-on modules:
+The binary distribution contains the following (20) dynamically loaded add-on modules:
  - bsp.Obxd_VCF
+ - bsp.Scanner
  - bsp.Sway
  - dBiz.dBizBlank
  - dBiz.Multiple

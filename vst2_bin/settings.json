@@ -119,6 +119,10 @@
       },
       {
           "plugin": "bsp",
+          "model": "Scanner"
+      },
+      {
+          "plugin": "bsp",
           "model": "Sway"
       },
       {
@@ -140,6 +144,14 @@
       {
         "plugin": "Fundamental",
         "model": "Scope"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "LFO"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "LFO2"
       },
       {
         "plugin": "Fundamental",
@@ -198,8 +210,8 @@
         "model": "Maude221"
       },
       {
-        "plugin": "RJModules",
-        "model": "Noise"
+        "plugin": "PG-Instruments",
+        "model": "PGPanner"
       },
       {
         "plugin": "Southpole",
