@@ -1,4 +1,5 @@
 ALL_OBJ= \
 	src/bsp.o \
 	src/Obxd_VCF.o \
+	src/Scanner.o \
 	src/Sway.o
