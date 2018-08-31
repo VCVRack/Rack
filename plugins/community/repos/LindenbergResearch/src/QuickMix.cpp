@@ -41,6 +41,7 @@ struct QuickMix : Module {
    };
 
 
+    float lightVals[NUM_LIGHTS];
    QuickMix() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 
 
@@ -52,7 +53,8 @@ void QuickMix::step() {
    float out = 0;
    /* lights */
    for (int i = 0; i < NUM_LIGHTS - 1; i++) {
-      lights[i].value = quadraticBipolar(params[i].value) * inputs[i].value / 10;
+        lightVals[i] = (lightVals[i] + (abs(quadraticBipolar(params[i].value)) * abs(inputs[i].value) / 10)) / 2;
+        lights[i].value = lightVals[i];
    }
 
    /* mixup all signals */
@@ -61,7 +63,7 @@ void QuickMix::step() {
    }
 
    /* master out light */
-   lights[LEVELM_LIGHT].value = quadraticBipolar(params[LEVELM_PARAM].value) * out / 10;
+    //lights[LEVELM_LIGHT].value = quadraticBipolar(params[LEVELM_PARAM].value) * out / 10;
 
    out *= quadraticBipolar(params[LEVELM_PARAM].value);
 

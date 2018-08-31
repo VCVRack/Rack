@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:serif="http://www.serif.com/" width="105px" height="380px" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-miterlimit:10;">
     <g id="Panel" transform="matrix(1.4,0,0,1,-7.10543e-15,0)">
-        <rect x="0" y="0" width="75" height="380" style="fill:#1d1d1d;"/>
+        <rect x="0" y="0" width="75" height="380" style="fill:#161616;"/>
     </g>
     <g id="Scales" transform="matrix(1,0,0,1,7.5,0)">
         <g id="ScaleSmall_3_" transform="matrix(1,0,0,1,-6.09332,-115.43)">
@@ -46,23 +46,6 @@
                 <path d="M66.295,194.337c-4.545,-2.404 -7.642,-7.182 -7.642,-12.684c0,-7.92 6.422,-14.343 14.342,-14.343c7.921,0 14.343,6.423 14.343,14.343c0,5.459 -3.05,10.206 -7.538,12.628" style="fill:none;stroke:#d63e3e;stroke-opacity:0.65098;stroke-width:4.93px;"/>
             </g>
             <circle id="Circle_4_6" serif:id="Circle_4_" cx="72.995" cy="181.659" r="11.474" style="fill:#323232;"/>
-        </g>
-    </g>
-    <g id="LEDs" transform="matrix(1,0,0,1,6.5,0)">
-        <g transform="matrix(0.721533,0,0,0.783514,-41.1115,-54.6254)">
-            <ellipse cx="118.999" cy="152.748" rx="5.197" ry="4.786" style="fill:#1b297a;"/>
-        </g>
-        <g transform="matrix(0.721533,0,0,0.783514,-41.1115,-19.6254)">
-            <ellipse cx="118.999" cy="152.748" rx="5.197" ry="4.786" style="fill:#1b297a;"/>
-        </g>
-        <g transform="matrix(0.721533,0,0,0.783514,-41.1115,15.3746)">
-            <ellipse cx="118.999" cy="152.748" rx="5.197" ry="4.786" style="fill:#1b297a;"/>
-        </g>
-        <g transform="matrix(0.721533,0,0,0.783514,-41.1115,50.3746)">
-            <ellipse cx="118.999" cy="152.748" rx="5.197" ry="4.786" style="fill:#1b297a;"/>
-        </g>
-        <g transform="matrix(0.721533,0,0,0.783514,-41.1115,86.6246)">
-            <ellipse cx="118.999" cy="152.748" rx="5.197" ry="4.786" style="fill:#1b297a;"/>
         </g>
     </g>
     <g id="Logo" transform="matrix(1,0,0,1,15.5,0)">

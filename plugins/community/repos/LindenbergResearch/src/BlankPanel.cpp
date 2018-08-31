@@ -45,6 +45,8 @@ BlankPanelWidget::BlankPanelWidget(BlankPanel *module) : LRModuleWidget(module) 
 
     box.size = panel->box.size;
 
+    panel->setInner(nvgRGBAf(1.4f * .369f, 1.4f * 0.357f, 1.5f * 0.3333f, 0.27f));
+    panel->setOuter(nvgRGBAf(0.f, 0.f, 0.f, 0.15f));
     float speed = 0.004;
 
     addChild(SVGRotator::create(Vec(140.5, 65), SVG::load(assetPlugin(plugin, "res/CogBig.svg")), speed));

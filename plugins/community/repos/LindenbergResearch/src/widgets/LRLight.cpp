@@ -9,12 +9,12 @@ namespace lrt {
         // Solid
         nvgBeginPath(vg);
         nvgCircle(vg, radius, radius, radius);
-    nvgFillColor(vg, nvgRGBAf(0.2, 0.3, 0.9, 0.3));
+    nvgFillColor(vg, bgColor);
         nvgFill(vg);
 
         // Border
         nvgStrokeWidth(vg, 1.0f);
-    NVGcolor borderColor = nvgRGBAf(0.01, 0.03, 0.09, 0.9);
+    // NVGcolor borderColor = nvgRGBAf(0.01, 0.03, 0.09, 0.9);
         borderColor.a *= 0.5f;
         nvgStrokeColor(vg, borderColor);
         nvgStroke(vg);
@@ -43,7 +43,11 @@ namespace lrt {
      */
     LRLight::LRLight() {
     box.size = Vec(7.5f, 7.5f);
-        addBaseColor(nvgRGBAf(0.1, 0.3, 0.9, 0.99));
+
+    color = LED_DEFAULT_COLOR;
+    addBaseColor(color);
+    borderColor = nvgRGBAf(color.r / 100, color.g / 100, color.b / 100, 0.9);
+    bgColor = nvgRGBAf(color.r, color.g, color.b, 0.3);
     }
 
 }

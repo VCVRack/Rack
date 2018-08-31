@@ -8,6 +8,9 @@
 #define LCD_FONTSIZE 11
 #define LCD_LETTER_SPACING 0
 
+#define LED_DEFAULT_COLOR nvgRGBAf(0.1, 0.3, 0.9, 0.99)
+#define LED_RED_COLOR nvgRGBAf(0.9, 0.1, 0.1, 0.99)
+#define LED_GREEN_COLOR nvgRGBAf(0.1, 0.9, 0.3, 0.99)
 /* show values of all knobs */
 #define DEBUG_VALUES false
 
@@ -574,7 +577,7 @@ struct LRLCDWidget : Label {
    /**
     * @brief Standard LED
     */
-   struct LRLight : SmallLight<ModuleLightWidget> {
+struct LRLight : ModuleLightWidget {
       LRLight();
 
       void draw(NVGcontext *vg) override;
@@ -590,8 +593,8 @@ struct LRLCDWidget : Label {
       static constexpr float MARGIN = 10;
 
       /** gradient colors */
-    NVGcolor inner = nvgRGBAf(1.4f * .369f, 1.5f * 0.357f, 1.5f * 0.3333f, 0.25f);
-    NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.15f);;
+    NVGcolor inner = nvgRGBAf(1.5f * .369f, 1.5f * 0.357f, 1.5f * 0.3333f, 0.33f);
+    NVGcolor outer = nvgRGBAf(0.0f, 0.0f, 0.0f, 0.1f);;
 
       /** gradient offset */
       Vec offset = Vec(30, -50);

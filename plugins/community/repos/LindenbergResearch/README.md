@@ -3,7 +3,7 @@ LRT Rack modules is a collection of modules made for [VCV Rack](https://vcvrack.
 
 Copyright (C) 2017-2018 by Lindenberg Research / Patrick Lindenberg
 
-![SCREENSHOT](doc/LRTRackModules_0.6.1.png)
+![SCREENSHOT](doc/LRTRackModules_0.6.2.png)
 
 
 ## 1. Installation
