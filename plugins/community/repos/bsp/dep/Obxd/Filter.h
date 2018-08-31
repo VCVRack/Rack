@@ -60,6 +60,10 @@ public:
 		R=1;
 		R24=0;
 	}
+   void reset(void)
+   {
+		s1=s2=s3=s4=0;
+   }
 	void setMultimode(float m)
 	{
 		mm = m;
