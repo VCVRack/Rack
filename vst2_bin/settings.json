@@ -9,7 +9,7 @@
     0.0
   ],
   "wireOpacity": 50.0,
-  "wireTension": 0.97,
+  "wireTension": 0.94,
   "zoom": 1.0,
   "refreshRate": 30,
   "vsync": true,
@@ -115,6 +115,10 @@
       },
       {
           "plugin": "bsp",
+          "model": "AttenuMixer"
+      },
+      {
+          "plugin": "bsp",
           "model": "Obxd_VCF"
       },
       {
@@ -124,6 +128,10 @@
       {
           "plugin": "bsp",
           "model": "Sway"
+      },
+      {
+          "plugin": "bsp",
+          "model": "TunedDelayLine"
       },
       {
         "plugin": "HetrickCV",
