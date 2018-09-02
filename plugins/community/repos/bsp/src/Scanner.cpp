@@ -27,7 +27,27 @@ SOFTWARE.
 
 namespace rack_plugin_bsp {
 
+typedef union fi_u {
+   float f;
+   unsigned int u;
+   int s;
+} fi_t;
+
+// struct TrigButton : CKD6 {
+// struct TrigButton : TL1105 {
+struct TrigButton : LEDButton {
+};
+
+struct NullButton : SVGSwitch, ToggleSwitch {
+	NullButton() {
+		addFrame(SVG::load(assetPlugin("res/null.svg")));
+		addFrame(SVG::load(assetPlugin("res/null.svg")));
+   }
+};
+
 struct Scanner : Module {
+
+   static const uint32_t MAX_INPUTS = 16u;
 
    enum ParamIds {
 		POSITION_PARAM,
@@ -37,6 +57,9 @@ struct Scanner : Module {
       TABLE_TYPE_PARAM,
       OUT_WINDOW_SHAPE_PARAM,
       OUT_WINDOW_OFFSET_SWITCH_PARAM,
+      RANDOM_TRIG_PARAM,
+      RANDOM_ENABLE_PARAM,
+      RANDOM_SEED_PARAM,
 		NUM_PARAMS
 	};
 
@@ -101,9 +124,19 @@ struct Scanner : Module {
    // (note) the table is actually symmetric (center = LUT_SIZE/2)
    uint32_t out_buffer_idx;
 
+   uint32_t input_shuffle_lut[MAX_INPUTS];
+   fi_t     last_input_shuffle_seed;
+   fi_t     tmp_seed;
+   float    last_rand_enable;
+   uint32_t last_num_active_inputs;
+
+
 	Scanner() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-      last_mix_shape = -999;
-      last_out_shape = -999;
+      last_mix_shape = -999.f;
+      last_out_shape = -999.f;
+      tmp_seed.u = 0u;
+      last_num_active_inputs  = 0u;
+      last_rand_enable = -999.f;
       memset((void*)out_buffer, 0, sizeof(out_buffer));
       out_buffer_idx = 0u;
    }
@@ -111,6 +144,9 @@ struct Scanner : Module {
    void calcLUT (float *_lut, const uint32_t _lutSize, const float _shape);
    void calcMixLUT (void);
    void calcOutLUT (void);
+
+   uint32_t fastRand (void);
+   void calcInputShuffleLUT (uint32_t _numActiveInputs);
 
 	void step() override;
 };
@@ -179,6 +215,56 @@ void Scanner::calcOutLUT(void) {
       out_lut[i] *= scl;
 }
 
+uint32_t Scanner::fastRand(void) {
+   tmp_seed.u *= 16807u;
+   printf("xxx fastRand()=%u\n", tmp_seed.u);
+   return tmp_seed.u >> 10;
+}
+
+void Scanner::calcInputShuffleLUT(uint32_t _numActiveInputs) {
+
+   printf("xxx Scanner::calcInputShuffleLUT(numActiveInputs=%u)\n", _numActiveInputs);
+
+   tmp_seed.f = params[RANDOM_SEED_PARAM].value;
+   tmp_seed.u &= 0xFFffFFu;
+   tmp_seed.u += (~tmp_seed.u) & 1u;
+
+   if(params[RANDOM_ENABLE_PARAM].value >= 0.5f)
+   {
+      for(uint32_t i = 0u; i < _numActiveInputs; i++)
+      {
+         // (note) there are other "random" functions that produce non-repeating number sequences
+         //         but this one is good enough (usually <8 iterations to generate 4 unique random values)
+         bool bDuplicate;
+
+         do
+         {
+            input_shuffle_lut[i] = fastRand() % _numActiveInputs;
+
+            bDuplicate = false;
+
+            for(uint32_t j = 0u; j < i; j++)
+            {
+               if(input_shuffle_lut[j] == input_shuffle_lut[i])
+               {
+                  bDuplicate = true;
+                  break;
+               }
+            }
+         }
+         while(bDuplicate);
+
+      }
+   }
+   else
+   {
+      for(uint32_t i = 0u; i < _numActiveInputs; i++)
+      {
+         input_shuffle_lut[i] = i;
+      }
+   }
+
+}
 
 
 void Scanner::step() {
@@ -204,6 +290,25 @@ void Scanner::step() {
       {
          lights[MIX_1_LIGHT + i].setBrightnessSmooth(0.0f);
       }
+   }
+
+   if(params[RANDOM_TRIG_PARAM].value >= 0.5f)
+   {
+      // (todo) don't handle UI button in the audio thread
+      params[RANDOM_TRIG_PARAM].value = 0.0f;
+      fi_t r; r.s = rand();
+      params[RANDOM_SEED_PARAM].value = r.f;
+   }
+
+   if((last_num_active_inputs != numInputs) || 
+      (last_input_shuffle_seed.f != params[RANDOM_SEED_PARAM].value) ||
+      (last_rand_enable != params[RANDOM_ENABLE_PARAM].value)
+      )
+   {
+      last_num_active_inputs = numInputs;
+      last_input_shuffle_seed.f = params[RANDOM_SEED_PARAM].value;
+      last_rand_enable = params[RANDOM_ENABLE_PARAM].value;
+      calcInputShuffleLUT(numInputs);
    }
 
    float mixOut = 0.0f;
@@ -260,7 +365,7 @@ void Scanner::step() {
 
       for(int i = 0; i < numInputs; i++)
       {
-         int portIdx = inputIdx[i];
+         int portIdx = inputIdx[input_shuffle_lut[i]];
 
          lights[MIX_1_LIGHT + portIdx].setBrightnessSmooth(outWeights[i]);
 
@@ -369,13 +474,18 @@ ScannerWidget::ScannerWidget(Scanner *module) : ModuleWidget(module) {
 	addParam(ParamWidget::create<RoundBlackKnob>(Vec(cx, cy), module, Scanner::MOD_POSITION_AMOUNT_PARAM, -1.0f, 1.0f, 0.0f));
    addInput(Port::create<PJ301MPort>(Vec(cx+2.3f, cy + 37.0f), Port::INPUT, module, Scanner::MOD_POSITION_INPUT));
    cx += STX;
-	addParam(ParamWidget::create<RoundBlackKnob>(Vec(cx, cy), module, Scanner::SHAPE_PARAM, 0.0f, 1.0f, 0.0f));
+	addParam(ParamWidget::create<RoundBlackKnob>(Vec(cx, cy), module, Scanner::SHAPE_PARAM, 0.0f, 1.0f, 0.45f));
    cx += STX;
 	addParam(ParamWidget::create<RoundBlackKnob>(Vec(cx, cy), module, Scanner::WIDTH_PARAM, 0.0f, 1.0f, 1.0f));
 
 	addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(27, box.size.y - 60), module, Scanner::OUT_WINDOW_SHAPE_PARAM, 0.0f, 1.0f, 0.34f));
 
 	addParam(ParamWidget::create<CKSS>(Vec(9, box.size.y-58), module, Scanner::OUT_WINDOW_OFFSET_SWITCH_PARAM, 0.0f, 1.0f, 0.0f));
+
+   cy = 286.0f;
+   addParam(ParamWidget::create<TrigButton>(Vec(box.size.x - 45, cy+2.0f), module, Scanner::RANDOM_TRIG_PARAM, 0.0f, 1.0f, 0.0f));
+	addParam(ParamWidget::create<CKSS>(Vec(box.size.x - 25, cy), module, Scanner::RANDOM_ENABLE_PARAM, 0.0f, 1.0f, 0.0f));
+   addParam(ParamWidget::create<NullButton>(Vec(box.size.x - 70, cy-30), module, Scanner::RANDOM_SEED_PARAM, -INFINITY, INFINITY, 0.0f));
 
 	addOutput(Port::create<PJ301MPort>(Vec(box.size.x - 40, 320), Port::OUTPUT, module, Scanner::MIX_OUTPUT));
 	addOutput(Port::create<PJ301MPort>(Vec(box.size.x - 90, 320), Port::OUTPUT, module, Scanner::WIN_OUTPUT));

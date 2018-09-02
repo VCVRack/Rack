@@ -239,9 +239,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="-105.23473"
-     inkscape:cy="241.47063"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="-7.8270125"
+     inkscape:cy="39.533899"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -353,6 +353,14 @@
          id="path965"
          inkscape:connector-curvature="0" />
     </g>
+    <rect
+       style="display:inline;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.20018744;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="rect866-0-0"
+       width="10.705551"
+       height="10.537507"
+       x="59.100956"
+       y="179.87476"
+       ry="1.2795542" />
   </g>
   <g
      inkscape:groupmode="layer"
