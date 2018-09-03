@@ -14,6 +14,7 @@ void Slider::draw(NVGcontext *vg) {
 void Slider::onDragStart(EventDragStart &e) {
 	state = BND_ACTIVE;
 	windowCursorLock();
+   revert_val = value;
 }
 
 void Slider::onDragMove(EventDragMove &e) {
@@ -29,9 +30,17 @@ void Slider::onDragEnd(EventDragEnd &e) {
 
 void Slider::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
-		setValue(defaultValue);
-		EventAction eAction;
-		onAction(eAction);
+      if(INVALID_REVERT_VAL != revert_val) // during mouse drag
+      {
+         setValue(revert_val);
+         revert_val = INVALID_REVERT_VAL;
+      }
+      else
+      {
+         setValue(defaultValue);
+      }
+      EventAction eAction;
+      onAction(eAction);
 	}
 	e.consumed = true;
 	e.target = this;

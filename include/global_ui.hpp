@@ -21,6 +21,8 @@ struct Toolbar;
 struct RackScene;
 struct Scene;
 struct Model;
+struct ParamWidget;
+struct TextField;
 
 
 //
@@ -91,6 +93,17 @@ struct GlobalUI {
       int bnd_font;
    } blendish;
 
+   struct {
+      const ParamWidget *last_param_widget;  // never dereferenced, may have already been deleted. unset after redraw().
+      int last_param_gid;      // updated during redraw()
+      float last_param_value;  // updated in onMouseMove() and onChange(). corresponding param may not exist anymore.
+      float value_clipboard;
+      TextField *tf_id;
+      TextField *tf_value;
+      bool b_lock;  // true=don't update info (e.g. when receiving VST parameter updates from host)
+      int placeholder_framecount;
+   } param_info;
+
 
    void init(void) {
       
@@ -130,6 +143,15 @@ struct GlobalUI {
 
       blendish.bnd_icon_image = -1;
       blendish.bnd_font = -1;
+
+      param_info.last_param_widget = NULL;
+      param_info.last_param_gid = 0;
+      param_info.last_param_value = 0.0f;
+      param_info.value_clipboard = 0.0f;
+      param_info.tf_id = NULL;
+      param_info.tf_value = NULL;
+      param_info.b_lock = false;
+      param_info.placeholder_framecount = 0;
    } 
 
 };

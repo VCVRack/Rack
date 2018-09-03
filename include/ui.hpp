@@ -6,7 +6,6 @@
 #define CHECKMARK_STRING "✔"
 #define CHECKMARK(_cond) ((_cond) ? CHECKMARK_STRING : "")
 
-
 namespace rack {
 
 ////////////////////
@@ -233,9 +232,11 @@ struct TextField : OpaqueWidget {
 	/** Inserts text at the cursor, replacing the selection if necessary */
 	void insertText(std::string text);
 	/** Replaces the entire text */
-	void setText(std::string text);
+	void setText(std::string text);  // set text and emit onChange()
+	void setTextQuiet(std::string text);  // just set the text
 	virtual int getTextPosition(Vec mousePos);
-	virtual void onTextChange() {}
+	virtual void onTextChange() {}  // Type
+	virtual void onTextEnter() {}  // Return
 };
 
 struct PasswordField : TextField {

@@ -15,6 +15,7 @@ namespace rack {
 }
 
 typedef void (*vst2_handle_ui_param_fxn_t) (int uniqueParamId, float normValue);
+typedef void (*vst2_queue_param_sync_fxn_t) (int uniqueParamId, float value, bool _bNormalized);
 typedef void (*rack_set_tls_globals_fxn_t) (rack::Plugin *p);
 
 #ifdef RACK_HOST
@@ -22,6 +23,7 @@ typedef void (*rack_set_tls_globals_fxn_t) (rack::Plugin *p);
 // Rack host build:
 
 extern void vst2_handle_ui_param (int uniqueParamId, float normValue);
+extern void vst2_queue_param_sync (int _uniqueParamId, float _value, bool _bNormalized);
 
 #define RACK_PLUGIN_DECLARE(pluginname) 
 #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
@@ -44,6 +46,7 @@ extern void vst2_handle_ui_param (int uniqueParamId, float normValue);
 #endif // _MSC_VER
 
 extern vst2_handle_ui_param_fxn_t vst2_handle_ui_param;
+extern vst2_queue_param_sync_fxn_t vst2_queue_param_sync;
 
 #ifndef RACK_PLUGIN_SHARED_LIB_BUILD
 #ifdef RACK_PLUGIN_SHARED
@@ -56,6 +59,7 @@ extern vst2_handle_ui_param_fxn_t vst2_handle_ui_param;
 #endif
  #define RACK_PLUGIN_INIT(pluginname)                   \
 vst2_handle_ui_param_fxn_t vst2_handle_ui_param;        \
+vst2_queue_param_sync_fxn_t vst2_queue_param_sync;      \
 JSON_SEED_INIT_EXTERNAL                                 \
 extern "C" extern volatile uint32_t hashtable_seed;     \
 namespace rack {                                        \
@@ -75,6 +79,7 @@ RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p)
    rack::plugin = p;                                                 \
    rack::plugin->set_tls_globals_fxn = &rack::loc_set_tls_globals;   \
    vst2_handle_ui_param = p->vst2_handle_ui_param_fxn;               \
+   vst2_queue_param_sync = p->vst2_queue_param_sync_fxn;             \
    rack::global = p->global;                                         \
    rack::global_ui = p->global_ui;                                   \
    RACK_PLUGIN_INIT_ID_INTERNAL
@@ -143,6 +148,7 @@ struct Plugin {
    // Set by Rack host (before init_plugin()):
    //
    vst2_handle_ui_param_fxn_t vst2_handle_ui_param_fxn = NULL;
+   vst2_queue_param_sync_fxn_t vst2_queue_param_sync_fxn = NULL;
    Global *global = NULL;
    GlobalUI *global_ui = NULL;
 

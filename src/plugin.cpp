@@ -135,6 +135,7 @@ static bool loadPlugin(std::string path) {
 #ifdef USE_VST2
 #ifdef RACK_HOST
    plugin->vst2_handle_ui_param_fxn = &vst2_handle_ui_param;
+   plugin->vst2_queue_param_sync_fxn = &vst2_queue_param_sync;
    plugin->global = global;
    plugin->global_ui = global_ui;
 #endif // RACK_HOST

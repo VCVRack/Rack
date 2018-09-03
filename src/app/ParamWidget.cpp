@@ -1,5 +1,8 @@
+#include "global_pre.hpp"
 #include "app.hpp"
 #include "engine.hpp"
+#include "global.hpp"
+#include "global_ui.hpp"
 
 
 namespace rack {
@@ -35,10 +38,29 @@ void ParamWidget::randomize() {
 	}
 }
 
+void ParamWidget::onMouseMove(EventMouseMove &e) {
+   QuantityWidget::onMouseMove(e);
+   if(!global_ui->param_info.b_lock)
+      global_ui->param_info.last_param_widget = this;
+}
+
 void ParamWidget::onMouseDown(EventMouseDown &e) {
+   printf("xxx ParamWidget::onMouseDown: e.button=%d revert_val=%f\n", e.button, revert_val);
 	if (e.button == 1) {
-		reset();
+      if(INVALID_REVERT_VAL != revert_val) // during mouse drag
+      {
+         setValue(revert_val);
+         revert_val = INVALID_REVERT_VAL;
+      }
+      else
+      {
+         reset();
+      }
 	}
+
+	// if (e.button == 1) {
+	// 	reset();
+	// }
 	e.consumed = true;
 	e.target = this;
 }
@@ -48,6 +70,8 @@ void ParamWidget::onChange(EventChange &e) {
 		return;
 
    // printf("xxx ParamWidget::onChange: paramId=%d value=%f this=%p smooth=%d\n", paramId, value, this, smooth);
+   if(!global_ui->param_info.b_lock)
+      global_ui->param_info.last_param_widget = this;
 
 	if (smooth)
 		engineSetParamSmooth(module, paramId, value);

@@ -296,6 +296,7 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 }
 
 void ModuleWidget::onMouseDown(EventMouseDown &e) {
+
 	Widget::onMouseDown(e);
 	if (e.consumed)
 		return;
@@ -330,7 +331,7 @@ void ModuleWidget::onMouseMove(EventMouseMove &e) {
 void ModuleWidget::onHoverKey(EventHoverKey &e) {
 	switch (e.key) {
 
-		case 'i'/*GLFW_KEY_I*/:
+		case 'i':
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				reset();
 				e.consumed = true;
@@ -338,7 +339,7 @@ void ModuleWidget::onHoverKey(EventHoverKey &e) {
 			}
          break;
 
-		case 'r'/*GLFW_KEY_R*/:
+		case 'r':
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				randomize();
 				e.consumed = true;
@@ -346,7 +347,7 @@ void ModuleWidget::onHoverKey(EventHoverKey &e) {
 			}
          break;
 
-		case 'd'/*GLFW_KEY_D*/:
+		case 'd':
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				global_ui->app.gRackWidget->cloneModule(this);
 				e.consumed = true;
@@ -354,7 +355,7 @@ void ModuleWidget::onHoverKey(EventHoverKey &e) {
 			}
          break;
 
-		case 'u'/*GLFW_KEY_U*/:
+		case 'u':
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				disconnect();
 				e.consumed = true;
@@ -377,14 +378,24 @@ void ModuleWidget::onHoverKey(EventHoverKey &e) {
 
 		case 'w':
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
-            global_ui->app.gRackWidget->deleteModule(this);
-            this->finalizeEvents();
-            delete this;
-            e.consumed = true;
-            return;
+            global_ui->param_info.value_clipboard = global_ui->param_info.last_param_value;
+            printf("xxx CopyParamItem: value=%f\n", global_ui->param_info.value_clipboard);
+				e.consumed = true;
+				return;
 			}
          break;
 
+		case 'e':
+			if (windowIsModPressed() && !windowIsShiftPressed()) {
+            vst2_queue_param_sync(global_ui->param_info.last_param_gid,
+                                  global_ui->param_info.value_clipboard,
+                                  false/*bNormalized*/
+                                  );
+            printf("xxx PasteParamItem: value=%f\n", global_ui->param_info.value_clipboard);
+				e.consumed = true;
+				return;
+			}
+         break;
 	}
 
 	Widget::onHoverKey(e);
@@ -443,6 +454,23 @@ struct DeleteMenuItem : MenuItem {
 	}
 };
 
+struct CopyParamItem : MenuItem {
+	void onAction(EventAction &e) override {
+		global_ui->param_info.value_clipboard = global_ui->param_info.last_param_value;
+      printf("xxx CopyParamItem: value=%f\n", global_ui->param_info.value_clipboard);
+	}
+};
+
+struct PasteParamItem : MenuItem {
+	void onAction(EventAction &e) override {
+      vst2_queue_param_sync(global_ui->param_info.last_param_gid,
+                            global_ui->param_info.value_clipboard,
+                            false/*bNormalized*/
+                            );
+      printf("xxx PasteParamItem: value=%f\n", global_ui->param_info.value_clipboard);
+	}
+};
+
 Menu *ModuleWidget::createContextMenu() {
    // printf("xxx ModuleWidget::createContextMenu: ENTER\n");
 	Menu *menu = global_ui->ui.gScene->createMenu();
@@ -482,6 +510,16 @@ Menu *ModuleWidget::createContextMenu() {
 	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;
 	menu->addChild(deleteItem);
+
+	CopyParamItem *copyParamItem = new CopyParamItem();
+	copyParamItem->text = "Copy Param Value";
+	copyParamItem->rightText = WINDOW_MOD_KEY_NAME "+W";
+	menu->addChild(copyParamItem);
+
+	PasteParamItem *pasteParamItem = new PasteParamItem();
+	pasteParamItem->text = "Paste Param Value";
+	pasteParamItem->rightText = WINDOW_MOD_KEY_NAME "+E";
+	menu->addChild(pasteParamItem);
 
 	appendContextMenu(menu);
 

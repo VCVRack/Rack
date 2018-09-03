@@ -5,8 +5,35 @@
 #include "osdialog.h"
 
 
+#ifdef USE_VST2
+#ifdef RACK_HOST
+extern void vst2_queue_param_sync(int _uniqueParamId, float _value, bool _bNormalized);
+#endif // RACK_HOST
+#endif // USE_VST2
+
 namespace rack {
 
+
+#ifdef USE_VST2
+struct ParamIdTextField : TextField {
+   void onTextEnter() override {
+      printf("xxx ParamIdTextField: enter param id \"%s\"\n", text);
+   }
+};
+
+struct ParamValueTextField : TextField {
+   ParamIdTextField *tf_id;
+
+   void onTextEnter() override {
+      printf("xxx ParamValueTextField: enter param value \"%s\"\n", text);
+      int gid;
+      float value;
+      sscanf(tf_id->text.c_str(), "%d", &gid);
+      sscanf(text.c_str(), "%f", &value);
+      vst2_queue_param_sync(gid, value, false/*bNormalized*/);
+   }
+};
+#endif // USE_VST2
 
 struct RegisterButton : Button {
 	void onAction(EventAction &e) override {
@@ -131,6 +158,21 @@ PluginManagerWidget::PluginManagerWidget() {
 		layout->spacing = 5;
 		loginWidget = layout;
 
+#ifdef USE_VST2
+		ParamIdTextField *paramIdField = new ParamIdTextField();
+		paramIdField->box.size.x = 100;
+		paramIdField->placeholder = "VST Param Id";
+		loginWidget->addChild(paramIdField);
+
+		ParamValueTextField *paramValueField = new ParamValueTextField();
+      paramValueField->tf_id = paramIdField;
+		paramValueField->box.size.x = 100;
+		paramValueField->placeholder = "Param Value";
+		loginWidget->addChild(paramValueField);
+
+      global_ui->param_info.tf_id = (TextField*)paramIdField;
+      global_ui->param_info.tf_value = (TextField*)paramValueField;
+#else
 		Button *registerButton = new RegisterButton();
 		registerButton->box.size.x = 75;
 		registerButton->text = "Register";
@@ -152,6 +194,8 @@ PluginManagerWidget::PluginManagerWidget() {
 		logInButton->emailField = emailField;
 		logInButton->passwordField = passwordField;
 		loginWidget->addChild(logInButton);
+#endif // USE_VST2
+
 
 		Label *label = new StatusLabel();
 		loginWidget->addChild(label);

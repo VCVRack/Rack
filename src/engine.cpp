@@ -269,6 +269,7 @@ static bool loc_vst2_find_module_and_paramid_by_unique_paramid(int uniqueParamId
    }
    return false;
 }
+
 #endif // USE_VST2
 
 #ifdef USE_VST2
@@ -331,12 +332,13 @@ void engineSetParam(Module *module, int paramId, float value) {
 #ifdef USE_VST2
 }
 using namespace rack;
-void vst2_queue_param(int uniqueParamId, float normValue) {
+void vst2_queue_param(int uniqueParamId, float value, bool bNormalized) {
    // Called from any thread via setParameter()
    //  (note) protected by caller mutex
    VST2QueuedParam qp;
    qp.unique_id = uniqueParamId;
-   qp.norm_value = normValue;
+   qp.value = value;
+   qp.b_normalized = bNormalized;
    global->vst2.queued_params.push_back(qp);
 }
 
@@ -359,19 +361,31 @@ void vst2_handle_queued_params(void) {
                ParamWidget *paramWidget = moduleWidget->findParamWidgetByParamId(paramId);
                if(NULL != paramWidget)
                {
-                  // Normalize parameter
                   if(isfinite(paramWidget->minValue) && isfinite(paramWidget->maxValue))
                   {
-                     float paramRange = (paramWidget->maxValue - paramWidget->minValue);
-                     if(paramRange > 0.0f)
+                     if(qp.b_normalized)
                      {
-                        // float value = qp.norm_value - 0.5f;
-                        // value *= 2.0f;
-                        float value = (qp.norm_value * paramRange) + paramWidget->minValue;
-                        engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
+                        // De-Normalize parameter
+                        global_ui->param_info.b_lock = true;
+                        float paramRange = (paramWidget->maxValue - paramWidget->minValue);
+                        if(paramRange > 0.0f)
+                        {
+                           // float value = qp.norm_value - 0.5f;
+                           // value *= 2.0f;
+                           float value = (qp.value * paramRange) + paramWidget->minValue;
+                           engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
+
+                           // Update UI widget
+                           paramWidget->setValue(value);
+                        }
+                        global_ui->param_info.b_lock = false;
+                     }
+                     else
+                     {
+                        engineSetParam(module, paramId, qp.value, false/*bVSTAutomate*/);
 
                         // Update UI widget
-                        paramWidget->setValue(value);
+                        paramWidget->setValue(qp.value);
                      }
                   }
                }

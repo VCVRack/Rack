@@ -9,6 +9,7 @@
 #include "events.hpp"
 #include "util/color.hpp"
 
+#define INVALID_REVERT_VAL -999999.0f
 
 namespace rack {
 
@@ -286,6 +287,7 @@ struct QuantityWidget : VirtualWidget {
 	A precision of 2 will display as "1.00" for example.
 	*/
 	int precision = 2;
+   float revert_val = INVALID_REVERT_VAL;  // value at drag start (Knob, Slider)
 
 	QuantityWidget();
 	void setValue(float value);
@@ -293,6 +295,7 @@ struct QuantityWidget : VirtualWidget {
 	void setDefaultValue(float defaultValue);
 	/** Generates the display value */
 	std::string getText();
+   void onMouseLeave(EventMouseLeave &e) override;
 };
 
 

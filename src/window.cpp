@@ -457,6 +457,67 @@ void vst2_editor_redraw(void) {
 
    global_ui->window.gGuiFrame++;
 
+   // Find/validate hover param
+   if(NULL != global_ui->param_info.last_param_widget)
+   {
+      int uniqueParamId;
+      ParamWidget *paramWidget =
+         global_ui->app.gRackWidget->findParamWidgetAndUniqueParamIdByWidgetRef(global_ui->param_info.last_param_widget,
+                                                                                &uniqueParamId
+                                                                                );
+      if(NULL != paramWidget)
+      {
+         global_ui->param_info.last_param_gid = uniqueParamId;
+         global_ui->param_info.last_param_value = paramWidget->value;
+
+#if 0
+         printf("xxx vst2_editor_redraw: param_info: uniqueParamId=%d value=%f clipboardValue=%f\n",
+                global_ui->param_info.last_param_gid,
+                global_ui->param_info.last_param_value,
+                global_ui->param_info.value_clipboard
+                );
+#endif
+
+         char buf[64];
+         sprintf(buf, "%d", global_ui->param_info.last_param_gid);
+         global_ui->param_info.tf_id->setTextQuiet(buf);
+         sprintf(buf, "%f", global_ui->param_info.last_param_value);
+
+         // Delete trailing zeros
+         {
+            char *d = buf;
+            while(0 != *d)
+               d++;
+            d--;
+            if(d > buf)
+            {
+               while('0' == *d)
+               {
+                  if(((d-1) > buf) && ('.' != d[-1]))
+                     *d-- = 0;
+                  else
+                     break;
+               }
+            }
+         }
+
+         global_ui->param_info.tf_value->setTextQuiet(buf);
+      }
+
+      global_ui->param_info.last_param_widget = NULL;
+      global_ui->param_info.placeholder_framecount = 1;
+   }
+   else if(0 != global_ui->param_info.placeholder_framecount)
+   {
+      if(++global_ui->param_info.placeholder_framecount > (30*30))
+      {
+         global_ui->param_info.tf_id->setTextQuiet("");
+         global_ui->param_info.tf_value->setTextQuiet("");
+         global_ui->param_info.placeholder_framecount = 0;
+      }
+   }
+   
+
 #if 0
    // Set window title
    //  (note) the VST plugin editor window title is set by the VST host

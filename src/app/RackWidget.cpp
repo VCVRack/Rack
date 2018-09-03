@@ -80,6 +80,7 @@ void RackWidget::clear() {
 	global_ui->app.gRackScene->scrollWidget->offset = Vec(0, 0);
 #ifdef USE_VST2
    global->vst2.next_unique_param_base_id = 1;
+   global_ui->param_info.placeholder_framecount = (30*30)-1;
 #endif // USE_VST2
 }
 
@@ -530,6 +531,11 @@ void RackWidget::fromJson(json_t *rootJ) {
 	if (!message.empty()) {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
+
+#ifdef USE_VST2
+   global_ui->param_info.placeholder_framecount = (30*30)-10;
+   global_ui->param_info.last_param_widget = NULL;
+#endif // USE_VST2
 }
 
 void RackWidget::addModule(ModuleWidget *m) {
@@ -553,6 +559,19 @@ ModuleWidget *RackWidget::findModuleWidgetByModule(Module *_module) {
          return moduleWidget;
    }
    return NULL;   
+}
+
+ParamWidget *RackWidget::findParamWidgetAndUniqueParamIdByWidgetRef(const ParamWidget *ref, int *retUniqueParamId) {
+	for(Widget *w : moduleContainer->children) {
+		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
+      for(ParamWidget *param : moduleWidget->params) {
+         if( (void*)param == (void*)ref ) {
+            *retUniqueParamId = moduleWidget->module->vst2_unique_param_base_id + param->paramId;
+            return param;
+         }
+      }
+   }
+   return NULL;
 }
 
 void RackWidget::cloneModule(ModuleWidget *m) {

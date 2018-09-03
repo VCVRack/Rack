@@ -13,6 +13,7 @@ static const float KNOB_SENSITIVITY = 0.0015f;
 Knob::Knob() {
 	// smooth = true;
 	smooth = false;  // xxx
+   revert_val = INVALID_REVERT_VAL;
 }
 
 void Knob::onDragStart(EventDragStart &e) {
@@ -20,6 +21,7 @@ void Knob::onDragStart(EventDragStart &e) {
    // printf("xxx Knob::onDragStart: value=%f\n", value);
    dragValue = value;
 	randomizable = false;
+   revert_val = value;
 }
 
 void Knob::onDragMove(EventDragMove &e) {

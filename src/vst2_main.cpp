@@ -77,7 +77,7 @@ extern void vst2_editor_redraw (void);
 extern void vst2_set_samplerate (sF32 _rate);
 extern void vst2_engine_process (float *const*_in, float **_out, unsigned int _numFrames);
 extern void vst2_process_midi_input_event (sU8 _a, sU8 _b, sU8 _c);
-extern void vst2_queue_param (int uniqueParamId, float normValue);
+extern void vst2_queue_param (int uniqueParamId, float value, bool bNormalized);
 extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
@@ -602,6 +602,8 @@ public:
       }
 
       b_editor_open = true;
+      rack::global_ui->param_info.placeholder_framecount = (30*30)-10;
+      rack::global_ui->param_info.last_param_widget = NULL;
    }
 
    void closeEditor(void) {
@@ -1828,8 +1830,19 @@ void VSTPluginSetParameter(VSTPlugin *vstPlugin,
 
    wrapper->lockAudio();
    wrapper->setGlobals();
-   vst2_queue_param(index, parameter);
+   vst2_queue_param(index, parameter, true/*bNormalized*/);
    wrapper->unlockAudio();
+}
+
+void vst2_queue_param_sync(int _uniqueParamId, float _value, bool _bNormalized) {
+   // Called when parameter is edited numerically via textfield
+   printf("xxx vst2_queue_param_sync ENTER: uniqueParamId=%d value=%f bNormalized=%d\n", _uniqueParamId, _value, _bNormalized);
+   VSTPluginWrapper *wrapper = rack::global->vst2.wrapper;
+
+   wrapper->lockAudio();
+   vst2_queue_param(_uniqueParamId, _value, _bNormalized);
+   wrapper->unlockAudio();
+   printf("xxx vst2_queue_param_sync LEAVE\n");
 }
 
 

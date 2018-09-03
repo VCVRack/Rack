@@ -133,11 +133,21 @@ void TextField::onKey(EventKey &e) {
          break;
 
 		case LGLW_VKEY_HOME:
-			selection = cursor = 0;
+			if(windowIsShiftPressed()) {
+            cursor = 0;
+         }
+         else {
+            selection = cursor = 0;
+         }
          break;
 
 		case LGLW_VKEY_END:
-			selection = cursor = text.size();
+			if(windowIsShiftPressed()) {
+            cursor = text.size();
+         }
+         else {
+            selection = cursor = text.size();
+         }
          break;
 
 		case 'v':
@@ -196,6 +206,18 @@ void TextField::onKey(EventKey &e) {
 			}
          break;
 
+		case 'w':
+			if (windowIsModPressed()) {
+            return; // don't consume ctrl-w (copy param value)
+			}
+         break;
+
+		case 'e':
+			if (windowIsModPressed()) {
+            return; // don't consume ctrl-e (paste param value)
+			}
+         break;
+
 		case LGLW_VKEY_RETURN:
          // printf("xxx TextField::onKey: RETURN\n");
 			if (multiline) {
@@ -210,6 +232,7 @@ void TextField::onKey(EventKey &e) {
             }
 #endif // RACK_HOST
 				onAction(e);
+            onTextEnter();
 			}
          break;
 	}
@@ -235,6 +258,11 @@ void TextField::setText(std::string text) {
 	this->text = text;
 	selection = cursor = text.size();
 	onTextChange();
+}
+
+void TextField::setTextQuiet(std::string text) {
+	this->text = text;
+	selection = cursor = text.size();
 }
 
 int TextField::getTextPosition(Vec mousePos) {

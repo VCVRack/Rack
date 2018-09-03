@@ -37,7 +37,8 @@ struct VSTMidiInputDevice;
 
 struct VST2QueuedParam {
    int   unique_id;
-   float norm_value;
+   float value;
+   bool  b_normalized;
 };
 
 struct Global {

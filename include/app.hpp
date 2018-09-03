@@ -189,6 +189,8 @@ struct RackWidget : OpaqueWidget {
 	void onMouseMove(EventMouseMove &e) override;
 	void onMouseDown(EventMouseDown &e) override;
 	void onZoom(EventZoom &e) override;
+
+   ParamWidget *findParamWidgetAndUniqueParamIdByWidgetRef (const ParamWidget *ref, int *retUniqueParamId);
 };
 
 struct RackRail : TransparentWidget {
@@ -246,6 +248,7 @@ struct ParamWidget : Component, QuantityWidget {
 	virtual void randomize();
 	void onMouseDown(EventMouseDown &e) override;
 	void onChange(EventChange &e) override;
+	void onMouseMove(EventMouseMove &e) override;
 
 	template <typename T = ParamWidget>
 	static T *create(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
