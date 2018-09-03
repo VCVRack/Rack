@@ -32,7 +32,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-02Sep2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-02Sep2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-03Sep2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-03Sep2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
@@ -777,7 +777,7 @@ $ mv <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll
 ## Dynamically loaded plugins (via plugin SDK)
 
 1. Install the `Microsoft Visual Studio 2017 Community Edition` IDE
-2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-14Jul2018.7z)
+2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-03Sep2018.7z)
 3. Open the solution file (`example\Template_shared\vs2017\Template_shared\Template_shared.sln`)
 4. Make sure that the `Release` / `x64` configuration is selected
 5. Rebuild the solution to create the "plugin.dll" file.

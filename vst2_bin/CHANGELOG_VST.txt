@@ -1,3 +1,13 @@
+** September 3rd, 2018
+- ui: remove email, password, and login widgets
+- ui: add vst param id + param value fields
+- ui: ctrl-w / ctrl-e over a param widget now copies / pastes param values
+- ui: RMB click after param widget mouse drag now undoes last param change
+       (undo works until the mouse pointer leaves the widget)
+       (second RMB click will load param reset value)
+- update precompiled plugin SDK
+
+
 ** September 2nd, 2018
 - update module bsp.Scanner
    - add input randomization feature
