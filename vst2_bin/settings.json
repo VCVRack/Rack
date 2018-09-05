@@ -1,7 +1,7 @@
 {
   "token": "",
   "windowSize": [
-    1266.0,
+    1272.0,
     820.0
   ],
   "windowPos": [
@@ -9,93 +9,85 @@
     0.0
   ],
   "wireOpacity": 50.0,
-  "wireTension": 0.94,
+  "wireTension": 0.939999998,
   "zoom": 1.0,
   "refreshRate": 30,
   "vsync": true,
-  "allowCursorLock": true,
   "touchInput": false,
   "touchKbd": false,
-  "sampleRate": 44100.0,
   "oversampleFactor": 1.0,
-  "oversampleQuality": 7.0,
+  "oversampleQuality": 7,
+  "oversampleOfflineFactor": 16.0,
+  "oversampleOfflineQuality": 10,
+  "oversampleOffline": false,
   "oversampleNumIn": 8.0,
   "oversampleNumOut": 8.0,
-  "oversampleOffline": false,
-  "oversampleOfflineFactor": 16.0,
-  "oversampleOfflineQuality": 10.0,
   "idleDetectInstr": 1,
   "idleDetectFx": 2,
+  "allowCursorLock": true,
+  "sampleRate": 44100.0,
   "lastPath": "",
   "moduleBrowser": {
     "favorites": [
-      {
-        "plugin": "21kHz",
-        "model": "kHzD_Inf"
-      },
-      {
-        "plugin": "Template_shared",
-        "model": "MyModule"
-      },
-      {
-        "plugin": "Alikins",
-        "model": "SpecificValue"
-      },
       {
         "plugin": "AS",
         "model": "ADSR"
       },
       {
         "plugin": "AS",
-        "model": "AtNuVrTr"
+        "model": "TriLFO"
       },
       {
         "plugin": "AS",
-        "model": "TriLFO"
+        "model": "AtNuVrTr"
+      },
+      {
+        "plugin": "21kHz",
+        "model": "kHzD_Inf"
+      },
+      {
+        "plugin": "Alikins",
+        "model": "SpecificValue"
+      },
+      {
+        "plugin": "Core",
+        "model": "Notes"
       },
       {
         "plugin": "AudibleInstruments",
         "model": "Clouds"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Braids"
+        "plugin": "Autodafe",
+        "model": "Multiple 1x8"
       },
       {
         "plugin": "AudibleInstruments",
         "model": "Elements"
       },
       {
-        "plugin": "Autodafe",
-        "model": "Multiple 1x8"
+        "plugin": "AudibleInstruments",
+        "model": "Braids"
       },
       {
-        "plugin": "Befaco",
-        "model": "Mixer"
-      },
-      {
-        "plugin": "Befaco",
-        "model": "SlewLimiter"
+        "plugin": "Bidoo",
+        "model": "lIMbO"
       },
       {
         "plugin": "Bidoo",
         "model": "Σ"
       },
       {
+        "plugin": "Befaco",
+        "model": "Mixer"
+      },
+      {
         "plugin": "Bidoo",
         "model": "rabBIT"
       },
       {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Mult"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Noise"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-VCAmp"
+        "plugin": "Befaco",
+        "model": "SlewLimiter"
       },
       {
         "plugin": "Bogaudio",
@@ -103,75 +95,47 @@
       },
       {
         "plugin": "Bogaudio",
-        "model": "Bogaudio-SampleHold"
-      },
-      {
-        "plugin": "Bogaudio",
         "model": "Bogaudio-Switch"
       },
       {
         "plugin": "Bogaudio",
-        "model": "Bogaudio-XFade"
+        "model": "Bogaudio-Noise"
       },
       {
-          "plugin": "bsp",
-          "model": "AttenuMixer"
-      },
-      {
-          "plugin": "bsp",
-          "model": "Obxd_VCF"
-      },
-      {
-          "plugin": "bsp",
-          "model": "Scanner"
-      },
-      {
-          "plugin": "bsp",
-          "model": "Sway"
-      },
-      {
-          "plugin": "bsp",
-          "model": "TunedDelayLine"
-      },
-      {
-        "plugin": "HetrickCV",
-        "model": "Exponent"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-SampleHold"
       },
       {
         "plugin": "DHE-Modules",
         "model": "Cubic"
       },
       {
-        "plugin": "FrankBussFormula",
-        "model": "FrankBussFormula"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-VCAmp"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Mult"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-XFade"
+      },
+      {
+        "plugin": "HetrickCV",
+        "model": "Exponent"
       },
       {
         "plugin": "JE",
         "model": "RingModulator"
       },
       {
+        "plugin": "huaba",
+        "model": "EQ3"
+      },
+      {
         "plugin": "Fundamental",
         "model": "Scope"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "LFO"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "LFO2"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCO"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCO2"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCF"
       },
       {
         "plugin": "Fundamental",
@@ -183,15 +147,43 @@
       },
       {
         "plugin": "Fundamental",
+        "model": "LFO2"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCO2"
+      },
+      {
+        "plugin": "ErraticInstruments",
+        "model": "MPEToCV"
+      },
+      {
+        "plugin": "Fundamental",
         "model": "VCMixer"
       },
       {
-        "plugin": "huaba",
-        "model": "EQ3"
+        "plugin": "FrankBussFormula",
+        "model": "FrankBussFormula"
       },
       {
-        "plugin": "HetrickCV",
-        "model": "Exponent"
+        "plugin": "Fundamental",
+        "model": "VCO"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCF"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "LFO"
+      },
+      {
+        "plugin": "mscHack",
+        "model": "Maude221"
+      },
+      {
+        "plugin": "ML_modules",
+        "model": "VoltMeter"
       },
       {
         "plugin": "LindenbergResearch",
@@ -203,19 +195,15 @@
       },
       {
         "plugin": "LindenbergResearch",
-        "model": "MS20 VCF"
-      },
-      {
-        "plugin": "LindenbergResearch",
         "model": "Westcoast VCS"
       },
       {
-        "plugin": "ML_modules",
-        "model": "VoltMeter"
+        "plugin": "LindenbergResearch",
+        "model": "MS20 VCF"
       },
       {
-        "plugin": "mscHack",
-        "model": "Maude221"
+        "plugin": "PG-Instruments",
+        "model": "PGVCF"
       },
       {
         "plugin": "PG-Instruments",
@@ -226,12 +214,36 @@
         "model": "Abr"
       },
       {
+        "plugin": "bsp",
+        "model": "Obxd_VCF"
+      },
+      {
+        "plugin": "bsp",
+        "model": "Sway"
+      },
+      {
+        "plugin": "bsp",
+        "model": "Scanner"
+      },
+      {
+        "plugin": "Template_shared",
+        "model": "MyModule"
+      },
+      {
+        "plugin": "bsp",
+        "model": "TunedDelayLine"
+      },
+      {
         "plugin": "Valley",
         "model": "Dexter"
       },
       {
         "plugin": "Valley",
         "model": "Plateau"
+      },
+      {
+        "plugin": "bsp",
+        "model": "AttenuMixer"
       }
     ]
   },

@@ -32,7 +32,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-03Sep2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-03Sep2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-05Sep2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-05Sep2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
@@ -50,7 +50,10 @@ see [vst2_bin/CHANGELOG_VST.txt](vst2_bin/CHANGELOG_VST.txt)
 
 # Demo Video
 
-Here are some demo videos of it: https://vimeo.com/277703414 (early version), https://vimeo.com/287875320 (guitar synthesis sound demo).
+Here are some demo videos of it:
+ - https://vimeo.com/277703414 (early version)
+ - https://vimeo.com/287875320 (guitar synthesis sound demo).
+ - https://vimeo.com/288076107 (tuned delay line ambient pad drone)
 
 
 # Add-on modules
@@ -80,7 +83,7 @@ The binary distribution contains the following (22) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (632) add-on modules are statically linked with the VST plugin:
+The following (638) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -126,6 +129,7 @@ The following (632) add-on modules are statically linked with the VST plugin:
  - AS.Multiple2.5
  - AS.PhaserFx
  - AS.QuadVCA
+ - AS.ReScale
  - AS.ReverbFx
  - AS.ReverbStereoFx
  - AS.SEQ16
@@ -139,6 +143,7 @@ The following (632) add-on modules are statically linked with the VST plugin:
  - AS.TriLFO
  - AS.TriggersMKI
  - AS.TriggersMKII
+ - AS.TriggersMKIII
  - AS.VCA
  - AS.WaveShaper
  - AS.StereoVUmeter
@@ -250,7 +255,6 @@ The following (632) add-on modules are statically linked with the VST plugin:
  - Bogaudio.Sums
  - Bogaudio.Switch
  - Bogaudio.Lag
- - Bogaudio.RM
  - Bogaudio.Test
  - Bogaudio.Test2
  - Bogaudio.ThreeHP
@@ -265,6 +269,10 @@ The following (632) add-on modules are statically linked with the VST plugin:
  - Bogaudio.TwentyTwoHP
  - Bogaudio.TwentyFiveHP
  - Bogaudio.ThirtyHP
+ - BogAudio.AD
+ - BogAudio.AMRM
+ - BogAudio.Matrix88
+ - BogAudio.UMix
  - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ
@@ -420,6 +428,7 @@ The following (632) add-on modules are statically linked with the VST plugin:
  - LindenbergResearch.ReShaper
  - LindenbergResearch.BlankPanel
  - LindenbergResearch.BlankPanelM1
+ - LindenbergResearch.BlankPanelWood
  - LindenbergResearch.VCO
  - LindenbergResearch.Westcoast (preview)
  - LOGinstruments.constant

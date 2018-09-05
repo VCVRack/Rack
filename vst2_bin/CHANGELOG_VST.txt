@@ -1,3 +1,26 @@
+** September 5th, 2018
+- ui: add global settings toolbar menu
+   - select window size preset
+   - change refresh rate
+   - toggle vsync
+   - save settings.json (including favourites)
+- ui: fix MsDisplayWidget namespace issue 
+   - affects e.g. AS.SignalDelay module
+- update module AS.Flow (v0.6.9)
+- update module AS.SignalDelay
+- update module AS.Phaser
+- add module AS.TriggersMKIII
+- add module AS.ReScale
+- remove module BogAudio.RM
+- add module BogAudio.AD
+- add module BogAudio.AMRM
+- add module BogAudio.Matrix88
+- add module BogAudio.UMix
+- update module LindenbergResearch.QuickMix
+- update module LindenbergResearch.MS20VCF
+- add module LindenbergResearch.BlankPanelWood
+
+
 ** September 3rd, 2018
 - ui: remove email, password, and login widgets
 - ui: add vst param id + param value fields
