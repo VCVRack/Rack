@@ -20,7 +20,7 @@ struct SpecificValue : Module
     };
     enum InputIds
     {
-    	VALUE1_INPUT,
+      VALUE1_INPUT,
         NUM_INPUTS
     };
     enum OutputIds
@@ -431,7 +431,7 @@ SmallPurpleTrimpot::SmallPurpleTrimpot() : Trimpot() {
 }
 
 struct PurpleTrimpot : Trimpot {
-	Module *module;
+   Module *module;
     bool initialized = false;
     PurpleTrimpot();
     void step() override;
@@ -450,22 +450,34 @@ PurpleTrimpot::PurpleTrimpot() : Trimpot() {
 //        over the trimpot, we kind of jitter arround.
 // maybe run this via an onChange()?
 void PurpleTrimpot::step() {
-	//debug("paramId=%d this->initialized: %d initialized: %d this->value: %f value: %f param.value: %f",
+   //debug("paramId=%d this->initialized: %d initialized: %d this->value: %f value: %f param.value: %f",
      // paramId,  this->initialized, initialized, this->value, value, module->params[paramId].value);
 
-    if (this->value != module->params[paramId].value) {
-       if (this != RACK_PLUGIN_UI_HOVERED_WIDGET && this->initialized) {
-			// this->value = module->params[paramId].value;
-			setValue(module->params[paramId].value);
-		} else {
-			module->params[paramId].value = this->value;
+   if(module->inputs[SpecificValue::VALUE1_INPUT].active)
+   {
+      if (this->value != module->params[paramId].value) {
+         if (this != RACK_PLUGIN_UI_HOVERED_WIDGET && this->initialized) {
+         // //    // this->value = module->params[paramId].value;
+             setValue(module->params[paramId].value);
+         }
+         else
+         {
+            module->params[paramId].value = this->value;
             this->initialized |= true;
-		}
-		EventChange e;
-		onChange(e);
-	}
+            EventChange e;
+            onChange(e);
+         }
+      }
+   }
+   else
+   {
+      module->params[paramId].value = this->value;
+      this->initialized |= true;
+      EventChange e;
+      onChange(e);
+   }
 
-	Trimpot::step();
+   Trimpot::step();
 }
 
 void PurpleTrimpot::reset() {
@@ -627,7 +639,7 @@ void SpecificValueWidget::step() {
             prev_octave = module->params[SpecificValue::OCTAVE_PARAM].value;
             prev_input = module->params[SpecificValue::VALUE1_INPUT].value;
             EventChange e;
-		    onChange(e);
+          onChange(e);
     }
 }
 

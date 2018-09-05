@@ -1,6 +1,7 @@
 #include <sstream>
 #include <iomanip>
 
+namespace rack_plugin_Alikins {
 
 //  From AS DelayPlus.cpp https://github.com/AScustomWorks/AS
 struct MsDisplayWidget : TransparentWidget {
@@ -47,3 +48,4 @@ struct MsDisplayWidget : TransparentWidget {
   }
 };
 
+} // namespace rack_plugin_Alikins
