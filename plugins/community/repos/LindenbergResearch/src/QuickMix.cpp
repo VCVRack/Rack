@@ -1,10 +1,59 @@
-#include <dsp/functions.hpp>
+#include "dsp/functions.hpp"
+#include "dsp/DSPMath.hpp"
 #include "LindenbergResearch.hpp"
 
 using namespace rack;
 using namespace lrt;
 
 namespace rack_plugin_LindenbergResearch {
+
+struct ShapedVCA {
+
+    float shapeExp(float x) {
+        float y = powf(x, 7);
+
+        if (x > 1) {
+            y = tanh(y) * 5; // limit exp curve
+        }
+
+        return y;
+    }
+
+
+    float shapeLog(float x) {
+        return tanh(6 * x);
+    }
+
+
+    float shapeLin(float x) {
+        return x;
+    }
+
+
+    /**
+     * @brief Returns the correct weighted gain value
+     * @param gain Input gain 0 <= x < 1
+     * @param shape Mixing value of the given shapes (LOG->LIN->EXP) -1 <= x < 1
+     * @return Weighted gain coefficent
+     */
+    float getWeightedGain(float gain, float shape) {
+        float y = 0;
+
+        if (shape < 0 && shape >= -1) {
+           y = dsp::fade2(shapeLog(gain), shapeLin(gain), shape + 1);
+        } else if (shape <= 1 && shape >= 0) {
+           y = dsp::fade2(shapeLin(gain), shapeExp(gain), shape);
+        }
+
+        return y;
+    }
+
+
+    float compute(float in, float gain, float shape) {
+        return in * getWeightedGain(gain, shape);
+    }
+
+};
 
 struct QuickMix : Module {
    enum ParamIds {
@@ -36,12 +85,12 @@ struct QuickMix : Module {
       LEVEL3_LIGHT,
       LEVEL4_LIGHT,
       LEVEL5_LIGHT,
-      LEVELM_LIGHT,
       NUM_LIGHTS
    };
 
 
     float lightVals[NUM_LIGHTS];
+    ShapedVCA vca;
    QuickMix() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 
 
@@ -52,22 +101,32 @@ struct QuickMix : Module {
 void QuickMix::step() {
    float out = 0;
    /* lights */
-   for (int i = 0; i < NUM_LIGHTS - 1; i++) {
-        lightVals[i] = (lightVals[i] + (abs(quadraticBipolar(params[i].value)) * abs(inputs[i].value) / 10)) / 2;
-        lights[i].value = lightVals[i];
-   }
+    for (int i = 0; i < NUM_LIGHTS - 1; i++) {
+        lightVals[i] = clamp(inputs[i].value * abs(quadraticBipolar(params[i].value)) / 6, 0.f, 1.f);
 
-   /* mixup all signals */
-   for (int i = 0; i < NUM_INPUTS; i++) {
-      out += inputs[i].value * quadraticBipolar(params[i].value);
-   }
+        if (inputs[i].active) {
+            lights[i].setBrightnessSmooth(lightVals[i]);
+        } else {
+            lights[i].value = 0;
+        }
+    }
 
-   /* master out light */
-    //lights[LEVELM_LIGHT].value = quadraticBipolar(params[LEVELM_PARAM].value) * out / 10;
+    /* mixup all signals */
+    for (int i = 0; i < NUM_INPUTS; i++) {
+        out += inputs[i].value * quadraticBipolar(params[i].value);
+    }
 
-   out *= quadraticBipolar(params[LEVELM_PARAM].value);
+    /* VCA mode active */
+    if (inputs[CV_INPUT].active) {
+        float cv = inputs[CV_INPUT].value / 5;
 
-   outputs[MASTER_OUTPUT].value = out;
+        out = vca.getWeightedGain(cv, params[SHAPE_PARAM].value);
+    }
+
+//    out *= quadraticBipolar(params[LEVELM_PARAM].value) * 2;
+    out *= params[LEVELM_PARAM].value;
+
+    outputs[MASTER_OUTPUT].value = out;
 }
 
 
@@ -102,7 +161,7 @@ QuickMixWidget::QuickMixWidget(QuickMix *module) : LRModuleWidget(module) {
 
     addParam(ParamWidget::create<LRSmallKnob>(Vec(62.3, 242.0), module, QuickMix::SHAPE_PARAM, -1.f, 1.f, 0.f));
 
-    addParam(ParamWidget::create<LRSmallKnob>(Vec(18.8, 305.8), module, QuickMix::LEVELM_PARAM, -3.f, 3.f, 1.f));
+    addParam(ParamWidget::create<LRSmallKnob>(Vec(18.8, 305.8), module, QuickMix::LEVELM_PARAM, 0.f, 1.f, 0.5f));
     // ***** MAIN KNOBS ******
 
     // ***** INPUTS **********
@@ -117,15 +176,14 @@ QuickMixWidget::QuickMixWidget(QuickMix *module) : LRModuleWidget(module) {
 
     // ***** OUTPUTS *********
     addOutput(Port::create<LRIOPort>(Vec(60.9, 304.8), Port::OUTPUT, module, QuickMix::MASTER_OUTPUT));
-   // ***** OUTPUTS *********
 
 
     // ***** LIGHTS **********
-    addChild(ModuleLightWidget::create<LRLight>(Vec(47.5, 61.3), module, QuickMix::LEVEL1_LIGHT));
-    addChild(ModuleLightWidget::create<LRLight>(Vec(47.5, 96.3), module, QuickMix::LEVEL2_LIGHT));
-    addChild(ModuleLightWidget::create<LRLight>(Vec(47.5, 131.3), module, QuickMix::LEVEL3_LIGHT));
-    addChild(ModuleLightWidget::create<LRLight>(Vec(47.5, 166.3), module, QuickMix::LEVEL4_LIGHT));
-    addChild(ModuleLightWidget::create<LRLight>(Vec(47.5, 201.3), module, QuickMix::LEVEL5_LIGHT));
+    addChild(ModuleLightWidget::create<LRLight>(Vec(47., 61.3), module, QuickMix::LEVEL1_LIGHT));
+    addChild(ModuleLightWidget::create<LRLight>(Vec(47., 96.3), module, QuickMix::LEVEL2_LIGHT));
+    addChild(ModuleLightWidget::create<LRLight>(Vec(47., 131.3), module, QuickMix::LEVEL3_LIGHT));
+    addChild(ModuleLightWidget::create<LRLight>(Vec(47., 166.3), module, QuickMix::LEVEL4_LIGHT));
+    addChild(ModuleLightWidget::create<LRLight>(Vec(47., 201.3), module, QuickMix::LEVEL5_LIGHT));
 
 
     // addChild(ModuleLightWidget::create<LRLight>(Vec(47.5, 304.6), module, QuickMix::LEVEL6_LIGHT));
@@ -138,6 +196,6 @@ QuickMixWidget::QuickMixWidget(QuickMix *module) : LRModuleWidget(module) {
 using namespace rack_plugin_LindenbergResearch;
 
 RACK_PLUGIN_MODEL_INIT(LindenbergResearch, QuickMix) {
-   Model *modelQuickMix = Model::create<QuickMix, QuickMixWidget>("Lindenberg Research", "QuickMixer", "Q: Quick Mixer", MIXER_TAG);
+   Model *modelQuickMix = Model::create<QuickMix, QuickMixWidget>("Lindenberg Research", "QuickMixer", "VC Mixer Amp", MIXER_TAG);
    return modelQuickMix;
 }

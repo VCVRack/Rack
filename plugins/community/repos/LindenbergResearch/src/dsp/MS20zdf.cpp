@@ -64,6 +64,6 @@ void MS20zdf::process() {
  * @param sr sample rate
  */
 MS20zdf::MS20zdf(float sr) : DSPSystem(sr) {
-    rs = new Resampler<1>(OVERSAMPLE);
+    rs = new Resampler<1>(OVERSAMPLE, 8);
 }
 

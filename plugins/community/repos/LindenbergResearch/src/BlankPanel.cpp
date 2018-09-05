@@ -66,6 +66,6 @@ BlankPanelWidget::BlankPanelWidget(BlankPanel *module) : LRModuleWidget(module) 
 using namespace rack_plugin_LindenbergResearch;
 
 RACK_PLUGIN_MODEL_INIT(LindenbergResearch, BlankPanel) {
-   Model *modelBlankPanel = Model::create<BlankPanel, BlankPanelWidget>("Lindenberg Research", "BlankPanel 01", "Blank Panel 20TE", BLANK_TAG);
+Model *modelBlankPanel = Model::create<BlankPanel, BlankPanelWidget>("Lindenberg Research", "BlankPanel 01", "Blank: Logo", BLANK_TAG);
    return modelBlankPanel;
 }

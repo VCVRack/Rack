@@ -181,6 +181,11 @@ namespace dsp {
     */
    template<int CHANNELS>
    struct Resampler {
+    struct Vector {
+        double y0, y1;
+    };
+
+    Vector y[CHANNELS] = {};
       double up[CHANNELS][RS_BUFFER_SIZE] = {};
       double data[CHANNELS][RS_BUFFER_SIZE] = {};
 
@@ -209,12 +214,28 @@ namespace dsp {
       }
 
 
-      /**
-       * @brief Create up-sampled data out of two basic values
-       */
-      void doUpsample(int channel, double in) {
-         interpolator[channel]->process(in * UPSAMPLE_COMPENSATION, up[channel]);
-      }
+    /**
+     * @brief Return linear interpolated position
+     * @param point Point in oversampled data
+     * @return
+     */
+    double interpolate(int channel, int point) {
+        return y[channel].y0 + (point / getFactor()) * (y[channel].y1 - y[channel].y0);
+    }
+
+
+    /**
+     * @brief Create up-sampled data out of two basic values
+     */
+    void doUpsample(int channel, double in) {
+        // interpolator[channel]->process(in * UPSAMPLE_COMPENSATION, up[channel]);
+        y[channel].y0 = y[channel].y1;
+        y[channel].y1 = in;
+
+        for (int i = 0; i < getFactor(); i++) {
+            up[channel][i] = interpolate(channel, i + 1);
+        }
+    }
 
 
       /**

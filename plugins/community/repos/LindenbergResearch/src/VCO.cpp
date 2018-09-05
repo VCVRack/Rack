@@ -94,7 +94,7 @@ void VCO::step() {
 
     /* for LFO mode */
     if (osc->isLFO())
-        lights[LFO_LIGHT].value = (osc->getTriWave() + 2.5f) / 10.f;
+        lights[LFO_LIGHT].setBrightnessSmooth(osc->getSineWave() / 10.f + 0.3f);
     else lights[LFO_LIGHT].value = 0.f;
 
     lcd->active = osc->isLFO();

@@ -42,8 +42,8 @@
             <circle id="Circle_4_5" serif:id="Circle_4_" cx="72.995" cy="181.659" r="11.474" style="fill:#323232;"/>
         </g>
         <g id="ScaleSmall_3_6" serif:id="ScaleSmall_3_" transform="matrix(-1,0,0,1,96.4955,136.57)">
-            <g id="OuterCircle_4_6" serif:id="OuterCircle_4_" transform="matrix(0.871536,0,0,0.871536,9.37732,23.2294)">
-                <path d="M66.295,194.337c-4.545,-2.404 -7.642,-7.182 -7.642,-12.684c0,-7.92 6.422,-14.343 14.342,-14.343c7.921,0 14.343,6.423 14.343,14.343c0,5.459 -3.05,10.206 -7.538,12.628" style="fill:none;stroke:#d63e3e;stroke-opacity:0.65098;stroke-width:4.93px;"/>
+            <g id="OuterCircle_4_6" serif:id="OuterCircle_4_" transform="matrix(0.941258,0,0,0.941258,4.28787,10.6218)">
+                <path d="M66.295,194.337c-4.545,-2.404 -7.642,-7.182 -7.642,-12.684c0,-7.92 6.422,-14.343 14.342,-14.343c7.921,0 14.343,6.423 14.343,14.343c0,5.459 -3.05,10.206 -7.538,12.628" style="fill:#292929;stroke:#7a2323;stroke-width:6.91px;"/>
             </g>
             <circle id="Circle_4_6" serif:id="Circle_4_" cx="72.995" cy="181.659" r="11.474" style="fill:#323232;"/>
         </g>

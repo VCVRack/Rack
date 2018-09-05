@@ -211,5 +211,5 @@ void LadderFilter::setLightValue(float lightValue) {
 
 
 LadderFilter::LadderFilter(float sr) : DSPEffect(sr) {
-    rs = new Resampler<1>(OVERSAMPLE);
+    rs = new Resampler<1>(OVERSAMPLE, 8);
 }

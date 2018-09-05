@@ -359,6 +359,18 @@ inline double sign(double x) {
 
 
 /**
+ * @brief Signum function
+ * @param x
+ * @return
+ */
+inline float sign(float x) {
+    if (x > 0) return 1;
+    if (x < 0) return -1;
+    return 0;
+}
+
+
+/**
  * @brief Lambert-W function using Halley's method
  *        see: http://smc2017.aalto.fi/media/materials/proceedings/SMC17_p336.pdf
  * @param x

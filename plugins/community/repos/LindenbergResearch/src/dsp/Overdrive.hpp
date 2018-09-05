@@ -10,7 +10,8 @@ namespace dsp {
 
       Noise *noise;
 
-   public:
+
+public:
 
       explicit Overdrive(float sr);
 

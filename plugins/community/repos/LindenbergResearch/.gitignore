@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+plugin.dylib
+
+*.[oa]
+.idea/
+build/
+cmake-build-debug/
+dist/
+cmake-build-release/
+res/Untitled.afdesign

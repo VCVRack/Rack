@@ -9,7 +9,7 @@ namespace dsp {
 
    struct LadderFilter : DSPEffect {
 
-      static const int OVERSAMPLE = 8;                // factor of internal oversampling
+    static const int OVERSAMPLE = 4;                // factor of internal oversampling
       static constexpr float NOISE_GAIN = 10e-10f;    // internal noise gain used for self-oscillation
       static constexpr float INPUT_GAIN = 20.f;       // input level
 
