@@ -22,6 +22,10 @@ struct Knob16 : BGKnob {
 	Knob16();
 };
 
+struct Knob19 : BGKnob {
+	Knob19();
+};
+
 struct Knob26 : BGKnob {
 	Knob26();
 };
@@ -32,6 +36,10 @@ struct Knob29 : BGKnob {
 
 struct Knob38 : BGKnob {
 	Knob38();
+};
+
+struct Knob45 : BGKnob {
+	Knob45();
 };
 
 struct Knob68 : BGKnob {

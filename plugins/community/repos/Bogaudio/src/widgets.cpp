@@ -5,7 +5,6 @@
 using namespace bogaudio;
 using namespace bogaudio::dsp;
 
-
 Button18::Button18() {
 	addFrame(SVG::load(assetPlugin(plugin, "res/button_18px_0.svg")));
 	addFrame(SVG::load(assetPlugin(plugin, "res/button_18px_1.svg")));
@@ -27,6 +26,11 @@ Knob16::Knob16() : BGKnob("res/knob_16px.svg", 16) {
 }
 
 
+Knob19::Knob19() : BGKnob("res/knob_19px.svg", 19) {
+	shadow->box.pos = Vec(0.0, 2.5);
+}
+
+
 Knob26::Knob26() : BGKnob("res/knob_26px.svg", 26) {
 }
 
@@ -36,6 +40,10 @@ Knob29::Knob29() : BGKnob("res/knob_29px.svg", 29) {
 
 
 Knob38::Knob38() : BGKnob("res/knob_38px.svg", 38) {
+}
+
+
+Knob45::Knob45() : BGKnob("res/knob_45px.svg", 45) {
 }
 
 

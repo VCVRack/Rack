@@ -1,10 +1,13 @@
 
 #include "bogaudio.hpp"
 
+#include "AD.hpp"
 #include "ADSR.hpp"
 #include "Additator.hpp"
+#include "AMRM.hpp"
 #include "Analyzer.hpp"
 #include "Bool.hpp"
+#include "Cmp.hpp"
 #include "CVD.hpp"
 #include "DADSRH.hpp"
 #include "DADSRHPlus.hpp"
@@ -17,13 +20,13 @@
 #include "LFO.hpp"
 #include "Lag.hpp"
 #include "Manual.hpp"
+#include "Matrix88.hpp"
 #include "Mix4.hpp"
 #include "Mix8.hpp"
 #include "Mult.hpp"
 #include "Noise.hpp"
 #include "Offset.hpp"
 #include "Pan.hpp"
-#include "RM.hpp"
 #include "Reftone.hpp"
 #include "SampleHold.hpp"
 #include "Shaper.hpp"
@@ -31,6 +34,7 @@
 #include "Stack.hpp"
 #include "Sums.hpp"
 #include "Switch.hpp"
+#include "UMix.hpp"
 #include "VCA.hpp"
 #include "VCAmp.hpp"
 #include "VCM.hpp"
@@ -89,7 +93,6 @@ RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Switch);
 
 #ifdef EXPERIMENTAL
 RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Lag);
-RACK_PLUGIN_MODEL_DECLARE(Bogaudio, RM);
 #endif
 
 #ifdef TEST
@@ -110,8 +113,15 @@ RACK_PLUGIN_MODEL_DECLARE(Bogaudio, TwentyFiveHP);
 RACK_PLUGIN_MODEL_DECLARE(Bogaudio, ThirtyHP);
 #endif
 
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, AD);
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, AMRM);
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Matrix88);
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, UMix);
+
 RACK_PLUGIN_INIT(Bogaudio) {
    RACK_PLUGIN_INIT_ID();
+
+   RACK_PLUGIN_INIT_VERSION("0.6.7");
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/bogaudio/BogaudioModules");
    RACK_PLUGIN_INIT_MANUAL("https://github.com/bogaudio/BogaudioModules/blob/master/README.md");
@@ -160,7 +170,6 @@ RACK_PLUGIN_INIT(Bogaudio) {
 
 #ifdef EXPERIMENTAL
 	RACK_PLUGIN_MODEL_ADD(Bogaudio, Lag);
-	RACK_PLUGIN_MODEL_ADD(Bogaudio, RM);
 #endif
 
 #ifdef TEST
@@ -180,6 +189,11 @@ RACK_PLUGIN_INIT(Bogaudio) {
 	RACK_PLUGIN_MODEL_ADD(Bogaudio, TwentyFiveHP);
 	RACK_PLUGIN_MODEL_ADD(Bogaudio, ThirtyHP);
 #endif
+
+	RACK_PLUGIN_MODEL_ADD(Bogaudio, AD);
+	RACK_PLUGIN_MODEL_ADD(Bogaudio, AMRM);
+	RACK_PLUGIN_MODEL_ADD(Bogaudio, Matrix88);
+	RACK_PLUGIN_MODEL_ADD(Bogaudio, UMix);
 
 	//NEW_MODELS_HERE
 }

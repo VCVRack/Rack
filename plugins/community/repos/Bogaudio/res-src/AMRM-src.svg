@@ -1,0 +1,132 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="90"
+  height="380"
+  viewBox="0 0 90 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="knob45" viewBox="0 0 90px 90px">
+      <g transform="translate(45 45)">
+        <polyline points="-5,0 5,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-5 0,5" stroke-width="1" stroke="#00f" />
+        <circle cx="0" cy="0" r="22" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-rectify" viewBox="0 0 90px 90px">
+      <g transform="translate(45 45)">
+        <text font-size="6.0pt" transform="rotate(-240) translate(29 0) rotate(240) translate(-4 3)">0</text>
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-210) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-180) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-150) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-120) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-90) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-60) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-30) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(0) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(30) translate(26 0)" />
+        <polyline points="0,0 5.5,0" stroke-width="1.5" stroke="#333" transform="rotate(60) translate(26 0)" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-drywet" viewBox="0 0 90px 90px">
+      <g transform="translate(45 45)">
+        <text font-size="6.0pt" transform="rotate(-240) translate(29 0) rotate(240) translate(-4 3)">D</text>
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-210) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-180) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-150) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-120) translate(26 0)" />
+        <polyline points="0,0 5.5,0" stroke-width="1.5" stroke="#333" transform="rotate(-90) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-60) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(-30) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(0) translate(26 0)" />
+        <polyline points="0,0 3.5,0" stroke-width="0.3" stroke="#333" transform="rotate(30) translate(26 0)" />
+        <text font-size="6.0pt" transform="rotate(60) translate(29 0) rotate(-60) translate(-1 3)">W</text>
+      </g>
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 89,1 89,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 89.5,0.5 89.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 90,0 90,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <text class="title" x="26.5" y="17" font-size="9pt" letter-spacing="3px">AM/RM</text>
+  <g transform="translate(5.5 374)">
+    <text class="brand" font-size="6.5pt" letter-spacing="2px">BOGAUDIO</text>
+    <rect width="1.5" height="2" fill="#ddd" transform="translate(21 -4)" />
+  </g>
+
+  <!-- <rect width="90" height="23" fill="#0f0" transform="translate(0 18)" /> -->
+  <!-- <rect width="90" height="23" fill="#0f0" transform="translate(0 117)" /> -->
+  <!-- <rect width="90" height="23" fill="#0f0" transform="translate(0 217)" /> -->
+
+  <g transform="translate(0 49)">
+    <text font-size="8pt" letter-spacing="2px" transform="translate(18 0)">RECTIFY</text>
+    <use id="RECTIFY_PARAM" xlink:href="#knob45" transform="translate(0 -5)" />
+    <use xlink:href="#knobguide-rectify" transform="translate(0 -5)" />
+  </g>
+
+  <g transform="translate(0 148)">
+    <text font-size="8pt" letter-spacing="2px" transform="translate(15.5 0)">DRY/WET</text>
+    <use id="DRYWET_PARAM" xlink:href="#knob45" transform="translate(0 -5)" />
+    <use xlink:href="#knobguide-drywet" transform="translate(0 -5)" />
+  </g>
+
+  <g transform="translate(11 240)">
+    <g transform="translate(0 0)">
+      <rect width="68" height="10" fill="#fafafa" transform="translate(0 66)" />
+      <rect width="68" height="73" rx="5" fill="#fafafa" />
+      <use id="MODULATOR_INPUT" xlink:href="#input" transform="translate(5 4)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(7.5 36)">MOD</text>
+      <use id="CARRIER_INPUT" xlink:href="#input" transform="translate(39 4)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(42.5 36)">CAR</text>
+      <use id="RECTIFY_INPUT" xlink:href="#input" transform="translate(5 40)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(5.5 72)">RECT</text>
+      <use id="DRYWET_INPUT" xlink:href="#input" transform="translate(39 40)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(42 72)">D/W</text>
+    </g>
+    <g transform="translate(0 79)">
+      <rect width="68" height="10" fill="#bbb" transform="translate(0 -3)" />
+      <rect width="68" height="37" rx="5" fill="#bbb" />
+      <use id="RECTIFY_OUTPUT" xlink:href="#output" transform="translate(5 1)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(5.5 33)">RECT</text>
+      <use id="OUT_OUTPUT" xlink:href="#output" transform="translate(39 1)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(42.5 33)">OUT</text>
+    </g>
+  </g>
+
+  <!-- <polyline points="0,0 45,0" stroke-width="0.5" stroke="#0f0" transform="translate(0 73)" /> -->
+</svg>

@@ -95,7 +95,7 @@ void Additator::step() {
 			_filter = filter;
 
 #ifdef _MSC_VER
-			float *as = new float[maxPartials + 1];
+         float *as = (float*)_alloca(sizeof(float) * (maxPartials + 1));
 #else
 			float as[maxPartials + 1];
 #endif
@@ -126,9 +126,6 @@ void Additator::step() {
 				as[i] /= norm;
 				_oscillator.setPartialAmplitude(i, as[i], i <= envelopes);
 			}
-#ifdef _MSC_VER
-         delete [] as;
-#endif
 		}
 
 		float frequency = params[FREQUENCY_PARAM].value;

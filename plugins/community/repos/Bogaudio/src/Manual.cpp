@@ -3,20 +3,20 @@
 
 void Manual::onReset() {
 	_trigger.reset();
-	_pulse.process(10.0);
+	_pulse.process(10.0f);
 }
 
 void Manual::step() {
 	bool high = _trigger.process(params[TRIGGER_PARAM].value) || _trigger.isHigh() || (_firstStep && _triggerOnLoad && _shouldTriggerOnLoad);
 	if (high) {
-		_pulse.trigger(0.001);
+		_pulse.trigger(0.001f);
 		_pulse.process(engineGetSampleTime());
 	}
 	else {
 		high = _pulse.process(engineGetSampleTime());
 	}
 
-	float out = high ? 5.0 : 0.0;
+	float out = high ? 5.0f : 0.0f;
 	outputs[OUT1_OUTPUT].value = out;
 	outputs[OUT2_OUTPUT].value = out;
 	outputs[OUT3_OUTPUT].value = out;

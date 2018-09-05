@@ -1,0 +1,111 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="45"
+  height="380"
+  viewBox="0 0 45 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="knob-small" viewBox="0 0 45px 45px">
+      <g transform="translate(22.5 22.5)">
+        <polyline points="-3,0 3,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-3 0,3" stroke-width="1" stroke="#00f" />
+        <circle cx="0" cy="0" r="7.5" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-maxtick" viewBox="0 0 40px 40px">
+      <g transform="translate(20 20)">
+        <g transform="rotate(60) translate(10 0)">
+          <polyline points="0,0 4,0" stroke-width="1" stroke="#333" />
+        </g>
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 1 12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(0)" />
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 1 12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(43)" />
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 0 -12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(0)" />
+        <path d="M 0 -12.5 A 12.5 12.5 0 0 0 -12.5 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(-43)" />
+      </g>
+    </symbol>
+
+    <symbol id="switch" viewBox="0 0 14px 24px">
+      <rect width="14px" height="24px" stroke-width="1" stroke="#000" fill="#ddd" />
+      <rect width="14px" height="12px" stroke-width="0" fill="#000" />
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 44,1 44,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 44.5,0.5 44.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 45,0 45,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <g transform="rotate(-90) translate(-376 13)">
+    <text class="title" font-size="7pt" letter-spacing="2.5px">UMIX</text>
+    <g transform="translate(0 12)">
+      <text class="brand" font-size="7pt" letter-spacing="2px">BGA</text>
+      <rect width="3.0" height="3" fill="#ddd" transform="translate(11.5 -5)" />
+    </g>
+  </g>
+
+  <!-- <polyline points="22.5,0 22.5,380" stroke-width="0.5" stroke="#0f0" /> -->
+
+  <g transform="translate(0 18)">
+    <g transform="translate(5.5 0)">
+      <rect width="34" height="10" fill="#fafafa" transform="translate(0 172)" />
+      <rect width="34" height="182" rx="5" fill="#fafafa" />
+      <use id="IN1_INPUT" xlink:href="#input" transform="translate(5 5)" />
+      <use id="IN2_INPUT" xlink:href="#input" transform="translate(5 35)" />
+      <use id="IN3_INPUT" xlink:href="#input" transform="translate(5 65)" />
+      <use id="IN4_INPUT" xlink:href="#input" transform="translate(5 95)" />
+      <use id="IN5_INPUT" xlink:href="#input" transform="translate(5 125)" />
+      <use id="IN6_INPUT" xlink:href="#input" transform="translate(5 155)" />
+    </g>
+    <g transform="translate(5.5 185)">
+      <rect width="34" height="10" fill="#bbb" transform="translate(0 -3)" />
+      <rect width="34" height="36" rx="5" fill="#bbb" />
+      <use id="OUT_OUTPUT" xlink:href="#output" transform="translate(5 0)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.5 32)">OUT</text>
+    </g>
+  </g>
+
+  <g transform="translate(15.5 254)">
+    <text font-size="5pt" letter-spacing="2px" transform="translate(-2 -1)">SUM</text>
+    <use id="MODE_PARAM" xlink:href="#switch" transform="translate(0 2)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(-1 34)">AVG</text>
+  </g>
+
+  <g transform="translate(0 305)">
+    <text font-size="6pt" letter-spacing="2px" transform="translate(7 0)">LEVEL</text>
+    <use id="LEVEL_PARAM" xlink:href="#knob-small" transform="translate(0 -5)" />
+    <use xlink:href="#knobguide-maxtick" transform="translate(2.2 -2.5)" />
+  </g>
+</svg>

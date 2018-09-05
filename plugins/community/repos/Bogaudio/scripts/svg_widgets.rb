@@ -62,7 +62,7 @@ struct %MODULE%Widget : ModuleWidget {
 	}
 };
 
-Model* model%MODULE% = createModel<%MODULE%, %MODULE%Widget>("%MANUFACTURER%-%MODULE%", "%MODULE%",  "");
+Model* model%MODULE% = createModel<%MODULE%, %MODULE%Widget>("%MANUFACTURER%-%MODULE%", "%MODULE%", "");
 CPP_TEMPLATE
 
 require 'optparse'

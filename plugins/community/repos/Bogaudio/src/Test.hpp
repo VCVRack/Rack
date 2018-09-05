@@ -17,6 +17,7 @@ extern Model* modelTest;
 // #define OVERSAMPLED_BL 1
 // #define ANTIALIASING 1
 // #define DECIMATORS 1
+#define INTERPOLATOR 1
 // #define FM 1
 // #define PM 1
 // #define FEEDBACK_PM 1
@@ -25,7 +26,7 @@ extern Model* modelTest;
 // #define SLEW 1
 // #define RMS 1
 // #define RAVG 1
-#define SATURATOR 1
+// #define SATURATOR 1
 
 #include "pitch.hpp"
 #ifdef LPF
@@ -63,6 +64,9 @@ extern Model* modelTest;
 #include "dsp/oscillator.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/decimator.hpp" // rack
+#elif INTERPOLATOR
+#include "dsp/oscillator.hpp"
+#include "dsp/filter.hpp"
 #elif FM
 #include "dsp/oscillator.hpp"
 #elif PM
@@ -171,6 +175,15 @@ struct Test : Module {
 	bogaudio::dsp::CICDecimator _cicDecimator;
 	bogaudio::dsp::LPFDecimator _lpfDecimator;
 	rack::Decimator<OVERSAMPLEN, OVERSAMPLEN> _rackDecimator;
+#elif INTERPOLATOR
+	#define FACTOR 8
+	#define STAGES 4
+	BandLimitedSawOscillator _saw;
+	bogaudio::dsp::CICDecimator _decimator;
+	bogaudio::dsp::CICInterpolator _interpolator;
+	int _steps;
+	float _rawSamples[FACTOR] {};
+	float _processedSamples[FACTOR] {};
 #elif FM
 	float _baseHz = 0.0f;
 	float _ratio = 0.0f;
@@ -211,6 +224,9 @@ struct Test : Module {
 	, _sine2(_table)
 #elif DECIMATORS
 	, _cicDecimator(STAGES)
+#elif INTERPOLATOR
+	, _decimator(STAGES)
+	, _interpolator(STAGES)
 #elif TABLES
   , _table(StaticBlepTable::table(), 44100.0, 1000.0)
 #elif RAVG

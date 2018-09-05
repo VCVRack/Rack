@@ -7,8 +7,10 @@ ALL_OBJ= \
 	src/dsp/oscillator.o \
 	src/dsp/signal.o \
 	src/dsp/table.o \
+	src/AD.o \
 	src/ADSR.o \
 	src/Additator.o \
+	src/AMRM.o \
 	src/Analyzer.o \
 	src/Bool.o \
 	src/CVD.o \
@@ -23,13 +25,13 @@ ALL_OBJ= \
 	src/LFO.o \
 	src/Lag.o \
 	src/Manual.o \
+	src/Matrix88.o \
 	src/Mix4.o \
 	src/Mix8.o \
 	src/Mult.o \
 	src/Noise.o \
 	src/Offset.o \
 	src/Pan.o \
-	src/RM.o \
 	src/Reftone.o \
 	src/SampleHold.o \
 	src/Shaper.o \
@@ -39,6 +41,7 @@ ALL_OBJ= \
 	src/Switch.o \
 	src/Test.o \
 	src/Test2.o \
+	src/UMix.o \
 	src/VCA.o \
 	src/VCAmp.o \
 	src/VCM.o \

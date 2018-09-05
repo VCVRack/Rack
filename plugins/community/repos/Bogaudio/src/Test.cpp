@@ -268,6 +268,26 @@ void Test::step() {
 	// outputs[OUT2_OUTPUT].value = _lpfDecimator.next(buf) * 5.0f;
 	outputs[OUT2_OUTPUT].value = _rackDecimator.process(buf) * 5.0f;
 
+#elif INTERPOLATOR
+	const int quality = 12;
+	float sampleRate = engineGetSampleRate();
+	float frequency = oscillatorPitch();
+	_saw.setSampleRate(sampleRate);
+	_saw.setFrequency(frequency);
+	_saw.setQuality(quality);
+	_decimator.setParams(sampleRate, FACTOR);
+	_interpolator.setParams(sampleRate, FACTOR);
+	if (_steps >= FACTOR) {
+		_steps = 0;
+		for (int i = 0; i < FACTOR; ++i) {
+			_rawSamples[i] = _saw.next();
+		}
+		_interpolator.next(_decimator.next(_rawSamples), _processedSamples);
+	}
+	outputs[OUT_OUTPUT].value = _processedSamples[_steps] * 5.0f;
+	outputs[OUT2_OUTPUT].value = _rawSamples[_steps] * 5.0f;
+	++_steps;
+
 #elif FM
 	const float amplitude = 5.0f;
 	float baseHz = oscillatorPitch();
