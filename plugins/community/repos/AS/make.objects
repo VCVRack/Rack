@@ -20,6 +20,7 @@ ALL_OBJ= \
 	src/Multiple2_5.o \
 	src/Phaser.o \
 	src/QuadVCA.o \
+	src/ReScale.o \
 	src/Reverb.o \
 	src/ReverbStereo.o \
 	src/SEQ16.o \
@@ -33,6 +34,7 @@ ALL_OBJ= \
 	src/TriLFO.o \
 	src/TriggersMKI.o \
 	src/TriggersMKII.o \
+	src/TriggersMKIII.o \
 	src/VCA.o \
 	src/WaveShaper.o \
 	src/stereoVUmeter.o \

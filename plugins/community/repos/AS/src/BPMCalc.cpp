@@ -102,10 +102,10 @@ struct BPMCalc : Module {
   void calculateValues(float bpm){ 
 
         millisecondsPerBeat = millisecs/bpm;
-        millisecondsPerMeasure = millisecondsPerBeat * 4;
+        millisecondsPerMeasure = millisecondsPerBeat * 4.f;
 
-        secondsPerBeat = 60 / bpm;
-        secondsPerMeasure = secondsPerBeat * 4;
+        secondsPerBeat = 60.f / bpm;
+        secondsPerMeasure = secondsPerBeat * 4.f;
 
         bar = (millisecondsPerMeasure);
 
@@ -121,11 +121,11 @@ struct BPMCalc : Module {
         eight_note = millisecondsPerBeat / 2;
         eight_note_t = millisecondsPerBeat / 3;
 
-        sixth_note_d = ( millisecondsPerBeat / 4 ) * 1.5;
+        sixth_note_d = ( millisecondsPerBeat / 4.f ) * 1.5f;
         sixth_note = millisecondsPerBeat / 4;
         sixth_note_t = millisecondsPerBeat / 6;
 
-        trth_note_d = ( millisecondsPerBeat / 8 ) * 1.5;
+        trth_note_d = ( millisecondsPerBeat / 8 ) * 1.5f;
         trth_note = millisecondsPerBeat / 8;
         trth_note_t = millisecondsPerBeat / 8 * 2 / 3;
         //hz measures
@@ -237,7 +237,7 @@ void BPMCalc::step() {
     }
     //When BPM is locked
     if ( beatLock ) {
-      bpm = (int)round( 60 / beatOld );
+      bpm = float((int)round( 60 / beatOld ));
       tempo = std::to_string( (int)round(bpm) );
       if(bpm!=last_bpm){
         if(bpm<999){
@@ -270,7 +270,7 @@ void BPMCalc::step() {
     if (bpm<30){
       bpm = 30;
     }
-    bpm = (int)round(bpm);
+    bpm = float((int)round(bpm));
     tempo = std::to_string( (int)round(bpm) );
     if(bpm!=last_bpm){
         calculateValues(bpm);

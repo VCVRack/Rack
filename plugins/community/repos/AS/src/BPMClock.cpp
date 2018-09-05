@@ -107,6 +107,7 @@ struct BPMClock : Module {
   
   float tempo =120.0f;
   int time_sig_top, time_sig_bottom = 0;
+  int time_sig_bottom_old = 0;
   float frequency = 2.0f;
   int quarters_count_limit = 4;
   int eighths_count_limit = 2;
@@ -192,10 +193,10 @@ void BPMClock::step() {
   }else{
 
     if (time_sig_top == time_sig_bottom){
-      clock.setFreq(frequency*4);
       quarters_count_limit = 4;
       eighths_count_limit = 2;
       bars_count_limit = 16;    
+      clock.setFreq(frequency*4);   
     }else{
       if(time_sig_bottom == 4){
         quarters_count_limit = 4;

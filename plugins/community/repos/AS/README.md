@@ -132,6 +132,21 @@ V 0.5.7: First relase of this module.
 
 V 0.6.5: Added "RUN" label at the end of the list.
 
+### Triggers MKIII
+A manual CV signal temporary trigger module with labeling integrated, now you can type directly the labels you want to use. Also added a handy second EXT input.
+
+V 0.6.9: First relase of this module.
+
+### ReScale
+Utility module to convert from one voltage range to another, available inputs are:
+ -5v/5v, 0v/5v, 0v/10v, 1V/OCT*.
+ Available output signal options are: 
+ -5v/5v, 0v/5v, -10v/10v, 0v/10v*
+ *1V/OCT option is to convert any voltage source to 1 octave 1V/OCT range.
+
+
+V 0.6.9: First relase of this module.
+
 ### Steps
 Strum's Mental VCV Counters module. Mods: graphics, 3 counters, up to 64 steps each, added reset lights to the buttons.
 
@@ -160,10 +175,14 @@ V 0.6.0: First relase of this module.
 
 V 0.6.5: Now it features soft mute, so you can use it both for audio and cv signals without any switching noise.
 
+V 0.6.9: Switch selector added to reverse the default ON/OFF swtiches light behavior(by usrer request).
+
 ### Signal Delay
 Delay the incomming CV signal by set milliseconds, with signal thru and delayed output. You can chain several Signal Delay modules together for unlimited length of delays. (TAOS request).
 
 V 0.5.5: First relase of this module.
+
+V 0.6,9: Small fix on the ms CV input to take the proper values fron BPM calc module.
 
 ### CV 2 T
 CV to Trigger module. Feed a midi signal to the CV inputs and it will output one trigger signal when the incoming signal rises above 0v, and another trigger signal when the incoming signal returns to 0v. Useful to use your external hardware controller/keyboard as a trigger.

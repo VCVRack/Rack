@@ -37,11 +37,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.7258659"
-     inkscape:cx="-41.48078"
-     inkscape:cy="234.09555"
+     inkscape:zoom="6.2307619"
+     inkscape:cx="59.390478"
+     inkscape:cy="341.3318"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="g961"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -49,8 +49,8 @@
      fit-margin-bottom="0"
      inkscape:window-width="1678"
      inkscape:window-height="1334"
-     inkscape:window-x="124"
-     inkscape:window-y="13"
+     inkscape:window-x="268"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      units="px" />
   <metadata
@@ -166,7 +166,7 @@
        inkscape:connector-curvature="0" />
     <g
        id="g455"
-       transform="matrix(0.26458333,0,0,0.26458333,-289.86482,-296.47329)">
+       transform="matrix(0.26458333,0,0,0.26458333,-293.56898,-296.47329)">
       <path
          inkscape:connector-curvature="0"
          id="path447"
@@ -490,6 +490,41 @@
          d="M 11.350625,49.629286 V 48.33812 l 0.555625,0.320146 0.555625,0.320146 -0.555625,0.320145 z"
          data-name="path900"
          id="path1278" />
+    </g>
+    <g
+       id="g961"
+       transform="translate(-1.5875,0.52916667)">
+      <g
+         id="g1201-6"
+         transform="translate(12.334346,-34.033555)">
+        <g
+           transform="matrix(0.26458333,0,0,0.26458333,-288.96336,-294.40048)"
+           id="g1019-8-1"
+           data-name="g1019">
+          <path
+             id="path12062-8-2"
+             data-name="path12062"
+             d="m 791.63,585.45 a 0.425,0.425 0 0 0 0.85,0 v -4 a 0.425,0.425 0 0 0 -0.85,0 z"
+             transform="translate(319.8,697.39)"
+             style="fill:#fff7d4"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
+      <g
+         id="g1192-6"
+         transform="translate(1.7068624,-30.663258)">
+        <g
+           transform="matrix(0.26458333,0,0,0.26458333,-288.96336,-294.40048)"
+           id="g920-2-5"
+           data-name="g920">
+          <path
+             id="path910-4-2"
+             data-name="path910"
+             d="m 1153.9481,1257.5977 a 0.32,0.32 0 0 1 -0.12,0.26 0.47,0.47 0 0 1 -0.5,0 0.44,0.44 0 0 1 -0.16,-0.15 l -0.91,-1.36 a 0.88,0.88 0 0 0 -0.28,-0.3 0.81,0.81 0 0 0 -0.4,-0.09 h -0.63 v 1.51 a 0.44,0.44 0 0 1 -0.11,0.32 0.41,0.41 0 0 1 -0.31,0.12 0.42,0.42 0 0 1 -0.32,-0.12 0.43,0.43 0 0 1 -0.12,-0.32 v -3.95 a 0.41,0.41 0 0 1 0.11,-0.3 0.42,0.42 0 0 1 0.31,-0.11 h 1.68 a 1.84,1.84 0 0 1 1.23,0.36 1.29,1.29 0 0 1 0.42,1 1.32,1.32 0 0 1 -0.32,0.91 1.49,1.49 0 0 1 -0.89,0.45 0.81,0.81 0 0 1 0.34,0.17 1.49,1.49 0 0 1 0.29,0.34 l 0.62,0.93 a 0.43,0.43 0 0 1 0.07,0.33 z m -1.18,-2.44 a 0.69,0.69 0 0 0 0.23,-0.57 0.68,0.68 0 0 0 -0.23,-0.57 1.18,1.18 0 0 0 -0.72,-0.18 h -1.1 v 1.54 h 1.13 a 1.14,1.14 0 0 0 0.76,-0.2 z"
+             style="fill:#fff8d5"
+             inkscape:connector-curvature="0" />
+        </g>
+      </g>
     </g>
   </g>
   <g

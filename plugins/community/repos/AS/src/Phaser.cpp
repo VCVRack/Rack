@@ -120,8 +120,7 @@ public:
 
     float Update( float inSamp ){
     	//calculate and update phaser sweep lfo...
-        float d  = _dmin + (_dmax-_dmin) * ((sin( _lfoPhase ) + 
-1.f)/2.f);
+        float d  = _dmin + (_dmax-_dmin) * ((sin( _lfoPhase ) + 1.f)/2.f);
         _lfoPhase += _lfoInc;
         if( _lfoPhase >= F_PI * 2.0f )
         	_lfoPhase -= F_PI * 2.0f;

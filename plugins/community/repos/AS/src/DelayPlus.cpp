@@ -13,6 +13,8 @@
 #include <sstream>
 #include <iomanip>
 
+namespace rack_plugin_AS {
+
 #define HISTORY_SIZE (1<<21)
 
 struct DelayPlusFx : Module {
@@ -295,6 +297,10 @@ DelayPlusFxWidget::DelayPlusFxWidget(DelayPlusFx *module) : ModuleWidget(module)
 	addInput(Port::create<as_PJ301MPort>(Vec(49, 320), Port::INPUT, module, DelayPlusFx::BYPASS_CV_INPUT));
 
 }
+
+} // namespace rack_plugin_AS
+
+using namespace rack_plugin_AS;
 
 RACK_PLUGIN_MODEL_INIT(AS, DelayPlusFx) {
    Model *modelDelayPlusFx = Model::create<DelayPlusFx, DelayPlusFxWidget>("AS", "DelayPlusFx", "DelayPlus Fx", DELAY_TAG, EFFECT_TAG);

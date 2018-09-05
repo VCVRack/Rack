@@ -27,30 +27,48 @@ struct as_HexScrew : SVGScrew {
 
 struct as_Knob : SVGKnob {
 	as_Knob() {
-      minAngle = -0.83 * M_PI;
-		maxAngle = 0.83 * M_PI;
+      minAngle = float(-0.83 * M_PI);
+		maxAngle = float(0.83 * M_PI);
 		setSVG( SVG::load(assetPlugin(plugin, "res/as-knob.svg")) );
 	}
 };
 struct as_KnobBlack : SVGKnob {
 	as_KnobBlack() {
-      minAngle = -0.83 * M_PI;
-		maxAngle = 0.83 * M_PI;
+      minAngle = float(-0.83 * M_PI);
+		maxAngle = float(0.83 * M_PI);
 		setSVG( SVG::load(assetPlugin(plugin, "res/as-knobBlack.svg")) );
 	}
 };
 
+struct as_KnobBlackSnap : as_KnobBlack {
+	as_KnobBlackSnap() {
+		snap = true;
+	}
+};
+
+struct as_KnobBlackSnap4 : as_KnobBlack {
+	as_KnobBlackSnap4() {
+		minAngle = float(-0.30 * M_PI);
+		maxAngle = float(0.30 * M_PI);
+		snap = true;
+	}
+};
+
+
+
+
+
 struct as_FxKnobWhite : SVGKnob {
 	as_FxKnobWhite() {
-      minAngle = -0.83 * M_PI;
-		maxAngle = 0.83 * M_PI;
+      minAngle = float(-0.83 * M_PI);
+		maxAngle = float(0.83 * M_PI);
 		setSVG( SVG::load(assetPlugin(plugin, "res/as-FxKnobWhite.svg")) );
 	}
 };
 struct as_FxKnobBlack : SVGKnob {
 	as_FxKnobBlack() {
-      minAngle = -0.83 * M_PI;
-		maxAngle = 0.83 * M_PI;
+      minAngle = float(-0.83 * M_PI);
+		maxAngle = float(0.83 * M_PI);
 		setSVG( SVG::load(assetPlugin(plugin, "res/as-FxKnobBlack.svg")) );
 	}
 };

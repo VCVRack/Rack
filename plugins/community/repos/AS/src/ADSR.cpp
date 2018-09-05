@@ -77,7 +77,7 @@ void ADSR::step() {
 				env = 1.0f;
 			}
 			else {
-				env += powf(base, 1 - attack) / maxTime * (1.01 - env) / engineGetSampleRate();
+				env += powf(base, 1 - attack) / maxTime * (1.01f - env) / engineGetSampleRate();
 			}
 			if (env >= 1.0f) {
 				env = 1.0f;
@@ -91,7 +91,7 @@ void ADSR::step() {
 			env = 0.0f;
 		}
 		else {
-			env += powf(base, 1 - release) / maxTime * (0.0 - env) / engineGetSampleRate();
+			env += powf(base, 1 - release) / maxTime * (0.0f - env) / engineGetSampleRate();
 		}
 		decaying = false;
 	}

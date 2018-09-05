@@ -9,6 +9,7 @@ struct Flow: Module {
     enum ParamIds {
         SWITCH_1,
         SWITCH_2,
+        MODE_PARAM, 
         NUM_PARAMS
     };
     enum InputIds {
@@ -40,6 +41,7 @@ struct Flow: Module {
 
     bool on_1 = false;
     bool on_2 = false;
+    bool light_inverted = false;
 
     float mute_fade1 =0.0f;
     float mute_fade2 =0.0f;
@@ -79,6 +81,13 @@ struct Flow: Module {
 
 void Flow::step() {
 
+    if (params[MODE_PARAM].value){
+        light_inverted = false;
+	}else{
+        //switch lights turn off when the switch is enabled
+        light_inverted = true;
+    }
+
     //TRIGGER 1
     if (btnTrigger1.process(params[SWITCH_1].value)||extTrigger1.process(inputs[CV_TRIG_INPUT_1].value)) {
         on_1 = !on_1; 
@@ -94,7 +103,12 @@ void Flow::step() {
       mute_fade1 = 1.0f;
     }
     outputs[OUTPUT_1].value = inputs[INPUT_1].value * mute_fade1;
-    lights[TRIGGER_LED_1].value = on_1 ? 1.0f : 0.0f;
+    if(light_inverted){
+        lights[TRIGGER_LED_1].value = on_1 ? 0.0f : 1.0f;
+    }else{
+        lights[TRIGGER_LED_1].value = on_1 ? 1.0f : 0.0f;
+    }
+    
     //TRIGGER 2
     if (btnTrigger2.process(params[SWITCH_2].value)||extTrigger2.process(inputs[CV_TRIG_INPUT_2].value)) {
         on_2 = !on_2; 
@@ -110,7 +124,12 @@ void Flow::step() {
       mute_fade2 = 1.0f;
     }
     outputs[OUTPUT_2].value = inputs[INPUT_2].value * mute_fade2;
-    lights[TRIGGER_LED_2].value = on_2 ? 1.0f : 0.0f;
+    if(light_inverted){
+        lights[TRIGGER_LED_2].value = on_2 ? 0.0f : 1.0f;
+    }else{
+        lights[TRIGGER_LED_2].value = on_2 ? 1.0f : 0.0f;
+    }
+    
 }
 
 ////////////////////////////////////
@@ -128,6 +147,9 @@ FlowWidget::FlowWidget(Flow *module) : ModuleWidget(module) {
 	addChild(Widget::create<as_HexScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 	addChild(Widget::create<as_HexScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 	addChild(Widget::create<as_HexScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+      //OLD/NEW SWITCH FROM 40-250 TO 30-300
+	addParam(ParamWidget::create<as_CKSS>(Vec(67, 23), module, Flow::MODE_PARAM, 0.0f, 1.0f, 1.0f));
 
     static const float led_offset = 3.3;
     static const float led_center = 15;
