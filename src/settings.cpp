@@ -9,16 +9,22 @@
 #include "global_ui.hpp"
 
 
+#ifdef RACK_HOST
 extern void vst2_window_size_set (int _width, int _height);
 extern void vst2_refresh_rate_set (float _hz);
-
-#ifdef RACK_HOST
+extern float vst2_refresh_rate_get (void);
 extern void vst2_oversample_realtime_set (float _factor, int _quality);
+extern void vst2_oversample_realtime_get (float *_factor, int *_quality);
 extern void vst2_oversample_offline_set (float _factor, int _quality);
+extern void vst2_oversample_offline_get (float *_factor, int *_quality);
 extern void vst2_oversample_offline_check_set (int _bEnable);
+extern int32_t vst2_oversample_offline_check_get (void);
 extern void vst2_oversample_channels_set (int _numIn, int _numOut);
+extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 extern void vst2_idle_detect_mode_fx_set (int _mode);
+extern int vst2_idle_detect_mode_fx_get (void);
 extern void vst2_idle_detect_mode_instr_set (int _mode);
+extern int vst2_idle_detect_mode_instr_get (void);
 #endif // RACK_HOST
 
 namespace rack {
@@ -30,11 +36,16 @@ static json_t *settingsToJson() {
 	// root
 	json_t *rootJ = json_object();
 
+#ifdef RACK_HOST
+
 	// token
 	json_t *tokenJ = json_string(global->plugin.gToken.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
-	if (!windowIsMaximized()) {
+#if 0
+	if (!windowIsMaximized())
+#endif
+   {
 		// windowSize
 		Vec windowSize = windowGetWindowSize();
 		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
@@ -60,6 +71,86 @@ static json_t *settingsToJson() {
 	float zoom = global_ui->app.gRackScene->zoomWidget->zoom;
 	json_t *zoomJ = json_real(zoom);
 	json_object_set_new(rootJ, "zoom", zoomJ);
+
+   // refresh rate (Hz)
+	float refreshRate = vst2_refresh_rate_get();
+	json_t *refreshRateJ = json_integer(int(refreshRate));
+	json_object_set_new(rootJ, "refreshRate", refreshRateJ);
+
+   // vsync
+	int vsync = lglw_swap_interval_get(global_ui->window.lglw);
+	json_t *vsyncJ = json_boolean(vsync);
+	json_object_set_new(rootJ, "vsync", vsyncJ);
+
+   // touchInput
+   int touchInput = lglw_touchinput_get(global_ui->window.lglw);
+	json_t *touchInputJ = json_boolean(touchInput);
+	json_object_set_new(rootJ, "touchInput", touchInputJ);
+
+   // touchKbd
+   int touchKbd = b_touchkeyboard_enable;
+	json_t *touchKbdJ = json_boolean(touchKbd);
+	json_object_set_new(rootJ, "touchKbd", touchKbdJ);
+
+   // (realtime) oversampleFactor, oversampleQuality
+   {
+      float factor;
+      int quality;
+      vst2_oversample_realtime_get(&factor, &quality);
+
+      json_t *factorJ = json_real(factor);
+      json_object_set_new(rootJ, "oversampleFactor", factorJ);
+
+      json_t *qualityJ = json_integer(quality);
+      json_object_set_new(rootJ, "oversampleQuality", qualityJ);
+   }
+
+   // oversampleOfflineFactor, oversampleOfflineQuality
+   {
+      float factor;
+      int quality;
+      vst2_oversample_offline_get(&factor, &quality);
+
+      json_t *factorJ = json_real(factor);
+      json_object_set_new(rootJ, "oversampleOfflineFactor", factorJ);
+
+      json_t *qualityJ = json_integer(quality);
+      json_object_set_new(rootJ, "oversampleOfflineQuality", qualityJ);
+   }
+
+   // oversample offline check (oversampleOffline)
+   json_t *offlineJ = json_boolean(vst2_oversample_offline_check_get());
+   json_object_set_new(rootJ, "oversampleOffline", offlineJ);
+
+   // oversample input channel limit (oversampleNumIn)
+   // oversample output channel limit (oversampleNumOut)
+   {
+      int numIn;
+      int numOut;
+      vst2_oversample_channels_get(&numIn, &numOut);
+
+      json_t *numInJ = json_real(numIn);
+      json_object_set_new(rootJ, "oversampleNumIn", numInJ);
+
+      json_t *numOutJ = json_real(numOut);
+      json_object_set_new(rootJ, "oversampleNumOut", numOutJ);
+   }
+
+   // idleDetectInstr
+   {
+      int idleMode = vst2_idle_detect_mode_instr_get();
+
+      json_t *idleJ = json_integer(idleMode);
+      json_object_set_new(rootJ, "idleDetectInstr", idleJ);
+   }
+
+   // idleDetectFx
+   {
+      int idleMode = vst2_idle_detect_mode_fx_get();
+
+      json_t *idleJ = json_integer(idleMode);
+      json_object_set_new(rootJ, "idleDetectFx", idleJ);
+   }
 
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_boolean(global_ui->window.gAllowCursorLock);
@@ -87,6 +178,8 @@ static json_t *settingsToJson() {
 	// checkVersion
 	json_object_set_new(rootJ, "checkVersion", json_boolean(global_ui->app.gCheckVersion));
 
+#endif // RACK_HOST
+
 	return rootJ;
 }
 
@@ -107,7 +200,9 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
       {
          global_ui->window.windowWidth = int(width);
          global_ui->window.windowHeight = int(height);
+#ifdef RACK_HOST
          vst2_window_size_set((int)width, (int)height);
+#endif // RACK_HOST
          return;
       }
 #else
@@ -146,7 +241,9 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
    //  (note) <15: use DAW timer (effEditIdle)
 	json_t *refreshJ = json_object_get(rootJ, "refreshRate");
 	if (refreshJ) {
+#ifdef RACK_HOST
 		vst2_refresh_rate_set(clamp((float) json_number_value(refreshJ), 0.0f, 200.0f));
+#endif // RACK_HOST
 	}
 
 	// vsync
@@ -156,7 +253,7 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
       if (vsyncJ)
       {
          lglw_glcontext_push(global_ui->window.lglw);
-         lglw_swap_interval(global_ui->window.lglw, json_is_true(vsyncJ));
+         lglw_swap_interval_set(global_ui->window.lglw, json_is_true(vsyncJ));
          lglw_glcontext_pop(global_ui->window.lglw);
       }
    }

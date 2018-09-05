@@ -45,7 +45,7 @@ std::string QuantityWidget::getText() {
 }
 
 void QuantityWidget::onMouseLeave(EventMouseLeave &e) {
-   revert_val = INVALID_REVERT_VAL;
+   // // revert_val = INVALID_REVERT_VAL;
 }
 
 } // namespace rack

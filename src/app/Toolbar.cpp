@@ -3,6 +3,7 @@
 #include "window.hpp"
 #include "engine.hpp"
 #include "asset.hpp"
+#include "settings.hpp"
 #include "global.hpp"
 #include "global_ui.hpp"
 
@@ -14,6 +15,9 @@ extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 extern void vst2_idle_detect_mode_set (int _mode);
 extern void vst2_idle_detect_mode_get (int *_mode);
+extern void vst2_refresh_rate_set (float _hz);
+extern float vst2_refresh_rate_get (void);
+extern void vst2_window_size_set (int _width, int _height);
 #endif // RACK_HOST
 
 namespace rack {
@@ -320,6 +324,125 @@ struct IdleModeButton : TooltipIconButton {
 	}
 };
 
+struct settings_win_size_entry_t {
+   int w;
+   int h;
+};
+
+static settings_win_size_entry_t loc_settings_win_sizes[] = {
+   { 1002, 600 },
+   { 1272, 820 },
+   { 1408, 850 },
+   { 1588, 1100 },
+   { 1902, 1100 },
+   { 2500, 1980 },
+   { 3000, 1980 },
+};
+#define NUM_SETTINGS_WIN_SIZE (sizeof(loc_settings_win_sizes) / sizeof(settings_win_size_entry_t))
+
+struct SettingsWinSizeItem : MenuItem {
+	const settings_win_size_entry_t *setting;
+
+	void onAction(EventAction &e) override {
+#ifdef RACK_HOST
+		global_ui->window.windowWidth = setting->w;
+		global_ui->window.windowHeight = setting->h;
+      vst2_window_size_set(setting->w, setting->h);
+#endif // RACK_HOST
+	}
+};
+
+struct settings_refresh_rate_entry_t {
+   int rate;
+   const char *caption;
+};
+
+static settings_refresh_rate_entry_t loc_settings_refresh_rates[] = {
+   { 0, "<host fps>" },
+   { 15, "15 fps" },
+   { 30, "30 fps" },
+   { 60, "60 fps" },
+   { 75, "75 fps" },
+   { 100, "100 fps" },
+};
+#define NUM_SETTINGS_REFRESH_RATE (sizeof(loc_settings_refresh_rates) / sizeof(settings_refresh_rate_entry_t))
+
+struct SettingsRefreshRateItem : MenuItem {
+	const settings_refresh_rate_entry_t *setting;
+
+	void onAction(EventAction &e) override {
+#ifdef RACK_HOST
+      vst2_refresh_rate_set(float(setting->rate));
+#endif // RACK_HOST
+	}
+};
+
+struct SettingsVsyncItem : MenuItem {
+
+	void onAction(EventAction &e) override {
+      lglw_swap_interval_set(global_ui->window.lglw, lglw_swap_interval_get(global_ui->window.lglw) ^ 1);
+	}
+};
+
+struct SettingsSaveItem : MenuItem {
+
+	void onAction(EventAction &e) override {
+      settingsSave(assetLocal("settings.json"));
+	}
+};
+
+struct SettingsButton : TooltipIconButton {
+	SettingsButton() {
+		setSVG(SVG::load(assetGlobal("res/icons/settings_icon_cc.svg")));
+		tooltipText = "Global Settings";
+	}
+	void onAction(EventAction &e) override {
+		Menu *menu = global_ui->ui.gScene->createMenu();
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		menu->addChild(MenuLabel::create("Global Settings"));
+
+#ifdef RACK_HOST
+      int cWinW = int(global_ui->window.windowWidth);
+      int cWinH = int(global_ui->window.windowHeight);
+      for(int i = 0; i < NUM_SETTINGS_WIN_SIZE; i++)
+      {
+         const settings_win_size_entry_t *en = &loc_settings_win_sizes[i];
+
+         SettingsWinSizeItem *winSizeItem = new SettingsWinSizeItem();
+         char buf[256];
+         sprintf(buf, "%dx%d", en->w, en->h);
+         winSizeItem->text = buf;
+         winSizeItem->setting = en;
+         winSizeItem->rightText = CHECKMARK( (cWinW == en->w) && (cWinH == en->h) );
+         menu->addChild(winSizeItem);
+      }
+
+      int cRate = int(vst2_refresh_rate_get());
+      for(int i = 0; i < NUM_SETTINGS_REFRESH_RATE; i++)
+      {
+         const settings_refresh_rate_entry_t *en = &loc_settings_refresh_rates[i];
+
+         SettingsRefreshRateItem *rateItem = new SettingsRefreshRateItem();
+         rateItem->text = en->caption;
+         rateItem->setting = en;
+         rateItem->rightText = CHECKMARK( (cRate == en->rate) );
+         menu->addChild(rateItem);
+      }
+
+		SettingsVsyncItem *vsyncItem = new SettingsVsyncItem();
+		vsyncItem->text = "Vsync";
+      vsyncItem->rightText = CHECKMARK( (0 != lglw_swap_interval_get(global_ui->window.lglw)) );
+		menu->addChild(vsyncItem);
+
+		SettingsSaveItem *saveItem = new SettingsSaveItem();
+		saveItem->text = "Save Settings (+Favourites)";
+		menu->addChild(saveItem);
+#endif // RACK_HOST
+	}
+};
+
 struct ZoomSlider : Slider {
 	void onAction(EventAction &e) override {
 		Slider::onAction(e);
@@ -347,6 +470,7 @@ Toolbar::Toolbar() {
 	layout->addChild(new PowerMeterButton());
 	layout->addChild(new RackLockButton());
 	layout->addChild(new IdleModeButton());
+	layout->addChild(new SettingsButton());
 
 	wireOpacitySlider = new Slider();
 	wireOpacitySlider->box.size.x = 150;

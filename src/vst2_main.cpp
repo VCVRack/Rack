@@ -18,7 +18,7 @@
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
-///          18Aug2018, 19Aug2018
+///          18Aug2018, 19Aug2018, 05Sep2018
 ///
 ///
 
@@ -458,6 +458,8 @@ public:
    bool b_check_offline;  // true=ask host if it's in offline rendering mode
 
    sUI idle_detect_mode;
+   sUI idle_detect_mode_fx;
+   sUI idle_detect_mode_instr;
    sF32 idle_input_level_threshold;
    sF32 idle_output_level_threshold;
    sF32 idle_output_sec_threshold;
@@ -563,6 +565,8 @@ public:
 
       editor_rect.right  = EDITWIN_X + _width;
       editor_rect.bottom = EDITWIN_Y + _height;
+
+      (void)lglw_window_resize(rack_global_ui.window.lglw, _width, _height);
    }
 
    void setRefreshRate(float _hz) {
@@ -570,6 +574,23 @@ public:
          redraw_ival_ms = 0u;
       else
          redraw_ival_ms = sUI(1000.0f / _hz);
+
+      if(b_editor_open)
+      {
+         lglw_timer_stop(rack_global_ui.window.lglw);
+
+         if(0u != redraw_ival_ms)
+         {
+            lglw_timer_start(rack_global_ui.window.lglw, redraw_ival_ms);
+         }
+      }
+   }
+
+   float getRefreshRate(void) {
+      if(redraw_ival_ms > 0u)
+         return (1000.0f / redraw_ival_ms);
+      else
+         return 0.0f;
    }
 
    void destroyResamplerStates(void) {
@@ -889,6 +910,20 @@ public:
       }
       b_idle = false;
       idle_output_framecount = 0u;
+   }
+
+   void setIdleDetectModeFx(uint32_t _mode) {
+      idle_detect_mode_fx = _mode;
+#ifdef VST2_EFFECT
+      setIdleDetectMode(uint32_t(_mode));
+#endif // VST2_EFFECT
+   }
+
+   void setIdleDetectModeInstr(uint32_t _mode) {
+      idle_detect_mode_instr = _mode;
+#ifndef VST2_EFFECT
+      setIdleDetectMode(uint32_t(_mode));
+#endif // VST2_EFFECT
    }
 
    sUI getProgramChunk(uint8_t**_addr) {
@@ -1719,6 +1754,12 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          if(NULL != ptr)
          {
             // ...
+            printf("xxx vstrack_plugin: effEditGetRect: (%d; %d; %d; %d)\n",
+                   wrapper->editor_rect.top,
+                   wrapper->editor_rect.left,
+                   wrapper->editor_rect.bottom,
+                   wrapper->editor_rect.right
+                   );
             *(void**)ptr = (void*) &wrapper->editor_rect;
             r = 1;
          }
@@ -1936,6 +1977,8 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    b_check_offline = false;
 
    idle_detect_mode            = IDLE_DETECT_NONE;
+   idle_detect_mode_fx         = IDLE_DETECT_AUDIO;
+   idle_detect_mode_instr      = IDLE_DETECT_MIDI;
    b_idle                      = false;
    idle_input_level_threshold  = 0.00018f;//0.00007f;
    idle_output_level_threshold = 0.00018f;//0.00003f;
@@ -1997,6 +2040,10 @@ void vst2_refresh_rate_set(float _hz) {
    rack::global->vst2.wrapper->setRefreshRate(_hz);
 }
 
+float vst2_refresh_rate_get(void) {
+   return rack::global->vst2.wrapper->getRefreshRate();
+}
+
 extern "C" void lglw_timer_cbk(lglw_t _lglw) {
    VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
    wrapper->queueRedraw();
@@ -2029,6 +2076,10 @@ void vst2_oversample_offline_check_set(int _bEnable) {
    rack::global->vst2.wrapper->b_check_offline = (0 != _bEnable);
 }
 
+int32_t vst2_oversample_offline_check_get(void) {
+   return int32_t(rack::global->vst2.wrapper->b_check_offline);
+}
+
 void vst2_oversample_channels_set(int _numIn, int _numOut) {
    rack::global->vst2.wrapper->setOversampleChannels(_numIn, _numOut);
 }
@@ -2039,15 +2090,19 @@ void vst2_oversample_channels_get(int *_numIn, int *_numOut) {
 }
 
 void vst2_idle_detect_mode_fx_set(int _mode) {
-#ifdef VST2_EFFECT
-   rack::global->vst2.wrapper->setIdleDetectMode(uint32_t(_mode));
-#endif // VST2_EFFECT
+   rack::global->vst2.wrapper->setIdleDetectModeFx(uint32_t(_mode));
+}
+
+int vst2_idle_detect_mode_fx_get(void) {
+   return rack::global->vst2.wrapper->idle_detect_mode_fx;
 }
 
 void vst2_idle_detect_mode_instr_set(int _mode) {
-#ifndef VST2_EFFECT
-   rack::global->vst2.wrapper->setIdleDetectMode(uint32_t(_mode));
-#endif // VST2_EFFECT
+   rack::global->vst2.wrapper->setIdleDetectModeInstr(uint32_t(_mode));
+}
+
+int vst2_idle_detect_mode_instr_get(void) {
+   return rack::global->vst2.wrapper->idle_detect_mode_instr;
 }
 
 void vst2_idle_detect_mode_set(int _mode) {

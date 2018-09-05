@@ -374,7 +374,7 @@ void windowInit() {
 	global_ui->window.lastWindowTitle = "";
 
    lglw_glcontext_push(global_ui->window.lglw);
-   lglw_swap_interval(global_ui->window.lglw, 1);  // can be overridden via settings.json:"vsync" property
+   lglw_swap_interval_set(global_ui->window.lglw, 1);  // can be overridden via settings.json:"vsync" property
 
    lglw_mouse_callback_set     (global_ui->window.lglw, &lglw_mouse_cbk);
    lglw_focus_callback_set     (global_ui->window.lglw, &lglw_focus_cbk);
