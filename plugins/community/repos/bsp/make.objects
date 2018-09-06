@@ -2,6 +2,7 @@ ALL_OBJ= \
 	src/AttenuMixer.o \
 	src/bsp.o \
 	src/Obxd_VCF.o \
+	src/RMS.o \
 	src/Scanner.o \
 	src/Sway.o \
 	src/TunedDelayLine.o

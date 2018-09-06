@@ -23,6 +23,7 @@ Suggested applications:
 An adaption of Filatov Vadim's excellent Ob-Xd filter. Distributed under terms of the GNU General Public License V3.
 
 
+
 # Scanner
 
 A mixer that can seamlessly blend up to 16 input channels.
@@ -47,6 +48,17 @@ The switch enables the randomizer, and the button next to it is used to generate
 NOTE: try modulating the position with the post output (feedback).
 
 
+
+# RMS
+
+A Root-Mean-Square based envelope follower, coupled with a slew limiter.
+
+The rise and fall rates can be configured separately.
+
+The module can be used to derive envelopes from audio signals, e.g. to implement compressor effects.
+
+
+
 # Sway
 
 A kind of slew-filtered noise generator, mainly designed for randomizing control voltages.
@@ -58,6 +70,7 @@ The "amp" knobs select the minimum and maximum amplification (-1..1).
 The "s+o" knobs are used to apply a final scaling/amplification (-5..5) and offset (-5..5) to the output signal.
 
 NOTE: when the min/max time is set to very small values, the module can be used to generate audio-rate noise.
+
 
 
 # Tuned Delay Line

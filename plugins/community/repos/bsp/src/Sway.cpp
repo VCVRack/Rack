@@ -182,7 +182,7 @@ struct SwayWidget : ModuleWidget {
 };
 
 SwayWidget::SwayWidget(Sway *module) : ModuleWidget(module) {
-	setPanel(SVG::load(assetPlugin(plugin, "res/sway.svg")));
+	setPanel(SVG::load(assetPlugin(plugin, "res/Sway.svg")));
 
 	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
 	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
