@@ -70,13 +70,13 @@ void Plugin::addModel(Model *model) {
 // private API
 ////////////////////
 
-static bool loadPlugin(std::string path) {
+static bool loadPlugin(std::string path, bool _bFX) {
 #ifdef RACK_HOST
 	std::string libraryFilename;
 #if ARCH_LIN
 	libraryFilename = path + "/" + "plugin.so";
 #elif ARCH_WIN
-	libraryFilename = path + "/" + "plugin.dll";
+	libraryFilename = path + "/" + "plugin.dll" + (_bFX ? ".fx" : ".instr");
 #elif ARCH_MAC
 	libraryFilename = path + "/" + "plugin.dylib";
 #endif
@@ -138,6 +138,7 @@ static bool loadPlugin(std::string path) {
    plugin->vst2_queue_param_sync_fxn = &vst2_queue_param_sync;
    plugin->global = global;
    plugin->global_ui = global_ui;
+   printf("xxx vstrack_plugin: loadPlugin: global=%p plugin->global=%p\n", global, plugin->global);
 #endif // RACK_HOST
 #endif // USE_VST2
 	initCallback(plugin);
@@ -252,13 +253,13 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 #endif // USE_VST2
 }
 
-static void loadPlugins(std::string path) {
+static void loadPlugins(std::string path, bool _bFX) {
 #ifdef RACK_HOST
 	std::string message;
 	for (std::string pluginPath : systemListEntries(path)) {
 		if (!systemIsDirectory(pluginPath))
 			continue;
-		if (!loadPlugin(pluginPath)) {
+		if (!loadPlugin(pluginPath, _bFX)) {
 #ifndef USE_VST2
          // (note) skip message (some plugins are linked statically in VST2 build)
 			message += stringf("Could not load plugin %s\n", pluginPath.c_str());
@@ -376,7 +377,7 @@ static void extractPackages(std::string path) {
 // public API
 ////////////////////
 
-void pluginInit(bool devMode) {
+void pluginInit(bool devMode, bool _bFX) {
 	tagsInit();
 #ifdef RACK_HOST
 
@@ -411,7 +412,7 @@ void pluginInit(bool devMode) {
 #endif // USE_VST2
 
    // Load/init dynamically loaded plugins
-	loadPlugins(localPlugins);
+	loadPlugins(localPlugins, _bFX);
 
 #endif // RACK_HOST
 }
@@ -775,11 +776,16 @@ void vst2_set_shared_plugin_tls_globals(void) {
    // Called in audio thread (see vst2_main.cpp:VSTPluginProcessReplacingFloat32())
    for(Plugin *p : global->plugin.gPlugins) {
       if(NULL != p->set_tls_globals_fxn) {
-         // printf("xxx vcvrack: calling p->set_tls_globals_fxn() global=%p\n", p->global);
+         if(0)
+         {
+            static int xxx = 0;
+            if(0 == (++xxx & 255))
+               printf("xxx vstrack_plugin: calling p->set_tls_globals_fxn() global=%p p->global=%p\n", global, p->global);
+         }
          p->json.hashtable_seed = hashtable_seed;
          p->json.seed_initialized = seed_initialized;
          p->set_tls_globals_fxn(p);
-         // printf("xxx vcvrack: calling p->set_tls_globals_fxn() OK\n");
+         // printf("xxx vstrack_plugin: calling p->set_tls_globals_fxn() OK\n");
       }
    }
 }

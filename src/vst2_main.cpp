@@ -18,7 +18,7 @@
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
-///          18Aug2018, 19Aug2018, 05Sep2018
+///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018
 ///
 ///
 
@@ -69,7 +69,7 @@ typedef union mem_u {
    sF32 f32;
 } mem_t;
 
-extern int  vst2_init (int argc, char* argv[]);
+extern int  vst2_init (int argc, char* argv[], bool _bFX);
 extern void vst2_exit (void);
 namespace rack {
 extern void vst2_editor_redraw (void);
@@ -81,7 +81,7 @@ extern void vst2_queue_param (int uniqueParamId, float value, bool bNormalized);
 extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
-extern void vst2_set_shared_plugin_tls_globals (void);
+extern void vst2_set_shared_plugin_tls_globals (void);  // see plugin.cpp
 extern "C" extern int vst2_handle_effeditkeydown (unsigned int _vkey);
 
 namespace rack {
@@ -540,7 +540,13 @@ public:
       //argv[0] = (char*)cwd.chars;
       argv[0] = (char*)dllnameraw;
       Dprintf("xxx vstrack_plugin::openEffect: dllname=\"%s\"\n", argv[0]);
-      (void)vst2_init(argc, argv);
+      (void)vst2_init(argc, argv,
+#ifdef VST2_EFFECT
+                      true/*bFX*/
+#else
+                      false/*bFX*/
+#endif // VST2_EFFECT
+                      );
       Dprintf("xxx vstrack_plugin::openEffect: vst2_init() done\n");
 
       vst2_set_shared_plugin_tls_globals();
@@ -1869,10 +1875,12 @@ void VSTPluginSetParameter(VSTPlugin *vstPlugin,
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
    VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
 
-   wrapper->lockAudio();
+   // // wrapper->lockAudio();
    wrapper->setGlobals();
+   rack::global_ui->app.mtx_param.lock();
    vst2_queue_param(index, parameter, true/*bNormalized*/);
-   wrapper->unlockAudio();
+   rack::global_ui->app.mtx_param.unlock();
+   // // wrapper->unlockAudio();
 }
 
 void vst2_queue_param_sync(int _uniqueParamId, float _value, bool _bNormalized) {
@@ -1880,9 +1888,11 @@ void vst2_queue_param_sync(int _uniqueParamId, float _value, bool _bNormalized) 
    printf("xxx vst2_queue_param_sync ENTER: uniqueParamId=%d value=%f bNormalized=%d\n", _uniqueParamId, _value, _bNormalized);
    VSTPluginWrapper *wrapper = rack::global->vst2.wrapper;
 
-   wrapper->lockAudio();
+   // // wrapper->lockAudio();
+   rack::global_ui->app.mtx_param.lock();
    vst2_queue_param(_uniqueParamId, _value, _bNormalized);
-   wrapper->unlockAudio();
+   rack::global_ui->app.mtx_param.unlock();
+   // // wrapper->unlockAudio();
    printf("xxx vst2_queue_param_sync LEAVE\n");
 }
 
@@ -2019,6 +2029,7 @@ void vst2_unlock_midi_device() {
 
 void vst2_handle_ui_param(int uniqueParamId, float normValue) {
    // Called by engineSetParam()
+   // printf("xxx vst2_handle_ui_param: uniqueParamId=%d &global=%p global=%p wrapper=%p\n", uniqueParamId, &rack::global, rack::global, rack::global->vst2.wrapper);
    rack::global->vst2.wrapper->handleUIParam(uniqueParamId, normValue);
 }
 
@@ -2030,6 +2041,7 @@ void vst2_get_timing_info(int *_retPlaying, float *_retBPM, float *_retSongPosPP
 void vst2_set_globals(void *_wrapper) {
    VSTPluginWrapper *wrapper = (VSTPluginWrapper *)_wrapper;
    wrapper->setGlobals();
+   vst2_set_shared_plugin_tls_globals();
 }
 
 void vst2_window_size_set(int _width, int _height) {
@@ -2135,7 +2147,7 @@ VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback) {
                            CCONST('g', 'v', 'g', 'y'),
 #else
                            CCONST('v', '5', 'k', 'v'),
-#endif
+#endif // VST2_EFFECT
                            PLUGIN_VERSION, // version
                            VST2_MAX_UNIQUE_PARAM_IDS,    // num params
                            1,    // one program

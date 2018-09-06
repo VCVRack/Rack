@@ -54,8 +54,9 @@ namespace rack {
 extern "C" {
 
 static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _buttonState, uint32_t _changedButtonState) {
-   // printf("xxx lglw_mouse_cbk: lglw=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, _x, _y, _buttonState, _changedButtonState);
+   // printf("xxx lglw_mouse_cbk: lglw=%p wrapper=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, lglw_userdata_get(_lglw), _x, _y, _buttonState, _changedButtonState);
    vst2_set_globals(lglw_userdata_get(_lglw));
+   // printf("xxx   lglw_mouse_cbk: &global=%p global=%p\n", &rack::global, rack::global);
 
    // (note) assumes that GL context is never touched during regular mouse move
    // (note) mouse clicks may cause new SVGs to be loaded, which in turn may cause new GL textures to be created
@@ -249,6 +250,8 @@ static void lglw_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _butto
 
    // if(0u != _changedButtonState)
       lglw_glcontext_pop(global_ui->window.lglw);
+
+   // printf("xxx lglw_mouse_cbk: LEAVE global=%p\n", rack::global);
 }
 
 static void lglw_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changedFocusState) {

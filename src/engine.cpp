@@ -313,17 +313,6 @@ void engineSetParam(Module *module, int paramId, float value) {
                }
             }
          }
-         // else
-         // {
-         //    // Should not be reachable
-         //    // (note) [bsp] this scale+bias hack should work for most parameters, though
-         //    // (note) [bsp]  => automation curves will look a bit strange, though
-         //    // (note) [bsp]  => this may potentially crash modules which cannot deal with params outside the expected range
-         //    float normValue = value / 2.0f;
-         //    normValue += 0.5f;
-         //    // Call host audioMasterAutomate
-         //    vst2_handle_ui_param(uniqueParamId, normValue);
-         // }
       }
    }
 #endif // USE_VST2

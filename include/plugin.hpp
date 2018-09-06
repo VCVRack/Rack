@@ -70,6 +70,7 @@ namespace rack {                                        \
       plugin = p; \
       global = plugin->global;                          \
       global_ui = plugin->global_ui;                    \
+      /*printf("xxx plugin:loc_set_tls_globals: &global=%p global=%p\n", &global, plugin->global);*/ \
       hashtable_seed = p->json.hashtable_seed;          \
       seed_initialized = p->json.seed_initialized;      \
    }                                                    \
@@ -235,7 +236,7 @@ struct Model {
 };
 
 
-void pluginInit(bool devMode);
+void pluginInit(bool devMode, bool _bFX);
 void pluginDestroy();
 void pluginLogIn(std::string email, std::string password);
 void pluginLogOut();

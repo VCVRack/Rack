@@ -29,7 +29,7 @@ YAC_TLS rack::GlobalUI *rack::global_ui;
 
 
 #ifdef USE_VST2
-int vst2_init(int argc, char* argv[]) {
+int vst2_init(int argc, char* argv[], bool _bFX) {
 	bool devMode = false;
 	std::string patchFile;
 
@@ -63,7 +63,7 @@ int vst2_init(int argc, char* argv[]) {
 	info("Local directory: %s", assetLocal("").c_str());
 
 	// Initialize app
-	pluginInit(devMode);
+	pluginInit(devMode, _bFX);
 	engineInit();
 #ifndef USE_VST2
 	rtmidiInit();
