@@ -1,3 +1,11 @@
+** September 6th, 2018
+- fix critical multi-instancing issue (mixed instr+fx plugins)
+   - or better: a workaround:
+      let each VST plugin instance load its unique set of add-on module plugins.
+      each plugin.dll now exists twice: plugin.dll.fx, and plugin.dll.instr (same content)
+- add module bsp.RMS
+
+
 ** September 5th, 2018
 - ui: add global settings toolbar menu
    - select window size preset
