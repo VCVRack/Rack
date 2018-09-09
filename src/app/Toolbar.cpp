@@ -190,8 +190,9 @@ static OversampleChannelSetting oversample_channel_settings[] = {
    /*  3 */ { "Oversample: 0 in, 8 out",  0,  8 },
    /*  4 */ { "Oversample: 2 in, 2 out",  2,  2 },
    /*  5 */ { "Oversample: 2 in, 4 out",  2,  4 },
-   /*  6 */ { "Oversample: 4 in, 8 out",  4,  8 },
-   /*  7 */ { "Oversample: 8 in, 8 out",  8,  8 },
+   /*  6 */ { "Oversample: 4 in, 2 out",  4,  2 },
+   /*  7 */ { "Oversample: 4 in, 8 out",  4,  8 },
+   /*  8 */ { "Oversample: 8 in, 8 out",  8,  8 },
 };
 #define NUM_OVERSAMPLE_CHANNEL_SETTINGS  (sizeof(oversample_channel_settings) / sizeof(OversampleChannelSetting))
 
