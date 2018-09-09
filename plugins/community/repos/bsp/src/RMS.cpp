@@ -27,12 +27,6 @@ SOFTWARE.
 
 namespace rack_plugin_bsp {
 
-typedef union fi_u {
-   float f;
-   unsigned int u;
-   int s;
-} fi_t;
-
 struct RMS : Module {
 	enum ParamIds {
 		IN_AMP_PARAM,
@@ -74,11 +68,6 @@ struct RMS : Module {
 
 void RMS::step() {
 
-#if 0
-   outputs[RMS_OUTPUT].value = 0.0f;
-   return;
-#endif
-
    uint32_t winSize = (1u << uint32_t(params[WIN_SIZE_PARAM].value));
    uint32_t winSizeMask = (winSize - 1u);
 
@@ -96,7 +85,7 @@ void RMS::step() {
    float inAmp = params[IN_AMP_PARAM].value;
    inAmp *= inAmp;
    inAmp *= inAmp;
-   // amp is now in range 0..1000
+   // amp is now in range 0..81
 
    // Read new input and calc square
    float inValOrig = inputs[AUDIO_INPUT].value;
@@ -140,7 +129,7 @@ void RMS::step() {
    float outAmp = params[OUT_AMP_PARAM].value;
    outAmp *= outAmp;
    outAmp *= outAmp;
-   // out amp is now in range 0..1000
+   // out amp is now in range 0..81
    outputs[RMS_OUTPUT].value = float(smoothed_val * outAmp);
 
 #if 0
