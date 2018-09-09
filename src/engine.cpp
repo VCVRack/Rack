@@ -359,8 +359,6 @@ void vst2_handle_queued_params(void) {
                         float paramRange = (paramWidget->maxValue - paramWidget->minValue);
                         if(paramRange > 0.0f)
                         {
-                           // float value = qp.norm_value - 0.5f;
-                           // value *= 2.0f;
                            float value = (qp.value * paramRange) + paramWidget->minValue;
                            engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
 
@@ -371,7 +369,12 @@ void vst2_handle_queued_params(void) {
                      }
                      else
                      {
-                        engineSetParam(module, paramId, qp.value, false/*bVSTAutomate*/);
+                        float value = qp.value;
+                        if(value < paramWidget->minValue)
+                           value = paramWidget->minValue;
+                        else if(value > paramWidget->maxValue)
+                           value = paramWidget->maxValue;
+                        engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
 
                         // Update UI widget
                         paramWidget->setValue(qp.value);
