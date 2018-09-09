@@ -18,6 +18,20 @@ Suggested applications:
 
 
 
+# DownSampler
+
+Records audio into a ringbuffer (~10 seconds) and plays it back at a lower sample rate (/1../8).
+
+The trigger input resets the record and play heads.
+
+NOTE: this used to be a sampler trick that was especially popular in 90ies dub techno music (e.g. downsampled chord stabs).
+
+NOTE: the module makes absolutely no attempt to hide / filter out the aliased frequencies. feel free to pre-process the input with a steep lowpass filter.
+
+NOTE: here's an example video: https://vimeo.com/288968750
+
+
+
 # Obxd_VCF
 
 An adaption of Filatov Vadim's excellent Ob-Xd filter. Distributed under terms of the GNU General Public License V3.
