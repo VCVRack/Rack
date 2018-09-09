@@ -1,3 +1,8 @@
+** September 9th, 2018
+- ui: clamp param value to min/max range when pasting param via ctrl-e
+- add module bsp.DownSampler
+
+
 ** September 6th, 2018
 - fix critical multi-instancing issue (mixed instr+fx plugins)
    - or better: a workaround:
