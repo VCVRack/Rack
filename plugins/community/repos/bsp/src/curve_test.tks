@@ -1,0 +1,132 @@
+
+use tksdl;
+use tkopengl;
+
+int numframesrendered=0;
+
+float shape = 0.0f;
+
+function onDraw() {
+
+   float dt=FPS.precision;
+   glClearColor(0,0,0.2,1);
+   // glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+   glClear(GL_COLOR_BUFFER_BIT);
+   glDisable(GL_DEPTH_TEST);
+
+   if( !(++numframesrendered&127) )
+      trace "FPS.real="+FPS.real;
+
+   zglInitOrtho(1, 1);
+   glColor3f(0.9,0.9,0.9);
+
+   float cx = -1.0f;
+   float stepCx = (2.0f / Viewport.width);
+
+   float x = 0.0f;
+   float stepX = (1.0f / Viewport.width);
+
+   float lx = 0;
+   float ly = 0;
+
+   glBegin(GL_LINES);
+   loop(Viewport.width)
+   {
+      float cy = 0.0f;
+      
+      float triY = x*2;
+      if(triY > 1.0f)
+         triY = (2.0f - triY);
+
+      float expY = sin(x*PI);
+      expY = mathPowerf(expY, mathPowerf(1.0f - shape, 9.0f)*64 + 1.0f);
+
+      float rectY = triY;
+      // rectY = (triY < 0.5) ? 0.0f : 1.0f;
+      rectY = mathPowerf(triY * 2.0f, mathPowerf((shape - 0.75f)*4, 20) * 400.0f + 1.0f);
+      if(rectY > 1.0f)
+         rectY = 1.0f;
+
+      float t;
+
+      if(shape < 0.5f)
+      {
+         cy = expY;
+      }
+      else if( (shape >= 0.5f) && (shape < 0.75f))
+      {
+         t = (shape -0.5f) * 4.0f;
+         cy = expY + (triY - expY) * t;
+      }
+      else if(shape >= 0.75f)
+      {
+         t = (shape - 0.75f) * 4.0f;
+         cy = triY + (rectY - triY) * t;
+      }
+
+      // cy = triY;
+      // cy = expY;
+
+      glVertex2f(lx, ly);
+      glVertex2f(cx, cy);
+      lx = cx;
+      ly = cy;
+      cx += stepCx;
+      x += stepX;
+   }
+   
+   glVertex2f(0.0f, 0.0f);
+   glVertex2f(1.0f, 0.0f);
+
+   glEnd();
+}
+
+function onMouse(int _x, int _y, int _cbs, int _nbs) {
+   print "x="+_x+" y="+_y+" cbs="+_cbs+" nbs="+_nbs;
+
+   shape = (_y / float(Viewport.height));
+}
+
+function onKeyboard(Key _k) {
+   switch(_k.pressed)
+   {
+      case VKEY_ESCAPE:
+         SDL.exitEventLoop();
+         break;
+   }
+}
+
+int tim_count = 0;
+function onTimer() {
+   // trace "xxx onTimer";
+   // if(++tim_count > 100)
+   //    SDL.exitEventLoop();
+}
+
+function main() {
+   use callbacks;
+
+   FPS.tickInterval=1000.0/60;
+   //FPS.limit=30;
+   FPS.limit=60;
+
+   SDL.eventPolling = false; // tksdl default is "true" (do not block while waiting for an SDL event)
+   SDL.timerInterval = 20;
+
+   // SDL.dpiAwareness = true;  // no OS scaling
+   // SDL.dpiAwareness = false;  // assume 96dpi and let OS scale window to actual DPI
+
+   // SDL.touchInput = true;  // enable WM_POINTER* messages
+
+   Viewport.multisampleSamples = 4;
+   Viewport.multisampleBuffers = 1;
+   // Viewport.stencilBits = 8;
+   Viewport.openWindow(640, 480);
+   //Viewport.openScreen(640, 480, 32);
+   //Viewport.swapInterval(1);
+
+   trace "xxx Viewport.dpi="+Viewport.dpi;
+   trace "xxx entering eventloop";
+
+   SDL.eventLoop();
+}

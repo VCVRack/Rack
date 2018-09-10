@@ -32,6 +32,21 @@ NOTE: here's an example video: https://vimeo.com/288968750
 
 
 
+# Legato
+
+Meant for legato-slides, this module applies a slew filter to the incoming (V/oct) signal.
+
+Two parameter sets are used to configure the slide speed
+1) when a new note is triggered ("min")
+2) when the next note is played while the previous note key is still held down (i.e. no new trigger) ("max")
+
+- Connect the original V/oct signal to the "I" input
+- Connect the trigger (gate) to the "T" input. 
+- The "R" knob (rate) determines the interpolation speed between the min/max parameter sets. The speed can be modulated via the "M" input. Whe a new note is triggered, the interpolation is reset to 0.
+- The "min" and "max" knobs are used to adjust the rise and fall rates
+
+
+
 # Obxd_VCF
 
 An adaption of Filatov Vadim's excellent Ob-Xd filter. Distributed under terms of the GNU General Public License V3.
