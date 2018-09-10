@@ -1,3 +1,7 @@
+** September 10th, 2018
+- add module bsp.Legato
+
+
 ** September 9th, 2018
 - ui: clamp param value to min/max range when pasting param via ctrl-e
 - add module bsp.DownSampler

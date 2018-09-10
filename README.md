@@ -32,7 +32,7 @@ Tested in
 # Downloads
 The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-09Sep2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-09Sep2018.7z) (64bit)
+Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-10Sep2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-10Sep2018.7z) (64bit)
 
 Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
 
@@ -60,9 +60,10 @@ Here are some demo videos of it:
 
 # Add-on modules
 
-The binary distribution contains the following (24) dynamically loaded add-on modules:
+The binary distribution contains the following (25) dynamically loaded add-on modules:
  - bsp.AttenuMixer
  - bsp.DownSampler
+ - bsp.Legato
  - bsp.Obxd_VCF
  - bsp.RMS
  - bsp.Scanner
