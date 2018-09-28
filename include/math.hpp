@@ -156,63 +156,63 @@ struct Vec {
 	Vec() {}
 	Vec(float x, float y) : x(x), y(y) {}
 
-	Vec neg() {
+	Vec neg() const {
 		return Vec(-x, -y);
 	}
-	Vec plus(Vec b) {
+	Vec plus(Vec b) const {
 		return Vec(x + b.x, y + b.y);
 	}
-	Vec minus(Vec b) {
+	Vec minus(Vec b) const {
 		return Vec(x - b.x, y - b.y);
 	}
-	Vec mult(float s) {
+	Vec mult(float s) const {
 		return Vec(x * s, y * s);
 	}
-	Vec mult(Vec b) {
+	Vec mult(Vec b) const {
 		return Vec(x * b.x, y * b.y);
 	}
-	Vec div(float s) {
+	Vec div(float s) const {
 		return Vec(x / s, y / s);
 	}
-	Vec div(Vec b) {
+	Vec div(Vec b) const {
 		return Vec(x / b.x, y / b.y);
 	}
-	float dot(Vec b) {
+	float dot(Vec b) const {
 		return x * b.x + y * b.y;
 	}
-	float norm() {
+	float norm() const {
 		return std::hypotf(x, y);
 	}
-	Vec flip() {
+	Vec flip() const {
 		return Vec(y, x);
 	}
-	Vec min(Vec b) {
+	Vec min(Vec b) const {
 		return Vec(std::min(x, b.x), std::min(y, b.y));
 	}
-	Vec max(Vec b) {
+	Vec max(Vec b) const {
 		return Vec(std::max(x, b.x), std::max(y, b.y));
 	}
-	Vec round() {
+	Vec round() const {
 		return Vec(std::round(x), std::round(y));
 	}
-	Vec floor() {
+	Vec floor() const {
 		return Vec(std::floor(x), std::floor(y));
 	}
-	Vec ceil() {
+	Vec ceil() const {
 		return Vec(std::ceil(x), std::ceil(y));
 	}
-	bool isEqual(Vec b) {
+	bool isEqual(Vec b) const {
 		return x == b.x && y == b.y;
 	}
-	bool isZero() {
+	bool isZero() const {
 		return x == 0.0f && y == 0.0f;
 	}
-	bool isFinite() {
+	bool isFinite() const {
 		return std::isfinite(x) && std::isfinite(y);
 	}
-	Vec clamp(Rect bound);
-	Vec clampBetween(Rect bound);
-	DEPRECATED Vec clamp2(Rect bound);
+	Vec clamp(Rect bound) const;
+	Vec clampBetween(Rect bound) const;
+	DEPRECATED Vec clamp2(Rect bound) const;
 };
 
 
@@ -228,40 +228,40 @@ struct Rect {
 	}
 
 	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right */
-	bool contains(Vec v) {
+	bool contains(Vec v) const {
 		return pos.x <= v.x && v.x < pos.x + size.x
 			&& pos.y <= v.y && v.y < pos.y + size.y;
 	}
 	/** Returns whether this Rect contains an entire Rect */
-	bool contains(Rect r) {
+	bool contains(Rect r) const {
 		return pos.x <= r.pos.x && r.pos.x + r.size.x <= pos.x + size.x
 			&& pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
 	}
 	/** Returns whether this Rect overlaps with another Rect */
-	bool intersects(Rect r) {
+	bool intersects(Rect r) const {
 		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
 			&& (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
 	}
-	bool isEqual(Rect r) {
+	bool isEqual(Rect r) const {
 		return pos.isEqual(r.pos) && size.isEqual(r.size);
 	}
-	Vec getCenter() {
+	Vec getCenter() const {
 		return pos.plus(size.mult(0.5f));
 	}
-	Vec getTopLeft() {
+	Vec getTopLeft() const {
 		return pos;
 	}
-	Vec getTopRight() {
+	Vec getTopRight() const {
 		return pos.plus(Vec(size.x, 0.f));
 	}
-	Vec getBottomLeft() {
+	Vec getBottomLeft() const {
 		return pos.plus(Vec(0.f, size.y));
 	}
-	Vec getBottomRight() {
+	Vec getBottomRight() const {
 		return pos.plus(size);
 	}
 	/** Clamps the edges of the rectangle to fit within a bound */
-	Rect clamp(Rect bound) {
+	Rect clamp(Rect bound) const {
 		Rect r;
 		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
 		r.pos.y = clampBetween(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
@@ -270,7 +270,7 @@ struct Rect {
 		return r;
 	}
 	/** Nudges the position to fix inside a bounding box */
-	Rect nudge(Rect bound) {
+	Rect nudge(Rect bound) const {
 		Rect r;
 		r.size = size;
 		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
@@ -278,7 +278,7 @@ struct Rect {
 		return r;
 	}
 	/** Expands this Rect to contain `other` */
-	Rect expand(Rect other) {
+	Rect expand(Rect other) const {
 		Rect r;
 		r.pos.x = std::min(pos.x, other.pos.x);
 		r.pos.y = std::min(pos.y, other.pos.y);
@@ -287,16 +287,16 @@ struct Rect {
 		return r;
 	}
 	/** Returns a Rect with its position set to zero */
-	Rect zeroPos() {
+	Rect zeroPos() const {
 		return Rect(Vec(), size);
 	}
-	Rect grow(Vec delta) {
+	Rect grow(Vec delta) const {
 		Rect r;
 		r.pos = pos.minus(delta);
 		r.size = size.plus(delta.mult(2.f));
 		return r;
 	}
-	Rect shrink(Vec delta) {
+	Rect shrink(Vec delta) const {
 		Rect r;
 		r.pos = pos.plus(delta);
 		r.size = size.minus(delta.mult(2.f));
@@ -305,19 +305,19 @@ struct Rect {
 };
 
 
-inline Vec Vec::clamp(Rect bound) {
+inline Vec Vec::clamp(Rect bound) const {
 	return Vec(
 		rack::math::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
 		rack::math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
-inline Vec Vec::clampBetween(Rect bound) {
+inline Vec Vec::clampBetween(Rect bound) const {
 	return Vec(
 		rack::math::clampBetween(x, bound.pos.x, bound.pos.x + bound.size.x),
 		rack::math::clampBetween(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
-inline Vec Vec::clamp2(Rect bound) {return clampBetween(bound);}
+inline Vec Vec::clamp2(Rect bound) const {return clampBetween(bound);}
 
 
 } // namespace math

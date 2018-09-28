@@ -1,5 +1,4 @@
-#include "widgets.hpp"
-#include "window.hpp"
+#include "widgets/FramebufferWidget.hpp"
 #include "nanovg_gl.h"
 #include "nanovg_gl_utils.h"
 
@@ -116,11 +115,6 @@ int FramebufferWidget::getImageHandle() {
 	if (!internal->fb)
 		return -1;
 	return internal->fb->image;
-}
-
-void FramebufferWidget::onZoom(EventZoom &e) {
-	dirty = true;
-	Widget::onZoom(e);
 }
 
 

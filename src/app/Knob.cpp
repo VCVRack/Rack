@@ -15,13 +15,13 @@ Knob::Knob() {
 	smooth = true;
 }
 
-void Knob::onDragStart(EventDragStart &e) {
+void Knob::on(event::DragStart &e) {
 	windowCursorLock();
 	dragValue = value;
 	randomizable = false;
 }
 
-void Knob::onDragMove(EventDragMove &e) {
+void Knob::on(event::DragMove &e) {
 	float range;
 	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
 		range = maxValue - minValue;
@@ -30,7 +30,7 @@ void Knob::onDragMove(EventDragMove &e) {
 		// Continuous encoders scale as if their limits are +/-1
 		range = 1.f - (-1.f);
 	}
-	float delta = KNOB_SENSITIVITY * -e.mouseRel.y * speed * range;
+	float delta = KNOB_SENSITIVITY * -e.mouseDelta.y * speed * range;
 
 	// Drag slower if Mod is held
 	if (windowIsModPressed())
@@ -43,7 +43,7 @@ void Knob::onDragMove(EventDragMove &e) {
 		setValue(dragValue);
 }
 
-void Knob::onDragEnd(EventDragEnd &e) {
+void Knob::on(event::DragEnd &e) {
 	windowCursorUnlock();
 	randomizable = true;
 }

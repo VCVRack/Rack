@@ -330,93 +330,86 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 	nvgFill(vg);
 }
 
-void ModuleWidget::onMouseDown(EventMouseDown &e) {
-	Widget::onMouseDown(e);
-	if (e.consumed)
-		return;
+void ModuleWidget::on(event::Hover &e) {
+	OpaqueWidget::on(e);
 
-	if (e.button == 1) {
-		createContextMenu();
-	}
-	e.consumed = true;
-	e.target = this;
-}
-
-void ModuleWidget::onMouseMove(EventMouseMove &e) {
-	OpaqueWidget::onMouseMove(e);
-
-	// Don't delete the ModuleWidget if a TextField is focused
-	if (!gFocusedWidget) {
-		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-		if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-			if (!windowIsModPressed() && !windowIsShiftPressed()) {
-				gRackWidget->deleteModule(this);
-				this->finalizeEvents();
-				delete this;
-				e.consumed = true;
-				return;
-			}
+	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
+	if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+		if (!windowIsModPressed() && !windowIsShiftPressed()) {
+			gRackWidget->deleteModule(this);
+			delete this;
+			// e.target = this;
+			return;
 		}
 	}
 }
 
-void ModuleWidget::onHoverKey(EventHoverKey &e) {
+void ModuleWidget::on(event::Button &e) {
+	OpaqueWidget::on(e);
+	if (e.target == this) {
+		if (e.button == 1) {
+			createContextMenu();
+		}
+	}
+}
+
+void ModuleWidget::on(event::HoverKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_I: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				reset();
-				e.consumed = true;
+				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_R: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				randomize();
-				e.consumed = true;
+				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_C: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				copyClipboard();
-				e.consumed = true;
+				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_V: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				pasteClipboard();
-				e.consumed = true;
+				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_D: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				gRackWidget->cloneModule(this);
-				e.consumed = true;
+				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_U: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
 				disconnect();
-				e.consumed = true;
+				e.target = this;
 				return;
 			}
 		} break;
 	}
 
-	Widget::onHoverKey(e);
+	OpaqueWidget::on(e);
 }
 
-void ModuleWidget::onDragStart(EventDragStart &e) {
+void ModuleWidget::on(event::DragStart &e) {
 	dragPos = gRackWidget->lastMousePos.minus(box.pos);
 }
 
-void ModuleWidget::onDragEnd(EventDragEnd &e) {
+void ModuleWidget::on(event::DragEnd &e) {
 }
 
-void ModuleWidget::onDragMove(EventDragMove &e) {
+void ModuleWidget::on(event::DragMove &e) {
 	if (!gRackWidget->lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
@@ -427,65 +420,64 @@ void ModuleWidget::onDragMove(EventDragMove &e) {
 
 struct ModuleDisconnectItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		moduleWidget->disconnect();
 	}
 };
 
 struct ModuleResetItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		moduleWidget->reset();
 	}
 };
 
 struct ModuleRandomizeItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		moduleWidget->randomize();
 	}
 };
 
 struct ModuleCopyItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		moduleWidget->copyClipboard();
 	}
 };
 
 struct ModulePasteItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		moduleWidget->pasteClipboard();
 	}
 };
 
 struct ModuleSaveItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		moduleWidget->saveDialog();
 	}
 };
 
 struct ModuleLoadItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		moduleWidget->loadDialog();
 	}
 };
 
 struct ModuleCloneItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct ModuleDeleteItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->deleteModule(moduleWidget);
-		moduleWidget->finalizeEvents();
 		delete moduleWidget;
 	}
 };

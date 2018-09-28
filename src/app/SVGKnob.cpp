@@ -46,9 +46,9 @@ void SVGKnob::step() {
 	FramebufferWidget::step();
 }
 
-void SVGKnob::onChange(EventChange &e) {
+void SVGKnob::on(event::Change &e) {
 	dirty = true;
-	Knob::onChange(e);
+	ParamWidget::on(e);
 }
 
 

@@ -1,12 +1,13 @@
 #pragma once
 #include <memory>
 #define GLEW_STATIC
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 #include "nanovg.h"
 #include "nanosvg.h"
 
 #include "common.hpp"
+#include "math.hpp"
 
 
 #ifdef ARCH_MAC
@@ -75,6 +76,9 @@ bool windowIsMaximized();
 void windowSetTheme(NVGcolor bg, NVGcolor fg);
 void windowSetFullScreen(bool fullScreen);
 bool windowGetFullScreen();
+
+// In svg.cpp
+void svgDraw(NVGcontext *vg, NSVGimage *svg);
 
 
 } // namespace rack

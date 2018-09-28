@@ -1,6 +1,7 @@
 #include "app.hpp"
 #include "plugin.hpp"
 #include "window.hpp"
+#include "helpers.hpp"
 #include <set>
 #include <algorithm>
 
@@ -45,7 +46,7 @@ static bool isModelMatch(Model *model, std::string search) {
 struct FavoriteRadioButton : RadioButton {
 	Model *model = NULL;
 
-	void onAction(EventAction &e) override;
+	void on(event::Action &e) override;
 };
 
 
@@ -56,7 +57,7 @@ struct SeparatorItem : OpaqueWidget {
 
 	void setText(std::string text) {
 		clearChildren();
-		Label *label = Widget::create<Label>(math::Vec(0, 12 + itemMargin));
+		Label *label = createWidget<Label>(math::Vec(0, 12 + itemMargin));
 		label->text = text;
 		label->fontSize = 20;
 		label->color.a *= 0.5;
@@ -78,19 +79,19 @@ struct BrowserListItem : OpaqueWidget {
 		Widget::draw(vg);
 	}
 
-	void onDragStart(EventDragStart &e) override;
+	void on(event::DragStart &e) override;
 
-	void onDragDrop(EventDragDrop &e) override {
+	void on(event::DragDrop &e) override {
 		if (e.origin != this)
 			return;
 		doAction();
 	}
 
 	void doAction() {
-		EventAction eAction;
-		eAction.consumed = true;
-		onAction(eAction);
-		if (eAction.consumed) {
+		event::Action eAction;
+		eAction.target = this;
+		handleEvent(eAction);
+		if (eAction.target) {
 			// deletes `this`
 			gScene->setOverlay(NULL);
 		}
@@ -107,7 +108,7 @@ struct ModelItem : BrowserListItem {
 		assert(model);
 		this->model = model;
 
-		FavoriteRadioButton *favoriteButton = Widget::create<FavoriteRadioButton>(math::Vec(8, itemMargin));
+		FavoriteRadioButton *favoriteButton = createWidget<FavoriteRadioButton>(math::Vec(8, itemMargin));
 		favoriteButton->box.size.x = 20;
 		favoriteButton->label = "★";
 		addChild(favoriteButton);
@@ -118,11 +119,11 @@ struct ModelItem : BrowserListItem {
 			favoriteButton->setValue(1);
 		favoriteButton->model = model;
 
-		Label *nameLabel = Widget::create<Label>(favoriteButton->box.getTopRight());
+		Label *nameLabel = createWidget<Label>(favoriteButton->box.getTopRight());
 		nameLabel->text = model->name;
 		addChild(nameLabel);
 
-		pluginLabel = Widget::create<Label>(math::Vec(0, itemMargin));
+		pluginLabel = createWidget<Label>(math::Vec(0, itemMargin));
 		pluginLabel->alignment = Label::RIGHT_ALIGNMENT;
 		pluginLabel->text = model->plugin->slug + " " + model->plugin->version;
 		pluginLabel->color.a = 0.5;
@@ -135,7 +136,7 @@ struct ModelItem : BrowserListItem {
 			pluginLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
 	}
 
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		if (!moduleWidget)
 			return;
@@ -153,7 +154,7 @@ struct AuthorItem : BrowserListItem {
 	void setAuthor(std::string author) {
 		clearChildren();
 		this->author = author;
-		Label *authorLabel = Widget::create<Label>(math::Vec(0, 0 + itemMargin));
+		Label *authorLabel = createWidget<Label>(math::Vec(0, 0 + itemMargin));
 		if (author.empty())
 			authorLabel->text = "Show all modules";
 		else
@@ -161,7 +162,7 @@ struct AuthorItem : BrowserListItem {
 		addChild(authorLabel);
 	}
 
-	void onAction(EventAction &e) override;
+	void on(event::Action &e) override;
 };
 
 
@@ -171,7 +172,7 @@ struct TagItem : BrowserListItem {
 	void setTag(ModelTag tag) {
 		clearChildren();
 		this->tag = tag;
-		Label *tagLabel = Widget::create<Label>(math::Vec(0, 0 + itemMargin));
+		Label *tagLabel = createWidget<Label>(math::Vec(0, 0 + itemMargin));
 		if (tag == NO_TAG)
 			tagLabel->text = "Show all tags";
 		else
@@ -179,18 +180,18 @@ struct TagItem : BrowserListItem {
 		addChild(tagLabel);
 	}
 
-	void onAction(EventAction &e) override;
+	void on(event::Action &e) override;
 };
 
 
 struct ClearFilterItem : BrowserListItem {
 	ClearFilterItem() {
-		Label *label = Widget::create<Label>(math::Vec(0, 0 + itemMargin));
+		Label *label = createWidget<Label>(math::Vec(0, 0 + itemMargin));
 		label->text = "Back";
 		addChild(label);
 	}
 
-	void onAction(EventAction &e) override;
+	void on(event::Action &e) override;
 };
 
 
@@ -270,8 +271,8 @@ struct ModuleBrowser;
 
 struct SearchModuleField : TextField {
 	ModuleBrowser *moduleBrowser;
-	void onTextChange() override;
-	void onKey(EventKey &e) override;
+	void on(event::Change &e) override;
+	void on(event::SelectKey &e) override;
 };
 
 
@@ -428,7 +429,7 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleScroll->box.size.y = std::min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
 		box.size.y = std::min(box.size.y, moduleScroll->box.getBottomRight().y);
 
-		gFocusedWidget = searchField;
+		gSelectedWidget = searchField;
 		Widget::step();
 	}
 };
@@ -436,31 +437,31 @@ struct ModuleBrowser : OpaqueWidget {
 
 // Implementations of inline methods above
 
-void AuthorItem::onAction(EventAction &e) {
+void AuthorItem::on(event::Action &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sAuthorFilter = author;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
-	e.consumed = false;
+	e.target = this;
 }
 
-void TagItem::onAction(EventAction &e) {
+void TagItem::on(event::Action &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sTagFilter = tag;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
-	e.consumed = false;
+	e.target = this;
 }
 
-void ClearFilterItem::onAction(EventAction &e) {
+void ClearFilterItem::on(event::Action &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sAuthorFilter = "";
 	sTagFilter = NO_TAG;
 	moduleBrowser->refreshSearch();
-	e.consumed = false;
+	e.target = this;
 }
 
-void FavoriteRadioButton::onAction(EventAction &e) {
+void FavoriteRadioButton::on(event::Action &e) {
 	if (!model)
 		return;
 	if (value) {
@@ -477,56 +478,56 @@ void FavoriteRadioButton::onAction(EventAction &e) {
 		moduleBrowser->refreshSearch();
 }
 
-void BrowserListItem::onDragStart(EventDragStart &e) {
+void BrowserListItem::on(event::DragStart &e) {
 	BrowserList *list = dynamic_cast<BrowserList*>(parent);
 	if (list) {
 		list->selectItem(this);
 	}
 }
 
-void SearchModuleField::onTextChange() {
+void SearchModuleField::on(event::Change &e) {
 	moduleBrowser->refreshSearch();
 }
 
-void SearchModuleField::onKey(EventKey &e) {
+void SearchModuleField::on(event::SelectKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_ESCAPE: {
 			gScene->setOverlay(NULL);
-			e.consumed = true;
+			e.target = this;
 			return;
 		} break;
 		case GLFW_KEY_UP: {
 			moduleBrowser->moduleList->incrementSelection(-1);
 			moduleBrowser->moduleList->scrollSelected();
-			e.consumed = true;
+			e.target = this;
 		} break;
 		case GLFW_KEY_DOWN: {
 			moduleBrowser->moduleList->incrementSelection(1);
 			moduleBrowser->moduleList->scrollSelected();
-			e.consumed = true;
+			e.target = this;
 		} break;
 		case GLFW_KEY_PAGE_UP: {
 			moduleBrowser->moduleList->incrementSelection(-5);
 			moduleBrowser->moduleList->scrollSelected();
-			e.consumed = true;
+			e.target = this;
 		} break;
 		case GLFW_KEY_PAGE_DOWN: {
 			moduleBrowser->moduleList->incrementSelection(5);
 			moduleBrowser->moduleList->scrollSelected();
-			e.consumed = true;
+			e.target = this;
 		} break;
 		case GLFW_KEY_ENTER: {
 			BrowserListItem *item = moduleBrowser->moduleList->getSelectedItem();
 			if (item) {
 				item->doAction();
-				e.consumed = true;
+				e.target = this;
 				return;
 			}
 		} break;
 	}
 
-	if (!e.consumed) {
-		TextField::onKey(e);
+	if (!e.target) {
+		TextField::on(e);
 	}
 }
 

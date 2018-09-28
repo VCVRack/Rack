@@ -45,30 +45,64 @@ math::Vec gMousePos;
 std::string lastWindowTitle;
 
 
-void windowSizeCallback(GLFWwindow* window, int width, int height) {
-}
+static void windowSizeCallback(GLFWwindow* window, int width, int height) {}
 
-void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
+static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 #ifdef ARCH_MAC
-	// Ctrl-left click --> right click
+	// Remap Ctrl-left click to right click on Mac
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
+		if (mods & GLFW_MOD_CONTROL) {
 			button = GLFW_MOUSE_BUTTON_RIGHT;
 		}
 	}
 #endif
 
-	if (action == GLFW_PRESS) {
-		gTempWidget = NULL;
-		// onMouseDown
-		{
-			EventMouseDown e;
-			e.pos = gMousePos;
-			e.button = button;
-			gScene->onMouseDown(e);
-			gTempWidget = e.target;
+	// event::Button
+	event::Button eButton;
+	eButton.button = button;
+	eButton.action = action;
+	eButton.mods = mods;
+	gScene->handleEvent(eButton);
+	Widget *clickedWidget = eButton.target;
+
+	// Dragging
+	if (clickedWidget) {
+		// TODO keep track of dragged mouse button
+		if (action == GLFW_PRESS) {
+			event::DragStart eDragStart;
+			eDragStart.button = button;
+			clickedWidget->handleEvent(eDragStart);
+			gDraggedWidget = eDragStart.target;
 		}
 
+		if (action == GLFW_RELEASE) {
+			event::DragEnd eDragEnd;
+			// TODO Use dragged button
+			eDragEnd.button = button;
+			clickedWidget->handleEvent(eDragEnd);
+			gDraggedWidget = eDragEnd.target;
+		}
+	}
+
+	// Selection
+	if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (clickedWidget != gSelectedWidget) {
+			if (gSelectedWidget) {
+				event::Deselect eDeselect;
+				gSelectedWidget->handleEvent(eDeselect);
+			}
+
+			gSelectedWidget = clickedWidget;
+
+			if (gSelectedWidget) {
+				event::Select eSelect;
+				gSelectedWidget->handleEvent(eSelect);
+			}
+		}
+	}
+
+/*
+	if (action == GLFW_PRESS) {
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
 			if (gTempWidget) {
 				// onDragStart
@@ -77,19 +111,19 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 			}
 			gDraggedWidget = gTempWidget;
 
-			if (gTempWidget != gFocusedWidget) {
-				if (gFocusedWidget) {
+			if (gTempWidget != gSelectedWidget) {
+				if (gSelectedWidget) {
 					// onDefocus
 					EventDefocus e;
-					gFocusedWidget->onDefocus(e);
+					gSelectedWidget->onDefocus(e);
 				}
-				gFocusedWidget = NULL;
+				gSelectedWidget = NULL;
 				if (gTempWidget) {
 					// onFocus
 					EventFocus e;
 					gTempWidget->onFocus(e);
 					if (e.consumed) {
-						gFocusedWidget = gTempWidget;
+						gSelectedWidget = gTempWidget;
 					}
 				}
 			}
@@ -125,6 +159,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 		}
 		gTempWidget = NULL;
 	}
+*/
 }
 
 struct MouseButtonArguments {
@@ -151,7 +186,7 @@ void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int m
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	math::Vec mousePos = math::Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
-	math::Vec mouseRel = mousePos.minus(gMousePos);
+	math::Vec mouseDelta = mousePos.minus(gMousePos);
 
 	int cursorMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
 	(void) cursorMode;
@@ -171,20 +206,24 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 	gMousePos = mousePos;
 
-	gTempWidget = NULL;
-	// onMouseMove
-	{
-		EventMouseMove e;
-		e.pos = mousePos;
-		e.mouseRel = mouseRel;
-		gScene->onMouseMove(e);
-		gTempWidget = e.target;
+	event::Hover eHover;
+	eHover.pos = mousePos;
+	eHover.mouseDelta = mouseDelta;
+	gScene->handleEvent(eHover);
+
+	if (gDraggedWidget) {
+		event::DragMove eDragMove;
+		// TODO
+		eDragMove.button = 0;
+		eDragMove.mouseDelta = mouseDelta;
+		gDraggedWidget->handleEvent(eDragMove);
 	}
 
+/*
 	if (gDraggedWidget) {
 		// onDragMove
 		EventDragMove e;
-		e.mouseRel = mouseRel;
+		e.mouseDelta = mouseDelta;
 		gDraggedWidget->onDragMove(e);
 
 		if (gTempWidget != gDragHoveredWidget) {
@@ -222,59 +261,63 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 		// Define a new global called gScrollWidget, which remembers the widget where middle-click was first pressed
 		EventScroll e;
 		e.pos = mousePos;
-		e.scrollRel = mouseRel;
+		e.scrollRel = mouseDelta;
 		gScene->onScroll(e);
 	}
+*/
 }
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {
 	if (!entered) {
 		if (gHoveredWidget) {
-			// onMouseLeave
-			EventMouseLeave e;
-			gHoveredWidget->onMouseLeave(e);
+			event::Leave eLeave;
+			gHoveredWidget->handleEvent(eLeave);
 		}
 		gHoveredWidget = NULL;
 	}
 }
 
 void scrollCallback(GLFWwindow *window, double x, double y) {
-	math::Vec scrollRel = math::Vec(x, y);
+	math::Vec scrollDelta = math::Vec(x, y);
 #if ARCH_LIN || ARCH_WIN
 	if (windowIsShiftPressed())
-		scrollRel = math::Vec(y, x);
+		scrollDelta = math::Vec(y, x);
 #endif
-	// onScroll
-	EventScroll e;
-	e.pos = gMousePos;
-	e.scrollRel = scrollRel.mult(50.0);
-	gScene->onScroll(e);
+	scrollDelta = scrollDelta.mult(50.0);
+
+	event::HoverScroll eHoverScroll;
+	eHoverScroll.scrollDelta = scrollDelta;
+	gScene->handleEvent(eHoverScroll);
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	if (gFocusedWidget) {
-		// onText
-		EventText e;
-		e.codepoint = codepoint;
-		gFocusedWidget->onText(e);
+	if (gSelectedWidget) {
+		event::SelectText eSelectText;
+		eSelectText.codepoint = codepoint;
+		gSelectedWidget->handleEvent(eSelectText);
 	}
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		if (gFocusedWidget) {
-			// onKey
-			EventKey e;
-			e.key = key;
-			gFocusedWidget->onKey(e);
-			if (e.consumed)
+		if (gSelectedWidget) {
+			event::SelectKey eSelectKey;
+			eSelectKey.key = key;
+			eSelectKey.scancode = scancode;
+			eSelectKey.action = action;
+			eSelectKey.mods = mods;
+			gSelectedWidget->handleEvent(eSelectKey);
+			if (eSelectKey.target)
 				return;
 		}
-		// onHoverKey
-		EventHoverKey e;
-		e.pos = gMousePos;
-		e.key = key;
-		gScene->onHoverKey(e);
+
+		event::HoverKey eHoverKey;
+		eHoverKey.key = key;
+		eHoverKey.scancode = scancode;
+		eHoverKey.action = action;
+		eHoverKey.mods = mods;
+		eHoverKey.pos = gMousePos;
+		gScene->handleEvent(eHoverKey);
 	}
 
 	// Keyboard MIDI driver
@@ -289,13 +332,12 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 }
 
 void dropCallback(GLFWwindow *window, int count, const char **paths) {
-	// onPathDrop
-	EventPathDrop e;
-	e.pos = gMousePos;
+	event::PathDrop ePathDrop;
+	ePathDrop.pos = gMousePos;
 	for (int i = 0; i < count; i++) {
-		e.paths.push_back(paths[i]);
+		ePathDrop.paths.push_back(paths[i]);
 	}
-	gScene->onPathDrop(e);
+	gScene->handleEvent(ePathDrop);
 }
 
 void errorCallback(int error, const char *description) {
@@ -464,8 +506,8 @@ void windowRun() {
 		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
 		pixelRatio = roundf(pixelRatio);
 		if (pixelRatio != gPixelRatio) {
-			EventZoom eZoom;
-			gScene->onZoom(eZoom);
+			event::Zoom eZoom;
+			gScene->handleEvent(eZoom);
 			gPixelRatio = pixelRatio;
 		}
 

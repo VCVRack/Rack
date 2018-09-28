@@ -49,20 +49,19 @@ void Port::draw(NVGcontext *vg) {
 	}
 }
 
-void Port::onMouseDown(EventMouseDown &e) {
-	if (e.button == 1) {
+void Port::on(event::Button &e) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		gRackWidget->wireContainer->removeTopWire(this);
 
 		// HACK
 		// Update hovered*Port of active wire if applicable
-		EventDragEnter e;
-		onDragEnter(e);
+		event::DragEnter eDragEnter;
+		on(eDragEnter);
 	}
-	e.consumed = true;
 	e.target = this;
 }
 
-void Port::onDragStart(EventDragStart &e) {
+void Port::on(event::DragStart &e) {
 	// Try to grab wire on top of stack
 	WireWidget *wire = gRackWidget->wireContainer->getTopWire(this);
 	if (type == OUTPUT && windowIsModPressed()) {
@@ -88,16 +87,16 @@ void Port::onDragStart(EventDragStart &e) {
 	gRackWidget->wireContainer->setActiveWire(wire);
 }
 
-void Port::onDragEnd(EventDragEnd &e) {
+void Port::on(event::DragEnd &e) {
 	// FIXME
 	// If the source Port is deleted, this will be called, removing the cable
 	gRackWidget->wireContainer->commitActiveWire();
 }
 
-void Port::onDragDrop(EventDragDrop &e) {
+void Port::on(event::DragDrop &e) {
 }
 
-void Port::onDragEnter(EventDragEnter &e) {
+void Port::on(event::DragEnter &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		WireWidget *topWire = gRackWidget->wireContainer->getTopWire(this);
@@ -114,7 +113,7 @@ void Port::onDragEnter(EventDragEnter &e) {
 	}
 }
 
-void Port::onDragLeave(EventDragEnter &e) {
+void Port::on(event::DragLeave &e) {
 	WireWidget *activeWire = gRackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		if (type == INPUT)

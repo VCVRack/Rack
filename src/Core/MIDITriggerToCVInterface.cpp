@@ -171,17 +171,17 @@ struct MidiTrigChoice : GridChoice {
 			text = string::stringf("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
 
-			if (gFocusedWidget == this)
-				gFocusedWidget = NULL;
+			if (gSelectedWidget == this)
+				gSelectedWidget = NULL;
 		}
 	}
 
-	void onFocus(EventFocus &e) override {
-		e.consumed = true;
+	void on(event::Select &e) override {
+		e.target = this;
 		module->learningId = id;
 	}
 
-	void onDefocus(EventDefocus &e) override {
+	void on(event::Deselect &e) override {
 		module->learningId = -1;
 	}
 };
@@ -201,29 +201,29 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 	MIDITriggerToCVInterfaceWidget(MIDITriggerToCVInterface *module) : ModuleWidget(module) {
 		setPanel(SVG::load(asset::global("res/Core/MIDITriggerToCVInterface.svg")));
 
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 73.344704)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 0));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 73.344704)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 1));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094982, 73.344704)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 2));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 73.344704)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 3));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.8943355, 84.945023)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 4));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.49466, 84.945023)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 5));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.094982, 84.945023)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 6));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 84.945023)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 7));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.8943343, 96.543976)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 8));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.494659, 96.543976)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 9));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.09498, 96.543976)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 10));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 96.543976)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 11));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.894335, 108.14429)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 12));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(15.49466, 108.14429)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 13));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 14));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), Port::OUTPUT, module, MIDITriggerToCVInterface::TRIG_OUTPUT + 15));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 73.344704)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 0));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 73.344704)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 1));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 73.344704)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 2));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 73.344704)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 3));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943355, 84.945023)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 4));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 84.945023)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 5));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 84.945023)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 6));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 84.945023)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 7));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943343, 96.543976)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 8));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 96.543976)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 9));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 96.543976)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 10));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 96.543976)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 11));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 108.14429)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 12));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 108.14429)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 13));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 14));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDITriggerToCVInterface::TRIG_OUTPUT + 15));
 
-		MidiTrigWidget *midiWidget = Widget::create<MidiTrigWidget>(mm2px(Vec(3.399621, 14.837339)));
+		MidiTrigWidget *midiWidget = createWidget<MidiTrigWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->module = module;
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		midiWidget->midiIO = &module->midiInput;
@@ -236,17 +236,17 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 
 		struct VelocityItem : MenuItem {
 			MIDITriggerToCVInterface *module;
-			void onAction(EventAction &e) override {
+			void on(event::Action &e) override {
 				module->velocity ^= true;
 			}
 		};
 
-		menu->addChild(MenuEntry::create());
-		VelocityItem *velocityItem = MenuItem::create<VelocityItem>("Velocity", CHECKMARK(module->velocity));
+		menu->addChild(new MenuEntry());
+		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity", CHECKMARK(module->velocity));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
 	}
 };
 
 
-Model *modelMIDITriggerToCVInterface = Model::create<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("Core", "MIDITriggerToCVInterface", "MIDI-Trig", MIDI_TAG, EXTERNAL_TAG);
+Model *modelMIDITriggerToCVInterface = createModel<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("Core", "MIDITriggerToCVInterface", "MIDI-Trig", MIDI_TAG, EXTERNAL_TAG);

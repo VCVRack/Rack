@@ -36,15 +36,16 @@ void ParamWidget::randomize() {
 	}
 }
 
-void ParamWidget::onMouseDown(EventMouseDown &e) {
-	if (e.button == 1) {
-		reset();
+void ParamWidget::on(event::Button &e) {
+	OpaqueWidget::on(e);
+	if (e.target == this) {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			reset();
+		}
 	}
-	e.consumed = true;
-	e.target = this;
 }
 
-void ParamWidget::onChange(EventChange &e) {
+void ParamWidget::on(event::Change &e) {
 	if (!module)
 		return;
 

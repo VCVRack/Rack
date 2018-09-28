@@ -52,11 +52,10 @@ void LedDisplayChoice::draw(NVGcontext *vg) {
 	nvgResetScissor(vg);
 }
 
-void LedDisplayChoice::onMouseDown(EventMouseDown &e) {
-	if (e.button == 0 || e.button == 1) {
-		EventAction eAction;
-		onAction(eAction);
-		e.consumed = true;
+void LedDisplayChoice::on(event::Button &e) {
+	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
+		event::Action eAction;
+		handleEvent(eAction);
 		e.target = this;
 	}
 }
@@ -85,7 +84,7 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 		NVGcolor highlightColor = color;
 		highlightColor.a = 0.5;
 		int begin = std::min(cursor, selection);
-		int end = (this == gFocusedWidget) ? std::max(cursor, selection) : -1;
+		int end = (this == gSelectedWidget) ? std::max(cursor, selection) : -1;
 		bndIconLabelCaret(vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, 12, text.c_str(), highlightColor, begin, end);

@@ -65,34 +65,6 @@ struct Model {
 	virtual ModuleWidget *createModuleWidget() { return NULL; }
 	/** Creates a ModuleWidget with no Module, useful for previews */
 	virtual ModuleWidget *createModuleWidgetNull() { return NULL; }
-
-	/** Create Model subclass which constructs a specific Module and ModuleWidget subclass */
-	template <typename TModule, typename TModuleWidget, typename... Tags>
-	static Model *create(std::string author, std::string slug, std::string name, Tags... tags) {
-		struct TModel : Model {
-			Module *createModule() override {
-				TModule *module = new TModule();
-				return module;
-			}
-			ModuleWidget *createModuleWidget() override {
-				TModule *module = new TModule();
-				TModuleWidget *moduleWidget = new TModuleWidget(module);
-				moduleWidget->model = this;
-				return moduleWidget;
-			}
-			ModuleWidget *createModuleWidgetNull() override {
-				TModuleWidget *moduleWidget = new TModuleWidget(NULL);
-				moduleWidget->model = this;
-				return moduleWidget;
-			}
-		};
-		TModel *o = new TModel();
-		o->author = author;
-		o->slug = slug;
-		o->name = name;
-		o->tags = {tags...};
-		return o;
-	}
 };
 
 

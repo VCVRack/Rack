@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "audio.hpp"
+#include "helpers.hpp"
 
 
 namespace rack {
@@ -8,16 +9,16 @@ namespace rack {
 struct AudioDriverItem : MenuItem {
 	AudioIO *audioIO;
 	int driver;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		audioIO->setDriver(driver);
 	}
 };
 
 struct AudioDriverChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Audio driver"));
+		menu->addChild(createMenuLabel("Audio driver"));
 		for (int driver : audioWidget->audioIO->getDrivers()) {
 			AudioDriverItem *item = new AudioDriverItem();
 			item->audioIO = audioWidget->audioIO;
@@ -37,7 +38,7 @@ struct AudioDeviceItem : MenuItem {
 	AudioIO *audioIO;
 	int device;
 	int offset;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		audioIO->setDevice(device, offset);
 	}
 };
@@ -47,9 +48,9 @@ struct AudioDeviceChoice : LedDisplayChoice {
 	/** Prevents devices with a ridiculous number of channels from being displayed */
 	int maxTotalChannels = 128;
 
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Audio device"));
+		menu->addChild(createMenuLabel("Audio device"));
 		int deviceCount = audioWidget->audioIO->getDeviceCount();
 		{
 			AudioDeviceItem *item = new AudioDeviceItem();
@@ -88,19 +89,19 @@ struct AudioDeviceChoice : LedDisplayChoice {
 struct AudioSampleRateItem : MenuItem {
 	AudioIO *audioIO;
 	int sampleRate;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		audioIO->setSampleRate(sampleRate);
 	}
 };
 
 struct AudioSampleRateChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Sample rate"));
+		menu->addChild(createMenuLabel("Sample rate"));
 		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
 		if (sampleRates.empty()) {
-			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(Locked by device)"));
+			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int sampleRate : sampleRates) {
 			AudioSampleRateItem *item = new AudioSampleRateItem();
@@ -120,19 +121,19 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 struct AudioBlockSizeItem : MenuItem {
 	AudioIO *audioIO;
 	int blockSize;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		audioIO->setBlockSize(blockSize);
 	}
 };
 
 struct AudioBlockSizeChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Block size"));
+		menu->addChild(createMenuLabel("Block size"));
 		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
 		if (blockSizes.empty()) {
-			menu->addChild(construct<MenuLabel>(&MenuLabel::text, "(Locked by device)"));
+			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int blockSize : blockSizes) {
 			AudioBlockSizeItem *item = new AudioBlockSizeItem();
@@ -155,34 +156,34 @@ AudioWidget::AudioWidget() {
 
 	math::Vec pos = math::Vec();
 
-	AudioDriverChoice *driverChoice = Widget::create<AudioDriverChoice>(pos);
+	AudioDriverChoice *driverChoice = createWidget<AudioDriverChoice>(pos);
 	driverChoice->audioWidget = this;
 	addChild(driverChoice);
 	pos = driverChoice->box.getBottomLeft();
 	this->driverChoice = driverChoice;
 
-	this->driverSeparator = Widget::create<LedDisplaySeparator>(pos);
+	this->driverSeparator = createWidget<LedDisplaySeparator>(pos);
 	addChild(this->driverSeparator);
 
-	AudioDeviceChoice *deviceChoice = Widget::create<AudioDeviceChoice>(pos);
+	AudioDeviceChoice *deviceChoice = createWidget<AudioDeviceChoice>(pos);
 	deviceChoice->audioWidget = this;
 	addChild(deviceChoice);
 	pos = deviceChoice->box.getBottomLeft();
 	this->deviceChoice = deviceChoice;
 
-	this->deviceSeparator = Widget::create<LedDisplaySeparator>(pos);
+	this->deviceSeparator = createWidget<LedDisplaySeparator>(pos);
 	addChild(this->deviceSeparator);
 
-	AudioSampleRateChoice *sampleRateChoice = Widget::create<AudioSampleRateChoice>(pos);
+	AudioSampleRateChoice *sampleRateChoice = createWidget<AudioSampleRateChoice>(pos);
 	sampleRateChoice->audioWidget = this;
 	addChild(sampleRateChoice);
 	this->sampleRateChoice = sampleRateChoice;
 
-	this->sampleRateSeparator = Widget::create<LedDisplaySeparator>(pos);
+	this->sampleRateSeparator = createWidget<LedDisplaySeparator>(pos);
 	this->sampleRateSeparator->box.size.y = this->sampleRateChoice->box.size.y;
 	addChild(this->sampleRateSeparator);
 
-	AudioBlockSizeChoice *bufferSizeChoice = Widget::create<AudioBlockSizeChoice>(pos);
+	AudioBlockSizeChoice *bufferSizeChoice = createWidget<AudioBlockSizeChoice>(pos);
 	bufferSizeChoice->audioWidget = this;
 	addChild(bufferSizeChoice);
 	this->bufferSizeChoice = bufferSizeChoice;

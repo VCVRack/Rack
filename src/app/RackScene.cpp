@@ -55,53 +55,53 @@ void RackScene::draw(NVGcontext *vg) {
 	Scene::draw(vg);
 }
 
-void RackScene::onHoverKey(EventHoverKey &e) {
-	Widget::onHoverKey(e);
+void RackScene::on(event::HoverKey &e) {
+	Scene::on(e);
 
-	if (!e.consumed) {
+	if (!e.target) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->reset();
-					e.consumed = true;
+					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_Q: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					windowClose();
-					e.consumed = true;
+					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_O: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->loadDialog();
-					e.consumed = true;
+					e.target = this;
 				}
 				if (windowIsModPressed() && windowIsShiftPressed()) {
 					gRackWidget->revert();
-					e.consumed = true;
+					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_S: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->saveDialog();
-					e.consumed = true;
+					e.target = this;
 				}
 				if (windowIsModPressed() && windowIsShiftPressed()) {
 					gRackWidget->saveAsDialog();
-					e.consumed = true;
+					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_V: {
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
 					gRackWidget->pastePresetClipboard();
-					e.consumed = true;
+					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_ENTER:
 			case GLFW_KEY_KP_ENTER: {
 				appModuleBrowserCreate();
-				e.consumed = true;
+				e.target = this;
 			} break;
 			case GLFW_KEY_F11: {
 				windowSetFullScreen(!windowGetFullScreen());
@@ -110,17 +110,17 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 	}
 }
 
-void RackScene::onPathDrop(EventPathDrop &e) {
+void RackScene::on(event::PathDrop &e) {
 	if (e.paths.size() >= 1) {
-		const std::string &firstPath = e.paths.front();
-		if (string::extension(firstPath) == "vcv") {
-			gRackWidget->load(firstPath);
-			e.consumed = true;
+		const std::string &path = e.paths[0];
+		if (string::extension(path) == "vcv") {
+			gRackWidget->load(path);
+			e.target = this;
 		}
 	}
 
-	if (!e.consumed)
-		Scene::onPathDrop(e);
+	if (!e.target)
+		Scene::on(e);
 }
 
 

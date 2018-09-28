@@ -10,12 +10,12 @@ struct NotesWidget : ModuleWidget {
 	NotesWidget(Module *module) : ModuleWidget(module) {
 		setPanel(SVG::load(asset::global("res/Core/Notes.svg")));
 
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		textField = Widget::create<LedDisplayTextField>(mm2px(Vec(3.39962, 14.8373)));
+		textField = createWidget<LedDisplayTextField>(mm2px(Vec(3.39962, 14.8373)));
 		textField->box.size = mm2px(Vec(74.480, 102.753));
 		textField->multiline = true;
 		addChild(textField);
@@ -41,4 +41,4 @@ struct NotesWidget : ModuleWidget {
 };
 
 
-Model *modelNotes = Model::create<Module, NotesWidget>("Core", "Notes", "Notes", BLANK_TAG);
+Model *modelNotes = createModel<Module, NotesWidget>("Core", "Notes", "Notes", BLANK_TAG);

@@ -12,8 +12,7 @@ Widget::~Widget() {
 	if (gHoveredWidget == this) gHoveredWidget = NULL;
 	if (gDraggedWidget == this) gDraggedWidget = NULL;
 	if (gDragHoveredWidget == this) gDragHoveredWidget = NULL;
-	if (gFocusedWidget == this) gFocusedWidget = NULL;
-	if (gTempWidget == this) gTempWidget = NULL;
+	if (gSelectedWidget == this) gSelectedWidget = NULL;
 	clearChildren();
 }
 
@@ -75,34 +74,18 @@ void Widget::clearChildren() {
 	children.clear();
 }
 
-void Widget::finalizeEvents() {
-	// Stop dragging and hovering this widget
-	if (gHoveredWidget == this) {
-		EventMouseLeave e;
-		gHoveredWidget->onMouseLeave(e);
-		gHoveredWidget = NULL;
-	}
-	if (gDraggedWidget == this) {
-		EventDragEnd e;
-		gDraggedWidget->onDragEnd(e);
-		gDraggedWidget = NULL;
-	}
-	if (gDragHoveredWidget == this) {
-		gDragHoveredWidget = NULL;
-	}
-	if (gFocusedWidget == this) {
-		EventDefocus e;
-		gFocusedWidget->onDefocus(e);
-		gFocusedWidget = NULL;
-	}
-	for (Widget *child : children) {
-		child->finalizeEvents();
-	}
-}
-
 void Widget::step() {
-	for (Widget *child : children) {
+	for (auto it = children.begin(); it != children.end();) {
+		Widget *child = *it;
+		// Delete children if a delete is requested
+		if (child->requestedDelete) {
+			it = children.erase(it);
+			delete child;
+			continue;
+		}
+
 		child->step();
+		it++;
 	}
 }
 
@@ -117,52 +100,5 @@ void Widget::draw(NVGcontext *vg) {
 	}
 }
 
-#define RECURSE_EVENT_POSITION(_method) { \
-	math::Vec pos = e.pos; \
-	for (auto it = children.rbegin(); it != children.rend(); it++) { \
-		Widget *child = *it; \
-		if (!child->visible) \
-			continue; \
-		if (child->box.contains(pos)) { \
-			e.pos = pos.minus(child->box.pos); \
-			child->_method(e); \
-			if (e.consumed) \
-				break; \
-		} \
-	} \
-	e.pos = pos; \
-}
-
-
-void Widget::onMouseDown(EventMouseDown &e) {
-	RECURSE_EVENT_POSITION(onMouseDown);
-}
-
-void Widget::onMouseUp(EventMouseUp &e) {
-	RECURSE_EVENT_POSITION(onMouseUp);
-}
-
-void Widget::onMouseMove(EventMouseMove &e) {
-	RECURSE_EVENT_POSITION(onMouseMove);
-}
-
-void Widget::onHoverKey(EventHoverKey &e) {
-	RECURSE_EVENT_POSITION(onHoverKey);
-}
-
-void Widget::onScroll(EventScroll &e) {
-	RECURSE_EVENT_POSITION(onScroll);
-}
-
-void Widget::onPathDrop(EventPathDrop &e) {
-	RECURSE_EVENT_POSITION(onPathDrop);
-}
-
-void Widget::onZoom(EventZoom &e) {
-	for (auto it = children.rbegin(); it != children.rend(); it++) {
-		Widget *child = *it;
-		child->onZoom(e);
-	}
-}
 
 } // namespace rack

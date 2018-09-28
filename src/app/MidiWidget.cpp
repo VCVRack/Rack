@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "midi.hpp"
+#include "helpers.hpp"
 
 
 namespace rack {
@@ -8,16 +9,16 @@ namespace rack {
 struct MidiDriverItem : MenuItem {
 	MidiIO *midiIO;
 	int driverId;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		midiIO->setDriverId(driverId);
 	}
 };
 
 struct MidiDriverChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI driver"));
+		menu->addChild(createMenuLabel("MIDI driver"));
 		for (int driverId : midiWidget->midiIO->getDriverIds()) {
 			MidiDriverItem *item = new MidiDriverItem();
 			item->midiIO = midiWidget->midiIO;
@@ -42,16 +43,16 @@ struct MidiDriverChoice : LedDisplayChoice {
 struct MidiDeviceItem : MenuItem {
 	MidiIO *midiIO;
 	int deviceId;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		midiIO->setDeviceId(deviceId);
 	}
 };
 
 struct MidiDeviceChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI device"));
+		menu->addChild(createMenuLabel("MIDI device"));
 		{
 			MidiDeviceItem *item = new MidiDeviceItem();
 			item->midiIO = midiWidget->midiIO;
@@ -84,16 +85,16 @@ struct MidiDeviceChoice : LedDisplayChoice {
 struct MidiChannelItem : MenuItem {
 	MidiIO *midiIO;
 	int channel;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		midiIO->channel = channel;
 	}
 };
 
 struct MidiChannelChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
-		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MIDI channel"));
+		menu->addChild(createMenuLabel("MIDI channel"));
 		for (int channel = -1; channel < 16; channel++) {
 			MidiChannelItem *item = new MidiChannelItem();
 			item->midiIO = midiWidget->midiIO;
@@ -114,25 +115,25 @@ MidiWidget::MidiWidget() {
 
 	math::Vec pos = math::Vec();
 
-	MidiDriverChoice *driverChoice = Widget::create<MidiDriverChoice>(pos);
+	MidiDriverChoice *driverChoice = createWidget<MidiDriverChoice>(pos);
 	driverChoice->midiWidget = this;
 	addChild(driverChoice);
 	pos = driverChoice->box.getBottomLeft();
 	this->driverChoice = driverChoice;
 
-	this->driverSeparator = Widget::create<LedDisplaySeparator>(pos);
+	this->driverSeparator = createWidget<LedDisplaySeparator>(pos);
 	addChild(this->driverSeparator);
 
-	MidiDeviceChoice *deviceChoice = Widget::create<MidiDeviceChoice>(pos);
+	MidiDeviceChoice *deviceChoice = createWidget<MidiDeviceChoice>(pos);
 	deviceChoice->midiWidget = this;
 	addChild(deviceChoice);
 	pos = deviceChoice->box.getBottomLeft();
 	this->deviceChoice = deviceChoice;
 
-	this->deviceSeparator = Widget::create<LedDisplaySeparator>(pos);
+	this->deviceSeparator = createWidget<LedDisplaySeparator>(pos);
 	addChild(this->deviceSeparator);
 
-	MidiChannelChoice *channelChoice = Widget::create<MidiChannelChoice>(pos);
+	MidiChannelChoice *channelChoice = createWidget<MidiChannelChoice>(pos);
 	channelChoice->midiWidget = this;
 	addChild(channelChoice);
 	this->channelChoice = channelChoice;

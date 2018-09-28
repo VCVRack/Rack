@@ -28,11 +28,11 @@ struct Grid16MidiWidget : MidiWidget {
 	void createGridChoices() {
 		Vec pos = channelChoice->box.getBottomLeft();
 		for (int x = 1; x < 4; x++) {
-			vSeparators[x] = Widget::create<LedDisplaySeparator>(pos);
+			vSeparators[x] = createWidget<LedDisplaySeparator>(pos);
 			addChild(vSeparators[x]);
 		}
 		for (int y = 0; y < 4; y++) {
-			hSeparators[y] = Widget::create<LedDisplaySeparator>(pos);
+			hSeparators[y] = createWidget<LedDisplaySeparator>(pos);
 			addChild(hSeparators[y]);
 			for (int x = 0; x < 4; x++) {
 				GridChoice *gridChoice = createGridChoice();

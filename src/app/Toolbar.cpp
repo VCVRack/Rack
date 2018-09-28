@@ -2,6 +2,7 @@
 #include "window.hpp"
 #include "engine.hpp"
 #include "asset.hpp"
+#include "helpers.hpp"
 
 
 namespace rack {
@@ -10,22 +11,22 @@ namespace rack {
 struct TooltipIconButton : IconButton {
 	Tooltip *tooltip = NULL;
 	std::string tooltipText;
-	void onMouseEnter(EventMouseEnter &e) override {
+	void on(event::Enter &e) override {
 		if (!tooltip) {
 			tooltip = new Tooltip();
 			tooltip->box.pos = getAbsoluteOffset(math::Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = tooltipText;
 			gScene->addChild(tooltip);
 		}
-		IconButton::onMouseEnter(e);
+		IconButton::on(e);
 	}
-	void onMouseLeave(EventMouseLeave &e) override {
+	void on(event::Leave &e) override {
 		if (tooltip) {
 			gScene->removeChild(tooltip);
 			delete tooltip;
 			tooltip = NULL;
 		}
-		IconButton::onMouseLeave(e);
+		IconButton::on(e);
 	}
 };
 
@@ -34,7 +35,7 @@ struct NewButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_146097_cc.svg")));
 		tooltipText = "New patch (" WINDOW_MOD_KEY_NAME "+N)";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->reset();
 	}
 };
@@ -44,7 +45,7 @@ struct OpenButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_31859_cc.svg")));
 		tooltipText = "Open patch (" WINDOW_MOD_KEY_NAME "+O)";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->loadDialog();
 	}
 };
@@ -54,7 +55,7 @@ struct SaveButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1343816_cc.svg")));
 		tooltipText = "Save patch (" WINDOW_MOD_KEY_NAME "+S)";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->saveDialog();
 	}
 };
@@ -64,7 +65,7 @@ struct SaveAsButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1343811_cc.svg")));
 		tooltipText = "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->saveAsDialog();
 	}
 };
@@ -74,7 +75,7 @@ struct RevertButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1084369_cc.svg")));
 		tooltipText = "Revert patch";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->revert();
 	}
 };
@@ -84,7 +85,7 @@ struct DisconnectCablesButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1745061_cc.svg")));
 		tooltipText = "Disconnect cables";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->disconnect();
 	}
 };
@@ -94,20 +95,20 @@ struct PowerMeterButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_305536_cc.svg")));
 		tooltipText = "Toggle power meter (see manual for explanation)";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gPowerMeter ^= true;
 	}
 };
 
 struct EnginePauseItem : MenuItem {
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gPaused ^= true;
 	}
 };
 
 struct SampleRateItem : MenuItem {
 	float sampleRate;
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		engineSetSampleRate(sampleRate);
 		gPaused = false;
 	}
@@ -118,12 +119,12 @@ struct SampleRateButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1240789_cc.svg")));
 		tooltipText = "Engine sample rate";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		Menu *menu = gScene->createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(MenuLabel::create("Engine sample rate"));
+		menu->addChild(createMenuLabel("Engine sample rate"));
 
 		EnginePauseItem *pauseItem = new EnginePauseItem();
 		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
@@ -145,15 +146,15 @@ struct RackLockButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_468341_cc.svg")));
 		tooltipText = "Lock modules";
 	}
-	void onAction(EventAction &e) override {
+	void on(event::Action &e) override {
 		gRackWidget->lockModules ^= true;
 	}
 };
 
 struct ZoomSlider : Slider {
-	void onAction(EventAction &e) override {
-		Slider::onAction(e);
-		gRackScene->zoomWidget->setZoom(roundf(value) / 100.0);
+	void on(event::Action &e) override {
+		EventWidget::on(e);
+		gRackScene->zoomWidget->setZoom(std::round(value) / 100.0);
 	}
 };
 

@@ -3,25 +3,25 @@
 using namespace rack;
 
 
-struct ModuleResizeHandle : Widget {
+struct ModuleResizeHandle : EventWidget {
 	bool right = false;
 	float dragX;
 	Rect originalBox;
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
-	void onMouseDown(EventMouseDown &e) override {
-		if (e.button == 0) {
-			e.consumed = true;
-			e.target = this;
-		}
+	void on(event::Hover &e) override {
+		// TODO
+		// if (e.button == 0) {
+		// 	e.target = this;
+		// }
 	}
-	void onDragStart(EventDragStart &e) override {
+	void on(event::DragStart &e) override {
 		dragX = gRackWidget->lastMousePos.x;
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 		originalBox = m->box;
 	}
-	void onDragMove(EventDragMove &e) override {
+	void on(event::DragMove &e) override {
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
 		float newDragX = gRackWidget->lastMousePos.x;
@@ -78,10 +78,10 @@ struct BlankWidget : ModuleWidget {
 		addChild(leftHandle);
 		addChild(rightHandle);
 
-		addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-		addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-		topRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0));
-		bottomRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365));
+		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
+		addChild(createWidget<ScrewSilver>(Vec(15, 365)));
+		topRightScrew = createWidget<ScrewSilver>(Vec(box.size.x - 30, 0));
+		bottomRightScrew = createWidget<ScrewSilver>(Vec(box.size.x - 30, 365));
 		addChild(topRightScrew);
 		addChild(bottomRightScrew);
 	}
@@ -120,4 +120,4 @@ struct BlankWidget : ModuleWidget {
 };
 
 
-Model *modelBlank = Model::create<Module, BlankWidget>("Core", "Blank", "Blank", BLANK_TAG);
+Model *modelBlank = createModel<Module, BlankWidget>("Core", "Blank", "Blank", BLANK_TAG);

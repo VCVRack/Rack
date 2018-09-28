@@ -57,12 +57,6 @@ DEPRECATED inline float randomNormal() {return random::normal();}
 DEPRECATED inline float randomf() {return random::uniform();}
 
 ////////////////////
-// string
-////////////////////
-
-using string::stringf;
-
-////////////////////
 // logger
 ////////////////////
 

@@ -4,13 +4,11 @@
 namespace rack {
 
 
-void MomentarySwitch::onDragStart(EventDragStart &e) {
+void MomentarySwitch::on(event::DragStart &e) {
 	setValue(maxValue);
-	EventAction eAction;
-	onAction(eAction);
 }
 
-void MomentarySwitch::onDragEnd(EventDragEnd &e) {
+void MomentarySwitch::on(event::DragEnd &e) {
 	setValue(minValue);
 }
 

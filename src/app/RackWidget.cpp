@@ -497,26 +497,23 @@ void RackWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
 
-void RackWidget::onMouseMove(EventMouseMove &e) {
-	OpaqueWidget::onMouseMove(e);
+void RackWidget::on(event::Hover &e) {
+	OpaqueWidget::on(e);
 	lastMousePos = e.pos;
 }
 
-void RackWidget::onMouseDown(EventMouseDown &e) {
-	Widget::onMouseDown(e);
-	if (e.consumed)
-		return;
-
-	if (e.button == 1) {
-		appModuleBrowserCreate();
+void RackWidget::on(event::Button &e) {
+	OpaqueWidget::on(e);
+	if (e.target == this) {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			appModuleBrowserCreate();
+		}
 	}
-	e.consumed = true;
-	e.target = this;
 }
 
-void RackWidget::onZoom(EventZoom &e) {
+void RackWidget::on(event::Zoom &e) {
 	rails->box.size = math::Vec();
-	Widget::onZoom(e);
+	EventWidget::on(e);
 }
 
 
