@@ -18,15 +18,15 @@ struct RadioButton : OpaqueWidget, QuantityWidget {
 		bndRadioButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, value == 0.0 ? state : BND_ACTIVE, -1, label.c_str());
 	}
 
-	void on(event::Enter &e) override {
+	void onEnter(event::Enter &e) override {
 		state = BND_HOVER;
 	}
 
-	void on(event::Leave &e) override {
+	void onLeave(event::Leave &e) override {
 		state = BND_DEFAULT;
 	}
 
-	void on(event::DragDrop &e) override {
+	void onDragDrop(event::DragDrop &e) override {
 		if (e.origin == this) {
 			if (value)
 				setValue(0.0);
@@ -34,7 +34,7 @@ struct RadioButton : OpaqueWidget, QuantityWidget {
 				setValue(1.0);
 
 			event::Action eAction;
-			handleEvent(eAction);
+			onAction(eAction);
 		}
 	}
 };

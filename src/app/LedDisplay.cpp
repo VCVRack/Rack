@@ -53,10 +53,10 @@ void LedDisplayChoice::draw(NVGcontext *vg) {
 	nvgResetScissor(vg);
 }
 
-void LedDisplayChoice::on(event::Button &e) {
+void LedDisplayChoice::onButton(event::Button &e) {
 	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
 		event::Action eAction;
-		handleEvent(eAction);
+		onAction(eAction);
 		e.target = this;
 	}
 }

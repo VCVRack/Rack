@@ -41,7 +41,7 @@ struct MenuItem : MenuEntry {
 
 	virtual Menu *createChildMenu() {return NULL;}
 
-	void on(event::Enter &e) override {
+	void onEnter(event::Enter &e) override {
 		Menu *parentMenu = dynamic_cast<Menu*>(parent);
 		if (!parentMenu)
 			return;
@@ -57,14 +57,14 @@ struct MenuItem : MenuEntry {
 		parentMenu->setChildMenu(childMenu);
 	}
 
-	void on(event::DragDrop &e) override {
+	void onDragDrop(event::DragDrop &e) override {
 		if (e.origin != this)
 			return;
 
 		event::Action eAction;
 		// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.
 		eAction.target = this;
-		handleEvent(eAction);
+		onAction(eAction);
 		if (!eAction.target)
 			return;
 

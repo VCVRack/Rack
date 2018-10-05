@@ -3,25 +3,25 @@
 using namespace rack;
 
 
-struct ModuleResizeHandle : EventWidget {
+struct ModuleResizeHandle : virtual Widget {
 	bool right = false;
 	float dragX;
 	Rect originalBox;
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
-	void on(event::Hover &e) override {
+	void onHover(event::Hover &e) override {
 		// TODO
 		// if (e.button == 0) {
 		// 	e.target = this;
 		// }
 	}
-	void on(event::DragStart &e) override {
+	void onDragStart(event::DragStart &e) override {
 		dragX = gRackWidget->lastMousePos.x;
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 		originalBox = m->box;
 	}
-	void on(event::DragMove &e) override {
+	void onDragMove(event::DragMove &e) override {
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
 		float newDragX = gRackWidget->lastMousePos.x;

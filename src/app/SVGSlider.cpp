@@ -30,9 +30,9 @@ void SVGSlider::step() {
 	FramebufferWidget::step();
 }
 
-void SVGSlider::on(event::Change &e) {
+void SVGSlider::onChange(event::Change &e) {
 	dirty = true;
-	ParamWidget::on(e);
+	ParamWidget::onChange(e);
 }
 
 

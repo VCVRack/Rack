@@ -1,5 +1,5 @@
 #pragma once
-#include "widgets/EventWidget.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
@@ -9,7 +9,7 @@ namespace rack {
 When `dirty` is true, its children will be re-rendered on the next call to step() override.
 Events are not passed to the underlying scene.
 */
-struct FramebufferWidget : virtual EventWidget {
+struct FramebufferWidget : virtual Widget {
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
 	/** A margin in pixels around the children in the framebuffer
@@ -27,9 +27,9 @@ struct FramebufferWidget : virtual EventWidget {
 	void draw(NVGcontext *vg) override;
 	int getImageHandle();
 
-	void on(event::Zoom &e) override {
+	void onZoom(event::Zoom &e) override {
 		dirty = true;
-		EventWidget::on(e);
+		Widget::onZoom(e);
 	}
 };
 

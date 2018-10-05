@@ -7,7 +7,7 @@
 namespace rack {
 
 
-struct Tooltip : virtual EventWidget {
+struct Tooltip : virtual Widget {
 	std::string text;
 
 	void draw(NVGcontext *vg) override {

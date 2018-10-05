@@ -47,7 +47,7 @@ static bool isModelMatch(Model *model, std::string search) {
 struct FavoriteRadioButton : RadioButton {
 	Model *model = NULL;
 
-	void on(event::Action &e) override;
+	void onAction(event::Action &e) override;
 };
 
 
@@ -80,9 +80,9 @@ struct BrowserListItem : OpaqueWidget {
 		Widget::draw(vg);
 	}
 
-	void on(event::DragStart &e) override;
+	void onDragStart(event::DragStart &e) override;
 
-	void on(event::DragDrop &e) override {
+	void onDragDrop(event::DragDrop &e) override {
 		if (e.origin != this)
 			return;
 		doAction();
@@ -91,7 +91,7 @@ struct BrowserListItem : OpaqueWidget {
 	void doAction() {
 		event::Action eAction;
 		eAction.target = this;
-		handleEvent(eAction);
+		onAction(eAction);
 		if (eAction.target) {
 			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
 			overlay->requestedDelete = true;
@@ -137,7 +137,7 @@ struct ModelItem : BrowserListItem {
 			pluginLabel->box.size.x = box.size.x - BND_SCROLLBAR_WIDTH;
 	}
 
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		if (!moduleWidget)
 			return;
@@ -163,7 +163,7 @@ struct AuthorItem : BrowserListItem {
 		addChild(authorLabel);
 	}
 
-	void on(event::Action &e) override;
+	void onAction(event::Action &e) override;
 };
 
 
@@ -181,7 +181,7 @@ struct TagItem : BrowserListItem {
 		addChild(tagLabel);
 	}
 
-	void on(event::Action &e) override;
+	void onAction(event::Action &e) override;
 };
 
 
@@ -192,7 +192,7 @@ struct ClearFilterItem : BrowserListItem {
 		addChild(label);
 	}
 
-	void on(event::Action &e) override;
+	void onAction(event::Action &e) override;
 };
 
 
@@ -272,8 +272,8 @@ struct ModuleBrowser;
 
 struct SearchModuleField : TextField {
 	ModuleBrowser *moduleBrowser;
-	void on(event::Change &e) override;
-	void on(event::SelectKey &e) override;
+	void onChange(event::Change &e) override;
+	void onSelectKey(event::SelectKey &e) override;
 };
 
 
@@ -438,7 +438,7 @@ struct ModuleBrowser : OpaqueWidget {
 
 // Implementations of inline methods above
 
-void AuthorItem::on(event::Action &e) {
+void AuthorItem::onAction(event::Action &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sAuthorFilter = author;
 	moduleBrowser->clearSearch();
@@ -446,7 +446,7 @@ void AuthorItem::on(event::Action &e) {
 	e.target = this;
 }
 
-void TagItem::on(event::Action &e) {
+void TagItem::onAction(event::Action &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sTagFilter = tag;
 	moduleBrowser->clearSearch();
@@ -454,7 +454,7 @@ void TagItem::on(event::Action &e) {
 	e.target = this;
 }
 
-void ClearFilterItem::on(event::Action &e) {
+void ClearFilterItem::onAction(event::Action &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sAuthorFilter = "";
 	sTagFilter = NO_TAG;
@@ -462,7 +462,7 @@ void ClearFilterItem::on(event::Action &e) {
 	e.target = this;
 }
 
-void FavoriteRadioButton::on(event::Action &e) {
+void FavoriteRadioButton::onAction(event::Action &e) {
 	if (!model)
 		return;
 	if (value) {
@@ -479,18 +479,18 @@ void FavoriteRadioButton::on(event::Action &e) {
 		moduleBrowser->refreshSearch();
 }
 
-void BrowserListItem::on(event::DragStart &e) {
+void BrowserListItem::onDragStart(event::DragStart &e) {
 	BrowserList *list = dynamic_cast<BrowserList*>(parent);
 	if (list) {
 		list->selectItem(this);
 	}
 }
 
-void SearchModuleField::on(event::Change &e) {
+void SearchModuleField::onChange(event::Change &e) {
 	moduleBrowser->refreshSearch();
 }
 
-void SearchModuleField::on(event::SelectKey &e) {
+void SearchModuleField::onSelectKey(event::SelectKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_ESCAPE: {
 			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
@@ -529,7 +529,7 @@ void SearchModuleField::on(event::SelectKey &e) {
 	}
 
 	if (!e.target) {
-		TextField::on(e);
+		TextField::onSelectKey(e);
 	}
 }
 

@@ -136,9 +136,9 @@ struct RackWidget : OpaqueWidget {
 	void step() override;
 	void draw(NVGcontext *vg) override;
 
-	void on(event::Hover &e) override;
-	void on(event::Button &e) override;
-	void on(event::Zoom &e) override;
+	void onHover(event::Hover &e) override;
+	void onButton(event::Button &e) override;
+	void onZoom(event::Zoom &e) override;
 };
 
 struct RackRail : TransparentWidget {
@@ -175,8 +175,8 @@ struct ParamWidget : Component, QuantityWidget {
 	void fromJson(json_t *rootJ);
 	virtual void reset();
 	virtual void randomize();
-	void on(event::Button &e) override;
-	void on(event::Change &e) override;
+	void onButton(event::Button &e) override;
+	void onChange(event::Change &e) override;
 };
 
 /** Implements vertical dragging behavior for ParamWidgets */
@@ -187,9 +187,9 @@ struct Knob : ParamWidget {
 	float speed = 1.0;
 	float dragValue;
 	Knob();
-	void on(event::DragStart &e) override;
-	void on(event::DragMove &e) override;
-	void on(event::DragEnd &e) override;
+	void onDragStart(event::DragStart &e) override;
+	void onDragMove(event::DragMove &e) override;
+	void onDragEnd(event::DragEnd &e) override;
 };
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
@@ -203,7 +203,7 @@ struct SVGKnob : Knob, FramebufferWidget {
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
 	void step() override;
-	void on(event::Change &e) override;
+	void onChange(event::Change &e) override;
 };
 
 /** Behaves like a knob but linearly moves an SVGWidget between two points.
@@ -218,7 +218,7 @@ struct SVGSlider : Knob, FramebufferWidget {
 	SVGSlider();
 	void setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG> handleSVG);
 	void step() override;
-	void on(event::Change &e) override;
+	void onChange(event::Change &e) override;
 };
 
 /** A ParamWidget with multiple frames corresponding to its value */
@@ -228,12 +228,12 @@ struct SVGSwitch : virtual ParamWidget, FramebufferWidget {
 	SVGSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<SVG> svg);
-	void on(event::Change &e) override;
+	void onChange(event::Change &e) override;
 };
 
 /** A switch that cycles through each mechanical position */
 struct ToggleSwitch : virtual ParamWidget {
-	void on(event::DragStart &e) override;
+	void onDragStart(event::DragStart &e) override;
 };
 
 /** A switch that is turned on when held and turned off when released.
@@ -242,8 +242,8 @@ Consider using SVGButton if the switch simply changes the state of your Module w
 struct MomentarySwitch : virtual ParamWidget {
 	/** Don't randomize state */
 	void randomize() override {}
-	void on(event::DragStart &e) override;
-	void on(event::DragEnd &e) override;
+	void onDragStart(event::DragStart &e) override;
+	void onDragEnd(event::DragEnd &e) override;
 };
 
 /** A Component with a default (up) and active (down) state when clicked.
@@ -257,15 +257,15 @@ struct SVGButton : Component, FramebufferWidget {
 	SVGButton();
 	/** If `activeSVG` is NULL, `defaultSVG` is used as the active state instead. */
 	void setSVGs(std::shared_ptr<SVG> defaultSVG, std::shared_ptr<SVG> activeSVG);
-	void on(event::DragStart &e) override;
-	void on(event::DragEnd &e) override;
+	void onDragStart(event::DragStart &e) override;
+	void onDragEnd(event::DragEnd &e) override;
 };
 
 ////////////////////
 // IO widgets
 ////////////////////
 
-struct LedDisplay : virtual EventWidget {
+struct LedDisplay : virtual Widget {
 	void draw(NVGcontext *vg) override;
 };
 
@@ -281,7 +281,7 @@ struct LedDisplayChoice : TransparentWidget {
 	NVGcolor color;
 	LedDisplayChoice();
 	void draw(NVGcontext *vg) override;
-	void on(event::Button &e) override;
+	void onButton(event::Button &e) override;
 };
 
 struct LedDisplayTextField : TextField {
@@ -371,12 +371,12 @@ struct Port : Component {
 	~Port();
 	void step() override;
 	void draw(NVGcontext *vg) override;
-	void on(event::Button &e) override;
-	void on(event::DragStart &e) override;
-	void on(event::DragEnd &e) override;
-	void on(event::DragDrop &e) override;
-	void on(event::DragEnter &e) override;
-	void on(event::DragLeave &e) override;
+	void onButton(event::Button &e) override;
+	void onDragStart(event::DragStart &e) override;
+	void onDragEnd(event::DragEnd &e) override;
+	void onDragDrop(event::DragDrop &e) override;
+	void onDragEnter(event::DragEnter &e) override;
+	void onDragLeave(event::DragLeave &e) override;
 };
 
 struct SVGPort : Port, FramebufferWidget {
@@ -409,7 +409,7 @@ struct Toolbar : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct PluginManagerWidget : virtual EventWidget {
+struct PluginManagerWidget : virtual Widget {
 	Widget *loginWidget;
 	Widget *manageWidget;
 	Widget *downloadWidget;
@@ -428,8 +428,8 @@ struct RackScene : Scene {
 	RackScene();
 	void step() override;
 	void draw(NVGcontext *vg) override;
-	void on(event::HoverKey &e) override;
-	void on(event::PathDrop &e) override;
+	void onHoverKey(event::HoverKey &e) override;
+	void onPathDrop(event::PathDrop &e) override;
 };
 
 ////////////////////

@@ -1,12 +1,12 @@
 #pragma once
-#include "widgets/EventWidget.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
 
 
 /** A Widget representing a float value */
-struct QuantityWidget : virtual EventWidget {
+struct QuantityWidget : virtual Widget {
 	float value = 0.0;
 	float minValue = 0.0;
 	float maxValue = 1.0;
@@ -26,7 +26,7 @@ struct QuantityWidget : virtual EventWidget {
 	void setValue(float value) {
 		this->value = math::clampBetween(value, minValue, maxValue);
 		event::Change e;
-		on(e);
+		onChange(e);
 	}
 
 	void setLimits(float minValue, float maxValue) {

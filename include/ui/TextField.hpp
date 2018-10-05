@@ -45,28 +45,28 @@ struct TextField : OpaqueWidget {
 		nvgResetScissor(vg);
 	}
 
-	void on(event::Button &e) override {
+	void onButton(event::Button &e) override {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			cursor = selection = getTextPosition(e.pos);
 		}
-		OpaqueWidget::on(e);
+		OpaqueWidget::onButton(e);
 	}
 
-	void on(event::Hover &e) override {
+	void onHover(event::Hover &e) override {
 		if (this == gWidgetState->draggedWidget) {
 			int pos = getTextPosition(e.pos);
 			if (pos != selection) {
 				cursor = pos;
 			}
 		}
-		OpaqueWidget::on(e);
+		OpaqueWidget::onHover(e);
 	}
 
-	void on(event::Enter &e) override {
+	void onEnter(event::Enter &e) override {
 		e.target = this;
 	}
 
-	void on(event::SelectText &e) override {
+	void onSelectText(event::SelectText &e) override {
 		if (e.codepoint < 128) {
 			std::string newText(1, (char) e.codepoint);
 			insertText(newText);
@@ -74,7 +74,7 @@ struct TextField : OpaqueWidget {
 		e.target = this;
 	}
 
-	void on(event::SelectKey &e) override {
+	void onSelectKey(event::SelectKey &e) override {
 		switch (e.key) {
 			case GLFW_KEY_BACKSPACE: {
 				if (cursor == selection) {
@@ -82,7 +82,7 @@ struct TextField : OpaqueWidget {
 					if (cursor >= 0) {
 						text.erase(cursor, 1);
 						event::Change eChange;
-						handleEvent(eChange);
+						onChange(eChange);
 					}
 					selection = cursor;
 				}
@@ -90,7 +90,7 @@ struct TextField : OpaqueWidget {
 					int begin = std::min(cursor, selection);
 					text.erase(begin, std::abs(selection - cursor));
 					event::Change eChange;
-					handleEvent(eChange);
+					onChange(eChange);
 					cursor = selection = begin;
 				}
 			} break;
@@ -98,13 +98,13 @@ struct TextField : OpaqueWidget {
 				if (cursor == selection) {
 					text.erase(cursor, 1);
 					event::Change eChange;
-					handleEvent(eChange);
+					onChange(eChange);
 				}
 				else {
 					int begin = std::min(cursor, selection);
 					text.erase(begin, std::abs(selection - cursor));
 					event::Change eChange;
-					handleEvent(eChange);
+					onChange(eChange);
 					cursor = selection = begin;
 				}
 			} break;
@@ -180,7 +180,7 @@ struct TextField : OpaqueWidget {
 				}
 				else {
 					event::Action eAction;
-					handleEvent(eAction);
+					onAction(eAction);
 				}
 			} break;
 		}
@@ -201,7 +201,7 @@ struct TextField : OpaqueWidget {
 		cursor += text.size();
 		selection = cursor;
 		event::Change eChange;
-		handleEvent(eChange);
+		onChange(eChange);
 	}
 
 	/** Replaces the entire text */
@@ -209,7 +209,7 @@ struct TextField : OpaqueWidget {
 		this->text = text;
 		selection = cursor = text.size();
 		event::Change eChange;
-		handleEvent(eChange);
+		onChange(eChange);
 	}
 
 	virtual int getTextPosition(math::Vec mousePos) {

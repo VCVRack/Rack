@@ -11,7 +11,7 @@ namespace rack {
 
 
 struct RegisterButton : Button {
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/");
 		});
@@ -23,7 +23,7 @@ struct RegisterButton : Button {
 struct LogInButton : Button {
 	TextField *emailField;
 	TextField *passwordField;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		std::thread t(pluginLogIn, emailField->text, passwordField->text);
 		t.detach();
 		passwordField->text = "";
@@ -39,7 +39,7 @@ struct StatusLabel : Label {
 
 
 struct ManageButton : Button {
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/plugins.html");
 		});
@@ -85,7 +85,7 @@ struct SyncButton : Button {
 			nvgStroke(vg);
 		}
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		available = false;
 		std::thread t([this]() {
 			if (pluginSync(false))
@@ -97,7 +97,7 @@ struct SyncButton : Button {
 
 
 struct LogOutButton : Button {
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		pluginLogOut();
 	}
 };
@@ -115,7 +115,7 @@ struct DownloadProgressBar : ProgressBar {
 
 
 struct CancelButton : Button {
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		pluginCancelDownload();
 	}
 };

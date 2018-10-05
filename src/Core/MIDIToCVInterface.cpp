@@ -292,7 +292,7 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 			MIDIToCVInterface *module;
 			int index;
 			int division;
-			void on(event::Action &e) override {
+			void onAction(event::Action &e) override {
 				module->divisions[index] = division;
 			}
 		};

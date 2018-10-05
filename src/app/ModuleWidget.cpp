@@ -330,8 +330,8 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 	nvgFill(vg);
 }
 
-void ModuleWidget::on(event::Hover &e) {
-	OpaqueWidget::on(e);
+void ModuleWidget::onHover(event::Hover &e) {
+	OpaqueWidget::onHover(e);
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 	if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
@@ -344,8 +344,8 @@ void ModuleWidget::on(event::Hover &e) {
 	}
 }
 
-void ModuleWidget::on(event::Button &e) {
-	OpaqueWidget::on(e);
+void ModuleWidget::onButton(event::Button &e) {
+	OpaqueWidget::onButton(e);
 	if (e.target == this) {
 		if (e.button == 1) {
 			createContextMenu();
@@ -353,7 +353,7 @@ void ModuleWidget::on(event::Button &e) {
 	}
 }
 
-void ModuleWidget::on(event::HoverKey &e) {
+void ModuleWidget::onHoverKey(event::HoverKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_I: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
@@ -399,17 +399,17 @@ void ModuleWidget::on(event::HoverKey &e) {
 		} break;
 	}
 
-	OpaqueWidget::on(e);
+	OpaqueWidget::onHoverKey(e);
 }
 
-void ModuleWidget::on(event::DragStart &e) {
+void ModuleWidget::onDragStart(event::DragStart &e) {
 	dragPos = gRackWidget->lastMousePos.minus(box.pos);
 }
 
-void ModuleWidget::on(event::DragEnd &e) {
+void ModuleWidget::onDragEnd(event::DragEnd &e) {
 }
 
-void ModuleWidget::on(event::DragMove &e) {
+void ModuleWidget::onDragMove(event::DragMove &e) {
 	if (!gRackWidget->lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
@@ -420,63 +420,63 @@ void ModuleWidget::on(event::DragMove &e) {
 
 struct ModuleDisconnectItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		moduleWidget->disconnect();
 	}
 };
 
 struct ModuleResetItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		moduleWidget->reset();
 	}
 };
 
 struct ModuleRandomizeItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		moduleWidget->randomize();
 	}
 };
 
 struct ModuleCopyItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		moduleWidget->copyClipboard();
 	}
 };
 
 struct ModulePasteItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		moduleWidget->pasteClipboard();
 	}
 };
 
 struct ModuleSaveItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		moduleWidget->saveDialog();
 	}
 };
 
 struct ModuleLoadItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		moduleWidget->loadDialog();
 	}
 };
 
 struct ModuleCloneItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct ModuleDeleteItem : MenuItem {
 	ModuleWidget *moduleWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->deleteModule(moduleWidget);
 		delete moduleWidget;
 	}

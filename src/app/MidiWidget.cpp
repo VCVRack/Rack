@@ -9,14 +9,14 @@ namespace rack {
 struct MidiDriverItem : MenuItem {
 	MidiIO *midiIO;
 	int driverId;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		midiIO->setDriverId(driverId);
 	}
 };
 
 struct MidiDriverChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI driver"));
 		for (int driverId : midiWidget->midiIO->getDriverIds()) {
@@ -43,14 +43,14 @@ struct MidiDriverChoice : LedDisplayChoice {
 struct MidiDeviceItem : MenuItem {
 	MidiIO *midiIO;
 	int deviceId;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		midiIO->setDeviceId(deviceId);
 	}
 };
 
 struct MidiDeviceChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI device"));
 		{
@@ -85,14 +85,14 @@ struct MidiDeviceChoice : LedDisplayChoice {
 struct MidiChannelItem : MenuItem {
 	MidiIO *midiIO;
 	int channel;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		midiIO->channel = channel;
 	}
 };
 
 struct MidiChannelChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI channel"));
 		for (int channel = -1; channel < 16; channel++) {

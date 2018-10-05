@@ -1,12 +1,12 @@
 #pragma once
-#include "widgets/EventWidget.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
 
 
 /** Transforms appearance only, not positions of events */
-struct TransformWidget : virtual EventWidget {
+struct TransformWidget : virtual Widget {
 	/** The transformation matrix */
 	float transform[6];
 

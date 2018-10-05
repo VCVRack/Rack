@@ -15,13 +15,13 @@ Knob::Knob() {
 	smooth = true;
 }
 
-void Knob::on(event::DragStart &e) {
+void Knob::onDragStart(event::DragStart &e) {
 	windowCursorLock();
 	dragValue = value;
 	randomizable = false;
 }
 
-void Knob::on(event::DragMove &e) {
+void Knob::onDragMove(event::DragMove &e) {
 	float range;
 	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
 		range = maxValue - minValue;
@@ -43,7 +43,7 @@ void Knob::on(event::DragMove &e) {
 		setValue(dragValue);
 }
 
-void Knob::on(event::DragEnd &e) {
+void Knob::onDragEnd(event::DragEnd &e) {
 	windowCursorUnlock();
 	randomizable = true;
 }

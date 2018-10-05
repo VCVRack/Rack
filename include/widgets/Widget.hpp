@@ -4,6 +4,7 @@
 #include "math.hpp"
 #include "window.hpp"
 #include "color.hpp"
+#include "event.hpp"
 
 
 namespace rack {
@@ -16,7 +17,10 @@ struct Event;
 } // namespace event
 
 
-/** A node in the 2D scene graph */
+/** A node in the 2D scene graph
+It is recommended to inherit virtually from Widget instead of directly.
+e.g. `struct MyWidget : virtual Widget {}`
+*/
 struct Widget {
 	/** Stores position and size */
 	math::Rect box = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
@@ -75,10 +79,55 @@ struct Widget {
 	/** Draws to NanoVG context */
 	virtual void draw(NVGcontext *vg);
 
-	/** Trigger an event on this Widget. */
-	virtual void handleEvent(event::Event &e) {
-		// Basic widgets do not handle events, but the EventWidget subclass does.
+	// Events
+
+	template <typename TMethod, class TEvent>
+	void recursePositionEvent(TMethod f, TEvent &e) {
+		for (auto it = children.rbegin(); it != children.rend(); it++) {
+			Widget *child = *it;
+			// Filter child by visibility and position
+			if (!child->visible)
+				continue;
+			if (!child->box.contains(e.pos))
+				continue;
+
+			// Clone event so modifications do not up-propagate
+			TEvent e2 = e;
+			e2.pos = e.pos.minus(child->box.pos);
+			// Call child event handler
+			(child->*f)(e2);
+			// Up-propagate target if consumed
+			if (e2.target) {
+				e.target = e2.target;
+				break;
+			}
+		}
 	}
+
+	/** Override these event callbacks to respond to events.
+	See events.hpp for a description of each event.
+	*/
+	virtual void onHover(event::Hover &e) {recursePositionEvent(&Widget::onHover, e);}
+	virtual void onButton(event::Button &e) {recursePositionEvent(&Widget::onButton, e);}
+	virtual void onHoverKey(event::HoverKey &e) {recursePositionEvent(&Widget::onHoverKey, e);}
+	virtual void onHoverText(event::HoverText &e) {recursePositionEvent(&Widget::onHoverText, e);}
+	virtual void onHoverScroll(event::HoverScroll &e) {recursePositionEvent(&Widget::onHoverScroll, e);}
+	virtual void onEnter(event::Enter &e) {}
+	virtual void onLeave(event::Leave &e) {}
+	virtual void onSelect(event::Select &e) {}
+	virtual void onDeselect(event::Deselect &e) {}
+	virtual void onSelectKey(event::SelectKey &e) {}
+	virtual void onSelectText(event::SelectText &e) {}
+	virtual void onDragStart(event::DragStart &e) {}
+	virtual void onDragEnd(event::DragEnd &e) {}
+	virtual void onDragMove(event::DragMove &e) {}
+	virtual void onDragEnter(event::DragEnter &e) {}
+	virtual void onDragLeave(event::DragLeave &e) {}
+	virtual void onDragDrop(event::DragDrop &e) {}
+	virtual void onPathDrop(event::PathDrop &e) {recursePositionEvent(&Widget::onPathDrop, e);}
+	virtual void onAction(event::Action &e) {}
+	virtual void onChange(event::Change &e) {}
+	virtual void onZoom(event::Zoom &e) {}
 };
 
 

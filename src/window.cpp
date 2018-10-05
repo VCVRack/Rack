@@ -319,8 +319,7 @@ void windowRun() {
 		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
 		pixelRatio = roundf(pixelRatio);
 		if (pixelRatio != gPixelRatio) {
-			event::Zoom eZoom;
-			gWidgetState->rootWidget->handleEvent(eZoom);
+			gWidgetState->handleZoom();
 			gPixelRatio = pixelRatio;
 		}
 

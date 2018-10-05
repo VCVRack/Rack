@@ -68,7 +68,7 @@ struct Menu : OpaqueWidget {
 		Widget::draw(vg);
 	}
 
-	void on(event::HoverScroll &e) override {
+	void onHoverScroll(event::HoverScroll &e) override {
 		if (!parent)
 			return;
 		if (!parent->box.contains(box))

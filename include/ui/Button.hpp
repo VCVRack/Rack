@@ -20,26 +20,26 @@ struct Button : OpaqueWidget {
 		Widget::draw(vg);
 	}
 
-	void on(event::Enter &e) override {
+	void onEnter(event::Enter &e) override {
 		state = BND_HOVER;
 	}
 
-	void on(event::Leave &e) override {
+	void onLeave(event::Leave &e) override {
 		state = BND_DEFAULT;
 	}
 
-	void on(event::DragStart &e) override {
+	void onDragStart(event::DragStart &e) override {
 		state = BND_ACTIVE;
 	}
 
-	void on(event::DragEnd &e) override {
+	void onDragEnd(event::DragEnd &e) override {
 		state = BND_HOVER;
 	}
 
-	void on(event::DragDrop &e) override {
+	void onDragDrop(event::DragDrop &e) override {
 		if (e.origin == this) {
 			event::Action eAction;
-			handleEvent(eAction);
+			onAction(eAction);
 		}
 	}
 };

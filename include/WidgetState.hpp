@@ -1,5 +1,6 @@
 #pragma once
 #include "event.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
@@ -22,6 +23,7 @@ struct WidgetState {
 	void handleText(math::Vec pos, int codepoint);
 	void handleKey(math::Vec pos, int key, int scancode, int action, int mods);
 	void handleDrop(math::Vec pos, std::vector<std::string> paths);
+	void handleZoom();
 	/** Prepares a widget for deletion */
 	void finalizeWidget(Widget *w);
 };

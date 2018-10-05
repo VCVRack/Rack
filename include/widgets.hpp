@@ -1,7 +1,6 @@
 #pragma once
 
 #include "widgets/Widget.hpp"
-#include "widgets/EventWidget.hpp"
 #include "widgets/TransparentWidget.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "widgets/TransformWidget.hpp"

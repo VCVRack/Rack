@@ -1,12 +1,12 @@
 #pragma once
-#include "widgets/EventWidget.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
 
 
 /** Draws an SVG */
-struct SVGWidget : virtual EventWidget {
+struct SVGWidget : virtual Widget {
 	std::shared_ptr<SVG> svg;
 
 	/** Sets the box size to the svg image size */

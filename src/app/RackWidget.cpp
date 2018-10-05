@@ -497,14 +497,14 @@ void RackWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
 
-void RackWidget::on(event::Hover &e) {
-	OpaqueWidget::on(e);
+void RackWidget::onHover(event::Hover &e) {
+	OpaqueWidget::onHover(e);
 	lastMousePos = e.pos;
 }
 
-void RackWidget::on(event::Button &e) {
+void RackWidget::onButton(event::Button &e) {
 	DEBUG("1");
-	OpaqueWidget::on(e);
+	OpaqueWidget::onButton(e);
 	DEBUG("2");
 	if (e.target == this) {
 		DEBUG("3");
@@ -515,9 +515,9 @@ void RackWidget::on(event::Button &e) {
 	}
 }
 
-void RackWidget::on(event::Zoom &e) {
+void RackWidget::onZoom(event::Zoom &e) {
 	rails->box.size = math::Vec();
-	EventWidget::on(e);
+	OpaqueWidget::onZoom(e);
 }
 
 

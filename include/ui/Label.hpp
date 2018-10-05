@@ -7,7 +7,7 @@
 namespace rack {
 
 
-struct Label : virtual EventWidget {
+struct Label : virtual Widget {
 	std::string text;
 	float fontSize;
 	NVGcolor color;

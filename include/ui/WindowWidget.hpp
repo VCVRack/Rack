@@ -15,7 +15,7 @@ struct WindowWidget : OpaqueWidget {
 		Widget::draw(vg);
 	}
 
-	void on(event::DragMove &e) override {
+	void onDragMove(event::DragMove &e) override {
 		box.pos = box.pos.plus(e.mouseDelta);
 	}
 };

@@ -11,22 +11,22 @@ namespace rack {
 struct TooltipIconButton : IconButton {
 	Tooltip *tooltip = NULL;
 	std::string tooltipText;
-	void on(event::Enter &e) override {
+	void onEnter(event::Enter &e) override {
 		if (!tooltip) {
 			tooltip = new Tooltip;
 			tooltip->box.pos = getAbsoluteOffset(math::Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = tooltipText;
 			gRackScene->addChild(tooltip);
 		}
-		IconButton::on(e);
+		IconButton::onEnter(e);
 	}
-	void on(event::Leave &e) override {
+	void onLeave(event::Leave &e) override {
 		if (tooltip) {
 			gRackScene->removeChild(tooltip);
 			delete tooltip;
 			tooltip = NULL;
 		}
-		IconButton::on(e);
+		IconButton::onLeave(e);
 	}
 };
 
@@ -35,7 +35,7 @@ struct NewButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_146097_cc.svg")));
 		tooltipText = "New patch (" WINDOW_MOD_KEY_NAME "+N)";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->reset();
 	}
 };
@@ -45,7 +45,7 @@ struct OpenButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_31859_cc.svg")));
 		tooltipText = "Open patch (" WINDOW_MOD_KEY_NAME "+O)";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->loadDialog();
 	}
 };
@@ -55,7 +55,7 @@ struct SaveButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1343816_cc.svg")));
 		tooltipText = "Save patch (" WINDOW_MOD_KEY_NAME "+S)";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->saveDialog();
 	}
 };
@@ -65,7 +65,7 @@ struct SaveAsButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1343811_cc.svg")));
 		tooltipText = "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->saveAsDialog();
 	}
 };
@@ -75,7 +75,7 @@ struct RevertButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1084369_cc.svg")));
 		tooltipText = "Revert patch";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->revert();
 	}
 };
@@ -85,7 +85,7 @@ struct DisconnectCablesButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1745061_cc.svg")));
 		tooltipText = "Disconnect cables";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->disconnect();
 	}
 };
@@ -95,20 +95,20 @@ struct PowerMeterButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_305536_cc.svg")));
 		tooltipText = "Toggle power meter (see manual for explanation)";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gPowerMeter ^= true;
 	}
 };
 
 struct EnginePauseItem : MenuItem {
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gPaused ^= true;
 	}
 };
 
 struct SampleRateItem : MenuItem {
 	float sampleRate;
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		engineSetSampleRate(sampleRate);
 		gPaused = false;
 	}
@@ -119,7 +119,7 @@ struct SampleRateButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_1240789_cc.svg")));
 		tooltipText = "Engine sample rate";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -146,14 +146,14 @@ struct RackLockButton : TooltipIconButton {
 		setSVG(SVG::load(asset::global("res/icons/noun_468341_cc.svg")));
 		tooltipText = "Lock modules";
 	}
-	void on(event::Action &e) override {
+	void onAction(event::Action &e) override {
 		gRackWidget->lockModules ^= true;
 	}
 };
 
 struct ZoomSlider : Slider {
-	void on(event::Action &e) override {
-		EventWidget::on(e);
+	void onAction(event::Action &e) override {
+		Slider::onAction(e);
 		gRackScene->zoomWidget->setZoom(std::round(value) / 100.0);
 	}
 };

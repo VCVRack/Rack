@@ -55,8 +55,8 @@ void RackScene::draw(NVGcontext *vg) {
 	Scene::draw(vg);
 }
 
-void RackScene::on(event::HoverKey &e) {
-	Scene::on(e);
+void RackScene::onHoverKey(event::HoverKey &e) {
+	Scene::onHoverKey(e);
 
 	if (!e.target) {
 		switch (e.key) {
@@ -110,7 +110,7 @@ void RackScene::on(event::HoverKey &e) {
 	}
 }
 
-void RackScene::on(event::PathDrop &e) {
+void RackScene::onPathDrop(event::PathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
 		if (string::extension(path) == "vcv") {
@@ -120,7 +120,7 @@ void RackScene::on(event::PathDrop &e) {
 	}
 
 	if (!e.target)
-		Scene::on(e);
+		Scene::onPathDrop(e);
 }
 
 

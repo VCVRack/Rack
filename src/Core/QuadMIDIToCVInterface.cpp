@@ -337,7 +337,7 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 		struct PolyphonyItem : MenuItem {
 			QuadMIDIToCVInterface *module;
 			QuadMIDIToCVInterface::PolyMode polyMode;
-			void on(event::Action &e) override {
+			void onAction(event::Action &e) override {
 				module->polyMode = polyMode;
 				module->onReset();
 			}

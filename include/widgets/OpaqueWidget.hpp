@@ -1,5 +1,5 @@
 #pragma once
-#include "widgets/EventWidget.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
@@ -7,23 +7,44 @@ namespace rack {
 
 /** Widget that consumes recursing events but gives a chance for children to consume first.
 You can of course override the events.
-You may also call OpaqueWidget::on() from the overridden method to continue recursing/consuming the event.
+You may also call OpaqueWidget::on*() from the overridden method to continue recursing/consuming the event.
 */
-struct OpaqueWidget : virtual EventWidget {
-	template <class TEvent>
-	void consumeEvent(TEvent &e) {
-		EventWidget::on(e);
-		if (!e.target) {
+struct OpaqueWidget : virtual Widget {
+	void onHover(event::Hover &e) override {
+		Widget::onHover(e);
+		if (!e.target)
 			e.target = this;
-		}
 	}
 
-	void on(event::Hover &e) override {consumeEvent(e);}
-	void on(event::Button &e) override {consumeEvent(e);}
-	void on(event::HoverKey &e) override {consumeEvent(e);}
-	void on(event::HoverText &e) override {consumeEvent(e);}
-	// void on(event::HoverScroll &e) override {consumeEvent(e);}
-	void on(event::PathDrop &e) override {consumeEvent(e);}
+	void onButton(event::Button &e) override {
+		Widget::onButton(e);
+		if (!e.target)
+			e.target = this;
+	}
+
+	void onHoverKey(event::HoverKey &e) override {
+		Widget::onHoverKey(e);
+		if (!e.target)
+			e.target = this;
+	}
+
+	void onHoverText(event::HoverText &e) override {
+		Widget::onHoverText(e);
+		if (!e.target)
+			e.target = this;
+	}
+
+	// void onHoverScroll(event::HoverScroll &e) override {
+	// 	Widget::onHoverScroll(e);
+	// 	if (!e.target)
+	// 		e.target = this;
+	// }
+
+	void onPathDrop(event::PathDrop &e) override {
+		Widget::onPathDrop(e);
+		if (!e.target)
+			e.target = this;
+	}
 };
 
 

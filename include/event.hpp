@@ -1,12 +1,12 @@
 #pragma once
+#include "math.hpp"
 #include <vector>
-#include "widgets/Widget.hpp"
 
 
 namespace rack {
 
 
-struct EventWidget;
+struct Widget;
 
 
 namespace event {
@@ -17,12 +17,6 @@ struct Event {
 	This stops propagation of the event if applicable.
 	*/
 	Widget *target = NULL;
-
-	virtual ~Event() {}
-	/** Triggers the event on an EventWidget.
-	Calls the appropriate `EventWidget::on()` method.
-	*/
-	virtual void trigger(EventWidget *w) = 0;
 };
 
 
@@ -50,10 +44,6 @@ struct Text {
 };
 
 
-#define EVENT_TRIGGER_DECLARATION() void trigger(EventWidget *w) override
-#define EVENT_TRIGGER_DEFINITION(_event) inline void _event::trigger(EventWidget *w) { w->on(*this); }
-
-
 /** Occurs every frame when the mouse is hovering over a Widget.
 Recurses until consumed.
 If target is set, other events may occur on that Widget.
@@ -61,7 +51,6 @@ If target is set, other events may occur on that Widget.
 struct Hover : Event, Position {
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -76,7 +65,6 @@ struct Button : Event, Position {
 	int action;
 	/** GLFW_MOD_* */
 	int mods;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -84,7 +72,6 @@ struct Button : Event, Position {
 Recurses until consumed.
 */
 struct HoverKey : Event, Position, Key {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -92,7 +79,6 @@ struct HoverKey : Event, Position, Key {
 Recurses until consumed.
 */
 struct HoverText : Event, Position, Text {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -102,49 +88,42 @@ Recurses until consumed.
 struct HoverScroll : Event, Position {
 	/** Change of scroll wheel position. */
 	math::Vec scrollDelta;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when a Widget begins consuming the Hover event.
 */
 struct Enter : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when a different Widget is entered.
 */
 struct Leave : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when a Widget begins consuming the Button press event.
 */
 struct Select : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when a different Widget is selected.
 */
 struct Deselect : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when a key is pressed while a Widget is selected.
 */
 struct SelectKey : Event, Key {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when text is typed while a Widget is selected.
 */
 struct SelectText : Event, Text {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -152,14 +131,12 @@ struct SelectText : Event, Text {
 Must consume to allow the drag to occur.
 */
 struct DragStart : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when a Widget stops being dragged by releasing the mouse button.
 */
 struct DragEnd : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -168,7 +145,6 @@ Called once per frame, even when mouseDelta is zero.
 */
 struct DragMove : Event {
 	math::Vec mouseDelta;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -176,7 +152,6 @@ struct DragMove : Event {
 */
 struct DragEnter : Event {
 	Widget *origin = NULL;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -184,7 +159,6 @@ struct DragEnter : Event {
 */
 struct DragLeave : Event {
 	Widget *origin = NULL;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -192,7 +166,6 @@ struct DragLeave : Event {
 */
 struct DragDrop : Event {
 	Widget *origin = NULL;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -201,21 +174,18 @@ struct DragDrop : Event {
 struct PathDrop : Event, Position {
 	/** List of file paths in the dropped selection */
 	std::vector<std::string> paths;
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when an certain action is triggered on a Widget.
 */
 struct Action : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
 /** Occurs when the value of a Widget changes.
 */
 struct Change : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 
@@ -223,7 +193,6 @@ struct Change : Event {
 Recurses.
 */
 struct Zoom : Event {
-	EVENT_TRIGGER_DECLARATION();
 };
 
 

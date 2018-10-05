@@ -20,8 +20,8 @@ struct MenuOverlay : OpaqueWidget {
 		}
 	}
 
-	void on(event::Button &e) override {
-		EventWidget::on(e);
+	void onButton(event::Button &e) override {
+		Widget::onButton(e);
 
 		if (!e.target) {
 			e.target = this;
@@ -29,7 +29,7 @@ struct MenuOverlay : OpaqueWidget {
 		}
 	}
 
-	void on(event::HoverKey &e) override {
+	void onHoverKey(event::HoverKey &e) override {
 		switch (e.key) {
 			case GLFW_KEY_ESCAPE: {
 				e.target = this;
@@ -38,7 +38,7 @@ struct MenuOverlay : OpaqueWidget {
 			} break;
 		}
 
-		EventWidget::on(e);
+		Widget::onHoverKey(e);
 	}
 };
 

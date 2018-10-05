@@ -1,11 +1,11 @@
 #pragma once
-#include "widgets/EventWidget.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
 
 
-struct ZoomWidget : virtual EventWidget {
+struct ZoomWidget : virtual Widget {
 	float zoom = 1.f;
 
 	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override {
@@ -24,7 +24,7 @@ struct ZoomWidget : virtual EventWidget {
 	void setZoom(float zoom) {
 		if (zoom != this->zoom) {
 			event::Zoom eZoom;
-			EventWidget::on(eZoom);
+			Widget::onZoom(eZoom);
 		}
 		this->zoom = zoom;
 	}
@@ -35,40 +35,40 @@ struct ZoomWidget : virtual EventWidget {
 		Widget::draw(vg);
 	}
 
-	void on(event::Hover &e) override {
+	void onHover(event::Hover &e) override {
 		event::Hover e2 = e;
 		e2.pos = e.pos.div(zoom);
-		EventWidget::on(e2);
+		Widget::onHover(e2);
 	}
 
-	void on(event::Button &e) override {
+	void onButton(event::Button &e) override {
 		event::Button e2 = e;
 		e2.pos = e.pos.div(zoom);
-		EventWidget::on(e2);
+		Widget::onButton(e2);
 	}
 
-	void on(event::HoverKey &e) override {
+	void onHoverKey(event::HoverKey &e) override {
 		event::HoverKey e2 = e;
 		e2.pos = e.pos.div(zoom);
-		EventWidget::on(e2);
+		Widget::onHoverKey(e2);
 	}
 
-	void on(event::HoverText &e) override {
+	void onHoverText(event::HoverText &e) override {
 		event::HoverText e2 = e;
 		e2.pos = e.pos.div(zoom);
-		EventWidget::on(e2);
+		Widget::onHoverText(e2);
 	}
 
-	void on(event::HoverScroll &e) override {
+	void onHoverScroll(event::HoverScroll &e) override {
 		event::HoverScroll e2 = e;
 		e2.pos = e.pos.div(zoom);
-		EventWidget::on(e2);
+		Widget::onHoverScroll(e2);
 	}
 
-	void on(event::PathDrop &e) override {
+	void onPathDrop(event::PathDrop &e) override {
 		event::PathDrop e2 = e;
 		e2.pos = e.pos.div(zoom);
-		EventWidget::on(e2);
+		Widget::onPathDrop(e2);
 	}
 };
 
