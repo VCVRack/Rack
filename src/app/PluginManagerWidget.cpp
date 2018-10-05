@@ -129,29 +129,29 @@ PluginManagerWidget::PluginManagerWidget() {
 		layout->spacing = 5;
 		loginWidget = layout;
 
-		Button *registerButton = new RegisterButton();
+		Button *registerButton = new RegisterButton;
 		registerButton->box.size.x = 75;
 		registerButton->text = "Register";
 		loginWidget->addChild(registerButton);
 
-		TextField *emailField = new TextField();
+		TextField *emailField = new TextField;
 		emailField->box.size.x = 175;
 		emailField->placeholder = "Email";
 		loginWidget->addChild(emailField);
 
-		PasswordField *passwordField = new PasswordField();
+		PasswordField *passwordField = new PasswordField;
 		passwordField->box.size.x = 175;
 		passwordField->placeholder = "Password";
 		loginWidget->addChild(passwordField);
 
-		LogInButton *logInButton = new LogInButton();
+		LogInButton *logInButton = new LogInButton;
 		logInButton->box.size.x = 100;
 		logInButton->text = "Log in";
 		logInButton->emailField = emailField;
 		logInButton->passwordField = passwordField;
 		loginWidget->addChild(logInButton);
 
-		Label *label = new StatusLabel();
+		Label *label = new StatusLabel;
 		loginWidget->addChild(label);
 
 		addChild(loginWidget);
@@ -162,17 +162,17 @@ PluginManagerWidget::PluginManagerWidget() {
 		layout->spacing = 5;
 		manageWidget = layout;
 
-		Button *manageButton = new ManageButton();
+		Button *manageButton = new ManageButton;
 		manageButton->box.size.x = 125;
 		manageButton->text = "Manage plugins";
 		manageWidget->addChild(manageButton);
 
-		Button *syncButton = new SyncButton();
+		Button *syncButton = new SyncButton;
 		syncButton->box.size.x = 125;
 		syncButton->text = "Update plugins";
 		manageWidget->addChild(syncButton);
 
-		Button *logOutButton = new LogOutButton();
+		Button *logOutButton = new LogOutButton;
 		logOutButton->box.size.x = 100;
 		logOutButton->text = "Log out";
 		manageWidget->addChild(logOutButton);
@@ -185,13 +185,13 @@ PluginManagerWidget::PluginManagerWidget() {
 		layout->spacing = 5;
 		downloadWidget = layout;
 
-		ProgressBar *downloadProgress = new DownloadProgressBar();
+		ProgressBar *downloadProgress = new DownloadProgressBar;
 		downloadProgress->box.size.x = 300;
 		downloadProgress->setLimits(0, 100);
 		downloadProgress->unit = "%";
 		downloadWidget->addChild(downloadProgress);
 
-		// Button *cancelButton = new CancelButton();
+		// Button *cancelButton = new CancelButton;
 		// cancelButton->box.size.x = 100;
 		// cancelButton->text = "Cancel";
 		// downloadWidget->addChild(cancelButton);

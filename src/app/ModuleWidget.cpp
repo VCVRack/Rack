@@ -48,7 +48,7 @@ void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 		panel = NULL;
 	}
 
-	panel = new SVGPanel();
+	panel = new SVGPanel;
 	panel->setBackground(svg);
 	addChild(panel);
 
@@ -485,57 +485,57 @@ struct ModuleDeleteItem : MenuItem {
 Menu *ModuleWidget::createContextMenu() {
 	Menu *menu = createMenu();
 
-	MenuLabel *menuLabel = new MenuLabel();
+	MenuLabel *menuLabel = new MenuLabel;
 	menuLabel->text = model->author + " " + model->name + " " + model->plugin->version;
 	menu->addChild(menuLabel);
 
-	ModuleResetItem *resetItem = new ModuleResetItem();
+	ModuleResetItem *resetItem = new ModuleResetItem;
 	resetItem->text = "Initialize";
 	resetItem->rightText = WINDOW_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->addChild(resetItem);
 
-	ModuleRandomizeItem *randomizeItem = new ModuleRandomizeItem();
+	ModuleRandomizeItem *randomizeItem = new ModuleRandomizeItem;
 	randomizeItem->text = "Randomize";
 	randomizeItem->rightText = WINDOW_MOD_KEY_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->addChild(randomizeItem);
 
-	ModuleDisconnectItem *disconnectItem = new ModuleDisconnectItem();
+	ModuleDisconnectItem *disconnectItem = new ModuleDisconnectItem;
 	disconnectItem->text = "Disconnect cables";
 	disconnectItem->rightText = WINDOW_MOD_KEY_NAME "+U";
 	disconnectItem->moduleWidget = this;
 	menu->addChild(disconnectItem);
 
-	ModuleCloneItem *cloneItem = new ModuleCloneItem();
+	ModuleCloneItem *cloneItem = new ModuleCloneItem;
 	cloneItem->text = "Duplicate";
 	cloneItem->rightText = WINDOW_MOD_KEY_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
-	ModuleCopyItem *copyItem = new ModuleCopyItem();
+	ModuleCopyItem *copyItem = new ModuleCopyItem;
 	copyItem->text = "Copy preset";
 	copyItem->rightText = WINDOW_MOD_KEY_NAME "+C";
 	copyItem->moduleWidget = this;
 	menu->addChild(copyItem);
 
-	ModulePasteItem *pasteItem = new ModulePasteItem();
+	ModulePasteItem *pasteItem = new ModulePasteItem;
 	pasteItem->text = "Paste preset";
 	pasteItem->rightText = WINDOW_MOD_KEY_NAME "+V";
 	pasteItem->moduleWidget = this;
 	menu->addChild(pasteItem);
 
-	ModuleLoadItem *loadItem = new ModuleLoadItem();
+	ModuleLoadItem *loadItem = new ModuleLoadItem;
 	loadItem->text = "Load preset";
 	loadItem->moduleWidget = this;
 	menu->addChild(loadItem);
 
-	ModuleSaveItem *saveItem = new ModuleSaveItem();
+	ModuleSaveItem *saveItem = new ModuleSaveItem;
 	saveItem->text = "Save preset";
 	saveItem->moduleWidget = this;
 	menu->addChild(saveItem);
 
-	ModuleDeleteItem *deleteItem = new ModuleDeleteItem();
+	ModuleDeleteItem *deleteItem = new ModuleDeleteItem;
 	deleteItem->text = "Delete";
 	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;

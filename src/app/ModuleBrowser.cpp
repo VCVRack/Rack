@@ -290,16 +290,16 @@ struct ModuleBrowser : OpaqueWidget {
 		sTagFilter = NO_TAG;
 
 		// Search
-		searchField	= new SearchModuleField();
+		searchField	= new SearchModuleField;
 		searchField->box.size.x = box.size.x;
 		searchField->moduleBrowser = this;
 		addChild(searchField);
 
-		moduleList = new BrowserList();
+		moduleList = new BrowserList;
 		moduleList->box.size = math::Vec(box.size.x, 0.0);
 
 		// Module Scroll
-		moduleScroll = new ScrollWidget();
+		moduleScroll = new ScrollWidget;
 		moduleScroll->box.pos.y = searchField->box.size.y;
 		moduleScroll->box.size.x = box.size.x;
 		moduleScroll->container->addChild(moduleList);
@@ -352,39 +352,39 @@ struct ModuleBrowser : OpaqueWidget {
 		if (!filterPage) {
 			// Favorites
 			if (!sFavoriteModels.empty()) {
-				SeparatorItem *item = new SeparatorItem();
+				SeparatorItem *item = new SeparatorItem;
 				item->setText("Favorites");
 				moduleList->addChild(item);
 			}
 			for (Model *model : sFavoriteModels) {
 				if (isModelFiltered(model) && isModelMatch(model, search)) {
-					ModelItem *item = new ModelItem();
+					ModelItem *item = new ModelItem;
 					item->setModel(model);
 					moduleList->addChild(item);
 				}
 			}
 			// Author items
 			{
-				SeparatorItem *item = new SeparatorItem();
+				SeparatorItem *item = new SeparatorItem;
 				item->setText("Authors");
 				moduleList->addChild(item);
 			}
 			for (std::string author : availableAuthors) {
 				if (isMatch(author, search)) {
-					AuthorItem *item = new AuthorItem();
+					AuthorItem *item = new AuthorItem;
 					item->setAuthor(author);
 					moduleList->addChild(item);
 				}
 			}
 			// Tag items
 			{
-				SeparatorItem *item = new SeparatorItem();
+				SeparatorItem *item = new SeparatorItem;
 				item->setText("Tags");
 				moduleList->addChild(item);
 			}
 			for (ModelTag tag : availableTags) {
 				if (isMatch(gTagNames[tag], search)) {
-					TagItem *item = new TagItem();
+					TagItem *item = new TagItem;
 					item->setTag(tag);
 					moduleList->addChild(item);
 				}
@@ -392,18 +392,18 @@ struct ModuleBrowser : OpaqueWidget {
 		}
 		else {
 			// Clear filter
-			ClearFilterItem *item = new ClearFilterItem();
+			ClearFilterItem *item = new ClearFilterItem;
 			moduleList->addChild(item);
 		}
 
 		if (filterPage || !search.empty()) {
 			if (!search.empty()) {
-				SeparatorItem *item = new SeparatorItem();
+				SeparatorItem *item = new SeparatorItem;
 				item->setText("Modules");
 				moduleList->addChild(item);
 			}
 			else if (filterPage) {
-				SeparatorItem *item = new SeparatorItem();
+				SeparatorItem *item = new SeparatorItem;
 				if (!sAuthorFilter.empty())
 					item->setText(sAuthorFilter);
 				else if (sTagFilter != NO_TAG)
@@ -414,7 +414,7 @@ struct ModuleBrowser : OpaqueWidget {
 			for (Plugin *plugin : gPlugins) {
 				for (Model *model : plugin->models) {
 					if (isModelFiltered(model) && isModelMatch(model, search)) {
-						ModelItem *item = new ModelItem();
+						ModelItem *item = new ModelItem;
 						item->setModel(model);
 						moduleList->addChild(item);
 					}
@@ -536,9 +536,9 @@ void SearchModuleField::on(event::SelectKey &e) {
 // Global functions
 
 void appModuleBrowserCreate() {
-	MenuOverlay *overlay = new MenuOverlay();
+	MenuOverlay *overlay = new MenuOverlay;
 
-	ModuleBrowser *moduleBrowser = new ModuleBrowser();
+	ModuleBrowser *moduleBrowser = new ModuleBrowser;
 	overlay->addChild(moduleBrowser);
 
 	gRackScene->addChild(overlay);

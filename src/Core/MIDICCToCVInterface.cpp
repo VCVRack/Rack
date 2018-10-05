@@ -174,7 +174,7 @@ struct MidiCcChoice : GridChoice {
 struct MidiCcWidget : Grid16MidiWidget {
 	MIDICCToCVInterface *module;
 	GridChoice *createGridChoice() override {
-		MidiCcChoice *gridChoice = new MidiCcChoice();
+		MidiCcChoice *gridChoice = new MidiCcChoice;
 		gridChoice->module = module;
 		return gridChoice;
 	}

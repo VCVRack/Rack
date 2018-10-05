@@ -120,7 +120,7 @@ void Driver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
 
 
 void init() {
-	driver = new Driver();
+	driver = new Driver;
 	midiDriverAdd(DRIVER, driver);
 }
 

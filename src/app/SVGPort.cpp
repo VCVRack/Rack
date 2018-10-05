@@ -5,13 +5,13 @@ namespace rack {
 
 
 SVGPort::SVGPort() {
-	shadow = new CircularShadow();
+	shadow = new CircularShadow;
 	addChild(shadow);
 	// Avoid breakage if plugins fail to call setSVG()
 	// In that case, just disable the shadow.
 	shadow->box.size = math::Vec();
 
-	background = new SVGWidget();
+	background = new SVGWidget;
 	addChild(background);
 }
 

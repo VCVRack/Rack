@@ -5,7 +5,7 @@ namespace rack {
 
 
 SVGSwitch::SVGSwitch() {
-	sw = new SVGWidget();
+	sw = new SVGWidget;
 	addChild(sw);
 }
 

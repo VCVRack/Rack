@@ -7,19 +7,19 @@ namespace rack {
 
 
 RackScene::RackScene() {
-	scrollWidget = new RackScrollWidget();
+	scrollWidget = new RackScrollWidget;
 	{
-		zoomWidget = new ZoomWidget();
+		zoomWidget = new ZoomWidget;
 		{
 			assert(!gRackWidget);
-			gRackWidget = new RackWidget();
+			gRackWidget = new RackWidget;
 			zoomWidget->addChild(gRackWidget);
 		}
 		scrollWidget->container->addChild(zoomWidget);
 	}
 	addChild(scrollWidget);
 
-	gToolbar = new Toolbar();
+	gToolbar = new Toolbar;
 	addChild(gToolbar);
 	scrollWidget->box.pos.y = gToolbar->box.size.y;
 }

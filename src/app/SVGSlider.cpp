@@ -5,10 +5,10 @@ namespace rack {
 
 
 SVGSlider::SVGSlider() {
-	background = new SVGWidget();
+	background = new SVGWidget;
 	addChild(background);
 
-	handle = new SVGWidget();
+	handle = new SVGWidget;
 	addChild(handle);
 
 	speed = 2.0;

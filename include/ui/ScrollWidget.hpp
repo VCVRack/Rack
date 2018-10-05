@@ -48,15 +48,15 @@ struct ScrollWidget : OpaqueWidget {
 	math::Vec offset;
 
 	ScrollWidget() {
-		container = new Widget();
+		container = new Widget;
 		addChild(container);
 
-		horizontalScrollBar = new ScrollBar();
+		horizontalScrollBar = new ScrollBar;
 		horizontalScrollBar->orientation = ScrollBar::HORIZONTAL;
 		horizontalScrollBar->visible = false;
 		addChild(horizontalScrollBar);
 
-		verticalScrollBar = new ScrollBar();
+		verticalScrollBar = new ScrollBar;
 		verticalScrollBar->orientation = ScrollBar::VERTICAL;
 		verticalScrollBar->visible = false;
 		addChild(verticalScrollBar);

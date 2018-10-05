@@ -102,7 +102,7 @@ void WireWidget::updateWire() {
 		assert(outputPort->type == Port::OUTPUT);
 
 		if (!wire) {
-			wire = new Wire();
+			wire = new Wire;
 			wire->outputModule = outputPort->module;
 			wire->outputId = outputPort->portId;
 			wire->inputModule = inputPort->module;

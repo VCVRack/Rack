@@ -301,7 +301,7 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 			MIDIToCVInterface *module;
 			int index;
 			Menu *createChildMenu() override {
-				Menu *menu = new Menu();
+				Menu *menu = new Menu;
 				std::vector<int> divisions = {24*4, 24*2, 24, 24/2, 24/4, 24/8, 2, 1};
 				std::vector<std::string> divisionNames = {"Whole", "Half", "Quarter", "8th", "16th", "32nd", "12 PPQN", "24 PPQN"};
 				for (size_t i = 0; i < divisions.size(); i++) {

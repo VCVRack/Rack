@@ -27,20 +27,20 @@ struct ModuleContainer : Widget {
 
 
 RackWidget::RackWidget() {
-	rails = new FramebufferWidget();
+	rails = new FramebufferWidget;
 	rails->box.size = math::Vec();
 	rails->oversample = 1.0;
 	{
-		RackRail *rail = new RackRail();
+		RackRail *rail = new RackRail;
 		rail->box.size = math::Vec();
 		rails->addChild(rail);
 	}
 	addChild(rails);
 
-	moduleContainer = new ModuleContainer();
+	moduleContainer = new ModuleContainer;
 	addChild(moduleContainer);
 
-	wireContainer = new WireContainer();
+	wireContainer = new WireContainer;
 	addChild(wireContainer);
 }
 
@@ -344,7 +344,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			continue;
 
 		// Create WireWidget
-		WireWidget *wireWidget = new WireWidget();
+		WireWidget *wireWidget = new WireWidget;
 		wireWidget->fromJson(wireJ);
 		wireWidget->outputPort = outputPort;
 		wireWidget->inputPort = inputPort;

@@ -406,7 +406,7 @@ void bridgeInit() {
 	serverRunning = true;
 	serverThread = std::thread(serverRun);
 
-	driver = new BridgeMidiDriver();
+	driver = new BridgeMidiDriver;
 	midiDriverAdd(BRIDGE_DRIVER, driver);
 }
 

@@ -5,7 +5,7 @@ namespace rack {
 
 
 SVGButton::SVGButton() {
-	sw = new SVGWidget();
+	sw = new SVGWidget;
 	addChild(sw);
 }
 

@@ -23,7 +23,7 @@ struct FramebufferWidget::Internal {
 
 FramebufferWidget::FramebufferWidget() {
 	oversample = 1.0;
-	internal = new Internal();
+	internal = new Internal;
 }
 
 FramebufferWidget::~FramebufferWidget() {

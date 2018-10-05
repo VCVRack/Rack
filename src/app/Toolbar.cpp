@@ -13,7 +13,7 @@ struct TooltipIconButton : IconButton {
 	std::string tooltipText;
 	void on(event::Enter &e) override {
 		if (!tooltip) {
-			tooltip = new Tooltip();
+			tooltip = new Tooltip;
 			tooltip->box.pos = getAbsoluteOffset(math::Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = tooltipText;
 			gRackScene->addChild(tooltip);
@@ -126,13 +126,13 @@ struct SampleRateButton : TooltipIconButton {
 
 		menu->addChild(createMenuLabel("Engine sample rate"));
 
-		EnginePauseItem *pauseItem = new EnginePauseItem();
+		EnginePauseItem *pauseItem = new EnginePauseItem;
 		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
 		menu->addChild(pauseItem);
 
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (float sampleRate : sampleRates) {
-			SampleRateItem *item = new SampleRateItem();
+			SampleRateItem *item = new SampleRateItem;
 			item->text = string::stringf("%.0f Hz", sampleRate);
 			item->rightText = CHECKMARK(engineGetSampleRate() == sampleRate);
 			item->sampleRate = sampleRate;
@@ -162,23 +162,23 @@ struct ZoomSlider : Slider {
 Toolbar::Toolbar() {
 	box.size.y = BND_WIDGET_HEIGHT + 2*5;
 
-	SequentialLayout *layout = new SequentialLayout();
+	SequentialLayout *layout = new SequentialLayout;
 	layout->box.pos = math::Vec(5, 5);
 	layout->spacing = 5;
 	addChild(layout);
 
-	layout->addChild(new NewButton());
-	layout->addChild(new OpenButton());
-	layout->addChild(new SaveButton());
-	layout->addChild(new SaveAsButton());
-	layout->addChild(new RevertButton());
-	layout->addChild(new DisconnectCablesButton());
+	layout->addChild(new NewButton);
+	layout->addChild(new OpenButton);
+	layout->addChild(new SaveButton);
+	layout->addChild(new SaveAsButton);
+	layout->addChild(new RevertButton);
+	layout->addChild(new DisconnectCablesButton);
 
-	layout->addChild(new SampleRateButton());
-	layout->addChild(new PowerMeterButton());
-	layout->addChild(new RackLockButton());
+	layout->addChild(new SampleRateButton);
+	layout->addChild(new PowerMeterButton);
+	layout->addChild(new RackLockButton);
 
-	wireOpacitySlider = new Slider();
+	wireOpacitySlider = new Slider;
 	wireOpacitySlider->box.size.x = 150;
 	wireOpacitySlider->label = "Cable opacity";
 	wireOpacitySlider->precision = 0;
@@ -187,7 +187,7 @@ Toolbar::Toolbar() {
 	wireOpacitySlider->setDefaultValue(50.0);
 	layout->addChild(wireOpacitySlider);
 
-	wireTensionSlider = new Slider();
+	wireTensionSlider = new Slider;
 	wireTensionSlider->box.size.x = 150;
 	wireTensionSlider->label = "Cable tension";
 	wireTensionSlider->unit = "";
@@ -195,7 +195,7 @@ Toolbar::Toolbar() {
 	wireTensionSlider->setDefaultValue(0.5);
 	layout->addChild(wireTensionSlider);
 
-	zoomSlider = new ZoomSlider();
+	zoomSlider = new ZoomSlider;
 	zoomSlider->box.size.x = 150;
 	zoomSlider->precision = 0;
 	zoomSlider->label = "Zoom";
@@ -206,7 +206,7 @@ Toolbar::Toolbar() {
 
 	// Kind of hacky, but display the PluginManagerWidget only if the local directory is not the development directory
 	if (asset::local("") != "./") {
-		Widget *pluginManager = new PluginManagerWidget();
+		Widget *pluginManager = new PluginManagerWidget;
 		layout->addChild(pluginManager);
 	}
 }

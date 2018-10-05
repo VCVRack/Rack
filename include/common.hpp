@@ -88,7 +88,7 @@ Example:
 */
 template<typename T>
 T *construct() {
-	return new T();
+	return new T;
 }
 
 template<typename T, typename F, typename V, typename... Args>

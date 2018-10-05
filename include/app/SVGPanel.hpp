@@ -29,14 +29,14 @@ struct SVGPanel : FramebufferWidget {
 	}
 
 	void setBackground(std::shared_ptr<SVG> svg) {
-		SVGWidget *sw = new SVGWidget();
+		SVGWidget *sw = new SVGWidget;
 		sw->setSVG(svg);
 		addChild(sw);
 
 		// Set size
 		box.size = sw->box.size.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
 
-		PanelBorder *pb = new PanelBorder();
+		PanelBorder *pb = new PanelBorder;
 		pb->box.size = box.size;
 		addChild(pb);
 	}

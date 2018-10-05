@@ -100,7 +100,7 @@ static bool loadPlugin(std::string path) {
 	}
 
 	// Construct and initialize Plugin instance
-	Plugin *plugin = new Plugin();
+	Plugin *plugin = new Plugin;
 	plugin->path = path;
 	plugin->handle = handle;
 	initCallback(plugin);
@@ -320,7 +320,7 @@ void pluginInit(bool devMode) {
 
 	// Load core
 	// This function is defined in core.cpp
-	Plugin *corePlugin = new Plugin();
+	Plugin *corePlugin = new Plugin;
 	init(corePlugin);
 	gPlugins.push_back(corePlugin);
 

@@ -5,14 +5,14 @@ namespace rack {
 
 
 SVGKnob::SVGKnob() {
-	shadow = new CircularShadow();
+	shadow = new CircularShadow;
 	addChild(shadow);
 	shadow->box.size = math::Vec();
 
-	tw = new TransformWidget();
+	tw = new TransformWidget;
 	addChild(tw);
 
-	sw = new SVGWidget();
+	sw = new SVGWidget;
 	tw->addChild(sw);
 }
 

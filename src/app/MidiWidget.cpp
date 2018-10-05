@@ -20,7 +20,7 @@ struct MidiDriverChoice : LedDisplayChoice {
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI driver"));
 		for (int driverId : midiWidget->midiIO->getDriverIds()) {
-			MidiDriverItem *item = new MidiDriverItem();
+			MidiDriverItem *item = new MidiDriverItem;
 			item->midiIO = midiWidget->midiIO;
 			item->driverId = driverId;
 			item->text = midiWidget->midiIO->getDriverName(driverId);
@@ -54,7 +54,7 @@ struct MidiDeviceChoice : LedDisplayChoice {
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI device"));
 		{
-			MidiDeviceItem *item = new MidiDeviceItem();
+			MidiDeviceItem *item = new MidiDeviceItem;
 			item->midiIO = midiWidget->midiIO;
 			item->deviceId = -1;
 			item->text = "(No device)";
@@ -62,7 +62,7 @@ struct MidiDeviceChoice : LedDisplayChoice {
 			menu->addChild(item);
 		}
 		for (int deviceId : midiWidget->midiIO->getDeviceIds()) {
-			MidiDeviceItem *item = new MidiDeviceItem();
+			MidiDeviceItem *item = new MidiDeviceItem;
 			item->midiIO = midiWidget->midiIO;
 			item->deviceId = deviceId;
 			item->text = midiWidget->midiIO->getDeviceName(deviceId);
@@ -96,7 +96,7 @@ struct MidiChannelChoice : LedDisplayChoice {
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI channel"));
 		for (int channel = -1; channel < 16; channel++) {
-			MidiChannelItem *item = new MidiChannelItem();
+			MidiChannelItem *item = new MidiChannelItem;
 			item->midiIO = midiWidget->midiIO;
 			item->channel = channel;
 			item->text = midiWidget->midiIO->getChannelName(channel);

@@ -20,7 +20,7 @@ struct AudioDriverChoice : LedDisplayChoice {
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
 		for (int driver : audioWidget->audioIO->getDrivers()) {
-			AudioDriverItem *item = new AudioDriverItem();
+			AudioDriverItem *item = new AudioDriverItem;
 			item->audioIO = audioWidget->audioIO;
 			item->driver = driver;
 			item->text = audioWidget->audioIO->getDriverName(driver);
@@ -53,7 +53,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		menu->addChild(createMenuLabel("Audio device"));
 		int deviceCount = audioWidget->audioIO->getDeviceCount();
 		{
-			AudioDeviceItem *item = new AudioDeviceItem();
+			AudioDeviceItem *item = new AudioDeviceItem;
 			item->audioIO = audioWidget->audioIO;
 			item->device = -1;
 			item->text = "(No device)";
@@ -63,7 +63,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		for (int device = 0; device < deviceCount; device++) {
 			int channels = std::min(maxTotalChannels, audioWidget->audioIO->getDeviceChannels(device));
 			for (int offset = 0; offset < channels; offset += audioWidget->audioIO->maxChannels) {
-				AudioDeviceItem *item = new AudioDeviceItem();
+				AudioDeviceItem *item = new AudioDeviceItem;
 				item->audioIO = audioWidget->audioIO;
 				item->device = device;
 				item->offset = offset;
@@ -104,7 +104,7 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int sampleRate : sampleRates) {
-			AudioSampleRateItem *item = new AudioSampleRateItem();
+			AudioSampleRateItem *item = new AudioSampleRateItem;
 			item->audioIO = audioWidget->audioIO;
 			item->sampleRate = sampleRate;
 			item->text = string::stringf("%d Hz", sampleRate);
@@ -136,7 +136,7 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int blockSize : blockSizes) {
-			AudioBlockSizeItem *item = new AudioBlockSizeItem();
+			AudioBlockSizeItem *item = new AudioBlockSizeItem;
 			item->audioIO = audioWidget->audioIO;
 			item->blockSize = blockSize;
 			float latency = (float) blockSize / audioWidget->audioIO->sampleRate * 1000.0;

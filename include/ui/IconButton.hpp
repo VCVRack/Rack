@@ -13,11 +13,11 @@ struct IconButton : Button {
 	IconButton() {
 		box.size.x = BND_TOOL_WIDTH;
 
-		fw = new FramebufferWidget();
+		fw = new FramebufferWidget;
 		fw->oversample = 2;
 		addChild(fw);
 
-		sw = new SVGWidget();
+		sw = new SVGWidget;
 		sw->box.pos = math::Vec(2, 2);
 		fw->addChild(sw);
 	}

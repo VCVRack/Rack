@@ -18,7 +18,7 @@ struct PlugLight : MultiLightWidget {
 
 
 Port::Port() {
-	plugLight = new PlugLight();
+	plugLight = new PlugLight;
 }
 
 Port::~Port() {
@@ -78,7 +78,7 @@ void Port::on(event::DragStart &e) {
 	}
 	else {
 		// Create a new wire
-		wire = new WireWidget();
+		wire = new WireWidget;
 		if (type == INPUT)
 			wire->inputPort = this;
 		else

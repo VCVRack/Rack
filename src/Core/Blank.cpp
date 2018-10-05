@@ -66,13 +66,13 @@ struct BlankWidget : ModuleWidget {
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
 		// {
-		// 	panel = new LightPanel();
+		// 	panel = new LightPanel;
 		// 	panel->box.size = box.size;
 		// 	addChild(panel);
 		// }
 
-		ModuleResizeHandle *leftHandle = new ModuleResizeHandle();
-		ModuleResizeHandle *rightHandle = new ModuleResizeHandle();
+		ModuleResizeHandle *leftHandle = new ModuleResizeHandle;
+		ModuleResizeHandle *rightHandle = new ModuleResizeHandle;
 		rightHandle->right = true;
 		this->rightHandle = rightHandle;
 		addChild(leftHandle);

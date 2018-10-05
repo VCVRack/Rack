@@ -343,11 +343,11 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuEntry());
+		menu->addChild(new MenuEntry);
 		menu->addChild(createMenuLabel("Polyphony mode"));
 
 		auto addPolyphonyItem = [&](QuadMIDIToCVInterface::PolyMode polyMode, std::string name) {
-			PolyphonyItem *item = new PolyphonyItem();
+			PolyphonyItem *item = new PolyphonyItem;
 			item->text = name;
 			item->rightText = CHECKMARK(module->polyMode == polyMode);
 			item->module = module;

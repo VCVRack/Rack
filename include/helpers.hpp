@@ -11,11 +11,11 @@ template <class TModule, class TModuleWidget, typename... Tags>
 Model *createModel(std::string author, std::string slug, std::string name, Tags... tags) {
 	struct TModel : Model {
 		Module *createModule() override {
-			TModule *o = new TModule();
+			TModule *o = new TModule;
 			return o;
 		}
 		ModuleWidget *createModuleWidget() override {
-			TModule *module = new TModule();
+			TModule *module = new TModule;
 			TModuleWidget *o = new TModuleWidget(module);
 			o->model = this;
 			return o;
@@ -27,7 +27,7 @@ Model *createModel(std::string author, std::string slug, std::string name, Tags.
 		}
 	};
 
-	Model *o = new TModel();
+	Model *o = new TModel;
 	o->author = author;
 	o->slug = slug;
 	o->name = name;
@@ -37,14 +37,14 @@ Model *createModel(std::string author, std::string slug, std::string name, Tags.
 
 template <class TWidget>
 TWidget *createWidget(math::Vec pos) {
-	TWidget *o = new TWidget();
+	TWidget *o = new TWidget;
 	o->box.pos = pos;
 	return o;
 }
 
 template <class TParamWidget>
 TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
-	TParamWidget *o = new TParamWidget();
+	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos;
 	o->module = module;
 	o->paramId = paramId;
@@ -55,7 +55,7 @@ TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minV
 
 template <class TParamWidget>
 TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
-	TParamWidget *o = new TParamWidget();
+	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
 	o->paramId = paramId;
@@ -66,7 +66,7 @@ TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId, fl
 
 template <class TPort>
 TPort *createInput(math::Vec pos, Module *module, int inputId) {
-	TPort *o = new TPort();
+	TPort *o = new TPort;
 	o->box.pos = pos;
 	o->module = module;
 	o->type = Port::INPUT;
@@ -76,7 +76,7 @@ TPort *createInput(math::Vec pos, Module *module, int inputId) {
 
 template <class TPort>
 TPort *createInputCentered(math::Vec pos, Module *module, int inputId) {
-	TPort *o = new TPort();
+	TPort *o = new TPort;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
 	o->type = Port::INPUT;
@@ -86,7 +86,7 @@ TPort *createInputCentered(math::Vec pos, Module *module, int inputId) {
 
 template <class TPort>
 TPort *createOutput(math::Vec pos, Module *module, int outputId) {
-	TPort *o = new TPort();
+	TPort *o = new TPort;
 	o->box.pos = pos;
 	o->module = module;
 	o->type = Port::OUTPUT;
@@ -96,7 +96,7 @@ TPort *createOutput(math::Vec pos, Module *module, int outputId) {
 
 template <class TPort>
 TPort *createOutputCentered(math::Vec pos, Module *module, int outputId) {
-	TPort *o = new TPort();
+	TPort *o = new TPort;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
 	o->type = Port::OUTPUT;
@@ -106,7 +106,7 @@ TPort *createOutputCentered(math::Vec pos, Module *module, int outputId) {
 
 template <class TModuleLightWidget>
 TModuleLightWidget *createLight(math::Vec pos, Module *module, int firstLightId) {
-	TModuleLightWidget *o = new TModuleLightWidget();
+	TModuleLightWidget *o = new TModuleLightWidget;
 	o->box.pos = pos;
 	o->module = module;
 	o->firstLightId = firstLightId;
@@ -115,7 +115,7 @@ TModuleLightWidget *createLight(math::Vec pos, Module *module, int firstLightId)
 
 template <class TModuleLightWidget>
 TModuleLightWidget *createLightCentered(math::Vec pos, Module *module, int firstLightId) {
-	TModuleLightWidget *o = new TModuleLightWidget();
+	TModuleLightWidget *o = new TModuleLightWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
 	o->firstLightId = firstLightId;
@@ -124,14 +124,14 @@ TModuleLightWidget *createLightCentered(math::Vec pos, Module *module, int first
 
 template <class TMenuLabel = MenuLabel>
 TMenuLabel *createMenuLabel(std::string text) {
-	TMenuLabel *o = new TMenuLabel();
+	TMenuLabel *o = new TMenuLabel;
 	o->text = text;
 	return o;
 }
 
 template <class TMenuItem = MenuItem>
 TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
-	TMenuItem *o = new TMenuItem();
+	TMenuItem *o = new TMenuItem;
 	o->text = text;
 	o->rightText = rightText;
 	return o;
@@ -139,10 +139,10 @@ TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
 
 // TODO Reevaluate this. Does it belong here?
 inline Menu *createMenu() {
-	Menu *o = new Menu();
+	Menu *o = new Menu;
 	o->box.pos = gMousePos;
 
-	MenuOverlay *menuOverlay = new MenuOverlay();
+	MenuOverlay *menuOverlay = new MenuOverlay;
 	menuOverlay->addChild(o);
 
 	gWidgetState->rootWidget->addChild(menuOverlay);

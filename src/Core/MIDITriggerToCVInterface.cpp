@@ -191,7 +191,7 @@ struct MidiTrigChoice : GridChoice {
 struct MidiTrigWidget : Grid16MidiWidget {
 	MIDITriggerToCVInterface *module;
 	GridChoice *createGridChoice() override {
-		MidiTrigChoice *gridChoice = new MidiTrigChoice();
+		MidiTrigChoice *gridChoice = new MidiTrigChoice;
 		gridChoice->module = module;
 		return gridChoice;
 	}
@@ -242,7 +242,7 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 			}
 		};
 
-		menu->addChild(new MenuEntry());
+		menu->addChild(new MenuEntry);
 		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity", CHECKMARK(module->velocity));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
