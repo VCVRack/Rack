@@ -1,6 +1,7 @@
 #include "plugin.hpp"
 #include "engine.hpp"
 #include "app.hpp"
+#include "WidgetState.hpp"
 
 
 namespace rack {
@@ -133,6 +134,18 @@ TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
 	TMenuItem *o = new TMenuItem();
 	o->text = text;
 	o->rightText = rightText;
+	return o;
+}
+
+// TODO Reevaluate this. Does it belong here?
+inline Menu *createMenu() {
+	Menu *o = new Menu();
+	o->box.pos = gMousePos;
+
+	MenuOverlay *menuOverlay = new MenuOverlay();
+	menuOverlay->addChild(o);
+
+	gWidgetState->rootWidget->addChild(menuOverlay);
 	return o;
 }
 

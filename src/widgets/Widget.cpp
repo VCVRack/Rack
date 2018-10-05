@@ -1,5 +1,6 @@
 #include "widgets.hpp"
 #include "app.hpp"
+#include "WidgetState.hpp"
 #include <algorithm>
 
 
@@ -9,10 +10,10 @@ Widget::~Widget() {
 	// You should only delete orphaned widgets
 	assert(!parent);
 	// Stop dragging and hovering this widget
-	if (gHoveredWidget == this) gHoveredWidget = NULL;
-	if (gDraggedWidget == this) gDraggedWidget = NULL;
-	if (gDragHoveredWidget == this) gDragHoveredWidget = NULL;
-	if (gSelectedWidget == this) gSelectedWidget = NULL;
+	if (gWidgetState->hoveredWidget == this) gWidgetState->hoveredWidget = NULL;
+	if (gWidgetState->draggedWidget == this) gWidgetState->draggedWidget = NULL;
+	if (gWidgetState->hoveredWidget == this) gWidgetState->hoveredWidget = NULL;
+	if (gWidgetState->selectedWidget == this) gWidgetState->selectedWidget = NULL;
 	clearChildren();
 }
 

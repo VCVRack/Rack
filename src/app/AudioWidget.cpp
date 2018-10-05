@@ -17,7 +17,7 @@ struct AudioDriverItem : MenuItem {
 struct AudioDriverChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
 		for (int driver : audioWidget->audioIO->getDrivers()) {
 			AudioDriverItem *item = new AudioDriverItem();
@@ -49,7 +49,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 	int maxTotalChannels = 128;
 
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio device"));
 		int deviceCount = audioWidget->audioIO->getDeviceCount();
 		{
@@ -97,7 +97,7 @@ struct AudioSampleRateItem : MenuItem {
 struct AudioSampleRateChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Sample rate"));
 		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
 		if (sampleRates.empty()) {
@@ -129,7 +129,7 @@ struct AudioBlockSizeItem : MenuItem {
 struct AudioBlockSizeChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Block size"));
 		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
 		if (blockSizes.empty()) {

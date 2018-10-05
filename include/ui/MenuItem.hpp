@@ -2,6 +2,7 @@
 
 #include "widgets.hpp"
 #include "blendish.h"
+#include "ui/MenuOverlay.hpp"
 
 
 namespace rack {
@@ -16,7 +17,7 @@ struct MenuItem : MenuEntry {
 
 	void draw(NVGcontext *vg) override {
 		// Get state
-		BNDwidgetState state = (gHoveredWidget == this) ? BND_HOVER : BND_DEFAULT;
+		BNDwidgetState state = (gWidgetState->hoveredWidget == this) ? BND_HOVER : BND_DEFAULT;
 		Menu *parentMenu = dynamic_cast<Menu*>(parent);
 		if (parentMenu && parentMenu->activeEntry == this) {
 			state = BND_ACTIVE;
@@ -64,10 +65,11 @@ struct MenuItem : MenuEntry {
 		// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.
 		eAction.target = this;
 		handleEvent(eAction);
-		if (eAction.target) {
-			// deletes `this`
-			gScene->setOverlay(NULL);
-		}
+		if (!eAction.target)
+			return;
+
+		Widget *overlay = getAncestorOfType<MenuOverlay>();
+		overlay->requestedDelete = true;
 	}
 };
 

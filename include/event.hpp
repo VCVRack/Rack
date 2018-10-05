@@ -234,12 +234,4 @@ struct Zoom : Event {
 
 
 } // namespace event
-
-
-extern Widget *gHoveredWidget;
-extern Widget *gSelectedWidget;
-extern Widget *gDraggedWidget;
-extern Widget *gDragHoveredWidget;
-
-
 } // namespace rack

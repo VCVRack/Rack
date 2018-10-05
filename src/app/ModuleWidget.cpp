@@ -483,7 +483,7 @@ struct ModuleDeleteItem : MenuItem {
 };
 
 Menu *ModuleWidget::createContextMenu() {
-	Menu *menu = gScene->createMenu();
+	Menu *menu = createMenu();
 
 	MenuLabel *menuLabel = new MenuLabel();
 	menuLabel->text = model->author + " " + model->name + " " + model->plugin->version;

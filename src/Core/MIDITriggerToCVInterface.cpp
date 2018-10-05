@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "midi.hpp"
+#include "WidgetState.hpp"
 
 
 struct MIDITriggerToCVInterface : Module {
@@ -171,8 +172,8 @@ struct MidiTrigChoice : GridChoice {
 			text = string::stringf("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
 
-			if (gSelectedWidget == this)
-				gSelectedWidget = NULL;
+			if (gWidgetState->selectedWidget == this)
+				gWidgetState->selectedWidget = NULL;
 		}
 	}
 

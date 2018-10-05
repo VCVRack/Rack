@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "window.hpp"
 #include "helpers.hpp"
+#include "WidgetState.hpp"
 #include <set>
 #include <algorithm>
 
@@ -92,8 +93,8 @@ struct BrowserListItem : OpaqueWidget {
 		eAction.target = this;
 		handleEvent(eAction);
 		if (eAction.target) {
-			// deletes `this`
-			gScene->setOverlay(NULL);
+			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
+			overlay->requestedDelete = true;
 		}
 	}
 };
@@ -429,7 +430,7 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleScroll->box.size.y = std::min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
 		box.size.y = std::min(box.size.y, moduleScroll->box.getBottomRight().y);
 
-		gSelectedWidget = searchField;
+		gWidgetState->selectedWidget = searchField;
 		Widget::step();
 	}
 };
@@ -492,7 +493,8 @@ void SearchModuleField::on(event::Change &e) {
 void SearchModuleField::on(event::SelectKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_ESCAPE: {
-			gScene->setOverlay(NULL);
+			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
+			overlay->requestedDelete = true;
 			e.target = this;
 			return;
 		} break;
@@ -539,7 +541,7 @@ void appModuleBrowserCreate() {
 	ModuleBrowser *moduleBrowser = new ModuleBrowser();
 	overlay->addChild(moduleBrowser);
 
-	gScene->setOverlay(overlay);
+	gRackScene->addChild(overlay);
 }
 
 json_t *appModuleBrowserToJson() {

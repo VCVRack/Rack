@@ -37,7 +37,9 @@ static void checkVersion() {
 
 void appInit(bool devMode) {
 	gRackScene = new RackScene();
-	gScene = gRackScene;
+
+	gWidgetState = new WidgetState();
+	gWidgetState->rootWidget = gRackScene;
 
 	// Request latest version from server
 	if (!devMode && gCheckVersion) {
@@ -46,8 +48,13 @@ void appInit(bool devMode) {
 	}
 }
 
+
 void appDestroy() {
 	delete gRackScene;
+	gRackScene = NULL;
+
+	delete gWidgetState;
+	gWidgetState = NULL;
 }
 
 

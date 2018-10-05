@@ -16,13 +16,13 @@ struct TooltipIconButton : IconButton {
 			tooltip = new Tooltip();
 			tooltip->box.pos = getAbsoluteOffset(math::Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = tooltipText;
-			gScene->addChild(tooltip);
+			gRackScene->addChild(tooltip);
 		}
 		IconButton::on(e);
 	}
 	void on(event::Leave &e) override {
 		if (tooltip) {
-			gScene->removeChild(tooltip);
+			gRackScene->removeChild(tooltip);
 			delete tooltip;
 			tooltip = NULL;
 		}
@@ -120,7 +120,7 @@ struct SampleRateButton : TooltipIconButton {
 		tooltipText = "Engine sample rate";
 	}
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 

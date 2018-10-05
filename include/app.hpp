@@ -3,6 +3,7 @@
 #include <jansson.h>
 #include "widgets.hpp"
 #include "ui.hpp"
+#include "WidgetState.hpp"
 
 
 static const float SVG_DPI = 75.0;

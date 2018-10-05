@@ -13,6 +13,7 @@
 #include "rack.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
+#include "WidgetState.hpp"
 
 #define NANOVG_GL2_IMPLEMENTATION 1
 // #define NANOVG_GL3_IMPLEMENTATION 1
@@ -45,7 +46,9 @@ math::Vec gMousePos;
 std::string lastWindowTitle;
 
 
-static void windowSizeCallback(GLFWwindow* window, int width, int height) {}
+static void windowSizeCallback(GLFWwindow* window, int width, int height) {
+	// Do nothing. Window size is reset each frame anyway.
+}
 
 static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
 #ifdef ARCH_MAC
@@ -62,7 +65,7 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 	eButton.button = button;
 	eButton.action = action;
 	eButton.mods = mods;
-	gScene->handleEvent(eButton);
+	gWidgetState->rootWidget->handleEvent(eButton);
 	Widget *clickedWidget = eButton.target;
 
 	// Dragging
@@ -72,7 +75,7 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 			event::DragStart eDragStart;
 			eDragStart.button = button;
 			clickedWidget->handleEvent(eDragStart);
-			gDraggedWidget = eDragStart.target;
+			gWidgetState->draggedWidget = eDragStart.target;
 		}
 
 		if (action == GLFW_RELEASE) {
@@ -80,23 +83,23 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 			// TODO Use dragged button
 			eDragEnd.button = button;
 			clickedWidget->handleEvent(eDragEnd);
-			gDraggedWidget = eDragEnd.target;
+			gWidgetState->draggedWidget = eDragEnd.target;
 		}
 	}
 
 	// Selection
 	if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (clickedWidget != gSelectedWidget) {
-			if (gSelectedWidget) {
+		if (clickedWidget != gWidgetState->selectedWidget) {
+			if (gWidgetState->selectedWidget) {
 				event::Deselect eDeselect;
-				gSelectedWidget->handleEvent(eDeselect);
+				gWidgetState->selectedWidget->handleEvent(eDeselect);
 			}
 
-			gSelectedWidget = clickedWidget;
+			gWidgetState->selectedWidget = clickedWidget;
 
-			if (gSelectedWidget) {
+			if (gWidgetState->selectedWidget) {
 				event::Select eSelect;
-				gSelectedWidget->handleEvent(eSelect);
+				gWidgetState->selectedWidget->handleEvent(eSelect);
 			}
 		}
 	}
@@ -109,21 +112,21 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 				EventDragStart e;
 				gTempWidget->onDragStart(e);
 			}
-			gDraggedWidget = gTempWidget;
+			gWidgetState->draggedWidget = gTempWidget;
 
-			if (gTempWidget != gSelectedWidget) {
-				if (gSelectedWidget) {
+			if (gTempWidget != gWidgetState->selectedWidget) {
+				if (gWidgetState->selectedWidget) {
 					// onDefocus
 					EventDefocus e;
-					gSelectedWidget->onDefocus(e);
+					gWidgetState->selectedWidget->onDefocus(e);
 				}
-				gSelectedWidget = NULL;
+				gWidgetState->selectedWidget = NULL;
 				if (gTempWidget) {
 					// onFocus
 					EventFocus e;
 					gTempWidget->onFocus(e);
 					if (e.consumed) {
-						gSelectedWidget = gTempWidget;
+						gWidgetState->selectedWidget = gTempWidget;
 					}
 				}
 			}
@@ -137,25 +140,25 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 			EventMouseUp e;
 			e.pos = gMousePos;
 			e.button = button;
-			gScene->onMouseUp(e);
+			gWidgetState->rootWidget->onMouseUp(e);
 			gTempWidget = e.target;
 		}
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			if (gDraggedWidget) {
+			if (gWidgetState->draggedWidget) {
 				// onDragDrop
 				EventDragDrop e;
-				e.origin = gDraggedWidget;
+				e.origin = gWidgetState->draggedWidget;
 				gTempWidget->onDragDrop(e);
 			}
-			// gDraggedWidget might have been set to null in the last event, recheck here
-			if (gDraggedWidget) {
+			// gWidgetState->draggedWidget might have been set to null in the last event, recheck here
+			if (gWidgetState->draggedWidget) {
 				// onDragEnd
 				EventDragEnd e;
-				gDraggedWidget->onDragEnd(e);
+				gWidgetState->draggedWidget->onDragEnd(e);
 			}
-			gDraggedWidget = NULL;
-			gDragHoveredWidget = NULL;
+			gWidgetState->draggedWidget = NULL;
+			gDragWidgetState->hoveredWidget = NULL;
 		}
 		gTempWidget = NULL;
 	}
@@ -209,49 +212,49 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	event::Hover eHover;
 	eHover.pos = mousePos;
 	eHover.mouseDelta = mouseDelta;
-	gScene->handleEvent(eHover);
+	gWidgetState->rootWidget->handleEvent(eHover);
 
-	if (gDraggedWidget) {
+	if (gWidgetState->draggedWidget) {
 		event::DragMove eDragMove;
 		// TODO
 		eDragMove.button = 0;
 		eDragMove.mouseDelta = mouseDelta;
-		gDraggedWidget->handleEvent(eDragMove);
+		gWidgetState->draggedWidget->handleEvent(eDragMove);
 	}
 
 /*
-	if (gDraggedWidget) {
+	if (gWidgetState->draggedWidget) {
 		// onDragMove
 		EventDragMove e;
 		e.mouseDelta = mouseDelta;
-		gDraggedWidget->onDragMove(e);
+		gWidgetState->draggedWidget->onDragMove(e);
 
-		if (gTempWidget != gDragHoveredWidget) {
-			if (gDragHoveredWidget) {
+		if (gTempWidget != gDragWidgetState->hoveredWidget) {
+			if (gDragWidgetState->hoveredWidget) {
 				EventDragEnter e;
-				e.origin = gDraggedWidget;
-				gDragHoveredWidget->onDragLeave(e);
+				e.origin = gWidgetState->draggedWidget;
+				gDragWidgetState->hoveredWidget->onDragLeave(e);
 			}
-			gDragHoveredWidget = gTempWidget;
-			if (gDragHoveredWidget) {
+			gDragWidgetState->hoveredWidget = gTempWidget;
+			if (gDragWidgetState->hoveredWidget) {
 				EventDragEnter e;
-				e.origin = gDraggedWidget;
-				gDragHoveredWidget->onDragEnter(e);
+				e.origin = gWidgetState->draggedWidget;
+				gDragWidgetState->hoveredWidget->onDragEnter(e);
 			}
 		}
 	}
 	else {
-		if (gTempWidget != gHoveredWidget) {
-			if (gHoveredWidget) {
+		if (gTempWidget != gWidgetState->hoveredWidget) {
+			if (gWidgetState->hoveredWidget) {
 				// onMouseLeave
 				EventMouseLeave e;
-				gHoveredWidget->onMouseLeave(e);
+				gWidgetState->hoveredWidget->onMouseLeave(e);
 			}
-			gHoveredWidget = gTempWidget;
-			if (gHoveredWidget) {
+			gWidgetState->hoveredWidget = gTempWidget;
+			if (gWidgetState->hoveredWidget) {
 				// onMouseEnter
 				EventMouseEnter e;
-				gHoveredWidget->onMouseEnter(e);
+				gWidgetState->hoveredWidget->onMouseEnter(e);
 			}
 		}
 	}
@@ -262,18 +265,18 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 		EventScroll e;
 		e.pos = mousePos;
 		e.scrollRel = mouseDelta;
-		gScene->onScroll(e);
+		gWidgetState->rootWidget->onScroll(e);
 	}
 */
 }
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {
 	if (!entered) {
-		if (gHoveredWidget) {
+		if (gWidgetState->hoveredWidget) {
 			event::Leave eLeave;
-			gHoveredWidget->handleEvent(eLeave);
+			gWidgetState->hoveredWidget->handleEvent(eLeave);
 		}
-		gHoveredWidget = NULL;
+		gWidgetState->hoveredWidget = NULL;
 	}
 }
 
@@ -287,26 +290,26 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 
 	event::HoverScroll eHoverScroll;
 	eHoverScroll.scrollDelta = scrollDelta;
-	gScene->handleEvent(eHoverScroll);
+	gWidgetState->rootWidget->handleEvent(eHoverScroll);
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	if (gSelectedWidget) {
+	if (gWidgetState->selectedWidget) {
 		event::SelectText eSelectText;
 		eSelectText.codepoint = codepoint;
-		gSelectedWidget->handleEvent(eSelectText);
+		gWidgetState->selectedWidget->handleEvent(eSelectText);
 	}
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		if (gSelectedWidget) {
+		if (gWidgetState->selectedWidget) {
 			event::SelectKey eSelectKey;
 			eSelectKey.key = key;
 			eSelectKey.scancode = scancode;
 			eSelectKey.action = action;
 			eSelectKey.mods = mods;
-			gSelectedWidget->handleEvent(eSelectKey);
+			gWidgetState->selectedWidget->handleEvent(eSelectKey);
 			if (eSelectKey.target)
 				return;
 		}
@@ -317,7 +320,7 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 		eHoverKey.action = action;
 		eHoverKey.mods = mods;
 		eHoverKey.pos = gMousePos;
-		gScene->handleEvent(eHoverKey);
+		gWidgetState->rootWidget->handleEvent(eHoverKey);
 	}
 
 	// Keyboard MIDI driver
@@ -337,7 +340,7 @@ void dropCallback(GLFWwindow *window, int count, const char **paths) {
 	for (int i = 0; i < count; i++) {
 		ePathDrop.paths.push_back(paths[i]);
 	}
-	gScene->handleEvent(ePathDrop);
+	gWidgetState->rootWidget->handleEvent(ePathDrop);
 }
 
 void errorCallback(int error, const char *description) {
@@ -353,7 +356,7 @@ void renderGui() {
 
 	nvgReset(gVg);
 	nvgScale(gVg, gPixelRatio, gPixelRatio);
-	gScene->draw(gVg);
+	gWidgetState->rootWidget->draw(gVg);
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -507,7 +510,7 @@ void windowRun() {
 		pixelRatio = roundf(pixelRatio);
 		if (pixelRatio != gPixelRatio) {
 			event::Zoom eZoom;
-			gScene->handleEvent(eZoom);
+			gWidgetState->rootWidget->handleEvent(eZoom);
 			gPixelRatio = pixelRatio;
 		}
 
@@ -518,10 +521,10 @@ void windowRun() {
 		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 		gWindowRatio = (float)width / windowWidth;
 
-		gScene->box.size = math::Vec(width, height).div(gPixelRatio);
+		gWidgetState->rootWidget->box.size = math::Vec(width, height).div(gPixelRatio);
 
 		// Step scene
-		gScene->step();
+		gWidgetState->rootWidget->step();
 
 		// Render
 		bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);

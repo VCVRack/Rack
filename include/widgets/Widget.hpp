@@ -10,14 +10,10 @@ namespace rack {
 
 
 namespace event {
+
 struct Event;
+
 } // namespace event
-
-
-enum PickTarget {
-	PICK_MOUSE,
-	PICK_SCROLL,
-};
 
 
 /** A node in the 2D scene graph */

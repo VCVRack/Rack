@@ -1,6 +1,7 @@
 #pragma once
 
 #include "widgets.hpp"
+#include "WidgetState.hpp"
 #include "blendish.h"
 
 
@@ -26,9 +27,9 @@ struct TextField : OpaqueWidget {
 		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
 		BNDwidgetState state;
-		if (this == gSelectedWidget)
+		if (this == gWidgetState->selectedWidget)
 			state = BND_ACTIVE;
-		else if (this == gHoveredWidget)
+		else if (this == gWidgetState->hoveredWidget)
 			state = BND_HOVER;
 		else
 			state = BND_DEFAULT;
@@ -52,7 +53,7 @@ struct TextField : OpaqueWidget {
 	}
 
 	void on(event::Hover &e) override {
-		if (this == gDraggedWidget) {
+		if (this == gWidgetState->draggedWidget) {
 			int pos = getTextPosition(e.pos);
 			if (pos != selection) {
 				cursor = pos;

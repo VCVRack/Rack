@@ -69,8 +69,8 @@ int main(int argc, char* argv[]) {
 	bridgeInit();
 	keyboard::init();
 	gamepad::init();
-	windowInit();
 	appInit(devMode);
+	windowInit();
 	settings::load(asset::local("settings.json"));
 
 	if (patchFile.empty()) {

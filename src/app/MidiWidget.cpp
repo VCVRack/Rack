@@ -17,7 +17,7 @@ struct MidiDriverItem : MenuItem {
 struct MidiDriverChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI driver"));
 		for (int driverId : midiWidget->midiIO->getDriverIds()) {
 			MidiDriverItem *item = new MidiDriverItem();
@@ -51,7 +51,7 @@ struct MidiDeviceItem : MenuItem {
 struct MidiDeviceChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI device"));
 		{
 			MidiDeviceItem *item = new MidiDeviceItem();
@@ -93,7 +93,7 @@ struct MidiChannelItem : MenuItem {
 struct MidiChannelChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void on(event::Action &e) override {
-		Menu *menu = gScene->createMenu();
+		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI channel"));
 		for (int channel = -1; channel < 16; channel++) {
 			MidiChannelItem *item = new MidiChannelItem();
