@@ -503,13 +503,9 @@ void RackWidget::onHover(event::Hover &e) {
 }
 
 void RackWidget::onButton(event::Button &e) {
-	DEBUG("1");
 	OpaqueWidget::onButton(e);
-	DEBUG("2");
 	if (e.target == this) {
-		DEBUG("3");
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			DEBUG("4");
 			appModuleBrowserCreate();
 		}
 	}

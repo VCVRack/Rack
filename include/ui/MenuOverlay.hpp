@@ -9,8 +9,6 @@ namespace rack {
 /** Deletes itself from parent when clicked */
 struct MenuOverlay : OpaqueWidget {
 	void step() override {
-		Widget::step();
-
 		// Adopt parent's size
 		box.size = parent->box.size;
 
@@ -18,27 +16,26 @@ struct MenuOverlay : OpaqueWidget {
 		for (Widget *child : children) {
 			child->box = child->box.nudge(box.zeroPos());
 		}
+
+		Widget::step();
 	}
 
 	void onButton(event::Button &e) override {
-		Widget::onButton(e);
+		OpaqueWidget::onButton(e);
 
-		if (!e.target) {
-			e.target = this;
+		if (e.target == this && e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			requestedDelete = true;
 		}
 	}
 
 	void onHoverKey(event::HoverKey &e) override {
-		switch (e.key) {
-			case GLFW_KEY_ESCAPE: {
-				e.target = this;
-				requestedDelete = true;
-				return;
-			} break;
-		}
+		OpaqueWidget::onHoverKey(e);
 
-		Widget::onHoverKey(e);
+		if (e.target == this && e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
+			e.target = this;
+			requestedDelete = true;
+			return;
+		}
 	}
 };
 
