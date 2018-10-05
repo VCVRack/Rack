@@ -1,4 +1,5 @@
 #include "WidgetState.hpp"
+#include "logger.hpp"
 
 namespace rack {
 
@@ -15,6 +16,7 @@ WidgetState::WidgetState() {
 void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) {
 	// Button event
 	event::Button eButton;
+	eButton.pos = pos;
 	eButton.button = button;
 	eButton.action = action;
 	eButton.mods = mods;
@@ -97,7 +99,7 @@ void WidgetState::handleDrop(math::Vec pos, std::vector<std::string> paths) {
 	rootWidget->handleEvent(ePathDrop);
 }
 
-void WidgetState::handleChar(math::Vec pos, int codepoint) {
+void WidgetState::handleText(math::Vec pos, int codepoint) {
 	if (selectedWidget) {
 		// SelectText event
 		event::SelectText eSelectText;

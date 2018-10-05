@@ -61,66 +61,6 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 #endif
 
 	gWidgetState->handleButton(gMousePos, button, action, mods);
-
-/*
-	if (action == GLFW_PRESS) {
-		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			if (gTempWidget) {
-				// onDragStart
-				EventDragStart e;
-				gTempWidget->onDragStart(e);
-			}
-			gWidgetState->draggedWidget = gTempWidget;
-
-			if (gTempWidget != gWidgetState->selectedWidget) {
-				if (gWidgetState->selectedWidget) {
-					// onDefocus
-					EventDefocus e;
-					gWidgetState->selectedWidget->onDefocus(e);
-				}
-				gWidgetState->selectedWidget = NULL;
-				if (gTempWidget) {
-					// onFocus
-					EventFocus e;
-					gTempWidget->onFocus(e);
-					if (e.consumed) {
-						gWidgetState->selectedWidget = gTempWidget;
-					}
-				}
-			}
-		}
-		gTempWidget = NULL;
-	}
-	else if (action == GLFW_RELEASE) {
-		// onMouseUp
-		gTempWidget = NULL;
-		{
-			EventMouseUp e;
-			e.pos = gMousePos;
-			e.button = button;
-			gWidgetState->rootWidget->onMouseUp(e);
-			gTempWidget = e.target;
-		}
-
-		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			if (gWidgetState->draggedWidget) {
-				// onDragDrop
-				EventDragDrop e;
-				e.origin = gWidgetState->draggedWidget;
-				gTempWidget->onDragDrop(e);
-			}
-			// gWidgetState->draggedWidget might have been set to null in the last event, recheck here
-			if (gWidgetState->draggedWidget) {
-				// onDragEnd
-				EventDragEnd e;
-				gWidgetState->draggedWidget->onDragEnd(e);
-			}
-			gWidgetState->draggedWidget = NULL;
-			gDragWidgetState->hoveredWidget = NULL;
-		}
-		gTempWidget = NULL;
-	}
-*/
 }
 
 struct MouseButtonArguments {
@@ -168,53 +108,6 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	gMousePos = mousePos;
 
 	gWidgetState->handleHover(mousePos, mouseDelta);
-
-/*
-	if (gWidgetState->draggedWidget) {
-		// onDragMove
-		EventDragMove e;
-		e.mouseDelta = mouseDelta;
-		gWidgetState->draggedWidget->onDragMove(e);
-
-		if (gTempWidget != gDragWidgetState->hoveredWidget) {
-			if (gDragWidgetState->hoveredWidget) {
-				EventDragEnter e;
-				e.origin = gWidgetState->draggedWidget;
-				gDragWidgetState->hoveredWidget->onDragLeave(e);
-			}
-			gDragWidgetState->hoveredWidget = gTempWidget;
-			if (gDragWidgetState->hoveredWidget) {
-				EventDragEnter e;
-				e.origin = gWidgetState->draggedWidget;
-				gDragWidgetState->hoveredWidget->onDragEnter(e);
-			}
-		}
-	}
-	else {
-		if (gTempWidget != gWidgetState->hoveredWidget) {
-			if (gWidgetState->hoveredWidget) {
-				// onMouseLeave
-				EventMouseLeave e;
-				gWidgetState->hoveredWidget->onMouseLeave(e);
-			}
-			gWidgetState->hoveredWidget = gTempWidget;
-			if (gWidgetState->hoveredWidget) {
-				// onMouseEnter
-				EventMouseEnter e;
-				gWidgetState->hoveredWidget->onMouseEnter(e);
-			}
-		}
-	}
-	gTempWidget = NULL;
-	if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-		// TODO
-		// Define a new global called gScrollWidget, which remembers the widget where middle-click was first pressed
-		EventScroll e;
-		e.pos = mousePos;
-		e.scrollRel = mouseDelta;
-		gWidgetState->rootWidget->onScroll(e);
-	}
-*/
 }
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {
@@ -235,7 +128,7 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	gWidgetState->handleChar(gMousePos, codepoint);
+	gWidgetState->handleText(gMousePos, codepoint);
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
