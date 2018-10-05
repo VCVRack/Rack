@@ -4,15 +4,6 @@
 namespace rack {
 
 
-WidgetState::WidgetState() {
-	rootWidget = NULL;
-	hoveredWidget = NULL;
-	draggedWidget = NULL;
-	dragHoveredWidget = NULL;
-	selectedWidget = NULL;
-}
-
-
 void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) {
 	// Button event
 	event::Button eButton;
@@ -23,18 +14,20 @@ void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) 
 	rootWidget->handleEvent(eButton);
 	Widget *clickedWidget = eButton.target;
 
-	if (button == GLFW_MOUSE_BUTTON_LEFT && clickedWidget) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		// Drag events
-		if (action == GLFW_PRESS && !draggedWidget) {
+		if (action == GLFW_PRESS && !draggedWidget && clickedWidget) {
 			event::DragStart eDragStart;
 			clickedWidget->handleEvent(eDragStart);
-			draggedWidget = eDragStart.target;
+			draggedWidget = clickedWidget;
 		}
 
 		if (action == GLFW_RELEASE && draggedWidget) {
-			event::DragDrop eDragDrop;
-			eDragDrop.origin = draggedWidget;
-			clickedWidget->handleEvent(eDragDrop);
+			if (clickedWidget) {
+				event::DragDrop eDragDrop;
+				eDragDrop.origin = draggedWidget;
+				clickedWidget->handleEvent(eDragDrop);
+			}
 
 			event::DragEnd eDragEnd;
 			draggedWidget->handleEvent(eDragEnd);
@@ -56,21 +49,53 @@ void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) 
 			}
 		}
 	}
+
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+		if (action == GLFW_PRESS) {
+			scrollWidget = clickedWidget;
+		}
+		if (action == GLFW_RELEASE) {
+			scrollWidget = NULL;
+		}
+	}
 }
 
 
 void WidgetState::handleHover(math::Vec pos, math::Vec mouseDelta) {
-	// Hover event
-	event::Hover eHover;
-	eHover.pos = pos;
-	eHover.mouseDelta = mouseDelta;
-	rootWidget->handleEvent(eHover);
-
 	// Drag events
 	if (draggedWidget) {
 		event::DragMove eDragMove;
 		eDragMove.mouseDelta = mouseDelta;
 		draggedWidget->handleEvent(eDragMove);
+		return;
+	}
+
+	// if (scrollWidget) {
+	// 	event::HoverScroll eHoverScroll;
+	// 	eHoverScroll.pos = pos;
+	// 	eHoverScroll.scrollDelta = scrollDelta;
+	// 	rootWidget->handleEvent(eHoverScroll);
+	// }
+
+	// Hover event
+	event::Hover eHover;
+	eHover.pos = pos;
+	eHover.mouseDelta = mouseDelta;
+	rootWidget->handleEvent(eHover);
+	Widget *newHoveredWidget = eHover.target;
+
+	if (newHoveredWidget != hoveredWidget) {
+		if (hoveredWidget) {
+			event::Leave eLeave;
+			hoveredWidget->handleEvent(eLeave);
+		}
+
+		hoveredWidget = newHoveredWidget;
+
+		if (hoveredWidget) {
+			event::Enter eEnter;
+			hoveredWidget->handleEvent(eEnter);
+		}
 	}
 }
 
@@ -136,6 +161,15 @@ void WidgetState::handleKey(math::Vec pos, int key, int scancode, int action, in
 	eHoverKey.mods = mods;
 	rootWidget->handleEvent(eHoverKey);
 }
+
+void WidgetState::finalizeWidget(Widget *w) {
+	if (hoveredWidget == w) hoveredWidget = NULL;
+	if (draggedWidget == w) draggedWidget = NULL;
+	if (dragHoveredWidget == w) dragHoveredWidget = NULL;
+	if (selectedWidget == w) selectedWidget = NULL;
+	if (scrollWidget == w) scrollWidget = NULL;
+}
+
 
 
 // TODO Move this elsewhere

@@ -9,11 +9,7 @@ namespace rack {
 Widget::~Widget() {
 	// You should only delete orphaned widgets
 	assert(!parent);
-	// Stop dragging and hovering this widget
-	if (gWidgetState->hoveredWidget == this) gWidgetState->hoveredWidget = NULL;
-	if (gWidgetState->draggedWidget == this) gWidgetState->draggedWidget = NULL;
-	if (gWidgetState->hoveredWidget == this) gWidgetState->hoveredWidget = NULL;
-	if (gWidgetState->selectedWidget == this) gWidgetState->selectedWidget = NULL;
+	gWidgetState->finalizeWidget(this);
 	clearChildren();
 }
 
@@ -81,6 +77,7 @@ void Widget::step() {
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
 			it = children.erase(it);
+			child->parent = NULL;
 			delete child;
 			continue;
 		}
