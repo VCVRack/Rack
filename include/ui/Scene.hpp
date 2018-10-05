@@ -1,6 +1,7 @@
 #pragma once
 
 #include "widgets.hpp"
+#include "logger.hpp"
 
 
 namespace rack {

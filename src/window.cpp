@@ -167,16 +167,7 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 	gMousePos = mousePos;
 
-	event::Hover eHover;
-	eHover.pos = mousePos;
-	eHover.mouseDelta = mouseDelta;
-	gWidgetState->rootWidget->handleEvent(eHover);
-
-	if (gWidgetState->draggedWidget) {
-		event::DragMove eDragMove;
-		eDragMove.mouseDelta = mouseDelta;
-		gWidgetState->draggedWidget->handleEvent(eDragMove);
-	}
+	gWidgetState->handleHover(mousePos, mouseDelta);
 
 /*
 	if (gWidgetState->draggedWidget) {
@@ -228,11 +219,7 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {
 	if (!entered) {
-		if (gWidgetState->hoveredWidget) {
-			event::Leave eLeave;
-			gWidgetState->hoveredWidget->handleEvent(eLeave);
-		}
-		gWidgetState->hoveredWidget = NULL;
+		gWidgetState->handleLeave();
 	}
 }
 
@@ -244,40 +231,15 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 #endif
 	scrollDelta = scrollDelta.mult(50.0);
 
-	event::HoverScroll eHoverScroll;
-	eHoverScroll.scrollDelta = scrollDelta;
-	gWidgetState->rootWidget->handleEvent(eHoverScroll);
+	gWidgetState->handleScroll(gMousePos, scrollDelta);
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	if (gWidgetState->selectedWidget) {
-		event::SelectText eSelectText;
-		eSelectText.codepoint = codepoint;
-		gWidgetState->selectedWidget->handleEvent(eSelectText);
-	}
+	gWidgetState->handleChar(gMousePos, codepoint);
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-		if (gWidgetState->selectedWidget) {
-			event::SelectKey eSelectKey;
-			eSelectKey.key = key;
-			eSelectKey.scancode = scancode;
-			eSelectKey.action = action;
-			eSelectKey.mods = mods;
-			gWidgetState->selectedWidget->handleEvent(eSelectKey);
-			if (eSelectKey.target)
-				return;
-		}
-
-		event::HoverKey eHoverKey;
-		eHoverKey.key = key;
-		eHoverKey.scancode = scancode;
-		eHoverKey.action = action;
-		eHoverKey.mods = mods;
-		eHoverKey.pos = gMousePos;
-		gWidgetState->rootWidget->handleEvent(eHoverKey);
-	}
+	gWidgetState->handleKey(gMousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
 	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
@@ -291,12 +253,11 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 }
 
 void dropCallback(GLFWwindow *window, int count, const char **paths) {
-	event::PathDrop ePathDrop;
-	ePathDrop.pos = gMousePos;
+	std::vector<std::string> pathsVec;
 	for (int i = 0; i < count; i++) {
-		ePathDrop.paths.push_back(paths[i]);
+		pathsVec.push_back(paths[i]);
 	}
-	gWidgetState->rootWidget->handleEvent(ePathDrop);
+	gWidgetState->handleDrop(gMousePos, pathsVec);
 }
 
 void errorCallback(int error, const char *description) {
