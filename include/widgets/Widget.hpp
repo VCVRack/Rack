@@ -20,9 +20,10 @@ struct Event;
 struct Widget {
 	/** Stores position and size */
 	math::Rect box = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
+	/** Automatically set when Widget is added as a child to another Widget */
 	Widget *parent = NULL;
 	std::list<Widget*> children;
-	/** Disable rendering but continue stepping */
+	/** Disables rendering but allow stepping */
 	bool visible = true;
 	/** If set to true, parent will delete Widget in the next step() */
 	bool requestedDelete = false;
@@ -75,7 +76,9 @@ struct Widget {
 	virtual void draw(NVGcontext *vg);
 
 	/** Trigger an event on this Widget. */
-	virtual void handleEvent(event::Event &e) {}
+	virtual void handleEvent(event::Event &e) {
+		// Basic widgets do not handle events, but the EventWidget subclass does.
+	}
 };
 
 

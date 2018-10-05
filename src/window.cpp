@@ -60,49 +60,7 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 	}
 #endif
 
-	// event::Button
-	event::Button eButton;
-	eButton.button = button;
-	eButton.action = action;
-	eButton.mods = mods;
-	gWidgetState->rootWidget->handleEvent(eButton);
-	Widget *clickedWidget = eButton.target;
-
-	// Dragging
-	if (clickedWidget) {
-		// TODO keep track of dragged mouse button
-		if (action == GLFW_PRESS) {
-			event::DragStart eDragStart;
-			eDragStart.button = button;
-			clickedWidget->handleEvent(eDragStart);
-			gWidgetState->draggedWidget = eDragStart.target;
-		}
-
-		if (action == GLFW_RELEASE) {
-			event::DragEnd eDragEnd;
-			// TODO Use dragged button
-			eDragEnd.button = button;
-			clickedWidget->handleEvent(eDragEnd);
-			gWidgetState->draggedWidget = eDragEnd.target;
-		}
-	}
-
-	// Selection
-	if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (clickedWidget != gWidgetState->selectedWidget) {
-			if (gWidgetState->selectedWidget) {
-				event::Deselect eDeselect;
-				gWidgetState->selectedWidget->handleEvent(eDeselect);
-			}
-
-			gWidgetState->selectedWidget = clickedWidget;
-
-			if (gWidgetState->selectedWidget) {
-				event::Select eSelect;
-				gWidgetState->selectedWidget->handleEvent(eSelect);
-			}
-		}
-	}
+	gWidgetState->handleButton(gMousePos, button, action, mods);
 
 /*
 	if (action == GLFW_PRESS) {
@@ -216,8 +174,6 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 	if (gWidgetState->draggedWidget) {
 		event::DragMove eDragMove;
-		// TODO
-		eDragMove.button = 0;
 		eDragMove.mouseDelta = mouseDelta;
 		gWidgetState->draggedWidget->handleEvent(eDragMove);
 	}

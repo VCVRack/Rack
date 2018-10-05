@@ -9,6 +9,7 @@ namespace rack {
 /** A widget that responds to events */
 struct EventWidget : Widget {
 	void handleEvent(event::Event &e) override {
+		// Call visitor's visit method
 		e.trigger(this);
 	}
 
@@ -20,11 +21,14 @@ struct EventWidget : Widget {
 				continue;
 			if (!child->box.contains(e.pos))
 				continue;
+
+			// Clone event so modifications do not up-propagate
 			TEvent e2 = e;
 			e2.pos = e.pos.minus(child->box.pos);
 			child->handleEvent(e2);
+			// Up-propagate target if consumed
 			if (e2.target) {
-				e.target = e.target;
+				e.target = e2.target;
 				break;
 			}
 		}

@@ -14,7 +14,7 @@ struct WidgetState {
 	Widget *selectedWidget;
 
 	WidgetState();
-
+	void handleButton(math::Vec pos, int button, int action, int mods);
 };
 
 

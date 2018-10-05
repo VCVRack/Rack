@@ -152,7 +152,6 @@ struct SelectText : Event, Text {
 Must consume to allow the drag to occur.
 */
 struct DragStart : Event {
-	int button;
 	EVENT_TRIGGER_DECLARATION();
 };
 
@@ -160,7 +159,6 @@ struct DragStart : Event {
 /** Occurs when a Widget stops being dragged by releasing the mouse button.
 */
 struct DragEnd : Event {
-	int button;
 	EVENT_TRIGGER_DECLARATION();
 };
 
@@ -169,7 +167,6 @@ struct DragEnd : Event {
 Called once per frame, even when mouseDelta is zero.
 */
 struct DragMove : Event {
-	int button;
 	math::Vec mouseDelta;
 	EVENT_TRIGGER_DECLARATION();
 };
@@ -179,7 +176,6 @@ struct DragMove : Event {
 */
 struct DragEnter : Event {
 	Widget *origin = NULL;
-	int button;
 	EVENT_TRIGGER_DECLARATION();
 };
 
@@ -188,7 +184,6 @@ struct DragEnter : Event {
 */
 struct DragLeave : Event {
 	Widget *origin = NULL;
-	int button;
 	EVENT_TRIGGER_DECLARATION();
 };
 
@@ -197,7 +192,6 @@ struct DragLeave : Event {
 */
 struct DragDrop : Event {
 	Widget *origin = NULL;
-	int button;
 	EVENT_TRIGGER_DECLARATION();
 };
 
