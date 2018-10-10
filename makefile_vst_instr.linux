@@ -1,0 +1,8 @@
+
+PLUGIN_DIR=plugins/community/repos/
+
+include dep/yac/install_linux.mk
+
+TARGET_BASENAME=veeseevstrack_instr
+
+include vst2_common_linux.mk

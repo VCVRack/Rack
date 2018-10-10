@@ -1,0 +1,26 @@
+#
+# Makefile for VCV rack lib + GCC
+# 
+#
+
+include dep/yac/install_linux.mk
+
+TARGET_BASENAME=Rack
+
+EXTRAFLAGS= -DVERSION=0.6.1 -DARCH_LIN -D_USE_MATH_DEFINES -DRACK_HOST -DUSE_VST2 -Iinclude/ -Idep/include -Idep/
+
+# for osdialog:
+EXTRAFLAGS+= `pkg-config gtk+-2.0 --cflags`
+
+EXTRALIBS+= 
+
+# need to link these later on:
+#jansson.a
+
+PLAF_OBJ= 
+
+include make.objects
+
+ALL_OBJ=$(LIB_OBJ) $(LIB_OBJ_LINUX)
+
+include dep/yac/staticlib_linux.mk

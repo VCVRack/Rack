@@ -114,10 +114,12 @@ static void engineStep() {
 }
 
 static void engineRun() {
+#ifdef _MSC_VER
 	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
 	// https://software.intel.com/en-us/node/682949
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+#endif // _MSC_VER
 
 	// Every time the engine waits and locks a mutex, it steps this many frames
 	const int mutexSteps = 64;

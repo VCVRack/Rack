@@ -1,0 +1,37 @@
+#
+# Makefile for VCV rack lib + GCC
+# 
+#
+
+#NUM_JOBS=20
+NUM_JOBS=1
+
+.PHONY: bin
+bin: vst
+
+.PHONY: lib
+lib:
+	make -f makefile_lib.linux bin -j $(NUM_JOBS)
+
+.PHONY: shared_lib
+shared_lib:
+	make -f makefile_shared_lib.linux bin -j $(NUM_JOBS) && mv Rack_shared.a plugins/
+
+.PHONY: vst
+vst: lib
+	rm -f src/vst2_main.o
+	make -f makefile_vst_instr.linux bin -j $(NUM_JOBS)
+	rm -f src/vst2_main.o
+	make -f makefile_vst_effect.linux bin -j $(NUM_JOBS)
+	mv veeseevstrack_instr.so vst2_bin/
+	mv veeseevstrack_effect.so vst2_bin/
+	@ls -l vst2_bin/veeseevstrack_instr.so
+	@ls -l vst2_bin/veeseevstrack_effect.so
+
+.PHONY: clean
+clean:
+	make -f makefile_lib.linux clean
+	make -f makefile_shared_lib.linux clean
+	make -f makefile_vst_instr.linux clean
+	make -f makefile_vst_effect.linux clean
+

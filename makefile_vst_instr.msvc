@@ -5,4 +5,4 @@ include dep/yac/install_msvc.mk
 
 TARGET_BASENAME=veeseevstrack_instr
 
-include vst2_common.mk
+include vst2_common_msvc.mk

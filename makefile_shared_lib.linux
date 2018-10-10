@@ -1,0 +1,34 @@
+#
+# Makefile for VCV rack shared lib + GCC
+# 
+#
+
+include dep/yac/install_linux.mk
+
+TARGET_BASENAME=Rack_shared
+
+EXTRAFLAGS= -DVERSION=0.6.1 -DARCH_LIN -D_USE_MATH_DEFINES -DRACK_PLUGIN -DRACK_PLUGIN_SHARED -DUSE_VST2 -Iinclude/ -Idep/include -Idep/
+EXTRAFLAGS+= -DRACK_PLUGIN_SHARED_LIB_BUILD
+
+# for osdialog:
+EXTRAFLAGS+= `pkg-config gtk+-2.0 --cflags`
+
+ifeq ($(BUILD_64),y)
+EXTRALIBS_DEP= dep/lib/linux_gcc/x64
+else
+EXTRALIBS_DEP= dep/lib/linux_gcc/x86
+endif
+
+# need to link these later on:
+#EXTRALIBS+= `pkg-config gtk+-2.0 --libs`
+#EXTRALIBS+= $(EXTRALIBS_DEP)/jansson.a
+#EXTRALIBS+= $(EXTRALIBS_DEP)/glew.a
+#libspeexdsp.a
+
+PLAF_OBJ= 
+
+include make.objects
+
+ALL_OBJ=$(SHARED_LIB_OBJ) $(LIB_OBJ_LINUX)
+
+include dep/yac/staticlib_linux.mk

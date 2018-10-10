@@ -1,9 +1,10 @@
-COMMON_OBJ= \
+COMMON_DEP_OBJ= \
 	dep/jpommier-pffft-29e4f76ac53b/fftpack.o \
 	dep/jpommier-pffft-29e4f76ac53b/pffft.o \
 	dep/nanovg/src/nanovg.o \
-	dep/osdialog/osdialog.o \
-	dep/osdialog/osdialog_win.o \
+	dep/osdialog/osdialog.o
+
+COMMON_OBJ= \
 	src/app/app.o \
 	src/app/AudioWidget.o \
 	src/app/CircularShadow.o \
@@ -84,6 +85,9 @@ COMMON_OBJ= \
 
 #	src/keyboard.o
 
+COMMON_OBJ+=$(COMMON_DEP_OBJ)
+
+
 HOST_OBJ= \
 	src/Core/AudioInterface.o \
 	src/Core/Blank.o \
@@ -101,10 +105,16 @@ LIB_OBJ= \
 LIB_OBJ_WIN= \
 	src/util/dirent_win32/dirent.o \
 	dep/lglw/lglw_windows.o \
-	dep/lglw/lglw_windows_cpp.o
+	dep/lglw/lglw_windows_cpp.o \
+	dep/osdialog/osdialog_win.o
+
+LIB_OBJ_LINUX= \
+	dep/lglw/lglw_linux.o \
+	dep/osdialog/osdialog_gtk2.o
 
 SHARED_LIB_OBJ= \
 	$(COMMON_OBJ)
+
 
 MAIN_OBJ= \
 	src/vst2_main.o \

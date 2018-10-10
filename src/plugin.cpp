@@ -767,11 +767,11 @@ using namespace rack;
 
 #ifdef USE_VST2
 #ifdef ARCH_WIN
-extern "C" extern long seed_initialized;
+extern "C" { extern long seed_initialized; }
 #else
-extern "C" extern volatile char seed_initialized;
+extern "C" { extern volatile char seed_initialized; }
 #endif // ARCH_WIN
-extern "C" extern volatile uint32_t hashtable_seed;
+extern "C" { extern volatile uint32_t hashtable_seed; }
 void vst2_set_shared_plugin_tls_globals(void) {
    // Called in audio thread (see vst2_main.cpp:VSTPluginProcessReplacingFloat32())
    for(Plugin *p : global->plugin.gPlugins) {

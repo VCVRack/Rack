@@ -6,4 +6,5 @@ include dep/yac/install_msvc.mk
 TARGET_BASENAME=veeseevstrack_effect
 
 EXTRAFLAGS+= -DVST2_EFFECT
-include vst2_common.mk
+
+include vst2_common_msvc.mk

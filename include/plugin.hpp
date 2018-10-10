@@ -4,6 +4,7 @@
 #include <stdio.h> // debug
 #include <list>
 #include "tags.hpp"
+#include "util/common.hpp"
 
 
 #define RACK_PLUGIN_INIT_ID_INTERNAL p->slug = TOSTRING(SLUG); p->version = TOSTRING(VERSION)
@@ -26,7 +27,11 @@ extern void vst2_handle_ui_param (int uniqueParamId, float normValue);
 extern void vst2_queue_param_sync (int _uniqueParamId, float _value, bool _bNormalized);
 
 #define RACK_PLUGIN_DECLARE(pluginname) 
+#ifdef _MSC_VER
 #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
+#else
+#define RACK_PLUGIN_INIT(pluginname)  extern "C" void CONCAT(init_plugin_, pluginname) (rack::Plugin *p)
+#endif // _MSC_VER
 #define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
 
 #else
@@ -87,7 +92,11 @@ RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p)
 #else
  // Statically linked plugin build
  #define RACK_PLUGIN_DECLARE(pluginname) 
- #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
+ #ifdef _MSC_VER
+  #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
+ #else
+  #define RACK_PLUGIN_INIT(pluginname)  extern "C" void CONCAT(init_plugin_, pluginname) (rack::Plugin *p)
+ #endif
  #define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
 #endif // RACK_PLUGIN_SHARED
 #endif // RACK_PLUGIN_SHARED_LIB_BUILD
@@ -107,9 +116,17 @@ RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p)
 #define RACK_PLUGIN_INIT_MANUAL(url) p->manual = url
 #define RACK_PLUGIN_INIT_VERSION(ver) p->version = ver
 
+#ifdef _MSC_VER
 #define RACK_PLUGIN_MODEL_DECLARE(pluginname, modelname) extern Model *create_model_##pluginname##_##modelname##(void)
 #define RACK_PLUGIN_MODEL_INIT(pluginname, modelname) Model *create_model_##pluginname##_##modelname##(void)
 #define RACK_PLUGIN_MODEL_ADD(pluginname, modelname) p->addModel(create_model_##pluginname##_##modelname##())
+#else
+#define CONCAT_USCORE_LITERAL(x, y) x ## _ ## y
+#define CONCAT_USCORE(x, y) CONCAT_USCORE_LITERAL(x, y)
+#define RACK_PLUGIN_MODEL_DECLARE(pluginname, modelname) extern Model *CONCAT(create_model_, CONCAT_USCORE(pluginname, modelname))(void)
+#define RACK_PLUGIN_MODEL_INIT(pluginname, modelname) Model *CONCAT(create_model_, CONCAT_USCORE(pluginname, modelname))(void)
+#define RACK_PLUGIN_MODEL_ADD(pluginname, modelname) p->addModel(CONCAT(create_model_, CONCAT_USCORE(pluginname, modelname))())
+#endif // _MSC_VER
 
 
 namespace rack {
