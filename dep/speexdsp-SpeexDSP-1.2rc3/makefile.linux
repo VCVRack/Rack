@@ -1,0 +1,18 @@
+#
+# Makefile for speex lib + GCC
+# 
+#
+
+include ../yac/install_linux.mk
+
+TARGET_BASENAME=libspeexdsp
+
+EXTRAFLAGS= -D_GLFW_USE_CONFIG_H -DHAVE_CONFIG_H -Iinclude -I./
+
+EXTRALIBS= 
+
+PLAF_OBJ= 
+
+include make.objects
+
+include ../yac/staticlib_linux.mk

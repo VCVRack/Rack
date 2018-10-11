@@ -1,0 +1,18 @@
+#
+# Makefile for glew lib + GCC
+# 
+#
+
+include ../yac/install_linux.mk
+
+TARGET_BASENAME=glew
+
+EXTRAFLAGS= -DGLEW_NO_GLU -DGLEW_BUILD -Iinclude/
+
+EXTRALIBS=
+
+PLAF_OBJ= 
+
+include make.objects
+
+include ../yac/staticlib_linux.mk

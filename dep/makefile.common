@@ -1,0 +1,18 @@
+
+.PHONY: bin
+bin:
+	make -C glew-2.1.0/ -f makefile.${MK} -j $(NUM_JOBS) bin
+	make -C jansson-2.10/ -f makefile.${MK} -j $(NUM_JOBS) bin
+	make -C speexdsp-SpeexDSP-1.2rc3/ -f makefile.${MK} -j $(NUM_JOBS) bin
+
+.PHONY: install
+install:
+	make -C glew-2.1.0/ -f makefile.${MK} install
+	make -C jansson-2.10/ -f makefile.${MK} install
+	make -C speexdsp-SpeexDSP-1.2rc3/ -f makefile.${MK} install
+
+.PHONY: clean
+clean:
+	make -C glew-2.1.0/ -f makefile.${MK} clean
+	make -C jansson-2.10/ -f makefile.${MK} clean
+	make -C speexdsp-SpeexDSP-1.2rc3/ -f makefile.${MK} clean
