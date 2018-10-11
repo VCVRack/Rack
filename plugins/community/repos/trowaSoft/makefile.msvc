@@ -1,8 +1,8 @@
 SLUG=trowaSoft
 
-include ../../../build_plugin_pre.mk
+include ../../../build_plugin_pre_msvc.mk
 
 include make.objects
 ALL_OBJ=$(WIN32_OBJ) $(RACK_OBJ)
 
-include ../../../build_plugin_post.mk
+include ../../../build_plugin_post_msvc.mk

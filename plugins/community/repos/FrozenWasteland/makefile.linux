@@ -1,0 +1,13 @@
+SLUG=FrozenWasteland
+
+include ../../../build_plugin_pre_linux.mk
+
+EXTRAFLAGS+= \
+	-DTEST \
+	-I./eurorack \
+	-I./src/dsp-delay \
+	-I./src/dsp-filter/utils -I./src/dsp-filter/filters -I./src/dsp-filter/third-party/falco
+
+include make.objects
+
+include ../../../build_plugin_post_linux.mk

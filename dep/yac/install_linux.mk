@@ -8,6 +8,7 @@
 BUILD_64=n
 BUILD_ARM=n
 
+MK=linux
 
 #
 # Enable optimizations 

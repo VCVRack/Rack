@@ -167,10 +167,10 @@ void trSEQ::step() {
       
       if (!inputs[NOTESIN_INPUT].active) inputs[NOTESIN_INPUT].value = 0;
       if (!inputs[CLEAR_INPUT].active) inputs[CLEAR_INPUT].value = 0;
-#define or ||
-      if (params[NOTESIN_PARAM].value or inputs[NOTESIN_INPUT].value>0) gateState[index] = true;
-      if (params[CLEAR_PARAM].value or inputs[CLEAR_INPUT].value>0) gateState[index] = false;
-#undef or
+// // #define or ||
+      if (params[NOTESIN_PARAM].value || inputs[NOTESIN_INPUT].value>0) gateState[index] = true;
+      if (params[CLEAR_PARAM].value || inputs[CLEAR_INPUT].value>0) gateState[index] = false;
+// // #undef or
 
 		stepLights[index] = 1.0;
 		gatePulse.trigger(1e-3);

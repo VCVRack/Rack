@@ -1,0 +1,9 @@
+SLUG=ML_modules
+
+include ../../../build_plugin_pre_linux.mk
+
+EXTRAFLAGS += -Dv_dev
+
+include make.objects
+
+include ../../../build_plugin_post_linux.mk

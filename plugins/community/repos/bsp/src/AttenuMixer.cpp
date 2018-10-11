@@ -43,6 +43,7 @@ struct AttenuMixer : Module {
 		IN_4_SCL_PARAM,
 		IN_4_OFF_PARAM,
 		BIPOLAR_PARAM,
+		FINEOFF_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -68,27 +69,72 @@ void AttenuMixer::step() {
 
    float outVal = 0.0f;
 
-   if(params[BIPOLAR_PARAM].value >= 0.5f)
+   if(params[FINEOFF_PARAM].value >= 0.5f)
    {
-      for(int i = 0; i < 4; i++)
+      if(params[BIPOLAR_PARAM].value >= 0.5f)
       {
-         fi_t scl; scl.f = params[IN_1_SCL_PARAM + (i<<1)].value;
-         scl.f = (2.0f * scl.f) - 1.0f;
-         uint32_t sclSign = scl.u & 0x80000000u;
-         scl.f *= scl.f;
-         scl.f *= scl.f;
-         scl.u |= sclSign;
-         outVal += inputs[IN_1_INPUT + i].value * scl.f + params[IN_1_OFF_PARAM + (i<<1)].value;
+         for(int i = 0; i < 4; i++)
+         {
+            fi_t scl; scl.f = params[IN_1_SCL_PARAM + (i<<1)].value;
+            scl.f = (2.0f * scl.f) - 1.0f;
+            uint32_t sclSign = scl.u & 0x80000000u;
+            scl.f *= scl.f;
+            scl.f *= scl.f;
+            scl.u |= sclSign;
+            fi_t off; off.f = params[IN_1_OFF_PARAM + (i<<1)].value;
+            uint32_t offSign = off.u & 0x80000000u;
+            off.f /= 5.0f;
+            off.f *= off.f;
+            off.f *= off.f;
+            off.u |= offSign;
+            off.f *= 5.0f;
+            outVal += inputs[IN_1_INPUT + i].value * scl.f + off.f;
+         }
+      }
+      else
+      {
+         for(int i = 0; i < 4; i++)
+         {
+            float scl = params[IN_1_SCL_PARAM + (i<<1)].value;
+            scl *= scl;
+            scl *= scl;
+            fi_t off; off.f = params[IN_1_OFF_PARAM + (i<<1)].value;
+            uint32_t offSign = off.u & 0x80000000u;
+            off.f /= 5.0f;
+            off.f *= off.f;
+            off.f *= off.f;
+            off.u |= offSign;
+            off.f *= 5.0f;
+            outVal += inputs[IN_1_INPUT + i].value * scl + off.f;
+         }
       }
    }
    else
    {
-      for(int i = 0; i < 4; i++)
+      if(params[BIPOLAR_PARAM].value >= 0.5f)
       {
-         float scl = params[IN_1_SCL_PARAM + (i<<1)].value;
-         scl *= scl;
-         scl *= scl;
-         outVal += inputs[IN_1_INPUT + i].value * scl + params[IN_1_OFF_PARAM + (i<<1)].value;
+         for(int i = 0; i < 4; i++)
+         {
+            fi_t scl; scl.f = params[IN_1_SCL_PARAM + (i<<1)].value;
+            scl.f = (2.0f * scl.f) - 1.0f;
+            uint32_t sclSign = scl.u & 0x80000000u;
+            scl.f *= scl.f;
+            scl.f *= scl.f;
+            scl.u |= sclSign;
+            float off = params[IN_1_OFF_PARAM + (i<<1)].value;
+            outVal += inputs[IN_1_INPUT + i].value * scl.f + off;
+         }
+      }
+      else
+      {
+         for(int i = 0; i < 4; i++)
+         {
+            float scl = params[IN_1_SCL_PARAM + (i<<1)].value;
+            scl *= scl;
+            scl *= scl;
+            float off = params[IN_1_OFF_PARAM + (i<<1)].value;
+            outVal += inputs[IN_1_INPUT + i].value * scl + off;
+         }
       }
    }
 
@@ -115,6 +161,7 @@ AttenuMixerWidget::AttenuMixerWidget(AttenuMixer *module) : ModuleWidget(module)
 	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
 
 	addParam(ParamWidget::create<CKSS>(Vec(box.size.x - 19, 18), module, AttenuMixer::BIPOLAR_PARAM, 0.0f, 1.0f, 0.0f));
+	addParam(ParamWidget::create<CKSS>(Vec(2, 12), module, AttenuMixer::FINEOFF_PARAM, 0.0f, 1.0f, 0.0f));
 
 #define STY 42
 #define OFX 17

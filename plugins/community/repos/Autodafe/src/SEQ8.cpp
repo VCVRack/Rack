@@ -307,7 +307,7 @@ SEQ8Widget::SEQ8Widget(SEQ8 *module) : ModuleWidget(module) {
 }
 
 struct SEQ8GateModeItem : MenuItem {
-   SEQ8 *SEQ8;
+   struct SEQ8 *SEQ8;
    SEQ8::GateMode gateMode;
    void onAction(EventAction &e) override {
       SEQ8->gateMode = gateMode;

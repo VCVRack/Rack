@@ -1,0 +1,8 @@
+SLUG=trowaSoft
+
+include ../../../build_plugin_pre_linux.mk
+
+include make.objects
+ALL_OBJ=$(POSIX_OBJ) $(RACK_OBJ)
+
+include ../../../build_plugin_post_linux.mk

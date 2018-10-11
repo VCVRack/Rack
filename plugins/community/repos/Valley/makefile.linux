@@ -1,0 +1,9 @@
+SLUG=Valley
+
+include ../../../build_plugin_pre_linux.mk
+
+EXTRAFLAGS+= 
+
+include make.objects
+
+include ../../../build_plugin_post_linux.mk

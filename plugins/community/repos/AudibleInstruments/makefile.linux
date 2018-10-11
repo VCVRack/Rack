@@ -1,0 +1,9 @@
+SLUG=AudibleInstruments
+
+include ../../../build_plugin_pre_linux.mk
+
+EXTRAFLAGS+= -Ieurorack/ -DTEST -Ieurorack/stmlib/third_party/STM -Ieurorack/stmlib/third_party/STM/STM32F0xx_StdPeriph_Driver/inc/
+
+include make.objects
+
+include ../../../build_plugin_post_linux.mk

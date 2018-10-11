@@ -32,6 +32,7 @@ bin: $(BIN_RULES) $(ALL_OBJ)
 ifneq ($(DEBUG),y)
 	$(STRIP) "$(TARGET)"
 endif
+	$(call BIN_POST_FXN)
 	@echo "Build finished at `date +%H:%M`."
 
 

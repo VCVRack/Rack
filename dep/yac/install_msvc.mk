@@ -7,7 +7,9 @@
 # y=64bit build ("amd64", no jit)
 BUILD_64=y
 
+MK=msvc
 
+# invalid path, will be overwritten later on
 LIB_INSTALL_PREFIX=/f/git/VeeSeeVSTRack/dep/lib/msvc/
 
 

@@ -1,9 +1,9 @@
 SLUG=JE
 
-include ../../../build_plugin_pre.mk
+include ../../../build_plugin_pre_msvc.mk
 
 CPPFLAGS+= -Iext/LambertW/
 
 include make.objects
 
-include ../../../build_plugin_post.mk
+include ../../../build_plugin_post_msvc.mk

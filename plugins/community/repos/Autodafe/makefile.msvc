@@ -1,15 +1,16 @@
 SLUG=Autodafe
 
-#include ../../../build_shared_plugin_pre.mk
-include ../../../build_plugin_pre.mk
+#include ../../../build_shared_plugin_pre_msvc.mk
+include ../../../build_plugin_pre_msvc.mk
 
 CPPFLAGS+= -Idep/ -Idep/stk/include/
 
 include make.objects
 
 define BIN_POST_FXN
-	cp -f $(SLUG).dll ../../../../vst2_bin/plugins/$(SLUG)/plugin.dll
+	cp -f $(SLUG).dll ../../../../vst2_bin/plugins/$(SLUG)/plugin.dll.fx
+	cp -f $(SLUG).dll ../../../../vst2_bin/plugins/$(SLUG)/plugin.dll.instr
 endef
 
-#include ../../../build_shared_plugin_post.mk
-include ../../../build_plugin_post.mk
+#include ../../../build_shared_plugin_post_msvc.mk
+include ../../../build_plugin_post_msvc.mk

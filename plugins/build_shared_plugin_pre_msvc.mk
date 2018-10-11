@@ -1,9 +1,6 @@
 # called from plugin directory (plugins/community/repos/<pluginname>/)
 #
-#include ../../../../arch.mk
-#ifdef ARCH_WIN
 include ../../../../dep/yac/install_msvc.mk
-#endif
 
 TARGET_BASENAME=$(SLUG)
 
@@ -14,6 +11,5 @@ EXTRALIBS+= ../../../Rack_shared.lib
 
 PLAF_OBJ+= 
 
-#ifdef ARCH_WIN
-include ../../../build_plugin_msvc_pre.mk
-#endif
+EXTRAFLAGS+= -DARCH_WIN 
+

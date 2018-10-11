@@ -1,5 +1,4 @@
-ALL_OBJ= \
-	src/dirent_win32/dirent.o \
+COMMON_OBJ= \
 	src/AudioFile.o \
 	src/CUBE.o \
 	src/DAVE.o \
@@ -20,3 +19,6 @@ ALL_OBJ= \
 	src/SUB.o \
 	src/cf.o \
 	src/trSEQ.o
+
+WIN32_OBJ= \
+	src/dirent_win32/dirent.o

@@ -58,15 +58,15 @@ extern vst2_queue_param_sync_fxn_t vst2_queue_param_sync;
  // Dynamically loaded plugin build
  #define RACK_PLUGIN_DECLARE(pluginname)  namespace rack { extern RACK_TLS Plugin *plugin; } extern void __rack_unused_symbol(void)
 #ifdef ARCH_WIN
-#define JSON_SEED_INIT_EXTERNAL extern "C" extern long seed_initialized;
+#define JSON_SEED_INIT_EXTERNAL extern "C" { extern long seed_initialized; }
 #else
-#define JSON_SEED_INIT_EXTERNAL extern "C" extern volatile char seed_initialized;
+#define JSON_SEED_INIT_EXTERNAL extern "C" { extern volatile char seed_initialized; }
 #endif
  #define RACK_PLUGIN_INIT(pluginname)                   \
 vst2_handle_ui_param_fxn_t vst2_handle_ui_param;        \
 vst2_queue_param_sync_fxn_t vst2_queue_param_sync;      \
 JSON_SEED_INIT_EXTERNAL                                 \
-extern "C" extern volatile uint32_t hashtable_seed;     \
+extern "C" { extern volatile uint32_t hashtable_seed; } \
 namespace rack {                                        \
    RACK_TLS Plugin *plugin;                             \
    RACK_TLS Global *global;                             \

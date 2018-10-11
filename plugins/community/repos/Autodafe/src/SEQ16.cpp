@@ -313,7 +313,7 @@ SEQ16Widget::SEQ16Widget(SEQ16 *module) : ModuleWidget(module) {
 }
 
 struct SEQ16GateModeItem : MenuItem {
-   SEQ16 *SEQ16;
+   struct SEQ16 *SEQ16;
    SEQ16::GateMode gateMode;
    void onAction(EventAction &e) override {
       SEQ16->gateMode = gateMode;

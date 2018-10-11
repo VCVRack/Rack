@@ -744,15 +744,14 @@ Prerequisites:
 If you want to build the dependent libraries, you may need additional SDKs.
 Precompiled libs can be found in the `dep/lib/msvc/` folder.
 
+NOTE: the VST(s) and the add-on modules can also be built for Linux but the LGLW OS abstraction layer is currently (11Oct2018) a stub (i.e. it won't open a window etc)
+
 ```
 $ git clone https://github.com/bsp2/VeeSeeVSTRack.git
 ```
 ```
 $ cd VeeSeeVSTRack/
 ```
-
-<unpack `dep/dep.7z`>
-(contains the source codes and MSVC-precompiled libraries)
 
 Edit `dep/yac/install_msvc.mk` and adjust the `LIB_INSTALL_PREFIX`, `WINDDK_PATH`, `VCTK`, `W32API_INC`, `W32API_LIB` as required.
 

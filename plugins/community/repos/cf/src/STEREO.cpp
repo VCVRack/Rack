@@ -117,17 +117,17 @@ void STEREO::step() {
 	if (soloTrigger.process(params[SOLO_PARAM].value)+soloinTrigger.process(inputs[SOLOT_INPUT].value))
 			{if (SOLO_STATE == 0) {SOLO_STATE = 1;} else {SOLO_STATE = 0;soloed=0;}}
 
-#define and &&
-	if ((!SOLO_STATE and !soloed) and (retard > 0)) retard = 0; else if (retard < 1000) retard = retard + 1;
-#undef and
+// // #define and &&
+	if ((!SOLO_STATE && !soloed) && (retard > 0)) retard = 0; else if (retard < 1000) retard = retard + 1;
+// // #undef and
 
 
 	outputs[EXTSOLO_OUTPUT].value=round(10*retard/1000);
 
 	if (!SOLO_STATE) {SIGNAL1 = SIGNAL1 * ON_STATE ; SIGNAL2 = SIGNAL2 * ON_STATE ;}
-#define and &&
-	if (soloed and !SOLO_STATE) {SIGNAL1 = 0; SIGNAL2 = 0;}
-#undef and
+// // #define and &&
+	if (soloed && !SOLO_STATE) {SIGNAL1 = 0; SIGNAL2 = 0;}
+// // #undef and
 	
 
 	if (!inputs[PAN_INPUT].active) {
