@@ -7,7 +7,7 @@ EXTRAFLAGS+= -DVERSION=0.6.1 -D_USE_MATH_DEFINES -Iinclude/ -Idep/include -Idep/
 
 include vst2_common_linux_pre.mk
 
-include vst2_common_staticlibs.mk
+#include vst2_common_staticlibs.mk
 
 PLAF_OBJ= 
 

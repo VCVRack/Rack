@@ -1045,7 +1045,7 @@ public:
       if(NULL != _vstHostCallback)
       {
          VstIntPtr result = _vstHostCallback(&_vstPlugin, audioMasterGetTime, 0, 0/*value*/, NULL/*ptr*/, 0.0f/*opt*/);
-         if(NULL != result)
+         if(0 != result)
          {
             const struct VstTimeInfo *timeInfo = (const struct VstTimeInfo *)result;
 
@@ -1238,6 +1238,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
                                                           d,
                                                           &outNumFrames
                                                           );
+                  (void)err;
                }
                else
                {
@@ -1291,6 +1292,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
                                                           d,
                                                           &outNumFrames
                                                           );
+                  (void)err;
 
                   // Next output channel
                   s += inNumFrames;
@@ -1357,7 +1359,9 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
                {
                   static int x = 0;
                   if(0 == (++x & 127))
+                  {
                      Dprintf_idle("xxx vstrack_plugin: output avg is %f\n", sum);
+                  }
                }
 
                if(sum >= wrapper->idle_output_level_threshold)
@@ -1634,7 +1638,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          //  value: buffer size
          //    ptr: buffer address
          //      r: 1
-         Dprintf("xxx vstrack_plugin: effSetChunk index=%d size=%lld ptr=%p\n", index, value, ptr);
+         Dprintf("xxx vstrack_plugin: effSetChunk index=%d size=%d ptr=%p\n", index, (int)value, ptr);
          // // if(0 == index)
          // // {
          // //    r = wrapper->setBankChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
@@ -1737,8 +1741,8 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 
                         case kVstSysExType:
                         {
-                           VstMidiSysexEvent *xev = (VstMidiSysexEvent*)ev;
 #ifdef DEBUG_PRINT_EVENTS
+                           VstMidiSysexEvent *xev = (VstMidiSysexEvent*)ev;
                            Dprintf("vstrack_plugin:effProcessEvents<syx>: ev[%u].dumpBytes = %u\n", evIdx, uint32_t(xev->dumpBytes));  // size
                            Dprintf("vstrack_plugin:effProcessEvents<syx>: ev[%u].sysexDump = %p\n", evIdx, xev->sysexDump);            // buffer addr
 #endif // DEBUG_PRINT_EVENTS
@@ -1905,7 +1909,7 @@ void VSTPluginSetParameter(VSTPlugin *vstPlugin,
 void vst2_queue_param_sync(int _uniqueParamId, float _value, bool _bNormalized) {
    // Called when parameter is edited numerically via textfield
    printf("xxx vst2_queue_param_sync ENTER: uniqueParamId=%d value=%f bNormalized=%d\n", _uniqueParamId, _value, _bNormalized);
-   VSTPluginWrapper *wrapper = rack::global->vst2.wrapper;
+   // // VSTPluginWrapper *wrapper = rack::global->vst2.wrapper;
 
    // // wrapper->lockAudio();
    rack::global_ui->app.mtx_param.lock();
