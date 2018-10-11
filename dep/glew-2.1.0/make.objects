@@ -1,0 +1,2 @@
+ALL_OBJ= src/glew.o
+

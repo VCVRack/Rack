@@ -5,7 +5,6 @@
 /autosave.json
 /settings.json
 /build
-/dep
 *.vcv
 /patches
 /design

@@ -1,0 +1,11 @@
+.deps
+.libs
+*.la
+*.lo
+*.o
+Makefile
+Makefile.in
+testdenoise
+testenc
+testenc_uwb
+testenc_wb

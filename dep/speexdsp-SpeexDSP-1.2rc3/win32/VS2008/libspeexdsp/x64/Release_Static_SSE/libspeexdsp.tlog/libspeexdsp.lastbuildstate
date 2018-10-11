@@ -1,0 +1,2 @@
+#TargetFrameworkVersion=v4.0:PlatformToolSet=v141:EnableManagedIncrementalBuild=false:VCToolArchitecture=Native32Bit:WindowsTargetPlatformVersion=8.1
+Release_Static_SSE|x64|F:\git\Rack\dep\speexdsp-SpeexDSP-1.2rc3\win32\VS2008\|

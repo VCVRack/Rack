@@ -1,0 +1,22 @@
+SpeexDSP has been ported to the Blackfin DSP, for the STAMP development board.
+
+This port has been tested on the STAMP development board and requires the 
+toolchain available at http://blackfin.uclinux.org/
+
+1/ In order to cross-compile for uClinux from the SpeexDSP tarball:
+
+  ./configure --enable-blackfin-asm --enable-fixed-point --host=bfin-uclinux
+  cd libspeexdsp
+  make
+
+The --enable-blackfin-asm option is not required, but it speeds up Speex by
+approximately a factor of two.
+
+2/ In order to cross-compile for uClinux from the SpeexDSP git:
+
+  git clone git://git.xiph.org/speexdsp.git
+  cd speexdsp
+  ./autogen.sh
+  ./configure --enable-blackfin-asm --enable-fixed-point --host=bfin-uclinux
+  cd libspeexdsp
+  make

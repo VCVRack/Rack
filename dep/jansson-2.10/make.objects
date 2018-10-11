@@ -1,0 +1,12 @@
+ALL_OBJ = \
+	src/dump.o \
+	src/error.o \
+	src/hashtable.o \
+	src/hashtable_seed.o \
+	src/load.o \
+	src/memory.o \
+	src/pack_unpack.o \
+	src/strbuffer.o \
+	src/strconv.o \
+	src/utf.o \
+	src/value.o

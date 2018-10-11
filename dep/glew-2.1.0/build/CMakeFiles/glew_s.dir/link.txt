@@ -1,0 +1,2 @@
+C:/msys64/mingw64/bin/ar.exe qc lib/libglew32.a  CMakeFiles/glew_s.dir/F_/git/Rack/dep/glew-2.1.0/src/glew.c.obj CMakeFiles/glew_s.dir/glew.rc.obj
+C:/msys64/mingw64/bin/ranlib.exe lib/libglew32.a

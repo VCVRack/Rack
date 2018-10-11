@@ -1,0 +1,435 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		73814AFF0907FB8200C478FC /* speex_echo.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF30907FB8200C478FC /* speex_echo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B000907FB8200C478FC /* speex_header.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF40907FB8200C478FC /* speex_header.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B010907FB8200C478FC /* speex_jitter.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF50907FB8200C478FC /* speex_jitter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B020907FB8200C478FC /* speex_preprocess.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF60907FB8200C478FC /* speex_preprocess.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B030907FB8200C478FC /* speex_stereo.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF70907FB8200C478FC /* speex_stereo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B040907FB8200C478FC /* speex_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF80907FB8200C478FC /* speex_types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B060907FBAB00C478FC /* speex_callbacks.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF10907FB8200C478FC /* speex_callbacks.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B070907FBAD00C478FC /* speex_bits.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AF00907FB8200C478FC /* speex_bits.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B080907FBAE00C478FC /* speex.h in Headers */ = {isa = PBXBuildFile; fileRef = 73814AEF0907FB8200C478FC /* speex.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		73814B750907FC9900C478FC /* jitter.c in Sources */ = {isa = PBXBuildFile; fileRef = 73814B280907FC9900C478FC /* jitter.c */; };
+		73814B840907FC9900C478FC /* math_approx.c in Sources */ = {isa = PBXBuildFile; fileRef = 73814B370907FC9900C478FC /* math_approx.c */; };
+		73814B880907FC9900C478FC /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = 73814B3B0907FC9900C478FC /* misc.c */; };
+		73814B8E0907FC9900C478FC /* preprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = 73814B410907FC9900C478FC /* preprocess.c */; };
+		73814B930907FC9900C478FC /* smallft.c in Sources */ = {isa = PBXBuildFile; fileRef = 73814B460907FC9900C478FC /* smallft.c */; };
+		8D07F2C00486CC7A007CD1D0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		4F0BB7EC011F40E904CA0E50 /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4F0BB7ED011F40E904CA0E50 /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXFileReference section */
+		089C1667FE841158C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		32BAE0B70371A74B00C91783 /* Speex_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Speex_Prefix.pch; sourceTree = "<group>"; };
+		73814AEF0907FB8200C478FC /* speex.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex.h; sourceTree = "<group>"; };
+		73814AF00907FB8200C478FC /* speex_bits.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_bits.h; sourceTree = "<group>"; };
+		73814AF10907FB8200C478FC /* speex_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_callbacks.h; sourceTree = "<group>"; };
+		73814AF30907FB8200C478FC /* speex_echo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_echo.h; sourceTree = "<group>"; };
+		73814AF40907FB8200C478FC /* speex_header.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_header.h; sourceTree = "<group>"; };
+		73814AF50907FB8200C478FC /* speex_jitter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_jitter.h; sourceTree = "<group>"; };
+		73814AF60907FB8200C478FC /* speex_preprocess.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_preprocess.h; sourceTree = "<group>"; };
+		73814AF70907FB8200C478FC /* speex_stereo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_stereo.h; sourceTree = "<group>"; };
+		73814AF80907FB8200C478FC /* speex_types.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = speex_types.h; sourceTree = "<group>"; };
+		73814B0C0907FC9900C478FC /* arch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = arch.h; path = ../libspeex/arch.h; sourceTree = SOURCE_ROOT; };
+		73814B1E0907FC9900C478FC /* fixed_arm4.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fixed_arm4.h; path = ../libspeex/fixed_arm4.h; sourceTree = SOURCE_ROOT; };
+		73814B1F0907FC9900C478FC /* fixed_arm5e.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fixed_arm5e.h; path = ../libspeex/fixed_arm5e.h; sourceTree = SOURCE_ROOT; };
+		73814B200907FC9900C478FC /* fixed_bfin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fixed_bfin.h; path = ../libspeex/fixed_bfin.h; sourceTree = SOURCE_ROOT; };
+		73814B210907FC9900C478FC /* fixed_debug.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fixed_debug.h; path = ../libspeex/fixed_debug.h; sourceTree = SOURCE_ROOT; };
+		73814B220907FC9900C478FC /* fixed_generic.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fixed_generic.h; path = ../libspeex/fixed_generic.h; sourceTree = SOURCE_ROOT; };
+		73814B280907FC9900C478FC /* jitter.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = jitter.c; path = ../libspeex/jitter.c; sourceTree = SOURCE_ROOT; };
+		73814B370907FC9900C478FC /* math_approx.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = math_approx.c; path = ../libspeex/math_approx.c; sourceTree = SOURCE_ROOT; };
+		73814B380907FC9900C478FC /* math_approx.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = math_approx.h; path = ../libspeex/math_approx.h; sourceTree = SOURCE_ROOT; };
+		73814B390907FC9900C478FC /* mdf.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = mdf.c; path = ../libspeex/mdf.c; sourceTree = SOURCE_ROOT; };
+		73814B3A0907FC9900C478FC /* misc_bfin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = misc_bfin.h; path = ../libspeex/misc_bfin.h; sourceTree = SOURCE_ROOT; };
+		73814B3B0907FC9900C478FC /* misc.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = misc.c; path = ../libspeex/misc.c; sourceTree = SOURCE_ROOT; };
+		73814B3C0907FC9900C478FC /* misc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = misc.h; path = ../libspeex/misc.h; sourceTree = SOURCE_ROOT; };
+		73814B3E0907FC9900C478FC /* modes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = modes.h; path = ../libspeex/modes.h; sourceTree = SOURCE_ROOT; };
+		73814B410907FC9900C478FC /* preprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = preprocess.c; path = ../libspeex/preprocess.c; sourceTree = SOURCE_ROOT; };
+		73814B460907FC9900C478FC /* smallft.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = smallft.c; path = ../libspeex/smallft.c; sourceTree = SOURCE_ROOT; };
+		73814B470907FC9900C478FC /* smallft.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = smallft.h; path = ../libspeex/smallft.h; sourceTree = SOURCE_ROOT; };
+		73814B4B0907FC9900C478FC /* stack_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = stack_alloc.h; path = ../libspeex/stack_alloc.h; sourceTree = SOURCE_ROOT; };
+		73814B4D0907FC9900C478FC /* testdenoise.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = testdenoise.c; path = ../libspeex/testdenoise.c; sourceTree = SOURCE_ROOT; };
+		73814B4E0907FC9900C478FC /* testecho.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = testecho.c; path = ../libspeex/testecho.c; sourceTree = SOURCE_ROOT; };
+		8D07F2C70486CC7A007CD1D0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D07F2C80486CC7A007CD1D0 /* Speex.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Speex.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D07F2C30486CC7A007CD1D0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034768DDFF38A45A11DB9C8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D07F2C80486CC7A007CD1D0 /* Speex.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0867D691FE84028FC02AAC07 /* Speex */ = {
+			isa = PBXGroup;
+			children = (
+				08FB77ACFE841707C02AAC07 /* Source */,
+				73814AEB0907FB6400C478FC /* Headers */,
+				089C1665FE841158C02AAC07 /* Resources */,
+				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
+				034768DDFF38A45A11DB9C8B /* Products */,
+			);
+			name = Speex;
+			sourceTree = "<group>";
+		};
+		0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		089C1665FE841158C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D07F2C70486CC7A007CD1D0 /* Info.plist */,
+				089C1666FE841158C02AAC07 /* InfoPlist.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77ACFE841707C02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				73814B0C0907FC9900C478FC /* arch.h */,
+				73814B1E0907FC9900C478FC /* fixed_arm4.h */,
+				73814B1F0907FC9900C478FC /* fixed_arm5e.h */,
+				73814B200907FC9900C478FC /* fixed_bfin.h */,
+				73814B210907FC9900C478FC /* fixed_debug.h */,
+				73814B220907FC9900C478FC /* fixed_generic.h */,
+				73814B280907FC9900C478FC /* jitter.c */,
+				73814B370907FC9900C478FC /* math_approx.c */,
+				73814B380907FC9900C478FC /* math_approx.h */,
+				73814B390907FC9900C478FC /* mdf.c */,
+				73814B3A0907FC9900C478FC /* misc_bfin.h */,
+				73814B3B0907FC9900C478FC /* misc.c */,
+				73814B3C0907FC9900C478FC /* misc.h */,
+				73814B410907FC9900C478FC /* preprocess.c */,
+				73814B460907FC9900C478FC /* smallft.c */,
+				73814B470907FC9900C478FC /* smallft.h */,
+				73814B4B0907FC9900C478FC /* stack_alloc.h */,
+				73814B4D0907FC9900C478FC /* testdenoise.c */,
+				73814B4E0907FC9900C478FC /* testecho.c */,
+				32BAE0B70371A74B00C91783 /* Speex_Prefix.pch */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		73814AEB0907FB6400C478FC /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				73814AEC0907FB8200C478FC /* speex */,
+			);
+			name = Headers;
+			sourceTree = "<group>";
+		};
+		73814AEC0907FB8200C478FC /* speex */ = {
+			isa = PBXGroup;
+			children = (
+				73814AEF0907FB8200C478FC /* speex.h */,
+				73814AF00907FB8200C478FC /* speex_bits.h */,
+				73814AF10907FB8200C478FC /* speex_callbacks.h */,
+				73814AF30907FB8200C478FC /* speex_echo.h */,
+				73814AF40907FB8200C478FC /* speex_header.h */,
+				73814AF50907FB8200C478FC /* speex_jitter.h */,
+				73814AF60907FB8200C478FC /* speex_preprocess.h */,
+				73814AF70907FB8200C478FC /* speex_stereo.h */,
+				73814AF80907FB8200C478FC /* speex_types.h */,
+			);
+			name = speex;
+			path = ../include/speex;
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		8D07F2BD0486CC7A007CD1D0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				73814AFF0907FB8200C478FC /* speex_echo.h in Headers */,
+				73814B000907FB8200C478FC /* speex_header.h in Headers */,
+				73814B010907FB8200C478FC /* speex_jitter.h in Headers */,
+				73814B020907FB8200C478FC /* speex_preprocess.h in Headers */,
+				73814B030907FB8200C478FC /* speex_stereo.h in Headers */,
+				73814B040907FB8200C478FC /* speex_types.h in Headers */,
+				73814B060907FBAB00C478FC /* speex_callbacks.h in Headers */,
+				73814B070907FBAD00C478FC /* speex_bits.h in Headers */,
+				73814B080907FBAE00C478FC /* speex.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		8D07F2BC0486CC7A007CD1D0 /* Speex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 73814ADF0907FB1E00C478FC /* Build configuration list for PBXNativeTarget "Speex" */;
+			buildPhases = (
+				8D07F2BD0486CC7A007CD1D0 /* Headers */,
+				8D07F2BF0486CC7A007CD1D0 /* Resources */,
+				8D07F2C10486CC7A007CD1D0 /* Sources */,
+				8D07F2C30486CC7A007CD1D0 /* Frameworks */,
+				8D07F2C50486CC7A007CD1D0 /* Rez */,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Speex_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				LIBRARY_STYLE = DYNAMIC;
+				PRODUCT_NAME = Speex;
+				WRAPPER_EXTENSION = framework;
+			};
+			dependencies = (
+			);
+			name = Speex;
+			productInstallPath = "$(HOME)/Library/Frameworks";
+			productName = Speex;
+			productReference = 8D07F2C80486CC7A007CD1D0 /* Speex.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0867D690FE84028FC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 73814AE30907FB1E00C478FC /* Build configuration list for PBXProject "Speex_UB" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				4F0BB7EC011F40E904CA0E50 /* Development */,
+				4F0BB7ED011F40E904CA0E50 /* Deployment */,
+			);
+			hasScannedForEncodings = 1;
+			mainGroup = 0867D691FE84028FC02AAC07 /* Speex */;
+			productRefGroup = 034768DDFF38A45A11DB9C8B /* Products */;
+			projectDirPath = "";
+			targets = (
+				8D07F2BC0486CC7A007CD1D0 /* Speex */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D07F2BF0486CC7A007CD1D0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D07F2C00486CC7A007CD1D0 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		8D07F2C50486CC7A007CD1D0 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D07F2C10486CC7A007CD1D0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				73814B750907FC9900C478FC /* jitter.c in Sources */,
+				73814B840907FC9900C478FC /* math_approx.c in Sources */,
+				73814B880907FC9900C478FC /* misc.c in Sources */,
+				73814B8E0907FC9900C478FC /* preprocess.c in Sources */,
+				73814B930907FC9900C478FC /* smallft.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C1666FE841158C02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C1667FE841158C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		73814AE00907FB1E00C478FC /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Speex_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Library/Frameworks;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_NAME = Speex;
+				WRAPPER_EXTENSION = framework;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		73814AE10907FB1E00C478FC /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Speex_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Library/Frameworks;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_NAME = Speex;
+				WRAPPER_EXTENSION = framework;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		73814AE20907FB1E00C478FC /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Speex_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = /Library/Frameworks;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				PRODUCT_NAME = Speex;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Default;
+		};
+		73814AE40907FB1E00C478FC /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = __MACOSX__;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Development;
+		};
+		73814AE50907FB1E00C478FC /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = __MACOSX__;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Deployment;
+		};
+		73814AE60907FB1E00C478FC /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = __MACOSX__;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		73814ADF0907FB1E00C478FC /* Build configuration list for PBXNativeTarget "Speex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73814AE00907FB1E00C478FC /* Development */,
+				73814AE10907FB1E00C478FC /* Deployment */,
+				73814AE20907FB1E00C478FC /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		73814AE30907FB1E00C478FC /* Build configuration list for PBXProject "Speex_UB" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				73814AE40907FB1E00C478FC /* Development */,
+				73814AE50907FB1E00C478FC /* Deployment */,
+				73814AE60907FB1E00C478FC /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
+}

@@ -1,0 +1,12 @@
+ALL_OBJ= \
+	libspeexdsp/buffer.o \
+	libspeexdsp/fftwrap.o \
+	libspeexdsp/filterbank.o \
+	libspeexdsp/jitter.o \
+	libspeexdsp/kiss_fft.o \
+	libspeexdsp/kiss_fftr.o \
+	libspeexdsp/mdf.o \
+	libspeexdsp/preprocess.o \
+	libspeexdsp/resample.o \
+	libspeexdsp/scal.o \
+	libspeexdsp/smallft.o

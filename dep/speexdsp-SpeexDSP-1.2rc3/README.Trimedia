@@ -1,0 +1,103 @@
+################# REMOVE warnings on trimedia compiler 	##############################
+################# Not critical to compilation			##############################
+
+1. Change the following statements to remove warning for constant expression
+(i)		mdf.c			[if(0) --> #if 0]
+(ii)	preprocess.c	[if(1) --> #if 1]
+
+2. add REMARK_ON macro to remove warning on not reference variable
+-- uses (void)<variable> to remove warning on not referenced variable
+-- #define REMARK_ON
+--	  (void)<variable>
+-- #endif
+-- search for REMARK_ON on the following files 
+(i)		jitter.c
+(ii)	mdf.c
+(iii)	filterbank.c
+(iv)	preprocess.c
+
+3. commented out the following in pseudofloat.h for unused variable
+//static const spx_float_t FLOAT_HALF = {16384,-15};
+
+################# Patches for trimedia compiler 		##############################
+################# Critical to compilation				##############################
+
+-- added the #elif defined (TM_ASM) to the following files for optimized codes
+(1)		arch.h 
+(2)		fftwrap.c
+(3)		filterbank.c
+(4) 	kiss_fft.c
+(5)		kiss_fftr.c
+(6)		mdf.c
+(7)		preprocess.c
+
+-- added macro PREPROCESS_MDF_FLOAT to allow using of floating point 
+-- in mdf and preprocess while keeping fixed point in encoder/decoder
+-- This is due to the fact that preprocess/mdf run faster on floating
+-- point on trimedia
+-- added the following 3 lines to the files below
+#ifdef PREPROCESS_MDF_FLOAT
+#undef FIXED_POINT
+#endif
+(1) mdf.c
+(2) preprocess.c
+(3) filterbank.c
+(4) fftwrap.c
+(5) kiss_fft.c
+(6) kiss_fftr.c
+
+-- created a new USE_COMPACT_KISS_FFT for fftwrap.c and shifted defination 
+-- to config file so that user configure the usage of fft on config.h
+-- TOEXPLORE:is it possible to share table between mdf/preprocess?
+-- Introducing this macro made the following changes in C code 
+-- New macro to facilitate integration
+(grouping real/complex for dc and nyquist frequency seems to require a large
+amount of memory for mdf, therefore did not made the changes for that)
+(1) modify preprocess.c on init and destroy
+(2) modify mdf.c on init and destroy
+(3) shifted power_spectrum to fftwrap.c to share optimised code between
+	preprocess.c and mdf.c
+	
+################# NOTES 								##############################
+(1) fixed point encoding/decoding is tested on narrowband
+	-	some of the QX fractions are packed together to 
+			(frac1 * a + frac2 * a) >> X (should be more accurate in rounding)
+		instead of 
+			((frac1 * a) >> X) + ((frac2 * a) >> X)
+		will cause some different between optimized and unoptimized code.
+		tried decoding/encoding optimized code on some audio files retains 
+		the clearity of the word
+		
+	- wideband/ultrawideband is not heavily tested yet
+		
+(2) optimized fixed point code requires memory alignment
+	-	used config to debug on functions where memory is not align
+
+(3) floating point optimization for preprocess/mdf is tested
+	fixed point is not tested yet (except fft/filterbank)
+	Note (1) also applies to sround in fft for fixed point
+	some optimization is provided for fixed point as it requires lesser
+	memory compared to floating point.
+	
+(4) unroll configurations provided to reduce code size if required
+
+(5) use profile options only if compiler profiling fails to work 
+
+(6) can't include the makefile as it is close proprietary
+
+################# TODO:For Trimedia						##############################
+(1) Optimizations for fixed point in mdf/preprocess
+
+################# Added Files							##############################
+- _kiss_fft_guts_tm.h
+- fftwrap_tm.h
+- filterbank_tm.h
+- filters_tm.h
+- fixed_tm.h
+- kiss_fft_tm.h
+- kiss_fftr_tm.h
+- mdf_tm.h
+- misc_tm.h
+- preprocess_tm.h
+- config.h
+- speex_config_types.h

@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Speex Programming</title>
+      
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+</head>
+  <body>
+ 
+<div align="center"> 
+<h1>Speex Programming</h1>
+ 
+<div align="left"> 
+<h2>Encoding</h2>
+ In order to encode speech using Speex, you first need to:<br>
+ 
+<blockquote>   
+  <pre><big>#include &lt;speex.h&gt;</big></pre>
+ </blockquote>
+ You then need to declare a Speex bit-packing struct<br>
+ 
+<blockquote>   
+  <pre><big>SpeexBits bits;</big></pre>
+ </blockquote>
+ and a Speex encoder state<br>
+ 
+<blockquote>   
+  <pre><big>void *enc_state;</big></pre>
+ </blockquote>
+ The two are initialized by:<br>
+ 
+<blockquote>   
+  <pre><big>speex_bits_init(&amp;bits);</big></pre>
+   
+  <pre><big>enc_state = speex_encoder_init(&amp;speex_nb_mode);</big></pre>
+ </blockquote>
+ For wideband coding, <i>speex_nb_mode</i> will be replaced by <i>speex_wb_mode</i>
+. In most cases, you will need to know the frame size used by the mode you
+are using. You can get that value in the <i>frame_size</i> variable with:<br>
+<blockquote><big><tt>speex_encoder_ctl(enc_state, SPEEX_GET_FRAME_SIZE, &amp;frame_size);</tt></big><br>
+</blockquote>
+ For every input frame:<br>
+ 
+<blockquote>   
+  <pre><big>speex_bits_reset(&amp;bits);</big></pre>
+   
+  <pre><big>speex_encode(enc_state, input_frame, &amp;bits);</big></pre>
+   
+  <pre><big>nbBytes = speex_bits_write(&amp;bits, byte_ptr, MAX_NB_BYTES);</big></pre>
+ </blockquote>
+ where <i>input_frame</i> is a <i>(float *)</i> pointing to the beginning 
+of a speech frame, byte_ptr is a <i>(char *)</i> where the encoded frame will
+be written, <i>MAX_NB_BYTES</i> is the maximum number of bytes that can be
+written to <i>byte_ptr</i> without causing an overflow and <i>nbBytes</i>
+  is the number of bytes actually written to <i>byte_ptr</i> (the encoded 
+size in bytes).<br>
+ <br>
+ After you're done with the encoding, free all resources with:<br>
+ 
+<blockquote>   
+  <pre><big>speex_bits_destroy(&amp;bits);</big></pre>
+   
+  <pre><big>speex_encoder_destroy(&amp;enc_state);</big></pre>
+ </blockquote>
+ That's about it for the encoder.<br>
+ 
+<h2>Decoding</h2>
+ In order to encode speech using Speex, you first need to:<br>
+   
+<blockquote>      
+  <pre><big>#include &lt;speex.h&gt;</big></pre>
+  </blockquote>
+  You then need to declare a Speex bit-packing struct<br>
+   
+<blockquote>      
+  <pre><big>SpeexBits bits;</big></pre>
+  </blockquote>
+  and a Speex encoder state<br>
+   
+<blockquote>      
+  <pre><big>void *dec_state;</big></pre>
+  </blockquote>
+  The two are initialized by:<br>
+   
+<blockquote>      
+  <pre><big>speex_bits_init(&amp;bits);</big></pre>
+       
+  <pre><big>dec_state = speex_decoder_init(&amp;speex_nb_mode);</big></pre>
+  </blockquote>
+  For wideband decoding, <i>speex_nb_mode</i> will be replaced by <i>speex_wb_mode</i>
+. You can get that value in the <i>frame_size</i> variable with:<br>
+ 
+<blockquote><big><tt>speex_decoder_ctl(dec_state, SPEEX_GET_FRAME_SIZE, &amp;frame_size);</tt></big><br>
+</blockquote>
+  There is also a parameter that can be set for the decoder: whether or not
+to use a perceptual post-filter. This can be set by:<br>
+<blockquote><big><tt>speex_decoder_ctl(dec_state, SPEEX_SET_PF, &amp;pf);</tt></big><br>
+</blockquote>
+where <i>pf</i> is an <i>int</i> that with value 0 to have the post-filter
+disabled and 1 to have it enabled.<br>
+<br>
+For every input frame:<br>
+       
+<blockquote>   
+  <pre><big>speex_bits_read_from(&amp;bits, input_bytes, nbBytes);</big></pre>
+   
+  <pre><big>speex_decode(st, &amp;bits, output_frame, 0);</big></pre>
+ </blockquote>
+ where <i>input_bytes</i> is a <i>(char *)</i> containing the bit-stream
+data received for a frame, <i>nbBytes</i> is the size (in bytes) of that
+bit-stream, and <i>output_frame</i> is a <i>(float *)</i> and points to the
+area where the decoded speech frame will be written. The last argument indicates
+whether the frame we'd like to decode was lost. A value of 0 indicates the
+normal case where bits points to the bit of the current frame. A value of
+1 indicates that we don't have the bits for the current frame, in which case
+the bits argument should be the same as the bits for the last correctly received
+frame. When a frame is lost, the Speex decoder will do its best to "guess"
+the sorrect signal.<br>
+ <br>
+ </div>
+ </div>
+ 
+</body>
+</html>

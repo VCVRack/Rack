@@ -1,0 +1,13 @@
+F:/git/Rack/dep/lib/libglew32.dll.a
+F:/git/Rack/dep/bin/glew32.dll
+F:/git/Rack/dep/lib/libglew32.a
+F:/git/Rack/dep/bin/glewinfo.exe
+F:/git/Rack/dep/bin/visualinfo.exe
+F:/git/Rack/dep/lib/pkgconfig/glew.pc
+F:/git/Rack/dep/include/GL/wglew.h
+F:/git/Rack/dep/include/GL/glew.h
+F:/git/Rack/dep/include/GL/glxew.h
+F:/git/Rack/dep/lib/cmake/glew/glew-targets.cmake
+F:/git/Rack/dep/lib/cmake/glew/glew-targets-release.cmake
+F:/git/Rack/dep/lib/cmake/glew/glew-config.cmake
+F:/git/Rack/dep/lib/cmake/glew/CopyImportedTargetProperties.cmake

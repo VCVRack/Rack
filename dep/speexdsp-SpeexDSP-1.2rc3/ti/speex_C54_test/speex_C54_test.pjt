@@ -1,0 +1,44 @@
+; Code Composer Project File, Version 2.0 (do not modify or remove this line)
+
+[Project Settings]
+ProjectDir="C:\Speex\speex_14274\ti\speex_C54_test\"
+ProjectType=Executable
+CPUFamily=TMS320C54XX
+Tool="Compiler"
+Tool="CustomBuilder"
+Tool="DspBiosBuilder"
+Tool="Linker"
+Config="Debug"
+Config="Release"
+
+[Source Files]
+Source="..\..\libspeexdsp\buffer.c"
+Source="..\..\libspeexdsp\fftwrap.c"
+Source="..\..\libspeexdsp\filterbank.c"
+Source="..\..\libspeexdsp\jitter.c"
+Source="..\..\libspeexdsp\kiss_fft.c"
+Source="..\..\libspeexdsp\kiss_fftr.c"
+Source="..\..\libspeexdsp\mdf.c"
+Source="..\..\libspeexdsp\preprocess.c"
+Source="..\..\libspeexdsp\resample.c"
+Source="..\..\libspeexdsp\scal.c"
+Source="speex_C54_test.cmd"
+
+["Compiler" Settings: "Debug"]
+Options=-g -q -o3 -fr"..\ti\speex_C54_test\Debug" -i"..\ti" -i"..\include" -d"_DEBUG" -d"CONFIG_TI_C54X" -d"HAVE_CONFIG_H" -d"NO_LONGLONG" -mf -ms
+
+["Compiler" Settings: "Release"]
+Options=-q -o2 -fr"..\ti\speex_C54_test\Release" -i"..\ti" -i"..\include" -d"CONFIG_TI_C54X" -d"HAVE_CONFIG_H" -d"NO_LONGLONG" -mf -ms
+
+["DspBiosBuilder" Settings: "Debug"]
+Options=-v54
+
+["DspBiosBuilder" Settings: "Release"]
+Options=-v54
+
+["Linker" Settings: "Debug"]
+Options=-q -c -heap4096 -m".\Debug\speex_C54_test.map" -o".\Debug\speex_C54_test.out" -stack4096 -w -x
+
+["Linker" Settings: "Release"]
+Options=-q -c -m".\Release\speex_C54_test.map" -o".\Release\speex_C54_test.out" -w -x
+

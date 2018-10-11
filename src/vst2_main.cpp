@@ -85,7 +85,7 @@ extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
 extern void vst2_set_shared_plugin_tls_globals (void);  // see plugin.cpp
-extern "C" { int vst2_handle_effeditkeydown (unsigned int _vkey); }
+extern "C" { extern int vst2_handle_effeditkeydown (unsigned int _vkey); }
 
 namespace rack {
    extern bool b_touchkeyboard_enable;

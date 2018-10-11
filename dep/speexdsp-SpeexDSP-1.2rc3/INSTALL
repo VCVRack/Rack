@@ -1,0 +1,8 @@
+Installing SpeexDSP is as easy as:
+
+% ./configure [--prefix=<install-path>]
+% make
+% make install
+
+Note that if you are using the code from git you will need to run "autogen.sh"
+and then "configure".

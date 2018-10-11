@@ -1,0 +1,17 @@
+Makefile
+Makefile.in
+Speex.spec
+aclocal.m4
+autom4te.cache
+config.guess
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+libtool
+ltconfig
+ltmain.sh
+missing
+mkinstalldirs

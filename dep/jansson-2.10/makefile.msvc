@@ -1,0 +1,19 @@
+#
+# Makefile for jansson lib + Microsoft Visual C++ 2003 / 2005 / 2008 ToolKit
+# 
+#
+
+include ../yac/install_msvc.mk
+
+TARGET_BASENAME=jansson
+
+EXTRAFLAGS= -I./ -Isrc/ -DHAVE_STDINT_H
+
+EXTRALIBS=
+# opengl32.lib gdi32.lib user32.lib kernel32.lib
+
+PLAF_OBJ= 
+
+include make.objects
+
+include ../yac/staticlib_msvc.mk

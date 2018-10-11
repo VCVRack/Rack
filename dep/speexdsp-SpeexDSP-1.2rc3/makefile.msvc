@@ -1,0 +1,18 @@
+#
+# Makefile for speex lib + Microsoft Visual C++ 2003 / 2005 / 2008 / 2017 ToolKit
+# 
+#
+
+include ../yac/install_msvc.mk
+
+TARGET_BASENAME=libspeexdsp
+
+EXTRAFLAGS= -DWINVER=0x0501 -D_GLFW_USE_CONFIG_H -D_USE_SSE -DWIN32 -DNDEBUG -D_WINDOWS -D_USRDLL -DHAVE_CONFIG_H -Iinclude -Iwin32
+
+EXTRALIBS= 
+
+PLAF_OBJ= 
+
+include make.objects
+
+include ../yac/staticlib_msvc.mk

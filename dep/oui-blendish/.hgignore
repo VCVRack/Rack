@@ -1,0 +1,12 @@
+syntax: glob
+
+.sconsign.dblite
+.settings
+*.orig
+.project
+.pydevproject
+
+syntax: regexp
+
+^build
+^nanovg

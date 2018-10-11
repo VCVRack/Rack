@@ -1,0 +1,4 @@
+1: 723f644e09333a0230383eae4af1f3aa3e46e1c3 (r12736): broke resampler badly
+Changed the sign of a bunch of parameters in the API. Tons of signed/unsigned changes in the code as a consequence of that. Hopefully this will be the last change to the API.
+Fixed: 2007-08-11
+
