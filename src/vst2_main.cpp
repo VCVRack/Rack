@@ -42,6 +42,9 @@
 #include <aeffect.h>
 #include <aeffectx.h>
 #include <stdio.h>
+#ifdef HAVE_UNIX
+#include <unistd.h>
+#endif
 
 #include "../dep/yac/yac.h"
 #include "../dep/yac/yac_host.cpp"
@@ -82,7 +85,7 @@ extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
 extern void vst2_set_shared_plugin_tls_globals (void);  // see plugin.cpp
-extern "C" extern int vst2_handle_effeditkeydown (unsigned int _vkey);
+extern "C" { int vst2_handle_effeditkeydown (unsigned int _vkey); }
 
 namespace rack {
    extern bool b_touchkeyboard_enable;
@@ -523,15 +526,26 @@ public:
 
       char oldCWD[1024];
       char dllnameraw[1024];
+
+#ifdef HAVE_WINDOWS
       ::GetCurrentDirectory(1024, (LPSTR) oldCWD);
       // ::GetModuleFileNameA(NULL, dllnameraw, 1024); // returns executable name (not the dll pathname)
       GetModuleFileNameA((HINSTANCE)&__ImageBase, dllnameraw, 1024);
+#elif defined(HAVE_UNIX)
+      getcwd(oldCWD, 1024);
+      readlink("/proc/self/exe", dllnameraw, 1024);
+#endif
+
       dllname.visit(dllnameraw);
       dllname.getDirName(&cwd);
       rack::global->vst2.program_dir = (const char*)cwd.chars;
+
       Dprintf("xxx vstrack_plugin::openEffect: cd to \"%s\"\n", (const char*)cwd.chars);
-      // // ::SetCurrentDirectory("f:/vst_64bit/vstrack_plugin");
+#ifdef HAVE_WINDOWS
       ::SetCurrentDirectory((const char*)cwd.chars);
+#elif defined(HAVE_UNIX)
+      chdir((const char*)cwd.chars);
+#endif
       Dprintf("xxx vstrack_plugin::openEffect: cwd change done\n");
       // cwd.replace('\\', '/');
 
@@ -552,7 +566,12 @@ public:
       vst2_set_shared_plugin_tls_globals();
 
       Dprintf("xxx vstrack_plugin::openEffect: restore cwd=\"%s\"\n", oldCWD);      
+
+#ifdef HAVE_WINDOWS
       ::SetCurrentDirectory(oldCWD);
+#elif defined(HAVE_UNIX)
+      chdir(oldCWD);
+#endif
 
       setSampleRate(sample_rate);
 
