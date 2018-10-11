@@ -3,7 +3,7 @@
 # 
 #
 
-EXTRAFLAGS+= -DVERSION=0.6.1 -D_USE_MATH_DEFINES -Iinclude/ -Idep/include -Idep/ -DUSE_VST2
+EXTRAFLAGS+= -DVERSION=0.6.1 -D_USE_MATH_DEFINES -Iinclude/ -Idep/include -Idep/ -DUSE_VST2 -DSKIP_STATIC_MODULES
 
 include vst2_common_linux_pre.mk
 

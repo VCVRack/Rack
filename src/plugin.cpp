@@ -603,6 +603,7 @@ Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
 
 #ifdef USE_VST2
 #ifndef RACK_PLUGIN
+#ifndef SKIP_STATIC_MODULES
 extern "C" {
 extern void init_plugin_21kHz                (rack::Plugin *p);
 extern void init_plugin_AmalgamatedHarmonics (rack::Plugin *p);
@@ -667,6 +668,7 @@ extern void init_plugin_unless_modules       (rack::Plugin *p);
 extern void init_plugin_Valley               (rack::Plugin *p);
 // extern void init_plugin_VultModules          (rack::Plugin *p);
 }
+#endif // SKIP_STATIC_MODULES
 
 static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCallback) {
 
@@ -695,6 +697,7 @@ static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCa
 }
 
 void vst2_load_static_rack_plugins(void) {
+#ifndef SKIP_STATIC_MODULES
    vst2_load_static_rack_plugin("21kHz",                &init_plugin_21kHz);
    vst2_load_static_rack_plugin("AmalgamatedHarmonics", &init_plugin_AmalgamatedHarmonics);
    vst2_load_static_rack_plugin("Alikins",              &init_plugin_Alikins);
@@ -757,6 +760,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("unless_modules",       &init_plugin_unless_modules);
    vst2_load_static_rack_plugin("Valley",               &init_plugin_Valley);
    // vst2_load_static_rack_plugin("VultModules",          &init_plugin_VultModules);
+#endif // SKIP_STATIC_MODULES
 }
 #endif // RACK_PLUGIN
 #endif // USE_VST2
