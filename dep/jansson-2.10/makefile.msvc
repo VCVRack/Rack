@@ -15,4 +15,10 @@ PLAF_OBJ=
 
 include make.objects
 
+ifeq ($(BUILD_64),y)
+LIB_INSTALL_PREFIX=../lib/msvc/x64/
+else
+LIB_INSTALL_PREFIX=../lib/msvc/x86/
+endif
+
 include ../yac/staticlib_msvc.mk
