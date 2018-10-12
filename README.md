@@ -765,6 +765,7 @@ $ cd ..
 ```
 Edit `vst2_common_msvc_pre.mk` and adjust the VST2 SDK path
 ```
+$ m clean
 $ m bin
 ```
 If the build succeeded, the effect and instrument plugin DLLs can now be found in the `vst2_bin/` folder.
