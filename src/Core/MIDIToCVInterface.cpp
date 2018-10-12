@@ -55,6 +55,7 @@ struct MIDIToCVInterface : Module {
 	PulseGenerator stopPulse;
 	PulseGenerator continuePulse;
 	int clock = 0;
+   int last_clock = -1;  // when clock is derived from ppqPos
 	int divisions[2];
 #ifdef USE_VST2
    int b_vst_transport_playing = 0;
@@ -111,6 +112,7 @@ struct MIDIToCVInterface : Module {
 		pedal = false;
 		gate = false;
 		clock = 0;
+      last_clock = -1;
 		divisions[0] = 24;
 		divisions[1] = 6;
 #ifdef USE_VST2
@@ -128,7 +130,7 @@ struct MIDIToCVInterface : Module {
 		heldNotes.push_back(note);
 		lastNote = note;
 		gate = true;
-		retriggerPulse.trigger(1e-3);
+		retriggerPulse.trigger(1e-3f);
 	}
 
 	void releaseNote(uint8_t note) {
@@ -172,45 +174,66 @@ struct MIDIToCVInterface : Module {
       {
          if(bPlaying)
          {
-            startPulse.trigger(1e-3);
+            startPulse.trigger(1e-3f);
             clock = 0;
+            last_clock = -1;
             vst_timing_clock_samples = 0.0f;
          }
          else
          {
-            stopPulse.trigger(1e-3);
+            stopPulse.trigger(1e-3f);
             // Reset timing
             clock = 0;
+            last_clock = -1;
          }
          b_vst_transport_playing = bPlaying;
       }
 
-      if(bPlaying && (bpm > 0.0f))
+      if(bPlaying)
       {
-         float secondsPerQuarter = 60.0f / bpm;
          // 24 clock ticks per quarter note (MIDI timing clock)
-         float samplesPerTimingClockTick = (engineGetSampleRate() * secondsPerQuarter) / 24.0f;
-
-         if (clock % divisions[0] == 0) {
-            clockPulses[0].trigger(1e-3);
-         }
-         if (clock % divisions[1] == 0) {
-            clockPulses[1].trigger(1e-3);
-         }
-
-         vst_timing_clock_samples += 1.0f;
-         if(vst_timing_clock_samples >= samplesPerTimingClockTick)
+         if(-1.0f != songPosPPQ)
          {
-            vst_timing_clock_samples -= samplesPerTimingClockTick;
+            clock = int(songPosPPQ * 24.0f);
 
-            // if(++clock < 0) clock = 0  (may be optimized away by a C compiler)
-            union {
-               int s;
-               unsigned int u;
-            } uclock;
-            uclock.s = clock;
-            uclock.u++;
-            clock = (uclock.s < 0) ? 0 : uclock.s;
+            if(clock != last_clock)
+            {
+               last_clock = clock;
+
+               if (clock % divisions[0] == 0) {
+                  clockPulses[0].trigger(1e-3f);
+               }
+               if (clock % divisions[1] == 0) {
+                  clockPulses[1].trigger(1e-3f);
+               }
+            }
+         }
+         else if(bpm > 0.0f)
+         {
+            float secondsPerQuarter = 60.0f / bpm;
+            float samplesPerTimingClockTick = (engineGetSampleRate() * secondsPerQuarter) / 24.0f;
+
+            if (clock % divisions[0] == 0) {
+               clockPulses[0].trigger(1e-3);
+            }
+            if (clock % divisions[1] == 0) {
+               clockPulses[1].trigger(1e-3);
+            }
+
+            vst_timing_clock_samples += 1.0f;
+            if(vst_timing_clock_samples >= samplesPerTimingClockTick)
+            {
+               vst_timing_clock_samples -= samplesPerTimingClockTick;
+
+               // if(++clock < 0) clock = 0  (may be optimized away by a C compiler)
+               union {
+                  int s;
+                  unsigned int u;
+               } uclock;
+               uclock.s = clock;
+               uclock.u++;
+               clock = (uclock.s < 0) ? 0 : uclock.s;
+            }
          }
       } // if bPlaying
    }
@@ -322,6 +345,7 @@ struct MIDIToCVInterface : Module {
 			case 0xa: {
 				startPulse.trigger(1e-3);
 				clock = 0;
+            last_clock = -1;
 			} break;
 			// Continue
 			case 0xb: {
@@ -332,6 +356,7 @@ struct MIDIToCVInterface : Module {
 				stopPulse.trigger(1e-3);
 				// Reset timing
 				clock = 0;
+            last_clock = -1;
 			} break;
 			default: break;
 		}
@@ -351,21 +376,21 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 60.1445)), Port::OUTPUT, module, MIDIToCVInterface::CV_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 60.1445)), Port::OUTPUT, module, MIDIToCVInterface::GATE_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 60.1445)), Port::OUTPUT, module, MIDIToCVInterface::VELOCITY_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 76.1449)), Port::OUTPUT, module, MIDIToCVInterface::AFTERTOUCH_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 76.1449)), Port::OUTPUT, module, MIDIToCVInterface::PITCH_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 76.1449)), Port::OUTPUT, module, MIDIToCVInterface::MOD_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 92.1439)), Port::OUTPUT, module, MIDIToCVInterface::RETRIGGER_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 92.1439)), Port::OUTPUT, module, MIDIToCVInterface::CLOCK_1_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 92.1439)), Port::OUTPUT, module, MIDIToCVInterface::CLOCK_2_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505, 108.144)), Port::OUTPUT, module, MIDIToCVInterface::START_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214, 108.144)), Port::OUTPUT, module, MIDIToCVInterface::STOP_OUTPUT));
-		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143, 108.144)), Port::OUTPUT, module, MIDIToCVInterface::CONTINUE_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505f, 60.1445f)), Port::OUTPUT, module, MIDIToCVInterface::CV_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214f, 60.1445f)), Port::OUTPUT, module, MIDIToCVInterface::GATE_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143f, 60.1445f)), Port::OUTPUT, module, MIDIToCVInterface::VELOCITY_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505f, 76.1449f)), Port::OUTPUT, module, MIDIToCVInterface::AFTERTOUCH_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214f, 76.1449f)), Port::OUTPUT, module, MIDIToCVInterface::PITCH_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143f, 76.1449f)), Port::OUTPUT, module, MIDIToCVInterface::MOD_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505f, 92.1439f)), Port::OUTPUT, module, MIDIToCVInterface::RETRIGGER_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214f, 92.1439f)), Port::OUTPUT, module, MIDIToCVInterface::CLOCK_1_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143f, 92.1439f)), Port::OUTPUT, module, MIDIToCVInterface::CLOCK_2_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(4.61505f, 108.144f)), Port::OUTPUT, module, MIDIToCVInterface::START_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(16.214f, 108.144f)), Port::OUTPUT, module, MIDIToCVInterface::STOP_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(mm2px(Vec(27.8143f, 108.144f)), Port::OUTPUT, module, MIDIToCVInterface::CONTINUE_OUTPUT));
 
-		MidiWidget *midiWidget = Widget::create<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
-		midiWidget->box.size = mm2px(Vec(33.840, 28));
+		MidiWidget *midiWidget = Widget::create<MidiWidget>(mm2px(Vec(3.41891f, 14.8373f)));
+		midiWidget->box.size = mm2px(Vec(33.840f, 28.f));
 		midiWidget->midiIO = &module->midiInput;
 
 #ifdef USE_VST2

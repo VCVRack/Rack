@@ -1044,7 +1044,10 @@ public:
 
       if(NULL != _vstHostCallback)
       {
-         VstIntPtr result = _vstHostCallback(&_vstPlugin, audioMasterGetTime, 0, 0/*value*/, NULL/*ptr*/, 0.0f/*opt*/);
+         VstIntPtr result = _vstHostCallback(&_vstPlugin, audioMasterGetTime, 0,
+                                             (kVstTransportPlaying | kVstTempoValid | kVstPpqPosValid)/*value=requestmask*/,
+                                             NULL/*ptr*/, 0.0f/*opt*/
+                                             );
          if(0 != result)
          {
             const struct VstTimeInfo *timeInfo = (const struct VstTimeInfo *)result;

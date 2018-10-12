@@ -1,3 +1,9 @@
+
+** October 12th, 2018
+- add support for ppqPos based timing clock
+   (fixes CLK1/2 output in FLStudio)
+
+
 ** September 10th, 2018
 - add module bsp.Legato
 
