@@ -19,6 +19,8 @@
 *.map
 *.o
 *.so
+*.so.fx
+*.so.instr
 *.a
 __ATTIC
 __INCOMING
