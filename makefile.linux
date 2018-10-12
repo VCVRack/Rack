@@ -3,8 +3,9 @@
 # 
 #
 
-#NUM_JOBS=20
-NUM_JOBS=1
+NUM_JOBS=20
+#NUM_JOBS=1
+#NUM_JOBS=$(NUM_PROCESSORS)
 
 .PHONY: bin
 bin: vst
@@ -35,3 +36,21 @@ clean:
 	make -f makefile_vst_instr.linux clean
 	make -f makefile_vst_effect.linux clean
 
+# rebuild dependencies:
+.PHONY: dep
+dep:
+	make -C dep -f makefile.linux clean
+	make -C dep -f makefile.linux bin
+
+# do a complete rebuild:
+.PHONY: all
+all:
+	make -C dep -f makefile.linux clean
+	make -C dep -f makefile.linux bin
+	make -f makefile.linux clean
+	make -f makefile.linux shared_lib
+	make -C plugins -f makefile.linux clean
+	make -C plugins -f makefile.linux bin
+	make -f makefile.linux clean
+	make -f makefile.linux lib
+	make -f makefile.linux bin
