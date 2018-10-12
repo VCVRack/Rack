@@ -24,7 +24,8 @@ Tested in
   - Steinberg Cubase Pro 9.5.30
   - LMMS 1.2.0-rc6
   - Jeskola Buzz 1.2 (build 1503 / x64)
-  - according to users: works in Bitwig Studio
+  - Bitwig Studio
+  - FLStudio
   - according to users: works in Nuendo
   - according to users: works in Ableton Live
 
