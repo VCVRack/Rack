@@ -1,0 +1,14 @@
+
+include ../../dep/yac/install_linux.mk
+
+.cpp.o:
+	$(CPP) $(CPPFLAGS) $(OPTFLAGS_PLUGIN) -I"$(VSVR_BASE_DIR)/dep/yac/" -I"$(VST2_SDK_DIR)" -c "$<" -o"$@"
+
+.PHONY: bin
+bin: vst2_debug_host.o
+	$(CPP) -o vst2_debug_host vst2_debug_host.o -ldl
+
+.PHONY: clean
+clean:
+	rm -f vst2_debug_host vst2_debug_host.o
+
