@@ -367,17 +367,27 @@ void renderGui() {
 void windowInit() {
 	int err;
 
+   printf("xxx vstrack_plugin:windowInit: ENTER\n");
+
    // (note) the hidden LGLW context window must have the same size as the real window created later on
    settingsLoad(assetLocal("settings.json"), true/*bWindowSizeOnly*/);
 
+   printf("xxx vstrack_plugin:windowInit: 2\n");
+
    global_ui->window.lglw = lglw_init(global_ui->window.windowWidth, global_ui->window.windowHeight);
 
+   printf("xxx vstrack_plugin:windowInit: 3\n");
+
    lglw_userdata_set(global_ui->window.lglw, global->vst2.wrapper);
+
+   printf("xxx vstrack_plugin:windowInit: 4\n");
 
 	global_ui->window.lastWindowTitle = "";
 
    lglw_glcontext_push(global_ui->window.lglw);
+   printf("xxx vstrack_plugin:windowInit: 5\n");
    lglw_swap_interval_set(global_ui->window.lglw, 1);  // can be overridden via settings.json:"vsync" property
+   printf("xxx vstrack_plugin:windowInit: 6\n");
 
    lglw_mouse_callback_set     (global_ui->window.lglw, &lglw_mouse_cbk);
    lglw_focus_callback_set     (global_ui->window.lglw, &lglw_focus_cbk);
@@ -385,6 +395,7 @@ void windowInit() {
    lglw_timer_callback_set     (global_ui->window.lglw, &lglw_timer_cbk);
    lglw_dropfiles_callback_set (global_ui->window.lglw, &lglw_dropfiles_cbk);
    lglw_redraw_callback_set    (global_ui->window.lglw, &lglw_redraw_cbk);
+   printf("xxx vstrack_plugin:windowInit: 7\n");
 
 	// Set up GLEW
 	glewExperimental = GL_TRUE;
@@ -394,9 +405,11 @@ void windowInit() {
       lglw_glcontext_pop(global_ui->window.lglw);
 		exit(1);
 	}
+   printf("xxx vstrack_plugin:windowInit: 8\n");
 
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
+   printf("xxx vstrack_plugin:windowInit: 9\n");
 
 	// Set up NanoVG
 	int nvgFlags = NVG_ANTIALIAS;
@@ -407,6 +420,7 @@ void windowInit() {
 #elif defined NANOVG_GLES2
 	global_ui->window.gVg = nvgCreateGLES2(nvgFlags);
 #endif
+   printf("xxx vstrack_plugin:windowInit: 10\n");
 	assert(global_ui->window.gVg);
 
 #if defined NANOVG_GL2
@@ -416,15 +430,22 @@ void windowInit() {
 #elif defined NANOVG_GLES2
 	global_ui->window.gFramebufferVg = nvgCreateGLES2(nvgFlags);
 #endif
+   printf("xxx vstrack_plugin:windowInit: 11\n");
 	assert(global_ui->window.gFramebufferVg);
 
 	// Set up Blendish
+   printf("xxx vstrack_plugin:windowInit: 12\n");
 	global_ui->window.gGuiFont = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
+   printf("xxx vstrack_plugin:windowInit: 13\n");
 	bndSetFont(global_ui->window.gGuiFont->handle);
+   printf("xxx vstrack_plugin:windowInit: 14\n");
 
 	windowSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
+   printf("xxx vstrack_plugin:windowInit: 15\n");
 
    lglw_glcontext_pop(global_ui->window.lglw);
+
+   printf("xxx vstrack_plugin:windowInit: LEAVE\n");
 }
 
 void windowDestroy() {
