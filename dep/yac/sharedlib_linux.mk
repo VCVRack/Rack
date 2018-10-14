@@ -11,8 +11,10 @@ ifeq ("$(TARGET)","")
 TARGET=$(TARGET_BASENAME).so
 endif
 
-CPPFLAGS += -fPIC -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
-CFLAGS += -fPIC -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
+CPPFLAGS += -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
+#CPPFLAGS+= -fPIC
+CFLAGS += -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
+#CFLAGS+= -fPIC
 EXTRALIBS += -L$(CROSS_ROOT)/usr/lib -lm -lpthread
 
 ###########include sharedlib_common_gcc.mk
@@ -28,7 +30,7 @@ CFLAGS += -Wall -I$(CROSS_ROOT)/usr/include
 # Build plugin library
 #
 bin: $(BIN_RULES) $(ALL_OBJ) 
-	$(CPP) -shared -o "$(TARGET)" -Wl,-soname,$(TARGET) $(ALL_OBJ) $(EXTRALIBS)
+	$(CPP) -shared -o "$(TARGET)" -Wl,-soname,$(TARGET) -mtls-dialect=gnu2 $(ALL_OBJ) $(EXTRALIBS) 
 ifneq ($(DEBUG),y)
 	$(STRIP) "$(TARGET)"
 endif

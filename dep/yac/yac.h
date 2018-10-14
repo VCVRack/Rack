@@ -52,6 +52,7 @@
 
 /// Define in the project/makefile to disable the use of thread local storage
 /* #define YAC_FORCE_NO_TLS defined */
+#define YAC_FORCE_NO_PRINTF_TLS defined  // avoid huge 128k TLS printf buffer
 
 // ----
 // ---- Version number
