@@ -7,6 +7,6 @@ else
 EXTRALIBS_DEP= dep/lib/linux_gcc/x86
 endif
 
-EXTRALIBS+= $(EXTRALIBS_DEP)/libspeexdsp.a $(EXTRALIBS_DEP)/glew.a -lGL
+EXTRALIBS+= $(EXTRALIBS_DEP)/libspeexdsp.a $(EXTRALIBS_DEP)/glew.a $(EXTRALIBS_DEP)/jansson.a `pkg-config gtk+-2.0 --libs` -lGL
 
 plugin_lib = $(PLUGIN_DIR)/$(1)/$(1).a
