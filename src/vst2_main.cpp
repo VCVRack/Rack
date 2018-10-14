@@ -533,7 +533,14 @@ public:
       GetModuleFileNameA((HINSTANCE)&__ImageBase, dllnameraw, 1024);
 #elif defined(HAVE_UNIX)
       getcwd(oldCWD, 1024);
+#if 0
+      // this does not work, it reports the path of the host, not the plugin
+      // (+the string is not NULL-terminated from the looks of it)
       readlink("/proc/self/exe", dllnameraw, 1024);
+#else
+      // (TODO) just a test
+      sprintf(dllnameraw, "/mnt/git/VeeSeeVSTRack/vst2_bin/");
+#endif
 #endif
 
       dllname.visit(dllnameraw);
@@ -553,6 +560,7 @@ public:
       char *argv[1];
       //argv[0] = (char*)cwd.chars;
       argv[0] = (char*)dllnameraw;
+      Dprintf("xxx argv[0]=%p\n", argv[0]);
       Dprintf("xxx vstrack_plugin::openEffect: dllname=\"%s\"\n", argv[0]);
       (void)vst2_init(argc, argv,
 #ifdef VST2_EFFECT
