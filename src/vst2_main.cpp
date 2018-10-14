@@ -148,6 +148,9 @@ struct PluginMutex {
 #include <fcntl.h>
 #include <sys/mman.h>
 
+// #define _GNU_SOURCE
+#include <dlfcn.h>
+
 //static pthread_mutex_t loc_pthread_mutex_t_init = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 static pthread_mutex_t loc_pthread_mutex_t_init = PTHREAD_MUTEX_INITIALIZER;
 
@@ -526,6 +529,7 @@ public:
 
       char oldCWD[1024];
       char dllnameraw[1024];
+      char *dllnamerawp = dllnameraw;
 
 #ifdef HAVE_WINDOWS
       ::GetCurrentDirectory(1024, (LPSTR) oldCWD);
@@ -538,12 +542,16 @@ public:
       // (+the string is not NULL-terminated from the looks of it)
       readlink("/proc/self/exe", dllnameraw, 1024);
 #else
-      // (TODO) just a test
-      sprintf(dllnameraw, "/mnt/git/VeeSeeVSTRack/vst2_bin/");
+      // (note) 'dli_fname' can be a relative path
+      Dl_info dlInfo;
+      ::dladdr((void*)VSTPluginMain, &dlInfo);
+      // // dllnamerawp = (char*)dlInfo.dli_fname;
+      sprintf(dllnameraw, "%s/%s", oldCWD, dlInfo.dli_fname);
 #endif
 #endif
 
-      dllname.visit(dllnameraw);
+      Dprintf("xxx vstrack_plugin::openEffect: dllnamerawp=\"%s\"\n", dllnamerawp);
+      dllname.visit(dllnamerawp);
       dllname.getDirName(&cwd);
       rack::global->vst2.program_dir = (const char*)cwd.chars;
 
@@ -559,7 +567,7 @@ public:
       int argc = 1;
       char *argv[1];
       //argv[0] = (char*)cwd.chars;
-      argv[0] = (char*)dllnameraw;
+      argv[0] = (char*)dllnamerawp;
       Dprintf("xxx argv[0]=%p\n", argv[0]);
       Dprintf("xxx vstrack_plugin::openEffect: dllname=\"%s\"\n", argv[0]);
       (void)vst2_init(argc, argv,
