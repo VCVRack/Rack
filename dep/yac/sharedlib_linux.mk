@@ -11,9 +11,9 @@ ifeq ("$(TARGET)","")
 TARGET=$(TARGET_BASENAME).so
 endif
 
-CPPFLAGS += -fPIC -I"dep/yac" $(EXTRAFLAGS)
-CFLAGS += -fPIC -I"dep/yac" $(EXTRAFLAGS)
-EXTRALIBS += -L$(CROSS_ROOT)/usr/lib -lm 
+CPPFLAGS += -fPIC -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
+CFLAGS += -fPIC -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
+EXTRALIBS += -L$(CROSS_ROOT)/usr/lib -lm -lpthread
 
 ###########include sharedlib_common_gcc.mk
 #

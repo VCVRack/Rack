@@ -25,7 +25,7 @@ ifeq ("$(TARGET)","")
 TARGET=$(TARGET_BASENAME).a
 endif
 
-CPPFLAGS += -I"/f/git/VeeSeeVSTRack/dep/yac" -DLINUX $(EXTRAFLAGS)
+CPPFLAGS += -I"$(VSVR_BASE_DIR)/dep/yac/" -DLINUX $(EXTRAFLAGS)
 # -DYAC_FORCE_NO_TLS
 EXTRALIBS += 
 

@@ -25,7 +25,7 @@ ifeq ("$(TARGET)","")
 TARGET=$(TARGET_BASENAME).lib
 endif
 
-CPPFLAGS += -I"/f/git/VeeSeeVSTRack/dep/yac" -DWIN32 $(EXTRAFLAGS)
+CPPFLAGS += -I"$(VSVR_BASE_DIR)/dep/yac" -DWIN32 $(EXTRAFLAGS)
 # -DYAC_FORCE_NO_TLS
 EXTRALIBS += 
 #-DLL -MAP 
