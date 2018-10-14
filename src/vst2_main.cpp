@@ -542,11 +542,19 @@ public:
       // (+the string is not NULL-terminated from the looks of it)
       readlink("/proc/self/exe", dllnameraw, 1024);
 #else
-      // (note) 'dli_fname' can be a relative path
       Dl_info dlInfo;
       ::dladdr((void*)VSTPluginMain, &dlInfo);
       // // dllnamerawp = (char*)dlInfo.dli_fname;
-      sprintf(dllnameraw, "%s/%s", oldCWD, dlInfo.dli_fname);
+      if('/' != dlInfo.dli_fname[0])
+      {
+         // (note) 'dli_fname' can be a relative path (e.g. when loaded from vst2_debug_host)
+         sprintf(dllnameraw, "%s/%s", oldCWD, dlInfo.dli_fname);
+      }
+      else
+      {
+         // Absolute path (e.g. when loaded from Renoise host)
+         dllnamerawp = (char*)dlInfo.dli_fname;
+      }
 #endif
 #endif
 
