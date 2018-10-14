@@ -13,6 +13,8 @@
 
 namespace rack {
    struct Plugin;
+
+   typedef void (*InitCallback)(Plugin *);
 }
 
 typedef void (*vst2_handle_ui_param_fxn_t) (int uniqueParamId, float normValue);
@@ -30,7 +32,7 @@ extern void vst2_queue_param_sync (int _uniqueParamId, float _value, bool _bNorm
 #ifdef _MSC_VER
 #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
 #else
-#define RACK_PLUGIN_INIT(pluginname)  extern "C" void CONCAT(init_plugin_, pluginname) (rack::Plugin *p)
+#define RACK_PLUGIN_INIT(pluginname)  static void loc_init_plugin(rack::Plugin *p); extern "C" { void CONCAT(init_plugin_, pluginname) (rack::Plugin *p) { loc_init_plugin(p); } } static void loc_init_plugin(rack::Plugin *p)
 #endif // _MSC_VER
 #define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
 
@@ -80,7 +82,7 @@ namespace rack {                                        \
       seed_initialized = p->json.seed_initialized;      \
    }                                                    \
 }                                                       \
-RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p)
+static void loc_init_plugin(rack::Plugin *p); extern "C" { RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p) { loc_init_plugin(p); } } static void loc_init_plugin(rack::Plugin *p)
  #define RACK_PLUGIN_INIT_ID() \
    rack::plugin = p;                                                 \
    rack::plugin->set_tls_globals_fxn = &rack::loc_set_tls_globals;   \
@@ -95,7 +97,7 @@ RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p)
  #ifdef _MSC_VER
   #define RACK_PLUGIN_INIT(pluginname)  extern "C" void init_plugin_##pluginname##(rack::Plugin *p)
  #else
-  #define RACK_PLUGIN_INIT(pluginname)  extern "C" void CONCAT(init_plugin_, pluginname) (rack::Plugin *p)
+  #define RACK_PLUGIN_INIT(pluginname)  static void loc_init_plugin(rack::Plugin *p); extern "C" { void CONCAT(init_plugin_, pluginname) (rack::Plugin *p) { loc_init_plugin(p); } } static void loc_init_plugin(rack::Plugin *p)
  #endif
  #define RACK_PLUGIN_INIT_ID() RACK_PLUGIN_INIT_ID_INTERNAL
 #endif // RACK_PLUGIN_SHARED

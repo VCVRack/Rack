@@ -26,12 +26,14 @@ namespace rack {
 
 
 void assetInit(bool devMode) {
+#ifndef USE_VST2
 	if (devMode) {
 		// Use current working directory if running in development mode
 		global->asset.globalDir = ".";
 		global->asset.localDir = ".";
 		return;
 	}
+#endif // USE_VST2
 
 #if ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
@@ -69,6 +71,7 @@ void assetInit(bool devMode) {
 
 #endif
 #if ARCH_LIN
+#ifndef USE_VST2
 	// TODO For now, users should launch Rack from their terminal in the global directory
 	global->asset.globalDir = ".";
 
@@ -81,6 +84,10 @@ void assetInit(bool devMode) {
 	}
 	global->asset.localDir = homeBuf;
 	global->asset.localDir += "/.Rack";
+#else
+	global->asset.globalDir = global->vst2.program_dir; 
+   global->asset.localDir = global->vst2.program_dir;
+#endif // USE_VST2
 #endif
 	systemCreateDirectory(global->asset.localDir);
 }

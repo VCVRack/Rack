@@ -8,7 +8,7 @@ include dep/yac/install_linux.mk
 TARGET_BASENAME=Rack
 
 EXTRAFLAGS= -DVERSION=0.6.1 -DARCH_LIN -D_USE_MATH_DEFINES -DRACK_HOST -DUSE_VST2 -Iinclude/ -Idep/include -Idep/
-EXTRAFLAGS+= -DSKIP_STATIC_MODULES
+#EXTRAFLAGS+= -DSKIP_STATIC_MODULES
 
 # for osdialog:
 EXTRAFLAGS+= `pkg-config gtk+-2.0 --cflags`
@@ -21,6 +21,10 @@ EXTRALIBS+=
 PLAF_OBJ= 
 
 include make.objects
+
+# compile but link this one in a different order than the other objects
+#  (the GNU linker is very unforgiving in this regard)
+BIN_RULES+= src/plugin_static.o
 
 ALL_OBJ=$(LIB_OBJ) $(LIB_OBJ_LINUX)
 

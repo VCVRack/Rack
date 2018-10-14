@@ -3,7 +3,7 @@
 #ifndef RACK_PLUGIN_SHARED
 using namespace rack;
 
-RACK_PLUGIN_INIT(Core);
+// // RACK_PLUGIN_INIT(Core);
 
 struct GridChoice : LedDisplayChoice {
 	virtual void setId(int id) {}
