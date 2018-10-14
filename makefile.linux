@@ -41,12 +41,14 @@ clean:
 dep:
 	make -C dep -f makefile.linux clean
 	make -C dep -f makefile.linux bin
+	make -C dep -f makefile.linux install
 
 # do a complete rebuild:
 .PHONY: all
 all:
 	make -C dep -f makefile.linux clean
 	make -C dep -f makefile.linux bin
+	make -C dep -f makefile.linux install
 	make -f makefile.linux clean
 	make -f makefile.linux shared_lib
 	make -C plugins -f makefile.linux clean
