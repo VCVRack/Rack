@@ -73,11 +73,15 @@ void open_and_close(void) {
       if(NULL != mainProc)
       {
          AEffect *effect;
+         printf("xxx calling mainProc\n");
          effect = mainProc(HostCallback);
+         printf("xxx mainProc returned effect=%p\n", effect);
 
          if(NULL != effect)
          {
+            printf("xxx calling effect->dispatcher<effOpen>\n");
             effect->dispatcher(effect, effOpen, 0, 0, NULL, 0.0f);
+            printf("xxx effect->dispatcher<effOpen> returned\n");
             VstIntPtr ip = effect->dispatcher(effect, effEditOpen, 0, 0, NULL/*hWnd*/, 0.0f);
             (void)ip;
             printf("xxx call processreplacing\n");
