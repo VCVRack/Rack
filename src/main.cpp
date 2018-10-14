@@ -30,7 +30,11 @@ YAC_TLS rack::GlobalUI *rack::global_ui;
 
 #ifdef USE_VST2
 int vst2_init(int argc, char* argv[], bool _bFX) {
+#ifdef YAC_LINUX
+	bool devMode = true; // true=log to stderr, false=log to file
+#else
 	bool devMode = false;
+#endif // YAC_LINUX
 	std::string patchFile;
 
 #if 0
@@ -50,10 +54,14 @@ int vst2_init(int argc, char* argv[], bool _bFX) {
 	}
 #endif
 
+   printf("xxx vst2_init: 1\n");
 	// Initialize environment
 	randomInit();
+   printf("xxx vst2_init: 2\n");
 	assetInit(devMode);
+   printf("xxx vst2_init: 3\n");
 	loggerInit(devMode);
+   printf("xxx vst2_init: 4 global_ui=%p\n", global_ui);
 
 	// Log environment
 	info("%s %s", global_ui->app.gApplicationName.c_str(), global_ui->app.gApplicationVersion.c_str());
@@ -62,21 +70,29 @@ int vst2_init(int argc, char* argv[], bool _bFX) {
 	info("Global directory: %s", assetGlobal("").c_str());
 	info("Local directory: %s", assetLocal("").c_str());
 
+   printf("xxx vst2_init: 5\n");
+
 	// Initialize app
 	pluginInit(devMode, _bFX);
+   printf("xxx vst2_init: 6\n");
 	engineInit();
+   printf("xxx vst2_init: 7\n");
 #ifndef USE_VST2
 	rtmidiInit();
 	bridgeInit();
 #endif // USE_VST2
    vstmidiInit();
+   printf("xxx vst2_init: 8\n");
 #ifndef USE_VST2
 	keyboardInit();
 	gamepadInit();
 #endif // USE_VST2
 	windowInit();
+   printf("xxx vst2_init: 9\n");
 	appInit(devMode);
+   printf("xxx vst2_init: 10\n");
    settingsLoad(assetLocal("settings.json"), false/*bWindowSizeOnly*/);
+   printf("xxx vst2_init: 11\n");
 
 #if 0
 	if (patchFile.empty()) {
@@ -102,6 +118,7 @@ int vst2_init(int argc, char* argv[], bool _bFX) {
 #endif
 
 	// // engineStart();  // starts bg thread for audio rendering
+   printf("xxx vst2_init: LEAVE\n");
    return 0;
 }
 
