@@ -7,12 +7,15 @@
 
 namespace rack {
 
+// #define LOG_STDFILE stderr
+#define LOG_STDFILE stdout
+
 
 void loggerInit(bool devMode) {
 #ifdef RACK_HOST
 	global->logger.startTime = std::chrono::high_resolution_clock::now();
 	if (devMode) {
-		global->logger.logFile = stderr;
+		global->logger.logFile = LOG_STDFILE;
 	}
 	else {
 		std::string logFilename = assetLocal("log.txt");
@@ -23,7 +26,7 @@ void loggerInit(bool devMode) {
 
 void loggerDestroy() {
 #ifdef RACK_HOST
-	if (global->logger.logFile != stderr) {
+	if (global->logger.logFile != LOG_STDFILE) {
 		fclose(global->logger.logFile);
 	}
 #endif // RACK_HOST
@@ -47,10 +50,10 @@ static void loggerLogVa(LoggerLevel level, const char *file, int line, const cha
 #ifdef RACK_HOST
 	auto nowTime = std::chrono::high_resolution_clock::now();
 	int duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - global->logger.startTime).count();
-	if (global->logger.logFile == stderr)
+	if (global->logger.logFile == LOG_STDFILE)
 		fprintf(global->logger.logFile, "\x1B[%dm", loggerColor[level]);
 	fprintf(global->logger.logFile, "[%.03f %s %s:%d] ", duration / 1000.0, loggerText[level], file, line);
-	if (global->logger.logFile == stderr)
+	if (global->logger.logFile == LOG_STDFILE)
 		fprintf(global->logger.logFile, "\x1B[0m");
 	vfprintf(global->logger.logFile, format, args);
    vprintf(format, args); // xxx
