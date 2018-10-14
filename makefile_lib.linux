@@ -28,4 +28,10 @@ BIN_RULES+= src/plugin_static.o
 
 ALL_OBJ=$(LIB_OBJ) $(LIB_OBJ_LINUX)
 
+.PHONY: clean_plugin_static
+clean_plugin_static:
+	rm -f src/plugin_static.o
+
+CLEAN_RULES+= clean_plugin_static
+
 include dep/yac/staticlib_linux.mk
