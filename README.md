@@ -756,17 +756,12 @@ $ cd VeeSeeVSTRack/
 
 Edit `dep/yac/install_msvc.mk` and adjust the `LIB_INSTALL_PREFIX`, `WINDDK_PATH`, `VCTK`, `W32API_INC`, `W32API_LIB` as required.
 
+EDIT `setenv_msvc.sh` and adjust the `VST2_SDK_DIR` as required.
+
 ```
 $ alias m="make -j 20 makefile.msvc"
-$ m lib
-$ cd plugins
-$ m bin
-$ cd ..
-```
-Edit `vst2_common_msvc_pre.mk` and adjust the VST2 SDK path
-```
-$ m clean
-$ m bin
+$ . setenv_msvc.sh
+$ m all
 ```
 If the build succeeded, the effect and instrument plugin DLLs can now be found in the `vst2_bin/` folder.
 
