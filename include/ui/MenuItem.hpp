@@ -1,8 +1,6 @@
 #pragma once
-
-#include "widgets.hpp"
-#include "blendish.h"
-#include "ui/MenuOverlay.hpp"
+#include "common.hpp"
+#include "MenuOverlay.hpp"
 
 
 namespace rack {

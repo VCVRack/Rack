@@ -1,11 +1,14 @@
 #include "WidgetState.hpp"
+#include "event.hpp"
+#include "widgets.hpp"
 #include "logger.hpp"
+
 
 namespace rack {
 
 
 void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) {
-	// Button event
+	// event::Button
 	event::Button eButton;
 	eButton.pos = pos;
 	eButton.button = button;
@@ -15,28 +18,37 @@ void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) 
 	Widget *clickedWidget = eButton.target;
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		// Drag events
 		if (action == GLFW_PRESS && !draggedWidget && clickedWidget) {
+			// event::DragStart
 			event::DragStart eDragStart;
 			clickedWidget->onDragStart(eDragStart);
 			draggedWidget = clickedWidget;
 		}
 
 		if (action == GLFW_RELEASE && draggedWidget) {
+			if (dragHoveredWidget) {
+				// event::DragLeave
+				event::DragLeave eDragLeave;
+				dragHoveredWidget->onDragLeave(eDragLeave);
+			}
+
 			if (clickedWidget) {
+				// event::DragDrop
 				event::DragDrop eDragDrop;
 				eDragDrop.origin = draggedWidget;
 				clickedWidget->onDragDrop(eDragDrop);
 			}
 
+			// event::DragEnd
 			event::DragEnd eDragEnd;
 			draggedWidget->onDragEnd(eDragEnd);
 			draggedWidget = NULL;
+			dragHoveredWidget = NULL;
 		}
 
-		// Select events
 		if (action == GLFW_PRESS && clickedWidget != selectedWidget) {
 			if (selectedWidget) {
+				// event::Deselect
 				event::Deselect eDeselect;
 				selectedWidget->onDeselect(eDeselect);
 			}
@@ -44,6 +56,7 @@ void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) 
 			selectedWidget = clickedWidget;
 
 			if (selectedWidget) {
+				// event::Select
 				event::Select eSelect;
 				selectedWidget->onSelect(eSelect);
 			}
@@ -62,22 +75,47 @@ void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) 
 
 
 void WidgetState::handleHover(math::Vec pos, math::Vec mouseDelta) {
-	// Drag events
 	if (draggedWidget) {
+		// event::DragMove
 		event::DragMove eDragMove;
 		eDragMove.mouseDelta = mouseDelta;
 		draggedWidget->onDragMove(eDragMove);
+
+		// event::DragHover
+		event::DragHover eDragHover;
+		eDragHover.pos = pos;
+		eDragHover.mouseDelta = mouseDelta;
+		rootWidget->onDragHover(eDragHover);
+		Widget *newDragHoveredWidget = eDragHover.target;
+
+		if (newDragHoveredWidget != dragHoveredWidget) {
+			if (dragHoveredWidget) {
+				// event::DragLeave
+				event::DragLeave eDragLeave;
+				dragHoveredWidget->onDragLeave(eDragLeave);
+			}
+
+			dragHoveredWidget = newDragHoveredWidget;
+
+			if (dragHoveredWidget) {
+				// event::DragEnter
+				event::DragEnter eDragEnter;
+				dragHoveredWidget->onDragEnter(eDragEnter);
+			}
+		}
+
 		return;
 	}
 
 	// if (scrollWidget) {
+	// event::HoverScroll
 	// 	event::HoverScroll eHoverScroll;
 	// 	eHoverScroll.pos = pos;
 	// 	eHoverScroll.scrollDelta = scrollDelta;
 	// 	rootWidget->onHoverScroll(eHoverScroll);
 	// }
 
-	// Hover event
+	// event::Hover
 	event::Hover eHover;
 	eHover.pos = pos;
 	eHover.mouseDelta = mouseDelta;
@@ -86,6 +124,7 @@ void WidgetState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 
 	if (newHoveredWidget != hoveredWidget) {
 		if (hoveredWidget) {
+			// event::Leave
 			event::Leave eLeave;
 			hoveredWidget->onLeave(eLeave);
 		}
@@ -93,6 +132,7 @@ void WidgetState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		hoveredWidget = newHoveredWidget;
 
 		if (hoveredWidget) {
+			// event::Enter
 			event::Enter eEnter;
 			hoveredWidget->onEnter(eEnter);
 		}
@@ -101,7 +141,7 @@ void WidgetState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 
 void WidgetState::handleLeave() {
 	if (hoveredWidget) {
-		// Leave event
+		// event::Leave
 		event::Leave eLeave;
 		hoveredWidget->onLeave(eLeave);
 	}
@@ -109,7 +149,7 @@ void WidgetState::handleLeave() {
 }
 
 void WidgetState::handleScroll(math::Vec pos, math::Vec scrollDelta) {
-	// HoverScroll event
+	// event::HoverScroll
 	event::HoverScroll eHoverScroll;
 	eHoverScroll.pos = pos;
 	eHoverScroll.scrollDelta = scrollDelta;
@@ -117,7 +157,7 @@ void WidgetState::handleScroll(math::Vec pos, math::Vec scrollDelta) {
 }
 
 void WidgetState::handleDrop(math::Vec pos, std::vector<std::string> paths) {
-	// PathDrop event
+	// event::PathDrop
 	event::PathDrop ePathDrop;
 	ePathDrop.pos = pos;
 	ePathDrop.paths = paths;
@@ -126,7 +166,7 @@ void WidgetState::handleDrop(math::Vec pos, std::vector<std::string> paths) {
 
 void WidgetState::handleText(math::Vec pos, int codepoint) {
 	if (selectedWidget) {
-		// SelectText event
+		// event::SelectText
 		event::SelectText eSelectText;
 		eSelectText.codepoint = codepoint;
 		selectedWidget->onSelectText(eSelectText);
@@ -134,7 +174,7 @@ void WidgetState::handleText(math::Vec pos, int codepoint) {
 			return;
 	}
 
-	// HoverText event
+	// event::HoverText
 	event::HoverText eHoverText;
 	eHoverText.pos = pos;
 	eHoverText.codepoint = codepoint;
@@ -143,6 +183,7 @@ void WidgetState::handleText(math::Vec pos, int codepoint) {
 
 void WidgetState::handleKey(math::Vec pos, int key, int scancode, int action, int mods) {
 	if (selectedWidget) {
+		// event::SelectKey
 		event::SelectKey eSelectKey;
 		eSelectKey.key = key;
 		eSelectKey.scancode = scancode;
@@ -153,6 +194,7 @@ void WidgetState::handleKey(math::Vec pos, int key, int scancode, int action, in
 			return;
 	}
 
+	// event::HoverKey
 	event::HoverKey eHoverKey;
 	eHoverKey.pos = pos;
 	eHoverKey.key = key;
@@ -171,6 +213,7 @@ void WidgetState::finalizeWidget(Widget *w) {
 }
 
 void WidgetState::handleZoom() {
+	// event::Zoom
 	event::Zoom eZoom;
 	rootWidget->onZoom(eZoom);
 }

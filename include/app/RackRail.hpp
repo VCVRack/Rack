@@ -5,7 +5,8 @@
 namespace rack {
 
 
-struct TooltipOverlay : TransparentWidget {
+struct RackRail : TransparentWidget {
+	void draw(NVGcontext *vg) override;
 };
 
 

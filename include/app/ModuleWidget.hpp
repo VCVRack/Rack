@@ -1,11 +1,14 @@
 #pragma once
-#include "widgets/OpaqueWidget.hpp"
-#include "app/SVGPanel.hpp"
+#include "common.hpp"
 #include "plugin.hpp"
 #include "engine.hpp"
 
 
 namespace rack {
+
+
+struct SVGPanel;
+struct Port;
 
 
 struct ModuleWidget : OpaqueWidget {

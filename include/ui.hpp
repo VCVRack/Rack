@@ -1,4 +1,5 @@
 #pragma once
+#include "ui/common.hpp"
 #include "ui/SequentialLayout.hpp"
 #include "ui/Label.hpp"
 #include "ui/List.hpp"

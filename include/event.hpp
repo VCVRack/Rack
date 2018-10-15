@@ -12,8 +12,10 @@ struct Widget;
 namespace event {
 
 
+/** Base event class */
 struct Event {
-	/** Set this to the Widget that consumes (responds to) the event.
+	/** The Widget that consumes the event.
+	Set to `this` in your event handler method if consumed.
 	This stops propagation of the event if applicable.
 	*/
 	Widget *target = NULL;
@@ -46,7 +48,7 @@ struct Text {
 
 /** Occurs every frame when the mouse is hovering over a Widget.
 Recurses until consumed.
-If target is set, other events may occur on that Widget.
+If `target` is set, other events may occur on that Widget.
 */
 struct Hover : Event, Position {
 	/** Change in mouse position since the last frame. Can be zero. */
@@ -56,7 +58,7 @@ struct Hover : Event, Position {
 
 /** Occurs each mouse button press or release.
 Recurses until consumed.
-If target is set, other events may occur on that Widget.
+If `target` is set, other events may occur on that Widget.
 */
 struct Button : Event, Position {
 	/** GLFW_MOUSE_BUTTON_LEFT, GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOUSE_BUTTON_MIDDLE, etc. */
@@ -116,6 +118,7 @@ struct Deselect : Event {
 
 
 /** Occurs when a key is pressed while a Widget is selected.
+If consumed, a HoverKey event will not be triggered.
 */
 struct SelectKey : Event, Key {
 };
@@ -140,13 +143,21 @@ struct DragEnd : Event {
 };
 
 
-/** Occurs when a dragged Widget is moved.
-Called once per frame, even when mouseDelta is zero.
+/** Occurs every frame on the dragged Widget.
+`mouseDelta` may be zero.
 */
 struct DragMove : Event {
 	math::Vec mouseDelta;
 };
 
+
+/** Occurs every frame when the mouse is hovering over a Widget while dragging.
+Must consume to allow DragEnter, DragLeave, and DragDrop to occur.
+*/
+struct DragHover : Event, Position {
+	/** Change in mouse position since the last frame. Can be zero. */
+	math::Vec mouseDelta;
+};
 
 /** Occurs when the mouse enters a Widget while dragging.
 */

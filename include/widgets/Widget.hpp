@@ -121,6 +121,7 @@ struct Widget {
 	virtual void onDragStart(event::DragStart &e) {}
 	virtual void onDragEnd(event::DragEnd &e) {}
 	virtual void onDragMove(event::DragMove &e) {}
+	virtual void onDragHover(event::DragHover &e) {recursePositionEvent(&Widget::onDragHover, e);}
 	virtual void onDragEnter(event::DragEnter &e) {}
 	virtual void onDragLeave(event::DragLeave &e) {}
 	virtual void onDragDrop(event::DragDrop &e) {}

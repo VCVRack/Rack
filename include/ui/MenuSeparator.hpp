@@ -1,7 +1,5 @@
 #pragma once
-
-#include "widgets.hpp"
-#include "blendish.h"
+#include "common.hpp"
 
 
 namespace rack {

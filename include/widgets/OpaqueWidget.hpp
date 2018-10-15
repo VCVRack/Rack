@@ -15,31 +15,31 @@ struct OpaqueWidget : virtual Widget {
 		if (!e.target)
 			e.target = this;
 	}
-
 	void onButton(event::Button &e) override {
 		Widget::onButton(e);
 		if (!e.target)
 			e.target = this;
 	}
-
 	void onHoverKey(event::HoverKey &e) override {
 		Widget::onHoverKey(e);
 		if (!e.target)
 			e.target = this;
 	}
-
 	void onHoverText(event::HoverText &e) override {
 		Widget::onHoverText(e);
 		if (!e.target)
 			e.target = this;
 	}
-
-	// void onHoverScroll(event::HoverScroll &e) override {
-	// 	Widget::onHoverScroll(e);
-	// 	if (!e.target)
-	// 		e.target = this;
-	// }
-
+	void onHoverScroll(event::HoverScroll &e) override {
+		Widget::onHoverScroll(e);
+		if (!e.target)
+			e.target = this;
+	}
+	void onDragHover(event::DragHover &e) override {
+		Widget::onDragHover(e);
+		if (!e.target)
+			e.target = this;
+	}
 	void onPathDrop(event::PathDrop &e) override {
 		Widget::onPathDrop(e);
 		if (!e.target)

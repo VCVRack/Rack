@@ -5,7 +5,8 @@
 namespace rack {
 
 
-struct TooltipOverlay : TransparentWidget {
+struct RackScrollWidget : ScrollWidget {
+	void step() override;
 };
 
 

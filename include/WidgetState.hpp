@@ -1,10 +1,12 @@
 #pragma once
-#include "event.hpp"
-#include "widgets/Widget.hpp"
+#include "math.hpp"
+#include <vector>
 
 
 namespace rack {
 
+
+struct Widget;
 
 
 struct WidgetState {
