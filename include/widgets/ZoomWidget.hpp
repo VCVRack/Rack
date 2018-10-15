@@ -8,11 +8,11 @@ namespace rack {
 struct ZoomWidget : virtual Widget {
 	float zoom = 1.f;
 
-	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override {
+	Vec getRelativeOffset(Vec v, Widget *relative) override {
 		return Widget::getRelativeOffset(v.mult(zoom), relative);
 	}
 
-	math::Rect getViewport(math::Rect r) override {
+	Rect getViewport(Rect r) override {
 		r.pos = r.pos.mult(zoom);
 		r.size = r.size.mult(zoom);
 		r = Widget::getViewport(r);

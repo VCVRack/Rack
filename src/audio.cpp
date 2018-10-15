@@ -122,7 +122,7 @@ std::string AudioIO::getDeviceName(int device) {
 			return deviceInfo.name;
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		return string::stringf("%d", device + 1);
+		return string::f("%d", device + 1);
 	}
 	return "";
 }
@@ -134,19 +134,19 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
 		if (getDeviceInfo(device, &deviceInfo)) {
-			std::string deviceDetail = string::stringf("%s (", deviceInfo.name.c_str());
+			std::string deviceDetail = string::f("%s (", deviceInfo.name.c_str());
 			if (offset < (int) deviceInfo.inputChannels)
-				deviceDetail += string::stringf("%d-%d in", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.inputChannels));
+				deviceDetail += string::f("%d-%d in", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.inputChannels));
 			if (offset < (int) deviceInfo.inputChannels && offset < (int) deviceInfo.outputChannels)
 				deviceDetail += ", ";
 			if (offset < (int) deviceInfo.outputChannels)
-				deviceDetail += string::stringf("%d-%d out", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.outputChannels));
+				deviceDetail += string::f("%d-%d out", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.outputChannels));
 			deviceDetail += ")";
 			return deviceDetail;
 		}
 	}
 	else if (driver == BRIDGE_DRIVER) {
-		return string::stringf("Port %d", device + 1);
+		return string::f("Port %d", device + 1);
 	}
 	return "";
 }
@@ -226,7 +226,7 @@ void AudioIO::openStream() {
 		if (rtAudio->isStreamOpen())
 			return;
 
-		setChannels(math::clamp((int) deviceInfo.outputChannels - offset, 0, maxChannels), math::clamp((int) deviceInfo.inputChannels - offset, 0, maxChannels));
+		setChannels(clamp((int) deviceInfo.outputChannels - offset, 0, maxChannels), clamp((int) deviceInfo.inputChannels - offset, 0, maxChannels));
 
 		if (numOutputs == 0 && numInputs == 0) {
 			WARN("RtAudio device %d has 0 inputs and 0 outputs", device);

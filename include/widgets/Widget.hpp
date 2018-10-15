@@ -10,20 +10,13 @@
 namespace rack {
 
 
-namespace event {
-
-struct Event;
-
-} // namespace event
-
-
 /** A node in the 2D scene graph
 It is recommended to inherit virtually from Widget instead of directly.
 e.g. `struct MyWidget : virtual Widget {}`
 */
 struct Widget {
 	/** Stores position and size */
-	math::Rect box = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
+	Rect box = Rect(Vec(), Vec(INFINITY, INFINITY));
 	/** Automatically set when Widget is added as a child to another Widget */
 	Widget *parent = NULL;
 	std::list<Widget*> children;
@@ -34,15 +27,15 @@ struct Widget {
 
 	virtual ~Widget();
 
-	virtual math::Rect getChildrenBoundingBox();
+	virtual Rect getChildrenBoundingBox();
 	/**  Returns `v` transformed into the coordinate system of `relative` */
-	virtual math::Vec getRelativeOffset(math::Vec v, Widget *relative);
+	virtual Vec getRelativeOffset(Vec v, Widget *relative);
 	/** Returns `v` transformed into world coordinates */
-	math::Vec getAbsoluteOffset(math::Vec v) {
+	Vec getAbsoluteOffset(Vec v) {
 		return getRelativeOffset(v, NULL);
 	}
-	/** Returns a subset of the given math::Rect bounded by the box of this widget and all ancestors */
-	virtual math::Rect getViewport(math::Rect r);
+	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors */
+	virtual Rect getViewport(Rect r);
 
 	template <class T>
 	T *getAncestorOfType() {

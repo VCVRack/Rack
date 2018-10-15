@@ -23,7 +23,7 @@ static const NVGcolor CYAN = nvgRGB(0x00, 0xff, 0xff);
 
 inline NVGcolor clip(NVGcolor a) {
 	for (int i = 0; i < 4; i++)
-		a.rgba[i] = math::clamp(a.rgba[i], 0.f, 1.f);
+		a.rgba[i] = clamp(a.rgba[i], 0.f, 1.f);
 	return a;
 }
 
@@ -87,9 +87,9 @@ inline std::string toHexString(NVGcolor c) {
 	uint8_t b = std::round(c.b * 255);
 	uint8_t a = std::round(c.a * 255);
 	if (a == 255)
-		return string::stringf("#%02x%02x%02x", r, g, b);
+		return string::f("#%02x%02x%02x", r, g, b);
 	else
-		return string::stringf("#%02x%02x%02x%02x", r, g, b, a);
+		return string::f("#%02x%02x%02x%02x", r, g, b, a);
 }
 
 

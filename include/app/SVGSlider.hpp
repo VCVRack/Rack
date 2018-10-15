@@ -12,7 +12,7 @@ struct SVGSlider : Knob, FramebufferWidget {
 	SVGWidget *background;
 	SVGWidget *handle;
 	/** Intermediate positions will be interpolated between these positions */
-	math::Vec minHandlePos, maxHandlePos;
+	Vec minHandlePos, maxHandlePos;
 
 	SVGSlider();
 	void setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG> handleSVG);

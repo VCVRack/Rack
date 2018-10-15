@@ -57,7 +57,7 @@ This is not equal to gPixelRatio in general.
 extern float gWindowRatio;
 extern bool gAllowCursorLock;
 extern int gGuiFrame;
-extern math::Vec gMousePos;
+extern Vec gMousePos;
 
 
 void windowInit();
@@ -68,10 +68,10 @@ void windowCursorLock();
 void windowCursorUnlock();
 bool windowIsModPressed();
 bool windowIsShiftPressed();
-math::Vec windowGetWindowSize();
-void windowSetWindowSize(math::Vec size);
-math::Vec windowGetWindowPos();
-void windowSetWindowPos(math::Vec pos);
+Vec windowGetWindowSize();
+void windowSetWindowSize(Vec size);
+Vec windowGetWindowPos();
+void windowSetWindowPos(Vec pos);
 bool windowIsMaximized();
 void windowSetTheme(NVGcolor bg, NVGcolor fg);
 void windowSetFullScreen(bool fullScreen);

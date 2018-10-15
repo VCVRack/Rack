@@ -36,14 +36,14 @@ Model *createModel(std::string author, std::string slug, std::string name, Tags.
 }
 
 template <class TWidget>
-TWidget *createWidget(math::Vec pos) {
+TWidget *createWidget(Vec pos) {
 	TWidget *o = new TWidget;
 	o->box.pos = pos;
 	return o;
 }
 
 template <class TParamWidget>
-TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+TParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos;
 	o->module = module;
@@ -54,7 +54,7 @@ TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minV
 }
 
 template <class TParamWidget>
-TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+TParamWidget *createParamCentered(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
@@ -65,7 +65,7 @@ TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId, fl
 }
 
 template <class TPort>
-TPort *createInput(math::Vec pos, Module *module, int inputId) {
+TPort *createInput(Vec pos, Module *module, int inputId) {
 	TPort *o = new TPort;
 	o->box.pos = pos;
 	o->module = module;
@@ -75,7 +75,7 @@ TPort *createInput(math::Vec pos, Module *module, int inputId) {
 }
 
 template <class TPort>
-TPort *createInputCentered(math::Vec pos, Module *module, int inputId) {
+TPort *createInputCentered(Vec pos, Module *module, int inputId) {
 	TPort *o = new TPort;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
@@ -85,7 +85,7 @@ TPort *createInputCentered(math::Vec pos, Module *module, int inputId) {
 }
 
 template <class TPort>
-TPort *createOutput(math::Vec pos, Module *module, int outputId) {
+TPort *createOutput(Vec pos, Module *module, int outputId) {
 	TPort *o = new TPort;
 	o->box.pos = pos;
 	o->module = module;
@@ -95,7 +95,7 @@ TPort *createOutput(math::Vec pos, Module *module, int outputId) {
 }
 
 template <class TPort>
-TPort *createOutputCentered(math::Vec pos, Module *module, int outputId) {
+TPort *createOutputCentered(Vec pos, Module *module, int outputId) {
 	TPort *o = new TPort;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
@@ -105,7 +105,7 @@ TPort *createOutputCentered(math::Vec pos, Module *module, int outputId) {
 }
 
 template <class TModuleLightWidget>
-TModuleLightWidget *createLight(math::Vec pos, Module *module, int firstLightId) {
+TModuleLightWidget *createLight(Vec pos, Module *module, int firstLightId) {
 	TModuleLightWidget *o = new TModuleLightWidget;
 	o->box.pos = pos;
 	o->module = module;
@@ -114,7 +114,7 @@ TModuleLightWidget *createLight(math::Vec pos, Module *module, int firstLightId)
 }
 
 template <class TModuleLightWidget>
-TModuleLightWidget *createLightCentered(math::Vec pos, Module *module, int firstLightId) {
+TModuleLightWidget *createLightCentered(Vec pos, Module *module, int firstLightId) {
 	TModuleLightWidget *o = new TModuleLightWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;

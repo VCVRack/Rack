@@ -14,7 +14,7 @@ struct TooltipIconButton : IconButton {
 	void onEnter(event::Enter &e) override {
 		if (!tooltip) {
 			tooltip = new Tooltip;
-			tooltip->box.pos = getAbsoluteOffset(math::Vec(0, BND_WIDGET_HEIGHT));
+			tooltip->box.pos = getAbsoluteOffset(Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = tooltipText;
 			gRackScene->addChild(tooltip);
 		}
@@ -121,7 +121,7 @@ struct SampleRateButton : TooltipIconButton {
 	}
 	void onAction(event::Action &e) override {
 		Menu *menu = createMenu();
-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
 		menu->addChild(createMenuLabel("Engine sample rate"));
@@ -133,7 +133,7 @@ struct SampleRateButton : TooltipIconButton {
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (float sampleRate : sampleRates) {
 			SampleRateItem *item = new SampleRateItem;
-			item->text = string::stringf("%.0f Hz", sampleRate);
+			item->text = string::f("%.0f Hz", sampleRate);
 			item->rightText = CHECKMARK(engineGetSampleRate() == sampleRate);
 			item->sampleRate = sampleRate;
 			menu->addChild(item);
@@ -163,7 +163,7 @@ Toolbar::Toolbar() {
 	box.size.y = BND_WIDGET_HEIGHT + 2*5;
 
 	SequentialLayout *layout = new SequentialLayout;
-	layout->box.pos = math::Vec(5, 5);
+	layout->box.pos = Vec(5, 5);
 	layout->spacing = 5;
 	addChild(layout);
 

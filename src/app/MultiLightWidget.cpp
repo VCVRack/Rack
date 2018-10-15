@@ -14,7 +14,7 @@ void MultiLightWidget::setValues(const std::vector<float> &values) {
 	color = nvgRGBAf(0, 0, 0, 0);
 	for (size_t i = 0; i < baseColors.size(); i++) {
 		NVGcolor c = baseColors[i];
-		c.a *= math::clamp(values[i], 0.f, 1.f);
+		c.a *= clamp(values[i], 0.f, 1.f);
 		color = color::screen(color, c);
 	}
 	color = color::clip(color);

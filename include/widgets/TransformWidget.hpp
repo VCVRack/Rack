@@ -18,7 +18,7 @@ struct TransformWidget : virtual Widget {
 		nvgTransformIdentity(transform);
 	}
 
-	void translate(math::Vec delta) {
+	void translate(Vec delta) {
 		float t[6];
 		nvgTransformTranslate(t, delta.x, delta.y);
 		nvgTransformPremultiply(transform, t);
@@ -30,7 +30,7 @@ struct TransformWidget : virtual Widget {
 		nvgTransformPremultiply(transform, t);
 	}
 
-	void scale(math::Vec s) {
+	void scale(Vec s) {
 		float t[6];
 		nvgTransformScale(t, s.x, s.y);
 		nvgTransformPremultiply(transform, t);

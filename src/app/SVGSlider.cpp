@@ -25,7 +25,7 @@ void SVGSlider::setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG>
 void SVGSlider::step() {
 	if (dirty) {
 		// Interpolate handle position
-		handle->box.pos = math::Vec(math::rescale(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), math::rescale(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
+		handle->box.pos = Vec(rescale(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), rescale(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
 	}
 	FramebufferWidget::step();
 }

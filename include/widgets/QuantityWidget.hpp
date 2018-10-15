@@ -24,7 +24,7 @@ struct QuantityWidget : virtual Widget {
 	}
 
 	void setValue(float value) {
-		this->value = math::clampBetween(value, minValue, maxValue);
+		this->value = clampBetween(value, minValue, maxValue);
 		event::Change e;
 		onChange(e);
 	}
@@ -41,7 +41,7 @@ struct QuantityWidget : virtual Widget {
 
 	/** Generates the display value */
 	std::string getText() {
-		return string::stringf("%s: %.*f%s", label.c_str(), precision, value, unit.c_str());
+		return string::f("%s: %.*f%s", label.c_str(), precision, value, unit.c_str());
 	}
 };
 

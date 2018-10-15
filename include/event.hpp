@@ -24,7 +24,7 @@ struct Event {
 
 struct Position {
 	/** The pixel coordinate where the event occurred, relative to the Widget it is called on. */
-	math::Vec pos;
+	Vec pos;
 };
 
 
@@ -52,7 +52,7 @@ If `target` is set, other events may occur on that Widget.
 */
 struct Hover : Event, Position {
 	/** Change in mouse position since the last frame. Can be zero. */
-	math::Vec mouseDelta;
+	Vec mouseDelta;
 };
 
 
@@ -89,7 +89,7 @@ Recurses until consumed.
 */
 struct HoverScroll : Event, Position {
 	/** Change of scroll wheel position. */
-	math::Vec scrollDelta;
+	Vec scrollDelta;
 };
 
 
@@ -147,7 +147,7 @@ struct DragEnd : Event {
 `mouseDelta` may be zero.
 */
 struct DragMove : Event {
-	math::Vec mouseDelta;
+	Vec mouseDelta;
 };
 
 
@@ -156,7 +156,7 @@ Must consume to allow DragEnter, DragLeave, and DragDrop to occur.
 */
 struct DragHover : Event, Position {
 	/** Change in mouse position since the last frame. Can be zero. */
-	math::Vec mouseDelta;
+	Vec mouseDelta;
 };
 
 /** Occurs when the mouse enters a Widget while dragging.

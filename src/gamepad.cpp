@@ -22,8 +22,8 @@ void InputDevice::step() {
 	// Convert axes to MIDI CC
 	ccs.resize(numAxes);
 	for (int i = 0; i < numAxes; i++) {
-		// Allow CC value to go negative, but math::clamp at -127 instead of -128 for symmetry
-		int8_t cc = math::clamp((int) std::round(axes[i] * 127), -127, 127);
+		// Allow CC value to go negative, but clamp at -127 instead of -128 for symmetry
+		int8_t cc = clamp((int) std::round(axes[i] * 127), -127, 127);
 		if (cc != ccs[i]) {
 			ccs[i] = cc;
 
@@ -78,7 +78,7 @@ std::string Driver::getInputDeviceName(int deviceId) {
 	if (name) {
 		return name;
 	}
-	return string::stringf(" %d (unavailable)", deviceId + 1);
+	return string::f(" %d (unavailable)", deviceId + 1);
 }
 
 MidiInputDevice *Driver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {

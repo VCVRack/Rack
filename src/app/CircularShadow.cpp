@@ -15,7 +15,7 @@ void CircularShadow::draw(NVGcontext *vg) {
 
 	nvgBeginPath(vg);
 	nvgRect(vg, -blurRadius, -blurRadius, box.size.x + 2*blurRadius, box.size.y + 2*blurRadius);
-	math::Vec center = box.size.div(2.0);
+	Vec center = box.size.div(2.0);
 	float radius = center.x;
 	NVGcolor icol = nvgRGBAf(0.0, 0.0, 0.0, opacity);
 	NVGcolor ocol = nvgRGBAf(0.0, 0.0, 0.0, 0.0);

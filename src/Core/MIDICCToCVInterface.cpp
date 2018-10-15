@@ -122,13 +122,13 @@ struct MidiCcChoice : GridChoice {
 	void step() override {
 		if (module->learningId == id) {
 			if (0 <= focusCc)
-				text = string::stringf("%d", focusCc);
+				text = string::f("%d", focusCc);
 			else
 				text = "LRN";
 			color.a = 0.5;
 		}
 		else {
-			text = string::stringf("%d", module->learnedCcs[id]);
+			text = string::f("%d", module->learnedCcs[id]);
 			color.a = 1.0;
 			if (gWidgetState->selectedWidget == this)
 				gWidgetState->selectedWidget = NULL;

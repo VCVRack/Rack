@@ -125,7 +125,7 @@ PluginManagerWidget::PluginManagerWidget() {
 	box.size.y = BND_WIDGET_HEIGHT;
 
 	{
-		SequentialLayout *layout = createWidget<SequentialLayout>(math::Vec(0, 0));
+		SequentialLayout *layout = createWidget<SequentialLayout>(Vec(0, 0));
 		layout->spacing = 5;
 		loginWidget = layout;
 
@@ -158,7 +158,7 @@ PluginManagerWidget::PluginManagerWidget() {
 	}
 
 	{
-		SequentialLayout *layout = createWidget<SequentialLayout>(math::Vec(0, 0));
+		SequentialLayout *layout = createWidget<SequentialLayout>(Vec(0, 0));
 		layout->spacing = 5;
 		manageWidget = layout;
 
@@ -181,7 +181,7 @@ PluginManagerWidget::PluginManagerWidget() {
 	}
 
 	{
-		SequentialLayout *layout = createWidget<SequentialLayout>(math::Vec(0, 0));
+		SequentialLayout *layout = createWidget<SequentialLayout>(Vec(0, 0));
 		layout->spacing = 5;
 		downloadWidget = layout;
 

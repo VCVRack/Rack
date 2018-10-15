@@ -317,7 +317,7 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 
 		menu->addChild(construct<MenuLabel>());
 		for (int i = 0; i < 2; i++) {
-			ClockItem *item = createMenuItem<ClockItem>(string::stringf("CLK %d rate", i + 1));
+			ClockItem *item = createMenuItem<ClockItem>(string::f("CLK %d rate", i + 1));
 			item->module = module;
 			item->index = i;
 			menu->addChild(item);

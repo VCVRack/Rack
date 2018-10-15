@@ -36,7 +36,7 @@ void Knob::onDragMove(event::DragMove &e) {
 	if (windowIsModPressed())
 		delta /= 16.f;
 	dragValue += delta;
-	dragValue = math::clampBetween(dragValue, minValue, maxValue);
+	dragValue = clampBetween(dragValue, minValue, maxValue);
 	if (snap)
 		setValue(std::round(dragValue));
 	else

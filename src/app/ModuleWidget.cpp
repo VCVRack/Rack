@@ -199,7 +199,7 @@ void ModuleWidget::load(std::string filename) {
 		json_decref(moduleJ);
 	}
 	else {
-		std::string message = string::stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 
@@ -300,13 +300,13 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.5));
 		nvgFill(vg);
 
-		std::string cpuText = string::stringf("%.0f mS", module->cpuTime * 1000.f);
+		std::string cpuText = string::f("%.0f mS", module->cpuTime * 1000.f);
 		nvgFontFaceId(vg, gGuiFont->handle);
 		nvgFontSize(vg, 12);
 		nvgFillColor(vg, nvgRGBf(1, 1, 1));
 		nvgText(vg, 10.0, box.size.y - 6.0, cpuText.c_str(), NULL);
 
-		float p = math::clamp(module->cpuTime, 0.f, 1.f);
+		float p = clamp(module->cpuTime, 0.f, 1.f);
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, (1.f - p) * box.size.y,
@@ -322,7 +322,7 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 	nvgBeginPath(vg);
 	float r = 20; // Blur radius
 	float c = 20; // Corner radius
-	math::Vec b = math::Vec(-10, 30); // Offset from each corner
+	Vec b = Vec(-10, 30); // Offset from each corner
 	nvgRect(vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
 	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
 	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
@@ -411,7 +411,7 @@ void ModuleWidget::onDragEnd(event::DragEnd &e) {
 
 void ModuleWidget::onDragMove(event::DragMove &e) {
 	if (!gRackWidget->lockModules) {
-		math::Rect newBox = box;
+		Rect newBox = box;
 		newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
 		gRackWidget->requestModuleBoxNearest(this, newBox);
 	}

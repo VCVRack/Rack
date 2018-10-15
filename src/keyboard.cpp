@@ -61,7 +61,7 @@ void InputDevice::onKeyPress(int key) {
 		default: break;
 	}
 
-	octave = math::clamp(octave, 0, 9);
+	octave = clamp(octave, 0, 9);
 	if (note < 0)
 		return;
 

@@ -17,7 +17,7 @@ struct LedDisplaySeparator : TransparentWidget {
 struct LedDisplayChoice : TransparentWidget {
 	std::string text;
 	std::shared_ptr<Font> font;
-	math::Vec textOffset;
+	Vec textOffset;
 	NVGcolor color;
 	LedDisplayChoice();
 	void draw(NVGcontext *vg) override;
@@ -26,11 +26,11 @@ struct LedDisplayChoice : TransparentWidget {
 
 struct LedDisplayTextField : TextField {
 	std::shared_ptr<Font> font;
-	math::Vec textOffset;
+	Vec textOffset;
 	NVGcolor color;
 	LedDisplayTextField();
 	void draw(NVGcontext *vg) override;
-	int getTextPosition(math::Vec mousePos) override;
+	int getTextPosition(Vec mousePos) override;
 };
 
 

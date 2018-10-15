@@ -28,11 +28,11 @@ struct ModuleContainer : Widget {
 
 RackWidget::RackWidget() {
 	rails = new FramebufferWidget;
-	rails->box.size = math::Vec();
+	rails->box.size = Vec();
 	rails->oversample = 1.0;
 	{
 		RackRail *rail = new RackRail;
-		rail->box.size = math::Vec();
+		rail->box.size = Vec();
 		rails->addChild(rail);
 	}
 	addChild(rails);
@@ -52,7 +52,7 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 
-	gRackScene->scrollWidget->offset = math::Vec(0, 0);
+	gRackScene->scrollWidget->offset = Vec(0, 0);
 }
 
 void RackWidget::reset() {
@@ -151,7 +151,7 @@ void RackWidget::load(std::string filename) {
 		json_decref(rootJ);
 	}
 	else {
-		std::string message = string::stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 
@@ -198,7 +198,7 @@ json_t *RackWidget::toJson() {
 		json_t *moduleJ = moduleWidget->toJson();
 		{
 			// pos
-			math::Vec pos = moduleWidget->box.pos.div(RACK_GRID_SIZE).round();
+			Vec pos = moduleWidget->box.pos.div(RACK_GRID_SIZE).round();
 			json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
 			json_object_set_new(moduleJ, "pos", posJ);
 		}
@@ -281,7 +281,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			json_t *posJ = json_object_get(moduleJ, "pos");
 			double x, y;
 			json_unpack(posJ, "[F, F]", &x, &y);
-			math::Vec pos = math::Vec(x, y);
+			Vec pos = Vec(x, y);
 			if (legacy && legacy <= 1) {
 				moduleWidget->box.pos = pos;
 			}
@@ -296,7 +296,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			json_t *modelSlugJ = json_object_get(moduleJ, "model");
 			std::string pluginSlug = json_string_value(pluginSlugJ);
 			std::string modelSlug = json_string_value(modelSlugJ);
-			message += string::stringf("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
+			message += string::f("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 		}
 	}
 
@@ -395,7 +395,7 @@ void RackWidget::pastePresetClipboard() {
 	if (moduleJ) {
 		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
 		// Set moduleWidget position
-		math::Rect newBox = moduleWidget->box;
+		Rect newBox = moduleWidget->box;
 		newBox.pos = lastMousePos.minus(newBox.size.div(2));
 		requestModuleBoxNearest(moduleWidget, newBox);
 
@@ -421,12 +421,12 @@ void RackWidget::cloneModule(ModuleWidget *m) {
 	json_t *moduleJ = m->toJson();
 	ModuleWidget *clonedModuleWidget = moduleFromJson(moduleJ);
 	json_decref(moduleJ);
-	math::Rect clonedBox = clonedModuleWidget->box;
+	Rect clonedBox = clonedModuleWidget->box;
 	clonedBox.pos = m->box.pos;
 	requestModuleBoxNearest(clonedModuleWidget, clonedBox);
 }
 
-bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect box) {
+bool RackWidget::requestModuleBox(ModuleWidget *m, Rect box) {
 	if (box.pos.x < 0 || box.pos.y < 0)
 		return false;
 
@@ -440,25 +440,25 @@ bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect box) {
 	return true;
 }
 
-bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect box) {
+bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, Rect box) {
 	// Create possible positions
 	int x0 = roundf(box.pos.x / RACK_GRID_WIDTH);
 	int y0 = roundf(box.pos.y / RACK_GRID_HEIGHT);
-	std::vector<math::Vec> positions;
+	std::vector<Vec> positions;
 	for (int y = std::max(0, y0 - 8); y < y0 + 8; y++) {
 		for (int x = std::max(0, x0 - 400); x < x0 + 400; x++) {
-			positions.push_back(math::Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
+			positions.push_back(Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
 		}
 	}
 
 	// Sort possible positions by distance to the requested position
-	std::sort(positions.begin(), positions.end(), [box](math::Vec a, math::Vec b) {
+	std::sort(positions.begin(), positions.end(), [box](Vec a, Vec b) {
 		return a.minus(box.pos).norm() < b.minus(box.pos).norm();
 	});
 
 	// Find a position that does not collide
-	for (math::Vec position : positions) {
-		math::Rect newBox = box;
+	for (Vec position : positions) {
+		Rect newBox = box;
 		newBox.pos = position;
 		if (requestModuleBox(m, newBox))
 			return true;
@@ -468,15 +468,15 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect box) {
 
 void RackWidget::step() {
 	// Expand size to fit modules
-	math::Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
+	Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
 	// We assume that the size is reset by a parent before calling step(). Otherwise it will grow unbounded.
 	box.size = box.size.max(moduleSize);
 
 	// Adjust size and position of rails
 	Widget *rail = rails->children.front();
-	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
+	Rect bound = getViewport(Rect(Vec(), box.size));
 	if (!rails->box.contains(bound)) {
-		math::Vec cellMargin = math::Vec(20, 1);
+		Vec cellMargin = Vec(20, 1);
 		rails->box.pos = bound.pos.div(RACK_GRID_SIZE).floor().minus(cellMargin).mult(RACK_GRID_SIZE);
 		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
 		rails->dirty = true;
@@ -512,7 +512,7 @@ void RackWidget::onButton(event::Button &e) {
 }
 
 void RackWidget::onZoom(event::Zoom &e) {
-	rails->box.size = math::Vec();
+	rails->box.size = Vec();
 	OpaqueWidget::onZoom(e);
 }
 

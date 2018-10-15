@@ -15,7 +15,7 @@ struct RackWidget : OpaqueWidget {
 	// Only put WireWidgets in here
 	WireContainer *wireContainer;
 	std::string lastPath;
-	math::Vec lastMousePos;
+	Vec lastMousePos;
 	bool lockModules = false;
 
 	RackWidget();
@@ -45,9 +45,9 @@ struct RackWidget : OpaqueWidget {
 	void deleteModule(ModuleWidget *m);
 	void cloneModule(ModuleWidget *m);
 	/** Sets a module's box if non-colliding. Returns true if set */
-	bool requestModuleBox(ModuleWidget *m, math::Rect box);
+	bool requestModuleBox(ModuleWidget *m, Rect box);
 	/** Moves a module to the closest non-colliding position */
-	bool requestModuleBoxNearest(ModuleWidget *m, math::Rect box);
+	bool requestModuleBoxNearest(ModuleWidget *m, Rect box);
 
 	void step() override;
 	void draw(NVGcontext *vg) override;

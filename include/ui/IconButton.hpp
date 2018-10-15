@@ -17,7 +17,7 @@ struct IconButton : Button {
 		addChild(fw);
 
 		sw = new SVGWidget;
-		sw->box.pos = math::Vec(2, 2);
+		sw->box.pos = Vec(2, 2);
 		fw->addChild(sw);
 	}
 

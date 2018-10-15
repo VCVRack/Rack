@@ -18,7 +18,7 @@ struct ScrollBar : OpaqueWidget {
 	float size = 0.0;
 
 	ScrollBar() {
-		box.size = math::Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
+		box.size = Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 	}
 
 	void draw(NVGcontext *vg) override {
@@ -44,7 +44,7 @@ struct ScrollWidget : OpaqueWidget {
 	Widget *container;
 	ScrollBar *horizontalScrollBar;
 	ScrollBar *verticalScrollBar;
-	math::Vec offset;
+	Vec offset;
 
 	ScrollWidget() {
 		container = new Widget;
@@ -61,8 +61,8 @@ struct ScrollWidget : OpaqueWidget {
 		addChild(verticalScrollBar);
 	}
 
-	void scrollTo(math::Rect r) {
-		math::Rect bound = math::Rect::fromMinMax(r.getBottomRight().minus(box.size), r.pos);
+	void scrollTo(Rect r) {
+		Rect bound = Rect::fromMinMax(r.getBottomRight().minus(box.size), r.pos);
 		offset = offset.clampBetween(bound);
 	}
 
@@ -76,8 +76,8 @@ struct ScrollWidget : OpaqueWidget {
 		Widget::step();
 
 		// Clamp scroll offset
-		math::Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
-		math::Rect containerBox = math::Rect(math::Vec(0, 0), containerCorner.minus(box.size));
+		Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
+		Rect containerBox = Rect(Vec(0, 0), containerCorner.minus(box.size));
 		offset = offset.clamp(containerBox);
 		// Lock offset to top/left if no scrollbar will display
 		if (containerBox.size.x < 0.0)
@@ -89,9 +89,9 @@ struct ScrollWidget : OpaqueWidget {
 		container->box.pos = offset.neg().round();
 
 		// Update scrollbar offsets and sizes
-		math::Vec viewportSize = container->getChildrenBoundingBox().getBottomRight();
-		math::Vec scrollbarOffset = offset.div(viewportSize.minus(box.size));
-		math::Vec scrollbarSize = box.size.div(viewportSize);
+		Vec viewportSize = container->getChildrenBoundingBox().getBottomRight();
+		Vec scrollbarOffset = offset.div(viewportSize.minus(box.size));
+		Vec scrollbarSize = box.size.div(viewportSize);
 
 		horizontalScrollBar->visible = (0.0 < scrollbarSize.x && scrollbarSize.x < 1.0);
 		verticalScrollBar->visible = (0.0 < scrollbarSize.y && scrollbarSize.y < 1.0);
@@ -101,7 +101,7 @@ struct ScrollWidget : OpaqueWidget {
 		verticalScrollBar->size = scrollbarSize.y;
 
 		// Resize scroll bars
-		math::Vec inner = math::Vec(box.size.x - verticalScrollBar->box.size.x, box.size.y - horizontalScrollBar->box.size.y);
+		Vec inner = Vec(box.size.x - verticalScrollBar->box.size.x, box.size.y - horizontalScrollBar->box.size.y);
 		horizontalScrollBar->box.pos.y = inner.y;
 		verticalScrollBar->box.pos.x = inner.x;
 		horizontalScrollBar->box.size.x = verticalScrollBar->visible ? inner.x : box.size.x;

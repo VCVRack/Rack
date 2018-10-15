@@ -25,7 +25,7 @@ static NVGpaint getPaint(NVGcontext *vg, NSVGpaint *p) {
 	float inverse[6];
 	nvgTransformInverse(inverse, g->xform);
 	DEBUG_ONLY(printf("			inverse: %f %f %f %f %f %f\n", inverse[0], inverse[1], inverse[2], inverse[3], inverse[4], inverse[5]);)
-	math::Vec s, e;
+	Vec s, e;
 	DEBUG_ONLY(printf("			sx: %f sy: %f ex: %f ey: %f\n", s.x, s.y, e.x, e.y);)
 	// Is it always the case that the gradient should be transformed from (0, 0) to (0, 1)?
 	nvgTransformPoint(&s.x, &s.y, inverse, 0, 0);
@@ -41,10 +41,10 @@ static NVGpaint getPaint(NVGcontext *vg, NSVGpaint *p) {
 }
 
 /** Returns the parameterized value of the line p2--p3 where it intersects with p0--p1 */
-static float getLineCrossing(math::Vec p0, math::Vec p1, math::Vec p2, math::Vec p3) {
-	math::Vec b = p2.minus(p0);
-	math::Vec d = p1.minus(p0);
-	math::Vec e = p3.minus(p2);
+static float getLineCrossing(Vec p0, Vec p1, Vec p2, Vec p3) {
+	Vec b = p2.minus(p0);
+	Vec d = p1.minus(p0);
+	Vec e = p3.minus(p2);
 	float m = d.x * e.y - d.y * e.x;
 	// Check if lines are parallel, or if either pair of points are equal
 	if (std::abs(m) < 1e-6)
@@ -93,8 +93,8 @@ void svgDraw(NVGcontext *vg, NSVGimage *svg) {
 			// Also assume that the topology is the same if we use straight lines rather than Beziers (not always the case but usually true).
 			// Using the even-odd fill rule, if we draw a line from a point on the path to a point outside the boundary (e.g. top left) and count the number of times it crosses another path, the parity of this count determines whether the path is a hole (odd) or solid (even).
 			int crossings = 0;
-			math::Vec p0 = math::Vec(path->pts[0], path->pts[1]);
-			math::Vec p1 = math::Vec(path->bounds[0] - 1.0, path->bounds[1] - 1.0);
+			Vec p0 = Vec(path->pts[0], path->pts[1]);
+			Vec p1 = Vec(path->bounds[0] - 1.0, path->bounds[1] - 1.0);
 			// Iterate all other paths
 			for (NSVGpath *path2 = shape->paths; path2; path2 = path2->next) {
 				if (path2 == path)
@@ -106,9 +106,9 @@ void svgDraw(NVGcontext *vg, NSVGimage *svg) {
 				for (int i = 1; i < path2->npts + 3; i += 3) {
 					float *p = &path2->pts[2*i];
 					// The previous point
-					math::Vec p2 = math::Vec(p[-2], p[-1]);
+					Vec p2 = Vec(p[-2], p[-1]);
 					// The current point
-					math::Vec p3 = (i < path2->npts) ? math::Vec(p[4], p[5]) : math::Vec(path2->pts[0], path2->pts[1]);
+					Vec p3 = (i < path2->npts) ? Vec(p[4], p[5]) : Vec(path2->pts[0], path2->pts[1]);
 					float crossing = getLineCrossing(p0, p1, p2, p3);
 					float crossing2 = getLineCrossing(p2, p3, p0, p1);
 					if (0.0 <= crossing && crossing < 1.0 && 0.0 <= crossing2) {
@@ -125,10 +125,10 @@ void svgDraw(NVGcontext *vg, NSVGimage *svg) {
 /*
 			// Shoelace algorithm for computing the area, and thus the winding direction
 			float area = 0.0;
-			math::Vec p0 = math::Vec(path->pts[0], path->pts[1]);
+			Vec p0 = Vec(path->pts[0], path->pts[1]);
 			for (int i = 1; i < path->npts; i += 3) {
 				float *p = &path->pts[2*i];
-				math::Vec p1 = (i < path->npts) ? math::Vec(p[4], p[5]) : math::Vec(path->pts[0], path->pts[1]);
+				Vec p1 = (i < path->npts) ? Vec(p[4], p[5]) : Vec(path->pts[0], path->pts[1]);
 				area += 0.5 * (p1.x - p0.x) * (p1.y + p0.y);
 				printf("%f %f, %f %f\n", p0.x, p0.y, p1.x, p1.y);
 				p0 = p1;

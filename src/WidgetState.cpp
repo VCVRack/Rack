@@ -7,7 +7,7 @@
 namespace rack {
 
 
-void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) {
+void WidgetState::handleButton(Vec pos, int button, int action, int mods) {
 	// event::Button
 	event::Button eButton;
 	eButton.pos = pos;
@@ -74,7 +74,7 @@ void WidgetState::handleButton(math::Vec pos, int button, int action, int mods) 
 }
 
 
-void WidgetState::handleHover(math::Vec pos, math::Vec mouseDelta) {
+void WidgetState::handleHover(Vec pos, Vec mouseDelta) {
 	if (draggedWidget) {
 		// event::DragMove
 		event::DragMove eDragMove;
@@ -148,7 +148,7 @@ void WidgetState::handleLeave() {
 	hoveredWidget = NULL;
 }
 
-void WidgetState::handleScroll(math::Vec pos, math::Vec scrollDelta) {
+void WidgetState::handleScroll(Vec pos, Vec scrollDelta) {
 	// event::HoverScroll
 	event::HoverScroll eHoverScroll;
 	eHoverScroll.pos = pos;
@@ -156,7 +156,7 @@ void WidgetState::handleScroll(math::Vec pos, math::Vec scrollDelta) {
 	rootWidget->onHoverScroll(eHoverScroll);
 }
 
-void WidgetState::handleDrop(math::Vec pos, std::vector<std::string> paths) {
+void WidgetState::handleDrop(Vec pos, std::vector<std::string> paths) {
 	// event::PathDrop
 	event::PathDrop ePathDrop;
 	ePathDrop.pos = pos;
@@ -164,7 +164,7 @@ void WidgetState::handleDrop(math::Vec pos, std::vector<std::string> paths) {
 	rootWidget->onPathDrop(ePathDrop);
 }
 
-void WidgetState::handleText(math::Vec pos, int codepoint) {
+void WidgetState::handleText(Vec pos, int codepoint) {
 	if (selectedWidget) {
 		// event::SelectText
 		event::SelectText eSelectText;
@@ -181,7 +181,7 @@ void WidgetState::handleText(math::Vec pos, int codepoint) {
 	rootWidget->onHoverText(eHoverText);
 }
 
-void WidgetState::handleKey(math::Vec pos, int key, int scancode, int action, int mods) {
+void WidgetState::handleKey(Vec pos, int key, int scancode, int action, int mods) {
 	if (selectedWidget) {
 		// event::SelectKey
 		event::SelectKey eSelectKey;

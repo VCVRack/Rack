@@ -18,13 +18,13 @@ struct WidgetState {
 	/** For middle-click dragging */
 	Widget *scrollWidget = NULL;
 
-	void handleButton(math::Vec pos, int button, int action, int mods);
-	void handleHover(math::Vec pos, math::Vec mouseDelta);
+	void handleButton(Vec pos, int button, int action, int mods);
+	void handleHover(Vec pos, Vec mouseDelta);
 	void handleLeave();
-	void handleScroll(math::Vec pos, math::Vec scrollDelta);
-	void handleText(math::Vec pos, int codepoint);
-	void handleKey(math::Vec pos, int key, int scancode, int action, int mods);
-	void handleDrop(math::Vec pos, std::vector<std::string> paths);
+	void handleScroll(Vec pos, Vec scrollDelta);
+	void handleText(Vec pos, int codepoint);
+	void handleKey(Vec pos, int key, int scancode, int action, int mods);
+	void handleDrop(Vec pos, std::vector<std::string> paths);
 	void handleZoom();
 	/** Prepares a widget for deletion */
 	void finalizeWidget(Widget *w);

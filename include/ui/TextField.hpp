@@ -183,8 +183,8 @@ struct TextField : OpaqueWidget {
 			} break;
 		}
 
-		cursor = math::clamp(cursor, 0, (int) text.size());
-		selection = math::clamp(selection, 0, (int) text.size());
+		cursor = clamp(cursor, 0, (int) text.size());
+		selection = clamp(selection, 0, (int) text.size());
 		e.target = this;
 	}
 
@@ -210,7 +210,7 @@ struct TextField : OpaqueWidget {
 		onChange(eChange);
 	}
 
-	virtual int getTextPosition(math::Vec mousePos) {
+	virtual int getTextPosition(Vec mousePos) {
 		return bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
 	}
 };

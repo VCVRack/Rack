@@ -32,7 +32,7 @@ void RackScene::step() {
 	// Resize to be a bit larger than the ScrollWidget viewport
 	gRackWidget->box.size = scrollWidget->box.size
 		.minus(scrollWidget->container->box.pos)
-		.plus(math::Vec(500, 500))
+		.plus(Vec(500, 500))
 		.div(zoomWidget->zoom);
 
 	Scene::step();
@@ -41,7 +41,7 @@ void RackScene::step() {
 
 	// Version popup message
 	if (!gLatestVersion.empty()) {
-		std::string versionMessage = string::stringf("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", gLatestVersion.c_str(), gApplicationVersion.c_str());
+		std::string versionMessage = string::f("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", gLatestVersion.c_str(), gApplicationVersion.c_str());
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
 			std::thread t(system::openBrowser, "https://vcvrack.com/");
 			t.detach();

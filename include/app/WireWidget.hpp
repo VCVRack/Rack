@@ -20,8 +20,8 @@ struct WireWidget : OpaqueWidget {
 	~WireWidget();
 	/** Synchronizes the plugged state of the widget to the owned wire */
 	void updateWire();
-	math::Vec getOutputPos();
-	math::Vec getInputPos();
+	Vec getOutputPos();
+	Vec getInputPos();
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 	void draw(NVGcontext *vg) override;

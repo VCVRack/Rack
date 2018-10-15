@@ -41,7 +41,7 @@ float gPixelRatio = 1.0;
 float gWindowRatio = 1.0;
 bool gAllowCursorLock = true;
 int gGuiFrame;
-math::Vec gMousePos;
+Vec gMousePos;
 
 std::string lastWindowTitle;
 
@@ -86,15 +86,15 @@ void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int m
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	math::Vec mousePos = math::Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
-	math::Vec mouseDelta = mousePos.minus(gMousePos);
+	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
+	Vec mouseDelta = mousePos.minus(gMousePos);
 
 	int cursorMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
 	(void) cursorMode;
 
 #ifdef ARCH_MAC
 	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
-	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be math::clamped.
+	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
 		glfwSetCursorPos(gWindow, gMousePos.x, gMousePos.y);
@@ -117,10 +117,10 @@ void cursorEnterCallback(GLFWwindow* window, int entered) {
 }
 
 void scrollCallback(GLFWwindow *window, double x, double y) {
-	math::Vec scrollDelta = math::Vec(x, y);
+	Vec scrollDelta = Vec(x, y);
 #if ARCH_LIN || ARCH_WIN
 	if (windowIsShiftPressed())
-		scrollDelta = math::Vec(y, x);
+		scrollDelta = Vec(y, x);
 #endif
 	scrollDelta = scrollDelta.mult(50.0);
 
@@ -330,7 +330,7 @@ void windowRun() {
 		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 		gWindowRatio = (float)width / windowWidth;
 
-		gWidgetState->rootWidget->box.size = math::Vec(width, height).div(gPixelRatio);
+		gWidgetState->rootWidget->box.size = Vec(width, height).div(gPixelRatio);
 
 		// Step scene
 		gWidgetState->rootWidget->step();
@@ -385,25 +385,25 @@ bool windowIsShiftPressed() {
 	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
-math::Vec windowGetWindowSize() {
+Vec windowGetWindowSize() {
 	int width, height;
 	glfwGetWindowSize(gWindow, &width, &height);
-	return math::Vec(width, height);
+	return Vec(width, height);
 }
 
-void windowSetWindowSize(math::Vec size) {
+void windowSetWindowSize(Vec size) {
 	int width = size.x;
 	int height = size.y;
 	glfwSetWindowSize(gWindow, width, height);
 }
 
-math::Vec windowGetWindowPos() {
+Vec windowGetWindowPos() {
 	int x, y;
 	glfwGetWindowPos(gWindow, &x, &y);
-	return math::Vec(x, y);
+	return Vec(x, y);
 }
 
-void windowSetWindowPos(math::Vec pos) {
+void windowSetWindowPos(Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
 	glfwSetWindowPos(gWindow, x, y);

@@ -169,7 +169,7 @@ struct MidiTrigChoice : GridChoice {
 			};
 			int oct = note / 12 - 1;
 			int semi = note % 12;
-			text = string::stringf("%s%d", noteNames[semi], oct);
+			text = string::f("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
 
 			if (gWidgetState->selectedWidget == this)

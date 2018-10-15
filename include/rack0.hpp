@@ -110,7 +110,7 @@ DEPRECATED static const NVGcolor COLOR_DARK_PANEL = SCHEME_DARK_PANEL;
 ////////////////////
 
 template <class TScrew>
-DEPRECATED TScrew *createScrew(math::Vec pos) {
+DEPRECATED TScrew *createScrew(Vec pos) {
 	return createWidget<TScrew>(pos);
 }
 
