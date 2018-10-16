@@ -1,6 +1,4 @@
 #pragma once
-
-// Include headers that plugins will likely use, for convenience
 #include "common.hpp"
 #include "math.hpp"
 #include "string.hpp"

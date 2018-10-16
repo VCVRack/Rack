@@ -1,7 +1,7 @@
 #pragma once
-#include "common.hpp"
-#include "WireWidget.hpp"
-#include "WireContainer.hpp"
+#include "app/common.hpp"
+#include "app/WireWidget.hpp"
+#include "app/WireContainer.hpp"
 #include "engine.hpp"
 
 

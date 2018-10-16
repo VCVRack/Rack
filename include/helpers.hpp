@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 #include "engine.hpp"
 #include "app.hpp"
-#include "WidgetState.hpp"
+#include "event.hpp"
 
 
 namespace rack {
@@ -145,7 +145,7 @@ inline Menu *createMenu() {
 	MenuOverlay *menuOverlay = new MenuOverlay;
 	menuOverlay->addChild(o);
 
-	gWidgetState->rootWidget->addChild(menuOverlay);
+	event::gContext->rootWidget->addChild(menuOverlay);
 	return o;
 }
 

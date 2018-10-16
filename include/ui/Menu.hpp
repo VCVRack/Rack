@@ -1,5 +1,5 @@
 #pragma once
-#include "MenuEntry.hpp"
+#include "ui/MenuEntry.hpp"
 
 
 namespace rack {

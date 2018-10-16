@@ -13,7 +13,7 @@
 #include "rack.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
-#include "WidgetState.hpp"
+#include "event.hpp"
 
 #define NANOVG_GL2_IMPLEMENTATION 1
 // #define NANOVG_GL3_IMPLEMENTATION 1
@@ -60,7 +60,7 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 	}
 #endif
 
-	gWidgetState->handleButton(gMousePos, button, action, mods);
+	event::gContext->handleButton(gMousePos, button, action, mods);
 }
 
 struct MouseButtonArguments {
@@ -107,12 +107,12 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 	gMousePos = mousePos;
 
-	gWidgetState->handleHover(mousePos, mouseDelta);
+	event::gContext->handleHover(mousePos, mouseDelta);
 }
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {
 	if (!entered) {
-		gWidgetState->handleLeave();
+		event::gContext->handleLeave();
 	}
 }
 
@@ -124,15 +124,15 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 #endif
 	scrollDelta = scrollDelta.mult(50.0);
 
-	gWidgetState->handleScroll(gMousePos, scrollDelta);
+	event::gContext->handleScroll(gMousePos, scrollDelta);
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	gWidgetState->handleText(gMousePos, codepoint);
+	event::gContext->handleText(gMousePos, codepoint);
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-	gWidgetState->handleKey(gMousePos, key, scancode, action, mods);
+	event::gContext->handleKey(gMousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
 	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
@@ -150,7 +150,7 @@ void dropCallback(GLFWwindow *window, int count, const char **paths) {
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
 	}
-	gWidgetState->handleDrop(gMousePos, pathsVec);
+	event::gContext->handleDrop(gMousePos, pathsVec);
 }
 
 void errorCallback(int error, const char *description) {
@@ -166,7 +166,7 @@ void renderGui() {
 
 	nvgReset(gVg);
 	nvgScale(gVg, gPixelRatio, gPixelRatio);
-	gWidgetState->rootWidget->draw(gVg);
+	event::gContext->rootWidget->draw(gVg);
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -319,7 +319,7 @@ void windowRun() {
 		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
 		pixelRatio = roundf(pixelRatio);
 		if (pixelRatio != gPixelRatio) {
-			gWidgetState->handleZoom();
+			event::gContext->handleZoom();
 			gPixelRatio = pixelRatio;
 		}
 
@@ -330,10 +330,10 @@ void windowRun() {
 		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 		gWindowRatio = (float)width / windowWidth;
 
-		gWidgetState->rootWidget->box.size = Vec(width, height).div(gPixelRatio);
+		event::gContext->rootWidget->box.size = Vec(width, height).div(gPixelRatio);
 
 		// Step scene
-		gWidgetState->rootWidget->step();
+		event::gContext->rootWidget->step();
 
 		// Render
 		bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);

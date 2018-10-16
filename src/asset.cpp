@@ -15,8 +15,8 @@
 	#include <pwd.h>
 #endif
 
-#include "rack.hpp"
-#include "osdialog.h"
+#include "asset.hpp"
+#include "system.hpp"
 
 
 namespace rack {

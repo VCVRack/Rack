@@ -2,7 +2,7 @@
 #include "midi.hpp"
 #include "dsp/filter.hpp"
 #include "window.hpp"
-#include "WidgetState.hpp"
+#include "event.hpp"
 
 
 struct MIDICCToCVInterface : Module {
@@ -130,8 +130,8 @@ struct MidiCcChoice : GridChoice {
 		else {
 			text = string::f("%d", module->learnedCcs[id]);
 			color.a = 1.0;
-			if (gWidgetState->selectedWidget == this)
-				gWidgetState->selectedWidget = NULL;
+			if (event::gContext->selectedWidget == this)
+				event::gContext->selectedWidget = NULL;
 		}
 	}
 
@@ -159,11 +159,11 @@ struct MidiCcChoice : GridChoice {
 	}
 
 	void onSelectKey(event::SelectKey &e) override {
-		if (gWidgetState->selectedWidget == this) {
+		if (event::gContext->selectedWidget == this) {
 			if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
 				event::Deselect eDeselect;
 				onDeselect(eDeselect);
-				gWidgetState->selectedWidget = NULL;
+				event::gContext->selectedWidget = NULL;
 				e.target = this;
 			}
 		}

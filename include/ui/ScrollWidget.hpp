@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "WidgetState.hpp"
+#include "ui/common.hpp"
+#include "event.hpp"
 
 
 namespace rack {
@@ -110,7 +110,7 @@ struct ScrollWidget : OpaqueWidget {
 
 	void onHover(event::Hover &e) override {
 		// Scroll with arrow keys
-		if (!gWidgetState->selectedWidget) {
+		if (!event::gContext->selectedWidget) {
 			float arrowSpeed = 30.0;
 			if (windowIsShiftPressed() && windowIsModPressed())
 				arrowSpeed /= 16.0;

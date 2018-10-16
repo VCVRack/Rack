@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "Port.hpp"
+#include "app/common.hpp"
+#include "app/Port.hpp"
 
 
 namespace rack {

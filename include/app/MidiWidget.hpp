@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "LedDisplay.hpp"
+#include "app/common.hpp"
+#include "app/LedDisplay.hpp"
 
 
 namespace rack {

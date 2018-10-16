@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "WireWidget.hpp"
+#include "app/common.hpp"
+#include "app/WireWidget.hpp"
 #include "engine.hpp"
 
 

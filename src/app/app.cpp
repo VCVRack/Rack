@@ -38,8 +38,8 @@ static void checkVersion() {
 void appInit(bool devMode) {
 	gRackScene = new RackScene;
 
-	gWidgetState = new WidgetState;
-	gWidgetState->rootWidget = gRackScene;
+	event::gContext = new event::Context;
+	event::gContext->rootWidget = gRackScene;
 
 	// Request latest version from server
 	if (!devMode && gCheckVersion) {
@@ -53,8 +53,8 @@ void appDestroy() {
 	delete gRackScene;
 	gRackScene = NULL;
 
-	delete gWidgetState;
-	gWidgetState = NULL;
+	delete event::gContext;
+	event::gContext = NULL;
 }
 
 

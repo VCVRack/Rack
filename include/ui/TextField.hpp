@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "WidgetState.hpp"
+#include "ui/common.hpp"
+#include "event.hpp"
 
 
 namespace rack {
@@ -25,9 +25,9 @@ struct TextField : OpaqueWidget {
 		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
 		BNDwidgetState state;
-		if (this == gWidgetState->selectedWidget)
+		if (this == event::gContext->selectedWidget)
 			state = BND_ACTIVE;
-		else if (this == gWidgetState->hoveredWidget)
+		else if (this == event::gContext->hoveredWidget)
 			state = BND_HOVER;
 		else
 			state = BND_DEFAULT;
@@ -51,7 +51,7 @@ struct TextField : OpaqueWidget {
 	}
 
 	void onHover(event::Hover &e) override {
-		if (this == gWidgetState->draggedWidget) {
+		if (this == event::gContext->draggedWidget) {
 			int pos = getTextPosition(e.pos);
 			if (pos != selection) {
 				cursor = pos;

@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "CircularShadow.hpp"
+#include "app/common.hpp"
+#include "app/CircularShadow.hpp"
 
 
 namespace rack {

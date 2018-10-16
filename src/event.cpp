@@ -1,13 +1,13 @@
-#include "WidgetState.hpp"
 #include "event.hpp"
-#include "widgets.hpp"
+#include "widgets/Widget.hpp"
 #include "logger.hpp"
 
 
 namespace rack {
+namespace event {
 
 
-void WidgetState::handleButton(Vec pos, int button, int action, int mods) {
+void Context::handleButton(Vec pos, int button, int action, int mods) {
 	// event::Button
 	event::Button eButton;
 	eButton.pos = pos;
@@ -74,7 +74,7 @@ void WidgetState::handleButton(Vec pos, int button, int action, int mods) {
 }
 
 
-void WidgetState::handleHover(Vec pos, Vec mouseDelta) {
+void Context::handleHover(Vec pos, Vec mouseDelta) {
 	if (draggedWidget) {
 		// event::DragMove
 		event::DragMove eDragMove;
@@ -139,7 +139,7 @@ void WidgetState::handleHover(Vec pos, Vec mouseDelta) {
 	}
 }
 
-void WidgetState::handleLeave() {
+void Context::handleLeave() {
 	if (hoveredWidget) {
 		// event::Leave
 		event::Leave eLeave;
@@ -148,7 +148,7 @@ void WidgetState::handleLeave() {
 	hoveredWidget = NULL;
 }
 
-void WidgetState::handleScroll(Vec pos, Vec scrollDelta) {
+void Context::handleScroll(Vec pos, Vec scrollDelta) {
 	// event::HoverScroll
 	event::HoverScroll eHoverScroll;
 	eHoverScroll.pos = pos;
@@ -156,7 +156,7 @@ void WidgetState::handleScroll(Vec pos, Vec scrollDelta) {
 	rootWidget->onHoverScroll(eHoverScroll);
 }
 
-void WidgetState::handleDrop(Vec pos, std::vector<std::string> paths) {
+void Context::handleDrop(Vec pos, std::vector<std::string> paths) {
 	// event::PathDrop
 	event::PathDrop ePathDrop;
 	ePathDrop.pos = pos;
@@ -164,7 +164,7 @@ void WidgetState::handleDrop(Vec pos, std::vector<std::string> paths) {
 	rootWidget->onPathDrop(ePathDrop);
 }
 
-void WidgetState::handleText(Vec pos, int codepoint) {
+void Context::handleText(Vec pos, int codepoint) {
 	if (selectedWidget) {
 		// event::SelectText
 		event::SelectText eSelectText;
@@ -181,7 +181,7 @@ void WidgetState::handleText(Vec pos, int codepoint) {
 	rootWidget->onHoverText(eHoverText);
 }
 
-void WidgetState::handleKey(Vec pos, int key, int scancode, int action, int mods) {
+void Context::handleKey(Vec pos, int key, int scancode, int action, int mods) {
 	if (selectedWidget) {
 		// event::SelectKey
 		event::SelectKey eSelectKey;
@@ -204,7 +204,7 @@ void WidgetState::handleKey(Vec pos, int key, int scancode, int action, int mods
 	rootWidget->onHoverKey(eHoverKey);
 }
 
-void WidgetState::finalizeWidget(Widget *w) {
+void Context::finalizeWidget(Widget *w) {
 	if (hoveredWidget == w) hoveredWidget = NULL;
 	if (draggedWidget == w) draggedWidget = NULL;
 	if (dragHoveredWidget == w) dragHoveredWidget = NULL;
@@ -212,7 +212,7 @@ void WidgetState::finalizeWidget(Widget *w) {
 	if (scrollWidget == w) scrollWidget = NULL;
 }
 
-void WidgetState::handleZoom() {
+void Context::handleZoom() {
 	// event::Zoom
 	event::Zoom eZoom;
 	rootWidget->onZoom(eZoom);
@@ -220,7 +220,8 @@ void WidgetState::handleZoom() {
 
 
 // TODO Move this elsewhere
-WidgetState *gWidgetState = NULL;
+Context *gContext = NULL;
 
 
+} // namespace event
 } // namespace rack

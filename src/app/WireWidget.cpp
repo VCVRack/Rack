@@ -2,7 +2,7 @@
 #include "engine.hpp"
 #include "componentlibrary.hpp"
 #include "window.hpp"
-#include "WidgetState.hpp"
+#include "event.hpp"
 
 
 namespace rack {
@@ -172,7 +172,7 @@ void WireWidget::draw(NVGcontext *vg) {
 			opacity = 1.0;
 	}
 	else {
-		Port *hoveredPort = dynamic_cast<Port*>(gWidgetState->hoveredWidget);
+		Port *hoveredPort = dynamic_cast<Port*>(event::gContext->hoveredWidget);
 		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
 			opacity = 1.0;
 	}

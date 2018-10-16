@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "LightWidget.hpp"
+#include "app/common.hpp"
+#include "app/LightWidget.hpp"
 
 
 namespace rack {

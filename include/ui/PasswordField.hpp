@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "TextField.hpp"
+#include "ui/common.hpp"
+#include "ui/TextField.hpp"
 
 
 namespace rack {

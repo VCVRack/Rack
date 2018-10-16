@@ -2,7 +2,7 @@
 #include "plugin.hpp"
 #include "window.hpp"
 #include "helpers.hpp"
-#include "WidgetState.hpp"
+#include "event.hpp"
 #include <set>
 #include <algorithm>
 
@@ -430,7 +430,7 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleScroll->box.size.y = std::min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
 		box.size.y = std::min(box.size.y, moduleScroll->box.getBottomRight().y);
 
-		gWidgetState->selectedWidget = searchField;
+		event::gContext->selectedWidget = searchField;
 		Widget::step();
 	}
 };
