@@ -40,31 +40,31 @@ struct ZoomWidget : virtual Widget {
 		e2.pos = e.pos.div(zoom);
 		Widget::onHover(e2);
 	}
-
 	void onButton(event::Button &e) override {
 		event::Button e2 = e;
 		e2.pos = e.pos.div(zoom);
 		Widget::onButton(e2);
 	}
-
 	void onHoverKey(event::HoverKey &e) override {
 		event::HoverKey e2 = e;
 		e2.pos = e.pos.div(zoom);
 		Widget::onHoverKey(e2);
 	}
-
 	void onHoverText(event::HoverText &e) override {
 		event::HoverText e2 = e;
 		e2.pos = e.pos.div(zoom);
 		Widget::onHoverText(e2);
 	}
-
 	void onHoverScroll(event::HoverScroll &e) override {
 		event::HoverScroll e2 = e;
 		e2.pos = e.pos.div(zoom);
 		Widget::onHoverScroll(e2);
 	}
-
+	void onDragHover(event::DragHover &e) override {
+		event::DragHover e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onDragHover(e2);
+	}
 	void onPathDrop(event::PathDrop &e) override {
 		event::PathDrop e2 = e;
 		e2.pos = e.pos.div(zoom);

@@ -6,4 +6,3 @@
 #include "widgets/ZoomWidget.hpp"
 #include "widgets/SVGWidget.hpp"
 #include "widgets/FramebufferWidget.hpp"
-#include "widgets/QuantityWidget.hpp"

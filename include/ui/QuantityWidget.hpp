@@ -1,5 +1,5 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "ui/common.hpp"
 
 
 namespace rack {

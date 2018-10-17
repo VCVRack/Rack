@@ -89,8 +89,13 @@ void Widget::step() {
 
 void Widget::draw(NVGcontext *vg) {
 	for (Widget *child : children) {
+		// Don't draw if invisible
 		if (!child->visible)
 			continue;
+		// Don't draw if child is outside bounding box
+		if (!box.zeroPos().intersects(child->box))
+			continue;
+
 		nvgSave(vg);
 		nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
 		child->draw(vg);

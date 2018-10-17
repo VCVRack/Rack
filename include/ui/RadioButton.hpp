@@ -1,5 +1,6 @@
 #pragma once
 #include "ui/common.hpp"
+#include "ui/QuantityWidget.hpp"
 
 
 namespace rack {

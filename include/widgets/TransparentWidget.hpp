@@ -13,6 +13,7 @@ struct TransparentWidget : virtual Widget {
 	void onHoverKey(event::HoverKey &e) override {}
 	void onHoverText(event::HoverText &e) override {}
 	void onHoverScroll(event::HoverScroll &e) override {}
+	void onDragHover(event::DragHover &e) override {}
 	void onPathDrop(event::PathDrop &e) override {}
 };
 
