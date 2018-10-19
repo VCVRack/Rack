@@ -1,0 +1,8 @@
+﻿  lglw_windows.c
+  lglw_windows_cpp.cpp
+  plugin.cpp
+     Creating library F:\Projects\research\vst24_gl_test\M3dB\vs2017\m3db\x64\Release\m3db.lib and object F:\Projects\research\vst24_gl_test\M3dB\vs2017\m3db\x64\Release\m3db.exp
+  Generating code
+  All 57 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  m3db.vcxproj -> F:\Projects\research\vst24_gl_test\M3dB\vs2017\m3db\x64\Release\m3db.dll
