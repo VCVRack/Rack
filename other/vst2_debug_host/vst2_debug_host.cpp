@@ -213,11 +213,14 @@ void open_and_close(void) {
          printf("[---] failed to find mainProc\n");
       }
 
+      printf("xxx debug_host: closing library\n");
+
 #ifdef YAC_WIN32
       ::FreeLibrary(dllHandle);
 #else
       ::dlclose(dllHandle);
 #endif
+      printf("xxx debug_host: library closed\n");
    }
 
    for(int i = 0; i < 48; i++)
@@ -231,10 +234,11 @@ void open_and_close(void) {
 #endif
 }
 
- int main() {
-    for(int i = 0; i < 5; i++)
-    {
-       open_and_close();
-    }
+int main() {
+   for(int i = 0; i < 5; i++)
+   {
+      open_and_close();
+   }
+   printf("xxx debug_host: exiting\n");
    return 0;
 }
