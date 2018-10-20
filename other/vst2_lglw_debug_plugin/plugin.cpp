@@ -479,7 +479,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
          break;
 
       case effEditIdle:
-         printf("vstgltest: redraw window\n");
+         // printf("vstgltest: redraw window\n");
          // (void)::RedrawWindow(wrapper->hwnd, NULL, NULL, RDW_INTERNALPAINT);
          //(void)::UpdateWindow(wrapper->hwnd);
 #ifdef USE_LGLW
