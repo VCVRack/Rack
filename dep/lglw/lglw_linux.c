@@ -185,7 +185,7 @@ lglw_t lglw_init(int32_t _w, int32_t _h) {
    lglw_int_t *lglw = malloc(sizeof(lglw_int_t));
 
    // TODO: remove/improve
-   logfile = fopen("/home/cameron/src/VeeSeeVSTRack/other/log.txt", "w");
+   logfile = fopen("/tmp/lglw_log.txt", "w");
    XSetErrorHandler(xerror_handler);
 
    if(NULL != lglw)
