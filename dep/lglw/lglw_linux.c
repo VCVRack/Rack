@@ -409,7 +409,7 @@ void loc_setEventProc (Display *display, Window window) {
 #else
 // Pulled from the eXT2 example
 // TODO: 32-bit support
-void loc_setEventProc_32bit (Display *display, Window window) {
+void loc_setEventProc (Display *display, Window window) {
    void* data = (void*)&loc_eventProc; // swapped the function name here
 
    Atom atom = XInternAtom(display, "_XEventProc", False);
