@@ -85,6 +85,7 @@ typedef struct lglw_int_s {
       Window       xwnd;
       lglw_bool_t  mapped;
       int32_t      swap_interval;
+      lglw_bool_t  b_owner;
    } win;
 
    GLXContext   ctx;
@@ -351,28 +352,31 @@ static void loc_destroy_hidden_window(lglw_int_t *lglw) {
 
 // Very simple function to test _XEventProc is properly called
 void loc_eventProc(void *xevent) {
-   // lglw_log("XEventProc");
-   printf("XEventProc\n");
+   lglw_log("XEventProc\n");
+   printf("vstgltest<lglw_linux>: XEventProc\n");
 }
 
+
+#ifdef ARCH_X64
+#if 0
 // Pulled from the Renoise 64-bit callback example
 // Unsure what data was supposed to be, but swapping it to a function name did not work
 // This does nothing, no event proc found
-// TODO: 32-bit support
-// void loc_setEventProc (Display *display, Window window) {
-//    size_t data = (size_t)loc_eventProc;
-//    long temp[2];
+void loc_setEventProc (Display *display, Window window) {
+   size_t data = (size_t)loc_eventProc;
+   long temp[2];
 
-//    // Split the 64 bit pointer into a little-endian long array
-//    temp[0] = (long)(data & 0xffffffffUL);
-//    temp[1] = (long)(data >> 32L);
+   printf("vstgltest<lglw_linux>: setEventProc (2*32bit). window=%lu loc_eventProc=%p\n", window, &loc_eventProc);
 
-//    Atom atom = XInternAtom(display, "_XEventProc", False);
-//    XChangeProperty(display, window, atom, atom, 32,
-//       PropModeReplace, (unsigned char*)temp, 2);
-// }
+   // Split the 64 bit pointer into a little-endian long array
+   temp[0] = (long)(data & 0xffffffffUL);
+   temp[1] = (long)(data >> 32L);
 
-#ifdef ARCH_X64
+   Atom atom = XInternAtom(display, "_XEventProc", False);
+   XChangeProperty(display, window, atom, atom, 32,
+      PropModeReplace, (unsigned char*)temp, 2);
+}
+#else
 // GPL code pulled from the amsynth example <https://github.com/amsynth/amsynth/blob/4a87798e650c6d71d70274a961c9b8d98fc6da7e/src/amsynth_vst.cpp>
 // Simply swapped out the function names, crashes Ardour in the same was as the others
 void loc_setEventProc (Display *display, Window window) {
@@ -404,6 +408,7 @@ void loc_setEventProc (Display *display, Window window) {
          memcpy(ptr, kJumpInstructions, sizeof(kJumpInstructions));
          *((uint64_t *)(ptr + kJumpAddress)) = (uint64_t)(&loc_eventProc);
          msync(ptr, sizeof(kJumpInstructions), MS_INVALIDATE);
+         printf("vstgltest<lglw_linux>: 64bit trampoline installed\n");
       }
    }
 
@@ -411,6 +416,7 @@ void loc_setEventProc (Display *display, Window window) {
    Atom atom = XInternAtom(display, "_XEventProc", False);
    XChangeProperty(display, window, atom, atom, 32, PropModeReplace, (unsigned char *)temp, 2);
 }
+#endif
 #else
 // Pulled from the eXT2 example
 // TODO: 32-bit support
@@ -449,6 +455,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       XEvent event;
       XSync(lglw->xdsp, False);
 
+#if 1
       lglw_log("lglw:lglw_window_open: 5\n");
       swa.border_pixel = 0;
       swa.colormap = lglw->cmap;
@@ -460,23 +467,29 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       lglw_log("lglw:lglw_window_open: 6\n");
       XSetStandardProperties(lglw->xdsp, lglw->win.xwnd, "LGLW", "LGLW", None, NULL, 0, NULL);
 
-      // Setup the event proc now, on the parent window as well just for the debug host
-      // It was simpler to do this than check in the debug host for the reparent event
-      lglw_log("lglw:lglw_window_open: 7\n");
-      loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
-      loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
-
       // Some hosts only check and store the callback when the Window is reparented
       // Since creating the Window with a Parent may or may not do that, but the callback is not set,
       // ... it's created as a root window, the callback is set, and then it's reparented
       if (0 != _parentHWNDOrNull)
       {
-         lglw_log("lglw:lglw_window_open: 8\n");
+         lglw_log("lglw:lglw_window_open: 7\n");
          XReparentWindow(lglw->xdsp, lglw->win.xwnd, lglw->parent_xwnd, 0, 0);
       }
+      lglw->win.b_owner = LGLW_TRUE;
+#else
+      lglw->win.xwnd = (Window)_parentHWNDOrNull;
+      lglw->win.b_owner = LGLW_FALSE;
+#endif
+
+      // Setup the event proc now, on the parent window as well just for the debug host
+      // It was simpler to do this than check in the debug host for the reparent event
+      lglw_log("lglw:lglw_window_open: 8\n");
+      loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
+      loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
 
       lglw_log("lglw:lglw_window_open: 9\n");
-      XMapRaised(lglw->xdsp, lglw->win.xwnd);
+      if(lglw->win.b_owner)
+         XMapRaised(lglw->xdsp, lglw->win.xwnd);
       XSync(lglw->xdsp, False);
       lglw->win.mapped = LGLW_TRUE;
 
@@ -572,7 +585,11 @@ void lglw_window_close (lglw_t _lglw) {
          glXMakeCurrent(lglw->xdsp, None, NULL);
 
          lglw_log("lglw:lglw_window_close: 4\n");
-         XDestroyWindow(lglw->xdsp, lglw->win.xwnd);
+         if(lglw->win.b_owner)
+         {
+            XDestroyWindow(lglw->xdsp, lglw->win.xwnd);
+            lglw->win.b_owner = LGLW_FALSE;
+         }
          XSync(lglw->xdsp, False);
          lglw->win.xwnd = 0;
          lglw->win.mapped = LGLW_FALSE;
