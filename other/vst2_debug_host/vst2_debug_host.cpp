@@ -165,11 +165,15 @@ void open_and_close(void) {
 
          if(NULL != effect)
          {
+            ERect *rect = 0;
+            effect->dispatcher(effect, effEditGetRect, 0, 0, (void*)&rect, 0.0f);
+            printf("xxx effEditGetRect returned left=%d top=%d right=%d bottom=%d\n", rect->left, rect->top, rect->right, rect->bottom);
 
 #ifndef YAC_WIN32
-            w = XCreateSimpleWindow(d, RootWindow(d, s), 10, 10, 100, 100, 1,
-                                    BlackPixel(d, s), WhitePixel(d, s));
-            XSelectInput(d, w, ExposureMask | KeyPressMask);
+            w = XCreateSimpleWindow(d, RootWindow(d, s), rect->left, rect->top, (rect->right - rect->left), (rect->bottom - rect->top), 1,
+                                    BlackPixel(d, s), WhitePixel(d, s)
+                                    );
+            XSelectInput(d, w, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | FocusChangeMask);
             XMapRaised(d, w);
             XFlush(d);
 #endif
@@ -193,10 +197,17 @@ void open_and_close(void) {
             }
             else
             {
-               printf("xxx XEventProc found... calling\n");
                void (* eventProc) (void * event);
+               int evIdx = 0;
                eventProc = (void (*) (void* event))result;
-               eventProc(NULL);
+               printf("xxx XEventProc found\n");
+               for(;;)
+               {
+                  XEvent xev;
+                  XNextEvent(d, &xev);
+                  printf("xxx call XEventProc[%d]\n", evIdx++);
+                  eventProc(&xev);
+               }
             }
 #endif
 
