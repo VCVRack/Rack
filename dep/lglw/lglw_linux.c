@@ -42,6 +42,11 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 
+#ifdef ARCH_X64
+#include <sys/mman.h>
+#include <unistd.h>
+#endif // ARCH_X64
+
 #define Dprintf if(0);else printf
 // #define Dprintf if(1);else printf
 
@@ -387,10 +392,10 @@ void loc_setEventProc (Display *display, Window window) {
    static char *ptr = 0;
    if (!ptr) {
       ptr = (char *)mmap(0,
-                     PAGE_SIZE,
-                     PROT_READ | PROT_WRITE | PROT_EXEC,
-                     MAP_ANONYMOUS | MAP_PRIVATE | MAP_32BIT,
-                     0, 0);
+                         getpagesize()/*PAGE_SIZE*/,
+                         PROT_READ | PROT_WRITE | PROT_EXEC,
+                         MAP_ANONYMOUS | MAP_PRIVATE | MAP_32BIT,
+                         0, 0);
       if (ptr == MAP_FAILED) {
          perror("mmap");
          ptr = 0;
