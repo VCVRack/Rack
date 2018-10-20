@@ -1,19 +1,41 @@
 
 include ../../dep/yac/install_linux.mk
 
+TARGET=debug_lglw.so
+
+ALL_OBJ= \
+	plugin.o \
+   $(VSVR_BASE_DIR)/dep/lglw/lglw_linux.o
+
 .cpp.o:
 	$(CPP) $(CPPFLAGS) $(OPTFLAGS_PLUGIN) -I"$(VSVR_BASE_DIR)/dep/yac/" -I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/" -shared -fPIC -c "$<" -o"$@"
 
+.c.o:
+	$(CC) $(CFLAGS) $(OPTFLAGS_PLUGIN) -I"$(VSVR_BASE_DIR)/dep/yac/" -I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/" -shared -fPIC -c "$<" -o"$@"
+
 .PHONY: bin
-bin: plugin.o
-	$(CPP) -shared -o debug_lglw.so -Wl,-soname,debug_lglw.so -mtls-dialect=gnu2 plugin.o "$(VSVR_BASE_DIR)/dep/lglw/lglw_linux.o" -ldl -lGL -L/usr/lib -lm -lpthread
+bin: $(ALL_OBJ)
+	$(CPP) -shared -o $(TARGET) -Wl,-soname,$(TARGET) -mtls-dialect=gnu2 $(ALL_OBJ) -ldl -lGL -L/usr/lib -lm -lpthread
 
 .PHONY: clean
 clean:
-	rm -f plugin plugin.o
+	rm -f $(TARGET) $(ALL_OBJ)
 
 .PHONY: all
 all:
 	make -f makefile.linux clean
 	make -f makefile.linux bin
-	cp debug_lglw.so /home/cameron/.local/share/VST/
+	make -f makefile.linux install
+
+.PHONY: install
+install:
+ifeq ($(USER),cameron)
+	cp $(TARGET) /home/cameron/.local/share/VST/
+endif
+ifeq ($(USER),bsp)
+   # copy to Qtractor VST search path
+	cp $(TARGET) /usr/local/lib/vst/
+endif
+
+
+# (todo) include ../../dep/yac/sharedlib_linux.mk
