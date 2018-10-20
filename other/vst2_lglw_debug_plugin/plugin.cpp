@@ -1,4 +1,5 @@
 
+#define USE_LGLW defined
 
 #include <aeffect.h>
 #include <aeffectx.h>
@@ -14,6 +15,7 @@
   #include <X11/Xutil.h>
   #include <X11/Xos.h>
   #define VST_EXPORT extern
+  #include <dlfcn.h>
 #endif
 
 #include "lglw.h"
@@ -67,8 +69,9 @@ const VstInt32 PLUGIN_VERSION = 1000;
 
 // extern "C" LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+#ifdef USE_LGLW
 void loc_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _buttonState, uint32_t _changedButtonState) {
-   printf("xxx lglw_mouse_cbk: lglw=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, _x, _y, _buttonState, _changedButtonState);
+   printf("vstgltest: lglw_mouse_cbk: lglw=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, _x, _y, _buttonState, _changedButtonState);
 
    if(LGLW_IS_MOUSE_LBUTTON_DOWN())
    {
@@ -82,17 +85,18 @@ void loc_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _buttonState, 
 }
 
 void loc_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changedFocusState) {
-   printf("xxx lglw_focus_cbk: lglw=%p focusState=0x%08x changedFocusState=0x%08x\n", _lglw, _focusState, _changedFocusState);
+   printf("vstgltest: lglw_focus_cbk: lglw=%p focusState=0x%08x changedFocusState=0x%08x\n", _lglw, _focusState, _changedFocusState);
 }
 
 lglw_bool_t loc_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw_bool_t _bPressed) {
-   printf("xxx lglw_keyboard_cbk: lglw=%p vkey=0x%08x (\'%c\') kmod=0x%08x bPressed=%d\n", _lglw, _vkey, _vkey, _kmod, _bPressed);
+   printf("vstgltest: lglw_keyboard_cbk: lglw=%p vkey=0x%08x (\'%c\') kmod=0x%08x bPressed=%d\n", _lglw, _vkey, _vkey, _kmod, _bPressed);
    return LGLW_FALSE;
 }
 
 void loc_timer_cbk(lglw_t _lglw) {
-   printf("xxx lglw_timer_cbk: tick\n");
+   printf("vstgltest: lglw_timer_cbk: tick\n");
 }
+#endif // USE_LGLW
 
 /**
  * Encapsulates the plugin as a C++ class. It will keep both the host callback and the structure required by the
@@ -104,7 +108,9 @@ class VSTPluginWrapper
 public:
    ERect editor_rect;
 
+#ifdef USE_LGLW
    lglw_t lglw;
+#endif // USE_LGLW
 
    float clear_color = 0.0f;
 
@@ -136,8 +142,18 @@ public:
          return _vstPlugin.numOutputs;
       }
 
+   int openEffect(void) {
+      printf("vstgltest: openEffect()\n");
+      return 1;
+   }
+
+   void closeEffect(void) {
+      closeEditor();
+   }
+
    void openEditor(void *_hwnd) {
-      
+
+#ifdef USE_LGLW      
       (void)lglw_window_open(lglw, _hwnd, 0/*x*/, 0/*y*/, EDITWIN_W, EDITWIN_H);
 
       lglw_mouse_callback_set(lglw, &loc_mouse_cbk);
@@ -146,6 +162,7 @@ public:
       lglw_timer_callback_set(lglw, &loc_timer_cbk);
 
       lglw_timer_start(lglw, 200);
+#endif // USE_LGLW
 
       window_to_wrapper = this;
    }
@@ -153,7 +170,9 @@ public:
    void closeEditor(void) {
       if(NULL != window_to_wrapper)
       {
+#ifdef USE_LGLW
          lglw_window_close(lglw);
+#endif // USE_LGLW
 
          window_to_wrapper = NULL;
       }
@@ -165,6 +184,7 @@ public:
 
    void redrawWindow(void) {
 #if 0
+#ifdef USE_LGLW
       // Save host GL context
       lglw_glcontext_push(lglw);
 
@@ -180,6 +200,7 @@ public:
 
       // Restore host GL context
       lglw_glcontext_pop(lglw);
+#endif // USE_LGLW
 #endif
    }
 
@@ -209,6 +230,7 @@ VSTPluginWrapper *VSTPluginWrapper::window_to_wrapper = NULL;
  * @param outputs an array of array of output samples. You write to it. First dimension is for outputs, second dimension is for samples: outputs[numOuputs][sampleFrames]
  * @param sampleFrames the number of samples (second dimension in both arrays)
  */
+extern "C" {
 void VSTPluginProcessSamplesFloat32(VSTPlugin *vstPlugin, float **inputs, float **outputs, VstInt32 sampleFrames)
 {
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
@@ -226,6 +248,7 @@ void VSTPluginProcessSamplesFloat32(VSTPlugin *vstPlugin, float **inputs, float 
       }
    }
 }
+}
 
 /**
  * This is the callback that will be called to process the samples in the case of double precision. This is where the
@@ -236,6 +259,7 @@ void VSTPluginProcessSamplesFloat32(VSTPlugin *vstPlugin, float **inputs, float 
  * @param outputs an array of array of output samples. You write to it. First dimension is for outputs, second dimension is for samples: outputs[numOuputs][sampleFrames]
  * @param sampleFrames the number of samples (second dimension in both arrays)
  */
+extern "C" {
 void VSTPluginProcessSamplesFloat64(VSTPlugin *vstPlugin, double **inputs, double **outputs, VstInt32 sampleFrames)
 {
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
@@ -253,6 +277,7 @@ void VSTPluginProcessSamplesFloat64(VSTPlugin *vstPlugin, double **inputs, doubl
       }
    }
 }
+}
 
 /**
  * This is the plugin called by the host to communicate with the plugin, mainly to request information (like the
@@ -267,6 +292,7 @@ void VSTPluginProcessSamplesFloat64(VSTPlugin *vstPlugin, double **inputs, doubl
  * @param opt depend on the opcode
  * @return depend on the opcode (0 is ok when you don't implement an opcode...)
  */
+extern "C" {
 VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 index, VstIntPtr value, void *ptr, float opt)
 {
    // printf("vstgltest: called VSTPluginDispatcher(%d)\n", opCode);
@@ -278,19 +304,41 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
    // see aeffect.h/AEffectOpcodes and aeffectx.h/AEffectXOpcodes for details on all of them
    switch(opCode)
    {
+      default:
+         printf("vstgltest: unhandled VSTPluginDispatcher opcode=%d\n", opCode);
+         break;
+
+      case effGetVstVersion: /*58*/
+         r = 0;
+         break;
+
       // request for the category of the plugin: in this case it is an effect since it is modifying the input (as opposed
       // to generating sound)
       case effGetPlugCategory:
          // return kPlugCategEffect;
          return kPlugCategSynth;
 
+      case effOpen:
+         // called by the host after it has obtained the effect instance (but _not_ during plugin scans)
+         //  (note) any heavy-lifting init code should go here
+         printf("vstgltest: effOpen\n");
+         r = wrapper->openEffect();
+         break;
+
          // called by the host when the plugin was called... time to reclaim memory!
       case effClose:
+         printf("vstgltest: effClose\n");
+         wrapper->closeEffect();
          delete wrapper;
          break;
 
       case effGetEffectName:
          ::strncpy((char*)ptr, "VST GL Test", kVstMaxEffectNameLen);
+         r = 1;
+         break;
+
+      case effGetProductString:
+         ::strncpy((char*)ptr, "VST GL Test ProdStr", kVstMaxProductStrLen);
          r = 1;
          break;
 
@@ -304,19 +352,142 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
       case effGetVendorVersion:
          return PLUGIN_VERSION;
 
+      case effGetNumMidiInputChannels:
+         r = 16;
+         break;
+
+      case effGetNumMidiOutputChannels:
+         r = 0;
+         break;
+
+      case effCanDo:
+         // ptr:
+         // "sendVstEvents"
+         // "sendVstMidiEvent"
+         // "sendVstTimeInfo"
+         // "receiveVstEvents"
+         // "receiveVstMidiEvent"
+         // "receiveVstTimeInfo"
+         // "offline"
+         // "plugAsChannelInsert"
+         // "plugAsSend"
+         // "mixDryWet"
+         // "noRealTime"
+         // "multipass"
+         // "metapass"
+         // "1in1out"
+         // "1in2out"
+         // "2in1out"
+         // "2in2out"
+         // "2in4out"
+         // "4in2out"
+         // "4in4out"
+         // "4in8out"
+         // "8in4out"
+         // "8in8out"
+         // "midiProgramNames"
+         // "conformsToWindowRules"
+         if(!strcmp((char*)ptr, "receiveVstEvents"))
+            r = 1;
+         else if(!strcmp((char*)ptr, "receiveVstMidiEvent"))  // (note) required by Jeskola Buzz
+            r = 1;
+         else if(!strcmp((char*)ptr, "noRealTime"))
+            r = 1;
+         else
+            r = 0;
+         break;
+
+      case effGetInputProperties:
+         {
+            VstPinProperties *pin = (VstPinProperties*)ptr;
+            ::snprintf(pin->label, kVstMaxLabelLen, "Input #%d", index);
+            pin->flags           = kVstPinIsActive | ((0 == (index & 1)) ? kVstPinIsStereo : 0);
+            pin->arrangementType = ((0 == (index & 1)) ? kSpeakerArrStereo : kSpeakerArrMono);
+            ::snprintf(pin->shortLabel, kVstMaxShortLabelLen, "in%d", index);
+            memset((void*)pin->future, 0, 48);
+            r = 1;
+         }
+         break;
+
+      case effGetOutputProperties:
+         {
+            VstPinProperties *pin = (VstPinProperties*)ptr;
+            ::snprintf(pin->label, kVstMaxLabelLen, "Output #%d", index);
+            pin->flags           = kVstPinIsActive | ((0 == (index & 1)) ? kVstPinIsStereo : 0);
+            pin->arrangementType = ((0 == (index & 1)) ? kSpeakerArrStereo : kSpeakerArrMono);
+            ::snprintf(pin->shortLabel, kVstMaxShortLabelLen, "out%d", index);
+            memset((void*)pin->future, 0, 48);
+            r = 1;
+         }
+         break;
+
+      case effSetSampleRate:
+         printf("vstgltest: effSetSampleRate(%f)\n", opt);
+         r = 1;////wrapper->setSampleRate(opt) ? 1 : 0;
+         break;
+
+      case effSetBlockSize:
+         printf("vstgltest: effSetBlockSize(%u)\n", uint32_t(value));
+         r = 1;////wrapper->setBlockSize(uint32_t(value)) ? 1 : 0;
+         break;
+
+      case effMainsChanged:
+         printf("vstgltest: effMainsChanged(%d)\n", value);
+         // value = 0=suspend, 1=resume
+         // wrapper->setEnableProcessingActive((value > 0) ? true : false);
+         r = 1;
+         break;
+
+      case effSetProgram:
+         r = 1;
+         break;
+
+      case effGetProgram:
+         r = 0;
+         break;
+
+      case effGetProgramName:
+         ::snprintf((char*)ptr, kVstMaxProgNameLen, "default");
+         r = 1;
+         break;
+
+      case effSetProgramName:
+         r = 1;
+         break;
+
+      case effGetProgramNameIndexed:
+         ::sprintf((char*)ptr, "default");
+         r = 1;
+         break;
+
       case effGetParamName:
          strncpy(static_cast<char *>(ptr), "myparam", kVstMaxParamStrLen);
          r = 1;
          break;
 
+      case effCanBeAutomated:
+         // fix Propellerhead Reason VST parameter support
+         r = 1;
+         break;
+
+      case effStartProcess:
+         r = 1;
+         break;
+
+      case effStopProcess:
+         r = 1;
+         break;
+
       case effEditIdle:
-         printf("xxx vstgltest: redraw window\n");
+         printf("vstgltest: redraw window\n");
          // (void)::RedrawWindow(wrapper->hwnd, NULL, NULL, RDW_INTERNALPAINT);
          //(void)::UpdateWindow(wrapper->hwnd);
+#ifdef USE_LGLW
          if(lglw_window_is_visible(wrapper->lglw))
          {
             wrapper->redrawWindow();
          }
+#endif // USE_LGLW
          break;
 
       case effEditGetRect:
@@ -358,34 +529,35 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
          r = 1;
          break;
 
-    // ignoring all other opcodes
-    default:
-      // printf("Unknown opCode %d [ignored] \n", opCode);
-      break;
   }
 
   return r;
+}
 }
 
 /**
  * Used for parameter setting (not used by this plugin)
  */
+extern "C" {
 void VSTPluginSetParameter(VSTPlugin *vstPlugin, VstInt32 index, float parameter)
 {
-  printf("called VSTPluginSetParameter(%d, %f)\n", index, parameter);
+  printf("vstgltest: VSTPluginSetParameter(%d, %f)\n", index, parameter);
   // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
   VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
+}
 }
 
 /**
  * Used for parameter (not used by this plugin)
  */
+extern "C" {
 float VSTPluginGetParameter(VSTPlugin *vstPlugin, VstInt32 index)
 {
-  printf("called VSTPluginGetParameter(%d)\n", index);
+  printf("vstgltest: VSTPluginGetParameter(%d)\n", index);
   // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
   VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
   return 0;
+}
 }
 
 /**
@@ -400,38 +572,45 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
                                    VstInt32 numOutputs) :
   _vstHostCallback(vstHostCallback)
 {
-  // Make sure that the memory is properly initialized
-  memset(&_vstPlugin, 0, sizeof(_vstPlugin));
+   // Make sure that the memory is properly initialized
+   memset(&_vstPlugin, 0, sizeof(_vstPlugin));
 
-  // this field must be set with this constant...
-  _vstPlugin.magic = kEffectMagic;
+   // this field must be set with this constant...
+   _vstPlugin.magic = kEffectMagic;
 
-  // storing this object into the VSTPlugin so that it can be retrieved when called back (see callbacks for use)
-  _vstPlugin.object = this;
+   // storing this object into the VSTPlugin so that it can be retrieved when called back (see callbacks for use)
+   _vstPlugin.object = this;
 
-  // specifying that we handle both single and double precision (there are other flags see aeffect.h/VstAEffectFlags)
-  _vstPlugin.flags = effFlagsCanReplacing | effFlagsCanDoubleReplacing | effFlagsHasEditor;
+   // specifying that we handle both single and double precision (there are other flags see aeffect.h/VstAEffectFlags)
+   _vstPlugin.flags = 
+      effFlagsIsSynth | 
+      effFlagsCanReplacing | 
+      effFlagsCanDoubleReplacing | 
+      effFlagsHasEditor
+      ;
 
-  // initializing the plugin with the various values
-  _vstPlugin.uniqueID = vendorUniqueID;
-  _vstPlugin.version = vendorVersion;
-  _vstPlugin.numParams = numParams;
-  _vstPlugin.numPrograms = numPrograms;
-  _vstPlugin.numInputs = numInputs;
-  _vstPlugin.numOutputs = numOutputs;
+   // initializing the plugin with the various values
+   _vstPlugin.uniqueID = vendorUniqueID;
+   _vstPlugin.version = vendorVersion;
+   _vstPlugin.numParams = numParams;
+   _vstPlugin.numPrograms = numPrograms;
+   _vstPlugin.numInputs = numInputs;
+   _vstPlugin.numOutputs = numOutputs;
 
-  // setting the callbacks to the previously defined functions
-  _vstPlugin.dispatcher = VSTPluginDispatcher;
-  _vstPlugin.getParameter = VSTPluginGetParameter;
-  _vstPlugin.setParameter = VSTPluginSetParameter;
-  _vstPlugin.processReplacing = VSTPluginProcessSamplesFloat32;
-  _vstPlugin.processDoubleReplacing = VSTPluginProcessSamplesFloat64;
+   // setting the callbacks to the previously defined functions
+   _vstPlugin.dispatcher = VSTPluginDispatcher;
+   _vstPlugin.getParameter = VSTPluginGetParameter;
+   _vstPlugin.setParameter = VSTPluginSetParameter;
+   _vstPlugin.processReplacing = VSTPluginProcessSamplesFloat32;
+   _vstPlugin.processDoubleReplacing = VSTPluginProcessSamplesFloat64;
 
-  printf("xxx debug_plugin: calling lglw_init()\n");
+#ifdef USE_LGLW
+   printf("vstgltest: calling lglw_init()\n");
 
-  lglw = lglw_init(EDITWIN_W, EDITWIN_H);
+   lglw = lglw_init(EDITWIN_W, EDITWIN_H);
 
-  printf("xxx debug_plugin: lglw_init() returned lglw=%p\n", lglw);
+   printf("vstgltest: lglw_init() returned lglw=%p\n", lglw);
+#endif // USE_LGLW
 }
 
 /**
@@ -440,7 +619,9 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
  * memory leak which may end up slowing down and/or crashing the host
  */
 VSTPluginWrapper::~VSTPluginWrapper() {
+#ifdef USE_LGLW
    lglw_exit(lglw);
+#endif // USE_LGLW
 }
 
 /**
@@ -448,18 +629,45 @@ VSTPluginWrapper::~VSTPluginWrapper() {
  */
 VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback)
 {
-  printf("called VSTPluginMain... \n");
+   printf("vstgltest: entering VSTPluginMain... \n");
+   {
+      FILE *fh = fopen("/tmp/debug_lglw.txt", "w");
+      fprintf(fh, "hello\n");
+      fflush(fh);
+      fclose(fh);
+   }
 
-  // simply create our plugin C++ class
-  VSTPluginWrapper *plugin =
-    new VSTPluginWrapper(vstHostCallback,
-                         CCONST('u', 's', 'a', '§'), // registered with Steinberg (http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm)
-                         PLUGIN_VERSION, // version
-                         2,    // no params
-                         0,    // no programs
-                         2,    // 2 inputs
-                         2);   // 2 outputs
+   {
+      Dl_info dlInfo;
+      char dllnameraw[1024];
+      char *dllnamerawp = dllnameraw;
+      char oldCWD[1024];
+      getcwd(oldCWD, 1024);
+      ::dladdr((void*)VSTPluginMain, &dlInfo);
+      if('/' != dlInfo.dli_fname[0])
+      {
+         // (note) 'dli_fname' can be a relative path (e.g. when loaded from vst2_debug_host)
+         sprintf(dllnameraw, "%s/%s", oldCWD, dlInfo.dli_fname);
+      }
+      else
+      {
+         // Absolute path (e.g. when loaded from Renoise host)
+         dllnamerawp = (char*)dlInfo.dli_fname;
+      }
+      printf("vstgltest: dllname=\"%s\"\n", dllnamerawp);
+   }
 
-  // return the plugin per the contract of the API
-  return plugin->getVSTPlugin();
+   // simply create our plugin C++ class
+   VSTPluginWrapper *plugin =
+      new VSTPluginWrapper(vstHostCallback,
+                           //CCONST('u', 's', 'a', '§'), // registered with Steinberg (http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm)
+                           CCONST('t', 'e', 's', 't'), // unregistered
+                           PLUGIN_VERSION, // version
+                           0,    // no params
+                           1,    // no programs
+                           0,    // 2 inputs
+                           2);   // 2 outputs
+
+   // return the plugin per the contract of the API
+   return plugin->getVSTPlugin();
 }
