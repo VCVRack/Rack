@@ -367,7 +367,7 @@ void loc_eventProc(void *xevent) {
 //       PropModeReplace, (unsigned char*)temp, 2);
 // }
 
-#ifdef BUILD_64
+#ifdef ARCH_X64
 // GPL code pulled from the amsynth example <https://github.com/amsynth/amsynth/blob/4a87798e650c6d71d70274a961c9b8d98fc6da7e/src/amsynth_vst.cpp>
 // Simply swapped out the function names, crashes Ardour in the same was as the others
 void loc_setEventProc (Display *display, Window window) {
@@ -416,7 +416,7 @@ void loc_setEventProc (Display *display, Window window) {
    XChangeProperty(display, window, atom, atom, 32,
       PropModeReplace, (unsigned char*)&data, 1); // 1 instead of 2 will crash Ardour, 2 will not do anything
 }
-#endif // BUILD_64
+#endif // ARCH_X64
 
 
 // ---------------------------------------------------------------------------- lglw_window_open
