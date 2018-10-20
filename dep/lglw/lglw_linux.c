@@ -187,6 +187,7 @@ lglw_t lglw_init(int32_t _w, int32_t _h) {
    // TODO: remove/improve
    logfile = fopen("/tmp/lglw_log.txt", "w");
    XSetErrorHandler(xerror_handler);
+   XInitThreads();  // fix GL crash, see <https://forum.juce.com/t/linux-vst-opengl-crash-because-xinitthreads-not-called/22821>
 
    if(NULL != lglw)
    {
