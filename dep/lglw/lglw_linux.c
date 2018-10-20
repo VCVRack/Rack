@@ -460,9 +460,19 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       swa.border_pixel = 0;
       swa.colormap = lglw->cmap;
       swa.event_mask = EnterWindowMask | LeaveWindowMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask;
-      lglw->win.xwnd = XCreateWindow(lglw->xdsp, DefaultRootWindow(lglw->xdsp),
-         0, 0, _w, _h, 0, CopyFromParent, InputOutput,
-         lglw->vi->visual, CWBorderPixel | CWColormap | CWEventMask, &swa);
+      lglw->win.xwnd = XCreateWindow(lglw->xdsp/*display*/,
+                                     lglw->parent_xwnd/*parent*/,
+                                     0/*x*/,
+                                     0/*y*/,
+                                     _w/*width*/,
+                                     _h/*height*/,
+                                     0/*border_width*/,
+                                     CopyFromParent/*depth*/,
+                                     InputOutput/*class*/,
+                                     lglw->vi->visual,
+                                     CWBorderPixel | CWColormap | CWEventMask/*value_mask*/,
+                                     &swa/*attributes*/
+                                     );
 
       lglw_log("lglw:lglw_window_open: 6\n");
       XSetStandardProperties(lglw->xdsp, lglw->win.xwnd, "LGLW", "LGLW", None, NULL, 0, NULL);
@@ -470,11 +480,13 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       // Some hosts only check and store the callback when the Window is reparented
       // Since creating the Window with a Parent may or may not do that, but the callback is not set,
       // ... it's created as a root window, the callback is set, and then it's reparented
+#if 0
       if (0 != _parentHWNDOrNull)
       {
          lglw_log("lglw:lglw_window_open: 7\n");
          XReparentWindow(lglw->xdsp, lglw->win.xwnd, lglw->parent_xwnd, 0, 0);
       }
+#endif
       lglw->win.b_owner = LGLW_TRUE;
 #else
       lglw->win.xwnd = (Window)_parentHWNDOrNull;
