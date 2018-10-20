@@ -7,15 +7,27 @@ ALL_OBJ= \
 	plugin.o \
    $(VSVR_BASE_DIR)/dep/lglw/lglw_linux.o
 
-.cpp.o:
-	$(CPP) $(CPPFLAGS) $(OPTFLAGS_PLUGIN) -I"$(VSVR_BASE_DIR)/dep/yac/" -I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/" -shared -fPIC -c "$<" -o"$@"
+EXTRAFLAGS+=-I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/"
+EXTRAFLAGS+= -march=haswell
+EXTRAFLAGS+= `pkg-config gtk+-2.0 --cflags`
 
-.c.o:
-	$(CC) $(CFLAGS) $(OPTFLAGS_PLUGIN) -I"$(VSVR_BASE_DIR)/dep/yac/" -I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/" -shared -fPIC -c "$<" -o"$@"
+EXTRALIBS+= -march=haswell
+EXTRALIBS+= `pkg-config gtk+-2.0 --libs`
+EXTRALIBS+= -lGL -ldl
 
-.PHONY: bin
-bin: $(ALL_OBJ)
-	$(CPP) -shared -o $(TARGET) -Wl,-soname,$(TARGET) -mtls-dialect=gnu2 $(ALL_OBJ) -ldl -lGL -L/usr/lib -lm -lpthread
+#.cpp.o:
+##-fPIC
+#	$(CPP) $(CPPFLAGS) $(OPTFLAGS_PLUGIN) -I"$(VSVR_BASE_DIR)/dep/yac/" -I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/" -shared  -c "$<" -o"$@"
+
+#.c.o:
+##-fPIC
+#	$(CC) $(CFLAGS) $(OPTFLAGS_PLUGIN) -I"$(VSVR_BASE_DIR)/dep/yac/" -I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/" -shared  -c "$<" -o"$@"
+
+#.PHONY: bin
+#bin: $(ALL_OBJ)
+#	$(CPP) -shared -o $(TARGET) -Wl,-soname,$(TARGET)  $(ALL_OBJ) -ldl -lGL -L/usr/lib -lm -lpthread
+#-mtls-dialect=gnu2
+#	$(STRIP) $(TARGET)
 
 .PHONY: clean
 clean:
@@ -33,9 +45,11 @@ ifeq ($(USER),cameron)
 	cp $(TARGET) /home/cameron/.local/share/VST/
 endif
 ifeq ($(USER),bsp)
-   # copy to Qtractor VST search path
-	cp $(TARGET) /usr/local/lib/vst/
+  # copy to Qtractor VST search path
+	#cp $(TARGET) /usr/local/lib/vst/
+	cp $(TARGET) ../../vst2_bin/
 endif
 
 
 # (todo) include ../../dep/yac/sharedlib_linux.mk
+include ../../dep/yac/sharedlib_linux.mk

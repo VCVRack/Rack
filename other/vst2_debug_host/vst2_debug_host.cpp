@@ -2,8 +2,11 @@
 //
 
 #define DLL_PATH "../../vst2_bin/veeseevstrack_effect.dll"
+
 // #define SO_PATH  "../../vst2_bin/veeseevstrack_effect.so"
-#define SO_PATH  "../vst2_lglw_debug_plugin/debug_lglw.so"
+// #define SO_PATH  "../vst2_lglw_debug_plugin/debug_lglw.so"
+// #define SO_PATH  "/usr/local/lib/vst/debug_lglw.so"
+#define SO_PATH  "../../vst2_bin/debug_lglw.so"
 
 
 #include <yac.h>
