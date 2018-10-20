@@ -31,8 +31,9 @@ ifeq ($(USER),cameron)
 endif
 ifeq ($(USER),bsp)
    # copy to Qtractor VST search path
-   # cp $(TARGET) /usr/local/lib/vst/
-	cp $(TARGET) ../../vst2_bin/
+   cp $(TARGET) /usr/local/lib/vst/
 endif
+   # always copy to vst2_bin/
+	cp $(TARGET) ../../vst2_bin/
 
 include ../../dep/yac/sharedlib_linux.mk
