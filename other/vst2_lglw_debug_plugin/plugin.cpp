@@ -164,6 +164,7 @@ public:
    }
 
    void redrawWindow(void) {
+#if 0
       // Save host GL context
       lglw_glcontext_push(lglw);
 
@@ -179,6 +180,7 @@ public:
 
       // Restore host GL context
       lglw_glcontext_pop(lglw);
+#endif
    }
 
 private:
@@ -279,7 +281,8 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
       // request for the category of the plugin: in this case it is an effect since it is modifying the input (as opposed
       // to generating sound)
       case effGetPlugCategory:
-         return kPlugCategEffect;
+         // return kPlugCategEffect;
+         return kPlugCategSynth;
 
          // called by the host when the plugin was called... time to reclaim memory!
       case effClose:
@@ -424,7 +427,11 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
   _vstPlugin.processReplacing = VSTPluginProcessSamplesFloat32;
   _vstPlugin.processDoubleReplacing = VSTPluginProcessSamplesFloat64;
 
+  printf("xxx debug_plugin: calling lglw_init()\n");
+
   lglw = lglw_init(EDITWIN_W, EDITWIN_H);
+
+  printf("xxx debug_plugin: lglw_init() returned lglw=%p\n", lglw);
 }
 
 /**
