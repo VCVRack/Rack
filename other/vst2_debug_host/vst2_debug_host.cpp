@@ -30,9 +30,8 @@ typedef AEffect* (*PluginEntryProc) (audioMasterCallback audioMaster);
 
 #ifndef YAC_WIN32
 // https://github.com/Ardour/ardour/blob/master/gtk2_ardour/linux_vst_gui_support.cc
-long getXWindowProperty(Display* display, Window window, Atom atom)
+void *getXWindowProperty(Display* display, Window window, Atom atom)
 {
-   long result = 0;
    int userSize;
    unsigned long bytes;
    unsigned long userCount;
@@ -47,27 +46,53 @@ long getXWindowProperty(Display* display, Window window, Atom atom)
 
    // XErrorHandler olderrorhandler = XSetErrorHandler(TempErrorHandler);
 
-   XGetWindowProperty(display,
-                  window,
-                  atom,
-                  0,
-                  2,
-                  false,
-                  AnyPropertyType,
-                  &userType,
-                  &userSize,
-                  &userCount,
-                  &bytes,
-                  &data);
+   printf("xxx getXWindowProperty: window=%lu\n", window);
 
-   if(userCount == 1)
-      result = *(long*)data;
+   XGetWindowProperty(display,
+                      window,
+                      atom,
+                      0/*offset*/,
+                      2/*length*/,
+                      false/*delete*/,
+                      AnyPropertyType,
+                      &userType/*actual_type_return*/,
+                      &userSize/*actual_format_return*/,
+                      &userCount/*nitems_return*/,
+                      &bytes/*bytes_after_return / partial reads*/,
+                      &data);
+
+   union {
+      long l[2];
+      void *any;
+   } uptr;
+   uptr.any = 0;
+
+   printf("xxx getXWindowProperty: userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
+
+   if(NULL != data)
+   {
+      if(userCount == 1)
+      {
+         // 32-bit
+         uptr.l[0] = *(long*)data;
+         uptr.l[1] = 0;
+      }
+      else if(2 == userCount)
+      {
+         // 64-bit
+         uptr.l[0] = ((long*)data)[0];
+         uptr.l[1] = ((long*)data)[1];
+      }
+
+      XFree(data);
+   }
 
    // XSetErrorHandler(olderrorhandler);
 
    /*Hopefully this will return zero if the property is not set*/
+   printf("xxx getXWindowProperty: return callback addr=%p\n", uptr.any);
 
-   return result;
+   return uptr.any;
 }
 #endif
 
@@ -161,7 +186,7 @@ void open_and_close(void) {
             sleep(2);
 
 #ifndef YAC_WIN32
-            long result = getXWindowProperty(d, w, XInternAtom(d, "_XEventProc", false));
+            void *result = getXWindowProperty(d, w, XInternAtom(d, "_XEventProc", false));
             if(result == 0)
             {
                printf("xxx no XEventProc found\n");
