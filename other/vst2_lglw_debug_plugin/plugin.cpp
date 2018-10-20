@@ -183,7 +183,7 @@ public:
    }
 
    void redrawWindow(void) {
-#if 0
+#if 1
 #ifdef USE_LGLW
       // Save host GL context
       lglw_glcontext_push(lglw);
