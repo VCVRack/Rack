@@ -24,7 +24,7 @@
  * ---- info   : This is part of the "lglw" package.
  * ----
  * ---- created: 04Aug2018
- * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018, 10Oct2018
+ * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018, 10Oct2018, 16Oct2018
  * ----
  * ----
  */
@@ -34,6 +34,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
+
+#include <GL/gl.h>
+#include <GL/glx.h>
 
 #define Dprintf if(0);else printf
 // #define Dprintf if(1);else printf
@@ -57,18 +64,29 @@
 
 // ---------------------------------------------------------------------------- structs and typedefs
 typedef struct lglw_int_s {
-   void *user_data;  // arbitrary user data
+   void        *user_data;    // arbitrary user data
+   Display     *xdsp;
+   XVisualInfo *vi;
+   Colormap     cmap;
+   Window       parent_xwnd;  // created by host
 
    struct {
       lglw_vec2i_t size;
+      Window       xwnd;
    } hidden;
 
    struct {
       lglw_vec2i_t size;
+      Window       xwnd;
+      lglw_bool_t  mapped;
       int32_t      swap_interval;
    } win;
 
+   GLXContext   ctx;
+
    struct {
+      GLXContext   ctx;
+      GLXDrawable  drw;
    } prev;
 
    struct {
@@ -142,26 +160,55 @@ static void loc_enable_dropfiles (lglw_int_t *lglw, lglw_bool_t _bEnable);
 static lglw_int_t *khook_lglw = NULL;  // currently key-hooked lglw instance (one at a time)
 
 
+// TODO: remove and/or improve debug logging for a debug build
+// ---------------------------------------------------------------------------- lglw_log
+static FILE *logfile;
+
+void lglw_log(const char *logData, ...) {
+   fprintf(logfile, logData);
+   fflush(logfile);
+}
+
+
+// TODO: remove, or maybe not in some specific use cases
+// ---------------------------------------------------------------------------- xerror_log
+static int xerror_handler(Display *display, XErrorEvent *error) {
+   char error_text[1024];
+   XGetErrorText(display, error->error_code, error_text, 1024);
+   lglw_log("XERROR (%d): %s, %d, %d\n", error->error_code, error_text, error->request_code, error->minor_code);
+   return 0;
+}
+
+
 // ---------------------------------------------------------------------------- lglw_init
 lglw_t lglw_init(int32_t _w, int32_t _h) {
    lglw_int_t *lglw = malloc(sizeof(lglw_int_t));
+
+   // TODO: remove/improve
+   logfile = fopen("/home/cameron/src/VeeSeeVSTRack/other/log.txt", "w");
+   XSetErrorHandler(xerror_handler);
 
    if(NULL != lglw)
    {
       memset(lglw, 0, sizeof(lglw_int_t));
 
+      lglw_log("lglw:lglw_init: 1\n");
       if(_w <= 16)
          _w = LGLW_DEFAULT_HIDDEN_W;
 
       if(_h <= 16)
          _h = LGLW_DEFAULT_HIDDEN_H;
 
+      lglw_log("lglw:lglw_init: 2\n");
       if(!loc_create_hidden_window(lglw, _w, _h))
       {
          free(lglw);
          lglw = NULL;
       }
+      lglw_log("lglw:lglw_init: 3\n");
    }
+
+   lglw_log("lglw:lglw_init: EXIT\n");
 
    return lglw;
 }
@@ -173,8 +220,13 @@ void lglw_exit(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
+      lglw_log("lglw:lglw_exit: 1\n");
+
       loc_destroy_hidden_window(lglw);
 
+      lglw_log("lglw:lglw_exit: 2\n");
+
+      fclose(logfile);
       free(lglw);
    }
 }
@@ -186,6 +238,7 @@ void lglw_userdata_set(lglw_t _lglw, void *_userData) {
 
    if(NULL != lglw)
    {
+      lglw_log("lglw:lglw_userdata_set: 1\n");
       lglw->user_data = _userData;
    }
 }
@@ -196,6 +249,7 @@ void *lglw_userdata_get(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
+      lglw_log("lglw:lglw_userdata_get: 1\n");
       return lglw->user_data;
    }
 
@@ -206,19 +260,166 @@ void *lglw_userdata_get(lglw_t _lglw) {
 // ---------------------------------------------------------------------------- loc_create_hidden_window
 static lglw_bool_t loc_create_hidden_window(lglw_int_t *lglw, int32_t _w, int32_t _h) {
 
-   // (todo) implement me
+   // TODO: compare to 'WindowClass' from Windows implementation
 
+   lglw_log("lglw:loc_create_hidden_window: 1\n");
+   XSetWindowAttributes swa;
+   int attrib[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 24, None };
+   int screen;
+
+   lglw_log("lglw:loc_create_hidden_window: 2\n");
+   lglw->xdsp = XOpenDisplay(NULL);
+   screen = DefaultScreen(lglw->xdsp);
+
+   lglw_log("lglw:loc_create_hidden_window: 3\n");
+   lglw->vi = glXChooseVisual(lglw->xdsp, screen, attrib);
+
+   lglw_log("lglw:loc_create_hidden_window: 4\n");
+   if(NULL == lglw->vi)
+   {
+      lglw_log("[---] lglw: failed to find GLX Visual for hidden window\n");
+      return LGLW_FALSE;
+   }
+
+   lglw_log("lglw:loc_create_hidden_window: 5\n");
+   lglw->ctx = glXCreateContext(lglw->xdsp, lglw->vi, None, True);
+
+   lglw_log("lglw:loc_create_hidden_window: 6\n");
+   if(NULL == lglw->ctx)
+   {
+      lglw_log("[---] lglw: failed to create GLX Context for hidden window\n");
+      return LGLW_FALSE;
+   }
+
+   lglw_log("lglw:loc_create_hidden_window: 7\n");
+   lglw->cmap = XCreateColormap(lglw->xdsp, RootWindow(lglw->xdsp, lglw->vi->screen),
+                                lglw->vi->visual, AllocNone);
+
+   lglw_log("lglw:loc_create_hidden_window: 8\n");
+   swa.border_pixel = 0;
+   swa.colormap = lglw->cmap;
+   lglw->hidden.xwnd = XCreateWindow(lglw->xdsp, DefaultRootWindow(lglw->xdsp),
+      0, 0, LGLW_DEFAULT_HIDDEN_W, LGLW_DEFAULT_HIDDEN_H, 0, CopyFromParent, InputOutput,
+      lglw->vi->visual, CWBorderPixel | CWColormap, &swa);
+
+   lglw_log("lglw:loc_create_hidden_window: 9\n");
+   XSetStandardProperties(lglw->xdsp, lglw->hidden.xwnd, "LGLW_hidden", "LGLW_hidden", None, NULL, 0, NULL);
+   XSync(lglw->xdsp, False);
+
+   lglw_log("lglw:loc_create_hidden_window: EXIT\n");
    lglw->hidden.size.x = _w;
    lglw->hidden.size.y = _h;
 
-   return LGLW_FALSE;
+   return LGLW_TRUE;
 }
 
 
 // ---------------------------------------------------------------------------- loc_destroy_hidden_window
 static void loc_destroy_hidden_window(lglw_int_t *lglw) {
-   // (todo) implement me
+   lglw_log("lglw:loc_destroy_hidden_window: 1\n");
+   if(NULL != lglw->xdsp && NULL != lglw->ctx)
+   {
+      glXMakeCurrent(lglw->xdsp, None, NULL);
+      glXDestroyContext(lglw->xdsp, lglw->ctx);
+   }
+   lglw_log("lglw:loc_destroy_hidden_window: 2\n");
+   if(NULL != lglw->xdsp && 0 != lglw->hidden.xwnd) XDestroyWindow(lglw->xdsp, lglw->hidden.xwnd);
+   lglw_log("lglw:loc_destroy_hidden_window: 3\n");
+   if(NULL != lglw->xdsp && 0 != lglw->cmap) XFreeColormap(lglw->xdsp, lglw->cmap);
+   lglw_log("lglw:loc_destroy_hidden_window: 4\n");
+   if(NULL != lglw->vi) XFree(lglw->vi);
+
+   lglw_log("lglw:loc_destroy_hidden_window: 5\n");
+   XSync(lglw->xdsp, False);
+   if(NULL != lglw->xdsp) XCloseDisplay(lglw->xdsp);
 }
+
+
+// ---------------------------------------------------------------------------- loc_setEventProc
+// https://www.kvraudio.com/forum/viewtopic.php?t=387924
+// https://github.com/Ardour/ardour/blob/master/gtk2_ardour/linux_vst_gui_support.cc
+// https://discourse.ardour.org/t/overtonedsp-plugins/90115/22
+// https://github.com/amsynth/amsynth/blob/4a87798e650c6d71d70274a961c9b8d98fc6da7e/src/amsynth_vst.cpp
+// https://github.com/rsenn/eXT2/blob/7f00a09561ded8175ffed2f4912dad74e466a1c7/vstplugins/vstgui/vstgui.cpp
+// https://github.com/COx2/DistortionFilter/blob/c6a34fb56b503a6e95bf0975e00f438bbf4ff52a/juce/modules/juce_audio_processors/format_types/juce_VSTPluginFormat.cpp
+
+// Very simple function to test _XEventProc is properly called
+void loc_eventProc(void *xevent) {
+   // lglw_log("XEventProc");
+   printf("XEventProc\n");
+}
+
+// Pulled from the Renoise 64-bit callback example
+// Unsure what data was supposed to be, but swapping it to a function name did not work
+// This does nothing, no event proc found
+// TODO: 32-bit support
+// void loc_setEventProc (Display *display, Window window) {
+//    size_t data = (size_t)loc_eventProc;
+//    long temp[2];
+
+//    // Split the 64 bit pointer into a little-endian long array
+//    temp[0] = (long)(data & 0xffffffffUL);
+//    temp[1] = (long)(data >> 32L);
+
+//    Atom atom = XInternAtom(display, "_XEventProc", False);
+//    XChangeProperty(display, window, atom, atom, 32,
+//       PropModeReplace, (unsigned char*)temp, 2);
+// }
+
+// Pulled from the eXT2 example
+// TODO: 32-bit support
+void loc_setEventProc (Display *display, Window window) {
+   void* data = (void*)&loc_eventProc; // swapped the function name here
+
+   Atom atom = XInternAtom(display, "_XEventProc", False);
+   XChangeProperty(display, window, atom, atom, 32,
+      PropModeReplace, (unsigned char*)&data, 1); // 1 instead of 2 will crash Ardour, 2 will not do anything
+}
+
+// Pulled from the amsynth example
+// Simply swapped out the function names, crashes Ardour in the same was as the others
+// void loc_setEventProc (Display *display, Window window) {
+// #ifdef BUILD_64
+//    //
+//    // JUCE calls XGetWindowProperty with long_length = 1 which means it only fetches the lower 32 bits of the address.
+//    // Therefore we need to ensure we return an address in the lower 32-bits of address space.
+//    //
+
+//    // based on mach_override
+//    static const unsigned char kJumpInstructions[] = {
+//          0xFF, 0x25, 0x00, 0x00, 0x00, 0x00,
+//          0x00, 0x00, 0x00, 0x00,
+//          0x00, 0x00, 0x00, 0x00
+//    };
+//    static const int kJumpAddress = 6;
+
+//    static char *ptr;
+//    if (!ptr) {
+//       ptr = (char *)mmap(0,
+//                      PAGE_SIZE,
+//                      PROT_READ | PROT_WRITE | PROT_EXEC,
+//                      MAP_ANONYMOUS | MAP_PRIVATE | MAP_32BIT,
+//                      0, 0);
+//       if (ptr == MAP_FAILED) {
+//          perror("mmap");
+//          ptr = 0;
+//          return;
+//       } else {
+//          memcpy(ptr, kJumpInstructions, sizeof(kJumpInstructions));
+//          *((uint64_t *)(ptr + kJumpAddress)) = (uint64_t)(&loc_eventProc);
+//          msync(ptr, sizeof(kJumpInstructions), MS_INVALIDATE);
+//       }
+//    }
+
+//    long temp[2] = {(long)ptr, 0};
+//    Atom atom = XInternAtom(display, "_XEventProc", False);
+//    XChangeProperty(display, window, atom, atom, 32, PropModeReplace, (unsigned char *)temp, 2);
+// #else
+//    long temp[1] = {(long)(void *)(&loc_eventProc)};
+//    Atom atom = XInternAtom(display, "_XEventProc", False);
+//    XChangeProperty(display, window, atom, atom, 32, PropModeReplace, (unsigned char *)temp, 1);
+// #endif
+// }
 
 
 // ---------------------------------------------------------------------------- lglw_window_open
@@ -226,20 +427,65 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
    lglw_bool_t r = LGLW_FALSE;
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      lglw_log("lglw:lglw_window_open: 1, %p, %i\n", (Window)_parentHWNDOrNull, (Window)_parentHWNDOrNull);
+      lglw->parent_xwnd = (0 == _parentHWNDOrNull) ? DefaultRootWindow(lglw->xdsp) : (Window)_parentHWNDOrNull;
+
+      lglw_log("lglw:lglw_window_open: 2\n");
       if(_w <= 16)
          _w = lglw->hidden.size.x;
 
+      lglw_log("lglw:lglw_window_open: 3\n");
       if(_h <= 16)
          _h = lglw->hidden.size.y;
 
+      // TODO: compare to 'WindowClass' from Windows implementation
+
+      lglw_log("lglw:lglw_window_open: 4\n");
+      XSetWindowAttributes swa;
+      XEvent event;
+      XSync(lglw->xdsp, False);
+
+      lglw_log("lglw:lglw_window_open: 5\n");
+      swa.border_pixel = 0;
+      swa.colormap = lglw->cmap;
+      swa.event_mask = EnterWindowMask | LeaveWindowMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask;
+      lglw->win.xwnd = XCreateWindow(lglw->xdsp, DefaultRootWindow(lglw->xdsp),
+         0, 0, _w, _h, 0, CopyFromParent, InputOutput,
+         lglw->vi->visual, CWBorderPixel | CWColormap | CWEventMask, &swa);
+
+      lglw_log("lglw:lglw_window_open: 6\n");
+      XSetStandardProperties(lglw->xdsp, lglw->win.xwnd, "LGLW", "LGLW", None, NULL, 0, NULL);
+
+      // Setup the event proc now, on the parent window as well just for the debug host
+      // It was simpler to do this than check in the debug host for the reparent event
+      lglw_log("lglw:lglw_window_open: 7\n");
+      loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
+      loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
+
+      // Some hosts only check and store the callback when the Window is reparented
+      // Since creating the Window with a Parent may or may not do that, but the callback is not set,
+      // ... it's created as a root window, the callback is set, and then it's reparented
+      if (0 != _parentHWNDOrNull)
+      {
+         lglw_log("lglw:lglw_window_open: 8\n");
+         XReparentWindow(lglw->xdsp, lglw->win.xwnd, lglw->parent_xwnd, 0, 0);
+      }
+
+      lglw_log("lglw:lglw_window_open: 9\n");
+      XMapRaised(lglw->xdsp, lglw->win.xwnd);
+      XSync(lglw->xdsp, False);
+      lglw->win.mapped = LGLW_TRUE;
+
+      lglw_log("lglw:lglw_window_open: 10\n");
       lglw->win.size.x = _w;
       lglw->win.size.y = _h;
 
+      lglw_log("lglw:lglw_window_open: 11\n");
       loc_enable_dropfiles(lglw, (NULL != lglw->dropfiles.cbk));
+
+      lglw_log("lglw:lglw_window_open: EXIT\n");
    }
    return r;
 }
@@ -250,10 +496,56 @@ lglw_bool_t lglw_window_resize (lglw_t _lglw, int32_t _w, int32_t _h) {
    lglw_bool_t r = LGLW_FALSE;
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      if(0 != lglw->win.xwnd)
+      {
+         lglw_log("lglw:lglw_window_resize: 1\n");
+         r = LGLW_TRUE;
+
+         lglw_log("lglw:lglw_window_resize: 2\n");
+         XResizeWindow(lglw->xdsp, lglw->win.xwnd, _w, _h);
+         XRaiseWindow(lglw->xdsp, lglw->win.xwnd);
+
+         lglw_log("lglw:lglw_window_resize: 3\n");
+         int deltaW = _w - lglw->win.size.x;
+         int deltaH = _h - lglw->win.size.y;
+
+         lglw_log("lglw:lglw_window_resize: 4\n");
+         lglw->win.size.x = _w;
+         lglw->win.size.y = _h;
+
+         lglw_log("lglw:lglw_window_resize: 5\n");
+         Window root, parent, *children = NULL;
+         unsigned int num_children;
+
+         lglw_log("lglw:lglw_window_resize: 6\n");
+         if(!XQueryTree(lglw->xdsp, lglw->win.xwnd, &root, &parent, &children, &num_children))
+            return r;
+
+         lglw_log("lglw:lglw_window_resize: 7\n");
+         if(children)
+            XFree((char *)children);
+
+         lglw_log("lglw:lglw_window_resize: 8\n");
+         // Resize parent window (if any)
+         if(0 != parent)
+         {
+            lglw_log("lglw:lglw_window_resize: 8.1\n");
+            int x, y;
+            unsigned int width, height;
+            unsigned int border_width;
+            unsigned int depth;
+
+            lglw_log("lglw:lglw_window_resize: 8.2\n");
+            if(!XGetGeometry(lglw->xdsp, lglw->win.xwnd, &root, &x, &y, &width, &height, &border_width, &depth))
+               return r;
+
+            lglw_log("lglw:lglw_window_resize: 8.3\n");
+            XResizeWindow(lglw->xdsp, parent, width + deltaW, height + deltaH);
+         }
+         lglw_log("lglw:lglw_window_resize: EXIT\n");
+      }
    }
 
    return r;
@@ -264,17 +556,27 @@ lglw_bool_t lglw_window_resize (lglw_t _lglw, int32_t _w, int32_t _h) {
 void lglw_window_close (lglw_t _lglw) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
-      // if(NULL != lglw->win.hwnd)
+      if(0 != lglw->win.xwnd)
       {
+         lglw_log("lglw:lglw_window_close: 1\n");
          lglw_timer_stop(_lglw);
 
+         lglw_log("lglw:lglw_window_close: 2\n");
          loc_key_unhook(lglw);
+
+         lglw_log("lglw:lglw_window_close: 3\n");
+         glXMakeCurrent(lglw->xdsp, None, NULL);
+
+         lglw_log("lglw:lglw_window_close: 4\n");
+         XDestroyWindow(lglw->xdsp, lglw->win.xwnd);
+         XSync(lglw->xdsp, False);
+         lglw->win.xwnd = 0;
+         lglw->win.mapped = LGLW_FALSE;
       }
    }
+   lglw_log("lglw:lglw_window_close: EXIT\n");
 }
 
 
@@ -282,11 +584,14 @@ void lglw_window_close (lglw_t _lglw) {
 void lglw_window_show(lglw_t _lglw) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      lglw_log("lglw:lglw_window_show: 1\n");
+      XMapRaised(lglw->xdsp, lglw->win.xwnd);
+
+      lglw->win.mapped = LGLW_TRUE;
    }
+   lglw_log("lglw:lglw_window_show: EXIT\n");
 }
 
 
@@ -294,11 +599,14 @@ void lglw_window_show(lglw_t _lglw) {
 void lglw_window_hide(lglw_t _lglw) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      lglw_log("lglw:lglw_window_hide: 1\n");
+      XUnmapWindow(lglw->xdsp, lglw->win.xwnd);
+
+      lglw->win.mapped = LGLW_FALSE;
    }
+   lglw_log("lglw:lglw_window_hide: EXIT\n");
 }
 
 
@@ -307,12 +615,14 @@ lglw_bool_t lglw_window_is_visible(lglw_t _lglw) {
    lglw_bool_t r = LGLW_FALSE;
    LGLW(_lglw);
 
-   // (todo) implement me
-
-   if(NULL != lglw)
+   // lglw_log("lglw:lglw_window_is_visible: 1\n");
+   if(NULL != lglw && 0 != lglw->win.xwnd)
    {
+      // lglw_log("lglw:lglw_window_is_visible: 2\n");
+      r = lglw->win.mapped;
    }
 
+   // lglw_log("lglw:lglw_window_is_visible: EXIT\n");
    return r;
 }
 
@@ -321,11 +631,19 @@ lglw_bool_t lglw_window_is_visible(lglw_t _lglw) {
 void lglw_window_size_get(lglw_t _lglw, int32_t *_retX, int32_t *_retY) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
+   lglw_log("lglw:lglw_window_size_get: 1\n");
    if(NULL != lglw)
    {
+      if(0 != lglw->win.xwnd)
+      {
+         if(NULL != _retX)
+            *_retX = lglw->win.size.x;
+
+         if(NULL != _retY)
+            *_retY = lglw->win.size.y;
+      }
    }
+   lglw_log("lglw:lglw_window_size_get: EXIT\n");
 }
 
 
@@ -337,6 +655,13 @@ void lglw_redraw(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
+      if(0 != lglw->win.xwnd)
+      {
+         // TODO Event Loop
+         lglw_log("lglw:lglw_redraw: 1\n");
+         XClearArea(lglw->xdsp, lglw->win.xwnd, 0, 0, 1, 1, True); // clear tiny area for exposing
+         XFlush(lglw->xdsp);
+      }
    }
 }
 
@@ -355,11 +680,18 @@ void lglw_redraw_callback_set(lglw_t _lglw, lglw_redraw_fxn_t _cbk) {
 // ---------------------------------------------------------------------------- lglw_glcontext_push
 void lglw_glcontext_push(lglw_t _lglw) {
    LGLW(_lglw);
-   
-   // (todo) implement me
 
    if(NULL != lglw)
    {
+      lglw->prev.drw = glXGetCurrentDrawable();
+      lglw->prev.ctx = glXGetCurrentContext();
+
+      // lglw_log("lglw:lglw_glcontext_push: win.xwnd=%p hidden.xwnd=%p ctx=%p\n",
+      //    lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx);
+      if(!glXMakeCurrent(lglw->xdsp, (0 == lglw->win.xwnd) ? lglw->hidden.xwnd : lglw->win.xwnd, lglw->ctx))
+      {
+         lglw_log("[---] lglw_glcontext_push: glXMakeCurrent() failed. win.xwnd=%p hidden.xwnd=%p ctx=%p glGetError()=%d\n", lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx, glGetError());
+      }
    }
 }
 
@@ -367,11 +699,15 @@ void lglw_glcontext_push(lglw_t _lglw) {
 // ---------------------------------------------------------------------------- lglw_glcontext_pop
 void lglw_glcontext_pop(lglw_t _lglw) {
    LGLW(_lglw);
-   
-   // (todo) implement me
 
    if(NULL != lglw)
    {
+      // lglw_log("lglw:lglw_glcontext_pop: prev.drw=%p prev.ctx=%p\n",
+      //    lglw->prev.drw, lglw->prev.ctx);
+      if(!glXMakeCurrent(lglw->xdsp, lglw->prev.drw, lglw->prev.ctx))
+      {
+         lglw_log("[---] lglw_glcontext_pop: glXMakeCurrent() failed. prev.drw=%p ctx=%p glGetError()=%d\n", lglw->prev.drw, lglw->prev.ctx, glGetError());
+      }
    }
 }
 
@@ -380,22 +716,33 @@ void lglw_glcontext_pop(lglw_t _lglw) {
 void lglw_swap_buffers(lglw_t _lglw) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      if(0 != lglw->win.xwnd)
+      {
+         // lglw_log("lglw:lglw_swap_buffers: 1\n");
+         glXSwapBuffers(lglw->xdsp, lglw->win.xwnd);
+      }
    }
 }
 
 
 // ---------------------------------------------------------------------------- lglw_swap_interval_set
+typedef void (APIENTRY *PFNWGLEXTSWAPINTERVALPROC) (int);
 void lglw_swap_interval_set(lglw_t _lglw, int32_t _ival) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      lglw_log("lglw:lglw_swap_interval_set: 1\n");
+      PFNWGLEXTSWAPINTERVALPROC glXSwapIntervalEXT;
+      glXSwapIntervalEXT = (PFNWGLEXTSWAPINTERVALPROC) glXGetProcAddress("glXSwapIntervalEXT");
+      if(NULL != glXSwapIntervalEXT)
+      {
+         lglw_log("lglw:lglw_swap_interval_set: 2\n");
+         glXSwapIntervalEXT(_ival);
+         lglw->win.swap_interval = _ival;
+      }
    }
 }
 
@@ -444,7 +791,7 @@ static void loc_handle_mouseleave(lglw_int_t *lglw) {
       lglw->focus.cbk(lglw, lglw->focus.state, LGLW_FOCUS_MOUSE);
    }
 
-   Dprintf("xxx lglw:loc_handle_mouseleave: LEAVE\n");
+   lglw_log("xxx lglw:loc_handle_mouseleave: LEAVE\n");
 }
 
 
@@ -460,7 +807,7 @@ static void loc_handle_mouseenter(lglw_int_t *lglw) {
       lglw->focus.cbk(lglw, lglw->focus.state, LGLW_FOCUS_MOUSE);
    }
 
-   Dprintf("xxx lglw:loc_handle_mouseenter: LEAVE\n");
+   lglw_log("xxx lglw:loc_handle_mouseenter: LEAVE\n");
 }
 
 

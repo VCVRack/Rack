@@ -6,7 +6,7 @@ include ../../dep/yac/install_linux.mk
 
 .PHONY: bin
 bin: vst2_debug_host.o
-	$(CPP) -o vst2_debug_host vst2_debug_host.o -ldl
+	$(CPP) -o vst2_debug_host vst2_debug_host.o -ldl -L/usr/lib -lpthread -lX11
 
 .PHONY: clean
 clean:

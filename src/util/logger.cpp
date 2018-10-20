@@ -56,7 +56,11 @@ static void loggerLogVa(LoggerLevel level, const char *file, int line, const cha
 	if (global->logger.logFile == LOG_STDFILE)
 		fprintf(global->logger.logFile, "\x1B[0m");
 	vfprintf(global->logger.logFile, format, args);
-   vprintf(format, args); // xxx
+
+	// TODO
+	// At least for me, this will cause a complete crash from __strlen_avx512
+   // vprintf(format, args); // xxx
+
    printf("\n"); // xxx
 	fprintf(global->logger.logFile, "\n");
 	fflush(global->logger.logFile);
