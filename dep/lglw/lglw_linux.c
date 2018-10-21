@@ -461,7 +461,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       swa.colormap = lglw->cmap;
       swa.event_mask = EnterWindowMask | LeaveWindowMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask;
       lglw->win.xwnd = XCreateWindow(lglw->xdsp/*display*/,
-                                     lglw->parent_xwnd/*parent*/,
+                                     DefaultRootWindow(lglw->xdsp)/*parent. see Cameron's comment below.*/,
                                      0/*x*/,
                                      0/*y*/,
                                      _w/*width*/,
@@ -480,7 +480,8 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       // Some hosts only check and store the callback when the Window is reparented
       // Since creating the Window with a Parent may or may not do that, but the callback is not set,
       // ... it's created as a root window, the callback is set, and then it's reparented
-#if 0
+#if 1
+      // (note) [cameronleger] In Ardour's code-base, the only time it looks for the _XEventProc is during a ReparentNotify event
       if (0 != _parentHWNDOrNull)
       {
          lglw_log("lglw:lglw_window_open: 7\n");
@@ -502,6 +503,19 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       lglw_log("lglw:lglw_window_open: 9\n");
       if(lglw->win.b_owner)
          XMapRaised(lglw->xdsp, lglw->win.xwnd);
+
+#if 0
+      XSelectInput(lglw->xdsp, lglw->win.xwnd,
+                   ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | FocusChangeMask
+                   );
+      XGrabKeyboard(lglw->xdsp, lglw->win.xwnd,
+                    False/*owner_events*/,
+                    GrabModeAsync/*pointer_mode*/,
+                    GrabModeAsync/*keyboard_mode*/,
+                    CurrentTime/*time*/
+                    );
+#endif
+
       XSync(lglw->xdsp, False);
       lglw->win.mapped = LGLW_TRUE;
 
