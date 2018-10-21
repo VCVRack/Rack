@@ -489,6 +489,12 @@ static void loc_eventProc(void *_xevent) {
                   case Button3:
                      loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_MBUTTON);
                      break;
+                  case Button4:
+                     loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_WHEELUP);
+                     break;
+                  case Button5:
+                     loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_WHEELDOWN);
+                     break;
                }
                break;
 
@@ -510,6 +516,12 @@ static void loc_eventProc(void *_xevent) {
                      break;
                   case Button3:
                      loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_MBUTTON);
+                     break;
+                  case Button4:
+                     loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_WHEELUP);
+                     break;
+                  case Button5:
+                     loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_WHEELDOWN);
                      break;
                }
                break;
