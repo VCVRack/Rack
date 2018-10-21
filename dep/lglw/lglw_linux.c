@@ -396,6 +396,8 @@ static void loc_eventProc(void *_xevent) {
                break;
 
             case EnterNotify:
+               // printf("vstgltest<lglw_linux>: xev XEnterWindowEvent\n");
+               ; // empty statement
                XEnterWindowEvent *wenter = (XEnterWindowEvent*)xev;
                printf("vstgltest<lglw_linux>: xev EnterNotify: mode:%i, detail:%i, state:%d\n", wenter->mode, wenter->detail, wenter->state);
                lglw->mouse.p.x = wenter->x;
@@ -413,6 +415,8 @@ static void loc_eventProc(void *_xevent) {
                break;
 
             case LeaveNotify:
+               // printf("vstgltest<lglw_linux>: xev XLeaveWindowEvent\n");
+               ; // empty statement
                XLeaveWindowEvent *wexit = (XLeaveWindowEvent*)xev;
                printf("vstgltest<lglw_linux>: xev LeaveNotify: mode:%i, detail:%i, state:%d\n", wexit->mode, wexit->detail, wexit->state);
 
