@@ -11,7 +11,10 @@
 // #define SO_PATH  "/home/bsp/.vst/DiscoveryPro68DemoLinux/64-bit/DiscoveryPro64.so"
 // #define SO_PATH  "/home/bsp/.vst/AcidBoxDEMO-Linux/AcidBoxDEMOVST-x64.so"
 // #define SO_PATH "/home/bsp/.vst/DigitsLinux_2_1/DigitsVST_64.so"
-
+// #define SO_PATH "/usr/lib/lxvst/helm.so"
+// #define SO_PATH "/home/bsp/.vst/oxevst134/oxevst64.so"  // crashes VirtualBox (!)
+// #define SO_PATH "/home/bsp/.vst/tunefish-v4.2.0-linux64-vst24.tar/Tunefish4.so"  // does not load (GLIBC error)
+// #define SO_PATH "/home/bsp/.vst/zyn-fusion/ZynAddSubFX.so"
 
 #include <yac.h>
 
