@@ -387,8 +387,68 @@ static void loc_eventProc(void *_xevent) {
                }
                break;
 
+            case FocusIn:
+               printf("vstgltest<lglw_linux>: xev FocusIn\n");
+               break;
+
+            case FocusOut:
+               printf("vstgltest<lglw_linux>: xev FocusOut\n");
+               break;
+
+            case EnterNotify:
+               XEnterWindowEvent *wenter = (XEnterWindowEvent*)xev;
+               printf("vstgltest<lglw_linux>: xev EnterNotify: mode:%i, detail:%i, state:%d\n", wenter->mode, wenter->detail, wenter->state);
+               lglw->mouse.p.x = wenter->x;
+               lglw->mouse.p.y = wenter->y;
+               loc_handle_mousemotion(lglw);
+
+               // EnterNotify messages can be pseudo-motion events (NotifyGrab, NotifyUngrab)
+               // when buttons are pressed, which would trigger false focus changes
+               // so, the callback is only sent when a normal entry happens
+               if (wenter->mode == NotifyNormal)
+               {
+                  loc_handle_mouseenter(lglw);
+               }
+
+               break;
+
+            case LeaveNotify:
+               XLeaveWindowEvent *wexit = (XLeaveWindowEvent*)xev;
+               printf("vstgltest<lglw_linux>: xev LeaveNotify: mode:%i, detail:%i, state:%d\n", wexit->mode, wexit->detail, wexit->state);
+
+               // LeaveNotify messages can be pseudo-motion events (NotifyGrab, NotifyUngrab)
+               // when buttons are pressed, which would trigger false focus changes
+               // so, the callback is only sent when a normal entry happens
+               if (wexit->mode == NotifyNormal)
+               {
+                  loc_handle_mouseleave(lglw);
+               }
+
+               break;
+
             case MotionNotify:
-               printf("vstgltest<lglw_linux>: xev MotionNotify\n");
+               // printf("vstgltest<lglw_linux>: xev MotionNotify\n");
+               ; // empty statement
+               XMotionEvent *motion = (XMotionEvent*)xev;
+
+               if(LGLW_MOUSE_GRAB_WARP == lglw->mouse.grab.mode)
+               {
+                  lglw->mouse.grab.b_queue_warp = LGLW_TRUE;
+
+                  lglw->mouse.p.x += (motion->x - lglw->mouse.grab.last_p.x);
+                  lglw->mouse.p.y += (motion->y - lglw->mouse.grab.last_p.y);
+
+                  lglw->mouse.grab.last_p.x = motion->x;
+                  lglw->mouse.grab.last_p.y = motion->y;
+               }
+               else
+               {
+                  lglw->mouse.p.x = motion->x;
+                  lglw->mouse.p.y = motion->y;
+               }
+
+               loc_handle_mousemotion(lglw);
+
                break;
 
             case KeyPress:
@@ -398,6 +458,56 @@ static void loc_eventProc(void *_xevent) {
 
             case KeyRelease:
                printf("vstgltest<lglw_linux>: xev KeyRelease\n");
+               break;
+
+            case ButtonPress:
+               printf("vstgltest<lglw_linux>: xev ButtonPress\n");
+               XButtonPressedEvent *btnPress = (XButtonPressedEvent*)xev;
+               lglw->mouse.p.x = btnPress->x;
+               lglw->mouse.p.y = btnPress->y;
+
+               if(0u == (lglw->focus.state & LGLW_FOCUS_MOUSE))
+               {
+                  loc_handle_mouseenter(lglw);
+               }
+
+               switch(btnPress->button)
+               {
+                  default:
+                     printf("vstgltest<lglw_linux>: xev ButtonPress unhandled button: %i\n", btnPress->button);
+                     break;
+                  case Button1:
+                     loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_LBUTTON);
+                     break;
+                  case Button2:
+                     loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_RBUTTON);
+                     break;
+                  case Button3:
+                     loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_MBUTTON);
+                     break;
+               }
+               break;
+
+            case ButtonRelease:
+               printf("vstgltest<lglw_linux>: xev ButtonRelease\n");
+               XButtonReleasedEvent *btnRelease = (XButtonReleasedEvent*)xev;
+               lglw->mouse.p.x = btnRelease->x;
+               lglw->mouse.p.y = btnRelease->y;
+               switch(btnRelease->button)
+               {
+                  default:
+                     printf("vstgltest<lglw_linux>: xev ButtonRelease unhandled button: %i\n", btnRelease->button);
+                     break;
+                  case Button1:
+                     loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_LBUTTON);
+                     break;
+                  case Button2:
+                     loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_RBUTTON);
+                     break;
+                  case Button3:
+                     loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_MBUTTON);
+                     break;
+               }
                break;
          }
       }
@@ -904,7 +1014,6 @@ void lglw_redraw(lglw_t _lglw) {
       {
          // TODO Event Loop
          lglw_log("lglw:lglw_redraw: 1\n");
-         // XClearArea(lglw->xdsp, lglw->win.xwnd, 0, 0, 1, 1, True); // clear tiny area for exposing
          XEvent xev;
          xev.xany.type       = Expose;
          xev.xany.serial     = 0;
@@ -1058,7 +1167,7 @@ static void loc_handle_mouseleave(lglw_int_t *lglw) {
 
 // ---------------------------------------------------------------------------- loc_handle_mouseenter
 static void loc_handle_mouseenter(lglw_int_t *lglw) {
-   
+
    loc_key_hook(lglw);
 
    lglw->focus.state |= LGLW_FOCUS_MOUSE;
@@ -1188,8 +1297,7 @@ void lglw_mouse_grab(lglw_t _lglw, uint32_t _grabMode) {
 
    if(NULL != lglw)
    {
-      // (todo) implement me
-      // if(NULL != lglw->win.hwnd)
+      if(0 != lglw->win.xwnd)
       {
          if(!lglw->mouse.touch.b_enable)
          {
@@ -1198,6 +1306,8 @@ void lglw_mouse_grab(lglw_t _lglw, uint32_t _grabMode) {
                lglw_mouse_ungrab(_lglw);
             }
 
+            int result;
+
             switch(_grabMode)
             {
                default:
@@ -1205,18 +1315,44 @@ void lglw_mouse_grab(lglw_t _lglw, uint32_t _grabMode) {
                   break;
 
                case LGLW_MOUSE_GRAB_CAPTURE:
-                  // (todo) implement me
-                  // (void)SetCapture(lglw->win.hwnd);
-                  lglw->mouse.grab.mode = _grabMode;
+                  result = XGrabPointer(lglw->xdsp, lglw->win.xwnd,
+                                        True/*owner_events*/,
+                                        ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | PointerMotionHintMask | ButtonMotionMask | KeymapStateMask/*event_mask*/,
+                                        GrabModeAsync/*pointer_mode*/,
+                                        GrabModeAsync/*keyboard_mode*/,
+                                        lglw->win.xwnd/*confine_to*/,
+                                        None/*cursor*/,
+                                        CurrentTime/*time*/);
+                  if(GrabSuccess != result)
+                  {
+                     printf("vstgltest<lglw_linux>: Grab Result: %i\n", result);
+                  }
+                  else
+                  {
+                     lglw->mouse.grab.mode = _grabMode;
+                  }
                   break;
 
                case LGLW_MOUSE_GRAB_WARP:
-                  // (todo) implement me
-                  // (void)SetCapture(lglw->win.hwnd);
-                  lglw_mouse_cursor_show(_lglw, LGLW_FALSE);
-                  lglw->mouse.grab.p = lglw->mouse.p;
-                  lglw->mouse.grab.last_p = lglw->mouse.p;
-                  lglw->mouse.grab.mode = _grabMode;
+                  result = XGrabPointer(lglw->xdsp, lglw->win.xwnd,
+                                        True/*owner_events*/,
+                                        ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | PointerMotionHintMask | ButtonMotionMask | KeymapStateMask/*event_mask*/,
+                                        GrabModeAsync/*pointer_mode*/,
+                                        GrabModeAsync/*keyboard_mode*/,
+                                        lglw->win.xwnd/*confine_to*/,
+                                        None/*cursor*/,
+                                        CurrentTime/*time*/);
+                  if(GrabSuccess != result)
+                  {
+                     printf("vstgltest<lglw_linux>: Grab Result: %i\n", result);
+                  }
+                  else
+                  {
+                     lglw_mouse_cursor_show(_lglw, LGLW_FALSE);
+                     lglw->mouse.grab.p = lglw->mouse.p;
+                     lglw->mouse.grab.last_p = lglw->mouse.p;
+                     lglw->mouse.grab.mode = _grabMode;
+                  }
                   break;
             }
          }
@@ -1231,8 +1367,7 @@ void lglw_mouse_ungrab(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      // (todo) implement me
-      // if(NULL != lglw->win.hwnd)
+      if(0 != lglw->win.xwnd)
       {
          if(!lglw->mouse.touch.b_enable)
          {
@@ -1243,14 +1378,12 @@ void lglw_mouse_ungrab(lglw_t _lglw) {
                   break;
 
                case LGLW_MOUSE_GRAB_CAPTURE:
-                  // (todo) implement me
-                  // (void)ReleaseCapture();
+                  XUngrabPointer(lglw->xdsp, CurrentTime);
                   lglw->mouse.grab.mode = LGLW_MOUSE_GRAB_NONE;
                   break;
 
                case LGLW_MOUSE_GRAB_WARP:
-                  // (todo) implement me
-                  // (void)ReleaseCapture();
+                  XUngrabPointer(lglw->xdsp, CurrentTime);
                   lglw->mouse.grab.mode = LGLW_MOUSE_GRAB_NONE;
                   lglw->mouse.grab.b_queue_warp = LGLW_TRUE;
                   lglw_mouse_cursor_show(_lglw, LGLW_TRUE);
@@ -1266,10 +1399,20 @@ void lglw_mouse_ungrab(lglw_t _lglw) {
 void lglw_mouse_warp(lglw_t _lglw, int32_t _x, int32_t _y) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      if(0 != lglw->win.xwnd)
+      {
+         XWarpPointer(lglw->xdsp,
+                      None/*src_w*/,
+                      lglw->win.xwnd/*dest_w*/,
+                      0/*src_x*/,
+                      0/*src_y*/,
+                      0/*src_width*/,
+                      0/*src_height*/,
+                      _x/*dest_x*/,
+                      _y/*dest_y*/);
+      }
    }
 }
 
@@ -1289,10 +1432,30 @@ static void loc_handle_queued_mouse_warp(lglw_int_t *lglw) {
 void lglw_mouse_cursor_show (lglw_t _lglw, lglw_bool_t _bShow) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
+      if(LGLW_FALSE == _bShow)
+      {
+         Pixmap noPxm;
+         Cursor noCursor;
+         XColor black, dummy;
+         static char pxmNoData[] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+         XAllocNamedColor(lglw->xdsp, lglw->cmap, "black", &black, &dummy);
+         noPxm = XCreateBitmapFromData(lglw->xdsp, lglw->win.xwnd, pxmNoData, 8, 8);
+         noCursor = XCreatePixmapCursor(lglw->xdsp, noPxm, noPxm, &black, &black, 0, 0);
+
+         XDefineCursor(lglw->xdsp, lglw->win.xwnd, noCursor);
+         XFreeCursor(lglw->xdsp, noCursor);
+         if(noPxm != None)
+         {
+            XFreePixmap(lglw->xdsp, noPxm);
+         }
+      }
+      else
+      {
+         XUndefineCursor(lglw->xdsp, lglw->win.xwnd);
+      }
    }
 }
 
