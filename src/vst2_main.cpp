@@ -2106,14 +2106,18 @@ float vst2_refresh_rate_get(void) {
    return rack::global->vst2.wrapper->getRefreshRate();
 }
 
-extern "C" void lglw_timer_cbk(lglw_t _lglw) {
+extern "C" {
+void lglw_timer_cbk(lglw_t _lglw) {
    VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
    wrapper->queueRedraw();
 }
+}
 
-extern "C" void lglw_redraw_cbk(lglw_t _lglw) {
+extern "C" {
+void lglw_redraw_cbk(lglw_t _lglw) {
    VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
    wrapper->redraw();
+}
 }
 
 void vst2_oversample_realtime_set(float _factor, int _quality) {
