@@ -7,6 +7,9 @@
 // #define SO_PATH  "../vst2_lglw_debug_plugin/debug_lglw.so"
 // #define SO_PATH  "/usr/local/lib/vst/debug_lglw.so"
 #define SO_PATH  "../../vst2_bin/debug_lglw.so"
+// #define SO_PATH  "/home/bsp/.vst/DiscoveryPro68DemoLinux/64-bit/DiscoveryPro64.so"
+// #define SO_PATH  "/home/bsp/.vst/AcidBoxDEMO-Linux/AcidBoxDEMOVST-x64.so"
+
 
 
 #include <yac.h>
@@ -106,6 +109,17 @@ static VstIntPtr VSTCALLBACK HostCallback(AEffect* effect, VstInt32 opcode, VstI
 
    (void)lastOpcode;
    (void)lastTimeMask;
+
+   switch(opcode)
+   {
+      default:
+         printf("xxx debug_host: HostCallback: unhandled opcode=%d index=%d value=%ld ptr=%p opt=%f\n", opcode, index, value, ptr, opt);
+         break;
+
+      case audioMasterVersion:
+         result = 2400;
+         break;
+   }
 
    return result;
 }
