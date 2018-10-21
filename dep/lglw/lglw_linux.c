@@ -658,6 +658,18 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
                              NULL/*XSizeHints*/
                              );
 
+      // Setup the event proc now, on the parent window as well just for the debug host
+      // It was simpler to do this than check in the debug host for the reparent event
+      lglw_log("lglw:lglw_window_open: 7\n");
+      loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
+      loc_setProperty(lglw->xdsp, lglw->win.xwnd, "_lglw", (void*)lglw);  // set instance pointer
+
+      if(0 != _parentHWNDOrNull)
+      {
+         loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
+         loc_setProperty(lglw->xdsp, lglw->parent_xwnd, "_lglw", (void*)lglw);  // set instance pointer
+      }
+
       // Some hosts only check and store the callback when the Window is reparented
       // Since creating the Window with a Parent may or may not do that, but the callback is not set,
       // ... it's created as a root window, the callback is set, and then it's reparented
@@ -665,7 +677,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       // (note) [cameronleger] In Ardour's code-base, the only time it looks for the _XEventProc is during a ReparentNotify event
       if (0 != _parentHWNDOrNull)
       {
-         lglw_log("lglw:lglw_window_open: 7\n");
+         lglw_log("lglw:lglw_window_open: 8\n");
          XReparentWindow(lglw->xdsp, lglw->win.xwnd, lglw->parent_xwnd, 0, 0);
       }
 #endif
@@ -674,18 +686,6 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       lglw->win.xwnd = (Window)_parentHWNDOrNull;
       lglw->win.b_owner = LGLW_FALSE;
 #endif
-
-      // Setup the event proc now, on the parent window as well just for the debug host
-      // It was simpler to do this than check in the debug host for the reparent event
-      lglw_log("lglw:lglw_window_open: 8\n");
-      loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
-
-      if(NULL != _parentHWNDOrNull)
-      {
-         loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
-         loc_setProperty(lglw->xdsp, lglw->parent_xwnd, "_lglw", (void*)lglw);  // set instance pointer
-      }
-      loc_setProperty(lglw->xdsp, lglw->win.xwnd, "_lglw", (void*)lglw);  // set instance pointer
 
       lglw_log("lglw:lglw_window_open: 9\n");
       if(lglw->win.b_owner)
