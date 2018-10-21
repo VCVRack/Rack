@@ -161,6 +161,11 @@ static void loc_touchinput_update (lglw_int_t *lglw);
 
 static void loc_enable_dropfiles (lglw_int_t *lglw, lglw_bool_t _bEnable);
 
+static void loc_eventProc (void *_xevent);
+static void loc_setProperty (Display *_display, Window _window, const char *_name, void *_value);
+static void *loc_getProperty (Display *_display, Window _window, const char *_name);
+static void loc_setEventProc (Display *display, Window window);
+
 
 // ---------------------------------------------------------------------------- module vars
 static lglw_int_t *khook_lglw = NULL;  // currently key-hooked lglw instance (one at a time)
@@ -173,6 +178,7 @@ static FILE *logfile;
 void lglw_log(const char *logData, ...) {
    fprintf(logfile, logData);
    fflush(logfile);
+   printf(logData);
 }
 
 
@@ -189,6 +195,8 @@ static int xerror_handler(Display *display, XErrorEvent *error) {
 // ---------------------------------------------------------------------------- lglw_init
 lglw_t lglw_init(int32_t _w, int32_t _h) {
    lglw_int_t *lglw = malloc(sizeof(lglw_int_t));
+
+   printf("xxx lglw_init: sizeof(uint32_t)=%u sizeof(long)=%u sizeof(void*)=%u\n", sizeof(uint32_t), sizeof(long), sizeof(void*));
 
    // TODO: remove/improve
    logfile = fopen("/tmp/lglw_log.txt", "w");
@@ -351,9 +359,153 @@ static void loc_destroy_hidden_window(lglw_int_t *lglw) {
 // https://github.com/COx2/DistortionFilter/blob/c6a34fb56b503a6e95bf0975e00f438bbf4ff52a/juce/modules/juce_audio_processors/format_types/juce_VSTPluginFormat.cpp
 
 // Very simple function to test _XEventProc is properly called
-void loc_eventProc(void *xevent) {
+static void loc_eventProc(void *_xevent) {
+   XEvent *xev = (XEvent*)_xevent;
+
    lglw_log("XEventProc\n");
-   printf("vstgltest<lglw_linux>: XEventProc\n");
+   printf("vstgltest<lglw_linux>: XEventProc, xev=%p\n", xev);
+
+   if(NULL != xev)
+   {
+      LGLW(loc_getProperty(xev->xany.display, xev->xany.window, "_lglw"));  // get instance pointer
+
+      printf("vstgltest<lglw_linux>: XEventProc, type=%d serial=%lu send_event=%d lglw=%p\n", xev->xany.type, xev->xany.serial, xev->xany.send_event, lglw);
+
+      if(NULL != lglw)
+      {
+         switch(xev->type)
+         {
+            default:
+               printf("vstgltest<lglw_linux>: unhandled X11 event type=%d\n", xev->type);
+               break;
+
+            case Expose:
+               printf("vstgltest<lglw_linux>: xev Expose\n");
+               if(NULL != lglw->redraw.cbk)
+               {
+                  lglw->redraw.cbk(lglw);
+               }
+               break;
+
+            case MotionNotify:
+               printf("vstgltest<lglw_linux>: xev MotionNotify\n");
+               break;
+
+            case KeyPress:
+               printf("vstgltest<lglw_linux>: xev KeyPress\n");
+               lglw_redraw(lglw);
+               break;
+
+            case KeyRelease:
+               printf("vstgltest<lglw_linux>: xev KeyRelease\n");
+               break;
+         }
+      }
+   }
+}
+
+static void loc_setProperty(Display *_display, Window _window, const char *_name, void *_value) {
+   size_t data = (size_t)_value;
+   long temp[2];
+
+   // Split the 64 bit pointer into a little-endian long array
+   temp[0] = (long)(data & 0xffffffffUL);
+   temp[1] = (long)(data >> 32L);
+
+   printf("xxx lglw_linux:loc_setProperty: name=\"%s\" value=%p temp[0]=%08x temp[1]=%08x\n", _name, _value, temp[0], temp[1]);
+
+   Atom atom = XInternAtom(_display, _name, False/*only_if_exists*/);
+
+   // (note) what's quite weird here is that we're writing an array of 32bit values, yet the element format must be 64bit (long)
+   XChangeProperty(_display, _window,
+                   atom/*property*/,
+                   atom/*type*/,
+                   32/*format*/,
+                   PropModeReplace/*mode*/,
+                   (unsigned char*)temp/*data*/,
+                   2/*nelements*/
+                   );
+}
+
+static void *loc_getProperty(Display *_display, Window _window, const char *_name) {
+   int userSize;
+   unsigned long bytes;
+   unsigned long userCount;
+   unsigned char *data;
+   Atom userType;
+   Atom atom = XInternAtom(_display, _name, False);
+
+   // (note) 64bit properties need to be read with two XGetWindowProperty() calls.
+   //         When using just one call and setting the 'length' to 2, the upper 32bit (second array element) will be 0xFFFFffff.
+   XGetWindowProperty(_display,
+                      _window,
+                      atom,
+                      0/*offset*/,
+                      1/*length*/,
+                      False/*delete*/,
+                      AnyPropertyType,
+                      &userType/*actual_type_return*/,
+                      &userSize/*actual_format_return*/,
+                      &userCount/*nitems_return*/,
+                      &bytes/*bytes_after_return / partial reads*/,
+                      &data);
+
+   union {
+      uint32_t ui[2];
+      void *any;
+   } uptr;
+   uptr.any = 0;
+
+   printf("xxx lglw_linux: loc_getProperty: LOWER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
+
+   if(NULL != data)
+   {
+      if(userCount >= 1)
+      {
+         if(userCount >= 2)
+         {
+            printf("xxx loc_getProperty: lo=0x%08x hi=0x%08x\n", ((uint32_t*)data)[0], ((uint32_t*)data)[1]);
+         }
+
+         // lower 32-bit
+         uptr.ui[0] = *(long*)data;
+         uptr.ui[1] = 0;
+
+         printf("xxx     lower=0x%08x\n", uptr.ui[0]);
+         // // printf("xxx     upper=0x%08x\n", uptr.ui[1]);
+
+         XFree(data);
+
+         // // if(userCount >= 2)
+         {
+            XGetWindowProperty(_display,
+                               _window,
+                               atom,
+                               1/*offset*/,
+                               1/*length*/,
+                               False/*delete*/,
+                               AnyPropertyType,
+                               &userType/*actual_type_return*/,
+                               &userSize/*actual_format_return*/,
+                               &userCount/*nitems_return*/,
+                               &bytes/*bytes_after_return / partial reads*/,
+                               &data);
+
+            printf("xxx lglw_linux: loc_getProperty: UPPER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
+            if(NULL != data)
+            {
+               // upper 32-bit
+               uptr.ui[1] = *(long*)data;
+               printf("xxx     upper=0x%08x\n", uptr.ui[1]);
+               XFree(data);
+            }
+         }
+      }
+   }
+
+   printf("xxx lglw_linux: loc_getProperty: return value=%p\n", uptr.any);
+
+   return uptr.any;
 }
 
 
@@ -362,24 +514,30 @@ void loc_eventProc(void *xevent) {
 // Pulled from the Renoise 64-bit callback example
 // Unsure what data was supposed to be, but swapping it to a function name did not work
 // This does nothing, no event proc found
-void loc_setEventProc (Display *display, Window window) {
+static void loc_setEventProc (Display *display, Window window) {
    size_t data = (size_t)loc_eventProc;
    long temp[2];
 
    printf("vstgltest<lglw_linux>: setEventProc (2*32bit). window=%lu loc_eventProc=%p\n", window, &loc_eventProc);
 
-   // Split the 64 bit pointer into a little-endian long array
-   temp[0] = (long)(data & 0xffffffffUL);
-   temp[1] = (long)(data >> 32L);
+   // Split the 64 bit pointer into a little-endian unsigned int array
+   temp[0] = (uint32_t)(data & 0xffffffffUL);
+   temp[1] = (uint32_t)(data >> 32L);
 
    Atom atom = XInternAtom(display, "_XEventProc", False);
-   XChangeProperty(display, window, atom, atom, 32,
-      PropModeReplace, (unsigned char*)temp, 2);
+   XChangeProperty(display, window,
+                   atom/*property*/,
+                   atom/*type*/,
+                   32/*format*/,
+                   PropModeReplace/*mode*/,
+                   (unsigned char*)temp/*data*/,
+                   2/*nelements*/
+                   );
 }
 #else
 // GPL code pulled from the amsynth example <https://github.com/amsynth/amsynth/blob/4a87798e650c6d71d70274a961c9b8d98fc6da7e/src/amsynth_vst.cpp>
 // Simply swapped out the function names, crashes Ardour in the same was as the others
-void loc_setEventProc (Display *display, Window window) {
+static void loc_setEventProc (Display *display, Window window) {
    //
    // JUCE calls XGetWindowProperty with long_length = 1 which means it only fetches the lower 32 bits of the address.
    // Therefore we need to ensure we return an address in the lower 32-bits of address space.
@@ -412,20 +570,33 @@ void loc_setEventProc (Display *display, Window window) {
       }
    }
 
-   long temp[2] = {(long)ptr, 0};
+   long temp[2] = {(uint32_t)(((size_t)ptr)&0xFFFFfffful), 0};
    Atom atom = XInternAtom(display, "_XEventProc", False);
-   XChangeProperty(display, window, atom, atom, 32, PropModeReplace, (unsigned char *)temp, 2);
+   XChangeProperty(display, window,
+                   atom/*property*/,
+                   atom/*type*/,
+                   32/*format*/,
+                   PropModeReplace/*mode*/,
+                   (unsigned char *)temp/*data*/,
+                   2/*nelements*/
+                   );
 }
 #endif
 #else
 // Pulled from the eXT2 example
-// TODO: 32-bit support
-void loc_setEventProc (Display *display, Window window) {
+static void loc_setEventProc (Display *display, Window window) {
    void* data = (void*)&loc_eventProc; // swapped the function name here
 
+   // (note) 32-bit only
    Atom atom = XInternAtom(display, "_XEventProc", False);
-   XChangeProperty(display, window, atom, atom, 32,
-      PropModeReplace, (unsigned char*)&data, 1); // 1 instead of 2 will crash Ardour, 2 will not do anything
+   XChangeProperty(display, window,
+                   atom/*property*/,
+                   atom/*type*/,
+                   32/*format*/,
+                   PropModeReplace/*mode*/,
+                   (unsigned char*)&data/*data*/,
+                   1/*nelements*/
+                   );
 }
 #endif // ARCH_X64
 
@@ -437,10 +608,10 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_window_open: 1, %p, %i\n", (Window)_parentHWNDOrNull, (Window)_parentHWNDOrNull);
+      lglw_log("lglw:lglw_window_open: 1, %p, %i \n", (Window)_parentHWNDOrNull, (Window)_parentHWNDOrNull);
       lglw->parent_xwnd = (0 == _parentHWNDOrNull) ? DefaultRootWindow(lglw->xdsp) : (Window)_parentHWNDOrNull;
 
-      lglw_log("lglw:lglw_window_open: 2\n");
+      lglw_log("lglw:lglw_window_open: 2 lglw=%p\n", lglw);
       if(_w <= 16)
          _w = lglw->hidden.size.x;
 
@@ -452,7 +623,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
 
       lglw_log("lglw:lglw_window_open: 4\n");
       XSetWindowAttributes swa;
-      XEvent event;
+      // // XEvent event;
       XSync(lglw->xdsp, False);
 
 #if 1
@@ -508,7 +679,13 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       // It was simpler to do this than check in the debug host for the reparent event
       lglw_log("lglw:lglw_window_open: 8\n");
       loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
-      loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
+
+      if(NULL != _parentHWNDOrNull)
+      {
+         loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
+         loc_setProperty(lglw->xdsp, lglw->parent_xwnd, "_lglw", (void*)lglw);  // set instance pointer
+      }
+      loc_setProperty(lglw->xdsp, lglw->win.xwnd, "_lglw", (void*)lglw);  // set instance pointer
 
       lglw_log("lglw:lglw_window_open: 9\n");
       if(lglw->win.b_owner)
@@ -548,6 +725,8 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       loc_enable_dropfiles(lglw, (NULL != lglw->dropfiles.cbk));
 
       lglw_log("lglw:lglw_window_open: EXIT\n");
+
+      r = LGLW_TRUE;
    }
    return r;
 }
@@ -725,7 +904,23 @@ void lglw_redraw(lglw_t _lglw) {
       {
          // TODO Event Loop
          lglw_log("lglw:lglw_redraw: 1\n");
-         XClearArea(lglw->xdsp, lglw->win.xwnd, 0, 0, 1, 1, True); // clear tiny area for exposing
+         // XClearArea(lglw->xdsp, lglw->win.xwnd, 0, 0, 1, 1, True); // clear tiny area for exposing
+         XEvent xev;
+         xev.xany.type       = Expose;
+         xev.xany.serial     = 0;
+         xev.xany.send_event = True;
+         xev.xany.display    = lglw->xdsp;
+         xev.xany.window     = lglw->win.xwnd;
+         xev.xexpose.x      = 0;
+         xev.xexpose.y      = 0;
+         xev.xexpose.width  = lglw->win.size.x;
+         xev.xexpose.height = lglw->win.size.y;
+         xev.xexpose.count  = 0;
+         XSendEvent(lglw->xdsp, lglw->win.xwnd,
+                    True/*propagate*/,
+                    ExposureMask/*event_mask*/,
+                    &xev
+                    );
          XFlush(lglw->xdsp);
       }
    }
@@ -802,7 +997,7 @@ void lglw_swap_interval_set(lglw_t _lglw, int32_t _ival) {
    {
       lglw_log("lglw:lglw_swap_interval_set: 1\n");
       PFNWGLEXTSWAPINTERVALPROC glXSwapIntervalEXT;
-      glXSwapIntervalEXT = (PFNWGLEXTSWAPINTERVALPROC) glXGetProcAddress("glXSwapIntervalEXT");
+      glXSwapIntervalEXT = (PFNWGLEXTSWAPINTERVALPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
       if(NULL != glXSwapIntervalEXT)
       {
          lglw_log("lglw:lglw_swap_interval_set: 2\n");
@@ -1199,6 +1394,7 @@ void lglw_clipboard_text_set(lglw_t _lglw, const uint32_t _numChars, const char 
 
    if(NULL != _text)
    {
+      (void)lglw;
    }
 }
 
@@ -1218,6 +1414,7 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
       if(NULL != _lglw)
       {
          // (todo) implement me
+         (void)lglw;
       }
    }
 }
