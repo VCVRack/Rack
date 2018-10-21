@@ -459,7 +459,9 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       lglw_log("lglw:lglw_window_open: 5\n");
       swa.border_pixel = 0;
       swa.colormap = lglw->cmap;
-      swa.event_mask = EnterWindowMask | LeaveWindowMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask;
+      // (note) [bsp] setting this to NoEventMask causes all events to be propagated to the parent (host) window.
+      //               The host then reports the event to the plugin by calling its eventProc function (set via "_XEventProc").
+      swa.event_mask = NoEventMask;/////ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | FocusChangeMask;
       lglw->win.xwnd = XCreateWindow(lglw->xdsp/*display*/,
                                      DefaultRootWindow(lglw->xdsp)/*parent. see Cameron's comment below.*/,
                                      0/*x*/,
@@ -475,7 +477,15 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
                                      );
 
       lglw_log("lglw:lglw_window_open: 6\n");
-      XSetStandardProperties(lglw->xdsp, lglw->win.xwnd, "LGLW", "LGLW", None, NULL, 0, NULL);
+      XSetStandardProperties(lglw->xdsp/*display*/,
+                             lglw->win.xwnd/*window*/,
+                             "LGLW"/*window_name*/,
+                             "LGLW"/*icon_name*/,
+                             None/*icon_pixmap*/,
+                             NULL/*argv*/,
+                             0/*argc*/,
+                             NULL/*XSizeHints*/
+                             );
 
       // Some hosts only check and store the callback when the Window is reparented
       // Since creating the Window with a Parent may or may not do that, but the callback is not set,
@@ -502,7 +512,10 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
 
       lglw_log("lglw:lglw_window_open: 9\n");
       if(lglw->win.b_owner)
-         XMapRaised(lglw->xdsp, lglw->win.xwnd);
+      {
+         // // XMapRaised(lglw->xdsp, lglw->win.xwnd);
+         XMapWindow(lglw->xdsp, lglw->win.xwnd);
+      }
 
 #if 0
       XSelectInput(lglw->xdsp, lglw->win.xwnd,
@@ -514,6 +527,14 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
                     GrabModeAsync/*keyboard_mode*/,
                     CurrentTime/*time*/
                     );
+#endif
+
+#if 0
+      XSetInputFocus(lglw->xdsp/*display*/,
+                     PointerRoot/*focus*/,
+                     RevertToPointerRoot/*revert_to*/,
+                     CurrentTime
+                     );
 #endif
 
       XSync(lglw->xdsp, False);
