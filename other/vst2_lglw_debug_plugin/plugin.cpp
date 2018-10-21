@@ -70,7 +70,8 @@ const VstInt32 PLUGIN_VERSION = 1000;
 // extern "C" LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 #ifdef USE_LGLW
-void loc_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _buttonState, uint32_t _changedButtonState) {
+extern "C" {
+static void loc_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _buttonState, uint32_t _changedButtonState) {
    printf("vstgltest: lglw_mouse_cbk: lglw=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, _x, _y, _buttonState, _changedButtonState);
 
    if(LGLW_IS_MOUSE_LBUTTON_DOWN())
@@ -84,17 +85,20 @@ void loc_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _buttonState, 
    }
 }
 
-void loc_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changedFocusState) {
+static void loc_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changedFocusState) {
    printf("vstgltest: lglw_focus_cbk: lglw=%p focusState=0x%08x changedFocusState=0x%08x\n", _lglw, _focusState, _changedFocusState);
 }
 
-lglw_bool_t loc_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw_bool_t _bPressed) {
+static lglw_bool_t loc_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw_bool_t _bPressed) {
    printf("vstgltest: lglw_keyboard_cbk: lglw=%p vkey=0x%08x (\'%c\') kmod=0x%08x bPressed=%d\n", _lglw, _vkey, _vkey, _kmod, _bPressed);
    return LGLW_FALSE;
 }
 
-void loc_timer_cbk(lglw_t _lglw) {
+static void loc_timer_cbk(lglw_t _lglw) {
    printf("vstgltest: lglw_timer_cbk: tick\n");
+}
+
+static void loc_redraw_cbk (lglw_t _lglw);
 }
 #endif // USE_LGLW
 
@@ -160,6 +164,7 @@ public:
       lglw_focus_callback_set(lglw, &loc_focus_cbk);
       lglw_keyboard_callback_set(lglw, &loc_keyboard_cbk);
       lglw_timer_callback_set(lglw, &loc_timer_cbk);
+      lglw_redraw_callback_set(lglw, &loc_redraw_cbk);
 
       lglw_timer_start(lglw, 200);
 #endif // USE_LGLW
@@ -185,6 +190,8 @@ public:
    void redrawWindow(void) {
 #if 1
 #ifdef USE_LGLW
+      printf("vstgltest: redrawWindow()\n");
+
       // Save host GL context
       lglw_glcontext_push(lglw);
 
@@ -432,7 +439,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
          break;
 
       case effMainsChanged:
-         printf("vstgltest: effMainsChanged(%d)\n", value);
+         printf("vstgltest: effMainsChanged(%ld)\n", value);
          // value = 0=suspend, 1=resume
          // wrapper->setEnableProcessingActive((value > 0) ? true : false);
          r = 1;
@@ -544,6 +551,7 @@ void VSTPluginSetParameter(VSTPlugin *vstPlugin, VstInt32 index, float parameter
   printf("vstgltest: VSTPluginSetParameter(%d, %f)\n", index, parameter);
   // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
   VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
+  (void)wrapper;
 }
 }
 
@@ -556,7 +564,15 @@ float VSTPluginGetParameter(VSTPlugin *vstPlugin, VstInt32 index)
   printf("vstgltest: VSTPluginGetParameter(%d)\n", index);
   // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
   VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
+  (void)wrapper;
   return 0;
+}
+}
+
+extern "C" {
+static void loc_redraw_cbk(lglw_t _lglw) {
+   VSTPluginWrapper *wrapper = (VSTPluginWrapper*)lglw_userdata_get(_lglw);
+   wrapper->redrawWindow();
 }
 }
 
@@ -608,6 +624,8 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    printf("vstgltest: calling lglw_init()\n");
 
    lglw = lglw_init(EDITWIN_W, EDITWIN_H);
+
+   lglw_userdata_set(lglw, this);
 
    printf("vstgltest: lglw_init() returned lglw=%p\n", lglw);
 #endif // USE_LGLW
