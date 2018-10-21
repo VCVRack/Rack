@@ -7,9 +7,10 @@
 // #define SO_PATH  "../vst2_lglw_debug_plugin/debug_lglw.so"
 // #define SO_PATH  "/usr/local/lib/vst/debug_lglw.so"
 #define SO_PATH  "../../vst2_bin/debug_lglw.so"
+
 // #define SO_PATH  "/home/bsp/.vst/DiscoveryPro68DemoLinux/64-bit/DiscoveryPro64.so"
 // #define SO_PATH  "/home/bsp/.vst/AcidBoxDEMO-Linux/AcidBoxDEMOVST-x64.so"
-
+// #define SO_PATH "/home/bsp/.vst/DigitsLinux_2_1/DigitsVST_64.so"
 
 
 #include <yac.h>
@@ -179,12 +180,24 @@ void open_and_close(void) {
 
          if(NULL != effect)
          {
-            ERect *rect = 0;
-            effect->dispatcher(effect, effEditGetRect, 0, 0, (void*)&rect, 0.0f);
-            printf("xxx effEditGetRect returned left=%d top=%d right=%d bottom=%d\n", rect->left, rect->top, rect->right, rect->bottom);
+            ERect *rectp = 0;
+            ERect rect;
+            effect->dispatcher(effect, effEditGetRect, 0, 0, (void*)&rectp, 0.0f);
+            if(NULL != rectp)
+            {
+               rect = *rectp;
+            }
+            else
+            {
+               rect.top  = 0;
+               rect.left = 0;
+               rect.right = 640;
+               rect.bottom = 480;
+            }
+            printf("xxx effEditGetRect returned left=%d top=%d right=%d bottom=%d\n", rect.left, rect.top, rect.right, rect.bottom);
 
 #ifndef YAC_WIN32
-            w = XCreateSimpleWindow(d, RootWindow(d, s), rect->left, rect->top, (rect->right - rect->left), (rect->bottom - rect->top), 1,
+            w = XCreateSimpleWindow(d, RootWindow(d, s), rect.left, rect.top, (rect.right - rect.left), (rect.bottom - rect.top), 1,
                                     BlackPixel(d, s), WhitePixel(d, s)
                                     );
             XSelectInput(d, w, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | FocusChangeMask);
