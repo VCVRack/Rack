@@ -131,6 +131,11 @@ typedef struct lglw_int_s {
    } timer;
 
    struct {
+      uint32_t numChars;
+      char *data;
+   } clipboard;
+
+   struct {
       lglw_dropfiles_fxn_t cbk;
    } dropfiles;
 
@@ -524,6 +529,41 @@ static void loc_eventProc(void *_xevent) {
                      loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_WHEELDOWN);
                      break;
                }
+               break;
+
+            case SelectionClear:
+               printf("vstgltest<lglw_linux>: xev SelectionClear\n");
+               lglw->clipboard.numChars = 0;
+               free(lglw->clipboard.data);
+               break;
+
+            case SelectionRequest:
+               printf("vstgltest<lglw_linux>: xev SelectionRequest\n");
+               XSelectionRequestEvent *cbReq = (XSelectionRequestEvent*)xev;
+               XSelectionEvent cbRes;
+
+               Atom utf8 = XInternAtom(lglw->xdsp, "UTF8_STRING", False);
+
+               cbRes.type = SelectionNotify;
+               cbRes.requestor = cbReq->requestor;
+               cbRes.selection = cbReq->selection;
+               cbRes.target = cbReq->target;
+               cbRes.time = cbReq->time;
+
+               if(cbReq->target == utf8)
+               {
+                  XChangeProperty(lglw->xdsp, cbReq->requestor, cbReq->property, utf8, 8/*format*/, PropModeReplace,
+                                 (unsigned char *)lglw->clipboard.data, lglw->clipboard.numChars);
+
+                  cbRes.property = cbReq->property;
+               }
+               else
+               {
+                  cbRes.property = None;
+               }
+
+               XSendEvent(lglw->xdsp, cbReq->requestor, True, NoEventMask, (XEvent *)&cbRes);
+
                break;
          }
       }
@@ -1569,12 +1609,41 @@ void lglw_clipboard_text_set(lglw_t _lglw, const uint32_t _numChars, const char 
    LGLW(_lglw);
    (void)_numChars;
 
-   // (todo) implement me
-
    if(NULL != _text)
    {
-      (void)lglw;
+      if(NULL != _lglw)
+      {
+         if(0 != lglw->win.xwnd)
+         {
+            uint32_t numChars = (0u == _numChars) ? ((uint32_t)strlen(_text)+1u) : _numChars;
+
+            if(numChars > 0u)
+            {
+               lglw->clipboard.numChars = numChars;
+               lglw->clipboard.data = malloc(numChars+1);
+
+               uint32_t i;
+               for(i = 0u; i < numChars; i++)
+               {
+                  lglw->clipboard.data[i] = _text[i];
+               }
+               lglw->clipboard.data[numChars - 1] = 0;
+
+               printf("xxx lglw_clipboard_text_set(%i): %s\n", lglw->clipboard.numChars, lglw->clipboard.data);
+
+               Atom clipboard = XInternAtom(lglw->xdsp, "CLIPBOARD", False);
+               XSetSelectionOwner(lglw->xdsp, clipboard, lglw->win.xwnd, CurrentTime);
+               XSync(lglw->xdsp, False);
+            }
+         }
+      }
    }
+}
+
+
+// ---------------------------------------------------------------------------- loc_is_clipboard_event
+static Bool loc_is_clipboard_event(Display *_display, XEvent *_xevent, XPointer _xarg) {
+   return _xevent->type == SelectionNotify;
 }
 
 
@@ -1592,8 +1661,118 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
    {
       if(NULL != _lglw)
       {
-         // (todo) implement me
-         (void)lglw;
+         if(0 != lglw->win.xwnd)
+         {
+            Window owner;
+            XEvent xev;
+            XSelectionEvent *cbReq;
+            Atom clipboard = XInternAtom(lglw->xdsp, "CLIPBOARD", False);
+            Atom utf8 = XInternAtom(lglw->xdsp, "UTF8_STRING", False);
+            Atom target = XInternAtom(lglw->xdsp, "_clipboard_result", False);
+
+            owner = XGetSelectionOwner(lglw->xdsp, clipboard);
+            if(owner == None)
+            {
+               printf("xxx lglw_clipboard_text_get: No Window can provide a clipboard result\n");
+               return;
+            }
+
+            if(owner == lglw->win.xwnd)
+            {
+               printf("xxx lglw_clipboard_text_get: We are the owner of the clipboard, skip X interactions\n");
+
+               uint32_t i = 0u;
+               for(; i < _maxChars; i++)
+               {
+                  _retText[i] = lglw->clipboard.data[i];
+                  if(0 == _retText[i])
+                     break;
+               }
+               _retText[_maxChars - 1u] = 0;
+
+               if(NULL != _retNumChars)
+                  *_retNumChars = i;
+
+               printf("xxx lglw_clipboard_text_get: (result on next line)\n%s\n", _retText);
+               return;
+            }
+
+            XConvertSelection(lglw->xdsp, clipboard, utf8, target, lglw->win.xwnd, CurrentTime);
+            XIfEvent(lglw->xdsp, &xev, &loc_is_clipboard_event, None);
+
+            cbReq = (XSelectionEvent*)&xev;
+            if(None == cbReq->property)
+            {
+               printf("xxx lglw_clipboard_text_get: Clipboard was not converted to UTF-8 string\n");
+               return;
+            }
+
+            Atom returnType;
+            int returnFormat;
+            unsigned long size, returnSize, bytesLeft;
+            unsigned char *propertyValue = NULL;
+
+            XGetWindowProperty(lglw->xdsp, lglw->win.xwnd, target,
+                               0/*offset*/,
+                               0/*length*/,
+                               False/*delete*/,
+                               AnyPropertyType/*req_type*/,
+                               &returnType/*actual_type_return*/,
+                               &returnFormat/*actual_format_return*/,
+                               &returnSize/*nitems_return*/,
+                               &size/*bytes_after_return*/,
+                               &propertyValue/*prop_return*/);
+            XFree(propertyValue);
+
+            if(utf8 != returnType)
+            {
+               printf("xxx lglw_clipboard_text_get: Clipboard result is not a UTF-8 string\n");
+               return;
+            }
+
+            if(8u != returnFormat)
+            {
+               printf("xxx lglw_clipboard_text_get: Clipboard format is not a char array\n");
+               return;
+            }
+
+            if(_maxChars < size)
+               size = _maxChars;
+            size = 1 + ((size - 1) / 4);
+
+            // TODO: Even with the largest current use-case, multiple calls aren't necessary. do it anyway just in case
+            XGetWindowProperty(lglw->xdsp, lglw->win.xwnd, target,
+                               0/*offset*/,
+                               size/*length*/,
+                               True/*delete*/,
+                               AnyPropertyType/*req_type*/,
+                               &returnType/*actual_type_return*/,
+                               &returnFormat/*actual_format_return*/,
+                               &returnSize/*nitems_return*/,
+                               &bytesLeft/*bytes_after_return*/,
+                               &propertyValue/*prop_return*/);
+
+            if(returnSize == 0)
+            {
+               printf("xxx lglw_clipboard_text_get: No Clipboard result after final request\n");
+               return;
+            }
+
+            uint32_t i = 0u;
+            for(; i < _maxChars; i++)
+            {
+               _retText[i] = propertyValue[i];
+               if(0 == _retText[i])
+                  break;
+            }
+            _retText[_maxChars - 1u] = 0;
+
+            if(NULL != _retNumChars)
+               *_retNumChars = i;
+
+            printf("xxx lglw_clipboard_text_get: (result on next line)\n%s\n", _retText);
+            XFree(propertyValue);
+         }
       }
    }
 }
