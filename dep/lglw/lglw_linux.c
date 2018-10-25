@@ -372,20 +372,23 @@ static void loc_eventProc(void *_xevent) {
 
       if(NULL != lglw)
       {
-         lglw_bool_t bHandled = LGLW_FALSE;
+         lglw_bool_t eventHandled = LGLW_FALSE;
 
          switch(xev->type)
          {
             default:
                printf("vstgltest<lglw_linux>: unhandled X11 event type=%d\n", xev->type);
+               eventHandled = LGLW_FALSE;
                break;
 
             case Expose:
                printf("vstgltest<lglw_linux>: xev Expose\n");
                loc_handle_queued_mouse_warp(lglw);
+               eventHandled = LGLW_FALSE;
                if(NULL != lglw->redraw.cbk)
                {
                   lglw->redraw.cbk(lglw);
+                  eventHandled = LGLW_TRUE;
                }
                break;
 
@@ -393,10 +396,12 @@ static void loc_eventProc(void *_xevent) {
 
             case FocusIn:
                printf("vstgltest<lglw_linux>: xev FocusIn\n");
+               eventHandled = LGLW_FALSE;
                break;
 
             case FocusOut:
                printf("vstgltest<lglw_linux>: xev FocusOut\n");
+               eventHandled = LGLW_FALSE;
                break;
 
             case EnterNotify:
@@ -415,6 +420,7 @@ static void loc_eventProc(void *_xevent) {
                {
                   loc_handle_mouseenter(lglw);
                }
+               eventHandled = LGLW_TRUE;
 
                break;
 
@@ -431,6 +437,7 @@ static void loc_eventProc(void *_xevent) {
                {
                   loc_handle_mouseleave(lglw);
                }
+               eventHandled = LGLW_TRUE;
 
                break;
 
@@ -456,6 +463,7 @@ static void loc_eventProc(void *_xevent) {
                }
 
                loc_handle_mousemotion(lglw);
+               eventHandled = LGLW_TRUE;
 
                break;
 
@@ -463,6 +471,7 @@ static void loc_eventProc(void *_xevent) {
                printf("vstgltest<lglw_linux>: xev KeyPress\n");
                XKeyPressedEvent *keyPress = (XKeyPressedEvent*)xev;
 
+               eventHandled = LGLW_FALSE;
                KeySym xkp = XLookupKeysym(keyPress, 0);
                switch(xkp)
                {
@@ -473,11 +482,11 @@ static void loc_eventProc(void *_xevent) {
                         KeySym xkpl;
                         KeySym xkpu;
                         XConvertCase(xkp, &xkpl, &xkpu);
-                        bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, xkpu);
+                        eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, xkpu);
                      }
                      else
                      {
-                        bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, xkp);
+                        eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, xkp);
                      }
                      break;
 
@@ -486,91 +495,91 @@ static void loc_eventProc(void *_xevent) {
                      break;
 
                   case XK_F1:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F1);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F1);
                      break;
 
                   case XK_F2:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F2);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F2);
                      break;
 
                   case XK_F3:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F3);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F3);
                      break;
 
                   case XK_F4:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F4);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F4);
                      break;
 
                   case XK_F5:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F5);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F5);
                      break;
 
                   case XK_F6:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F6);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F6);
                      break;
 
                   case XK_F7:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F7);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F7);
                      break;
 
                   case XK_F8:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F8);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F8);
                      break;
 
                   case XK_F9:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F9);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F9);
                      break;
 
                   case XK_F10:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F10);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F10);
                      break;
 
                   case XK_F11:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F11);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F11);
                      break;
 
                   case XK_F12:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F12);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F12);
                      break;
 
                   case XK_BackSpace:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_BACKSPACE);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_BACKSPACE);
                      break;
 
                   case XK_Tab:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_TAB);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_TAB);
                      break;
 
                   case XK_Return:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_RETURN);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_RETURN);
                      break;
 
                   case XK_Escape:
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_ESCAPE);
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_ESCAPE);
                      break;
 
                   case XK_Shift_L:
                      lglw->keyboard.kmod_state |= LGLW_KMOD_LSHIFT;
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_LSHIFT);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_LSHIFT);
+                     eventHandled = LGLW_FALSE;
                      break;
 
                   case XK_Shift_R:
                      lglw->keyboard.kmod_state |= LGLW_KMOD_RSHIFT;
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_RSHIFT);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_RSHIFT);
+                     eventHandled = LGLW_FALSE;
                      break;
 
                   case XK_Control_L:
                      lglw->keyboard.kmod_state |= LGLW_KMOD_LCTRL;
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_KMOD_LCTRL);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_KMOD_LCTRL);
+                     eventHandled = LGLW_FALSE;
                      break;
 
                   case XK_Control_R:
                      lglw->keyboard.kmod_state |= LGLW_KMOD_RCTRL;
-                     bHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_KMOD_RCTRL);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_KMOD_RCTRL);
+                     eventHandled = LGLW_FALSE;
                      break;
                }
 
@@ -580,6 +589,7 @@ static void loc_eventProc(void *_xevent) {
                printf("vstgltest<lglw_linux>: xev KeyRelease\n");
                XKeyReleasedEvent *keyRelease = (XKeyReleasedEvent*)xev;
 
+               eventHandled = LGLW_FALSE;
                KeySym xkr = XLookupKeysym(keyRelease, 0);
                switch(xkr)
                {
@@ -590,11 +600,11 @@ static void loc_eventProc(void *_xevent) {
                         KeySym xkrl;
                         KeySym xkru;
                         XConvertCase(xkr, &xkrl, &xkru);
-                        bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, xkru);
+                        eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, xkru);
                      }
                      else
                      {
-                        bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, xkr);
+                        eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, xkr);
                      }
                      break;
 
@@ -603,91 +613,91 @@ static void loc_eventProc(void *_xevent) {
                      break;
 
                   case XK_F1:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F1);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F1);
                      break;
 
                   case XK_F2:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F2);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F2);
                      break;
 
                   case XK_F3:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F3);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F3);
                      break;
 
                   case XK_F4:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F4);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F4);
                      break;
 
                   case XK_F5:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F5);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F5);
                      break;
 
                   case XK_F6:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F6);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F6);
                      break;
 
                   case XK_F7:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F7);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F7);
                      break;
 
                   case XK_F8:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F8);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F8);
                      break;
 
                   case XK_F9:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F9);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F9);
                      break;
 
                   case XK_F10:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F10);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F10);
                      break;
 
                   case XK_F11:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F11);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F11);
                      break;
 
                   case XK_F12:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F12);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_F12);
                      break;
 
                   case XK_BackSpace:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_BACKSPACE);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_BACKSPACE);
                      break;
 
                   case XK_Tab:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_TAB);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_TAB);
                      break;
 
                   case XK_Return:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RETURN);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RETURN);
                      break;
 
                   case XK_Escape:
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_ESCAPE);
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_ESCAPE);
                      break;
 
                   case XK_Shift_L:
                      lglw->keyboard.kmod_state &= ~LGLW_KMOD_LSHIFT;
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_LSHIFT);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_LSHIFT);
+                     eventHandled = LGLW_FALSE;
                      break;
 
                   case XK_Shift_R:
                      lglw->keyboard.kmod_state &= ~LGLW_KMOD_RSHIFT;
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RSHIFT);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RSHIFT);
+                     eventHandled = LGLW_FALSE;
                      break;
 
                   case XK_Control_L:
                      lglw->keyboard.kmod_state &= ~LGLW_KMOD_LCTRL;
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_LCTRL);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_LCTRL);
+                     eventHandled = LGLW_FALSE;
                      break;
 
                   case XK_Control_R:
                      lglw->keyboard.kmod_state &= ~LGLW_KMOD_RCTRL;
-                     bHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RCTRL);
-                     bHandled = LGLW_FALSE;
+                     eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RCTRL);
+                     eventHandled = LGLW_FALSE;
                      break;
                }
 
@@ -708,21 +718,27 @@ static void loc_eventProc(void *_xevent) {
                {
                   default:
                      printf("vstgltest<lglw_linux>: xev ButtonPress unhandled button: %i\n", btnPress->button);
+                     eventHandled = LGLW_FALSE;
                      break;
                   case Button1:
                      loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_LBUTTON);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button2:
                      loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_RBUTTON);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button3:
                      loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_MBUTTON);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button4:
                      loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_WHEELUP);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button5:
                      loc_handle_mousebutton(lglw, LGLW_TRUE/*bPressed*/, LGLW_MOUSE_WHEELDOWN);
+                     eventHandled = LGLW_TRUE;
                      break;
                }
                break;
@@ -736,21 +752,27 @@ static void loc_eventProc(void *_xevent) {
                {
                   default:
                      printf("vstgltest<lglw_linux>: xev ButtonRelease unhandled button: %i\n", btnRelease->button);
+                     eventHandled = LGLW_FALSE;
                      break;
                   case Button1:
                      loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_LBUTTON);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button2:
                      loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_RBUTTON);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button3:
                      loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_MBUTTON);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button4:
                      loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_WHEELUP);
+                     eventHandled = LGLW_TRUE;
                      break;
                   case Button5:
                      loc_handle_mousebutton(lglw, LGLW_FALSE/*bPressed*/, LGLW_MOUSE_WHEELDOWN);
+                     eventHandled = LGLW_TRUE;
                      break;
                }
                break;
@@ -759,6 +781,7 @@ static void loc_eventProc(void *_xevent) {
                printf("vstgltest<lglw_linux>: xev SelectionClear\n");
                lglw->clipboard.numChars = 0;
                free(lglw->clipboard.data);
+               eventHandled = LGLW_TRUE;
                break;
 
             case SelectionRequest:
@@ -787,8 +810,22 @@ static void loc_eventProc(void *_xevent) {
                }
 
                XSendEvent(lglw->xdsp, cbReq->requestor, True, NoEventMask, (XEvent *)&cbRes);
+               eventHandled = LGLW_TRUE;
 
                break;
+         }
+
+         if(LGLW_FALSE == eventHandled)
+         {
+            if(0 == lglw->parent_xwnd)
+            {
+               printf("lglw_linux:loc_eventProc: no parent window to send events to");
+               XSendEvent(lglw->xdsp, InputFocus, True/*propgate*/, NoEventMask, xev);
+            }
+            else
+            {
+               XSendEvent(lglw->xdsp, lglw->parent_xwnd, True/*propgate*/, NoEventMask, xev);
+            }
          }
       }
    }
