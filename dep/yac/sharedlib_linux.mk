@@ -12,9 +12,9 @@ TARGET=$(TARGET_BASENAME).so
 endif
 
 CPPFLAGS += -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
-#CPPFLAGS+= -fPIC
+CPPFLAGS+= -fPIC
 CFLAGS += -I"$(VSVR_BASE_DIR)/dep/yac" $(EXTRAFLAGS)
-#CFLAGS+= -fPIC
+CFLAGS+= -fPIC
 EXTRALIBS += -L$(CROSS_ROOT)/usr/lib -lm -lpthread
 
 ###########include sharedlib_common_gcc.mk
