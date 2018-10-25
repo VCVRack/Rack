@@ -18,6 +18,8 @@
 #ifndef NANOVG_GL_H
 #define NANOVG_GL_H
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -426,24 +428,41 @@ static void glnvg__checkError(GLNVGcontext* gl, const char* str)
 	}
 }
 
-static int glnvg__createShader(GLNVGshader* shader, const char* name, const char* header, const char* opts, const char* vshader, const char* fshader)
+/* static void loc_print_shader(char**lines, int numlines) { */
+/*    int i; */
+/*    for(i = 0; i < numlines; i++) */
+/*    { */
+/*       printf("xxx loc_print_shader: line[%d]=\"%s\"\n", i, lines[i]); */
+/*    } */
+/* } */
+
+static int glnvg__createShader(GLNVGshader* shader, const char* name, const char* header, const char* opts, const char *vshader, const char *fshader)
 {
 	GLint status;
 	GLuint prog, vert, frag;
-	const char* str[3];
-	str[0] = header;
-	str[1] = opts != NULL ? opts : "";
+	/* const char* str[3]; */
+	/* str[0] = header; */
+	/* str[1] = opts != NULL ? opts : ""; */
+   /* vshader[0] = header; */
+   /* vshader[1] = opts != NULL ? opts : (char*)""; */
+   /* fshader[0] = header; */
+   /* fshader[1] = opts != NULL ? opts : (char*)""; */
 
 	memset(shader, 0, sizeof(*shader));
 
 	prog = glCreateProgram();
 	vert = glCreateShader(GL_VERTEX_SHADER);
 	frag = glCreateShader(GL_FRAGMENT_SHADER);
-	str[2] = vshader;
-	glShaderSource(vert, 3, str, 0);
-	str[2] = fshader;
-	glShaderSource(frag, 3, str, 0);
+	/* str[2] = vshader; */
+   /* printf("xxx glnvg__createShader: glShaderSource(vert, ..)\n"); */
+   /* loc_print_shader(vshader, vshader_numlines); */
+	glShaderSource(vert, 1, &vshader, 0);
+	/* str[2] = fshader; */
+   /* printf("xxx glnvg__createShader: glShaderSource(frag, ..)\n"); */
+   /* loc_print_shader(fshader, fshader_numlines); */
+	glShaderSource(frag, 1, &fshader, 0);
 
+   /* printf("xxx glnvg__createShader: compileShader(vert)\n"); */
 	glCompileShader(vert);
 	glGetShaderiv(vert, GL_COMPILE_STATUS, &status);
 	if (status != GL_TRUE) {
@@ -451,6 +470,7 @@ static int glnvg__createShader(GLNVGshader* shader, const char* name, const char
 		return 0;
 	}
 
+   /* printf("xxx glnvg__createShader: compileShader(frag)\n"); */
 	glCompileShader(frag);
 	glGetShaderiv(frag, GL_COMPILE_STATUS, &status);
 	if (status != GL_TRUE) {
@@ -458,14 +478,17 @@ static int glnvg__createShader(GLNVGshader* shader, const char* name, const char
 		return 0;
 	}
 
+   /* printf("xxx glnvg__createShader: attach shaders\n"); */
 	glAttachShader(prog, vert);
 	glAttachShader(prog, frag);
 
 	glBindAttribLocation(prog, 0, "vertex");
 	glBindAttribLocation(prog, 1, "tcoord");
 
+   /* printf("xxx glnvg__createShader: link program\n"); */
 	glLinkProgram(prog);
 	glGetProgramiv(prog, GL_LINK_STATUS, &status);
+   /* printf("xxx glnvg__createShader: link program status=%u\n", status); */
 	if (status != GL_TRUE) {
 		glnvg__dumpProgramError(prog, name);
 		return 0;
@@ -505,9 +528,12 @@ static int glnvg__renderCreate(void* uptr)
 	GLNVGcontext* gl = (GLNVGcontext*)uptr;
 	int align = 4;
 
+   // (note) [bsp] 25Oct2018: the VirtualBox GL wrapper/driver does not support shader sources with multiple lines.
+   //         the header+opts are therefore 'inlined' now
+#if 0
 	// TODO: mediump float may not be enough for GLES2 in iOS.
 	// see the following discussion: https://github.com/memononen/nanovg/issues/46
-	static const char* shaderHeader =
+	static char* shaderHeader =
 #if defined NANOVG_GL2
 		"#define NANOVG_GL2 1\n"
 #elif defined NANOVG_GL3
@@ -527,8 +553,30 @@ static int glnvg__renderCreate(void* uptr)
 	"#define UNIFORMARRAY_SIZE 11\n"
 #endif
 	"\n";
+#endif
 
-	static const char* fillVertShader =
+	static const char* fillVertShader = {
+#if defined NANOVG_GL2
+		"#define NANOVG_GL2 1\n"
+#elif defined NANOVG_GL3
+		"#version 150 core\n"
+		"#define NANOVG_GL3 1\n"
+#elif defined NANOVG_GLES2
+		"#version 100\n"
+		"#define NANOVG_GL2 1\n"
+#elif defined NANOVG_GLES3
+		"#version 300 es\n"
+		"#define NANOVG_GL3 1\n"
+#endif
+
+#if NANOVG_GL_USE_UNIFORMBUFFER
+	"#define USE_UNIFORMBUFFER 1\n"
+#else
+	"#define UNIFORMARRAY_SIZE 11\n"
+#endif
+
+      "#define EDGE_AA 1\n"  // opts
+
 		"#ifdef NANOVG_GL3\n"
 		"	uniform vec2 viewSize;\n"
 		"	in vec2 vertex;\n"
@@ -546,9 +594,31 @@ static int glnvg__renderCreate(void* uptr)
 		"	ftcoord = tcoord;\n"
 		"	fpos = vertex;\n"
 		"	gl_Position = vec4(2.0*vertex.x/viewSize.x - 1.0, 1.0 - 2.0*vertex.y/viewSize.y, 0, 1);\n"
-		"}\n";
+		"}\n"
+   };
 
-	static const char* fillFragShader =
+	static const char* fillFragShader = {
+#if defined NANOVG_GL2
+		"#define NANOVG_GL2 1\n"
+#elif defined NANOVG_GL3
+		"#version 150 core\n"
+		"#define NANOVG_GL3 1\n"
+#elif defined NANOVG_GLES2
+		"#version 100\n"
+		"#define NANOVG_GL2 1\n"
+#elif defined NANOVG_GLES3
+		"#version 300 es\n"
+		"#define NANOVG_GL3 1\n"
+#endif
+
+#if NANOVG_GL_USE_UNIFORMBUFFER
+	"#define USE_UNIFORMBUFFER 1\n"
+#else
+	"#define UNIFORMARRAY_SIZE 11\n"
+#endif
+
+      "#define EDGE_AA 1\n"  // opts
+
 		"#ifdef GL_ES\n"
 		"#if defined(GL_FRAGMENT_PRECISION_HIGH) || defined(NANOVG_GL3)\n"
 		" precision highp float;\n"
@@ -621,7 +691,8 @@ static int glnvg__renderCreate(void* uptr)
 		"}\n"
 		"#endif\n"
 		"\n"
-		"void main(void) {\n"
+		/* "void main(void) {\n" */
+		"void main() {\n"
 		"   vec4 result;\n"
 		"	float scissor = scissorMask(fpos);\n"
 		"#ifdef EDGE_AA\n"
@@ -671,26 +742,36 @@ static int glnvg__renderCreate(void* uptr)
 		"#else\n"
 		"	gl_FragColor = result;\n"
 		"#endif\n"
-		"}\n";
+		"}\n"
+   };
 
 	glnvg__checkError(gl, "init");
 
+   /* printf("xxx glnvg__renderCreate: 1\n"); */
+   
 	if (gl->flags & NVG_ANTIALIAS) {
-		if (glnvg__createShader(&gl->shader, "shader", shaderHeader, "#define EDGE_AA 1\n", fillVertShader, fillFragShader) == 0)
+      /* printf("xxx glnvg__renderCreate: 2a\n"); */
+		if (glnvg__createShader(&gl->shader, "shader", NULL/*shaderHeader*/, NULL/*"#define EDGE_AA 1\n"*/, fillVertShader, fillFragShader) == 0)
 			return 0;
 	} else {
-		if (glnvg__createShader(&gl->shader, "shader", shaderHeader, NULL, fillVertShader, fillFragShader) == 0)
+      /* printf("xxx glnvg__renderCreate: 2b\n"); */
+		if (glnvg__createShader(&gl->shader, "shader", NULL/*shaderHeader*/, NULL, fillVertShader, fillFragShader) == 0)
 			return 0;
 	}
 
+   /* printf("xxx glnvg__renderCreate: 3\n"); */
+
 	glnvg__checkError(gl, "uniform locations");
+   /* printf("xxx glnvg__renderCreate: 4\n"); */
 	glnvg__getUniforms(&gl->shader);
+   /* printf("xxx glnvg__renderCreate: 5\n"); */
 
 	// Create dynamic vertex array
 #if defined NANOVG_GL3
 	glGenVertexArrays(1, &gl->vertArr);
 #endif
 	glGenBuffers(1, &gl->vertBuf);
+   /* printf("xxx glnvg__renderCreate: 6\n"); */
 
 #if NANOVG_GL_USE_UNIFORMBUFFER
 	// Create UBOs
@@ -700,9 +781,13 @@ static int glnvg__renderCreate(void* uptr)
 #endif
 	gl->fragSize = sizeof(GLNVGfragUniforms) + align - sizeof(GLNVGfragUniforms) % align;
 
+   /* printf("xxx glnvg__renderCreate: 7\n"); */
 	glnvg__checkError(gl, "create done");
+   /* printf("xxx glnvg__renderCreate: 8\n"); */
 
 	glFinish();
+
+   /* printf("xxx glnvg__renderCreate: LEAVE\n"); */
 
 	return 1;
 }
@@ -1582,7 +1667,9 @@ NVGcontext* nvgCreateGLES3(int flags)
 
 	gl->flags = flags;
 
+   /* printf("xxx nvgCreateInternal 1\n"); */
 	ctx = nvgCreateInternal(&params);
+   /* printf("xxx nvgCreateInternal 2\n"); */
 	if (ctx == NULL) goto error;
 
 	return ctx;
