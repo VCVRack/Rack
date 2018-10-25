@@ -3,10 +3,10 @@
 
 #define DLL_PATH "../../vst2_bin/veeseevstrack_effect.dll"
 
-// #define SO_PATH  "../../vst2_bin/veeseevstrack_effect.so"
+#define SO_PATH  "../../vst2_bin/veeseevstrack_effect.so"
 // #define SO_PATH  "../vst2_lglw_debug_plugin/debug_lglw.so"
 // #define SO_PATH  "/usr/local/lib/vst/debug_lglw.so"
-#define SO_PATH  "../../vst2_bin/debug_lglw.so"
+// #define SO_PATH  "../../vst2_bin/debug_lglw.so"
 
 // #define SO_PATH  "/home/bsp/.vst/DiscoveryPro68DemoLinux/64-bit/DiscoveryPro64.so"
 // #define SO_PATH  "/home/bsp/.vst/AcidBoxDEMO-Linux/AcidBoxDEMOVST-x64.so"
