@@ -36,12 +36,19 @@ FramebufferWidget::~FramebufferWidget() {
 
 void FramebufferWidget::draw(NVGcontext *vg) {
 	// Bypass framebuffer rendering entirely
+   // printf("xxx FramebufferWidget::draw\n");
 #ifdef RACK_PLUGIN_SHARED
+   bool bFBO = false;
+#else
+   bool bFBO = global_ui->b_fbo;
+#endif // RACK_PLUGIN_SHARED
    // (note) FBO path crashes when plugin is a DLL (!)
    //         (the glGenFramebuffers() call in nvgluCreateFramebuffer() to be precise)
-   Widget::draw(vg);
-   return;
-#endif // RACK_PLUGIN_SHARED
+   if(!bFBO)
+   {
+      Widget::draw(vg);
+      return;
+   }
    // printf("xxx FramebufferWidget::draw: ENTER vg=%p\n", vg);
    // printf("xxx FramebufferWidget::draw: GetCurrentThreadId=%d\n", GetCurrentThreadId());
 

@@ -104,6 +104,8 @@ struct GlobalUI {
       int placeholder_framecount;
    } param_info;
 
+   bool b_fbo;  // usually true. set to false when using the VirtualBox GL driver.
+   int pending_swap_interval; // -1=none, 1=vsync on, 0=vsync off
 
    void init(void) {
       
@@ -152,6 +154,9 @@ struct GlobalUI {
       param_info.tf_value = NULL;
       param_info.b_lock = false;
       param_info.placeholder_framecount = 0;
+
+      b_fbo = true;
+      pending_swap_interval = -1;
    } 
 
 };

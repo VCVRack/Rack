@@ -82,6 +82,10 @@ static json_t *settingsToJson() {
 	json_t *vsyncJ = json_boolean(vsync);
 	json_object_set_new(rootJ, "vsync", vsyncJ);
 
+   // fbo
+	json_t *fboJ = json_boolean(!global_ui->b_fbo);
+	json_object_set_new(rootJ, "fbo", fboJ);
+
    // touchInput
    int touchInput = lglw_touchinput_get(global_ui->window.lglw);
 	json_t *touchInputJ = json_boolean(touchInput);
@@ -252,10 +256,21 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
       json_t *vsyncJ = json_object_get(rootJ, "vsync");
       if (vsyncJ)
       {
-         lglw_glcontext_push(global_ui->window.lglw);
-         lglw_swap_interval_set(global_ui->window.lglw, json_is_true(vsyncJ));
-         lglw_glcontext_pop(global_ui->window.lglw);
+         // lglw_glcontext_push(global_ui->window.lglw);
+         // lglw_swap_interval_set(global_ui->window.lglw, json_is_true(vsyncJ);
+         // lglw_glcontext_pop(global_ui->window.lglw);
+
+         // postpone until first vst2_editor_redraw() call (see window.cpp)
+         //  (note) on Linux we need a drawable to set the swap interval
+         global_ui->pending_swap_interval = json_is_true(vsyncJ);
       }
+   }
+
+   // fbo support (not working with VirtualBox GL driver!)
+   json_t *fboJ = json_object_get(rootJ, "fbo");
+   if (fboJ)
+   {
+      global_ui->b_fbo = json_is_true(fboJ);
    }
 
 	// allowCursorLock
