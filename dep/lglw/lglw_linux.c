@@ -1412,20 +1412,23 @@ void lglw_swap_buffers(lglw_t _lglw) {
 
 
 // ---------------------------------------------------------------------------- lglw_swap_interval_set
-typedef void (APIENTRY *PFNWGLEXTSWAPINTERVALPROC) (int);
+typedef void (APIENTRY *PFNWGLEXTSWAPINTERVALPROC) (Display *, GLXDrawable, int);
 void lglw_swap_interval_set(lglw_t _lglw, int32_t _ival) {
    LGLW(_lglw);
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_swap_interval_set: 1\n");
-      PFNWGLEXTSWAPINTERVALPROC glXSwapIntervalEXT;
-      glXSwapIntervalEXT = (PFNWGLEXTSWAPINTERVALPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
-      if(NULL != glXSwapIntervalEXT)
+      if(0 != lglw->win.xwnd)
       {
-         lglw_log("lglw:lglw_swap_interval_set: 2\n");
-         glXSwapIntervalEXT(_ival);
-         lglw->win.swap_interval = _ival;
+         lglw_log("lglw:lglw_swap_interval_set: 1\n");
+         PFNWGLEXTSWAPINTERVALPROC glXSwapIntervalEXT;
+         glXSwapIntervalEXT = (PFNWGLEXTSWAPINTERVALPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
+         if(NULL != glXSwapIntervalEXT)
+         {
+            lglw_log("lglw:lglw_swap_interval_set: 2\n");
+            glXSwapIntervalEXT(lglw->xdsp, lglw->win.xwnd, _ival);
+            lglw->win.swap_interval = _ival;
+         }
       }
    }
 }
