@@ -6,6 +6,8 @@ namespace rack {
 void RackRail::draw(NVGcontext *vg) {
 	const float railHeight = RACK_GRID_WIDTH;
 
+   // printf("xxx RackRail::draw: ENTER\n");
+
 	// Background color
 	nvgBeginPath(vg);
 	nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
@@ -55,6 +57,8 @@ void RackRail::draw(NVGcontext *vg) {
 		nvgFillColor(vg, nvgRGBf(1.0, 1.0, 1.0));
 		nvgFill(vg);
 	}
+
+   // printf("xxx RackRail::draw: LEAVE\n");
 }
 
 

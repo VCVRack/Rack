@@ -68,6 +68,7 @@ void ScrollWidget::scrollTo(Rect r) {
 }
 
 void ScrollWidget::draw(NVGcontext *vg) {
+   // printf("xxx ScrollWidget::draw\n");
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(vg);
 	nvgResetScissor(vg);

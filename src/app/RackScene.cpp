@@ -57,6 +57,7 @@ void RackScene::step() {
 }
 
 void RackScene::draw(NVGcontext *vg) {
+   // printf("xxx RackScene::draw\n");
 	Scene::draw(vg);
 }
 

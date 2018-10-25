@@ -507,6 +507,7 @@ Toolbar::Toolbar() {
 }
 
 void Toolbar::draw(NVGcontext *vg) {
+   // printf("xxx Toolbar::draw\n");
 	bndBackground(vg, 0.0, 0.0, box.size.x, box.size.y);
 	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 

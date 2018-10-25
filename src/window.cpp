@@ -348,18 +348,28 @@ void renderGui() {
    // printf("xxx renderGui: ENTER\n");
    lglw_window_size_get(global_ui->window.lglw, &width, &height);
 
+   // printf("xxx renderGui: 1 lglw=%p size=(%d; %d)\n", global_ui->window.lglw, width, height);
+
 	// Update and render
 	nvgBeginFrame(global_ui->window.gVg, width, height, global_ui->window.gPixelRatio);
 
+   // printf("xxx renderGui: 2\n");
+
 	nvgReset(global_ui->window.gVg);
+   // printf("xxx renderGui: 3\n");
 	nvgScale(global_ui->window.gVg, global_ui->window.gPixelRatio, global_ui->window.gPixelRatio);
    // printf("xxx renderGui: gScene->draw() BEGIN\n");
+   // printf("xxx renderGui: 4\n");
 	global_ui->ui.gScene->draw(global_ui->window.gVg);
    // printf("xxx renderGui: gScene->draw() END\n");
+   // printf("xxx renderGui: 5\n");
 
 	glViewport(0, 0, width, height);
+   // printf("xxx renderGui: 6\n");
 	glClearColor(0.0, 0.0, 0.0, 1.0);
+   // printf("xxx renderGui: 7\n");
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+   // printf("xxx renderGui: 8\n");
 	nvgEndFrame(global_ui->window.gVg);
    // printf("xxx renderGui: LEAVE\n");
 }
@@ -386,7 +396,7 @@ void windowInit() {
 
    lglw_glcontext_push(global_ui->window.lglw);
    printf("xxx vstrack_plugin:windowInit: 5\n");
-   lglw_swap_interval_set(global_ui->window.lglw, 1);  // can be overridden via settings.json:"vsync" property
+   global_ui->pending_swap_interval = 1;
    printf("xxx vstrack_plugin:windowInit: 6\n");
 
    lglw_mouse_callback_set     (global_ui->window.lglw, &lglw_mouse_cbk);
@@ -479,9 +489,18 @@ void windowDestroy() {
 void vst2_editor_redraw(void) {
    // (note) the GL context is set by the caller
 
+   // printf("xxx vst2_editor_redraw: ENTER\n");
+
+   if(-1 != global_ui->pending_swap_interval)
+   {
+      lglw_swap_interval_set(global_ui->window.lglw, global_ui->pending_swap_interval);  // can be overridden via settings.json:"vsync" property
+      global_ui->pending_swap_interval = -1;
+   }
+
    global_ui->window.gGuiFrame++;
 
    // Find/validate hover param
+   // printf("xxx vst2_editor_redraw: 2 global_ui->param_info.last_param_widget=%p\n", global_ui->param_info.last_param_widget);
    if(NULL != global_ui->param_info.last_param_widget)
    {
       int uniqueParamId;
@@ -541,6 +560,7 @@ void vst2_editor_redraw(void) {
       }
    }
    
+   // printf("xxx vst2_editor_redraw: 3\n");
 
 #if 0
    // Set window title
@@ -565,15 +585,24 @@ void vst2_editor_redraw(void) {
    global_ui->window.gWindowRatio = 1.0f;
    global_ui->ui.gScene->box.size = Vec(width, height);
 
+   // printf("xxx vst2_editor_redraw: 4\n");
+
    // Step scene
    global_ui->ui.gScene->step();
+
+   // printf("xxx vst2_editor_redraw: 5\n");
 
    // Render
    renderGui();
 
+   // printf("xxx vst2_editor_redraw: 6\n");
+
    // Present
    glFlush();
+   // printf("xxx vst2_editor_redraw: 7\n");
    lglw_swap_buffers(global_ui->window.lglw);
+
+   // printf("xxx vst2_editor_redraw: LEAVE\n");
 }
 
 void windowCursorLock() {

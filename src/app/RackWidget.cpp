@@ -659,6 +659,7 @@ void RackWidget::step() {
 }
 
 void RackWidget::draw(NVGcontext *vg) {
+   // printf("xxx RackWidget::draw\n");
 	Widget::draw(vg);
 }
 
