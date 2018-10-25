@@ -289,6 +289,9 @@ NVGcontext* nvgCreateInternal(NVGparams* params)
 	NVGcontext* ctx = (NVGcontext*)malloc(sizeof(NVGcontext));
 	int i;
 	if (ctx == NULL) goto error;
+
+   // printf("xxx nvgCreateInternal: 1\n");
+
 	memset(ctx, 0, sizeof(NVGcontext));
 
 	ctx->params = *params;
@@ -300,15 +303,22 @@ NVGcontext* nvgCreateInternal(NVGparams* params)
 	ctx->ncommands = 0;
 	ctx->ccommands = NVG_INIT_COMMANDS_SIZE;
 
+   // printf("xxx nvgCreateInternal: 2\n");
+
 	ctx->cache = nvg__allocPathCache();
 	if (ctx->cache == NULL) goto error;
 
+   // printf("xxx nvgCreateInternal: 3\n");
 	nvgSave(ctx);
+   // printf("xxx nvgCreateInternal: 4\n");
 	nvgReset(ctx);
+   // printf("xxx nvgCreateInternal: 5\n");
 
 	nvg__setDevicePixelRatio(ctx, 1.0f);
+   // printf("xxx nvgCreateInternal: 6\n");
 
 	if (ctx->params.renderCreate(ctx->params.userPtr) == 0) goto error;
+   // printf("xxx nvgCreateInternal: 7\n");
 
 	// Init font rendering
 	memset(&fontParams, 0, sizeof(fontParams));
@@ -322,16 +332,22 @@ NVGcontext* nvgCreateInternal(NVGparams* params)
 	fontParams.userPtr = NULL;
 	ctx->fs = fonsCreateInternal(&fontParams);
 	if (ctx->fs == NULL) goto error;
+   // printf("xxx nvgCreateInternal: 8\n");
 
 	// Create font texture
 	ctx->fontImages[0] = ctx->params.renderCreateTexture(ctx->params.userPtr, NVG_TEXTURE_ALPHA, fontParams.width, fontParams.height, 0, NULL);
+   // printf("xxx nvgCreateInternal: 9\n");
 	if (ctx->fontImages[0] == 0) goto error;
 	ctx->fontImageIdx = 0;
+
+   // printf("xxx nvgCreateInternal: LEAVE\n");
 
 	return ctx;
 
 error:
+   printf("xxx nvgCreateInternal: ERROR 1 \n");
 	nvgDeleteInternal(ctx);
+   printf("xxx nvgCreateInternal: ERROR LEAVE \n");
 	return 0;
 }
 
