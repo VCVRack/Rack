@@ -574,6 +574,14 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
                   eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_END);
                   break;
 
+               case XK_Prior:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_PAGEUP);
+                  break;
+
+               case XK_Next:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_PAGEDOWN);
+                  break;
+
                case XK_F1:
                   eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F1);
                   break;
@@ -722,6 +730,14 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
 
                case XK_End:
                   eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_END);
+                  break;
+
+               case XK_Prior:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_PAGEUP);
+                  break;
+
+               case XK_Next:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_PAGEDOWN);
                   break;
 
                case XK_F1:
