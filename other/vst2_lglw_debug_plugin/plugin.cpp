@@ -96,6 +96,7 @@ static lglw_bool_t loc_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod
 
 static void loc_timer_cbk(lglw_t _lglw) {
    printf("vstgltest: lglw_timer_cbk: tick\n");
+   lglw_redraw(_lglw);
 }
 
 static void loc_redraw_cbk (lglw_t _lglw);
@@ -166,7 +167,7 @@ public:
       lglw_timer_callback_set(lglw, &loc_timer_cbk);
       lglw_redraw_callback_set(lglw, &loc_redraw_cbk);
 
-      lglw_timer_start(lglw, 200);
+      lglw_timer_start(lglw, 1000/30);
 #endif // USE_LGLW
 
       window_to_wrapper = this;
@@ -492,6 +493,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
 #ifdef USE_LGLW
          if(lglw_window_is_visible(wrapper->lglw))
          {
+            // lglw_events(wrapper->lglw);
             wrapper->redrawWindow();
          }
 #endif // USE_LGLW
