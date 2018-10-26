@@ -18,7 +18,7 @@ CPU_ARCH=haswell
 fi
 
 if [ "${USER}" = "cameron" ]; then
-CPU_ARCH=haswell
+CPU_ARCH=skylake-avx512
 fi
 
 # Extra C compiler flags
