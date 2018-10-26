@@ -3,10 +3,10 @@
 
 #define DLL_PATH "../../vst2_bin/veeseevstrack_effect.dll"
 
-// #define SO_PATH  "../../vst2_bin/veeseevstrack_effect.so"
+#define SO_PATH  "../../vst2_bin/veeseevstrack_effect.so"
 // #define SO_PATH  "../vst2_lglw_debug_plugin/debug_lglw.so"
 // #define SO_PATH  "/usr/local/lib/vst/debug_lglw.so"
-#define SO_PATH  "../../vst2_bin/debug_lglw.so"
+// #define SO_PATH  "../../vst2_bin/debug_lglw.so"
 
 // #define SO_PATH  "/home/bsp/.vst/DiscoveryPro68DemoLinux/64-bit/DiscoveryPro64.so"
 // #define SO_PATH  "/home/bsp/.vst/AcidBoxDEMO-Linux/AcidBoxDEMOVST-x64.so"
@@ -192,6 +192,10 @@ void open_and_close(void) {
 
          if(NULL != effect)
          {
+            printf("xxx calling effect->dispatcher<effOpen>\n");
+            effect->dispatcher(effect, effOpen, 0, 0, NULL, 0.0f);
+            printf("xxx effect->dispatcher<effOpen> returned\n");
+
             ERect *rectp = 0;
             ERect rect;
             effect->dispatcher(effect, effEditGetRect, 0, 0, (void*)&rectp, 0.0f);
@@ -230,9 +234,6 @@ void open_and_close(void) {
             }
 #endif
 
-            printf("xxx calling effect->dispatcher<effOpen>\n");
-            effect->dispatcher(effect, effOpen, 0, 0, NULL, 0.0f);
-            printf("xxx effect->dispatcher<effOpen> returned\n");
 #ifdef YAC_WIN32
             VstIntPtr ip = effect->dispatcher(effect, effEditOpen, 0, 0, NULL/*hWnd*/, 0.0f);
 #else
@@ -251,12 +252,12 @@ void open_and_close(void) {
                {
                   XEvent xev;
                   int queued = XPending(d);
-                  printf("xxx =====================================================\n");
-                  printf("xxx checking host queue before effEditIdle (events: %i)\n", queued);
+                  // printf("xxx =====================================================\n");
+                  // printf("xxx checking host queue before effEditIdle (events: %i)\n", queued);
                   while(queued)
                   {
                      XNextEvent(d, &xev);
-                     printf("xxx event type: %i\n", xev.type);
+                     // printf("xxx event type: %i\n", xev.type);
                      queued--;
                   }
 
@@ -264,12 +265,12 @@ void open_and_close(void) {
                   effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
 
                   queued = XPending(d);
-                  printf("xxx checking host queue after effEditIdle (events: %i)\n", queued);
+                  // printf("xxx checking host queue after effEditIdle (events: %i)\n", queued);
                   while(queued)
                   {
                      XNextEvent(d, &xev);
-                     if(MotionNotify != xev.type)
-                        printf("xxx event type: %i\n", xev.type);
+                     // if(MotionNotify != xev.type)
+                     //    printf("xxx event type: %i\n", xev.type);
                      queued--;
                   }
 
