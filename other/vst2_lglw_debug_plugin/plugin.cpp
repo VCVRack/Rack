@@ -496,8 +496,8 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
 #ifdef USE_LGLW
          if(lglw_window_is_visible(wrapper->lglw))
          {
-            // lglw_events(wrapper->lglw);
             // wrapper->redrawWindow();  // redraw is triggered by timer_cbk instead
+            lglw_events(wrapper->lglw);
          }
 #endif // USE_LGLW
          break;
@@ -683,7 +683,7 @@ VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback)
    // simply create our plugin C++ class
    VSTPluginWrapper *plugin =
       new VSTPluginWrapper(vstHostCallback,
-                           //CCONST('u', 's', 'a', '§'), // registered with Steinberg (http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm)
+                           //CCONST('u', 's', 'a', 'ï¿½'), // registered with Steinberg (http://service.steinberg.de/databases/plugin.nsf/plugIn?openForm)
                            CCONST('t', 'e', 's', 't'), // unregistered
                            PLUGIN_VERSION, // version
                            0,    // no params

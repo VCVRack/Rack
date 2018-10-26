@@ -1117,6 +1117,15 @@ public:
       }
    }
 
+   void events(void) {
+      setGlobals();
+
+      if(lglw_window_is_visible(rack::global_ui->window.lglw))
+      {
+         lglw_events(rack::global_ui->window.lglw);
+      }
+   }
+
 private:
    // the host callback (a function pointer)
    VSTHostCallback _vstHostCallback;
@@ -1798,9 +1807,10 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 #endif
 
       case effEditIdle:
-         if(0 == wrapper->redraw_ival_ms)
+         // if(0 == wrapper->redraw_ival_ms)
          {
             wrapper->queueRedraw();
+            wrapper->events();
          }
          break;
 
