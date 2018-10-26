@@ -267,6 +267,11 @@ void lglw_clipboard_text_set (lglw_t _lglw, const uint32_t _numChars, const char
 // Get clipboard string
 void lglw_clipboard_text_get (lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNumChars, char *_retText);
 
+// Process all available events and return (i.e.: don't loop, don't block)
+//  (note) events are usually delivered to the window's event callback (WndProc on Windows)
+//  (note) do we really need this on Linux ?
+void lglw_events (lglw_t _lglw);
+
 #include "cplusplus_end.h"
 
 #endif // __LGLW_H__
