@@ -50,6 +50,12 @@
 #define Dprintf if(0);else printf
 // #define Dprintf if(1);else printf
 
+#define Dprintf_verbose if(1);else printf
+// #define Dprintf_verbose if(0);else printf
+
+#define Dlog_verbose if(1);else lglw_log
+// #define Dlog_verbose if(0);else lglw_log
+
 // ---------------------------------------------------------------------------- macros and defines
 #define LGLW(a) lglw_int_t *lglw = ((lglw_int_t*)(a))
 
@@ -163,7 +169,6 @@ static void loc_handle_mouseenter (lglw_int_t *lglw);
 static void loc_handle_mousebutton (lglw_int_t *lglw, lglw_bool_t _bPressed, uint32_t _button);
 static void loc_handle_mousemotion (lglw_int_t *lglw);
 static void loc_handle_queued_mouse_warp (lglw_int_t *lglw);
-static void loc_touchinput_update (lglw_int_t *lglw);
 
 static void loc_enable_dropfiles (lglw_int_t *lglw, lglw_bool_t _bEnable);
 
@@ -275,7 +280,7 @@ void lglw_userdata_set(lglw_t _lglw, void *_userData) {
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_userdata_set: 1\n");
+      // lglw_log("lglw:lglw_userdata_set: 1\n");
       lglw->user_data = _userData;
    }
 }
@@ -286,7 +291,7 @@ void *lglw_userdata_get(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_userdata_get: 1\n");
+      // lglw_log("lglw:lglw_userdata_get: 1\n");
       return lglw->user_data;
    }
 
@@ -383,7 +388,7 @@ static void loc_destroy_hidden_window(lglw_int_t *lglw) {
 // Very simple function to test _XEventProc is properly called
 static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
 
-   printf("vstgltest<lglw_linux>: eventProc: type=%d serial=%lu send_event=%d lglw=%p\n", xev->xany.type, xev->xany.serial, xev->xany.send_event, lglw);
+   Dlog_verbose("vstgltest<lglw_linux>: eventProc: type=%d serial=%lu send_event=%d lglw=%p\n", xev->xany.type, xev->xany.serial, xev->xany.send_event, lglw);
 
    loc_process_timer(lglw);
 
@@ -399,7 +404,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case Expose:
-            printf("vstgltest<lglw_linux>: xev Expose\n");
+            Dlog_verbose("vstgltest<lglw_linux>: xev Expose\n");
             loc_handle_queued_mouse_warp(lglw);
             eventHandled = LGLW_FALSE;
             if(NULL != lglw->redraw.cbk)
@@ -412,12 +417,12 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             // TODO: Should FocusIn/Out be treated like WM_CAPTURECHANGED and reset the grab state?
 
          case FocusIn:
-            printf("vstgltest<lglw_linux>: xev FocusIn\n");
+            Dlog_verbose("vstgltest<lglw_linux>: xev FocusIn\n");
             eventHandled = LGLW_FALSE;
             break;
 
          case FocusOut:
-            printf("vstgltest<lglw_linux>: xev FocusOut\n");
+            Dlog_verbose("vstgltest<lglw_linux>: xev FocusOut\n");
             eventHandled = LGLW_FALSE;
             break;
 
@@ -850,13 +855,13 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
 static void loc_XEventProc(void *_xevent) {
    XEvent *xev = (XEvent*)_xevent;
 
-   lglw_log("XEventProc\n");
+   Dlog_verbose("XEventProc\n");
    // printf("vstgltest<lglw_linux>: XEventProc, xev=%p\n", xev);
 
    if(NULL != xev)
    {
       LGLW(loc_getProperty(xev->xany.display, xev->xany.window, "_lglw"));  // get instance pointer
-      printf("lglw_linux:loc_XEventProc: xev=%p lglw=%p\n", xev, lglw);
+      Dlog_verbose("lglw_linux:loc_XEventProc: xev=%p lglw=%p\n", xev, lglw);
 
       loc_eventProc(xev, lglw);
    }
@@ -1358,7 +1363,7 @@ void lglw_redraw(lglw_t _lglw) {
       if(0 != lglw->win.xwnd)
       {
          // TODO Event Loop
-         lglw_log("lglw:lglw_redraw: 1\n");
+         Dlog_verbose("lglw:lglw_redraw: 1\n");
          XEvent xev;
          xev.xany.type       = Expose;
          xev.xany.serial     = 0;
@@ -1435,7 +1440,7 @@ void lglw_swap_buffers(lglw_t _lglw) {
    {
       if(0 != lglw->win.xwnd)
       {
-         lglw_log("lglw:lglw_swap_buffers: 1\n");
+         // lglw_log("lglw:lglw_swap_buffers: 1\n");
          glXSwapBuffers(lglw->xdsp, lglw->win.xwnd);
       }
    }
@@ -1791,7 +1796,7 @@ void lglw_timer_start(lglw_t _lglw, uint32_t _millisec) {
 
    if(NULL != lglw)
    {
-      printf("xxx lglw_linux:lglw_timer_start: interval=%u\n", _millisec);
+      lglw_log("xxx lglw_linux:lglw_timer_start: interval=%u\n", _millisec);
       lglw->timer.interval_ms = _millisec;
       lglw->timer.b_running   = LGLW_TRUE;
    }
@@ -1804,7 +1809,7 @@ void lglw_timer_stop(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      printf("xxx lglw_linux:lglw_timer_stop\n");
+      lglw_log("xxx lglw_linux:lglw_timer_stop\n");
       lglw->timer.b_running = LGLW_FALSE;
    }
 }
@@ -1857,13 +1862,6 @@ void lglw_dropfiles_callback_set(lglw_t _lglw, lglw_dropfiles_fxn_t _cbk) {
 
       loc_enable_dropfiles(lglw, (NULL != _cbk));
    }
-}
-
-
-// ---------------------------------------------------------------------------- loc_touchinput_update
-static void loc_touchinput_update(lglw_int_t *lglw) {
-
-   // (todo) implement me
 }
 
 
