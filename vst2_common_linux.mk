@@ -7,8 +7,10 @@ EXTRAFLAGS+= -DVERSION=0.6.1 -D_USE_MATH_DEFINES -Iinclude/ -Idep/include -Idep/
 
 EXTRALIBS+= src/plugin_static.o
 
-## note: remove -DSKIP_STATIC_MODULES in makefile_lib.linux and uncomment the following line to link the add-on modules
+## See setenv_linux.sh (export RACK_STATIC_MODULES=y/n)
+ifeq ($(RACK_STATIC_MODULES),y)
 include vst2_common_staticlibs.mk
+endif
 ##EXTRALIBS+= $(call plugin_lib,Template)
 
 EXTRALIBS+= Rack.a
