@@ -38,6 +38,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
+#include <X11/Xatom.h>
 
 #include <GL/gl.h>
 #include <GL/glx.h>
@@ -50,26 +51,26 @@
 //
 // Regular log entry (low frequency)
 //
-// #define Dlog_verbose if(1);else lglw_log
-#define Dlog if(0);else lglw_log
+// #define Dlog_verbose if(1);else printf
+#define Dlog if(0);else printf
 
 //
 // Verbose log entry
 //
-// #define Dlog_v if(1);else lglw_log
-#define Dlog_v if(0);else lglw_log
+// #define Dlog_v if(1);else printf
+#define Dlog_v if(0);else printf
 
 //
 // Very-verbose log entry
 //
-// #define Dlog_vv if(1);else lglw_log
-#define Dlog_vv if(0);else lglw_log
+// #define Dlog_vv if(1);else printf
+#define Dlog_vv if(0);else printf
 
 //
 // Very-very-verbose log entry
 //
-#define Dlog_vvv if(1);else lglw_log
-// #define Dlog_vvv if(0);else lglw_log
+#define Dlog_vvv if(1);else printf
+// #define Dlog_vvv if(0);else printf
 
 //
 // Print to stdout
@@ -253,7 +254,7 @@ lglw_t lglw_init(int32_t _w, int32_t _h) {
    logfile = fopen("/tmp/lglw_log.txt", "w");
    XSetErrorHandler(xerror_handler);
    XInitThreads();  // fix GL crash, see <https://forum.juce.com/t/linux-vst-opengl-crash-because-xinitthreads-not-called/22821>
-   
+
    loc_millisec_init(lglw);
 
    if(NULL != lglw)
@@ -490,7 +491,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case MotionNotify:
-            Dlog_v("lglw:loc_eventProc: xev MotionNotify\n");
+            Dlog_vvv("lglw:loc_eventProc: xev MotionNotify\n");
             ; // empty statement
             XMotionEvent *motion = (XMotionEvent*)xev;
 
@@ -943,23 +944,19 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
       }
 
-#if 0
-      // (note) this causes a feedback loop in the VST2 debug host
       if(LGLW_FALSE == eventHandled)
       {
          if(0 == lglw->parent_xwnd)
          {
-            Dlog("lglw:loc_eventProc: no parent window to send events to");
+            Dlog("lglw:loc_eventProc: no parent window to send events to\n");
             XSendEvent(lglw->xdsp, InputFocus, True/*propgate*/, NoEventMask, xev);
          }
          else
          {
+            Dlog("lglw:loc_eventProc: sending event %i to parent\n", xev->type);
             XSendEvent(lglw->xdsp, lglw->parent_xwnd, True/*propgate*/, NoEventMask, xev);
          }
       }
-#else
-      (void)eventHandled;
-#endif
    }
 }
 
@@ -1190,16 +1187,12 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
 
       Dlog_v("lglw:lglw_window_open: 4\n");
       XSetWindowAttributes swa;
-      // // XEvent event;
       XSync(lglw->xdsp, False);
 
-#if 1
       Dlog_v("lglw:lglw_window_open: 5\n");
       swa.border_pixel = 0;
       swa.colormap = lglw->cmap;
-      // (note) [bsp] setting this to NoEventMask causes all events to be propagated to the parent (host) window.
-      //               The host then reports the event to the plugin by calling its eventProc function (set via "_XEventProc").
-      swa.event_mask = NoEventMask;/////ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | FocusChangeMask;
+      swa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | ExposureMask | FocusChangeMask; // NoEventMask to bubble-up to parent
       lglw->win.xwnd = XCreateWindow(lglw->xdsp/*display*/,
                                      DefaultRootWindow(lglw->xdsp)/*parent. see Cameron's comment below.*/,
                                      0/*x*/,
@@ -1225,34 +1218,26 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
                              NULL/*XSizeHints*/
                              );
 
-      // Setup the event proc now, on the parent window as well just for the debug host
-      // It was simpler to do this than check in the debug host for the reparent event
       Dlog_v("lglw:lglw_window_open: 7\n");
-      loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
+      // loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
       loc_setProperty(lglw->xdsp, lglw->win.xwnd, "_lglw", (void*)lglw);  // set instance pointer
 
       if(0 != _parentHWNDOrNull)
       {
-         loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
+         // loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
          loc_setProperty(lglw->xdsp, lglw->parent_xwnd, "_lglw", (void*)lglw);  // set instance pointer
       }
 
       // Some hosts only check and store the callback when the Window is reparented
       // Since creating the Window with a Parent may or may not do that, but the callback is not set,
       // ... it's created as a root window, the callback is set, and then it's reparented
-#if 1
-      // (note) [cameronleger] In Ardour's code-base, the only time it looks for the _XEventProc is during a ReparentNotify event
       if (0 != _parentHWNDOrNull)
       {
          Dlog_v("lglw:lglw_window_open: 8\n");
          XReparentWindow(lglw->xdsp, lglw->win.xwnd, lglw->parent_xwnd, 0, 0);
       }
-#endif
+
       lglw->win.b_owner = LGLW_TRUE;
-#else
-      lglw->win.xwnd = (Window)_parentHWNDOrNull;
-      lglw->win.b_owner = LGLW_FALSE;
-#endif
 
       Dlog_v("lglw:lglw_window_open: 9\n");
       if(lglw->win.b_owner)
@@ -1260,26 +1245,6 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
          // // XMapRaised(lglw->xdsp, lglw->win.xwnd);
          XMapWindow(lglw->xdsp, lglw->win.xwnd);
       }
-
-#if 0
-      XSelectInput(lglw->xdsp, lglw->win.xwnd,
-                   ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | FocusChangeMask
-                   );
-      XGrabKeyboard(lglw->xdsp, lglw->win.xwnd,
-                    False/*owner_events*/,
-                    GrabModeAsync/*pointer_mode*/,
-                    GrabModeAsync/*keyboard_mode*/,
-                    CurrentTime/*time*/
-                    );
-#endif
-
-#if 0
-      XSetInputFocus(lglw->xdsp/*display*/,
-                     PointerRoot/*focus*/,
-                     RevertToPointerRoot/*revert_to*/,
-                     CurrentTime
-                     );
-#endif
 
       XSync(lglw->xdsp, False);
       lglw->win.mapped = LGLW_TRUE;
@@ -1460,13 +1425,10 @@ void lglw_window_size_get(lglw_t _lglw, int32_t *_retX, int32_t *_retY) {
 void lglw_redraw(lglw_t _lglw) {
    LGLW(_lglw);
 
-   // (todo) implement me
-
    if(NULL != lglw)
    {
       if(0 != lglw->win.xwnd)
       {
-         // TODO Event Loop
          Dlog_vvv("lglw:lglw_redraw: 1\n");
          XEvent xev;
          xev.xany.type       = Expose;
@@ -1751,7 +1713,7 @@ void lglw_mouse_grab(lglw_t _lglw, uint32_t _grabMode) {
                case LGLW_MOUSE_GRAB_CAPTURE:
                   result = XGrabPointer(lglw->xdsp, lglw->win.xwnd,
                                         True/*owner_events*/,
-                                        ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | PointerMotionHintMask | ButtonMotionMask | KeymapStateMask/*event_mask*/,
+                                        NoEventMask/*event_mask*/,
                                         GrabModeAsync/*pointer_mode*/,
                                         GrabModeAsync/*keyboard_mode*/,
                                         lglw->win.xwnd/*confine_to*/,
@@ -1770,7 +1732,7 @@ void lglw_mouse_grab(lglw_t _lglw, uint32_t _grabMode) {
                case LGLW_MOUSE_GRAB_WARP:
                   result = XGrabPointer(lglw->xdsp, lglw->win.xwnd,
                                         True/*owner_events*/,
-                                        ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | PointerMotionHintMask | ButtonMotionMask | KeymapStateMask/*event_mask*/,
+                                        NoEventMask/*event_mask*/,
                                         GrabModeAsync/*pointer_mode*/,
                                         GrabModeAsync/*keyboard_mode*/,
                                         lglw->win.xwnd/*confine_to*/,
@@ -2169,6 +2131,7 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
    }
 }
 
+
 // ---------------------------------------------------------------------------- lglw_events
 void lglw_events(lglw_t _lglw) {
    LGLW(_lglw);
@@ -2177,34 +2140,17 @@ void lglw_events(lglw_t _lglw) {
    {
       if(0 != lglw->win.xwnd)
       {
-#if 0
-         //int numEv = XEventsQueued(lglw->xdsp, QueuedAlready);
-         int numEv = XEventsQueued(lglw->xdsp, QueuedAfterReading);
-         // => numEv is always 0
-         int evIdx = 0;
-         Dlog_v("xxx lglw_events: numEv=%d\n", numEv);
-
-         //for(; evIdx < numEv; evIdx++)
-         for(;;)
+         XEvent xev;
+         int queued = XPending(lglw->xdsp);
+         Dlog_v("lglw:lglw_events: (events: %i)\n", queued);
+         while(queued)
          {
-            XEvent xev;
             XNextEvent(lglw->xdsp, &xev);
-            Dlog_v("xxx lglw_events: XNextEvent[%d]\n", evIdx++);
             loc_eventProc(&xev, lglw);
+            queued--;
          }
-#else
-         // // int evIdx = 0;
-         // // for(;;)
-         // // {
-         // //    XEvent xev;
-         // //    // => blocks forever
-         // //    XNextEvent(lglw->xdsp, &xev);
-         // //    Dlog_v("xxx XNextEvent[%d]\n", evIdx++);
-         // // }
 
          loc_process_timer(lglw);
-#endif
-         
       }
    }
 }

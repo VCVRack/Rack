@@ -237,6 +237,7 @@ void open_and_close(void) {
             VstIntPtr ip = effect->dispatcher(effect, effEditOpen, 0, 0, NULL/*hWnd*/, 0.0f);
 #else
             VstIntPtr ip = effect->dispatcher(effect, effEditOpen, 0, 0, (void*)(w)/*hWnd*/, 0.0f);
+            effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f); // test feedback loop
 #endif
             (void)ip;
             sleep(2);
@@ -245,7 +246,35 @@ void open_and_close(void) {
             void *result = loc_getProperty(d, w, "_XEventProc");
             if(result == 0)
             {
-               printf("xxx no XEventProc found\n");
+               printf("xxx no XEventProc found, running effEditIdle instead\n");
+               for(;;)
+               {
+                  XEvent xev;
+                  int queued = XPending(d);
+                  printf("xxx =====================================================\n");
+                  printf("xxx checking host queue before effEditIdle (events: %i)\n", queued);
+                  while(queued)
+                  {
+                     XNextEvent(d, &xev);
+                     printf("xxx event type: %i\n", xev.type);
+                     queued--;
+                  }
+
+                  // printf("xxx calling effect->dispatcher<effEditIdle>\n");
+                  effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
+
+                  queued = XPending(d);
+                  printf("xxx checking host queue after effEditIdle (events: %i)\n", queued);
+                  while(queued)
+                  {
+                     XNextEvent(d, &xev);
+                     if(MotionNotify != xev.type)
+                        printf("xxx event type: %i\n", xev.type);
+                     queued--;
+                  }
+
+                  // sleep(1); // can be helpful when viewing print statements
+               }
             }
             else
             {
@@ -253,7 +282,7 @@ void open_and_close(void) {
                int evIdx = 0;
                eventProc = (void (*) (void* event))result;
                printf("xxx XEventProc found\n");
-#if 1
+
                for(;;)
                {
                   XEvent xev;
@@ -261,20 +290,11 @@ void open_and_close(void) {
                   Dprintf_verbose("xxx call XEventProc[%d]\n", evIdx++);
                   eventProc(&xev);
 
-                  Dprintf_verbose("xxx calling effect->dispatcher<effEditIdle>\n");
-                  effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
+                  // Dprintf_verbose("xxx calling effect->dispatcher<effEditIdle>\n");
+                  // effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
                }
-#endif
             }
 #endif
-
-#if 0
-            for(;;)
-#endif
-            {
-               printf("xxx calling effect->dispatcher<effEditIdle>\n");
-               effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
-            }
 
             sleep(1);
             printf("xxx calling effect->dispatcher<effEditClose>\n");
