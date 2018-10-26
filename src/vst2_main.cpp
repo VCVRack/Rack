@@ -18,7 +18,7 @@
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
-///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018, 10Oct2018
+///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018, 10Oct2018, 26Oct2018
 ///
 ///
 
@@ -1117,6 +1117,7 @@ public:
       }
    }
 
+#ifdef YAC_LINUX
    void events(void) {
       setGlobals();
 
@@ -1125,6 +1126,7 @@ public:
          lglw_events(rack::global_ui->window.lglw);
       }
    }
+#endif // YAC_LINUX
 
 private:
    // the host callback (a function pointer)
@@ -1807,11 +1809,15 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 #endif
 
       case effEditIdle:
-         // if(0 == wrapper->redraw_ival_ms)
+#ifdef YAC_LINUX
+         // pump event queue (when not using _XEventProc callback)
+         wrapper->events();
+#else
+         if(0 == wrapper->redraw_ival_ms)
          {
             wrapper->queueRedraw();
-            wrapper->events();
          }
+#endif // YAC_LINUX
          break;
 
       case effEditGetRect:
