@@ -30,7 +30,7 @@ CFLAGS += -Wall -I$(CROSS_ROOT)/usr/include
 # Build plugin library
 #
 bin: $(BIN_RULES) $(ALL_OBJ) 
-	$(CPP) -shared -o "$(TARGET)" -Wl,-soname,$(TARGET) -mtls-dialect=gnu2 $(ALL_OBJ) $(EXTRALIBS) 
+	$(CPP) -shared -o "$(TARGET)" -Wl,-soname,$(TARGET) -mtls-dialect=gnu2 $(ALL_OBJ) $(LDFLAGS) $(EXTRALIBS) 
 ifneq ($(DEBUG),y)
 	$(STRIP) "$(TARGET)"
 endif
