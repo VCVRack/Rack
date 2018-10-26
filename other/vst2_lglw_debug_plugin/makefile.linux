@@ -8,10 +8,6 @@ ALL_OBJ= \
    $(VSVR_BASE_DIR)/dep/lglw/lglw_linux.o
 
 EXTRAFLAGS+=-I"$(VST2_SDK_DIR)" -I"$(VSVR_BASE_DIR)/dep/lglw/"
-EXTRAFLAGS+= -march=haswell
-EXTRAFLAGS+= -fPIC
-
-EXTRALIBS+= -march=haswell -fPIC
 EXTRALIBS+= -lGL -ldl
 
 .PHONY: clean

@@ -5,8 +5,13 @@
 
 # n=32bit build ("x86", jit)
 # y=64bit build ("amd64", no jit)
+ifeq ($(BUILD_64),)
 BUILD_64=y
+endif
+
+ifeq ($(BUILD_ARM),)
 BUILD_ARM=n
+endif
 
 MK=linux
 
@@ -122,13 +127,13 @@ endif
 #
 # C compiler flags
 #
-CFLAGS= -Wall
+CFLAGS= -Wall $(EXTRA_CFLAGS)
 
 
 #
 # C++ compiler flags
 #
-CPPFLAGS= -Wall
+CPPFLAGS= -Wall $(EXTRA_CPPFLAGS)
 
 
 #
@@ -166,7 +171,7 @@ endif
 #
 # Linker flags
 #
-LDFLAGS=
+LDFLAGS= $(EXTRA_LDFLAGS)
 
 
 #
@@ -238,8 +243,9 @@ HAVE_HYPOTF=y
 # Which flags to use for plugins
 #
 # "hack" for VSVR build (pffft lib requires SSE)
-#OPTFLAGS+=-mtune=core2
-OPTFLAGS+=-march=haswell
+#OPTFLAGS+= -mtune=core2
+#OPTFLAGS+= -march=haswell
+OPTFLAGS+= $(EXTRA_OPTFLAGS)
 
 #OPTFLAGS_PLUGIN = $(OPTFLAGS_SIZE)
 OPTFLAGS_PLUGIN = $(OPTFLAGS)
