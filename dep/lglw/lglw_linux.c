@@ -47,14 +47,40 @@
 #include <unistd.h>
 #endif // ARCH_X64
 
+//
+// Regular log entry (low frequency)
+//
+// #define Dlog_verbose if(1);else lglw_log
+#define Dlog if(0);else lglw_log
+
+//
+// Verbose log entry
+//
+// #define Dlog_v if(1);else lglw_log
+#define Dlog_v if(0);else lglw_log
+
+//
+// Very-verbose log entry
+//
+// #define Dlog_vv if(1);else lglw_log
+#define Dlog_vv if(0);else lglw_log
+
+//
+// Very-very-verbose log entry
+//
+#define Dlog_vvv if(1);else lglw_log
+// #define Dlog_vvv if(0);else lglw_log
+
+//
+// Print to stdout
+//
+//   Please use the Dlog* macros instead!
+//
 #define Dprintf if(0);else printf
 // #define Dprintf if(1);else printf
 
 #define Dprintf_verbose if(1);else printf
 // #define Dprintf_verbose if(0);else printf
-
-#define Dlog_verbose if(1);else lglw_log
-// #define Dlog_verbose if(0);else lglw_log
 
 // ---------------------------------------------------------------------------- macros and defines
 #define LGLW(a) lglw_int_t *lglw = ((lglw_int_t*)(a))
@@ -212,7 +238,7 @@ void lglw_log(const char *logData, ...) {
 static int xerror_handler(Display *display, XErrorEvent *error) {
    char error_text[1024];
    XGetErrorText(display, error->error_code, error_text, 1024);
-   lglw_log("XERROR (%d): %s, %d, %d\n", error->error_code, error_text, error->request_code, error->minor_code);
+   Dlog("XERROR (%d): %s, %d, %d\n", error->error_code, error_text, error->request_code, error->minor_code);
    return 0;
 }
 
@@ -221,7 +247,7 @@ static int xerror_handler(Display *display, XErrorEvent *error) {
 lglw_t lglw_init(int32_t _w, int32_t _h) {
    lglw_int_t *lglw = malloc(sizeof(lglw_int_t));
 
-   printf("xxx lglw_init: sizeof(uint32_t)=%lu sizeof(long)=%lu sizeof(void*)=%lu\n", sizeof(uint32_t), sizeof(long), sizeof(void*));
+   Dprintf("xxx lglw_init: sizeof(uint32_t)=%lu sizeof(long)=%lu sizeof(void*)=%lu\n", sizeof(uint32_t), sizeof(long), sizeof(void*));
 
    // TODO: remove/improve
    logfile = fopen("/tmp/lglw_log.txt", "w");
@@ -234,23 +260,23 @@ lglw_t lglw_init(int32_t _w, int32_t _h) {
    {
       memset(lglw, 0, sizeof(lglw_int_t));
 
-      lglw_log("lglw:lglw_init: 1\n");
+      Dlog("lglw:lglw_init: 1\n");
       if(_w <= 16)
          _w = LGLW_DEFAULT_HIDDEN_W;
 
       if(_h <= 16)
          _h = LGLW_DEFAULT_HIDDEN_H;
 
-      lglw_log("lglw:lglw_init: 2\n");
+      Dlog("lglw:lglw_init: 2\n");
       if(!loc_create_hidden_window(lglw, _w, _h))
       {
          free(lglw);
          lglw = NULL;
       }
-      lglw_log("lglw:lglw_init: 3\n");
+      Dlog("lglw:lglw_init: 3\n");
    }
 
-   lglw_log("lglw:lglw_init: EXIT\n");
+   Dlog("lglw:lglw_init: EXIT\n");
 
    return lglw;
 }
@@ -262,11 +288,11 @@ void lglw_exit(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_exit: 1\n");
+      Dlog("lglw:lglw_exit: 1\n");
 
       loc_destroy_hidden_window(lglw);
 
-      lglw_log("lglw:lglw_exit: 2\n");
+      Dlog("lglw:lglw_exit: 2\n");
 
       fclose(logfile);
       free(lglw);
@@ -280,7 +306,7 @@ void lglw_userdata_set(lglw_t _lglw, void *_userData) {
 
    if(NULL != lglw)
    {
-      // lglw_log("lglw:lglw_userdata_set: 1\n");
+      Dlog_vvv("lglw:lglw_userdata_set: ptr=%p\n", _userData);
       lglw->user_data = _userData;
    }
 }
@@ -291,7 +317,7 @@ void *lglw_userdata_get(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      // lglw_log("lglw:lglw_userdata_get: 1\n");
+      Dlog_vvv("lglw:lglw_userdata_get: return ptr=%p\n", lglw->user_data);
       return lglw->user_data;
    }
 
@@ -304,51 +330,51 @@ static lglw_bool_t loc_create_hidden_window(lglw_int_t *lglw, int32_t _w, int32_
 
    // TODO: compare to 'WindowClass' from Windows implementation
 
-   lglw_log("lglw:loc_create_hidden_window: 1\n");
+   Dlog_v("lglw:loc_create_hidden_window: 1\n");
    XSetWindowAttributes swa;
    int attrib[] = { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 24, None };
    int screen;
 
-   lglw_log("lglw:loc_create_hidden_window: 2\n");
+   Dlog_v("lglw:loc_create_hidden_window: 2\n");
    lglw->xdsp = XOpenDisplay(NULL);
    screen = DefaultScreen(lglw->xdsp);
 
-   lglw_log("lglw:loc_create_hidden_window: 3\n");
+   Dlog_v("lglw:loc_create_hidden_window: 3\n");
    lglw->vi = glXChooseVisual(lglw->xdsp, screen, attrib);
 
-   lglw_log("lglw:loc_create_hidden_window: 4\n");
+   Dlog_v("lglw:loc_create_hidden_window: 4\n");
    if(NULL == lglw->vi)
    {
-      lglw_log("[---] lglw: failed to find GLX Visual for hidden window\n");
+      Dlog("[---] lglw: failed to find GLX Visual for hidden window\n");
       return LGLW_FALSE;
    }
 
-   lglw_log("lglw:loc_create_hidden_window: 5\n");
+   Dlog_v("lglw:loc_create_hidden_window: 5\n");
    lglw->ctx = glXCreateContext(lglw->xdsp, lglw->vi, None, True);
 
-   lglw_log("lglw:loc_create_hidden_window: 6\n");
+   Dlog_v("lglw:loc_create_hidden_window: 6\n");
    if(NULL == lglw->ctx)
    {
-      lglw_log("[---] lglw: failed to create GLX Context for hidden window\n");
+      Dlog("[---] lglw: failed to create GLX Context for hidden window\n");
       return LGLW_FALSE;
    }
 
-   lglw_log("lglw:loc_create_hidden_window: 7\n");
+   Dlog_v("lglw:loc_create_hidden_window: 7\n");
    lglw->cmap = XCreateColormap(lglw->xdsp, RootWindow(lglw->xdsp, lglw->vi->screen),
                                 lglw->vi->visual, AllocNone);
 
-   lglw_log("lglw:loc_create_hidden_window: 8\n");
+   Dlog_v("lglw:loc_create_hidden_window: 8\n");
    swa.border_pixel = 0;
    swa.colormap = lglw->cmap;
    lglw->hidden.xwnd = XCreateWindow(lglw->xdsp, DefaultRootWindow(lglw->xdsp),
-      0, 0, LGLW_DEFAULT_HIDDEN_W, LGLW_DEFAULT_HIDDEN_H, 0, CopyFromParent, InputOutput,
-      lglw->vi->visual, CWBorderPixel | CWColormap, &swa);
+                                     0, 0, LGLW_DEFAULT_HIDDEN_W, LGLW_DEFAULT_HIDDEN_H, 0, CopyFromParent, InputOutput,
+                                     lglw->vi->visual, CWBorderPixel | CWColormap, &swa);
 
-   lglw_log("lglw:loc_create_hidden_window: 9\n");
+   Dlog_v("lglw:loc_create_hidden_window: 9\n");
    XSetStandardProperties(lglw->xdsp, lglw->hidden.xwnd, "LGLW_hidden", "LGLW_hidden", None, NULL, 0, NULL);
    XSync(lglw->xdsp, False);
 
-   lglw_log("lglw:loc_create_hidden_window: EXIT\n");
+   Dlog_v("lglw:loc_create_hidden_window: EXIT\n");
    lglw->hidden.size.x = _w;
    lglw->hidden.size.y = _h;
 
@@ -358,20 +384,20 @@ static lglw_bool_t loc_create_hidden_window(lglw_int_t *lglw, int32_t _w, int32_
 
 // ---------------------------------------------------------------------------- loc_destroy_hidden_window
 static void loc_destroy_hidden_window(lglw_int_t *lglw) {
-   lglw_log("lglw:loc_destroy_hidden_window: 1\n");
+   Dlog_v("lglw:loc_destroy_hidden_window: 1\n");
    if(NULL != lglw->xdsp && NULL != lglw->ctx)
    {
       glXMakeCurrent(lglw->xdsp, None, NULL);
       glXDestroyContext(lglw->xdsp, lglw->ctx);
    }
-   lglw_log("lglw:loc_destroy_hidden_window: 2\n");
+   Dlog_v("lglw:loc_destroy_hidden_window: 2\n");
    if(NULL != lglw->xdsp && 0 != lglw->hidden.xwnd) XDestroyWindow(lglw->xdsp, lglw->hidden.xwnd);
-   lglw_log("lglw:loc_destroy_hidden_window: 3\n");
+   Dlog_v("lglw:loc_destroy_hidden_window: 3\n");
    if(NULL != lglw->xdsp && 0 != lglw->cmap) XFreeColormap(lglw->xdsp, lglw->cmap);
-   lglw_log("lglw:loc_destroy_hidden_window: 4\n");
+   Dlog_v("lglw:loc_destroy_hidden_window: 4\n");
    if(NULL != lglw->vi) XFree(lglw->vi);
 
-   lglw_log("lglw:loc_destroy_hidden_window: 5\n");
+   Dlog_v("lglw:loc_destroy_hidden_window: 5\n");
    XSync(lglw->xdsp, False);
    if(NULL != lglw->xdsp) XCloseDisplay(lglw->xdsp);
 }
@@ -388,7 +414,7 @@ static void loc_destroy_hidden_window(lglw_int_t *lglw) {
 // Very simple function to test _XEventProc is properly called
 static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
 
-   Dlog_verbose("vstgltest<lglw_linux>: eventProc: type=%d serial=%lu send_event=%d lglw=%p\n", xev->xany.type, xev->xany.serial, xev->xany.send_event, lglw);
+   Dlog_vvv("lglw:loc_eventProc: type=%d serial=%lu send_event=%d lglw=%p\n", xev->xany.type, xev->xany.serial, xev->xany.send_event, lglw);
 
    loc_process_timer(lglw);
 
@@ -399,12 +425,12 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
       switch(xev->type)
       {
          default:
-            printf("vstgltest<lglw_linux>: unhandled X11 event type=%d\n", xev->type);
+            Dlog("lglw:loc_eventProc: unhandled X11 event type=%d\n", xev->type);
             eventHandled = LGLW_FALSE;
             break;
 
          case Expose:
-            Dlog_verbose("vstgltest<lglw_linux>: xev Expose\n");
+            Dlog_v("lglw:loc_eventProc: xev Expose\n");
             loc_handle_queued_mouse_warp(lglw);
             eventHandled = LGLW_FALSE;
             if(NULL != lglw->redraw.cbk)
@@ -417,20 +443,20 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             // TODO: Should FocusIn/Out be treated like WM_CAPTURECHANGED and reset the grab state?
 
          case FocusIn:
-            Dlog_verbose("vstgltest<lglw_linux>: xev FocusIn\n");
+            Dlog_v("lglw:loc_eventProc: xev FocusIn\n");
             eventHandled = LGLW_FALSE;
             break;
 
          case FocusOut:
-            Dlog_verbose("vstgltest<lglw_linux>: xev FocusOut\n");
+            Dlog_v("lglw:loc_eventProc: xev FocusOut\n");
             eventHandled = LGLW_FALSE;
             break;
 
          case EnterNotify:
-            // printf("vstgltest<lglw_linux>: xev XEnterWindowEvent\n");
+            // Dlog_v("lglw:loc_eventProc: xev XEnterWindowEvent\n");
             ; // empty statement
             XEnterWindowEvent *wenter = (XEnterWindowEvent*)xev;
-            printf("vstgltest<lglw_linux>: xev EnterNotify: mode:%i, detail:%i, state:%d\n", wenter->mode, wenter->detail, wenter->state);
+            Dlog_v("lglw:loc_eventProc: xev EnterNotify: mode:%i, detail:%i, state:%d\n", wenter->mode, wenter->detail, wenter->state);
             lglw->mouse.p.x = wenter->x;
             lglw->mouse.p.y = wenter->y;
             loc_handle_mousemotion(lglw);
@@ -447,10 +473,10 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case LeaveNotify:
-            // printf("vstgltest<lglw_linux>: xev XLeaveWindowEvent\n");
+            // Dlog_v("lglw:loc_eventProc: xev XLeaveWindowEvent\n");
             ; // empty statement
             XLeaveWindowEvent *wexit = (XLeaveWindowEvent*)xev;
-            printf("vstgltest<lglw_linux>: xev LeaveNotify: mode:%i, detail:%i, state:%d\n", wexit->mode, wexit->detail, wexit->state);
+            Dlog_v("lglw:loc_eventProc: xev LeaveNotify: mode:%i, detail:%i, state:%d\n", wexit->mode, wexit->detail, wexit->state);
 
             // LeaveNotify messages can be pseudo-motion events (NotifyGrab, NotifyUngrab)
             // when buttons are pressed, which would trigger false focus changes
@@ -464,7 +490,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case MotionNotify:
-            // printf("vstgltest<lglw_linux>: xev MotionNotify\n");
+            Dlog_v("lglw:loc_eventProc: xev MotionNotify\n");
             ; // empty statement
             XMotionEvent *motion = (XMotionEvent*)xev;
 
@@ -490,7 +516,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case KeyPress:
-            printf("vstgltest<lglw_linux>: xev KeyPress\n");
+            Dlog("lglw:loc_eventProc: xev KeyPress\n");
             XKeyPressedEvent *keyPress = (XKeyPressedEvent*)xev;
 
             eventHandled = LGLW_FALSE;
@@ -498,7 +524,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             switch(xkp)
             {
                default:
-                  printf("vstgltest<lglw_linux>: xev KeyPress: %x or %lu\n", keyPress->keycode, xkp);
+                  Dlog("lglw:loc_eventProc: xev KeyPress: %x or %lu\n", keyPress->keycode, xkp);
                   if(0u != (lglw->keyboard.kmod_state & LGLW_KMOD_SHIFT))
                   {
                      KeySym xkpl;
@@ -513,7 +539,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
                   break;
 
                case NoSymbol:
-                  printf("vstgltest<lglw_linux>: xev UNKNOWN KeyPress: %x\n", keyPress->keycode);
+                  Dlog("lglw:loc_eventProc: xev UNKNOWN KeyPress: %x\n", keyPress->keycode);
                   break;
 
                case XK_Left:
@@ -640,7 +666,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case KeyRelease:
-            printf("vstgltest<lglw_linux>: xev KeyRelease\n");
+            Dlog("lglw:loc_eventProc: xev KeyRelease\n");
             XKeyReleasedEvent *keyRelease = (XKeyReleasedEvent*)xev;
 
             eventHandled = LGLW_FALSE;
@@ -648,7 +674,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             switch(xkr)
             {
                default:
-                  printf("vstgltest<lglw_linux>: xev KeyRelease: %x or %lu\n", keyRelease->keycode, xkr);
+                  Dlog("lglw:loc_eventProc: xev KeyRelease: %x or %lu\n", keyRelease->keycode, xkr);
                   if(0u != (lglw->keyboard.kmod_state & LGLW_KMOD_SHIFT))
                   {
                      KeySym xkrl;
@@ -663,7 +689,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
                   break;
 
                case NoSymbol:
-                  printf("vstgltest<lglw_linux>: xev UNKNOWN KeyRelease: %x\n", keyRelease->keycode);
+                  Dlog("lglw:loc_eventProc: xev UNKNOWN KeyRelease: %x\n", keyRelease->keycode);
                   break;
 
                case XK_Left:
@@ -790,7 +816,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case ButtonPress:
-            printf("vstgltest<lglw_linux>: xev ButtonPress\n");
+            Dlog("lglw:loc_eventProc: xev ButtonPress\n");
             XButtonPressedEvent *btnPress = (XButtonPressedEvent*)xev;
             lglw->mouse.p.x = btnPress->x;
             lglw->mouse.p.y = btnPress->y;
@@ -803,7 +829,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             switch(btnPress->button)
             {
                default:
-                  printf("vstgltest<lglw_linux>: xev ButtonPress unhandled button: %i\n", btnPress->button);
+                  Dlog("lglw:loc_eventProc: xev ButtonPress unhandled button: %i\n", btnPress->button);
                   eventHandled = LGLW_FALSE;
                   break;
                case Button1:
@@ -830,14 +856,14 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case ButtonRelease:
-            printf("vstgltest<lglw_linux>: xev ButtonRelease\n");
+            Dlog("lglw:loc_eventProc: xev ButtonRelease\n");
             XButtonReleasedEvent *btnRelease = (XButtonReleasedEvent*)xev;
             lglw->mouse.p.x = btnRelease->x;
             lglw->mouse.p.y = btnRelease->y;
             switch(btnRelease->button)
             {
                default:
-                  printf("vstgltest<lglw_linux>: xev ButtonRelease unhandled button: %i\n", btnRelease->button);
+                  Dlog("lglw:loc_eventProc: xev ButtonRelease unhandled button: %i\n", btnRelease->button);
                   eventHandled = LGLW_FALSE;
                   break;
                case Button1:
@@ -864,14 +890,14 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case SelectionClear:
-            printf("vstgltest<lglw_linux>: xev SelectionClear\n");
+            Dlog("lglw:loc_eventProc: xev SelectionClear\n");
             lglw->clipboard.numChars = 0;
             free(lglw->clipboard.data);
             eventHandled = LGLW_TRUE;
             break;
 
          case SelectionRequest:
-            printf("vstgltest<lglw_linux>: xev SelectionRequest\n");
+            Dlog("lglw:loc_eventProc: xev SelectionRequest\n");
             XSelectionRequestEvent *cbReq = (XSelectionRequestEvent*)xev;
             XSelectionEvent cbRes;
 
@@ -907,7 +933,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
       {
          if(0 == lglw->parent_xwnd)
          {
-            printf("lglw_linux:loc_eventProc: no parent window to send events to");
+            Dlog("lglw:loc_eventProc: no parent window to send events to");
             XSendEvent(lglw->xdsp, InputFocus, True/*propgate*/, NoEventMask, xev);
          }
          else
@@ -924,16 +950,18 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
 static void loc_XEventProc(void *_xevent) {
    XEvent *xev = (XEvent*)_xevent;
 
-   Dlog_verbose("XEventProc\n");
-   // printf("vstgltest<lglw_linux>: XEventProc, xev=%p\n", xev);
+   Dlog_vvv("lglw:loc_XEventProc: ENTER\n");
+   // Dlog_vvv("lglw: XEventProc, xev=%p\n", xev);
 
    if(NULL != xev)
    {
       LGLW(loc_getProperty(xev->xany.display, xev->xany.window, "_lglw"));  // get instance pointer
-      Dlog_verbose("lglw_linux:loc_XEventProc: xev=%p lglw=%p\n", xev, lglw);
+      Dlog_vvv("lglw:loc_XEventProc: xev=%p lglw=%p\n", xev, lglw);
 
       loc_eventProc(xev, lglw);
    }
+
+   Dlog_vvv("lglw:loc_XEventProc: LEAVE\n");
 }
 
 static void loc_setProperty(Display *_display, Window _window, const char *_name, void *_value) {
@@ -944,7 +972,7 @@ static void loc_setProperty(Display *_display, Window _window, const char *_name
    temp[0] = (long)(data & 0xffffffffUL);
    temp[1] = (long)(data >> 32L);
 
-   printf("xxx lglw_linux:loc_setProperty: name=\"%s\" value=%p temp[0]=%08x temp[1]=%08x\n", _name, _value, (uint32_t)temp[0], (uint32_t)temp[1]);
+   Dlog_v("lglw:loc_setProperty: name=\"%s\" value=%p temp[0]=%08x temp[1]=%08x\n", _name, _value, (uint32_t)temp[0], (uint32_t)temp[1]);
 
    Atom atom = XInternAtom(_display, _name, False/*only_if_exists*/);
 
@@ -988,54 +1016,45 @@ static void *loc_getProperty(Display *_display, Window _window, const char *_nam
    } uptr;
    uptr.any = 0;
 
-   // printf("xxx lglw_linux: loc_getProperty: LOWER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
+   Dlog_vvv("lglw:loc_getProperty: LOWER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
 
    if(NULL != data)
    {
       if(userCount >= 1)
       {
-         // if(userCount >= 2)
-         // {
-         //    printf("xxx loc_getProperty: lo=0x%08x hi=0x%08x\n", ((uint32_t*)data)[0], ((uint32_t*)data)[1]);
-         // }
-
          // lower 32-bit
          uptr.ui[0] = *(long*)data;
          uptr.ui[1] = 0;
 
-         // printf("xxx     lower=0x%08x\n", uptr.ui[0]);
-         // // printf("xxx     upper=0x%08x\n", uptr.ui[1]);
+         Dlog_vvv("lglw:loc_getProperty:    lower=0x%08x\n", uptr.ui[0]);
 
          XFree(data);
 
-         // // if(userCount >= 2)
-         {
-            XGetWindowProperty(_display,
-                               _window,
-                               atom,
-                               1/*offset*/,
-                               1/*length*/,
-                               False/*delete*/,
-                               AnyPropertyType,
-                               &userType/*actual_type_return*/,
-                               &userSize/*actual_format_return*/,
-                               &userCount/*nitems_return*/,
-                               &bytes/*bytes_after_return / partial reads*/,
-                               &data);
+         XGetWindowProperty(_display,
+                            _window,
+                            atom,
+                            1/*offset*/,
+                            1/*length*/,
+                            False/*delete*/,
+                            AnyPropertyType,
+                            &userType/*actual_type_return*/,
+                            &userSize/*actual_format_return*/,
+                            &userCount/*nitems_return*/,
+                            &bytes/*bytes_after_return / partial reads*/,
+                            &data);
 
-            // printf("xxx lglw_linux: loc_getProperty: UPPER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
-            if(NULL != data)
-            {
-               // upper 32-bit
-               uptr.ui[1] = *(long*)data;
-               // printf("xxx     upper=0x%08x\n", uptr.ui[1]);
-               XFree(data);
-            }
+         Dlog_vvv("lglw:loc_getProperty: UPPER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
+         if(NULL != data)
+         {
+            // upper 32-bit
+            uptr.ui[1] = *(long*)data;
+            Dlog_vvv("lglw:loc_getProperty:    upper=0x%08x\n", uptr.ui[1]);
+            XFree(data);
          }
       }
    }
 
-   // printf("xxx lglw_linux: loc_getProperty: return value=%p\n", uptr.any);
+   Dlog_vvv("lglw:loc_getProperty: return value=%p\n", uptr.any);
 
    return uptr.any;
 }
@@ -1050,7 +1069,7 @@ static void loc_setEventProc (Display *display, Window window) {
    size_t data = (size_t)loc_eventProc;
    long temp[2];
 
-   printf("vstgltest<lglw_linux>: setEventProc (2*32bit). window=%lu loc_eventProc=%p\n", window, &loc_eventProc);
+   Dlog("lglw: setEventProc (2*32bit). window=%lu loc_eventProc=%p\n", window, &loc_eventProc);
 
    // Split the 64 bit pointer into a little-endian unsigned int array
    temp[0] = (uint32_t)(data & 0xffffffffUL);
@@ -1098,7 +1117,7 @@ static void loc_setEventProc (Display *display, Window window) {
          memcpy(ptr, kJumpInstructions, sizeof(kJumpInstructions));
          *((uint64_t *)(ptr + kJumpAddress)) = (uint64_t)(&loc_XEventProc);
          msync(ptr, sizeof(kJumpInstructions), MS_INVALIDATE);
-         printf("vstgltest<lglw_linux>: 64bit trampoline installed\n");
+         Dlog("lglw: 64bit trampoline installed\n");
       }
    }
 
@@ -1140,26 +1159,26 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_window_open: 1, %p, %i \n", (Window)_parentHWNDOrNull, (Window)_parentHWNDOrNull);
+      Dlog_v("lglw:lglw_window_open: 1, %p, %i \n", (Window)_parentHWNDOrNull, (Window)_parentHWNDOrNull);
       lglw->parent_xwnd = (0 == _parentHWNDOrNull) ? DefaultRootWindow(lglw->xdsp) : (Window)_parentHWNDOrNull;
 
-      lglw_log("lglw:lglw_window_open: 2 lglw=%p\n", lglw);
+      Dlog_v("lglw:lglw_window_open: 2 lglw=%p\n", lglw);
       if(_w <= 16)
          _w = lglw->hidden.size.x;
 
-      lglw_log("lglw:lglw_window_open: 3\n");
+      Dlog_v("lglw:lglw_window_open: 3\n");
       if(_h <= 16)
          _h = lglw->hidden.size.y;
 
       // TODO: compare to 'WindowClass' from Windows implementation
 
-      lglw_log("lglw:lglw_window_open: 4\n");
+      Dlog_v("lglw:lglw_window_open: 4\n");
       XSetWindowAttributes swa;
       // // XEvent event;
       XSync(lglw->xdsp, False);
 
 #if 1
-      lglw_log("lglw:lglw_window_open: 5\n");
+      Dlog_v("lglw:lglw_window_open: 5\n");
       swa.border_pixel = 0;
       swa.colormap = lglw->cmap;
       // (note) [bsp] setting this to NoEventMask causes all events to be propagated to the parent (host) window.
@@ -1179,7 +1198,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
                                      &swa/*attributes*/
                                      );
 
-      lglw_log("lglw:lglw_window_open: 6\n");
+      Dlog_v("lglw:lglw_window_open: 6\n");
       XSetStandardProperties(lglw->xdsp/*display*/,
                              lglw->win.xwnd/*window*/,
                              "LGLW"/*window_name*/,
@@ -1192,7 +1211,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
 
       // Setup the event proc now, on the parent window as well just for the debug host
       // It was simpler to do this than check in the debug host for the reparent event
-      lglw_log("lglw:lglw_window_open: 7\n");
+      Dlog_v("lglw:lglw_window_open: 7\n");
       loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
       loc_setProperty(lglw->xdsp, lglw->win.xwnd, "_lglw", (void*)lglw);  // set instance pointer
 
@@ -1209,7 +1228,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       // (note) [cameronleger] In Ardour's code-base, the only time it looks for the _XEventProc is during a ReparentNotify event
       if (0 != _parentHWNDOrNull)
       {
-         lglw_log("lglw:lglw_window_open: 8\n");
+         Dlog_v("lglw:lglw_window_open: 8\n");
          XReparentWindow(lglw->xdsp, lglw->win.xwnd, lglw->parent_xwnd, 0, 0);
       }
 #endif
@@ -1219,7 +1238,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       lglw->win.b_owner = LGLW_FALSE;
 #endif
 
-      lglw_log("lglw:lglw_window_open: 9\n");
+      Dlog_v("lglw:lglw_window_open: 9\n");
       if(lglw->win.b_owner)
       {
          // // XMapRaised(lglw->xdsp, lglw->win.xwnd);
@@ -1249,14 +1268,14 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
       XSync(lglw->xdsp, False);
       lglw->win.mapped = LGLW_TRUE;
 
-      lglw_log("lglw:lglw_window_open: 10\n");
+      Dlog_v("lglw:lglw_window_open: 10\n");
       lglw->win.size.x = _w;
       lglw->win.size.y = _h;
 
-      lglw_log("lglw:lglw_window_open: 11\n");
+      Dlog_v("lglw:lglw_window_open: 11\n");
       loc_enable_dropfiles(lglw, (NULL != lglw->dropfiles.cbk));
 
-      lglw_log("lglw:lglw_window_open: EXIT\n");
+      Dlog_v("lglw:lglw_window_open: EXIT\n");
 
       r = LGLW_TRUE;
    }
@@ -1273,51 +1292,51 @@ lglw_bool_t lglw_window_resize (lglw_t _lglw, int32_t _w, int32_t _h) {
    {
       if(0 != lglw->win.xwnd)
       {
-         lglw_log("lglw:lglw_window_resize: 1\n");
+         Dlog_v("lglw:lglw_window_resize: 1\n");
          r = LGLW_TRUE;
 
-         lglw_log("lglw:lglw_window_resize: 2\n");
+         Dlog_v("lglw:lglw_window_resize: 2\n");
          XResizeWindow(lglw->xdsp, lglw->win.xwnd, _w, _h);
          XRaiseWindow(lglw->xdsp, lglw->win.xwnd);
 
-         lglw_log("lglw:lglw_window_resize: 3\n");
+         Dlog_v("lglw:lglw_window_resize: 3\n");
          int deltaW = _w - lglw->win.size.x;
          int deltaH = _h - lglw->win.size.y;
 
-         lglw_log("lglw:lglw_window_resize: 4\n");
+         Dlog_v("lglw:lglw_window_resize: 4\n");
          lglw->win.size.x = _w;
          lglw->win.size.y = _h;
 
-         lglw_log("lglw:lglw_window_resize: 5\n");
+         Dlog_v("lglw:lglw_window_resize: 5\n");
          Window root, parent, *children = NULL;
          unsigned int num_children;
 
-         lglw_log("lglw:lglw_window_resize: 6\n");
+         Dlog_v("lglw:lglw_window_resize: 6\n");
          if(!XQueryTree(lglw->xdsp, lglw->win.xwnd, &root, &parent, &children, &num_children))
             return r;
 
-         lglw_log("lglw:lglw_window_resize: 7\n");
+         Dlog_v("lglw:lglw_window_resize: 7\n");
          if(children)
             XFree((char *)children);
 
-         lglw_log("lglw:lglw_window_resize: 8\n");
+         Dlog_v("lglw:lglw_window_resize: 8\n");
          // Resize parent window (if any)
          if(0 != parent)
          {
-            lglw_log("lglw:lglw_window_resize: 8.1\n");
+            Dlog_v("lglw:lglw_window_resize: 8.1\n");
             int x, y;
             unsigned int width, height;
             unsigned int border_width;
             unsigned int depth;
 
-            lglw_log("lglw:lglw_window_resize: 8.2\n");
+            Dlog_v("lglw:lglw_window_resize: 8.2\n");
             if(!XGetGeometry(lglw->xdsp, lglw->win.xwnd, &root, &x, &y, &width, &height, &border_width, &depth))
                return r;
 
-            lglw_log("lglw:lglw_window_resize: 8.3\n");
+            Dlog_v("lglw:lglw_window_resize: 8.3\n");
             XResizeWindow(lglw->xdsp, parent, width + deltaW, height + deltaH);
          }
-         lglw_log("lglw:lglw_window_resize: EXIT\n");
+         Dlog_v("lglw:lglw_window_resize: EXIT\n");
       }
    }
 
@@ -1333,13 +1352,13 @@ void lglw_window_close (lglw_t _lglw) {
    {
       if(0 != lglw->win.xwnd)
       {
-         lglw_log("lglw:lglw_window_close: 1\n");
+         Dlog_v("lglw:lglw_window_close: 1\n");
          lglw_timer_stop(_lglw);
 
-         lglw_log("lglw:lglw_window_close: 2\n");
+         Dlog_v("lglw:lglw_window_close: 2\n");
          glXMakeCurrent(lglw->xdsp, None, NULL);
 
-         lglw_log("lglw:lglw_window_close: 3\n");
+         Dlog_v("lglw:lglw_window_close: 3\n");
          if(lglw->win.b_owner)
          {
             XDestroyWindow(lglw->xdsp, lglw->win.xwnd);
@@ -1350,7 +1369,7 @@ void lglw_window_close (lglw_t _lglw) {
          lglw->win.mapped = LGLW_FALSE;
       }
    }
-   lglw_log("lglw:lglw_window_close: EXIT\n");
+   Dlog_v("lglw:lglw_window_close: EXIT\n");
 }
 
 
@@ -1360,12 +1379,12 @@ void lglw_window_show(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_window_show: 1\n");
+      Dlog_v("lglw:lglw_window_show: 1\n");
       XMapRaised(lglw->xdsp, lglw->win.xwnd);
 
       lglw->win.mapped = LGLW_TRUE;
    }
-   lglw_log("lglw:lglw_window_show: EXIT\n");
+   Dlog_v("lglw:lglw_window_show: EXIT\n");
 }
 
 
@@ -1375,12 +1394,12 @@ void lglw_window_hide(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      lglw_log("lglw:lglw_window_hide: 1\n");
+      Dlog_v("lglw:lglw_window_hide: 1\n");
       XUnmapWindow(lglw->xdsp, lglw->win.xwnd);
 
       lglw->win.mapped = LGLW_FALSE;
    }
-   lglw_log("lglw:lglw_window_hide: EXIT\n");
+   Dlog_v("lglw:lglw_window_hide: EXIT\n");
 }
 
 
@@ -1389,14 +1408,14 @@ lglw_bool_t lglw_window_is_visible(lglw_t _lglw) {
    lglw_bool_t r = LGLW_FALSE;
    LGLW(_lglw);
 
-   // lglw_log("lglw:lglw_window_is_visible: 1\n");
+   Dlog_vvv("lglw:lglw_window_is_visible: 1\n");
    if(NULL != lglw && 0 != lglw->win.xwnd)
    {
-      // lglw_log("lglw:lglw_window_is_visible: 2\n");
+      Dlog_vvv("lglw:lglw_window_is_visible: 2\n");
       r = lglw->win.mapped;
    }
 
-   // lglw_log("lglw:lglw_window_is_visible: EXIT\n");
+   Dlog_vvv("lglw:lglw_window_is_visible: EXIT\n");
    return r;
 }
 
@@ -1405,7 +1424,7 @@ lglw_bool_t lglw_window_is_visible(lglw_t _lglw) {
 void lglw_window_size_get(lglw_t _lglw, int32_t *_retX, int32_t *_retY) {
    LGLW(_lglw);
 
-   Dlog_verbose("lglw:lglw_window_size_get: 1\n");
+   Dlog_vvv("lglw:lglw_window_size_get: 1\n");
    if(NULL != lglw)
    {
       if(0 != lglw->win.xwnd)
@@ -1417,7 +1436,7 @@ void lglw_window_size_get(lglw_t _lglw, int32_t *_retX, int32_t *_retY) {
             *_retY = lglw->win.size.y;
       }
    }
-   Dlog_verbose("lglw:lglw_window_size_get: EXIT\n");
+   Dlog_vvv("lglw:lglw_window_size_get: EXIT\n");
 }
 
 
@@ -1432,7 +1451,7 @@ void lglw_redraw(lglw_t _lglw) {
       if(0 != lglw->win.xwnd)
       {
          // TODO Event Loop
-         Dlog_verbose("lglw:lglw_redraw: 1\n");
+         Dlog_vvv("lglw:lglw_redraw: 1\n");
          XEvent xev;
          xev.xany.type       = Expose;
          xev.xany.serial     = 0;
@@ -1475,11 +1494,11 @@ void lglw_glcontext_push(lglw_t _lglw) {
       lglw->prev.drw = glXGetCurrentDrawable();
       lglw->prev.ctx = glXGetCurrentContext();
 
-      // lglw_log("lglw:lglw_glcontext_push: win.xwnd=%p hidden.xwnd=%p ctx=%p\n",
-      //    lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx);
+      Dlog_vvv("lglw:lglw_glcontext_push: win.xwnd=%p hidden.xwnd=%p ctx=%p\n",
+               lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx);
       if(!glXMakeCurrent(lglw->xdsp, (0 == lglw->win.xwnd) ? lglw->hidden.xwnd : lglw->win.xwnd, lglw->ctx))
       {
-         lglw_log("[---] lglw_glcontext_push: glXMakeCurrent() failed. win.xwnd=%p hidden.xwnd=%p ctx=%p glGetError()=%d\n", lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx, glGetError());
+         Dlog("[---] lglw_glcontext_push: glXMakeCurrent() failed. win.xwnd=%p hidden.xwnd=%p ctx=%p glGetError()=%d\n", lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx, glGetError());
       }
    }
 }
@@ -1491,11 +1510,11 @@ void lglw_glcontext_pop(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      // lglw_log("lglw:lglw_glcontext_pop: prev.drw=%p prev.ctx=%p\n",
-      //    lglw->prev.drw, lglw->prev.ctx);
+      Dlog_vvv("lglw:lglw_glcontext_pop: prev.drw=%p prev.ctx=%p\n",
+               lglw->prev.drw, lglw->prev.ctx);
       if(!glXMakeCurrent(lglw->xdsp, lglw->prev.drw, lglw->prev.ctx))
       {
-         lglw_log("[---] lglw_glcontext_pop: glXMakeCurrent() failed. prev.drw=%p ctx=%p glGetError()=%d\n", lglw->prev.drw, lglw->prev.ctx, glGetError());
+         Dlog("[---] lglw_glcontext_pop: glXMakeCurrent() failed. prev.drw=%p ctx=%p glGetError()=%d\n", lglw->prev.drw, lglw->prev.ctx, glGetError());
       }
    }
 }
@@ -1509,7 +1528,7 @@ void lglw_swap_buffers(lglw_t _lglw) {
    {
       if(0 != lglw->win.xwnd)
       {
-         // lglw_log("lglw:lglw_swap_buffers: 1\n");
+         Dlog_vv("lglw:lglw_swap_buffers: 1\n");
          glXSwapBuffers(lglw->xdsp, lglw->win.xwnd);
       }
    }
@@ -1525,12 +1544,12 @@ void lglw_swap_interval_set(lglw_t _lglw, int32_t _ival) {
    {
       if(0 != lglw->win.xwnd)
       {
-         lglw_log("lglw:lglw_swap_interval_set: 1\n");
+         Dlog_vv("lglw:lglw_swap_interval_set: 1\n");
          PFNWGLEXTSWAPINTERVALPROC glXSwapIntervalEXT;
          glXSwapIntervalEXT = (PFNWGLEXTSWAPINTERVALPROC) glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
          if(NULL != glXSwapIntervalEXT)
          {
-            lglw_log("lglw:lglw_swap_interval_set: 2\n");
+            Dlog_vv("lglw:lglw_swap_interval_set: 2\n");
             glXSwapIntervalEXT(lglw->xdsp, lglw->win.xwnd, _ival);
             lglw->win.swap_interval = _ival;
          }
@@ -1562,7 +1581,7 @@ static void loc_handle_mouseleave(lglw_int_t *lglw) {
       lglw->focus.cbk(lglw, lglw->focus.state, LGLW_FOCUS_MOUSE);
    }
 
-   lglw_log("xxx lglw:loc_handle_mouseleave: LEAVE\n");
+   Dlog_vv("xxx lglw:loc_handle_mouseleave: LEAVE\n");
 }
 
 
@@ -1576,7 +1595,7 @@ static void loc_handle_mouseenter(lglw_int_t *lglw) {
       lglw->focus.cbk(lglw, lglw->focus.state, LGLW_FOCUS_MOUSE);
    }
 
-   lglw_log("xxx lglw:loc_handle_mouseenter: LEAVE\n");
+   Dlog_vv("xxx lglw:loc_handle_mouseenter: LEAVE\n");
 }
 
 
@@ -1724,7 +1743,7 @@ void lglw_mouse_grab(lglw_t _lglw, uint32_t _grabMode) {
                                         CurrentTime/*time*/);
                   if(GrabSuccess != result)
                   {
-                     printf("vstgltest<lglw_linux>: Grab Result: %i\n", result);
+                     Dlog("lglw: Grab Result: %i\n", result);
                   }
                   else
                   {
@@ -1743,7 +1762,7 @@ void lglw_mouse_grab(lglw_t _lglw, uint32_t _grabMode) {
                                         CurrentTime/*time*/);
                   if(GrabSuccess != result)
                   {
-                     printf("vstgltest<lglw_linux>: Grab Result: %i\n", result);
+                     Dlog("lglw: Grab Result: %i\n", result);
                   }
                   else
                   {
@@ -1865,7 +1884,7 @@ void lglw_timer_start(lglw_t _lglw, uint32_t _millisec) {
 
    if(NULL != lglw)
    {
-      lglw_log("xxx lglw_linux:lglw_timer_start: interval=%u\n", _millisec);
+      Dlog_v("lglw:lglw_timer_start: interval=%u\n", _millisec);
       lglw->timer.interval_ms = _millisec;
       lglw->timer.b_running   = LGLW_TRUE;
    }
@@ -1878,7 +1897,7 @@ void lglw_timer_stop(lglw_t _lglw) {
 
    if(NULL != lglw)
    {
-      lglw_log("xxx lglw_linux:lglw_timer_stop\n");
+      Dlog_v("lglw:lglw_timer_stop\n");
       lglw->timer.b_running = LGLW_FALSE;
    }
 }
@@ -1907,6 +1926,7 @@ static void loc_process_timer(lglw_int_t *lglw) {
 
          if(NULL != lglw->timer.cbk)
          {
+            Dlog_vvv("lglw: invoke timer callback\n");
             lglw->timer.cbk(lglw);
          }
       }
@@ -1985,7 +2005,7 @@ void lglw_clipboard_text_set(lglw_t _lglw, const uint32_t _numChars, const char 
                }
                lglw->clipboard.data[numChars - 1] = 0;
 
-               printf("xxx lglw_clipboard_text_set(%i): %s\n", lglw->clipboard.numChars, lglw->clipboard.data);
+               Dlog("xxx lglw_clipboard_text_set(%i): %s\n", lglw->clipboard.numChars, lglw->clipboard.data);
 
                Atom clipboard = XInternAtom(lglw->xdsp, "CLIPBOARD", False);
                XSetSelectionOwner(lglw->xdsp, clipboard, lglw->win.xwnd, CurrentTime);
@@ -2029,13 +2049,13 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
             owner = XGetSelectionOwner(lglw->xdsp, clipboard);
             if(owner == None)
             {
-               printf("xxx lglw_clipboard_text_get: No Window can provide a clipboard result\n");
+               Dlog("xxx lglw_clipboard_text_get: No Window can provide a clipboard result\n");
                return;
             }
 
             if(owner == lglw->win.xwnd)
             {
-               printf("xxx lglw_clipboard_text_get: We are the owner of the clipboard, skip X interactions\n");
+               Dlog("xxx lglw_clipboard_text_get: We are the owner of the clipboard, skip X interactions\n");
 
                uint32_t i = 0u;
                for(; i < _maxChars; i++)
@@ -2049,7 +2069,7 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
                if(NULL != _retNumChars)
                   *_retNumChars = i;
 
-               printf("xxx lglw_clipboard_text_get: (result on next line)\n%s\n", _retText);
+               Dlog("xxx lglw_clipboard_text_get: (result on next line)\n%s\n", _retText);
                return;
             }
 
@@ -2059,7 +2079,7 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
             cbReq = (XSelectionEvent*)&xev;
             if(None == cbReq->property)
             {
-               printf("xxx lglw_clipboard_text_get: Clipboard was not converted to UTF-8 string\n");
+               Dlog("xxx lglw_clipboard_text_get: Clipboard was not converted to UTF-8 string\n");
                return;
             }
 
@@ -2082,13 +2102,13 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
 
             if(utf8 != returnType)
             {
-               printf("xxx lglw_clipboard_text_get: Clipboard result is not a UTF-8 string\n");
+               Dlog("xxx lglw_clipboard_text_get: Clipboard result is not a UTF-8 string\n");
                return;
             }
 
             if(8u != returnFormat)
             {
-               printf("xxx lglw_clipboard_text_get: Clipboard format is not a char array\n");
+               Dlog("xxx lglw_clipboard_text_get: Clipboard format is not a char array\n");
                return;
             }
 
@@ -2110,7 +2130,7 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
 
             if(returnSize == 0)
             {
-               printf("xxx lglw_clipboard_text_get: No Clipboard result after final request\n");
+               Dlog("xxx lglw_clipboard_text_get: No Clipboard result after final request\n");
                return;
             }
 
@@ -2126,7 +2146,7 @@ void lglw_clipboard_text_get(lglw_t _lglw, uint32_t _maxChars, uint32_t *_retNum
             if(NULL != _retNumChars)
                *_retNumChars = i;
 
-            printf("xxx lglw_clipboard_text_get: (result on next line)\n%s\n", _retText);
+            Dlog("xxx lglw_clipboard_text_get: (result on next line)\n%s\n", _retText);
             XFree(propertyValue);
          }
       }
@@ -2146,14 +2166,14 @@ void lglw_events(lglw_t _lglw) {
          int numEv = XEventsQueued(lglw->xdsp, QueuedAfterReading);
          // => numEv is always 0
          int evIdx = 0;
-         printf("xxx lglw_events: numEv=%d\n", numEv);
+         Dlog_v("xxx lglw_events: numEv=%d\n", numEv);
 
          //for(; evIdx < numEv; evIdx++)
          for(;;)
          {
             XEvent xev;
             XNextEvent(lglw->xdsp, &xev);
-            printf("xxx lglw_events: XNextEvent[%d]\n", evIdx++);
+            Dlog_v("xxx lglw_events: XNextEvent[%d]\n", evIdx++);
             loc_eventProc(&xev, lglw);
          }
 #else
@@ -2163,7 +2183,7 @@ void lglw_events(lglw_t _lglw) {
          // //    XEvent xev;
          // //    // => blocks forever
          // //    XNextEvent(lglw->xdsp, &xev);
-         // //    printf("xxx XNextEvent[%d]\n", evIdx++);
+         // //    Dlog_v("xxx XNextEvent[%d]\n", evIdx++);
          // // }
 
          loc_process_timer(lglw);
