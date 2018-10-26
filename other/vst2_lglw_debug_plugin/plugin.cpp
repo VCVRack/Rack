@@ -1,6 +1,9 @@
 
 #define USE_LGLW defined
 
+#define Dprintf_verbose if(1);else printf
+// #define Dprintf_verbose if(0);else printf
+
 #include <aeffect.h>
 #include <aeffectx.h>
 #include <stdio.h>
@@ -72,7 +75,7 @@ const VstInt32 PLUGIN_VERSION = 1000;
 #ifdef USE_LGLW
 extern "C" {
 static void loc_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _buttonState, uint32_t _changedButtonState) {
-   printf("vstgltest: lglw_mouse_cbk: lglw=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, _x, _y, _buttonState, _changedButtonState);
+   Dprintf_verbose("vstgltest: lglw_mouse_cbk: lglw=%p p=(%d; %d) bt=0x%08x changedBt=0x%08x\n", _lglw, _x, _y, _buttonState, _changedButtonState);
 
    if(LGLW_IS_MOUSE_LBUTTON_DOWN())
    {
@@ -86,7 +89,7 @@ static void loc_mouse_cbk(lglw_t _lglw, int32_t _x, int32_t _y, uint32_t _button
 }
 
 static void loc_focus_cbk(lglw_t _lglw, uint32_t _focusState, uint32_t _changedFocusState) {
-   printf("vstgltest: lglw_focus_cbk: lglw=%p focusState=0x%08x changedFocusState=0x%08x\n", _lglw, _focusState, _changedFocusState);
+   Dprintf_verbose("vstgltest: lglw_focus_cbk: lglw=%p focusState=0x%08x changedFocusState=0x%08x\n", _lglw, _focusState, _changedFocusState);
 }
 
 static lglw_bool_t loc_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod, lglw_bool_t _bPressed) {
@@ -95,7 +98,7 @@ static lglw_bool_t loc_keyboard_cbk(lglw_t _lglw, uint32_t _vkey, uint32_t _kmod
 }
 
 static void loc_timer_cbk(lglw_t _lglw) {
-   printf("vstgltest: lglw_timer_cbk: tick\n");
+   Dprintf_verbose("vstgltest: lglw_timer_cbk: tick\n");
    lglw_redraw(_lglw);
 }
 
@@ -191,7 +194,7 @@ public:
    void redrawWindow(void) {
 #if 1
 #ifdef USE_LGLW
-      printf("vstgltest: redrawWindow()\n");
+      Dprintf_verbose("vstgltest: redrawWindow()\n");
 
       // Save host GL context
       lglw_glcontext_push(lglw);
@@ -494,7 +497,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin, VstInt32 opCode, VstInt32 in
          if(lglw_window_is_visible(wrapper->lglw))
          {
             // lglw_events(wrapper->lglw);
-            wrapper->redrawWindow();
+            // wrapper->redrawWindow();  // redraw is triggered by timer_cbk instead
          }
 #endif // USE_LGLW
          break;
