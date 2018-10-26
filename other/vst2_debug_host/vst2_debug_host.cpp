@@ -65,22 +65,22 @@ static void *loc_getProperty(Display *_display, Window _window, const char *_nam
    } uptr;
    uptr.any = 0;
 
-   printf("xxx debug_host: loc_getProperty: LOWER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
+   // printf("xxx debug_host: loc_getProperty: LOWER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
 
    if(NULL != data)
    {
       if(userCount >= 1)
       {
-         if(userCount >= 2)
-         {
-            printf("xxx debug_host: loc_getProperty: lo=0x%08x hi=0x%08x\n", ((uint32_t*)data)[0], ((uint32_t*)data)[1]);
-         }
+         // if(userCount >= 2)
+         // {
+         //    printf("xxx debug_host: loc_getProperty: lo=0x%08x hi=0x%08x\n", ((uint32_t*)data)[0], ((uint32_t*)data)[1]);
+         // }
 
          // lower 32-bit
          uptr.ui[0] = *(long*)data;
          uptr.ui[1] = 0;
 
-         printf("xxx     lower=0x%08x\n", uptr.ui[0]);
+         // printf("xxx     lower=0x%08x\n", uptr.ui[0]);
          // // printf("xxx     upper=0x%08x\n", uptr.ui[1]);
 
          XFree(data);
@@ -100,7 +100,7 @@ static void *loc_getProperty(Display *_display, Window _window, const char *_nam
                                &bytes/*bytes_after_return / partial reads*/,
                                &data);
 
-            printf("xxx lglw_linux: loc_getProperty: UPPER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
+            // printf("xxx debug_host: loc_getProperty: UPPER userSize=%d userCount=%lu bytes=%lu data=%p\n", userSize, userCount, bytes, data);
             if(NULL != data)
             {
                // upper 32-bit
@@ -259,21 +259,29 @@ void open_and_close(void) {
                int evIdx = 0;
                eventProc = (void (*) (void* event))result;
                printf("xxx XEventProc found\n");
+#if 1
                for(;;)
                {
                   XEvent xev;
                   XNextEvent(d, &xev);
                   printf("xxx call XEventProc[%d]\n", evIdx++);
                   eventProc(&xev);
+
+                  printf("xxx calling effect->dispatcher<effEditIdle>\n");
+                  effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
                }
+#endif
             }
 #endif
 
-            printf("xxx calling effect->dispatcher<effEditIdle>\n");
-            effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
-            sleep(1);
-            printf("xxx calling effect->dispatcher<effEditIdle>\n");
-            effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
+#if 0
+            for(;;)
+#endif
+            {
+               printf("xxx calling effect->dispatcher<effEditIdle>\n");
+               effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
+            }
+
             sleep(1);
             printf("xxx calling effect->dispatcher<effEditClose>\n");
             effect->dispatcher(effect, effEditClose, 0, 0, NULL, 0.0f);
