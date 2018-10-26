@@ -516,6 +516,38 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
                   printf("vstgltest<lglw_linux>: xev UNKNOWN KeyPress: %x\n", keyPress->keycode);
                   break;
 
+               case XK_Left:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_LEFT);
+                  break;
+
+               case XK_Right:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_RIGHT);
+                  break;
+
+               case XK_Up:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_UP);
+                  break;
+
+               case XK_Down:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_DOWN);
+                  break;
+
+               case XK_Insert:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_INSERT);
+                  break;
+
+               case XK_Delete:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_DELETE);
+                  break;
+
+               case XK_Home:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_HOME);
+                  break;
+
+               case XK_End:
+                  eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_END);
+                  break;
+
                case XK_F1:
                   eventHandled = loc_handle_key(lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_F1);
                   break;
@@ -632,6 +664,38 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
 
                case NoSymbol:
                   printf("vstgltest<lglw_linux>: xev UNKNOWN KeyRelease: %x\n", keyRelease->keycode);
+                  break;
+
+               case XK_Left:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_LEFT);
+                  break;
+
+               case XK_Right:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RIGHT);
+                  break;
+
+               case XK_Up:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_UP);
+                  break;
+
+               case XK_Down:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_DOWN);
+                  break;
+
+               case XK_Insert:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_INSERT);
+                  break;
+
+               case XK_Delete:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_DELETE);
+                  break;
+
+               case XK_Home:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_HOME);
+                  break;
+
+               case XK_End:
+                  eventHandled = loc_handle_key(lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_END);
                   break;
 
                case XK_F1:
@@ -837,6 +901,8 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
       }
 
+#if 0
+      // (note) this causes a feedback loop in the VST2 debug host
       if(LGLW_FALSE == eventHandled)
       {
          if(0 == lglw->parent_xwnd)
@@ -849,6 +915,9 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             XSendEvent(lglw->xdsp, lglw->parent_xwnd, True/*propgate*/, NoEventMask, xev);
          }
       }
+#else
+      (void)eventHandled;
+#endif
    }
 }
 
@@ -1336,7 +1405,7 @@ lglw_bool_t lglw_window_is_visible(lglw_t _lglw) {
 void lglw_window_size_get(lglw_t _lglw, int32_t *_retX, int32_t *_retY) {
    LGLW(_lglw);
 
-   lglw_log("lglw:lglw_window_size_get: 1\n");
+   Dlog_verbose("lglw:lglw_window_size_get: 1\n");
    if(NULL != lglw)
    {
       if(0 != lglw->win.xwnd)
@@ -1348,7 +1417,7 @@ void lglw_window_size_get(lglw_t _lglw, int32_t *_retX, int32_t *_retY) {
             *_retY = lglw->win.size.y;
       }
    }
-   lglw_log("lglw:lglw_window_size_get: EXIT\n");
+   Dlog_verbose("lglw:lglw_window_size_get: EXIT\n");
 }
 
 
