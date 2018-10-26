@@ -259,7 +259,7 @@ static bool loc_vst2_find_module_and_paramid_by_unique_paramid(int uniqueParamId
          // (todo) speed this up with a hashtable
          for(Module *module : global->gModules) {
             if( (uniqueParamId >= module->vst2_unique_param_base_id) &&
-                (uniqueParamId < (module->vst2_unique_param_base_id + module->params.size()))
+                (uniqueParamId < int(module->vst2_unique_param_base_id + module->params.size()))
                 )
             {
                *retParamId = (uniqueParamId - module->vst2_unique_param_base_id);

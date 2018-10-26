@@ -275,7 +275,7 @@ void Scanner::step() {
       calcMixLUT();
    }
 
-   int numInputs = 0;
+   uint32_t numInputs = 0u;
    int inputIdx[16];
    float outWeights[16];
    for(int i = 0; i < 16; i++)
@@ -321,10 +321,10 @@ void Scanner::step() {
    {
       float pos = -params[POSITION_PARAM].value + 0.5f - (inputs[MOD_POSITION_INPUT].value * (1.0f/5.0f))*params[MOD_POSITION_AMOUNT_PARAM].value;
       float posStep = 1.0f / numInputs;
-      float xStep = float(MIX_LUT_SIZE) / numInputs;
+      // float xStep = float(MIX_LUT_SIZE) / numInputs;
       float outWSum = 0.0f;
 
-      for(int i = 0; i < numInputs; i++)
+      for(uint32_t i = 0u; i < numInputs; i++)
       {
          if(pos < 0.0f)
             pos += 1.0f;
@@ -363,7 +363,7 @@ void Scanner::step() {
 
       float outWScale = (outWSum > 0.0f) ? (1.0f / outWSum) : 0.0f;
 
-      for(int i = 0; i < numInputs; i++)
+      for(uint32_t i = 0u; i < numInputs; i++)
       {
          int portIdx = inputIdx[input_shuffle_lut[i]];
 

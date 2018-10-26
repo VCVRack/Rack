@@ -142,7 +142,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
          json_t *vst2_unique_param_base_idJ = json_object_get(rootJ, "vst2_unique_param_base_id");
          if (vst2_unique_param_base_idJ) {
             module->vst2_unique_param_base_id = json_integer_value(vst2_unique_param_base_idJ);
-            if((module->vst2_unique_param_base_id + module->params.size()) > global->vst2.next_unique_param_base_id) {
+            if(int(module->vst2_unique_param_base_id + module->params.size()) > global->vst2.next_unique_param_base_id) {
                global->vst2.next_unique_param_base_id = (module->vst2_unique_param_base_id + module->params.size());
             }
          }

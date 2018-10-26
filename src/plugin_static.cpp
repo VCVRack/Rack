@@ -113,7 +113,6 @@ extern void init_plugin_unless_modules       (rack::Plugin *p);
 extern void init_plugin_Valley               (rack::Plugin *p);
 // extern void init_plugin_VultModules          (rack::Plugin *p);
 }
-#endif // SKIP_STATIC_MODULES
 
 static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCallback) {
 
@@ -140,6 +139,7 @@ static void vst2_load_static_rack_plugin(const char *_name, InitCallback _initCa
 	global->plugin.gPlugins.push_back(plugin);
 	info("vcvrack: Loaded static plugin %s %s", plugin->slug.c_str(), plugin->version.c_str());
 }
+#endif // SKIP_STATIC_MODULES
 
 void vst2_load_static_rack_plugins(void) {
 #ifndef SKIP_STATIC_MODULES

@@ -339,7 +339,7 @@ static settings_win_size_entry_t loc_settings_win_sizes[] = {
    { 2500, 1980 },
    { 3000, 1980 },
 };
-#define NUM_SETTINGS_WIN_SIZE (sizeof(loc_settings_win_sizes) / sizeof(settings_win_size_entry_t))
+#define NUM_SETTINGS_WIN_SIZE (int(sizeof(loc_settings_win_sizes) / sizeof(settings_win_size_entry_t)))
 
 struct SettingsWinSizeItem : MenuItem {
 	const settings_win_size_entry_t *setting;
@@ -366,7 +366,7 @@ static settings_refresh_rate_entry_t loc_settings_refresh_rates[] = {
    { 75, "75 fps" },
    { 100, "100 fps" },
 };
-#define NUM_SETTINGS_REFRESH_RATE (sizeof(loc_settings_refresh_rates) / sizeof(settings_refresh_rate_entry_t))
+#define NUM_SETTINGS_REFRESH_RATE (int(sizeof(loc_settings_refresh_rates) / sizeof(settings_refresh_rate_entry_t)))
 
 struct SettingsRefreshRateItem : MenuItem {
 	const settings_refresh_rate_entry_t *setting;

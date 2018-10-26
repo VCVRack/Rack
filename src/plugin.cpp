@@ -166,8 +166,8 @@ static bool loadPlugin(std::string path, bool _bFX) {
 	return true;
 }
 
-static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 #ifndef USE_VST2
+static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	// Check that "status" is "available"
 	json_t *statusJ = json_object_get(manifestJ, "status");
 	if (!statusJ) {
@@ -251,10 +251,8 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 		global->plugin.downloadName = "";
 		return true;
 	}
-#else
-   return false;
-#endif // USE_VST2
 }
+#endif // USE_VST2
 
 static void loadPlugins(std::string path, bool _bFX) {
 #ifdef RACK_HOST

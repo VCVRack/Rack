@@ -647,6 +647,8 @@ void windowSetWindowPos(Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
    // (note) not supported
+   (void)x;
+   (void)y;
 }
 
 bool windowIsMaximized() {

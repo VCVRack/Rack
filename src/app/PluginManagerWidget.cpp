@@ -17,7 +17,7 @@ namespace rack {
 #ifdef USE_VST2
 struct ParamIdTextField : TextField {
    void onTextEnter() override {
-      printf("xxx ParamIdTextField: enter param id \"%s\"\n", text);
+      printf("xxx ParamIdTextField: enter param id \"%s\"\n", text.c_str());
    }
 };
 
@@ -25,7 +25,7 @@ struct ParamValueTextField : TextField {
    ParamIdTextField *tf_id;
 
    void onTextEnter() override {
-      printf("xxx ParamValueTextField: enter param value \"%s\"\n", text);
+      printf("xxx ParamValueTextField: enter param value \"%s\"\n", text.c_str());
       int gid;
       float value;
       sscanf(tf_id->text.c_str(), "%d", &gid);
