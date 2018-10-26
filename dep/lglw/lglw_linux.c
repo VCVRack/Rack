@@ -167,7 +167,7 @@ static void loc_touchinput_update (lglw_int_t *lglw);
 
 static void loc_enable_dropfiles (lglw_int_t *lglw, lglw_bool_t _bEnable);
 
-static void loc_eventProc (const XEvent *xev, lglw_int_t *lglw);
+static void loc_eventProc (XEvent *xev, lglw_int_t *lglw);
 static void loc_XEventProc (void *_xevent);
 static void loc_setProperty (Display *_display, Window _window, const char *_name, void *_value);
 static void *loc_getProperty (Display *_display, Window _window, const char *_name);
@@ -216,7 +216,7 @@ static int xerror_handler(Display *display, XErrorEvent *error) {
 lglw_t lglw_init(int32_t _w, int32_t _h) {
    lglw_int_t *lglw = malloc(sizeof(lglw_int_t));
 
-   printf("xxx lglw_init: sizeof(uint32_t)=%u sizeof(long)=%u sizeof(void*)=%u\n", sizeof(uint32_t), sizeof(long), sizeof(void*));
+   printf("xxx lglw_init: sizeof(uint32_t)=%lu sizeof(long)=%lu sizeof(void*)=%lu\n", sizeof(uint32_t), sizeof(long), sizeof(void*));
 
    // TODO: remove/improve
    logfile = fopen("/tmp/lglw_log.txt", "w");
@@ -381,7 +381,7 @@ static void loc_destroy_hidden_window(lglw_int_t *lglw) {
 // https://github.com/COx2/DistortionFilter/blob/c6a34fb56b503a6e95bf0975e00f438bbf4ff52a/juce/modules/juce_audio_processors/format_types/juce_VSTPluginFormat.cpp
 
 // Very simple function to test _XEventProc is properly called
-static void loc_eventProc(const XEvent *xev, lglw_int_t *lglw) {
+static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
 
    printf("vstgltest<lglw_linux>: eventProc: type=%d serial=%lu send_event=%d lglw=%p\n", xev->xany.type, xev->xany.serial, xev->xany.send_event, lglw);
 
@@ -848,7 +848,7 @@ static void loc_eventProc(const XEvent *xev, lglw_int_t *lglw) {
 }
 
 static void loc_XEventProc(void *_xevent) {
-   const XEvent *xev = (const XEvent*)_xevent;
+   XEvent *xev = (XEvent*)_xevent;
 
    lglw_log("XEventProc\n");
    // printf("vstgltest<lglw_linux>: XEventProc, xev=%p\n", xev);
@@ -870,7 +870,7 @@ static void loc_setProperty(Display *_display, Window _window, const char *_name
    temp[0] = (long)(data & 0xffffffffUL);
    temp[1] = (long)(data >> 32L);
 
-   printf("xxx lglw_linux:loc_setProperty: name=\"%s\" value=%p temp[0]=%08x temp[1]=%08x\n", _name, _value, temp[0], temp[1]);
+   printf("xxx lglw_linux:loc_setProperty: name=\"%s\" value=%p temp[0]=%08x temp[1]=%08x\n", _name, _value, (uint32_t)temp[0], (uint32_t)temp[1]);
 
    Atom atom = XInternAtom(_display, _name, False/*only_if_exists*/);
 
