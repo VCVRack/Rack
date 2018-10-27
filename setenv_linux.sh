@@ -21,12 +21,15 @@ if [ "${USER}" = "cameron" ]; then
 CPU_ARCH=haswell
 fi
 
+# Extra compiler flags (C and C++)
+#EXTRA_FLAGS=-DUSE_LOG_PRINTF
+EXTRA_FLAGS=""
+
 # Extra C compiler flags
-export EXTRA_CFLAGS=-march=${CPU_ARCH}
-#-DUSE_LOG_PRINTF
+export EXTRA_CFLAGS="-march=${CPU_ARCH} ${EXTRA_FLAGS}"
 
 # Extra C++ compiler flags
-export EXTRA_CPPFLAGS=-march=${CPU_ARCH}
+export EXTRA_CPPFLAGS="-march=${CPU_ARCH}  ${EXTRA_FLAGS}"
 
 # Extra optimization flags (C/C++)
 export EXTRA_OPTFLAGS=
@@ -39,5 +42,5 @@ export VST2_SDK_DIR=/mnt/dev/vstsdk2.4/pluginterfaces/vst2.x/
 
 # n = build the plugin w/o 3rd party modules (only useful for debugging purposes)
 # y = statically link 3rd party modules
-#export RACK_STATIC_MODULES=y
-export RACK_STATIC_MODULES=n
+export RACK_STATIC_MODULES=y
+#export RACK_STATIC_MODULES=n
