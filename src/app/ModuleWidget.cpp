@@ -13,6 +13,15 @@
 #endif // USE_VST2
 
 
+#ifdef USE_LOG_PRINTF
+extern void log_printf(const char *logData, ...);
+#undef Dprintf
+#define Dprintf log_printf
+#else
+#define Dprintf printf
+#endif // USE_LOG_PRINTF
+
+
 namespace rack {
 
 
@@ -185,6 +194,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 			if (!paramIdJ)
 				continue;
 			int paramId = json_integer_value(paramIdJ);
+         // Dprintf("fromJson: paramId=%d\n", paramId);
 			// Find ParamWidget(s) with paramId
 			for (ParamWidget *paramWidget : params) {
 				if (paramWidget->paramId == paramId)

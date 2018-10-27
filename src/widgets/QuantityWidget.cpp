@@ -1,5 +1,13 @@
 #include "widgets.hpp"
 
+#ifdef USE_LOG_PRINTF
+extern void log_printf(const char *logData, ...);
+#undef Dprintf
+#define Dprintf log_printf
+#else
+#define Dprintf printf
+#endif // USE_LOG_PRINTF
+
 
 namespace rack {
 
@@ -9,21 +17,23 @@ QuantityWidget::QuantityWidget() {
 }
 
 void QuantityWidget::setValue(float value) {
-   // printf("xxx QuantityWidget::setValue: value=%f\n", value);
+   // Dprintf("xxx QuantityWidget::setValue: value=%f\n", value);
    if(isfinite(minValue) && isfinite(maxValue))
    {
+      // Dprintf("xxx QuantityWidget::setValue: isfinite value=%f\n", value);
       this->value = clamp(value, fminf(minValue, maxValue), fmaxf(minValue, maxValue));
       EventChange e;
       onChange(e);
    }
    else
    {
+      // Dprintf("xxx QuantityWidget::setValue: !isfinite value=%f\n", value);
       // Rotary knob
       this->value = value;
       EventChange e;
       onChange(e);
    }
-   // printf("xxx QuantityWidget::setValue: LEAVE value=%f\n", value);
+   // Dprintf("xxx QuantityWidget::setValue: LEAVE value=%f\n", value);
 }
 
 void QuantityWidget::setLimits(float minValue, float maxValue) {
