@@ -23,6 +23,7 @@ fi
 
 # Extra C compiler flags
 export EXTRA_CFLAGS=-march=${CPU_ARCH}
+#-DUSE_LOG_PRINTF
 
 # Extra C++ compiler flags
 export EXTRA_CPPFLAGS=-march=${CPU_ARCH}

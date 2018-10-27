@@ -150,11 +150,14 @@ struct PluginMutex {
 #include <fenv.h>  // fesetround()
 #include <stdarg.h>
 
+// #define USE_LOG_PRINTF  defined
+
+#ifdef USE_LOG_PRINTF
 static FILE *logfile;
 #undef Dprintf
 #define Dprintf log_printf
 
-static void log_printf(const char *logData, ...) {
+void log_printf(const char *logData, ...) {
    static char buf[16*1024]; 
    va_list va; 
    va_start(va, logData); 
@@ -164,13 +167,14 @@ static void log_printf(const char *logData, ...) {
    fputs(buf, logfile);
    fflush(logfile);
 }
+#endif // USE_LOG_PRINTF
 
 
 // #define _GNU_SOURCE
 #include <dlfcn.h>
 
-//static pthread_mutex_t loc_pthread_mutex_t_init = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
-static pthread_mutex_t loc_pthread_mutex_t_init = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t loc_pthread_mutex_t_init = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+//static pthread_mutex_t loc_pthread_mutex_t_init = PTHREAD_MUTEX_INITIALIZER;
 
 struct PluginMutex {
    pthread_mutex_t handle;
@@ -768,6 +772,7 @@ public:
    }
 
    void setOversampleRealtime(float _factor, int _quality) {
+      Dprintf("xxx setOversampleRealtime 1\n");
       if(_factor < 0.0f)
          _factor = oversample.realtime_factor;  // keep
 
@@ -786,6 +791,8 @@ public:
 
       oversample.realtime_factor = _factor;
       oversample.realtime_quality = _quality;
+
+      Dprintf("xxx setOversampleRealtime 2 b_offline=%d\n", b_offline);
 
       if(!b_offline)
       {
@@ -836,33 +843,51 @@ public:
       else if(_numOut > NUM_OUTPUTS)
          _numOut = NUM_OUTPUTS;
 
+      // Dprintf("xxx setOversampleChannels: lockAudio\n");
       lockAudio();
+      // Dprintf("xxx setOversampleChannels: lockAudio done\n");
       oversample.num_in  = sUI(_numIn);
       oversample.num_out = sUI(_numOut);
+      // Dprintf("xxx setOversampleChannels: unlockAudio\n");
       unlockAudio();
+      // Dprintf("xxx setOversampleChannels: unlockAudio done\n");
    }
 
    bool setSampleRate(float _rate, bool _bLock = true) {
       bool r = false;
 
+      // Dprintf("xxx setSampleRate: 1 bLock=%d\n", _bLock);
+
       if((_rate >= float(MIN_SAMPLE_RATE)) && (_rate <= float(MAX_SAMPLE_RATE)))
       {
+         // Dprintf("xxx setSampleRate: 2\n");
          if(_bLock)
          {
+            // Dprintf("xxx setSampleRate: 2.1\n");
             setGlobals();
+            // Dprintf("xxx setSampleRate: 2.2\n");
             lockAudio();
+            // Dprintf("xxx setSampleRate: 2.3\n");
          }
 
          sample_rate = _rate;
 
+         // Dprintf("xxx setSampleRate: 3\n");
+
          vst2_set_samplerate(sample_rate * oversample.factor);  // see engine.cpp
 
+         // Dprintf("xxx setSampleRate: 4\n");
+
          destroyResamplerStates();
+
+         // Dprintf("xxx setSampleRate: 5\n");
 
          // Lazy-alloc resampler state
          if(!Dfltequal(oversample.factor, 1.0f))
          {
             int err;
+
+            // Dprintf("xxx setSampleRate: 6\n");
 
             oversample.srs_in = speex_resampler_init(NUM_INPUTS,
                                                      sUI(sample_rate),  // in rate
@@ -870,6 +895,8 @@ public:
                                                      oversample.quality,
                                                      &err
                                                      );
+
+            // Dprintf("xxx setSampleRate: 7\n");
 
             oversample.srs_out = speex_resampler_init(NUM_OUTPUTS,
                                                       sUI(sample_rate * oversample.factor),  // in rate
@@ -881,12 +908,20 @@ public:
             Dprintf("xxx vstrack_plugin: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
          }
 
+         // Dprintf("xxx setSampleRate: 8\n");
+
          if(_bLock)
          {
+            // Dprintf("xxx setSampleRate: 8.1\n");
             unlockAudio();
+            // Dprintf("xxx setSampleRate: 8.2\n");
          }
+
+         // Dprintf("xxx setSampleRate: 9\n");
          r = true;
       }
+
+      // Dprintf("xxx setSampleRate: LEAVE\n");
 
       return r;
    }
@@ -1014,26 +1049,26 @@ public:
    }
 
    bool setProgramChunk(size_t _size, uint8_t *_addr) {
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 1\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 1\n");
       setGlobals();
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 2\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 2\n");
       lockAudio();
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 3\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 3\n");
       vst2_set_shared_plugin_tls_globals();
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 4\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 4\n");
 #if 0
       Dprintf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
 #endif
       lglw_glcontext_push(rack::global_ui->window.lglw);
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 5\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 5\n");
       bool r = rack::global_ui->app.gRackWidget->loadPatchFromString((const char*)_addr);
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 6\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 6\n");
       rack::global_ui->ui.gScene->step();  // w/o this the patch is bypassed
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 7\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 7\n");
       lglw_glcontext_pop(rack::global_ui->window.lglw);
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 8 r=%d\n", r);
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 8 r=%d\n", r);
       unlockAudio();
-      Dprintf("xxx vstrack_plugin:setProgramChunk: 9\n");
+      // Dprintf("xxx vstrack_plugin:setProgramChunk: 9\n");
       return r;
    }
 
@@ -2233,9 +2268,9 @@ void vst2_idle_detect_mode_get(int *_mode) {
  */
 VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback) {
 
-#ifdef YAC_LINUX
+#ifdef USE_LOG_PRINTF
    logfile = fopen("/tmp/vst2_log.txt", "w");
-#endif
+#endif // USE_LOG_PRINTF
 
    Dprintf("vstrack_plugin: called VSTPluginMain... \n");
 

@@ -27,6 +27,14 @@ extern void vst2_idle_detect_mode_get (int *_mode);
 #endif // USE_VST2
 
 
+#define Dprintf printf
+
+#ifdef USE_LOG_PRINTF
+extern void log_printf(const char *logData, ...);
+#undef Dprintf
+#define Dprintf log_printf
+#endif // USE_LOG_PRINTF
+
 namespace rack {
 
 
@@ -213,17 +221,23 @@ bool RackWidget::loadPatchFromString(const char *_string) {
 	}
    
 	json_error_t error;
+   Dprintf("call json_loads\n");
 	json_t *rootJ = json_loads(_string, 0/*flags*/, &error);
+   Dprintf("json_loads returned rootJ=%p\n", rootJ);
 	if (rootJ) {
 		clear();
 #ifdef USE_VST2
       global->vst2.b_patch_loading = true;
 #endif
+      Dprintf("call fromJson\n");
 		fromJson(rootJ);
+      // Dprintf("fromJson returned\n");
 #ifdef USE_VST2
       global->vst2.b_patch_loading = false;
 #endif // USE_VST2
+      Dprintf("call json_decref\n");
 		json_decref(rootJ);
+      Dprintf("json_decref returned\n");
       return true;
 	}
 	else {
@@ -364,7 +378,10 @@ json_t *RackWidget::toJson() {
 void RackWidget::fromJson(json_t *rootJ) {
 	std::string message;
 
+   // Dprintf("fromJson: 1\n");
    vst2_set_shared_plugin_tls_globals();  // update JSON hashtable seed
+
+   // Dprintf("fromJson: 2\n");
 
 	// version
 	std::string version;
@@ -372,6 +389,8 @@ void RackWidget::fromJson(json_t *rootJ) {
 	if (versionJ) {
 		version = json_string_value(versionJ);
 	}
+
+   // Dprintf("fromJson: 3\n");
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
 	// (We now use Module::params/inputs/outputs indices.)
@@ -382,6 +401,8 @@ void RackWidget::fromJson(json_t *rootJ) {
 	if (legacy) {
 		info("Loading patch using legacy mode %d", legacy);
 	}
+
+   // Dprintf("fromJson: 4\n");
 
 #ifdef RACK_HOST
    float oversampleFactor = -1.0f;
@@ -395,6 +416,8 @@ void RackWidget::fromJson(json_t *rootJ) {
       }
    }
 
+   // Dprintf("fromJson: 5\n");
+
 	// Oversample quality (0..10)
    {
       json_t *oversampleJ = json_object_get(rootJ, "oversampleQuality");
@@ -403,7 +426,11 @@ void RackWidget::fromJson(json_t *rootJ) {
       }
    }
 
+   // Dprintf("fromJson: 6\n");
+
    vst2_oversample_realtime_set(oversampleFactor, oversampleQuality);
+
+   // Dprintf("fromJson: 7\n");
 
    // Oversample channel limit
    int oversampleNumIn = -1;
@@ -417,6 +444,8 @@ void RackWidget::fromJson(json_t *rootJ) {
       }
    }
 
+   // Dprintf("fromJson: 8\n");
+
 	// Oversample output channel limit
    {
       json_t *oversampleJ = json_object_get(rootJ, "oversampleNumOut");
@@ -425,7 +454,11 @@ void RackWidget::fromJson(json_t *rootJ) {
       }
    }
 
+   // Dprintf("fromJson: 9\n");
+
    vst2_oversample_channels_set(oversampleNumIn, oversampleNumOut);
+
+   // Dprintf("fromJson: 10\n");
 
 	// Idle detection mode
    {
@@ -436,6 +469,8 @@ void RackWidget::fromJson(json_t *rootJ) {
    }
 #endif // RACK_HOST
 
+   // Dprintf("fromJson: 11\n");
+
 	// modules
 	std::map<int, ModuleWidget*> moduleWidgets;
 	json_t *modulesJ = json_object_get(rootJ, "modules");
@@ -444,22 +479,30 @@ void RackWidget::fromJson(json_t *rootJ) {
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleId, moduleJ) {
 		// Add "legacy" property if in legacy mode
+      // Dprintf("fromJson: 12.1\n");
 		if (legacy) {
 			json_object_set(moduleJ, "legacy", json_integer(legacy));
 		}
+      // Dprintf("fromJson: 12.2\n");
 
 		json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
 		if (!pluginSlugJ) continue;
+      // Dprintf("fromJson: 12.3\n");
 		json_t *modelSlugJ = json_object_get(moduleJ, "model");
 		if (!modelSlugJ) continue;
+      // Dprintf("fromJson: 12.4\n");
 		std::string pluginSlug = json_string_value(pluginSlugJ);
+      // Dprintf("fromJson: 12.5\n");
 		std::string modelSlug = json_string_value(modelSlugJ);
+      // Dprintf("fromJson: 12.6\n");
 
 		Model *model = pluginGetModel(pluginSlug, modelSlug);
+      // Dprintf("fromJson: 12.7\n");
 		if (!model) {
 			message += stringf("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 			continue;
 		}
+      // Dprintf("fromJson: 12.8\n");
 
 		// Create ModuleWidget
 // // #ifdef USE_VST2
@@ -467,29 +510,47 @@ void RackWidget::fromJson(json_t *rootJ) {
 // //          model->plugin->set_tls_globals_fxn(model->plugin);
 // //       }
 // // #endif // USE_VST2
+      // Dprintf("fromJson: 12.9\n");
 		ModuleWidget *moduleWidget = model->createModuleWidget();
+      // Dprintf("fromJson: 12.10\n");
 		assert(moduleWidget);
+      // Dprintf("fromJson: 12.11\n");
 		moduleWidget->fromJson(moduleJ);
+      // Dprintf("fromJson: 12.12\n");
 		moduleContainer->addChild(moduleWidget);
+      // Dprintf("fromJson: 12.13\n");
 		moduleWidgets[moduleId] = moduleWidget;
+      // Dprintf("fromJson: 12.14\n");
 	}
+
+   // Dprintf("fromJson: 13\n");
 
 	// wires
 	json_t *wiresJ = json_object_get(rootJ, "wires");
 	if (!wiresJ) return;
+   // Dprintf("fromJson: 14\n");
 	size_t wireId;
 	json_t *wireJ;
 	json_array_foreach(wiresJ, wireId, wireJ) {
+      // Dprintf("fromJson: 14.1\n");
 		int outputModuleId = json_integer_value(json_object_get(wireJ, "outputModuleId"));
+      // Dprintf("fromJson: 14.2\n");
 		int outputId = json_integer_value(json_object_get(wireJ, "outputId"));
+      // Dprintf("fromJson: 14.3\n");
 		int inputModuleId = json_integer_value(json_object_get(wireJ, "inputModuleId"));
+      // Dprintf("fromJson: 14.4\n");
 		int inputId = json_integer_value(json_object_get(wireJ, "inputId"));
+      // Dprintf("fromJson: 14.5\n");
 
 		// Get module widgets
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
+      // Dprintf("fromJson: 14.6\n");
 		if (!outputModuleWidget) continue;
+      // Dprintf("fromJson: 14.7\n");
 		ModuleWidget *inputModuleWidget = moduleWidgets[inputModuleId];
+      // Dprintf("fromJson: 14.8\n");
 		if (!inputModuleWidget) continue;
+      // Dprintf("fromJson: 14.9\n");
 
 		// Get port widgets
 		Port *outputPort = NULL;
@@ -516,26 +577,37 @@ void RackWidget::fromJson(json_t *rootJ) {
 		}
 		if (!outputPort || !inputPort)
 			continue;
+      // Dprintf("fromJson: 14.10\n");
 
 		// Create WireWidget
 		WireWidget *wireWidget = new WireWidget();
+      // Dprintf("fromJson: 14.11\n");
 		wireWidget->fromJson(wireJ);
+      // Dprintf("fromJson: 14.12\n");
 		wireWidget->outputPort = outputPort;
 		wireWidget->inputPort = inputPort;
 		wireWidget->updateWire();
+      // Dprintf("fromJson: 14.13\n");
 		// Add wire to rack
 		wireContainer->addChild(wireWidget);
+      // Dprintf("fromJson: 14.14\n");
 	}
+
+   // Dprintf("fromJson: 15\n");
 
 	// Display a message if we have something to say
 	if (!message.empty()) {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 
+   // Dprintf("fromJson: 16\n");
+
 #ifdef USE_VST2
    global_ui->param_info.placeholder_framecount = (30*30)-10;
    global_ui->param_info.last_param_widget = NULL;
 #endif // USE_VST2
+
+   // Dprintf("fromJson: LEAVE\n");
 }
 
 void RackWidget::addModule(ModuleWidget *m) {
