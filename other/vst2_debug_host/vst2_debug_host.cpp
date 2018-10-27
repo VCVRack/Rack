@@ -217,6 +217,14 @@ void open_and_close(void) {
                                     BlackPixel(d, s), WhitePixel(d, s)
                                     );
             XSelectInput(d, w, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | FocusChangeMask);
+
+            // see <https://stackoverflow.com/questions/1157364/intercept-wm-delete-window-on-x11>
+            Atom wm_delete_window;
+            {
+               wm_delete_window = XInternAtom(d, "WM_DELETE_WINDOW", False);
+               XSetWMProtocols(d, w, &wm_delete_window, 1);
+            }
+
             XMapRaised(d, w);
             XFlush(d);
 #endif
@@ -248,7 +256,8 @@ void open_and_close(void) {
             if(result == 0)
             {
                printf("xxx no XEventProc found, running effEditIdle instead\n");
-               for(;;)
+               bool bRunning = true;
+               while(bRunning)
                {
                   XEvent xev;
                   int queued = XPending(d);
@@ -266,11 +275,25 @@ void open_and_close(void) {
 
                   queued = XPending(d);
                   // printf("xxx checking host queue after effEditIdle (events: %i)\n", queued);
-                  while(queued)
+                  while((queued > 0) && bRunning)
                   {
                      XNextEvent(d, &xev);
+
+                     // printf("xxx debug_host: xev.type=%d\n", xev.type);
+
+                     if(ClientMessage == xev.type)
+                     {
+                        printf("xxx debug_host: ClientMessage\n");
+                        if((Atom)xev.xclient.data.l[0] == wm_delete_window)
+                        {
+                           printf("xxx debug_host: ClientMessage<wm_delete_window>\n");
+                           bRunning = false;
+                        }
+                     }
+
                      // if(MotionNotify != xev.type)
                      //    printf("xxx event type: %i\n", xev.type);
+
                      queued--;
                   }
 
@@ -300,6 +323,8 @@ void open_and_close(void) {
             sleep(1);
             printf("xxx calling effect->dispatcher<effEditClose>\n");
             effect->dispatcher(effect, effEditClose, 0, 0, NULL, 0.0f);
+
+#if 0
             sleep(1);
             printf("xxx calling effect->dispatcher<effEditOpen> again\n");
 #ifdef YAC_WIN32
@@ -311,14 +336,19 @@ void open_and_close(void) {
             printf("xxx calling effect->dispatcher<effEditIdle>\n");
             effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
             sleep(1);
+#endif
+
             printf("xxx call processreplacing\n");
             for(int i = 0; i < 1024; i++)
             {
                effect->processReplacing(effect, inputBuffers, outputBuffers, (VstInt32)64);
             }
+
+#if 0
             printf("xxx calling effect->dispatcher<effEditClose>\n");
             effect->dispatcher(effect, effEditClose, 0, 0, NULL, 0.0f);
             sleep(1);
+#endif
             printf("xxx calling effect->dispatcher<effClose>\n");
             effect->dispatcher(effect, effClose, 0, 0, NULL, 0.0f);
             sleep(1);
@@ -355,7 +385,7 @@ void open_and_close(void) {
 }
 
 int main() {
-   for(int i = 0; i < 5; i++)
+   for(int i = 0; i < 2; i++)
    {
       open_and_close();
    }
