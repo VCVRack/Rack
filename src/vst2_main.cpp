@@ -148,6 +148,23 @@ struct PluginMutex {
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <fenv.h>  // fesetround()
+#include <stdarg.h>
+
+static FILE *logfile;
+#undef Dprintf
+#define Dprintf log_printf
+
+static void log_printf(const char *logData, ...) {
+   static char buf[16*1024]; 
+   va_list va; 
+   va_start(va, logData); 
+   vsprintf(buf, logData, va);
+   va_end(va); 
+   printf(buf); 
+   fputs(buf, logfile);
+   fflush(logfile);
+}
+
 
 // #define _GNU_SOURCE
 #include <dlfcn.h>
@@ -689,7 +706,6 @@ public:
    }
 
    void closeEffect(void) {
-
       closeEditor();
 
       // (todo) use mutex
@@ -998,18 +1014,26 @@ public:
    }
 
    bool setProgramChunk(size_t _size, uint8_t *_addr) {
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 1\n");
       setGlobals();
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 2\n");
       lockAudio();
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 3\n");
       vst2_set_shared_plugin_tls_globals();
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 4\n");
 #if 0
       Dprintf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
 #endif
       lglw_glcontext_push(rack::global_ui->window.lglw);
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 5\n");
       bool r = rack::global_ui->app.gRackWidget->loadPatchFromString((const char*)_addr);
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 6\n");
       rack::global_ui->ui.gScene->step();  // w/o this the patch is bypassed
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 7\n");
       lglw_glcontext_pop(rack::global_ui->window.lglw);
-      Dprintf("xxx vstrack_plugin:setProgramChunk: r=%d\n", r);
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 8 r=%d\n", r);
       unlockAudio();
+      Dprintf("xxx vstrack_plugin:setProgramChunk: 9\n");
       return r;
    }
 
@@ -1102,6 +1126,7 @@ public:
    }
 
    void redraw(void) {
+#if 1
       setGlobals();
 
       if(lglw_window_is_visible(rack::global_ui->window.lglw))
@@ -1116,6 +1141,7 @@ public:
          // Restore the DAW's GL context
          lglw_glcontext_pop(rack::global_ui->window.lglw);
       }
+#endif
    }
 
 #ifdef YAC_LINUX
@@ -1690,6 +1716,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // // {
             r = wrapper->setProgramChunk(size_t(value), (uint8_t*)ptr) ? 1 : 0;
          // // }
+         Dprintf("xxx vstrack_plugin: effSetChunk LEAVE\n");
          break;
 
       case effShellGetNextPlugin:
@@ -2205,6 +2232,11 @@ void vst2_idle_detect_mode_get(int *_mode) {
  * Implementation of the main entry point of the plugin
  */
 VST_EXPORT VSTPlugin *VSTPluginMain(VSTHostCallback vstHostCallback) {
+
+#ifdef YAC_LINUX
+   logfile = fopen("/tmp/vst2_log.txt", "w");
+#endif
+
    Dprintf("vstrack_plugin: called VSTPluginMain... \n");
 
 #if 0

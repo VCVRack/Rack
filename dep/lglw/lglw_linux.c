@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -52,25 +53,25 @@
 // Regular log entry (low frequency)
 //
 // #define Dlog_verbose if(1);else printf
-#define Dlog if(0);else printf
+#define Dlog if(0);else lglw_log
 
 //
 // Verbose log entry
 //
-// #define Dlog_v if(1);else printf
-#define Dlog_v if(0);else printf
+// #define Dlog_v if(1);else lglw_log
+#define Dlog_v if(0);else lglw_log
 
 //
 // Very-verbose log entry
 //
-// #define Dlog_vv if(1);else printf
-#define Dlog_vv if(0);else printf
+// #define Dlog_vv if(1);else lglw_log
+#define Dlog_vv if(0);else lglw_log
 
 //
 // Very-very-verbose log entry
 //
-#define Dlog_vvv if(1);else printf
-// #define Dlog_vvv if(0);else printf
+#define Dlog_vvv if(0);else lglw_log
+// #define Dlog_vvv if(0);else lglw_log
 
 //
 // Print to stdout
@@ -228,9 +229,16 @@ static uint32_t loc_millisec_delta (lglw_int_t *lglw) {
 static FILE *logfile;
 
 void lglw_log(const char *logData, ...) {
-   fprintf(logfile, logData);
+   static char buf[16*1024]; 
+   va_list va; 
+   va_start(va, logData); 
+   vsprintf(buf, logData, va);
+   va_end(va); 
+   printf(buf); 
+   //fprintf(logfile, logData);
+   fputs(buf, logfile);
    fflush(logfile);
-   printf(logData);
+   // printf(logData);
 }
 
 
@@ -353,6 +361,11 @@ static lglw_bool_t loc_create_hidden_window(lglw_int_t *lglw, int32_t _w, int32_
    Dlog_v("lglw:loc_create_hidden_window: 5\n");
    lglw->ctx = glXCreateContext(lglw->xdsp, lglw->vi, None, True);
 
+   if(NULL == lglw->ctx)
+   {
+      Dlog("lglw: FAILED to create context!!!\n");
+   }
+
    Dlog_v("lglw:loc_create_hidden_window: 6\n");
    if(NULL == lglw->ctx)
    {
@@ -431,7 +444,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case Expose:
-            Dlog_v("lglw:loc_eventProc: xev Expose\n");
+            Dlog_vv("lglw:loc_eventProc: xev Expose\n");
             loc_handle_queued_mouse_warp(lglw);
             eventHandled = LGLW_FALSE;
             if(NULL != lglw->redraw.cbk)
@@ -1172,7 +1185,7 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
 
    if(NULL != lglw)
    {
-      Dlog_v("lglw:lglw_window_open: 1, %p, %i \n", (Window)_parentHWNDOrNull, (Window)_parentHWNDOrNull);
+      Dlog_v("lglw:lglw_window_open: 1, %p, %i p=(%d; %d) s=(%d; %d)\n", (Window)_parentHWNDOrNull, (Window)_parentHWNDOrNull, _x, _y, _w, _h);
       lglw->parent_xwnd = (0 == _parentHWNDOrNull) ? DefaultRootWindow(lglw->xdsp) : (Window)_parentHWNDOrNull;
 
       Dlog_v("lglw:lglw_window_open: 2 lglw=%p\n", lglw);
@@ -1342,12 +1355,24 @@ void lglw_window_close (lglw_t _lglw) {
          Dlog_v("lglw:lglw_window_close: 3\n");
          if(lglw->win.b_owner)
          {
+            XUnmapWindow(lglw->xdsp, lglw->win.xwnd);
             XDestroyWindow(lglw->xdsp, lglw->win.xwnd);
             lglw->win.b_owner = LGLW_FALSE;
          }
          XSync(lglw->xdsp, False);
          lglw->win.xwnd = 0;
          lglw->win.mapped = LGLW_FALSE;
+
+         {
+            XEvent xev;
+            int queued = XPending(lglw->xdsp);
+            Dlog_vvv("lglw:lglw_window_close: consume %d pending events\n", queued);
+            while(queued)
+            {
+               XNextEvent(lglw->xdsp, &xev);
+               queued--;
+            }
+         }
       }
    }
    Dlog_v("lglw:lglw_window_close: EXIT\n");
@@ -1389,14 +1414,14 @@ lglw_bool_t lglw_window_is_visible(lglw_t _lglw) {
    lglw_bool_t r = LGLW_FALSE;
    LGLW(_lglw);
 
-   Dlog_vvv("lglw:lglw_window_is_visible: 1\n");
+   // Dlog_vvv("lglw:lglw_window_is_visible: 1\n");
    if(NULL != lglw && 0 != lglw->win.xwnd)
    {
-      Dlog_vvv("lglw:lglw_window_is_visible: 2\n");
+      // Dlog_vvv("lglw:lglw_window_is_visible: 2\n");
       r = lglw->win.mapped;
    }
 
-   Dlog_vvv("lglw:lglw_window_is_visible: EXIT\n");
+   // Dlog_vvv("lglw:lglw_window_is_visible: EXIT\n");
    return r;
 }
 
@@ -1478,6 +1503,7 @@ void lglw_glcontext_push(lglw_t _lglw) {
       {
          Dlog("[---] lglw_glcontext_push: glXMakeCurrent() failed. win.xwnd=%p hidden.xwnd=%p ctx=%p glGetError()=%d\n", lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx, glGetError());
       }
+      // Dlog_vvv("lglw:lglw_glcontext_push: LEAVE\n");
    }
 }
 
@@ -2142,7 +2168,8 @@ void lglw_events(lglw_t _lglw) {
       {
          XEvent xev;
          int queued = XPending(lglw->xdsp);
-         Dlog_v("lglw:lglw_events: (events: %i)\n", queued);
+         if(queued > 0)
+            Dlog_vvv("lglw:lglw_events: (events: %i)\n", queued);
          while(queued)
          {
             XNextEvent(lglw->xdsp, &xev);
