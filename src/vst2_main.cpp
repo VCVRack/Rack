@@ -1983,6 +1983,11 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          }
          break;
 
+      case 56:
+      case 66:
+         // (todo) what are these ? Bitwig (Linux) sends a lot of them
+         break;
+
       default:
          // ignoring all other opcodes
          Dprintf("vstrack_plugin:dispatcher: unhandled opCode %d [ignored] \n", opCode);
