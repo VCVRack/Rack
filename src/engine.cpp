@@ -21,6 +21,14 @@
 #include <fenv.h>
 #endif
 
+#ifdef USE_LOG_PRINTF
+extern void log_printf(const char *logData, ...);
+#undef Dprintf
+#define Dprintf log_printf
+#else
+#define Dprintf printf
+#endif // USE_LOG_PRINTF
+
 namespace rack {
 
 
@@ -369,6 +377,7 @@ void vst2_handle_queued_params(void) {
                         if(paramRange > 0.0f)
                         {
                            float value = (qp.value * paramRange) + paramWidget->minValue;
+                           // Dprintf("vst2_handle_queued_params: paramId=%d value=%f min=%f max=%f\n", paramId, value, paramWidget->minValue, paramWidget->maxValue);
                            engineSetParam(module, paramId, value, false/*bVSTAutomate*/);
 
                            // Update UI widget
@@ -405,7 +414,21 @@ float vst2_get_param(int uniqueParamId) {
    {
       if(sUI(paramId) < sUI(module->params.size())) // paranoia
       {
-         return module->params[paramId].value;
+         ModuleWidget *moduleWidget = global_ui->app.gRackWidget->findModuleWidgetByModule(module);
+         if(NULL != moduleWidget)
+         {
+            // Find 
+            ParamWidget *paramWidget = moduleWidget->findParamWidgetByParamId(paramId);
+            if(NULL != paramWidget)
+            {
+               if(isfinite(paramWidget->minValue) && isfinite(paramWidget->maxValue))
+               {
+                  float value = module->params[paramId].value;
+                  value = (value - paramWidget->minValue) / (paramWidget->maxValue - paramWidget->minValue);
+                  return value;
+               }
+            }
+         }
       }      
    }
    return 0.0f;

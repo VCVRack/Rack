@@ -4,6 +4,14 @@
 #include "global.hpp"
 #include "global_ui.hpp"
 
+#ifdef USE_LOG_PRINTF
+extern void log_printf(const char *logData, ...);
+#undef Dprintf
+#define Dprintf log_printf
+#else
+#define Dprintf printf
+#endif // USE_LOG_PRINTF
+
 
 namespace rack {
 
@@ -21,7 +29,11 @@ json_t *ParamWidget::toJson() {
 void ParamWidget::fromJson(json_t *rootJ) {
 	json_t *valueJ = json_object_get(rootJ, "value");
 	if (valueJ)
-		setValue(json_number_value(valueJ));
+   {
+      float numberVal = json_number_value(valueJ);
+      // Dprintf("ParamWidget::fromJson: numberVal=%f\n", numberVal);
+		setValue(numberVal);
+   }
 }
 
 void ParamWidget::reset() {
