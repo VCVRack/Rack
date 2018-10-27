@@ -83,7 +83,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "vsync", vsyncJ);
 
    // fbo
-	json_t *fboJ = json_boolean(!global_ui->b_fbo);
+	json_t *fboJ = json_boolean(global_ui->b_fbo);
 	json_object_set_new(rootJ, "fbo", fboJ);
 
    // touchInput
