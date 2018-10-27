@@ -147,6 +147,7 @@ struct PluginMutex {
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <fenv.h>  // fesetround()
 
 // #define _GNU_SOURCE
 #include <dlfcn.h>
@@ -1189,6 +1190,10 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 #ifdef HAVE_WINDOWS
    _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 #endif // HAVE_WINDOWS
+
+#ifdef YAC_LINUX
+   fesetround(FE_TOWARDZERO);
+#endif // YAC_LINUX
 
    sUI chIdx;
 
