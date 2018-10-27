@@ -17,6 +17,9 @@
 #include "global.hpp"
 #include "global_ui.hpp"
 
+#ifdef __GNUC__
+#include <fenv.h>
+#endif
 
 namespace rack {
 
@@ -120,6 +123,10 @@ static void engineRun() {
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 #endif // _MSC_VER
+
+#if defined(__GNUC__) && (defined(ARCH_X64) || defined(ARCH_X86))
+   ::fesetround(FE_TOWARDZERO);
+#endif // __GNUC__
 
 	// Every time the engine waits and locks a mutex, it steps this many frames
 	const int mutexSteps = 64;
