@@ -7,10 +7,9 @@
   <title>trem_panel</title>
   <g style="clip-path: url(#clip-path)">
     <g id="Custom_Size_1" data-name="Custom Size 1">
-      <rect width="150" height="380" style="fill: #fff"/>
-      <g id="Rectangle_1" data-name="Rectangle 1">
-        <rect x="0.5" y="0.5" width="149" height="379" style="fill: #e6e6e6"/>
-        <rect x="1" y="1" width="148" height="378" style="fill: none;stroke: #707070"/>
+      <g id="background_fill" data-name="background fill">
+        <rect width="150" height="380" style="fill: #e6e6e6"/>
+        <rect x="0.5" y="0.5" width="149" height="379" style="fill: none;stroke: #707070"/>
       </g>
       <rect id="Rectangle_3" data-name="Rectangle 3" x="112" y="303" width="31" height="43" rx="3.5" ry="3.5"/>
       <rect id="Rectangle_4" data-name="Rectangle 4" x="77" y="303" width="31" height="43" rx="3.5" ry="3.5"/>

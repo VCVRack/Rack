@@ -37,13 +37,16 @@ public:
 
     /**
      * Executes function "func" and measures how long it takes.
-     * Will call func in a tight look lasting minTime seconds.
+     * Will call func in a tight loop lasting minTime seconds.
      * When done, prints out statistics.
+     *
+     * returns - percent used
      */
-    static void run(const char * name, std::function<T()> func, float minTime)
+    static double run(double overhead, const char * name, std::function<T()> func, float minTime)
     {
         int64_t iterations;
         bool done = false;
+        double percent = 0;
 
         //keep increasing the number of iterations until we last at least minTime seconds
         for (iterations = 100; !done; iterations *= 2) {
@@ -51,7 +54,8 @@ public:
             if (elapsed >= minTime) {
                 double itersPerSec = iterations / elapsed;
                 double full = 44100;
-                double percent = full * 100 / itersPerSec;
+                percent = full * 100 / itersPerSec;
+                percent -= overhead;
                 printf("\nmeasure %s over time %f\n", name, minTime);
 
                 printf("did %" PRId64 " iterations in %f seconds\n", iterations, elapsed);
@@ -63,6 +67,7 @@ public:
                 done = true;
             }
         }
+        return percent;
     }
 
    /**
@@ -82,10 +87,9 @@ public:
     }
 };
 
-
 /**
  * Simple producer / consumer for test data.
- * Serves up a precalculated list of random numbers.
+ * Serves up a pre-calculated list of random numbers.
  */
 template <typename T>
 class TestBuffers
@@ -121,7 +125,6 @@ private:
     static T destData[size];
 };
 
-
 template <typename T>
 T TestBuffers<T>::sourceData[size];
 
@@ -133,13 +136,3 @@ size_t TestBuffers<T>::sourceIndex = 0;
 
 template <typename T>
 size_t TestBuffers<T>::destIndex = 512;
-
-
-/**
- * Simple timer implementation for running inside Visual Studio
- */
-
-
-
-
-

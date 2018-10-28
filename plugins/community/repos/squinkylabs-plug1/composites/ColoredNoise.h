@@ -75,7 +75,7 @@ public:
     /**
     * Main processing entry point. Called every sample
     */
-    void step();
+    void step() override;
 
     float getSlope() const;
 
@@ -159,9 +159,9 @@ protected:
         FFT::makeNoiseSpectrum(noiseSpectrum.get(),
             noiseMessage->noiseSpec);
 
-// Now inverse FFT to time domain noise in client's buffer
+        // Now inverse FFT to time domain noise in client's buffer
         FFT::inverse(noiseMessage->dataBuffer.get(), *noiseSpectrum.get());
-        FFT::normalize(noiseMessage->dataBuffer.get());
+        FFT::normalize(noiseMessage->dataBuffer.get(), 5);          // use 5v amplitude.
         sendMessageToClient(noiseMessage);
     }
 private:

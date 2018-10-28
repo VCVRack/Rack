@@ -1,6 +1,8 @@
 
 #pragma once
 
+extern int _numBiquads;
+
 /**
  * Structure to hold the mutable state of a biquad filter: in this case the delay memory.
  *

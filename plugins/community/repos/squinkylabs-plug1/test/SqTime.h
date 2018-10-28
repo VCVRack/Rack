@@ -31,7 +31,6 @@ public:
 private:
     static double frequency;
 };
-double SqTime::frequency = 0;
 
 #else
 #include <time.h>

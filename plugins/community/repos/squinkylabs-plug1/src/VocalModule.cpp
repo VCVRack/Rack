@@ -195,6 +195,6 @@ VocalWidget::VocalWidget(VocalModule *module) : ModuleWidget(module)
 RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, Vocal) {
    Model *modelVocalModule = Model::create<VocalModule, VocalWidget>("Squinky Labs",
                                                                      "squinkylabs-vocalanimator",
-                                                                     "Vocal Animator", EFFECT_TAG, FILTER_TAG, LFO_TAG, RANDOM_TAG);
+                                                                     "Growler: Vocal Animator", EFFECT_TAG, FILTER_TAG, LFO_TAG, RANDOM_TAG);
    return modelVocalModule;
 }

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <iostream>
 
+#include "asserts.h"
 #include "MultiModOsc.h"
 #include "AudioMath.h"
 #include "SawOscillator.h"
@@ -259,6 +260,80 @@ static void testSaw7()
 }
 
 template <typename T>
+static void testSawFreq_old(bool neg)
+{
+   // assert(!neg);
+    const T freq = neg ? T(-.1) : T(.1);
+    SawOscillatorParams<T> params;
+    SawOscillator<T, true>::setFrequency(params, freq);
+    SawOscillatorState<T> state;
+
+    T lastValue = neg ? T(-100) : T(100);
+    for (int i = 0; i < 100; ++i) {
+        T saw = SawOscillator<T, true>::runSaw(state, params);
+
+        if (!neg) {
+            if (0 == (i % 10)) {
+                assertLT(saw, lastValue);
+            } else {
+                assertGT(saw, lastValue);
+            }
+        } else {
+#if 0
+            if (0 == (i % 10)) {
+                assertGT(saw, lastValue);
+            } else {
+                assertLT(saw, lastValue);
+            }
+#endif
+            printf("i = %d out=%.2f\n", i, saw);
+            fflush(stdout);
+        }
+        lastValue = saw;
+    }
+
+}
+
+template <typename T>
+static void testSawFreq(bool neg)
+{
+
+    int period = 10000;
+    if (sizeof(T) > 4) {
+        
+        period *= 1000;
+    }
+    T freq = T(1.0 / period);
+    if (neg) {
+        freq *= -1;
+   }
+    SawOscillatorParams<T> params;
+    SawOscillator<T, true>::setFrequency(params, freq);
+    SawOscillatorState<T> state;
+
+    T last = SawOscillator<T, true>::runSaw(state, params);
+    bool done = false;
+    int count = 0;
+    for (; !done; ++count) {
+        if (count > period + 100) {
+            done = true;
+            assert(false);
+        }
+        T saw = SawOscillator<T, true>::runSaw(state, params);
+        assertNE(saw, last);
+        bool moreThanLast = saw > last;
+        last = saw;
+        // if saw is turning going back
+        if (moreThanLast == neg) {
+            const int measuredPeriod = count + 1;
+            assertClose(measuredPeriod, period, 1.1);
+            done = true;
+        }
+    }
+}
+
+
+template <typename T>
 static void testSawT()
 {
     testSaw1<T>();
@@ -272,6 +347,8 @@ static void testSawT()
     testSaw6<T>();
     testTri7<T>();
     testSaw7<T>();
+    testSawFreq<T>(false);
+ //   testSawFreq<T>(true);
 }
 
 void testSaw()

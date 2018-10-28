@@ -4,16 +4,27 @@
 #include <assert.h>
 
 
+/**
+ * Gate trigger if for processing gate and trigger inputs.
+ * Features:
+ *      SchmidtTrigger on the input, to condition it.
+ *      Level sensor, for gate inputs.
+ *      Edge detector, for trigger inputs.
+ */
 class GateTrigger
 {
 public:
-    GateTrigger() :
+    GateTrigger(bool wantResetLogic) :
         _gate(false),
         _trigger(false),
-        _reset(true)
+        _reset(wantResetLogic)
     {
     }
 
+    /**
+     * Clock in one input sample. Afterwards may query
+     * gate() and trigger()
+     */
     void go(float v)
     {
         const bool newGate = _sc.go(v);

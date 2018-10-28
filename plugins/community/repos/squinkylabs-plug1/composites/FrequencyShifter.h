@@ -67,7 +67,7 @@ public:
     /**
      * Main processing entry point. Called every sample
      */
-    void step();
+    void step() override;
 
     typedef float T;        // use floats for all signals
     T freqRange = 5;        // the freq range switch

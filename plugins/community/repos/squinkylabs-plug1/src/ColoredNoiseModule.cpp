@@ -244,6 +244,3 @@ RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, ColoredNoise) {
       "Colored Noise", NOISE_TAG);
    return modelColoredNoiseModule;
 }
-
-
-

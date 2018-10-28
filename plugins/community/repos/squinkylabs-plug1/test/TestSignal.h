@@ -83,7 +83,7 @@ inline double TestSignal<T>::measureOutput(int numSamples, std::function<T()> fu
     for (int i = 0; i < numSamples; ++i) {
         buffer[i] = func();
     }
-   
+
     return getRMS(buffer.data(), numSamples);
 
 }

@@ -6,17 +6,17 @@
 
 static void testConstruct()
 {
-    RingBuffer<int, 4> rb;
+    SqRingBuffer<int, 4> rb;
     assert(rb.empty());
     assert(!rb.full());
 
 
-    RingBuffer<char *, 1> rb2;
+    SqRingBuffer<char *, 1> rb2;
 }
 
 static void testSimpleAccess()
 {
-    RingBuffer<int, 4> rb;
+    SqRingBuffer<int, 4> rb;
     rb.push(55);
     assert(!rb.empty());
     assert(!rb.full());
@@ -30,7 +30,7 @@ static void testSimpleAccess()
 
 static void testMultiAccess()
 {
-    RingBuffer<int, 4> rb;
+    SqRingBuffer<int, 4> rb;
     rb.push(1234);
     rb.push(5678);
     assert(!rb.empty());
@@ -51,7 +51,7 @@ static void testMultiAccess()
 
 static void testWrap()
 {
-    RingBuffer<int, 4> rb;
+    SqRingBuffer<int, 4> rb;
     rb.push(1234);
     rb.push(5678);
     rb.pop();
@@ -69,7 +69,7 @@ static void testWrap()
 
 static void testFull()
 {
-    RingBuffer<int, 4> rb;
+    SqRingBuffer<int, 4> rb;
     rb.push(1234);
     rb.push(5678);
     rb.pop();
@@ -93,7 +93,7 @@ static void testFull()
 static void testOne()
 {
     const char * p = "foo";
-    RingBuffer<const char*, 1> rb;
+    SqRingBuffer<const char*, 1> rb;
     rb.push(p);
     assert(!rb.empty());
     assert(rb.full());

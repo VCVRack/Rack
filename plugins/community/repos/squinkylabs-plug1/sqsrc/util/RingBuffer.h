@@ -10,10 +10,10 @@
  * Objects in RingBuffer are not owned by RingBuffer - they will not be destroyed.
  */
 template <typename T, int SIZE>
-class RingBuffer
+class SqRingBuffer
 {
 public:
-    RingBuffer()
+    SqRingBuffer()
     {
         for (int i = 0; i < SIZE; ++i) {
             memory[i] = 0;
@@ -38,7 +38,7 @@ private:
 };
 
 template <typename T, int SIZE>
-inline void RingBuffer<T, SIZE>::push(T value)
+inline void SqRingBuffer<T, SIZE>::push(T value)
 {
     assert(!full());
     memory[inIndex] = value;
@@ -48,7 +48,7 @@ inline void RingBuffer<T, SIZE>::push(T value)
 
 
 template <typename T, int SIZE>
-inline T RingBuffer<T, SIZE>::pop()
+inline T SqRingBuffer<T, SIZE>::pop()
 {
     assert(!empty());
     T value = memory[outIndex];
@@ -58,19 +58,19 @@ inline T RingBuffer<T, SIZE>::pop()
 }
 
 template <typename T, int SIZE>
-inline bool RingBuffer<T, SIZE>::full() const
+inline bool SqRingBuffer<T, SIZE>::full() const
 {
     return (inIndex == outIndex) && couldBeFull;
 }
 
 template <typename T, int SIZE>
-inline bool RingBuffer<T, SIZE>::empty() const
+inline bool SqRingBuffer<T, SIZE>::empty() const
 {
     return (inIndex == outIndex) && !couldBeFull;
 }
 
 template <typename T, int SIZE>
-inline void RingBuffer<T, SIZE>::advance(int &p)
+inline void SqRingBuffer<T, SIZE>::advance(int &p)
 {
     if (++p >= SIZE) p = 0;
 }

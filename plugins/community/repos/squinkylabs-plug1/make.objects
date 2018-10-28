@@ -6,16 +6,28 @@ ALL_OBJ= \
 	dsp/filters/FormantTables2.o \
 	dsp/filters/HilbertFilterDesigner.o \
 	dsp/third-party/falco/DspFilter.o \
+	dsp/utils/AsymWaveShaper.o \
 	dsp/utils/AudioMath.o \
 	dsp/utils/ObjectCache.o \
 	sqsrc/clock/ClockMult.o \
 	sqsrc/thread/ThreadClient.o \
 	sqsrc/thread/ThreadServer.o \
 	sqsrc/thread/ThreadSharedState.o \
+	src/BlankModule.o \
 	src/BootyModule.o \
+	src/CHBModule.o \
 	src/CPU_Hog.o \
 	src/ColoredNoiseModule.o \
+	src/DGModule.o \
+	src/EV3Module.o \
+	src/EVModule.o \
+	src/FunVModule.o \
+	src/GMRModule.o \
+	src/GrayModule.o \
+	src/LFNModule.o \
+	src/ShaperModule.o \
 	src/Squinky.o \
+	src/SuperModule.o \
 	src/ThreadBoost.o \
 	src/TremoloModule.o \
 	src/VocalFilterModule.o \

@@ -2,6 +2,7 @@
 
 #include <complex>
 #include <vector>
+#include <assert.h>
 
 
 class FFT;
@@ -13,22 +14,34 @@ class FFT;
  */
 using cpx = std::complex<float>;
 
-class FFTDataCpx
+template <typename T>
+class FFTData
 {
 public:
     friend FFT;
-    FFTDataCpx(int numBins);
-    ~FFTDataCpx();
-    cpx get(int bin) const;
-    void set(int bin, cpx value);
+    FFTData(int numBins);
+    ~FFTData();
+    T get(int bin) const;
+    void set(int bin, T value);
 
     int size() const
     {
         return (int) buffer.size();
     }
+
+    T * data()
+    {
+        return buffer.data();
+    }
+
+    float getAbs(int bin) const
+    {
+        return std::abs(buffer[bin]);
+    }
+
     static int _count;
 private:
-    std::vector<cpx> buffer;
+    std::vector<T> buffer;
 
     /**
     * we store this without type so that clients don't need
@@ -40,31 +53,39 @@ private:
     mutable void * kiss_cfg = 0;
 };
 
-/**
- * Holds an fft frame of real data.
- */
-class FFTDataReal
-{
-public:
-    friend FFT;
-    FFTDataReal(int numBins);
-    ~FFTDataReal();
-    float get(int numBin) const;
-    void set(int numBin, float value);
-    int size() const
-    {
-        return (int) buffer.size();
-    }
-    static int _count;
-private:
-    std::vector<float> buffer;
+using FFTDataReal = FFTData<float>;
+using FFTDataCpx = FFTData<cpx>;
 
-    /**
-     * we store this without type so that clients don't need
-     * to pull in the kiss_fft headers. It's mutable so it can
-     * be lazy created by FFT functions.
-     * Note that the cfg has a "direction" baked into it. For
-     * now we assume that all FFT with real input will be forward FFTs.
-     */
-    mutable void * kiss_cfg = 0;
-};
+//int FFTDataCpx::_count = 0;
+
+template <typename T>
+inline FFTData<T>::FFTData(int numBins) :
+    buffer(numBins)
+{
+    ++_count;
+}
+
+template <typename T>
+inline FFTData<T>::~FFTData()
+{
+    // We need to manually delete the cfg, since only "we" know
+    // what type it is.
+    if (kiss_cfg) {
+        free(kiss_cfg);
+    }
+    --_count;
+}
+
+template <typename T>
+inline T FFTData<T>::get(int index) const
+{
+    assert(index < (int) buffer.size() && index >= 0);
+    return buffer[index];
+}
+
+template <typename T>
+inline void FFTData<T>::set(int index, T value)
+{
+    assert(index < (int) buffer.size() && index >= 0);
+    buffer[index] = value;
+}

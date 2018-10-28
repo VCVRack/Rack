@@ -1,0 +1,1056 @@
+test1
+
+
+: step  
+: final out saw=-0.95 mb=0.00 smb = 0.00 tot=-0.95
+***** testSync3*****
+
+VCO1: step  
+VCO1: final out saw=-0.91 mb=0.00 smb = 0.00 tot=-0.91
+
+VCO2: step  
+VCO2: final out saw=-0.80 mb=0.00 smb = 0.00 tot=-0.80
+
+VCO3: step  
+VCO3: final out saw=-0.80 mb=0.00 smb = 0.00 tot=-0.80
+-------- sample 0 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.81 mb=0.00 smb = 0.00 tot=-0.81
+
+VCO2: step  
+VCO2: final out saw=-0.60 mb=0.00 smb = 0.00 tot=-0.60
+
+VCO3: step  
+VCO3: final out saw=-0.60 mb=0.00 smb = 0.00 tot=-0.60
+-------- sample 1 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.72 mb=0.00 smb = 0.00 tot=-0.72
+
+VCO2: step  
+VCO2: final out saw=-0.40 mb=0.00 smb = 0.00 tot=-0.40
+
+VCO3: step  
+VCO3: final out saw=-0.40 mb=0.00 smb = 0.00 tot=-0.40
+-------- sample 2 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.62 mb=0.00 smb = 0.00 tot=-0.62
+
+VCO2: step  
+VCO2: final out saw=-0.20 mb=0.00 smb = 0.00 tot=-0.20
+
+VCO3: step  
+VCO3: final out saw=-0.20 mb=0.00 smb = 0.00 tot=-0.20
+-------- sample 3 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.53 mb=0.00 smb = 0.00 tot=-0.53
+
+VCO2: step  
+VCO2: final out saw=0.01 mb=0.00 smb = 0.00 tot=0.01
+
+VCO3: step  
+VCO3: final out saw=0.01 mb=0.00 smb = 0.00 tot=0.01
+-------- sample 4 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.43 mb=0.00 smb = 0.00 tot=-0.43
+
+VCO2: step  
+VCO2: final out saw=0.21 mb=0.00 smb = 0.00 tot=0.21
+
+VCO3: step  
+VCO3: final out saw=0.21 mb=0.00 smb = 0.00 tot=0.21
+-------- sample 5 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.34 mb=0.00 smb = 0.00 tot=-0.34
+
+VCO2: step  
+VCO2: final out saw=0.41 mb=0.00 smb = 0.00 tot=0.41
+
+VCO3: step  
+VCO3: final out saw=0.41 mb=0.00 smb = 0.00 tot=0.41
+-------- sample 6 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.24 mb=0.00 smb = 0.00 tot=-0.24
+
+VCO2: step  
+VCO2: final out saw=0.61 mb=0.00 smb = 0.00 tot=0.61
+
+VCO3: step  
+VCO3: final out saw=0.61 mb=0.00 smb = 0.00 tot=0.61
+-------- sample 7 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.15 mb=0.00 smb = 0.00 tot=-0.15
+
+VCO2: step  
+VCO2: final out saw=0.81 mb=0.00 smb = 0.00 tot=0.81
+
+VCO3: step  
+VCO3: final out saw=0.81 mb=0.00 smb = 0.00 tot=0.81
+-------- sample 8 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.05 mb=0.00 smb = 0.00 tot=-0.05
+
+VCO2: step  
+VCO2: phase wrap 1.01->0.01 cross=-0.06 jump=-2.00  
+VCO2: final out saw=-0.99 mb=2.00 smb = 0.00 tot=1.01
+
+VCO3: step  
+VCO3: phase wrap 1.01->0.01 cross=-0.06 jump=-2.00  
+VCO3: final out saw=-0.99 mb=2.00 smb = 0.00 tot=1.01
+-------- sample 9 -----------
+
+VCO1: step  
+VCO1: final out saw=0.04 mb=0.00 smb = 0.00 tot=0.04
+
+VCO2: step  
+VCO2: final out saw=-0.79 mb=1.96 smb = 0.00 tot=1.18
+
+VCO3: step  
+VCO3: final out saw=-0.79 mb=1.96 smb = 0.00 tot=1.18
+-------- sample 10 -----------
+
+VCO1: step  
+VCO1: final out saw=0.14 mb=0.00 smb = 0.00 tot=0.14
+
+VCO2: step  
+VCO2: final out saw=-0.59 mb=1.39 smb = 0.00 tot=0.80
+
+VCO3: step  
+VCO3: final out saw=-0.59 mb=1.39 smb = 0.00 tot=0.80
+-------- sample 11 -----------
+
+VCO1: step  
+VCO1: final out saw=0.23 mb=0.00 smb = 0.00 tot=0.23
+
+VCO2: step  
+VCO2: final out saw=-0.39 mb=-0.09 smb = 0.00 tot=-0.48
+
+VCO3: step  
+VCO3: final out saw=-0.39 mb=-0.09 smb = 0.00 tot=-0.48
+-------- sample 12 -----------
+
+VCO1: step  
+VCO1: final out saw=0.33 mb=0.00 smb = 0.00 tot=0.33
+
+VCO2: step  
+VCO2: final out saw=-0.18 mb=-0.20 smb = 0.00 tot=-0.39
+
+VCO3: step  
+VCO3: final out saw=-0.18 mb=-0.20 smb = 0.00 tot=-0.39
+-------- sample 13 -----------
+
+VCO1: step  
+VCO1: final out saw=0.42 mb=0.00 smb = 0.00 tot=0.42
+
+VCO2: step  
+VCO2: final out saw=0.02 mb=0.21 smb = 0.00 tot=0.23
+
+VCO3: step  
+VCO3: final out saw=0.02 mb=0.21 smb = 0.00 tot=0.23
+-------- sample 14 -----------
+
+VCO1: step  
+VCO1: final out saw=0.52 mb=0.00 smb = 0.00 tot=0.52
+
+VCO2: step  
+VCO2: final out saw=0.22 mb=-0.18 smb = 0.00 tot=0.04
+
+VCO3: step  
+VCO3: final out saw=0.22 mb=-0.18 smb = 0.00 tot=0.04
+-------- sample 15 -----------
+
+VCO1: step  
+VCO1: final out saw=0.61 mb=0.00 smb = 0.00 tot=0.61
+
+VCO2: step  
+VCO2: final out saw=0.42 mb=0.13 smb = 0.00 tot=0.55
+
+VCO3: step  
+VCO3: final out saw=0.42 mb=0.13 smb = 0.00 tot=0.55
+-------- sample 16 -----------
+
+VCO1: step  
+VCO1: final out saw=0.71 mb=0.00 smb = 0.00 tot=0.71
+
+VCO2: step  
+VCO2: final out saw=0.62 mb=-0.11 smb = 0.00 tot=0.51
+
+VCO3: step  
+VCO3: final out saw=0.62 mb=-0.11 smb = 0.00 tot=0.51
+-------- sample 17 -----------
+
+VCO1: step  
+VCO1: final out saw=0.80 mb=0.00 smb = 0.00 tot=0.80
+
+VCO2: step  
+VCO2: final out saw=0.82 mb=0.07 smb = 0.00 tot=0.89
+
+VCO3: step  
+VCO3: final out saw=0.82 mb=0.07 smb = 0.00 tot=0.89
+-------- sample 18 -----------
+
+VCO1: step  
+VCO1: final out saw=0.90 mb=0.00 smb = 0.00 tot=0.90
+
+VCO2: step  
+VCO2: phase wrap 1.01->0.01 cross=-0.11 jump=-2.00  
+VCO2: final out saw=-0.98 mb=1.94 smb = 0.00 tot=0.96
+
+VCO3: step  
+VCO3: phase wrap 1.01->0.01 cross=-0.11 jump=-2.00  
+VCO3: final out saw=-0.98 mb=1.94 smb = 0.00 tot=0.96
+-------- sample 19 -----------
+
+VCO1: step  
+VCO1: final out saw=0.99 mb=0.00 smb = 0.00 tot=0.99
+
+VCO2: step  
+VCO2: final out saw=-0.78 mb=1.99 smb = 0.00 tot=1.22
+
+VCO3: step  
+VCO3: final out saw=-0.78 mb=1.99 smb = 0.00 tot=1.22
+-------- sample 20 -----------
+
+VCO1: step  
+VCO1: phase wrap 1.04->0.04 cross=-0.93 jump=-2.00  
+VCO1: calling slave with -0.93
+VCO1: final out saw=-0.91 mb=1.98 smb = 0.00 tot=1.07
+
+VCO2: step  
+VCO2: got sync ph=0.21 nph=0.59 excess=0.09 send cross -0.93 jump 0.76 
+
+VCO3: step  
+VCO3: final out saw=-0.58 mb=1.29 smb = 0.00 tot=0.71
+-------- sample 21 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.82 mb=1.53 smb = 0.00 tot=0.71
+
+VCO2: step  
+VCO2: final out saw=0.39 mb=1.29 smb = -0.75 tot=0.92
+
+VCO3: step  
+VCO3: final out saw=-0.37 mb=-0.14 smb = 0.00 tot=-0.51
+-------- sample 22 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.72 mb=0.08 smb = 0.00 tot=-0.65
+
+VCO2: step  
+VCO2: final out saw=0.59 mb=-0.14 smb = -0.58 tot=-0.13
+
+VCO3: step  
+VCO3: final out saw=-0.17 mb=-0.18 smb = 0.00 tot=-0.35
+-------- sample 23 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.63 mb=-0.30 smb = 0.00 tot=-0.92
+
+VCO2: step  
+VCO2: final out saw=0.79 mb=-0.18 smb = -0.03 tot=0.59
+
+VCO3: step  
+VCO3: final out saw=0.03 mb=0.19 smb = 0.00 tot=0.22
+-------- sample 24 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.53 mb=0.24 smb = 0.00 tot=-0.29
+
+VCO2: step  
+VCO2: final out saw=0.99 mb=0.19 smb = 0.11 tot=1.30
+
+VCO3: step  
+VCO3: final out saw=0.23 mb=-0.19 smb = 0.00 tot=0.04
+-------- sample 25 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.44 mb=-0.18 smb = 0.00 tot=-0.62
+
+VCO2: step  
+VCO2: phase wrap 1.10->0.10 cross=-0.96 jump=-2.00  
+VCO2: final out saw=-0.81 mb=1.79 smb = -0.09 tot=0.89
+
+VCO3: step  
+VCO3: final out saw=0.43 mb=0.13 smb = 0.00 tot=0.56
+-------- sample 26 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.34 mb=0.12 smb = 0.00 tot=-0.22
+
+VCO2: step  
+VCO2: final out saw=-0.61 mb=1.63 smb = 0.07 tot=1.10
+
+VCO3: step  
+VCO3: final out saw=0.63 mb=-0.10 smb = 0.00 tot=0.54
+-------- sample 27 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.25 mb=-0.09 smb = 0.00 tot=-0.34
+
+VCO2: step  
+VCO2: final out saw=-0.41 mb=-0.06 smb = -0.04 tot=-0.51
+
+VCO3: step  
+VCO3: final out saw=0.83 mb=0.11 smb = 0.00 tot=0.94
+-------- sample 28 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.15 mb=0.05 smb = 0.00 tot=-0.10
+
+VCO2: step  
+VCO2: final out saw=-0.20 mb=-0.17 smb = 0.03 tot=-0.34
+
+VCO3: step  
+VCO3: phase wrap 1.02->0.02 cross=-0.17 jump=-2.00  
+VCO3: final out saw=-0.97 mb=1.90 smb = 0.00 tot=0.94
+-------- sample 29 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.06 mb=-0.04 smb = 0.00 tot=-0.10
+
+VCO2: step  
+VCO2: final out saw=-0.00 mb=0.14 smb = -0.02 tot=0.12
+
+VCO3: step  
+VCO3: final out saw=-0.76 mb=2.00 smb = 0.00 tot=1.24
+-------- sample 30 -----------
+
+VCO1: step  
+VCO1: final out saw=0.04 mb=0.02 smb = 0.00 tot=0.06
+
+VCO2: step  
+VCO2: final out saw=0.20 mb=-0.13 smb = 0.02 tot=0.09
+
+VCO3: step  
+VCO3: final out saw=-0.56 mb=1.20 smb = 0.00 tot=0.64
+-------- sample 31 -----------
+
+VCO1: step  
+VCO1: final out saw=0.13 mb=-0.02 smb = 0.00 tot=0.11
+
+VCO2: step  
+VCO2: final out saw=0.40 mb=0.07 smb = -0.01 tot=0.47
+
+VCO3: step  
+VCO3: final out saw=-0.36 mb=-0.20 smb = 0.00 tot=-0.56
+-------- sample 32 -----------
+
+VCO1: step  
+VCO1: final out saw=0.23 mb=0.01 smb = 0.00 tot=0.23
+
+VCO2: step  
+VCO2: final out saw=0.60 mb=-0.07 smb = 0.01 tot=0.54
+
+VCO3: step  
+VCO3: final out saw=-0.16 mb=-0.13 smb = 0.00 tot=-0.29
+-------- sample 33 -----------
+
+VCO1: step  
+VCO1: final out saw=0.32 mb=-0.01 smb = 0.00 tot=0.31
+
+VCO2: step  
+VCO2: final out saw=0.80 mb=0.03 smb = -0.00 tot=0.83
+
+VCO3: step  
+VCO3: final out saw=0.04 mb=0.16 smb = 0.00 tot=0.20
+-------- sample 34 -----------
+
+VCO1: step  
+VCO1: final out saw=0.42 mb=0.00 smb = 0.00 tot=0.42
+
+VCO2: step  
+VCO2: phase wrap 1.00->0.00 cross=-0.01 jump=-2.00  
+VCO2: final out saw=-1.00 mb=1.96 smb = 0.00 tot=0.96
+
+VCO3: step  
+VCO3: final out saw=0.24 mb=-0.17 smb = 0.00 tot=0.07
+-------- sample 35 -----------
+
+VCO1: step  
+VCO1: final out saw=0.51 mb=-0.01 smb = 0.00 tot=0.50
+
+VCO2: step  
+VCO2: final out saw=-0.80 mb=1.98 smb = -0.00 tot=1.19
+
+VCO3: step  
+VCO3: final out saw=0.44 mb=0.13 smb = 0.00 tot=0.57
+-------- sample 36 -----------
+
+VCO1: step  
+VCO1: final out saw=0.61 mb=-0.00 smb = 0.00 tot=0.61
+
+VCO2: step  
+VCO2: final out saw=-0.59 mb=1.41 smb = 0.00 tot=0.82
+
+VCO3: step  
+VCO3: final out saw=0.64 mb=-0.09 smb = 0.00 tot=0.55
+-------- sample 37 -----------
+
+VCO1: step  
+VCO1: final out saw=0.70 mb=0.01 smb = 0.00 tot=0.71
+
+VCO2: step  
+VCO2: final out saw=-0.39 mb=-0.01 smb = 0.00 tot=-0.41
+
+VCO3: step  
+VCO3: final out saw=0.84 mb=0.11 smb = 0.00 tot=0.95
+-------- sample 38 -----------
+
+VCO1: step  
+VCO1: final out saw=0.80 mb=0.04 smb = 0.00 tot=0.83
+
+VCO2: step  
+VCO2: final out saw=-0.19 mb=-0.22 smb = -0.00 tot=-0.42
+
+VCO3: step  
+VCO3: phase wrap 1.02->0.02 cross=-0.22 jump=-2.00  
+VCO3: final out saw=-0.95 mb=1.90 smb = 0.00 tot=0.94
+-------- sample 39 -----------
+
+VCO1: step  
+VCO1: final out saw=0.89 mb=-0.02 smb = 0.00 tot=0.87
+
+VCO2: step  
+VCO2: final out saw=0.01 mb=0.19 smb = -0.01 tot=0.19
+
+VCO3: step  
+VCO3: final out saw=-0.75 mb=1.99 smb = 0.00 tot=1.24
+-------- sample 40 -----------
+
+VCO1: step  
+VCO1: final out saw=0.99 mb=0.01 smb = 0.00 tot=0.99
+
+VCO2: step  
+VCO2: final out saw=0.21 mb=-0.18 smb = 0.01 tot=0.04
+
+VCO3: step  
+VCO3: final out saw=-0.55 mb=1.12 smb = 0.00 tot=0.57
+-------- sample 41 -----------
+
+VCO1: step  
+VCO1: phase wrap 1.04->0.04 cross=-0.86 jump=-2.00  
+VCO1: calling slave with -0.86
+VCO1: final out saw=-0.92 mb=1.98 smb = 0.00 tot=1.06
+
+VCO2: step  
+VCO2: got sync ph=0.71 nph=0.59 excess=0.09 send cross -0.86 jump -0.24 
+
+VCO3: step  
+VCO3: final out saw=-0.35 mb=-0.24 smb = 0.00 tot=-0.60
+-------- sample 42 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.82 mb=1.59 smb = 0.00 tot=0.76
+
+VCO2: step  
+VCO2: final out saw=0.37 mb=0.12 smb = 0.23 tot=0.73
+
+VCO3: step  
+VCO3: final out saw=-0.15 mb=-0.09 smb = 0.00 tot=-0.24
+-------- sample 43 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.73 mb=0.18 smb = 0.00 tot=-0.54
+
+VCO2: step  
+VCO2: final out saw=0.58 mb=-0.09 smb = 0.19 tot=0.68
+
+VCO3: step  
+VCO3: final out saw=0.05 mb=0.14 smb = 0.00 tot=0.19
+-------- sample 44 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.63 mb=-0.35 smb = 0.00 tot=-0.98
+
+VCO2: step  
+VCO2: final out saw=0.78 mb=0.10 smb = 0.02 tot=0.90
+
+VCO3: step  
+VCO3: final out saw=0.25 mb=-0.16 smb = 0.00 tot=0.09
+-------- sample 45 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.54 mb=0.25 smb = 0.00 tot=-0.28
+
+VCO2: step  
+VCO2: final out saw=0.98 mb=-0.08 smb = -0.04 tot=0.85
+
+VCO3: step  
+VCO3: final out saw=0.45 mb=0.12 smb = 0.00 tot=0.58
+-------- sample 46 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.44 mb=-0.18 smb = 0.00 tot=-0.63
+
+VCO2: step  
+VCO2: phase wrap 1.09->0.09 cross=-0.89 jump=-2.00  
+VCO2: final out saw=-0.82 mb=2.02 smb = 0.03 tot=1.23
+
+VCO3: step  
+VCO3: final out saw=0.65 mb=-0.09 smb = 0.00 tot=0.56
+-------- sample 47 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.35 mb=0.11 smb = 0.00 tot=-0.24
+
+VCO2: step  
+VCO2: final out saw=-0.62 mb=1.53 smb = -0.02 tot=0.89
+
+VCO3: step  
+VCO3: final out saw=0.86 mb=0.10 smb = 0.00 tot=0.96
+-------- sample 48 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.25 mb=-0.08 smb = 0.00 tot=-0.33
+
+VCO2: step  
+VCO2: final out saw=-0.42 mb=0.14 smb = 0.02 tot=-0.26
+
+VCO3: step  
+VCO3: phase wrap 1.03->0.03 cross=-0.28 jump=-2.00  
+VCO3: final out saw=-0.94 mb=1.89 smb = 0.00 tot=0.95
+-------- sample 49 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.16 mb=0.04 smb = 0.00 tot=-0.12
+
+VCO2: step  
+VCO2: final out saw=-0.22 mb=-0.34 smb = -0.01 tot=-0.57
+
+VCO3: step  
+VCO3: final out saw=-0.74 mb=1.98 smb = 0.00 tot=1.24
+-------- sample 50 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.06 mb=-0.03 smb = 0.00 tot=-0.10
+
+VCO2: step  
+VCO2: final out saw=-0.02 mb=0.24 smb = 0.01 tot=0.23
+
+VCO3: step  
+VCO3: final out saw=-0.54 mb=1.03 smb = 0.00 tot=0.49
+-------- sample 51 -----------
+
+VCO1: step  
+VCO1: final out saw=0.03 mb=0.01 smb = 0.00 tot=0.04
+
+VCO2: step  
+VCO2: final out saw=0.18 mb=-0.19 smb = -0.00 tot=-0.01
+
+VCO3: step  
+VCO3: final out saw=-0.34 mb=-0.29 smb = 0.00 tot=-0.63
+-------- sample 52 -----------
+
+VCO1: step  
+VCO1: final out saw=0.13 mb=-0.01 smb = 0.00 tot=0.11
+
+VCO2: step  
+VCO2: final out saw=0.39 mb=0.10 smb = 0.00 tot=0.49
+
+VCO3: step  
+VCO3: final out saw=-0.14 mb=-0.05 smb = 0.00 tot=-0.19
+-------- sample 53 -----------
+
+VCO1: step  
+VCO1: final out saw=0.22 mb=-0.00 smb = 0.00 tot=0.22
+
+VCO2: step  
+VCO2: final out saw=0.59 mb=-0.06 smb = -0.00 tot=0.52
+
+VCO3: step  
+VCO3: final out saw=0.06 mb=0.11 smb = 0.00 tot=0.17
+-------- sample 54 -----------
+
+VCO1: step  
+VCO1: final out saw=0.32 mb=-0.01 smb = 0.00 tot=0.31
+
+VCO2: step  
+VCO2: final out saw=0.79 mb=0.07 smb = -0.00 tot=0.86
+
+VCO3: step  
+VCO3: final out saw=0.26 mb=-0.15 smb = 0.00 tot=0.12
+-------- sample 55 -----------
+
+VCO1: step  
+VCO1: final out saw=0.41 mb=-0.00 smb = 0.00 tot=0.41
+
+VCO2: step  
+VCO2: final out saw=0.99 mb=-0.06 smb = -0.00 tot=0.93
+
+VCO3: step  
+VCO3: final out saw=0.46 mb=0.11 smb = 0.00 tot=0.58
+-------- sample 56 -----------
+
+VCO1: step  
+VCO1: final out saw=0.51 mb=-0.01 smb = 0.00 tot=0.50
+
+VCO2: step  
+VCO2: phase wrap 1.09->0.09 cross=-0.94 jump=-2.00  
+VCO2: final out saw=-0.81 mb=2.00 smb = -0.00 tot=1.19
+
+VCO3: step  
+VCO3: final out saw=0.67 mb=-0.09 smb = 0.00 tot=0.58
+-------- sample 57 -----------
+
+VCO1: step  
+VCO1: final out saw=0.60 mb=-0.00 smb = 0.00 tot=0.60
+
+VCO2: step  
+VCO2: final out saw=-0.61 mb=1.49 smb = -0.00 tot=0.88
+
+VCO3: step  
+VCO3: final out saw=0.87 mb=0.10 smb = 0.00 tot=0.97
+-------- sample 58 -----------
+
+VCO1: step  
+VCO1: final out saw=0.70 mb=0.01 smb = 0.00 tot=0.71
+
+VCO2: step  
+VCO2: final out saw=-0.41 mb=0.05 smb = -0.00 tot=-0.35
+
+VCO3: step  
+VCO3: phase wrap 1.03->0.03 cross=-0.34 jump=-2.00  
+VCO3: final out saw=-0.93 mb=1.89 smb = 0.00 tot=0.96
+-------- sample 59 -----------
+
+VCO1: step  
+VCO1: final out saw=0.79 mb=0.04 smb = 0.00 tot=0.83
+
+VCO2: step  
+VCO2: final out saw=-0.21 mb=-0.29 smb = 0.00 tot=-0.50
+
+VCO3: step  
+VCO3: final out saw=-0.73 mb=1.97 smb = 0.00 tot=1.24
+-------- sample 60 -----------
+
+VCO1: step  
+VCO1: final out saw=0.89 mb=-0.02 smb = 0.00 tot=0.87
+
+VCO2: step  
+VCO2: final out saw=-0.01 mb=0.23 smb = 0.00 tot=0.23
+
+VCO3: step  
+VCO3: final out saw=-0.53 mb=0.95 smb = 0.00 tot=0.42
+-------- sample 61 -----------
+
+VCO1: step  
+VCO1: final out saw=0.98 mb=0.00 smb = 0.00 tot=0.98
+
+VCO2: step  
+VCO2: final out saw=0.20 mb=-0.19 smb = -0.00 tot=0.01
+
+VCO3: step  
+VCO3: final out saw=-0.33 mb=-0.32 smb = 0.00 tot=-0.65
+-------- sample 62 -----------
+
+VCO1: step  
+VCO1: phase wrap 1.04->0.04 cross=-0.79 jump=-2.00  
+VCO1: calling slave with -0.79
+VCO1: final out saw=-0.93 mb=1.99 smb = 0.00 tot=1.07
+
+VCO2: step  
+VCO2: got sync ph=0.70 nph=0.58 excess=0.08 send cross -0.79 jump -0.24 
+
+VCO3: step  
+VCO3: final out saw=-0.13 mb=-0.00 smb = 0.00 tot=-0.13
+-------- sample 63 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.83 mb=1.65 smb = 0.00 tot=0.82
+
+VCO2: step  
+VCO2: final out saw=0.36 mb=0.11 smb = 0.24 tot=0.71
+
+VCO3: step  
+VCO3: final out saw=0.07 mb=0.08 smb = 0.00 tot=0.16
+-------- sample 64 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.74 mb=0.29 smb = 0.00 tot=-0.44
+
+VCO2: step  
+VCO2: final out saw=0.56 mb=-0.08 smb = 0.20 tot=0.68
+
+VCO3: step  
+VCO3: final out saw=0.27 mb=-0.13 smb = 0.00 tot=0.15
+-------- sample 65 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.64 mb=-0.39 smb = 0.00 tot=-1.03
+
+VCO2: step  
+VCO2: final out saw=0.76 mb=0.09 smb = 0.03 tot=0.88
+
+VCO3: step  
+VCO3: final out saw=0.48 mb=0.10 smb = 0.00 tot=0.58
+-------- sample 66 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.55 mb=0.25 smb = 0.00 tot=-0.29
+
+VCO2: step  
+VCO2: final out saw=0.96 mb=-0.07 smb = -0.04 tot=0.85
+
+VCO3: step  
+VCO3: final out saw=0.68 mb=-0.08 smb = 0.00 tot=0.60
+-------- sample 67 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.45 mb=-0.17 smb = 0.00 tot=-0.62
+
+VCO2: step  
+VCO2: phase wrap 1.08->0.08 cross=-0.82 jump=-2.00  
+VCO2: final out saw=-0.84 mb=2.01 smb = 0.03 tot=1.20
+
+VCO3: step  
+VCO3: final out saw=0.88 mb=0.09 smb = 0.00 tot=0.97
+-------- sample 68 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.36 mb=0.09 smb = 0.00 tot=-0.27
+
+VCO2: step  
+VCO2: final out saw=-0.63 mb=1.61 smb = -0.02 tot=0.96
+
+VCO3: step  
+VCO3: phase wrap 1.04->0.04 cross=-0.39 jump=-2.00  
+VCO3: final out saw=-0.92 mb=1.89 smb = 0.00 tot=0.97
+-------- sample 69 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.26 mb=-0.06 smb = 0.00 tot=-0.32
+
+VCO2: step  
+VCO2: final out saw=-0.43 mb=0.24 smb = 0.01 tot=-0.19
+
+VCO3: step  
+VCO3: final out saw=-0.72 mb=1.95 smb = 0.00 tot=1.23
+-------- sample 70 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.17 mb=0.02 smb = 0.00 tot=-0.14
+
+VCO2: step  
+VCO2: final out saw=-0.23 mb=-0.37 smb = -0.01 tot=-0.61
+
+VCO3: step  
+VCO3: final out saw=-0.52 mb=0.86 smb = 0.00 tot=0.34
+-------- sample 71 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.07 mb=-0.02 smb = 0.00 tot=-0.09
+
+VCO2: step  
+VCO2: final out saw=-0.03 mb=0.24 smb = 0.00 tot=0.21
+
+VCO3: step  
+VCO3: final out saw=-0.32 mb=-0.35 smb = 0.00 tot=-0.67
+-------- sample 72 -----------
+
+VCO1: step  
+VCO1: final out saw=0.02 mb=-0.00 smb = 0.00 tot=0.02
+
+VCO2: step  
+VCO2: final out saw=0.17 mb=-0.17 smb = -0.00 tot=0.00
+
+VCO3: step  
+VCO3: final out saw=-0.12 mb=0.04 smb = 0.00 tot=-0.08
+-------- sample 73 -----------
+
+VCO1: step  
+VCO1: final out saw=0.12 mb=-0.00 smb = 0.00 tot=0.12
+
+VCO2: step  
+VCO2: final out saw=0.37 mb=0.08 smb = -0.00 tot=0.45
+
+VCO3: step  
+VCO3: final out saw=0.08 mb=0.05 smb = 0.00 tot=0.14
+-------- sample 74 -----------
+
+VCO1: step  
+VCO1: final out saw=0.21 mb=-0.01 smb = 0.00 tot=0.21
+
+VCO2: step  
+VCO2: final out saw=0.57 mb=-0.04 smb = -0.00 tot=0.53
+
+VCO3: step  
+VCO3: final out saw=0.29 mb=-0.11 smb = 0.00 tot=0.18
+-------- sample 75 -----------
+
+VCO1: step  
+VCO1: final out saw=0.31 mb=-0.00 smb = 0.00 tot=0.31
+
+VCO2: step  
+VCO2: final out saw=0.77 mb=0.06 smb = -0.00 tot=0.83
+
+VCO3: step  
+VCO3: final out saw=0.49 mb=0.09 smb = 0.00 tot=0.58
+-------- sample 76 -----------
+
+VCO1: step  
+VCO1: final out saw=0.40 mb=-0.01 smb = 0.00 tot=0.40
+
+VCO2: step  
+VCO2: final out saw=0.97 mb=-0.04 smb = -0.00 tot=0.93
+
+VCO3: step  
+VCO3: final out saw=0.69 mb=-0.07 smb = 0.00 tot=0.62
+-------- sample 77 -----------
+
+VCO1: step  
+VCO1: final out saw=0.50 mb=-0.00 smb = 0.00 tot=0.50
+
+VCO2: step  
+VCO2: phase wrap 1.09->0.09 cross=-0.87 jump=-2.00  
+VCO2: final out saw=-0.82 mb=1.99 smb = -0.00 tot=1.16
+
+VCO3: step  
+VCO3: final out saw=0.89 mb=0.08 smb = 0.00 tot=0.97
+-------- sample 78 -----------
+
+VCO1: step  
+VCO1: final out saw=0.59 mb=-0.01 smb = 0.00 tot=0.59
+
+VCO2: step  
+VCO2: final out saw=-0.62 mb=1.58 smb = -0.00 tot=0.95
+
+VCO3: step  
+VCO3: phase wrap 1.05->0.05 cross=-0.45 jump=-2.00  
+VCO3: final out saw=-0.91 mb=1.90 smb = 0.00 tot=0.99
+-------- sample 79 -----------
+
+VCO1: step  
+VCO1: final out saw=0.69 mb=0.01 smb = 0.00 tot=0.70
+
+VCO2: step  
+VCO2: final out saw=-0.42 mb=0.14 smb = -0.00 tot=-0.28
+
+VCO3: step  
+VCO3: final out saw=-0.71 mb=1.93 smb = 0.00 tot=1.22
+-------- sample 80 -----------
+
+VCO1: step  
+VCO1: final out saw=0.78 mb=0.04 smb = 0.00 tot=0.82
+
+VCO2: step  
+VCO2: final out saw=-0.22 mb=-0.33 smb = 0.00 tot=-0.55
+
+VCO3: step  
+VCO3: final out saw=-0.51 mb=0.77 smb = 0.00 tot=0.26
+-------- sample 81 -----------
+
+VCO1: step  
+VCO1: final out saw=0.88 mb=-0.02 smb = 0.00 tot=0.86
+
+VCO2: step  
+VCO2: final out saw=-0.02 mb=0.23 smb = 0.00 tot=0.22
+
+VCO3: step  
+VCO3: final out saw=-0.31 mb=-0.37 smb = 0.00 tot=-0.68
+-------- sample 82 -----------
+
+VCO1: step  
+VCO1: final out saw=0.97 mb=-0.00 smb = 0.00 tot=0.97
+
+VCO2: step  
+VCO2: final out saw=0.18 mb=-0.17 smb = -0.00 tot=0.01
+
+VCO3: step  
+VCO3: final out saw=-0.10 mb=0.07 smb = 0.00 tot=-0.03
+-------- sample 83 -----------
+
+VCO1: step  
+VCO1: phase wrap 1.03->0.03 cross=-0.72 jump=-2.00  
+VCO1: calling slave with -0.72
+VCO1: final out saw=-0.93 mb=2.00 smb = 0.00 tot=1.07
+
+VCO2: step  
+VCO2: got sync ph=0.69 nph=0.57 excess=0.07 send cross -0.72 jump -0.24 
+
+VCO3: step  
+VCO3: final out saw=0.10 mb=0.02 smb = 0.00 tot=0.11
+-------- sample 84 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.84 mb=1.70 smb = 0.00 tot=0.86
+
+VCO2: step  
+VCO2: final out saw=0.35 mb=0.09 smb = 0.24 tot=0.67
+
+VCO3: step  
+VCO3: final out saw=0.30 mb=-0.08 smb = 0.00 tot=0.21
+-------- sample 85 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.74 mb=0.41 smb = 0.00 tot=-0.33
+
+VCO2: step  
+VCO2: final out saw=0.55 mb=-0.06 smb = 0.20 tot=0.69
+
+VCO3: step  
+VCO3: final out saw=0.50 mb=0.07 smb = 0.00 tot=0.57
+-------- sample 86 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.65 mb=-0.42 smb = 0.00 tot=-1.06
+
+VCO2: step  
+VCO2: final out saw=0.75 mb=0.07 smb = 0.05 tot=0.86
+
+VCO3: step  
+VCO3: final out saw=0.70 mb=-0.05 smb = 0.00 tot=0.65
+-------- sample 87 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.55 mb=0.24 smb = 0.00 tot=-0.31
+
+VCO2: step  
+VCO2: final out saw=0.95 mb=-0.05 smb = -0.05 tot=0.85
+
+VCO3: step  
+VCO3: final out saw=0.90 mb=0.07 smb = 0.00 tot=0.97
+-------- sample 88 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.46 mb=-0.14 smb = 0.00 tot=-0.60
+
+VCO2: step  
+VCO2: phase wrap 1.08->0.08 cross=-0.75 jump=-2.00  
+VCO2: final out saw=-0.85 mb=1.99 smb = 0.03 tot=1.17
+
+VCO3: step  
+VCO3: phase wrap 1.05->0.05 cross=-0.51 jump=-2.00  
+VCO3: final out saw=-0.90 mb=1.90 smb = 0.00 tot=1.01
+-------- sample 89 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.36 mb=0.06 smb = 0.00 tot=-0.30
+
+VCO2: step  
+VCO2: final out saw=-0.65 mb=1.68 smb = -0.01 tot=1.02
+
+VCO3: step  
+VCO3: final out saw=-0.70 mb=1.90 smb = 0.00 tot=1.20
+-------- sample 90 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.27 mb=-0.04 smb = 0.00 tot=-0.30
+
+VCO2: step  
+VCO2: final out saw=-0.45 mb=0.34 smb = 0.01 tot=-0.10
+
+VCO3: step  
+VCO3: final out saw=-0.50 mb=0.68 smb = 0.00 tot=0.19
+-------- sample 91 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.17 mb=0.00 smb = 0.00 tot=-0.17
+
+VCO2: step  
+VCO2: final out saw=-0.25 mb=-0.39 smb = -0.00 tot=-0.64
+
+VCO3: step  
+VCO3: final out saw=-0.29 mb=-0.38 smb = 0.00 tot=-0.68
+-------- sample 92 -----------
+
+VCO1: step  
+VCO1: final out saw=-0.08 mb=-0.00 smb = 0.00 tot=-0.08
+
+VCO2: step  
+VCO2: final out saw=-0.05 mb=0.23 smb = -0.00 tot=0.18
+
+VCO3: step  
+VCO3: final out saw=-0.09 mb=0.11 smb = 0.00 tot=0.01
+-------- sample 93 -----------
+
+VCO1: step  
+VCO1: final out saw=0.02 mb=-0.01 smb = 0.00 tot=0.00
+
+VCO2: step  
+VCO2: final out saw=0.16 mb=-0.14 smb = 0.00 tot=0.02
+
+VCO3: step  
+VCO3: final out saw=0.11 mb=-0.01 smb = 0.00 tot=0.09
+-------- sample 94 -----------
+
+VCO1: step  
+VCO1: final out saw=0.11 mb=0.01 smb = 0.00 tot=0.12
+
+VCO2: step  
+VCO2: final out saw=0.36 mb=0.05 smb = -0.00 tot=0.41
+
+VCO3: step  
+VCO3: final out saw=0.31 mb=-0.06 smb = 0.00 tot=0.25
+-------- sample 95 -----------
+
+VCO1: step  
+VCO1: final out saw=0.21 mb=-0.02 smb = 0.00 tot=0.19
+
+VCO2: step  
+VCO2: final out saw=0.56 mb=-0.02 smb = 0.00 tot=0.54
+
+VCO3: step  
+VCO3: final out saw=0.51 mb=0.06 smb = 0.00 tot=0.57
+-------- sample 96 -----------
+
+VCO1: step  
+VCO1: final out saw=0.30 mb=0.01 smb = 0.00 tot=0.31
+
+VCO2: step  
+VCO2: final out saw=0.76 mb=0.04 smb = -0.00 tot=0.79
+
+VCO3: step  
+VCO3: final out saw=0.71 mb=-0.04 smb = 0.00 tot=0.67
+-------- sample 97 -----------
+
+VCO1: step  
+VCO1: final out saw=0.40 mb=-0.01 smb = 0.00 tot=0.38
+
+VCO2: step  
+VCO2: final out saw=0.96 mb=-0.02 smb = 0.00 tot=0.94
+
+VCO3: step  
+VCO3: final out saw=0.91 mb=0.06 smb = 0.00 tot=0.97
+-------- sample 98 -----------
+
+VCO1: step  
+VCO1: final out saw=0.49 mb=0.00 smb = 0.00 tot=0.49
+
+VCO2: step  
+VCO2: phase wrap 1.08->0.08 cross=-0.80 jump=-2.00  
+VCO2: final out saw=-0.84 mb=1.97 smb = -0.00 tot=1.13
+
+VCO3: step  
+VCO3: phase wrap 1.06->0.06 cross=-0.56 jump=-2.00  
+VCO3: final out saw=-0.89 mb=1.91 smb = 0.00 tot=1.03
+-------- sample 99 -----------
+
+VCO1: step  
+VCO1: final out saw=0.59 mb=-0.01 smb = 0.00 tot=0.58
+
+VCO2: step  
+VCO2: final out saw=-0.64 mb=1.65 smb = 0.00 tot=1.01
+
+VCO3: step  
+VCO3: final out saw=-0.69 mb=1.87 smb = 0.00 tot=1.18
+0 ret = 0.000000
+1 ret = 1.000000
+-1 ret = -0.200000
+running testSplineExtremes
+extreme test starting for shaper. test output ....
+extreme test done
+extreme test starting for shifter. test output ....
+extreme test done
+extreme test starting for vocal filter.  ....
+extreme test done
+extreme test starting for vocal animator.  ....
+extreme test done
+Tests passed.

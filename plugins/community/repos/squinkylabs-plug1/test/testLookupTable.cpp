@@ -6,6 +6,7 @@
 #include "AudioMath.h"
 #include "LookupTable.h"
 #include "LookupTableFactory.h"
+#include "ObjectCache.h"
 
 using namespace std;
 
@@ -164,8 +165,8 @@ static void testExpSimpleLookup()
     LookupTableParams<T> lookup;
     LookupTableFactory<T>::makeExp2(lookup);
 
-    const double xMin = LookupTableFactory<T>::expXMin();
-    const double xMax = LookupTableFactory<T>::expXMax();
+    const double xMin = LookupTableFactory<T>::exp2XMin();
+    const double xMax = LookupTableFactory<T>::exp2XMax();
     assert(5 > xMin);
     assert(11 < xMax);
     assertClose(LookupTable<T>::lookup(lookup, 5), std::pow(2, 5), .01);
@@ -193,16 +194,107 @@ static void testExpRange()
 template<typename T>
 static void testExpTolerance(T centsTolerance)
 {
-    const T xMin = (T) LookupTableFactory<T>::expXMin();
-    const T xMax = (T) LookupTableFactory<T>::expXMax();
+    const T xMin = (T) LookupTableFactory<T>::exp2XMin();
+    const T xMax = (T) LookupTableFactory<T>::exp2XMax();
 
     LookupTableParams<T> table;
     LookupTableFactory<T>::makeExp2(table);
-    for (T x = xMin; x <= xMax; x += T(.0001)) {
+    for (T x = xMin; x <= xMax; x += T(.001)) {
         T y = LookupTable<T>::lookup(table, x);            // and back
         double accurate = std::pow(2.0, x);
-        double errorCents = std::abs(1200.0 * std::log2(y / accurate));
+        double errorCents = AudioMath::acents(y, accurate);
         assertClose(errorCents, 0, centsTolerance);
+    }
+}
+
+
+template<typename T>
+static void testExpTolerance2(T centsTolerance, T hzTolerance)
+{
+    const T xMin = (T) LookupTableFactory<T>::exp2XMin();
+    const T xMax = (T) LookupTableFactory<T>::exp2XMax();
+
+    LookupTableParams<T> table;
+    LookupTableFactory<T>::makeExp2(table);
+    for (T x = xMin; x <= xMax; x += T(.001)) {
+        T y = LookupTable<T>::lookup(table, x);            // and back
+        double accurate = std::pow(2.0, x);
+        double errorCents = AudioMath::acents(y, accurate);
+        assertClose(errorCents, 0, centsTolerance);
+        const double errorHz = std::abs(y - accurate);
+        assertClose(errorHz, 0, hzTolerance);
+    }
+}
+
+template<typename T>
+static void testExp2HiTolerance(T centsTolerance, T hzTolerance)
+{
+
+    const T xMin = (T) LookupTableFactory<T>::exp2ExHighXMin();
+    const T xMax = (T) LookupTableFactory<T>::exp2ExHighXMax();
+
+    LookupTableParams<T> table;
+    LookupTableFactory<T>::makeExp2ExHigh(table);
+
+    for (T x = xMin; x <= xMax; x += T(.001)) {
+        T y = LookupTable<T>::lookup(table, x);            // and back
+        double accurate = std::pow(2.0, x);
+        double errorCents = AudioMath::acents(y, accurate);
+        assertClose(errorCents, 0, centsTolerance);
+        const double errorHz = std::abs(y - accurate);
+
+        // relax limits at high freq
+        T curHzTol = hzTolerance;
+        if (y > 10000)  curHzTol *= 10;
+        if (y > 5000) curHzTol *= 4;
+        else if (y > 3000) curHzTol *= 2;
+        if (y > 2000) curHzTol *= 1.1f;
+
+        assertClose(errorHz, 0, curHzTol);
+    }
+}
+
+template<typename T>
+static void testExp2LowTolerance(T centsTolerance, T hzTolerance)
+{
+    const T xMin = (T) LookupTableFactory<T>::exp2ExLowXMin();
+    const T xMax = (T) LookupTableFactory<T>::exp2ExLowXMax();
+
+    LookupTableParams<T> table;
+    LookupTableFactory<T>::makeExp2ExLow(table);
+
+    for (T x = xMin; x <= xMax; x += T(.001)) {
+        T y = LookupTable<T>::lookup(table, x);            // and back
+        double accurate = std::pow(2.0, x);
+        double errorCents = AudioMath::acents(y, accurate);
+        assertClose(errorCents, 0, centsTolerance);
+        const double errorHz = std::abs(y - accurate);
+        assertClose(errorHz, 0, hzTolerance);
+    }
+}
+
+template<typename T>
+static void testExp2CombinedTolerance(T centsTolerance, T hzTolerance)
+{
+    const T xMin = (T) LookupTableFactory<T>::exp2ExLowXMin();
+    const T xMax = (T) LookupTableFactory<T>::exp2ExHighXMax();
+
+   // LookupTableParams<T> table;
+    auto exp = ObjectCache<T>::getExp2Ex();
+    for (T x = xMin; x <= xMax; x += T(.001)) {
+        T y = exp(x);
+        double accurate = std::pow(2.0, x);
+        double errorCents = AudioMath::acents(y, accurate);
+        assertClose(errorCents, 0, centsTolerance);
+        const double errorHz = std::abs(y - accurate);
+
+        T curHzTol = hzTolerance;
+        if (y > 10000)  curHzTol *= 10;
+        if (y > 5000) curHzTol *= 4;
+        else if (y > 3000) curHzTol *= 2;
+        if (y > 2000) curHzTol *= 1.1f;
+
+        assertClose(errorHz, 0, curHzTol);
     }
 }
 
@@ -217,6 +309,16 @@ static void testBipolarSimpleLookup()
     assertClose(LookupTable<T>::lookup(lookup, -1), -1, .01);
 }
 
+
+template <typename T>
+static void testAudioTaperSimpleLookup()
+{
+    LookupTableParams<T> lookup;
+    LookupTableFactory<T>::makeAudioTaper(lookup);
+
+    assertClose(LookupTable<T>::lookup(lookup, 0), 0, .01);
+    assertClose(LookupTable<T>::lookup(lookup, 1), 1, .01);
+}
 
 template <typename T>
 static void testBipolarTolerance()
@@ -245,6 +347,24 @@ static void testBipolarTolerance()
     }
 }
 
+
+template <typename T>
+static void testAudioTaperTolerance()
+{
+    LookupTableParams<T> lookup;
+    LookupTableFactory<T>::makeAudioTaper(lookup);
+    const double toleratedError = 1 - AudioMath::gainFromDb(-.1);// let's go for one db.
+    assert(toleratedError > 0);
+
+    auto refFuncPos = AudioMath::makeFunc_AudioTaper(LookupTableFactory<T>::audioTaperKnee());
+
+    for (double x = 0; x < 1; x += .001) {
+        const T test = LookupTable<T>::lookup(lookup, (T) x);
+        T ref = (T) refFuncPos(x);
+        assertClose(test, ref, toleratedError);
+    }
+}
+
 template<typename T>
 static void test()
 {
@@ -256,15 +376,22 @@ static void test()
     testDiscrete1<T>();
     testDiscrete2<T>();
     testExpSimpleLookup<T>();
-    testExpTolerance<T>(100);   // 1 semitone
-    testExpTolerance<T>(10);
-    testExpTolerance<T>(1);
+
+    testExpTolerance<T>(1);     // 1 cent
+
+    testExp2HiTolerance<T>(.125, T(.05));
+    testExp2LowTolerance<T>(.125, T(.05));
+    testExp2CombinedTolerance<T>(.125, T(.5));
+
     testBipolarSimpleLookup<T>();
     testBipolarTolerance<T>();
+    testAudioTaperSimpleLookup<T>();
+    testAudioTaperTolerance<T>();
 }
 
 void testLookupTable()
 {
-    test<float>();
+
     test<double>();
+    test<float>();
 }

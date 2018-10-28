@@ -19,7 +19,7 @@ public:
      */
     void start()
     {
-		startTime = SqTime::seconds();
+        startTime = SqTime::seconds();
     }
 
     /**
@@ -28,36 +28,36 @@ public:
      */
     void stop(int numLoops)
     {
-		const double stop = SqTime::seconds();
-		const double delta = stop - startTime;
-		numDataPoints += numLoops;
-		totalTimeFrame += delta;
-		if (delta < minTime) {
-			minTime = delta;
-		} else if (delta > maxTime) {
-			maxTime = delta;
-		}
-		
-		if (numDataPoints > 1000) {
-			const double avgTime = totalTimeFrame / numDataPoints;
-			const double srTime = (1.0 / 44100.0);
-			const double ratio = avgTime / srTime;
+        const double stop = SqTime::seconds();
+        const double delta = stop - startTime;
+        numDataPoints += numLoops;
+        totalTimeFrame += delta;
+        if (delta < minTime) {
+            minTime = delta;
+        } else if (delta > maxTime) {
+            maxTime = delta;
+        }
+
+        if (numDataPoints > 1000) {
+            const double avgTime = totalTimeFrame / numDataPoints;
+            const double srTime = (1.0 / 44100.0);
+            const double ratio = avgTime / srTime;
             totalTimeGlobal += avgTime;
             numFramesInTotal++;
 
             double runningAvg = totalTimeGlobal / (numFramesInTotal * srTime);
 
             printf("\nsrTime=%f avtTime=%f\n", srTime, avgTime);
-            printf("this block: %f%% min=%f max=%f globalmax=%f running avg=%f\n", 
+            printf("this block: %f%% min=%f max=%f globalmax=%f running avg=%f\n",
                 ratio * 100, minTime, maxTime, globalMax, runningAvg * 100);
             if (globalMax < maxTime) {
                 globalMax = maxTime;
             }
-			numDataPoints=0;
-			totalTimeFrame = 0;
-			minTime = 1000000000;
-			maxTime = -100000000000;
-		}
+            numDataPoints = 0;
+            totalTimeFrame = 0;
+            minTime = 1000000000;
+            maxTime = -100000000000;
+        }
     }
 
 private:

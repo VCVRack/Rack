@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "asserts.h"
 #include "AudioMath.h"
 #include "TestSignal.h"
 
@@ -14,6 +15,7 @@ static void test1()
     T buffer[size];
     TestSignal<T>::generateSin(buffer, size, T(.01));
 
+#if 0
     T min = 1, max = -1;
     for (int i = 0; i < size; ++i) {
         const T x = buffer[i];
@@ -30,6 +32,11 @@ static void test1()
     const T delta = T(.0000001);
     assert(AudioMath::closeTo(min, T(-1), delta));
     assert(AudioMath::closeTo(max, T(1), delta));
+#endif
+    const T delta = T(.0000001);
+    auto x = AudioMath::getMinMax(buffer, size);
+    assertClose(x.first, -1, delta);
+    assertClose(x.second, 1, delta);
 }
 
 /**

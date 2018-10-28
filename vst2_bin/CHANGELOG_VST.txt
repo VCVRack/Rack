@@ -9,9 +9,20 @@
 - add module dBiz.SuHa
 - add module dBiz.TROSC
 - add module dBiz.Util2
-o add module AudibleInstruments.Marbles
-o add module AudibleInstruments.Plaits
-o add module AudibleInstruments.Stages
+- add module AudibleInstruments.Marbles
+- add module AudibleInstruments.Plaits
+- add module AudibleInstruments.Stages
+- add module SquinkyLabs.Blank (crash)
+- add module SquinkyLabs.CHB
+- add module SquinkyLabs.DG
+- add module SquinkyLabs.EV3
+- add module SquinkyLabs.EV
+- add module SquinkyLabs.FunV (crash)
+- add module SquinkyLabs.GMR
+- add module SquinkyLabs.Gray
+- add module SquinkyLabs.LFN
+- add module SquinkyLabs.Shaper (crash)
+- add module SquinkyLabs.Super
 
 
 ** October 12th, 2018

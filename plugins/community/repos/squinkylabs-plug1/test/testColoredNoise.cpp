@@ -37,7 +37,7 @@ static void test1()
     for (bool done = false; !done; ) {
         cn.step();
         const float output = cn.outputs[Noise::AUDIO_OUTPUT].value;
-        if (output > .1) {;
+        if (output > .1) {
             started = true;
         }
         assert(output < 10);
@@ -80,7 +80,7 @@ static void test2()
     while (cn._msgCount() < 6) {
         cn.step();
     }
-      cn.params[Noise::SLOPE_PARAM].value = -1.2f;
+    cn.params[Noise::SLOPE_PARAM].value = -1.2f;
     while (cn._msgCount() < 7) {
         cn.step();
     }

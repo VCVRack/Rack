@@ -2,6 +2,7 @@
 
 
 #include "LookupTable.h"
+#include "BiquadParams.h"
 
 /**
  * This class creates objects and caches them.
@@ -18,6 +19,7 @@ class ObjectCache
 {
 public:
     static std::shared_ptr<LookupTableParams<T>> getBipolarAudioTaper();
+    static std::shared_ptr<LookupTableParams<T>> getAudioTaper();
     static std::shared_ptr<LookupTableParams<T>> getSinLookup();
 
     /**
@@ -30,6 +32,14 @@ public:
      * accuracy = 1 cent (1V/octave)
      */
     static std::shared_ptr<LookupTableParams<T>> getExp2();
+
+    static std::function<T(T)> getExp2Ex();
+
+    static std::shared_ptr<LookupTableParams<T>> getExp2ExtendedLow();
+    static std::shared_ptr<LookupTableParams<T>> getExp2ExtendedHigh();
+
+
+
     static std::shared_ptr<LookupTableParams<T>> getDb2Gain();
 
     /**
@@ -37,14 +47,22 @@ public:
      */
     static std::shared_ptr<LookupTableParams<T>> getTanh5();
 
+    static std::shared_ptr<BiquadParams<float, 3>> get6PLPParams(float normalizedFc);
+
 private:
     /**
      * Cache uses weak pointers. This allows the cached objects to be
      * freed when the last client reference goes away.
      */
     static std::weak_ptr<LookupTableParams<T>> bipolarAudioTaper;
+    static std::weak_ptr<LookupTableParams<T>> audioTaper;
     static std::weak_ptr<LookupTableParams<T>> sinLookupTable;
     static std::weak_ptr<LookupTableParams<T>> exp2;
+    static std::weak_ptr<LookupTableParams<T>> exp2ExHigh;
+    static std::weak_ptr<LookupTableParams<T>> exp2ExLow;
     static std::weak_ptr<LookupTableParams<T>> db2Gain;
     static std::weak_ptr<LookupTableParams<T>> tanh5;
+
+    static std::weak_ptr< BiquadParams<float, 3>> lowpass64;
+    static std::weak_ptr< BiquadParams<float, 3>> lowpass16;
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 #include "AudioMath.h"
 #include "LookupTable.h"
 #include "ObjectCache.h"
@@ -30,25 +32,14 @@ public:
 template<typename T, bool frequencyCanBeNegative>
 inline void SinOscillator<T, frequencyCanBeNegative>::setFrequency(SinOscillatorParams<T>& params, T frequency)
 {
-
-    std::function<double(double)> f = AudioMath::makeFunc_Sin();
-
-    // TODO: figure out a better initialization strategy
-    // and a better strategy for table size
-    // with 4096 thd was -130 db. let's use less memory!
-  // if (!params.lookupParams.isValid()) {
- //       LookupTable<T>::init(params.lookupParams, 256, 0, 1, f);
-  //  }
     assert(params.lookupParams->isValid());
-
-    SawOscillator<T, true>::setFrequency(params.sawParams, frequency);
+    SawOscillator<T, frequencyCanBeNegative>::setFrequency(params.sawParams, frequency);
 }
 
 template<typename T, bool frequencyCanBeNegative>
 inline T SinOscillator<T, frequencyCanBeNegative>::run(
     SinOscillatorState<T>& state, const SinOscillatorParams<T>& params)
 {
-
     const T temp = SawOscillator<T, frequencyCanBeNegative>::runSaw(state.sawState, params.sawParams);
     const T ret = LookupTable<T>::lookup(*params.lookupParams, temp);
     return ret;
@@ -58,7 +49,6 @@ template<typename T, bool frequencyCanBeNegative>
 inline void SinOscillator<T, frequencyCanBeNegative>::runQuadrature(
     T& output, T& outputQuadrature, SinOscillatorState<T>& state, const SinOscillatorParams<T>& params)
 {
-
     T saw, quadratureSaw;
     SawOscillator<T, frequencyCanBeNegative>::runQuadrature(saw, quadratureSaw, state.sawState, params.sawParams);
     output = LookupTable<T>::lookup(*params.lookupParams, saw);

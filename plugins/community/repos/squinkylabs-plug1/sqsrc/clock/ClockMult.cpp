@@ -32,7 +32,7 @@ void ClockMult::sampleClockLockedMode()
         case State::TRAINING:
             ++trainingCounter;
             break;
-        case State::RUNNING: 
+        case State::RUNNING:
             ++trainingCounter;          // we are still training, even while running
             sawPhase += learnedFrequency;
             if (sawPhase >= 1) {
@@ -47,7 +47,7 @@ void ClockMult::sampleClockLockedMode()
 
             break;
 
-        default: 
+        default:
             assert(false);
     }
  //   printf("leave sampleClock: state=%d saw=%f\n", state, sawPhase);
@@ -75,14 +75,14 @@ void ClockMult::refClock()
             trainingCounter = 0;
             learnedFrequency = (float) freqMultFactor / learnedPeriod;
             state = State::RUNNING;
-            
+
             startNewClock();
          // printf("refClock moved from TRAINING to RUNNING. period = %d freq=%f clockOut=%d\n",  learnedPeriod, learnedFrequency, clockOutValue);
             break;
-       
+
         default:
             assert(0);
-            
+
     }
     //printf("leave refClock: state=%d\n", state);
 }

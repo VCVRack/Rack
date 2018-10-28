@@ -78,9 +78,9 @@ template<typename T, bool frequencyCanBeNegative>
 inline void SawOscillator<T, frequencyCanBeNegative>::setFrequency(SawOscillatorParams<T>& params, T freq)
 {
     if (frequencyCanBeNegative) {
-        assert(freq >= -.5 && freq < .5);
+        assert(freq >= -.5 && freq <= .5);
     } else {
-        assert(freq >= 0 && freq < .5);
+        assert(freq >= 0 && freq <= .5);
     }
     params.phaseIncrement = freq;
 }

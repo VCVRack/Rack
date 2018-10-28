@@ -6,7 +6,7 @@
 #include "RingBuffer.h"
 
 /**
- * A very specialized container. Made for holding one free 
+ * A very specialized container. Made for holding one free
  * work buffers, and making sure they are destroyed.
  *
  * At construction time, objects are created to fill the pool.
@@ -17,7 +17,7 @@
  *
  * Note that unlike RingBuffer, ManagePool manages T*, not T.
  *
- * All public functions are no-blocking, so may be called from the audio thread 
+ * All public functions are no-blocking, so may be called from the audio thread
  * without danger. Of course the constructor and destructor are exceptions - they may block.
  */
 template <typename T, int SIZE>
@@ -38,7 +38,7 @@ private:
      * this ring buffer is where the raw T* are kept.
      * client pops and pushes here
      */
-    RingBuffer<T*, SIZE> ringBuffer;
+    SqRingBuffer<T*, SIZE> ringBuffer;
     std::vector< std::unique_ptr<T>> lifetimeManager;
 };
 

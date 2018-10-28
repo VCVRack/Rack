@@ -4,9 +4,11 @@ This project is a growing collection of modules for the VCV Rack vritual modular
 
 You can find us on Facebook [here](https://www.facebook.com/SquinkyLabs).
 
-## Manuals
+## Manuals and Release Notes
 
 Here is the user's manual for our modules: [instruction manual](./docs/booty-shifter.md). It contains descriptions of all of them.
+
+The [release notes](./docs/release-notes.md) describe recent changes.
 
 ## Contributing
 

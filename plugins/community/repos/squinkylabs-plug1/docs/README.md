@@ -2,6 +2,8 @@
 
 All of our plugins are free and open source. The [instruction manual](booty-shifter.md) describes all of the released modules.
 
+The [release notes](release-notes.md) describe recent changes.
+
 All of our released modules may be found in the [VCV Rack plugin manager] (https://vcvrack.com/plugins.html). This is by far the easiest way for most users to install our modules and keep them up to date.
 
 It is also quite easy to clone this repo and build them yourself. In order to do this, however, you must first download and build [VCV Rack itself](https://github.com/VCVRack/Rack).
@@ -21,10 +23,6 @@ As with all third-party modules for VCV, you must:
 * Clone SquinkyVCV in Rack’s plugins folder.
 * `CD SquinkyVCV`
 * `make`
-
-## Experimental modules
-
-At any given time, there may partially finished "experimental" modules in this repo. You can find up to date information on them [here](experimental.md).
 
 ## Unit testing framework
 

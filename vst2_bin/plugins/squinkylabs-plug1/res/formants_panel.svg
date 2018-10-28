@@ -7,7 +7,10 @@
   <title>formants_panel</title>
   <g style="clip-path: url(#clip-path)">
     <g id="Custom_Size_1" data-name="Custom Size 1">
-      <rect width="180" height="380" style="fill: #e6e6e6"/>
+      <g id="background_fill" data-name="background fill">
+        <rect width="180" height="380" style="fill: #e6e6e6"/>
+        <rect x="0.5" y="0.5" width="179" height="379" style="fill: none;stroke: #707070"/>
+      </g>
       <g id="Squinky_Labs" data-name="Squinky Labs" style="isolation: isolate">
         <g style="isolation: isolate">
           <path d="M54.66,342.74l-6.17,4.14,4.6,7.77-9.63,2.91-.05-.14,6.11-4.1-4.62-7.76,9.71-2.93Z"/>

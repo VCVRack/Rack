@@ -260,6 +260,6 @@ VocalFilterWidget::VocalFilterWidget(VocalFilterModule *module) : ModuleWidget(m
 RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, VocalFilter) {
    Model *modelVocalFilterModule = Model::create<VocalFilterModule, VocalFilterWidget>("Squinky Labs",
                                                                                        "squinkylabs-vocalfilter",
-                                                                                       "Vocal Filter", EFFECT_TAG, FILTER_TAG);
+                                                                                       "Formants: Vocal Filter", EFFECT_TAG, FILTER_TAG);
    return modelVocalFilterModule;
 }

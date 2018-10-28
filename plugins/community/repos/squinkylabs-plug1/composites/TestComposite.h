@@ -13,7 +13,7 @@ public:
     TestComposite() :
         inputs(20),
         outputs(20),
-        params(20),
+        params(40),
         lights(20)
     {
 
@@ -32,7 +32,9 @@ public:
         {
             value = (brightness > 0.f) ? brightness * brightness : 0.f;
         }
-        void setBrightnessSmooth(float brightness);
+        void setBrightnessSmooth(float brightness)
+        {
+        }
     };
 
     struct Input
@@ -54,7 +56,7 @@ public:
         /** Voltage of the port. Write-only by Module */
         float value = 0.0;
         /** Whether a wire is plugged in */
-        bool active = false;
+        bool active = true;
         Light plugLights[2];
     };
 
@@ -62,4 +64,18 @@ public:
     std::vector<Output> outputs;
     std::vector<Param> params;
     std::vector<Light> lights;
+
+    float engineGetSampleTime()
+    {
+        return 1.0f / 44100.0f;
+    }
+
+    float engineGetSampleRate()
+    {
+        return 44100.f;
+    }
+
+    virtual void step()
+    {
+    }
 };

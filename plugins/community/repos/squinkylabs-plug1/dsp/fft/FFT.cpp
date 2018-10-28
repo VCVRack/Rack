@@ -49,7 +49,6 @@ bool FFT::forward(FFTDataCpx* out, const FFTDataReal& in)
     return true;
 }
 
-
 bool FFT::inverse(FFTDataReal* out, const FFTDataCpx& in)
 {
     if (out->buffer.size() != in.buffer.size()) {
@@ -83,16 +82,16 @@ bool FFT::inverse(FFTDataReal* out, const FFTDataCpx& in)
     return true;
 }
 
-int FFT::freqToBin(float freq, float sampleRate, int numBins)
+int FFT::freqToBin(double freq, double sampleRate, int numBins)
 {
     assert(freq <= (sampleRate / 2));
     // bin(numBins) <> sr / 2;
-    return (int)((freq / sampleRate)*(numBins * 2));
+    return (int)((freq / sampleRate)*(numBins));
 }
 
-float FFT::bin2Freq(int bin, float sampleRate, int numBins)
+double FFT::bin2Freq(int bin, double sampleRate, int numBins)
 {
-    return  sampleRate * float(bin) / (float(numBins) * 2);
+    return  sampleRate * double(bin) / double(numBins);
 }
 
 static float randomPhase()
@@ -120,8 +119,8 @@ static void makeNegSlope(FFTDataCpx* output, const ColoredNoiseSpec& spec)
     static float k = -spec.slope * log2(lowFreqCorner);
     for (int i = bin40 + 1; i < numBins; ++i) {
         if (i < numBins / 2) {
-            const float f = FFT::bin2Freq(i, spec.sampleRate, numBins);
-            const float gainDb = std::log2(f) * spec.slope + k;
+            const double f = FFT::bin2Freq(i, spec.sampleRate, numBins);
+            const double gainDb = std::log2(f) * spec.slope + k;
             const float gain = float(AudioMath::gainFromDb(gainDb));
             output->set(i, std::polar(gain, randomPhase()));
         } else {
@@ -143,8 +142,8 @@ static void makePosSlope(FFTDataCpx* output, const ColoredNoiseSpec& spec)
     static float k = -spec.slope * log2(spec.highFreqCorner);
     for (int i = binHigh - 1; i > 0; --i) {
         if (i < numBins / 2) {
-            const float f = FFT::bin2Freq(i, spec.sampleRate, numBins);
-            const float gainDb = std::log2(f) * spec.slope + k;
+            const double f = FFT::bin2Freq(i, spec.sampleRate, numBins);
+            const double gainDb = std::log2(f) * spec.slope + k;
             const float gain = float(AudioMath::gainFromDb(gainDb));
             gainMax = std::max(gain, gainMax);
             output->set(i, std::polar(gain, randomPhase()));
@@ -189,10 +188,11 @@ static float getPeak(const FFTDataReal& data)
     return peak;
 }
 
-void FFT::normalize(FFTDataReal* data)
+void FFT::normalize(FFTDataReal* data, float maxValue)
 {
+    assert(maxValue > 0);
     const float peak = getPeak(*data);
-    const float correction = 1.0f / peak;
+    const float correction = maxValue / peak;
     for (int i = 0; i < data->size(); ++i) {
         float x = data->get(i);
         x *= correction;

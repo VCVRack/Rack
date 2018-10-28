@@ -1,8 +1,9 @@
 #pragma once
 
-class FFTDataCpx;
-class FFTDataReal;
+//class FFTDataCpx;
+//class FFTDataReal;
 
+#include "FFTData.h"
 
 class ColoredNoiseSpec
 {
@@ -33,7 +34,7 @@ public:
      */
     static void makeNoiseSpectrum(FFTDataCpx* output, const ColoredNoiseSpec&);
 
-    static void normalize(FFTDataReal*);
-    static float bin2Freq(int bin, float sampleRate, int numBins);
-    static int freqToBin(float freq, float sampleRate, int numBins);
+    static void normalize(FFTDataReal*, float maxValue);
+    static double bin2Freq(int bin, double sampleRate, int numBins);
+    static int freqToBin(double freq, double sampleRate, int numBins);
 };

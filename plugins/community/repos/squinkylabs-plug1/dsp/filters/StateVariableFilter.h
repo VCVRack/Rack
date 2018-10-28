@@ -111,6 +111,7 @@ public:
      * units are 1 == sample rate
      */
     void setFreq(T f);
+    void setFreqAccurate(T f);
     void setMode(Mode m)
     {
         mode = m;
@@ -143,6 +144,12 @@ inline void StateVariableFilterParams<T>::setFreq(T fc)
     // Note that we are skipping the high freq warping.
     // Going for speed over accuracy
     fcGain = T(AudioMath::Pi) * T(2) * fc;
+}
+
+template <typename T>
+inline void StateVariableFilterParams<T>::setFreqAccurate(T fc)
+{
+    fcGain = T(2) * std::sin( T(AudioMath::Pi) * fc);
 }
 
 /*******************************************************************************************/

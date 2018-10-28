@@ -213,7 +213,7 @@ BootyWidget::BootyWidget(BootyModule *module) : ModuleWidget(module)
 RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, Booty) {
    Model *modelBootyModule = Model::create<BootyModule, BootyWidget>("Squinky Labs",
                                                                      "squinkylabs-freqshifter",
-                                                                     "Booty Frequency Shifter", EFFECT_TAG, RING_MODULATOR_TAG);
+                                                                     "Booty Shifter: Frequency Shifter", EFFECT_TAG, RING_MODULATOR_TAG);
    return modelBootyModule;
 }
 

@@ -58,7 +58,7 @@ private:
     int trainingCounter = 12345;
     int learnedPeriod = 999;
     float learnedFrequency = 0;
-    int freqMultFactor = 0;         // if 0, free run, else mult by n.
+    int freqMultFactor = 0;         // if 0, free run, else multiply by n.
     State state = State::INIT;
 
     bool clockOutValue = 0;

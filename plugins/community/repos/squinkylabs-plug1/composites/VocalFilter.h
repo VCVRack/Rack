@@ -72,7 +72,7 @@ public:
     };
 
     void init();
-    void step();
+    void step() override;
 
     float reciprocalSampleRate;
 
@@ -156,7 +156,7 @@ inline void VocalFilter<TBase>::step()
     for (int i = LED_A; i <= LED_U; ++i) {
         if (i == iVowel) {
             TBase::lights[i].value = ((i + 1) - fVowel) * 1;
-            TBase::lights[i+1].value = (fVowel - i) * 1;
+            TBase::lights[i + 1].value = (fVowel - i) * 1;
         } else if (i != (iVowel + 1)) {
             TBase::lights[i].value = 0;
         }
@@ -199,7 +199,7 @@ inline void VocalFilter<TBase>::step()
         T modifiedGainDB = (1 - gainDB) * brightness + gainDB;
 
         // TODO: why is normalizedBW in this equation?
-        const T gain =LookupTable<T>::lookup(*db2GainLookup, modifiedGainDB) * normalizedBw;
+        const T gain = LookupTable<T>::lookup(*db2GainLookup, modifiedGainDB) * normalizedBw;
 
         T fcFinalLog = fcLog + fPara;
         T fcFinal = LookupTable<T>::lookup(*expLookup, fcFinalLog);

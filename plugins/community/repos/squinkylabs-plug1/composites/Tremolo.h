@@ -14,10 +14,10 @@ template <class TBase>
 class Tremolo : public TBase
 {
 public:
-    Tremolo(struct Module * module) : TBase(module)
+    Tremolo(struct Module * module) : TBase(module), gateTrigger(true)
     {
     }
-    Tremolo() : TBase()
+    Tremolo() : TBase(), gateTrigger(true)
     {
     }
     void setSampleRate(float rate)
@@ -71,7 +71,7 @@ public:
     /**
      * Main processing entry point. Called every sample
      */
-    void step();
+    void step() override;
 
 private:
 
@@ -80,7 +80,7 @@ private:
     float reciprocalSampleRate = 0;
 
     AsymRampShaperParams rampShaper;
-    std::shared_ptr<LookupTableParams<float>> exp2 =  ObjectCache<float>::getExp2();
+    std::shared_ptr<LookupTableParams<float>> exp2 = ObjectCache<float>::getExp2();
 
     // make some bootstrap scalers
     AudioMath::ScaleFun<float> scale_rate;
@@ -126,7 +126,7 @@ inline void Tremolo<TBase>::step()
 
 
     clock.setMultiplier(clockMul);
- 
+
 
     const float shape = scale_shape(
         TBase::inputs[LFO_SHAPE_INPUT].value,
@@ -160,7 +160,7 @@ inline void Tremolo<TBase>::step()
         clock.setFreeRunFreq(scaledRate * reciprocalSampleRate);
     }
 
-   
+
 
     // For now, call setup every sample. will eat a lot of cpu
     AsymRampShaper::setup(rampShaper, skew, phase);

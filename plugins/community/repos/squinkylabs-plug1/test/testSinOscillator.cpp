@@ -119,7 +119,7 @@ static void testDistortion()
     }
     double errDb = AudioMath::db(err);
    // printf("THD = %f\n", errDb);
-    assertLT(errDb, -80);
+    assertLT(errDb, -90);
 }
 
 template<typename T>

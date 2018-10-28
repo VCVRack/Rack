@@ -31,7 +31,7 @@ struct CPU_HogModule : Module
      */
     void step() override;
 
-    int stepsWhileDrawing=0;
+    int stepsWhileDrawing = 0;
 private:
     typedef float T;
     std::vector< std::shared_ptr<ThreadClient> > threads;
@@ -40,29 +40,30 @@ private:
 class PServer : public ThreadServer
 {
 public:
-    PServer(std::shared_ptr<ThreadSharedState> state) 
-      : ThreadServer(state)
+    PServer(std::shared_ptr<ThreadSharedState> state)
+        : ThreadServer(state)
     {
 
     }
-    virtual void threadFunction () override;
+    virtual void threadFunction() override;
 
-    ~PServer() {
+    ~PServer()
+    {
     }
 private:
     bool didRun = false;
     double dummy = 0;
 };
 
- void PServer::threadFunction() 
- {
+void PServer::threadFunction()
+{
     sharedState->serverRunning = true;
     for (bool done = false; !done; ) {
         if (sharedState->serverStopRequested.load()) {
             done = true;
         } else {
           // now kill a lot of time
-            for (int i=0; i< 10000; ++i) {
+            for (int i = 0; i < 10000; ++i) {
                 dummy += std::log(rand()) * std::sin(rand());
             }
 
@@ -71,19 +72,19 @@ private:
 
     thread->detach();
     sharedState->serverRunning = false;
- }
+}
 
-CPU_HogModule::CPU_HogModule() : Module(0,0,0,0)
+CPU_HogModule::CPU_HogModule() : Module(0, 0, 0, 0)
 {
-    for (int i=0; i<numLoadThreads; ++i) {
+    for (int i = 0; i < numLoadThreads; ++i) {
         std::shared_ptr<ThreadSharedState> state = std::make_shared<ThreadSharedState>();
         std::unique_ptr<ThreadServer> server(new PServer(state));
-        threads.push_back( 
+        threads.push_back(
             std::make_shared<ThreadClient>(
-                state,
-                std::move(server)));
+            state,
+            std::move(server)));
     }
-    
+
     // TODO: can we assume onSampleRateChange() gets called first, so this is unnecessary?
     onSampleRateChange();
 }
@@ -114,7 +115,7 @@ struct CPU_HogWidget : ModuleWidget
         std::stringstream s;
         s << pMod->stepsWhileDrawing;
         steps->text = s.str();
- 
+
         ModuleWidget::draw(vg);
         if (drawMillisecondSleep) {
             drawIsSleeping = true;
@@ -141,13 +142,13 @@ CPU_HogWidget::CPU_HogWidget(CPU_HogModule *module) : ModuleWidget(module)
         addChild(panel);
     }
 
-    Label* label=new Label();
+    Label* label = new Label();
     label->box.pos = Vec(10, 140);
     label->text = "SleepSteps";
     label->color = COLOR_BLACK;
     addChild(label);
 
-    steps=new Label();
+    steps = new Label();
     steps->box.pos = Vec(10, 180);
     steps->text = "";
     steps->color = COLOR_BLACK;

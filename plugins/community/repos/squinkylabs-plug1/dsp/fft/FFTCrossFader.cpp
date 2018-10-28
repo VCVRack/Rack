@@ -15,12 +15,12 @@ NoiseMessage* FFTCrossFader::step(float* out)
         // curPlayOffset1 is the index into buffer 1, but also the crossfade index
         assert(curPlayOffset[1] < crossfadeSamples);
 
-        float buffer0Value = dataFrames[0]->dataBuffer->get(curPlayOffset[0]) * 
-            (crossfadeSamples - (curPlayOffset[1]+1));
+        float buffer0Value = dataFrames[0]->dataBuffer->get(curPlayOffset[0]) *
+            (crossfadeSamples - (curPlayOffset[1] + 1));
         float buffer1Value = dataFrames[1]->dataBuffer->get(curPlayOffset[1]) * curPlayOffset[1];
 
         // TODO: do we need to pre-divide
-        *out = (buffer1Value + buffer0Value) / (crossfadeSamples-1);
+        *out = (buffer1Value + buffer0Value) / (crossfadeSamples - 1);
         if (makeupGain) {
             float gain = std::sqrt(2.0f) - 1;
             float offset = float(curPlayOffset[1]);
@@ -70,8 +70,7 @@ NoiseMessage * FFTCrossFader::acceptData(NoiseMessage* msg)
     if (dataFrames[0] == nullptr) {
         dataFrames[0] = msg;
         curPlayOffset[0] = 0;
-    }
-    else if (dataFrames[1] == nullptr) {
+    } else if (dataFrames[1] == nullptr) {
         dataFrames[1] = msg;
         curPlayOffset[1] = 0;
     } else {

@@ -34,6 +34,13 @@ public:
     T A2(int stage) const;
 
     void dump() const;
+
+    /**
+     * Direct access for the rare client that
+     * wants to see taps as a straight array.
+     */
+    T getAtIndex(int index);
+    void setAtIndex(T x, int index);
 private:
     T _taps[5 * N];
 };
@@ -88,50 +95,64 @@ inline T& BiquadParams<T, N>::B2(int stage)
 }
 
 template <typename T, int N>
-T BiquadParams<T, N>::A1(int stage) const
+inline T BiquadParams<T, N>::A1(int stage) const
 {
     assert(stage >= 0 && stage < N);
     return _taps[stage * 5 + 3];
 }
 
 template <typename T, int N>
-T BiquadParams<T, N>::A2(int stage) const
+inline T BiquadParams<T, N>::A2(int stage) const
 {
     assert(stage >= 0 && stage < N);
     return _taps[stage * 5 + 4];
 }
 
 template <typename T, int N>
-T BiquadParams<T, N>::B0(int stage) const
+inline T BiquadParams<T, N>::B0(int stage) const
 {
     assert(stage >= 0 && stage < N);
     return _taps[stage * 5];
 }
 
 template <typename T, int N>
-T BiquadParams<T, N>::B1(int stage) const
+inline T BiquadParams<T, N>::B1(int stage) const
 {
     assert(stage >= 0 && stage < N);
     return _taps[stage * 5 + 1];
 }
 
 template <typename T, int N>
-T BiquadParams<T, N>::B2(int stage) const
+inline T BiquadParams<T, N>::B2(int stage) const
 {
     assert(stage >= 0 && stage < N);
     return _taps[stage * 5 + 2];
 }
 
 template <typename T, int N>
-T& BiquadParams<T, N>::A1(int stage)
+inline T& BiquadParams<T, N>::A1(int stage)
 {
     assert(stage >= 0 && stage < N);
     return _taps[stage * 5 + 3];
 }
 
 template <typename T, int N>
-T& BiquadParams<T, N>::A2(int stage)
+inline T& BiquadParams<T, N>::A2(int stage)
 {
     assert(stage >= 0 && stage < N);
     return _taps[stage * 5 + 4];
+}
+
+template <typename T, int N>
+inline T BiquadParams<T, N>::getAtIndex(int index)
+{
+    assert(index < N * 5);
+    return _taps[index];
+}
+
+template <typename T, int N>
+inline void BiquadParams<T, N>::setAtIndex(T x, int index)
+{
+    assert(index < N * 5);
+    _taps[index] = x;
 }

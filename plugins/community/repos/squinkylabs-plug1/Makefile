@@ -2,13 +2,14 @@
 SLUG = squinkylabs-plug1
 
 # Must follow the format in the Versioning section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-VERSION = 0.6.5
+VERSION = 0.6.9
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS += -I./dsp/generators -I./dsp/utils -I./dsp/filters
-FLAGS += -I./dsp/third-party/falco -I./dsp/third-party/kiss_fft130  -I./dsp/third-party/kiss_fft130/tools
+FLAGS += -I./dsp/third-party/falco -I./dsp/third-party/kiss_fft130 
+FLAGS += -I./dsp/third-party/kiss_fft130/tools -I./dsp/third-party/src
 FLAGS += -I./sqsrc/thread -I./dsp/fft -I./composites
-FLAGS += -I./sqsrc/noise -I./sqsrc/util -I./sqsrc/clock
+FLAGS += -I./sqsrc/noise -I./sqsrc/util -I./sqsrc/clock -I./sqsrc/grammar -I./sqsrc/delay
 CFLAGS +=
 CXXFLAGS +=
 
@@ -35,6 +36,7 @@ LDFLAGS += -lpthread
 SOURCES += $(wildcard src/*.cpp)
 SOURCES += $(wildcard dsp/**/*.cpp)
 SOURCES += $(wildcard dsp/third-party/falco/*.cpp)
+xxSOURCES += dsp/third-party/src/minblep.cpp
 SOURCES += dsp/third-party/kiss_fft130/kiss_fft.c
 SOURCES += dsp/third-party/kiss_fft130/tools/kiss_fftr.c
 SOURCES += $(wildcard sqsrc/**/*.cpp)

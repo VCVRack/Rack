@@ -68,7 +68,7 @@ static void test3()
     for (int i = 0; i < 16; ++i) {
         cpx v = complex.get(i);
         float mag = std::abs(v);
-      
+
         float expect = (i == 1) ? 1.f : 0.f;
         assertClose(mag, expect, .0001);
     }
@@ -91,16 +91,16 @@ static void testRoundTrip()
     b = FFT::inverse(&realOut, complex);
 
     for (int i = 0; i < 16; ++i) {
-      
+
         float expect = 1.f; // scaled DC (TODO: fix scaling) 
-        assertEQ(realOut.get(i) , expect);
+        assertEQ(realOut.get(i), expect);
     }
 }
 
 
 static void testNoiseFormula()
 {
-    const int bins = 64 * 1024 ;
+    const int bins = 64 * 1024;
     std::unique_ptr<FFTDataCpx> data(new FFTDataCpx(bins));
     assertEQ(data->size(), bins);
 
@@ -114,7 +114,7 @@ static void testNoiseFormula()
         float phase = std::arg(x);
 
         const float expectedMag = (i == 0) ? 0.f : (i < (bins / 2)) ? 1.f : 0.f;
-        
+
         assertClose(mag, expectedMag, .0001);
         phases.insert(phase);
     }
@@ -138,7 +138,7 @@ static void testWhiteNoiseRT()
     std::unique_ptr<FFTDataCpx> noiseSpectrum2(new FFTDataCpx(bins));
 
     for (int i = 0; i < bins; ++i) {
-        cpx x(0,0);
+        cpx x(0, 0);
         noiseSpectrum2->set(i, x);
     }
 
@@ -147,14 +147,14 @@ static void testWhiteNoiseRT()
     FFT::inverse(noiseRealSignal.get(), *noiseSpectrum);
 
     FFT::forward(noiseSpectrum2.get(), *noiseRealSignal);
-    
+
     float totalPhase = 0;
     float minPhase = 0;
     float maxPhase = 0;
-    for (int i = 0; i < bins/2; ++i) {
+    for (int i = 0; i < bins / 2; ++i) {
         float expected = (i == 0) ? 0.f : 1.f;
         cpx data = noiseSpectrum2->get(i);
-      
+
         assertClose(std::abs(data), expected, .0001);
         const float phase = std::arg(data);
         totalPhase += phase;
@@ -176,12 +176,11 @@ static void testNoiseRTSub(int bins)
     FFT::makeNoiseSpectrum(dataCpx.get(), ColoredNoiseSpec());
 
     FFT::inverse(dataReal.get(), *dataCpx);
-    FFT::normalize(dataReal.get());
+    FFT::normalize(dataReal.get(), 2);
 
     const float peak = getPeak(*dataReal);
 
-    assertClose( peak, 1.0f , .001);
-
+    assertClose(peak, 2.0f, .001);
 }
 
 static void testNoiseRT()
@@ -196,7 +195,7 @@ static void testNoiseRT()
 
 static void testPinkNoise()
 {
-    const int bins = 1024*4;
+    const int bins = 1024 * 4;
     std::unique_ptr<FFTDataCpx> data(new FFTDataCpx(bins));
     assertEQ(data->size(), bins);
 
@@ -211,8 +210,8 @@ static void testPinkNoise()
     // pick a starting bin above our 40 hz low freq corner
     const int baseBin = 16;
     //float freqBase = 44100 * baseBin / (float) bins;
-    const float freqBase = FFT::bin2Freq(baseBin, 44100, bins);
-    assertGT (freqBase, 80);
+    const double freqBase = FFT::bin2Freq(baseBin, 44100, bins);
+    assertGT(freqBase, 80);
 
     // mid-band, quadruple freq should reduce amp by 6db
     float mag16 = std::abs(data->get(baseBin));
@@ -236,11 +235,11 @@ static void testPinkNoise()
 
 static void testBlueNoise(float corner = 0)
 {
-   const int bins = 1024 * 4;
+    const int bins = 1024 * 4;
     std::unique_ptr<FFTDataCpx> data(new FFTDataCpx(bins));
     assertEQ(data->size(), bins);
 
-    ColoredNoiseSpec spec;      
+    ColoredNoiseSpec spec;
     spec.slope = 3;
     spec.sampleRate = 44100;
 

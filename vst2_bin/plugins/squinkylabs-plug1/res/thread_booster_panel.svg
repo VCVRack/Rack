@@ -7,7 +7,11 @@
   <title>thread_booster_panel</title>
   <g style="clip-path: url(#clip-path)">
     <g id="Custom_Size_1" data-name="Custom Size 1">
+
+    <g id="background_fill" data-name="background fill">
       <rect width="90" height="380" style="fill: #e6e6e6"/>
+      <rect x="0.5" y="0.5" width="89" height="379" style="fill: none;stroke: #707070"/>
+    </g>
       <g id="Thread_Booster" data-name="Thread Booster" style="isolation: isolate">
         <g style="isolation: isolate">
           <path d="M29.58,31.44l-6.5,2.5,1.64,10.8H21l1.62-10.6-5.11,2,1-4,11.08-.77Z"/>

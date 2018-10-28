@@ -91,7 +91,7 @@ public:
     };
 
     void init();
-    void step();
+    void step() override;
     T modulatorOutput[numModOutputs];
 
     // The frequency inputs to the filters, exposed for testing.
@@ -144,10 +144,10 @@ inline void VocalAnimator<TBase>::init()
 
         normalizedFilterFreq[i] = nominalFilterCenterHz[i] * reciprocalSampleRate;
     }
-    scale0_1 = AudioMath::makeBipolarAudioScaler(0, 1); // full CV range -> 0..1
-    scalem2_2 = AudioMath::makeBipolarAudioScaler(-2, 2); // full CV range -> -2..2
-    scaleQ = AudioMath::makeBipolarAudioScaler(.71f, 21);
-    scalen5_5 = AudioMath::makeBipolarAudioScaler(-5, 5);
+    scale0_1 = AudioMath::makeScalerWithBipolarAudioTrim(0, 1); // full CV range -> 0..1
+    scalem2_2 = AudioMath::makeScalerWithBipolarAudioTrim(-2, 2); // full CV range -> -2..2
+    scaleQ = AudioMath::makeScalerWithBipolarAudioTrim(.71f, 21);
+    scalen5_5 = AudioMath::makeScalerWithBipolarAudioTrim(-5, 5);
 
     // make table of 2 ** x
     expLookup = ObjectCache<T>::getExp2();

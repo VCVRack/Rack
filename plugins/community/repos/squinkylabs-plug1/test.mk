@@ -6,6 +6,7 @@ TEST_SOURCES = $(wildcard test/*.cpp)
 TEST_SOURCES += $(wildcard dsp/**/*.cpp)
 TEST_SOURCES += $(wildcard dsp/third-party/falco/*.cpp)
 TEST_SOURCES += $(wildcard sqsrc/**/*.cpp)
+TEST_SOURCES += dsp/third-party/src/minblep.cpp
 TEST_SOURCES += dsp/third-party/kiss_fft130/tools/kiss_fftr.c
 TEST_SOURCES += dsp/third-party/kiss_fft130/kiss_fft.c
 

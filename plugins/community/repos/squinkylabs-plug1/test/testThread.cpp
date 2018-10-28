@@ -122,7 +122,7 @@ static std::atomic<int> slow;
 static std::atomic<int> fast;
 
 //thread func
-static void t4(bool iAmIt,int boost)
+static void t4(bool iAmIt, int boost)
 {
    // printf("t4 called with %d\n", iAmIt);
 
@@ -142,9 +142,9 @@ static void t4(bool iAmIt,int boost)
             default:
                 assert(false);
         }
-            
+
         fflush(stdout);
-           
+
     }
     while (!stopNow) {
         for (int i = 0; i < 100000; ++i) {
@@ -217,18 +217,18 @@ static void test5()
 void testThread(bool extended)
 {
 
-   assertEQ(ThreadSharedState::_dbgCount, 0);
-   assertEQ(ThreadMessage::_dbgCount, 0);
-   test0();
-   test1();
-   test2();
-   test3();
-   if (extended) {
-       test4();
-   }
+    assertEQ(ThreadSharedState::_dbgCount, 0);
+    assertEQ(ThreadMessage::_dbgCount, 0);
+    test0();
+    test1();
+    test2();
+    test3();
+    if (extended) {
+        test4();
+    }
 #ifdef ARCH_WIN
-   test5();
+    test5();
 #endif
-   assertEQ(ThreadSharedState::_dbgCount, 0);
-   assertEQ(ThreadMessage::_dbgCount, 0);
+    assertEQ(ThreadSharedState::_dbgCount, 0);
+    assertEQ(ThreadMessage::_dbgCount, 0);
 }

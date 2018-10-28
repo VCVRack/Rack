@@ -87,7 +87,7 @@ static void testScaler()
 
 static void testBipolarAudioScaler()
 {
-    AudioMath::ScaleFun<float> f = AudioMath::makeBipolarAudioScaler(3, 4);
+    AudioMath::ScaleFun<float> f = AudioMath::makeScalerWithBipolarAudioTrim(3, 4);
     // scale(cv, knob, trim
 
     // knob comes through only shifted
@@ -107,10 +107,76 @@ static void testBipolarAudioScaler()
     assertEQ(f(-5, 0, -1), 4.);
 
     // trim quarter  - should be audio knee
-    auto f2 = AudioMath::makeBipolarAudioScaler(-1, 1);
+    auto f2 = AudioMath::makeScalerWithBipolarAudioTrim(-1, 1);
     float x = f2(5, 0, .25);
     float y = (float) AudioMath::gainFromDb(LookupTableFactory<float>::audioTaperKnee());
     assertClose(x, y, .001);
+}
+
+static void testAudioScaler()
+{
+    AudioMath::SimpleScaleFun<float> f = AudioMath::makeSimpleScalerAudioTaper(3, 4);
+
+    float kneeGain = (float) AudioMath::gainFromDb(LookupTableFactory<float>::audioTaperKnee());
+
+    // knob comes through with taper
+    assertEQ(f(0, -5), 3.);
+    assertEQ(f(0, 5), 4.);
+
+    // 1/4, is the knee
+    assertEQ(f(0, -2.5), 3.0f + kneeGain);
+
+    // cv also come through, it trim up
+    assertEQ(f(-5, 0), 3.);
+    assertEQ(f(5, 0), 4.);
+    assertEQ(f(-2.5, 0), 3.0f + kneeGain);
+}
+
+
+static void testAudioScaler2()
+{
+    AudioMath::SimpleScaleFun<float> f = AudioMath::makeSimpleScalerAudioTaper(0, 20);
+
+    float kneeGain = (float) AudioMath::gainFromDb(LookupTableFactory<float>::audioTaperKnee());
+
+    // knob comes through with taper
+    assertEQ(f(0, -5), 0);
+    assertEQ(f(0, 5), 20);
+
+    // 1/4, is the knee
+    assertEQ(f(0, -2.5), 20 * kneeGain);
+
+    // cv also come through, it trim up
+    assertEQ(f(-5, 0), 0);
+    assertEQ(f(5, 0), 20);
+    assertEQ(f(-2.5, 0), 20 * kneeGain);
+}
+
+
+
+static void testFold()
+{
+    float last = 0;
+    const float deltaX = 0.05f;
+    for (float x = 0; x < 15; x += deltaX) {
+        float y = AudioMath::fold(x);
+        float absChange = std::abs(y - last);
+        last = y;
+        assertLE(absChange, deltaX + .0001f);
+    }
+}
+
+
+static void testFoldNegative()
+{
+    float last = 0;
+    const float deltaX = 0.05f;
+    for (float x = 0; x > -15; x -= deltaX) {
+        float y = AudioMath::fold(x);
+        float absChange = std::abs(y - last);
+        last = y;
+        assertLE(absChange, deltaX + .0001f);
+    }
 }
 
 void testAudioMath()
@@ -122,4 +188,8 @@ void testAudioMath()
     testAudioTaper();
     testScaler();
     testBipolarAudioScaler();
+    testAudioScaler();
+    testAudioScaler2();
+    testFold();
+    testFoldNegative();
 }
