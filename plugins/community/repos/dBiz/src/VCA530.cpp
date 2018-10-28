@@ -146,8 +146,8 @@ VCA530Widget(VCA530 *module) : ModuleWidget(module)
   
 
 
-  addParam(ParamWidget::create<DaviesBlu>(Vec(52,  med + up ), module, VCA530::MIX1_PARAM, 0.0, 1.0, 0.0));
-  addParam(ParamWidget::create<DaviesBlu>(Vec(129, med + up), module, VCA530::MIX2_PARAM, 0.0, 1.0, 0.0));
+  addParam(ParamWidget::create<SDKnob>(Vec(52,  med + up ), module, VCA530::MIX1_PARAM, 0.0, 1.0, 0.0));
+  addParam(ParamWidget::create<SDKnob>(Vec(129, med + up), module, VCA530::MIX2_PARAM, 0.0, 1.0, 0.0));
 
   // channel strips
 

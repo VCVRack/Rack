@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -9,112 +7,94 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="6"
-   height="15"
-   viewBox="0 0 1.5875 3.9687501"
+   width="10"
+   height="20"
+   viewBox="0 0 10 20"
    version="1.1"
-   id="svg56722"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
-   sodipodi:docname="MCKSSS_1.svg">
-  <defs
-     id="defs56716" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="31.678384"
-     inkscape:cx="-2.7566469"
-     inkscape:cy="8.1603788"
-     inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:window-width="1600"
-     inkscape:window-height="882"
-     inkscape:window-x="2077"
-     inkscape:window-y="142"
-     inkscape:window-maximized="0"
-     units="px" />
+   id="svg6"
+   sodipodi:docname="MCKSSS_2.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
   <metadata
-     id="metadata56719">
+     id="metadata12">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1506"
+     inkscape:window-height="814"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="19.981919"
+     inkscape:cx="-3.0609974"
+     inkscape:cy="10.77842"
+     inkscape:window-x="248"
+     inkscape:window-y="246"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="moDllzSwitchH_0" />
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-30.16787,-66.867)">
+     id="Page-1"
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1"
+     transform="matrix(1,0,0,0.66525424,0,0.04237288)">
     <g
-       transform="matrix(0.11906604,0,0,-0.19999202,-60.620909,300.61482)"
-       id="g56702"
-       style="stroke-width:1.2817142">
-      <g
-         transform="translate(762.5078,1167.3652)"
-         id="g5827"
-         style="stroke-width:1.2817142">
-        <path
-           inkscape:connector-curvature="0"
-           id="path5829"
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.2817142"
-           d="M 0,0 C 0,0.779 0.639,1.418 1.418,1.418 H 12.04 c 0.779,0 1.418,-0.639 1.418,-1.418 v -17.007 c 0,-0.779 -0.639,-1.417 -1.418,-1.417 H 1.418 C 0.639,-18.424 0,-17.786 0,-17.007 Z" />
-      </g>
-      <g
-         style="fill:#282828;fill-opacity:1;stroke-width:1.2817142"
-         id="g5839">
-        <g
-           style="fill:#282828;fill-opacity:1;stroke-width:1.2817142"
-           id="g5841">
-          <path
-             inkscape:connector-curvature="0"
-             id="path5849"
-             style="fill:#282828;fill-opacity:1;stroke:none;stroke-width:1.2817142"
-             d="m 764.617,1167.502 c -0.468,0 -0.852,-0.382 -0.852,-0.85 v 0 -15.724 c 0,-0.468 0.384,-0.851 0.852,-0.851 v 0 h 9.239 c 0.467,0 0.85,0.383 0.85,0.851 v 0 15.724 c 0,0.468 -0.383,0.85 -0.85,0.85 v 0 z" />
-        </g>
-      </g>
-      <path
-         inkscape:connector-curvature="0"
-         id="path5859"
-         style="fill:#444444;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.2817142"
-         d="m 763.767,1167.503 h 10.94 v -8.504 h -10.94 z" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path5861"
-         style="fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.2817142"
-         d="m 763.767,1163.719 h 10.94 v -0.936 h -10.94 z" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path5863"
-         style="fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.2817142"
-         d="m 763.767,1159.935 h 10.94 v -0.936 h -10.94 z" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path5865"
-         style="fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.2817142"
-         d="m 763.767,1161.826 h 10.94 v -0.936 h -10.94 z" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path5867"
-         style="fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.2817142"
-         d="m 763.767,1165.611 h 10.94 v -0.936 h -10.94 z" />
-      <path
-         inkscape:connector-curvature="0"
-         id="path5869"
-         style="fill:#999999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.2817142"
-         d="m 763.767,1167.503 h 10.94 v -0.936 h -10.94 z" />
+       id="moDllzSwitchH_0">
+      <rect
+         style="fill:#222222;stroke-width:1.06808424"
+         id="hole-4"
+         x="-30.342781"
+         y="0.51906741"
+         width="30.45113"
+         height="8.9912233"
+         rx="6.3439856"
+         transform="rotate(-90)" />
+      <ellipse
+         style="fill:#cccccc;stroke:#666666;stroke-width:1.03487051"
+         id="led"
+         cx="-6.0899501"
+         cy="4.9928284"
+         rx="5.328948"
+         ry="3.545105"
+         transform="rotate(-90)" />
+      <ellipse
+         style="opacity:0.6;fill:#dddddd;stroke-width:1.03487051"
+         id="hi"
+         cx="-6.0899501"
+         cy="4.9928284"
+         rx="3.1719928"
+         ry="2.1101816"
+         transform="rotate(-90)" />
+      <ellipse
+         style="opacity:0.8;fill:#eeeeee;stroke-width:1.03487051"
+         id="circle5"
+         cx="-7.3587441"
+         cy="4.9928284"
+         rx="1.9031956"
+         ry="1.2661089"
+         transform="rotate(-90)" />
+      <ellipse
+         style="opacity:1;fill:#ffffff;stroke-width:1.03487051"
+         id="circle7"
+         cx="-4.1867523"
+         cy="4.9928284"
+         rx="0.95159781"
+         ry="0.63305444"
+         transform="rotate(-90)" />
     </g>
   </g>
 </svg>

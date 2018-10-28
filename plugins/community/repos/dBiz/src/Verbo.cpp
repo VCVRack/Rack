@@ -321,8 +321,8 @@ VerboWidget(Verbo *module) : ModuleWidget(module)
 	for(int i=0; i<8;i++)
 	{
 		addParam(ParamWidget::create<SlidePot>(Vec(left+95+space*i, 110), module, Verbo::HARM_PARAM+i, 0.0, 1.0, 0.0));
-		addOutput(Port::create<PJ301MPort>(Vec(left+90+space*i, 80), Port::OUTPUT, module, Verbo::HARM_OUTPUT+i));
-		addInput(Port::create<PJ301MPort>(Vec(left+90+space*i, 222), Port::INPUT, module, Verbo::HARM_INPUT+i));
+		addOutput(Port::create<PJ301MIPort>(Vec(left+90+space*i, 80), Port::OUTPUT, module, Verbo::HARM_OUTPUT+i));
+		addInput(Port::create<PJ301MIPort>(Vec(left+90+space*i, 222), Port::INPUT, module, Verbo::HARM_INPUT+i));
 		addChild(GrayModuleLightWidget::create<MediumLight<BlueLight>>(Vec(left+95+space*i, 250), module, Verbo::HARM_LIGHT+i));
 	}
 
@@ -330,28 +330,28 @@ int ks = 60;
 int vp=20;
 
 	addParam(ParamWidget::create<VerboS>(Vec(10, vp+272), module, Verbo::FM_PARAM, 0.0, 1.0, 0.0));
-	addInput(Port::create<PJ301MPort>(Vec(15, vp+320), Port::INPUT, module, Verbo::FM_INPUT));
+	addInput(Port::create<PJ301MIPort>(Vec(15, vp+320), Port::INPUT, module, Verbo::FM_INPUT));
 	addParam(ParamWidget::create<VerboS>(Vec(55, vp+272), module, Verbo::CV_PARAM, -1.0, 1.0, 0.0));
-	addInput(Port::create<PJ301MPort>(Vec(60, vp+320), Port::INPUT, module, Verbo::CV_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(90, vp+320), Port::INPUT, module, Verbo::PITCH_INPUT));
+	addInput(Port::create<PJ301MIPort>(Vec(60, vp+320), Port::INPUT, module, Verbo::CV_INPUT));
+	addInput(Port::create<PJ301MIPort>(Vec(90, vp+320), Port::INPUT, module, Verbo::PITCH_INPUT));
 
 	addParam(ParamWidget::create<VerboS>(Vec(30+left+ks, vp+272), module, Verbo::WIDTH_CV_PARAM, -1.0, 1.0, 0.0));
 	addParam(ParamWidget::create<VerboS>(Vec(30+left+ks+space*2, vp+272), module, Verbo::WIDTH_PARAM, 1.0, 8.0, 0.0));
 
 	addParam(ParamWidget::create<Trimpot>(Vec(30+left+ks*2-15, vp+322.5), module, Verbo::SLOPE_PARAM, 0.0, 5.0, 0.0));
-	addInput(Port::create<PJ301MPort>(Vec(30+left+ks*2+25, vp+320), Port::INPUT, module, Verbo::SLOPE_INPUT));
+	addInput(Port::create<PJ301MIPort>(Vec(30+left+ks*2+25, vp+320), Port::INPUT, module, Verbo::SLOPE_INPUT));
 
 	addParam(ParamWidget::create<VerboS>(Vec(30+left+ks*3, vp+272), module, Verbo::CENTER_CV_PARAM, -1.0, 1.0, 0.0));
 	addParam(ParamWidget::create<VerboS>(Vec(30+left+ks*3+space*2, vp+272), module, Verbo::CENTER_PARAM, -1.0, 8.0, -1.0));
-	addInput(Port::create<PJ301MPort>(Vec(30+left+ks+5, vp+320), Port::INPUT, module, Verbo::WIDTH_INPUT));
-	addInput(Port::create<PJ301MPort>(Vec(30+left+ks*3+5, vp+320), Port::INPUT, module, Verbo::CENTER_INPUT));
+	addInput(Port::create<PJ301MIPort>(Vec(30+left+ks+5, vp+320), Port::INPUT, module, Verbo::WIDTH_INPUT));
+	addInput(Port::create<PJ301MIPort>(Vec(30+left+ks*3+5, vp+320), Port::INPUT, module, Verbo::CENTER_INPUT));
 	
 
 
-	addOutput(Port::create<PJ301MPort>(Vec(5, 80), Port::OUTPUT, module, Verbo::TRI_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(33, 80), Port::OUTPUT, module, Verbo::SQR_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(61, 80), Port::OUTPUT, module, Verbo::SAW_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(89, 80), Port::OUTPUT, module, Verbo::SIN_OUTPUT));
+	addOutput(Port::create<PJ301MIPort>(Vec(5, 80), Port::OUTPUT, module, Verbo::TRI_OUTPUT));
+	addOutput(Port::create<PJ301MIPort>(Vec(33, 80), Port::OUTPUT, module, Verbo::SQR_OUTPUT));
+	addOutput(Port::create<PJ301MIPort>(Vec(61, 80), Port::OUTPUT, module, Verbo::SAW_OUTPUT));
+	addOutput(Port::create<PJ301MIPort>(Vec(89, 80), Port::OUTPUT, module, Verbo::SIN_OUTPUT));
 
 	
 }

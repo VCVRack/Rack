@@ -1,4 +1,15 @@
 
+** October ??th, 2018
+- add Linux port
+- add module dBiz.FourSeq
+- add module dBiz.Divider
+- add module dBiz.DualFilter
+- add module dBiz.SmiX
+- add module dBiz.SuHa
+- add module dBiz.TROSC
+- add module dBiz.Util2
+
+
 ** October 12th, 2018
 - add support for ppqPos based timing clock
    (fixes CLK1/2 output in FLStudio)

@@ -1,4 +1,5 @@
 ALL_OBJ= \
+	src/4Seq.o \
 	src/Bene.o \
 	src/Bene2.o \
 	src/BenePads.o \
@@ -7,13 +8,20 @@ ALL_OBJ= \
 	src/Contorno.o \
 	src/DAOSC.o \
 	src/dBiz.o \
+	src/Divider.o \
+	src/DualFilter.o \
 	src/DVCO.o \
 	src/Multiple.o \
 	src/PerfMixer.o \
 	src/Remix.o \
+	src/SmiX.o \
 	src/SubMixer.o \
+	src/SuHa.o \
 	src/Transpose.o \
+	src/TROSC.o \
+	src/Util2.o \
 	src/Utility.o \
+	src/VCA4.o \
 	src/VCA530.o \
 	src/Verbo.o
 

@@ -473,13 +473,13 @@ Bene2Widget(Bene2 *module) : ModuleWidget(module)
 
 for (int i=0;i<4;i++)
 {
-  addInput(Port::create<PJ301MPort>(Vec(lb, top+jacks*i), Port::INPUT, module, Bene2::LEFT+i));
-  addInput(Port::create<PJ301MPort>(Vec(lb+27, top+jacks*i), Port::INPUT, module, Bene2::RIGHT+i));
-  addInput(Port::create<PJ301MPort>(Vec(lb + 27 + 27, top + jacks * i), Port::INPUT, module, Bene2::RESETL + i));
+  addInput(Port::create<PJ301MCPort>(Vec(lb, top+jacks*i), Port::INPUT, module, Bene2::LEFT+i));
+  addInput(Port::create<PJ301MCPort>(Vec(lb+27, top+jacks*i), Port::INPUT, module, Bene2::RIGHT+i));
+  addInput(Port::create<PJ301MCPort>(Vec(lb + 27 + 27, top + jacks * i), Port::INPUT, module, Bene2::RESETL + i));
 
-  addInput(Port::create<PJ301MPort>(Vec(lb, top+jacks*i + 140), Port::INPUT, module, Bene2::UP+i));
-  addInput(Port::create<PJ301MPort>(Vec(lb + 27, top + jacks * i + 140), Port::INPUT, module, Bene2::DOWN + i));
-  addInput(Port::create<PJ301MPort>(Vec(lb + 27 + 27, top + jacks * i + 140), Port::INPUT, module, Bene2::RESETC + i));
+  addInput(Port::create<PJ301MCPort>(Vec(lb, top+jacks*i + 140), Port::INPUT, module, Bene2::UP+i));
+  addInput(Port::create<PJ301MCPort>(Vec(lb + 27, top + jacks * i + 140), Port::INPUT, module, Bene2::DOWN + i));
+  addInput(Port::create<PJ301MCPort>(Vec(lb + 27 + 27, top + jacks * i + 140), Port::INPUT, module, Bene2::RESETC + i));
 }
 
 addParam(ParamWidget::create<LEDBezel>(Vec(lb,5+ 10 ), module, Bene2::RUNL_PARAM, 0.0, 1.0, 0.0));
@@ -488,8 +488,8 @@ addParam(ParamWidget::create<LEDBezel>(Vec(lb,5+ 10+30), module, Bene2::RUNC_PAR
 addChild(GrayModuleLightWidget::create<RunLight<OrangeLight>>(Vec(lb+3,5+ 10+3), module, Bene2::RUNL_LIGHT));
 addChild(GrayModuleLightWidget::create<RunLight<OrangeLight>>(Vec(lb+3,5+ 10+3+30), module, Bene2::RUNC_LIGHT));
 
-addInput(Port::create<PJ301MPort>(Vec(lb+30,5+ 9), Port::INPUT, module, Bene2::RUNL_INPUT));
-addInput(Port::create<PJ301MPort>(Vec(lb+ 30,5+ 9 + 30), Port::INPUT, module, Bene2::RUNC_INPUT));
+addInput(Port::create<PJ301MCPort>(Vec(lb+30,5+ 9), Port::INPUT, module, Bene2::RUNL_INPUT));
+addInput(Port::create<PJ301MCPort>(Vec(lb+ 30,5+ 9 + 30), Port::INPUT, module, Bene2::RUNC_INPUT));
 
 addParam(ParamWidget::create<LEDBezel>(Vec(lb+ 120, 5 + 10), module, Bene2::RESET_LINE, 0.0, 1.0, 0.0));
 addParam(ParamWidget::create<LEDBezel>(Vec(lb+ 120, 5 + 10 + 30), module, Bene2::RESET_COL, 0.0, 1.0, 0.0));
@@ -497,10 +497,10 @@ addParam(ParamWidget::create<LEDBezel>(Vec(lb+ 120, 5 + 10 + 30), module, Bene2:
 addChild(GrayModuleLightWidget::create<RunLight<OrangeLight>>(Vec(lb +  120+3, 5 + 10 + 3), module, Bene2::RESETL_LIGHT));
 addChild(GrayModuleLightWidget::create<RunLight<OrangeLight>>(Vec(lb +  120+3, 5 + 10 + 3 + 30), module, Bene2::RESETC_LIGHT));
 
-addInput(Port::create<PJ301MPort>(Vec(lb + 150, 5 + 9), Port::INPUT, module, Bene2::RESETL_INPUT));
-addInput(Port::create<PJ301MPort>(Vec(lb + 150, 5 + 9 + 30), Port::INPUT, module, Bene2::RESETC_INPUT));
+addInput(Port::create<PJ301MCPort>(Vec(lb + 150, 5 + 9), Port::INPUT, module, Bene2::RESETL_INPUT));
+addInput(Port::create<PJ301MCPort>(Vec(lb + 150, 5 + 9 + 30), Port::INPUT, module, Bene2::RESETC_INPUT));
 
-//addInput(Port::create<PJ301MPort>(Vec(left + column_spacing * 3, top ), Port::INPUT, module, Bene2::RESET));
+//addInput(Port::create<PJ301MCPort>(Vec(left + column_spacing * 3, top ), Port::INPUT, module, Bene2::RESET));
  
  
   for ( int i = 0 ; i < 4 ; i++)

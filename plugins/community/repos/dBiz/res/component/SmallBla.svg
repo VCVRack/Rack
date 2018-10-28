@@ -14,8 +14,8 @@
    viewBox="0 0 7.0462589 7.1788893"
    version="1.1"
    id="svg6414"
-   inkscape:version="0.92.1 r"
-   sodipodi:docname="Davies1900hSmallBlack.svg">
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="SmallBla.svg">
   <defs
      id="defs6408">
     <clipPath
@@ -40,11 +40,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="101.21858"
-     inkscape:cy="-36.897917"
+     inkscape:zoom="16.078125"
+     inkscape:cx="-4.8899598"
+     inkscape:cy="14.382429"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g28551"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -63,7 +63,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -74,25 +74,21 @@
      transform="translate(-36.542344,-107.44627)">
     <g
        id="g6344"
-       transform="matrix(0.35277777,0,0,-0.35277777,-474.41126,963.93894)">
+       transform="matrix(0.35277777,0,0,-0.35277777,-474.41126,963.93894)"
+       style="stroke:#ffffff;stroke-opacity:1">
       <g
-         style="clip-rule:nonzero"
+         style="clip-rule:nonzero;stroke:#0e0e0e;stroke-opacity:1;fill:#000000;fill-opacity:1"
          id="g28551"
          clip-path="url(#clip82)"
          transform="matrix(0.75000002,0,0,-0.75000002,713.70253,2631.9236)">
         <path
            inkscape:connector-curvature="0"
            id="path28547"
-           d="m 1005.8555,288.88281 c -1.6407,7.16406 -8.78128,11.64844 -15.94925,10.00781 -7.16797,-1.64062 -11.64844,-8.78125 -10.00781,-15.94921 1.64062,-7.16797 8.78125,-11.64844 15.94922,-10.00782 7.16794,1.64063 11.64454,8.78125 10.00784,15.94922"
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
-        <path
-           inkscape:connector-curvature="0"
-           id="path28549"
-           d="m 1005.8555,288.88281 c -1.6407,7.16406 -8.78128,11.64844 -15.94925,10.00781 -7.16797,-1.64062 -11.64844,-8.78125 -10.00781,-15.94921 1.64062,-7.16797 8.78125,-11.64844 15.94922,-10.00782 7.16794,1.64063 11.64454,8.78125 10.00784,15.94922"
-           style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none" />
+           d="m 1005.3296,288.76244 c -1.5742,6.8738 -8.42546,11.1765 -15.30301,9.60234 -6.87755,-1.57415 -11.17649,-8.42547 -9.60233,-15.30301 1.57414,-6.87755 8.42546,-11.17649 15.30301,-9.60234 6.87753,1.57415 11.17273,8.42546 9.60233,15.30301"
+           style="fill:#2d2d2d;fill-opacity:1;fill-rule:nonzero;stroke:#0c0c0c;stroke-width:0.95948386;stroke-opacity:1" />
       </g>
       <g
-         style="clip-rule:nonzero"
+         style="clip-rule:nonzero;stroke:#ffffff;stroke-opacity:1"
          id="g28555"
          clip-path="url(#clip83)"
          transform="matrix(0.75000002,0,0,-0.75000002,713.70253,2631.9236)">

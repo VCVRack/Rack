@@ -9,17 +9,12 @@ struct sinebank {
 	float phase = 0.0;
 	float freq;
 	float pitch;
-	float pitchSlew = 0.0;
-	int pitchSlewIndex = 0;
 
 	//void setPitch(float pitchKnob, float pitchCv)
 	void setPitch(float pitchKnob, float pitchCv)
 	{
 		// Compute frequency
 		pitch = pitchKnob;
-		// Apply pitch slew
-		const float pitchSlewAmount = 3.0;
-		pitch += pitchSlew * pitchSlewAmount;
 		pitch += pitchCv;
 		// Note C3
 		freq = 261.626 * powf(2.0, pitch / 12.0);
@@ -31,16 +26,17 @@ struct sinebank {
 	
 	void setFreq(float freq2)
 	{
+
 		// Accumulate the phase
 		phase += freq2 * deltaTime;
 		if (phase >= 1.0)
 			phase -= 1.0;
 	}
+		float sin() {
+			return sinf(2*M_PI * phase);
 
-	float light()
-	{
-		return sinf(2 * M_PI * phase);
 	}
+
 };
 
 
@@ -53,7 +49,6 @@ struct DAOSC : Module {
         A_FINE_PARAM,
         A_FOLD_PARAM,
         A_DRIVE_PARAM,
-        //A_MODE_PARAM,
         A_SAW_PARAM,
         A_SQUARE_PARAM,
         A_FM_PARAM,
@@ -62,7 +57,6 @@ struct DAOSC : Module {
         B_FINE_PARAM,
         B_FOLD_PARAM,
         B_DRIVE_PARAM,
-        //B_MODE_PARAM,
         B_SAW_PARAM,
         B_SQUARE_PARAM,
         B_FM_PARAM,
@@ -79,7 +73,6 @@ struct DAOSC : Module {
 		A_PITCH_INPUT,
 		A_FOLD_INPUT,
 		A_DRIVE_INPUT,
-		//A_OFF_INPUT,
 
 		B_FM_INPUT,
 		B_SAW_INPUT,
@@ -87,7 +80,6 @@ struct DAOSC : Module {
 		B_PITCH_INPUT,
 		B_DRIVE_INPUT,
 		B_FOLD_INPUT,
-		//B_OFF_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds
@@ -97,38 +89,26 @@ struct DAOSC : Module {
         SUM_OUTPUT,
 		NUM_OUTPUTS
 	};
-	enum LightIds {
-		NUM_LIGHTS
+	enum sinIds {
+		NUM_sinS
 	};
 
 	float phase = 0.0;
 	float blinkPhase = 0.0;
 
 	sinebank osc_a;
-	sinebank a_harmonic[20]={};
-	sinebank a_harmonicq[20] = {};
+	sinebank a_harmonic[5]={};
+	sinebank a_harmonicq[5] = {};
 	sinebank osc_b;
-	sinebank b_harmonic[20] = {};
-	sinebank b_harmonicq[20] = {};
+	sinebank b_harmonic[5] = {};
+	sinebank b_harmonicq[5] = {};
 
-	DAOSC() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	DAOSC() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_sinS) {}
 	void step() override;
 
 };
 
 void DAOSC::step() {
-
-
-	int a_harm = round(params[A_SAW_PARAM].value+clamp(inputs[A_SAW_INPUT].value, 0.0f, 19.0f));
-	int a_harmq = round(params[A_SQUARE_PARAM].value+clamp(inputs[A_SQUARE_INPUT].value, 0.0f, 19.0f));
-	int b_harm = round(params[B_SAW_PARAM].value + clamp(inputs[B_SAW_INPUT].value, 0.0f, 19.0f));
-	int b_harmq = round(params[B_SQUARE_PARAM].value + clamp(inputs[B_SQUARE_INPUT].value, 0.0f, 19.0f));
-
-	if(a_harm >20) a_harm = 20;
-	if(a_harmq>20) a_harmq = 20;
-	if(b_harm >20) b_harm = 20;
-	if(b_harmq>20) b_harmq = 20;
-
 
 	float a_harmsum = 0.0;
 	float a_harmsumq = 0.0;
@@ -154,36 +134,28 @@ void DAOSC::step() {
 	osc_a.setPitch(params[A_PITCH_PARAM].value, a_pitchFine + a_pitchCv);
 	osc_b.setPitch(params[B_PITCH_PARAM].value, b_pitchFine + b_pitchCv);
 
-	for (int i = 1; i < a_harm; i++)
-	{
-		a_harmonic[i].setFreq((i*2)*osc_a.freq);
-		a_harmsum += a_harmonic[i].light()*3.0/i;
-	}
+	for (int i =0; i < 5; i++)
+	{ 
+		a_harmonic[i].setFreq(((i+1)*2)*osc_a.freq);
+		a_harmsum += (a_harmonic[i].sin()/(i+2))*params[A_SAW_PARAM].value+clamp(inputs[A_SAW_INPUT].value, 0.0f, 1.0f);
 
-	for (int i = 1; i < a_harmq; i++)
-	{
-		a_harmonicq[i].setFreq(((i * 2) + 1) * osc_a.freq);
-		a_harmsumq += a_harmonicq[i].light() * 3.0/ i;
-	}
+		a_harmonicq[i].setFreq((((i+1)*2)+1) * osc_a.freq);
+		a_harmsumq += (a_harmonicq[i].sin()/(i+2))*params[A_SQUARE_PARAM].value+clamp(inputs[A_SQUARE_INPUT].value, 0.0f, 1.0f);
 
-	for (int i = 1; i < b_harm; i++)
-	{
-		b_harmonic[i].setFreq((i * 2) * osc_b.freq);
-		b_harmsum += b_harmonic[i].light() * 3.0/ i;
-	}
+		b_harmonic[i].setFreq(((i+1)*2) * osc_b.freq);
+		b_harmsum += (b_harmonic[i].sin()/(i+2))*params[B_SAW_PARAM].value+ clamp(inputs[B_SAW_INPUT].value, 0.0f, 1.0f);
 
-	for (int i = 1; i < b_harmq; i++)
-	{
-		b_harmonicq[i].setFreq(((i * 2) + 1) * osc_b.freq);
-		b_harmsumq += b_harmonicq[i].light() * 3.0 / i;
-    }
+		b_harmonicq[i].setFreq((((i+1)*2)+1) * osc_b.freq);
+		b_harmsumq += (b_harmonicq[i].sin()/(i+2))*params[B_SQUARE_PARAM].value+ clamp(inputs[B_SQUARE_INPUT].value, 0.0f, 1.0f);
+	}
+    
 
 	//////////////// Contrast - Thx to  Michael Hetrick!!!
 
 	////////////////A
 
-	float a_inputf = 3.0 * osc_a.light() + a_harmsum + a_harmsumq;
-	float b_inputf = 3.0 * osc_b.light() + b_harmsum + b_harmsumq;
+	float a_inputf = 2*(osc_a.sin() + a_harmsum + a_harmsumq);
+	float b_inputf = 2*(osc_b.sin() + b_harmsum + b_harmsumq);
 
 	a_inputf = clamp(a_inputf, -6.0f, 6.0f) * 0.2f;
 	b_inputf = clamp(b_inputf, -6.0f, 6.0f) * 0.2f;
@@ -234,13 +206,12 @@ void DAOSC::step() {
 	a_outputd = a_outputd / ((std::abs(a_inputd) * a_shapeA) + a_shapeB);
 	b_outputd = b_outputd / ((std::abs(b_inputd) * b_shapeA) + b_shapeB);
 
-	b_outputd *= 1.0f;
 
 	////////////////////////////////////////////////////////
-	outputs[A_OUTPUT].value = 3.0 * a_outputd;
-	outputs[B_OUTPUT].value = 3.0 * b_outputd;
+	outputs[A_OUTPUT].value = 5.0f * a_outputd;
+	outputs[B_OUTPUT].value = 5.0f * b_outputd;
 
-	outputs[SUM_OUTPUT].value = 3.0 * (a_outputd + b_outputd) / 2;
+	outputs[SUM_OUTPUT].value = 5.0f * (a_outputd + b_outputd) / 2;
 }
 
 struct DAOSCWidget : ModuleWidget 
@@ -273,35 +244,35 @@ int down = 50;
 
 addParam(ParamWidget::create<LRoundWhy>(Vec(box.size.x-mid-50, top), module, DAOSC::A_PITCH_PARAM, -54.0, 54.0, 0.0));
 addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid-knob*2 - 10, top), module, DAOSC::A_FINE_PARAM, -1.0, 1.0, 0.0));
-addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x - mid - knob * 1 , top + knob + 35), module, DAOSC::A_FM_PARAM, 0.0, 1.0, 0.0));
+addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x - mid - knob * 1 , top + knob + 45), module, DAOSC::A_FM_PARAM, 0.0, 1.0, 0.0));
 addParam(ParamWidget::create<RoundAzz>(Vec(box.size.x - mid - knob * 2 - 5, top + knob + 5), module, DAOSC::A_FOLD_PARAM, 0.0, 5.0, 0.0));
 addParam(ParamWidget::create<RoundRed>(Vec(box.size.x - mid - knob * 2 - 5, 125), module, DAOSC::A_DRIVE_PARAM, -5.0, 5.0, 0.0));
-addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid-knob, 157), module, DAOSC::A_SQUARE_PARAM, 1.0, 20.0, 1.0));
-addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid-knob*2, 177), module, DAOSC::A_SAW_PARAM, 1.0, 20.0, 1.0));
+addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid-knob, 157), module, DAOSC::A_SQUARE_PARAM, 0.0, 1.0, 0.0));
+addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid-knob*2, 177), module, DAOSC::A_SAW_PARAM, 0.0, 1.0, 0.0));
 
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack-5, 160+down), Port::INPUT, module, DAOSC::A_FM_INPUT));
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack-5, 190+down), Port::INPUT, module, DAOSC::A_PITCH_INPUT));
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack*2-5, 190+down), Port::INPUT, module, DAOSC::A_FOLD_INPUT));
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack*3-5, 190+down), Port::INPUT, module, DAOSC::A_DRIVE_INPUT));
-addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack*2-5, 230+down), Port::INPUT, module, DAOSC::A_SAW_INPUT));
-addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack*3-5, 230+down), Port::INPUT, module, DAOSC::A_SQUARE_INPUT));
+addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack*2-5, 230+down), Port::INPUT, module, DAOSC::A_SQUARE_INPUT));
+addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid-jack*3-5, 230+down), Port::INPUT, module, DAOSC::A_SAW_INPUT));
 
 addOutput(Port::create<PJ301MOPort>(Vec(box.size.x - mid-jack-5, 230+down), Port::OUTPUT, module, DAOSC::A_OUTPUT));
 
 addParam(ParamWidget::create<LRoundWhy>(Vec(box.size.x-mid+5, top), module, DAOSC::B_PITCH_PARAM, -54.0, 54.0, 0.0));
 addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid+5+knob+10, top), module, DAOSC::B_FINE_PARAM, -1.0, 1.0, 0.0));
-addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x - mid + 5, top + knob+35), module, DAOSC::B_FM_PARAM, 0.0, 1.0, 0.0));
+addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x - mid + 5, top + knob+45), module, DAOSC::B_FM_PARAM, 0.0, 1.0, 0.0));
 addParam(ParamWidget::create<RoundAzz>(Vec(box.size.x - mid + 10 + knob, top + knob + 5), module, DAOSC::B_FOLD_PARAM, 0.0, 5.0, 0.0));
 addParam(ParamWidget::create<RoundRed>(Vec(box.size.x - mid + 10 + knob, 125), module, DAOSC::B_DRIVE_PARAM, -5.0, 5.0, 0.0));
-addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid+5, 157), module, DAOSC::B_SQUARE_PARAM, 1.0, 20.0, 1.0));
-addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid+5+knob, 177), module, DAOSC::B_SAW_PARAM, 1.0, 20.0, 1.0));
+addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid+5, 157), module, DAOSC::B_SQUARE_PARAM,  0.0, 1.0, 0.0));
+addParam(ParamWidget::create<RoundWhy>(Vec(box.size.x-mid+5+knob, 177), module, DAOSC::B_SAW_PARAM, 0.0, 1.0, 0.0));
 
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10, 160+down), Port::INPUT, module, DAOSC::B_FM_INPUT));
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10, 190+down), Port::INPUT, module, DAOSC::B_PITCH_INPUT));
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10+jack, 190+down), Port::INPUT, module, DAOSC::B_FOLD_INPUT));
 addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10+jack*2, 190+down), Port::INPUT, module, DAOSC::B_DRIVE_INPUT));
-addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10+jack, 230+down), Port::INPUT, module, DAOSC::B_SAW_INPUT));
-addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10+jack*2, 230+down), Port::INPUT, module, DAOSC::B_SQUARE_INPUT));
+addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10+jack, 230+down), Port::INPUT, module, DAOSC::B_SQUARE_INPUT));
+addInput(Port::create<PJ301MIPort>(Vec(box.size.x-mid+10+jack*2, 230+down), Port::INPUT, module, DAOSC::B_SAW_INPUT));
 
 addOutput(Port::create<PJ301MOPort>(Vec(box.size.x - mid+10, 230+down), Port::OUTPUT, module, DAOSC::B_OUTPUT));
 
