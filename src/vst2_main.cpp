@@ -1885,12 +1885,11 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 #ifdef YAC_LINUX
          // pump event queue (when not using _XEventProc callback)
          wrapper->events();
-#else
+#endif // YAC_LINUX
          if(0 == wrapper->redraw_ival_ms)
          {
             wrapper->queueRedraw();
          }
-#endif // YAC_LINUX
          break;
 
       case effEditGetRect:
