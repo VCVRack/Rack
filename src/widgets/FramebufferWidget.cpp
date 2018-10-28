@@ -36,12 +36,13 @@ FramebufferWidget::~FramebufferWidget() {
 
 void FramebufferWidget::draw(NVGcontext *vg) {
 	// Bypass framebuffer rendering entirely
-   // printf("xxx FramebufferWidget::draw\n");
+   // printf("xxx FramebufferWidget::draw: global_ui=%p\n", global_ui);
 #ifdef RACK_PLUGIN_SHARED
-   bool bFBO = false;
+   bool bFBO = global_ui->b_fbo_shared;
 #else
    bool bFBO = global_ui->b_fbo;
 #endif // RACK_PLUGIN_SHARED
+   // printf("xxx FramebufferWidget::draw: global_ui=%p, bFBO=%d\n", global_ui, bFBO);
    // (note) FBO path crashes when plugin is a DLL (!)
    //         (the glGenFramebuffers() call in nvgluCreateFramebuffer() to be precise)
    if(!bFBO)

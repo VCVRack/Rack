@@ -86,6 +86,10 @@ static json_t *settingsToJson() {
 	json_t *fboJ = json_boolean(global_ui->b_fbo);
 	json_object_set_new(rootJ, "fbo", fboJ);
 
+   // fbo_shared (dynamically loaded modules)
+	json_t *fbo_sharedJ = json_boolean(global_ui->b_fbo_shared);
+	json_object_set_new(rootJ, "fbo_shared", fbo_sharedJ);
+
    // touchInput
    int touchInput = lglw_touchinput_get(global_ui->window.lglw);
 	json_t *touchInputJ = json_boolean(touchInput);
@@ -271,6 +275,13 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
    if (fboJ)
    {
       global_ui->b_fbo = json_is_true(fboJ);
+   }
+
+   // fbo support in dynamically loaded modules (not working with VirtualBox GL driver or Windows NVidia driver)
+   json_t *fbo_sharedJ = json_object_get(rootJ, "fbo_shared");
+   if (fbo_sharedJ)
+   {
+      global_ui->b_fbo_shared = json_is_true(fbo_sharedJ);
    }
 
 	// allowCursorLock

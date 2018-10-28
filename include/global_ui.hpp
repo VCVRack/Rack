@@ -105,6 +105,7 @@ struct GlobalUI {
    } param_info;
 
    bool b_fbo;  // usually true. set to false when using the VirtualBox GL driver.
+   bool b_fbo_shared;  // this may or may not work. default is false (=> don't use FBOs in dynamically loaded modules).
    int pending_swap_interval; // -1=none, 1=vsync on, 0=vsync off
 
    void init(void) {
@@ -156,6 +157,7 @@ struct GlobalUI {
       param_info.placeholder_framecount = 0;
 
       b_fbo = true;
+      b_fbo_shared = false;
       pending_swap_interval = -1;
    } 
 
