@@ -629,6 +629,17 @@ void vst2_set_shared_plugin_tls_globals(void) {
       }
    }
 }
+#ifdef USE_BEGIN_REDRAW_FXN
+void vst2_begin_shared_plugin_redraw(void) {
+   // Called in UI thread
+   for(Plugin *p : global->plugin.gPlugins) {
+      if(NULL != p->begin_redraw_fxn) {
+         printf("xxx call begin_redraw_fxn()\n");
+         p->begin_redraw_fxn();
+      }
+   }
+}
+#endif // USE_BEGIN_REDRAW_FXN
 #endif // USE_VST2
 
 RackScene *rack_plugin_ui_get_rackscene(void) {

@@ -85,6 +85,9 @@ extern void vst2_handle_queued_params (void);
 extern float vst2_get_param (int uniqueParamId);
 extern void  vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen);
 extern void vst2_set_shared_plugin_tls_globals (void);  // see plugin.cpp
+#ifdef USE_BEGIN_REDRAW_FXN
+extern void vst2_begin_shared_plugin_redraw (void);  // see plugin.cpp
+#endif // USE_BEGIN_REDRAW_FXN
 extern "C" { extern int vst2_handle_effeditkeydown (unsigned int _vkey); }
 
 namespace rack {
@@ -1174,6 +1177,10 @@ public:
 
          // Save DAW GL context and bind our own
          lglw_glcontext_push(rack::global_ui->window.lglw);
+
+#ifdef USE_BEGIN_REDRAW_FXN
+         vst2_begin_shared_plugin_redraw();
+#endif // USE_BEGIN_REDRAW_FXN
 
          rack::vst2_editor_redraw();
 

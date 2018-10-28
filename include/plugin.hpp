@@ -6,8 +6,13 @@
 #include "tags.hpp"
 #include "util/common.hpp"
 
-
 #define RACK_PLUGIN_INIT_ID_INTERNAL p->slug = TOSTRING(SLUG); p->version = TOSTRING(VERSION)
+
+#ifdef USE_BEGIN_REDRAW_FXN
+extern "C" {
+#include <lglw.h>
+}
+#endif // USE_BEGIN_REDRAW_FXN
 
 #ifdef USE_VST2
 
@@ -20,6 +25,9 @@ namespace rack {
 typedef void (*vst2_handle_ui_param_fxn_t) (int uniqueParamId, float normValue);
 typedef void (*vst2_queue_param_sync_fxn_t) (int uniqueParamId, float value, bool _bNormalized);
 typedef void (*rack_set_tls_globals_fxn_t) (rack::Plugin *p);
+#ifdef USE_BEGIN_REDRAW_FXN
+typedef void (*rack_begin_redraw_fxn_t) (void);
+#endif // USE_BEGIN_REDRAW_FXN
 
 #ifdef RACK_HOST
 
@@ -64,7 +72,21 @@ extern vst2_queue_param_sync_fxn_t vst2_queue_param_sync;
 #else
 #define JSON_SEED_INIT_EXTERNAL extern "C" { extern volatile char seed_initialized; }
 #endif
- #define RACK_PLUGIN_INIT(pluginname)                   \
+
+#ifdef USE_BEGIN_REDRAW_FXN
+// a hack that rebinds the GL context in shared plugins (may fix shared module redraw issues on Linux)
+#define BEGIN_REDRAW_FXN_SET \
+   rack::plugin->begin_redraw_fxn = &rack::loc_begin_redraw;
+#define BEGIN_REDRAW_FXN_IMP \
+   static void loc_begin_redraw(void) {                 \
+      lglw_glcontext_rebind(global_ui->window.lglw);    \
+   }
+#else
+#define BEGIN_REDRAW_FXN_SET  
+#define BEGIN_REDRAW_FXN_IMP  
+#endif // USE_BEGIN_REDRAW_FXN
+
+#define RACK_PLUGIN_INIT(pluginname)                    \
 vst2_handle_ui_param_fxn_t vst2_handle_ui_param;        \
 vst2_queue_param_sync_fxn_t vst2_queue_param_sync;      \
 JSON_SEED_INIT_EXTERNAL                                 \
@@ -74,18 +96,20 @@ namespace rack {                                        \
    RACK_TLS Global *global;                             \
    RACK_TLS GlobalUI *global_ui;                        \
    static void loc_set_tls_globals(rack::Plugin *p) {   \
-      plugin = p; \
+      plugin = p;                                       \
       global = plugin->global;                          \
       global_ui = plugin->global_ui;                    \
       /*printf("xxx plugin:loc_set_tls_globals: &global=%p global=%p\n", &global, plugin->global);*/ \
       hashtable_seed = p->json.hashtable_seed;          \
       seed_initialized = p->json.seed_initialized;      \
    }                                                    \
+   BEGIN_REDRAW_FXN_IMP                                 \
 }                                                       \
 static void loc_init_plugin(rack::Plugin *p); extern "C" { RACK_PLUGIN_EXPORT void init_plugin(rack::Plugin *p) { loc_init_plugin(p); } } static void loc_init_plugin(rack::Plugin *p)
  #define RACK_PLUGIN_INIT_ID() \
    rack::plugin = p;                                                 \
    rack::plugin->set_tls_globals_fxn = &rack::loc_set_tls_globals;   \
+   BEGIN_REDRAW_FXN_SET                                              \
    vst2_handle_ui_param = p->vst2_handle_ui_param_fxn;               \
    vst2_queue_param_sync = p->vst2_queue_param_sync_fxn;             \
    rack::global = p->global;                                         \
@@ -186,10 +210,17 @@ struct Plugin {
    //
    // Set by plugin:
    //  - in init_plugin()
-   //  - called by Rack host in audio thread
+   //  - called by Rack host in audio+UI threads
    //  - NULL if this is a statically linked add-on
    //
    rack_set_tls_globals_fxn_t set_tls_globals_fxn = NULL;
+
+#ifdef USE_BEGIN_REDRAW_FXN
+   // Called when redrawing the UI.
+   //  An attempt to fix the GL issue with shared modules on Cameron's machine.
+   rack_begin_redraw_fxn_t begin_redraw_fxn = NULL;
+#endif // USE_BEGIN_REDRAW_FXN
+
 #endif // USE_VST2
 
 	virtual ~Plugin();
