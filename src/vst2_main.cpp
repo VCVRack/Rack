@@ -1982,9 +1982,9 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          }
          break;
 
-      case 56:
-      case 66:
-         // (todo) what are these ? Bitwig (Linux) sends a lot of them
+      case effGetParameterProperties/*56*/:
+      case effGetMidiKeyName/*66*/:
+         // (todo) Bitwig (Linux) sends a lot of them
          break;
 
       default:
