@@ -51,26 +51,29 @@
 #include <unistd.h>
 #endif // ARCH_X64
 
+
+#define LOG_FXN  printf
+// #define LOG_FXN  lglw_log
+
 //
 // Regular log entry (low frequency)
 //
-// #define Dlog_verbose if(1);else printf
-#define Dlog if(0);else lglw_log
+#define Dlog if(0);else LOG_FXN
 
 //
 // Verbose log entry
 //
-#define Dlog_v if(0);else lglw_log
+#define Dlog_v if(0);else LOG_FXN
 
 //
 // Very-verbose log entry
 //
-#define Dlog_vv if(1);else lglw_log
+#define Dlog_vv if(1);else LOG_FXN
 
 //
 // Very-very-verbose log entry
 //
-#define Dlog_vvv if(1);else lglw_log
+#define Dlog_vvv if(0);else LOG_FXN
 
 //
 // Print to stdout

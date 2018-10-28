@@ -23,8 +23,8 @@ fi
 
 # Extra compiler flags (C and C++)
 #EXTRA_FLAGS=-DUSE_LOG_PRINTF
-#EXTRA_FLAGS="-DUSE_BEGIN_REDRAW_FXN -I${VSVR_BASE_DIR}/dep/lglw"
-EXTRA_FLAGS=""
+EXTRA_FLAGS="-DUSE_BEGIN_REDRAW_FXN -I${VSVR_BASE_DIR}/dep/lglw"
+#EXTRA_FLAGS=""
 
 # Extra C compiler flags
 export EXTRA_CFLAGS="-march=${CPU_ARCH} ${EXTRA_FLAGS}"
