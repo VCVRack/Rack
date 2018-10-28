@@ -642,7 +642,13 @@ public:
 
    void setRefreshRate(float _hz) {
       if(_hz < 15.0f)
+      {
+#ifdef YAC_LINUX
+         redraw_ival_ms = 1000/30u; // start timer
+#else
          redraw_ival_ms = 0u;
+#endif
+      }
       else
          redraw_ival_ms = sUI(1000.0f / _hz);
 
