@@ -29,6 +29,8 @@
  * ----
  */
 
+// #define USE_XEVENTPROC defined
+
 #include "lglw.h"
 
 #include <stdlib.h>
@@ -58,20 +60,17 @@
 //
 // Verbose log entry
 //
-// #define Dlog_v if(1);else lglw_log
 #define Dlog_v if(0);else lglw_log
 
 //
 // Very-verbose log entry
 //
-// #define Dlog_vv if(1);else lglw_log
-#define Dlog_vv if(0);else lglw_log
+#define Dlog_vv if(1);else lglw_log
 
 //
 // Very-very-verbose log entry
 //
-#define Dlog_vvv if(0);else lglw_log
-// #define Dlog_vvv if(0);else lglw_log
+#define Dlog_vvv if(1);else lglw_log
 
 //
 // Print to stdout
@@ -79,10 +78,8 @@
 //   Please use the Dlog* macros instead!
 //
 #define Dprintf if(0);else printf
-// #define Dprintf if(1);else printf
 
 #define Dprintf_verbose if(1);else printf
-// #define Dprintf_verbose if(0);else printf
 
 // ---------------------------------------------------------------------------- macros and defines
 #define LGLW(a) lglw_int_t *lglw = ((lglw_int_t*)(a))
@@ -1232,12 +1229,23 @@ lglw_bool_t lglw_window_open (lglw_t _lglw, void *_parentHWNDOrNull, int32_t _x,
                              );
 
       Dlog_v("lglw:lglw_window_open: 7\n");
-      // loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
+
+#ifdef USE_XEVENTPROC
+      loc_setEventProc(lglw->xdsp, lglw->win.xwnd);
+#else
+      {
+         void *nowarn = &loc_setEventProc;
+         (void)nowarn;
+      }
+#endif
+
       loc_setProperty(lglw->xdsp, lglw->win.xwnd, "_lglw", (void*)lglw);  // set instance pointer
 
       if(0 != _parentHWNDOrNull)
       {
-         // loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
+#ifdef USE_XEVENTPROC
+         loc_setEventProc(lglw->xdsp, lglw->parent_xwnd);
+#endif // USE_XEVENTPROC
          loc_setProperty(lglw->xdsp, lglw->parent_xwnd, "_lglw", (void*)lglw);  // set instance pointer
       }
 
@@ -1504,6 +1512,23 @@ void lglw_glcontext_push(lglw_t _lglw) {
          Dlog("[---] lglw_glcontext_push: glXMakeCurrent() failed. win.xwnd=%p hidden.xwnd=%p ctx=%p glGetError()=%d\n", lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx, glGetError());
       }
       // Dlog_vvv("lglw:lglw_glcontext_push: LEAVE\n");
+   }
+}
+
+
+// ---------------------------------------------------------------------------- lglw_glcontext_rebind
+void lglw_glcontext_rebind(lglw_t _lglw) {
+   LGLW(_lglw);
+   // printf("xxx lglw_glcontext_rebind\n");
+
+   if(NULL != lglw)
+   {
+      Dlog_vvv("lglw:lglw_glcontext_rebind: win.xwnd=%p hidden.xwnd=%p ctx=%p\n",
+               lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx);
+      if(!glXMakeCurrent(lglw->xdsp, (0 == lglw->win.xwnd) ? lglw->hidden.xwnd : lglw->win.xwnd, lglw->ctx))
+      {
+         Dlog("[---] lglw_glcontext_rebind: glXMakeCurrent() failed. win.xwnd=%p hidden.xwnd=%p ctx=%p glGetError()=%d\n", lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx, glGetError());
+      }
    }
 }
 
@@ -2169,7 +2194,9 @@ void lglw_events(lglw_t _lglw) {
          XEvent xev;
          int queued = XPending(lglw->xdsp);
          if(queued > 0)
+         {
             Dlog_vvv("lglw:lglw_events: (events: %i)\n", queued);
+         }
          while(queued)
          {
             XNextEvent(lglw->xdsp, &xev);

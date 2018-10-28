@@ -198,6 +198,10 @@ void lglw_redraw_callback_set (lglw_t _lglw, lglw_redraw_fxn_t _cbk);
 // Save previous GL context and bind LGLW context
 void lglw_glcontext_push (lglw_t _lglw);
 
+// Rebind LGLW context
+//  (note) experimental. try push/pop first.
+void lglw_glcontext_rebind (lglw_t _lglw);
+
 // Unbind LGLW context and restore previous GL context
 void lglw_glcontext_pop (lglw_t _lglw);
 
