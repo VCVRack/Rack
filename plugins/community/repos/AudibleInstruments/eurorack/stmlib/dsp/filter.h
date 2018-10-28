@@ -33,7 +33,7 @@
 #include "stmlib/stmlib.h"
 
 #include <cmath>
-#include <cstdio>
+#include <algorithm>
 
 namespace stmlib {
 
@@ -153,6 +153,14 @@ class OnePole {
       return in - lp;
     } else {
       return 0.0f;
+    }
+  }
+  
+  template<FilterMode mode>
+  inline void Process(float* in_out, size_t size) {
+    while (size--) {
+      *in_out = Process<mode>(*in_out);
+      ++in_out;
     }
   }
   
@@ -375,6 +383,31 @@ class Svf {
     float hp_gain = mode < 0.5f ? -mode * 2.0f : -2.0f + mode * 2.0f;
     float lp_gain = mode < 0.5f ? 1.0f - mode * 2.0f : 0.0f;
     float bp_gain = mode < 0.5f ? 0.0f : mode * 2.0f - 1.0f;
+    while (size--) {
+      hp = (*in - r_ * state_1 - g_ * state_1 - state_2) * h_;
+      bp = g_ * hp + state_1;
+      state_1 = g_ * hp + bp;
+      lp = g_ * bp + state_2;
+      state_2 = g_ * bp + lp;
+      *out = hp_gain * hp + bp_gain * bp + lp_gain * lp;
+      ++in;
+      ++out;
+    }
+    state_1_ = state_1;
+    state_2_ = state_2;
+  }
+  
+  inline void ProcessMultimodeLPtoHP(
+      const float* in,
+      float* out,
+      size_t size,
+      float mode) {
+    float hp, bp, lp;
+    float state_1 = state_1_;
+    float state_2 = state_2_;
+    float hp_gain = std::min(-mode * 2.0f + 1.0f, 0.0f);
+    float bp_gain = 1.0f - 2.0f * fabsf(mode - 0.5f);
+    float lp_gain = std::max(1.0f - mode * 2.0f, 0.0f);
     while (size--) {
       hp = (*in - r_ * state_1 - g_ * state_1 - state_2) * h_;
       bp = g_ * hp + state_1;

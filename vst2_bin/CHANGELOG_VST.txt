@@ -1,6 +1,7 @@
 
 ** October ??th, 2018
 - add Linux port
+- update dBiz modules (fixes UI issues)
 - add module dBiz.FourSeq
 - add module dBiz.Divider
 - add module dBiz.DualFilter
@@ -8,6 +9,9 @@
 - add module dBiz.SuHa
 - add module dBiz.TROSC
 - add module dBiz.Util2
+o add module AudibleInstruments.Marbles
+o add module AudibleInstruments.Plaits
+o add module AudibleInstruments.Stages
 
 
 ** October 12th, 2018

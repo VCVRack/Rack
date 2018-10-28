@@ -50,8 +50,49 @@ EURORACK_OBJ= \
 	eurorack/peaks/modulations/multistage_envelope.o \
 	eurorack/peaks/pulse_processor/pulse_shaper.o \
 	eurorack/peaks/pulse_processor/pulse_randomizer.o \
-	eurorack/peaks/number_station/number_station.o
+	eurorack/peaks/number_station/number_station.o \
+	eurorack/plaits/dsp/engine/additive_engine.o \
+	eurorack/plaits/dsp/engine/bass_drum_engine.o \
+	eurorack/plaits/dsp/engine/chord_engine.o \
+	eurorack/plaits/dsp/engine/fm_engine.o \
+	eurorack/plaits/dsp/engine/grain_engine.o \
+	eurorack/plaits/dsp/engine/hi_hat_engine.o \
+	eurorack/plaits/dsp/engine/modal_engine.o \
+	eurorack/plaits/dsp/engine/noise_engine.o \
+	eurorack/plaits/dsp/engine/particle_engine.o \
+	eurorack/plaits/dsp/engine/snare_drum_engine.o \
+	eurorack/plaits/dsp/engine/speech_engine.o \
+	eurorack/plaits/dsp/engine/string_engine.o \
+	eurorack/plaits/dsp/engine/swarm_engine.o \
+	eurorack/plaits/dsp/engine/virtual_analog_engine.o \
+	eurorack/plaits/dsp/engine/waveshaping_engine.o \
+	eurorack/plaits/dsp/engine/wavetable_engine.o \
+	eurorack/plaits/dsp/physical_modelling/modal_voice.o \
+	eurorack/plaits/dsp/physical_modelling/resonator.o \
+	eurorack/plaits/dsp/physical_modelling/string.o \
+	eurorack/plaits/dsp/physical_modelling/string_voice.o \
+	eurorack/plaits/dsp/speech/lpc_speech_synth.o \
+	eurorack/plaits/dsp/speech/lpc_speech_synth_controller.o \
+	eurorack/plaits/dsp/speech/lpc_speech_synth_phonemes.o \
+	eurorack/plaits/dsp/speech/lpc_speech_synth_words.o \
+	eurorack/plaits/dsp/speech/naive_speech_synth.o \
+	eurorack/plaits/dsp/speech/sam_speech_synth.o \
+	eurorack/plaits/dsp/voice.o \
+	eurorack/plaits/resources.o \
+	eurorack/stages/segment_generator.o \
+	eurorack/stages/ramp_extractor.o \
+	eurorack/stages/resources.o \
+	eurorack/marbles/random/t_generator.o \
+	eurorack/marbles/random/x_y_generator.o \
+	eurorack/marbles/random/output_channel.o \
+	eurorack/marbles/random/lag_processor.o \
+	eurorack/marbles/random/quantizer.o \
+	eurorack/marbles/ramp/ramp_extractor.o \
+	eurorack/marbles/resources.o
 
+
+REMOVED_OBJ= \
+	eurorack/plaits/plaits.o
 
 
 PLUGIN_OBJ= \
@@ -64,9 +105,12 @@ PLUGIN_OBJ= \
 	src/Frames.o \
 	src/Kinks.o \
 	src/Links.o \
+	src/Marbles.o \
 	src/Peaks.o \
+	src/Plaits.o \
 	src/Rings.o \
 	src/Shades.o \
+	src/Stages.o \
 	src/Tides.o \
 	src/Veils.o \
 	src/Warps.o

@@ -32,18 +32,40 @@ struct Branches : Module {
 		NUM_LIGHTS
 	};
 
-	SchmittTrigger gateTrigger[2];
-	SchmittTrigger modeTrigger[2];
-	bool mode[2] = {};
-	bool outcome[2] = {};
+	SchmittTrigger gateTriggers[2];
+	SchmittTrigger modeTriggers[2];
+	bool modes[2] = {};
+	bool outcomes[2] = {};
 
 	Branches() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+
+	json_t *toJson() override {
+		json_t *rootJ = json_object();
+		json_t *modesJ = json_array();
+		for (int i = 0; i < 2; i++) {
+			json_array_insert_new(modesJ, i, json_boolean(modes[i]));
+		}
+		json_object_set_new(rootJ, "modes", modesJ);
+		return rootJ;
+	}
+
+	void fromJson(json_t *rootJ) override {
+		json_t *modesJ = json_object_get(rootJ, "modes");
+		if (modesJ) {
+			for (int i = 0; i < 2; i++) {
+				json_t *modeJ = json_array_get(modesJ, i);
+				if (modeJ)
+					modes[i] = json_boolean_value(modeJ);
+			}
+		}
+	}
+
 	void step() override;
 
 	void onReset() override {
 		for (int i = 0; i < 2; i++) {
-			mode[i] = false;
-			outcome[i] = false;
+			modes[i] = false;
+			outcomes[i] = false;
 		}
 	}
 };
@@ -53,27 +75,27 @@ void Branches::step() {
 	float gate = 0.0;
 	for (int i = 0; i < 2; i++) {
 		// mode button
-		if (modeTrigger[i].process(params[MODE1_PARAM + i].value))
-			mode[i] = !mode[i];
+		if (modeTriggers[i].process(params[MODE1_PARAM + i].value))
+			modes[i] = !modes[i];
 
 		if (inputs[IN1_INPUT + i].active)
 			gate = inputs[IN1_INPUT + i].value;
 
-		if (gateTrigger[i].process(gate)) {
+		if (gateTriggers[i].process(gate)) {
 			// trigger
 			float r = randomUniform();
 			float threshold = clamp(params[THRESHOLD1_PARAM + i].value + inputs[P1_INPUT + i].value / 10.f, 0.f, 1.f);
 			bool toss = (r < threshold);
-			if (!mode[i]) {
-				// direct mode
-				outcome[i] = toss;
+			if (!modes[i]) {
+				// direct modes
+				outcomes[i] = toss;
 			}
 			else {
-				// toggle mode
-				outcome[i] = (outcome[i] != toss);
+				// toggle modes
+				outcomes[i] = (outcomes[i] != toss);
 			}
 
-			if (!outcome[i])
+			if (!outcomes[i])
 				lights[STATE1_POS_LIGHT + 2*i].value = 1.0;
 			else
 				lights[STATE1_NEG_LIGHT + 2*i].value = 1.0;
@@ -81,10 +103,10 @@ void Branches::step() {
 
 		lights[STATE1_POS_LIGHT + 2*i].value *= 1.0 - engineGetSampleTime() * 15.0;
 		lights[STATE1_NEG_LIGHT + 2*i].value *= 1.0 - engineGetSampleTime() * 15.0;
-		lights[MODE1_LIGHT + i].value = mode[i] ? 1.0 : 0.0;
+		lights[MODE1_LIGHT + i].value = modes[i] ? 1.0 : 0.0;
 
-		outputs[OUT1A_OUTPUT + i].value = outcome[i] ? 0.0 : gate;
-		outputs[OUT1B_OUTPUT + i].value = outcome[i] ? gate : 0.0;
+		outputs[OUT1A_OUTPUT + i].value = outcomes[i] ? 0.0 : gate;
+		outputs[OUT1B_OUTPUT + i].value = outcomes[i] ? gate : 0.0;
 	}
 }
 
@@ -122,10 +144,10 @@ struct BranchesWidget : ModuleWidget {
 			Branches *branches;
 			int channel;
 			void onAction(EventAction &e) override {
-				branches->mode[channel] ^= 1;
+				branches->modes[channel] ^= 1;
 			}
 			void step() override {
-				rightText = branches->mode[channel] ? "Toggle" : "Latch";
+				rightText = branches->modes[channel] ? "Toggle" : "Latch";
 				MenuItem::step();
 			}
 		};
@@ -133,8 +155,8 @@ struct BranchesWidget : ModuleWidget {
 		menu->addChild(construct<MenuLabel>());
 
 		menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Channels"));
-		menu->addChild(construct<BranchesModeItem>(&MenuItem::text, "Channel 1 mode", &BranchesModeItem::branches, branches, &BranchesModeItem::channel, 0));
-		menu->addChild(construct<BranchesModeItem>(&MenuItem::text, "Channel 2 mode", &BranchesModeItem::branches, branches, &BranchesModeItem::channel, 1));
+		menu->addChild(construct<BranchesModeItem>(&MenuItem::text, "Channel 1 modes", &BranchesModeItem::branches, branches, &BranchesModeItem::channel, 0));
+		menu->addChild(construct<BranchesModeItem>(&MenuItem::text, "Channel 2 modes", &BranchesModeItem::branches, branches, &BranchesModeItem::channel, 1));
 	}
 };
 

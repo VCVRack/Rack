@@ -129,7 +129,7 @@ void Braids::step() {
 		if (!settings.meta_modulation)
 			pitchV += fm;
 		if (lowCpu)
-			pitchV += log2f(96000.0 / engineGetSampleRate());
+			pitchV += log2f(96000.f * engineGetSampleTime());
 		int32_t pitch = (pitchV * 12.0 + 60) * 128;
 		pitch += jitter_source.Render(settings.vco_drift);
 		pitch = clamp(pitch, 0, 16383);

@@ -2,7 +2,7 @@ SLUG=AudibleInstruments
 
 include ../../../build_plugin_pre_linux.mk
 
-EXTRAFLAGS+= -Ieurorack/ -DTEST -Ieurorack/stmlib/third_party/STM -Ieurorack/stmlib/third_party/STM/STM32F0xx_StdPeriph_Driver/inc/
+EXTRAFLAGS+= -Ieurorack/ -DTEST -Ieurorack/stmlib/third_party/STM -Ieurorack/stmlib/third_party/STM/STM32F0xx_StdPeriph_Driver/inc/ -Ieurorack/stmlib/third_party/STM/STM32F10x_StdPeriph_Driver/inc/ -Ieurorack/stmlib/third_party/STM/STM32F37x_StdPeriph_Driver/inc/ -Ieurorack/stmlib/third_party/STM/CMSIS/CM3_f37x/
 
 include make.objects
 

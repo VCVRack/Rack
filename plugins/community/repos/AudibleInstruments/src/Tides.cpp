@@ -145,7 +145,7 @@ void Tides::step() {
 		// Sync
 		// Slight deviation from spec here.
 		// Instead of toggling sync by holding the range button, just enable it if the clock port is plugged in.
-		generator.set_sync(inputs[CLOCK_INPUT].active);
+		generator.set_sync(inputs[CLOCK_INPUT].active && !sheep);
 
 		// Generator
 		generator.Process(sheep);
@@ -190,18 +190,6 @@ void Tides::step() {
 	lights[PHASE_GREEN_LIGHT].setBrightnessSmooth(fmaxf(0.0, unif));
 	lights[PHASE_RED_LIGHT].setBrightnessSmooth(fmaxf(0.0, -unif));
 }
-
-
-struct TidesSheepItem : MenuItem {
-	Tides *tides;
-	void onAction(EventAction &e) override {
-		tides->sheep ^= true;
-	}
-	void step() override {
-		rightText = (tides->sheep) ? "✔" : "";
-		MenuItem::step();
-	}
-};
 
 
 struct TidesWidget : ModuleWidget {
@@ -279,11 +267,19 @@ struct TidesWidget : ModuleWidget {
 
 
 	void appendContextMenu(Menu *menu) override {
-		Tides *tides = dynamic_cast<Tides*>(module);
-		assert(tides);
+		Tides *module = dynamic_cast<Tides*>(this->module);
 
-		menu->addChild(construct<MenuLabel>());
-		menu->addChild(construct<TidesSheepItem>(&MenuItem::text, "Sheep", &TidesSheepItem::tides, tides));
+		struct SheepItem : MenuItem {
+			Tides *module;
+			void onAction(EventAction &e) override {
+				module->sheep ^= true;
+			}
+		};
+
+		menu->addChild(MenuEntry::create());
+		SheepItem *sheepItem = MenuItem::create<SheepItem>("Sheep", CHECKMARK(module->sheep));
+		sheepItem->module = module;
+		menu->addChild(sheepItem);
 	}
 };
 

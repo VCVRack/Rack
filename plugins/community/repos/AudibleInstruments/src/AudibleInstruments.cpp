@@ -14,9 +14,13 @@ RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Branches);
 RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Blinds);
 RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Veils);
 RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Frames);
+RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Marbles);
+RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Plaits);
+RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Stages);
 
 RACK_PLUGIN_INIT(AudibleInstruments) {
    RACK_PLUGIN_INIT_ID();
+   RACK_PLUGIN_INIT_VERSION("0.6.3");
 
 	RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Braids);
 	RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Elements);
@@ -32,4 +36,7 @@ RACK_PLUGIN_INIT(AudibleInstruments) {
 	RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Veils);
 	RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Frames);
 	// RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Peaks);
+   RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Marbles);
+   RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Plaits);
+   RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Stages);
 }
