@@ -634,7 +634,7 @@ void vst2_begin_shared_plugin_redraw(void) {
    // Called in UI thread
    for(Plugin *p : global->plugin.gPlugins) {
       if(NULL != p->begin_redraw_fxn) {
-         printf("xxx call begin_redraw_fxn()\n");
+         // printf("xxx call begin_redraw_fxn()\n");
          p->begin_redraw_fxn();
       }
    }

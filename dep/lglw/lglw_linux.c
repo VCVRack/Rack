@@ -73,7 +73,7 @@
 //
 // Very-very-verbose log entry
 //
-#define Dlog_vvv if(0);else LOG_FXN
+#define Dlog_vvv if(1);else LOG_FXN
 
 //
 // Print to stdout
