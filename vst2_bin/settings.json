@@ -14,7 +14,7 @@
   "refreshRate": 30,
   "vsync": true,
   "fbo": true,
-  "fbo_shared": false,
+  "fbo_shared": true,
   "touchInput": false,
   "touchKbd": false,
   "oversampleFactor": 1.0,

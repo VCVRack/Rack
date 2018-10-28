@@ -39,6 +39,20 @@ void FramebufferWidget::draw(NVGcontext *vg) {
    // printf("xxx FramebufferWidget::draw: global_ui=%p\n", global_ui);
 #ifdef RACK_PLUGIN_SHARED
    bool bFBO = global_ui->b_fbo_shared;
+
+   static bool bInit = false;
+   if(bFBO && !bInit)
+   {
+      printf("xxx FramebufferWidget::draw: lazy-init glew\n");
+      glewExperimental = GL_TRUE;
+      bInit = true;
+      if(glewInit() != GLEW_OK) {
+         printf("Could not init glew.\n");
+         return;
+      }
+      // GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
+      glGetError();
+   }
 #else
    bool bFBO = global_ui->b_fbo;
 #endif // RACK_PLUGIN_SHARED
