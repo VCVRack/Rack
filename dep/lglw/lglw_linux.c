@@ -1528,6 +1528,7 @@ void lglw_glcontext_rebind(lglw_t _lglw) {
    {
       Dlog_vvv("lglw:lglw_glcontext_rebind: win.xwnd=%p hidden.xwnd=%p ctx=%p\n",
                lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx);
+      (void)glXMakeCurrent(lglw->xdsp, None, NULL);
       if(!glXMakeCurrent(lglw->xdsp, (0 == lglw->win.xwnd) ? lglw->hidden.xwnd : lglw->win.xwnd, lglw->ctx))
       {
          Dlog("[---] lglw_glcontext_rebind: glXMakeCurrent() failed. win.xwnd=%p hidden.xwnd=%p ctx=%p glGetError()=%d\n", lglw->win.xwnd, lglw->hidden.xwnd, lglw->ctx, glGetError());
