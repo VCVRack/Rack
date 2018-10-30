@@ -64,14 +64,14 @@ struct XF202 : ModuleWidget {
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-202.svg")));
 		for (int i = 0; i < XF_202::deviceCount; i++) {
 			int offset = 176 * i;
-			addInput(Port::create<sub_port>(Vec(3,18 + offset), Port::INPUT, module, XF_202::INPUT_A_1 + i));
-			addInput(Port::create<sub_port_red>(Vec(3,45 + offset), Port::INPUT, module, XF_202::INPUT_AR_1 + i));
-			addInput(Port::create<sub_port>(Vec(92,18 + offset), Port::INPUT, module, XF_202::INPUT_B_1 + i));
-			addInput(Port::create<sub_port_red>(Vec(92,45 + offset), Port::INPUT, module, XF_202::INPUT_BR_1 + i));
-			addInput(Port::create<sub_port>(Vec(3,120 + offset), Port::INPUT, module, XF_202::INPUT_CV_1 + i));
+			addInput(Port::create<SilverPort>(Vec(3,18 + offset), Port::INPUT, module, XF_202::INPUT_A_1 + i));
+			addInput(Port::create<RedPort>(Vec(3,45 + offset), Port::INPUT, module, XF_202::INPUT_AR_1 + i));
+			addInput(Port::create<SilverPort>(Vec(92,18 + offset), Port::INPUT, module, XF_202::INPUT_B_1 + i));
+			addInput(Port::create<RedPort>(Vec(92,45 + offset), Port::INPUT, module, XF_202::INPUT_BR_1 + i));
+			addInput(Port::create<SilverPort>(Vec(3,120 + offset), Port::INPUT, module, XF_202::INPUT_CV_1 + i));
 
-			addOutput(Port::create<sub_port>(Vec(92,93 + offset), Port::OUTPUT, module, XF_202::OUTPUT_1 + i));
-			addOutput(Port::create<sub_port_red>(Vec(92,120 + offset), Port::OUTPUT, module, XF_202::OUTPUTR_1 + i));
+			addOutput(Port::create<SilverPort>(Vec(92,93 + offset), Port::OUTPUT, module, XF_202::OUTPUT_1 + i));
+			addOutput(Port::create<RedPort>(Vec(92,120 + offset), Port::OUTPUT, module, XF_202::OUTPUTR_1 + i));
 
 			addParam(ParamWidget::create<sub_sw_2>(Vec(28, 154.5 + offset), module, XF_202::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
 			addParam(ParamWidget::create<sub_sw_3>(Vec(65, 152 + offset), module, XF_202::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
@@ -93,6 +93,6 @@ struct XF202 : ModuleWidget {
 using namespace rack_plugin_SubmarineFree;
 
 RACK_PLUGIN_MODEL_INIT(SubmarineFree, XF202) {
-   Model *modelXF202 = Model::create<XF_202, XF202>("SubmarineFree", "XF-202", "XF-202 Dual Stereo Cross Fader", MIXER_TAG, DUAL_TAG);
+   Model *modelXF202 = Model::create<XF_202, XF202>("Submarine (Free)", "XF-202", "XF-202 Dual Stereo Cross Fader", MIXER_TAG, DUAL_TAG);
    return modelXF202;
 }

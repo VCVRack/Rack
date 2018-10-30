@@ -1,6 +1,8 @@
 
 ** October ??th, 2018
 - add Linux port
+- support FBO rendering in dynamically loaded modules
+   - add "fbo" and "fbo_shared" settings (must be set to false in VirtualBox VM)
 - update dBiz modules (fixes UI issues)
 - add module dBiz.FourSeq
 - add module dBiz.Divider
@@ -23,6 +25,27 @@
 - add module SquinkyLabs.LFN
 - add module SquinkyLabs.Shaper (crash)
 - add module SquinkyLabs.Super
+- add module SubmarineFree.AG-104
+- add module SubmarineFree.AO106
+- add module SubmarineFree.AO112
+- add module SubmarineFree.AO118
+- add module SubmarineFree.AO124
+- add module SubmarineFree.AO136
+- add module SubmarineFree.EO102
+- add module SubmarineFree.LD103
+- add module SubmarineFree.NG106
+- add module SubmarineFree.OG104
+- add module SubmarineFree.PG104
+- add module SubmarineFree.SS112
+- add module SubmarineFree.SS208
+- add module SubmarineFree.SS212
+- add module SubmarineFree.SS220
+- add module SubmarineFree.SS221
+- add module SubmarineFree.TD116
+- add module SubmarineFree.TD202
+- add module SubmarineFree.TF101
+- add module SubmarineFree.TM105
+- add module SubmarineFree.XG104
 
 
 ** October 12th, 2018

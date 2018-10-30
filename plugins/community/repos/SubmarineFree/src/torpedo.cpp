@@ -11,16 +11,16 @@ void BasePort::raiseError(unsigned int errorType) {
 	_checksum = 0;
 	switch (errorType) {
 		case ERROR_STATE:
-			//if (dbg) debug("Torpedo Error: STATE");
+			if (dbg) debug("Torpedo Error: STATE");
 			break;
 		case ERROR_COUNTER:
-			//if (dbg) debug("Torpedo Error: COUNTER");
+			if (dbg) debug("Torpedo Error: COUNTER");
 			break;
 		case ERROR_LENGTH:
-			//if (dbg) debug("Torpedo Error: LENGTH");
+			if (dbg) debug("Torpedo Error: LENGTH");
 			break;
 		case ERROR_CHECKSUM:
-			//if (dbg) debug("Torpedo Error: CHECKSUM");
+			if (dbg) debug("Torpedo Error: CHECKSUM");
 			break;
 	}
 	error(errorType);
@@ -33,7 +33,7 @@ void RawOutputPort::abort(void) {
 }
 
 void RawOutputPort::completed(void) {
-	//if (dbg) debug("Torpedo Completed:");
+	if (dbg) debug("Torpedo Completed:");
 }
 
 void RawOutputPort::process(void) {
@@ -130,7 +130,7 @@ void RawOutputPort::send(std::string message) {
 		raiseError(ERROR_LENGTH);
 		return;
 	}
-	//if (dbg) debug("Torpedo Send:%s %s", _appId.c_str(), message.c_str());
+	if (dbg) debug("Torpedo Send:%s %s", _appId.c_str(), message.c_str());
 	switch (_state) {
 		case STATE_HEADER:
 		case STATE_BODY:
@@ -269,7 +269,7 @@ void RawInputPort::process(void) {
 }
 
 void RawInputPort::received(std::string appId, std::string message) {
-	//if (dbg) debug("Torpedo Received:%s %s", appId.c_str(), message.c_str());
+	if (dbg) debug("Torpedo Received:%s %s", appId.c_str(), message.c_str());
 }
 
 void TextInputPort::received(std::string appId, std::string message) {
@@ -303,12 +303,12 @@ void QueuedOutputPort::send(std::string message) {
 			std::string *s = _queue.back();
 			_queue.pop_back();
 			delete s;
-			//if (dbg) debug("Torpedo Replaced:");
+			if (dbg) debug("Torpedo Replaced:");
 		}
 		{
 			std::string *s = new std::string(message);
 			_queue.push_back(s);
-			//if (dbg) debug("Torpedo Queued:");
+			if (dbg) debug("Torpedo Queued:");
 		}
 		return;
 	}
@@ -334,7 +334,7 @@ void MessageOutputPort::send(std::string pluginName, std::string moduleName, std
 }
 
 void MessageInputPort::received(std::string appId, std::string message) {
-	//if (dbg) debug("Torpedo Received: %s", message.c_str());
+	if (dbg) debug("Torpedo Received: %s", message.c_str());
 	std::string pluginName;
 	std::string moduleName;
 	std::string messageText;
@@ -344,7 +344,7 @@ void MessageInputPort::received(std::string appId, std::string message) {
 	json_error_t error;
 	json_t *rootJ = json_loads(message.c_str(), 0, &error);
 	if (!rootJ) {
-		//debug("Torpedo MESG Error: %s", error.text);
+		debug("Torpedo MESG Error: %s", error.text);
 		return;
 	} 
 	json_t *jp = json_object_get(rootJ, "plugin");
@@ -372,7 +372,7 @@ void PatchOutputPort::send(std::string pluginName, std::string moduleName, json_
 }
 
 void PatchInputPort::received(std::string appId, std::string message) {
-	//if (dbg) debug("Torpedo Received: %s", message.c_str());
+	if (dbg) debug("Torpedo Received: %s", message.c_str());
 	std::string pluginName;
 	std::string moduleName;
 
@@ -381,7 +381,7 @@ void PatchInputPort::received(std::string appId, std::string message) {
 	json_error_t error;
 	json_t *rootJ = json_loads(message.c_str(), 0, &error);
 	if (!rootJ) {
-		//debug("Torpedo MESG Error: %s", error.text);
+		debug("Torpedo MESG Error: %s", error.text);
 		return;
 	} 
 	json_t *jp = json_object_get(rootJ, "plugin");

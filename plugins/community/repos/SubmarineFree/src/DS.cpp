@@ -22,7 +22,7 @@ void DS_Module::fromJson(json_t *rootJ) {
 
 void DS_Module::onReset() {
 	voltage0 = 0.0f;
-	voltage1 = 5.0f;
+	voltage1 = 10.0f;
 }
 
 float DS_Module::output(int state) {

@@ -32,6 +32,10 @@
   "moduleBrowser": {
     "favorites": [
       {
+        "plugin": "Alikins",
+        "model": "SpecificValue"
+      },
+      {
         "plugin": "Core",
         "model": "Notes"
       },
@@ -40,8 +44,24 @@
         "model": "kHzD_Inf"
       },
       {
-        "plugin": "Alikins",
-        "model": "SpecificValue"
+        "plugin": "AudibleInstruments",
+        "model": "Braids"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Clouds"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Rings"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Plaits"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Stages"
       },
       {
         "plugin": "AS",
@@ -57,19 +77,11 @@
       },
       {
         "plugin": "AudibleInstruments",
-        "model": "Braids"
-      },
-      {
-        "plugin": "AudibleInstruments",
         "model": "Elements"
       },
       {
         "plugin": "AudibleInstruments",
-        "model": "Clouds"
-      },
-      {
-        "plugin": "Autodafe",
-        "model": "Multiple 1x8"
+        "model": "Tides"
       },
       {
         "plugin": "Befaco",
@@ -80,8 +92,8 @@
         "model": "SlewLimiter"
       },
       {
-        "plugin": "Bidoo",
-        "model": "lIMbO"
+        "plugin": "Autodafe",
+        "model": "Multiple 1x8"
       },
       {
         "plugin": "Bidoo",
@@ -93,15 +105,31 @@
       },
       {
         "plugin": "Bogaudio",
+        "model": "Bogaudio-Additator"
+      },
+      {
+        "plugin": "Bidoo",
+        "model": "lIMbO"
+      },
+      {
+        "plugin": "Bogaudio",
         "model": "Bogaudio-XCO"
       },
       {
         "plugin": "Bogaudio",
-        "model": "Bogaudio-Additator"
+        "model": "Bogaudio-SampleHold"
       },
       {
         "plugin": "Bogaudio",
         "model": "Bogaudio-XFade"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Noise"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Switch"
       },
       {
         "plugin": "Bogaudio",
@@ -112,32 +140,20 @@
         "model": "Bogaudio-Mult"
       },
       {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Noise"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-SampleHold"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Switch"
-      },
-      {
-        "plugin": "DHE-Modules",
-        "model": "Cubic"
-      },
-      {
-        "plugin": "ErraticInstruments",
-        "model": "MPEToCV"
-      },
-      {
-        "plugin": "FrankBussFormula",
-        "model": "FrankBussFormula"
+        "plugin": "huaba",
+        "model": "EQ3"
       },
       {
         "plugin": "Fundamental",
-        "model": "VCO"
+        "model": "Scope"
+      },
+      {
+        "plugin": "HetrickCV",
+        "model": "Exponent"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCA-1"
       },
       {
         "plugin": "Fundamental",
@@ -145,11 +161,19 @@
       },
       {
         "plugin": "Fundamental",
-        "model": "VCF"
+        "model": "VCMixer"
       },
       {
         "plugin": "Fundamental",
-        "model": "VCA-1"
+        "model": "VCO"
+      },
+      {
+        "plugin": "FrankBussFormula",
+        "model": "FrankBussFormula"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCF"
       },
       {
         "plugin": "Fundamental",
@@ -164,40 +188,12 @@
         "model": "LFO2"
       },
       {
-        "plugin": "Fundamental",
-        "model": "VCMixer"
+        "plugin": "ErraticInstruments",
+        "model": "MPEToCV"
       },
       {
-        "plugin": "Fundamental",
-        "model": "Scope"
-      },
-      {
-        "plugin": "HetrickCV",
-        "model": "Exponent"
-      },
-      {
-        "plugin": "huaba",
-        "model": "EQ3"
-      },
-      {
-        "plugin": "JE",
-        "model": "RingModulator"
-      },
-      {
-        "plugin": "LindenbergResearch",
-        "model": "VCF"
-      },
-      {
-        "plugin": "LindenbergResearch",
-        "model": "MS20 VCF"
-      },
-      {
-        "plugin": "LindenbergResearch",
-        "model": "VCO"
-      },
-      {
-        "plugin": "LindenbergResearch",
-        "model": "Westcoast VCS"
+        "plugin": "DHE-Modules",
+        "model": "Cubic"
       },
       {
         "plugin": "ML_modules",
@@ -206,6 +202,26 @@
       {
         "plugin": "mscHack",
         "model": "Maude221"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "Westcoast VCS"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "MS20 VCF"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "VCF"
+      },
+      {
+        "plugin": "JE",
+        "model": "RingModulator"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "VCO"
       },
       {
         "plugin": "PG-Instruments",
@@ -220,12 +236,28 @@
         "model": "Abr"
       },
       {
+        "plugin": "bsp",
+        "model": "TunedDelayLine"
+      },
+      {
         "plugin": "Valley",
         "model": "Dexter"
       },
       {
+        "plugin": "bsp",
+        "model": "RMS"
+      },
+      {
         "plugin": "Valley",
         "model": "Plateau"
+      },
+      {
+        "plugin": "bsp",
+        "model": "Legato"
+      },
+      {
+        "plugin": "bsp",
+        "model": "Scanner"
       },
       {
         "plugin": "bsp",
@@ -237,27 +269,11 @@
       },
       {
         "plugin": "bsp",
-        "model": "Legato"
-      },
-      {
-        "plugin": "bsp",
         "model": "Obxd_VCF"
       },
       {
         "plugin": "bsp",
-        "model": "RMS"
-      },
-      {
-        "plugin": "bsp",
-        "model": "Scanner"
-      },
-      {
-        "plugin": "bsp",
         "model": "Sway"
-      },
-      {
-        "plugin": "bsp",
-        "model": "TunedDelayLine"
       },
       {
         "plugin": "Template_shared",

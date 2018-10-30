@@ -1,0 +1,14 @@
+[
+  {
+    "comment1": "To use custom tunings with the SubmarineFree WK modules",
+    "comment2": "Copy this template file and name it WK_Custom.tunings",
+    "comment3": "Each entry has a name and an array of 12 values",
+    "comment4": "Each value is the offset in cents." 
+    "name": "Custom",
+    "tunings": [0,1.5,2.5,3.5,4.5,5.5,-6.5,-7.5,8.5,9.5,10.5,11.872]
+  },
+  {
+    "name": "Custom2",
+    "tunings": [11,10,9,8,7,6,5,4,3,2,1,0]
+  }
+]

@@ -35,7 +35,7 @@ struct XF_Controls {
 	XF_Correlator *correlator;
 }; 
 
-struct XF_LightKnob : sub_knob_large_narrow {
+struct XF_LightKnob : LargeKnob<NarrowKnob<LightKnob>> {
 	int cv;
 	int link;
 	void step() override;

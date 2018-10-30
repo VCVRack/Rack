@@ -2,6 +2,27 @@
 // Ports
 //////////////////
 
+struct SilverPort : Port {
+	NVGcolor col = nvgRGB(0xf0, 0xf0, 0xf0);
+	SilverPort() {
+		box.size.x = 25;
+		box.size.y = 25;
+	}
+	void draw(NVGcontext *vg) override;
+};
+
+struct RedPort : SilverPort {
+	RedPort() { col = nvgRGB(0xff, 0x20, 0x20); }
+};
+
+struct BluePort : SilverPort {
+	BluePort() { col = nvgRGB(0x29, 0xb2, 0xef); }
+};
+
+struct BlackPort : SilverPort {
+	BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
+};
+/*
 struct sub_port : SVGPort {
 	sub_port() {
 		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port.svg")));
@@ -26,6 +47,7 @@ struct sub_port_black : SVGPort {
 	}
 };
 
+*/
 //////////////////
 // Switches
 //////////////////
@@ -83,6 +105,9 @@ struct sub_btn : SVGSwitch, ToggleSwitch {
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_btn.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_btn_a.svg")));
 	}
+	void step() override {
+		setValue(module->params[paramId].value);
+	}
 };
 
 //////////////////
@@ -96,76 +121,52 @@ struct LightKnob : Knob {
 	/** Radii in standard units */
 	float radius = 19.0;
 	int enabled = 1;
-	LightKnob() {}
+	LightKnob() {smooth = false;}
 	void draw(NVGcontext *vg) override;
 	void setEnabled(int val);
 	void setRadius(int r);
 };
 
-struct sub_knob_small : LightKnob {
-	sub_knob_small() {
-		setRadius(12.0);	
+template <class K>
+struct TinyKnob : K {
+	TinyKnob() {
+		K::setRadius(9.0f);
 	}
 };
 
-struct sub_knob_med : LightKnob {
-	sub_knob_med() {
-		setRadius(19.0);
+template <class K>
+struct SmallKnob : K {
+	SmallKnob() {
+		K::setRadius(12.0f);
 	}
 };
 
-struct sub_knob_large : LightKnob {
-	sub_knob_large() {
-		setRadius(27.0);
+template <class K>
+struct MedKnob : K {
+	MedKnob() {
+		K::setRadius(19.0f);
 	}
 };
 
-struct sub_knob_small_narrow : sub_knob_small {
-	sub_knob_small_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+template <class K>
+struct LargeKnob : K {
+	LargeKnob() {
+		K::setRadius(27.0f);
 	}
 };
 
-struct sub_knob_med_narrow : sub_knob_med {
-	sub_knob_med_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+template <class K>
+struct SnapKnob : K {
+	SnapKnob() {
+		K::snap = true;
 	}
 };
 
-struct sub_knob_large_narrow : sub_knob_large {
-	sub_knob_large_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
-	}
-};
-
-struct sub_knob_small_snap : sub_knob_small {
-	sub_knob_small_snap() {
-		snap = true;
-		smooth = false;
-	}
-};
-
-struct sub_knob_med_snap : sub_knob_med {
-	sub_knob_med_snap() {
-		snap = true;
-		smooth = false;
-	}
-};
-
-struct sub_knob_large_snap : sub_knob_large {
-	sub_knob_large_snap() {
-		snap = true;
-		smooth = false;
-	}
-};
-
-struct sub_knob_med_snap_narrow : sub_knob_med_snap {
-	sub_knob_med_snap_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+template <class K>
+struct NarrowKnob : K {
+	NarrowKnob() {
+		K::minAngle = -0.75*M_PI;
+		K::maxAngle = 0.75*M_PI;	
 	}
 };
 
