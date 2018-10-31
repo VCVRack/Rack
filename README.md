@@ -14,10 +14,11 @@
    - there's a [plugin SDK](#dynamically-loaded-plugins-via-plugin-sdk) (for Microsoft Visual Studio 2017 Community Edition) which can be used to build new plugins without checking out this entire GIT repository
 + supports internal oversampling (up to 16x with configurable quality)
    - the number of oversampled I/O channels can be limited to save CPU time
+   - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
 
-Tested in 
+**Windows** version tested in:
   - Eureka (my own work-in-progress VST host)
   - Cockos Reaper
   - Propellerhead Reason 10
@@ -29,15 +30,29 @@ Tested in
   - according to users: works in Nuendo
   - according to users: works in Ableton Live
 
+**Linux** version tested in:
+  - Bitwig Studio 2.4.1
+  - Renoise 3.1.0
+  - according to users: works in Qtractor 0.9.2
+
 
 # Downloads
-The current release can be found in the [vst2_bin/](vst2_bin/) folder.
 
-Here's a snapshot of it: [veeseevstrack_0_6_1_win64_bin-12Oct2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-12Oct2018.7z) (64bit)
+## Windows
+- [veeseevstrack_0_6_1_win64_bin-31Oct2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-31Oct2018.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-31Oct2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-31Oct2018.7z) (32bit, experimental)
 
-Note: The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
+## Linux
+- [veeseevstrack_0_6_1_lin64_bin-31Oct2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_lin64_bin-31Oct2018.7z) (64bit/SSE2, beta)
 
-Note: The idle detection is enabled by default. A side effect of this is that e.g. sequencer modules will not play while the plugin is idle. Please turn off the idle detection in the toolbar menu (set it to "Always Active") in this case. Since some of the UI handling is tied to the engine, certain widgets (typically buttons, e.g. the waveform selector in the Macro Oscillator module) will not work while the plugin is idle. Play some notes (or turn off the idle detection) in this case.
+## Notes
+- The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
+
+- The idle detection is enabled by default. A side effect of this is that e.g. sequencer modules will not play while the plugin is idle. Please turn off the idle detection in the toolbar menu (set it to "Always Active") in this case. Since some of the UI handling is tied to the engine, certain widgets (typically buttons, e.g. the waveform selector in the Macro Oscillator module) will not work while the plugin is idle. Play some notes (or turn off the idle detection) in this case.
+
+- The binary releases come with 702 precompiled modules.
+
+- To make the Linux version work in a [VirtualBox](https://www.virtualbox.org/) VM, the `fbo` and `fbo_shared` options in `settings.json` have to be set to `false`
 
 
 # Installation
@@ -61,7 +76,7 @@ Here are some demo videos of it:
 
 # Add-on modules
 
-The binary distribution contains the following (25) dynamically loaded add-on modules:
+The binary distribution contains the following (32) dynamically loaded add-on modules:
  - bsp.AttenuMixer
  - bsp.DownSampler
  - bsp.Legato
@@ -71,25 +86,32 @@ The binary distribution contains the following (25) dynamically loaded add-on mo
  - bsp.Sway
  - bsp.TunedDelayLine
  - dBiz.dBizBlank
- - dBiz.Multiple
  - dBiz.Contorno
  - dBiz.Chord
- - dBiz.Utility
- - dBiz.Transpose
  - dBiz.Bene
  - dBiz.Bene2
  - dBiz.BenePads
- - dBiz.SubMix
- - dBiz.Remix
+ - dBiz.DAOSC
+ - dBiz.Divider
+ - dBiz.DualFilter
+ - dBiz.DVCO
+ - dBiz.FourSeq
+ - dBiz.Multiple
  - dBiz.PerfMixer
+ - dBiz.Remix
+ - dBiz.SmiX
+ - dBiz.SubMix
+ - dBiz.SuHa
+ - dBiz.Transpose
+ - dBiz.TROSC
+ - dBiz.Utility
+ - dBiz.Util2
  - dBiz.VCA530
  - dBiz.Verbo
- - dBiz.DVCO
- - dBiz.DAOSC
  - Template_shared.MyModule
 
 
-The following (638) add-on modules are statically linked with the VST plugin:
+The following (670) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -153,19 +175,22 @@ The following (638) add-on modules are statically linked with the VST plugin:
  - AS.VCA
  - AS.WaveShaper
  - AS.StereoVUmeter
- - AudibleInstruments.Braids
- - AudibleInstruments.Elements
- - AudibleInstruments.Tides
- - AudibleInstruments.Clouds
- - AudibleInstruments.Warps
- - AudibleInstruments.Rings
- - AudibleInstruments.Links
- - AudibleInstruments.Kinks
- - AudibleInstruments.Shades
- - AudibleInstruments.Branches
  - AudibleInstruments.Blinds
- - AudibleInstruments.Veils
+ - AudibleInstruments.Braids
+ - AudibleInstruments.Branches
+ - AudibleInstruments.Clouds
+ - AudibleInstruments.Elements
  - AudibleInstruments.Frames
+ - AudibleInstruments.Kinks
+ - AudibleInstruments.Links
+ - AudibleInstruments.Marbles
+ - AudibleInstruments.Plaits
+ - AudibleInstruments.Rings
+ - AudibleInstruments.Shades
+ - AudibleInstruments.Stages
+ - AudibleInstruments.Tides
+ - AudibleInstruments.Veils
+ - AudibleInstruments.Warps
  - Autodafe.Multiple18
  - Autodafe.Multiple28
  - Autodafe.LFOWidget
@@ -652,25 +677,53 @@ The following (638) add-on modules are statically linked with the VST plugin:
  - Southpole-parasites.Annuli
  - Southpole-parasites.Splash
  - squinkylabs-plug1.Booty
+ - squinkylabs-plug1.CHB
+ - squinkylabs-plug1.ColoredNoise
+ - squinkylabs-plug1.CPU_Hog
+ - squinkylabs-plug1.DG
+ - squinkylabs-plug1.EV
+ - squinkylabs-plug1.EV3
+ - squinkylabs-plug1.GMR
+ - squinkylabs-plug1.Gray
+ - squinkylabs-plug1.LFN
+ - squinkylabs-plug1.Super
+ - squinkylabs-plug1.ThreadBoost
+ - squinkylabs-plug1.Tremolo
  - squinkylabs-plug1.Vocal
  - squinkylabs-plug1.VocalFilter
- - squinkylabs-plug1.ColoredNoise
- - squinkylabs-plug1.Tremolo
- - squinkylabs-plug1.CPU_Hog
- - squinkylabs-plug1.ThreadBoost
+ - SubmarineFree.AG104
  - SubmarineFree.AG106
+ - SubmarineFree.AO106
+ - SubmarineFree.AO112
+ - SubmarineFree.AO118
+ - SubmarineFree.AO124
+ - SubmarineFree.AO136
  - SubmarineFree.BB120
+ - SubmarineFree.EO102
  - SubmarineFree.FF110
  - SubmarineFree.FF120
  - SubmarineFree.FF212
  - SubmarineFree.LA108
+ - SubmarineFree.LD103
  - SubmarineFree.LD106
+ - SubmarineFree.NG106
  - SubmarineFree.NG112
+ - SubmarineFree.OG104
  - SubmarineFree.OG106
+ - SubmarineFree.PG104
  - SubmarineFree.PG112
  - SubmarineFree.PO101
  - SubmarineFree.PO102
  - SubmarineFree.PO204
+ - SubmarineFree.SS112
+ - SubmarineFree.SS208
+ - SubmarineFree.SS212
+ - SubmarineFree.SS220
+ - SubmarineFree.SS221
+ - SubmarineFree.TD116
+ - SubmarineFree.TD202
+ - SubmarineFree.TF101
+ - SubmarineFree.TM105
  - SubmarineFree.WK101
  - SubmarineFree.WK205
  - SubmarineFree.XF101
@@ -678,6 +731,7 @@ The following (638) add-on modules are statically linked with the VST plugin:
  - SubmarineFree.XF104
  - SubmarineFree.XF201
  - SubmarineFree.XF202
+ - SubmarineFree.XG104
  - SubmarineFree.XG106
  - SubmarineFree.BP101
  - SubmarineFree.BP102
@@ -734,7 +788,7 @@ The following (638) add-on modules are statically linked with the VST plugin:
 All additional source code added by me is placed under the [MIT](https://en.wikipedia.org/wiki/MIT_License) license.
 
 
-# How to build
+# How to build (Windows)
 
 Prerequisites:
 - GNU Bash (tested with MSYS1.0 / bash v2.04.0(1))
@@ -745,7 +799,6 @@ Prerequisites:
 If you want to build the dependent libraries, you may need additional SDKs.
 Precompiled libs can be found in the `dep/lib/msvc/` folder.
 
-NOTE: the VST(s) and the add-on modules can also be built for Linux but the LGLW OS abstraction layer is currently (11Oct2018) a stub (i.e. it won't open a window etc)
 
 ```
 $ git clone https://github.com/bsp2/VeeSeeVSTRack.git
@@ -787,10 +840,34 @@ $ mv <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll
 ## Dynamically loaded plugins (via plugin SDK)
 
 1. Install the `Microsoft Visual Studio 2017 Community Edition` IDE
-2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-03Sep2018.7z)
+2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-31Oct2018.7z)
 3. Open the solution file (`example\Template_shared\vs2017\Template_shared\Template_shared.sln`)
 4. Make sure that the `Release` / `x64` configuration is selected
 5. Rebuild the solution to create the "plugin.dll" file.
+
+
+# How to build (Linux)
+
+Prerequisites:
+- Standard GNU build environment (bash, make, GCC/G++)
+- GTK+ headers+libs
+- OpenGL headers+libs
+- Steinberg VST2.4 SDK
+
+```
+$ git clone https://github.com/bsp2/VeeSeeVSTRack.git
+```
+```
+$ cd VeeSeeVSTRack/
+```
+
+EDIT `setenv_linux.sh` and adjust the `VST2_SDK_DIR` as required.
+
+```
+$ . setenv_linux.sh
+$ alias m="make -j 20 makefile.linux"
+$ m all
+```
 
 
 # VCV Rack
