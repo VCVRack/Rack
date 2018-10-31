@@ -1,6 +1,11 @@
 
-** October ??th, 2018
+** October 31st, 2018
 - add Linux port
+   - thanks to Github user "cameronleger" for porting LGLW !
+   - thanks to Github user "davephillips" for testing the port !
+- change default idle detection mode to "Always Active"
+   (in the instrument version of the plugin)
+   - set "idleDetectInstr" to 1 to re-enable it (settings.json)
 - support FBO rendering in dynamically loaded modules
    - add "fbo" and "fbo_shared" settings (must be set to false in VirtualBox VM)
 - update dBiz modules (fixes UI issues)
