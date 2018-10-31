@@ -24,7 +24,7 @@
   "oversampleOffline": false,
   "oversampleNumIn": 8.0,
   "oversampleNumOut": 8.0,
-  "idleDetectInstr": 1,
+  "idleDetectInstr": 0,
   "idleDetectFx": 2,
   "allowCursorLock": true,
   "sampleRate": 44100.0,
