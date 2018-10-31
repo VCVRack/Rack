@@ -10,15 +10,18 @@ export BUILD_ARM=n
 
 
 # CPU architecture
-#CPU_ARCH=haswell
-CPU_ARCH=athlon-fx
+CPU_ARCH="-msse2"
 
 if [ "${USER}" = "bsp" ]; then
-CPU_ARCH=haswell
+CPU_ARCH="-march=haswell"
 fi
 
 if [ "${USER}" = "cameron" ]; then
-CPU_ARCH=skylake-avx512
+CPU_ARCH="-march=skylake-avx512"
+fi
+
+if [ "${USER}" = "dave" ]; then
+CPU_ARCH="-march=athlon-fx"
 fi
 
 # Extra compiler flags (C and C++)
@@ -27,10 +30,10 @@ EXTRA_FLAGS="-DUSE_BEGIN_REDRAW_FXN -I${VSVR_BASE_DIR}/dep/lglw"
 #EXTRA_FLAGS=""
 
 # Extra C compiler flags
-export EXTRA_CFLAGS="-march=${CPU_ARCH} ${EXTRA_FLAGS}"
+export EXTRA_CFLAGS="${CPU_ARCH} ${EXTRA_FLAGS}"
 
 # Extra C++ compiler flags
-export EXTRA_CPPFLAGS="-march=${CPU_ARCH} ${EXTRA_FLAGS}"
+export EXTRA_CPPFLAGS="${CPU_ARCH} ${EXTRA_FLAGS}"
 
 # Extra optimization flags (C/C++)
 export EXTRA_OPTFLAGS=
@@ -38,7 +41,7 @@ export EXTRA_OPTFLAGS=
 # Extra linker flags
 export EXTRA_LDFLAGS=-march=${CPU_ARCH}
 
-# this must point to the directory which contains the 'aeffect.h' and 'aeffectx.h' files
+# Point this to the directory which contains the 'aeffect.h' and 'aeffectx.h' files
 export VST2_SDK_DIR=/mnt/dev/vstsdk2.4/pluginterfaces/vst2.x/
 
 # n = build the plugin w/o 3rd party modules (only useful for debugging purposes)
