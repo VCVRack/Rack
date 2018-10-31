@@ -552,6 +552,7 @@ using namespace rack_plugin_SubmarineFree;
 
 RACK_PLUGIN_MODEL_INIT(SubmarineFree, WK101) {
    Model *modelWK101 = Model::create<WK_101, WK101>("Submarine (Free)", "WK-101", "WK-101 Das Wohltemperierte Klavier", QUANTIZER_TAG, TUNER_TAG);
+   return modelWK101;
 }
 
 RACK_PLUGIN_MODEL_INIT(SubmarineFree, WK205) {
