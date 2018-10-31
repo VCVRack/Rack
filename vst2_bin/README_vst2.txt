@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- October 12th, 2018
+VeeSeeVST Rack VST 2.4 Plugin -- October 31st, 2018
 ===================================================
 
 !!!------------------------------------------------------------------------------
@@ -17,23 +17,36 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 + supports VST parameters (send / recv)
 + supports internal resampling (up to 16x with configurable quality)
-+ supports idle-detection (+wake up on MIDI note on or audio input)
++ supports dynamically loaded plugin DLLs
+   - the plugin.dll files are _not_ binary compatible with the VCV Rack plugins !
+   - there's a [plugin SDK](#dynamically-loaded-plugins-via-plugin-sdk) (for Microsoft Visual Studio 2017 Community Edition) which can be used to build new plugins without checking out this entire GIT repository
++ supports internal oversampling (up to 16x with configurable quality)
+   - the number of oversampled I/O channels can be limited to save CPU time
+   - offline rendering uses separate settings (highest quality by default)
++ supports idle-detection
+   - wake up on MIDI note on or audio input
 
 Here's a demo video of it: https://vimeo.com/277703414
 
-Tested in 
+Windows version tested in:
   - Eureka (my own work-in-progress VST host)
   - Cockos Reaper
   - Propellerhead Reason 10
   - Steinberg Cubase Pro 9.5.30
   - LMMS 1.2.0-rc6
   - Jeskola Buzz 1.2 (build 1503 / x64)
-  - according to users: works in Bitwig Studio
+  - Bitwig Studio
+  - FLStudio
   - according to users: works in Nuendo
   - according to users: works in Ableton Live
 
+Linux version tested in:
+  - Bitwig Studio 2.4.1
+  - Renoise 3.1.0
+  - according to users: works in Qtractor 0.9.2
 
-The binary distribution contains the following (25) dynamically loaded add-on modules:
+
+The binary distribution contains the following (32) dynamically loaded add-on modules:
  - bsp.AttenuMixer
  - bsp.DownSampler
  - bsp.Legato
@@ -43,25 +56,32 @@ The binary distribution contains the following (25) dynamically loaded add-on mo
  - bsp.Sway
  - bsp.TunedDelayLine
  - dBiz.dBizBlank
- - dBiz.Multiple
  - dBiz.Contorno
  - dBiz.Chord
- - dBiz.Utility
- - dBiz.Transpose
  - dBiz.Bene
  - dBiz.Bene2
  - dBiz.BenePads
- - dBiz.SubMix
- - dBiz.Remix
+ - dBiz.DAOSC
+ - dBiz.Divider
+ - dBiz.DualFilter
+ - dBiz.DVCO
+ - dBiz.FourSeq
+ - dBiz.Multiple
  - dBiz.PerfMixer
+ - dBiz.Remix
+ - dBiz.SmiX
+ - dBiz.SubMix
+ - dBiz.SuHa
+ - dBiz.Transpose
+ - dBiz.TROSC
+ - dBiz.Utility
+ - dBiz.Util2
  - dBiz.VCA530
  - dBiz.Verbo
- - dBiz.DVCO
- - dBiz.DAOSC
  - Template_shared.MyModule
 
 
-The following (638) add-on modules are statically linked with the VST plugin:
+The following (672) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -125,19 +145,22 @@ The following (638) add-on modules are statically linked with the VST plugin:
  - AS.VCA
  - AS.WaveShaper
  - AS.StereoVUmeter
- - AudibleInstruments.Braids
- - AudibleInstruments.Elements
- - AudibleInstruments.Tides
- - AudibleInstruments.Clouds
- - AudibleInstruments.Warps
- - AudibleInstruments.Rings
- - AudibleInstruments.Links
- - AudibleInstruments.Kinks
- - AudibleInstruments.Shades
- - AudibleInstruments.Branches
  - AudibleInstruments.Blinds
- - AudibleInstruments.Veils
+ - AudibleInstruments.Braids
+ - AudibleInstruments.Branches
+ - AudibleInstruments.Clouds
+ - AudibleInstruments.Elements
  - AudibleInstruments.Frames
+ - AudibleInstruments.Kinks
+ - AudibleInstruments.Links
+ - AudibleInstruments.Marbles
+ - AudibleInstruments.Plaits
+ - AudibleInstruments.Rings
+ - AudibleInstruments.Shades
+ - AudibleInstruments.Stages
+ - AudibleInstruments.Tides
+ - AudibleInstruments.Veils
+ - AudibleInstruments.Warps
  - Autodafe.Multiple18
  - Autodafe.Multiple28
  - Autodafe.LFOWidget
@@ -624,25 +647,55 @@ The following (638) add-on modules are statically linked with the VST plugin:
  - Southpole-parasites.Annuli
  - Southpole-parasites.Splash
  - squinkylabs-plug1.Booty
+ - squinkylabs-plug1.CHB
+ - squinkylabs-plug1.ColoredNoise
+ - squinkylabs-plug1.CPU_Hog
+ - squinkylabs-plug1.DG
+ - squinkylabs-plug1.EV
+ - squinkylabs-plug1.EV3
+ - squinkylabs-plug1.FunV (crash)
+ - squinkylabs-plug1.GMR
+ - squinkylabs-plug1.Gray
+ - squinkylabs-plug1.LFN
+ - squinkylabs-plug1.Shaper (crash)
+ - squinkylabs-plug1.Super
+ - squinkylabs-plug1.ThreadBoost
+ - squinkylabs-plug1.Tremolo
  - squinkylabs-plug1.Vocal
  - squinkylabs-plug1.VocalFilter
- - squinkylabs-plug1.ColoredNoise
- - squinkylabs-plug1.Tremolo
- - squinkylabs-plug1.CPU_Hog
- - squinkylabs-plug1.ThreadBoost
+ - SubmarineFree.AG104
  - SubmarineFree.AG106
+ - SubmarineFree.AO106
+ - SubmarineFree.AO112
+ - SubmarineFree.AO118
+ - SubmarineFree.AO124
+ - SubmarineFree.AO136
  - SubmarineFree.BB120
+ - SubmarineFree.EO102
  - SubmarineFree.FF110
  - SubmarineFree.FF120
  - SubmarineFree.FF212
  - SubmarineFree.LA108
+ - SubmarineFree.LD103
  - SubmarineFree.LD106
+ - SubmarineFree.NG106
  - SubmarineFree.NG112
+ - SubmarineFree.OG104
  - SubmarineFree.OG106
+ - SubmarineFree.PG104
  - SubmarineFree.PG112
  - SubmarineFree.PO101
  - SubmarineFree.PO102
  - SubmarineFree.PO204
+ - SubmarineFree.SS112
+ - SubmarineFree.SS208
+ - SubmarineFree.SS212
+ - SubmarineFree.SS220
+ - SubmarineFree.SS221
+ - SubmarineFree.TD116
+ - SubmarineFree.TD202
+ - SubmarineFree.TF101
+ - SubmarineFree.TM105
  - SubmarineFree.WK101
  - SubmarineFree.WK205
  - SubmarineFree.XF101
@@ -650,6 +703,7 @@ The following (638) add-on modules are statically linked with the VST plugin:
  - SubmarineFree.XF104
  - SubmarineFree.XF201
  - SubmarineFree.XF202
+ - SubmarineFree.XG104
  - SubmarineFree.XG106
  - SubmarineFree.BP101
  - SubmarineFree.BP102
@@ -700,6 +754,7 @@ The following (638) add-on modules are statically linked with the VST plugin:
  - Valley.UGraph
  - Valley.Dexter
  - Valley.Plateau
+
 
 
 For more info about VCV rack, see https://vcvrack.com/
