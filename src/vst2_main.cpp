@@ -1594,6 +1594,10 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // request for the version
          return PLUGIN_VERSION;
 
+      case effGetVstVersion:
+          r = kVstVersion;
+          break;
+
       case effGetEffectName:
 #ifdef VST2_EFFECT
          ::strncpy((char*)ptr, "VeeSeeVST Rack 0.6.1", kVstMaxEffectNameLen);
