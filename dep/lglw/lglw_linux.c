@@ -1297,8 +1297,16 @@ lglw_bool_t lglw_window_resize (lglw_t _lglw, int32_t _w, int32_t _h) {
       if(0 != lglw->hidden.xwnd)
       {
          XResizeWindow(lglw->xdsp, lglw->hidden.xwnd, _w, _h);
+
+#ifdef LGLW_CONTEXT_ALLOW_USE_AFTER_FREE
+         // (note) [bsp] destroying the GL context also destroys all GL objects attached to it
+         //               (_if_ the GL driver is implemented correctly).
+         //               IOW, if we destroy the context here, we'd have to re-create all the textures,
+         //               buffer objects, framebuffer objects, shaders, .. before they can be used again.
+         //               Apparently this works with certain GL drivers on Linux but it still is an application error.
          loc_destroy_gl(lglw);
          loc_create_gl(lglw);
+#endif // LGLW_CONTEXT_ALLOW_USE_AFTER_FREE
       }
 
       if(0 != lglw->win.xwnd)

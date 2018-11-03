@@ -25,9 +25,16 @@ CPU_ARCH="-march=athlon-fx"
 fi
 
 # Extra compiler flags (C and C++)
+#EXTRA_FLAGS=""
 #EXTRA_FLAGS=-DUSE_LOG_PRINTF
 EXTRA_FLAGS="-DUSE_BEGIN_REDRAW_FXN -I${VSVR_BASE_DIR}/dep/lglw"
-#EXTRA_FLAGS=""
+
+#  (note) see dep/lglw/lglw_linux.c for an important note re: LGLW_CONTEXT_ALLOW_USE_AFTER_FREE
+#EXTRA_FLAGS="${EXTRA_FLAGS} -DLGLW_CONTEXT_ALLOW_USE_AFTER_FREE"
+
+if [ "${USER}" = "cameron" ]; then
+EXTRA_FLAGS="${EXTRA_FLAGS} -DLGLW_CONTEXT_ALLOW_USE_AFTER_FREE"
+fi
 
 # Extra C compiler flags
 export EXTRA_CFLAGS="${CPU_ARCH} ${EXTRA_FLAGS}"
