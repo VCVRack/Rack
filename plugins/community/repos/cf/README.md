@@ -1,7 +1,7 @@
 
 
-![alt text](/cf060.png)
-
+![alt text](/screens/cf064.png)
+![alt text](/screens/cf064b.png)
  
  
 **trSEQ : tr style 16 steps SEQ with trig input per step**

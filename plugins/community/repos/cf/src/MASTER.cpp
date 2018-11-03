@@ -131,8 +131,8 @@ MASTERWidget::MASTERWidget(MASTER *module) : ModuleWidget(module) {
 	addOutput(Port::create<PJ301MPort>(Vec(54, 61), Port::OUTPUT, module, MASTER::LEFT_OUTPUT));
 	addOutput(Port::create<PJ301MPort>(Vec(54, 91), Port::OUTPUT, module, MASTER::RIGHT_OUTPUT));
 
-	addOutput(Port::create<PJ301MPort>(Vec(11, 321), Port::OUTPUT, module, MASTER::LEFT_MAIN_OUTPUT));
-	addOutput(Port::create<PJ301MPort>(Vec(54, 321), Port::OUTPUT, module, MASTER::RIGHT_MAIN_OUTPUT));
+	addOutput(Port::create<PJ301MPort>(Vec(54, 308), Port::OUTPUT, module, MASTER::LEFT_MAIN_OUTPUT));
+	addOutput(Port::create<PJ301MPort>(Vec(54, 334), Port::OUTPUT, module, MASTER::RIGHT_MAIN_OUTPUT));
 
 	addInput(Port::create<PJ301MPort>(Vec(11, 61), Port::INPUT, module, MASTER::LEFT_INPUT));
 	addInput(Port::create<PJ301MPort>(Vec(11, 91), Port::INPUT, module, MASTER::RIGHT_INPUT));

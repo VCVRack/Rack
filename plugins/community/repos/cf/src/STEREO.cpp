@@ -6,8 +6,8 @@ namespace rack_plugin_cf {
 struct STEREO : Module {
 	enum ParamIds {
 		PAN_PARAM,
-      GAIN_PARAM,
-      SOLO_PARAM,
+	        GAIN_PARAM,
+	        SOLO_PARAM,
 		ON_PARAM,
 		NUM_PARAMS
 	};
@@ -40,23 +40,23 @@ struct STEREO : Module {
 	};
 
 
-   float SIGNAL1 = 0.0 ;
-   float SIGNAL2 = 0.0 ;
-   bool ON_STATE = false ;
-   bool SOLO_STATE = false ;
-   bool soloed = false;
-   int lightState[11] = {};
-   int cligno =0;
-   int retard =0;
-   int retard2 =0;
-   SchmittTrigger onTrigger;
-   SchmittTrigger oninTrigger;
-   SchmittTrigger soloTrigger;
-   SchmittTrigger soloinTrigger;
-   float or_gain ;
-   int or_affi ;
-   float orp_gain ;
-   int orp_affi ;
+float SIGNAL1 = 0.0 ;
+float SIGNAL2 = 0.0 ;
+bool ON_STATE = false ;
+bool SOLO_STATE = false ;
+bool soloed = false;
+int lightState[11] = {};
+int cligno =0;
+int retard =0;
+int retard2 =0;
+SchmittTrigger onTrigger;
+SchmittTrigger oninTrigger;
+SchmittTrigger soloTrigger;
+SchmittTrigger soloinTrigger;
+float or_gain ;
+int or_affi ;
+float orp_gain ;
+int orp_affi ;
 
 	STEREO() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {onReset();}
 	void step() override;

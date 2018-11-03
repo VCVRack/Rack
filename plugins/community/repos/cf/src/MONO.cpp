@@ -6,8 +6,8 @@ namespace rack_plugin_cf {
 struct MONO : Module {
 	enum ParamIds {
 		PAN_PARAM,
-      GAIN_PARAM,
-      SOLO_PARAM,
+	        GAIN_PARAM,
+	        SOLO_PARAM,
 		ON_PARAM,
 		NUM_PARAMS
 	};
@@ -30,7 +30,7 @@ struct MONO : Module {
 		OUT1_OUTPUT,
 		NUM_OUTPUTS
 	};
-   enum LightIds {
+    enum LightIds {
 		SOLO_LIGHT,
 		ON_LIGHT,
 		LEVEL_LIGHTS,
@@ -179,6 +179,7 @@ struct MOTORPOTDisplay : TransparentWidget {
 
 	}
 };
+
 
 struct MONOWidget : ModuleWidget {
 	MONOWidget(MONO *module);

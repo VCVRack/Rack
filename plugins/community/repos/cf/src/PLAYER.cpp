@@ -1,7 +1,11 @@
 #include "cf.hpp"
 #include "dsp/digital.hpp"
 #include "osdialog.h"
-#include "AudioFile.h"
+namespace rack_plugin_cf {
+// (note) also used in Bidoo module(s)
+#define DR_WAV_IMPLEMENTATION
+#include "dr_wav.h"
+}
 #include <vector>
 #include "cmath"
 #ifdef _MSC_VER
@@ -37,6 +41,7 @@ struct PLAYER : Module {
 	PREV_INPUT,
 	NEXT_INPUT,
 		TRIG_INPUT,
+		VO_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -49,12 +54,22 @@ struct PLAYER : Module {
 		NUM_LIGHTS
 	};
 	
+	unsigned int channels;
+	unsigned int sampleRate;
+	drwav_uint64 totalSampleCount;
+
+	vector<vector<float>> playBuffer;
+	bool loading = false;
+
 	bool play = false;
+
 	string lastPath = "";
-	AudioFile<double> audioFile;
+
+
 	float samplePos = 0;
  	float startPos = 0;
 	vector<double> displayBuff;
+
 	string fileDesc;
 	bool fileLoaded = false;
 
@@ -65,6 +80,7 @@ struct PLAYER : Module {
 	SchmittTrigger nextinTrigger;
 	SchmittTrigger previnTrigger;
 	SchmittTrigger oscTrigger;
+
 	vector <string> fichier;
 
 	int sampnumber = 0;
@@ -73,7 +89,10 @@ struct PLAYER : Module {
 	bool oscState = false ;
 
 
-	PLAYER() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) { }
+	PLAYER() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+			playBuffer.resize(2);
+			playBuffer[0].resize(0);
+			playBuffer[1].resize(0); }
 
 	void step() override;
 	
@@ -98,29 +117,47 @@ json_object_set_new(rootJ, "oscstate", json_integer(oscState));
 			loadSample(lastPath);
 			
 		}
-	json_t *oscstateJ = json_object_get(rootJ, "oscstate");
-		if (oscstateJ) {
+      json_t *oscstateJ = json_object_get(rootJ, "oscstate");
+		if (oscstateJ)
 			oscState = json_integer_value(oscstateJ);
-      }
       lights[OSC_LIGHT].value=oscState;
+	
 	}
 };
 
 void PLAYER::loadSample(std::string path) {
-	if (audioFile.load (path.c_str())) {
+
+		loading = true;
+		unsigned int c;
+  		unsigned int sr;
+  		drwav_uint64 sc;
+		float* pSampleData;
+		pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &sc);
+
+	if (pSampleData != NULL) {
+		channels = c;
+		sampleRate = sr;
+		playBuffer[0].clear();
+		playBuffer[1].clear();
+		for (unsigned int i=0; i < sc; i = i + c) {
+			playBuffer[0].push_back(pSampleData[i]);
+			if (channels == 2)
+				playBuffer[1].push_back((float)pSampleData[i+1]);
+			
+		}
+		totalSampleCount = playBuffer[0].size();
+		drwav_free(pSampleData);
+loading = false;
+
+
 		fileLoaded = true;
 		vector<double>().swap(displayBuff);
-		for (int i=0; i < audioFile.getNumSamplesPerChannel(); i = i + floor(audioFile.getNumSamplesPerChannel()/130)) {
-			displayBuff.push_back(audioFile.samples[0][i]);
+		for (int i=0; i < floor(totalSampleCount); i = i + floor(totalSampleCount/130)) {
+			displayBuff.push_back(playBuffer[0][i]);
 		}
 		fileDesc = stringFilename(path)+ "\n";
-		fileDesc += std::to_string(audioFile.getSampleRate())+ " Hz" + " - ";                 //"\n";
-		fileDesc += std::to_string(audioFile.getBitDepth())+ " bits" + " \n";
-	//	fileDesc += std::to_string(audioFile.getNumSamplesPerChannel())+ " smp" +"\n";
-	//	fileDesc += std::to_string(audioFile.getLengthInSeconds())+ " s." + "\n";
-		fileDesc += std::to_string(audioFile.getNumChannels())+ " channel(s)" + "\n";
-	//	fileDesc += std::to_string(audioFile.isMono())+ "\n";
-	//	fileDesc += std::to_string(audioFile.isStereo())+ "\n";
+		fileDesc += std::to_string(sampleRate)+ " Hz" + "\n";
+		fileDesc += std::to_string(channels)+ " channel(s)" + "\n";
 
 		if (reload) {
 			DIR* rep = NULL;
@@ -135,26 +172,22 @@ void PLAYER::loadSample(std::string path) {
 
 				std::size_t found = name.find(".wav",name.length()-5);
 				if (found==std::string::npos) found = name.find(".WAV",name.length()-5);
-				if (found==std::string::npos) found = name.find(".aif",name.length()-5);
-				if (found==std::string::npos) found = name.find(".AIF",name.length()-5);
-				if (found==std::string::npos) found = name.find(".aiff",name.length()-5);
-				if (found==std::string::npos) found = name.find(".AIFF",name.length()-5);
 
   				if (found!=std::string::npos) {
 					fichier.push_back(name);
 					if ((dir + "/" + name)==path) {sampnumber = i;}
 					i=i+1;
-            }
+					}
 				
-         }
+				}
 
 //----added by Joakim Lindbom
-         sort(fichier.begin(), fichier.end());  // Linux needs this to get files in right order
-         for (int o=0;o<int(fichier.size()-1); o++) {
-            if ((dir + "/" + fichier[o])==path) {
-               sampnumber = o;
+		sort(fichier.begin(), fichier.end());  // Linux needs this to get files in right order
+            for (int o=0;o<int(fichier.size()-1); o++) {
+                if ((dir + "/" + fichier[o])==path) {
+                    sampnumber = o;
+                }
             }
-         }
 //---------------
 
 			closedir(rep);
@@ -185,7 +218,7 @@ void PLAYER::step() {
 			if (sampnumber > 0) sampnumber=sampnumber-1; else sampnumber =int(fichier.size()-1);
 			loadSample(dir + "/" + fichier[sampnumber]);
 			} 
-	} else fileDesc = "right click to load \n .wav or .aif sample \n :)";
+	} else fileDesc = "right click to load \n .wav sample \n :)";
 
 if (oscTrigger.process(params[OSC_PARAM].value))
 			{oscState =!oscState;lights[OSC_LIGHT].value=oscState;}
@@ -195,8 +228,8 @@ if (!oscState) {
     bool gated = inputs[GATE_INPUT].value > 0;
     
     if (inputs[POS_INPUT].active)
-    startPos = clamp((params[LSTART_PARAM].value + inputs[POS_INPUT].value * params[TSTART_PARAM].value),0.0f,10.0f)*audioFile.getNumSamplesPerChannel()/10;
-    else {startPos = clamp((params[LSTART_PARAM].value),0.0f,10.0f)*audioFile.getNumSamplesPerChannel()/10;
+    startPos = clamp((params[LSTART_PARAM].value + inputs[POS_INPUT].value * params[TSTART_PARAM].value),0.0f,10.0f)*totalSampleCount/10;
+    else {startPos = clamp((params[LSTART_PARAM].value),0.0f,10.0f)*totalSampleCount/10;
         inputs[POS_INPUT].value = 0 ;
     }
     
@@ -212,18 +245,18 @@ if (!oscState) {
 		}
 	}
     
-	if ((play) && ((floor(samplePos) < audioFile.getNumSamplesPerChannel()) && (floor(samplePos) >= 0))) {
-		if (audioFile.getNumChannels() == 1) {
-			outputs[OUT_OUTPUT].value = 5 * audioFile.samples[0][floor(samplePos)];
-			outputs[OUT2_OUTPUT].value = 5 * audioFile.samples[0][floor(samplePos)];}
-		else if (audioFile.getNumChannels() ==2) {
-			outputs[OUT_OUTPUT].value = 5 * audioFile.samples[0][floor(samplePos)];
-			outputs[OUT2_OUTPUT].value = 5 * audioFile.samples[1][floor(samplePos)];
+	if ((!loading) && (play) && ((floor(samplePos) < totalSampleCount) && (floor(samplePos) >= 0))) {
+		if (channels == 1) {
+			outputs[OUT_OUTPUT].value = 5 * playBuffer[0][floor(samplePos)];
+			outputs[OUT2_OUTPUT].value = 5 * playBuffer[0][floor(samplePos)];}
+		else if (channels ==2) {
+			outputs[OUT_OUTPUT].value = 5 * playBuffer[0][floor(samplePos)];
+			outputs[OUT2_OUTPUT].value = 5 * playBuffer[1][floor(samplePos)];
         		}
 		if (inputs[SPD_INPUT].active)
-        samplePos = samplePos+1+(params[LSPEED_PARAM].value +inputs[SPD_INPUT].value * params[TSPEED_PARAM].value) /3;
+        samplePos = samplePos+powf(2.0, inputs[VO_INPUT].value)+(params[LSPEED_PARAM].value +inputs[SPD_INPUT].value * params[TSPEED_PARAM].value) /3;
         else {
-            samplePos = samplePos+1+(params[LSPEED_PARAM].value) /3;
+            samplePos = samplePos+powf(2.0, inputs[VO_INPUT].value)+(params[LSPEED_PARAM].value) /3;
             inputs[SPD_INPUT].value = 0 ;}
 	}
 	else
@@ -234,20 +267,20 @@ if (!oscState) {
        if (!inputs[TRIG_INPUT].active) {if (gated == false) {play = false; outputs[OUT_OUTPUT].value = 0;outputs[OUT2_OUTPUT].value = 0;}}
 } else {
 	
-	if (((floor(samplePos) < audioFile.getNumSamplesPerChannel()) && (floor(samplePos) >= 0))) {
+	if (((floor(samplePos) < totalSampleCount) && (floor(samplePos) >= 0))) {
 		if (playTrigger.process(inputs[TRIG_INPUT].value)) samplePos = 0;
 
-		if (audioFile.getNumChannels() == 1) {
-			outputs[OUT_OUTPUT].value = 5 * audioFile.samples[0][floor(samplePos)];
-			outputs[OUT2_OUTPUT].value = 5 * audioFile.samples[0][floor(samplePos)];}
-		else if (audioFile.getNumChannels() ==2) {
-			outputs[OUT_OUTPUT].value = 5 * audioFile.samples[0][floor(samplePos)];
-			outputs[OUT2_OUTPUT].value = 5 * audioFile.samples[1][floor(samplePos)];
+		if (channels == 1) {
+			outputs[OUT_OUTPUT].value = 5 * playBuffer[0][floor(samplePos)];
+			outputs[OUT2_OUTPUT].value = 5 * playBuffer[0][floor(samplePos)];}
+		else if (channels ==2) {
+			outputs[OUT_OUTPUT].value = 5 * playBuffer[0][floor(samplePos)];
+			outputs[OUT2_OUTPUT].value = 5 * playBuffer[1][floor(samplePos)];
         		}
 		if (inputs[SPD_INPUT].active)
-        samplePos = samplePos+1+(params[LSPEED_PARAM].value +inputs[SPD_INPUT].value * params[TSPEED_PARAM].value) /3;
+        samplePos = samplePos+powf(2.0, inputs[VO_INPUT].value)+(params[LSPEED_PARAM].value +inputs[SPD_INPUT].value * params[TSPEED_PARAM].value) /3;
         else {
-            samplePos = samplePos+1+(params[LSPEED_PARAM].value) /3;
+            samplePos = samplePos+powf(2.0, inputs[VO_INPUT].value)+(params[LSPEED_PARAM].value) /3;
             inputs[SPD_INPUT].value = 0 ;}
 	}
 	else
@@ -307,8 +340,8 @@ struct PLAYERDisplay : TransparentWidget {
             nvgStrokeWidth(vg, 0.8);
 			{
 				nvgBeginPath(vg);
-				nvgMoveTo(vg, floor(module->samplePos * 125 / module->audioFile.getNumSamplesPerChannel()) , 85);
-				nvgLineTo(vg, floor(module->samplePos * 125 / module->audioFile.getNumSamplesPerChannel()) , 165);
+				nvgMoveTo(vg, floor(module->samplePos * 125 / module->totalSampleCount) , 85);
+				nvgLineTo(vg, floor(module->samplePos * 125 / module->totalSampleCount) , 165);
 				nvgClosePath(vg);
 			}
 			nvgStroke(vg);
@@ -318,8 +351,8 @@ struct PLAYERDisplay : TransparentWidget {
             nvgStrokeWidth(vg, 1.5);
 			{
 				nvgBeginPath(vg);
-				nvgMoveTo(vg, floor(module->startPos * 125 / module->audioFile.getNumSamplesPerChannel()) , 85);
-				nvgLineTo(vg, floor(module->startPos * 125 / module->audioFile.getNumSamplesPerChannel()) , 165);
+				nvgMoveTo(vg, floor(module->startPos * 125 / module->totalSampleCount) , 85);
+				nvgLineTo(vg, floor(module->startPos * 125 / module->totalSampleCount) , 165);
 				nvgClosePath(vg);
 			}
 			nvgStroke(vg);
@@ -380,8 +413,8 @@ PLAYERWidget::PLAYERWidget(PLAYER *module) : ModuleWidget(module) {
 	static const float portX0[4] = {10, 40, 70, 100};
 	
 
-	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(23, 230), module, PLAYER::LSTART_PARAM, 0.0f, 10.0f, 0.0f));
-	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(73, 230), module, PLAYER::LSPEED_PARAM, -5.0f, 5.0f, 0.0f));
+	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(23, 235), module, PLAYER::LSTART_PARAM, 0.0f, 10.0f, 0.0f));
+	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(73, 235), module, PLAYER::LSPEED_PARAM, -5.0f, 5.0f, 0.0f));
 	addParam(ParamWidget::create<Trimpot>(Vec(42, 278), module, PLAYER::TSTART_PARAM, -1.0f, 1.0f, 0.0f));
 	addParam(ParamWidget::create<Trimpot>(Vec(73, 278), module, PLAYER::TSPEED_PARAM, -1.0f, 1.0f, 0.0f));
 
@@ -397,9 +430,9 @@ PLAYERWidget::PLAYERWidget(PLAYER *module) : ModuleWidget(module) {
 	addParam(ParamWidget::create<upButton>(Vec(43, 95), module, PLAYER::PREV_PARAM, 0.0f, 1.0f, 0.0f));
 	addParam(ParamWidget::create<downButton>(Vec(73, 95), module, PLAYER::NEXT_PARAM, 0.0f, 1.0f, 0.0f));
 
-	addParam(ParamWidget::create<LEDButton>(Vec(11, 210), module, PLAYER::OSC_PARAM, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(15.4, 214.4), module, PLAYER::OSC_LIGHT));
-
+	addParam(ParamWidget::create<LEDButton>(Vec(104, 212), module, PLAYER::OSC_PARAM, 0.0, 1.0, 0.0));
+		addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(108.4, 216.4), module, PLAYER::OSC_LIGHT));
+	addInput(Port::create<PJ301MPort>(Vec(portX0[0], 210), Port::INPUT, module, PLAYER::VO_INPUT));
 }
 
 struct PLAYERItem : MenuItem {

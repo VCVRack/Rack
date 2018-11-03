@@ -25,7 +25,6 @@ struct L3DS3Q : Module {
 	};
 
 
-int wait = 0;
 int pas = 0;
 bool ledState[80] = {};
 int tempState[5] = {};
@@ -33,7 +32,7 @@ bool editState = false ;
 SchmittTrigger rstTrigger;
 SchmittTrigger upTrigger;
 SchmittTrigger editTrigger;
-
+SchmittTrigger ledTrigger[80] ={};
 
 	L3DS3Q() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -91,7 +90,7 @@ void L3DS3Q::step() {
 	if (upTrigger.process(inputs[UP_INPUT].value))
 			{
 				for (int i = 0; i < 5; i++) {
-					if (ledState[(i+pas*5)%80]) tempState [i] = 20;
+					if (ledState[(i+pas*5)%80]) tempState [i] = 50;
 				}
 				if (pas <15) pas = pas+1; else pas =0;
 			}
@@ -105,29 +104,21 @@ void L3DS3Q::step() {
 		{
 			for (int i = 0; i < 80; i++) {lights[LED_LIGHT +i].value=ledState[(i+pas*5)%80];}
 
-			if (wait == 0) {
 				for (int i = 0; i < 80; i++) {
-					if (params[ON_PARAM +i].value) {ledState[(i+pas*5)%80]=!ledState[(i+pas*5)%80]; wait = 20000;}
-			}} else wait = wait-1;
+					if (ledTrigger[i].process(params[ON_PARAM +i].value)) {ledState[(i+pas*5)%80]=!ledState[(i+pas*5)%80];}
+			};
 
 		} else {
 			for (int i = 0; i < 80; i++) {lights[LED_LIGHT +i].value=ledState[i];}
-			if (wait == 0) {
+
 				for (int i = 0; i < 80; i++) {
-					if (params[ON_PARAM +i].value) {ledState[i]=!ledState[i]; wait = 20000;}
-				}} else wait = wait-1;
+					if (ledTrigger[i].process(params[ON_PARAM +i].value)) {ledState[i]=!ledState[i];}
+				};
 		}
 
 	for (int i = 0; i < 5; i++) {
 			if (tempState [i]>0) {tempState [i] = tempState [i]-1;outputs[TR_OUTPUT+i].value=10.0f;} else outputs[TR_OUTPUT+i].value=0.0f;
 		}
-
-	//if (wait == 0) {
-	//	for (int i = 0; i < 80; i++) {
-			
-	//		if (params[ON_PARAM +i].value) {ledState[i]=!ledState[i]; wait = 20000;}
-	//		lights[LED_LIGHT +i].value=ledState[i];
-	//}} else wait = wait-1;
 
 
 }

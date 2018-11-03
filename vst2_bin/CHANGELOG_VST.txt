@@ -1,4 +1,14 @@
 
+** November ??, 2018
+- update cf modules to v0.6.7
+- add module cf.ALGEBRA
+- add module cf.BUFFER
+- add module cf.CHOKE
+- add module cf.DISTO
+- add module cf.PLAY
+- add module cf.VARIABLE
+
+
 ** October 31st, 2018
 - add Linux port
    - thanks to Github user "cameronleger" for porting LGLW !

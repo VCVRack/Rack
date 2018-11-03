@@ -1,7 +1,10 @@
 COMMON_OBJ= \
-	src/AudioFile.o \
+   src/ALGEBRA.o \
+   src/BUFFER.o \
+   src/CHOKE.o \
 	src/CUBE.o \
 	src/DAVE.o \
+	src/DISTO.o \
 	src/EACH.o \
 	src/FOUR.o \
 	src/L3DS3Q.o \
@@ -12,11 +15,13 @@ COMMON_OBJ= \
 	src/MONO.o \
 	src/PATCH.o \
 	src/PEAK.o \
+	src/PLAY.o \
 	src/PLAYER.o \
 	src/SLIDERSEQ.o \
 	src/STEPS.o \
 	src/STEREO.o \
 	src/SUB.o \
+	src/VARIABLE.o \
 	src/cf.o \
 	src/trSEQ.o
 

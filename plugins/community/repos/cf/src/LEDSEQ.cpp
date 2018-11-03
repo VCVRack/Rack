@@ -25,7 +25,7 @@ struct LEDSEQ : Module {
 	};
 
 
-int wait = 0;
+
 int pas = 0;
 bool ledState[80] = {};
 int tempState[5] = {};
@@ -33,6 +33,7 @@ bool editState = false ;
 SchmittTrigger rstTrigger;
 SchmittTrigger upTrigger;
 SchmittTrigger editTrigger;
+SchmittTrigger ledTrigger[80] ={};
 
 
 	LEDSEQ() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
@@ -91,7 +92,7 @@ void LEDSEQ::step() {
 	if (upTrigger.process(inputs[UP_INPUT].value))
 			{
 				for (int i = 0; i < 5; i++) {
-					if (ledState[(i+pas*5)%80]) tempState [i] = 20;
+					if (ledState[(i+pas*5)%80]) tempState [i] = 50;
 				}
 				if (pas <15) pas = pas+1; else pas =0;
 			}
@@ -105,17 +106,17 @@ void LEDSEQ::step() {
 		{
 			for (int i = 0; i < 80; i++) {lights[LED_LIGHT +i].value=ledState[(i+pas*5)%80];}
 
-			if (wait == 0) {
+			
 				for (int i = 0; i < 80; i++) {
-					if (params[ON_PARAM +i].value) {ledState[(i+pas*5)%80]=!ledState[(i+pas*5)%80]; wait = 20000;}
-			}} else wait = wait-1;
+					if (ledTrigger[i].process(params[ON_PARAM +i].value)) {ledState[(i+pas*5)%80]=!ledState[(i+pas*5)%80];}
+			};
 
 		} else {
 			for (int i = 0; i < 80; i++) {lights[LED_LIGHT +i].value=ledState[i];}
-			if (wait == 0) {
+			
 				for (int i = 0; i < 80; i++) {
-					if (params[ON_PARAM +i].value) {ledState[i]=!ledState[i]; wait = 20000;}
-				}} else wait = wait-1;
+					if (ledTrigger[i].process(params[ON_PARAM +i].value)) {ledState[i]=!ledState[i];}
+				};
 		}
 
 	for (int i = 0; i < 5; i++) {

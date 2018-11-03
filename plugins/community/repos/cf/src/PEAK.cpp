@@ -15,10 +15,12 @@ struct PEAK : Module {
 	enum InputIds {
 		LIN1_INPUT,
 		IN1_INPUT,
+		IN2_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
 		OUT1_OUTPUT,
+		OUT2_OUTPUT,
 		NUM_OUTPUTS
 	};
     enum LightIds {
@@ -71,6 +73,37 @@ void PEAK::step() {
         lights[TRESHOLD_LIGHT].value = 0.0;
         lights[OVER_LIGHT].value = 0.0;
 	}
+
+
+
+	if (inputs[IN2_INPUT].active)
+	{
+
+        if (inputs[IN2_INPUT].value > params[TRESHOLD_PARAM].value)
+        	{
+            	outputs[OUT2_OUTPUT].value = (max_GAIN/10.0*(params[TRESHOLD_PARAM].value + ((inputs[IN2_INPUT].value-params[TRESHOLD_PARAM].value)/(1+(inputs[IN2_INPUT].value-params[TRESHOLD_PARAM].value)))));
+            	reman_t = sensiv;
+        	}
+        else if (inputs[IN2_INPUT].value < 0-params[TRESHOLD_PARAM].value)
+        	{
+            	outputs[OUT2_OUTPUT].value = (max_GAIN/10.0*(0-(params[TRESHOLD_PARAM].value - ((inputs[IN2_INPUT].value+params[TRESHOLD_PARAM].value)/(1+(-inputs[IN2_INPUT].value-params[TRESHOLD_PARAM].value))))));
+            	reman_t = sensiv;
+        	}
+        	else 
+		{
+          	  outputs[OUT2_OUTPUT].value =(max_GAIN*inputs[IN2_INPUT].value)/10.0;
+       		}
+
+        if (outputs[OUT2_OUTPUT].value >10) reman_o=sensiv;
+        
+	}
+	else
+	{
+	outputs[OUT2_OUTPUT].value = max_GAIN/10;
+        lights[TRESHOLD_LIGHT].value = 0.0;
+        lights[OVER_LIGHT].value = 0.0;
+	}
+
 
 	if (reman_t >0) 
 	{
@@ -158,9 +191,13 @@ PEAKWidget::PEAKWidget(PEAK *module) : ModuleWidget(module) {
 	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(27, 227), module, PEAK::TRESHOLD_PARAM, 0.0f, 10.0f, 10.0f));
 		addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(42.4, 211.4), module, PEAK::TRESHOLD_LIGHT));
 
-	addInput(Port::create<PJ301MPort>(Vec(11, 321), Port::INPUT, module, PEAK::IN1_INPUT));
+	addInput(Port::create<PJ301MPort>(Vec(11, 308), Port::INPUT, module, PEAK::IN1_INPUT));
 
-	addOutput(Port::create<PJ301MPort>(Vec(54, 321), Port::OUTPUT, module, PEAK::OUT1_OUTPUT));
+	addOutput(Port::create<PJ301MPort>(Vec(54, 308), Port::OUTPUT, module, PEAK::OUT1_OUTPUT));
+
+	addInput(Port::create<PJ301MPort>(Vec(11, 334), Port::INPUT, module, PEAK::IN2_INPUT));
+
+	addOutput(Port::create<PJ301MPort>(Vec(54, 334), Port::OUTPUT, module, PEAK::OUT2_OUTPUT));
 
 NumbDisplayWidget *display = new NumbDisplayWidget();
 	display->box.pos = Vec(20,56);

@@ -27,9 +27,9 @@ struct CUBE : Module {
 	float yy[12] = {-1.0,-1.0, 1.0, 1.0,-1.0,-1.0, 1.0, 1.0};
 	float zz[12] = {-1.0,-1.0,-1.0,-1.0, 1.0, 1.0, 1.0, 1.0};
 
-	float x[12] = {};
-	float y[12] = {};
-	float z[12] = {};
+	float x[8] = {};
+	float y[8] = {};
+	float z[8] = {};
 
 	float d = 0.0;
 	float theta= 0.0 ;
@@ -49,7 +49,7 @@ void CUBE::step() {
 	if (inputs[X_INPUT].active) gainX=inputs[X_INPUT].value;
 	if (inputs[Y_INPUT].active) gainY=inputs[Y_INPUT].value;
 
-       	for(int i=0; i<12; i++)
+       	for(int i=0; i<8; i++)
         	{
 			d = sqrt(yy[i]*yy[i] + zz[i]*zz[i]);
 			theta = atan2(yy[i],zz[i])+frameX;
@@ -73,8 +73,8 @@ void CUBE::step() {
 
 struct CUBEDisplay : TransparentWidget {
 
-	float *xxxx[12] = {};
-	float *yyyy[12] = {};
+	float *xxxx[8] = {};
+	float *yyyy[8] = {};
 
 	CUBEDisplay() {
 		
@@ -155,7 +155,7 @@ CUBEWidget::CUBEWidget(CUBE *module) : ModuleWidget(module) {
 	{
 		CUBEDisplay *display = new CUBEDisplay();
 		display->box.pos = Vec(60, 120);
-		for (int i=0;i<12;i++) {
+		for (int i=0;i<8;i++) {
 			display->xxxx[i] = &module->x[i] ;
 			display->yyyy[i] = &module->y[i] ;	
 		}

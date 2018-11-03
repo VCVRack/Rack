@@ -50,8 +50,8 @@ void EACH::step() {
 		max_EACH = floor(params[DIV_PARAM].value);
 		or_affi=0;
 	} else {
-		max_EACH = round(clamp((inputs[DIV_INPUT].value * 1.2)+1,1.0f,12.0f));
-		or_gain = round(clamp(inputs[DIV_INPUT].value,0.0f,10.0f));
+		max_EACH = round(clamp((inputs[DIV_INPUT].value * 4.8)+1,1.0f,48.0f));
+		or_gain = (clamp(inputs[DIV_INPUT].value,0.0f,10.0f));
 		or_affi=1;
 	}
 
@@ -66,7 +66,7 @@ void EACH::step() {
 	if (inputs[DOUZE_INPUT].active) {
 		
 		if (stepa == max_EACH) {
-			note = 5;
+			note = 50;
 			stepa = 0; 
 			lum = 2000;
 			}
@@ -180,7 +180,7 @@ EACHWidget::EACHWidget(EACH *module) : ModuleWidget(module) {
 	addOutput(Port::create<PJ301MPort>(Vec(54, 321), Port::OUTPUT, module, EACH::DOUZE_OUTPUT));
 	addOutput(Port::create<PJ301MPort>(Vec(35, 235), Port::OUTPUT, module, EACH::BEAT_OUTPUT));
 
-	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(27, 107), module, EACH::DIV_PARAM, 1.0f, 12.1f, 3.1f));
+	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(27, 107), module, EACH::DIV_PARAM, 1.0f, 48.1f, 3.1f));
 	addInput(Port::create<PJ301MPort>(Vec(11, 141), Port::INPUT, module, EACH::DIV_INPUT));
 	{
 		MOTORPOTDisplay *display = new MOTORPOTDisplay();

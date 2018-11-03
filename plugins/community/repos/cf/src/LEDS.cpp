@@ -27,6 +27,7 @@ bool ledState[100] = {};
 bool tempState[5] = {};
 SchmittTrigger rndTrigger;
 SchmittTrigger upTrigger;
+SchmittTrigger ledTrigger[100];
 
 
 	LEDS() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
@@ -94,12 +95,12 @@ void LEDS::step() {
 				{ledState[i+95] = tempState[i];}
 			}
 
-	if (wait == 0) {
+	
 		for (int i = 0; i < 100; i++) {
 			
-			if (params[ON_PARAM +i].value) {ledState[i]=!ledState[i]; wait = 20000;}
+			if (ledTrigger[i].process(params[ON_PARAM +i].value)) {ledState[i]=!ledState[i];}
 			lights[LED_LIGHT +i].value=ledState[i];
-	}} else wait = wait-1;
+		}
 
 
 }
