@@ -58,12 +58,12 @@
 //
 // Regular log entry (low frequency)
 //
-#define Dlog if(0);else LOG_FXN
+#define Dlog if(1);else LOG_FXN
 
 //
 // Verbose log entry
 //
-#define Dlog_v if(0);else LOG_FXN
+#define Dlog_v if(1);else LOG_FXN
 
 //
 // Very-verbose log entry
@@ -74,15 +74,6 @@
 // Very-very-verbose log entry
 //
 #define Dlog_vvv if(1);else LOG_FXN
-
-//
-// Print to stdout
-//
-//   Please use the Dlog* macros instead!
-//
-#define Dprintf if(0);else printf
-
-#define Dprintf_verbose if(1);else printf
 
 // ---------------------------------------------------------------------------- macros and defines
 #define LGLW(a) lglw_int_t *lglw = ((lglw_int_t*)(a))
@@ -256,8 +247,6 @@ static int xerror_handler(Display *display, XErrorEvent *error) {
 lglw_t lglw_init(int32_t _w, int32_t _h) {
    lglw_int_t *lglw = malloc(sizeof(lglw_int_t));
 
-   Dprintf("xxx lglw_init: sizeof(uint32_t)=%lu sizeof(long)=%lu sizeof(void*)=%lu\n", sizeof(uint32_t), sizeof(long), sizeof(void*));
-
    // TODO: remove/improve
    logfile = fopen("/tmp/lglw_log.txt", "w");
    XSetErrorHandler(xerror_handler);
@@ -333,6 +322,20 @@ void *lglw_userdata_get(lglw_t _lglw) {
    return NULL;
 }
 
+// ---------------------------------------------------------------------------- lglw_userdata_get
+void loc_create_gl(lglw_int_t *lglw) {
+   lglw->ctx = glXCreateContext(lglw->xdsp, lglw->vi, None, True);
+}
+
+// ---------------------------------------------------------------------------- lglw_userdata_get
+void loc_destroy_gl(lglw_int_t *lglw) {
+   if(NULL != lglw->xdsp && NULL != lglw->ctx)
+   {
+      glXMakeCurrent(lglw->xdsp, None, NULL);
+      glXDestroyContext(lglw->xdsp, lglw->ctx);
+   }
+}
+
 
 // ---------------------------------------------------------------------------- loc_create_hidden_window
 static lglw_bool_t loc_create_hidden_window(lglw_int_t *lglw, int32_t _w, int32_t _h) {
@@ -359,7 +362,7 @@ static lglw_bool_t loc_create_hidden_window(lglw_int_t *lglw, int32_t _w, int32_
    }
 
    Dlog_v("lglw:loc_create_hidden_window: 5\n");
-   lglw->ctx = glXCreateContext(lglw->xdsp, lglw->vi, None, True);
+   loc_create_gl(lglw);
 
    if(NULL == lglw->ctx)
    {
@@ -399,11 +402,7 @@ static lglw_bool_t loc_create_hidden_window(lglw_int_t *lglw, int32_t _w, int32_
 // ---------------------------------------------------------------------------- loc_destroy_hidden_window
 static void loc_destroy_hidden_window(lglw_int_t *lglw) {
    Dlog_v("lglw:loc_destroy_hidden_window: 1\n");
-   if(NULL != lglw->xdsp && NULL != lglw->ctx)
-   {
-      glXMakeCurrent(lglw->xdsp, None, NULL);
-      glXDestroyContext(lglw->xdsp, lglw->ctx);
-   }
+   loc_destroy_gl(lglw);
    Dlog_v("lglw:loc_destroy_hidden_window: 2\n");
    if(NULL != lglw->xdsp && 0 != lglw->hidden.xwnd) XDestroyWindow(lglw->xdsp, lglw->hidden.xwnd);
    Dlog_v("lglw:loc_destroy_hidden_window: 3\n");
@@ -444,7 +443,7 @@ static void loc_eventProc(XEvent *xev, lglw_int_t *lglw) {
             break;
 
          case Expose:
-            Dlog_vv("lglw:loc_eventProc: xev Expose\n");
+            Dlog_vvv("lglw:loc_eventProc: xev Expose\n");
             loc_handle_queued_mouse_warp(lglw);
             eventHandled = LGLW_FALSE;
             if(NULL != lglw->redraw.cbk)
@@ -1295,53 +1294,52 @@ lglw_bool_t lglw_window_resize (lglw_t _lglw, int32_t _w, int32_t _h) {
 
    if(NULL != lglw)
    {
+      if(0 != lglw->hidden.xwnd)
+      {
+         XResizeWindow(lglw->xdsp, lglw->hidden.xwnd, _w, _h);
+         loc_destroy_gl(lglw);
+         loc_create_gl(lglw);
+      }
+
       if(0 != lglw->win.xwnd)
       {
-         Dlog_v("lglw:lglw_window_resize: 1\n");
          r = LGLW_TRUE;
 
-         Dlog_v("lglw:lglw_window_resize: 2\n");
-         XResizeWindow(lglw->xdsp, lglw->win.xwnd, _w, _h);
-         XRaiseWindow(lglw->xdsp, lglw->win.xwnd);
-
-         Dlog_v("lglw:lglw_window_resize: 3\n");
          int deltaW = _w - lglw->win.size.x;
          int deltaH = _h - lglw->win.size.y;
 
-         Dlog_v("lglw:lglw_window_resize: 4\n");
+         Dlog_v("Child Window Resize; old (%5i x %5i) new(%5i x %5i)\n", lglw->win.size.x, lglw->win.size.y, _w, _h);
+
          lglw->win.size.x = _w;
          lglw->win.size.y = _h;
 
-         Dlog_v("lglw:lglw_window_resize: 5\n");
          Window root, parent, *children = NULL;
          unsigned int num_children;
 
-         Dlog_v("lglw:lglw_window_resize: 6\n");
          if(!XQueryTree(lglw->xdsp, lglw->win.xwnd, &root, &parent, &children, &num_children))
             return r;
 
-         Dlog_v("lglw:lglw_window_resize: 7\n");
          if(children)
             XFree((char *)children);
 
-         Dlog_v("lglw:lglw_window_resize: 8\n");
          // Resize parent window (if any)
          if(0 != parent)
          {
-            Dlog_v("lglw:lglw_window_resize: 8.1\n");
             int x, y;
             unsigned int width, height;
             unsigned int border_width;
             unsigned int depth;
 
-            Dlog_v("lglw:lglw_window_resize: 8.2\n");
             if(!XGetGeometry(lglw->xdsp, lglw->win.xwnd, &root, &x, &y, &width, &height, &border_width, &depth))
                return r;
 
-            Dlog_v("lglw:lglw_window_resize: 8.3\n");
+            Dlog_v("Parent Window Resize; old (%5i x %5i) new(%5i x %5i), delta (%5i x %5i)\n", width, height, width + deltaW, height + deltaH, deltaW, deltaH);
+
             XResizeWindow(lglw->xdsp, parent, width + deltaW, height + deltaH);
          }
-         Dlog_v("lglw:lglw_window_resize: EXIT\n");
+
+         XResizeWindow(lglw->xdsp, lglw->win.xwnd, _w, _h);
+         XRaiseWindow(lglw->xdsp, lglw->win.xwnd);
       }
    }
 
@@ -1561,7 +1559,7 @@ void lglw_swap_buffers(lglw_t _lglw) {
    {
       if(0 != lglw->win.xwnd)
       {
-         Dlog_vv("lglw:lglw_swap_buffers: 1\n");
+         Dlog_vvv("lglw:lglw_swap_buffers: 1\n");
          glXSwapBuffers(lglw->xdsp, lglw->win.xwnd);
       }
    }
