@@ -439,6 +439,7 @@ void windowRun() {
 
 		// Poll events
 		glfwPollEvents();
+		glfwMakeContextCurrent(gWindow);
 		{
 			double xpos, ypos;
 			glfwGetCursorPos(gWindow, &xpos, &ypos);
