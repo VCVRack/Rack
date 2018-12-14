@@ -61,7 +61,7 @@ struct MIDIToCVInterface : Module {
 		onReset();
 	}
 
-	json_t *toJson() override {
+	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 
 		json_t *divisionsJ = json_array();
@@ -75,7 +75,7 @@ struct MIDIToCVInterface : Module {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		json_t *divisionsJ = json_object_get(rootJ, "divisions");
 		if (divisionsJ) {
 			for (int i = 0; i < 2; i++) {

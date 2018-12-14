@@ -36,6 +36,7 @@ struct ModuleWidget : OpaqueWidget {
 
 	virtual json_t *toJson();
 	virtual void fromJson(json_t *rootJ);
+
 	void copyClipboard();
 	void pasteClipboard();
 	void save(std::string filename);

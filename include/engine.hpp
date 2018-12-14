@@ -115,9 +115,12 @@ struct Module {
 		randomize();
 	}
 
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
+
 	/** Override these to store extra internal data in the "data" property of the module's JSON object */
-	virtual json_t *toJson() { return NULL; }
-	virtual void fromJson(json_t *root) {}
+	virtual json_t *dataToJson() { return NULL; }
+	virtual void dataFromJson(json_t *root) {}
 
 	/** Deprecated */
 	virtual void reset() {}

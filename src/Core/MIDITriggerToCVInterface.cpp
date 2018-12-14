@@ -107,7 +107,7 @@ struct MIDITriggerToCVInterface : Module {
 		}
 	}
 
-	json_t *toJson() override {
+	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 
 		json_t *notesJ = json_array();
@@ -122,7 +122,7 @@ struct MIDITriggerToCVInterface : Module {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		json_t *notesJ = json_object_get(rootJ, "notes");
 		if (notesJ) {
 			for (int i = 0; i < 16; i++) {

@@ -66,23 +66,14 @@ json_t *ModuleWidget::toJson() {
 		json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
-	// params
-	if (module) {
-		json_t *paramsJ = json_array();
-		for (Param &param : module->params) {
-			json_t *paramJ = param.toJson();
-			json_array_append_new(paramsJ, paramJ);
-		}
-		json_object_set_new(rootJ, "params", paramsJ);
-	}
-	// data
-	if (module) {
-		json_t *dataJ = module->toJson();
-		if (dataJ) {
-			json_object_set_new(rootJ, "data", dataJ);
-		}
-	}
 
+	// Other properties
+	if (module) {
+		json_t *moduleJ = module->toJson();
+		// Merge with rootJ
+		json_object_update(rootJ, moduleJ);
+		json_decref(moduleJ);
+	}
 	return rootJ;
 }
 
@@ -117,27 +108,8 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 		}
 	}
 
-	// params
-	json_t *paramsJ = json_object_get(rootJ, "params");
-	size_t i;
-	json_t *paramJ;
-	json_array_foreach(paramsJ, i, paramJ) {
-		uint32_t paramId = i;
-		// Get paramId
-		json_t *paramIdJ = json_object_get(paramJ, "paramId");
-		if (paramIdJ) {
-			// Legacy v0.6.0 to <v1.0
-			paramId = json_integer_value(paramIdJ);
-		}
-		if (paramId < module->params.size()) {
-			module->params[paramId].fromJson(paramJ);
-		}
-	}
-
-	// data
-	json_t *dataJ = json_object_get(rootJ, "data");
-	if (dataJ && module) {
-		module->fromJson(dataJ);
+	if (module) {
+		module->fromJson(rootJ);
 	}
 }
 

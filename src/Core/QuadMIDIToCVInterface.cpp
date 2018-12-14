@@ -55,14 +55,14 @@ struct QuadMIDIToCVInterface : Module {
 		onReset();
 	}
 
-	json_t *toJson() override {
+	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		json_object_set_new(rootJ, "polyMode", json_integer(polyMode));
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);

@@ -125,13 +125,13 @@ struct AudioInterface : Module {
 
 	void step() override;
 
-	json_t *toJson() override {
+	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "audio", audioIO.toJson());
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		json_t *audioJ = json_object_get(rootJ, "audio");
 		audioIO.fromJson(audioJ);
 	}
