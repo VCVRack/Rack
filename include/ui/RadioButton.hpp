@@ -1,36 +1,53 @@
 #pragma once
+#include "widgets/OpaqueWidget.hpp"
 #include "ui/common.hpp"
-#include "ui/QuantityWidget.hpp"
 
 
 namespace rack {
 
 
-struct RadioButton : OpaqueWidget, QuantityWidget {
+struct RadioButton : OpaqueWidget {
 	BNDwidgetState state = BND_DEFAULT;
+	Quantity *quantity = NULL;
 
 	RadioButton() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 
+	~RadioButton() {
+		if (quantity)
+			delete quantity;
+	}
+
 	void draw(NVGcontext *vg) override {
-		bndRadioButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, value == 0.0 ? state : BND_ACTIVE, -1, label.c_str());
+		std::string label;
+		if (quantity)
+			label = quantity->getLabel();
+		bndRadioButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
 	}
 
 	void onEnter(event::Enter &e) override {
-		state = BND_HOVER;
+		if (state != BND_ACTIVE)
+			state = BND_HOVER;
 	}
 
 	void onLeave(event::Leave &e) override {
-		state = BND_DEFAULT;
+		if (state != BND_ACTIVE)
+			state = BND_DEFAULT;
 	}
 
 	void onDragDrop(event::DragDrop &e) override {
 		if (e.origin == this) {
-			if (value)
-				setValue(0.0);
-			else
-				setValue(1.0);
+			if (state == BND_ACTIVE) {
+				state = BND_HOVER;
+				if (quantity)
+					quantity->setMin();
+			}
+			else {
+				state = BND_ACTIVE;
+				if (quantity)
+					quantity->setMax();
+			}
 
 			event::Action eAction;
 			onAction(eAction);

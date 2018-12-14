@@ -1,17 +1,21 @@
 #pragma once
+#include "widgets/OpaqueWidget.hpp"
 #include "app/common.hpp"
+#include "app/MultiLightWidget.hpp"
 
 
 namespace rack {
 
 
-struct Port : Component {
+struct Port : OpaqueWidget {
+	Module *module = NULL;
+	int portId;
+
 	enum PortType {
 		INPUT,
 		OUTPUT
 	};
 	PortType type = INPUT;
-	int portId;
 	MultiLightWidget *plugLight;
 
 	Port();

@@ -1,4 +1,6 @@
 #pragma once
+#include "widgets/OpaqueWidget.hpp"
+#include "ui/common.hpp"
 #include "ui/MenuEntry.hpp"
 
 

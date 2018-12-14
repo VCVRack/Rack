@@ -153,17 +153,17 @@ json_t *WireWidget::toJson() {
 void WireWidget::fromJson(json_t *rootJ) {
 	json_t *colorJ = json_object_get(rootJ, "color");
 	if (colorJ) {
-		// Legacy v0.6.0 and earlier
-		if (json_is_object(colorJ))
-			color = jsonToColor(colorJ);
-		else
+		// v0.6.0 and earlier patches use JSON objects. Just ignore them if so and use the existing wire color.
+		if (json_is_string(colorJ))
 			color = color::fromHexString(json_string_value(colorJ));
 	}
 }
 
 void WireWidget::draw(NVGcontext *vg) {
-	float opacity = gToolbar->wireOpacitySlider->value / 100.0;
-	float tension = gToolbar->wireTensionSlider->value;
+	// float opacity = gToolbar->wireOpacitySlider->value / 100.0;
+	// float tension = gToolbar->wireTensionSlider->value;
+	float opacity = 0.5;
+	float tension = 0.5;
 
 	WireWidget *activeWire = gRackWidget->wireContainer->activeWire;
 	if (activeWire) {

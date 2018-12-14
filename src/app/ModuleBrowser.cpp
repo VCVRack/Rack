@@ -44,8 +44,19 @@ static bool isModelMatch(Model *model, std::string search) {
 }
 
 
+struct FavoriteQuantity : Quantity {
+	std::string getString() override {
+		return "★";
+	}
+};
+
+
 struct FavoriteRadioButton : RadioButton {
 	Model *model = NULL;
+
+	FavoriteRadioButton() {
+		quantity = new FavoriteQuantity;
+	}
 
 	void onAction(event::Action &e) override;
 };
@@ -111,13 +122,12 @@ struct ModelItem : BrowserListItem {
 
 		FavoriteRadioButton *favoriteButton = createWidget<FavoriteRadioButton>(Vec(8, itemMargin));
 		favoriteButton->box.size.x = 20;
-		favoriteButton->label = "★";
 		addChild(favoriteButton);
 
 		// Set favorite button initial state
 		auto it = sFavoriteModels.find(model);
 		if (it != sFavoriteModels.end())
-			favoriteButton->setValue(1);
+			favoriteButton->quantity->setValue(1);
 		favoriteButton->model = model;
 
 		Label *nameLabel = createWidget<Label>(favoriteButton->box.getTopRight());
@@ -465,7 +475,7 @@ void ClearFilterItem::onAction(event::Action &e) {
 void FavoriteRadioButton::onAction(event::Action &e) {
 	if (!model)
 		return;
-	if (value) {
+	if (quantity->isMax()) {
 		sFavoriteModels.insert(model);
 	}
 	else {

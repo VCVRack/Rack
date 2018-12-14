@@ -1,4 +1,5 @@
 #pragma once
+#include "widgets/Widget.hpp"
 #include "ui/common.hpp"
 
 
@@ -6,7 +7,7 @@ namespace rack {
 
 
 /** Positions children in a row/column based on their widths/heights */
-struct SequentialLayout : virtual Widget {
+struct SequentialLayout : VirtualWidget {
 	enum Orientation {
 		HORIZONTAL_ORIENTATION,
 		VERTICAL_ORIENTATION,

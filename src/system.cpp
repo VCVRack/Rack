@@ -13,8 +13,8 @@ namespace rack {
 namespace system {
 
 
-std::vector<std::string> listEntries(std::string path) {
-	std::vector<std::string> filenames;
+std::list<std::string> listEntries(std::string path) {
+	std::list<std::string> filenames;
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
 		struct dirent *d;

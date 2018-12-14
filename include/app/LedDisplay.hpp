@@ -1,11 +1,14 @@
 #pragma once
+#include "widgets/Widget.hpp"
+#include "widgets/TransparentWidget.hpp"
+#include "ui/TextField.hpp"
 #include "app/common.hpp"
 
 
 namespace rack {
 
 
-struct LedDisplay : virtual Widget {
+struct LedDisplay : VirtualWidget {
 	void draw(NVGcontext *vg) override;
 };
 

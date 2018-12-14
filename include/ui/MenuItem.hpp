@@ -1,6 +1,6 @@
 #pragma once
 #include "ui/common.hpp"
-#include "ui/MenuOverlay.hpp"
+#include "ui/MenuEntry.hpp"
 
 
 namespace rack {

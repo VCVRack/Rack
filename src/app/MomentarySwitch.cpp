@@ -5,11 +5,15 @@ namespace rack {
 
 
 void MomentarySwitch::onDragStart(event::DragStart &e) {
-	setValue(maxValue);
+	if (quantity) {
+		quantity->setMax();
+	}
 }
 
 void MomentarySwitch::onDragEnd(event::DragEnd &e) {
-	setValue(minValue);
+	if (quantity) {
+		quantity->setMin();
+	}
 }
 
 

@@ -244,6 +244,12 @@ struct Rect {
 	bool isEqual(Rect r) const {
 		return pos.isEqual(r.pos) && size.isEqual(r.size);
 	}
+	float getLeft() const {
+		return pos.x + size.x;
+	}
+	float getBottom() const {
+		return pos.y + size.y;
+	}
 	Vec getCenter() const {
 		return pos.plus(size.mult(0.5f));
 	}

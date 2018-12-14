@@ -1,4 +1,5 @@
 #pragma once
+#include "widgets/TransparentWidget.hpp"
 #include "app/common.hpp"
 
 

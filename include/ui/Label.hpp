@@ -1,11 +1,12 @@
 #pragma once
+#include "widgets/Widget.hpp"
 #include "ui/common.hpp"
 
 
 namespace rack {
 
 
-struct Label : virtual Widget {
+struct Label : VirtualWidget {
 	std::string text;
 	float fontSize;
 	NVGcolor color;

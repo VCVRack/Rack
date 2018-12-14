@@ -1,11 +1,12 @@
 #pragma once
+#include "widgets/Widget.hpp"
 #include "ui/common.hpp"
 
 
 namespace rack {
 
 
-struct Tooltip : virtual Widget {
+struct Tooltip : VirtualWidget {
 	std::string text;
 
 	void draw(NVGcontext *vg) override {

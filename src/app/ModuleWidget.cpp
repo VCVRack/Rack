@@ -61,18 +61,20 @@ json_t *ModuleWidget::toJson() {
 
 	// plugin
 	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
-	// version (of plugin)
+	// version of plugin
 	if (!model->plugin->version.empty())
 		json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 	// params
-	json_t *paramsJ = json_array();
-	for (ParamWidget *paramWidget : params) {
-		json_t *paramJ = paramWidget->toJson();
-		json_array_append_new(paramsJ, paramJ);
+	if (module) {
+		json_t *paramsJ = json_array();
+		for (Param &param : module->params) {
+			json_t *paramJ = param.toJson();
+			json_array_append_new(paramsJ, paramJ);
+		}
+		json_object_set_new(rootJ, "params", paramsJ);
 	}
-	json_object_set_new(rootJ, "params", paramsJ);
 	// data
 	if (module) {
 		json_t *dataJ = module->toJson();
@@ -126,28 +128,15 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	size_t i;
 	json_t *paramJ;
 	json_array_foreach(paramsJ, i, paramJ) {
-		if (legacy && legacy <= 1) {
-			// Legacy 1 mode
-			// The index in the array we're iterating is the index of the ParamWidget in the params vector.
-			if (i < params.size()) {
-				// Create upgraded version of param JSON object
-				json_t *newParamJ = json_object();
-				json_object_set(newParamJ, "value", paramJ);
-				params[i]->fromJson(newParamJ);
-				json_decref(newParamJ);
-			}
+		uint32_t paramId = i;
+		// Get paramId
+		json_t *paramIdJ = json_object_get(paramJ, "paramId");
+		if (paramIdJ) {
+			// Legacy v0.6.0 to <v1.0
+			paramId = json_integer_value(paramIdJ);
 		}
-		else {
-			// Get paramId
-			json_t *paramIdJ = json_object_get(paramJ, "paramId");
-			if (!paramIdJ)
-				continue;
-			int paramId = json_integer_value(paramIdJ);
-			// Find ParamWidget(s) with paramId
-			for (ParamWidget *paramWidget : params) {
-				if (paramWidget->paramId == paramId)
-					paramWidget->fromJson(paramJ);
-			}
+		if (paramId < module->params.size()) {
+			module->params[paramId].fromJson(paramJ);
 		}
 	}
 

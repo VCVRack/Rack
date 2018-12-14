@@ -1,4 +1,4 @@
-#include "app.hpp"
+#include "app/AudioWidget.hpp"
 #include "audio.hpp"
 #include "helpers.hpp"
 

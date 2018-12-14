@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "common.hpp"
 
 
@@ -7,7 +7,7 @@ namespace rack {
 namespace system {
 
 
-std::vector<std::string> listEntries(std::string path);
+std::list<std::string> listEntries(std::string path);
 bool isFile(std::string path);
 bool isDirectory(std::string path);
 void copyFile(std::string srcPath, std::string destPath);

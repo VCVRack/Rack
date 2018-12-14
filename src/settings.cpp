@@ -31,12 +31,12 @@ static json_t *settingsToJson() {
 	}
 
 	// opacity
-	float opacity = gToolbar->wireOpacitySlider->value;
+	float opacity = gToolbar->wireOpacity;
 	json_t *opacityJ = json_real(opacity);
 	json_object_set_new(rootJ, "wireOpacity", opacityJ);
 
 	// tension
-	float tension = gToolbar->wireTensionSlider->value;
+	float tension = gToolbar->wireTension;
 	json_t *tensionJ = json_real(tension);
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
@@ -99,18 +99,17 @@ static void settingsFromJson(json_t *rootJ) {
 	// opacity
 	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");
 	if (opacityJ)
-		gToolbar->wireOpacitySlider->value = json_number_value(opacityJ);
+		gToolbar->wireOpacity = json_number_value(opacityJ);
 
 	// tension
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
-		gToolbar->wireTensionSlider->value = json_number_value(tensionJ);
+		gToolbar->wireTension = json_number_value(tensionJ);
 
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ) {
 		gRackScene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
-		gToolbar->zoomSlider->setValue(json_number_value(zoomJ) * 100.0);
 	}
 
 	// allowCursorLock

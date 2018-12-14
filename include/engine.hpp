@@ -8,7 +8,27 @@ namespace rack {
 
 
 struct Param {
-	float value = 0.0;
+	float value = 0.f;
+	float minValue = 0.f;
+	float maxValue = 1.f;
+	float defaultValue = 0.f;
+	std::string label;
+	std::string unit;
+	int precision = 2;
+
+	// TODO Change this horrible method name
+	void setup(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", int precision = 2) {
+		this->value = defaultValue;
+		this->minValue = minValue;
+		this->maxValue = maxValue;
+		this->defaultValue = defaultValue;
+		this->label = label;
+		this->unit = unit;
+		this->precision = precision;
+	}
+
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
 };
 
 

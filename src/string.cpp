@@ -63,13 +63,16 @@ std::string filename(std::string path) {
 	return filename;
 }
 
+std::string basename(std::string path) {
+	size_t pos = path.rfind('.');
+	return std::string(path, 0, pos);
+}
+
 std::string extension(std::string path) {
-	const char *ext = strrchr(filename(path).c_str(), '.');
-	if (!ext)
-		return "";
-	return ext + 1;
+	size_t pos = path.rfind('.');
+	return std::string(path, pos);
 }
 
 
-} // namespace network
+} // namespace string
 } // namespace rack

@@ -1,11 +1,12 @@
 #pragma once
+#include "widgets/Widget.hpp"
 #include "app/common.hpp"
 
 
 namespace rack {
 
 
-struct PluginManagerWidget : virtual Widget {
+struct PluginManagerWidget : VirtualWidget {
 	Widget *loginWidget;
 	Widget *manageWidget;
 	Widget *downloadWidget;

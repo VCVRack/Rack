@@ -69,10 +69,27 @@ static int smoothParamId;
 static float smoothValue;
 
 
+json_t *Param::toJson() {
+	json_t *rootJ = json_object();
+
+	// Infinite params should serialize to 0
+	float v = (std::isfinite(minValue) && std::isfinite(maxValue)) ? value : 0.f;
+	json_object_set_new(rootJ, "value", json_real(v));
+
+	return rootJ;
+}
+
+void Param::fromJson(json_t *rootJ) {
+	json_t *valueJ = json_object_get(rootJ, "value");
+	if (valueJ)
+		value = json_number_value(valueJ);
+}
+
+
 float Light::getBrightness() {
 	// LEDs are diodes, so don't allow reverse current.
 	// For some reason, instead of the RMS, the sqrt of RMS looks better
-	return powf(fmaxf(0.f, value), 0.25f);
+	return std::pow(std::fmaxf(0.f, value), 0.25f);
 }
 
 void Light::setBrightnessSmooth(float brightness, float frames) {

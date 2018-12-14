@@ -1,5 +1,7 @@
 #pragma once
+#include "widgets/OpaqueWidget.hpp"
 #include "ui/common.hpp"
+#include "ui/Quantity.hpp"
 
 
 namespace rack {
@@ -8,9 +10,16 @@ namespace rack {
 struct Button : OpaqueWidget {
 	std::string text;
 	BNDwidgetState state = BND_DEFAULT;
+	/** Optional, owned. Tracks the pressed state of the button.*/
+	Quantity *quantity = NULL;
 
 	Button() {
 		box.size.y = BND_WIDGET_HEIGHT;
+	}
+
+	~Button() {
+		if (quantity)
+			delete quantity;
 	}
 
 	void draw(NVGcontext *vg) override {
@@ -28,10 +37,14 @@ struct Button : OpaqueWidget {
 
 	void onDragStart(event::DragStart &e) override {
 		state = BND_ACTIVE;
+		if (quantity)
+			quantity->setMax();
 	}
 
 	void onDragEnd(event::DragEnd &e) override {
 		state = BND_HOVER;
+		if (quantity)
+			quantity->setMin();
 	}
 
 	void onDragDrop(event::DragDrop &e) override {

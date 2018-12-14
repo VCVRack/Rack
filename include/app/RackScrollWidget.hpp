@@ -1,4 +1,5 @@
 #pragma once
+#include "ui/ScrollWidget.hpp"
 #include "app/common.hpp"
 
 

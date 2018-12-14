@@ -27,14 +27,14 @@ void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
 
 void SVGKnob::step() {
 	// Re-transform TransformWidget if dirty
-	if (dirty) {
+	if (dirty && quantity) {
 		float angle;
-		if (std::isfinite(minValue) && std::isfinite(maxValue)) {
-			angle = rescale(value, minValue, maxValue, minAngle, maxAngle);
+		if (quantity->isBounded()) {
+			angle = rescale(quantity->getValue(), -1.f, 1.f, minAngle, maxAngle);
+			angle = std::fmod(angle, 2*M_PI);
 		}
 		else {
-			angle = rescale(value, -1.0, 1.0, minAngle, maxAngle);
-			angle = std::fmod(angle, 2*M_PI);
+			angle = rescale(quantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
 		}
 		tw->identity();
 		// Rotate SVG

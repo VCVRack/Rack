@@ -9,7 +9,7 @@ namespace rack {
 /** A Component with a default (up) and active (down) state when clicked.
 Does not modify a Param, simply calls onAction() of a subclass.
 */
-struct SVGButton : Component, FramebufferWidget {
+struct SVGButton : FramebufferWidget {
 	std::shared_ptr<SVG> defaultSVG;
 	std::shared_ptr<SVG> activeSVG;
 	SVGWidget *sw;

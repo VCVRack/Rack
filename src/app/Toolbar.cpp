@@ -10,12 +10,11 @@ namespace rack {
 
 struct TooltipIconButton : IconButton {
 	Tooltip *tooltip = NULL;
-	std::string tooltipText;
 	void onEnter(event::Enter &e) override {
 		if (!tooltip) {
 			tooltip = new Tooltip;
 			tooltip->box.pos = getAbsoluteOffset(Vec(0, BND_WIDGET_HEIGHT));
-			tooltip->text = tooltipText;
+			tooltip->text = getTooltipText();
 			gRackScene->addChild(tooltip);
 		}
 		IconButton::onEnter(e);
@@ -28,13 +27,14 @@ struct TooltipIconButton : IconButton {
 		}
 		IconButton::onLeave(e);
 	}
+	virtual std::string getTooltipText() {return "";}
 };
 
 struct NewButton : TooltipIconButton {
 	NewButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_146097_cc.svg")));
-		tooltipText = "New patch (" WINDOW_MOD_KEY_NAME "+N)";
 	}
+	std::string getTooltipText() override {return "New patch (" WINDOW_MOD_KEY_NAME "+N)";}
 	void onAction(event::Action &e) override {
 		gRackWidget->reset();
 	}
@@ -43,8 +43,8 @@ struct NewButton : TooltipIconButton {
 struct OpenButton : TooltipIconButton {
 	OpenButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_31859_cc.svg")));
-		tooltipText = "Open patch (" WINDOW_MOD_KEY_NAME "+O)";
 	}
+	std::string getTooltipText() override {return "Open patch (" WINDOW_MOD_KEY_NAME "+O)";}
 	void onAction(event::Action &e) override {
 		gRackWidget->loadDialog();
 	}
@@ -53,8 +53,8 @@ struct OpenButton : TooltipIconButton {
 struct SaveButton : TooltipIconButton {
 	SaveButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_1343816_cc.svg")));
-		tooltipText = "Save patch (" WINDOW_MOD_KEY_NAME "+S)";
 	}
+	std::string getTooltipText() override {return "Save patch (" WINDOW_MOD_KEY_NAME "+S)";}
 	void onAction(event::Action &e) override {
 		gRackWidget->saveDialog();
 	}
@@ -63,8 +63,8 @@ struct SaveButton : TooltipIconButton {
 struct SaveAsButton : TooltipIconButton {
 	SaveAsButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_1343811_cc.svg")));
-		tooltipText = "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
+	std::string getTooltipText() override {return "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";}
 	void onAction(event::Action &e) override {
 		gRackWidget->saveAsDialog();
 	}
@@ -73,8 +73,8 @@ struct SaveAsButton : TooltipIconButton {
 struct RevertButton : TooltipIconButton {
 	RevertButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_1084369_cc.svg")));
-		tooltipText = "Revert patch";
 	}
+	std::string getTooltipText() override {return "Revert patch";}
 	void onAction(event::Action &e) override {
 		gRackWidget->revert();
 	}
@@ -83,8 +83,8 @@ struct RevertButton : TooltipIconButton {
 struct DisconnectCablesButton : TooltipIconButton {
 	DisconnectCablesButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_1745061_cc.svg")));
-		tooltipText = "Disconnect cables";
 	}
+	std::string getTooltipText() override {return "Disconnect cables";}
 	void onAction(event::Action &e) override {
 		gRackWidget->disconnect();
 	}
@@ -93,8 +93,8 @@ struct DisconnectCablesButton : TooltipIconButton {
 struct PowerMeterButton : TooltipIconButton {
 	PowerMeterButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_305536_cc.svg")));
-		tooltipText = "Toggle power meter (see manual for explanation)";
 	}
+	std::string getTooltipText() override {return "Toggle power meter (see manual for explanation)";}
 	void onAction(event::Action &e) override {
 		gPowerMeter ^= true;
 	}
@@ -117,8 +117,8 @@ struct SampleRateItem : MenuItem {
 struct SampleRateButton : TooltipIconButton {
 	SampleRateButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_1240789_cc.svg")));
-		tooltipText = "Engine sample rate";
 	}
+	std::string getTooltipText() override {return "Engine sample rate";}
 	void onAction(event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(Vec(0, box.size.y));
@@ -144,18 +144,52 @@ struct SampleRateButton : TooltipIconButton {
 struct RackLockButton : TooltipIconButton {
 	RackLockButton() {
 		setSVG(SVG::load(asset::global("res/icons/noun_468341_cc.svg")));
-		tooltipText = "Lock modules";
 	}
+	std::string getTooltipText() override {return "Lock modules";}
 	void onAction(event::Action &e) override {
 		gRackWidget->lockModules ^= true;
 	}
 };
 
-struct ZoomSlider : Slider {
-	void onAction(event::Action &e) override {
-		Slider::onAction(e);
-		gRackScene->zoomWidget->setZoom(std::round(value) / 100.0);
+struct WireOpacityQuantity : Quantity {
+	void setValue(float value) override {
+		// TODO
 	}
+	float getValue() override {
+		return 0;
+	}
+	float getDefaultValue() override {return 0.5;}
+	std::string getLabel() override {return "Cable opacity";}
+	int getPrecision() override {return 0;}
+};
+
+
+struct WireTensionQuantity : Quantity {
+	void setValue(float value) override {
+		// TODO
+	}
+	float getValue() override {
+		return 0;
+	}
+	float getDefaultValue() override {return 0.5;}
+	std::string getLabel() override {return "Cable tension";}
+	int getPrecision() override {return 0;}
+};
+
+
+struct ZoomQuantity : Quantity {
+	void setValue(float value) override {
+		gRackScene->zoomWidget->setZoom(std::round(value) / 100);
+	}
+	float getValue() override {
+		return gRackScene->zoomWidget->zoom * 100;
+	}
+	float getMinValue() override {return 25;}
+	float getMaxValue() override {return 200;}
+	float getDefaultValue() override {return 100;}
+	std::string getLabel() override {return "Zoom";}
+	std::string getUnit() override {return "%";}
+	int getPrecision() override {return 0;}
 };
 
 
@@ -178,30 +212,22 @@ Toolbar::Toolbar() {
 	layout->addChild(new PowerMeterButton);
 	layout->addChild(new RackLockButton);
 
-	wireOpacitySlider = new Slider;
+	Slider *wireOpacitySlider = new Slider;
+	WireOpacityQuantity *wireOpacityQuantity = new WireOpacityQuantity;
+	wireOpacitySlider->quantity = wireOpacityQuantity;
 	wireOpacitySlider->box.size.x = 150;
-	wireOpacitySlider->label = "Cable opacity";
-	wireOpacitySlider->precision = 0;
-	wireOpacitySlider->unit = "%";
-	wireOpacitySlider->setLimits(0.0, 100.0);
-	wireOpacitySlider->setDefaultValue(50.0);
 	layout->addChild(wireOpacitySlider);
 
-	wireTensionSlider = new Slider;
+	Slider *wireTensionSlider = new Slider;
+	WireTensionQuantity *wireTensionQuantity = new WireTensionQuantity;
+	wireTensionSlider->quantity = wireTensionQuantity;
 	wireTensionSlider->box.size.x = 150;
-	wireTensionSlider->label = "Cable tension";
-	wireTensionSlider->unit = "";
-	wireTensionSlider->setLimits(0.0, 1.0);
-	wireTensionSlider->setDefaultValue(0.5);
 	layout->addChild(wireTensionSlider);
 
-	zoomSlider = new ZoomSlider;
+	Slider *zoomSlider = new Slider;
+	ZoomQuantity *zoomQuantity = new ZoomQuantity;
+	zoomSlider->quantity = zoomQuantity;
 	zoomSlider->box.size.x = 150;
-	zoomSlider->precision = 0;
-	zoomSlider->label = "Zoom";
-	zoomSlider->unit = "%";
-	zoomSlider->setLimits(25.0, 200.0);
-	zoomSlider->setDefaultValue(100.0);
 	layout->addChild(zoomSlider);
 
 	// Kind of hacky, but display the PluginManagerWidget only if the local directory is not the development directory

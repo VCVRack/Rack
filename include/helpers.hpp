@@ -46,8 +46,8 @@ template <class TParamWidget>
 TParamWidget *createParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos;
-	o->module = module;
-	o->paramId = paramId;
+	o->quantity->module = module;
+	o->quantity->paramId = paramId;
 	o->setLimits(minValue, maxValue);
 	o->setDefaultValue(defaultValue);
 	return o;
@@ -57,8 +57,8 @@ template <class TParamWidget>
 TParamWidget *createParamCentered(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
-	o->module = module;
-	o->paramId = paramId;
+	o->quantity->module = module;
+	o->quantity->paramId = paramId;
 	o->setLimits(minValue, maxValue);
 	o->setDefaultValue(defaultValue);
 	return o;

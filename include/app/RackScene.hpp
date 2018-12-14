@@ -1,8 +1,13 @@
 #pragma once
+#include "ui/Scene.hpp"
 #include "app/common.hpp"
 
 
 namespace rack {
+
+
+struct ScrollWidget;
+struct ZoomWidget;
 
 
 struct RackScene : Scene {

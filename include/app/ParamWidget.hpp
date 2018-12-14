@@ -1,4 +1,6 @@
 #pragma once
+#include "widgets/OpaqueWidget.hpp"
+#include "app/ParamQuantity.hpp"
 #include "app/common.hpp"
 #include "engine.hpp"
 
@@ -6,22 +8,23 @@
 namespace rack {
 
 
-/** A Component which has control over a Param */
-struct ParamWidget : Component, QuantityWidget {
-	int paramId;
-	/** Used to momentarily disable value randomization
-	To permanently disable or change randomization behavior, override the randomize() method instead of changing this.
-	*/
-	bool randomizable = true;
-	/** Apply per-sample smoothing in the engine */
-	bool smooth = false;
+/** Controls a ParamQuantity */
+struct ParamWidget : OpaqueWidget {
+	ParamQuantity *quantity;
 
-	json_t *toJson();
+	ParamWidget() {
+		quantity = new ParamQuantity;
+	}
+
+	~ParamWidget() {
+		delete quantity;
+	}
+
+	/** For legacy patch loading */
 	void fromJson(json_t *rootJ);
 	virtual void reset();
 	virtual void randomize();
 	void onButton(event::Button &e) override;
-	void onChange(event::Change &e) override;
 };
 
 

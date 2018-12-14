@@ -1,6 +1,6 @@
 #pragma once
+#include "widgets.hpp"
 #include "ui/common.hpp"
-#include "ui/QuantityWidget.hpp"
 #include "ui/SequentialLayout.hpp"
 #include "ui/Label.hpp"
 #include "ui/List.hpp"

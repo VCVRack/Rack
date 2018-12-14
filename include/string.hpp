@@ -22,6 +22,9 @@ bool endsWith(std::string str, std::string suffix);
 /** Extracts portions of a path */
 std::string directory(std::string path);
 std::string filename(std::string path);
+/** Extracts the portion of a path without the extension */
+std::string basename(std::string path);
+/** Extracts the extension of a path */
 std::string extension(std::string path);
 
 struct CaseInsensitiveCompare {

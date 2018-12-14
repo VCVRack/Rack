@@ -103,13 +103,28 @@ struct LogOutButton : Button {
 };
 
 
+struct DownloadQuantity : Quantity {
+	float getValue() override {
+		return pluginGetDownloadProgress();
+	}
+
+	float getDisplayValue() override {
+		return getValue() * 100.f;
+	}
+
+	int getPrecision() override {return 0;}
+
+	std::string getLabel() override {
+		return "Downloading " + pluginGetDownloadName();
+	}
+
+	std::string getUnit() override {return "%";}
+};
+
+
 struct DownloadProgressBar : ProgressBar {
-	void step() override {
-		label = "Downloading";
-		std::string name = pluginGetDownloadName();
-		if (name != "")
-			label += " " + name;
-		setValue(100.0 * pluginGetDownloadProgress());
+	DownloadProgressBar() {
+		quantity = new DownloadQuantity;
 	}
 };
 
@@ -187,8 +202,6 @@ PluginManagerWidget::PluginManagerWidget() {
 
 		ProgressBar *downloadProgress = new DownloadProgressBar;
 		downloadProgress->box.size.x = 300;
-		downloadProgress->setLimits(0, 100);
-		downloadProgress->unit = "%";
 		downloadWidget->addChild(downloadProgress);
 
 		// Button *cancelButton = new CancelButton;

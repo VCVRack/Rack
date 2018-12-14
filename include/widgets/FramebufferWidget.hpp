@@ -9,7 +9,7 @@ namespace rack {
 When `dirty` is true, its children will be re-rendered on the next call to step() override.
 Events are not passed to the underlying scene.
 */
-struct FramebufferWidget : virtual Widget {
+struct FramebufferWidget : VirtualWidget {
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
 	/** A margin in pixels around the children in the framebuffer

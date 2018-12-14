@@ -9,7 +9,7 @@ namespace rack {
 You can of course override the events.
 You may also call OpaqueWidget::on*() from the overridden method to continue recursing/consuming the event.
 */
-struct OpaqueWidget : virtual Widget {
+struct OpaqueWidget : VirtualWidget {
 	void onHover(event::Hover &e) override {
 		Widget::onHover(e);
 		if (!e.target)

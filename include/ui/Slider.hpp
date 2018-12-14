@@ -1,6 +1,7 @@
 #pragma once
+#include "widgets/OpaqueWidget.hpp"
+#include "ui/Quantity.hpp"
 #include "ui/common.hpp"
-#include "ui/QuantityWidget.hpp"
 
 
 namespace rack {
@@ -9,16 +10,23 @@ namespace rack {
 static const float SLIDER_SENSITIVITY = 0.001f;
 
 
-struct Slider : OpaqueWidget, QuantityWidget {
+struct Slider : OpaqueWidget {
 	BNDwidgetState state = BND_DEFAULT;
+	Quantity *quantity = NULL;
 
 	Slider() {
 		box.size.y = BND_WIDGET_HEIGHT;
 	}
 
+	~Slider() {
+		if (quantity)
+			delete quantity;
+	}
+
 	void draw(NVGcontext *vg) override {
-		float progress = rescale(value, minValue, maxValue, 0.0, 1.0);
-		bndSlider(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, getText().c_str(), NULL);
+		float progress = quantity ? quantity->getScaledValue() : 0.f;
+		std::string text = quantity ? quantity->getString() : "";
+		bndSlider(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
 	}
 
 	void onDragStart(event::DragStart &e) override {
@@ -27,7 +35,9 @@ struct Slider : OpaqueWidget, QuantityWidget {
 	}
 
 	void onDragMove(event::DragMove &e) override {
-		setValue(value + SLIDER_SENSITIVITY * (maxValue - minValue) * e.mouseDelta.x);
+		if (quantity) {
+			quantity->moveScaledValue(SLIDER_SENSITIVITY * e.mouseDelta.x);
+		}
 	}
 
 	void onDragEnd(event::DragEnd &e) override {
@@ -37,7 +47,8 @@ struct Slider : OpaqueWidget, QuantityWidget {
 
 	void onButton(event::Button &e) override {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			setValue(defaultValue);
+			if (quantity)
+				quantity->reset();
 		}
 		e.target = this;
 	}

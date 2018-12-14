@@ -59,8 +59,9 @@ struct RoundHugeBlackKnob : RoundKnob {
 
 struct RoundBlackSnapKnob : RoundBlackKnob {
 	RoundBlackSnapKnob() {
-		snap = true;
-		smooth = false;
+		// TODO
+		// quantity.snap = true;
+		// quantity.smooth = false;
 	}
 };
 
@@ -308,8 +309,9 @@ struct BefacoBigKnob : SVGKnob {
 
 struct BefacoBigSnapKnob : BefacoBigKnob {
 	BefacoBigSnapKnob() {
-		snap = true;
-		smooth = false;
+		// TODO
+		// quantity.snap = true;
+		// quantity.smooth = false;
 	}
 };
 

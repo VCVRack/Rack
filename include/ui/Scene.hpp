@@ -1,4 +1,5 @@
 #pragma once
+#include "widgets/OpaqueWidget.hpp"
 #include "ui/common.hpp"
 
 

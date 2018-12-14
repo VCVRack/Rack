@@ -1,5 +1,6 @@
 #pragma once
-#include "ui.hpp"
+#include "math.hpp"
+#include <string>
 #include <jansson.h>
 
 
@@ -35,13 +36,6 @@ static const float RACK_GRID_HEIGHT = 380;
 static const Vec RACK_GRID_SIZE = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
 static const std::string PRESET_FILTERS = "VCV Rack module preset (.vcvm):vcvm";
 static const std::string PATCH_FILTERS = "VCV Rack patch (.vcv):vcv";
-
-
-
-/** Deprecated. Will be removed in v1 */
-json_t *colorToJson(NVGcolor color);
-/** Deprecated. Will be removed in v1 */
-NVGcolor jsonToColor(json_t *colorJ);
 
 
 } // namespace rack

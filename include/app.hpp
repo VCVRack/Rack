@@ -1,8 +1,8 @@
 #pragma once
+#include "ui.hpp"
 #include "app/AudioWidget.hpp"
 #include "app/CircularShadow.hpp"
 #include "app/common.hpp"
-#include "app/Component.hpp"
 #include "app/Knob.hpp"
 #include "app/LedDisplay.hpp"
 #include "app/LightWidget.hpp"
