@@ -12,19 +12,24 @@ struct Param {
 	float minValue = 0.f;
 	float maxValue = 1.f;
 	float defaultValue = 0.f;
+
+	// For formatting/displaying the value
+	/** Set to 0 for linear, nonzero for exponential */
+	float displayBase = 0.f;
+	float displayMultiplier = 1.f;
+	int displayPrecision = 2;
 	std::string label;
 	std::string unit;
-	int precision = 2;
 
 	// TODO Change this horrible method name
-	void setup(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", int precision = 2) {
+	void setup(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", int displayPrecision = 2) {
 		this->value = defaultValue;
 		this->minValue = minValue;
 		this->maxValue = maxValue;
 		this->defaultValue = defaultValue;
 		this->label = label;
 		this->unit = unit;
-		this->precision = precision;
+		this->displayPrecision = displayPrecision;
 	}
 
 	json_t *toJson();

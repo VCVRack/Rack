@@ -30,26 +30,55 @@ struct ParamQuantity : Quantity {
 		// TODO Snap
 		getParam()->value = value;
 	}
+
 	float getValue() override {
 		return getParam()->value;
 	}
+
 	float getMinValue() override {
 		return getParam()->minValue;
 	}
+
 	float getMaxValue() override {
 		return getParam()->maxValue;
 	}
+
 	float getDefaultValue() override {
 		return getParam()->defaultValue;
 	}
+
+	float getDisplayValue() override {
+		if (getParam()->displayBase == 0.f) {
+			// Linear
+			return getParam()->value * getParam()->displayMultiplier;
+		}
+		else {
+			// Exponential
+			return std::pow(getParam()->displayBase, getParam()->value) * getParam()->displayMultiplier;
+		}
+	}
+
+	void setDisplayValue(float displayValue) override {
+		if (getParam()->displayBase == 0.f) {
+			// Linear
+			getParam()->value = displayValue / getParam()->displayMultiplier;
+		}
+		else {
+			// Exponential
+			getParam()->value = std::log(displayValue / getParam()->displayMultiplier) / std::log(getParam()->displayBase);
+		}
+	}
+
+	int getDisplayPrecision() override {
+		return getParam()->displayPrecision;
+	}
+
 	std::string getLabel() override {
 		return getParam()->label;
 	}
+
 	std::string getUnit() override {
 		return getParam()->unit;
-	}
-	int getPrecision() override {
-		return getParam()->precision;
 	}
 };
 

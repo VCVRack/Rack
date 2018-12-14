@@ -30,22 +30,22 @@ struct Quantity {
 	/** Returns the default value, for resetting */
 	virtual float getDefaultValue() {return 0.f;}
 
-	/** Returns the value, possibly transformed
+	/** Returns the value, possibly transformed for displaying
 	Useful for logarithmic scaling, multiplying by 100 for percentages, etc.
 	*/
 	virtual float getDisplayValue() {return getValue();}
 
-	/** Sets the value by the transformed display value */
+	/** Inversely transforms the display value and sets the value */
 	virtual void setDisplayValue(float displayValue) {setValue(displayValue);}
 
-	/** The number of decimal places for display
+	/** The number of decimal places for displaying
 	A precision of 2 will display as "1.00" for example.
 	*/
-	virtual int getPrecision() {return 2;}
+	virtual int getDisplayPrecision() {return 2;}
 
 	/** Returns a string representation of the display value */
 	virtual std::string getDisplayValueString() {
-		return string::f("%.*f", getPrecision(), getDisplayValue());
+		return string::f("%.*f", getDisplayPrecision(), getDisplayValue());
 	}
 
 	/** The name of the quantity */

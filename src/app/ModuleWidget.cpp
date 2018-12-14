@@ -117,12 +117,6 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 		}
 	}
 
-	// legacy
-	int legacy = 0;
-	json_t *legacyJ = json_object_get(rootJ, "legacy");
-	if (legacyJ)
-		legacy = json_integer_value(legacyJ);
-
 	// params
 	json_t *paramsJ = json_object_get(rootJ, "params");
 	size_t i;

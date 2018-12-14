@@ -112,7 +112,7 @@ struct DownloadQuantity : Quantity {
 		return getValue() * 100.f;
 	}
 
-	int getPrecision() override {return 0;}
+	int getDisplayPrecision() override {return 0;}
 
 	std::string getLabel() override {
 		return "Downloading " + pluginGetDownloadName();

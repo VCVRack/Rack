@@ -160,7 +160,7 @@ struct WireOpacityQuantity : Quantity {
 	}
 	float getDefaultValue() override {return 0.5;}
 	std::string getLabel() override {return "Cable opacity";}
-	int getPrecision() override {return 0;}
+	int getDisplayPrecision() override {return 0;}
 };
 
 
@@ -173,7 +173,7 @@ struct WireTensionQuantity : Quantity {
 	}
 	float getDefaultValue() override {return 0.5;}
 	std::string getLabel() override {return "Cable tension";}
-	int getPrecision() override {return 0;}
+	int getDisplayPrecision() override {return 0;}
 };
 
 
@@ -189,7 +189,7 @@ struct ZoomQuantity : Quantity {
 	float getDefaultValue() override {return 100;}
 	std::string getLabel() override {return "Zoom";}
 	std::string getUnit() override {return "%";}
-	int getPrecision() override {return 0;}
+	int getDisplayPrecision() override {return 0;}
 };
 
 
