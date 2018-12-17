@@ -1,3 +1,6 @@
+#include "asset.hpp"
+#include "system.hpp"
+
 #if ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
 	#include <pwd.h>
@@ -14,9 +17,6 @@
 	#include <sys/types.h>
 	#include <pwd.h>
 #endif
-
-#include "asset.hpp"
-#include "system.hpp"
 
 
 namespace rack {

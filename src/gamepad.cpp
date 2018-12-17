@@ -1,5 +1,6 @@
-#include "rack.hpp"
 #include "gamepad.hpp"
+#include "string.hpp"
+#include "window.hpp"
 
 
 namespace rack {

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "common.hpp"
 #include <jansson.h>
 
 #pragma GCC diagnostic push
@@ -8,8 +8,6 @@
 #endif
 #include <RtAudio.h>
 #pragma GCC diagnostic pop
-
-#include "common.hpp"
 
 
 namespace rack {

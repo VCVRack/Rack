@@ -1,5 +1,5 @@
 #pragma once
-
+#include "common.hpp"
 #include "midi.hpp"
 #include <map>
 

@@ -1,5 +1,4 @@
-#include <unistd.h>
-#include "osdialog.h"
+#include "common.hpp"
 #include "random.hpp"
 #include "logger.hpp"
 #include "asset.hpp"
@@ -12,6 +11,8 @@
 #include "app/Scene.hpp"
 #include "tags.hpp"
 #include "plugin/PluginManager.hpp"
+#include <unistd.h>
+#include "osdialog.h"
 
 #ifdef ARCH_WIN
 	#include <Windows.h>

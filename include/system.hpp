@@ -1,6 +1,6 @@
 #pragma once
-#include <list>
 #include "common.hpp"
+#include <list>
 
 
 namespace rack {

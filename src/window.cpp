@@ -1,3 +1,11 @@
+#include "window.hpp"
+#include "logger.hpp"
+#include "asset.hpp"
+#include "app/Scene.hpp"
+#include "keyboard.hpp"
+#include "gamepad.hpp"
+#include "event.hpp"
+
 #include <map>
 #include <queue>
 #include <thread>
@@ -7,15 +15,7 @@
 	#include <ApplicationServices/ApplicationServices.h>
 #endif
 
-
 #include "osdialog.h"
-
-#include "logger.hpp"
-#include "asset.hpp"
-#include "app/Scene.hpp"
-#include "keyboard.hpp"
-#include "gamepad.hpp"
-#include "event.hpp"
 
 #define NANOVG_GL2_IMPLEMENTATION 1
 // #define NANOVG_GL3_IMPLEMENTATION 1

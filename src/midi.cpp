@@ -1,9 +1,6 @@
 #include "rack.hpp"
 #include "midi.hpp"
-#include "rtmidi.hpp"
-#include "bridge.hpp"
-#include "gamepad.hpp"
-#include "keyboard.hpp"
+#include <map>
 
 
 namespace rack {

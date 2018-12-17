@@ -1,7 +1,7 @@
-#include <time.h>
-#include <sys/time.h>
 #include "random.hpp"
 #include "math.hpp"
+#include <time.h>
+#include <sys/time.h>
 
 
 namespace rack {

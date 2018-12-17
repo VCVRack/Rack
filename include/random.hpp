@@ -1,6 +1,6 @@
 #pragma once
-#include <cstdint>
 #include "common.hpp"
+#include <cstdint>
 
 
 namespace rack {

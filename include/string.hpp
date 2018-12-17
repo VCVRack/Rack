@@ -1,8 +1,5 @@
 #pragma once
-
 #include "common.hpp"
-#include <algorithm> // for transform
-#include <libgen.h> // for dirname and basename
 
 
 namespace rack {

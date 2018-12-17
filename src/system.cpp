@@ -1,3 +1,4 @@
+#include "system.hpp"
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -5,8 +6,6 @@
 	#include <windows.h>
 	#include <shellapi.h>
 #endif
-
-#include "system.hpp"
 
 
 namespace rack {

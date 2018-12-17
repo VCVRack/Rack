@@ -1,7 +1,7 @@
 #pragma once
-#include <map>
 #include "common.hpp"
 #include "midi.hpp"
+#include <map>
 
 
 namespace rack {

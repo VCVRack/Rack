@@ -1,6 +1,6 @@
 #pragma once
-#include <algorithm> // for std::min, max
 #include "common.hpp"
+#include <algorithm> // for std::min, max
 
 
 namespace rack {

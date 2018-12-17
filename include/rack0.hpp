@@ -1,5 +1,4 @@
 #pragma once
-
 #include "rack.hpp"
 #include "componentlibrary.hpp"
 

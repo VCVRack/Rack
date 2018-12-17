@@ -1,13 +1,13 @@
 #pragma once
+#include "common.hpp"
+#include "math.hpp"
+
 #include <memory>
 #define GLEW_STATIC
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "nanovg.h"
 #include "nanosvg.h"
-
-#include "common.hpp"
-#include "math.hpp"
 
 
 #ifdef ARCH_MAC
