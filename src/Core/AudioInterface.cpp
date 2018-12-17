@@ -119,7 +119,8 @@ struct AudioInterface : Module {
 	DoubleRingBuffer<Frame<AUDIO_INPUTS>, 16> inputBuffer;
 	DoubleRingBuffer<Frame<AUDIO_OUTPUTS>, 16> outputBuffer;
 
-	AudioInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	AudioInterface() {
+		setup(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		onSampleRateChange();
 	}
 

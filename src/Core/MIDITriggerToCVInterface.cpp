@@ -28,7 +28,8 @@ struct MIDITriggerToCVInterface : Module {
 	uint8_t learnedNotes[16] = {};
 	bool velocity = false;
 
-	MIDITriggerToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	MIDITriggerToCVInterface() {
+		setup(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		onReset();
 	}
 

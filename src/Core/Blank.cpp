@@ -103,7 +103,7 @@ struct BlankWidget : ModuleWidget {
 	json_t *toJson() override {
 		json_t *rootJ = ModuleWidget::toJson();
 
-		// // width
+		// width
 		json_object_set_new(rootJ, "width", json_real(box.size.x));
 
 		return rootJ;

@@ -51,7 +51,9 @@ struct QuadMIDIToCVInterface : Module {
 	int rotateIndex;
 	int stealIndex;
 
-	QuadMIDIToCVInterface() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS), cachedNotes(128) {
+	QuadMIDIToCVInterface() {
+		setup(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		cachedNotes.resize(128, 0);
 		onReset();
 	}
 
