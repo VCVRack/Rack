@@ -144,7 +144,7 @@ struct MIDIToCVInterface : Module {
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-		float deltaTime = engineGetSampleTime();
+		float deltaTime = gEngine->getSampleTime();
 
 		outputs[CV_OUTPUT].value = (lastNote - 60) / 12.f;
 		outputs[GATE_OUTPUT].value = gate ? 10.f : 0.f;

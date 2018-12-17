@@ -1,7 +1,7 @@
 #include "plugin.hpp"
-#include "engine.hpp"
 #include "app.hpp"
 #include "event.hpp"
+#include "engine/Module.hpp"
 
 
 namespace rack {

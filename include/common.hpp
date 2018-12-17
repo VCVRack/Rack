@@ -1,6 +1,6 @@
 #pragma once
 
-// Include some of the C++ standard library for convenience
+// Include most of the C stdlib for convenience
 #include <cstdlib>
 #include <cstdio>
 #include <cstdint>
@@ -9,6 +9,8 @@
 #include <cmath>
 #include <cstring>
 #include <cassert>
+
+// Include some of the C++ stdlib for convenience
 #include <string>
 
 

@@ -1,4 +1,5 @@
 #include "osdialog.h"
+#include "engine/Engine.hpp"
 #include "rack.hpp"
 
 
@@ -7,7 +8,7 @@ namespace rack {
 
 ModuleWidget::ModuleWidget(Module *module) {
 	if (module) {
-		engineAddModule(module);
+		gEngine->addModule(module);
 	}
 	this->module = module;
 }
@@ -17,7 +18,7 @@ ModuleWidget::~ModuleWidget() {
 	disconnect();
 	// Remove and delete the Module instance
 	if (module) {
-		engineRemoveModule(module);
+		gEngine->removeModule(module);
 		delete module;
 		module = NULL;
 	}
@@ -229,7 +230,7 @@ void ModuleWidget::reset() {
 		param->reset();
 	}
 	if (module) {
-		engineResetModule(module);
+		gEngine->resetModule(module);
 	}
 }
 
@@ -238,7 +239,7 @@ void ModuleWidget::randomize() {
 		param->randomize();
 	}
 	if (module) {
-		engineRandomizeModule(module);
+		gEngine->randomizeModule(module);
 	}
 }
 
@@ -247,7 +248,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 
 	// Power meter
-	if (module && gPowerMeter) {
+	if (module && gEngine->powerMeter) {
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, box.size.y - 20,

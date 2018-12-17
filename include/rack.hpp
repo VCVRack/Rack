@@ -8,7 +8,7 @@
 #include "network.hpp"
 #include "asset.hpp"
 #include "plugin.hpp"
-#include "engine.hpp"
+#include "engine/Engine.hpp"
 #include "window.hpp"
 #include "widgets.hpp"
 #include "app.hpp"

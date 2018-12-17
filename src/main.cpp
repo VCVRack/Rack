@@ -6,6 +6,7 @@
 #include "gamepad.hpp"
 #include "bridge.hpp"
 #include "settings.hpp"
+#include "engine/Engine.hpp"
 
 #ifdef ARCH_WIN
 	#include <Windows.h>
@@ -64,7 +65,7 @@ int main(int argc, char* argv[]) {
 
 	// Initialize app
 	pluginInit(devMode);
-	engineInit();
+	gEngine = new Engine;
 	rtmidiInit();
 	bridgeInit();
 	keyboard::init();
@@ -95,9 +96,9 @@ int main(int argc, char* argv[]) {
 		gRackWidget->lastPath = patchFile;
 	}
 
-	engineStart();
+	gEngine->start();
 	windowRun();
-	engineStop();
+	gEngine->stop();
 
 	// Destroy namespaces
 	gRackWidget->save(asset::local("autosave.vcv"));
@@ -105,7 +106,7 @@ int main(int argc, char* argv[]) {
 	appDestroy();
 	windowDestroy();
 	bridgeDestroy();
-	engineDestroy();
+	delete gEngine;
 	midiDestroy();
 	pluginDestroy();
 	logger::destroy();

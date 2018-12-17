@@ -1,7 +1,6 @@
 #pragma once
 #include "app/common.hpp"
 #include "app/WireWidget.hpp"
-#include "engine.hpp"
 
 
 namespace rack {

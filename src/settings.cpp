@@ -1,6 +1,10 @@
-#include <jansson.h>
-#include "rack.hpp"
 #include "settings.hpp"
+#include "logger.hpp"
+#include "window.hpp"
+#include "plugin.hpp"
+#include "app.hpp"
+#include "engine/Engine.hpp"
+#include <jansson.h>
 
 
 namespace rack {
@@ -50,7 +54,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
 	// sampleRate
-	json_t *sampleRateJ = json_real(engineGetSampleRate());
+	json_t *sampleRateJ = json_real(gEngine->getSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// lastPath
@@ -66,7 +70,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "moduleBrowser", appModuleBrowserToJson());
 
 	// powerMeter
-	json_object_set_new(rootJ, "powerMeter", json_boolean(gPowerMeter));
+	json_object_set_new(rootJ, "powerMeter", json_boolean(gEngine->powerMeter));
 
 	// checkVersion
 	json_object_set_new(rootJ, "checkVersion", json_boolean(gCheckVersion));
@@ -121,7 +125,7 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ) {
 		float sampleRate = json_number_value(sampleRateJ);
-		engineSetSampleRate(sampleRate);
+		gEngine->setSampleRate(sampleRate);
 	}
 
 	// lastPath
@@ -142,7 +146,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// powerMeter
 	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
 	if (powerMeterJ)
-		gPowerMeter = json_boolean_value(powerMeterJ);
+		gEngine->powerMeter = json_boolean_value(powerMeterJ);
 
 	// checkVersion
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");

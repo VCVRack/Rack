@@ -2,7 +2,6 @@
 #include "widgets/OpaqueWidget.hpp"
 #include "app/ParamQuantity.hpp"
 #include "app/common.hpp"
-#include "engine.hpp"
 
 
 namespace rack {

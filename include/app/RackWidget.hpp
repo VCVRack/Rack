@@ -2,7 +2,6 @@
 #include "app/common.hpp"
 #include "app/WireWidget.hpp"
 #include "app/WireContainer.hpp"
-#include "engine.hpp"
 
 
 namespace rack {

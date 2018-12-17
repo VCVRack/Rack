@@ -6,7 +6,7 @@
 #include "app/Port.hpp"
 #include "app/ParamWidget.hpp"
 #include "plugin.hpp"
-#include "engine.hpp"
+#include "engine/Module.hpp"
 
 
 namespace rack {

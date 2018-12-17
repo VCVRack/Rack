@@ -1,6 +1,6 @@
 #include "app.hpp"
 #include "window.hpp"
-#include "engine.hpp"
+#include "engine/Engine.hpp"
 #include "asset.hpp"
 #include "helpers.hpp"
 
@@ -96,21 +96,21 @@ struct PowerMeterButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Toggle power meter (see manual for explanation)";}
 	void onAction(event::Action &e) override {
-		gPowerMeter ^= true;
+		gEngine->powerMeter ^= true;
 	}
 };
 
 struct EnginePauseItem : MenuItem {
 	void onAction(event::Action &e) override {
-		gPaused ^= true;
+		gEngine->paused ^= true;
 	}
 };
 
 struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction(event::Action &e) override {
-		engineSetSampleRate(sampleRate);
-		gPaused = false;
+		gEngine->setSampleRate(sampleRate);
+		gEngine->paused = false;
 	}
 };
 
@@ -127,14 +127,14 @@ struct SampleRateButton : TooltipIconButton {
 		menu->addChild(createMenuLabel("Engine sample rate"));
 
 		EnginePauseItem *pauseItem = new EnginePauseItem;
-		pauseItem->text = gPaused ? "Resume engine" : "Pause engine";
+		pauseItem->text = gEngine->paused ? "Resume engine" : "Pause engine";
 		menu->addChild(pauseItem);
 
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (float sampleRate : sampleRates) {
 			SampleRateItem *item = new SampleRateItem;
 			item->text = string::f("%.0f Hz", sampleRate);
-			item->rightText = CHECKMARK(engineGetSampleRate() == sampleRate);
+			item->rightText = CHECKMARK(gEngine->getSampleRate() == sampleRate);
 			item->sampleRate = sampleRate;
 			menu->addChild(item);
 		}

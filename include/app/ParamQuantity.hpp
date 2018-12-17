@@ -1,6 +1,6 @@
 #pragma once
 #include "ui/Quantity.hpp"
-#include "engine.hpp"
+#include "engine/Module.hpp"
 
 
 namespace rack {

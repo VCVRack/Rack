@@ -1,5 +1,6 @@
 #pragma once
 #include "app/common.hpp"
+#include "engine/Wire.hpp"
 
 
 namespace rack {

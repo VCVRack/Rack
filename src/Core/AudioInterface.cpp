@@ -144,7 +144,7 @@ struct AudioInterface : Module {
 
 void AudioInterface::step() {
 	// Update SRC states
-	int sampleRate = (int) engineGetSampleRate();
+	int sampleRate = (int) gEngine->getSampleRate();
 	inputSrc.setRates(audioIO.sampleRate, sampleRate);
 	outputSrc.setRates(sampleRate, audioIO.sampleRate);
 

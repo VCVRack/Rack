@@ -47,7 +47,7 @@ struct MIDICCToCVInterface : Module {
 			processMessage(msg);
 		}
 
-		float lambda = 100.f * engineGetSampleTime();
+		float lambda = 100.f * gEngine->getSampleTime();
 		for (int i = 0; i < 16; i++) {
 			int learnedCc = learnedCcs[i];
 			float value = rescale(clamp(ccs[learnedCc], -127, 127), 0, 127, 0.f, 10.f);

@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "midi.hpp"
+#include "engine/Engine.hpp"
 #include "event.hpp"
 
 
@@ -70,7 +71,7 @@ struct MIDITriggerToCVInterface : Module {
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-		float deltaTime = engineGetSampleTime();
+		float deltaTime = gEngine->getSampleTime();
 
 		for (int i = 0; i < 16; i++) {
 			if (gateTimes[i] > 0.f) {

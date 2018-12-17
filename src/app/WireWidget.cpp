@@ -1,5 +1,5 @@
 #include "app.hpp"
-#include "engine.hpp"
+#include "engine/Engine.hpp"
 #include "componentlibrary.hpp"
 #include "window.hpp"
 #include "event.hpp"
@@ -107,12 +107,12 @@ void WireWidget::updateWire() {
 			wire->outputId = outputPort->portId;
 			wire->inputModule = inputPort->module;
 			wire->inputId = inputPort->portId;
-			engineAddWire(wire);
+			gEngine->addWire(wire);
 		}
 	}
 	else {
 		if (wire) {
-			engineRemoveWire(wire);
+			gEngine->removeWire(wire);
 			delete wire;
 			wire = NULL;
 		}
