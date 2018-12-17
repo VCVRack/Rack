@@ -4,6 +4,7 @@
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
 #include "app/RackScrollWidget.hpp"
+#include "context.hpp"
 #include <thread>
 
 
@@ -43,7 +44,7 @@ void Scene::step() {
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 
 	// Request latest version from server
-	if (!devMode && checkVersion && !checkedVersion) {
+	if (!context()->devMode && checkVersion && !checkedVersion) {
 		std::thread t(&Scene::runCheckVersion, this);
 		t.detach();
 		checkedVersion = true;
@@ -147,9 +148,6 @@ void Scene::runCheckVersion() {
 		json_decref(resJ);
 	}
 }
-
-
-Scene *gScene = NULL;
 
 
 } // namespace rack

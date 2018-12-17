@@ -1,5 +1,6 @@
 #include "asset.hpp"
 #include "system.hpp"
+#include "context.hpp"
 
 #if ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
@@ -27,9 +28,10 @@ std::string systemDir;
 std::string userDir;
 
 
-void init(bool devMode) {
+void init() {
+	// Get system dir
 	if (systemDir.empty()) {
-		if (devMode) {
+		if (context()->devMode) {
 			systemDir = ".";
 		}
 		else {
@@ -57,8 +59,9 @@ void init(bool devMode) {
 		}
 	}
 
+	// Get user dir
 	if (userDir.empty()) {
-		if (devMode) {
+		if (context()->devMode) {
 			userDir = ".";
 		}
 		else {

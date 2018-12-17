@@ -325,7 +325,4 @@ float Engine::getSampleTime() {
 }
 
 
-Engine *gEngine = NULL;
-
-
 } // namespace rack

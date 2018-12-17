@@ -11,6 +11,7 @@
 #include "ui/List.hpp"
 #include "ui/TextField.hpp"
 #include "plugin/PluginManager.hpp"
+#include "context.hpp"
 
 
 static const float itemMargin = 2.0;
@@ -157,10 +158,10 @@ struct ModelItem : BrowserListItem {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		if (!moduleWidget)
 			return;
-		gScene->rackWidget->addModule(moduleWidget);
+		context()->scene->rackWidget->addModule(moduleWidget);
 		// Move module nearest to the mouse position
-		moduleWidget->box.pos = gScene->rackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
-		gScene->rackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
+		moduleWidget->box.pos = context()->scene->rackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
+		context()->scene->rackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
 	}
 };
 
@@ -446,7 +447,7 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleScroll->box.size.y = std::min(box.size.y - moduleScroll->box.pos.y, moduleList->box.size.y);
 		box.size.y = std::min(box.size.y, moduleScroll->box.getBottomRight().y);
 
-		event::gContext->selectedWidget = searchField;
+		context()->event->selectedWidget = searchField;
 		Widget::step();
 	}
 };
@@ -557,7 +558,7 @@ void moduleBrowserCreate() {
 	ModuleBrowser *moduleBrowser = new ModuleBrowser;
 	overlay->addChild(moduleBrowser);
 
-	gScene->addChild(overlay);
+	context()->scene->addChild(overlay);
 }
 
 json_t *moduleBrowserToJson() {

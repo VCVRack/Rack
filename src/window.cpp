@@ -5,6 +5,7 @@
 #include "keyboard.hpp"
 #include "gamepad.hpp"
 #include "event.hpp"
+#include "context.hpp"
 
 #include <map>
 #include <queue>
@@ -62,7 +63,7 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 	}
 #endif
 
-	event::gContext->handleButton(gMousePos, button, action, mods);
+	context()->event->handleButton(gMousePos, button, action, mods);
 }
 
 struct MouseButtonArguments {
@@ -109,12 +110,12 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 
 	gMousePos = mousePos;
 
-	event::gContext->handleHover(mousePos, mouseDelta);
+	context()->event->handleHover(mousePos, mouseDelta);
 }
 
 void cursorEnterCallback(GLFWwindow* window, int entered) {
 	if (!entered) {
-		event::gContext->handleLeave();
+		context()->event->handleLeave();
 	}
 }
 
@@ -126,15 +127,15 @@ void scrollCallback(GLFWwindow *window, double x, double y) {
 #endif
 	scrollDelta = scrollDelta.mult(50.0);
 
-	event::gContext->handleScroll(gMousePos, scrollDelta);
+	context()->event->handleScroll(gMousePos, scrollDelta);
 }
 
 void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	event::gContext->handleText(gMousePos, codepoint);
+	context()->event->handleText(gMousePos, codepoint);
 }
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-	event::gContext->handleKey(gMousePos, key, scancode, action, mods);
+	context()->event->handleKey(gMousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
 	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
@@ -152,7 +153,7 @@ void dropCallback(GLFWwindow *window, int count, const char **paths) {
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
 	}
-	event::gContext->handleDrop(gMousePos, pathsVec);
+	context()->event->handleDrop(gMousePos, pathsVec);
 }
 
 void errorCallback(int error, const char *description) {
@@ -168,7 +169,7 @@ void renderGui() {
 
 	nvgReset(gVg);
 	nvgScale(gVg, gPixelRatio, gPixelRatio);
-	event::gContext->rootWidget->draw(gVg);
+	context()->event->rootWidget->draw(gVg);
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -307,9 +308,9 @@ void windowRun() {
 		windowTitle = APP_NAME;
 		windowTitle += " ";
 		windowTitle += APP_VERSION;
-		if (!gScene->rackWidget->lastPath.empty()) {
+		if (!context()->scene->rackWidget->lastPath.empty()) {
 			windowTitle += " - ";
-			windowTitle += string::filename(gScene->rackWidget->lastPath);
+			windowTitle += string::filename(context()->scene->rackWidget->lastPath);
 		}
 		if (windowTitle != lastWindowTitle) {
 			glfwSetWindowTitle(gWindow, windowTitle.c_str());
@@ -321,7 +322,7 @@ void windowRun() {
 		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
 		pixelRatio = roundf(pixelRatio);
 		if (pixelRatio != gPixelRatio) {
-			event::gContext->handleZoom();
+			context()->event->handleZoom();
 			gPixelRatio = pixelRatio;
 		}
 
@@ -332,10 +333,10 @@ void windowRun() {
 		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
 		gWindowRatio = (float)width / windowWidth;
 
-		event::gContext->rootWidget->box.size = Vec(width, height).div(gPixelRatio);
+		context()->event->rootWidget->box.size = Vec(width, height).div(gPixelRatio);
 
 		// Step scene
-		event::gContext->rootWidget->step();
+		context()->event->rootWidget->step();
 
 		// Render
 		bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);

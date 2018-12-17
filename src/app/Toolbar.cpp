@@ -8,6 +8,7 @@
 #include "ui/Slider.hpp"
 #include "app/PluginManagerWidget.hpp"
 #include "app/Scene.hpp"
+#include "context.hpp"
 #include "helpers.hpp"
 
 
@@ -21,13 +22,13 @@ struct TooltipIconButton : IconButton {
 			tooltip = new Tooltip;
 			tooltip->box.pos = getAbsoluteOffset(Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = getTooltipText();
-			gScene->addChild(tooltip);
+			context()->scene->addChild(tooltip);
 		}
 		IconButton::onEnter(e);
 	}
 	void onLeave(event::Leave &e) override {
 		if (tooltip) {
-			gScene->removeChild(tooltip);
+			context()->scene->removeChild(tooltip);
 			delete tooltip;
 			tooltip = NULL;
 		}
@@ -42,7 +43,7 @@ struct NewButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "New patch (" WINDOW_MOD_KEY_NAME "+N)";}
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->reset();
+		context()->scene->rackWidget->reset();
 	}
 };
 
@@ -52,7 +53,7 @@ struct OpenButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Open patch (" WINDOW_MOD_KEY_NAME "+O)";}
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->loadDialog();
+		context()->scene->rackWidget->loadDialog();
 	}
 };
 
@@ -62,7 +63,7 @@ struct SaveButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Save patch (" WINDOW_MOD_KEY_NAME "+S)";}
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->saveDialog();
+		context()->scene->rackWidget->saveDialog();
 	}
 };
 
@@ -72,7 +73,7 @@ struct SaveAsButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";}
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->saveAsDialog();
+		context()->scene->rackWidget->saveAsDialog();
 	}
 };
 
@@ -82,7 +83,7 @@ struct RevertButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Revert patch";}
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->revert();
+		context()->scene->rackWidget->revert();
 	}
 };
 
@@ -92,7 +93,7 @@ struct DisconnectCablesButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Disconnect cables";}
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->disconnect();
+		context()->scene->rackWidget->disconnect();
 	}
 };
 
@@ -102,21 +103,21 @@ struct PowerMeterButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Toggle power meter (see manual for explanation)";}
 	void onAction(event::Action &e) override {
-		gEngine->powerMeter ^= true;
+		context()->engine->powerMeter ^= true;
 	}
 };
 
 struct EnginePauseItem : MenuItem {
 	void onAction(event::Action &e) override {
-		gEngine->paused ^= true;
+		context()->engine->paused ^= true;
 	}
 };
 
 struct SampleRateItem : MenuItem {
 	float sampleRate;
 	void onAction(event::Action &e) override {
-		gEngine->setSampleRate(sampleRate);
-		gEngine->paused = false;
+		context()->engine->setSampleRate(sampleRate);
+		context()->engine->paused = false;
 	}
 };
 
@@ -133,14 +134,14 @@ struct SampleRateButton : TooltipIconButton {
 		menu->addChild(createMenuLabel("Engine sample rate"));
 
 		EnginePauseItem *pauseItem = new EnginePauseItem;
-		pauseItem->text = gEngine->paused ? "Resume engine" : "Pause engine";
+		pauseItem->text = context()->engine->paused ? "Resume engine" : "Pause engine";
 		menu->addChild(pauseItem);
 
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (float sampleRate : sampleRates) {
 			SampleRateItem *item = new SampleRateItem;
 			item->text = string::f("%.0f Hz", sampleRate);
-			item->rightText = CHECKMARK(gEngine->getSampleRate() == sampleRate);
+			item->rightText = CHECKMARK(context()->engine->getSampleRate() == sampleRate);
 			item->sampleRate = sampleRate;
 			menu->addChild(item);
 		}
@@ -153,7 +154,7 @@ struct RackLockButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Lock modules";}
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->lockModules ^= true;
+		context()->scene->rackWidget->lockModules ^= true;
 	}
 };
 
@@ -185,10 +186,10 @@ struct WireTensionQuantity : Quantity {
 
 struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
-		gScene->zoomWidget->setZoom(std::round(value) / 100);
+		context()->scene->zoomWidget->setZoom(std::round(value) / 100);
 	}
 	float getValue() override {
-		return gScene->zoomWidget->zoom * 100;
+		return context()->scene->zoomWidget->zoom * 100;
 	}
 	float getMinValue() override {return 25;}
 	float getMaxValue() override {return 200;}

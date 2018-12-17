@@ -1,6 +1,7 @@
 #include "app/RackScrollWidget.hpp"
 #include "app/Scene.hpp"
 #include "window.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -10,7 +11,7 @@ void RackScrollWidget::step() {
 	Vec pos = gMousePos;
 	Rect viewport = getViewport(box.zeroPos());
 	// Scroll rack if dragging cable near the edge of the screen
-	if (gScene->rackWidget->wireContainer->activeWire) {
+	if (context()->scene->rackWidget->wireContainer->activeWire) {
 		float margin = 20.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)

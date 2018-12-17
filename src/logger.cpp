@@ -1,5 +1,6 @@
 #include "logger.hpp"
 #include "asset.hpp"
+#include "context.hpp"
 #include <chrono>
 
 
@@ -11,9 +12,9 @@ static FILE *outputFile = NULL;
 static std::chrono::high_resolution_clock::time_point startTime;
 
 
-void init(bool devMode) {
+void init() {
 	startTime = std::chrono::high_resolution_clock::now();
-	if (devMode) {
+	if (context()->devMode) {
 		outputFile = stderr;
 	}
 	else {

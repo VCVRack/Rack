@@ -17,7 +17,7 @@ struct PluginManager {
 	std::string downloadName;
 	std::string loginStatus;
 
-	PluginManager(bool devMode);
+	PluginManager();
 	~PluginManager();
 	void logIn(std::string email, std::string password);
 	void logOut();

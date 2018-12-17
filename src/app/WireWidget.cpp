@@ -4,6 +4,7 @@
 #include "componentlibrary.hpp"
 #include "window.hpp"
 #include "event.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -108,12 +109,12 @@ void WireWidget::updateWire() {
 			wire->outputId = outputPort->portId;
 			wire->inputModule = inputPort->module;
 			wire->inputId = inputPort->portId;
-			gEngine->addWire(wire);
+			context()->engine->addWire(wire);
 		}
 	}
 	else {
 		if (wire) {
-			gEngine->removeWire(wire);
+			context()->engine->removeWire(wire);
 			delete wire;
 			wire = NULL;
 		}
@@ -122,25 +123,25 @@ void WireWidget::updateWire() {
 
 Vec WireWidget::getOutputPos() {
 	if (outputPort) {
-		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), gScene->rackWidget);
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
 	}
 	else if (hoveredOutputPort) {
-		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), gScene->rackWidget);
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
 	}
 	else {
-		return gScene->rackWidget->lastMousePos;
+		return context()->scene->rackWidget->lastMousePos;
 	}
 }
 
 Vec WireWidget::getInputPos() {
 	if (inputPort) {
-		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), gScene->rackWidget);
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
 	}
 	else if (hoveredInputPort) {
-		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), gScene->rackWidget);
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
 	}
 	else {
-		return gScene->rackWidget->lastMousePos;
+		return context()->scene->rackWidget->lastMousePos;
 	}
 }
 
@@ -166,14 +167,14 @@ void WireWidget::draw(NVGcontext *vg) {
 	float opacity = 0.5;
 	float tension = 0.5;
 
-	WireWidget *activeWire = gScene->rackWidget->wireContainer->activeWire;
+	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		// Draw as opaque if the wire is active
 		if (activeWire == this)
 			opacity = 1.0;
 	}
 	else {
-		Port *hoveredPort = dynamic_cast<Port*>(event::gContext->hoveredWidget);
+		Port *hoveredPort = dynamic_cast<Port*>(context()->event->hoveredWidget);
 		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
 			opacity = 1.0;
 	}

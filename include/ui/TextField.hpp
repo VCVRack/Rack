@@ -2,6 +2,7 @@
 #include "widgets/OpaqueWidget.hpp"
 #include "ui/common.hpp"
 #include "event.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -26,9 +27,9 @@ struct TextField : OpaqueWidget {
 		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
 		BNDwidgetState state;
-		if (this == event::gContext->selectedWidget)
+		if (this == context()->event->selectedWidget)
 			state = BND_ACTIVE;
-		else if (this == event::gContext->hoveredWidget)
+		else if (this == context()->event->hoveredWidget)
 			state = BND_HOVER;
 		else
 			state = BND_DEFAULT;
@@ -52,7 +53,7 @@ struct TextField : OpaqueWidget {
 	}
 
 	void onHover(event::Hover &e) override {
-		if (this == event::gContext->draggedWidget) {
+		if (this == context()->event->draggedWidget) {
 			int pos = getTextPosition(e.pos);
 			if (pos != selection) {
 				cursor = pos;

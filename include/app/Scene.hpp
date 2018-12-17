@@ -18,7 +18,6 @@ struct Scene : OpaqueWidget {
 	RackWidget *rackWidget;
 	Toolbar *toolbar;
 
-	bool devMode = false;
 	// Version checking
 	bool checkVersion = true;
 	bool checkedVersion = false;
@@ -32,9 +31,6 @@ struct Scene : OpaqueWidget {
 
 	void runCheckVersion();
 };
-
-
-extern Scene *gScene;
 
 
 } // namespace rack

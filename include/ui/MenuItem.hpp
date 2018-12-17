@@ -3,6 +3,7 @@
 #include "ui/Menu.hpp"
 #include "ui/MenuEntry.hpp"
 #include "ui/MenuOverlay.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -17,7 +18,7 @@ struct MenuItem : MenuEntry {
 
 	void draw(NVGcontext *vg) override {
 		// Get state
-		BNDwidgetState state = (event::gContext->hoveredWidget == this) ? BND_HOVER : BND_DEFAULT;
+		BNDwidgetState state = (context()->event->hoveredWidget == this) ? BND_HOVER : BND_DEFAULT;
 		Menu *parentMenu = dynamic_cast<Menu*>(parent);
 		if (parentMenu && parentMenu->activeEntry == this) {
 			state = BND_ACTIVE;

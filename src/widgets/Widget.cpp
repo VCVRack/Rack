@@ -1,5 +1,6 @@
 #include "widgets/Widget.hpp"
 #include "event.hpp"
+#include "context.hpp"
 #include <algorithm>
 
 
@@ -8,7 +9,7 @@ namespace rack {
 Widget::~Widget() {
 	// You should only delete orphaned widgets
 	assert(!parent);
-	event::gContext->finalizeWidget(this);
+	context()->event->finalizeWidget(this);
 	clearChildren();
 }
 

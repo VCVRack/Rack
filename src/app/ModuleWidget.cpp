@@ -5,6 +5,8 @@
 #include "asset.hpp"
 #include "app/Scene.hpp"
 #include "helpers.hpp"
+#include "context.hpp"
+
 #include "osdialog.h"
 
 
@@ -13,7 +15,7 @@ namespace rack {
 
 ModuleWidget::ModuleWidget(Module *module) {
 	if (module) {
-		gEngine->addModule(module);
+		context()->engine->addModule(module);
 	}
 	this->module = module;
 }
@@ -23,7 +25,7 @@ ModuleWidget::~ModuleWidget() {
 	disconnect();
 	// Remove and delete the Module instance
 	if (module) {
-		gEngine->removeModule(module);
+		context()->engine->removeModule(module);
 		delete module;
 		module = NULL;
 	}
@@ -217,10 +219,10 @@ void ModuleWidget::saveDialog() {
 
 void ModuleWidget::disconnect() {
 	for (Port *input : inputs) {
-		gScene->rackWidget->wireContainer->removeAllWires(input);
+		context()->scene->rackWidget->wireContainer->removeAllWires(input);
 	}
 	for (Port *output : outputs) {
-		gScene->rackWidget->wireContainer->removeAllWires(output);
+		context()->scene->rackWidget->wireContainer->removeAllWires(output);
 	}
 }
 
@@ -235,7 +237,7 @@ void ModuleWidget::reset() {
 		param->reset();
 	}
 	if (module) {
-		gEngine->resetModule(module);
+		context()->engine->resetModule(module);
 	}
 }
 
@@ -244,7 +246,7 @@ void ModuleWidget::randomize() {
 		param->randomize();
 	}
 	if (module) {
-		gEngine->randomizeModule(module);
+		context()->engine->randomizeModule(module);
 	}
 }
 
@@ -253,7 +255,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 
 	// Power meter
-	if (module && gEngine->powerMeter) {
+	if (module && context()->engine->powerMeter) {
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, box.size.y - 20,
@@ -297,7 +299,7 @@ void ModuleWidget::onHover(event::Hover &e) {
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 	if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
 		if (!windowIsModPressed() && !windowIsShiftPressed()) {
-			gScene->rackWidget->deleteModule(this);
+			context()->scene->rackWidget->deleteModule(this);
 			delete this;
 			// e.target = this;
 			return;
@@ -346,7 +348,7 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 		} break;
 		case GLFW_KEY_D: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
-				gScene->rackWidget->cloneModule(this);
+				context()->scene->rackWidget->cloneModule(this);
 				e.target = this;
 				return;
 			}
@@ -364,17 +366,17 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 }
 
 void ModuleWidget::onDragStart(event::DragStart &e) {
-	dragPos = gScene->rackWidget->lastMousePos.minus(box.pos);
+	dragPos = context()->scene->rackWidget->lastMousePos.minus(box.pos);
 }
 
 void ModuleWidget::onDragEnd(event::DragEnd &e) {
 }
 
 void ModuleWidget::onDragMove(event::DragMove &e) {
-	if (!gScene->rackWidget->lockModules) {
+	if (!context()->scene->rackWidget->lockModules) {
 		Rect newBox = box;
-		newBox.pos = gScene->rackWidget->lastMousePos.minus(dragPos);
-		gScene->rackWidget->requestModuleBoxNearest(this, newBox);
+		newBox.pos = context()->scene->rackWidget->lastMousePos.minus(dragPos);
+		context()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}
 }
 
@@ -431,14 +433,14 @@ struct ModuleLoadItem : MenuItem {
 struct ModuleCloneItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->cloneModule(moduleWidget);
+		context()->scene->rackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct ModuleDeleteItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(event::Action &e) override {
-		gScene->rackWidget->deleteModule(moduleWidget);
+		context()->scene->rackWidget->deleteModule(moduleWidget);
 		delete moduleWidget;
 	}
 };

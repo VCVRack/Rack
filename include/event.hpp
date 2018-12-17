@@ -230,9 +230,5 @@ struct Context {
 };
 
 
-// TODO Move this into a global context class
-extern Context *gContext;
-
-
 } // namespace event
 } // namespace rack

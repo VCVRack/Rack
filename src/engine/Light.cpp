@@ -1,5 +1,6 @@
 #include "engine/Light.hpp"
 #include "engine/Engine.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -15,7 +16,7 @@ void Light::setBrightnessSmooth(float brightness, float frames) {
 	float v = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;
 	if (v < value) {
 		// Fade out light with lambda = framerate
-		value += (v - value) * gEngine->getSampleTime() * frames * 60.f;
+		value += (v - value) * context()->engine->getSampleTime() * frames * 60.f;
 	}
 	else {
 		// Immediately illuminate light

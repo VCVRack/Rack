@@ -5,6 +5,7 @@
 #include "ui/Menu.hpp"
 #include "app/Port.hpp"
 #include "engine/Module.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -148,7 +149,7 @@ inline Menu *createMenu() {
 	MenuOverlay *menuOverlay = new MenuOverlay;
 	menuOverlay->addChild(o);
 
-	event::gContext->rootWidget->addChild(menuOverlay);
+	context()->event->rootWidget->addChild(menuOverlay);
 	return o;
 }
 

@@ -5,6 +5,7 @@
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
 #include "engine/Engine.hpp"
+#include "context.hpp"
 #include <jansson.h>
 
 
@@ -36,17 +37,17 @@ static json_t *settingsToJson() {
 	}
 
 	// opacity
-	float opacity = gScene->toolbar->wireOpacity;
+	float opacity = context()->scene->toolbar->wireOpacity;
 	json_t *opacityJ = json_real(opacity);
 	json_object_set_new(rootJ, "wireOpacity", opacityJ);
 
 	// tension
-	float tension = gScene->toolbar->wireTension;
+	float tension = context()->scene->toolbar->wireTension;
 	json_t *tensionJ = json_real(tension);
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
 	// zoom
-	float zoom = gScene->zoomWidget->zoom;
+	float zoom = context()->scene->zoomWidget->zoom;
 	json_t *zoomJ = json_real(zoom);
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
@@ -55,11 +56,11 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
 	// sampleRate
-	json_t *sampleRateJ = json_real(gEngine->getSampleRate());
+	json_t *sampleRateJ = json_real(context()->engine->getSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// lastPath
-	json_t *lastPathJ = json_string(gScene->rackWidget->lastPath.c_str());
+	json_t *lastPathJ = json_string(context()->scene->rackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
 	// skipAutosaveOnLaunch
@@ -71,10 +72,10 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "moduleBrowser", moduleBrowserToJson());
 
 	// powerMeter
-	json_object_set_new(rootJ, "powerMeter", json_boolean(gEngine->powerMeter));
+	json_object_set_new(rootJ, "powerMeter", json_boolean(context()->engine->powerMeter));
 
 	// checkVersion
-	json_object_set_new(rootJ, "checkVersion", json_boolean(gScene->checkVersion));
+	json_object_set_new(rootJ, "checkVersion", json_boolean(context()->scene->checkVersion));
 
 	return rootJ;
 }
@@ -104,17 +105,17 @@ static void settingsFromJson(json_t *rootJ) {
 	// opacity
 	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");
 	if (opacityJ)
-		gScene->toolbar->wireOpacity = json_number_value(opacityJ);
+		context()->scene->toolbar->wireOpacity = json_number_value(opacityJ);
 
 	// tension
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
-		gScene->toolbar->wireTension = json_number_value(tensionJ);
+		context()->scene->toolbar->wireTension = json_number_value(tensionJ);
 
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ) {
-		gScene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
+		context()->scene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
 	}
 
 	// allowCursorLock
@@ -126,13 +127,13 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ) {
 		float sampleRate = json_number_value(sampleRateJ);
-		gEngine->setSampleRate(sampleRate);
+		context()->engine->setSampleRate(sampleRate);
 	}
 
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
 	if (lastPathJ)
-		gScene->rackWidget->lastPath = json_string_value(lastPathJ);
+		context()->scene->rackWidget->lastPath = json_string_value(lastPathJ);
 
 	// skipAutosaveOnLaunch
 	json_t *skipAutosaveOnLaunchJ = json_object_get(rootJ, "skipAutosaveOnLaunch");
@@ -147,12 +148,12 @@ static void settingsFromJson(json_t *rootJ) {
 	// powerMeter
 	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
 	if (powerMeterJ)
-		gEngine->powerMeter = json_boolean_value(powerMeterJ);
+		context()->engine->powerMeter = json_boolean_value(powerMeterJ);
 
 	// checkVersion
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
 	if (checkVersionJ)
-		gScene->checkVersion = json_boolean_value(checkVersionJ);
+		context()->scene->checkVersion = json_boolean_value(checkVersionJ);
 }
 
 

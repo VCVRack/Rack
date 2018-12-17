@@ -1,6 +1,7 @@
 #include "app/Port.hpp"
 #include "app/Scene.hpp"
 #include "window.hpp"
+#include "context.hpp"
 #include "componentlibrary.hpp"
 
 
@@ -24,7 +25,7 @@ Port::Port() {
 Port::~Port() {
 	// plugLight is not a child and is thus owned by the Port, so we need to delete it here
 	delete plugLight;
-	gScene->rackWidget->wireContainer->removeAllWires(this);
+	context()->scene->rackWidget->wireContainer->removeAllWires(this);
 }
 
 void Port::step() {
@@ -41,7 +42,7 @@ void Port::step() {
 }
 
 void Port::draw(NVGcontext *vg) {
-	WireWidget *activeWire = gScene->rackWidget->wireContainer->activeWire;
+	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		// Dim the Port if the active wire cannot plug into this Port
 		if (type == INPUT ? activeWire->inputPort : activeWire->outputPort)
@@ -51,7 +52,7 @@ void Port::draw(NVGcontext *vg) {
 
 void Port::onButton(event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		gScene->rackWidget->wireContainer->removeTopWire(this);
+		context()->scene->rackWidget->wireContainer->removeTopWire(this);
 
 		// HACK
 		// Update hovered*Port of active wire if applicable
@@ -63,7 +64,7 @@ void Port::onButton(event::Button &e) {
 
 void Port::onDragStart(event::DragStart &e) {
 	// Try to grab wire on top of stack
-	WireWidget *wire = gScene->rackWidget->wireContainer->getTopWire(this);
+	WireWidget *wire = context()->scene->rackWidget->wireContainer->getTopWire(this);
 	if (type == OUTPUT && windowIsModPressed()) {
 		wire = NULL;
 	}
@@ -84,13 +85,13 @@ void Port::onDragStart(event::DragStart &e) {
 		else
 			wire->outputPort = this;
 	}
-	gScene->rackWidget->wireContainer->setActiveWire(wire);
+	context()->scene->rackWidget->wireContainer->setActiveWire(wire);
 }
 
 void Port::onDragEnd(event::DragEnd &e) {
 	// FIXME
 	// If the source Port is deleted, this will be called, removing the cable
-	gScene->rackWidget->wireContainer->commitActiveWire();
+	context()->scene->rackWidget->wireContainer->commitActiveWire();
 }
 
 void Port::onDragDrop(event::DragDrop &e) {
@@ -99,12 +100,12 @@ void Port::onDragDrop(event::DragDrop &e) {
 void Port::onDragEnter(event::DragEnter &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
-		WireWidget *topWire = gScene->rackWidget->wireContainer->getTopWire(this);
+		WireWidget *topWire = context()->scene->rackWidget->wireContainer->getTopWire(this);
 		if (topWire)
 			return;
 	}
 
-	WireWidget *activeWire = gScene->rackWidget->wireContainer->activeWire;
+	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		if (type == INPUT)
 			activeWire->hoveredInputPort = this;
@@ -114,7 +115,7 @@ void Port::onDragEnter(event::DragEnter &e) {
 }
 
 void Port::onDragLeave(event::DragLeave &e) {
-	WireWidget *activeWire = gScene->rackWidget->wireContainer->activeWire;
+	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		if (type == INPUT)
 			activeWire->hoveredInputPort = NULL;

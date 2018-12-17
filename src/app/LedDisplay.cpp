@@ -2,6 +2,7 @@
 #include "asset.hpp"
 #include "window.hpp"
 #include "event.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -85,7 +86,7 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 		NVGcolor highlightColor = color;
 		highlightColor.a = 0.5;
 		int begin = std::min(cursor, selection);
-		int end = (this == event::gContext->selectedWidget) ? std::max(cursor, selection) : -1;
+		int end = (this == context()->event->selectedWidget) ? std::max(cursor, selection) : -1;
 		bndIconLabelCaret(vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, 12, text.c_str(), highlightColor, begin, end);

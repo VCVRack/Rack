@@ -71,7 +71,7 @@ struct MIDITriggerToCVInterface : Module {
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-		float deltaTime = gEngine->getSampleTime();
+		float deltaTime = context()->engine->getSampleTime();
 
 		for (int i = 0; i < 16; i++) {
 			if (gateTimes[i] > 0.f) {
@@ -173,8 +173,8 @@ struct MidiTrigChoice : GridChoice {
 			text = string::f("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
 
-			if (event::gContext->selectedWidget == this)
-				event::gContext->selectedWidget = NULL;
+			if (context()->event->selectedWidget == this)
+				context()->event->selectedWidget = NULL;
 		}
 	}
 

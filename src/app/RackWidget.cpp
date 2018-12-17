@@ -10,6 +10,7 @@
 #include "system.hpp"
 #include "logger.hpp"
 #include "plugin/PluginManager.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -59,7 +60,7 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 
-	gScene->scrollWidget->offset = Vec(0, 0);
+	context()->scene->scrollWidget->offset = Vec(0, 0);
 }
 
 void RackWidget::reset() {

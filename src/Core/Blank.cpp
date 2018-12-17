@@ -1,4 +1,5 @@
 #include "Core.hpp"
+#include "context.hpp"
 
 using namespace rack;
 
@@ -17,14 +18,14 @@ struct ModuleResizeHandle : virtual Widget {
 		// }
 	}
 	void onDragStart(event::DragStart &e) override {
-		dragX = gScene->rackWidget->lastMousePos.x;
+		dragX = context()->scene->rackWidget->lastMousePos.x;
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 		originalBox = m->box;
 	}
 	void onDragMove(event::DragMove &e) override {
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
-		float newDragX = gScene->rackWidget->lastMousePos.x;
+		float newDragX = context()->scene->rackWidget->lastMousePos.x;
 		float deltaX = newDragX - dragX;
 
 		Rect newBox = originalBox;
@@ -40,7 +41,7 @@ struct ModuleResizeHandle : virtual Widget {
 			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
-		gScene->rackWidget->requestModuleBox(m, newBox);
+		context()->scene->rackWidget->requestModuleBox(m, newBox);
 	}
 	void draw(NVGcontext *vg) override {
 		for (float x = 5.0; x <= 10.0; x += 5.0) {

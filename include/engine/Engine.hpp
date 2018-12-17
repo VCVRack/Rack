@@ -44,8 +44,4 @@ struct Engine {
 };
 
 
-// TODO Move to global state header
-extern Engine *gEngine;
-
-
 } // namespace rack

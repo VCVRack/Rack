@@ -4,6 +4,7 @@
 #include "network.hpp"
 #include "asset.hpp"
 #include "string.hpp"
+#include "context.hpp"
 #include "app/common.hpp"
 
 #include <unistd.h>
@@ -299,7 +300,7 @@ static void extractPackages(std::string path) {
 // public API
 ////////////////////
 
-PluginManager::PluginManager(bool devMode) {
+PluginManager::PluginManager() {
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *corePlugin = new Plugin;
@@ -310,7 +311,7 @@ PluginManager::PluginManager(bool devMode) {
 	std::string userPlugins = asset::user("plugins");
 	mkdir(userPlugins.c_str(), 0755);
 
-	if (!devMode) {
+	if (!context()->devMode) {
 		// Copy Fundamental package to plugins directory if folder does not exist
 		std::string fundamentalSrc = asset::system("Fundamental.zip");
 		std::string fundamentalDest = asset::user("plugins/Fundamental.zip");
