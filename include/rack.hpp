@@ -8,7 +8,6 @@
 #include "random.hpp"
 #include "network.hpp"
 #include "asset.hpp"
-#include "plugin.hpp"
 #include "window.hpp"
 #include "helpers.hpp"
 
@@ -77,3 +76,7 @@
 #include "engine/Output.hpp"
 #include "engine/Param.hpp"
 #include "engine/Wire.hpp"
+
+#include "plugin/Plugin.hpp"
+#include "plugin/Model.hpp"
+#include "plugin/callbacks.hpp"

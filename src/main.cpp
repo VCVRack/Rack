@@ -10,6 +10,8 @@
 #include "settings.hpp"
 #include "engine/Engine.hpp"
 #include "app/Scene.hpp"
+#include "tags.hpp"
+#include "plugin/PluginManager.hpp"
 
 #ifdef ARCH_WIN
 	#include <Windows.h>
@@ -67,7 +69,8 @@ int main(int argc, char *argv[]) {
 	INFO("Local directory: %s", asset::local("").c_str());
 
 	// Initialize app
-	pluginInit(devMode);
+	tagsInit();
+	gPluginManager = new PluginManager(devMode);
 	gEngine = new Engine;
 	rtmidiInit();
 	bridgeInit();
@@ -118,7 +121,8 @@ int main(int argc, char *argv[]) {
 	delete gEngine;
 	gEngine = NULL;
 	midiDestroy();
-	pluginDestroy();
+	delete gPluginManager;
+	gPluginManager = NULL;
 	logger::destroy();
 
 	return 0;

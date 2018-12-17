@@ -9,6 +9,7 @@
 #include "asset.hpp"
 #include "system.hpp"
 #include "logger.hpp"
+#include "plugin/PluginManager.hpp"
 
 
 namespace rack {
@@ -377,7 +378,7 @@ ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
 	std::string modelSlug = json_string_value(modelSlugJ);
 
 	// Get Model
-	Model *model = pluginGetModel(pluginSlug, modelSlug);
+	Model *model = gPluginManager->getModel(pluginSlug, modelSlug);
 	if (!model)
 		return NULL;
 

@@ -5,7 +5,7 @@
 #include "app/SVGPanel.hpp"
 #include "app/Port.hpp"
 #include "app/ParamWidget.hpp"
-#include "plugin.hpp"
+#include "plugin/Model.hpp"
 #include "engine/Module.hpp"
 
 

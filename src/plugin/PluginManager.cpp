@@ -19,7 +19,7 @@
 #endif
 #include <dirent.h>
 
-#include "plugin.hpp"
+#include "plugin/PluginManager.hpp"
 #include "system.hpp"
 #include "logger.hpp"
 #include "network.hpp"
@@ -32,33 +32,11 @@
 namespace rack {
 
 
-std::list<Plugin*> gPlugins;
-std::string gToken;
-
-
-static bool isDownloading = false;
-static float downloadProgress = 0.0;
-static std::string downloadName;
-static std::string loginStatus;
-
-
-Plugin::~Plugin() {
-	for (Model *model : models) {
-		delete model;
-	}
-}
-
-void Plugin::addModel(Model *model) {
-	assert(!model->plugin);
-	model->plugin = this;
-	models.push_back(model);
-}
-
 ////////////////////
 // private API
 ////////////////////
 
-static bool loadPlugin(std::string path) {
+static bool PluginManager_loadPlugin(PluginManager *pluginManager, std::string path) {
 	std::string libraryFilename;
 #if ARCH_LIN
 	libraryFilename = path + "/" + "plugin.so";
@@ -112,7 +90,7 @@ static bool loadPlugin(std::string path) {
 	initCallback(plugin);
 
 	// Reject plugin if slug already exists
-	Plugin *oldPlugin = pluginGetPlugin(plugin->slug);
+	Plugin *oldPlugin = pluginManager->getPlugin(plugin->slug);
 	if (oldPlugin) {
 		WARN("Plugin \"%s\" is already loaded, not attempting to load it again", plugin->slug.c_str());
 		// TODO
@@ -121,13 +99,13 @@ static bool loadPlugin(std::string path) {
 	}
 
 	// Add plugin to list
-	gPlugins.push_back(plugin);
+	pluginManager->plugins.push_back(plugin);
 	INFO("Loaded plugin %s %s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
 
 	return true;
 }
 
-static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
+static bool PluginManager_syncPlugin(PluginManager *pluginManager, std::string slug, json_t *manifestJ, bool dryRun) {
 	// Check that "status" is "available"
 	json_t *statusJ = json_object_get(manifestJ, "status");
 	if (!statusJ) {
@@ -147,7 +125,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	std::string latestVersion = json_string_value(latestVersionJ);
 
 	// Check whether we already have a plugin with the same slug and version
-	Plugin *plugin = pluginGetPlugin(slug);
+	Plugin *plugin = pluginManager->getPlugin(slug);
 	if (plugin && plugin->version == latestVersion) {
 		return false;
 	}
@@ -175,7 +153,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	if (dryRun) {
 		downloadUrl += "/available";
 	}
-	downloadUrl += "?token=" + network::encodeUrl(gToken);
+	downloadUrl += "?token=" + network::encodeUrl(pluginManager->token);
 	downloadUrl += "&slug=" + network::encodeUrl(slug);
 	downloadUrl += "&version=" + network::encodeUrl(latestVersion);
 	downloadUrl += "&arch=" + network::encodeUrl(arch);
@@ -194,28 +172,28 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 		return json_boolean_value(successJ);
 	}
 	else {
-		downloadName = name;
-		downloadProgress = 0.0;
+		pluginManager->downloadName = name;
+		pluginManager->downloadProgress = 0.0;
 		INFO("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
 
 		// Download zip
 		std::string pluginDest = asset::local("plugins/" + slug + ".zip");
-		if (!network::requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
+		if (!network::requestDownload(downloadUrl, pluginDest, &pluginManager->downloadProgress)) {
 			WARN("Plugin %s download was unsuccessful", slug.c_str());
 			return false;
 		}
 
-		downloadName = "";
+		pluginManager->downloadName = "";
 		return true;
 	}
 }
 
-static void loadPlugins(std::string path) {
+static void PluginManager_loadPlugins(PluginManager *pluginManager, std::string path) {
 	std::string message;
 	for (std::string pluginPath : system::listEntries(path)) {
 		if (!system::isDirectory(pluginPath))
 			continue;
-		if (!loadPlugin(pluginPath)) {
+		if (!PluginManager_loadPlugin(pluginManager, pluginPath)) {
 			message += string::f("Could not load plugin %s\n", pluginPath.c_str());
 		}
 	}
@@ -321,14 +299,12 @@ static void extractPackages(std::string path) {
 // public API
 ////////////////////
 
-void pluginInit(bool devMode) {
-	tagsInit();
-
+PluginManager::PluginManager(bool devMode) {
 	// Load core
 	// This function is defined in core.cpp
 	Plugin *corePlugin = new Plugin;
 	init(corePlugin);
-	gPlugins.push_back(corePlugin);
+	plugins.push_back(corePlugin);
 
 	// Get local plugins directory
 	std::string localPlugins = asset::local("plugins");
@@ -346,15 +322,15 @@ void pluginInit(bool devMode) {
 
 	// Extract packages and load plugins
 	extractPackages(localPlugins);
-	loadPlugins(localPlugins);
+	PluginManager_loadPlugins(this, localPlugins);
 }
 
-void pluginDestroy() {
-	for (Plugin *plugin : gPlugins) {
+PluginManager::~PluginManager() {
+	for (Plugin *plugin : plugins) {
 		// Free library handle
 #if ARCH_WIN
 		if (plugin->handle)
-			FreeLibrary((HINSTANCE)plugin->handle);
+			FreeLibrary((HINSTANCE) plugin->handle);
 #else
 		if (plugin->handle)
 			dlclose(plugin->handle);
@@ -364,11 +340,40 @@ void pluginDestroy() {
 		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
 		// delete plugin;
 	}
-	gPlugins.clear();
+	plugins.clear();
 }
 
-bool pluginSync(bool dryRun) {
-	if (gToken.empty())
+void PluginManager::logIn(std::string email, std::string password) {
+	json_t *reqJ = json_object();
+	json_object_set(reqJ, "email", json_string(email.c_str()));
+	json_object_set(reqJ, "password", json_string(password.c_str()));
+	json_t *resJ = network::requestJson(network::METHOD_POST, API_HOST + "/token", reqJ);
+	json_decref(reqJ);
+
+	if (resJ) {
+		json_t *errorJ = json_object_get(resJ, "error");
+		if (errorJ) {
+			const char *errorStr = json_string_value(errorJ);
+			loginStatus = errorStr;
+		}
+		else {
+			json_t *tokenJ = json_object_get(resJ, "token");
+			if (tokenJ) {
+				const char *tokenStr = json_string_value(tokenJ);
+				token = tokenStr;
+				loginStatus = "";
+			}
+		}
+		json_decref(resJ);
+	}
+}
+
+void PluginManager::logOut() {
+	token = "";
+}
+
+bool PluginManager::sync(bool dryRun) {
+	if (token.empty())
 		return false;
 
 	bool available = false;
@@ -384,7 +389,7 @@ bool pluginSync(bool dryRun) {
 
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
-	json_object_set(pluginsReqJ, "token", json_string(gToken.c_str()));
+	json_object_set(pluginsReqJ, "token", json_string(token.c_str()));
 	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, API_HOST + "/plugins", pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
@@ -438,7 +443,7 @@ bool pluginSync(bool dryRun) {
 		if (!manifestJ)
 			continue;
 
-		if (syncPlugin(slug, manifestJ, dryRun)) {
+		if (PluginManager_syncPlugin(this, slug, manifestJ, dryRun)) {
 			available = true;
 		}
 	}
@@ -446,61 +451,16 @@ bool pluginSync(bool dryRun) {
 	return available;
 }
 
-void pluginLogIn(std::string email, std::string password) {
-	json_t *reqJ = json_object();
-	json_object_set(reqJ, "email", json_string(email.c_str()));
-	json_object_set(reqJ, "password", json_string(password.c_str()));
-	json_t *resJ = network::requestJson(network::METHOD_POST, API_HOST + "/token", reqJ);
-	json_decref(reqJ);
-
-	if (resJ) {
-		json_t *errorJ = json_object_get(resJ, "error");
-		if (errorJ) {
-			const char *errorStr = json_string_value(errorJ);
-			loginStatus = errorStr;
-		}
-		else {
-			json_t *tokenJ = json_object_get(resJ, "token");
-			if (tokenJ) {
-				const char *tokenStr = json_string_value(tokenJ);
-				gToken = tokenStr;
-				loginStatus = "";
-			}
-		}
-		json_decref(resJ);
-	}
-}
-
-void pluginLogOut() {
-	gToken = "";
-}
-
-void pluginCancelDownload() {
+void PluginManager::cancelDownload() {
 	// TODO
 }
 
-bool pluginIsLoggedIn() {
-	return gToken != "";
+bool PluginManager::isLoggedIn() {
+	return token != "";
 }
 
-bool pluginIsDownloading() {
-	return isDownloading;
-}
-
-float pluginGetDownloadProgress() {
-	return downloadProgress;
-}
-
-std::string pluginGetDownloadName() {
-	return downloadName;
-}
-
-std::string pluginGetLoginStatus() {
-	return loginStatus;
-}
-
-Plugin *pluginGetPlugin(std::string pluginSlug) {
-	for (Plugin *plugin : gPlugins) {
+Plugin *PluginManager::getPlugin(std::string pluginSlug) {
+	for (Plugin *plugin : plugins) {
 		if (plugin->slug == pluginSlug) {
 			return plugin;
 		}
@@ -508,8 +468,8 @@ Plugin *pluginGetPlugin(std::string pluginSlug) {
 	return NULL;
 }
 
-Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
-	Plugin *plugin = pluginGetPlugin(pluginSlug);
+Model *PluginManager::getModel(std::string pluginSlug, std::string modelSlug) {
+	Plugin *plugin = getPlugin(pluginSlug);
 	if (plugin) {
 		for (Model *model : plugin->models) {
 			if (model->slug == modelSlug) {
@@ -519,6 +479,9 @@ Model *pluginGetModel(std::string pluginSlug, std::string modelSlug) {
 	}
 	return NULL;
 }
+
+
+PluginManager *gPluginManager = NULL;
 
 
 } // namespace rack

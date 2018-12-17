@@ -1,6 +1,5 @@
 #include <set>
 #include <algorithm>
-#include "plugin.hpp"
 #include "window.hpp"
 #include "helpers.hpp"
 #include "event.hpp"
@@ -11,6 +10,7 @@
 #include "app/Scene.hpp"
 #include "ui/List.hpp"
 #include "ui/TextField.hpp"
+#include "plugin/PluginManager.hpp"
 
 
 static const float itemMargin = 2.0;
@@ -322,7 +322,7 @@ struct ModuleBrowser : OpaqueWidget {
 		addChild(moduleScroll);
 
 		// Collect authors
-		for (Plugin *plugin : gPlugins) {
+		for (Plugin *plugin : gPluginManager->plugins) {
 			for (Model *model : plugin->models) {
 				// Insert author
 				if (!model->author.empty())
@@ -427,7 +427,7 @@ struct ModuleBrowser : OpaqueWidget {
 				moduleList->addChild(item);
 			}
 			// Modules
-			for (Plugin *plugin : gPlugins) {
+			for (Plugin *plugin : gPluginManager->plugins) {
 				for (Model *model : plugin->models) {
 					if (isModelFiltered(model) && isModelMatch(model, search)) {
 						ModelItem *item = new ModelItem;
@@ -587,7 +587,7 @@ void moduleBrowserFromJson(json_t *rootJ) {
 				continue;
 			std::string pluginSlug = json_string_value(pluginJ);
 			std::string modelSlug = json_string_value(modelJ);
-			Model *model = pluginGetModel(pluginSlug, modelSlug);
+			Model *model = gPluginManager->getModel(pluginSlug, modelSlug);
 			if (!model)
 				continue;
 			sFavoriteModels.insert(model);

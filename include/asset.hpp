@@ -1,6 +1,6 @@
 #pragma once
 #include "common.hpp"
-#include "plugin.hpp"
+#include "plugin/Plugin.hpp"
 
 
 namespace rack {

@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "plugin/Model.hpp"
 #include "event.hpp"
 #include "ui/MenuLabel.hpp"
 #include "ui/MenuItem.hpp"
