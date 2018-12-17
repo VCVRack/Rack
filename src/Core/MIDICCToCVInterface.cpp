@@ -182,7 +182,7 @@ struct MidiCcWidget : Grid16MidiWidget {
 
 struct MIDICCToCVInterfaceWidget : ModuleWidget {
 	MIDICCToCVInterfaceWidget(MIDICCToCVInterface *module) : ModuleWidget(module) {
-		setPanel(SVG::load(asset::system("res/Core/MIDICCToCVInterface.svg")));
+		setPanel(SVG::load(context()->asset->system("res/Core/MIDICCToCVInterface.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

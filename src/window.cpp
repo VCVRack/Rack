@@ -1,6 +1,6 @@
 #include "window.hpp"
 #include "logger.hpp"
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "app/Scene.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
@@ -257,7 +257,7 @@ void windowInit() {
 	assert(gFramebufferVg);
 
 	// Set up Blendish
-	gGuiFont = Font::load(asset::system("res/fonts/DejaVuSans.ttf"));
+	gGuiFont = Font::load(context()->asset->system("res/fonts/DejaVuSans.ttf"));
 	bndSetFont(gGuiFont->handle);
 
 	windowSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));

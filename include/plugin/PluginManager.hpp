@@ -29,8 +29,6 @@ struct PluginManager {
 	Model *getModel(std::string pluginSlug, std::string modelSlug);
 };
 
-extern PluginManager *gPluginManager;
-
 
 } // namespace rack
 

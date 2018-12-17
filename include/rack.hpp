@@ -7,7 +7,7 @@
 #include "system.hpp"
 #include "random.hpp"
 #include "network.hpp"
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "window.hpp"
 #include "context.hpp"
 #include "helpers.hpp"

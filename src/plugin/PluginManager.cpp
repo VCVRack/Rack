@@ -2,7 +2,7 @@
 #include "system.hpp"
 #include "logger.hpp"
 #include "network.hpp"
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "string.hpp"
 #include "context.hpp"
 #include "app/common.hpp"
@@ -178,7 +178,7 @@ static bool PluginManager_syncPlugin(PluginManager *pluginManager, std::string s
 		INFO("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
 
 		// Download zip
-		std::string pluginDest = asset::user("plugins/" + slug + ".zip");
+		std::string pluginDest = context()->asset->user("plugins/" + slug + ".zip");
 		if (!network::requestDownload(downloadUrl, pluginDest, &pluginManager->downloadProgress)) {
 			WARN("Plugin %s download was unsuccessful", slug.c_str());
 			return false;
@@ -308,14 +308,14 @@ PluginManager::PluginManager() {
 	plugins.push_back(corePlugin);
 
 	// Get user plugins directory
-	std::string userPlugins = asset::user("plugins");
+	std::string userPlugins = context()->asset->user("plugins");
 	mkdir(userPlugins.c_str(), 0755);
 
 	if (!context()->devMode) {
 		// Copy Fundamental package to plugins directory if folder does not exist
-		std::string fundamentalSrc = asset::system("Fundamental.zip");
-		std::string fundamentalDest = asset::user("plugins/Fundamental.zip");
-		std::string fundamentalDir = asset::user("plugins/Fundamental");
+		std::string fundamentalSrc = context()->asset->system("Fundamental.zip");
+		std::string fundamentalDest = context()->asset->user("plugins/Fundamental.zip");
+		std::string fundamentalDir = context()->asset->user("plugins/Fundamental");
 		if (system::isFile(fundamentalSrc) && !system::isFile(fundamentalDest) && !system::isDirectory(fundamentalDir)) {
 			system::copyFile(fundamentalSrc, fundamentalDest);
 		}
@@ -480,9 +480,6 @@ Model *PluginManager::getModel(std::string pluginSlug, std::string modelSlug) {
 	}
 	return NULL;
 }
-
-
-PluginManager *gPluginManager = NULL;
 
 
 } // namespace rack

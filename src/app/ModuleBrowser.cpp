@@ -323,7 +323,7 @@ struct ModuleBrowser : OpaqueWidget {
 		addChild(moduleScroll);
 
 		// Collect authors
-		for (Plugin *plugin : gPluginManager->plugins) {
+		for (Plugin *plugin : context()->plugin->plugins) {
 			for (Model *model : plugin->models) {
 				// Insert author
 				if (!model->author.empty())
@@ -428,7 +428,7 @@ struct ModuleBrowser : OpaqueWidget {
 				moduleList->addChild(item);
 			}
 			// Modules
-			for (Plugin *plugin : gPluginManager->plugins) {
+			for (Plugin *plugin : context()->plugin->plugins) {
 				for (Model *model : plugin->models) {
 					if (isModelFiltered(model) && isModelMatch(model, search)) {
 						ModelItem *item = new ModelItem;
@@ -588,7 +588,7 @@ void moduleBrowserFromJson(json_t *rootJ) {
 				continue;
 			std::string pluginSlug = json_string_value(pluginJ);
 			std::string modelSlug = json_string_value(modelJ);
-			Model *model = gPluginManager->getModel(pluginSlug, modelSlug);
+			Model *model = context()->plugin->getModel(pluginSlug, modelSlug);
 			if (!model)
 				continue;
 			sFavoriteModels.insert(model);

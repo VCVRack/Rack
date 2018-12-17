@@ -8,6 +8,7 @@
 #include "ui/PasswordField.hpp"
 #include "ui/Label.hpp"
 #include "plugin/PluginManager.hpp"
+#include "context.hpp"
 #include "window.hpp"
 #include "helpers.hpp"
 #include "osdialog.h"
@@ -31,7 +32,7 @@ struct LogInButton : Button {
 	TextField *passwordField;
 	void onAction(event::Action &e) override {
 		std::thread t([&]() {
-			gPluginManager->logIn(emailField->text, passwordField->text);
+			context()->plugin->logIn(emailField->text, passwordField->text);
 		});
 		t.detach();
 		passwordField->text = "";
@@ -41,7 +42,7 @@ struct LogInButton : Button {
 
 struct StatusLabel : Label {
 	void step() override {
-		text = gPluginManager->loginStatus;
+		text = context()->plugin->loginStatus;
 	}
 };
 
@@ -67,7 +68,7 @@ struct SyncButton : Button {
 		// Check for plugin update on first step()
 		if (!checked) {
 			std::thread t([this]() {
-				if (gPluginManager->sync(true))
+				if (context()->plugin->sync(true))
 					available = true;
 			});
 			t.detach();
@@ -96,7 +97,7 @@ struct SyncButton : Button {
 	void onAction(event::Action &e) override {
 		available = false;
 		std::thread t([this]() {
-			if (gPluginManager->sync(false))
+			if (context()->plugin->sync(false))
 				completed = true;
 		});
 		t.detach();
@@ -106,14 +107,14 @@ struct SyncButton : Button {
 
 struct LogOutButton : Button {
 	void onAction(event::Action &e) override {
-		gPluginManager->logOut();
+		context()->plugin->logOut();
 	}
 };
 
 
 struct DownloadQuantity : Quantity {
 	float getValue() override {
-		return gPluginManager->downloadProgress;
+		return context()->plugin->downloadProgress;
 	}
 
 	float getDisplayValue() override {
@@ -123,7 +124,7 @@ struct DownloadQuantity : Quantity {
 	int getDisplayPrecision() override {return 0;}
 
 	std::string getLabel() override {
-		return "Downloading " + gPluginManager->downloadName;
+		return "Downloading " + context()->plugin->downloadName;
 	}
 
 	std::string getUnit() override {return "%";}
@@ -139,7 +140,7 @@ struct DownloadProgressBar : ProgressBar {
 
 struct CancelButton : Button {
 	void onAction(event::Action &e) override {
-		gPluginManager->cancelDownload();
+		context()->plugin->cancelDownload();
 	}
 };
 
@@ -226,9 +227,9 @@ void PluginManagerWidget::step() {
 	manageWidget->visible = false;
 	downloadWidget->visible = false;
 
-	if (gPluginManager->isDownloading)
+	if (context()->plugin->isDownloading)
 		downloadWidget->visible = true;
-	else if (gPluginManager->isLoggedIn())
+	else if (context()->plugin->isLoggedIn())
 		manageWidget->visible = true;
 	else
 		loginWidget->visible = true;

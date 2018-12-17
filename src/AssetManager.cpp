@@ -1,6 +1,7 @@
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "system.hpp"
 #include "context.hpp"
+#include "plugin/Plugin.hpp"
 
 #if ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
@@ -21,14 +22,9 @@
 
 
 namespace rack {
-namespace asset {
 
 
-std::string systemDir;
-std::string userDir;
-
-
-void init() {
+AssetManager::AssetManager() {
 	// Get system dir
 	if (systemDir.empty()) {
 		if (context()->devMode) {
@@ -99,21 +95,20 @@ void init() {
 }
 
 
-std::string system(std::string filename) {
+std::string AssetManager::system(std::string filename) {
 	return systemDir + "/" + filename;
 }
 
 
-std::string user(std::string filename) {
+std::string AssetManager::user(std::string filename) {
 	return userDir + "/" + filename;
 }
 
 
-std::string plugin(Plugin *plugin, std::string filename) {
+std::string AssetManager::plugin(Plugin *plugin, std::string filename) {
 	assert(plugin);
 	return plugin->path + "/" + filename;
 }
 
 
-} // namespace asset
 } // namespace rack

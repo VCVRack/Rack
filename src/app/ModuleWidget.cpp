@@ -2,7 +2,7 @@
 #include "engine/Engine.hpp"
 #include "logger.hpp"
 #include "system.hpp"
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "app/Scene.hpp"
 #include "helpers.hpp"
 #include "context.hpp"
@@ -185,7 +185,7 @@ void ModuleWidget::save(std::string filename) {
 }
 
 void ModuleWidget::loadDialog() {
-	std::string dir = asset::user("presets");
+	std::string dir = context()->asset->user("presets");
 	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
@@ -198,7 +198,7 @@ void ModuleWidget::loadDialog() {
 }
 
 void ModuleWidget::saveDialog() {
-	std::string dir = asset::user("presets");
+	std::string dir = context()->asset->user("presets");
 	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());

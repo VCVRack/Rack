@@ -1,5 +1,5 @@
 #include "logger.hpp"
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "context.hpp"
 #include <chrono>
 
@@ -18,7 +18,7 @@ void init() {
 		outputFile = stderr;
 	}
 	else {
-		std::string logFilename = asset::user("log.txt");
+		std::string logFilename = context()->asset->user("log.txt");
 		outputFile = fopen(logFilename.c_str(), "w");
 	}
 }

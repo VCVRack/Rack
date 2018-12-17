@@ -5,12 +5,14 @@
 namespace rack {
 
 
-struct Scene;
-struct Engine;
-
 namespace event {
 	struct Context;
 }
+
+struct Scene;
+struct Engine;
+struct PluginManager;
+struct AssetManager;
 
 
 struct Context {
@@ -19,6 +21,8 @@ struct Context {
 	event::Context *event = NULL;
 	Scene *scene = NULL;
 	Engine *engine = NULL;
+	PluginManager *plugin = NULL;
+	AssetManager *asset = NULL;
 };
 
 

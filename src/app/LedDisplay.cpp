@@ -1,5 +1,5 @@
 #include "app/LedDisplay.hpp"
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "window.hpp"
 #include "event.hpp"
 #include "context.hpp"
@@ -34,7 +34,7 @@ void LedDisplaySeparator::draw(NVGcontext *vg) {
 
 LedDisplayChoice::LedDisplayChoice() {
 	box.size = mm2px(Vec(0, 28.0 / 3));
-	font = Font::load(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+	font = Font::load(context()->asset->system("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = Vec(10, 18);
 }
@@ -64,7 +64,7 @@ void LedDisplayChoice::onButton(event::Button &e) {
 
 
 LedDisplayTextField::LedDisplayTextField() {
-	font = Font::load(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+	font = Font::load(context()->asset->system("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = Vec(5, 5);
 }

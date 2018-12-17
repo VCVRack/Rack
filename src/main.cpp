@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include "random.hpp"
 #include "logger.hpp"
-#include "asset.hpp"
+#include "AssetManager.hpp"
 #include "rtmidi.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
@@ -46,10 +46,10 @@ int main(int argc, char *argv[]) {
 				context()->devMode = true;
 			} break;
 			case 's': {
-				asset::systemDir = optarg;
+				context()->asset->systemDir = optarg;
 			} break;
 			case 'u': {
-				asset::userDir = optarg;
+				context()->asset->userDir = optarg;
 			} break;
 			default: break;
 		}
@@ -60,19 +60,19 @@ int main(int argc, char *argv[]) {
 
 	// Initialize environment
 	random::init();
-	asset::init();
+	context()->asset = new AssetManager;
 	logger::init();
 
 	// Log environment
 	INFO("%s %s", APP_NAME.c_str(), APP_VERSION.c_str());
 	if (context()->devMode)
 		INFO("Development mode");
-	INFO("System directory: %s", asset::system("").c_str());
-	INFO("User directory: %s", asset::user("").c_str());
+	INFO("System directory: %s", context()->asset->system("").c_str());
+	INFO("User directory: %s", context()->asset->user("").c_str());
 
 	// Initialize app
 	tagsInit();
-	gPluginManager = new PluginManager;
+	context()->plugin = new PluginManager;
 	context()->engine = new Engine;
 	rtmidiInit();
 	bridgeInit();
@@ -82,13 +82,13 @@ int main(int argc, char *argv[]) {
 	context()->scene = new Scene;
 	context()->event->rootWidget = context()->scene;
 	windowInit();
-	settings::load(asset::user("settings.json"));
+	settings::load(context()->asset->user("settings.json"));
 
 	if (patchFile.empty()) {
 		// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
 		bool oldSkipAutosaveOnLaunch = settings::gSkipAutosaveOnLaunch;
 		settings::gSkipAutosaveOnLaunch = true;
-		settings::save(asset::user("settings.json"));
+		settings::save(context()->asset->user("settings.json"));
 		settings::gSkipAutosaveOnLaunch = false;
 		if (oldSkipAutosaveOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
 			context()->scene->rackWidget->lastPath = "";
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 		else {
 			// Load autosave
 			std::string oldLastPath = context()->scene->rackWidget->lastPath;
-			context()->scene->rackWidget->load(asset::user("autosave.vcv"));
+			context()->scene->rackWidget->load(context()->asset->user("autosave.vcv"));
 			context()->scene->rackWidget->lastPath = oldLastPath;
 		}
 	}
@@ -111,8 +111,8 @@ int main(int argc, char *argv[]) {
 	context()->engine->stop();
 
 	// Destroy namespaces
-	context()->scene->rackWidget->save(asset::user("autosave.vcv"));
-	settings::save(asset::user("settings.json"));
+	context()->scene->rackWidget->save(context()->asset->user("autosave.vcv"));
+	settings::save(context()->asset->user("settings.json"));
 	delete context()->scene;
 	context()->scene = NULL;
 	delete context()->event;
@@ -122,8 +122,10 @@ int main(int argc, char *argv[]) {
 	delete context()->engine;
 	context()->engine = NULL;
 	midiDestroy();
-	delete gPluginManager;
-	gPluginManager = NULL;
+	delete context()->plugin;
+	context()->plugin = NULL;
+	delete context()->asset;
+	context()->asset = NULL;
 	logger::destroy();
 
 	return 0;
