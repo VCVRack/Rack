@@ -1,13 +1,12 @@
-#include <assert.h>
+#include "Core.hpp"
+#include "audio.hpp"
+#include "dsp/resampler.hpp"
+#include "dsp/ringbuffer.hpp"
 #include <mutex>
 #include <chrono>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include "Core.hpp"
-#include "audio.hpp"
-#include "dsp/resampler.hpp"
-#include "dsp/ringbuffer.hpp"
 
 
 #define AUDIO_OUTPUTS 8

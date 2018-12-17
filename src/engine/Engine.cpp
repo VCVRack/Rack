@@ -1,13 +1,12 @@
+#include "engine/Engine.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <thread>
 #include <condition_variable>
 #include <mutex>
-
 #include <xmmintrin.h>
 #include <pmmintrin.h>
-
-#include "engine/Engine.hpp"
 
 
 namespace rack {

@@ -15,21 +15,21 @@
 	#include <ApplicationServices/ApplicationServices.h>
 #endif
 
-#include "osdialog.h"
+#include <osdialog.h>
 
 #define NANOVG_GL2_IMPLEMENTATION 1
 // #define NANOVG_GL3_IMPLEMENTATION 1
 // #define NANOVG_GLES2_IMPLEMENTATION 1
 // #define NANOVG_GLES3_IMPLEMENTATION 1
-#include "nanovg_gl.h"
+#include <nanovg_gl.h>
 // Hack to get framebuffer objects working on OpenGL 2 (we blindly assume the extension is supported)
 #define NANOVG_FBO_VALID 1
-#include "nanovg_gl_utils.h"
+#include <nanovg_gl_utils.h>
 #define BLENDISH_IMPLEMENTATION
-#include "blendish.h"
+#include <blendish.h>
 #define NANOSVG_IMPLEMENTATION
 #define NANOSVG_ALL_COLOR_KEYWORDS
-#include "nanosvg.h"
+#include <nanosvg.h>
 
 
 namespace rack {

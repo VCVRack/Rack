@@ -1,6 +1,6 @@
 #include "widgets/FramebufferWidget.hpp"
-#include "nanovg_gl.h"
-#include "nanovg_gl_utils.h"
+#include <nanovg_gl.h>
+#include <nanovg_gl_utils.h>
 
 
 namespace rack {

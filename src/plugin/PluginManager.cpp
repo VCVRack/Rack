@@ -1,3 +1,11 @@
+#include "plugin/PluginManager.hpp"
+#include "system.hpp"
+#include "logger.hpp"
+#include "network.hpp"
+#include "asset.hpp"
+#include "string.hpp"
+#include "app/common.hpp"
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -18,15 +26,7 @@
 	#include <dlfcn.h>
 #endif
 #include <dirent.h>
-
-#include "plugin/PluginManager.hpp"
-#include "system.hpp"
-#include "logger.hpp"
-#include "network.hpp"
-#include "asset.hpp"
-#include "string.hpp"
-#include "app/common.hpp"
-#include "osdialog.h"
+#include <osdialog.h>
 
 
 namespace rack {

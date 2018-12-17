@@ -4,10 +4,10 @@
 
 #include <memory>
 #define GLEW_STATIC
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
-#include "nanovg.h"
-#include "nanosvg.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <nanovg.h>
+#include <nanosvg.h>
 
 
 #ifdef ARCH_MAC

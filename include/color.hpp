@@ -1,7 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "string.hpp"
-#include "nanovg.h"
+#include <nanovg.h>
 
 
 namespace rack {

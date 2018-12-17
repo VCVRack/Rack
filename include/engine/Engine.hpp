@@ -1,8 +1,8 @@
 #pragma once
-#include <vector>
 #include "common.hpp"
 #include "engine/Module.hpp"
 #include "engine/Wire.hpp"
+#include <vector>
 
 
 namespace rack {

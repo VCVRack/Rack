@@ -1,5 +1,5 @@
-#include "rack.hpp"
 #include "midi.hpp"
+#include "string.hpp"
 #include <map>
 
 

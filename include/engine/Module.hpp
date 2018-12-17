@@ -1,10 +1,10 @@
 #pragma once
-#include <vector>
 #include "common.hpp"
 #include "engine/Param.hpp"
 #include "engine/Input.hpp"
 #include "engine/Output.hpp"
 #include "engine/Light.hpp"
+#include <vector>
 #include <jansson.h>
 
 

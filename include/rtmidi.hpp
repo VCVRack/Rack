@@ -7,7 +7,7 @@
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
-#include "rtmidi/RtMidi.h"
+#include <rtmidi/RtMidi.h>
 #pragma GCC diagnostic pop
 
 

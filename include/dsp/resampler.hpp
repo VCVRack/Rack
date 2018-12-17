@@ -1,11 +1,10 @@
 #pragma once
-
-#include <assert.h>
-#include <string.h>
-#include <speex/speex_resampler.h>
 #include "frame.hpp"
 #include "ringbuffer.hpp"
 #include "fir.hpp"
+#include <assert.h>
+#include <string.h>
+#include <speex/speex_resampler.h>
 
 
 namespace rack {

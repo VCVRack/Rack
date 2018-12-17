@@ -1,10 +1,10 @@
 #pragma once
-#include <list>
 #include "common.hpp"
 #include "math.hpp"
 #include "window.hpp"
 #include "color.hpp"
 #include "event.hpp"
+#include <list>
 
 
 namespace rack {

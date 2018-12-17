@@ -1,8 +1,6 @@
 #include "Core.hpp"
 #include "midi.hpp"
 #include "dsp/filter.hpp"
-#include "window.hpp"
-#include "event.hpp"
 
 
 struct MIDICCToCVInterface : Module {

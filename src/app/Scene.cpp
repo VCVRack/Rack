@@ -1,10 +1,10 @@
-#include <thread>
 #include "osdialog.h"
 #include "system.hpp"
 #include "network.hpp"
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
 #include "app/RackScrollWidget.hpp"
+#include <thread>
 
 
 namespace rack {
