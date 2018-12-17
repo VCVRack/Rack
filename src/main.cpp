@@ -40,16 +40,16 @@ int main(int argc, char *argv[]) {
 	// Parse command line arguments
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "dg:l:")) != -1) {
+	while ((c = getopt(argc, argv, "ds:u:")) != -1) {
 		switch (c) {
 			case 'd': {
 				devMode = true;
 			} break;
-			case 'g': {
-				asset::globalDir = optarg;
+			case 's': {
+				asset::systemDir = optarg;
 			} break;
-			case 'l': {
-				asset::localDir = optarg;
+			case 'u': {
+				asset::userDir = optarg;
 			} break;
 			default: break;
 		}
@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
 	INFO("%s %s", APP_NAME.c_str(), APP_VERSION.c_str());
 	if (devMode)
 		INFO("Development mode");
-	INFO("Global directory: %s", asset::global("").c_str());
-	INFO("Local directory: %s", asset::local("").c_str());
+	INFO("System directory: %s", asset::system("").c_str());
+	INFO("User directory: %s", asset::user("").c_str());
 
 	// Initialize app
 	tagsInit();
@@ -83,13 +83,13 @@ int main(int argc, char *argv[]) {
 	gScene->devMode = devMode;
 	event::gContext->rootWidget = gScene;
 	windowInit();
-	settings::load(asset::local("settings.json"));
+	settings::load(asset::user("settings.json"));
 
 	if (patchFile.empty()) {
 		// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
 		bool oldSkipAutosaveOnLaunch = settings::gSkipAutosaveOnLaunch;
 		settings::gSkipAutosaveOnLaunch = true;
-		settings::save(asset::local("settings.json"));
+		settings::save(asset::user("settings.json"));
 		settings::gSkipAutosaveOnLaunch = false;
 		if (oldSkipAutosaveOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
 			gScene->rackWidget->lastPath = "";
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 		else {
 			// Load autosave
 			std::string oldLastPath = gScene->rackWidget->lastPath;
-			gScene->rackWidget->load(asset::local("autosave.vcv"));
+			gScene->rackWidget->load(asset::user("autosave.vcv"));
 			gScene->rackWidget->lastPath = oldLastPath;
 		}
 	}
@@ -112,8 +112,8 @@ int main(int argc, char *argv[]) {
 	gEngine->stop();
 
 	// Destroy namespaces
-	gScene->rackWidget->save(asset::local("autosave.vcv"));
-	settings::save(asset::local("settings.json"));
+	gScene->rackWidget->save(asset::user("autosave.vcv"));
+	settings::save(asset::user("settings.json"));
 	delete gScene;
 	gScene = NULL;
 	delete event::gContext;

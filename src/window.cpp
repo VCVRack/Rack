@@ -256,7 +256,7 @@ void windowInit() {
 	assert(gFramebufferVg);
 
 	// Set up Blendish
-	gGuiFont = Font::load(asset::global("res/fonts/DejaVuSans.ttf"));
+	gGuiFont = Font::load(asset::system("res/fonts/DejaVuSans.ttf"));
 	bndSetFont(gGuiFont->handle);
 
 	windowSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));

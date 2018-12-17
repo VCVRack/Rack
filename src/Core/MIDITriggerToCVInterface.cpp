@@ -201,7 +201,7 @@ struct MidiTrigWidget : Grid16MidiWidget {
 
 struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 	MIDITriggerToCVInterfaceWidget(MIDITriggerToCVInterface *module) : ModuleWidget(module) {
-		setPanel(SVG::load(asset::global("res/Core/MIDITriggerToCVInterface.svg")));
+		setPanel(SVG::load(asset::system("res/Core/MIDITriggerToCVInterface.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

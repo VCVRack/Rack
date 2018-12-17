@@ -23,14 +23,14 @@ namespace rack {
 namespace asset {
 
 
-std::string globalDir;
-std::string localDir;
+std::string systemDir;
+std::string userDir;
 
 
 void init(bool devMode) {
-	if (globalDir.empty()) {
+	if (systemDir.empty()) {
 		if (devMode) {
-			globalDir = ".";
+			systemDir = ".";
 		}
 		else {
 #if ARCH_MAC
@@ -41,25 +41,25 @@ void init(bool devMode) {
 			Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
 			assert(success);
 			CFRelease(resourcesUrl);
-			globalDir = resourcesBuf;
+			systemDir = resourcesBuf;
 #endif
 #if ARCH_WIN
 			char moduleBuf[MAX_PATH];
 			DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
 			assert(length > 0);
 			PathRemoveFileSpec(moduleBuf);
-			globalDir = moduleBuf;
+			systemDir = moduleBuf;
 #endif
 #if ARCH_LIN
-			// TODO For now, users should launch Rack from their terminal in the global directory
-			globalDir = ".";
+			// TODO For now, users should launch Rack from their terminal in the system directory
+			systemDir = ".";
 #endif
 		}
 	}
 
-	if (localDir.empty()) {
+	if (userDir.empty()) {
 		if (devMode) {
-			localDir = ".";
+			userDir = ".";
 		}
 		else {
 #if ARCH_WIN
@@ -67,15 +67,15 @@ void init(bool devMode) {
 			char documentsBuf[MAX_PATH];
 			HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
 			assert(result == S_OK);
-			localDir = documentsBuf;
-			localDir += "/Rack";
+			userDir = documentsBuf;
+			userDir += "/Rack";
 #endif
 #if ARCH_MAC
 			// Get home directory
 			struct passwd *pw = getpwuid(getuid());
 			assert(pw);
-			localDir = pw->pw_dir;
-			localDir += "/Documents/Rack";
+			userDir = pw->pw_dir;
+			userDir += "/Documents/Rack";
 #endif
 #if ARCH_LIN
 			// Get home directory
@@ -85,24 +85,24 @@ void init(bool devMode) {
 				assert(pw);
 				homeBuf = pw->pw_dir;
 			}
-			localDir = homeBuf;
-			localDir += "/.Rack";
+			userDir = homeBuf;
+			userDir += "/.Rack";
 #endif
 		}
 	}
 
-	system::createDirectory(globalDir);
-	system::createDirectory(localDir);
+	system::createDirectory(systemDir);
+	system::createDirectory(userDir);
 }
 
 
-std::string global(std::string filename) {
-	return globalDir + "/" + filename;
+std::string system(std::string filename) {
+	return systemDir + "/" + filename;
 }
 
 
-std::string local(std::string filename) {
-	return localDir + "/" + filename;
+std::string user(std::string filename) {
+	return userDir + "/" + filename;
 }
 
 

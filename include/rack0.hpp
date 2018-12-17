@@ -69,8 +69,8 @@ DEPRECATED inline float randomf() {return random::uniform();}
 // asset
 ////////////////////
 
-DEPRECATED inline std::string assetGlobal(std::string filename) {return asset::global(filename);}
-DEPRECATED inline std::string assetLocal(std::string filename) {return asset::local(filename);}
+DEPRECATED inline std::string assetGlobal(std::string filename) {return asset::system(filename);}
+DEPRECATED inline std::string assetLocal(std::string filename) {return asset::user(filename);}
 DEPRECATED inline std::string assetPlugin(Plugin *plugin, std::string filename) {return asset::plugin(plugin, filename);}
 
 ////////////////////

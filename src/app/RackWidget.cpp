@@ -66,7 +66,7 @@ void RackWidget::reset() {
 	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear patch and start over?")) {
 		clear();
 		// Fails silently if file does not exist
-		load(asset::local("template.vcv"));
+		load(asset::user("template.vcv"));
 		lastPath = "";
 	}
 }
@@ -74,7 +74,7 @@ void RackWidget::reset() {
 void RackWidget::loadDialog() {
 	std::string dir;
 	if (lastPath.empty()) {
-		dir = asset::local("patches");
+		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
@@ -103,7 +103,7 @@ void RackWidget::saveAsDialog() {
 	std::string dir;
 	std::string filename;
 	if (lastPath.empty()) {
-		dir = asset::local("patches");
+		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
@@ -493,8 +493,8 @@ void RackWidget::step() {
 
 	// Autosave every 15 seconds
 	if (gGuiFrame % (60 * 15) == 0) {
-		save(asset::local("autosave.vcv"));
-		settings::save(asset::local("settings.json"));
+		save(asset::user("autosave.vcv"));
+		settings::save(asset::user("settings.json"));
 	}
 
 	Widget::step();

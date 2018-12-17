@@ -177,7 +177,7 @@ static bool PluginManager_syncPlugin(PluginManager *pluginManager, std::string s
 		INFO("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
 
 		// Download zip
-		std::string pluginDest = asset::local("plugins/" + slug + ".zip");
+		std::string pluginDest = asset::user("plugins/" + slug + ".zip");
 		if (!network::requestDownload(downloadUrl, pluginDest, &pluginManager->downloadProgress)) {
 			WARN("Plugin %s download was unsuccessful", slug.c_str());
 			return false;
@@ -306,23 +306,23 @@ PluginManager::PluginManager(bool devMode) {
 	init(corePlugin);
 	plugins.push_back(corePlugin);
 
-	// Get local plugins directory
-	std::string localPlugins = asset::local("plugins");
-	mkdir(localPlugins.c_str(), 0755);
+	// Get user plugins directory
+	std::string userPlugins = asset::user("plugins");
+	mkdir(userPlugins.c_str(), 0755);
 
 	if (!devMode) {
 		// Copy Fundamental package to plugins directory if folder does not exist
-		std::string fundamentalSrc = asset::global("Fundamental.zip");
-		std::string fundamentalDest = asset::local("plugins/Fundamental.zip");
-		std::string fundamentalDir = asset::local("plugins/Fundamental");
+		std::string fundamentalSrc = asset::system("Fundamental.zip");
+		std::string fundamentalDest = asset::user("plugins/Fundamental.zip");
+		std::string fundamentalDir = asset::user("plugins/Fundamental");
 		if (system::isFile(fundamentalSrc) && !system::isFile(fundamentalDest) && !system::isDirectory(fundamentalDir)) {
 			system::copyFile(fundamentalSrc, fundamentalDest);
 		}
 	}
 
 	// Extract packages and load plugins
-	extractPackages(localPlugins);
-	PluginManager_loadPlugins(this, localPlugins);
+	extractPackages(userPlugins);
+	PluginManager_loadPlugins(this, userPlugins);
 }
 
 PluginManager::~PluginManager() {
