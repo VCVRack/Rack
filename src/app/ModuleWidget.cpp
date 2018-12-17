@@ -1,6 +1,11 @@
-#include "osdialog.h"
+#include "app/ModuleWidget.hpp"
 #include "engine/Engine.hpp"
-#include "rack.hpp"
+#include "logger.hpp"
+#include "system.hpp"
+#include "asset.hpp"
+#include "app/Scene.hpp"
+#include "helpers.hpp"
+#include "osdialog.h"
 
 
 namespace rack {
@@ -212,10 +217,10 @@ void ModuleWidget::saveDialog() {
 
 void ModuleWidget::disconnect() {
 	for (Port *input : inputs) {
-		gRackWidget->wireContainer->removeAllWires(input);
+		gScene->rackWidget->wireContainer->removeAllWires(input);
 	}
 	for (Port *output : outputs) {
-		gRackWidget->wireContainer->removeAllWires(output);
+		gScene->rackWidget->wireContainer->removeAllWires(output);
 	}
 }
 
@@ -292,7 +297,7 @@ void ModuleWidget::onHover(event::Hover &e) {
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 	if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
 		if (!windowIsModPressed() && !windowIsShiftPressed()) {
-			gRackWidget->deleteModule(this);
+			gScene->rackWidget->deleteModule(this);
 			delete this;
 			// e.target = this;
 			return;
@@ -341,7 +346,7 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 		} break;
 		case GLFW_KEY_D: {
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
-				gRackWidget->cloneModule(this);
+				gScene->rackWidget->cloneModule(this);
 				e.target = this;
 				return;
 			}
@@ -359,17 +364,17 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 }
 
 void ModuleWidget::onDragStart(event::DragStart &e) {
-	dragPos = gRackWidget->lastMousePos.minus(box.pos);
+	dragPos = gScene->rackWidget->lastMousePos.minus(box.pos);
 }
 
 void ModuleWidget::onDragEnd(event::DragEnd &e) {
 }
 
 void ModuleWidget::onDragMove(event::DragMove &e) {
-	if (!gRackWidget->lockModules) {
+	if (!gScene->rackWidget->lockModules) {
 		Rect newBox = box;
-		newBox.pos = gRackWidget->lastMousePos.minus(dragPos);
-		gRackWidget->requestModuleBoxNearest(this, newBox);
+		newBox.pos = gScene->rackWidget->lastMousePos.minus(dragPos);
+		gScene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}
 }
 
@@ -426,14 +431,14 @@ struct ModuleLoadItem : MenuItem {
 struct ModuleCloneItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(event::Action &e) override {
-		gRackWidget->cloneModule(moduleWidget);
+		gScene->rackWidget->cloneModule(moduleWidget);
 	}
 };
 
 struct ModuleDeleteItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(event::Action &e) override {
-		gRackWidget->deleteModule(moduleWidget);
+		gScene->rackWidget->deleteModule(moduleWidget);
 		delete moduleWidget;
 	}
 };

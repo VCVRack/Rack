@@ -1,7 +1,7 @@
 #pragma once
+#include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "ui/Menu.hpp"
-#include "app/common.hpp"
 #include "app/SVGPanel.hpp"
 #include "app/Port.hpp"
 #include "app/ParamWidget.hpp"

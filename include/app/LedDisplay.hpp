@@ -1,8 +1,8 @@
 #pragma once
+#include "app/common.hpp"
 #include "widgets/Widget.hpp"
 #include "widgets/TransparentWidget.hpp"
 #include "ui/TextField.hpp"
-#include "app/common.hpp"
 
 
 namespace rack {

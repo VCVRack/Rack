@@ -1,4 +1,5 @@
 #pragma once
+#include "../common.hpp"
 #include "blendish.h"
 
 #define CHECKMARK_STRING "✔"

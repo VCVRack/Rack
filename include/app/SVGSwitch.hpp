@@ -1,5 +1,9 @@
 #pragma once
 #include "app/common.hpp"
+#include "widgets/Widget.hpp"
+#include "widgets/FramebufferWidget.hpp"
+#include "widgets/SVGWidget.hpp"
+#include "app/ParamWidget.hpp"
 
 
 namespace rack {

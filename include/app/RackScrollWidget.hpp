@@ -1,6 +1,6 @@
 #pragma once
-#include "ui/ScrollWidget.hpp"
 #include "app/common.hpp"
+#include "ui/ScrollWidget.hpp"
 
 
 namespace rack {

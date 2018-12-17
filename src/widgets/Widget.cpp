@@ -1,5 +1,4 @@
-#include "widgets.hpp"
-#include "app.hpp"
+#include "widgets/Widget.hpp"
 #include "event.hpp"
 #include <algorithm>
 

@@ -1,12 +1,15 @@
 #include <unistd.h>
 #include "osdialog.h"
-#include "rack.hpp"
+#include "random.hpp"
+#include "logger.hpp"
+#include "asset.hpp"
 #include "rtmidi.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
 #include "bridge.hpp"
 #include "settings.hpp"
 #include "engine/Engine.hpp"
+#include "app/Scene.hpp"
 
 #ifdef ARCH_WIN
 	#include <Windows.h>
@@ -15,7 +18,18 @@
 using namespace rack;
 
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
+	#ifdef ARCH_WIN
+		// Windows global mutex to prevent multiple instances
+		// Handle will be closed by Windows when the process ends
+		HANDLE instanceMutex = CreateMutex(NULL, true, gApplicationName.c_str());
+		if (GetLastError() == ERROR_ALREADY_EXISTS) {
+			osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
+			exit(1);
+		}
+		(void) instanceMutex;
+	#endif
+
 	bool devMode = false;
 	std::string patchFile;
 
@@ -40,24 +54,13 @@ int main(int argc, char* argv[]) {
 		patchFile = argv[optind];
 	}
 
-#ifdef ARCH_WIN
-	// Windows global mutex to prevent multiple instances
-	// Handle will be closed by Windows when the process ends
-	HANDLE instanceMutex = CreateMutex(NULL, true, gApplicationName.c_str());
-	if (GetLastError() == ERROR_ALREADY_EXISTS) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
-		exit(1);
-	}
-	(void) instanceMutex;
-#endif
-
 	// Initialize environment
 	random::init();
 	asset::init(devMode);
 	logger::init(devMode);
 
 	// Log environment
-	INFO("%s %s", gApplicationName.c_str(), gApplicationVersion.c_str());
+	INFO("%s %s", APP_NAME.c_str(), APP_VERSION.c_str());
 	if (devMode)
 		INFO("Development mode");
 	INFO("Global directory: %s", asset::global("").c_str());
@@ -70,7 +73,10 @@ int main(int argc, char* argv[]) {
 	bridgeInit();
 	keyboard::init();
 	gamepad::init();
-	appInit(devMode);
+	event::gContext = new event::Context;
+	gScene = new Scene;
+	gScene->devMode = devMode;
+	event::gContext->rootWidget = gScene;
 	windowInit();
 	settings::load(asset::local("settings.json"));
 
@@ -81,19 +87,19 @@ int main(int argc, char* argv[]) {
 		settings::save(asset::local("settings.json"));
 		settings::gSkipAutosaveOnLaunch = false;
 		if (oldSkipAutosaveOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
-			gRackWidget->lastPath = "";
+			gScene->rackWidget->lastPath = "";
 		}
 		else {
 			// Load autosave
-			std::string oldLastPath = gRackWidget->lastPath;
-			gRackWidget->load(asset::local("autosave.vcv"));
-			gRackWidget->lastPath = oldLastPath;
+			std::string oldLastPath = gScene->rackWidget->lastPath;
+			gScene->rackWidget->load(asset::local("autosave.vcv"));
+			gScene->rackWidget->lastPath = oldLastPath;
 		}
 	}
 	else {
 		// Load patch
-		gRackWidget->load(patchFile);
-		gRackWidget->lastPath = patchFile;
+		gScene->rackWidget->load(patchFile);
+		gScene->rackWidget->lastPath = patchFile;
 	}
 
 	gEngine->start();
@@ -101,12 +107,16 @@ int main(int argc, char* argv[]) {
 	gEngine->stop();
 
 	// Destroy namespaces
-	gRackWidget->save(asset::local("autosave.vcv"));
+	gScene->rackWidget->save(asset::local("autosave.vcv"));
 	settings::save(asset::local("settings.json"));
-	appDestroy();
+	delete gScene;
+	gScene = NULL;
+	delete event::gContext;
+	event::gContext = NULL;
 	windowDestroy();
 	bridgeDestroy();
 	delete gEngine;
+	gEngine = NULL;
 	midiDestroy();
 	pluginDestroy();
 	logger::destroy();

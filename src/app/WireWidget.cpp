@@ -1,4 +1,5 @@
-#include "app.hpp"
+#include "app/WireWidget.hpp"
+#include "app/Scene.hpp"
 #include "engine/Engine.hpp"
 #include "componentlibrary.hpp"
 #include "window.hpp"
@@ -121,25 +122,25 @@ void WireWidget::updateWire() {
 
 Vec WireWidget::getOutputPos() {
 	if (outputPort) {
-		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), gRackWidget);
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), gScene->rackWidget);
 	}
 	else if (hoveredOutputPort) {
-		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), gRackWidget);
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), gScene->rackWidget);
 	}
 	else {
-		return gRackWidget->lastMousePos;
+		return gScene->rackWidget->lastMousePos;
 	}
 }
 
 Vec WireWidget::getInputPos() {
 	if (inputPort) {
-		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), gRackWidget);
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), gScene->rackWidget);
 	}
 	else if (hoveredInputPort) {
-		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), gRackWidget);
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), gScene->rackWidget);
 	}
 	else {
-		return gRackWidget->lastMousePos;
+		return gScene->rackWidget->lastMousePos;
 	}
 }
 
@@ -165,7 +166,7 @@ void WireWidget::draw(NVGcontext *vg) {
 	float opacity = 0.5;
 	float tension = 0.5;
 
-	WireWidget *activeWire = gRackWidget->wireContainer->activeWire;
+	WireWidget *activeWire = gScene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		// Draw as opaque if the wire is active
 		if (activeWire == this)

@@ -1,4 +1,4 @@
-#include "app.hpp"
+#include "app/LightWidget.hpp"
 #include "color.hpp"
 
 

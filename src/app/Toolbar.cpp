@@ -1,7 +1,13 @@
-#include "app.hpp"
+#include "app/Toolbar.hpp"
 #include "window.hpp"
 #include "engine/Engine.hpp"
 #include "asset.hpp"
+#include "ui/Tooltip.hpp"
+#include "ui/IconButton.hpp"
+#include "ui/SequentialLayout.hpp"
+#include "ui/Slider.hpp"
+#include "app/PluginManagerWidget.hpp"
+#include "app/Scene.hpp"
 #include "helpers.hpp"
 
 
@@ -15,13 +21,13 @@ struct TooltipIconButton : IconButton {
 			tooltip = new Tooltip;
 			tooltip->box.pos = getAbsoluteOffset(Vec(0, BND_WIDGET_HEIGHT));
 			tooltip->text = getTooltipText();
-			gRackScene->addChild(tooltip);
+			gScene->addChild(tooltip);
 		}
 		IconButton::onEnter(e);
 	}
 	void onLeave(event::Leave &e) override {
 		if (tooltip) {
-			gRackScene->removeChild(tooltip);
+			gScene->removeChild(tooltip);
 			delete tooltip;
 			tooltip = NULL;
 		}
@@ -36,7 +42,7 @@ struct NewButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "New patch (" WINDOW_MOD_KEY_NAME "+N)";}
 	void onAction(event::Action &e) override {
-		gRackWidget->reset();
+		gScene->rackWidget->reset();
 	}
 };
 
@@ -46,7 +52,7 @@ struct OpenButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Open patch (" WINDOW_MOD_KEY_NAME "+O)";}
 	void onAction(event::Action &e) override {
-		gRackWidget->loadDialog();
+		gScene->rackWidget->loadDialog();
 	}
 };
 
@@ -56,7 +62,7 @@ struct SaveButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Save patch (" WINDOW_MOD_KEY_NAME "+S)";}
 	void onAction(event::Action &e) override {
-		gRackWidget->saveDialog();
+		gScene->rackWidget->saveDialog();
 	}
 };
 
@@ -66,7 +72,7 @@ struct SaveAsButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";}
 	void onAction(event::Action &e) override {
-		gRackWidget->saveAsDialog();
+		gScene->rackWidget->saveAsDialog();
 	}
 };
 
@@ -76,7 +82,7 @@ struct RevertButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Revert patch";}
 	void onAction(event::Action &e) override {
-		gRackWidget->revert();
+		gScene->rackWidget->revert();
 	}
 };
 
@@ -86,7 +92,7 @@ struct DisconnectCablesButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Disconnect cables";}
 	void onAction(event::Action &e) override {
-		gRackWidget->disconnect();
+		gScene->rackWidget->disconnect();
 	}
 };
 
@@ -147,7 +153,7 @@ struct RackLockButton : TooltipIconButton {
 	}
 	std::string getTooltipText() override {return "Lock modules";}
 	void onAction(event::Action &e) override {
-		gRackWidget->lockModules ^= true;
+		gScene->rackWidget->lockModules ^= true;
 	}
 };
 
@@ -179,10 +185,10 @@ struct WireTensionQuantity : Quantity {
 
 struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
-		gRackScene->zoomWidget->setZoom(std::round(value) / 100);
+		gScene->zoomWidget->setZoom(std::round(value) / 100);
 	}
 	float getValue() override {
-		return gRackScene->zoomWidget->zoom * 100;
+		return gScene->zoomWidget->zoom * 100;
 	}
 	float getMinValue() override {return 25;}
 	float getMaxValue() override {return 200;}

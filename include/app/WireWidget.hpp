@@ -1,5 +1,7 @@
 #pragma once
 #include "app/common.hpp"
+#include "widgets/OpaqueWidget.hpp"
+#include "app/Port.hpp"
 #include "engine/Wire.hpp"
 
 

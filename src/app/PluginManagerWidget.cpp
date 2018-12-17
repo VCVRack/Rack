@@ -1,6 +1,12 @@
 #include <thread>
 #include "system.hpp"
-#include "app.hpp"
+#include "app/PluginManagerWidget.hpp"
+#include "ui/SequentialLayout.hpp"
+#include "ui/Button.hpp"
+#include "ui/ProgressBar.hpp"
+#include "ui/TextField.hpp"
+#include "ui/PasswordField.hpp"
+#include "ui/Label.hpp"
 #include "plugin.hpp"
 #include "window.hpp"
 #include "helpers.hpp"

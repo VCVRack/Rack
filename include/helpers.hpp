@@ -1,6 +1,9 @@
 #include "plugin.hpp"
-#include "app.hpp"
 #include "event.hpp"
+#include "ui/MenuLabel.hpp"
+#include "ui/MenuItem.hpp"
+#include "ui/Menu.hpp"
+#include "app/Port.hpp"
 #include "engine/Module.hpp"
 
 

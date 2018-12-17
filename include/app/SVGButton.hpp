@@ -1,5 +1,7 @@
 #pragma once
 #include "app/common.hpp"
+#include "widgets/FramebufferWidget.hpp"
+#include "widgets/SVGWidget.hpp"
 
 
 namespace rack {
@@ -12,6 +14,7 @@ struct SVGButton : FramebufferWidget {
 	std::shared_ptr<SVG> defaultSVG;
 	std::shared_ptr<SVG> activeSVG;
 	SVGWidget *sw;
+
 	SVGButton();
 	/** If `activeSVG` is NULL, `defaultSVG` is used as the active state instead. */
 	void setSVGs(std::shared_ptr<SVG> defaultSVG, std::shared_ptr<SVG> activeSVG);

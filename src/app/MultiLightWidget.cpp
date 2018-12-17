@@ -1,4 +1,4 @@
-#include "app.hpp"
+#include "app/MultiLightWidget.hpp"
 #include "color.hpp"
 
 

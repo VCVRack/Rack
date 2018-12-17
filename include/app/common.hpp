@@ -1,11 +1,15 @@
 #pragma once
+#include "../common.hpp"
 #include "math.hpp"
-#include <string>
 #include <jansson.h>
 
 
 namespace rack {
 
+
+extern const std::string APP_NAME;
+extern const std::string APP_VERSION;
+extern const std::string API_HOST;
 
 static const float SVG_DPI = 75.0;
 static const float MM_PER_IN = 25.4;
@@ -34,8 +38,8 @@ inline Vec mm2px(Vec mm) {
 static const float RACK_GRID_WIDTH = 15;
 static const float RACK_GRID_HEIGHT = 380;
 static const Vec RACK_GRID_SIZE = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
-static const std::string PRESET_FILTERS = "VCV Rack module preset (.vcvm):vcvm";
-static const std::string PATCH_FILTERS = "VCV Rack patch (.vcv):vcv";
+extern const std::string PRESET_FILTERS;
+extern const std::string PATCH_FILTERS;
 
 
 } // namespace rack

@@ -1,7 +1,8 @@
 #pragma once
-#include "widgets/OpaqueWidget.hpp"
 #include "app/common.hpp"
+#include "widgets/OpaqueWidget.hpp"
 #include "app/MultiLightWidget.hpp"
+#include "engine/Module.hpp"
 
 
 namespace rack {

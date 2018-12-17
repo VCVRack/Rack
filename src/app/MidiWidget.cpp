@@ -1,4 +1,4 @@
-#include "app.hpp"
+#include "app/MidiWidget.hpp"
 #include "midi.hpp"
 #include "helpers.hpp"
 

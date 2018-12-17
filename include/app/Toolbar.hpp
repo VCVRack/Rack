@@ -1,8 +1,6 @@
 #pragma once
-#include "widgets/OpaqueWidget.hpp"
-#include "ui/Slider.hpp"
-#include "ui/RadioButton.hpp"
 #include "app/common.hpp"
+#include "widgets/OpaqueWidget.hpp"
 
 
 namespace rack {

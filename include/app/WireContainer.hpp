@@ -1,6 +1,8 @@
 #pragma once
 #include "app/common.hpp"
+#include "widgets/TransparentWidget.hpp"
 #include "app/WireWidget.hpp"
+#include "app/Port.hpp"
 
 
 namespace rack {

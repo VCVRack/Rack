@@ -1,6 +1,8 @@
 #pragma once
 #include "common.hpp"
-#include "Port.hpp"
+#include "app/Port.hpp"
+#include "widgets/FramebufferWidget.hpp"
+#include "widgets/SVGWidget.hpp"
 
 
 namespace rack {

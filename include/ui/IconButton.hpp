@@ -1,4 +1,6 @@
 #pragma once
+#include "widgets/FramebufferWidget.hpp"
+#include "widgets/SVGWidget.hpp"
 #include "ui/common.hpp"
 #include "ui/Button.hpp"
 

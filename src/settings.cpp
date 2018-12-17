@@ -2,7 +2,8 @@
 #include "logger.hpp"
 #include "window.hpp"
 #include "plugin.hpp"
-#include "app.hpp"
+#include "app/Scene.hpp"
+#include "app/ModuleBrowser.hpp"
 #include "engine/Engine.hpp"
 #include <jansson.h>
 
@@ -35,17 +36,17 @@ static json_t *settingsToJson() {
 	}
 
 	// opacity
-	float opacity = gToolbar->wireOpacity;
+	float opacity = gScene->toolbar->wireOpacity;
 	json_t *opacityJ = json_real(opacity);
 	json_object_set_new(rootJ, "wireOpacity", opacityJ);
 
 	// tension
-	float tension = gToolbar->wireTension;
+	float tension = gScene->toolbar->wireTension;
 	json_t *tensionJ = json_real(tension);
 	json_object_set_new(rootJ, "wireTension", tensionJ);
 
 	// zoom
-	float zoom = gRackScene->zoomWidget->zoom;
+	float zoom = gScene->zoomWidget->zoom;
 	json_t *zoomJ = json_real(zoom);
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
@@ -58,7 +59,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// lastPath
-	json_t *lastPathJ = json_string(gRackWidget->lastPath.c_str());
+	json_t *lastPathJ = json_string(gScene->rackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
 	// skipAutosaveOnLaunch
@@ -67,13 +68,13 @@ static json_t *settingsToJson() {
 	}
 
 	// moduleBrowser
-	json_object_set_new(rootJ, "moduleBrowser", appModuleBrowserToJson());
+	json_object_set_new(rootJ, "moduleBrowser", moduleBrowserToJson());
 
 	// powerMeter
 	json_object_set_new(rootJ, "powerMeter", json_boolean(gEngine->powerMeter));
 
 	// checkVersion
-	json_object_set_new(rootJ, "checkVersion", json_boolean(gCheckVersion));
+	json_object_set_new(rootJ, "checkVersion", json_boolean(gScene->checkVersion));
 
 	return rootJ;
 }
@@ -103,17 +104,17 @@ static void settingsFromJson(json_t *rootJ) {
 	// opacity
 	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");
 	if (opacityJ)
-		gToolbar->wireOpacity = json_number_value(opacityJ);
+		gScene->toolbar->wireOpacity = json_number_value(opacityJ);
 
 	// tension
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
-		gToolbar->wireTension = json_number_value(tensionJ);
+		gScene->toolbar->wireTension = json_number_value(tensionJ);
 
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ) {
-		gRackScene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
+		gScene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
 	}
 
 	// allowCursorLock
@@ -131,7 +132,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
 	if (lastPathJ)
-		gRackWidget->lastPath = json_string_value(lastPathJ);
+		gScene->rackWidget->lastPath = json_string_value(lastPathJ);
 
 	// skipAutosaveOnLaunch
 	json_t *skipAutosaveOnLaunchJ = json_object_get(rootJ, "skipAutosaveOnLaunch");
@@ -141,7 +142,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// moduleBrowser
 	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
 	if (moduleBrowserJ)
-		appModuleBrowserFromJson(moduleBrowserJ);
+		moduleBrowserFromJson(moduleBrowserJ);
 
 	// powerMeter
 	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
@@ -151,7 +152,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// checkVersion
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
 	if (checkVersionJ)
-		gCheckVersion = json_boolean_value(checkVersionJ);
+		gScene->checkVersion = json_boolean_value(checkVersionJ);
 }
 
 

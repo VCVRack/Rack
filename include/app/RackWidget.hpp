@@ -1,7 +1,9 @@
 #pragma once
 #include "app/common.hpp"
-#include "app/WireWidget.hpp"
+#include "widgets/OpaqueWidget.hpp"
+#include "widgets/FramebufferWidget.hpp"
 #include "app/WireContainer.hpp"
+#include "app/ModuleWidget.hpp"
 
 
 namespace rack {

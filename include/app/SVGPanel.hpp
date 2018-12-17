@@ -1,5 +1,6 @@
 #pragma once
 #include "app/common.hpp"
+#include "widgets/TransparentWidget.hpp"
 #include "widgets/FramebufferWidget.hpp"
 #include "widgets/SVGWidget.hpp"
 

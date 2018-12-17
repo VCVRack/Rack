@@ -1,8 +1,14 @@
 #include <map>
 #include <algorithm>
+#include "app/RackWidget.hpp"
+#include "app/RackRail.hpp"
+#include "app/Scene.hpp"
+#include "app/ModuleBrowser.hpp"
 #include "osdialog.h"
-#include "rack.hpp"
 #include "settings.hpp"
+#include "asset.hpp"
+#include "system.hpp"
+#include "logger.hpp"
 
 
 namespace rack {
@@ -52,7 +58,7 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 
-	gRackScene->scrollWidget->offset = Vec(0, 0);
+	gScene->scrollWidget->offset = Vec(0, 0);
 }
 
 void RackWidget::reset() {
@@ -182,7 +188,7 @@ json_t *RackWidget::toJson() {
 	json_t *rootJ = json_object();
 
 	// version
-	json_t *versionJ = json_string(gApplicationVersion.c_str());
+	json_t *versionJ = json_string(APP_VERSION.c_str());
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// modules
@@ -506,7 +512,7 @@ void RackWidget::onButton(event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.target == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			appModuleBrowserCreate();
+			moduleBrowserCreate();
 		}
 	}
 }

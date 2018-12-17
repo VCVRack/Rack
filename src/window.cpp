@@ -10,7 +10,9 @@
 
 #include "osdialog.h"
 
-#include "rack.hpp"
+#include "logger.hpp"
+#include "asset.hpp"
+#include "app/Scene.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
 #include "event.hpp"
@@ -302,12 +304,12 @@ void windowRun() {
 
 		// Set window title
 		std::string windowTitle;
-		windowTitle = gApplicationName;
+		windowTitle = APP_NAME;
 		windowTitle += " ";
-		windowTitle += gApplicationVersion;
-		if (!gRackWidget->lastPath.empty()) {
+		windowTitle += APP_VERSION;
+		if (!gScene->rackWidget->lastPath.empty()) {
 			windowTitle += " - ";
-			windowTitle += string::filename(gRackWidget->lastPath);
+			windowTitle += string::filename(gScene->rackWidget->lastPath);
 		}
 		if (windowTitle != lastWindowTitle) {
 			glfwSetWindowTitle(gWindow, windowTitle.c_str());

@@ -1,10 +1,16 @@
-#include "app.hpp"
+#include <set>
+#include <algorithm>
 #include "plugin.hpp"
 #include "window.hpp"
 #include "helpers.hpp"
 #include "event.hpp"
-#include <set>
-#include <algorithm>
+#include "ui/Quantity.hpp"
+#include "ui/RadioButton.hpp"
+#include "ui/Label.hpp"
+#include "app/ModuleBrowser.hpp"
+#include "app/Scene.hpp"
+#include "ui/List.hpp"
+#include "ui/TextField.hpp"
 
 
 static const float itemMargin = 2.0;
@@ -151,10 +157,10 @@ struct ModelItem : BrowserListItem {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		if (!moduleWidget)
 			return;
-		gRackWidget->addModule(moduleWidget);
+		gScene->rackWidget->addModule(moduleWidget);
 		// Move module nearest to the mouse position
-		moduleWidget->box.pos = gRackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
-		gRackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
+		moduleWidget->box.pos = gScene->rackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
+		gScene->rackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
 	}
 };
 
@@ -545,16 +551,16 @@ void SearchModuleField::onSelectKey(event::SelectKey &e) {
 
 // Global functions
 
-void appModuleBrowserCreate() {
+void moduleBrowserCreate() {
 	MenuOverlay *overlay = new MenuOverlay;
 
 	ModuleBrowser *moduleBrowser = new ModuleBrowser;
 	overlay->addChild(moduleBrowser);
 
-	gRackScene->addChild(overlay);
+	gScene->addChild(overlay);
 }
 
-json_t *appModuleBrowserToJson() {
+json_t *moduleBrowserToJson() {
 	json_t *rootJ = json_object();
 
 	json_t *favoritesJ = json_array();
@@ -569,7 +575,7 @@ json_t *appModuleBrowserToJson() {
 	return rootJ;
 }
 
-void appModuleBrowserFromJson(json_t *rootJ) {
+void moduleBrowserFromJson(json_t *rootJ) {
 	json_t *favoritesJ = json_object_get(rootJ, "favorites");
 	if (favoritesJ) {
 		size_t i;

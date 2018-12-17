@@ -1,7 +1,10 @@
 #pragma once
 #include "app/common.hpp"
-#include "app/CircularShadow.hpp"
+#include "app/Knob.hpp"
+#include "widgets/FramebufferWidget.hpp"
 #include "widgets/TransformWidget.hpp"
+#include "widgets/SVGWidget.hpp"
+#include "app/CircularShadow.hpp"
 
 
 namespace rack {
