@@ -22,7 +22,7 @@ namespace rack {
 
 struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
-static AudioIO *audioListeners[BRIDGE_NUM_PORTS] = {};
+static audio::IO *audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverRunning = false;
 static BridgeMidiDriver *driver = NULL;
@@ -416,7 +416,7 @@ void bridgeDestroy() {
 	serverThread.join();
 }
 
-void bridgeAudioSubscribe(int port, AudioIO *audio) {
+void bridgeAudioSubscribe(int port, audio::IO *audio) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	// Check if an Audio is already subscribed on the port
@@ -427,7 +427,7 @@ void bridgeAudioSubscribe(int port, AudioIO *audio) {
 		connections[port]->refreshAudio();
 }
 
-void bridgeAudioUnsubscribe(int port, AudioIO *audio) {
+void bridgeAudioUnsubscribe(int port, audio::IO *audio) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	if (audioListeners[port] != audio)

@@ -24,8 +24,8 @@ struct BridgeMidiDriver : midi::Driver {
 
 void bridgeInit();
 void bridgeDestroy();
-void bridgeAudioSubscribe(int channel, AudioIO *audio);
-void bridgeAudioUnsubscribe(int channel, AudioIO *audio);
+void bridgeAudioSubscribe(int channel, audio::IO *audio);
+void bridgeAudioUnsubscribe(int channel, audio::IO *audio);
 
 
 } // namespace rack

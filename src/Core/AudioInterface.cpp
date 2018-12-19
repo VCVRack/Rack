@@ -17,7 +17,7 @@
 using namespace rack;
 
 
-struct AudioInterfaceIO : AudioIO {
+struct AudioInterfaceIO : audio::IO {
 	std::mutex engineMutex;
 	std::condition_variable engineCv;
 	std::mutex audioMutex;

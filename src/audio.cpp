@@ -6,17 +6,18 @@
 
 
 namespace rack {
+namespace audio {
 
 
-AudioIO::AudioIO() {
+IO::IO() {
 	setDriver(RtAudio::UNSPECIFIED);
 }
 
-AudioIO::~AudioIO() {
+IO::~IO() {
 	closeStream();
 }
 
-std::vector<int> AudioIO::getDrivers() {
+std::vector<int> IO::getDrivers() {
 	std::vector<RtAudio::Api> apis;
 	RtAudio::getCompiledApi(apis);
 	std::vector<int> drivers;
@@ -28,7 +29,7 @@ std::vector<int> AudioIO::getDrivers() {
 	return drivers;
 }
 
-std::string AudioIO::getDriverName(int driver) {
+std::string IO::getDriverName(int driver) {
 	switch (driver) {
 		case RtAudio::UNSPECIFIED: return "Unspecified";
 		case RtAudio::LINUX_ALSA: return "ALSA";
@@ -45,7 +46,7 @@ std::string AudioIO::getDriverName(int driver) {
 	}
 }
 
-void AudioIO::setDriver(int driver) {
+void IO::setDriver(int driver) {
 	// Close device
 	setDevice(-1, 0);
 
@@ -66,7 +67,7 @@ void AudioIO::setDriver(int driver) {
 	}
 }
 
-int AudioIO::getDeviceCount() {
+int IO::getDeviceCount() {
 	if (rtAudio) {
 		return rtAudio->getDeviceCount();
 	}
@@ -76,7 +77,7 @@ int AudioIO::getDeviceCount() {
 	return 0;
 }
 
-bool AudioIO::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
+bool IO::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
 	if (!deviceInfo)
 		return false;
 
@@ -99,7 +100,7 @@ bool AudioIO::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
 	return false;
 }
 
-int AudioIO::getDeviceChannels(int device) {
+int IO::getDeviceChannels(int device) {
 	if (device < 0)
 		return 0;
 
@@ -114,7 +115,7 @@ int AudioIO::getDeviceChannels(int device) {
 	return 0;
 }
 
-std::string AudioIO::getDeviceName(int device) {
+std::string IO::getDeviceName(int device) {
 	if (device < 0)
 		return "";
 
@@ -129,7 +130,7 @@ std::string AudioIO::getDeviceName(int device) {
 	return "";
 }
 
-std::string AudioIO::getDeviceDetail(int device, int offset) {
+std::string IO::getDeviceDetail(int device, int offset) {
 	if (device < 0)
 		return "";
 
@@ -153,14 +154,14 @@ std::string AudioIO::getDeviceDetail(int device, int offset) {
 	return "";
 }
 
-void AudioIO::setDevice(int device, int offset) {
+void IO::setDevice(int device, int offset) {
 	closeStream();
 	this->device = device;
 	this->offset = offset;
 	openStream();
 }
 
-std::vector<int> AudioIO::getSampleRates() {
+std::vector<int> IO::getSampleRates() {
 	if (rtAudio) {
 		try {
 			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
@@ -174,7 +175,7 @@ std::vector<int> AudioIO::getSampleRates() {
 	return {};
 }
 
-void AudioIO::setSampleRate(int sampleRate) {
+void IO::setSampleRate(int sampleRate) {
 	if (sampleRate == this->sampleRate)
 		return;
 	closeStream();
@@ -182,14 +183,14 @@ void AudioIO::setSampleRate(int sampleRate) {
 	openStream();
 }
 
-std::vector<int> AudioIO::getBlockSizes() {
+std::vector<int> IO::getBlockSizes() {
 	if (rtAudio) {
 		return {64, 128, 256, 512, 1024, 2048, 4096};
 	}
 	return {};
 }
 
-void AudioIO::setBlockSize(int blockSize) {
+void IO::setBlockSize(int blockSize) {
 	if (blockSize == this->blockSize)
 		return;
 	closeStream();
@@ -197,7 +198,7 @@ void AudioIO::setBlockSize(int blockSize) {
 	openStream();
 }
 
-void AudioIO::setChannels(int numOutputs, int numInputs) {
+void IO::setChannels(int numOutputs, int numInputs) {
 	this->numOutputs = numOutputs;
 	this->numInputs = numInputs;
 	onChannelsChange();
@@ -205,13 +206,13 @@ void AudioIO::setChannels(int numOutputs, int numInputs) {
 
 
 static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
-	AudioIO *audioIO = (AudioIO*) userData;
+	IO *audioIO = (IO*) userData;
 	assert(audioIO);
 	audioIO->processStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
 	return 0;
 }
 
-void AudioIO::openStream() {
+void IO::openStream() {
 	if (device < 0)
 		return;
 
@@ -288,7 +289,7 @@ void AudioIO::openStream() {
 	}
 }
 
-void AudioIO::closeStream() {
+void IO::closeStream() {
 	setChannels(0, 0);
 
 	if (rtAudio) {
@@ -319,7 +320,7 @@ void AudioIO::closeStream() {
 	onCloseStream();
 }
 
-json_t *AudioIO::toJson() {
+json_t *IO::toJson() {
 	json_t *rootJ = json_object();
 	json_object_set_new(rootJ, "driver", json_integer(driver));
 	std::string deviceName = getDeviceName(device);
@@ -331,7 +332,7 @@ json_t *AudioIO::toJson() {
 	return rootJ;
 }
 
-void AudioIO::fromJson(json_t *rootJ) {
+void IO::fromJson(json_t *rootJ) {
 	closeStream();
 
 	json_t *driverJ = json_object_get(rootJ, "driver");
@@ -370,4 +371,5 @@ void AudioIO::fromJson(json_t *rootJ) {
 }
 
 
+} // namespace audio
 } // namespace rack

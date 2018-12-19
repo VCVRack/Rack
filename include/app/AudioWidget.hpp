@@ -6,12 +6,14 @@
 namespace rack {
 
 
-struct AudioIO;
+namespace audio {
+	struct IO;
+}
 
 
 struct AudioWidget : LedDisplay {
 	/** Not owned */
-	AudioIO *audioIO = NULL;
+	audio::IO *audioIO = NULL;
 	LedDisplayChoice *driverChoice;
 	LedDisplaySeparator *driverSeparator;
 	LedDisplayChoice *deviceChoice;

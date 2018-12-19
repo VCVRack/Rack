@@ -7,7 +7,7 @@ namespace rack {
 
 
 struct AudioDriverItem : MenuItem {
-	AudioIO *audioIO;
+	audio::IO *audioIO;
 	int driver;
 	void onAction(event::Action &e) override {
 		audioIO->setDriver(driver);
@@ -35,7 +35,7 @@ struct AudioDriverChoice : LedDisplayChoice {
 
 
 struct AudioDeviceItem : MenuItem {
-	AudioIO *audioIO;
+	audio::IO *audioIO;
 	int device;
 	int offset;
 	void onAction(event::Action &e) override {
@@ -87,7 +87,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 
 
 struct AudioSampleRateItem : MenuItem {
-	AudioIO *audioIO;
+	audio::IO *audioIO;
 	int sampleRate;
 	void onAction(event::Action &e) override {
 		audioIO->setSampleRate(sampleRate);
@@ -119,7 +119,7 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 
 
 struct AudioBlockSizeItem : MenuItem {
-	AudioIO *audioIO;
+	audio::IO *audioIO;
 	int blockSize;
 	void onAction(event::Action &e) override {
 		audioIO->setBlockSize(blockSize);
