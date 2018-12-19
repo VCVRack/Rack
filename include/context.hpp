@@ -11,7 +11,6 @@ namespace event {
 
 struct Scene;
 struct Engine;
-struct PluginManager;
 struct Window;
 
 
@@ -19,7 +18,6 @@ struct Context {
 	event::Context *event = NULL;
 	Scene *scene = NULL;
 	Engine *engine = NULL;
-	PluginManager *plugin = NULL;
 	Window *window = NULL;
 };
 

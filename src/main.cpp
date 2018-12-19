@@ -10,7 +10,7 @@
 #include "engine/Engine.hpp"
 #include "app/Scene.hpp"
 #include "tags.hpp"
-#include "plugin/PluginManager.hpp"
+#include "plugin.hpp"
 #include "context.hpp"
 #include "ui.hpp"
 
@@ -48,10 +48,10 @@ int main(int argc, char *argv[]) {
 				devMode = true;
 			} break;
 			case 's': {
-				asset::gSystemDir = optarg;
+				asset::systemDir = optarg;
 			} break;
 			case 'u': {
-				asset::gUserDir = optarg;
+				asset::userDir = optarg;
 			} break;
 			default: break;
 		}
@@ -70,16 +70,16 @@ int main(int argc, char *argv[]) {
 	keyboard::init();
 	gamepad::init();
 	uiInit();
+	plugin::init(devMode);
 
 	// Log environment
 	INFO("%s %s", APP_NAME.c_str(), APP_VERSION.c_str());
 	if (devMode)
 		INFO("Development mode");
-	INFO("System directory: %s", asset::gSystemDir.c_str());
-	INFO("User directory: %s", asset::gUserDir.c_str());
+	INFO("System directory: %s", asset::systemDir.c_str());
+	INFO("User directory: %s", asset::userDir.c_str());
 
 	// Initialize app
-	context()->plugin = new PluginManager(devMode);
 	context()->engine = new Engine;
 	context()->event = new event::Context;
 	context()->scene = new Scene;
@@ -125,10 +125,9 @@ int main(int argc, char *argv[]) {
 	context()->window = NULL;
 	delete context()->engine;
 	context()->engine = NULL;
-	delete context()->plugin;
-	context()->plugin = NULL;
 
 	// Destroy environment
+	plugin::destroy();
 	uiDestroy();
 	bridgeDestroy();
 	midiDestroy();

@@ -7,7 +7,7 @@
 #include "ui/TextField.hpp"
 #include "ui/PasswordField.hpp"
 #include "ui/Label.hpp"
-#include "plugin/PluginManager.hpp"
+#include "plugin.hpp"
 #include "context.hpp"
 #include "window.hpp"
 #include "helpers.hpp"
@@ -32,7 +32,7 @@ struct LogInButton : Button {
 	TextField *passwordField;
 	void onAction(event::Action &e) override {
 		std::thread t([&]() {
-			context()->plugin->logIn(emailField->text, passwordField->text);
+			plugin::logIn(emailField->text, passwordField->text);
 		});
 		t.detach();
 		passwordField->text = "";
@@ -42,7 +42,7 @@ struct LogInButton : Button {
 
 struct StatusLabel : Label {
 	void step() override {
-		text = context()->plugin->loginStatus;
+		text = plugin::loginStatus;
 	}
 };
 
@@ -68,7 +68,7 @@ struct SyncButton : Button {
 		// Check for plugin update on first step()
 		if (!checked) {
 			std::thread t([this]() {
-				if (context()->plugin->sync(true))
+				if (plugin::sync(true))
 					available = true;
 			});
 			t.detach();
@@ -97,7 +97,7 @@ struct SyncButton : Button {
 	void onAction(event::Action &e) override {
 		available = false;
 		std::thread t([this]() {
-			if (context()->plugin->sync(false))
+			if (plugin::sync(false))
 				completed = true;
 		});
 		t.detach();
@@ -107,14 +107,14 @@ struct SyncButton : Button {
 
 struct LogOutButton : Button {
 	void onAction(event::Action &e) override {
-		context()->plugin->logOut();
+		plugin::logOut();
 	}
 };
 
 
 struct DownloadQuantity : Quantity {
 	float getValue() override {
-		return context()->plugin->downloadProgress;
+		return plugin::downloadProgress;
 	}
 
 	float getDisplayValue() override {
@@ -124,7 +124,7 @@ struct DownloadQuantity : Quantity {
 	int getDisplayPrecision() override {return 0;}
 
 	std::string getLabel() override {
-		return "Downloading " + context()->plugin->downloadName;
+		return "Downloading " + plugin::downloadName;
 	}
 
 	std::string getUnit() override {return "%";}
@@ -140,7 +140,7 @@ struct DownloadProgressBar : ProgressBar {
 
 struct CancelButton : Button {
 	void onAction(event::Action &e) override {
-		context()->plugin->cancelDownload();
+		plugin::cancelDownload();
 	}
 };
 
@@ -227,9 +227,9 @@ void PluginManagerWidget::step() {
 	manageWidget->visible = false;
 	downloadWidget->visible = false;
 
-	if (context()->plugin->isDownloading)
+	if (plugin::isDownloading)
 		downloadWidget->visible = true;
-	else if (context()->plugin->isLoggedIn())
+	else if (plugin::isLoggedIn())
 		manageWidget->visible = true;
 	else
 		loginWidget->visible = true;

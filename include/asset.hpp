@@ -18,8 +18,8 @@ std::string user(std::string filename);
 std::string plugin(Plugin *plugin, std::string filename);
 
 
-extern std::string gSystemDir;
-extern std::string gUserDir;
+extern std::string systemDir;
+extern std::string userDir;
 
 
 } // namespace asset

@@ -9,7 +9,7 @@
 #include "asset.hpp"
 #include "system.hpp"
 #include "logger.hpp"
-#include "plugin/PluginManager.hpp"
+#include "plugin.hpp"
 #include "context.hpp"
 
 
@@ -379,7 +379,7 @@ ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
 	std::string modelSlug = json_string_value(modelSlugJ);
 
 	// Get Model
-	Model *model = context()->plugin->getModel(pluginSlug, modelSlug);
+	Model *model = plugin::getModel(pluginSlug, modelSlug);
 	if (!model)
 		return NULL;
 

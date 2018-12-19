@@ -1,7 +1,7 @@
 #include "settings.hpp"
 #include "logger.hpp"
 #include "window.hpp"
-#include "plugin/PluginManager.hpp"
+#include "plugin.hpp"
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
 #include "engine/Engine.hpp"
@@ -21,7 +21,7 @@ static json_t *settingsToJson() {
 	json_t *rootJ = json_object();
 
 	// token
-	json_t *tokenJ = json_string(context()->plugin->token.c_str());
+	json_t *tokenJ = json_string(plugin::token.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
 	if (!context()->window->isMaximized()) {
@@ -84,7 +84,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// token
 	json_t *tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
-		context()->plugin->token = json_string_value(tokenJ);
+		plugin::token = json_string_value(tokenJ);
 
 	// windowSize
 	json_t *windowSizeJ = json_object_get(rootJ, "windowSize");
