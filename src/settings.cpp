@@ -13,9 +13,6 @@ namespace rack {
 namespace settings {
 
 
-bool gSkipAutosaveOnLaunch = false;
-
-
 static json_t *settingsToJson() {
 	// root
 	json_t *rootJ = json_object();
@@ -63,9 +60,9 @@ static json_t *settingsToJson() {
 	json_t *lastPathJ = json_string(context()->scene->rackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
-	// skipAutosaveOnLaunch
-	if (gSkipAutosaveOnLaunch) {
-		json_object_set_new(rootJ, "skipAutosaveOnLaunch", json_true());
+	// skipLoadOnLaunch
+	if (context()->skipLoadOnLaunch) {
+		json_object_set_new(rootJ, "skipLoadOnLaunch", json_true());
 	}
 
 	// moduleBrowser
@@ -135,10 +132,10 @@ static void settingsFromJson(json_t *rootJ) {
 	if (lastPathJ)
 		context()->scene->rackWidget->lastPath = json_string_value(lastPathJ);
 
-	// skipAutosaveOnLaunch
-	json_t *skipAutosaveOnLaunchJ = json_object_get(rootJ, "skipAutosaveOnLaunch");
-	if (skipAutosaveOnLaunchJ)
-		gSkipAutosaveOnLaunch = json_boolean_value(skipAutosaveOnLaunchJ);
+	// skipLoadOnLaunch
+	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
+	if (skipLoadOnLaunchJ)
+		context()->skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
 
 	// moduleBrowser
 	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");

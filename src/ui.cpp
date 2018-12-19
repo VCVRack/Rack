@@ -2,16 +2,17 @@
 
 
 namespace rack {
+namespace ui {
 
 
-void uiInit(){
-	uiSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
+void init(){
+	setTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
 }
 
-void uiDestroy() {
+void destroy() {
 }
 
-void uiSetTheme(NVGcolor bg, NVGcolor fg) {
+void setTheme(NVGcolor bg, NVGcolor fg) {
 	// Assume dark background and light foreground
 
 	BNDwidgetTheme w;
@@ -58,7 +59,5 @@ void uiSetTheme(NVGcolor bg, NVGcolor fg) {
 }
 
 
-std::shared_ptr<Font> gGuiFont;
-
-
+} // namespace ui
 } // namespace rack

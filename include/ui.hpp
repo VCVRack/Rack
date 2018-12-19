@@ -1,15 +1,16 @@
 #pragma once
 #include "ui/common.hpp"
 #include "color.hpp"
-#include "window.hpp"
 
 
 namespace rack {
+namespace ui {
 
 
-void uiInit();
-void uiDestroy();
-void uiSetTheme(NVGcolor bg, NVGcolor fg);
+void init();
+void destroy();
+void setTheme(NVGcolor bg, NVGcolor fg);
 
 
+} // namespace ui
 } // namespace rack
