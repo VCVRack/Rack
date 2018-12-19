@@ -43,42 +43,41 @@ struct SVG {
 	static std::shared_ptr<SVG> load(const std::string &filename);
 };
 
+struct Window {
+	GLFWwindow *win = NULL;
+	NVGcontext *vg = NULL;
+	NVGcontext *framebufferVg = NULL;
+	/** The scaling ratio */
+	float pixelRatio = 1.f;
+	/* The ratio between the framebuffer size and the window size reported by the OS.
+	This is not equal to gPixelRatio in general.
+	*/
+	float windowRatio = 1.f;
+	bool allowCursorLock = true;
+	int frame = 0;
+	/** The last known absolute mouse position in the window */
+	Vec mousePos;
+	std::shared_ptr<Font> uiFont;
 
-extern GLFWwindow *gWindow;
-extern NVGcontext *gVg;
-extern NVGcontext *gFramebufferVg;
-/** The default font to use for GUI elements */
-extern std::shared_ptr<Font> gGuiFont;
-/** The scaling ratio */
-extern float gPixelRatio;
-/* The ratio between the framebuffer size and the window size reported by the OS.
-This is not equal to gPixelRatio in general.
-*/
-extern float gWindowRatio;
-extern bool gAllowCursorLock;
-extern int gGuiFrame;
-extern Vec gMousePos;
+	struct Internal;
+	Internal *internal;
 
-
-void windowInit();
-void windowDestroy();
-void windowRun();
-void windowClose();
-void windowCursorLock();
-void windowCursorUnlock();
-bool windowIsModPressed();
-bool windowIsShiftPressed();
-Vec windowGetWindowSize();
-void windowSetWindowSize(Vec size);
-Vec windowGetWindowPos();
-void windowSetWindowPos(Vec pos);
-bool windowIsMaximized();
-void windowSetTheme(NVGcolor bg, NVGcolor fg);
-void windowSetFullScreen(bool fullScreen);
-bool windowGetFullScreen();
-
-// In svg.cpp
-void svgDraw(NVGcontext *vg, NSVGimage *svg);
+	Window();
+	~Window();
+	void run();
+	void close();
+	void cursorLock();
+	void cursorUnlock();
+	bool isModPressed();
+	bool isShiftPressed();
+	Vec getWindowSize();
+	void setWindowSize(Vec size);
+	Vec getWindowPos();
+	void setWindowPos(Vec pos);
+	bool isMaximized();
+	void setFullScreen(bool fullScreen);
+	bool isFullScreen();
+};
 
 
 } // namespace rack

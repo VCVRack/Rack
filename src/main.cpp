@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include "random.hpp"
 #include "logger.hpp"
-#include "AssetManager.hpp"
+#include "asset.hpp"
 #include "rtmidi.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
@@ -12,6 +12,7 @@
 #include "tags.hpp"
 #include "plugin/PluginManager.hpp"
 #include "context.hpp"
+#include "ui.hpp"
 
 #include <unistd.h>
 #include <osdialog.h>
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
 		(void) instanceMutex;
 	#endif
 
+	bool devMode = false;
 	std::string patchFile;
 
 	// Parse command line arguments
@@ -43,13 +45,13 @@ int main(int argc, char *argv[]) {
 	while ((c = getopt(argc, argv, "ds:u:")) != -1) {
 		switch (c) {
 			case 'd': {
-				context()->devMode = true;
+				devMode = true;
 			} break;
 			case 's': {
-				context()->asset->systemDir = optarg;
+				asset::gSystemDir = optarg;
 			} break;
 			case 'u': {
-				context()->asset->userDir = optarg;
+				asset::gUserDir = optarg;
 			} break;
 			default: break;
 		}
@@ -60,35 +62,37 @@ int main(int argc, char *argv[]) {
 
 	// Initialize environment
 	random::init();
-	context()->asset = new AssetManager;
-	logger::init();
-
-	// Log environment
-	INFO("%s %s", APP_NAME.c_str(), APP_VERSION.c_str());
-	if (context()->devMode)
-		INFO("Development mode");
-	INFO("System directory: %s", context()->asset->system("").c_str());
-	INFO("User directory: %s", context()->asset->user("").c_str());
-
-	// Initialize app
+	asset::init(devMode);
+	logger::init(devMode);
 	tagsInit();
-	context()->plugin = new PluginManager;
-	context()->engine = new Engine;
 	rtmidiInit();
 	bridgeInit();
 	keyboard::init();
 	gamepad::init();
+	uiInit();
+
+	// Log environment
+	INFO("%s %s", APP_NAME.c_str(), APP_VERSION.c_str());
+	if (devMode)
+		INFO("Development mode");
+	INFO("System directory: %s", asset::gSystemDir.c_str());
+	INFO("User directory: %s", asset::gUserDir.c_str());
+
+	// Initialize app
+	context()->plugin = new PluginManager(devMode);
+	context()->engine = new Engine;
 	context()->event = new event::Context;
 	context()->scene = new Scene;
+	context()->scene->devMode = devMode;
 	context()->event->rootWidget = context()->scene;
-	windowInit();
-	settings::load(context()->asset->user("settings.json"));
+	context()->window = new Window;
+	settings::load(asset::user("settings.json"));
 
 	if (patchFile.empty()) {
 		// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
 		bool oldSkipAutosaveOnLaunch = settings::gSkipAutosaveOnLaunch;
 		settings::gSkipAutosaveOnLaunch = true;
-		settings::save(context()->asset->user("settings.json"));
+		settings::save(asset::user("settings.json"));
 		settings::gSkipAutosaveOnLaunch = false;
 		if (oldSkipAutosaveOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
 			context()->scene->rackWidget->lastPath = "";
@@ -96,7 +100,7 @@ int main(int argc, char *argv[]) {
 		else {
 			// Load autosave
 			std::string oldLastPath = context()->scene->rackWidget->lastPath;
-			context()->scene->rackWidget->load(context()->asset->user("autosave.vcv"));
+			context()->scene->rackWidget->load(asset::user("autosave.vcv"));
 			context()->scene->rackWidget->lastPath = oldLastPath;
 		}
 	}
@@ -107,25 +111,27 @@ int main(int argc, char *argv[]) {
 	}
 
 	context()->engine->start();
-	windowRun();
+	context()->window->run();
 	context()->engine->stop();
 
-	// Destroy namespaces
-	context()->scene->rackWidget->save(context()->asset->user("autosave.vcv"));
-	settings::save(context()->asset->user("settings.json"));
+	// Destroy app
+	context()->scene->rackWidget->save(asset::user("autosave.vcv"));
+	settings::save(asset::user("settings.json"));
 	delete context()->scene;
 	context()->scene = NULL;
 	delete context()->event;
 	context()->event = NULL;
-	windowDestroy();
-	bridgeDestroy();
+	delete context()->window;
+	context()->window = NULL;
 	delete context()->engine;
 	context()->engine = NULL;
-	midiDestroy();
 	delete context()->plugin;
 	context()->plugin = NULL;
-	delete context()->asset;
-	context()->asset = NULL;
+
+	// Destroy environment
+	uiDestroy();
+	bridgeDestroy();
+	midiDestroy();
 	logger::destroy();
 
 	return 0;

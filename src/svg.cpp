@@ -1,4 +1,5 @@
-#include "window.hpp"
+#include "svg.hpp"
+#include "math.hpp"
 
 
 // #define DEBUG_ONLY(x) x
@@ -186,9 +187,6 @@ void svgDraw(NVGcontext *vg, NSVGimage *svg) {
 		}
 
 		nvgRestore(vg);
-
-		// if (std::string(shape->id) == "rect19347")
-		// 	exit(0);
 	}
 
 	DEBUG_ONLY(printf("\n");)

@@ -1,6 +1,7 @@
 #pragma once
 #include "app/common.hpp"
 #include "app/ParamWidget.hpp"
+#include "context.hpp"
 
 
 namespace rack {
@@ -15,11 +16,11 @@ struct Knob : ParamWidget {
 	float speed = 1.0;
 
 	void onDragStart(event::DragStart &e) override {
-		windowCursorLock();
+		context()->window->cursorLock();
 	}
 
 	void onDragEnd(event::DragEnd &e) override {
-		windowCursorUnlock();
+		context()->window->cursorUnlock();
 	}
 
 	void onDragMove(event::DragMove &e) override {
@@ -35,7 +36,7 @@ struct Knob : ParamWidget {
 			float delta = KNOB_SENSITIVITY * -e.mouseDelta.y * speed * range;
 
 			// Drag slower if Mod is held
-			if (windowIsModPressed())
+			if (context()->window->isModPressed())
 				delta /= 16.f;
 			quantity->moveValue(delta);
 		}

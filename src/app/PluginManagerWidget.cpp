@@ -77,7 +77,7 @@ struct SyncButton : Button {
 		// Display message if we've completed updates
 		if (completed) {
 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
-				windowClose();
+				context()->window->close();
 			}
 			completed = false;
 		}

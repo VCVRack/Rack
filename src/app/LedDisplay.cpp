@@ -1,8 +1,9 @@
 #include "app/LedDisplay.hpp"
-#include "AssetManager.hpp"
+#include "asset.hpp"
 #include "window.hpp"
 #include "event.hpp"
 #include "context.hpp"
+#include "ui.hpp"
 
 
 namespace rack {
@@ -34,7 +35,7 @@ void LedDisplaySeparator::draw(NVGcontext *vg) {
 
 LedDisplayChoice::LedDisplayChoice() {
 	box.size = mm2px(Vec(0, 28.0 / 3));
-	font = Font::load(context()->asset->system("res/fonts/ShareTechMono-Regular.ttf"));
+	font = Font::load(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = Vec(10, 18);
 }
@@ -64,7 +65,7 @@ void LedDisplayChoice::onButton(event::Button &e) {
 
 
 LedDisplayTextField::LedDisplayTextField() {
-	font = Font::load(context()->asset->system("res/fonts/ShareTechMono-Regular.ttf"));
+	font = Font::load(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = Vec(5, 5);
 }
@@ -91,7 +92,7 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, 12, text.c_str(), highlightColor, begin, end);
 
-		bndSetFont(gGuiFont->handle);
+		bndSetFont(context()->window->uiFont->handle);
 	}
 
 	nvgResetScissor(vg);
@@ -99,10 +100,10 @@ void LedDisplayTextField::draw(NVGcontext *vg) {
 
 int LedDisplayTextField::getTextPosition(Vec mousePos) {
 	bndSetFont(font->handle);
-	int textPos = bndIconLabelTextPosition(gVg, textOffset.x, textOffset.y,
+	int textPos = bndIconLabelTextPosition(context()->window->vg, textOffset.x, textOffset.y,
 		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 		-1, 12, text.c_str(), mousePos.x, mousePos.y);
-	bndSetFont(gGuiFont->handle);
+	bndSetFont(context()->window->uiFont->handle);
 	return textPos;
 }
 

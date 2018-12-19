@@ -6,7 +6,7 @@
 #include "app/ModuleBrowser.hpp"
 #include "osdialog.h"
 #include "settings.hpp"
-#include "AssetManager.hpp"
+#include "asset.hpp"
 #include "system.hpp"
 #include "logger.hpp"
 #include "plugin/PluginManager.hpp"
@@ -67,7 +67,7 @@ void RackWidget::reset() {
 	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear patch and start over?")) {
 		clear();
 		// Fails silently if file does not exist
-		load(context()->asset->user("template.vcv"));
+		load(asset::user("template.vcv"));
 		lastPath = "";
 	}
 }
@@ -75,7 +75,7 @@ void RackWidget::reset() {
 void RackWidget::loadDialog() {
 	std::string dir;
 	if (lastPath.empty()) {
-		dir = context()->asset->user("patches");
+		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
@@ -104,7 +104,7 @@ void RackWidget::saveAsDialog() {
 	std::string dir;
 	std::string filename;
 	if (lastPath.empty()) {
-		dir = context()->asset->user("patches");
+		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
@@ -392,7 +392,7 @@ ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
 }
 
 void RackWidget::pastePresetClipboard() {
-	const char *moduleJson = glfwGetClipboardString(gWindow);
+	const char *moduleJson = glfwGetClipboardString(context()->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
 		return;
@@ -493,9 +493,9 @@ void RackWidget::step() {
 	}
 
 	// Autosave every 15 seconds
-	if (gGuiFrame % (60 * 15) == 0) {
-		save(context()->asset->user("autosave.vcv"));
-		settings::save(context()->asset->user("settings.json"));
+	if (context()->window->frame % (60 * 15) == 0) {
+		save(asset::user("autosave.vcv"));
+		settings::save(asset::user("settings.json"));
 	}
 
 	Widget::step();

@@ -219,9 +219,5 @@ void Context::handleZoom() {
 }
 
 
-// TODO Move this elsewhere
-Context *gContext = NULL;
-
-
 } // namespace event
 } // namespace rack

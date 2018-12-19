@@ -24,14 +24,14 @@ static json_t *settingsToJson() {
 	json_t *tokenJ = json_string(context()->plugin->token.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
-	if (!windowIsMaximized()) {
+	if (!context()->window->isMaximized()) {
 		// windowSize
-		Vec windowSize = windowGetWindowSize();
+		Vec windowSize = context()->window->getWindowSize();
 		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
 		json_object_set_new(rootJ, "windowSize", windowSizeJ);
 
 		// windowPos
-		Vec windowPos = windowGetWindowPos();
+		Vec windowPos = context()->window->getWindowPos();
 		json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
 		json_object_set_new(rootJ, "windowPos", windowPosJ);
 	}
@@ -52,7 +52,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
 	// allowCursorLock
-	json_t *allowCursorLockJ = json_boolean(gAllowCursorLock);
+	json_t *allowCursorLockJ = json_boolean(context()->window->allowCursorLock);
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
 	// sampleRate
@@ -91,7 +91,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowSizeJ) {
 		double width, height;
 		json_unpack(windowSizeJ, "[F, F]", &width, &height);
-		windowSetWindowSize(Vec(width, height));
+		context()->window->setWindowSize(Vec(width, height));
 	}
 
 	// windowPos
@@ -99,7 +99,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
-		windowSetWindowPos(Vec(x, y));
+		context()->window->setWindowPos(Vec(x, y));
 	}
 
 	// opacity
@@ -121,7 +121,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
-		gAllowCursorLock = json_is_true(allowCursorLockJ);
+		context()->window->allowCursorLock = json_is_true(allowCursorLockJ);
 
 	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");

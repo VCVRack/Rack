@@ -29,14 +29,14 @@ struct ScrollBar : OpaqueWidget {
 
 	void onDragStart(event::DragStart &e) override {
 		state = BND_ACTIVE;
-		windowCursorLock();
+		context()->window->cursorLock();
 	}
 
 	void onDragMove(event::DragMove &e) override;
 
 	void onDragEnd(event::DragEnd &e) override {
 		state = BND_DEFAULT;
-		windowCursorUnlock();
+		context()->window->cursorUnlock();
 	}
 };
 
@@ -114,23 +114,23 @@ struct ScrollWidget : OpaqueWidget {
 		// Scroll with arrow keys
 		if (!context()->event->selectedWidget) {
 			float arrowSpeed = 30.0;
-			if (windowIsShiftPressed() && windowIsModPressed())
+			if (context()->window->isShiftPressed() && context()->window->isModPressed())
 				arrowSpeed /= 16.0;
-			else if (windowIsShiftPressed())
+			else if (context()->window->isShiftPressed())
 				arrowSpeed *= 4.0;
-			else if (windowIsModPressed())
+			else if (context()->window->isModPressed())
 				arrowSpeed /= 4.0;
 
-			if (glfwGetKey(gWindow, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			if (glfwGetKey(context()->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
 				offset.x -= arrowSpeed;
 			}
-			if (glfwGetKey(gWindow, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+			if (glfwGetKey(context()->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 				offset.x += arrowSpeed;
 			}
-			if (glfwGetKey(gWindow, GLFW_KEY_UP) == GLFW_PRESS) {
+			if (glfwGetKey(context()->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
 				offset.y -= arrowSpeed;
 			}
-			if (glfwGetKey(gWindow, GLFW_KEY_DOWN) == GLFW_PRESS) {
+			if (glfwGetKey(context()->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
 				offset.y += arrowSpeed;
 			}
 		}

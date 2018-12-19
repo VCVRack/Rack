@@ -2,10 +2,11 @@
 #include "engine/Engine.hpp"
 #include "logger.hpp"
 #include "system.hpp"
-#include "AssetManager.hpp"
+#include "asset.hpp"
 #include "app/Scene.hpp"
 #include "helpers.hpp"
 #include "context.hpp"
+#include "ui.hpp"
 
 #include "osdialog.h"
 
@@ -124,13 +125,13 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 void ModuleWidget::copyClipboard() {
 	json_t *moduleJ = toJson();
 	char *moduleJson = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-	glfwSetClipboardString(gWindow, moduleJson);
+	glfwSetClipboardString(context()->window->win, moduleJson);
 	free(moduleJson);
 	json_decref(moduleJ);
 }
 
 void ModuleWidget::pasteClipboard() {
-	const char *moduleJson = glfwGetClipboardString(gWindow);
+	const char *moduleJson = glfwGetClipboardString(context()->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
 		return;
@@ -185,7 +186,7 @@ void ModuleWidget::save(std::string filename) {
 }
 
 void ModuleWidget::loadDialog() {
-	std::string dir = context()->asset->user("presets");
+	std::string dir = asset::user("presets");
 	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
@@ -198,7 +199,7 @@ void ModuleWidget::loadDialog() {
 }
 
 void ModuleWidget::saveDialog() {
-	std::string dir = context()->asset->user("presets");
+	std::string dir = asset::user("presets");
 	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
@@ -264,7 +265,8 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgFill(vg);
 
 		std::string cpuText = string::f("%.0f mS", module->cpuTime * 1000.f);
-		nvgFontFaceId(vg, gGuiFont->handle);
+		// TODO Use blendish text function
+		nvgFontFaceId(vg, context()->window->uiFont->handle);
 		nvgFontSize(vg, 12);
 		nvgFillColor(vg, nvgRGBf(1, 1, 1));
 		nvgText(vg, 10.0, box.size.y - 6.0, cpuText.c_str(), NULL);
@@ -297,8 +299,8 @@ void ModuleWidget::onHover(event::Hover &e) {
 	OpaqueWidget::onHover(e);
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-	if (glfwGetKey(gWindow, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-		if (!windowIsModPressed() && !windowIsShiftPressed()) {
+	if (glfwGetKey(context()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(context()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+		if (!context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 			context()->scene->rackWidget->deleteModule(this);
 			delete this;
 			// e.target = this;
@@ -319,42 +321,42 @@ void ModuleWidget::onButton(event::Button &e) {
 void ModuleWidget::onHoverKey(event::HoverKey &e) {
 	switch (e.key) {
 		case GLFW_KEY_I: {
-			if (windowIsModPressed() && !windowIsShiftPressed()) {
+			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 				reset();
 				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_R: {
-			if (windowIsModPressed() && !windowIsShiftPressed()) {
+			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 				randomize();
 				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_C: {
-			if (windowIsModPressed() && !windowIsShiftPressed()) {
+			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 				copyClipboard();
 				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_V: {
-			if (windowIsModPressed() && !windowIsShiftPressed()) {
+			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 				pasteClipboard();
 				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_D: {
-			if (windowIsModPressed() && !windowIsShiftPressed()) {
+			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 				context()->scene->rackWidget->cloneModule(this);
 				e.target = this;
 				return;
 			}
 		} break;
 		case GLFW_KEY_U: {
-			if (windowIsModPressed() && !windowIsShiftPressed()) {
+			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 				disconnect();
 				e.target = this;
 				return;

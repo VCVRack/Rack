@@ -34,9 +34,9 @@ struct MenuItem : MenuEntry {
 	void step() override {
 		// Add 10 more pixels because measurements on high-DPI screens are sometimes too small for some reason
 		const float rightPadding = 10.0;
-		// HACK use gVg from the window.
-		// All this does is inspect the font, so it shouldn't modify gVg and should work when called from a FramebufferWidget for example.
-		box.size.x = bndLabelWidth(gVg, -1, text.c_str()) + bndLabelWidth(gVg, -1, rightText.c_str()) + rightPadding;
+		// HACK use context()->window->vg from the window.
+		// All this does is inspect the font, so it shouldn't modify context()->window->vg and should work when called from a FramebufferWidget for example.
+		box.size.x = bndLabelWidth(context()->window->vg, -1, text.c_str()) + bndLabelWidth(context()->window->vg, -1, rightText.c_str()) + rightPadding;
 		Widget::step();
 	}
 

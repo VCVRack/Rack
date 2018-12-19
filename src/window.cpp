@@ -1,6 +1,6 @@
 #include "window.hpp"
 #include "logger.hpp"
-#include "AssetManager.hpp"
+#include "asset.hpp"
 #include "app/Scene.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
@@ -36,24 +36,32 @@
 namespace rack {
 
 
-GLFWwindow *gWindow = NULL;
-NVGcontext *gVg = NULL;
-NVGcontext *gFramebufferVg = NULL;
-std::shared_ptr<Font> gGuiFont;
-float gPixelRatio = 1.0;
-float gWindowRatio = 1.0;
-bool gAllowCursorLock = true;
-int gGuiFrame;
-Vec gMousePos;
-
-std::string lastWindowTitle;
+struct MouseButtonArguments {
+	GLFWwindow *win;
+	int button;
+	int action;
+	int mods;
+};
 
 
-static void windowSizeCallback(GLFWwindow* window, int width, int height) {
+struct Window::Internal {
+	std::string lastWindowTitle;
+
+	int lastWindowX = 0;
+	int lastWindowY = 0;
+	int lastWindowWidth = 0;
+	int lastWindowHeight = 0;
+
+	std::queue<MouseButtonArguments> mouseButtonQueue;
+};
+
+
+static void windowSizeCallback(GLFWwindow *win, int width, int height) {
 	// Do nothing. Window size is reset each frame anyway.
 }
 
-static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods) {
+static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mods) {
+	Window *window = (Window*) glfwGetWindowUserPointer(win);
 #ifdef ARCH_MAC
 	// Remap Ctrl-left click to right click on Mac
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -63,36 +71,30 @@ static void mouseButtonCallback(GLFWwindow *window, int button, int action, int 
 	}
 #endif
 
-	context()->event->handleButton(gMousePos, button, action, mods);
+	context()->event->handleButton(window->mousePos, button, action, mods);
 }
 
-struct MouseButtonArguments {
-	GLFWwindow *window;
-	int button;
-	int action;
-	int mods;
-};
-
-static std::queue<MouseButtonArguments> mouseButtonQueue;
-void mouseButtonStickyPop() {
-	if (!mouseButtonQueue.empty()) {
-		MouseButtonArguments args = mouseButtonQueue.front();
-		mouseButtonQueue.pop();
-		mouseButtonCallback(args.window, args.button, args.action, args.mods);
+static void Window_mouseButtonStickyPop(Window *window) {
+	if (!window->internal->mouseButtonQueue.empty()) {
+		MouseButtonArguments args = window->internal->mouseButtonQueue.front();
+		window->internal->mouseButtonQueue.pop();
+		mouseButtonCallback(args.win, args.button, args.action, args.mods);
 	}
 }
 
-void mouseButtonStickyCallback(GLFWwindow *window, int button, int action, int mods) {
+static void mouseButtonStickyCallback(GLFWwindow *win, int button, int action, int mods) {
+	Window *window = (Window*) glfwGetWindowUserPointer(win);
 	// Defer multiple clicks per frame to future frames
-	MouseButtonArguments args = {window, button, action, mods};
-	mouseButtonQueue.push(args);
+	MouseButtonArguments args = {win, button, action, mods};
+	window->internal->mouseButtonQueue.push(args);
 }
 
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-	Vec mousePos = Vec(xpos, ypos).div(gPixelRatio / gWindowRatio).round();
-	Vec mouseDelta = mousePos.minus(gMousePos);
+static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
+	Window *window = (Window*) glfwGetWindowUserPointer(win);
+	Vec mousePos = Vec(xpos, ypos).div(window->pixelRatio / window->windowRatio).round();
+	Vec mouseDelta = mousePos.minus(window->mousePos);
 
-	int cursorMode = glfwGetInputMode(gWindow, GLFW_CURSOR);
+	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
 	(void) cursorMode;
 
 #ifdef ARCH_MAC
@@ -100,42 +102,45 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
-		glfwSetCursorPos(gWindow, gMousePos.x, gMousePos.y);
+		glfwSetCursorPos(win, window->mousePos.x, window->mousePos.y);
 		CGAssociateMouseAndMouseCursorPosition(true);
-		mousePos = gMousePos;
+		mousePos = window->mousePos;
 	}
 	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
-	glfwSetCursor(gWindow, NULL);
+	glfwSetCursor(win, NULL);
 #endif
 
-	gMousePos = mousePos;
+	window->mousePos = mousePos;
 
 	context()->event->handleHover(mousePos, mouseDelta);
 }
 
-void cursorEnterCallback(GLFWwindow* window, int entered) {
+static void cursorEnterCallback(GLFWwindow *win, int entered) {
 	if (!entered) {
 		context()->event->handleLeave();
 	}
 }
 
-void scrollCallback(GLFWwindow *window, double x, double y) {
+static void scrollCallback(GLFWwindow *win, double x, double y) {
+	Window *window = (Window*) glfwGetWindowUserPointer(win);
 	Vec scrollDelta = Vec(x, y);
 #if ARCH_LIN || ARCH_WIN
-	if (windowIsShiftPressed())
+	if (window->isShiftPressed())
 		scrollDelta = Vec(y, x);
 #endif
 	scrollDelta = scrollDelta.mult(50.0);
 
-	context()->event->handleScroll(gMousePos, scrollDelta);
+	context()->event->handleScroll(window->mousePos, scrollDelta);
 }
 
-void charCallback(GLFWwindow *window, unsigned int codepoint) {
-	context()->event->handleText(gMousePos, codepoint);
+static void charCallback(GLFWwindow *win, unsigned int codepoint) {
+	Window *window = (Window*) glfwGetWindowUserPointer(win);
+	context()->event->handleText(window->mousePos, codepoint);
 }
 
-void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-	context()->event->handleKey(gMousePos, key, scancode, action, mods);
+static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
+	Window *window = (Window*) glfwGetWindowUserPointer(win);
+	context()->event->handleKey(window->mousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
 	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
@@ -148,37 +153,22 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
 	}
 }
 
-void dropCallback(GLFWwindow *window, int count, const char **paths) {
+static void dropCallback(GLFWwindow *win, int count, const char **paths) {
+	Window *window = (Window*) glfwGetWindowUserPointer(win);
 	std::vector<std::string> pathsVec;
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
 	}
-	context()->event->handleDrop(gMousePos, pathsVec);
+	context()->event->handleDrop(window->mousePos, pathsVec);
 }
 
-void errorCallback(int error, const char *description) {
+static void errorCallback(int error, const char *description) {
 	WARN("GLFW error %d: %s", error, description);
 }
 
-void renderGui() {
-	int width, height;
-	glfwGetFramebufferSize(gWindow, &width, &height);
+Window::Window() {
+	internal = new Internal;
 
-	// Update and render
-	nvgBeginFrame(gVg, width, height, gPixelRatio);
-
-	nvgReset(gVg);
-	nvgScale(gVg, gPixelRatio, gPixelRatio);
-	context()->event->rootWidget->draw(gVg);
-
-	glViewport(0, 0, width, height);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	nvgEndFrame(gVg);
-	glfwSwapBuffers(gWindow);
-}
-
-void windowInit() {
 	int err;
 
 	// Set up GLFW
@@ -200,28 +190,29 @@ void windowInit() {
 #endif
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	lastWindowTitle = "";
-	gWindow = glfwCreateWindow(640, 480, lastWindowTitle.c_str(), NULL, NULL);
-	if (!gWindow) {
+	internal->lastWindowTitle = "";
+	win = glfwCreateWindow(640, 480, internal->lastWindowTitle.c_str(), NULL, NULL);
+
+	if (!win) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
 
-	glfwMakeContextCurrent(gWindow);
+	glfwSetWindowUserPointer(win, this);
+	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
 
+	glfwMakeContextCurrent(win);
 	glfwSwapInterval(1);
 
-	glfwSetInputMode(gWindow, GLFW_LOCK_KEY_MODS, 1);
-
-	glfwSetWindowSizeCallback(gWindow, windowSizeCallback);
-	glfwSetMouseButtonCallback(gWindow, mouseButtonStickyCallback);
+	glfwSetWindowSizeCallback(win, windowSizeCallback);
+	glfwSetMouseButtonCallback(win, mouseButtonStickyCallback);
 	// Call this ourselves, but on every frame instead of only when the mouse moves
-	// glfwSetCursorPosCallback(gWindow, cursorPosCallback);
-	glfwSetCursorEnterCallback(gWindow, cursorEnterCallback);
-	glfwSetScrollCallback(gWindow, scrollCallback);
-	glfwSetCharCallback(gWindow, charCallback);
-	glfwSetKeyCallback(gWindow, keyCallback);
-	glfwSetDropCallback(gWindow, dropCallback);
+	// glfwSetCursorPosCallback(win, cursorPosCallback);
+	glfwSetCursorEnterCallback(win, cursorEnterCallback);
+	glfwSetScrollCallback(win, scrollCallback);
+	glfwSetCharCallback(win, charCallback);
+	glfwSetKeyCallback(win, keyCallback);
+	glfwSetDropCallback(win, dropCallback);
 
 	// Set up GLEW
 	glewExperimental = GL_TRUE;
@@ -234,73 +225,87 @@ void windowInit() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
-	glfwSetWindowSizeLimits(gWindow, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(win, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
 	int nvgFlags = NVG_ANTIALIAS;
 #if defined NANOVG_GL2
-	gVg = nvgCreateGL2(nvgFlags);
+	vg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
-	gVg = nvgCreateGL3(nvgFlags);
+	vg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
-	gVg = nvgCreateGLES2(nvgFlags);
+	vg = nvgCreateGLES2(nvgFlags);
 #endif
-	assert(gVg);
+	assert(vg);
 
 #if defined NANOVG_GL2
-	gFramebufferVg = nvgCreateGL2(nvgFlags);
+	framebufferVg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
-	gFramebufferVg = nvgCreateGL3(nvgFlags);
+	framebufferVg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
-	gFramebufferVg = nvgCreateGLES2(nvgFlags);
+	framebufferVg = nvgCreateGLES2(nvgFlags);
 #endif
-	assert(gFramebufferVg);
-
-	// Set up Blendish
-	gGuiFont = Font::load(context()->asset->system("res/fonts/DejaVuSans.ttf"));
-	bndSetFont(gGuiFont->handle);
-
-	windowSetTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
+	assert(framebufferVg);
 }
 
-void windowDestroy() {
-	gGuiFont.reset();
-
+Window::~Window() {
 #if defined NANOVG_GL2
-	nvgDeleteGL2(gVg);
+	nvgDeleteGL2(vg);
 #elif defined NANOVG_GL3
-	nvgDeleteGL3(gVg);
+	nvgDeleteGL3(vg);
 #elif defined NANOVG_GLES2
-	nvgDeleteGLES2(gVg);
+	nvgDeleteGLES2(vg);
 #endif
 
 #if defined NANOVG_GL2
-	nvgDeleteGL2(gFramebufferVg);
+	nvgDeleteGL2(framebufferVg);
 #elif defined NANOVG_GL3
-	nvgDeleteGL3(gFramebufferVg);
+	nvgDeleteGL3(framebufferVg);
 #elif defined NANOVG_GLES2
-	nvgDeleteGLES2(gFramebufferVg);
+	nvgDeleteGLES2(framebufferVg);
 #endif
 
-	glfwDestroyWindow(gWindow);
+	glfwDestroyWindow(win);
 	glfwTerminate();
+	delete internal;
 }
 
-void windowRun() {
-	assert(gWindow);
-	gGuiFrame = 0;
-	while(!glfwWindowShouldClose(gWindow)) {
+static void Window_renderGui(Window *window) {
+	int width, height;
+	glfwGetFramebufferSize(window->win, &width, &height);
+
+	bndSetFont(window->uiFont->handle);
+
+	// Update and render
+	nvgBeginFrame(window->vg, width, height, window->pixelRatio);
+
+	nvgReset(window->vg);
+	nvgScale(window->vg, window->pixelRatio, window->pixelRatio);
+	context()->event->rootWidget->draw(window->vg);
+
+	glViewport(0, 0, width, height);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	nvgEndFrame(window->vg);
+	glfwSwapBuffers(window->win);
+}
+
+void Window::run() {
+	uiFont = Font::load(asset::system("res/fonts/DejaVuSans.ttf"));
+
+	frame = 0;
+	while(!glfwWindowShouldClose(win)) {
 		double startTime = glfwGetTime();
-		gGuiFrame++;
+		frame++;
 
 		// Poll events
 		glfwPollEvents();
 		{
 			double xpos, ypos;
-			glfwGetCursorPos(gWindow, &xpos, &ypos);
-			cursorPosCallback(gWindow, xpos, ypos);
+			glfwGetCursorPos(win, &xpos, &ypos);
+			cursorPosCallback(win, xpos, ypos);
 		}
-		mouseButtonStickyPop();
+		Window_mouseButtonStickyPop(this);
 		gamepad::step();
 
 		// Set window title
@@ -312,36 +317,36 @@ void windowRun() {
 			windowTitle += " - ";
 			windowTitle += string::filename(context()->scene->rackWidget->lastPath);
 		}
-		if (windowTitle != lastWindowTitle) {
-			glfwSetWindowTitle(gWindow, windowTitle.c_str());
-			lastWindowTitle = windowTitle;
+		if (windowTitle != internal->lastWindowTitle) {
+			glfwSetWindowTitle(win, windowTitle.c_str());
+			internal->lastWindowTitle = windowTitle;
 		}
 
 		// Get desired scaling
-		float pixelRatio;
-		glfwGetWindowContentScale(gWindow, &pixelRatio, NULL);
-		pixelRatio = roundf(pixelRatio);
-		if (pixelRatio != gPixelRatio) {
+		float newPixelRatio;
+		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
+		newPixelRatio = std::round(newPixelRatio);
+		if (newPixelRatio != pixelRatio) {
 			context()->event->handleZoom();
-			gPixelRatio = pixelRatio;
+			pixelRatio = newPixelRatio;
 		}
 
 		// Get framebuffer/window ratio
 		int width, height;
-		glfwGetFramebufferSize(gWindow, &width, &height);
+		glfwGetFramebufferSize(win, &width, &height);
 		int windowWidth, windowHeight;
-		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
-		gWindowRatio = (float)width / windowWidth;
+		glfwGetWindowSize(win, &windowWidth, &windowHeight);
+		windowRatio = (float)width / windowWidth;
 
-		context()->event->rootWidget->box.size = Vec(width, height).div(gPixelRatio);
+		context()->event->rootWidget->box.size = Vec(width, height).div(pixelRatio);
 
 		// Step scene
 		context()->event->rootWidget->step();
 
 		// Render
-		bool visible = glfwGetWindowAttrib(gWindow, GLFW_VISIBLE) && !glfwGetWindowAttrib(gWindow, GLFW_ICONIFIED);
+		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
 		if (visible) {
-			renderGui();
+			Window_renderGui(this);
 		}
 
 		// Limit framerate manually if vsync isn't working
@@ -356,132 +361,81 @@ void windowRun() {
 	}
 }
 
-void windowClose() {
-	glfwSetWindowShouldClose(gWindow, GLFW_TRUE);
+void Window::close() {
+	glfwSetWindowShouldClose(win, GLFW_TRUE);
 }
 
-void windowCursorLock() {
-	if (gAllowCursorLock) {
+void Window::cursorLock() {
+	if (allowCursorLock) {
 #ifdef ARCH_MAC
-		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
-		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
 	}
 }
 
-void windowCursorUnlock() {
-	if (gAllowCursorLock) {
-		glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+void Window::cursorUnlock() {
+	if (allowCursorLock) {
+		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
 
-bool windowIsModPressed() {
+bool Window::isModPressed() {
 #ifdef ARCH_MAC
-	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
+	return glfwGetKey(win, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
 #else
-	return glfwGetKey(gWindow, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+	return glfwGetKey(win, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
 #endif
 }
 
-bool windowIsShiftPressed() {
-	return glfwGetKey(gWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(gWindow, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
+bool Window::isShiftPressed() {
+	return glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
-Vec windowGetWindowSize() {
+Vec Window::getWindowSize() {
 	int width, height;
-	glfwGetWindowSize(gWindow, &width, &height);
+	glfwGetWindowSize(win, &width, &height);
 	return Vec(width, height);
 }
 
-void windowSetWindowSize(Vec size) {
+void Window::setWindowSize(Vec size) {
 	int width = size.x;
 	int height = size.y;
-	glfwSetWindowSize(gWindow, width, height);
+	glfwSetWindowSize(win, width, height);
 }
 
-Vec windowGetWindowPos() {
+Vec Window::getWindowPos() {
 	int x, y;
-	glfwGetWindowPos(gWindow, &x, &y);
+	glfwGetWindowPos(win, &x, &y);
 	return Vec(x, y);
 }
 
-void windowSetWindowPos(Vec pos) {
+void Window::setWindowPos(Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
-	glfwSetWindowPos(gWindow, x, y);
+	glfwSetWindowPos(win, x, y);
 }
 
-bool windowIsMaximized() {
-	return glfwGetWindowAttrib(gWindow, GLFW_MAXIMIZED);
+bool Window::isMaximized() {
+	return glfwGetWindowAttrib(win, GLFW_MAXIMIZED);
 }
 
-void windowSetTheme(NVGcolor bg, NVGcolor fg) {
-	// Assume dark background and light foreground
-
-	BNDwidgetTheme w;
-	w.outlineColor = bg;
-	w.itemColor = fg;
-	w.innerColor = bg;
-	w.innerSelectedColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
-	w.textColor = fg;
-	w.textSelectedColor = fg;
-	w.shadeTop = 0;
-	w.shadeDown = 0;
-
-	BNDtheme t;
-	t.backgroundColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
-	t.regularTheme = w;
-	t.toolTheme = w;
-	t.radioTheme = w;
-	t.textFieldTheme = w;
-	t.optionTheme = w;
-	t.choiceTheme = w;
-	t.numberFieldTheme = w;
-	t.sliderTheme = w;
-	t.scrollBarTheme = w;
-	t.tooltipTheme = w;
-	t.menuTheme = w;
-	t.menuItemTheme = w;
-
-	t.sliderTheme.itemColor = bg;
-	t.sliderTheme.innerColor = color::plus(bg, nvgRGB(0x50, 0x50, 0x50));
-	t.sliderTheme.innerSelectedColor = color::plus(bg, nvgRGB(0x60, 0x60, 0x60));
-
-	t.textFieldTheme = t.sliderTheme;
-	t.textFieldTheme.textColor = color::minus(bg, nvgRGB(0x20, 0x20, 0x20));
-	t.textFieldTheme.textSelectedColor = t.textFieldTheme.textColor;
-
-	t.scrollBarTheme.itemColor = color::plus(bg, nvgRGB(0x50, 0x50, 0x50));
-	t.scrollBarTheme.innerColor = bg;
-
-	t.menuTheme.innerColor = color::minus(bg, nvgRGB(0x10, 0x10, 0x10));
-	t.menuTheme.textColor = color::minus(fg, nvgRGB(0x50, 0x50, 0x50));
-	t.menuTheme.textSelectedColor = t.menuTheme.textColor;
-
-	bndSetTheme(t);
-}
-
-static int windowX = 0;
-static int windowY = 0;
-static int windowWidth = 0;
-static int windowHeight = 0;
-
-void windowSetFullScreen(bool fullScreen) {
-	if (windowGetFullScreen()) {
-		glfwSetWindowMonitor(gWindow, NULL, windowX, windowY, windowWidth, windowHeight, GLFW_DONT_CARE);
+void Window::setFullScreen(bool fullScreen) {
+	if (isFullScreen()) {
+		glfwSetWindowMonitor(win, NULL, internal->lastWindowX, internal->lastWindowY, internal->lastWindowWidth, internal->lastWindowHeight, GLFW_DONT_CARE);
 	}
 	else {
-		glfwGetWindowPos(gWindow, &windowX, &windowY);
-		glfwGetWindowSize(gWindow, &windowWidth, &windowHeight);
+		glfwGetWindowPos(win, &internal->lastWindowX, &internal->lastWindowY);
+		glfwGetWindowSize(win, &internal->lastWindowWidth, &internal->lastWindowHeight);
 		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		glfwSetWindowMonitor(gWindow, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+		glfwSetWindowMonitor(win, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 	}
 }
 
-bool windowGetFullScreen() {
-	GLFWmonitor *monitor = glfwGetWindowMonitor(gWindow);
+bool Window::isFullScreen() {
+	GLFWmonitor *monitor = glfwGetWindowMonitor(win);
 	return monitor != NULL;
 }
 
@@ -491,7 +445,7 @@ bool windowGetFullScreen() {
 ////////////////////
 
 Font::Font(const std::string &filename) {
-	handle = nvgCreateFont(gVg, filename.c_str(), filename.c_str());
+	handle = nvgCreateFont(context()->window->vg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		INFO("Loaded font %s", filename.c_str());
 	}
@@ -517,7 +471,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 ////////////////////
 
 Image::Image(const std::string &filename) {
-	handle = nvgCreateImage(gVg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+	handle = nvgCreateImage(context()->window->vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		INFO("Loaded image %s", filename.c_str());
 	}
@@ -528,7 +482,7 @@ Image::Image(const std::string &filename) {
 
 Image::~Image() {
 	// TODO What if handle is invalid?
-	nvgDeleteImage(gVg, handle);
+	nvgDeleteImage(context()->window->vg, handle);
 }
 
 std::shared_ptr<Image> Image::load(const std::string &filename) {

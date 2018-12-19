@@ -240,7 +240,7 @@ void AudioInterface::step() {
 
 struct AudioInterfaceWidget : ModuleWidget {
 	AudioInterfaceWidget(AudioInterface *module) : ModuleWidget(module) {
-		setPanel(SVG::load(context()->asset->system("res/Core/AudioInterface.svg")));
+		setPanel(SVG::load(asset::system("res/Core/AudioInterface.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

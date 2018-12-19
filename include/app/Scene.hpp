@@ -19,6 +19,7 @@ struct Scene : OpaqueWidget {
 	Toolbar *toolbar;
 
 	// Version checking
+	bool devMode = false;
 	bool checkVersion = true;
 	bool checkedVersion = false;
 	std::string latestVersion;

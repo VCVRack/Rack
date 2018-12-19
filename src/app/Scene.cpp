@@ -44,7 +44,7 @@ void Scene::step() {
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 
 	// Request latest version from server
-	if (!context()->devMode && checkVersion && !checkedVersion) {
+	if (!devMode && checkVersion && !checkedVersion) {
 		std::thread t(&Scene::runCheckVersion, this);
 		t.detach();
 		checkedVersion = true;
@@ -56,7 +56,7 @@ void Scene::step() {
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
 			std::thread t(system::openBrowser, "https://vcvrack.com/");
 			t.detach();
-			windowClose();
+			context()->window->close();
 		}
 		latestVersion = "";
 	}
@@ -72,39 +72,39 @@ void Scene::onHoverKey(event::HoverKey &e) {
 	if (!e.target) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
-				if (windowIsModPressed() && !windowIsShiftPressed()) {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->reset();
 					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_Q: {
-				if (windowIsModPressed() && !windowIsShiftPressed()) {
-					windowClose();
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					context()->window->close();
 					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_O: {
-				if (windowIsModPressed() && !windowIsShiftPressed()) {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->loadDialog();
 					e.target = this;
 				}
-				if (windowIsModPressed() && windowIsShiftPressed()) {
+				if (context()->window->isModPressed() && context()->window->isShiftPressed()) {
 					rackWidget->revert();
 					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_S: {
-				if (windowIsModPressed() && !windowIsShiftPressed()) {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->saveDialog();
 					e.target = this;
 				}
-				if (windowIsModPressed() && windowIsShiftPressed()) {
+				if (context()->window->isModPressed() && context()->window->isShiftPressed()) {
 					rackWidget->saveAsDialog();
 					e.target = this;
 				}
 			} break;
 			case GLFW_KEY_V: {
-				if (windowIsModPressed() && !windowIsShiftPressed()) {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->pastePresetClipboard();
 					e.target = this;
 				}
@@ -115,7 +115,7 @@ void Scene::onHoverKey(event::HoverKey &e) {
 				e.target = this;
 			} break;
 			case GLFW_KEY_F11: {
-				windowSetFullScreen(!windowGetFullScreen());
+				context()->window->setFullScreen(!context()->window->isFullScreen());
 			}
 		}
 	}

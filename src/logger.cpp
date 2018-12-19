@@ -1,6 +1,5 @@
 #include "logger.hpp"
-#include "AssetManager.hpp"
-#include "context.hpp"
+#include "asset.hpp"
 #include <chrono>
 
 
@@ -12,13 +11,13 @@ static FILE *outputFile = NULL;
 static std::chrono::high_resolution_clock::time_point startTime;
 
 
-void init() {
+void init(bool devMode) {
 	startTime = std::chrono::high_resolution_clock::now();
-	if (context()->devMode) {
+	if (devMode) {
 		outputFile = stderr;
 	}
 	else {
-		std::string logFilename = context()->asset->user("log.txt");
+		std::string logFilename = asset::user("log.txt");
 		outputFile = fopen(logFilename.c_str(), "w");
 	}
 }

@@ -109,7 +109,7 @@ struct TextField : OpaqueWidget {
 				}
 			} break;
 			case GLFW_KEY_LEFT: {
-				if (windowIsModPressed()) {
+				if (context()->window->isModPressed()) {
 					while (--cursor > 0) {
 						if (text[cursor] == ' ')
 							break;
@@ -118,12 +118,12 @@ struct TextField : OpaqueWidget {
 				else {
 					cursor--;
 				}
-				if (!windowIsShiftPressed()) {
+				if (!context()->window->isShiftPressed()) {
 					selection = cursor;
 				}
 			} break;
 			case GLFW_KEY_RIGHT: {
-				if (windowIsModPressed()) {
+				if (context()->window->isModPressed()) {
 					while (++cursor < (int) text.size()) {
 						if (text[cursor] == ' ')
 							break;
@@ -132,7 +132,7 @@ struct TextField : OpaqueWidget {
 				else {
 					cursor++;
 				}
-				if (!windowIsShiftPressed()) {
+				if (!context()->window->isShiftPressed()) {
 					selection = cursor;
 				}
 			} break;
@@ -143,33 +143,33 @@ struct TextField : OpaqueWidget {
 				selection = cursor = text.size();
 			} break;
 			case GLFW_KEY_V: {
-				if (windowIsModPressed()) {
-					const char *newText = glfwGetClipboardString(gWindow);
+				if (context()->window->isModPressed()) {
+					const char *newText = glfwGetClipboardString(context()->window->win);
 					if (newText)
 						insertText(newText);
 				}
 			} break;
 			case GLFW_KEY_X: {
-				if (windowIsModPressed()) {
+				if (context()->window->isModPressed()) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-						glfwSetClipboardString(gWindow, selectedText.c_str());
+						glfwSetClipboardString(context()->window->win, selectedText.c_str());
 						insertText("");
 					}
 				}
 			} break;
 			case GLFW_KEY_C: {
-				if (windowIsModPressed()) {
+				if (context()->window->isModPressed()) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-						glfwSetClipboardString(gWindow, selectedText.c_str());
+						glfwSetClipboardString(context()->window->win, selectedText.c_str());
 					}
 				}
 			} break;
 			case GLFW_KEY_A: {
-				if (windowIsModPressed()) {
+				if (context()->window->isModPressed()) {
 					selection = 0;
 					cursor = text.size();
 				}
@@ -213,7 +213,7 @@ struct TextField : OpaqueWidget {
 	}
 
 	virtual int getTextPosition(Vec mousePos) {
-		return bndTextFieldTextPosition(gVg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
+		return bndTextFieldTextPosition(context()->window->vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
 	}
 };
 

@@ -24,7 +24,7 @@ enum Level {
 	FATAL_LEVEL
 };
 
-void init();
+void init(bool devMode);
 void destroy();
 /** Do not use this function directly. Use the macros below. */
 void log(Level level, const char *filename, int line, const char *format, ...);

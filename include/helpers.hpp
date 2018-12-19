@@ -144,7 +144,7 @@ TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
 // TODO Reevaluate this. Does it belong here?
 inline Menu *createMenu() {
 	Menu *o = new Menu;
-	o->box.pos = gMousePos;
+	o->box.pos = context()->window->mousePos;
 
 	MenuOverlay *menuOverlay = new MenuOverlay;
 	menuOverlay->addChild(o);

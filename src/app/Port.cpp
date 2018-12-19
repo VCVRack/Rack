@@ -65,7 +65,7 @@ void Port::onButton(event::Button &e) {
 void Port::onDragStart(event::DragStart &e) {
 	// Try to grab wire on top of stack
 	WireWidget *wire = context()->scene->rackWidget->wireContainer->getTopWire(this);
-	if (type == OUTPUT && windowIsModPressed()) {
+	if (type == OUTPUT && context()->window->isModPressed()) {
 		wire = NULL;
 	}
 

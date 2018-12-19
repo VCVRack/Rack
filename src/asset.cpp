@@ -1,6 +1,5 @@
-#include "AssetManager.hpp"
+#include "asset.hpp"
 #include "system.hpp"
-#include "context.hpp"
 #include "plugin/Plugin.hpp"
 
 #if ARCH_MAC
@@ -22,13 +21,14 @@
 
 
 namespace rack {
+namespace asset {
 
 
-AssetManager::AssetManager() {
+void init(bool devMode) {
 	// Get system dir
-	if (systemDir.empty()) {
-		if (context()->devMode) {
-			systemDir = ".";
+	if (gSystemDir.empty()) {
+		if (devMode) {
+			gSystemDir = ".";
 		}
 		else {
 #if ARCH_MAC
@@ -39,26 +39,26 @@ AssetManager::AssetManager() {
 			Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
 			assert(success);
 			CFRelease(resourcesUrl);
-			systemDir = resourcesBuf;
+			gSystemDir = resourcesBuf;
 #endif
 #if ARCH_WIN
 			char moduleBuf[MAX_PATH];
 			DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
 			assert(length > 0);
 			PathRemoveFileSpec(moduleBuf);
-			systemDir = moduleBuf;
+			gSystemDir = moduleBuf;
 #endif
 #if ARCH_LIN
 			// TODO For now, users should launch Rack from their terminal in the system directory
-			systemDir = ".";
+			gSystemDir = ".";
 #endif
 		}
 	}
 
 	// Get user dir
-	if (userDir.empty()) {
-		if (context()->devMode) {
-			userDir = ".";
+	if (gUserDir.empty()) {
+		if (devMode) {
+			gUserDir = ".";
 		}
 		else {
 #if ARCH_WIN
@@ -66,15 +66,15 @@ AssetManager::AssetManager() {
 			char documentsBuf[MAX_PATH];
 			HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
 			assert(result == S_OK);
-			userDir = documentsBuf;
-			userDir += "/Rack";
+			gUserDir = documentsBuf;
+			gUserDir += "/Rack";
 #endif
 #if ARCH_MAC
 			// Get home directory
 			struct passwd *pw = getpwuid(getuid());
 			assert(pw);
-			userDir = pw->pw_dir;
-			userDir += "/Documents/Rack";
+			gUserDir = pw->pw_dir;
+			gUserDir += "/Documents/Rack";
 #endif
 #if ARCH_LIN
 			// Get home directory
@@ -84,31 +84,36 @@ AssetManager::AssetManager() {
 				assert(pw);
 				homeBuf = pw->pw_dir;
 			}
-			userDir = homeBuf;
-			userDir += "/.Rack";
+			gUserDir = homeBuf;
+			gUserDir += "/.Rack";
 #endif
 		}
 	}
 
-	system::createDirectory(systemDir);
-	system::createDirectory(userDir);
+	system::createDirectory(gSystemDir);
+	system::createDirectory(gUserDir);
 }
 
 
-std::string AssetManager::system(std::string filename) {
-	return systemDir + "/" + filename;
+std::string system(std::string filename) {
+	return gSystemDir + "/" + filename;
 }
 
 
-std::string AssetManager::user(std::string filename) {
-	return userDir + "/" + filename;
+std::string user(std::string filename) {
+	return gUserDir + "/" + filename;
 }
 
 
-std::string AssetManager::plugin(Plugin *plugin, std::string filename) {
+std::string plugin(Plugin *plugin, std::string filename) {
 	assert(plugin);
 	return plugin->path + "/" + filename;
 }
 
 
+std::string gSystemDir;
+std::string gUserDir;
+
+
+} // namespace asset
 } // namespace rack

@@ -12,17 +12,15 @@ namespace event {
 struct Scene;
 struct Engine;
 struct PluginManager;
-struct AssetManager;
+struct Window;
 
 
 struct Context {
-	bool devMode = false;
-
 	event::Context *event = NULL;
 	Scene *scene = NULL;
 	Engine *engine = NULL;
 	PluginManager *plugin = NULL;
-	AssetManager *asset = NULL;
+	Window *window = NULL;
 };
 
 
