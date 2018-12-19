@@ -4,52 +4,53 @@
 
 
 namespace rack {
+namespace midi {
 
 
 static std::vector<int> driverIds;
-static std::map<int, MidiDriver*> drivers;
+static std::map<int, Driver*> drivers;
 
 
 ////////////////////
-// MidiDevice
+// Device
 ////////////////////
 
-void MidiInputDevice::subscribe(MidiInput *midiInput) {
-	subscribed.insert(midiInput);
+void InputDevice::subscribe(Input *input) {
+	subscribed.insert(input);
 }
 
-void MidiInputDevice::unsubscribe(MidiInput *midiInput) {
-	// Remove MidiInput from subscriptions
-	auto it = subscribed.find(midiInput);
+void InputDevice::unsubscribe(Input *input) {
+	// Remove Input from subscriptions
+	auto it = subscribed.find(input);
 	if (it != subscribed.end())
 		subscribed.erase(it);
 }
 
-void MidiInputDevice::onMessage(MidiMessage message) {
-	for (MidiInput *midiInput : subscribed) {
-		midiInput->onMessage(message);
+void InputDevice::onMessage(Message message) {
+	for (Input *input : subscribed) {
+		input->onMessage(message);
 	}
 }
 
 ////////////////////
-// MidiDriver
+// Driver
 ////////////////////
 
 
 ////////////////////
-// MidiIO
+// IO
 ////////////////////
 
-MidiIO::~MidiIO() {
+IO::~IO() {
 	// Because of polymorphic destruction, descendants must call this in their own destructor
 	// setDriverId(-1);
 }
 
-std::vector<int> MidiIO::getDriverIds() {
+std::vector<int> IO::getDriverIds() {
 	return driverIds;
 }
 
-std::string MidiIO::getDriverName(int driverId) {
+std::string IO::getDriverName(int driverId) {
 	auto it = drivers.find(driverId);
 	if (it == drivers.end())
 		return "";
@@ -57,7 +58,7 @@ std::string MidiIO::getDriverName(int driverId) {
 	return it->second->getName();
 }
 
-void MidiIO::setDriverId(int driverId) {
+void IO::setDriverId(int driverId) {
 	// Destroy driver
 	setDeviceId(-1);
 	if (driver) {
@@ -73,14 +74,14 @@ void MidiIO::setDriverId(int driverId) {
 	}
 }
 
-std::string MidiIO::getChannelName(int channel) {
+std::string IO::getChannelName(int channel) {
 	if (channel == -1)
 		return "All channels";
 	else
 		return string::f("Channel %d", channel + 1);
 }
 
-json_t *MidiIO::toJson() {
+json_t *IO::toJson() {
 	json_t *rootJ = json_object();
 	json_object_set_new(rootJ, "driver", json_integer(driverId));
 	std::string deviceName = getDeviceName(deviceId);
@@ -90,7 +91,7 @@ json_t *MidiIO::toJson() {
 	return rootJ;
 }
 
-void MidiIO::fromJson(json_t *rootJ) {
+void IO::fromJson(json_t *rootJ) {
 	json_t *driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
 		setDriverId(json_integer_value(driverJ));
@@ -113,34 +114,34 @@ void MidiIO::fromJson(json_t *rootJ) {
 }
 
 ////////////////////
-// MidiInput
+// Input
 ////////////////////
 
-MidiInput::MidiInput() {
+Input::Input() {
 	if (driverIds.size() >= 1) {
 		setDriverId(driverIds[0]);
 	}
 }
 
-MidiInput::~MidiInput() {
+Input::~Input() {
 	setDriverId(-1);
 }
 
-std::vector<int> MidiInput::getDeviceIds() {
+std::vector<int> Input::getDeviceIds() {
 	if (driver) {
 		return driver->getInputDeviceIds();
 	}
 	return {};
 }
 
-std::string MidiInput::getDeviceName(int deviceId) {
+std::string Input::getDeviceName(int deviceId) {
 	if (driver) {
 		return driver->getInputDeviceName(deviceId);
 	}
 	return "";
 }
 
-void MidiInput::setDeviceId(int deviceId) {
+void Input::setDeviceId(int deviceId) {
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
 		driver->unsubscribeInputDevice(this->deviceId, this);
@@ -154,7 +155,7 @@ void MidiInput::setDeviceId(int deviceId) {
 	}
 }
 
-void MidiInputQueue::onMessage(MidiMessage message) {
+void InputQueue::onMessage(Message message) {
 	// Filter channel
 	if (channel >= 0) {
 		if (message.status() != 0xf && message.channel() != channel)
@@ -166,7 +167,7 @@ void MidiInputQueue::onMessage(MidiMessage message) {
 		queue.push(message);
 }
 
-bool MidiInputQueue::shift(MidiMessage *message) {
+bool InputQueue::shift(Message *message) {
 	if (!message)
 		return false;
 	if (!queue.empty()) {
@@ -178,17 +179,17 @@ bool MidiInputQueue::shift(MidiMessage *message) {
 }
 
 ////////////////////
-// MidiOutput
+// Output
 ////////////////////
 
-MidiOutput::MidiOutput() {
+Output::Output() {
 }
 
-MidiOutput::~MidiOutput() {
+Output::~Output() {
 	setDriverId(-1);
 }
 
-void MidiOutput::setDeviceId(int deviceId) {
+void Output::setDeviceId(int deviceId) {
 	// TODO
 }
 
@@ -196,7 +197,10 @@ void MidiOutput::setDeviceId(int deviceId) {
 // midi
 ////////////////////
 
-void midiDestroy() {
+void init() {
+}
+
+void destroy() {
 	driverIds.clear();
 	for (auto &pair : drivers) {
 		delete pair.second;
@@ -204,11 +208,12 @@ void midiDestroy() {
 	drivers.clear();
 }
 
-void midiDriverAdd(int driverId, MidiDriver *driver) {
+void addDriver(int driverId, Driver *driver) {
 	assert(driver);
 	driverIds.push_back(driverId);
 	drivers[driverId] = driver;
 }
 
 
+} // namespace midi
 } // namespace rack

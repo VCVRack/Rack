@@ -18,7 +18,7 @@ struct MIDITriggerToCVInterface : Module {
 		NUM_LIGHTS
 	};
 
-	MidiInputQueue midiInput;
+	midi::InputQueue midiInput;
 
 	bool gates[16];
 	float gateTimes[16];
@@ -67,7 +67,7 @@ struct MIDITriggerToCVInterface : Module {
 	}
 
 	void step() override {
-		MidiMessage msg;
+		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
@@ -88,7 +88,7 @@ struct MIDITriggerToCVInterface : Module {
 		}
 	}
 
-	void processMessage(MidiMessage msg) {
+	void processMessage(midi::Message msg) {
 		switch (msg.status()) {
 			// note off
 			case 0x8: {

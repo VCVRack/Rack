@@ -147,7 +147,7 @@ struct BridgeClientConnection {
 			} break;
 
 			case MIDI_MESSAGE_COMMAND: {
-				MidiMessage message;
+				midi::Message message;
 				if (!recv(&message, 3)) {
 					return;
 				}
@@ -203,7 +203,7 @@ struct BridgeClientConnection {
 		}
 	}
 
-	void processMidi(MidiMessage message) {
+	void processMidi(midi::Message message) {
 		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 			return;
 		if (!driver)
@@ -387,19 +387,19 @@ std::string BridgeMidiDriver::getInputDeviceName(int deviceId) {
 	return string::f("Port %d", deviceId + 1);
 }
 
-MidiInputDevice *BridgeMidiDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+midi::InputDevice *BridgeMidiDriver::subscribeInputDevice(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return NULL;
 
-	devices[deviceId].subscribe(midiInput);
+	devices[deviceId].subscribe(input);
 	return &devices[deviceId];
 }
 
-void BridgeMidiDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+void BridgeMidiDriver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return;
 
-	devices[deviceId].unsubscribe(midiInput);
+	devices[deviceId].unsubscribe(input);
 }
 
 
@@ -408,7 +408,7 @@ void bridgeInit() {
 	serverThread = std::thread(serverRun);
 
 	driver = new BridgeMidiDriver;
-	midiDriverAdd(BRIDGE_DRIVER, driver);
+	midi::addDriver(BRIDGE_DRIVER, driver);
 }
 
 void bridgeDestroy() {

@@ -11,7 +11,7 @@ static void midiInputCallback(double timeStamp, std::vector<unsigned char> *mess
 
 	RtMidiInputDevice *midiInputDevice = (RtMidiInputDevice*) userData;
 	if (!midiInputDevice) return;
-	MidiMessage msg;
+	midi::Message msg;
 	if (message->size() >= 1)
 		msg.cmd = (*message)[0];
 	if (message->size() >= 2)
@@ -77,7 +77,7 @@ std::string RtMidiDriver::getInputDeviceName(int deviceId) {
 	return "";
 }
 
-MidiInputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+midi::InputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()))
 		return NULL;
 	RtMidiInputDevice *device = devices[deviceId];
@@ -85,16 +85,16 @@ MidiInputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, MidiInput *mid
 		devices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
 	}
 
-	device->subscribe(midiInput);
+	device->subscribe(input);
 	return device;
 }
 
-void RtMidiDriver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+void RtMidiDriver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
 	auto it = devices.find(deviceId);
 	if (it == devices.end())
 		return;
 	RtMidiInputDevice *device = it->second;
-	device->unsubscribe(midiInput);
+	device->unsubscribe(input);
 
 	// Destroy device if nothing is subscribed anymore
 	if (device->subscribed.empty()) {
@@ -109,8 +109,8 @@ void rtmidiInit() {
 	RtMidi::getCompiledApi(rtApis);
 	for (RtMidi::Api api : rtApis) {
 		int driverId = (int) api;
-		MidiDriver *driver = new RtMidiDriver(driverId);
-		midiDriverAdd(driverId, driver);
+		midi::Driver *driver = new RtMidiDriver(driverId);
+		midi::addDriver(driverId, driver);
 	}
 }
 

@@ -29,7 +29,7 @@ void InputDevice::step() {
 			ccs[i] = cc;
 
 			// Send MIDI message
-			MidiMessage msg;
+			midi::Message msg;
 			// MIDI channel 1
 			msg.cmd = (0xb << 4) | 0;
 			msg.data1 = i;
@@ -45,7 +45,7 @@ void InputDevice::step() {
 		if (state != states[i]) {
 			states[i] = state;
 
-			MidiMessage msg;
+			midi::Message msg;
 			msg.cmd = ((state ? 0x9 : 0x8) << 4);
 			msg.data1 = i;
 			msg.data2 = 127;
@@ -82,25 +82,25 @@ std::string Driver::getInputDeviceName(int deviceId) {
 	return string::f(" %d (unavailable)", deviceId + 1);
 }
 
-MidiInputDevice *Driver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+midi::InputDevice *Driver::subscribeInputDevice(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return NULL;
 
-	devices[deviceId].subscribe(midiInput);
+	devices[deviceId].subscribe(input);
 	return &devices[deviceId];
 }
 
-void Driver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+void Driver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return;
 
-	devices[deviceId].unsubscribe(midiInput);
+	devices[deviceId].unsubscribe(input);
 }
 
 
 void init() {
 	driver = new Driver;
-	midiDriverAdd(DRIVER, driver);
+	midi::addDriver(DRIVER, driver);
 }
 
 void step() {

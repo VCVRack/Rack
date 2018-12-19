@@ -69,7 +69,7 @@ void InputDevice::onKeyPress(int key) {
 	if (note > 127)
 		return;
 
-	MidiMessage msg;
+	midi::Message msg;
 	msg.cmd = 0x9 << 4;
 	msg.data1 = note;
 	msg.data2 = 127;
@@ -82,7 +82,7 @@ void InputDevice::onKeyRelease(int key) {
 	auto it = pressedNotes.find(key);
 	if (it != pressedNotes.end()) {
 		int note = it->second;
-		MidiMessage msg;
+		midi::Message msg;
 		msg.cmd = 0x8 << 4;
 		msg.data1 = note;
 		msg.data2 = 127;
@@ -103,25 +103,25 @@ std::string Driver::getInputDeviceName(int deviceId) {
 	return "";
 }
 
-MidiInputDevice *Driver::subscribeInputDevice(int deviceId, MidiInput *midiInput) {
+midi::InputDevice *Driver::subscribeInputDevice(int deviceId, midi::Input *input) {
 	if (deviceId != 0)
 		return NULL;
 
-	device.subscribe(midiInput);
+	device.subscribe(input);
 	return &device;
 }
 
-void Driver::unsubscribeInputDevice(int deviceId, MidiInput *midiInput) {
+void Driver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
 	if (deviceId != 0)
 		return;
 
-	device.unsubscribe(midiInput);
+	device.unsubscribe(input);
 }
 
 
 void init() {
 	driver = new Driver;
-	midiDriverAdd(DRIVER, driver);
+	midi::addDriver(DRIVER, driver);
 }
 
 void press(int key) {

@@ -14,7 +14,7 @@
 namespace rack {
 
 
-struct RtMidiInputDevice : MidiInputDevice {
+struct RtMidiInputDevice : midi::InputDevice {
 	RtMidiIn *rtMidiIn;
 
 	RtMidiInputDevice(int driverId, int deviceId);
@@ -22,7 +22,7 @@ struct RtMidiInputDevice : MidiInputDevice {
 };
 
 
-struct RtMidiDriver : MidiDriver {
+struct RtMidiDriver : midi::Driver {
 	int driverId;
 	/** Just for querying MIDI driver information */
 	RtMidiIn *rtMidiIn;
@@ -34,8 +34,8 @@ struct RtMidiDriver : MidiDriver {
 	std::string getName() override;
 	std::vector<int> getInputDeviceIds() override;
 	std::string getInputDeviceName(int deviceId) override;
-	MidiInputDevice *subscribeInputDevice(int deviceId, MidiInput *midiInput) override;
-	void unsubscribeInputDevice(int deviceId, MidiInput *midiInput) override;
+	midi::InputDevice *subscribeInputDevice(int deviceId, midi::Input *input) override;
+	void unsubscribeInputDevice(int deviceId, midi::Input *input) override;
 };
 
 

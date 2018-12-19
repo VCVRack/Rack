@@ -8,7 +8,7 @@ namespace rack {
 namespace keyboard {
 
 
-struct InputDevice : MidiInputDevice {
+struct InputDevice : midi::InputDevice {
 	int octave = 5;
 	std::map<int, int> pressedNotes;
 	void onKeyPress(int key);
@@ -16,14 +16,14 @@ struct InputDevice : MidiInputDevice {
 };
 
 
-struct Driver : MidiDriver {
+struct Driver : midi::Driver {
 	InputDevice device;
 	std::string getName() override {return "Computer keyboard";}
 
 	std::vector<int> getInputDeviceIds() override;
 	std::string getInputDeviceName(int deviceId) override;
-	MidiInputDevice *subscribeInputDevice(int deviceId, MidiInput *midiInput) override;
-	void unsubscribeInputDevice(int deviceId, MidiInput *midiInput) override;
+	midi::InputDevice *subscribeInputDevice(int deviceId, midi::Input *input) override;
+	void unsubscribeInputDevice(int deviceId, midi::Input *input) override;
 };
 
 

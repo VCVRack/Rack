@@ -18,7 +18,7 @@ struct MIDICCToCVInterface : Module {
 		NUM_LIGHTS
 	};
 
-	MidiInputQueue midiInput;
+	midi::InputQueue midiInput;
 	int8_t ccs[128];
 	ExponentialFilter ccFilters[16];
 
@@ -41,7 +41,7 @@ struct MIDICCToCVInterface : Module {
 	}
 
 	void step() override {
-		MidiMessage msg;
+		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
@@ -55,7 +55,7 @@ struct MIDICCToCVInterface : Module {
 		}
 	}
 
-	void processMessage(MidiMessage msg) {
+	void processMessage(midi::Message msg) {
 		switch (msg.status()) {
 			// cc
 			case 0xb: {

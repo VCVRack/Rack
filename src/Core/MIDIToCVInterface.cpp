@@ -32,7 +32,7 @@ struct MIDIToCVInterface : Module {
 		NUM_LIGHTS
 	};
 
-	MidiInputQueue midiInput;
+	midi::InputQueue midiInput;
 
 	uint8_t mod = 0;
 	ExponentialFilter modFilter;
@@ -142,7 +142,7 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void step() override {
-		MidiMessage msg;
+		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
@@ -167,7 +167,7 @@ struct MIDIToCVInterface : Module {
 		outputs[CONTINUE_OUTPUT].value = continuePulse.process(deltaTime) ? 10.f : 0.f;
 	}
 
-	void processMessage(MidiMessage msg) {
+	void processMessage(midi::Message msg) {
 		// DEBUG("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.note(), msg.value());
 
 		switch (msg.status()) {
@@ -206,7 +206,7 @@ struct MIDIToCVInterface : Module {
 		}
 	}
 
-	void processCC(MidiMessage msg) {
+	void processCC(midi::Message msg) {
 		switch (msg.note()) {
 			// mod
 			case 0x01: {
@@ -223,7 +223,7 @@ struct MIDIToCVInterface : Module {
 		}
 	}
 
-	void processSystem(MidiMessage msg) {
+	void processSystem(midi::Message msg) {
 		switch (msg.channel()) {
 			// Timing
 			case 0x8: {

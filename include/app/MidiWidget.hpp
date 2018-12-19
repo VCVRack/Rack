@@ -6,12 +6,14 @@
 namespace rack {
 
 
-struct MidiIO;
+namespace midi {
+	struct IO;
+}
 
 
 struct MidiWidget : LedDisplay {
 	/** Not owned */
-	MidiIO *midiIO = NULL;
+	midi::IO *midiIO = NULL;
 	LedDisplayChoice *driverChoice;
 	LedDisplaySeparator *driverSeparator;
 	LedDisplayChoice *deviceChoice;

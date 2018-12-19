@@ -7,18 +7,18 @@
 namespace rack {
 
 
-struct BridgeMidiInputDevice : MidiInputDevice {
+struct BridgeMidiInputDevice : midi::InputDevice {
 };
 
 
-struct BridgeMidiDriver : MidiDriver {
+struct BridgeMidiDriver : midi::Driver {
 	BridgeMidiInputDevice devices[16];
 	std::string getName() override {return "Bridge";}
 
 	std::vector<int> getInputDeviceIds() override;
 	std::string getInputDeviceName(int deviceId) override;
-	MidiInputDevice *subscribeInputDevice(int deviceId, MidiInput *midiInput) override;
-	void unsubscribeInputDevice(int deviceId, MidiInput *midiInput) override;
+	midi::InputDevice *subscribeInputDevice(int deviceId, midi::Input *input) override;
+	void unsubscribeInputDevice(int deviceId, midi::Input *input) override;
 };
 
 

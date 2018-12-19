@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
 	asset::init(devMode);
 	logger::init(devMode);
 	tagsInit();
+	midi::init();
 	rtmidiInit();
 	bridgeInit();
 	keyboard::init();
@@ -130,7 +131,7 @@ int main(int argc, char *argv[]) {
 	plugin::destroy();
 	ui::destroy();
 	bridgeDestroy();
-	midiDestroy();
+	midi::destroy();
 	logger::destroy();
 
 	return 0;

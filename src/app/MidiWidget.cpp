@@ -7,7 +7,7 @@ namespace rack {
 
 
 struct MidiDriverItem : MenuItem {
-	MidiIO *midiIO;
+	midi::IO *midiIO;
 	int driverId;
 	void onAction(event::Action &e) override {
 		midiIO->setDriverId(driverId);
@@ -41,7 +41,7 @@ struct MidiDriverChoice : LedDisplayChoice {
 };
 
 struct MidiDeviceItem : MenuItem {
-	MidiIO *midiIO;
+	midi::IO *midiIO;
 	int deviceId;
 	void onAction(event::Action &e) override {
 		midiIO->setDeviceId(deviceId);
@@ -83,7 +83,7 @@ struct MidiDeviceChoice : LedDisplayChoice {
 };
 
 struct MidiChannelItem : MenuItem {
-	MidiIO *midiIO;
+	midi::IO *midiIO;
 	int channel;
 	void onAction(event::Action &e) override {
 		midiIO->channel = channel;

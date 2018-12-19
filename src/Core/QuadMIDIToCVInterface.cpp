@@ -23,7 +23,7 @@ struct QuadMIDIToCVInterface : Module {
 		NUM_LIGHTS
 	};
 
-	MidiInputQueue midiInput;
+	midi::InputQueue midiInput;
 
 	enum PolyMode {
 		ROTATE_MODE,
@@ -243,7 +243,7 @@ struct QuadMIDIToCVInterface : Module {
 	}
 
 	void step() override {
-		MidiMessage msg;
+		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
@@ -258,7 +258,7 @@ struct QuadMIDIToCVInterface : Module {
 		}
 	}
 
-	void processMessage(MidiMessage msg) {
+	void processMessage(midi::Message msg) {
 		switch (msg.status()) {
 			// note off
 			case 0x8: {
@@ -286,7 +286,7 @@ struct QuadMIDIToCVInterface : Module {
 		}
 	}
 
-	void processCC(MidiMessage msg) {
+	void processCC(midi::Message msg) {
 		switch (msg.note()) {
 			// sustain
 			case 0x40: {
