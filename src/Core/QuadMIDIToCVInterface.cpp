@@ -366,5 +366,5 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelQuadMIDIToCVInterface = createModel<QuadMIDIToCVInterface, QuadMIDIToCVInterfaceWidget>("Core", "QuadMIDIToCVInterface", "MIDI-4", MIDI_TAG, EXTERNAL_TAG, QUAD_TAG);
+Model *modelQuadMIDIToCVInterface = createModel<QuadMIDIToCVInterface, QuadMIDIToCVInterfaceWidget>("QuadMIDIToCVInterface");
 

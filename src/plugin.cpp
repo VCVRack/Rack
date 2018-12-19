@@ -40,6 +40,28 @@ namespace plugin {
 ////////////////////
 
 static bool loadPlugin(std::string path) {
+	// Load plugin.json
+	std::string metadataFilename = path + "/plugin.json";
+	FILE *file = fopen(metadataFilename.c_str(), "r");
+	if (!file) {
+		WARN("Plugin metadata file %s does not exist", metadataFilename.c_str());
+		return false;
+	}
+	DEFER({
+		fclose(file);
+	});
+
+	json_error_t error;
+	json_t *rootJ = json_loadf(file, 0, &error);
+	if (!rootJ) {
+		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		return false;
+	}
+	DEFER({
+		json_decref(rootJ);
+	});
+
+	// Load plugin library
 	std::string libraryFilename;
 #if ARCH_LIN
 	libraryFilename = path + "/" + "plugin.so";
@@ -91,6 +113,7 @@ static bool loadPlugin(std::string path) {
 	plugin->path = path;
 	plugin->handle = handle;
 	initCallback(plugin);
+	plugin->fromJson(rootJ);
 
 	// Reject plugin if slug already exists
 	Plugin *oldPlugin = getPlugin(plugin->slug);
@@ -473,14 +496,21 @@ Plugin *getPlugin(std::string pluginSlug) {
 
 Model *getModel(std::string pluginSlug, std::string modelSlug) {
 	Plugin *plugin = getPlugin(pluginSlug);
-	if (plugin) {
-		for (Model *model : plugin->models) {
-			if (model->slug == modelSlug) {
-				return model;
-			}
-		}
+	if (!plugin)
+		return NULL;
+	Model *model = plugin->getModel(modelSlug);
+	if (!model)
+		return NULL;
+	return model;
+}
+
+std::string getAllowedTag(std::string tag) {
+	tag = string::lowercase(tag);
+	for (std::string allowedTag : allowedTags) {
+		if (tag == string::lowercase(allowedTag))
+			return allowedTag;
 	}
-	return NULL;
+	return "";
 }
 
 
@@ -490,6 +520,63 @@ bool isDownloading = false;
 float downloadProgress = 0.f;
 std::string downloadName;
 std::string loginStatus;
+
+
+const std::vector<std::string> allowedTags = {
+	"VCA",
+	"Arpeggiator",
+	"Attenuator",
+	"Blank",
+	"Chorus",
+	"Clock Modulator", // Clock dividers, multipliers, etc.
+	"Clock",
+	"Compressor",
+	"Controller", // Use only if the artist "performs" with this module. Knobs are not sufficient. Examples: on-screen keyboard, XY pad.
+	"Delay",
+	"Digital",
+	"Distortion",
+	"Drum",
+	"Dual", // The core functionality times two. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Dual module.
+	"Dynamics",
+	"Effect",
+	"Envelope Follower",
+	"Envelope Generator",
+	"Equalizer",
+	"External",
+	"Filter",
+	"Flanger",
+	"Function Generator",
+	"Granular",
+	"LFO",
+	"Limiter",
+	"Logic",
+	"Low Pass Gate",
+	"MIDI",
+	"Mixer",
+	"Multiple",
+	"Noise",
+	"VCO",
+	"Panning",
+	"Phaser",
+	"Physical Modeling",
+	"Quad", // The core functionality times four. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Quad module.
+	"Quantizer",
+	"Random",
+	"Recording",
+	"Reverb",
+	"Ring Modulator",
+	"Sample and Hold",
+	"Sampler",
+	"Sequencer",
+	"Slew Limiter",
+	"Switch",
+	"Synth Voice", // A synth voice must have an envelope built-in.
+	"Tuner",
+	"Utility", // Serves only extremely basic functions, like inverting, max, min, multiplying by 2, etc.
+	"Visual",
+	"Vocoder",
+	"Waveshaper",
+};
 
 
 } // namespace plugin

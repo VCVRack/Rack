@@ -115,7 +115,7 @@ static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 	return 0;
 }
 
-bool requestDownload(std::string url, std::string filename, float *progress) {
+bool requestDownload(std::string url, const std::string &filename, float *progress) {
 	if (progress)
 		*progress = 0.f;
 
@@ -150,7 +150,7 @@ bool requestDownload(std::string url, std::string filename, float *progress) {
 	return res == CURLE_OK;
 }
 
-std::string encodeUrl(std::string s) {
+std::string encodeUrl(const std::string &s) {
 	CURL *curl = curl_easy_init();
 	assert(curl);
 	char *escaped = curl_easy_escape(curl, s.c_str(), s.size());
@@ -160,7 +160,7 @@ std::string encodeUrl(std::string s) {
 	return ret;
 }
 
-std::string computeSHA256File(std::string filename) {
+std::string computeSHA256File(const std::string &filename) {
 	FILE *f = fopen(filename.c_str(), "rb");
 	if (!f)
 		return "";

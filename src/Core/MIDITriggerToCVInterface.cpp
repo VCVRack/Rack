@@ -251,4 +251,4 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelMIDITriggerToCVInterface = createModel<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("Core", "MIDITriggerToCVInterface", "MIDI-Trig", MIDI_TAG, EXTERNAL_TAG);
+Model *modelMIDITriggerToCVInterface = createModel<MIDITriggerToCVInterface, MIDITriggerToCVInterfaceWidget>("MIDITriggerToCVInterface");

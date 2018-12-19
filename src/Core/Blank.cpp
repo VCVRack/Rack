@@ -121,4 +121,4 @@ struct BlankWidget : ModuleWidget {
 };
 
 
-Model *modelBlank = createModel<Module, BlankWidget>("Core", "Blank", "Blank", BLANK_TAG);
+Model *modelBlank = createModel<Module, BlankWidget>("Blank");

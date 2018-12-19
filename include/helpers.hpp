@@ -12,7 +12,7 @@ namespace rack {
 
 
 template <class TModule, class TModuleWidget, typename... Tags>
-Model *createModel(std::string author, std::string slug, std::string name, Tags... tags) {
+Model *createModel(std::string slug) {
 	struct TModel : Model {
 		Module *createModule() override {
 			TModule *o = new TModule;
@@ -32,10 +32,7 @@ Model *createModel(std::string author, std::string slug, std::string name, Tags.
 	};
 
 	Model *o = new TModel;
-	o->author = author;
 	o->slug = slug;
-	o->name = name;
-	o->tags = {tags...};
 	return o;
 }
 
@@ -46,25 +43,28 @@ TWidget *createWidget(math::Vec pos) {
 	return o;
 }
 
-template <class TParamWidget>
-TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
-	TParamWidget *o = new TParamWidget;
-	o->box.pos = pos;
-	o->quantity->module = module;
-	o->quantity->paramId = paramId;
-	o->setLimits(minValue, maxValue);
-	o->setDefaultValue(defaultValue);
+template <class TWidget>
+TWidget *createWidgetCentered(math::Vec pos) {
+	TWidget *o = new TWidget;
+	o->box.pos = pos.minus(o->box.size.div(2));;
 	return o;
 }
 
 template <class TParamWidget>
-TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+TParamWidget *createParam(math::Vec pos, Module *module, int paramId) {
+	TParamWidget *o = new TParamWidget;
+	o->box.pos = pos;
+	o->quantity->module = module;
+	o->quantity->paramId = paramId;
+	return o;
+}
+
+template <class TParamWidget>
+TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->quantity->module = module;
 	o->quantity->paramId = paramId;
-	o->setLimits(minValue, maxValue);
-	o->setDefaultValue(defaultValue);
 	return o;
 }
 

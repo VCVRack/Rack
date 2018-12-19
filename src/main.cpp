@@ -9,7 +9,6 @@
 #include "settings.hpp"
 #include "engine/Engine.hpp"
 #include "app/Scene.hpp"
-#include "tags.hpp"
 #include "plugin.hpp"
 #include "context.hpp"
 #include "ui.hpp"
@@ -64,7 +63,6 @@ int main(int argc, char *argv[]) {
 	random::init();
 	asset::init(devMode);
 	logger::init(devMode);
-	tagsInit();
 	midi::init();
 	rtmidiInit();
 	bridgeInit();

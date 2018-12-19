@@ -41,4 +41,4 @@ struct NotesWidget : ModuleWidget {
 };
 
 
-Model *modelNotes = createModel<Module, NotesWidget>("Core", "Notes", "Notes", BLANK_TAG);
+Model *modelNotes = createModel<Module, NotesWidget>("Notes");

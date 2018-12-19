@@ -1,9 +1,9 @@
 RACK_DIR ?= .
 VERSION = 1.dev
 
-FLAGS += \
-	-Iinclude \
-	-Idep/include -Idep/lib/libzip/include
+FLAGS += -DVERSION=$(VERSION)
+FLAGS += -Iinclude
+FLAGS += -Idep/include -Idep/lib/libzip/include
 
 include arch.mk
 

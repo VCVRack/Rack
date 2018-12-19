@@ -34,43 +34,41 @@ std::string uppercase(std::string s) {
 	return s;
 }
 
-/** Truncates and adds "..." to a string, not exceeding `len` characters */
-std::string ellipsize(std::string s, size_t len) {
+std::string ellipsize(const std::string &s, size_t len) {
 	if (s.size() <= len)
 		return s;
 	else
 		return s.substr(0, len - 3) + "...";
 }
 
-bool startsWith(std::string str, std::string prefix) {
+bool startsWith(const std::string &str, const std::string &prefix) {
 	return str.substr(0, prefix.size()) == prefix;
 }
 
-bool endsWith(std::string str, std::string suffix) {
+bool endsWith(const std::string &str, const std::string &suffix) {
 	return str.substr(str.size() - suffix.size(), suffix.size()) == suffix;
 }
 
-/** Extracts portions of a path */
-std::string directory(std::string path) {
+std::string directory(const std::string &path) {
 	char *pathDup = strdup(path.c_str());
 	std::string directory = dirname(pathDup);
 	free(pathDup);
 	return directory;
 }
 
-std::string filename(std::string path) {
+std::string filename(const std::string &path) {
 	char *pathDup = strdup(path.c_str());
 	std::string filename = basename(pathDup);
 	free(pathDup);
 	return filename;
 }
 
-std::string basename(std::string path) {
+std::string basename(const std::string &path) {
 	size_t pos = path.rfind('.');
 	return std::string(path, 0, pos);
 }
 
-std::string extension(std::string path) {
+std::string extension(const std::string &path) {
 	size_t pos = path.rfind('.');
 	return std::string(path, pos);
 }

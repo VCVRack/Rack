@@ -2,15 +2,10 @@ ifndef RACK_DIR
 $(error RACK_DIR is not defined)
 endif
 
-ifndef VERSION
-$(error VERSION is not defined)
-endif
-
 include $(RACK_DIR)/arch.mk
 
 OBJCOPY ?= objcopy
 
-FLAGS += -DVERSION=$(VERSION)
 # Generate dependency files alongside the object files
 FLAGS += -MMD -MP
 FLAGS += -g

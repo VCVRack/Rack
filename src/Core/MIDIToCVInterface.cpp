@@ -328,4 +328,4 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelMIDIToCVInterface = createModel<MIDIToCVInterface, MIDIToCVInterfaceWidget>("Core", "MIDIToCVInterface", "MIDI-1", MIDI_TAG, EXTERNAL_TAG);
+Model *modelMIDIToCVInterface = createModel<MIDIToCVInterface, MIDIToCVInterfaceWidget>("MIDIToCVInterface");

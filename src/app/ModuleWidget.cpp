@@ -450,7 +450,7 @@ Menu *ModuleWidget::createContextMenu() {
 	Menu *menu = createMenu();
 
 	MenuLabel *menuLabel = new MenuLabel;
-	menuLabel->text = model->author + " " + model->name + " " + model->plugin->version;
+	menuLabel->text = model->plugin->author + " " + model->name + " " + model->plugin->version;
 	menu->addChild(menuLabel);
 
 	ModuleResetItem *resetItem = new ModuleResetItem;

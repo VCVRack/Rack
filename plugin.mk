@@ -2,13 +2,13 @@ ifndef RACK_DIR
 $(error RACK_DIR is not defined)
 endif
 
-ifndef SLUG
-$(error SLUG is not defined)
-endif
+SLUG := $(shell jq ".slug" plugin.json)
+VERSION := $(shell jq ".version" plugin.json)
 
 STRIP ?= strip
 
-FLAGS += -DSLUG=$(SLUG)
+DISTRIBUTABLES += plugin.json
+
 FLAGS += -fPIC
 FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 

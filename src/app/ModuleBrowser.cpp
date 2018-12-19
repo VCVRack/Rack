@@ -22,7 +22,7 @@ namespace rack {
 
 static std::set<Model*> sFavoriteModels;
 static std::string sAuthorFilter;
-static ModelTag sTagFilter = NO_TAG;
+static std::string sTagFilter;
 
 
 
@@ -38,14 +38,17 @@ static bool isModelMatch(Model *model, std::string search) {
 	std::string s;
 	s += model->plugin->slug;
 	s += " ";
-	s += model->author;
+	s += model->plugin->author;
 	s += " ";
 	s += model->name;
 	s += " ";
 	s += model->slug;
-	for (ModelTag tag : model->tags) {
-		s += " ";
-		s += gTagNames[tag];
+	for (std::string tag : model->tags) {
+		std::string allowedTag = plugin::getAllowedTag(tag);
+		if (!allowedTag.empty()) {
+			s += " ";
+			s += allowedTag;
+		}
 	}
 	return isMatch(s, search);
 }
@@ -185,16 +188,16 @@ struct AuthorItem : BrowserListItem {
 
 
 struct TagItem : BrowserListItem {
-	ModelTag tag;
+	std::string tag;
 
-	void setTag(ModelTag tag) {
+	void setTag(std::string tag) {
 		clearChildren();
 		this->tag = tag;
 		Label *tagLabel = createWidget<Label>(math::Vec(0, 0 + itemMargin));
-		if (tag == NO_TAG)
+		if (tag.empty())
 			tagLabel->text = "Show all tags";
 		else
-			tagLabel->text = gTagNames[tag];
+			tagLabel->text = tag;
 		addChild(tagLabel);
 	}
 
@@ -299,12 +302,12 @@ struct ModuleBrowser : OpaqueWidget {
 	ScrollWidget *moduleScroll;
 	BrowserList *moduleList;
 	std::set<std::string, string::CaseInsensitiveCompare> availableAuthors;
-	std::set<ModelTag> availableTags;
+	std::set<std::string> availableTags;
 
 	ModuleBrowser() {
 		box.size.x = 450;
 		sAuthorFilter = "";
-		sTagFilter = NO_TAG;
+		sTagFilter = "";
 
 		// Search
 		searchField	= new SearchModuleField;
@@ -324,13 +327,14 @@ struct ModuleBrowser : OpaqueWidget {
 
 		// Collect authors
 		for (Plugin *plugin : plugin::plugins) {
+			// Insert author
+			if (!plugin->author.empty())
+				availableAuthors.insert(plugin->author);
 			for (Model *model : plugin->models) {
-				// Insert author
-				if (!model->author.empty())
-					availableAuthors.insert(model->author);
 				// Insert tag
-				for (ModelTag tag : model->tags) {
-					if (tag != NO_TAG)
+				for (std::string tag : model->tags) {
+					std::string allowedTag = plugin::getAllowedTag(tag);
+					if (!allowedTag.empty())
 						availableTags.insert(tag);
 				}
 			}
@@ -350,12 +354,10 @@ struct ModuleBrowser : OpaqueWidget {
 	}
 
 	bool isModelFiltered(Model *model) {
-		if (!sAuthorFilter.empty() && model->author != sAuthorFilter)
+		if (!sAuthorFilter.empty() && model->plugin->author != sAuthorFilter)
 			return false;
-		if (sTagFilter != NO_TAG) {
-			auto it = std::find(model->tags.begin(), model->tags.end(), sTagFilter);
-			if (it == model->tags.end())
-				return false;
+		if (!sTagFilter.empty()) {
+			// TODO filter tags
 		}
 		return true;
 	}
@@ -364,7 +366,7 @@ struct ModuleBrowser : OpaqueWidget {
 		std::string search = searchField->text;
 		moduleList->clearChildren();
 		moduleList->selected = 0;
-		bool filterPage = !(sAuthorFilter.empty() && sTagFilter == NO_TAG);
+		bool filterPage = !(sAuthorFilter.empty() && sTagFilter.empty());
 
 		if (!filterPage) {
 			// Favorites
@@ -399,8 +401,8 @@ struct ModuleBrowser : OpaqueWidget {
 				item->setText("Tags");
 				moduleList->addChild(item);
 			}
-			for (ModelTag tag : availableTags) {
-				if (isMatch(gTagNames[tag], search)) {
+			for (std::string tag : availableTags) {
+				if (isMatch(tag, search)) {
 					TagItem *item = new TagItem;
 					item->setTag(tag);
 					moduleList->addChild(item);
@@ -423,8 +425,8 @@ struct ModuleBrowser : OpaqueWidget {
 				SeparatorItem *item = new SeparatorItem;
 				if (!sAuthorFilter.empty())
 					item->setText(sAuthorFilter);
-				else if (sTagFilter != NO_TAG)
-					item->setText("Tag: " + gTagNames[sTagFilter]);
+				else if (!sTagFilter.empty())
+					item->setText("Tag: " + sTagFilter);
 				moduleList->addChild(item);
 			}
 			// Modules
@@ -474,7 +476,7 @@ void TagItem::onAction(event::Action &e) {
 void ClearFilterItem::onAction(event::Action &e) {
 	ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 	sAuthorFilter = "";
-	sTagFilter = NO_TAG;
+	sTagFilter = "";
 	moduleBrowser->refreshSearch();
 	e.target = this;
 }

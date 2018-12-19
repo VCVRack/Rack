@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include <jansson.h>
 #include <list>
 
 
@@ -22,19 +23,26 @@ struct Plugin {
 	To guarantee uniqueness, it is a good idea to prefix the slug by your "company name" if available, e.g. "MyCompany-MyPlugin"
 	*/
 	std::string slug;
-
 	/** The version of your plugin
 	Plugins should follow the versioning scheme described at https://github.com/VCVRack/Rack/issues/266
 	Do not include the "v" in "v1.0" for example.
 	*/
 	std::string version;
-
-	/** Deprecated, do not use. */
-	std::string website;
-	std::string manual;
+	/** Human readable name for your plugin, e.g. "Voltage Controlled Oscillator" */
+	std::string name;
+	std::string author;
+	std::string license;
+	std::string authorEmail;
+	std::string pluginUrl;
+	std::string authorUrl;
+	std::string manualUrl;
+	std::string sourceUrl;
+	std::string donateUrl;
 
 	virtual ~Plugin();
 	void addModel(Model *model);
+	Model *getModel(std::string slug);
+	void fromJson(json_t *rootJ);
 };
 
 

@@ -282,4 +282,4 @@ struct AudioInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelAudioInterface = createModel<AudioInterface, AudioInterfaceWidget>("Core", "AudioInterface", "Audio", EXTERNAL_TAG);
+Model *modelAudioInterface = createModel<AudioInterface, AudioInterfaceWidget>("AudioInterface");

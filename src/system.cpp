@@ -12,7 +12,7 @@ namespace rack {
 namespace system {
 
 
-std::list<std::string> listEntries(std::string path) {
+std::list<std::string> listEntries(const std::string &path) {
 	std::list<std::string> filenames;
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
@@ -28,21 +28,21 @@ std::list<std::string> listEntries(std::string path) {
 	return filenames;
 }
 
-bool isFile(std::string path) {
+bool isFile(const std::string &path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISREG(statbuf.st_mode);
 }
 
-bool isDirectory(std::string path) {
+bool isDirectory(const std::string &path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISDIR(statbuf.st_mode);
 }
 
-void copyFile(std::string srcPath, std::string destPath) {
+void copyFile(const std::string &srcPath, const std::string &destPath) {
 	// Open files
 	FILE *source = fopen(srcPath.c_str(), "rb");
 	if (!source)
@@ -69,7 +69,7 @@ void copyFile(std::string srcPath, std::string destPath) {
 	}
 }
 
-void createDirectory(std::string path) {
+void createDirectory(const std::string &path) {
 #if ARCH_WIN
 	CreateDirectory(path.c_str(), NULL);
 #else
@@ -77,7 +77,7 @@ void createDirectory(std::string path) {
 #endif
 }
 
-void openBrowser(std::string url) {
+void openBrowser(const std::string &url) {
 #if ARCH_LIN
 	std::string command = "xdg-open " + url;
 	(void) std::system(command.c_str());

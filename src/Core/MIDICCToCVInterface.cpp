@@ -216,4 +216,4 @@ struct MIDICCToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelMIDICCToCVInterface = createModel<MIDICCToCVInterface, MIDICCToCVInterfaceWidget>("Core", "MIDICCToCVInterface", "MIDI-CC", MIDI_TAG, EXTERNAL_TAG);
+Model *modelMIDICCToCVInterface = createModel<MIDICCToCVInterface, MIDICCToCVInterfaceWidget>("MIDICCToCVInterface");

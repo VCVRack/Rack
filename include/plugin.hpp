@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "plugin/Plugin.hpp"
 #include "plugin/Model.hpp"
+#include <vector>
 #include <list>
 
 
@@ -19,6 +20,7 @@ void cancelDownload();
 bool isLoggedIn();
 Plugin *getPlugin(std::string pluginSlug);
 Model *getModel(std::string pluginSlug, std::string modelSlug);
+std::string getAllowedTag(std::string tag);
 
 
 extern std::list<Plugin*> plugins;
@@ -27,6 +29,7 @@ extern bool isDownloading;
 extern float downloadProgress;
 extern std::string downloadName;
 extern std::string loginStatus;
+extern const std::vector<std::string> allowedTags;
 
 
 } // namespace plugin
