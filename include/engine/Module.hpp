@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include "string.hpp"
 #include "engine/Param.hpp"
 #include "engine/Input.hpp"
 #include "engine/Output.hpp"
@@ -29,6 +30,10 @@ struct Module {
 
 	void setup(int numParams, int numInputs, int numOutputs, int numLights = 0) {
 		params.resize(numParams);
+		// Create default param labels
+		for (int i = 0; i < numParams; i++) {
+			params[i].label = string::f("#%d", i + 1);
+		}
 		inputs.resize(numInputs);
 		outputs.resize(numOutputs);
 		lights.resize(numLights);
