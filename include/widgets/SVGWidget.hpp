@@ -13,10 +13,10 @@ struct SVGWidget : VirtualWidget {
 	/** Sets the box size to the svg image size */
 	void wrap() {
 		if (svg && svg->handle) {
-			box.size = Vec(svg->handle->width, svg->handle->height);
+			box.size = math::Vec(svg->handle->width, svg->handle->height);
 		}
 		else {
-			box.size = Vec();
+			box.size = math::Vec();
 		}
 	}
 

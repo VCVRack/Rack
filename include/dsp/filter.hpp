@@ -56,7 +56,7 @@ struct SlewLimiter {
 		this->fall = fall;
 	}
 	float process(float in) {
-		out = clamp(in, out - fall, out + rise);
+		out = math::clamp(in, out - fall, out + rise);
 		return out;
 	}
 };

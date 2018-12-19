@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace math {
 
 ////////////////////
 // basic integer functions
@@ -270,8 +271,8 @@ struct Rect {
 		Rect r;
 		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
 		r.pos.y = clampBetween(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
-		r.size.x = rack::clamp(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
-		r.size.y = rack::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
+		r.size.x = math::clamp(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
+		r.size.y = math::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
 		return r;
 	}
 	/** Nudges the position to fix inside a bounding box */
@@ -312,17 +313,18 @@ struct Rect {
 
 inline Vec Vec::clamp(Rect bound) const {
 	return Vec(
-		rack::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
-		rack::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
+		math::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
+		math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 inline Vec Vec::clampBetween(Rect bound) const {
 	return Vec(
-		rack::clampBetween(x, bound.pos.x, bound.pos.x + bound.size.x),
-		rack::clampBetween(y, bound.pos.y, bound.pos.y + bound.size.y));
+		math::clampBetween(x, bound.pos.x, bound.pos.x + bound.size.x),
+		math::clampBetween(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 inline Vec Vec::clamp2(Rect bound) const {return clampBetween(bound);}
 
 
+} // namespace math
 } // namespace rack

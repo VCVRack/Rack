@@ -70,7 +70,7 @@ struct ModuleWidget : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 	void drawShadow(NVGcontext *vg);
 
-	Vec dragPos;
+	math::Vec dragPos;
 	void onHover(event::Hover &e) override;
 	void onButton(event::Button &e) override;
 	void onHoverKey(event::HoverKey &e) override;

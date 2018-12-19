@@ -16,7 +16,7 @@ e.g. `struct MyWidget : VirtualWidget {}`
 */
 struct Widget {
 	/** Stores position and size */
-	Rect box = Rect(Vec(), Vec(INFINITY, INFINITY));
+	math::Rect box = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
 	/** Automatically set when Widget is added as a child to another Widget */
 	Widget *parent = NULL;
 	std::list<Widget*> children;
@@ -27,15 +27,15 @@ struct Widget {
 
 	virtual ~Widget();
 
-	virtual Rect getChildrenBoundingBox();
+	virtual math::Rect getChildrenBoundingBox();
 	/**  Returns `v` transformed into the coordinate system of `relative` */
-	virtual Vec getRelativeOffset(Vec v, Widget *relative);
+	virtual math::Vec getRelativeOffset(math::Vec v, Widget *relative);
 	/** Returns `v` transformed into world coordinates */
-	Vec getAbsoluteOffset(Vec v) {
+	math::Vec getAbsoluteOffset(math::Vec v) {
 		return getRelativeOffset(v, NULL);
 	}
-	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors */
-	virtual Rect getViewport(Rect r);
+	/** Returns a subset of the given math::Rect bounded by the box of this widget and all ancestors */
+	virtual math::Rect getViewport(math::Rect r);
 
 	template <class T>
 	T *getAncestorOfType() {

@@ -22,7 +22,7 @@ struct VUMeter {
 			return (dBScaled >= 0.0) ? 1.0 : 0.0;
 		}
 		else {
-			return clamp(dBScaled + i, 0.0, 1.0);
+			return math::clamp(dBScaled + i, 0.0, 1.0);
 		}
 	}
 };

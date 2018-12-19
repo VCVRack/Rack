@@ -81,3 +81,11 @@
 #include "plugin/Plugin.hpp"
 #include "plugin/Model.hpp"
 #include "plugin/callbacks.hpp"
+
+
+namespace rack {
+
+// Import namespace for convenience
+using namespace math;
+
+} // namespace rack

@@ -8,7 +8,7 @@ namespace color {
 
 NVGcolor clip(NVGcolor a) {
 	for (int i = 0; i < 4; i++)
-		a.rgba[i] = clamp(a.rgba[i], 0.f, 1.f);
+		a.rgba[i] = math::clamp(a.rgba[i], 0.f, 1.f);
 	return a;
 }
 

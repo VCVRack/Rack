@@ -91,8 +91,8 @@ static void mouseButtonStickyCallback(GLFWwindow *win, int button, int action, i
 
 static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
-	Vec mousePos = Vec(xpos, ypos).div(window->pixelRatio / window->windowRatio).round();
-	Vec mouseDelta = mousePos.minus(window->mousePos);
+	math::Vec mousePos = math::Vec(xpos, ypos).div(window->pixelRatio / window->windowRatio).round();
+	math::Vec mouseDelta = mousePos.minus(window->mousePos);
 
 	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
 	(void) cursorMode;
@@ -123,10 +123,10 @@ static void cursorEnterCallback(GLFWwindow *win, int entered) {
 
 static void scrollCallback(GLFWwindow *win, double x, double y) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
-	Vec scrollDelta = Vec(x, y);
+	math::Vec scrollDelta = math::Vec(x, y);
 #if ARCH_LIN || ARCH_WIN
 	if (window->isShiftPressed())
-		scrollDelta = Vec(y, x);
+		scrollDelta = math::Vec(y, x);
 #endif
 	scrollDelta = scrollDelta.mult(50.0);
 
@@ -338,7 +338,7 @@ void Window::run() {
 		glfwGetWindowSize(win, &windowWidth, &windowHeight);
 		windowRatio = (float)width / windowWidth;
 
-		context()->event->rootWidget->box.size = Vec(width, height).div(pixelRatio);
+		context()->event->rootWidget->box.size = math::Vec(width, height).div(pixelRatio);
 
 		// Step scene
 		context()->event->rootWidget->step();
@@ -393,25 +393,25 @@ bool Window::isShiftPressed() {
 	return glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 }
 
-Vec Window::getWindowSize() {
+math::Vec Window::getWindowSize() {
 	int width, height;
 	glfwGetWindowSize(win, &width, &height);
-	return Vec(width, height);
+	return math::Vec(width, height);
 }
 
-void Window::setWindowSize(Vec size) {
+void Window::setWindowSize(math::Vec size) {
 	int width = size.x;
 	int height = size.y;
 	glfwSetWindowSize(win, width, height);
 }
 
-Vec Window::getWindowPos() {
+math::Vec Window::getWindowPos() {
 	int x, y;
 	glfwGetWindowPos(win, &x, &y);
-	return Vec(x, y);
+	return math::Vec(x, y);
 }
 
-void Window::setWindowPos(Vec pos) {
+void Window::setWindowPos(math::Vec pos) {
 	int x = pos.x;
 	int y = pos.y;
 	glfwSetWindowPos(win, x, y);

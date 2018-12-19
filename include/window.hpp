@@ -56,7 +56,7 @@ struct Window {
 	bool allowCursorLock = true;
 	int frame = 0;
 	/** The last known absolute mouse position in the window */
-	Vec mousePos;
+	math::Vec mousePos;
 	std::shared_ptr<Font> uiFont;
 
 	struct Internal;
@@ -70,10 +70,10 @@ struct Window {
 	void cursorUnlock();
 	bool isModPressed();
 	bool isShiftPressed();
-	Vec getWindowSize();
-	void setWindowSize(Vec size);
-	Vec getWindowPos();
-	void setWindowPos(Vec pos);
+	math::Vec getWindowSize();
+	void setWindowSize(math::Vec size);
+	math::Vec getWindowPos();
+	void setWindowPos(math::Vec pos);
 	bool isMaximized();
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();

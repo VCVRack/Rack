@@ -14,7 +14,7 @@ struct Menu : OpaqueWidget {
 	MenuEntry *activeEntry = NULL;
 
 	Menu() {
-		box.size = Vec(0, 0);
+		box.size = math::Vec(0, 0);
 	}
 
 	~Menu() {
@@ -44,12 +44,12 @@ struct Menu : OpaqueWidget {
 		Widget::step();
 
 		// Set positions of children
-		box.size = Vec(0, 0);
+		box.size = math::Vec(0, 0);
 		for (Widget *child : children) {
 			if (!child->visible)
 				continue;
 			// Increment height, set position of child
-			child->box.pos = Vec(0, box.size.y);
+			child->box.pos = math::Vec(0, box.size.y);
 			box.size.y += child->box.size.y;
 			// Increase width based on maximum width of child
 			if (child->box.size.x > box.size.x) {

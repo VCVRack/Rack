@@ -26,9 +26,9 @@ void SVGSlider::step() {
 	if (dirty && quantity) {
 		// Interpolate handle position
 		float v = quantity->getScaledValue();
-		handle->box.pos = Vec(
-			rescale(v, 0.f, 1.f, minHandlePos.x, maxHandlePos.x),
-			rescale(v, 0.f, 1.f, minHandlePos.y, maxHandlePos.y));
+		handle->box.pos = math::Vec(
+			math::rescale(v, 0.f, 1.f, minHandlePos.x, maxHandlePos.x),
+			math::rescale(v, 0.f, 1.f, minHandlePos.y, maxHandlePos.y));
 	}
 	FramebufferWidget::step();
 }

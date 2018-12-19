@@ -9,7 +9,7 @@
 
 namespace rack {
 
-static void drawPlug(NVGcontext *vg, Vec pos, NVGcolor color) {
+static void drawPlug(NVGcontext *vg, math::Vec pos, NVGcolor color) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Plug solid
@@ -30,7 +30,7 @@ static void drawPlug(NVGcontext *vg, Vec pos, NVGcolor color) {
 	nvgFill(vg);
 }
 
-static void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color, float tension, float opacity) {
+static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float tension, float opacity) {
 	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
@@ -40,14 +40,14 @@ static void drawWire(NVGcontext *vg, Vec pos1, Vec pos2, NVGcolor color, float t
 		nvgGlobalAlpha(vg, powf(opacity, 1.5));
 
 		float dist = pos1.minus(pos2).norm();
-		Vec slump;
+		math::Vec slump;
 		slump.y = (1.0 - tension) * (150.0 + 1.0*dist);
-		Vec pos3 = pos1.plus(pos2).div(2).plus(slump);
+		math::Vec pos3 = pos1.plus(pos2).div(2).plus(slump);
 
 		nvgLineJoin(vg, NVG_ROUND);
 
 		// Shadow
-		Vec pos4 = pos3.plus(slump.mult(0.08));
+		math::Vec pos4 = pos3.plus(slump.mult(0.08));
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, pos1.x, pos1.y);
 		nvgQuadTo(vg, pos4.x, pos4.y, pos2.x, pos2.y);
@@ -121,7 +121,7 @@ void WireWidget::updateWire() {
 	}
 }
 
-Vec WireWidget::getOutputPos() {
+math::Vec WireWidget::getOutputPos() {
 	if (outputPort) {
 		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
 	}
@@ -133,7 +133,7 @@ Vec WireWidget::getOutputPos() {
 	}
 }
 
-Vec WireWidget::getInputPos() {
+math::Vec WireWidget::getInputPos() {
 	if (inputPort) {
 		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
 	}
@@ -179,15 +179,15 @@ void WireWidget::draw(NVGcontext *vg) {
 			opacity = 1.0;
 	}
 
-	Vec outputPos = getOutputPos();
-	Vec inputPos = getInputPos();
+	math::Vec outputPos = getOutputPos();
+	math::Vec inputPos = getInputPos();
 	drawWire(vg, outputPos, inputPos, color, tension, opacity);
 }
 
 void WireWidget::drawPlugs(NVGcontext *vg) {
 	// TODO Figure out a way to draw plugs first and wires last, and cut the plug portion of the wire off.
-	Vec outputPos = getOutputPos();
-	Vec inputPos = getInputPos();
+	math::Vec outputPos = getOutputPos();
+	math::Vec inputPos = getInputPos();
 	drawPlug(vg, outputPos, color);
 	drawPlug(vg, inputPos, color);
 

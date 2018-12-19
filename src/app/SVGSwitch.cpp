@@ -22,7 +22,7 @@ void SVGSwitch::onChange(event::Change &e) {
 	assert(frames.size() > 0);
 	if (quantity) {
 		int index = quantity->getScaledValue() * (frames.size() - 1);
-		index = clamp(index, 0, (int) frames.size() - 1);
+		index = math::clamp(index, 0, (int) frames.size() - 1);
 		sw->setSVG(frames[index]);
 		dirty = true;
 	}

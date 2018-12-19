@@ -23,7 +23,7 @@ struct SchmittTrigger {
 	/** Updates the state of the Schmitt Trigger given a value.
 	Returns true if triggered, i.e. the value increases from 0 to 1.
 	If different trigger thresholds are needed, use
-		process(rescale(in, low, high, 0.f, 1.f))
+		process(math::rescale(in, low, high, 0.f, 1.f))
 	for example.
 	*/
 	bool process(float in) {

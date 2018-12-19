@@ -28,7 +28,7 @@ DEPRECATED inline float clamp2(float x, float a, float b) {return clampBetween(x
 
 DEPRECATED inline int mini(int a, int b) {return std::min(a, b);}
 DEPRECATED inline int maxi(int a, int b) {return std::max(a, b);}
-DEPRECATED inline int clampi(int x, int min, int max) {return clamp(x, min, max);}
+DEPRECATED inline int clampi(int x, int min, int max) {return math::clamp(x, min, max);}
 DEPRECATED inline int absi(int a) {return std::abs(a);}
 DEPRECATED inline int eucmodi(int a, int base) {return eucMod(a, base);}
 DEPRECATED inline int log2i(int n) {return log2(n);}
@@ -36,11 +36,11 @@ DEPRECATED inline bool ispow2i(int n) {return isPow2(n);}
 DEPRECATED inline float absf(float x) {return std::abs(x);}
 DEPRECATED inline float sgnf(float x) {return sgn(x);}
 DEPRECATED inline float eucmodf(float a, float base) {return eucMod(a, base);}
-DEPRECATED inline bool nearf(float a, float b, float epsilon = 1.0e-6f) {return isNear(a, b, epsilon);}
-DEPRECATED inline float clampf(float x, float min, float max) {return clamp(x, min, max);}
+DEPRECATED inline bool nearf(float a, float b, float epsilon = 1.0e-6f) {return math::isNear(a, b, epsilon);}
+DEPRECATED inline float clampf(float x, float min, float max) {return math::clamp(x, min, max);}
 DEPRECATED inline float clamp2f(float x, float min, float max) {return clampBetween(x, min, max);}
 DEPRECATED inline float chopf(float x, float eps) {return chop(x, eps);}
-DEPRECATED inline float rescalef(float x, float a, float b, float yMin, float yMax) {return rescale(x, a, b, yMin, yMax);}
+DEPRECATED inline float rescalef(float x, float a, float b, float yMin, float yMax) {return math::rescale(x, a, b, yMin, yMax);}
 DEPRECATED inline float crossf(float a, float b, float frac) {return crossfade(a, b, frac);}
 DEPRECATED inline float interpf(const float *p, float x) {return interpolateLinear(p, x);}
 DEPRECATED inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {return cmult(cr, ci, ar, ai, br, bi);}
@@ -109,7 +109,7 @@ DEPRECATED static const NVGcolor COLOR_DARK_PANEL = SCHEME_DARK_PANEL;
 ////////////////////
 
 template <class TScrew>
-DEPRECATED TScrew *createScrew(Vec pos) {
+DEPRECATED TScrew *createScrew(math::Vec pos) {
 	return createWidget<TScrew>(pos);
 }
 

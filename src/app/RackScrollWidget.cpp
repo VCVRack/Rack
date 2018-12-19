@@ -8,8 +8,8 @@ namespace rack {
 
 
 void RackScrollWidget::step() {
-	Vec pos = context()->window->mousePos;
-	Rect viewport = getViewport(box.zeroPos());
+	math::Vec pos = context()->window->mousePos;
+	math::Rect viewport = getViewport(box.zeroPos());
 	// Scroll rack if dragging cable near the edge of the screen
 	if (context()->scene->rackWidget->wireContainer->activeWire) {
 		float margin = 20.0;

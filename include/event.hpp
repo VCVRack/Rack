@@ -25,7 +25,7 @@ struct Event {
 
 struct Position {
 	/** The pixel coordinate where the event occurred, relative to the Widget it is called on. */
-	Vec pos;
+	math::Vec pos;
 };
 
 
@@ -53,7 +53,7 @@ If `target` is set, other events may occur on that Widget.
 */
 struct Hover : Event, Position {
 	/** Change in mouse position since the last frame. Can be zero. */
-	Vec mouseDelta;
+	math::Vec mouseDelta;
 };
 
 
@@ -90,7 +90,7 @@ Recurses until consumed.
 */
 struct HoverScroll : Event, Position {
 	/** Change of scroll wheel position. */
-	Vec scrollDelta;
+	math::Vec scrollDelta;
 };
 
 
@@ -148,7 +148,7 @@ struct DragEnd : Event {
 `mouseDelta` may be zero.
 */
 struct DragMove : Event {
-	Vec mouseDelta;
+	math::Vec mouseDelta;
 };
 
 
@@ -157,7 +157,7 @@ Must consume to allow DragEnter, DragLeave, and DragDrop to occur.
 */
 struct DragHover : Event, Position {
 	/** Change in mouse position since the last frame. Can be zero. */
-	Vec mouseDelta;
+	math::Vec mouseDelta;
 };
 
 /** Occurs when the mouse enters a Widget while dragging.
@@ -217,13 +217,13 @@ struct Context {
 	/** For middle-click dragging */
 	Widget *scrollWidget = NULL;
 
-	void handleButton(Vec pos, int button, int action, int mods);
-	void handleHover(Vec pos, Vec mouseDelta);
+	void handleButton(math::Vec pos, int button, int action, int mods);
+	void handleHover(math::Vec pos, math::Vec mouseDelta);
 	void handleLeave();
-	void handleScroll(Vec pos, Vec scrollDelta);
-	void handleText(Vec pos, int codepoint);
-	void handleKey(Vec pos, int key, int scancode, int action, int mods);
-	void handleDrop(Vec pos, std::vector<std::string> paths);
+	void handleScroll(math::Vec pos, math::Vec scrollDelta);
+	void handleText(math::Vec pos, int codepoint);
+	void handleKey(math::Vec pos, int key, int scancode, int action, int mods);
+	void handleDrop(math::Vec pos, std::vector<std::string> paths);
 	void handleZoom();
 	/** Prepares a widget for deletion */
 	void finalizeWidget(Widget *w);

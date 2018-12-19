@@ -23,12 +23,12 @@ static json_t *settingsToJson() {
 
 	if (!context()->window->isMaximized()) {
 		// windowSize
-		Vec windowSize = context()->window->getWindowSize();
+		math::Vec windowSize = context()->window->getWindowSize();
 		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
 		json_object_set_new(rootJ, "windowSize", windowSizeJ);
 
 		// windowPos
-		Vec windowPos = context()->window->getWindowPos();
+		math::Vec windowPos = context()->window->getWindowPos();
 		json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
 		json_object_set_new(rootJ, "windowPos", windowPosJ);
 	}
@@ -88,7 +88,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowSizeJ) {
 		double width, height;
 		json_unpack(windowSizeJ, "[F, F]", &width, &height);
-		context()->window->setWindowSize(Vec(width, height));
+		context()->window->setWindowSize(math::Vec(width, height));
 	}
 
 	// windowPos
@@ -96,7 +96,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
-		context()->window->setWindowPos(Vec(x, y));
+		context()->window->setWindowPos(math::Vec(x, y));
 	}
 
 	// opacity
@@ -112,7 +112,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ) {
-		context()->scene->zoomWidget->setZoom(clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
+		context()->scene->zoomWidget->setZoom(math::clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
 	}
 
 	// allowCursorLock

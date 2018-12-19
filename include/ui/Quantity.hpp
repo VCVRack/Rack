@@ -95,12 +95,12 @@ struct Quantity {
 
 	/** Sets value from the range 0 to 1 */
 	void setScaledValue(float scaledValue) {
-		setValue(rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
+		setValue(math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
 	}
 
 	/** Returns the value rescaled to the range 0 to 1 */
 	float getScaledValue() {
-		return rescale(getValue(), getMinValue(), getMaxValue(), 0.f, 1.f);
+		return math::rescale(getValue(), getMinValue(), getMaxValue(), 0.f, 1.f);
 	}
 
 	/** The difference between the max and min values */

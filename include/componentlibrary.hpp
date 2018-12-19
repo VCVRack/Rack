@@ -325,9 +325,9 @@ struct BefacoTinyKnob : SVGKnob {
 
 struct BefacoSlidePot : SVGSlider {
 	BefacoSlidePot() {
-		Vec margin = Vec(3.5, 3.5);
-		maxHandlePos = Vec(-1, -2).plus(margin);
-		minHandlePos = Vec(-1, 87).plus(margin);
+		math::Vec margin = math::Vec(3.5, 3.5);
+		maxHandlePos = math::Vec(-1, -2).plus(margin);
+		minHandlePos = math::Vec(-1, 87).plus(margin);
 		setSVGs(SVG::load(asset::system("res/ComponentLibrary/BefacoSlidePot.svg")), SVG::load(asset::system("res/ComponentLibrary/BefacoSlidePotHandle.svg")));
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
@@ -336,8 +336,8 @@ struct BefacoSlidePot : SVGSlider {
 
 struct LEDSlider : SVGSlider {
 	LEDSlider() {
-		maxHandlePos = mm2px(Vec(0.738, 0.738).plus(Vec(2, 0)));
-		minHandlePos = mm2px(Vec(0.738, 22.078).plus(Vec(2, 0)));
+		maxHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)));
+		minHandlePos = mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0)));
 		setSVGs(SVG::load(asset::system("res/ComponentLibrary/LEDSlider.svg")), NULL);
 	}
 };
@@ -459,7 +459,7 @@ struct RGBLight : ModuleLightWidget {
 template <typename BASE>
 struct LargeLight : BASE {
 	LargeLight() {
-		this->box.size = mm2px(Vec(5.179, 5.179));
+		this->box.size = mm2px(math::Vec(5.179, 5.179));
 	}
 };
 
@@ -467,7 +467,7 @@ struct LargeLight : BASE {
 template <typename BASE>
 struct MediumLight : BASE {
 	MediumLight() {
-		this->box.size = mm2px(Vec(3.176, 3.176));
+		this->box.size = mm2px(math::Vec(3.176, 3.176));
 	}
 };
 
@@ -475,7 +475,7 @@ struct MediumLight : BASE {
 template <typename BASE>
 struct SmallLight : BASE {
 	SmallLight() {
-		this->box.size = mm2px(Vec(2.176, 2.176));
+		this->box.size = mm2px(math::Vec(2.176, 2.176));
 	}
 };
 
@@ -483,7 +483,7 @@ struct SmallLight : BASE {
 template <typename BASE>
 struct TinyLight : BASE {
 	TinyLight() {
-		this->box.size = mm2px(Vec(1.088, 1.088));
+		this->box.size = mm2px(math::Vec(1.088, 1.088));
 	}
 };
 
@@ -492,18 +492,18 @@ template <typename BASE>
 struct LEDBezelLight : BASE {
 	LEDBezelLight() {
 		this->bgColor = color::BLACK_TRANSPARENT;
-		this->box.size = mm2px(Vec(6.0, 6.0));
+		this->box.size = mm2px(math::Vec(6.0, 6.0));
 	}
 };
 
 /** A light to displayed over PB61303. Must add a color by subclassing or templating.
-Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by mm2px(Vec(0.5, 0.5)).
+Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by mm2px(math::Vec(0.5, 0.5)).
 */
 template <typename BASE>
 struct PB61303Light : BASE {
 	PB61303Light() {
 		this->bgColor = color::BLACK_TRANSPARENT;
-		this->box.size = mm2px(Vec(9.0, 9.0));
+		this->box.size = mm2px(math::Vec(9.0, 9.0));
 	}
 };
 

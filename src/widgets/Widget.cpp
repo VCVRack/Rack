@@ -13,8 +13,8 @@ Widget::~Widget() {
 	clearChildren();
 }
 
-Rect Widget::getChildrenBoundingBox() {
-	Rect bound;
+math::Rect Widget::getChildrenBoundingBox() {
+	math::Rect bound;
 	for (Widget *child : children) {
 		if (child == children.front()) {
 			bound = child->box;
@@ -26,7 +26,7 @@ Rect Widget::getChildrenBoundingBox() {
 	return bound;
 }
 
-Vec Widget::getRelativeOffset(Vec v, Widget *relative) {
+math::Vec Widget::getRelativeOffset(math::Vec v, Widget *relative) {
 	if (this == relative) {
 		return v;
 	}
@@ -37,8 +37,8 @@ Vec Widget::getRelativeOffset(Vec v, Widget *relative) {
 	return v;
 }
 
-Rect Widget::getViewport(Rect r) {
-	Rect bound;
+math::Rect Widget::getViewport(math::Rect r) {
+	math::Rect bound;
 	if (parent) {
 		bound = parent->getViewport(box);
 	}

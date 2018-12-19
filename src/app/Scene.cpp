@@ -36,7 +36,7 @@ void Scene::step() {
 	// Resize to be a bit larger than the ScrollWidget viewport
 	rackWidget->box.size = scrollWidget->box.size
 		.minus(scrollWidget->container->box.pos)
-		.plus(Vec(500, 500))
+		.plus(math::Vec(500, 500))
 		.div(zoomWidget->zoom);
 
 	OpaqueWidget::step();

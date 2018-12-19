@@ -270,7 +270,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgFillColor(vg, nvgRGBf(1, 1, 1));
 		nvgText(vg, 10.0, box.size.y - 6.0, cpuText.c_str(), NULL);
 
-		float p = clamp(module->cpuTime, 0.f, 1.f);
+		float p = math::clamp(module->cpuTime, 0.f, 1.f);
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, (1.f - p) * box.size.y,
@@ -286,7 +286,7 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 	nvgBeginPath(vg);
 	float r = 20; // Blur radius
 	float c = 20; // Corner radius
-	Vec b = Vec(-10, 30); // Offset from each corner
+	math::Vec b = math::Vec(-10, 30); // Offset from each corner
 	nvgRect(vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
 	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
 	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
@@ -375,7 +375,7 @@ void ModuleWidget::onDragEnd(event::DragEnd &e) {
 
 void ModuleWidget::onDragMove(event::DragMove &e) {
 	if (!context()->scene->rackWidget->lockModules) {
-		Rect newBox = box;
+		math::Rect newBox = box;
 		newBox.pos = context()->scene->rackWidget->lastMousePos.minus(dragPos);
 		context()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}

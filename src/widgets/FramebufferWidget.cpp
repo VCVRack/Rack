@@ -9,7 +9,7 @@ namespace rack {
 
 struct FramebufferWidget::Internal {
 	NVGLUframebuffer *fb = NULL;
-	Rect box;
+	math::Rect box;
 
 	~Internal() {
 		setFramebuffer(NULL);
@@ -42,10 +42,10 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	// Skew and rotate is not supported
 	assert(std::abs(xform[1]) < 1e-6);
 	assert(std::abs(xform[2]) < 1e-6);
-	Vec s = Vec(xform[0], xform[3]);
-	Vec b = Vec(xform[4], xform[5]);
-	Vec bi = b.floor();
-	Vec bf = b.minus(bi);
+	math::Vec s = math::Vec(xform[0], xform[3]);
+	math::Vec b = math::Vec(xform[4], xform[5]);
+	math::Vec bi = b.floor();
+	math::Vec bf = b.minus(bi);
 
 	// Render to framebuffer
 	if (dirty) {
@@ -53,9 +53,9 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 
 		internal->box = getChildrenBoundingBox();
 		internal->box.pos = internal->box.pos.mult(s).floor();
-		internal->box.size = internal->box.size.mult(s).ceil().plus(Vec(1, 1));
+		internal->box.size = internal->box.size.mult(s).ceil().plus(math::Vec(1, 1));
 
-		Vec fbSize = internal->box.size.mult(context()->window->pixelRatio * oversample);
+		math::Vec fbSize = internal->box.size.mult(context()->window->pixelRatio * oversample);
 
 		if (!fbSize.isFinite())
 			return;

@@ -24,7 +24,7 @@ void InputDevice::step() {
 	ccs.resize(numAxes);
 	for (int i = 0; i < numAxes; i++) {
 		// Allow CC value to go negative, but clamp at -127 instead of -128 for symmetry
-		int8_t cc = clamp((int) std::round(axes[i] * 127), -127, 127);
+		int8_t cc = math::clamp((int) std::round(axes[i] * 127), -127, 127);
 		if (cc != ccs[i]) {
 			ccs[i] = cc;
 

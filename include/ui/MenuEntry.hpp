@@ -8,7 +8,7 @@ namespace rack {
 
 struct MenuEntry : OpaqueWidget {
 	MenuEntry() {
-		box.size = Vec(0, BND_WIDGET_HEIGHT);
+		box.size = math::Vec(0, BND_WIDGET_HEIGHT);
 	}
 };
 
