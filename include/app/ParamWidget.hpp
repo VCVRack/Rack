@@ -1,22 +1,18 @@
 #pragma once
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
-#include "app/ParamQuantity.hpp"
+#include "ui/Quantity.hpp"
 
 
 namespace rack {
 
 
-/** Controls a ParamQuantity */
 struct ParamWidget : OpaqueWidget {
-	ParamQuantity *quantity;
-
-	ParamWidget() {
-		quantity = new ParamQuantity;
-	}
+	Quantity *quantity = NULL;
 
 	~ParamWidget() {
-		delete quantity;
+		if (quantity)
+			delete quantity;
 	}
 
 	/** For legacy patch loading */

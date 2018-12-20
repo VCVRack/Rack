@@ -1,11 +1,13 @@
 #include "plugin/Model.hpp"
-#include "event.hpp"
 #include "ui/MenuLabel.hpp"
 #include "ui/MenuItem.hpp"
 #include "ui/Menu.hpp"
 #include "app/Port.hpp"
+#include "app/ParamQuantity.hpp"
+#include "app/ParamWidget.hpp"
 #include "engine/Module.hpp"
 #include "context.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -54,8 +56,10 @@ template <class TParamWidget>
 TParamWidget *createParam(math::Vec pos, Module *module, int paramId) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos;
-	o->quantity->module = module;
-	o->quantity->paramId = paramId;
+	ParamQuantity *q = new ParamQuantity;
+	q->module = module;
+	q->paramId = paramId;
+	o->quantity = q;
 	return o;
 }
 
@@ -63,8 +67,10 @@ template <class TParamWidget>
 TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
-	o->quantity->module = module;
-	o->quantity->paramId = paramId;
+	ParamQuantity *q = new ParamQuantity;
+	q->module = module;
+	q->paramId = paramId;
+	o->quantity = q;
 	return o;
 }
 

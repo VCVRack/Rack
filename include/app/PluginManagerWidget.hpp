@@ -6,7 +6,7 @@
 namespace rack {
 
 
-struct PluginManagerWidget : VirtualWidget {
+struct PluginManagerWidget : virtual Widget {
 	Widget *loginWidget;
 	Widget *manageWidget;
 	Widget *downloadWidget;

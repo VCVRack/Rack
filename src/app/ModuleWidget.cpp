@@ -365,6 +365,7 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 
 void ModuleWidget::onDragStart(event::DragStart &e) {
 	dragPos = context()->scene->rackWidget->lastMousePos.minus(box.pos);
+	e.target = this;
 }
 
 void ModuleWidget::onDragEnd(event::DragEnd &e) {

@@ -6,7 +6,7 @@ namespace rack {
 
 
 /** Widget that does not respond to events and does not pass events to children */
-struct TransparentWidget : VirtualWidget {
+struct TransparentWidget : virtual Widget {
 	/** Override behavior to do nothing instead. */
 	void onHover(event::Hover &e) override {}
 	void onButton(event::Button &e) override {}

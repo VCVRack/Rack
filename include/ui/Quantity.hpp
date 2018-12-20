@@ -1,4 +1,6 @@
 #pragma once
+#include "ui/common.hpp"
+#include "math.hpp"
 #include "string.hpp"
 
 

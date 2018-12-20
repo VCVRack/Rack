@@ -7,7 +7,7 @@ namespace rack {
 
 
 /** Draws an SVG */
-struct SVGWidget : VirtualWidget {
+struct SVGWidget : virtual Widget {
 	std::shared_ptr<SVG> svg;
 
 	/** Sets the box size to the svg image size */

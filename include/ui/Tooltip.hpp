@@ -6,7 +6,7 @@
 namespace rack {
 
 
-struct Tooltip : VirtualWidget {
+struct Tooltip : virtual Widget {
 	std::string text;
 
 	void draw(NVGcontext *vg) override {

@@ -99,6 +99,15 @@ void Widget::draw(NVGcontext *vg) {
 		nvgSave(vg);
 		nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
 		child->draw(vg);
+
+		// Draw red hitboxes
+		// if (context()->event->hoveredWidget == child) {
+		// 	nvgBeginPath(vg);
+		// 	nvgRect(vg, 0, 0, child->box.size.x, child->box.size.y);
+		// 	nvgFillColor(vg, nvgRGBAf(1, 0, 0, 0.5));
+		// 	nvgFill(vg);
+		// }
+
 		nvgRestore(vg);
 	}
 }

@@ -8,7 +8,7 @@
 namespace rack {
 
 
-struct LedDisplay : VirtualWidget {
+struct LedDisplay : virtual Widget {
 	void draw(NVGcontext *vg) override;
 };
 

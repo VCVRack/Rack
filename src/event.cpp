@@ -22,7 +22,7 @@ void Context::handleButton(math::Vec pos, int button, int action, int mods) {
 			// event::DragStart
 			event::DragStart eDragStart;
 			clickedWidget->onDragStart(eDragStart);
-			draggedWidget = clickedWidget;
+			draggedWidget = eDragStart.target;
 		}
 
 		if (action == GLFW_RELEASE && draggedWidget) {
@@ -63,14 +63,14 @@ void Context::handleButton(math::Vec pos, int button, int action, int mods) {
 		}
 	}
 
-	if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-		if (action == GLFW_PRESS) {
-			scrollWidget = clickedWidget;
-		}
-		if (action == GLFW_RELEASE) {
-			scrollWidget = NULL;
-		}
-	}
+	// if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+	// 	if (action == GLFW_PRESS) {
+	// 		scrollWidget = clickedWidget;
+	// 	}
+	// 	if (action == GLFW_RELEASE) {
+	// 		scrollWidget = NULL;
+	// 	}
+	// }
 }
 
 

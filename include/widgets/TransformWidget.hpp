@@ -6,7 +6,7 @@ namespace rack {
 
 
 /** Transforms appearance only, not positions of events */
-struct TransformWidget : VirtualWidget {
+struct TransformWidget : virtual Widget {
 	/** The transformation matrix */
 	float transform[6];
 

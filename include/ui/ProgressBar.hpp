@@ -5,7 +5,7 @@
 namespace rack {
 
 
-struct ProgressBar : VirtualWidget {
+struct ProgressBar : virtual Widget {
 	Quantity *quantity = NULL;
 
 	ProgressBar() {

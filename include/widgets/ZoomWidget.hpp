@@ -5,7 +5,7 @@
 namespace rack {
 
 
-struct ZoomWidget : VirtualWidget {
+struct ZoomWidget : virtual Widget {
 	float zoom = 1.f;
 
 	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override {
@@ -36,39 +36,32 @@ struct ZoomWidget : VirtualWidget {
 	}
 
 	void onHover(event::Hover &e) override {
-		event::Hover e2 = e;
-		e2.pos = e.pos.div(zoom);
-		Widget::onHover(e2);
+		e.pos = e.pos.div(zoom);
+		Widget::onHover(e);
 	}
 	void onButton(event::Button &e) override {
-		event::Button e2 = e;
-		e2.pos = e.pos.div(zoom);
-		Widget::onButton(e2);
+		e.pos = e.pos.div(zoom);
+		Widget::onButton(e);
 	}
 	void onHoverKey(event::HoverKey &e) override {
-		event::HoverKey e2 = e;
-		e2.pos = e.pos.div(zoom);
-		Widget::onHoverKey(e2);
+		e.pos = e.pos.div(zoom);
+		Widget::onHoverKey(e);
 	}
 	void onHoverText(event::HoverText &e) override {
-		event::HoverText e2 = e;
-		e2.pos = e.pos.div(zoom);
-		Widget::onHoverText(e2);
+		e.pos = e.pos.div(zoom);
+		Widget::onHoverText(e);
 	}
 	void onHoverScroll(event::HoverScroll &e) override {
-		event::HoverScroll e2 = e;
-		e2.pos = e.pos.div(zoom);
-		Widget::onHoverScroll(e2);
+		e.pos = e.pos.div(zoom);
+		Widget::onHoverScroll(e);
 	}
 	void onDragHover(event::DragHover &e) override {
-		event::DragHover e2 = e;
-		e2.pos = e.pos.div(zoom);
-		Widget::onDragHover(e2);
+		e.pos = e.pos.div(zoom);
+		Widget::onDragHover(e);
 	}
 	void onPathDrop(event::PathDrop &e) override {
-		event::PathDrop e2 = e;
-		e2.pos = e.pos.div(zoom);
-		Widget::onPathDrop(e2);
+		e.pos = e.pos.div(zoom);
+		Widget::onPathDrop(e);
 	}
 };
 

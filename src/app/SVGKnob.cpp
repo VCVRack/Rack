@@ -30,11 +30,11 @@ void SVGKnob::step() {
 	if (dirty && quantity) {
 		float angle;
 		if (quantity->isBounded()) {
-			angle = math::rescale(quantity->getValue(), -1.f, 1.f, minAngle, maxAngle);
+			angle = math::rescale(quantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
 			angle = std::fmod(angle, 2*M_PI);
 		}
 		else {
-			angle = math::rescale(quantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
+			angle = math::rescale(quantity->getValue(), 0.f, 1.f, minAngle, maxAngle);
 		}
 		tw->identity();
 		// Rotate SVG
@@ -48,7 +48,7 @@ void SVGKnob::step() {
 
 void SVGKnob::onChange(event::Change &e) {
 	dirty = true;
-	ParamWidget::onChange(e);
+	Knob::onChange(e);
 }
 
 

@@ -511,6 +511,7 @@ void RackWidget::onHover(event::Hover &e) {
 }
 
 void RackWidget::onButton(event::Button &e) {
+	DEBUG("what");
 	OpaqueWidget::onButton(e);
 	if (e.target == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {

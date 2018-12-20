@@ -12,7 +12,7 @@ namespace rack {
 
 /** A node in the 2D scene graph
 It is recommended to inherit virtually from Widget instead of directly.
-e.g. `struct MyWidget : VirtualWidget {}`
+e.g. `struct MyWidget : virtual Widget {}`
 */
 struct Widget {
 	/** Stores position and size */
@@ -123,12 +123,6 @@ struct Widget {
 	virtual void onChange(event::Change &e) {}
 	virtual void onZoom(event::Zoom &e) {}
 };
-
-
-/** Inherit from this class instead of inheriting from Widget directly.
-Allows multiple inheritance in the class hierarchy.
-*/
-struct VirtualWidget : virtual Widget {};
 
 
 } // namespace rack

@@ -7,7 +7,7 @@ namespace rack {
 
 
 /** Positions children in a row/column based on their widths/heights */
-struct SequentialLayout : VirtualWidget {
+struct SequentialLayout : virtual Widget {
 	enum Orientation {
 		HORIZONTAL_ORIENTATION,
 		VERTICAL_ORIENTATION,
