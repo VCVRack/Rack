@@ -5,6 +5,7 @@
 #include "app/ModuleBrowser.hpp"
 #include "app/RackScrollWidget.hpp"
 #include "context.hpp"
+#include "logger.hpp"
 #include <thread>
 
 
@@ -67,9 +68,7 @@ void Scene::draw(NVGcontext *vg) {
 }
 
 void Scene::onHoverKey(event::HoverKey &e) {
-	OpaqueWidget::onHoverKey(e);
-
-	if (!e.target) {
+	if (e.action == GLFW_PRESS) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
@@ -116,9 +115,13 @@ void Scene::onHoverKey(event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_F11: {
 				context()->window->setFullScreen(!context()->window->isFullScreen());
+				e.target = this;
 			}
 		}
 	}
+
+	if (!e.target)
+		OpaqueWidget::onHoverKey(e);
 }
 
 void Scene::onPathDrop(event::PathDrop &e) {

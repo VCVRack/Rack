@@ -32,9 +32,7 @@ struct MenuOverlay : OpaqueWidget {
 		OpaqueWidget::onHoverKey(e);
 
 		if (e.target == this && e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
-			e.target = this;
 			requestedDelete = true;
-			return;
 		}
 	}
 };

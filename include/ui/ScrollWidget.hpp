@@ -142,10 +142,6 @@ struct ScrollWidget : OpaqueWidget {
 		offset = offset.minus(e.scrollDelta);
 		e.target = this;
 	}
-
-	void onHoverKey(event::HoverKey &e) override {
-		OpaqueWidget::onHoverKey(e);
-	}
 };
 
 

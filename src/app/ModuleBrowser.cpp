@@ -510,46 +510,46 @@ void SearchModuleField::onChange(event::Change &e) {
 }
 
 void SearchModuleField::onSelectKey(event::SelectKey &e) {
-	switch (e.key) {
-		case GLFW_KEY_ESCAPE: {
-			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
-			overlay->requestedDelete = true;
-			e.target = this;
-			return;
-		} break;
-		case GLFW_KEY_UP: {
-			moduleBrowser->moduleList->incrementSelection(-1);
-			moduleBrowser->moduleList->scrollSelected();
-			e.target = this;
-		} break;
-		case GLFW_KEY_DOWN: {
-			moduleBrowser->moduleList->incrementSelection(1);
-			moduleBrowser->moduleList->scrollSelected();
-			e.target = this;
-		} break;
-		case GLFW_KEY_PAGE_UP: {
-			moduleBrowser->moduleList->incrementSelection(-5);
-			moduleBrowser->moduleList->scrollSelected();
-			e.target = this;
-		} break;
-		case GLFW_KEY_PAGE_DOWN: {
-			moduleBrowser->moduleList->incrementSelection(5);
-			moduleBrowser->moduleList->scrollSelected();
-			e.target = this;
-		} break;
-		case GLFW_KEY_ENTER: {
-			BrowserListItem *item = moduleBrowser->moduleList->getSelectedItem();
-			if (item) {
-				item->doAction();
+	if (e.action == GLFW_PRESS) {
+		switch (e.key) {
+			case GLFW_KEY_ESCAPE: {
+				MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
+				overlay->requestedDelete = true;
 				e.target = this;
 				return;
-			}
-		} break;
+			} break;
+			case GLFW_KEY_UP: {
+				moduleBrowser->moduleList->incrementSelection(-1);
+				moduleBrowser->moduleList->scrollSelected();
+				e.target = this;
+			} break;
+			case GLFW_KEY_DOWN: {
+				moduleBrowser->moduleList->incrementSelection(1);
+				moduleBrowser->moduleList->scrollSelected();
+				e.target = this;
+			} break;
+			case GLFW_KEY_PAGE_UP: {
+				moduleBrowser->moduleList->incrementSelection(-5);
+				moduleBrowser->moduleList->scrollSelected();
+				e.target = this;
+			} break;
+			case GLFW_KEY_PAGE_DOWN: {
+				moduleBrowser->moduleList->incrementSelection(5);
+				moduleBrowser->moduleList->scrollSelected();
+				e.target = this;
+			} break;
+			case GLFW_KEY_ENTER: {
+				BrowserListItem *item = moduleBrowser->moduleList->getSelectedItem();
+				if (item) {
+					item->doAction();
+					e.target = this;
+				}
+			} break;
+		}
 	}
 
-	if (!e.target) {
+	if (!e.target)
 		TextField::onSelectKey(e);
-	}
 }
 
 // Global functions

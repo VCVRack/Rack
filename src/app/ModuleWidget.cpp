@@ -318,52 +318,49 @@ void ModuleWidget::onButton(event::Button &e) {
 }
 
 void ModuleWidget::onHoverKey(event::HoverKey &e) {
-	switch (e.key) {
-		case GLFW_KEY_I: {
-			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-				reset();
-				e.target = this;
-				return;
-			}
-		} break;
-		case GLFW_KEY_R: {
-			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-				randomize();
-				e.target = this;
-				return;
-			}
-		} break;
-		case GLFW_KEY_C: {
-			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-				copyClipboard();
-				e.target = this;
-				return;
-			}
-		} break;
-		case GLFW_KEY_V: {
-			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-				pasteClipboard();
-				e.target = this;
-				return;
-			}
-		} break;
-		case GLFW_KEY_D: {
-			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-				context()->scene->rackWidget->cloneModule(this);
-				e.target = this;
-				return;
-			}
-		} break;
-		case GLFW_KEY_U: {
-			if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-				disconnect();
-				e.target = this;
-				return;
-			}
-		} break;
+	if (e.action == GLFW_PRESS) {
+		switch (e.key) {
+			case GLFW_KEY_I: {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					reset();
+					e.target = this;
+				}
+			} break;
+			case GLFW_KEY_R: {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					randomize();
+					e.target = this;
+				}
+			} break;
+			case GLFW_KEY_C: {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					copyClipboard();
+					e.target = this;
+				}
+			} break;
+			case GLFW_KEY_V: {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					pasteClipboard();
+					e.target = this;
+				}
+			} break;
+			case GLFW_KEY_D: {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					context()->scene->rackWidget->cloneModule(this);
+					e.target = this;
+				}
+			} break;
+			case GLFW_KEY_U: {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					disconnect();
+					e.target = this;
+				}
+			} break;
+		}
 	}
 
-	OpaqueWidget::onHoverKey(e);
+	if (!e.target)
+		OpaqueWidget::onHoverKey(e);
 }
 
 void ModuleWidget::onDragStart(event::DragStart &e) {
