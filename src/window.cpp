@@ -8,6 +8,7 @@
 #include <map>
 #include <queue>
 #include <thread>
+#include <vector>
 
 #include "osdialog.h"
 
@@ -699,6 +700,17 @@ SVG::SVG(const std::string &filename) {
 	}
 }
 
+SVG::SVG(const char *data, unsigned int size) {
+    std::vector<char> buffer(data, data + size);
+    handle = nsvgParse(buffer.data(), "px", SVG_DPI);
+    if (handle) {
+        info("Loaded SVG from buffer");
+    }
+    else {
+        warn("Failed to load SVG from buffer");
+    }
+}
+
 SVG::~SVG() {
 	nsvgDelete(handle);
 }
@@ -709,6 +721,10 @@ std::shared_ptr<SVG> SVG::load(const std::string &filename) {
 	if (!sp)
 		cache[filename] = sp = std::make_shared<SVG>(filename);
 	return sp;
+}
+
+std::shared_ptr<SVG> SVG::load(const char *data, unsigned int size) {
+    return std::make_shared<SVG>(data, size);
 }
 
 

@@ -36,8 +36,10 @@ struct Image {
 struct SVG {
 	NSVGimage *handle;
 	SVG(const std::string &filename);
+    SVG(const char *data, unsigned int size);
 	~SVG();
 	static std::shared_ptr<SVG> load(const std::string &filename);
+    static std::shared_ptr<SVG> load(const char *data, unsigned int size);
 };
 
 
