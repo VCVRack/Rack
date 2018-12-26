@@ -334,6 +334,16 @@ struct ManageItem : MenuItem {
 };
 
 
+struct SyncItem : MenuItem {
+	SyncItem() {
+		text = "Sync";
+		disabled = true;
+	}
+	void onAction(event::Action &e) override {
+	}
+};
+
+
 // struct SyncButton : Button {
 // 	bool checked = false;
 // 	/** Updates are available */
@@ -416,6 +426,7 @@ struct PluginsButton : MenuButton {
 		}
 		else if (plugin::isLoggedIn()) {
 			menu->addChild(new ManageItem);
+			menu->addChild(new SyncItem);
 			menu->addChild(new LogOutItem);
 		}
 		else {
