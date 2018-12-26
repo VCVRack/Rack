@@ -3,6 +3,7 @@
 #include "system.hpp"
 #include "asset.hpp"
 #include "app/Scene.hpp"
+#include "app/SVGPanel.hpp"
 #include "helpers.hpp"
 #include "context.hpp"
 #include "settings.hpp"
@@ -56,11 +57,13 @@ void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 		panel = NULL;
 	}
 
-	panel = new SVGPanel;
-	panel->setBackground(svg);
-	addChild(panel);
-
-	box.size = panel->box.size;
+	{
+		SVGPanel *panel = new SVGPanel;
+		panel->setBackground(svg);
+		addChild(panel);
+		box.size = panel->box.size;
+		this->panel = panel;
+	}
 }
 
 
@@ -123,10 +126,14 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 
 void ModuleWidget::copyClipboard() {
 	json_t *moduleJ = toJson();
+	DEFER({
+		json_decref(moduleJ);
+	});
 	char *moduleJson = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	DEFER({
+		free(moduleJson);
+	});
 	glfwSetClipboardString(context()->window->win, moduleJson);
-	free(moduleJson);
-	json_decref(moduleJ);
 }
 
 void ModuleWidget::pasteClipboard() {
@@ -138,50 +145,61 @@ void ModuleWidget::pasteClipboard() {
 
 	json_error_t error;
 	json_t *moduleJ = json_loads(moduleJson, 0, &error);
-	if (moduleJ) {
-		fromJson(moduleJ);
-		json_decref(moduleJ);
-	}
-	else {
+	if (!moduleJ) {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		return;
 	}
+	DEFER({
+		json_decref(moduleJ);
+	});
+
+	fromJson(moduleJ);
 }
 
 void ModuleWidget::load(std::string filename) {
 	INFO("Loading preset %s", filename.c_str());
+
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file) {
-		// Exit silently
+		WARN("Could not load patch file %s", filename.c_str());
 		return;
 	}
+	DEFER({
+		fclose(file);
+	});
 
 	json_error_t error;
 	json_t *moduleJ = json_loadf(file, 0, &error);
-	if (moduleJ) {
-		fromJson(moduleJ);
-		json_decref(moduleJ);
-	}
-	else {
-		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+	if (!moduleJ) {
+		std::string message = string::f("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+		return;
 	}
+	DEFER({
+		json_decref(moduleJ);
+	});
 
-	fclose(file);
+	fromJson(moduleJ);
 }
 
 void ModuleWidget::save(std::string filename) {
 	INFO("Saving preset %s", filename.c_str());
+
 	json_t *moduleJ = toJson();
-	if (!moduleJ)
-		return;
+	assert(moduleJ);
+	DEFER({
+		json_decref(moduleJ);
+	});
 
 	FILE *file = fopen(filename.c_str(), "w");
-	if (file) {
-		json_dumpf(moduleJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-		fclose(file);
+	if (!file) {
+		WARN("Could not write to patch file %s", filename.c_str());
 	}
+	DEFER({
+		fclose(file);
+	});
 
-	json_decref(moduleJ);
+	json_dumpf(moduleJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 }
 
 void ModuleWidget::loadDialog() {
@@ -189,12 +207,20 @@ void ModuleWidget::loadDialog() {
 	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
+	DEFER({
+		osdialog_filters_free(filters);
+	});
+
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
-	if (path) {
-		load(path);
-		free(path);
+	if (!path) {
+		// No path selected
+		return;
 	}
-	osdialog_filters_free(filters);
+	DEFER({
+		free(path);
+	});
+
+	load(path);
 }
 
 void ModuleWidget::saveDialog() {
@@ -202,19 +228,26 @@ void ModuleWidget::saveDialog() {
 	system::createDirectory(dir);
 
 	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
+	DEFER({
+		osdialog_filters_free(filters);
+	});
+
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcvm", filters);
-
-	if (path) {
-		std::string pathStr = path;
-		free(path);
-		std::string extension = string::extension(pathStr);
-		if (extension.empty()) {
-			pathStr += ".vcvm";
-		}
-
-		save(pathStr);
+	if (!path) {
+		// No path selected
+		return;
 	}
-	osdialog_filters_free(filters);
+	DEFER({
+		free(path);
+	});
+
+	std::string pathStr = path;
+	std::string extension = string::extension(pathStr);
+	if (extension.empty()) {
+		pathStr += ".vcvm";
+	}
+
+	save(pathStr);
 }
 
 void ModuleWidget::disconnect() {
@@ -226,25 +259,13 @@ void ModuleWidget::disconnect() {
 	}
 }
 
-void ModuleWidget::create() {
-}
-
-void ModuleWidget::_delete() {
-}
-
 void ModuleWidget::reset() {
-	for (ParamWidget *param : params) {
-		param->reset();
-	}
 	if (module) {
 		context()->engine->resetModule(module);
 	}
 }
 
 void ModuleWidget::randomize() {
-	for (ParamWidget *param : params) {
-		param->randomize();
-	}
 	if (module) {
 		context()->engine->randomizeModule(module);
 	}
@@ -300,9 +321,7 @@ void ModuleWidget::onHover(event::Hover &e) {
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 	if (glfwGetKey(context()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(context()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
 		if (!context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-			context()->scene->rackWidget->deleteModule(this);
-			delete this;
-			// e.target = this;
+			requestedDelete = true;
 			return;
 		}
 	}
@@ -365,7 +384,6 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 
 void ModuleWidget::onDragStart(event::DragStart &e) {
 	dragPos = context()->scene->rackWidget->lastMousePos.minus(box.pos);
-	e.target = this;
 }
 
 void ModuleWidget::onDragEnd(event::DragEnd &e) {
@@ -375,6 +393,7 @@ void ModuleWidget::onDragMove(event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = context()->scene->rackWidget->lastMousePos.minus(dragPos);
+		DEBUG("%f %f", newBox.pos.x, newBox.pos.y);
 		context()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}
 }
@@ -382,6 +401,10 @@ void ModuleWidget::onDragMove(event::DragMove &e) {
 
 struct ModuleDisconnectItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleDisconnectItem() {
+		text = "Disconnect cables";
+		rightText = WINDOW_MOD_KEY_NAME "+U";
+	}
 	void onAction(event::Action &e) override {
 		moduleWidget->disconnect();
 	}
@@ -389,6 +412,10 @@ struct ModuleDisconnectItem : MenuItem {
 
 struct ModuleResetItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleResetItem() {
+		text = "Initialize";
+		rightText = WINDOW_MOD_KEY_NAME "+I";
+	}
 	void onAction(event::Action &e) override {
 		moduleWidget->reset();
 	}
@@ -396,6 +423,10 @@ struct ModuleResetItem : MenuItem {
 
 struct ModuleRandomizeItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleRandomizeItem() {
+		text = "Randomize";
+		rightText = WINDOW_MOD_KEY_NAME "+R";
+	}
 	void onAction(event::Action &e) override {
 		moduleWidget->randomize();
 	}
@@ -403,6 +434,10 @@ struct ModuleRandomizeItem : MenuItem {
 
 struct ModuleCopyItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleCopyItem() {
+		text = "Copy preset";
+		rightText = WINDOW_MOD_KEY_NAME "+C";
+	}
 	void onAction(event::Action &e) override {
 		moduleWidget->copyClipboard();
 	}
@@ -410,6 +445,10 @@ struct ModuleCopyItem : MenuItem {
 
 struct ModulePasteItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModulePasteItem() {
+		text = "Paste preset";
+		rightText = WINDOW_MOD_KEY_NAME "+V";
+	}
 	void onAction(event::Action &e) override {
 		moduleWidget->pasteClipboard();
 	}
@@ -417,6 +456,9 @@ struct ModulePasteItem : MenuItem {
 
 struct ModuleSaveItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleSaveItem() {
+		text = "Save preset";
+	}
 	void onAction(event::Action &e) override {
 		moduleWidget->saveDialog();
 	}
@@ -424,6 +466,9 @@ struct ModuleSaveItem : MenuItem {
 
 struct ModuleLoadItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleLoadItem() {
+		text = "Load preset";
+	}
 	void onAction(event::Action &e) override {
 		moduleWidget->loadDialog();
 	}
@@ -431,6 +476,10 @@ struct ModuleLoadItem : MenuItem {
 
 struct ModuleCloneItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleCloneItem() {
+		text = "Duplicate";
+		rightText = WINDOW_MOD_KEY_NAME "+D";
+	}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->cloneModule(moduleWidget);
 	}
@@ -438,6 +487,10 @@ struct ModuleCloneItem : MenuItem {
 
 struct ModuleDeleteItem : MenuItem {
 	ModuleWidget *moduleWidget;
+	ModuleDeleteItem() {
+		text = "Delete";
+		rightText = "Backspace/Delete";
+	}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->deleteModule(moduleWidget);
 		delete moduleWidget;
@@ -452,54 +505,38 @@ Menu *ModuleWidget::createContextMenu() {
 	menu->addChild(menuLabel);
 
 	ModuleResetItem *resetItem = new ModuleResetItem;
-	resetItem->text = "Initialize";
-	resetItem->rightText = WINDOW_MOD_KEY_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->addChild(resetItem);
 
 	ModuleRandomizeItem *randomizeItem = new ModuleRandomizeItem;
-	randomizeItem->text = "Randomize";
-	randomizeItem->rightText = WINDOW_MOD_KEY_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->addChild(randomizeItem);
 
 	ModuleDisconnectItem *disconnectItem = new ModuleDisconnectItem;
-	disconnectItem->text = "Disconnect cables";
-	disconnectItem->rightText = WINDOW_MOD_KEY_NAME "+U";
 	disconnectItem->moduleWidget = this;
 	menu->addChild(disconnectItem);
 
 	ModuleCloneItem *cloneItem = new ModuleCloneItem;
-	cloneItem->text = "Duplicate";
-	cloneItem->rightText = WINDOW_MOD_KEY_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
 	ModuleCopyItem *copyItem = new ModuleCopyItem;
-	copyItem->text = "Copy preset";
-	copyItem->rightText = WINDOW_MOD_KEY_NAME "+C";
 	copyItem->moduleWidget = this;
 	menu->addChild(copyItem);
 
 	ModulePasteItem *pasteItem = new ModulePasteItem;
-	pasteItem->text = "Paste preset";
-	pasteItem->rightText = WINDOW_MOD_KEY_NAME "+V";
 	pasteItem->moduleWidget = this;
 	menu->addChild(pasteItem);
 
 	ModuleLoadItem *loadItem = new ModuleLoadItem;
-	loadItem->text = "Load preset";
 	loadItem->moduleWidget = this;
 	menu->addChild(loadItem);
 
 	ModuleSaveItem *saveItem = new ModuleSaveItem;
-	saveItem->text = "Save preset";
 	saveItem->moduleWidget = this;
 	menu->addChild(saveItem);
 
 	ModuleDeleteItem *deleteItem = new ModuleDeleteItem;
-	deleteItem->text = "Delete";
-	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;
 	menu->addChild(deleteItem);
 

@@ -93,11 +93,11 @@ static void Engine_step(Engine *engine) {
 
 	// Events
 	if (engine->internal->resetModule) {
-		engine->internal->resetModule->onReset();
+		engine->internal->resetModule->reset();
 		engine->internal->resetModule = NULL;
 	}
 	if (engine->internal->randomizeModule) {
-		engine->internal->randomizeModule->onRandomize();
+		engine->internal->randomizeModule->randomize();
 		engine->internal->randomizeModule = NULL;
 	}
 

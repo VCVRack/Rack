@@ -2,7 +2,6 @@
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "ui/Menu.hpp"
-#include "app/SVGPanel.hpp"
 #include "app/Port.hpp"
 #include "app/ParamWidget.hpp"
 #include "plugin/Model.hpp"
@@ -12,19 +11,15 @@
 namespace rack {
 
 
-struct SVGPanel;
-struct Port;
-
-
 struct ModuleWidget : OpaqueWidget {
 	Model *model = NULL;
 	/** Owns the module pointer */
 	Module *module = NULL;
 
-	SVGPanel *panel = NULL;
+	Widget *panel = NULL;
+	std::vector<ParamWidget*> params;
 	std::vector<Port*> inputs;
 	std::vector<Port*> outputs;
-	std::vector<ParamWidget*> params;
 
 	ModuleWidget(Module *module);
 	~ModuleWidget();
@@ -39,13 +34,11 @@ struct ModuleWidget : OpaqueWidget {
 
 	void copyClipboard();
 	void pasteClipboard();
-	void save(std::string filename);
 	void load(std::string filename);
+	void save(std::string filename);
 	void loadDialog();
 	void saveDialog();
 
-	virtual void create();
-	virtual void _delete();
 	/** Disconnects cables from all ports
 	Called when the user clicks Disconnect Cables in the context menu.
 	*/

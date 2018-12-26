@@ -53,6 +53,7 @@ struct RackWidget : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 
 	void onHover(event::Hover &e) override;
+	void onDragHover(event::DragHover &e) override;
 	void onButton(event::Button &e) override;
 	void onZoom(event::Zoom &e) override;
 };

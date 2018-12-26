@@ -39,6 +39,11 @@ struct Module {
 		lights.resize(numLights);
 	}
 
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
+	void reset();
+	void randomize();
+
 	/** Advances the module by 1 audio frame with duration 1.0 / gSampleRate
 	Override this method to read inputs and params, and to write outputs and lights.
 	*/
@@ -50,9 +55,6 @@ struct Module {
 	virtual void onReset() {}
 	/** Called when user clicks Randomize in the module context menu */
 	virtual void onRandomize() {}
-
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
 
 	/** Override these to store extra internal data in the "data" property of the module's JSON object */
 	virtual json_t *dataToJson() { return NULL; }

@@ -17,13 +17,14 @@ namespace rack {
 
 struct ModuleContainer : Widget {
 	void draw(NVGcontext *vg) override {
-		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front.
+		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front of other ModuleWidgets.
 		for (Widget *child : children) {
 			if (!child->visible)
 				continue;
 			nvgSave(vg);
 			nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
 			ModuleWidget *w = dynamic_cast<ModuleWidget*>(child);
+			assert(w);
 			w->drawShadow(vg);
 			nvgRestore(vg);
 		}
@@ -415,16 +416,14 @@ void RackWidget::pastePresetClipboard() {
 
 void RackWidget::addModule(ModuleWidget *m) {
 	moduleContainer->addChild(m);
-	m->create();
 }
 
 void RackWidget::deleteModule(ModuleWidget *m) {
-	m->_delete();
 	moduleContainer->removeChild(m);
 }
 
 void RackWidget::cloneModule(ModuleWidget *m) {
-	// JSON serialization is the most straightforward way to do this
+	// JSON serialization is the obvious way to do this
 	json_t *moduleJ = m->toJson();
 	ModuleWidget *clonedModuleWidget = moduleFromJson(moduleJ);
 	json_decref(moduleJ);
@@ -506,6 +505,11 @@ void RackWidget::draw(NVGcontext *vg) {
 
 void RackWidget::onHover(event::Hover &e) {
 	OpaqueWidget::onHover(e);
+	lastMousePos = e.pos;
+}
+
+void RackWidget::onDragHover(event::DragHover &e) {
+	OpaqueWidget::onDragHover(e);
 	lastMousePos = e.pos;
 }
 

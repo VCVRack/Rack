@@ -34,6 +34,8 @@ struct Param {
 
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
+	void reset();
+	void randomize();
 };
 
 

@@ -13,31 +13,17 @@ void ParamWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-void ParamWidget::reset() {
-	if (quantity) {
-		// Infinite params should not be reset
-		if (quantity->isBounded())
-			quantity->reset();
-	}
-}
-
-void ParamWidget::randomize() {
-	if (quantity) {
-		// Infinite params should not be randomized
-		if (quantity->isBounded()) {
-			quantity->setScaledValue(random::uniform());
-		}
-	}
-}
-
 void ParamWidget::onButton(event::Button &e) {
-	OpaqueWidget::onButton(e);
-	if (e.target == this) {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			if (quantity)
-				quantity->reset();
-		}
+	// Right click to reset
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (quantity)
+			quantity->reset();
+		// Here's another way of doing it, but either works.
+		// dynamic_cast<ParamQuantity*>(quantity)->getParam()->reset();
+		return;
 	}
+
+	OpaqueWidget::onButton(e);
 }
 
 

@@ -336,7 +336,7 @@ struct ManageItem : MenuItem {
 
 struct SyncItem : MenuItem {
 	SyncItem() {
-		text = "Sync";
+		text = "Sync plugins";
 		disabled = true;
 	}
 	void onAction(event::Action &e) override {

@@ -50,5 +50,19 @@ void Module::fromJson(json_t *rootJ) {
 	}
 }
 
+void Module::reset() {
+	for (Param &param : params) {
+		param.reset();
+	}
+	onReset();
+}
+
+void Module::randomize() {
+	for (Param &param : params) {
+		param.randomize();
+	}
+	onRandomize();
+}
+
 
 } // namespace rack
