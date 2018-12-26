@@ -5,6 +5,7 @@
 #include "app/Port.hpp"
 #include "app/ParamQuantity.hpp"
 #include "app/ParamWidget.hpp"
+#include "app/Scene.hpp"
 #include "engine/Module.hpp"
 #include "context.hpp"
 #include "window.hpp"
@@ -154,7 +155,7 @@ inline Menu *createMenu() {
 	MenuOverlay *menuOverlay = new MenuOverlay;
 	menuOverlay->addChild(o);
 
-	context()->event->rootWidget->addChild(menuOverlay);
+	context()->scene->addChild(menuOverlay);
 	return o;
 }
 

@@ -6,7 +6,6 @@ namespace rack {
 
 void Knob::onDragStart(event::DragStart &e) {
 	context()->window->cursorLock();
-	e.target = this;
 }
 
 void Knob::onDragEnd(event::DragEnd &e) {

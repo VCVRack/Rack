@@ -5,6 +5,7 @@
 #include "window.hpp"
 #include "event.hpp"
 #include "context.hpp"
+#include "settings.hpp"
 
 
 namespace rack {
@@ -162,10 +163,8 @@ void WireWidget::fromJson(json_t *rootJ) {
 }
 
 void WireWidget::draw(NVGcontext *vg) {
-	// float opacity = gToolbar->wireOpacitySlider->value / 100.0;
-	// float tension = gToolbar->wireTensionSlider->value;
-	float opacity = 0.5;
-	float tension = 0.5;
+	float opacity = settings::wireOpacity;
+	float tension = settings::wireTension;
 
 	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {

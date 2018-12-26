@@ -13,6 +13,7 @@ struct SequentialLayout : virtual Widget {
 		VERTICAL_ORIENTATION,
 	};
 	Orientation orientation = HORIZONTAL_ORIENTATION;
+
 	enum Alignment {
 		LEFT_ALIGNMENT,
 		CENTER_ALIGNMENT,

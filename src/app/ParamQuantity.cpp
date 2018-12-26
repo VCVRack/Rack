@@ -41,6 +41,10 @@ float ParamQuantity::getDisplayValue() {
 		// Linear
 		return getParam()->value * getParam()->displayMultiplier;
 	}
+	else if (getParam()->displayBase == 1.f) {
+		// Fixed (special case of exponential)
+		return getParam()->displayMultiplier;
+	}
 	else {
 		// Exponential
 		return std::pow(getParam()->displayBase, getParam()->value) * getParam()->displayMultiplier;
@@ -51,6 +55,10 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 	if (getParam()->displayBase == 0.f) {
 		// Linear
 		getParam()->value = displayValue / getParam()->displayMultiplier;
+	}
+	else if (getParam()->displayBase == 1.f) {
+		// Fixed
+		getParam()->value = getParam()->displayMultiplier;
 	}
 	else {
 		// Exponential

@@ -1,5 +1,4 @@
 #include "settings.hpp"
-#include "logger.hpp"
 #include "window.hpp"
 #include "plugin.hpp"
 #include "app/Scene.hpp"
@@ -33,18 +32,15 @@ static json_t *settingsToJson() {
 		json_object_set_new(rootJ, "windowPos", windowPosJ);
 	}
 
-	// opacity
-	float opacity = context()->scene->toolbar->wireOpacity;
-	json_t *opacityJ = json_real(opacity);
-	json_object_set_new(rootJ, "wireOpacity", opacityJ);
+	// wireOpacity
+	json_t *wireOpacityJ = json_real(wireOpacity);
+	json_object_set_new(rootJ, "wireOpacity", wireOpacityJ);
 
-	// tension
-	float tension = context()->scene->toolbar->wireTension;
-	json_t *tensionJ = json_real(tension);
-	json_object_set_new(rootJ, "wireTension", tensionJ);
+	// wireTension
+	json_t *wireTensionJ = json_real(wireTension);
+	json_object_set_new(rootJ, "wireTension", wireTensionJ);
 
 	// zoom
-	float zoom = context()->scene->zoomWidget->zoom;
 	json_t *zoomJ = json_real(zoom);
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
@@ -69,10 +65,10 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "moduleBrowser", moduleBrowserToJson());
 
 	// powerMeter
-	json_object_set_new(rootJ, "powerMeter", json_boolean(context()->engine->powerMeter));
+	json_object_set_new(rootJ, "powerMeter", json_boolean(powerMeter));
 
 	// checkVersion
-	json_object_set_new(rootJ, "checkVersion", json_boolean(context()->scene->checkVersion));
+	json_object_set_new(rootJ, "checkVersion", json_boolean(checkVersion));
 
 	return rootJ;
 }
@@ -99,21 +95,20 @@ static void settingsFromJson(json_t *rootJ) {
 		context()->window->setWindowPos(math::Vec(x, y));
 	}
 
-	// opacity
-	json_t *opacityJ = json_object_get(rootJ, "wireOpacity");
-	if (opacityJ)
-		context()->scene->toolbar->wireOpacity = json_number_value(opacityJ);
+	// wireOpacity
+	json_t *wireOpacityJ = json_object_get(rootJ, "wireOpacity");
+	if (wireOpacityJ)
+		wireOpacity = json_number_value(wireOpacityJ);
 
 	// tension
 	json_t *tensionJ = json_object_get(rootJ, "wireTension");
 	if (tensionJ)
-		context()->scene->toolbar->wireTension = json_number_value(tensionJ);
+		wireTension = json_number_value(tensionJ);
 
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
-	if (zoomJ) {
-		context()->scene->zoomWidget->setZoom(math::clamp((float) json_number_value(zoomJ), 0.25f, 4.0f));
-	}
+	if (zoomJ)
+		zoom = json_number_value(zoomJ);
 
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
@@ -145,12 +140,12 @@ static void settingsFromJson(json_t *rootJ) {
 	// powerMeter
 	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
 	if (powerMeterJ)
-		context()->engine->powerMeter = json_boolean_value(powerMeterJ);
+		powerMeter = json_boolean_value(powerMeterJ);
 
 	// checkVersion
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
 	if (checkVersionJ)
-		context()->scene->checkVersion = json_boolean_value(checkVersionJ);
+		checkVersion = json_boolean_value(checkVersionJ);
 }
 
 
@@ -186,6 +181,14 @@ void load(std::string filename) {
 
 	fclose(file);
 }
+
+
+float zoom = 1.0;
+float wireOpacity = 0.5;
+float wireTension = 0.5;
+bool powerMeter = false;
+bool lockModules = false;
+bool checkVersion = true;
 
 
 } // namespace settings

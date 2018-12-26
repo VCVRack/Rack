@@ -1,6 +1,5 @@
 #include "plugin.hpp"
 #include "system.hpp"
-#include "logger.hpp"
 #include "network.hpp"
 #include "asset.hpp"
 #include "string.hpp"

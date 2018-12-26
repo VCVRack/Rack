@@ -12,7 +12,6 @@
 #include "ui/TextField.hpp"
 #include "plugin.hpp"
 #include "context.hpp"
-#include "logger.hpp"
 
 
 static const float itemMargin = 2.0;

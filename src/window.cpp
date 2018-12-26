@@ -1,5 +1,4 @@
 #include "window.hpp"
-#include "logger.hpp"
 #include "asset.hpp"
 #include "app/Scene.hpp"
 #include "keyboard.hpp"

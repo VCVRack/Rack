@@ -1,6 +1,5 @@
 #include "plugin/Plugin.hpp"
 #include "plugin/Model.hpp"
-#include "logger.hpp"
 
 
 namespace rack {

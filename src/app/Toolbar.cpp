@@ -2,250 +2,531 @@
 #include "window.hpp"
 #include "engine/Engine.hpp"
 #include "asset.hpp"
-#include "ui/Tooltip.hpp"
-#include "ui/IconButton.hpp"
+#include "ui/Button.hpp"
+#include "ui/MenuItem.hpp"
 #include "ui/SequentialLayout.hpp"
 #include "ui/Slider.hpp"
-#include "app/PluginManagerWidget.hpp"
+#include "ui/TextField.hpp"
+#include "ui/PasswordField.hpp"
+#include "ui/ProgressBar.hpp"
 #include "app/Scene.hpp"
 #include "context.hpp"
+#include "settings.hpp"
 #include "helpers.hpp"
+#include "system.hpp"
+#include "plugin.hpp"
+#include <thread>
 
 
 namespace rack {
 
 
-struct TooltipIconButton : IconButton {
-	Tooltip *tooltip = NULL;
-	void onEnter(event::Enter &e) override {
-		if (!tooltip) {
-			tooltip = new Tooltip;
-			tooltip->box.pos = getAbsoluteOffset(math::Vec(0, BND_WIDGET_HEIGHT));
-			tooltip->text = getTooltipText();
-			context()->scene->addChild(tooltip);
-		}
-		IconButton::onEnter(e);
+struct MenuButton : Button {
+	void step() override {
+		box.size.x = bndLabelWidth(context()->window->vg, -1, text.c_str());
+		Widget::step();
 	}
-	void onLeave(event::Leave &e) override {
-		if (tooltip) {
-			context()->scene->removeChild(tooltip);
-			delete tooltip;
-			tooltip = NULL;
-		}
-		IconButton::onLeave(e);
+	void draw(NVGcontext *vg) override {
+		bndMenuItem(vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
 	}
-	virtual std::string getTooltipText() {return "";}
 };
 
-struct NewButton : TooltipIconButton {
-	NewButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_146097_cc.svg")));
+
+struct NewItem : MenuItem {
+	NewItem() {
+		text = "New";
+		rightText = "(" WINDOW_MOD_KEY_NAME "+N)";
 	}
-	std::string getTooltipText() override {return "New patch (" WINDOW_MOD_KEY_NAME "+N)";}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->reset();
 	}
 };
 
-struct OpenButton : TooltipIconButton {
-	OpenButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_31859_cc.svg")));
+
+struct OpenItem : MenuItem {
+	OpenItem() {
+		text = "Open";
+		rightText = "(" WINDOW_MOD_KEY_NAME "+O)";
 	}
-	std::string getTooltipText() override {return "Open patch (" WINDOW_MOD_KEY_NAME "+O)";}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->loadDialog();
 	}
 };
 
-struct SaveButton : TooltipIconButton {
-	SaveButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_1343816_cc.svg")));
+
+struct SaveItem : MenuItem {
+	SaveItem() {
+		text = "Save";
+		rightText = "(" WINDOW_MOD_KEY_NAME "+S)";
 	}
-	std::string getTooltipText() override {return "Save patch (" WINDOW_MOD_KEY_NAME "+S)";}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->saveDialog();
 	}
 };
 
-struct SaveAsButton : TooltipIconButton {
-	SaveAsButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_1343811_cc.svg")));
+
+struct SaveAsItem : MenuItem {
+	SaveAsItem() {
+		text = "Save as";
+		rightText = "(" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
-	std::string getTooltipText() override {return "Save patch as (" WINDOW_MOD_KEY_NAME "+Shift+S)";}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->saveAsDialog();
 	}
 };
 
-struct RevertButton : TooltipIconButton {
-	RevertButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_1084369_cc.svg")));
+
+struct RevertItem : MenuItem {
+	RevertItem() {
+		text = "Revert";
 	}
-	std::string getTooltipText() override {return "Revert patch";}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->revert();
 	}
 };
 
-struct DisconnectCablesButton : TooltipIconButton {
-	DisconnectCablesButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_1745061_cc.svg")));
+
+struct DisconnectCablesItem : MenuItem {
+	DisconnectCablesItem() {
+		text = "Disconnect cables";
 	}
-	std::string getTooltipText() override {return "Disconnect cables";}
 	void onAction(event::Action &e) override {
 		context()->scene->rackWidget->disconnect();
 	}
 };
 
-struct PowerMeterButton : TooltipIconButton {
-	PowerMeterButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_305536_cc.svg")));
-	}
-	std::string getTooltipText() override {return "Toggle power meter (see manual for explanation)";}
-	void onAction(event::Action &e) override {
-		context()->engine->powerMeter ^= true;
-	}
-};
 
-struct EnginePauseItem : MenuItem {
-	void onAction(event::Action &e) override {
-		context()->engine->paused ^= true;
+struct FileButton : MenuButton {
+	FileButton() {
+		text = "File";
 	}
-};
-
-struct SampleRateItem : MenuItem {
-	float sampleRate;
-	void onAction(event::Action &e) override {
-		context()->engine->setSampleRate(sampleRate);
-		context()->engine->paused = false;
-	}
-};
-
-struct SampleRateButton : TooltipIconButton {
-	SampleRateButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_1240789_cc.svg")));
-	}
-	std::string getTooltipText() override {return "Engine sample rate";}
 	void onAction(event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(createMenuLabel("Engine sample rate"));
-
-		EnginePauseItem *pauseItem = new EnginePauseItem;
-		pauseItem->text = context()->engine->paused ? "Resume engine" : "Pause engine";
-		menu->addChild(pauseItem);
-
-		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
-		for (float sampleRate : sampleRates) {
-			SampleRateItem *item = new SampleRateItem;
-			item->text = string::f("%.0f Hz", sampleRate);
-			item->rightText = CHECKMARK(context()->engine->getSampleRate() == sampleRate);
-			item->sampleRate = sampleRate;
-			menu->addChild(item);
-		}
+		menu->addChild(new NewItem);
+		menu->addChild(new OpenItem);
+		menu->addChild(new SaveItem);
+		menu->addChild(new SaveAsItem);
+		menu->addChild(new RevertItem);
+		menu->addChild(new DisconnectCablesItem);
 	}
-};
-
-struct RackLockButton : TooltipIconButton {
-	RackLockButton() {
-		setSVG(SVG::load(asset::system("res/icons/noun_468341_cc.svg")));
-	}
-	std::string getTooltipText() override {return "Lock modules";}
-	void onAction(event::Action &e) override {
-		context()->scene->rackWidget->lockModules ^= true;
-	}
-};
-
-struct WireOpacityQuantity : Quantity {
-	void setValue(float value) override {
-		// TODO
-	}
-	float getValue() override {
-		return 0;
-	}
-	float getDefaultValue() override {return 0.5;}
-	std::string getLabel() override {return "Cable opacity";}
-	int getDisplayPrecision() override {return 0;}
-};
-
-
-struct WireTensionQuantity : Quantity {
-	void setValue(float value) override {
-		// TODO
-	}
-	float getValue() override {
-		return 0;
-	}
-	float getDefaultValue() override {return 0.5;}
-	std::string getLabel() override {return "Cable tension";}
-	int getDisplayPrecision() override {return 0;}
 };
 
 
 struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
-		context()->scene->zoomWidget->setZoom(std::round(value) / 100);
+		settings::zoom = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return context()->scene->zoomWidget->zoom * 100;
+		return settings::zoom;
 	}
-	float getMinValue() override {return 25;}
-	float getMaxValue() override {return 200;}
-	float getDefaultValue() override {return 100;}
+	float getMinValue() override {return 0.25;}
+	float getMaxValue() override {return 2.0;}
+	float getDefaultValue() override {return 1.0;}
+	float getDisplayValue() override {return getValue() * 100.0;}
+	void setDisplayValue(float displayValue) override {setValue(displayValue / 100.0);}
 	std::string getLabel() override {return "Zoom";}
 	std::string getUnit() override {return "%";}
 	int getDisplayPrecision() override {return 0;}
 };
 
 
+struct WireOpacityQuantity : Quantity {
+	void setValue(float value) override {
+		settings::wireOpacity = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::wireOpacity;
+	}
+	float getDefaultValue() override {return 0.5;}
+	float getDisplayValue() override {return getValue() * 100.0;}
+	void setDisplayValue(float displayValue) override {setValue(displayValue / 100.0);}
+	std::string getLabel() override {return "Cable opacity";}
+	std::string getUnit() override {return "%";}
+	int getDisplayPrecision() override {return 0;}
+};
+
+
+
+struct WireTensionQuantity : Quantity {
+	void setValue(float value) override {
+		settings::wireTension = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::wireTension;
+	}
+	float getDefaultValue() override {return 0.5;}
+	std::string getLabel() override {return "Cable tension";}
+	int getDisplayPrecision() override {return 2;}
+};
+
+
+struct PowerMeterItem : MenuItem {
+	PowerMeterItem() {
+		text = "Power meter";
+		rightText = CHECKMARK(settings::powerMeter);
+	}
+	void onAction(event::Action &e) override {
+		settings::powerMeter ^= true;
+	}
+};
+
+
+struct LockModulesItem : MenuItem {
+	LockModulesItem() {
+		text = "Lock modules";
+		rightText = CHECKMARK(settings::lockModules);
+	}
+	void onAction(event::Action &e) override {
+		settings::lockModules ^= true;
+	}
+};
+
+
+struct EnginePauseItem : MenuItem {
+	EnginePauseItem() {
+		text = "Pause engine";
+		rightText = CHECKMARK(context()->engine->paused);
+	}
+	void onAction(event::Action &e) override {
+		context()->engine->paused ^= true;
+	}
+};
+
+
+struct SampleRateValueItem : MenuItem {
+	float sampleRate;
+	SampleRateValueItem(float sampleRate) {
+		this->sampleRate = sampleRate;
+		text = string::f("%.0f Hz", sampleRate);
+		rightText = CHECKMARK(context()->engine->getSampleRate() == sampleRate);
+	}
+	void onAction(event::Action &e) override {
+		context()->engine->setSampleRate(sampleRate);
+		context()->engine->paused = false;
+	}
+};
+
+
+struct SampleRateItem : MenuItem {
+	SampleRateItem() {
+		text = "Engine sample rate";
+	}
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu;
+
+		menu->addChild(new EnginePauseItem);
+
+		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
+		for (float sampleRate : sampleRates) {
+			menu->addChild(new SampleRateValueItem(sampleRate));
+		}
+		return menu;
+	}
+};
+
+
+struct SettingsButton : MenuButton {
+	SettingsButton() {
+		text = "Settings";
+	}
+	void onAction(event::Action &e) override {
+		Menu *menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		menu->addChild(new PowerMeterItem);
+		menu->addChild(new LockModulesItem);
+		menu->addChild(new SampleRateItem);
+
+		Slider *zoomSlider = new Slider;
+		zoomSlider->box.size.x = 200.0;
+		zoomSlider->quantity = new ZoomQuantity;
+		menu->addChild(zoomSlider);
+
+		Slider *wireOpacitySlider = new Slider;
+		wireOpacitySlider->box.size.x = 200.0;
+		wireOpacitySlider->quantity = new WireOpacityQuantity;
+		menu->addChild(wireOpacitySlider);
+
+		Slider *wireTensionSlider = new Slider;
+		wireTensionSlider->box.size.x = 200.0;
+		wireTensionSlider->quantity = new WireTensionQuantity;
+		menu->addChild(wireTensionSlider);
+	}
+};
+
+
+struct RegisterItem : MenuItem {
+	RegisterItem() {
+		text = "Register VCV account";
+	}
+	void onAction(event::Action &e) override {
+		std::thread t([&]() {
+			system::openBrowser("https://vcvrack.com/");
+		});
+		t.detach();
+	}
+};
+
+
+struct AccountEmailField : TextField {
+	TextField *passwordField;
+	AccountEmailField() {
+		placeholder = "Email";
+	}
+	void onSelectKey(event::SelectKey &e) override {
+		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
+			context()->event->selectedWidget = passwordField;
+			e.target = this;
+			return;
+		}
+		TextField::onSelectKey(e);
+	}
+};
+
+
+struct AccountPasswordField : PasswordField {
+	MenuItem *logInItem;
+	AccountPasswordField() {
+		placeholder = "Password";
+	}
+	void onSelectKey(event::SelectKey &e) override {
+		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
+			logInItem->doAction();
+			e.target = this;
+			return;
+		}
+		PasswordField::onSelectKey(e);
+	}
+};
+
+
+struct LogInItem : MenuItem {
+	TextField *emailField;
+	TextField *passwordField;
+	LogInItem() {
+		text = "Log in";
+	}
+	void onAction(event::Action &e) override {
+		std::string email = emailField->text;
+		std::string password = passwordField->text;
+		std::thread t([&, email, password]() {
+			plugin::logIn(email, password);
+		});
+		t.detach();
+	}
+};
+
+
+struct ManageItem : MenuItem {
+	ManageItem() {
+		text = "Manage plugins";
+	}
+	void onAction(event::Action &e) override {
+		std::thread t([&]() {
+			system::openBrowser("https://vcvrack.com/plugins.html");
+		});
+		t.detach();
+	}
+};
+
+
+// struct SyncButton : Button {
+// 	bool checked = false;
+// 	/** Updates are available */
+// 	bool available = false;
+// 	/** Plugins have been updated */
+// 	bool completed = false;
+
+// 	void step() override {
+// 		// Check for plugin update on first step()
+// 		if (!checked) {
+// 			std::thread t([this]() {
+// 				if (plugin::sync(true))
+// 					available = true;
+// 			});
+// 			t.detach();
+// 			checked = true;
+// 		}
+// 		// Display message if we've completed updates
+// 		if (completed) {
+// 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
+// 				context()->window->close();
+// 			}
+// 			completed = false;
+// 		}
+// 	}
+// 	void onAction(event::Action &e) override {
+// 		available = false;
+// 		std::thread t([this]() {
+// 			if (plugin::sync(false))
+// 				completed = true;
+// 		});
+// 		t.detach();
+// 	}
+// };
+
+
+struct LogOutItem : MenuItem {
+	LogOutItem() {
+		text = "Log out";
+	}
+	void onAction(event::Action &e) override {
+		plugin::logOut();
+	}
+};
+
+
+struct DownloadQuantity : Quantity {
+	float getValue() override {
+		return plugin::downloadProgress;
+	}
+
+	float getDisplayValue() override {
+		return getValue() * 100.f;
+	}
+
+	int getDisplayPrecision() override {return 0;}
+
+	std::string getLabel() override {
+		return "Downloading " + plugin::downloadName;
+	}
+
+	std::string getUnit() override {return "%";}
+};
+
+
+struct PluginsButton : MenuButton {
+	PluginsButton() {
+		text = "Plugins";
+	}
+	void onAction(event::Action &e) override {
+		Menu *menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		// TODO Design dialog box for plugin syncing
+		if (plugin::isDownloading) {
+			ProgressBar *downloadProgressBar = new ProgressBar;
+			downloadProgressBar->quantity = new DownloadQuantity;
+			menu->addChild(downloadProgressBar);
+		}
+		else if (plugin::isLoggedIn()) {
+			menu->addChild(new ManageItem);
+			menu->addChild(new LogOutItem);
+		}
+		else {
+			menu->addChild(new RegisterItem);
+			AccountEmailField *emailField = new AccountEmailField;
+			emailField->box.size.x = 200.0;
+			menu->addChild(emailField);
+			AccountPasswordField *passwordField = new AccountPasswordField;
+			passwordField->box.size.x = 200.0;
+			emailField->passwordField = passwordField;
+			menu->addChild(passwordField);
+			LogInItem *logInItem = new LogInItem;
+			logInItem->emailField = emailField;
+			logInItem->passwordField = passwordField;
+			passwordField->logInItem = logInItem;
+			menu->addChild(logInItem);
+		}
+	}
+
+	void draw(NVGcontext *vg) override {
+		MenuButton::draw(vg);
+		// if (1) {
+		// 	// Notification circle
+		// 	nvgBeginPath(vg);
+		// 	nvgCircle(vg, box.size.x - 3, 3, 4.0);
+		// 	nvgFillColor(vg, nvgRGBf(1.0, 0.0, 0.0));
+		// 	nvgFill(vg);
+		// 	nvgStrokeColor(vg, nvgRGBf(0.5, 0.0, 0.0));
+		// 	nvgStroke(vg);
+		// }
+	}
+};
+
+
+struct ManualItem : MenuItem {
+	ManualItem() {
+		text = "Manual";
+	}
+	void onAction(event::Action &e) override {
+		std::thread t([&]() {
+			system::openBrowser("https://vcvrack.com/manual/");
+		});
+		t.detach();
+	}
+};
+
+
+struct WebsiteItem : MenuItem {
+	WebsiteItem() {
+		text = "VCVRack.com";
+	}
+	void onAction(event::Action &e) override {
+		std::thread t([&]() {
+			system::openBrowser("https://vcvrack.com/");
+		});
+		t.detach();
+	}
+};
+
+
+struct CheckVersionItem : MenuItem {
+	CheckVersionItem() {
+		text = "Check version on launch";
+		rightText = CHECKMARK(settings::checkVersion);
+	}
+	void onAction(event::Action &e) override {
+		settings::checkVersion ^= true;
+	}
+};
+
+
+struct HelpButton : MenuButton {
+	HelpButton() {
+		text = "Help";
+	}
+	void onAction(event::Action &e) override {
+		Menu *menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		menu->addChild(new ManualItem);
+		menu->addChild(new WebsiteItem);
+		menu->addChild(new CheckVersionItem);
+	}
+};
+
+
 Toolbar::Toolbar() {
-	box.size.y = BND_WIDGET_HEIGHT + 2*5;
+	const float margin = 5;
+	box.size.y = BND_WIDGET_HEIGHT + 2*margin;
 
 	SequentialLayout *layout = new SequentialLayout;
-	layout->box.pos = math::Vec(5, 5);
-	layout->spacing = 5;
+	layout->box.pos = math::Vec(margin, margin);
+	layout->spacing = 0.0;
 	addChild(layout);
 
-	layout->addChild(new NewButton);
-	layout->addChild(new OpenButton);
-	layout->addChild(new SaveButton);
-	layout->addChild(new SaveAsButton);
-	layout->addChild(new RevertButton);
-	layout->addChild(new DisconnectCablesButton);
+	FileButton *fileButton = new FileButton;
+	layout->addChild(fileButton);
 
-	layout->addChild(new SampleRateButton);
-	layout->addChild(new PowerMeterButton);
-	layout->addChild(new RackLockButton);
+	SettingsButton *settingsButton = new SettingsButton;
+	layout->addChild(settingsButton);
 
-	Slider *wireOpacitySlider = new Slider;
-	WireOpacityQuantity *wireOpacityQuantity = new WireOpacityQuantity;
-	wireOpacitySlider->quantity = wireOpacityQuantity;
-	wireOpacitySlider->box.size.x = 150;
-	layout->addChild(wireOpacitySlider);
+	PluginsButton *pluginsButton = new PluginsButton;
+	layout->addChild(pluginsButton);
 
-	Slider *wireTensionSlider = new Slider;
-	WireTensionQuantity *wireTensionQuantity = new WireTensionQuantity;
-	wireTensionSlider->quantity = wireTensionQuantity;
-	wireTensionSlider->box.size.x = 150;
-	layout->addChild(wireTensionSlider);
-
-	Slider *zoomSlider = new Slider;
-	ZoomQuantity *zoomQuantity = new ZoomQuantity;
-	zoomSlider->quantity = zoomQuantity;
-	zoomSlider->box.size.x = 150;
-	layout->addChild(zoomSlider);
-
-	// Kind of hacky, but display the PluginManagerWidget only if the user directory is not the development directory
-	if (asset::user("") != "./") {
-		Widget *pluginManager = new PluginManagerWidget;
-		layout->addChild(pluginManager);
-	}
+	HelpButton *helpButton = new HelpButton;
+	layout->addChild(helpButton);
 }
 
 void Toolbar::draw(NVGcontext *vg) {
-	bndBackground(vg, 0.0, 0.0, box.size.x, box.size.y);
+	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, 0);
 	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 
 	Widget::draw(vg);

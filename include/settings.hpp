@@ -10,5 +10,13 @@ void save(std::string filename);
 void load(std::string filename);
 
 
+extern float zoom;
+extern float wireOpacity;
+extern float wireTension;
+extern bool powerMeter;
+extern bool lockModules;
+extern bool checkVersion;
+
+
 } // namespace settings
 } // namespace rack

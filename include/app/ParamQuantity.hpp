@@ -26,7 +26,7 @@ struct ParamQuantity : Quantity {
 	float getMaxValue() override;
 	float getDefaultValue() override;
 	float getDisplayValue() override;
-	void setDisplayValue(float displayValue) override ;
+	void setDisplayValue(float displayValue) override;
 	int getDisplayPrecision() override;
 	std::string getLabel() override;
 	std::string getUnit() override;

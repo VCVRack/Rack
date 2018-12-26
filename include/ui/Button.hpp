@@ -24,7 +24,6 @@ struct Button : OpaqueWidget {
 
 	void draw(NVGcontext *vg) override {
 		bndToolButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str());
-		Widget::draw(vg);
 	}
 
 	void onEnter(event::Enter &e) override {

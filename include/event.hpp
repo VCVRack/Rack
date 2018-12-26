@@ -153,7 +153,6 @@ struct DragMove : Event {
 
 
 /** Occurs every frame when the mouse is hovering over a Widget while dragging.
-Must consume to allow DragEnter, DragLeave, and DragDrop to occur.
 */
 struct DragHover : Event, Position {
 	/** Change in mouse position since the last frame. Can be zero. */
@@ -217,6 +216,13 @@ struct Context {
 	/** For middle-click dragging */
 	Widget *scrollWidget = NULL;
 
+	void setHovered(Widget *w);
+	void setDragged(Widget *w);
+	void setDragHovered(Widget *w);
+	void setSelected(Widget *w);
+	/** Prepares a widget for deletion */
+	void finalizeWidget(Widget *w);
+
 	void handleButton(math::Vec pos, int button, int action, int mods);
 	void handleHover(math::Vec pos, math::Vec mouseDelta);
 	void handleLeave();
@@ -225,8 +231,6 @@ struct Context {
 	void handleKey(math::Vec pos, int key, int scancode, int action, int mods);
 	void handleDrop(math::Vec pos, std::vector<std::string> paths);
 	void handleZoom();
-	/** Prepares a widget for deletion */
-	void finalizeWidget(Widget *w);
 };
 
 

@@ -1,6 +1,5 @@
 #include "bridge.hpp"
 #include "string.hpp"
-#include "logger.hpp"
 #include "dsp/ringbuffer.hpp"
 
 #include <unistd.h>

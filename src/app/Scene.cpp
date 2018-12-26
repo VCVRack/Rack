@@ -5,7 +5,6 @@
 #include "app/ModuleBrowser.hpp"
 #include "app/RackScrollWidget.hpp"
 #include "context.hpp"
-#include "logger.hpp"
 #include <thread>
 
 

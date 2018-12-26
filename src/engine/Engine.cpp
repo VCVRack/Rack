@@ -1,4 +1,5 @@
 #include "engine/Engine.hpp"
+#include "settings.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -125,7 +126,7 @@ static void Engine_step(Engine *engine) {
 
 	// Step modules
 	for (Module *module : engine->modules) {
-		if (engine->powerMeter) {
+		if (settings::powerMeter) {
 			auto startTime = std::chrono::high_resolution_clock::now();
 
 			module->step();

@@ -1,11 +1,11 @@
 #include "app/ModuleWidget.hpp"
 #include "engine/Engine.hpp"
-#include "logger.hpp"
 #include "system.hpp"
 #include "asset.hpp"
 #include "app/Scene.hpp"
 #include "helpers.hpp"
 #include "context.hpp"
+#include "settings.hpp"
 
 #include "osdialog.h"
 
@@ -255,7 +255,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 
 	// Power meter
-	if (module && context()->engine->powerMeter) {
+	if (module && settings::powerMeter) {
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, box.size.y - 20,
@@ -372,7 +372,7 @@ void ModuleWidget::onDragEnd(event::DragEnd &e) {
 }
 
 void ModuleWidget::onDragMove(event::DragMove &e) {
-	if (!context()->scene->rackWidget->lockModules) {
+	if (!settings::lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = context()->scene->rackWidget->lastMousePos.minus(dragPos);
 		context()->scene->rackWidget->requestModuleBoxNearest(this, newBox);

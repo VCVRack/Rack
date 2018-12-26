@@ -15,7 +15,6 @@ struct Engine {
 	std::vector<Module*> modules;
 	std::vector<Wire*> wires;
 	bool paused = false;
-	bool powerMeter = false;
 
 	struct Internal;
 	Internal *internal;
