@@ -13,7 +13,7 @@ struct Port {
 	/** Voltage of the port */
 	union {
 		float value;
-		float values[PORT_MAX_CHANNELS];
+		float values[PORT_MAX_CHANNELS] = {};
 	};
 	/** Number of polyphonic channels */
 	int numChannels = 1;
