@@ -393,7 +393,6 @@ void ModuleWidget::onDragMove(event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = context()->scene->rackWidget->lastMousePos.minus(dragPos);
-		DEBUG("%f %f", newBox.pos.x, newBox.pos.y);
 		context()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}
 }

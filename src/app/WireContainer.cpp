@@ -20,13 +20,13 @@ void WireContainer::commitActiveWire() {
 	if (!activeWire)
 		return;
 
-	if (activeWire->hoveredInputPort) {
-		activeWire->inputPort = activeWire->hoveredInputPort;
-		activeWire->hoveredInputPort = NULL;
-	}
 	if (activeWire->hoveredOutputPort) {
 		activeWire->outputPort = activeWire->hoveredOutputPort;
 		activeWire->hoveredOutputPort = NULL;
+	}
+	if (activeWire->hoveredInputPort) {
+		activeWire->inputPort = activeWire->hoveredInputPort;
+		activeWire->hoveredInputPort = NULL;
 	}
 	activeWire->updateWire();
 

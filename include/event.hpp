@@ -155,6 +155,7 @@ struct DragMove : Event {
 /** Occurs every frame when the mouse is hovering over a Widget while dragging.
 */
 struct DragHover : Event, Position {
+	Widget *origin = NULL;
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
 };

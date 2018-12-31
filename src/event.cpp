@@ -51,6 +51,7 @@ void Context::setDragHovered(Widget *w) {
 	if (dragHoveredWidget) {
 		// event::DragLeave
 		event::DragLeave eDragLeave;
+		eDragLeave.origin = draggedWidget;
 		dragHoveredWidget->onDragLeave(eDragLeave);
 	}
 
@@ -59,6 +60,7 @@ void Context::setDragHovered(Widget *w) {
 	if (dragHoveredWidget) {
 		// event::DragEnter
 		event::DragEnter eDragEnter;
+		eDragEnter.origin = draggedWidget;
 		dragHoveredWidget->onDragEnter(eDragEnter);
 	}
 }
@@ -144,6 +146,7 @@ void Context::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		event::DragHover eDragHover;
 		eDragHover.pos = pos;
 		eDragHover.mouseDelta = mouseDelta;
+		eDragHover.origin = draggedWidget;
 		rootWidget->onDragHover(eDragHover);
 
 		setDragHovered(eDragHover.target);

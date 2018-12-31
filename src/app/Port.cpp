@@ -51,39 +51,33 @@ void Port::draw(NVGcontext *vg) {
 }
 
 void Port::onButton(event::Button &e) {
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		context()->scene->rackWidget->wireContainer->removeTopWire(this);
 
 		// HACK
 		// Update hovered*Port of active wire if applicable
-		event::DragEnter eDragEnter;
-		onDragEnter(eDragEnter);
+		// event::DragEnter eDragEnter;
+		// onDragEnter(eDragEnter);
 	}
 	e.target = this;
 }
 
 void Port::onDragStart(event::DragStart &e) {
 	// Try to grab wire on top of stack
-	WireWidget *wire = context()->scene->rackWidget->wireContainer->getTopWire(this);
-	if (type == OUTPUT && context()->window->isModPressed()) {
-		wire = NULL;
+	WireWidget *wire = NULL;
+	if (type == INPUT || !context()->window->isModPressed()) {
+		wire = context()->scene->rackWidget->wireContainer->getTopWire(this);
 	}
 
 	if (wire) {
 		// Disconnect existing wire
-		if (type == INPUT)
-			wire->inputPort = NULL;
-		else
-			wire->outputPort = NULL;
+		(type == INPUT ? wire->inputPort : wire->outputPort) = NULL;
 		wire->updateWire();
 	}
 	else {
 		// Create a new wire
 		wire = new WireWidget;
-		if (type == INPUT)
-			wire->inputPort = this;
-		else
-			wire->outputPort = this;
+		(type == INPUT ? wire->inputPort : wire->outputPort) = this;
 	}
 	context()->scene->rackWidget->wireContainer->setActiveWire(wire);
 }
@@ -95,9 +89,21 @@ void Port::onDragEnd(event::DragEnd &e) {
 }
 
 void Port::onDragDrop(event::DragDrop &e) {
+	Port *originPort = dynamic_cast<Port*>(e.origin);
+	if (!originPort)
+		return;
+
+	// Fake onDragEnter because onDragLeave is triggered immediately before this one
+	event::DragEnter eDragEnter;
+	eDragEnter.origin = e.origin;
+	onDragEnter(eDragEnter);
 }
 
 void Port::onDragEnter(event::DragEnter &e) {
+	Port *originPort = dynamic_cast<Port*>(e.origin);
+	if (!originPort)
+		return;
+
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		WireWidget *topWire = context()->scene->rackWidget->wireContainer->getTopWire(this);
@@ -107,20 +113,18 @@ void Port::onDragEnter(event::DragEnter &e) {
 
 	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
-		if (type == INPUT)
-			activeWire->hoveredInputPort = this;
-		else
-			activeWire->hoveredOutputPort = this;
+		(type == INPUT ? activeWire->hoveredInputPort : activeWire->hoveredOutputPort) = this;
 	}
 }
 
 void Port::onDragLeave(event::DragLeave &e) {
+	Port *originPort = dynamic_cast<Port*>(e.origin);
+	if (!originPort)
+		return;
+
 	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
-		if (type == INPUT)
-			activeWire->hoveredInputPort = NULL;
-		else
-			activeWire->hoveredOutputPort = NULL;
+		(type == INPUT ? activeWire->hoveredInputPort : activeWire->hoveredOutputPort) = NULL;
 	}
 }
 
