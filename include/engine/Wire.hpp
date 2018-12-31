@@ -7,6 +7,7 @@ namespace rack {
 
 
 struct Wire {
+	int id = 0;
 	Module *outputModule = NULL;
 	int outputId;
 	Module *inputModule = NULL;

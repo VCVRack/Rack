@@ -13,7 +13,7 @@ namespace rack {
 
 
 struct Module {
-	int id = -1;
+	int id = 0;
 	std::vector<Param> params;
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;

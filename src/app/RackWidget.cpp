@@ -235,7 +235,7 @@ json_t *RackWidget::toJson() {
 	json_object_set_new(rootJ, "modules", modulesJ);
 
 	// wires
-	json_t *wires = json_array();
+	json_t *wiresJ = json_array();
 	for (Widget *w : wireContainer->children) {
 		WireWidget *wireWidget = dynamic_cast<WireWidget*>(w);
 		assert(wireWidget);
@@ -245,20 +245,24 @@ json_t *RackWidget::toJson() {
 		// Only serialize WireWidgets connected on both ends
 		if (!(outputPort && inputPort))
 			continue;
+
+		Wire *wire = wireWidget->wire;
+		assert(wire);
 		// wire
-		json_t *wire = wireWidget->toJson();
+		json_t *wireJ = wireWidget->toJson();
 
 		assert(outputPort->module);
 		assert(inputPort->module);
 
-		json_object_set_new(wire, "outputModuleId", json_integer(outputPort->module->id));
-		json_object_set_new(wire, "outputId", json_integer(outputPort->portId));
-		json_object_set_new(wire, "inputModuleId", json_integer(inputPort->module->id));
-		json_object_set_new(wire, "inputId", json_integer(inputPort->portId));
+		json_object_set_new(wireJ, "id", json_integer(wire->id));
+		json_object_set_new(wireJ, "outputModuleId", json_integer(outputPort->module->id));
+		json_object_set_new(wireJ, "outputId", json_integer(outputPort->portId));
+		json_object_set_new(wireJ, "inputModuleId", json_integer(inputPort->module->id));
+		json_object_set_new(wireJ, "inputId", json_integer(inputPort->portId));
 
-		json_array_append_new(wires, wire);
+		json_array_append_new(wiresJ, wireJ);
 	}
-	json_object_set_new(rootJ, "wires", wires);
+	json_object_set_new(rootJ, "wires", wiresJ);
 
 	return rootJ;
 }
@@ -306,7 +310,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 		if (moduleWidget) {
 			// id
 			json_t *idJ = json_object_get(moduleJ, "id");
-			int id = -1;
+			int id = 0;
 			if (idJ)
 				id = json_integer_value(idJ);
 			// pos

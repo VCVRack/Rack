@@ -52,7 +52,8 @@ struct Engine::Internal {
 
 	Module *resetModule = NULL;
 	Module *randomizeModule = NULL;
-	int nextModuleId = 0;
+	int nextModuleId = 1;
+	int nextWireId = 1;
 
 	// Parameter smoothing
 	Module *smoothModule = NULL;
@@ -218,7 +219,7 @@ void Engine::addModule(Module *module) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
 	// Set ID
-	assert(module->id == -1);
+	assert(module->id == 0);
 	module->id = internal->nextModuleId++;
 	// Check that the module is not already added
 	auto it = std::find(modules.begin(), modules.end(), module);
@@ -245,7 +246,7 @@ void Engine::removeModule(Module *module) {
 	// Remove the module
 	modules.erase(it);
 	// Remove id
-	module->id = -1;
+	module->id = 0;
 }
 
 void Engine::resetModule(Module *module) {
@@ -285,6 +286,9 @@ void Engine::addWire(Wire *wire) {
 		assert(wire2 != wire);
 		assert(!(wire2->inputModule == wire->inputModule && wire2->inputId == wire->inputId));
 	}
+	// Set ID
+	assert(wire->id == 0);
+	wire->id = internal->nextWireId++;
 	// Add the wire
 	wires.push_back(wire);
 	Engine_updateActive(this);
@@ -302,6 +306,8 @@ void Engine::removeWire(Wire *wire) {
 	// Remove the wire
 	wires.erase(it);
 	Engine_updateActive(this);
+	// Remove ID
+	wire->id = 0;
 }
 
 void Engine::setParam(Module *module, int paramId, float value) {
