@@ -2,7 +2,7 @@
 #include "app/common.hpp"
 #include "widgets/TransparentWidget.hpp"
 #include "app/WireWidget.hpp"
-#include "app/Port.hpp"
+#include "app/PortWidget.hpp"
 
 
 namespace rack {
@@ -14,10 +14,10 @@ struct WireContainer : TransparentWidget {
 	void setActiveWire(WireWidget *w);
 	/** "Drops" the wire onto the port, making an engine connection if successful */
 	void commitActiveWire();
-	void removeTopWire(Port *port);
-	void removeAllWires(Port *port);
+	void removeTopWire(PortWidget *port);
+	void removeAllWires(PortWidget *port);
 	/** Returns the most recently added wire connected to the given Port, i.e. the top of the stack */
-	WireWidget *getTopWire(Port *port);
+	WireWidget *getTopWire(PortWidget *port);
 	void draw(NVGcontext *vg) override;
 };
 

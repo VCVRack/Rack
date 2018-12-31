@@ -1,21 +1,18 @@
 #pragma once
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
-#include "app/Port.hpp"
+#include "app/PortWidget.hpp"
 #include "engine/Wire.hpp"
 
 
 namespace rack {
 
 
-struct Port;
-
-
 struct WireWidget : OpaqueWidget {
-	Port *outputPort = NULL;
-	Port *inputPort = NULL;
-	Port *hoveredOutputPort = NULL;
-	Port *hoveredInputPort = NULL;
+	PortWidget *outputPort = NULL;
+	PortWidget *inputPort = NULL;
+	PortWidget *hoveredOutputPort = NULL;
+	PortWidget *hoveredInputPort = NULL;
 	Wire *wire = NULL;
 	NVGcolor color;
 

@@ -1,4 +1,4 @@
-#include "app/Port.hpp"
+#include "app/PortWidget.hpp"
 #include "app/Scene.hpp"
 #include "window.hpp"
 #include "context.hpp"
@@ -18,17 +18,17 @@ struct PlugLight : MultiLightWidget {
 };
 
 
-Port::Port() {
+PortWidget::PortWidget() {
 	plugLight = new PlugLight;
 }
 
-Port::~Port() {
-	// plugLight is not a child and is thus owned by the Port, so we need to delete it here
+PortWidget::~PortWidget() {
+	// plugLight is not a child and is thus owned by the PortWidget, so we need to delete it here
 	delete plugLight;
 	context()->scene->rackWidget->wireContainer->removeAllWires(this);
 }
 
-void Port::step() {
+void PortWidget::step() {
 	std::vector<float> values(2);
 	if (type == INPUT) {
 		values[0] = module->inputs[portId].plugLights[0].getBrightness();
@@ -41,28 +41,28 @@ void Port::step() {
 	plugLight->setValues(values);
 }
 
-void Port::draw(NVGcontext *vg) {
+void PortWidget::draw(NVGcontext *vg) {
 	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
-		// Dim the Port if the active wire cannot plug into this Port
+		// Dim the PortWidget if the active wire cannot plug into this PortWidget
 		if (type == INPUT ? activeWire->inputPort : activeWire->outputPort)
 			nvgGlobalAlpha(vg, 0.5);
 	}
 }
 
-void Port::onButton(event::Button &e) {
+void PortWidget::onButton(event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		context()->scene->rackWidget->wireContainer->removeTopWire(this);
 
 		// HACK
-		// Update hovered*Port of active wire if applicable
+		// Update hovered*PortWidget of active wire if applicable
 		// event::DragEnter eDragEnter;
 		// onDragEnter(eDragEnter);
 	}
 	e.target = this;
 }
 
-void Port::onDragStart(event::DragStart &e) {
+void PortWidget::onDragStart(event::DragStart &e) {
 	// Try to grab wire on top of stack
 	WireWidget *wire = NULL;
 	if (type == INPUT || !context()->window->isModPressed()) {
@@ -82,14 +82,14 @@ void Port::onDragStart(event::DragStart &e) {
 	context()->scene->rackWidget->wireContainer->setActiveWire(wire);
 }
 
-void Port::onDragEnd(event::DragEnd &e) {
+void PortWidget::onDragEnd(event::DragEnd &e) {
 	// FIXME
-	// If the source Port is deleted, this will be called, removing the cable
+	// If the source PortWidget is deleted, this will be called, removing the cable
 	context()->scene->rackWidget->wireContainer->commitActiveWire();
 }
 
-void Port::onDragDrop(event::DragDrop &e) {
-	Port *originPort = dynamic_cast<Port*>(e.origin);
+void PortWidget::onDragDrop(event::DragDrop &e) {
+	PortWidget *originPort = dynamic_cast<PortWidget*>(e.origin);
 	if (!originPort)
 		return;
 
@@ -99,8 +99,8 @@ void Port::onDragDrop(event::DragDrop &e) {
 	onDragEnter(eDragEnter);
 }
 
-void Port::onDragEnter(event::DragEnter &e) {
-	Port *originPort = dynamic_cast<Port*>(e.origin);
+void PortWidget::onDragEnter(event::DragEnter &e) {
+	PortWidget *originPort = dynamic_cast<PortWidget*>(e.origin);
 	if (!originPort)
 		return;
 
@@ -117,8 +117,8 @@ void Port::onDragEnter(event::DragEnter &e) {
 	}
 }
 
-void Port::onDragLeave(event::DragLeave &e) {
-	Port *originPort = dynamic_cast<Port*>(e.origin);
+void PortWidget::onDragLeave(event::DragLeave &e) {
+	PortWidget *originPort = dynamic_cast<PortWidget*>(e.origin);
 	if (!originPort)
 		return;
 

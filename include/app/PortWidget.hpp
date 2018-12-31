@@ -8,7 +8,7 @@
 namespace rack {
 
 
-struct Port : OpaqueWidget {
+struct PortWidget : OpaqueWidget {
 	Module *module = NULL;
 	int portId;
 
@@ -19,8 +19,8 @@ struct Port : OpaqueWidget {
 	PortType type = INPUT;
 	MultiLightWidget *plugLight;
 
-	Port();
-	~Port();
+	PortWidget();
+	~PortWidget();
 	void step() override;
 	void draw(NVGcontext *vg) override;
 	void onButton(event::Button &e) override;

@@ -24,7 +24,7 @@ void SVGPort::setSVG(std::shared_ptr<SVG> svg) {
 }
 
 void SVGPort::draw(NVGcontext *vg) {
-	Port::draw(vg);
+	PortWidget::draw(vg);
 	FramebufferWidget::draw(vg);
 }
 

@@ -240,8 +240,8 @@ json_t *RackWidget::toJson() {
 		WireWidget *wireWidget = dynamic_cast<WireWidget*>(w);
 		assert(wireWidget);
 
-		Port *outputPort = wireWidget->outputPort;
-		Port *inputPort = wireWidget->inputPort;
+		PortWidget *outputPort = wireWidget->outputPort;
+		PortWidget *inputPort = wireWidget->inputPort;
 		// Only serialize WireWidgets connected on both ends
 		if (!(outputPort && inputPort))
 			continue;
@@ -362,21 +362,21 @@ void RackWidget::fromJson(json_t *rootJ) {
 		if (!inputModuleWidget) continue;
 
 		// Get port widgets
-		Port *outputPort = NULL;
-		Port *inputPort = NULL;
+		PortWidget *outputPort = NULL;
+		PortWidget *inputPort = NULL;
 		if (legacy && legacy <= 1) {
-			// Before 0.6, the index of the "ports" array was the index of the Port in the `outputs` and `inputs` vector.
+			// Before 0.6, the index of the "ports" array was the index of the PortWidget in the `outputs` and `inputs` vector.
 			outputPort = outputModuleWidget->outputs[outputId];
 			inputPort = inputModuleWidget->inputs[inputId];
 		}
 		else {
-			for (Port *port : outputModuleWidget->outputs) {
+			for (PortWidget *port : outputModuleWidget->outputs) {
 				if (port->portId == outputId) {
 					outputPort = port;
 					break;
 				}
 			}
-			for (Port *port : inputModuleWidget->inputs) {
+			for (PortWidget *port : inputModuleWidget->inputs) {
 				if (port->portId == inputId) {
 					inputPort = port;
 					break;

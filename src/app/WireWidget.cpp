@@ -101,8 +101,8 @@ WireWidget::~WireWidget() {
 void WireWidget::updateWire() {
 	if (inputPort && outputPort) {
 		// Check correct types
-		assert(inputPort->type == Port::INPUT);
-		assert(outputPort->type == Port::OUTPUT);
+		assert(inputPort->type == PortWidget::INPUT);
+		assert(outputPort->type == PortWidget::OUTPUT);
 
 		if (!wire) {
 			wire = new Wire;
@@ -173,7 +173,7 @@ void WireWidget::draw(NVGcontext *vg) {
 			opacity = 1.0;
 	}
 	else {
-		Port *hoveredPort = dynamic_cast<Port*>(context()->event->hoveredWidget);
+		PortWidget *hoveredPort = dynamic_cast<PortWidget*>(context()->event->hoveredWidget);
 		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
 			opacity = 1.0;
 	}

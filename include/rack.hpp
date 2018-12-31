@@ -51,7 +51,7 @@
 #include "app/MomentarySwitch.hpp"
 #include "app/MultiLightWidget.hpp"
 #include "app/ParamWidget.hpp"
-#include "app/Port.hpp"
+#include "app/PortWidget.hpp"
 #include "app/RackRail.hpp"
 #include "app/Scene.hpp"
 #include "app/RackScrollWidget.hpp"

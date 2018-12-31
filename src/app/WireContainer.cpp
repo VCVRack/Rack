@@ -41,7 +41,7 @@ void WireContainer::commitActiveWire() {
 	}
 }
 
-void WireContainer::removeTopWire(Port *port) {
+void WireContainer::removeTopWire(PortWidget *port) {
 	WireWidget *wire = getTopWire(port);
 	if (wire) {
 		removeChild(wire);
@@ -49,7 +49,7 @@ void WireContainer::removeTopWire(Port *port) {
 	}
 }
 
-void WireContainer::removeAllWires(Port *port) {
+void WireContainer::removeAllWires(PortWidget *port) {
 	// As a convenience, de-hover the active wire so we don't attach them once it is dropped.
 	if (activeWire) {
 		if (activeWire->hoveredInputPort == port)
@@ -80,7 +80,7 @@ void WireContainer::removeAllWires(Port *port) {
 	}
 }
 
-WireWidget *WireContainer::getTopWire(Port *port) {
+WireWidget *WireContainer::getTopWire(PortWidget *port) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
 		WireWidget *wire = dynamic_cast<WireWidget*>(*it);
 		assert(wire);

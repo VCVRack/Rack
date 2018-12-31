@@ -2,7 +2,7 @@
 #include "ui/MenuLabel.hpp"
 #include "ui/MenuItem.hpp"
 #include "ui/Menu.hpp"
-#include "app/Port.hpp"
+#include "app/PortWidget.hpp"
 #include "app/ParamQuantity.hpp"
 #include "app/ParamWidget.hpp"
 #include "app/Scene.hpp"
@@ -75,42 +75,42 @@ TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId) {
 	return o;
 }
 
-template <class TPort>
-TPort *createInput(math::Vec pos, Module *module, int inputId) {
-	TPort *o = new TPort;
+template <class TPortWidget>
+TPortWidget *createInput(math::Vec pos, Module *module, int inputId) {
+	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos;
 	o->module = module;
-	o->type = Port::INPUT;
+	o->type = PortWidget::INPUT;
 	o->portId = inputId;
 	return o;
 }
 
-template <class TPort>
-TPort *createInputCentered(math::Vec pos, Module *module, int inputId) {
-	TPort *o = new TPort;
+template <class TPortWidget>
+TPortWidget *createInputCentered(math::Vec pos, Module *module, int inputId) {
+	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
-	o->type = Port::INPUT;
+	o->type = PortWidget::INPUT;
 	o->portId = inputId;
 	return o;
 }
 
-template <class TPort>
-TPort *createOutput(math::Vec pos, Module *module, int outputId) {
-	TPort *o = new TPort;
+template <class TPortWidget>
+TPortWidget *createOutput(math::Vec pos, Module *module, int outputId) {
+	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos;
 	o->module = module;
-	o->type = Port::OUTPUT;
+	o->type = PortWidget::OUTPUT;
 	o->portId = outputId;
 	return o;
 }
 
-template <class TPort>
-TPort *createOutputCentered(math::Vec pos, Module *module, int outputId) {
-	TPort *o = new TPort;
+template <class TPortWidget>
+TPortWidget *createOutputCentered(math::Vec pos, Module *module, int outputId) {
+	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
-	o->type = Port::OUTPUT;
+	o->type = PortWidget::OUTPUT;
 	o->portId = outputId;
 	return o;
 }

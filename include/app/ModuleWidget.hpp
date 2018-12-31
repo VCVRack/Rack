@@ -2,7 +2,7 @@
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "ui/Menu.hpp"
-#include "app/Port.hpp"
+#include "app/PortWidget.hpp"
 #include "app/ParamWidget.hpp"
 #include "plugin/Model.hpp"
 #include "engine/Module.hpp"
@@ -18,14 +18,14 @@ struct ModuleWidget : OpaqueWidget {
 
 	Widget *panel = NULL;
 	std::vector<ParamWidget*> params;
-	std::vector<Port*> inputs;
-	std::vector<Port*> outputs;
+	std::vector<PortWidget*> inputs;
+	std::vector<PortWidget*> outputs;
 
 	ModuleWidget(Module *module);
 	~ModuleWidget();
 	/** Convenience functions for adding special widgets (calls addChild()) */
-	void addInput(Port *input);
-	void addOutput(Port *output);
+	void addInput(PortWidget *input);
+	void addOutput(PortWidget *output);
 	void addParam(ParamWidget *param);
 	void setPanel(std::shared_ptr<SVG> svg);
 

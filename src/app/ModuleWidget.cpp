@@ -32,14 +32,14 @@ ModuleWidget::~ModuleWidget() {
 	}
 }
 
-void ModuleWidget::addInput(Port *input) {
-	assert(input->type == Port::INPUT);
+void ModuleWidget::addInput(PortWidget *input) {
+	assert(input->type == PortWidget::INPUT);
 	inputs.push_back(input);
 	addChild(input);
 }
 
-void ModuleWidget::addOutput(Port *output) {
-	assert(output->type == Port::OUTPUT);
+void ModuleWidget::addOutput(PortWidget *output) {
+	assert(output->type == PortWidget::OUTPUT);
 	outputs.push_back(output);
 	addChild(output);
 }
@@ -251,10 +251,10 @@ void ModuleWidget::saveDialog() {
 }
 
 void ModuleWidget::disconnect() {
-	for (Port *input : inputs) {
+	for (PortWidget *input : inputs) {
 		context()->scene->rackWidget->wireContainer->removeAllWires(input);
 	}
-	for (Port *output : outputs) {
+	for (PortWidget *output : outputs) {
 		context()->scene->rackWidget->wireContainer->removeAllWires(output);
 	}
 }
