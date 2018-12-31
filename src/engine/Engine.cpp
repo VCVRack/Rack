@@ -52,6 +52,7 @@ struct Engine::Internal {
 
 	Module *resetModule = NULL;
 	Module *randomizeModule = NULL;
+	int nextModuleId = 0;
 
 	// Parameter smoothing
 	Module *smoothModule = NULL;
@@ -216,6 +217,9 @@ void Engine::addModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
+	// Set ID
+	assert(module->id == -1);
+	module->id = internal->nextModuleId++;
 	// Check that the module is not already added
 	auto it = std::find(modules.begin(), modules.end(), module);
 	assert(it == modules.end());
@@ -238,8 +242,10 @@ void Engine::removeModule(Module *module) {
 	// Check that the module actually exists
 	auto it = std::find(modules.begin(), modules.end(), module);
 	assert(it != modules.end());
-	// Remove it
+	// Remove the module
 	modules.erase(it);
+	// Remove id
+	module->id = -1;
 }
 
 void Engine::resetModule(Module *module) {
@@ -311,6 +317,10 @@ void Engine::setParamSmooth(Module *module, int paramId, float value) {
 	internal->smoothParamId = paramId;
 	internal->smoothValue = value;
 	internal->smoothModule = module;
+}
+
+int Engine::getNextModuleId() {
+	return internal->nextModuleId++;
 }
 
 void Engine::setSampleRate(float newSampleRate) {

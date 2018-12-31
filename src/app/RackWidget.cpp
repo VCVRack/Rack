@@ -81,14 +81,23 @@ void RackWidget::loadDialog() {
 	else {
 		dir = string::directory(lastPath);
 	}
+
 	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
+	DEFER({
+		osdialog_filters_free(filters);
+	});
+
 	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
-	if (path) {
-		load(path);
-		lastPath = path;
-		free(path);
+	if (!path) {
+		// Fail silently
+		return;
 	}
-	osdialog_filters_free(filters);
+	DEFER({
+		free(path);
+	});
+
+	load(path);
+	lastPath = path;
 }
 
 void RackWidget::saveDialog() {
@@ -111,21 +120,29 @@ void RackWidget::saveAsDialog() {
 		dir = string::directory(lastPath);
 		filename = string::filename(lastPath);
 	}
+
 	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
+	DEFER({
+		osdialog_filters_free(filters);
+	});
+
 	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
-
-	if (path) {
-		std::string pathStr = path;
-		free(path);
-		std::string extension = string::extension(pathStr);
-		if (extension.empty()) {
-			pathStr += ".vcv";
-		}
-
-		save(pathStr);
-		lastPath = pathStr;
+	if (!path) {
+		// Fail silently
+		return;
 	}
-	osdialog_filters_free(filters);
+	DEFER({
+		free(path);
+	});
+
+
+	std::string pathStr = path;
+	if (string::extension(pathStr).empty()) {
+		pathStr += ".vcv";
+	}
+
+	save(pathStr);
+	lastPath = pathStr;
 }
 
 void RackWidget::save(std::string filename) {
@@ -133,14 +150,20 @@ void RackWidget::save(std::string filename) {
 	json_t *rootJ = toJson();
 	if (!rootJ)
 		return;
+	DEFER({
+		json_decref(rootJ);
+	});
 
 	FILE *file = fopen(filename.c_str(), "w");
-	if (file) {
-		json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-		fclose(file);
+	if (!file) {
+		// Fail silently
+		return;
 	}
+	DEFER({
+		fclose(file);
+	});
 
-	json_decref(rootJ);
+	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 }
 
 void RackWidget::load(std::string filename) {
@@ -150,20 +173,23 @@ void RackWidget::load(std::string filename) {
 		// Exit silently
 		return;
 	}
+	DEFER({
+		fclose(file);
+	});
 
 	json_error_t error;
 	json_t *rootJ = json_loadf(file, 0, &error);
-	if (rootJ) {
-		clear();
-		fromJson(rootJ);
-		json_decref(rootJ);
-	}
-	else {
+	if (!rootJ) {
 		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+		return;
 	}
+	DEFER({
+		json_decref(rootJ);
+	});
 
-	fclose(file);
+	clear();
+	fromJson(rootJ);
 }
 
 void RackWidget::revert() {
@@ -178,11 +204,7 @@ void RackWidget::disconnect() {
 	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
 		return;
 
-	for (Widget *w : moduleContainer->children) {
-		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
-		assert(moduleWidget);
-		moduleWidget->disconnect();
-	}
+	wireContainer->removeAllWires(NULL);
 }
 
 json_t *RackWidget::toJson() {
@@ -195,16 +217,14 @@ json_t *RackWidget::toJson() {
 
 	// modules
 	json_t *modulesJ = json_array();
-	std::map<ModuleWidget*, int> moduleIds;
-	int moduleId = 0;
 	for (Widget *w : moduleContainer->children) {
 		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
 		assert(moduleWidget);
-		moduleIds[moduleWidget] = moduleId;
-		moduleId++;
 		// module
 		json_t *moduleJ = moduleWidget->toJson();
 		{
+			// id
+			json_object_set_new(moduleJ, "id", json_integer(moduleWidget->module->id));
 			// pos
 			math::Vec pos = moduleWidget->box.pos.div(RACK_GRID_SIZE).round();
 			json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
@@ -219,29 +239,22 @@ json_t *RackWidget::toJson() {
 	for (Widget *w : wireContainer->children) {
 		WireWidget *wireWidget = dynamic_cast<WireWidget*>(w);
 		assert(wireWidget);
+
+		Port *outputPort = wireWidget->outputPort;
+		Port *inputPort = wireWidget->inputPort;
 		// Only serialize WireWidgets connected on both ends
-		if (!(wireWidget->outputPort && wireWidget->inputPort))
+		if (!(outputPort && inputPort))
 			continue;
 		// wire
 		json_t *wire = wireWidget->toJson();
 
-		// Get the modules at each end of the wire
-		ModuleWidget *outputModuleWidget = wireWidget->outputPort->getAncestorOfType<ModuleWidget>();
-		assert(outputModuleWidget);
-		int outputModuleId = moduleIds[outputModuleWidget];
+		assert(outputPort->module);
+		assert(inputPort->module);
 
-		ModuleWidget *inputModuleWidget = wireWidget->inputPort->getAncestorOfType<ModuleWidget>();
-		assert(inputModuleWidget);
-		int inputModuleId = moduleIds[inputModuleWidget];
-
-		// Get output/input ports
-		int outputId = wireWidget->outputPort->portId;
-		int inputId = wireWidget->inputPort->portId;
-
-		json_object_set_new(wire, "outputModuleId", json_integer(outputModuleId));
-		json_object_set_new(wire, "outputId", json_integer(outputId));
-		json_object_set_new(wire, "inputModuleId", json_integer(inputModuleId));
-		json_object_set_new(wire, "inputId", json_integer(inputId));
+		json_object_set_new(wire, "outputModuleId", json_integer(outputPort->module->id));
+		json_object_set_new(wire, "outputId", json_integer(outputPort->portId));
+		json_object_set_new(wire, "inputModuleId", json_integer(inputPort->module->id));
+		json_object_set_new(wire, "inputId", json_integer(inputPort->portId));
 
 		json_array_append_new(wires, wire);
 	}
@@ -256,8 +269,10 @@ void RackWidget::fromJson(json_t *rootJ) {
 	// version
 	std::string version;
 	json_t *versionJ = json_object_get(rootJ, "version");
-	if (versionJ) {
+	if (versionJ)
 		version = json_string_value(versionJ);
+	if (version != APP_VERSION) {
+		INFO("Patch made with Rack version %s, current Rack version is %s", version.c_str(), APP_VERSION.c_str());
 	}
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
@@ -266,17 +281,21 @@ void RackWidget::fromJson(json_t *rootJ) {
 	if (string::startsWith(version, "0.3.") || string::startsWith(version, "0.4.") || string::startsWith(version, "0.5.") || version == "" || version == "dev") {
 		legacy = 1;
 	}
+	else if (string::startsWith(version, "0.6.")) {
+		legacy = 2;
+	}
 	if (legacy) {
 		INFO("Loading patch using legacy mode %d", legacy);
 	}
 
 	// modules
-	std::map<int, ModuleWidget*> moduleWidgets;
 	json_t *modulesJ = json_object_get(rootJ, "modules");
-	if (!modulesJ) return;
-	size_t moduleId;
+	if (!modulesJ)
+		return;
+	std::map<int, ModuleWidget*> moduleWidgets;
+	size_t moduleIndex;
 	json_t *moduleJ;
-	json_array_foreach(modulesJ, moduleId, moduleJ) {
+	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
 		// Add "legacy" property if in legacy mode
 		if (legacy) {
 			json_object_set(moduleJ, "legacy", json_integer(legacy));
@@ -285,19 +304,32 @@ void RackWidget::fromJson(json_t *rootJ) {
 		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
 
 		if (moduleWidget) {
+			// id
+			json_t *idJ = json_object_get(moduleJ, "id");
+			int id = -1;
+			if (idJ)
+				id = json_integer_value(idJ);
 			// pos
 			json_t *posJ = json_object_get(moduleJ, "pos");
 			double x, y;
 			json_unpack(posJ, "[F, F]", &x, &y);
 			math::Vec pos = math::Vec(x, y);
 			if (legacy && legacy <= 1) {
+				// Before 0.6, positions were in pixel units
 				moduleWidget->box.pos = pos;
 			}
 			else {
 				moduleWidget->box.pos = pos.mult(RACK_GRID_SIZE);
 			}
 
-			moduleWidgets[moduleId] = moduleWidget;
+			if (legacy && legacy <= 2) {
+				// Before 1.0, the module ID was the index in the "modules" array
+				moduleWidgets[moduleIndex] = moduleWidget;
+			}
+			else {
+				moduleWidgets[id] = moduleWidget;
+			}
+			addModule(moduleWidget);
 		}
 		else {
 			json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
@@ -310,10 +342,10 @@ void RackWidget::fromJson(json_t *rootJ) {
 
 	// wires
 	json_t *wiresJ = json_object_get(rootJ, "wires");
-	if (!wiresJ) return;
-	size_t wireId;
+	assert(wiresJ);
+	size_t wireIndex;
 	json_t *wireJ;
-	json_array_foreach(wiresJ, wireId, wireJ) {
+	json_array_foreach(wiresJ, wireIndex, wireJ) {
 		int outputModuleId = json_integer_value(json_object_get(wireJ, "outputModuleId"));
 		int outputId = json_integer_value(json_object_get(wireJ, "outputId"));
 		int inputModuleId = json_integer_value(json_object_get(wireJ, "inputModuleId"));
@@ -329,8 +361,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 		Port *outputPort = NULL;
 		Port *inputPort = NULL;
 		if (legacy && legacy <= 1) {
-			// Legacy 1 mode
-			// The index of the "ports" array is the index of the Port in the `outputs` and `inputs` vector.
+			// Before 0.6, the index of the "ports" array was the index of the Port in the `outputs` and `inputs` vector.
 			outputPort = outputModuleWidget->outputs[outputId];
 			inputPort = inputModuleWidget->inputs[inputId];
 		}
@@ -387,7 +418,6 @@ ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
 	ModuleWidget *moduleWidget = model->createModuleWidget();
 	assert(moduleWidget);
 	moduleWidget->fromJson(moduleJ);
-	moduleContainer->addChild(moduleWidget);
 	return moduleWidget;
 }
 
@@ -402,12 +432,12 @@ void RackWidget::pastePresetClipboard() {
 	json_t *moduleJ = json_loads(moduleJson, 0, &error);
 	if (moduleJ) {
 		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
+		json_decref(moduleJ);
+		addModule(moduleWidget);
 		// Set moduleWidget position
 		math::Rect newBox = moduleWidget->box;
 		newBox.pos = lastMousePos.minus(newBox.size.div(2));
 		requestModuleBoxNearest(moduleWidget, newBox);
-
-		json_decref(moduleJ);
 	}
 	else {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
@@ -427,6 +457,7 @@ void RackWidget::cloneModule(ModuleWidget *m) {
 	json_t *moduleJ = m->toJson();
 	ModuleWidget *clonedModuleWidget = moduleFromJson(moduleJ);
 	json_decref(moduleJ);
+	addModule(clonedModuleWidget);
 	math::Rect clonedBox = clonedModuleWidget->box;
 	clonedBox.pos = m->box.pos;
 	requestModuleBoxNearest(clonedModuleWidget, clonedBox);
@@ -491,7 +522,8 @@ void RackWidget::step() {
 	}
 
 	// Autosave every 15 seconds
-	if (context()->window->frame % (60 * 15) == 0) {
+	int frame = context()->window->frame;
+	if (frame > 0 && frame % (60 * 15) == 0) {
 		save(asset::user("autosave.vcv"));
 		settings::save(asset::user("settings.json"));
 	}

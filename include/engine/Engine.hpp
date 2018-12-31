@@ -35,6 +35,7 @@ struct Engine {
 	void removeWire(Wire *wire);
 	void setParam(Module *module, int paramId, float value);
 	void setParamSmooth(Module *module, int paramId, float value);
+	int getNextModuleId();
 
 	void setSampleRate(float sampleRate);
 	float getSampleRate();

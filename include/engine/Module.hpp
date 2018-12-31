@@ -13,32 +13,23 @@ namespace rack {
 
 
 struct Module {
+	int id = -1;
 	std::vector<Param> params;
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;
 	std::vector<Light> lights;
-	/** For CPU usage meter */
+	/** For power meter */
 	float cpuTime = 0.f;
 
 	/** Constructs a Module with no params, inputs, outputs, and lights */
-	Module() {}
-	/** Constructs a Module with a fixed number of params, inputs, outputs, and lights */
-	Module(int numParams, int numInputs, int numOutputs, int numLights = 0) {
+	Module();
+	/** Deprecated. Use setup() instead. */
+	Module(int numParams, int numInputs, int numOutputs, int numLights = 0) : Module() {
 		setup(numParams, numInputs, numOutputs, numLights);
 	}
 	virtual ~Module() {}
 
-	void setup(int numParams, int numInputs, int numOutputs, int numLights = 0) {
-		params.resize(numParams);
-		// Create default param labels
-		for (int i = 0; i < numParams; i++) {
-			params[i].label = string::f("#%d", i + 1);
-		}
-		inputs.resize(numInputs);
-		outputs.resize(numOutputs);
-		lights.resize(numLights);
-	}
-
+	void setup(int numParams, int numInputs, int numOutputs, int numLights = 0);
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 	void reset();

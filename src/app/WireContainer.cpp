@@ -64,7 +64,7 @@ void WireContainer::removeAllWires(Port *port) {
 	for (Widget *child : children) {
 		WireWidget *wire = dynamic_cast<WireWidget*>(child);
 		assert(wire);
-		if (wire->inputPort == port || wire->outputPort == port) {
+		if (!wire || wire->inputPort == port || wire->outputPort == port) {
 			if (activeWire == wire) {
 				activeWire = NULL;
 			}

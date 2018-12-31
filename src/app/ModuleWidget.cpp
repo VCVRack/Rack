@@ -337,7 +337,7 @@ void ModuleWidget::onButton(event::Button &e) {
 }
 
 void ModuleWidget::onHoverKey(event::HoverKey &e) {
-	if (e.action == GLFW_PRESS) {
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_I: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
