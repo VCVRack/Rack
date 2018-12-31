@@ -5,9 +5,14 @@ namespace rack {
 
 
 void Wire::step() {
-	// Copy output to input
-	float value = outputModule->outputs[outputId].value;
-	inputModule->inputs[inputId].value = value;
+	Output *output = &outputModule->outputs[outputId];
+	Input *input = &inputModule->inputs[inputId];
+	// Match number of polyphonic channels to output port
+	input->numChannels = output->numChannels;
+	// Copy values from output to input
+	for (int i = 0; i < output->numChannels; i++) {
+		input->values[i] = output->values[i];
+	}
 }
 
 
