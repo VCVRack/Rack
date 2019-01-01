@@ -9,6 +9,11 @@ SVGSwitch::SVGSwitch() {
 	addChild(sw);
 }
 
+void SVGSwitch::step() {
+	ParamWidget::step();
+	FramebufferWidget::step();
+}
+
 void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 	frames.push_back(svg);
 	// If this is our first frame, automatically set SVG and size

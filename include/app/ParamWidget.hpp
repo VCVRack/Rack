@@ -9,12 +9,14 @@ namespace rack {
 
 struct ParamWidget : OpaqueWidget {
 	Quantity *quantity = NULL;
+	float dirtyValue = NAN;
 
 	~ParamWidget() {
 		if (quantity)
 			delete quantity;
 	}
 
+	void step() override;
 	/** For legacy patch loading */
 	void fromJson(json_t *rootJ);
 	void onButton(event::Button &e) override;

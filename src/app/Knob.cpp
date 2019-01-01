@@ -4,6 +4,15 @@
 namespace rack {
 
 
+void Knob::onButton(event::Button &e) {
+	float r = box.size.x / 2;
+	math::Vec c = box.size.div(2);
+	float dist = e.pos.minus(c).norm();
+	if (dist <= r) {
+		ParamWidget::onButton(e);
+	}
+}
+
 void Knob::onDragStart(event::DragStart &e) {
 	context()->window->cursorLock();
 }
@@ -28,9 +37,6 @@ void Knob::onDragMove(event::DragMove &e) {
 		if (context()->window->isModPressed())
 			delta /= 16.f;
 		quantity->moveValue(delta);
-
-		event::Change eChange;
-		onChange(eChange);
 	}
 }
 

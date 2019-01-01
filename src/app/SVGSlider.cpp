@@ -23,18 +23,19 @@ void SVGSlider::setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG>
 }
 
 void SVGSlider::step() {
-	if (dirty && quantity) {
+	Knob::step();
+	FramebufferWidget::step();
+}
+
+void SVGSlider::onChange(event::Change &e) {
+	if (quantity) {
 		// Interpolate handle position
 		float v = quantity->getScaledValue();
 		handle->box.pos = math::Vec(
 			math::rescale(v, 0.f, 1.f, minHandlePos.x, maxHandlePos.x),
 			math::rescale(v, 0.f, 1.f, minHandlePos.y, maxHandlePos.y));
+		dirty = true;
 	}
-	FramebufferWidget::step();
-}
-
-void SVGSlider::onChange(event::Change &e) {
-	dirty = true;
 	ParamWidget::onChange(e);
 }
 

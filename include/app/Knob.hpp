@@ -15,6 +15,7 @@ struct Knob : ParamWidget {
 	/** Multiplier for mouse movement to adjust knob value */
 	float speed = 1.0;
 
+	void onButton(event::Button &e) override;
 	void onDragStart(event::DragStart &e) override;
 	void onDragEnd(event::DragEnd &e) override;
 	void onDragMove(event::DragMove &e) override;

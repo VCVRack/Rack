@@ -26,8 +26,13 @@ void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
 }
 
 void SVGKnob::step() {
-	// Re-transform TransformWidget if dirty
-	if (dirty && quantity) {
+	Knob::step();
+	FramebufferWidget::step();
+}
+
+void SVGKnob::onChange(event::Change &e) {
+	// Re-transform the TransformWidget
+	if (quantity) {
 		float angle;
 		if (quantity->isBounded()) {
 			angle = math::rescale(quantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
@@ -42,12 +47,8 @@ void SVGKnob::step() {
 		tw->translate(center);
 		tw->rotate(angle);
 		tw->translate(center.neg());
+		dirty = true;
 	}
-	FramebufferWidget::step();
-}
-
-void SVGKnob::onChange(event::Change &e) {
-	dirty = true;
 	Knob::onChange(e);
 }
 

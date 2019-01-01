@@ -21,9 +21,6 @@ void Module::setup(int numParams, int numInputs, int numOutputs, int numLights) 
 json_t *Module::toJson() {
 	json_t *rootJ = json_object();
 
-	// id
-	json_object_set_new(rootJ, "id", json_integer(id));
-
 	// params
 	json_t *paramsJ = json_array();
 	for (Param &param : params) {
@@ -42,11 +39,6 @@ json_t *Module::toJson() {
 }
 
 void Module::fromJson(json_t *rootJ) {
-	// id
-	json_t *idJ = json_object_get(rootJ, "id");
-	if (idJ)
-		id = json_integer_value(idJ);
-
 	// params
 	json_t *paramsJ = json_object_get(rootJ, "params");
 	size_t i;

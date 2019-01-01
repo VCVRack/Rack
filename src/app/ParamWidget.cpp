@@ -5,6 +5,20 @@
 namespace rack {
 
 
+void ParamWidget::step() {
+	if (quantity) {
+		float value = quantity->getValue();
+		// Trigger change event when quantity value changes
+		if (value != dirtyValue) {
+			dirtyValue = value;
+			event::Change eChange;
+			onChange(eChange);
+		}
+	}
+
+	OpaqueWidget::step();
+}
+
 void ParamWidget::fromJson(json_t *rootJ) {
 	json_t *valueJ = json_object_get(rootJ, "value");
 	if (valueJ) {
@@ -20,7 +34,6 @@ void ParamWidget::onButton(event::Button &e) {
 			quantity->reset();
 		// Here's another way of doing it, but either works.
 		// dynamic_cast<ParamQuantity*>(quantity)->getParam()->reset();
-		return;
 	}
 
 	OpaqueWidget::onButton(e);

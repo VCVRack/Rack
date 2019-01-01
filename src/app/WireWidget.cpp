@@ -31,7 +31,7 @@ static void drawPlug(NVGcontext *vg, math::Vec pos, NVGcolor color) {
 	nvgFill(vg);
 }
 
-static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float width, float tension, float opacity) {
+static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
 	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
@@ -54,7 +54,7 @@ static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor co
 		nvgMoveTo(vg, pos1.x, pos1.y);
 		nvgQuadTo(vg, pos4.x, pos4.y, pos2.x, pos2.y);
 		nvgStrokeColor(vg, colorShadow);
-		nvgStrokeWidth(vg, width);
+		nvgStrokeWidth(vg, thickness);
 		nvgStroke(vg);
 
 		// Wire outline
@@ -62,12 +62,12 @@ static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor co
 		nvgMoveTo(vg, pos1.x, pos1.y);
 		nvgQuadTo(vg, pos3.x, pos3.y, pos2.x, pos2.y);
 		nvgStrokeColor(vg, colorOutline);
-		nvgStrokeWidth(vg, width);
+		nvgStrokeWidth(vg, thickness);
 		nvgStroke(vg);
 
 		// Wire solid
 		nvgStrokeColor(vg, color);
-		nvgStrokeWidth(vg, width - 2);
+		nvgStrokeWidth(vg, thickness - 2);
 		nvgStroke(vg);
 
 		nvgRestore(vg);
@@ -179,17 +179,17 @@ void WireWidget::draw(NVGcontext *vg) {
 			opacity = 1.0;
 	}
 
-	float width = 5;
+	float thickness = 5;
 	if (wire && wire->outputModule) {
 		Output *output = &wire->outputModule->outputs[wire->outputId];
 		if (output->numChannels != 1) {
-			width = 8;
+			thickness = 8;
 		}
 	}
 
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
-	drawWire(vg, outputPos, inputPos, color, width, tension, opacity);
+	drawWire(vg, outputPos, inputPos, color, thickness, tension, opacity);
 }
 
 void WireWidget::drawPlugs(NVGcontext *vg) {
