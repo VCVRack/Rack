@@ -16,6 +16,7 @@ extern float wireTension;
 extern bool powerMeter;
 extern bool lockModules;
 extern bool checkVersion;
+extern bool skipLoadOnLaunch;
 
 
 } // namespace settings

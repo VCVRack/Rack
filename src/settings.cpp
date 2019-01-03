@@ -57,7 +57,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
 	// skipLoadOnLaunch
-	if (context()->skipLoadOnLaunch) {
+	if (skipLoadOnLaunch) {
 		json_object_set_new(rootJ, "skipLoadOnLaunch", json_true());
 	}
 
@@ -130,7 +130,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// skipLoadOnLaunch
 	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
 	if (skipLoadOnLaunchJ)
-		context()->skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
+		skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
 
 	// moduleBrowser
 	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
@@ -189,6 +189,7 @@ float wireTension = 0.5;
 bool powerMeter = false;
 bool lockModules = false;
 bool checkVersion = true;
+bool skipLoadOnLaunch = false;
 
 
 } // namespace settings
