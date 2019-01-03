@@ -110,10 +110,12 @@ struct BrowserListItem : OpaqueWidget {
 	}
 
 	void doAction() {
+		event::Context eActionContext;
 		event::Action eAction;
-		eAction.target = this;
+		eAction.context = &eActionContext;
+		eAction.consume(this);
 		onAction(eAction);
-		if (eAction.target) {
+		if (eActionContext.consumed) {
 			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
 			overlay->requestedDelete = true;
 		}
@@ -462,7 +464,7 @@ void AuthorItem::onAction(event::Action &e) {
 	sAuthorFilter = author;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
-	e.target = this;
+	e.consume(this);
 }
 
 void TagItem::onAction(event::Action &e) {
@@ -470,7 +472,7 @@ void TagItem::onAction(event::Action &e) {
 	sTagFilter = tag;
 	moduleBrowser->clearSearch();
 	moduleBrowser->refreshSearch();
-	e.target = this;
+	e.consume(this);
 }
 
 void ClearFilterItem::onAction(event::Action &e) {
@@ -478,7 +480,7 @@ void ClearFilterItem::onAction(event::Action &e) {
 	sAuthorFilter = "";
 	sTagFilter = "";
 	moduleBrowser->refreshSearch();
-	e.target = this;
+	e.consume(this);
 }
 
 void FavoriteRadioButton::onAction(event::Action &e) {
@@ -515,40 +517,40 @@ void SearchModuleField::onSelectKey(event::SelectKey &e) {
 			case GLFW_KEY_ESCAPE: {
 				MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
 				overlay->requestedDelete = true;
-				e.target = this;
+				e.consume(this);
 				return;
 			} break;
 			case GLFW_KEY_UP: {
 				moduleBrowser->moduleList->incrementSelection(-1);
 				moduleBrowser->moduleList->scrollSelected();
-				e.target = this;
+				e.consume(this);
 			} break;
 			case GLFW_KEY_DOWN: {
 				moduleBrowser->moduleList->incrementSelection(1);
 				moduleBrowser->moduleList->scrollSelected();
-				e.target = this;
+				e.consume(this);
 			} break;
 			case GLFW_KEY_PAGE_UP: {
 				moduleBrowser->moduleList->incrementSelection(-5);
 				moduleBrowser->moduleList->scrollSelected();
-				e.target = this;
+				e.consume(this);
 			} break;
 			case GLFW_KEY_PAGE_DOWN: {
 				moduleBrowser->moduleList->incrementSelection(5);
 				moduleBrowser->moduleList->scrollSelected();
-				e.target = this;
+				e.consume(this);
 			} break;
 			case GLFW_KEY_ENTER: {
 				BrowserListItem *item = moduleBrowser->moduleList->getSelectedItem();
 				if (item) {
 					item->doAction();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 		}
 	}
 
-	if (!e.target)
+	if (!e.getConsumed())
 		TextField::onSelectKey(e);
 }
 

@@ -135,7 +135,7 @@ struct MidiCcChoice : GridChoice {
 	}
 
 	void onSelect(event::Select &e) override {
-		e.target = this;
+		e.consume(this);
 		module->learningId = id;
 		focusCc = -1;
 	}
@@ -154,7 +154,7 @@ struct MidiCcChoice : GridChoice {
 				focusCc = 0;
 			focusCc = focusCc * 10 + (c - '0');
 		}
-		e.target = this;
+		e.consume(this);
 	}
 
 	void onSelectKey(event::SelectKey &e) override {
@@ -163,7 +163,7 @@ struct MidiCcChoice : GridChoice {
 				event::Deselect eDeselect;
 				onDeselect(eDeselect);
 				context()->event->selectedWidget = NULL;
-				e.target = this;
+				e.consume(this);
 			}
 		}
 	}

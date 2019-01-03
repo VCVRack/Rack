@@ -47,7 +47,7 @@ void TextField::onHover(event::Hover &e) {
 }
 
 void TextField::onEnter(event::Enter &e) {
-	e.target = this;
+	e.consume(this);
 }
 
 void TextField::onSelectText(event::SelectText &e) {
@@ -55,11 +55,11 @@ void TextField::onSelectText(event::SelectText &e) {
 		std::string newText(1, (char) e.codepoint);
 		insertText(newText);
 	}
-	e.target = this;
+	e.consume(this);
 }
 
 void TextField::onSelectKey(event::SelectKey &e) {
-	if (e.action == GLFW_PRESS) {
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_BACKSPACE: {
 				if (cursor == selection) {
@@ -172,7 +172,7 @@ void TextField::onSelectKey(event::SelectKey &e) {
 
 		cursor = math::clamp(cursor, 0, (int) text.size());
 		selection = math::clamp(selection, 0, (int) text.size());
-		e.target = this;
+		e.consume(this);
 	}
 }
 

@@ -179,7 +179,7 @@ struct MidiTrigChoice : GridChoice {
 	}
 
 	void onSelect(event::Select &e) override {
-		e.target = this;
+		e.consume(this);
 		module->learningId = id;
 	}
 

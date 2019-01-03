@@ -13,13 +13,25 @@ struct Widget;
 namespace event {
 
 
-/** Base event class */
-struct Event {
+struct Context {
 	/** The Widget that consumes the event.
-	Set to `this` in your event handler method if consumed.
 	This stops propagation of the event if applicable.
 	*/
-	Widget *target = NULL;
+	Widget *consumed = NULL;
+};
+
+
+/** Base event class */
+struct Event {
+	Context *context = NULL;
+
+	void consume(Widget *w) const {
+		if (context)
+			context->consumed = w;
+	}
+	Widget *getConsumed() const {
+		return context ? context->consumed : NULL;
+	}
 };
 
 
@@ -208,7 +220,7 @@ struct Zoom : Event {
 };
 
 
-struct Context {
+struct State {
 	/** State widgets
 	Don't set these directly unless you know what you're doing. Use the set*() methods instead.
 	*/

@@ -23,7 +23,7 @@ struct MenuOverlay : OpaqueWidget {
 	void onButton(event::Button &e) override {
 		OpaqueWidget::onButton(e);
 
-		if (e.target == this && e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (e.getConsumed() == this && e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			requestedDelete = true;
 		}
 	}
@@ -31,7 +31,7 @@ struct MenuOverlay : OpaqueWidget {
 	void onHoverKey(event::HoverKey &e) override {
 		OpaqueWidget::onHoverKey(e);
 
-		if (e.target == this && e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
+		if (e.getConsumed() == this && e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
 			requestedDelete = true;
 		}
 	}

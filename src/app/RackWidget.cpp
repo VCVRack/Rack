@@ -551,7 +551,7 @@ void RackWidget::onDragHover(event::DragHover &e) {
 
 void RackWidget::onButton(event::Button &e) {
 	OpaqueWidget::onButton(e);
-	if (e.target == this) {
+	if (e.getConsumed() == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			moduleBrowserCreate();
 		}

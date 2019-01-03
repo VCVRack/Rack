@@ -75,6 +75,22 @@ struct Widget {
 	// Events
 
 	template <typename TMethod, class TEvent>
+	void recurseEvent(TMethod f, TEvent &e) {
+		for (auto it = children.rbegin(); it != children.rend(); it++) {
+			Widget *child = *it;
+			// Filter child by visibility
+			if (!child->visible)
+				continue;
+
+			// Call child event handler
+			(child->*f)(e);
+			// Stop iterating if consumed
+			if (e.getConsumed())
+				break;
+		}
+	}
+
+	template <typename TMethod, class TEvent>
 	void recursePositionEvent(TMethod f, TEvent &e) {
 		for (auto it = children.rbegin(); it != children.rend(); it++) {
 			Widget *child = *it;
@@ -84,16 +100,14 @@ struct Widget {
 			if (!child->box.contains(e.pos))
 				continue;
 
-			// Clone event so modifications do not up-propagate
+			// Clone event and adjust its position
 			TEvent e2 = e;
 			e2.pos = e.pos.minus(child->box.pos);
 			// Call child event handler
 			(child->*f)(e2);
-			// Up-propagate target if consumed
-			if (e2.target) {
-				e.target = e2.target;
+			// Stop iterating if consumed
+			if (e.getConsumed())
 				break;
-			}
 		}
 	}
 
@@ -121,7 +135,7 @@ struct Widget {
 	virtual void onPathDrop(event::PathDrop &e) {recursePositionEvent(&Widget::onPathDrop, e);}
 	virtual void onAction(event::Action &e) {}
 	virtual void onChange(event::Change &e) {}
-	virtual void onZoom(event::Zoom &e) {}
+	virtual void onZoom(event::Zoom &e) {recurseEvent(&Widget::onZoom, e);}
 };
 
 

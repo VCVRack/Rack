@@ -51,7 +51,7 @@ struct Slider : OpaqueWidget {
 			if (quantity)
 				quantity->reset();
 		}
-		e.target = this;
+		e.consume(this);
 	}
 };
 

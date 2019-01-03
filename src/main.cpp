@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 
 	// Initialize app
 	context()->engine = new Engine;
-	context()->event = new event::Context;
+	context()->event = new event::State;
 	context()->scene = new Scene;
 	context()->scene->devMode = devMode;
 	context()->event->rootWidget = context()->scene;

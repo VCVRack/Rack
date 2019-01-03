@@ -39,5 +39,11 @@ void ParamWidget::onButton(event::Button &e) {
 	OpaqueWidget::onButton(e);
 }
 
+void ParamWidget::onDragMove(event::DragMove &e) {
+	if (quantity) {
+		DEBUG("%s", quantity->getString().c_str());
+	}
+}
+
 
 } // namespace rack

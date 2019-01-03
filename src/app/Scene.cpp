@@ -72,54 +72,54 @@ void Scene::onHoverKey(event::HoverKey &e) {
 			case GLFW_KEY_N: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->reset();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Q: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					context()->window->close();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_O: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->loadDialog();
-					e.target = this;
+					e.consume(this);
 				}
 				if (context()->window->isModPressed() && context()->window->isShiftPressed()) {
 					rackWidget->revert();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_S: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->saveDialog();
-					e.target = this;
+					e.consume(this);
 				}
 				if (context()->window->isModPressed() && context()->window->isShiftPressed()) {
 					rackWidget->saveAsDialog();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_V: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					rackWidget->pastePresetClipboard();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_ENTER:
 			case GLFW_KEY_KP_ENTER: {
 				moduleBrowserCreate();
-				e.target = this;
+				e.consume(this);
 			} break;
 			case GLFW_KEY_F11: {
 				context()->window->setFullScreen(!context()->window->isFullScreen());
-				e.target = this;
+				e.consume(this);
 			}
 		}
 	}
 
-	if (!e.target)
+	if (!e.getConsumed())
 		OpaqueWidget::onHoverKey(e);
 }
 
@@ -128,11 +128,11 @@ void Scene::onPathDrop(event::PathDrop &e) {
 		const std::string &path = e.paths[0];
 		if (string::extension(path) == "vcv") {
 			rackWidget->load(path);
-			e.target = this;
+			e.consume(this);
 		}
 	}
 
-	if (!e.target)
+	if (!e.getConsumed())
 		OpaqueWidget::onPathDrop(e);
 }
 

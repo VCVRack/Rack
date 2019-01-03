@@ -140,7 +140,7 @@ struct ScrollWidget : OpaqueWidget {
 
 	void onHoverScroll(event::HoverScroll &e) override {
 		offset = offset.minus(e.scrollDelta);
-		e.target = this;
+		e.consume(this);
 	}
 };
 

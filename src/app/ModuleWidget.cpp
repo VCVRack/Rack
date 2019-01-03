@@ -329,7 +329,7 @@ void ModuleWidget::onHover(event::Hover &e) {
 
 void ModuleWidget::onButton(event::Button &e) {
 	OpaqueWidget::onButton(e);
-	if (e.target == this) {
+	if (e.getConsumed() == this) {
 		if (e.button == 1) {
 			createContextMenu();
 		}
@@ -342,43 +342,43 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 			case GLFW_KEY_I: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					reset();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_R: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					randomize();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_C: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					copyClipboard();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_V: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					pasteClipboard();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_D: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					context()->scene->rackWidget->cloneModule(this);
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_U: {
 				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
 					disconnect();
-					e.target = this;
+					e.consume(this);
 				}
 			} break;
 		}
 	}
 
-	if (!e.target)
+	if (!e.getConsumed())
 		OpaqueWidget::onHoverKey(e);
 }
 

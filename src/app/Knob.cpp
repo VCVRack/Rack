@@ -38,6 +38,8 @@ void Knob::onDragMove(event::DragMove &e) {
 			delta /= 16.f;
 		quantity->moveValue(delta);
 	}
+
+	ParamWidget::onDragMove(e);
 }
 
 

@@ -61,11 +61,13 @@ void MenuItem::doAction() {
 	if (disabled)
 		return;
 
+	event::Context eActionContext;
 	event::Action eAction;
+	eAction.context = &eActionContext;
 	// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.
-	eAction.target = this;
+	eAction.consume(this);
 	onAction(eAction);
-	if (!eAction.target)
+	if (!eActionContext.consumed)
 		return;
 
 	Widget *overlay = getAncestorOfType<MenuOverlay>();

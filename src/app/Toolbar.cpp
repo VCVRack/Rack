@@ -280,7 +280,7 @@ struct AccountEmailField : TextField {
 	void onSelectKey(event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
 			context()->event->selectedWidget = passwordField;
-			e.target = this;
+			e.consume(this);
 			return;
 		}
 		TextField::onSelectKey(e);
@@ -296,7 +296,7 @@ struct AccountPasswordField : PasswordField {
 	void onSelectKey(event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			logInItem->doAction();
-			e.target = this;
+			e.consume(this);
 			return;
 		}
 		PasswordField::onSelectKey(e);

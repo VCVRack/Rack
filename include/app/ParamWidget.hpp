@@ -20,6 +20,7 @@ struct ParamWidget : OpaqueWidget {
 	/** For legacy patch loading */
 	void fromJson(json_t *rootJ);
 	void onButton(event::Button &e) override;
+	void onDragMove(event::DragMove &e) override;
 };
 
 

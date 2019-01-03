@@ -6,7 +6,7 @@ namespace rack {
 
 
 namespace event {
-	struct Context;
+	struct State;
 }
 
 struct Scene;
@@ -15,7 +15,7 @@ struct Window;
 
 
 struct Context {
-	event::Context *event = NULL;
+	event::State *event = NULL;
 	Scene *scene = NULL;
 	Engine *engine = NULL;
 	Window *window = NULL;

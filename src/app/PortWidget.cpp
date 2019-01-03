@@ -59,7 +59,7 @@ void PortWidget::onButton(event::Button &e) {
 		// event::DragEnter eDragEnter;
 		// onDragEnter(eDragEnter);
 	}
-	e.target = this;
+	e.consume(this);
 }
 
 void PortWidget::onDragStart(event::DragStart &e) {

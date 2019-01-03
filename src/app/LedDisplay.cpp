@@ -58,7 +58,7 @@ void LedDisplayChoice::onButton(event::Button &e) {
 	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
 		event::Action eAction;
 		onAction(eAction);
-		e.target = this;
+		e.consume(this);
 	}
 }
 
