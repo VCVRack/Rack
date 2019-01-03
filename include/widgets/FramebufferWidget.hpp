@@ -27,7 +27,7 @@ struct FramebufferWidget : virtual Widget {
 	void draw(NVGcontext *vg) override;
 	int getImageHandle();
 
-	void onZoom(event::Zoom &e) override {
+	void onZoom(const event::Zoom &e) override {
 		dirty = true;
 		Widget::onZoom(e);
 	}

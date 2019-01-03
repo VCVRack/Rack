@@ -27,14 +27,14 @@ struct ScrollBar : OpaqueWidget {
 		bndScrollBar(vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 	}
 
-	void onDragStart(event::DragStart &e) override {
+	void onDragStart(const event::DragStart &e) override {
 		state = BND_ACTIVE;
 		context()->window->cursorLock();
 	}
 
-	void onDragMove(event::DragMove &e) override;
+	void onDragMove(const event::DragMove &e) override;
 
-	void onDragEnd(event::DragEnd &e) override {
+	void onDragEnd(const event::DragEnd &e) override {
 		state = BND_DEFAULT;
 		context()->window->cursorUnlock();
 	}
@@ -110,7 +110,7 @@ struct ScrollWidget : OpaqueWidget {
 		verticalScrollBar->box.size.y = horizontalScrollBar->visible ? inner.y : box.size.y;
 	}
 
-	void onHover(event::Hover &e) override {
+	void onHover(const event::Hover &e) override {
 		// Scroll with arrow keys
 		if (!context()->event->selectedWidget) {
 			float arrowSpeed = 30.0;
@@ -138,14 +138,14 @@ struct ScrollWidget : OpaqueWidget {
 		OpaqueWidget::onHover(e);
 	}
 
-	void onHoverScroll(event::HoverScroll &e) override {
+	void onHoverScroll(const event::HoverScroll &e) override {
 		offset = offset.minus(e.scrollDelta);
 		e.consume(this);
 	}
 };
 
 
-inline void ScrollBar::onDragMove(event::DragMove &e) {
+inline void ScrollBar::onDragMove(const event::DragMove &e) {
 	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
 	assert(scrollWidget);
 	if (orientation == HORIZONTAL)

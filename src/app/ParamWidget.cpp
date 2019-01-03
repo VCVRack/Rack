@@ -27,7 +27,7 @@ void ParamWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-void ParamWidget::onButton(event::Button &e) {
+void ParamWidget::onButton(const event::Button &e) {
 	// Right click to reset
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		if (quantity)
@@ -39,7 +39,7 @@ void ParamWidget::onButton(event::Button &e) {
 	OpaqueWidget::onButton(e);
 }
 
-void ParamWidget::onDragMove(event::DragMove &e) {
+void ParamWidget::onDragMove(const event::DragMove &e) {
 	if (quantity) {
 		DEBUG("%s", quantity->getString().c_str());
 	}

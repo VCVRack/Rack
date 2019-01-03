@@ -29,14 +29,14 @@ void TextField::draw(NVGcontext *vg) {
 	nvgResetScissor(vg);
 }
 
-void TextField::onButton(event::Button &e) {
+void TextField::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		cursor = selection = getTextPosition(e.pos);
 	}
 	OpaqueWidget::onButton(e);
 }
 
-void TextField::onHover(event::Hover &e) {
+void TextField::onHover(const event::Hover &e) {
 	if (this == context()->event->draggedWidget) {
 		int pos = getTextPosition(e.pos);
 		if (pos != selection) {
@@ -46,11 +46,11 @@ void TextField::onHover(event::Hover &e) {
 	OpaqueWidget::onHover(e);
 }
 
-void TextField::onEnter(event::Enter &e) {
+void TextField::onEnter(const event::Enter &e) {
 	e.consume(this);
 }
 
-void TextField::onSelectText(event::SelectText &e) {
+void TextField::onSelectText(const event::SelectText &e) {
 	if (e.codepoint < 128) {
 		std::string newText(1, (char) e.codepoint);
 		insertText(newText);
@@ -58,7 +58,7 @@ void TextField::onSelectText(event::SelectText &e) {
 	e.consume(this);
 }
 
-void TextField::onSelectKey(event::SelectKey &e) {
+void TextField::onSelectKey(const event::SelectKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_BACKSPACE: {

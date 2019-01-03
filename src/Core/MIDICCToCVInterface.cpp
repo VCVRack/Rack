@@ -134,20 +134,20 @@ struct MidiCcChoice : GridChoice {
 		}
 	}
 
-	void onSelect(event::Select &e) override {
+	void onSelect(const event::Select &e) override {
 		e.consume(this);
 		module->learningId = id;
 		focusCc = -1;
 	}
 
-	void onDeselect(event::Deselect &e) override {
+	void onDeselect(const event::Deselect &e) override {
 		if (0 <= focusCc && focusCc < 128) {
 			module->learnedCcs[id] = focusCc;
 		}
 		module->learningId = -1;
 	}
 
-	void onSelectText(event::SelectText &e) override {
+	void onSelectText(const event::SelectText &e) override {
 		char c = e.codepoint;
 		if ('0' <= c && c <= '9') {
 			if (focusCc < 0)
@@ -157,7 +157,7 @@ struct MidiCcChoice : GridChoice {
 		e.consume(this);
 	}
 
-	void onSelectKey(event::SelectKey &e) override {
+	void onSelectKey(const event::SelectKey &e) override {
 		if (context()->event->selectedWidget == this) {
 			if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
 				event::Deselect eDeselect;

@@ -37,7 +37,7 @@ struct NewItem : MenuItem {
 		text = "New";
 		rightText = "(" WINDOW_MOD_KEY_NAME "+N)";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->reset();
 	}
 };
@@ -48,7 +48,7 @@ struct OpenItem : MenuItem {
 		text = "Open";
 		rightText = "(" WINDOW_MOD_KEY_NAME "+O)";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->loadDialog();
 	}
 };
@@ -59,7 +59,7 @@ struct SaveItem : MenuItem {
 		text = "Save";
 		rightText = "(" WINDOW_MOD_KEY_NAME "+S)";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->saveDialog();
 	}
 };
@@ -70,7 +70,7 @@ struct SaveAsItem : MenuItem {
 		text = "Save as";
 		rightText = "(" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->saveAsDialog();
 	}
 };
@@ -80,7 +80,7 @@ struct RevertItem : MenuItem {
 	RevertItem() {
 		text = "Revert";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->revert();
 	}
 };
@@ -90,7 +90,7 @@ struct DisconnectCablesItem : MenuItem {
 	DisconnectCablesItem() {
 		text = "Disconnect cables";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->disconnect();
 	}
 };
@@ -100,7 +100,7 @@ struct FileButton : MenuButton {
 	FileButton() {
 		text = "File";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -168,7 +168,7 @@ struct PowerMeterItem : MenuItem {
 		text = "Power meter";
 		rightText = CHECKMARK(settings::powerMeter);
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		settings::powerMeter ^= true;
 	}
 };
@@ -179,7 +179,7 @@ struct LockModulesItem : MenuItem {
 		text = "Lock modules";
 		rightText = CHECKMARK(settings::lockModules);
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		settings::lockModules ^= true;
 	}
 };
@@ -190,7 +190,7 @@ struct EnginePauseItem : MenuItem {
 		text = "Pause engine";
 		rightText = CHECKMARK(context()->engine->paused);
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->engine->paused ^= true;
 	}
 };
@@ -203,7 +203,7 @@ struct SampleRateValueItem : MenuItem {
 		text = string::f("%.0f Hz", sampleRate);
 		rightText = CHECKMARK(context()->engine->getSampleRate() == sampleRate);
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->engine->setSampleRate(sampleRate);
 		context()->engine->paused = false;
 	}
@@ -232,7 +232,7 @@ struct SettingsButton : MenuButton {
 	SettingsButton() {
 		text = "Settings";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -263,7 +263,7 @@ struct RegisterItem : MenuItem {
 	RegisterItem() {
 		text = "Register VCV account";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/");
 		});
@@ -277,7 +277,7 @@ struct AccountEmailField : TextField {
 	AccountEmailField() {
 		placeholder = "Email";
 	}
-	void onSelectKey(event::SelectKey &e) override {
+	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
 			context()->event->selectedWidget = passwordField;
 			e.consume(this);
@@ -293,7 +293,7 @@ struct AccountPasswordField : PasswordField {
 	AccountPasswordField() {
 		placeholder = "Password";
 	}
-	void onSelectKey(event::SelectKey &e) override {
+	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			logInItem->doAction();
 			e.consume(this);
@@ -310,7 +310,7 @@ struct LogInItem : MenuItem {
 	LogInItem() {
 		text = "Log in";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
 		std::thread t([&, email, password]() {
@@ -325,7 +325,7 @@ struct ManageItem : MenuItem {
 	ManageItem() {
 		text = "Manage plugins";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/plugins.html");
 		});
@@ -339,7 +339,7 @@ struct SyncItem : MenuItem {
 		text = "Sync plugins";
 		disabled = true;
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 	}
 };
 
@@ -369,7 +369,7 @@ struct SyncItem : MenuItem {
 // 			completed = false;
 // 		}
 // 	}
-// 	void onAction(event::Action &e) override {
+// 	void onAction(const event::Action &e) override {
 // 		available = false;
 // 		std::thread t([this]() {
 // 			if (plugin::sync(false))
@@ -384,7 +384,7 @@ struct LogOutItem : MenuItem {
 	LogOutItem() {
 		text = "Log out";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		plugin::logOut();
 	}
 };
@@ -413,7 +413,7 @@ struct PluginsButton : MenuButton {
 	PluginsButton() {
 		text = "Plugins";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -465,7 +465,7 @@ struct ManualItem : MenuItem {
 	ManualItem() {
 		text = "Manual";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/manual/");
 		});
@@ -478,7 +478,7 @@ struct WebsiteItem : MenuItem {
 	WebsiteItem() {
 		text = "VCVRack.com";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/");
 		});
@@ -492,7 +492,7 @@ struct CheckVersionItem : MenuItem {
 		text = "Check version on launch";
 		rightText = CHECKMARK(settings::checkVersion);
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		settings::checkVersion ^= true;
 	}
 };
@@ -502,7 +502,7 @@ struct HelpButton : MenuButton {
 	HelpButton() {
 		text = "Help";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;

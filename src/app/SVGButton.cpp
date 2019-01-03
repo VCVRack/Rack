@@ -16,14 +16,14 @@ void SVGButton::setSVGs(std::shared_ptr<SVG> defaultSVG, std::shared_ptr<SVG> ac
 	this->activeSVG = activeSVG ? activeSVG : defaultSVG;
 }
 
-void SVGButton::onDragStart(event::DragStart &e) {
+void SVGButton::onDragStart(const event::DragStart &e) {
 	event::Action eAction;
 	onAction(eAction);
 	sw->setSVG(activeSVG);
 	dirty = true;
 }
 
-void SVGButton::onDragEnd(event::DragEnd &e) {
+void SVGButton::onDragEnd(const event::DragEnd &e) {
 	sw->setSVG(defaultSVG);
 	dirty = true;
 }

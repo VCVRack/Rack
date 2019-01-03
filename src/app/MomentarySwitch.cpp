@@ -4,13 +4,13 @@
 namespace rack {
 
 
-void MomentarySwitch::onDragStart(event::DragStart &e) {
+void MomentarySwitch::onDragStart(const event::DragStart &e) {
 	if (quantity) {
 		quantity->setMax();
 	}
 }
 
-void MomentarySwitch::onDragEnd(event::DragEnd &e) {
+void MomentarySwitch::onDragEnd(const event::DragEnd &e) {
 	if (quantity) {
 		quantity->setMin();
 	}

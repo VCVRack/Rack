@@ -315,7 +315,7 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 	nvgFill(vg);
 }
 
-void ModuleWidget::onHover(event::Hover &e) {
+void ModuleWidget::onHover(const event::Hover &e) {
 	OpaqueWidget::onHover(e);
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
@@ -327,7 +327,7 @@ void ModuleWidget::onHover(event::Hover &e) {
 	}
 }
 
-void ModuleWidget::onButton(event::Button &e) {
+void ModuleWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.getConsumed() == this) {
 		if (e.button == 1) {
@@ -336,7 +336,7 @@ void ModuleWidget::onButton(event::Button &e) {
 	}
 }
 
-void ModuleWidget::onHoverKey(event::HoverKey &e) {
+void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_I: {
@@ -382,14 +382,14 @@ void ModuleWidget::onHoverKey(event::HoverKey &e) {
 		OpaqueWidget::onHoverKey(e);
 }
 
-void ModuleWidget::onDragStart(event::DragStart &e) {
+void ModuleWidget::onDragStart(const event::DragStart &e) {
 	dragPos = context()->scene->rackWidget->lastMousePos.minus(box.pos);
 }
 
-void ModuleWidget::onDragEnd(event::DragEnd &e) {
+void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 }
 
-void ModuleWidget::onDragMove(event::DragMove &e) {
+void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = context()->scene->rackWidget->lastMousePos.minus(dragPos);
@@ -404,7 +404,7 @@ struct ModuleDisconnectItem : MenuItem {
 		text = "Disconnect cables";
 		rightText = WINDOW_MOD_KEY_NAME "+U";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->disconnect();
 	}
 };
@@ -415,7 +415,7 @@ struct ModuleResetItem : MenuItem {
 		text = "Initialize";
 		rightText = WINDOW_MOD_KEY_NAME "+I";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->reset();
 	}
 };
@@ -426,7 +426,7 @@ struct ModuleRandomizeItem : MenuItem {
 		text = "Randomize";
 		rightText = WINDOW_MOD_KEY_NAME "+R";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->randomize();
 	}
 };
@@ -437,7 +437,7 @@ struct ModuleCopyItem : MenuItem {
 		text = "Copy preset";
 		rightText = WINDOW_MOD_KEY_NAME "+C";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->copyClipboard();
 	}
 };
@@ -448,7 +448,7 @@ struct ModulePasteItem : MenuItem {
 		text = "Paste preset";
 		rightText = WINDOW_MOD_KEY_NAME "+V";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->pasteClipboard();
 	}
 };
@@ -458,7 +458,7 @@ struct ModuleSaveItem : MenuItem {
 	ModuleSaveItem() {
 		text = "Save preset";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->saveDialog();
 	}
 };
@@ -468,7 +468,7 @@ struct ModuleLoadItem : MenuItem {
 	ModuleLoadItem() {
 		text = "Load preset";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->loadDialog();
 	}
 };
@@ -479,7 +479,7 @@ struct ModuleCloneItem : MenuItem {
 		text = "Duplicate";
 		rightText = WINDOW_MOD_KEY_NAME "+D";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->cloneModule(moduleWidget);
 	}
 };
@@ -490,7 +490,7 @@ struct ModuleDeleteItem : MenuItem {
 		text = "Delete";
 		rightText = "Backspace/Delete";
 	}
-	void onAction(event::Action &e) override {
+	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->deleteModule(moduleWidget);
 		delete moduleWidget;
 	}

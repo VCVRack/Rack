@@ -178,12 +178,12 @@ struct MidiTrigChoice : GridChoice {
 		}
 	}
 
-	void onSelect(event::Select &e) override {
+	void onSelect(const event::Select &e) override {
 		e.consume(this);
 		module->learningId = id;
 	}
 
-	void onDeselect(event::Deselect &e) override {
+	void onDeselect(const event::Deselect &e) override {
 		module->learningId = -1;
 	}
 };
@@ -238,7 +238,7 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 
 		struct VelocityItem : MenuItem {
 			MIDITriggerToCVInterface *module;
-			void onAction(event::Action &e) override {
+			void onAction(const event::Action &e) override {
 				module->velocity ^= true;
 			}
 		};

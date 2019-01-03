@@ -30,7 +30,7 @@ void SVGKnob::step() {
 	FramebufferWidget::step();
 }
 
-void SVGKnob::onChange(event::Change &e) {
+void SVGKnob::onChange(const event::Change &e) {
 	// Re-transform the TransformWidget
 	if (quantity) {
 		float angle;

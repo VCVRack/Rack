@@ -35,7 +35,7 @@ void MenuItem::step() {
 	Widget::step();
 }
 
-void MenuItem::onEnter(event::Enter &e) {
+void MenuItem::onEnter(const event::Enter &e) {
 	Menu *parentMenu = dynamic_cast<Menu*>(parent);
 	if (!parentMenu)
 		return;
@@ -51,7 +51,7 @@ void MenuItem::onEnter(event::Enter &e) {
 	parentMenu->setChildMenu(childMenu);
 }
 
-void MenuItem::onDragDrop(event::DragDrop &e) {
+void MenuItem::onDragDrop(const event::DragDrop &e) {
 	if (e.origin != this)
 		return;
 	doAction();

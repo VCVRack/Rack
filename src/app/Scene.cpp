@@ -66,7 +66,7 @@ void Scene::draw(NVGcontext *vg) {
 	OpaqueWidget::draw(vg);
 }
 
-void Scene::onHoverKey(event::HoverKey &e) {
+void Scene::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
@@ -123,7 +123,7 @@ void Scene::onHoverKey(event::HoverKey &e) {
 		OpaqueWidget::onHoverKey(e);
 }
 
-void Scene::onPathDrop(event::PathDrop &e) {
+void Scene::onPathDrop(const event::PathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
 		if (string::extension(path) == "vcv") {

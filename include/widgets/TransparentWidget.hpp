@@ -8,13 +8,13 @@ namespace rack {
 /** Widget that does not respond to events and does not pass events to children */
 struct TransparentWidget : virtual Widget {
 	/** Override behavior to do nothing instead. */
-	void onHover(event::Hover &e) override {}
-	void onButton(event::Button &e) override {}
-	void onHoverKey(event::HoverKey &e) override {}
-	void onHoverText(event::HoverText &e) override {}
-	void onHoverScroll(event::HoverScroll &e) override {}
-	void onDragHover(event::DragHover &e) override {}
-	void onPathDrop(event::PathDrop &e) override {}
+	void onHover(const event::Hover &e) override {}
+	void onButton(const event::Button &e) override {}
+	void onHoverKey(const event::HoverKey &e) override {}
+	void onHoverText(const event::HoverText &e) override {}
+	void onHoverScroll(const event::HoverScroll &e) override {}
+	void onDragHover(const event::DragHover &e) override {}
+	void onPathDrop(const event::PathDrop &e) override {}
 };
 
 

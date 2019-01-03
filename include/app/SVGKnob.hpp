@@ -21,7 +21,7 @@ struct SVGKnob : Knob, FramebufferWidget {
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
 	void step() override;
-	void onChange(event::Change &e) override;
+	void onChange(const event::Change &e) override;
 };
 
 

@@ -8,7 +8,7 @@ namespace rack {
 
 /** A switch that cycles through each mechanical position */
 struct ToggleSwitch : virtual ParamWidget {
-	void onDragStart(event::DragStart &e) override;
+	void onDragStart(const event::DragStart &e) override;
 };
 
 

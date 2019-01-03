@@ -4,7 +4,7 @@
 namespace rack {
 
 
-void Knob::onButton(event::Button &e) {
+void Knob::onButton(const event::Button &e) {
 	float r = box.size.x / 2;
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
@@ -13,15 +13,15 @@ void Knob::onButton(event::Button &e) {
 	}
 }
 
-void Knob::onDragStart(event::DragStart &e) {
+void Knob::onDragStart(const event::DragStart &e) {
 	context()->window->cursorLock();
 }
 
-void Knob::onDragEnd(event::DragEnd &e) {
+void Knob::onDragEnd(const event::DragEnd &e) {
 	context()->window->cursorUnlock();
 }
 
-void Knob::onDragMove(event::DragMove &e) {
+void Knob::onDragMove(const event::DragMove &e) {
 	if (quantity) {
 		float range;
 		if (quantity->isBounded()) {

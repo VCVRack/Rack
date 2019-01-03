@@ -18,7 +18,7 @@ struct Menu : OpaqueWidget {
 	void setChildMenu(Menu *menu);
 	void step() override;
 	void draw(NVGcontext *vg) override;
-	void onHoverScroll(event::HoverScroll &e) override;
+	void onHoverScroll(const event::HoverScroll &e) override;
 };
 
 

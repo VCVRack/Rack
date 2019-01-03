@@ -10,8 +10,8 @@ namespace rack {
 Consider using SVGButton if the switch simply changes the state of your Module when clicked.
 */
 struct MomentarySwitch : virtual ParamWidget {
-	void onDragStart(event::DragStart &e) override;
-	void onDragEnd(event::DragEnd &e) override;
+	void onDragStart(const event::DragStart &e) override;
+	void onDragEnd(const event::DragEnd &e) override;
 };
 
 

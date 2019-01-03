@@ -19,8 +19,8 @@ struct MenuItem : MenuEntry {
 
 	void draw(NVGcontext *vg) override;
 	void step() override;
-	void onEnter(event::Enter &e) override;
-	void onDragDrop(event::DragDrop &e) override;
+	void onEnter(const event::Enter &e) override;
+	void onDragDrop(const event::DragDrop &e) override;
 	void doAction();
 	virtual Menu *createChildMenu() {return NULL;}
 };

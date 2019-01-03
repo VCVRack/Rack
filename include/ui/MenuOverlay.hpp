@@ -20,7 +20,7 @@ struct MenuOverlay : OpaqueWidget {
 		Widget::step();
 	}
 
-	void onButton(event::Button &e) override {
+	void onButton(const event::Button &e) override {
 		OpaqueWidget::onButton(e);
 
 		if (e.getConsumed() == this && e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -28,7 +28,7 @@ struct MenuOverlay : OpaqueWidget {
 		}
 	}
 
-	void onHoverKey(event::HoverKey &e) override {
+	void onHoverKey(const event::HoverKey &e) override {
 		OpaqueWidget::onHoverKey(e);
 
 		if (e.getConsumed() == this && e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {

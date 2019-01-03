@@ -53,7 +53,7 @@ void Menu::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
 
-void Menu::onHoverScroll(event::HoverScroll &e) {
+void Menu::onHoverScroll(const event::HoverScroll &e) {
 	if (parent && !parent->box.contains(box))
 		box.pos.y += e.scrollDelta.y;
 }

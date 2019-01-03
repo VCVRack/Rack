@@ -35,33 +35,40 @@ struct ZoomWidget : virtual Widget {
 		Widget::draw(vg);
 	}
 
-	void onHover(event::Hover &e) override {
-		e.pos = e.pos.div(zoom);
-		Widget::onHover(e);
+	void onHover(const event::Hover &e) override {
+		event::Hover e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onHover(e2);
 	}
-	void onButton(event::Button &e) override {
-		e.pos = e.pos.div(zoom);
-		Widget::onButton(e);
+	void onButton(const event::Button &e) override {
+		event::Button e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onButton(e2);
 	}
-	void onHoverKey(event::HoverKey &e) override {
-		e.pos = e.pos.div(zoom);
-		Widget::onHoverKey(e);
+	void onHoverKey(const event::HoverKey &e) override {
+		event::HoverKey e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onHoverKey(e2);
 	}
-	void onHoverText(event::HoverText &e) override {
-		e.pos = e.pos.div(zoom);
-		Widget::onHoverText(e);
+	void onHoverText(const event::HoverText &e) override {
+		event::HoverText e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onHoverText(e2);
 	}
-	void onHoverScroll(event::HoverScroll &e) override {
-		e.pos = e.pos.div(zoom);
-		Widget::onHoverScroll(e);
+	void onHoverScroll(const event::HoverScroll &e) override {
+		event::HoverScroll e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onHoverScroll(e2);
 	}
-	void onDragHover(event::DragHover &e) override {
-		e.pos = e.pos.div(zoom);
-		Widget::onDragHover(e);
+	void onDragHover(const event::DragHover &e) override {
+		event::DragHover e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onDragHover(e2);
 	}
-	void onPathDrop(event::PathDrop &e) override {
-		e.pos = e.pos.div(zoom);
-		Widget::onPathDrop(e);
+	void onPathDrop(const event::PathDrop &e) override {
+		event::PathDrop e2 = e;
+		e2.pos = e.pos.div(zoom);
+		Widget::onPathDrop(e2);
 	}
 };
 

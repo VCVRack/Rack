@@ -20,7 +20,7 @@ struct SVGSlider : Knob, FramebufferWidget {
 	SVGSlider();
 	void setSVGs(std::shared_ptr<SVG> backgroundSVG, std::shared_ptr<SVG> handleSVG);
 	void step() override;
-	void onChange(event::Change &e) override;
+	void onChange(const event::Change &e) override;
 };
 
 

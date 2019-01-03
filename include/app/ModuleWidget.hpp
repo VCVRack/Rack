@@ -64,12 +64,12 @@ struct ModuleWidget : OpaqueWidget {
 	void drawShadow(NVGcontext *vg);
 
 	math::Vec dragPos;
-	void onHover(event::Hover &e) override;
-	void onButton(event::Button &e) override;
-	void onHoverKey(event::HoverKey &e) override;
-	void onDragStart(event::DragStart &e) override;
-	void onDragEnd(event::DragEnd &e) override;
-	void onDragMove(event::DragMove &e) override;
+	void onHover(const event::Hover &e) override;
+	void onButton(const event::Button &e) override;
+	void onHoverKey(const event::HoverKey &e) override;
+	void onDragStart(const event::DragStart &e) override;
+	void onDragEnd(const event::DragEnd &e) override;
+	void onDragMove(const event::DragMove &e) override;
 };
 
 

@@ -26,17 +26,17 @@ struct RadioButton : OpaqueWidget {
 		bndRadioButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
 	}
 
-	void onEnter(event::Enter &e) override {
+	void onEnter(const event::Enter &e) override {
 		if (state != BND_ACTIVE)
 			state = BND_HOVER;
 	}
 
-	void onLeave(event::Leave &e) override {
+	void onLeave(const event::Leave &e) override {
 		if (state != BND_ACTIVE)
 			state = BND_DEFAULT;
 	}
 
-	void onDragDrop(event::DragDrop &e) override {
+	void onDragDrop(const event::DragDrop &e) override {
 		if (e.origin == this) {
 			if (state == BND_ACTIVE) {
 				state = BND_HOVER;

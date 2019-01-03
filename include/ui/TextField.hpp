@@ -21,11 +21,11 @@ struct TextField : OpaqueWidget {
 
 	TextField();
 	void draw(NVGcontext *vg) override;
-	void onButton(event::Button &e) override;
-	void onHover(event::Hover &e) override;
-	void onEnter(event::Enter &e) override;
-	void onSelectText(event::SelectText &e) override;
-	void onSelectKey(event::SelectKey &e) override;
+	void onButton(const event::Button &e) override;
+	void onHover(const event::Hover &e) override;
+	void onEnter(const event::Enter &e) override;
+	void onSelectText(const event::SelectText &e) override;
+	void onSelectKey(const event::SelectKey &e) override;
 
 	/** Inserts text at the cursor, replacing the selection if necessary */
 	void insertText(std::string text);

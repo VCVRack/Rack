@@ -11,18 +11,18 @@ struct ModuleResizeHandle : virtual Widget {
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
-	void onHover(event::Hover &e) override {
+	void onHover(const event::Hover &e) override {
 		// TODO
 		// if (e.button == 0) {
 		// 	e.target = this;
 		// }
 	}
-	void onDragStart(event::DragStart &e) override {
+	void onDragStart(const event::DragStart &e) override {
 		dragX = context()->scene->rackWidget->lastMousePos.x;
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 		originalBox = m->box;
 	}
-	void onDragMove(event::DragMove &e) override {
+	void onDragMove(const event::DragMove &e) override {
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
 		float newDragX = context()->scene->rackWidget->lastMousePos.x;

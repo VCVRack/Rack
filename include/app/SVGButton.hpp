@@ -18,8 +18,8 @@ struct SVGButton : FramebufferWidget {
 	SVGButton();
 	/** If `activeSVG` is NULL, `defaultSVG` is used as the active state instead. */
 	void setSVGs(std::shared_ptr<SVG> defaultSVG, std::shared_ptr<SVG> activeSVG);
-	void onDragStart(event::DragStart &e) override;
-	void onDragEnd(event::DragEnd &e) override;
+	void onDragStart(const event::DragStart &e) override;
+	void onDragEnd(const event::DragEnd &e) override;
 };
 
 

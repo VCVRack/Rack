@@ -30,23 +30,23 @@ struct Slider : OpaqueWidget {
 		bndSlider(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
 	}
 
-	void onDragStart(event::DragStart &e) override {
+	void onDragStart(const event::DragStart &e) override {
 		state = BND_ACTIVE;
 		context()->window->cursorLock();
 	}
 
-	void onDragMove(event::DragMove &e) override {
+	void onDragMove(const event::DragMove &e) override {
 		if (quantity) {
 			quantity->moveScaledValue(SLIDER_SENSITIVITY * e.mouseDelta.x);
 		}
 	}
 
-	void onDragEnd(event::DragEnd &e) override {
+	void onDragEnd(const event::DragEnd &e) override {
 		state = BND_DEFAULT;
 		context()->window->cursorUnlock();
 	}
 
-	void onButton(event::Button &e) override {
+	void onButton(const event::Button &e) override {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (quantity)
 				quantity->reset();

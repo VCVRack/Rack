@@ -24,7 +24,7 @@ struct LedDisplayChoice : TransparentWidget {
 	NVGcolor color;
 	LedDisplayChoice();
 	void draw(NVGcontext *vg) override;
-	void onButton(event::Button &e) override;
+	void onButton(const event::Button &e) override;
 };
 
 struct LedDisplayTextField : TextField {

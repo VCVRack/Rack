@@ -27,7 +27,7 @@ void SVGSlider::step() {
 	FramebufferWidget::step();
 }
 
-void SVGSlider::onChange(event::Change &e) {
+void SVGSlider::onChange(const event::Change &e) {
 	if (quantity) {
 		// Interpolate handle position
 		float v = quantity->getScaledValue();

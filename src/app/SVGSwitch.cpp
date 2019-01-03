@@ -23,7 +23,7 @@ void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 	}
 }
 
-void SVGSwitch::onChange(event::Change &e) {
+void SVGSwitch::onChange(const event::Change &e) {
 	assert(frames.size() > 0);
 	if (quantity) {
 		int index = quantity->getScaledValue() * (frames.size() - 1);

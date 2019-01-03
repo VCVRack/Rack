@@ -18,7 +18,7 @@ struct SVGSwitch : virtual ParamWidget, FramebufferWidget {
 	void step() override;
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<SVG> svg);
-	void onChange(event::Change &e) override;
+	void onChange(const event::Change &e) override;
 };
 
 
