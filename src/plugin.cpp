@@ -111,8 +111,8 @@ static bool loadPlugin(std::string path) {
 	Plugin *plugin = new Plugin;
 	plugin->path = path;
 	plugin->handle = handle;
-	plugin->fromJson(rootJ);
 	initCallback(plugin);
+	plugin->fromJson(rootJ);
 
 	// Reject plugin if slug already exists
 	Plugin *oldPlugin = getPlugin(plugin->slug);
