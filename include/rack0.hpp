@@ -108,10 +108,43 @@ DEPRECATED static const NVGcolor COLOR_DARK_PANEL = SCHEME_DARK_PANEL;
 // helpers
 ////////////////////
 
+/** Use createWidget() instead */
 template <class TScrew>
 DEPRECATED TScrew *createScrew(math::Vec pos) {
 	return createWidget<TScrew>(pos);
 }
 
+/** Use createParam(pos, module, paramId) and set the Param properties in your Module constructor */
+template <class TParamWidget>
+DEPRECATED TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+	TParamWidget *o = createParam<TParamWidget>(pos, module, paramId);
+	if (module) {
+		module->params[paramId].setup(minValue, maxValue, defaultValue);
+	}
+	return o;
+}
+
+/** Use createInput() and createOutput() without the `type` variable */
+template <class TPortWidget>
+DEPRECATED TPortWidget *createPort(math::Vec pos, PortWidget::Type type, Module *module, int inputId) {
+	TPortWidget *o = new TPortWidget;
+	o->box.pos = pos;
+	o->type = type;
+	o->module = module;
+	o->portId = inputId;
+	return o;
+}
+
+////////////////////
+// engine
+////////////////////
+
+DEPRECATED inline float engineGetSampleRate() {
+	return context()->engine->getSampleRate();
+}
+
+DEPRECATED inline float engineGetSampleTime() {
+	return context()->engine->getSampleTime();
+}
 
 } // namespace rack

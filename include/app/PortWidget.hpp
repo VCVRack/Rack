@@ -12,11 +12,11 @@ struct PortWidget : OpaqueWidget {
 	Module *module = NULL;
 	int portId;
 
-	enum PortType {
+	enum Type {
 		INPUT,
 		OUTPUT
 	};
-	PortType type = INPUT;
+	Type type = INPUT;
 	MultiLightWidget *plugLight;
 
 	PortWidget();
