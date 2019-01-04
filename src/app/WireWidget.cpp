@@ -183,7 +183,7 @@ void WireWidget::draw(NVGcontext *vg) {
 	if (wire && wire->outputModule) {
 		Output *output = &wire->outputModule->outputs[wire->outputId];
 		if (output->numChannels != 1) {
-			thickness = 8;
+			thickness = 9;
 		}
 	}
 

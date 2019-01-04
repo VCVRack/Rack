@@ -76,6 +76,16 @@ struct SaveAsItem : MenuItem {
 };
 
 
+struct SaveTemplateItem : MenuItem {
+	SaveTemplateItem() {
+		text = "Save template";
+	}
+	void onAction(const event::Action &e) override {
+		context()->scene->rackWidget->saveTemplate();
+	}
+};
+
+
 struct RevertItem : MenuItem {
 	RevertItem() {
 		text = "Revert";
@@ -120,6 +130,7 @@ struct FileButton : MenuButton {
 		menu->addChild(new OpenItem);
 		menu->addChild(new SaveItem);
 		menu->addChild(new SaveAsItem);
+		menu->addChild(new SaveTemplateItem);
 		menu->addChild(new RevertItem);
 		menu->addChild(new DisconnectCablesItem);
 		menu->addChild(new QuitItem);

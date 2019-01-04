@@ -145,6 +145,12 @@ void RackWidget::saveAsDialog() {
 	lastPath = pathStr;
 }
 
+void RackWidget::saveTemplate() {
+	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?")) {
+		save(asset::user("template.vcv"));
+	}
+}
+
 void RackWidget::save(std::string filename) {
 	INFO("Saving patch %s", filename.c_str());
 	json_t *rootJ = toJson();

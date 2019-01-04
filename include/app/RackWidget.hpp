@@ -28,6 +28,7 @@ struct RackWidget : OpaqueWidget {
 	void loadDialog();
 	void saveDialog();
 	void saveAsDialog();
+	void saveTemplate();
 	/** If `lastPath` is defined, ask the user to reload it */
 	void revert();
 	/** Disconnects all wires */
