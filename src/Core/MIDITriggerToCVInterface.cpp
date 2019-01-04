@@ -159,6 +159,8 @@ struct MidiTrigChoice : GridChoice {
 	}
 
 	void step() override {
+		if (!module)
+			return;
 		if (module->learningId == id) {
 			text = "LRN";
 			color.a = 0.5;
@@ -180,10 +182,14 @@ struct MidiTrigChoice : GridChoice {
 
 	void onSelect(const event::Select &e) override {
 		e.consume(this);
+		if (!module)
+			return;
 		module->learningId = id;
 	}
 
 	void onDeselect(const event::Deselect &e) override {
+		if (!module)
+			return;
 		module->learningId = -1;
 	}
 };
@@ -228,7 +234,8 @@ struct MIDITriggerToCVInterfaceWidget : ModuleWidget {
 		MidiTrigWidget *midiWidget = createWidget<MidiTrigWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->module = module;
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
-		midiWidget->midiIO = &module->midiInput;
+		if (module)
+			midiWidget->midiIO = &module->midiInput;
 		midiWidget->createGridChoices();
 		addChild(midiWidget);
 	}

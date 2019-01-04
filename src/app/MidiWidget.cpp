@@ -17,6 +17,9 @@ struct MidiDriverItem : MenuItem {
 struct MidiDriverChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void onAction(const event::Action &e) override {
+		if (!midiWidget->midiIO)
+			return;
+
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI driver"));
 		for (int driverId : midiWidget->midiIO->getDriverIds()) {
@@ -29,6 +32,10 @@ struct MidiDriverChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
+		if (!midiWidget->midiIO) {
+			text = "";
+			return;
+		}
 		text = midiWidget->midiIO->getDriverName(midiWidget->midiIO->driverId);
 		if (text.empty()) {
 			text = "(No driver)";
@@ -51,6 +58,9 @@ struct MidiDeviceItem : MenuItem {
 struct MidiDeviceChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void onAction(const event::Action &e) override {
+		if (!midiWidget->midiIO)
+			return;
+
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI device"));
 		{
@@ -71,6 +81,10 @@ struct MidiDeviceChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
+		if (!midiWidget->midiIO) {
+			text = "";
+			return;
+		}
 		text = midiWidget->midiIO->getDeviceName(midiWidget->midiIO->deviceId);
 		if (text.empty()) {
 			text = "(No device)";
@@ -93,6 +107,9 @@ struct MidiChannelItem : MenuItem {
 struct MidiChannelChoice : LedDisplayChoice {
 	MidiWidget *midiWidget;
 	void onAction(const event::Action &e) override {
+		if (!midiWidget->midiIO)
+			return;
+
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI channel"));
 		for (int channel = -1; channel < 16; channel++) {
@@ -105,7 +122,10 @@ struct MidiChannelChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = midiWidget->midiIO->getChannelName(midiWidget->midiIO->channel);
+		if (midiWidget->midiIO)
+			text = midiWidget->midiIO->getChannelName(midiWidget->midiIO->channel);
+		else
+			text = "";
 	}
 };
 

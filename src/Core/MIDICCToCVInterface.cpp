@@ -119,6 +119,10 @@ struct MidiCcChoice : GridChoice {
 	}
 
 	void step() override {
+		if (!module) {
+			text = "";
+			return;
+		}
 		if (module->learningId == id) {
 			if (0 <= focusCc)
 				text = string::f("%d", focusCc);
@@ -136,11 +140,15 @@ struct MidiCcChoice : GridChoice {
 
 	void onSelect(const event::Select &e) override {
 		e.consume(this);
+		if (!module)
+			return;
 		module->learningId = id;
 		focusCc = -1;
 	}
 
 	void onDeselect(const event::Deselect &e) override {
+		if (!module)
+			return;
 		if (0 <= focusCc && focusCc < 128) {
 			module->learnedCcs[id] = focusCc;
 		}
@@ -159,7 +167,7 @@ struct MidiCcChoice : GridChoice {
 
 	void onSelectKey(const event::SelectKey &e) override {
 		if (context()->event->selectedWidget == this) {
-			if (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) {
+			if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 				event::Deselect eDeselect;
 				onDeselect(eDeselect);
 				context()->event->selectedWidget = NULL;
@@ -209,7 +217,8 @@ struct MIDICCToCVInterfaceWidget : ModuleWidget {
 		MidiCcWidget *midiWidget = createWidget<MidiCcWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->module = module;
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
-		midiWidget->midiIO = &module->midiInput;
+		if (module)
+			midiWidget->midiIO = &module->midiInput;
 		midiWidget->createGridChoices();
 		addChild(midiWidget);
 	}

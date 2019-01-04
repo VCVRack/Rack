@@ -14,6 +14,8 @@ void ParamQuantity::commitSnap() {
 }
 
 void ParamQuantity::setValue(float value) {
+	if (!module)
+		return;
 	value = math::clamp(value, getMinValue(), getMaxValue());
 	// TODO Smooth
 	// TODO Snap
@@ -21,22 +23,32 @@ void ParamQuantity::setValue(float value) {
 }
 
 float ParamQuantity::getValue() {
+	if (!module)
+		return Quantity::getValue();
 	return getParam()->value;
 }
 
 float ParamQuantity::getMinValue() {
+	if (!module)
+		return Quantity::getMinValue();
 	return getParam()->minValue;
 }
 
 float ParamQuantity::getMaxValue() {
+	if (!module)
+		return Quantity::getMaxValue();
 	return getParam()->maxValue;
 }
 
 float ParamQuantity::getDefaultValue() {
+	if (!module)
+		return Quantity::getDefaultValue();
 	return getParam()->defaultValue;
 }
 
 float ParamQuantity::getDisplayValue() {
+	if (!module)
+		return Quantity::getDisplayValue();
 	if (getParam()->displayBase == 0.f) {
 		// Linear
 		return getParam()->value * getParam()->displayMultiplier;
@@ -52,6 +64,8 @@ float ParamQuantity::getDisplayValue() {
 }
 
 void ParamQuantity::setDisplayValue(float displayValue) {
+	if (!module)
+		return;
 	if (getParam()->displayBase == 0.f) {
 		// Linear
 		getParam()->value = displayValue / getParam()->displayMultiplier;
@@ -67,14 +81,20 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 }
 
 int ParamQuantity::getDisplayPrecision() {
+	if (!module)
+		return Quantity::getDisplayPrecision();
 	return getParam()->displayPrecision;
 }
 
 std::string ParamQuantity::getLabel() {
+	if (!module)
+		return Quantity::getLabel();
 	return getParam()->label;
 }
 
 std::string ParamQuantity::getUnit() {
+	if (!module)
+		return Quantity::getUnit();
 	return getParam()->unit;
 }
 

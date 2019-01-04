@@ -17,6 +17,9 @@ struct AudioDriverItem : MenuItem {
 struct AudioDriverChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void onAction(const event::Action &e) override {
+		if (!audioWidget->audioIO)
+			return;
+
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
 		for (int driver : audioWidget->audioIO->getDrivers()) {
@@ -29,7 +32,10 @@ struct AudioDriverChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = audioWidget->audioIO->getDriverName(audioWidget->audioIO->driver);
+		if (audioWidget->audioIO)
+			text = audioWidget->audioIO->getDriverName(audioWidget->audioIO->driver);
+		else
+			text = "";
 	}
 };
 
@@ -49,6 +55,9 @@ struct AudioDeviceChoice : LedDisplayChoice {
 	int maxTotalChannels = 128;
 
 	void onAction(const event::Action &e) override {
+		if (!audioWidget->audioIO)
+			return;
+
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio device"));
 		int deviceCount = audioWidget->audioIO->getDeviceCount();
@@ -74,6 +83,10 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
+		if (!audioWidget->audioIO) {
+			text = "";
+			return;
+		}
 		text = audioWidget->audioIO->getDeviceDetail(audioWidget->audioIO->device, audioWidget->audioIO->offset);
 		if (text.empty()) {
 			text = "(No device)";
@@ -97,6 +110,9 @@ struct AudioSampleRateItem : MenuItem {
 struct AudioSampleRateChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void onAction(const event::Action &e) override {
+		if (!audioWidget->audioIO)
+			return;
+
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Sample rate"));
 		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
@@ -113,7 +129,10 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = string::f("%g kHz", audioWidget->audioIO->sampleRate / 1000.f);
+		if (audioWidget->audioIO)
+			text = string::f("%g kHz", audioWidget->audioIO->sampleRate / 1000.f);
+		else
+			text = "";
 	}
 };
 
@@ -129,6 +148,9 @@ struct AudioBlockSizeItem : MenuItem {
 struct AudioBlockSizeChoice : LedDisplayChoice {
 	AudioWidget *audioWidget;
 	void onAction(const event::Action &e) override {
+		if (!audioWidget->audioIO)
+			return;
+
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Block size"));
 		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
@@ -146,7 +168,10 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = string::f("%d", audioWidget->audioIO->blockSize);
+		if (audioWidget->audioIO)
+			text = string::f("%d", audioWidget->audioIO->blockSize);
+		else
+			text = "";
 	}
 };
 

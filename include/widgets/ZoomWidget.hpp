@@ -22,11 +22,12 @@ struct ZoomWidget : virtual Widget {
 	}
 
 	void setZoom(float zoom) {
-		if (zoom != this->zoom) {
-			event::Zoom eZoom;
-			Widget::onZoom(eZoom);
-		}
 		this->zoom = zoom;
+
+		event::Context eZoomContext;
+		event::Zoom eZoom;
+		eZoom.context = &eZoomContext;
+		Widget::onZoom(eZoom);
 	}
 
 	void draw(NVGcontext *vg) override {

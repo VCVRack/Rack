@@ -276,7 +276,8 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 		AudioWidget *audioWidget = createWidget<AudioWidget>(mm2px(Vec(3.2122073, 14.837339)));
 		audioWidget->box.size = mm2px(Vec(44, 28));
-		audioWidget->audioIO = &module->audioIO;
+		if (module)
+			audioWidget->audioIO = &module->audioIO;
 		addChild(audioWidget);
 	}
 };

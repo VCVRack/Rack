@@ -29,6 +29,9 @@ PortWidget::~PortWidget() {
 }
 
 void PortWidget::step() {
+	if (!module)
+		return;
+
 	std::vector<float> values(2);
 	if (type == INPUT) {
 		values[0] = module->inputs[portId].plugLights[0].getBrightness();

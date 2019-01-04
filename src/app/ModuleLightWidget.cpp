@@ -5,7 +5,9 @@ namespace rack {
 
 
 void ModuleLightWidget::step() {
-	assert(module);
+	if (!module)
+		return;
+
 	assert(module->lights.size() >= firstLightId + baseColors.size());
 	std::vector<float> values(baseColors.size());
 

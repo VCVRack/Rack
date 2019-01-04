@@ -329,7 +329,8 @@ struct QuadMIDIToCVInterfaceWidget : ModuleWidget {
 
 		MidiWidget *midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.4009969, 14.837336)));
 		midiWidget->box.size = mm2px(Vec(44, 28));
-		midiWidget->midiIO = &module->midiInput;
+		if (module)
+			midiWidget->midiIO = &module->midiInput;
 		addChild(midiWidget);
 	}
 
