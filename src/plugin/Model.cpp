@@ -9,7 +9,9 @@ void Model::fromJson(json_t *rootJ) {
 	if (nameJ)
 		name = json_string_value(nameJ);
 
-	DEBUG("name: %s", name.c_str());
+	json_t *descriptionJ = json_object_get(rootJ, "description");
+	if (descriptionJ)
+		description = json_string_value(descriptionJ);
 
 	json_t *tagsJ = json_object_get(rootJ, "tags");
 	if (tagsJ) {
@@ -17,7 +19,7 @@ void Model::fromJson(json_t *rootJ) {
 		json_t *tagJ;
 		json_array_foreach(tagsJ, i, tagJ) {
 			std::string tag = json_string_value(tagJ);
-			DEBUG("tag: %s", tag.c_str());
+			tags.push_back(tag);
 		}
 	}
 }

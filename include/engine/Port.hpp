@@ -12,6 +12,9 @@ static const int PORT_MAX_CHANNELS = 16;
 struct Port {
 	/** Voltage of the port */
 	union {
+		/** Accessing this directly is deprecated.
+		Use getVoltage() and setVoltage() instead
+		*/
 		float value;
 		float values[PORT_MAX_CHANNELS] = {};
 	};
@@ -21,12 +24,11 @@ struct Port {
 	bool active = false;
 	Light plugLights[2];
 
-	float getValue(int index = 0) {
+	float getVoltage(int index = 0) {
 		return values[index];
 	}
-
-	void setValue(float value, int index = 0) {
-		this->values[index] = value;
+	void setVoltage(float voltage, int index = 0) {
+		values[index] = voltage;
 	}
 };
 

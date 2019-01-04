@@ -51,7 +51,7 @@ struct MIDICCToCVInterface : Module {
 			int learnedCc = learnedCcs[i];
 			float value = rescale(clamp(ccs[learnedCc], -127, 127), 0, 127, 0.f, 10.f);
 			ccFilters[i].lambda = lambda;
-			outputs[CC_OUTPUT + i].value = ccFilters[i].process(value);
+			outputs[CC_OUTPUT + i].setVoltage(ccFilters[i].process(value));
 		}
 	}
 

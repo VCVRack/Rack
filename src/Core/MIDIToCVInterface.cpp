@@ -148,23 +148,23 @@ struct MIDIToCVInterface : Module {
 		}
 		float deltaTime = context()->engine->getSampleTime();
 
-		outputs[CV_OUTPUT].value = (lastNote - 60) / 12.f;
-		outputs[GATE_OUTPUT].value = gate ? 10.f : 0.f;
-		outputs[VELOCITY_OUTPUT].value = rescale(noteData[lastNote].velocity, 0, 127, 0.f, 10.f);
+		outputs[CV_OUTPUT].setVoltage((lastNote - 60) / 12.f);
+		outputs[GATE_OUTPUT].setVoltage(gate ? 10.f : 0.f);
+		outputs[VELOCITY_OUTPUT].setVoltage(rescale(noteData[lastNote].velocity, 0, 127, 0.f, 10.f));
 
-		outputs[AFTERTOUCH_OUTPUT].value = rescale(noteData[lastNote].aftertouch, 0, 127, 0.f, 10.f);
+		outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(noteData[lastNote].aftertouch, 0, 127, 0.f, 10.f));
 		pitchFilter.lambda = 100.f * deltaTime;
-		outputs[PITCH_OUTPUT].value = pitchFilter.process(rescale(pitch, 0, 16384, -5.f, 5.f));
+		outputs[PITCH_OUTPUT].setVoltage(pitchFilter.process(rescale(pitch, 0, 16384, -5.f, 5.f)));
 		modFilter.lambda = 100.f * deltaTime;
-		outputs[MOD_OUTPUT].value = modFilter.process(rescale(mod, 0, 127, 0.f, 10.f));
+		outputs[MOD_OUTPUT].setVoltage(modFilter.process(rescale(mod, 0, 127, 0.f, 10.f)));
 
-		outputs[RETRIGGER_OUTPUT].value = retriggerPulse.process(deltaTime) ? 10.f : 0.f;
-		outputs[CLOCK_1_OUTPUT].value = clockPulses[0].process(deltaTime) ? 10.f : 0.f;
-		outputs[CLOCK_2_OUTPUT].value = clockPulses[1].process(deltaTime) ? 10.f : 0.f;
+		outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulse.process(deltaTime) ? 10.f : 0.f);
+		outputs[CLOCK_1_OUTPUT].setVoltage(clockPulses[0].process(deltaTime) ? 10.f : 0.f);
+		outputs[CLOCK_2_OUTPUT].setVoltage(clockPulses[1].process(deltaTime) ? 10.f : 0.f);
 
-		outputs[START_OUTPUT].value = startPulse.process(deltaTime) ? 10.f : 0.f;
-		outputs[STOP_OUTPUT].value = stopPulse.process(deltaTime) ? 10.f : 0.f;
-		outputs[CONTINUE_OUTPUT].value = continuePulse.process(deltaTime) ? 10.f : 0.f;
+		outputs[START_OUTPUT].setVoltage(startPulse.process(deltaTime) ? 10.f : 0.f);
+		outputs[STOP_OUTPUT].setVoltage(stopPulse.process(deltaTime) ? 10.f : 0.f);
+		outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(deltaTime) ? 10.f : 0.f);
 	}
 
 	void processMessage(midi::Message msg) {

@@ -251,10 +251,10 @@ struct QuadMIDIToCVInterface : Module {
 		for (int i = 0; i < 4; i++) {
 			uint8_t lastNote = notes[i];
 			uint8_t lastGate = (gates[i] || pedalgates[i]);
-			outputs[CV_OUTPUT + i].value = (lastNote - 60) / 12.f;
-			outputs[GATE_OUTPUT + i].value = lastGate ? 10.f : 0.f;
-			outputs[VELOCITY_OUTPUT + i].value = rescale(noteData[lastNote].velocity, 0, 127, 0.f, 10.f);
-			outputs[AFTERTOUCH_OUTPUT + i].value = rescale(noteData[lastNote].aftertouch, 0, 127, 0.f, 10.f);
+			outputs[CV_OUTPUT + i].setVoltage((lastNote - 60) / 12.f);
+			outputs[GATE_OUTPUT + i].setVoltage(lastGate ? 10.f : 0.f);
+			outputs[VELOCITY_OUTPUT + i].setVoltage(rescale(noteData[lastNote].velocity, 0, 127, 0.f, 10.f));
+			outputs[AFTERTOUCH_OUTPUT + i].setVoltage(rescale(noteData[lastNote].aftertouch, 0, 127, 0.f, 10.f));
 		}
 	}
 

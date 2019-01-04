@@ -62,13 +62,6 @@ int main(int argc, char *argv[]) {
 	random::init();
 	asset::init(devMode);
 	logger::init(devMode);
-	midi::init();
-	rtmidiInit();
-	bridgeInit();
-	keyboard::init();
-	gamepad::init();
-	ui::init();
-	plugin::init(devMode);
 
 	// Log environment
 	INFO("%s %s", APP_NAME.c_str(), APP_VERSION.c_str());
@@ -76,6 +69,14 @@ int main(int argc, char *argv[]) {
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());
 	INFO("User directory: %s", asset::userDir.c_str());
+
+	midi::init();
+	rtmidiInit();
+	bridgeInit();
+	keyboard::init();
+	gamepad::init();
+	ui::init();
+	plugin::init(devMode);
 
 	// Initialize app
 	context()->engine = new Engine;

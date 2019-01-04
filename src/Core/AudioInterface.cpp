@@ -71,7 +71,7 @@ struct AudioInterfaceIO : audio::IO {
 			else {
 				// Timed out, fill output with zeros
 				memset(output, 0, frames * numOutputs * sizeof(float));
-				DEBUG("Audio Interface IO underflow");
+				// DEBUG("Audio Interface IO underflow");
 			}
 		}
 
@@ -172,7 +172,7 @@ void AudioInterface::step() {
 		else {
 			// Give up on pulling input
 			audioIO.active = false;
-			DEBUG("Audio Interface underflow");
+			// DEBUG("Audio Interface underflow");
 		}
 	}
 
@@ -185,10 +185,10 @@ void AudioInterface::step() {
 		memset(&inputFrame, 0, sizeof(inputFrame));
 	}
 	for (int i = 0; i < audioIO.numInputs; i++) {
-		outputs[AUDIO_OUTPUT + i].value = 10.f * inputFrame.samples[i];
+		outputs[AUDIO_OUTPUT + i].setVoltage(10.f * inputFrame.samples[i]);
 	}
 	for (int i = audioIO.numInputs; i < AUDIO_INPUTS; i++) {
-		outputs[AUDIO_OUTPUT + i].value = 0.f;
+		outputs[AUDIO_OUTPUT + i].setVoltage(0.f);
 	}
 
 	// Outputs: rack engine -> audio engine
@@ -197,7 +197,7 @@ void AudioInterface::step() {
 		if (!outputBuffer.full()) {
 			Frame<AUDIO_OUTPUTS> outputFrame;
 			for (int i = 0; i < AUDIO_OUTPUTS; i++) {
-				outputFrame.samples[i] = inputs[AUDIO_INPUT + i].value / 10.f;
+				outputFrame.samples[i] = inputs[AUDIO_INPUT + i].getVoltage() / 10.f;
 			}
 			outputBuffer.push(outputFrame);
 		}
@@ -222,7 +222,7 @@ void AudioInterface::step() {
 				// Give up on pushing output
 				audioIO.active = false;
 				outputBuffer.clear();
-				DEBUG("Audio Interface underflow");
+				// DEBUG("Audio Interface underflow");
 			}
 		}
 
@@ -232,9 +232,9 @@ void AudioInterface::step() {
 
 	// Turn on light if at least one port is enabled in the nearby pair
 	for (int i = 0; i < AUDIO_INPUTS / 2; i++)
-		lights[INPUT_LIGHT + i].value = (audioIO.active && audioIO.numOutputs >= 2*i+1);
+		lights[INPUT_LIGHT + i].setBrightness(audioIO.active && audioIO.numOutputs >= 2*i+1);
 	for (int i = 0; i < AUDIO_OUTPUTS / 2; i++)
-		lights[OUTPUT_LIGHT + i].value = (audioIO.active && audioIO.numInputs >= 2*i+1);
+		lights[OUTPUT_LIGHT + i].setBrightness(audioIO.active && audioIO.numInputs >= 2*i+1);
 }
 
 
