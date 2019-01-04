@@ -26,6 +26,22 @@ static std::string sTagFilter;
 
 
 struct ModuleWidgetWrapper : ObstructWidget {
+	Model *model;
+
+	void onDragDrop(const event::DragDrop &e) override {
+		if (e.origin == this) {
+			// Create module
+			ModuleWidget *moduleWidget = model->createModuleWidget();
+			assert(moduleWidget);
+			context()->scene->rackWidget->addModule(moduleWidget);
+			// Move module nearest to the mouse position
+			moduleWidget->box.pos = context()->scene->rackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
+			context()->scene->rackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
+			// Close Module Browser
+			MenuOverlay *menuOverlay = getAncestorOfType<MenuOverlay>();
+			menuOverlay->requestedDelete = true;
+		}
+	}
 };
 
 
@@ -36,6 +52,7 @@ struct ModuleBrowser : OpaqueWidget {
 			for (Model *model : plugin->models) {
 				ModuleWidgetWrapper *wrapper = new ModuleWidgetWrapper;
 				wrapper->box.pos = p;
+				wrapper->model = model;
 				addChild(wrapper);
 
 				ZoomWidget *zoomWidget = new ZoomWidget;
