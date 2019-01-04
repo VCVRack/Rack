@@ -250,6 +250,12 @@ void ModuleWidget::saveDialog() {
 	save(pathStr);
 }
 
+void ModuleWidget::toggleBypass() {
+	if (!module)
+		return;
+	module->bypass ^= true;
+}
+
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
 		context()->scene->rackWidget->wireContainer->removeAllWires(input);
@@ -272,6 +278,9 @@ void ModuleWidget::randomize() {
 }
 
 void ModuleWidget::draw(NVGcontext *vg) {
+	if (module && module->bypass) {
+		nvgGlobalAlpha(vg, 0.5);
+	}
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(vg);
 
@@ -375,6 +384,12 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 					e.consume(this);
 				}
 			} break;
+			case GLFW_KEY_E: {
+				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+					toggleBypass();
+					e.consume(this);
+				}
+			} break;
 		}
 	}
 
@@ -456,7 +471,7 @@ struct ModulePasteItem : MenuItem {
 struct ModuleSaveItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleSaveItem() {
-		text = "Save preset";
+		text = "Save preset as";
 	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->saveDialog();
@@ -481,6 +496,23 @@ struct ModuleCloneItem : MenuItem {
 	}
 	void onAction(const event::Action &e) override {
 		context()->scene->rackWidget->cloneModule(moduleWidget);
+	}
+};
+
+struct ModuleBypassItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleBypassItem() {
+		text = "Bypass";
+	}
+	void step() override {
+		rightText = WINDOW_MOD_KEY_NAME "+E";
+		if (!moduleWidget->module)
+			return;
+		if (moduleWidget->module->bypass)
+			rightText = CHECKMARK_STRING " " + rightText;
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->toggleBypass();
 	}
 };
 
@@ -534,6 +566,10 @@ Menu *ModuleWidget::createContextMenu() {
 	ModuleSaveItem *saveItem = new ModuleSaveItem;
 	saveItem->moduleWidget = this;
 	menu->addChild(saveItem);
+
+	ModuleBypassItem *bypassItem = new ModuleBypassItem;
+	bypassItem->moduleWidget = this;
+	menu->addChild(bypassItem);
 
 	ModuleDeleteItem *deleteItem = new ModuleDeleteItem;
 	deleteItem->moduleWidget = this;

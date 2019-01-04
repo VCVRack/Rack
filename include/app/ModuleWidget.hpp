@@ -38,6 +38,7 @@ struct ModuleWidget : OpaqueWidget {
 	void save(std::string filename);
 	void loadDialog();
 	void saveDialog();
+	void toggleBypass();
 
 	/** Disconnects cables from all ports
 	Called when the user clicks Disconnect Cables in the context menu.

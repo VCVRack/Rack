@@ -128,18 +128,27 @@ static void Engine_step(Engine *engine) {
 
 	// Step modules
 	for (Module *module : engine->modules) {
-		if (settings::powerMeter) {
-			auto startTime = std::chrono::high_resolution_clock::now();
-
-			module->step();
-
-			auto stopTime = std::chrono::high_resolution_clock::now();
-			float cpuTime = std::chrono::duration<float>(stopTime - startTime).count() * engine->internal->sampleRate;
-			// Smooth cpu time
-			module->cpuTime += (cpuTime - module->cpuTime) * engine->internal->sampleTime / 0.5f;
+		if (module->bypass) {
+			for (Output &output : module->outputs) {
+				output.numChannels = 1;
+				output.setValue(0.f);
+			}
+			module->cpuTime = 0.f;
 		}
 		else {
-			module->step();
+			if (settings::powerMeter) {
+				auto startTime = std::chrono::high_resolution_clock::now();
+
+				module->step();
+
+				auto stopTime = std::chrono::high_resolution_clock::now();
+				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count() * engine->internal->sampleRate;
+				// Smooth cpu time
+				module->cpuTime += (cpuTime - module->cpuTime) * engine->internal->sampleTime / 0.5f;
+			}
+			else {
+				module->step();
+			}
 		}
 
 		// Step ports

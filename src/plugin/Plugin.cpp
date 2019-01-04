@@ -78,7 +78,7 @@ void Plugin::fromJson(json_t *rootJ) {
 		json_object_foreach(modulesJ, slug, moduleJ) {
 			Model *model = getModel(slug);
 			if (!model) {
-				WARN("Metadata references module \"%s\" but it is not registered in the plugin library", slug);
+				WARN("plugin.json contains module \"%s\" but it is not defined in the plugin", slug);
 				continue;
 			}
 

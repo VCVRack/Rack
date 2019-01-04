@@ -96,6 +96,17 @@ struct DisconnectCablesItem : MenuItem {
 };
 
 
+struct QuitItem : MenuItem {
+	QuitItem() {
+		text = "Quit";
+		rightText = "(" WINDOW_MOD_KEY_NAME "+Q)";
+	}
+	void onAction(const event::Action &e) override {
+		context()->window->close();
+	}
+};
+
+
 struct FileButton : MenuButton {
 	FileButton() {
 		text = "File";
@@ -111,6 +122,7 @@ struct FileButton : MenuButton {
 		menu->addChild(new SaveAsItem);
 		menu->addChild(new RevertItem);
 		menu->addChild(new DisconnectCablesItem);
+		menu->addChild(new QuitItem);
 	}
 };
 

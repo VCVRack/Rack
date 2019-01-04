@@ -20,6 +20,7 @@ struct Module {
 	std::vector<Light> lights;
 	/** For power meter */
 	float cpuTime = 0.f;
+	bool bypass = false;
 
 	/** Constructs a Module with no params, inputs, outputs, and lights */
 	Module();
