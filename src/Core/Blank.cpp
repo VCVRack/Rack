@@ -4,6 +4,28 @@
 using namespace rack;
 
 
+struct BlankPanel : virtual Widget {
+	Widget *panelBorder;
+
+	BlankPanel() {
+		panelBorder = new PanelBorder;
+		addChild(panelBorder);
+	}
+
+	void step() override {
+		panelBorder->box.size = box.size;
+	}
+
+	void draw(NVGcontext *vg) override {
+		nvgBeginPath(vg);
+		nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
+		nvgFillColor(vg, nvgRGB(0xe6, 0xe6, 0xe6));
+		nvgFill(vg);
+		Widget::draw(vg);
+	}
+};
+
+
 struct ModuleResizeHandle : virtual Widget {
 	bool right = false;
 	float dragX;
@@ -58,7 +80,6 @@ struct ModuleResizeHandle : virtual Widget {
 
 
 struct BlankWidget : ModuleWidget {
-	// Panel *panel;
 	Widget *topRightScrew;
 	Widget *bottomRightScrew;
 	Widget *rightHandle;
@@ -66,11 +87,8 @@ struct BlankWidget : ModuleWidget {
 	BlankWidget(Module *module) : ModuleWidget(module) {
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
-		// {
-		// 	panel = new LightPanel;
-		// 	panel->box.size = box.size;
-		// 	addChild(panel);
-		// }
+		panel = new BlankPanel;
+		addChild(panel);
 
 		ModuleResizeHandle *leftHandle = new ModuleResizeHandle;
 		ModuleResizeHandle *rightHandle = new ModuleResizeHandle;
@@ -88,7 +106,7 @@ struct BlankWidget : ModuleWidget {
 	}
 
 	void step() override {
-		// panel->box.size = box.size;
+		panel->box.size = box.size;
 		topRightScrew->box.pos.x = box.size.x - 30;
 		bottomRightScrew->box.pos.x = box.size.x - 30;
 		if (box.size.x < RACK_GRID_WIDTH * 6) {

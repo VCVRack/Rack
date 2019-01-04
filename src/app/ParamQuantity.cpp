@@ -24,25 +24,25 @@ void ParamQuantity::setValue(float value) {
 
 float ParamQuantity::getValue() {
 	if (!module)
-		return Quantity::getValue();
+		return 0.f;
 	return getParam()->value;
 }
 
 float ParamQuantity::getMinValue() {
 	if (!module)
-		return Quantity::getMinValue();
+		return -1.f;
 	return getParam()->minValue;
 }
 
 float ParamQuantity::getMaxValue() {
 	if (!module)
-		return Quantity::getMaxValue();
+		return 1.f;
 	return getParam()->maxValue;
 }
 
 float ParamQuantity::getDefaultValue() {
 	if (!module)
-		return Quantity::getDefaultValue();
+		return 0.f;
 	return getParam()->defaultValue;
 }
 
