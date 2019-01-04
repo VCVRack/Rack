@@ -21,6 +21,8 @@ bool isLoggedIn();
 Plugin *getPlugin(std::string pluginSlug);
 Model *getModel(std::string pluginSlug, std::string modelSlug);
 std::string getAllowedTag(std::string tag);
+/** Checks that the slug contains only alphanumeric characters, "-", and "_" */
+bool isSlugValid(std::string slug);
 
 
 extern std::list<Plugin*> plugins;

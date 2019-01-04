@@ -114,12 +114,18 @@ static bool loadPlugin(std::string path) {
 	initCallback(plugin);
 	plugin->fromJson(rootJ);
 
+	// Check slug
+	if (!isSlugValid(plugin->slug)) {
+		WARN("Plugin slug \"%s\" is invalid", plugin->slug.c_str());
+		// TODO Fix memory leak with `plugin`
+		return false;
+	}
+
 	// Reject plugin if slug already exists
 	Plugin *oldPlugin = getPlugin(plugin->slug);
 	if (oldPlugin) {
 		WARN("Plugin \"%s\" is already loaded, not attempting to load it again", plugin->slug.c_str());
-		// TODO
-		// Fix memory leak with `plugin` here
+		// TODO Fix memory leak with `plugin`
 		return false;
 	}
 
@@ -510,6 +516,14 @@ std::string getAllowedTag(std::string tag) {
 			return allowedTag;
 	}
 	return "";
+}
+
+bool isSlugValid(std::string slug) {
+	for (char c : slug) {
+		if (!(std::isalnum(c) || c == '-' || c == '_'))
+			return false;
+	}
+	return true;
 }
 
 

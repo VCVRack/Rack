@@ -105,30 +105,31 @@ static void Engine_step(Engine *engine) {
 
 	// Param smoothing
 	{
-		// Store in local variables for thread safety
-		Module *localSmoothModule = engine->internal->smoothModule;
-		int localSmoothParamId = engine->internal->smoothParamId;
-		float localSmoothValue = engine->internal->smoothValue;
-		if (localSmoothModule) {
-			float value = localSmoothModule->params[localSmoothParamId].value;
+		Module *smoothModule = engine->internal->smoothModule;
+		int smoothParamId = engine->internal->smoothParamId;
+		float smoothValue = engine->internal->smoothValue;
+		if (smoothModule) {
+			Param *param = &smoothModule->params[smoothParamId];
+			float value = param->value;
 			// decay rate is 1 graphics frame
 			const float lambda = 60.f;
-			float delta = localSmoothValue - value;
+			float delta = smoothValue - value;
 			float newValue = value + delta * lambda * engine->internal->sampleTime;
 			if (value == newValue) {
 				// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
-				localSmoothModule->params[localSmoothParamId].value = localSmoothValue;
+				param->value = smoothValue;
 				engine->internal->smoothModule = NULL;
 			}
 			else {
-				localSmoothModule->params[localSmoothParamId].value = newValue;
+				param->value = newValue;
 			}
 		}
 	}
 
-	// Step modules
+	// Iterate modules
 	for (Module *module : engine->modules) {
 		if (module->bypass) {
+			// Bypass module
 			for (Output &output : module->outputs) {
 				output.numChannels = 1;
 				output.setValue(0.f);
@@ -136,6 +137,7 @@ static void Engine_step(Engine *engine) {
 			module->cpuTime = 0.f;
 		}
 		else {
+			// Step module
 			if (settings::powerMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -151,7 +153,7 @@ static void Engine_step(Engine *engine) {
 			}
 		}
 
-		// Step ports
+		// Iterate ports and step plug lights
 		for (Input &input : module->inputs) {
 			if (input.active) {
 				float value = input.value / 5.f;
@@ -168,7 +170,7 @@ static void Engine_step(Engine *engine) {
 		}
 	}
 
-	// Step cables by moving their output values to inputs
+	// Step cables
 	for (Wire *wire : engine->wires) {
 		wire->step();
 	}
