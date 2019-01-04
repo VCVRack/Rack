@@ -33,11 +33,10 @@ struct ModuleResizeHandle : virtual Widget {
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
-	void onHover(const event::Hover &e) override {
-		// TODO
-		// if (e.button == 0) {
-		// 	e.target = this;
-		// }
+	void onButton(const event::Button &e) override {
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			e.consume(this);
+		}
 	}
 	void onDragStart(const event::DragStart &e) override {
 		dragX = context()->scene->rackWidget->lastMousePos.x;

@@ -323,7 +323,8 @@ json_t *IO::toJson() {
 	json_t *rootJ = json_object();
 	json_object_set_new(rootJ, "driver", json_integer(driver));
 	std::string deviceName = getDeviceName(device);
-	json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+	if (!deviceName.empty())
+		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
 	json_object_set_new(rootJ, "offset", json_integer(offset));
 	json_object_set_new(rootJ, "maxChannels", json_integer(maxChannels));
 	json_object_set_new(rootJ, "sampleRate", json_integer(sampleRate));
