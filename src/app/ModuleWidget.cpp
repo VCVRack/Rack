@@ -22,8 +22,11 @@ ModuleWidget::ModuleWidget(Module *module) {
 }
 
 ModuleWidget::~ModuleWidget() {
-	// Make sure WireWidget destructors are called *before* removing `module` from the rack.
-	disconnect();
+	// HACK
+	// If we try to disconnect wires in the Module Browser (e.g. when Rack is closed while the Module Browser is open), context()->scene->rackWidget will be an invalid pointer.
+	// So only attempt to disconnect if the module is not NULL.
+	if (module)
+		disconnect();
 	// Remove and delete the Module instance
 	if (module) {
 		context()->engine->removeModule(module);

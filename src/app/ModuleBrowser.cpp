@@ -33,10 +33,7 @@ struct ModuleWidgetWrapper : ObstructWidget {
 			// Create module
 			ModuleWidget *moduleWidget = model->createModuleWidget();
 			assert(moduleWidget);
-			context()->scene->rackWidget->addModule(moduleWidget);
-			// Move module nearest to the mouse position
-			moduleWidget->box.pos = context()->scene->rackWidget->lastMousePos.minus(moduleWidget->box.size.div(2));
-			context()->scene->rackWidget->requestModuleBoxNearest(moduleWidget, moduleWidget->box);
+			context()->scene->rackWidget->addModuleAtMouse(moduleWidget);
 			// Close Module Browser
 			MenuOverlay *menuOverlay = getAncestorOfType<MenuOverlay>();
 			menuOverlay->requestedDelete = true;
@@ -62,7 +59,7 @@ struct ModuleBrowser : OpaqueWidget {
 				ModuleWidget *moduleWidget = model->createModuleWidgetNull();
 				zoomWidget->addChild(moduleWidget);
 				wrapper->box.size = moduleWidget->box.size.mult(zoomWidget->zoom);
-				p = wrapper->box.getTopRight();
+				p = wrapper->box.getTopRight().plus(math::Vec(20, 0));
 			}
 		}
 	}

@@ -42,6 +42,7 @@ struct RackWidget : OpaqueWidget {
 	void pastePresetClipboard();
 
 	void addModule(ModuleWidget *m);
+	void addModuleAtMouse(ModuleWidget *m);
 	/** Removes the module and transfers ownership to the caller */
 	void deleteModule(ModuleWidget *m);
 	void cloneModule(ModuleWidget *m);

@@ -11,10 +11,9 @@ namespace rack {
 
 
 struct Scene : OpaqueWidget {
+	// Convenience variables for accessing important widgets
 	ScrollWidget *scrollWidget;
 	ZoomWidget *zoomWidget;
-
-	// Convenience variables for accessing important widgets
 	RackWidget *rackWidget;
 	Toolbar *toolbar;
 
@@ -25,6 +24,7 @@ struct Scene : OpaqueWidget {
 	std::string latestVersion;
 
 	Scene();
+	~Scene();
 	void step() override;
 	void draw(NVGcontext *vg) override;
 	void onHoverKey(const event::HoverKey &e) override;

@@ -458,6 +458,13 @@ void RackWidget::addModule(ModuleWidget *m) {
 	moduleContainer->addChild(m);
 }
 
+void RackWidget::addModuleAtMouse(ModuleWidget *m) {
+	addModule(m);
+	// Move module nearest to the mouse position
+	m->box.pos = lastMousePos.minus(m->box.size.div(2));
+	requestModuleBoxNearest(m, m->box);
+}
+
 void RackWidget::deleteModule(ModuleWidget *m) {
 	moduleContainer->removeChild(m);
 }

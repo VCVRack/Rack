@@ -25,7 +25,10 @@ PortWidget::PortWidget() {
 PortWidget::~PortWidget() {
 	// plugLight is not a child and is thus owned by the PortWidget, so we need to delete it here
 	delete plugLight;
-	context()->scene->rackWidget->wireContainer->removeAllWires(this);
+	// HACK
+	// See ModuleWidget::~ModuleWidget for description
+	if (module)
+		context()->scene->rackWidget->wireContainer->removeAllWires(this);
 }
 
 void PortWidget::step() {

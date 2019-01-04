@@ -28,6 +28,9 @@ Scene::Scene() {
 	scrollWidget->box.pos.y = toolbar->box.size.y;
 }
 
+Scene::~Scene() {
+}
+
 void Scene::step() {
 	// Resize owned descendants
 	toolbar->box.size.x = box.size.x;
