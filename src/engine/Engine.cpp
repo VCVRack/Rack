@@ -146,7 +146,8 @@ static void Engine_step(Engine *engine) {
 				auto stopTime = std::chrono::high_resolution_clock::now();
 				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count() * engine->internal->sampleRate;
 				// Smooth cpu time
-				module->cpuTime += (cpuTime - module->cpuTime) * engine->internal->sampleTime / 0.5f;
+				float powerLambda = 2.f / 10.f;
+				module->cpuTime += (cpuTime - module->cpuTime) * engine->internal->sampleTime * powerLambda;
 			}
 			else {
 				module->step();

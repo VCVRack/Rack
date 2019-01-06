@@ -1,19 +1,22 @@
-#include <set>
-#include <algorithm>
+#include "app/ModuleBrowser.hpp"
+// TODO clean up
 #include "window.hpp"
 #include "helpers.hpp"
 #include "event.hpp"
 #include "ui/Quantity.hpp"
 #include "ui/RadioButton.hpp"
 #include "ui/Label.hpp"
-#include "app/ModuleBrowser.hpp"
 #include "app/Scene.hpp"
 #include "ui/List.hpp"
 #include "ui/TextField.hpp"
+#include "ui/SequentialLayout.hpp"
 #include "widgets/ObstructWidget.hpp"
 #include "widgets/ZoomWidget.hpp"
 #include "plugin.hpp"
 #include "context.hpp"
+
+#include <set>
+#include <algorithm>
 
 
 namespace rack {
@@ -43,14 +46,17 @@ struct ModuleWidgetWrapper : ObstructWidget {
 
 
 struct ModuleBrowser : OpaqueWidget {
+	SequentialLayout *moduleLayout;
 	ModuleBrowser() {
-		math::Vec p;
+		moduleLayout = new SequentialLayout;
+		moduleLayout->spacing = math::Vec(10, 10);
+		addChild(moduleLayout);
+
 		for (Plugin *plugin : plugin::plugins) {
 			for (Model *model : plugin->models) {
 				ModuleWidgetWrapper *wrapper = new ModuleWidgetWrapper;
-				wrapper->box.pos = p;
 				wrapper->model = model;
-				addChild(wrapper);
+				moduleLayout->addChild(wrapper);
 
 				ZoomWidget *zoomWidget = new ZoomWidget;
 				zoomWidget->setZoom(0.5);
@@ -59,7 +65,6 @@ struct ModuleBrowser : OpaqueWidget {
 				ModuleWidget *moduleWidget = model->createModuleWidgetNull();
 				zoomWidget->addChild(moduleWidget);
 				wrapper->box.size = moduleWidget->box.size.mult(zoomWidget->zoom);
-				p = wrapper->box.getTopRight().plus(math::Vec(20, 0));
 			}
 		}
 	}
@@ -67,7 +72,8 @@ struct ModuleBrowser : OpaqueWidget {
 	void step() override {
 		assert(parent);
 
-		box = parent->box.zeroPos().grow(math::Vec(-100, -100));
+		box = parent->box.zeroPos().grow(math::Vec(-50, -50));
+		moduleLayout->box.size = box.size;
 
 		OpaqueWidget::step();
 	}

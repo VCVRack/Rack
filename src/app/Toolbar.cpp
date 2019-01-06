@@ -543,7 +543,7 @@ Toolbar::Toolbar() {
 
 	SequentialLayout *layout = new SequentialLayout;
 	layout->box.pos = math::Vec(margin, margin);
-	layout->spacing = 0.0;
+	layout->spacing = math::Vec(0, 0);
 	addChild(layout);
 
 	FileButton *fileButton = new FileButton;
