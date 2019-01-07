@@ -192,13 +192,12 @@ void State::handleScroll(math::Vec pos, math::Vec scrollDelta) {
 	rootWidget->onHoverScroll(eHoverScroll);
 }
 
-void State::handleDrop(math::Vec pos, std::vector<std::string> paths) {
+void State::handleDrop(math::Vec pos, const std::vector<std::string> &paths) {
 	// event::PathDrop
 	event::Context ePathDropContext;
-	event::PathDrop ePathDrop;
+	event::PathDrop ePathDrop(paths);
 	ePathDrop.context = &ePathDropContext;
 	ePathDrop.pos = pos;
-	ePathDrop.paths = paths;
 	rootWidget->onPathDrop(ePathDrop);
 }
 

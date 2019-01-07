@@ -83,7 +83,7 @@ struct Button : Event, Position {
 };
 
 
-/** Occurs when a key is pressed while the mouse is hovering a Widget.
+/** Occurs when a key is pressed, released, or repeated while the mouse is hovering a Widget.
 Recurses until consumed.
 */
 struct HoverKey : Event, Position, Key {
@@ -130,7 +130,7 @@ struct Deselect : Event {
 };
 
 
-/** Occurs when a key is pressed while a Widget is selected.
+/** Occurs when a key is pressed, released, or repeated while a Widget is selected.
 If consumed, a HoverKey event will not be triggered.
 */
 struct SelectKey : Event, Key {
@@ -144,7 +144,6 @@ struct SelectText : Event, Text {
 
 
 /** Occurs when a Widget begins being dragged.
-Must consume to allow the drag to occur.
 */
 struct DragStart : Event {
 };
@@ -157,16 +156,18 @@ struct DragEnd : Event {
 
 
 /** Occurs every frame on the dragged Widget.
-`mouseDelta` may be zero.
 */
 struct DragMove : Event {
+	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
 };
 
 
-/** Occurs every frame when the mouse is hovering over a Widget while dragging.
+/** Occurs every frame when the mouse is hovering over a Widget while another Widget (possibly the same one) is being dragged.
+Recurses until consumed.
 */
 struct DragHover : Event, Position {
+	/** The dragged widget */
 	Widget *origin = NULL;
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
@@ -175,6 +176,7 @@ struct DragHover : Event, Position {
 /** Occurs when the mouse enters a Widget while dragging.
 */
 struct DragEnter : Event {
+	/** The dragged widget */
 	Widget *origin = NULL;
 };
 
@@ -182,6 +184,7 @@ struct DragEnter : Event {
 /** Occurs when the mouse leaves a Widget while dragging.
 */
 struct DragLeave : Event {
+	/** The dragged widget */
 	Widget *origin = NULL;
 };
 
@@ -189,15 +192,19 @@ struct DragLeave : Event {
 /** Occurs when the mouse button is released over a Widget while dragging.
 */
 struct DragDrop : Event {
+	/** The dragged widget */
 	Widget *origin = NULL;
 };
 
 
-/** Occurs when a selection of files from the operating system are dropped onto a Widget.
+/** Occurs when a selection of files from the operating system is dropped onto a Widget.
+Recurses until consumed.
 */
 struct PathDrop : Event, Position {
+	PathDrop(const std::vector<std::string> &paths) : paths(paths) {}
+
 	/** List of file paths in the dropped selection */
-	std::vector<std::string> paths;
+	const std::vector<std::string> &paths;
 };
 
 
@@ -214,7 +221,7 @@ struct Change : Event {
 
 
 /** Occurs when the zoom level of a Widget is changed.
-Recurses.
+Recurses until consumed.
 */
 struct Zoom : Event {
 };
@@ -245,7 +252,7 @@ struct State {
 	void handleScroll(math::Vec pos, math::Vec scrollDelta);
 	void handleText(math::Vec pos, int codepoint);
 	void handleKey(math::Vec pos, int key, int scancode, int action, int mods);
-	void handleDrop(math::Vec pos, std::vector<std::string> paths);
+	void handleDrop(math::Vec pos, const std::vector<std::string> &paths);
 	void handleZoom();
 };
 

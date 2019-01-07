@@ -74,6 +74,7 @@ struct Widget {
 
 	// Events
 
+	/** Recurses an event to all visible Widgets */
 	template <typename TMethod, class TEvent>
 	void recurseEvent(TMethod f, const TEvent &e) {
 		for (auto it = children.rbegin(); it != children.rend(); it++) {
@@ -84,12 +85,10 @@ struct Widget {
 
 			// Call child event handler
 			(child->*f)(e);
-			// Stop iterating if consumed
-			if (e.getConsumed())
-				break;
 		}
 	}
 
+	/** Recurses an event to all visible Widgets until it is consumed. */
 	template <typename TMethod, class TEvent>
 	void recursePositionEvent(TMethod f, const TEvent &e) {
 		for (auto it = children.rbegin(); it != children.rend(); it++) {

@@ -20,6 +20,8 @@ struct ModuleWidget : OpaqueWidget {
 	std::vector<ParamWidget*> params;
 	std::vector<PortWidget*> inputs;
 	std::vector<PortWidget*> outputs;
+	/** For RackWidget dragging */
+	math::Vec dragPos;
 
 	ModuleWidget(Module *module);
 	~ModuleWidget();
@@ -64,7 +66,6 @@ struct ModuleWidget : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 	void drawShadow(NVGcontext *vg);
 
-	math::Vec dragPos;
 	void onHover(const event::Hover &e) override;
 	void onButton(const event::Button &e) override;
 	void onHoverKey(const event::HoverKey &e) override;

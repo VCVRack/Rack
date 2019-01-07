@@ -72,7 +72,7 @@ struct ModuleBox : OpaqueWidget {
 			// Create module
 			ModuleWidget *moduleWidget = model->createModuleWidget();
 			assert(moduleWidget);
-			context()->scene->rackWidget->addModuleAtMouse(moduleWidget);
+			context()->scene->rackWidget->addModule(moduleWidget);
 			// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
 			e.consume(moduleWidget);
 			// Close Module Browser
