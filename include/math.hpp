@@ -156,6 +156,9 @@ struct Vec {
 	Vec() {}
 	Vec(float x, float y) : x(x), y(y) {}
 
+	/** Negates the vector
+	Equivalent to a reflection across the y=-x line.
+	*/
 	Vec neg() const {
 		return Vec(-x, -y);
 	}
@@ -183,6 +186,15 @@ struct Vec {
 	float norm() const {
 		return std::hypotf(x, y);
 	}
+	/** Rotates counterclockwise in radians */
+	Vec rotate(float angle) {
+		float sin = std::sin(angle);
+		float cos = std::cos(angle);
+		return Vec(x * cos - y * sin, x * sin + y * cos);
+	}
+	/** Swaps the coordinates
+	Equivalent to a reflection across the y=x line.
+	*/
 	Vec flip() const {
 		return Vec(y, x);
 	}
