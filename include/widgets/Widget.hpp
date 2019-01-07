@@ -59,11 +59,11 @@ struct Widget {
 	/** Adds widget to list of children.
 	Gives ownership of widget to this widget instance.
 	*/
-	void addChild(Widget *widget);
+	void addChild(Widget *child);
 	/** Removes widget from list of children if it exists.
 	Does not delete widget but transfers ownership to caller
 	*/
-	void removeChild(Widget *widget);
+	void removeChild(Widget *child);
 	/** Removes and deletes all children */
 	void clearChildren();
 

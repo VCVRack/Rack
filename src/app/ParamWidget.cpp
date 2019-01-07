@@ -1,9 +1,16 @@
 #include "app/ParamWidget.hpp"
+#include "app/Scene.hpp"
+#include "context.hpp"
 #include "random.hpp"
 
 
 namespace rack {
 
+
+ParamWidget::~ParamWidget() {
+	if (quantity)
+		delete quantity;
+}
 
 void ParamWidget::step() {
 	if (quantity) {
@@ -14,6 +21,12 @@ void ParamWidget::step() {
 			event::Change eChange;
 			onChange(eChange);
 		}
+	}
+
+	if (tooltip) {
+		if (quantity)
+			tooltip->text = quantity->getString();
+		tooltip->box.pos = getAbsoluteOffset(box.size);
 	}
 
 	OpaqueWidget::step();
@@ -39,10 +52,19 @@ void ParamWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 }
 
-void ParamWidget::onDragMove(const event::DragMove &e) {
-	if (quantity) {
-		DEBUG("%s", quantity->getString().c_str());
-	}
+void ParamWidget::onEnter(const event::Enter &e) {
+	if (tooltip)
+		return;
+	tooltip = new Tooltip;
+	context()->scene->addChild(tooltip);
+}
+
+void ParamWidget::onLeave(const event::Leave &e) {
+	if (!tooltip)
+		return;
+	context()->scene->removeChild(tooltip);
+	delete tooltip;
+	tooltip = NULL;
 }
 
 

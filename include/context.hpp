@@ -14,6 +14,7 @@ struct Engine;
 struct Window;
 
 
+/** Contains the application state  */
 struct Context {
 	event::State *event = NULL;
 	Scene *scene = NULL;
@@ -22,6 +23,7 @@ struct Context {
 };
 
 
+/** Returns the global context */
 Context *context();
 
 

@@ -17,8 +17,6 @@ namespace rack {
 
 
 static std::set<Model*> sFavoriteModels;
-static std::string sAuthorFilter;
-static std::string sTagFilter;
 
 
 struct ModuleBox : OpaqueWidget {

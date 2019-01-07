@@ -9,7 +9,6 @@ namespace rack {
 Widget::~Widget() {
 	// You should only delete orphaned widgets
 	assert(!parent);
-	context()->event->finalizeWidget(this);
 	clearChildren();
 }
 
@@ -49,22 +48,28 @@ math::Rect Widget::getViewport(math::Rect r) {
 	return r.clamp(bound);
 }
 
-void Widget::addChild(Widget *widget) {
-	assert(!widget->parent);
-	widget->parent = this;
-	children.push_back(widget);
+void Widget::addChild(Widget *child) {
+	assert(!child->parent);
+	child->parent = this;
+	children.push_back(child);
 }
 
-void Widget::removeChild(Widget *widget) {
-	assert(widget->parent == this);
-	auto it = std::find(children.begin(), children.end(), widget);
+void Widget::removeChild(Widget *child) {
+	// Make sure `this` is the child's parent
+	assert(child->parent == this);
+	// Prepare to remove widget from the event state
+	context()->event->finalizeWidget(child);
+	// Delete child from children list
+	auto it = std::find(children.begin(), children.end(), child);
 	assert(it != children.end());
 	children.erase(it);
-	widget->parent = NULL;
+	// Revoke child's parent
+	child->parent = NULL;
 }
 
 void Widget::clearChildren() {
 	for (Widget *child : children) {
+		context()->event->finalizeWidget(child);
 		child->parent = NULL;
 		delete child;
 	}
@@ -76,6 +81,7 @@ void Widget::step() {
 		Widget *child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
+			context()->event->finalizeWidget(child);
 			it = children.erase(it);
 			child->parent = NULL;
 			delete child;
