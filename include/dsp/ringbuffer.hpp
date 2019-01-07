@@ -1,9 +1,11 @@
 #pragma once
-#include "common.hpp"
+#include "dsp/common.hpp"
 #include <string.h>
 
 
 namespace rack {
+namespace dsp {
+
 
 /** A simple cyclic buffer.
 S must be a power of 2.
@@ -196,4 +198,6 @@ struct AppleRingBuffer {
 	}
 };
 
+
+} // namespace dsp
 } // namespace rack

@@ -1,8 +1,9 @@
 #pragma once
-#include "math.hpp"
+#include "dsp/common.hpp"
 
 
 namespace rack {
+namespace dsp {
 
 
 /** Turns HIGH when value reaches 1.f, turns LOW when value reaches 0.f. */
@@ -102,4 +103,5 @@ struct PulseGenerator {
 };
 
 
+} // namespace dsp
 } // namespace rack

@@ -1,7 +1,5 @@
 #include "Core.hpp"
 #include "audio.hpp"
-#include "dsp/resampler.hpp"
-#include "dsp/ringbuffer.hpp"
 #include <mutex>
 #include <chrono>
 #include <thread>
@@ -23,9 +21,9 @@ struct AudioInterfaceIO : audio::IO {
 	std::mutex audioMutex;
 	std::condition_variable audioCv;
 	// Audio thread produces, engine thread consumes
-	DoubleRingBuffer<Frame<AUDIO_INPUTS>, (1<<15)> inputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<AUDIO_INPUTS>, (1<<15)> inputBuffer;
 	// Audio thread consumes, engine thread produces
-	DoubleRingBuffer<Frame<AUDIO_OUTPUTS>, (1<<15)> outputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<AUDIO_OUTPUTS>, (1<<15)> outputBuffer;
 	bool active = false;
 
 	~AudioInterfaceIO() {
@@ -46,7 +44,7 @@ struct AudioInterfaceIO : audio::IO {
 			for (int i = 0; i < frames; i++) {
 				if (inputBuffer.full())
 					break;
-				Frame<AUDIO_INPUTS> inputFrame;
+				dsp::Frame<AUDIO_INPUTS> inputFrame;
 				memset(&inputFrame, 0, sizeof(inputFrame));
 				memcpy(&inputFrame, &input[numInputs * i], numInputs * sizeof(float));
 				inputBuffer.push(inputFrame);
@@ -62,7 +60,7 @@ struct AudioInterfaceIO : audio::IO {
 			if (audioCv.wait_for(lock, timeout, cond)) {
 				// Consume audio block
 				for (int i = 0; i < frames; i++) {
-					Frame<AUDIO_OUTPUTS> f = outputBuffer.shift();
+					dsp::Frame<AUDIO_OUTPUTS> f = outputBuffer.shift();
 					for (int j = 0; j < numOutputs; j++) {
 						output[numOutputs*i + j] = clamp(f.samples[j], -1.f, 1.f);
 					}
@@ -112,12 +110,12 @@ struct AudioInterface : Module {
 	int lastNumOutputs = -1;
 	int lastNumInputs = -1;
 
-	SampleRateConverter<AUDIO_INPUTS> inputSrc;
-	SampleRateConverter<AUDIO_OUTPUTS> outputSrc;
+	dsp::SampleRateConverter<AUDIO_INPUTS> inputSrc;
+	dsp::SampleRateConverter<AUDIO_OUTPUTS> outputSrc;
 
 	// in rack's sample rate
-	DoubleRingBuffer<Frame<AUDIO_INPUTS>, 16> inputBuffer;
-	DoubleRingBuffer<Frame<AUDIO_OUTPUTS>, 16> outputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<AUDIO_INPUTS>, 16> inputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<AUDIO_OUTPUTS>, 16> outputBuffer;
 
 	AudioInterface() {
 		setup(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -177,7 +175,7 @@ void AudioInterface::step() {
 	}
 
 	// Take input from buffer
-	Frame<AUDIO_INPUTS> inputFrame;
+	dsp::Frame<AUDIO_INPUTS> inputFrame;
 	if (!inputBuffer.empty()) {
 		inputFrame = inputBuffer.shift();
 	}
@@ -195,7 +193,7 @@ void AudioInterface::step() {
 	if (audioIO.active && audioIO.numOutputs > 0) {
 		// Get and push output SRC frame
 		if (!outputBuffer.full()) {
-			Frame<AUDIO_OUTPUTS> outputFrame;
+			dsp::Frame<AUDIO_OUTPUTS> outputFrame;
 			for (int i = 0; i < AUDIO_OUTPUTS; i++) {
 				outputFrame.samples[i] = inputs[AUDIO_INPUT + i].getVoltage() / 10.f;
 			}

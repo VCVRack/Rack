@@ -1,7 +1,5 @@
 #include "Core.hpp"
 #include "midi.hpp"
-#include "dsp/digital.hpp"
-#include "dsp/filter.hpp"
 
 #include <algorithm>
 
@@ -35,14 +33,14 @@ struct MIDIToCVInterface : Module {
 	midi::InputQueue midiInput;
 
 	uint8_t mod = 0;
-	ExponentialFilter modFilter;
+	dsp::ExponentialFilter modFilter;
 	uint16_t pitch = 8192;
-	ExponentialFilter pitchFilter;
-	PulseGenerator retriggerPulse;
-	PulseGenerator clockPulses[2];
-	PulseGenerator startPulse;
-	PulseGenerator stopPulse;
-	PulseGenerator continuePulse;
+	dsp::ExponentialFilter pitchFilter;
+	dsp::PulseGenerator retriggerPulse;
+	dsp::PulseGenerator clockPulses[2];
+	dsp::PulseGenerator startPulse;
+	dsp::PulseGenerator stopPulse;
+	dsp::PulseGenerator continuePulse;
 	int clock = 0;
 	int divisions[2];
 

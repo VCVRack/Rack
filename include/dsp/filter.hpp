@@ -1,8 +1,10 @@
 #pragma once
-#include "math.hpp"
+#include "dsp/common.hpp"
 
 
 namespace rack {
+namespace dsp {
+
 
 struct RCFilter {
 	float c = 0.f;
@@ -81,4 +83,5 @@ struct ExponentialFilter {
 };
 
 
+} // namespace dsp
 } // namespace rack

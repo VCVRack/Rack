@@ -3,6 +3,11 @@
 
 
 namespace rack {
+namespace dsp {
+
+
+static const float FREQ_C4 = 261.6256f;
+static const float FREQ_A4 = 440.0000f;
 
 
 /** The normalized sinc function. https://en.wikipedia.org/wiki/Sinc_function */
@@ -42,13 +47,14 @@ inline float exponentialBipolar(float b, float x) {
 	return (std::pow(b, x) - std::pow(b, -x)) / a;
 }
 
-inline float gainToDb(float gain) {
-	return std::log10(gain) * 20.f;
+inline float amplitudeToDb(float amp) {
+	return std::log10(amp) * 20.f;
 }
 
-inline float dbToGain(float db) {
+inline float dbToAmplitude(float db) {
 	return std::pow(10.f, db / 20.f);
 }
 
 
+} // namespace dsp
 } // namespace rack

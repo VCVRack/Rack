@@ -1,8 +1,10 @@
 #pragma once
+#include "dsp/common.hpp"
 
 
 namespace rack {
-namespace ode {
+namespace dsp {
+
 
 /** The callback function `f` in each of these stepping functions must have the signature
 
@@ -84,5 +86,6 @@ void stepRK4(float t, float dt, float x[], int len, F f) {
 	}
 }
 
-} // namespace ode
+
+} // namespace dsp
 } // namespace rack

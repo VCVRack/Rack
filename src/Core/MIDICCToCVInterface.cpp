@@ -1,6 +1,5 @@
 #include "Core.hpp"
 #include "midi.hpp"
-#include "dsp/filter.hpp"
 
 
 struct MIDICCToCVInterface : Module {
@@ -20,7 +19,7 @@ struct MIDICCToCVInterface : Module {
 
 	midi::InputQueue midiInput;
 	int8_t ccs[128];
-	ExponentialFilter ccFilters[16];
+	dsp::ExponentialFilter ccFilters[16];
 
 	int learningId = -1;
 	int learnedCcs[16] = {};

@@ -1,13 +1,16 @@
 #pragma once
-#include "frame.hpp"
-#include "ringbuffer.hpp"
-#include "fir.hpp"
+#include "dsp/common.hpp"
+#include "dsp/frame.hpp"
+#include "dsp/ringbuffer.hpp"
+#include "dsp/fir.hpp"
 #include <assert.h>
 #include <string.h>
 #include <speex/speex_resampler.h>
 
 
 namespace rack {
+namespace dsp {
+
 
 template<int CHANNELS>
 struct SampleRateConverter {
@@ -170,4 +173,5 @@ struct Upsampler {
 };
 
 
+} // namespace dsp
 } // namespace rack

@@ -147,4 +147,19 @@ DEPRECATED inline float engineGetSampleTime() {
 	return context()->engine->getSampleTime();
 }
 
+////////////////////
+// dsp
+////////////////////
+
+using namespace dsp;
+
+inline float gainToDb(float gain) {
+	return dsp::amplitudeToDb(gain);
+}
+
+inline float dbToGain(float db) {
+	return dsp::dbToAmplitude(db);
+}
+
+
 } // namespace rack

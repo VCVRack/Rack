@@ -1,8 +1,10 @@
 #pragma once
-#include "math.hpp"
+#include "dsp/common.hpp"
 
 
 namespace rack {
+namespace dsp {
+
 
 // Pre-made minBLEP samples in minBLEP.cpp
 extern const float minblep_16_32[];
@@ -33,4 +35,6 @@ struct MinBLEP {
 	}
 };
 
+
+} // namespace dsp
 } // namespace rack

@@ -1,8 +1,9 @@
 #pragma once
-#include "math.hpp"
+#include "dsp/common.hpp"
 
 
 namespace rack {
+namespace dsp {
 
 
 struct VUMeter {
@@ -28,4 +29,5 @@ struct VUMeter {
 };
 
 
+} // namespace dsp
 } // namespace rack

@@ -1,9 +1,11 @@
 #pragma once
-#include "dsp/functions.hpp"
+#include "dsp/common.hpp"
 #include <pffft.h>
 
 
 namespace rack {
+namespace dsp {
+
 
 /** Performs a direct sum convolution */
 inline float convolveNaive(const float *in, const float *kernel, int len) {
@@ -145,4 +147,5 @@ struct RealTimeConvolver {
 };
 
 
+} // namespace dsp
 } // namespace rack
