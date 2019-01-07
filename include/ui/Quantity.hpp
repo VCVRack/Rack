@@ -50,6 +50,13 @@ struct Quantity {
 		return string::f("%.*f", getDisplayPrecision(), getDisplayValue());
 	}
 
+	virtual void setDisplayValueString(std::string s) {
+		float displayValue = 0.f;
+		int n = std::sscanf(s.c_str(), "%f", &displayValue);
+		if (n == 1)
+			setDisplayValue(displayValue);
+	}
+
 	/** The name of the quantity */
 	virtual std::string getLabel() {return "";}
 

@@ -51,7 +51,7 @@ float ParamQuantity::getDisplayValue() {
 		return Quantity::getDisplayValue();
 	if (getParam()->displayBase == 0.f) {
 		// Linear
-		return getParam()->value * getParam()->displayMultiplier;
+		return getValue() * getParam()->displayMultiplier;
 	}
 	else if (getParam()->displayBase == 1.f) {
 		// Fixed (special case of exponential)
@@ -59,7 +59,7 @@ float ParamQuantity::getDisplayValue() {
 	}
 	else {
 		// Exponential
-		return std::pow(getParam()->displayBase, getParam()->value) * getParam()->displayMultiplier;
+		return std::pow(getParam()->displayBase, getValue()) * getParam()->displayMultiplier;
 	}
 }
 
@@ -68,22 +68,26 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 		return;
 	if (getParam()->displayBase == 0.f) {
 		// Linear
-		getParam()->value = displayValue / getParam()->displayMultiplier;
+		setValue(displayValue / getParam()->displayMultiplier);
 	}
 	else if (getParam()->displayBase == 1.f) {
 		// Fixed
-		getParam()->value = getParam()->displayMultiplier;
+		setValue(getParam()->displayMultiplier);
 	}
 	else {
 		// Exponential
-		getParam()->value = std::log(displayValue / getParam()->displayMultiplier) / std::log(getParam()->displayBase);
+		setValue(std::log(displayValue / getParam()->displayMultiplier) / std::log(getParam()->displayBase));
 	}
 }
 
 int ParamQuantity::getDisplayPrecision() {
 	if (!module)
 		return Quantity::getDisplayPrecision();
-	return getParam()->displayPrecision;
+	float displayValue = getDisplayValue();
+	if (displayValue == 0.f)
+		return 0;
+	float log = std::log10(std::abs(getDisplayValue()));
+	return (int) std::ceil(math::clamp(-log + 3.f, 0.f, 6.f));
 }
 
 std::string ParamQuantity::getLabel() {

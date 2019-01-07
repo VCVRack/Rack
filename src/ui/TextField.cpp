@@ -155,8 +155,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 			} break;
 			case GLFW_KEY_A: {
 				if (context()->window->isModPressed()) {
-					selection = 0;
-					cursor = text.size();
+					selectAll();
 				}
 			} break;
 			case GLFW_KEY_ENTER: {
@@ -196,6 +195,11 @@ void TextField::setText(std::string text) {
 	selection = cursor = text.size();
 	event::Change eChange;
 	onChange(eChange);
+}
+
+void TextField::selectAll() {
+	cursor = text.size();
+	selection = 0;
 }
 
 int TextField::getTextPosition(math::Vec mousePos) {

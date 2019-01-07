@@ -32,6 +32,7 @@ struct TextField : OpaqueWidget {
 
 	/** Replaces the entire text */
 	void setText(std::string text);
+	void selectAll();
 	virtual int getTextPosition(math::Vec mousePos);
 };
 
