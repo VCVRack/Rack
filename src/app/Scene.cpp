@@ -26,6 +26,10 @@ Scene::Scene() {
 	toolbar = new Toolbar;
 	addChild(toolbar);
 	scrollWidget->box.pos.y = toolbar->box.size.y;
+
+	moduleBrowser = new ModuleBrowser;
+	moduleBrowser->visible = false;
+	addChild(moduleBrowser);
 }
 
 Scene::~Scene() {
@@ -45,6 +49,7 @@ void Scene::step() {
 	OpaqueWidget::step();
 
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
+	moduleBrowser->box.size = box.size;
 
 	// Request latest version from server
 	if (!devMode && checkVersion && !checkedVersion) {
@@ -112,7 +117,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_ENTER:
 			case GLFW_KEY_KP_ENTER: {
-				moduleBrowserCreate();
+				moduleBrowser->visible = true;
 				e.consume(this);
 			} break;
 			case GLFW_KEY_F11: {

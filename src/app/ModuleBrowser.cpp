@@ -1,17 +1,11 @@
 #include "app/ModuleBrowser.hpp"
-// TODO clean up
-#include "window.hpp"
-#include "helpers.hpp"
-#include "event.hpp"
-#include "ui/Quantity.hpp"
-#include "ui/RadioButton.hpp"
-#include "ui/Label.hpp"
-#include "app/Scene.hpp"
-#include "ui/List.hpp"
-#include "ui/TextField.hpp"
-#include "ui/SequentialLayout.hpp"
-#include "widgets/ObstructWidget.hpp"
+#include "widgets/OpaqueWidget.hpp"
+#include "widgets/TransparentWidget.hpp"
 #include "widgets/ZoomWidget.hpp"
+#include "ui/Label.hpp"
+#include "ui/MenuOverlay.hpp"
+#include "app/ModuleWidget.hpp"
+#include "app/Scene.hpp"
 #include "plugin.hpp"
 #include "context.hpp"
 
@@ -27,75 +21,122 @@ static std::string sAuthorFilter;
 static std::string sTagFilter;
 
 
-
-struct ModuleWidgetWrapper : ObstructWidget {
+struct ModuleBox : OpaqueWidget {
 	Model *model;
 
-	void onDragDrop(const event::DragDrop &e) override {
-		if (e.origin == this) {
+	void setModel(Model *model) {
+		this->model = model;
+
+		Widget *transparentWidget = new TransparentWidget;
+		addChild(transparentWidget);
+
+		ZoomWidget *zoomWidget = new ZoomWidget;
+		zoomWidget->setZoom(0.5);
+		transparentWidget->addChild(zoomWidget);
+
+		ModuleWidget *moduleWidget = model->createModuleWidgetNull();
+		zoomWidget->addChild(moduleWidget);
+
+		box.size = math::Vec(moduleWidget->box.size.x, RACK_GRID_SIZE.y).mult(zoomWidget->zoom).ceil();
+
+		math::Vec p;
+		p.y = box.size.y;
+		box.size.y += 40.0;
+		box.size.x = std::max(box.size.x, 70.f);
+
+		Label *nameLabel = new Label;
+		nameLabel->text = model->name;
+		nameLabel->box.pos = p;
+		p.y += nameLabel->box.size.y;
+		addChild(nameLabel);
+
+		Label *pluginLabel = new Label;
+		pluginLabel->text = model->plugin->name;
+		pluginLabel->box.pos = p;
+		p.y += pluginLabel->box.size.y;
+		addChild(pluginLabel);
+	}
+
+	void draw(NVGcontext *vg) override {
+		OpaqueWidget::draw(vg);
+		if (context()->event->hoveredWidget == this) {
+			nvgBeginPath(vg);
+			nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
+			nvgFillColor(vg, nvgRGBAf(1, 1, 1, 0.25));
+			nvgFill(vg);
+		}
+	}
+
+	void onButton(const event::Button &e) override {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			// Create module
 			ModuleWidget *moduleWidget = model->createModuleWidget();
 			assert(moduleWidget);
 			context()->scene->rackWidget->addModuleAtMouse(moduleWidget);
+			// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
+			e.consume(moduleWidget);
 			// Close Module Browser
-			MenuOverlay *menuOverlay = getAncestorOfType<MenuOverlay>();
-			menuOverlay->requestedDelete = true;
+			ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
+			moduleBrowser->visible = false;
 		}
+		OpaqueWidget::onButton(e);
 	}
 };
 
 
-struct ModuleBrowser : OpaqueWidget {
-	SequentialLayout *moduleLayout;
-	ModuleBrowser() {
-		moduleLayout = new SequentialLayout;
-		moduleLayout->spacing = math::Vec(10, 10);
-		addChild(moduleLayout);
+ModuleBrowser::ModuleBrowser() {
+	moduleScroll = new ScrollWidget;
+	addChild(moduleScroll);
 
-		for (Plugin *plugin : plugin::plugins) {
-			for (Model *model : plugin->models) {
-				ModuleWidgetWrapper *wrapper = new ModuleWidgetWrapper;
-				wrapper->model = model;
-				moduleLayout->addChild(wrapper);
+	moduleLayout = new SequentialLayout;
+	moduleLayout->spacing = math::Vec(10, 10);
+	moduleScroll->container->addChild(moduleLayout);
 
-				ZoomWidget *zoomWidget = new ZoomWidget;
-				zoomWidget->setZoom(0.5);
-				wrapper->addChild(zoomWidget);
+	for (Plugin *plugin : plugin::plugins) {
+		for (Model *model : plugin->models) {
+			ModuleBox *moduleBox = new ModuleBox;
+			moduleBox->setModel(model);
+			moduleLayout->addChild(moduleBox);
+		}
+	}
+}
 
-				ModuleWidget *moduleWidget = model->createModuleWidgetNull();
-				zoomWidget->addChild(moduleWidget);
-				wrapper->box.size = moduleWidget->box.size.mult(zoomWidget->zoom);
-			}
+void ModuleBrowser::step() {
+	// TODO resize sidebar
+	float sidebarWidth = 300.0;
+
+	moduleScroll->box.pos.x = sidebarWidth;
+	moduleScroll->box.size.x = box.size.x - sidebarWidth;
+	moduleScroll->box.size.y = box.size.y;
+	moduleLayout->box.size.x = moduleScroll->box.size.x;
+	moduleLayout->box.size.y = moduleLayout->getChildrenBoundingBox().getBottomRight().y;
+
+	OpaqueWidget::step();
+}
+
+void ModuleBrowser::draw(NVGcontext *vg) {
+	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+	Widget::draw(vg);
+}
+
+void ModuleBrowser::onHoverKey(const event::HoverKey &e) {
+	if (e.action == GLFW_PRESS) {
+		switch (e.key) {
+			case GLFW_KEY_ESCAPE: {
+				// Close menu
+				this->visible = false;
+				e.consume(this);
+			} break;
 		}
 	}
 
-	void step() override {
-		assert(parent);
-
-		box = parent->box.zeroPos().grow(math::Vec(-50, -50));
-		moduleLayout->box.size = box.size;
-
-		OpaqueWidget::step();
-	}
-
-	void draw(NVGcontext *vg) override {
-		bndTooltipBackground(vg, 0.0, 0.0, box.size.x, box.size.y);
-		Widget::draw(vg);
-	}
-};
+	if (!e.getConsumed())
+		OpaqueWidget::onHoverKey(e);
+}
 
 
 
 // Global functions
-
-void moduleBrowserCreate() {
-	MenuOverlay *overlay = new MenuOverlay;
-
-	ModuleBrowser *moduleBrowser = new ModuleBrowser;
-	overlay->addChild(moduleBrowser);
-
-	context()->scene->addChild(overlay);
-}
 
 json_t *moduleBrowserToJson() {
 	json_t *rootJ = json_object();

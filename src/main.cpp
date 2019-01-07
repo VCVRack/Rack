@@ -79,12 +79,12 @@ int main(int argc, char *argv[]) {
 	plugin::init(devMode);
 
 	// Initialize app
-	context()->engine = new Engine;
 	context()->event = new event::State;
+	context()->window = new Window;
+	context()->engine = new Engine;
 	context()->scene = new Scene;
 	context()->scene->devMode = devMode;
 	context()->event->rootWidget = context()->scene;
-	context()->window = new Window;
 	settings::load(asset::user("settings.json"));
 
 	if (patchFile.empty()) {
@@ -120,10 +120,10 @@ int main(int argc, char *argv[]) {
 	context()->scene = NULL;
 	delete context()->event;
 	context()->event = NULL;
-	delete context()->window;
-	context()->window = NULL;
 	delete context()->engine;
 	context()->engine = NULL;
+	delete context()->window;
+	context()->window = NULL;
 
 	// Destroy environment
 	plugin::destroy();

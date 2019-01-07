@@ -5,6 +5,7 @@
 #include "ui/ScrollWidget.hpp"
 #include "app/RackWidget.hpp"
 #include "app/Toolbar.hpp"
+#include "app/ModuleBrowser.hpp"
 
 
 namespace rack {
@@ -16,6 +17,7 @@ struct Scene : OpaqueWidget {
 	ZoomWidget *zoomWidget;
 	RackWidget *rackWidget;
 	Toolbar *toolbar;
+	ModuleBrowser *moduleBrowser;
 
 	// Version checking
 	bool devMode = false;

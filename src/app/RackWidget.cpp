@@ -566,7 +566,7 @@ void RackWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.getConsumed() == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			moduleBrowserCreate();
+			context()->scene->moduleBrowser->visible = true;
 		}
 	}
 }

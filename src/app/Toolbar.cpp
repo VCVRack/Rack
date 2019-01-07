@@ -560,7 +560,7 @@ Toolbar::Toolbar() {
 }
 
 void Toolbar::draw(NVGcontext *vg) {
-	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
 	bndBevel(vg, 0.0, 0.0, box.size.x, box.size.y);
 
 	Widget::draw(vg);

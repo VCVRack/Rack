@@ -7,14 +7,15 @@ namespace rack {
 
 
 struct Label : virtual Widget {
-	std::string text;
-	float fontSize;
-	NVGcolor color;
 	enum Alignment {
 		LEFT_ALIGNMENT,
 		CENTER_ALIGNMENT,
 		RIGHT_ALIGNMENT,
 	};
+
+	std::string text;
+	float fontSize;
+	NVGcolor color;
 	Alignment alignment = LEFT_ALIGNMENT;
 
 	Label() {

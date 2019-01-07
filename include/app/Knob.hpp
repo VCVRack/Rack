@@ -7,9 +7,6 @@
 namespace rack {
 
 
-static const float KNOB_SENSITIVITY = 0.0015f;
-
-
 /** Implements vertical dragging behavior for ParamWidgets */
 struct Knob : ParamWidget {
 	/** Multiplier for mouse movement to adjust knob value */

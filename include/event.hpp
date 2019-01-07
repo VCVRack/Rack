@@ -221,10 +221,10 @@ struct Zoom : Event {
 
 
 struct State {
+	Widget *rootWidget = NULL;
 	/** State widgets
 	Don't set these directly unless you know what you're doing. Use the set*() methods instead.
 	*/
-	Widget *rootWidget = NULL;
 	Widget *hoveredWidget = NULL;
 	Widget *draggedWidget = NULL;
 	Widget *dragHoveredWidget = NULL;

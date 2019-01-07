@@ -4,6 +4,9 @@
 namespace rack {
 
 
+static const float KNOB_SENSITIVITY = 0.0015f;
+
+
 void Knob::onButton(const event::Button &e) {
 	float r = box.size.x / 2;
 	math::Vec c = box.size.div(2);

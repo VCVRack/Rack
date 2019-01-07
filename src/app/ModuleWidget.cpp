@@ -284,7 +284,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 	if (module && module->bypass) {
 		nvgGlobalAlpha(vg, 0.5);
 	}
-	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+	// nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(vg);
 
 	// Power meter
@@ -312,7 +312,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgFill(vg);
 	}
 
-	nvgResetScissor(vg);
+	// nvgResetScissor(vg);
 }
 
 void ModuleWidget::drawShadow(NVGcontext *vg) {
