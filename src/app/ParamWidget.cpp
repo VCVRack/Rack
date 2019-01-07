@@ -2,6 +2,7 @@
 #include "ui/MenuOverlay.hpp"
 #include "ui/TextField.hpp"
 #include "app/Scene.hpp"
+#include "app/ParamQuantity.hpp"
 #include "context.hpp"
 #include "settings.hpp"
 #include "random.hpp"
@@ -64,8 +65,18 @@ void ParamWidget::step() {
 	}
 
 	if (tooltip) {
-		if (quantity)
+		// Quantity string
+		if (quantity) {
 			tooltip->text = quantity->getString();
+		}
+		// Param description
+		ParamQuantity *paramQuantity = dynamic_cast<ParamQuantity*>(quantity);
+		if (paramQuantity) {
+			std::string description = paramQuantity->getParam()->description;
+			if (!description.empty())
+				tooltip->text += "\n" + description;
+		}
+		// Position at bottom-right of parameter
 		tooltip->box.pos = getAbsoluteOffset(box.size).round();
 	}
 

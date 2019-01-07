@@ -18,6 +18,7 @@ struct Param {
 	float displayMultiplier = 1.f;
 	std::string label;
 	std::string unit;
+	std::string description;
 
 	void setup(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f) {
 		this->value = defaultValue;
