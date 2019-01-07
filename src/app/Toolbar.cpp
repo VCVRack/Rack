@@ -197,6 +197,17 @@ struct PowerMeterItem : MenuItem {
 };
 
 
+struct ParamTooltipItem : MenuItem {
+	ParamTooltipItem() {
+		text = "Parameter tooltips";
+		rightText = CHECKMARK(settings::paramTooltip);
+	}
+	void onAction(const event::Action &e) override {
+		settings::paramTooltip ^= true;
+	}
+};
+
+
 struct LockModulesItem : MenuItem {
 	LockModulesItem() {
 		text = "Lock modules";
@@ -260,6 +271,7 @@ struct SettingsButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
+		menu->addChild(new ParamTooltipItem);
 		menu->addChild(new PowerMeterItem);
 		menu->addChild(new LockModulesItem);
 		menu->addChild(new SampleRateItem);

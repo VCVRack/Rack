@@ -70,6 +70,9 @@ static json_t *settingsToJson() {
 	// checkVersion
 	json_object_set_new(rootJ, "checkVersion", json_boolean(checkVersion));
 
+	// paramTooltip
+	json_object_set_new(rootJ, "paramTooltip", json_boolean(paramTooltip));
+
 	return rootJ;
 }
 
@@ -146,6 +149,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
 	if (checkVersionJ)
 		checkVersion = json_boolean_value(checkVersionJ);
+
+	// paramTooltip
+	json_t *paramTooltipJ = json_object_get(rootJ, "paramTooltip");
+	if (paramTooltipJ)
+		paramTooltip = json_boolean_value(paramTooltipJ);
 }
 
 
@@ -186,6 +194,7 @@ void load(std::string filename) {
 float zoom = 1.0;
 float wireOpacity = 0.5;
 float wireTension = 0.5;
+bool paramTooltip = false;
 bool powerMeter = false;
 bool lockModules = false;
 bool checkVersion = true;

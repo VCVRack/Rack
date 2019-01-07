@@ -1,6 +1,7 @@
 #include "app/ParamWidget.hpp"
 #include "app/Scene.hpp"
 #include "context.hpp"
+#include "settings.hpp"
 #include "random.hpp"
 
 
@@ -53,18 +54,18 @@ void ParamWidget::onButton(const event::Button &e) {
 }
 
 void ParamWidget::onEnter(const event::Enter &e) {
-	if (tooltip)
-		return;
-	tooltip = new Tooltip;
-	context()->scene->addChild(tooltip);
+	if (settings::paramTooltip && !tooltip) {
+		tooltip = new Tooltip;
+		context()->scene->addChild(tooltip);
+	}
 }
 
 void ParamWidget::onLeave(const event::Leave &e) {
-	if (!tooltip)
-		return;
-	context()->scene->removeChild(tooltip);
-	delete tooltip;
-	tooltip = NULL;
+	if (tooltip) {
+		context()->scene->removeChild(tooltip);
+		delete tooltip;
+		tooltip = NULL;
+	}
 }
 
 
