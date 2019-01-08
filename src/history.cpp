@@ -5,16 +5,33 @@ namespace rack {
 namespace history {
 
 
-void State::push(Action *action) {
+State::~State() {
+	for (Action *action : actions) {
+		delete action;
+	}
+}
 
+void State::push(Action *action) {
+	for (int i = actionIndex; i < (int) actions.size(); i++) {
+		delete actions[i];
+	}
+	actions.resize(actionIndex);
+	actions.push_back(action);
+	actionIndex++;
 }
 
 void State::undo() {
-	DEBUG("undo");
+	if (actionIndex > 0) {
+		actionIndex--;
+		actions[actionIndex]->undo();
+	}
 }
 
 void State::redo() {
-	DEBUG("redo");
+	if ((int) actions.size() > actionIndex) {
+		actions[actionIndex]->redo();
+		actionIndex++;
+	}
 }
 
 
