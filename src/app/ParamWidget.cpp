@@ -3,7 +3,7 @@
 #include "ui/TextField.hpp"
 #include "app/Scene.hpp"
 #include "app/ParamQuantity.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "settings.hpp"
 #include "random.hpp"
 
@@ -16,7 +16,7 @@ struct ParamField : TextField {
 
 	void step() override {
 		// Keep selected
-		context()->event->setSelected(this);
+		app()->event->setSelected(this);
 	}
 
 	void setParamWidget(ParamWidget *paramWidget) {
@@ -104,7 +104,7 @@ void ParamWidget::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & GLFW_MOD_SHIFT) && !(e.mods & GLFW_MOD_CONTROL)) {
 		// Create ParamField
 		MenuOverlay *overlay = new MenuOverlay;
-		context()->scene->addChild(overlay);
+		app()->scene->addChild(overlay);
 
 		ParamField *paramField = new ParamField;
 		paramField->box.size.x = 100;
@@ -119,13 +119,13 @@ void ParamWidget::onButton(const event::Button &e) {
 void ParamWidget::onEnter(const event::Enter &e) {
 	if (settings::paramTooltip && !tooltip) {
 		tooltip = new Tooltip;
-		context()->scene->addChild(tooltip);
+		app()->scene->addChild(tooltip);
 	}
 }
 
 void ParamWidget::onLeave(const event::Leave &e) {
 	if (tooltip) {
-		context()->scene->removeChild(tooltip);
+		app()->scene->removeChild(tooltip);
 		delete tooltip;
 		tooltip = NULL;
 	}

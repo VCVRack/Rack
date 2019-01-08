@@ -17,11 +17,11 @@ void Knob::onButton(const event::Button &e) {
 }
 
 void Knob::onDragStart(const event::DragStart &e) {
-	context()->window->cursorLock();
+	app()->window->cursorLock();
 }
 
 void Knob::onDragEnd(const event::DragEnd &e) {
-	context()->window->cursorUnlock();
+	app()->window->cursorUnlock();
 }
 
 void Knob::onDragMove(const event::DragMove &e) {
@@ -37,7 +37,7 @@ void Knob::onDragMove(const event::DragMove &e) {
 		float delta = KNOB_SENSITIVITY * -e.mouseDelta.y * speed * range;
 
 		// Drag slower if Mod is held
-		if (context()->window->isModPressed())
+		if (app()->window->isModPressed())
 			delta /= 16.f;
 		quantity->moveValue(delta);
 	}

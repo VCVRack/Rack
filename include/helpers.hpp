@@ -7,7 +7,7 @@
 #include "app/ParamWidget.hpp"
 #include "app/Scene.hpp"
 #include "engine/Module.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "window.hpp"
 
 
@@ -150,12 +150,12 @@ TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
 
 inline Menu *createMenu() {
 	Menu *o = new Menu;
-	o->box.pos = context()->window->mousePos;
+	o->box.pos = app()->window->mousePos;
 
 	MenuOverlay *menuOverlay = new MenuOverlay;
 	menuOverlay->addChild(o);
 
-	context()->scene->addChild(menuOverlay);
+	app()->scene->addChild(menuOverlay);
 	return o;
 }
 

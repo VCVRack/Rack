@@ -4,7 +4,7 @@
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
 #include "engine/Engine.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include <jansson.h>
 
 
@@ -20,14 +20,14 @@ static json_t *settingsToJson() {
 	json_t *tokenJ = json_string(plugin::token.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
-	if (!context()->window->isMaximized()) {
+	if (!app()->window->isMaximized()) {
 		// windowSize
-		math::Vec windowSize = context()->window->getWindowSize();
+		math::Vec windowSize = app()->window->getWindowSize();
 		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
 		json_object_set_new(rootJ, "windowSize", windowSizeJ);
 
 		// windowPos
-		math::Vec windowPos = context()->window->getWindowPos();
+		math::Vec windowPos = app()->window->getWindowPos();
 		json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
 		json_object_set_new(rootJ, "windowPos", windowPosJ);
 	}
@@ -45,15 +45,15 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
 	// allowCursorLock
-	json_t *allowCursorLockJ = json_boolean(context()->window->allowCursorLock);
+	json_t *allowCursorLockJ = json_boolean(app()->window->allowCursorLock);
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
 	// sampleRate
-	json_t *sampleRateJ = json_real(context()->engine->getSampleRate());
+	json_t *sampleRateJ = json_real(app()->engine->getSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// lastPath
-	json_t *lastPathJ = json_string(context()->scene->rackWidget->lastPath.c_str());
+	json_t *lastPathJ = json_string(app()->scene->rackWidget->lastPath.c_str());
 	json_object_set_new(rootJ, "lastPath", lastPathJ);
 
 	// skipLoadOnLaunch
@@ -87,7 +87,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowSizeJ) {
 		double width, height;
 		json_unpack(windowSizeJ, "[F, F]", &width, &height);
-		context()->window->setWindowSize(math::Vec(width, height));
+		app()->window->setWindowSize(math::Vec(width, height));
 	}
 
 	// windowPos
@@ -95,7 +95,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
-		context()->window->setWindowPos(math::Vec(x, y));
+		app()->window->setWindowPos(math::Vec(x, y));
 	}
 
 	// wireOpacity
@@ -116,19 +116,19 @@ static void settingsFromJson(json_t *rootJ) {
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
-		context()->window->allowCursorLock = json_is_true(allowCursorLockJ);
+		app()->window->allowCursorLock = json_is_true(allowCursorLockJ);
 
 	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ) {
 		float sampleRate = json_number_value(sampleRateJ);
-		context()->engine->setSampleRate(sampleRate);
+		app()->engine->setSampleRate(sampleRate);
 	}
 
 	// lastPath
 	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
 	if (lastPathJ)
-		context()->scene->rackWidget->lastPath = json_string_value(lastPathJ);
+		app()->scene->rackWidget->lastPath = json_string_value(lastPathJ);
 
 	// skipLoadOnLaunch
 	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");

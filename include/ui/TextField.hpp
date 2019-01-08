@@ -2,7 +2,7 @@
 #include "widgets/OpaqueWidget.hpp"
 #include "ui/common.hpp"
 #include "event.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 
 namespace rack {

@@ -2,7 +2,7 @@
 #include "widgets/OpaqueWidget.hpp"
 #include "ui/Quantity.hpp"
 #include "ui/common.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 
 namespace rack {
@@ -32,7 +32,7 @@ struct Slider : OpaqueWidget {
 
 	void onDragStart(const event::DragStart &e) override {
 		state = BND_ACTIVE;
-		context()->window->cursorLock();
+		app()->window->cursorLock();
 	}
 
 	void onDragMove(const event::DragMove &e) override {
@@ -43,7 +43,7 @@ struct Slider : OpaqueWidget {
 
 	void onDragEnd(const event::DragEnd &e) override {
 		state = BND_DEFAULT;
-		context()->window->cursorUnlock();
+		app()->window->cursorUnlock();
 	}
 
 	void onButton(const event::Button &e) override {

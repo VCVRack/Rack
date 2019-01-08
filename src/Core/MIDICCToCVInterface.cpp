@@ -45,7 +45,7 @@ struct MIDICCToCVInterface : Module {
 			processMessage(msg);
 		}
 
-		float lambda = 100.f * context()->engine->getSampleTime();
+		float lambda = 100.f * app()->engine->getSampleTime();
 		for (int i = 0; i < 16; i++) {
 			int learnedCc = learnedCcs[i];
 			float value = rescale(clamp(ccs[learnedCc], -127, 127), 0, 127, 0.f, 10.f);
@@ -132,8 +132,8 @@ struct MidiCcChoice : GridChoice {
 		else {
 			text = string::f("%d", module->learnedCcs[id]);
 			color.a = 1.0;
-			if (context()->event->selectedWidget == this)
-				context()->event->selectedWidget = NULL;
+			if (app()->event->selectedWidget == this)
+				app()->event->selectedWidget = NULL;
 		}
 	}
 
@@ -165,11 +165,11 @@ struct MidiCcChoice : GridChoice {
 	}
 
 	void onSelectKey(const event::SelectKey &e) override {
-		if (context()->event->selectedWidget == this) {
+		if (app()->event->selectedWidget == this) {
 			if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 				event::Deselect eDeselect;
 				onDeselect(eDeselect);
-				context()->event->selectedWidget = NULL;
+				app()->event->selectedWidget = NULL;
 				e.consume(this);
 			}
 		}

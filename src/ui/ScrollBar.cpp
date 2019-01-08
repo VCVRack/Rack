@@ -1,6 +1,6 @@
 #include "ui/ScrollBar.hpp"
 #include "ui/ScrollWidget.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "window.hpp"
 
 
@@ -20,7 +20,7 @@ void ScrollBar::draw(NVGcontext *vg) {
 
 void ScrollBar::onDragStart(const event::DragStart &e) {
 	state = BND_ACTIVE;
-	context()->window->cursorLock();
+	app()->window->cursorLock();
 }
 
 void ScrollBar::onDragMove(const event::DragMove &e) {
@@ -34,7 +34,7 @@ void ScrollBar::onDragMove(const event::DragMove &e) {
 
 void ScrollBar::onDragEnd(const event::DragEnd &e) {
 	state = BND_DEFAULT;
-	context()->window->cursorUnlock();
+	app()->window->cursorUnlock();
 }
 
 

@@ -140,11 +140,11 @@ DEPRECATED TPortWidget *createPort(math::Vec pos, PortWidget::Type type, Module 
 ////////////////////
 
 DEPRECATED inline float engineGetSampleRate() {
-	return context()->engine->getSampleRate();
+	return app()->engine->getSampleRate();
 }
 
 DEPRECATED inline float engineGetSampleTime() {
-	return context()->engine->getSampleTime();
+	return app()->engine->getSampleTime();
 }
 
 ////////////////////
@@ -153,11 +153,11 @@ DEPRECATED inline float engineGetSampleTime() {
 
 using namespace dsp;
 
-inline float gainToDb(float gain) {
+DEPRECATED inline float gainToDb(float gain) {
 	return dsp::amplitudeToDb(gain);
 }
 
-inline float dbToGain(float db) {
+DEPRECATED inline float dbToGain(float db) {
 	return dsp::dbToAmplitude(db);
 }
 

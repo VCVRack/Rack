@@ -9,7 +9,7 @@
 #include "asset.hpp"
 #include "system.hpp"
 #include "plugin.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 
 namespace rack {
@@ -60,7 +60,7 @@ void RackWidget::clear() {
 	wireContainer->clearChildren();
 	moduleContainer->clearChildren();
 
-	context()->scene->scrollWidget->offset = math::Vec(0, 0);
+	app()->scene->scrollWidget->offset = math::Vec(0, 0);
 }
 
 void RackWidget::reset() {
@@ -432,7 +432,7 @@ ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
 }
 
 void RackWidget::pastePresetClipboard() {
-	const char *moduleJson = glfwGetClipboardString(context()->window->win);
+	const char *moduleJson = glfwGetClipboardString(app()->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
 		return;
@@ -539,7 +539,7 @@ void RackWidget::step() {
 	}
 
 	// Autosave every 15 seconds
-	int frame = context()->window->frame;
+	int frame = app()->window->frame;
 	if (frame > 0 && frame % (60 * 15) == 0) {
 		save(asset::user("autosave.vcv"));
 		settings::save(asset::user("settings.json"));
@@ -566,7 +566,7 @@ void RackWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.getConsumed() == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			context()->scene->moduleBrowser->visible = true;
+			app()->scene->moduleBrowser->visible = true;
 		}
 	}
 }

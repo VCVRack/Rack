@@ -7,7 +7,7 @@
 #include "app/ModuleWidget.hpp"
 #include "app/Scene.hpp"
 #include "plugin.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 #include <set>
 #include <algorithm>
@@ -21,26 +21,17 @@ static std::set<Model*> sFavoriteModels;
 
 struct ModuleBox : OpaqueWidget {
 	Model *model;
+	bool initialized = false;
 
 	void setModel(Model *model) {
 		this->model = model;
 
-		Widget *transparentWidget = new TransparentWidget;
-		addChild(transparentWidget);
-
-		ZoomWidget *zoomWidget = new ZoomWidget;
-		zoomWidget->setZoom(0.5);
-		transparentWidget->addChild(zoomWidget);
-
-		ModuleWidget *moduleWidget = model->createModuleWidgetNull();
-		zoomWidget->addChild(moduleWidget);
-
-		box.size = math::Vec(moduleWidget->box.size.x, RACK_GRID_SIZE.y).mult(zoomWidget->zoom).ceil();
+		box.size.x = 70.f;
+		box.size.y = std::ceil(RACK_GRID_SIZE.y * 0.5f);
 
 		math::Vec p;
 		p.y = box.size.y;
 		box.size.y += 40.0;
-		box.size.x = std::max(box.size.x, 70.f);
 
 		Label *nameLabel = new Label;
 		nameLabel->text = model->name;
@@ -56,8 +47,25 @@ struct ModuleBox : OpaqueWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
+		// Lazily create ModuleWidget when drawn
+		if (!initialized) {
+			Widget *transparentWidget = new TransparentWidget;
+			addChild(transparentWidget);
+
+			ZoomWidget *zoomWidget = new ZoomWidget;
+			zoomWidget->setZoom(0.5f);
+			transparentWidget->addChild(zoomWidget);
+
+			ModuleWidget *moduleWidget = model->createModuleWidgetNull();
+			zoomWidget->addChild(moduleWidget);
+
+			float width = std::ceil(moduleWidget->box.size.x * 0.5f);
+			box.size.x = std::max(box.size.x, width);
+			initialized = true;
+		}
+
 		OpaqueWidget::draw(vg);
-		if (context()->event->hoveredWidget == this) {
+		if (app()->event->hoveredWidget == this) {
 			nvgBeginPath(vg);
 			nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
 			nvgFillColor(vg, nvgRGBAf(1, 1, 1, 0.25));
@@ -70,7 +78,7 @@ struct ModuleBox : OpaqueWidget {
 			// Create module
 			ModuleWidget *moduleWidget = model->createModuleWidget();
 			assert(moduleWidget);
-			context()->scene->rackWidget->addModule(moduleWidget);
+			app()->scene->rackWidget->addModule(moduleWidget);
 			// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
 			e.consume(moduleWidget);
 			// Close Module Browser

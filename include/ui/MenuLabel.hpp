@@ -1,7 +1,7 @@
 #pragma once
 #include "ui/common.hpp"
 #include "ui/MenuEntry.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 
 namespace rack {
@@ -17,8 +17,8 @@ struct MenuLabel : MenuEntry {
 	void step() override {
 		// Add 10 more pixels because Retina measurements are sometimes too small
 		const float rightPadding = 10.0;
-		// HACK use context()->window->vg from the window.
-		box.size.x = bndLabelWidth(context()->window->vg, -1, text.c_str()) + rightPadding;
+		// HACK use app()->window->vg from the window.
+		box.size.x = bndLabelWidth(app()->window->vg, -1, text.c_str()) + rightPadding;
 		Widget::step();
 	}
 };

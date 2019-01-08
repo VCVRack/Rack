@@ -1,6 +1,6 @@
 #include "widgets/Widget.hpp"
 #include "event.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include <algorithm>
 
 
@@ -58,7 +58,7 @@ void Widget::removeChild(Widget *child) {
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
 	// Prepare to remove widget from the event state
-	context()->event->finalizeWidget(child);
+	app()->event->finalizeWidget(child);
 	// Delete child from children list
 	auto it = std::find(children.begin(), children.end(), child);
 	assert(it != children.end());
@@ -69,7 +69,7 @@ void Widget::removeChild(Widget *child) {
 
 void Widget::clearChildren() {
 	for (Widget *child : children) {
-		context()->event->finalizeWidget(child);
+		app()->event->finalizeWidget(child);
 		child->parent = NULL;
 		delete child;
 	}
@@ -81,7 +81,7 @@ void Widget::step() {
 		Widget *child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
-			context()->event->finalizeWidget(child);
+			app()->event->finalizeWidget(child);
 			it = children.erase(it);
 			child->parent = NULL;
 			delete child;
@@ -107,7 +107,7 @@ void Widget::draw(NVGcontext *vg) {
 		child->draw(vg);
 
 		// Draw red hitboxes
-		// if (context()->event->hoveredWidget == child) {
+		// if (app()->event->hoveredWidget == child) {
 		// 	nvgBeginPath(vg);
 		// 	nvgRect(vg, 0, 0, child->box.size.x, child->box.size.y);
 		// 	nvgFillColor(vg, nvgRGBAf(1, 0, 0, 0.5));

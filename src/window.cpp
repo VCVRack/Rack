@@ -4,7 +4,7 @@
 #include "keyboard.hpp"
 #include "gamepad.hpp"
 #include "event.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 #include <map>
 #include <queue>
@@ -70,7 +70,7 @@ static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mod
 	}
 #endif
 
-	context()->event->handleButton(window->mousePos, button, action, mods);
+	app()->event->handleButton(window->mousePos, button, action, mods);
 }
 
 static void Window_mouseButtonStickyPop(Window *window) {
@@ -111,12 +111,12 @@ static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
 
 	window->mousePos = mousePos;
 
-	context()->event->handleHover(mousePos, mouseDelta);
+	app()->event->handleHover(mousePos, mouseDelta);
 }
 
 static void cursorEnterCallback(GLFWwindow *win, int entered) {
 	if (!entered) {
-		context()->event->handleLeave();
+		app()->event->handleLeave();
 	}
 }
 
@@ -129,17 +129,17 @@ static void scrollCallback(GLFWwindow *win, double x, double y) {
 #endif
 	scrollDelta = scrollDelta.mult(50.0);
 
-	context()->event->handleScroll(window->mousePos, scrollDelta);
+	app()->event->handleScroll(window->mousePos, scrollDelta);
 }
 
 static void charCallback(GLFWwindow *win, unsigned int codepoint) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
-	context()->event->handleText(window->mousePos, codepoint);
+	app()->event->handleText(window->mousePos, codepoint);
 }
 
 static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
-	context()->event->handleKey(window->mousePos, key, scancode, action, mods);
+	app()->event->handleKey(window->mousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
 	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
@@ -158,7 +158,7 @@ static void dropCallback(GLFWwindow *win, int count, const char **paths) {
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
 	}
-	context()->event->handleDrop(window->mousePos, pathsVec);
+	app()->event->handleDrop(window->mousePos, pathsVec);
 }
 
 static void errorCallback(int error, const char *description) {
@@ -280,7 +280,7 @@ static void Window_renderGui(Window *window) {
 
 	nvgReset(window->vg);
 	nvgScale(window->vg, window->pixelRatio, window->pixelRatio);
-	context()->event->rootWidget->draw(window->vg);
+	app()->event->rootWidget->draw(window->vg);
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -312,9 +312,9 @@ void Window::run() {
 		windowTitle = APP_NAME;
 		windowTitle += " ";
 		windowTitle += APP_VERSION;
-		if (!context()->scene->rackWidget->lastPath.empty()) {
+		if (!app()->scene->rackWidget->lastPath.empty()) {
 			windowTitle += " - ";
-			windowTitle += string::filename(context()->scene->rackWidget->lastPath);
+			windowTitle += string::filename(app()->scene->rackWidget->lastPath);
 		}
 		if (windowTitle != internal->lastWindowTitle) {
 			glfwSetWindowTitle(win, windowTitle.c_str());
@@ -326,7 +326,7 @@ void Window::run() {
 		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
 		newPixelRatio = std::round(newPixelRatio);
 		if (newPixelRatio != pixelRatio) {
-			context()->event->handleZoom();
+			app()->event->handleZoom();
 			pixelRatio = newPixelRatio;
 		}
 
@@ -337,10 +337,10 @@ void Window::run() {
 		glfwGetWindowSize(win, &windowWidth, &windowHeight);
 		windowRatio = (float)width / windowWidth;
 
-		context()->event->rootWidget->box.size = math::Vec(width, height).div(pixelRatio);
+		app()->event->rootWidget->box.size = math::Vec(width, height).div(pixelRatio);
 
 		// Step scene
-		context()->event->rootWidget->step();
+		app()->event->rootWidget->step();
 
 		// Render
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
@@ -444,7 +444,7 @@ bool Window::isFullScreen() {
 ////////////////////
 
 Font::Font(const std::string &filename) {
-	handle = nvgCreateFont(context()->window->vg, filename.c_str(), filename.c_str());
+	handle = nvgCreateFont(app()->window->vg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		INFO("Loaded font %s", filename.c_str());
 	}
@@ -470,7 +470,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 ////////////////////
 
 Image::Image(const std::string &filename) {
-	handle = nvgCreateImage(context()->window->vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+	handle = nvgCreateImage(app()->window->vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		INFO("Loaded image %s", filename.c_str());
 	}
@@ -481,7 +481,7 @@ Image::Image(const std::string &filename) {
 
 Image::~Image() {
 	// TODO What if handle is invalid?
-	nvgDeleteImage(context()->window->vg, handle);
+	nvgDeleteImage(app()->window->vg, handle);
 }
 
 std::shared_ptr<Image> Image::load(const std::string &filename) {

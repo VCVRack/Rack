@@ -4,7 +4,8 @@
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
 #include "app/RackScrollWidget.hpp"
-#include "context.hpp"
+#include "app.hpp"
+#include "history.hpp"
 #include <thread>
 
 
@@ -64,7 +65,7 @@ void Scene::step() {
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
 			std::thread t(system::openBrowser, "https://vcvrack.com/");
 			t.detach();
-			context()->window->close();
+			app()->window->close();
 		}
 		latestVersion = "";
 	}
@@ -78,40 +79,50 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
 					rackWidget->reset();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Q: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-					context()->window->close();
+				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+					app()->window->close();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_O: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
 					rackWidget->loadDialog();
 					e.consume(this);
 				}
-				if (context()->window->isModPressed() && context()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
 					rackWidget->revert();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_S: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
 					rackWidget->saveDialog();
 					e.consume(this);
 				}
-				if (context()->window->isModPressed() && context()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
 					rackWidget->saveAsDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_V: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
 					rackWidget->pastePresetClipboard();
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_Z: {
+				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+					app()->history->undo();
+					e.consume(this);
+				}
+				if ((e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
+					app()->history->redo();
 					e.consume(this);
 				}
 			} break;
@@ -121,7 +132,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 				e.consume(this);
 			} break;
 			case GLFW_KEY_F11: {
-				context()->window->setFullScreen(!context()->window->isFullScreen());
+				app()->window->setFullScreen(!app()->window->isFullScreen());
 				e.consume(this);
 			}
 		}

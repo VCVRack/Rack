@@ -7,7 +7,7 @@ namespace rack {
 void MenuItem::draw(NVGcontext *vg) {
 	BNDwidgetState state = BND_DEFAULT;
 
-	if (context()->event->hoveredWidget == this)
+	if (app()->event->hoveredWidget == this)
 		state = BND_HOVER;
 
 	// Set active state if this MenuItem
@@ -30,9 +30,9 @@ void MenuItem::draw(NVGcontext *vg) {
 void MenuItem::step() {
 	// Add 10 more pixels because measurements on high-DPI screens are sometimes too small for some reason
 	const float rightPadding = 10.0;
-	// HACK use context()->window->vg from the window.
-	// All this does is inspect the font, so it shouldn't modify context()->window->vg and should work when called from a FramebufferWidget for example.
-	box.size.x = bndLabelWidth(context()->window->vg, -1, text.c_str()) + bndLabelWidth(context()->window->vg, -1, rightText.c_str()) + rightPadding;
+	// HACK use app()->window->vg from the window.
+	// All this does is inspect the font, so it shouldn't modify app()->window->vg and should work when called from a FramebufferWidget for example.
+	box.size.x = bndLabelWidth(app()->window->vg, -1, text.c_str()) + bndLabelWidth(app()->window->vg, -1, rightText.c_str()) + rightPadding;
 	Widget::step();
 }
 

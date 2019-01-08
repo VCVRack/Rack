@@ -11,9 +11,9 @@ void TextField::draw(NVGcontext *vg) {
 	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
 	BNDwidgetState state;
-	if (this == context()->event->selectedWidget)
+	if (this == app()->event->selectedWidget)
 		state = BND_ACTIVE;
-	else if (this == context()->event->hoveredWidget)
+	else if (this == app()->event->hoveredWidget)
 		state = BND_HOVER;
 	else
 		state = BND_DEFAULT;
@@ -37,7 +37,7 @@ void TextField::onButton(const event::Button &e) {
 }
 
 void TextField::onHover(const event::Hover &e) {
-	if (this == context()->event->draggedWidget) {
+	if (this == app()->event->draggedWidget) {
 		int pos = getTextPosition(e.pos);
 		if (pos != selection) {
 			cursor = pos;
@@ -94,7 +94,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				}
 			} break;
 			case GLFW_KEY_LEFT: {
-				if (context()->window->isModPressed()) {
+				if (app()->window->isModPressed()) {
 					while (--cursor > 0) {
 						if (text[cursor] == ' ')
 							break;
@@ -103,12 +103,12 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				else {
 					cursor--;
 				}
-				if (!context()->window->isShiftPressed()) {
+				if (!app()->window->isShiftPressed()) {
 					selection = cursor;
 				}
 			} break;
 			case GLFW_KEY_RIGHT: {
-				if (context()->window->isModPressed()) {
+				if (app()->window->isModPressed()) {
 					while (++cursor < (int) text.size()) {
 						if (text[cursor] == ' ')
 							break;
@@ -117,7 +117,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				else {
 					cursor++;
 				}
-				if (!context()->window->isShiftPressed()) {
+				if (!app()->window->isShiftPressed()) {
 					selection = cursor;
 				}
 			} break;
@@ -128,33 +128,33 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				selection = cursor = text.size();
 			} break;
 			case GLFW_KEY_V: {
-				if (context()->window->isModPressed()) {
-					const char *newText = glfwGetClipboardString(context()->window->win);
+				if (app()->window->isModPressed()) {
+					const char *newText = glfwGetClipboardString(app()->window->win);
 					if (newText)
 						insertText(newText);
 				}
 			} break;
 			case GLFW_KEY_X: {
-				if (context()->window->isModPressed()) {
+				if (app()->window->isModPressed()) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-						glfwSetClipboardString(context()->window->win, selectedText.c_str());
+						glfwSetClipboardString(app()->window->win, selectedText.c_str());
 						insertText("");
 					}
 				}
 			} break;
 			case GLFW_KEY_C: {
-				if (context()->window->isModPressed()) {
+				if (app()->window->isModPressed()) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-						glfwSetClipboardString(context()->window->win, selectedText.c_str());
+						glfwSetClipboardString(app()->window->win, selectedText.c_str());
 					}
 				}
 			} break;
 			case GLFW_KEY_A: {
-				if (context()->window->isModPressed()) {
+				if (app()->window->isModPressed()) {
 					selectAll();
 				}
 			} break;
@@ -203,7 +203,7 @@ void TextField::selectAll() {
 }
 
 int TextField::getTextPosition(math::Vec mousePos) {
-	return bndTextFieldTextPosition(context()->window->vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
+	return bndTextFieldTextPosition(app()->window->vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
 }
 
 

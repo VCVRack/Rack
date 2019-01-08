@@ -4,7 +4,7 @@
 #include "componentlibrary.hpp"
 #include "window.hpp"
 #include "event.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "settings.hpp"
 
 
@@ -111,12 +111,12 @@ void WireWidget::updateWire() {
 			wire->outputId = outputPort->portId;
 			wire->inputModule = inputPort->module;
 			wire->inputId = inputPort->portId;
-			context()->engine->addWire(wire);
+			app()->engine->addWire(wire);
 		}
 	}
 	else {
 		if (wire) {
-			context()->engine->removeWire(wire);
+			app()->engine->removeWire(wire);
 			delete wire;
 			wire = NULL;
 		}
@@ -125,25 +125,25 @@ void WireWidget::updateWire() {
 
 math::Vec WireWidget::getOutputPos() {
 	if (outputPort) {
-		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
 	}
 	else if (hoveredOutputPort) {
-		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
 	}
 	else {
-		return context()->scene->rackWidget->lastMousePos;
+		return app()->scene->rackWidget->lastMousePos;
 	}
 }
 
 math::Vec WireWidget::getInputPos() {
 	if (inputPort) {
-		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
 	}
 	else if (hoveredInputPort) {
-		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), context()->scene->rackWidget);
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
 	}
 	else {
-		return context()->scene->rackWidget->lastMousePos;
+		return app()->scene->rackWidget->lastMousePos;
 	}
 }
 
@@ -167,14 +167,14 @@ void WireWidget::draw(NVGcontext *vg) {
 	float opacity = settings::wireOpacity;
 	float tension = settings::wireTension;
 
-	WireWidget *activeWire = context()->scene->rackWidget->wireContainer->activeWire;
+	WireWidget *activeWire = app()->scene->rackWidget->wireContainer->activeWire;
 	if (activeWire) {
 		// Draw as opaque if the wire is active
 		if (activeWire == this)
 			opacity = 1.0;
 	}
 	else {
-		PortWidget *hoveredPort = dynamic_cast<PortWidget*>(context()->event->hoveredWidget);
+		PortWidget *hoveredPort = dynamic_cast<PortWidget*>(app()->event->hoveredWidget);
 		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
 			opacity = 1.0;
 	}

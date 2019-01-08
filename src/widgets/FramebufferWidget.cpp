@@ -1,5 +1,5 @@
 #include "widgets/FramebufferWidget.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include <nanovg_gl.h>
 #include <nanovg_gl_utils.h>
 
@@ -55,7 +55,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		internal->box.pos = internal->box.pos.mult(s).floor();
 		internal->box.size = internal->box.size.mult(s).ceil().plus(math::Vec(1, 1));
 
-		math::Vec fbSize = internal->box.size.mult(context()->window->pixelRatio * oversample);
+		math::Vec fbSize = internal->box.size.mult(app()->window->pixelRatio * oversample);
 
 		if (!fbSize.isFinite())
 			return;
@@ -66,7 +66,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		// Delete old one first to free up GPU memory
 		internal->setFramebuffer(NULL);
 		// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
-		NVGLUframebuffer *fb = nvgluCreateFramebuffer(context()->window->vg, fbSize.x, fbSize.y, 0);
+		NVGLUframebuffer *fb = nvgluCreateFramebuffer(app()->window->vg, fbSize.x, fbSize.y, 0);
 		if (!fb)
 			return;
 		internal->setFramebuffer(fb);
@@ -76,10 +76,10 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		NVGcontext *framebufferVg = context()->window->framebufferVg;
-		nvgBeginFrame(framebufferVg, fbSize.x, fbSize.y, context()->window->pixelRatio * oversample);
+		NVGcontext *framebufferVg = app()->window->framebufferVg;
+		nvgBeginFrame(framebufferVg, fbSize.x, fbSize.y, app()->window->pixelRatio * oversample);
 
-		nvgScale(framebufferVg, context()->window->pixelRatio * oversample, context()->window->pixelRatio * oversample);
+		nvgScale(framebufferVg, app()->window->pixelRatio * oversample, app()->window->pixelRatio * oversample);
 		// Use local scaling
 		nvgTranslate(framebufferVg, bf.x, bf.y);
 		nvgTranslate(framebufferVg, -internal->box.pos.x, -internal->box.pos.y);

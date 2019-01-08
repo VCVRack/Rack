@@ -10,7 +10,7 @@
 #include "ui/PasswordField.hpp"
 #include "ui/ProgressBar.hpp"
 #include "app/Scene.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "settings.hpp"
 #include "helpers.hpp"
 #include "system.hpp"
@@ -23,7 +23,7 @@ namespace rack {
 
 struct MenuButton : Button {
 	void step() override {
-		box.size.x = bndLabelWidth(context()->window->vg, -1, text.c_str());
+		box.size.x = bndLabelWidth(app()->window->vg, -1, text.c_str());
 		Widget::step();
 	}
 	void draw(NVGcontext *vg) override {
@@ -38,7 +38,7 @@ struct NewItem : MenuItem {
 		rightText = "(" WINDOW_MOD_KEY_NAME "+N)";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->reset();
+		app()->scene->rackWidget->reset();
 	}
 };
 
@@ -49,7 +49,7 @@ struct OpenItem : MenuItem {
 		rightText = "(" WINDOW_MOD_KEY_NAME "+O)";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->loadDialog();
+		app()->scene->rackWidget->loadDialog();
 	}
 };
 
@@ -60,7 +60,7 @@ struct SaveItem : MenuItem {
 		rightText = "(" WINDOW_MOD_KEY_NAME "+S)";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->saveDialog();
+		app()->scene->rackWidget->saveDialog();
 	}
 };
 
@@ -71,7 +71,7 @@ struct SaveAsItem : MenuItem {
 		rightText = "(" WINDOW_MOD_KEY_NAME "+Shift+S)";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->saveAsDialog();
+		app()->scene->rackWidget->saveAsDialog();
 	}
 };
 
@@ -81,7 +81,7 @@ struct SaveTemplateItem : MenuItem {
 		text = "Save template";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->saveTemplate();
+		app()->scene->rackWidget->saveTemplate();
 	}
 };
 
@@ -91,7 +91,7 @@ struct RevertItem : MenuItem {
 		text = "Revert";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->revert();
+		app()->scene->rackWidget->revert();
 	}
 };
 
@@ -101,7 +101,7 @@ struct DisconnectCablesItem : MenuItem {
 		text = "Disconnect cables";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->disconnect();
+		app()->scene->rackWidget->disconnect();
 	}
 };
 
@@ -112,7 +112,7 @@ struct QuitItem : MenuItem {
 		rightText = "(" WINDOW_MOD_KEY_NAME "+Q)";
 	}
 	void onAction(const event::Action &e) override {
-		context()->window->close();
+		app()->window->close();
 	}
 };
 
@@ -222,10 +222,10 @@ struct LockModulesItem : MenuItem {
 struct EnginePauseItem : MenuItem {
 	EnginePauseItem() {
 		text = "Pause engine";
-		rightText = CHECKMARK(context()->engine->paused);
+		rightText = CHECKMARK(app()->engine->paused);
 	}
 	void onAction(const event::Action &e) override {
-		context()->engine->paused ^= true;
+		app()->engine->paused ^= true;
 	}
 };
 
@@ -235,11 +235,11 @@ struct SampleRateValueItem : MenuItem {
 	SampleRateValueItem(float sampleRate) {
 		this->sampleRate = sampleRate;
 		text = string::f("%.0f Hz", sampleRate);
-		rightText = CHECKMARK(context()->engine->getSampleRate() == sampleRate);
+		rightText = CHECKMARK(app()->engine->getSampleRate() == sampleRate);
 	}
 	void onAction(const event::Action &e) override {
-		context()->engine->setSampleRate(sampleRate);
-		context()->engine->paused = false;
+		app()->engine->setSampleRate(sampleRate);
+		app()->engine->paused = false;
 	}
 };
 
@@ -314,7 +314,7 @@ struct AccountEmailField : TextField {
 	}
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
-			context()->event->selectedWidget = passwordField;
+			app()->event->selectedWidget = passwordField;
 			e.consume(this);
 			return;
 		}
@@ -399,7 +399,7 @@ struct SyncItem : MenuItem {
 // 		// Display message if we've completed updates
 // 		if (completed) {
 // 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
-// 				context()->window->close();
+// 				app()->window->close();
 // 			}
 // 			completed = false;
 // 		}

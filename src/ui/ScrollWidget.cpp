@@ -1,5 +1,5 @@
 #include "ui/ScrollWidget.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "event.hpp"
 
 
@@ -70,25 +70,25 @@ void ScrollWidget::step() {
 
 void ScrollWidget::onHover(const event::Hover &e) {
 	// Scroll with arrow keys
-	if (!context()->event->selectedWidget) {
+	if (!app()->event->selectedWidget) {
 		float arrowSpeed = 30.0;
-		if (context()->window->isShiftPressed() && context()->window->isModPressed())
+		if (app()->window->isShiftPressed() && app()->window->isModPressed())
 			arrowSpeed /= 16.0;
-		else if (context()->window->isShiftPressed())
+		else if (app()->window->isShiftPressed())
 			arrowSpeed *= 4.0;
-		else if (context()->window->isModPressed())
+		else if (app()->window->isModPressed())
 			arrowSpeed /= 4.0;
 
-		if (glfwGetKey(context()->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		if (glfwGetKey(app()->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			offset.x -= arrowSpeed;
 		}
-		if (glfwGetKey(context()->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		if (glfwGetKey(app()->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 			offset.x += arrowSpeed;
 		}
-		if (glfwGetKey(context()->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
+		if (glfwGetKey(app()->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
 			offset.y -= arrowSpeed;
 		}
-		if (glfwGetKey(context()->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		if (glfwGetKey(app()->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
 			offset.y += arrowSpeed;
 		}
 	}

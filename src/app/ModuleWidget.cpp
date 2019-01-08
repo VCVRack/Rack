@@ -5,7 +5,7 @@
 #include "app/Scene.hpp"
 #include "app/SVGPanel.hpp"
 #include "helpers.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "settings.hpp"
 
 #include "osdialog.h"
@@ -16,20 +16,20 @@ namespace rack {
 
 ModuleWidget::ModuleWidget(Module *module) {
 	if (module) {
-		context()->engine->addModule(module);
+		app()->engine->addModule(module);
 	}
 	this->module = module;
 }
 
 ModuleWidget::~ModuleWidget() {
 	// HACK
-	// If we try to disconnect wires in the Module Browser (e.g. when Rack is closed while the Module Browser is open), context()->scene->rackWidget will be an invalid pointer.
+	// If we try to disconnect wires in the Module Browser (e.g. when Rack is closed while the Module Browser is open), app()->scene->rackWidget will be an invalid pointer.
 	// So only attempt to disconnect if the module is not NULL.
 	if (module)
 		disconnect();
 	// Remove and delete the Module instance
 	if (module) {
-		context()->engine->removeModule(module);
+		app()->engine->removeModule(module);
 		delete module;
 		module = NULL;
 	}
@@ -136,11 +136,11 @@ void ModuleWidget::copyClipboard() {
 	DEFER({
 		free(moduleJson);
 	});
-	glfwSetClipboardString(context()->window->win, moduleJson);
+	glfwSetClipboardString(app()->window->win, moduleJson);
 }
 
 void ModuleWidget::pasteClipboard() {
-	const char *moduleJson = glfwGetClipboardString(context()->window->win);
+	const char *moduleJson = glfwGetClipboardString(app()->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
 		return;
@@ -261,22 +261,22 @@ void ModuleWidget::toggleBypass() {
 
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
-		context()->scene->rackWidget->wireContainer->removeAllWires(input);
+		app()->scene->rackWidget->wireContainer->removeAllWires(input);
 	}
 	for (PortWidget *output : outputs) {
-		context()->scene->rackWidget->wireContainer->removeAllWires(output);
+		app()->scene->rackWidget->wireContainer->removeAllWires(output);
 	}
 }
 
 void ModuleWidget::reset() {
 	if (module) {
-		context()->engine->resetModule(module);
+		app()->engine->resetModule(module);
 	}
 }
 
 void ModuleWidget::randomize() {
 	if (module) {
-		context()->engine->randomizeModule(module);
+		app()->engine->randomizeModule(module);
 	}
 }
 
@@ -298,7 +298,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 
 		std::string cpuText = string::f("%.0f mS", module->cpuTime * 1000.f);
 		// TODO Use blendish text function
-		nvgFontFaceId(vg, context()->window->uiFont->handle);
+		nvgFontFaceId(vg, app()->window->uiFont->handle);
 		nvgFontSize(vg, 12);
 		nvgFillColor(vg, nvgRGBf(1, 1, 1));
 		nvgText(vg, 10.0, box.size.y - 6.0, cpuText.c_str(), NULL);
@@ -331,8 +331,8 @@ void ModuleWidget::onHover(const event::Hover &e) {
 	OpaqueWidget::onHover(e);
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-	if (glfwGetKey(context()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(context()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-		if (!context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+	if (glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+		if (!app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 			requestedDelete = true;
 			return;
 		}
@@ -352,43 +352,43 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_I: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 					reset();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_R: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 					randomize();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_C: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 					copyClipboard();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_V: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 					pasteClipboard();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_D: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
-					context()->scene->rackWidget->cloneModule(this);
+				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+					app()->scene->rackWidget->cloneModule(this);
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_U: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 					disconnect();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_E: {
-				if (context()->window->isModPressed() && !context()->window->isShiftPressed()) {
+				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 					toggleBypass();
 					e.consume(this);
 				}
@@ -401,7 +401,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 }
 
 void ModuleWidget::onDragStart(const event::DragStart &e) {
-	dragPos = context()->scene->rackWidget->lastMousePos.minus(box.pos);
+	dragPos = app()->scene->rackWidget->lastMousePos.minus(box.pos);
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {
@@ -410,8 +410,8 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Rect newBox = box;
-		newBox.pos = context()->scene->rackWidget->lastMousePos.minus(dragPos);
-		context()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
+		newBox.pos = app()->scene->rackWidget->lastMousePos.minus(dragPos);
+		app()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}
 }
 
@@ -498,7 +498,7 @@ struct ModuleCloneItem : MenuItem {
 		rightText = WINDOW_MOD_KEY_NAME "+D";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->cloneModule(moduleWidget);
+		app()->scene->rackWidget->cloneModule(moduleWidget);
 	}
 };
 
@@ -526,7 +526,7 @@ struct ModuleDeleteItem : MenuItem {
 		rightText = "Backspace/Delete";
 	}
 	void onAction(const event::Action &e) override {
-		context()->scene->rackWidget->deleteModule(moduleWidget);
+		app()->scene->rackWidget->deleteModule(moduleWidget);
 		delete moduleWidget;
 	}
 };

@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include "context.hpp"
+#include "app.hpp"
 
 
 #define AUDIO_OUTPUTS 8
@@ -143,7 +143,7 @@ struct AudioInterface : Module {
 
 void AudioInterface::step() {
 	// Update SRC states
-	int sampleRate = (int) context()->engine->getSampleRate();
+	int sampleRate = (int) app()->engine->getSampleRate();
 	inputSrc.setRates(audioIO.sampleRate, sampleRate);
 	outputSrc.setRates(sampleRate, audioIO.sampleRate);
 

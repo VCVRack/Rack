@@ -11,8 +11,10 @@
 
 
 #ifdef ARCH_MAC
+	#define WINDOW_MOD GLFW_MOD_SUPER
 	#define WINDOW_MOD_KEY_NAME "Cmd"
 #else
+	#define WINDOW_MOD GLFW_MOD_CONTROL
 	#define WINDOW_MOD_KEY_NAME "Ctrl"
 #endif
 

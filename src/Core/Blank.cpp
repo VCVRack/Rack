@@ -1,5 +1,5 @@
 #include "Core.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 using namespace rack;
 
@@ -39,14 +39,14 @@ struct ModuleResizeHandle : virtual Widget {
 		}
 	}
 	void onDragStart(const event::DragStart &e) override {
-		dragX = context()->scene->rackWidget->lastMousePos.x;
+		dragX = app()->scene->rackWidget->lastMousePos.x;
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 		originalBox = m->box;
 	}
 	void onDragMove(const event::DragMove &e) override {
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
-		float newDragX = context()->scene->rackWidget->lastMousePos.x;
+		float newDragX = app()->scene->rackWidget->lastMousePos.x;
 		float deltaX = newDragX - dragX;
 
 		Rect newBox = originalBox;
@@ -62,7 +62,7 @@ struct ModuleResizeHandle : virtual Widget {
 			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
-		context()->scene->rackWidget->requestModuleBox(m, newBox);
+		app()->scene->rackWidget->requestModuleBox(m, newBox);
 	}
 	void draw(NVGcontext *vg) override {
 		for (float x = 5.0; x <= 10.0; x += 5.0) {

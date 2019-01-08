@@ -144,7 +144,7 @@ struct MIDIToCVInterface : Module {
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-		float deltaTime = context()->engine->getSampleTime();
+		float deltaTime = app()->engine->getSampleTime();
 
 		outputs[CV_OUTPUT].setVoltage((lastNote - 60) / 12.f);
 		outputs[GATE_OUTPUT].setVoltage(gate ? 10.f : 0.f);

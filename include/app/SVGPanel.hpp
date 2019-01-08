@@ -3,7 +3,7 @@
 #include "widgets/TransparentWidget.hpp"
 #include "widgets/FramebufferWidget.hpp"
 #include "widgets/SVGWidget.hpp"
-#include "context.hpp"
+#include "app.hpp"
 
 
 namespace rack {
@@ -23,7 +23,7 @@ struct PanelBorder : TransparentWidget {
 
 struct SVGPanel : FramebufferWidget {
 	void step() override {
-		if (math::isNear(context()->window->pixelRatio, 1.0)) {
+		if (math::isNear(app()->window->pixelRatio, 1.0)) {
 			// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 			oversample = 2.0;
 		}

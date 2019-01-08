@@ -9,7 +9,7 @@
 #include "engine/Engine.hpp"
 #include "app/Scene.hpp"
 #include "plugin.hpp"
-#include "context.hpp"
+#include "app.hpp"
 #include "ui.hpp"
 
 #include <unistd.h>
@@ -79,12 +79,8 @@ int main(int argc, char *argv[]) {
 	plugin::init(devMode);
 
 	// Initialize app
-	context()->event = new event::State;
-	context()->window = new Window;
-	context()->engine = new Engine;
-	context()->scene = new Scene;
-	context()->scene->devMode = devMode;
-	context()->event->rootWidget = context()->scene;
+	appInit();
+	app()->scene->devMode = devMode;
 	settings::load(asset::user("settings.json"));
 
 	if (patchFile.empty()) {
@@ -94,36 +90,29 @@ int main(int argc, char *argv[]) {
 		settings::save(asset::user("settings.json"));
 		settings::skipLoadOnLaunch = false;
 		if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
-			context()->scene->rackWidget->lastPath = "";
+			app()->scene->rackWidget->lastPath = "";
 		}
 		else {
 			// Load autosave
-			std::string oldLastPath = context()->scene->rackWidget->lastPath;
-			context()->scene->rackWidget->load(asset::user("autosave.vcv"));
-			context()->scene->rackWidget->lastPath = oldLastPath;
+			std::string oldLastPath = app()->scene->rackWidget->lastPath;
+			app()->scene->rackWidget->load(asset::user("autosave.vcv"));
+			app()->scene->rackWidget->lastPath = oldLastPath;
 		}
 	}
 	else {
 		// Load patch
-		context()->scene->rackWidget->load(patchFile);
-		context()->scene->rackWidget->lastPath = patchFile;
+		app()->scene->rackWidget->load(patchFile);
+		app()->scene->rackWidget->lastPath = patchFile;
 	}
 
-	context()->engine->start();
-	context()->window->run();
-	context()->engine->stop();
+	app()->engine->start();
+	app()->window->run();
+	app()->engine->stop();
 
 	// Destroy app
-	context()->scene->rackWidget->save(asset::user("autosave.vcv"));
+	app()->scene->rackWidget->save(asset::user("autosave.vcv"));
 	settings::save(asset::user("settings.json"));
-	delete context()->scene;
-	context()->scene = NULL;
-	delete context()->event;
-	context()->event = NULL;
-	delete context()->engine;
-	context()->engine = NULL;
-	delete context()->window;
-	context()->window = NULL;
+	appDestroy();
 
 	// Destroy environment
 	plugin::destroy();
