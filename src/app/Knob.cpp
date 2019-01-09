@@ -1,4 +1,7 @@
 #include "app/Knob.hpp"
+#include "app.hpp"
+#include "app/Scene.hpp"
+#include "history.hpp"
 
 
 namespace rack {
@@ -17,18 +20,34 @@ void Knob::onButton(const event::Button &e) {
 }
 
 void Knob::onDragStart(const event::DragStart &e) {
+	if (paramQuantity)
+		oldValue = paramQuantity->getValue();
+
 	app()->window->cursorLock();
 }
 
 void Knob::onDragEnd(const event::DragEnd &e) {
 	app()->window->cursorUnlock();
+
+	if (paramQuantity) {
+		float newValue = paramQuantity->getValue();
+		if (oldValue != newValue) {
+			// Push ParamChange history action
+			history::ParamChange *h = new history::ParamChange;
+			h->moduleId = paramQuantity->module->id;
+			h->paramId = paramQuantity->paramId;
+			h->oldValue = oldValue;
+			h->newValue = newValue;
+			app()->history->push(h);
+		}
+	}
 }
 
 void Knob::onDragMove(const event::DragMove &e) {
-	if (quantity) {
+	if (paramQuantity) {
 		float range;
-		if (quantity->isBounded()) {
-			range = quantity->getRange();
+		if (paramQuantity->isBounded()) {
+			range = paramQuantity->getRange();
 		}
 		else {
 			// Continuous encoders scale as if their limits are +/-1
@@ -39,7 +58,7 @@ void Knob::onDragMove(const event::DragMove &e) {
 		// Drag slower if Mod is held
 		if (app()->window->isModPressed())
 			delta /= 16.f;
-		quantity->moveValue(delta);
+		paramQuantity->moveValue(delta);
 	}
 
 	ParamWidget::onDragMove(e);

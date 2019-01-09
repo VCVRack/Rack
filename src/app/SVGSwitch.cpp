@@ -25,8 +25,8 @@ void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 
 void SVGSwitch::onChange(const event::Change &e) {
 	assert(frames.size() > 0);
-	if (quantity) {
-		int index = quantity->getScaledValue() * (frames.size() - 1);
+	if (paramQuantity) {
+		int index = paramQuantity->getScaledValue() * (frames.size() - 1);
 		index = math::clamp(index, 0, (int) frames.size() - 1);
 		sw->setSVG(frames[index]);
 		dirty = true;

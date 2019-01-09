@@ -32,14 +32,14 @@ void SVGKnob::step() {
 
 void SVGKnob::onChange(const event::Change &e) {
 	// Re-transform the TransformWidget
-	if (quantity) {
+	if (paramQuantity) {
 		float angle;
-		if (quantity->isBounded()) {
-			angle = math::rescale(quantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
+		if (paramQuantity->isBounded()) {
+			angle = math::rescale(paramQuantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
 			angle = std::fmod(angle, 2*M_PI);
 		}
 		else {
-			angle = math::rescale(quantity->getValue(), 0.f, 1.f, minAngle, maxAngle);
+			angle = math::rescale(paramQuantity->getValue(), 0.f, 1.f, minAngle, maxAngle);
 		}
 		tw->identity();
 		// Rotate SVG

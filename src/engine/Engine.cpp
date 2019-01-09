@@ -230,12 +230,22 @@ void Engine::addModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
-	// Set ID
-	assert(module->id == 0);
-	module->id = internal->nextModuleId++;
 	// Check that the module is not already added
 	auto it = std::find(modules.begin(), modules.end(), module);
 	assert(it == modules.end());
+	// Set ID
+	if (module->id == 0) {
+		// Automatically assign ID
+		module->id = internal->nextModuleId++;
+	}
+	else {
+		// Manual ID
+		// Check that the ID is not already taken
+		for (Module *m : modules) {
+			assert(module->id != m->id);
+		}
+	}
+	// Add module
 	modules.push_back(module);
 }
 
@@ -299,8 +309,17 @@ void Engine::addWire(Wire *wire) {
 		assert(!(wire2->inputModule == wire->inputModule && wire2->inputId == wire->inputId));
 	}
 	// Set ID
-	assert(wire->id == 0);
-	wire->id = internal->nextWireId++;
+	if (wire->id == 0) {
+		// Automatically assign ID
+		wire->id = internal->nextWireId++;
+	}
+	else {
+		// Manual ID
+		// Check that the ID is not already taken
+		for (Wire *w : wires) {
+			assert(wire->id != w->id);
+		}
+	}
 	// Add the wire
 	wires.push_back(wire);
 	Engine_updateActive(this);

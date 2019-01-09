@@ -60,7 +60,7 @@ TParamWidget *createParam(math::Vec pos, Module *module, int paramId) {
 	ParamQuantity *q = new ParamQuantity;
 	q->module = module;
 	q->paramId = paramId;
-	o->quantity = q;
+	o->paramQuantity = q;
 	return o;
 }
 
@@ -71,7 +71,7 @@ TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId) {
 	ParamQuantity *q = new ParamQuantity;
 	q->module = module;
 	q->paramId = paramId;
-	o->quantity = q;
+	o->paramQuantity = q;
 	return o;
 }
 

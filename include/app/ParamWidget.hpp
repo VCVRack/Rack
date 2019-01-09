@@ -2,14 +2,15 @@
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "ui/Tooltip.hpp"
-#include "ui/Quantity.hpp"
+#include "app/ParamQuantity.hpp"
+#include "history.hpp"
 
 
 namespace rack {
 
 
 struct ParamWidget : OpaqueWidget {
-	Quantity *quantity = NULL;
+	ParamQuantity *paramQuantity = NULL;
 	float dirtyValue = NAN;
 	Tooltip *tooltip = NULL;
 

@@ -6,6 +6,7 @@
 #include "app.hpp"
 #include "settings.hpp"
 #include "random.hpp"
+#include "history.hpp"
 
 
 namespace rack {
@@ -21,15 +22,27 @@ struct ParamField : TextField {
 
 	void setParamWidget(ParamWidget *paramWidget) {
 		this->paramWidget = paramWidget;
-		if (paramWidget->quantity)
-			text = paramWidget->quantity->getDisplayValueString();
+		if (paramWidget->paramQuantity)
+			text = paramWidget->paramQuantity->getDisplayValueString();
 		selectAll();
 	}
 
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
-			if (paramWidget->quantity)
-				paramWidget->quantity->setDisplayValueString(text);
+			float oldValue = paramWidget->paramQuantity->getValue();
+			if (paramWidget->paramQuantity)
+				paramWidget->paramQuantity->setDisplayValueString(text);
+			float newValue = paramWidget->paramQuantity->getValue();
+
+			if (oldValue != newValue) {
+				// Push ParamChange history action
+				history::ParamChange *h = new history::ParamChange;
+				h->moduleId = paramWidget->paramQuantity->module->id;
+				h->paramId = paramWidget->paramQuantity->paramId;
+				h->oldValue = oldValue;
+				h->newValue = newValue;
+				app()->history->push(h);
+			}
 
 			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
 			overlay->requestedDelete = true;
@@ -49,14 +62,14 @@ struct ParamField : TextField {
 
 
 ParamWidget::~ParamWidget() {
-	if (quantity)
-		delete quantity;
+	if (paramQuantity)
+		delete paramQuantity;
 }
 
 void ParamWidget::step() {
-	if (quantity) {
-		float value = quantity->getValue();
-		// Trigger change event when quantity value changes
+	if (paramQuantity) {
+		float value = paramQuantity->getValue();
+		// Trigger change event when paramQuantity value changes
 		if (value != dirtyValue) {
 			dirtyValue = value;
 			event::Change eChange;
@@ -65,13 +78,10 @@ void ParamWidget::step() {
 	}
 
 	if (tooltip) {
-		// Quantity string
-		if (quantity) {
-			tooltip->text = quantity->getString();
-		}
-		// Param description
-		ParamQuantity *paramQuantity = dynamic_cast<ParamQuantity*>(quantity);
 		if (paramQuantity) {
+			// Quantity string
+			tooltip->text = paramQuantity->getString();
+			// Param description
 			std::string description = paramQuantity->getParam()->description;
 			if (!description.empty())
 				tooltip->text += "\n" + description;
@@ -86,18 +96,31 @@ void ParamWidget::step() {
 void ParamWidget::fromJson(json_t *rootJ) {
 	json_t *valueJ = json_object_get(rootJ, "value");
 	if (valueJ) {
-		if (quantity)
-			quantity->setValue(json_number_value(valueJ));
+		if (paramQuantity)
+			paramQuantity->setValue(json_number_value(valueJ));
 	}
 }
 
 void ParamWidget::onButton(const event::Button &e) {
 	// Right click to reset
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && !(e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
-		if (quantity)
-			quantity->reset();
+		if (paramQuantity) {
+			float oldValue = paramQuantity->getValue();
+			paramQuantity->reset();
+			float newValue = paramQuantity->getValue();
+
+			if (oldValue != newValue) {
+				// Push ParamChange history action
+				history::ParamChange *h = new history::ParamChange;
+				h->moduleId = paramQuantity->module->id;
+				h->paramId = paramQuantity->paramId;
+				h->oldValue = oldValue;
+				h->newValue = newValue;
+				app()->history->push(h);
+			}
+		}
 		// Here's another way of doing it, but either works.
-		// dynamic_cast<ParamQuantity*>(quantity)->getParam()->reset();
+		// paramQuantity->getParam()->reset();
 		e.consume(this);
 	}
 

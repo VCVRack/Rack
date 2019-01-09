@@ -8,6 +8,7 @@
 #include "app/Scene.hpp"
 #include "plugin.hpp"
 #include "app.hpp"
+#include "history.hpp"
 
 #include <set>
 #include <algorithm>
@@ -78,12 +79,19 @@ struct ModuleBox : OpaqueWidget {
 			// Create module
 			ModuleWidget *moduleWidget = model->createModuleWidget();
 			assert(moduleWidget);
-			app()->scene->rackWidget->addModule(moduleWidget);
+			app()->scene->rackWidget->addModuleAtMouse(moduleWidget);
 			// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
-			e.consume(moduleWidget);
+			// e.consume(moduleWidget);
 			// Close Module Browser
 			ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
 			moduleBrowser->visible = false;
+
+			// Push ModuleAdd history action
+			history::ModuleAdd *h = new history::ModuleAdd;
+			h->model = moduleWidget->model;
+			h->moduleId = moduleWidget->module->id;
+			h->pos = moduleWidget->box.pos;
+			app()->history->push(h);
 		}
 		OpaqueWidget::onButton(e);
 	}

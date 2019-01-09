@@ -44,12 +44,13 @@ struct RackWidget : OpaqueWidget {
 	void addModule(ModuleWidget *m);
 	void addModuleAtMouse(ModuleWidget *m);
 	/** Removes the module and transfers ownership to the caller */
-	void deleteModule(ModuleWidget *m);
+	void removeModule(ModuleWidget *m);
 	void cloneModule(ModuleWidget *m);
 	/** Sets a module's box if non-colliding. Returns true if set */
 	bool requestModuleBox(ModuleWidget *m, math::Rect box);
 	/** Moves a module to the closest non-colliding position */
 	bool requestModuleBoxNearest(ModuleWidget *m, math::Rect box);
+	ModuleWidget *getModule(int moduleId);
 
 	void step() override;
 	void draw(NVGcontext *vg) override;

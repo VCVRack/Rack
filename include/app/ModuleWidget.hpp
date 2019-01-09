@@ -22,6 +22,7 @@ struct ModuleWidget : OpaqueWidget {
 	std::vector<PortWidget*> outputs;
 	/** For RackWidget dragging */
 	math::Vec dragPos;
+	math::Vec oldPos;
 
 	ModuleWidget(Module *module);
 	~ModuleWidget();

@@ -9,6 +9,7 @@
 #include "asset.hpp"
 #include "system.hpp"
 #include "plugin.hpp"
+#include "engine/Engine.hpp"
 #include "app.hpp"
 
 
@@ -53,12 +54,19 @@ RackWidget::RackWidget() {
 }
 
 RackWidget::~RackWidget() {
+	clear();
 }
 
 void RackWidget::clear() {
 	wireContainer->activeWire = NULL;
 	wireContainer->clearChildren();
-	moduleContainer->clearChildren();
+	// Remove ModuleWidgets
+	std::list<Widget*> widgets = moduleContainer->children;
+	for (Widget *w : widgets) {
+		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
+		assert(moduleWidget);
+		removeModule(moduleWidget);
+	}
 
 	app()->scene->scrollWidget->offset = math::Vec(0, 0);
 }
@@ -455,17 +463,32 @@ void RackWidget::pastePresetClipboard() {
 }
 
 void RackWidget::addModule(ModuleWidget *m) {
+	// Add module to ModuleContainer
+	assert(m);
+	assert(m->module);
 	moduleContainer->addChild(m);
+
+	// Add module to Engine
+	app()->engine->addModule(m->module);
 }
 
 void RackWidget::addModuleAtMouse(ModuleWidget *m) {
-	addModule(m);
+	assert(m);
 	// Move module nearest to the mouse position
 	m->box.pos = lastMousePos.minus(m->box.size.div(2));
 	requestModuleBoxNearest(m, m->box);
+	addModule(m);
 }
 
-void RackWidget::deleteModule(ModuleWidget *m) {
+void RackWidget::removeModule(ModuleWidget *m) {
+	// Disconnect wires
+	m->disconnect();
+
+	// Remove module from Engine
+	assert(m->module);
+	app()->engine->removeModule(m->module);
+
+	// Remove module from ModuleContainer
 	moduleContainer->removeChild(m);
 }
 
@@ -496,8 +519,8 @@ bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect box) {
 
 bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect box) {
 	// Create possible positions
-	int x0 = roundf(box.pos.x / RACK_GRID_WIDTH);
-	int y0 = roundf(box.pos.y / RACK_GRID_HEIGHT);
+	int x0 = std::round(box.pos.x / RACK_GRID_WIDTH);
+	int y0 = std::round(box.pos.y / RACK_GRID_HEIGHT);
 	std::vector<math::Vec> positions;
 	for (int y = std::max(0, y0 - 8); y < y0 + 8; y++) {
 		for (int x = std::max(0, x0 - 400); x < x0 + 400; x++) {
@@ -518,6 +541,16 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect box) {
 			return true;
 	}
 	return false;
+}
+
+ModuleWidget *RackWidget::getModule(int moduleId) {
+	for (Widget *w : moduleContainer->children) {
+		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
+		assert(moduleWidget);
+		if (moduleWidget->module->id == moduleId)
+			return moduleWidget;
+	}
+	return NULL;
 }
 
 void RackWidget::step() {

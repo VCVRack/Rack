@@ -7,6 +7,7 @@
 #include "helpers.hpp"
 #include "app.hpp"
 #include "settings.hpp"
+#include "history.hpp"
 
 #include "osdialog.h"
 
@@ -15,23 +16,12 @@ namespace rack {
 
 
 ModuleWidget::ModuleWidget(Module *module) {
-	if (module) {
-		app()->engine->addModule(module);
-	}
 	this->module = module;
 }
 
 ModuleWidget::~ModuleWidget() {
-	// HACK
-	// If we try to disconnect wires in the Module Browser (e.g. when Rack is closed while the Module Browser is open), app()->scene->rackWidget will be an invalid pointer.
-	// So only attempt to disconnect if the module is not NULL.
-	if (module)
-		disconnect();
-	// Remove and delete the Module instance
 	if (module) {
-		app()->engine->removeModule(module);
 		delete module;
-		module = NULL;
 	}
 }
 
@@ -327,13 +317,26 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 	nvgFill(vg);
 }
 
+static void ModuleWidget_removeAction(ModuleWidget *moduleWidget) {
+	// Push ModuleRemove history action
+	history::ModuleRemove *h = new history::ModuleRemove;
+	h->model = moduleWidget->model;
+	h->moduleId = moduleWidget->module->id;
+	h->pos = moduleWidget->box.pos;
+	h->moduleJ = moduleWidget->toJson();
+	app()->history->push(h);
+
+	app()->scene->rackWidget->removeModule(moduleWidget);
+	delete moduleWidget;
+}
+
 void ModuleWidget::onHover(const event::Hover &e) {
 	OpaqueWidget::onHover(e);
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 	if (glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
 		if (!app()->window->isModPressed() && !app()->window->isShiftPressed()) {
-			requestedDelete = true;
+			ModuleWidget_removeAction(this);
 			return;
 		}
 	}
@@ -401,10 +404,19 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 }
 
 void ModuleWidget::onDragStart(const event::DragStart &e) {
+	oldPos = box.pos;
 	dragPos = app()->scene->rackWidget->lastMousePos.minus(box.pos);
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {
+	if (!box.pos.isEqual(oldPos)) {
+		// Push ModuleMove history action
+		history::ModuleMove *h = new history::ModuleMove;
+		h->moduleId = module->id;
+		h->oldPos = oldPos;
+		h->newPos = box.pos;
+		app()->history->push(h);
+	}
 }
 
 void ModuleWidget::onDragMove(const event::DragMove &e) {
@@ -526,8 +538,7 @@ struct ModuleDeleteItem : MenuItem {
 		rightText = "Backspace/Delete";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->deleteModule(moduleWidget);
-		delete moduleWidget;
+		ModuleWidget_removeAction(moduleWidget);
 	}
 };
 

@@ -76,7 +76,7 @@ void Scene::draw(NVGcontext *vg) {
 }
 
 void Scene::onHoverKey(const event::HoverKey &e) {
-	if (e.action == GLFW_PRESS) {
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
 				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {

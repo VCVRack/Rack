@@ -1,8 +1,80 @@
 #include "history.hpp"
+#include "app.hpp"
+#include "app/Scene.hpp"
 
 
 namespace rack {
 namespace history {
+
+
+void ModuleAdd::undo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	app()->scene->rackWidget->removeModule(moduleWidget);
+	delete moduleWidget;
+}
+
+void ModuleAdd::redo() {
+	ModuleWidget *moduleWidget = model->createModuleWidget();
+	assert(moduleWidget);
+	assert(moduleWidget->module);
+	moduleWidget->module->id = moduleId;
+	moduleWidget->box.pos = pos;
+	app()->scene->rackWidget->addModule(moduleWidget);
+}
+
+
+ModuleRemove::~ModuleRemove() {
+	json_decref(moduleJ);
+}
+
+void ModuleRemove::undo() {
+	ModuleWidget *moduleWidget = model->createModuleWidget();
+	assert(moduleWidget);
+	assert(moduleWidget->module);
+	moduleWidget->module->id = moduleId;
+	moduleWidget->box.pos = pos;
+	moduleWidget->fromJson(moduleJ);
+	app()->scene->rackWidget->addModule(moduleWidget);
+
+	// Add wires
+	for (WireInfo &wireInfo : wireInfos) {
+		// TODO Add wire
+	}
+}
+
+void ModuleRemove::redo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	app()->scene->rackWidget->removeModule(moduleWidget);
+	delete moduleWidget;
+}
+
+
+void ModuleMove::undo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	moduleWidget->box.pos = oldPos;
+}
+
+void ModuleMove::redo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	moduleWidget->box.pos = newPos;
+}
+
+
+void ParamChange::undo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	moduleWidget->module->params[paramId].value = oldValue;
+}
+
+void ParamChange::redo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	moduleWidget->module->params[paramId].value = newValue;
+}
 
 
 State::~State() {
