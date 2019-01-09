@@ -99,10 +99,7 @@ void PortWidget::onDragDrop(const event::DragDrop &e) {
 	if (!originPort)
 		return;
 
-	// Fake onDragEnter because onDragLeave is triggered immediately before this one
-	event::DragEnter eDragEnter;
-	eDragEnter.origin = e.origin;
-	onDragEnter(eDragEnter);
+	setHovered();
 }
 
 void PortWidget::onDragEnter(const event::DragEnter &e) {
@@ -110,17 +107,7 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 	if (!originPort)
 		return;
 
-	// Reject ports if this is an input port and something is already plugged into it
-	if (type == INPUT) {
-		CableWidget *topCable = app()->scene->rackWidget->cableContainer->getTopCable(this);
-		if (topCable)
-			return;
-	}
-
-	CableWidget *activeCable = app()->scene->rackWidget->cableContainer->activeCable;
-	if (activeCable) {
-		(type == INPUT ? activeCable->hoveredInputPort : activeCable->hoveredOutputPort) = this;
-	}
+	setHovered();
 }
 
 void PortWidget::onDragLeave(const event::DragLeave &e) {
@@ -131,6 +118,20 @@ void PortWidget::onDragLeave(const event::DragLeave &e) {
 	CableWidget *activeCable = app()->scene->rackWidget->cableContainer->activeCable;
 	if (activeCable) {
 		(type == INPUT ? activeCable->hoveredInputPort : activeCable->hoveredOutputPort) = NULL;
+	}
+}
+
+void PortWidget::setHovered() {
+	// Reject ports if this is an input port and something is already plugged into it
+	if (type == INPUT) {
+		CableWidget *topCable = app()->scene->rackWidget->cableContainer->getTopCable(this);
+		if (topCable)
+			return;
+	}
+
+	CableWidget *activeCable = app()->scene->rackWidget->cableContainer->activeCable;
+	if (activeCable) {
+		(type == INPUT ? activeCable->hoveredInputPort : activeCable->hoveredOutputPort) = this;
 	}
 }
 

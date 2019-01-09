@@ -37,7 +37,6 @@
 #include "ui/IconButton.hpp"
 #include "ui/ChoiceButton.hpp"
 #include "ui/RadioButton.hpp"
-#include "ui/WindowWidget.hpp"
 #include "ui/ProgressBar.hpp"
 
 #include "app/AudioWidget.hpp"
