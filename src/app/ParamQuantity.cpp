@@ -86,6 +86,8 @@ int ParamQuantity::getDisplayPrecision() {
 	float displayValue = getDisplayValue();
 	if (displayValue == 0.f)
 		return 0;
+	if (std::round(displayValue) == displayValue)
+		return 0;
 	float log = std::log10(std::abs(getDisplayValue()));
 	return (int) std::ceil(math::clamp(-log + 3.f, 0.f, 6.f));
 }

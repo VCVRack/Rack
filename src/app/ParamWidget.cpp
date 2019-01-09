@@ -93,15 +93,16 @@ void ParamWidget::fromJson(json_t *rootJ) {
 
 void ParamWidget::onButton(const event::Button &e) {
 	// Right click to reset
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && !(e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
 		if (quantity)
 			quantity->reset();
 		// Here's another way of doing it, but either works.
 		// dynamic_cast<ParamQuantity*>(quantity)->getParam()->reset();
+		e.consume(this);
 	}
 
 	// Shift-click to open value entry
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & GLFW_MOD_SHIFT) && !(e.mods & GLFW_MOD_CONTROL)) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && !(e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
 		// Create ParamField
 		MenuOverlay *overlay = new MenuOverlay;
 		app()->scene->addChild(overlay);
@@ -111,9 +112,11 @@ void ParamWidget::onButton(const event::Button &e) {
 		paramField->box.pos = getAbsoluteOffset(box.size).round();
 		paramField->setParamWidget(this);
 		overlay->addChild(paramField);
+		e.consume(this);
 	}
 
-	OpaqueWidget::onButton(e);
+	if (!e.getConsumed())
+		OpaqueWidget::onButton(e);
 }
 
 void ParamWidget::onEnter(const event::Enter &e) {
