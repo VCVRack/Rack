@@ -15,8 +15,16 @@
 #include <string>
 
 
-/** Deprecation notice for GCC */
-#define DEPRECATED __attribute__ ((deprecated))
+/** Deprecation notice for functions
+E.g.
+	DEPRECATED void foo();
+*/
+#if defined(__GNUC__) || defined(__clang__)
+	#define DEPRECATED __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+	#define DEPRECATED __declspec(deprecated)
+#endif
+
 
 
 /** Concatenates two literals or two macros
