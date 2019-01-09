@@ -9,6 +9,11 @@ Param *ParamQuantity::getParam() {
 	return &module->params[paramId];
 }
 
+ParamInfo *ParamQuantity::getParamInfo() {
+	assert(module);
+	return &module->paramInfos[paramId];
+}
+
 void ParamQuantity::commitSnap() {
 	// TODO
 }
@@ -49,34 +54,34 @@ float ParamQuantity::getDefaultValue() {
 float ParamQuantity::getDisplayValue() {
 	if (!module)
 		return Quantity::getDisplayValue();
-	if (getParam()->displayBase == 0.f) {
+	if (getParamInfo()->displayBase == 0.f) {
 		// Linear
-		return getValue() * getParam()->displayMultiplier;
+		return getValue() * getParamInfo()->displayMultiplier;
 	}
-	else if (getParam()->displayBase == 1.f) {
+	else if (getParamInfo()->displayBase == 1.f) {
 		// Fixed (special case of exponential)
-		return getParam()->displayMultiplier;
+		return getParamInfo()->displayMultiplier;
 	}
 	else {
 		// Exponential
-		return std::pow(getParam()->displayBase, getValue()) * getParam()->displayMultiplier;
+		return std::pow(getParamInfo()->displayBase, getValue()) * getParamInfo()->displayMultiplier;
 	}
 }
 
 void ParamQuantity::setDisplayValue(float displayValue) {
 	if (!module)
 		return;
-	if (getParam()->displayBase == 0.f) {
+	if (getParamInfo()->displayBase == 0.f) {
 		// Linear
-		setValue(displayValue / getParam()->displayMultiplier);
+		setValue(displayValue / getParamInfo()->displayMultiplier);
 	}
-	else if (getParam()->displayBase == 1.f) {
+	else if (getParamInfo()->displayBase == 1.f) {
 		// Fixed
-		setValue(getParam()->displayMultiplier);
+		setValue(getParamInfo()->displayMultiplier);
 	}
 	else {
 		// Exponential
-		setValue(std::log(displayValue / getParam()->displayMultiplier) / std::log(getParam()->displayBase));
+		setValue(std::log(displayValue / getParamInfo()->displayMultiplier) / std::log(getParamInfo()->displayBase));
 	}
 }
 
@@ -95,13 +100,13 @@ int ParamQuantity::getDisplayPrecision() {
 std::string ParamQuantity::getLabel() {
 	if (!module)
 		return Quantity::getLabel();
-	return getParam()->label;
+	return getParamInfo()->label;
 }
 
 std::string ParamQuantity::getUnit() {
 	if (!module)
 		return Quantity::getUnit();
-	return getParam()->unit;
+	return getParamInfo()->unit;
 }
 
 

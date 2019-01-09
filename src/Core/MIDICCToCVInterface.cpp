@@ -25,7 +25,7 @@ struct MIDICCToCVInterface : Module {
 	int learnedCcs[16] = {};
 
 	MIDICCToCVInterface() {
-		setup(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		onReset();
 	}
 

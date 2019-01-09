@@ -5,6 +5,7 @@
 #include "engine/Input.hpp"
 #include "engine/Output.hpp"
 #include "engine/Light.hpp"
+#include "engine/ParamInfo.hpp"
 #include <vector>
 #include <jansson.h>
 
@@ -18,19 +19,20 @@ struct Module {
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;
 	std::vector<Light> lights;
+	std::vector<ParamInfo> paramInfos;
 	/** For power meter */
 	float cpuTime = 0.f;
 	bool bypass = false;
 
 	/** Constructs a Module with no params, inputs, outputs, and lights */
 	Module();
-	/** Deprecated. Use setup() instead. */
-	Module(int numParams, int numInputs, int numOutputs, int numLights = 0) : Module() {
-		setup(numParams, numInputs, numOutputs, numLights);
+	/** Deprecated. Use config() instead. */
+	DEPRECATED Module(int numParams, int numInputs, int numOutputs, int numLights = 0) : Module() {
+		config(numParams, numInputs, numOutputs, numLights);
 	}
 	virtual ~Module() {}
 
-	void setup(int numParams, int numInputs, int numOutputs, int numLights = 0);
+	void config(int numParams, int numInputs, int numOutputs, int numLights = 0);
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 	void reset();

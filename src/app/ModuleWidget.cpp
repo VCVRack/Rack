@@ -282,18 +282,14 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, box.size.y - 20,
-			55, 20);
+			65, 20);
 		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.5));
 		nvgFill(vg);
 
-		std::string cpuText = string::f("%.0f mS", module->cpuTime * 1000.f);
-		// TODO Use blendish text function
-		nvgFontFaceId(vg, app()->window->uiFont->handle);
-		nvgFontSize(vg, 12);
-		nvgFillColor(vg, nvgRGBf(1, 1, 1));
-		nvgText(vg, 10.0, box.size.y - 6.0, cpuText.c_str(), NULL);
+		std::string cpuText = string::f("%.2f μs", module->cpuTime * 1e6f);
+		bndLabel(vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
 
-		float p = math::clamp(module->cpuTime, 0.f, 1.f);
+		float p = math::clamp(module->cpuTime / app()->engine->getSampleTime(), 0.f, 1.f);
 		nvgBeginPath(vg);
 		nvgRect(vg,
 			0, (1.f - p) * box.size.y,
@@ -318,13 +314,17 @@ void ModuleWidget::drawShadow(NVGcontext *vg) {
 }
 
 static void ModuleWidget_removeAction(ModuleWidget *moduleWidget) {
+	history::ComplexAction *complexAction = new history::ComplexAction;
+
 	// Push ModuleRemove history action
-	history::ModuleRemove *h = new history::ModuleRemove;
-	h->model = moduleWidget->model;
-	h->moduleId = moduleWidget->module->id;
-	h->pos = moduleWidget->box.pos;
-	h->moduleJ = moduleWidget->toJson();
-	app()->history->push(h);
+	history::ModuleRemove *moduleRemove = new history::ModuleRemove;
+	moduleRemove->model = moduleWidget->model;
+	moduleRemove->moduleId = moduleWidget->module->id;
+	moduleRemove->pos = moduleWidget->box.pos;
+	moduleRemove->moduleJ = moduleWidget->toJson();
+	complexAction->push(moduleRemove);
+
+	app()->history->push(complexAction);
 
 	app()->scene->rackWidget->removeModule(moduleWidget);
 	delete moduleWidget;

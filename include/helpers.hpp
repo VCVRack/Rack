@@ -57,21 +57,22 @@ template <class TParamWidget>
 TParamWidget *createParam(math::Vec pos, Module *module, int paramId) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos;
-	ParamQuantity *q = new ParamQuantity;
-	q->module = module;
-	q->paramId = paramId;
-	o->paramQuantity = q;
+	if (module) {
+		ParamQuantityFactory *f = module->paramInfos[paramId].paramQuantityFactory;
+		if (f)
+			o->paramQuantity = f->create();
+		else
+			o->paramQuantity = new ParamQuantity;
+		o->paramQuantity->module = module;
+		o->paramQuantity->paramId = paramId;
+	}
 	return o;
 }
 
 template <class TParamWidget>
 TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId) {
-	TParamWidget *o = new TParamWidget;
-	o->box.pos = pos.minus(o->box.size.div(2));
-	ParamQuantity *q = new ParamQuantity;
-	q->module = module;
-	q->paramId = paramId;
-	o->paramQuantity = q;
+	TParamWidget *o = createParam<TParamWidget>(pos, module, paramId);
+	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
 

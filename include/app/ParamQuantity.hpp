@@ -2,6 +2,7 @@
 #include "ui/Quantity.hpp"
 #include "engine/Module.hpp"
 #include "engine/Param.hpp"
+#include "engine/ParamInfo.hpp"
 
 
 namespace rack {
@@ -18,6 +19,7 @@ struct ParamQuantity : Quantity {
 	float snapValue = 0.f;
 
 	Param *getParam();
+	ParamInfo *getParamInfo();
 	void commitSnap();
 
 	void setValue(float value) override;

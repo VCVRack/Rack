@@ -144,10 +144,10 @@ static void Engine_step(Engine *engine) {
 				module->step();
 
 				auto stopTime = std::chrono::high_resolution_clock::now();
-				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count() * engine->internal->sampleRate;
+				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
 				// Smooth cpu time
-				float powerLambda = 2.f / 10.f;
-				module->cpuTime += (cpuTime - module->cpuTime) * engine->internal->sampleTime * powerLambda;
+				float powerLambda = engine->internal->sampleTime / 2.f;
+				module->cpuTime += (cpuTime - module->cpuTime) * powerLambda;
 			}
 			else {
 				module->step();
@@ -240,6 +240,7 @@ void Engine::addModule(Module *module) {
 	}
 	else {
 		// Manual ID
+		assert(module->id < internal->nextModuleId);
 		// Check that the ID is not already taken
 		for (Module *m : modules) {
 			assert(module->id != m->id);
@@ -315,6 +316,7 @@ void Engine::addCable(Cable *cable) {
 	}
 	else {
 		// Manual ID
+		assert(cable->id < internal->nextCableId);
 		// Check that the ID is not already taken
 		for (Cable *w : cables) {
 			assert(cable->id != w->id);

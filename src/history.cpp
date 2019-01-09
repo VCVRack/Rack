@@ -7,6 +7,30 @@ namespace rack {
 namespace history {
 
 
+ComplexAction::~ComplexAction() {
+	for (Action *action : actions) {
+		delete action;
+	}
+}
+
+void ComplexAction::undo() {
+	for (auto it = actions.rbegin(); it != actions.rend(); it++) {
+		Action *action = *it;
+		action->undo();
+	}
+}
+
+void ComplexAction::redo() {
+	for (Action *action : actions) {
+		action->redo();
+	}
+}
+
+void ComplexAction::push(Action *action) {
+	actions.push_back(action);
+}
+
+
 void ModuleAdd::undo() {
 	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
 	assert(moduleWidget);
@@ -36,11 +60,6 @@ void ModuleRemove::undo() {
 	moduleWidget->box.pos = pos;
 	moduleWidget->fromJson(moduleJ);
 	app()->scene->rackWidget->addModule(moduleWidget);
-
-	// Add cables
-	for (CableInfo &cableInfo : cableInfos) {
-		// TODO Add cable
-	}
 }
 
 void ModuleRemove::redo() {

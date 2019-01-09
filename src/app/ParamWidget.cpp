@@ -82,7 +82,7 @@ void ParamWidget::step() {
 			// Quantity string
 			tooltip->text = paramQuantity->getString();
 			// Param description
-			std::string description = paramQuantity->getParam()->description;
+			std::string description = paramQuantity->getParamInfo()->description;
 			if (!description.empty())
 				tooltip->text += "\n" + description;
 		}

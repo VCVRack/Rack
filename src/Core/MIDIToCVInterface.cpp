@@ -56,7 +56,7 @@ struct MIDIToCVInterface : Module {
 	bool gate;
 
 	MIDIToCVInterface() {
-		setup(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		heldNotes.resize(128, 0);
 		onReset();
 	}

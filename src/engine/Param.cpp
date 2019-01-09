@@ -9,8 +9,10 @@ namespace rack {
 json_t *Param::toJson() {
 	json_t *rootJ = json_object();
 
+	float v = 0.f;
 	// Infinite params should serialize to 0
-	float v = (std::isfinite(minValue) && std::isfinite(maxValue)) ? value : 0.f;
+	if (std::isfinite(minValue) && std::isfinite(maxValue))
+		v = value;
 	json_object_set_new(rootJ, "value", json_real(v));
 
 	return rootJ;

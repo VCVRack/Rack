@@ -17,6 +17,17 @@ struct Action {
 };
 
 
+/** Batches multiple actions into one */
+struct ComplexAction : Action {
+	/** Ordered by time occurred. Undoing will replay them backwards. */
+	std::vector<Action*> actions;
+	~ComplexAction();
+	void undo() override;
+	void redo() override;
+	void push(Action *action);
+};
+
+
 /** An action operating on a module
 Subclass this to create your own custom actions for your module.
 */
@@ -37,16 +48,6 @@ struct ModuleRemove : ModuleAction {
 	Model *model;
 	math::Vec pos;
 	json_t *moduleJ;
-
-	struct CableInfo {
-		int cableId;
-		int outputModuleId;
-		int outputId;
-		int inputModuleId;
-		int inputId;
-	};
-	std::vector<CableInfo> cableInfos;
-
 	~ModuleRemove();
 	void undo() override;
 	void redo() override;
@@ -87,21 +88,6 @@ struct CableRemove : Action {
 	int outputId;
 	int inputModuleId;
 	int inputId;
-	void undo() override;
-	void redo() override;
-};
-
-
-struct CableMove : Action {
-	int cableId;
-	int oldOutputModuleId;
-	int oldOutputId;
-	int oldInputModuleId;
-	int oldInputId;
-	int newOutputModuleId;
-	int newOutputId;
-	int newInputModuleId;
-	int newInputId;
 	void undo() override;
 	void redo() override;
 };

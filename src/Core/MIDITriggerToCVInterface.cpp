@@ -28,7 +28,7 @@ struct MIDITriggerToCVInterface : Module {
 	bool velocity = false;
 
 	MIDITriggerToCVInterface() {
-		setup(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		onReset();
 	}
 

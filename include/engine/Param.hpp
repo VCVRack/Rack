@@ -12,23 +12,11 @@ struct Param {
 	float maxValue = 1.f;
 	float defaultValue = 0.f;
 
-	// For formatting/displaying the value
-	/** Set to 0 for linear, nonzero for exponential */
-	float displayBase = 0.f;
-	float displayMultiplier = 1.f;
-	std::string label;
-	std::string unit;
-	std::string description;
-
-	void setup(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f) {
+	void config(float minValue, float maxValue, float defaultValue) {
 		this->value = defaultValue;
 		this->minValue = minValue;
 		this->maxValue = maxValue;
 		this->defaultValue = defaultValue;
-		this->label = label;
-		this->unit = unit;
-		this->displayBase = displayBase;
-		this->displayMultiplier = displayMultiplier;
 	}
 
 	json_t *toJson();
