@@ -28,7 +28,7 @@ PortWidget::~PortWidget() {
 	// HACK
 	// See ModuleWidget::~ModuleWidget for description
 	if (module)
-		app()->scene->rackWidget->wireContainer->removeAllWires(this);
+		app()->scene->rackWidget->cableContainer->removeAllCables(this);
 }
 
 void PortWidget::step() {
@@ -48,20 +48,20 @@ void PortWidget::step() {
 }
 
 void PortWidget::draw(NVGcontext *vg) {
-	WireWidget *activeWire = app()->scene->rackWidget->wireContainer->activeWire;
-	if (activeWire) {
-		// Dim the PortWidget if the active wire cannot plug into this PortWidget
-		if (type == INPUT ? activeWire->inputPort : activeWire->outputPort)
+	CableWidget *activeCable = app()->scene->rackWidget->cableContainer->activeCable;
+	if (activeCable) {
+		// Dim the PortWidget if the active cable cannot plug into this PortWidget
+		if (type == INPUT ? activeCable->inputPort : activeCable->outputPort)
 			nvgGlobalAlpha(vg, 0.5);
 	}
 }
 
 void PortWidget::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		app()->scene->rackWidget->wireContainer->removeTopWire(this);
+		app()->scene->rackWidget->cableContainer->removeTopCable(this);
 
 		// HACK
-		// Update hovered*PortWidget of active wire if applicable
+		// Update hovered*PortWidget of active cable if applicable
 		// event::DragEnter eDragEnter;
 		// onDragEnter(eDragEnter);
 	}
@@ -69,29 +69,29 @@ void PortWidget::onButton(const event::Button &e) {
 }
 
 void PortWidget::onDragStart(const event::DragStart &e) {
-	// Try to grab wire on top of stack
-	WireWidget *wire = NULL;
+	// Try to grab cable on top of stack
+	CableWidget *cable = NULL;
 	if (type == INPUT || !app()->window->isModPressed()) {
-		wire = app()->scene->rackWidget->wireContainer->getTopWire(this);
+		cable = app()->scene->rackWidget->cableContainer->getTopCable(this);
 	}
 
-	if (wire) {
-		// Disconnect existing wire
-		(type == INPUT ? wire->inputPort : wire->outputPort) = NULL;
-		wire->updateWire();
+	if (cable) {
+		// Disconnect existing cable
+		(type == INPUT ? cable->inputPort : cable->outputPort) = NULL;
+		cable->updateCable();
 	}
 	else {
-		// Create a new wire
-		wire = new WireWidget;
-		(type == INPUT ? wire->inputPort : wire->outputPort) = this;
+		// Create a new cable
+		cable = new CableWidget;
+		(type == INPUT ? cable->inputPort : cable->outputPort) = this;
 	}
-	app()->scene->rackWidget->wireContainer->setActiveWire(wire);
+	app()->scene->rackWidget->cableContainer->setActiveCable(cable);
 }
 
 void PortWidget::onDragEnd(const event::DragEnd &e) {
 	// FIXME
 	// If the source PortWidget is deleted, this will be called, removing the cable
-	app()->scene->rackWidget->wireContainer->commitActiveWire();
+	app()->scene->rackWidget->cableContainer->commitActiveCable();
 }
 
 void PortWidget::onDragDrop(const event::DragDrop &e) {
@@ -112,14 +112,14 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
-		WireWidget *topWire = app()->scene->rackWidget->wireContainer->getTopWire(this);
-		if (topWire)
+		CableWidget *topCable = app()->scene->rackWidget->cableContainer->getTopCable(this);
+		if (topCable)
 			return;
 	}
 
-	WireWidget *activeWire = app()->scene->rackWidget->wireContainer->activeWire;
-	if (activeWire) {
-		(type == INPUT ? activeWire->hoveredInputPort : activeWire->hoveredOutputPort) = this;
+	CableWidget *activeCable = app()->scene->rackWidget->cableContainer->activeCable;
+	if (activeCable) {
+		(type == INPUT ? activeCable->hoveredInputPort : activeCable->hoveredOutputPort) = this;
 	}
 }
 
@@ -128,9 +128,9 @@ void PortWidget::onDragLeave(const event::DragLeave &e) {
 	if (!originPort)
 		return;
 
-	WireWidget *activeWire = app()->scene->rackWidget->wireContainer->activeWire;
-	if (activeWire) {
-		(type == INPUT ? activeWire->hoveredInputPort : activeWire->hoveredOutputPort) = NULL;
+	CableWidget *activeCable = app()->scene->rackWidget->cableContainer->activeCable;
+	if (activeCable) {
+		(type == INPUT ? activeCable->hoveredInputPort : activeCable->hoveredOutputPort) = NULL;
 	}
 }
 

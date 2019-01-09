@@ -65,8 +65,8 @@
 #include "app/SVGSwitch.hpp"
 #include "app/ToggleSwitch.hpp"
 #include "app/Toolbar.hpp"
-#include "app/WireContainer.hpp"
-#include "app/WireWidget.hpp"
+#include "app/CableContainer.hpp"
+#include "app/CableWidget.hpp"
 
 #include "engine/Engine.hpp"
 #include "engine/Input.hpp"
@@ -74,7 +74,7 @@
 #include "engine/Module.hpp"
 #include "engine/Output.hpp"
 #include "engine/Param.hpp"
-#include "engine/Wire.hpp"
+#include "engine/Cable.hpp"
 
 #include "plugin/Plugin.hpp"
 #include "plugin/Model.hpp"

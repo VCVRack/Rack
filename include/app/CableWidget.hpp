@@ -2,24 +2,24 @@
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "app/PortWidget.hpp"
-#include "engine/Wire.hpp"
+#include "engine/Cable.hpp"
 
 
 namespace rack {
 
 
-struct WireWidget : OpaqueWidget {
+struct CableWidget : OpaqueWidget {
 	PortWidget *outputPort = NULL;
 	PortWidget *inputPort = NULL;
 	PortWidget *hoveredOutputPort = NULL;
 	PortWidget *hoveredInputPort = NULL;
-	Wire *wire = NULL;
+	Cable *cable = NULL;
 	NVGcolor color;
 
-	WireWidget();
-	~WireWidget();
-	/** Synchronizes the plugged state of the widget to the owned wire */
-	void updateWire();
+	CableWidget();
+	~CableWidget();
+	/** Synchronizes the plugged state of the widget to the owned cable */
+	void updateCable();
 	math::Vec getOutputPos();
 	math::Vec getInputPos();
 	json_t *toJson();

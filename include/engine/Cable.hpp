@@ -6,7 +6,7 @@
 namespace rack {
 
 
-struct Wire {
+struct Cable {
 	int id = 0;
 	Module *outputModule = NULL;
 	int outputId;

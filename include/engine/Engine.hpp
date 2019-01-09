@@ -1,7 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "engine/Module.hpp"
-#include "engine/Wire.hpp"
+#include "engine/Cable.hpp"
 #include <vector>
 
 
@@ -9,11 +9,11 @@ namespace rack {
 
 
 struct Engine {
-	/** Plugins should not manipulate other modules or wires unless that is the entire purpose of the module.
-	Your plugin needs to have a clear purpose for manipulating other modules and wires and must be done with a good UX.
+	/** Plugins should not manipulate other modules or cables unless that is the entire purpose of the module.
+	Your plugin needs to have a clear purpose for manipulating other modules and cables and must be done with a good UX.
 	*/
 	std::vector<Module*> modules;
-	std::vector<Wire*> wires;
+	std::vector<Cable*> cables;
 	bool paused = false;
 
 	struct Internal;
@@ -31,8 +31,8 @@ struct Engine {
 	void resetModule(Module *module);
 	void randomizeModule(Module *module);
 	/** Does not transfer pointer ownership */
-	void addWire(Wire *wire);
-	void removeWire(Wire *wire);
+	void addCable(Cable *cable);
+	void removeCable(Cable *cable);
 	void setParam(Module *module, int paramId, float value);
 	void setParamSmooth(Module *module, int paramId, float value);
 	int getNextModuleId();

@@ -2,7 +2,7 @@
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "widgets/FramebufferWidget.hpp"
-#include "app/WireContainer.hpp"
+#include "app/CableContainer.hpp"
 #include "app/ModuleWidget.hpp"
 
 
@@ -13,15 +13,15 @@ struct RackWidget : OpaqueWidget {
 	FramebufferWidget *rails;
 	// Only put ModuleWidgets in here
 	Widget *moduleContainer;
-	// Only put WireWidgets in here
-	WireContainer *wireContainer;
+	// Only put CableWidgets in here
+	CableContainer *cableContainer;
 	std::string lastPath;
 	math::Vec lastMousePos;
 
 	RackWidget();
 	~RackWidget();
 
-	/** Completely clear the rack's modules and wires */
+	/** Completely clear the rack's modules and cables */
 	void clear();
 	/** Clears the rack and loads the template patch */
 	void reset();
@@ -31,7 +31,7 @@ struct RackWidget : OpaqueWidget {
 	void saveTemplate();
 	/** If `lastPath` is defined, ask the user to reload it */
 	void revert();
-	/** Disconnects all wires */
+	/** Disconnects all cables */
 	void disconnect();
 	void save(std::string filename);
 	void load(std::string filename);

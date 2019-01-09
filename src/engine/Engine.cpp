@@ -53,7 +53,7 @@ struct Engine::Internal {
 	Module *resetModule = NULL;
 	Module *randomizeModule = NULL;
 	int nextModuleId = 1;
-	int nextWireId = 1;
+	int nextCableId = 1;
 
 	// Parameter smoothing
 	Module *smoothModule = NULL;
@@ -76,8 +76,8 @@ Engine::Engine() {
 }
 
 Engine::~Engine() {
-	// Make sure there are no wires or modules in the rack on destruction. This suggests that a module failed to remove itself before the RackWidget was destroyed.
-	assert(wires.empty());
+	// Make sure there are no cables or modules in the rack on destruction. This suggests that a module failed to remove itself before the RackWidget was destroyed.
+	assert(cables.empty());
 	assert(modules.empty());
 
 	delete internal;
@@ -172,8 +172,8 @@ static void Engine_step(Engine *engine) {
 	}
 
 	// Step cables
-	for (Wire *wire : engine->wires) {
-		wire->step();
+	for (Cable *cable : engine->cables) {
+		cable->step();
 	}
 }
 
@@ -257,10 +257,10 @@ void Engine::removeModule(Module *module) {
 	if (module == internal->smoothModule) {
 		internal->smoothModule = NULL;
 	}
-	// Check that all wires are disconnected
-	for (Wire *wire : wires) {
-		assert(wire->outputModule != module);
-		assert(wire->inputModule != module);
+	// Check that all cables are disconnected
+	for (Cable *cable : cables) {
+		assert(cable->outputModule != module);
+		assert(cable->inputModule != module);
 	}
 	// Check that the module actually exists
 	auto it = std::find(modules.begin(), modules.end(), module);
@@ -290,55 +290,55 @@ static void Engine_updateActive(Engine *engine) {
 		}
 	}
 	// Set inputs/outputs to active
-	for (Wire *wire : engine->wires) {
-		wire->outputModule->outputs[wire->outputId].active = true;
-		wire->inputModule->inputs[wire->inputId].active = true;
+	for (Cable *cable : engine->cables) {
+		cable->outputModule->outputs[cable->outputId].active = true;
+		cable->inputModule->inputs[cable->inputId].active = true;
 	}
 }
 
-void Engine::addWire(Wire *wire) {
-	assert(wire);
+void Engine::addCable(Cable *cable) {
+	assert(cable);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
-	// Check wire properties
-	assert(wire->outputModule);
-	assert(wire->inputModule);
-	// Check that the wire is not already added, and that the input is not already used by another cable
-	for (Wire *wire2 : wires) {
-		assert(wire2 != wire);
-		assert(!(wire2->inputModule == wire->inputModule && wire2->inputId == wire->inputId));
+	// Check cable properties
+	assert(cable->outputModule);
+	assert(cable->inputModule);
+	// Check that the cable is not already added, and that the input is not already used by another cable
+	for (Cable *cable2 : cables) {
+		assert(cable2 != cable);
+		assert(!(cable2->inputModule == cable->inputModule && cable2->inputId == cable->inputId));
 	}
 	// Set ID
-	if (wire->id == 0) {
+	if (cable->id == 0) {
 		// Automatically assign ID
-		wire->id = internal->nextWireId++;
+		cable->id = internal->nextCableId++;
 	}
 	else {
 		// Manual ID
 		// Check that the ID is not already taken
-		for (Wire *w : wires) {
-			assert(wire->id != w->id);
+		for (Cable *w : cables) {
+			assert(cable->id != w->id);
 		}
 	}
-	// Add the wire
-	wires.push_back(wire);
+	// Add the cable
+	cables.push_back(cable);
 	Engine_updateActive(this);
 }
 
-void Engine::removeWire(Wire *wire) {
-	assert(wire);
+void Engine::removeCable(Cable *cable) {
+	assert(cable);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
-	// Check that the wire is already added
-	auto it = std::find(wires.begin(), wires.end(), wire);
-	assert(it != wires.end());
+	// Check that the cable is already added
+	auto it = std::find(cables.begin(), cables.end(), cable);
+	assert(it != cables.end());
 	// Set input to 0V
-	wire->inputModule->inputs[wire->inputId].value = 0.f;
-	// Remove the wire
-	wires.erase(it);
+	cable->inputModule->inputs[cable->inputId].value = 0.f;
+	// Remove the cable
+	cables.erase(it);
 	Engine_updateActive(this);
 	// Remove ID
-	wire->id = 0;
+	cable->id = 0;
 }
 
 void Engine::setParam(Module *module, int paramId, float value) {

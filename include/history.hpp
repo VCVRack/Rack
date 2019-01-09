@@ -38,14 +38,14 @@ struct ModuleRemove : ModuleAction {
 	math::Vec pos;
 	json_t *moduleJ;
 
-	struct WireInfo {
-		int wireId;
+	struct CableInfo {
+		int cableId;
 		int outputModuleId;
 		int outputId;
 		int inputModuleId;
 		int inputId;
 	};
-	std::vector<WireInfo> wireInfos;
+	std::vector<CableInfo> cableInfos;
 
 	~ModuleRemove();
 	void undo() override;
@@ -70,8 +70,8 @@ struct ParamChange : ModuleAction {
 };
 
 
-struct WireAdd : Action {
-	int wireId;
+struct CableAdd : Action {
+	int cableId;
 	int outputModuleId;
 	int outputId;
 	int inputModuleId;
@@ -81,8 +81,8 @@ struct WireAdd : Action {
 };
 
 
-struct WireRemove : Action {
-	int wireId;
+struct CableRemove : Action {
+	int cableId;
 	int outputModuleId;
 	int outputId;
 	int inputModuleId;
@@ -92,8 +92,8 @@ struct WireRemove : Action {
 };
 
 
-struct WireMove : Action {
-	int wireId;
+struct CableMove : Action {
+	int cableId;
 	int oldOutputModuleId;
 	int oldOutputId;
 	int oldInputModuleId;

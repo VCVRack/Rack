@@ -11,8 +11,8 @@ void load(std::string filename);
 
 
 extern float zoom;
-extern float wireOpacity;
-extern float wireTension;
+extern float cableOpacity;
+extern float cableTension;
 extern bool paramTooltip;
 extern bool powerMeter;
 extern bool lockModules;

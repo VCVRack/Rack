@@ -1,4 +1,4 @@
-#include "app/WireWidget.hpp"
+#include "app/CableWidget.hpp"
 #include "app/Scene.hpp"
 #include "engine/Engine.hpp"
 #include "componentlibrary.hpp"
@@ -31,11 +31,11 @@ static void drawPlug(NVGcontext *vg, math::Vec pos, NVGcolor color) {
 	nvgFill(vg);
 }
 
-static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
+static void drawCable(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
 	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
-	// Wire
+	// Cable
 	if (opacity > 0.0) {
 		nvgSave(vg);
 		// This power scaling looks more linear than actual linear scaling
@@ -57,7 +57,7 @@ static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor co
 		nvgStrokeWidth(vg, thickness);
 		nvgStroke(vg);
 
-		// Wire outline
+		// Cable outline
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, pos1.x, pos1.y);
 		nvgQuadTo(vg, pos3.x, pos3.y, pos2.x, pos2.y);
@@ -65,7 +65,7 @@ static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor co
 		nvgStrokeWidth(vg, thickness);
 		nvgStroke(vg);
 
-		// Wire solid
+		// Cable solid
 		nvgStrokeColor(vg, color);
 		nvgStrokeWidth(vg, thickness - 2);
 		nvgStroke(vg);
@@ -75,7 +75,7 @@ static void drawWire(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor co
 }
 
 
-static const NVGcolor wireColors[] = {
+static const NVGcolor cableColors[] = {
 	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
 	nvgRGB(0xc9, 0x18, 0x47), // red
 	nvgRGB(0x0c, 0x8e, 0x15), // green
@@ -85,45 +85,45 @@ static const NVGcolor wireColors[] = {
 	// nvgRGB(0x88, 0x88, 0x88), // light gray
 	// nvgRGB(0xaa, 0xaa, 0xaa), // white
 };
-static int lastWireColorId = -1;
+static int lastCableColorId = -1;
 
 
-WireWidget::WireWidget() {
-	lastWireColorId = (lastWireColorId + 1) % LENGTHOF(wireColors);
-	color = wireColors[lastWireColorId];
+CableWidget::CableWidget() {
+	lastCableColorId = (lastCableColorId + 1) % LENGTHOF(cableColors);
+	color = cableColors[lastCableColorId];
 }
 
-WireWidget::~WireWidget() {
+CableWidget::~CableWidget() {
 	outputPort = NULL;
 	inputPort = NULL;
-	updateWire();
+	updateCable();
 }
 
-void WireWidget::updateWire() {
+void CableWidget::updateCable() {
 	if (inputPort && outputPort) {
 		// Check correct types
 		assert(inputPort->type == PortWidget::INPUT);
 		assert(outputPort->type == PortWidget::OUTPUT);
 
-		if (!wire) {
-			wire = new Wire;
-			wire->outputModule = outputPort->module;
-			wire->outputId = outputPort->portId;
-			wire->inputModule = inputPort->module;
-			wire->inputId = inputPort->portId;
-			app()->engine->addWire(wire);
+		if (!cable) {
+			cable = new Cable;
+			cable->outputModule = outputPort->module;
+			cable->outputId = outputPort->portId;
+			cable->inputModule = inputPort->module;
+			cable->inputId = inputPort->portId;
+			app()->engine->addCable(cable);
 		}
 	}
 	else {
-		if (wire) {
-			app()->engine->removeWire(wire);
-			delete wire;
-			wire = NULL;
+		if (cable) {
+			app()->engine->removeCable(cable);
+			delete cable;
+			cable = NULL;
 		}
 	}
 }
 
-math::Vec WireWidget::getOutputPos() {
+math::Vec CableWidget::getOutputPos() {
 	if (outputPort) {
 		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
 	}
@@ -135,7 +135,7 @@ math::Vec WireWidget::getOutputPos() {
 	}
 }
 
-math::Vec WireWidget::getInputPos() {
+math::Vec CableWidget::getInputPos() {
 	if (inputPort) {
 		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
 	}
@@ -147,30 +147,30 @@ math::Vec WireWidget::getInputPos() {
 	}
 }
 
-json_t *WireWidget::toJson() {
+json_t *CableWidget::toJson() {
 	json_t *rootJ = json_object();
 	std::string s = color::toHexString(color);
 	json_object_set_new(rootJ, "color", json_string(s.c_str()));
 	return rootJ;
 }
 
-void WireWidget::fromJson(json_t *rootJ) {
+void CableWidget::fromJson(json_t *rootJ) {
 	json_t *colorJ = json_object_get(rootJ, "color");
 	if (colorJ) {
-		// v0.6.0 and earlier patches use JSON objects. Just ignore them if so and use the existing wire color.
+		// v0.6.0 and earlier patches use JSON objects. Just ignore them if so and use the existing cable color.
 		if (json_is_string(colorJ))
 			color = color::fromHexString(json_string_value(colorJ));
 	}
 }
 
-void WireWidget::draw(NVGcontext *vg) {
-	float opacity = settings::wireOpacity;
-	float tension = settings::wireTension;
+void CableWidget::draw(NVGcontext *vg) {
+	float opacity = settings::cableOpacity;
+	float tension = settings::cableTension;
 
-	WireWidget *activeWire = app()->scene->rackWidget->wireContainer->activeWire;
-	if (activeWire) {
-		// Draw as opaque if the wire is active
-		if (activeWire == this)
+	CableWidget *activeCable = app()->scene->rackWidget->cableContainer->activeCable;
+	if (activeCable) {
+		// Draw as opaque if the cable is active
+		if (activeCable == this)
 			opacity = 1.0;
 	}
 	else {
@@ -180,8 +180,8 @@ void WireWidget::draw(NVGcontext *vg) {
 	}
 
 	float thickness = 5;
-	if (wire && wire->outputModule) {
-		Output *output = &wire->outputModule->outputs[wire->outputId];
+	if (cable && cable->outputModule) {
+		Output *output = &cable->outputModule->outputs[cable->outputId];
 		if (output->numChannels != 1) {
 			thickness = 9;
 		}
@@ -189,11 +189,11 @@ void WireWidget::draw(NVGcontext *vg) {
 
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
-	drawWire(vg, outputPos, inputPos, color, thickness, tension, opacity);
+	drawCable(vg, outputPos, inputPos, color, thickness, tension, opacity);
 }
 
-void WireWidget::drawPlugs(NVGcontext *vg) {
-	// TODO Figure out a way to draw plugs first and wires last, and cut the plug portion of the wire off.
+void CableWidget::drawPlugs(NVGcontext *vg) {
+	// TODO Figure out a way to draw plugs first and cables last, and cut the plug portion of the cable off.
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
 	drawPlug(vg, outputPos, color);

@@ -156,12 +156,12 @@ struct ZoomQuantity : Quantity {
 };
 
 
-struct WireOpacityQuantity : Quantity {
+struct CableOpacityQuantity : Quantity {
 	void setValue(float value) override {
-		settings::wireOpacity = math::clamp(value, getMinValue(), getMaxValue());
+		settings::cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings::wireOpacity;
+		return settings::cableOpacity;
 	}
 	float getDefaultValue() override {return 0.5;}
 	float getDisplayValue() override {return getValue() * 100.0;}
@@ -173,12 +173,12 @@ struct WireOpacityQuantity : Quantity {
 
 
 
-struct WireTensionQuantity : Quantity {
+struct CableTensionQuantity : Quantity {
 	void setValue(float value) override {
-		settings::wireTension = math::clamp(value, getMinValue(), getMaxValue());
+		settings::cableTension = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings::wireTension;
+		return settings::cableTension;
 	}
 	float getDefaultValue() override {return 0.5;}
 	std::string getLabel() override {return "Cable tension";}
@@ -281,15 +281,15 @@ struct SettingsButton : MenuButton {
 		zoomSlider->quantity = new ZoomQuantity;
 		menu->addChild(zoomSlider);
 
-		Slider *wireOpacitySlider = new Slider;
-		wireOpacitySlider->box.size.x = 200.0;
-		wireOpacitySlider->quantity = new WireOpacityQuantity;
-		menu->addChild(wireOpacitySlider);
+		Slider *cableOpacitySlider = new Slider;
+		cableOpacitySlider->box.size.x = 200.0;
+		cableOpacitySlider->quantity = new CableOpacityQuantity;
+		menu->addChild(cableOpacitySlider);
 
-		Slider *wireTensionSlider = new Slider;
-		wireTensionSlider->box.size.x = 200.0;
-		wireTensionSlider->quantity = new WireTensionQuantity;
-		menu->addChild(wireTensionSlider);
+		Slider *cableTensionSlider = new Slider;
+		cableTensionSlider->box.size.x = 200.0;
+		cableTensionSlider->quantity = new CableTensionQuantity;
+		menu->addChild(cableTensionSlider);
 	}
 };
 

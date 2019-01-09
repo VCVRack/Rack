@@ -49,8 +49,8 @@ RackWidget::RackWidget() {
 	moduleContainer = new ModuleContainer;
 	addChild(moduleContainer);
 
-	wireContainer = new WireContainer;
-	addChild(wireContainer);
+	cableContainer = new CableContainer;
+	addChild(cableContainer);
 }
 
 RackWidget::~RackWidget() {
@@ -58,8 +58,8 @@ RackWidget::~RackWidget() {
 }
 
 void RackWidget::clear() {
-	wireContainer->activeWire = NULL;
-	wireContainer->clearChildren();
+	cableContainer->activeCable = NULL;
+	cableContainer->clearChildren();
 	// Remove ModuleWidgets
 	std::list<Widget*> widgets = moduleContainer->children;
 	for (Widget *w : widgets) {
@@ -218,7 +218,7 @@ void RackWidget::disconnect() {
 	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
 		return;
 
-	wireContainer->removeAllWires(NULL);
+	cableContainer->removeAllCables(NULL);
 }
 
 json_t *RackWidget::toJson() {
@@ -248,35 +248,35 @@ json_t *RackWidget::toJson() {
 	}
 	json_object_set_new(rootJ, "modules", modulesJ);
 
-	// wires
-	json_t *wiresJ = json_array();
-	for (Widget *w : wireContainer->children) {
-		WireWidget *wireWidget = dynamic_cast<WireWidget*>(w);
-		assert(wireWidget);
+	// cables
+	json_t *cablesJ = json_array();
+	for (Widget *w : cableContainer->children) {
+		CableWidget *cableWidget = dynamic_cast<CableWidget*>(w);
+		assert(cableWidget);
 
-		PortWidget *outputPort = wireWidget->outputPort;
-		PortWidget *inputPort = wireWidget->inputPort;
-		// Only serialize WireWidgets connected on both ends
+		PortWidget *outputPort = cableWidget->outputPort;
+		PortWidget *inputPort = cableWidget->inputPort;
+		// Only serialize CableWidgets connected on both ends
 		if (!(outputPort && inputPort))
 			continue;
 
-		Wire *wire = wireWidget->wire;
-		assert(wire);
-		// wire
-		json_t *wireJ = wireWidget->toJson();
+		Cable *cable = cableWidget->cable;
+		assert(cable);
+		// cable
+		json_t *cableJ = cableWidget->toJson();
 
 		assert(outputPort->module);
 		assert(inputPort->module);
 
-		json_object_set_new(wireJ, "id", json_integer(wire->id));
-		json_object_set_new(wireJ, "outputModuleId", json_integer(outputPort->module->id));
-		json_object_set_new(wireJ, "outputId", json_integer(outputPort->portId));
-		json_object_set_new(wireJ, "inputModuleId", json_integer(inputPort->module->id));
-		json_object_set_new(wireJ, "inputId", json_integer(inputPort->portId));
+		json_object_set_new(cableJ, "id", json_integer(cable->id));
+		json_object_set_new(cableJ, "outputModuleId", json_integer(outputPort->module->id));
+		json_object_set_new(cableJ, "outputId", json_integer(outputPort->portId));
+		json_object_set_new(cableJ, "inputModuleId", json_integer(inputPort->module->id));
+		json_object_set_new(cableJ, "inputId", json_integer(inputPort->portId));
 
-		json_array_append_new(wiresJ, wireJ);
+		json_array_append_new(cablesJ, cableJ);
 	}
-	json_object_set_new(rootJ, "wires", wiresJ);
+	json_object_set_new(rootJ, "cables", cablesJ);
 
 	return rootJ;
 }
@@ -358,16 +358,19 @@ void RackWidget::fromJson(json_t *rootJ) {
 		}
 	}
 
-	// wires
-	json_t *wiresJ = json_object_get(rootJ, "wires");
-	assert(wiresJ);
-	size_t wireIndex;
-	json_t *wireJ;
-	json_array_foreach(wiresJ, wireIndex, wireJ) {
-		int outputModuleId = json_integer_value(json_object_get(wireJ, "outputModuleId"));
-		int outputId = json_integer_value(json_object_get(wireJ, "outputId"));
-		int inputModuleId = json_integer_value(json_object_get(wireJ, "inputModuleId"));
-		int inputId = json_integer_value(json_object_get(wireJ, "inputId"));
+	// cables
+	json_t *cablesJ = json_object_get(rootJ, "cables");
+	// Before 1.0, cables were called wires
+	if (!cablesJ)
+		cablesJ = json_object_get(rootJ, "wires");
+	assert(cablesJ);
+	size_t cableIndex;
+	json_t *cableJ;
+	json_array_foreach(cablesJ, cableIndex, cableJ) {
+		int outputModuleId = json_integer_value(json_object_get(cableJ, "outputModuleId"));
+		int outputId = json_integer_value(json_object_get(cableJ, "outputId"));
+		int inputModuleId = json_integer_value(json_object_get(cableJ, "inputModuleId"));
+		int inputId = json_integer_value(json_object_get(cableJ, "inputId"));
 
 		// Get module widgets
 		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
@@ -400,14 +403,14 @@ void RackWidget::fromJson(json_t *rootJ) {
 		if (!outputPort || !inputPort)
 			continue;
 
-		// Create WireWidget
-		WireWidget *wireWidget = new WireWidget;
-		wireWidget->fromJson(wireJ);
-		wireWidget->outputPort = outputPort;
-		wireWidget->inputPort = inputPort;
-		wireWidget->updateWire();
-		// Add wire to rack
-		wireContainer->addChild(wireWidget);
+		// Create CableWidget
+		CableWidget *cableWidget = new CableWidget;
+		cableWidget->fromJson(cableJ);
+		cableWidget->outputPort = outputPort;
+		cableWidget->inputPort = inputPort;
+		cableWidget->updateCable();
+		// Add cable to rack
+		cableContainer->addChild(cableWidget);
 	}
 
 	// Display a message if we have something to say
@@ -481,7 +484,7 @@ void RackWidget::addModuleAtMouse(ModuleWidget *m) {
 }
 
 void RackWidget::removeModule(ModuleWidget *m) {
-	// Disconnect wires
+	// Disconnect cables
 	m->disconnect();
 
 	// Remove module from Engine

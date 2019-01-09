@@ -251,10 +251,10 @@ void ModuleWidget::toggleBypass() {
 
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
-		app()->scene->rackWidget->wireContainer->removeAllWires(input);
+		app()->scene->rackWidget->cableContainer->removeAllCables(input);
 	}
 	for (PortWidget *output : outputs) {
-		app()->scene->rackWidget->wireContainer->removeAllWires(output);
+		app()->scene->rackWidget->cableContainer->removeAllCables(output);
 	}
 }
 

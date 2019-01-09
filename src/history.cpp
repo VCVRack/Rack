@@ -37,9 +37,9 @@ void ModuleRemove::undo() {
 	moduleWidget->fromJson(moduleJ);
 	app()->scene->rackWidget->addModule(moduleWidget);
 
-	// Add wires
-	for (WireInfo &wireInfo : wireInfos) {
-		// TODO Add wire
+	// Add cables
+	for (CableInfo &cableInfo : cableInfos) {
+		// TODO Add cable
 	}
 }
 

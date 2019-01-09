@@ -20,7 +20,7 @@ struct Port {
 	};
 	/** Number of polyphonic channels */
 	int numChannels = 1;
-	/** Whether a wire is plugged in */
+	/** Whether a cable is plugged in */
 	bool active = false;
 	Light plugLights[2];
 

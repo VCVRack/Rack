@@ -1,10 +1,10 @@
-#include "engine/Wire.hpp"
+#include "engine/Cable.hpp"
 
 
 namespace rack {
 
 
-void Wire::step() {
+void Cable::step() {
 	Output *output = &outputModule->outputs[outputId];
 	Input *input = &inputModule->inputs[inputId];
 	// Match number of polyphonic channels to output port

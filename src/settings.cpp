@@ -32,13 +32,13 @@ static json_t *settingsToJson() {
 		json_object_set_new(rootJ, "windowPos", windowPosJ);
 	}
 
-	// wireOpacity
-	json_t *wireOpacityJ = json_real(wireOpacity);
-	json_object_set_new(rootJ, "wireOpacity", wireOpacityJ);
+	// cableOpacity
+	json_t *cableOpacityJ = json_real(cableOpacity);
+	json_object_set_new(rootJ, "cableOpacity", cableOpacityJ);
 
-	// wireTension
-	json_t *wireTensionJ = json_real(wireTension);
-	json_object_set_new(rootJ, "wireTension", wireTensionJ);
+	// cableTension
+	json_t *cableTensionJ = json_real(cableTension);
+	json_object_set_new(rootJ, "cableTension", cableTensionJ);
 
 	// zoom
 	json_t *zoomJ = json_real(zoom);
@@ -98,15 +98,15 @@ static void settingsFromJson(json_t *rootJ) {
 		app()->window->setWindowPos(math::Vec(x, y));
 	}
 
-	// wireOpacity
-	json_t *wireOpacityJ = json_object_get(rootJ, "wireOpacity");
-	if (wireOpacityJ)
-		wireOpacity = json_number_value(wireOpacityJ);
+	// cableOpacity
+	json_t *cableOpacityJ = json_object_get(rootJ, "cableOpacity");
+	if (cableOpacityJ)
+		cableOpacity = json_number_value(cableOpacityJ);
 
 	// tension
-	json_t *tensionJ = json_object_get(rootJ, "wireTension");
+	json_t *tensionJ = json_object_get(rootJ, "cableTension");
 	if (tensionJ)
-		wireTension = json_number_value(tensionJ);
+		cableTension = json_number_value(tensionJ);
 
 	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
@@ -192,8 +192,8 @@ void load(std::string filename) {
 
 
 float zoom = 1.0;
-float wireOpacity = 0.5;
-float wireTension = 0.5;
+float cableOpacity = 0.5;
+float cableTension = 0.5;
 bool paramTooltip = false;
 bool powerMeter = false;
 bool lockModules = false;
