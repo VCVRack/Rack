@@ -25,7 +25,8 @@ struct ParamInfo {
 	ParamQuantityFactory *paramQuantityFactory = NULL;
 
 	~ParamInfo() {
-		delete paramQuantityFactory;
+		if (paramQuantityFactory)
+			delete paramQuantityFactory;
 	}
 
 	template<class TParamQuantity = ParamQuantity>
