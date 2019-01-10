@@ -83,6 +83,19 @@ void ModuleMove::redo() {
 }
 
 
+void ModuleBypass::undo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	moduleWidget->module->bypass = !bypass;
+}
+
+void ModuleBypass::redo() {
+	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
+	assert(moduleWidget);
+	moduleWidget->module->bypass = bypass;
+}
+
+
 void ParamChange::undo() {
 	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
 	assert(moduleWidget);

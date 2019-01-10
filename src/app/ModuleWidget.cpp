@@ -243,10 +243,13 @@ void ModuleWidget::saveDialog() {
 	save(pathStr);
 }
 
-void ModuleWidget::toggleBypass() {
-	if (!module)
-		return;
-	module->bypass ^= true;
+void ModuleWidget_bypassAction(ModuleWidget *moduleWidget) {
+	// Push ModuleBypass history action
+	history::ModuleBypass *h = new history::ModuleBypass;
+	h->bypass = !moduleWidget->module->bypass;
+	h->moduleId = moduleWidget->module->id;
+	app()->history->push(h);
+	h->redo();
 }
 
 void ModuleWidget::disconnect() {
@@ -392,7 +395,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_E: {
 				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
-					toggleBypass();
+					ModuleWidget_bypassAction(this);
 					e.consume(this);
 				}
 			} break;
@@ -527,7 +530,7 @@ struct ModuleBypassItem : MenuItem {
 			rightText = CHECKMARK_STRING " " + rightText;
 	}
 	void onAction(const event::Action &e) override {
-		moduleWidget->toggleBypass();
+		ModuleWidget_bypassAction(moduleWidget);
 	}
 };
 

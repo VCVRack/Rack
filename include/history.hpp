@@ -62,6 +62,13 @@ struct ModuleMove : ModuleAction {
 };
 
 
+struct ModuleBypass : ModuleAction {
+	bool bypass;
+	void undo() override;
+	void redo() override;
+};
+
+
 struct ParamChange : ModuleAction {
 	int paramId;
 	float oldValue;

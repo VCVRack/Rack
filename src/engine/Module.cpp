@@ -30,6 +30,10 @@ json_t *Module::toJson() {
 	}
 	json_object_set_new(rootJ, "params", paramsJ);
 
+	// bypass
+	if (bypass)
+		json_object_set_new(rootJ, "bypass", json_boolean(bypass));
+
 	// data
 	json_t *dataJ = dataToJson();
 	if (dataJ) {
@@ -58,11 +62,15 @@ void Module::fromJson(json_t *rootJ) {
 		}
 	}
 
+	// bypass
+	json_t *bypassJ = json_object_get(rootJ, "bypass");
+	if (bypassJ)
+		bypass = json_boolean_value(bypassJ);
+
 	// data
 	json_t *dataJ = json_object_get(rootJ, "data");
-	if (dataJ) {
+	if (dataJ)
 		dataFromJson(dataJ);
-	}
 }
 
 void Module::reset() {
