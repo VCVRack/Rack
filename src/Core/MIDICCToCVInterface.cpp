@@ -18,11 +18,12 @@ struct MIDICCToCVInterface : Module {
 	};
 
 	midi::InputQueue midiInput;
-	int8_t ccs[128];
+	int8_t values[128];
 	dsp::ExponentialFilter ccFilters[16];
 
 	int learningId = -1;
 	int learnedCcs[16] = {};
+	bool jump[16] = {};
 
 	MIDICCToCVInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -31,7 +32,7 @@ struct MIDICCToCVInterface : Module {
 
 	void onReset() override {
 		for (int i = 0; i < 128; i++) {
-			ccs[i] = 0;
+			values[i] = 0;
 		}
 		for (int i = 0; i < 16; i++) {
 			learnedCcs[i] = i;
@@ -45,12 +46,20 @@ struct MIDICCToCVInterface : Module {
 			processMessage(msg);
 		}
 
-		float lambda = 100.f * app()->engine->getSampleTime();
+		float lambda = app()->engine->getSampleTime() * 100.f;
 		for (int i = 0; i < 16; i++) {
 			int learnedCc = learnedCcs[i];
-			float value = rescale(clamp(ccs[learnedCc], -127, 127), 0, 127, 0.f, 10.f);
+			float value = rescale(values[learnedCc], 0, 127, 0.f, 10.f);
 			ccFilters[i].lambda = lambda;
-			outputs[CC_OUTPUT + i].setVoltage(ccFilters[i].process(value));
+			// Smooth value unless we're jumping there
+			if (jump[i]) {
+				ccFilters[i].out = value;
+				jump[i] = false;
+			}
+			else {
+				ccFilters[i].process(value);
+			}
+			outputs[CC_OUTPUT + i].setVoltage(ccFilters[i].out);
 		}
 	}
 
@@ -60,13 +69,19 @@ struct MIDICCToCVInterface : Module {
 			case 0xb: {
 				uint8_t cc = msg.note();
 				// Learn
-				if (learningId >= 0 && ccs[cc] != msg.data2) {
+				if (learningId >= 0 && values[cc] != msg.data2) {
 					learnedCcs[learningId] = cc;
 					learningId = -1;
 				}
-				// Set CV
-				// Allow CC to be negative if the 8th bit is set
-				ccs[cc] = msg.data2;
+				int8_t oldValue = values[cc];
+				// Allow CC to be negative if the 8th bit is set.
+				// The gamepad driver abuses this, for example.
+				int8_t value = msg.data2;
+				// Detect behavior from MIDI buttons.
+				// Don't run these through a smoothing filter.
+				if ((oldValue == 0 && value == 127) || (oldValue == 127 && value == 0))
+					jump[cc] = true;
+				values[cc] = value;
 			} break;
 			default: break;
 		}
