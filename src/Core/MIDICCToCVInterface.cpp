@@ -19,10 +19,10 @@ struct MIDICCToCVInterface : Module {
 
 	midi::InputQueue midiInput;
 	int8_t values[128];
-	dsp::ExponentialFilter ccFilters[16];
+	dsp::ExponentialFilter valueFilters[16];
 
 	int learningId = -1;
-	int learnedCcs[16] = {};
+	int ccs[16] = {};
 	bool jump[16] = {};
 
 	MIDICCToCVInterface() {
@@ -35,7 +35,7 @@ struct MIDICCToCVInterface : Module {
 			values[i] = 0;
 		}
 		for (int i = 0; i < 16; i++) {
-			learnedCcs[i] = i;
+			ccs[i] = i;
 		}
 		learningId = -1;
 	}
@@ -48,18 +48,18 @@ struct MIDICCToCVInterface : Module {
 
 		float lambda = app()->engine->getSampleTime() * 100.f;
 		for (int i = 0; i < 16; i++) {
-			int learnedCc = learnedCcs[i];
+			int learnedCc = ccs[i];
 			float value = rescale(values[learnedCc], 0, 127, 0.f, 10.f);
-			ccFilters[i].lambda = lambda;
+			valueFilters[i].lambda = lambda;
 			// Smooth value unless we're jumping there
 			if (jump[i]) {
-				ccFilters[i].out = value;
+				valueFilters[i].out = value;
 				jump[i] = false;
 			}
 			else {
-				ccFilters[i].process(value);
+				valueFilters[i].process(value);
 			}
-			outputs[CC_OUTPUT + i].setVoltage(ccFilters[i].out);
+			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out);
 		}
 	}
 
@@ -70,7 +70,7 @@ struct MIDICCToCVInterface : Module {
 				uint8_t cc = msg.note();
 				// Learn
 				if (learningId >= 0 && values[cc] != msg.data2) {
-					learnedCcs[learningId] = cc;
+					ccs[learningId] = cc;
 					learningId = -1;
 				}
 				int8_t oldValue = values[cc];
@@ -92,10 +92,16 @@ struct MIDICCToCVInterface : Module {
 
 		json_t *ccsJ = json_array();
 		for (int i = 0; i < 16; i++) {
-			json_t *ccJ = json_integer(learnedCcs[i]);
-			json_array_append_new(ccsJ, ccJ);
+			json_array_append_new(ccsJ, json_integer(ccs[i]));
 		}
 		json_object_set_new(rootJ, "ccs", ccsJ);
+
+		// Remember values so users don't have to touch MIDI controller knobs when restarting Rack
+		json_t *valuesJ = json_array();
+		for (int i = 0; i < 128; i++) {
+			json_array_append_new(valuesJ, json_integer(values[i]));
+		}
+		json_object_set_new(rootJ, "values", valuesJ);
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
@@ -107,7 +113,21 @@ struct MIDICCToCVInterface : Module {
 			for (int i = 0; i < 16; i++) {
 				json_t *ccJ = json_array_get(ccsJ, i);
 				if (ccJ)
-					learnedCcs[i] = json_integer_value(ccJ);
+					ccs[i] = json_integer_value(ccJ);
+			}
+		}
+
+		json_t *valuesJ = json_object_get(rootJ, "values");
+		if (valuesJ) {
+			for (int i = 0; i < 128; i++) {
+				json_t *valueJ = json_array_get(valuesJ, i);
+				if (valueJ) {
+					values[i] = json_integer_value(valueJ);
+				}
+			}
+			// Jump all CCs
+			for (int i = 0; i < 16; i++) {
+				jump[i] = true;
 			}
 		}
 
@@ -145,7 +165,7 @@ struct MidiCcChoice : GridChoice {
 			color.a = 0.5;
 		}
 		else {
-			text = string::f("%d", module->learnedCcs[id]);
+			text = string::f("%d", module->ccs[id]);
 			color.a = 1.0;
 			if (app()->event->selectedWidget == this)
 				app()->event->selectedWidget = NULL;
@@ -164,7 +184,7 @@ struct MidiCcChoice : GridChoice {
 		if (!module)
 			return;
 		if (0 <= focusCc && focusCc < 128) {
-			module->learnedCcs[id] = focusCc;
+			module->ccs[id] = focusCc;
 		}
 		module->learningId = -1;
 	}
