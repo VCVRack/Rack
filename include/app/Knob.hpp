@@ -12,6 +12,9 @@ struct Knob : ParamWidget {
 	/** Multiplier for mouse movement to adjust knob value */
 	float speed = 1.0;
 	float oldValue = 0.f;
+	/** Enable snapping at integer values */
+	bool snap = false;
+	float snapValue = NAN;
 
 	void onButton(const event::Button &e) override;
 	void onDragStart(const event::DragStart &e) override;

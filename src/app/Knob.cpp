@@ -20,8 +20,12 @@ void Knob::onButton(const event::Button &e) {
 }
 
 void Knob::onDragStart(const event::DragStart &e) {
-	if (paramQuantity)
+	if (paramQuantity) {
 		oldValue = paramQuantity->getValue();
+		if (snap) {
+			snapValue = oldValue;
+		}
+	}
 
 	app()->window->cursorLock();
 }
@@ -58,8 +62,15 @@ void Knob::onDragMove(const event::DragMove &e) {
 		// Drag slower if Mod is held
 		if (app()->window->isModPressed())
 			delta /= 16.f;
-		float oldValue = paramQuantity->getSmoothValue();
-		paramQuantity->setSmoothValue(oldValue + delta);
+
+		if (snap) {
+			snapValue += delta;
+			snapValue = math::clamp(snapValue, paramQuantity->getMinValue(), paramQuantity->getMaxValue());
+			paramQuantity->setValue(std::round(snapValue));
+		}
+		else {
+			paramQuantity->setSmoothValue(paramQuantity->getSmoothValue() + delta);
+		}
 	}
 
 	ParamWidget::onDragMove(e);
