@@ -13,6 +13,7 @@ struct ParamWidget : OpaqueWidget {
 	ParamQuantity *paramQuantity = NULL;
 	float dirtyValue = NAN;
 	Tooltip *tooltip = NULL;
+	bool snap = false;
 
 	~ParamWidget();
 	void step() override;

@@ -1,4 +1,6 @@
 #include "app/ParamQuantity.hpp"
+#include "app.hpp"
+#include "engine/Engine.hpp"
 
 
 namespace rack {
@@ -14,8 +16,15 @@ ParamInfo *ParamQuantity::getParamInfo() {
 	return &module->paramInfos[paramId];
 }
 
-void ParamQuantity::commitSnap() {
-	// TODO
+void ParamQuantity::setSmoothValue(float smoothValue) {
+	if (!module)
+		return;
+	smoothValue = math::clamp(smoothValue, getMinValue(), getMaxValue());
+	app()->engine->setSmoothParam(module, paramId, smoothValue);
+}
+
+float ParamQuantity::getSmoothValue() {
+	return app()->engine->getSmoothParam(module, paramId);
 }
 
 void ParamQuantity::setValue(float value) {

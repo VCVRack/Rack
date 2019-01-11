@@ -58,7 +58,8 @@ void Knob::onDragMove(const event::DragMove &e) {
 		// Drag slower if Mod is held
 		if (app()->window->isModPressed())
 			delta /= 16.f;
-		paramQuantity->moveValue(delta);
+		float oldValue = paramQuantity->getSmoothValue();
+		paramQuantity->setSmoothValue(oldValue + delta);
 	}
 
 	ParamWidget::onDragMove(e);

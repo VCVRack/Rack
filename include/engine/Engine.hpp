@@ -34,7 +34,9 @@ struct Engine {
 	void addCable(Cable *cable);
 	void removeCable(Cable *cable);
 	void setParam(Module *module, int paramId, float value);
-	void setParamSmooth(Module *module, int paramId, float value);
+	float getParam(Module *module, int paramId);
+	void setSmoothParam(Module *module, int paramId, float value);
+	float getSmoothParam(Module *module, int paramId);
 	int getNextModuleId();
 
 	void setSampleRate(float sampleRate);

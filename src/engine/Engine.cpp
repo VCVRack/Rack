@@ -348,7 +348,11 @@ void Engine::setParam(Module *module, int paramId, float value) {
 	module->params[paramId].value = value;
 }
 
-void Engine::setParamSmooth(Module *module, int paramId, float value) {
+float Engine::getParam(Module *module, int paramId) {
+	return module->params[paramId].value;
+}
+
+void Engine::setSmoothParam(Module *module, int paramId, float value) {
 	// If another param is being smoothed, jump value
 	if (internal->smoothModule && !(internal->smoothModule == module && internal->smoothParamId == paramId)) {
 		internal->smoothModule->params[internal->smoothParamId].value = internal->smoothValue;
@@ -356,6 +360,12 @@ void Engine::setParamSmooth(Module *module, int paramId, float value) {
 	internal->smoothParamId = paramId;
 	internal->smoothValue = value;
 	internal->smoothModule = module;
+}
+
+float Engine::getSmoothParam(Module *module, int paramId) {
+	if (internal->smoothModule == module && internal->smoothParamId == paramId)
+		return internal->smoothValue;
+	return getParam(module, paramId);
 }
 
 int Engine::getNextModuleId() {

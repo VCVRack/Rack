@@ -15,10 +15,9 @@ struct ParamQuantityFactory {
 
 
 struct ParamInfo {
-	// For formatting/displaying the value
-	/** Set to 0 for linear, nonzero for exponential */
 	std::string label;
 	std::string unit;
+	/** Set to 0 for linear, nonzero for exponential */
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
 	std::string description;

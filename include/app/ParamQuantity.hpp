@@ -12,15 +12,12 @@ namespace rack {
 struct ParamQuantity : Quantity {
 	Module *module = NULL;
 	int paramId = 0;
-	/** Use engine smoothing of Param values */
-	bool smooth = false;
-	/** Snap to the nearest integer */
-	bool snap = false;
-	float snapValue = 0.f;
 
 	Param *getParam();
 	ParamInfo *getParamInfo();
-	void commitSnap();
+	/** Request to the engine to smoothly set the value */
+	void setSmoothValue(float smoothValue);
+	float getSmoothValue();
 
 	void setValue(float value) override;
 	float getValue() override;
