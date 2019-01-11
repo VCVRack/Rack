@@ -36,11 +36,11 @@ void SVGKnob::onChange(const event::Change &e) {
 		float angle;
 		if (paramQuantity->isBounded()) {
 			angle = math::rescale(paramQuantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
-			angle = std::fmod(angle, 2*M_PI);
 		}
 		else {
-			angle = math::rescale(paramQuantity->getValue(), 0.f, 1.f, minAngle, maxAngle);
+			angle = math::rescale(paramQuantity->getValue(), -1.f, 1.f, minAngle, maxAngle);
 		}
+		angle = std::fmod(angle, 2*M_PI);
 		tw->identity();
 		// Rotate SVG
 		math::Vec center = sw->box.getCenter();

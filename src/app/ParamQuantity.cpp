@@ -101,6 +101,14 @@ int ParamQuantity::getDisplayPrecision() {
 	return (int) std::ceil(math::clamp(-log + 3.f, 0.f, 6.f));
 }
 
+std::string ParamQuantity::getDisplayValueString() {
+	return Quantity::getDisplayValueString();
+}
+
+void ParamQuantity::setDisplayValueString(std::string s) {
+	Quantity::setDisplayValueString(s);
+}
+
 std::string ParamQuantity::getLabel() {
 	if (!module)
 		return Quantity::getLabel();

@@ -104,7 +104,7 @@ void ParamWidget::fromJson(json_t *rootJ) {
 void ParamWidget::onButton(const event::Button &e) {
 	// Right click to reset
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && !(e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
-		if (paramQuantity) {
+		if (paramQuantity && paramQuantity->isBounded()) {
 			float oldValue = paramQuantity->getValue();
 			paramQuantity->reset();
 			float newValue = paramQuantity->getValue();
