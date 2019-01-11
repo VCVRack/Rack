@@ -19,11 +19,10 @@ struct MIDICCToCVInterface : Module {
 
 	midi::InputQueue midiInput;
 	int8_t values[128];
-	dsp::ExponentialFilter valueFilters[16];
-
 	int learningId = -1;
 	int ccs[16] = {};
-	bool jump[16] = {};
+	dsp::ExponentialFilter valueFilters[16];
+	int8_t lastValues[16] = {};
 
 	MIDICCToCVInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -48,17 +47,24 @@ struct MIDICCToCVInterface : Module {
 
 		float lambda = app()->engine->getSampleTime() * 100.f;
 		for (int i = 0; i < 16; i++) {
-			int learnedCc = ccs[i];
-			float value = rescale(values[learnedCc], 0, 127, 0.f, 10.f);
+			if (!outputs[CC_OUTPUT + i].active)
+				continue;
+
+			int cc = ccs[i];
+
+			float value = rescale(values[cc], 0, 127, 0.f, 10.f);
 			valueFilters[i].lambda = lambda;
-			// Smooth value unless we're jumping there
-			if (jump[i]) {
+
+			// Detect behavior from MIDI buttons.
+			if ((lastValues[i] == 0 && values[cc] == 127) || (lastValues[i] == 127 && values[cc] == 0)) {
+				// Jump value
 				valueFilters[i].out = value;
-				jump[i] = false;
 			}
 			else {
+				// Smooth value with filter
 				valueFilters[i].process(value);
 			}
+			lastValues[i] = values[cc];
 			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out);
 		}
 	}
@@ -73,15 +79,9 @@ struct MIDICCToCVInterface : Module {
 					ccs[learningId] = cc;
 					learningId = -1;
 				}
-				int8_t oldValue = values[cc];
 				// Allow CC to be negative if the 8th bit is set.
 				// The gamepad driver abuses this, for example.
-				int8_t value = msg.data2;
-				// Detect behavior from MIDI buttons.
-				// Don't run these through a smoothing filter.
-				if ((oldValue == 0 && value == 127) || (oldValue == 127 && value == 0))
-					jump[cc] = true;
-				values[cc] = value;
+				values[cc] = msg.data2;
 			} break;
 			default: break;
 		}
@@ -124,10 +124,6 @@ struct MIDICCToCVInterface : Module {
 				if (valueJ) {
 					values[i] = json_integer_value(valueJ);
 				}
-			}
-			// Jump all CCs
-			for (int i = 0; i < 16; i++) {
-				jump[i] = true;
 			}
 		}
 
