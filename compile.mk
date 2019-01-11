@@ -8,9 +8,11 @@ OBJCOPY ?= objcopy
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD -MP
+# Debugger symbols. These are removed with `strip`.
 FLAGS += -g
 # Optimization
-FLAGS += -O3 -march=nocona -ffast-math -fno-finite-math-only
+FLAGS += -O3 -march=nocona
+# Warnings
 FLAGS += -Wall -Wextra -Wno-unused-parameter
 
 ifneq ($(ARCH), mac)

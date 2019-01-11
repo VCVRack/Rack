@@ -103,6 +103,11 @@ inline float sgn(float x) {
 	return x > 0.f ? 1.f : x < 0.f ? -1.f : 0.f;
 }
 
+/** Converts -0.f to 0.f. Leaves all other values unchanged. */
+inline float normalizeZero(float x) {
+	return x + 0.f;
+}
+
 inline float eucMod(float a, float base) {
 	float mod = std::fmod(a, base);
 	return (mod >= 0.0f) ? mod : mod + base;

@@ -1,7 +1,6 @@
 #pragma once
 #include "ui/common.hpp"
 #include "math.hpp"
-#include "string.hpp"
 
 
 namespace rack {
@@ -46,16 +45,9 @@ struct Quantity {
 	virtual int getDisplayPrecision() {return 2;}
 
 	/** Returns a string representation of the display value */
-	virtual std::string getDisplayValueString() {
-		return string::f("%.*f", getDisplayPrecision(), getDisplayValue());
-	}
+	virtual std::string getDisplayValueString();
 
-	virtual void setDisplayValueString(std::string s) {
-		float displayValue = 0.f;
-		int n = std::sscanf(s.c_str(), "%f", &displayValue);
-		if (n == 1)
-			setDisplayValue(displayValue);
-	}
+	virtual void setDisplayValueString(std::string s);
 
 	/** The name of the quantity */
 	virtual std::string getLabel() {return "";}
@@ -66,14 +58,7 @@ struct Quantity {
 	virtual std::string getUnit() {return "";}
 
 	/** Returns a string representation of the quantity */
-	virtual std::string getString() {
-		std::string s;
-		std::string label = getLabel();
-		if (!label.empty())
-			s += label + ": ";
-		s += getDisplayValueString() + getUnit();
-		return s;
-	}
+	virtual std::string getString();
 
 	// Helper methods
 
