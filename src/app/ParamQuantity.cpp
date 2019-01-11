@@ -11,11 +11,6 @@ Param *ParamQuantity::getParam() {
 	return &module->params[paramId];
 }
 
-ParamInfo *ParamQuantity::getParamInfo() {
-	assert(module);
-	return &module->paramInfos[paramId];
-}
-
 void ParamQuantity::setSmoothValue(float smoothValue) {
 	if (!module)
 		return;
@@ -63,34 +58,34 @@ float ParamQuantity::getDefaultValue() {
 float ParamQuantity::getDisplayValue() {
 	if (!module)
 		return Quantity::getDisplayValue();
-	if (getParamInfo()->displayBase == 0.f) {
+	if (getParam()->displayBase == 0.f) {
 		// Linear
-		return getValue() * getParamInfo()->displayMultiplier;
+		return getValue() * getParam()->displayMultiplier;
 	}
-	else if (getParamInfo()->displayBase == 1.f) {
+	else if (getParam()->displayBase == 1.f) {
 		// Fixed (special case of exponential)
-		return getParamInfo()->displayMultiplier;
+		return getParam()->displayMultiplier;
 	}
 	else {
 		// Exponential
-		return std::pow(getParamInfo()->displayBase, getValue()) * getParamInfo()->displayMultiplier;
+		return std::pow(getParam()->displayBase, getValue()) * getParam()->displayMultiplier;
 	}
 }
 
 void ParamQuantity::setDisplayValue(float displayValue) {
 	if (!module)
 		return;
-	if (getParamInfo()->displayBase == 0.f) {
+	if (getParam()->displayBase == 0.f) {
 		// Linear
-		setValue(displayValue / getParamInfo()->displayMultiplier);
+		setValue(displayValue / getParam()->displayMultiplier);
 	}
-	else if (getParamInfo()->displayBase == 1.f) {
+	else if (getParam()->displayBase == 1.f) {
 		// Fixed
-		setValue(getParamInfo()->displayMultiplier);
+		setValue(getParam()->displayMultiplier);
 	}
 	else {
 		// Exponential
-		setValue(std::log(displayValue / getParamInfo()->displayMultiplier) / std::log(getParamInfo()->displayBase));
+		setValue(std::log(displayValue / getParam()->displayMultiplier) / std::log(getParam()->displayBase));
 	}
 }
 
@@ -109,13 +104,13 @@ int ParamQuantity::getDisplayPrecision() {
 std::string ParamQuantity::getLabel() {
 	if (!module)
 		return Quantity::getLabel();
-	return getParamInfo()->label;
+	return getParam()->label;
 }
 
 std::string ParamQuantity::getUnit() {
 	if (!module)
 		return Quantity::getUnit();
-	return getParamInfo()->unit;
+	return getParam()->unit;
 }
 
 

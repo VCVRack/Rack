@@ -2,7 +2,6 @@
 #include "ui/Quantity.hpp"
 #include "engine/Module.hpp"
 #include "engine/Param.hpp"
-#include "engine/ParamInfo.hpp"
 
 
 namespace rack {
@@ -14,7 +13,6 @@ struct ParamQuantity : Quantity {
 	int paramId = 0;
 
 	Param *getParam();
-	ParamInfo *getParamInfo();
 	/** Request to the engine to smoothly set the value */
 	void setSmoothValue(float smoothValue);
 	float getSmoothValue();

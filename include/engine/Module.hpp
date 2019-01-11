@@ -5,7 +5,6 @@
 #include "engine/Input.hpp"
 #include "engine/Output.hpp"
 #include "engine/Light.hpp"
-#include "engine/ParamInfo.hpp"
 #include <vector>
 #include <jansson.h>
 
@@ -19,7 +18,6 @@ struct Module {
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;
 	std::vector<Light> lights;
-	std::vector<ParamInfo> paramInfos;
 	/** For power meter */
 	float cpuTime = 0.f;
 	bool bypass = false;

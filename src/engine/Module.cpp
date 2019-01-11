@@ -9,14 +9,13 @@ Module::Module() {
 
 void Module::config(int numParams, int numInputs, int numOutputs, int numLights) {
 	params.resize(numParams);
+	// Create default param labels
+	for (int i = 0; i < numParams; i++) {
+		params[i].label = string::f("#%d", i + 1);
+	}
 	inputs.resize(numInputs);
 	outputs.resize(numOutputs);
 	lights.resize(numLights);
-	paramInfos.resize(numParams);
-	// Create default param labels
-	for (int i = 0; i < numParams; i++) {
-		paramInfos[i].label = string::f("#%d", i + 1);
-	}
 }
 
 json_t *Module::toJson() {

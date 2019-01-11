@@ -58,7 +58,7 @@ TParamWidget *createParam(math::Vec pos, Module *module, int paramId) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos;
 	if (module) {
-		ParamQuantityFactory *f = module->paramInfos[paramId].paramQuantityFactory;
+		ParamQuantityFactory *f = module->params[paramId].paramQuantityFactory;
 		if (f)
 			o->paramQuantity = f->create();
 		else
