@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace dsp {
 
 
 // TODO I should probably compute this on launch
@@ -10,4 +11,5 @@ const float minblep_16_32[] = {
 };
 
 
+} // namespace dsp
 } // namespace rack

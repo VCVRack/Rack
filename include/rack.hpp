@@ -92,7 +92,9 @@
 
 namespace rack {
 
-// Import namespace for convenience
+
+// Import math:: namespace for convenience
 using namespace math;
+
 
 } // namespace rack

@@ -8,8 +8,8 @@
 #include "app.hpp"
 
 
-#define AUDIO_OUTPUTS 8
-#define AUDIO_INPUTS 8
+static const int AUDIO_OUTPUTS = 8;
+static const int AUDIO_INPUTS = 8;
 
 
 using namespace rack;
@@ -45,8 +45,8 @@ struct AudioInterfaceIO : audio::IO {
 				if (inputBuffer.full())
 					break;
 				dsp::Frame<AUDIO_INPUTS> inputFrame;
-				memset(&inputFrame, 0, sizeof(inputFrame));
-				memcpy(&inputFrame, &input[numInputs * i], numInputs * sizeof(float));
+				std::memset(&inputFrame, 0, sizeof(inputFrame));
+				std::memcpy(&inputFrame, &input[numInputs * i], numInputs * sizeof(float));
 				inputBuffer.push(inputFrame);
 			}
 		}
@@ -68,7 +68,7 @@ struct AudioInterfaceIO : audio::IO {
 			}
 			else {
 				// Timed out, fill output with zeros
-				memset(output, 0, frames * numOutputs * sizeof(float));
+				std::memset(output, 0, frames * numOutputs * sizeof(float));
 				// DEBUG("Audio Interface IO underflow");
 			}
 		}
@@ -180,7 +180,7 @@ void AudioInterface::step() {
 		inputFrame = inputBuffer.shift();
 	}
 	else {
-		memset(&inputFrame, 0, sizeof(inputFrame));
+		std::memset(&inputFrame, 0, sizeof(inputFrame));
 	}
 	for (int i = 0; i < audioIO.numInputs; i++) {
 		outputs[AUDIO_OUTPUT + i].setVoltage(10.f * inputFrame.samples[i]);

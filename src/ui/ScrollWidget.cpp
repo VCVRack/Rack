@@ -23,7 +23,7 @@ ScrollWidget::ScrollWidget() {
 
 void ScrollWidget::scrollTo(math::Rect r) {
 	math::Rect bound = math::Rect::fromMinMax(r.getBottomRight().minus(box.size), r.pos);
-	offset = offset.clampBetween(bound);
+	offset = offset.clampSafe(bound);
 }
 
 void ScrollWidget::draw(NVGcontext *vg) {

@@ -6,6 +6,7 @@
 namespace rack {
 namespace math {
 
+
 ////////////////////
 // basic integer functions
 ////////////////////
@@ -30,12 +31,13 @@ inline int clamp(int x, int a, int b) {
 /** Limits `x` between `a` and `b`
 If a > b, switches the two values
 */
-inline int clampBetween(int x, int a, int b) {
+inline int clampSafe(int x, int a, int b) {
 	return clamp(x, std::min(a, b), std::max(a, b));
 }
 
 /** Euclidean modulus. Always returns 0 <= mod < b.
 b must be positive.
+See https://en.wikipedia.org/wiki/Euclidean_division
 */
 inline int eucMod(int a, int b) {
 	int mod = a % b;
@@ -76,6 +78,7 @@ inline int log2(int n) {
 	return i;
 }
 
+/** Returns whether `n` is a power of 2 */
 inline bool isPow2(int n) {
 	return n > 0 && (n & (n - 1)) == 0;
 }
@@ -94,11 +97,13 @@ inline float clamp(float x, float a, float b) {
 /** Limits `x` between `a` and `b`
 If a > b, switches the two values
 */
-inline float clampBetween(float x, float a, float b) {
+inline float clampSafe(float x, float a, float b) {
 	return clamp(x, std::min(a, b), std::max(a, b));
 }
 
-/** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero */
+/** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero
+See https://en.wikipedia.org/wiki/Sign_function
+*/
 inline float sgn(float x) {
 	return x > 0.f ? 1.f : x < 0.f ? -1.f : 0.f;
 }
@@ -108,6 +113,9 @@ inline float normalizeZero(float x) {
 	return x + 0.f;
 }
 
+/** Euclidean modulus. Always returns 0 <= mod < b.
+See https://en.wikipedia.org/wiki/Euclidean_division
+*/
 inline float eucMod(float a, float base) {
 	float mod = std::fmod(a, base);
 	return (mod >= 0.0f) ? mod : mod + base;
@@ -143,10 +151,11 @@ inline float interpolateLinear(const float *p, float x) {
 Arguments may be the same pointers
 i.e. cmultf(&ar, &ai, ar, ai, br, bi)
 */
-inline void cmult(float *cr, float *ci, float ar, float ai, float br, float bi) {
+inline void complexMult(float *cr, float *ci, float ar, float ai, float br, float bi) {
 	*cr = ar * br - ai * bi;
 	*ci = ar * bi + ai * br;
 }
+
 
 ////////////////////
 // 2D vector and rectangle
@@ -228,8 +237,7 @@ struct Vec {
 		return std::isfinite(x) && std::isfinite(y);
 	}
 	Vec clamp(Rect bound) const;
-	Vec clampBetween(Rect bound) const;
-	DEPRECATED Vec clamp2(Rect bound) const;
+	Vec clampSafe(Rect bound) const;
 };
 
 
@@ -286,8 +294,8 @@ struct Rect {
 	/** Clamps the edges of the rectangle to fit within a bound */
 	Rect clamp(Rect bound) const {
 		Rect r;
-		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
-		r.pos.y = clampBetween(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
+		r.pos.x = math::clampSafe(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
+		r.pos.y = math::clampSafe(pos.y, bound.pos.y, bound.pos.y + bound.size.y);
 		r.size.x = math::clamp(pos.x + size.x, bound.pos.x, bound.pos.x + bound.size.x) - r.pos.x;
 		r.size.y = math::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
 		return r;
@@ -296,8 +304,8 @@ struct Rect {
 	Rect nudge(Rect bound) const {
 		Rect r;
 		r.size = size;
-		r.pos.x = clampBetween(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
-		r.pos.y = clampBetween(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
+		r.pos.x = math::clampSafe(pos.x, bound.pos.x, bound.pos.x + bound.size.x - size.x);
+		r.pos.y = math::clampSafe(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
 	/** Expands this Rect to contain `other` */
@@ -331,13 +339,11 @@ inline Vec Vec::clamp(Rect bound) const {
 		math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
-inline Vec Vec::clampBetween(Rect bound) const {
+inline Vec Vec::clampSafe(Rect bound) const {
 	return Vec(
-		math::clampBetween(x, bound.pos.x, bound.pos.x + bound.size.x),
-		math::clampBetween(y, bound.pos.y, bound.pos.y + bound.size.y));
+		math::clampSafe(x, bound.pos.x, bound.pos.x + bound.size.x),
+		math::clampSafe(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
-
-inline Vec Vec::clamp2(Rect bound) const {return clampBetween(bound);}
 
 
 } // namespace math

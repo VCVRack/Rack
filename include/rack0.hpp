@@ -16,6 +16,8 @@ namespace rack {
 // math
 ////////////////////
 
+using namespace math;
+
 DEPRECATED inline int min(int a, int b) {return std::min(a, b);}
 DEPRECATED inline int max(int a, int b) {return std::max(a, b);}
 DEPRECATED inline int eucmod(int a, int base) {return eucMod(a, base);}
