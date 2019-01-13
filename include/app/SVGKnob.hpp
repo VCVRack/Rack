@@ -11,7 +11,8 @@ namespace rack {
 
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
-struct SVGKnob : Knob, FramebufferWidget {
+struct SVGKnob : Knob {
+	FramebufferWidget *fb;
 	TransformWidget *tw;
 	SVGWidget *sw;
 	CircularShadow *shadow;
@@ -20,7 +21,6 @@ struct SVGKnob : Knob, FramebufferWidget {
 
 	SVGKnob();
 	void setSVG(std::shared_ptr<SVG> svg);
-	void step() override;
 	void onChange(const event::Change &e) override;
 };
 

@@ -54,6 +54,7 @@ void PortWidget::draw(NVGcontext *vg) {
 		if (type == INPUT ? activeCable->inputPort : activeCable->outputPort)
 			nvgGlobalAlpha(vg, 0.5);
 	}
+	Widget::draw(vg);
 }
 
 void PortWidget::onButton(const event::Button &e) {

@@ -9,13 +9,13 @@
 namespace rack {
 
 
-struct SVGPort : PortWidget, FramebufferWidget {
-	SVGWidget *background;
+struct SVGPort : PortWidget {
+	FramebufferWidget *fb;
+	SVGWidget *sw;
 	CircularShadow *shadow;
 
 	SVGPort();
 	void setSVG(std::shared_ptr<SVG> svg);
-	void draw(NVGcontext *vg) override;
 };
 
 

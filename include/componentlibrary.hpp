@@ -324,7 +324,8 @@ struct BefacoSlidePot : SVGSlider {
 		math::Vec margin = math::Vec(3.5, 3.5);
 		maxHandlePos = math::Vec(-1, -2).plus(margin);
 		minHandlePos = math::Vec(-1, 87).plus(margin);
-		setSVGs(SVG::load(asset::system("res/ComponentLibrary/BefacoSlidePot.svg")), SVG::load(asset::system("res/ComponentLibrary/BefacoSlidePotHandle.svg")));
+		setBackgroundSVG(SVG::load(asset::system("res/ComponentLibrary/BefacoSlidePot.svg")));
+		setHandleSVG(SVG::load(asset::system("res/ComponentLibrary/BefacoSlidePotHandle.svg")));
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
 	}
@@ -334,38 +335,38 @@ struct LEDSlider : SVGSlider {
 	LEDSlider() {
 		maxHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)));
 		minHandlePos = mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0)));
-		setSVGs(SVG::load(asset::system("res/ComponentLibrary/LEDSlider.svg")), NULL);
+		setBackgroundSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSlider.svg")));
 	}
 };
 
 /** API is unstable for LEDSlider. Will add a LightWidget later. */
 struct LEDSliderGreen : LEDSlider {
 	LEDSliderGreen() {
-		handle->setSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderGreenHandle.svg")));
+		setHandleSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderGreenHandle.svg")));
 	}
 };
 
 struct LEDSliderRed : LEDSlider {
 	LEDSliderRed() {
-		handle->setSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderRedHandle.svg")));
+		setHandleSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderRedHandle.svg")));
 	}
 };
 
 struct LEDSliderYellow : LEDSlider {
 	LEDSliderYellow() {
-		handle->setSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderYellowHandle.svg")));
+		setHandleSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderYellowHandle.svg")));
 	}
 };
 
 struct LEDSliderBlue : LEDSlider {
 	LEDSliderBlue() {
-		handle->setSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderBlueHandle.svg")));
+		setHandleSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderBlueHandle.svg")));
 	}
 };
 
 struct LEDSliderWhite : LEDSlider {
 	LEDSliderWhite() {
-		handle->setSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderWhiteHandle.svg")));
+		setHandleSVG(SVG::load(asset::system("res/ComponentLibrary/LEDSliderWhiteHandle.svg")));
 	}
 };
 
@@ -508,7 +509,7 @@ struct PB61303Light : BASE {
 // Switches and Buttons
 ////////////////////
 
-struct NKK : SVGSwitch, ToggleSwitch {
+struct NKK : SVGSwitch {
 	NKK() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/NKK_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/NKK_1.svg")));
@@ -516,14 +517,14 @@ struct NKK : SVGSwitch, ToggleSwitch {
 	}
 };
 
-struct CKSS : SVGSwitch, ToggleSwitch {
+struct CKSS : SVGSwitch {
 	CKSS() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSS_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSS_1.svg")));
 	}
 };
 
-struct CKSSThree : SVGSwitch, ToggleSwitch {
+struct CKSSThree : SVGSwitch {
 	CKSSThree() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSSThree_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSSThree_1.svg")));
@@ -531,27 +532,30 @@ struct CKSSThree : SVGSwitch, ToggleSwitch {
 	}
 };
 
-struct CKD6 : SVGSwitch, MomentarySwitch {
+struct CKD6 : SVGSwitch {
 	CKD6() {
+		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKD6_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKD6_1.svg")));
 	}
 };
 
-struct TL1105 : SVGSwitch, MomentarySwitch {
+struct TL1105 : SVGSwitch {
 	TL1105() {
+		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/TL1105_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/TL1105_1.svg")));
 	}
 };
 
-struct LEDButton : SVGSwitch, MomentarySwitch {
+struct LEDButton : SVGSwitch {
 	LEDButton() {
+		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/LEDButton.svg")));
 	}
 };
 
-struct BefacoSwitch : SVGSwitch, ToggleSwitch {
+struct BefacoSwitch : SVGSwitch {
 	BefacoSwitch() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/BefacoSwitch_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/BefacoSwitch_1.svg")));
@@ -559,21 +563,24 @@ struct BefacoSwitch : SVGSwitch, ToggleSwitch {
 	}
 };
 
-struct BefacoPush : SVGSwitch, MomentarySwitch {
+struct BefacoPush : SVGSwitch {
 	BefacoPush() {
+		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/BefacoPush_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/BefacoPush_1.svg")));
 	}
 };
 
-struct LEDBezel : SVGSwitch, MomentarySwitch {
+struct LEDBezel : SVGSwitch {
 	LEDBezel() {
+		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/LEDBezel.svg")));
 	}
 };
 
-struct PB61303 : SVGSwitch, MomentarySwitch {
+struct PB61303 : SVGSwitch {
 	PB61303() {
+		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/PB61303.svg")));
 	}
 };

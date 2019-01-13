@@ -5,13 +5,11 @@ namespace rack {
 
 
 SVGSwitch::SVGSwitch() {
-	sw = new SVGWidget;
-	addChild(sw);
-}
+	fb = new FramebufferWidget;
+	addChild(fb);
 
-void SVGSwitch::step() {
-	ParamWidget::step();
-	FramebufferWidget::step();
+	sw = new SVGWidget;
+	fb->addChild(sw);
 }
 
 void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
@@ -20,16 +18,16 @@ void SVGSwitch::addFrame(std::shared_ptr<SVG> svg) {
 	if (!sw->svg) {
 		sw->setSVG(svg);
 		box.size = sw->box.size;
+		fb->box.size = sw->box.size;
 	}
 }
 
 void SVGSwitch::onChange(const event::Change &e) {
-	assert(frames.size() > 0);
-	if (paramQuantity) {
-		int index = paramQuantity->getScaledValue() * (frames.size() - 1);
+	if (!frames.empty() && paramQuantity) {
+		int index = (int) paramQuantity->getValue();
 		index = math::clamp(index, 0, (int) frames.size() - 1);
 		sw->setSVG(frames[index]);
-		dirty = true;
+		fb->dirty = true;
 	}
 	ParamWidget::onChange(e);
 }

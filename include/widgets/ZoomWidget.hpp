@@ -5,7 +5,7 @@
 namespace rack {
 
 
-struct ZoomWidget : virtual Widget {
+struct ZoomWidget : Widget {
 	float zoom = 1.f;
 
 	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override {

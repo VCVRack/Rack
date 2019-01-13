@@ -6,10 +6,10 @@
 namespace rack {
 
 
-/** A switch that is turned on when held and turned off when released.
-Consider using SVGButton if the switch simply changes the state of your Module when clicked.
-*/
-struct MomentarySwitch : virtual ParamWidget {
+/** A ParamWidget that controls  */
+struct Switch : ParamWidget {
+	/** Return to original position when released */
+	bool momentary = false;
 	void onDragStart(const event::DragStart &e) override;
 	void onDragEnd(const event::DragEnd &e) override;
 };

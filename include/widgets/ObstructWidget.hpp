@@ -7,7 +7,7 @@ namespace rack {
 
 /** Widget that consumes recursing events without giving a chance for children to consume.
 */
-struct ObstructWidget : virtual Widget {
+struct ObstructWidget : Widget {
 	void onHover(const event::Hover &e) override {
 		e.consume(this);
 	}

@@ -11,8 +11,6 @@ namespace rack {
 
 
 /** A node in the 2D scene graph
-It is recommended to inherit virtually from Widget instead of directly.
-e.g. `struct MyWidget : virtual Widget {}`
 */
 struct Widget {
 	/** Stores position and size */

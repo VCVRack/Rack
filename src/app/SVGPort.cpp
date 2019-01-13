@@ -5,27 +5,28 @@ namespace rack {
 
 
 SVGPort::SVGPort() {
+	fb = new FramebufferWidget;
+	addChild(fb);
+
 	shadow = new CircularShadow;
-	addChild(shadow);
+	fb->addChild(shadow);
 	// Avoid breakage if plugins fail to call setSVG()
 	// In that case, just disable the shadow.
 	shadow->box.size = math::Vec();
 
-	background = new SVGWidget;
-	addChild(background);
+	sw = new SVGWidget;
+	fb->addChild(sw);
 }
 
 void SVGPort::setSVG(std::shared_ptr<SVG> svg) {
-	background->setSVG(svg);
-	box.size = background->box.size;
-	shadow->box.size = background->box.size;
-	shadow->box.pos = math::Vec(0, background->box.size.y * 0.1);
+	sw->setSVG(svg);
+	fb->box.size = sw->box.size;
+	box.size = sw->box.size;
+	shadow->box.size = sw->box.size;
+	// Move shadow downward by 10%
+	shadow->box.pos = math::Vec(0, sw->box.size.y * 0.10);
 	// shadow->box = shadow->box.grow(math::Vec(2, 2));
-}
-
-void SVGPort::draw(NVGcontext *vg) {
-	PortWidget::draw(vg);
-	FramebufferWidget::draw(vg);
+	fb->dirty = true;
 }
 
 

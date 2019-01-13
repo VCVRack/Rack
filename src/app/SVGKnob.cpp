@@ -5,12 +5,15 @@ namespace rack {
 
 
 SVGKnob::SVGKnob() {
+	fb = new FramebufferWidget;
+	addChild(fb);
+
 	shadow = new CircularShadow;
-	addChild(shadow);
+	fb->addChild(shadow);
 	shadow->box.size = math::Vec();
 
 	tw = new TransformWidget;
-	addChild(tw);
+	fb->addChild(tw);
 
 	sw = new SVGWidget;
 	tw->addChild(sw);
@@ -19,15 +22,12 @@ SVGKnob::SVGKnob() {
 void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
 	sw->setSVG(svg);
 	tw->box.size = sw->box.size;
+	fb->box.size = sw->box.size;
 	box.size = sw->box.size;
 	shadow->box.size = sw->box.size;
-	shadow->box.pos = math::Vec(0, sw->box.size.y * 0.1);
+	// Move shadow downward by 10%
+	shadow->box.pos = math::Vec(0, sw->box.size.y * 0.10);
 	// shadow->box = shadow->box.grow(math::Vec(2, 2));
-}
-
-void SVGKnob::step() {
-	Knob::step();
-	FramebufferWidget::step();
 }
 
 void SVGKnob::onChange(const event::Change &e) {
@@ -47,7 +47,7 @@ void SVGKnob::onChange(const event::Change &e) {
 		tw->translate(center);
 		tw->rotate(angle);
 		tw->translate(center.neg());
-		dirty = true;
+		fb->dirty = true;
 	}
 	Knob::onChange(e);
 }

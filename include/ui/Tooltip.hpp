@@ -6,7 +6,7 @@
 namespace rack {
 
 
-struct Tooltip : virtual Widget {
+struct Tooltip : Widget {
 	std::string text;
 
 	void step() override;

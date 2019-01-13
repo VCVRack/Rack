@@ -6,7 +6,7 @@
 namespace rack {
 
 
-struct Label : virtual Widget {
+struct Label : Widget {
 	enum Alignment {
 		LEFT_ALIGNMENT,
 		CENTER_ALIGNMENT,
