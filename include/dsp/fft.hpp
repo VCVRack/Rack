@@ -9,7 +9,7 @@ namespace dsp {
 
 template<typename T>
 T *alignedNew(size_t len) {
-	return pffft_aligned_malloc(len * sizeof(T));
+	return (T*) pffft_aligned_malloc(len * sizeof(T));
 }
 
 template<typename T>

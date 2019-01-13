@@ -109,7 +109,7 @@ struct Decimator {
 
 	Decimator(float cutoff = 0.9f) {
 		boxcarLowpassIR(kernel, OVERSAMPLE*QUALITY, cutoff * 0.5f / OVERSAMPLE);
-		blackmanHarris(kernel, OVERSAMPLE*QUALITY);
+		blackmanHarrisWindow(kernel, OVERSAMPLE*QUALITY);
 		reset();
 	}
 	void reset() {
