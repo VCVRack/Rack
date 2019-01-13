@@ -6,7 +6,7 @@ namespace rack {
 
 
 std::string Quantity::getDisplayValueString() {
-	return string::f("%.*f", getDisplayPrecision(), math::normalizeZero(getDisplayValue()));
+	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(getDisplayValue()));
 }
 
 void Quantity::setDisplayValueString(std::string s) {

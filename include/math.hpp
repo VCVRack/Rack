@@ -109,6 +109,7 @@ inline float sgn(float x) {
 }
 
 /** Converts -0.f to 0.f. Leaves all other values unchanged. */
+__attribute__((optimize("signed-zeros")))
 inline float normalizeZero(float x) {
 	return x + 0.f;
 }

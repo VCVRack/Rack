@@ -60,7 +60,7 @@ float ParamQuantity::getDisplayValue() {
 		return Quantity::getDisplayValue();
 	if (getParam()->displayBase == 0.f) {
 		// Linear
-		return getValue() * getParam()->displayMultiplier;
+		return getSmoothValue() * getParam()->displayMultiplier;
 	}
 	else if (getParam()->displayBase == 1.f) {
 		// Fixed (special case of exponential)
@@ -68,7 +68,7 @@ float ParamQuantity::getDisplayValue() {
 	}
 	else {
 		// Exponential
-		return std::pow(getParam()->displayBase, getValue()) * getParam()->displayMultiplier;
+		return std::pow(getParam()->displayBase, getSmoothValue()) * getParam()->displayMultiplier;
 	}
 }
 
@@ -92,13 +92,7 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 int ParamQuantity::getDisplayPrecision() {
 	if (!module)
 		return Quantity::getDisplayPrecision();
-	float displayValue = getDisplayValue();
-	if (displayValue == 0.f)
-		return 0;
-	if (std::round(displayValue) == displayValue)
-		return 0;
-	float log = std::log10(std::abs(getDisplayValue()));
-	return (int) std::ceil(math::clamp(-log + 3.f, 0.f, 6.f));
+	return 5;
 }
 
 std::string ParamQuantity::getDisplayValueString() {
