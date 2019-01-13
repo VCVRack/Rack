@@ -54,6 +54,14 @@ struct Param {
 		paramQuantityFactory = new TParamQuantityFactory;
 	}
 
+	float getValue() {
+		return value;
+	}
+
+	void setValue(float value) {
+		this->value = value;
+	}
+
 	bool isBounded();
 	json_t *toJson();
 	void fromJson(json_t *rootJ);

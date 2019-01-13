@@ -180,7 +180,7 @@ endif
 
 # Plugin helpers
 
-allplugins:
+plugins:
 	for f in plugins/*; do $(MAKE) -C "$$f"; done
 
 cleanplugins:
@@ -189,7 +189,7 @@ cleanplugins:
 distplugins:
 	for f in plugins/*; do $(MAKE) -C "$$f" dist; done
 
-plugins:
+cmdplugins:
 	for f in plugins/*; do (cd "$$f" && ${CMD}); done
 
 
