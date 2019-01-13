@@ -119,15 +119,15 @@ See https://en.wikipedia.org/wiki/Euclidean_division
 */
 inline float eucMod(float a, float base) {
 	float mod = std::fmod(a, base);
-	return (mod >= 0.0f) ? mod : mod + base;
+	return (mod >= 0.f) ? mod : mod + base;
 }
 
-inline bool isNear(float a, float b, float epsilon = 1.0e-6f) {
+inline bool isNear(float a, float b, float epsilon = 1e-6f) {
 	return std::abs(a - b) <= epsilon;
 }
 
 /** If the magnitude of x if less than epsilon, return 0 */
-inline float chop(float x, float epsilon = 1.0e-6f) {
+inline float chop(float x, float epsilon = 1e-6f) {
 	return isNear(x, 0.f, epsilon) ? 0.f : x;
 }
 
@@ -156,7 +156,6 @@ inline void complexMult(float *cr, float *ci, float ar, float ai, float br, floa
 	*cr = ar * br - ai * bi;
 	*ci = ar * bi + ai * br;
 }
-
 
 ////////////////////
 // 2D vector and rectangle
@@ -232,7 +231,7 @@ struct Vec {
 		return x == b.x && y == b.y;
 	}
 	bool isZero() const {
-		return x == 0.0f && y == 0.0f;
+		return x == 0.f && y == 0.f;
 	}
 	bool isFinite() const {
 		return std::isfinite(x) && std::isfinite(y);

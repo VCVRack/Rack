@@ -24,7 +24,7 @@ inline void boxcarLowpassIR(float *out, int len, float cutoff = 0.5f) {
 	}
 }
 
-inline void blackmanHarrisWindow(float *x, int len) {
+inline void blackmanHarris(float *x, int len) {
 	// Constants from https://en.wikipedia.org/wiki/Window_function#Blackman%E2%80%93Harris_window
 	const float a0 = 0.35875f;
 	const float a1 = 0.48829f;
@@ -34,9 +34,9 @@ inline void blackmanHarrisWindow(float *x, int len) {
 	for (int i = 0; i < len; i++) {
 		x[i] *=
 			+ a0
-			- a1 * cosf(1*factor * i)
-			+ a2 * cosf(2*factor * i)
-			- a3 * cosf(3*factor * i);
+			- a1 * std::cos(1*factor * i)
+			+ a2 * std::cos(2*factor * i)
+			- a3 * std::cos(3*factor * i);
 	}
 }
 

@@ -79,6 +79,7 @@
 
 #include "dsp/common.hpp"
 #include "dsp/digital.hpp"
+#include "dsp/fft.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/fir.hpp"
 #include "dsp/frame.hpp"

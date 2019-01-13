@@ -15,6 +15,9 @@
 #include <string>
 
 
+namespace rack {
+
+
 /** Deprecation notice for functions
 E.g.
 	DEPRECATED void foo();
@@ -130,4 +133,7 @@ DeferWrapper<F> deferWrapper(F f) {
 	return DeferWrapper<F>(f);
 }
 
-#define DEFER(code) auto CONCAT(_defer_, __COUNTER__) = deferWrapper([&]() code)
+#define DEFER(code) auto CONCAT(_defer_, __COUNTER__) = rack::deferWrapper([&]() code)
+
+
+} // namespace rack

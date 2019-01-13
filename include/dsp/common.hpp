@@ -6,17 +6,23 @@ namespace rack {
 namespace dsp {
 
 
+// Useful constants
+
 static const float FREQ_C4 = 261.6256f;
 static const float FREQ_A4 = 440.0000f;
 
 
-/** The normalized sinc function. https://en.wikipedia.org/wiki/Sinc_function */
+/** The normalized sinc function
+See https://en.wikipedia.org/wiki/Sinc_function
+*/
 inline float sinc(float x) {
 	if (x == 0.f)
 		return 1.f;
 	x *= M_PI;
 	return std::sin(x) / x;
 }
+
+// Functions for parameter scaling
 
 inline float quadraticBipolar(float x) {
 	float x2 = x*x;
@@ -33,7 +39,7 @@ inline float quarticBipolar(float x) {
 }
 
 inline float quintic(float x) {
-	// optimal with --fast-math
+	// optimal with -fassociative-math
 	return x*x*x*x*x;
 }
 
@@ -46,6 +52,8 @@ inline float exponentialBipolar(float b, float x) {
 	const float a = b - 1.f / b;
 	return (std::pow(b, x) - std::pow(b, -x)) / a;
 }
+
+// Useful conversion functions
 
 inline float amplitudeToDb(float amp) {
 	return std::log10(amp) * 20.f;
