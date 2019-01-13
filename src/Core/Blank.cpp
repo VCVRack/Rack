@@ -4,7 +4,7 @@
 using namespace rack;
 
 
-struct BlankPanel : virtual Widget {
+struct BlankPanel : Widget {
 	Widget *panelBorder;
 
 	BlankPanel() {
@@ -26,7 +26,7 @@ struct BlankPanel : virtual Widget {
 };
 
 
-struct ModuleResizeHandle : virtual Widget {
+struct ModuleResizeHandle : Widget {
 	bool right = false;
 	float dragX;
 	Rect originalBox;

@@ -90,9 +90,7 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 }
 
 int ParamQuantity::getDisplayPrecision() {
-	if (!module)
-		return Quantity::getDisplayPrecision();
-	return 5;
+	return Quantity::getDisplayPrecision();
 }
 
 std::string ParamQuantity::getDisplayValueString() {

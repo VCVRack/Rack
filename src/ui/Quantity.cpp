@@ -5,6 +5,10 @@
 namespace rack {
 
 
+int Quantity::getDisplayPrecision() {
+	return 5;
+}
+
 std::string Quantity::getDisplayValueString() {
 	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(getDisplayValue()));
 }

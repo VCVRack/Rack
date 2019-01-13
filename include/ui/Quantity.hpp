@@ -39,10 +39,9 @@ struct Quantity {
 	/** Inversely transforms the display value and sets the value */
 	virtual void setDisplayValue(float displayValue) {setValue(displayValue);}
 
-	/** The number of decimal places for displaying
-	A precision of 2 will display as "1.00" for example.
+	/** The number of total decimal places for generating the display value string
 	*/
-	virtual int getDisplayPrecision() {return 2;}
+	virtual int getDisplayPrecision();
 
 	/** Returns a string representation of the display value */
 	virtual std::string getDisplayValueString();

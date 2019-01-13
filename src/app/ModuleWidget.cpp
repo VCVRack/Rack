@@ -340,6 +340,7 @@ void ModuleWidget::onHover(const event::Hover &e) {
 	if (glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
 		if (!app()->window->isModPressed() && !app()->window->isShiftPressed()) {
 			ModuleWidget_removeAction(this);
+			e.consume(NULL);
 			return;
 		}
 	}
