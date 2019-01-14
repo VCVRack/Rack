@@ -286,7 +286,7 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgRect(vg,
 			0, box.size.y - 20,
 			65, 20);
-		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.5));
+		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.75));
 		nvgFill(vg);
 
 		std::string cpuText = string::f("%.2f μs", module->cpuTime * 1e6f);

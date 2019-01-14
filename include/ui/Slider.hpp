@@ -8,9 +8,6 @@
 namespace rack {
 
 
-static const float SLIDER_SENSITIVITY = 0.001f;
-
-
 struct Slider : OpaqueWidget {
 	BNDwidgetState state = BND_DEFAULT;
 	Quantity *quantity = NULL;

@@ -4,6 +4,9 @@
 namespace rack {
 
 
+static const float SENSITIVITY = 0.001f;
+
+
 Slider::Slider() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
@@ -26,7 +29,7 @@ void Slider::onDragStart(const event::DragStart &e) {
 
 void Slider::onDragMove(const event::DragMove &e) {
 	if (quantity) {
-		quantity->moveScaledValue(SLIDER_SENSITIVITY * e.mouseDelta.x);
+		quantity->moveScaledValue(SENSITIVITY * e.mouseDelta.x);
 	}
 }
 

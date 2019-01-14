@@ -1,6 +1,6 @@
 #pragma once
 #include "app/common.hpp"
-#include "app/Knob.hpp"
+#include "app/SliderKnob.hpp"
 #include "widgets/FramebufferWidget.hpp"
 #include "widgets/SVGWidget.hpp"
 
@@ -11,7 +11,7 @@ namespace rack {
 /** Behaves like a knob but linearly moves an SVGWidget between two points.
 Can be used for horizontal or vertical linear faders.
 */
-struct SVGSlider : Knob {
+struct SVGSlider : SliderKnob {
 	FramebufferWidget *fb;
 	SVGWidget *background;
 	SVGWidget *handle;

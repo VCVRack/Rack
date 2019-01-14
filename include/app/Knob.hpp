@@ -16,6 +16,7 @@ struct Knob : ParamWidget {
 	bool snap = false;
 	float snapValue = NAN;
 
+	void onHover(const event::Hover &e) override;
 	void onButton(const event::Button &e) override;
 	void onDragStart(const event::DragStart &e) override;
 	void onDragEnd(const event::DragEnd &e) override;

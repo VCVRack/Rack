@@ -10,11 +10,18 @@ namespace rack {
 static const float KNOB_SENSITIVITY = 0.0015f;
 
 
-void Knob::onButton(const event::Button &e) {
-	float r = box.size.x / 2;
+void Knob::onHover(const event::Hover &e) {
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
-	if (dist <= r) {
+	if (dist <= c.x) {
+		ParamWidget::onHover(e);
+	}
+}
+
+void Knob::onButton(const event::Button &e) {
+	math::Vec c = box.size.div(2);
+	float dist = e.pos.minus(c).norm();
+	if (dist <= c.x) {
 		ParamWidget::onButton(e);
 	}
 }

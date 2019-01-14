@@ -19,7 +19,8 @@ void alignedDelete(T *p) {
 
 
 /** Real-valued FFT context
-Wraps PFFFT (https://bitbucket.org/jpommier/pffft/)
+Wrapper for PFFFT (https://bitbucket.org/jpommier/pffft/)
+`length` must be a multiple of 32.
 */
 struct RealFFT {
 	PFFFT_Setup *setup;
@@ -83,6 +84,9 @@ struct RealFFT {
 };
 
 
+/** Complex-valued FFT context
+`length` must be a multiple of 16.
+*/
 struct ComplexFFT {
 	PFFFT_Setup *setup;
 	int length;
