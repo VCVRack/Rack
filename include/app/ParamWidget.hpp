@@ -16,11 +16,13 @@ struct ParamWidget : OpaqueWidget {
 
 	~ParamWidget();
 	void step() override;
-	/** For legacy patch loading */
-	void fromJson(json_t *rootJ);
+	void draw(NVGcontext *vg) override;
 	void onButton(const event::Button &e) override;
 	void onEnter(const event::Enter &e) override;
 	void onLeave(const event::Leave &e) override;
+
+	/** For legacy patch loading */
+	void fromJson(json_t *rootJ);
 };
 
 

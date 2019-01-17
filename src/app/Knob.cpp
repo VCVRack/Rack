@@ -28,9 +28,9 @@ void Knob::onButton(const event::Button &e) {
 
 void Knob::onDragStart(const event::DragStart &e) {
 	if (paramQuantity) {
-		oldValue = paramQuantity->getValue();
+		oldValue = paramQuantity->getSmoothValue();
 		if (snap) {
-			snapValue = oldValue;
+			snapValue = paramQuantity->getValue();
 		}
 	}
 
@@ -41,7 +41,7 @@ void Knob::onDragEnd(const event::DragEnd &e) {
 	app()->window->cursorUnlock();
 
 	if (paramQuantity) {
-		float newValue = paramQuantity->getValue();
+		float newValue = paramQuantity->getSmoothValue();
 		if (oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange *h = new history::ParamChange;
@@ -75,8 +75,11 @@ void Knob::onDragMove(const event::DragMove &e) {
 			snapValue = math::clamp(snapValue, paramQuantity->getMinValue(), paramQuantity->getMaxValue());
 			paramQuantity->setValue(std::round(snapValue));
 		}
-		else {
+		else if (smooth) {
 			paramQuantity->setSmoothValue(paramQuantity->getSmoothValue() + delta);
+		}
+		else {
+			paramQuantity->setValue(paramQuantity->getValue() + delta);
 		}
 	}
 

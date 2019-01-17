@@ -52,6 +52,7 @@ struct Key {
 	int mods;
 };
 
+// Events
 
 struct Text {
 	/** Unicode code point of the character */

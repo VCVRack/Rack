@@ -183,7 +183,7 @@ void CableWidget::draw(NVGcontext *vg) {
 	if (cable && cable->outputModule) {
 		Output *output = &cable->outputModule->outputs[cable->outputId];
 		if (output->numChannels != 1) {
-			thickness = 9;
+			thickness = 7;
 		}
 	}
 

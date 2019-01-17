@@ -16,23 +16,23 @@
 #include <osdialog.h>
 
 #ifdef ARCH_WIN
-	#include <Windows.h>
+#include <Windows.h>
 #endif
 
 using namespace rack;
 
 
 int main(int argc, char *argv[]) {
-	#ifdef ARCH_WIN
-		// Windows global mutex to prevent multiple instances
-		// Handle will be closed by Windows when the process ends
-		HANDLE instanceMutex = CreateMutex(NULL, true, APP_NAME.c_str());
-		if (GetLastError() == ERROR_ALREADY_EXISTS) {
-			osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
-			exit(1);
-		}
-		(void) instanceMutex;
-	#endif
+#ifdef ARCH_WIN
+	// Windows global mutex to prevent multiple instances
+	// Handle will be closed by Windows when the process ends
+	HANDLE instanceMutex = CreateMutex(NULL, true, APP_NAME.c_str());
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
+		exit(1);
+	}
+	(void) instanceMutex;
+#endif
 
 	bool devMode = false;
 	std::string patchFile;
@@ -59,7 +59,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Initialize environment
-	random::init();
 	asset::init(devMode);
 	logger::init(devMode);
 
@@ -70,6 +69,7 @@ int main(int argc, char *argv[]) {
 	INFO("System directory: %s", asset::systemDir.c_str());
 	INFO("User directory: %s", asset::userDir.c_str());
 
+	random::init();
 	midi::init();
 	rtmidiInit();
 	bridgeInit();
@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
 	gamepad::init();
 	ui::init();
 	plugin::init(devMode);
+	INFO("Initialized environment")
 
 	// Initialize app
 	appInit();
@@ -104,21 +105,25 @@ int main(int argc, char *argv[]) {
 		app()->scene->rackWidget->load(patchFile);
 		app()->scene->rackWidget->lastPath = patchFile;
 	}
+	INFO("Initialized app")
 
 	app()->engine->start();
 	app()->window->run();
+	INFO("Window closed");
 	app()->engine->stop();
 
 	// Destroy app
 	app()->scene->rackWidget->save(asset::user("autosave.vcv"));
 	settings::save(asset::user("settings.json"));
 	appDestroy();
+	INFO("Cleaned up app")
 
 	// Destroy environment
 	plugin::destroy();
 	ui::destroy();
 	bridgeDestroy();
 	midi::destroy();
+	INFO("Cleaned up environment")
 	logger::destroy();
 
 	return 0;

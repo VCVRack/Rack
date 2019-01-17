@@ -93,6 +93,22 @@ void ParamWidget::step() {
 	OpaqueWidget::step();
 }
 
+void ParamWidget::draw(NVGcontext *vg) {
+	Widget::draw(vg);
+
+	if (paramQuantity) {
+		nvgBeginPath(vg);
+		nvgRect(vg,
+			box.size.x - 12, box.size.y - 12,
+			12, 12);
+		nvgFillColor(vg, nvgRGBAf(1, 0, 1, 0.9));
+		nvgFill(vg);
+
+		std::string mapText = string::f("%d", paramQuantity->paramId);
+		bndLabel(vg, box.size.x - 17.0, box.size.y - 16.0, INFINITY, INFINITY, -1, mapText.c_str());
+	}
+}
+
 void ParamWidget::fromJson(json_t *rootJ) {
 	json_t *valueJ = json_object_get(rootJ, "value");
 	if (valueJ) {
