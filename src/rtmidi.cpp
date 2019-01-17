@@ -77,7 +77,7 @@ std::string RtMidiDriver::getInputDeviceName(int deviceId) {
 	return "";
 }
 
-midi::InputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, midi::Input *input) {
+midi::InputDevice *RtMidiDriver::subscribeInput(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()))
 		return NULL;
 	RtMidiInputDevice *device = devices[deviceId];
@@ -89,7 +89,7 @@ midi::InputDevice *RtMidiDriver::subscribeInputDevice(int deviceId, midi::Input 
 	return device;
 }
 
-void RtMidiDriver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
+void RtMidiDriver::unsubscribeInput(int deviceId, midi::Input *input) {
 	auto it = devices.find(deviceId);
 	if (it == devices.end())
 		return;

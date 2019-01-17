@@ -34,8 +34,8 @@ struct RtMidiDriver : midi::Driver {
 	std::string getName() override;
 	std::vector<int> getInputDeviceIds() override;
 	std::string getInputDeviceName(int deviceId) override;
-	midi::InputDevice *subscribeInputDevice(int deviceId, midi::Input *input) override;
-	void unsubscribeInputDevice(int deviceId, midi::Input *input) override;
+	midi::InputDevice *subscribeInput(int deviceId, midi::Input *input) override;
+	void unsubscribeInput(int deviceId, midi::Input *input) override;
 };
 
 

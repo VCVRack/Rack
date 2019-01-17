@@ -103,7 +103,7 @@ std::string Driver::getInputDeviceName(int deviceId) {
 	return "";
 }
 
-midi::InputDevice *Driver::subscribeInputDevice(int deviceId, midi::Input *input) {
+midi::InputDevice *Driver::subscribeInput(int deviceId, midi::Input *input) {
 	if (deviceId != 0)
 		return NULL;
 
@@ -111,7 +111,7 @@ midi::InputDevice *Driver::subscribeInputDevice(int deviceId, midi::Input *input
 	return &device;
 }
 
-void Driver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
+void Driver::unsubscribeInput(int deviceId, midi::Input *input) {
 	if (deviceId != 0)
 		return;
 

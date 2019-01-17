@@ -82,7 +82,7 @@ std::string Driver::getInputDeviceName(int deviceId) {
 	return string::f(" %d (unavailable)", deviceId + 1);
 }
 
-midi::InputDevice *Driver::subscribeInputDevice(int deviceId, midi::Input *input) {
+midi::InputDevice *Driver::subscribeInput(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return NULL;
 
@@ -90,7 +90,7 @@ midi::InputDevice *Driver::subscribeInputDevice(int deviceId, midi::Input *input
 	return &devices[deviceId];
 }
 
-void Driver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
+void Driver::unsubscribeInput(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return;
 

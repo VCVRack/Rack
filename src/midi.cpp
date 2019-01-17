@@ -7,6 +7,7 @@ namespace rack {
 namespace midi {
 
 
+/** Preserves the order of IDs */
 static std::vector<int> driverIds;
 static std::map<int, Driver*> drivers;
 
@@ -28,23 +29,27 @@ void InputDevice::unsubscribe(Input *input) {
 
 void InputDevice::onMessage(Message message) {
 	for (Input *input : subscribed) {
-		input->onMessage(message);
+		// Filter channel
+		if (input->channel < 0 || message.status() == 0xf || message.channel() == input->channel) {
+			input->onMessage(message);
+		}
 	}
 }
 
-////////////////////
-// Driver
-////////////////////
+void OutputDevice::subscribe(Output *output) {
+	subscribed.insert(output);
+}
 
+void OutputDevice::unsubscribe(Output *output) {
+	// Remove Output from subscriptions
+	auto it = subscribed.find(output);
+	if (it != subscribed.end())
+		subscribed.erase(it);
+}
 
 ////////////////////
 // IO
 ////////////////////
-
-IO::~IO() {
-	// Because of polymorphic destruction, descendants must call this in their own destructor
-	// setDriverId(-1);
-}
 
 std::vector<int> IO::getDriverIds() {
 	return driverIds;
@@ -59,7 +64,7 @@ std::string IO::getDriverName(int driverId) {
 }
 
 void IO::setDriverId(int driverId) {
-	// Destroy driver
+	// Unset device and driver
 	setDeviceId(-1);
 	if (driver) {
 		driver = NULL;
@@ -79,6 +84,10 @@ std::string IO::getChannelName(int channel) {
 		return "All channels";
 	else
 		return string::f("Channel %d", channel + 1);
+}
+
+void IO::setChannel(int channel) {
+	this->channel = channel;
 }
 
 json_t *IO::toJson() {
@@ -118,6 +127,7 @@ void IO::fromJson(json_t *rootJ) {
 ////////////////////
 
 Input::Input() {
+	// Set first driver as default
 	if (driverIds.size() >= 1) {
 		setDriverId(driverIds[0]);
 	}
@@ -144,24 +154,19 @@ std::string Input::getDeviceName(int deviceId) {
 void Input::setDeviceId(int deviceId) {
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
-		driver->unsubscribeInputDevice(this->deviceId, this);
+		driver->unsubscribeInput(this->deviceId, this);
+		inputDevice = NULL;
 	}
 	this->deviceId = -1;
 
 	// Create device
 	if (driver && deviceId >= 0) {
-		driver->subscribeInputDevice(deviceId, this);
+		inputDevice = driver->subscribeInput(deviceId, this);
 		this->deviceId = deviceId;
 	}
 }
 
 void InputQueue::onMessage(Message message) {
-	// Filter channel
-	if (channel >= 0) {
-		if (message.status() != 0xf && message.channel() != channel)
-			return;
-	}
-
 	// Push to queue
 	if ((int) queue.size() < queueMaxSize)
 		queue.push(message);
@@ -183,15 +188,51 @@ bool InputQueue::shift(Message *message) {
 ////////////////////
 
 Output::Output() {
+	// Set first driver as default
+	if (driverIds.size() >= 1) {
+		setDriverId(driverIds[0]);
+	}
 }
 
 Output::~Output() {
 	setDriverId(-1);
 }
 
-void Output::setDeviceId(int deviceId) {
-	// TODO
+std::vector<int> Output::getDeviceIds() {
+	if (driver) {
+		return driver->getOutputDeviceIds();
+	}
+	return {};
 }
+
+std::string Output::getDeviceName(int deviceId) {
+	if (driver) {
+		return driver->getOutputDeviceName(deviceId);
+	}
+	return "";
+}
+
+void Output::setDeviceId(int deviceId) {
+	// Destroy device
+	if (driver && this->deviceId >= 0) {
+		driver->unsubscribeOutput(this->deviceId, this);
+		outputDevice = NULL;
+	}
+	this->deviceId = -1;
+
+	// Create device
+	if (driver && deviceId >= 0) {
+		outputDevice = driver->subscribeOutput(deviceId, this);
+		this->deviceId = deviceId;
+	}
+}
+
+void Output::sendMessage(Message message) {
+	if (outputDevice) {
+		outputDevice->sendMessage(message);
+	}
+}
+
 
 ////////////////////
 // midi

@@ -386,7 +386,7 @@ std::string BridgeMidiDriver::getInputDeviceName(int deviceId) {
 	return string::f("Port %d", deviceId + 1);
 }
 
-midi::InputDevice *BridgeMidiDriver::subscribeInputDevice(int deviceId, midi::Input *input) {
+midi::InputDevice *BridgeMidiDriver::subscribeInput(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return NULL;
 
@@ -394,7 +394,7 @@ midi::InputDevice *BridgeMidiDriver::subscribeInputDevice(int deviceId, midi::In
 	return &devices[deviceId];
 }
 
-void BridgeMidiDriver::unsubscribeInputDevice(int deviceId, midi::Input *input) {
+void BridgeMidiDriver::unsubscribeInput(int deviceId, midi::Input *input) {
 	if (!(0 <= deviceId && deviceId < 16))
 		return;
 

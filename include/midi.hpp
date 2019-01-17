@@ -30,14 +30,36 @@ struct Message {
 };
 
 ////////////////////
+// Driver
+////////////////////
+
+struct InputDevice;
+struct Input;
+struct OutputDevice;
+struct Output;
+
+struct Driver {
+	virtual ~Driver() {}
+	virtual std::string getName() {return "";}
+
+	virtual std::vector<int> getInputDeviceIds() {return {};}
+	virtual std::string getInputDeviceName(int deviceId) {return "";}
+	virtual InputDevice *subscribeInput(int deviceId, Input *input) {return NULL;}
+	virtual void unsubscribeInput(int deviceId, Input *input) {}
+
+	virtual std::vector<int> getOutputDeviceIds() {return {};}
+	virtual std::string getOutputDeviceName(int deviceId) {return "";}
+	virtual OutputDevice *subscribeOutput(int deviceId, Output *output) {return NULL;}
+	virtual void unsubscribeOutput(int deviceId, Output *output) {}
+};
+
+////////////////////
 // Device
 ////////////////////
 
 struct Device {
 	virtual ~Device() {}
 };
-
-struct Input;
 
 struct InputDevice : Device {
 	std::set<Input*> subscribed;
@@ -47,26 +69,10 @@ struct InputDevice : Device {
 };
 
 struct OutputDevice : Device {
-	// TODO
-};
-
-////////////////////
-// Driver
-////////////////////
-
-struct Driver {
-	virtual ~Driver() {}
-	virtual std::string getName() {return "";}
-
-	virtual std::vector<int> getInputDeviceIds() {return {};}
-	virtual std::string getInputDeviceName(int deviceId) {return "";}
-	virtual InputDevice *subscribeInputDevice(int deviceId, Input *input) {return NULL;}
-	virtual void unsubscribeInputDevice(int deviceId, Input *input) {}
-
-	// virtual std::vector<int> getOutputDeviceIds() = 0;
-	// virtual std::string getOutputDeviceName(int deviceId) = 0;
-	// virtual OutputDevice *subscribeOutputDevice(int deviceId, Output *midiOutput) = 0;
-	// virtual void unsubscribeOutputDevice(int deviceId, Output *midiOutput) = 0;
+	std::set<Output*> subscribed;
+	void subscribe(Output *input);
+	void unsubscribe(Output *input);
+	virtual void sendMessage(Message message) {}
 };
 
 ////////////////////
@@ -85,7 +91,8 @@ struct IO {
 	/** Not owned */
 	Driver *driver = NULL;
 
-	virtual ~IO();
+	/** Remember to call setDriverId(-1) in subclass destructors. */
+	virtual ~IO() {}
 
 	std::vector<int> getDriverIds();
 	std::string getDriverName(int driverId);
@@ -96,12 +103,17 @@ struct IO {
 	virtual void setDeviceId(int deviceId) = 0;
 
 	std::string getChannelName(int channel);
+	void setChannel(int channel);
+
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 };
 
 
 struct Input : IO {
+	/** Not owned */
+	InputDevice *inputDevice = NULL;
+
 	Input();
 	~Input();
 
@@ -122,9 +134,17 @@ struct InputQueue : Input {
 
 
 struct Output : IO {
+	/** Not owned */
+	OutputDevice *outputDevice = NULL;
+
 	Output();
 	~Output();
+
+	std::vector<int> getDeviceIds() override;
+	std::string getDeviceName(int deviceId) override;
 	void setDeviceId(int deviceId) override;
+
+	void sendMessage(Message message);
 };
 
 
