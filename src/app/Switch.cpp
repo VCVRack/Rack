@@ -7,11 +7,27 @@
 namespace rack {
 
 
+void Switch::step() {
+	if (momentaryPressed) {
+		momentaryPressed = false;
+		// Wait another frame.
+	}
+	else if (momentaryReleased) {
+		momentaryReleased = false;
+		if (paramQuantity) {
+			// Set to minimum value
+			paramQuantity->setMin();
+		}
+	}
+	ParamWidget::step();
+}
+
 void Switch::onDragStart(const event::DragStart &e) {
 	if (momentary) {
 		if (paramQuantity) {
 			// Set to maximum value
 			paramQuantity->setMax();
+			momentaryPressed = true;
 		}
 	}
 	else {
@@ -41,10 +57,7 @@ void Switch::onDragStart(const event::DragStart &e) {
 
 void Switch::onDragEnd(const event::DragEnd &e) {
 	if (momentary) {
-		if (paramQuantity) {
-			// Set to minimum value
-			paramQuantity->setMin();
-		}
+		momentaryReleased = true;
 	}
 }
 

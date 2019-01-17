@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 	gamepad::init();
 	ui::init();
 	plugin::init(devMode);
-	INFO("Initialized environment")
+	INFO("Initialized environment");
 
 	// Initialize app
 	appInit();
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 		app()->scene->rackWidget->load(patchFile);
 		app()->scene->rackWidget->lastPath = patchFile;
 	}
-	INFO("Initialized app")
+	INFO("Initialized app");
 
 	app()->engine->start();
 	app()->window->run();
@@ -116,14 +116,14 @@ int main(int argc, char *argv[]) {
 	app()->scene->rackWidget->save(asset::user("autosave.vcv"));
 	settings::save(asset::user("settings.json"));
 	appDestroy();
-	INFO("Cleaned up app")
+	INFO("Cleaned up app");
 
 	// Destroy environment
 	plugin::destroy();
 	ui::destroy();
 	bridgeDestroy();
 	midi::destroy();
-	INFO("Cleaned up environment")
+	INFO("Cleaned up environment");
 	logger::destroy();
 
 	return 0;

@@ -10,7 +10,11 @@ namespace rack {
 struct Switch : ParamWidget {
 	/** Return to original position when released */
 	bool momentary = false;
+	/** Hysteresis state for momentary switch */
+	bool momentaryPressed = false;
+	bool momentaryReleased = false;
 
+	void step() override;
 	void onDragStart(const event::DragStart &e) override;
 	void onDragEnd(const event::DragEnd &e) override;
 };
