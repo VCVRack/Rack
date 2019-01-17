@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "random.hpp"
 #include "asset.hpp"
+#include "midi.hpp"
 #include "rtmidi.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"

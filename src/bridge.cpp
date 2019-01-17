@@ -1,4 +1,5 @@
 #include "bridge.hpp"
+#include "midi.hpp"
 #include "string.hpp"
 #include "dsp/ringbuffer.hpp"
 
@@ -19,12 +20,55 @@
 namespace rack {
 
 
+struct BridgeMidiDriver;
+
+
 struct BridgeClientConnection;
 static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
 static audio::IO *audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverRunning = false;
 static BridgeMidiDriver *driver = NULL;
+
+
+struct BridgeMidiInputDevice : midi::InputDevice {
+};
+
+
+struct BridgeMidiDriver : midi::Driver {
+	BridgeMidiInputDevice devices[16];
+
+	std::string getName() override {return "Bridge";}
+
+	std::vector<int> getInputDeviceIds() override {
+		std::vector<int> deviceIds;
+		for (int i = 0; i < 16; i++) {
+			deviceIds.push_back(i);
+		}
+		return deviceIds;
+	}
+
+	std::string getInputDeviceName(int deviceId) override {
+		if (deviceId < 0)
+			return "";
+		return string::f("Port %d", deviceId + 1);
+	}
+
+	midi::InputDevice *subscribeInput(int deviceId, midi::Input *input) override {
+		if (!(0 <= deviceId && deviceId < 16))
+			return NULL;
+
+		devices[deviceId].subscribe(input);
+		return &devices[deviceId];
+	}
+
+	void unsubscribeInput(int deviceId, midi::Input *input) override {
+		if (!(0 <= deviceId && deviceId < 16))
+			return;
+
+		devices[deviceId].unsubscribe(input);
+	}
+};
 
 
 struct BridgeClientConnection {
@@ -369,36 +413,6 @@ static void serverRun() {
 		std::this_thread::sleep_for(std::chrono::duration<double>(0.1));
 		serverConnect();
 	}
-}
-
-
-std::vector<int> BridgeMidiDriver::getInputDeviceIds() {
-	std::vector<int> deviceIds;
-	for (int i = 0; i < 16; i++) {
-		deviceIds.push_back(i);
-	}
-	return deviceIds;
-}
-
-std::string BridgeMidiDriver::getInputDeviceName(int deviceId) {
-	if (deviceId < 0)
-		return "";
-	return string::f("Port %d", deviceId + 1);
-}
-
-midi::InputDevice *BridgeMidiDriver::subscribeInput(int deviceId, midi::Input *input) {
-	if (!(0 <= deviceId && deviceId < 16))
-		return NULL;
-
-	devices[deviceId].subscribe(input);
-	return &devices[deviceId];
-}
-
-void BridgeMidiDriver::unsubscribeInput(int deviceId, midi::Input *input) {
-	if (!(0 <= deviceId && deviceId < 16))
-		return;
-
-	devices[deviceId].unsubscribe(input);
 }
 
 
