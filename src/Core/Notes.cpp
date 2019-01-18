@@ -7,7 +7,8 @@ using namespace rack;
 struct NotesWidget : ModuleWidget {
 	TextField *textField;
 
-	NotesWidget(Module *module) : ModuleWidget(module) {
+	NotesWidget(Module *module) {
+		setModule(module);
 		setPanel(SVG::load(asset::system("res/Core/Notes.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));

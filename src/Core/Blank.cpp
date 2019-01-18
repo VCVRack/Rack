@@ -83,7 +83,8 @@ struct BlankWidget : ModuleWidget {
 	Widget *bottomRightScrew;
 	Widget *rightHandle;
 
-	BlankWidget(Module *module) : ModuleWidget(module) {
+	BlankWidget(Module *module) {
+		setModule(module);
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
 		panel = new BlankPanel;

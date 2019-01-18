@@ -53,7 +53,9 @@ void Scene::step() {
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 	moduleBrowser->box.size = box.size;
 
-	zoomWidget->setZoom(settings::zoom);
+	// Set zoom every few frames
+	if (app()->window->frame % 10 == 0)
+		zoomWidget->setZoom(settings::zoom);
 
 	// Request latest version from server
 	if (!devMode && checkVersion && !checkedVersion) {

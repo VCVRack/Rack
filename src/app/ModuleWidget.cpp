@@ -15,14 +15,14 @@
 namespace rack {
 
 
-ModuleWidget::ModuleWidget(Module *module) {
-	this->module = module;
-}
-
 ModuleWidget::~ModuleWidget() {
 	if (module) {
 		delete module;
 	}
+}
+
+void ModuleWidget::setModule(Module *module) {
+	this->module = module;
 }
 
 void ModuleWidget::addInput(PortWidget *input) {

@@ -33,6 +33,18 @@ struct Port {
 	void setVoltage(float voltage, int channel = 0) {
 		values[channel] = voltage;
 	}
+
+	void setChannels(int channels) {
+		// Set higher channel values to 0
+		for (int c = channels; c < this->channels; c++) {
+			values[c] = 0.f;
+		}
+		this->channels = channels;
+	}
+
+	int getChannels() {
+		return channels;
+	}
 };
 
 

@@ -24,8 +24,13 @@ struct ModuleWidget : OpaqueWidget {
 	math::Vec dragPos;
 	math::Vec oldPos;
 
-	ModuleWidget(Module *module);
+	ModuleWidget() {}
+	DEPRECATED ModuleWidget(Module *module) {
+		setModule(module);
+	}
 	~ModuleWidget();
+
+	void setModule(Module *module);
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addInput(PortWidget *input);
 	void addOutput(PortWidget *output);

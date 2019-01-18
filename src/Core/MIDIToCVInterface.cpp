@@ -259,7 +259,8 @@ struct MIDIToCVInterface : Module {
 
 
 struct MIDIToCVInterfaceWidget : ModuleWidget {
-	MIDIToCVInterfaceWidget(MIDIToCVInterface *module) : ModuleWidget(module) {
+	MIDIToCVInterfaceWidget(MIDIToCVInterface *module) {
+		setModule(module);
 		setPanel(SVG::load(asset::system("res/Core/MIDIToCVInterface.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));

@@ -235,7 +235,7 @@ struct CV_MIDI : Module {
 	}
 
 	void step() override {
-		for (int c = 0; c < inputs[PITCH_INPUT].channels; c++) {
+		for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
 			int vel = (int) std::round(inputs[VEL_INPUT].normalize(10.f * 100 / 127, c) / 10.f * 127);
 			vel = clamp(vel, 0, 127);
 			midiOutput.setVel(vel, c);
@@ -286,7 +286,8 @@ struct CV_MIDI : Module {
 
 
 struct CV_MIDIWidget : ModuleWidget {
-	CV_MIDIWidget(CV_MIDI *module) : ModuleWidget(module) {
+	CV_MIDIWidget(CV_MIDI *module) {
+		setModule(module);
 		setPanel(SVG::load(asset::system("res/Core/CV-MIDI.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
