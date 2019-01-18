@@ -6,6 +6,7 @@
 #include "app/RackScrollWidget.hpp"
 #include "app.hpp"
 #include "history.hpp"
+#include "settings.hpp"
 #include <thread>
 
 
@@ -51,6 +52,8 @@ void Scene::step() {
 
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 	moduleBrowser->box.size = box.size;
+
+	zoomWidget->setZoom(settings::zoom);
 
 	// Request latest version from server
 	if (!devMode && checkVersion && !checkedVersion) {

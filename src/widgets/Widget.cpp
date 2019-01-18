@@ -6,6 +6,7 @@
 
 namespace rack {
 
+
 Widget::~Widget() {
 	// You should only delete orphaned widgets
 	assert(!parent);

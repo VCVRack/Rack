@@ -8,33 +8,10 @@ namespace rack {
 struct ZoomWidget : Widget {
 	float zoom = 1.f;
 
-	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override {
-		return Widget::getRelativeOffset(v.mult(zoom), relative);
-	}
-
-	math::Rect getViewport(math::Rect r) override {
-		r.pos = r.pos.mult(zoom);
-		r.size = r.size.mult(zoom);
-		r = Widget::getViewport(r);
-		r.pos = r.pos.div(zoom);
-		r.size = r.size.div(zoom);
-		return r;
-	}
-
-	void setZoom(float zoom) {
-		this->zoom = zoom;
-
-		event::Context eZoomContext;
-		event::Zoom eZoom;
-		eZoom.context = &eZoomContext;
-		Widget::onZoom(eZoom);
-	}
-
-	void draw(NVGcontext *vg) override {
-		// No need to save the state because that is done in the parent
-		nvgScale(vg, zoom, zoom);
-		Widget::draw(vg);
-	}
+	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override;
+	math::Rect getViewport(math::Rect r) override;
+	void setZoom(float zoom);
+	void draw(NVGcontext *vg) override;
 
 	void onHover(const event::Hover &e) override {
 		event::Hover e2 = e;

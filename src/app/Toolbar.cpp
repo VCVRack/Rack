@@ -152,7 +152,6 @@ struct ZoomQuantity : Quantity {
 	void setDisplayValue(float displayValue) override {setValue(displayValue / 100.0);}
 	std::string getLabel() override {return "Zoom";}
 	std::string getUnit() override {return "%";}
-	int getDisplayPrecision() override {return 0;}
 };
 
 
@@ -168,7 +167,6 @@ struct CableOpacityQuantity : Quantity {
 	void setDisplayValue(float displayValue) override {setValue(displayValue / 100.0);}
 	std::string getLabel() override {return "Cable opacity";}
 	std::string getUnit() override {return "%";}
-	int getDisplayPrecision() override {return 0;}
 };
 
 
