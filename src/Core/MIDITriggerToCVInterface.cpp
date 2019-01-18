@@ -39,6 +39,7 @@ struct MIDITriggerToCVInterface : Module {
 			learnedNotes[i] = i + 36;
 		}
 		learningId = -1;
+		midiInput.reset();
 	}
 
 	void pressNote(uint8_t note, uint8_t vel) {

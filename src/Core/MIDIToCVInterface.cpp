@@ -98,6 +98,7 @@ struct MIDIToCVInterface : Module {
 		clock = 0;
 		divisions[0] = 24;
 		divisions[1] = 6;
+		midiInput.reset();
 	}
 
 	void pressNote(uint8_t note) {

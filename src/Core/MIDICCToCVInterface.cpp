@@ -37,6 +37,7 @@ struct MIDICCToCVInterface : Module {
 			ccs[i] = i;
 		}
 		learningId = -1;
+		midiInput.reset();
 	}
 
 	void step() override {

@@ -130,6 +130,7 @@ struct Input : IO {
 	Input();
 	~Input();
 
+	void reset();
 	std::vector<int> getDeviceIds() override;
 	std::string getDeviceName(int deviceId) override;
 	void setDeviceId(int deviceId) override;
@@ -155,6 +156,7 @@ struct Output : IO {
 	Output();
 	~Output();
 
+	void reset();
 	std::vector<int> getDeviceIds() override;
 	std::string getDeviceName(int deviceId) override;
 	void setDeviceId(int deviceId) override;

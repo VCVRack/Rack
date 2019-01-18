@@ -82,6 +82,7 @@ struct QuadMIDIToCVInterface : Module {
 		pedal = false;
 		rotateIndex = -1;
 		cachedNotes.clear();
+		midiInput.reset();
 	}
 
 	int getPolyIndex(int nowIndex) {

@@ -127,15 +127,19 @@ void IO::fromJson(json_t *rootJ) {
 ////////////////////
 
 Input::Input() {
+	reset();
+}
+
+Input::~Input() {
+	setDriverId(-1);
+}
+
+void Input::reset() {
 	channel = -1;
 	// Set first driver as default
 	if (driverIds.size() >= 1) {
 		setDriverId(driverIds[0]);
 	}
-}
-
-Input::~Input() {
-	setDriverId(-1);
 }
 
 std::vector<int> Input::getDeviceIds() {
@@ -197,15 +201,19 @@ bool InputQueue::shift(Message *message) {
 ////////////////////
 
 Output::Output() {
+	reset();
+}
+
+Output::~Output() {
+	setDriverId(-1);
+}
+
+void Output::reset() {
 	channel = 0;
 	// Set first driver as default
 	if (driverIds.size() >= 1) {
 		setDriverId(driverIds[0]);
 	}
-}
-
-Output::~Output() {
-	setDriverId(-1);
 }
 
 std::vector<int> Output::getDeviceIds() {
