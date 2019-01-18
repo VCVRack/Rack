@@ -258,24 +258,24 @@ struct QuadMIDIToCVInterface : Module {
 	}
 
 	void processMessage(midi::Message msg) {
-		switch (msg.status()) {
+		switch (msg.getStatus()) {
 			// note off
 			case 0x8: {
-				releaseNote(msg.note());
+				releaseNote(msg.getNote());
 			} break;
 			// note on
 			case 0x9: {
-				if (msg.value() > 0) {
-					noteData[msg.note()].velocity = msg.value();
-					pressNote(msg.note());
+				if (msg.getValue() > 0) {
+					noteData[msg.getNote()].velocity = msg.getValue();
+					pressNote(msg.getNote());
 				}
 				else {
-					releaseNote(msg.note());
+					releaseNote(msg.getNote());
 				}
 			} break;
 			// channel aftertouch
 			case 0xa: {
-				noteData[msg.note()].aftertouch = msg.value();
+				noteData[msg.getNote()].aftertouch = msg.getValue();
 			} break;
 			// cc
 			case 0xb: {
@@ -286,10 +286,10 @@ struct QuadMIDIToCVInterface : Module {
 	}
 
 	void processCC(midi::Message msg) {
-		switch (msg.note()) {
+		switch (msg.getNote()) {
 			// sustain
 			case 0x40: {
-				if (msg.value() >= 64)
+				if (msg.getValue() >= 64)
 					pressPedal();
 				else
 					releasePedal();

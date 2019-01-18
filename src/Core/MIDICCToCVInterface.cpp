@@ -70,10 +70,10 @@ struct MIDICCToCVInterface : Module {
 	}
 
 	void processMessage(midi::Message msg) {
-		switch (msg.status()) {
+		switch (msg.getStatus()) {
 			// cc
 			case 0xb: {
-				uint8_t cc = msg.note();
+				uint8_t cc = msg.getNote();
 				// Learn
 				if (learningId >= 0 && values[cc] != msg.data2) {
 					ccs[learningId] = cc;

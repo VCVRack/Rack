@@ -45,9 +45,9 @@ struct PolyphonicMidiOutput : midi::Output {
 		for (int note = 0; note <= 127; note++) {
 			// Note off
 			midi::Message m;
-			m.cmd = 0x8;
-			m.data1 = note;
-			m.data2 = 0;
+			m.setStatus(0x8);
+			m.setNote(note);
+			m.setValue(0);
 			sendMessage(m);
 		}
 	}
@@ -71,17 +71,17 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (changedNote || enabledGate) {
 			// Note on
 			midi::Message m;
-			m.cmd = 0x9;
-			m.data1 = notes[c];
-			m.data2 = vels[c];
+			m.setStatus(0x9);
+			m.setNote(notes[c]);
+			m.setValue(vels[c]);
 			sendMessage(m);
 		}
 		if (changedNote || disabledGate) {
 			// Note off
 			midi::Message m;
-			m.cmd = 0x8;
-			m.data1 = lastNotes[c];
-			m.data2 = vels[c];
+			m.setStatus(0x8);
+			m.setNote(lastNotes[c]);
+			m.setValue(vels[c]);
 			sendMessage(m);
 		}
 		lastNotes[c] = notes[c];
@@ -94,9 +94,9 @@ struct PolyphonicMidiOutput : midi::Output {
 		lastAfts[c] = aft;
 		// Polyphonic key pressure
 		midi::Message m;
-		m.cmd = 0xa;
-		m.data1 = notes[c];
-		m.data2 = aft;
+		m.setStatus(0xa);
+		m.setNote(notes[c]);
+		m.setValue(aft);
 		sendMessage(m);
 	}
 
@@ -106,9 +106,9 @@ struct PolyphonicMidiOutput : midi::Output {
 		lastPw = pw;
 		// Pitch wheel
 		midi::Message m;
-		m.cmd = 0xe;
-		m.data1 = pw & 0x7f;
-		m.data2 = (pw >> 7) & 0x7f;
+		m.setStatus(0xe);
+		m.setNote(pw & 0x7f);
+		m.setValue((pw >> 7) & 0x7f);
 		sendMessage(m);
 	}
 
@@ -118,9 +118,9 @@ struct PolyphonicMidiOutput : midi::Output {
 		lastMw = mw;
 		// CC Mod wheel
 		midi::Message m;
-		m.cmd = 0xb;
-		m.data1 = 0x01;
-		m.data2 = mw;
+		m.setStatus(0xb);
+		m.setNote(0x01);
+		m.setValue(mw);
 		sendMessage(m);
 	}
 
@@ -131,8 +131,8 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (clk) {
 			// Timing clock
 			midi::Message m;
-			m.cmd = 0xf;
-			m.data1 = 0x8;
+			m.setStatus(0xf);
+			m.setChannel(0x8);
 			sendMessage(m);
 		}
 	}
@@ -143,9 +143,9 @@ struct PolyphonicMidiOutput : midi::Output {
 		lastVol = vol;
 		// CC Volume
 		midi::Message m;
-		m.cmd = 0xb;
-		m.data1 = 0x07;
-		m.data2 = vol;
+		m.setStatus(0xb);
+		m.setNote(0x07);
+		m.setValue(vol);
 		sendMessage(m);
 	}
 
@@ -155,9 +155,9 @@ struct PolyphonicMidiOutput : midi::Output {
 		lastPan = pan;
 		// CC Pan
 		midi::Message m;
-		m.cmd = 0xb;
-		m.data1 = 0x0a;
-		m.data2 = pan;
+		m.setStatus(0xb);
+		m.setNote(0x0a);
+		m.setValue(pan);
 		sendMessage(m);
 	}
 
@@ -168,8 +168,8 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (start) {
 			// Start
 			midi::Message m;
-			m.cmd = 0xf;
-			m.data1 = 0xa;
+			m.setStatus(0xf);
+			m.setChannel(0xa);
 			sendMessage(m);
 		}
 	}
@@ -181,8 +181,8 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (stop) {
 			// Stop
 			midi::Message m;
-			m.cmd = 0xf;
-			m.data1 = 0xb;
+			m.setStatus(0xf);
+			m.setChannel(0xb);
 			sendMessage(m);
 		}
 	}
@@ -194,8 +194,8 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (cont) {
 			// Continue
 			midi::Message m;
-			m.cmd = 0xf;
-			m.data1 = 0xc;
+			m.setStatus(0xf);
+			m.setChannel(0xc);
 			sendMessage(m);
 		}
 	}

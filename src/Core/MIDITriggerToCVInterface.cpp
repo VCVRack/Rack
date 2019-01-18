@@ -89,19 +89,19 @@ struct MIDITriggerToCVInterface : Module {
 	}
 
 	void processMessage(midi::Message msg) {
-		switch (msg.status()) {
+		switch (msg.getStatus()) {
 			// note off
 			case 0x8: {
-				releaseNote(msg.note());
+				releaseNote(msg.getNote());
 			} break;
 			// note on
 			case 0x9: {
-				if (msg.value() > 0) {
-					pressNote(msg.note(), msg.value());
+				if (msg.getValue() > 0) {
+					pressNote(msg.getNote(), msg.getValue());
 				}
 				else {
 					// Many stupid keyboards send a "note on" command with 0 velocity to mean "note release"
-					releaseNote(msg.note());
+					releaseNote(msg.getNote());
 				}
 			} break;
 			default: break;

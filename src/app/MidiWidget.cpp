@@ -112,7 +112,7 @@ struct MidiChannelChoice : LedDisplayChoice {
 
 		Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI channel"));
-		for (int channel = -1; channel < 16; channel++) {
+		for (int channel : midiWidget->midiIO->getChannels()) {
 			MidiChannelItem *item = new MidiChannelItem;
 			item->midiIO = midiWidget->midiIO;
 			item->channel = channel;

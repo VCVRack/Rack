@@ -30,7 +30,7 @@ void InputDevice::unsubscribe(Input *input) {
 void InputDevice::onMessage(Message message) {
 	for (Input *input : subscribed) {
 		// Filter channel
-		if (input->channel < 0 || message.status() == 0xf || message.channel() == input->channel) {
+		if (input->channel < 0 || message.getStatus() == 0xf || message.getChannel() == input->channel) {
 			input->onMessage(message);
 		}
 	}
@@ -127,6 +127,7 @@ void IO::fromJson(json_t *rootJ) {
 ////////////////////
 
 Input::Input() {
+	channel = -1;
 	// Set first driver as default
 	if (driverIds.size() >= 1) {
 		setDriverId(driverIds[0]);
@@ -166,6 +167,14 @@ void Input::setDeviceId(int deviceId) {
 	}
 }
 
+std::vector<int> Input::getChannels() {
+	std::vector<int> channels;
+	for (int c = -1; c < 16; c++) {
+		channels.push_back(c);
+	}
+	return channels;
+}
+
 void InputQueue::onMessage(Message message) {
 	// Push to queue
 	if ((int) queue.size() < queueMaxSize)
@@ -188,6 +197,7 @@ bool InputQueue::shift(Message *message) {
 ////////////////////
 
 Output::Output() {
+	channel = 0;
 	// Set first driver as default
 	if (driverIds.size() >= 1) {
 		setDriverId(driverIds[0]);
@@ -227,7 +237,19 @@ void Output::setDeviceId(int deviceId) {
 	}
 }
 
+std::vector<int> Output::getChannels() {
+	std::vector<int> channels;
+	for (int c = 0; c < 16; c++) {
+		channels.push_back(c);
+	}
+	return channels;
+}
+
 void Output::sendMessage(Message message) {
+	// Set channel
+	if (message.getStatus() != 0xf) {
+		message.setChannel(channel);
+	}
 	// DEBUG("sendMessage %02x %02x %02x", message.cmd, message.data1, message.data2);
 	if (outputDevice) {
 		outputDevice->sendMessage(message);

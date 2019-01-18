@@ -166,28 +166,28 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processMessage(midi::Message msg) {
-		// DEBUG("MIDI: %01x %01x %02x %02x", msg.status(), msg.channel(), msg.note(), msg.value());
+		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.channel(), msg.getNote(), msg.getValue());
 
-		switch (msg.status()) {
+		switch (msg.getStatus()) {
 			// note off
 			case 0x8: {
-				releaseNote(msg.note());
+				releaseNote(msg.getNote());
 			} break;
 			// note on
 			case 0x9: {
-				if (msg.value() > 0) {
-					noteData[msg.note()].velocity = msg.value();
-					pressNote(msg.note());
+				if (msg.getValue() > 0) {
+					noteData[msg.getNote()].velocity = msg.getValue();
+					pressNote(msg.getNote());
 				}
 				else {
 					// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
-					releaseNote(msg.note());
+					releaseNote(msg.getNote());
 				}
 			} break;
 			// channel aftertouch
 			case 0xa: {
-				uint8_t note = msg.note();
-				noteData[note].aftertouch = msg.value();
+				uint8_t note = msg.getNote();
+				noteData[note].aftertouch = msg.getValue();
 			} break;
 			// cc
 			case 0xb: {
@@ -195,7 +195,7 @@ struct MIDIToCVInterface : Module {
 			} break;
 			// pitch wheel
 			case 0xe: {
-				pitch = msg.value() * 128 + msg.note();
+				pitch = msg.getValue() * 128 + msg.getNote();
 			} break;
 			case 0xf: {
 				processSystem(msg);
@@ -205,14 +205,14 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processCC(midi::Message msg) {
-		switch (msg.note()) {
+		switch (msg.getNote()) {
 			// mod
 			case 0x01: {
-				mod = msg.value();
+				mod = msg.getValue();
 			} break;
 			// sustain
 			case 0x40: {
-				if (msg.value() >= 64)
+				if (msg.getValue() >= 64)
 					pressPedal();
 				else
 					releasePedal();
@@ -222,7 +222,7 @@ struct MIDIToCVInterface : Module {
 	}
 
 	void processSystem(midi::Message msg) {
-		switch (msg.channel()) {
+		switch (msg.getChannel()) {
 			// Timing
 			case 0x8: {
 				if (clock % divisions[0] == 0) {

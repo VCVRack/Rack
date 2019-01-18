@@ -15,17 +15,29 @@ struct Message {
 	uint8_t data1 = 0x00;
 	uint8_t data2 = 0x00;
 
-	uint8_t channel() {
+	uint8_t getChannel() {
 		return cmd & 0xf;
 	}
-	uint8_t status() {
+	void setChannel(uint8_t channel) {
+		cmd = (cmd & 0xf0) | (channel & 0xf);
+	}
+	uint8_t getStatus() {
 		return (cmd >> 4) & 0xf;
 	}
-	uint8_t note() {
+	void setStatus(uint8_t status) {
+		cmd = (cmd & 0xf) | ((status << 4) & 0xf0);
+	}
+	uint8_t getNote() {
 		return data1 & 0x7f;
 	}
-	uint8_t value() {
+	void setNote(uint8_t note) {
+		data1 = note & 0x7f;
+	}
+	uint8_t getValue() {
 		return data2 & 0x7f;
+	}
+	void setValue(uint8_t value) {
+		data2 = value & 0x7f;
 	}
 };
 
@@ -102,6 +114,7 @@ struct IO {
 	virtual std::string getDeviceName(int deviceId) = 0;
 	virtual void setDeviceId(int deviceId) = 0;
 
+	virtual std::vector<int> getChannels() = 0;
 	std::string getChannelName(int channel);
 	void setChannel(int channel);
 
@@ -120,6 +133,8 @@ struct Input : IO {
 	std::vector<int> getDeviceIds() override;
 	std::string getDeviceName(int deviceId) override;
 	void setDeviceId(int deviceId) override;
+	std::vector<int> getChannels() override;
+
 	virtual void onMessage(Message message) {}
 };
 
@@ -143,6 +158,7 @@ struct Output : IO {
 	std::vector<int> getDeviceIds() override;
 	std::string getDeviceName(int deviceId) override;
 	void setDeviceId(int deviceId) override;
+	std::vector<int> getChannels() override;
 
 	void sendMessage(Message message);
 };
