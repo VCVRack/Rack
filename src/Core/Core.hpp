@@ -10,6 +10,7 @@ extern Model *modelMIDIToCVInterface;
 extern Model *modelQuadMIDIToCVInterface;
 extern Model *modelMIDICCToCVInterface;
 extern Model *modelMIDITriggerToCVInterface;
+extern Model *modelCV_MIDI;
 extern Model *modelBlank;
 extern Model *modelNotes;
 

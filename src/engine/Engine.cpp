@@ -131,7 +131,7 @@ static void Engine_step(Engine *engine) {
 		if (module->bypass) {
 			// Bypass module
 			for (Output &output : module->outputs) {
-				output.numChannels = 1;
+				output.channels = 1;
 				output.setVoltage(0.f);
 			}
 			module->cpuTime = 0.f;

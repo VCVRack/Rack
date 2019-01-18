@@ -8,9 +8,9 @@ void Cable::step() {
 	Output *output = &outputModule->outputs[outputId];
 	Input *input = &inputModule->inputs[inputId];
 	// Match number of polyphonic channels to output port
-	input->numChannels = output->numChannels;
+	input->channels = output->channels;
 	// Copy values from output to input
-	for (int i = 0; i < output->numChannels; i++) {
+	for (int i = 0; i < output->channels; i++) {
 		input->values[i] = output->values[i];
 	}
 }

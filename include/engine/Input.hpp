@@ -8,8 +8,8 @@ namespace rack {
 
 struct Input : Port {
 	/** Returns the value if a cable is plugged in, otherwise returns the given default value */
-	float normalize(float normalVoltage, int index = 0) {
-		return active ? getVoltage(index) : normalVoltage;
+	float normalize(float normalVoltage, int channel = 0) {
+		return active ? getVoltage(channel) : normalVoltage;
 	}
 };
 

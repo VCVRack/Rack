@@ -18,17 +18,20 @@ struct Port {
 		float value;
 		float values[PORT_MAX_CHANNELS] = {};
 	};
-	/** Number of polyphonic channels */
-	int numChannels = 1;
+	/** Number of polyphonic channels
+	May be 0 to PORT_MAX_CHANNELS.
+	*/
+	int channels = 1;
 	/** Whether a cable is plugged in */
 	bool active = false;
 	Light plugLights[2];
 
-	float getVoltage(int index = 0) {
-		return values[index];
+	float getVoltage(int channel = 0) {
+		return values[channel];
 	}
-	void setVoltage(float voltage, int index = 0) {
-		values[index] = voltage;
+
+	void setVoltage(float voltage, int channel = 0) {
+		values[channel] = voltage;
 	}
 };
 

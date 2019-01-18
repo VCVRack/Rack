@@ -38,6 +38,11 @@ void init(rack::Plugin *p) {
 	modelMIDITriggerToCVInterface->tags = {"External", "MIDI"};
 	p->addModel(modelMIDITriggerToCVInterface);
 
+	modelCV_MIDI->name = "CV-MIDI";
+	modelCV_MIDI->description = "";
+	modelCV_MIDI->tags = {"External", "MIDI"};
+	p->addModel(modelCV_MIDI);
+
 	modelBlank->name = "Blank";
 	modelBlank->description = "";
 	modelBlank->tags = {"Blank"};

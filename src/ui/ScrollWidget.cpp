@@ -69,30 +69,6 @@ void ScrollWidget::step() {
 }
 
 void ScrollWidget::onHover(const event::Hover &e) {
-	// Scroll with arrow keys
-	if (!app()->event->selectedWidget) {
-		float arrowSpeed = 30.0;
-		if (app()->window->isShiftPressed() && app()->window->isModPressed())
-			arrowSpeed /= 16.0;
-		else if (app()->window->isShiftPressed())
-			arrowSpeed *= 4.0;
-		else if (app()->window->isModPressed())
-			arrowSpeed /= 4.0;
-
-		if (glfwGetKey(app()->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
-			offset.x -= arrowSpeed;
-		}
-		if (glfwGetKey(app()->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-			offset.x += arrowSpeed;
-		}
-		if (glfwGetKey(app()->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
-			offset.y -= arrowSpeed;
-		}
-		if (glfwGetKey(app()->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
-			offset.y += arrowSpeed;
-		}
-	}
-
 	OpaqueWidget::onHover(e);
 }
 

@@ -228,6 +228,7 @@ void Output::setDeviceId(int deviceId) {
 }
 
 void Output::sendMessage(Message message) {
+	// DEBUG("sendMessage %02x %02x %02x", message.cmd, message.data1, message.data2);
 	if (outputDevice) {
 		outputDevice->sendMessage(message);
 	}

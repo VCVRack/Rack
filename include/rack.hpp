@@ -9,6 +9,7 @@
 #include "asset.hpp"
 #include "window.hpp"
 #include "app.hpp"
+#include "midi.hpp"
 #include "helpers.hpp"
 
 #include "widgets/Widget.hpp"
