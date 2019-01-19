@@ -591,11 +591,11 @@ void RackWidget::draw(NVGcontext *vg) {
 void RackWidget::onHover(const event::Hover &e) {
 	// Scroll with arrow keys
 	float arrowSpeed = 30.0;
-	if (app()->window->isShiftPressed() && app()->window->isModPressed())
+	if ((app()->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
 		arrowSpeed /= 16.0;
-	else if (app()->window->isShiftPressed())
+	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
 		arrowSpeed *= 4.0;
-	else if (app()->window->isModPressed())
+	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
 		arrowSpeed /= 4.0;
 
 	ScrollWidget *scrollWidget = app()->scene->scrollWidget;

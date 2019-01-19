@@ -84,49 +84,49 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
-				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					rackWidget->reset();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Q: {
-				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					app()->window->close();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_O: {
-				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					rackWidget->loadDialog();
 					e.consume(this);
 				}
-				if ((e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
 					rackWidget->revert();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_S: {
-				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					rackWidget->saveDialog();
 					e.consume(this);
 				}
-				if ((e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
 					rackWidget->saveAsDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_V: {
-				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					rackWidget->pastePresetClipboard();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Z: {
-				if ((e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					app()->history->undo();
 					e.consume(this);
 				}
-				if ((e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
+				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
 					app()->history->redo();
 					e.consume(this);
 				}

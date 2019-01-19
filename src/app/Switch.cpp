@@ -33,12 +33,13 @@ void Switch::onDragStart(const event::DragStart &e) {
 	else {
 		if (paramQuantity) {
 			float oldValue = paramQuantity->getValue();
-			// Increment value by 1, or reset back to minimum
 			if (paramQuantity->isMax()) {
+				// Reset value back to minimum
 				paramQuantity->setMin();
 			}
 			else {
-				paramQuantity->setValue(std::floor(paramQuantity->getValue() + 1));
+				// Increment value by 1
+				paramQuantity->setValue(std::round(paramQuantity->getValue()) + 1.f);
 			}
 
 			float newValue = paramQuantity->getValue();

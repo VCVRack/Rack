@@ -35,7 +35,7 @@ struct MenuButton : Button {
 struct NewItem : MenuItem {
 	NewItem() {
 		text = "New";
-		rightText = "(" WINDOW_MOD_KEY_NAME "+N)";
+		rightText = "(" WINDOW_MOD_CTRL_NAME "+N)";
 	}
 	void onAction(const event::Action &e) override {
 		app()->scene->rackWidget->reset();
@@ -46,7 +46,7 @@ struct NewItem : MenuItem {
 struct OpenItem : MenuItem {
 	OpenItem() {
 		text = "Open";
-		rightText = "(" WINDOW_MOD_KEY_NAME "+O)";
+		rightText = "(" WINDOW_MOD_CTRL_NAME "+O)";
 	}
 	void onAction(const event::Action &e) override {
 		app()->scene->rackWidget->loadDialog();
@@ -57,7 +57,7 @@ struct OpenItem : MenuItem {
 struct SaveItem : MenuItem {
 	SaveItem() {
 		text = "Save";
-		rightText = "(" WINDOW_MOD_KEY_NAME "+S)";
+		rightText = "(" WINDOW_MOD_CTRL_NAME "+S)";
 	}
 	void onAction(const event::Action &e) override {
 		app()->scene->rackWidget->saveDialog();
@@ -68,7 +68,7 @@ struct SaveItem : MenuItem {
 struct SaveAsItem : MenuItem {
 	SaveAsItem() {
 		text = "Save as";
-		rightText = "(" WINDOW_MOD_KEY_NAME "+Shift+S)";
+		rightText = "(" WINDOW_MOD_CTRL_NAME "+Shift+S)";
 	}
 	void onAction(const event::Action &e) override {
 		app()->scene->rackWidget->saveAsDialog();
@@ -109,7 +109,7 @@ struct DisconnectCablesItem : MenuItem {
 struct QuitItem : MenuItem {
 	QuitItem() {
 		text = "Quit";
-		rightText = "(" WINDOW_MOD_KEY_NAME "+Q)";
+		rightText = "(" WINDOW_MOD_CTRL_NAME "+Q)";
 	}
 	void onAction(const event::Action &e) override {
 		app()->window->close();

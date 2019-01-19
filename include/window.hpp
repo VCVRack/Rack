@@ -10,13 +10,23 @@
 #include <nanosvg.h>
 
 
+/** Remaps Ctrl to Cmd on Mac
+Use this instead of GLFW_MOD_CONTROL, since Cmd should be used on Mac in place of Ctrl on Linux/Windows.
+*/
 #ifdef ARCH_MAC
-	#define WINDOW_MOD GLFW_MOD_SUPER
-	#define WINDOW_MOD_KEY_NAME "Cmd"
+	#define WINDOW_MOD_CTRL GLFW_MOD_SUPER
+	#define WINDOW_MOD_CTRL_NAME "Cmd"
 #else
-	#define WINDOW_MOD GLFW_MOD_CONTROL
-	#define WINDOW_MOD_KEY_NAME "Ctrl"
+	#define WINDOW_MOD_CTRL GLFW_MOD_CONTROL
+	#define WINDOW_MOD_CTRL_NAME "Ctrl"
 #endif
+
+/** Filters actual mod keys from the mod flags.
+Use this if you don't care about GLFW_MOD_CAPS_LOCK and GLFW_MOD_NUM_LOCK.
+Example usage:
+	if ((e.mod & WINDOW_MOD_MASK) == (WINDOW_MOD | GLFW_MOD_SHIFT)) ...
+*/
+#define WINDOW_MOD_MASK (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER)
 
 
 namespace rack {
@@ -70,8 +80,10 @@ struct Window {
 	void close();
 	void cursorLock();
 	void cursorUnlock();
-	bool isModPressed();
-	bool isShiftPressed();
+	/** Gets the current keyboard mod state
+	Don't call this from a Key event. Simply use `e.mods` instead.
+	*/
+	int getMods();
 	math::Vec getWindowSize();
 	void setWindowSize(math::Vec size);
 	math::Vec getWindowPos();

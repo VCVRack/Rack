@@ -14,7 +14,7 @@ void init(rack::Plugin *p) {
 	p->sourceUrl = "https://github.com/VCVRack/Rack";
 
 	modelAudioInterface->name = "Audio";
-	modelAudioInterface->description = "";
+	modelAudioInterface->description = "Sends audio and CV to/from an audio device";
 	modelAudioInterface->tags = {"External"};
 	p->addModel(modelAudioInterface);
 
@@ -42,6 +42,16 @@ void init(rack::Plugin *p) {
 	modelCV_MIDI->description = "";
 	modelCV_MIDI->tags = {"External", "MIDI"};
 	p->addModel(modelCV_MIDI);
+
+	modelCV_CC->name = "CV-CC";
+	modelCV_CC->description = "";
+	modelCV_CC->tags = {"External", "MIDI"};
+	p->addModel(modelCV_CC);
+
+	modelCV_Gate->name = "CV-Gate";
+	modelCV_Gate->description = "";
+	modelCV_Gate->tags = {"External", "MIDI"};
+	p->addModel(modelCV_Gate);
 
 	modelBlank->name = "Blank";
 	modelBlank->description = "";

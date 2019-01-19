@@ -67,7 +67,7 @@ void Knob::onDragMove(const event::DragMove &e) {
 		float delta = KNOB_SENSITIVITY * -e.mouseDelta.y * speed * range;
 
 		// Drag slower if Mod is held
-		if (app()->window->isModPressed())
+		if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
 			delta /= 16.f;
 
 		if (snap) {

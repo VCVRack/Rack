@@ -119,7 +119,7 @@ void ParamWidget::fromJson(json_t *rootJ) {
 
 void ParamWidget::onButton(const event::Button &e) {
 	// Right click to reset
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && !(e.mods & WINDOW_MOD) && !(e.mods & GLFW_MOD_SHIFT)) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & WINDOW_MOD_MASK) == 0) {
 		if (paramQuantity && paramQuantity->isBounded()) {
 			float oldValue = paramQuantity->getValue();
 			paramQuantity->reset();
@@ -141,7 +141,7 @@ void ParamWidget::onButton(const event::Button &e) {
 	}
 
 	// Shift-click to open value entry
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && !(e.mods & WINDOW_MOD) && (e.mods & GLFW_MOD_SHIFT)) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT) {
 		// Create ParamField
 		MenuOverlay *overlay = new MenuOverlay;
 		app()->scene->addChild(overlay);

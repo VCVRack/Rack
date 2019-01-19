@@ -66,6 +66,7 @@ static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mod
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (mods & GLFW_MOD_CONTROL) {
 			button = GLFW_MOUSE_BUTTON_RIGHT;
+			mods &= ~GLFW_MOD_CONTROL;
 		}
 	}
 #endif
@@ -123,11 +124,11 @@ static void cursorEnterCallback(GLFWwindow *win, int entered) {
 static void scrollCallback(GLFWwindow *win, double x, double y) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
 	math::Vec scrollDelta = math::Vec(x, y);
-#if ARCH_LIN || ARCH_WIN
-	if (window->isShiftPressed())
-		scrollDelta = math::Vec(y, x);
-#endif
 	scrollDelta = scrollDelta.mult(50.0);
+
+	// Flip coordinates if shift is held
+	if ((window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
+		scrollDelta = scrollDelta.flip();
 
 	app()->event->handleScroll(window->mousePos, scrollDelta);
 }
@@ -142,7 +143,7 @@ static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int 
 	app()->event->handleKey(window->mousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
-	if (!(mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT | GLFW_MOD_SUPER))) {
+	if ((mods & WINDOW_MOD_MASK) == 0) {
 		if (action == GLFW_PRESS) {
 			keyboard::press(key);
 		}
@@ -380,16 +381,17 @@ void Window::cursorUnlock() {
 	}
 }
 
-bool Window::isModPressed() {
-#ifdef ARCH_MAC
-	return glfwGetKey(win, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS;
-#else
-	return glfwGetKey(win, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
-#endif
-}
-
-bool Window::isShiftPressed() {
-	return glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
+int Window::getMods() {
+	int mods = 0;
+	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+		mods |= GLFW_MOD_SHIFT;
+	if (glfwGetKey(win, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+		mods |= GLFW_MOD_CONTROL;
+	if (glfwGetKey(win, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
+		mods |= GLFW_MOD_ALT;
+	if (glfwGetKey(win, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS)
+		mods |= GLFW_MOD_SUPER;
+	return mods;
 }
 
 math::Vec Window::getWindowSize() {

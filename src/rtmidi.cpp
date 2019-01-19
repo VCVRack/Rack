@@ -63,8 +63,8 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	void sendMessage(midi::Message message) override {
 		unsigned char msg[3];
 		msg[0] = message.cmd;
-		msg[0] = message.data1;
-		msg[0] = message.data2;
+		msg[1] = message.data1;
+		msg[2] = message.data2;
 		rtMidiOut->sendMessage(msg, 3);
 	}
 };

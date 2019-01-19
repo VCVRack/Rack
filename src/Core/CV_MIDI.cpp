@@ -52,7 +52,7 @@ struct PolyphonicMidiOutput : midi::Output {
 		}
 	}
 
-	void setVel(int vel, int c) {
+	void setVelocity(int vel, int c) {
 		vels[c] = vel;
 	}
 
@@ -229,16 +229,26 @@ struct CV_MIDI : Module {
 	};
 
 	PolyphonicMidiOutput<PORT_MAX_CHANNELS> midiOutput;
+	float rateLimiterPhase = 0.f;
 
 	CV_MIDI() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
 
 	void step() override {
+		const float rateLimiterPeriod = 0.005f;
+		rateLimiterPhase += app()->engine->getSampleTime() / rateLimiterPeriod;
+		if (rateLimiterPhase >= 1.f) {
+			rateLimiterPhase -= 1.f;
+		}
+		else {
+			return;
+		}
+
 		for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
 			int vel = (int) std::round(inputs[VEL_INPUT].normalize(10.f * 100 / 127, c) / 10.f * 127);
 			vel = clamp(vel, 0, 127);
-			midiOutput.setVel(vel, c);
+			midiOutput.setVelocity(vel, c);
 
 			int note = (int) std::round(inputs[PITCH_INPUT].getVoltage(c) * 12.f + 60.f);
 			note = clamp(note, 0, 127);
@@ -262,9 +272,6 @@ struct CV_MIDI : Module {
 		mw = clamp(mw, 0, 127);
 		midiOutput.setModWheel(mw);
 
-		bool clk = inputs[CLK_INPUT].value >= 1.f;
-		midiOutput.setClock(clk);
-
 		int vol = (int) std::round(inputs[VOL_INPUT].normalize(10.f) / 10.f * 127);
 		vol = clamp(vol, 0, 127);
 		midiOutput.setVolume(vol);
@@ -272,6 +279,9 @@ struct CV_MIDI : Module {
 		int pan = (int) std::round((inputs[PAN_INPUT].getVoltage() + 5.f) / 10.f * 127);
 		pan = clamp(pan, 0, 127);
 		midiOutput.setPan(pan);
+
+		bool clk = inputs[CLK_INPUT].value >= 1.f;
+		midiOutput.setClock(clk);
 
 		bool start = inputs[START_INPUT].value >= 1.f;
 		midiOutput.setStart(start);

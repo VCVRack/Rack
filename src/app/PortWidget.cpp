@@ -72,7 +72,10 @@ void PortWidget::onButton(const event::Button &e) {
 void PortWidget::onDragStart(const event::DragStart &e) {
 	// Try to grab cable on top of stack
 	CableWidget *cable = NULL;
-	if (type == INPUT || !app()->window->isModPressed()) {
+	if (type == OUTPUT && (app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+		// Keep cable NULL
+	}
+	else {
 		cable = app()->scene->rackWidget->cableContainer->getTopCable(this);
 	}
 

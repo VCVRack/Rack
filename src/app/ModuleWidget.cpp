@@ -16,12 +16,13 @@ namespace rack {
 
 
 ModuleWidget::~ModuleWidget() {
-	if (module) {
-		delete module;
-	}
+	setModule(NULL);
 }
 
 void ModuleWidget::setModule(Module *module) {
+	if (this->module) {
+		delete this->module;
+	}
 	this->module = module;
 }
 
@@ -338,7 +339,7 @@ void ModuleWidget::onHover(const event::Hover &e) {
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 	if (glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-		if (!app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+		if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 			ModuleWidget_removeAction(this);
 			e.consume(NULL);
 			return;
@@ -348,8 +349,9 @@ void ModuleWidget::onHover(const event::Hover &e) {
 
 void ModuleWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
+
 	if (e.getConsumed() == this) {
-		if (e.button == 1) {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			createContextMenu();
 		}
 	}
@@ -359,43 +361,43 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_I: {
-				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					reset();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_R: {
-				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					randomize();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_C: {
-				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					copyClipboard();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_V: {
-				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					pasteClipboard();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_D: {
-				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					app()->scene->rackWidget->cloneModule(this);
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_U: {
-				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					disconnect();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_E: {
-				if (app()->window->isModPressed() && !app()->window->isShiftPressed()) {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					ModuleWidget_bypassAction(this);
 					e.consume(this);
 				}
@@ -436,7 +438,7 @@ struct ModuleDisconnectItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleDisconnectItem() {
 		text = "Disconnect cables";
-		rightText = WINDOW_MOD_KEY_NAME "+U";
+		rightText = WINDOW_MOD_CTRL_NAME "+U";
 	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->disconnect();
@@ -447,7 +449,7 @@ struct ModuleResetItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleResetItem() {
 		text = "Initialize";
-		rightText = WINDOW_MOD_KEY_NAME "+I";
+		rightText = WINDOW_MOD_CTRL_NAME "+I";
 	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->reset();
@@ -458,7 +460,7 @@ struct ModuleRandomizeItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleRandomizeItem() {
 		text = "Randomize";
-		rightText = WINDOW_MOD_KEY_NAME "+R";
+		rightText = WINDOW_MOD_CTRL_NAME "+R";
 	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->randomize();
@@ -469,7 +471,7 @@ struct ModuleCopyItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleCopyItem() {
 		text = "Copy preset";
-		rightText = WINDOW_MOD_KEY_NAME "+C";
+		rightText = WINDOW_MOD_CTRL_NAME "+C";
 	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->copyClipboard();
@@ -480,7 +482,7 @@ struct ModulePasteItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModulePasteItem() {
 		text = "Paste preset";
-		rightText = WINDOW_MOD_KEY_NAME "+V";
+		rightText = WINDOW_MOD_CTRL_NAME "+V";
 	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->pasteClipboard();
@@ -511,7 +513,7 @@ struct ModuleCloneItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleCloneItem() {
 		text = "Duplicate";
-		rightText = WINDOW_MOD_KEY_NAME "+D";
+		rightText = WINDOW_MOD_CTRL_NAME "+D";
 	}
 	void onAction(const event::Action &e) override {
 		app()->scene->rackWidget->cloneModule(moduleWidget);
@@ -524,7 +526,7 @@ struct ModuleBypassItem : MenuItem {
 		text = "Bypass";
 	}
 	void step() override {
-		rightText = WINDOW_MOD_KEY_NAME "+E";
+		rightText = WINDOW_MOD_CTRL_NAME "+E";
 		if (!moduleWidget->module)
 			return;
 		if (moduleWidget->module->bypass)
