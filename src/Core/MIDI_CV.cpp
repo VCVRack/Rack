@@ -4,7 +4,7 @@
 #include <algorithm>
 
 
-struct MIDIToCVInterface : Module {
+struct MIDI_CV : Module {
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -55,7 +55,7 @@ struct MIDIToCVInterface : Module {
 	bool pedal;
 	bool gate;
 
-	MIDIToCVInterface() {
+	MIDI_CV() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		heldNotes.resize(128, 0);
 		onReset();
@@ -258,28 +258,28 @@ struct MIDIToCVInterface : Module {
 };
 
 
-struct MIDIToCVInterfaceWidget : ModuleWidget {
-	MIDIToCVInterfaceWidget(MIDIToCVInterface *module) {
+struct MIDI_CVWidget : ModuleWidget {
+	MIDI_CVWidget(MIDI_CV *module) {
 		setModule(module);
-		setPanel(SVG::load(asset::system("res/Core/MIDIToCVInterface.svg")));
+		setPanel(SVG::load(asset::system("res/Core/MIDI-CV.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 60.1445)), module, MIDIToCVInterface::CV_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 60.1445)), module, MIDIToCVInterface::GATE_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 60.1445)), module, MIDIToCVInterface::VELOCITY_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 76.1449)), module, MIDIToCVInterface::AFTERTOUCH_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 76.1449)), module, MIDIToCVInterface::PITCH_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 76.1449)), module, MIDIToCVInterface::MOD_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 92.1439)), module, MIDIToCVInterface::RETRIGGER_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 92.1439)), module, MIDIToCVInterface::CLOCK_1_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 92.1439)), module, MIDIToCVInterface::CLOCK_2_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 108.144)), module, MIDIToCVInterface::START_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 108.144)), module, MIDIToCVInterface::STOP_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 108.144)), module, MIDIToCVInterface::CONTINUE_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 60.1445)), module, MIDI_CV::CV_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 60.1445)), module, MIDI_CV::GATE_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 60.1445)), module, MIDI_CV::VELOCITY_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 76.1449)), module, MIDI_CV::AFTERTOUCH_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 76.1449)), module, MIDI_CV::PITCH_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 76.1449)), module, MIDI_CV::MOD_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 92.1439)), module, MIDI_CV::RETRIGGER_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 92.1439)), module, MIDI_CV::CLOCK_1_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 92.1439)), module, MIDI_CV::CLOCK_2_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 108.144)), module, MIDI_CV::START_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 108.144)), module, MIDI_CV::STOP_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 108.144)), module, MIDI_CV::CONTINUE_OUTPUT));
 
 		MidiWidget *midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(33.840, 28));
@@ -289,10 +289,10 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 	}
 
 	void appendContextMenu(Menu *menu) override {
-		MIDIToCVInterface *module = dynamic_cast<MIDIToCVInterface*>(this->module);
+		MIDI_CV *module = dynamic_cast<MIDI_CV*>(this->module);
 
 		struct ClockDivisionItem : MenuItem {
-			MIDIToCVInterface *module;
+			MIDI_CV *module;
 			int index;
 			int division;
 			void onAction(const event::Action &e) override {
@@ -301,7 +301,7 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 		};
 
 		struct ClockItem : MenuItem {
-			MIDIToCVInterface *module;
+			MIDI_CV *module;
 			int index;
 			Menu *createChildMenu() override {
 				Menu *menu = new Menu;
@@ -329,4 +329,5 @@ struct MIDIToCVInterfaceWidget : ModuleWidget {
 };
 
 
-Model *modelMIDIToCVInterface = createModel<MIDIToCVInterface, MIDIToCVInterfaceWidget>("MIDIToCVInterface");
+// Use legacy slug for compatibility
+Model *modelMIDI_CV = createModel<MIDI_CV, MIDI_CVWidget>("MIDIToCVInterface");

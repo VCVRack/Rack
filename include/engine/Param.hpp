@@ -41,7 +41,8 @@ struct Param {
 		this->minValue = minValue;
 		this->maxValue = maxValue;
 		this->defaultValue = defaultValue;
-		this->label = label;
+		if (!label.empty())
+			this->label = label;
 		this->unit = unit;
 		this->displayBase = displayBase;
 		this->displayMultiplier = displayMultiplier;

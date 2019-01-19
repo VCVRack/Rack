@@ -18,25 +18,20 @@ void init(rack::Plugin *p) {
 	modelAudioInterface->tags = {"External"};
 	p->addModel(modelAudioInterface);
 
-	modelMIDIToCVInterface->name = "MIDI-1";
-	modelMIDIToCVInterface->description = "";
-	modelMIDIToCVInterface->tags = {"External", "MIDI"};
-	p->addModel(modelMIDIToCVInterface);
+	modelMIDI_CV->name = "MIDI-CV";
+	modelMIDI_CV->description = "";
+	modelMIDI_CV->tags = {"External", "MIDI"};
+	p->addModel(modelMIDI_CV);
 
-	modelQuadMIDIToCVInterface->name = "MIDI-4";
-	modelQuadMIDIToCVInterface->description = "";
-	modelQuadMIDIToCVInterface->tags = {"External", "MIDI", "Quad"};
-	p->addModel(modelQuadMIDIToCVInterface);
+	modelMIDI_CC->name = "MIDI-CC";
+	modelMIDI_CC->description = "";
+	modelMIDI_CC->tags = {"External", "MIDI"};
+	p->addModel(modelMIDI_CC);
 
-	modelMIDICCToCVInterface->name = "MIDI-CC";
-	modelMIDICCToCVInterface->description = "";
-	modelMIDICCToCVInterface->tags = {"External", "MIDI"};
-	p->addModel(modelMIDICCToCVInterface);
-
-	modelMIDITriggerToCVInterface->name = "MIDI-Trig";
-	modelMIDITriggerToCVInterface->description = "";
-	modelMIDITriggerToCVInterface->tags = {"External", "MIDI"};
-	p->addModel(modelMIDITriggerToCVInterface);
+	modelMIDI_Gate->name = "MIDI-Gate";
+	modelMIDI_Gate->description = "";
+	modelMIDI_Gate->tags = {"External", "MIDI"};
+	p->addModel(modelMIDI_Gate);
 
 	modelCV_MIDI->name = "CV-MIDI";
 	modelCV_MIDI->description = "";

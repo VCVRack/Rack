@@ -86,6 +86,7 @@ struct ParamLabel : MenuLabel {
 	ParamWidget *paramWidget;
 	void step() override {
 		text = paramWidget->paramQuantity->getString();
+		MenuLabel::step();
 	}
 };
 
@@ -94,7 +95,7 @@ struct ParamResetItem : MenuItem {
 	ParamWidget *paramWidget;
 	ParamResetItem() {
 		text = "Initialize";
-		rightText = WINDOW_MOD_ALT_NAME "+click";
+		rightText = WINDOW_MOD_ALT_NAME "+Click";
 	}
 	void onAction(const event::Action &e) override {
 		paramWidget->resetAction();
@@ -106,7 +107,7 @@ struct ParamFieldItem : MenuItem {
 	ParamWidget *paramWidget;
 	ParamFieldItem() {
 		text = "Enter value";
-		rightText = WINDOW_MOD_SHIFT_NAME "+click";
+		rightText = WINDOW_MOD_SHIFT_NAME "+Click";
 	}
 	void onAction(const event::Action &e) override {
 		paramWidget->createParamField();

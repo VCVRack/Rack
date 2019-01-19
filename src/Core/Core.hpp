@@ -6,10 +6,9 @@ using namespace rack;
 
 
 extern Model *modelAudioInterface;
-extern Model *modelMIDIToCVInterface;
-extern Model *modelQuadMIDIToCVInterface;
-extern Model *modelMIDICCToCVInterface;
-extern Model *modelMIDITriggerToCVInterface;
+extern Model *modelMIDI_CV;
+extern Model *modelMIDI_CC;
+extern Model *modelMIDI_Gate;
 extern Model *modelCV_MIDI;
 extern Model *modelCV_CC;
 extern Model *modelCV_Gate;
