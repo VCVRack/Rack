@@ -76,7 +76,16 @@ struct ParamTooltip : Tooltip {
 				text += "\n" + description;
 		}
 		// Position at bottom-right of parameter
-		box.pos = paramWidget->getAbsoluteOffset(box.size).round();
+		box.pos = paramWidget->getAbsoluteOffset(paramWidget->box.size).round();
+		Tooltip::step();
+	}
+};
+
+
+struct ParamLabel : MenuLabel {
+	ParamWidget *paramWidget;
+	void step() override {
+		text = paramWidget->paramQuantity->getString();
 	}
 };
 
@@ -202,6 +211,10 @@ void ParamWidget::createParamField() {
 
 void ParamWidget::createContextMenu() {
 	Menu *menu = createMenu();
+
+	ParamLabel *paramLabel = new ParamLabel;
+	paramLabel->paramWidget = this;
+	menu->addChild(paramLabel);
 
 	ParamResetItem *resetItem = new ParamResetItem;
 	resetItem->paramWidget = this;
