@@ -15,8 +15,265 @@
 namespace rack {
 
 
+struct ModuleDisconnectItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleDisconnectItem() {
+		text = "Disconnect cables";
+		rightText = WINDOW_MOD_CTRL_NAME "+U";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->disconnect();
+	}
+};
+
+struct ModuleResetItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleResetItem() {
+		text = "Initialize";
+		rightText = WINDOW_MOD_CTRL_NAME "+I";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->reset();
+	}
+};
+
+struct ModuleRandomizeItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleRandomizeItem() {
+		text = "Randomize";
+		rightText = WINDOW_MOD_CTRL_NAME "+R";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->randomize();
+	}
+};
+
+struct ModuleCopyItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleCopyItem() {
+		text = "Copy preset";
+		rightText = WINDOW_MOD_CTRL_NAME "+C";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->copyClipboard();
+	}
+};
+
+struct ModulePasteItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModulePasteItem() {
+		text = "Paste preset";
+		rightText = WINDOW_MOD_CTRL_NAME "+V";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->pasteClipboard();
+	}
+};
+
+struct ModuleSaveItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleSaveItem() {
+		text = "Save preset as";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->saveDialog();
+	}
+};
+
+struct ModuleLoadItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleLoadItem() {
+		text = "Load preset";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->loadDialog();
+	}
+};
+
+struct ModuleCloneItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleCloneItem() {
+		text = "Duplicate";
+		rightText = WINDOW_MOD_CTRL_NAME "+D";
+	}
+	void onAction(const event::Action &e) override {
+		app()->scene->rackWidget->cloneModule(moduleWidget);
+	}
+};
+
+struct ModuleBypassItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleBypassItem() {
+		text = "Bypass";
+	}
+	void step() override {
+		rightText = WINDOW_MOD_CTRL_NAME "+E";
+		if (!moduleWidget->module)
+			return;
+		if (moduleWidget->module->bypass)
+			rightText = CHECKMARK_STRING " " + rightText;
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->bypassAction();
+	}
+};
+
+struct ModuleDeleteItem : MenuItem {
+	ModuleWidget *moduleWidget;
+	ModuleDeleteItem() {
+		text = "Delete";
+		rightText = "Backspace/Delete";
+	}
+	void onAction(const event::Action &e) override {
+		moduleWidget->removeAction();
+	}
+};
+
+
 ModuleWidget::~ModuleWidget() {
 	setModule(NULL);
+}
+
+void ModuleWidget::draw(NVGcontext *vg) {
+	if (module && module->bypass) {
+		nvgGlobalAlpha(vg, 0.5);
+	}
+	// nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+	Widget::draw(vg);
+
+	// Power meter
+	if (module && settings::powerMeter) {
+		nvgBeginPath(vg);
+		nvgRect(vg,
+			0, box.size.y - 20,
+			65, 20);
+		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.75));
+		nvgFill(vg);
+
+		std::string cpuText = string::f("%.2f μs", module->cpuTime * 1e6f);
+		bndLabel(vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
+
+		float p = math::clamp(module->cpuTime / app()->engine->getSampleTime(), 0.f, 1.f);
+		nvgBeginPath(vg);
+		nvgRect(vg,
+			0, (1.f - p) * box.size.y,
+			5, p * box.size.y);
+		nvgFillColor(vg, nvgRGBAf(1, 0, 0, 1.0));
+		nvgFill(vg);
+	}
+
+	// nvgResetScissor(vg);
+}
+
+void ModuleWidget::drawShadow(NVGcontext *vg) {
+	nvgBeginPath(vg);
+	float r = 20; // Blur radius
+	float c = 20; // Corner radius
+	math::Vec b = math::Vec(-10, 30); // Offset from each corner
+	nvgRect(vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
+	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
+	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
+	nvgFillPaint(vg, nvgBoxGradient(vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
+	nvgFill(vg);
+}
+
+void ModuleWidget::onHover(const event::Hover &e) {
+	OpaqueWidget::onHover(e);
+
+	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
+	if (glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
+		if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+			removeAction();
+			e.consume(NULL);
+			return;
+		}
+	}
+}
+
+void ModuleWidget::onButton(const event::Button &e) {
+	OpaqueWidget::onButton(e);
+
+	if (e.getConsumed() == this) {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			createContextMenu();
+		}
+	}
+}
+
+void ModuleWidget::onHoverKey(const event::HoverKey &e) {
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+		switch (e.key) {
+			case GLFW_KEY_I: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					reset();
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_R: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					randomize();
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_C: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					copyClipboard();
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_V: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					pasteClipboard();
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_D: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					app()->scene->rackWidget->cloneModule(this);
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_U: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					disconnect();
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_E: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					bypassAction();
+					e.consume(this);
+				}
+			} break;
+		}
+	}
+
+	if (!e.getConsumed())
+		OpaqueWidget::onHoverKey(e);
+}
+
+void ModuleWidget::onDragStart(const event::DragStart &e) {
+	oldPos = box.pos;
+	dragPos = app()->scene->rackWidget->lastMousePos.minus(box.pos);
+}
+
+void ModuleWidget::onDragEnd(const event::DragEnd &e) {
+	if (!box.pos.isEqual(oldPos)) {
+		// Push ModuleMove history action
+		history::ModuleMove *h = new history::ModuleMove;
+		h->moduleId = module->id;
+		h->oldPos = oldPos;
+		h->newPos = box.pos;
+		app()->history->push(h);
+	}
+}
+
+void ModuleWidget::onDragMove(const event::DragMove &e) {
+	if (!settings::lockModules) {
+		math::Rect newBox = box;
+		newBox.pos = app()->scene->rackWidget->lastMousePos.minus(dragPos);
+		app()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
+	}
 }
 
 void ModuleWidget::setModule(Module *module) {
@@ -244,15 +501,6 @@ void ModuleWidget::saveDialog() {
 	save(pathStr);
 }
 
-void ModuleWidget_bypassAction(ModuleWidget *moduleWidget) {
-	// Push ModuleBypass history action
-	history::ModuleBypass *h = new history::ModuleBypass;
-	h->bypass = !moduleWidget->module->bypass;
-	h->moduleId = moduleWidget->module->id;
-	app()->history->push(h);
-	h->redo();
-}
-
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
 		app()->scene->rackWidget->cableContainer->removeAllCables(input);
@@ -274,282 +522,35 @@ void ModuleWidget::randomize() {
 	}
 }
 
-void ModuleWidget::draw(NVGcontext *vg) {
-	if (module && module->bypass) {
-		nvgGlobalAlpha(vg, 0.5);
-	}
-	// nvgScissor(vg, 0, 0, box.size.x, box.size.y);
-	Widget::draw(vg);
-
-	// Power meter
-	if (module && settings::powerMeter) {
-		nvgBeginPath(vg);
-		nvgRect(vg,
-			0, box.size.y - 20,
-			65, 20);
-		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.75));
-		nvgFill(vg);
-
-		std::string cpuText = string::f("%.2f μs", module->cpuTime * 1e6f);
-		bndLabel(vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
-
-		float p = math::clamp(module->cpuTime / app()->engine->getSampleTime(), 0.f, 1.f);
-		nvgBeginPath(vg);
-		nvgRect(vg,
-			0, (1.f - p) * box.size.y,
-			5, p * box.size.y);
-		nvgFillColor(vg, nvgRGBAf(1, 0, 0, 1.0));
-		nvgFill(vg);
-	}
-
-	// nvgResetScissor(vg);
-}
-
-void ModuleWidget::drawShadow(NVGcontext *vg) {
-	nvgBeginPath(vg);
-	float r = 20; // Blur radius
-	float c = 20; // Corner radius
-	math::Vec b = math::Vec(-10, 30); // Offset from each corner
-	nvgRect(vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
-	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
-	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
-	nvgFillPaint(vg, nvgBoxGradient(vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
-	nvgFill(vg);
-}
-
-static void ModuleWidget_removeAction(ModuleWidget *moduleWidget) {
+void ModuleWidget::removeAction() {
 	history::ComplexAction *complexAction = new history::ComplexAction;
 
 	// Push ModuleRemove history action
 	history::ModuleRemove *moduleRemove = new history::ModuleRemove;
-	moduleRemove->model = moduleWidget->model;
-	moduleRemove->moduleId = moduleWidget->module->id;
-	moduleRemove->pos = moduleWidget->box.pos;
-	moduleRemove->moduleJ = moduleWidget->toJson();
+	moduleRemove->model = model;
+	moduleRemove->moduleId = module->id;
+	moduleRemove->pos = box.pos;
+	moduleRemove->moduleJ = toJson();
 	complexAction->push(moduleRemove);
 
 	app()->history->push(complexAction);
 
-	app()->scene->rackWidget->removeModule(moduleWidget);
-	delete moduleWidget;
+	app()->scene->rackWidget->removeModule(this);
+	delete this;
 }
 
-void ModuleWidget::onHover(const event::Hover &e) {
-	OpaqueWidget::onHover(e);
-
-	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-	if (glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-		if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-			ModuleWidget_removeAction(this);
-			e.consume(NULL);
-			return;
-		}
-	}
+void ModuleWidget::bypassAction() {
+	// Push ModuleBypass history action
+	history::ModuleBypass *h = new history::ModuleBypass;
+	h->bypass = !module->bypass;
+	h->moduleId = module->id;
+	app()->history->push(h);
+	h->redo();
 }
 
-void ModuleWidget::onButton(const event::Button &e) {
-	OpaqueWidget::onButton(e);
-
-	if (e.getConsumed() == this) {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			createContextMenu();
-		}
-	}
-}
-
-void ModuleWidget::onHoverKey(const event::HoverKey &e) {
-	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		switch (e.key) {
-			case GLFW_KEY_I: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					reset();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_R: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					randomize();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_C: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					copyClipboard();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_V: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					pasteClipboard();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_D: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					app()->scene->rackWidget->cloneModule(this);
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_U: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					disconnect();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_E: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					ModuleWidget_bypassAction(this);
-					e.consume(this);
-				}
-			} break;
-		}
-	}
-
-	if (!e.getConsumed())
-		OpaqueWidget::onHoverKey(e);
-}
-
-void ModuleWidget::onDragStart(const event::DragStart &e) {
-	oldPos = box.pos;
-	dragPos = app()->scene->rackWidget->lastMousePos.minus(box.pos);
-}
-
-void ModuleWidget::onDragEnd(const event::DragEnd &e) {
-	if (!box.pos.isEqual(oldPos)) {
-		// Push ModuleMove history action
-		history::ModuleMove *h = new history::ModuleMove;
-		h->moduleId = module->id;
-		h->oldPos = oldPos;
-		h->newPos = box.pos;
-		app()->history->push(h);
-	}
-}
-
-void ModuleWidget::onDragMove(const event::DragMove &e) {
-	if (!settings::lockModules) {
-		math::Rect newBox = box;
-		newBox.pos = app()->scene->rackWidget->lastMousePos.minus(dragPos);
-		app()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
-	}
-}
-
-
-struct ModuleDisconnectItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleDisconnectItem() {
-		text = "Disconnect cables";
-		rightText = WINDOW_MOD_CTRL_NAME "+U";
-	}
-	void onAction(const event::Action &e) override {
-		moduleWidget->disconnect();
-	}
-};
-
-struct ModuleResetItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleResetItem() {
-		text = "Initialize";
-		rightText = WINDOW_MOD_CTRL_NAME "+I";
-	}
-	void onAction(const event::Action &e) override {
-		moduleWidget->reset();
-	}
-};
-
-struct ModuleRandomizeItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleRandomizeItem() {
-		text = "Randomize";
-		rightText = WINDOW_MOD_CTRL_NAME "+R";
-	}
-	void onAction(const event::Action &e) override {
-		moduleWidget->randomize();
-	}
-};
-
-struct ModuleCopyItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleCopyItem() {
-		text = "Copy preset";
-		rightText = WINDOW_MOD_CTRL_NAME "+C";
-	}
-	void onAction(const event::Action &e) override {
-		moduleWidget->copyClipboard();
-	}
-};
-
-struct ModulePasteItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModulePasteItem() {
-		text = "Paste preset";
-		rightText = WINDOW_MOD_CTRL_NAME "+V";
-	}
-	void onAction(const event::Action &e) override {
-		moduleWidget->pasteClipboard();
-	}
-};
-
-struct ModuleSaveItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleSaveItem() {
-		text = "Save preset as";
-	}
-	void onAction(const event::Action &e) override {
-		moduleWidget->saveDialog();
-	}
-};
-
-struct ModuleLoadItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleLoadItem() {
-		text = "Load preset";
-	}
-	void onAction(const event::Action &e) override {
-		moduleWidget->loadDialog();
-	}
-};
-
-struct ModuleCloneItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleCloneItem() {
-		text = "Duplicate";
-		rightText = WINDOW_MOD_CTRL_NAME "+D";
-	}
-	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->cloneModule(moduleWidget);
-	}
-};
-
-struct ModuleBypassItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleBypassItem() {
-		text = "Bypass";
-	}
-	void step() override {
-		rightText = WINDOW_MOD_CTRL_NAME "+E";
-		if (!moduleWidget->module)
-			return;
-		if (moduleWidget->module->bypass)
-			rightText = CHECKMARK_STRING " " + rightText;
-	}
-	void onAction(const event::Action &e) override {
-		ModuleWidget_bypassAction(moduleWidget);
-	}
-};
-
-struct ModuleDeleteItem : MenuItem {
-	ModuleWidget *moduleWidget;
-	ModuleDeleteItem() {
-		text = "Delete";
-		rightText = "Backspace/Delete";
-	}
-	void onAction(const event::Action &e) override {
-		ModuleWidget_removeAction(moduleWidget);
-	}
-};
-
-Menu *ModuleWidget::createContextMenu() {
+void ModuleWidget::createContextMenu() {
 	Menu *menu = createMenu();
+	assert(model);
 
 	MenuLabel *menuLabel = new MenuLabel;
 	menuLabel->text = model->plugin->name + " " + model->name + " " + model->plugin->version;
@@ -596,8 +597,6 @@ Menu *ModuleWidget::createContextMenu() {
 	menu->addChild(deleteItem);
 
 	appendContextMenu(menu);
-
-	return menu;
 }
 
 

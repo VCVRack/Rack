@@ -20,6 +20,8 @@ Use this instead of GLFW_MOD_CONTROL, since Cmd should be used on Mac in place o
 	#define WINDOW_MOD_CTRL GLFW_MOD_CONTROL
 	#define WINDOW_MOD_CTRL_NAME "Ctrl"
 #endif
+#define WINDOW_MOD_SHIFT_NAME "Shift"
+#define WINDOW_MOD_ALT_NAME "Alt"
 
 /** Filters actual mod keys from the mod flags.
 Use this if you don't care about GLFW_MOD_CAPS_LOCK and GLFW_MOD_NUM_LOCK.
