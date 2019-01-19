@@ -1,5 +1,4 @@
 #include "Core.hpp"
-#include "midi.hpp"
 
 #include <algorithm>
 

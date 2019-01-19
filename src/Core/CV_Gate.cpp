@@ -1,28 +1,25 @@
 #include "Core.hpp"
 
 
-template <int N>
 struct GateMidiOutput : midi::Output {
-	int vels[N];
-	bool lastGates[N];
-	int notes[N];
+	int vels[128];
+	bool lastGates[128];
 
 	GateMidiOutput() {
 		reset();
 	}
 
 	void reset() {
-		for (int n = 0; n < N; n++) {
-			vels[n] = 100;
-			lastGates[n] = false;
-			notes[n] = 60 + n;
+		for (int note = 0; note < 128; note++) {
+			vels[note] = 100;
+			lastGates[note] = false;
 		}
 	}
 
 	void panic() {
 		reset();
 		// Send all note off commands
-		for (int note = 0; note <= 127; note++) {
+		for (int note = 0; note < 128; note++) {
 			// Note off
 			midi::Message m;
 			m.setStatus(0x8);
@@ -32,48 +29,28 @@ struct GateMidiOutput : midi::Output {
 		}
 	}
 
-	void setVelocity(int vel, int n) {
-		vels[n] = vel;
+	void setVelocity(int vel, int note) {
+		vels[note] = vel;
 	}
 
-	void setGate(bool gate, int n) {
-		if (gate && !lastGates[n]) {
+	void setGate(bool gate, int note) {
+		if (gate && !lastGates[note]) {
 			// Note on
 			midi::Message m;
 			m.setStatus(0x9);
-			m.setNote(notes[n]);
-			m.setValue(vels[n]);
+			m.setNote(note);
+			m.setValue(vels[note]);
 			sendMessage(m);
 		}
-		else if (!gate && lastGates[n]) {
+		else if (!gate && lastGates[note]) {
 			// Note off
 			midi::Message m;
 			m.setStatus(0x8);
-			m.setNote(notes[n]);
-			m.setValue(vels[n]);
+			m.setNote(note);
+			m.setValue(vels[note]);
 			sendMessage(m);
 		}
-		lastGates[n] = gate;
-	}
-
-	void setNote(int note, int n) {
-		if (note == notes[n])
-			return;
-		if (lastGates[n]) {
-			// Note off
-			midi::Message m1;
-			m1.setStatus(0x8);
-			m1.setNote(notes[n]);
-			m1.setValue(vels[n]);
-			sendMessage(m1);
-			// Note on
-			midi::Message m2;
-			m2.setStatus(0x9);
-			m2.setNote(note);
-			m2.setValue(vels[n]);
-			sendMessage(m2);
-		}
-		notes[n] = note;
+		lastGates[note] = gate;
 	}
 };
 
@@ -93,27 +70,75 @@ struct CV_Gate : Module {
 		NUM_LIGHTS
 	};
 
-	GateMidiOutput<16> midiOutput;
+	GateMidiOutput midiOutput;
 	bool velocityMode = false;
+	int learningId = -1;
+	uint8_t learnedNotes[16] = {};
 
 	CV_Gate() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		onReset();
+	}
+
+	void onReset() override {
+		for (int i = 0; i < 16; i++) {
+			learnedNotes[i] = i + 36;
+		}
+		learningId = -1;
+		midiOutput.reset();
+		midiOutput.midi::Output::reset();
 	}
 
 	void step() override {
-		for (int n = 0; n < 16; n++) {
+		for (int i = 0; i < 16; i++) {
+			int note = learnedNotes[i];
 			if (velocityMode) {
-				int vel = (int) std::round(inputs[GATE_INPUTS + n].getVoltage() / 10.f * 127);
+				int vel = (int) std::round(inputs[GATE_INPUTS + i].getVoltage() / 10.f * 127);
 				vel = clamp(vel, 0, 127);
-				midiOutput.setVelocity(vel, n);
-				midiOutput.setGate(vel > 0, n);
+				midiOutput.setVelocity(vel, note);
+				midiOutput.setGate(vel > 0, note);
 			}
 			else {
-				bool gate = inputs[GATE_INPUTS + n].getVoltage() >= 1.f;
-				midiOutput.setVelocity(100, n);
-				midiOutput.setGate(gate, n);
+				bool gate = inputs[GATE_INPUTS + i].getVoltage() >= 1.f;
+				midiOutput.setVelocity(100, note);
+				midiOutput.setGate(gate, note);
 			}
 		}
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+
+		json_t *notesJ = json_array();
+		for (int i = 0; i < 16; i++) {
+			json_t *noteJ = json_integer(learnedNotes[i]);
+			json_array_append_new(notesJ, noteJ);
+		}
+		json_object_set_new(rootJ, "notes", notesJ);
+
+		json_object_set_new(rootJ, "velocity", json_boolean(velocityMode));
+
+		json_object_set_new(rootJ, "midi", midiOutput.toJson());
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t *notesJ = json_object_get(rootJ, "notes");
+		if (notesJ) {
+			for (int i = 0; i < 16; i++) {
+				json_t *noteJ = json_array_get(notesJ, i);
+				if (noteJ)
+					learnedNotes[i] = json_integer_value(noteJ);
+			}
+		}
+
+		json_t *velocityJ = json_object_get(rootJ, "velocity");
+		if (velocityJ)
+			velocityMode = json_boolean_value(velocityJ);
+
+		json_t *midiJ = json_object_get(rootJ, "midi");
+		if (midiJ)
+			midiOutput.fromJson(midiJ);
 	}
 };
 
@@ -145,11 +170,12 @@ struct CV_GateWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31, 112)), module, CV_Gate::GATE_INPUTS + 14));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 112)), module, CV_Gate::GATE_INPUTS + 15));
 
-		MidiWidget *midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.4, 14.839)));
+		typedef Grid16MidiWidget<NoteChoice<CV_Gate>> TMidiWidget;
+		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		if (module)
 			midiWidget->midiIO = &module->midiOutput;
-		// midiWidget->createGridChoices();
+		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 };

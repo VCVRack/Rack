@@ -1,5 +1,4 @@
 #include "Core.hpp"
-#include "midi.hpp"
 
 
 struct MIDI_CC : Module {
@@ -20,7 +19,7 @@ struct MIDI_CC : Module {
 	midi::InputQueue midiInput;
 	int8_t values[128];
 	int learningId = -1;
-	int ccs[16] = {};
+	int learnedCcs[16] = {};
 	dsp::ExponentialFilter valueFilters[16];
 	int8_t lastValues[16] = {};
 
@@ -34,7 +33,7 @@ struct MIDI_CC : Module {
 			values[i] = 0;
 		}
 		for (int i = 0; i < 16; i++) {
-			ccs[i] = i;
+			learnedCcs[i] = i;
 		}
 		learningId = -1;
 		midiInput.reset();
@@ -51,7 +50,7 @@ struct MIDI_CC : Module {
 			if (!outputs[CC_OUTPUT + i].active)
 				continue;
 
-			int cc = ccs[i];
+			int cc = learnedCcs[i];
 
 			float value = rescale(values[cc], 0, 127, 0.f, 10.f);
 			valueFilters[i].lambda = lambda;
@@ -77,7 +76,7 @@ struct MIDI_CC : Module {
 				uint8_t cc = msg.getNote();
 				// Learn
 				if (learningId >= 0 && values[cc] != msg.data2) {
-					ccs[learningId] = cc;
+					learnedCcs[learningId] = cc;
 					learningId = -1;
 				}
 				// Allow CC to be negative if the 8th bit is set.
@@ -93,7 +92,7 @@ struct MIDI_CC : Module {
 
 		json_t *ccsJ = json_array();
 		for (int i = 0; i < 16; i++) {
-			json_array_append_new(ccsJ, json_integer(ccs[i]));
+			json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
 		}
 		json_object_set_new(rootJ, "ccs", ccsJ);
 
@@ -114,7 +113,7 @@ struct MIDI_CC : Module {
 			for (int i = 0; i < 16; i++) {
 				json_t *ccJ = json_array_get(ccsJ, i);
 				if (ccJ)
-					ccs[i] = json_integer_value(ccJ);
+					learnedCcs[i] = json_integer_value(ccJ);
 			}
 		}
 
@@ -131,90 +130,6 @@ struct MIDI_CC : Module {
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
-	}
-};
-
-
-struct MidiCcChoice : GridChoice {
-	MIDI_CC *module;
-	int id;
-	int focusCc;
-
-	MidiCcChoice() {
-		box.size.y = mm2px(6.666);
-		textOffset.y -= 4;
-	}
-
-	void setId(int id) override {
-		this->id = id;
-	}
-
-	void step() override {
-		if (!module) {
-			text = "";
-			return;
-		}
-		if (module->learningId == id) {
-			if (0 <= focusCc)
-				text = string::f("%d", focusCc);
-			else
-				text = "LRN";
-			color.a = 0.5;
-		}
-		else {
-			text = string::f("%d", module->ccs[id]);
-			color.a = 1.0;
-			if (app()->event->selectedWidget == this)
-				app()->event->selectedWidget = NULL;
-		}
-	}
-
-	void onSelect(const event::Select &e) override {
-		e.consume(this);
-		if (!module)
-			return;
-		module->learningId = id;
-		focusCc = -1;
-	}
-
-	void onDeselect(const event::Deselect &e) override {
-		if (!module)
-			return;
-		if (0 <= focusCc && focusCc < 128) {
-			module->ccs[id] = focusCc;
-		}
-		module->learningId = -1;
-	}
-
-	void onSelectText(const event::SelectText &e) override {
-		char c = e.codepoint;
-		if ('0' <= c && c <= '9') {
-			if (focusCc < 0)
-				focusCc = 0;
-			focusCc = focusCc * 10 + (c - '0');
-		}
-		e.consume(this);
-	}
-
-	void onSelectKey(const event::SelectKey &e) override {
-		if (app()->event->selectedWidget == this) {
-			if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
-				event::Deselect eDeselect;
-				onDeselect(eDeselect);
-				app()->event->selectedWidget = NULL;
-				e.consume(this);
-			}
-		}
-	}
-};
-
-
-struct MidiCcWidget : Grid16MidiWidget {
-	MIDI_CC *module;
-	GridChoice *createGridChoice() override {
-		MidiCcChoice *gridChoice = new MidiCcChoice;
-		gridChoice->module = module;
-		return gridChoice;
 	}
 };
 
@@ -246,12 +161,12 @@ struct MIDI_CCWidget : ModuleWidget {
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), module, MIDI_CC::CC_OUTPUT + 14));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDI_CC::CC_OUTPUT + 15));
 
-		MidiCcWidget *midiWidget = createWidget<MidiCcWidget>(mm2px(Vec(3.399621, 14.837339)));
-		midiWidget->module = module;
+		typedef Grid16MidiWidget<CcChoice<MIDI_CC>> TMidiWidget;
+		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		if (module)
 			midiWidget->midiIO = &module->midiInput;
-		midiWidget->createGridChoices();
+		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 };

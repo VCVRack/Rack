@@ -1,34 +1,27 @@
 #include "Core.hpp"
 
 
-template <int N>
 struct CCMidiOutput : midi::Output {
-	int ccs[N];
-	int lastValues[N];
+	int lastValues[128];
 
 	CCMidiOutput() {
 		reset();
 	}
 
 	void reset() {
-		for (int n = 0; n < N; n++) {
-			ccs[n] = n;
+		for (int n = 0; n < 128; n++) {
 			lastValues[n] = -1;
 		}
 	}
 
-	void setCC(int cc, int n) {
-		ccs[n] = cc;
-	}
-
-	void setValue(int value, int n) {
-		if (value == lastValues[n])
+	void setValue(int value, int cc) {
+		if (value == lastValues[cc])
 			return;
-		lastValues[n] = value;
+		lastValues[cc] = value;
 		// CC
 		midi::Message m;
 		m.setStatus(0xb);
-		m.setNote(ccs[n]);
+		m.setNote(cc);
 		m.setValue(value);
 		sendMessage(m);
 	}
@@ -50,11 +43,23 @@ struct CV_CC : Module {
 		NUM_LIGHTS
 	};
 
-	CCMidiOutput<16> midiOutput;
+	CCMidiOutput midiOutput;
 	float rateLimiterPhase = 0.f;
+	int learningId = -1;
+	int learnedCcs[16] = {};
 
 	CV_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		onReset();
+	}
+
+	void onReset() override {
+		for (int i = 0; i < 16; i++) {
+			learnedCcs[i] = i;
+		}
+		learningId = -1;
+		midiOutput.reset();
+		midiOutput.midi::Output::reset();
 	}
 
 	void step() override {
@@ -67,11 +72,39 @@ struct CV_CC : Module {
 			return;
 		}
 
-		for (int n = 0; n < 16; n++) {
-			int value = (int) std::round(inputs[CC_INPUTS + n].getVoltage() / 10.f * 127);
+		for (int i = 0; i < 16; i++) {
+			int value = (int) std::round(inputs[CC_INPUTS + i].getVoltage() / 10.f * 127);
 			value = clamp(value, 0, 127);
-			midiOutput.setValue(value, n);
+			midiOutput.setValue(value, learnedCcs[i]);
 		}
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+
+		json_t *ccsJ = json_array();
+		for (int i = 0; i < 16; i++) {
+			json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
+		}
+		json_object_set_new(rootJ, "ccs", ccsJ);
+
+		json_object_set_new(rootJ, "midi", midiOutput.toJson());
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t *ccsJ = json_object_get(rootJ, "ccs");
+		if (ccsJ) {
+			for (int i = 0; i < 16; i++) {
+				json_t *ccJ = json_array_get(ccsJ, i);
+				if (ccJ)
+					learnedCcs[i] = json_integer_value(ccJ);
+			}
+		}
+
+		json_t *midiJ = json_object_get(rootJ, "midi");
+		if (midiJ)
+			midiOutput.fromJson(midiJ);
 	}
 };
 
@@ -103,11 +136,12 @@ struct CV_CCWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31, 112)), module, CV_CC::CC_INPUTS + 14));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 112)), module, CV_CC::CC_INPUTS + 15));
 
-		MidiWidget *midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.4, 14.839)));
+		typedef Grid16MidiWidget<CcChoice<CV_CC>> TMidiWidget;
+		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		if (module)
 			midiWidget->midiIO = &module->midiOutput;
-		// midiWidget->createGridChoices();
+		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 };

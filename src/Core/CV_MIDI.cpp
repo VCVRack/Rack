@@ -233,6 +233,12 @@ struct CV_MIDI : Module {
 
 	CV_MIDI() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		onReset();
+	}
+
+	void onReset() override {
+		midiOutput.reset();
+		midiOutput.midi::Output::reset();
 	}
 
 	void step() override {
@@ -291,6 +297,18 @@ struct CV_MIDI : Module {
 
 		bool cont = inputs[CONTINUE_INPUT].value >= 1.f;
 		midiOutput.setContinue(cont);
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "midi", midiOutput.toJson());
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t *midiJ = json_object_get(rootJ, "midi");
+		if (midiJ)
+			midiOutput.fromJson(midiJ);
 	}
 };
 

@@ -1,6 +1,4 @@
 #include "Core.hpp"
-#include "midi.hpp"
-#include "event.hpp"
 
 
 struct MIDI_Gate : Module {
@@ -25,7 +23,7 @@ struct MIDI_Gate : Module {
 	uint8_t velocities[16];
 	int learningId = -1;
 	uint8_t learnedNotes[16] = {};
-	bool velocity = false;
+	bool velocityMode = false;
 
 	MIDI_Gate() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -76,7 +74,7 @@ struct MIDI_Gate : Module {
 
 		for (int i = 0; i < 16; i++) {
 			if (gateTimes[i] > 0.f) {
-				outputs[TRIG_OUTPUT + i].setVoltage(velocity ? rescale(velocities[i], 0, 127, 0.f, 10.f) : 10.f);
+				outputs[TRIG_OUTPUT + i].setVoltage(velocityMode ? rescale(velocities[i], 0, 127, 0.f, 10.f) : 10.f);
 				// If the gate is off, wait 1 ms before turning the pulse off.
 				// This avoids drum controllers sending a pulse with 0 ms duration.
 				if (!gates[i]) {
@@ -119,8 +117,9 @@ struct MIDI_Gate : Module {
 		}
 		json_object_set_new(rootJ, "notes", notesJ);
 
+		json_object_set_new(rootJ, "velocity", json_boolean(velocityMode));
+
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
-		json_object_set_new(rootJ, "velocity", json_boolean(velocity));
 		return rootJ;
 	}
 
@@ -134,74 +133,13 @@ struct MIDI_Gate : Module {
 			}
 		}
 
+		json_t *velocityJ = json_object_get(rootJ, "velocity");
+		if (velocityJ)
+			velocityMode = json_boolean_value(velocityJ);
+
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
-
-		json_t *velocityJ = json_object_get(rootJ, "velocity");
-		if (velocityJ)
-			velocity = json_boolean_value(velocityJ);
-	}
-};
-
-
-struct MidiTrigChoice : GridChoice {
-	MIDI_Gate *module;
-	int id;
-
-	MidiTrigChoice() {
-		box.size.y = mm2px(6.666);
-		textOffset.y -= 4;
-		textOffset.x -= 4;
-	}
-
-	void setId(int id) override {
-		this->id = id;
-	}
-
-	void step() override {
-		if (!module)
-			return;
-		if (module->learningId == id) {
-			text = "LRN";
-			color.a = 0.5;
-		}
-		else {
-			uint8_t note = module->learnedNotes[id];
-			static const char *noteNames[] = {
-				"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
-			};
-			int oct = note / 12 - 1;
-			int semi = note % 12;
-			text = string::f("%s%d", noteNames[semi], oct);
-			color.a = 1.0;
-
-			if (app()->event->selectedWidget == this)
-				app()->event->selectedWidget = NULL;
-		}
-	}
-
-	void onSelect(const event::Select &e) override {
-		e.consume(this);
-		if (!module)
-			return;
-		module->learningId = id;
-	}
-
-	void onDeselect(const event::Deselect &e) override {
-		if (!module)
-			return;
-		module->learningId = -1;
-	}
-};
-
-
-struct MidiTrigWidget : Grid16MidiWidget {
-	MIDI_Gate *module;
-	GridChoice *createGridChoice() override {
-		MidiTrigChoice *gridChoice = new MidiTrigChoice;
-		gridChoice->module = module;
-		return gridChoice;
 	}
 };
 
@@ -233,12 +171,12 @@ struct MIDI_GateWidget : ModuleWidget {
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), module, MIDI_Gate::TRIG_OUTPUT + 14));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDI_Gate::TRIG_OUTPUT + 15));
 
-		MidiTrigWidget *midiWidget = createWidget<MidiTrigWidget>(mm2px(Vec(3.399621, 14.837339)));
-		midiWidget->module = module;
+		typedef Grid16MidiWidget<NoteChoice<MIDI_Gate>> TMidiWidget;
+		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		if (module)
 			midiWidget->midiIO = &module->midiInput;
-		midiWidget->createGridChoices();
+		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 
@@ -248,12 +186,12 @@ struct MIDI_GateWidget : ModuleWidget {
 		struct VelocityItem : MenuItem {
 			MIDI_Gate *module;
 			void onAction(const event::Action &e) override {
-				module->velocity ^= true;
+				module->velocityMode ^= true;
 			}
 		};
 
 		menu->addChild(new MenuEntry);
-		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity", CHECKMARK(module->velocity));
+		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
 	}
