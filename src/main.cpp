@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
 	gamepad::init();
 	ui::init();
 	plugin::init(devMode);
+	windowInit();
 	INFO("Initialized environment");
 
 	// Initialize app
@@ -120,6 +121,7 @@ int main(int argc, char *argv[]) {
 	INFO("Cleaned up app");
 
 	// Destroy environment
+	windowDestroy();
 	plugin::destroy();
 	ui::destroy();
 	bridgeDestroy();

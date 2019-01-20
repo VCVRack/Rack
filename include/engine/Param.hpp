@@ -22,11 +22,19 @@ struct Param {
 	float maxValue = 1.f;
 	float defaultValue = 0.f;
 
+	/** The name of the parameter in sentence capitalization
+	e.g. "Frequency", "Pulse width", "Alternative mode"
+	*/
 	std::string label;
+	/** The numerical unit of measurement
+	Use a space before non-abbreviations to separate the numerical value.
+	e.g. " semitones", "Hz", "%", "V"
+	*/
 	std::string unit;
 	/** Set to 0 for linear, nonzero for exponential */
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
+	/** An optional one-sentence description of the parameter */
 	std::string description;
 	ParamQuantityFactory *paramQuantityFactory = NULL;
 

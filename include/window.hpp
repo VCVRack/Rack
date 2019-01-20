@@ -96,4 +96,8 @@ struct Window {
 };
 
 
+void windowInit();
+void windowDestroy();
+
+
 } // namespace rack

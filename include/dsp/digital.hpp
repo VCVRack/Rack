@@ -103,5 +103,23 @@ struct PulseGenerator {
 };
 
 
+struct Timer {
+	float time;
+
+	Timer() {
+		reset();
+	}
+
+	void reset() {
+		time = 0.f;
+	}
+
+	float process(float deltaTime) {
+		time += deltaTime;
+		return time;
+	}
+};
+
+
 } // namespace dsp
 } // namespace rack

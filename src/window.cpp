@@ -35,12 +35,74 @@
 namespace rack {
 
 
-struct MouseButtonArguments {
-	GLFWwindow *win;
-	int button;
-	int action;
-	int mods;
-};
+static std::map<std::string, std::weak_ptr<Font>> fontCache;
+static std::map<std::string, std::weak_ptr<Image>> imageCache;
+static std::map<std::string, std::weak_ptr<SVG>> svgCache;
+
+
+Font::Font(const std::string &filename) {
+	handle = nvgCreateFont(app()->window->vg, filename.c_str(), filename.c_str());
+	if (handle >= 0) {
+		INFO("Loaded font %s", filename.c_str());
+	}
+	else {
+		WARN("Failed to load font %s", filename.c_str());
+	}
+}
+
+Font::~Font() {
+	// There is no NanoVG deleteFont() function yet, so do nothing
+}
+
+std::shared_ptr<Font> Font::load(const std::string &filename) {
+	auto sp = fontCache[filename].lock();
+	if (!sp)
+		fontCache[filename] = sp = std::make_shared<Font>(filename);
+	return sp;
+}
+
+Image::Image(const std::string &filename) {
+	handle = nvgCreateImage(app()->window->vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+	if (handle > 0) {
+		INFO("Loaded image %s", filename.c_str());
+	}
+	else {
+		WARN("Failed to load image %s", filename.c_str());
+	}
+}
+
+Image::~Image() {
+	// TODO What if handle is invalid?
+	nvgDeleteImage(app()->window->vg, handle);
+}
+
+std::shared_ptr<Image> Image::load(const std::string &filename) {
+	auto sp = imageCache[filename].lock();
+	if (!sp)
+		imageCache[filename] = sp = std::make_shared<Image>(filename);
+	return sp;
+}
+
+SVG::SVG(const std::string &filename) {
+	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
+	if (handle) {
+		INFO("Loaded SVG %s", filename.c_str());
+	}
+	else {
+		WARN("Failed to load SVG %s", filename.c_str());
+	}
+}
+
+SVG::~SVG() {
+	nsvgDelete(handle);
+}
+
+std::shared_ptr<SVG> SVG::load(const std::string &filename) {
+	auto sp = svgCache[filename].lock();
+	if (!sp)
+		svgCache[filename] = sp = std::make_shared<SVG>(filename);
+	return sp;
+}
 
 
 struct Window::Internal {
@@ -50,8 +112,6 @@ struct Window::Internal {
 	int lastWindowY = 0;
 	int lastWindowWidth = 0;
 	int lastWindowHeight = 0;
-
-	std::queue<MouseButtonArguments> mouseButtonQueue;
 };
 
 
@@ -72,21 +132,6 @@ static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mod
 #endif
 
 	app()->event->handleButton(window->mousePos, button, action, mods);
-}
-
-static void Window_mouseButtonStickyPop(Window *window) {
-	if (!window->internal->mouseButtonQueue.empty()) {
-		MouseButtonArguments args = window->internal->mouseButtonQueue.front();
-		window->internal->mouseButtonQueue.pop();
-		mouseButtonCallback(args.win, args.button, args.action, args.mods);
-	}
-}
-
-static void mouseButtonStickyCallback(GLFWwindow *win, int button, int action, int mods) {
-	Window *window = (Window*) glfwGetWindowUserPointer(win);
-	// Defer multiple clicks per frame to future frames
-	MouseButtonArguments args = {win, button, action, mods};
-	window->internal->mouseButtonQueue.push(args);
 }
 
 static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
@@ -168,21 +213,12 @@ static void errorCallback(int error, const char *description) {
 
 Window::Window() {
 	internal = new Internal;
-
 	int err;
 
-	// Set up GLFW
-	glfwSetErrorCallback(errorCallback);
-	err = glfwInit();
-	if (err != GLFW_TRUE) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
-		exit(1);
-	}
-
-#if defined NANOVG_GL2
+#if NANOVG_GL2
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-#elif defined NANOVG_GL3
+#elif NANOVG_GL3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -191,7 +227,7 @@ Window::Window() {
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	internal->lastWindowTitle = "";
-	win = glfwCreateWindow(640, 480, internal->lastWindowTitle.c_str(), NULL, NULL);
+	win = glfwCreateWindow(800, 600, internal->lastWindowTitle.c_str(), NULL, NULL);
 
 	if (!win) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
@@ -205,7 +241,7 @@ Window::Window() {
 	glfwSwapInterval(1);
 
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
-	glfwSetMouseButtonCallback(win, mouseButtonStickyCallback);
+	glfwSetMouseButtonCallback(win, mouseButtonCallback);
 	// Call this ourselves, but on every frame instead of only when the mouse moves
 	// glfwSetCursorPosCallback(win, cursorPosCallback);
 	glfwSetCursorEnterCallback(win, cursorEnterCallback);
@@ -225,7 +261,7 @@ Window::Window() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
-	glfwSetWindowSizeLimits(win, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG
 	int nvgFlags = NVG_ANTIALIAS;
@@ -266,28 +302,7 @@ Window::~Window() {
 #endif
 
 	glfwDestroyWindow(win);
-	glfwTerminate();
 	delete internal;
-}
-
-static void Window_renderGui(Window *window) {
-	int width, height;
-	glfwGetFramebufferSize(window->win, &width, &height);
-
-	bndSetFont(window->uiFont->handle);
-
-	// Update and render
-	nvgBeginFrame(window->vg, width, height, window->pixelRatio);
-
-	nvgReset(window->vg);
-	nvgScale(window->vg, window->pixelRatio, window->pixelRatio);
-	app()->event->rootWidget->draw(window->vg);
-
-	glViewport(0, 0, width, height);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	nvgEndFrame(window->vg);
-	glfwSwapBuffers(window->win);
 }
 
 void Window::run() {
@@ -300,12 +315,12 @@ void Window::run() {
 
 		// Poll events
 		glfwPollEvents();
+		// Call cursorPosCallback every frame, not just when the mouse moves
 		{
 			double xpos, ypos;
 			glfwGetCursorPos(win, &xpos, &ypos);
 			cursorPosCallback(win, xpos, ypos);
 		}
-		Window_mouseButtonStickyPop(this);
 		gamepad::step();
 
 		// Set window title
@@ -322,23 +337,26 @@ void Window::run() {
 			internal->lastWindowTitle = windowTitle;
 		}
 
+		bndSetFont(uiFont->handle);
+
 		// Get desired scaling
-		float newPixelRatio;
-		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
-		newPixelRatio = std::round(newPixelRatio);
-		if (newPixelRatio != pixelRatio) {
+		float pixelRatio;
+		glfwGetWindowContentScale(win, &pixelRatio, NULL);
+		pixelRatio = std::round(pixelRatio);
+		if (pixelRatio != this->pixelRatio) {
 			app()->event->handleZoom();
-			pixelRatio = newPixelRatio;
+			this->pixelRatio = pixelRatio;
 		}
 
 		// Get framebuffer/window ratio
-		int width, height;
-		glfwGetFramebufferSize(win, &width, &height);
-		int windowWidth, windowHeight;
-		glfwGetWindowSize(win, &windowWidth, &windowHeight);
-		windowRatio = (float)width / windowWidth;
+		int fbWidth, fbHeight;
+		glfwGetFramebufferSize(win, &fbWidth, &fbHeight);
+		int winWidth, winHeight;
+		glfwGetWindowSize(win, &winWidth, &winHeight);
+		windowRatio = (float)fbWidth / winWidth;
 
-		app()->event->rootWidget->box.size = math::Vec(width, height).div(pixelRatio);
+		// Resize scene
+		app()->event->rootWidget->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
 
 		// Step scene
 		app()->event->rootWidget->step();
@@ -346,13 +364,28 @@ void Window::run() {
 		// Render
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
 		if (visible) {
-			Window_renderGui(this);
+			// In case glfwPollEvents() worked with another OpenGL context
+			glfwMakeContextCurrent(win);
+			glViewport(0, 0, fbWidth, fbHeight);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+			// Update and render
+			nvgBeginFrame(vg, winWidth, winHeight, pixelRatio);
+
+			// nvgReset(vg);
+			// nvgScale(vg, pixelRatio, pixelRatio);
+
+			app()->event->rootWidget->draw(vg);
+
+			nvgEndFrame(vg);
+			glfwSwapBuffers(win);
 		}
 
 		// Limit framerate manually if vsync isn't working
 		double endTime = glfwGetTime();
 		double frameTime = endTime - startTime;
-		double minTime = 1.0 / 90.0;
+		double minTime = 1 / 120.0;
 		if (frameTime < minTime) {
 			std::this_thread::sleep_for(std::chrono::duration<double>(minTime - frameTime));
 		}
@@ -441,84 +474,22 @@ bool Window::isFullScreen() {
 }
 
 
-////////////////////
-// resources
-////////////////////
+void windowInit() {
+	int err;
 
-Font::Font(const std::string &filename) {
-	handle = nvgCreateFont(app()->window->vg, filename.c_str(), filename.c_str());
-	if (handle >= 0) {
-		INFO("Loaded font %s", filename.c_str());
-	}
-	else {
-		WARN("Failed to load font %s", filename.c_str());
+	// Set up GLFW
+	glfwSetErrorCallback(errorCallback);
+	err = glfwInit();
+	if (err != GLFW_TRUE) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
+		exit(1);
 	}
 }
 
-Font::~Font() {
-	// There is no NanoVG deleteFont() function yet, so do nothing
+void windowDestroy() {
+	glfwTerminate();
 }
 
-std::shared_ptr<Font> Font::load(const std::string &filename) {
-	static std::map<std::string, std::weak_ptr<Font>> cache;
-	auto sp = cache[filename].lock();
-	if (!sp)
-		cache[filename] = sp = std::make_shared<Font>(filename);
-	return sp;
-}
-
-////////////////////
-// Image
-////////////////////
-
-Image::Image(const std::string &filename) {
-	handle = nvgCreateImage(app()->window->vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
-	if (handle > 0) {
-		INFO("Loaded image %s", filename.c_str());
-	}
-	else {
-		WARN("Failed to load image %s", filename.c_str());
-	}
-}
-
-Image::~Image() {
-	// TODO What if handle is invalid?
-	nvgDeleteImage(app()->window->vg, handle);
-}
-
-std::shared_ptr<Image> Image::load(const std::string &filename) {
-	static std::map<std::string, std::weak_ptr<Image>> cache;
-	auto sp = cache[filename].lock();
-	if (!sp)
-		cache[filename] = sp = std::make_shared<Image>(filename);
-	return sp;
-}
-
-////////////////////
-// SVG
-////////////////////
-
-SVG::SVG(const std::string &filename) {
-	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
-	if (handle) {
-		INFO("Loaded SVG %s", filename.c_str());
-	}
-	else {
-		WARN("Failed to load SVG %s", filename.c_str());
-	}
-}
-
-SVG::~SVG() {
-	nsvgDelete(handle);
-}
-
-std::shared_ptr<SVG> SVG::load(const std::string &filename) {
-	static std::map<std::string, std::weak_ptr<SVG>> cache;
-	auto sp = cache[filename].lock();
-	if (!sp)
-		cache[filename] = sp = std::make_shared<SVG>(filename);
-	return sp;
-}
 
 
 } // namespace rack
