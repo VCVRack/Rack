@@ -191,7 +191,7 @@ struct MIDI_GateWidget : ModuleWidget {
 		};
 
 		menu->addChild(new MenuEntry);
-		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity", CHECKMARK(module->velocityMode));
+		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
 	}

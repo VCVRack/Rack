@@ -178,6 +178,22 @@ struct CV_GateWidget : ModuleWidget {
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
+
+	void appendContextMenu(Menu *menu) override {
+		CV_Gate *module = dynamic_cast<CV_Gate*>(this->module);
+
+		struct VelocityItem : MenuItem {
+			CV_Gate *module;
+			void onAction(const event::Action &e) override {
+				module->velocityMode ^= true;
+			}
+		};
+
+		menu->addChild(new MenuEntry);
+		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
+		velocityItem->module = module;
+		menu->addChild(velocityItem);
+	}
 };
 
 
