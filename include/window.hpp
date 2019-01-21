@@ -7,6 +7,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <nanovg.h>
+#define NANOVG_GL2
+#include <nanovg_gl.h>
+#include <nanovg_gl_utils.h>
 #include <nanosvg.h>
 
 
@@ -60,7 +63,8 @@ struct SVG {
 struct Window {
 	GLFWwindow *win = NULL;
 	NVGcontext *vg = NULL;
-	NVGcontext *framebufferVg = NULL;
+	/** Secondary nanovg context for drawing to framebuffers */
+	NVGcontext *fbVg = NULL;
 	/** The scaling ratio */
 	float pixelRatio = 1.f;
 	/* The ratio between the framebuffer size and the window size reported by the OS.

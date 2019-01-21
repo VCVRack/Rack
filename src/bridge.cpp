@@ -4,7 +4,7 @@
 #include "dsp/ringbuffer.hpp"
 
 #include <unistd.h>
-#if ARCH_WIN
+#if defined ARCH_WIN
 	#include <winsock2.h>
 #else
 	#include <sys/socket.h>
@@ -87,7 +87,7 @@ struct BridgeClientConnection {
 		if (length <= 0)
 			return false;
 
-#if ARCH_LIN
+#if defined ARCH_LIN
 		int flags = MSG_NOSIGNAL;
 #else
 		int flags = 0;
@@ -114,7 +114,7 @@ struct BridgeClientConnection {
 		if (length <= 0)
 			return false;
 
-#if ARCH_LIN
+#if defined ARCH_LIN
 		int flags = MSG_NOSIGNAL;
 #else
 		int flags = 0;
@@ -282,7 +282,7 @@ struct BridgeClientConnection {
 
 static void clientRun(int client) {
 	DEFER({
-#if ARCH_WIN
+#if defined ARCH_WIN
 		if (shutdown(client, SD_SEND)) {
 			WARN("Bridge client shutdown() failed");
 		}
@@ -296,7 +296,7 @@ static void clientRun(int client) {
 #endif
 	});
 
-#if ARCH_MAC
+#if defined ARCH_MAC
 	// Avoid SIGPIPE
 	int flag = 1;
 	if (setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(int))) {
@@ -306,7 +306,7 @@ static void clientRun(int client) {
 #endif
 
 	// Disable non-blocking
-#if ARCH_WIN
+#if defined ARCH_WIN
 	unsigned long blockingMode = 0;
 	if (ioctlsocket(client, FIONBIO, &blockingMode)) {
 		WARN("Bridge client ioctlsocket() failed");
@@ -327,7 +327,7 @@ static void clientRun(int client) {
 
 static void serverConnect() {
 	// Initialize sockets
-#if ARCH_WIN
+#if defined ARCH_WIN
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData)) {
 		WARN("Bridge server WSAStartup() failed");
@@ -343,7 +343,7 @@ static void serverConnect() {
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(BRIDGE_PORT);
-#if ARCH_WIN
+#if defined ARCH_WIN
 	addr.sin_addr.s_addr = inet_addr(BRIDGE_HOST);
 #else
 	inet_pton(AF_INET, BRIDGE_HOST, &addr.sin_addr);
@@ -363,7 +363,7 @@ static void serverConnect() {
 		INFO("Bridge server closed");
 	});
 
-#if ARCH_MAC || ARCH_LIN
+#if defined ARCH_MAC || defined ARCH_LIN
 	int reuseAddrFlag = 1;
 	setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &reuseAddrFlag, sizeof(reuseAddrFlag));
 #endif
@@ -382,7 +382,7 @@ static void serverConnect() {
 	INFO("Bridge server started");
 
 	// Enable non-blocking
-#if ARCH_WIN
+#if defined ARCH_WIN
 	unsigned long blockingMode = 1;
 	if (ioctlsocket(server, FIONBIO, &blockingMode)) {
 		WARN("Bridge server ioctlsocket() failed");

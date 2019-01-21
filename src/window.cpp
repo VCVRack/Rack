@@ -17,20 +17,6 @@
 
 #include <osdialog.h>
 
-#define NANOVG_GL2_IMPLEMENTATION 1
-// #define NANOVG_GL3_IMPLEMENTATION 1
-// #define NANOVG_GLES2_IMPLEMENTATION 1
-// #define NANOVG_GLES3_IMPLEMENTATION 1
-#include <nanovg_gl.h>
-// Hack to get framebuffer objects working on OpenGL 2 (we blindly assume the extension is supported)
-#define NANOVG_FBO_VALID 1
-#include <nanovg_gl_utils.h>
-#define BLENDISH_IMPLEMENTATION
-#include <blendish.h>
-#define NANOSVG_IMPLEMENTATION
-#define NANOSVG_ALL_COLOR_KEYWORDS
-#include <nanosvg.h>
-
 
 namespace rack {
 
@@ -84,7 +70,7 @@ std::shared_ptr<Image> Image::load(const std::string &filename) {
 }
 
 SVG::SVG(const std::string &filename) {
-	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
+	handle = nsvgParseFromFile(filename.c_str(), "px", APP_SVG_DPI);
 	if (handle) {
 		INFO("Loaded SVG %s", filename.c_str());
 	}
@@ -171,10 +157,6 @@ static void scrollCallback(GLFWwindow *win, double x, double y) {
 	math::Vec scrollDelta = math::Vec(x, y);
 	scrollDelta = scrollDelta.mult(50.0);
 
-	// Flip coordinates if shift is held
-	if ((window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
-		scrollDelta = scrollDelta.flip();
-
 	app()->event->handleScroll(window->mousePos, scrollDelta);
 }
 
@@ -215,10 +197,10 @@ Window::Window() {
 	internal = new Internal;
 	int err;
 
-#if NANOVG_GL2
+#if defined NANOVG_GL2
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-#elif NANOVG_GL3
+#elif defined NANOVG_GL3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -275,13 +257,13 @@ Window::Window() {
 	assert(vg);
 
 #if defined NANOVG_GL2
-	framebufferVg = nvgCreateGL2(nvgFlags);
+	fbVg = nvgCreateGL2(nvgFlags);
 #elif defined NANOVG_GL3
-	framebufferVg = nvgCreateGL3(nvgFlags);
+	fbVg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
-	framebufferVg = nvgCreateGLES2(nvgFlags);
+	fbVg = nvgCreateGLES2(nvgFlags);
 #endif
-	assert(framebufferVg);
+	assert(fbVg);
 }
 
 Window::~Window() {
@@ -294,11 +276,11 @@ Window::~Window() {
 #endif
 
 #if defined NANOVG_GL2
-	nvgDeleteGL2(framebufferVg);
+	nvgDeleteGL2(fbVg);
 #elif defined NANOVG_GL3
-	nvgDeleteGL3(framebufferVg);
+	nvgDeleteGL3(fbVg);
 #elif defined NANOVG_GLES2
-	nvgDeleteGLES2(framebufferVg);
+	nvgDeleteGLES2(fbVg);
 #endif
 
 	glfwDestroyWindow(win);
@@ -311,10 +293,11 @@ void Window::run() {
 	frame = 0;
 	while(!glfwWindowShouldClose(win)) {
 		double startTime = glfwGetTime();
-		frame++;
 
 		// Poll events
 		glfwPollEvents();
+		// In case glfwPollEvents() set another OpenGL context
+		glfwMakeContextCurrent(win);
 		// Call cursorPosCallback every frame, not just when the mouse moves
 		{
 			double xpos, ypos;
@@ -364,12 +347,6 @@ void Window::run() {
 		// Render
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
 		if (visible) {
-			// In case glfwPollEvents() worked with another OpenGL context
-			glfwMakeContextCurrent(win);
-			glViewport(0, 0, fbWidth, fbHeight);
-			glClearColor(0.0, 0.0, 0.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 			// Update and render
 			nvgBeginFrame(vg, winWidth, winHeight, pixelRatio);
 
@@ -378,7 +355,11 @@ void Window::run() {
 
 			app()->event->rootWidget->draw(vg);
 
+			glViewport(0, 0, fbWidth, fbHeight);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			nvgEndFrame(vg);
+
 			glfwSwapBuffers(win);
 		}
 
@@ -391,6 +372,7 @@ void Window::run() {
 		}
 		endTime = glfwGetTime();
 		// INFO("%lf fps", 1.0 / (endTime - startTime));
+		frame++;
 	}
 }
 

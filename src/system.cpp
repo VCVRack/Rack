@@ -2,7 +2,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#if ARCH_WIN
+#if defined ARCH_WIN
 	#include <windows.h>
 	#include <shellapi.h>
 #endif
@@ -70,7 +70,7 @@ void copyFile(const std::string &srcPath, const std::string &destPath) {
 }
 
 void createDirectory(const std::string &path) {
-#if ARCH_WIN
+#if defined ARCH_WIN
 	CreateDirectory(path.c_str(), NULL);
 #else
 	mkdir(path.c_str(), 0755);
@@ -78,15 +78,15 @@ void createDirectory(const std::string &path) {
 }
 
 void openBrowser(const std::string &url) {
-#if ARCH_LIN
+#if defined ARCH_LIN
 	std::string command = "xdg-open " + url;
 	(void) std::system(command.c_str());
 #endif
-#if ARCH_MAC
+#if defined ARCH_MAC
 	std::string command = "open " + url;
 	std::system(command.c_str());
 #endif
-#if ARCH_WIN
+#if defined ARCH_WIN
 	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
 }

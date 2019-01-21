@@ -2,18 +2,18 @@
 #include "system.hpp"
 #include "plugin/Plugin.hpp"
 
-#if ARCH_MAC
+#if defined ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
 	#include <pwd.h>
 #endif
 
-#if ARCH_WIN
+#if defined ARCH_WIN
 	#include <Windows.h>
 	#include <Shlobj.h>
 	#include <Shlwapi.h>
 #endif
 
-#if ARCH_LIN
+#if defined ARCH_LIN
 	#include <unistd.h>
 	#include <sys/types.h>
 	#include <pwd.h>
@@ -31,7 +31,7 @@ void init(bool devMode) {
 			systemDir = ".";
 		}
 		else {
-#if ARCH_MAC
+#if defined ARCH_MAC
 			CFBundleRef bundle = CFBundleGetMainBundle();
 			assert(bundle);
 			CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
@@ -41,14 +41,14 @@ void init(bool devMode) {
 			CFRelease(resourcesUrl);
 			systemDir = resourcesBuf;
 #endif
-#if ARCH_WIN
+#if defined ARCH_WIN
 			char moduleBuf[MAX_PATH];
 			DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
 			assert(length > 0);
 			PathRemoveFileSpec(moduleBuf);
 			systemDir = moduleBuf;
 #endif
-#if ARCH_LIN
+#if defined ARCH_LIN
 			// TODO For now, users should launch Rack from their terminal in the system directory
 			systemDir = ".";
 #endif
@@ -61,7 +61,7 @@ void init(bool devMode) {
 			userDir = ".";
 		}
 		else {
-#if ARCH_WIN
+#if defined ARCH_WIN
 			// Get "My Documents" folder
 			char documentsBuf[MAX_PATH];
 			HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
@@ -69,14 +69,14 @@ void init(bool devMode) {
 			userDir = documentsBuf;
 			userDir += "/Rack";
 #endif
-#if ARCH_MAC
+#if defined ARCH_MAC
 			// Get home directory
 			struct passwd *pw = getpwuid(getuid());
 			assert(pw);
 			userDir = pw->pw_dir;
 			userDir += "/Documents/Rack";
 #endif
-#if ARCH_LIN
+#if defined ARCH_LIN
 			// Get home directory
 			const char *homeBuf = getenv("HOME");
 			if (!homeBuf) {

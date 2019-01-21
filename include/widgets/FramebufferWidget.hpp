@@ -12,19 +12,23 @@ Events are not passed to the underlying scene.
 struct FramebufferWidget : Widget {
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
-	/** A margin in pixels around the children in the framebuffer
-	This prevents cutting the rendered SVG off on the box edges.
-	*/
 	float oversample;
-	/** The root object in the framebuffer scene
-	The FramebufferWidget owns the pointer
+	NVGLUframebuffer *fb = NULL;
+	/** Pixel dimensions of the allocated framebuffer */
+	math::Vec fbSize;
+	/** Bounding box in world coordinates of where the framebuffer should be painted
+	Always has integer coordinates so that blitting framebuffers is pixel-perfect.
 	*/
-	struct Internal;
-	Internal *internal;
+	math::Rect fbBox;
+	/** Local scale relative to the world scale */
+	math::Vec fbScale;
+	/** Subpixel offset of fbBox in world coordinates */
+	math::Vec fbOffset;
 
 	FramebufferWidget();
 	~FramebufferWidget();
 	void draw(NVGcontext *vg) override;
+	virtual void drawFramebuffer(NVGcontext *vg);
 	int getImageHandle();
 
 	void onZoom(const event::Zoom &e) override {

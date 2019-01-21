@@ -346,5 +346,12 @@ inline Vec Vec::clampSafe(Rect bound) const {
 }
 
 
+/** Useful for debugging Vecs and Rects, e.g.
+	printf("%f %f %f %f", RECT_ARGS(r));
+*/
+#define VEC_ARGS(v) (v).x, (v).y
+#define RECT_ARGS(r) (r).pos.x, (r).pos.y, (r).size.x, (r).size.y
+
+
 } // namespace math
 } // namespace rack

@@ -19,7 +19,7 @@
 #include <zip.h>
 #include <jansson.h>
 
-#if ARCH_WIN
+#if defined ARCH_WIN
 	#include <windows.h>
 	#include <direct.h>
 	#define mkdir(_dir, _perms) _mkdir(_dir)
@@ -62,9 +62,9 @@ static bool loadPlugin(std::string path) {
 
 	// Load plugin library
 	std::string libraryFilename;
-#if ARCH_LIN
+#if defined ARCH_LIN
 	libraryFilename = path + "/" + "plugin.so";
-#elif ARCH_WIN
+#elif defined ARCH_WIN
 	libraryFilename = path + "/" + "plugin.dll";
 #elif ARCH_MAC
 	libraryFilename = path + "/" + "plugin.dylib";
@@ -77,7 +77,7 @@ static bool loadPlugin(std::string path) {
 	}
 
 	// Load dynamic/shared library
-#if ARCH_WIN
+#if defined ARCH_WIN
 	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
 	HINSTANCE handle = LoadLibrary(libraryFilename.c_str());
 	SetErrorMode(0);
@@ -97,7 +97,7 @@ static bool loadPlugin(std::string path) {
 	// Call plugin's init() function
 	typedef void (*InitCallback)(Plugin *);
 	InitCallback initCallback;
-#if ARCH_WIN
+#if defined ARCH_WIN
 	initCallback = (InitCallback) GetProcAddress(handle, "init");
 #else
 	initCallback = (InitCallback) dlsym(handle, "init");
@@ -170,11 +170,11 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 		name = slug;
 	}
 
-#if ARCH_WIN
+#if defined ARCH_WIN
 	std::string arch = "win";
 #elif ARCH_MAC
 	std::string arch = "mac";
-#elif ARCH_LIN
+#elif defined ARCH_LIN
 	std::string arch = "lin";
 #endif
 
@@ -359,7 +359,7 @@ void init(bool devMode) {
 void destroy() {
 	for (Plugin *plugin : plugins) {
 		// Free library handle
-#if ARCH_WIN
+#if defined ARCH_WIN
 		if (plugin->handle)
 			FreeLibrary((HINSTANCE) plugin->handle);
 #else

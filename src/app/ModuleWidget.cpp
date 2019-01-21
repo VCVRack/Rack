@@ -181,12 +181,12 @@ void ModuleWidget::onHover(const event::Hover &e) {
 	OpaqueWidget::onHover(e);
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-	if (glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS || glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS) {
-		if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-			removeAction();
-			e.consume(NULL);
-			return;
-		}
+	if ((glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
+		|| glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+		&& (app()->window->getMods() & WINDOW_MOD_MASK) == 0) {
+		removeAction();
+		e.consume(NULL);
+		return;
 	}
 }
 

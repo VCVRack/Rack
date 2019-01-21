@@ -1,34 +1,17 @@
 #include "widgets/FramebufferWidget.hpp"
 #include "app.hpp"
-#include <nanovg_gl.h>
-#include <nanovg_gl_utils.h>
 
 
 namespace rack {
 
 
-struct FramebufferWidget::Internal {
-	NVGLUframebuffer *fb = NULL;
-	math::Rect box;
-
-	~Internal() {
-		setFramebuffer(NULL);
-	}
-	void setFramebuffer(NVGLUframebuffer *fb) {
-		if (this->fb)
-			nvgluDeleteFramebuffer(this->fb);
-		this->fb = fb;
-	}
-};
-
-
 FramebufferWidget::FramebufferWidget() {
 	oversample = 1.0;
-	internal = new Internal;
 }
 
 FramebufferWidget::~FramebufferWidget() {
-	delete internal;
+	if (fb)
+		nvgluDeleteFramebuffer(fb);
 }
 
 void FramebufferWidget::draw(NVGcontext *vg) {
@@ -40,83 +23,106 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	float xform[6];
 	nvgCurrentTransform(vg, xform);
 	// Skew and rotate is not supported
-	assert(std::abs(xform[1]) < 1e-6);
-	assert(std::abs(xform[2]) < 1e-6);
-	math::Vec s = math::Vec(xform[0], xform[3]);
-	math::Vec b = math::Vec(xform[4], xform[5]);
-	math::Vec bi = b.floor();
-	math::Vec bf = b.minus(bi);
+	assert(math::isNear(xform[1], 0.f));
+	assert(math::isNear(xform[2], 0.f));
+	// Extract scale and offset from world transform
+	math::Vec scale = math::Vec(xform[0], xform[3]);
+	math::Vec offset = math::Vec(xform[4], xform[5]);
+	math::Vec offsetI = offset.floor();
 
 	// Render to framebuffer
 	if (dirty) {
 		dirty = false;
 
-		internal->box = getChildrenBoundingBox();
-		internal->box.pos = internal->box.pos.mult(s).floor();
-		internal->box.size = internal->box.size.mult(s).ceil().plus(math::Vec(1, 1));
+		fbScale = scale;
+		// World coordinates, in range [0, 1)
+		fbOffset = offset.minus(offsetI);
 
-		math::Vec fbSize = internal->box.size.mult(app()->window->pixelRatio * oversample);
+		math::Rect localBox;
+		if (children.empty()) {
+			localBox = box.zeroPos();
+		}
+		else {
+			localBox = getChildrenBoundingBox();
+		}
 
-		if (!fbSize.isFinite())
-			return;
-		if (fbSize.isZero())
-			return;
+		// DEBUG("%g %g %g %g, %g %g, %g %g", RECT_ARGS(localBox), VEC_ARGS(fbOffset), VEC_ARGS(scale));
+		// Transform to world coordinates, then expand to nearest integer coordinates
+		math::Vec min = localBox.getTopLeft().mult(scale).plus(fbOffset).floor();
+		math::Vec max = localBox.getBottomRight().mult(scale).plus(fbOffset).ceil();
+		fbBox = math::Rect::fromMinMax(min, max);
+		// DEBUG("%g %g %g %g", RECT_ARGS(fbBox));
 
-		// INFO("rendering framebuffer %f %f", fbSize.x, fbSize.y);
-		// Delete old one first to free up GPU memory
-		internal->setFramebuffer(NULL);
-		// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
-		NVGLUframebuffer *fb = nvgluCreateFramebuffer(app()->window->vg, fbSize.x, fbSize.y, 0);
+		math::Vec newFbSize = fbBox.size.mult(app()->window->pixelRatio * oversample);
+
+		if (!fb || !newFbSize.isEqual(fbSize)) {
+			fbSize = newFbSize;
+			// Delete old framebuffer
+			if (fb)
+				nvgluDeleteFramebuffer(fb);
+			// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
+			if (fbSize.isFinite() && !fbSize.isZero())
+				fb = nvgluCreateFramebuffer(vg, fbSize.x, fbSize.y, 0);
+		}
+
 		if (!fb)
 			return;
-		internal->setFramebuffer(fb);
 
 		nvgluBindFramebuffer(fb);
-		glViewport(0.0, 0.0, fbSize.x, fbSize.y);
-		glClearColor(0.0, 0.0, 0.0, 0.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-		NVGcontext *framebufferVg = app()->window->framebufferVg;
-		nvgBeginFrame(framebufferVg, fbSize.x, fbSize.y, app()->window->pixelRatio * oversample);
-
-		nvgScale(framebufferVg, app()->window->pixelRatio * oversample, app()->window->pixelRatio * oversample);
-		// Use local scaling
-		nvgTranslate(framebufferVg, bf.x, bf.y);
-		nvgTranslate(framebufferVg, -internal->box.pos.x, -internal->box.pos.y);
-		nvgScale(framebufferVg, s.x, s.y);
-		Widget::draw(framebufferVg);
-
-		nvgEndFrame(framebufferVg);
+		drawFramebuffer(app()->window->fbVg);
 		nvgluBindFramebuffer(NULL);
 	}
 
-	if (!internal->fb) {
+	if (!fb)
 		return;
-	}
 
 	// Draw framebuffer image, using world coordinates
 	nvgSave(vg);
 	nvgResetTransform(vg);
-	nvgTranslate(vg, bi.x, bi.y);
 
 	nvgBeginPath(vg);
-	nvgRect(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y);
-	NVGpaint paint = nvgImagePattern(vg, internal->box.pos.x, internal->box.pos.y, internal->box.size.x, internal->box.size.y, 0.0, internal->fb->image, 1.0);
+	nvgRect(vg,
+		offsetI.x + fbBox.pos.x,
+		offsetI.y + fbBox.pos.y,
+		fbBox.size.x, fbBox.size.y);
+	NVGpaint paint = nvgImagePattern(vg,
+		offsetI.x + fbBox.pos.x,
+		offsetI.y + fbBox.pos.y,
+		fbBox.size.x, fbBox.size.y,
+		0.0, fb->image, 1.0);
 	nvgFillPaint(vg, paint);
 	nvgFill(vg);
 
 	// For debugging the bounding box of the framebuffer
 	// nvgStrokeWidth(vg, 2.0);
-	// nvgStrokeColor(vg, nvgRGBA(255, 0, 0, 128));
+	// nvgStrokeColor(vg, nvgRGBAf(1, 1, 0, 0.5));
 	// nvgStroke(vg);
 
 	nvgRestore(vg);
 }
 
+void FramebufferWidget::drawFramebuffer(NVGcontext *vg) {
+	float pixelRatio = fbSize.x / fbBox.size.x;
+	nvgBeginFrame(vg, fbBox.size.x, fbBox.size.y, pixelRatio);
+
+	// Use local scaling
+	nvgTranslate(vg, -fbBox.pos.x, -fbBox.pos.y);
+	nvgTranslate(vg, fbOffset.x, fbOffset.y);
+	nvgScale(vg, fbScale.x, fbScale.y);
+
+	Widget::draw(vg);
+
+	glViewport(0.0, 0.0, fbSize.x, fbSize.y);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	// glClearColor(0.0, 1.0, 1.0, 0.5);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	nvgEndFrame(vg);
+}
+
 int FramebufferWidget::getImageHandle() {
-	if (!internal->fb)
+	if (!fb)
 		return -1;
-	return internal->fb->image;
+	return fb->image;
 }
 
 

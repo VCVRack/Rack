@@ -11,26 +11,26 @@ extern const std::string APP_NAME;
 extern const std::string APP_VERSION;
 extern const std::string API_HOST;
 
-static const float SVG_DPI = 75.0;
+static const float APP_SVG_DPI = 75.0;
 static const float MM_PER_IN = 25.4;
 
 
 /** Converts inch measurements to pixels */
 inline float in2px(float in) {
-	return in * SVG_DPI;
+	return in * APP_SVG_DPI;
 }
 
 inline math::Vec in2px(math::Vec in) {
-	return in.mult(SVG_DPI);
+	return in.mult(APP_SVG_DPI);
 }
 
 /** Converts millimeter measurements to pixels */
 inline float mm2px(float mm) {
-	return mm * (SVG_DPI / MM_PER_IN);
+	return mm * (APP_SVG_DPI / MM_PER_IN);
 }
 
 inline math::Vec mm2px(math::Vec mm) {
-	return mm.mult(SVG_DPI / MM_PER_IN);
+	return mm.mult(APP_SVG_DPI / MM_PER_IN);
 }
 
 
