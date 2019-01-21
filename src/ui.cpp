@@ -47,6 +47,7 @@ void setTheme(NVGcolor bg, NVGcolor fg) {
 	t.textFieldTheme = t.sliderTheme;
 	t.textFieldTheme.textColor = color::minus(bg, nvgRGB(0x20, 0x20, 0x20));
 	t.textFieldTheme.textSelectedColor = t.textFieldTheme.textColor;
+	t.textFieldTheme.itemColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
 
 	t.scrollBarTheme.itemColor = color::plus(bg, nvgRGB(0x50, 0x50, 0x50));
 	t.scrollBarTheme.innerColor = bg;

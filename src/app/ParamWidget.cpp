@@ -95,7 +95,7 @@ struct ParamResetItem : MenuItem {
 	ParamWidget *paramWidget;
 	ParamResetItem() {
 		text = "Initialize";
-		rightText = WINDOW_MOD_ALT_NAME "+Click";
+		rightText = WINDOW_MOD_CTRL_NAME "+Click";
 	}
 	void onAction(const event::Action &e) override {
 		paramWidget->resetAction();
@@ -107,10 +107,19 @@ struct ParamFieldItem : MenuItem {
 	ParamWidget *paramWidget;
 	ParamFieldItem() {
 		text = "Enter value";
-		rightText = WINDOW_MOD_SHIFT_NAME "+Click";
+		rightText = WINDOW_MOD_ALT_NAME "+Click";
 	}
 	void onAction(const event::Action &e) override {
 		paramWidget->createParamField();
+	}
+};
+
+
+struct ParamFineItem : MenuItem {
+	ParamFineItem() {
+		text = "Fine adjust";
+		rightText = WINDOW_MOD_SHIFT_NAME "+Drag";
+		disabled = true;
 	}
 };
 
@@ -157,14 +166,16 @@ void ParamWidget::onButton(const event::Button &e) {
 		e.consume(this);
 	}
 
-	// Alt-click to reset
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == GLFW_MOD_ALT) {
+	// Mod-click to reset
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 		resetAction();
-		e.consume(this);
+		// HACK so that dragging won't occur
+		e.consume(NULL);
+		return;
 	}
 
 	// Shift-click to open value entry
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == GLFW_MOD_ALT) {
 		createParamField();
 		e.consume(this);
 	}
@@ -224,6 +235,9 @@ void ParamWidget::createContextMenu() {
 	ParamFieldItem *fieldItem = new ParamFieldItem;
 	fieldItem->paramWidget = this;
 	menu->addChild(fieldItem);
+
+	// ParamFineItem *fineItem = new ParamFineItem;
+	// menu->addChild(fineItem);
 }
 
 void ParamWidget::resetAction() {
