@@ -19,6 +19,7 @@
 #include "widgets/ZoomWidget.hpp"
 #include "widgets/SVGWidget.hpp"
 #include "widgets/FramebufferWidget.hpp"
+#include "widgets/GLWidget.hpp"
 
 #include "ui/SequentialLayout.hpp"
 #include "ui/Label.hpp"

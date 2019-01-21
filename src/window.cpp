@@ -243,6 +243,11 @@ Window::Window() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
+	const GLubyte *renderer = glGetString(GL_RENDERER);
+	const GLubyte *version = glGetString(GL_VERSION);
+	INFO("Renderer: %s", renderer);
+	INFO("OpenGL: %s", version);
+
 	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	// Set up NanoVG

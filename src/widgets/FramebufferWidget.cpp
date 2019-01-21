@@ -69,7 +69,7 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 			return;
 
 		nvgluBindFramebuffer(fb);
-		drawFramebuffer(app()->window->fbVg);
+		drawFramebuffer();
 		nvgluBindFramebuffer(NULL);
 	}
 
@@ -101,7 +101,9 @@ void FramebufferWidget::draw(NVGcontext *vg) {
 	nvgRestore(vg);
 }
 
-void FramebufferWidget::drawFramebuffer(NVGcontext *vg) {
+void FramebufferWidget::drawFramebuffer() {
+	NVGcontext *vg = app()->window->fbVg;
+
 	float pixelRatio = fbSize.x / fbBox.size.x;
 	nvgBeginFrame(vg, fbBox.size.x, fbBox.size.y, pixelRatio);
 

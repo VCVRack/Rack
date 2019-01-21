@@ -28,7 +28,7 @@ struct FramebufferWidget : Widget {
 	FramebufferWidget();
 	~FramebufferWidget();
 	void draw(NVGcontext *vg) override;
-	virtual void drawFramebuffer(NVGcontext *vg);
+	virtual void drawFramebuffer();
 	int getImageHandle();
 
 	void onZoom(const event::Zoom &e) override {
