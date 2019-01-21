@@ -34,6 +34,7 @@ struct Param {
 	/** Set to 0 for linear, nonzero for exponential */
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
+	float displayOffset = 0.f;
 	/** An optional one-sentence description of the parameter */
 	std::string description;
 	ParamQuantityFactory *paramQuantityFactory = NULL;
@@ -44,7 +45,7 @@ struct Param {
 	}
 
 	template<class TParamQuantity = ParamQuantity>
-	void config(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f) {
+	void config(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
 		this->value = defaultValue;
 		this->minValue = minValue;
 		this->maxValue = maxValue;
@@ -54,6 +55,7 @@ struct Param {
 		this->unit = unit;
 		this->displayBase = displayBase;
 		this->displayMultiplier = displayMultiplier;
+		this->displayOffset = displayOffset;
 
 		struct TParamQuantityFactory : ParamQuantityFactory {
 			ParamQuantity *create() override {return new TParamQuantity;}

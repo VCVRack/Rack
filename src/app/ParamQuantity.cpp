@@ -58,45 +58,39 @@ float ParamQuantity::getDefaultValue() {
 float ParamQuantity::getDisplayValue() {
 	if (!module)
 		return Quantity::getDisplayValue();
+	float v = getSmoothValue();
 	float displayBase = getParam()->displayBase;
 	if (displayBase == 0.f) {
 		// Linear
-		return getSmoothValue() * getParam()->displayMultiplier;
-	}
-	else if (displayBase == 1.f) {
-		// Fixed (special case of exponential)
-		return getParam()->displayMultiplier;
 	}
 	else if (displayBase < 0.f) {
 		// Logarithmic
-		return std::log(getSmoothValue()) / std::log(-displayBase) * getParam()->displayMultiplier;
+		v = std::log(v) / std::log(-displayBase);
 	}
 	else {
 		// Exponential
-		return std::pow(displayBase, getSmoothValue()) * getParam()->displayMultiplier;
+		v = std::pow(displayBase, v);
 	}
+	return v * getParam()->displayMultiplier + getParam()->displayOffset;
 }
 
 void ParamQuantity::setDisplayValue(float displayValue) {
 	if (!module)
 		return;
+	float v = (displayValue - getParam()->displayOffset) / getParam()->displayMultiplier;
 	float displayBase = getParam()->displayBase;
 	if (displayBase == 0.f) {
 		// Linear
-		setValue(displayValue / getParam()->displayMultiplier);
-	}
-	else if (displayBase == 1.f) {
-		// Fixed
-		setValue(getParam()->displayMultiplier);
 	}
 	else if (displayBase < 0.f) {
 		// Logarithmic
-		setValue(std::pow(displayBase, displayValue / getParam()->displayMultiplier));
+		v = std::pow(displayBase, v);
 	}
 	else {
 		// Exponential
-		setValue(std::log(displayValue / getParam()->displayMultiplier) / std::log(displayBase));
+		v = std::log(v) / std::log(displayBase);
 	}
+	setValue(v);
 }
 
 int ParamQuantity::getDisplayPrecision() {

@@ -89,7 +89,7 @@ struct ParamResetItem : MenuItem {
 	ParamWidget *paramWidget;
 	ParamResetItem() {
 		text = "Initialize";
-		rightText = WINDOW_MOD_CTRL_NAME "+Click";
+		rightText = WINDOW_MOD_SHIFT_NAME "+Click";
 	}
 	void onAction(const event::Action &e) override {
 		paramWidget->resetAction();
@@ -100,7 +100,7 @@ struct ParamResetItem : MenuItem {
 struct ParamFineItem : MenuItem {
 	ParamFineItem() {
 		text = "Fine adjust";
-		rightText = WINDOW_MOD_SHIFT_NAME "+Drag";
+		rightText = WINDOW_MOD_CTRL_NAME "+Drag";
 		disabled = true;
 	}
 };
@@ -201,8 +201,8 @@ void ParamWidget::createContextMenu() {
 	resetItem->paramWidget = this;
 	menu->addChild(resetItem);
 
-	ParamFineItem *fineItem = new ParamFineItem;
-	menu->addChild(fineItem);
+	// ParamFineItem *fineItem = new ParamFineItem;
+	// menu->addChild(fineItem);
 }
 
 void ParamWidget::resetAction() {
