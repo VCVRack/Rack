@@ -51,12 +51,6 @@ struct ParamField : TextField {
 			e.consume(this);
 		}
 
-		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
-			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
-			overlay->requestedDelete = true;
-			e.consume(this);
-		}
-
 		if (!e.getConsumed())
 			TextField::onSelectKey(e);
 	}
@@ -99,18 +93,6 @@ struct ParamResetItem : MenuItem {
 	}
 	void onAction(const event::Action &e) override {
 		paramWidget->resetAction();
-	}
-};
-
-
-struct ParamFieldItem : MenuItem {
-	ParamWidget *paramWidget;
-	ParamFieldItem() {
-		text = "Enter value";
-		rightText = WINDOW_MOD_ALT_NAME "+Click";
-	}
-	void onAction(const event::Action &e) override {
-		paramWidget->createParamField();
 	}
 };
 
@@ -166,18 +148,12 @@ void ParamWidget::onButton(const event::Button &e) {
 		e.consume(this);
 	}
 
-	// Mod-click to reset
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+	// Shift-click to reset
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT) {
 		resetAction();
 		// HACK so that dragging won't occur
 		e.consume(NULL);
 		return;
-	}
-
-	// Shift-click to open value entry
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == GLFW_MOD_ALT) {
-		createParamField();
-		e.consume(this);
 	}
 
 	if (!e.getConsumed())
@@ -209,18 +185,6 @@ void ParamWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-void ParamWidget::createParamField() {
-	// Create ParamField
-	MenuOverlay *overlay = new MenuOverlay;
-	app()->scene->addChild(overlay);
-
-	ParamField *paramField = new ParamField;
-	paramField->box.size.x = 100;
-	paramField->box.pos = getAbsoluteOffset(box.size).round();
-	paramField->setParamWidget(this);
-	overlay->addChild(paramField);
-}
-
 void ParamWidget::createContextMenu() {
 	Menu *menu = createMenu();
 
@@ -228,16 +192,17 @@ void ParamWidget::createContextMenu() {
 	paramLabel->paramWidget = this;
 	menu->addChild(paramLabel);
 
+	ParamField *paramField = new ParamField;
+	paramField->box.size.x = 100;
+	paramField->setParamWidget(this);
+	menu->addChild(paramField);
+
 	ParamResetItem *resetItem = new ParamResetItem;
 	resetItem->paramWidget = this;
 	menu->addChild(resetItem);
 
-	ParamFieldItem *fieldItem = new ParamFieldItem;
-	fieldItem->paramWidget = this;
-	menu->addChild(fieldItem);
-
-	// ParamFineItem *fineItem = new ParamFineItem;
-	// menu->addChild(fineItem);
+	ParamFineItem *fineItem = new ParamFineItem;
+	menu->addChild(fineItem);
 }
 
 void ParamWidget::resetAction() {

@@ -7,9 +7,7 @@ FLAGS += -Idep/include -Idep/lib/libzip/include
 
 include arch.mk
 
-STRIP ?= strip
-SED := perl -p -i -e
-# SED := sed -i
+SED := perl -pi -e
 
 # Sources and build flags
 

@@ -5,8 +5,6 @@ endif
 SLUG := $(shell jq ".slug" plugin.json)
 VERSION := $(shell jq ".version" plugin.json)
 
-STRIP ?= strip
-
 DISTRIBUTABLES += plugin.json
 
 FLAGS += -fPIC

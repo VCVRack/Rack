@@ -5,6 +5,7 @@ endif
 include $(RACK_DIR)/arch.mk
 
 OBJCOPY ?= objcopy
+STRIP ?= strip
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD -MP

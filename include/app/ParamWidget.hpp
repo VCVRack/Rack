@@ -23,7 +23,6 @@ struct ParamWidget : OpaqueWidget {
 
 	/** For legacy patch loading */
 	void fromJson(json_t *rootJ);
-	void createParamField();
 	void createContextMenu();
 	void resetAction();
 };

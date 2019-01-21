@@ -15,9 +15,12 @@ FramebufferWidget::~FramebufferWidget() {
 }
 
 void FramebufferWidget::draw(NVGcontext *vg) {
-	// Bypass framebuffer rendering entirely
-	// Widget::draw(vg);
-	// return;
+	// Bypass framebuffer rendering if we're already drawing in a framebuffer
+	// In other words, disallow nested framebuffers. They look bad.
+	if (vg == app()->window->fbVg) {
+		Widget::draw(vg);
+		return;
+	}
 
 	// Get world transform
 	float xform[6];
