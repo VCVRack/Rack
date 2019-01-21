@@ -33,6 +33,11 @@ void init(rack::Plugin *p) {
 	modelMIDI_Gate->tags = {"External", "MIDI"};
 	p->addModel(modelMIDI_Gate);
 
+	modelMIDI_Map->name = "MIDI-Map";
+	modelMIDI_Map->description = "";
+	modelMIDI_Map->tags = {"External", "MIDI"};
+	p->addModel(modelMIDI_Map);
+
 	modelCV_MIDI->name = "CV-MIDI";
 	modelCV_MIDI->description = "";
 	modelCV_MIDI->tags = {"External", "MIDI"};

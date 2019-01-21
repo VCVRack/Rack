@@ -9,6 +9,7 @@ extern Model *modelAudioInterface;
 extern Model *modelMIDI_CV;
 extern Model *modelMIDI_CC;
 extern Model *modelMIDI_Gate;
+extern Model *modelMIDI_Map;
 extern Model *modelCV_MIDI;
 extern Model *modelCV_CC;
 extern Model *modelCV_Gate;

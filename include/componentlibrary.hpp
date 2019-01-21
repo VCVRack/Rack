@@ -506,7 +506,7 @@ struct PB61303Light : BASE {
 
 
 ////////////////////
-// Switches and Buttons
+// Switches
 ////////////////////
 
 struct NKK : SVGSwitch {
@@ -582,18 +582,6 @@ struct PB61303 : SVGSwitch {
 	PB61303() {
 		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/PB61303.svg")));
-	}
-};
-
-struct PB61303Button : SVGButton {
-	PB61303Button() {
-		setSVGs(SVG::load(asset::system("res/ComponentLibrary/PB61303.svg")), NULL);
-	}
-};
-
-struct LEDBezelButton : SVGButton {
-	LEDBezelButton() {
-		setSVGs(SVG::load(asset::system("res/ComponentLibrary/LEDBezel.svg")), NULL);
 	}
 };
 
