@@ -8,6 +8,7 @@
 #include <map>
 #include <queue>
 #include <thread>
+#include <cstdlib>
 
 #include "osdialog.h"
 
@@ -559,6 +560,8 @@ void windowSetWindowPos(Vec pos) {
 }
 
 bool windowIsMaximized() {
+  if (getenv("RACK_XMONAD_HACK"))
+    return true;
 	return glfwGetWindowAttrib(gWindow, GLFW_MAXIMIZED);
 }
 
