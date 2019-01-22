@@ -47,12 +47,14 @@ math::Rect Widget::getViewport(math::Rect r) {
 }
 
 void Widget::addChild(Widget *child) {
+	assert(child);
 	assert(!child->parent);
 	child->parent = this;
 	children.push_back(child);
 }
 
 void Widget::removeChild(Widget *child) {
+	assert(child);
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
 	// Prepare to remove widget from the event state

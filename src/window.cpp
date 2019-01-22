@@ -316,9 +316,9 @@ void Window::run() {
 		windowTitle = APP_NAME;
 		windowTitle += " ";
 		windowTitle += APP_VERSION;
-		if (!app()->scene->rackWidget->lastPath.empty()) {
+		if (!app()->scene->rackWidget->patchPath.empty()) {
 			windowTitle += " - ";
-			windowTitle += string::filename(app()->scene->rackWidget->lastPath);
+			windowTitle += string::filename(app()->scene->rackWidget->patchPath);
 		}
 		if (windowTitle != internal->lastWindowTitle) {
 			glfwSetWindowTitle(win, windowTitle.c_str());

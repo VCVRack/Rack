@@ -13,10 +13,10 @@ struct PortWidget : OpaqueWidget {
 	int portId;
 
 	enum Type {
-		INPUT,
-		OUTPUT
+		OUTPUT,
+		INPUT
 	};
-	Type type = INPUT;
+	Type type;
 	MultiLightWidget *plugLight;
 
 	PortWidget();
@@ -29,7 +29,6 @@ struct PortWidget : OpaqueWidget {
 	void onDragDrop(const event::DragDrop &e) override;
 	void onDragEnter(const event::DragEnter &e) override;
 	void onDragLeave(const event::DragLeave &e) override;
-	void setHovered();
 };
 
 

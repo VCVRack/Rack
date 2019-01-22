@@ -15,8 +15,10 @@ struct RackWidget : OpaqueWidget {
 	Widget *moduleContainer;
 	// Only put CableWidgets in here
 	CableContainer *cableContainer;
-	std::string lastPath;
-	math::Vec lastMousePos;
+	/** The currently loaded patch file path */
+	std::string patchPath;
+	/** The last mouse position in the RackWidget */
+	math::Vec mousePos;
 
 	RackWidget();
 	~RackWidget();
@@ -37,8 +39,6 @@ struct RackWidget : OpaqueWidget {
 	void load(std::string filename);
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
-	/** Creates a module and adds it to the rack */
-	ModuleWidget *moduleFromJson(json_t *moduleJ);
 	void pastePresetClipboard();
 
 	void addModule(ModuleWidget *m);
@@ -46,9 +46,9 @@ struct RackWidget : OpaqueWidget {
 	/** Removes the module and transfers ownership to the caller */
 	void removeModule(ModuleWidget *m);
 	/** Sets a module's box if non-colliding. Returns true if set */
-	bool requestModuleBox(ModuleWidget *m, math::Rect box);
+	bool requestModuleBox(ModuleWidget *m, math::Rect requestedBox);
 	/** Moves a module to the closest non-colliding position */
-	bool requestModuleBoxNearest(ModuleWidget *m, math::Rect box);
+	bool requestModuleBoxNearest(ModuleWidget *m, math::Rect requestedBox);
 	ModuleWidget *getModule(int moduleId);
 
 	void step() override;

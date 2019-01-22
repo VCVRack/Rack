@@ -16,6 +16,30 @@
 namespace rack {
 
 
+static ModuleWidget *moduleFromJson(json_t *moduleJ) {
+	// Get slugs
+	json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
+	if (!pluginSlugJ)
+		return NULL;
+	json_t *modelSlugJ = json_object_get(moduleJ, "model");
+	if (!modelSlugJ)
+		return NULL;
+	std::string pluginSlug = json_string_value(pluginSlugJ);
+	std::string modelSlug = json_string_value(modelSlugJ);
+
+	// Get Model
+	Model *model = plugin::getModel(pluginSlug, modelSlug);
+	if (!model)
+		return NULL;
+
+	// Create ModuleWidget
+	ModuleWidget *moduleWidget = model->createModuleWidget();
+	assert(moduleWidget);
+	moduleWidget->fromJson(moduleJ);
+	return moduleWidget;
+}
+
+
 struct ModuleContainer : Widget {
 	void draw(NVGcontext *vg) override {
 		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front of other ModuleWidgets.
@@ -58,8 +82,6 @@ RackWidget::~RackWidget() {
 }
 
 void RackWidget::clear() {
-	cableContainer->activeCable = NULL;
-	cableContainer->clearChildren();
 	// Remove ModuleWidgets
 	std::list<Widget*> widgets = moduleContainer->children;
 	for (Widget *w : widgets) {
@@ -67,27 +89,27 @@ void RackWidget::clear() {
 		assert(moduleWidget);
 		removeModule(moduleWidget);
 	}
-
-	app()->scene->scrollWidget->offset = math::Vec(0, 0);
+	assert(cableContainer->children.empty());
 }
 
 void RackWidget::reset() {
 	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear patch and start over?")) {
 		clear();
+		app()->scene->scrollWidget->offset = math::Vec(0, 0);
 		// Fails silently if file does not exist
 		load(asset::user("template.vcv"));
-		lastPath = "";
+		patchPath = "";
 	}
 }
 
 void RackWidget::loadDialog() {
 	std::string dir;
-	if (lastPath.empty()) {
+	if (patchPath.empty()) {
 		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
-		dir = string::directory(lastPath);
+		dir = string::directory(patchPath);
 	}
 
 	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
@@ -105,12 +127,12 @@ void RackWidget::loadDialog() {
 	});
 
 	load(path);
-	lastPath = path;
+	patchPath = path;
 }
 
 void RackWidget::saveDialog() {
-	if (!lastPath.empty()) {
-		save(lastPath);
+	if (!patchPath.empty()) {
+		save(patchPath);
 	}
 	else {
 		saveAsDialog();
@@ -120,13 +142,13 @@ void RackWidget::saveDialog() {
 void RackWidget::saveAsDialog() {
 	std::string dir;
 	std::string filename;
-	if (lastPath.empty()) {
+	if (patchPath.empty()) {
 		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
-		dir = string::directory(lastPath);
-		filename = string::filename(lastPath);
+		dir = string::directory(patchPath);
+		filename = string::filename(patchPath);
 	}
 
 	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
@@ -150,7 +172,7 @@ void RackWidget::saveAsDialog() {
 	}
 
 	save(pathStr);
-	lastPath = pathStr;
+	patchPath = pathStr;
 }
 
 void RackWidget::saveTemplate() {
@@ -203,14 +225,15 @@ void RackWidget::load(std::string filename) {
 	});
 
 	clear();
+	app()->scene->scrollWidget->offset = math::Vec(0, 0);
 	fromJson(rootJ);
 }
 
 void RackWidget::revert() {
-	if (lastPath.empty())
+	if (patchPath.empty())
 		return;
 	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert patch to the last saved state?")) {
-		load(lastPath);
+		load(patchPath);
 	}
 }
 
@@ -218,7 +241,7 @@ void RackWidget::disconnect() {
 	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
 		return;
 
-	cableContainer->removeAllCables(NULL);
+	cableContainer->clear();
 }
 
 json_t *RackWidget::toJson() {
@@ -249,34 +272,7 @@ json_t *RackWidget::toJson() {
 	json_object_set_new(rootJ, "modules", modulesJ);
 
 	// cables
-	json_t *cablesJ = json_array();
-	for (Widget *w : cableContainer->children) {
-		CableWidget *cableWidget = dynamic_cast<CableWidget*>(w);
-		assert(cableWidget);
-
-		PortWidget *outputPort = cableWidget->outputPort;
-		PortWidget *inputPort = cableWidget->inputPort;
-		// Only serialize CableWidgets connected on both ends
-		if (!(outputPort && inputPort))
-			continue;
-
-		Cable *cable = cableWidget->cable;
-		assert(cable);
-		// cable
-		json_t *cableJ = cableWidget->toJson();
-
-		assert(outputPort->module);
-		assert(inputPort->module);
-
-		json_object_set_new(cableJ, "id", json_integer(cable->id));
-		json_object_set_new(cableJ, "outputModuleId", json_integer(outputPort->module->id));
-		json_object_set_new(cableJ, "outputId", json_integer(outputPort->portId));
-		json_object_set_new(cableJ, "inputModuleId", json_integer(inputPort->module->id));
-		json_object_set_new(cableJ, "inputId", json_integer(inputPort->portId));
-
-		json_array_append_new(cablesJ, cableJ);
-	}
-	json_object_set_new(rootJ, "cables", cablesJ);
+	json_object_set_new(rootJ, "cables", cableContainer->toJson());
 
 	return rootJ;
 }
@@ -363,83 +359,13 @@ void RackWidget::fromJson(json_t *rootJ) {
 	// Before 1.0, cables were called wires
 	if (!cablesJ)
 		cablesJ = json_object_get(rootJ, "wires");
-	assert(cablesJ);
-	size_t cableIndex;
-	json_t *cableJ;
-	json_array_foreach(cablesJ, cableIndex, cableJ) {
-		int outputModuleId = json_integer_value(json_object_get(cableJ, "outputModuleId"));
-		int outputId = json_integer_value(json_object_get(cableJ, "outputId"));
-		int inputModuleId = json_integer_value(json_object_get(cableJ, "inputModuleId"));
-		int inputId = json_integer_value(json_object_get(cableJ, "inputId"));
-
-		// Get module widgets
-		ModuleWidget *outputModuleWidget = moduleWidgets[outputModuleId];
-		if (!outputModuleWidget) continue;
-		ModuleWidget *inputModuleWidget = moduleWidgets[inputModuleId];
-		if (!inputModuleWidget) continue;
-
-		// Get port widgets
-		PortWidget *outputPort = NULL;
-		PortWidget *inputPort = NULL;
-		if (legacy && legacy <= 1) {
-			// Before 0.6, the index of the "ports" array was the index of the PortWidget in the `outputs` and `inputs` vector.
-			outputPort = outputModuleWidget->outputs[outputId];
-			inputPort = inputModuleWidget->inputs[inputId];
-		}
-		else {
-			for (PortWidget *port : outputModuleWidget->outputs) {
-				if (port->portId == outputId) {
-					outputPort = port;
-					break;
-				}
-			}
-			for (PortWidget *port : inputModuleWidget->inputs) {
-				if (port->portId == inputId) {
-					inputPort = port;
-					break;
-				}
-			}
-		}
-		if (!outputPort || !inputPort)
-			continue;
-
-		// Create CableWidget
-		CableWidget *cableWidget = new CableWidget;
-		cableWidget->fromJson(cableJ);
-		cableWidget->outputPort = outputPort;
-		cableWidget->inputPort = inputPort;
-		cableWidget->updateCable();
-		// Add cable to rack
-		cableContainer->addChild(cableWidget);
-	}
+	if (cablesJ)
+		cableContainer->fromJson(cablesJ, moduleWidgets);
 
 	// Display a message if we have something to say
 	if (!message.empty()) {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
-}
-
-ModuleWidget *RackWidget::moduleFromJson(json_t *moduleJ) {
-	// Get slugs
-	json_t *pluginSlugJ = json_object_get(moduleJ, "plugin");
-	if (!pluginSlugJ)
-		return NULL;
-	json_t *modelSlugJ = json_object_get(moduleJ, "model");
-	if (!modelSlugJ)
-		return NULL;
-	std::string pluginSlug = json_string_value(pluginSlugJ);
-	std::string modelSlug = json_string_value(modelSlugJ);
-
-	// Get Model
-	Model *model = plugin::getModel(pluginSlug, modelSlug);
-	if (!model)
-		return NULL;
-
-	// Create ModuleWidget
-	ModuleWidget *moduleWidget = model->createModuleWidget();
-	assert(moduleWidget);
-	moduleWidget->fromJson(moduleJ);
-	return moduleWidget;
 }
 
 void RackWidget::pastePresetClipboard() {
@@ -457,7 +383,7 @@ void RackWidget::pastePresetClipboard() {
 		addModule(moduleWidget);
 		// Set moduleWidget position
 		math::Rect newBox = moduleWidget->box;
-		newBox.pos = lastMousePos.minus(newBox.size.div(2));
+		newBox.pos = mousePos.minus(newBox.size.div(2));
 		requestModuleBoxNearest(moduleWidget, newBox);
 	}
 	else {
@@ -468,17 +394,18 @@ void RackWidget::pastePresetClipboard() {
 void RackWidget::addModule(ModuleWidget *m) {
 	// Add module to ModuleContainer
 	assert(m);
-	assert(m->module);
 	moduleContainer->addChild(m);
 
-	// Add module to Engine
-	app()->engine->addModule(m->module);
+	if (m->module) {
+		// Add module to Engine
+		app()->engine->addModule(m->module);
+	}
 }
 
 void RackWidget::addModuleAtMouse(ModuleWidget *m) {
 	assert(m);
 	// Move module nearest to the mouse position
-	m->box.pos = lastMousePos.minus(m->box.size.div(2));
+	m->box.pos = mousePos.minus(m->box.size.div(2));
 	requestModuleBoxNearest(m, m->box);
 	addModule(m);
 }
@@ -487,32 +414,37 @@ void RackWidget::removeModule(ModuleWidget *m) {
 	// Disconnect cables
 	m->disconnect();
 
-	// Remove module from Engine
-	assert(m->module);
-	app()->engine->removeModule(m->module);
+	if (m->module) {
+		// Remove module from Engine
+		app()->engine->removeModule(m->module);
+	}
 
 	// Remove module from ModuleContainer
 	moduleContainer->removeChild(m);
 }
 
-bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect box) {
-	if (box.pos.x < 0 || box.pos.y < 0)
+bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect requestedBox) {
+	// Check bounds
+	if (requestedBox.pos.x < 0 || requestedBox.pos.y < 0)
 		return false;
 
-	for (Widget *child2 : moduleContainer->children) {
-		if (m == child2) continue;
-		if (box.intersects(child2->box)) {
+	// Check intersection with other modules
+	for (Widget *m2 : moduleContainer->children) {
+		if (m == m2) continue;
+		if (requestedBox.intersects(m2->box)) {
 			return false;
 		}
 	}
-	m->box = box;
+
+	// Accept requested position
+	m->box = requestedBox;
 	return true;
 }
 
-bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect box) {
+bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect requestedBox) {
 	// Create possible positions
-	int x0 = std::round(box.pos.x / RACK_GRID_WIDTH);
-	int y0 = std::round(box.pos.y / RACK_GRID_HEIGHT);
+	int x0 = std::round(requestedBox.pos.x / RACK_GRID_WIDTH);
+	int y0 = std::round(requestedBox.pos.y / RACK_GRID_HEIGHT);
 	std::vector<math::Vec> positions;
 	for (int y = std::max(0, y0 - 8); y < y0 + 8; y++) {
 		for (int x = std::max(0, x0 - 400); x < x0 + 400; x++) {
@@ -521,17 +453,18 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect box) {
 	}
 
 	// Sort possible positions by distance to the requested position
-	std::sort(positions.begin(), positions.end(), [box](math::Vec a, math::Vec b) {
-		return a.minus(box.pos).norm() < b.minus(box.pos).norm();
+	std::sort(positions.begin(), positions.end(), [requestedBox](math::Vec a, math::Vec b) {
+		return a.minus(requestedBox.pos).norm() < b.minus(requestedBox.pos).norm();
 	});
 
 	// Find a position that does not collide
 	for (math::Vec position : positions) {
-		math::Rect newBox = box;
+		math::Rect newBox = requestedBox;
 		newBox.pos = position;
 		if (requestModuleBox(m, newBox))
 			return true;
 	}
+	// We failed to find a box with this brute force algorithm.
 	return false;
 }
 
@@ -602,12 +535,12 @@ void RackWidget::onHover(const event::Hover &e) {
 	}
 
 	OpaqueWidget::onHover(e);
-	lastMousePos = e.pos;
+	mousePos = e.pos;
 }
 
 void RackWidget::onDragHover(const event::DragHover &e) {
 	OpaqueWidget::onDragHover(e);
-	lastMousePos = e.pos;
+	mousePos = e.pos;
 }
 
 void RackWidget::onButton(const event::Button &e) {

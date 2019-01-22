@@ -3,21 +3,31 @@
 #include "widgets/TransparentWidget.hpp"
 #include "app/CableWidget.hpp"
 #include "app/PortWidget.hpp"
+#include <map>
 
 
 namespace rack {
 
 
 struct CableContainer : TransparentWidget {
-	CableWidget *activeCable = NULL;
+	CableWidget *incompleteCable = NULL;
+
+	~CableContainer();
+	void clear();
+	/** Removes all complete cables connected to the port */
+	void clearPort(PortWidget *port);
+	/** Adds a complete cable and adds it to the Engine.
+	Ownership rules work like add/removeChild()
+	*/
+	void addCable(CableWidget *w);
+	void removeCable(CableWidget *w);
 	/** Takes ownership of `w` and adds it as a child if it isn't already */
-	void setActiveCable(CableWidget *w);
-	/** "Drops" the cable onto the port, making an engine connection if successful */
-	void commitActiveCable();
-	void removeTopCable(PortWidget *port);
-	void removeAllCables(PortWidget *port);
+	void setIncompleteCable(CableWidget *w);
+	CableWidget *releaseIncompleteCable();
 	/** Returns the most recently added cable connected to the given Port, i.e. the top of the stack */
 	CableWidget *getTopCable(PortWidget *port);
+	json_t *toJson();
+	void fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &moduleWidgets);
 	void draw(NVGcontext *vg) override;
 };
 

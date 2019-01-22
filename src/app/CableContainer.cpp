@@ -1,106 +1,132 @@
 #include "app/CableContainer.hpp"
+#include "app.hpp"
+#include "engine/Engine.hpp"
+
 
 namespace rack {
 
 
-void CableContainer::setActiveCable(CableWidget *w) {
-	if (activeCable) {
-		removeChild(activeCable);
-		delete activeCable;
-		activeCable = NULL;
-	}
-	if (w) {
-		if (w->parent == NULL)
-			addChild(w);
-		activeCable = w;
-	}
+CableContainer::~CableContainer() {
+	clear();
 }
 
-void CableContainer::commitActiveCable() {
-	if (!activeCable)
-		return;
-
-	if (activeCable->hoveredOutputPort) {
-		activeCable->outputPort = activeCable->hoveredOutputPort;
-		activeCable->hoveredOutputPort = NULL;
+void CableContainer::clear() {
+	for (Widget *w : children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw != incompleteCable)
+			app()->engine->removeCable(cw->cable);
 	}
-	if (activeCable->hoveredInputPort) {
-		activeCable->inputPort = activeCable->hoveredInputPort;
-		activeCable->hoveredInputPort = NULL;
-	}
-	activeCable->updateCable();
-
-	// Did it successfully connect?
-	if (activeCable->cable) {
-		// Make it permanent
-		activeCable = NULL;
-	}
-	else {
-		// Remove it
-		setActiveCable(NULL);
-	}
+	incompleteCable = NULL;
+	clearChildren();
 }
 
-void CableContainer::removeTopCable(PortWidget *port) {
-	CableWidget *cable = getTopCable(port);
-	if (cable) {
-		removeChild(cable);
-		delete cable;
-	}
-}
-
-void CableContainer::removeAllCables(PortWidget *port) {
-	// As a convenience, de-hover the active cable so we don't attach them once it is dropped.
-	if (activeCable) {
-		if (activeCable->hoveredInputPort == port)
-			activeCable->hoveredInputPort = NULL;
-		if (activeCable->hoveredOutputPort == port)
-			activeCable->hoveredOutputPort = NULL;
-	}
-
-	// Build a list of CableWidgets to delete
+void CableContainer::clearPort(PortWidget *port) {
+	assert(port);
+	// Collect cables to remove
 	std::list<CableWidget*> cables;
-
-	for (Widget *child : children) {
-		CableWidget *cable = dynamic_cast<CableWidget*>(child);
-		assert(cable);
-		if (!cable || cable->inputPort == port || cable->outputPort == port) {
-			if (activeCable == cable) {
-				activeCable = NULL;
-			}
-			// We can't delete from this list while we're iterating it, so add it to the deletion list.
-			cables.push_back(cable);
+	for (Widget *w : children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw->inputPort == port || cw->outputPort == port) {
+			cables.push_back(cw);
 		}
 	}
 
-	// Once we're done building the list, actually delete them
-	for (CableWidget *cable : cables) {
-		removeChild(cable);
-		delete cable;
+	// Remove and delete the cables
+	for (CableWidget *cw : cables) {
+		if (cw == incompleteCable) {
+			incompleteCable = NULL;
+			removeChild(cw);
+		}
+		else {
+			removeCable(cw);
+		}
+		delete cw;
 	}
+}
+
+void CableContainer::addCable(CableWidget *w) {
+	assert(w->isComplete());
+	app()->engine->addCable(w->cable);
+	addChild(w);
+}
+
+void CableContainer::removeCable(CableWidget *w) {
+	assert(w->isComplete());
+	app()->engine->removeCable(w->cable);
+	removeChild(w);
+}
+
+void CableContainer::setIncompleteCable(CableWidget *w) {
+	if (incompleteCable) {
+		removeChild(incompleteCable);
+		delete incompleteCable;
+		incompleteCable = NULL;
+	}
+	if (w) {
+		addChild(w);
+		incompleteCable = w;
+	}
+}
+
+CableWidget *CableContainer::releaseIncompleteCable() {
+	CableWidget *cw = incompleteCable;
+	removeChild(incompleteCable);
+	incompleteCable = NULL;
+	return cw;
 }
 
 CableWidget *CableContainer::getTopCable(PortWidget *port) {
 	for (auto it = children.rbegin(); it != children.rend(); it++) {
-		CableWidget *cable = dynamic_cast<CableWidget*>(*it);
-		assert(cable);
+		CableWidget *cw = dynamic_cast<CableWidget*>(*it);
+		assert(cw);
 		// Ignore incomplete cables
-		if (!(cable->inputPort && cable->outputPort))
+		if (!cw->isComplete())
 			continue;
-		if (cable->inputPort == port || cable->outputPort == port)
-			return cable;
+		if (cw->inputPort == port || cw->outputPort == port)
+			return cw;
 	}
 	return NULL;
+}
+
+json_t *CableContainer::toJson() {
+	json_t *rootJ = json_array();
+	for (Widget *w : children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+
+		// Only serialize complete cables
+		if (!cw->isComplete())
+			continue;
+
+		json_array_append_new(rootJ, cw->toJson());
+	}
+	return rootJ;
+}
+
+void CableContainer::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &moduleWidgets) {
+	size_t cableIndex;
+	json_t *cableJ;
+	json_array_foreach(rootJ, cableIndex, cableJ) {
+		CableWidget *cw = new CableWidget;
+		cw->fromJson(cableJ, moduleWidgets);
+		if (!cw->isComplete()) {
+			delete cw;
+			continue;
+		}
+		addCable(cw);
+	}
 }
 
 void CableContainer::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 
 	// Cable plugs
-	for (Widget *child : children) {
-		CableWidget *cable = dynamic_cast<CableWidget*>(child);
-		assert(cable);
-		cable->drawPlugs(vg);
+	for (Widget *w : children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		cw->drawPlugs(vg);
 	}
 }
 

@@ -93,19 +93,19 @@ int main(int argc, char *argv[]) {
 		settings::save(asset::user("settings.json"));
 		settings::skipLoadOnLaunch = false;
 		if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
-			app()->scene->rackWidget->lastPath = "";
+			app()->scene->rackWidget->patchPath = "";
 		}
 		else {
 			// Load autosave
-			std::string oldLastPath = app()->scene->rackWidget->lastPath;
+			std::string oldLastPath = app()->scene->rackWidget->patchPath;
 			app()->scene->rackWidget->load(asset::user("autosave.vcv"));
-			app()->scene->rackWidget->lastPath = oldLastPath;
+			app()->scene->rackWidget->patchPath = oldLastPath;
 		}
 	}
 	else {
 		// Load patch
 		app()->scene->rackWidget->load(patchFile);
-		app()->scene->rackWidget->lastPath = patchFile;
+		app()->scene->rackWidget->patchPath = patchFile;
 	}
 	INFO("Initialized app");
 

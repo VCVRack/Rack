@@ -253,7 +253,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 
 void ModuleWidget::onDragStart(const event::DragStart &e) {
 	oldPos = box.pos;
-	dragPos = app()->scene->rackWidget->lastMousePos.minus(box.pos);
+	dragPos = app()->scene->rackWidget->mousePos.minus(box.pos);
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {
@@ -270,7 +270,7 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Rect newBox = box;
-		newBox.pos = app()->scene->rackWidget->lastMousePos.minus(dragPos);
+		newBox.pos = app()->scene->rackWidget->mousePos.minus(dragPos);
 		app()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}
 }
@@ -502,10 +502,10 @@ void ModuleWidget::saveDialog() {
 
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
-		app()->scene->rackWidget->cableContainer->removeAllCables(input);
+		app()->scene->rackWidget->cableContainer->clearPort(input);
 	}
 	for (PortWidget *output : outputs) {
-		app()->scene->rackWidget->cableContainer->removeAllCables(output);
+		app()->scene->rackWidget->cableContainer->clearPort(output);
 	}
 }
 

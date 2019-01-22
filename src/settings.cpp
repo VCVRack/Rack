@@ -52,9 +52,9 @@ static json_t *settingsToJson() {
 	json_t *sampleRateJ = json_real(app()->engine->getSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
-	// lastPath
-	json_t *lastPathJ = json_string(app()->scene->rackWidget->lastPath.c_str());
-	json_object_set_new(rootJ, "lastPath", lastPathJ);
+	// patchPath
+	json_t *patchPathJ = json_string(app()->scene->rackWidget->patchPath.c_str());
+	json_object_set_new(rootJ, "patchPath", patchPathJ);
 
 	// skipLoadOnLaunch
 	if (skipLoadOnLaunch) {
@@ -125,10 +125,10 @@ static void settingsFromJson(json_t *rootJ) {
 		app()->engine->setSampleRate(sampleRate);
 	}
 
-	// lastPath
-	json_t *lastPathJ = json_object_get(rootJ, "lastPath");
-	if (lastPathJ)
-		app()->scene->rackWidget->lastPath = json_string_value(lastPathJ);
+	// patchPath
+	json_t *patchPathJ = json_object_get(rootJ, "patchPath");
+	if (patchPathJ)
+		app()->scene->rackWidget->patchPath = json_string_value(patchPathJ);
 
 	// skipLoadOnLaunch
 	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
