@@ -4,6 +4,7 @@
 #include "window.hpp"
 #include "event.hpp"
 #include "app.hpp"
+#include "patch.hpp"
 #include "settings.hpp"
 
 
@@ -174,8 +175,7 @@ void CableWidget::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &mo
 	ModuleWidget *inputModule = inputModuleIt->second;
 
 	// Set ports
-	// TODO
-	if (false /*legacy && legacy <= 1*/) {
+	if (app()->patch->isLegacy(1)) {
 		// Before 0.6, the index of the "ports" array was the index of the PortWidget in the `outputs` and `inputs` vector.
 		setOutputPort(outputModule->outputs[outputId]);
 		setInputPort(inputModule->inputs[inputId]);

@@ -5,6 +5,7 @@
 #include "gamepad.hpp"
 #include "event.hpp"
 #include "app.hpp"
+#include "patch.hpp"
 
 #include <map>
 #include <queue>
@@ -316,9 +317,9 @@ void Window::run() {
 		windowTitle = APP_NAME;
 		windowTitle += " ";
 		windowTitle += APP_VERSION;
-		if (!app()->scene->rackWidget->patchPath.empty()) {
+		if (!app()->patch->path.empty()) {
 			windowTitle += " - ";
-			windowTitle += string::filename(app()->scene->rackWidget->patchPath);
+			windowTitle += string::filename(app()->patch->path);
 		}
 		if (windowTitle != internal->lastWindowTitle) {
 			glfwSetWindowTitle(win, windowTitle.c_str());

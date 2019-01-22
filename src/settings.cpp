@@ -5,6 +5,7 @@
 #include "app/ModuleBrowser.hpp"
 #include "engine/Engine.hpp"
 #include "app.hpp"
+#include "patch.hpp"
 #include <jansson.h>
 
 
@@ -53,7 +54,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// patchPath
-	json_t *patchPathJ = json_string(app()->scene->rackWidget->patchPath.c_str());
+	json_t *patchPathJ = json_string(app()->patch->path.c_str());
 	json_object_set_new(rootJ, "patchPath", patchPathJ);
 
 	// skipLoadOnLaunch
@@ -128,7 +129,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// patchPath
 	json_t *patchPathJ = json_object_get(rootJ, "patchPath");
 	if (patchPathJ)
-		app()->scene->rackWidget->patchPath = json_string_value(patchPathJ);
+		app()->patch->path = json_string_value(patchPathJ);
 
 	// skipLoadOnLaunch
 	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");

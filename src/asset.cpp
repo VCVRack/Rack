@@ -49,7 +49,7 @@ void init(bool devMode) {
 			systemDir = moduleBuf;
 #endif
 #if defined ARCH_LIN
-			// TODO For now, users should launch Rack from their terminal in the system directory
+			// Users should launch Rack from their terminal in the system directory
 			systemDir = ".";
 #endif
 		}

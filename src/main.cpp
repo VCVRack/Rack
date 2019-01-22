@@ -11,6 +11,7 @@
 #include "app/Scene.hpp"
 #include "plugin.hpp"
 #include "app.hpp"
+#include "patch.hpp"
 #include "ui.hpp"
 
 #include <unistd.h>
@@ -93,19 +94,19 @@ int main(int argc, char *argv[]) {
 		settings::save(asset::user("settings.json"));
 		settings::skipLoadOnLaunch = false;
 		if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
-			app()->scene->rackWidget->patchPath = "";
+			app()->patch->path = "";
 		}
 		else {
 			// Load autosave
-			std::string oldLastPath = app()->scene->rackWidget->patchPath;
-			app()->scene->rackWidget->load(asset::user("autosave.vcv"));
-			app()->scene->rackWidget->patchPath = oldLastPath;
+			std::string oldLastPath = app()->patch->path;
+			app()->patch->load(asset::user("autosave.vcv"));
+			app()->patch->path = oldLastPath;
 		}
 	}
 	else {
 		// Load patch
-		app()->scene->rackWidget->load(patchFile);
-		app()->scene->rackWidget->patchPath = patchFile;
+		app()->patch->load(patchFile);
+		app()->patch->path = patchFile;
 	}
 	INFO("Initialized app");
 
@@ -115,7 +116,7 @@ int main(int argc, char *argv[]) {
 	app()->engine->stop();
 
 	// Destroy app
-	app()->scene->rackWidget->save(asset::user("autosave.vcv"));
+	app()->patch->save(asset::user("autosave.vcv"));
 	settings::save(asset::user("settings.json"));
 	appDestroy();
 	INFO("Cleaned up app");

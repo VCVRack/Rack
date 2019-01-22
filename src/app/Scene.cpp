@@ -1,4 +1,3 @@
-#include "osdialog.h"
 #include "system.hpp"
 #include "network.hpp"
 #include "app/Scene.hpp"
@@ -7,6 +6,9 @@
 #include "app.hpp"
 #include "history.hpp"
 #include "settings.hpp"
+#include "patch.hpp"
+#include "asset.hpp"
+#include "osdialog.h"
 #include <thread>
 
 
@@ -53,6 +55,13 @@ void Scene::step() {
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 	moduleBrowser->box.size = box.size;
 
+	// Autosave every 15 seconds
+	int frame = app()->window->frame;
+	if (frame > 0 && frame % (60 * 15) == 0) {
+		app()->patch->save(asset::user("autosave.vcv"));
+		settings::save(asset::user("settings.json"));
+	}
+
 	// Set zoom every few frames
 	if (app()->window->frame % 10 == 0)
 		zoomWidget->setZoom(settings::zoom);
@@ -85,7 +94,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					rackWidget->reset();
+					app()->patch->resetDialog();
 					e.consume(this);
 				}
 			} break;
@@ -97,21 +106,21 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_O: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					rackWidget->loadDialog();
+					app()->patch->loadDialog();
 					e.consume(this);
 				}
 				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
-					rackWidget->revert();
+					app()->patch->revertDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_S: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					rackWidget->saveDialog();
+					app()->patch->saveDialog();
 					e.consume(this);
 				}
 				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
-					rackWidget->saveAsDialog();
+					app()->patch->saveAsDialog();
 					e.consume(this);
 				}
 			} break;
@@ -151,7 +160,7 @@ void Scene::onPathDrop(const event::PathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
 		if (string::extension(path) == "vcv") {
-			rackWidget->load(path);
+			app()->patch->load(path);
 			e.consume(this);
 		}
 	}

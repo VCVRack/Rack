@@ -328,7 +328,7 @@ json_t *ModuleWidget::toJson() {
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 
-	// Other properties
+	// Merge with module JSON
 	if (module) {
 		json_t *moduleJ = module->toJson();
 		// Merge with rootJ

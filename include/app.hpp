@@ -16,6 +16,7 @@ namespace history {
 struct Scene;
 struct Engine;
 struct Window;
+struct PatchManager;
 
 
 /** Contains the application state  */
@@ -25,6 +26,7 @@ struct App {
 	Engine *engine = NULL;
 	Window *window = NULL;
 	history::State *history = NULL;
+	PatchManager *patch = NULL;
 
 	App();
 	~App();

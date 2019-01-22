@@ -11,45 +11,29 @@ namespace rack {
 
 struct RackWidget : OpaqueWidget {
 	FramebufferWidget *rails;
-	// Only put ModuleWidgets in here
 	Widget *moduleContainer;
-	// Only put CableWidgets in here
 	CableContainer *cableContainer;
-	/** The currently loaded patch file path */
-	std::string patchPath;
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
 
 	RackWidget();
 	~RackWidget();
 
+	void addModule(ModuleWidget *mw);
+	void addModuleAtMouse(ModuleWidget *mw);
+	/** Removes the module and transfers ownership to the caller */
+	void removeModule(ModuleWidget *mw);
+	/** Sets a module's box if non-colliding. Returns true if set */
+	bool requestModuleBox(ModuleWidget *mw, math::Rect requestedBox);
+	/** Moves a module to the closest non-colliding position */
+	bool requestModuleBoxNearest(ModuleWidget *mw, math::Rect requestedBox);
+	ModuleWidget *getModule(int moduleId);
+
 	/** Completely clear the rack's modules and cables */
 	void clear();
-	/** Clears the rack and loads the template patch */
-	void reset();
-	void loadDialog();
-	void saveDialog();
-	void saveAsDialog();
-	void saveTemplate();
-	/** If `lastPath` is defined, ask the user to reload it */
-	void revert();
-	/** Disconnects all cables */
-	void disconnect();
-	void save(std::string filename);
-	void load(std::string filename);
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 	void pastePresetClipboard();
-
-	void addModule(ModuleWidget *m);
-	void addModuleAtMouse(ModuleWidget *m);
-	/** Removes the module and transfers ownership to the caller */
-	void removeModule(ModuleWidget *m);
-	/** Sets a module's box if non-colliding. Returns true if set */
-	bool requestModuleBox(ModuleWidget *m, math::Rect requestedBox);
-	/** Moves a module to the closest non-colliding position */
-	bool requestModuleBoxNearest(ModuleWidget *m, math::Rect requestedBox);
-	ModuleWidget *getModule(int moduleId);
 
 	void step() override;
 	void draw(NVGcontext *vg) override;

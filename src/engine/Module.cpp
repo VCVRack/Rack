@@ -50,9 +50,9 @@ void Module::fromJson(json_t *rootJ) {
 	json_array_foreach(paramsJ, i, paramJ) {
 		uint32_t paramId = i;
 		// Get paramId
+		// Legacy v0.6.0 to <v1.0
 		json_t *paramIdJ = json_object_get(paramJ, "paramId");
 		if (paramIdJ) {
-			// Legacy v0.6.0 to <v1.0
 			paramId = json_integer_value(paramIdJ);
 		}
 

@@ -9,12 +9,12 @@
 #include "ui/TextField.hpp"
 #include "ui/PasswordField.hpp"
 #include "ui/ProgressBar.hpp"
-#include "app/Scene.hpp"
 #include "app.hpp"
 #include "settings.hpp"
 #include "helpers.hpp"
 #include "system.hpp"
 #include "plugin.hpp"
+#include "patch.hpp"
 #include <thread>
 
 
@@ -38,7 +38,7 @@ struct NewItem : MenuItem {
 		rightText = "(" WINDOW_MOD_CTRL_NAME "+N)";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->reset();
+		app()->patch->resetDialog();
 	}
 };
 
@@ -49,7 +49,7 @@ struct OpenItem : MenuItem {
 		rightText = "(" WINDOW_MOD_CTRL_NAME "+O)";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->loadDialog();
+		app()->patch->loadDialog();
 	}
 };
 
@@ -60,7 +60,7 @@ struct SaveItem : MenuItem {
 		rightText = "(" WINDOW_MOD_CTRL_NAME "+S)";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->saveDialog();
+		app()->patch->saveDialog();
 	}
 };
 
@@ -71,7 +71,7 @@ struct SaveAsItem : MenuItem {
 		rightText = "(" WINDOW_MOD_CTRL_NAME "+Shift+S)";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->saveAsDialog();
+		app()->patch->saveAsDialog();
 	}
 };
 
@@ -81,7 +81,7 @@ struct SaveTemplateItem : MenuItem {
 		text = "Save template";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->saveTemplate();
+		app()->patch->saveTemplateDialog();
 	}
 };
 
@@ -91,7 +91,7 @@ struct RevertItem : MenuItem {
 		text = "Revert";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->revert();
+		app()->patch->revertDialog();
 	}
 };
 
@@ -101,7 +101,7 @@ struct DisconnectCablesItem : MenuItem {
 		text = "Disconnect cables";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->disconnect();
+		app()->patch->disconnectDialog();
 	}
 };
 

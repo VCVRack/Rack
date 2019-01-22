@@ -1,16 +1,16 @@
-#include <map>
-#include <algorithm>
 #include "app/RackWidget.hpp"
 #include "app/RackRail.hpp"
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
-#include "osdialog.h"
 #include "settings.hpp"
-#include "asset.hpp"
-#include "system.hpp"
 #include "plugin.hpp"
 #include "engine/Engine.hpp"
 #include "app.hpp"
+#include "asset.hpp"
+#include "patch.hpp"
+#include "osdialog.h"
+#include <map>
+#include <algorithm>
 
 
 namespace rack {
@@ -92,165 +92,9 @@ void RackWidget::clear() {
 	assert(cableContainer->children.empty());
 }
 
-void RackWidget::reset() {
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear patch and start over?")) {
-		clear();
-		app()->scene->scrollWidget->offset = math::Vec(0, 0);
-		// Fails silently if file does not exist
-		load(asset::user("template.vcv"));
-		patchPath = "";
-	}
-}
-
-void RackWidget::loadDialog() {
-	std::string dir;
-	if (patchPath.empty()) {
-		dir = asset::user("patches");
-		system::createDirectory(dir);
-	}
-	else {
-		dir = string::directory(patchPath);
-	}
-
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
-	DEFER({
-		osdialog_filters_free(filters);
-	});
-
-	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
-	if (!path) {
-		// Fail silently
-		return;
-	}
-	DEFER({
-		free(path);
-	});
-
-	load(path);
-	patchPath = path;
-}
-
-void RackWidget::saveDialog() {
-	if (!patchPath.empty()) {
-		save(patchPath);
-	}
-	else {
-		saveAsDialog();
-	}
-}
-
-void RackWidget::saveAsDialog() {
-	std::string dir;
-	std::string filename;
-	if (patchPath.empty()) {
-		dir = asset::user("patches");
-		system::createDirectory(dir);
-	}
-	else {
-		dir = string::directory(patchPath);
-		filename = string::filename(patchPath);
-	}
-
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
-	DEFER({
-		osdialog_filters_free(filters);
-	});
-
-	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
-	if (!path) {
-		// Fail silently
-		return;
-	}
-	DEFER({
-		free(path);
-	});
-
-
-	std::string pathStr = path;
-	if (string::extension(pathStr).empty()) {
-		pathStr += ".vcv";
-	}
-
-	save(pathStr);
-	patchPath = pathStr;
-}
-
-void RackWidget::saveTemplate() {
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?")) {
-		save(asset::user("template.vcv"));
-	}
-}
-
-void RackWidget::save(std::string filename) {
-	INFO("Saving patch %s", filename.c_str());
-	json_t *rootJ = toJson();
-	if (!rootJ)
-		return;
-	DEFER({
-		json_decref(rootJ);
-	});
-
-	FILE *file = fopen(filename.c_str(), "w");
-	if (!file) {
-		// Fail silently
-		return;
-	}
-	DEFER({
-		fclose(file);
-	});
-
-	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-}
-
-void RackWidget::load(std::string filename) {
-	INFO("Loading patch %s", filename.c_str());
-	FILE *file = fopen(filename.c_str(), "r");
-	if (!file) {
-		// Exit silently
-		return;
-	}
-	DEFER({
-		fclose(file);
-	});
-
-	json_error_t error;
-	json_t *rootJ = json_loadf(file, 0, &error);
-	if (!rootJ) {
-		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
-		return;
-	}
-	DEFER({
-		json_decref(rootJ);
-	});
-
-	clear();
-	app()->scene->scrollWidget->offset = math::Vec(0, 0);
-	fromJson(rootJ);
-}
-
-void RackWidget::revert() {
-	if (patchPath.empty())
-		return;
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert patch to the last saved state?")) {
-		load(patchPath);
-	}
-}
-
-void RackWidget::disconnect() {
-	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
-		return;
-
-	cableContainer->clear();
-}
-
 json_t *RackWidget::toJson() {
 	// root
 	json_t *rootJ = json_object();
-
-	// version
-	json_t *versionJ = json_string(APP_VERSION.c_str());
-	json_object_set_new(rootJ, "version", versionJ);
 
 	// modules
 	json_t *modulesJ = json_array();
@@ -278,30 +122,6 @@ json_t *RackWidget::toJson() {
 }
 
 void RackWidget::fromJson(json_t *rootJ) {
-	std::string message;
-
-	// version
-	std::string version;
-	json_t *versionJ = json_object_get(rootJ, "version");
-	if (versionJ)
-		version = json_string_value(versionJ);
-	if (version != APP_VERSION) {
-		INFO("Patch made with Rack version %s, current Rack version is %s", version.c_str(), APP_VERSION.c_str());
-	}
-
-	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
-	// (We now use Module::params/inputs/outputs indices.)
-	int legacy = 0;
-	if (string::startsWith(version, "0.3.") || string::startsWith(version, "0.4.") || string::startsWith(version, "0.5.") || version == "" || version == "dev") {
-		legacy = 1;
-	}
-	else if (string::startsWith(version, "0.6.")) {
-		legacy = 2;
-	}
-	if (legacy) {
-		INFO("Loading patch using legacy mode %d", legacy);
-	}
-
 	// modules
 	json_t *modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
@@ -310,11 +130,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 	size_t moduleIndex;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
-		// Add "legacy" property if in legacy mode
-		if (legacy) {
-			json_object_set(moduleJ, "legacy", json_integer(legacy));
-		}
-
 		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
 
 		if (moduleWidget) {
@@ -328,7 +143,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			double x, y;
 			json_unpack(posJ, "[F, F]", &x, &y);
 			math::Vec pos = math::Vec(x, y);
-			if (legacy && legacy <= 1) {
+			if (app()->patch->isLegacy(1)) {
 				// Before 0.6, positions were in pixel units
 				moduleWidget->box.pos = pos;
 			}
@@ -336,7 +151,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 				moduleWidget->box.pos = pos.mult(RACK_GRID_SIZE);
 			}
 
-			if (legacy && legacy <= 2) {
+			if (app()->patch->isLegacy(2)) {
 				// Before 1.0, the module ID was the index in the "modules" array
 				moduleWidgets[moduleIndex] = moduleWidget;
 			}
@@ -350,7 +165,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			json_t *modelSlugJ = json_object_get(moduleJ, "model");
 			std::string pluginSlug = json_string_value(pluginSlugJ);
 			std::string modelSlug = json_string_value(modelSlugJ);
-			message += string::f("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
+			app()->patch->warningLog += string::f("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 		}
 	}
 
@@ -361,11 +176,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 		cablesJ = json_object_get(rootJ, "wires");
 	if (cablesJ)
 		cableContainer->fromJson(cablesJ, moduleWidgets);
-
-	// Display a message if we have something to say
-	if (!message.empty()) {
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
-	}
 }
 
 void RackWidget::pastePresetClipboard() {
@@ -494,13 +304,6 @@ void RackWidget::step() {
 		rails->dirty = true;
 
 		rail->box.size = rails->box.size;
-	}
-
-	// Autosave every 15 seconds
-	int frame = app()->window->frame;
-	if (frame > 0 && frame % (60 * 15) == 0) {
-		save(asset::user("autosave.vcv"));
-		settings::save(asset::user("settings.json"));
 	}
 
 	Widget::step();

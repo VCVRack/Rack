@@ -23,26 +23,22 @@ void CableContainer::clear() {
 
 void CableContainer::clearPort(PortWidget *port) {
 	assert(port);
-	// Collect cables to remove
-	std::list<CableWidget*> cables;
-	for (Widget *w : children) {
+	std::list<Widget*> childrenCopy = children;
+	for (Widget *w : childrenCopy) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
-		if (cw->inputPort == port || cw->outputPort == port) {
-			cables.push_back(cw);
-		}
-	}
 
-	// Remove and delete the cables
-	for (CableWidget *cw : cables) {
-		if (cw == incompleteCable) {
-			incompleteCable = NULL;
-			removeChild(cw);
+		// Check if cable is connected to port
+		if (cw->inputPort == port || cw->outputPort == port) {
+			if (cw == incompleteCable) {
+				incompleteCable = NULL;
+				removeChild(cw);
+			}
+			else {
+				removeCable(cw);
+			}
+			delete cw;
 		}
-		else {
-			removeCable(cw);
-		}
-		delete cw;
 	}
 }
 
@@ -109,6 +105,7 @@ void CableContainer::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> 
 	size_t cableIndex;
 	json_t *cableJ;
 	json_array_foreach(rootJ, cableIndex, cableJ) {
+		// Create a unserialize cable
 		CableWidget *cw = new CableWidget;
 		cw->fromJson(cableJ, moduleWidgets);
 		if (!cw->isComplete()) {

@@ -38,8 +38,8 @@ inline math::Vec mm2px(math::Vec mm) {
 static const float RACK_GRID_WIDTH = 15;
 static const float RACK_GRID_HEIGHT = 380;
 static const math::Vec RACK_GRID_SIZE = math::Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
-extern const std::string PRESET_FILTERS;
-extern const std::string PATCH_FILTERS;
+
+static const std::string PRESET_FILTERS = "VCV Rack module preset (.vcvm):vcvm";
 
 
 } // namespace rack
