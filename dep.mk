@@ -25,6 +25,10 @@ ifdef ARCH_WIN
 else
 	CMAKE := cmake -DCMAKE_INSTALL_PREFIX="$(DEP_PATH)"
 endif
+# Some platforms try to install to lib64
+CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
+
+SHA256 := sha256sum -c - <<<
 
 # Export environment for all dependency targets
 $(DEPS): export CFLAGS = $(DEP_CFLAGS)
