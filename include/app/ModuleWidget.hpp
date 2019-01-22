@@ -80,6 +80,7 @@ struct ModuleWidget : OpaqueWidget {
 
 	void removeAction();
 	void bypassAction();
+	void cloneAction();
 	void createContextMenu();
 	/** Override to add context menu entries to your subclass.
 	It is recommended to add a blank MenuEntry first for spacing.

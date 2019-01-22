@@ -495,17 +495,6 @@ void RackWidget::removeModule(ModuleWidget *m) {
 	moduleContainer->removeChild(m);
 }
 
-void RackWidget::cloneModule(ModuleWidget *m) {
-	// JSON serialization is the obvious way to do this
-	json_t *moduleJ = m->toJson();
-	ModuleWidget *clonedModuleWidget = moduleFromJson(moduleJ);
-	json_decref(moduleJ);
-	addModule(clonedModuleWidget);
-	math::Rect clonedBox = clonedModuleWidget->box;
-	clonedBox.pos = m->box.pos;
-	requestModuleBoxNearest(clonedModuleWidget, clonedBox);
-}
-
 bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect box) {
 	if (box.pos.x < 0 || box.pos.y < 0)
 		return false;

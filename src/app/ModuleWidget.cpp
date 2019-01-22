@@ -97,7 +97,7 @@ struct ModuleCloneItem : MenuItem {
 		rightText = WINDOW_MOD_CTRL_NAME "+D";
 	}
 	void onAction(const event::Action &e) override {
-		app()->scene->rackWidget->cloneModule(moduleWidget);
+		moduleWidget->cloneAction();
 	}
 };
 
@@ -229,8 +229,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_D: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					app()->scene->rackWidget->cloneModule(this);
-					e.consume(this);
+					cloneAction();
 				}
 			} break;
 			case GLFW_KEY_U: {
@@ -546,6 +545,24 @@ void ModuleWidget::bypassAction() {
 	h->moduleId = module->id;
 	app()->history->push(h);
 	h->redo();
+}
+
+void ModuleWidget::cloneAction() {
+	ModuleWidget *clonedModuleWidget = model->createModuleWidget();
+	assert(clonedModuleWidget);
+	// JSON serialization is the obvious way to do this
+	json_t *moduleJ = toJson();
+	clonedModuleWidget->fromJson(moduleJ);
+	json_decref(moduleJ);
+
+	app()->scene->rackWidget->addModuleAtMouse(clonedModuleWidget);
+
+	// Push ModuleAdd history action
+	history::ModuleAdd *h = new history::ModuleAdd;
+	h->model = clonedModuleWidget->model;
+	h->moduleId = clonedModuleWidget->module->id;
+	h->pos = clonedModuleWidget->box.pos;
+	app()->history->push(h);
 }
 
 void ModuleWidget::createContextMenu() {
