@@ -86,6 +86,16 @@ CableWidget *CableContainer::getTopCable(PortWidget *port) {
 	return NULL;
 }
 
+CableWidget *CableContainer::getCable(int cableId) {
+	for (Widget *w : children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw->cable->id == cableId)
+			return cw;
+	}
+	return NULL;
+}
+
 json_t *CableContainer::toJson() {
 	json_t *rootJ = json_array();
 	for (Widget *w : children) {

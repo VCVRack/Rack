@@ -1,6 +1,7 @@
 #include "history.hpp"
 #include "app.hpp"
 #include "app/Scene.hpp"
+#include "engine/Cable.hpp"
 
 
 namespace rack {
@@ -106,6 +107,47 @@ void ParamChange::redo() {
 	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
 	assert(moduleWidget);
 	moduleWidget->module->params[paramId].value = newValue;
+}
+
+
+void CableAdd::setCable(CableWidget *cw) {
+	assert(cw->cable);
+	assert(cw->cable->id > 0);
+	cableId = cw->cable->id;
+	assert(cw->cable->outputModule);
+	outputModuleId = cw->cable->outputModule->id;
+	outputId = cw->cable->outputId;
+	assert(cw->cable->inputModule);
+	inputModuleId = cw->cable->inputModule->id;
+	inputId = cw->cable->inputId;
+	color = cw->color;
+}
+
+void CableAdd::undo() {
+	CableWidget *cw = app()->scene->rackWidget->cableContainer->getCable(cableId);
+	app()->scene->rackWidget->cableContainer->removeCable(cw);
+	delete cw;
+}
+
+void CableAdd::redo() {
+	CableWidget *cw = new CableWidget;
+	cw->cable->id = cableId;
+
+	ModuleWidget *outputModule = app()->scene->rackWidget->getModule(outputModuleId);
+	assert(outputModule);
+	PortWidget *outputPort = outputModule->getOutput(outputId);
+	assert(outputPort);
+	cw->setOutput(outputPort);
+
+	ModuleWidget *inputModule = app()->scene->rackWidget->getModule(inputModuleId);
+	assert(inputModule);
+	PortWidget *inputPort = inputModule->getInput(inputId);
+	assert(inputPort);
+	cw->setInput(inputPort);
+
+	cw->color = color;
+
+	app()->scene->rackWidget->cableContainer->addCable(cw);
 }
 
 

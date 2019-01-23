@@ -15,8 +15,8 @@ namespace rack {
 struct Module {
 	int id = 0;
 	std::vector<Param> params;
-	std::vector<Input> inputs;
 	std::vector<Output> outputs;
+	std::vector<Input> inputs;
 	std::vector<Light> lights;
 	/** For power meter */
 	float cpuTime = 0.f;

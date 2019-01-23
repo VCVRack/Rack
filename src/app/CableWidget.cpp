@@ -99,7 +99,7 @@ bool CableWidget::isComplete() {
 	return outputPort && inputPort;
 }
 
-void CableWidget::setOutputPort(PortWidget *outputPort) {
+void CableWidget::setOutput(PortWidget *outputPort) {
 	this->outputPort = outputPort;
 	if (outputPort) {
 		assert(outputPort->type == PortWidget::OUTPUT);
@@ -108,7 +108,7 @@ void CableWidget::setOutputPort(PortWidget *outputPort) {
 	}
 }
 
-void CableWidget::setInputPort(PortWidget *inputPort) {
+void CableWidget::setInput(PortWidget *inputPort) {
 	this->inputPort = inputPort;
 	if (inputPort) {
 		assert(inputPort->type == PortWidget::INPUT);
@@ -145,7 +145,7 @@ json_t *CableWidget::toJson() {
 	assert(isComplete());
 	json_t *rootJ = json_object();
 
-	// This is just here for fun. It is not used in fromJson()
+	// This is just here for fun. It is not used in fromJson(), since cableIds are not preserved across multiple launches of Rack.
 	json_object_set_new(rootJ, "id", json_integer(cable->id));
 
 	json_object_set_new(rootJ, "outputModuleId", json_integer(cable->outputModule->id));
@@ -177,19 +177,19 @@ void CableWidget::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &mo
 	// Set ports
 	if (app()->patch->isLegacy(1)) {
 		// Before 0.6, the index of the "ports" array was the index of the PortWidget in the `outputs` and `inputs` vector.
-		setOutputPort(outputModule->outputs[outputId]);
-		setInputPort(inputModule->inputs[inputId]);
+		setOutput(outputModule->outputs[outputId]);
+		setInput(inputModule->inputs[inputId]);
 	}
 	else {
 		for (PortWidget *port : outputModule->outputs) {
 			if (port->portId == outputId) {
-				setOutputPort(port);
+				setOutput(port);
 				break;
 			}
 		}
 		for (PortWidget *port : inputModule->inputs) {
 			if (port->portId == inputId) {
-				setInputPort(port);
+				setInput(port);
 				break;
 			}
 		}

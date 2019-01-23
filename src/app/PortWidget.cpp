@@ -2,6 +2,7 @@
 #include "app/Scene.hpp"
 #include "window.hpp"
 #include "app.hpp"
+#include "history.hpp"
 #include "componentlibrary.hpp"
 
 
@@ -60,6 +61,11 @@ void PortWidget::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		CableWidget *cw = app()->scene->rackWidget->cableContainer->getTopCable(this);
 		if (cw) {
+			// history::CableRemove
+			history::CableRemove *h = new history::CableRemove;
+			h->setCable(cw);
+			app()->history->push(h);
+
 			app()->scene->rackWidget->cableContainer->removeCable(cw);
 			delete cw;
 		}
@@ -78,20 +84,25 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 	}
 
 	if (cw) {
+		// history::CableRemove
+		history::CableRemove *h = new history::CableRemove;
+		h->setCable(cw);
+		app()->history->push(h);
+
 		// Disconnect and reuse existing cable
 		app()->scene->rackWidget->cableContainer->removeCable(cw);
 		if (type == OUTPUT)
-			cw->setOutputPort(NULL);
+			cw->setOutput(NULL);
 		else
-			cw->setInputPort(NULL);
+			cw->setInput(NULL);
 	}
 	else {
 		// Create a new cable
 		cw = new CableWidget;
 		if (type == OUTPUT)
-			cw->setOutputPort(this);
+			cw->setOutput(this);
 		else
-			cw->setInputPort(this);
+			cw->setInput(this);
 	}
 	app()->scene->rackWidget->cableContainer->setIncompleteCable(cw);
 }
@@ -102,6 +113,11 @@ void PortWidget::onDragEnd(const event::DragEnd &e) {
 	CableWidget *cw = app()->scene->rackWidget->cableContainer->releaseIncompleteCable();
 	if (cw->isComplete()) {
 		app()->scene->rackWidget->cableContainer->addCable(cw);
+
+		// history::CableAdd
+		history::CableAdd *h = new history::CableAdd;
+		h->setCable(cw);
+		app()->history->push(h);
 	}
 	else {
 		delete cw;
@@ -119,9 +135,9 @@ void PortWidget::onDragDrop(const event::DragDrop &e) {
 	if (cw) {
 		cw->hoveredOutputPort = cw->hoveredInputPort = NULL;
 		if (type == OUTPUT)
-			cw->setOutputPort(this);
+			cw->setOutput(this);
 		else
-			cw->setInputPort(this);
+			cw->setInput(this);
 	}
 }
 

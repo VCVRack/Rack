@@ -21,8 +21,8 @@ struct CableWidget : OpaqueWidget {
 	CableWidget();
 	~CableWidget();
 	bool isComplete();
-	void setOutputPort(PortWidget *outputPort);
-	void setInputPort(PortWidget *inputPort);
+	void setOutput(PortWidget *outputPort);
+	void setInput(PortWidget *inputPort);
 	math::Vec getOutputPos();
 	math::Vec getInputPos();
 	json_t *toJson();

@@ -162,6 +162,16 @@ void ModuleWidget::draw(NVGcontext *vg) {
 		nvgFill(vg);
 	}
 
+	// if (module) {
+	// 	nvgBeginPath(vg);
+	// 	nvgRect(vg, 0, 0, 20, 20);
+	// 	nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.75));
+	// 	nvgFill(vg);
+
+	// 	std::string debugText = string::f("%d", module->id);
+	// 	bndLabel(vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
+	// }
+
 	// nvgResetScissor(vg);
 }
 
@@ -282,23 +292,6 @@ void ModuleWidget::setModule(Module *module) {
 	this->module = module;
 }
 
-void ModuleWidget::addInput(PortWidget *input) {
-	assert(input->type == PortWidget::INPUT);
-	inputs.push_back(input);
-	addChild(input);
-}
-
-void ModuleWidget::addOutput(PortWidget *output) {
-	assert(output->type == PortWidget::OUTPUT);
-	outputs.push_back(output);
-	addChild(output);
-}
-
-void ModuleWidget::addParam(ParamWidget *param) {
-	params.push_back(param);
-	addChild(param);
-}
-
 void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 	// Remove old panel
 	if (panel) {
@@ -316,6 +309,40 @@ void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 	}
 }
 
+void ModuleWidget::addParam(ParamWidget *param) {
+	params.push_back(param);
+	addChild(param);
+}
+
+void ModuleWidget::addOutput(PortWidget *output) {
+	assert(output->type == PortWidget::OUTPUT);
+	outputs.push_back(output);
+	addChild(output);
+}
+
+void ModuleWidget::addInput(PortWidget *input) {
+	assert(input->type == PortWidget::INPUT);
+	inputs.push_back(input);
+	addChild(input);
+}
+
+ParamWidget *ModuleWidget::getParam(int paramId) {
+	if (0 <= paramId && paramId < (int) params.size())
+		return params[paramId];
+	return NULL;
+}
+
+PortWidget *ModuleWidget::getOutput(int outputId) {
+	if (0 <= outputId && outputId < (int) outputs.size())
+		return outputs[outputId];
+	return NULL;
+}
+
+PortWidget *ModuleWidget::getInput(int inputId) {
+	if (0 <= inputId && inputId < (int) inputs.size())
+		return inputs[inputId];
+	return NULL;
+}
 
 json_t *ModuleWidget::toJson() {
 	json_t *rootJ = json_object();

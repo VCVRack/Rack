@@ -1,12 +1,18 @@
 #pragma once
 #include "common.hpp"
 #include "math.hpp"
+#include "color.hpp"
 #include "plugin/Model.hpp"
 #include <vector>
 #include <jansson.h>
 
 
 namespace rack {
+
+
+struct CableWidget;
+
+
 namespace history {
 
 
@@ -14,6 +20,17 @@ struct Action {
 	virtual ~Action() {}
 	virtual void undo() {}
 	virtual void redo() {}
+};
+
+
+template <class TAction>
+struct InverseAction : TAction {
+	void undo() override {
+		TAction::redo();
+	}
+	void redo() override {
+		TAction::undo();
+	}
 };
 
 
@@ -84,20 +101,14 @@ struct CableAdd : Action {
 	int outputId;
 	int inputModuleId;
 	int inputId;
+	NVGcolor color;
+	void setCable(CableWidget *cw);
 	void undo() override;
 	void redo() override;
 };
 
 
-struct CableRemove : Action {
-	int cableId;
-	int outputModuleId;
-	int outputId;
-	int inputModuleId;
-	int inputId;
-	void undo() override;
-	void redo() override;
-};
+struct CableRemove : InverseAction<CableAdd> {};
 
 
 struct State {

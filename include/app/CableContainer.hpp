@@ -24,8 +24,10 @@ struct CableContainer : TransparentWidget {
 	/** Takes ownership of `w` and adds it as a child if it isn't already */
 	void setIncompleteCable(CableWidget *w);
 	CableWidget *releaseIncompleteCable();
-	/** Returns the most recently added cable connected to the given Port, i.e. the top of the stack */
+	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack */
 	CableWidget *getTopCable(PortWidget *port);
+	CableWidget *getCable(int cableId);
+
 	json_t *toJson();
 	void fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &moduleWidgets);
 	void draw(NVGcontext *vg) override;

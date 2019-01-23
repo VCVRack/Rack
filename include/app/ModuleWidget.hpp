@@ -18,8 +18,8 @@ struct ModuleWidget : OpaqueWidget {
 
 	Widget *panel = NULL;
 	std::vector<ParamWidget*> params;
-	std::vector<PortWidget*> inputs;
 	std::vector<PortWidget*> outputs;
+	std::vector<PortWidget*> inputs;
 	/** For RackWidget dragging */
 	math::Vec dragPos;
 	math::Vec oldPos;
@@ -44,12 +44,15 @@ struct ModuleWidget : OpaqueWidget {
 	Transfers ownership
 	*/
 	void setModule(Module *module);
+	void setPanel(std::shared_ptr<SVG> svg);
 
 	/** Convenience functions for adding special widgets (calls addChild()) */
-	void addInput(PortWidget *input);
-	void addOutput(PortWidget *output);
 	void addParam(ParamWidget *param);
-	void setPanel(std::shared_ptr<SVG> svg);
+	void addOutput(PortWidget *output);
+	void addInput(PortWidget *input);
+	ParamWidget *getParam(int paramId);
+	PortWidget *getOutput(int outputId);
+	PortWidget *getInput(int inputId);
 
 	/** Overriding these is deprecated.
 	Use Module::dataToJson() and dataFromJson() instead
