@@ -53,6 +53,7 @@ struct RackWidget : OpaqueWidget {
 	// Cable methods
 
 	void clearCables();
+	void clearCablesAction();
 	/** Removes all complete cables connected to the port */
 	void clearCablesOnPort(PortWidget *port);
 	/** Adds a complete cable and adds it to the Engine.

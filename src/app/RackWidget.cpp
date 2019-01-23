@@ -408,6 +408,26 @@ void RackWidget::clearCables() {
 	cableContainer->clearChildren();
 }
 
+void RackWidget::clearCablesAction() {
+	// Add CableRemove for every cable to a ComplexAction
+	history::ComplexAction *complexAction = new history::ComplexAction;
+
+	for (Widget *w : cableContainer->children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw == incompleteCable)
+			continue;
+
+		// history::CableRemove
+		history::CableRemove *h = new history::CableRemove;
+		h->setCable(cw);
+		complexAction->push(h);
+	}
+
+	app()->history->push(complexAction);
+	clearCables();
+}
+
 void RackWidget::clearCablesOnPort(PortWidget *port) {
 	assert(port);
 	std::list<Widget*> childrenCopy = cableContainer->children;

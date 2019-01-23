@@ -4,6 +4,7 @@
 #include "app.hpp"
 #include "app/Scene.hpp"
 #include "app/RackWidget.hpp"
+#include "history.hpp"
 #include "osdialog.h"
 
 
@@ -14,6 +15,7 @@ static const std::string PATCH_FILTERS = "VCV Rack patch (.vcv):vcv";
 
 
 void PatchManager::reset() {
+	app()->history->clear();
 	app()->scene->rackWidget->clear();
 	app()->scene->scrollWidget->offset = math::Vec(0, 0);
 	// Fails silently if file does not exist
@@ -122,6 +124,7 @@ void PatchManager::load(std::string path) {
 		json_decref(rootJ);
 	});
 
+	app()->history->clear();
 	app()->scene->rackWidget->clear();
 	app()->scene->scrollWidget->offset = math::Vec(0, 0);
 	fromJson(rootJ);
@@ -167,7 +170,7 @@ void PatchManager::disconnectDialog() {
 	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
 		return;
 
-	app()->scene->rackWidget->clear();
+	app()->scene->rackWidget->clearCablesAction();
 }
 
 json_t *PatchManager::toJson() {
