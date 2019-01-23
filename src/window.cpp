@@ -9,6 +9,7 @@
 #include <map>
 #include <queue>
 #include <thread>
+#include <cstdlib>
 
 #ifdef ARCH_MAC
 	// For CGAssociateMouseAndMouseCursorPosition
@@ -439,6 +440,7 @@ void Window::setWindowPos(math::Vec pos) {
 }
 
 bool Window::isMaximized() {
+	if (getenv("RACK_XMONAD_HACK")) return true;
 	return glfwGetWindowAttrib(win, GLFW_MAXIMIZED);
 }
 
