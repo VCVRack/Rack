@@ -2,8 +2,9 @@
 #include "app/common.hpp"
 #include "widgets/OpaqueWidget.hpp"
 #include "widgets/FramebufferWidget.hpp"
-#include "app/CableContainer.hpp"
 #include "app/ModuleWidget.hpp"
+#include "app/CableWidget.hpp"
+#include "app/PortWidget.hpp"
 
 
 namespace rack {
@@ -12,13 +13,33 @@ namespace rack {
 struct RackWidget : OpaqueWidget {
 	FramebufferWidget *rails;
 	Widget *moduleContainer;
-	CableContainer *cableContainer;
+	Widget *cableContainer;
+	CableWidget *incompleteCable = NULL;
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
 
 	RackWidget();
 	~RackWidget();
 
+	void step() override;
+	void draw(NVGcontext *vg) override;
+
+	void onHover(const event::Hover &e) override;
+	void onDragHover(const event::DragHover &e) override;
+	void onButton(const event::Button &e) override;
+	void onZoom(const event::Zoom &e) override;
+
+	/** Completely clear the rack's modules and cables */
+	void clear();
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
+	void pastePresetClipboard();
+
+	// Module methods
+
+	/** Adds a module and adds it to the Engine
+	Ownership rules work like add/removeChild()
+	*/
 	void addModule(ModuleWidget *mw);
 	void addModuleAtMouse(ModuleWidget *mw);
 	/** Removes the module and transfers ownership to the caller */
@@ -29,19 +50,22 @@ struct RackWidget : OpaqueWidget {
 	bool requestModuleBoxNearest(ModuleWidget *mw, math::Rect requestedBox);
 	ModuleWidget *getModule(int moduleId);
 
-	/** Completely clear the rack's modules and cables */
-	void clear();
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
-	void pastePresetClipboard();
+	// Cable methods
 
-	void step() override;
-	void draw(NVGcontext *vg) override;
-
-	void onHover(const event::Hover &e) override;
-	void onDragHover(const event::DragHover &e) override;
-	void onButton(const event::Button &e) override;
-	void onZoom(const event::Zoom &e) override;
+	void clearCables();
+	/** Removes all complete cables connected to the port */
+	void clearCablesOnPort(PortWidget *port);
+	/** Adds a complete cable and adds it to the Engine.
+	Ownership rules work like add/removeChild()
+	*/
+	void addCable(CableWidget *w);
+	void removeCable(CableWidget *w);
+	/** Takes ownership of `w` and adds it as a child if it isn't already */
+	void setIncompleteCable(CableWidget *w);
+	CableWidget *releaseIncompleteCable();
+	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack */
+	CableWidget *getTopCable(PortWidget *port);
+	CableWidget *getCable(int cableId);
 };
 
 

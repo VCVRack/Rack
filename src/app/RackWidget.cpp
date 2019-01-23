@@ -1,4 +1,5 @@
 #include "app/RackWidget.hpp"
+#include "widgets/TransparentWidget.hpp"
 #include "app/RackRail.hpp"
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
@@ -44,17 +45,30 @@ struct ModuleContainer : Widget {
 	void draw(NVGcontext *vg) override {
 		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front of other ModuleWidgets.
 		for (Widget *child : children) {
-			if (!child->visible)
-				continue;
-			nvgSave(vg);
-			nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
 			ModuleWidget *w = dynamic_cast<ModuleWidget*>(child);
 			assert(w);
+
+			nvgSave(vg);
+			nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
 			w->drawShadow(vg);
 			nvgRestore(vg);
 		}
 
 		Widget::draw(vg);
+	}
+};
+
+
+struct CableContainer : TransparentWidget {
+	void draw(NVGcontext *vg) override {
+		Widget::draw(vg);
+
+		// Draw cable plugs
+		for (Widget *w : children) {
+			CableWidget *cw = dynamic_cast<CableWidget*>(w);
+			assert(cw);
+			cw->drawPlugs(vg);
+		}
 	}
 };
 
@@ -81,7 +95,81 @@ RackWidget::~RackWidget() {
 	clear();
 }
 
+void RackWidget::step() {
+	// Expand size to fit modules
+	math::Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
+	// We assume that the size is reset by a parent before calling step(). Otherwise it will grow unbounded.
+	box.size = box.size.max(moduleSize);
+
+	// Adjust size and position of rails
+	Widget *rail = rails->children.front();
+	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
+	if (!rails->box.contains(bound)) {
+		math::Vec cellMargin = math::Vec(20, 1);
+		rails->box.pos = bound.pos.div(RACK_GRID_SIZE).floor().minus(cellMargin).mult(RACK_GRID_SIZE);
+		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
+		rails->dirty = true;
+
+		rail->box.size = rails->box.size;
+	}
+
+	Widget::step();
+}
+
+void RackWidget::draw(NVGcontext *vg) {
+	Widget::draw(vg);
+}
+
+void RackWidget::onHover(const event::Hover &e) {
+	// Scroll with arrow keys
+	float arrowSpeed = 30.0;
+	if ((app()->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
+		arrowSpeed /= 16.0;
+	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
+		arrowSpeed *= 4.0;
+	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
+		arrowSpeed /= 4.0;
+
+	ScrollWidget *scrollWidget = app()->scene->scrollWidget;
+	if (glfwGetKey(app()->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		scrollWidget->offset.x -= arrowSpeed;
+	}
+	if (glfwGetKey(app()->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		scrollWidget->offset.x += arrowSpeed;
+	}
+	if (glfwGetKey(app()->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
+		scrollWidget->offset.y -= arrowSpeed;
+	}
+	if (glfwGetKey(app()->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		scrollWidget->offset.y += arrowSpeed;
+	}
+
+	OpaqueWidget::onHover(e);
+	mousePos = e.pos;
+}
+
+void RackWidget::onDragHover(const event::DragHover &e) {
+	OpaqueWidget::onDragHover(e);
+	mousePos = e.pos;
+}
+
+void RackWidget::onButton(const event::Button &e) {
+	OpaqueWidget::onButton(e);
+	if (e.getConsumed() == this) {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			app()->scene->moduleBrowser->visible = true;
+		}
+	}
+}
+
+void RackWidget::onZoom(const event::Zoom &e) {
+	rails->box.size = math::Vec();
+	OpaqueWidget::onZoom(e);
+}
+
 void RackWidget::clear() {
+	// This isn't required because removing all ModuleWidgets should remove all cables, but do it just in case.
+	clearCables();
 	// Remove ModuleWidgets
 	std::list<Widget*> widgets = moduleContainer->children;
 	for (Widget *w : widgets) {
@@ -89,7 +177,6 @@ void RackWidget::clear() {
 		assert(moduleWidget);
 		removeModule(moduleWidget);
 	}
-	assert(cableContainer->children.empty());
 }
 
 json_t *RackWidget::toJson() {
@@ -116,7 +203,18 @@ json_t *RackWidget::toJson() {
 	json_object_set_new(rootJ, "modules", modulesJ);
 
 	// cables
-	json_object_set_new(rootJ, "cables", cableContainer->toJson());
+	json_t *cablesJ = json_array();
+	for (Widget *w : cableContainer->children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+
+		// Only serialize complete cables
+		if (!cw->isComplete())
+			continue;
+
+		json_array_append_new(cablesJ, cw->toJson());
+	}
+	json_object_set_new(rootJ, "cables", cablesJ);
 
 	return rootJ;
 }
@@ -174,8 +272,19 @@ void RackWidget::fromJson(json_t *rootJ) {
 	// Before 1.0, cables were called wires
 	if (!cablesJ)
 		cablesJ = json_object_get(rootJ, "wires");
-	if (cablesJ)
-		cableContainer->fromJson(cablesJ, moduleWidgets);
+	assert(cablesJ);
+	size_t cableIndex;
+	json_t *cableJ;
+	json_array_foreach(cablesJ, cableIndex, cableJ) {
+		// Create a unserialize cable
+		CableWidget *cw = new CableWidget;
+		cw->fromJson(cableJ, moduleWidgets);
+		if (!cw->isComplete()) {
+			delete cw;
+			continue;
+		}
+		addCable(cw);
+	}
 }
 
 void RackWidget::pastePresetClipboard() {
@@ -288,76 +397,90 @@ ModuleWidget *RackWidget::getModule(int moduleId) {
 	return NULL;
 }
 
-void RackWidget::step() {
-	// Expand size to fit modules
-	math::Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
-	// We assume that the size is reset by a parent before calling step(). Otherwise it will grow unbounded.
-	box.size = box.size.max(moduleSize);
-
-	// Adjust size and position of rails
-	Widget *rail = rails->children.front();
-	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
-	if (!rails->box.contains(bound)) {
-		math::Vec cellMargin = math::Vec(20, 1);
-		rails->box.pos = bound.pos.div(RACK_GRID_SIZE).floor().minus(cellMargin).mult(RACK_GRID_SIZE);
-		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
-		rails->dirty = true;
-
-		rail->box.size = rails->box.size;
+void RackWidget::clearCables() {
+	for (Widget *w : cableContainer->children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw != incompleteCable)
+			app()->engine->removeCable(cw->cable);
 	}
-
-	Widget::step();
+	incompleteCable = NULL;
+	cableContainer->clearChildren();
 }
 
-void RackWidget::draw(NVGcontext *vg) {
-	Widget::draw(vg);
-}
+void RackWidget::clearCablesOnPort(PortWidget *port) {
+	assert(port);
+	std::list<Widget*> childrenCopy = cableContainer->children;
+	for (Widget *w : childrenCopy) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
 
-void RackWidget::onHover(const event::Hover &e) {
-	// Scroll with arrow keys
-	float arrowSpeed = 30.0;
-	if ((app()->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
-		arrowSpeed /= 16.0;
-	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
-		arrowSpeed *= 4.0;
-	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
-		arrowSpeed /= 4.0;
-
-	ScrollWidget *scrollWidget = app()->scene->scrollWidget;
-	if (glfwGetKey(app()->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		scrollWidget->offset.x -= arrowSpeed;
-	}
-	if (glfwGetKey(app()->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		scrollWidget->offset.x += arrowSpeed;
-	}
-	if (glfwGetKey(app()->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
-		scrollWidget->offset.y -= arrowSpeed;
-	}
-	if (glfwGetKey(app()->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		scrollWidget->offset.y += arrowSpeed;
-	}
-
-	OpaqueWidget::onHover(e);
-	mousePos = e.pos;
-}
-
-void RackWidget::onDragHover(const event::DragHover &e) {
-	OpaqueWidget::onDragHover(e);
-	mousePos = e.pos;
-}
-
-void RackWidget::onButton(const event::Button &e) {
-	OpaqueWidget::onButton(e);
-	if (e.getConsumed() == this) {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			app()->scene->moduleBrowser->visible = true;
+		// Check if cable is connected to port
+		if (cw->inputPort == port || cw->outputPort == port) {
+			if (cw == incompleteCable) {
+				incompleteCable = NULL;
+				cableContainer->removeChild(cw);
+			}
+			else {
+				removeCable(cw);
+			}
+			delete cw;
 		}
 	}
 }
 
-void RackWidget::onZoom(const event::Zoom &e) {
-	rails->box.size = math::Vec();
-	OpaqueWidget::onZoom(e);
+void RackWidget::addCable(CableWidget *w) {
+	assert(w->isComplete());
+	app()->engine->addCable(w->cable);
+	cableContainer->addChild(w);
+}
+
+void RackWidget::removeCable(CableWidget *w) {
+	assert(w->isComplete());
+	app()->engine->removeCable(w->cable);
+	cableContainer->removeChild(w);
+}
+
+void RackWidget::setIncompleteCable(CableWidget *w) {
+	if (incompleteCable) {
+		cableContainer->removeChild(incompleteCable);
+		delete incompleteCable;
+		incompleteCable = NULL;
+	}
+	if (w) {
+		cableContainer->addChild(w);
+		incompleteCable = w;
+	}
+}
+
+CableWidget *RackWidget::releaseIncompleteCable() {
+	CableWidget *cw = incompleteCable;
+	cableContainer->removeChild(incompleteCable);
+	incompleteCable = NULL;
+	return cw;
+}
+
+CableWidget *RackWidget::getTopCable(PortWidget *port) {
+	for (auto it = cableContainer->children.rbegin(); it != cableContainer->children.rend(); it++) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(*it);
+		assert(cw);
+		// Ignore incomplete cables
+		if (!cw->isComplete())
+			continue;
+		if (cw->inputPort == port || cw->outputPort == port)
+			return cw;
+	}
+	return NULL;
+}
+
+CableWidget *RackWidget::getCable(int cableId) {
+	for (Widget *w : cableContainer->children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw->cable->id == cableId)
+			return cw;
+	}
+	return NULL;
 }
 
 

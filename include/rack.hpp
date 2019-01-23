@@ -64,7 +64,6 @@
 #include "app/SVGSlider.hpp"
 #include "app/SVGSwitch.hpp"
 #include "app/Toolbar.hpp"
-#include "app/CableContainer.hpp"
 #include "app/CableWidget.hpp"
 
 #include "engine/Engine.hpp"

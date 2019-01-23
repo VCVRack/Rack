@@ -124,8 +124,8 @@ void CableAdd::setCable(CableWidget *cw) {
 }
 
 void CableAdd::undo() {
-	CableWidget *cw = app()->scene->rackWidget->cableContainer->getCable(cableId);
-	app()->scene->rackWidget->cableContainer->removeCable(cw);
+	CableWidget *cw = app()->scene->rackWidget->getCable(cableId);
+	app()->scene->rackWidget->removeCable(cw);
 	delete cw;
 }
 
@@ -147,7 +147,7 @@ void CableAdd::redo() {
 
 	cw->color = color;
 
-	app()->scene->rackWidget->cableContainer->addCable(cw);
+	app()->scene->rackWidget->addCable(cw);
 }
 
 

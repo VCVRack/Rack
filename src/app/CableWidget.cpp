@@ -240,7 +240,7 @@ void CableWidget::drawPlugs(NVGcontext *vg) {
 	math::Vec inputPos = getInputPos();
 
 	// Draw plug if the cable is on top, or if the cable is incomplete
-	if (!isComplete() || app()->scene->rackWidget->cableContainer->getTopCable(outputPort) == this) {
+	if (!isComplete() || app()->scene->rackWidget->getTopCable(outputPort) == this) {
 		drawPlug(vg, outputPos, color);
 		if (outputPort) {
 			// Draw plug light
@@ -251,7 +251,7 @@ void CableWidget::drawPlugs(NVGcontext *vg) {
 		}
 	}
 
-	if (!isComplete() || app()->scene->rackWidget->cableContainer->getTopCable(inputPort) == this) {
+	if (!isComplete() || app()->scene->rackWidget->getTopCable(inputPort) == this) {
 		drawPlug(vg, inputPos, color);
 		if (inputPort) {
 			nvgSave(vg);

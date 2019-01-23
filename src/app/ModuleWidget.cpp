@@ -529,10 +529,10 @@ void ModuleWidget::saveDialog() {
 
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
-		app()->scene->rackWidget->cableContainer->clearPort(input);
+		app()->scene->rackWidget->clearCablesOnPort(input);
 	}
 	for (PortWidget *output : outputs) {
-		app()->scene->rackWidget->cableContainer->clearPort(output);
+		app()->scene->rackWidget->clearCablesOnPort(output);
 	}
 }
 

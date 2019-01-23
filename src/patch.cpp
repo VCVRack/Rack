@@ -167,7 +167,7 @@ void PatchManager::disconnectDialog() {
 	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
 		return;
 
-	app()->scene->rackWidget->cableContainer->clear();
+	app()->scene->rackWidget->clear();
 }
 
 json_t *PatchManager::toJson() {
