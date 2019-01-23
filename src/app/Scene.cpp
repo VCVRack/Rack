@@ -124,12 +124,6 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 					e.consume(this);
 				}
 			} break;
-			case GLFW_KEY_V: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					rackWidget->pastePresetClipboard();
-					e.consume(this);
-				}
-			} break;
 			case GLFW_KEY_Z: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					app()->history->undo();

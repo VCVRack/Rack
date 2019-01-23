@@ -83,6 +83,15 @@ struct ModuleBypass : ModuleAction {
 };
 
 
+struct ModuleChange : ModuleAction {
+	json_t *oldModuleJ;
+	json_t *newModuleJ;
+	~ModuleChange();
+	void undo() override;
+	void redo() override;
+};
+
+
 struct ParamChange : ModuleAction {
 	int paramId;
 	float oldValue;

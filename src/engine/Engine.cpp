@@ -50,8 +50,6 @@ struct Engine::Internal {
 	float sampleTime;
 	float sampleRateRequested;
 
-	Module *resetModule = NULL;
-	Module *randomizeModule = NULL;
 	int nextModuleId = 1;
 	int nextCableId = 1;
 
@@ -91,16 +89,6 @@ static void Engine_step(Engine *engine) {
 		for (Module *module : engine->modules) {
 			module->onSampleRateChange();
 		}
-	}
-
-	// Events
-	if (engine->internal->resetModule) {
-		engine->internal->resetModule->reset();
-		engine->internal->resetModule = NULL;
-	}
-	if (engine->internal->randomizeModule) {
-		engine->internal->randomizeModule->randomize();
-		engine->internal->randomizeModule = NULL;
 	}
 
 	// Param smoothing
@@ -273,11 +261,17 @@ void Engine::removeModule(Module *module) {
 }
 
 void Engine::resetModule(Module *module) {
-	internal->resetModule = module;
+	assert(module);
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::mutex> lock(internal->mutex);
+	module->reset();
 }
 
 void Engine::randomizeModule(Module *module) {
-	internal->randomizeModule = module;
+	assert(module);
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::mutex> lock(internal->mutex);
+	module->randomize();
 }
 
 static void Engine_updateActive(Engine *engine) {
@@ -344,7 +338,7 @@ void Engine::removeCable(Cable *cable) {
 }
 
 void Engine::setParam(Module *module, int paramId, float value) {
-	// TODO Make thread safe
+	// TODO Does this need to be thread-safe?
 	module->params[paramId].value = value;
 }
 

@@ -62,8 +62,8 @@ struct ModuleWidget : OpaqueWidget {
 
 	/** Serializes/unserializes the module state */
 	void copyClipboard();
-	void pasteClipboard();
-	void load(std::string filename);
+	void pasteClipboardAction();
+	void loadAction(std::string filename);
 	void save(std::string filename);
 	void loadDialog();
 	void saveDialog();
@@ -72,18 +72,20 @@ struct ModuleWidget : OpaqueWidget {
 	Called when the user clicks Disconnect Cables in the context menu.
 	*/
 	void disconnect();
+
 	/** Resets the parameters of the module and calls the Module's randomize().
 	Called when the user clicks Initialize in the context menu.
 	*/
-	void reset();
+	void resetAction();
 	/** Randomizes the parameters of the module and calls the Module's randomize().
 	Called when the user clicks Randomize in the context menu.
 	*/
-	void randomize();
-
-	void removeAction();
-	void bypassAction();
+	void randomizeAction();
+	void disconnectAction();
 	void cloneAction();
+	void bypassAction();
+	/** Deletes `this` */
+	void removeAction();
 	void createContextMenu();
 	/** Override to add context menu entries to your subclass.
 	It is recommended to add a blank MenuEntry first for spacing.

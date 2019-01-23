@@ -108,8 +108,6 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 }
 
 void PortWidget::onDragEnd(const event::DragEnd &e) {
-	// FIXME
-	// If the source PortWidget is deleted, this will be called, removing the cable
 	CableWidget *cw = app()->scene->rackWidget->releaseIncompleteCable();
 	if (cw->isComplete()) {
 		app()->scene->rackWidget->addCable(cw);

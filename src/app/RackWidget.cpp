@@ -148,6 +148,22 @@ void RackWidget::onHover(const event::Hover &e) {
 	mousePos = e.pos;
 }
 
+void RackWidget::onHoverKey(const event::HoverKey &e) {
+	OpaqueWidget::onHoverKey(e);
+	if (e.getConsumed() != this)
+		return;
+
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+		switch (e.key) {
+			case GLFW_KEY_V: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					pastePresetClipboardAction();
+				}
+			} break;
+		}
+	}
+}
+
 void RackWidget::onDragHover(const event::DragHover &e) {
 	OpaqueWidget::onDragHover(e);
 	mousePos = e.pos;
@@ -287,7 +303,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-void RackWidget::pastePresetClipboard() {
+void RackWidget::pastePresetClipboardAction() {
 	const char *moduleJson = glfwGetClipboardString(app()->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
@@ -297,13 +313,14 @@ void RackWidget::pastePresetClipboard() {
 	json_error_t error;
 	json_t *moduleJ = json_loads(moduleJson, 0, &error);
 	if (moduleJ) {
-		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
+		ModuleWidget *mw = moduleFromJson(moduleJ);
 		json_decref(moduleJ);
-		addModule(moduleWidget);
-		// Set moduleWidget position
-		math::Rect newBox = moduleWidget->box;
-		newBox.pos = mousePos.minus(newBox.size.div(2));
-		requestModuleBoxNearest(moduleWidget, newBox);
+		addModuleAtMouse(mw);
+
+		// history::ModuleAdd
+		history::ModuleAdd *h = new history::ModuleAdd;
+		h->setModule(mw);
+		app()->history->push(h);
 	}
 	else {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
@@ -349,7 +366,9 @@ bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect requestedBox) {
 
 	// Check intersection with other modules
 	for (Widget *m2 : moduleContainer->children) {
-		if (m == m2) continue;
+		// Don't intersect with self
+		if (m == m2)
+			continue;
 		if (requestedBox.intersects(m2->box)) {
 			return false;
 		}
@@ -401,8 +420,10 @@ void RackWidget::clearCables() {
 	for (Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
-		if (cw != incompleteCable)
-			app()->engine->removeCable(cw->cable);
+		if (!cw->isComplete())
+			continue;
+
+		app()->engine->removeCable(cw->cable);
 	}
 	incompleteCable = NULL;
 	cableContainer->clearChildren();
@@ -415,7 +436,7 @@ void RackWidget::clearCablesAction() {
 	for (Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
-		if (cw == incompleteCable)
+		if (!cw->isComplete())
 			continue;
 
 		// history::CableRemove
@@ -429,23 +450,16 @@ void RackWidget::clearCablesAction() {
 }
 
 void RackWidget::clearCablesOnPort(PortWidget *port) {
-	assert(port);
-	std::list<Widget*> childrenCopy = cableContainer->children;
-	for (Widget *w : childrenCopy) {
-		CableWidget *cw = dynamic_cast<CableWidget*>(w);
-		assert(cw);
-
+	for (CableWidget *cw : getCablesOnPort(port)) {
 		// Check if cable is connected to port
-		if (cw->inputPort == port || cw->outputPort == port) {
-			if (cw == incompleteCable) {
-				incompleteCable = NULL;
-				cableContainer->removeChild(cw);
-			}
-			else {
-				removeCable(cw);
-			}
-			delete cw;
+		if (cw == incompleteCable) {
+			incompleteCable = NULL;
+			cableContainer->removeChild(cw);
 		}
+		else {
+			removeCable(cw);
+		}
+		delete cw;
 	}
 }
 
@@ -501,6 +515,19 @@ CableWidget *RackWidget::getCable(int cableId) {
 			return cw;
 	}
 	return NULL;
+}
+
+std::list<CableWidget*> RackWidget::getCablesOnPort(PortWidget *port) {
+	assert(port);
+	std::list<CableWidget*> cables;
+	for (Widget *w : cableContainer->children) {
+		CableWidget *cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw->inputPort == port || cw->outputPort == port) {
+			cables.push_back(cw);
+		}
+	}
+	return cables;
 }
 
 

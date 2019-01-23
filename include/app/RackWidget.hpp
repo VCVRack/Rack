@@ -25,6 +25,7 @@ struct RackWidget : OpaqueWidget {
 	void draw(NVGcontext *vg) override;
 
 	void onHover(const event::Hover &e) override;
+	void onHoverKey(const event::HoverKey &e) override;
 	void onDragHover(const event::DragHover &e) override;
 	void onButton(const event::Button &e) override;
 	void onZoom(const event::Zoom &e) override;
@@ -33,7 +34,7 @@ struct RackWidget : OpaqueWidget {
 	void clear();
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
-	void pastePresetClipboard();
+	void pastePresetClipboardAction();
 
 	// Module methods
 
@@ -67,6 +68,8 @@ struct RackWidget : OpaqueWidget {
 	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack */
 	CableWidget *getTopCable(PortWidget *port);
 	CableWidget *getCable(int cableId);
+	/** Returns all cables attached to port, complete or not */
+	std::list<CableWidget*> getCablesOnPort(PortWidget *port);
 };
 
 

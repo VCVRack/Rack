@@ -22,7 +22,7 @@ struct ModuleDisconnectItem : MenuItem {
 		rightText = WINDOW_MOD_CTRL_NAME "+U";
 	}
 	void onAction(const event::Action &e) override {
-		moduleWidget->disconnect();
+		moduleWidget->disconnectAction();
 	}
 };
 
@@ -33,7 +33,7 @@ struct ModuleResetItem : MenuItem {
 		rightText = WINDOW_MOD_CTRL_NAME "+I";
 	}
 	void onAction(const event::Action &e) override {
-		moduleWidget->reset();
+		moduleWidget->resetAction();
 	}
 };
 
@@ -44,7 +44,7 @@ struct ModuleRandomizeItem : MenuItem {
 		rightText = WINDOW_MOD_CTRL_NAME "+R";
 	}
 	void onAction(const event::Action &e) override {
-		moduleWidget->randomize();
+		moduleWidget->randomizeAction();
 	}
 };
 
@@ -66,7 +66,7 @@ struct ModulePasteItem : MenuItem {
 		rightText = WINDOW_MOD_CTRL_NAME "+V";
 	}
 	void onAction(const event::Action &e) override {
-		moduleWidget->pasteClipboard();
+		moduleWidget->pasteClipboardAction();
 	}
 };
 
@@ -214,13 +214,13 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 		switch (e.key) {
 			case GLFW_KEY_I: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					reset();
+					resetAction();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_R: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					randomize();
+					randomizeAction();
 					e.consume(this);
 				}
 			} break;
@@ -232,18 +232,19 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_V: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					pasteClipboard();
+					pasteClipboardAction();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_D: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					cloneAction();
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_U: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					disconnect();
+					disconnectAction();
 					e.consume(this);
 				}
 			} break;
@@ -267,7 +268,7 @@ void ModuleWidget::onDragStart(const event::DragStart &e) {
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 	if (!box.pos.isEqual(oldPos)) {
-		// Push ModuleMove history action
+		// history::ModuleMove
 		history::ModuleMove *h = new history::ModuleMove;
 		h->moduleId = module->id;
 		h->oldPos = oldPos;
@@ -412,7 +413,7 @@ void ModuleWidget::copyClipboard() {
 	glfwSetClipboardString(app()->window->win, moduleJson);
 }
 
-void ModuleWidget::pasteClipboard() {
+void ModuleWidget::pasteClipboardAction() {
 	const char *moduleJson = glfwGetClipboardString(app()->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
@@ -429,10 +430,18 @@ void ModuleWidget::pasteClipboard() {
 		json_decref(moduleJ);
 	});
 
+	// history::ModuleChange
+	history::ModuleChange *h = new history::ModuleChange;
+	h->moduleId = module->id;
+	h->oldModuleJ = toJson();
+
 	fromJson(moduleJ);
+
+	h->newModuleJ = toJson();
+	app()->history->push(h);
 }
 
-void ModuleWidget::load(std::string filename) {
+void ModuleWidget::loadAction(std::string filename) {
 	INFO("Loading preset %s", filename.c_str());
 
 	FILE *file = fopen(filename.c_str(), "r");
@@ -455,7 +464,15 @@ void ModuleWidget::load(std::string filename) {
 		json_decref(moduleJ);
 	});
 
+	// history::ModuleChange
+	history::ModuleChange *h = new history::ModuleChange;
+	h->moduleId = module->id;
+	h->oldModuleJ = toJson();
+
 	fromJson(moduleJ);
+
+	h->newModuleJ = toJson();
+	app()->history->push(h);
 }
 
 void ModuleWidget::save(std::string filename) {
@@ -496,7 +513,7 @@ void ModuleWidget::loadDialog() {
 		free(path);
 	});
 
-	load(path);
+	loadAction(path);
 }
 
 void ModuleWidget::saveDialog() {
@@ -535,39 +552,68 @@ void ModuleWidget::disconnect() {
 	}
 }
 
-void ModuleWidget::reset() {
-	if (module) {
-		app()->engine->resetModule(module);
+void ModuleWidget::resetAction() {
+	assert(module);
+
+	// history::ModuleChange
+	history::ModuleChange *h = new history::ModuleChange;
+	h->moduleId = module->id;
+	h->oldModuleJ = toJson();
+
+	app()->engine->resetModule(module);
+
+	h->newModuleJ = toJson();
+	app()->history->push(h);
+}
+
+void ModuleWidget::randomizeAction() {
+	assert(module);
+
+	// history::ModuleChange
+	history::ModuleChange *h = new history::ModuleChange;
+	h->moduleId = module->id;
+	h->oldModuleJ = toJson();
+
+	app()->engine->randomizeModule(module);
+
+	h->newModuleJ = toJson();
+	app()->history->push(h);
+}
+
+static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexAction) {
+	// Add CableRemove action for all cables attached to outputs
+	for (PortWidget* output : mw->outputs) {
+		for (CableWidget *cw : app()->scene->rackWidget->getCablesOnPort(output)) {
+			if (!cw->isComplete())
+				continue;
+			// history::CableRemove
+			history::CableRemove *h = new history::CableRemove;
+			h->setCable(cw);
+			complexAction->push(h);
+		}
+	}
+	// Add CableRemove action for all cables attached to inputs
+	for (PortWidget* input : mw->inputs) {
+		for (CableWidget *cw : app()->scene->rackWidget->getCablesOnPort(input)) {
+			if (!cw->isComplete())
+				continue;
+			// Avoid creating duplicate actions for self-patched cables
+			if (cw->outputPort->module == mw->module)
+				continue;
+			// history::CableRemove
+			history::CableRemove *h = new history::CableRemove;
+			h->setCable(cw);
+			complexAction->push(h);
+		}
 	}
 }
 
-void ModuleWidget::randomize() {
-	if (module) {
-		app()->engine->randomizeModule(module);
-	}
-}
-
-void ModuleWidget::removeAction() {
+void ModuleWidget::disconnectAction() {
 	history::ComplexAction *complexAction = new history::ComplexAction;
-
-	// Push ModuleRemove history action
-	history::ModuleRemove *moduleRemove = new history::ModuleRemove;
-	moduleRemove->setModule(this);
-	complexAction->push(moduleRemove);
-
+	disconnectActions(this, complexAction);
 	app()->history->push(complexAction);
 
-	app()->scene->rackWidget->removeModule(this);
-	delete this;
-}
-
-void ModuleWidget::bypassAction() {
-	// Push ModuleBypass history action
-	history::ModuleBypass *h = new history::ModuleBypass;
-	h->moduleId = module->id;
-	h->bypass = !module->bypass;
-	app()->history->push(h);
-	h->redo();
+	disconnect();
 }
 
 void ModuleWidget::cloneAction() {
@@ -580,10 +626,36 @@ void ModuleWidget::cloneAction() {
 
 	app()->scene->rackWidget->addModuleAtMouse(clonedModuleWidget);
 
-	// Push ModuleAdd history action
+	// history::ModuleAdd
 	history::ModuleAdd *h = new history::ModuleAdd;
 	h->setModule(clonedModuleWidget);
 	app()->history->push(h);
+}
+
+void ModuleWidget::bypassAction() {
+	assert(module);
+	// history::ModuleBypass
+	history::ModuleBypass *h = new history::ModuleBypass;
+	h->moduleId = module->id;
+	h->bypass = !module->bypass;
+	app()->history->push(h);
+	h->redo();
+}
+
+void ModuleWidget::removeAction() {
+	history::ComplexAction *complexAction = new history::ComplexAction;
+	disconnectActions(this, complexAction);
+
+	// history::ModuleRemove
+	history::ModuleRemove *moduleRemove = new history::ModuleRemove;
+	moduleRemove->setModule(this);
+	complexAction->push(moduleRemove);
+
+	app()->history->push(complexAction);
+
+	// This disconnects cables, removes the module, and transfers ownership to caller
+	app()->scene->rackWidget->removeModule(this);
+	delete this;
 }
 
 void ModuleWidget::createContextMenu() {

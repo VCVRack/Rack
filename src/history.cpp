@@ -90,6 +90,24 @@ void ModuleBypass::redo() {
 }
 
 
+ModuleChange::~ModuleChange() {
+	json_decref(oldModuleJ);
+	json_decref(newModuleJ);
+}
+
+void ModuleChange::undo() {
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->fromJson(oldModuleJ);
+}
+
+void ModuleChange::redo() {
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->fromJson(newModuleJ);
+}
+
+
 void ParamChange::undo() {
 	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
 	assert(mw);
