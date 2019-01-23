@@ -32,81 +32,74 @@ void ComplexAction::push(Action *action) {
 }
 
 
-void ModuleAdd::undo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	app()->scene->rackWidget->removeModule(moduleWidget);
-	delete moduleWidget;
-}
-
-void ModuleAdd::redo() {
-	ModuleWidget *moduleWidget = model->createModuleWidget();
-	assert(moduleWidget);
-	assert(moduleWidget->module);
-	moduleWidget->module->id = moduleId;
-	moduleWidget->box.pos = pos;
-	app()->scene->rackWidget->addModule(moduleWidget);
-}
-
-
-ModuleRemove::~ModuleRemove() {
+ModuleAdd::~ModuleAdd() {
 	json_decref(moduleJ);
 }
 
-void ModuleRemove::undo() {
-	ModuleWidget *moduleWidget = model->createModuleWidget();
-	assert(moduleWidget);
-	assert(moduleWidget->module);
-	moduleWidget->module->id = moduleId;
-	moduleWidget->box.pos = pos;
-	moduleWidget->fromJson(moduleJ);
-	app()->scene->rackWidget->addModule(moduleWidget);
+void ModuleAdd::setModule(ModuleWidget *mw) {
+	model = mw->model;
+	assert(mw->module);
+	moduleId = mw->module->id;
+	pos = mw->box.pos;
+	// ModuleAdd doesn't *really* need the state to be serialized, although ModuleRemove certainly does.
+	// However, creating a module may give it a nondeterministic initial state for whatever reason, so serialize anyway.
+	moduleJ = mw->toJson();
 }
 
-void ModuleRemove::redo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	app()->scene->rackWidget->removeModule(moduleWidget);
-	delete moduleWidget;
+void ModuleAdd::undo() {
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	app()->scene->rackWidget->removeModule(mw);
+	delete mw;
+}
+
+void ModuleAdd::redo() {
+	ModuleWidget *mw = model->createModuleWidget();
+	assert(mw);
+	assert(mw->module);
+	mw->module->id = moduleId;
+	mw->box.pos = pos;
+	mw->fromJson(moduleJ);
+	app()->scene->rackWidget->addModule(mw);
 }
 
 
 void ModuleMove::undo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	moduleWidget->box.pos = oldPos;
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->box.pos = oldPos;
 }
 
 void ModuleMove::redo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	moduleWidget->box.pos = newPos;
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->box.pos = newPos;
 }
 
 
 void ModuleBypass::undo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	moduleWidget->module->bypass = !bypass;
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->module->bypass = !bypass;
 }
 
 void ModuleBypass::redo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	moduleWidget->module->bypass = bypass;
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->module->bypass = bypass;
 }
 
 
 void ParamChange::undo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	moduleWidget->module->params[paramId].value = oldValue;
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->module->params[paramId].value = oldValue;
 }
 
 void ParamChange::redo() {
-	ModuleWidget *moduleWidget = app()->scene->rackWidget->getModule(moduleId);
-	assert(moduleWidget);
-	moduleWidget->module->params[paramId].value = newValue;
+	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	assert(mw);
+	mw->module->params[paramId].value = newValue;
 }
 
 
@@ -152,9 +145,15 @@ void CableAdd::redo() {
 
 
 State::~State() {
+	clear();
+}
+
+void State::clear() {
 	for (Action *action : actions) {
 		delete action;
 	}
+	actions.clear();
+	actionIndex = 0;
 }
 
 void State::push(Action *action) {

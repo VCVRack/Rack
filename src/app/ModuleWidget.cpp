@@ -553,10 +553,7 @@ void ModuleWidget::removeAction() {
 
 	// Push ModuleRemove history action
 	history::ModuleRemove *moduleRemove = new history::ModuleRemove;
-	moduleRemove->model = model;
-	moduleRemove->moduleId = module->id;
-	moduleRemove->pos = box.pos;
-	moduleRemove->moduleJ = toJson();
+	moduleRemove->setModule(this);
 	complexAction->push(moduleRemove);
 
 	app()->history->push(complexAction);
@@ -568,8 +565,8 @@ void ModuleWidget::removeAction() {
 void ModuleWidget::bypassAction() {
 	// Push ModuleBypass history action
 	history::ModuleBypass *h = new history::ModuleBypass;
-	h->bypass = !module->bypass;
 	h->moduleId = module->id;
+	h->bypass = !module->bypass;
 	app()->history->push(h);
 	h->redo();
 }
@@ -586,9 +583,7 @@ void ModuleWidget::cloneAction() {
 
 	// Push ModuleAdd history action
 	history::ModuleAdd *h = new history::ModuleAdd;
-	h->model = clonedModuleWidget->model;
-	h->moduleId = clonedModuleWidget->module->id;
-	h->pos = clonedModuleWidget->box.pos;
+	h->setModule(clonedModuleWidget);
 	app()->history->push(h);
 }
 

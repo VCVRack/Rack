@@ -88,9 +88,7 @@ struct ModuleBox : OpaqueWidget {
 
 			// Push ModuleAdd history action
 			history::ModuleAdd *h = new history::ModuleAdd;
-			h->model = moduleWidget->model;
-			h->moduleId = moduleWidget->module->id;
-			h->pos = moduleWidget->box.pos;
+			h->setModule(moduleWidget);
 			app()->history->push(h);
 		}
 		OpaqueWidget::onButton(e);

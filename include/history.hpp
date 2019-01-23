@@ -10,6 +10,7 @@
 namespace rack {
 
 
+struct ModuleWidget;
 struct CableWidget;
 
 
@@ -56,19 +57,15 @@ struct ModuleAction : Action {
 struct ModuleAdd : ModuleAction {
 	Model *model;
 	math::Vec pos;
-	void undo() override;
-	void redo() override;
-};
-
-
-struct ModuleRemove : ModuleAction {
-	Model *model;
-	math::Vec pos;
 	json_t *moduleJ;
-	~ModuleRemove();
+	~ModuleAdd();
+	void setModule(ModuleWidget *mw);
 	void undo() override;
 	void redo() override;
 };
+
+
+struct ModuleRemove : InverseAction<ModuleAdd> {};
 
 
 struct ModuleMove : ModuleAction {
@@ -116,6 +113,7 @@ struct State {
 	int actionIndex = 0;
 
 	~State();
+	void clear();
 	void push(Action *action);
 	void undo();
 	void redo();
