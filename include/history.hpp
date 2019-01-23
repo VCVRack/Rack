@@ -117,6 +117,8 @@ struct State {
 	void push(Action *action);
 	void undo();
 	void redo();
+	bool canUndo();
+	bool canRedo();
 };
 
 

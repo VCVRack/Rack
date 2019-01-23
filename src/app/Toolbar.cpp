@@ -35,7 +35,7 @@ struct MenuButton : Button {
 struct NewItem : MenuItem {
 	NewItem() {
 		text = "New";
-		rightText = "(" WINDOW_MOD_CTRL_NAME "+N)";
+		rightText = WINDOW_MOD_CTRL_NAME "+N";
 	}
 	void onAction(const event::Action &e) override {
 		app()->patch->resetDialog();
@@ -46,7 +46,7 @@ struct NewItem : MenuItem {
 struct OpenItem : MenuItem {
 	OpenItem() {
 		text = "Open";
-		rightText = "(" WINDOW_MOD_CTRL_NAME "+O)";
+		rightText = WINDOW_MOD_CTRL_NAME "+O";
 	}
 	void onAction(const event::Action &e) override {
 		app()->patch->loadDialog();
@@ -57,7 +57,7 @@ struct OpenItem : MenuItem {
 struct SaveItem : MenuItem {
 	SaveItem() {
 		text = "Save";
-		rightText = "(" WINDOW_MOD_CTRL_NAME "+S)";
+		rightText = WINDOW_MOD_CTRL_NAME "+S";
 	}
 	void onAction(const event::Action &e) override {
 		app()->patch->saveDialog();
@@ -68,7 +68,7 @@ struct SaveItem : MenuItem {
 struct SaveAsItem : MenuItem {
 	SaveAsItem() {
 		text = "Save as";
-		rightText = "(" WINDOW_MOD_CTRL_NAME "+Shift+S)";
+		rightText = WINDOW_MOD_CTRL_NAME "+Shift+S";
 	}
 	void onAction(const event::Action &e) override {
 		app()->patch->saveAsDialog();
@@ -109,7 +109,7 @@ struct DisconnectCablesItem : MenuItem {
 struct QuitItem : MenuItem {
 	QuitItem() {
 		text = "Quit";
-		rightText = "(" WINDOW_MOD_CTRL_NAME "+Q)";
+		rightText = WINDOW_MOD_CTRL_NAME "+Q";
 	}
 	void onAction(const event::Action &e) override {
 		app()->window->close();
@@ -134,6 +134,45 @@ struct FileButton : MenuButton {
 		menu->addChild(new RevertItem);
 		menu->addChild(new DisconnectCablesItem);
 		menu->addChild(new QuitItem);
+	}
+};
+
+
+struct UndoItem : MenuItem {
+	UndoItem() {
+		text = "Undo";
+		rightText = WINDOW_MOD_CTRL_NAME "+Z";
+		disabled = !app()->history->canUndo();
+	}
+	void onAction(const event::Action &e) override {
+		app()->history->undo();
+	}
+};
+
+
+struct RedoItem : MenuItem {
+	RedoItem() {
+		text = "Redo";
+		rightText = WINDOW_MOD_CTRL_NAME "+" WINDOW_MOD_SHIFT_NAME "+Z";
+		disabled = !app()->history->canRedo();
+	}
+	void onAction(const event::Action &e) override {
+		app()->history->redo();
+	}
+};
+
+
+struct EditButton : MenuButton {
+	EditButton() {
+		text = "Edit";
+	}
+	void onAction(const event::Action &e) override {
+		Menu *menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		menu->addChild(new UndoItem);
+		menu->addChild(new RedoItem);
 	}
 };
 
@@ -260,6 +299,19 @@ struct SampleRateItem : MenuItem {
 };
 
 
+struct FullscreenItem : MenuItem {
+	FullscreenItem() {
+		text = "Fullscreen";
+		rightText = "F11";
+		if (app()->window->isFullScreen())
+			rightText = CHECKMARK_STRING " " + rightText;
+	}
+	void onAction(const event::Action &e) override {
+		app()->window->setFullScreen(!app()->window->isFullScreen());
+	}
+};
+
+
 struct SettingsButton : MenuButton {
 	SettingsButton() {
 		text = "Settings";
@@ -273,6 +325,7 @@ struct SettingsButton : MenuButton {
 		menu->addChild(new PowerMeterItem);
 		menu->addChild(new LockModulesItem);
 		menu->addChild(new SampleRateItem);
+		menu->addChild(new FullscreenItem);
 
 		Slider *zoomSlider = new Slider;
 		zoomSlider->box.size.x = 200.0;
@@ -497,6 +550,7 @@ struct PluginsButton : MenuButton {
 struct ManualItem : MenuItem {
 	ManualItem() {
 		text = "Manual";
+		rightText = "F1";
 	}
 	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
@@ -558,6 +612,9 @@ Toolbar::Toolbar() {
 
 	FileButton *fileButton = new FileButton;
 	layout->addChild(fileButton);
+
+	EditButton *editButton = new EditButton;
+	layout->addChild(editButton);
 
 	SettingsButton *settingsButton = new SettingsButton;
 	layout->addChild(settingsButton);

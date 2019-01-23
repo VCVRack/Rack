@@ -166,17 +166,25 @@ void State::push(Action *action) {
 }
 
 void State::undo() {
-	if (actionIndex > 0) {
+	if (canUndo()) {
 		actionIndex--;
 		actions[actionIndex]->undo();
 	}
 }
 
 void State::redo() {
-	if ((int) actions.size() > actionIndex) {
+	if (canRedo()) {
 		actions[actionIndex]->redo();
 		actionIndex++;
 	}
+}
+
+bool State::canUndo() {
+	return actionIndex > 0;
+}
+
+bool State::canRedo() {
+	return actionIndex < (int) actions.size();
 }
 
 

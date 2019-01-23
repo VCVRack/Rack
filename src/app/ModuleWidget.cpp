@@ -106,11 +106,10 @@ struct ModuleBypassItem : MenuItem {
 	ModuleBypassItem() {
 		text = "Bypass";
 	}
-	void step() override {
+	void setModule(ModuleWidget *moduleWidget) {
+		this->moduleWidget = moduleWidget;
 		rightText = WINDOW_MOD_CTRL_NAME "+E";
-		if (!moduleWidget->module)
-			return;
-		if (moduleWidget->module->bypass)
+		if (moduleWidget->module && moduleWidget->module->bypass)
 			rightText = CHECKMARK_STRING " " + rightText;
 	}
 	void onAction(const event::Action &e) override {
@@ -628,7 +627,7 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(saveItem);
 
 	ModuleBypassItem *bypassItem = new ModuleBypassItem;
-	bypassItem->moduleWidget = this;
+	bypassItem->setModule(this);
 	menu->addChild(bypassItem);
 
 	ModuleDeleteItem *deleteItem = new ModuleDeleteItem;

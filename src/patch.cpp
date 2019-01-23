@@ -167,8 +167,9 @@ void PatchManager::revertDialog() {
 }
 
 void PatchManager::disconnectDialog() {
-	if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
-		return;
+	// Since we have undo history, no need for a warning.
+	// if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
+	// 	return;
 
 	app()->scene->rackWidget->clearCablesAction();
 }
