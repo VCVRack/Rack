@@ -81,7 +81,8 @@ void Module::reset() {
 
 void Module::randomize() {
 	for (Param &param : params) {
-		param.randomize();
+		if (param.randomizable)
+			param.randomize();
 	}
 	onRandomize();
 }

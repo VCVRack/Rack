@@ -38,6 +38,8 @@ struct Param {
 	/** An optional one-sentence description of the parameter */
 	std::string description;
 	ParamQuantityFactory *paramQuantityFactory = NULL;
+	/** Determines whether this param will be randomized automatically when the user requests to randomize the module state */
+	bool randomizable = true;
 
 	~Param() {
 		if (paramQuantityFactory)
