@@ -114,13 +114,14 @@ static void Engine_step(Engine *engine) {
 		}
 	}
 
+	float cpuLambda = engine->internal->sampleTime / 2.f;
+
 	// Iterate modules
 	for (Module *module : engine->modules) {
 		if (module->bypass) {
 			// Bypass module
 			for (Output &output : module->outputs) {
-				output.channels = 1;
-				output.setVoltage(0.f);
+				output.setChannels(0);
 			}
 			module->cpuTime = 0.f;
 		}
@@ -134,8 +135,7 @@ static void Engine_step(Engine *engine) {
 				auto stopTime = std::chrono::high_resolution_clock::now();
 				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
 				// Smooth cpu time
-				float powerLambda = engine->internal->sampleTime / 2.f;
-				module->cpuTime += (cpuTime - module->cpuTime) * powerLambda;
+				module->cpuTime += (cpuTime - module->cpuTime) * cpuLambda;
 			}
 			else {
 				module->step();
@@ -144,18 +144,10 @@ static void Engine_step(Engine *engine) {
 
 		// Iterate ports and step plug lights
 		for (Input &input : module->inputs) {
-			if (input.active) {
-				float value = input.value / 5.f;
-				input.plugLights[0].setBrightnessSmooth(value);
-				input.plugLights[1].setBrightnessSmooth(-value);
-			}
+			input.step();
 		}
 		for (Output &output : module->outputs) {
-			if (output.active) {
-				float value = output.value / 5.f;
-				output.plugLights[0].setBrightnessSmooth(value);
-				output.plugLights[1].setBrightnessSmooth(-value);
-			}
+			output.step();
 		}
 	}
 
@@ -274,23 +266,6 @@ void Engine::randomizeModule(Module *module) {
 	module->randomize();
 }
 
-static void Engine_updateActive(Engine *engine) {
-	// Set everything to inactive
-	for (Module *module : engine->modules) {
-		for (Input &input : module->inputs) {
-			input.active = false;
-		}
-		for (Output &output : module->outputs) {
-			output.active = false;
-		}
-	}
-	// Set inputs/outputs to active
-	for (Cable *cable : engine->cables) {
-		cable->outputModule->outputs[cable->outputId].active = true;
-		cable->inputModule->inputs[cable->inputId].active = true;
-	}
-}
-
 void Engine::addCable(Cable *cable) {
 	assert(cable);
 	VIPLock vipLock(internal->vipMutex);
@@ -318,7 +293,6 @@ void Engine::addCable(Cable *cable) {
 	}
 	// Add the cable
 	cables.push_back(cable);
-	Engine_updateActive(this);
 }
 
 void Engine::removeCable(Cable *cable) {
@@ -328,11 +302,11 @@ void Engine::removeCable(Cable *cable) {
 	// Check that the cable is already added
 	auto it = std::find(cables.begin(), cables.end(), cable);
 	assert(it != cables.end());
-	// Set input to 0V
-	cable->inputModule->inputs[cable->inputId].value = 0.f;
+	// Set input to inactive
+	Input &input = cable->inputModule->inputs[cable->inputId];
+	input.setChannels(0);
 	// Remove the cable
 	cables.erase(it);
-	Engine_updateActive(this);
 	// Remove ID
 	cable->id = 0;
 }

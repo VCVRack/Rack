@@ -222,10 +222,14 @@ void CableWidget::draw(NVGcontext *vg) {
 
 	float thickness = 5;
 	if (cable && cable->outputModule) {
-		// Increase thickness if output port is polyphonic
 		Output *output = &cable->outputModule->outputs[cable->outputId];
-		if (output->channels != 1) {
+		if (output->channels > 1) {
+			// Increase thickness if output port is polyphonic
 			thickness = 7;
+		}
+		else if (output->channels == 0) {
+			// Draw translucent cable if not active (i.e. 0 channels)
+			nvgGlobalAlpha(vg, 0.5);
 		}
 	}
 

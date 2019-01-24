@@ -12,19 +12,22 @@ static const int PORT_MAX_CHANNELS = 16;
 struct Port {
 	/** Voltage of the port */
 	union {
-		/** Accessing this directly is deprecated.
-		Use getVoltage() and setVoltage() instead
-		*/
-		float value;
 		float values[PORT_MAX_CHANNELS] = {};
+		/** DEPRECATED. Use getVoltage() and setVoltage() instead. */
+		float value;
 	};
 	/** Number of polyphonic channels
 	May be 0 to PORT_MAX_CHANNELS.
 	*/
-	int channels = 1;
-	/** Whether a cable is plugged in */
-	bool active = false;
-	Light plugLights[2];
+	union {
+		uint8_t channels = 1;
+		/** DEPRECATED. Use isActive() instead. */
+		bool active;
+	};
+	/** For rendering plug lights on cables
+	Green for positive, red for negative, and blue for polyphonic
+	*/
+	Light plugLights[3];
 
 	float getVoltage(int channel = 0) {
 		return values[channel];
@@ -45,6 +48,12 @@ struct Port {
 	int getChannels() {
 		return channels;
 	}
+
+	bool isActive() {
+		return channels;
+	}
+
+	void step();
 };
 
 
