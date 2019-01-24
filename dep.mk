@@ -28,7 +28,7 @@ endif
 # Some platforms try to install to lib64
 CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
 
-SHA256 := sha256sum -c - <<<
+SHA256 := sha256check() { echo "$$2" "$$1" | sha256sum -c; }; sha256check
 
 # Export environment for all dependency targets
 $(DEPS): export CFLAGS = $(DEP_CFLAGS)

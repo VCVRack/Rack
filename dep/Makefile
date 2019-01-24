@@ -59,7 +59,7 @@ include $(RACK_DIR)/dep.mk
 
 $(glew):
 	$(WGET) "https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz"
-	$(SHA256) "04de91e7e6763039bc11940095cd9c7f880baba82196a7765f727ac05a993c95 glew-2.1.0.tgz"
+	$(SHA256) glew-2.1.0.tgz 04de91e7e6763039bc11940095cd9c7f880baba82196a7765f727ac05a993c95
 	$(UNTAR) glew-2.1.0.tgz
 	cd glew-2.1.0 && mkdir -p build
 	cd glew-2.1.0/build && $(CMAKE) ./cmake
@@ -75,7 +75,7 @@ $(glfw):
 
 $(jansson):
 	$(WGET) "http://www.digip.org/jansson/releases/jansson-2.12.tar.gz"
-	$(SHA256) "5f8dec765048efac5d919aded51b26a32a05397ea207aa769ff6b53c7027d2c9 jansson-2.12.tar.gz"
+	$(SHA256) jansson-2.12.tar.gz 5f8dec765048efac5d919aded51b26a32a05397ea207aa769ff6b53c7027d2c9
 	$(UNTAR) jansson-2.12.tar.gz
 	cd jansson-2.12 && $(CONFIGURE)
 	$(MAKE) -C jansson-2.12
@@ -83,7 +83,7 @@ $(jansson):
 
 $(libspeexdsp):
 	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
-	$(SHA256) "c8dded1454747f65956f981c95e7f89a06abdaa2a53e8aeaa66bab2a3d59cebd speexdsp-SpeexDSP-1.2rc3.tgz"
+	$(SHA256) speexdsp-SpeexDSP-1.2rc3.tgz c8dded1454747f65956f981c95e7f89a06abdaa2a53e8aeaa66bab2a3d59cebd
 	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
 	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
@@ -91,7 +91,7 @@ $(libspeexdsp):
 
 $(openssl):
 	$(WGET) "https://www.openssl.org/source/openssl-1.1.1a.tar.gz"
-	$(SHA256) "fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41 openssl-1.1.1a.tar.gz"
+	$(SHA256) openssl-1.1.1a.tar.gz fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41
 	$(UNTAR) openssl-1.1.1a.tar.gz
 	@# ./config ignores CFLAGS, so hack it in with CC
 	cd openssl-1.1.1a && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
@@ -100,7 +100,7 @@ $(openssl):
 
 $(libcurl): $(openssl)
 	$(WGET) "https://curl.haxx.se/download/curl-7.63.0.tar.gz"
-	$(SHA256) "d483b89062832e211c887d7cf1b65c902d591b48c11fe7d174af781681580b41 curl-7.63.0.tar.gz"
+	$(SHA256) curl-7.63.0.tar.gz d483b89062832e211c887d7cf1b65c902d591b48c11fe7d174af781681580b41
 	$(UNTAR) curl-7.63.0.tar.gz
 	cd curl-7.63.0 && PKG_CONFIG_PATH= $(CONFIGURE) \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding \
@@ -111,7 +111,7 @@ $(libcurl): $(openssl)
 
 $(libzip): $(zlib)
 	$(WGET) "https://libzip.org/download/libzip-1.5.1.tar.xz"
-	$(SHA256) "04ea35b6956c7b3453f1ed3f3fe40e3ddae1f43931089124579e8384e79ed372 libzip-1.5.1.tar.xz"
+	$(SHA256) libzip-1.5.1.tar.xz 04ea35b6956c7b3453f1ed3f3fe40e3ddae1f43931089124579e8384e79ed372
 	$(UNTAR) libzip-1.5.1.tar.xz
 	cd libzip-1.5.1 && mkdir -p build
 	cd libzip-1.5.1/build && $(CMAKE) .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON -DCMAKE_FIND_ROOT_PATH="$(realpath $(DEP_LOCAL))"
@@ -120,7 +120,7 @@ $(libzip): $(zlib)
 
 $(zlib):
 	$(WGET) "https://www.zlib.net/zlib-1.2.11.tar.gz"
-	$(SHA256) "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1 zlib-1.2.11.tar.gz"
+	$(SHA256) zlib-1.2.11.tar.gz c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
 	$(UNTAR) zlib-1.2.11.tar.gz
 ifdef ARCH_WIN
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
@@ -133,7 +133,7 @@ endif
 
 $(rtmidi):
 	$(WGET) "https://vcvrack.com/downloads/dep/rtmidi.tgz"
-	$(SHA256) "b66ddc090eec2f3d05bdbe863760be9dce77cd525c3ca7c3a47cbabe035ebde1 rtmidi.tgz"
+	$(SHA256) rtmidi.tgz b66ddc090eec2f3d05bdbe863760be9dce77cd525c3ca7c3a47cbabe035ebde1
 	$(UNTAR) rtmidi.tgz
 	cd rtmidi && $(CONFIGURE)
 	$(MAKE) -C rtmidi
@@ -170,7 +170,7 @@ $(osdialog): $(wildcard osdialog/*.h)
 
 $(pffft):
 	$(WGET) "https://bitbucket.org/jpommier/pffft/get/29e4f76ac53b.zip"
-	$(SHA256) "bb10afba127904a0c6c553fa445082729b7d72373511bda1b12a5be0e03f318a 29e4f76ac53b.zip"
+	$(SHA256) 29e4f76ac53b.zip bb10afba127904a0c6c553fa445082729b7d72373511bda1b12a5be0e03f318a
 	$(UNZIP) 29e4f76ac53b.zip
 	cp jpommier-pffft-29e4f76ac53b/*.h include/
 
