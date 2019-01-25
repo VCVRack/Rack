@@ -9,18 +9,20 @@ namespace dsp {
 /** Turns HIGH when value reaches 1.f, turns LOW when value reaches 0.f. */
 struct SchmittTrigger {
 	enum State {
-		UNKNOWN,
 		LOW,
-		HIGH
+		HIGH,
+		UNKNOWN
 	};
 	State state;
 
 	SchmittTrigger() {
 		reset();
 	}
+
 	void reset() {
 		state = UNKNOWN;
 	}
+
 	/** Updates the state of the Schmitt Trigger given a value.
 	Returns true if triggered, i.e. the value increases from 0 to 1.
 	If different trigger thresholds are needed, use
@@ -51,24 +53,28 @@ struct SchmittTrigger {
 		}
 		return false;
 	}
+
 	bool isHigh() {
 		return state == HIGH;
 	}
 };
 
 
+/** Detects when a boolean changes from false to true */
 struct BooleanTrigger {
-	bool lastState;
+	bool state;
 
 	BooleanTrigger() {
 		reset();
 	}
+
 	void reset() {
-		lastState = true;
+		state = true;
 	}
+
 	bool process(bool state) {
-		bool triggered = (state && !lastState);
-		lastState = state;
+		bool triggered = (state && !this->state);
+		this->state = state;
 		return triggered;
 	}
 };
@@ -76,28 +82,31 @@ struct BooleanTrigger {
 
 /** When triggered, holds a high value for a specified time before going low again */
 struct PulseGenerator {
-	float time;
-	float triggerDuration;
+	float remaining;
 
 	PulseGenerator() {
 		reset();
 	}
-	/** Immediately resets the state to LOW */
+
+	/** Immediately disables the pulse */
 	void reset() {
-		time = 0.f;
-		triggerDuration = 0.f;
+		remaining = 0.f;
 	}
+
 	/** Advances the state by `deltaTime`. Returns whether the pulse is in the HIGH state. */
 	bool process(float deltaTime) {
-		time += deltaTime;
-		return time < triggerDuration;
+		if (remaining > 0.f) {
+			remaining -= deltaTime;
+			return true;
+		}
+		return false;
 	}
-	/** Begins a trigger with the given `triggerDuration`. */
-	void trigger(float triggerDuration) {
-		// Keep the previous triggerDuration if the existing pulse would be held longer than the currently requested one.
-		if (time + triggerDuration >= this->triggerDuration) {
-			time = 0.f;
-			this->triggerDuration = triggerDuration;
+
+	/** Begins a trigger with the given `duration`. */
+	void trigger(float duration = 1e-3f) {
+		// Keep the previous pulse if the existing pulse will be held longer than the currently requested one.
+		if (duration > remaining) {
+			remaining = duration;
 		}
 	}
 };
