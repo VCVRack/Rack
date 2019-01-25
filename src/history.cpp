@@ -2,6 +2,7 @@
 #include "app.hpp"
 #include "app/Scene.hpp"
 #include "engine/Cable.hpp"
+#include "engine/Engine.hpp"
 
 
 namespace rack {
@@ -80,13 +81,13 @@ void ModuleMove::redo() {
 void ModuleBypass::undo() {
 	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
 	assert(mw);
-	mw->module->bypass = !bypass;
+	app()->engine->bypassModule(mw->module, !bypass);
 }
 
 void ModuleBypass::redo() {
 	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
 	assert(mw);
-	mw->module->bypass = bypass;
+	app()->engine->bypassModule(mw->module, bypass);
 }
 
 

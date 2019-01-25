@@ -117,22 +117,7 @@ static void Engine_step(Engine *engine) {
 
 	// Iterate modules
 	for (Module *module : engine->modules) {
-		if (module->bypass) {
-			// Bypass module
-			for (Output &output : module->outputs) {
-				// This also zeros all voltages
-				output.setChannels(0);
-			}
-			if (settings::powerMeter) {
-				module->cpuTime = 0.f;
-			}
-		}
-		else {
-			// Set all outputs to 1 channel so that modules are forced to specify 0 or >2 channels every frame
-			for (Output &output : module->outputs) {
-				// Don't use Port::setChannels() so we maintain all previous voltages
-				output.channels = 1;
-			}
+		if (!module->bypass) {
 			// Step module
 			if (settings::powerMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
@@ -263,6 +248,7 @@ void Engine::resetModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
+
 	module->reset();
 }
 
@@ -270,7 +256,29 @@ void Engine::randomizeModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
+
 	module->randomize();
+}
+
+void Engine::bypassModule(Module *module, bool bypass) {
+	assert(module);
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::mutex> lock(internal->mutex);
+	if (bypass) {
+		for (Output &output : module->outputs) {
+			// This also zeros all voltages
+			output.setChannels(0);
+		}
+		module->cpuTime = 0.f;
+	}
+	else {
+		// Set all outputs to 1 channel
+		for (Output &output : module->outputs) {
+			// Don't use Port::setChannels() so we maintain all previous voltages
+			output.channels = 1;
+		}
+	}
+	module->bypass = bypass;
 }
 
 static void Engine_updateConnected(Engine *engine) {

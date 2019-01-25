@@ -37,14 +37,14 @@ struct Port {
 		return voltages[channel];
 	}
 
-	/** Returns the voltage if a cable is plugged in, otherwise returns the given normal voltage */
-	float getNormalVoltage(float normalVoltage, int channel = 0) {
-		return isConnected() ? getVoltage(channel) : normalVoltage;
-	}
-
-	/** Returns the voltage if there are enough channels, otherwise returns the first voltage (channel 0) */
+	/** Returns the voltage if `channel` is a valid channel, otherwise returns the first voltage (channel 0) */
 	float getPolyVoltage(int channel) {
 		return (channel < channels) ? getVoltage(channel) : getVoltage(0);
+	}
+
+	/** Returns the voltage if a cable is connected, otherwise returns the given normal voltage */
+	float getNormalVoltage(float normalVoltage, int channel = 0) {
+		return isConnected() ? getVoltage(channel) : normalVoltage;
 	}
 
 	float getNormalPolyVoltage(float normalVoltage, int channel) {

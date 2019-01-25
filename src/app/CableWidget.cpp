@@ -221,7 +221,7 @@ void CableWidget::draw(NVGcontext *vg) {
 	}
 
 	float thickness = 5;
-	if (cable->outputModule) {
+	if (isComplete()) {
 		Output *output = &cable->outputModule->outputs[cable->outputId];
 		if (output->channels > 1) {
 			// Increase thickness if output port is polyphonic
@@ -246,7 +246,7 @@ void CableWidget::drawPlugs(NVGcontext *vg) {
 	// Draw plug if the cable is on top, or if the cable is incomplete
 	if (!isComplete() || app()->scene->rackWidget->getTopCable(outputPort) == this) {
 		drawPlug(vg, outputPos, color);
-		if (outputPort) {
+		if (isComplete()) {
 			// Draw plug light
 			nvgSave(vg);
 			nvgTranslate(vg, outputPos.x - 4, outputPos.y - 4);
@@ -257,7 +257,7 @@ void CableWidget::drawPlugs(NVGcontext *vg) {
 
 	if (!isComplete() || app()->scene->rackWidget->getTopCable(inputPort) == this) {
 		drawPlug(vg, inputPos, color);
-		if (inputPort) {
+		if (isComplete()) {
 			nvgSave(vg);
 			nvgTranslate(vg, inputPos.x - 4, inputPos.y - 4);
 			inputPort->plugLight->draw(vg);

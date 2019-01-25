@@ -30,6 +30,7 @@ struct Engine {
 	void removeModule(Module *module);
 	void resetModule(Module *module);
 	void randomizeModule(Module *module);
+	void bypassModule(Module *module, bool bypass);
 	/** Does not transfer pointer ownership */
 	void addCable(Cable *cable);
 	void removeCable(Cable *cable);
