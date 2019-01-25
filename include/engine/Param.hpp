@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include "math.hpp"
 #include <jansson.h>
 
 
@@ -16,6 +17,7 @@ struct ParamQuantityFactory {
 
 
 struct Param {
+	/** Unstable API. Use set/getValue() instead. */
 	float value = 0.f;
 
 	float minValue = 0.f;
@@ -72,7 +74,7 @@ struct Param {
 	}
 
 	void setValue(float value) {
-		this->value = value;
+		this->value = math::clamp(value, minValue, maxValue);
 	}
 
 	bool isBounded();

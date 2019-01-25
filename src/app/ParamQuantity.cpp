@@ -25,16 +25,14 @@ float ParamQuantity::getSmoothValue() {
 void ParamQuantity::setValue(float value) {
 	if (!module)
 		return;
-	value = math::clamp(value, getMinValue(), getMaxValue());
-	// TODO Smooth
-	// TODO Snap
-	getParam()->value = value;
+	// This setter clamps the value
+	getParam()->setValue(value);
 }
 
 float ParamQuantity::getValue() {
 	if (!module)
 		return 0.f;
-	return getParam()->value;
+	return getParam()->getValue();
 }
 
 float ParamQuantity::getMinValue() {

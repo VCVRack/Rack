@@ -13,6 +13,7 @@ struct PlugLight : MultiLightWidget {
 	PlugLight() {
 		addBaseColor(color::GREEN);
 		addBaseColor(color::RED);
+		addBaseColor(color::BLUE);
 		box.size = math::Vec(8, 8);
 		bgColor = color::BLACK_TRANSPARENT;
 	}
@@ -35,14 +36,17 @@ void PortWidget::step() {
 	if (!module)
 		return;
 
-	std::vector<float> values(2);
+	std::vector<float> values(3);
+	// Input and Outputs are not virtual, so we can't cast to Port to make this less redundant.
 	if (type == OUTPUT) {
 		values[0] = module->outputs[portId].plugLights[0].getBrightness();
 		values[1] = module->outputs[portId].plugLights[1].getBrightness();
+		values[2] = module->outputs[portId].plugLights[2].getBrightness();
 	}
 	else {
 		values[0] = module->inputs[portId].plugLights[0].getBrightness();
 		values[1] = module->inputs[portId].plugLights[1].getBrightness();
+		values[2] = module->inputs[portId].plugLights[2].getBrightness();
 	}
 	plugLight->setValues(values);
 }

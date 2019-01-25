@@ -122,7 +122,99 @@ struct AudioInterface : Module {
 		onSampleRateChange();
 	}
 
-	void step() override;
+	void step() override {
+		// Update SRC states
+		int sampleRate = (int) app()->engine->getSampleRate();
+		inputSrc.setRates(audioIO.sampleRate, sampleRate);
+		outputSrc.setRates(sampleRate, audioIO.sampleRate);
+
+		inputSrc.setChannels(audioIO.numInputs);
+		outputSrc.setChannels(audioIO.numOutputs);
+
+		// Inputs: audio engine -> rack engine
+		if (audioIO.active && audioIO.numInputs > 0) {
+			// Wait until inputs are present
+			// Give up after a timeout in case the audio device is being unresponsive.
+			std::unique_lock<std::mutex> lock(audioIO.engineMutex);
+			auto cond = [&] {
+				return (!audioIO.inputBuffer.empty());
+			};
+			auto timeout = std::chrono::milliseconds(200);
+			if (audioIO.engineCv.wait_for(lock, timeout, cond)) {
+				// Convert inputs
+				int inLen = audioIO.inputBuffer.size();
+				int outLen = inputBuffer.capacity();
+				inputSrc.process(audioIO.inputBuffer.startData(), &inLen, inputBuffer.endData(), &outLen);
+				audioIO.inputBuffer.startIncr(inLen);
+				inputBuffer.endIncr(outLen);
+			}
+			else {
+				// Give up on pulling input
+				audioIO.active = false;
+				// DEBUG("Audio Interface underflow");
+			}
+		}
+
+		// Take input from buffer
+		dsp::Frame<AUDIO_INPUTS> inputFrame;
+		if (!inputBuffer.empty()) {
+			inputFrame = inputBuffer.shift();
+		}
+		else {
+			std::memset(&inputFrame, 0, sizeof(inputFrame));
+		}
+		for (int i = 0; i < audioIO.numInputs; i++) {
+			outputs[AUDIO_OUTPUT + i].setVoltage(10.f * inputFrame.samples[i]);
+		}
+		for (int i = audioIO.numInputs; i < AUDIO_INPUTS; i++) {
+			outputs[AUDIO_OUTPUT + i].setVoltage(0.f);
+		}
+
+		// Outputs: rack engine -> audio engine
+		if (audioIO.active && audioIO.numOutputs > 0) {
+			// Get and push output SRC frame
+			if (!outputBuffer.full()) {
+				dsp::Frame<AUDIO_OUTPUTS> outputFrame;
+				for (int i = 0; i < AUDIO_OUTPUTS; i++) {
+					outputFrame.samples[i] = inputs[AUDIO_INPUT + i].getVoltage() / 10.f;
+				}
+				outputBuffer.push(outputFrame);
+			}
+
+			if (outputBuffer.full()) {
+				// Wait until enough outputs are consumed
+				// Give up after a timeout in case the audio device is being unresponsive.
+				std::unique_lock<std::mutex> lock(audioIO.engineMutex);
+				auto cond = [&] {
+					return (audioIO.outputBuffer.size() < (size_t) audioIO.blockSize);
+				};
+				auto timeout = std::chrono::milliseconds(200);
+				if (audioIO.engineCv.wait_for(lock, timeout, cond)) {
+					// Push converted output
+					int inLen = outputBuffer.size();
+					int outLen = audioIO.outputBuffer.capacity();
+					outputSrc.process(outputBuffer.startData(), &inLen, audioIO.outputBuffer.endData(), &outLen);
+					outputBuffer.startIncr(inLen);
+					audioIO.outputBuffer.endIncr(outLen);
+				}
+				else {
+					// Give up on pushing output
+					audioIO.active = false;
+					outputBuffer.clear();
+					// DEBUG("Audio Interface underflow");
+				}
+			}
+
+			// Notify audio thread that an output is potentially ready
+			audioIO.audioCv.notify_one();
+		}
+
+		// Turn on light if at least one port is enabled in the nearby pair
+		for (int i = 0; i < AUDIO_INPUTS / 2; i++)
+			lights[INPUT_LIGHT + i].setBrightness(audioIO.active && audioIO.numOutputs >= 2*i+1);
+		for (int i = 0; i < AUDIO_OUTPUTS / 2; i++)
+			lights[OUTPUT_LIGHT + i].setBrightness(audioIO.active && audioIO.numInputs >= 2*i+1);
+	}
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
@@ -139,101 +231,6 @@ struct AudioInterface : Module {
 		audioIO.setDevice(-1, 0);
 	}
 };
-
-
-void AudioInterface::step() {
-	// Update SRC states
-	int sampleRate = (int) app()->engine->getSampleRate();
-	inputSrc.setRates(audioIO.sampleRate, sampleRate);
-	outputSrc.setRates(sampleRate, audioIO.sampleRate);
-
-	inputSrc.setChannels(audioIO.numInputs);
-	outputSrc.setChannels(audioIO.numOutputs);
-
-	// Inputs: audio engine -> rack engine
-	if (audioIO.active && audioIO.numInputs > 0) {
-		// Wait until inputs are present
-		// Give up after a timeout in case the audio device is being unresponsive.
-		std::unique_lock<std::mutex> lock(audioIO.engineMutex);
-		auto cond = [&] {
-			return (!audioIO.inputBuffer.empty());
-		};
-		auto timeout = std::chrono::milliseconds(200);
-		if (audioIO.engineCv.wait_for(lock, timeout, cond)) {
-			// Convert inputs
-			int inLen = audioIO.inputBuffer.size();
-			int outLen = inputBuffer.capacity();
-			inputSrc.process(audioIO.inputBuffer.startData(), &inLen, inputBuffer.endData(), &outLen);
-			audioIO.inputBuffer.startIncr(inLen);
-			inputBuffer.endIncr(outLen);
-		}
-		else {
-			// Give up on pulling input
-			audioIO.active = false;
-			// DEBUG("Audio Interface underflow");
-		}
-	}
-
-	// Take input from buffer
-	dsp::Frame<AUDIO_INPUTS> inputFrame;
-	if (!inputBuffer.empty()) {
-		inputFrame = inputBuffer.shift();
-	}
-	else {
-		std::memset(&inputFrame, 0, sizeof(inputFrame));
-	}
-	for (int i = 0; i < audioIO.numInputs; i++) {
-		outputs[AUDIO_OUTPUT + i].setVoltage(10.f * inputFrame.samples[i]);
-	}
-	for (int i = audioIO.numInputs; i < AUDIO_INPUTS; i++) {
-		outputs[AUDIO_OUTPUT + i].setVoltage(0.f);
-	}
-
-	// Outputs: rack engine -> audio engine
-	if (audioIO.active && audioIO.numOutputs > 0) {
-		// Get and push output SRC frame
-		if (!outputBuffer.full()) {
-			dsp::Frame<AUDIO_OUTPUTS> outputFrame;
-			for (int i = 0; i < AUDIO_OUTPUTS; i++) {
-				outputFrame.samples[i] = inputs[AUDIO_INPUT + i].getVoltage() / 10.f;
-			}
-			outputBuffer.push(outputFrame);
-		}
-
-		if (outputBuffer.full()) {
-			// Wait until enough outputs are consumed
-			// Give up after a timeout in case the audio device is being unresponsive.
-			std::unique_lock<std::mutex> lock(audioIO.engineMutex);
-			auto cond = [&] {
-				return (audioIO.outputBuffer.size() < (size_t) audioIO.blockSize);
-			};
-			auto timeout = std::chrono::milliseconds(200);
-			if (audioIO.engineCv.wait_for(lock, timeout, cond)) {
-				// Push converted output
-				int inLen = outputBuffer.size();
-				int outLen = audioIO.outputBuffer.capacity();
-				outputSrc.process(outputBuffer.startData(), &inLen, audioIO.outputBuffer.endData(), &outLen);
-				outputBuffer.startIncr(inLen);
-				audioIO.outputBuffer.endIncr(outLen);
-			}
-			else {
-				// Give up on pushing output
-				audioIO.active = false;
-				outputBuffer.clear();
-				// DEBUG("Audio Interface underflow");
-			}
-		}
-
-		// Notify audio thread that an output is potentially ready
-		audioIO.audioCv.notify_one();
-	}
-
-	// Turn on light if at least one port is enabled in the nearby pair
-	for (int i = 0; i < AUDIO_INPUTS / 2; i++)
-		lights[INPUT_LIGHT + i].setBrightness(audioIO.active && audioIO.numOutputs >= 2*i+1);
-	for (int i = 0; i < AUDIO_OUTPUTS / 2; i++)
-		lights[OUTPUT_LIGHT + i].setBrightness(audioIO.active && audioIO.numInputs >= 2*i+1);
-}
 
 
 struct AudioInterfaceWidget : ModuleWidget {

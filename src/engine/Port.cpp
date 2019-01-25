@@ -5,6 +5,7 @@ namespace rack {
 
 
 void Port::step() {
+	// Set plug lights
 	if (channels == 0) {
 		plugLights[0].setBrightness(0.f);
 		plugLights[1].setBrightness(0.f);

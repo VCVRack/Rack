@@ -6,15 +6,17 @@ namespace rack {
 
 
 struct Light {
-	/** The mean-square of the brightness */
+	/** The mean-square of the brightness
+	Unstable API. Use set/getBrightness().
+	*/
 	float value = 0.f;
-
-	float getBrightness() {
-		return std::sqrt(value);
-	}
 
 	void setBrightness(float brightness) {
 		value = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;
+	}
+
+	float getBrightness() {
+		return std::sqrt(value);
 	}
 
 	/** Emulates slow fall (but immediate rise) of LED brightness.

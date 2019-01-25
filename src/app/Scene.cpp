@@ -75,7 +75,7 @@ void Scene::step() {
 
 	// Version popup message
 	if (!latestVersion.empty()) {
-		std::string versionMessage = string::f("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", latestVersion.c_str(), APP_VERSION.c_str());
+		std::string versionMessage = string::f("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", latestVersion.c_str(), APP_VERSION);
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
 			std::thread t(system::openBrowser, "https://vcvrack.com/");
 			t.detach();
@@ -164,17 +164,19 @@ void Scene::onPathDrop(const event::PathDrop &e) {
 }
 
 void Scene::runCheckVersion() {
-	json_t *resJ = network::requestJson(network::METHOD_GET, API_HOST + "/version", NULL);
+	std::string versionUrl = API_HOST;
+	versionUrl += "/version";
+	json_t *versionResJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
 
-	if (resJ) {
-		json_t *versionJ = json_object_get(resJ, "version");
+	if (versionResJ) {
+		json_t *versionJ = json_object_get(versionResJ, "version");
 		if (versionJ) {
 			std::string version = json_string_value(versionJ);
 			if (version != APP_VERSION) {
 				latestVersion = version;
 			}
 		}
-		json_decref(resJ);
+		json_decref(versionResJ);
 	}
 }
 

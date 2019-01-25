@@ -378,7 +378,9 @@ void logIn(std::string email, std::string password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	json_t *resJ = network::requestJson(network::METHOD_POST, API_HOST + "/token", reqJ);
+	std::string tokenUrl = API_HOST;
+	tokenUrl += "/token";
+	json_t *resJ = network::requestJson(network::METHOD_POST, tokenUrl, reqJ);
 	json_decref(reqJ);
 
 	if (resJ) {
@@ -421,7 +423,9 @@ bool sync(bool dryRun) {
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
 	json_object_set(pluginsReqJ, "token", json_string(token.c_str()));
-	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, API_HOST + "/plugins", pluginsReqJ);
+	std::string pluginsUrl = API_HOST;
+	pluginsUrl += "/plugins";
+	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
@@ -438,7 +442,9 @@ bool sync(bool dryRun) {
 	}
 
 	// Get community manifests
-	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, API_HOST + "/community/manifests", NULL);
+	std::string manifestsUrl = API_HOST;
+	manifestsUrl += "/community/manifests";
+	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, NULL);
 	if (!manifestsResJ) {
 		WARN("Request for community manifests failed");
 		return false;

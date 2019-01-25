@@ -252,7 +252,7 @@ struct CV_MIDI : Module {
 		}
 
 		for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
-			int vel = (int) std::round(inputs[VEL_INPUT].normalize(10.f * 100 / 127, c) / 10.f * 127);
+			int vel = (int) std::round(inputs[VEL_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);
 			vel = clamp(vel, 0, 127);
 			midiOutput.setVelocity(vel, c);
 
@@ -260,12 +260,12 @@ struct CV_MIDI : Module {
 			note = clamp(note, 0, 127);
 			midiOutput.setNote(note, c);
 
-			bool gate = inputs[GATE_INPUT].getVoltage(c) >= 1.f;
+			bool gate = inputs[GATE_INPUT].getPolyVoltage(c) >= 1.f;
 			midiOutput.setGate(gate, c);
 
 			midiOutput.stepChannel(c);
 
-			int aft = (int) std::round(inputs[AFT_INPUT].getVoltage(c) / 10.f * 127);
+			int aft = (int) std::round(inputs[AFT_INPUT].getPolyVoltage(c) / 10.f * 127);
 			aft = clamp(aft, 0, 127);
 			midiOutput.setAftertouch(aft, c);
 		}
@@ -278,7 +278,7 @@ struct CV_MIDI : Module {
 		mw = clamp(mw, 0, 127);
 		midiOutput.setModWheel(mw);
 
-		int vol = (int) std::round(inputs[VOL_INPUT].normalize(10.f) / 10.f * 127);
+		int vol = (int) std::round(inputs[VOL_INPUT].getNormalVoltage(10.f) / 10.f * 127);
 		vol = clamp(vol, 0, 127);
 		midiOutput.setVolume(vol);
 
@@ -286,16 +286,16 @@ struct CV_MIDI : Module {
 		pan = clamp(pan, 0, 127);
 		midiOutput.setPan(pan);
 
-		bool clk = inputs[CLK_INPUT].value >= 1.f;
+		bool clk = inputs[CLK_INPUT].getVoltage() >= 1.f;
 		midiOutput.setClock(clk);
 
-		bool start = inputs[START_INPUT].value >= 1.f;
+		bool start = inputs[START_INPUT].getVoltage() >= 1.f;
 		midiOutput.setStart(start);
 
-		bool stop = inputs[STOP_INPUT].value >= 1.f;
+		bool stop = inputs[STOP_INPUT].getVoltage() >= 1.f;
 		midiOutput.setStop(stop);
 
-		bool cont = inputs[CONTINUE_INPUT].value >= 1.f;
+		bool cont = inputs[CONTINUE_INPUT].getVoltage() >= 1.f;
 		midiOutput.setContinue(cont);
 	}
 

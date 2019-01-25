@@ -12,35 +12,49 @@ static const int PORT_MAX_CHANNELS = 16;
 struct Port {
 	/** Voltage of the port */
 	union {
-		float values[PORT_MAX_CHANNELS] = {};
-		/** DEPRECATED. Use getVoltage() and setVoltage() instead. */
+		/** Unstable API. Use set/getVoltage() instead. */
+		float voltages[PORT_MAX_CHANNELS] = {};
+		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */
 		float value;
 	};
 	/** Number of polyphonic channels
+	Unstable API. Use set/getChannels() instead.
 	May be 0 to PORT_MAX_CHANNELS.
 	*/
-	union {
-		uint8_t channels = 1;
-		/** DEPRECATED. Use isActive() instead. */
-		bool active;
-	};
+	uint8_t channels = 1;
+	/** Unstable API. Use isConnected() instead. */
+	bool active;
 	/** For rendering plug lights on cables
 	Green for positive, red for negative, and blue for polyphonic
 	*/
 	Light plugLights[3];
 
-	float getVoltage(int channel = 0) {
-		return values[channel];
+	void setVoltage(float voltage, int channel = 0) {
+		voltages[channel] = voltage;
 	}
 
-	void setVoltage(float voltage, int channel = 0) {
-		values[channel] = voltage;
+	float getVoltage(int channel = 0) {
+		return voltages[channel];
+	}
+
+	/** Returns the voltage if a cable is plugged in, otherwise returns the given normal voltage */
+	float getNormalVoltage(float normalVoltage, int channel = 0) {
+		return isConnected() ? getVoltage(channel) : normalVoltage;
+	}
+
+	/** Returns the voltage if there are enough channels, otherwise returns the first voltage (channel 0) */
+	float getPolyVoltage(int channel) {
+		return (channel < channels) ? getVoltage(channel) : getVoltage(0);
+	}
+
+	float getNormalPolyVoltage(float normalVoltage, int channel) {
+		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
 	}
 
 	void setChannels(int channels) {
-		// Set higher channel values to 0
+		// Set higher channel voltages to 0
 		for (int c = channels; c < this->channels; c++) {
-			values[c] = 0.f;
+			voltages[c] = 0.f;
 		}
 		this->channels = channels;
 	}
@@ -49,12 +63,20 @@ struct Port {
 		return channels;
 	}
 
-	bool isActive() {
-		return channels;
+	bool isConnected() {
+		return active;
 	}
 
 	void step();
+
+	DEPRECATED float normalize(float normalVoltage) {
+		return getNormalVoltage(normalVoltage);
+	}
 };
+
+
+struct Output : Port {};
+struct Input : Port {};
 
 
 } // namespace rack

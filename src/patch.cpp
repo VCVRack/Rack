@@ -11,7 +11,7 @@
 namespace rack {
 
 
-static const std::string PATCH_FILTERS = "VCV Rack patch (.vcv):vcv";
+static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 
 
 void PatchManager::reset() {
@@ -72,7 +72,7 @@ void PatchManager::saveAsDialog() {
 		filename = string::filename(path);
 	}
 
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
+	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
@@ -140,7 +140,7 @@ void PatchManager::loadDialog() {
 		dir = string::directory(path);
 	}
 
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS.c_str());
+	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
@@ -179,7 +179,7 @@ json_t *PatchManager::toJson() {
 	json_t *rootJ = json_object();
 
 	// version
-	json_t *versionJ = json_string(APP_VERSION.c_str());
+	json_t *versionJ = json_string(APP_VERSION);
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// Merge with RackWidget JSON
@@ -200,7 +200,7 @@ void PatchManager::fromJson(json_t *rootJ) {
 	if (versionJ)
 		version = json_string_value(versionJ);
 	if (version != APP_VERSION) {
-		INFO("Patch made with Rack version %s, current Rack version is %s", version.c_str(), APP_VERSION.c_str());
+		INFO("Patch made with Rack version %s, current Rack version is %s", version.c_str(), APP_VERSION);
 	}
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.

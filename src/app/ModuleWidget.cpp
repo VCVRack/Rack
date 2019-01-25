@@ -15,6 +15,9 @@
 namespace rack {
 
 
+static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
+
+
 struct ModuleDisconnectItem : MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleDisconnectItem() {
@@ -499,7 +502,7 @@ void ModuleWidget::loadDialog() {
 	std::string dir = asset::user("presets");
 	system::createDirectory(dir);
 
-	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
+	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
@@ -520,7 +523,7 @@ void ModuleWidget::saveDialog() {
 	std::string dir = asset::user("presets");
 	system::createDirectory(dir);
 
-	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS.c_str());
+	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});

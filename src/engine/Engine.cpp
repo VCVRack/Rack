@@ -100,12 +100,11 @@ static void Engine_step(Engine *engine) {
 			Param *param = &smoothModule->params[smoothParamId];
 			float value = param->value;
 			// decay rate is 1 graphics frame
-			const float lambda = 60.f;
-			float delta = smoothValue - value;
-			float newValue = value + delta * lambda * engine->internal->sampleTime;
-			if (value == newValue) {
-				// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
-				param->value = smoothValue;
+			const float smoothLambda = 60.f;
+			float newValue = value + (smoothValue - value) * smoothLambda * engine->internal->sampleTime;
+			if (value == newValue || !(param->minValue <= newValue && newValue <= param->maxValue)) {
+				// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats), or if newValue is out of bounds
+				param->setValue(smoothValue);
 				engine->internal->smoothModule = NULL;
 			}
 			else {
@@ -121,11 +120,19 @@ static void Engine_step(Engine *engine) {
 		if (module->bypass) {
 			// Bypass module
 			for (Output &output : module->outputs) {
+				// This also zeros all voltages
 				output.setChannels(0);
 			}
-			module->cpuTime = 0.f;
+			if (settings::powerMeter) {
+				module->cpuTime = 0.f;
+			}
 		}
 		else {
+			// Set all outputs to 1 channel so that modules are forced to specify 0 or >2 channels every frame
+			for (Output &output : module->outputs) {
+				// Don't use Port::setChannels() so we maintain all previous voltages
+				output.channels = 1;
+			}
 			// Step module
 			if (settings::powerMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
@@ -266,6 +273,23 @@ void Engine::randomizeModule(Module *module) {
 	module->randomize();
 }
 
+static void Engine_updateConnected(Engine *engine) {
+	// Set everything to unconnected
+	for (Module *module : engine->modules) {
+		for (Input &input : module->inputs) {
+			input.active = false;
+		}
+		for (Output &output : module->outputs) {
+			output.active = false;
+		}
+	}
+	// Set inputs/outputs to active
+	for (Cable *cable : engine->cables) {
+		cable->outputModule->outputs[cable->outputId].active = true;
+		cable->inputModule->inputs[cable->inputId].active = true;
+	}
+}
+
 void Engine::addCable(Cable *cable) {
 	assert(cable);
 	VIPLock vipLock(internal->vipMutex);
@@ -293,6 +317,7 @@ void Engine::addCable(Cable *cable) {
 	}
 	// Add the cable
 	cables.push_back(cable);
+	Engine_updateConnected(this);
 }
 
 void Engine::removeCable(Cable *cable) {
@@ -307,6 +332,7 @@ void Engine::removeCable(Cable *cable) {
 	input.setChannels(0);
 	// Remove the cable
 	cables.erase(it);
+	Engine_updateConnected(this);
 	// Remove ID
 	cable->id = 0;
 }
