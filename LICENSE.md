@@ -1,9 +1,6 @@
 # VCV Rack Licenses
 
-All **source code** in the `src/` directory is copyright © 2019 Andrew Belt and licensed under the [GNU Lesser General Public License Version 3](https://www.gnu.org/licenses/lgpl-3.0.en.html).
-This allows open- and closed-source plugins to freely link to the Rack application while disallowing closed-source forks of Rack itself.
-
-All **header files and scripts** in this repository *excluding* the `src/` directory are copyright © 2019 Andrew Belt and licensed under the [BSD-3-Clause License](https://opensource.org/licenses/BSD-3-Clause).
+All **source code** is copyright © 2019 Andrew Belt and licensed under the [BSD-3-Clause License](https://opensource.org/licenses/BSD-3-Clause).
 This allows open- and closed-source plugins to freely compile Rack header files into their binaries.
 
 Licenses of **third-party libraries** are listed in [LICENSE-dist.txt](LICENSE-dist.txt).
