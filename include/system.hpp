@@ -13,6 +13,8 @@ bool isDirectory(const std::string &path);
 void copyFile(const std::string &srcPath, const std::string &destPath);
 void createDirectory(const std::string &path);
 
+/** Currently this lies and returns the number of logical cores instead. */
+int getPhysicalCoreCount();
 void setThreadName(const std::string &name);
 
 /** Opens a URL, also happens to work with PDFs and folders.

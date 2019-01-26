@@ -1,4 +1,5 @@
 #include "system.hpp"
+#include <thread>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -75,6 +76,11 @@ void createDirectory(const std::string &path) {
 #else
 	mkdir(path.c_str(), 0755);
 #endif
+}
+
+int getPhysicalCoreCount() {
+	// TODO Return the physical cores, not logical cores.
+	return std::thread::hardware_concurrency();
 }
 
 void setThreadName(const std::string &name) {

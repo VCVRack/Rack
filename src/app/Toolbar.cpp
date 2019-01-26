@@ -299,6 +299,35 @@ struct SampleRateItem : MenuItem {
 };
 
 
+struct ThreadCountValueItem : MenuItem {
+	int threadCount;
+	ThreadCountValueItem(int threadCount) {
+		this->threadCount = threadCount;
+		text = string::f("%d", threadCount);
+		rightText = CHECKMARK(app()->engine->threadCount == threadCount);
+	}
+	void onAction(const event::Action &e) override {
+		app()->engine->threadCount = threadCount;
+	}
+};
+
+
+struct ThreadCount : MenuItem {
+	ThreadCount() {
+		text = "Thread count";
+	}
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu;
+
+		int coreCount = system::getPhysicalCoreCount();
+		for (int i = 1; i <= coreCount; i++) {
+			menu->addChild(new ThreadCountValueItem(i));
+		}
+		return menu;
+	}
+};
+
+
 struct FullscreenItem : MenuItem {
 	FullscreenItem() {
 		text = "Fullscreen";
@@ -325,6 +354,7 @@ struct SettingsButton : MenuButton {
 		menu->addChild(new PowerMeterItem);
 		menu->addChild(new LockModulesItem);
 		menu->addChild(new SampleRateItem);
+		menu->addChild(new ThreadCount);
 		menu->addChild(new FullscreenItem);
 
 		Slider *zoomSlider = new Slider;
