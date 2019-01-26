@@ -179,7 +179,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 #endif
 
 	std::string downloadUrl;
-	downloadUrl = API_HOST;
+	downloadUrl = APP_API_URL;
 	downloadUrl += "/download";
 	if (dryRun) {
 		downloadUrl += "/available";
@@ -378,7 +378,7 @@ void logIn(std::string email, std::string password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	std::string tokenUrl = API_HOST;
+	std::string tokenUrl = APP_API_URL;
 	tokenUrl += "/token";
 	json_t *resJ = network::requestJson(network::METHOD_POST, tokenUrl, reqJ);
 	json_decref(reqJ);
@@ -423,7 +423,7 @@ bool sync(bool dryRun) {
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
 	json_object_set(pluginsReqJ, "token", json_string(token.c_str()));
-	std::string pluginsUrl = API_HOST;
+	std::string pluginsUrl = APP_API_URL;
 	pluginsUrl += "/plugins";
 	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
 	json_decref(pluginsReqJ);
@@ -442,7 +442,7 @@ bool sync(bool dryRun) {
 	}
 
 	// Get community manifests
-	std::string manifestsUrl = API_HOST;
+	std::string manifestsUrl = APP_API_URL;
 	manifestsUrl += "/community/manifests";
 	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, NULL);
 	if (!manifestsResJ) {

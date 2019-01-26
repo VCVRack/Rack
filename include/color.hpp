@@ -20,7 +20,7 @@ static const NVGcolor MAGENTA = nvgRGB(0xff, 0x00, 0xff);
 static const NVGcolor YELLOW = nvgRGB(0xff, 0xff, 0x00);
 
 
-NVGcolor clip(NVGcolor a);
+NVGcolor clamp(NVGcolor a);
 NVGcolor minus(NVGcolor a, NVGcolor b);
 NVGcolor plus(NVGcolor a, NVGcolor b);
 NVGcolor mult(NVGcolor a, NVGcolor b);

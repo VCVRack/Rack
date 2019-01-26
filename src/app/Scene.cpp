@@ -164,7 +164,7 @@ void Scene::onPathDrop(const event::PathDrop &e) {
 }
 
 void Scene::runCheckVersion() {
-	std::string versionUrl = API_HOST;
+	std::string versionUrl = APP_API_URL;
 	versionUrl += "/version";
 	json_t *versionResJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
 

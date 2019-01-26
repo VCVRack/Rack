@@ -48,7 +48,7 @@ void PortWidget::step() {
 		values[1] = module->inputs[portId].plugLights[1].getBrightness();
 		values[2] = module->inputs[portId].plugLights[2].getBrightness();
 	}
-	plugLight->setValues(values);
+	plugLight->setBrightnesses(values);
 }
 
 void PortWidget::draw(NVGcontext *vg) {

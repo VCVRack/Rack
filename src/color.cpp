@@ -6,7 +6,7 @@ namespace rack {
 namespace color {
 
 
-NVGcolor clip(NVGcolor a) {
+NVGcolor clamp(NVGcolor a) {
 	for (int i = 0; i < 4; i++)
 		a.rgba[i] = math::clamp(a.rgba[i], 0.f, 1.f);
 	return a;
@@ -48,7 +48,7 @@ NVGcolor screen(NVGcolor a, NVGcolor b) {
 	NVGcolor c = minus(plus(a, b), mult(a, b));
 	c.a = a.a + b.a - a.a * b.a;
 	c = mult(c, 1.f / c.a);
-	c = clip(c);
+	c = clamp(c);
 	return c;
 }
 
@@ -62,6 +62,7 @@ NVGcolor fromHexString(std::string s) {
 	uint8_t g = 0;
 	uint8_t b = 0;
 	uint8_t a = 255;
+	// If only three hex pairs are given, this will leave `a` unset.
 	sscanf(s.c_str(), "#%2hhx%2hhx%2hhx%2hhx", &r, &g, &b, &a);
 	return nvgRGBA(r, g, b, a);
 }

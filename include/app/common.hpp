@@ -9,7 +9,7 @@ namespace rack {
 
 static const char APP_NAME[] = "VCV Rack";
 static const char APP_VERSION[] = TOSTRING(VERSION);
-static const char API_HOST[] = "https://api.vcvrack.com";
+static const char APP_API_URL[] = "https://api.vcvrack.com";
 
 static const float APP_SVG_DPI = 75.0;
 static const float MM_PER_IN = 25.4;
