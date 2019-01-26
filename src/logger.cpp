@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "asset.hpp"
 #include <chrono>
+#include <mutex>
 
 
 namespace rack {
@@ -9,6 +10,7 @@ namespace logger {
 
 static FILE *outputFile = NULL;
 static std::chrono::high_resolution_clock::time_point startTime;
+static std::mutex logMutex;
 
 
 void init(bool devMode) {
@@ -43,6 +45,8 @@ static const int levelColors[] = {
 };
 
 static void logVa(Level level, const char *filename, int line, const char *format, va_list args) {
+	std::lock_guard<std::mutex> lock(logMutex);
+
 	auto nowTime = std::chrono::high_resolution_clock::now();
 	int duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime).count();
 	if (outputFile == stderr)
