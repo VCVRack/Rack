@@ -13,6 +13,8 @@ bool isDirectory(const std::string &path);
 void copyFile(const std::string &srcPath, const std::string &destPath);
 void createDirectory(const std::string &path);
 
+void setThreadName(const std::string &name);
+
 /** Opens a URL, also happens to work with PDFs and folders.
 Shell injection is possible, so make sure the URL is trusted or hard coded.
 May block, so open in a new thread.
