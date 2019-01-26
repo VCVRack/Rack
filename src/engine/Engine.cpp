@@ -121,7 +121,7 @@ static void Engine_step(Engine *engine) {
 
 	// Iterate modules
 	int modulesLen = engine->modules.size();
-	#pragma omp parallel for num_threads(engine->threadCount) schedule(dynamic)
+	#pragma omp parallel for num_threads(engine->threadCount) schedule(guided, 1)
 	for (int i = 0; i < modulesLen; i++) {
 		Module *module = engine->modules[i];
 		if (!module->bypass) {
