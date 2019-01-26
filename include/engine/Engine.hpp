@@ -15,6 +15,7 @@ struct Engine {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
 	bool paused = false;
+	int threadCount;
 
 	struct Internal;
 	Internal *internal;

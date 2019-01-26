@@ -4,6 +4,8 @@ VERSION = 1.dev
 FLAGS += -DVERSION=$(VERSION)
 FLAGS += -Iinclude
 FLAGS += -Idep/include -Idep/lib/libzip/include
+FLAGS += -fopenmp
+LDFLAGS += -fopenmp
 
 include arch.mk
 

@@ -1,11 +1,13 @@
 #include "engine/Engine.hpp"
 #include "settings.hpp"
+#include "system.hpp"
 
 #include <algorithm>
 #include <chrono>
 #include <thread>
 #include <condition_variable>
 #include <mutex>
+#include <omp.h>
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 
@@ -71,6 +73,8 @@ Engine::Engine() {
 	internal->sampleRate = sampleRate;
 	internal->sampleTime = 1 / sampleRate;
 	internal->sampleRateRequested = sampleRate;
+
+	threadCount = 1;
 }
 
 Engine::~Engine() {
@@ -116,7 +120,10 @@ static void Engine_step(Engine *engine) {
 	float cpuLambda = engine->internal->sampleTime / 2.f;
 
 	// Iterate modules
-	for (Module *module : engine->modules) {
+	int modulesLen = engine->modules.size();
+	#pragma omp parallel for num_threads(engine->threadCount) schedule(dynamic)
+	for (int i = 0; i < modulesLen; i++) {
+		Module *module = engine->modules[i];
 		if (!module->bypass) {
 			// Step module
 			if (settings::powerMeter) {
@@ -150,6 +157,10 @@ static void Engine_step(Engine *engine) {
 }
 
 static void Engine_run(Engine *engine) {
+#if defined ARCH_LIN
+	// Name thread
+	system::setThreadName("Engine");
+#endif
 	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
 	// https://software.intel.com/en-us/node/682949
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
@@ -166,9 +177,15 @@ static void Engine_run(Engine *engine) {
 
 		if (!engine->paused) {
 			std::lock_guard<std::mutex> lock(engine->internal->mutex);
+			// auto startTime = std::chrono::high_resolution_clock::now();
+
 			for (int i = 0; i < mutexSteps; i++) {
 				Engine_step(engine);
 			}
+
+			// auto stopTime = std::chrono::high_resolution_clock::now();
+			// float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
+			// DEBUG("%g", cpuTime / mutexSteps * 44100);
 		}
 
 		double stepTime = mutexSteps * engine->internal->sampleTime;
