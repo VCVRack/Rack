@@ -77,6 +77,12 @@ void createDirectory(const std::string &path) {
 #endif
 }
 
+void setThreadName(const std::string &name) {
+#if defined ARCH_LIN
+	pthread_setname_np(pthread_self(), name.c_str());
+#endif
+}
+
 void openBrowser(const std::string &url) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open " + url;
