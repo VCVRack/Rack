@@ -19,8 +19,8 @@ static const NVGcolor SCHEME_GREEN = nvgRGB(0x90, 0xc7, 0x3e);
 static const NVGcolor SCHEME_CYAN = nvgRGB(0x22, 0xe6, 0xef);
 static const NVGcolor SCHEME_BLUE = nvgRGB(0x29, 0xb2, 0xef);
 static const NVGcolor SCHEME_PURPLE = nvgRGB(0xd5, 0x2b, 0xed);
-static const NVGcolor SCHEME_LIGHT_PANEL = nvgRGB(0xe6, 0xe6, 0xe6);
-static const NVGcolor SCHEME_DARK_PANEL = nvgRGB(0x17, 0x17, 0x17);
+static const NVGcolor SCHEME_LIGHT_GRAY = nvgRGB(0xe6, 0xe6, 0xe6);
+static const NVGcolor SCHEME_DARK_GRAY = nvgRGB(0x17, 0x17, 0x17);
 
 ////////////////////
 // Knobs
