@@ -1,6 +1,7 @@
 #include "engine/Engine.hpp"
 #include "settings.hpp"
 #include "system.hpp"
+#include "random.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -149,6 +150,16 @@ static void Engine_step(Engine *engine) {
 			output.step();
 		}
 	}
+
+#if 0
+	if (random::u32() % 1000 == 0 && settings::powerMeter) {
+		float cpuTotal = 0.f;
+		for (Module *module : engine->modules) {
+			cpuTotal += module->cpuTime;
+		}
+		DEBUG("%fus %f%% CPU", cpuTotal * 1e6, cpuTotal * engine->internal->sampleRate * 100);
+	}
+#endif
 
 	// Step cables
 	for (Cable *cable : engine->cables) {

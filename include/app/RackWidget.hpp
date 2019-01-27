@@ -50,6 +50,7 @@ struct RackWidget : OpaqueWidget {
 	/** Moves a module to the closest non-colliding position */
 	bool requestModuleBoxNearest(ModuleWidget *mw, math::Rect requestedBox);
 	ModuleWidget *getModule(int moduleId);
+	bool isEmpty();
 
 	// Cable methods
 

@@ -187,8 +187,8 @@ struct ZoomQuantity : Quantity {
 	float getMinValue() override {return 0.25;}
 	float getMaxValue() override {return 2.0;}
 	float getDefaultValue() override {return 1.0;}
-	float getDisplayValue() override {return getValue() * 100.0;}
-	void setDisplayValue(float displayValue) override {setValue(displayValue / 100.0);}
+	float getDisplayValue() override {return std::round(getValue() * 100);}
+	void setDisplayValue(float displayValue) override {setValue(displayValue / 100);}
 	std::string getLabel() override {return "Zoom";}
 	std::string getUnit() override {return "%";}
 };
@@ -202,8 +202,8 @@ struct CableOpacityQuantity : Quantity {
 		return settings::cableOpacity;
 	}
 	float getDefaultValue() override {return 0.5;}
-	float getDisplayValue() override {return getValue() * 100.0;}
-	void setDisplayValue(float displayValue) override {setValue(displayValue / 100.0);}
+	float getDisplayValue() override {return getValue() * 100;}
+	void setDisplayValue(float displayValue) override {setValue(displayValue / 100);}
 	std::string getLabel() override {return "Cable opacity";}
 	std::string getUnit() override {return "%";}
 };
@@ -225,7 +225,7 @@ struct CableTensionQuantity : Quantity {
 
 struct PowerMeterItem : MenuItem {
 	PowerMeterItem() {
-		text = "Power meter";
+		text = "CPU meter";
 		rightText = CHECKMARK(settings::powerMeter);
 	}
 	void onAction(const event::Action &e) override {

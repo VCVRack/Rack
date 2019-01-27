@@ -416,6 +416,10 @@ ModuleWidget *RackWidget::getModule(int moduleId) {
 	return NULL;
 }
 
+bool RackWidget::isEmpty() {
+	return moduleContainer->children.empty();
+}
+
 void RackWidget::clearCables() {
 	for (Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);

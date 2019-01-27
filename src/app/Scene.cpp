@@ -64,7 +64,7 @@ void Scene::step() {
 
 	// Set zoom every few frames
 	if (app()->window->frame % 10 == 0)
-		zoomWidget->setZoom(settings::zoom);
+		zoomWidget->setZoom(std::round(settings::zoom * 100) / 100);
 
 	// Request latest version from server
 	if (!devMode && checkVersion && !checkedVersion) {
