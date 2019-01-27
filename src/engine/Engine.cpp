@@ -117,7 +117,7 @@ static void Engine_step(Engine *engine) {
 		}
 	}
 
-	float cpuLambda = engine->internal->sampleTime / 2.f;
+	const float cpuLambda = engine->internal->sampleTime / 2.f;
 
 	// Iterate modules
 	int modulesLen = engine->modules.size();
