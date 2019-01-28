@@ -17,10 +17,11 @@ SOURCES += $(wildcard dep/jpommier-pffft-*/pffft.c) $(wildcard dep/jpommier-pfff
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifdef ARCH_MAC
+	FLAGS += -Xpreprocessor -fopenmp
 	SOURCES += dep/osdialog/osdialog_mac.m
 	LDFLAGS += -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
-		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a
+		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a dep/lib/libomp.a
 	TARGET := Rack
 	BUNDLE := dist/$(TARGET).app
 endif
@@ -98,9 +99,6 @@ dist: all
 	rm -rf dist
 	mkdir -p dist
 
-	@# Rack
-	$(MAKE) -C plugins/Fundamental dist
-
 ifdef ARCH_MAC
 	mkdir -p $(BUNDLE)
 	mkdir -p $(BUNDLE)/Contents
@@ -115,7 +113,7 @@ ifdef ARCH_MAC
 
 	otool -L $(BUNDLE)/Contents/MacOS/$(TARGET)
 
-	cp plugins/Fundamental/dist/Fundamental-*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
+	cp Fundamental-*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
 	cp -R Bridge/AU/dist/VCV-Bridge.component dist/
 	cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
 	cp -R Bridge/VST/dist/VCV-Bridge-fx.vst dist/
@@ -135,7 +133,7 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
-	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
+	cp Fundamental-*.zip dist/Rack/Fundamental.zip
 	@# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 	@# Make NSIS installer
@@ -150,7 +148,7 @@ ifdef ARCH_LIN
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
 	ldd dist/Rack/$(TARGET)
-	cp plugins/Fundamental/dist/Fundamental-*.zip dist/Rack/Fundamental.zip
+	cp Fundamental-*.zip dist/Rack/Fundamental.zip
 	@# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
