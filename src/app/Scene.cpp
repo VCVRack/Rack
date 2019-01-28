@@ -31,7 +31,7 @@ Scene::Scene() {
 	addChild(toolbar);
 	scrollWidget->box.pos.y = toolbar->box.size.y;
 
-	moduleBrowser = new ModuleBrowser;
+	moduleBrowser = moduleBrowserCreate();
 	moduleBrowser->visible = false;
 	addChild(moduleBrowser);
 }

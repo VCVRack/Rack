@@ -1,23 +1,12 @@
 #pragma once
 #include "app/common.hpp"
-#include "ui/ScrollWidget.hpp"
-#include "ui/SequentialLayout.hpp"
+#include "widgets/Widget.hpp"
 
 
 namespace rack {
 
 
-struct ModuleBrowser : OpaqueWidget {
-	ScrollWidget *moduleScroll;
-	SequentialLayout *moduleLayout;
-
-	ModuleBrowser();
-	void step() override;
-	void draw(const DrawContext &ctx) override;
-	void onHoverKey(const event::HoverKey &e) override;
-};
-
-
+Widget *moduleBrowserCreate();
 json_t *moduleBrowserToJson();
 void moduleBrowserFromJson(json_t *rootJ);
 

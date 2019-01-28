@@ -2,7 +2,10 @@
 #include "widgets/OpaqueWidget.hpp"
 #include "widgets/TransparentWidget.hpp"
 #include "widgets/ZoomWidget.hpp"
+#include "ui/ScrollWidget.hpp"
+#include "ui/SequentialLayout.hpp"
 #include "ui/Label.hpp"
+#include "ui/TextField.hpp"
 #include "ui/MenuOverlay.hpp"
 #include "app/ModuleWidget.hpp"
 #include "app/Scene.hpp"
@@ -18,6 +21,9 @@ namespace rack {
 
 
 static std::set<Model*> sFavoriteModels;
+
+
+struct ModuleBrowser;
 
 
 struct ModuleBox : OpaqueWidget {
@@ -59,6 +65,8 @@ struct ModuleBox : OpaqueWidget {
 	}
 
 	void draw(const DrawContext &ctx) override {
+		visibleFrames = 0;
+
 		// Lazily create ModuleWidget when drawn
 		if (!previewWidget) {
 			Widget *transparentWidget = new TransparentWidget;
@@ -95,82 +103,115 @@ struct ModuleBox : OpaqueWidget {
 		}
 	}
 
-	void onButton(const event::Button &e) override {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-			// Create module
-			ModuleWidget *moduleWidget = model->createModuleWidget();
-			assert(moduleWidget);
-			app()->scene->rackWidget->addModuleAtMouse(moduleWidget);
-			// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
-			// e.consume(moduleWidget);
-			// Close Module Browser
-			ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-			moduleBrowser->visible = false;
+	void onButton(const event::Button &e) override;
+};
 
-			// Push ModuleAdd history action
-			history::ModuleAdd *h = new history::ModuleAdd;
-			h->setModule(moduleWidget);
-			app()->history->push(h);
-		}
-		OpaqueWidget::onButton(e);
+
+struct BrowserSearchField : TextField {
+};
+
+
+struct BrowserSidebar : Widget {
+	BrowserSearchField *searchField;
+
+	BrowserSidebar() {
+		searchField = new BrowserSearchField;
+		addChild(searchField);
+	}
+
+	void step() override {
+		searchField->box.size.x = box.size.x;
+		Widget::step();
 	}
 };
 
 
-ModuleBrowser::ModuleBrowser() {
-	moduleScroll = new ScrollWidget;
-	addChild(moduleScroll);
+struct ModuleBrowser : OpaqueWidget {
+	BrowserSidebar *sidebar;
+	ScrollWidget *moduleScroll;
+	SequentialLayout *moduleLayout;
 
-	moduleLayout = new SequentialLayout;
-	moduleLayout->spacing = math::Vec(10, 10);
-	moduleScroll->container->addChild(moduleLayout);
+	ModuleBrowser() {
+		sidebar = new BrowserSidebar;
+		sidebar->box.size.x = 300;
+		addChild(sidebar);
 
-	for (int i = 0; i < 100; i++)
-	for (Plugin *plugin : plugin::plugins) {
-		for (Model *model : plugin->models) {
-			ModuleBox *moduleBox = new ModuleBox;
-			moduleBox->setModel(model);
-			moduleLayout->addChild(moduleBox);
-		}
-	}
-}
+		moduleScroll = new ScrollWidget;
+		addChild(moduleScroll);
 
-void ModuleBrowser::step() {
-	// TODO resize sidebar
-	float sidebarWidth = 300.0;
+		moduleLayout = new SequentialLayout;
+		moduleLayout->spacing = math::Vec(10, 10);
+		moduleScroll->container->addChild(moduleLayout);
 
-	moduleScroll->box.pos.x = sidebarWidth;
-	moduleScroll->box.size.x = box.size.x - sidebarWidth;
-	moduleScroll->box.size.y = box.size.y;
-	moduleLayout->box.size.x = moduleScroll->box.size.x;
-	moduleLayout->box.size.y = moduleLayout->getChildrenBoundingBox().getBottomRight().y;
-
-	OpaqueWidget::step();
-}
-
-void ModuleBrowser::draw(const DrawContext &ctx) {
-	bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
-	Widget::draw(ctx);
-}
-
-void ModuleBrowser::onHoverKey(const event::HoverKey &e) {
-	if (e.action == GLFW_PRESS) {
-		switch (e.key) {
-			case GLFW_KEY_ESCAPE: {
-				// Close menu
-				this->visible = false;
-				e.consume(this);
-			} break;
+		for (Plugin *plugin : plugin::plugins) {
+			for (Model *model : plugin->models) {
+				ModuleBox *moduleBox = new ModuleBox;
+				moduleBox->setModel(model);
+				moduleLayout->addChild(moduleBox);
+			}
 		}
 	}
 
-	if (!e.getConsumed())
-		OpaqueWidget::onHoverKey(e);
-}
+	void step() override {
+		sidebar->box.size.y = box.size.y;
 
+		moduleScroll->box.pos.x = sidebar->box.size.x;
+		moduleScroll->box.size.x = box.size.x - sidebar->box.size.x;
+		moduleScroll->box.size.y = box.size.y;
+		moduleLayout->box.size.x = moduleScroll->box.size.x;
+		moduleLayout->box.size.y = moduleLayout->getChildrenBoundingBox().getBottomRight().y;
+
+		OpaqueWidget::step();
+	}
+
+	void draw(const DrawContext &ctx) override {
+		bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+		Widget::draw(ctx);
+	}
+
+	void onHoverKey(const event::HoverKey &e) override {
+		if (e.action == GLFW_PRESS) {
+			switch (e.key) {
+				case GLFW_KEY_ESCAPE: {
+					// Close menu
+					this->visible = false;
+					e.consume(this);
+				} break;
+			}
+		}
+
+		if (!e.getConsumed())
+			OpaqueWidget::onHoverKey(e);
+	}
+};
+
+
+void ModuleBox::onButton(const event::Button &e) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		// Create module
+		ModuleWidget *moduleWidget = model->createModuleWidget();
+		assert(moduleWidget);
+		app()->scene->rackWidget->addModuleAtMouse(moduleWidget);
+		// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
+		// e.consume(moduleWidget);
+		// Close Module Browser
+		ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
+		moduleBrowser->visible = false;
+
+		// Push ModuleAdd history action
+		history::ModuleAdd *h = new history::ModuleAdd;
+		h->setModule(moduleWidget);
+		app()->history->push(h);
+	}
+	OpaqueWidget::onButton(e);
+}
 
 
 // Global functions
+
+Widget *moduleBrowserCreate() {
+	return new ModuleBrowser;
+}
 
 json_t *moduleBrowserToJson() {
 	json_t *rootJ = json_object();

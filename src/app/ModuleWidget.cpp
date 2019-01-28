@@ -138,7 +138,7 @@ ModuleWidget::~ModuleWidget() {
 
 void ModuleWidget::draw(const DrawContext &ctx) {
 	if (module && module->bypass) {
-		nvgGlobalAlpha(ctx.vg, 0.5);
+		nvgGlobalAlpha(ctx.vg, 0.25);
 	}
 	// nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
 	Widget::draw(ctx);
