@@ -134,8 +134,8 @@ inline float rescale(float x, float a, float b, float yMin, float yMax) {
 	return yMin + (x - a) / (b - a) * (yMax - yMin);
 }
 
-inline float crossfade(float a, float b, float frac) {
-	return a + frac * (b - a);
+inline float crossfade(float a, float b, float p) {
+	return a + (b - a) * p;
 }
 
 /** Linearly interpolate an array `p` with index `x`
@@ -240,6 +240,9 @@ struct Vec {
 	}
 	Vec clamp(Rect bound) const;
 	Vec clampSafe(Rect bound) const;
+	Vec crossfade(Vec b, float p) {
+		return this->plus(b.minus(*this).mult(p));
+	}
 };
 
 

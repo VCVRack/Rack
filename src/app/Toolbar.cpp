@@ -269,7 +269,7 @@ struct EnginePauseItem : MenuItem {
 
 struct SampleRateValueItem : MenuItem {
 	float sampleRate;
-	SampleRateValueItem(float sampleRate) {
+	void setSampleRate(float sampleRate) {
 		this->sampleRate = sampleRate;
 		text = string::f("%.0f Hz", sampleRate);
 		rightText = CHECKMARK(app()->engine->getSampleRate() == sampleRate);
@@ -292,7 +292,9 @@ struct SampleRateItem : MenuItem {
 
 		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
 		for (float sampleRate : sampleRates) {
-			menu->addChild(new SampleRateValueItem(sampleRate));
+			SampleRateValueItem *item = new SampleRateValueItem;
+			item->setSampleRate(sampleRate);
+			menu->addChild(item);
 		}
 		return menu;
 	}
@@ -301,9 +303,13 @@ struct SampleRateItem : MenuItem {
 
 struct ThreadCountValueItem : MenuItem {
 	int threadCount;
-	ThreadCountValueItem(int threadCount) {
+	void setThreadCount(int threadCount) {
 		this->threadCount = threadCount;
 		text = string::f("%d", threadCount);
+		if (threadCount == 1)
+			text += " (default)";
+		else if (threadCount == system::getPhysicalCoreCount() / 2)
+			text += " (recommended)";
 		rightText = CHECKMARK(app()->engine->threadCount == threadCount);
 	}
 	void onAction(const event::Action &e) override {
@@ -321,7 +327,9 @@ struct ThreadCount : MenuItem {
 
 		int coreCount = system::getPhysicalCoreCount();
 		for (int i = 1; i <= coreCount; i++) {
-			menu->addChild(new ThreadCountValueItem(i));
+			ThreadCountValueItem *item = new ThreadCountValueItem;
+			item->setThreadCount(i);
+			menu->addChild(item);
 		}
 		return menu;
 	}

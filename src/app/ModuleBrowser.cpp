@@ -48,19 +48,30 @@ struct ModuleBox : OpaqueWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
+		DEBUG("%p model", model);
+
 		// Lazily create ModuleWidget when drawn
 		if (!initialized) {
 			Widget *transparentWidget = new TransparentWidget;
 			addChild(transparentWidget);
 
+			FramebufferWidget *fbWidget = new FramebufferWidget;
+			if (math::isNear(app()->window->pixelRatio, 1.0)) {
+				// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
+				fbWidget->oversample = 2.0;
+			}
+			transparentWidget->addChild(fbWidget);
+
 			ZoomWidget *zoomWidget = new ZoomWidget;
 			zoomWidget->setZoom(0.5f);
-			transparentWidget->addChild(zoomWidget);
+			fbWidget->addChild(zoomWidget);
 
 			ModuleWidget *moduleWidget = model->createModuleWidgetNull();
 			zoomWidget->addChild(moduleWidget);
 
-			float width = std::ceil(moduleWidget->box.size.x * 0.5f);
+			zoomWidget->box.size.x = moduleWidget->box.size.x * zoomWidget->zoom;
+			zoomWidget->box.size.y = RACK_GRID_HEIGHT;
+			float width = std::ceil(zoomWidget->box.size.x);
 			box.size.x = std::max(box.size.x, width);
 			initialized = true;
 		}

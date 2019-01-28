@@ -25,6 +25,7 @@ void SVGSlider::setBackgroundSVG(std::shared_ptr<SVG> backgroundSVG) {
 
 void SVGSlider::setHandleSVG(std::shared_ptr<SVG> handleSVG) {
 	handle->setSVG(handleSVG);
+	handle->box.pos = maxHandlePos;
 	fb->dirty = true;
 }
 

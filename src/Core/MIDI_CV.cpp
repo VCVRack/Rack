@@ -60,35 +60,6 @@ struct MIDI_CV : Module {
 		onReset();
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
-
-		json_t *divisionsJ = json_array();
-		for (int i = 0; i < 2; i++) {
-			json_t *divisionJ = json_integer(divisions[i]);
-			json_array_append_new(divisionsJ, divisionJ);
-		}
-		json_object_set_new(rootJ, "divisions", divisionsJ);
-
-		json_object_set_new(rootJ, "midi", midiInput.toJson());
-		return rootJ;
-	}
-
-	void dataFromJson(json_t *rootJ) override {
-		json_t *divisionsJ = json_object_get(rootJ, "divisions");
-		if (divisionsJ) {
-			for (int i = 0; i < 2; i++) {
-				json_t *divisionJ = json_array_get(divisionsJ, i);
-				if (divisionJ)
-					divisions[i] = json_integer_value(divisionJ);
-			}
-		}
-
-		json_t *midiJ = json_object_get(rootJ, "midi");
-		if (midiJ)
-			midiInput.fromJson(midiJ);
-	}
-
 	void onReset() override {
 		heldNotes.clear();
 		lastNote = 60;
@@ -98,45 +69,6 @@ struct MIDI_CV : Module {
 		divisions[0] = 24;
 		divisions[1] = 6;
 		midiInput.reset();
-	}
-
-	void pressNote(uint8_t note) {
-		// Remove existing similar note
-		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
-		if (it != heldNotes.end())
-			heldNotes.erase(it);
-		// Push note
-		heldNotes.push_back(note);
-		lastNote = note;
-		gate = true;
-		retriggerPulse.trigger(1e-3);
-	}
-
-	void releaseNote(uint8_t note) {
-		// Remove the note
-		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
-		if (it != heldNotes.end())
-			heldNotes.erase(it);
-		// Hold note if pedal is pressed
-		if (pedal)
-			return;
-		// Set last note
-		if (!heldNotes.empty()) {
-			lastNote = heldNotes[heldNotes.size() - 1];
-			gate = true;
-		}
-		else {
-			gate = false;
-		}
-	}
-
-	void pressPedal() {
-		pedal = true;
-	}
-
-	void releasePedal() {
-		pedal = false;
-		releaseNote(255);
 	}
 
 	void step() override {
@@ -253,6 +185,74 @@ struct MIDI_CV : Module {
 			} break;
 			default: break;
 		}
+	}
+
+	void pressNote(uint8_t note) {
+		// Remove existing similar note
+		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
+		if (it != heldNotes.end())
+			heldNotes.erase(it);
+		// Push note
+		heldNotes.push_back(note);
+		lastNote = note;
+		gate = true;
+		retriggerPulse.trigger(1e-3);
+	}
+
+	void releaseNote(uint8_t note) {
+		// Remove the note
+		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
+		if (it != heldNotes.end())
+			heldNotes.erase(it);
+		// Hold note if pedal is pressed
+		if (pedal)
+			return;
+		// Set last note
+		if (!heldNotes.empty()) {
+			lastNote = heldNotes[heldNotes.size() - 1];
+			gate = true;
+		}
+		else {
+			gate = false;
+		}
+	}
+
+	void pressPedal() {
+		pedal = true;
+	}
+
+	void releasePedal() {
+		pedal = false;
+		releaseNote(255);
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+
+		json_t *divisionsJ = json_array();
+		for (int i = 0; i < 2; i++) {
+			json_t *divisionJ = json_integer(divisions[i]);
+			json_array_append_new(divisionsJ, divisionJ);
+		}
+		json_object_set_new(rootJ, "divisions", divisionsJ);
+
+		json_object_set_new(rootJ, "midi", midiInput.toJson());
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t *divisionsJ = json_object_get(rootJ, "divisions");
+		if (divisionsJ) {
+			for (int i = 0; i < 2; i++) {
+				json_t *divisionJ = json_array_get(divisionsJ, i);
+				if (divisionJ)
+					divisions[i] = json_integer_value(divisionJ);
+			}
+		}
+
+		json_t *midiJ = json_object_get(rootJ, "midi");
+		if (midiJ)
+			midiInput.fromJson(midiJ);
 	}
 };
 
