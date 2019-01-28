@@ -7,8 +7,8 @@ TextField::TextField() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
 
-void TextField::draw(NVGcontext *vg) {
-	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+void TextField::draw(const DrawContext &ctx) {
+	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
 
 	BNDwidgetState state;
 	if (this == app()->event->selectedWidget)
@@ -20,13 +20,13 @@ void TextField::draw(NVGcontext *vg) {
 
 	int begin = std::min(cursor, selection);
 	int end = std::max(cursor, selection);
-	bndTextField(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str(), begin, end);
+	bndTextField(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str(), begin, end);
 	// Draw placeholder text
 	if (text.empty() && state != BND_ACTIVE) {
-		bndIconLabelCaret(vg, 0.0, 0.0, box.size.x, box.size.y, -1, bndGetTheme()->textFieldTheme.itemColor, 13, placeholder.c_str(), bndGetTheme()->textFieldTheme.itemColor, 0, -1);
+		bndIconLabelCaret(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, -1, bndGetTheme()->textFieldTheme.itemColor, 13, placeholder.c_str(), bndGetTheme()->textFieldTheme.itemColor, 0, -1);
 	}
 
-	nvgResetScissor(vg);
+	nvgResetScissor(ctx.vg);
 }
 
 void TextField::onButton(const event::Button &e) {

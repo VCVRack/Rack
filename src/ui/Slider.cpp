@@ -16,10 +16,10 @@ Slider::~Slider() {
 		delete quantity;
 }
 
-void Slider::draw(NVGcontext *vg) {
+void Slider::draw(const DrawContext &ctx) {
 	float progress = quantity ? quantity->getScaledValue() : 0.f;
 	std::string text = quantity ? quantity->getString() : "";
-	bndSlider(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
+	bndSlider(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
 }
 
 void Slider::onDragStart(const event::DragStart &e) {

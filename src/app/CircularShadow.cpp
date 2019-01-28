@@ -9,19 +9,19 @@ CircularShadow::CircularShadow() {
 	opacity = 0.15;
 }
 
-void CircularShadow::draw(NVGcontext *vg) {
+void CircularShadow::draw(const DrawContext &ctx) {
 	if (opacity <= 0.0)
 		return;
 
-	nvgBeginPath(vg);
-	nvgRect(vg, -blurRadius, -blurRadius, box.size.x + 2*blurRadius, box.size.y + 2*blurRadius);
+	nvgBeginPath(ctx.vg);
+	nvgRect(ctx.vg, -blurRadius, -blurRadius, box.size.x + 2*blurRadius, box.size.y + 2*blurRadius);
 	math::Vec center = box.size.div(2.0);
 	float radius = center.x;
 	NVGcolor icol = nvgRGBAf(0.0, 0.0, 0.0, opacity);
 	NVGcolor ocol = nvgRGBAf(0.0, 0.0, 0.0, 0.0);
-	NVGpaint paint = nvgRadialGradient(vg, center.x, center.y, radius - blurRadius, radius, icol, ocol);
-	nvgFillPaint(vg, paint);
-	nvgFill(vg);
+	NVGpaint paint = nvgRadialGradient(ctx.vg, center.x, center.y, radius - blurRadius, radius, icol, ocol);
+	nvgFillPaint(ctx.vg, paint);
+	nvgFill(ctx.vg);
 }
 
 

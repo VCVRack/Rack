@@ -8,7 +8,7 @@ namespace rack {
 
 struct MenuSeparator : MenuEntry {
 	MenuSeparator();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

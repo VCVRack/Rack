@@ -7,7 +7,7 @@ namespace rack {
 
 
 struct RackRail : TransparentWidget {
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

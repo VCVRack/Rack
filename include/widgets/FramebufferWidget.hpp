@@ -27,7 +27,7 @@ struct FramebufferWidget : Widget {
 
 	FramebufferWidget();
 	~FramebufferWidget();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	virtual void drawFramebuffer();
 	int getImageHandle();
 

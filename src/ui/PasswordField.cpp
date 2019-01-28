@@ -4,10 +4,10 @@
 namespace rack {
 
 
-void PasswordField::draw(NVGcontext *vg) {
+void PasswordField::draw(const DrawContext &ctx) {
 	std::string textTmp = text;
 	text = std::string(textTmp.size(), '*');
-	TextField::draw(vg);
+	TextField::draw(ctx);
 	text = textTmp;
 }
 

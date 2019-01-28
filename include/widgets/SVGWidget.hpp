@@ -26,9 +26,9 @@ struct SVGWidget : Widget {
 		wrap();
 	}
 
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawContext &ctx) override {
 		if (svg && svg->handle) {
-			svgDraw(vg, svg->handle);
+			svgDraw(ctx.vg, svg->handle);
 		}
 	}
 };

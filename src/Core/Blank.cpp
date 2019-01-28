@@ -16,12 +16,12 @@ struct BlankPanel : Widget {
 		panelBorder->box.size = box.size;
 	}
 
-	void draw(NVGcontext *vg) override {
-		nvgBeginPath(vg);
-		nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
-		nvgFillColor(vg, nvgRGB(0xe6, 0xe6, 0xe6));
-		nvgFill(vg);
-		Widget::draw(vg);
+	void draw(const DrawContext &ctx) override {
+		nvgBeginPath(ctx.vg);
+		nvgRect(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
+		nvgFillColor(ctx.vg, nvgRGB(0xe6, 0xe6, 0xe6));
+		nvgFill(ctx.vg);
+		Widget::draw(ctx);
 	}
 };
 
@@ -64,15 +64,15 @@ struct ModuleResizeHandle : Widget {
 		}
 		app()->scene->rackWidget->requestModuleBox(m, newBox);
 	}
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawContext &ctx) override {
 		for (float x = 5.0; x <= 10.0; x += 5.0) {
-			nvgBeginPath(vg);
+			nvgBeginPath(ctx.vg);
 			const float margin = 5.0;
-			nvgMoveTo(vg, x + 0.5, margin + 0.5);
-			nvgLineTo(vg, x + 0.5, box.size.y - margin + 0.5);
-			nvgStrokeWidth(vg, 1.0);
-			nvgStrokeColor(vg, nvgRGBAf(0.5, 0.5, 0.5, 0.5));
-			nvgStroke(vg);
+			nvgMoveTo(ctx.vg, x + 0.5, margin + 0.5);
+			nvgLineTo(ctx.vg, x + 0.5, box.size.y - margin + 0.5);
+			nvgStrokeWidth(ctx.vg, 1.0);
+			nvgStrokeColor(ctx.vg, nvgRGBAf(0.5, 0.5, 0.5, 0.5));
+			nvgStroke(ctx.vg);
 		}
 	}
 };

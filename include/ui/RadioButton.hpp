@@ -13,7 +13,7 @@ struct RadioButton : OpaqueWidget {
 
 	RadioButton();
 	~RadioButton();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void onEnter(const event::Enter &e) override;
 	void onLeave(const event::Leave &e) override;
 	void onDragDrop(const event::DragDrop &e) override;

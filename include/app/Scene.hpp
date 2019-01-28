@@ -28,7 +28,7 @@ struct Scene : OpaqueWidget {
 	Scene();
 	~Scene();
 	void step() override;
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void onHoverKey(const event::HoverKey &e) override;
 	void onPathDrop(const event::PathDrop &e) override;
 

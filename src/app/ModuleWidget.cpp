@@ -136,57 +136,57 @@ ModuleWidget::~ModuleWidget() {
 	setModule(NULL);
 }
 
-void ModuleWidget::draw(NVGcontext *vg) {
+void ModuleWidget::draw(const DrawContext &ctx) {
 	if (module && module->bypass) {
-		nvgGlobalAlpha(vg, 0.5);
+		nvgGlobalAlpha(ctx.vg, 0.5);
 	}
-	// nvgScissor(vg, 0, 0, box.size.x, box.size.y);
-	Widget::draw(vg);
+	// nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+	Widget::draw(ctx);
 
 	// Power meter
 	if (module && settings::powerMeter) {
-		nvgBeginPath(vg);
-		nvgRect(vg,
+		nvgBeginPath(ctx.vg);
+		nvgRect(ctx.vg,
 			0, box.size.y - 20,
 			65, 20);
-		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.75));
-		nvgFill(vg);
+		nvgFillColor(ctx.vg, nvgRGBAf(0, 0, 0, 0.75));
+		nvgFill(ctx.vg);
 
 		std::string cpuText = string::f("%.2f μs", module->cpuTime * 1e6f);
-		bndLabel(vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
+		bndLabel(ctx.vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
 
 		float p = math::clamp(module->cpuTime / app()->engine->getSampleTime(), 0.f, 1.f);
-		nvgBeginPath(vg);
-		nvgRect(vg,
+		nvgBeginPath(ctx.vg);
+		nvgRect(ctx.vg,
 			0, (1.f - p) * box.size.y,
 			5, p * box.size.y);
-		nvgFillColor(vg, nvgRGBAf(1, 0, 0, 1.0));
-		nvgFill(vg);
+		nvgFillColor(ctx.vg, nvgRGBAf(1, 0, 0, 1.0));
+		nvgFill(ctx.vg);
 	}
 
 	// if (module) {
-	// 	nvgBeginPath(vg);
-	// 	nvgRect(vg, 0, 0, 20, 20);
-	// 	nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.75));
-	// 	nvgFill(vg);
+	// 	nvgBeginPath(ctx.vg);
+	// 	nvgRect(ctx.vg, 0, 0, 20, 20);
+	// 	nvgFillColor(ctx.vg, nvgRGBAf(0, 0, 0, 0.75));
+	// 	nvgFill(ctx.vg);
 
 	// 	std::string debugText = string::f("%d", module->id);
-	// 	bndLabel(vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
+	// 	bndLabel(ctx.vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
 	// }
 
-	// nvgResetScissor(vg);
+	// nvgResetScissor(ctx.vg);
 }
 
-void ModuleWidget::drawShadow(NVGcontext *vg) {
-	nvgBeginPath(vg);
+void ModuleWidget::drawShadow(const DrawContext &ctx) {
+	nvgBeginPath(ctx.vg);
 	float r = 20; // Blur radius
 	float c = 20; // Corner radius
 	math::Vec b = math::Vec(-10, 30); // Offset from each corner
-	nvgRect(vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
+	nvgRect(ctx.vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
 	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
 	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
-	nvgFillPaint(vg, nvgBoxGradient(vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
-	nvgFill(vg);
+	nvgFillPaint(ctx.vg, nvgBoxGradient(ctx.vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
+	nvgFill(ctx.vg);
 }
 
 void ModuleWidget::onHover(const event::Hover &e) {

@@ -16,7 +16,7 @@ struct ScrollWidget : OpaqueWidget {
 
 	ScrollWidget();
 	void scrollTo(math::Rect r);
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void step() override;
 	void onHover(const event::Hover &e) override;
 	void onHoverScroll(const event::HoverScroll &e) override;

@@ -10,7 +10,7 @@ struct CircularShadow : TransparentWidget {
 	float blurRadius;
 	float opacity;
 	CircularShadow();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

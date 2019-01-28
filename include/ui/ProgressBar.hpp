@@ -12,7 +12,7 @@ struct ProgressBar : Widget {
 
 	ProgressBar();
 	~ProgressBar();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

@@ -10,6 +10,11 @@
 namespace rack {
 
 
+struct DrawContext {
+	mutable NVGcontext *vg;
+};
+
+
 /** A node in the 2D scene graph
 */
 struct Widget {
@@ -67,8 +72,10 @@ struct Widget {
 
 	/** Advances the module by one frame */
 	virtual void step();
-	/** Draws to NanoVG context */
-	virtual void draw(NVGcontext *vg);
+	/** Draws the widget to the NanoVG context */
+	virtual void draw(const DrawContext &ctx);
+	/** Override `draw(const DrawContext &ctx)` instead */
+	DEPRECATED virtual void draw(NVGcontext *vg) {}
 
 	// Events
 

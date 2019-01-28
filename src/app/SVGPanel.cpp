@@ -4,13 +4,13 @@
 namespace rack {
 
 
-void PanelBorder::draw(NVGcontext *vg) {
+void PanelBorder::draw(const DrawContext &ctx) {
 	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
-	nvgBeginPath(vg);
-	nvgRect(vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
-	nvgStrokeColor(vg, borderColor);
-	nvgStrokeWidth(vg, 1.0);
-	nvgStroke(vg);
+	nvgBeginPath(ctx.vg);
+	nvgRect(ctx.vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
+	nvgStrokeColor(ctx.vg, borderColor);
+	nvgStrokeWidth(ctx.vg, 1.0);
+	nvgStroke(ctx.vg);
 }
 
 

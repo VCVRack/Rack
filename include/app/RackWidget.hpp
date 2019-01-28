@@ -22,7 +22,7 @@ struct RackWidget : OpaqueWidget {
 	~RackWidget();
 
 	void step() override;
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 
 	void onHover(const event::Hover &e) override;
 	void onHoverKey(const event::HoverKey &e) override;

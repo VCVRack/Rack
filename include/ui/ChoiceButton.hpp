@@ -7,7 +7,7 @@ namespace rack {
 
 
 struct ChoiceButton : Button {
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

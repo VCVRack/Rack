@@ -19,7 +19,7 @@ struct Label : Widget {
 	Alignment alignment = LEFT_ALIGNMENT;
 
 	Label();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

@@ -5,45 +5,45 @@
 namespace rack {
 
 
-void LightWidget::draw(NVGcontext *vg) {
-	drawLight(vg);
-	drawHalo(vg);
+void LightWidget::draw(const DrawContext &ctx) {
+	drawLight(ctx);
+	drawHalo(ctx);
 }
 
-void LightWidget::drawLight(NVGcontext *vg) {
+void LightWidget::drawLight(const DrawContext &ctx) {
 	float radius = box.size.x / 2.0;
 
-	nvgBeginPath(vg);
-	nvgCircle(vg, radius, radius, radius);
+	nvgBeginPath(ctx.vg);
+	nvgCircle(ctx.vg, radius, radius, radius);
 
 	// Background
-	nvgFillColor(vg, bgColor);
-	nvgFill(vg);
+	nvgFillColor(ctx.vg, bgColor);
+	nvgFill(ctx.vg);
 
 	// Foreground
-	nvgFillColor(vg, color);
-	nvgFill(vg);
+	nvgFillColor(ctx.vg, color);
+	nvgFill(ctx.vg);
 
 	// Border
-	nvgStrokeWidth(vg, 0.5);
-	nvgStrokeColor(vg, borderColor);
-	nvgStroke(vg);
+	nvgStrokeWidth(ctx.vg, 0.5);
+	nvgStrokeColor(ctx.vg, borderColor);
+	nvgStroke(ctx.vg);
 }
 
-void LightWidget::drawHalo(NVGcontext *vg) {
+void LightWidget::drawHalo(const DrawContext &ctx) {
 	float radius = box.size.x / 2.0;
 	float oradius = radius + 15.0;
 
-	nvgBeginPath(vg);
-	nvgRect(vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
+	nvgBeginPath(ctx.vg);
+	nvgRect(ctx.vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
 
 	NVGpaint paint;
 	NVGcolor icol = color::mult(color, 0.08);
 	NVGcolor ocol = nvgRGB(0, 0, 0);
-	paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
-	nvgFillPaint(vg, paint);
-	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-	nvgFill(vg);
+	paint = nvgRadialGradient(ctx.vg, radius, radius, radius, oradius, icol, ocol);
+	nvgFillPaint(ctx.vg, paint);
+	nvgGlobalCompositeOperation(ctx.vg, NVG_LIGHTER);
+	nvgFill(ctx.vg);
 }
 
 

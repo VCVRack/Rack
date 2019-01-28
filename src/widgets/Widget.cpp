@@ -93,7 +93,7 @@ void Widget::step() {
 	}
 }
 
-void Widget::draw(NVGcontext *vg) {
+void Widget::draw(const DrawContext &ctx) {
 	for (Widget *child : children) {
 		// Don't draw if invisible
 		if (!child->visible)
@@ -102,19 +102,26 @@ void Widget::draw(NVGcontext *vg) {
 		if (!box.zeroPos().intersects(child->box))
 			continue;
 
-		nvgSave(vg);
-		nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
-		child->draw(vg);
+		nvgSave(ctx.vg);
+		nvgTranslate(ctx.vg, child->box.pos.x, child->box.pos.y);
+
+		DrawContext childCtx = ctx;
+		child->draw(childCtx);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+		child->draw(ctx.vg);
+#pragma GCC diagnostic pop
 
 		// Draw red hitboxes
 		// if (app()->event->hoveredWidget == child) {
-		// 	nvgBeginPath(vg);
-		// 	nvgRect(vg, 0, 0, child->box.size.x, child->box.size.y);
-		// 	nvgFillColor(vg, nvgRGBAf(1, 0, 0, 0.5));
-		// 	nvgFill(vg);
+		// 	nvgBeginPath(ctx.vg);
+		// 	nvgRect(ctx.vg, 0, 0, child->box.size.x, child->box.size.y);
+		// 	nvgFillColor(ctx.vg, nvgRGBAf(1, 0, 0, 0.5));
+		// 	nvgFill(ctx.vg);
 		// }
 
-		nvgRestore(vg);
+		nvgRestore(ctx.vg);
 	}
 }
 

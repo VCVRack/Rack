@@ -23,7 +23,7 @@ struct PortWidget : OpaqueWidget {
 	~PortWidget();
 
 	void step() override;
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 
 	void onButton(const event::Button &e) override;
 	void onDragStart(const event::DragStart &e) override;

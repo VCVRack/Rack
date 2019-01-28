@@ -15,7 +15,7 @@ struct Button : OpaqueWidget {
 
 	Button();
 	~Button();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void onEnter(const event::Enter &e) override;
 	void onLeave(const event::Leave &e) override;
 	void onDragStart(const event::DragStart &e) override;

@@ -13,11 +13,11 @@ RadioButton::~RadioButton() {
 		delete quantity;
 }
 
-void RadioButton::draw(NVGcontext *vg) {
+void RadioButton::draw(const DrawContext &ctx) {
 	std::string label;
 	if (quantity)
 		label = quantity->getLabel();
-	bndRadioButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
+	bndRadioButton(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
 }
 
 void RadioButton::onEnter(const event::Enter &e) {

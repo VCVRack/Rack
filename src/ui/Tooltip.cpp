@@ -13,10 +13,10 @@ void Tooltip::step() {
 	Widget::step();
 }
 
-void Tooltip::draw(NVGcontext *vg) {
-	bndTooltipBackground(vg, 0.0, 0.0, box.size.x, box.size.y);
-	bndMenuLabel(vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
-	Widget::draw(vg);
+void Tooltip::draw(const DrawContext &ctx) {
+	bndTooltipBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
+	bndMenuLabel(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
+	Widget::draw(ctx);
 }
 
 

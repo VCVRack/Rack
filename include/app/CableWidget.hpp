@@ -27,8 +27,8 @@ struct CableWidget : OpaqueWidget {
 	math::Vec getInputPos();
 	json_t *toJson();
 	void fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &moduleWidgets);
-	void draw(NVGcontext *vg) override;
-	void drawPlugs(NVGcontext *vg);
+	void draw(const DrawContext &ctx) override;
+	void drawPlugs(const DrawContext &ctx);
 };
 
 

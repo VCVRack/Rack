@@ -26,10 +26,10 @@ void ScrollWidget::scrollTo(math::Rect r) {
 	offset = offset.clampSafe(bound);
 }
 
-void ScrollWidget::draw(NVGcontext *vg) {
-	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
-	Widget::draw(vg);
-	nvgResetScissor(vg);
+void ScrollWidget::draw(const DrawContext &ctx) {
+	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+	Widget::draw(ctx);
+	nvgResetScissor(ctx.vg);
 }
 
 void ScrollWidget::step() {

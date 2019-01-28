@@ -13,7 +13,7 @@ struct ModuleBrowser : OpaqueWidget {
 
 	ModuleBrowser();
 	void step() override;
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void onHoverKey(const event::HoverKey &e) override;
 };
 

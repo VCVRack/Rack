@@ -17,7 +17,7 @@ struct MenuItem : MenuEntry {
 	std::string rightText;
 	bool disabled = false;
 
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void step() override;
 	void onEnter(const event::Enter &e) override;
 	void onDragDrop(const event::DragDrop &e) override;

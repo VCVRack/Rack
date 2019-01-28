@@ -20,7 +20,7 @@ struct TextField : OpaqueWidget {
 	int selection = 0;
 
 	TextField();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void onButton(const event::Button &e) override;
 	void onHover(const event::Hover &e) override;
 	void onEnter(const event::Enter &e) override;

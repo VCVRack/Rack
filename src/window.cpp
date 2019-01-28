@@ -359,7 +359,9 @@ void Window::run() {
 			// nvgReset(vg);
 			// nvgScale(vg, pixelRatio, pixelRatio);
 
-			app()->event->rootWidget->draw(vg);
+			DrawContext ctx;
+			ctx.vg = vg;
+			app()->event->rootWidget->draw(ctx);
 
 			glViewport(0, 0, fbWidth, fbHeight);
 			glClearColor(0.0, 0.0, 0.0, 1.0);

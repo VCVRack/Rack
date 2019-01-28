@@ -10,7 +10,7 @@ namespace rack {
 
 
 struct PanelBorder : TransparentWidget {
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

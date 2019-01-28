@@ -47,9 +47,7 @@ struct ModuleBox : OpaqueWidget {
 		addChild(pluginLabel);
 	}
 
-	void draw(NVGcontext *vg) override {
-		DEBUG("%p model", model);
-
+	void draw(const DrawContext &ctx) override {
 		// Lazily create ModuleWidget when drawn
 		if (!initialized) {
 			Widget *transparentWidget = new TransparentWidget;
@@ -76,12 +74,12 @@ struct ModuleBox : OpaqueWidget {
 			initialized = true;
 		}
 
-		OpaqueWidget::draw(vg);
+		OpaqueWidget::draw(ctx);
 		if (app()->event->hoveredWidget == this) {
-			nvgBeginPath(vg);
-			nvgRect(vg, 0.0, 0.0, box.size.x, box.size.y);
-			nvgFillColor(vg, nvgRGBAf(1, 1, 1, 0.25));
-			nvgFill(vg);
+			nvgBeginPath(ctx.vg);
+			nvgRect(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
+			nvgFillColor(ctx.vg, nvgRGBAf(1, 1, 1, 0.25));
+			nvgFill(ctx.vg);
 		}
 	}
 
@@ -137,9 +135,9 @@ void ModuleBrowser::step() {
 	OpaqueWidget::step();
 }
 
-void ModuleBrowser::draw(NVGcontext *vg) {
-	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, 0);
-	Widget::draw(vg);
+void ModuleBrowser::draw(const DrawContext &ctx) {
+	bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+	Widget::draw(ctx);
 }
 
 void ModuleBrowser::onHoverKey(const event::HoverKey &e) {

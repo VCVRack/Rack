@@ -11,7 +11,7 @@ struct ZoomWidget : Widget {
 	math::Vec getRelativeOffset(math::Vec v, Widget *relative) override;
 	math::Rect getViewport(math::Rect r) override;
 	void setZoom(float zoom);
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 
 	void onHover(const event::Hover &e) override {
 		event::Hover e2 = e;

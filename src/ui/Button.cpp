@@ -13,8 +13,8 @@ Button::~Button() {
 		delete quantity;
 }
 
-void Button::draw(NVGcontext *vg) {
-	bndToolButton(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str());
+void Button::draw(const DrawContext &ctx) {
+	bndToolButton(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str());
 }
 
 void Button::onEnter(const event::Enter &e) {

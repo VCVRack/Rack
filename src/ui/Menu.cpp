@@ -48,9 +48,9 @@ void Menu::step() {
 	}
 }
 
-void Menu::draw(NVGcontext *vg) {
-	bndMenuBackground(vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
-	Widget::draw(vg);
+void Menu::draw(const DrawContext &ctx) {
+	bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
+	Widget::draw(ctx);
 }
 
 void Menu::onHoverScroll(const event::HoverScroll &e) {

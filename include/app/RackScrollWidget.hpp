@@ -8,7 +8,7 @@ namespace rack {
 
 struct RackScrollWidget : ScrollWidget {
 	void step() override;
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

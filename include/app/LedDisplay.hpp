@@ -9,12 +9,12 @@ namespace rack {
 
 
 struct LedDisplay : Widget {
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 struct LedDisplaySeparator : TransparentWidget {
 	LedDisplaySeparator();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 struct LedDisplayChoice : TransparentWidget {
@@ -23,7 +23,7 @@ struct LedDisplayChoice : TransparentWidget {
 	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayChoice();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void onButton(const event::Button &e) override;
 };
 
@@ -32,7 +32,7 @@ struct LedDisplayTextField : TextField {
 	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayTextField();
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	int getTextPosition(math::Vec mousePos) override;
 };
 

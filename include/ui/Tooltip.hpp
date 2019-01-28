@@ -10,7 +10,7 @@ struct Tooltip : Widget {
 	std::string text;
 
 	void step() override;
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 };
 
 

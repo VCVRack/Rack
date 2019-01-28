@@ -16,7 +16,7 @@ struct ParamWidget : OpaqueWidget {
 
 	~ParamWidget();
 	void step() override;
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void onButton(const event::Button &e) override;
 	void onEnter(const event::Enter &e) override;
 	void onLeave(const event::Leave &e) override;

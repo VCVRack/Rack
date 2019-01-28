@@ -42,32 +42,32 @@ static ModuleWidget *moduleFromJson(json_t *moduleJ) {
 
 
 struct ModuleContainer : Widget {
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawContext &ctx) override {
 		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front of other ModuleWidgets.
 		for (Widget *child : children) {
 			ModuleWidget *w = dynamic_cast<ModuleWidget*>(child);
 			assert(w);
 
-			nvgSave(vg);
-			nvgTranslate(vg, child->box.pos.x, child->box.pos.y);
-			w->drawShadow(vg);
-			nvgRestore(vg);
+			nvgSave(ctx.vg);
+			nvgTranslate(ctx.vg, child->box.pos.x, child->box.pos.y);
+			w->drawShadow(ctx);
+			nvgRestore(ctx.vg);
 		}
 
-		Widget::draw(vg);
+		Widget::draw(ctx);
 	}
 };
 
 
 struct CableContainer : TransparentWidget {
-	void draw(NVGcontext *vg) override {
-		Widget::draw(vg);
+	void draw(const DrawContext &ctx) override {
+		Widget::draw(ctx);
 
 		// Draw cable plugs
 		for (Widget *w : children) {
 			CableWidget *cw = dynamic_cast<CableWidget*>(w);
 			assert(cw);
-			cw->drawPlugs(vg);
+			cw->drawPlugs(ctx);
 		}
 	}
 };
@@ -116,8 +116,8 @@ void RackWidget::step() {
 	Widget::step();
 }
 
-void RackWidget::draw(NVGcontext *vg) {
-	Widget::draw(vg);
+void RackWidget::draw(const DrawContext &ctx) {
+	Widget::draw(ctx);
 }
 
 void RackWidget::onHover(const event::Hover &e) {

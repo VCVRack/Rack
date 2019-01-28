@@ -9,7 +9,7 @@ namespace rack {
 struct MenuLabel : MenuEntry {
 	std::string text;
 
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawContext &ctx) override;
 	void step() override;
 };
 

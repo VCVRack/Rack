@@ -14,8 +14,8 @@ ScrollBar::ScrollBar() {
 	box.size = math::Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 }
 
-void ScrollBar::draw(NVGcontext *vg) {
-	bndScrollBar(vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
+void ScrollBar::draw(const DrawContext &ctx) {
+	bndScrollBar(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }
 
 void ScrollBar::onDragStart(const event::DragStart &e) {

@@ -85,8 +85,8 @@ void Scene::step() {
 	}
 }
 
-void Scene::draw(NVGcontext *vg) {
-	OpaqueWidget::draw(vg);
+void Scene::draw(const DrawContext &ctx) {
+	OpaqueWidget::draw(ctx);
 }
 
 void Scene::onHoverKey(const event::HoverKey &e) {
