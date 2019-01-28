@@ -22,7 +22,10 @@ static std::set<Model*> sFavoriteModels;
 
 struct ModuleBox : OpaqueWidget {
 	Model *model;
-	bool initialized = false;
+	/** Lazily created */
+	Widget *previewWidget = NULL;
+	/** Number of frames since draw() has been called */
+	int visibleFrames = 0;
 
 	void setModel(Model *model) {
 		this->model = model;
@@ -47,9 +50,17 @@ struct ModuleBox : OpaqueWidget {
 		addChild(pluginLabel);
 	}
 
+	void step() override {
+		if (previewWidget && ++visibleFrames >= 60) {
+			removeChild(previewWidget);
+			delete previewWidget;
+			previewWidget = NULL;
+		}
+	}
+
 	void draw(const DrawContext &ctx) override {
 		// Lazily create ModuleWidget when drawn
-		if (!initialized) {
+		if (!previewWidget) {
 			Widget *transparentWidget = new TransparentWidget;
 			addChild(transparentWidget);
 
@@ -71,7 +82,8 @@ struct ModuleBox : OpaqueWidget {
 			zoomWidget->box.size.y = RACK_GRID_HEIGHT;
 			float width = std::ceil(zoomWidget->box.size.x);
 			box.size.x = std::max(box.size.x, width);
-			initialized = true;
+
+			previewWidget = transparentWidget;
 		}
 
 		OpaqueWidget::draw(ctx);
@@ -113,6 +125,7 @@ ModuleBrowser::ModuleBrowser() {
 	moduleLayout->spacing = math::Vec(10, 10);
 	moduleScroll->container->addChild(moduleLayout);
 
+	for (int i = 0; i < 100; i++)
 	for (Plugin *plugin : plugin::plugins) {
 		for (Model *model : plugin->models) {
 			ModuleBox *moduleBox = new ModuleBox;

@@ -104,7 +104,7 @@ void RackWidget::step() {
 	// Adjust size and position of rails
 	Widget *rail = rails->children.front();
 	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
-	if (!rails->box.contains(bound)) {
+	if (!rails->box.isContaining(bound)) {
 		math::Vec cellMargin = math::Vec(20, 1);
 		rails->box.pos = bound.pos.div(RACK_GRID_SIZE).floor().minus(cellMargin).mult(RACK_GRID_SIZE);
 		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
@@ -369,7 +369,7 @@ bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect requestedBox) {
 		// Don't intersect with self
 		if (m == m2)
 			continue;
-		if (requestedBox.intersects(m2->box)) {
+		if (requestedBox.isIntersecting(m2->box)) {
 			return false;
 		}
 	}

@@ -54,7 +54,7 @@ void Menu::draw(const DrawContext &ctx) {
 }
 
 void Menu::onHoverScroll(const event::HoverScroll &e) {
-	if (parent && !parent->box.contains(box))
+	if (parent && !parent->box.isContaining(box))
 		box.pos.y += e.scrollDelta.y;
 }
 

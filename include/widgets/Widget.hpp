@@ -11,7 +11,8 @@ namespace rack {
 
 
 struct DrawContext {
-	mutable NVGcontext *vg;
+	NVGcontext *vg;
+	math::Rect clipBox = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
 };
 
 
@@ -101,7 +102,7 @@ struct Widget {
 			// Filter child by visibility and position
 			if (!child->visible)
 				continue;
-			if (!child->box.contains(e.pos))
+			if (!child->box.isContaining(e.pos))
 				continue;
 
 			// Clone event and adjust its position

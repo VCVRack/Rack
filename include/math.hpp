@@ -258,17 +258,17 @@ struct Rect {
 	}
 
 	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right */
-	bool contains(Vec v) const {
+	bool isContaining(Vec v) const {
 		return pos.x <= v.x && v.x < pos.x + size.x
 			&& pos.y <= v.y && v.y < pos.y + size.y;
 	}
 	/** Returns whether this Rect contains an entire Rect */
-	bool contains(Rect r) const {
+	bool isContaining(Rect r) const {
 		return pos.x <= r.pos.x && r.pos.x + r.size.x <= pos.x + size.x
 			&& pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
 	}
 	/** Returns whether this Rect overlaps with another Rect */
-	bool intersects(Rect r) const {
+	bool isIntersecting(Rect r) const {
 		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
 			&& (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
 	}
@@ -313,13 +313,22 @@ struct Rect {
 		r.pos.y = math::clampSafe(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
-	/** Expands this Rect to contain `other` */
-	Rect expand(Rect other) const {
+	/** Expands this Rect to contain `b` */
+	Rect expand(Rect b) const {
 		Rect r;
-		r.pos.x = std::min(pos.x, other.pos.x);
-		r.pos.y = std::min(pos.y, other.pos.y);
-		r.size.x = std::max(pos.x + size.x, other.pos.x + other.size.x) - r.pos.x;
-		r.size.y = std::max(pos.y + size.y, other.pos.y + other.size.y) - r.pos.y;
+		r.pos.x = std::min(pos.x, b.pos.x);
+		r.pos.y = std::min(pos.y, b.pos.y);
+		r.size.x = std::max(pos.x + size.x, b.pos.x + b.size.x) - r.pos.x;
+		r.size.y = std::max(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
+		return r;
+	}
+	/** Returns the intersection of `this` and `b` */
+	Rect intersect(Rect b) const {
+		Rect r;
+		r.pos.x = std::max(pos.x, b.pos.x);
+		r.pos.y = std::max(pos.y, b.pos.y);
+		r.size.x = std::min(pos.x + size.x, b.pos.x + b.size.x) - r.pos.x;
+		r.size.y = std::min(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
 		return r;
 	}
 	/** Returns a Rect with its position set to zero */
@@ -335,6 +344,10 @@ struct Rect {
 		r.size = size.plus(delta.mult(2.f));
 		return r;
 	}
+
+	DEPRECATED bool contains(Vec v) const {return isContaining(v);}
+	DEPRECATED bool contains(Rect r) const {return isContaining(r);}
+	DEPRECATED bool intersects(Rect r) const {return isIntersecting(r);}
 };
 
 

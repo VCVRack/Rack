@@ -94,24 +94,30 @@ void Widget::step() {
 }
 
 void Widget::draw(const DrawContext &ctx) {
+	// Iterate children
 	for (Widget *child : children) {
 		// Don't draw if invisible
 		if (!child->visible)
 			continue;
-		// Don't draw if child is outside bounding box
-		if (!box.zeroPos().intersects(child->box))
+		// Don't draw if child is outside clip box
+		if (!ctx.clipBox.isIntersecting(child->box))
 			continue;
+
+		DrawContext childCtx = ctx;
+		// Intersect child clip box with self
+		childCtx.clipBox = childCtx.clipBox.intersect(child->box);
+		childCtx.clipBox.pos = childCtx.clipBox.pos.minus(child->box.pos);
 
 		nvgSave(ctx.vg);
 		nvgTranslate(ctx.vg, child->box.pos.x, child->box.pos.y);
 
-		DrawContext childCtx = ctx;
-		child->draw(childCtx);
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+		// Call deprecated draw function, which does nothing by default
 		child->draw(ctx.vg);
 #pragma GCC diagnostic pop
+
+		child->draw(childCtx);
 
 		// Draw red hitboxes
 		// if (app()->event->hoveredWidget == child) {
