@@ -7,6 +7,7 @@ namespace rack {
 
 
 struct SliderKnob : Knob {
+	// Bypass Knob's circular hitbox detection
 	void onHover(const event::Hover &e) override {
 		ParamWidget::onHover(e);
 	}

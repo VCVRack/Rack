@@ -64,7 +64,10 @@ void Knob::onDragMove(const event::DragMove &e) {
 			// Continuous encoders scale as if their limits are +/-1
 			range = 2.f;
 		}
-		float delta = KNOB_SENSITIVITY * -e.mouseDelta.y * speed * range;
+		float delta = (horizontal ? e.mouseDelta.x : -e.mouseDelta.y);
+		delta *= KNOB_SENSITIVITY;
+		delta *= speed;
+		delta *= range;
 
 		// Drag slower if mod is held
 		int mods = app()->window->getMods();
