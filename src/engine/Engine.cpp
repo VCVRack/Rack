@@ -8,7 +8,6 @@
 #include <thread>
 #include <condition_variable>
 #include <mutex>
-#include <omp.h>
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 
