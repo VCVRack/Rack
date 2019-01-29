@@ -88,10 +88,8 @@ struct CcChoice : LedDisplayChoice {
 	}
 
 	void step() override {
-		if (!module) {
-			text = "";
+		if (!module)
 			return;
-		}
 		if (module->learningId == id) {
 			if (0 <= focusCc)
 				text = string::f("%d", focusCc);
@@ -103,25 +101,27 @@ struct CcChoice : LedDisplayChoice {
 			text = string::f("%d", module->learnedCcs[id]);
 			color.a = 1.0;
 			if (APP->event->selectedWidget == this)
-				APP->event->selectedWidget = NULL;
+				APP->event->setSelected(NULL);
 		}
 	}
 
 	void onSelect(const event::Select &e) override {
-		e.consume(this);
 		if (!module)
 			return;
 		module->learningId = id;
 		focusCc = -1;
+		e.consume(this);
 	}
 
 	void onDeselect(const event::Deselect &e) override {
 		if (!module)
 			return;
-		if (0 <= focusCc && focusCc < 128) {
-			module->learnedCcs[id] = focusCc;
+		if (module->learningId == id) {
+			if (0 <= focusCc && focusCc < 128) {
+				module->learnedCcs[id] = focusCc;
+			}
+			module->learningId = -1;
 		}
-		module->learningId = -1;
 	}
 
 	void onSelectText(const event::SelectText &e) override {
@@ -180,20 +180,22 @@ struct NoteChoice : LedDisplayChoice {
 			color.a = 1.0;
 
 			if (APP->event->selectedWidget == this)
-				APP->event->selectedWidget = NULL;
+				APP->event->setSelected(NULL);
 		}
 	}
 
 	void onSelect(const event::Select &e) override {
-		e.consume(this);
 		if (!module)
 			return;
 		module->learningId = id;
+		e.consume(this);
 	}
 
 	void onDeselect(const event::Deselect &e) override {
 		if (!module)
 			return;
-		module->learningId = -1;
+		if (module->learningId == id) {
+			module->learningId = -1;
+		}
 	}
 };

@@ -216,8 +216,7 @@ void CableWidget::draw(const widget::DrawContext &ctx) {
 	}
 	else {
 		// Draw opaque if mouse is hovering over a connected port
-		PortWidget *hoveredPort = dynamic_cast<PortWidget*>(APP->event->hoveredWidget);
-		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
+		if (outputPort->hovered || inputPort->hovered)
 			opacity = 1.0;
 	}
 

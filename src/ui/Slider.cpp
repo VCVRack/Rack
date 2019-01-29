@@ -26,6 +26,7 @@ void Slider::draw(const widget::DrawContext &ctx) {
 void Slider::onDragStart(const event::DragStart &e) {
 	state = BND_ACTIVE;
 	APP->window->cursorLock();
+	e.consume(this);
 }
 
 void Slider::onDragMove(const event::DragMove &e) {

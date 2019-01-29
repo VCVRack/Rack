@@ -24,6 +24,7 @@ void RadioButton::draw(const widget::DrawContext &ctx) {
 void RadioButton::onEnter(const event::Enter &e) {
 	if (state != BND_ACTIVE)
 		state = BND_HOVER;
+	e.consume(this);
 }
 
 void RadioButton::onLeave(const event::Leave &e) {

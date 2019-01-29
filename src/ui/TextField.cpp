@@ -51,6 +51,10 @@ void TextField::onEnter(const event::Enter &e) {
 	e.consume(this);
 }
 
+void TextField::onSelect(const event::Select &e) {
+	e.consume(this);
+}
+
 void TextField::onSelectText(const event::SelectText &e) {
 	if (e.codepoint < 128) {
 		std::string newText(1, (char) e.codepoint);

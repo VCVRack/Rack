@@ -28,6 +28,7 @@ void SVGButton::onDragStart(const event::DragStart &e) {
 		sw->setSVG(frames[1]);
 		fb->dirty = true;
 	}
+	e.consume(this);
 }
 
 void SVGButton::onDragEnd(const event::DragEnd &e) {

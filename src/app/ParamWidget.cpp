@@ -167,6 +167,7 @@ void ParamWidget::onEnter(const event::Enter &e) {
 		paramTooltip->paramWidget = this;
 		APP->scene->addChild(paramTooltip);
 		tooltip = paramTooltip;
+		e.consume(this);
 	}
 }
 

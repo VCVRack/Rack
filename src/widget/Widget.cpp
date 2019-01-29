@@ -120,14 +120,6 @@ void Widget::draw(const DrawContext &ctx) {
 
 		child->draw(childCtx);
 
-		// Draw red hitboxes
-		// if (APP->event->hoveredWidget == child) {
-		// 	nvgBeginPath(ctx.vg);
-		// 	nvgRect(ctx.vg, 0, 0, child->box.size.x, child->box.size.y);
-		// 	nvgFillColor(ctx.vg, nvgRGBAf(1, 0, 0, 0.5));
-		// 	nvgFill(ctx.vg);
-		// }
-
 		nvgRestore(ctx.vg);
 	}
 }

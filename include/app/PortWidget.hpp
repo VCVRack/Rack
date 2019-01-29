@@ -12,6 +12,7 @@ namespace app {
 struct PortWidget : widget::OpaqueWidget {
 	engine::Module *module = NULL;
 	int portId;
+	bool hovered = false;
 
 	enum Type {
 		OUTPUT,
@@ -27,6 +28,8 @@ struct PortWidget : widget::OpaqueWidget {
 	void draw(const widget::DrawContext &ctx) override;
 
 	void onButton(const event::Button &e) override;
+	void onEnter(const event::Enter &e) override;
+	void onLeave(const event::Leave &e) override;
 	void onDragStart(const event::DragStart &e) override;
 	void onDragEnd(const event::DragEnd &e) override;
 	void onDragDrop(const event::DragDrop &e) override;

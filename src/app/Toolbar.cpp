@@ -415,9 +415,10 @@ struct AccountEmailField : ui::TextField {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
 			APP->event->selectedWidget = passwordField;
 			e.consume(this);
-			return;
 		}
-		ui::TextField::onSelectKey(e);
+
+		if (!e.getConsumed())
+			ui::TextField::onSelectKey(e);
 	}
 };
 
@@ -431,9 +432,10 @@ struct AccountPasswordField : ui::PasswordField {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			logInItem->doAction();
 			e.consume(this);
-			return;
 		}
-		ui::PasswordField::onSelectKey(e);
+
+		if (!e.getConsumed())
+			ui::PasswordField::onSelectKey(e);
 	}
 };
 

@@ -14,14 +14,16 @@ void State::setHovered(widget::Widget *w) {
 		// event::Leave
 		event::Leave eLeave;
 		hoveredWidget->onLeave(eLeave);
+		hoveredWidget = NULL;
 	}
 
-	hoveredWidget = w;
-
-	if (hoveredWidget) {
+	if (w) {
 		// event::Enter
+		event::Context eEnterContext;
 		event::Enter eEnter;
-		hoveredWidget->onEnter(eEnter);
+		eEnter.context = &eEnterContext;
+		w->onEnter(eEnter);
+		hoveredWidget = eEnterContext.consumed;
 	}
 }
 
@@ -33,14 +35,16 @@ void State::setDragged(widget::Widget *w) {
 		// event::DragEnd
 		event::DragEnd eDragEnd;
 		draggedWidget->onDragEnd(eDragEnd);
+		draggedWidget = NULL;
 	}
 
-	draggedWidget = w;
-
-	if (draggedWidget) {
+	if (w) {
 		// event::DragStart
+		event::Context eDragStartContext;
 		event::DragStart eDragStart;
-		draggedWidget->onDragStart(eDragStart);
+		eDragStart.context = &eDragStartContext;
+		w->onDragStart(eDragStart);
+		draggedWidget = eDragStartContext.consumed;
 	}
 }
 
@@ -53,15 +57,17 @@ void State::setDragHovered(widget::Widget *w) {
 		event::DragLeave eDragLeave;
 		eDragLeave.origin = draggedWidget;
 		dragHoveredWidget->onDragLeave(eDragLeave);
+		dragHoveredWidget = NULL;
 	}
 
-	dragHoveredWidget = w;
-
-	if (dragHoveredWidget) {
+	if (w) {
 		// event::DragEnter
+		event::Context eDragEnterContext;
 		event::DragEnter eDragEnter;
+		eDragEnter.context = &eDragEnterContext;
 		eDragEnter.origin = draggedWidget;
-		dragHoveredWidget->onDragEnter(eDragEnter);
+		w->onDragEnter(eDragEnter);
+		dragHoveredWidget = eDragEnterContext.consumed;
 	}
 }
 
@@ -73,14 +79,16 @@ void State::setSelected(widget::Widget *w) {
 		// event::Deselect
 		event::Deselect eDeselect;
 		selectedWidget->onDeselect(eDeselect);
+		selectedWidget = NULL;
 	}
 
-	selectedWidget = w;
-
-	if (selectedWidget) {
+	if (w) {
 		// event::Select
+		event::Context eSelectContext;
 		event::Select eSelect;
-		selectedWidget->onSelect(eSelect);
+		eSelect.context = &eSelectContext;
+		w->onSelect(eSelect);
+		selectedWidget = eSelectContext.consumed;
 	}
 }
 

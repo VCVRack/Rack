@@ -25,6 +25,7 @@ struct TextField : widget::OpaqueWidget {
 	void onButton(const event::Button &e) override;
 	void onHover(const event::Hover &e) override;
 	void onEnter(const event::Enter &e) override;
+	void onSelect(const event::Select &e) override;
 	void onSelectText(const event::SelectText &e) override;
 	void onSelectKey(const event::SelectKey &e) override;
 

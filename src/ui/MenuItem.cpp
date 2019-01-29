@@ -38,6 +38,7 @@ void MenuItem::step() {
 }
 
 void MenuItem::onEnter(const event::Enter &e) {
+	e.consume(this);
 	Menu *parentMenu = dynamic_cast<Menu*>(parent);
 	if (!parentMenu)
 		return;
@@ -51,6 +52,10 @@ void MenuItem::onEnter(const event::Enter &e) {
 		childMenu->box.pos = parent->box.pos.plus(box.getTopRight());
 	}
 	parentMenu->setChildMenu(childMenu);
+}
+
+void MenuItem::onDragStart(const event::DragStart &e) {
+	e.consume(this);
 }
 
 void MenuItem::onDragDrop(const event::DragDrop &e) {

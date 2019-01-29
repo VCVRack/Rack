@@ -78,6 +78,15 @@ void PortWidget::onButton(const event::Button &e) {
 	e.consume(this);
 }
 
+void PortWidget::onEnter(const event::Enter &e) {
+	hovered = true;
+	e.consume(this);
+}
+
+void PortWidget::onLeave(const event::Leave &e) {
+	hovered = false;
+}
+
 void PortWidget::onDragStart(const event::DragStart &e) {
 	CableWidget *cw = NULL;
 	if (type == OUTPUT && (APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
@@ -110,6 +119,7 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 			cw->setInput(this);
 	}
 	APP->scene->rackWidget->setIncompleteCable(cw);
+	e.consume(this);
 }
 
 void PortWidget::onDragEnd(const event::DragEnd &e) {
@@ -158,6 +168,7 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 		else
 			cw->hoveredInputPort = this;
 	}
+	e.consume(this);
 }
 
 void PortWidget::onDragLeave(const event::DragLeave &e) {

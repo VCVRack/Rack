@@ -110,6 +110,7 @@ struct HoverScroll : Event, Position {
 
 
 /** Occurs when a Widget begins consuming the Hover event.
+Must consume to set the widget as hovered.
 */
 struct Enter : Event {
 };
@@ -122,6 +123,7 @@ struct Leave : Event {
 
 
 /** Occurs when a Widget begins consuming the Button press event.
+Must consume to set the widget as selected.
 */
 struct Select : Event {
 };
@@ -141,12 +143,14 @@ struct SelectKey : Event, Key {
 
 
 /** Occurs when text is typed while a Widget is selected.
+If consumed, a HoverText event will not be triggered.
 */
 struct SelectText : Event, Text {
 };
 
 
 /** Occurs when a Widget begins being dragged.
+Must consume to set the widget as dragged.
 */
 struct DragStart : Event {
 };
@@ -177,6 +181,7 @@ struct DragHover : Event, Position {
 };
 
 /** Occurs when the mouse enters a Widget while dragging.
+Must consume to set the widget as drag-hovered.
 */
 struct DragEnter : Event {
 	/** The dragged widget */

@@ -62,6 +62,7 @@ struct ModuleBox : widget::OpaqueWidget {
 	widget::Widget *previewWidget = NULL;
 	/** Number of frames since draw() has been called */
 	int visibleFrames = 0;
+	bool selected = false;
 
 	void setModel(plugin::Model *model) {
 		this->model = model;
@@ -125,7 +126,7 @@ struct ModuleBox : widget::OpaqueWidget {
 		}
 
 		widget::OpaqueWidget::draw(ctx);
-		if (APP->event->hoveredWidget == this) {
+		if (selected) {
 			nvgBeginPath(ctx.vg);
 			nvgRect(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
 			nvgFillColor(ctx.vg, nvgRGBAf(1, 1, 1, 0.25));
@@ -134,6 +135,15 @@ struct ModuleBox : widget::OpaqueWidget {
 	}
 
 	void onButton(const event::Button &e) override;
+
+	void onEnter(const event::Enter &e) override {
+		e.consume(this);
+		selected = true;
+	}
+
+	void onLeave(const event::Leave &e) override {
+		selected = false;
+	}
 };
 
 
