@@ -290,7 +290,7 @@ struct SampleRateItem : MenuItem {
 
 		menu->addChild(new EnginePauseItem);
 
-		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000};
+		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000, 705600, 768000};
 		for (float sampleRate : sampleRates) {
 			SampleRateValueItem *item = new SampleRateValueItem;
 			item->setSampleRate(sampleRate);
