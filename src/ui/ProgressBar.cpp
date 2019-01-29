@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 ProgressBar::ProgressBar() {
@@ -13,11 +14,12 @@ ProgressBar::~ProgressBar() {
 		delete quantity;
 }
 
-void ProgressBar::draw(const DrawContext &ctx) {
+void ProgressBar::draw(const widget::DrawContext &ctx) {
 	float progress = quantity ? quantity->getScaledValue() : 0.f;
 	std::string text = quantity ? quantity->getString() : "";
 	bndSlider(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL, BND_DEFAULT, progress, text.c_str(), NULL);
 }
 
 
+} // namespace ui
 } // namespace rack

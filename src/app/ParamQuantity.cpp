@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 Param *ParamQuantity::getParam() {
@@ -15,11 +16,11 @@ void ParamQuantity::setSmoothValue(float smoothValue) {
 	if (!module)
 		return;
 	smoothValue = math::clamp(smoothValue, getMinValue(), getMaxValue());
-	app()->engine->setSmoothParam(module, paramId, smoothValue);
+	APP->engine->setSmoothParam(module, paramId, smoothValue);
 }
 
 float ParamQuantity::getSmoothValue() {
-	return app()->engine->getSmoothParam(module, paramId);
+	return APP->engine->getSmoothParam(module, paramId);
 }
 
 void ParamQuantity::setValue(float value) {
@@ -55,7 +56,7 @@ float ParamQuantity::getDefaultValue() {
 
 float ParamQuantity::getDisplayValue() {
 	if (!module)
-		return Quantity::getDisplayValue();
+		return ui::Quantity::getDisplayValue();
 	float v = getSmoothValue();
 	float displayBase = getParam()->displayBase;
 	if (displayBase == 0.f) {
@@ -92,28 +93,29 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 }
 
 int ParamQuantity::getDisplayPrecision() {
-	return Quantity::getDisplayPrecision();
+	return ui::Quantity::getDisplayPrecision();
 }
 
 std::string ParamQuantity::getDisplayValueString() {
-	return Quantity::getDisplayValueString();
+	return ui::Quantity::getDisplayValueString();
 }
 
 void ParamQuantity::setDisplayValueString(std::string s) {
-	Quantity::setDisplayValueString(s);
+	ui::Quantity::setDisplayValueString(s);
 }
 
 std::string ParamQuantity::getLabel() {
 	if (!module)
-		return Quantity::getLabel();
+		return ui::Quantity::getLabel();
 	return getParam()->label;
 }
 
 std::string ParamQuantity::getUnit() {
 	if (!module)
-		return Quantity::getUnit();
+		return ui::Quantity::getUnit();
 	return getParam()->unit;
 }
 
 
+} // namespace app
 } // namespace rack

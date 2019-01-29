@@ -3,6 +3,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 void MultiLightWidget::addBaseColor(NVGcolor baseColor) {
@@ -21,4 +22,5 @@ void MultiLightWidget::setBrightnesses(const std::vector<float> &brightnesses) {
 }
 
 
+} // namespace app
 } // namespace rack

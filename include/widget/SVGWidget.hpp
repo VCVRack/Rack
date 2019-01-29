@@ -1,9 +1,10 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 #include "svg.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 /** Draws an SVG */
@@ -34,4 +35,5 @@ struct SVGWidget : Widget {
 };
 
 
+} // namespace widget
 } // namespace rack

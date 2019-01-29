@@ -12,14 +12,14 @@
 #include "midi.hpp"
 #include "helpers.hpp"
 
-#include "widgets/Widget.hpp"
-#include "widgets/TransparentWidget.hpp"
-#include "widgets/OpaqueWidget.hpp"
-#include "widgets/TransformWidget.hpp"
-#include "widgets/ZoomWidget.hpp"
-#include "widgets/SVGWidget.hpp"
-#include "widgets/FramebufferWidget.hpp"
-#include "widgets/GLWidget.hpp"
+#include "widget/Widget.hpp"
+#include "widget/TransparentWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
+#include "widget/TransformWidget.hpp"
+#include "widget/ZoomWidget.hpp"
+#include "widget/SVGWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
+#include "widget/GLWidget.hpp"
 
 #include "ui/SequentialLayout.hpp"
 #include "ui/Label.hpp"
@@ -92,8 +92,11 @@
 namespace rack {
 
 
-// Import math:: namespace for convenience
+// Import some namespaces for convenience
 using namespace math;
+using namespace widget;
+using namespace ui;
+using namespace app;
 
 
 } // namespace rack

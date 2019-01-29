@@ -4,12 +4,14 @@
 
 
 namespace rack {
+namespace app {
 
 
-struct RackScrollWidget : ScrollWidget {
+struct RackScrollWidget : ui::ScrollWidget {
 	void step() override;
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 };
 
 
+} // namespace app
 } // namespace rack

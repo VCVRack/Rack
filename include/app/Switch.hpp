@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 /** A ParamWidget that controls  */
@@ -20,4 +21,5 @@ struct Switch : ParamWidget {
 };
 
 
+} // namespace app
 } // namespace rack

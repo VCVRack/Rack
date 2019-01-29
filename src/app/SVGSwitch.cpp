@@ -2,13 +2,14 @@
 
 
 namespace rack {
+namespace app {
 
 
 SVGSwitch::SVGSwitch() {
-	fb = new FramebufferWidget;
+	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
-	sw = new SVGWidget;
+	sw = new widget::SVGWidget;
 	fb->addChild(sw);
 }
 
@@ -33,4 +34,5 @@ void SVGSwitch::onChange(const event::Change &e) {
 }
 
 
+} // namespace app
 } // namespace rack

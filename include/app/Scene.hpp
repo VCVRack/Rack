@@ -1,22 +1,23 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
-#include "widgets/ZoomWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
+#include "widget/ZoomWidget.hpp"
 #include "ui/ScrollWidget.hpp"
 #include "app/RackWidget.hpp"
 #include "app/Toolbar.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-struct Scene : OpaqueWidget {
+struct Scene : widget::OpaqueWidget {
 	// Convenience variables for accessing important widgets
-	ScrollWidget *scrollWidget;
-	ZoomWidget *zoomWidget;
+	ui::ScrollWidget *scrollWidget;
+	widget::ZoomWidget *zoomWidget;
 	RackWidget *rackWidget;
 	Toolbar *toolbar;
-	Widget *moduleBrowser;
+	widget::Widget *moduleBrowser;
 
 	// Version checking
 	bool devMode = false;
@@ -27,7 +28,7 @@ struct Scene : OpaqueWidget {
 	Scene();
 	~Scene();
 	void step() override;
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void onHoverKey(const event::HoverKey &e) override;
 	void onPathDrop(const event::PathDrop &e) override;
 
@@ -35,4 +36,5 @@ struct Scene : OpaqueWidget {
 };
 
 
+} // namespace app
 } // namespace rack

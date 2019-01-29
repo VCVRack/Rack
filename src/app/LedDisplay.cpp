@@ -6,15 +6,16 @@
 
 
 namespace rack {
+namespace app {
 
 
-void LedDisplay::draw(const DrawContext &ctx) {
+void LedDisplay::draw(const widget::DrawContext &ctx) {
 	nvgBeginPath(ctx.vg);
 	nvgRoundedRect(ctx.vg, 0, 0, box.size.x, box.size.y, 5.0);
 	nvgFillColor(ctx.vg, nvgRGB(0x00, 0x00, 0x00));
 	nvgFill(ctx.vg);
 
-	Widget::draw(ctx);
+	widget::Widget::draw(ctx);
 }
 
 
@@ -22,7 +23,7 @@ LedDisplaySeparator::LedDisplaySeparator() {
 	box.size = math::Vec();
 }
 
-void LedDisplaySeparator::draw(const DrawContext &ctx) {
+void LedDisplaySeparator::draw(const widget::DrawContext &ctx) {
 	nvgBeginPath(ctx.vg);
 	nvgMoveTo(ctx.vg, 0, 0);
 	nvgLineTo(ctx.vg, box.size.x, box.size.y);
@@ -39,7 +40,7 @@ LedDisplayChoice::LedDisplayChoice() {
 	textOffset = math::Vec(10, 18);
 }
 
-void LedDisplayChoice::draw(const DrawContext &ctx) {
+void LedDisplayChoice::draw(const widget::DrawContext &ctx) {
 	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
 
 	if (font->handle >= 0) {
@@ -70,7 +71,7 @@ LedDisplayTextField::LedDisplayTextField() {
 }
 
 
-void LedDisplayTextField::draw(const DrawContext &ctx) {
+void LedDisplayTextField::draw(const widget::DrawContext &ctx) {
 	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
 
 	// Background
@@ -86,12 +87,12 @@ void LedDisplayTextField::draw(const DrawContext &ctx) {
 		NVGcolor highlightColor = color;
 		highlightColor.a = 0.5;
 		int begin = std::min(cursor, selection);
-		int end = (this == app()->event->selectedWidget) ? std::max(cursor, selection) : -1;
+		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
 		bndIconLabelCaret(ctx.vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, 12, text.c_str(), highlightColor, begin, end);
 
-		bndSetFont(app()->window->uiFont->handle);
+		bndSetFont(APP->window->uiFont->handle);
 	}
 
 	nvgResetScissor(ctx.vg);
@@ -99,12 +100,13 @@ void LedDisplayTextField::draw(const DrawContext &ctx) {
 
 int LedDisplayTextField::getTextPosition(math::Vec mousePos) {
 	bndSetFont(font->handle);
-	int textPos = bndIconLabelTextPosition(app()->window->vg, textOffset.x, textOffset.y,
+	int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
 		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 		-1, 12, text.c_str(), mousePos.x, mousePos.y);
-	bndSetFont(app()->window->uiFont->handle);
+	bndSetFont(APP->window->uiFont->handle);
 	return textPos;
 }
 
 
+} // namespace app
 } // namespace rack

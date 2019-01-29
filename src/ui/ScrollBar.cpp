@@ -5,6 +5,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 static const float SCROLLBAR_SENSITIVITY = 2.f;
@@ -14,13 +15,13 @@ ScrollBar::ScrollBar() {
 	box.size = math::Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 }
 
-void ScrollBar::draw(const DrawContext &ctx) {
+void ScrollBar::draw(const widget::DrawContext &ctx) {
 	bndScrollBar(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }
 
 void ScrollBar::onDragStart(const event::DragStart &e) {
 	state = BND_ACTIVE;
-	app()->window->cursorLock();
+	APP->window->cursorLock();
 }
 
 void ScrollBar::onDragMove(const event::DragMove &e) {
@@ -34,8 +35,9 @@ void ScrollBar::onDragMove(const event::DragMove &e) {
 
 void ScrollBar::onDragEnd(const event::DragEnd &e) {
 	state = BND_DEFAULT;
-	app()->window->cursorUnlock();
+	APP->window->cursorUnlock();
 }
 
 
+} // namespace ui
 } // namespace rack

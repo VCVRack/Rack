@@ -142,11 +142,11 @@ DEPRECATED TPortWidget *createPort(math::Vec pos, PortWidget::Type type, Module 
 ////////////////////
 
 DEPRECATED inline float engineGetSampleRate() {
-	return app()->engine->getSampleRate();
+	return APP->engine->getSampleRate();
 }
 
 DEPRECATED inline float engineGetSampleTime() {
-	return app()->engine->getSampleTime();
+	return APP->engine->getSampleTime();
 }
 
 ////////////////////

@@ -10,8 +10,10 @@
 namespace rack {
 
 
-struct ModuleWidget;
-struct CableWidget;
+namespace app {
+	struct ModuleWidget;
+	struct CableWidget;
+} // namespace app
 
 
 namespace history {
@@ -59,7 +61,7 @@ struct ModuleAdd : ModuleAction {
 	math::Vec pos;
 	json_t *moduleJ;
 	~ModuleAdd();
-	void setModule(ModuleWidget *mw);
+	void setModule(app::ModuleWidget *mw);
 	void undo() override;
 	void redo() override;
 };
@@ -108,7 +110,7 @@ struct CableAdd : Action {
 	int inputModuleId;
 	int inputId;
 	NVGcolor color;
-	void setCable(CableWidget *cw);
+	void setCable(app::CableWidget *cw);
 	void undo() override;
 	void redo() override;
 };

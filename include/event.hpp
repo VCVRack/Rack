@@ -7,7 +7,9 @@
 namespace rack {
 
 
-struct Widget;
+namespace widget {
+	struct Widget;
+} // namespace widget
 
 
 namespace event {
@@ -17,7 +19,7 @@ struct Context {
 	/** The Widget that consumes the event.
 	This stops propagation of the event if applicable.
 	*/
-	Widget *consumed = NULL;
+	widget::Widget *consumed = NULL;
 };
 
 
@@ -25,11 +27,11 @@ struct Context {
 struct Event {
 	Context *context = NULL;
 
-	void consume(Widget *w) const {
+	void consume(widget::Widget *w) const {
 		if (context)
 			context->consumed = w;
 	}
-	Widget *getConsumed() const {
+	widget::Widget *getConsumed() const {
 		return context ? context->consumed : NULL;
 	}
 };
@@ -169,7 +171,7 @@ Recurses until consumed.
 */
 struct DragHover : Event, Position {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
 };
@@ -178,7 +180,7 @@ struct DragHover : Event, Position {
 */
 struct DragEnter : Event {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 };
 
 
@@ -186,7 +188,7 @@ struct DragEnter : Event {
 */
 struct DragLeave : Event {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 };
 
 
@@ -194,7 +196,7 @@ struct DragLeave : Event {
 */
 struct DragDrop : Event {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 };
 
 
@@ -229,23 +231,23 @@ struct Zoom : Event {
 
 
 struct State {
-	Widget *rootWidget = NULL;
+	widget::Widget *rootWidget = NULL;
 	/** State widgets
 	Don't set these directly unless you know what you're doing. Use the set*() methods instead.
 	*/
-	Widget *hoveredWidget = NULL;
-	Widget *draggedWidget = NULL;
-	Widget *dragHoveredWidget = NULL;
-	Widget *selectedWidget = NULL;
+	widget::Widget *hoveredWidget = NULL;
+	widget::Widget *draggedWidget = NULL;
+	widget::Widget *dragHoveredWidget = NULL;
+	widget::Widget *selectedWidget = NULL;
 	/** For middle-click dragging */
-	Widget *scrollWidget = NULL;
+	widget::Widget *scrollWidget = NULL;
 
-	void setHovered(Widget *w);
-	void setDragged(Widget *w);
-	void setDragHovered(Widget *w);
-	void setSelected(Widget *w);
+	void setHovered(widget::Widget *w);
+	void setDragged(widget::Widget *w);
+	void setDragHovered(widget::Widget *w);
+	void setSelected(widget::Widget *w);
 	/** Prepares a widget for deletion */
-	void finalizeWidget(Widget *w);
+	void finalizeWidget(widget::Widget *w);
 
 	void handleButton(math::Vec pos, int button, int action, int mods);
 	void handleHover(math::Vec pos, math::Vec mouseDelta);

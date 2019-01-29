@@ -1,19 +1,20 @@
 #include "ui/TextField.hpp"
 
 namespace rack {
+namespace ui {
 
 
 TextField::TextField() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
 
-void TextField::draw(const DrawContext &ctx) {
+void TextField::draw(const widget::DrawContext &ctx) {
 	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
 
 	BNDwidgetState state;
-	if (this == app()->event->selectedWidget)
+	if (this == APP->event->selectedWidget)
 		state = BND_ACTIVE;
-	else if (this == app()->event->hoveredWidget)
+	else if (this == APP->event->hoveredWidget)
 		state = BND_HOVER;
 	else
 		state = BND_DEFAULT;
@@ -33,17 +34,17 @@ void TextField::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		cursor = selection = getTextPosition(e.pos);
 	}
-	OpaqueWidget::onButton(e);
+	widget::OpaqueWidget::onButton(e);
 }
 
 void TextField::onHover(const event::Hover &e) {
-	if (this == app()->event->draggedWidget) {
+	if (this == APP->event->draggedWidget) {
 		int pos = getTextPosition(e.pos);
 		if (pos != selection) {
 			cursor = pos;
 		}
 	}
-	OpaqueWidget::onHover(e);
+	widget::OpaqueWidget::onHover(e);
 }
 
 void TextField::onEnter(const event::Enter &e) {
@@ -129,7 +130,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 			} break;
 			case GLFW_KEY_V: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					const char *newText = glfwGetClipboardString(app()->window->win);
+					const char *newText = glfwGetClipboardString(APP->window->win);
 					if (newText)
 						insertText(newText);
 				}
@@ -139,7 +140,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-						glfwSetClipboardString(app()->window->win, selectedText.c_str());
+						glfwSetClipboardString(APP->window->win, selectedText.c_str());
 						insertText("");
 					}
 				}
@@ -149,7 +150,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-						glfwSetClipboardString(app()->window->win, selectedText.c_str());
+						glfwSetClipboardString(APP->window->win, selectedText.c_str());
 					}
 				}
 			} break;
@@ -203,8 +204,9 @@ void TextField::selectAll() {
 }
 
 int TextField::getTextPosition(math::Vec mousePos) {
-	return bndTextFieldTextPosition(app()->window->vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
+	return bndTextFieldTextPosition(APP->window->vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
 }
 
 
+} // namespace ui
 } // namespace rack

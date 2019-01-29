@@ -11,6 +11,9 @@ namespace audio {
 }
 
 
+namespace app {
+
+
 struct AudioWidget : LedDisplay {
 	/** Not owned */
 	audio::IO *audioIO = NULL;
@@ -26,4 +29,5 @@ struct AudioWidget : LedDisplay {
 };
 
 
+} // namespace app
 } // namespace rack

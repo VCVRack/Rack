@@ -1,8 +1,9 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 /** Transforms appearance only, not positions of events */
@@ -44,4 +45,5 @@ struct TransformWidget : Widget {
 };
 
 
+} // namespace widget
 } // namespace rack

@@ -1,10 +1,11 @@
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 #include "event.hpp"
 #include "app.hpp"
 #include <algorithm>
 
 
 namespace rack {
+namespace widget {
 
 
 Widget::~Widget() {
@@ -58,7 +59,7 @@ void Widget::removeChild(Widget *child) {
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
 	// Prepare to remove widget from the event state
-	app()->event->finalizeWidget(child);
+	APP->event->finalizeWidget(child);
 	// Delete child from children list
 	auto it = std::find(children.begin(), children.end(), child);
 	assert(it != children.end());
@@ -69,7 +70,7 @@ void Widget::removeChild(Widget *child) {
 
 void Widget::clearChildren() {
 	for (Widget *child : children) {
-		app()->event->finalizeWidget(child);
+		APP->event->finalizeWidget(child);
 		child->parent = NULL;
 		delete child;
 	}
@@ -81,7 +82,7 @@ void Widget::step() {
 		Widget *child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
-			app()->event->finalizeWidget(child);
+			APP->event->finalizeWidget(child);
 			it = children.erase(it);
 			child->parent = NULL;
 			delete child;
@@ -120,7 +121,7 @@ void Widget::draw(const DrawContext &ctx) {
 		child->draw(childCtx);
 
 		// Draw red hitboxes
-		// if (app()->event->hoveredWidget == child) {
+		// if (APP->event->hoveredWidget == child) {
 		// 	nvgBeginPath(ctx.vg);
 		// 	nvgRect(ctx.vg, 0, 0, child->box.size.x, child->box.size.y);
 		// 	nvgFillColor(ctx.vg, nvgRGBAf(1, 0, 0, 0.5));
@@ -132,4 +133,5 @@ void Widget::draw(const DrawContext &ctx) {
 }
 
 
+} // namespace widget
 } // namespace rack

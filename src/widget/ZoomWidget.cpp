@@ -1,7 +1,8 @@
-#include "widgets/ZoomWidget.hpp"
+#include "widget/ZoomWidget.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 math::Vec ZoomWidget::getRelativeOffset(math::Vec v, Widget *relative) {
@@ -38,4 +39,5 @@ void ZoomWidget::draw(const DrawContext &ctx) {
 }
 
 
+} // namespace widget
 } // namespace rack

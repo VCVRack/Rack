@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 struct SliderKnob : Knob {
@@ -17,4 +18,5 @@ struct SliderKnob : Knob {
 };
 
 
+} // namespace app
 } // namespace rack

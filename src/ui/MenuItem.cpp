@@ -2,12 +2,13 @@
 
 
 namespace rack {
+namespace ui {
 
 
-void MenuItem::draw(const DrawContext &ctx) {
+void MenuItem::draw(const widget::DrawContext &ctx) {
 	BNDwidgetState state = BND_DEFAULT;
 
-	if (app()->event->hoveredWidget == this)
+	if (APP->event->hoveredWidget == this)
 		state = BND_HOVER;
 
 	// Set active state if this MenuItem
@@ -30,10 +31,10 @@ void MenuItem::draw(const DrawContext &ctx) {
 void MenuItem::step() {
 	// Add 10 more pixels because measurements on high-DPI screens are sometimes too small for some reason
 	const float rightPadding = 10.0;
-	// HACK use app()->window->vg from the window.
-	// All this does is inspect the font, so it shouldn't modify app()->window->vg and should work when called from a FramebufferWidget for example.
-	box.size.x = bndLabelWidth(app()->window->vg, -1, text.c_str()) + bndLabelWidth(app()->window->vg, -1, rightText.c_str()) + rightPadding;
-	Widget::step();
+	// HACK use APP->window->vg from the window.
+	// All this does is inspect the font, so it shouldn't modify APP->window->vg and should work when called from a widget::FramebufferWidget for example.
+	box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + bndLabelWidth(APP->window->vg, -1, rightText.c_str()) + rightPadding;
+	widget::Widget::step();
 }
 
 void MenuItem::onEnter(const event::Enter &e) {
@@ -71,9 +72,10 @@ void MenuItem::doAction() {
 	if (!eActionContext.consumed)
 		return;
 
-	Widget *overlay = getAncestorOfType<MenuOverlay>();
+	widget::Widget *overlay = getAncestorOfType<MenuOverlay>();
 	overlay->requestedDelete = true;
 }
 
 
+} // namespace ui
 } // namespace rack

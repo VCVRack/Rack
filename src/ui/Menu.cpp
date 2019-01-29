@@ -1,6 +1,7 @@
 #include "ui/Menu.hpp"
 
 namespace rack {
+namespace ui {
 
 
 Menu::Menu() {
@@ -26,11 +27,11 @@ void Menu::setChildMenu(Menu *menu) {
 }
 
 void Menu::step() {
-	Widget::step();
+	widget::Widget::step();
 
 	// Set positions of children
 	box.size = math::Vec(0, 0);
-	for (Widget *child : children) {
+	for (widget::Widget *child : children) {
 		if (!child->visible)
 			continue;
 		// Increment height, set position of child
@@ -43,14 +44,14 @@ void Menu::step() {
 	}
 
 	// Set widths of all children to maximum width
-	for (Widget *child : children) {
+	for (widget::Widget *child : children) {
 		child->box.size.x = box.size.x;
 	}
 }
 
-void Menu::draw(const DrawContext &ctx) {
+void Menu::draw(const widget::DrawContext &ctx) {
 	bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
-	Widget::draw(ctx);
+	widget::Widget::draw(ctx);
 }
 
 void Menu::onHoverScroll(const event::HoverScroll &e) {
@@ -59,4 +60,5 @@ void Menu::onHoverScroll(const event::HoverScroll &e) {
 }
 
 
+} // namespace ui
 } // namespace rack

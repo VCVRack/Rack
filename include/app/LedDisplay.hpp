@@ -1,40 +1,42 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/Widget.hpp"
-#include "widgets/TransparentWidget.hpp"
+#include "widget/Widget.hpp"
+#include "widget/TransparentWidget.hpp"
 #include "ui/TextField.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-struct LedDisplay : Widget {
-	void draw(const DrawContext &ctx) override;
+struct LedDisplay : widget::Widget {
+	void draw(const widget::DrawContext &ctx) override;
 };
 
-struct LedDisplaySeparator : TransparentWidget {
+struct LedDisplaySeparator : widget::TransparentWidget {
 	LedDisplaySeparator();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 };
 
-struct LedDisplayChoice : TransparentWidget {
+struct LedDisplayChoice : widget::TransparentWidget {
 	std::string text;
 	std::shared_ptr<Font> font;
 	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayChoice();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void onButton(const event::Button &e) override;
 };
 
-struct LedDisplayTextField : TextField {
+struct LedDisplayTextField : ui::TextField {
 	std::shared_ptr<Font> font;
 	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayTextField();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	int getTextPosition(math::Vec mousePos) override;
 };
 
 
+} // namespace app
 } // namespace rack

@@ -1,8 +1,9 @@
 #pragma once
-#include "widgets/FramebufferWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 struct GLWidget : FramebufferWidget {
@@ -14,4 +15,5 @@ struct GLWidget : FramebufferWidget {
 };
 
 
+} // namespace widget
 } // namespace rack

@@ -1,8 +1,9 @@
-#include "widgets/FramebufferWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
 #include "app.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 FramebufferWidget::FramebufferWidget() {
@@ -17,7 +18,7 @@ FramebufferWidget::~FramebufferWidget() {
 void FramebufferWidget::draw(const DrawContext &ctx) {
 	// Bypass framebuffer rendering if we're already drawing in a framebuffer
 	// In other words, disallow nested framebuffers. They look bad.
-	if (ctx.vg == app()->window->fbVg) {
+	if (ctx.vg == APP->window->fbVg) {
 		Widget::draw(ctx);
 		return;
 	}
@@ -56,7 +57,7 @@ void FramebufferWidget::draw(const DrawContext &ctx) {
 		fbBox = math::Rect::fromMinMax(min, max);
 		// DEBUG("%g %g %g %g", RECT_ARGS(fbBox));
 
-		math::Vec newFbSize = fbBox.size.mult(app()->window->pixelRatio * oversample);
+		math::Vec newFbSize = fbBox.size.mult(APP->window->pixelRatio * oversample);
 
 		if (!fb || !newFbSize.isEqual(fbSize)) {
 			fbSize = newFbSize;
@@ -105,7 +106,7 @@ void FramebufferWidget::draw(const DrawContext &ctx) {
 }
 
 void FramebufferWidget::drawFramebuffer() {
-	NVGcontext *vg = app()->window->fbVg;
+	NVGcontext *vg = APP->window->fbVg;
 
 	float pixelRatio = fbSize.x / fbBox.size.x;
 	nvgBeginFrame(vg, fbBox.size.x, fbBox.size.y, pixelRatio);
@@ -133,4 +134,5 @@ int FramebufferWidget::getImageHandle() {
 }
 
 
+} // namespace widget
 } // namespace rack

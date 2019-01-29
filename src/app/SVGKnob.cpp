@@ -2,20 +2,21 @@
 
 
 namespace rack {
+namespace app {
 
 
 SVGKnob::SVGKnob() {
-	fb = new FramebufferWidget;
+	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
 	shadow = new CircularShadow;
 	fb->addChild(shadow);
 	shadow->box.size = math::Vec();
 
-	tw = new TransformWidget;
+	tw = new widget::TransformWidget;
 	fb->addChild(tw);
 
-	sw = new SVGWidget;
+	sw = new widget::SVGWidget;
 	tw->addChild(sw);
 }
 
@@ -31,7 +32,7 @@ void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
 }
 
 void SVGKnob::onChange(const event::Change &e) {
-	// Re-transform the TransformWidget
+	// Re-transform the widget::TransformWidget
 	if (paramQuantity) {
 		float angle;
 		if (paramQuantity->isBounded()) {
@@ -53,4 +54,5 @@ void SVGKnob::onChange(const event::Change &e) {
 }
 
 
+} // namespace app
 } // namespace rack

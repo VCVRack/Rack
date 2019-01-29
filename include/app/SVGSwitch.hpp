@@ -1,17 +1,18 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/FramebufferWidget.hpp"
-#include "widgets/SVGWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
+#include "widget/SVGWidget.hpp"
 #include "app/Switch.hpp"
 
 
 namespace rack {
+namespace app {
 
 
 /** A ParamWidget with multiple frames corresponding to its value */
 struct SVGSwitch : Switch {
-	FramebufferWidget *fb;
-	SVGWidget *sw;
+	widget::FramebufferWidget *fb;
+	widget::SVGWidget *sw;
 	std::vector<std::shared_ptr<SVG>> frames;
 
 	SVGSwitch();
@@ -21,4 +22,5 @@ struct SVGSwitch : Switch {
 };
 
 
+} // namespace app
 } // namespace rack

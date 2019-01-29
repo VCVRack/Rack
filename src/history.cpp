@@ -37,7 +37,7 @@ ModuleAdd::~ModuleAdd() {
 	json_decref(moduleJ);
 }
 
-void ModuleAdd::setModule(ModuleWidget *mw) {
+void ModuleAdd::setModule(app::ModuleWidget *mw) {
 	model = mw->model;
 	assert(mw->module);
 	moduleId = mw->module->id;
@@ -48,46 +48,46 @@ void ModuleAdd::setModule(ModuleWidget *mw) {
 }
 
 void ModuleAdd::undo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
-	app()->scene->rackWidget->removeModule(mw);
+	APP->scene->rackWidget->removeModule(mw);
 	delete mw;
 }
 
 void ModuleAdd::redo() {
-	ModuleWidget *mw = model->createModuleWidget();
+	app::ModuleWidget *mw = model->createModuleWidget();
 	assert(mw);
 	assert(mw->module);
 	mw->module->id = moduleId;
 	mw->box.pos = pos;
 	mw->fromJson(moduleJ);
-	app()->scene->rackWidget->addModule(mw);
+	APP->scene->rackWidget->addModule(mw);
 }
 
 
 void ModuleMove::undo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
 	mw->box.pos = oldPos;
 }
 
 void ModuleMove::redo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
 	mw->box.pos = newPos;
 }
 
 
 void ModuleBypass::undo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
-	app()->engine->bypassModule(mw->module, !bypass);
+	APP->engine->bypassModule(mw->module, !bypass);
 }
 
 void ModuleBypass::redo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
-	app()->engine->bypassModule(mw->module, bypass);
+	APP->engine->bypassModule(mw->module, bypass);
 }
 
 
@@ -97,32 +97,32 @@ ModuleChange::~ModuleChange() {
 }
 
 void ModuleChange::undo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
 	mw->fromJson(oldModuleJ);
 }
 
 void ModuleChange::redo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
 	mw->fromJson(newModuleJ);
 }
 
 
 void ParamChange::undo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
 	mw->module->params[paramId].value = oldValue;
 }
 
 void ParamChange::redo() {
-	ModuleWidget *mw = app()->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
 	assert(mw);
 	mw->module->params[paramId].value = newValue;
 }
 
 
-void CableAdd::setCable(CableWidget *cw) {
+void CableAdd::setCable(app::CableWidget *cw) {
 	assert(cw->cable);
 	assert(cw->cable->id > 0);
 	cableId = cw->cable->id;
@@ -136,30 +136,30 @@ void CableAdd::setCable(CableWidget *cw) {
 }
 
 void CableAdd::undo() {
-	CableWidget *cw = app()->scene->rackWidget->getCable(cableId);
-	app()->scene->rackWidget->removeCable(cw);
+	app::CableWidget *cw = APP->scene->rackWidget->getCable(cableId);
+	APP->scene->rackWidget->removeCable(cw);
 	delete cw;
 }
 
 void CableAdd::redo() {
-	CableWidget *cw = new CableWidget;
+	app::CableWidget *cw = new app::CableWidget;
 	cw->cable->id = cableId;
 
-	ModuleWidget *outputModule = app()->scene->rackWidget->getModule(outputModuleId);
+	app::ModuleWidget *outputModule = APP->scene->rackWidget->getModule(outputModuleId);
 	assert(outputModule);
-	PortWidget *outputPort = outputModule->getOutput(outputId);
+	app::PortWidget *outputPort = outputModule->getOutput(outputId);
 	assert(outputPort);
 	cw->setOutput(outputPort);
 
-	ModuleWidget *inputModule = app()->scene->rackWidget->getModule(inputModuleId);
+	app::ModuleWidget *inputModule = APP->scene->rackWidget->getModule(inputModuleId);
 	assert(inputModule);
-	PortWidget *inputPort = inputModule->getInput(inputId);
+	app::PortWidget *inputPort = inputModule->getInput(inputId);
 	assert(inputPort);
 	cw->setInput(inputPort);
 
 	cw->color = color;
 
-	app()->scene->rackWidget->addCable(cw);
+	APP->scene->rackWidget->addCable(cw);
 }
 
 

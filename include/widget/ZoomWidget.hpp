@@ -1,8 +1,9 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 struct ZoomWidget : Widget {
@@ -51,4 +52,5 @@ struct ZoomWidget : Widget {
 };
 
 
+} // namespace widget
 } // namespace rack

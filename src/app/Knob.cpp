@@ -5,6 +5,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 static const float KNOB_SENSITIVITY = 0.0015f;
@@ -34,11 +35,11 @@ void Knob::onDragStart(const event::DragStart &e) {
 		}
 	}
 
-	app()->window->cursorLock();
+	APP->window->cursorLock();
 }
 
 void Knob::onDragEnd(const event::DragEnd &e) {
-	app()->window->cursorUnlock();
+	APP->window->cursorUnlock();
 
 	if (paramQuantity) {
 		float newValue = paramQuantity->getSmoothValue();
@@ -49,7 +50,7 @@ void Knob::onDragEnd(const event::DragEnd &e) {
 			h->paramId = paramQuantity->paramId;
 			h->oldValue = oldValue;
 			h->newValue = newValue;
-			app()->history->push(h);
+			APP->history->push(h);
 		}
 	}
 }
@@ -70,7 +71,7 @@ void Knob::onDragMove(const event::DragMove &e) {
 		delta *= range;
 
 		// Drag slower if mod is held
-		int mods = app()->window->getMods();
+		int mods = APP->window->getMods();
 		if ((mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 			delta /= 16.f;
 		}
@@ -96,4 +97,5 @@ void Knob::onDragMove(const event::DragMove &e) {
 }
 
 
+} // namespace app
 } // namespace rack

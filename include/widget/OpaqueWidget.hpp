@@ -1,8 +1,9 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 /** Widget that consumes recursing events but gives a chance for children to consume first.
@@ -48,4 +49,5 @@ struct OpaqueWidget : Widget {
 };
 
 
+} // namespace widget
 } // namespace rack

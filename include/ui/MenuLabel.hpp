@@ -4,14 +4,16 @@
 
 
 namespace rack {
+namespace ui {
 
 
 struct MenuLabel : MenuEntry {
 	std::string text;
 
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void step() override;
 };
 
 
+} // namespace ui
 } // namespace rack

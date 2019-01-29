@@ -50,9 +50,9 @@ void PatchManager::init(std::string path) {
 }
 
 void PatchManager::reset() {
-	app()->history->clear();
-	app()->scene->rackWidget->clear();
-	app()->scene->scrollWidget->offset = math::Vec(0, 0);
+	APP->history->clear();
+	APP->scene->rackWidget->clear();
+	APP->scene->scrollWidget->offset = math::Vec(0, 0);
 	// Fails silently if file does not exist
 	load(asset::user("template.vcv"));
 	legacy = 0;
@@ -159,9 +159,9 @@ bool PatchManager::load(std::string path) {
 		json_decref(rootJ);
 	});
 
-	app()->history->clear();
-	app()->scene->rackWidget->clear();
-	app()->scene->scrollWidget->offset = math::Vec(0, 0);
+	APP->history->clear();
+	APP->scene->rackWidget->clear();
+	APP->scene->scrollWidget->offset = math::Vec(0, 0);
 	fromJson(rootJ);
 	return true;
 }
@@ -207,7 +207,7 @@ void PatchManager::disconnectDialog() {
 	// if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
 	// 	return;
 
-	app()->scene->rackWidget->clearCablesAction();
+	APP->scene->rackWidget->clearCablesAction();
 }
 
 json_t *PatchManager::toJson() {
@@ -215,11 +215,11 @@ json_t *PatchManager::toJson() {
 	json_t *rootJ = json_object();
 
 	// version
-	json_t *versionJ = json_string(APP_VERSION);
+	json_t *versionJ = json_string(app::VERSION);
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// Merge with RackWidget JSON
-	json_t *rackJ = app()->scene->rackWidget->toJson();
+	json_t *rackJ = APP->scene->rackWidget->toJson();
 	// Merge with rootJ
 	json_object_update(rootJ, rackJ);
 	json_decref(rackJ);
@@ -235,8 +235,8 @@ void PatchManager::fromJson(json_t *rootJ) {
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ)
 		version = json_string_value(versionJ);
-	if (version != APP_VERSION) {
-		INFO("Patch made with Rack version %s, current Rack version is %s", version.c_str(), APP_VERSION);
+	if (version != app::VERSION) {
+		INFO("Patch made with Rack version %s, current Rack version is %s", version.c_str(), app::VERSION);
 	}
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
@@ -251,7 +251,7 @@ void PatchManager::fromJson(json_t *rootJ) {
 		INFO("Loading patch using legacy mode %d", legacy);
 	}
 
-	app()->scene->rackWidget->fromJson(rootJ);
+	APP->scene->rackWidget->fromJson(rootJ);
 
 	// Display a message if we have something to say
 	if (!warningLog.empty()) {

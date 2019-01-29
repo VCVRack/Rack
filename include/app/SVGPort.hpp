@@ -1,17 +1,18 @@
 #pragma once
 #include "app/common.hpp"
 #include "app/PortWidget.hpp"
-#include "widgets/FramebufferWidget.hpp"
-#include "widgets/SVGWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
+#include "widget/SVGWidget.hpp"
 #include "app/CircularShadow.hpp"
 
 
 namespace rack {
+namespace app {
 
 
 struct SVGPort : PortWidget {
-	FramebufferWidget *fb;
-	SVGWidget *sw;
+	widget::FramebufferWidget *fb;
+	widget::SVGWidget *sw;
 	CircularShadow *shadow;
 
 	SVGPort();
@@ -19,4 +20,5 @@ struct SVGPort : PortWidget {
 };
 
 
+} // namespace app
 } // namespace rack

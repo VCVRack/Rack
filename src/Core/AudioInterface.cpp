@@ -124,7 +124,7 @@ struct AudioInterface : Module {
 
 	void step() override {
 		// Update SRC states
-		int sampleRate = (int) app()->engine->getSampleRate();
+		int sampleRate = (int) APP->engine->getSampleRate();
 		inputSrc.setRates(audioIO.sampleRate, sampleRate);
 		outputSrc.setRates(sampleRate, audioIO.sampleRate);
 

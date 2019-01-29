@@ -5,6 +5,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 void Switch::step() {
@@ -50,7 +51,7 @@ void Switch::onDragStart(const event::DragStart &e) {
 				h->paramId = paramQuantity->paramId;
 				h->oldValue = oldValue;
 				h->newValue = newValue;
-				app()->history->push(h);
+				APP->history->push(h);
 			}
 		}
 	}
@@ -63,4 +64,5 @@ void Switch::onDragEnd(const event::DragEnd &e) {
 }
 
 
+} // namespace app
 } // namespace rack

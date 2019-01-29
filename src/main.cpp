@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 #ifdef ARCH_WIN
 	// Windows global mutex to prevent multiple instances
 	// Handle will be closed by Windows when the process ends
-	HANDLE instanceMutex = CreateMutex(NULL, true, APP_NAME);
+	HANDLE instanceMutex = CreateMutex(NULL, true, app::NAME);
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
 		exit(1);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 	logger::init(devMode);
 
 	// Log environment
-	INFO("%s %s", APP_NAME, APP_VERSION);
+	INFO("%s %s", app::NAME, app::VERSION);
 	if (devMode)
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());
@@ -83,22 +83,22 @@ int main(int argc, char *argv[]) {
 	INFO("Initialized environment");
 
 	// Initialize app
-	appInit();
-	app()->scene->devMode = devMode;
+	app::init();
+	APP->scene->devMode = devMode;
 	settings::load(asset::user("settings.json"));
-	app()->patch->init(patchPath);
+	APP->patch->init(patchPath);
 
 	INFO("Initialized app");
 
-	app()->engine->start();
-	app()->window->run();
+	APP->engine->start();
+	APP->window->run();
 	INFO("Window closed");
-	app()->engine->stop();
+	APP->engine->stop();
 
 	// Destroy app
-	app()->patch->save(asset::user("autosave.vcv"));
+	APP->patch->save(asset::user("autosave.vcv"));
 	settings::save(asset::user("settings.json"));
-	appDestroy();
+	app::destroy();
 	INFO("Cleaned up app");
 
 	// Destroy environment

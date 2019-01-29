@@ -26,7 +26,7 @@ static const NVGcolor SCHEME_DARK_GRAY = nvgRGB(0x17, 0x17, 0x17);
 // Knobs
 ////////////////////
 
-struct RoundKnob : SVGKnob {
+struct RoundKnob : app::SVGKnob {
 	RoundKnob() {
 		minAngle = -0.83*M_PI;
 		maxAngle = 0.83*M_PI;
@@ -64,7 +64,7 @@ struct RoundBlackSnapKnob : RoundBlackKnob {
 };
 
 
-struct Davies1900hKnob : SVGKnob {
+struct Davies1900hKnob : app::SVGKnob {
 	Davies1900hKnob() {
 		minAngle = -0.83*M_PI;
 		maxAngle = 0.83*M_PI;
@@ -108,7 +108,7 @@ struct Davies1900hLargeRedKnob : Davies1900hKnob {
 };
 
 
-struct Rogan : SVGKnob {
+struct Rogan : app::SVGKnob {
 	Rogan() {
 		minAngle = -0.83*M_PI;
 		maxAngle = 0.83*M_PI;
@@ -278,7 +278,7 @@ struct Rogan1PWhite : Rogan {
 };
 
 
-struct SynthTechAlco : SVGKnob {
+struct SynthTechAlco : app::SVGKnob {
 	SynthTechAlco() {
 		minAngle = -0.82*M_PI;
 		maxAngle = 0.82*M_PI;
@@ -289,7 +289,7 @@ struct SynthTechAlco : SVGKnob {
 	}
 };
 
-struct Trimpot : SVGKnob {
+struct Trimpot : app::SVGKnob {
 	Trimpot() {
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
@@ -297,7 +297,7 @@ struct Trimpot : SVGKnob {
 	}
 };
 
-struct BefacoBigKnob : SVGKnob {
+struct BefacoBigKnob : app::SVGKnob {
 	BefacoBigKnob() {
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
@@ -311,7 +311,7 @@ struct BefacoBigSnapKnob : BefacoBigKnob {
 	}
 };
 
-struct BefacoTinyKnob : SVGKnob {
+struct BefacoTinyKnob : app::SVGKnob {
 	BefacoTinyKnob() {
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
@@ -319,7 +319,7 @@ struct BefacoTinyKnob : SVGKnob {
 	}
 };
 
-struct BefacoSlidePot : SVGSlider {
+struct BefacoSlidePot : app::SVGSlider {
 	BefacoSlidePot() {
 		math::Vec margin = math::Vec(3.5, 3.5);
 		maxHandlePos = math::Vec(-1, -2).plus(margin);
@@ -331,7 +331,7 @@ struct BefacoSlidePot : SVGSlider {
 	}
 };
 
-struct LEDSlider : SVGSlider {
+struct LEDSlider : app::SVGSlider {
 	LEDSlider() {
 		maxHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)));
 		minHandlePos = mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0)));
@@ -374,19 +374,19 @@ struct LEDSliderWhite : LEDSlider {
 // Ports
 ////////////////////
 
-struct PJ301MPort : SVGPort {
+struct PJ301MPort : app::SVGPort {
 	PJ301MPort() {
 		setSVG(SVG::load(asset::system("res/ComponentLibrary/PJ301M.svg")));
 	}
 };
 
-struct PJ3410Port : SVGPort {
+struct PJ3410Port : app::SVGPort {
 	PJ3410Port() {
 		setSVG(SVG::load(asset::system("res/ComponentLibrary/PJ3410.svg")));
 	}
 };
 
-struct CL1362Port : SVGPort {
+struct CL1362Port : app::SVGPort {
 	CL1362Port() {
 		setSVG(SVG::load(asset::system("res/ComponentLibrary/CL1362.svg")));
 	}
@@ -396,7 +396,7 @@ struct CL1362Port : SVGPort {
 // Lights
 ////////////////////
 
-struct GrayModuleLightWidget : ModuleLightWidget {
+struct GrayModuleLightWidget : app::ModuleLightWidget {
 	GrayModuleLightWidget() {
 		bgColor = nvgRGB(0x5a, 0x5a, 0x5a);
 		borderColor = nvgRGBA(0, 0, 0, 0x60);
@@ -443,7 +443,7 @@ struct RedGreenBlueLight : GrayModuleLightWidget {
 	}
 };
 
-struct RGBLight : ModuleLightWidget {
+struct RGBLight : app::ModuleLightWidget {
 	RGBLight() {
 		addBaseColor(nvgRGBf(1, 0, 0));
 		addBaseColor(nvgRGBf(0, 1, 0));
@@ -509,7 +509,7 @@ struct PB61303Light : BASE {
 // Switches
 ////////////////////
 
-struct NKK : SVGSwitch {
+struct NKK : app::SVGSwitch {
 	NKK() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/NKK_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/NKK_1.svg")));
@@ -517,14 +517,14 @@ struct NKK : SVGSwitch {
 	}
 };
 
-struct CKSS : SVGSwitch {
+struct CKSS : app::SVGSwitch {
 	CKSS() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSS_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSS_1.svg")));
 	}
 };
 
-struct CKSSThree : SVGSwitch {
+struct CKSSThree : app::SVGSwitch {
 	CKSSThree() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSSThree_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKSSThree_1.svg")));
@@ -532,7 +532,7 @@ struct CKSSThree : SVGSwitch {
 	}
 };
 
-struct CKD6 : SVGSwitch {
+struct CKD6 : app::SVGSwitch {
 	CKD6() {
 		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKD6_0.svg")));
@@ -540,7 +540,7 @@ struct CKD6 : SVGSwitch {
 	}
 };
 
-struct TL1105 : SVGSwitch {
+struct TL1105 : app::SVGSwitch {
 	TL1105() {
 		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/TL1105_0.svg")));
@@ -548,14 +548,14 @@ struct TL1105 : SVGSwitch {
 	}
 };
 
-struct LEDButton : SVGSwitch {
+struct LEDButton : app::SVGSwitch {
 	LEDButton() {
 		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/LEDButton.svg")));
 	}
 };
 
-struct BefacoSwitch : SVGSwitch {
+struct BefacoSwitch : app::SVGSwitch {
 	BefacoSwitch() {
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/BefacoSwitch_0.svg")));
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/BefacoSwitch_1.svg")));
@@ -563,7 +563,7 @@ struct BefacoSwitch : SVGSwitch {
 	}
 };
 
-struct BefacoPush : SVGSwitch {
+struct BefacoPush : app::SVGSwitch {
 	BefacoPush() {
 		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/BefacoPush_0.svg")));
@@ -571,14 +571,14 @@ struct BefacoPush : SVGSwitch {
 	}
 };
 
-struct LEDBezel : SVGSwitch {
+struct LEDBezel : app::SVGSwitch {
 	LEDBezel() {
 		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/LEDBezel.svg")));
 	}
 };
 
-struct PB61303 : SVGSwitch {
+struct PB61303 : app::SVGSwitch {
 	PB61303() {
 		momentary = true;
 		addFrame(SVG::load(asset::system("res/ComponentLibrary/PB61303.svg")));
@@ -589,14 +589,14 @@ struct PB61303 : SVGSwitch {
 // Misc
 ////////////////////
 
-struct ScrewSilver : SVGScrew {
+struct ScrewSilver : app::SVGScrew {
 	ScrewSilver() {
 		sw->setSVG(SVG::load(asset::system("res/ComponentLibrary/ScrewSilver.svg")));
 		box.size = sw->box.size;
 	}
 };
 
-struct ScrewBlack : SVGScrew {
+struct ScrewBlack : app::SVGScrew {
 	ScrewBlack() {
 		sw->setSVG(SVG::load(asset::system("res/ComponentLibrary/ScrewBlack.svg")));
 		box.size = sw->box.size;

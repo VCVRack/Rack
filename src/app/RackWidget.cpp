@@ -1,5 +1,5 @@
 #include "app/RackWidget.hpp"
-#include "widgets/TransparentWidget.hpp"
+#include "widget/TransparentWidget.hpp"
 #include "app/RackRail.hpp"
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
@@ -15,6 +15,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 static ModuleWidget *moduleFromJson(json_t *moduleJ) {
@@ -41,10 +42,10 @@ static ModuleWidget *moduleFromJson(json_t *moduleJ) {
 }
 
 
-struct ModuleContainer : Widget {
-	void draw(const DrawContext &ctx) override {
+struct ModuleContainer : widget::Widget {
+	void draw(const widget::DrawContext &ctx) override {
 		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front of other ModuleWidgets.
-		for (Widget *child : children) {
+		for (widget::Widget *child : children) {
 			ModuleWidget *w = dynamic_cast<ModuleWidget*>(child);
 			assert(w);
 
@@ -54,17 +55,17 @@ struct ModuleContainer : Widget {
 			nvgRestore(ctx.vg);
 		}
 
-		Widget::draw(ctx);
+		widget::Widget::draw(ctx);
 	}
 };
 
 
-struct CableContainer : TransparentWidget {
-	void draw(const DrawContext &ctx) override {
-		Widget::draw(ctx);
+struct CableContainer : widget::TransparentWidget {
+	void draw(const widget::DrawContext &ctx) override {
+		widget::Widget::draw(ctx);
 
 		// Draw cable plugs
-		for (Widget *w : children) {
+		for (widget::Widget *w : children) {
 			CableWidget *cw = dynamic_cast<CableWidget*>(w);
 			assert(cw);
 			cw->drawPlugs(ctx);
@@ -74,7 +75,7 @@ struct CableContainer : TransparentWidget {
 
 
 RackWidget::RackWidget() {
-	rails = new FramebufferWidget;
+	rails = new widget::FramebufferWidget;
 	rails->box.size = math::Vec();
 	rails->oversample = 1.0;
 	{
@@ -102,7 +103,7 @@ void RackWidget::step() {
 	box.size = box.size.max(moduleSize);
 
 	// Adjust size and position of rails
-	Widget *rail = rails->children.front();
+	widget::Widget *rail = rails->children.front();
 	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
 	if (!rails->box.isContaining(bound)) {
 		math::Vec cellMargin = math::Vec(20, 1);
@@ -113,43 +114,43 @@ void RackWidget::step() {
 		rail->box.size = rails->box.size;
 	}
 
-	Widget::step();
+	widget::Widget::step();
 }
 
-void RackWidget::draw(const DrawContext &ctx) {
-	Widget::draw(ctx);
+void RackWidget::draw(const widget::DrawContext &ctx) {
+	widget::Widget::draw(ctx);
 }
 
 void RackWidget::onHover(const event::Hover &e) {
 	// Scroll with arrow keys
 	float arrowSpeed = 30.0;
-	if ((app()->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
+	if ((APP->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
 		arrowSpeed /= 16.0;
-	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
+	else if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
 		arrowSpeed *= 4.0;
-	else if ((app()->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
+	else if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
 		arrowSpeed /= 4.0;
 
-	ScrollWidget *scrollWidget = app()->scene->scrollWidget;
-	if (glfwGetKey(app()->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
+	ui::ScrollWidget *scrollWidget = APP->scene->scrollWidget;
+	if (glfwGetKey(APP->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		scrollWidget->offset.x -= arrowSpeed;
 	}
-	if (glfwGetKey(app()->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+	if (glfwGetKey(APP->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		scrollWidget->offset.x += arrowSpeed;
 	}
-	if (glfwGetKey(app()->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
+	if (glfwGetKey(APP->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
 		scrollWidget->offset.y -= arrowSpeed;
 	}
-	if (glfwGetKey(app()->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
+	if (glfwGetKey(APP->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		scrollWidget->offset.y += arrowSpeed;
 	}
 
-	OpaqueWidget::onHover(e);
+	widget::OpaqueWidget::onHover(e);
 	mousePos = e.pos;
 }
 
 void RackWidget::onHoverKey(const event::HoverKey &e) {
-	OpaqueWidget::onHoverKey(e);
+	widget::OpaqueWidget::onHoverKey(e);
 	if (e.getConsumed() != this)
 		return;
 
@@ -165,30 +166,30 @@ void RackWidget::onHoverKey(const event::HoverKey &e) {
 }
 
 void RackWidget::onDragHover(const event::DragHover &e) {
-	OpaqueWidget::onDragHover(e);
+	widget::OpaqueWidget::onDragHover(e);
 	mousePos = e.pos;
 }
 
 void RackWidget::onButton(const event::Button &e) {
-	OpaqueWidget::onButton(e);
+	widget::OpaqueWidget::onButton(e);
 	if (e.getConsumed() == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			app()->scene->moduleBrowser->visible = true;
+			APP->scene->moduleBrowser->visible = true;
 		}
 	}
 }
 
 void RackWidget::onZoom(const event::Zoom &e) {
 	rails->box.size = math::Vec();
-	OpaqueWidget::onZoom(e);
+	widget::OpaqueWidget::onZoom(e);
 }
 
 void RackWidget::clear() {
 	// This isn't required because removing all ModuleWidgets should remove all cables, but do it just in case.
 	clearCables();
 	// Remove ModuleWidgets
-	std::list<Widget*> widgets = moduleContainer->children;
-	for (Widget *w : widgets) {
+	std::list<widget::Widget*> widgets = moduleContainer->children;
+	for (widget::Widget *w : widgets) {
 		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
 		assert(moduleWidget);
 		removeModule(moduleWidget);
@@ -201,7 +202,7 @@ json_t *RackWidget::toJson() {
 
 	// modules
 	json_t *modulesJ = json_array();
-	for (Widget *w : moduleContainer->children) {
+	for (widget::Widget *w : moduleContainer->children) {
 		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
 		assert(moduleWidget);
 		// module
@@ -220,7 +221,7 @@ json_t *RackWidget::toJson() {
 
 	// cables
 	json_t *cablesJ = json_array();
-	for (Widget *w : cableContainer->children) {
+	for (widget::Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 
@@ -257,7 +258,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			double x, y;
 			json_unpack(posJ, "[F, F]", &x, &y);
 			math::Vec pos = math::Vec(x, y);
-			if (app()->patch->isLegacy(1)) {
+			if (APP->patch->isLegacy(1)) {
 				// Before 0.6, positions were in pixel units
 				moduleWidget->box.pos = pos;
 			}
@@ -265,7 +266,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 				moduleWidget->box.pos = pos.mult(RACK_GRID_SIZE);
 			}
 
-			if (app()->patch->isLegacy(2)) {
+			if (APP->patch->isLegacy(2)) {
 				// Before 1.0, the module ID was the index in the "modules" array
 				moduleWidgets[moduleIndex] = moduleWidget;
 			}
@@ -279,7 +280,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			json_t *modelSlugJ = json_object_get(moduleJ, "model");
 			std::string pluginSlug = json_string_value(pluginSlugJ);
 			std::string modelSlug = json_string_value(modelSlugJ);
-			app()->patch->warningLog += string::f("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
+			APP->patch->warningLog += string::f("Could not find module \"%s\" of plugin \"%s\"\n", modelSlug.c_str(), pluginSlug.c_str());
 		}
 	}
 
@@ -304,7 +305,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 }
 
 void RackWidget::pastePresetClipboardAction() {
-	const char *moduleJson = glfwGetClipboardString(app()->window->win);
+	const char *moduleJson = glfwGetClipboardString(APP->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
 		return;
@@ -320,7 +321,7 @@ void RackWidget::pastePresetClipboardAction() {
 		// history::ModuleAdd
 		history::ModuleAdd *h = new history::ModuleAdd;
 		h->setModule(mw);
-		app()->history->push(h);
+		APP->history->push(h);
 	}
 	else {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
@@ -334,7 +335,7 @@ void RackWidget::addModule(ModuleWidget *m) {
 
 	if (m->module) {
 		// Add module to Engine
-		app()->engine->addModule(m->module);
+		APP->engine->addModule(m->module);
 	}
 }
 
@@ -352,7 +353,7 @@ void RackWidget::removeModule(ModuleWidget *m) {
 
 	if (m->module) {
 		// Remove module from Engine
-		app()->engine->removeModule(m->module);
+		APP->engine->removeModule(m->module);
 	}
 
 	// Remove module from ModuleContainer
@@ -365,7 +366,7 @@ bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect requestedBox) {
 		return false;
 
 	// Check intersection with other modules
-	for (Widget *m2 : moduleContainer->children) {
+	for (widget::Widget *m2 : moduleContainer->children) {
 		// Don't intersect with self
 		if (m == m2)
 			continue;
@@ -407,7 +408,7 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect requestedBo
 }
 
 ModuleWidget *RackWidget::getModule(int moduleId) {
-	for (Widget *w : moduleContainer->children) {
+	for (widget::Widget *w : moduleContainer->children) {
 		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
 		assert(moduleWidget);
 		if (moduleWidget->module->id == moduleId)
@@ -421,13 +422,13 @@ bool RackWidget::isEmpty() {
 }
 
 void RackWidget::clearCables() {
-	for (Widget *w : cableContainer->children) {
+	for (widget::Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (!cw->isComplete())
 			continue;
 
-		app()->engine->removeCable(cw->cable);
+		APP->engine->removeCable(cw->cable);
 	}
 	incompleteCable = NULL;
 	cableContainer->clearChildren();
@@ -437,7 +438,7 @@ void RackWidget::clearCablesAction() {
 	// Add CableRemove for every cable to a ComplexAction
 	history::ComplexAction *complexAction = new history::ComplexAction;
 
-	for (Widget *w : cableContainer->children) {
+	for (widget::Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (!cw->isComplete())
@@ -449,7 +450,7 @@ void RackWidget::clearCablesAction() {
 		complexAction->push(h);
 	}
 
-	app()->history->push(complexAction);
+	APP->history->push(complexAction);
 	clearCables();
 }
 
@@ -469,13 +470,13 @@ void RackWidget::clearCablesOnPort(PortWidget *port) {
 
 void RackWidget::addCable(CableWidget *w) {
 	assert(w->isComplete());
-	app()->engine->addCable(w->cable);
+	APP->engine->addCable(w->cable);
 	cableContainer->addChild(w);
 }
 
 void RackWidget::removeCable(CableWidget *w) {
 	assert(w->isComplete());
-	app()->engine->removeCable(w->cable);
+	APP->engine->removeCable(w->cable);
 	cableContainer->removeChild(w);
 }
 
@@ -512,7 +513,7 @@ CableWidget *RackWidget::getTopCable(PortWidget *port) {
 }
 
 CableWidget *RackWidget::getCable(int cableId) {
-	for (Widget *w : cableContainer->children) {
+	for (widget::Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (cw->cable->id == cableId)
@@ -524,7 +525,7 @@ CableWidget *RackWidget::getCable(int cableId) {
 std::list<CableWidget*> RackWidget::getCablesOnPort(PortWidget *port) {
 	assert(port);
 	std::list<CableWidget*> cables;
-	for (Widget *w : cableContainer->children) {
+	for (widget::Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (cw->inputPort == port || cw->outputPort == port) {
@@ -535,4 +536,5 @@ std::list<CableWidget*> RackWidget::getCablesOnPort(PortWidget *port) {
 }
 
 
+} // namespace app
 } // namespace rack

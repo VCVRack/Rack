@@ -2,9 +2,10 @@
 
 
 namespace rack {
+namespace ui {
 
 
-void PasswordField::draw(const DrawContext &ctx) {
+void PasswordField::draw(const widget::DrawContext &ctx) {
 	std::string textTmp = text;
 	text = std::string(textTmp.size(), '*');
 	TextField::draw(ctx);
@@ -12,4 +13,5 @@ void PasswordField::draw(const DrawContext &ctx) {
 }
 
 
+} // namespace ui
 } // namespace rack

@@ -45,7 +45,7 @@ struct MIDI_CC : Module {
 			processMessage(msg);
 		}
 
-		float lambda = app()->engine->getSampleTime() * 100.f;
+		float lambda = APP->engine->getSampleTime() * 100.f;
 		for (int i = 0; i < 16; i++) {
 			if (!outputs[CC_OUTPUT + i].isConnected())
 				continue;

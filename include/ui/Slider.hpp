@@ -1,20 +1,21 @@
 #pragma once
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "ui/Quantity.hpp"
 #include "ui/common.hpp"
 #include "app.hpp"
 
 
 namespace rack {
+namespace ui {
 
 
-struct Slider : OpaqueWidget {
+struct Slider : widget::OpaqueWidget {
 	BNDwidgetState state = BND_DEFAULT;
 	Quantity *quantity = NULL;
 
 	Slider();
 	~Slider();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void onDragStart(const event::DragStart &e) override;
 	void onDragMove(const event::DragMove &e) override;
 	void onDragEnd(const event::DragEnd &e) override;
@@ -22,4 +23,5 @@ struct Slider : OpaqueWidget {
 };
 
 
+} // namespace ui
 } // namespace rack

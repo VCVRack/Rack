@@ -4,11 +4,13 @@
 
 
 namespace rack {
+namespace ui {
 
 
 struct ChoiceButton : Button {
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 };
 
 
+} // namespace ui
 } // namespace rack

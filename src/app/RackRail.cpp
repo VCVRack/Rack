@@ -2,8 +2,9 @@
 
 
 namespace rack {
+namespace app {
 
-void RackRail::draw(const DrawContext &ctx) {
+void RackRail::draw(const widget::DrawContext &ctx) {
 	const float railHeight = RACK_GRID_WIDTH;
 
 	// Background color
@@ -58,4 +59,5 @@ void RackRail::draw(const DrawContext &ctx) {
 }
 
 
+} // namespace app
 } // namespace rack

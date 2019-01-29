@@ -1,8 +1,9 @@
-#include "widgets/GLWidget.hpp"
+#include "widget/GLWidget.hpp"
 #include "app.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 void GLWidget::step() {
@@ -31,4 +32,5 @@ void GLWidget::drawFramebuffer() {
 }
 
 
+} // namespace widget
 } // namespace rack

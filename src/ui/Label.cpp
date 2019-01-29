@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 Label::Label() {
@@ -10,7 +11,7 @@ Label::Label() {
 	color = bndGetTheme()->regularTheme.textColor;
 }
 
-void Label::draw(const DrawContext &ctx) {
+void Label::draw(const widget::DrawContext &ctx) {
 	// TODO
 	// Custom font sizes do not work with right or center alignment
 	float x;
@@ -31,4 +32,5 @@ void Label::draw(const DrawContext &ctx) {
 }
 
 
+} // namespace ui
 } // namespace rack

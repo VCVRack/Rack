@@ -1,14 +1,15 @@
 #pragma once
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "ui/common.hpp"
 #include "event.hpp"
 #include "app.hpp"
 
 
 namespace rack {
+namespace ui {
 
 
-struct TextField : OpaqueWidget {
+struct TextField : widget::OpaqueWidget {
 	std::string text;
 	std::string placeholder;
 	bool multiline = false;
@@ -20,7 +21,7 @@ struct TextField : OpaqueWidget {
 	int selection = 0;
 
 	TextField();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void onButton(const event::Button &e) override;
 	void onHover(const event::Hover &e) override;
 	void onEnter(const event::Enter &e) override;
@@ -37,4 +38,5 @@ struct TextField : OpaqueWidget {
 };
 
 
+} // namespace ui
 } // namespace rack

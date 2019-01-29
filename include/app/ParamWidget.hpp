@@ -1,22 +1,23 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "ui/Tooltip.hpp"
 #include "app/ParamQuantity.hpp"
 #include "history.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-struct ParamWidget : OpaqueWidget {
+struct ParamWidget : widget::OpaqueWidget {
 	ParamQuantity *paramQuantity = NULL;
 	float dirtyValue = NAN;
-	Tooltip *tooltip = NULL;
+	ui::Tooltip *tooltip = NULL;
 
 	~ParamWidget();
 	void step() override;
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void onButton(const event::Button &e) override;
 	void onEnter(const event::Enter &e) override;
 	void onLeave(const event::Leave &e) override;
@@ -28,4 +29,5 @@ struct ParamWidget : OpaqueWidget {
 };
 
 
+} // namespace app
 } // namespace rack

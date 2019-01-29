@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 CircularShadow::CircularShadow() {
@@ -9,7 +10,7 @@ CircularShadow::CircularShadow() {
 	opacity = 0.15;
 }
 
-void CircularShadow::draw(const DrawContext &ctx) {
+void CircularShadow::draw(const widget::DrawContext &ctx) {
 	if (opacity <= 0.0)
 		return;
 
@@ -25,4 +26,5 @@ void CircularShadow::draw(const DrawContext &ctx) {
 }
 
 
+} // namespace app
 } // namespace rack

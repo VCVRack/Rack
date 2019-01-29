@@ -13,12 +13,13 @@
 
 
 namespace rack {
+namespace app {
 
 
 Scene::Scene() {
 	scrollWidget = new RackScrollWidget;
 	{
-		zoomWidget = new ZoomWidget;
+		zoomWidget = new widget::ZoomWidget;
 		{
 			rackWidget = new RackWidget;
 			zoomWidget->addChild(rackWidget);
@@ -44,25 +45,25 @@ void Scene::step() {
 	toolbar->box.size.x = box.size.x;
 	scrollWidget->box.size = box.size.minus(scrollWidget->box.pos);
 
-	// Resize to be a bit larger than the ScrollWidget viewport
+	// Resize to be a bit larger than the ui::ScrollWidget viewport
 	rackWidget->box.size = scrollWidget->box.size
 		.minus(scrollWidget->container->box.pos)
 		.plus(math::Vec(500, 500))
 		.div(zoomWidget->zoom);
 
-	OpaqueWidget::step();
+	widget::OpaqueWidget::step();
 
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 
 	// Autosave every 15 seconds
-	int frame = app()->window->frame;
+	int frame = APP->window->frame;
 	if (frame > 0 && frame % (60 * 15) == 0) {
-		app()->patch->save(asset::user("autosave.vcv"));
+		APP->patch->save(asset::user("autosave.vcv"));
 		settings::save(asset::user("settings.json"));
 	}
 
 	// Set zoom every few frames
-	if (app()->window->frame % 10 == 0)
+	if (APP->window->frame % 10 == 0)
 		zoomWidget->setZoom(std::round(settings::zoom * 100) / 100);
 
 	// Request latest version from server
@@ -74,18 +75,18 @@ void Scene::step() {
 
 	// Version popup message
 	if (!latestVersion.empty()) {
-		std::string versionMessage = string::f("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", latestVersion.c_str(), APP_VERSION);
+		std::string versionMessage = string::f("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", latestVersion.c_str(), app::VERSION);
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
 			std::thread t(system::openBrowser, "https://vcvrack.com/");
 			t.detach();
-			app()->window->close();
+			APP->window->close();
 		}
 		latestVersion = "";
 	}
 }
 
-void Scene::draw(const DrawContext &ctx) {
-	OpaqueWidget::draw(ctx);
+void Scene::draw(const widget::DrawContext &ctx) {
+	widget::OpaqueWidget::draw(ctx);
 }
 
 void Scene::onHoverKey(const event::HoverKey &e) {
@@ -93,43 +94,43 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					app()->patch->resetDialog();
+					APP->patch->resetDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Q: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					app()->window->close();
+					APP->window->close();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_O: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					app()->patch->loadDialog();
+					APP->patch->loadDialog();
 					e.consume(this);
 				}
 				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
-					app()->patch->revertDialog();
+					APP->patch->revertDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_S: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					app()->patch->saveDialog();
+					APP->patch->saveDialog();
 					e.consume(this);
 				}
 				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
-					app()->patch->saveAsDialog();
+					APP->patch->saveAsDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Z: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-					app()->history->undo();
+					APP->history->undo();
 					e.consume(this);
 				}
 				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
-					app()->history->redo();
+					APP->history->redo();
 					e.consume(this);
 				}
 			} break;
@@ -139,31 +140,31 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 				e.consume(this);
 			} break;
 			case GLFW_KEY_F11: {
-				app()->window->setFullScreen(!app()->window->isFullScreen());
+				APP->window->setFullScreen(!APP->window->isFullScreen());
 				e.consume(this);
 			}
 		}
 	}
 
 	if (!e.getConsumed())
-		OpaqueWidget::onHoverKey(e);
+		widget::OpaqueWidget::onHoverKey(e);
 }
 
 void Scene::onPathDrop(const event::PathDrop &e) {
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
 		if (string::extension(path) == "vcv") {
-			app()->patch->load(path);
+			APP->patch->load(path);
 			e.consume(this);
 		}
 	}
 
 	if (!e.getConsumed())
-		OpaqueWidget::onPathDrop(e);
+		widget::OpaqueWidget::onPathDrop(e);
 }
 
 void Scene::runCheckVersion() {
-	std::string versionUrl = APP_API_URL;
+	std::string versionUrl = app::API_URL;
 	versionUrl += "/version";
 	json_t *versionResJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
 
@@ -171,7 +172,7 @@ void Scene::runCheckVersion() {
 		json_t *versionJ = json_object_get(versionResJ, "version");
 		if (versionJ) {
 			std::string version = json_string_value(versionJ);
-			if (version != APP_VERSION) {
+			if (version != app::VERSION) {
 				latestVersion = version;
 			}
 		}
@@ -180,4 +181,5 @@ void Scene::runCheckVersion() {
 }
 
 
+} // namespace app
 } // namespace rack

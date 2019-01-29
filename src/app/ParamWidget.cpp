@@ -11,15 +11,16 @@
 
 
 namespace rack {
+namespace app {
 
 
-struct ParamField : TextField {
+struct ParamField : ui::TextField {
 	ParamWidget *paramWidget;
 
 	void step() override {
 		// Keep selected
-		app()->event->setSelected(this);
-		TextField::step();
+		APP->event->setSelected(this);
+		ui::TextField::step();
 	}
 
 	void setParamWidget(ParamWidget *paramWidget) {
@@ -43,26 +44,26 @@ struct ParamField : TextField {
 				h->paramId = paramWidget->paramQuantity->paramId;
 				h->oldValue = oldValue;
 				h->newValue = newValue;
-				app()->history->push(h);
+				APP->history->push(h);
 			}
 
-			MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
+			ui::MenuOverlay *overlay = getAncestorOfType<ui::MenuOverlay>();
 			overlay->requestedDelete = true;
 			e.consume(this);
 		}
 
 		if (!e.getConsumed())
-			TextField::onSelectKey(e);
+			ui::TextField::onSelectKey(e);
 	}
 };
 
 
-struct ParamTooltip : Tooltip {
+struct ParamTooltip : ui::Tooltip {
 	ParamWidget *paramWidget;
 
 	void step() override {
 		if (paramWidget->paramQuantity) {
-			// Quantity string
+			// ui::Quantity string
 			text = paramWidget->paramQuantity->getString();
 			// Param description
 			std::string description = paramWidget->paramQuantity->getParam()->description;
@@ -71,21 +72,21 @@ struct ParamTooltip : Tooltip {
 		}
 		// Position at bottom-right of parameter
 		box.pos = paramWidget->getAbsoluteOffset(paramWidget->box.size).round();
-		Tooltip::step();
+		ui::Tooltip::step();
 	}
 };
 
 
-struct ParamLabel : MenuLabel {
+struct ParamLabel : ui::MenuLabel {
 	ParamWidget *paramWidget;
 	void step() override {
 		text = paramWidget->paramQuantity->getString();
-		MenuLabel::step();
+		ui::MenuLabel::step();
 	}
 };
 
 
-struct ParamResetItem : MenuItem {
+struct ParamResetItem : ui::MenuItem {
 	ParamWidget *paramWidget;
 	ParamResetItem() {
 		text = "Initialize";
@@ -97,7 +98,7 @@ struct ParamResetItem : MenuItem {
 };
 
 
-struct ParamFineItem : MenuItem {
+struct ParamFineItem : ui::MenuItem {
 	ParamFineItem() {
 		text = "Fine adjust";
 		rightText = WINDOW_MOD_CTRL_NAME "+Drag";
@@ -122,11 +123,11 @@ void ParamWidget::step() {
 		}
 	}
 
-	OpaqueWidget::step();
+	widget::OpaqueWidget::step();
 }
 
-void ParamWidget::draw(const DrawContext &ctx) {
-	Widget::draw(ctx);
+void ParamWidget::draw(const widget::DrawContext &ctx) {
+	widget::Widget::draw(ctx);
 
 	// if (paramQuantity) {
 	// 	nvgBeginPath(ctx.vg);
@@ -157,21 +158,21 @@ void ParamWidget::onButton(const event::Button &e) {
 	}
 
 	if (!e.getConsumed())
-		OpaqueWidget::onButton(e);
+		widget::OpaqueWidget::onButton(e);
 }
 
 void ParamWidget::onEnter(const event::Enter &e) {
 	if (settings::paramTooltip && !tooltip && paramQuantity) {
 		ParamTooltip *paramTooltip = new ParamTooltip;
 		paramTooltip->paramWidget = this;
-		app()->scene->addChild(paramTooltip);
+		APP->scene->addChild(paramTooltip);
 		tooltip = paramTooltip;
 	}
 }
 
 void ParamWidget::onLeave(const event::Leave &e) {
 	if (tooltip) {
-		app()->scene->removeChild(tooltip);
+		APP->scene->removeChild(tooltip);
 		delete tooltip;
 		tooltip = NULL;
 	}
@@ -186,7 +187,7 @@ void ParamWidget::fromJson(json_t *rootJ) {
 }
 
 void ParamWidget::createContextMenu() {
-	Menu *menu = createMenu();
+	ui::Menu *menu = createMenu();
 
 	ParamLabel *paramLabel = new ParamLabel;
 	paramLabel->paramWidget = this;
@@ -218,7 +219,7 @@ void ParamWidget::resetAction() {
 			h->paramId = paramQuantity->paramId;
 			h->oldValue = oldValue;
 			h->newValue = newValue;
-			app()->history->push(h);
+			APP->history->push(h);
 		}
 
 		// Here's another way of doing it, but either works.
@@ -227,4 +228,5 @@ void ParamWidget::resetAction() {
 }
 
 
+} // namespace app
 } // namespace rack

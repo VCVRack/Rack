@@ -1,19 +1,21 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-struct Toolbar : OpaqueWidget {
+struct Toolbar : widget::OpaqueWidget {
 	// TODO Move these to future Rack app state
 	float cableOpacity = 0.5;
 	float cableTension = 0.5;
 
 	Toolbar();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 };
 
 
+} // namespace app
 } // namespace rack

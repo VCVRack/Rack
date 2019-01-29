@@ -70,7 +70,7 @@ struct MIDI_Gate : Module {
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-		float deltaTime = app()->engine->getSampleTime();
+		float deltaTime = APP->engine->getSampleTime();
 
 		for (int i = 0; i < 16; i++) {
 			if (gateTimes[i] > 0.f) {

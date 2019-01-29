@@ -1,12 +1,12 @@
 #include "event.hpp"
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 
 
 namespace rack {
 namespace event {
 
 
-void State::setHovered(Widget *w) {
+void State::setHovered(widget::Widget *w) {
 	if (w == hoveredWidget)
 		return;
 
@@ -25,7 +25,7 @@ void State::setHovered(Widget *w) {
 	}
 }
 
-void State::setDragged(Widget *w) {
+void State::setDragged(widget::Widget *w) {
 	if (w == draggedWidget)
 		return;
 
@@ -44,7 +44,7 @@ void State::setDragged(Widget *w) {
 	}
 }
 
-void State::setDragHovered(Widget *w) {
+void State::setDragHovered(widget::Widget *w) {
 	if (w == dragHoveredWidget)
 		return;
 
@@ -65,7 +65,7 @@ void State::setDragHovered(Widget *w) {
 	}
 }
 
-void State::setSelected(Widget *w) {
+void State::setSelected(widget::Widget *w) {
 	if (w == selectedWidget)
 		return;
 
@@ -84,7 +84,7 @@ void State::setSelected(Widget *w) {
 	}
 }
 
-void State::finalizeWidget(Widget *w) {
+void State::finalizeWidget(widget::Widget *w) {
 	if (hoveredWidget == w) setHovered(NULL);
 	if (draggedWidget == w) setDragged(NULL);
 	if (dragHoveredWidget == w) setDragHovered(NULL);
@@ -102,7 +102,7 @@ void State::handleButton(math::Vec pos, int button, int action, int mods) {
 	eButton.action = action;
 	eButton.mods = mods;
 	rootWidget->onButton(eButton);
-	Widget *clickedWidget = eButtonContext.consumed;
+	widget::Widget *clickedWidget = eButtonContext.consumed;
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (action == GLFW_PRESS) {

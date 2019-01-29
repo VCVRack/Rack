@@ -28,7 +28,7 @@ static std::map<std::string, std::weak_ptr<SVG>> svgCache;
 
 
 Font::Font(const std::string &filename) {
-	handle = nvgCreateFont(app()->window->vg, filename.c_str(), filename.c_str());
+	handle = nvgCreateFont(APP->window->vg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		INFO("Loaded font %s", filename.c_str());
 	}
@@ -49,7 +49,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 }
 
 Image::Image(const std::string &filename) {
-	handle = nvgCreateImage(app()->window->vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
+	handle = nvgCreateImage(APP->window->vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		INFO("Loaded image %s", filename.c_str());
 	}
@@ -60,7 +60,7 @@ Image::Image(const std::string &filename) {
 
 Image::~Image() {
 	// TODO What if handle is invalid?
-	nvgDeleteImage(app()->window->vg, handle);
+	nvgDeleteImage(APP->window->vg, handle);
 }
 
 std::shared_ptr<Image> Image::load(const std::string &filename) {
@@ -71,7 +71,7 @@ std::shared_ptr<Image> Image::load(const std::string &filename) {
 }
 
 SVG::SVG(const std::string &filename) {
-	handle = nsvgParseFromFile(filename.c_str(), "px", APP_SVG_DPI);
+	handle = nsvgParseFromFile(filename.c_str(), "px", app::SVG_DPI);
 	if (handle) {
 		INFO("Loaded SVG %s", filename.c_str());
 	}
@@ -118,7 +118,7 @@ static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mod
 	}
 #endif
 
-	app()->event->handleButton(window->mousePos, button, action, mods);
+	APP->event->handleButton(window->mousePos, button, action, mods);
 }
 
 static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
@@ -144,12 +144,12 @@ static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
 
 	window->mousePos = mousePos;
 
-	app()->event->handleHover(mousePos, mouseDelta);
+	APP->event->handleHover(mousePos, mouseDelta);
 }
 
 static void cursorEnterCallback(GLFWwindow *win, int entered) {
 	if (!entered) {
-		app()->event->handleLeave();
+		APP->event->handleLeave();
 	}
 }
 
@@ -158,17 +158,17 @@ static void scrollCallback(GLFWwindow *win, double x, double y) {
 	math::Vec scrollDelta = math::Vec(x, y);
 	scrollDelta = scrollDelta.mult(50.0);
 
-	app()->event->handleScroll(window->mousePos, scrollDelta);
+	APP->event->handleScroll(window->mousePos, scrollDelta);
 }
 
 static void charCallback(GLFWwindow *win, unsigned int codepoint) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
-	app()->event->handleText(window->mousePos, codepoint);
+	APP->event->handleText(window->mousePos, codepoint);
 }
 
 static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
-	app()->event->handleKey(window->mousePos, key, scancode, action, mods);
+	APP->event->handleKey(window->mousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
 	if ((mods & WINDOW_MOD_MASK) == 0) {
@@ -187,7 +187,7 @@ static void dropCallback(GLFWwindow *win, int count, const char **paths) {
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
 	}
-	app()->event->handleDrop(window->mousePos, pathsVec);
+	APP->event->handleDrop(window->mousePos, pathsVec);
 }
 
 static void errorCallback(int error, const char *description) {
@@ -314,12 +314,12 @@ void Window::run() {
 
 		// Set window title
 		std::string windowTitle;
-		windowTitle = APP_NAME;
+		windowTitle = app::NAME;
 		windowTitle += " ";
-		windowTitle += APP_VERSION;
-		if (!app()->patch->path.empty()) {
+		windowTitle += app::VERSION;
+		if (!APP->patch->path.empty()) {
 			windowTitle += " - ";
-			windowTitle += string::filename(app()->patch->path);
+			windowTitle += string::filename(APP->patch->path);
 		}
 		if (windowTitle != internal->lastWindowTitle) {
 			glfwSetWindowTitle(win, windowTitle.c_str());
@@ -333,7 +333,7 @@ void Window::run() {
 		glfwGetWindowContentScale(win, &pixelRatio, NULL);
 		pixelRatio = std::round(pixelRatio);
 		if (pixelRatio != this->pixelRatio) {
-			app()->event->handleZoom();
+			APP->event->handleZoom();
 			this->pixelRatio = pixelRatio;
 		}
 
@@ -345,10 +345,10 @@ void Window::run() {
 		windowRatio = (float)fbWidth / winWidth;
 
 		// Resize scene
-		app()->event->rootWidget->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
+		APP->event->rootWidget->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
 
 		// Step scene
-		app()->event->rootWidget->step();
+		APP->event->rootWidget->step();
 
 		// Render
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
@@ -359,9 +359,9 @@ void Window::run() {
 			// nvgReset(vg);
 			// nvgScale(vg, pixelRatio, pixelRatio);
 
-			DrawContext ctx;
+			widget::DrawContext ctx;
 			ctx.vg = vg;
-			app()->event->rootWidget->draw(ctx);
+			APP->event->rootWidget->draw(ctx);
 
 			glViewport(0, 0, fbWidth, fbHeight);
 			glClearColor(0.0, 0.0, 0.0, 1.0);

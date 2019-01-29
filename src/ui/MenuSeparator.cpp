@@ -2,13 +2,14 @@
 
 
 namespace rack {
+namespace ui {
 
 
 MenuSeparator::MenuSeparator() {
 	box.size.y = BND_WIDGET_HEIGHT / 2;
 }
 
-void MenuSeparator::draw(const DrawContext &ctx) {
+void MenuSeparator::draw(const widget::DrawContext &ctx) {
 	nvgBeginPath(ctx.vg);
 	const float margin = 8.0;
 	nvgMoveTo(ctx.vg, margin, box.size.y / 2.0);
@@ -19,4 +20,5 @@ void MenuSeparator::draw(const DrawContext &ctx) {
 }
 
 
+} // namespace ui
 } // namespace rack

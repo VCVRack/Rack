@@ -102,8 +102,8 @@ struct CcChoice : LedDisplayChoice {
 		else {
 			text = string::f("%d", module->learnedCcs[id]);
 			color.a = 1.0;
-			if (app()->event->selectedWidget == this)
-				app()->event->selectedWidget = NULL;
+			if (APP->event->selectedWidget == this)
+				APP->event->selectedWidget = NULL;
 		}
 	}
 
@@ -140,7 +140,7 @@ struct CcChoice : LedDisplayChoice {
 		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & WINDOW_MOD_MASK) == 0) {
 			event::Deselect eDeselect;
 			onDeselect(eDeselect);
-			app()->event->selectedWidget = NULL;
+			APP->event->selectedWidget = NULL;
 			e.consume(this);
 		}
 	}
@@ -179,8 +179,8 @@ struct NoteChoice : LedDisplayChoice {
 			text = string::f("%s%d", noteNames[semi], oct);
 			color.a = 1.0;
 
-			if (app()->event->selectedWidget == this)
-				app()->event->selectedWidget = NULL;
+			if (APP->event->selectedWidget == this)
+				APP->event->selectedWidget = NULL;
 		}
 	}
 

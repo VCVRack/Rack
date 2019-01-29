@@ -76,7 +76,7 @@ struct MIDI_CV : Module {
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-		float deltaTime = app()->engine->getSampleTime();
+		float deltaTime = APP->engine->getSampleTime();
 
 		outputs[CV_OUTPUT].setVoltage((lastNote - 60) / 12.f);
 		outputs[GATE_OUTPUT].setVoltage(gate ? 10.f : 0.f);

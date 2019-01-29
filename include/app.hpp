@@ -13,10 +13,16 @@ namespace history {
 	struct State;
 }
 
-struct Scene;
+
 struct Engine;
 struct Window;
 struct PatchManager;
+
+
+namespace app {
+
+
+struct Scene;
 
 
 /** Contains the application state  */
@@ -33,10 +39,15 @@ struct App {
 };
 
 
-void appInit();
-void appDestroy();
-/** Returns the global context */
-App *app();
+void init();
+void destroy();
+/** Returns the global App pointer */
+App *get();
 
 
+/** Accesses the global App pointer */
+#define APP rack::app::get()
+
+
+} // namespace app
 } // namespace rack

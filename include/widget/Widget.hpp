@@ -8,6 +8,7 @@
 
 
 namespace rack {
+namespace widget {
 
 
 struct DrawContext {
@@ -144,4 +145,5 @@ struct Widget {
 };
 
 
+} // namespace widget
 } // namespace rack

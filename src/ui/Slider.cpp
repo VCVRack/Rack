@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 static const float SENSITIVITY = 0.001f;
@@ -16,7 +17,7 @@ Slider::~Slider() {
 		delete quantity;
 }
 
-void Slider::draw(const DrawContext &ctx) {
+void Slider::draw(const widget::DrawContext &ctx) {
 	float progress = quantity ? quantity->getScaledValue() : 0.f;
 	std::string text = quantity ? quantity->getString() : "";
 	bndSlider(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
@@ -24,7 +25,7 @@ void Slider::draw(const DrawContext &ctx) {
 
 void Slider::onDragStart(const event::DragStart &e) {
 	state = BND_ACTIVE;
-	app()->window->cursorLock();
+	APP->window->cursorLock();
 }
 
 void Slider::onDragMove(const event::DragMove &e) {
@@ -35,7 +36,7 @@ void Slider::onDragMove(const event::DragMove &e) {
 
 void Slider::onDragEnd(const event::DragEnd &e) {
 	state = BND_DEFAULT;
-	app()->window->cursorUnlock();
+	APP->window->cursorUnlock();
 }
 
 void Slider::onButton(const event::Button &e) {
@@ -47,4 +48,5 @@ void Slider::onButton(const event::Button &e) {
 }
 
 
+} // namespace ui
 } // namespace rack

@@ -8,6 +8,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 App::App() {
@@ -33,20 +34,21 @@ App::~App() {
 
 static App *c = NULL;
 
-void appInit() {
+void init() {
 	assert(!c);
 	c = new App;
 }
 
-void appDestroy() {
+void destroy() {
 	assert(c);
 	delete c;
 	c = NULL;
 }
 
-App *app() {
+App *get() {
 	return c;
 }
 
 
+} // namespace app
 } // namespace rack

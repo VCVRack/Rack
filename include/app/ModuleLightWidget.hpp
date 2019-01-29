@@ -5,6 +5,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 /** A MultiLightWidget that points to a module's Light or a range of lights
@@ -17,4 +18,5 @@ struct ModuleLightWidget : MultiLightWidget {
 };
 
 
+} // namespace app
 } // namespace rack

@@ -1,20 +1,21 @@
 #pragma once
 #include "app/common.hpp"
 #include "app/Knob.hpp"
-#include "widgets/FramebufferWidget.hpp"
-#include "widgets/TransformWidget.hpp"
-#include "widgets/SVGWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
+#include "widget/TransformWidget.hpp"
+#include "widget/SVGWidget.hpp"
 #include "app/CircularShadow.hpp"
 
 
 namespace rack {
+namespace app {
 
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
 struct SVGKnob : Knob {
-	FramebufferWidget *fb;
-	TransformWidget *tw;
-	SVGWidget *sw;
+	widget::FramebufferWidget *fb;
+	widget::TransformWidget *tw;
+	widget::SVGWidget *sw;
 	CircularShadow *shadow;
 	/** Angles in radians */
 	float minAngle, maxAngle;
@@ -25,4 +26,5 @@ struct SVGKnob : Knob {
 };
 
 
+} // namespace app
 } // namespace rack

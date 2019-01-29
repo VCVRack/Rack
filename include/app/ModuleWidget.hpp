@@ -1,6 +1,6 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "ui/Menu.hpp"
 #include "app/PortWidget.hpp"
 #include "app/ParamWidget.hpp"
@@ -9,14 +9,15 @@
 
 
 namespace rack {
+namespace app {
 
 
-struct ModuleWidget : OpaqueWidget {
+struct ModuleWidget : widget::OpaqueWidget {
 	Model *model = NULL;
 	/** Owns the module pointer */
 	Module *module = NULL;
 
-	Widget *panel = NULL;
+	widget::Widget *panel = NULL;
 	std::vector<ParamWidget*> params;
 	std::vector<PortWidget*> outputs;
 	std::vector<PortWidget*> inputs;
@@ -30,8 +31,8 @@ struct ModuleWidget : OpaqueWidget {
 	}
 	~ModuleWidget();
 
-	void draw(const DrawContext &ctx) override;
-	void drawShadow(const DrawContext &ctx);
+	void draw(const widget::DrawContext &ctx) override;
+	void drawShadow(const widget::DrawContext &ctx);
 
 	void onHover(const event::Hover &e) override;
 	void onButton(const event::Button &e) override;
@@ -88,10 +89,11 @@ struct ModuleWidget : OpaqueWidget {
 	void removeAction();
 	void createContextMenu();
 	/** Override to add context menu entries to your subclass.
-	It is recommended to add a blank MenuEntry first for spacing.
+	It is recommended to add a blank ui::MenuEntry first for spacing.
 	*/
-	virtual void appendContextMenu(Menu *menu) {}
+	virtual void appendContextMenu(ui::Menu *menu) {}
 };
 
 
+} // namespace app
 } // namespace rack

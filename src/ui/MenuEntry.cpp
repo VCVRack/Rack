@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 MenuEntry::MenuEntry() {
@@ -9,4 +10,5 @@ MenuEntry::MenuEntry() {
 }
 
 
+} // namespace ui
 } // namespace rack

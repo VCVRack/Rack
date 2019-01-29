@@ -243,7 +243,7 @@ struct CV_MIDI : Module {
 
 	void step() override {
 		const float rateLimiterPeriod = 0.005f;
-		rateLimiterPhase += app()->engine->getSampleTime() / rateLimiterPeriod;
+		rateLimiterPhase += APP->engine->getSampleTime() / rateLimiterPeriod;
 		if (rateLimiterPhase >= 1.f) {
 			rateLimiterPhase -= 1.f;
 		}

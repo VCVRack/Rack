@@ -3,6 +3,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 int Quantity::getDisplayPrecision() {
@@ -43,4 +44,5 @@ std::string Quantity::getString() {
 }
 
 
+} // namespace ui
 } // namespace rack

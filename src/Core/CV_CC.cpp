@@ -64,7 +64,7 @@ struct CV_CC : Module {
 
 	void step() override {
 		const float rateLimiterPeriod = 0.010f;
-		rateLimiterPhase += app()->engine->getSampleTime() / rateLimiterPeriod;
+		rateLimiterPhase += APP->engine->getSampleTime() / rateLimiterPeriod;
 		if (rateLimiterPhase >= 1.f) {
 			rateLimiterPhase -= 1.f;
 		}

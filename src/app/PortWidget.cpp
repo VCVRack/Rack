@@ -7,6 +7,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 struct PlugLight : MultiLightWidget {
@@ -29,7 +30,7 @@ PortWidget::~PortWidget() {
 	delete plugLight;
 	// HACK
 	if (module)
-		app()->scene->rackWidget->clearCablesOnPort(this);
+		APP->scene->rackWidget->clearCablesOnPort(this);
 }
 
 void PortWidget::step() {
@@ -51,26 +52,26 @@ void PortWidget::step() {
 	plugLight->setBrightnesses(values);
 }
 
-void PortWidget::draw(const DrawContext &ctx) {
-	CableWidget *cw = app()->scene->rackWidget->incompleteCable;
+void PortWidget::draw(const widget::DrawContext &ctx) {
+	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
 	if (cw) {
 		// Dim the PortWidget if the active cable cannot plug into this PortWidget
 		if (type == OUTPUT ? cw->outputPort : cw->inputPort)
 			nvgGlobalAlpha(ctx.vg, 0.5);
 	}
-	Widget::draw(ctx);
+	widget::Widget::draw(ctx);
 }
 
 void PortWidget::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		CableWidget *cw = app()->scene->rackWidget->getTopCable(this);
+		CableWidget *cw = APP->scene->rackWidget->getTopCable(this);
 		if (cw) {
 			// history::CableRemove
 			history::CableRemove *h = new history::CableRemove;
 			h->setCable(cw);
-			app()->history->push(h);
+			APP->history->push(h);
 
-			app()->scene->rackWidget->removeCable(cw);
+			APP->scene->rackWidget->removeCable(cw);
 			delete cw;
 		}
 	}
@@ -79,22 +80,22 @@ void PortWidget::onButton(const event::Button &e) {
 
 void PortWidget::onDragStart(const event::DragStart &e) {
 	CableWidget *cw = NULL;
-	if (type == OUTPUT && (app()->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+	if (type == OUTPUT && (APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 		// Keep cable NULL
 	}
 	else {
 		// Grab cable on top of stack
-		cw = app()->scene->rackWidget->getTopCable(this);
+		cw = APP->scene->rackWidget->getTopCable(this);
 	}
 
 	if (cw) {
 		// history::CableRemove
 		history::CableRemove *h = new history::CableRemove;
 		h->setCable(cw);
-		app()->history->push(h);
+		APP->history->push(h);
 
 		// Disconnect and reuse existing cable
-		app()->scene->rackWidget->removeCable(cw);
+		APP->scene->rackWidget->removeCable(cw);
 		if (type == OUTPUT)
 			cw->setOutput(NULL);
 		else
@@ -108,18 +109,18 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 		else
 			cw->setInput(this);
 	}
-	app()->scene->rackWidget->setIncompleteCable(cw);
+	APP->scene->rackWidget->setIncompleteCable(cw);
 }
 
 void PortWidget::onDragEnd(const event::DragEnd &e) {
-	CableWidget *cw = app()->scene->rackWidget->releaseIncompleteCable();
+	CableWidget *cw = APP->scene->rackWidget->releaseIncompleteCable();
 	if (cw->isComplete()) {
-		app()->scene->rackWidget->addCable(cw);
+		APP->scene->rackWidget->addCable(cw);
 
 		// history::CableAdd
 		history::CableAdd *h = new history::CableAdd;
 		h->setCable(cw);
-		app()->history->push(h);
+		APP->history->push(h);
 	}
 	else {
 		delete cw;
@@ -129,11 +130,11 @@ void PortWidget::onDragEnd(const event::DragEnd &e) {
 void PortWidget::onDragDrop(const event::DragDrop &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
-		if (app()->scene->rackWidget->getTopCable(this))
+		if (APP->scene->rackWidget->getTopCable(this))
 			return;
 	}
 
-	CableWidget *cw = app()->scene->rackWidget->incompleteCable;
+	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
 	if (cw) {
 		cw->hoveredOutputPort = cw->hoveredInputPort = NULL;
 		if (type == OUTPUT)
@@ -146,11 +147,11 @@ void PortWidget::onDragDrop(const event::DragDrop &e) {
 void PortWidget::onDragEnter(const event::DragEnter &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
-		if (app()->scene->rackWidget->getTopCable(this))
+		if (APP->scene->rackWidget->getTopCable(this))
 			return;
 	}
 
-	CableWidget *cw = app()->scene->rackWidget->incompleteCable;
+	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
 	if (cw) {
 		if (type == OUTPUT)
 			cw->hoveredOutputPort = this;
@@ -164,7 +165,7 @@ void PortWidget::onDragLeave(const event::DragLeave &e) {
 	if (!originPort)
 		return;
 
-	CableWidget *cw = app()->scene->rackWidget->incompleteCable;
+	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
 	if (cw) {
 		if (type == OUTPUT)
 			cw->hoveredOutputPort = NULL;
@@ -174,4 +175,5 @@ void PortWidget::onDragLeave(const event::DragLeave &e) {
 }
 
 
+} // namespace app
 } // namespace rack

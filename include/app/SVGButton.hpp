@@ -1,16 +1,17 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
-#include "widgets/FramebufferWidget.hpp"
-#include "widgets/SVGWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
+#include "widget/SVGWidget.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-struct SVGButton : OpaqueWidget {
-	FramebufferWidget *fb;
-	SVGWidget *sw;
+struct SVGButton : widget::OpaqueWidget {
+	widget::FramebufferWidget *fb;
+	widget::SVGWidget *sw;
 	std::vector<std::shared_ptr<SVG>> frames;
 
 	SVGButton();
@@ -21,4 +22,5 @@ struct SVGButton : OpaqueWidget {
 };
 
 
+} // namespace app
 } // namespace rack

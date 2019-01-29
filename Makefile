@@ -1,7 +1,7 @@
 RACK_DIR ?= .
 VERSION = 1.dev
 
-FLAGS += -DVERSION=$(VERSION)
+FLAGS += -DAPP_VERSION=$(VERSION)
 FLAGS += -Iinclude
 FLAGS += -Idep/include -Idep/lib/libzip/include
 

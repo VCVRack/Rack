@@ -1,17 +1,19 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 #include "ui/common.hpp"
 
 
 namespace rack {
+namespace ui {
 
 
-struct Tooltip : Widget {
+struct Tooltip : widget::Widget {
 	std::string text;
 
 	void step() override;
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 };
 
 
+} // namespace ui
 } // namespace rack

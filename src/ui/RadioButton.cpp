@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 RadioButton::RadioButton() {
@@ -13,7 +14,7 @@ RadioButton::~RadioButton() {
 		delete quantity;
 }
 
-void RadioButton::draw(const DrawContext &ctx) {
+void RadioButton::draw(const widget::DrawContext &ctx) {
 	std::string label;
 	if (quantity)
 		label = quantity->getLabel();
@@ -49,4 +50,5 @@ void RadioButton::onDragDrop(const event::DragDrop &e) {
 }
 
 
+} // namespace ui
 } // namespace rack

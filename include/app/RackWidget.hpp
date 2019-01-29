@@ -1,19 +1,20 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
-#include "widgets/FramebufferWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
+#include "widget/FramebufferWidget.hpp"
 #include "app/ModuleWidget.hpp"
 #include "app/CableWidget.hpp"
 #include "app/PortWidget.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-struct RackWidget : OpaqueWidget {
-	FramebufferWidget *rails;
-	Widget *moduleContainer;
-	Widget *cableContainer;
+struct RackWidget : widget::OpaqueWidget {
+	widget::FramebufferWidget *rails;
+	widget::Widget *moduleContainer;
+	widget::Widget *cableContainer;
 	CableWidget *incompleteCable = NULL;
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
@@ -22,7 +23,7 @@ struct RackWidget : OpaqueWidget {
 	~RackWidget();
 
 	void step() override;
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 
 	void onHover(const event::Hover &e) override;
 	void onHoverKey(const event::HoverKey &e) override;
@@ -74,4 +75,5 @@ struct RackWidget : OpaqueWidget {
 };
 
 
+} // namespace app
 } // namespace rack

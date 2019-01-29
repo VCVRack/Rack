@@ -9,8 +9,9 @@
 
 
 namespace rack {
+namespace app {
 
-static void drawPlug(const DrawContext &ctx, math::Vec pos, NVGcolor color) {
+static void drawPlug(const widget::DrawContext &ctx, math::Vec pos, NVGcolor color) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Plug solid
@@ -31,7 +32,7 @@ static void drawPlug(const DrawContext &ctx, math::Vec pos, NVGcolor color) {
 	nvgFill(ctx.vg);
 }
 
-static void drawCable(const DrawContext &ctx, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
+static void drawCable(const widget::DrawContext &ctx, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
 	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
@@ -119,25 +120,25 @@ void CableWidget::setInput(PortWidget *inputPort) {
 
 math::Vec CableWidget::getOutputPos() {
 	if (outputPort) {
-		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
 	}
 	else if (hoveredOutputPort) {
-		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
 	}
 	else {
-		return app()->scene->rackWidget->mousePos;
+		return APP->scene->rackWidget->mousePos;
 	}
 }
 
 math::Vec CableWidget::getInputPos() {
 	if (inputPort) {
-		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
 	}
 	else if (hoveredInputPort) {
-		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), app()->scene->rackWidget);
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
 	}
 	else {
-		return app()->scene->rackWidget->mousePos;
+		return APP->scene->rackWidget->mousePos;
 	}
 }
 
@@ -175,7 +176,7 @@ void CableWidget::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &mo
 	ModuleWidget *inputModule = inputModuleIt->second;
 
 	// Set ports
-	if (app()->patch->isLegacy(1)) {
+	if (APP->patch->isLegacy(1)) {
 		// Before 0.6, the index of the "ports" array was the index of the PortWidget in the `outputs` and `inputs` vector.
 		setOutput(outputModule->outputs[outputId]);
 		setInput(inputModule->inputs[inputId]);
@@ -205,7 +206,7 @@ void CableWidget::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &mo
 	}
 }
 
-void CableWidget::draw(const DrawContext &ctx) {
+void CableWidget::draw(const widget::DrawContext &ctx) {
 	float opacity = settings::cableOpacity;
 	float tension = settings::cableTension;
 
@@ -215,7 +216,7 @@ void CableWidget::draw(const DrawContext &ctx) {
 	}
 	else {
 		// Draw opaque if mouse is hovering over a connected port
-		PortWidget *hoveredPort = dynamic_cast<PortWidget*>(app()->event->hoveredWidget);
+		PortWidget *hoveredPort = dynamic_cast<PortWidget*>(APP->event->hoveredWidget);
 		if (hoveredPort && (hoveredPort == outputPort || hoveredPort == inputPort))
 			opacity = 1.0;
 	}
@@ -238,13 +239,13 @@ void CableWidget::draw(const DrawContext &ctx) {
 	drawCable(ctx, outputPos, inputPos, color, thickness, tension, opacity);
 }
 
-void CableWidget::drawPlugs(const DrawContext &ctx) {
+void CableWidget::drawPlugs(const widget::DrawContext &ctx) {
 	// TODO Figure out a way to draw plugs first and cables last, and cut the plug portion of the cable off.
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
 
 	// Draw plug if the cable is on top, or if the cable is incomplete
-	if (!isComplete() || app()->scene->rackWidget->getTopCable(outputPort) == this) {
+	if (!isComplete() || APP->scene->rackWidget->getTopCable(outputPort) == this) {
 		drawPlug(ctx, outputPos, color);
 		if (isComplete()) {
 			// Draw plug light
@@ -255,7 +256,7 @@ void CableWidget::drawPlugs(const DrawContext &ctx) {
 		}
 	}
 
-	if (!isComplete() || app()->scene->rackWidget->getTopCable(inputPort) == this) {
+	if (!isComplete() || APP->scene->rackWidget->getTopCable(inputPort) == this) {
 		drawPlug(ctx, inputPos, color);
 		if (isComplete()) {
 			nvgSave(ctx.vg);
@@ -267,4 +268,5 @@ void CableWidget::drawPlugs(const DrawContext &ctx) {
 }
 
 
+} // namespace app
 } // namespace rack

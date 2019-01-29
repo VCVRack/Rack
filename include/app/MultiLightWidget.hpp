@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 /** Mixes a list of colors based on a list of brightness values */
@@ -16,4 +17,5 @@ struct MultiLightWidget : LightWidget {
 };
 
 
+} // namespace app
 } // namespace rack

@@ -7,12 +7,14 @@
 namespace rack {
 
 
-struct ParamQuantity;
+namespace app {
+	struct ParamQuantity;
+} // namespace app
 
 
 struct ParamQuantityFactory {
 	virtual ~ParamQuantityFactory() {}
-	virtual ParamQuantity *create() = 0;
+	virtual app::ParamQuantity *create() = 0;
 };
 
 
@@ -48,7 +50,7 @@ struct Param {
 			delete paramQuantityFactory;
 	}
 
-	template<class TParamQuantity = ParamQuantity>
+	template<class TParamQuantity = app::ParamQuantity>
 	void config(float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
 		this->value = defaultValue;
 		this->minValue = minValue;
@@ -62,7 +64,7 @@ struct Param {
 		this->displayOffset = displayOffset;
 
 		struct TParamQuantityFactory : ParamQuantityFactory {
-			ParamQuantity *create() override {return new TParamQuantity;}
+			app::ParamQuantity *create() override {return new TParamQuantity;}
 		};
 		if (paramQuantityFactory)
 			delete paramQuantityFactory;

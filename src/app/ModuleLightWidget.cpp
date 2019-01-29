@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 void ModuleLightWidget::step() {
@@ -24,4 +25,5 @@ void ModuleLightWidget::step() {
 }
 
 
+} // namespace app
 } // namespace rack

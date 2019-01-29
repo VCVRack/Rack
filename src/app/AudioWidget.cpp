@@ -4,9 +4,10 @@
 
 
 namespace rack {
+namespace app {
 
 
-struct AudioDriverItem : MenuItem {
+struct AudioDriverItem : ui::MenuItem {
 	audio::IO *audioIO;
 	int driver;
 	void onAction(const event::Action &e) override {
@@ -20,7 +21,7 @@ struct AudioDriverChoice : LedDisplayChoice {
 		if (!audioWidget->audioIO)
 			return;
 
-		Menu *menu = createMenu();
+		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
 		for (int driver : audioWidget->audioIO->getDrivers()) {
 			AudioDriverItem *item = new AudioDriverItem;
@@ -40,7 +41,7 @@ struct AudioDriverChoice : LedDisplayChoice {
 };
 
 
-struct AudioDeviceItem : MenuItem {
+struct AudioDeviceItem : ui::MenuItem {
 	audio::IO *audioIO;
 	int device;
 	int offset;
@@ -58,7 +59,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		if (!audioWidget->audioIO)
 			return;
 
-		Menu *menu = createMenu();
+		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio device"));
 		int deviceCount = audioWidget->audioIO->getDeviceCount();
 		{
@@ -99,7 +100,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 };
 
 
-struct AudioSampleRateItem : MenuItem {
+struct AudioSampleRateItem : ui::MenuItem {
 	audio::IO *audioIO;
 	int sampleRate;
 	void onAction(const event::Action &e) override {
@@ -113,7 +114,7 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		if (!audioWidget->audioIO)
 			return;
 
-		Menu *menu = createMenu();
+		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Sample rate"));
 		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
 		if (sampleRates.empty()) {
@@ -137,7 +138,7 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 };
 
 
-struct AudioBlockSizeItem : MenuItem {
+struct AudioBlockSizeItem : ui::MenuItem {
 	audio::IO *audioIO;
 	int blockSize;
 	void onAction(const event::Action &e) override {
@@ -151,7 +152,7 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		if (!audioWidget->audioIO)
 			return;
 
-		Menu *menu = createMenu();
+		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Block size"));
 		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
 		if (blockSizes.empty()) {
@@ -227,4 +228,5 @@ void AudioWidget::step() {
 }
 
 
+} // namespace app
 } // namespace rack

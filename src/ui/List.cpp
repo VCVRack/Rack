@@ -2,14 +2,15 @@
 
 
 namespace rack {
+namespace ui {
 
 
 void List::step() {
-	Widget::step();
+	widget::Widget::step();
 
 	// Set positions of children
 	box.size.y = 0.0;
-	for (Widget *child : children) {
+	for (widget::Widget *child : children) {
 		if (!child->visible)
 			continue;
 		// Increment height, set position of child
@@ -21,4 +22,5 @@ void List::step() {
 }
 
 
+} // namespace ui
 } // namespace rack

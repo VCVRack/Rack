@@ -1,7 +1,7 @@
 #include "app/ModuleBrowser.hpp"
-#include "widgets/OpaqueWidget.hpp"
-#include "widgets/TransparentWidget.hpp"
-#include "widgets/ZoomWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
+#include "widget/TransparentWidget.hpp"
+#include "widget/ZoomWidget.hpp"
 #include "ui/ScrollWidget.hpp"
 #include "ui/SequentialLayout.hpp"
 #include "ui/Label.hpp"
@@ -18,19 +18,20 @@
 
 
 namespace rack {
+namespace app {
 
 
 static std::set<Model*> sFavoriteModels;
 
 
-struct BrowserOverlay : OpaqueWidget {
+struct BrowserOverlay : widget::OpaqueWidget {
 	void step() override {
 		box = parent->box.zeroPos();
-		OpaqueWidget::step();
+		widget::OpaqueWidget::step();
 	}
 
 	void onButton(const event::Button &e) override {
-		OpaqueWidget::onButton(e);
+		widget::OpaqueWidget::onButton(e);
 		if (e.getConsumed() != this)
 			return;
 
@@ -50,15 +51,15 @@ struct BrowserOverlay : OpaqueWidget {
 		}
 
 		if (!e.getConsumed())
-			OpaqueWidget::onHoverKey(e);
+			widget::OpaqueWidget::onHoverKey(e);
 	}
 };
 
 
-struct ModuleBox : OpaqueWidget {
+struct ModuleBox : widget::OpaqueWidget {
 	Model *model;
 	/** Lazily created */
-	Widget *previewWidget = NULL;
+	widget::Widget *previewWidget = NULL;
 	/** Number of frames since draw() has been called */
 	int visibleFrames = 0;
 
@@ -72,13 +73,13 @@ struct ModuleBox : OpaqueWidget {
 		p.y = box.size.y;
 		box.size.y += 40.0;
 
-		Label *nameLabel = new Label;
+		ui::Label *nameLabel = new ui::Label;
 		nameLabel->text = model->name;
 		nameLabel->box.pos = p;
 		p.y += nameLabel->box.size.y;
 		addChild(nameLabel);
 
-		Label *pluginLabel = new Label;
+		ui::Label *pluginLabel = new ui::Label;
 		pluginLabel->text = model->plugin->name;
 		pluginLabel->box.pos = p;
 		p.y += pluginLabel->box.size.y;
@@ -93,22 +94,22 @@ struct ModuleBox : OpaqueWidget {
 		}
 	}
 
-	void draw(const DrawContext &ctx) override {
+	void draw(const widget::DrawContext &ctx) override {
 		visibleFrames = 0;
 
 		// Lazily create ModuleWidget when drawn
 		if (!previewWidget) {
-			Widget *transparentWidget = new TransparentWidget;
+			widget::Widget *transparentWidget = new widget::TransparentWidget;
 			addChild(transparentWidget);
 
-			FramebufferWidget *fbWidget = new FramebufferWidget;
-			if (math::isNear(app()->window->pixelRatio, 1.0)) {
+			widget::FramebufferWidget *fbWidget = new widget::FramebufferWidget;
+			if (math::isNear(APP->window->pixelRatio, 1.0)) {
 				// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 				fbWidget->oversample = 2.0;
 			}
 			transparentWidget->addChild(fbWidget);
 
-			ZoomWidget *zoomWidget = new ZoomWidget;
+			widget::ZoomWidget *zoomWidget = new widget::ZoomWidget;
 			zoomWidget->setZoom(0.5f);
 			fbWidget->addChild(zoomWidget);
 
@@ -123,8 +124,8 @@ struct ModuleBox : OpaqueWidget {
 			previewWidget = transparentWidget;
 		}
 
-		OpaqueWidget::draw(ctx);
-		if (app()->event->hoveredWidget == this) {
+		widget::OpaqueWidget::draw(ctx);
+		if (APP->event->hoveredWidget == this) {
 			nvgBeginPath(ctx.vg);
 			nvgRect(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
 			nvgFillColor(ctx.vg, nvgRGBAf(1, 1, 1, 0.25));
@@ -136,11 +137,11 @@ struct ModuleBox : OpaqueWidget {
 };
 
 
-struct BrowserSearchField : TextField {
+struct BrowserSearchField : ui::TextField {
 };
 
 
-struct BrowserSidebar : Widget {
+struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
 
 	BrowserSidebar() {
@@ -150,25 +151,25 @@ struct BrowserSidebar : Widget {
 
 	void step() override {
 		searchField->box.size.x = box.size.x;
-		Widget::step();
+		widget::Widget::step();
 	}
 };
 
 
-struct ModuleBrowser : OpaqueWidget {
+struct ModuleBrowser : widget::OpaqueWidget {
 	BrowserSidebar *sidebar;
-	ScrollWidget *moduleScroll;
-	SequentialLayout *moduleLayout;
+	ui::ScrollWidget *moduleScroll;
+	ui::SequentialLayout *moduleLayout;
 
 	ModuleBrowser() {
 		sidebar = new BrowserSidebar;
 		sidebar->box.size.x = 300;
 		addChild(sidebar);
 
-		moduleScroll = new ScrollWidget;
+		moduleScroll = new ui::ScrollWidget;
 		addChild(moduleScroll);
 
-		moduleLayout = new SequentialLayout;
+		moduleLayout = new ui::SequentialLayout;
 		moduleLayout->spacing = math::Vec(10, 10);
 		moduleScroll->container->addChild(moduleLayout);
 
@@ -192,12 +193,12 @@ struct ModuleBrowser : OpaqueWidget {
 		moduleLayout->box.size.x = moduleScroll->box.size.x;
 		moduleLayout->box.size.y = moduleLayout->getChildrenBoundingBox().getBottomRight().y;
 
-		OpaqueWidget::step();
+		widget::OpaqueWidget::step();
 	}
 
-	void draw(const DrawContext &ctx) override {
+	void draw(const widget::DrawContext &ctx) override {
 		bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
-		Widget::draw(ctx);
+		widget::Widget::draw(ctx);
 	}
 };
 
@@ -210,7 +211,7 @@ void ModuleBox::onButton(const event::Button &e) {
 		// Create module
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		assert(moduleWidget);
-		app()->scene->rackWidget->addModuleAtMouse(moduleWidget);
+		APP->scene->rackWidget->addModuleAtMouse(moduleWidget);
 		// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
 		// e.consume(moduleWidget);
 
@@ -221,16 +222,16 @@ void ModuleBox::onButton(const event::Button &e) {
 		// Push ModuleAdd history action
 		history::ModuleAdd *h = new history::ModuleAdd;
 		h->setModule(moduleWidget);
-		app()->history->push(h);
+		APP->history->push(h);
 	}
-	OpaqueWidget::onButton(e);
+	widget::OpaqueWidget::onButton(e);
 }
 
 
 // Global functions
 
 
-Widget *moduleBrowserCreate() {
+widget::Widget *moduleBrowserCreate() {
 	BrowserOverlay *overlay = new BrowserOverlay;
 
 	ModuleBrowser *browser = new ModuleBrowser;
@@ -275,4 +276,5 @@ void moduleBrowserFromJson(json_t *rootJ) {
 }
 
 
+} // namespace app
 } // namespace rack

@@ -13,12 +13,13 @@
 
 
 namespace rack {
+namespace app {
 
 
 static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 
 
-struct ModuleDisconnectItem : MenuItem {
+struct ModuleDisconnectItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleDisconnectItem() {
 		text = "Disconnect cables";
@@ -29,7 +30,7 @@ struct ModuleDisconnectItem : MenuItem {
 	}
 };
 
-struct ModuleResetItem : MenuItem {
+struct ModuleResetItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleResetItem() {
 		text = "Initialize";
@@ -40,7 +41,7 @@ struct ModuleResetItem : MenuItem {
 	}
 };
 
-struct ModuleRandomizeItem : MenuItem {
+struct ModuleRandomizeItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleRandomizeItem() {
 		text = "Randomize";
@@ -51,7 +52,7 @@ struct ModuleRandomizeItem : MenuItem {
 	}
 };
 
-struct ModuleCopyItem : MenuItem {
+struct ModuleCopyItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleCopyItem() {
 		text = "Copy preset";
@@ -62,7 +63,7 @@ struct ModuleCopyItem : MenuItem {
 	}
 };
 
-struct ModulePasteItem : MenuItem {
+struct ModulePasteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModulePasteItem() {
 		text = "Paste preset";
@@ -73,7 +74,7 @@ struct ModulePasteItem : MenuItem {
 	}
 };
 
-struct ModuleSaveItem : MenuItem {
+struct ModuleSaveItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleSaveItem() {
 		text = "Save preset as";
@@ -83,7 +84,7 @@ struct ModuleSaveItem : MenuItem {
 	}
 };
 
-struct ModuleLoadItem : MenuItem {
+struct ModuleLoadItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleLoadItem() {
 		text = "Load preset";
@@ -93,7 +94,7 @@ struct ModuleLoadItem : MenuItem {
 	}
 };
 
-struct ModuleCloneItem : MenuItem {
+struct ModuleCloneItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleCloneItem() {
 		text = "Duplicate";
@@ -104,7 +105,7 @@ struct ModuleCloneItem : MenuItem {
 	}
 };
 
-struct ModuleBypassItem : MenuItem {
+struct ModuleBypassItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleBypassItem() {
 		text = "Bypass";
@@ -120,7 +121,7 @@ struct ModuleBypassItem : MenuItem {
 	}
 };
 
-struct ModuleDeleteItem : MenuItem {
+struct ModuleDeleteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleDeleteItem() {
 		text = "Delete";
@@ -136,12 +137,12 @@ ModuleWidget::~ModuleWidget() {
 	setModule(NULL);
 }
 
-void ModuleWidget::draw(const DrawContext &ctx) {
+void ModuleWidget::draw(const widget::DrawContext &ctx) {
 	if (module && module->bypass) {
 		nvgGlobalAlpha(ctx.vg, 0.25);
 	}
 	// nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
-	Widget::draw(ctx);
+	widget::Widget::draw(ctx);
 
 	// Power meter
 	if (module && settings::powerMeter) {
@@ -155,7 +156,7 @@ void ModuleWidget::draw(const DrawContext &ctx) {
 		std::string cpuText = string::f("%.2f μs", module->cpuTime * 1e6f);
 		bndLabel(ctx.vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
 
-		float p = math::clamp(module->cpuTime / app()->engine->getSampleTime(), 0.f, 1.f);
+		float p = math::clamp(module->cpuTime / APP->engine->getSampleTime(), 0.f, 1.f);
 		nvgBeginPath(ctx.vg);
 		nvgRect(ctx.vg,
 			0, (1.f - p) * box.size.y,
@@ -177,7 +178,7 @@ void ModuleWidget::draw(const DrawContext &ctx) {
 	// nvgResetScissor(ctx.vg);
 }
 
-void ModuleWidget::drawShadow(const DrawContext &ctx) {
+void ModuleWidget::drawShadow(const widget::DrawContext &ctx) {
 	nvgBeginPath(ctx.vg);
 	float r = 20; // Blur radius
 	float c = 20; // Corner radius
@@ -190,12 +191,12 @@ void ModuleWidget::drawShadow(const DrawContext &ctx) {
 }
 
 void ModuleWidget::onHover(const event::Hover &e) {
-	OpaqueWidget::onHover(e);
+	widget::OpaqueWidget::onHover(e);
 
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-	if ((glfwGetKey(app()->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
-		|| glfwGetKey(app()->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
-		&& (app()->window->getMods() & WINDOW_MOD_MASK) == 0) {
+	if ((glfwGetKey(APP->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
+		|| glfwGetKey(APP->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+		&& (APP->window->getMods() & WINDOW_MOD_MASK) == 0) {
 		removeAction();
 		e.consume(NULL);
 		return;
@@ -203,7 +204,7 @@ void ModuleWidget::onHover(const event::Hover &e) {
 }
 
 void ModuleWidget::onButton(const event::Button &e) {
-	OpaqueWidget::onButton(e);
+	widget::OpaqueWidget::onButton(e);
 
 	if (e.getConsumed() == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
@@ -261,12 +262,12 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 	}
 
 	if (!e.getConsumed())
-		OpaqueWidget::onHoverKey(e);
+		widget::OpaqueWidget::onHoverKey(e);
 }
 
 void ModuleWidget::onDragStart(const event::DragStart &e) {
 	oldPos = box.pos;
-	dragPos = app()->scene->rackWidget->mousePos.minus(box.pos);
+	dragPos = APP->scene->rackWidget->mousePos.minus(box.pos);
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {
@@ -276,15 +277,15 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 		h->moduleId = module->id;
 		h->oldPos = oldPos;
 		h->newPos = box.pos;
-		app()->history->push(h);
+		APP->history->push(h);
 	}
 }
 
 void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Rect newBox = box;
-		newBox.pos = app()->scene->rackWidget->mousePos.minus(dragPos);
-		app()->scene->rackWidget->requestModuleBoxNearest(this, newBox);
+		newBox.pos = APP->scene->rackWidget->mousePos.minus(dragPos);
+		APP->scene->rackWidget->requestModuleBoxNearest(this, newBox);
 	}
 }
 
@@ -413,11 +414,11 @@ void ModuleWidget::copyClipboard() {
 	DEFER({
 		free(moduleJson);
 	});
-	glfwSetClipboardString(app()->window->win, moduleJson);
+	glfwSetClipboardString(APP->window->win, moduleJson);
 }
 
 void ModuleWidget::pasteClipboardAction() {
-	const char *moduleJson = glfwGetClipboardString(app()->window->win);
+	const char *moduleJson = glfwGetClipboardString(APP->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
 		return;
@@ -441,7 +442,7 @@ void ModuleWidget::pasteClipboardAction() {
 	fromJson(moduleJ);
 
 	h->newModuleJ = toJson();
-	app()->history->push(h);
+	APP->history->push(h);
 }
 
 void ModuleWidget::loadAction(std::string filename) {
@@ -475,7 +476,7 @@ void ModuleWidget::loadAction(std::string filename) {
 	fromJson(moduleJ);
 
 	h->newModuleJ = toJson();
-	app()->history->push(h);
+	APP->history->push(h);
 }
 
 void ModuleWidget::save(std::string filename) {
@@ -548,10 +549,10 @@ void ModuleWidget::saveDialog() {
 
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
-		app()->scene->rackWidget->clearCablesOnPort(input);
+		APP->scene->rackWidget->clearCablesOnPort(input);
 	}
 	for (PortWidget *output : outputs) {
-		app()->scene->rackWidget->clearCablesOnPort(output);
+		APP->scene->rackWidget->clearCablesOnPort(output);
 	}
 }
 
@@ -563,10 +564,10 @@ void ModuleWidget::resetAction() {
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	app()->engine->resetModule(module);
+	APP->engine->resetModule(module);
 
 	h->newModuleJ = toJson();
-	app()->history->push(h);
+	APP->history->push(h);
 }
 
 void ModuleWidget::randomizeAction() {
@@ -577,16 +578,16 @@ void ModuleWidget::randomizeAction() {
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	app()->engine->randomizeModule(module);
+	APP->engine->randomizeModule(module);
 
 	h->newModuleJ = toJson();
-	app()->history->push(h);
+	APP->history->push(h);
 }
 
 static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexAction) {
 	// Add CableRemove action for all cables attached to outputs
 	for (PortWidget* output : mw->outputs) {
-		for (CableWidget *cw : app()->scene->rackWidget->getCablesOnPort(output)) {
+		for (CableWidget *cw : APP->scene->rackWidget->getCablesOnPort(output)) {
 			if (!cw->isComplete())
 				continue;
 			// history::CableRemove
@@ -597,7 +598,7 @@ static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexA
 	}
 	// Add CableRemove action for all cables attached to inputs
 	for (PortWidget* input : mw->inputs) {
-		for (CableWidget *cw : app()->scene->rackWidget->getCablesOnPort(input)) {
+		for (CableWidget *cw : APP->scene->rackWidget->getCablesOnPort(input)) {
 			if (!cw->isComplete())
 				continue;
 			// Avoid creating duplicate actions for self-patched cables
@@ -614,7 +615,7 @@ static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexA
 void ModuleWidget::disconnectAction() {
 	history::ComplexAction *complexAction = new history::ComplexAction;
 	disconnectActions(this, complexAction);
-	app()->history->push(complexAction);
+	APP->history->push(complexAction);
 
 	disconnect();
 }
@@ -627,12 +628,12 @@ void ModuleWidget::cloneAction() {
 	clonedModuleWidget->fromJson(moduleJ);
 	json_decref(moduleJ);
 
-	app()->scene->rackWidget->addModuleAtMouse(clonedModuleWidget);
+	APP->scene->rackWidget->addModuleAtMouse(clonedModuleWidget);
 
 	// history::ModuleAdd
 	history::ModuleAdd *h = new history::ModuleAdd;
 	h->setModule(clonedModuleWidget);
-	app()->history->push(h);
+	APP->history->push(h);
 }
 
 void ModuleWidget::bypassAction() {
@@ -641,7 +642,7 @@ void ModuleWidget::bypassAction() {
 	history::ModuleBypass *h = new history::ModuleBypass;
 	h->moduleId = module->id;
 	h->bypass = !module->bypass;
-	app()->history->push(h);
+	APP->history->push(h);
 	h->redo();
 }
 
@@ -654,18 +655,18 @@ void ModuleWidget::removeAction() {
 	moduleRemove->setModule(this);
 	complexAction->push(moduleRemove);
 
-	app()->history->push(complexAction);
+	APP->history->push(complexAction);
 
 	// This disconnects cables, removes the module, and transfers ownership to caller
-	app()->scene->rackWidget->removeModule(this);
+	APP->scene->rackWidget->removeModule(this);
 	delete this;
 }
 
 void ModuleWidget::createContextMenu() {
-	Menu *menu = createMenu();
+	ui::Menu *menu = createMenu();
 	assert(model);
 
-	MenuLabel *menuLabel = new MenuLabel;
+	ui::MenuLabel *menuLabel = new ui::MenuLabel;
 	menuLabel->text = model->plugin->name + " " + model->name + " " + model->plugin->version;
 	menu->addChild(menuLabel);
 
@@ -713,4 +714,5 @@ void ModuleWidget::createContextMenu() {
 }
 
 
+} // namespace app
 } // namespace rack

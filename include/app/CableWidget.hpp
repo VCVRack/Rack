@@ -1,6 +1,6 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "app/PortWidget.hpp"
 #include "app/ModuleWidget.hpp"
 #include "engine/Cable.hpp"
@@ -8,9 +8,10 @@
 
 
 namespace rack {
+namespace app {
 
 
-struct CableWidget : OpaqueWidget {
+struct CableWidget : widget::OpaqueWidget {
 	PortWidget *outputPort = NULL;
 	PortWidget *inputPort = NULL;
 	PortWidget *hoveredOutputPort = NULL;
@@ -27,9 +28,10 @@ struct CableWidget : OpaqueWidget {
 	math::Vec getInputPos();
 	json_t *toJson();
 	void fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &moduleWidgets);
-	void draw(const DrawContext &ctx) override;
-	void drawPlugs(const DrawContext &ctx);
+	void draw(const widget::DrawContext &ctx) override;
+	void drawPlugs(const widget::DrawContext &ctx);
 };
 
 
+} // namespace app
 } // namespace rack

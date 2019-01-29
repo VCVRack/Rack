@@ -2,16 +2,17 @@
 
 
 namespace rack {
+namespace app {
 
 
 SVGSlider::SVGSlider() {
-	fb = new FramebufferWidget;
+	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
-	background = new SVGWidget;
+	background = new widget::SVGWidget;
 	fb->addChild(background);
 
-	handle = new SVGWidget;
+	handle = new widget::SVGWidget;
 	fb->addChild(handle);
 
 	speed = 2.0;
@@ -42,4 +43,5 @@ void SVGSlider::onChange(const event::Change &e) {
 }
 
 
+} // namespace app
 } // namespace rack

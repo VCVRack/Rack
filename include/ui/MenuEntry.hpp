@@ -1,14 +1,16 @@
 #pragma once
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "ui/common.hpp"
 
 
 namespace rack {
+namespace ui {
 
 
-struct MenuEntry : OpaqueWidget {
+struct MenuEntry : widget::OpaqueWidget {
 	MenuEntry();
 };
 
 
+} // namespace ui
 } // namespace rack

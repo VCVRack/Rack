@@ -7,6 +7,7 @@
 
 
 namespace rack {
+namespace ui {
 
 
 #define BND_LABEL_FONT_SIZE 13
@@ -17,7 +18,7 @@ struct MenuItem : MenuEntry {
 	std::string rightText;
 	bool disabled = false;
 
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void step() override;
 	void onEnter(const event::Enter &e) override;
 	void onDragDrop(const event::DragDrop &e) override;
@@ -26,4 +27,5 @@ struct MenuItem : MenuEntry {
 };
 
 
+} // namespace ui
 } // namespace rack

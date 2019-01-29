@@ -2,10 +2,11 @@
 
 
 namespace rack {
+namespace app {
 
 
 SVGPort::SVGPort() {
-	fb = new FramebufferWidget;
+	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
 	shadow = new CircularShadow;
@@ -14,7 +15,7 @@ SVGPort::SVGPort() {
 	// In that case, just disable the shadow.
 	shadow->box.size = math::Vec();
 
-	sw = new SVGWidget;
+	sw = new widget::SVGWidget;
 	fb->addChild(sw);
 }
 
@@ -30,4 +31,5 @@ void SVGPort::setSVG(std::shared_ptr<SVG> svg) {
 }
 
 
+} // namespace app
 } // namespace rack

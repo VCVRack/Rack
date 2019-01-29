@@ -2,13 +2,14 @@
 
 
 namespace rack {
+namespace app {
 
 
 SVGButton::SVGButton() {
-	fb = new FramebufferWidget;
+	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
-	sw = new SVGWidget;
+	sw = new widget::SVGWidget;
 	fb->addChild(sw);
 }
 
@@ -44,4 +45,5 @@ void SVGButton::onDragDrop(const event::DragDrop &e) {
 }
 
 
+} // namespace app
 } // namespace rack

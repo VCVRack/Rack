@@ -4,10 +4,11 @@
 
 
 namespace rack {
+namespace ui {
 
 
 /** A controller for manipulating a float value (which subclasses must store somehow) with limits and labels
-Often used as a decorator component for Widgets that read or write a quantity.
+Often used as a decorator component for widget::Widgets that read or write a quantity.
 */
 struct Quantity {
 	virtual ~Quantity() {}
@@ -118,4 +119,5 @@ struct Quantity {
 };
 
 
+} // namespace ui
 } // namespace rack

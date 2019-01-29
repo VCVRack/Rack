@@ -1,14 +1,15 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "app/MultiLightWidget.hpp"
 #include "engine/Module.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-struct PortWidget : OpaqueWidget {
+struct PortWidget : widget::OpaqueWidget {
 	Module *module = NULL;
 	int portId;
 
@@ -23,7 +24,7 @@ struct PortWidget : OpaqueWidget {
 	~PortWidget();
 
 	void step() override;
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 
 	void onButton(const event::Button &e) override;
 	void onDragStart(const event::DragStart &e) override;
@@ -34,4 +35,5 @@ struct PortWidget : OpaqueWidget {
 };
 
 
+} // namespace app
 } // namespace rack

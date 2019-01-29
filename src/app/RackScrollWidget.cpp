@@ -5,13 +5,14 @@
 
 
 namespace rack {
+namespace app {
 
 
 void RackScrollWidget::step() {
-	math::Vec pos = app()->window->mousePos;
+	math::Vec pos = APP->window->mousePos;
 	math::Rect viewport = getViewport(box.zeroPos());
 	// Scroll rack if dragging cable near the edge of the screen
-	if (app()->scene->rackWidget->incompleteCable) {
+	if (APP->scene->rackWidget->incompleteCable) {
 		float margin = 20.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)
@@ -23,13 +24,14 @@ void RackScrollWidget::step() {
 		if (pos.y >= viewport.pos.y + viewport.size.y - margin)
 			offset.y += speed;
 	}
-	ScrollWidget::step();
+	ui::ScrollWidget::step();
 }
 
 
-void RackScrollWidget::draw(const DrawContext &ctx) {
-	ScrollWidget::draw(ctx);
+void RackScrollWidget::draw(const widget::DrawContext &ctx) {
+	ui::ScrollWidget::draw(ctx);
 }
 
 
+} // namespace app
 } // namespace rack

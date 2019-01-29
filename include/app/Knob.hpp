@@ -5,6 +5,7 @@
 
 
 namespace rack {
+namespace app {
 
 
 /** Implements vertical dragging behavior for ParamWidgets */
@@ -27,4 +28,5 @@ struct Knob : ParamWidget {
 };
 
 
+} // namespace app
 } // namespace rack

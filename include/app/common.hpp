@@ -5,32 +5,33 @@
 
 
 namespace rack {
+namespace app {
 
 
-static const char APP_NAME[] = "VCV Rack";
-static const char APP_VERSION[] = TOSTRING(VERSION);
-static const char APP_API_URL[] = "https://api.vcvrack.com";
+static const char NAME[] = "VCV Rack";
+static const char VERSION[] = TOSTRING(APP_VERSION);
+static const char API_URL[] = "https://api.vcvrack.com";
 
-static const float APP_SVG_DPI = 75.0;
+static const float SVG_DPI = 75.0;
 static const float MM_PER_IN = 25.4;
 
 
 /** Converts inch measurements to pixels */
 inline float in2px(float in) {
-	return in * APP_SVG_DPI;
+	return in * SVG_DPI;
 }
 
 inline math::Vec in2px(math::Vec in) {
-	return in.mult(APP_SVG_DPI);
+	return in.mult(SVG_DPI);
 }
 
 /** Converts millimeter measurements to pixels */
 inline float mm2px(float mm) {
-	return mm * (APP_SVG_DPI / MM_PER_IN);
+	return mm * (SVG_DPI / MM_PER_IN);
 }
 
 inline math::Vec mm2px(math::Vec mm) {
-	return mm.mult(APP_SVG_DPI / MM_PER_IN);
+	return mm.mult(SVG_DPI / MM_PER_IN);
 }
 
 
@@ -40,4 +41,5 @@ static const float RACK_GRID_HEIGHT = 380;
 static const math::Vec RACK_GRID_SIZE = math::Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
 
 
+} // namespace app
 } // namespace rack

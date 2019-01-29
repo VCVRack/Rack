@@ -1,14 +1,16 @@
 #pragma once
 #include "app/common.hpp"
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 
 
 namespace rack {
+namespace app {
 
 
-Widget *moduleBrowserCreate();
+widget::Widget *moduleBrowserCreate();
 json_t *moduleBrowserToJson();
 void moduleBrowserFromJson(json_t *rootJ);
 
 
+} // namespace app
 } // namespace rack

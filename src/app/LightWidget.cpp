@@ -3,14 +3,15 @@
 
 
 namespace rack {
+namespace app {
 
 
-void LightWidget::draw(const DrawContext &ctx) {
+void LightWidget::draw(const widget::DrawContext &ctx) {
 	drawLight(ctx);
 	drawHalo(ctx);
 }
 
-void LightWidget::drawLight(const DrawContext &ctx) {
+void LightWidget::drawLight(const widget::DrawContext &ctx) {
 	float radius = box.size.x / 2.0;
 
 	nvgBeginPath(ctx.vg);
@@ -30,7 +31,7 @@ void LightWidget::drawLight(const DrawContext &ctx) {
 	nvgStroke(ctx.vg);
 }
 
-void LightWidget::drawHalo(const DrawContext &ctx) {
+void LightWidget::drawHalo(const widget::DrawContext &ctx) {
 	float radius = box.size.x / 2.0;
 	float oradius = radius + 15.0;
 
@@ -47,4 +48,5 @@ void LightWidget::drawHalo(const DrawContext &ctx) {
 }
 
 
+} // namespace app
 } // namespace rack

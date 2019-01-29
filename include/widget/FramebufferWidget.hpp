@@ -1,8 +1,9 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 /** Caches a widget's draw() result to a framebuffer so it is called less frequently
@@ -38,4 +39,5 @@ struct FramebufferWidget : Widget {
 };
 
 
+} // namespace widget
 } // namespace rack

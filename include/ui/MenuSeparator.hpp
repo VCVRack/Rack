@@ -4,12 +4,14 @@
 
 
 namespace rack {
+namespace ui {
 
 
 struct MenuSeparator : MenuEntry {
 	MenuSeparator();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 };
 
 
+} // namespace ui
 } // namespace rack

@@ -2,12 +2,14 @@
 
 
 namespace rack {
+namespace app {
 
 
 SVGScrew::SVGScrew() {
-	sw = new SVGWidget;
+	sw = new widget::SVGWidget;
 	addChild(sw);
 }
 
 
+} // namespace app
 } // namespace rack

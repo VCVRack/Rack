@@ -1,8 +1,9 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 
 
 namespace rack {
+namespace widget {
 
 
 /** Widget that does not respond to events and does not pass events to children */
@@ -18,4 +19,5 @@ struct TransparentWidget : Widget {
 };
 
 
+} // namespace widget
 } // namespace rack

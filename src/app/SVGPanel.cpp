@@ -2,9 +2,10 @@
 
 
 namespace rack {
+namespace app {
 
 
-void PanelBorder::draw(const DrawContext &ctx) {
+void PanelBorder::draw(const widget::DrawContext &ctx) {
 	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
 	nvgBeginPath(ctx.vg);
 	nvgRect(ctx.vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
@@ -15,15 +16,15 @@ void PanelBorder::draw(const DrawContext &ctx) {
 
 
 void SVGPanel::step() {
-	if (math::isNear(app()->window->pixelRatio, 1.0)) {
+	if (math::isNear(APP->window->pixelRatio, 1.0)) {
 		// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 		oversample = 2.0;
 	}
-	FramebufferWidget::step();
+	widget::FramebufferWidget::step();
 }
 
 void SVGPanel::setBackground(std::shared_ptr<SVG> svg) {
-	SVGWidget *sw = new SVGWidget;
+	widget::SVGWidget *sw = new widget::SVGWidget;
 	sw->setSVG(svg);
 	addChild(sw);
 
@@ -36,4 +37,5 @@ void SVGPanel::setBackground(std::shared_ptr<SVG> svg) {
 }
 
 
+} // namespace app
 } // namespace rack

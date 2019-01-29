@@ -21,13 +21,13 @@ Model *createModel(std::string slug) {
 			TModule *o = new TModule;
 			return o;
 		}
-		ModuleWidget *createModuleWidget() override {
+		app::ModuleWidget *createModuleWidget() override {
 			TModule *module = new TModule;
 			TModuleWidget *o = new TModuleWidget(module);
 			o->model = this;
 			return o;
 		}
-		ModuleWidget *createModuleWidgetNull() override {
+		app::ModuleWidget *createModuleWidgetNull() override {
 			TModuleWidget *o = new TModuleWidget(NULL);
 			o->model = this;
 			return o;
@@ -62,7 +62,7 @@ TParamWidget *createParam(math::Vec pos, Module *module, int paramId) {
 		if (f)
 			o->paramQuantity = f->create();
 		else
-			o->paramQuantity = new ParamQuantity;
+			o->paramQuantity = new app::ParamQuantity;
 		o->paramQuantity->module = module;
 		o->paramQuantity->paramId = paramId;
 	}
@@ -81,7 +81,7 @@ TPortWidget *createInput(math::Vec pos, Module *module, int inputId) {
 	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos;
 	o->module = module;
-	o->type = PortWidget::INPUT;
+	o->type = app::PortWidget::INPUT;
 	o->portId = inputId;
 	return o;
 }
@@ -91,7 +91,7 @@ TPortWidget *createInputCentered(math::Vec pos, Module *module, int inputId) {
 	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
-	o->type = PortWidget::INPUT;
+	o->type = app::PortWidget::INPUT;
 	o->portId = inputId;
 	return o;
 }
@@ -101,7 +101,7 @@ TPortWidget *createOutput(math::Vec pos, Module *module, int outputId) {
 	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos;
 	o->module = module;
-	o->type = PortWidget::OUTPUT;
+	o->type = app::PortWidget::OUTPUT;
 	o->portId = outputId;
 	return o;
 }
@@ -111,7 +111,7 @@ TPortWidget *createOutputCentered(math::Vec pos, Module *module, int outputId) {
 	TPortWidget *o = new TPortWidget;
 	o->box.pos = pos.minus(o->box.size.div(2));
 	o->module = module;
-	o->type = PortWidget::OUTPUT;
+	o->type = app::PortWidget::OUTPUT;
 	o->portId = outputId;
 	return o;
 }
@@ -134,14 +134,14 @@ TModuleLightWidget *createLightCentered(math::Vec pos, Module *module, int first
 	return o;
 }
 
-template <class TMenuLabel = MenuLabel>
+template <class TMenuLabel = ui::MenuLabel>
 TMenuLabel *createMenuLabel(std::string text) {
 	TMenuLabel *o = new TMenuLabel;
 	o->text = text;
 	return o;
 }
 
-template <class TMenuItem = MenuItem>
+template <class TMenuItem = ui::MenuItem>
 TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
 	TMenuItem *o = new TMenuItem;
 	o->text = text;
@@ -149,14 +149,14 @@ TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
 	return o;
 }
 
-inline Menu *createMenu() {
-	Menu *o = new Menu;
-	o->box.pos = app()->window->mousePos;
+inline ui::Menu *createMenu() {
+	ui::Menu *o = new ui::Menu;
+	o->box.pos = APP->window->mousePos;
 
-	MenuOverlay *menuOverlay = new MenuOverlay;
+	ui::MenuOverlay *menuOverlay = new ui::MenuOverlay;
 	menuOverlay->addChild(o);
 
-	app()->scene->addChild(menuOverlay);
+	APP->scene->addChild(menuOverlay);
 	return o;
 }
 

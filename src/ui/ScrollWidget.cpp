@@ -4,10 +4,11 @@
 
 
 namespace rack {
+namespace ui {
 
 
 ScrollWidget::ScrollWidget() {
-	container = new Widget;
+	container = new widget::Widget;
 	addChild(container);
 
 	horizontalScrollBar = new ScrollBar;
@@ -26,14 +27,14 @@ void ScrollWidget::scrollTo(math::Rect r) {
 	offset = offset.clampSafe(bound);
 }
 
-void ScrollWidget::draw(const DrawContext &ctx) {
+void ScrollWidget::draw(const widget::DrawContext &ctx) {
 	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
-	Widget::draw(ctx);
+	widget::Widget::draw(ctx);
 	nvgResetScissor(ctx.vg);
 }
 
 void ScrollWidget::step() {
-	Widget::step();
+	widget::Widget::step();
 
 	// Clamp scroll offset
 	math::Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
@@ -69,13 +70,13 @@ void ScrollWidget::step() {
 }
 
 void ScrollWidget::onHover(const event::Hover &e) {
-	OpaqueWidget::onHover(e);
+	widget::OpaqueWidget::onHover(e);
 }
 
 void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 	math::Vec scrollDelta = e.scrollDelta;
 	// Flip coordinates if shift is held
-	if ((app()->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
+	if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
 		scrollDelta = scrollDelta.flip();
 
 	offset = offset.minus(scrollDelta);
@@ -83,4 +84,5 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 }
 
 
+} // namespace ui
 } // namespace rack

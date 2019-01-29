@@ -8,7 +8,10 @@
 namespace rack {
 
 
-struct ModuleWidget;
+namespace app {
+	struct ModuleWidget;
+} // namespace app
+
 struct Module;
 
 
@@ -30,9 +33,9 @@ struct Model {
 	/** Creates a headless Module */
 	virtual Module *createModule() { return NULL; }
 	/** Creates a ModuleWidget with a Module attached */
-	virtual ModuleWidget *createModuleWidget() { return NULL; }
+	virtual app::ModuleWidget *createModuleWidget() { return NULL; }
 	/** Creates a ModuleWidget with no Module, useful for previews */
-	virtual ModuleWidget *createModuleWidgetNull() { return NULL; }
+	virtual app::ModuleWidget *createModuleWidgetNull() { return NULL; }
 
 	void fromJson(json_t *rootJ);
 };

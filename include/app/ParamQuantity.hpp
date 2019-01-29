@@ -5,10 +5,11 @@
 
 
 namespace rack {
+namespace app {
 
 
-/** A Quantity that wraps an engine Param */
-struct ParamQuantity : Quantity {
+/** A ui::Quantity that wraps an engine Param */
+struct ParamQuantity : ui::Quantity {
 	Module *module = NULL;
 	int paramId = 0;
 
@@ -32,4 +33,5 @@ struct ParamQuantity : Quantity {
 };
 
 
+} // namespace app
 } // namespace rack

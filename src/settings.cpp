@@ -21,14 +21,14 @@ static json_t *settingsToJson() {
 	json_t *tokenJ = json_string(plugin::token.c_str());
 	json_object_set_new(rootJ, "token", tokenJ);
 
-	if (!app()->window->isMaximized()) {
+	if (!APP->window->isMaximized()) {
 		// windowSize
-		math::Vec windowSize = app()->window->getWindowSize();
+		math::Vec windowSize = APP->window->getWindowSize();
 		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
 		json_object_set_new(rootJ, "windowSize", windowSizeJ);
 
 		// windowPos
-		math::Vec windowPos = app()->window->getWindowPos();
+		math::Vec windowPos = APP->window->getWindowPos();
 		json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
 		json_object_set_new(rootJ, "windowPos", windowPosJ);
 	}
@@ -46,15 +46,15 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "zoom", zoomJ);
 
 	// allowCursorLock
-	json_t *allowCursorLockJ = json_boolean(app()->window->allowCursorLock);
+	json_t *allowCursorLockJ = json_boolean(APP->window->allowCursorLock);
 	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
 
 	// sampleRate
-	json_t *sampleRateJ = json_real(app()->engine->getSampleRate());
+	json_t *sampleRateJ = json_real(APP->engine->getSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
 
 	// patchPath
-	json_t *patchPathJ = json_string(app()->patch->path.c_str());
+	json_t *patchPathJ = json_string(APP->patch->path.c_str());
 	json_object_set_new(rootJ, "patchPath", patchPathJ);
 
 	// skipLoadOnLaunch
@@ -63,13 +63,13 @@ static json_t *settingsToJson() {
 	}
 
 	// moduleBrowser
-	json_object_set_new(rootJ, "moduleBrowser", moduleBrowserToJson());
+	json_object_set_new(rootJ, "moduleBrowser", app::moduleBrowserToJson());
 
 	// powerMeter
 	json_object_set_new(rootJ, "powerMeter", json_boolean(powerMeter));
 
 	// threadCount
-	json_object_set_new(rootJ, "threadCount", json_integer(app()->engine->threadCount));
+	json_object_set_new(rootJ, "threadCount", json_integer(APP->engine->threadCount));
 
 	// checkVersion
 	json_object_set_new(rootJ, "checkVersion", json_boolean(checkVersion));
@@ -91,7 +91,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowSizeJ) {
 		double width, height;
 		json_unpack(windowSizeJ, "[F, F]", &width, &height);
-		app()->window->setWindowSize(math::Vec(width, height));
+		APP->window->setWindowSize(math::Vec(width, height));
 	}
 
 	// windowPos
@@ -99,7 +99,7 @@ static void settingsFromJson(json_t *rootJ) {
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
-		app()->window->setWindowPos(math::Vec(x, y));
+		APP->window->setWindowPos(math::Vec(x, y));
 	}
 
 	// cableOpacity
@@ -120,19 +120,19 @@ static void settingsFromJson(json_t *rootJ) {
 	// allowCursorLock
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
-		app()->window->allowCursorLock = json_is_true(allowCursorLockJ);
+		APP->window->allowCursorLock = json_is_true(allowCursorLockJ);
 
 	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ) {
 		float sampleRate = json_number_value(sampleRateJ);
-		app()->engine->setSampleRate(sampleRate);
+		APP->engine->setSampleRate(sampleRate);
 	}
 
 	// patchPath
 	json_t *patchPathJ = json_object_get(rootJ, "patchPath");
 	if (patchPathJ)
-		app()->patch->path = json_string_value(patchPathJ);
+		APP->patch->path = json_string_value(patchPathJ);
 
 	// skipLoadOnLaunch
 	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
@@ -142,7 +142,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// moduleBrowser
 	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
 	if (moduleBrowserJ)
-		moduleBrowserFromJson(moduleBrowserJ);
+		app::moduleBrowserFromJson(moduleBrowserJ);
 
 	// powerMeter
 	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
@@ -152,7 +152,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// threadCount
 	json_t *threadCountJ = json_object_get(rootJ, "threadCount");
 	if (threadCountJ)
-		app()->engine->threadCount = json_integer_value(threadCountJ);
+		APP->engine->threadCount = json_integer_value(threadCountJ);
 
 	// checkVersion
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");

@@ -1,13 +1,14 @@
 #pragma once
-#include "widgets/OpaqueWidget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "ui/common.hpp"
 #include "ui/Quantity.hpp"
 
 
 namespace rack {
+namespace ui {
 
 
-struct Button : OpaqueWidget {
+struct Button : widget::OpaqueWidget {
 	std::string text;
 	BNDwidgetState state = BND_DEFAULT;
 	/** Optional, owned. Tracks the pressed state of the button.*/
@@ -15,7 +16,7 @@ struct Button : OpaqueWidget {
 
 	Button();
 	~Button();
-	void draw(const DrawContext &ctx) override;
+	void draw(const widget::DrawContext &ctx) override;
 	void onEnter(const event::Enter &e) override;
 	void onLeave(const event::Leave &e) override;
 	void onDragStart(const event::DragStart &e) override;
@@ -24,4 +25,5 @@ struct Button : OpaqueWidget {
 };
 
 
+} // namespace ui
 } // namespace rack

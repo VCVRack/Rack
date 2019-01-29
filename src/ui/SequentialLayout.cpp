@@ -3,19 +3,20 @@
 
 
 namespace rack {
+namespace ui {
 
 
 #define X(_v) (orientation == HORIZONTAL_ORIENTATION ? (_v).x : (_v).y)
 #define Y(_v) (orientation == HORIZONTAL_ORIENTATION ? (_v).y : (_v).x)
 
 void SequentialLayout::step() {
-	Widget::step();
+	widget::Widget::step();
 
 	// Sort widgets into rows (or columns if vertical)
-	std::vector<std::vector<Widget*>> rows;
+	std::vector<std::vector<widget::Widget*>> rows;
 	rows.resize(1);
 	float rowWidth = 0.0;
-	for (Widget *child : children) {
+	for (widget::Widget *child : children) {
 		if (!child->visible)
 			continue;
 
@@ -36,7 +37,7 @@ void SequentialLayout::step() {
 		float offset = 0.0;
 		if (alignment != LEFT_ALIGNMENT) {
 			float rowWidth = 0.0;
-			for (Widget *child : row) {
+			for (widget::Widget *child : row) {
 				rowWidth += X(child->box.size) + X(spacing);
 			}
 			rowWidth -= X(spacing);
@@ -48,7 +49,7 @@ void SequentialLayout::step() {
 		}
 
 		float maxHeight = 0.0;
-		for (Widget *child : row) {
+		for (widget::Widget *child : row) {
 			child->box.pos = p;
 			X(child->box.pos) += offset;
 
@@ -62,4 +63,5 @@ void SequentialLayout::step() {
 }
 
 
+} // namespace ui
 } // namespace rack

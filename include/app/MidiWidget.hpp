@@ -11,6 +11,9 @@ namespace midi {
 }
 
 
+namespace app {
+
+
 struct MidiWidget : LedDisplay {
 	/** Not owned */
 	midi::IO *midiIO = NULL;
@@ -24,4 +27,5 @@ struct MidiWidget : LedDisplay {
 };
 
 
+} // namespace app
 } // namespace rack

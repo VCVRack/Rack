@@ -1,13 +1,14 @@
 #pragma once
-#include "widgets/Widget.hpp"
+#include "widget/Widget.hpp"
 #include "ui/common.hpp"
 
 
 namespace rack {
+namespace ui {
 
 
 /** Positions children in a row/column based on their widths/heights */
-struct SequentialLayout : Widget {
+struct SequentialLayout : widget::Widget {
 	enum Orientation {
 		HORIZONTAL_ORIENTATION,
 		VERTICAL_ORIENTATION,
@@ -27,4 +28,5 @@ struct SequentialLayout : Widget {
 };
 
 
+} // namespace ui
 } // namespace rack
