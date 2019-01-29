@@ -222,8 +222,9 @@ void ModuleBox::onButton(const event::Button &e) {
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		assert(moduleWidget);
 		APP->scene->rackWidget->addModuleAtMouse(moduleWidget);
-		// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
-		// e.consume(moduleWidget);
+
+		// Pretend the moduleWidget was clicked so it can be dragged in the RackWidget
+		e.consume(moduleWidget);
 
 		// Close Module Browser
 		BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
