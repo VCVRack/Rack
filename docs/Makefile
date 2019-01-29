@@ -8,4 +8,4 @@ upload: doxygen
 	rsync html/ vcvrack.com:vcvrack.com/docs/ -ruvz --delete
 
 clean:
-	rm -rf html
+	rm -rfv html
