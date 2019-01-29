@@ -53,7 +53,6 @@ void Scene::step() {
 	OpaqueWidget::step();
 
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
-	moduleBrowser->box.size = box.size;
 
 	// Autosave every 15 seconds
 	int frame = app()->window->frame;

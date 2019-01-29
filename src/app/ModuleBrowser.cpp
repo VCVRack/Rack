@@ -23,7 +23,36 @@ namespace rack {
 static std::set<Model*> sFavoriteModels;
 
 
-struct ModuleBrowser;
+struct BrowserOverlay : OpaqueWidget {
+	void step() override {
+		box = parent->box.zeroPos();
+		OpaqueWidget::step();
+	}
+
+	void onButton(const event::Button &e) override {
+		OpaqueWidget::onButton(e);
+		if (e.getConsumed() != this)
+			return;
+
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			this->visible = false;
+		}
+	}
+
+	void onHoverKey(const event::HoverKey &e) override {
+		if (e.action == GLFW_PRESS) {
+			switch (e.key) {
+				case GLFW_KEY_ESCAPE: {
+					this->visible = false;
+					e.consume(this);
+				} break;
+			}
+		}
+
+		if (!e.getConsumed())
+			OpaqueWidget::onHoverKey(e);
+	}
+};
 
 
 struct ModuleBox : OpaqueWidget {
@@ -153,6 +182,8 @@ struct ModuleBrowser : OpaqueWidget {
 	}
 
 	void step() override {
+		box = parent->box.zeroPos().grow(math::Vec(-50, -50));
+
 		sidebar->box.size.y = box.size.y;
 
 		moduleScroll->box.pos.x = sidebar->box.size.x;
@@ -168,22 +199,10 @@ struct ModuleBrowser : OpaqueWidget {
 		bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
 		Widget::draw(ctx);
 	}
-
-	void onHoverKey(const event::HoverKey &e) override {
-		if (e.action == GLFW_PRESS) {
-			switch (e.key) {
-				case GLFW_KEY_ESCAPE: {
-					// Close menu
-					this->visible = false;
-					e.consume(this);
-				} break;
-			}
-		}
-
-		if (!e.getConsumed())
-			OpaqueWidget::onHoverKey(e);
-	}
 };
+
+
+// Implementations to resolve dependencies
 
 
 void ModuleBox::onButton(const event::Button &e) {
@@ -194,9 +213,10 @@ void ModuleBox::onButton(const event::Button &e) {
 		app()->scene->rackWidget->addModuleAtMouse(moduleWidget);
 		// This is a bit nonstandard/unsupported usage, but pretend the moduleWidget was clicked so it can be dragged in the RackWidget
 		// e.consume(moduleWidget);
+
 		// Close Module Browser
-		ModuleBrowser *moduleBrowser = getAncestorOfType<ModuleBrowser>();
-		moduleBrowser->visible = false;
+		BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
+		overlay->visible = false;
 
 		// Push ModuleAdd history action
 		history::ModuleAdd *h = new history::ModuleAdd;
@@ -209,8 +229,14 @@ void ModuleBox::onButton(const event::Button &e) {
 
 // Global functions
 
+
 Widget *moduleBrowserCreate() {
-	return new ModuleBrowser;
+	BrowserOverlay *overlay = new BrowserOverlay;
+
+	ModuleBrowser *browser = new ModuleBrowser;
+	overlay->addChild(browser);
+
+	return overlay;
 }
 
 json_t *moduleBrowserToJson() {
