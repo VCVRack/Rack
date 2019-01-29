@@ -10,7 +10,7 @@
       },
       "id": 1,
       "pos": [
-        44,
+        57,
         0
       ]
     },
@@ -37,7 +37,7 @@
       ],
       "id": 2,
       "pos": [
-        34,
+        47,
         0
       ]
     },
@@ -80,7 +80,7 @@
       "model": "VCF",
       "params": [
         {
-          "value": 0.262999862
+          "value": 0.0599999949
         },
         {
           "value": 0.5
@@ -89,7 +89,7 @@
           "value": 0.236999944
         },
         {
-          "value": 0.869999945
+          "value": 1.0
         },
         {
           "value": 0.0
@@ -110,7 +110,12 @@
         "divisions": [
           24,
           6
-        ]
+        ],
+        "midi": {
+          "driver": -11,
+          "deviceName": "QWERTY keyboard (US)",
+          "channel": -1
+        }
       },
       "id": 5,
       "pos": [
@@ -124,7 +129,7 @@
       "model": "ADSR",
       "params": [
         {
-          "value": 0.356000006
+          "value": 0.25
         },
         {
           "value": 0.671000004
@@ -136,9 +141,61 @@
           "value": 0.5
         }
       ],
-      "id": 7,
+      "id": 6,
       "pos": [
         26,
+        0
+      ]
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "1.0.0",
+      "model": "Scope",
+      "params": [
+        {
+          "value": 0.0
+        },
+        {
+          "value": 0.0
+        },
+        {
+          "value": 0.0
+        },
+        {
+          "value": 0.0
+        },
+        {
+          "value": 14.0
+        },
+        {
+          "value": 0.0
+        },
+        {
+          "value": 0.0
+        },
+        {
+          "value": 0.0
+        }
+      ],
+      "data": {
+        "lissajous": 0,
+        "external": 0
+      },
+      "id": 7,
+      "pos": [
+        34,
+        0
+      ]
+    },
+    {
+      "plugin": "Core",
+      "version": "1.dev",
+      "model": "Notes",
+      "params": [],
+      "text": "Demo patch instructions:\n\n1. Choose an audio driver and device in the AUDIO module. \n\n2. Use the QWERTY and ZXCVB rows of your keyboard to generate MIDI notes and convert them to 1V/oct and GATE signals.\n\n3. Drag knobs up/down. Hold CTRL (CMD on Mac) while dragging to fine-tune. Right-click knobs to edit or reset their value. \n\n4. Drag cables to patch them between inputs and outputs. Stack multiple cables on outputs by holding CTRL (CMD on Mac) and dragging from an output.  \n",
+      "id": 8,
+      "pos": [
+        67,
         0
       ]
     }
@@ -161,7 +218,7 @@
       "color": "#0c8e15"
     },
     {
-      "id": 5,
+      "id": 3,
       "outputModuleId": 2,
       "outputId": 0,
       "inputModuleId": 1,
@@ -169,7 +226,7 @@
       "color": "#0986ad"
     },
     {
-      "id": 6,
+      "id": 4,
       "outputModuleId": 2,
       "outputId": 0,
       "inputModuleId": 1,
@@ -177,36 +234,52 @@
       "color": "#c9b70e"
     },
     {
-      "id": 7,
-      "outputModuleId": 7,
+      "id": 5,
+      "outputModuleId": 6,
       "outputId": 0,
       "inputModuleId": 4,
       "inputId": 0,
       "color": "#c91847"
     },
     {
-      "id": 9,
+      "id": 6,
       "outputModuleId": 5,
       "outputId": 1,
-      "inputModuleId": 7,
+      "inputModuleId": 6,
       "inputId": 4,
       "color": "#c9b70e"
     },
     {
-      "id": 11,
-      "outputModuleId": 7,
+      "id": 7,
+      "outputModuleId": 6,
       "outputId": 0,
       "inputModuleId": 2,
       "inputId": 5,
       "color": "#0c8e15"
     },
     {
-      "id": 13,
+      "id": 8,
       "outputModuleId": 4,
       "outputId": 0,
       "inputModuleId": 2,
       "inputId": 1,
       "color": "#0986ad"
+    },
+    {
+      "id": 9,
+      "outputModuleId": 2,
+      "outputId": 1,
+      "inputModuleId": 7,
+      "inputId": 0,
+      "color": "#c9b70e"
+    },
+    {
+      "id": 10,
+      "outputModuleId": 5,
+      "outputId": 6,
+      "inputModuleId": 6,
+      "inputId": 5,
+      "color": "#c91847"
     }
   ]
 }
