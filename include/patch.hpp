@@ -13,13 +13,14 @@ struct PatchManager {
 	int legacy;
 	std::string warningLog;
 
+	void init(std::string path);
 	void reset();
 	void resetDialog();
 	void save(std::string path);
 	void saveDialog();
 	void saveAsDialog();
 	void saveTemplateDialog();
-	void load(std::string path);
+	bool load(std::string path);
 	void loadDialog();
 	/** If `lastPath` is defined, ask the user to reload it */
 	void revertDialog();

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 	bool devMode = false;
-	std::string patchFile;
+	std::string patchPath;
 
 	// Parse command line arguments
 	int c;
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	if (optind < argc) {
-		patchFile = argv[optind];
+		patchPath = argv[optind];
 	}
 
 	// Initialize environment
@@ -86,28 +86,8 @@ int main(int argc, char *argv[]) {
 	appInit();
 	app()->scene->devMode = devMode;
 	settings::load(asset::user("settings.json"));
+	app()->patch->init(patchPath);
 
-	if (patchFile.empty()) {
-		// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
-		bool oldSkipLoadOnLaunch = settings::skipLoadOnLaunch;
-		settings::skipLoadOnLaunch = true;
-		settings::save(asset::user("settings.json"));
-		settings::skipLoadOnLaunch = false;
-		if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
-			app()->patch->path = "";
-		}
-		else {
-			// Load autosave
-			std::string oldLastPath = app()->patch->path;
-			app()->patch->load(asset::user("autosave.vcv"));
-			app()->patch->path = oldLastPath;
-		}
-	}
-	else {
-		// Load patch
-		app()->patch->load(patchFile);
-		app()->patch->path = patchFile;
-	}
 	INFO("Initialized app");
 
 	app()->engine->start();

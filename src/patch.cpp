@@ -5,6 +5,8 @@
 #include "app/Scene.hpp"
 #include "app/RackWidget.hpp"
 #include "history.hpp"
+#include "settings.hpp"
+
 #include "osdialog.h"
 
 
@@ -13,6 +15,39 @@ namespace rack {
 
 static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 
+
+void PatchManager::init(std::string path) {
+	if (!path.empty()) {
+		// Load patch
+		load(path);
+		this->path = path;
+		return;
+	}
+
+	// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
+	bool oldSkipLoadOnLaunch = settings::skipLoadOnLaunch;
+	settings::skipLoadOnLaunch = true;
+	settings::save(asset::user("settings.json"));
+	settings::skipLoadOnLaunch = false;
+	if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
+		this->path = "";
+		return;
+	}
+
+	// Load autosave
+	if (load(asset::user("autosave.vcv"))) {
+		return;
+	}
+
+	this->path = "";
+	if (load(asset::user("template.vcv"))) {
+		return;
+	}
+
+	if (load(asset::system("template.vcv"))) {
+		return;
+	}
+}
 
 void PatchManager::reset() {
 	app()->history->clear();
@@ -102,12 +137,12 @@ void PatchManager::saveTemplateDialog() {
 	}
 }
 
-void PatchManager::load(std::string path) {
+bool PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 	FILE *file = std::fopen(path.c_str(), "r");
 	if (!file) {
 		// Exit silently
-		return;
+		return false;
 	}
 	DEFER({
 		std::fclose(file);
@@ -118,7 +153,7 @@ void PatchManager::load(std::string path) {
 	if (!rootJ) {
 		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
-		return;
+		return false;
 	}
 	DEFER({
 		json_decref(rootJ);
@@ -128,6 +163,7 @@ void PatchManager::load(std::string path) {
 	app()->scene->rackWidget->clear();
 	app()->scene->scrollWidget->offset = math::Vec(0, 0);
 	fromJson(rootJ);
+	return true;
 }
 
 void PatchManager::loadDialog() {
