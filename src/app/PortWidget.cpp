@@ -3,7 +3,7 @@
 #include "window.hpp"
 #include "app.hpp"
 #include "history.hpp"
-#include "componentlibrary.hpp"
+#include "component.hpp"
 
 
 namespace rack {
@@ -12,11 +12,11 @@ namespace app {
 
 struct PlugLight : MultiLightWidget {
 	PlugLight() {
-		addBaseColor(SCHEME_GREEN);
-		addBaseColor(SCHEME_RED);
-		addBaseColor(SCHEME_BLUE);
+		addBaseColor(component::GREEN);
+		addBaseColor(component::RED);
+		addBaseColor(component::BLUE);
 		box.size = math::Vec(8, 8);
-		bgColor = SCHEME_BLACK_TRANSPARENT;
+		bgColor = component::BLACK_TRANSPARENT;
 	}
 };
 

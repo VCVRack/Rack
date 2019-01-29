@@ -3,24 +3,25 @@
 
 
 namespace rack {
+namespace component {
 
 
 ////////////////////
 // Color scheme
 ////////////////////
 
-static const NVGcolor SCHEME_BLACK_TRANSPARENT = nvgRGBA(0x00, 0x00, 0x00, 0x00);
-static const NVGcolor SCHEME_BLACK = nvgRGB(0x00, 0x00, 0x00);
-static const NVGcolor SCHEME_WHITE = nvgRGB(0xff, 0xff, 0xff);
-static const NVGcolor SCHEME_RED = nvgRGB(0xed, 0x2c, 0x24);
-static const NVGcolor SCHEME_ORANGE = nvgRGB(0xf2, 0xb1, 0x20);
-static const NVGcolor SCHEME_YELLOW = nvgRGB(0xf9, 0xdf, 0x1c);
-static const NVGcolor SCHEME_GREEN = nvgRGB(0x90, 0xc7, 0x3e);
-static const NVGcolor SCHEME_CYAN = nvgRGB(0x22, 0xe6, 0xef);
-static const NVGcolor SCHEME_BLUE = nvgRGB(0x29, 0xb2, 0xef);
-static const NVGcolor SCHEME_PURPLE = nvgRGB(0xd5, 0x2b, 0xed);
-static const NVGcolor SCHEME_LIGHT_GRAY = nvgRGB(0xe6, 0xe6, 0xe6);
-static const NVGcolor SCHEME_DARK_GRAY = nvgRGB(0x17, 0x17, 0x17);
+static const NVGcolor BLACK_TRANSPARENT = nvgRGBA(0x00, 0x00, 0x00, 0x00);
+static const NVGcolor BLACK = nvgRGB(0x00, 0x00, 0x00);
+static const NVGcolor WHITE = nvgRGB(0xff, 0xff, 0xff);
+static const NVGcolor RED = nvgRGB(0xed, 0x2c, 0x24);
+static const NVGcolor ORANGE = nvgRGB(0xf2, 0xb1, 0x20);
+static const NVGcolor YELLOW = nvgRGB(0xf9, 0xdf, 0x1c);
+static const NVGcolor GREEN = nvgRGB(0x90, 0xc7, 0x3e);
+static const NVGcolor CYAN = nvgRGB(0x22, 0xe6, 0xef);
+static const NVGcolor BLUE = nvgRGB(0x29, 0xb2, 0xef);
+static const NVGcolor PURPLE = nvgRGB(0xd5, 0x2b, 0xed);
+static const NVGcolor LIGHT_GRAY = nvgRGB(0xe6, 0xe6, 0xe6);
+static const NVGcolor DARK_GRAY = nvgRGB(0x17, 0x17, 0x17);
 
 ////////////////////
 // Knobs
@@ -405,41 +406,41 @@ struct GrayModuleLightWidget : app::ModuleLightWidget {
 
 struct RedLight : GrayModuleLightWidget {
 	RedLight() {
-		addBaseColor(SCHEME_RED);
+		addBaseColor(RED);
 	}
 };
 
 struct GreenLight : GrayModuleLightWidget {
 	GreenLight() {
-		addBaseColor(SCHEME_GREEN);
+		addBaseColor(GREEN);
 	}
 };
 
 struct YellowLight : GrayModuleLightWidget {
 	YellowLight() {
-		addBaseColor(SCHEME_YELLOW);
+		addBaseColor(YELLOW);
 	}
 };
 
 struct BlueLight : GrayModuleLightWidget {
 	BlueLight() {
-		addBaseColor(SCHEME_BLUE);
+		addBaseColor(BLUE);
 	}
 };
 
 /** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
 struct GreenRedLight : GrayModuleLightWidget {
 	GreenRedLight() {
-		addBaseColor(SCHEME_GREEN);
-		addBaseColor(SCHEME_RED);
+		addBaseColor(GREEN);
+		addBaseColor(RED);
 	}
 };
 
 struct RedGreenBlueLight : GrayModuleLightWidget {
 	RedGreenBlueLight() {
-		addBaseColor(SCHEME_RED);
-		addBaseColor(SCHEME_GREEN);
-		addBaseColor(SCHEME_BLUE);
+		addBaseColor(RED);
+		addBaseColor(GREEN);
+		addBaseColor(BLUE);
 	}
 };
 
@@ -604,4 +605,5 @@ struct ScrewBlack : app::SVGScrew {
 };
 
 
+} // namespace component
 } // namespace rack

@@ -101,5 +101,8 @@ using plugin::Plugin;
 using plugin::Model;
 using namespace engine;
 
+namespace component {}
+using namespace component;
+
 
 } // namespace rack

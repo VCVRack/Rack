@@ -1,5 +1,5 @@
 #include "rack.hpp"
-#include "componentlibrary.hpp"
+#include "component.hpp"
 
 
 using namespace rack;
