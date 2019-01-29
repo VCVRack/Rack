@@ -33,7 +33,7 @@ ifdef ARCH_WIN
 	LDFLAGS += -static \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
 		-Ldep/lib -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto -lrtaudio -lrtmidi \
-		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi
+		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid
 	TARGET := Rack.exe
 	OBJECTS += Rack.res
 endif
