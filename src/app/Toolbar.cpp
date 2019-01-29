@@ -290,10 +290,19 @@ struct SampleRateItem : MenuItem {
 
 		menu->addChild(new EnginePauseItem);
 
-		std::vector<float> sampleRates = {44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000, 705600, 768000};
-		for (float sampleRate : sampleRates) {
+		for (int i = 0; i <= 4; i++) {
+			int oversample = 1 << i;
+
 			SampleRateValueItem *item = new SampleRateValueItem;
-			item->setSampleRate(sampleRate);
+			item->setSampleRate(44100.f * oversample);
+			if (oversample > 1)
+				item->text += string::f(" (%dx)", oversample);
+			menu->addChild(item);
+
+			item = new SampleRateValueItem;
+			item->setSampleRate(48000.f * oversample);
+			if (oversample > 1)
+				item->text += string::f(" (%dx)", oversample);
 			menu->addChild(item);
 		}
 		return menu;
