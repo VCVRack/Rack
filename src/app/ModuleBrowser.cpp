@@ -21,7 +21,7 @@ namespace rack {
 namespace app {
 
 
-static std::set<Model*> sFavoriteModels;
+static std::set<plugin::Model*> sFavoriteModels;
 
 
 struct BrowserOverlay : widget::OpaqueWidget {
@@ -57,13 +57,13 @@ struct BrowserOverlay : widget::OpaqueWidget {
 
 
 struct ModuleBox : widget::OpaqueWidget {
-	Model *model;
+	plugin::Model *model;
 	/** Lazily created */
 	widget::Widget *previewWidget = NULL;
 	/** Number of frames since draw() has been called */
 	int visibleFrames = 0;
 
-	void setModel(Model *model) {
+	void setModel(plugin::Model *model) {
 		this->model = model;
 
 		box.size.x = 70.f;
@@ -173,8 +173,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		moduleLayout->spacing = math::Vec(10, 10);
 		moduleScroll->container->addChild(moduleLayout);
 
-		for (Plugin *plugin : plugin::plugins) {
-			for (Model *model : plugin->models) {
+		for (plugin::Plugin *plugin : plugin::plugins) {
+			for (plugin::Model *model : plugin->models) {
 				ModuleBox *moduleBox = new ModuleBox;
 				moduleBox->setModel(model);
 				moduleLayout->addChild(moduleBox);
@@ -244,7 +244,7 @@ json_t *moduleBrowserToJson() {
 	json_t *rootJ = json_object();
 
 	json_t *favoritesJ = json_array();
-	for (Model *model : sFavoriteModels) {
+	for (plugin::Model *model : sFavoriteModels) {
 		json_t *modelJ = json_object();
 		json_object_set_new(modelJ, "plugin", json_string(model->plugin->slug.c_str()));
 		json_object_set_new(modelJ, "model", json_string(model->slug.c_str()));
@@ -267,7 +267,7 @@ void moduleBrowserFromJson(json_t *rootJ) {
 				continue;
 			std::string pluginSlug = json_string_value(pluginJ);
 			std::string modelSlug = json_string_value(modelJ);
-			Model *model = plugin::getModel(pluginSlug, modelSlug);
+			plugin::Model *model = plugin::getModel(pluginSlug, modelSlug);
 			if (!model)
 				continue;
 			sFavoriteModels.insert(model);

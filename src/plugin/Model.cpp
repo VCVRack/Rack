@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace plugin {
 
 
 void Model::fromJson(json_t *rootJ) {
@@ -25,4 +26,5 @@ void Model::fromJson(json_t *rootJ) {
 }
 
 
+} // namespace plugin
 } // namespace rack

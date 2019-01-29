@@ -15,8 +15,8 @@ namespace rack {
 
 
 template <class TModule, class TModuleWidget, typename... Tags>
-Model *createModel(std::string slug) {
-	struct TModel : Model {
+plugin::Model *createModel(std::string slug) {
+	struct TModel : plugin::Model {
 		Module *createModule() override {
 			TModule *o = new TModule;
 			return o;
@@ -34,7 +34,7 @@ Model *createModel(std::string slug) {
 		}
 	};
 
-	Model *o = new TModel;
+	plugin::Model *o = new TModel;
 	o->slug = slug;
 	return o;
 }

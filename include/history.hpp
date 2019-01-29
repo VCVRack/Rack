@@ -57,7 +57,7 @@ struct ModuleAction : Action {
 
 
 struct ModuleAdd : ModuleAction {
-	Model *model;
+	plugin::Model *model;
 	math::Vec pos;
 	json_t *moduleJ;
 	~ModuleAdd();

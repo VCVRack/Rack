@@ -5,6 +5,7 @@
 
 
 namespace rack {
+namespace plugin {
 
 
 struct Model;
@@ -46,4 +47,5 @@ struct Plugin {
 };
 
 
+} // namespace plugin
 } // namespace rack

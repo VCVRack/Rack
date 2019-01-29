@@ -30,7 +30,7 @@ static ModuleWidget *moduleFromJson(json_t *moduleJ) {
 	std::string modelSlug = json_string_value(modelSlugJ);
 
 	// Get Model
-	Model *model = plugin::getModel(pluginSlug, modelSlug);
+	plugin::Model *model = plugin::getModel(pluginSlug, modelSlug);
 	if (!model)
 		return NULL;
 

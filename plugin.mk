@@ -10,7 +10,6 @@ DISTRIBUTABLES += plugin.json
 FLAGS += -fPIC
 FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 
-
 include $(RACK_DIR)/arch.mk
 
 ifdef ARCH_LIN

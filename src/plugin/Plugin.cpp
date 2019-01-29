@@ -3,6 +3,7 @@
 
 
 namespace rack {
+namespace plugin {
 
 
 Plugin::~Plugin() {
@@ -88,4 +89,5 @@ void Plugin::fromJson(json_t *rootJ) {
 }
 
 
+} // namespace plugin
 } // namespace rack

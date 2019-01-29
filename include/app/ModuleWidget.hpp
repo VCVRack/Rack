@@ -13,7 +13,7 @@ namespace app {
 
 
 struct ModuleWidget : widget::OpaqueWidget {
-	Model *model = NULL;
+	plugin::Model *model = NULL;
 	/** Owns the module pointer */
 	Module *module = NULL;
 

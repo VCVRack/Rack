@@ -105,7 +105,7 @@ std::string user(std::string filename) {
 }
 
 
-std::string plugin(Plugin *plugin, std::string filename) {
+std::string plugin(plugin::Plugin *plugin, std::string filename) {
 	assert(plugin);
 	return plugin->path + "/" + filename;
 }

@@ -97,6 +97,8 @@ using namespace math;
 using namespace widget;
 using namespace ui;
 using namespace app;
+using plugin::Plugin;
+using plugin::Model;
 
 
 } // namespace rack

@@ -12,7 +12,11 @@ namespace app {
 	struct ModuleWidget;
 } // namespace app
 
+
 struct Module;
+
+
+namespace plugin {
 
 
 struct Model {
@@ -41,4 +45,5 @@ struct Model {
 };
 
 
+} // namespace plugin
 } // namespace rack
