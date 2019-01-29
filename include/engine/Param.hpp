@@ -12,6 +12,9 @@ namespace app {
 } // namespace app
 
 
+namespace engine {
+
+
 struct ParamQuantityFactory {
 	virtual ~ParamQuantityFactory() {}
 	virtual app::ParamQuantity *create() = 0;
@@ -87,4 +90,5 @@ struct Param {
 };
 
 
+} // namespace engine
 } // namespace rack

@@ -15,7 +15,7 @@ namespace app {
 struct ModuleWidget : widget::OpaqueWidget {
 	plugin::Model *model = NULL;
 	/** Owns the module pointer */
-	Module *module = NULL;
+	engine::Module *module = NULL;
 
 	widget::Widget *panel = NULL;
 	std::vector<ParamWidget*> params;
@@ -26,7 +26,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	math::Vec oldPos;
 
 	ModuleWidget() {}
-	DEPRECATED ModuleWidget(Module *module) {
+	DEPRECATED ModuleWidget(engine::Module *module) {
 		setModule(module);
 	}
 	~ModuleWidget();
@@ -44,7 +44,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Associates this ModuleWidget with the Module
 	Transfers ownership
 	*/
-	void setModule(Module *module);
+	void setModule(engine::Module *module);
 	void setPanel(std::shared_ptr<SVG> svg);
 
 	/** Convenience functions for adding special widgets (calls addChild()) */

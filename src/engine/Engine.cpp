@@ -13,6 +13,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 /** Threads which obtain a VIPLock will cause wait() to block for other less important threads.
@@ -414,4 +415,5 @@ float Engine::getSampleTime() {
 }
 
 
+} // namespace engine
 } // namespace rack

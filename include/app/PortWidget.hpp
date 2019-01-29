@@ -10,7 +10,7 @@ namespace app {
 
 
 struct PortWidget : widget::OpaqueWidget {
-	Module *module = NULL;
+	engine::Module *module = NULL;
 	int portId;
 
 	enum Type {

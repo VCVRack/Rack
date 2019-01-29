@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 struct Cable {
@@ -16,4 +17,5 @@ struct Cable {
 };
 
 
+} // namespace engine
 } // namespace rack

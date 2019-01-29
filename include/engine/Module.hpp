@@ -9,6 +9,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 struct Module {
@@ -53,4 +54,5 @@ struct Module {
 };
 
 
+} // namespace engine
 } // namespace rack

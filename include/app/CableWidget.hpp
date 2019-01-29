@@ -16,7 +16,7 @@ struct CableWidget : widget::OpaqueWidget {
 	PortWidget *inputPort = NULL;
 	PortWidget *hoveredOutputPort = NULL;
 	PortWidget *hoveredInputPort = NULL;
-	Cable *cable;
+	engine::Cable *cable;
 	NVGcolor color;
 
 	CableWidget();

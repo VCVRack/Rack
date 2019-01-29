@@ -11,14 +11,19 @@ namespace rack {
 
 namespace event {
 	struct State;
-}
+} // namespace event
+
 
 namespace history {
 	struct State;
-}
+} // namespace history
 
 
-struct Engine;
+namespace engine {
+	struct Engine;
+} // namespace engine
+
+
 struct Window;
 struct PatchManager;
 
@@ -33,7 +38,7 @@ struct Scene;
 struct App {
 	event::State *event = NULL;
 	Scene *scene = NULL;
-	Engine *engine = NULL;
+	engine::Engine *engine = NULL;
 	Window *window = NULL;
 	history::State *history = NULL;
 	PatchManager *patch = NULL;

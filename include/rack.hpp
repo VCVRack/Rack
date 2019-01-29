@@ -99,6 +99,7 @@ using namespace ui;
 using namespace app;
 using plugin::Plugin;
 using plugin::Model;
+using namespace engine;
 
 
 } // namespace rack

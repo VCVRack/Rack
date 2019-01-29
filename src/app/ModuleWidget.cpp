@@ -289,7 +289,7 @@ void ModuleWidget::onDragMove(const event::DragMove &e) {
 	}
 }
 
-void ModuleWidget::setModule(Module *module) {
+void ModuleWidget::setModule(engine::Module *module) {
 	if (this->module) {
 		delete this->module;
 	}

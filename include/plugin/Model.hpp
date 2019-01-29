@@ -13,7 +13,9 @@ namespace app {
 } // namespace app
 
 
-struct Module;
+namespace engine {
+	struct Module;
+} // namespace engine
 
 
 namespace plugin {
@@ -35,7 +37,7 @@ struct Model {
 
 	virtual ~Model() {}
 	/** Creates a headless Module */
-	virtual Module *createModule() { return NULL; }
+	virtual engine::Module *createModule() { return NULL; }
 	/** Creates a ModuleWidget with a Module attached */
 	virtual app::ModuleWidget *createModuleWidget() { return NULL; }
 	/** Creates a ModuleWidget with no Module, useful for previews */

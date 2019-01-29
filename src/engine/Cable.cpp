@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 void Cable::step() {
@@ -16,4 +17,5 @@ void Cable::step() {
 }
 
 
+} // namespace engine
 } // namespace rack

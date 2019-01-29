@@ -3,6 +3,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 struct Light {
@@ -38,4 +39,5 @@ struct Light {
 };
 
 
+} // namespace engine
 } // namespace rack

@@ -89,7 +89,7 @@ CableWidget::CableWidget() {
 	lastCableColorId = (lastCableColorId + 1) % LENGTHOF(cableColors);
 	color = cableColors[lastCableColorId];
 
-	cable = new Cable;
+	cable = new engine::Cable;
 }
 
 CableWidget::~CableWidget() {

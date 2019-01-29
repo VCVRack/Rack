@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 Module::Module() {
@@ -88,4 +89,5 @@ void Module::randomize() {
 }
 
 
+} // namespace engine
 } // namespace rack

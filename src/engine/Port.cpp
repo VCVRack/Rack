@@ -2,6 +2,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 void Port::step() {
@@ -30,4 +31,5 @@ void Port::step() {
 }
 
 
+} // namespace engine
 } // namespace rack

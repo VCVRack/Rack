@@ -15,7 +15,7 @@ App::App() {
 	event = new event::State;
 	history = new history::State;
 	window = new Window;
-	engine = new Engine;
+	engine = new engine::Engine;
 	patch = new PatchManager;
 	scene = new Scene;
 	event->rootWidget = scene;

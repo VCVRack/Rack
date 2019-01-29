@@ -10,10 +10,10 @@ namespace app {
 
 /** A ui::Quantity that wraps an engine Param */
 struct ParamQuantity : ui::Quantity {
-	Module *module = NULL;
+	engine::Module *module = NULL;
 	int paramId = 0;
 
-	Param *getParam();
+	engine::Param *getParam();
 	/** Request to the engine to smoothly set the value */
 	void setSmoothValue(float smoothValue);
 	float getSmoothValue();

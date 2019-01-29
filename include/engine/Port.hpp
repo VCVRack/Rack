@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 static const int PORT_MAX_CHANNELS = 16;
@@ -79,4 +80,5 @@ struct Output : Port {};
 struct Input : Port {};
 
 
+} // namespace engine
 } // namespace rack

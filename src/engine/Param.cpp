@@ -4,6 +4,7 @@
 
 
 namespace rack {
+namespace engine {
 
 
 bool Param::isBounded() {
@@ -42,4 +43,5 @@ void Param::randomize() {
 }
 
 
+} // namespace engine
 } // namespace rack
