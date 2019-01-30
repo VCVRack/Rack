@@ -147,7 +147,7 @@ struct Engine::Internal {
 
 	int threadCount = 1;
 	std::vector<EngineWorker> workers;
-	Barrier engineBarrier;
+	SpinBarrier engineBarrier;
 	SpinBarrier workerBarrier;
 };
 
