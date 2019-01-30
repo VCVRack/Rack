@@ -17,8 +17,6 @@ SOURCES += $(wildcard dep/jpommier-pffft-*/pffft.c) $(wildcard dep/jpommier-pfff
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifdef ARCH_MAC
-	FLAGS += -Xpreprocessor -fopenmp
-	SOURCES += dep/osdialog/osdialog_mac.m
 	LDFLAGS += -lpthread -ldl \
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
 		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a dep/lib/libomp.a
@@ -27,8 +25,6 @@ ifdef ARCH_MAC
 endif
 
 ifdef ARCH_WIN
-	FLAGS += -fopenmp
-	LDFLAGS += -fopenmp
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -static \
 		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
@@ -39,8 +35,6 @@ ifdef ARCH_WIN
 endif
 
 ifdef ARCH_LIN
-	FLAGS += -fopenmp
-	LDFLAGS += -fopenmp
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
 	LDFLAGS += -rdynamic \

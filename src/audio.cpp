@@ -2,6 +2,7 @@
 #include "string.hpp"
 #include "math.hpp"
 #include "bridge.hpp"
+#include "system.hpp"
 
 
 namespace rack {
@@ -207,6 +208,10 @@ void IO::setChannels(int numOutputs, int numInputs) {
 static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
 	IO *audioIO = (IO*) userData;
 	assert(audioIO);
+	// Exploit the stream time to run code on startup of the audio thread
+	if (streamTime == 0.0) {
+		system::setThreadName("Audio");
+	}
 	audioIO->processStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
 	return 0;
 }

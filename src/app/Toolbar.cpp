@@ -260,10 +260,10 @@ struct LockModulesItem : ui::MenuItem {
 struct EnginePauseItem : ui::MenuItem {
 	EnginePauseItem() {
 		text = "Pause engine";
-		rightText = CHECKMARK(APP->engine->paused);
+		rightText = CHECKMARK(APP->engine->isPaused());
 	}
 	void onAction(const event::Action &e) override {
-		APP->engine->paused ^= true;
+		APP->engine->setPaused(!APP->engine->isPaused());
 	}
 };
 
@@ -277,7 +277,7 @@ struct SampleRateValueItem : ui::MenuItem {
 	}
 	void onAction(const event::Action &e) override {
 		APP->engine->setSampleRate(sampleRate);
-		APP->engine->paused = false;
+		APP->engine->setPaused(false);
 	}
 };
 
@@ -320,10 +320,10 @@ struct ThreadCountValueItem : ui::MenuItem {
 			text += " (default)";
 		else if (threadCount == system::getPhysicalCoreCount() / 2)
 			text += " (recommended)";
-		rightText = CHECKMARK(APP->engine->threadCount == threadCount);
+		rightText = CHECKMARK(APP->engine->getThreadCount() == threadCount);
 	}
 	void onAction(const event::Action &e) override {
-		APP->engine->threadCount = threadCount;
+		APP->engine->setThreadCount(threadCount);
 	}
 };
 

@@ -149,11 +149,11 @@ void ModuleWidget::draw(const widget::DrawContext &ctx) {
 		nvgBeginPath(ctx.vg);
 		nvgRect(ctx.vg,
 			0, box.size.y - 20,
-			65, 20);
+			105, 20);
 		nvgFillColor(ctx.vg, nvgRGBAf(0, 0, 0, 0.75));
 		nvgFill(ctx.vg);
 
-		std::string cpuText = string::f("%.2f μs", module->cpuTime * 1e6f);
+		std::string cpuText = string::f("%.2f μs %.1f%%", module->cpuTime * 1e6f, module->cpuTime * APP->engine->getSampleRate() * 100);
 		bndLabel(ctx.vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
 
 		float p = math::clamp(module->cpuTime / APP->engine->getSampleTime(), 0.f, 1.f);

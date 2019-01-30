@@ -69,7 +69,7 @@ static json_t *settingsToJson() {
 	json_object_set_new(rootJ, "powerMeter", json_boolean(powerMeter));
 
 	// threadCount
-	json_object_set_new(rootJ, "threadCount", json_integer(APP->engine->threadCount));
+	json_object_set_new(rootJ, "threadCount", json_integer(APP->engine->getThreadCount()));
 
 	// checkVersion
 	json_object_set_new(rootJ, "checkVersion", json_boolean(checkVersion));
@@ -152,7 +152,7 @@ static void settingsFromJson(json_t *rootJ) {
 	// threadCount
 	json_t *threadCountJ = json_object_get(rootJ, "threadCount");
 	if (threadCountJ)
-		APP->engine->threadCount = json_integer_value(threadCountJ);
+		APP->engine->setThreadCount(json_integer_value(threadCountJ));
 
 	// checkVersion
 	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");

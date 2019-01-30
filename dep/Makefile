@@ -30,7 +30,6 @@ ifdef ARCH_MAC
 	rtmidi = lib/librtmidi.a
 	rtaudio = lib/librtaudio.a
 	openssl = lib/libssl.a
-	libomp = lib/libomp.a
 endif
 
 ifdef ARCH_WIN
@@ -178,15 +177,6 @@ $(pffft):
 	$(SHA256) 29e4f76ac53b.zip bb10afba127904a0c6c553fa445082729b7d72373511bda1b12a5be0e03f318a
 	$(UNZIP) 29e4f76ac53b.zip
 	cp jpommier-pffft-29e4f76ac53b/*.h include/
-
-$(libomp):
-	$(WGET) "https://releases.llvm.org/7.0.1/openmp-7.0.1.src.tar.xz"
-	$(SHA256) openmp-7.0.1.src.tar.xz bf16b78a678da67d68405214ec7ee59d86a15f599855806192a75dcfca9b0d0c
-	$(UNTAR) openmp-7.0.1.src.tar.xz
-	cd openmp-7.0.1.src && mkdir -p build
-	cd openmp-7.0.1.src/build && $(CMAKE) .. -DLIBOMP_ENABLE_SHARED=OFF
-	$(MAKE) -C openmp-7.0.1.src/build
-	$(MAKE) -C openmp-7.0.1.src/build install
 
 clean:
 	git clean -fdx

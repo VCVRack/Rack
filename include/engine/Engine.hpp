@@ -10,14 +10,6 @@ namespace engine {
 
 
 struct Engine {
-	/** Plugins should not manipulate other modules or cables unless that is the entire purpose of the module.
-	Your plugin needs to have a clear purpose for manipulating other modules and cables and must be done with a good UX.
-	*/
-	std::vector<Module*> modules;
-	std::vector<Cable*> cables;
-	bool paused = false;
-	int threadCount;
-
 	struct Internal;
 	Internal *internal;
 
@@ -27,6 +19,10 @@ struct Engine {
 	void start();
 	/** Stops engine thread */
 	void stop();
+	void setThreadCount(int threadCount);
+	int getThreadCount();
+	void setPaused(bool paused);
+	bool isPaused();
 	/** Does not transfer pointer ownership */
 	void addModule(Module *module);
 	void removeModule(Module *module);

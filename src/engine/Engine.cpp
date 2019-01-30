@@ -8,6 +8,7 @@
 #include <thread>
 #include <condition_variable>
 #include <mutex>
+#include <atomic>
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 
@@ -32,6 +33,7 @@ struct VIPMutex {
 	}
 };
 
+
 struct VIPLock {
 	VIPMutex &m;
 	VIPLock(VIPMutex &m) : m(m) {
@@ -47,7 +49,85 @@ struct VIPLock {
 };
 
 
+struct Barrier {
+	std::mutex mutex;
+	std::condition_variable cv;
+	int count = 0;
+	int total = 0;
+
+	void wait() {
+		// Waiting on one thread is trivial.
+		if (total <= 1)
+			return;
+		std::unique_lock<std::mutex> lock(mutex);
+		count++;
+		if (count >= total) {
+			count = 0;
+			cv.notify_all();
+		}
+		else {
+			cv.wait(lock);
+		}
+	}
+};
+
+
+struct SpinBarrier {
+	std::atomic<int> count;
+	int total = 0;
+
+	SpinBarrier() {
+		count = 0;
+	}
+
+	void wait() {
+		count++;
+		if (count >= total) {
+			count = 0;
+		}
+		else {
+			while (count > 0) {}
+		}
+	}
+};
+
+
+struct EngineWorker {
+	Engine *engine;
+	int id;
+	std::thread thread;
+	bool running = true;
+
+	void start() {
+		thread = std::thread([&] {
+			system::setThreadName("Engine worker");
+			run();
+		});
+	}
+
+	void stop() {
+		running = false;
+	}
+
+	void join() {
+		thread.join();
+	}
+
+	void run() {
+		while (running) {
+			step();
+		}
+	}
+
+	void step();
+};
+
+
 struct Engine::Internal {
+	std::vector<Module*> modules;
+	std::vector<Cable*> cables;
+	bool paused = false;
+
 	bool running = false;
 	float sampleRate;
 	float sampleTime;
@@ -64,6 +144,11 @@ struct Engine::Internal {
 	std::mutex mutex;
 	std::thread thread;
 	VIPMutex vipMutex;
+
+	int threadCount = 1;
+	std::vector<EngineWorker> workers;
+	Barrier engineBarrier;
+	SpinBarrier workerBarrier;
 };
 
 
@@ -74,57 +159,55 @@ Engine::Engine() {
 	internal->sampleRate = sampleRate;
 	internal->sampleTime = 1 / sampleRate;
 	internal->sampleRateRequested = sampleRate;
-
-	threadCount = 1;
 }
 
 Engine::~Engine() {
 	// Make sure there are no cables or modules in the rack on destruction. This suggests that a module failed to remove itself before the RackWidget was destroyed.
-	assert(cables.empty());
-	assert(modules.empty());
+	assert(internal->cables.empty());
+	assert(internal->modules.empty());
 
 	delete internal;
 }
 
-static void Engine_step(Engine *engine) {
-	// Sample rate
-	if (engine->internal->sampleRateRequested != engine->internal->sampleRate) {
-		engine->internal->sampleRate = engine->internal->sampleRateRequested;
-		engine->internal->sampleTime = 1 / engine->internal->sampleRate;
-		for (Module *module : engine->modules) {
-			module->onSampleRateChange();
+static void Engine_setWorkerCount(Engine *engine, int workerCount) {
+	Engine::Internal *internal = engine->internal;
+
+	// Stop all workers
+	for (EngineWorker &worker : internal->workers) {
+		worker.stop();
+	}
+	internal->engineBarrier.wait();
+
+	// Destroy all workers
+	for (EngineWorker &worker : internal->workers) {
+		worker.join();
+	}
+	internal->workers.resize(0);
+
+	// Set barrier counts
+	internal->engineBarrier.total = workerCount + 1;
+	internal->workerBarrier.total = workerCount + 1;
+
+	if (workerCount >= 1) {
+		// Create workers
+		internal->workers.resize(workerCount);
+		for (int i = 0; i < workerCount; i++) {
+			EngineWorker &worker = internal->workers[i];
+			worker.id = i + 1;
+			worker.engine = engine;
+			worker.start();
 		}
 	}
+}
 
-	// Param smoothing
-	{
-		Module *smoothModule = engine->internal->smoothModule;
-		int smoothParamId = engine->internal->smoothParamId;
-		float smoothValue = engine->internal->smoothValue;
-		if (smoothModule) {
-			Param *param = &smoothModule->params[smoothParamId];
-			float value = param->value;
-			// decay rate is 1 graphics frame
-			const float smoothLambda = 60.f;
-			float newValue = value + (smoothValue - value) * smoothLambda * engine->internal->sampleTime;
-			if (value == newValue || !(param->minValue <= newValue && newValue <= param->maxValue)) {
-				// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats), or if newValue is out of bounds
-				param->setValue(smoothValue);
-				engine->internal->smoothModule = NULL;
-			}
-			else {
-				param->value = newValue;
-			}
-		}
-	}
+static void Engine_stepModules(Engine *engine, int id) {
+	Engine::Internal *internal = engine->internal;
 
-	const float cpuLambda = engine->internal->sampleTime / 2.f;
+	int threadCount = internal->threadCount;
+	int modulesLen = internal->modules.size();
 
-	// Iterate modules
-	int modulesLen = engine->modules.size();
-	#pragma omp parallel for num_threads(engine->threadCount) schedule(guided, 1)
-	for (int i = 0; i < modulesLen; i++) {
-		Module *module = engine->modules[i];
+	for (int i = id; i < modulesLen; i += threadCount) {
+		Module *module = internal->modules[i];
 		if (!module->bypass) {
 			// Step module
 			if (settings::powerMeter) {
@@ -134,8 +217,9 @@ static void Engine_step(Engine *engine) {
 
 				auto stopTime = std::chrono::high_resolution_clock::now();
 				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
-				// Smooth cpu time
-				module->cpuTime += (cpuTime - module->cpuTime) * cpuLambda;
+				// Smooth CPU time
+				const float cpuTau = 2.f /* seconds */;
+				module->cpuTime += (cpuTime - module->cpuTime) * internal->sampleTime / cpuTau;
 			}
 			else {
 				module->step();
@@ -150,19 +234,57 @@ static void Engine_step(Engine *engine) {
 			output.step();
 		}
 	}
+}
 
-#if 0
-	if (random::u32() % 1000 == 0 && settings::powerMeter) {
-		float cpuTotal = 0.f;
-		for (Module *module : engine->modules) {
-			cpuTotal += module->cpuTime;
+static void Engine_step(Engine *engine) {
+	Engine::Internal *internal = engine->internal;
+
+	// Sample rate
+	if (internal->sampleRateRequested != internal->sampleRate) {
+		internal->sampleRate = internal->sampleRateRequested;
+		internal->sampleTime = 1 / internal->sampleRate;
+		for (Module *module : internal->modules) {
+			module->onSampleRateChange();
 		}
-		DEBUG("%fus %f%% CPU", cpuTotal * 1e6, cpuTotal * engine->internal->sampleRate * 100);
 	}
-#endif
+
+	// Param smoothing
+	{
+		Module *smoothModule = internal->smoothModule;
+		int smoothParamId = internal->smoothParamId;
+		float smoothValue = internal->smoothValue;
+		if (smoothModule) {
+			Param *param = &smoothModule->params[smoothParamId];
+			float value = param->value;
+			// decay rate is 1 graphics frame
+			const float smoothLambda = 60.f;
+			float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
+			if (value == newValue || !(param->minValue <= newValue && newValue <= param->maxValue)) {
+				// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats), or if newValue is out of bounds
+				param->setValue(smoothValue);
+				internal->smoothModule = NULL;
+			}
+			else {
+				param->value = newValue;
+			}
+		}
+	}
+
+	// Lazily create/destroy workers
+	int workerCount = internal->threadCount - 1;
+	if ((int) internal->workers.size() != workerCount) {
+		Engine_setWorkerCount(engine, workerCount);
+	}
+	else {
+		internal->engineBarrier.wait();
+	}
+
+	// Step modules along with workers
+	Engine_stepModules(engine, 0);
+	internal->workerBarrier.wait();
 
 	// Step cables
-	for (Cable *cable : engine->cables) {
+	for (Cable *cable : engine->internal->cables) {
 		cable->step();
 	}
 }
@@ -186,7 +308,7 @@ static void Engine_run(Engine *engine) {
 	while (engine->internal->running) {
 		engine->internal->vipMutex.wait();
 
-		if (!engine->paused) {
+		if (!engine->internal->paused) {
 			std::lock_guard<std::mutex> lock(engine->internal->mutex);
 			// auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -214,6 +336,8 @@ static void Engine_run(Engine *engine) {
 			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
 		}
 	}
+
+	Engine_setWorkerCount(engine, 0);
 }
 
 void Engine::start() {
@@ -226,13 +350,35 @@ void Engine::stop() {
 	internal->thread.join();
 }
 
+void Engine::setThreadCount(int threadCount) {
+	assert(threadCount >= 1);
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::mutex> lock(internal->mutex);
+	internal->threadCount = threadCount;
+}
+
+int Engine::getThreadCount() {
+	// No lock
+	return internal->threadCount;
+}
+
+void Engine::setPaused(bool paused) {
+	// No lock
+	internal->paused = paused;
+}
+
+bool Engine::isPaused() {
+	// No lock
+	return internal->paused;
+}
+
 void Engine::addModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
 	// Check that the module is not already added
-	auto it = std::find(modules.begin(), modules.end(), module);
-	assert(it == modules.end());
+	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+	assert(it == internal->modules.end());
 	// Set ID
 	if (module->id == 0) {
 		// Automatically assign ID
@@ -242,12 +388,12 @@ void Engine::addModule(Module *module) {
 		// Manual ID
 		assert(module->id < internal->nextModuleId);
 		// Check that the ID is not already taken
-		for (Module *m : modules) {
+		for (Module *m : internal->modules) {
 			assert(module->id != m->id);
 		}
 	}
 	// Add module
-	modules.push_back(module);
+	internal->modules.push_back(module);
 }
 
 void Engine::removeModule(Module *module) {
@@ -259,15 +405,15 @@ void Engine::removeModule(Module *module) {
 		internal->smoothModule = NULL;
 	}
 	// Check that all cables are disconnected
-	for (Cable *cable : cables) {
+	for (Cable *cable : internal->cables) {
 		assert(cable->outputModule != module);
 		assert(cable->inputModule != module);
 	}
 	// Check that the module actually exists
-	auto it = std::find(modules.begin(), modules.end(), module);
-	assert(it != modules.end());
+	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+	assert(it != internal->modules.end());
 	// Remove the module
-	modules.erase(it);
+	internal->modules.erase(it);
 	// Remove id
 	module->id = 0;
 }
@@ -311,7 +457,7 @@ void Engine::bypassModule(Module *module, bool bypass) {
 
 static void Engine_updateConnected(Engine *engine) {
 	// Set everything to unconnected
-	for (Module *module : engine->modules) {
+	for (Module *module : engine->internal->modules) {
 		for (Input &input : module->inputs) {
 			input.active = false;
 		}
@@ -320,7 +466,7 @@ static void Engine_updateConnected(Engine *engine) {
 		}
 	}
 	// Set inputs/outputs to active
-	for (Cable *cable : engine->cables) {
+	for (Cable *cable : engine->internal->cables) {
 		cable->outputModule->outputs[cable->outputId].active = true;
 		cable->inputModule->inputs[cable->inputId].active = true;
 	}
@@ -334,7 +480,7 @@ void Engine::addCable(Cable *cable) {
 	assert(cable->outputModule);
 	assert(cable->inputModule);
 	// Check that the cable is not already added, and that the input is not already used by another cable
-	for (Cable *cable2 : cables) {
+	for (Cable *cable2 : internal->cables) {
 		assert(cable2 != cable);
 		assert(!(cable2->inputModule == cable->inputModule && cable2->inputId == cable->inputId));
 	}
@@ -347,12 +493,12 @@ void Engine::addCable(Cable *cable) {
 		// Manual ID
 		assert(cable->id < internal->nextCableId);
 		// Check that the ID is not already taken
-		for (Cable *w : cables) {
+		for (Cable *w : internal->cables) {
 			assert(cable->id != w->id);
 		}
 	}
 	// Add the cable
-	cables.push_back(cable);
+	internal->cables.push_back(cable);
 	Engine_updateConnected(this);
 }
 
@@ -361,13 +507,13 @@ void Engine::removeCable(Cable *cable) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::mutex> lock(internal->mutex);
 	// Check that the cable is already added
-	auto it = std::find(cables.begin(), cables.end(), cable);
-	assert(it != cables.end());
+	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
+	assert(it != internal->cables.end());
 	// Set input to inactive
 	Input &input = cable->inputModule->inputs[cable->inputId];
 	input.setChannels(0);
 	// Remove the cable
-	cables.erase(it);
+	internal->cables.erase(it);
 	Engine_updateConnected(this);
 	// Remove ID
 	cable->id = 0;
@@ -412,6 +558,13 @@ float Engine::getSampleRate() {
 
 float Engine::getSampleTime() {
 	return internal->sampleTime;
+}
+
+
+void EngineWorker::step() {
+	Engine_stepModules(engine, id);
+	engine->internal->workerBarrier.wait();
+	engine->internal->engineBarrier.wait();
 }
 
 

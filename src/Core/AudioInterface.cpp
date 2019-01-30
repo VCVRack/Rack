@@ -1,11 +1,11 @@
 #include "Core.hpp"
 #include "audio.hpp"
+#include "app.hpp"
 #include <mutex>
 #include <chrono>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include "app.hpp"
 
 
 static const int AUDIO_OUTPUTS = 8;
