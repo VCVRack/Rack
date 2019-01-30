@@ -20,24 +20,39 @@ struct Plugin {
 	/** OS-dependent library handle */
 	void *handle = NULL;
 
-	/** Must be unique. Used for patch files and the VCV store API.
+	/** Must be unique. Used for saving patches. Never change this.
 	To guarantee uniqueness, it is a good idea to prefix the slug by your "company name" if available, e.g. "MyCompany-MyPlugin"
 	*/
 	std::string slug;
-	/** The version of your plugin
-	Plugins should follow the versioning scheme described at https://github.com/VCVRack/Rack/issues/266
-	Do not include the "v" in "v1.0" for example.
+	/** Your plugin's latest version, using the guidelines at https://github.com/VCVRack/Rack/issues/266. Do not include the "v" prefix.
 	*/
 	std::string version;
-	/** Human readable name for your plugin, e.g. "Voltage Controlled Oscillator" */
+	/** Human-readable display name for your plugin. You can change this on a whim, unlike slugs.
+	*/
 	std::string name;
-	std::string author;
+	/** The license type of your plugin. Use "proprietary" if all rights are reserved. If your license is in the [SPDX license list](https://spdx.org/licenses/), use its abbreviation in the "Identifier" column.
+	*/
 	std::string license;
+	/** Your name, company, alias, or GitHub username.
+	*/
+	std::string author;
+	/** Your email address for support inquiries.
+	*/
 	std::string authorEmail;
+	/** Homepage featuring the plugin itself.
+	*/
 	std::string pluginUrl;
+	/** Homepage of the author.
+	*/
 	std::string authorUrl;
+	/** The manual of your plugin. HTML, PDF, or GitHub readme/wiki are fine.
+	*/
 	std::string manualUrl;
+	/** The source code homepage. E.g. GitHub repo.
+	*/
 	std::string sourceUrl;
+	/** Link to donation page for users who wish to donate. E.g. PayPal URL.
+	*/
 	std::string donateUrl;
 
 	virtual ~Plugin();
