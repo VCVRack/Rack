@@ -61,12 +61,12 @@ struct Barrier {
 			return;
 		std::unique_lock<std::mutex> lock(mutex);
 		count++;
-		if (count >= total) {
-			count = 0;
-			cv.notify_all();
+		if (count < total) {
+			cv.wait(lock);
 		}
 		else {
-			cv.wait(lock);
+			count = 0;
+			cv.notify_all();
 		}
 	}
 };
@@ -82,11 +82,11 @@ struct SpinBarrier {
 
 	void wait() {
 		count++;
-		if (count >= total) {
-			count = 0;
+		if (count < total) {
+			while (count > 0) {}
 		}
 		else {
-			while (count > 0) {}
+			count = 0;
 		}
 	}
 };
@@ -159,6 +159,9 @@ Engine::Engine() {
 	internal->sampleRate = sampleRate;
 	internal->sampleTime = 1 / sampleRate;
 	internal->sampleRateRequested = sampleRate;
+
+	internal->engineBarrier.total = 1;
+	internal->workerBarrier.total = 1;
 }
 
 Engine::~Engine() {
@@ -209,6 +212,11 @@ static void Engine_stepModules(Engine *engine, int id) {
 	for (int i = id; i < modulesLen; i += threadCount) {
 		Module *module = internal->modules[i];
 		if (!module->bypass) {
+			for (Output &output : module->outputs) {
+				// Reset output channels without clearing channel voltages
+				output.channels = 1;
+			}
+
 			// Step module
 			if (settings::powerMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
@@ -223,6 +231,11 @@ static void Engine_stepModules(Engine *engine, int id) {
 			}
 			else {
 				module->step();
+			}
+		}
+		else {
+			for (Output &output : module->outputs) {
+				output.setChannels(0);
 			}
 		}
 

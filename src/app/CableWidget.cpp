@@ -209,28 +209,27 @@ void CableWidget::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &mo
 void CableWidget::draw(const widget::DrawContext &ctx) {
 	float opacity = settings::cableOpacity;
 	float tension = settings::cableTension;
-
-	if (!isComplete()) {
-		// Draw opaque if the cable is incomplete
-		opacity = 1.0;
-	}
-	else {
-		// Draw opaque if mouse is hovering over a connected port
-		if (outputPort->hovered || inputPort->hovered)
-			opacity = 1.0;
-	}
-
 	float thickness = 5;
+
 	if (isComplete()) {
-		Output *output = &cable->outputModule->outputs[cable->outputId];
-		if (output->channels > 1) {
-			// Increase thickness if output port is polyphonic
+		Input *input = &cable->inputModule->inputs[cable->inputId];
+		// Draw opaque if mouse is hovering over a connected port
+		if (input->channels > 1) {
+			// Increase thickness if input port is polyphonic
 			thickness = 8;
 		}
-		// else if (output->channels == 0) {
-		// 	// Draw translucent cable if not active (i.e. 0 channels)
-		// 	opacity *= 0.5;
-		// }
+
+		if (outputPort->hovered || inputPort->hovered) {
+			opacity = 1.0;
+		}
+		else if (input->channels == 0) {
+			// Draw translucent cable if not active (i.e. 0 channels)
+			opacity *= 0.25;
+		}
+	}
+	else {
+		// Draw opaque if the cable is incomplete
+		opacity = 1.0;
 	}
 
 	math::Vec outputPos = getOutputPos();

@@ -38,16 +38,11 @@ void PortWidget::step() {
 		return;
 
 	std::vector<float> values(3);
-	// Input and Outputs are not virtual, so we can't cast to Port to make this less redundant.
-	if (type == OUTPUT) {
-		values[0] = module->outputs[portId].plugLights[0].getBrightness();
-		values[1] = module->outputs[portId].plugLights[1].getBrightness();
-		values[2] = module->outputs[portId].plugLights[2].getBrightness();
-	}
-	else {
-		values[0] = module->inputs[portId].plugLights[0].getBrightness();
-		values[1] = module->inputs[portId].plugLights[1].getBrightness();
-		values[2] = module->inputs[portId].plugLights[2].getBrightness();
+	for (int i = 0; i < 3; i++) {
+		if (type == OUTPUT)
+			values[i] = module->outputs[portId].plugLights[i].getBrightness();
+		else
+			values[i] = module->inputs[portId].plugLights[i].getBrightness();
 	}
 	plugLight->setBrightnesses(values);
 }
