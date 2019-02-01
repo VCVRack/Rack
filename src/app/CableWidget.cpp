@@ -212,17 +212,17 @@ void CableWidget::draw(const widget::DrawContext &ctx) {
 	float thickness = 5;
 
 	if (isComplete()) {
-		Input *input = &cable->inputModule->inputs[cable->inputId];
+		Output *output = &cable->outputModule->outputs[cable->outputId];
 		// Draw opaque if mouse is hovering over a connected port
-		if (input->channels > 1) {
-			// Increase thickness if input port is polyphonic
+		if (output->channels > 1) {
+			// Increase thickness if output port is polyphonic
 			thickness = 8;
 		}
 
 		if (outputPort->hovered || inputPort->hovered) {
 			opacity = 1.0;
 		}
-		else if (input->channels == 0) {
+		else if (output->channels == 0) {
 			// Draw translucent cable if not active (i.e. 0 channels)
 			opacity *= 0.25;
 		}

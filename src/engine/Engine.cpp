@@ -212,11 +212,6 @@ static void Engine_stepModules(Engine *engine, int id) {
 	for (int i = id; i < modulesLen; i += threadCount) {
 		Module *module = internal->modules[i];
 		if (!module->bypass) {
-			for (Output &output : module->outputs) {
-				// Reset output channels without clearing channel voltages
-				output.channels = 1;
-			}
-
 			// Step module
 			if (settings::powerMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
@@ -231,11 +226,6 @@ static void Engine_stepModules(Engine *engine, int id) {
 			}
 			else {
 				module->step();
-			}
-		}
-		else {
-			for (Output &output : module->outputs) {
-				output.setChannels(0);
 			}
 		}
 
@@ -461,8 +451,7 @@ void Engine::bypassModule(Module *module, bool bypass) {
 	else {
 		// Set all outputs to 1 channel
 		for (Output &output : module->outputs) {
-			// Don't use Port::setChannels() so we maintain all previous voltages
-			output.channels = 1;
+			output.setChannels(1);
 		}
 	}
 	module->bypass = bypass;
