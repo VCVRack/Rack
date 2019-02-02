@@ -7,11 +7,12 @@ namespace engine {
 
 
 struct Light {
-	/** The mean-square of the brightness
+	/** The mean-square of the brightness.
 	Unstable API. Use set/getBrightness().
 	*/
 	float value = 0.f;
 
+	/** Sets the brightness directly with no LED modeling. */
 	void setBrightness(float brightness) {
 		value = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;
 	}
@@ -21,7 +22,8 @@ struct Light {
 	}
 
 	/** Emulates slow fall (but immediate rise) of LED brightness.
-	`frames` rescales the timestep. For example, if your module calls this method every 16 frames, use 16.f.
+	`frames` rescales the timestep.
+	For example, if your module calls this method every 16 frames, use 16.f.
 	*/
 	void setBrightnessSmooth(float brightness, float frames = 1.f) {
 		float v = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;

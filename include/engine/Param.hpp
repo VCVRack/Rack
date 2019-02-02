@@ -22,30 +22,33 @@ struct ParamQuantityFactory {
 
 
 struct Param {
-	/** Unstable API. Use set/getValue() instead. */
+	/** Unstable API. Use setValue() and getValue() instead. */
 	float value = 0.f;
 
+	/** The minimum allowed value. */
 	float minValue = 0.f;
+	/** The maximum allowed value. Must be greater than minValue. */
 	float maxValue = 1.f;
+	/** The initial value. */
 	float defaultValue = 0.f;
 
-	/** The name of the parameter in sentence capitalization
+	/** The name of the parameter, using sentence capitalization.
 	e.g. "Frequency", "Pulse width", "Alternative mode"
 	*/
 	std::string label;
-	/** The numerical unit of measurement
+	/** The numerical unit of measurement appended to the value.
 	Use a space before non-abbreviations to separate the numerical value.
 	e.g. " semitones", "Hz", "%", "V"
 	*/
 	std::string unit;
-	/** Set to 0 for linear, nonzero for exponential */
+	/** Set to 0 for linear, nonzero for exponential. */
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
 	float displayOffset = 0.f;
-	/** An optional one-sentence description of the parameter */
+	/** An optional one-sentence description of the parameter. */
 	std::string description;
 	ParamQuantityFactory *paramQuantityFactory = NULL;
-	/** Determines whether this param will be randomized automatically when the user requests to randomize the module state */
+	/** Determines whether this Param will be randomized when the user requests to randomize the Module. */
 	bool randomizable = true;
 
 	~Param() {
@@ -82,6 +85,7 @@ struct Param {
 		this->value = math::clamp(value, minValue, maxValue);
 	}
 
+	/** Returns whether the Param has finite range between minValue and maxValue. */
 	bool isBounded();
 	json_t *toJson();
 	void fromJson(json_t *rootJ);

@@ -13,7 +13,7 @@ static const int PORT_MAX_CHANNELS = 16;
 struct Port {
 	/** Voltage of the port. */
 	union {
-		/** Unstable API. Use set/getVoltage() instead. */
+		/** Unstable API. Use getVoltage() and setVoltage() instead. */
 		float voltages[PORT_MAX_CHANNELS] = {};
 		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */
 		float value;
@@ -26,7 +26,7 @@ struct Port {
 	/** Unstable API. Use isConnected() instead. */
 	bool active;
 	/** For rendering plug lights on cables.
-	Green for positive, red for negative, and blue for polyphonic
+	Green for positive, red for negative, and blue for polyphonic.
 	*/
 	Light plugLights[3];
 
@@ -55,6 +55,7 @@ struct Port {
 		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
 	}
 
+	/** Sets the number of polyphony channels. */
 	void setChannels(int channels) {
 		// Set higher channel voltages to 0
 		for (int c = channels; c < this->channels; c++) {
@@ -67,12 +68,16 @@ struct Port {
 		return channels;
 	}
 
+	/** Returns if a cable is connected to the Port.
+	You can use this for skipping code that generates output voltages.
+	*/
 	bool isConnected() {
 		return active;
 	}
 
 	void step();
 
+	/** Use getNormalVoltage() instead. */
 	DEPRECATED float normalize(float normalVoltage) {
 		return getNormalVoltage(normalVoltage);
 	}

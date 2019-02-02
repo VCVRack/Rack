@@ -12,6 +12,7 @@ namespace rack {
 namespace dsp {
 
 
+/** Resamples by a fixed rational factor. */
 template<int CHANNELS>
 struct SampleRateConverter {
 	SpeexResamplerState *st = NULL;
@@ -101,6 +102,7 @@ struct SampleRateConverter {
 };
 
 
+/** Downsamples by an integer factor. */
 template<int OVERSAMPLE, int QUALITY>
 struct Decimator {
 	float inBuffer[OVERSAMPLE*QUALITY];
@@ -135,6 +137,7 @@ struct Decimator {
 };
 
 
+/** Upsamples by an integer factor. */
 template<int OVERSAMPLE, int QUALITY>
 struct Upsampler {
 	float inBuffer[QUALITY];

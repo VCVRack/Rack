@@ -15,21 +15,21 @@ struct Engine {
 
 	Engine();
 	~Engine();
-	/** Starts engine thread */
+	/** Starts engine thread. */
 	void start();
-	/** Stops engine thread */
+	/** Stops engine thread. */
 	void stop();
 	void setThreadCount(int threadCount);
 	int getThreadCount();
 	void setPaused(bool paused);
 	bool isPaused();
-	/** Does not transfer pointer ownership */
+	/** Does not transfer pointer ownership. */
 	void addModule(Module *module);
 	void removeModule(Module *module);
 	void resetModule(Module *module);
 	void randomizeModule(Module *module);
 	void bypassModule(Module *module, bool bypass);
-	/** Does not transfer pointer ownership */
+	/** Does not transfer pointer ownership. */
 	void addCable(Cable *cable);
 	void removeCable(Cable *cable);
 	void setParam(Module *module, int paramId, float value);
