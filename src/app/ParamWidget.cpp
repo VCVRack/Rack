@@ -90,7 +90,7 @@ struct ParamResetItem : ui::MenuItem {
 	ParamWidget *paramWidget;
 	ParamResetItem() {
 		text = "Initialize";
-		rightText = WINDOW_MOD_SHIFT_NAME "+Click";
+		rightText = "Double-click";
 	}
 	void onAction(const event::Action &e) override {
 		paramWidget->resetAction();
@@ -101,7 +101,7 @@ struct ParamResetItem : ui::MenuItem {
 struct ParamFineItem : ui::MenuItem {
 	ParamFineItem() {
 		text = "Fine adjust";
-		rightText = WINDOW_MOD_CTRL_NAME "+Drag";
+		rightText = WINDOW_MOD_CTRL_NAME "+drag";
 		disabled = true;
 	}
 };
@@ -149,16 +149,12 @@ void ParamWidget::onButton(const event::Button &e) {
 		e.consume(this);
 	}
 
-	// Shift-click to reset
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT) {
-		resetAction();
-		// HACK so that dragging won't occur
-		e.consume(NULL);
-		return;
-	}
-
 	if (!e.getConsumed())
 		widget::OpaqueWidget::onButton(e);
+}
+
+void ParamWidget::onDoubleClick(const event::DoubleClick &e) {
+	resetAction();
 }
 
 void ParamWidget::onEnter(const event::Enter &e) {

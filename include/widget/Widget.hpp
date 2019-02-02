@@ -122,6 +122,7 @@ struct Widget {
 	*/
 	virtual void onHover(const event::Hover &e) {recursePositionEvent(&Widget::onHover, e);}
 	virtual void onButton(const event::Button &e) {recursePositionEvent(&Widget::onButton, e);}
+	virtual void onDoubleClick(const event::DoubleClick &e) {}
 	virtual void onHoverKey(const event::HoverKey &e) {recursePositionEvent(&Widget::onHoverKey, e);}
 	virtual void onHoverText(const event::HoverText &e) {recursePositionEvent(&Widget::onHoverText, e);}
 	virtual void onHoverScroll(const event::HoverScroll &e) {recursePositionEvent(&Widget::onHoverScroll, e);}

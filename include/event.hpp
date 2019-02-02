@@ -86,6 +86,12 @@ struct Button : Event, Position {
 };
 
 
+/** Occurs when the left mouse button is pressed the second time within a time and position window.
+*/
+struct DoubleClick : Event {
+};
+
+
 /** Occurs when a key is pressed, released, or repeated while the mouse is hovering a Widget.
 Recurses until consumed.
 */
@@ -246,6 +252,9 @@ struct State {
 	widget::Widget *selectedWidget = NULL;
 	/** For middle-click dragging */
 	widget::Widget *scrollWidget = NULL;
+	/** For double-clicking */
+	double lastClickTime = -INFINITY;
+	math::Vec lastClickPos;
 
 	void setHovered(widget::Widget *w);
 	void setDragged(widget::Widget *w);

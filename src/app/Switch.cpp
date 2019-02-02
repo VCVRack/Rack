@@ -23,6 +23,10 @@ void Switch::step() {
 	ParamWidget::step();
 }
 
+void Switch::onDoubleClick(const event::DoubleClick &e) {
+	// Don't reset parameter on double-click
+}
+
 void Switch::onDragStart(const event::DragStart &e) {
 	if (momentary) {
 		if (paramQuantity) {

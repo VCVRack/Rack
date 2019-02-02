@@ -133,6 +133,20 @@ void State::handleButton(math::Vec pos, int button, int action, int mods) {
 		if (action == GLFW_PRESS) {
 			setSelected(clickedWidget);
 		}
+
+		if (action == GLFW_PRESS) {
+			const double doubleClickDuration = 0.5;
+			const float doubleClickDistance = 10;
+			double clickTime = glfwGetTime();
+			if (clickTime - lastClickTime <= doubleClickDuration && pos.minus(lastClickPos).norm() <= doubleClickDistance) {
+
+				// event::DoubleClick
+				event::DoubleClick eDoubleClick;
+				clickedWidget->onDoubleClick(eDoubleClick);
+			}
+			lastClickTime = clickTime;
+			lastClickPos = pos;
+		}
 	}
 
 	// if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
