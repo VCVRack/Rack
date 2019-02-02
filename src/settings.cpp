@@ -80,6 +80,9 @@ static json_t *settingsToJson() {
 	// frameRateLimit
 	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
 
+	// frameRateSync
+	json_object_set_new(rootJ, "frameRateSync", json_boolean(frameRateSync));
+
 	return rootJ;
 }
 
@@ -171,6 +174,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
 	if (frameRateLimitJ)
 		frameRateLimit = json_number_value(frameRateLimitJ);
+
+	// frameRateSync
+	json_t *frameRateSyncJ = json_object_get(rootJ, "frameRateSync");
+	if (frameRateSyncJ)
+		frameRateSync = json_boolean_value(frameRateSyncJ);
 }
 
 
@@ -217,6 +225,7 @@ bool lockModules = false;
 bool checkVersion = true;
 bool skipLoadOnLaunch = false;
 float frameRateLimit = 0.0;
+bool frameRateSync = true;
 
 
 } // namespace settings

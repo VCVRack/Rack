@@ -223,7 +223,7 @@ Window::Window() {
 
 	glfwMakeContextCurrent(win);
 	// Enable v-sync
-	glfwSwapInterval(1);
+	glfwSwapInterval(settings::frameRateSync ? 1 : 0);
 
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
 	glfwSetMouseButtonCallback(win, mouseButtonCallback);

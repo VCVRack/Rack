@@ -19,6 +19,7 @@ extern bool lockModules;
 extern bool checkVersion;
 extern bool skipLoadOnLaunch;
 extern float frameRateLimit;
+extern bool frameRateSync;
 
 
 } // namespace settings
