@@ -6,6 +6,7 @@
 #include "event.hpp"
 #include "app.hpp"
 #include "patch.hpp"
+#include "settings.hpp"
 
 #include <map>
 #include <queue>
@@ -221,6 +222,7 @@ Window::Window() {
 	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
 
 	glfwMakeContextCurrent(win);
+	// Enable v-sync
 	glfwSwapInterval(1);
 
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
@@ -371,15 +373,18 @@ void Window::run() {
 			glfwSwapBuffers(win);
 		}
 
-		// Limit framerate manually if vsync isn't working
+		// Limit frame rate
 		double endTime = glfwGetTime();
-		double frameTime = endTime - startTime;
-		double minTime = 1 / 120.0;
-		if (frameTime < minTime) {
-			std::this_thread::sleep_for(std::chrono::duration<double>(minTime - frameTime));
+		if (settings::frameRateLimit > 0.0) {
+			double frameDuration = endTime - startTime;
+			double waitDuration = 1.0 / settings::frameRateLimit - frameDuration;
+			if (waitDuration > 0.0) {
+				std::this_thread::sleep_for(std::chrono::duration<double>(waitDuration));
+			}
 		}
+
+		// Compute actual frame rate
 		endTime = glfwGetTime();
-		// INFO("%lf fps", 1.0 / (endTime - startTime));
 		frame++;
 	}
 }

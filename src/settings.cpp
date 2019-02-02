@@ -77,6 +77,9 @@ static json_t *settingsToJson() {
 	// paramTooltip
 	json_object_set_new(rootJ, "paramTooltip", json_boolean(paramTooltip));
 
+	// frameRateLimit
+	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
+
 	return rootJ;
 }
 
@@ -163,6 +166,11 @@ static void settingsFromJson(json_t *rootJ) {
 	json_t *paramTooltipJ = json_object_get(rootJ, "paramTooltip");
 	if (paramTooltipJ)
 		paramTooltip = json_boolean_value(paramTooltipJ);
+
+	// frameRateLimit
+	json_t *frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
+	if (frameRateLimitJ)
+		frameRateLimit = json_number_value(frameRateLimitJ);
 }
 
 
@@ -208,6 +216,7 @@ bool powerMeter = false;
 bool lockModules = false;
 bool checkVersion = true;
 bool skipLoadOnLaunch = false;
+float frameRateLimit = 0.0;
 
 
 } // namespace settings
