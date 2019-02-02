@@ -145,7 +145,7 @@ void ModuleWidget::draw(const widget::DrawContext &ctx) {
 	widget::Widget::draw(ctx);
 
 	// Power meter
-	if (module && settings::powerMeter) {
+	if (module && settings.cpuMeter) {
 		nvgBeginPath(ctx.vg);
 		nvgRect(ctx.vg,
 			0, box.size.y - 20,
@@ -285,7 +285,7 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 }
 
 void ModuleWidget::onDragMove(const event::DragMove &e) {
-	if (!settings::lockModules) {
+	if (!settings.lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = APP->scene->rackWidget->mousePos.minus(dragPos);
 		APP->scene->rackWidget->requestModuleBoxNearest(this, newBox);

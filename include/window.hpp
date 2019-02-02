@@ -71,7 +71,6 @@ struct Window {
 	This is not equal to gPixelRatio in general.
 	*/
 	float windowRatio = 1.f;
-	bool allowCursorLock = true;
 	int frame = 0;
 	/** The last known absolute mouse position in the window */
 	math::Vec mousePos;
@@ -90,11 +89,6 @@ struct Window {
 	Don't call this from a Key event. Simply use `e.mods` instead.
 	*/
 	int getMods();
-	math::Vec getWindowSize();
-	void setWindowSize(math::Vec size);
-	math::Vec getWindowPos();
-	void setWindowPos(math::Vec pos);
-	bool isMaximized();
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
 };

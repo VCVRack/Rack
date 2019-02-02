@@ -13,6 +13,8 @@ struct PatchManager {
 	int legacy;
 	std::string warningLog;
 
+	PatchManager();
+	~PatchManager();
 	void init(std::string path);
 	void reset();
 	void resetDialog();

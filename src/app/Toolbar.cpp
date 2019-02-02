@@ -180,10 +180,10 @@ struct EditButton : MenuButton {
 
 struct ZoomQuantity : ui::Quantity {
 	void setValue(float value) override {
-		settings::zoom = math::clamp(value, getMinValue(), getMaxValue());
+		settings.zoom = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings::zoom;
+		return settings.zoom;
 	}
 	float getMinValue() override {return 0.25;}
 	float getMaxValue() override {return 2.0;}
@@ -197,10 +197,10 @@ struct ZoomQuantity : ui::Quantity {
 
 struct CableOpacityQuantity : ui::Quantity {
 	void setValue(float value) override {
-		settings::cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
+		settings.cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings::cableOpacity;
+		return settings.cableOpacity;
 	}
 	float getDefaultValue() override {return 0.5;}
 	float getDisplayValue() override {return getValue() * 100;}
@@ -213,10 +213,10 @@ struct CableOpacityQuantity : ui::Quantity {
 
 struct CableTensionQuantity : ui::Quantity {
 	void setValue(float value) override {
-		settings::cableTension = math::clamp(value, getMinValue(), getMaxValue());
+		settings.cableTension = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings::cableTension;
+		return settings.cableTension;
 	}
 	float getDefaultValue() override {return 0.5;}
 	std::string getLabel() override {return "Cable tension";}
@@ -224,13 +224,13 @@ struct CableTensionQuantity : ui::Quantity {
 };
 
 
-struct PowerMeterItem : ui::MenuItem {
-	PowerMeterItem() {
+struct CpuMeterItem : ui::MenuItem {
+	CpuMeterItem() {
 		text = "CPU meter";
-		rightText = CHECKMARK(settings::powerMeter);
+		rightText = CHECKMARK(settings.cpuMeter);
 	}
 	void onAction(const event::Action &e) override {
-		settings::powerMeter ^= true;
+		settings.cpuMeter ^= true;
 	}
 };
 
@@ -238,10 +238,10 @@ struct PowerMeterItem : ui::MenuItem {
 struct ParamTooltipItem : ui::MenuItem {
 	ParamTooltipItem() {
 		text = "Parameter tooltips";
-		rightText = CHECKMARK(settings::paramTooltip);
+		rightText = CHECKMARK(settings.paramTooltip);
 	}
 	void onAction(const event::Action &e) override {
-		settings::paramTooltip ^= true;
+		settings.paramTooltip ^= true;
 	}
 };
 
@@ -249,10 +249,10 @@ struct ParamTooltipItem : ui::MenuItem {
 struct LockModulesItem : ui::MenuItem {
 	LockModulesItem() {
 		text = "Lock modules";
-		rightText = CHECKMARK(settings::lockModules);
+		rightText = CHECKMARK(settings.lockModules);
 	}
 	void onAction(const event::Action &e) override {
-		settings::lockModules ^= true;
+		settings.lockModules ^= true;
 	}
 };
 
@@ -369,7 +369,7 @@ struct SettingsButton : MenuButton {
 		menu->box.size.x = box.size.x;
 
 		menu->addChild(new ParamTooltipItem);
-		menu->addChild(new PowerMeterItem);
+		menu->addChild(new CpuMeterItem);
 		menu->addChild(new LockModulesItem);
 		menu->addChild(new SampleRateItem);
 		menu->addChild(new ThreadCount);
@@ -627,10 +627,10 @@ struct WebsiteItem : ui::MenuItem {
 struct CheckVersionItem : ui::MenuItem {
 	CheckVersionItem() {
 		text = "Check version on launch";
-		rightText = CHECKMARK(settings::checkVersion);
+		rightText = CHECKMARK(settings.checkVersion);
 	}
 	void onAction(const event::Action &e) override {
-		settings::checkVersion ^= true;
+		settings.checkVersion ^= true;
 	}
 };
 

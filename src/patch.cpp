@@ -16,6 +16,14 @@ namespace rack {
 static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 
 
+PatchManager::PatchManager() {
+	path = settings.patchPath;
+}
+
+PatchManager::~PatchManager() {
+	settings.patchPath = path;
+}
+
 void PatchManager::init(std::string path) {
 	if (!path.empty()) {
 		// Load patch
@@ -25,10 +33,10 @@ void PatchManager::init(std::string path) {
 	}
 
 	// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
-	bool oldSkipLoadOnLaunch = settings::skipLoadOnLaunch;
-	settings::skipLoadOnLaunch = true;
-	settings::save(asset::user("settings.json"));
-	settings::skipLoadOnLaunch = false;
+	bool oldSkipLoadOnLaunch = settings.skipLoadOnLaunch;
+	settings.skipLoadOnLaunch = true;
+	settings.save(asset::user("settings.json"));
+	settings.skipLoadOnLaunch = false;
 	if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
 		this->path = "";
 		return;

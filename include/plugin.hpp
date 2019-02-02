@@ -26,7 +26,6 @@ bool isSlugValid(std::string slug);
 
 
 extern std::list<Plugin*> plugins;
-extern std::string token;
 extern bool isDownloading;
 extern float downloadProgress;
 extern std::string downloadName;

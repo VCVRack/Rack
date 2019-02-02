@@ -59,12 +59,12 @@ void Scene::step() {
 	int frame = APP->window->frame;
 	if (frame > 0 && frame % (60 * 15) == 0) {
 		APP->patch->save(asset::user("autosave.vcv"));
-		settings::save(asset::user("settings.json"));
+		settings.save(asset::user("settings.json"));
 	}
 
 	// Set zoom every few frames
 	if (APP->window->frame % 10 == 0)
-		zoomWidget->setZoom(std::round(settings::zoom * 100) / 100);
+		zoomWidget->setZoom(std::round(settings.zoom * 100) / 100);
 
 	// Request latest version from server
 	if (!devMode && checkVersion && !checkedVersion) {

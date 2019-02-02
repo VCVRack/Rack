@@ -10,181 +10,137 @@
 
 
 namespace rack {
-namespace settings {
 
 
-static json_t *settingsToJson() {
-	// root
+json_t *Settings::toJson() {
 	json_t *rootJ = json_object();
 
-	// token
-	json_t *tokenJ = json_string(plugin::token.c_str());
-	json_object_set_new(rootJ, "token", tokenJ);
+	json_object_set_new(rootJ, "token", json_string(token.c_str()));
 
-	if (!APP->window->isMaximized()) {
-		// windowSize
-		math::Vec windowSize = APP->window->getWindowSize();
-		json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
-		json_object_set_new(rootJ, "windowSize", windowSizeJ);
+	json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
+	json_object_set_new(rootJ, "windowSize", windowSizeJ);
 
-		// windowPos
-		math::Vec windowPos = APP->window->getWindowPos();
-		json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
-		json_object_set_new(rootJ, "windowPos", windowPosJ);
-	}
+	json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
+	json_object_set_new(rootJ, "windowPos", windowPosJ);
 
-	// cableOpacity
-	json_t *cableOpacityJ = json_real(cableOpacity);
-	json_object_set_new(rootJ, "cableOpacity", cableOpacityJ);
+	json_object_set_new(rootJ, "zoom", json_real(zoom));
 
-	// cableTension
-	json_t *cableTensionJ = json_real(cableTension);
-	json_object_set_new(rootJ, "cableTension", cableTensionJ);
+	json_object_set_new(rootJ, "cableOpacity", json_real(cableOpacity));
 
-	// zoom
-	json_t *zoomJ = json_real(zoom);
-	json_object_set_new(rootJ, "zoom", zoomJ);
+	json_object_set_new(rootJ, "cableTension", json_real(cableTension));
 
-	// allowCursorLock
-	json_t *allowCursorLockJ = json_boolean(APP->window->allowCursorLock);
-	json_object_set_new(rootJ, "allowCursorLock", allowCursorLockJ);
+	json_object_set_new(rootJ, "allowCursorLock", json_boolean(allowCursorLock));
 
-	// sampleRate
-	json_t *sampleRateJ = json_real(APP->engine->getSampleRate());
-	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
+	json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
 
-	// patchPath
-	json_t *patchPathJ = json_string(APP->patch->path.c_str());
-	json_object_set_new(rootJ, "patchPath", patchPathJ);
+	json_object_set_new(rootJ, "threadCount", json_integer(threadCount));
 
-	// skipLoadOnLaunch
+	json_object_set_new(rootJ, "paramTooltip", json_boolean(paramTooltip));
+
+	json_object_set_new(rootJ, "cpuMeter", json_boolean(cpuMeter));
+
+	json_object_set_new(rootJ, "lockModules", json_boolean(lockModules));
+
+	json_object_set_new(rootJ, "checkVersion", json_boolean(checkVersion));
+
+	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
+
+	json_object_set_new(rootJ, "frameRateSync", json_boolean(frameRateSync));
+
 	if (skipLoadOnLaunch) {
 		json_object_set_new(rootJ, "skipLoadOnLaunch", json_true());
 	}
 
-	// moduleBrowser
+	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
+
 	json_object_set_new(rootJ, "moduleBrowser", app::moduleBrowserToJson());
-
-	// powerMeter
-	json_object_set_new(rootJ, "powerMeter", json_boolean(powerMeter));
-
-	// threadCount
-	json_object_set_new(rootJ, "threadCount", json_integer(APP->engine->getThreadCount()));
-
-	// checkVersion
-	json_object_set_new(rootJ, "checkVersion", json_boolean(checkVersion));
-
-	// paramTooltip
-	json_object_set_new(rootJ, "paramTooltip", json_boolean(paramTooltip));
-
-	// frameRateLimit
-	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
-
-	// frameRateSync
-	json_object_set_new(rootJ, "frameRateSync", json_boolean(frameRateSync));
 
 	return rootJ;
 }
 
-static void settingsFromJson(json_t *rootJ) {
-	// token
+void Settings::fromJson(json_t *rootJ) {
 	json_t *tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
-		plugin::token = json_string_value(tokenJ);
+		token = json_string_value(tokenJ);
 
-	// windowSize
 	json_t *windowSizeJ = json_object_get(rootJ, "windowSize");
 	if (windowSizeJ) {
-		double width, height;
-		json_unpack(windowSizeJ, "[F, F]", &width, &height);
-		APP->window->setWindowSize(math::Vec(width, height));
+		double x, y;
+		json_unpack(windowSizeJ, "[F, F]", &x, &y);
+		windowSize = math::Vec(x, y);
 	}
 
-	// windowPos
 	json_t *windowPosJ = json_object_get(rootJ, "windowPos");
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
-		APP->window->setWindowPos(math::Vec(x, y));
+		windowPos = math::Vec(x, y);
 	}
 
-	// cableOpacity
-	json_t *cableOpacityJ = json_object_get(rootJ, "cableOpacity");
-	if (cableOpacityJ)
-		cableOpacity = json_number_value(cableOpacityJ);
-
-	// tension
-	json_t *tensionJ = json_object_get(rootJ, "cableTension");
-	if (tensionJ)
-		cableTension = json_number_value(tensionJ);
-
-	// zoom
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ)
 		zoom = json_number_value(zoomJ);
 
-	// allowCursorLock
+	json_t *cableOpacityJ = json_object_get(rootJ, "cableOpacity");
+	if (cableOpacityJ)
+		cableOpacity = json_number_value(cableOpacityJ);
+
+	json_t *tensionJ = json_object_get(rootJ, "cableTension");
+	if (tensionJ)
+		cableTension = json_number_value(tensionJ);
+
 	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
-		APP->window->allowCursorLock = json_is_true(allowCursorLockJ);
+		allowCursorLock = json_is_true(allowCursorLockJ);
 
-	// sampleRate
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
-	if (sampleRateJ) {
-		float sampleRate = json_number_value(sampleRateJ);
-		APP->engine->setSampleRate(sampleRate);
-	}
+	if (sampleRateJ)
+		sampleRate = json_number_value(sampleRateJ);
 
-	// patchPath
-	json_t *patchPathJ = json_object_get(rootJ, "patchPath");
-	if (patchPathJ)
-		APP->patch->path = json_string_value(patchPathJ);
-
-	// skipLoadOnLaunch
-	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
-	if (skipLoadOnLaunchJ)
-		skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
-
-	// moduleBrowser
-	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
-	if (moduleBrowserJ)
-		app::moduleBrowserFromJson(moduleBrowserJ);
-
-	// powerMeter
-	json_t *powerMeterJ = json_object_get(rootJ, "powerMeter");
-	if (powerMeterJ)
-		powerMeter = json_boolean_value(powerMeterJ);
-
-	// threadCount
 	json_t *threadCountJ = json_object_get(rootJ, "threadCount");
 	if (threadCountJ)
-		APP->engine->setThreadCount(json_integer_value(threadCountJ));
+		threadCount = json_integer_value(threadCountJ);
 
-	// checkVersion
-	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
-	if (checkVersionJ)
-		checkVersion = json_boolean_value(checkVersionJ);
-
-	// paramTooltip
 	json_t *paramTooltipJ = json_object_get(rootJ, "paramTooltip");
 	if (paramTooltipJ)
 		paramTooltip = json_boolean_value(paramTooltipJ);
 
-	// frameRateLimit
+	json_t *cpuMeterJ = json_object_get(rootJ, "cpuMeter");
+	if (cpuMeterJ)
+		cpuMeter = json_boolean_value(cpuMeterJ);
+
+	json_t *lockModulesJ = json_object_get(rootJ, "lockModules");
+	if (lockModulesJ)
+		lockModules = json_boolean_value(lockModulesJ);
+
+	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
+	if (checkVersionJ)
+		checkVersion = json_boolean_value(checkVersionJ);
+
 	json_t *frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
 	if (frameRateLimitJ)
 		frameRateLimit = json_number_value(frameRateLimitJ);
 
-	// frameRateSync
 	json_t *frameRateSyncJ = json_object_get(rootJ, "frameRateSync");
 	if (frameRateSyncJ)
 		frameRateSync = json_boolean_value(frameRateSyncJ);
+
+	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
+	if (skipLoadOnLaunchJ)
+		skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
+
+	json_t *patchPathJ = json_object_get(rootJ, "patchPath");
+	if (patchPathJ)
+		patchPath = json_string_value(patchPathJ);
+
+	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
+	if (moduleBrowserJ)
+		app::moduleBrowserFromJson(moduleBrowserJ);
 }
 
-
-void save(std::string filename) {
+void Settings::save(std::string filename) {
 	INFO("Saving settings %s", filename.c_str());
-	json_t *rootJ = settingsToJson();
+	json_t *rootJ = toJson();
 	if (rootJ) {
 		FILE *file = fopen(filename.c_str(), "w");
 		if (!file)
@@ -196,7 +152,7 @@ void save(std::string filename) {
 	}
 }
 
-void load(std::string filename) {
+void Settings::load(std::string filename) {
 	INFO("Loading settings %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file)
@@ -205,7 +161,7 @@ void load(std::string filename) {
 	json_error_t error;
 	json_t *rootJ = json_loadf(file, 0, &error);
 	if (rootJ) {
-		settingsFromJson(rootJ);
+		fromJson(rootJ);
 		json_decref(rootJ);
 	}
 	else {
@@ -216,17 +172,7 @@ void load(std::string filename) {
 }
 
 
-float zoom = 1.0;
-float cableOpacity = 0.5;
-float cableTension = 0.5;
-bool paramTooltip = false;
-bool powerMeter = false;
-bool lockModules = false;
-bool checkVersion = true;
-bool skipLoadOnLaunch = false;
-float frameRateLimit = 0.0;
-bool frameRateSync = true;
+Settings settings;
 
 
-} // namespace settings
 } // namespace rack

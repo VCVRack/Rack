@@ -155,16 +155,20 @@ struct Engine::Internal {
 Engine::Engine() {
 	internal = new Internal;
 
-	float sampleRate = 44100.f;
+	float sampleRate = settings.sampleRate;
 	internal->sampleRate = sampleRate;
 	internal->sampleTime = 1 / sampleRate;
 	internal->sampleRateRequested = sampleRate;
 
+	internal->threadCount = settings.threadCount;
 	internal->engineBarrier.total = 1;
 	internal->workerBarrier.total = 1;
 }
 
 Engine::~Engine() {
+	settings.sampleRate = internal->sampleRate;
+	settings.threadCount = internal->threadCount;
+
 	// Make sure there are no cables or modules in the rack on destruction. This suggests that a module failed to remove itself before the RackWidget was destroyed.
 	assert(internal->cables.empty());
 	assert(internal->modules.empty());
@@ -173,6 +177,7 @@ Engine::~Engine() {
 }
 
 static void Engine_setWorkerCount(Engine *engine, int workerCount) {
+	assert(0 <= workerCount && workerCount <= 32);
 	Engine::Internal *internal = engine->internal;
 
 	// Stop all workers
@@ -213,7 +218,7 @@ static void Engine_stepModules(Engine *engine, int id) {
 		Module *module = internal->modules[i];
 		if (!module->bypass) {
 			// Step module
-			if (settings::powerMeter) {
+			if (settings.cpuMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
 
 				module->step();

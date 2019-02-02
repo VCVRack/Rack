@@ -83,9 +83,9 @@ int main(int argc, char *argv[]) {
 	INFO("Initialized environment");
 
 	// Initialize app
+	settings.load(asset::user("settings.json"));
 	app::init();
 	APP->scene->devMode = devMode;
-	settings::load(asset::user("settings.json"));
 	APP->patch->init(patchPath);
 
 	INFO("Initialized app");
@@ -97,8 +97,8 @@ int main(int argc, char *argv[]) {
 
 	// Destroy app
 	APP->patch->save(asset::user("autosave.vcv"));
-	settings::save(asset::user("settings.json"));
 	app::destroy();
+	settings.save(asset::user("settings.json"));
 	INFO("Cleaned up app");
 
 	// Destroy environment

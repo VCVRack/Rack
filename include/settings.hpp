@@ -1,26 +1,39 @@
 #pragma once
 #include "common.hpp"
+#include "math.hpp"
+#include <jansson.h>
 
 
 namespace rack {
-namespace settings {
 
 
-void save(std::string filename);
-void load(std::string filename);
+struct Settings {
+	std::string token;
+	math::Vec windowSize;
+	math::Vec windowPos;
+	float zoom = 1.0;
+	float cableOpacity = 0.5;
+	float cableTension = 0.5;
+	bool allowCursorLock = true;
+	float sampleRate = 44100.0;
+	int threadCount = 1;
+	bool paramTooltip = false;
+	bool cpuMeter = false;
+	bool lockModules = false;
+	bool checkVersion = true;
+	float frameRateLimit = 0.0;
+	bool frameRateSync = true;
+	bool skipLoadOnLaunch = false;
+	std::string patchPath;
+
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
+	void save(std::string filename);
+	void load(std::string filename);
+};
 
 
-extern float zoom;
-extern float cableOpacity;
-extern float cableTension;
-extern bool paramTooltip;
-extern bool powerMeter;
-extern bool lockModules;
-extern bool checkVersion;
-extern bool skipLoadOnLaunch;
-extern float frameRateLimit;
-extern bool frameRateSync;
+extern Settings settings;
 
 
-} // namespace settings
 } // namespace rack

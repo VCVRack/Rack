@@ -6,6 +6,7 @@
 #include "app.hpp"
 #include "app/common.hpp"
 #include "plugin/callbacks.hpp"
+#include "settings.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -184,7 +185,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	if (dryRun) {
 		downloadUrl += "/available";
 	}
-	downloadUrl += "?token=" + network::encodeUrl(token);
+	downloadUrl += "?token=" + network::encodeUrl(settings.token);
 	downloadUrl += "&slug=" + network::encodeUrl(slug);
 	downloadUrl += "&version=" + network::encodeUrl(latestVersion);
 	downloadUrl += "&arch=" + network::encodeUrl(arch);
@@ -393,7 +394,7 @@ void logIn(std::string email, std::string password) {
 			json_t *tokenJ = json_object_get(resJ, "token");
 			if (tokenJ) {
 				const char *tokenStr = json_string_value(tokenJ);
-				token = tokenStr;
+				settings.token = tokenStr;
 				loginStatus = "";
 			}
 		}
@@ -402,11 +403,11 @@ void logIn(std::string email, std::string password) {
 }
 
 void logOut() {
-	token = "";
+	settings.token = "";
 }
 
 bool sync(bool dryRun) {
-	if (token.empty())
+	if (settings.token.empty())
 		return false;
 
 	bool available = false;
@@ -422,7 +423,7 @@ bool sync(bool dryRun) {
 
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
-	json_object_set(pluginsReqJ, "token", json_string(token.c_str()));
+	json_object_set(pluginsReqJ, "token", json_string(settings.token.c_str()));
 	std::string pluginsUrl = app::API_URL;
 	pluginsUrl += "/plugins";
 	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
@@ -493,7 +494,7 @@ void cancelDownload() {
 }
 
 bool isLoggedIn() {
-	return token != "";
+	return settings.token != "";
 }
 
 Plugin *getPlugin(std::string pluginSlug) {
@@ -534,7 +535,6 @@ bool isSlugValid(std::string slug) {
 
 
 std::list<Plugin*> plugins;
-std::string token;
 bool isDownloading = false;
 float downloadProgress = 0.f;
 std::string downloadName;

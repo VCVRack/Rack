@@ -158,7 +158,7 @@ void ParamWidget::onDoubleClick(const event::DoubleClick &e) {
 }
 
 void ParamWidget::onEnter(const event::Enter &e) {
-	if (settings::paramTooltip && !tooltip && paramQuantity) {
+	if (settings.paramTooltip && !tooltip && paramQuantity) {
 		ParamTooltip *paramTooltip = new ParamTooltip;
 		paramTooltip->paramWidget = this;
 		APP->scene->addChild(paramTooltip);

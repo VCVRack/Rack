@@ -12,7 +12,7 @@
 #include <queue>
 #include <thread>
 
-#ifdef ARCH_MAC
+#if defined ARCH_MAC
 	// For CGAssociateMouseAndMouseCursorPosition
 	#include <ApplicationServices/ApplicationServices.h>
 #endif
@@ -109,7 +109,7 @@ static void windowSizeCallback(GLFWwindow *win, int width, int height) {
 
 static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mods) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
-#ifdef ARCH_MAC
+#if defined ARCH_MAC
 	// Remap Ctrl-left click to right click on Mac
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (mods & GLFW_MOD_CONTROL) {
@@ -130,7 +130,7 @@ static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
 	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
 	(void) cursorMode;
 
-#ifdef ARCH_MAC
+#if defined ARCH_MAC
 	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
@@ -223,7 +223,7 @@ Window::Window() {
 
 	glfwMakeContextCurrent(win);
 	// Enable v-sync
-	glfwSwapInterval(settings::frameRateSync ? 1 : 0);
+	glfwSwapInterval(settings.frameRateSync ? 1 : 0);
 
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
 	glfwSetMouseButtonCallback(win, mouseButtonCallback);
@@ -253,6 +253,14 @@ Window::Window() {
 
 	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
+	if (settings.windowSize.isZero()) {
+		glfwMaximizeWindow(win);
+	}
+	else {
+		glfwSetWindowSize(win, settings.windowSize.x, settings.windowSize.y);
+		glfwSetWindowPos(win, settings.windowPos.x, settings.windowPos.y);
+	}
+
 	// Set up NanoVG
 	int nvgFlags = NVG_ANTIALIAS;
 #if defined NANOVG_GL2
@@ -275,6 +283,19 @@ Window::Window() {
 }
 
 Window::~Window() {
+	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED)) {
+		settings.windowSize = math::Vec();
+		settings.windowPos = math::Vec();
+	}
+	else {
+		int winWidth, winHeight;
+		glfwGetWindowSize(win, &winWidth, &winHeight);
+		int winX, winY;
+		glfwGetWindowPos(win, &winX, &winY);
+		settings.windowSize = math::Vec(winWidth, winHeight);
+		settings.windowPos = math::Vec(winX, winY);
+	}
+
 #if defined NANOVG_GL2
 	nvgDeleteGL2(vg);
 #elif defined NANOVG_GL3
@@ -375,9 +396,9 @@ void Window::run() {
 
 		// Limit frame rate
 		double endTime = glfwGetTime();
-		if (settings::frameRateLimit > 0.0) {
+		if (settings.frameRateLimit > 0.0) {
 			double frameDuration = endTime - startTime;
-			double waitDuration = 1.0 / settings::frameRateLimit - frameDuration;
+			double waitDuration = 1.0 / settings.frameRateLimit - frameDuration;
 			if (waitDuration > 0.0) {
 				std::this_thread::sleep_for(std::chrono::duration<double>(waitDuration));
 			}
@@ -394,8 +415,8 @@ void Window::close() {
 }
 
 void Window::cursorLock() {
-	if (allowCursorLock) {
-#ifdef ARCH_MAC
+	if (settings.allowCursorLock) {
+#if defined ARCH_MAC
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -404,7 +425,7 @@ void Window::cursorLock() {
 }
 
 void Window::cursorUnlock() {
-	if (allowCursorLock) {
+	if (settings.allowCursorLock) {
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
@@ -420,34 +441,6 @@ int Window::getMods() {
 	if (glfwGetKey(win, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS)
 		mods |= GLFW_MOD_SUPER;
 	return mods;
-}
-
-math::Vec Window::getWindowSize() {
-	int width, height;
-	glfwGetWindowSize(win, &width, &height);
-	return math::Vec(width, height);
-}
-
-void Window::setWindowSize(math::Vec size) {
-	int width = size.x;
-	int height = size.y;
-	glfwSetWindowSize(win, width, height);
-}
-
-math::Vec Window::getWindowPos() {
-	int x, y;
-	glfwGetWindowPos(win, &x, &y);
-	return math::Vec(x, y);
-}
-
-void Window::setWindowPos(math::Vec pos) {
-	int x = pos.x;
-	int y = pos.y;
-	glfwSetWindowPos(win, x, y);
-}
-
-bool Window::isMaximized() {
-	return glfwGetWindowAttrib(win, GLFW_MAXIMIZED);
 }
 
 void Window::setFullScreen(bool fullScreen) {
