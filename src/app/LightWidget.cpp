@@ -18,28 +18,34 @@ void LightWidget::drawLight(const widget::DrawContext &ctx) {
 	nvgCircle(ctx.vg, radius, radius, radius);
 
 	// Background
-	nvgFillColor(ctx.vg, bgColor);
-	nvgFill(ctx.vg);
+	if (bgColor.a > 0.0) {
+		nvgFillColor(ctx.vg, bgColor);
+		nvgFill(ctx.vg);
+	}
 
 	// Foreground
-	nvgFillColor(ctx.vg, color);
-	nvgFill(ctx.vg);
+	if (color.a > 0.0) {
+		nvgFillColor(ctx.vg, color);
+		nvgFill(ctx.vg);
+	}
 
 	// Border
-	nvgStrokeWidth(ctx.vg, 0.5);
-	nvgStrokeColor(ctx.vg, borderColor);
-	nvgStroke(ctx.vg);
+	if (borderColor.a > 0.0) {
+		nvgStrokeWidth(ctx.vg, 0.5);
+		nvgStrokeColor(ctx.vg, borderColor);
+		nvgStroke(ctx.vg);
+	}
 }
 
 void LightWidget::drawHalo(const widget::DrawContext &ctx) {
 	float radius = box.size.x / 2.0;
-	float oradius = radius + 15.0;
+	float oradius = 4.0 * radius;
 
 	nvgBeginPath(ctx.vg);
 	nvgRect(ctx.vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
 
 	NVGpaint paint;
-	NVGcolor icol = color::mult(color, 0.08);
+	NVGcolor icol = color::mult(color, 0.07);
 	NVGcolor ocol = nvgRGB(0, 0, 0);
 	paint = nvgRadialGradient(ctx.vg, radius, radius, radius, oradius, icol, ocol);
 	nvgFillPaint(ctx.vg, paint);

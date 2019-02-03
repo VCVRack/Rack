@@ -216,7 +216,7 @@ void CableWidget::draw(const widget::DrawContext &ctx) {
 		// Draw opaque if mouse is hovering over a connected port
 		if (output->channels > 1) {
 			// Increase thickness if output port is polyphonic
-			thickness = 8;
+			thickness = 7;
 		}
 
 		if (outputPort->hovered || inputPort->hovered) {
@@ -224,7 +224,7 @@ void CableWidget::draw(const widget::DrawContext &ctx) {
 		}
 		else if (output->channels == 0) {
 			// Draw translucent cable if not active (i.e. 0 channels)
-			opacity *= 0.25;
+			opacity *= 0.5;
 		}
 	}
 	else {

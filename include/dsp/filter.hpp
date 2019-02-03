@@ -64,6 +64,25 @@ struct SlewLimiter {
 };
 
 
+struct ExponentialSlewLimiter {
+	float riseLambda = 1.f;
+	float fallLambda = 1.f;
+	float out = 0.f;
+
+	float process(float in) {
+		if (in > out) {
+			float y = out + (in - out) * riseLambda;
+			out = (out == y) ? in : y;
+		}
+		else if (in < out) {
+			float y = out + (in - out) * fallLambda;
+			out = (out == y) ? in : y;
+		}
+		return out;
+	}
+};
+
+
 /** Applies exponential smoothing to a signal with the ODE
 dy/dt = x * lambda
 */

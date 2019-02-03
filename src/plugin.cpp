@@ -577,6 +577,7 @@ const std::vector<std::string> allowedTags = {
 	"VCO",
 	"Panning",
 	"Phaser",
+	"Poly",
 	"Physical Modeling",
 	"Quad", // The core functionality times four. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Quad module.
 	"Quantizer",

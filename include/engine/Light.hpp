@@ -31,7 +31,7 @@ struct Light {
 			// Fade out light with lambda = framerate
 			// Use 44.1k here to avoid the call to Engine::getSampleRate().
 			// This is close enough to look okay up to 96k
-			value += (v - value) * frames * 120.f / 44100.f;
+			value += (v - value) * frames * 30.f / 44100.f;
 		}
 		else {
 			// Immediately illuminate light
