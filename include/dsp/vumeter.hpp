@@ -6,7 +6,7 @@ namespace rack {
 namespace dsp {
 
 
-/** Deprecated. */
+/** Deprecated. Use VUMeter2. */
 struct VUMeter {
 	/** Decibel level difference between adjacent meter lights */
 	float dBInterval = 3.0;
@@ -15,7 +15,7 @@ struct VUMeter {
 	void setValue(float v) {
 		dBScaled = std::log10(std::abs(v)) * 20.0 / dBInterval;
 	}
-	/** Returns the brightness of the light indexed by i
+	/** Returns the brightness of the light indexed by i.
 	Light 0 is a clip light (red) which is either on or off.
 	All others are smooth lights which are fully bright at -dBInterval*i and higher, and fully off at -dBInterval*(i-1).
 	*/
@@ -61,6 +61,7 @@ struct VUMeter2 {
 	}
 
 	/** Returns the LED brightness measuring tick marks between dbMin and dbMax.
+	For example, `getBrightness(-6.f, 0.f)` will be at minimum brightness at -6dB and maximum brightness at 0dB.
 	Set dbMin == dbMax == 0.f for a clip indicator.
 	Expensive, so call this infrequently.
 	*/

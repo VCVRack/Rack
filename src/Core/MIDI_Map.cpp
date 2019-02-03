@@ -46,13 +46,13 @@ struct MIDI_Map : Module {
 };
 
 
-struct CKD6Button : SVGButton {
+struct CKD6Button : SvgButton {
 	MIDI_Map *module;
 	int id;
 
 	CKD6Button() {
-		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKD6_0.svg")));
-		addFrame(SVG::load(asset::system("res/ComponentLibrary/CKD6_1.svg")));
+		addFrame(APP->window->loadSvg(asset::system("res/ComponentLibrary/CKD6_0.svg")));
+		addFrame(APP->window->loadSvg(asset::system("res/ComponentLibrary/CKD6_1.svg")));
 	}
 
 	void onAction(const event::Action &e) override {
@@ -73,7 +73,7 @@ TWidget *createMapButtonCentered(math::Vec pos, MIDI_Map *module, int id) {
 struct MIDI_MapWidget : ModuleWidget {
 	MIDI_MapWidget(MIDI_Map *module) {
 		setModule(module);
-		setPanel(SVG::load(asset::system("res/Core/MIDI-Map.svg")));
+		setPanel(APP->window->loadSvg(asset::system("res/Core/MIDI-Map.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

@@ -3,7 +3,7 @@
 #include "system.hpp"
 #include "asset.hpp"
 #include "app/Scene.hpp"
-#include "app/SVGPanel.hpp"
+#include "app/SvgPanel.hpp"
 #include "helpers.hpp"
 #include "app.hpp"
 #include "settings.hpp"
@@ -299,7 +299,7 @@ void ModuleWidget::setModule(engine::Module *module) {
 	this->module = module;
 }
 
-void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
+void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
 	// Remove old panel
 	if (panel) {
 		removeChild(panel);
@@ -308,7 +308,7 @@ void ModuleWidget::setPanel(std::shared_ptr<SVG> svg) {
 	}
 
 	{
-		SVGPanel *panel = new SVGPanel;
+		SvgPanel *panel = new SvgPanel;
 		panel->setBackground(svg);
 		addChild(panel);
 		box.size = panel->box.size;

@@ -40,25 +40,33 @@ namespace rack {
 // Constructing these directly will load from the disk each time. Use the load() functions to load from disk and cache them as long as the shared_ptr is held.
 
 struct Font {
+	NVGcontext *vg;
 	int handle;
-	Font(const std::string &filename);
+	Font(NVGcontext *vg, const std::string &filename);
 	~Font();
-	static std::shared_ptr<Font> load(const std::string &filename);
+	/** Use `APP->window->loadFont()` instead. */
+	DEPRECATED static std::shared_ptr<Font> load(const std::string &filename);
 };
 
 struct Image {
+	NVGcontext *vg;
 	int handle;
-	Image(const std::string &filename);
+	Image(NVGcontext *vg, const std::string &filename);
 	~Image();
-	static std::shared_ptr<Image> load(const std::string &filename);
+	/** Use `APP->window->loadImage()` instead. */
+	DEPRECATED static std::shared_ptr<Image> load(const std::string &filename);
 };
 
-struct SVG {
+struct Svg {
 	NSVGimage *handle;
-	SVG(const std::string &filename);
-	~SVG();
-	static std::shared_ptr<SVG> load(const std::string &filename);
+	Svg(const std::string &filename);
+	~Svg();
+	/** Use `APP->window->loadSvg()` instead. */
+	DEPRECATED static std::shared_ptr<Svg> load(const std::string &filename);
 };
+
+DEPRECATED typedef Svg SVG;
+
 
 struct Window {
 	GLFWwindow *win = NULL;
@@ -91,6 +99,10 @@ struct Window {
 	int getMods();
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
+
+	std::shared_ptr<Font> loadFont(const std::string &filename);
+	std::shared_ptr<Image> loadImage(const std::string &filename);
+	std::shared_ptr<Svg> loadSvg(const std::string &filename);
 };
 
 

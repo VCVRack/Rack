@@ -1,12 +1,12 @@
-#include "app/SVGScrew.hpp"
+#include "app/SvgScrew.hpp"
 
 
 namespace rack {
 namespace app {
 
 
-SVGScrew::SVGScrew() {
-	sw = new widget::SVGWidget;
+SvgScrew::SvgScrew() {
+	sw = new widget::SvgWidget;
 	addChild(sw);
 }
 

@@ -1,36 +1,36 @@
-#include "app/SVGSlider.hpp"
+#include "app/SvgSlider.hpp"
 
 
 namespace rack {
 namespace app {
 
 
-SVGSlider::SVGSlider() {
+SvgSlider::SvgSlider() {
 	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
-	background = new widget::SVGWidget;
+	background = new widget::SvgWidget;
 	fb->addChild(background);
 
-	handle = new widget::SVGWidget;
+	handle = new widget::SvgWidget;
 	fb->addChild(handle);
 
 	speed = 2.0;
 }
 
-void SVGSlider::setBackgroundSVG(std::shared_ptr<SVG> backgroundSVG) {
-	background->setSVG(backgroundSVG);
+void SvgSlider::setBackgroundSvg(std::shared_ptr<Svg> svg) {
+	background->setSvg(svg);
 	fb->box.size = background->box.size;
 	box.size = background->box.size;
 }
 
-void SVGSlider::setHandleSVG(std::shared_ptr<SVG> handleSVG) {
-	handle->setSVG(handleSVG);
+void SvgSlider::setHandleSvg(std::shared_ptr<Svg> svg) {
+	handle->setSvg(svg);
 	handle->box.pos = maxHandlePos;
 	fb->dirty = true;
 }
 
-void SVGSlider::onChange(const event::Change &e) {
+void SvgSlider::onChange(const event::Change &e) {
 	if (paramQuantity) {
 		// Interpolate handle position
 		float v = paramQuantity->getScaledValue();

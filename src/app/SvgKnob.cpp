@@ -1,11 +1,11 @@
-#include "app/SVGKnob.hpp"
+#include "app/SvgKnob.hpp"
 
 
 namespace rack {
 namespace app {
 
 
-SVGKnob::SVGKnob() {
+SvgKnob::SvgKnob() {
 	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
@@ -16,12 +16,12 @@ SVGKnob::SVGKnob() {
 	tw = new widget::TransformWidget;
 	fb->addChild(tw);
 
-	sw = new widget::SVGWidget;
+	sw = new widget::SvgWidget;
 	tw->addChild(sw);
 }
 
-void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
-	sw->setSVG(svg);
+void SvgKnob::setSvg(std::shared_ptr<Svg> svg) {
+	sw->setSvg(svg);
 	tw->box.size = sw->box.size;
 	fb->box.size = sw->box.size;
 	box.size = sw->box.size;
@@ -31,7 +31,7 @@ void SVGKnob::setSVG(std::shared_ptr<SVG> svg) {
 	// shadow->box = shadow->box.grow(math::Vec(2, 2));
 }
 
-void SVGKnob::onChange(const event::Change &e) {
+void SvgKnob::onChange(const event::Change &e) {
 	// Re-transform the widget::TransformWidget
 	if (paramQuantity) {
 		float angle;

@@ -1,4 +1,4 @@
-#include "widget/GLWidget.hpp"
+#include "widget/OpenGlWidget.hpp"
 #include "app.hpp"
 
 
@@ -6,13 +6,13 @@ namespace rack {
 namespace widget {
 
 
-void GLWidget::step() {
+void OpenGlWidget::step() {
 	// Render every frame
 	dirty = true;
 }
 
 
-void GLWidget::drawFramebuffer() {
+void OpenGlWidget::drawFramebuffer() {
 	glViewport(0.0, 0.0, fbSize.x, fbSize.y);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

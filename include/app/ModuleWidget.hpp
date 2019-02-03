@@ -45,7 +45,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	Transfers ownership
 	*/
 	void setModule(engine::Module *module);
-	void setPanel(std::shared_ptr<SVG> svg);
+	void setPanel(std::shared_ptr<Svg> svg);
 
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addParam(ParamWidget *param);

@@ -2,7 +2,7 @@
 #include "app/common.hpp"
 #include "widget/TransparentWidget.hpp"
 #include "widget/FramebufferWidget.hpp"
-#include "widget/SVGWidget.hpp"
+#include "widget/SvgWidget.hpp"
 #include "app.hpp"
 
 
@@ -15,11 +15,13 @@ struct PanelBorder : widget::TransparentWidget {
 };
 
 
-struct SVGPanel : widget::FramebufferWidget {
+struct SvgPanel : widget::FramebufferWidget {
 	void step() override;
-	void setBackground(std::shared_ptr<SVG> svg);
+	void setBackground(std::shared_ptr<Svg> svg);
 };
 
+
+DEPRECATED typedef SvgPanel SVGPanel;
 
 
 } // namespace app

@@ -3,7 +3,7 @@
 #include "app/Knob.hpp"
 #include "widget/FramebufferWidget.hpp"
 #include "widget/TransformWidget.hpp"
-#include "widget/SVGWidget.hpp"
+#include "widget/SvgWidget.hpp"
 #include "app/CircularShadow.hpp"
 
 
@@ -12,18 +12,22 @@ namespace app {
 
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
-struct SVGKnob : Knob {
+struct SvgKnob : Knob {
 	widget::FramebufferWidget *fb;
 	widget::TransformWidget *tw;
-	widget::SVGWidget *sw;
+	widget::SvgWidget *sw;
 	CircularShadow *shadow;
 	/** Angles in radians */
 	float minAngle, maxAngle;
 
-	SVGKnob();
-	void setSVG(std::shared_ptr<SVG> svg);
+	SvgKnob();
+	void setSvg(std::shared_ptr<Svg> svg);
+	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {setSvg(svg);}
 	void onChange(const event::Change &e) override;
 };
+
+
+DEPRECATED typedef SvgKnob SVGKnob;
 
 
 } // namespace app

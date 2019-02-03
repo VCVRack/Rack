@@ -6,7 +6,7 @@ namespace rack {
 namespace widget {
 
 
-struct GLWidget : FramebufferWidget {
+struct OpenGlWidget : FramebufferWidget {
 	/** Draws every frame by default
 	Override this to restore the default behavior of FramebufferWidget.
 	*/

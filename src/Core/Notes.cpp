@@ -9,7 +9,7 @@ struct NotesWidget : ModuleWidget {
 
 	NotesWidget(Module *module) {
 		setModule(module);
-		setPanel(SVG::load(asset::system("res/Core/Notes.svg")));
+		setPanel(APP->window->loadSvg(asset::system("res/Core/Notes.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

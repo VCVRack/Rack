@@ -1,4 +1,4 @@
-#include "app/SVGPanel.hpp"
+#include "app/SvgPanel.hpp"
 
 
 namespace rack {
@@ -15,7 +15,7 @@ void PanelBorder::draw(const widget::DrawContext &ctx) {
 }
 
 
-void SVGPanel::step() {
+void SvgPanel::step() {
 	if (math::isNear(APP->window->pixelRatio, 1.0)) {
 		// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 		oversample = 2.0;
@@ -23,9 +23,9 @@ void SVGPanel::step() {
 	widget::FramebufferWidget::step();
 }
 
-void SVGPanel::setBackground(std::shared_ptr<SVG> svg) {
-	widget::SVGWidget *sw = new widget::SVGWidget;
-	sw->setSVG(svg);
+void SvgPanel::setBackground(std::shared_ptr<Svg> svg) {
+	widget::SvgWidget *sw = new widget::SvgWidget;
+	sw->setSvg(svg);
 	addChild(sw);
 
 	// Set size

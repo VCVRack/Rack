@@ -1,6 +1,6 @@
 #pragma once
 #include "widget/FramebufferWidget.hpp"
-#include "widget/SVGWidget.hpp"
+#include "widget/SvgWidget.hpp"
 #include "ui/common.hpp"
 #include "ui/Button.hpp"
 
@@ -11,10 +11,11 @@ namespace ui {
 
 struct IconButton : Button {
 	widget::FramebufferWidget *fw;
-	widget::SVGWidget *sw;
+	widget::SvgWidget *sw;
 
 	IconButton();
-	void setSVG(std::shared_ptr<SVG> svg);
+	void setSvg(std::shared_ptr<Svg> svg);
+	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {setSvg(svg);}
 };
 
 

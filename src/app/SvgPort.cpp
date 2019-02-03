@@ -1,26 +1,26 @@
-#include "app/SVGPort.hpp"
+#include "app/SvgPort.hpp"
 
 
 namespace rack {
 namespace app {
 
 
-SVGPort::SVGPort() {
+SvgPort::SvgPort() {
 	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
 	shadow = new CircularShadow;
 	fb->addChild(shadow);
-	// Avoid breakage if plugins fail to call setSVG()
+	// Avoid breakage if plugins fail to call setSvg()
 	// In that case, just disable the shadow.
 	shadow->box.size = math::Vec();
 
-	sw = new widget::SVGWidget;
+	sw = new widget::SvgWidget;
 	fb->addChild(sw);
 }
 
-void SVGPort::setSVG(std::shared_ptr<SVG> svg) {
-	sw->setSVG(svg);
+void SvgPort::setSvg(std::shared_ptr<Svg> svg) {
+	sw->setSvg(svg);
 	fb->box.size = sw->box.size;
 	box.size = sw->box.size;
 	shadow->box.size = sw->box.size;

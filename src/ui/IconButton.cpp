@@ -12,13 +12,13 @@ IconButton::IconButton() {
 	fw->oversample = 2;
 	addChild(fw);
 
-	sw = new widget::SVGWidget;
+	sw = new widget::SvgWidget;
 	sw->box.pos = math::Vec(2, 2);
 	fw->addChild(sw);
 }
 
-void IconButton::setSVG(std::shared_ptr<SVG> svg) {
-	sw->setSVG(svg);
+void IconButton::setSvg(std::shared_ptr<Svg> svg) {
+	sw->setSvg(svg);
 	fw->dirty = true;
 }
 

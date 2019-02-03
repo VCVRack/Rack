@@ -1,7 +1,7 @@
 #pragma once
 #include "app/common.hpp"
 #include "widget/FramebufferWidget.hpp"
-#include "widget/SVGWidget.hpp"
+#include "widget/SvgWidget.hpp"
 #include "app/Switch.hpp"
 
 
@@ -10,16 +10,19 @@ namespace app {
 
 
 /** A ParamWidget with multiple frames corresponding to its value */
-struct SVGSwitch : Switch {
+struct SvgSwitch : Switch {
 	widget::FramebufferWidget *fb;
-	widget::SVGWidget *sw;
-	std::vector<std::shared_ptr<SVG>> frames;
+	widget::SvgWidget *sw;
+	std::vector<std::shared_ptr<Svg>> frames;
 
-	SVGSwitch();
+	SvgSwitch();
 	/** Adds an SVG file to represent the next switch position */
-	void addFrame(std::shared_ptr<SVG> svg);
+	void addFrame(std::shared_ptr<Svg> svg);
 	void onChange(const event::Change &e) override;
 };
+
+
+DEPRECATED typedef SvgSwitch SVGSwitch;
 
 
 } // namespace app
