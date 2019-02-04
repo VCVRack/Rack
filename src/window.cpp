@@ -433,7 +433,7 @@ int Window::getMods() {
 }
 
 void Window::setFullScreen(bool fullScreen) {
-	if (isFullScreen()) {
+	if (!fullScreen) {
 		glfwSetWindowMonitor(win, NULL, internal->lastWindowX, internal->lastWindowY, internal->lastWindowWidth, internal->lastWindowHeight, GLFW_DONT_CARE);
 	}
 	else {

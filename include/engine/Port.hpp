@@ -22,9 +22,9 @@ struct Port {
 	Unstable API. Use set/getChannels() instead.
 	May be 0 to PORT_MAX_CHANNELS.
 	*/
-	uint8_t channels = 1;
+	uint8_t channels = 0;
 	/** Unstable API. Use isConnected() instead. */
-	bool active;
+	bool active = false;
 	/** For rendering plug lights on cables.
 	Green for positive, red for negative, and blue for polyphonic.
 	*/
@@ -84,7 +84,13 @@ struct Port {
 };
 
 
-struct Output : Port {};
+struct Output : Port {
+	Output() {
+		channels = 1;
+	}
+};
+
+
 struct Input : Port {};
 
 

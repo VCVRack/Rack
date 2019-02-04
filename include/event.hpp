@@ -254,7 +254,7 @@ struct State {
 	widget::Widget *scrollWidget = NULL;
 	/** For double-clicking */
 	double lastClickTime = -INFINITY;
-	math::Vec lastClickPos;
+	widget::Widget *lastClickedWidget = NULL;
 
 	void setHovered(widget::Widget *w);
 	void setDragged(widget::Widget *w);

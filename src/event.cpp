@@ -98,6 +98,7 @@ void State::finalizeWidget(widget::Widget *w) {
 	if (dragHoveredWidget == w) setDragHovered(NULL);
 	if (selectedWidget == w) setSelected(NULL);
 	if (scrollWidget == w) scrollWidget = NULL;
+	if (lastClickedWidget == w) lastClickedWidget = NULL;
 }
 
 void State::handleButton(math::Vec pos, int button, int action, int mods) {
@@ -136,16 +137,16 @@ void State::handleButton(math::Vec pos, int button, int action, int mods) {
 
 		if (action == GLFW_PRESS) {
 			const double doubleClickDuration = 0.5;
-			const float doubleClickDistance = 10;
 			double clickTime = glfwGetTime();
-			if (clickTime - lastClickTime <= doubleClickDuration && pos.minus(lastClickPos).norm() <= doubleClickDistance) {
-
+			if (clickedWidget
+				&& clickTime - lastClickTime <= doubleClickDuration
+				&& lastClickedWidget == clickedWidget) {
 				// event::DoubleClick
 				event::DoubleClick eDoubleClick;
 				clickedWidget->onDoubleClick(eDoubleClick);
 			}
 			lastClickTime = clickTime;
-			lastClickPos = pos;
+			lastClickedWidget = clickedWidget;
 		}
 	}
 
