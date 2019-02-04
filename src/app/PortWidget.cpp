@@ -84,28 +84,38 @@ void PortWidget::onLeave(const event::Leave &e) {
 
 void PortWidget::onDragStart(const event::DragStart &e) {
 	CableWidget *cw = NULL;
-	if (type == OUTPUT && (APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
-		// Keep cable NULL
+	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+		if (type == OUTPUT) {
+			// Keep cable NULL. Will be created below
+		}
+		else {
+			CableWidget *topCw = APP->scene->rackWidget->getTopCable(this);
+			if (topCw) {
+				cw = new CableWidget;
+				cw->setOutput(topCw->outputPort);
+			}
+		}
 	}
 	else {
 		// Grab cable on top of stack
 		cw = APP->scene->rackWidget->getTopCable(this);
+
+		if (cw) {
+			// history::CableRemove
+			history::CableRemove *h = new history::CableRemove;
+			h->setCable(cw);
+			APP->history->push(h);
+
+			// Disconnect and reuse existing cable
+			APP->scene->rackWidget->removeCable(cw);
+			if (type == OUTPUT)
+				cw->setOutput(NULL);
+			else
+				cw->setInput(NULL);
+		}
 	}
 
-	if (cw) {
-		// history::CableRemove
-		history::CableRemove *h = new history::CableRemove;
-		h->setCable(cw);
-		APP->history->push(h);
-
-		// Disconnect and reuse existing cable
-		APP->scene->rackWidget->removeCable(cw);
-		if (type == OUTPUT)
-			cw->setOutput(NULL);
-		else
-			cw->setInput(NULL);
-	}
-	else {
+	if (!cw) {
 		// Create a new cable
 		cw = new CableWidget;
 		if (type == OUTPUT)
@@ -113,6 +123,7 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 		else
 			cw->setInput(this);
 	}
+
 	APP->scene->rackWidget->setIncompleteCable(cw);
 	e.consume(this);
 }
