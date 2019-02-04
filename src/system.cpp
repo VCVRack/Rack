@@ -89,7 +89,7 @@ int getPhysicalCoreCount() {
 }
 
 void setThreadName(const std::string &name) {
-#if defined ARCH_LIN || defined ARCH_MAC
+#if defined ARCH_LIN
 	pthread_setname_np(pthread_self(), name.c_str());
 #elif defined ARCH_WIN
 	// Unsupported on Windows
