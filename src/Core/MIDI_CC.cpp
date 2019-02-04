@@ -25,6 +25,9 @@ struct MIDI_CC : Module {
 
 	MIDI_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 16; i++) {
+			valueFilters[i].lambda = 1 / 0.01f;
+		}
 		onReset();
 	}
 
@@ -45,7 +48,8 @@ struct MIDI_CC : Module {
 			processMessage(msg);
 		}
 
-		float lambda = APP->engine->getSampleTime() * 100.f;
+		float deltaTime = APP->engine->getSampleTime();
+
 		for (int i = 0; i < 16; i++) {
 			if (!outputs[CC_OUTPUT + i].isConnected())
 				continue;
@@ -53,7 +57,6 @@ struct MIDI_CC : Module {
 			int cc = learnedCcs[i];
 
 			float value = rescale(values[cc], 0, 127, 0.f, 10.f);
-			valueFilters[i].lambda = lambda;
 
 			// Detect behavior from MIDI buttons.
 			if ((lastValues[i] == 0 && values[cc] == 127) || (lastValues[i] == 127 && values[cc] == 0)) {
@@ -62,7 +65,7 @@ struct MIDI_CC : Module {
 			}
 			else {
 				// Smooth value with filter
-				valueFilters[i].process(value);
+				valueFilters[i].process(deltaTime, value);
 			}
 			lastValues[i] = values[cc];
 			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out);

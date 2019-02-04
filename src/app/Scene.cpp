@@ -58,12 +58,13 @@ void Scene::step() {
 	// Autosave every 15 seconds
 	int frame = APP->window->frame;
 	if (frame > 0 && frame % (60 * 15) == 0) {
+		// DEBUG("frame %d", frame);
 		APP->patch->save(asset::user("autosave.vcv"));
 		settings.save(asset::user("settings.json"));
 	}
 
 	// Set zoom every few frames
-	if (APP->window->frame % 10 == 0)
+	if (frame % 10 == 0)
 		zoomWidget->setZoom(std::round(settings.zoom * 100) / 100);
 
 	// Request latest version from server
@@ -75,7 +76,7 @@ void Scene::step() {
 
 	// Version popup message
 	if (!latestVersion.empty()) {
-		std::string versionMessage = string::f("Rack %s is available.\n\nYou have Rack %s.\n\nClose Rack and download new version on the website?", latestVersion.c_str(), app::VERSION);
+		std::string versionMessage = string::f("Rack v%s is available.\n\nYou have Rack v%s.\n\nClose Rack and download new version on the website?", latestVersion.c_str(), app::APP_VERSION);
 		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
 			std::thread t(system::openBrowser, "https://vcvrack.com/");
 			t.detach();
@@ -172,7 +173,7 @@ void Scene::runCheckVersion() {
 		json_t *versionJ = json_object_get(versionResJ, "version");
 		if (versionJ) {
 			std::string version = json_string_value(versionJ);
-			if (version != app::VERSION) {
+			if (version != app::APP_VERSION) {
 				latestVersion = version;
 			}
 		}

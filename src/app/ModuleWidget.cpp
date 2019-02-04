@@ -399,7 +399,7 @@ void ModuleWidget::fromJson(json_t *rootJ) {
 	if (versionJ) {
 		std::string version = json_string_value(versionJ);
 		if (version != model->plugin->version) {
-			INFO("Patch created with %s version %s, using version %s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
+			INFO("Patch created with %s v%s, currently using v%s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
 		}
 	}
 
@@ -677,7 +677,7 @@ void ModuleWidget::createContextMenu() {
 	assert(model);
 
 	ui::MenuLabel *menuLabel = new ui::MenuLabel;
-	menuLabel->text = model->plugin->name + " " + model->name + " " + model->plugin->version;
+	menuLabel->text = model->plugin->name + " " + model->name + " v" + model->plugin->version;
 	menu->addChild(menuLabel);
 
 	ModuleResetItem *resetItem = new ModuleResetItem;

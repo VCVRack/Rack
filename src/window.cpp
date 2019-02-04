@@ -332,9 +332,9 @@ void Window::run() {
 
 		// Set window title
 		std::string windowTitle;
-		windowTitle = app::NAME;
-		windowTitle += " ";
-		windowTitle += app::VERSION;
+		windowTitle = app::APP_NAME;
+		windowTitle += " v";
+		windowTitle += app::APP_VERSION;
 		if (!APP->patch->path.empty()) {
 			windowTitle += " - ";
 			windowTitle += string::filename(APP->patch->path);

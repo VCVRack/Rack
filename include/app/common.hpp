@@ -8,8 +8,8 @@ namespace rack {
 namespace app {
 
 
-static const char NAME[] = "VCV Rack";
-static const char VERSION[] = TOSTRING(APP_VERSION);
+static const char APP_NAME[] = "VCV Rack";
+static const char APP_VERSION[] = TOSTRING(VERSION);
 static const char API_URL[] = "https://api.vcvrack.com";
 
 static const float SVG_DPI = 75.0;

@@ -84,14 +84,14 @@ struct ExponentialSlewLimiter {
 
 
 /** Applies exponential smoothing to a signal with the ODE
-dy/dt = x * lambda
+\f$ \frac{dy}{dt} = x \lambda \f$.
 */
 struct ExponentialFilter {
 	float out = 0.f;
-	float lambda = 1.f;
+	float lambda = 0.f;
 
-	float process(float in) {
-		float y = out + (in - out) * lambda;
+	float process(float deltaTime, float in) {
+		float y = out + (in - out) * lambda * deltaTime;
 		// If no change was detected, assume float granularity is too small and snap output to input
 		if (out == y)
 			out = in;
@@ -99,6 +99,8 @@ struct ExponentialFilter {
 			out = y;
 		return out;
 	}
+
+	DEPRECATED float process(float in) {return process(1.f, in);}
 };
 
 

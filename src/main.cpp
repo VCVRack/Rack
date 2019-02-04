@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 	logger::init(devMode);
 
 	// Log environment
-	INFO("%s %s", app::NAME, app::VERSION);
+	INFO("%s v%s", app::APP_NAME, app::APP_VERSION);
 	if (devMode)
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());

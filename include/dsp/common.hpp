@@ -33,6 +33,7 @@ inline float hann(float p) {
 	return 0.5f * (1.f - std::cos(2*M_PI * p));
 }
 
+/** Applies the Hann window to a signal `x` */
 inline void hannWindow(float *x, int len) {
 	for (int i = 0; i < len; i++) {
 		x[i] *= hann((float) i / (len - 1));

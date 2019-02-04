@@ -223,7 +223,7 @@ json_t *PatchManager::toJson() {
 	json_t *rootJ = json_object();
 
 	// version
-	json_t *versionJ = json_string(app::VERSION);
+	json_t *versionJ = json_string(app::APP_VERSION);
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// Merge with RackWidget JSON
@@ -243,8 +243,8 @@ void PatchManager::fromJson(json_t *rootJ) {
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ)
 		version = json_string_value(versionJ);
-	if (version != app::VERSION) {
-		INFO("Patch made with Rack version %s, current Rack version is %s", version.c_str(), app::VERSION);
+	if (version != app::APP_VERSION) {
+		INFO("Patch was made with Rack v%s, current Rack version is v%s", version.c_str(), app::APP_VERSION);
 	}
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
