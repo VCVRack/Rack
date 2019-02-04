@@ -200,20 +200,24 @@ Window::Window() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-
-	if (settings.windowSize.isZero()) {
-		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-	}
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 	// Create window
-	win = glfwCreateWindow(settings.windowSize.x, settings.windowSize.y, "", NULL, NULL);
+	win = glfwCreateWindow(800, 600, "", NULL, NULL);
 	if (!win) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not open GLFW window. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
 
 	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
-	glfwSetWindowPos(win, settings.windowPos.x, settings.windowPos.y);
+	if (settings.windowSize.isZero()) {
+		glfwMaximizeWindow(win);
+	}
+	else {
+		glfwSetWindowPos(win, settings.windowPos.x, settings.windowPos.y);
+		glfwSetWindowSize(win, settings.windowSize.x, settings.windowSize.y);
+	}
+	glfwShowWindow(win);
 
 	glfwSetWindowUserPointer(win, this);
 	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
