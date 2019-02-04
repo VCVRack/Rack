@@ -189,6 +189,7 @@ Window::Window() {
 	internal = new Internal;
 	int err;
 
+	// Set window hints
 #if defined NANOVG_GL2
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -200,12 +201,19 @@ Window::Window() {
 #endif
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
-	internal->lastWindowTitle = "";
-	win = glfwCreateWindow(800, 600, internal->lastWindowTitle.c_str(), NULL, NULL);
+	if (settings.windowSize.isZero()) {
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	}
+
+	// Create window
+	win = glfwCreateWindow(settings.windowSize.x, settings.windowSize.y, "", NULL, NULL);
 	if (!win) {
-		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Cannot open window with OpenGL 2.0 renderer. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not open GLFW window. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
+
+	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowPos(win, settings.windowPos.x, settings.windowPos.y);
 
 	glfwSetWindowUserPointer(win, this);
 	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
@@ -214,6 +222,7 @@ Window::Window() {
 	// Enable v-sync
 	glfwSwapInterval(settings.frameRateSync ? 1 : 0);
 
+	// Set window callbacks
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
 	glfwSetMouseButtonCallback(win, mouseButtonCallback);
 	// Call this ourselves, but on every frame instead of only when the mouse moves
@@ -240,16 +249,6 @@ Window::Window() {
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
 	glGetError();
 
-	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
-
-	if (settings.windowSize.isZero()) {
-		glfwMaximizeWindow(win);
-	}
-	else {
-		glfwSetWindowSize(win, settings.windowSize.x, settings.windowSize.y);
-		glfwSetWindowPos(win, settings.windowPos.x, settings.windowPos.y);
-	}
-
 	// Set up NanoVG
 	int nvgFlags = NVG_ANTIALIAS;
 #if defined NANOVG_GL2
@@ -259,7 +258,10 @@ Window::Window() {
 #elif defined NANOVG_GLES2
 	vg = nvgCreateGLES2(nvgFlags);
 #endif
-	assert(vg);
+	if (!vg) {
+		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
+		exit(1);
+	}
 
 #if defined NANOVG_GL2
 	fbVg = nvgCreateGL2(nvgFlags);
