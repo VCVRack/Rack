@@ -47,6 +47,7 @@ void Knob::onDragEnd(const event::DragEnd &e) {
 		if (oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange *h = new history::ParamChange;
+			h->name = "move knob";
 			h->moduleId = paramQuantity->module->id;
 			h->paramId = paramQuantity->paramId;
 			h->oldValue = oldValue;

@@ -51,6 +51,7 @@ void Switch::onDragStart(const event::DragStart &e) {
 			if (oldValue != newValue) {
 				// Push ParamChange history action
 				history::ParamChange *h = new history::ParamChange;
+				h->name = "move switch";
 				h->moduleId = paramQuantity->module->id;
 				h->paramId = paramQuantity->paramId;
 				h->oldValue = oldValue;

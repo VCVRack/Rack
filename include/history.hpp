@@ -20,6 +20,8 @@ namespace history {
 
 
 struct Action {
+	/** Name of the action, lowercase. Used in the phrase "Undo ..." */
+	std::string name;
 	virtual ~Action() {}
 	virtual void undo() {}
 	virtual void redo() {}
@@ -60,6 +62,9 @@ struct ModuleAdd : ModuleAction {
 	plugin::Model *model;
 	math::Vec pos;
 	json_t *moduleJ;
+	ModuleAdd() {
+		name = "add module";
+	}
 	~ModuleAdd();
 	void setModule(app::ModuleWidget *mw);
 	void undo() override;
@@ -67,7 +72,11 @@ struct ModuleAdd : ModuleAction {
 };
 
 
-struct ModuleRemove : InverseAction<ModuleAdd> {};
+struct ModuleRemove : InverseAction<ModuleAdd> {
+	ModuleRemove() {
+		name = "remove module";
+	}
+};
 
 
 struct ModuleMove : ModuleAction {
@@ -75,6 +84,9 @@ struct ModuleMove : ModuleAction {
 	math::Vec newPos;
 	void undo() override;
 	void redo() override;
+	ModuleMove() {
+		name = "move module";
+	}
 };
 
 
@@ -82,12 +94,18 @@ struct ModuleBypass : ModuleAction {
 	bool bypass;
 	void undo() override;
 	void redo() override;
+	ModuleBypass() {
+		name = "bypass module";
+	}
 };
 
 
 struct ModuleChange : ModuleAction {
 	json_t *oldModuleJ;
 	json_t *newModuleJ;
+	ModuleChange() {
+		name = "change module";
+	}
 	~ModuleChange();
 	void undo() override;
 	void redo() override;
@@ -100,6 +118,9 @@ struct ParamChange : ModuleAction {
 	float newValue;
 	void undo() override;
 	void redo() override;
+	ParamChange() {
+		name = "change parameter";
+	}
 };
 
 
@@ -113,10 +134,17 @@ struct CableAdd : Action {
 	void setCable(app::CableWidget *cw);
 	void undo() override;
 	void redo() override;
+	CableAdd() {
+		name = "add cable";
+	}
 };
 
 
-struct CableRemove : InverseAction<CableAdd> {};
+struct CableRemove : InverseAction<CableAdd> {
+	CableRemove() {
+		name = "remove cable";
+	}
+};
 
 
 struct State {
@@ -130,6 +158,8 @@ struct State {
 	void redo();
 	bool canUndo();
 	bool canRedo();
+	std::string getUndoName();
+	std::string getRedoName();
 };
 
 

@@ -439,6 +439,7 @@ void ModuleWidget::pasteClipboardAction() {
 
 	// history::ModuleChange
 	history::ModuleChange *h = new history::ModuleChange;
+	h->name = "paste module preset";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
@@ -473,6 +474,7 @@ void ModuleWidget::loadAction(std::string filename) {
 
 	// history::ModuleChange
 	history::ModuleChange *h = new history::ModuleChange;
+	h->name = "load module preset";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
@@ -564,6 +566,7 @@ void ModuleWidget::resetAction() {
 
 	// history::ModuleChange
 	history::ModuleChange *h = new history::ModuleChange;
+	h->name = "reset module";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
@@ -578,6 +581,7 @@ void ModuleWidget::randomizeAction() {
 
 	// history::ModuleChange
 	history::ModuleChange *h = new history::ModuleChange;
+	h->name = "randomize module";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
@@ -617,6 +621,7 @@ static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexA
 
 void ModuleWidget::disconnectAction() {
 	history::ComplexAction *complexAction = new history::ComplexAction;
+	complexAction->name = "disconnect cables";
 	disconnectActions(this, complexAction);
 	APP->history->push(complexAction);
 
@@ -635,6 +640,7 @@ void ModuleWidget::cloneAction() {
 
 	// history::ModuleAdd
 	history::ModuleAdd *h = new history::ModuleAdd;
+	h->name = "clone modules";
 	h->setModule(clonedModuleWidget);
 	APP->history->push(h);
 }
@@ -651,6 +657,7 @@ void ModuleWidget::bypassAction() {
 
 void ModuleWidget::removeAction() {
 	history::ComplexAction *complexAction = new history::ComplexAction;
+	complexAction->name = "remove module";
 	disconnectActions(this, complexAction);
 
 	// history::ModuleRemove

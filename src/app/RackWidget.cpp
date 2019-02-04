@@ -437,6 +437,7 @@ void RackWidget::clearCables() {
 void RackWidget::clearCablesAction() {
 	// Add CableRemove for every cable to a ComplexAction
 	history::ComplexAction *complexAction = new history::ComplexAction;
+	complexAction->name = "clear cables";
 
 	for (widget::Widget *w : cableContainer->children) {
 		CableWidget *cw = dynamic_cast<CableWidget*>(w);

@@ -232,6 +232,7 @@ void ModuleBox::onButton(const event::Button &e) {
 
 		// Push ModuleAdd history action
 		history::ModuleAdd *h = new history::ModuleAdd;
+		h->name = "create module";
 		h->setModule(moduleWidget);
 		APP->history->push(h);
 	}

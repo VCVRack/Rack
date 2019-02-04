@@ -212,6 +212,7 @@ void ParamWidget::resetAction() {
 		if (oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange *h = new history::ParamChange;
+			h->name = "reset parameter";
 			h->moduleId = paramQuantity->module->id;
 			h->paramId = paramQuantity->paramId;
 			h->oldValue = oldValue;

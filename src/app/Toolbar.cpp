@@ -141,7 +141,7 @@ struct FileButton : MenuButton {
 
 struct UndoItem : ui::MenuItem {
 	UndoItem() {
-		text = "Undo";
+		text = "Undo " + APP->history->getUndoName();
 		rightText = WINDOW_MOD_CTRL_NAME "+Z";
 		disabled = !APP->history->canUndo();
 	}
@@ -153,7 +153,7 @@ struct UndoItem : ui::MenuItem {
 
 struct RedoItem : ui::MenuItem {
 	RedoItem() {
-		text = "Redo";
+		text = "Redo " + APP->history->getRedoName();
 		rightText = WINDOW_MOD_CTRL_NAME "+" WINDOW_MOD_SHIFT_NAME "+Z";
 		disabled = !APP->history->canRedo();
 	}

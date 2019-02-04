@@ -206,6 +206,18 @@ bool State::canRedo() {
 	return actionIndex < (int) actions.size();
 }
 
+std::string State::getUndoName() {
+	if (!canUndo())
+		return "";
+	return actions[actionIndex - 1]->name;
+}
+
+std::string State::getRedoName() {
+	if (!canRedo())
+		return "";
+	return actions[actionIndex]->name;
+}
+
 
 } // namespace history
 } // namespace rack
