@@ -37,6 +37,7 @@ struct MIDI_CV : Module {
 		REUSE_MODE,
 		RESET_MODE,
 		REASSIGN_MODE,
+		MPE_MODE,
 		NUM_POLY_MODES
 	};
 	PolyMode polyMode;
@@ -77,7 +78,7 @@ struct MIDI_CV : Module {
 
 	void onReset() override {
 		channels = 1;
-		polyMode = RESET_MODE;
+		polyMode = ROTATE_MODE;
 		clockDivision = 24;
 		panic();
 		midiInput.reset();
@@ -147,7 +148,7 @@ struct MIDI_CV : Module {
 			case 0x9: {
 				if (msg.getValue() > 0) {
 					velocities[msg.getNote()] = msg.getValue();
-					pressNote(msg.getNote());
+					pressNote(msg.getNote(), msg.getChannel());
 				}
 				else {
 					// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
@@ -264,7 +265,7 @@ struct MIDI_CV : Module {
 		}
 	}
 
-	void pressNote(uint8_t note) {
+	void pressNote(uint8_t note, int channel) {
 		// Remove existing similar note
 		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
 		if (it != heldNotes.end())
@@ -272,7 +273,8 @@ struct MIDI_CV : Module {
 		// Push note
 		heldNotes.push_back(note);
 		// Set note
-		int channel = assignChannel(note);
+		if (polyMode != MPE_MODE)
+			channel = assignChannel(note);
 		notes[channel] = note;
 		gates[channel] = true;
 		retriggerPulses[channel].trigger(1e-3);
@@ -459,6 +461,7 @@ struct PolyModeItem : MenuItem {
 			"Reuse",
 			"Reset",
 			"Reassign",
+			"MPE",
 		};
 		for (int i = 0; i < MIDI_CV::NUM_POLY_MODES; i++) {
 			MIDI_CV::PolyMode polyMode = (MIDI_CV::PolyMode) i;
@@ -522,15 +525,19 @@ struct MIDI_CVWidget : ModuleWidget {
 		clockDivisionItem->module = module;
 		menu->addChild(clockDivisionItem);
 
-		ChannelItem *channelItem = createMenuItem<ChannelItem>("Polyphony channels");
+		ChannelItem *channelItem = new ChannelItem;
+		channelItem->text = "Polyphony channels";
+		channelItem->rightText = string::f("%d", module->channels);
 		channelItem->module = module;
 		menu->addChild(channelItem);
 
-		PolyModeItem *polyModeItem = createMenuItem<PolyModeItem>("Polyphony mode");
+		PolyModeItem *polyModeItem = new PolyModeItem;
+		polyModeItem->text = "Polyphony mode";
 		polyModeItem->module = module;
 		menu->addChild(polyModeItem);
 
-		PanicItem *panicItem = createMenuItem<PanicItem>("Panic");
+		PanicItem *panicItem = new PanicItem;
+		panicItem->text = "Panic";
 		panicItem->module = module;
 		menu->addChild(panicItem);
 	}
