@@ -31,8 +31,6 @@ struct MIDI_CV : Module {
 
 	midi::InputQueue midiInput;
 
-	// std::vector<uint8_t> heldNotes;
-
 	int channels;
 	enum PolyMode {
 		ROTATE_MODE,
@@ -46,14 +44,19 @@ struct MIDI_CV : Module {
 	uint32_t clock = 0;
 	int clockDivision;
 
-	bool pedal = false;
-	uint8_t notes[16] = {60};
-	bool gates[128] = {};
-	uint8_t velocities[128] = {};
-	uint8_t aftertouches[128] = {};
+	bool pedal;
+	// Indexed by channel
+	uint8_t notes[16];
+	bool gates[16];
+	// Indexed by note
+	uint8_t velocities[128];
+	uint8_t aftertouches[128];
+	std::vector<uint8_t> heldNotes;
 
-	uint16_t pitch = 8192;
-	uint8_t mod = 0;
+	int rotateIndex;
+
+	uint16_t pitch;
+	uint8_t mod;
 
 	dsp::ExponentialFilter pitchFilter;
 	dsp::ExponentialFilter modFilter;
@@ -64,25 +67,40 @@ struct MIDI_CV : Module {
 	dsp::PulseGenerator stopPulse;
 	dsp::PulseGenerator continuePulse;
 
-
 	MIDI_CV() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		// heldNotes.resize(128, 0);
+		heldNotes.reserve(128);
 		pitchFilter.lambda = 1 / 0.01f;
 		modFilter.lambda = 1 / 0.01f;
 		onReset();
 	}
 
 	void onReset() override {
-		// heldNotes.clear();
-		// lastNote = 60;
-		// pedal = false;
-		// gate = false;
-		// clock = 0;
 		channels = 1;
 		polyMode = RESET_MODE;
 		clockDivision = 24;
+		panic();
 		midiInput.reset();
+	}
+
+	/** Resets performance state */
+	void panic() {
+		pedal = false;
+		for (int c = 0; c < 16; c++) {
+			notes[c] = 60;
+			gates[c] = false;
+		}
+		for (int i = 0; i < 128; i++) {
+			velocities[i] = 0;
+			aftertouches[i] = 0;
+		}
+		pedal = false;
+		rotateIndex = -1;
+		pitch = 8192;
+		mod = 0;
+		pitchFilter.reset();
+		modFilter.reset();
+		heldNotes.clear();
 	}
 
 	void step() override {
@@ -100,7 +118,7 @@ struct MIDI_CV : Module {
 		for (int c = 0; c < channels; c++) {
 			uint8_t note = notes[c];
 			outputs[CV_OUTPUT].setVoltage((note - 60.f) / 12.f, c);
-			outputs[GATE_OUTPUT].setVoltage(gates[note] ? 10.f : 0.f, c);
+			outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
 			outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[note], 0, 127, 0.f, 10.f), c);
 			outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[note], 0, 127, 0.f, 10.f), c);
 			outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulses[c].process(deltaTime) ? 10.f : 0.f, c);
@@ -118,7 +136,7 @@ struct MIDI_CV : Module {
 	}
 
 	void processMessage(midi::Message msg) {
-		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.channel(), msg.getNote(), msg.getValue());
+		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.getChannel(), msg.getNote(), msg.getValue());
 
 		switch (msg.getStatus()) {
 			// note off
@@ -200,38 +218,89 @@ struct MIDI_CV : Module {
 		}
 	}
 
+	int assignChannel(uint8_t note) {
+		if (channels == 1)
+			return 0;
+
+		switch (polyMode) {
+			case REUSE_MODE: {
+				// Find channel with the same note
+				for (int c = 0; c < channels; c++) {
+					if (notes[c] == note)
+						return c;
+				}
+			} // fallthrough
+
+			case ROTATE_MODE: {
+				// Find next available channel
+				for (int i = 0; i < channels; i++) {
+					rotateIndex++;
+					if (rotateIndex >= channels)
+						rotateIndex = 0;
+					if (!gates[rotateIndex])
+						return rotateIndex;
+				}
+				// No notes are available. Advance rotateIndex once more.
+				rotateIndex++;
+				if (rotateIndex >= channels)
+					rotateIndex = 0;
+				return rotateIndex;
+			} break;
+
+			case RESET_MODE: {
+				for (int c = 0; c < channels; c++) {
+					if (!gates[c])
+						return c;
+				}
+				return channels - 1;
+			} break;
+
+			case REASSIGN_MODE: {
+				// TODO I forgot what this does.
+				return 0;
+			}
+
+			default: return 0;
+		}
+	}
+
 	void pressNote(uint8_t note) {
-		int c = 0;
-		notes[c] = note;
-		gates[note] = true;
-		// // Remove existing similar note
-		// auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
-		// if (it != heldNotes.end())
-		// 	heldNotes.erase(it);
-		// // Push note
-		// heldNotes.push_back(note);
-		// lastNote = note;
-		// gate = true;
-		retriggerPulses[c].trigger(1e-3);
+		// Remove existing similar note
+		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
+		if (it != heldNotes.end())
+			heldNotes.erase(it);
+		// Push note
+		heldNotes.push_back(note);
+		// Set note
+		int channel = assignChannel(note);
+		notes[channel] = note;
+		gates[channel] = true;
+		retriggerPulses[channel].trigger(1e-3);
 	}
 
 	void releaseNote(uint8_t note) {
-		gates[note] = false;
-		// // Remove the note
-		// auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
-		// if (it != heldNotes.end())
-		// 	heldNotes.erase(it);
-		// // Hold note if pedal is pressed
-		// if (pedal)
-		// 	return;
-		// // Set last note
-		// if (!heldNotes.empty()) {
-		// 	lastNote = heldNotes[heldNotes.size() - 1];
-		// 	gate = true;
-		// }
-		// else {
-		// 	gate = false;
-		// }
+		// Remove the note
+		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
+		if (it != heldNotes.end())
+			heldNotes.erase(it);
+		// Hold note if pedal is pressed
+		if (pedal)
+			return;
+		// Turn off gate of all channels with note
+		for (int c = 0; c < channels; c++) {
+			if (notes[c] == note) {
+				gates[c] = false;
+			}
+		}
+		// Set last note if monophonic
+		if (channels == 1) {
+			if (note == notes[0] && !heldNotes.empty()) {
+				uint8_t lastNote = heldNotes.back();
+				notes[0] = lastNote;
+				gates[0] = true;
+				return;
+			}
+		}
 	}
 
 	void pressPedal() {
@@ -240,7 +309,40 @@ struct MIDI_CV : Module {
 
 	void releasePedal() {
 		pedal = false;
-		// releaseNote(255);
+		// Clear all gates
+		for (int c = 0; c < 16; c++) {
+			gates[c] = false;
+		}
+		// Add only the gates from heldNotes
+		for (uint8_t note : heldNotes) {
+			// Find note's channels
+			for (int c = 0; c < channels; c++) {
+				if (notes[c] == note) {
+					gates[c] = true;
+				}
+			}
+		}
+		// Set last note if monophonic
+		if (channels == 1) {
+			if (!heldNotes.empty()) {
+				uint8_t lastNote = heldNotes.back();
+				notes[0] = lastNote;
+			}
+		}
+	}
+
+	void setChannels(int channels) {
+		if (channels == this->channels)
+			return;
+		this->channels = channels;
+		panic();
+	}
+
+	void setPolyMode(PolyMode polyMode) {
+		if (polyMode == this->polyMode)
+			return;
+		this->polyMode = polyMode;
+		panic();
 	}
 
 	json_t *dataToJson() override {
@@ -248,6 +350,8 @@ struct MIDI_CV : Module {
 		json_object_set_new(rootJ, "channels", json_integer(channels));
 		json_object_set_new(rootJ, "polyMode", json_integer(polyMode));
 		json_object_set_new(rootJ, "clockDivision", json_integer(clockDivision));
+		json_object_set_new(rootJ, "lastPitch", json_integer(pitch));
+		json_object_set_new(rootJ, "lastMod", json_integer(mod));
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
 	}
@@ -255,7 +359,7 @@ struct MIDI_CV : Module {
 	void dataFromJson(json_t *rootJ) override {
 		json_t *channelsJ = json_object_get(rootJ, "channels");
 		if (channelsJ)
-			channels = json_integer_value(channelsJ);
+			setChannels(json_integer_value(channelsJ));
 
 		json_t *polyModeJ = json_object_get(rootJ, "polyMode");
 		if (polyModeJ)
@@ -264,6 +368,14 @@ struct MIDI_CV : Module {
 		json_t *clockDivisionJ = json_object_get(rootJ, "clockDivision");
 		if (clockDivisionJ)
 			clockDivision = json_integer_value(clockDivisionJ);
+
+		json_t *lastPitchJ = json_object_get(rootJ, "lastPitch");
+		if (lastPitchJ)
+			pitch = json_integer_value(lastPitchJ);
+
+		json_t *lastModJ = json_object_get(rootJ, "lastMod");
+		if (lastModJ)
+			mod = json_integer_value(lastModJ);
 
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
@@ -304,7 +416,7 @@ struct ChannelValueItem : MenuItem {
 	MIDI_CV *module;
 	int channels;
 	void onAction(const event::Action &e) override {
-		module->channels = channels;
+		module->setChannels(channels);
 	}
 };
 
@@ -333,7 +445,7 @@ struct PolyModeValueItem : MenuItem {
 	MIDI_CV *module;
 	MIDI_CV::PolyMode polyMode;
 	void onAction(const event::Action &e) override {
-		module->polyMode = polyMode;
+		module->setPolyMode(polyMode);
 	}
 };
 
@@ -358,6 +470,14 @@ struct PolyModeItem : MenuItem {
 			menu->addChild(item);
 		}
 		return menu;
+	}
+};
+
+
+struct PanicItem : MenuItem {
+	MIDI_CV *module;
+	void onAction(const event::Action &e) override {
+		module->panic();
 	}
 };
 
@@ -409,6 +529,10 @@ struct MIDI_CVWidget : ModuleWidget {
 		PolyModeItem *polyModeItem = createMenuItem<PolyModeItem>("Polyphony mode");
 		polyModeItem->module = module;
 		menu->addChild(polyModeItem);
+
+		PanicItem *panicItem = createMenuItem<PanicItem>("Panic");
+		panicItem->module = module;
+		menu->addChild(panicItem);
 	}
 };
 
