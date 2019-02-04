@@ -16,6 +16,7 @@ void createDirectory(const std::string &path);
 /** Currently this lies and returns the number of logical cores instead. */
 int getPhysicalCoreCount();
 void setThreadName(const std::string &name);
+void setThreadRealTime();
 
 /** Opens a URL, also happens to work with PDFs and folders.
 Shell injection is possible, so make sure the URL is trusted or hard coded.

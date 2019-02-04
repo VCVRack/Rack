@@ -101,6 +101,7 @@ struct EngineWorker {
 	void start() {
 		thread = std::thread([&] {
 			system::setThreadName("Engine worker");
+			system::setThreadRealTime();
 			run();
 		});
 	}
@@ -298,10 +299,10 @@ static void Engine_step(Engine *engine) {
 }
 
 static void Engine_run(Engine *engine) {
-#if defined ARCH_LIN
-	// Name thread
+	// Set up thread
 	system::setThreadName("Engine");
-#endif
+	system::setThreadRealTime();
+
 	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
 	// https://software.intel.com/en-us/node/682949
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
