@@ -11,7 +11,6 @@
 #if defined ARCH_WIN
 	#include <windows.h>
 	#include <shellapi.h>
-	#include <processthreadsapi.h>
 #endif
 
 
@@ -93,18 +92,19 @@ void setThreadName(const std::string &name) {
 #if defined ARCH_LIN || defined ARCH_MAC
 	pthread_setname_np(pthread_self(), name.c_str());
 #elif defined ARCH_WIN
-	SetThreadDescription(GetCurrentThread(), name.c_str());
+	// Unsupported on Windows
 #endif
 }
 
 void setThreadRealTime() {
 #if defined ARCH_LIN || defined ARCH_MAC
+	// Round-robin scheduler policy
 	int policy = SCHED_RR;
 	struct sched_param param;
 	param.sched_priority = sched_get_priority_max(policy);
 	pthread_setschedparam(pthread_self(), policy, &param);
 #elif defined ARCH_WIN
-	// Set entire process as realtime
+	// Set process class first
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 #endif
