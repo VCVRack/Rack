@@ -58,7 +58,6 @@ void Scene::step() {
 	// Autosave every 15 seconds
 	int frame = APP->window->frame;
 	if (frame > 0 && frame % (60 * 15) == 0) {
-		// DEBUG("frame %d", frame);
 		APP->patch->save(asset::user("autosave.vcv"));
 		settings.save(asset::user("settings.json"));
 	}

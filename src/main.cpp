@@ -84,11 +84,13 @@ int main(int argc, char *argv[]) {
 	// We can now install a signal handler and log the output
 	// Mac has its own decent crash handler
 #if defined ARCH_LIN || defined ARCH_WIN
-	signal(SIGABRT, fatalSignalHandler);
-	signal(SIGFPE, fatalSignalHandler);
-	signal(SIGILL, fatalSignalHandler);
-	signal(SIGSEGV, fatalSignalHandler);
-	signal(SIGTERM, fatalSignalHandler);
+	if (!devMode) {
+		signal(SIGABRT, fatalSignalHandler);
+		signal(SIGFPE, fatalSignalHandler);
+		signal(SIGILL, fatalSignalHandler);
+		signal(SIGSEGV, fatalSignalHandler);
+		signal(SIGTERM, fatalSignalHandler);
+	}
 #endif
 
 	// Log environment

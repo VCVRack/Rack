@@ -36,7 +36,6 @@ struct MIDI_CV : Module {
 		ROTATE_MODE,
 		REUSE_MODE,
 		RESET_MODE,
-		REASSIGN_MODE,
 		MPE_MODE,
 		NUM_POLY_MODES
 	};
@@ -256,11 +255,6 @@ struct MIDI_CV : Module {
 				return channels - 1;
 			} break;
 
-			case REASSIGN_MODE: {
-				// TODO I forgot what this does.
-				return 0;
-			}
-
 			default: return 0;
 		}
 	}
@@ -460,7 +454,6 @@ struct PolyModeItem : MenuItem {
 			"Rotate",
 			"Reuse",
 			"Reset",
-			"Reassign",
 			"MPE",
 		};
 		for (int i = 0; i < MIDI_CV::NUM_POLY_MODES; i++) {
