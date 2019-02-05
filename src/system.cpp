@@ -4,7 +4,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#if defined ARCH_LIN
+#if defined ARCH_LIN || defined ARCH_MAC
 	#include <pthread.h>
 	#include <sched.h>
 	#include <execinfo.h> // for backtrace and backtrace_symbols
@@ -119,7 +119,7 @@ std::string getStackTrace() {
 	void *stack[stackLen];
 	std::string s;
 
-#if defined ARCH_LIN
+#if defined ARCH_LIN || defined ARCH_MAC
 	stackLen = backtrace(stack, stackLen);
 	char **strings = backtrace_symbols(stack, stackLen);
 
@@ -127,8 +127,6 @@ std::string getStackTrace() {
 		s += string::f("%d: %s\n", stackLen - i - 1, strings[i]);
 	}
 	free(strings);
-#elif defined ARCH_MAC
-	// TODO
 #elif defined ARCH_WIN
 	HANDLE process = GetCurrentProcess();
 	SymInitialize(process, NULL, true);
