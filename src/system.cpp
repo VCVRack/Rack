@@ -140,7 +140,7 @@ std::string getStackTrace() {
 
 	for (int i = 0; i < stackLen; i++) {
 		SymFromAddr(process, (DWORD64) stack[i], 0, symbol);
-		s += string::f("%d: %s 0x%0x", stackLen - i - 1, symbol->Name, symbol->Address);
+		s += string::f("%d: %s 0x%0x\n", stackLen - i - 1, symbol->Name, symbol->Address);
 	}
 	free(symbol);
 #endif
