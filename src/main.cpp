@@ -24,6 +24,8 @@
 
 #if defined ARCH_WIN
 	#include <Windows.h>
+	#include <processthreadsapi.h>
+	#include <dbghelp.h>
 #endif
 
 using namespace rack;
