@@ -21,7 +21,7 @@ struct Settings {
 	bool cpuMeter = false;
 	bool lockModules = false;
 	bool checkVersion = true;
-	float frameRateLimit = 0.0;
+	float frameRateLimit = 70.0;
 	bool frameRateSync = true;
 	bool skipLoadOnLaunch = false;
 	std::string patchPath;

@@ -401,6 +401,7 @@ void Window::run() {
 
 		// Compute actual frame rate
 		endTime = glfwGetTime();
+		// DEBUG("%g fps", 1 / (endTime - startTime));
 		frame++;
 	}
 }
