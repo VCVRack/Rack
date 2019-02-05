@@ -86,7 +86,6 @@ int main(int argc, char *argv[]) {
 	signal(SIGILL, fatalSignalHandler);
 	signal(SIGSEGV, fatalSignalHandler);
 	signal(SIGTERM, fatalSignalHandler);
-	abort();
 
 	// Log environment
 	INFO("%s v%s", app::APP_NAME, app::APP_VERSION);
