@@ -14,21 +14,48 @@
 #include "patch.hpp"
 #include "ui.hpp"
 
-#include <unistd.h>
 #include <osdialog.h>
+#include <unistd.h> // for getopt
+#include <execinfo.h> // for backtrace and backtrace_symbols
+#include <signal.h> // for signal
 
-#ifdef ARCH_WIN
+
+#if defined ARCH_WIN
 #include <Windows.h>
 #endif
 
 using namespace rack;
 
 
+static void fatalSignalHandler(int sig) {
+	// Only catch one signal
+	static bool caught = false;
+	if (caught)
+		exit(1);
+	caught = true;
+
+	const int bufferLen = 128;
+	void *buffer[bufferLen];
+	int size = backtrace(buffer, bufferLen);
+	char **strings = backtrace_symbols(buffer, size);
+
+	FATAL("Fatal signal %d. Backtrace:", sig);
+	FATAL("");
+	for (int i = 0; i < size; i++)
+		FATAL("%s", strings[i]);
+
+	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
+
+	free(strings);
+	exit(1);
+}
+
+
 int main(int argc, char *argv[]) {
-#ifdef ARCH_WIN
+#if defined ARCH_WIN
 	// Windows global mutex to prevent multiple instances
 	// Handle will be closed by Windows when the process ends
-	HANDLE instanceMutex = CreateMutex(NULL, true, app::NAME);
+	HANDLE instanceMutex = CreateMutex(NULL, true, app::APP_NAME);
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
 		exit(1);
@@ -63,6 +90,12 @@ int main(int argc, char *argv[]) {
 	// Initialize environment
 	asset::init(devMode);
 	logger::init(devMode);
+	// We can now install a signal handler and log the output
+	signal(SIGABRT, fatalSignalHandler);
+	signal(SIGFPE, fatalSignalHandler);
+	signal(SIGILL, fatalSignalHandler);
+	signal(SIGSEGV, fatalSignalHandler);
+	signal(SIGTERM, fatalSignalHandler);
 
 	// Log environment
 	INFO("%s v%s", app::APP_NAME, app::APP_VERSION);

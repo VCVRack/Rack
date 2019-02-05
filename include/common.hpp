@@ -81,7 +81,7 @@ to reference the data beginning and end as a void* array, and
 	BINARY_SIZE(Test_dat)
 to get its size in bytes.
 */
-#ifdef ARCH_MAC
+#if defined ARCH_MAC
 	// Use output from `xxd -i`
 	#define BINARY(sym) extern unsigned char sym[]; extern unsigned int sym##_len
 	#define BINARY_START(sym) ((const void*) sym)

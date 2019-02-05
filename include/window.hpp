@@ -16,7 +16,7 @@
 /** Remaps Ctrl to Cmd on Mac
 Use this instead of GLFW_MOD_CONTROL, since Cmd should be used on Mac in place of Ctrl on Linux/Windows.
 */
-#ifdef ARCH_MAC
+#if defined ARCH_MAC
 	#define WINDOW_MOD_CTRL GLFW_MOD_SUPER
 	#define WINDOW_MOD_CTRL_NAME "Cmd"
 #else
