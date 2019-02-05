@@ -24,7 +24,7 @@ namespace app {
 
 struct MenuButton : ui::Button {
 	void step() override {
-		box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str());
+		box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + 1.0;
 		widget::Widget::step();
 	}
 	void draw(const widget::DrawContext &ctx) override {

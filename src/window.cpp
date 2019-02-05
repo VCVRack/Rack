@@ -209,6 +209,10 @@ Window::Window() {
 		exit(1);
 	}
 
+	float pixelRatio;
+	glfwGetWindowContentScale(win, &pixelRatio, NULL);
+	INFO("Pixel ratio: %f", pixelRatio);
+
 	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	if (settings.windowSize.isZero()) {
 		glfwMaximizeWindow(win);
@@ -349,7 +353,7 @@ void Window::run() {
 		// Get desired scaling
 		float pixelRatio;
 		glfwGetWindowContentScale(win, &pixelRatio, NULL);
-		pixelRatio = std::round(pixelRatio);
+		pixelRatio = std::floor(pixelRatio + 0.25);
 		if (pixelRatio != this->pixelRatio) {
 			APP->event->handleZoom();
 			this->pixelRatio = pixelRatio;
