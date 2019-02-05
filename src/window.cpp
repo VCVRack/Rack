@@ -368,14 +368,12 @@ void Window::run() {
 		// Step scene
 		APP->event->rootWidget->step();
 
-		// Render
+		// Render scene
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
 		if (visible) {
 			// Update and render
 			nvgBeginFrame(vg, winWidth, winHeight, pixelRatio);
-
-			// nvgReset(vg);
-			// nvgScale(vg, pixelRatio, pixelRatio);
+			nvgScale(vg, pixelRatio, pixelRatio);
 
 			widget::DrawContext ctx;
 			ctx.vg = vg;
