@@ -123,7 +123,7 @@ std::string getStackTrace() {
 	stackLen = backtrace(stack, stackLen);
 	char **strings = backtrace_symbols(stack, stackLen);
 
-	for (int i = 0; i < stackLen; i++) {
+	for (int i = 1; i < stackLen; i++) {
 		s += string::f("%d: %s\n", stackLen - i - 1, strings[i]);
 	}
 	free(strings);
@@ -136,7 +136,7 @@ std::string getStackTrace() {
 	symbol->MaxNameLen = 255;
 	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
-	for (int i = 0; i < stackLen; i++) {
+	for (int i = 1; i < stackLen; i++) {
 		SymFromAddr(process, (DWORD64) stack[i], 0, symbol);
 		s += string::f("%d: %s 0x%0x\n", stackLen - i - 1, symbol->Name, symbol->Address);
 	}

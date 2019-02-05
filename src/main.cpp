@@ -29,9 +29,10 @@ using namespace rack;
 static void fatalSignalHandler(int sig) {
 	// Only catch one signal
 	static bool caught = false;
-	if (caught)
-		exit(1);
+	bool localCaught = caught;
 	caught = true;
+	if (localCaught)
+		exit(1);
 
 	FATAL("Fatal signal %d. Stack trace:\n%s", sig, system::getStackTrace().c_str());
 
@@ -81,11 +82,14 @@ int main(int argc, char *argv[]) {
 	asset::init(devMode);
 	logger::init(devMode);
 	// We can now install a signal handler and log the output
+	// Mac has its own decent crash handler
+#if defined ARCH_LIN || defined ARCH_WIN
 	signal(SIGABRT, fatalSignalHandler);
 	signal(SIGFPE, fatalSignalHandler);
 	signal(SIGILL, fatalSignalHandler);
 	signal(SIGSEGV, fatalSignalHandler);
 	signal(SIGTERM, fatalSignalHandler);
+#endif
 
 	// Log environment
 	INFO("%s v%s", app::APP_NAME, app::APP_VERSION);
