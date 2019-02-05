@@ -16,12 +16,14 @@
 
 #include <osdialog.h>
 #include <unistd.h> // for getopt
-#include <execinfo.h> // for backtrace and backtrace_symbols
 #include <signal.h> // for signal
 
+#if defined ARCH_LIN
+	#include <execinfo.h> // for backtrace and backtrace_symbols
+#endif
 
 #if defined ARCH_WIN
-#include <Windows.h>
+	#include <Windows.h>
 #endif
 
 using namespace rack;
@@ -34,19 +36,40 @@ static void fatalSignalHandler(int sig) {
 		exit(1);
 	caught = true;
 
-	const int bufferLen = 128;
-	void *buffer[bufferLen];
-	int size = backtrace(buffer, bufferLen);
-	char **strings = backtrace_symbols(buffer, size);
-
 	FATAL("Fatal signal %d. Backtrace:", sig);
 	FATAL("");
-	for (int i = 0; i < size; i++)
-		FATAL("%s", strings[i]);
+
+	int stackLen = 128;
+	void *stack[stackLen];
+
+#if defined ARCH_LIN
+	stackLen = backtrace(stack, stackLen);
+	char **strings = backtrace_symbols(stack, stackLen);
+
+	for (int i = 0; i < stackLen; i++) {
+		FATAL("%d: %s", i, strings[i]);
+	}
+	free(strings);
+#elif defined ARCH_MAC
+	// TODO
+#elif defined ARCH_WIN
+	HANDLE process = GetCurrentProcess();
+	SymInitialize(process, NULL, true);
+	stackLen = CaptureStackBackTrace(0, stackLen, stack, NULL);
+
+	SYMBOL_INFO *symbol = (SYMBOL_INFO*) calloc(sizeof(SYMBOL_INFO) + 256, 1);
+	symbol->MaxNameLen = 255;
+	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+	for (int i = 0; i < stackLen; i++) {
+		SymFromAddr(process, (DWORD64) stack[i], 0, symbol);
+		FATAL("%d: %s 0x%0x", i, symbol->Name, symbol->Address);
+	}
+	free(symbol);
+#endif
 
 	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
 
-	free(strings);
 	exit(1);
 }
 
