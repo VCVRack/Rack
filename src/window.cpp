@@ -200,7 +200,7 @@ Window::Window() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-	// glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 	// Create window
 	win = glfwCreateWindow(800, 600, "", NULL, NULL);
@@ -362,7 +362,7 @@ void Window::run() {
 		glfwGetWindowSize(win, &winWidth, &winHeight);
 		windowRatio = (float)fbWidth / winWidth;
 
-		DEBUG("%f %f", pixelRatio, windowRatio);
+		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
 		// Resize scene
 		APP->event->rootWidget->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
 
@@ -373,7 +373,7 @@ void Window::run() {
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
 		if (visible) {
 			// Update and render
-			nvgBeginFrame(vg, winWidth, winHeight, pixelRatio);
+			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
 			nvgScale(vg, pixelRatio, pixelRatio);
 
 			widget::DrawContext ctx;
