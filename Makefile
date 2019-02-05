@@ -16,25 +16,6 @@ SOURCES += dep/osdialog/osdialog.c
 SOURCES += $(wildcard dep/jpommier-pffft-*/pffft.c) $(wildcard dep/jpommier-pffft-*/fftpack.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
-ifdef ARCH_MAC
-	SOURCES += dep/osdialog/osdialog_mac.m
-	LDFLAGS += -lpthread -ldl \
-		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
-		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a
-	TARGET := Rack
-	BUNDLE := dist/$(TARGET).app
-endif
-
-ifdef ARCH_WIN
-	SOURCES += dep/osdialog/osdialog_win.c
-	LDFLAGS += -static \
-		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		-Ldep/lib -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto -lrtaudio -lrtmidi \
-		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
-	TARGET := Rack.exe
-	OBJECTS += Rack.res
-endif
-
 ifdef ARCH_LIN
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
@@ -46,6 +27,23 @@ ifdef ARCH_LIN
 	TARGET := Rack
 endif
 
+ifdef ARCH_MAC
+	SOURCES += dep/osdialog/osdialog_mac.m
+	LDFLAGS += -lpthread -ldl \
+		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
+		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a
+	TARGET := Rack
+	BUNDLE := dist/$(TARGET).app
+endif
+
+ifdef ARCH_WIN
+	SOURCES += dep/osdialog/osdialog_win.c
+	LDFLAGS += -Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
+		dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a \
+		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
+	TARGET := Rack.exe
+	OBJECTS += Rack.res
+endif
 
 # Convenience targets
 
@@ -141,9 +139,9 @@ ifdef ARCH_WIN
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
 	cp -R LICENSE* res template.vcv dist/Rack/
-	# cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
-	# cp /mingw64/bin/libstdc++-6.dll dist/Rack/
-	# cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
+	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
+	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
+	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
 	# mkdir -p dist/Rack/Bridge
 	# cp Bridge/VST/dist/VCV-Bridge-{32,64,fx-32,fx-64}.dll dist/Rack/Bridge/

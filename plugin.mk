@@ -2,8 +2,8 @@ ifndef RACK_DIR
 $(error RACK_DIR is not defined)
 endif
 
-SLUG := $(shell jq ".slug" plugin.json)
-VERSION := $(shell jq ".version" plugin.json)
+SLUG := $(shell jq .slug plugin.json)
+VERSION := $(shell jq .version plugin.json)
 
 DISTRIBUTABLES += plugin.json
 
@@ -27,7 +27,7 @@ endif
 ifdef ARCH_WIN
 	LDFLAGS += -shared -L$(RACK_DIR) -lRack
 	TARGET := plugin.dll
-	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack
+	RACK_USER_DIR ?= "$(USERPROFILE)"/Documents/Rack
 endif
 
 
