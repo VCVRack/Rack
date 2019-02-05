@@ -25,12 +25,12 @@ std::string getAllowedTag(std::string tag);
 bool isSlugValid(std::string slug);
 
 
+extern const std::vector<std::string> allowedTags;
 extern std::list<Plugin*> plugins;
 extern bool isDownloading;
 extern float downloadProgress;
 extern std::string downloadName;
 extern std::string loginStatus;
-extern const std::vector<std::string> allowedTags;
 
 
 } // namespace plugin

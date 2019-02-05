@@ -56,13 +56,15 @@ void Scene::step() {
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 
 	// Autosave every 15 seconds
-	int frame = APP->window->frame;
-	if (frame > 0 && frame % (60 * 15) == 0) {
+	double time = glfwGetTime();
+	if (time - lastAutoSaveTime >= 15.0) {
+		lastAutoSaveTime = time;
 		APP->patch->save(asset::user("autosave.vcv"));
 		settings.save(asset::user("settings.json"));
 	}
 
 	// Set zoom every few frames
+	int frame = APP->window->frame;
 	if (frame % 10 == 0)
 		zoomWidget->setZoom(std::round(settings.zoom * 100) / 100);
 

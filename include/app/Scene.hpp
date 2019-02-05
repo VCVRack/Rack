@@ -25,6 +25,8 @@ struct Scene : widget::OpaqueWidget {
 	bool checkedVersion = false;
 	std::string latestVersion;
 
+	double lastAutoSaveTime = 0.0;
+
 	Scene();
 	~Scene();
 	void step() override;
