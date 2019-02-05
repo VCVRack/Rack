@@ -343,14 +343,12 @@ void init(bool devMode) {
 	std::string userPlugins = asset::user("plugins");
 	mkdir(userPlugins.c_str(), 0755);
 
-	if (!devMode) {
-		// Copy Fundamental package to plugins directory if folder does not exist
-		std::string fundamentalSrc = asset::system("Fundamental.zip");
-		std::string fundamentalDest = asset::user("plugins/Fundamental.zip");
-		std::string fundamentalDir = asset::user("plugins/Fundamental");
-		if (system::isFile(fundamentalSrc) && !system::isFile(fundamentalDest) && !system::isDirectory(fundamentalDir)) {
-			system::copyFile(fundamentalSrc, fundamentalDest);
-		}
+	// Copy Fundamental package to plugins directory if folder does not exist
+	std::string fundamentalSrc = asset::system("Fundamental.zip");
+	std::string fundamentalDest = asset::user("plugins/Fundamental.zip");
+	std::string fundamentalDir = asset::user("plugins/Fundamental");
+	if (system::isFile(fundamentalSrc) && !system::isFile(fundamentalDest) && !system::isDirectory(fundamentalDir)) {
+		system::copyFile(fundamentalSrc, fundamentalDest);
 	}
 
 	// Extract packages and load plugins

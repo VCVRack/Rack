@@ -74,7 +74,7 @@ std::string extension(const std::string &path) {
 	size_t pos = path.rfind('.');
 	if (pos == std::string::npos)
 		return "";
-	return std::string(path, pos);
+	return std::string(path, pos + 1);
 }
 
 

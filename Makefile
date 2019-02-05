@@ -93,65 +93,69 @@ endif
 
 
 # This target is not intended for public use
-dist: all
+dist: $(TARGET)
 	rm -rf dist
 	mkdir -p dist
 
+	$(MAKE) -C plugins/Fundamental dist
+
+ifdef ARCH_LIN
+	mkdir -p dist/Rack
+	cp $(TARGET) dist/Rack/
+	$(STRIP) -s dist/Rack/$(TARGET)
+	cp -R LICENSE* res template.vcv dist/Rack/
+	# Manually check that no nonstandard shared libraries are linked
+	ldd dist/Rack/$(TARGET)
+	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
+	mkdir -p dist/Rack/Bridge
+	# cp Bridge/VST/dist/VCV-Bridge{,-fx}.so dist/Rack/Bridge/
+	# Make ZIP
+	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+endif
 ifdef ARCH_MAC
 	mkdir -p $(BUNDLE)
 	mkdir -p $(BUNDLE)/Contents
-	mkdir -p $(BUNDLE)/Contents/Resources
 	cp Info.plist $(BUNDLE)/Contents/
 	$(SED) 's/{VERSION}/$(VERSION)/g' $(BUNDLE)/Contents/Info.plist
-	cp -R LICENSE* icon.icns res $(BUNDLE)/Contents/Resources
-
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	cp $(TARGET) $(BUNDLE)/Contents/MacOS/
 	$(STRIP) -S $(BUNDLE)/Contents/MacOS/$(TARGET)
+	mkdir -p $(BUNDLE)/Contents/Resources
+	cp -R LICENSE* res template.vcv icon.icns $(BUNDLE)/Contents/Resources
 
+	# Manually check that no nonstandard shared libraries are linked
 	otool -L $(BUNDLE)/Contents/MacOS/$(TARGET)
 
-	cp Fundamental-*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
-	cp -R Bridge/AU/dist/VCV-Bridge.component dist/
-	cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
-	cp -R Bridge/VST/dist/VCV-Bridge-fx.vst dist/
-	@# Make DMG image
+	cp plugins/Fundamental/dist/*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
+	# cp -R Bridge/AU/dist/VCV-Bridge.component dist/
+	# cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
+	# cp -R Bridge/VST/dist/VCV-Bridge-fx.vst dist/
+	# Make DMG image
 	cd dist && ln -s /Applications Applications
-	cd dist && ln -s /Library/Audio/Plug-Ins/Components Components
-	cd dist && ln -s /Library/Audio/Plug-Ins/VST VST
+	# cd dist && ln -s /Library/Audio/Plug-Ins/Components Components
+	# cd dist && ln -s /Library/Audio/Plug-Ins/VST VST
 	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack-$(VERSION)-$(ARCH).dmg
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
-	mkdir -p dist/Rack/Bridge
-	cp Bridge/VST/dist/VCV-Bridge-{32,64,fx-32,fx-64}.dll dist/Rack/Bridge/
-	cp -R LICENSE* res dist/Rack/
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
-	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
-	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
-	cp Fundamental-*.zip dist/Rack/Fundamental.zip
-	@# Make ZIP
+	cp -R LICENSE* res template.vcv dist/Rack/
+	# cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
+	# cp /mingw64/bin/libstdc++-6.dll dist/Rack/
+	# cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
+	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
+	# mkdir -p dist/Rack/Bridge
+	# cp Bridge/VST/dist/VCV-Bridge-{32,64,fx-32,fx-64}.dll dist/Rack/Bridge/
+	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
-	@# Make NSIS installer
-	makensis installer.nsi
-	mv Rack-setup.exe dist/Rack-$(VERSION)-$(ARCH).exe
-endif
-ifdef ARCH_LIN
-	mkdir -p dist/Rack
-	mkdir -p dist/Rack/Bridge
-	cp Bridge/VST/dist/VCV-Bridge{,-fx}.so dist/Rack/Bridge/
-	cp -R LICENSE* res dist/Rack/
-	cp $(TARGET) dist/Rack/
-	$(STRIP) -s dist/Rack/$(TARGET)
-	ldd dist/Rack/$(TARGET)
-	cp Fundamental-*.zip dist/Rack/Fundamental.zip
-	@# Make ZIP
-	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	# Make NSIS installer
+	# pacman -S mingw-w64-x86_64-nsis
+	# makensis installer.nsi
+	# mv Rack-setup.exe dist/Rack-$(VERSION)-$(ARCH).exe
 endif
 
-	@# Rack SDK
+	# Rack SDK
 	mkdir -p dist/Rack-SDK
 	cp LICENSE* dist/Rack-SDK/
 	cp *.mk dist/Rack-SDK/

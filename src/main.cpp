@@ -81,6 +81,7 @@ int main(int argc, char *argv[]) {
 	// Initialize environment
 	asset::init(devMode);
 	logger::init(devMode);
+
 	// We can now install a signal handler and log the output
 	// Mac has its own decent crash handler
 #if defined ARCH_LIN || defined ARCH_WIN
