@@ -1,4 +1,5 @@
 #include "system.hpp"
+#include "string.hpp"
 #include <thread>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -6,11 +7,14 @@
 #if defined ARCH_LIN
 	#include <pthread.h>
 	#include <sched.h>
+	#include <execinfo.h> // for backtrace and backtrace_symbols
 #endif
 
 #if defined ARCH_WIN
 	#include <windows.h>
 	#include <shellapi.h>
+	#include <processthreadsapi.h>
+	#include <dbghelp.h>
 #endif
 
 
@@ -108,6 +112,40 @@ void setThreadRealTime() {
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 #endif
+}
+
+std::string getStackTrace() {
+	int stackLen = 128;
+	void *stack[stackLen];
+	std::string s;
+
+#if defined ARCH_LIN
+	stackLen = backtrace(stack, stackLen);
+	char **strings = backtrace_symbols(stack, stackLen);
+
+	for (int i = 0; i < stackLen; i++) {
+		s += string::f("%d: %s\n", stackLen - i - 1, strings[i]);
+	}
+	free(strings);
+#elif defined ARCH_MAC
+	// TODO
+#elif defined ARCH_WIN
+	HANDLE process = GetCurrentProcess();
+	SymInitialize(process, NULL, true);
+	stackLen = CaptureStackBackTrace(0, stackLen, stack, NULL);
+
+	SYMBOL_INFO *symbol = (SYMBOL_INFO*) calloc(sizeof(SYMBOL_INFO) + 256, 1);
+	symbol->MaxNameLen = 255;
+	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+	for (int i = 0; i < stackLen; i++) {
+		SymFromAddr(process, (DWORD64) stack[i], 0, symbol);
+		s += string::f("%d: %s 0x%0x", stackLen - i - 1, symbol->Name, symbol->Address);
+	}
+	free(symbol);
+#endif
+
+	return s;
 }
 
 void openBrowser(const std::string &url) {

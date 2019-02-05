@@ -13,19 +13,14 @@
 #include "app.hpp"
 #include "patch.hpp"
 #include "ui.hpp"
+#include "system.hpp"
 
 #include <osdialog.h>
 #include <unistd.h> // for getopt
 #include <signal.h> // for signal
 
-#if defined ARCH_LIN
-	#include <execinfo.h> // for backtrace and backtrace_symbols
-#endif
-
 #if defined ARCH_WIN
-	#include <Windows.h>
-	#include <processthreadsapi.h>
-	#include <dbghelp.h>
+	#include <windows.h> // for CreateMutex
 #endif
 
 using namespace rack;
@@ -38,37 +33,7 @@ static void fatalSignalHandler(int sig) {
 		exit(1);
 	caught = true;
 
-	FATAL("Fatal signal %d. Backtrace:", sig);
-	FATAL("");
-
-	int stackLen = 128;
-	void *stack[stackLen];
-
-#if defined ARCH_LIN
-	stackLen = backtrace(stack, stackLen);
-	char **strings = backtrace_symbols(stack, stackLen);
-
-	for (int i = 0; i < stackLen; i++) {
-		FATAL("%d: %s", i, strings[i]);
-	}
-	free(strings);
-#elif defined ARCH_MAC
-	// TODO
-#elif defined ARCH_WIN
-	HANDLE process = GetCurrentProcess();
-	SymInitialize(process, NULL, true);
-	stackLen = CaptureStackBackTrace(0, stackLen, stack, NULL);
-
-	SYMBOL_INFO *symbol = (SYMBOL_INFO*) calloc(sizeof(SYMBOL_INFO) + 256, 1);
-	symbol->MaxNameLen = 255;
-	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-	for (int i = 0; i < stackLen; i++) {
-		SymFromAddr(process, (DWORD64) stack[i], 0, symbol);
-		FATAL("%d: %s 0x%0x", i, symbol->Name, symbol->Address);
-	}
-	free(symbol);
-#endif
+	FATAL("Fatal signal %d. Stack trace:\n%s", sig, system::getStackTrace().c_str());
 
 	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
 
@@ -121,6 +86,7 @@ int main(int argc, char *argv[]) {
 	signal(SIGILL, fatalSignalHandler);
 	signal(SIGSEGV, fatalSignalHandler);
 	signal(SIGTERM, fatalSignalHandler);
+	abort();
 
 	// Log environment
 	INFO("%s v%s", app::APP_NAME, app::APP_VERSION);
