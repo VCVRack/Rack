@@ -73,11 +73,14 @@ endif
 
 perf: $(TARGET)
 	# Requires gperftools
-ifdef ARCH_LIN
 	perf record --call-graph dwarf -o perf.data ./$< -d
-endif
 	# Analyze with hotspot (https://github.com/KDAB/hotspot) for example
 	# hotspot perf.data
+
+valgrind: $(TARGET)
+	# --gen-suppressions=yes
+	# --leak-check=full
+	valgrind --suppressions=valgrind.supp ./$< -d
 
 clean:
 	rm -rfv $(TARGET) libRack.a Rack.res build dist
