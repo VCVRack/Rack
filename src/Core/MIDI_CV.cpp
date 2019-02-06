@@ -48,18 +48,18 @@ struct MIDI_CV : Module {
 	// Indexed by channel
 	uint8_t notes[16];
 	bool gates[16];
-	// Indexed by note
-	uint8_t velocities[128];
-	uint8_t aftertouches[128];
+	uint8_t velocities[16];
+	uint8_t aftertouches[16];
 	std::vector<uint8_t> heldNotes;
 
 	int rotateIndex;
 
-	uint16_t pitch;
-	uint8_t mod;
+	// 16 channels for MPE. When MPE is disabled, only the first channel is used.
+	uint16_t pitches[16];
+	uint8_t mods[16];
+	dsp::ExponentialFilter pitchFilters[16];
+	dsp::ExponentialFilter modFilters[16];
 
-	dsp::ExponentialFilter pitchFilter;
-	dsp::ExponentialFilter modFilter;
 	dsp::PulseGenerator clockPulse;
 	dsp::PulseGenerator clockDividerPulse;
 	dsp::PulseGenerator retriggerPulses[16];
@@ -70,8 +70,10 @@ struct MIDI_CV : Module {
 	MIDI_CV() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		heldNotes.reserve(128);
-		pitchFilter.lambda = 1 / 0.01f;
-		modFilter.lambda = 1 / 0.01f;
+		for (int c = 0; c < 16; c++) {
+			pitchFilters[c].lambda = 1 / 0.01f;
+			modFilters[c].lambda = 1 / 0.01f;
+		}
 		onReset();
 	}
 
@@ -89,17 +91,15 @@ struct MIDI_CV : Module {
 		for (int c = 0; c < 16; c++) {
 			notes[c] = 60;
 			gates[c] = false;
-		}
-		for (int i = 0; i < 128; i++) {
-			velocities[i] = 0;
-			aftertouches[i] = 0;
+			velocities[c] = 0;
+			aftertouches[c] = 0;
+			pitches[c] = 8192;
+			mods[c] = 0;
+			pitchFilters[c].reset();
+			modFilters[c].reset();
 		}
 		pedal = false;
 		rotateIndex = -1;
-		pitch = 8192;
-		mod = 0;
-		pitchFilter.reset();
-		modFilter.reset();
 		heldNotes.clear();
 	}
 
@@ -116,17 +116,27 @@ struct MIDI_CV : Module {
 		outputs[AFTERTOUCH_OUTPUT].setChannels(channels);
 		outputs[RETRIGGER_OUTPUT].setChannels(channels);
 		for (int c = 0; c < channels; c++) {
-			uint8_t note = notes[c];
-			outputs[CV_OUTPUT].setVoltage((note - 60.f) / 12.f, c);
+			outputs[CV_OUTPUT].setVoltage((notes[c] - 60.f) / 12.f, c);
 			outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
-			outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[note], 0, 127, 0.f, 10.f), c);
-			outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[note], 0, 127, 0.f, 10.f), c);
+			outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
+			outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
 			outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulses[c].process(deltaTime) ? 10.f : 0.f, c);
 		}
 
-		uint16_t pitchAdjusted = (pitch == 16383) ? 16384 : pitch;
-		outputs[PITCH_OUTPUT].setVoltage(pitchFilter.process(deltaTime, rescale(pitchAdjusted, 0, 1<<14, -5.f, 5.f)));
-		outputs[MOD_OUTPUT].setVoltage(modFilter.process(deltaTime, rescale(mod, 0, 127, 0.f, 10.f)));
+		if (polyMode == MPE_MODE) {
+			for (int c = 0; c < channels; c++) {
+				outputs[PITCH_OUTPUT].setChannels(channels);
+				outputs[MOD_OUTPUT].setChannels(channels);
+				outputs[PITCH_OUTPUT].setVoltage(pitchFilters[c].process(deltaTime, rescale(pitches[c], 0, 1<<14, -5.f, 5.f)), c);
+				outputs[MOD_OUTPUT].setVoltage(modFilters[c].process(deltaTime, rescale(mods[c], 0, 127, 0.f, 10.f)), c);
+			}
+		}
+		else {
+			outputs[PITCH_OUTPUT].setChannels(1);
+			outputs[MOD_OUTPUT].setChannels(1);
+			outputs[PITCH_OUTPUT].setVoltage(pitchFilters[0].process(deltaTime, rescale(pitches[0], 0, 1<<14, -5.f, 5.f)));
+			outputs[MOD_OUTPUT].setVoltage(modFilters[0].process(deltaTime, rescale(mods[0], 0, 127, 0.f, 10.f)));
+		}
 
 		outputs[CLOCK_OUTPUT].setVoltage(clockPulse.process(deltaTime) ? 10.f : 0.f);
 		outputs[CLOCK_DIV_OUTPUT].setVoltage(clockDividerPulse.process(deltaTime) ? 10.f : 0.f);
@@ -146,25 +156,45 @@ struct MIDI_CV : Module {
 			// note on
 			case 0x9: {
 				if (msg.getValue() > 0) {
-					velocities[msg.getNote()] = msg.getValue();
-					pressNote(msg.getNote(), msg.getChannel());
+					int c = (polyMode == MPE_MODE) ? msg.getChannel() : assignChannel(msg.getNote());
+					velocities[c] = msg.getValue();
+					pressNote(msg.getNote(), c);
 				}
 				else {
 					// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
 					releaseNote(msg.getNote());
 				}
 			} break;
-			// channel aftertouch
+			// key pressure
 			case 0xa: {
-				aftertouches[msg.getNote()] = msg.getValue();
+				// Set the aftertouches with the same note
+				// TODO Should we handle the MPE case differently?
+				for (int c = 0; c < 16; c++) {
+					if (notes[c] == msg.getNote())
+						aftertouches[c] = msg.getValue();
+				}
 			} break;
 			// cc
 			case 0xb: {
 				processCC(msg);
 			} break;
+			// channel pressure
+			case 0xd: {
+				if (polyMode == MPE_MODE) {
+					// Set the channel aftertouch
+					aftertouches[msg.getChannel()] = msg.getValue();
+				}
+				else {
+					// Set all aftertouches
+					for (int c = 0; c < 16; c++) {
+						aftertouches[c] = msg.getValue();
+					}
+				}
+			} break;
 			// pitch wheel
 			case 0xe: {
-				pitch = ((uint16_t) msg.getValue() << 7) | msg.getNote();
+				int c = (polyMode == MPE_MODE) ? msg.getChannel() : 0;
+				pitches[c] = ((uint16_t) msg.getValue() << 7) | msg.getNote();
 			} break;
 			case 0xf: {
 				processSystem(msg);
@@ -177,7 +207,8 @@ struct MIDI_CV : Module {
 		switch (msg.getNote()) {
 			// mod
 			case 0x01: {
-				mod = msg.getValue();
+				int c = (polyMode == MPE_MODE) ? msg.getChannel() : 0;
+				mods[c] = msg.getValue();
 			} break;
 			// sustain
 			case 0x40: {
@@ -255,6 +286,11 @@ struct MIDI_CV : Module {
 				return channels - 1;
 			} break;
 
+			case MPE_MODE: {
+				// This case is handled by querying the MIDI message channel.
+				return 0;
+			} break;
+
 			default: return 0;
 		}
 	}
@@ -267,8 +303,6 @@ struct MIDI_CV : Module {
 		// Push note
 		heldNotes.push_back(note);
 		// Set note
-		if (polyMode != MPE_MODE)
-			channel = assignChannel(note);
 		notes[channel] = note;
 		gates[channel] = true;
 		retriggerPulses[channel].trigger(1e-3);
@@ -309,7 +343,7 @@ struct MIDI_CV : Module {
 		for (int c = 0; c < 16; c++) {
 			gates[c] = false;
 		}
-		// Add only the gates from heldNotes
+		// Add back only the gates from heldNotes
 		for (uint8_t note : heldNotes) {
 			// Find note's channels
 			for (int c = 0; c < channels; c++) {
@@ -346,8 +380,11 @@ struct MIDI_CV : Module {
 		json_object_set_new(rootJ, "channels", json_integer(channels));
 		json_object_set_new(rootJ, "polyMode", json_integer(polyMode));
 		json_object_set_new(rootJ, "clockDivision", json_integer(clockDivision));
-		json_object_set_new(rootJ, "lastPitch", json_integer(pitch));
-		json_object_set_new(rootJ, "lastMod", json_integer(mod));
+		// Saving/restoring pitch and mod doesn't make much sense for MPE.
+		if (polyMode != MPE_MODE) {
+			json_object_set_new(rootJ, "lastPitch", json_integer(pitches[0]));
+			json_object_set_new(rootJ, "lastMod", json_integer(mods[0]));
+		}
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
 	}
@@ -367,11 +404,11 @@ struct MIDI_CV : Module {
 
 		json_t *lastPitchJ = json_object_get(rootJ, "lastPitch");
 		if (lastPitchJ)
-			pitch = json_integer_value(lastPitchJ);
+			pitches[0] = json_integer_value(lastPitchJ);
 
 		json_t *lastModJ = json_object_get(rootJ, "lastMod");
 		if (lastModJ)
-			mod = json_integer_value(lastModJ);
+			mods[0] = json_integer_value(lastModJ);
 
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
