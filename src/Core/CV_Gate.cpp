@@ -1,4 +1,4 @@
-#include "Core.hpp"
+#include "plugin.hpp"
 
 
 struct GateMidiOutput : midi::Output {

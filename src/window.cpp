@@ -162,7 +162,7 @@ static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int 
 	APP->event->handleKey(window->mousePos, key, scancode, action, mods);
 
 	// Keyboard MIDI driver
-	if ((mods & WINDOW_MOD_MASK) == 0) {
+	if (!APP->event->selectedWidget && (mods & WINDOW_MOD_MASK) == 0) {
 		if (action == GLFW_PRESS) {
 			keyboard::press(key);
 		}

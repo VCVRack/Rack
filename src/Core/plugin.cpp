@@ -1,4 +1,4 @@
-#include "Core.hpp"
+#include "plugin.hpp"
 
 
 void init(rack::Plugin *p) {
@@ -6,7 +6,7 @@ void init(rack::Plugin *p) {
 	p->version = TOSTRING(VERSION);
 	p->name = "Core";
 	p->author = "VCV";
-	p->license = "LGPL-3.0-only and BSD-3-Clause";
+	p->license = "BSD-3-Clause";
 	p->authorEmail = "contact@vcvrack.com";
 	p->pluginUrl = "https://vcvrack.com/";
 	p->authorUrl = "https://vcvrack.com/";
@@ -19,17 +19,17 @@ void init(rack::Plugin *p) {
 	p->addModel(modelAudioInterface);
 
 	modelMIDI_CV->name = "MIDI-CV";
-	modelMIDI_CV->description = "";
+	modelMIDI_CV->description = "Converts MIDI from an external device to CV and gates";
 	modelMIDI_CV->tags = {"External", "MIDI"};
 	p->addModel(modelMIDI_CV);
 
 	modelMIDI_CC->name = "MIDI-CC";
-	modelMIDI_CC->description = "";
+	modelMIDI_CC->description = "Converts MIDI CC from an external device to CV";
 	modelMIDI_CC->tags = {"External", "MIDI"};
 	p->addModel(modelMIDI_CC);
 
 	modelMIDI_Gate->name = "MIDI-Gate";
-	modelMIDI_Gate->description = "";
+	modelMIDI_Gate->description = "Converts MIDI notes from an external device to gates";
 	modelMIDI_Gate->tags = {"External", "MIDI"};
 	p->addModel(modelMIDI_Gate);
 
@@ -39,27 +39,27 @@ void init(rack::Plugin *p) {
 	p->addModel(modelMIDI_Map);
 
 	modelCV_MIDI->name = "CV-MIDI";
-	modelCV_MIDI->description = "";
+	modelCV_MIDI->description = "Converts CV to MIDI and sends to an external device";
 	modelCV_MIDI->tags = {"External", "MIDI"};
 	p->addModel(modelCV_MIDI);
 
 	modelCV_CC->name = "CV-CC";
-	modelCV_CC->description = "";
+	modelCV_CC->description = "Converts CV to MIDI CC and sends to an external device";
 	modelCV_CC->tags = {"External", "MIDI"};
 	p->addModel(modelCV_CC);
 
 	modelCV_Gate->name = "CV-Gate";
-	modelCV_Gate->description = "";
+	modelCV_Gate->description = "Converts gates to MIDI notes and sends to an external device";
 	modelCV_Gate->tags = {"External", "MIDI"};
 	p->addModel(modelCV_Gate);
 
 	modelBlank->name = "Blank";
-	modelBlank->description = "";
+	modelBlank->description = "A resizable blank panel";
 	modelBlank->tags = {"Blank"};
 	p->addModel(modelBlank);
 
 	modelNotes->name = "Notes";
-	modelNotes->description = "";
+	modelNotes->description = "Write text for patch notes or artist attribution";
 	modelNotes->tags = {"Blank"};
 	p->addModel(modelNotes);
 }

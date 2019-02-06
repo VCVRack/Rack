@@ -333,9 +333,9 @@ static void extractPackages(std::string path) {
 ////////////////////
 
 void init(bool devMode) {
-	// Load core
-	// This function is defined in core.cpp
+	// Load Core
 	Plugin *corePlugin = new Plugin;
+	// This function is defined in Core/plugin.cpp
 	::init(corePlugin);
 	plugins.push_back(corePlugin);
 
