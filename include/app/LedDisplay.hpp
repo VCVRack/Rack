@@ -23,6 +23,7 @@ struct LedDisplayChoice : widget::TransparentWidget {
 	std::shared_ptr<Font> font;
 	math::Vec textOffset;
 	NVGcolor color;
+	NVGcolor bgColor;
 	LedDisplayChoice();
 	void draw(const widget::DrawContext &ctx) override;
 	void onButton(const event::Button &e) override;

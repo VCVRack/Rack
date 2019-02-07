@@ -37,11 +37,19 @@ LedDisplayChoice::LedDisplayChoice() {
 	box.size = mm2px(math::Vec(0, 28.0 / 3));
 	font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 	color = nvgRGB(0xff, 0xd7, 0x14);
+	bgColor = nvgRGBAf(0, 0, 0, 0);
 	textOffset = math::Vec(10, 18);
 }
 
 void LedDisplayChoice::draw(const widget::DrawContext &ctx) {
 	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+
+	if (bgColor.a > 0.0) {
+		nvgBeginPath(ctx.vg);
+		nvgRect(ctx.vg, 0, 0, box.size.x, box.size.y);
+		nvgFillColor(ctx.vg, bgColor);
+		nvgFill(ctx.vg);
+	}
 
 	if (font->handle >= 0) {
 		nvgFillColor(ctx.vg, color);

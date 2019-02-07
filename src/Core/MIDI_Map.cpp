@@ -17,6 +17,8 @@ struct MIDI_Map : Module {
 
 	midi::InputQueue midiInput;
 	int8_t values[128];
+	int learningId = -1;
+	int learnedCcs[16] = {};
 	dsp::ExponentialFilter valueFilters[8];
 
 	MIDI_Map() {
@@ -35,9 +37,41 @@ struct MIDI_Map : Module {
 
 struct MIDI_MapChoice : LedDisplayChoice {
 	MIDI_Map *module;
+	int id;
 
 	void setModule(MIDI_Map *module) {
 		this->module = module;
+	}
+
+	void onSelect(const event::Select &e) override {
+		if (!module)
+			return;
+		module->learningId = id;
+		e.consume(this);
+	}
+
+	void onDeselect(const event::Deselect &e) override {
+		if (!module)
+			return;
+		if (module->learningId == id) {
+			module->learningId = -1;
+		}
+	}
+
+	void step() override {
+		if (!module)
+			return;
+		if (module->learningId == id) {
+			text = "Mapping...";
+			color.a = 1.0;
+			bgColor = color;
+			bgColor.a = 0.15;
+		}
+		else {
+			text = "Unmapped";
+			color.a = 0.5;
+			bgColor = nvgRGBA(0, 0, 0, 0);
+		}
 	}
 };
 
@@ -52,6 +86,7 @@ struct MIDI_MapDisplay : MidiWidget {
 
 			MIDI_MapChoice *choice = createWidget<MIDI_MapChoice>(pos);
 			choice->box.size.x = box.size.x;
+			choice->id = i;
 			choice->setModule(module);
 			addChild(choice);
 			pos = choice->box.getBottomLeft();
