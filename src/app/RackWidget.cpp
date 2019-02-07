@@ -229,7 +229,13 @@ json_t *RackWidget::toJson() {
 		if (!cw->isComplete())
 			continue;
 
-		json_array_append_new(cablesJ, cw->toJson());
+		json_t *cableJ = cw->toJson();
+		{
+			// id
+			json_object_set_new(rootJ, "id", json_integer(cw->cable->id));
+		}
+		json_array_append_new(cablesJ, cableJ);
+
 	}
 	json_object_set_new(rootJ, "cables", cablesJ);
 
@@ -241,18 +247,21 @@ void RackWidget::fromJson(json_t *rootJ) {
 	json_t *modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
 		return;
-	std::map<int, ModuleWidget*> moduleWidgets;
 	size_t moduleIndex;
 	json_t *moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
 		ModuleWidget *moduleWidget = moduleFromJson(moduleJ);
 
 		if (moduleWidget) {
+			// Before 1.0, the module ID was the index in the "modules" array
+			if (APP->patch->isLegacy(2)) {
+				moduleWidget->module->id = moduleIndex;
+			}
 			// id
 			json_t *idJ = json_object_get(moduleJ, "id");
-			int id = 0;
 			if (idJ)
-				id = json_integer_value(idJ);
+				moduleWidget->module->id = json_integer_value(idJ);
+
 			// pos
 			json_t *posJ = json_object_get(moduleJ, "pos");
 			double x, y;
@@ -266,13 +275,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 				moduleWidget->box.pos = pos.mult(RACK_GRID_SIZE);
 			}
 
-			if (APP->patch->isLegacy(2)) {
-				// Before 1.0, the module ID was the index in the "modules" array
-				moduleWidgets[moduleIndex] = moduleWidget;
-			}
-			else {
-				moduleWidgets[id] = moduleWidget;
-			}
 			addModule(moduleWidget);
 		}
 		else {
@@ -295,11 +297,20 @@ void RackWidget::fromJson(json_t *rootJ) {
 	json_array_foreach(cablesJ, cableIndex, cableJ) {
 		// Create a unserialize cable
 		CableWidget *cw = new CableWidget;
-		cw->fromJson(cableJ, moduleWidgets);
+		cw->fromJson(cableJ);
 		if (!cw->isComplete()) {
 			delete cw;
 			continue;
 		}
+
+		// Before 1.0, cables IDs were not used, so just use the index of the "cables" array.
+		if (APP->patch->isLegacy(2)) {
+			cw->cable->id = cableIndex;
+		}
+		// id
+		json_t *idJ = json_object_get(cableJ, "id");
+		if (idJ)
+			cw->cable->id = json_integer_value(idJ);
 		addCable(cw);
 	}
 }

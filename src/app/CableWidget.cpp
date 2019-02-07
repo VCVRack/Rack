@@ -146,9 +146,6 @@ json_t *CableWidget::toJson() {
 	assert(isComplete());
 	json_t *rootJ = json_object();
 
-	// This is just here for fun. It is not used in fromJson(), since cableIds are not preserved across multiple launches of Rack.
-	json_object_set_new(rootJ, "id", json_integer(cable->id));
-
 	json_object_set_new(rootJ, "outputModuleId", json_integer(cable->outputModule->id));
 	json_object_set_new(rootJ, "outputId", json_integer(cable->outputId));
 	json_object_set_new(rootJ, "inputModuleId", json_integer(cable->inputModule->id));
@@ -160,20 +157,30 @@ json_t *CableWidget::toJson() {
 	return rootJ;
 }
 
-void CableWidget::fromJson(json_t *rootJ, const std::map<int, ModuleWidget*> &moduleWidgets) {
-	int outputModuleId = json_integer_value(json_object_get(rootJ, "outputModuleId"));
-	int outputId = json_integer_value(json_object_get(rootJ, "outputId"));
-	int inputModuleId = json_integer_value(json_object_get(rootJ, "inputModuleId"));
-	int inputId = json_integer_value(json_object_get(rootJ, "inputId"));
+void CableWidget::fromJson(json_t *rootJ) {
+	// outputModuleId
+	json_t *outputModuleIdJ = json_object_get(rootJ, "outputModuleId");
+	if (!outputModuleIdJ) return;
+	int outputModuleId = json_integer_value(outputModuleIdJ);
+	ModuleWidget *outputModule = APP->scene->rackWidget->getModule(outputModuleId);
+	if (!outputModule) return;
 
-	// Get module widgets
-	auto outputModuleIt = moduleWidgets.find(outputModuleId);
-	auto inputModuleIt = moduleWidgets.find(inputModuleId);
-	if (outputModuleIt == moduleWidgets.end() || inputModuleIt == moduleWidgets.end())
-		return;
+	// inputModuleId
+	json_t *inputModuleIdJ = json_object_get(rootJ, "inputModuleId");
+	if (!inputModuleIdJ) return;
+	int inputModuleId = json_integer_value(inputModuleIdJ);
+	ModuleWidget *inputModule = APP->scene->rackWidget->getModule(inputModuleId);
+	if (!inputModule) return;
 
-	ModuleWidget *outputModule = outputModuleIt->second;
-	ModuleWidget *inputModule = inputModuleIt->second;
+	// outputId
+	json_t *outputIdJ = json_object_get(rootJ, "outputId");
+	if (!outputIdJ) return;
+	int outputId = json_integer_value(outputIdJ);
+
+	// inputId
+	json_t *inputIdJ = json_object_get(rootJ, "inputId");
+	if (!inputIdJ) return;
+	int inputId = json_integer_value(inputIdJ);
 
 	// Set ports
 	if (APP->patch->isLegacy(1)) {

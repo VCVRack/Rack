@@ -8,7 +8,7 @@ namespace engine {
 
 
 struct Cable {
-	int id = 0;
+	int id = -1;
 	Module *outputModule = NULL;
 	int outputId;
 	Module *inputModule = NULL;

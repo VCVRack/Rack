@@ -26,6 +26,8 @@ float ParamQuantity::getSmoothValue() {
 void ParamQuantity::setValue(float value) {
 	if (!module)
 		return;
+	if (!std::isfinite(value))
+		return;
 	// This setter clamps the value
 	getParam()->setValue(value);
 }

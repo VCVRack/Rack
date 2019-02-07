@@ -209,9 +209,9 @@ Window::Window() {
 		exit(1);
 	}
 
-	float pixelRatio;
-	glfwGetWindowContentScale(win, &pixelRatio, NULL);
-	INFO("Pixel ratio: %f", pixelRatio);
+	float contentScale;
+	glfwGetWindowContentScale(win, &contentScale, NULL);
+	INFO("Window content scale: %f", contentScale);
 
 	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	if (settings.windowSize.isZero()) {

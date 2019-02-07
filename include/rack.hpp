@@ -88,6 +88,7 @@
 #include "dsp/resampler.hpp"
 #include "dsp/ringbuffer.hpp"
 #include "dsp/vumeter.hpp"
+#include "dsp/window.hpp"
 
 namespace rack {
 

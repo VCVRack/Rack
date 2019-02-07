@@ -100,8 +100,6 @@ struct EngineWorker {
 
 	void start() {
 		thread = std::thread([&] {
-			system::setThreadName("Engine worker");
-			system::setThreadRealTime();
 			run();
 		});
 	}
@@ -115,6 +113,8 @@ struct EngineWorker {
 	}
 
 	void run() {
+		system::setThreadName("Engine worker");
+		system::setThreadRealTime();
 		while (running) {
 			step();
 		}
@@ -134,8 +134,8 @@ struct Engine::Internal {
 	float sampleTime;
 	float sampleRateRequested;
 
-	int nextModuleId = 1;
-	int nextCableId = 1;
+	int nextModuleId = 0;
+	int nextCableId = 0;
 
 	// Parameter smoothing
 	Module *smoothModule = NULL;
@@ -209,13 +209,13 @@ static void Engine_setWorkerCount(Engine *engine, int workerCount) {
 	}
 }
 
-static void Engine_stepModules(Engine *engine, int id) {
+static void Engine_stepModules(Engine *engine, int threadId) {
 	Engine::Internal *internal = engine->internal;
 
 	int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
 
-	for (int i = id; i < modulesLen; i += threadCount) {
+	for (int i = threadId; i < modulesLen; i += threadCount) {
 		Module *module = internal->modules[i];
 		if (!module->bypass) {
 			// Step module
@@ -389,16 +389,18 @@ void Engine::addModule(Module *module) {
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it == internal->modules.end());
 	// Set ID
-	if (module->id == 0) {
+	if (module->id < 0) {
 		// Automatically assign ID
 		module->id = internal->nextModuleId++;
 	}
 	else {
 		// Manual ID
-		assert(module->id < internal->nextModuleId);
 		// Check that the ID is not already taken
 		for (Module *m : internal->modules) {
 			assert(module->id != m->id);
+		}
+		if (module->id >= internal->nextModuleId) {
+			internal->nextModuleId = module->id + 1;
 		}
 	}
 	// Add module
@@ -424,7 +426,7 @@ void Engine::removeModule(Module *module) {
 	// Remove the module
 	internal->modules.erase(it);
 	// Remove id
-	module->id = 0;
+	module->id = -1;
 }
 
 void Engine::resetModule(Module *module) {
@@ -493,16 +495,18 @@ void Engine::addCable(Cable *cable) {
 		assert(!(cable2->inputModule == cable->inputModule && cable2->inputId == cable->inputId));
 	}
 	// Set ID
-	if (cable->id == 0) {
+	if (cable->id < 0) {
 		// Automatically assign ID
 		cable->id = internal->nextCableId++;
 	}
 	else {
 		// Manual ID
-		assert(cable->id < internal->nextCableId);
 		// Check that the ID is not already taken
 		for (Cable *w : internal->cables) {
 			assert(cable->id != w->id);
+		}
+		if (cable->id >= internal->nextCableId) {
+			internal->nextCableId = cable->id + 1;
 		}
 	}
 	// Add the cable
@@ -524,7 +528,7 @@ void Engine::removeCable(Cable *cable) {
 	internal->cables.erase(it);
 	Engine_updateConnected(this);
 	// Remove ID
-	cable->id = 0;
+	cable->id = -1;
 }
 
 void Engine::setParam(Module *module, int paramId, float value) {

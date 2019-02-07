@@ -3,6 +3,7 @@
 #include "dsp/frame.hpp"
 #include "dsp/ringbuffer.hpp"
 #include "dsp/fir.hpp"
+#include "dsp/window.hpp"
 #include <assert.h>
 #include <string.h>
 #include <speex/speex_resampler.h>

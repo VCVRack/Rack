@@ -124,7 +124,7 @@ void ParamChange::redo() {
 
 void CableAdd::setCable(app::CableWidget *cw) {
 	assert(cw->cable);
-	assert(cw->cable->id > 0);
+	assert(cw->cable->id >= 0);
 	cableId = cw->cable->id;
 	assert(cw->cable->outputModule);
 	outputModuleId = cw->cable->outputModule->id;
