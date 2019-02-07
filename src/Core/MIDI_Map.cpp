@@ -72,8 +72,7 @@ struct MIDI_MapWidget : ModuleWidget {
 
 		MIDI_MapDisplay *midiWidget = createWidget<MIDI_MapDisplay>(mm2px(Vec(3.4, 14.839)));
 		midiWidget->box.size = mm2px(Vec(43.999, 102.664));
-		if (module)
-			midiWidget->midiIO = &module->midiInput;
+		midiWidget->setMidiIO(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}

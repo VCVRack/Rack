@@ -16,25 +16,25 @@ struct AudioDriverItem : ui::MenuItem {
 };
 
 struct AudioDriverChoice : LedDisplayChoice {
-	AudioWidget *audioWidget;
+	audio::IO *audioIO;
 	void onAction(const event::Action &e) override {
-		if (!audioWidget->audioIO)
+		if (!audioIO)
 			return;
 
 		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
-		for (int driver : audioWidget->audioIO->getDrivers()) {
+		for (int driver : audioIO->getDrivers()) {
 			AudioDriverItem *item = new AudioDriverItem;
-			item->audioIO = audioWidget->audioIO;
+			item->audioIO = audioIO;
 			item->driver = driver;
-			item->text = audioWidget->audioIO->getDriverName(driver);
-			item->rightText = CHECKMARK(item->driver == audioWidget->audioIO->driver);
+			item->text = audioIO->getDriverName(driver);
+			item->rightText = CHECKMARK(item->driver == audioIO->driver);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		if (audioWidget->audioIO)
-			text = audioWidget->audioIO->getDriverName(audioWidget->audioIO->driver);
+		if (audioIO)
+			text = audioIO->getDriverName(audioIO->driver);
 		else
 			text = "";
 	}
@@ -51,44 +51,44 @@ struct AudioDeviceItem : ui::MenuItem {
 };
 
 struct AudioDeviceChoice : LedDisplayChoice {
-	AudioWidget *audioWidget;
+	audio::IO *audioIO;
 	/** Prevents devices with a ridiculous number of channels from being displayed */
 	int maxTotalChannels = 128;
 
 	void onAction(const event::Action &e) override {
-		if (!audioWidget->audioIO)
+		if (!audioIO)
 			return;
 
 		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio device"));
-		int deviceCount = audioWidget->audioIO->getDeviceCount();
+		int deviceCount = audioIO->getDeviceCount();
 		{
 			AudioDeviceItem *item = new AudioDeviceItem;
-			item->audioIO = audioWidget->audioIO;
+			item->audioIO = audioIO;
 			item->device = -1;
 			item->text = "(No device)";
-			item->rightText = CHECKMARK(item->device == audioWidget->audioIO->device);
+			item->rightText = CHECKMARK(item->device == audioIO->device);
 			menu->addChild(item);
 		}
 		for (int device = 0; device < deviceCount; device++) {
-			int channels = std::min(maxTotalChannels, audioWidget->audioIO->getDeviceChannels(device));
-			for (int offset = 0; offset < channels; offset += audioWidget->audioIO->maxChannels) {
+			int channels = std::min(maxTotalChannels, audioIO->getDeviceChannels(device));
+			for (int offset = 0; offset < channels; offset += audioIO->maxChannels) {
 				AudioDeviceItem *item = new AudioDeviceItem;
-				item->audioIO = audioWidget->audioIO;
+				item->audioIO = audioIO;
 				item->device = device;
 				item->offset = offset;
-				item->text = audioWidget->audioIO->getDeviceDetail(device, offset);
-				item->rightText = CHECKMARK(item->device == audioWidget->audioIO->device && item->offset == audioWidget->audioIO->offset);
+				item->text = audioIO->getDeviceDetail(device, offset);
+				item->rightText = CHECKMARK(item->device == audioIO->device && item->offset == audioIO->offset);
 				menu->addChild(item);
 			}
 		}
 	}
 	void step() override {
-		if (!audioWidget->audioIO) {
+		if (!audioIO) {
 			text = "";
 			return;
 		}
-		text = audioWidget->audioIO->getDeviceDetail(audioWidget->audioIO->device, audioWidget->audioIO->offset);
+		text = audioIO->getDeviceDetail(audioIO->device, audioIO->offset);
 		if (text.empty()) {
 			text = "(No device)";
 			color.a = 0.5f;
@@ -109,29 +109,29 @@ struct AudioSampleRateItem : ui::MenuItem {
 };
 
 struct AudioSampleRateChoice : LedDisplayChoice {
-	AudioWidget *audioWidget;
+	audio::IO *audioIO;
 	void onAction(const event::Action &e) override {
-		if (!audioWidget->audioIO)
+		if (!audioIO)
 			return;
 
 		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Sample rate"));
-		std::vector<int> sampleRates = audioWidget->audioIO->getSampleRates();
+		std::vector<int> sampleRates = audioIO->getSampleRates();
 		if (sampleRates.empty()) {
 			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int sampleRate : sampleRates) {
 			AudioSampleRateItem *item = new AudioSampleRateItem;
-			item->audioIO = audioWidget->audioIO;
+			item->audioIO = audioIO;
 			item->sampleRate = sampleRate;
 			item->text = string::f("%d Hz", sampleRate);
-			item->rightText = CHECKMARK(item->sampleRate == audioWidget->audioIO->sampleRate);
+			item->rightText = CHECKMARK(item->sampleRate == audioIO->sampleRate);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		if (audioWidget->audioIO)
-			text = string::f("%g kHz", audioWidget->audioIO->sampleRate / 1000.f);
+		if (audioIO)
+			text = string::f("%g kHz", audioIO->sampleRate / 1000.f);
 		else
 			text = "";
 	}
@@ -147,84 +147,80 @@ struct AudioBlockSizeItem : ui::MenuItem {
 };
 
 struct AudioBlockSizeChoice : LedDisplayChoice {
-	AudioWidget *audioWidget;
+	audio::IO *audioIO;
 	void onAction(const event::Action &e) override {
-		if (!audioWidget->audioIO)
+		if (!audioIO)
 			return;
 
 		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Block size"));
-		std::vector<int> blockSizes = audioWidget->audioIO->getBlockSizes();
+		std::vector<int> blockSizes = audioIO->getBlockSizes();
 		if (blockSizes.empty()) {
 			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int blockSize : blockSizes) {
 			AudioBlockSizeItem *item = new AudioBlockSizeItem;
-			item->audioIO = audioWidget->audioIO;
+			item->audioIO = audioIO;
 			item->blockSize = blockSize;
-			float latency = (float) blockSize / audioWidget->audioIO->sampleRate * 1000.0;
+			float latency = (float) blockSize / audioIO->sampleRate * 1000.0;
 			item->text = string::f("%d (%.1f ms)", blockSize, latency);
-			item->rightText = CHECKMARK(item->blockSize == audioWidget->audioIO->blockSize);
+			item->rightText = CHECKMARK(item->blockSize == audioIO->blockSize);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		if (audioWidget->audioIO)
-			text = string::f("%d", audioWidget->audioIO->blockSize);
+		if (audioIO)
+			text = string::f("%d", audioIO->blockSize);
 		else
 			text = "";
 	}
 };
 
 
-AudioWidget::AudioWidget() {
-	box.size = mm2px(math::Vec(44, 28));
+void AudioWidget::setAudioIO(audio::IO *audioIO) {
+	clearChildren();
 
-	math::Vec pos = math::Vec();
+	math::Vec pos;
 
 	AudioDriverChoice *driverChoice = createWidget<AudioDriverChoice>(pos);
-	driverChoice->audioWidget = this;
+	driverChoice->box.size.x = box.size.x;
+	driverChoice->audioIO = audioIO;
 	addChild(driverChoice);
 	pos = driverChoice->box.getBottomLeft();
 	this->driverChoice = driverChoice;
 
 	this->driverSeparator = createWidget<LedDisplaySeparator>(pos);
+	this->driverSeparator->box.size.x = box.size.x;
 	addChild(this->driverSeparator);
 
 	AudioDeviceChoice *deviceChoice = createWidget<AudioDeviceChoice>(pos);
-	deviceChoice->audioWidget = this;
+	deviceChoice->box.size.x = box.size.x;
+	deviceChoice->audioIO = audioIO;
 	addChild(deviceChoice);
 	pos = deviceChoice->box.getBottomLeft();
 	this->deviceChoice = deviceChoice;
 
 	this->deviceSeparator = createWidget<LedDisplaySeparator>(pos);
+	this->deviceSeparator->box.size.x = box.size.x;
 	addChild(this->deviceSeparator);
 
 	AudioSampleRateChoice *sampleRateChoice = createWidget<AudioSampleRateChoice>(pos);
-	sampleRateChoice->audioWidget = this;
+	sampleRateChoice->box.size.x = box.size.x / 2;
+	sampleRateChoice->audioIO = audioIO;
 	addChild(sampleRateChoice);
 	this->sampleRateChoice = sampleRateChoice;
 
 	this->sampleRateSeparator = createWidget<LedDisplaySeparator>(pos);
+	this->sampleRateSeparator->box.pos.x = box.size.x / 2;
 	this->sampleRateSeparator->box.size.y = this->sampleRateChoice->box.size.y;
 	addChild(this->sampleRateSeparator);
 
 	AudioBlockSizeChoice *bufferSizeChoice = createWidget<AudioBlockSizeChoice>(pos);
-	bufferSizeChoice->audioWidget = this;
+	bufferSizeChoice->box.pos.x = box.size.x / 2;
+	bufferSizeChoice->box.size.x = box.size.x / 2;
+	bufferSizeChoice->audioIO = audioIO;
 	addChild(bufferSizeChoice);
 	this->bufferSizeChoice = bufferSizeChoice;
-}
-
-void AudioWidget::step() {
-	this->driverChoice->box.size.x = box.size.x;
-	this->driverSeparator->box.size.x = box.size.x;
-	this->deviceChoice->box.size.x = box.size.x;
-	this->deviceSeparator->box.size.x = box.size.x;
-	this->sampleRateChoice->box.size.x = box.size.x / 2;
-	this->sampleRateSeparator->box.pos.x = box.size.x / 2;
-	this->bufferSizeChoice->box.pos.x = box.size.x / 2;
-	this->bufferSizeChoice->box.size.x = box.size.x / 2;
-	LedDisplay::step();
 }
 
 

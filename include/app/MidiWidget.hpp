@@ -15,15 +15,12 @@ namespace app {
 
 
 struct MidiWidget : LedDisplay {
-	/** Not owned */
-	midi::IO *midiIO = NULL;
 	LedDisplayChoice *driverChoice;
 	LedDisplaySeparator *driverSeparator;
 	LedDisplayChoice *deviceChoice;
 	LedDisplaySeparator *deviceSeparator;
 	LedDisplayChoice *channelChoice;
-	MidiWidget();
-	void step() override;
+	void setMidiIO(midi::IO *midiIO);
 };
 
 

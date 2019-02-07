@@ -15,8 +15,6 @@ namespace app {
 
 
 struct AudioWidget : LedDisplay {
-	/** Not owned */
-	audio::IO *audioIO = NULL;
 	LedDisplayChoice *driverChoice;
 	LedDisplaySeparator *driverSeparator;
 	LedDisplayChoice *deviceChoice;
@@ -24,8 +22,7 @@ struct AudioWidget : LedDisplay {
 	LedDisplayChoice *sampleRateChoice;
 	LedDisplaySeparator *sampleRateSeparator;
 	LedDisplayChoice *bufferSizeChoice;
-	AudioWidget();
-	void step() override;
+	void setAudioIO(audio::IO *audioIO);
 };
 
 
