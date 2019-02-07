@@ -32,12 +32,18 @@ struct MIDI_Gate : Module {
 
 	void onReset() override {
 		for (int i = 0; i < 16; i++) {
-			gates[i] = false;
-			gateTimes[i] = 0.f;
 			learnedNotes[i] = i + 36;
 		}
 		learningId = -1;
+		panic();
 		midiInput.reset();
+	}
+
+	void panic() {
+		for (int i = 0; i < 16; i++) {
+			gates[i] = false;
+			gateTimes[i] = 0.f;
+		}
 	}
 
 	void pressNote(uint8_t note, uint8_t vel) {
@@ -144,6 +150,22 @@ struct MIDI_Gate : Module {
 };
 
 
+struct MIDI_GateVelocityItem : MenuItem {
+	MIDI_Gate *module;
+	void onAction(const event::Action &e) override {
+		module->velocityMode ^= true;
+	}
+};
+
+
+struct MIDI_GatePanicItem : MenuItem {
+	MIDI_Gate *module;
+	void onAction(const event::Action &e) override {
+		module->panic();
+	}
+};
+
+
 struct MIDI_GateWidget : ModuleWidget {
 	MIDI_GateWidget(MIDI_Gate *module) {
 		setModule(module);
@@ -183,17 +205,15 @@ struct MIDI_GateWidget : ModuleWidget {
 	void appendContextMenu(Menu *menu) override {
 		MIDI_Gate *module = dynamic_cast<MIDI_Gate*>(this->module);
 
-		struct VelocityItem : MenuItem {
-			MIDI_Gate *module;
-			void onAction(const event::Action &e) override {
-				module->velocityMode ^= true;
-			}
-		};
-
 		menu->addChild(new MenuEntry);
-		VelocityItem *velocityItem = createMenuItem<VelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
+		MIDI_GateVelocityItem *velocityItem = createMenuItem<MIDI_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
+
+		MIDI_GatePanicItem *panicItem = new MIDI_GatePanicItem;
+		panicItem->text = "Panic";
+		panicItem->module = module;
+		menu->addChild(panicItem);
 	}
 };
 

@@ -507,7 +507,7 @@ struct PolyModeItem : MenuItem {
 };
 
 
-struct PanicItem : MenuItem {
+struct MIDI_CVPanicItem : MenuItem {
 	MIDI_CV *module;
 	void onAction(const event::Action &e) override {
 		module->panic();
@@ -566,7 +566,7 @@ struct MIDI_CVWidget : ModuleWidget {
 		polyModeItem->module = module;
 		menu->addChild(polyModeItem);
 
-		PanicItem *panicItem = new PanicItem;
+		MIDI_CVPanicItem *panicItem = new MIDI_CVPanicItem;
 		panicItem->text = "Panic";
 		panicItem->module = module;
 		menu->addChild(panicItem);

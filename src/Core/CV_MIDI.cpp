@@ -313,6 +313,14 @@ struct CV_MIDI : Module {
 };
 
 
+struct CV_MIDIPanicItem : MenuItem {
+	CV_MIDI *module;
+	void onAction(const event::Action &e) override {
+		module->midiOutput.panic();
+	}
+};
+
+
 struct CV_MIDIWidget : ModuleWidget {
 	CV_MIDIWidget(CV_MIDI *module) {
 		setModule(module);
@@ -341,6 +349,17 @@ struct CV_MIDIWidget : ModuleWidget {
 		if (module)
 			midiWidget->midiIO = &module->midiOutput;
 		addChild(midiWidget);
+	}
+
+	void appendContextMenu(Menu *menu) override {
+		CV_MIDI *module = dynamic_cast<CV_MIDI*>(this->module);
+
+		menu->addChild(new MenuEntry);
+
+		CV_MIDIPanicItem *panicItem = new CV_MIDIPanicItem;
+		panicItem->text = "Panic";
+		panicItem->module = module;
+		menu->addChild(panicItem);
 	}
 };
 
