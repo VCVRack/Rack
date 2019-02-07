@@ -105,6 +105,12 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		this->module = module;
 	}
 
+	void onAction(const event::Action &e) override {
+		if (!module)
+			return;
+		module->lastLearnedCc = -1;
+	}
+
 	void onSelect(const event::Select &e) override {
 		if (!module)
 			return;
@@ -133,15 +139,17 @@ struct MIDI_MapChoice : LedDisplayChoice {
 			if (APP->event->selectedWidget != this)
 				APP->event->setSelected(this);
 		}
-		else if (module->learnedCcs[id] >= 0) {
-			text = string::f("CC%d", module->learnedCcs[id]);
-			color.a = 1.0;
-			bgColor = nvgRGBA(0, 0, 0, 0);
-		}
 		else {
-			text = "Unmapped";
-			color.a = 0.5;
-			bgColor = nvgRGBA(0, 0, 0, 0);
+			if (module->learnedCcs[id] >= 0) {
+				text = string::f("CC%d", module->learnedCcs[id]);
+				color.a = 1.0;
+				bgColor = nvgRGBA(0, 0, 0, 0);
+			}
+			else {
+				text = "Unmapped";
+				color.a = 0.5;
+				bgColor = nvgRGBA(0, 0, 0, 0);
+			}
 
 			// HACK
 			if (APP->event->selectedWidget == this)
