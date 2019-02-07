@@ -86,7 +86,10 @@ struct Param {
 	}
 
 	/** Returns whether the Param has finite range between minValue and maxValue. */
-	bool isBounded();
+	bool isBounded() {
+		return std::isfinite(minValue) && std::isfinite(maxValue);
+	}
+
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
 	void reset();

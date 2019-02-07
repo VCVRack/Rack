@@ -21,9 +21,13 @@ struct MIDI_Map : Module {
 	int lastLearnedCc;
 	int learnedCcs[8];
 	dsp::ExponentialFilter valueFilters[8];
+	ParamMap paramMaps[8];
 
 	MIDI_Map() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 8; i++) {
+			valueFilters[i].lambda = 40.f;
+		}
 		onReset();
 	}
 
@@ -40,6 +44,27 @@ struct MIDI_Map : Module {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
+		}
+
+		float deltaTime = APP->engine->getSampleTime();
+
+		for (int i = 0; i < 8; i++) {
+			// Get module
+			int moduleId = paramMaps[i].moduleId;
+			if (moduleId < 0)
+				continue;
+			Module *module = APP->engine->getModule(moduleId);
+			if (!module)
+				continue;
+			// Get param
+			int paramId = paramMaps[i].paramId;
+			Param *param = &module->params[paramId];
+			if (!param->isBounded())
+				continue;
+			// Set param
+			float v = rescale(values[i], 0, 127, param->minValue, param->maxValue);
+			v = valueFilters[i].process(deltaTime, v);
+			module->params[paramId].setValue(v);
 		}
 	}
 
@@ -76,6 +101,12 @@ struct MIDI_Map : Module {
 		}
 		json_object_set_new(rootJ, "ccs", ccsJ);
 
+		json_t *paramMapsJ = json_array();
+		for (int i = 0; i < 8; i++) {
+			json_array_append_new(paramMapsJ, paramMaps[i].toJson());
+		}
+		json_object_set_new(rootJ, "paramMaps", paramMapsJ);
+
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
 	}
@@ -87,6 +118,15 @@ struct MIDI_Map : Module {
 				json_t *ccJ = json_array_get(ccsJ, i);
 				if (ccJ)
 					learnedCcs[i] = json_integer_value(ccJ);
+			}
+		}
+
+		json_t *paramMapsJ = json_object_get(rootJ, "paramMaps");
+		if (paramMapsJ) {
+			for (int i = 0; i < 8; i++) {
+				json_t *paramMapJ = json_array_get(paramMapsJ, i);
+				if (paramMapJ)
+					paramMaps[i].fromJson(paramMapJ);
 			}
 		}
 

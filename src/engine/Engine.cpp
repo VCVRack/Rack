@@ -132,7 +132,6 @@ struct Engine::Internal {
 	bool running = false;
 	float sampleRate;
 	float sampleTime;
-	float sampleRateRequested;
 
 	int nextModuleId = 0;
 	int nextCableId = 0;
@@ -142,7 +141,7 @@ struct Engine::Internal {
 	int smoothParamId;
 	float smoothValue;
 
-	std::mutex mutex;
+	std::recursive_mutex mutex;
 	std::thread thread;
 	VIPMutex vipMutex;
 
@@ -156,57 +155,26 @@ struct Engine::Internal {
 Engine::Engine() {
 	internal = new Internal;
 
-	float sampleRate = settings.sampleRate;
-	internal->sampleRate = sampleRate;
-	internal->sampleTime = 1 / sampleRate;
-	internal->sampleRateRequested = sampleRate;
-
-	internal->threadCount = settings.threadCount;
 	internal->engineBarrier.total = 1;
 	internal->workerBarrier.total = 1;
+
+	setSampleRate(44100.f);
+	setThreadCount(settings.threadCount);
 }
 
 Engine::~Engine() {
 	settings.sampleRate = internal->sampleRate;
 	settings.threadCount = internal->threadCount;
 
-	// Make sure there are no cables or modules in the rack on destruction. This suggests that a module failed to remove itself before the RackWidget was destroyed.
+	// Stop worker threads
+	setThreadCount(1);
+
+	// Make sure there are no cables or modules in the rack on destruction.
+	// If this happens, a module must have failed to remove itself before the RackWidget was destroyed.
 	assert(internal->cables.empty());
 	assert(internal->modules.empty());
 
 	delete internal;
-}
-
-static void Engine_setWorkerCount(Engine *engine, int workerCount) {
-	assert(0 <= workerCount && workerCount <= 32);
-	Engine::Internal *internal = engine->internal;
-
-	// Stop all workers
-	for (EngineWorker &worker : internal->workers) {
-		worker.stop();
-	}
-	internal->engineBarrier.wait();
-
-	// Destroy all workers
-	for (EngineWorker &worker : internal->workers) {
-		worker.join();
-	}
-	internal->workers.resize(0);
-
-	// Set barrier counts
-	internal->engineBarrier.total = workerCount + 1;
-	internal->workerBarrier.total = workerCount + 1;
-
-	if (workerCount >= 1) {
-		// Create workers
-		internal->workers.resize(workerCount);
-		for (int i = 0; i < workerCount; i++) {
-			EngineWorker &worker = internal->workers[i];
-			worker.id = i + 1;
-			worker.engine = engine;
-			worker.start();
-		}
-	}
 }
 
 static void Engine_stepModules(Engine *engine, int threadId) {
@@ -215,6 +183,11 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 	int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
 
+	// TODO
+	// There's room for optimization here by choosing modules intelligently rather than fixed strides.
+	// See OpenMP's `guided` scheduling algorithm.
+
+	// Step each module
 	for (int i = threadId; i < modulesLen; i += threadCount) {
 		Module *module = internal->modules[i];
 		if (!module->bypass) {
@@ -235,7 +208,7 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 			}
 		}
 
-		// Iterate ports and step plug lights
+		// Iterate ports to step plug lights
 		for (Input &input : module->inputs) {
 			input.step();
 		}
@@ -248,47 +221,28 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 static void Engine_step(Engine *engine) {
 	Engine::Internal *internal = engine->internal;
 
-	// Sample rate
-	if (internal->sampleRateRequested != internal->sampleRate) {
-		internal->sampleRate = internal->sampleRateRequested;
-		internal->sampleTime = 1 / internal->sampleRate;
-		for (Module *module : internal->modules) {
-			module->onSampleRateChange();
-		}
-	}
-
 	// Param smoothing
-	{
-		Module *smoothModule = internal->smoothModule;
-		int smoothParamId = internal->smoothParamId;
-		float smoothValue = internal->smoothValue;
-		if (smoothModule) {
-			Param *param = &smoothModule->params[smoothParamId];
-			float value = param->value;
-			// decay rate is 1 graphics frame
-			const float smoothLambda = 60.f;
-			float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
-			if (value == newValue || !(param->minValue <= newValue && newValue <= param->maxValue)) {
-				// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats), or if newValue is out of bounds
-				param->setValue(smoothValue);
-				internal->smoothModule = NULL;
-			}
-			else {
-				param->value = newValue;
-			}
+	Module *smoothModule = internal->smoothModule;
+	int smoothParamId = internal->smoothParamId;
+	float smoothValue = internal->smoothValue;
+	if (smoothModule) {
+		Param *param = &smoothModule->params[smoothParamId];
+		float value = param->value;
+		// decay rate is 1 graphics frame
+		const float smoothLambda = 60.f;
+		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
+		if (value == newValue || !(param->minValue <= newValue && newValue <= param->maxValue)) {
+			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats), or if newValue is out of bounds
+			param->setValue(smoothValue);
+			internal->smoothModule = NULL;
 		}
-	}
-
-	// Lazily create/destroy workers
-	int workerCount = internal->threadCount - 1;
-	if ((int) internal->workers.size() != workerCount) {
-		Engine_setWorkerCount(engine, workerCount);
-	}
-	else {
-		internal->engineBarrier.wait();
+		else {
+			param->value = newValue;
+		}
 	}
 
 	// Step modules along with workers
+	internal->engineBarrier.wait();
 	Engine_stepModules(engine, 0);
 	internal->workerBarrier.wait();
 
@@ -318,7 +272,7 @@ static void Engine_run(Engine *engine) {
 		engine->internal->vipMutex.wait();
 
 		if (!engine->internal->paused) {
-			std::lock_guard<std::mutex> lock(engine->internal->mutex);
+			std::lock_guard<std::recursive_mutex> lock(engine->internal->mutex);
 			// auto startTime = std::chrono::high_resolution_clock::now();
 
 			for (int i = 0; i < mutexSteps; i++) {
@@ -345,8 +299,6 @@ static void Engine_run(Engine *engine) {
 			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
 		}
 	}
-
-	Engine_setWorkerCount(engine, 0);
 }
 
 void Engine::start() {
@@ -360,10 +312,35 @@ void Engine::stop() {
 }
 
 void Engine::setThreadCount(int threadCount) {
-	assert(threadCount >= 1);
+	assert(1 <= threadCount);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+	// Stop all workers
+	for (EngineWorker &worker : internal->workers) {
+		worker.stop();
+	}
+	internal->engineBarrier.wait();
+
+	// Destroy all workers
+	for (EngineWorker &worker : internal->workers) {
+		worker.join();
+	}
+	internal->workers.resize(0);
+
+	// Set barrier counts
 	internal->threadCount = threadCount;
+	internal->engineBarrier.total = threadCount;
+	internal->workerBarrier.total = threadCount;
+
+	// Create workers
+	internal->workers.resize(threadCount - 1);
+	for (int id = 1; id < threadCount; id++) {
+		EngineWorker &worker = internal->workers[id - 1];
+		worker.id = id;
+		worker.engine = this;
+		worker.start();
+	}
 }
 
 int Engine::getThreadCount() {
@@ -372,7 +349,8 @@ int Engine::getThreadCount() {
 }
 
 void Engine::setPaused(bool paused) {
-	// No lock
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	internal->paused = paused;
 }
 
@@ -381,10 +359,29 @@ bool Engine::isPaused() {
 	return internal->paused;
 }
 
+void Engine::setSampleRate(float sampleRate) {
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+	internal->sampleRate = sampleRate;
+	internal->sampleTime = 1 / sampleRate;
+	for (Module *module : internal->modules) {
+		module->onSampleRateChange();
+	}
+}
+
+float Engine::getSampleRate() {
+	return internal->sampleRate;
+}
+
+float Engine::getSampleTime() {
+	return internal->sampleTime;
+}
+
 void Engine::addModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Check that the module is not already added
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it == internal->modules.end());
@@ -410,7 +407,7 @@ void Engine::addModule(Module *module) {
 void Engine::removeModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// If a param is being smoothed on this module, stop smoothing it immediately
 	if (module == internal->smoothModule) {
 		internal->smoothModule = NULL;
@@ -429,7 +426,7 @@ void Engine::removeModule(Module *module) {
 
 Module *Engine::getModule(int moduleId) {
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Find module
 	for (Module *module : internal->modules) {
 		if (module->id == moduleId)
@@ -441,7 +438,7 @@ Module *Engine::getModule(int moduleId) {
 void Engine::resetModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 	module->reset();
 }
@@ -449,7 +446,7 @@ void Engine::resetModule(Module *module) {
 void Engine::randomizeModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 	module->randomize();
 }
@@ -457,7 +454,7 @@ void Engine::randomizeModule(Module *module) {
 void Engine::bypassModule(Module *module, bool bypass) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	if (bypass) {
 		for (Output &output : module->outputs) {
 			// This also zeros all voltages
@@ -494,7 +491,7 @@ static void Engine_updateConnected(Engine *engine) {
 void Engine::addCable(Cable *cable) {
 	assert(cable);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Check cable properties
 	assert(cable->outputModule);
 	assert(cable->inputModule);
@@ -526,7 +523,7 @@ void Engine::addCable(Cable *cable) {
 void Engine::removeCable(Cable *cable) {
 	assert(cable);
 	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::mutex> lock(internal->mutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
 	assert(it != internal->cables.end());
@@ -563,27 +560,13 @@ float Engine::getSmoothParam(Module *module, int paramId) {
 	return getParam(module, paramId);
 }
 
-int Engine::getNextModuleId() {
-	return internal->nextModuleId++;
-}
-
-void Engine::setSampleRate(float newSampleRate) {
-	internal->sampleRateRequested = newSampleRate;
-}
-
-float Engine::getSampleRate() {
-	return internal->sampleRate;
-}
-
-float Engine::getSampleTime() {
-	return internal->sampleTime;
-}
-
 
 void EngineWorker::step() {
+	engine->internal->engineBarrier.wait();
+	if (!running)
+		return;
 	Engine_stepModules(engine, id);
 	engine->internal->workerBarrier.wait();
-	engine->internal->engineBarrier.wait();
 }
 
 

@@ -316,10 +316,10 @@ struct ThreadCountValueItem : ui::MenuItem {
 	void setThreadCount(int threadCount) {
 		this->threadCount = threadCount;
 		text = string::f("%d", threadCount);
-		if (threadCount == 1)
-			text += " (default)";
-		else if (threadCount == system::getPhysicalCoreCount() / 2)
-			text += " (recommended)";
+		if (threadCount == system::getLogicalCoreCount() / 2)
+			text += " (best performance)";
+		else if (threadCount == 1)
+			text += " (best efficiency)";
 		rightText = CHECKMARK(APP->engine->getThreadCount() == threadCount);
 	}
 	void onAction(const event::Action &e) override {
@@ -335,7 +335,7 @@ struct ThreadCount : ui::MenuItem {
 	ui::Menu *createChildMenu() override {
 		ui::Menu *menu = new ui::Menu;
 
-		int coreCount = system::getPhysicalCoreCount();
+		int coreCount = system::getLogicalCoreCount();
 		for (int i = 1; i <= coreCount; i++) {
 			ThreadCountValueItem *item = new ThreadCountValueItem;
 			item->setThreadCount(i);

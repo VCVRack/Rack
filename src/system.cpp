@@ -87,7 +87,7 @@ void createDirectory(const std::string &path) {
 #endif
 }
 
-int getPhysicalCoreCount() {
+int getLogicalCoreCount() {
 	// TODO Return the physical cores, not logical cores.
 	return std::thread::hardware_concurrency();
 }

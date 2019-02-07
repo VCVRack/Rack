@@ -7,10 +7,6 @@ namespace rack {
 namespace engine {
 
 
-bool Param::isBounded() {
-	return std::isfinite(minValue) && std::isfinite(maxValue);
-}
-
 json_t *Param::toJson() {
 	json_t *rootJ = json_object();
 
