@@ -46,31 +46,6 @@ struct MIDI_Gate : Module {
 		}
 	}
 
-	void pressNote(uint8_t note, uint8_t vel) {
-		// Learn
-		if (learningId >= 0) {
-			learnedNotes[learningId] = note;
-			learningId = -1;
-		}
-		// Find id
-		for (int i = 0; i < 16; i++) {
-			if (learnedNotes[i] == note) {
-				gates[i] = true;
-				gateTimes[i] = 1e-3f;
-				velocities[i] = vel;
-			}
-		}
-	}
-
-	void releaseNote(uint8_t note) {
-		// Find id
-		for (int i = 0; i < 16; i++) {
-			if (learnedNotes[i] == note) {
-				gates[i] = false;
-			}
-		}
-	}
-
 	void step() override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
@@ -110,6 +85,31 @@ struct MIDI_Gate : Module {
 				}
 			} break;
 			default: break;
+		}
+	}
+
+	void pressNote(uint8_t note, uint8_t vel) {
+		// Learn
+		if (learningId >= 0) {
+			learnedNotes[learningId] = note;
+			learningId = -1;
+		}
+		// Find id
+		for (int i = 0; i < 16; i++) {
+			if (learnedNotes[i] == note) {
+				gates[i] = true;
+				gateTimes[i] = 1e-3f;
+				velocities[i] = vel;
+			}
+		}
+	}
+
+	void releaseNote(uint8_t note) {
+		// Find id
+		for (int i = 0; i < 16; i++) {
+			if (learnedNotes[i] == note) {
+				gates[i] = false;
+			}
 		}
 	}
 

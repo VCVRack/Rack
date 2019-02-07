@@ -17,8 +17,9 @@ struct MIDI_Map : Module {
 
 	midi::InputQueue midiInput;
 	int8_t values[128];
-	int learningId = -1;
-	int learnedCcs[16] = {};
+	int learningId;
+	int lastLearnedCc;
+	int learnedCcs[8];
 	dsp::ExponentialFilter valueFilters[8];
 
 	MIDI_Map() {
@@ -27,10 +28,71 @@ struct MIDI_Map : Module {
 	}
 
 	void onReset() override {
+		learningId = -1;
+		lastLearnedCc = -1;
+		for (int i = 0; i < 8; i++) {
+			learnedCcs[i] = -1;
+		}
 		midiInput.reset();
 	}
 
 	void step() override {
+		midi::Message msg;
+		while (midiInput.shift(&msg)) {
+			processMessage(msg);
+		}
+	}
+
+	void processMessage(midi::Message msg) {
+		switch (msg.getStatus()) {
+			// cc
+			case 0xb: {
+				processCC(msg);
+			} break;
+			default: break;
+		}
+	}
+
+	void processCC(midi::Message msg) {
+		uint8_t cc = msg.getNote();
+		// Learn
+		if (learningId >= 0 && values[cc] != msg.data2) {
+			if (lastLearnedCc != cc) {
+				learnedCcs[learningId] = cc;
+				lastLearnedCc = cc;
+				if (++learningId >= 8)
+					learningId = -1;
+			}
+		}
+		values[cc] = msg.getValue();
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+
+		json_t *ccsJ = json_array();
+		for (int i = 0; i < 8; i++) {
+			json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
+		}
+		json_object_set_new(rootJ, "ccs", ccsJ);
+
+		json_object_set_new(rootJ, "midi", midiInput.toJson());
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t *ccsJ = json_object_get(rootJ, "ccs");
+		if (ccsJ) {
+			for (int i = 0; i < 8; i++) {
+				json_t *ccJ = json_array_get(ccsJ, i);
+				if (ccJ)
+					learnedCcs[i] = json_integer_value(ccJ);
+			}
+		}
+
+		json_t *midiJ = json_object_get(rootJ, "midi");
+		if (midiJ)
+			midiInput.fromJson(midiJ);
 	}
 };
 
@@ -66,11 +128,24 @@ struct MIDI_MapChoice : LedDisplayChoice {
 			color.a = 1.0;
 			bgColor = color;
 			bgColor.a = 0.15;
+
+			// HACK
+			if (APP->event->selectedWidget != this)
+				APP->event->setSelected(this);
+		}
+		else if (module->learnedCcs[id] >= 0) {
+			text = string::f("CC%d", module->learnedCcs[id]);
+			color.a = 1.0;
+			bgColor = nvgRGBA(0, 0, 0, 0);
 		}
 		else {
 			text = "Unmapped";
 			color.a = 0.5;
 			bgColor = nvgRGBA(0, 0, 0, 0);
+
+			// HACK
+			if (APP->event->selectedWidget == this)
+				APP->event->setSelected(NULL);
 		}
 	}
 };

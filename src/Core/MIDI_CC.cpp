@@ -18,8 +18,8 @@ struct MIDI_CC : Module {
 
 	midi::InputQueue midiInput;
 	int8_t values[128];
-	int learningId = -1;
-	int learnedCcs[16] = {};
+	int learningId;
+	int learnedCcs[16];
 	dsp::ExponentialFilter valueFilters[16];
 	int8_t lastValues[16] = {};
 
@@ -76,18 +76,22 @@ struct MIDI_CC : Module {
 		switch (msg.getStatus()) {
 			// cc
 			case 0xb: {
-				uint8_t cc = msg.getNote();
-				// Learn
-				if (learningId >= 0 && values[cc] != msg.data2) {
-					learnedCcs[learningId] = cc;
-					learningId = -1;
-				}
-				// Allow CC to be negative if the 8th bit is set.
-				// The gamepad driver abuses this, for example.
-				values[cc] = msg.data2;
+				processCC(msg);
 			} break;
 			default: break;
 		}
+	}
+
+	void processCC(midi::Message msg) {
+		uint8_t cc = msg.getNote();
+		// Learn
+		if (learningId >= 0 && values[cc] != msg.data2) {
+			learnedCcs[learningId] = cc;
+			learningId = -1;
+		}
+		// Allow CC to be negative if the 8th bit is set.
+		// The gamepad driver abuses this, for example.
+		values[cc] = msg.data2;
 	}
 
 	json_t *dataToJson() override {
