@@ -23,50 +23,33 @@ struct Grid16MidiWidget : MidiWidget {
 	LedDisplaySeparator *vSeparators[4];
 	TChoice *choices[4][4];
 
-	Grid16MidiWidget() {
+	template <class TModule>
+	void setModule(TModule *module) {
 		Vec pos = channelChoice->box.getBottomLeft();
 		// Add vSeparators
 		for (int x = 1; x < 4; x++) {
 			vSeparators[x] = createWidget<LedDisplaySeparator>(pos);
+			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
 			addChild(vSeparators[x]);
 		}
 		// Add hSeparators and choice widgets
 		for (int y = 0; y < 4; y++) {
 			hSeparators[y] = createWidget<LedDisplaySeparator>(pos);
+			hSeparators[y]->box.size.x = box.size.x;
 			addChild(hSeparators[y]);
 			for (int x = 0; x < 4; x++) {
 				choices[x][y] = new TChoice;
 				choices[x][y]->box.pos = pos;
 				choices[x][y]->setId(4*y + x);
+				choices[x][y]->box.size.x = box.size.x / 4;
+				choices[x][y]->box.pos.x = box.size.x / 4 * x;
+				choices[x][y]->setModule(module);
 				addChild(choices[x][y]);
 			}
 			pos = choices[0][y]->box.getBottomLeft();
 		}
 		for (int x = 1; x < 4; x++) {
 			vSeparators[x]->box.size.y = pos.y - vSeparators[x]->box.pos.y;
-		}
-	}
-
-	void step() override {
-		MidiWidget::step();
-		for (int x = 1; x < 4; x++) {
-			vSeparators[x]->box.pos.x = box.size.x / 4 * x;
-		}
-		for (int y = 0; y < 4; y++) {
-			hSeparators[y]->box.size.x = box.size.x;
-			for (int x = 0; x < 4; x++) {
-				choices[x][y]->box.size.x = box.size.x / 4;
-				choices[x][y]->box.pos.x = box.size.x / 4 * x;
-			}
-		}
-	}
-
-	template <class TModule>
-	void setModule(TModule *module) {
-		for (int y = 0; y < 4; y++) {
-			for (int x = 0; x < 4; x++) {
-				choices[x][y]->module = module;
-			}
 		}
 	}
 };
@@ -81,6 +64,10 @@ struct CcChoice : LedDisplayChoice {
 	CcChoice() {
 		box.size.y = mm2px(6.666);
 		textOffset.y -= 4;
+	}
+
+	void setModule(TModule *module) {
+		this->module = module;
 	}
 
 	void setId(int id) {
@@ -160,6 +147,10 @@ struct NoteChoice : LedDisplayChoice {
 
 	void setId(int id) {
 		this->id = id;
+	}
+
+	void setModule(TModule *module) {
+		this->module = module;
 	}
 
 	void step() override {

@@ -425,8 +425,17 @@ void Engine::removeModule(Module *module) {
 	assert(it != internal->modules.end());
 	// Remove the module
 	internal->modules.erase(it);
-	// Remove id
-	module->id = -1;
+}
+
+Module *Engine::getModule(int moduleId) {
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::mutex> lock(internal->mutex);
+	// Find module
+	for (Module *module : internal->modules) {
+		if (module->id == moduleId)
+			return module;
+	}
+	return NULL;
 }
 
 void Engine::resetModule(Module *module) {
@@ -527,8 +536,6 @@ void Engine::removeCable(Cable *cable) {
 	// Remove the cable
 	internal->cables.erase(it);
 	Engine_updateConnected(this);
-	// Remove ID
-	cable->id = -1;
 }
 
 void Engine::setParam(Module *module, int paramId, float value) {

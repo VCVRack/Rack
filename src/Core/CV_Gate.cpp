@@ -212,4 +212,3 @@ struct CV_GateWidget : ModuleWidget {
 
 
 Model *modelCV_Gate = createModel<CV_Gate, CV_GateWidget>("CV-Gate");
-

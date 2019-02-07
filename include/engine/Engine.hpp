@@ -26,6 +26,7 @@ struct Engine {
 	/** Does not transfer pointer ownership. */
 	void addModule(Module *module);
 	void removeModule(Module *module);
+	Module *getModule(int moduleId);
 	void resetModule(Module *module);
 	void randomizeModule(Module *module);
 	void bypassModule(Module *module, bool bypass);

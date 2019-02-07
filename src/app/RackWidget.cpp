@@ -193,6 +193,7 @@ void RackWidget::clear() {
 		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
 		assert(moduleWidget);
 		removeModule(moduleWidget);
+		delete moduleWidget;
 	}
 }
 
