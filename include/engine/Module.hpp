@@ -56,5 +56,12 @@ struct Module {
 };
 
 
+struct ModuleHandle {
+	int id = -1;
+	/** Automatically set when added to the Engine. */
+	Module *module = NULL;
+};
+
+
 } // namespace engine
 } // namespace rack

@@ -16,26 +16,38 @@ struct MIDI_Map : Module {
 	};
 
 	midi::InputQueue midiInput;
-	int8_t values[128];
 	int learningId;
-	int lastLearnedCc;
 	int learnedCcs[8];
+	ModuleHandle learnedModuleHandles[8];
+	int learnedParamIds[8];
+	int8_t values[128];
 	dsp::ExponentialFilter valueFilters[8];
-	ParamMap paramMaps[8];
 
 	MIDI_Map() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 8; i++) {
-			valueFilters[i].lambda = 40.f;
+			valueFilters[i].lambda = 60.f;
 		}
 		onReset();
 	}
 
+	~MIDI_Map() {
+		for (int i = 0; i < 8; i++) {
+			unloadModuleHandle(i);
+		}
+	}
+
 	void onReset() override {
 		learningId = -1;
-		lastLearnedCc = -1;
 		for (int i = 0; i < 8; i++) {
 			learnedCcs[i] = -1;
+			unloadModuleHandle(i);
+			learnedModuleHandles[i].id = -1;
+			learnedParamIds[i] = 0;
+			valueFilters[i].reset();
+		}
+		for (int i = 0; i < 128; i++) {
+			values[i] = -1;
 		}
 		midiInput.reset();
 	}
@@ -48,23 +60,43 @@ struct MIDI_Map : Module {
 
 		float deltaTime = APP->engine->getSampleTime();
 
+		// Check touched params when learning
+		if (learningId >= 0) {
+			Module *module;
+			int paramId;
+			APP->engine->getTouchedParam(module, paramId);
+			APP->engine->setTouchedParam(NULL, 0);
+			if (module) {
+				unloadModuleHandle(learningId);
+				learnedModuleHandles[learningId].id = module->id;
+				loadModuleHandle(learningId);
+				learnedParamIds[learningId] = paramId;
+				commitLearn();
+			}
+		}
+
+		// Step channels
 		for (int i = 0; i < 8; i++) {
-			// Get module
-			int moduleId = paramMaps[i].moduleId;
-			if (moduleId < 0)
+			int cc = learnedCcs[i];
+			if (cc < 0)
 				continue;
-			Module *module = APP->engine->getModule(moduleId);
+			// Check if CC value has been set
+			if (values[cc] < 0)
+				continue;
+			// Get module
+			Module *module = learnedModuleHandles[i].module;
 			if (!module)
 				continue;
 			// Get param
-			int paramId = paramMaps[i].paramId;
+			int paramId = learnedParamIds[i];
 			Param *param = &module->params[paramId];
 			if (!param->isBounded())
 				continue;
 			// Set param
-			float v = rescale(values[i], 0, 127, param->minValue, param->maxValue);
+			float v = rescale(values[cc], 0, 127, 0.f, 1.f);
 			v = valueFilters[i].process(deltaTime, v);
-			module->params[paramId].setValue(v);
+			v = rescale(v, 0.f, 1.f, param->minValue, param->maxValue);
+			APP->engine->setParam(module, paramId, v);
 		}
 	}
 
@@ -81,15 +113,42 @@ struct MIDI_Map : Module {
 	void processCC(midi::Message msg) {
 		uint8_t cc = msg.getNote();
 		// Learn
-		if (learningId >= 0 && values[cc] != msg.data2) {
-			if (lastLearnedCc != cc) {
-				learnedCcs[learningId] = cc;
-				lastLearnedCc = cc;
-				if (++learningId >= 8)
-					learningId = -1;
-			}
+		if (learningId >= 0 && values[cc] != msg.getValue()) {
+			learnedCcs[learningId] = cc;
+			commitLearn();
 		}
 		values[cc] = msg.getValue();
+	}
+
+	void loadModuleHandle(int i) {
+		if (learnedModuleHandles[i].id >= 0) {
+			APP->engine->addModuleHandle(&learnedModuleHandles[i]);
+		}
+	}
+
+	void unloadModuleHandle(int i) {
+		if (learnedModuleHandles[i].id >= 0) {
+			APP->engine->removeModuleHandle(&learnedModuleHandles[i]);
+		}
+	}
+
+	void commitLearn() {
+		if (learningId < 0)
+			return;
+		if (learnedModuleHandles[learningId].id < 0)
+			return;
+		if (learnedCcs[learningId] < 0)
+			return;
+		learningId++;
+		if (learningId >= 8)
+			learningId = -1;
+	}
+
+	void clearLearn(int id) {
+		learnedCcs[id] = -1;
+		unloadModuleHandle(id);
+		learnedModuleHandles[id].id = -1;
+		loadModuleHandle(id);
 	}
 
 	json_t *dataToJson() override {
@@ -101,11 +160,17 @@ struct MIDI_Map : Module {
 		}
 		json_object_set_new(rootJ, "ccs", ccsJ);
 
-		json_t *paramMapsJ = json_array();
+		json_t *moduleIdsJ = json_array();
 		for (int i = 0; i < 8; i++) {
-			json_array_append_new(paramMapsJ, paramMaps[i].toJson());
+			json_array_append_new(moduleIdsJ, json_integer(learnedModuleHandles[i].id));
 		}
-		json_object_set_new(rootJ, "paramMaps", paramMapsJ);
+		json_object_set_new(rootJ, "moduleIds", moduleIdsJ);
+
+		json_t *paramIdsJ = json_array();
+		for (int i = 0; i < 8; i++) {
+			json_array_append_new(paramIdsJ, json_integer(learnedParamIds[i]));
+		}
+		json_object_set_new(rootJ, "paramIds", paramIdsJ);
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
@@ -121,12 +186,23 @@ struct MIDI_Map : Module {
 			}
 		}
 
-		json_t *paramMapsJ = json_object_get(rootJ, "paramMaps");
-		if (paramMapsJ) {
+		json_t *moduleIdsJ = json_object_get(rootJ, "moduleIds");
+		if (moduleIdsJ) {
 			for (int i = 0; i < 8; i++) {
-				json_t *paramMapJ = json_array_get(paramMapsJ, i);
-				if (paramMapJ)
-					paramMaps[i].fromJson(paramMapJ);
+				json_t *moduleIdJ = json_array_get(moduleIdsJ, i);
+				unloadModuleHandle(i);
+				if (moduleIdJ)
+					learnedModuleHandles[i].id = json_integer_value(moduleIdJ);
+				loadModuleHandle(i);
+			}
+		}
+
+		json_t *paramIdsJ = json_object_get(rootJ, "paramIds");
+		if (paramIdsJ) {
+			for (int i = 0; i < 8; i++) {
+				json_t *paramIdJ = json_array_get(paramIdsJ, i);
+				if (paramIdJ)
+					learnedParamIds[i] = json_integer_value(paramIdJ);
 			}
 		}
 
@@ -145,10 +221,17 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		this->module = module;
 	}
 
-	void onAction(const event::Action &e) override {
-		if (!module)
-			return;
-		module->lastLearnedCc = -1;
+	void onButton(const event::Button &e) override {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			APP->engine->setTouchedParam(NULL, 0);
+			e.consume(this);
+		}
+
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			if (module) {
+				module->clearLearn(id);
+			}
+		}
 	}
 
 	void onSelect(const event::Select &e) override {
@@ -170,8 +253,6 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		if (!module)
 			return;
 		if (module->learningId == id) {
-			text = "Mapping...";
-			color.a = 1.0;
 			bgColor = color;
 			bgColor.a = 0.15;
 
@@ -180,21 +261,55 @@ struct MIDI_MapChoice : LedDisplayChoice {
 				APP->event->setSelected(this);
 		}
 		else {
-			if (module->learnedCcs[id] >= 0) {
-				text = string::f("CC%d", module->learnedCcs[id]);
-				color.a = 1.0;
-				bgColor = nvgRGBA(0, 0, 0, 0);
-			}
-			else {
-				text = "Unmapped";
-				color.a = 0.5;
-				bgColor = nvgRGBA(0, 0, 0, 0);
-			}
+			bgColor = nvgRGBA(0, 0, 0, 0);
 
 			// HACK
 			if (APP->event->selectedWidget == this)
 				APP->event->setSelected(NULL);
 		}
+
+		text = "";
+		color.a = 1.0;
+		if (module->learnedCcs[id] >= 0) {
+			text += string::f("CC%d ", module->learnedCcs[id]);
+		}
+		if (module->learnedModuleHandles[id].id >= 0) {
+			text += getParamName();
+		}
+		if (!(module->learnedCcs[id] >= 0) && !(module->learnedModuleHandles[id].id >= 0)) {
+			if (module->learningId == id) {
+				text = "Mapping...";
+			}
+			else {
+				text = "Unmapped";
+				color.a = 0.5;
+			}
+		}
+	}
+
+	std::string getParamName() {
+		if (!module)
+			return "";
+		ModuleHandle *moduleHandle = &module->learnedModuleHandles[id];
+		if (moduleHandle->id < 0)
+			return "";
+		ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleHandle->id);
+		if (!mw)
+			return "";
+		// Get the Module from the ModuleWidget instead of the ModuleHandle.
+		// I think this is more elegant since this method is called in the app world instead of the engine world.
+		Module *m = mw->module;
+		if (!m)
+			return "";
+		int paramId = module->learnedParamIds[id];
+		if (paramId >= (int) m->params.size())
+			return "";
+		Param *param = &m->params[paramId];
+		std::string s;
+		s += mw->model->name;
+		s += " ";
+		s += param->label;
+		return s;
 	}
 };
 

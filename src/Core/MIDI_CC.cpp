@@ -91,7 +91,7 @@ struct MIDI_CC : Module {
 		}
 		// Allow CC to be negative if the 8th bit is set.
 		// The gamepad driver abuses this, for example.
-		values[cc] = msg.data2;
+		values[cc] = clamp(msg.data2, -127, 127);
 	}
 
 	json_t *dataToJson() override {

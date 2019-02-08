@@ -87,20 +87,29 @@ struct ExponentialSlewLimiter {
 \f$ \frac{dy}{dt} = x \lambda \f$.
 */
 struct ExponentialFilter {
-	float out = 0.f;
+	float out;
 	float lambda = 0.f;
 
+	ExponentialFilter() {
+		reset();
+	}
+
 	void reset() {
-		out = 0.f;
+		out = NAN;
 	}
 
 	float process(float deltaTime, float in) {
-		float y = out + (in - out) * lambda * deltaTime;
-		// If no change was detected, assume float granularity is too small and snap output to input
-		if (out == y)
+		if (std::isnan(out)) {
 			out = in;
-		else
-			out = y;
+		}
+		else {
+			float y = out + (in - out) * lambda * deltaTime;
+			// If no change was detected, assume float granularity is too small and snap output to input
+			if (out == y)
+				out = in;
+			else
+				out = y;
+		}
 		return out;
 	}
 

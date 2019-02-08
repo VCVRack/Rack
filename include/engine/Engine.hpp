@@ -29,7 +29,11 @@ struct Engine {
 	float getSampleTime();
 
 	// Modules
-	/** Does not transfer pointer ownership. */
+	/** Adds a module to the rack engine.
+	The module ID must not be taken by another module.
+	If the module ID is -1, an ID is automatically assigned.
+	Does not transfer pointer ownership.
+	*/
 	void addModule(Module *module);
 	void removeModule(Module *module);
 	Module *getModule(int moduleId);
@@ -38,7 +42,11 @@ struct Engine {
 	void bypassModule(Module *module, bool bypass);
 
 	// Cables
-	/** Does not transfer pointer ownership. */
+	/** Adds a cable to the rack engine.
+	The cable ID must not be taken by another cable.
+	If the cable ID is -1, an ID is automatically assigned.
+	Does not transfer pointer ownership.
+	*/
 	void addCable(Cable *cable);
 	void removeCable(Cable *cable);
 
@@ -47,6 +55,12 @@ struct Engine {
 	float getParam(Module *module, int paramId);
 	void setSmoothParam(Module *module, int paramId, float value);
 	float getSmoothParam(Module *module, int paramId);
+	void setTouchedParam(Module *module, int paramId);
+	void getTouchedParam(Module *&module, int &paramId);
+
+	// ModuleHandles
+	void addModuleHandle(ModuleHandle *moduleHandle);
+	void removeModuleHandle(ModuleHandle *moduleHandle);
 };
 
 

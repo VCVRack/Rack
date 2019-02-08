@@ -127,6 +127,7 @@ struct EngineWorker {
 struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
+	std::vector<ModuleHandle*> moduleHandles;
 	bool paused = false;
 
 	bool running = false;
@@ -149,6 +150,9 @@ struct Engine::Internal {
 	std::vector<EngineWorker> workers;
 	SpinBarrier engineBarrier;
 	SpinBarrier workerBarrier;
+
+	Module *touchedModule = NULL;
+	int touchedParamId = 0;
 };
 
 
@@ -173,6 +177,7 @@ Engine::~Engine() {
 	// If this happens, a module must have failed to remove itself before the RackWidget was destroyed.
 	assert(internal->cables.empty());
 	assert(internal->modules.empty());
+	assert(internal->moduleHandles.empty());
 
 	delete internal;
 }
@@ -235,6 +240,7 @@ static void Engine_step(Engine *engine) {
 			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats), or if newValue is out of bounds
 			param->setValue(smoothValue);
 			internal->smoothModule = NULL;
+			internal->smoothParamId = 0;
 		}
 		else {
 			param->value = newValue;
@@ -400,6 +406,11 @@ void Engine::addModule(Module *module) {
 			internal->nextModuleId = module->id + 1;
 		}
 	}
+	// Update ModuleHandle
+	for (ModuleHandle *moduleHandle : internal->moduleHandles) {
+		if (moduleHandle->id == module->id)
+			moduleHandle->module = module;
+	}
 	// Add module
 	internal->modules.push_back(module);
 }
@@ -416,6 +427,16 @@ void Engine::removeModule(Module *module) {
 	for (Cable *cable : internal->cables) {
 		assert(cable->outputModule != module);
 		assert(cable->inputModule != module);
+	}
+	// Remove touched param
+	if (internal->touchedModule == module) {
+		internal->touchedModule = NULL;
+		internal->touchedParamId = 0;
+	}
+	// Update ModuleHandle
+	for (ModuleHandle *moduleHandle : internal->moduleHandles) {
+		if (moduleHandle->id == module->id)
+			moduleHandle->module = NULL;
 	}
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -537,6 +558,11 @@ void Engine::removeCable(Cable *cable) {
 
 void Engine::setParam(Module *module, int paramId, float value) {
 	// TODO Does this need to be thread-safe?
+	// If being smoothed, cancel smoothing
+	if (internal->smoothModule == module && internal->smoothParamId == paramId) {
+		internal->smoothModule = NULL;
+		internal->smoothParamId = 0;
+	}
 	module->params[paramId].value = value;
 }
 
@@ -551,6 +577,7 @@ void Engine::setSmoothParam(Module *module, int paramId, float value) {
 	}
 	internal->smoothParamId = paramId;
 	internal->smoothValue = value;
+	// Set this last so the above values are valid as soon as it is set
 	internal->smoothModule = module;
 }
 
@@ -558,6 +585,39 @@ float Engine::getSmoothParam(Module *module, int paramId) {
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
 	return getParam(module, paramId);
+}
+
+void Engine::setTouchedParam(Module *module, int paramId) {
+	internal->touchedModule = module;
+	internal->touchedParamId = paramId;
+}
+
+void Engine::getTouchedParam(Module *&module, int &paramId) {
+	module = internal->touchedModule;
+	paramId = internal->touchedParamId;
+}
+
+void Engine::addModuleHandle(ModuleHandle *moduleHandle) {
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+	// Check that the ModuleHandle is not already added
+	auto it = std::find(internal->moduleHandles.begin(), internal->moduleHandles.end(), moduleHandle);
+	assert(it == internal->moduleHandles.end());
+
+	moduleHandle->module = getModule(moduleHandle->id);
+	internal->moduleHandles.push_back(moduleHandle);
+}
+
+void Engine::removeModuleHandle(ModuleHandle *moduleHandle) {
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+	moduleHandle->module = NULL;
+	// Check that the ModuleHandle is already added
+	auto it = std::find(internal->moduleHandles.begin(), internal->moduleHandles.end(), moduleHandle);
+	assert(it != internal->moduleHandles.end());
+	internal->moduleHandles.erase(it);
 }
 
 

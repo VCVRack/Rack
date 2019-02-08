@@ -4,6 +4,7 @@
 #include "app/Scene.hpp"
 #include "app/ParamQuantity.hpp"
 #include "app.hpp"
+#include "engine/Engine.hpp"
 #include "settings.hpp"
 #include "random.hpp"
 #include "history.hpp"
@@ -143,6 +144,13 @@ void ParamWidget::draw(const widget::DrawContext &ctx) {
 }
 
 void ParamWidget::onButton(const event::Button &e) {
+	// Touch parameter
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == 0) {
+		if (paramQuantity) {
+			APP->engine->setTouchedParam(paramQuantity->module, paramQuantity->paramId);
+		}
+	}
+
 	// Right click to open context menu
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & WINDOW_MOD_MASK) == 0) {
 		createContextMenu();
