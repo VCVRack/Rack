@@ -63,7 +63,7 @@ struct Engine {
 	/** Sets the ParamHandle IDs and module pointer.
 	If the given ParamHandle is added to the engine and another ParamHandle points to the same param, unsets that one and replaces it with the given handle.
 	*/
-	void updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId);
+	void updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId, bool overwrite = true);
 };
 
 

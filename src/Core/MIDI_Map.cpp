@@ -1,6 +1,9 @@
 #include "plugin.hpp"
 
 
+static const int CHANNELS = 8;
+
+
 struct MIDI_Map : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -23,17 +26,17 @@ struct MIDI_Map : Module {
 	/** Whether the param has been set during the learning session */
 	bool learnedParam;
 	/** The learned CC number of each channel */
-	int learnedCcs[8];
+	int learnedCcs[CHANNELS];
 	/** The learned param handle of each channel */
-	ParamHandle learnedParamHandles[8];
+	ParamHandle learnedParamHandles[CHANNELS];
 	/** The value of each CC number */
 	int8_t values[128];
 	/** The smoothing processor (normalized between 0 and 1) of each channel */
-	dsp::ExponentialFilter valueFilters[8];
+	dsp::ExponentialFilter valueFilters[CHANNELS];
 
 	MIDI_Map() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < CHANNELS; i++) {
 			APP->engine->addParamHandle(&learnedParamHandles[i]);
 			valueFilters[i].lambda = 60.f;
 		}
@@ -41,7 +44,7 @@ struct MIDI_Map : Module {
 	}
 
 	~MIDI_Map() {
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < CHANNELS; i++) {
 			APP->engine->removeParamHandle(&learnedParamHandles[i]);
 		}
 	}
@@ -50,7 +53,7 @@ struct MIDI_Map : Module {
 		learningId = -1;
 		learnedCc = false;
 		learnedParam = false;
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < CHANNELS; i++) {
 			learnedCcs[i] = -1;
 			APP->engine->updateParamHandle(&learnedParamHandles[i], -1, 0);
 			valueFilters[i].reset();
@@ -70,7 +73,7 @@ struct MIDI_Map : Module {
 		float deltaTime = APP->engine->getSampleTime();
 
 		// Step channels
-		for (int id = 0; id < 8; id++) {
+		for (int id = 0; id < CHANNELS; id++) {
 			int cc = learnedCcs[id];
 			if (cc < 0)
 				continue;
@@ -128,7 +131,7 @@ struct MIDI_Map : Module {
 		learnedCc = false;
 		learnedParam = false;
 		// Find next unlearned channel
-		while (++learningId < 8) {
+		while (++learningId < CHANNELS) {
 			if (learnedCcs[learningId] < 0 || learnedParamHandles[learningId].moduleId < 0)
 				return;
 		}
@@ -156,7 +159,7 @@ struct MIDI_Map : Module {
 	}
 
 	void learnParam(int id, int moduleId, int paramId) {
-		APP->engine->updateParamHandle(&learnedParamHandles[id], moduleId, paramId);
+		APP->engine->updateParamHandle(&learnedParamHandles[id], moduleId, paramId, true);
 		learnedParam = true;
 		commitLearn();
 	}
@@ -172,7 +175,7 @@ struct MIDI_Map : Module {
 
 		json_t *moduleIdsJ = json_array();
 		json_t *paramIdsJ = json_array();
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < CHANNELS; i++) {
 			json_array_append_new(moduleIdsJ, json_integer(learnedParamHandles[i].moduleId));
 			json_array_append_new(paramIdsJ, json_integer(learnedParamHandles[i].paramId));
 		}
@@ -186,7 +189,7 @@ struct MIDI_Map : Module {
 	void dataFromJson(json_t *rootJ) override {
 		json_t *ccsJ = json_object_get(rootJ, "ccs");
 		if (ccsJ) {
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < CHANNELS; i++) {
 				json_t *ccJ = json_array_get(ccsJ, i);
 				if (ccJ)
 					learnedCcs[i] = json_integer_value(ccJ);
@@ -196,11 +199,11 @@ struct MIDI_Map : Module {
 		json_t *moduleIdsJ = json_object_get(rootJ, "moduleIds");
 		json_t *paramIdsJ = json_object_get(rootJ, "paramIds");
 		if (moduleIdsJ && paramIdsJ) {
-			for (int i = 0; i < 8; i++) {
+			for (int i = 0; i < CHANNELS; i++) {
 				json_t *moduleIdJ = json_array_get(moduleIdsJ, i);
 				json_t *paramIdJ = json_array_get(paramIdsJ, i);
 				if (moduleIdJ && paramIdsJ)
-					APP->engine->updateParamHandle(&learnedParamHandles[i], json_integer_value(moduleIdJ), json_integer_value(paramIdJ));
+					APP->engine->updateParamHandle(&learnedParamHandles[i], json_integer_value(moduleIdJ), json_integer_value(paramIdJ), false);
 			}
 		}
 
@@ -335,8 +338,15 @@ struct MIDI_MapChoice : LedDisplayChoice {
 
 struct MIDI_MapDisplay : MidiWidget {
 	void setModule(MIDI_Map *module) {
+		// ScrollWidget *scroll = new ScrollWidget;
+		// scroll->box.pos = channelChoice->box.getBottomLeft();
+		// scroll->box.size.x = box.size.x;
+		// scroll->box.size.y = box.size.y - scroll->box.pos.y;
+		// addChild(scroll);
+
 		Vec pos = channelChoice->box.getBottomLeft();
-		for (int i = 0; i < 8; i++) {
+
+		for (int i = 0; i < CHANNELS; i++) {
 			LedDisplaySeparator *separator = createWidget<LedDisplaySeparator>(pos);
 			separator->box.size.x = box.size.x;
 			addChild(separator);

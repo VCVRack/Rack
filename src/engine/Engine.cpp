@@ -589,7 +589,7 @@ void Engine::addParamHandle(ParamHandle *paramHandle) {
 	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
 	assert(it == internal->paramHandles.end());
 
-	updateParamHandle(paramHandle, paramHandle->moduleId, paramHandle->paramId);
+	assert(paramHandle->moduleId < 0);
 	internal->paramHandles.push_back(paramHandle);
 }
 
@@ -615,7 +615,7 @@ ParamHandle *Engine::getParamHandle(Module *module, int paramId) {
 	return NULL;
 }
 
-void Engine::updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId) {
+void Engine::updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId, bool overwrite) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
@@ -630,12 +630,15 @@ void Engine::updateParamHandle(ParamHandle *paramHandle, int moduleId, int param
 		// Remove existing ParamHandles pointing to the same param
 		for (ParamHandle *p : internal->paramHandles) {
 			if (p != paramHandle && p->moduleId == moduleId && p->paramId == paramId) {
-				p->reset();
+				if (overwrite)
+					p->reset();
+				else
+					paramHandle->reset();
 			}
 		}
 		// Find module with same moduleId
 		for (Module *module : internal->modules) {
-			if (module->id == moduleId) {
+			if (module->id == paramHandle->moduleId) {
 				paramHandle->module = module;
 			}
 		}

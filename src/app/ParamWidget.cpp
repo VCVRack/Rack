@@ -165,6 +165,7 @@ void ParamWidget::draw(const widget::DrawContext &ctx) {
 			nvgFillColor(ctx.vg, color);
 			nvgFill(ctx.vg);
 			nvgStrokeColor(ctx.vg, color::mult(color, 0.5));
+			nvgStrokeWidth(ctx.vg, 1.0);
 			nvgStroke(ctx.vg);
 	}
 }
