@@ -605,8 +605,8 @@ void Engine::removeParamHandle(ParamHandle *paramHandle) {
 }
 
 ParamHandle *Engine::getParamHandle(Module *module, int paramId) {
-	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	// VIPLock vipLock(internal->vipMutex);
+	// std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 	for (ParamHandle *paramHandle : internal->paramHandles) {
 		if (paramHandle->module == module && paramHandle->paramId == paramId)
@@ -640,7 +640,6 @@ void Engine::updateParamHandle(ParamHandle *paramHandle, int moduleId, int param
 			}
 		}
 	}
-	DEBUG("%d %p %d %d", it != internal->paramHandles.end(), paramHandle->module, paramHandle->moduleId, paramHandle->paramId);
 }
 
 

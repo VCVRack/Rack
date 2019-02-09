@@ -108,6 +108,20 @@ struct ParamFineItem : ui::MenuItem {
 };
 
 
+struct ParamUnmapItem : ui::MenuItem {
+	ParamWidget *paramWidget;
+	ParamUnmapItem() {
+		text = "Unmap";
+	}
+	void onAction(const event::Action &e) override {
+		engine::ParamHandle *paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module, paramWidget->paramQuantity->paramId);
+		if (paramHandle) {
+			APP->engine->updateParamHandle(paramHandle, -1, 0);
+		}
+	}
+};
+
+
 ParamWidget::~ParamWidget() {
 	if (paramQuantity)
 		delete paramQuantity;
@@ -141,6 +155,18 @@ void ParamWidget::draw(const widget::DrawContext &ctx) {
 	// 	std::string mapText = string::f("%d", paramQuantity->paramId);
 	// 	bndLabel(ctx.vg, box.size.x - 17.0, box.size.y - 16.0, INFINITY, INFINITY, -1, mapText.c_str());
 	// }
+
+	// Param map indicator
+	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module, paramQuantity->paramId) : NULL;
+	if (paramHandle) {
+			NVGcolor color = nvgRGB(0xff, 0x40, 0xff);
+			nvgBeginPath(ctx.vg);
+			nvgCircle(ctx.vg, box.size.x - 3, box.size.y - 3, 3.0);
+			nvgFillColor(ctx.vg, color);
+			nvgFill(ctx.vg);
+			nvgStrokeColor(ctx.vg, color::mult(color, 0.5));
+			nvgStroke(ctx.vg);
+	}
 }
 
 void ParamWidget::onButton(const event::Button &e) {
@@ -209,6 +235,13 @@ void ParamWidget::createContextMenu() {
 
 	// ParamFineItem *fineItem = new ParamFineItem;
 	// menu->addChild(fineItem);
+
+	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module, paramQuantity->paramId) : NULL;
+	if (paramHandle) {
+		ParamUnmapItem *unmapItem = new ParamUnmapItem;
+		unmapItem->paramWidget = this;
+		menu->addChild(unmapItem);
+	}
 }
 
 void ParamWidget::resetAction() {

@@ -1,3 +1,4 @@
+#pragma once
 #include "plugin/Model.hpp"
 #include "ui/MenuLabel.hpp"
 #include "ui/MenuItem.hpp"
