@@ -16,11 +16,21 @@ struct MIDI_Map : Module {
 	};
 
 	midi::InputQueue midiInput;
+	/** Channel ID of the learning session */
 	int learningId;
+	/** Whether the CC has been set during the learning session */
+	bool learnedCc;
+	/** Whether the param has been set during the learning session */
+	bool learnedParam;
+	/** The learned CC number of each channel */
 	int learnedCcs[8];
+	/** The learned module handle of each channel */
 	ModuleHandle learnedModuleHandles[8];
+	/** The learned param ID of each channel */
 	int learnedParamIds[8];
+	/** The value of each CC number */
 	int8_t values[128];
+	/** The smoothing processor (normalized between 0 and 1) of each channel */
 	dsp::ExponentialFilter valueFilters[8];
 
 	MIDI_Map() {
@@ -39,6 +49,8 @@ struct MIDI_Map : Module {
 
 	void onReset() override {
 		learningId = -1;
+		learnedCc = false;
+		learnedParam = false;
 		for (int i = 0; i < 8; i++) {
 			learnedCcs[i] = -1;
 			unloadModuleHandle(i);
@@ -71,6 +83,7 @@ struct MIDI_Map : Module {
 				learnedModuleHandles[learningId].id = module->id;
 				loadModuleHandle(learningId);
 				learnedParamIds[learningId] = paramId;
+				learnedParam = true;
 				commitLearn();
 			}
 		}
@@ -115,6 +128,8 @@ struct MIDI_Map : Module {
 		// Learn
 		if (learningId >= 0 && values[cc] != msg.getValue()) {
 			learnedCcs[learningId] = cc;
+			valueFilters[learningId].reset();
+			learnedCc = true;
 			commitLearn();
 		}
 		values[cc] = msg.getValue();
@@ -135,20 +150,43 @@ struct MIDI_Map : Module {
 	void commitLearn() {
 		if (learningId < 0)
 			return;
-		if (learnedModuleHandles[learningId].id < 0)
+		if (!learnedCc)
 			return;
-		if (learnedCcs[learningId] < 0)
+		if (!learnedParam)
 			return;
-		learningId++;
-		if (learningId >= 8)
-			learningId = -1;
+		// Reset learned state
+		learnedCc = false;
+		learnedParam = false;
+		// Find next unlearned channel
+		while (++learningId < 8) {
+			if (learnedCcs[learningId] < 0 || learnedModuleHandles[learningId].id < 0)
+				return;
+		}
+		learningId = -1;
 	}
 
 	void clearLearn(int id) {
+		disableLearn(id);
 		learnedCcs[id] = -1;
 		unloadModuleHandle(id);
 		learnedModuleHandles[id].id = -1;
 		loadModuleHandle(id);
+	}
+
+	void enableLearn(int id) {
+		if (learningId != id) {
+			learningId = id;
+			learnedCc = false;
+			learnedParam = false;
+		}
+	}
+
+	void disableLearn(int id) {
+		if (learningId == id) {
+			learningId = -1;
+			learnedCc = false;
+			learnedParam = false;
+		}
 	}
 
 	json_t *dataToJson() override {
@@ -231,27 +269,28 @@ struct MIDI_MapChoice : LedDisplayChoice {
 			if (module) {
 				module->clearLearn(id);
 			}
+			e.consume(this);
 		}
 	}
 
 	void onSelect(const event::Select &e) override {
 		if (!module)
 			return;
-		module->learningId = id;
+		module->enableLearn(id);
 		e.consume(this);
 	}
 
 	void onDeselect(const event::Deselect &e) override {
 		if (!module)
 			return;
-		if (module->learningId == id) {
-			module->learningId = -1;
-		}
+		module->disableLearn(id);
 	}
 
 	void step() override {
 		if (!module)
 			return;
+
+		// Set bgColor and selected state
 		if (module->learningId == id) {
 			bgColor = color;
 			bgColor.a = 0.15;
@@ -264,26 +303,34 @@ struct MIDI_MapChoice : LedDisplayChoice {
 			bgColor = nvgRGBA(0, 0, 0, 0);
 
 			// HACK
+			// Don't let the event state call onDeselect()
 			if (APP->event->selectedWidget == this)
 				APP->event->setSelected(NULL);
 		}
 
+		// Set text
 		text = "";
-		color.a = 1.0;
 		if (module->learnedCcs[id] >= 0) {
 			text += string::f("CC%d ", module->learnedCcs[id]);
 		}
 		if (module->learnedModuleHandles[id].id >= 0) {
 			text += getParamName();
 		}
-		if (!(module->learnedCcs[id] >= 0) && !(module->learnedModuleHandles[id].id >= 0)) {
+		if (module->learnedCcs[id] < 0 && module->learnedModuleHandles[id].id < 0) {
 			if (module->learningId == id) {
 				text = "Mapping...";
 			}
 			else {
 				text = "Unmapped";
-				color.a = 0.5;
 			}
+		}
+
+		// Set text color
+		if ((module->learnedCcs[id] >= 0 && module->learnedModuleHandles[id].id >= 0) || module->learningId == id) {
+			color.a = 1.0;
+		}
+		else {
+			color.a = 0.5;
 		}
 	}
 
