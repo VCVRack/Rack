@@ -362,6 +362,13 @@ void RackWidget::addModuleAtMouse(ModuleWidget *m) {
 }
 
 void RackWidget::removeModule(ModuleWidget *m) {
+	// Unset touchedParamWidget
+	if (touchedParam) {
+		ModuleWidget *touchedModule = touchedParam->getAncestorOfType<ModuleWidget>();
+		if (touchedModule == m)
+			touchedParam = NULL;
+	}
+
 	// Disconnect cables
 	m->disconnect();
 

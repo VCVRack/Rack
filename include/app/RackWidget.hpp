@@ -5,6 +5,7 @@
 #include "app/ModuleWidget.hpp"
 #include "app/CableWidget.hpp"
 #include "app/PortWidget.hpp"
+#include "app/ParamWidget.hpp"
 
 
 namespace rack {
@@ -18,6 +19,7 @@ struct RackWidget : widget::OpaqueWidget {
 	CableWidget *incompleteCable = NULL;
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
+	ParamWidget *touchedParam = NULL;
 
 	RackWidget();
 	~RackWidget();

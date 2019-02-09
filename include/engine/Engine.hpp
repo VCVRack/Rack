@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "engine/Module.hpp"
 #include "engine/Cable.hpp"
+#include "engine/ParamHandle.hpp"
 #include <vector>
 
 
@@ -55,12 +56,14 @@ struct Engine {
 	float getParam(Module *module, int paramId);
 	void setSmoothParam(Module *module, int paramId, float value);
 	float getSmoothParam(Module *module, int paramId);
-	void setTouchedParam(Module *module, int paramId);
-	void getTouchedParam(Module *&module, int &paramId);
-
-	// ModuleHandles
-	void addModuleHandle(ModuleHandle *moduleHandle);
-	void removeModuleHandle(ModuleHandle *moduleHandle);
+	void addParamHandle(ParamHandle *paramHandle);
+	void removeParamHandle(ParamHandle *paramHandle);
+	/** Returns the unique ParamHandle for the given paramId */
+	ParamHandle *getParamHandle(Module *module, int paramId);
+	/** Sets the ParamHandle IDs and module pointer.
+	If the given ParamHandle is added to the engine and another ParamHandle points to the same param, unsets that one and replaces it with the given handle.
+	*/
+	void updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId);
 };
 
 

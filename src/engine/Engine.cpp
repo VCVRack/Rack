@@ -127,7 +127,7 @@ struct EngineWorker {
 struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
-	std::vector<ModuleHandle*> moduleHandles;
+	std::vector<ParamHandle*> paramHandles;
 	bool paused = false;
 
 	bool running = false;
@@ -150,9 +150,6 @@ struct Engine::Internal {
 	std::vector<EngineWorker> workers;
 	SpinBarrier engineBarrier;
 	SpinBarrier workerBarrier;
-
-	Module *touchedModule = NULL;
-	int touchedParamId = 0;
 };
 
 
@@ -177,7 +174,7 @@ Engine::~Engine() {
 	// If this happens, a module must have failed to remove itself before the RackWidget was destroyed.
 	assert(internal->cables.empty());
 	assert(internal->modules.empty());
-	assert(internal->moduleHandles.empty());
+	assert(internal->paramHandles.empty());
 
 	delete internal;
 }
@@ -406,13 +403,14 @@ void Engine::addModule(Module *module) {
 			internal->nextModuleId = module->id + 1;
 		}
 	}
-	// Update ModuleHandle
-	for (ModuleHandle *moduleHandle : internal->moduleHandles) {
-		if (moduleHandle->id == module->id)
-			moduleHandle->module = module;
-	}
 	// Add module
 	internal->modules.push_back(module);
+	module->onAdd();
+	// Update ParamHandles
+	for (ParamHandle *paramHandle : internal->paramHandles) {
+		if (paramHandle->moduleId == module->id)
+			paramHandle->module = module;
+	}
 }
 
 void Engine::removeModule(Module *module) {
@@ -428,20 +426,16 @@ void Engine::removeModule(Module *module) {
 		assert(cable->outputModule != module);
 		assert(cable->inputModule != module);
 	}
-	// Remove touched param
-	if (internal->touchedModule == module) {
-		internal->touchedModule = NULL;
-		internal->touchedParamId = 0;
-	}
-	// Update ModuleHandle
-	for (ModuleHandle *moduleHandle : internal->moduleHandles) {
-		if (moduleHandle->id == module->id)
-			moduleHandle->module = NULL;
+	// Update ParamHandles
+	for (ParamHandle *paramHandle : internal->paramHandles) {
+		if (paramHandle->moduleId == module->id)
+			paramHandle->module = NULL;
 	}
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it != internal->modules.end());
 	// Remove the module
+	module->onRemove();
 	internal->modules.erase(it);
 }
 
@@ -587,37 +581,66 @@ float Engine::getSmoothParam(Module *module, int paramId) {
 	return getParam(module, paramId);
 }
 
-void Engine::setTouchedParam(Module *module, int paramId) {
-	internal->touchedModule = module;
-	internal->touchedParamId = paramId;
-}
-
-void Engine::getTouchedParam(Module *&module, int &paramId) {
-	module = internal->touchedModule;
-	paramId = internal->touchedParamId;
-}
-
-void Engine::addModuleHandle(ModuleHandle *moduleHandle) {
+void Engine::addParamHandle(ParamHandle *paramHandle) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
-	// Check that the ModuleHandle is not already added
-	auto it = std::find(internal->moduleHandles.begin(), internal->moduleHandles.end(), moduleHandle);
-	assert(it == internal->moduleHandles.end());
+	// Check that the ParamHandle is not already added
+	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
+	assert(it == internal->paramHandles.end());
 
-	moduleHandle->module = getModule(moduleHandle->id);
-	internal->moduleHandles.push_back(moduleHandle);
+	updateParamHandle(paramHandle, paramHandle->moduleId, paramHandle->paramId);
+	internal->paramHandles.push_back(paramHandle);
 }
 
-void Engine::removeModuleHandle(ModuleHandle *moduleHandle) {
+void Engine::removeParamHandle(ParamHandle *paramHandle) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
-	moduleHandle->module = NULL;
-	// Check that the ModuleHandle is already added
-	auto it = std::find(internal->moduleHandles.begin(), internal->moduleHandles.end(), moduleHandle);
-	assert(it != internal->moduleHandles.end());
-	internal->moduleHandles.erase(it);
+	paramHandle->module = NULL;
+	// Check that the ParamHandle is already added
+	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
+	assert(it != internal->paramHandles.end());
+	internal->paramHandles.erase(it);
+}
+
+ParamHandle *Engine::getParamHandle(Module *module, int paramId) {
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+	for (ParamHandle *paramHandle : internal->paramHandles) {
+		if (paramHandle->module == module && paramHandle->paramId == paramId)
+			return paramHandle;
+	}
+	return NULL;
+}
+
+void Engine::updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId) {
+	VIPLock vipLock(internal->vipMutex);
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+	// Set IDs
+	paramHandle->moduleId = moduleId;
+	paramHandle->paramId = paramId;
+	paramHandle->module = NULL;
+
+	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
+
+	if (it != internal->paramHandles.end() && paramHandle->moduleId >= 0) {
+		// Remove existing ParamHandles pointing to the same param
+		for (ParamHandle *p : internal->paramHandles) {
+			if (p != paramHandle && p->moduleId == moduleId && p->paramId == paramId) {
+				p->reset();
+			}
+		}
+		// Find module with same moduleId
+		for (Module *module : internal->modules) {
+			if (module->id == moduleId) {
+				paramHandle->module = module;
+			}
+		}
+	}
+	DEBUG("%d %p %d %d", it != internal->paramHandles.end(), paramHandle->module, paramHandle->moduleId, paramHandle->paramId);
 }
 
 

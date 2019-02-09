@@ -24,10 +24,8 @@ struct MIDI_Map : Module {
 	bool learnedParam;
 	/** The learned CC number of each channel */
 	int learnedCcs[8];
-	/** The learned module handle of each channel */
-	ModuleHandle learnedModuleHandles[8];
-	/** The learned param ID of each channel */
-	int learnedParamIds[8];
+	/** The learned param handle of each channel */
+	ParamHandle learnedParamHandles[8];
 	/** The value of each CC number */
 	int8_t values[128];
 	/** The smoothing processor (normalized between 0 and 1) of each channel */
@@ -36,6 +34,7 @@ struct MIDI_Map : Module {
 	MIDI_Map() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 8; i++) {
+			APP->engine->addParamHandle(&learnedParamHandles[i]);
 			valueFilters[i].lambda = 60.f;
 		}
 		onReset();
@@ -43,7 +42,7 @@ struct MIDI_Map : Module {
 
 	~MIDI_Map() {
 		for (int i = 0; i < 8; i++) {
-			unloadModuleHandle(i);
+			APP->engine->removeParamHandle(&learnedParamHandles[i]);
 		}
 	}
 
@@ -53,9 +52,7 @@ struct MIDI_Map : Module {
 		learnedParam = false;
 		for (int i = 0; i < 8; i++) {
 			learnedCcs[i] = -1;
-			unloadModuleHandle(i);
-			learnedModuleHandles[i].id = -1;
-			learnedParamIds[i] = 0;
+			APP->engine->updateParamHandle(&learnedParamHandles[i], -1, 0);
 			valueFilters[i].reset();
 		}
 		for (int i = 0; i < 128; i++) {
@@ -72,42 +69,27 @@ struct MIDI_Map : Module {
 
 		float deltaTime = APP->engine->getSampleTime();
 
-		// Check touched params when learning
-		if (learningId >= 0) {
-			Module *module;
-			int paramId;
-			APP->engine->getTouchedParam(module, paramId);
-			APP->engine->setTouchedParam(NULL, 0);
-			if (module) {
-				unloadModuleHandle(learningId);
-				learnedModuleHandles[learningId].id = module->id;
-				loadModuleHandle(learningId);
-				learnedParamIds[learningId] = paramId;
-				learnedParam = true;
-				commitLearn();
-			}
-		}
-
 		// Step channels
-		for (int i = 0; i < 8; i++) {
-			int cc = learnedCcs[i];
+		for (int id = 0; id < 8; id++) {
+			int cc = learnedCcs[id];
 			if (cc < 0)
 				continue;
+			// DEBUG("%d %d %p %d", id, learnedCcs[id], learnedParamHandles[id].module, learnedParamHandles[id].paramId);
 			// Check if CC value has been set
 			if (values[cc] < 0)
 				continue;
 			// Get module
-			Module *module = learnedModuleHandles[i].module;
+			Module *module = learnedParamHandles[id].module;
 			if (!module)
 				continue;
 			// Get param
-			int paramId = learnedParamIds[i];
+			int paramId = learnedParamHandles[id].paramId;
 			Param *param = &module->params[paramId];
 			if (!param->isBounded())
 				continue;
 			// Set param
 			float v = rescale(values[cc], 0, 127, 0.f, 1.f);
-			v = valueFilters[i].process(deltaTime, v);
+			v = valueFilters[id].process(deltaTime, v);
 			v = rescale(v, 0.f, 1.f, param->minValue, param->maxValue);
 			APP->engine->setParam(module, paramId, v);
 		}
@@ -135,18 +117,6 @@ struct MIDI_Map : Module {
 		values[cc] = msg.getValue();
 	}
 
-	void loadModuleHandle(int i) {
-		if (learnedModuleHandles[i].id >= 0) {
-			APP->engine->addModuleHandle(&learnedModuleHandles[i]);
-		}
-	}
-
-	void unloadModuleHandle(int i) {
-		if (learnedModuleHandles[i].id >= 0) {
-			APP->engine->removeModuleHandle(&learnedModuleHandles[i]);
-		}
-	}
-
 	void commitLearn() {
 		if (learningId < 0)
 			return;
@@ -159,7 +129,7 @@ struct MIDI_Map : Module {
 		learnedParam = false;
 		// Find next unlearned channel
 		while (++learningId < 8) {
-			if (learnedCcs[learningId] < 0 || learnedModuleHandles[learningId].id < 0)
+			if (learnedCcs[learningId] < 0 || learnedParamHandles[learningId].moduleId < 0)
 				return;
 		}
 		learningId = -1;
@@ -168,9 +138,7 @@ struct MIDI_Map : Module {
 	void clearLearn(int id) {
 		disableLearn(id);
 		learnedCcs[id] = -1;
-		unloadModuleHandle(id);
-		learnedModuleHandles[id].id = -1;
-		loadModuleHandle(id);
+		APP->engine->updateParamHandle(&learnedParamHandles[id], -1, 0);
 	}
 
 	void enableLearn(int id) {
@@ -184,9 +152,13 @@ struct MIDI_Map : Module {
 	void disableLearn(int id) {
 		if (learningId == id) {
 			learningId = -1;
-			learnedCc = false;
-			learnedParam = false;
 		}
+	}
+
+	void learnParam(int id, int moduleId, int paramId) {
+		APP->engine->updateParamHandle(&learnedParamHandles[id], moduleId, paramId);
+		learnedParam = true;
+		commitLearn();
 	}
 
 	json_t *dataToJson() override {
@@ -199,15 +171,12 @@ struct MIDI_Map : Module {
 		json_object_set_new(rootJ, "ccs", ccsJ);
 
 		json_t *moduleIdsJ = json_array();
-		for (int i = 0; i < 8; i++) {
-			json_array_append_new(moduleIdsJ, json_integer(learnedModuleHandles[i].id));
-		}
-		json_object_set_new(rootJ, "moduleIds", moduleIdsJ);
-
 		json_t *paramIdsJ = json_array();
 		for (int i = 0; i < 8; i++) {
-			json_array_append_new(paramIdsJ, json_integer(learnedParamIds[i]));
+			json_array_append_new(moduleIdsJ, json_integer(learnedParamHandles[i].moduleId));
+			json_array_append_new(paramIdsJ, json_integer(learnedParamHandles[i].paramId));
 		}
+		json_object_set_new(rootJ, "moduleIds", moduleIdsJ);
 		json_object_set_new(rootJ, "paramIds", paramIdsJ);
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
@@ -225,22 +194,13 @@ struct MIDI_Map : Module {
 		}
 
 		json_t *moduleIdsJ = json_object_get(rootJ, "moduleIds");
-		if (moduleIdsJ) {
+		json_t *paramIdsJ = json_object_get(rootJ, "paramIds");
+		if (moduleIdsJ && paramIdsJ) {
 			for (int i = 0; i < 8; i++) {
 				json_t *moduleIdJ = json_array_get(moduleIdsJ, i);
-				unloadModuleHandle(i);
-				if (moduleIdJ)
-					learnedModuleHandles[i].id = json_integer_value(moduleIdJ);
-				loadModuleHandle(i);
-			}
-		}
-
-		json_t *paramIdsJ = json_object_get(rootJ, "paramIds");
-		if (paramIdsJ) {
-			for (int i = 0; i < 8; i++) {
 				json_t *paramIdJ = json_array_get(paramIdsJ, i);
-				if (paramIdJ)
-					learnedParamIds[i] = json_integer_value(paramIdJ);
+				if (moduleIdJ && paramIdsJ)
+					APP->engine->updateParamHandle(&learnedParamHandles[i], json_integer_value(moduleIdJ), json_integer_value(paramIdJ));
 			}
 		}
 
@@ -254,21 +214,22 @@ struct MIDI_Map : Module {
 struct MIDI_MapChoice : LedDisplayChoice {
 	MIDI_Map *module;
 	int id;
+	int disableLearnFrames = -1;
 
 	void setModule(MIDI_Map *module) {
 		this->module = module;
 	}
 
 	void onButton(const event::Button &e) override {
+		if (!module)
+			return;
+
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-			APP->engine->setTouchedParam(NULL, 0);
 			e.consume(this);
 		}
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			if (module) {
-				module->clearLearn(id);
-			}
+			module->clearLearn(id);
 			e.consume(this);
 		}
 	}
@@ -276,6 +237,8 @@ struct MIDI_MapChoice : LedDisplayChoice {
 	void onSelect(const event::Select &e) override {
 		if (!module)
 			return;
+		// Reset touchedParam
+		APP->scene->rackWidget->touchedParam = NULL;
 		module->enableLearn(id);
 		e.consume(this);
 	}
@@ -283,7 +246,17 @@ struct MIDI_MapChoice : LedDisplayChoice {
 	void onDeselect(const event::Deselect &e) override {
 		if (!module)
 			return;
-		module->disableLearn(id);
+		// Check if a ParamWidget was touched
+		ParamWidget *touchedParam = APP->scene->rackWidget->touchedParam;
+		if (touchedParam) {
+			APP->scene->rackWidget->touchedParam = NULL;
+			int moduleId = touchedParam->paramQuantity->module->id;
+			int paramId = touchedParam->paramQuantity->paramId;
+			module->learnParam(id, moduleId, paramId);
+		}
+		else {
+			module->disableLearn(id);
+		}
 	}
 
 	void step() override {
@@ -303,7 +276,6 @@ struct MIDI_MapChoice : LedDisplayChoice {
 			bgColor = nvgRGBA(0, 0, 0, 0);
 
 			// HACK
-			// Don't let the event state call onDeselect()
 			if (APP->event->selectedWidget == this)
 				APP->event->setSelected(NULL);
 		}
@@ -313,10 +285,10 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		if (module->learnedCcs[id] >= 0) {
 			text += string::f("CC%d ", module->learnedCcs[id]);
 		}
-		if (module->learnedModuleHandles[id].id >= 0) {
+		if (module->learnedParamHandles[id].moduleId >= 0) {
 			text += getParamName();
 		}
-		if (module->learnedCcs[id] < 0 && module->learnedModuleHandles[id].id < 0) {
+		if (module->learnedCcs[id] < 0 && module->learnedParamHandles[id].moduleId < 0) {
 			if (module->learningId == id) {
 				text = "Mapping...";
 			}
@@ -326,7 +298,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		}
 
 		// Set text color
-		if ((module->learnedCcs[id] >= 0 && module->learnedModuleHandles[id].id >= 0) || module->learningId == id) {
+		if ((module->learnedCcs[id] >= 0 && module->learnedParamHandles[id].moduleId >= 0) || module->learningId == id) {
 			color.a = 1.0;
 		}
 		else {
@@ -337,18 +309,18 @@ struct MIDI_MapChoice : LedDisplayChoice {
 	std::string getParamName() {
 		if (!module)
 			return "";
-		ModuleHandle *moduleHandle = &module->learnedModuleHandles[id];
-		if (moduleHandle->id < 0)
+		ParamHandle *paramHandle = &module->learnedParamHandles[id];
+		if (paramHandle->moduleId < 0)
 			return "";
-		ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleHandle->id);
+		ModuleWidget *mw = APP->scene->rackWidget->getModule(paramHandle->moduleId);
 		if (!mw)
 			return "";
-		// Get the Module from the ModuleWidget instead of the ModuleHandle.
+		// Get the Module from the ModuleWidget instead of the ParamHandle.
 		// I think this is more elegant since this method is called in the app world instead of the engine world.
 		Module *m = mw->module;
 		if (!m)
 			return "";
-		int paramId = module->learnedParamIds[id];
+		int paramId = paramHandle->paramId;
 		if (paramId >= (int) m->params.size())
 			return "";
 		Param *param = &m->params[paramId];

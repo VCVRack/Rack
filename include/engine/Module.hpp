@@ -49,17 +49,14 @@ struct Module {
 	virtual void onReset() {}
 	/** Called when user clicks Randomize in the module context menu. */
 	virtual void onRandomize() {}
+	/** Called when the Module is added to the Engine */
+	virtual void onAdd() {}
+	/** Called when the Module is removed from the Engine */
+	virtual void onRemove() {}
 
 	/** Override to store extra internal data in the "data" property of the module's JSON object. */
 	virtual json_t *dataToJson() { return NULL; }
 	virtual void dataFromJson(json_t *root) {}
-};
-
-
-struct ModuleHandle {
-	int id = -1;
-	/** Automatically set when added to the Engine. */
-	Module *module = NULL;
 };
 
 
