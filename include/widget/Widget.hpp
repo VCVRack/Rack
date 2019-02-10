@@ -32,6 +32,9 @@ struct Widget {
 
 	virtual ~Widget();
 
+	void setPos(math::Vec pos);
+	void setSize(math::Vec size);
+
 	virtual math::Rect getChildrenBoundingBox();
 	/**  Returns `v` transformed into the coordinate system of `relative` */
 	virtual math::Vec getRelativeOffset(math::Vec v, Widget *relative);
@@ -143,6 +146,8 @@ struct Widget {
 	virtual void onAction(const event::Action &e) {}
 	virtual void onChange(const event::Change &e) {}
 	virtual void onZoom(const event::Zoom &e) {recurseEvent(&Widget::onZoom, e);}
+	virtual void onReposition(const event::Reposition &e) {}
+	virtual void onResize(const event::Resize &e) {}
 };
 
 

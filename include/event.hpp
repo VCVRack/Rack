@@ -241,6 +241,18 @@ struct Zoom : Event {
 };
 
 
+/** Occurs when Widget::setPos() is called.
+*/
+struct Reposition : Event {
+};
+
+
+/** Occurs when Widget::setSize() is called.
+*/
+struct Resize : Event {
+};
+
+
 struct State {
 	widget::Widget *rootWidget = NULL;
 	/** State widgets

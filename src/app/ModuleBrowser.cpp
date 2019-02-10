@@ -27,7 +27,9 @@ static std::set<plugin::Model*> sFavoriteModels;
 struct BrowserOverlay : widget::OpaqueWidget {
 	void step() override {
 		box = parent->box.zeroPos();
-		widget::OpaqueWidget::step();
+		// Only step if visible, since there are potentially thousands of descendants that don't need to be stepped.
+		if (visible)
+			widget::OpaqueWidget::step();
 	}
 
 	void onButton(const event::Button &e) override {

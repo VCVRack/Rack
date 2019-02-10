@@ -14,6 +14,18 @@ Widget::~Widget() {
 	clearChildren();
 }
 
+void Widget::setPos(math::Vec pos) {
+	box.pos = pos;
+	event::Reposition eReposition;
+	onReposition(eReposition);
+}
+
+void Widget::setSize(math::Vec size) {
+	box.size = size;
+	event::Resize eResize;
+	onResize(eResize);
+}
+
 math::Rect Widget::getChildrenBoundingBox() {
 	math::Vec min = math::Vec(INFINITY, INFINITY);
 	math::Vec max = math::Vec(-INFINITY, -INFINITY);
