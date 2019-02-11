@@ -1,6 +1,6 @@
 #pragma once
 #include "ui/common.hpp"
-#include "widget/OpaqueWidget.hpp"
+#include "widget/Widget.hpp"
 #include "ui/ScrollBar.hpp"
 
 
@@ -9,7 +9,7 @@ namespace ui {
 
 
 /** Handles a container with ScrollBar */
-struct ScrollWidget : widget::OpaqueWidget {
+struct ScrollWidget : widget::Widget {
 	widget::Widget *container;
 	ScrollBar *horizontalScrollBar;
 	ScrollBar *verticalScrollBar;

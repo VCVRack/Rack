@@ -1,7 +1,7 @@
 #include "plugin.hpp"
 
 
-static const int CHANNELS = 8;
+static const int MAX_CHANNELS = 128;
 
 
 struct MIDI_Map : Module {
@@ -19,33 +19,37 @@ struct MIDI_Map : Module {
 	};
 
 	midi::InputQueue midiInput;
+
+	/** Number of maps */
+	int mapLen = 0;
+	/** The mapped CC number of each channel */
+	int ccs[MAX_CHANNELS];
+	/** The mapped param handle of each channel */
+	ParamHandle paramHandles[MAX_CHANNELS];
+
 	/** Channel ID of the learning session */
 	int learningId;
 	/** Whether the CC has been set during the learning session */
 	bool learnedCc;
 	/** Whether the param has been set during the learning session */
 	bool learnedParam;
-	/** The learned CC number of each channel */
-	int learnedCcs[CHANNELS];
-	/** The learned param handle of each channel */
-	ParamHandle learnedParamHandles[CHANNELS];
+
 	/** The value of each CC number */
 	int8_t values[128];
 	/** The smoothing processor (normalized between 0 and 1) of each channel */
-	dsp::ExponentialFilter valueFilters[CHANNELS];
+	dsp::ExponentialFilter valueFilters[MAX_CHANNELS];
 
 	MIDI_Map() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		for (int i = 0; i < CHANNELS; i++) {
-			APP->engine->addParamHandle(&learnedParamHandles[i]);
-			valueFilters[i].lambda = 60.f;
+		for (int id = 0; id < MAX_CHANNELS; id++) {
+			APP->engine->addParamHandle(&paramHandles[id]);
 		}
 		onReset();
 	}
 
 	~MIDI_Map() {
-		for (int i = 0; i < CHANNELS; i++) {
-			APP->engine->removeParamHandle(&learnedParamHandles[i]);
+		for (int id = 0; id < MAX_CHANNELS; id++) {
+			APP->engine->removeParamHandle(&paramHandles[id]);
 		}
 	}
 
@@ -53,11 +57,8 @@ struct MIDI_Map : Module {
 		learningId = -1;
 		learnedCc = false;
 		learnedParam = false;
-		for (int i = 0; i < CHANNELS; i++) {
-			learnedCcs[i] = -1;
-			APP->engine->updateParamHandle(&learnedParamHandles[i], -1, 0);
-			valueFilters[i].reset();
-		}
+		clearMaps();
+		mapLen = 1;
 		for (int i = 0; i < 128; i++) {
 			values[i] = -1;
 		}
@@ -73,20 +74,19 @@ struct MIDI_Map : Module {
 		float deltaTime = APP->engine->getSampleTime();
 
 		// Step channels
-		for (int id = 0; id < CHANNELS; id++) {
-			int cc = learnedCcs[id];
+		for (int id = 0; id < mapLen; id++) {
+			int cc = ccs[id];
 			if (cc < 0)
 				continue;
-			// DEBUG("%d %d %p %d", id, learnedCcs[id], learnedParamHandles[id].module, learnedParamHandles[id].paramId);
 			// Check if CC value has been set
 			if (values[cc] < 0)
 				continue;
 			// Get module
-			Module *module = learnedParamHandles[id].module;
+			Module *module = paramHandles[id].module;
 			if (!module)
 				continue;
 			// Get param
-			int paramId = learnedParamHandles[id].paramId;
+			int paramId = paramHandles[id].paramId;
 			Param *param = &module->params[paramId];
 			if (!param->isBounded())
 				continue;
@@ -110,14 +110,47 @@ struct MIDI_Map : Module {
 
 	void processCC(midi::Message msg) {
 		uint8_t cc = msg.getNote();
+		int8_t value = msg.getValue();
 		// Learn
-		if (learningId >= 0 && values[cc] != msg.getValue()) {
-			learnedCcs[learningId] = cc;
+		if (0 <= learningId && values[cc] != value) {
+			ccs[learningId] = cc;
 			valueFilters[learningId].reset();
 			learnedCc = true;
 			commitLearn();
+			updateMapLen();
 		}
-		values[cc] = msg.getValue();
+		values[cc] = value;
+	}
+
+	void clearMap(int id) {
+		learningId = -1;
+		ccs[id] = -1;
+		APP->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
+		valueFilters[id].reset();
+		updateMapLen();
+	}
+
+	void clearMaps() {
+		learningId = -1;
+		for (int id = 0; id < MAX_CHANNELS; id++) {
+			ccs[id] = -1;
+			APP->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
+			valueFilters[id].reset();
+		}
+		mapLen = 0;
+	}
+
+	void updateMapLen() {
+		// Find last nonempty map
+		int id;
+		for (id = MAX_CHANNELS - 1; id >= 0; id--) {
+			if (ccs[id] >= 0 || paramHandles[id].moduleId >= 0)
+				break;
+		}
+		mapLen = id + 1;
+		// Add an empty "Mapping..." slot
+		if (mapLen < MAX_CHANNELS)
+			mapLen++;
 	}
 
 	void commitLearn() {
@@ -130,18 +163,12 @@ struct MIDI_Map : Module {
 		// Reset learned state
 		learnedCc = false;
 		learnedParam = false;
-		// Find next unlearned channel
-		while (++learningId < CHANNELS) {
-			if (learnedCcs[learningId] < 0 || learnedParamHandles[learningId].moduleId < 0)
+		// Find next incomplete map
+		while (++learningId < MAX_CHANNELS) {
+			if (ccs[learningId] < 0 || paramHandles[learningId].moduleId < 0)
 				return;
 		}
 		learningId = -1;
-	}
-
-	void clearLearn(int id) {
-		disableLearn(id);
-		learnedCcs[id] = -1;
-		APP->engine->updateParamHandle(&learnedParamHandles[id], -1, 0);
 	}
 
 	void enableLearn(int id) {
@@ -159,53 +186,50 @@ struct MIDI_Map : Module {
 	}
 
 	void learnParam(int id, int moduleId, int paramId) {
-		APP->engine->updateParamHandle(&learnedParamHandles[id], moduleId, paramId, true);
+		APP->engine->updateParamHandle(&paramHandles[id], moduleId, paramId, true);
 		learnedParam = true;
 		commitLearn();
+		updateMapLen();
 	}
 
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 
-		json_t *ccsJ = json_array();
-		for (int i = 0; i < 8; i++) {
-			json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
+		json_t *mapsJ = json_array();
+		for (int id = 0; id < mapLen; id++) {
+			json_t *mapJ = json_object();
+			json_object_set_new(mapJ, "cc", json_integer(ccs[id]));
+			json_object_set_new(mapJ, "moduleId", json_integer(paramHandles[id].moduleId));
+			json_object_set_new(mapJ, "paramId", json_integer(paramHandles[id].paramId));
+			json_array_append(mapsJ, mapJ);
 		}
-		json_object_set_new(rootJ, "ccs", ccsJ);
-
-		json_t *moduleIdsJ = json_array();
-		json_t *paramIdsJ = json_array();
-		for (int i = 0; i < CHANNELS; i++) {
-			json_array_append_new(moduleIdsJ, json_integer(learnedParamHandles[i].moduleId));
-			json_array_append_new(paramIdsJ, json_integer(learnedParamHandles[i].paramId));
-		}
-		json_object_set_new(rootJ, "moduleIds", moduleIdsJ);
-		json_object_set_new(rootJ, "paramIds", paramIdsJ);
+		json_object_set_new(rootJ, "maps", mapsJ);
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
-		json_t *ccsJ = json_object_get(rootJ, "ccs");
-		if (ccsJ) {
-			for (int i = 0; i < CHANNELS; i++) {
-				json_t *ccJ = json_array_get(ccsJ, i);
-				if (ccJ)
-					learnedCcs[i] = json_integer_value(ccJ);
+		clearMaps();
+
+		json_t *mapsJ = json_object_get(rootJ, "maps");
+		if (mapsJ) {
+			json_t *mapJ;
+			size_t mapIndex;
+			json_array_foreach(mapsJ, mapIndex, mapJ) {
+				json_t *ccJ = json_object_get(mapJ, "cc");
+				json_t *moduleIdJ = json_object_get(mapJ, "moduleId");
+				json_t *paramIdJ = json_object_get(mapJ, "paramId");
+				if (!(ccJ && moduleIdJ && paramIdJ))
+					continue;
+				if (mapIndex >= MAX_CHANNELS)
+					continue;
+				ccs[mapIndex] = json_integer_value(ccJ);
+				APP->engine->updateParamHandle(&paramHandles[mapIndex], json_integer_value(moduleIdJ), json_integer_value(paramIdJ), false);
 			}
 		}
 
-		json_t *moduleIdsJ = json_object_get(rootJ, "moduleIds");
-		json_t *paramIdsJ = json_object_get(rootJ, "paramIds");
-		if (moduleIdsJ && paramIdsJ) {
-			for (int i = 0; i < CHANNELS; i++) {
-				json_t *moduleIdJ = json_array_get(moduleIdsJ, i);
-				json_t *paramIdJ = json_array_get(paramIdsJ, i);
-				if (moduleIdJ && paramIdsJ)
-					APP->engine->updateParamHandle(&learnedParamHandles[i], json_integer_value(moduleIdJ), json_integer_value(paramIdJ), false);
-			}
-		}
+		updateMapLen();
 
 		json_t *midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
@@ -232,7 +256,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		}
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			module->clearLearn(id);
+			module->clearMap(id);
 			e.consume(this);
 		}
 	}
@@ -240,6 +264,10 @@ struct MIDI_MapChoice : LedDisplayChoice {
 	void onSelect(const event::Select &e) override {
 		if (!module)
 			return;
+
+		ScrollWidget *scroll = getAncestorOfType<ScrollWidget>();
+		scroll->scrollTo(box);
+
 		// Reset touchedParam
 		APP->scene->rackWidget->touchedParam = NULL;
 		module->enableLearn(id);
@@ -285,13 +313,13 @@ struct MIDI_MapChoice : LedDisplayChoice {
 
 		// Set text
 		text = "";
-		if (module->learnedCcs[id] >= 0) {
-			text += string::f("CC%d ", module->learnedCcs[id]);
+		if (module->ccs[id] >= 0) {
+			text += string::f("CC%d ", module->ccs[id]);
 		}
-		if (module->learnedParamHandles[id].moduleId >= 0) {
+		if (module->paramHandles[id].moduleId >= 0) {
 			text += getParamName();
 		}
-		if (module->learnedCcs[id] < 0 && module->learnedParamHandles[id].moduleId < 0) {
+		if (module->ccs[id] < 0 && module->paramHandles[id].moduleId < 0) {
 			if (module->learningId == id) {
 				text = "Mapping...";
 			}
@@ -301,7 +329,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		}
 
 		// Set text color
-		if ((module->learnedCcs[id] >= 0 && module->learnedParamHandles[id].moduleId >= 0) || module->learningId == id) {
+		if ((module->ccs[id] >= 0 && module->paramHandles[id].moduleId >= 0) || module->learningId == id) {
 			color.a = 1.0;
 		}
 		else {
@@ -312,7 +340,9 @@ struct MIDI_MapChoice : LedDisplayChoice {
 	std::string getParamName() {
 		if (!module)
 			return "";
-		ParamHandle *paramHandle = &module->learnedParamHandles[id];
+		if (id >= module->mapLen)
+			return "";
+		ParamHandle *paramHandle = &module->paramHandles[id];
 		if (paramHandle->moduleId < 0)
 			return "";
 		ModuleWidget *mw = APP->scene->rackWidget->getModule(paramHandle->moduleId);
@@ -337,27 +367,56 @@ struct MIDI_MapChoice : LedDisplayChoice {
 
 
 struct MIDI_MapDisplay : MidiWidget {
+	MIDI_Map *module;
+	ScrollWidget *scroll;
+	MIDI_MapChoice *choices[MAX_CHANNELS];
+	LedDisplaySeparator *separators[MAX_CHANNELS];
+
 	void setModule(MIDI_Map *module) {
-		// ScrollWidget *scroll = new ScrollWidget;
-		// scroll->box.pos = channelChoice->box.getBottomLeft();
-		// scroll->box.size.x = box.size.x;
-		// scroll->box.size.y = box.size.y - scroll->box.pos.y;
-		// addChild(scroll);
+		this->module = module;
 
-		Vec pos = channelChoice->box.getBottomLeft();
+		scroll = new ScrollWidget;
+		scroll->box.pos = channelChoice->box.getBottomLeft();
+		scroll->box.size.x = box.size.x;
+		scroll->box.size.y = box.size.y - scroll->box.pos.y;
+		addChild(scroll);
 
-		for (int i = 0; i < CHANNELS; i++) {
-			LedDisplaySeparator *separator = createWidget<LedDisplaySeparator>(pos);
-			separator->box.size.x = box.size.x;
-			addChild(separator);
+		LedDisplaySeparator *separator = createWidget<LedDisplaySeparator>(scroll->box.pos);
+		separator->box.size.x = box.size.x;
+		addChild(separator);
+		separators[0] = separator;
+
+		Vec pos;
+		for (int id = 0; id < MAX_CHANNELS; id++) {
+			if (id > 0) {
+				LedDisplaySeparator *separator = createWidget<LedDisplaySeparator>(pos);
+				separator->box.size.x = box.size.x;
+				scroll->container->addChild(separator);
+				separators[id] = separator;
+			}
 
 			MIDI_MapChoice *choice = createWidget<MIDI_MapChoice>(pos);
 			choice->box.size.x = box.size.x;
-			choice->id = i;
+			choice->id = id;
 			choice->setModule(module);
-			addChild(choice);
+			scroll->container->addChild(choice);
+			choices[id] = choice;
+
 			pos = choice->box.getBottomLeft();
 		}
+	}
+
+	void step() override {
+		if (!module)
+			return;
+
+		int mapLen = module->mapLen;
+		for (int id = 0; id < MAX_CHANNELS; id++) {
+			choices[id]->visible = (id < mapLen);
+			separators[id]->visible = (id < mapLen);
+		}
+
+		MidiWidget::step();
 	}
 };
 
@@ -372,7 +431,7 @@ struct MIDI_MapWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		MIDI_MapDisplay *midiWidget = createWidget<MIDI_MapDisplay>(mm2px(Vec(3.4, 14.839)));
+		MIDI_MapDisplay *midiWidget = createWidget<MIDI_MapDisplay>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(43.999, 102.664));
 		midiWidget->setMidiIO(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);

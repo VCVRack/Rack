@@ -40,12 +40,9 @@ void Slider::onDragEnd(const event::DragEnd &e) {
 	APP->window->cursorUnlock();
 }
 
-void Slider::onButton(const event::Button &e) {
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		if (quantity)
-			quantity->reset();
-	}
-	e.consume(this);
+void Slider::onDoubleClick(const event::DoubleClick &e) {
+	if (quantity)
+		quantity->reset();
 }
 
 

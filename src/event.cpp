@@ -97,7 +97,6 @@ void State::finalizeWidget(widget::Widget *w) {
 	if (draggedWidget == w) setDragged(NULL);
 	if (dragHoveredWidget == w) setDragHovered(NULL);
 	if (selectedWidget == w) setSelected(NULL);
-	if (scrollWidget == w) scrollWidget = NULL;
 	if (lastClickedWidget == w) lastClickedWidget = NULL;
 }
 
@@ -149,15 +148,6 @@ void State::handleButton(math::Vec pos, int button, int action, int mods) {
 			lastClickedWidget = clickedWidget;
 		}
 	}
-
-	// if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-	// 	if (action == GLFW_PRESS) {
-	// 		scrollWidget = clickedWidget;
-	// 	}
-	// 	if (action == GLFW_RELEASE) {
-	// 		scrollWidget = NULL;
-	// 	}
-	// }
 }
 
 void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
@@ -180,14 +170,6 @@ void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 
 		return;
 	}
-
-	// if (scrollWidget) {
-	// event::HoverScroll
-	// 	event::HoverScroll eHoverScroll;
-	// 	eHoverScroll.pos = pos;
-	// 	eHoverScroll.scrollDelta = scrollDelta;
-	// 	rootWidget->onHoverScroll(eHoverScroll);
-	// }
 
 	// event::Hover
 	event::Context eHoverContext;

@@ -70,10 +70,18 @@ void ScrollWidget::step() {
 }
 
 void ScrollWidget::onHover(const event::Hover &e) {
-	widget::OpaqueWidget::onHover(e);
+	widget::Widget::onHover(e);
 }
 
 void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
+	widget::Widget::onHoverScroll(e);
+	if (e.getConsumed())
+		return;
+
+	// Scroll only if the scrollbars are visible
+	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+		return;
+
 	math::Vec scrollDelta = e.scrollDelta;
 	// Flip coordinates if shift is held
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)

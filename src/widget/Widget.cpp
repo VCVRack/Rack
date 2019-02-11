@@ -16,12 +16,14 @@ Widget::~Widget() {
 
 void Widget::setPos(math::Vec pos) {
 	box.pos = pos;
+	// event::Reposition
 	event::Reposition eReposition;
 	onReposition(eReposition);
 }
 
 void Widget::setSize(math::Vec size) {
 	box.size = size;
+	// event::Resize
 	event::Resize eResize;
 	onResize(eResize);
 }
@@ -30,6 +32,8 @@ math::Rect Widget::getChildrenBoundingBox() {
 	math::Vec min = math::Vec(INFINITY, INFINITY);
 	math::Vec max = math::Vec(-INFINITY, -INFINITY);
 	for (Widget *child : children) {
+		if (!child->visible)
+			continue;
 		min = min.min(child->box.getTopLeft());
 		max = max.max(child->box.getBottomRight());
 	}
@@ -64,12 +68,18 @@ void Widget::addChild(Widget *child) {
 	assert(!child->parent);
 	child->parent = this;
 	children.push_back(child);
+	// event::Add
+	event::Add eAdd;
+	child->onAdd(eAdd);
 }
 
 void Widget::removeChild(Widget *child) {
 	assert(child);
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
+	// event::Remove
+	event::Remove eRemove;
+	child->onRemove(eRemove);
 	// Prepare to remove widget from the event state
 	APP->event->finalizeWidget(child);
 	// Delete child from children list
@@ -82,6 +92,9 @@ void Widget::removeChild(Widget *child) {
 
 void Widget::clearChildren() {
 	for (Widget *child : children) {
+		// event::Remove
+		event::Remove eRemove;
+		child->onRemove(eRemove);
 		APP->event->finalizeWidget(child);
 		child->parent = NULL;
 		delete child;
@@ -94,6 +107,9 @@ void Widget::step() {
 		Widget *child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
+			// event::Remove
+			event::Remove eRemove;
+			child->onRemove(eRemove);
 			APP->event->finalizeWidget(child);
 			it = children.erase(it);
 			child->parent = NULL;

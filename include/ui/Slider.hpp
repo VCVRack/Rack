@@ -19,7 +19,7 @@ struct Slider : widget::OpaqueWidget {
 	void onDragStart(const event::DragStart &e) override;
 	void onDragMove(const event::DragMove &e) override;
 	void onDragEnd(const event::DragEnd &e) override;
-	void onButton(const event::Button &e) override;
+	void onDoubleClick(const event::DoubleClick &e) override;
 };
 
 

@@ -589,6 +589,7 @@ void Engine::addParamHandle(ParamHandle *paramHandle) {
 	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
 	assert(it == internal->paramHandles.end());
 
+	// New ParamHandles must be blank
 	assert(paramHandle->moduleId < 0);
 	internal->paramHandles.push_back(paramHandle);
 }

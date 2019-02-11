@@ -31,18 +31,8 @@ struct OpaqueWidget : Widget {
 		if (!e.getConsumed())
 			e.consume(this);
 	}
-	void onHoverScroll(const event::HoverScroll &e) override {
-		Widget::onHoverScroll(e);
-		if (!e.getConsumed())
-			e.consume(this);
-	}
 	void onDragHover(const event::DragHover &e) override {
 		Widget::onDragHover(e);
-		if (!e.getConsumed())
-			e.consume(this);
-	}
-	void onPathDrop(const event::PathDrop &e) override {
-		Widget::onPathDrop(e);
 		if (!e.getConsumed())
 			e.consume(this);
 	}

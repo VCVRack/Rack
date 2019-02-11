@@ -148,6 +148,8 @@ struct Widget {
 	virtual void onZoom(const event::Zoom &e) {recurseEvent(&Widget::onZoom, e);}
 	virtual void onReposition(const event::Reposition &e) {}
 	virtual void onResize(const event::Resize &e) {}
+	virtual void onAdd(const event::Add &e) {}
+	virtual void onRemove(const event::Remove &e) {}
 };
 
 

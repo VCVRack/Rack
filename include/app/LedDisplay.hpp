@@ -1,6 +1,6 @@
 #pragma once
 #include "app/common.hpp"
-#include "widget/Widget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "widget/TransparentWidget.hpp"
 #include "ui/TextField.hpp"
 
@@ -9,7 +9,7 @@ namespace rack {
 namespace app {
 
 
-struct LedDisplay : widget::Widget {
+struct LedDisplay : widget::OpaqueWidget {
 	void draw(const widget::DrawContext &ctx) override;
 };
 

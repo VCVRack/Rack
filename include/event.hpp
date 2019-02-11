@@ -222,34 +222,48 @@ struct PathDrop : Event, Position {
 };
 
 
-/** Occurs when an certain action is triggered on a Widget.
+/** Occurs after a certain action is triggered on a Widget.
+The concept of an "action" is dependent on the type of Widget.
 */
 struct Action : Event {
 };
 
 
-/** Occurs when the value of a Widget changes.
+/** Occurs after the value of a Widget changes.
+The concept of a "value" is dependent on the type of Widget.
 */
 struct Change : Event {
 };
 
 
-/** Occurs when the zoom level of a Widget is changed.
+/** Occurs after the zoom level of a Widget is changed.
 Recurses until consumed.
 */
 struct Zoom : Event {
 };
 
 
-/** Occurs when Widget::setPos() is called.
+/** Occurs after the Widget's position is set by setPos();
 */
 struct Reposition : Event {
 };
 
 
-/** Occurs when Widget::setSize() is called.
+/** Occurs after the Widget's size is set by setSize();
 */
 struct Resize : Event {
+};
+
+
+/** Occurs after the Widget is added to a parent.
+*/
+struct Add : Event {
+};
+
+
+/** Occurs before the Widget is remove from its parent.
+*/
+struct Remove : Event {
 };
 
 
@@ -262,8 +276,6 @@ struct State {
 	widget::Widget *draggedWidget = NULL;
 	widget::Widget *dragHoveredWidget = NULL;
 	widget::Widget *selectedWidget = NULL;
-	/** For middle-click dragging */
-	widget::Widget *scrollWidget = NULL;
 	/** For double-clicking */
 	double lastClickTime = -INFINITY;
 	widget::Widget *lastClickedWidget = NULL;
