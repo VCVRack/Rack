@@ -4,6 +4,10 @@
 
 
 namespace rack {
+
+
+/** Networking functions for HTTP requests, URLs, and downloads
+*/
 namespace network {
 
 

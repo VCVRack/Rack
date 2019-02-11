@@ -5,6 +5,9 @@
 
 
 namespace rack {
+
+/** Utilities for `NVGcolor`
+*/
 namespace color {
 
 

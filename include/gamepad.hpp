@@ -3,6 +3,10 @@
 
 
 namespace rack {
+
+
+/** Gamepad/joystick/controller MIDI driver
+*/
 namespace gamepad {
 
 

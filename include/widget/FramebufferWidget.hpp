@@ -6,7 +6,7 @@ namespace rack {
 namespace widget {
 
 
-/** Caches a widget's draw() result to a framebuffer so it is called less frequently
+/** Caches a widget's draw() result to a framebuffer so it is called less frequently.
 When `dirty` is true, its children will be re-rendered on the next call to step() override.
 Events are not passed to the underlying scene.
 */

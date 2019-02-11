@@ -7,6 +7,10 @@
 
 
 namespace rack {
+
+
+/** MIDI driver
+*/
 namespace midi {
 
 

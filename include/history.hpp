@@ -16,6 +16,7 @@ namespace app {
 } // namespace app
 
 
+/** Undo history actions for the Rack application */
 namespace history {
 
 

@@ -13,6 +13,10 @@ will print something like
 
 
 namespace rack {
+
+
+/** Logs messages to a file or the console with decoration
+*/
 namespace logger {
 
 
@@ -25,7 +29,9 @@ enum Level {
 
 void init(bool devMode);
 void destroy();
-/** Do not use this function directly. Use the macros below. */
+/** Do not use this function directly. Use the macros below.
+Thread-safe.
+*/
 void log(Level level, const char *filename, int line, const char *format, ...);
 
 

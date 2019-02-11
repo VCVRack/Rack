@@ -12,6 +12,8 @@ namespace widget {
 } // namespace widget
 
 
+/** Event state machine for Widgets
+*/
 namespace event {
 
 

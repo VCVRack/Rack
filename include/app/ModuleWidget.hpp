@@ -12,6 +12,7 @@ namespace rack {
 namespace app {
 
 
+/** Manages an engine::Module in the rack. */
 struct ModuleWidget : widget::OpaqueWidget {
 	plugin::Model *model = NULL;
 	/** Owns the module pointer */

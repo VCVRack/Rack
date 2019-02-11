@@ -4,6 +4,10 @@
 
 
 namespace rack {
+
+
+/** Random number generator
+*/
 namespace random {
 
 
@@ -11,6 +15,7 @@ namespace random {
 void init();
 /** Returns a uniform random uint32_t from 0 to UINT32_MAX */
 uint32_t u32();
+/** Returns a uniform random uint64_t from 0 to UINT64_MAX */
 uint64_t u64();
 /** Returns a uniform random float in the interval [0.0, 1.0) */
 float uniform();

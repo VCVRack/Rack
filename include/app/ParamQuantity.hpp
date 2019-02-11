@@ -8,7 +8,7 @@ namespace rack {
 namespace app {
 
 
-/** A ui::Quantity that wraps an engine Param */
+/** A ui::Quantity that wraps an engine::Param. */
 struct ParamQuantity : ui::Quantity {
 	engine::Module *module = NULL;
 	int paramId = 0;

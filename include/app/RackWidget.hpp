@@ -12,6 +12,7 @@ namespace rack {
 namespace app {
 
 
+/** Container for ModuleWidget and CableWidget. */
 struct RackWidget : widget::OpaqueWidget {
 	widget::FramebufferWidget *rails;
 	widget::Widget *moduleContainer;

@@ -9,6 +9,7 @@ namespace rack {
 namespace app {
 
 
+/** Manages an engine::Port on a ModuleWidget. */
 struct PortWidget : widget::OpaqueWidget {
 	engine::Module *module = NULL;
 	int portId;

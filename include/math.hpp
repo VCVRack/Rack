@@ -4,6 +4,10 @@
 
 
 namespace rack {
+
+
+/** Supplemental `<cmath>` functions and types
+*/
 namespace math {
 
 

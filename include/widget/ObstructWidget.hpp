@@ -6,7 +6,7 @@ namespace rack {
 namespace widget {
 
 
-/** Widget that consumes recursing events without giving a chance for children to consume.
+/** A Widget that consumes recursing events without giving a chance for children to consume.
 */
 struct ObstructWidget : Widget {
 	void onHover(const event::Hover &e) override {
@@ -21,13 +21,7 @@ struct ObstructWidget : Widget {
 	void onHoverText(const event::HoverText &e) override {
 		e.consume(this);
 	}
-	void onHoverScroll(const event::HoverScroll &e) override {
-		e.consume(this);
-	}
 	void onDragHover(const event::DragHover &e) override {
-		e.consume(this);
-	}
-	void onPathDrop(const event::PathDrop &e) override {
 		e.consume(this);
 	}
 };

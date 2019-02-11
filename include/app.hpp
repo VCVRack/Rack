@@ -28,6 +28,8 @@ struct Window;
 struct PatchManager;
 
 
+/** Rack-specific GUI widgets and functions that control and offer feedback for the rack state.
+*/
 namespace app {
 
 

@@ -42,6 +42,7 @@ namespace rack {
 struct Font {
 	NVGcontext *vg;
 	int handle;
+	/** Don't call this directly but instead use `APP->window->loadFont()` */
 	Font(NVGcontext *vg, const std::string &filename);
 	~Font();
 	/** Use `APP->window->loadFont()` instead. */
@@ -51,6 +52,7 @@ struct Font {
 struct Image {
 	NVGcontext *vg;
 	int handle;
+	/** Don't call this directly but instead use `APP->window->loadImage()` */
 	Image(NVGcontext *vg, const std::string &filename);
 	~Image();
 	/** Use `APP->window->loadImage()` instead. */
@@ -59,6 +61,7 @@ struct Image {
 
 struct Svg {
 	NSVGimage *handle;
+	/** Don't call this directly but instead use `APP->window->loadSvg()` */
 	Svg(const std::string &filename);
 	~Svg();
 	/** Use `APP->window->loadSvg()` instead. */

@@ -3,6 +3,10 @@
 
 
 namespace rack {
+
+
+/** Supplemental `std::string` functions
+*/
 namespace string {
 
 

@@ -6,6 +6,7 @@ namespace rack {
 namespace widget {
 
 
+/** A Widget with a dynamic zoom level. */
 struct ZoomWidget : Widget {
 	float zoom = 1.f;
 

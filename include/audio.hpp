@@ -11,6 +11,10 @@
 
 
 namespace rack {
+
+
+/** Audio driver
+*/
 namespace audio {
 
 

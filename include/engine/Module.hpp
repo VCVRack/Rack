@@ -39,7 +39,7 @@ struct Module {
 	void randomize();
 
 	/** Advances the module by one audio sample.
-	Override this method to read Inputs and Params, and to write Outputs and Lights.
+	Override this method to read Inputs and Params and to write Outputs and Lights.
 	*/
 	virtual void step() {}
 

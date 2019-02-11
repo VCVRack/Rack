@@ -7,6 +7,10 @@
 
 
 namespace rack {
+
+
+/** Plugin loader and plugin manager
+*/
 namespace plugin {
 
 

@@ -8,6 +8,10 @@
 
 
 namespace rack {
+
+
+/** General UI widgets
+*/
 namespace widget {
 
 
@@ -17,7 +21,9 @@ struct DrawContext {
 };
 
 
-/** A node in the 2D scene graph
+/** A node in the 2D [scene graph](https://en.wikipedia.org/wiki/Scene_graph).
+The bounding box of a Widget is a rectangle specified by `box` relative to their parent.
+The appearance is defined by overriding `draw()`, and the behavior is defined by overriding `step()` and `on*()` event handlers.
 */
 struct Widget {
 	/** Stores position and size */

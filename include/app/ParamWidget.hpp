@@ -10,6 +10,7 @@ namespace rack {
 namespace app {
 
 
+/** Manages an engine::Param on a ModuleWidget. */
 struct ParamWidget : widget::OpaqueWidget {
 	ParamQuantity *paramQuantity = NULL;
 	float dirtyValue = NAN;

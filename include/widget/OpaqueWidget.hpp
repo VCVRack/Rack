@@ -6,7 +6,7 @@ namespace rack {
 namespace widget {
 
 
-/** Widget that consumes recursing events but gives a chance for children to consume first.
+/** A Widget that consumes recursing events but gives a chance for children to consume first.
 You can of course override the events.
 You may also call OpaqueWidget::on*() from the overridden method to continue recursing/consuming the event.
 */

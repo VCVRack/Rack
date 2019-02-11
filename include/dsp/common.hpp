@@ -3,6 +3,10 @@
 
 
 namespace rack {
+
+
+/** Digital signal processing routines for plugins
+*/
 namespace dsp {
 
 
