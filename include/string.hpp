@@ -15,9 +15,9 @@ Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string
 */
 std::string f(const char *format, ...);
 /** Replaces all characters to lowercase letters */
-std::string lowercase(std::string s);
+std::string lowercase(const std::string &s);
 /** Replaces all characters to uppercase letters */
-std::string uppercase(std::string s);
+std::string uppercase(const std::string &s);
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
 std::string ellipsize(const std::string &s, size_t len);
 bool startsWith(const std::string &str, const std::string &prefix);

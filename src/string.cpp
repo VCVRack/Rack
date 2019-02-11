@@ -24,14 +24,16 @@ std::string f(const char *format, ...) {
 	return s;
 }
 
-std::string lowercase(std::string s) {
-	std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::tolower(c); });
-	return s;
+std::string lowercase(const std::string &s) {
+	std::string r = s;
+	std::transform(r.begin(), r.end(), r.begin(), [](unsigned char c){ return std::tolower(c); });
+	return r;
 }
 
-std::string uppercase(std::string s) {
-	std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::toupper(c); });
-	return s;
+std::string uppercase(const std::string &s) {
+	std::string r = s;
+	std::transform(r.begin(), r.end(), r.begin(), [](unsigned char c){ return std::toupper(c); });
+	return r;
 }
 
 std::string ellipsize(const std::string &s, size_t len) {

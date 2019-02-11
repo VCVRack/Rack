@@ -11,6 +11,8 @@
 #include "app/Scene.hpp"
 #include "plugin.hpp"
 #include "app.hpp"
+#include "plugin/Model.hpp"
+#include "string.hpp"
 #include "history.hpp"
 
 #include <set>
@@ -22,6 +24,35 @@ namespace app {
 
 
 static std::set<plugin::Model*> sFavoriteModels;
+
+
+
+bool isMatch(const std::string &s, const std::string &search) {
+	std::string s2 = string::lowercase(s);
+	std::string search2 = string::lowercase(search);
+	return (s2.find(search2) != std::string::npos);
+}
+
+static bool isModelMatch(plugin::Model *model, const std::string &search) {
+	if (search.empty())
+		return true;
+	std::string s;
+	s += model->plugin->slug;
+	s += " ";
+	s += model->plugin->author;
+	s += " ";
+	s += model->plugin->name;
+	s += " ";
+	s += model->slug;
+	s += " ";
+	s += model->name;
+	for (const std::string &tag : model->tags) {
+		// TODO Normalize tag
+		s += tag;
+		s += " ";
+	}
+	return isMatch(s, search);
+}
 
 
 struct BrowserOverlay : widget::OpaqueWidget {
@@ -58,7 +89,7 @@ struct BrowserOverlay : widget::OpaqueWidget {
 };
 
 
-struct ModuleBox : widget::OpaqueWidget {
+struct ModelBox : widget::OpaqueWidget {
 	plugin::Model *model;
 	/** Lazily created */
 	widget::Widget *previewWidget = NULL;
@@ -150,6 +181,7 @@ struct ModuleBox : widget::OpaqueWidget {
 
 
 struct BrowserSearchField : ui::TextField {
+	void onChange(const event::Change &e) override;
 };
 
 
@@ -170,26 +202,26 @@ struct BrowserSidebar : widget::Widget {
 
 struct ModuleBrowser : widget::OpaqueWidget {
 	BrowserSidebar *sidebar;
-	ui::ScrollWidget *moduleScroll;
-	ui::SequentialLayout *moduleLayout;
+	ui::ScrollWidget *modelScroll;
+	ui::SequentialLayout *modelContainer;
 
 	ModuleBrowser() {
 		sidebar = new BrowserSidebar;
 		sidebar->box.size.x = 300;
 		addChild(sidebar);
 
-		moduleScroll = new ui::ScrollWidget;
-		addChild(moduleScroll);
+		modelScroll = new ui::ScrollWidget;
+		addChild(modelScroll);
 
-		moduleLayout = new ui::SequentialLayout;
-		moduleLayout->spacing = math::Vec(10, 10);
-		moduleScroll->container->addChild(moduleLayout);
+		modelContainer = new ui::SequentialLayout;
+		modelContainer->spacing = math::Vec(10, 10);
+		modelScroll->container->addChild(modelContainer);
 
 		for (plugin::Plugin *plugin : plugin::plugins) {
 			for (plugin::Model *model : plugin->models) {
-				ModuleBox *moduleBox = new ModuleBox;
+				ModelBox *moduleBox = new ModelBox;
 				moduleBox->setModel(model);
-				moduleLayout->addChild(moduleBox);
+				modelContainer->addChild(moduleBox);
 			}
 		}
 	}
@@ -199,11 +231,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		sidebar->box.size.y = box.size.y;
 
-		moduleScroll->box.pos.x = sidebar->box.size.x;
-		moduleScroll->box.size.x = box.size.x - sidebar->box.size.x;
-		moduleScroll->box.size.y = box.size.y;
-		moduleLayout->box.size.x = moduleScroll->box.size.x;
-		moduleLayout->box.size.y = moduleLayout->getChildrenBoundingBox().getBottomRight().y;
+		modelScroll->box.pos.x = sidebar->box.size.x;
+		modelScroll->box.size.x = box.size.x - sidebar->box.size.x;
+		modelScroll->box.size.y = box.size.y;
+		modelContainer->box.size.x = modelScroll->box.size.x;
+		modelContainer->box.size.y = modelContainer->getChildrenBoundingBox().getBottomRight().y;
 
 		widget::OpaqueWidget::step();
 	}
@@ -212,13 +244,22 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
 		widget::Widget::draw(ctx);
 	}
+
+	void setSearch(const std::string &search) {
+		for (Widget *w : modelContainer->children) {
+			ModelBox *modelBox = dynamic_cast<ModelBox*>(w);
+			assert(modelBox);
+			bool match = isModelMatch(modelBox->model, search);
+			modelBox->visible = match;
+		}
+	}
 };
 
 
 // Implementations to resolve dependencies
 
 
-void ModuleBox::onButton(const event::Button &e) {
+void ModelBox::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		// Create module
 		ModuleWidget *moduleWidget = model->createModuleWidget();
@@ -240,6 +281,12 @@ void ModuleBox::onButton(const event::Button &e) {
 	}
 	widget::OpaqueWidget::onButton(e);
 }
+
+void BrowserSearchField::onChange(const event::Change &e) {
+	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+	browser->setSearch(text);
+}
+
 
 
 // Global functions
