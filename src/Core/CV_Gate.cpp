@@ -189,7 +189,7 @@ struct CV_GateWidget : ModuleWidget {
 		typedef Grid16MidiWidget<NoteChoice<CV_Gate>> TMidiWidget;
 		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
-		midiWidget->setMidiIO(module ? &module->midiOutput : NULL);
+		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}

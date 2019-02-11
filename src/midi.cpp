@@ -48,14 +48,14 @@ void OutputDevice::unsubscribe(Output *output) {
 }
 
 ////////////////////
-// IO
+// Port
 ////////////////////
 
-std::vector<int> IO::getDriverIds() {
+std::vector<int> Port::getDriverIds() {
 	return driverIds;
 }
 
-std::string IO::getDriverName(int driverId) {
+std::string Port::getDriverName(int driverId) {
 	auto it = drivers.find(driverId);
 	if (it == drivers.end())
 		return "";
@@ -63,7 +63,7 @@ std::string IO::getDriverName(int driverId) {
 	return it->second->getName();
 }
 
-void IO::setDriverId(int driverId) {
+void Port::setDriverId(int driverId) {
 	// Unset device and driver
 	setDeviceId(-1);
 	if (driver) {
@@ -79,18 +79,18 @@ void IO::setDriverId(int driverId) {
 	}
 }
 
-std::string IO::getChannelName(int channel) {
+std::string Port::getChannelName(int channel) {
 	if (channel == -1)
 		return "All channels";
 	else
 		return string::f("Channel %d", channel + 1);
 }
 
-void IO::setChannel(int channel) {
+void Port::setChannel(int channel) {
 	this->channel = channel;
 }
 
-json_t *IO::toJson() {
+json_t *Port::toJson() {
 	json_t *rootJ = json_object();
 	json_object_set_new(rootJ, "driver", json_integer(driverId));
 	std::string deviceName = getDeviceName(deviceId);
@@ -100,7 +100,7 @@ json_t *IO::toJson() {
 	return rootJ;
 }
 
-void IO::fromJson(json_t *rootJ) {
+void Port::fromJson(json_t *rootJ) {
 	json_t *driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
 		setDriverId(json_integer_value(driverJ));

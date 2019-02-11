@@ -7,7 +7,7 @@ namespace rack {
 
 
 namespace audio {
-	struct IO;
+	struct Port;
 }
 
 
@@ -22,7 +22,7 @@ struct AudioWidget : LedDisplay {
 	LedDisplayChoice *sampleRateChoice;
 	LedDisplaySeparator *sampleRateSeparator;
 	LedDisplayChoice *bufferSizeChoice;
-	void setAudioIO(audio::IO *audioIO);
+	void setAudioPort(audio::Port *port);
 };
 
 

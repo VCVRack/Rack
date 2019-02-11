@@ -5,7 +5,7 @@
 namespace rack {
 
 
-/** Driver ID in AudioIO and MidiIO */
+/** Driver ID for AudioDriver and MidiDriver */
 const int BRIDGE_DRIVER = -12512;
 const char* const BRIDGE_HOST = "127.0.0.1";
 const int BRIDGE_PORT = 12512;

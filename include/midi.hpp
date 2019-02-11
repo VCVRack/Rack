@@ -88,10 +88,10 @@ struct OutputDevice : Device {
 };
 
 ////////////////////
-// IO
+// Port
 ////////////////////
 
-struct IO {
+struct Port {
 	int driverId = -1;
 	int deviceId = -1;
 	/* For MIDI output, the channel to output messages.
@@ -104,7 +104,7 @@ struct IO {
 	Driver *driver = NULL;
 
 	/** Remember to call setDriverId(-1) in subclass destructors. */
-	virtual ~IO() {}
+	virtual ~Port() {}
 
 	std::vector<int> getDriverIds();
 	std::string getDriverName(int driverId);
@@ -123,7 +123,7 @@ struct IO {
 };
 
 
-struct Input : IO {
+struct Input : Port {
 	/** Not owned */
 	InputDevice *inputDevice = NULL;
 
@@ -149,7 +149,7 @@ struct InputQueue : Input {
 };
 
 
-struct Output : IO {
+struct Output : Port {
 	/** Not owned */
 	OutputDevice *outputDevice = NULL;
 

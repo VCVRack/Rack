@@ -14,7 +14,7 @@ namespace rack {
 namespace audio {
 
 
-struct IO {
+struct Port {
 	// Stream properties
 	int driver = 0;
 	int device = -1;
@@ -28,8 +28,8 @@ struct IO {
 	/** Cached */
 	RtAudio::DeviceInfo deviceInfo;
 
-	IO();
-	virtual ~IO();
+	Port();
+	virtual ~Port();
 
 	std::vector<int> getDrivers();
 	std::string getDriverName(int driver);

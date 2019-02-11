@@ -171,7 +171,7 @@ struct MIDI_CCWidget : ModuleWidget {
 		typedef Grid16MidiWidget<CcChoice<MIDI_CC>> TMidiWidget;
 		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
-		midiWidget->setMidiIO(module ? &module->midiInput : NULL);
+		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}

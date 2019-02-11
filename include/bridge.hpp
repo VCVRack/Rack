@@ -8,8 +8,8 @@ namespace rack {
 
 void bridgeInit();
 void bridgeDestroy();
-void bridgeAudioSubscribe(int channel, audio::IO *audio);
-void bridgeAudioUnsubscribe(int channel, audio::IO *audio);
+void bridgeAudioSubscribe(int channel, audio::Port *port);
+void bridgeAudioUnsubscribe(int channel, audio::Port *port);
 
 
 } // namespace rack

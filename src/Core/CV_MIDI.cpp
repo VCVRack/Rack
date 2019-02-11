@@ -346,7 +346,7 @@ struct CV_MIDIWidget : ModuleWidget {
 
 		MidiWidget *midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(33.840, 28));
-		midiWidget->setMidiIO(module ? &module->midiOutput : NULL);
+		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		addChild(midiWidget);
 	}
 

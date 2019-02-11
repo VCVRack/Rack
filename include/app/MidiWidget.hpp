@@ -7,7 +7,7 @@ namespace rack {
 
 
 namespace midi {
-	struct IO;
+	struct Port;
 }
 
 
@@ -20,7 +20,7 @@ struct MidiWidget : LedDisplay {
 	LedDisplayChoice *deviceChoice;
 	LedDisplaySeparator *deviceSeparator;
 	LedDisplayChoice *channelChoice;
-	void setMidiIO(midi::IO *midiIO);
+	void setMidiPort(midi::Port *port);
 };
 
 

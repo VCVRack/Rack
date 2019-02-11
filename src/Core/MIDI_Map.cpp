@@ -433,7 +433,7 @@ struct MIDI_MapWidget : ModuleWidget {
 
 		MIDI_MapDisplay *midiWidget = createWidget<MIDI_MapDisplay>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(43.999, 102.664));
-		midiWidget->setMidiIO(module ? &module->midiInput : NULL);
+		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
