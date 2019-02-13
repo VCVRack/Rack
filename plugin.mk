@@ -5,6 +5,13 @@ endif
 SLUG := $(shell jq .slug plugin.json)
 VERSION := $(shell jq .version plugin.json)
 
+ifndef SLUG
+$(error SLUG could not be found in manifest)
+endif
+ifndef VERSION
+$(error VERSION could not be found in manifest)
+endif
+
 DISTRIBUTABLES += plugin.json
 
 FLAGS += -fPIC
