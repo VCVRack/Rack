@@ -108,7 +108,7 @@ struct ModuleCloneItem : ui::MenuItem {
 struct ModuleBypassItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ModuleBypassItem() {
-		text = "Bypass";
+		text = "Disable";
 	}
 	void setModule(ModuleWidget *moduleWidget) {
 		this->moduleWidget = moduleWidget;
