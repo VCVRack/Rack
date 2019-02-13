@@ -1,9 +1,7 @@
 #include <x86intrin.h>
 
 
-#define ALIGN(n) __attribute__((aligned(n)))
-
-
+namespace rack {
 namespace simd {
 
 
@@ -18,9 +16,8 @@ struct f32<4> {
 
 	f32<4>() {}
 	f32<4>(__m128 v) : v(v) {}
-	template <typename T>
-	f32<4>(T x) {
-		v = _mm_set_ps1((float) x);
+	f32<4>(float x) {
+		v = _mm_set_ps1(x);
 	}
 	/** Reads an array of 4 values */
 	f32<4>(const float *x) {
@@ -33,19 +30,22 @@ struct f32<4> {
 };
 
 
+typedef f32<4> f32_4;
+
+
 // Operator overloads
 
 #define DECLARE_F32_4_OPERATOR_INFIX(operator, func) \
-	inline f32<4> operator(f32<4> a, f32<4> b) { \
-		return f32<4>(func(a.v, b.v)); \
+	inline f32_4 operator(f32_4 a, f32_4 b) { \
+		return f32_4(func(a.v, b.v)); \
 	} \
 	template <typename T> \
-	f32<4> operator(T a, f32<4> b) { \
-		return operator(f32<4>(a), b); \
+	f32_4 operator(T a, f32_4 b) { \
+		return operator(f32_4(a), b); \
 	} \
 	template <typename T> \
-	f32<4> operator(f32<4> a, T b) { \
-		return operator(a, f32<4>(b)); \
+	f32_4 operator(f32_4 a, T b) { \
+		return operator(a, f32_4(b)); \
 	}
 
 DECLARE_F32_4_OPERATOR_INFIX(operator+, _mm_add_ps)
@@ -60,13 +60,13 @@ DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
 
 #define DECLARE_F32_4_OPERATOR_INCREMENT(operator, func) \
-	inline f32<4> &operator(f32<4> &a, f32<4> b) { \
+	inline f32_4 &operator(f32_4 &a, f32_4 b) { \
 		a.v = func(a.v, b.v); \
 		return a; \
 	} \
 	template <typename T> \
-	f32<4> &operator(f32<4> &a, T b) { \
-		return operator(a, f32<4>(b)); \
+	f32_4 &operator(f32_4 &a, T b) { \
+		return operator(a, f32_4(b)); \
 	}
 
 DECLARE_F32_4_OPERATOR_INCREMENT(operator+=, _mm_add_ps);
@@ -75,30 +75,31 @@ DECLARE_F32_4_OPERATOR_INCREMENT(operator*=, _mm_mul_ps);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator/=, _mm_div_ps);
 
 
-inline f32<4> rsqrt(f32<4> a) {
-	return f32<4>(_mm_rsqrt_ps(a.v));
+inline f32_4 rsqrt(f32_4 a) {
+	return f32_4(_mm_rsqrt_ps(a.v));
 }
 
-inline f32<4> rcp(f32<4> a) {
-	return f32<4>(_mm_rcp_ps(a.v));
+inline f32_4 rcp(f32_4 a) {
+	return f32_4(_mm_rcp_ps(a.v));
 }
 
 
 } // namespace simd
+} // namespace rack
 
 
 namespace std {
 
-inline simd::f32<4> max(simd::f32<4> a, simd::f32<4> b) {
-	return simd::f32<4>(_mm_max_ps(a.v, b.v));
+inline rack::simd::f32_4 max(rack::simd::f32_4 a, rack::simd::f32_4 b) {
+	return rack::simd::f32_4(_mm_max_ps(a.v, b.v));
 }
 
-inline simd::f32<4> min(simd::f32<4> a, simd::f32<4> b) {
-	return simd::f32<4>(_mm_min_ps(a.v, b.v));
+inline rack::simd::f32_4 min(rack::simd::f32_4 a, rack::simd::f32_4 b) {
+	return rack::simd::f32_4(_mm_min_ps(a.v, b.v));
 }
 
-inline simd::f32<4> sqrt(simd::f32<4> a) {
-	return simd::f32<4>(_mm_sqrt_ps(a.v));
+inline rack::simd::f32_4 sqrt(rack::simd::f32_4 a) {
+	return rack::simd::f32_4(_mm_sqrt_ps(a.v));
 }
 
 } // namespace std
