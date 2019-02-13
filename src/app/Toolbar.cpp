@@ -317,9 +317,9 @@ struct ThreadCountValueItem : ui::MenuItem {
 		this->threadCount = threadCount;
 		text = string::f("%d", threadCount);
 		if (threadCount == system::getLogicalCoreCount() / 2)
-			text += " (best performance)";
+			text += " (most modules)";
 		else if (threadCount == 1)
-			text += " (best efficiency)";
+			text += " (lowest CPU usage)";
 		rightText = CHECKMARK(APP->engine->getThreadCount() == threadCount);
 	}
 	void onAction(const event::Action &e) override {

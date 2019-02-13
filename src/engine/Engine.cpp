@@ -60,33 +60,29 @@ struct Barrier {
 		if (total <= 1)
 			return;
 		std::unique_lock<std::mutex> lock(mutex);
-		count++;
-		if (count < total) {
-			cv.wait(lock);
-		}
-		else {
+		int id = ++count;
+		if (id == total) {
 			count = 0;
 			cv.notify_all();
+		}
+		else {
+			cv.wait(lock);
 		}
 	}
 };
 
 
 struct SpinBarrier {
-	std::atomic<int> count;
+	std::atomic<int> count{0};
 	int total = 0;
 
-	SpinBarrier() {
-		count = 0;
-	}
-
 	void wait() {
-		count++;
-		if (count < total) {
-			while (count > 0) {}
+		int id = ++count;
+		if (id == total) {
+			count = 0;
 		}
 		else {
-			count = 0;
+			while (count != 0);
 		}
 	}
 };
@@ -150,6 +146,7 @@ struct Engine::Internal {
 	std::vector<EngineWorker> workers;
 	SpinBarrier engineBarrier;
 	SpinBarrier workerBarrier;
+	std::atomic<int> workerModuleIndex;
 };
 
 
@@ -185,12 +182,14 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 	int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
 
-	// TODO
-	// There's room for optimization here by choosing modules intelligently rather than fixed strides.
-	// See OpenMP's `guided` scheduling algorithm.
-
 	// Step each module
-	for (int i = threadId; i < modulesLen; i += threadCount) {
+	// for (int i = threadId; i < modulesLen; i += threadCount) {
+	while (true) {
+		// Chose module
+		int i = internal->workerModuleIndex++;
+		if (i >= modulesLen)
+			break;
+
 		Module *module = internal->modules[i];
 		if (!module->bypass) {
 			// Step module
@@ -245,6 +244,7 @@ static void Engine_step(Engine *engine) {
 	}
 
 	// Step modules along with workers
+	internal->workerModuleIndex = 0;
 	internal->engineBarrier.wait();
 	Engine_stepModules(engine, 0);
 	internal->workerBarrier.wait();

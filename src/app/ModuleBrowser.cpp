@@ -26,7 +26,6 @@ namespace app {
 static std::set<plugin::Model*> sFavoriteModels;
 
 
-
 bool isMatch(const std::string &s, const std::string &search) {
 	std::string s2 = string::lowercase(s);
 	std::string search2 = string::lowercase(search);
