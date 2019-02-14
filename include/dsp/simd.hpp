@@ -2,7 +2,7 @@
 
 
 namespace rack {
-namespace simd {
+namespace dsp {
 
 
 template <int N>
@@ -104,5 +104,5 @@ inline f32_4 rcp(f32_4 x) {
 }
 
 
-} // namespace simd
+} // namespace dsp
 } // namespace rack
