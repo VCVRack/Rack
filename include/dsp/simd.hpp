@@ -1,4 +1,5 @@
-#include <x86intrin.h>
+#include <emmintrin.h>
+#include "sse_mathfun.h"
 
 
 namespace rack {
@@ -101,6 +102,22 @@ Much faster than `1/x`.
 */
 inline f32_4 rcp(f32_4 x) {
 	return f32_4(_mm_rcp_ps(x.v));
+}
+
+inline f32_4 log(f32_4 x) {
+	return f32_4(log_ps(x.v));
+}
+
+inline f32_4 exp(f32_4 x) {
+	return f32_4(exp_ps(x.v));
+}
+
+inline f32_4 sin(f32_4 x) {
+	return f32_4(sin_ps(x.v));
+}
+
+inline f32_4 cos(f32_4 x) {
+	return f32_4(cos_ps(x.v));
 }
 
 
