@@ -1,3 +1,4 @@
+#include "common.hpp"
 #include "sse_mathfun.h"
 #include <emmintrin.h>
 
@@ -6,24 +7,51 @@ namespace rack {
 namespace dsp {
 
 
+inline float cast_i32_f32(int i) {
+	float f;
+	std::memcpy(&f, &i, sizeof(f));
+	return f;
+}
+
+
+inline int cast_f32_i32(float f) {
+	float i;
+	std::memcpy(&i, &f, sizeof(i));
+	return i;
+}
+
+
 template <int N>
 struct f32;
 
 
-/** Wrapper for `__m128` representing an aligned vector of 4 single-precision float values. */
+/** Wrapper for `__m128` representing an aligned vector of 4 single-precision float values.
+*/
 template <>
 struct f32<4> {
 	__m128 v;
 
+	/** Constructs an uninitialized vector. */
 	f32<4>() {}
+
+	/** Constructs a vector from a native `__m128` type. */
 	f32<4>(__m128 v) : v(v) {}
+
+	/** Constructs a vector with all elements set to `x`. */
 	f32<4>(float x) {
 		v = _mm_set_ps1(x);
 	}
+
 	/** Reads an array of 4 values. */
 	static f32<4> load(const float *x) {
 		return f32<4>(_mm_loadu_ps(x));
 	}
+
+	/** Returns a vector initialized to zero. */
+	static f32<4> zero() {
+		return f32<4>(_mm_setzero_ps());
+	}
+
 	/** Writes an array of 4 values. */
 	void store(float *x) {
 		_mm_storeu_ps(x, v);
@@ -52,9 +80,9 @@ typedef f32<4> f32_4;
 	}
 
 /** `a operator b` */
-#define DECLARE_F32_4_OPERATOR_INCREMENT(operator, func) \
+#define DECLARE_F32_4_OPERATOR_INCREMENT(operator, opfunc) \
 	inline f32_4 &operator(f32_4 &a, const f32_4 &b) { \
-		a.v = func(a.v, b.v); \
+		a = opfunc(a, b); \
 		return a; \
 	} \
 	template <typename T> \
@@ -67,6 +95,25 @@ DECLARE_F32_4_OPERATOR_INFIX(operator-, _mm_sub_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator*, _mm_mul_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
+/** Boolean operators on vectors give 0x00000000 for false and 0xffffffff for true, for each vector element.
+Use these to apply logic, bit masks, and conditions to elements.
+Examples:
+
+Subtract 1 from value if greater than or equal to 1.
+	x -= (x >= 1.f) & 1.f;
+*/
+DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator&, _mm_and_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator|, _mm_mul_ps)
+
+DECLARE_F32_4_OPERATOR_INCREMENT(operator+=, operator+);
+DECLARE_F32_4_OPERATOR_INCREMENT(operator-=, operator-);
+DECLARE_F32_4_OPERATOR_INCREMENT(operator*=, operator*);
+DECLARE_F32_4_OPERATOR_INCREMENT(operator/=, operator/);
+DECLARE_F32_4_OPERATOR_INCREMENT(operator^=, operator^);
+DECLARE_F32_4_OPERATOR_INCREMENT(operator&=, operator&);
+DECLARE_F32_4_OPERATOR_INCREMENT(operator|=, operator|);
+
 /** `+a` */
 inline f32_4 operator+(const f32_4 &a) {
 	return a;
@@ -76,11 +123,6 @@ inline f32_4 operator+(const f32_4 &a) {
 inline f32_4 operator-(const f32_4 &a) {
 	return 0.f - a;
 }
-
-DECLARE_F32_4_OPERATOR_INCREMENT(operator+=, _mm_add_ps);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator-=, _mm_sub_ps);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator*=, _mm_mul_ps);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator/=, _mm_div_ps);
 
 /** `++a` */
 inline f32_4 &operator++(f32_4 &a) {
@@ -108,10 +150,6 @@ inline f32_4 operator--(f32_4 &a, int) {
 	return b;
 }
 
-DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator&, _mm_and_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator|, _mm_mul_ps)
-
 /** `~a` */
 inline f32_4 operator~(const f32_4 &a) {
 	return f32_4(_mm_xor_ps(a.v, _mm_cmpeq_ps(a.v, a.v)));
@@ -123,7 +161,6 @@ DECLARE_F32_4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
-
 
 
 // Math functions
