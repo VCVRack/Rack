@@ -471,9 +471,13 @@ inline void sse_mathfun_sincos_ps(__m128 x, __m128 *s, __m128 *c) {
 }
 
 
+inline __m128 sse_mathfun_trunc_ps(__m128 a) {
+	return _mm_cvtepi32_ps(_mm_cvttps_epi32(a));
+}
+
+
 inline __m128 sse_mathfun_floor_ps(__m128 a) {
-	// Convert to i32 and back to f32
-	__m128 b = _mm_cvtepi32_ps(_mm_cvttps_epi32(a));
+	__m128 b = sse_mathfun_trunc_ps(a);
 	// If b > a, subtract 1 fom b
 	b = _mm_sub_ps(b, _mm_and_ps(_mm_cmpgt_ps(b, a), sse_mathfun_one_ps()));
 	return b;
@@ -481,8 +485,7 @@ inline __m128 sse_mathfun_floor_ps(__m128 a) {
 
 
 inline __m128 sse_mathfun_ceil_ps(__m128 a) {
-	// Convert to i32 and back to f32
-	__m128 b = _mm_cvtepi32_ps(_mm_cvttps_epi32(a));
+	__m128 b = sse_mathfun_trunc_ps(a);
 	// If b < a, add 1 to b
 	b = _mm_add_ps(b, _mm_and_ps(_mm_cmplt_ps(b, a), sse_mathfun_one_ps()));
 	return b;
@@ -495,13 +498,9 @@ inline __m128 sse_mathfun_round_ps(__m128 a) {
 }
 
 
-/* Computes `a % b`.
-Works between -8388608 and 8388608.
-*/
 inline __m128 sse_mathfun_fmod_ps(__m128 a, __m128 b) {
 	__m128 c = _mm_div_ps(a, b);
-	// Convert to i32 and back to f32
-	c = _mm_cvtepi32_ps(_mm_cvttps_epi32(c));
+	c = sse_mathfun_trunc_ps(c);
 	c = _mm_mul_ps(c, b);
 	return _mm_sub_ps(a, c);
 }

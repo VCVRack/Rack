@@ -191,6 +191,10 @@ inline f32_4 fabs(f32_4 a) {
 	return f32_4(sse_mathfun_fabs_ps(a.v));
 }
 
+inline f32_4 trunc(f32_4 a) {
+	return f32_4(sse_mathfun_trunc_ps(a.v));
+}
+
 
 } // namespace dsp
 } // namespace rack
