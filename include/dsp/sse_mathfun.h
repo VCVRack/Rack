@@ -1,5 +1,5 @@
-/*
-Modified version of http://gruntthepeon.free.fr/ssemath/ for VCV Rack.
+/* Modified version of http://gruntthepeon.free.fr/ssemath/ for VCV Rack.
+
 The following changes were made.
 - Remove typedefs for __m128 to avoid type pollution, and because it's not that ugly.
 - Make all functions inline since this is a header file.

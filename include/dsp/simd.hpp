@@ -10,7 +10,7 @@ template <int N>
 struct f32;
 
 
-/** Wrapper for `__m128` representing a vector of 4 single-precision float values. */
+/** Wrapper for `__m128` representing an aligned vector of 4 single-precision float values. */
 template <>
 struct f32<4> {
 	__m128 v;
@@ -21,8 +21,8 @@ struct f32<4> {
 		v = _mm_set_ps1(x);
 	}
 	/** Reads an array of 4 values. */
-	f32<4>(const float *x) {
-		v = _mm_loadu_ps(x);
+	static f32<4> load(const float *x) {
+		return f32<4>(_mm_loadu_ps(x));
 	}
 	/** Writes an array of 4 values. */
 	void store(float *x) {
