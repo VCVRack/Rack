@@ -1,5 +1,5 @@
-#include <emmintrin.h>
 #include "sse_mathfun.h"
+#include <emmintrin.h>
 
 
 namespace rack {
@@ -36,6 +36,8 @@ typedef f32<4> f32_4;
 
 // Operator overloads
 
+
+/** `a operator b` */
 #define DECLARE_F32_4_OPERATOR_INFIX(operator, func) \
 	inline f32_4 operator(const f32_4 &a, const f32_4 &b) { \
 		return f32_4(func(a.v, b.v)); \
@@ -49,6 +51,7 @@ typedef f32<4> f32_4;
 		return operator(a, f32_4(b)); \
 	}
 
+/** `a operator b` */
 #define DECLARE_F32_4_OPERATOR_INCREMENT(operator, func) \
 	inline f32_4 &operator(f32_4 &a, const f32_4 &b) { \
 		a.v = func(a.v, b.v); \
@@ -64,18 +67,66 @@ DECLARE_F32_4_OPERATOR_INFIX(operator-, _mm_sub_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator*, _mm_mul_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
+/** `+a` */
+inline f32_4 operator+(const f32_4 &a) {
+	return a;
+}
+
+/** `-a` */
+inline f32_4 operator-(const f32_4 &a) {
+	return 0.f - a;
+}
+
 DECLARE_F32_4_OPERATOR_INCREMENT(operator+=, _mm_add_ps);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator-=, _mm_sub_ps);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator*=, _mm_mul_ps);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator/=, _mm_div_ps);
 
-// TODO Perhaps return a future i32 type for these, or add casting between multiple simd types
+/** `++a` */
+inline f32_4 &operator++(f32_4 &a) {
+	a += 1.f;
+	return a;
+}
+
+/** `--a` */
+inline f32_4 &operator--(f32_4 &a) {
+	a -= 1.f;
+	return a;
+}
+
+/** `a++` */
+inline f32_4 operator++(f32_4 &a, int) {
+	f32_4 b = a;
+	++a;
+	return b;
+}
+
+/** `a--` */
+inline f32_4 operator--(f32_4 &a, int) {
+	f32_4 b = a;
+	--a;
+	return b;
+}
+
+DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator&, _mm_and_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator|, _mm_mul_ps)
+
+/** `~a` */
+inline f32_4 operator~(const f32_4 &a) {
+	return f32_4(_mm_xor_ps(a.v, _mm_cmpeq_ps(a.v, a.v)));
+}
+
 DECLARE_F32_4_OPERATOR_INFIX(operator==, _mm_cmpeq_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator>=, _mm_cmpge_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
+
+
+
+// Math functions
 
 
 inline f32_4 fmax(f32_4 x, f32_4 b) {
@@ -105,19 +156,39 @@ inline f32_4 rcp(f32_4 x) {
 }
 
 inline f32_4 log(f32_4 x) {
-	return f32_4(log_ps(x.v));
+	return f32_4(sse_mathfun_log_ps(x.v));
 }
 
 inline f32_4 exp(f32_4 x) {
-	return f32_4(exp_ps(x.v));
+	return f32_4(sse_mathfun_exp_ps(x.v));
 }
 
 inline f32_4 sin(f32_4 x) {
-	return f32_4(sin_ps(x.v));
+	return f32_4(sse_mathfun_sin_ps(x.v));
 }
 
 inline f32_4 cos(f32_4 x) {
-	return f32_4(cos_ps(x.v));
+	return f32_4(sse_mathfun_cos_ps(x.v));
+}
+
+inline f32_4 floor(f32_4 a) {
+	return f32_4(sse_mathfun_floor_ps(a.v));
+}
+
+inline f32_4 ceil(f32_4 a) {
+	return f32_4(sse_mathfun_ceil_ps(a.v));
+}
+
+inline f32_4 round(f32_4 a) {
+	return f32_4(sse_mathfun_round_ps(a.v));
+}
+
+inline f32_4 fmod(f32_4 a, f32_4 b) {
+	return f32_4(sse_mathfun_fmod_ps(a.v, b.v));
+}
+
+inline f32_4 fabs(f32_4 a) {
+	return f32_4(sse_mathfun_fabs_ps(a.v));
 }
 
 

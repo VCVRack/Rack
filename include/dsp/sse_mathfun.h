@@ -1,11 +1,13 @@
 /* Modified version of http://gruntthepeon.free.fr/ssemath/ for VCV Rack.
 
 The following changes were made.
-- Remove typedefs for __m128 to avoid type pollution, and because it's not that ugly.
+- Remove typedefs for __m128 to avoid type pollution, and because they're not that ugly.
 - Make all functions inline since this is a header file.
 - Remove non-SSE2 code, since Rack assumes SSE2 CPUs.
 - Move `const static` variables to function variables for clarity. See https://stackoverflow.com/a/52139901/272642 for explanation of why the performance is not worse.
 - Change header file to <emmintrin.h> since we're using SSE2 intrinsics.
+- Prefix functions with `sse_mathfun_`.
+- Add floor, ceil, fmod.
 
 This derived source file is released under the zlib license.
 */
@@ -41,9 +43,20 @@ This derived source file is released under the zlib license.
   (this is the zlib license)
 */
 
+
 #include <emmintrin.h>
 
-inline __m128 log_ps(__m128 x) {
+
+/** Generate 1.f without accessing memory */
+inline __m128 sse_mathfun_one_ps() {
+	__m128i zeros = _mm_setzero_si128();
+	__m128i ones = _mm_cmpeq_epi32(zeros, zeros);
+	__m128i a = _mm_slli_epi32(_mm_srli_epi32(ones, 25), 23);
+	return _mm_castsi128_ps(a);
+}
+
+
+inline __m128 sse_mathfun_log_ps(__m128 x) {
 	__m128i emm0;
 	__m128 one = _mm_set_ps1(1.0);
 
@@ -113,7 +126,8 @@ inline __m128 log_ps(__m128 x) {
 	return x;
 }
 
-inline __m128 exp_ps(__m128 x) {
+
+inline __m128 sse_mathfun_exp_ps(__m128 x) {
 	__m128 tmp = _mm_setzero_ps(), fx;
 	__m128i emm0;
 	__m128 one = _mm_set_ps1(1.0);
@@ -164,6 +178,7 @@ inline __m128 exp_ps(__m128 x) {
 	return y;
 }
 
+
 /* evaluation of 4 sines at onces, using only SSE1+MMX intrinsics so
    it runs also on old athlons XPs and the pentium III of your grand
    mother.
@@ -192,7 +207,7 @@ inline __m128 exp_ps(__m128 x) {
    Since it is based on SSE intrinsics, it has to be compiled at -O2 to
    deliver full speed.
 */
-inline __m128 sin_ps(__m128 x) { // any x
+inline __m128 sse_mathfun_sin_ps(__m128 x) { // any x
 	__m128 xmm1, xmm2 = _mm_setzero_ps(), xmm3, sign_bit, y;
 
 	__m128i emm0, emm2;
@@ -278,8 +293,9 @@ inline __m128 sin_ps(__m128 x) { // any x
 	return y;
 }
 
+
 /* almost the same as sin_ps */
-inline __m128 cos_ps(__m128 x) { // any x
+inline __m128 sse_mathfun_cos_ps(__m128 x) { // any x
 	__m128 xmm1, xmm2 = _mm_setzero_ps(), xmm3, y;
 	__m128i emm0, emm2;
 	/* take the absolute value */
@@ -356,9 +372,10 @@ inline __m128 cos_ps(__m128 x) { // any x
 	return y;
 }
 
+
 /* since sin_ps and cos_ps are almost identical, sincos_ps could replace both of them..
    it is almost as fast, and gives you a free cosine with your sine */
-inline void sincos_ps(__m128 x, __m128 *s, __m128 *c) {
+inline void sse_mathfun_sincos_ps(__m128 x, __m128 *s, __m128 *c) {
 	__m128 xmm1, xmm2, xmm3 = _mm_setzero_ps(), sign_bit_sin, y;
 	__m128i emm0, emm2, emm4;
 	sign_bit_sin = x;
@@ -451,4 +468,47 @@ inline void sincos_ps(__m128 x, __m128 *s, __m128 *c) {
 	/* update the sign */
 	*s = _mm_xor_ps(xmm1, sign_bit_sin);
 	*c = _mm_xor_ps(xmm2, sign_bit_cos);
+}
+
+
+inline __m128 sse_mathfun_floor_ps(__m128 a) {
+	// Convert to i32 and back to f32
+	__m128 b = _mm_cvtepi32_ps(_mm_cvttps_epi32(a));
+	// If b > a, subtract 1 fom b
+	b = _mm_sub_ps(b, _mm_and_ps(_mm_cmpgt_ps(b, a), sse_mathfun_one_ps()));
+	return b;
+}
+
+
+inline __m128 sse_mathfun_ceil_ps(__m128 a) {
+	// Convert to i32 and back to f32
+	__m128 b = _mm_cvtepi32_ps(_mm_cvttps_epi32(a));
+	// If b < a, add 1 to b
+	b = _mm_add_ps(b, _mm_and_ps(_mm_cmplt_ps(b, a), sse_mathfun_one_ps()));
+	return b;
+}
+
+
+inline __m128 sse_mathfun_round_ps(__m128 a) {
+	// TODO Incorrect for -0.5, -1.5, etc.
+	return sse_mathfun_floor_ps(_mm_add_ps(a, _mm_set_ps1(0.5f)));
+}
+
+
+/* Computes `a % b`.
+Works between -8388608 and 8388608.
+*/
+inline __m128 sse_mathfun_fmod_ps(__m128 a, __m128 b) {
+	__m128 c = _mm_div_ps(a, b);
+	// Convert to i32 and back to f32
+	c = _mm_cvtepi32_ps(_mm_cvttps_epi32(c));
+	c = _mm_mul_ps(c, b);
+	return _mm_sub_ps(a, c);
+}
+
+
+inline __m128 sse_mathfun_fabs_ps(__m128 a) {
+	__m128i minus1 = _mm_set1_epi32(-1);
+	__m128 abs_mask = _mm_castsi128_ps(_mm_srli_epi32(minus1, 1));
+	return _mm_and_ps(abs_mask, a);
 }
