@@ -7,12 +7,12 @@ namespace engine {
 
 
 struct Light {
-	/** The mean-square of the brightness.
+	/** The square of the brightness.
 	Unstable API. Use set/getBrightness().
 	*/
 	float value = 0.f;
 
-	/** Sets the brightness directly with no LED modeling. */
+	/** Sets the brightness immediately with no light decay. */
 	void setBrightness(float brightness) {
 		value = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;
 	}
@@ -21,22 +21,23 @@ struct Light {
 		return std::sqrt(value);
 	}
 
-	/** Emulates slow fall (but immediate rise) of LED brightness.
-	`frames` rescales the timestep.
-	For example, if your module calls this method every 16 frames, use 16.f.
-	*/
-	void setBrightnessSmooth(float brightness, float frames = 1.f) {
+	/** Emulates light decay with slow fall but immediate rise. */
+	void setSmoothBrightness(float brightness, float deltaTime) {
 		float v = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;
 		if (v < value) {
-			// Fade out light with lambda = framerate
-			// Use 44.1k here to avoid the call to Engine::getSampleRate().
-			// This is close enough to look okay up to 96k
-			value += (v - value) * frames * 30.f / 44100.f;
+			// Fade out light
+			const float lambda = 30.f;
+			value += (v - value) * lambda * deltaTime;
 		}
 		else {
 			// Immediately illuminate light
 			value = v;
 		}
+	}
+
+	/** Use `setSmoothBrightness(brightness, APP->engine->getSampleTime())` instead. */
+	DEPRECATED void setBrightnessSmooth(float brightness, float frames = 1.f) {
+		setSmoothBrightness(brightness, frames / 44100.f);
 	}
 };
 

@@ -75,7 +75,7 @@ struct Port {
 		return active;
 	}
 
-	void step();
+	void process(float deltaTime);
 
 	/** Use getNormalVoltage() instead. */
 	DEPRECATED float normalize(float normalVoltage) {

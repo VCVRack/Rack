@@ -6,8 +6,8 @@ namespace rack {
 namespace dsp {
 
 
-/** Deprecated. Use VUMeter2. */
-struct VUMeter {
+/** Deprecated. Use VuMeter2. */
+struct VuMeter {
 	/** Decibel level difference between adjacent meter lights */
 	float dBInterval = 3.0;
 	float dBScaled;
@@ -30,7 +30,10 @@ struct VUMeter {
 };
 
 
-struct VUMeter2 {
+DEPRECATED typedef VuMeter VUMeter;
+
+
+struct VuMeter2 {
 	enum Mode {
 		PEAK,
 		RMS

@@ -130,5 +130,29 @@ struct Timer {
 };
 
 
+struct Counter {
+	int count;
+	int period;
+
+	Counter() {
+		reset();
+	}
+
+	void reset() {
+		count = 0;
+		period = 1;
+	}
+
+	/** Returns true if the counter reaches `period` and resets. */
+	bool process() {
+		if (++count >= period) {
+			count = 0;
+			return true;
+		}
+		return false;
+	}
+};
+
+
 } // namespace dsp
 } // namespace rack

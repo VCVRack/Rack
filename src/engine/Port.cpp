@@ -5,7 +5,7 @@ namespace rack {
 namespace engine {
 
 
-void Port::step() {
+void Port::process(float deltaTime) {
 	// Set plug lights
 	if (!isConnected() || getChannels() == 0) {
 		plugLights[0].setBrightness(0.f);
@@ -14,8 +14,8 @@ void Port::step() {
 	}
 	else if (getChannels() == 1) {
 		float v = getVoltage() / 10.f;
-		plugLights[0].setBrightnessSmooth(v);
-		plugLights[1].setBrightnessSmooth(-v);
+		plugLights[0].setSmoothBrightness(v, deltaTime);
+		plugLights[1].setSmoothBrightness(-v, deltaTime);
 		plugLights[2].setBrightness(0.f);
 	}
 	else {
@@ -26,7 +26,7 @@ void Port::step() {
 		float v = std::sqrt(v2) / 10.f;
 		plugLights[0].setBrightness(0.f);
 		plugLights[1].setBrightness(0.f);
-		plugLights[2].setBrightnessSmooth(v);
+		plugLights[2].setSmoothBrightness(v, deltaTime);
 	}
 }
 

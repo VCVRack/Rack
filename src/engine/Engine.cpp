@@ -190,6 +190,7 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 
 	// int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
+	float deltaTime = internal->sampleTime;
 
 	// Step each module
 	// for (int i = threadId; i < modulesLen; i += threadCount) {
@@ -211,7 +212,7 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
 				// Smooth CPU time
 				const float cpuTau = 2.f /* seconds */;
-				module->cpuTime += (cpuTime - module->cpuTime) * internal->sampleTime / cpuTau;
+				module->cpuTime += (cpuTime - module->cpuTime) * deltaTime / cpuTau;
 			}
 			else {
 				module->step();
@@ -220,10 +221,10 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 
 		// Iterate ports to step plug lights
 		for (Input &input : module->inputs) {
-			input.step();
+			input.process(deltaTime);
 		}
 		for (Output &output : module->outputs) {
-			output.step();
+			output.process(deltaTime);
 		}
 	}
 }
