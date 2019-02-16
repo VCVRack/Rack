@@ -6,8 +6,9 @@ namespace rack {
 namespace ui {
 
 
-#define X(_v) (orientation == HORIZONTAL_ORIENTATION ? (_v).x : (_v).y)
-#define Y(_v) (orientation == HORIZONTAL_ORIENTATION ? (_v).y : (_v).x)
+#define X(v) (orientation == HORIZONTAL_ORIENTATION ? (v).x : (v).y)
+#define Y(v) (orientation == HORIZONTAL_ORIENTATION ? (v).y : (v).x)
+
 
 void SequentialLayout::step() {
 	widget::Widget::step();

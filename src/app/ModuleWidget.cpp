@@ -133,15 +133,21 @@ struct ModuleDeleteItem : ui::MenuItem {
 };
 
 
+ModuleWidget::ModuleWidget() {
+	box.size = math::Vec(0, RACK_GRID_HEIGHT);
+}
+
 ModuleWidget::~ModuleWidget() {
 	setModule(NULL);
 }
 
 void ModuleWidget::draw(const widget::DrawContext &ctx) {
+	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
+
 	if (module && module->bypass) {
 		nvgGlobalAlpha(ctx.vg, 0.25);
 	}
-	// nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+
 	widget::Widget::draw(ctx);
 
 	// Power meter
@@ -175,7 +181,7 @@ void ModuleWidget::draw(const widget::DrawContext &ctx) {
 	// 	bndLabel(ctx.vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
 	// }
 
-	// nvgResetScissor(ctx.vg);
+	nvgResetScissor(ctx.vg);
 }
 
 void ModuleWidget::drawShadow(const widget::DrawContext &ctx) {
@@ -307,13 +313,11 @@ void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
 		panel = NULL;
 	}
 
-	{
-		SvgPanel *panel = new SvgPanel;
-		panel->setBackground(svg);
-		addChild(panel);
-		box.size = panel->box.size;
-		this->panel = panel;
-	}
+	SvgPanel *svgPanel = new SvgPanel;
+	svgPanel->setBackground(svg);
+	addChild(svgPanel);
+	box.size.x = svgPanel->box.size.x;
+	panel = svgPanel;
 }
 
 void ModuleWidget::addParam(ParamWidget *param) {

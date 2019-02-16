@@ -28,7 +28,7 @@ void ScrollWidget::scrollTo(math::Rect r) {
 }
 
 void ScrollWidget::draw(const widget::DrawContext &ctx) {
-	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
 	widget::Widget::draw(ctx);
 	nvgResetScissor(ctx.vg);
 }

@@ -1,5 +1,5 @@
-#include "common.hpp"
 #include "sse_mathfun.h"
+#include <cstring>
 #include <emmintrin.h>
 
 
@@ -7,7 +7,10 @@ namespace rack {
 namespace dsp {
 
 
+/** Casts an int to float, bitwise without conversion. */
 inline float cast_i32_f32(int i) {
+	static_assert(sizeof(int) == sizeof(float), "int and float must be the same size");
+	// Should be optimized to two `mov` instructions
 	float f;
 	std::memcpy(&f, &i, sizeof(f));
 	return f;
@@ -21,6 +24,17 @@ inline int cast_f32_i32(float f) {
 }
 
 
+/** Generic class for vector float types.
+
+This class is designed to be used just like `float` scalars, with extra features for handling bitwise logic, conditions, loading, and storing.
+
+Usage example:
+	float a[4], b[4];
+	f32_4 a = f32_4::load(in);
+	f32_4 b = 2.f * a / (1 - a);
+	b *= sin(2 * M_PI * a);
+	b.store(out);
+*/
 template <int N>
 struct f32;
 
@@ -65,7 +79,7 @@ typedef f32<4> f32_4;
 // Operator overloads
 
 
-/** `a operator b` */
+/** `a @ b` */
 #define DECLARE_F32_4_OPERATOR_INFIX(operator, func) \
 	inline f32_4 operator(const f32_4 &a, const f32_4 &b) { \
 		return f32_4(func(a.v, b.v)); \
@@ -79,7 +93,7 @@ typedef f32<4> f32_4;
 		return operator(a, f32_4(b)); \
 	}
 
-/** `a operator b` */
+/** `a @= b` */
 #define DECLARE_F32_4_OPERATOR_INCREMENT(operator, opfunc) \
 	inline f32_4 &operator(f32_4 &a, const f32_4 &b) { \
 		a = opfunc(a, b); \
@@ -95,7 +109,7 @@ DECLARE_F32_4_OPERATOR_INFIX(operator-, _mm_sub_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator*, _mm_mul_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
-/** Boolean operators on vectors give 0x00000000 for false and 0xffffffff for true, for each vector element.
+/**
 Use these to apply logic, bit masks, and conditions to elements.
 Examples:
 
@@ -106,6 +120,8 @@ DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator&, _mm_and_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator|, _mm_mul_ps)
 
+/** Boolean operators on vectors give 0x00000000 for false and 0xffffffff for true, for each vector element.
+*/
 DECLARE_F32_4_OPERATOR_INCREMENT(operator+=, operator+);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator-=, operator-);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator*=, operator*);

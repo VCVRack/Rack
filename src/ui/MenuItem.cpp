@@ -78,7 +78,9 @@ void MenuItem::doAction() {
 		return;
 
 	widget::Widget *overlay = getAncestorOfType<MenuOverlay>();
-	overlay->requestedDelete = true;
+	if (overlay) {
+		overlay->requestedDelete = true;
+	}
 }
 
 

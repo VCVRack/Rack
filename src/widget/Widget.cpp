@@ -28,6 +28,28 @@ void Widget::setSize(math::Vec size) {
 	onResize(eResize);
 }
 
+void Widget::show() {
+	if (visible)
+		return;
+	visible = true;
+	// event::Show
+	event::Show eShow;
+	onShow(eShow);
+}
+
+void Widget::hide() {
+	if (!visible)
+		return;
+	visible = false;
+	// event::Hide
+	event::Hide eHide;
+	onHide(eHide);
+}
+
+void Widget::requestDelete() {
+	requestedDelete = true;
+}
+
 math::Rect Widget::getChildrenBoundingBox() {
 	math::Vec min = math::Vec(INFINITY, INFINITY);
 	math::Vec max = math::Vec(-INFINITY, -INFINITY);

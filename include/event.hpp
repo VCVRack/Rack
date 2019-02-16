@@ -245,27 +245,39 @@ struct Zoom : Event {
 };
 
 
-/** Occurs after the Widget's position is set by setPos();
+/** Occurs after a Widget's position is set by Widget::setPos().
 */
 struct Reposition : Event {
 };
 
 
-/** Occurs after the Widget's size is set by setSize();
+/** Occurs after a Widget's size is set by Widget::setSize().
 */
 struct Resize : Event {
 };
 
 
-/** Occurs after the Widget is added to a parent.
+/** Occurs after a Widget is added to a parent.
 */
 struct Add : Event {
 };
 
 
-/** Occurs before the Widget is remove from its parent.
+/** Occurs before a Widget is removed from its parent.
 */
 struct Remove : Event {
+};
+
+
+/** Occurs after a Widget is shown with Widget::show().
+*/
+struct Show : Event {
+};
+
+
+/** Occurs after a Widget is hidden with Widget::hide().
+*/
+struct Hide : Event {
 };
 
 

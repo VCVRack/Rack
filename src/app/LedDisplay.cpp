@@ -16,7 +16,7 @@ void LedDisplay::draw(const widget::DrawContext &ctx) {
 	nvgFillColor(ctx.vg, nvgRGB(0x00, 0x00, 0x00));
 	nvgFill(ctx.vg);
 
-	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
 	widget::Widget::draw(ctx);
 	nvgResetScissor(ctx.vg);
 }
@@ -79,7 +79,7 @@ LedDisplayTextField::LedDisplayTextField() {
 
 
 void LedDisplayTextField::draw(const widget::DrawContext &ctx) {
-	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
 
 	// Background
 	nvgBeginPath(ctx.vg);

@@ -40,6 +40,9 @@ struct Widget {
 
 	void setPos(math::Vec pos);
 	void setSize(math::Vec size);
+	void show();
+	void hide();
+	void requestDelete();
 
 	virtual math::Rect getChildrenBoundingBox();
 	/**  Returns `v` transformed into the coordinate system of `relative` */
@@ -156,6 +159,8 @@ struct Widget {
 	virtual void onResize(const event::Resize &e) {}
 	virtual void onAdd(const event::Add &e) {}
 	virtual void onRemove(const event::Remove &e) {}
+	virtual void onShow(const event::Show &e) {recurseEvent(&Widget::onShow, e);}
+	virtual void onHide(const event::Hide &e) {recurseEvent(&Widget::onHide, e);}
 };
 
 

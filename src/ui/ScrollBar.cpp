@@ -8,9 +8,6 @@ namespace rack {
 namespace ui {
 
 
-static const float SCROLLBAR_SENSITIVITY = 2.f;
-
-
 ScrollBar::ScrollBar() {
 	box.size = math::Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 }
@@ -26,12 +23,14 @@ void ScrollBar::onDragStart(const event::DragStart &e) {
 }
 
 void ScrollBar::onDragMove(const event::DragMove &e) {
+	const float sensitivity = 1.f;
+
 	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
 	assert(scrollWidget);
 	if (orientation == HORIZONTAL)
-		scrollWidget->offset.x += SCROLLBAR_SENSITIVITY * e.mouseDelta.x;
+		scrollWidget->offset.x += sensitivity * e.mouseDelta.x;
 	else
-		scrollWidget->offset.y += SCROLLBAR_SENSITIVITY * e.mouseDelta.y;
+		scrollWidget->offset.y += sensitivity * e.mouseDelta.y;
 }
 
 void ScrollBar::onDragEnd(const event::DragEnd &e) {

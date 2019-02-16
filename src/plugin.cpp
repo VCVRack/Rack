@@ -116,6 +116,17 @@ static bool loadPlugin(std::string path) {
 	initCallback(plugin);
 	plugin->fromJson(rootJ);
 
+	// Normalize tags
+	for (Model *model : plugin->models) {
+		std::set<std::string> normalizedTags;
+		for (const std::string &tag : model->tags) {
+			std::string normalizedTag = normalizeTag(tag);
+			if (!normalizedTag.empty())
+				normalizedTags.insert(normalizedTag);
+		}
+		model->tags = normalizedTags;
+	}
+
 	// Check slug
 	if (!isSlugValid(plugin->slug)) {
 		WARN("Plugin slug \"%s\" is invalid", plugin->slug.c_str());
@@ -305,7 +316,7 @@ static int extractZip(const char *filename, const char *path) {
 	return err;
 }
 
-static void extractPackages(std::string path) {
+static void extractPackages(const std::string &path) {
 	std::string message;
 
 	for (std::string packagePath : system::listEntries(path)) {
@@ -374,7 +385,7 @@ void destroy() {
 	plugins.clear();
 }
 
-void logIn(std::string email, std::string password) {
+void logIn(const std::string &email, const std::string &password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
@@ -496,7 +507,7 @@ bool isLoggedIn() {
 	return settings.token != "";
 }
 
-Plugin *getPlugin(std::string pluginSlug) {
+Plugin *getPlugin(const std::string &pluginSlug) {
 	for (Plugin *plugin : plugins) {
 		if (plugin->slug == pluginSlug) {
 			return plugin;
@@ -505,7 +516,7 @@ Plugin *getPlugin(std::string pluginSlug) {
 	return NULL;
 }
 
-Model *getModel(std::string pluginSlug, std::string modelSlug) {
+Model *getModel(const std::string &pluginSlug, const std::string &modelSlug) {
 	Plugin *plugin = getPlugin(pluginSlug);
 	if (!plugin)
 		return NULL;
@@ -599,21 +610,21 @@ const std::map<std::string, std::string> tagAliases = {
 };
 
 
-std::string getAllowedTag(std::string tag) {
-	tag = string::lowercase(tag);
+std::string normalizeTag(const std::string &tag) {
+	std::string lowercaseTag = string::lowercase(tag);
 	// Transform aliases
-	auto it = tagAliases.find(tag);
+	auto it = tagAliases.find(lowercaseTag);
 	if (it != tagAliases.end())
-		tag = it->second;
+		lowercaseTag = it->second;
 	// Find allowed tag
 	for (std::string allowedTag : allowedTags) {
-		if (tag == string::lowercase(allowedTag))
+		if (lowercaseTag == string::lowercase(allowedTag))
 			return allowedTag;
 	}
 	return "";
 }
 
-bool isSlugValid(std::string slug) {
+bool isSlugValid(const std::string &slug) {
 	for (char c : slug) {
 		if (!(std::isalnum(c) || c == '-' || c == '_'))
 			return false;
@@ -622,7 +633,7 @@ bool isSlugValid(std::string slug) {
 }
 
 
-std::list<Plugin*> plugins;
+std::vector<Plugin*> plugins;
 bool isDownloading = false;
 float downloadProgress = 0.f;
 std::string downloadName;

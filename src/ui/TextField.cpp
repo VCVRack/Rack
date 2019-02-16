@@ -9,7 +9,7 @@ TextField::TextField() {
 }
 
 void TextField::draw(const widget::DrawContext &ctx) {
-	nvgScissor(ctx.vg, 0, 0, box.size.x, box.size.y);
+	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
 
 	BNDwidgetState state;
 	if (this == APP->event->selectedWidget)
@@ -180,7 +180,6 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 	}
 }
 
-/** Inserts text at the cursor, replacing the selection if necessary */
 void TextField::insertText(std::string text) {
 	if (cursor != selection) {
 		int begin = std::min(cursor, selection);
@@ -194,12 +193,15 @@ void TextField::insertText(std::string text) {
 	onChange(eChange);
 }
 
-/** Replaces the entire text */
 void TextField::setText(std::string text) {
+	bool changed = (text != this->text);
 	this->text = text;
 	selection = cursor = text.size();
-	event::Change eChange;
-	onChange(eChange);
+	if (changed) {
+		// event::Change
+		event::Change eChange;
+		onChange(eChange);
+	}
 }
 
 void TextField::selectAll() {

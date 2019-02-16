@@ -17,6 +17,14 @@ namespace rack {
 namespace engine {
 
 
+void disableDenormals() {
+	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
+	// https://software.intel.com/en-us/node/682949
+	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+}
+
+
 /** Threads which obtain a VIPLock will cause wait() to block for other less important threads.
 This does not provide the VIPs with an exclusive lock. That should be left up to another mutex shared between the less important thread.
 */
@@ -111,6 +119,7 @@ struct EngineWorker {
 	void run() {
 		system::setThreadName("Engine worker");
 		system::setThreadRealTime();
+		disableDenormals();
 		while (running) {
 			step();
 		}
@@ -179,7 +188,7 @@ Engine::~Engine() {
 static void Engine_stepModules(Engine *engine, int threadId) {
 	Engine::Internal *internal = engine->internal;
 
-	int threadCount = internal->threadCount;
+	// int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
 
 	// Step each module
@@ -259,11 +268,7 @@ static void Engine_run(Engine *engine) {
 	// Set up thread
 	system::setThreadName("Engine");
 	system::setThreadRealTime();
-
-	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
-	// https://software.intel.com/en-us/node/682949
-	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+	disableDenormals();
 
 	// Every time the engine waits and locks a mutex, it steps this many frames
 	const int mutexSteps = 64;

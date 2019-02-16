@@ -20,7 +20,7 @@ void Model::fromJson(json_t *rootJ) {
 		json_t *tagJ;
 		json_array_foreach(tagsJ, i, tagJ) {
 			std::string tag = json_string_value(tagJ);
-			tags.push_back(tag);
+			tags.insert(tag);
 		}
 	}
 }

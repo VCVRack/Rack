@@ -2,7 +2,7 @@
 #include "common.hpp"
 #include "plugin/Plugin.hpp"
 #include <jansson.h>
-#include <list>
+#include <set>
 
 
 namespace rack {
@@ -31,7 +31,7 @@ struct Model {
 	/** Human readable name for your model, e.g. "Voltage Controlled Oscillator" */
 	std::string name;
 	/** List of tags representing the function(s) of the module */
-	std::list<std::string> tags;
+	std::set<std::string> tags;
 	/** A one-line summary of the module's purpose */
 	std::string description;
 

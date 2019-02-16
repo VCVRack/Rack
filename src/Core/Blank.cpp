@@ -14,6 +14,7 @@ struct BlankPanel : Widget {
 
 	void step() override {
 		panelBorder->box.size = box.size;
+		Widget::step();
 	}
 
 	void draw(const DrawContext &ctx) override {

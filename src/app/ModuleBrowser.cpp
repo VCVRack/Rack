@@ -4,9 +4,14 @@
 #include "widget/ZoomWidget.hpp"
 #include "ui/ScrollWidget.hpp"
 #include "ui/SequentialLayout.hpp"
+#include "ui/MarginLayout.hpp"
 #include "ui/Label.hpp"
 #include "ui/TextField.hpp"
 #include "ui/MenuOverlay.hpp"
+#include "ui/List.hpp"
+#include "ui/MenuItem.hpp"
+#include "ui/Button.hpp"
+#include "ui/ChoiceButton.hpp"
 #include "app/ModuleWidget.hpp"
 #include "app/Scene.hpp"
 #include "plugin.hpp"
@@ -68,96 +73,135 @@ struct BrowserOverlay : widget::OpaqueWidget {
 			return;
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-			this->visible = false;
+			hide();
 		}
-	}
-
-	void onHoverKey(const event::HoverKey &e) override {
-		if (e.action == GLFW_PRESS) {
-			switch (e.key) {
-				case GLFW_KEY_ESCAPE: {
-					this->visible = false;
-					e.consume(this);
-				} break;
-			}
-		}
-
-		if (!e.getConsumed())
-			widget::OpaqueWidget::onHoverKey(e);
 	}
 };
 
 
+static const float MODEL_BOX_ZOOM = 0.5f;
+
+
 struct ModelBox : widget::OpaqueWidget {
 	plugin::Model *model;
+	widget::Widget *infoWidget;
 	/** Lazily created */
 	widget::Widget *previewWidget = NULL;
 	/** Number of frames since draw() has been called */
 	int visibleFrames = 0;
 	bool selected = false;
 
+	ModelBox() {
+		box.size.x = 0.f;
+		box.size.y = std::ceil(RACK_GRID_HEIGHT * MODEL_BOX_ZOOM);
+	}
+
 	void setModel(plugin::Model *model) {
 		this->model = model;
 
-		box.size.x = 70.f;
-		box.size.y = std::ceil(RACK_GRID_SIZE.y * 0.5f);
+		infoWidget = new widget::Widget;
+		infoWidget->box.size.x = 140;
+		infoWidget->box.size.y = box.size.y;
+		addChild(infoWidget);
 
-		math::Vec p;
-		p.y = box.size.y;
-		box.size.y += 40.0;
+		math::Vec pos;
 
 		ui::Label *nameLabel = new ui::Label;
+		// nameLabel->box.size.x = infoWidget->box.size.x;
+		nameLabel->box.pos = pos;
 		nameLabel->text = model->name;
-		nameLabel->box.pos = p;
-		p.y += nameLabel->box.size.y;
-		addChild(nameLabel);
+		infoWidget->addChild(nameLabel);
+		pos = nameLabel->box.getBottomLeft();
 
 		ui::Label *pluginLabel = new ui::Label;
+		// pluginLabel->box.size.x = infoWidget->box.size.x;
+		pluginLabel->box.pos = pos;
 		pluginLabel->text = model->plugin->name;
-		pluginLabel->box.pos = p;
-		p.y += pluginLabel->box.size.y;
-		addChild(pluginLabel);
+		infoWidget->addChild(pluginLabel);
+		pos = pluginLabel->box.getBottomLeft();
+
+		ui::Label *descriptionLabel = new ui::Label;
+		descriptionLabel->box.size.x = infoWidget->box.size.x;
+		descriptionLabel->box.pos = pos;
+		descriptionLabel->text = model->description;
+		infoWidget->addChild(descriptionLabel);
+		pos = descriptionLabel->box.getBottomLeft();
+
+		pos.y = infoWidget->box.size.y;
+		for (const std::string &tag : model->tags) {
+			ui::Button *tagButton = new ui::Button;
+			tagButton->box.size.x = infoWidget->box.size.x;
+			tagButton->box.pos = pos;
+			tagButton->box.pos.y -= tagButton->box.size.y;
+			tagButton->text = tag;
+			infoWidget->addChild(tagButton);
+			pos = tagButton->box.getTopLeft();
+		}
+
+		ui::Button *favoriteButton = new ui::Button;
+		favoriteButton->box.size.x = infoWidget->box.size.x;
+		favoriteButton->box.pos = pos;
+		favoriteButton->box.pos.y -= favoriteButton->box.size.y;
+		favoriteButton->text = "★";
+		infoWidget->addChild(favoriteButton);
+		pos = favoriteButton->box.getTopLeft();
+	}
+
+	void createPreview() {
+		assert(!previewWidget);
+		previewWidget = new widget::TransparentWidget;
+		previewWidget->box.size.y = std::ceil(RACK_GRID_HEIGHT * MODEL_BOX_ZOOM);
+		addChild(previewWidget);
+
+		widget::FramebufferWidget *fbWidget = new widget::FramebufferWidget;
+		if (math::isNear(APP->window->pixelRatio, 1.0)) {
+			// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
+			fbWidget->oversample = 2.0;
+		}
+		previewWidget->addChild(fbWidget);
+
+		widget::ZoomWidget *zoomWidget = new widget::ZoomWidget;
+		zoomWidget->setZoom(MODEL_BOX_ZOOM);
+		fbWidget->addChild(zoomWidget);
+
+		ModuleWidget *moduleWidget = model->createModuleWidgetNull();
+		zoomWidget->addChild(moduleWidget);
+
+		zoomWidget->box.size.x = moduleWidget->box.size.x * MODEL_BOX_ZOOM;
+		zoomWidget->box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
+		previewWidget->box.size.x = std::ceil(zoomWidget->box.size.x);
+
+		// Reposition infoWidget
+		infoWidget->box.pos.x = previewWidget->box.size.x;
+		box.size.x = previewWidget->box.size.x + infoWidget->box.size.x;
+	}
+
+	void deletePreview() {
+		assert(previewWidget);
+		removeChild(previewWidget);
+		delete previewWidget;
+		previewWidget = NULL;
 	}
 
 	void step() override {
 		if (previewWidget && ++visibleFrames >= 60) {
-			removeChild(previewWidget);
-			delete previewWidget;
-			previewWidget = NULL;
+			deletePreview();
 		}
 	}
 
 	void draw(const widget::DrawContext &ctx) override {
 		visibleFrames = 0;
 
-		// Lazily create ModuleWidget when drawn
+		// Lazily create preview when drawn
 		if (!previewWidget) {
-			widget::Widget *transparentWidget = new widget::TransparentWidget;
-			addChild(transparentWidget);
-
-			widget::FramebufferWidget *fbWidget = new widget::FramebufferWidget;
-			if (math::isNear(APP->window->pixelRatio, 1.0)) {
-				// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
-				fbWidget->oversample = 2.0;
-			}
-			transparentWidget->addChild(fbWidget);
-
-			widget::ZoomWidget *zoomWidget = new widget::ZoomWidget;
-			zoomWidget->setZoom(0.5f);
-			fbWidget->addChild(zoomWidget);
-
-			ModuleWidget *moduleWidget = model->createModuleWidgetNull();
-			zoomWidget->addChild(moduleWidget);
-
-			zoomWidget->box.size.x = moduleWidget->box.size.x * zoomWidget->zoom;
-			zoomWidget->box.size.y = RACK_GRID_HEIGHT;
-			float width = std::ceil(zoomWidget->box.size.x);
-			box.size.x = std::max(box.size.x, width);
-
-			previewWidget = transparentWidget;
+			createPreview();
 		}
 
+		nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
 		widget::OpaqueWidget::draw(ctx);
+		nvgResetScissor(ctx.vg);
+
+		// Translucent overlay when selected
 		if (selected) {
 			nvgBeginPath(ctx.vg);
 			nvgRect(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
@@ -180,20 +224,82 @@ struct ModelBox : widget::OpaqueWidget {
 
 
 struct BrowserSearchField : ui::TextField {
+	void step() override {
+		// Steal focus when step is called
+		APP->event->setSelected(this);
+		ui::TextField::step();
+	}
+	void onSelectKey(const event::SelectKey &e) override {
+		if (e.action == GLFW_PRESS) {
+			if (e.key == GLFW_KEY_ESCAPE) {
+				BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
+				overlay->hide();
+				e.consume(this);
+			}
+		}
+
+		if (!e.getConsumed())
+			ui::TextField::onSelectKey(e);
+	}
 	void onChange(const event::Change &e) override;
+	void onHide(const event::Hide &e) override {
+		setText("");
+		APP->event->setSelected(NULL);
+		ui::TextField::onHide(e);
+	}
 };
 
 
 struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
+	ui::List *pluginList;
+	ui::ScrollWidget *pluginScroll;
+	ui::List *tagList;
+	ui::ScrollWidget *tagScroll;
 
 	BrowserSidebar() {
 		searchField = new BrowserSearchField;
 		addChild(searchField);
+
+		pluginScroll = new ui::ScrollWidget;
+		pluginScroll->box.pos = searchField->box.getBottomLeft();
+		addChild(pluginScroll);
+
+		pluginList = new ui::List;
+		pluginScroll->container->addChild(pluginList);
+
+		std::set<std::string> pluginNames;
+		for (plugin::Plugin *plugin : plugin::plugins) {
+			pluginNames.insert(plugin->name);
+		}
+
+		for (const std::string &pluginName : pluginNames) {
+			ui::MenuItem *item = new ui::MenuItem;
+			item->text = pluginName;
+			pluginList->addChild(item);
+		}
+
+		tagScroll = new ui::ScrollWidget;
+		tagScroll->box.pos = searchField->box.getBottomLeft();
+		addChild(tagScroll);
+
+		tagList = new ui::List;
+		tagScroll->container->addChild(tagList);
+
+		for (const std::string &tag : plugin::allowedTags) {
+			ui::MenuItem *item = new ui::MenuItem;
+			item->text = tag;
+			tagList->addChild(item);
+		}
 	}
 
 	void step() override {
 		searchField->box.size.x = box.size.x;
+		pluginScroll->box.size.y = box.size.y - searchField->box.size.y;
+		pluginList->box.size.x = pluginScroll->box.size.x = box.size.x / 2;
+		tagScroll->box.pos.x = box.size.x / 2;
+		tagScroll->box.size.y = box.size.y - searchField->box.size.y;
+		tagList->box.size.x = tagScroll->box.size.x = box.size.x / 2;
 		widget::Widget::step();
 	}
 };
@@ -202,6 +308,7 @@ struct BrowserSidebar : widget::Widget {
 struct ModuleBrowser : widget::OpaqueWidget {
 	BrowserSidebar *sidebar;
 	ui::ScrollWidget *modelScroll;
+	ui::MarginLayout *modelMargin;
 	ui::SequentialLayout *modelContainer;
 
 	ModuleBrowser() {
@@ -212,9 +319,13 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelScroll = new ui::ScrollWidget;
 		addChild(modelScroll);
 
+		modelMargin = new ui::MarginLayout;
+		modelMargin->margin = math::Vec(20, 20);
+		modelScroll->container->addChild(modelMargin);
+
 		modelContainer = new ui::SequentialLayout;
-		modelContainer->spacing = math::Vec(10, 10);
-		modelScroll->container->addChild(modelContainer);
+		modelContainer->spacing = math::Vec(20, 20);
+		modelMargin->addChild(modelContainer);
 
 		for (plugin::Plugin *plugin : plugin::plugins) {
 			for (plugin::Model *model : plugin->models) {
@@ -233,8 +344,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelScroll->box.pos.x = sidebar->box.size.x;
 		modelScroll->box.size.x = box.size.x - sidebar->box.size.x;
 		modelScroll->box.size.y = box.size.y;
-		modelContainer->box.size.x = modelScroll->box.size.x;
-		modelContainer->box.size.y = modelContainer->getChildrenBoundingBox().getBottomRight().y;
+		modelMargin->box.size.x = modelScroll->box.size.x;
+		modelMargin->box.size.y = modelContainer->getChildrenBoundingBox().size.y + 2 * modelMargin->margin.y;
 
 		widget::OpaqueWidget::step();
 	}
@@ -251,6 +362,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			bool match = isModelMatch(modelBox->model, search);
 			modelBox->visible = match;
 		}
+		// Reset scroll position
+		modelScroll->offset = math::Vec();
 	}
 };
 
@@ -259,6 +372,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 
 void ModelBox::onButton(const event::Button &e) {
+	widget::OpaqueWidget::onButton(e);
+	if (e.getConsumed() != this)
+		return;
+
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		// Create module
 		ModuleWidget *moduleWidget = model->createModuleWidget();
@@ -268,9 +385,9 @@ void ModelBox::onButton(const event::Button &e) {
 		// Pretend the moduleWidget was clicked so it can be dragged in the RackWidget
 		e.consume(moduleWidget);
 
-		// Close Module Browser
+		// Hide Module Browser
 		BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
-		overlay->visible = false;
+		overlay->hide();
 
 		// Push ModuleAdd history action
 		history::ModuleAdd *h = new history::ModuleAdd;
@@ -278,7 +395,6 @@ void ModelBox::onButton(const event::Button &e) {
 		h->setModule(moduleWidget);
 		APP->history->push(h);
 	}
-	widget::OpaqueWidget::onButton(e);
 }
 
 void BrowserSearchField::onChange(const event::Change &e) {

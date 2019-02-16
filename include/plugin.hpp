@@ -3,7 +3,7 @@
 #include "plugin/Plugin.hpp"
 #include "plugin/Model.hpp"
 #include <vector>
-#include <list>
+#include <set>
 
 
 namespace rack {
@@ -16,21 +16,21 @@ namespace plugin {
 
 void init(bool devMode);
 void destroy();
-void logIn(std::string email, std::string password);
+void logIn(const std::string &email, const std::string &password);
 void logOut();
 /** Returns whether a new plugin is available, and downloads it unless doing a dry run */
 bool sync(bool dryRun);
 void cancelDownload();
 bool isLoggedIn();
-Plugin *getPlugin(std::string pluginSlug);
-Model *getModel(std::string pluginSlug, std::string modelSlug);
-std::string getAllowedTag(std::string tag);
+Plugin *getPlugin(const std::string &pluginSlug);
+Model *getModel(const std::string &pluginSlug, const std::string &modelSlug);
+std::string normalizeTag(const std::string &tag);
 /** Checks that the slug contains only alphanumeric characters, "-", and "_" */
-bool isSlugValid(std::string slug);
+bool isSlugValid(const std::string &slug);
 
 
 extern const std::vector<std::string> allowedTags;
-extern std::list<Plugin*> plugins;
+extern std::vector<Plugin*> plugins;
 extern bool isDownloading;
 extern float downloadProgress;
 extern std::string downloadName;

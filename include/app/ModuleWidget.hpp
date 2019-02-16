@@ -26,7 +26,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	math::Vec dragPos;
 	math::Vec oldPos;
 
-	ModuleWidget() {}
+	ModuleWidget();
 	DEPRECATED ModuleWidget(engine::Module *module) {
 		setModule(module);
 	}
