@@ -143,6 +143,10 @@ struct Counter {
 		period = 1;
 	}
 
+	void setPeriod(int period) {
+		this->period = period;
+	}
+
 	/** Returns true if the counter reaches `period` and resets. */
 	bool process() {
 		if (++count >= period) {
