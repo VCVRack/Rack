@@ -241,9 +241,9 @@ struct CV_MIDI : Module {
 		midiOutput.midi::Output::reset();
 	}
 
-	void step() override {
+	void process(const ProcessContext &ctx) override {
 		const float rateLimiterPeriod = 0.005f;
-		rateLimiterPhase += APP->engine->getSampleTime() / rateLimiterPeriod;
+		rateLimiterPhase += ctx.sampleTime / rateLimiterPeriod;
 		if (rateLimiterPhase >= 1.f) {
 			rateLimiterPhase -= 1.f;
 		}

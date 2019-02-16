@@ -65,13 +65,11 @@ struct MIDI_Map : Module {
 		midiInput.reset();
 	}
 
-	void step() override {
+	void process(const ProcessContext &ctx) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-
-		float deltaTime = APP->engine->getSampleTime();
 
 		// Step channels
 		for (int id = 0; id < mapLen; id++) {
@@ -92,7 +90,7 @@ struct MIDI_Map : Module {
 				continue;
 			// Set param
 			float v = rescale(values[cc], 0, 127, 0.f, 1.f);
-			v = valueFilters[id].process(deltaTime, v);
+			v = valueFilters[id].process(ctx.sampleTime, v);
 			v = rescale(v, 0.f, 1.f, param->minValue, param->maxValue);
 			APP->engine->setParam(module, paramId, v);
 		}

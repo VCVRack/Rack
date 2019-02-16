@@ -130,9 +130,13 @@ struct Timer {
 };
 
 
+/** Counts the number of `process()` calls.
+If `period > 0`, `count` is reset to 0 when that number is reached.
+Useful for clock dividing and waiting to fill a fixed buffer.
+*/
 struct Counter {
 	int count;
-	int period;
+	int period = 0;
 
 	Counter() {
 		reset();
@@ -140,16 +144,17 @@ struct Counter {
 
 	void reset() {
 		count = 0;
-		period = 1;
 	}
 
 	void setPeriod(int period) {
 		this->period = period;
+		reset();
 	}
 
-	/** Returns true if the counter reaches `period` and resets. */
+	/** Returns true when the counter reaches `period` and resets. */
 	bool process() {
-		if (++count >= period) {
+		count++;
+		if (count == period) {
 			count = 0;
 			return true;
 		}

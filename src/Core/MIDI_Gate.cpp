@@ -46,12 +46,11 @@ struct MIDI_Gate : Module {
 		}
 	}
 
-	void step() override {
+	void process(const ProcessContext &ctx) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-		float deltaTime = APP->engine->getSampleTime();
 
 		for (int i = 0; i < 16; i++) {
 			if (gateTimes[i] > 0.f) {
@@ -59,7 +58,7 @@ struct MIDI_Gate : Module {
 				// If the gate is off, wait 1 ms before turning the pulse off.
 				// This avoids drum controllers sending a pulse with 0 ms duration.
 				if (!gates[i]) {
-					gateTimes[i] -= deltaTime;
+					gateTimes[i] -= ctx.sampleTime;
 				}
 			}
 			else {

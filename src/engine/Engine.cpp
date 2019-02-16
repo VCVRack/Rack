@@ -190,7 +190,11 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 
 	// int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
-	float deltaTime = internal->sampleTime;
+	float sampleTime = internal->sampleTime;
+
+	Module::ProcessContext processCtx;
+	processCtx.sampleRate = internal->sampleRate;
+	processCtx.sampleTime = internal->sampleTime;
 
 	// Step each module
 	// for (int i = threadId; i < modulesLen; i += threadCount) {
@@ -206,25 +210,28 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 			if (settings.cpuMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
 
+				module->process(processCtx);
 				module->step();
 
 				auto stopTime = std::chrono::high_resolution_clock::now();
 				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
 				// Smooth CPU time
 				const float cpuTau = 2.f /* seconds */;
-				module->cpuTime += (cpuTime - module->cpuTime) * deltaTime / cpuTau;
+				module->cpuTime += (cpuTime - module->cpuTime) * sampleTime / cpuTau;
 			}
 			else {
+				module->process(processCtx);
+				// Call deprecated method
 				module->step();
 			}
 		}
 
 		// Iterate ports to step plug lights
 		for (Input &input : module->inputs) {
-			input.process(deltaTime);
+			input.process(sampleTime);
 		}
 		for (Output &output : module->outputs) {
-			output.process(deltaTime);
+			output.process(sampleTime);
 		}
 	}
 }

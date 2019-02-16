@@ -42,13 +42,11 @@ struct MIDI_CC : Module {
 		midiInput.reset();
 	}
 
-	void step() override {
+	void process(const ProcessContext &ctx) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
 		}
-
-		float deltaTime = APP->engine->getSampleTime();
 
 		for (int i = 0; i < 16; i++) {
 			if (!outputs[CC_OUTPUT + i].isConnected())
@@ -65,7 +63,7 @@ struct MIDI_CC : Module {
 			}
 			else {
 				// Smooth value with filter
-				valueFilters[i].process(deltaTime, value);
+				valueFilters[i].process(ctx.sampleTime, value);
 			}
 			lastValues[i] = values[cc];
 			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out);
