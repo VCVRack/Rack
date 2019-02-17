@@ -1,4 +1,5 @@
 #pragma once
+
 // Include most Rack headers for convenience
 #include "common.hpp"
 #include "math.hpp"
@@ -11,6 +12,7 @@
 #include "app.hpp"
 #include "midi.hpp"
 #include "helpers.hpp"
+#include "component.hpp"
 
 #include "widget/Widget.hpp"
 #include "widget/TransparentWidget.hpp"
@@ -90,9 +92,12 @@
 #include "dsp/vumeter.hpp"
 #include "dsp/window.hpp"
 
+
 namespace rack {
 
 
+/** Define this macro before including this header to prevent common namespaces from being included in the main `rack::` namespace. */
+#ifndef RACK_FLATTEN_NAMESPACES
 // Import some namespaces for convenience
 using namespace math;
 using namespace widget;
@@ -101,9 +106,8 @@ using namespace app;
 using plugin::Plugin;
 using plugin::Model;
 using namespace engine;
-
-namespace component {}
 using namespace component;
+#endif
 
 
 } // namespace rack

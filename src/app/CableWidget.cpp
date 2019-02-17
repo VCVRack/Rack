@@ -6,6 +6,7 @@
 #include "app.hpp"
 #include "patch.hpp"
 #include "settings.hpp"
+#include "engine/Port.hpp"
 
 
 namespace rack {
@@ -219,7 +220,7 @@ void CableWidget::draw(const DrawArgs &args) {
 	float thickness = 5;
 
 	if (isComplete()) {
-		Output *output = &cable->outputModule->outputs[cable->outputId];
+		engine::Output *output = &cable->outputModule->outputs[cable->outputId];
 		// Draw opaque if mouse is hovering over a connected port
 		if (output->channels > 1) {
 			// Increase thickness if output port is polyphonic

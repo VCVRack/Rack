@@ -1,7 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include <jansson.h>
-#include <list>
+#include <vector>
 
 
 namespace rack {
@@ -14,7 +14,7 @@ struct Model;
 // Subclass this and return a pointer to a new one when init() is called
 struct Plugin {
 	/** A list of the models available by this plugin, add with addModel() */
-	std::list<Model*> models;
+	std::vector<Model*> models;
 	/** The file path of the plugin's directory */
 	std::string path;
 	/** OS-dependent library handle */

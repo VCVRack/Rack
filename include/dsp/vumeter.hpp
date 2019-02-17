@@ -6,7 +6,7 @@ namespace rack {
 namespace dsp {
 
 
-/** Deprecated. Use VuMeter2. */
+/** Deprecated. Use VuMeter2 instead. */
 struct VuMeter {
 	/** Decibel level difference between adjacent meter lights */
 	float dBInterval = 3.0;
@@ -34,17 +34,18 @@ DEPRECATED typedef VuMeter VUMeter;
 
 
 /** Models a VU meter with smoothing.
-Supports peak and RMS (root-mean-square) metering
+Supports peak and RMS (root-mean-square) metering.
 Usage example for a strip of lights with 3dB increments:
-
-	// Update VuMeter state every frame.
-	vuMeter.process(deltaTime, output);
-	// Iterate lights every ~512 frames (less than a screen refresh).
-	for (int i = 0; i < 6; i++) {
-		float b = vuMeter.getBrightness(-3.f * (i + 1), -3.f * i);
-		// No need to use setSmoothBrightness() since VuMeter2 smooths the value for you.
-		lights[i].setBrightness(b);
-	}
+```
+// Update VuMeter state every frame.
+vuMeter.process(deltaTime, output);
+// Iterate lights every ~512 frames (less than a screen refresh).
+for (int i = 0; i < 6; i++) {
+	float b = vuMeter.getBrightness(-3.f * (i + 1), -3.f * i);
+	// No need to use setSmoothBrightness() since VuMeter2 smooths the value for you.
+	lights[i].setBrightness(b);
+}
+```
 */
 struct VuMeter2 {
 	enum Mode {

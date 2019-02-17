@@ -18,8 +18,8 @@ void alignedDelete(T *p) {
 }
 
 
-/** Real-valued FFT context
-Wrapper for PFFFT (https://bitbucket.org/jpommier/pffft/)
+/** Real-valued FFT context.
+Wrapper for [PFFFT](https://bitbucket.org/jpommier/pffft/)
 `length` must be a multiple of 32.
 */
 struct RealFFT {
@@ -72,8 +72,7 @@ struct RealFFT {
 		pffft_transform_ordered(setup, input, output, NULL, PFFFT_BACKWARD);
 	}
 
-	/** Scales the RFFT so that
-	scale(IFFT(FFT(x))) = x
+	/** Scales the RFFT so that `scale(IFFT(FFT(x))) = x`.
 	*/
 	void scale(float *x) {
 		float a = 1.f / length;
@@ -84,7 +83,7 @@ struct RealFFT {
 };
 
 
-/** Complex-valued FFT context
+/** Complex-valued FFT context.
 `length` must be a multiple of 16.
 */
 struct ComplexFFT {

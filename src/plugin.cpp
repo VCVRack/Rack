@@ -527,7 +527,7 @@ Model *getModel(const std::string &pluginSlug, const std::string &modelSlug) {
 }
 
 
-/** List of allowed tags in human display form.
+/** List of allowed tags in human display form, alphabetized.
 All tags here should be in sentence caps for display consistency.
 However, tags are case-insensitive in plugin metadata.
 */
