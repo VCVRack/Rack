@@ -28,8 +28,8 @@ void RackScrollWidget::step() {
 }
 
 
-void RackScrollWidget::draw(const widget::DrawContext &ctx) {
-	ui::ScrollWidget::draw(ctx);
+void RackScrollWidget::draw(const DrawArgs &args) {
+	ui::ScrollWidget::draw(args);
 }
 
 

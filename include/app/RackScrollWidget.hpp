@@ -9,7 +9,7 @@ namespace app {
 
 struct RackScrollWidget : ui::ScrollWidget {
 	void step() override;
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 

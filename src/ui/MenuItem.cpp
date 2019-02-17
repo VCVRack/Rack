@@ -5,7 +5,7 @@ namespace rack {
 namespace ui {
 
 
-void MenuItem::draw(const widget::DrawContext &ctx) {
+void MenuItem::draw(const DrawArgs &args) {
 	BNDwidgetState state = BND_DEFAULT;
 
 	if (APP->event->hoveredWidget == this)
@@ -18,14 +18,14 @@ void MenuItem::draw(const widget::DrawContext &ctx) {
 
 	// Main text and background
 	if (!disabled)
-		bndMenuItem(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
+		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
 	else
-		bndMenuLabel(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
+		bndMenuLabel(args.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
 
 	// Right text
-	float x = box.size.x - bndLabelWidth(ctx.vg, -1, rightText.c_str());
+	float x = box.size.x - bndLabelWidth(args.vg, -1, rightText.c_str());
 	NVGcolor rightColor = (state == BND_DEFAULT && !disabled) ? bndGetTheme()->menuTheme.textColor : bndGetTheme()->menuTheme.textSelectedColor;
-	bndIconLabelValue(ctx.vg, x, 0.0, box.size.x, box.size.y, -1, rightColor, BND_LEFT, BND_LABEL_FONT_SIZE, rightText.c_str(), NULL);
+	bndIconLabelValue(args.vg, x, 0.0, box.size.x, box.size.y, -1, rightColor, BND_LEFT, BND_LABEL_FONT_SIZE, rightText.c_str(), NULL);
 }
 
 void MenuItem::step() {

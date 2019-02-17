@@ -6,8 +6,8 @@ namespace rack {
 namespace ui {
 
 
-void MenuLabel::draw(const widget::DrawContext &ctx) {
-	bndMenuLabel(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
+void MenuLabel::draw(const DrawArgs &args) {
+	bndMenuLabel(args.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
 }
 
 void MenuLabel::step() {

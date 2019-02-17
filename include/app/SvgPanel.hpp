@@ -11,7 +11,7 @@ namespace app {
 
 
 struct PanelBorder : widget::TransparentWidget {
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 

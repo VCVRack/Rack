@@ -37,10 +37,10 @@ struct TransformWidget : Widget {
 		nvgTransformPremultiply(transform, t);
 	}
 
-	void draw(const DrawContext &ctx) override {
+	void draw(const DrawArgs &args) override {
 		// No need to save the state because that is done in the parent
-		nvgTransform(ctx.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
-		Widget::draw(ctx);
+		nvgTransform(args.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
+		Widget::draw(args);
 	}
 };
 

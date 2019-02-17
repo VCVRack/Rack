@@ -122,10 +122,10 @@ struct AudioInterface : Module {
 		onSampleRateChange();
 	}
 
-	void process(const ProcessContext &ctx) override {
+	void process(const ProcessArgs &args) override {
 		// Update SRC states
-		inputSrc.setRates(port.sampleRate, ctx.sampleRate);
-		outputSrc.setRates(ctx.sampleRate, port.sampleRate);
+		inputSrc.setRates(port.sampleRate, args.sampleRate);
+		outputSrc.setRates(args.sampleRate, port.sampleRate);
 
 		inputSrc.setChannels(port.numInputs);
 		outputSrc.setChannels(port.numOutputs);

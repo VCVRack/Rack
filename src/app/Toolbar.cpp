@@ -27,8 +27,8 @@ struct MenuButton : ui::Button {
 		box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + 1.0;
 		widget::Widget::step();
 	}
-	void draw(const widget::DrawContext &ctx) override {
-		bndMenuItem(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
+	void draw(const DrawArgs &args) override {
+		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
 	}
 };
 
@@ -582,16 +582,16 @@ struct PluginsButton : MenuButton {
 		}
 	}
 
-	void draw(const widget::DrawContext &ctx) override {
-		MenuButton::draw(ctx);
+	void draw(const DrawArgs &args) override {
+		MenuButton::draw(args);
 		// if (1) {
 		// 	// Notification circle
-		// 	nvgBeginPath(ctx.vg);
-		// 	nvgCircle(ctx.vg, box.size.x - 3, 3, 4.0);
-		// 	nvgFillColor(ctx.vg, nvgRGBf(1.0, 0.0, 0.0));
-		// 	nvgFill(ctx.vg);
-		// 	nvgStrokeColor(ctx.vg, nvgRGBf(0.5, 0.0, 0.0));
-		// 	nvgStroke(ctx.vg);
+		// 	nvgBeginPath(args.vg);
+		// 	nvgCircle(args.vg, box.size.x - 3, 3, 4.0);
+		// 	nvgFillColor(args.vg, nvgRGBf(1.0, 0.0, 0.0));
+		// 	nvgFill(args.vg);
+		// 	nvgStrokeColor(args.vg, nvgRGBf(0.5, 0.0, 0.0));
+		// 	nvgStroke(args.vg);
 		// }
 	}
 };
@@ -676,11 +676,11 @@ Toolbar::Toolbar() {
 	layout->addChild(helpButton);
 }
 
-void Toolbar::draw(const widget::DrawContext &ctx) {
-	bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
-	bndBevel(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
+void Toolbar::draw(const DrawArgs &args) {
+	bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
+	bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 
-	widget::Widget::draw(ctx);
+	widget::Widget::draw(args);
 }
 
 

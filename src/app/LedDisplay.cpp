@@ -9,16 +9,16 @@ namespace rack {
 namespace app {
 
 
-void LedDisplay::draw(const widget::DrawContext &ctx) {
+void LedDisplay::draw(const DrawArgs &args) {
 
-	nvgBeginPath(ctx.vg);
-	nvgRoundedRect(ctx.vg, 0, 0, box.size.x, box.size.y, 5.0);
-	nvgFillColor(ctx.vg, nvgRGB(0x00, 0x00, 0x00));
-	nvgFill(ctx.vg);
+	nvgBeginPath(args.vg);
+	nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
+	nvgFillColor(args.vg, nvgRGB(0x00, 0x00, 0x00));
+	nvgFill(args.vg);
 
-	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
-	widget::Widget::draw(ctx);
-	nvgResetScissor(ctx.vg);
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+	widget::Widget::draw(args);
+	nvgResetScissor(args.vg);
 }
 
 
@@ -26,13 +26,13 @@ LedDisplaySeparator::LedDisplaySeparator() {
 	box.size = math::Vec();
 }
 
-void LedDisplaySeparator::draw(const widget::DrawContext &ctx) {
-	nvgBeginPath(ctx.vg);
-	nvgMoveTo(ctx.vg, 0, 0);
-	nvgLineTo(ctx.vg, box.size.x, box.size.y);
-	nvgStrokeWidth(ctx.vg, 1.0);
-	nvgStrokeColor(ctx.vg, nvgRGB(0x33, 0x33, 0x33));
-	nvgStroke(ctx.vg);
+void LedDisplaySeparator::draw(const DrawArgs &args) {
+	nvgBeginPath(args.vg);
+	nvgMoveTo(args.vg, 0, 0);
+	nvgLineTo(args.vg, box.size.x, box.size.y);
+	nvgStrokeWidth(args.vg, 1.0);
+	nvgStrokeColor(args.vg, nvgRGB(0x33, 0x33, 0x33));
+	nvgStroke(args.vg);
 }
 
 
@@ -44,21 +44,21 @@ LedDisplayChoice::LedDisplayChoice() {
 	textOffset = math::Vec(10, 18);
 }
 
-void LedDisplayChoice::draw(const widget::DrawContext &ctx) {
+void LedDisplayChoice::draw(const DrawArgs &args) {
 	if (bgColor.a > 0.0) {
-		nvgBeginPath(ctx.vg);
-		nvgRect(ctx.vg, 0, 0, box.size.x, box.size.y);
-		nvgFillColor(ctx.vg, bgColor);
-		nvgFill(ctx.vg);
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+		nvgFillColor(args.vg, bgColor);
+		nvgFill(args.vg);
 	}
 
 	if (font->handle >= 0) {
-		nvgFillColor(ctx.vg, color);
-		nvgFontFaceId(ctx.vg, font->handle);
-		nvgTextLetterSpacing(ctx.vg, 0.0);
+		nvgFillColor(args.vg, color);
+		nvgFontFaceId(args.vg, font->handle);
+		nvgTextLetterSpacing(args.vg, 0.0);
 
-		nvgFontSize(ctx.vg, 12);
-		nvgText(ctx.vg, textOffset.x, textOffset.y, text.c_str(), NULL);
+		nvgFontSize(args.vg, 12);
+		nvgText(args.vg, textOffset.x, textOffset.y, text.c_str(), NULL);
 	}
 }
 
@@ -78,14 +78,14 @@ LedDisplayTextField::LedDisplayTextField() {
 }
 
 
-void LedDisplayTextField::draw(const widget::DrawContext &ctx) {
-	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
+void LedDisplayTextField::draw(const DrawArgs &args) {
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
 	// Background
-	nvgBeginPath(ctx.vg);
-	nvgRoundedRect(ctx.vg, 0, 0, box.size.x, box.size.y, 5.0);
-	nvgFillColor(ctx.vg, nvgRGB(0x00, 0x00, 0x00));
-	nvgFill(ctx.vg);
+	nvgBeginPath(args.vg);
+	nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
+	nvgFillColor(args.vg, nvgRGB(0x00, 0x00, 0x00));
+	nvgFill(args.vg);
 
 	// Text
 	if (font->handle >= 0) {
@@ -95,14 +95,14 @@ void LedDisplayTextField::draw(const widget::DrawContext &ctx) {
 		highlightColor.a = 0.5;
 		int begin = std::min(cursor, selection);
 		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
-		bndIconLabelCaret(ctx.vg, textOffset.x, textOffset.y,
+		bndIconLabelCaret(args.vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, 12, text.c_str(), highlightColor, begin, end);
 
 		bndSetFont(APP->window->uiFont->handle);
 	}
 
-	nvgResetScissor(ctx.vg);
+	nvgResetScissor(args.vg);
 }
 
 int LedDisplayTextField::getTextPosition(math::Vec mousePos) {

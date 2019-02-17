@@ -189,7 +189,7 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 	}
 
-	void draw(const widget::DrawContext &ctx) override {
+	void draw(const DrawArgs &args) override {
 		visibleFrames = 0;
 
 		// Lazily create preview when drawn
@@ -197,16 +197,16 @@ struct ModelBox : widget::OpaqueWidget {
 			createPreview();
 		}
 
-		nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
-		widget::OpaqueWidget::draw(ctx);
-		nvgResetScissor(ctx.vg);
+		nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+		widget::OpaqueWidget::draw(args);
+		nvgResetScissor(args.vg);
 
 		// Translucent overlay when selected
 		if (selected) {
-			nvgBeginPath(ctx.vg);
-			nvgRect(ctx.vg, 0.0, 0.0, box.size.x, box.size.y);
-			nvgFillColor(ctx.vg, nvgRGBAf(1, 1, 1, 0.25));
-			nvgFill(ctx.vg);
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
+			nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.25));
+			nvgFill(args.vg);
 		}
 	}
 
@@ -350,9 +350,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		widget::OpaqueWidget::step();
 	}
 
-	void draw(const widget::DrawContext &ctx) override {
-		bndMenuBackground(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
-		widget::Widget::draw(ctx);
+	void draw(const DrawArgs &args) override {
+		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
+		widget::Widget::draw(args);
 	}
 
 	void setSearch(const std::string &search) {

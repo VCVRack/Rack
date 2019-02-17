@@ -42,7 +42,7 @@ struct MIDI_CC : Module {
 		midiInput.reset();
 	}
 
-	void process(const ProcessContext &ctx) override {
+	void process(const ProcessArgs &args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
@@ -63,7 +63,7 @@ struct MIDI_CC : Module {
 			}
 			else {
 				// Smooth value with filter
-				valueFilters[i].process(ctx.sampleTime, value);
+				valueFilters[i].process(args.sampleTime, value);
 			}
 			lastValues[i] = values[cc];
 			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out);

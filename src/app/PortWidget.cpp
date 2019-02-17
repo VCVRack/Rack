@@ -47,14 +47,14 @@ void PortWidget::step() {
 	plugLight->setBrightnesses(values);
 }
 
-void PortWidget::draw(const widget::DrawContext &ctx) {
+void PortWidget::draw(const DrawArgs &args) {
 	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
 	if (cw) {
 		// Dim the PortWidget if the active cable cannot plug into this PortWidget
 		if (type == OUTPUT ? cw->outputPort : cw->inputPort)
-			nvgGlobalAlpha(ctx.vg, 0.5);
+			nvgGlobalAlpha(args.vg, 0.5);
 	}
-	widget::Widget::draw(ctx);
+	widget::Widget::draw(args);
 }
 
 void PortWidget::onButton(const event::Button &e) {

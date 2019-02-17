@@ -26,7 +26,7 @@ struct RackWidget : widget::OpaqueWidget {
 	~RackWidget();
 
 	void step() override;
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 
 	void onHover(const event::Hover &e) override;
 	void onHoverKey(const event::HoverKey &e) override;

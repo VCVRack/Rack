@@ -18,7 +18,7 @@ struct MenuItem : MenuEntry {
 	std::string rightText;
 	bool disabled = false;
 
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	void step() override;
 	void onEnter(const event::Enter &e) override;
 	void onDragStart(const event::DragStart &e) override;

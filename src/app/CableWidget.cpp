@@ -11,67 +11,67 @@
 namespace rack {
 namespace app {
 
-static void drawPlug(const widget::DrawContext &ctx, math::Vec pos, NVGcolor color) {
+static void drawPlug(NVGcontext *vg, math::Vec pos, NVGcolor color) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Plug solid
-	nvgBeginPath(ctx.vg);
-	nvgCircle(ctx.vg, pos.x, pos.y, 9);
-	nvgFillColor(ctx.vg, color);
-	nvgFill(ctx.vg);
+	nvgBeginPath(vg);
+	nvgCircle(vg, pos.x, pos.y, 9);
+	nvgFillColor(vg, color);
+	nvgFill(vg);
 
 	// Border
-	nvgStrokeWidth(ctx.vg, 1.0);
-	nvgStrokeColor(ctx.vg, colorOutline);
-	nvgStroke(ctx.vg);
+	nvgStrokeWidth(vg, 1.0);
+	nvgStrokeColor(vg, colorOutline);
+	nvgStroke(vg);
 
 	// Hole
-	nvgBeginPath(ctx.vg);
-	nvgCircle(ctx.vg, pos.x, pos.y, 5);
-	nvgFillColor(ctx.vg, nvgRGBf(0.0, 0.0, 0.0));
-	nvgFill(ctx.vg);
+	nvgBeginPath(vg);
+	nvgCircle(vg, pos.x, pos.y, 5);
+	nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
+	nvgFill(vg);
 }
 
-static void drawCable(const widget::DrawContext &ctx, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
+static void drawCable(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
 	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Cable
 	if (opacity > 0.0) {
-		nvgSave(ctx.vg);
+		nvgSave(vg);
 		// This power scaling looks more linear than actual linear scaling
-		nvgGlobalAlpha(ctx.vg, std::pow(opacity, 1.5));
+		nvgGlobalAlpha(vg, std::pow(opacity, 1.5));
 
 		float dist = pos1.minus(pos2).norm();
 		math::Vec slump;
 		slump.y = (1.0 - tension) * (150.0 + 1.0*dist);
 		math::Vec pos3 = pos1.plus(pos2).div(2).plus(slump);
 
-		nvgLineJoin(ctx.vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
 
 		// Shadow
 		math::Vec pos4 = pos3.plus(slump.mult(0.08));
-		nvgBeginPath(ctx.vg);
-		nvgMoveTo(ctx.vg, pos1.x, pos1.y);
-		nvgQuadTo(ctx.vg, pos4.x, pos4.y, pos2.x, pos2.y);
-		nvgStrokeColor(ctx.vg, colorShadow);
-		nvgStrokeWidth(ctx.vg, thickness);
-		nvgStroke(ctx.vg);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, pos1.x, pos1.y);
+		nvgQuadTo(vg, pos4.x, pos4.y, pos2.x, pos2.y);
+		nvgStrokeColor(vg, colorShadow);
+		nvgStrokeWidth(vg, thickness);
+		nvgStroke(vg);
 
 		// Cable outline
-		nvgBeginPath(ctx.vg);
-		nvgMoveTo(ctx.vg, pos1.x, pos1.y);
-		nvgQuadTo(ctx.vg, pos3.x, pos3.y, pos2.x, pos2.y);
-		nvgStrokeColor(ctx.vg, colorOutline);
-		nvgStrokeWidth(ctx.vg, thickness);
-		nvgStroke(ctx.vg);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, pos1.x, pos1.y);
+		nvgQuadTo(vg, pos3.x, pos3.y, pos2.x, pos2.y);
+		nvgStrokeColor(vg, colorOutline);
+		nvgStrokeWidth(vg, thickness);
+		nvgStroke(vg);
 
 		// Cable solid
-		nvgStrokeColor(ctx.vg, color);
-		nvgStrokeWidth(ctx.vg, thickness - 2);
-		nvgStroke(ctx.vg);
+		nvgStrokeColor(vg, color);
+		nvgStrokeWidth(vg, thickness - 2);
+		nvgStroke(vg);
 
-		nvgRestore(ctx.vg);
+		nvgRestore(vg);
 	}
 }
 
@@ -213,7 +213,7 @@ void CableWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-void CableWidget::draw(const widget::DrawContext &ctx) {
+void CableWidget::draw(const DrawArgs &args) {
 	float opacity = settings.cableOpacity;
 	float tension = settings.cableTension;
 	float thickness = 5;
@@ -241,33 +241,33 @@ void CableWidget::draw(const widget::DrawContext &ctx) {
 
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
-	drawCable(ctx, outputPos, inputPos, color, thickness, tension, opacity);
+	drawCable(args.vg, outputPos, inputPos, color, thickness, tension, opacity);
 }
 
-void CableWidget::drawPlugs(const widget::DrawContext &ctx) {
+void CableWidget::drawPlugs(const DrawArgs &args) {
 	// TODO Figure out a way to draw plugs first and cables last, and cut the plug portion of the cable off.
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
 
 	// Draw plug if the cable is on top, or if the cable is incomplete
 	if (!isComplete() || APP->scene->rackWidget->getTopCable(outputPort) == this) {
-		drawPlug(ctx, outputPos, color);
+		drawPlug(args.vg, outputPos, color);
 		if (isComplete()) {
 			// Draw plug light
-			nvgSave(ctx.vg);
-			nvgTranslate(ctx.vg, outputPos.x - 4, outputPos.y - 4);
-			outputPort->plugLight->draw(ctx);
-			nvgRestore(ctx.vg);
+			nvgSave(args.vg);
+			nvgTranslate(args.vg, outputPos.x - 4, outputPos.y - 4);
+			outputPort->plugLight->draw(args);
+			nvgRestore(args.vg);
 		}
 	}
 
 	if (!isComplete() || APP->scene->rackWidget->getTopCable(inputPort) == this) {
-		drawPlug(ctx, inputPos, color);
+		drawPlug(args.vg, inputPos, color);
 		if (isComplete()) {
-			nvgSave(ctx.vg);
-			nvgTranslate(ctx.vg, inputPos.x - 4, inputPos.y - 4);
-			inputPort->plugLight->draw(ctx);
-			nvgRestore(ctx.vg);
+			nvgSave(args.vg);
+			nvgTranslate(args.vg, inputPos.x - 4, inputPos.y - 4);
+			inputPort->plugLight->draw(args);
+			nvgRestore(args.vg);
 		}
 	}
 }

@@ -11,7 +11,7 @@ struct CircularShadow : widget::TransparentWidget {
 	float blurRadius;
 	float opacity;
 	CircularShadow();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 

@@ -26,7 +26,7 @@ struct PortWidget : widget::OpaqueWidget {
 	~PortWidget();
 
 	void step() override;
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 
 	void onButton(const event::Button &e) override;
 	void onEnter(const event::Enter &e) override;

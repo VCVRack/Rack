@@ -141,59 +141,59 @@ ModuleWidget::~ModuleWidget() {
 	setModule(NULL);
 }
 
-void ModuleWidget::draw(const widget::DrawContext &ctx) {
-	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
+void ModuleWidget::draw(const DrawArgs &args) {
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
 	if (module && module->bypass) {
-		nvgGlobalAlpha(ctx.vg, 0.25);
+		nvgGlobalAlpha(args.vg, 0.25);
 	}
 
-	widget::Widget::draw(ctx);
+	widget::Widget::draw(args);
 
 	// Power meter
 	if (module && settings.cpuMeter) {
-		nvgBeginPath(ctx.vg);
-		nvgRect(ctx.vg,
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg,
 			0, box.size.y - 20,
 			105, 20);
-		nvgFillColor(ctx.vg, nvgRGBAf(0, 0, 0, 0.75));
-		nvgFill(ctx.vg);
+		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
+		nvgFill(args.vg);
 
 		std::string cpuText = string::f("%.2f μs %.1f%%", module->cpuTime * 1e6f, module->cpuTime * APP->engine->getSampleRate() * 100);
-		bndLabel(ctx.vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
+		bndLabel(args.vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
 
 		float p = math::clamp(module->cpuTime / APP->engine->getSampleTime(), 0.f, 1.f);
-		nvgBeginPath(ctx.vg);
-		nvgRect(ctx.vg,
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg,
 			0, (1.f - p) * box.size.y,
 			5, p * box.size.y);
-		nvgFillColor(ctx.vg, nvgRGBAf(1, 0, 0, 1.0));
-		nvgFill(ctx.vg);
+		nvgFillColor(args.vg, nvgRGBAf(1, 0, 0, 1.0));
+		nvgFill(args.vg);
 	}
 
 	// if (module) {
-	// 	nvgBeginPath(ctx.vg);
-	// 	nvgRect(ctx.vg, 0, 0, 20, 20);
-	// 	nvgFillColor(ctx.vg, nvgRGBAf(0, 0, 0, 0.75));
-	// 	nvgFill(ctx.vg);
+	// 	nvgBeginPath(args.vg);
+	// 	nvgRect(args.vg, 0, 0, 20, 20);
+	// 	nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
+	// 	nvgFill(args.vg);
 
 	// 	std::string debugText = string::f("%d", module->id);
-	// 	bndLabel(ctx.vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
+	// 	bndLabel(args.vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
 	// }
 
-	nvgResetScissor(ctx.vg);
+	nvgResetScissor(args.vg);
 }
 
-void ModuleWidget::drawShadow(const widget::DrawContext &ctx) {
-	nvgBeginPath(ctx.vg);
+void ModuleWidget::drawShadow(const DrawArgs &args) {
+	nvgBeginPath(args.vg);
 	float r = 20; // Blur radius
 	float c = 20; // Corner radius
 	math::Vec b = math::Vec(-10, 30); // Offset from each corner
-	nvgRect(ctx.vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
+	nvgRect(args.vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
 	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
 	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
-	nvgFillPaint(ctx.vg, nvgBoxGradient(ctx.vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
-	nvgFill(ctx.vg);
+	nvgFillPaint(args.vg, nvgBoxGradient(args.vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
+	nvgFill(args.vg);
 }
 
 void ModuleWidget::onHover(const event::Hover &e) {

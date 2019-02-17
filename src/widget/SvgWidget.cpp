@@ -20,9 +20,9 @@ void SvgWidget::setSvg(std::shared_ptr<Svg> svg) {
 	wrap();
 }
 
-void SvgWidget::draw(const DrawContext &ctx) {
+void SvgWidget::draw(const DrawArgs &args) {
 	if (svg && svg->handle) {
-		svgDraw(ctx.vg, svg->handle);
+		svgDraw(args.vg, svg->handle);
 	}
 }
 

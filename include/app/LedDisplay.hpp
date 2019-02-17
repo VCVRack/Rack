@@ -10,12 +10,12 @@ namespace app {
 
 
 struct LedDisplay : widget::OpaqueWidget {
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 struct LedDisplaySeparator : widget::TransparentWidget {
 	LedDisplaySeparator();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 struct LedDisplayChoice : widget::TransparentWidget {
@@ -25,7 +25,7 @@ struct LedDisplayChoice : widget::TransparentWidget {
 	NVGcolor color;
 	NVGcolor bgColor;
 	LedDisplayChoice();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	void onButton(const event::Button &e) override;
 };
 
@@ -34,7 +34,7 @@ struct LedDisplayTextField : ui::TextField {
 	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayTextField();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	int getTextPosition(math::Vec mousePos) override;
 };
 

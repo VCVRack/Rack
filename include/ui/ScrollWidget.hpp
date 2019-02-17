@@ -17,7 +17,7 @@ struct ScrollWidget : widget::Widget {
 
 	ScrollWidget();
 	void scrollTo(math::Rect r);
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	void step() override;
 	void onHover(const event::Hover &e) override;
 	void onHoverScroll(const event::HoverScroll &e) override;

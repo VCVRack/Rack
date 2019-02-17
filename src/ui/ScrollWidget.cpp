@@ -27,10 +27,10 @@ void ScrollWidget::scrollTo(math::Rect r) {
 	offset = offset.clampSafe(bound);
 }
 
-void ScrollWidget::draw(const widget::DrawContext &ctx) {
-	nvgScissor(ctx.vg, RECT_ARGS(ctx.clipBox));
-	widget::Widget::draw(ctx);
-	nvgResetScissor(ctx.vg);
+void ScrollWidget::draw(const DrawArgs &args) {
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+	widget::Widget::draw(args);
+	nvgResetScissor(args.vg);
 }
 
 void ScrollWidget::step() {

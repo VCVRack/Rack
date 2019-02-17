@@ -16,7 +16,7 @@ struct Button : widget::OpaqueWidget {
 
 	Button();
 	~Button();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	void onEnter(const event::Enter &e) override;
 	void onLeave(const event::Leave &e) override;
 	void onDragStart(const event::DragStart &e) override;

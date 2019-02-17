@@ -141,32 +141,32 @@ void ParamWidget::step() {
 	widget::OpaqueWidget::step();
 }
 
-void ParamWidget::draw(const widget::DrawContext &ctx) {
-	widget::Widget::draw(ctx);
+void ParamWidget::draw(const DrawArgs &args) {
+	widget::Widget::draw(args);
 
 	// if (paramQuantity) {
-	// 	nvgBeginPath(ctx.vg);
-	// 	nvgRect(ctx.vg,
+	// 	nvgBeginPath(args.vg);
+	// 	nvgRect(args.vg,
 	// 		box.size.x - 12, box.size.y - 12,
 	// 		12, 12);
-	// 	nvgFillColor(ctx.vg, nvgRGBAf(1, 0, 1, 0.9));
-	// 	nvgFill(ctx.vg);
+	// 	nvgFillColor(args.vg, nvgRGBAf(1, 0, 1, 0.9));
+	// 	nvgFill(args.vg);
 
 	// 	std::string mapText = string::f("%d", paramQuantity->paramId);
-	// 	bndLabel(ctx.vg, box.size.x - 17.0, box.size.y - 16.0, INFINITY, INFINITY, -1, mapText.c_str());
+	// 	bndLabel(args.vg, box.size.x - 17.0, box.size.y - 16.0, INFINITY, INFINITY, -1, mapText.c_str());
 	// }
 
 	// Param map indicator
 	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module, paramQuantity->paramId) : NULL;
 	if (paramHandle) {
 			NVGcolor color = nvgRGB(0xff, 0x40, 0xff);
-			nvgBeginPath(ctx.vg);
-			nvgCircle(ctx.vg, box.size.x - 3, box.size.y - 3, 3.0);
-			nvgFillColor(ctx.vg, color);
-			nvgFill(ctx.vg);
-			nvgStrokeColor(ctx.vg, color::mult(color, 0.5));
-			nvgStrokeWidth(ctx.vg, 1.0);
-			nvgStroke(ctx.vg);
+			nvgBeginPath(args.vg);
+			nvgCircle(args.vg, box.size.x - 3, box.size.y - 3, 3.0);
+			nvgFillColor(args.vg, color);
+			nvgFill(args.vg);
+			nvgStrokeColor(args.vg, color::mult(color, 0.5));
+			nvgStrokeWidth(args.vg, 1.0);
+			nvgStroke(args.vg);
 	}
 }
 

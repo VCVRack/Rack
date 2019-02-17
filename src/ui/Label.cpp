@@ -11,7 +11,7 @@ Label::Label() {
 	color = bndGetTheme()->regularTheme.textColor;
 }
 
-void Label::draw(const widget::DrawContext &ctx) {
+void Label::draw(const DrawArgs &args) {
 	// TODO
 	// Custom font sizes do not work with right or center alignment
 	float x;
@@ -21,14 +21,14 @@ void Label::draw(const widget::DrawContext &ctx) {
 			x = 0.0;
 		} break;
 		case RIGHT_ALIGNMENT: {
-			x = box.size.x - bndLabelWidth(ctx.vg, -1, text.c_str());
+			x = box.size.x - bndLabelWidth(args.vg, -1, text.c_str());
 		} break;
 		case CENTER_ALIGNMENT: {
-			x = (box.size.x - bndLabelWidth(ctx.vg, -1, text.c_str())) / 2.0;
+			x = (box.size.x - bndLabelWidth(args.vg, -1, text.c_str())) / 2.0;
 		} break;
 	}
 
-	bndIconLabelValue(ctx.vg, x, 0.0, box.size.x, box.size.y, -1, color, BND_LEFT, fontSize, text.c_str(), NULL);
+	bndIconLabelValue(args.vg, x, 0.0, box.size.x, box.size.y, -1, color, BND_LEFT, fontSize, text.c_str(), NULL);
 }
 
 

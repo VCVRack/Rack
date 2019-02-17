@@ -103,7 +103,7 @@ struct MIDI_CV : Module {
 		heldNotes.clear();
 	}
 
-	void process(const ProcessContext &ctx) override {
+	void process(const ProcessArgs &args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
@@ -119,29 +119,29 @@ struct MIDI_CV : Module {
 			outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
 			outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
 			outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
-			outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulses[c].process(ctx.sampleTime) ? 10.f : 0.f, c);
+			outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulses[c].process(args.sampleTime) ? 10.f : 0.f, c);
 		}
 
 		if (polyMode == MPE_MODE) {
 			for (int c = 0; c < channels; c++) {
 				outputs[PITCH_OUTPUT].setChannels(channels);
 				outputs[MOD_OUTPUT].setChannels(channels);
-				outputs[PITCH_OUTPUT].setVoltage(pitchFilters[c].process(ctx.sampleTime, rescale(pitches[c], 0, 1<<14, -5.f, 5.f)), c);
-				outputs[MOD_OUTPUT].setVoltage(modFilters[c].process(ctx.sampleTime, rescale(mods[c], 0, 127, 0.f, 10.f)), c);
+				outputs[PITCH_OUTPUT].setVoltage(pitchFilters[c].process(args.sampleTime, rescale(pitches[c], 0, 1<<14, -5.f, 5.f)), c);
+				outputs[MOD_OUTPUT].setVoltage(modFilters[c].process(args.sampleTime, rescale(mods[c], 0, 127, 0.f, 10.f)), c);
 			}
 		}
 		else {
 			outputs[PITCH_OUTPUT].setChannels(1);
 			outputs[MOD_OUTPUT].setChannels(1);
-			outputs[PITCH_OUTPUT].setVoltage(pitchFilters[0].process(ctx.sampleTime, rescale(pitches[0], 0, 1<<14, -5.f, 5.f)));
-			outputs[MOD_OUTPUT].setVoltage(modFilters[0].process(ctx.sampleTime, rescale(mods[0], 0, 127, 0.f, 10.f)));
+			outputs[PITCH_OUTPUT].setVoltage(pitchFilters[0].process(args.sampleTime, rescale(pitches[0], 0, 1<<14, -5.f, 5.f)));
+			outputs[MOD_OUTPUT].setVoltage(modFilters[0].process(args.sampleTime, rescale(mods[0], 0, 127, 0.f, 10.f)));
 		}
 
-		outputs[CLOCK_OUTPUT].setVoltage(clockPulse.process(ctx.sampleTime) ? 10.f : 0.f);
-		outputs[CLOCK_DIV_OUTPUT].setVoltage(clockDividerPulse.process(ctx.sampleTime) ? 10.f : 0.f);
-		outputs[START_OUTPUT].setVoltage(startPulse.process(ctx.sampleTime) ? 10.f : 0.f);
-		outputs[STOP_OUTPUT].setVoltage(stopPulse.process(ctx.sampleTime) ? 10.f : 0.f);
-		outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(ctx.sampleTime) ? 10.f : 0.f);
+		outputs[CLOCK_OUTPUT].setVoltage(clockPulse.process(args.sampleTime) ? 10.f : 0.f);
+		outputs[CLOCK_DIV_OUTPUT].setVoltage(clockDividerPulse.process(args.sampleTime) ? 10.f : 0.f);
+		outputs[START_OUTPUT].setVoltage(startPulse.process(args.sampleTime) ? 10.f : 0.f);
+		outputs[STOP_OUTPUT].setVoltage(stopPulse.process(args.sampleTime) ? 10.f : 0.f);
+		outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(args.sampleTime) ? 10.f : 0.f);
 	}
 
 	void processMessage(midi::Message msg) {

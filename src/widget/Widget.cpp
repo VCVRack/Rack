@@ -144,33 +144,33 @@ void Widget::step() {
 	}
 }
 
-void Widget::draw(const DrawContext &ctx) {
+void Widget::draw(const DrawArgs &args) {
 	// Iterate children
 	for (Widget *child : children) {
 		// Don't draw if invisible
 		if (!child->visible)
 			continue;
 		// Don't draw if child is outside clip box
-		if (!ctx.clipBox.isIntersecting(child->box))
+		if (!args.clipBox.isIntersecting(child->box))
 			continue;
 
-		DrawContext childCtx = ctx;
+		DrawArgs childCtx = args;
 		// Intersect child clip box with self
 		childCtx.clipBox = childCtx.clipBox.intersect(child->box);
 		childCtx.clipBox.pos = childCtx.clipBox.pos.minus(child->box.pos);
 
-		nvgSave(ctx.vg);
-		nvgTranslate(ctx.vg, child->box.pos.x, child->box.pos.y);
+		nvgSave(args.vg);
+		nvgTranslate(args.vg, child->box.pos.x, child->box.pos.y);
+
+		child->draw(childCtx);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 		// Call deprecated draw function, which does nothing by default
-		child->draw(ctx.vg);
+		child->draw(args.vg);
 #pragma GCC diagnostic pop
 
-		child->draw(childCtx);
-
-		nvgRestore(ctx.vg);
+		nvgRestore(args.vg);
 	}
 }
 

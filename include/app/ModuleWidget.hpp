@@ -32,8 +32,8 @@ struct ModuleWidget : widget::OpaqueWidget {
 	}
 	~ModuleWidget();
 
-	void draw(const widget::DrawContext &ctx) override;
-	void drawShadow(const widget::DrawContext &ctx);
+	void draw(const DrawArgs &args) override;
+	void drawShadow(const DrawArgs &args);
 
 	void onHover(const event::Hover &e) override;
 	void onButton(const event::Button &e) override;

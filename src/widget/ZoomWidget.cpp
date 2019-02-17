@@ -29,12 +29,12 @@ void ZoomWidget::setZoom(float zoom) {
 	Widget::onZoom(eZoom);
 }
 
-void ZoomWidget::draw(const DrawContext &ctx) {
-	DrawContext zoomCtx = ctx;
+void ZoomWidget::draw(const DrawArgs &args) {
+	DrawArgs zoomCtx = args;
 	zoomCtx.clipBox.pos = zoomCtx.clipBox.pos.div(zoom);
 	zoomCtx.clipBox.size = zoomCtx.clipBox.size.div(zoom);
 	// No need to save the state because that is done in the parent
-	nvgScale(ctx.vg, zoom, zoom);
+	nvgScale(args.vg, zoom, zoom);
 	Widget::draw(zoomCtx);
 }
 

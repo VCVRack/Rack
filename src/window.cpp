@@ -385,9 +385,10 @@ void Window::run() {
 			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
 			nvgScale(vg, pixelRatio, pixelRatio);
 
-			widget::DrawContext ctx;
-			ctx.vg = vg;
-			APP->event->rootWidget->draw(ctx);
+			widget::Widget::DrawArgs args;
+			args.vg = vg;
+			args.clipBox = APP->event->rootWidget->box.zeroPos();
+			APP->event->rootWidget->draw(args);
 
 			glViewport(0, 0, fbWidth, fbHeight);
 			glClearColor(0.0, 0.0, 0.0, 1.0);

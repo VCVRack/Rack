@@ -8,7 +8,7 @@ namespace app {
 
 
 struct RackRail : widget::TransparentWidget {
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 

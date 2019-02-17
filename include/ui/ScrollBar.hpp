@@ -19,7 +19,7 @@ struct ScrollBar : widget::OpaqueWidget {
 	float size = 0.0;
 
 	ScrollBar();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	void onDragStart(const event::DragStart &e) override;
 	void onDragMove(const event::DragMove &e) override;
 	void onDragEnd(const event::DragEnd &e) override;

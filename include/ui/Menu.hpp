@@ -18,7 +18,7 @@ struct Menu : widget::OpaqueWidget {
 	~Menu();
 	void setChildMenu(Menu *menu);
 	void step() override;
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	void onHoverScroll(const event::HoverScroll &e) override;
 };
 

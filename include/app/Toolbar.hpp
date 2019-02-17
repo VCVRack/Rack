@@ -13,7 +13,7 @@ struct Toolbar : widget::OpaqueWidget {
 	float cableTension = 0.5;
 
 	Toolbar();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 

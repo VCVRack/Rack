@@ -65,7 +65,7 @@ struct MIDI_Map : Module {
 		midiInput.reset();
 	}
 
-	void process(const ProcessContext &ctx) override {
+	void process(const ProcessArgs &args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
@@ -90,7 +90,7 @@ struct MIDI_Map : Module {
 				continue;
 			// Set param
 			float v = rescale(values[cc], 0, 127, 0.f, 1.f);
-			v = valueFilters[id].process(ctx.sampleTime, v);
+			v = valueFilters[id].process(args.sampleTime, v);
 			v = rescale(v, 0.f, 1.f, param->minValue, param->maxValue);
 			APP->engine->setParam(module, paramId, v);
 		}

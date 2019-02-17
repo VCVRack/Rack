@@ -14,10 +14,10 @@ ProgressBar::~ProgressBar() {
 		delete quantity;
 }
 
-void ProgressBar::draw(const widget::DrawContext &ctx) {
+void ProgressBar::draw(const DrawArgs &args) {
 	float progress = quantity ? quantity->getScaledValue() : 0.f;
 	std::string text = quantity ? quantity->getString() : "";
-	bndSlider(ctx.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL, BND_DEFAULT, progress, text.c_str(), NULL);
+	bndSlider(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL, BND_DEFAULT, progress, text.c_str(), NULL);
 }
 
 

@@ -28,8 +28,8 @@ struct CableWidget : widget::OpaqueWidget {
 	math::Vec getInputPos();
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
-	void draw(const widget::DrawContext &ctx) override;
-	void drawPlugs(const widget::DrawContext &ctx);
+	void draw(const DrawArgs &args) override;
+	void drawPlugs(const DrawArgs &args);
 };
 
 

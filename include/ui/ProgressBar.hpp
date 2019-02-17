@@ -13,7 +13,7 @@ struct ProgressBar : widget::Widget {
 
 	ProgressBar();
 	~ProgressBar();
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 

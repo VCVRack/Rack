@@ -38,7 +38,7 @@ struct Module {
 	void reset();
 	void randomize();
 
-	struct ProcessContext {
+	struct ProcessArgs {
 		float sampleRate;
 		float sampleTime;
 	};
@@ -46,9 +46,14 @@ struct Module {
 	/** Advances the module by one audio sample.
 	Override this method to read Inputs and Params and to write Outputs and Lights.
 	*/
-	virtual void process(const ProcessContext &ctx) {}
-	/** Deprecated. Override process() instead. */
-	virtual void step() {}
+	virtual void process(const ProcessArgs &args) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+		step();
+#pragma GCC diagnostic pop
+	}
+	/** Override process(const ProcessArgs &args) instead. */
+	DEPRECATED virtual void step() {}
 
 	/** Called when the engine sample rate is changed. */
 	virtual void onSampleRateChange() {}

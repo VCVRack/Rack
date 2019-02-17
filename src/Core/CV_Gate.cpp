@@ -89,7 +89,7 @@ struct CV_Gate : Module {
 		midiOutput.midi::Output::reset();
 	}
 
-	void process(const ProcessContext &ctx) override {
+	void process(const ProcessArgs &args) override {
 		for (int i = 0; i < 16; i++) {
 			int note = learnedNotes[i];
 			if (velocityMode) {

@@ -8,7 +8,7 @@ namespace ui {
 
 
 struct PasswordField : TextField {
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 };
 
 

@@ -15,12 +15,6 @@ namespace rack {
 namespace widget {
 
 
-struct DrawContext {
-	NVGcontext *vg;
-	math::Rect clipBox = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
-};
-
-
 /** A node in the 2D [scene graph](https://en.wikipedia.org/wiki/Scene_graph).
 The bounding box of a Widget is a rectangle specified by `box` relative to their parent.
 The appearance is defined by overriding `draw()`, and the behavior is defined by overriding `step()` and `on*()` event handlers.
@@ -86,9 +80,15 @@ struct Widget {
 
 	/** Advances the module by one frame */
 	virtual void step();
+
+	struct DrawArgs {
+		NVGcontext *vg;
+		math::Rect clipBox;
+	};
+
 	/** Draws the widget to the NanoVG context */
-	virtual void draw(const DrawContext &ctx);
-	/** Override `draw(const DrawContext &ctx)` instead */
+	virtual void draw(const DrawArgs &args);
+	/** Override draw(const DrawArgs &args) instead */
 	DEPRECATED virtual void draw(NVGcontext *vg) {}
 
 	// Events

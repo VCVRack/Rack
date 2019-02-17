@@ -192,7 +192,7 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 	int modulesLen = internal->modules.size();
 	float sampleTime = internal->sampleTime;
 
-	Module::ProcessContext processCtx;
+	Module::ProcessArgs processCtx;
 	processCtx.sampleRate = internal->sampleRate;
 	processCtx.sampleTime = internal->sampleTime;
 
@@ -211,7 +211,6 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 				auto startTime = std::chrono::high_resolution_clock::now();
 
 				module->process(processCtx);
-				module->step();
 
 				auto stopTime = std::chrono::high_resolution_clock::now();
 				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
@@ -221,8 +220,6 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 			}
 			else {
 				module->process(processCtx);
-				// Call deprecated method
-				module->step();
 			}
 		}
 

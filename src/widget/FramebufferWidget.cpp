@@ -15,17 +15,17 @@ FramebufferWidget::~FramebufferWidget() {
 		nvgluDeleteFramebuffer(fb);
 }
 
-void FramebufferWidget::draw(const DrawContext &ctx) {
+void FramebufferWidget::draw(const DrawArgs &args) {
 	// Bypass framebuffer rendering if we're already drawing in a framebuffer
 	// In other words, disallow nested framebuffers. They look bad.
-	if (ctx.vg == APP->window->fbVg) {
-		Widget::draw(ctx);
+	if (args.vg == APP->window->fbVg) {
+		Widget::draw(args);
 		return;
 	}
 
 	// Get world transform
 	float xform[6];
-	nvgCurrentTransform(ctx.vg, xform);
+	nvgCurrentTransform(args.vg, xform);
 	// Skew and rotate is not supported
 	assert(math::isNear(xform[1], 0.f));
 	assert(math::isNear(xform[2], 0.f));
@@ -66,7 +66,7 @@ void FramebufferWidget::draw(const DrawContext &ctx) {
 				nvgluDeleteFramebuffer(fb);
 			// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
 			if (fbSize.isFinite() && !fbSize.isZero())
-				fb = nvgluCreateFramebuffer(ctx.vg, fbSize.x, fbSize.y, 0);
+				fb = nvgluCreateFramebuffer(args.vg, fbSize.x, fbSize.y, 0);
 		}
 
 		if (!fb)
@@ -81,28 +81,28 @@ void FramebufferWidget::draw(const DrawContext &ctx) {
 		return;
 
 	// Draw framebuffer image, using world coordinates
-	nvgSave(ctx.vg);
-	nvgResetTransform(ctx.vg);
+	nvgSave(args.vg);
+	nvgResetTransform(args.vg);
 
-	nvgBeginPath(ctx.vg);
-	nvgRect(ctx.vg,
+	nvgBeginPath(args.vg);
+	nvgRect(args.vg,
 		offsetI.x + fbBox.pos.x,
 		offsetI.y + fbBox.pos.y,
 		fbBox.size.x, fbBox.size.y);
-	NVGpaint paint = nvgImagePattern(ctx.vg,
+	NVGpaint paint = nvgImagePattern(args.vg,
 		offsetI.x + fbBox.pos.x,
 		offsetI.y + fbBox.pos.y,
 		fbBox.size.x, fbBox.size.y,
 		0.0, fb->image, 1.0);
-	nvgFillPaint(ctx.vg, paint);
-	nvgFill(ctx.vg);
+	nvgFillPaint(args.vg, paint);
+	nvgFill(args.vg);
 
 	// For debugging the bounding box of the framebuffer
-	// nvgStrokeWidth(ctx.vg, 2.0);
-	// nvgStrokeColor(ctx.vg, nvgRGBAf(1, 1, 0, 0.5));
-	// nvgStroke(ctx.vg);
+	// nvgStrokeWidth(args.vg, 2.0);
+	// nvgStrokeColor(args.vg, nvgRGBAf(1, 1, 0, 0.5));
+	// nvgStroke(args.vg);
 
-	nvgRestore(ctx.vg);
+	nvgRestore(args.vg);
 }
 
 void FramebufferWidget::drawFramebuffer() {
@@ -116,9 +116,9 @@ void FramebufferWidget::drawFramebuffer() {
 	nvgTranslate(vg, fbOffset.x, fbOffset.y);
 	nvgScale(vg, fbScale.x, fbScale.y);
 
-	DrawContext ctx;
-	ctx.vg = vg;
-	Widget::draw(ctx);
+	DrawArgs args;
+	args.vg = vg;
+	Widget::draw(args);
 
 	glViewport(0.0, 0.0, fbSize.x, fbSize.y);
 	glClearColor(0.0, 0.0, 0.0, 0.0);

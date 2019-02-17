@@ -10,7 +10,7 @@ namespace ui {
 struct MenuLabel : MenuEntry {
 	std::string text;
 
-	void draw(const widget::DrawContext &ctx) override;
+	void draw(const DrawArgs &args) override;
 	void step() override;
 };
 
