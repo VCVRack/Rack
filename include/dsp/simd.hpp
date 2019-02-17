@@ -56,6 +56,11 @@ struct f32<4> {
 		v = _mm_set_ps1(x);
 	}
 
+	/** Constructs a vector from four values. */
+	f32<4>(float x1, float x2, float x3, float x4) {
+		v = _mm_set_ps(x1, x2, x3, x4);
+	}
+
 	/** Reads an array of 4 values. */
 	static f32<4> load(const float *x) {
 		return f32<4>(_mm_loadu_ps(x));
