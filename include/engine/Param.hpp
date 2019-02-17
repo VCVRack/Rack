@@ -81,9 +81,7 @@ struct Param {
 		return value;
 	}
 
-	/* Clamps and set the value.
-	Don't call this directly from Modules. Use `APP->engine->setParam()`.
-	*/
+	/* Clamps and sets the value. */
 	void setValue(float value) {
 		this->value = math::clamp(value, minValue, maxValue);
 	}

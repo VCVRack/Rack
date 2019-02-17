@@ -13,7 +13,7 @@ struct VuMeter {
 	float dBScaled;
 	/** Value should be scaled so that 1.0 is clipping */
 	void setValue(float v) {
-		dBScaled = std::log10(std::abs(v)) * 20.0 / dBInterval;
+		dBScaled = std::log10(std::fabs(v)) * 20.0 / dBInterval;
 	}
 	/** Returns the brightness of the light indexed by i.
 	Light 0 is a clip light (red) which is either on or off.
@@ -71,7 +71,7 @@ struct VuMeter2 {
 			v += (value - v) * lambda * deltaTime;
 		}
 		else {
-			value = std::abs(value);
+			value = std::fabs(value);
 			if (value >= v) {
 				v = value;
 			}

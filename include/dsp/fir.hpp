@@ -42,9 +42,9 @@ struct RealTimeConvolver {
 		this->blockSize = blockSize;
 		pffft = pffft_new_setup(blockSize*2, PFFFT_REAL);
 		outputTail = new float[blockSize];
-		memset(outputTail, 0, blockSize * sizeof(float));
+		std::memset(outputTail, 0, blockSize * sizeof(float));
 		tmpBlock = new float[blockSize*2];
-		memset(tmpBlock, 0, blockSize*2 * sizeof(float));
+		std::memset(tmpBlock, 0, blockSize*2 * sizeof(float));
 	}
 
 	~RealTimeConvolver() {
@@ -74,13 +74,13 @@ struct RealTimeConvolver {
 			// Allocate blocks
 			kernelFfts = (float*) pffft_aligned_malloc(sizeof(float) * blockSize*2 * kernelBlocks);
 			inputFfts = (float*) pffft_aligned_malloc(sizeof(float) * blockSize*2 * kernelBlocks);
-			memset(inputFfts, 0, sizeof(float) * blockSize*2 * kernelBlocks);
+			std::memset(inputFfts, 0, sizeof(float) * blockSize*2 * kernelBlocks);
 
 			for (size_t i = 0; i < kernelBlocks; i++) {
 				// Pad each block with zeros
-				memset(tmpBlock, 0, sizeof(float) * blockSize*2);
+				std::memset(tmpBlock, 0, sizeof(float) * blockSize*2);
 				size_t len = std::min((int) blockSize, (int) (length - i*blockSize));
-				memcpy(tmpBlock, &kernel[i*blockSize], sizeof(float)*len);
+				std::memcpy(tmpBlock, &kernel[i*blockSize], sizeof(float)*len);
 				// Compute fft
 				pffft_transform(pffft, tmpBlock, &kernelFfts[blockSize*2 * i], NULL, PFFFT_FORWARD);
 			}
@@ -92,19 +92,19 @@ struct RealTimeConvolver {
 	*/
 	void processBlock(const float *input, float *output) {
 		if (kernelBlocks == 0) {
-			memset(output, 0, sizeof(float) * blockSize);
+			std::memset(output, 0, sizeof(float) * blockSize);
 			return;
 		}
 
 		// Step input position
 		inputPos = (inputPos + 1) % kernelBlocks;
 		// Pad block with zeros
-		memset(tmpBlock, 0, sizeof(float) * blockSize*2);
-		memcpy(tmpBlock, input, sizeof(float) * blockSize);
+		std::memset(tmpBlock, 0, sizeof(float) * blockSize*2);
+		std::memcpy(tmpBlock, input, sizeof(float) * blockSize);
 		// Compute input fft
 		pffft_transform(pffft, tmpBlock, &inputFfts[blockSize*2 * inputPos], NULL, PFFFT_FORWARD);
 		// Create output fft
-		memset(tmpBlock, 0, sizeof(float) * blockSize*2);
+		std::memset(tmpBlock, 0, sizeof(float) * blockSize*2);
 		// convolve input fft by kernel fft
 		// Note: This is the CPU bottleneck loop
 		for (size_t i = 0; i < kernelBlocks; i++) {

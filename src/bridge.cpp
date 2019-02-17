@@ -218,7 +218,7 @@ struct BridgeClientConnection {
 				}
 
 				float output[BRIDGE_OUTPUTS * frames];
-				memset(&output, 0, sizeof(output));
+				std::memset(&output, 0, sizeof(output));
 				processStream(input, output, frames);
 				if (!send(&output, BRIDGE_OUTPUTS * frames * sizeof(float))) {
 					DEBUG("Failed to send");
@@ -340,7 +340,7 @@ static void serverConnect() {
 
 	// Get address
 	struct sockaddr_in addr;
-	memset(&addr, 0, sizeof(addr));
+	std::memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(BRIDGE_PORT);
 #if defined ARCH_WIN

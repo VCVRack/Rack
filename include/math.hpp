@@ -95,14 +95,14 @@ inline bool isPow2(int n) {
 Assumes a <= b
 */
 inline float clamp(float x, float a, float b) {
-	return std::min(std::max(x, a), b);
+	return std::fmin(std::fmax(x, a), b);
 }
 
 /** Limits `x` between `a` and `b`
 If a > b, switches the two values
 */
 inline float clampSafe(float x, float a, float b) {
-	return clamp(x, std::min(a, b), std::max(a, b));
+	return clamp(x, std::fmin(a, b), std::fmax(a, b));
 }
 
 /** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero
@@ -126,7 +126,7 @@ inline float eucMod(float a, float base) {
 }
 
 inline bool isNear(float a, float b, float epsilon = 1e-6f) {
-	return std::abs(a - b) <= epsilon;
+	return std::fabs(a - b) <= epsilon;
 }
 
 /** If the magnitude of x if less than epsilon, return 0 */
@@ -201,7 +201,7 @@ struct Vec {
 		return x * b.x + y * b.y;
 	}
 	float norm() const {
-		return std::hypotf(x, y);
+		return std::hypot(x, y);
 	}
 	float square() const {
 		return x * x + y * y;
@@ -219,10 +219,10 @@ struct Vec {
 		return Vec(y, x);
 	}
 	Vec min(Vec b) const {
-		return Vec(std::min(x, b.x), std::min(y, b.y));
+		return Vec(std::fmin(x, b.x), std::fmin(y, b.y));
 	}
 	Vec max(Vec b) const {
-		return Vec(std::max(x, b.x), std::max(y, b.y));
+		return Vec(std::fmax(x, b.x), std::fmax(y, b.y));
 	}
 	Vec round() const {
 		return Vec(std::round(x), std::round(y));
@@ -320,19 +320,19 @@ struct Rect {
 	/** Expands this Rect to contain `b` */
 	Rect expand(Rect b) const {
 		Rect r;
-		r.pos.x = std::min(pos.x, b.pos.x);
-		r.pos.y = std::min(pos.y, b.pos.y);
-		r.size.x = std::max(pos.x + size.x, b.pos.x + b.size.x) - r.pos.x;
-		r.size.y = std::max(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
+		r.pos.x = std::fmin(pos.x, b.pos.x);
+		r.pos.y = std::fmin(pos.y, b.pos.y);
+		r.size.x = std::fmax(pos.x + size.x, b.pos.x + b.size.x) - r.pos.x;
+		r.size.y = std::fmax(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
 		return r;
 	}
 	/** Returns the intersection of `this` and `b` */
 	Rect intersect(Rect b) const {
 		Rect r;
-		r.pos.x = std::max(pos.x, b.pos.x);
-		r.pos.y = std::max(pos.y, b.pos.y);
-		r.size.x = std::min(pos.x + size.x, b.pos.x + b.size.x) - r.pos.x;
-		r.size.y = std::min(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
+		r.pos.x = std::fmax(pos.x, b.pos.x);
+		r.pos.y = std::fmax(pos.y, b.pos.y);
+		r.size.x = std::fmin(pos.x + size.x, b.pos.x + b.size.x) - r.pos.x;
+		r.size.y = std::fmin(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
 		return r;
 	}
 	/** Returns a Rect with its position set to zero */
@@ -368,8 +368,14 @@ inline Vec Vec::clampSafe(Rect bound) const {
 }
 
 
-/** Useful for debugging Vecs and Rects, e.g.
+/** Expands a Vec and Rect into a comma-separated list.
+Useful for print debugging.
+
 	printf("%f %f %f %f", RECT_ARGS(r));
+
+Or passing the values to a C function.
+
+	nvgRect(vg, RECT_ARGS(r));
 */
 #define VEC_ARGS(v) (v).x, (v).y
 #define RECT_ARGS(r) (r).pos.x, (r).pos.y, (r).size.x, (r).size.y

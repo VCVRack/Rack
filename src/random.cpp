@@ -52,14 +52,14 @@ uint64_t u64() {
 
 float uniform() {
 	// 24 bits of granularity is the best that can be done with floats while ensuring that the return value lies in [0.0, 1.0).
-	return (xoroshiro128plus_next() >> (64 - 24)) / powf(2, 24);
+	return (xoroshiro128plus_next() >> (64 - 24)) / std::pow(2, 24);
 }
 
 float normal() {
 	// Box-Muller transform
-	float radius = sqrtf(-2.f * logf(1.f - uniform()));
+	float radius = std::sqrt(-2.f * std::log(1.f - uniform()));
 	float theta = 2.f * M_PI * uniform();
-	return radius * sinf(theta);
+	return radius * std::sin(theta);
 
 	// // Central Limit Theorem
 	// const int n = 8;
@@ -67,7 +67,7 @@ float normal() {
 	// for (int i = 0; i < n; i++) {
 	// 	sum += uniform();
 	// }
-	// return (sum - n / 2.f) / sqrtf(n / 12.f);
+	// return (sum - n / 2.f) / std::sqrt(n / 12.f);
 }
 
 

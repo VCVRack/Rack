@@ -95,7 +95,7 @@ struct SampleRateConverter {
 		else {
 			// Simply copy the buffer without conversion
 			int frames = std::min(*inFrames, *outFrames);
-			memcpy(out, in, frames * sizeof(Frame<CHANNELS>));
+			std::memcpy(out, in, frames * sizeof(Frame<CHANNELS>));
 			*inFrames = frames;
 			*outFrames = frames;
 		}
@@ -117,12 +117,12 @@ struct Decimator {
 	}
 	void reset() {
 		inIndex = 0;
-		memset(inBuffer, 0, sizeof(inBuffer));
+		std::memset(inBuffer, 0, sizeof(inBuffer));
 	}
 	/** `in` must be length OVERSAMPLE */
 	float process(float *in) {
 		// Copy input to buffer
-		memcpy(&inBuffer[inIndex], in, OVERSAMPLE*sizeof(float));
+		std::memcpy(&inBuffer[inIndex], in, OVERSAMPLE*sizeof(float));
 		// Advance index
 		inIndex += OVERSAMPLE;
 		inIndex %= OVERSAMPLE*QUALITY;
@@ -152,7 +152,7 @@ struct Upsampler {
 	}
 	void reset() {
 		inIndex = 0;
-		memset(inBuffer, 0, sizeof(inBuffer));
+		std::memset(inBuffer, 0, sizeof(inBuffer));
 	}
 	/** `out` must be length OVERSAMPLE */
 	void process(float in, float *out) {

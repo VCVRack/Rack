@@ -28,9 +28,9 @@ struct RingBuffer {
 		size_t i = mask(end);
 		size_t e1 = i + n;
 		size_t e2 = (e1 < S) ? e1 : S;
-		memcpy(&data[i], t, sizeof(T) * (e2 - i));
+		std::memcpy(&data[i], t, sizeof(T) * (e2 - i));
 		if (e1 > S) {
-			memcpy(data, &t[S - i], sizeof(T) * (e1 - S));
+			std::memcpy(data, &t[S - i], sizeof(T) * (e1 - S));
 		}
 		end += n;
 	}
@@ -41,9 +41,9 @@ struct RingBuffer {
 		size_t i = mask(start);
 		size_t s1 = i + n;
 		size_t s2 = (s1 < S) ? s1 : S;
-		memcpy(t, &data[i], sizeof(T) * (s2 - i));
+		std::memcpy(t, &data[i], sizeof(T) * (s2 - i));
 		if (s1 > S) {
-			memcpy(&t[S - i], data, sizeof(T) * (s1 - S));
+			std::memcpy(&t[S - i], data, sizeof(T) * (s1 - S));
 		}
 		start += n;
 	}
@@ -112,11 +112,11 @@ struct DoubleRingBuffer {
 		size_t e1 = e + n;
 		size_t e2 = (e1 < S) ? e1 : S;
 		// Copy data forward
-		memcpy(&data[S + e], &data[e], sizeof(T) * (e2 - e));
+		std::memcpy(&data[S + e], &data[e], sizeof(T) * (e2 - e));
 
 		if (e1 > S) {
 			// Copy data backward from the doubled block to the main block
-			memcpy(data, &data[S], sizeof(T) * (e1 - S));
+			std::memcpy(data, &data[S], sizeof(T) * (e1 - S));
 		}
 		end += n;
 	}
@@ -147,7 +147,7 @@ struct AppleRingBuffer {
 		// move end block to beginning
 		// may overlap, but memmove handles that correctly
 		size_t s = size();
-		memmove(data, &data[start], sizeof(T) * s);
+		std::memmove(data, &data[start], sizeof(T) * s);
 		start = 0;
 		end = s;
 	}

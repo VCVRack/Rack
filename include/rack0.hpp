@@ -31,11 +31,11 @@ DEPRECATED inline float clamp2(float x, float a, float b) {return clampSafe(x, a
 DEPRECATED inline int mini(int a, int b) {return std::min(a, b);}
 DEPRECATED inline int maxi(int a, int b) {return std::max(a, b);}
 DEPRECATED inline int clampi(int x, int min, int max) {return math::clamp(x, min, max);}
-DEPRECATED inline int absi(int a) {return std::abs(a);}
+DEPRECATED inline int absi(int a) {return std::fabs(a);}
 DEPRECATED inline int eucmodi(int a, int base) {return eucMod(a, base);}
-DEPRECATED inline int log2i(int n) {return log2(n);}
+DEPRECATED inline int log2i(int n) {return math::log2(n);}
 DEPRECATED inline bool ispow2i(int n) {return isPow2(n);}
-DEPRECATED inline float absf(float x) {return std::abs(x);}
+DEPRECATED inline float absf(float x) {return std::fabs(x);}
 DEPRECATED inline float sgnf(float x) {return sgn(x);}
 DEPRECATED inline float eucmodf(float a, float base) {return eucMod(a, base);}
 DEPRECATED inline bool nearf(float a, float b, float epsilon = 1.0e-6f) {return math::isNear(a, b, epsilon);}

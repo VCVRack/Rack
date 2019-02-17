@@ -24,15 +24,15 @@ void minBlepImpulse(int z, int o, float *output) {
 	RealFFT rfft(n);
 	rfft.rfft(x, fx);
 	// fx = log(abs(fx))
-	fx[0] = std::log(std::abs(fx[0]));
+	fx[0] = std::log(std::fabs(fx[0]));
 	for (int i = 1; i < n; i++) {
 		fx[2*i] = std::log(std::hypot(fx[2*i], fx[2*i+1]));
 		fx[2*i+1] = 0.f;
 	}
-	fx[1] = std::log(std::abs(fx[1]));
+	fx[1] = std::log(std::fabs(fx[1]));
 	// Clamp values in case we have -inf
 	for (int i = 0; i < 2*n; i++) {
-		fx[i] = std::max(-30.f, fx[i]);
+		fx[i] = std::fmax(-30.f, fx[i]);
 	}
 	rfft.irfft(fx, x);
 	rfft.scale(x);
