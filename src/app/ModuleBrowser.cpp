@@ -212,7 +212,6 @@ struct ModelBox : widget::OpaqueWidget {
 
 		nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 		OpaqueWidget::draw(args);
-		nvgResetScissor(args.vg);
 
 		// Translucent overlay when selected
 		if (selected) {
@@ -221,6 +220,8 @@ struct ModelBox : widget::OpaqueWidget {
 			nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.25));
 			nvgFill(args.vg);
 		}
+
+		nvgResetScissor(args.vg);
 	}
 
 	void onButton(const event::Button &e) override;

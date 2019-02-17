@@ -550,17 +550,19 @@ struct MIDI_CVWidget : ModuleWidget {
 
 		ClockDivisionItem *clockDivisionItem = new ClockDivisionItem;
 		clockDivisionItem->text = "CLK/N divider";
+		clockDivisionItem->rightText = RIGHT_ARROW;
 		clockDivisionItem->module = module;
 		menu->addChild(clockDivisionItem);
 
 		ChannelItem *channelItem = new ChannelItem;
 		channelItem->text = "Polyphony channels";
-		channelItem->rightText = string::f("%d", module->channels);
+		channelItem->rightText = string::f("%d", module->channels) + " " +RIGHT_ARROW;
 		channelItem->module = module;
 		menu->addChild(channelItem);
 
 		PolyModeItem *polyModeItem = new PolyModeItem;
 		polyModeItem->text = "Polyphony mode";
+		polyModeItem->rightText = RIGHT_ARROW;
 		polyModeItem->module = module;
 		menu->addChild(polyModeItem);
 
