@@ -118,6 +118,7 @@ void FramebufferWidget::drawFramebuffer() {
 
 	DrawArgs args;
 	args.vg = vg;
+	args.clipBox = box.zeroPos();
 	Widget::draw(args);
 
 	glViewport(0.0, 0.0, fbSize.x, fbSize.y);
