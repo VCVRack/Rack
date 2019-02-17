@@ -34,10 +34,6 @@ struct MenuButton : ui::Button {
 
 
 struct NewItem : ui::MenuItem {
-	NewItem() {
-		text = "New";
-		rightText = WINDOW_MOD_CTRL_NAME "+N";
-	}
 	void onAction(const event::Action &e) override {
 		APP->patch->resetDialog();
 	}
@@ -45,10 +41,6 @@ struct NewItem : ui::MenuItem {
 
 
 struct OpenItem : ui::MenuItem {
-	OpenItem() {
-		text = "Open";
-		rightText = WINDOW_MOD_CTRL_NAME "+O";
-	}
 	void onAction(const event::Action &e) override {
 		APP->patch->loadDialog();
 	}
@@ -56,10 +48,6 @@ struct OpenItem : ui::MenuItem {
 
 
 struct SaveItem : ui::MenuItem {
-	SaveItem() {
-		text = "Save";
-		rightText = WINDOW_MOD_CTRL_NAME "+S";
-	}
 	void onAction(const event::Action &e) override {
 		APP->patch->saveDialog();
 	}
@@ -67,10 +55,6 @@ struct SaveItem : ui::MenuItem {
 
 
 struct SaveAsItem : ui::MenuItem {
-	SaveAsItem() {
-		text = "Save as";
-		rightText = WINDOW_MOD_CTRL_NAME "+Shift+S";
-	}
 	void onAction(const event::Action &e) override {
 		APP->patch->saveAsDialog();
 	}
@@ -78,9 +62,6 @@ struct SaveAsItem : ui::MenuItem {
 
 
 struct SaveTemplateItem : ui::MenuItem {
-	SaveTemplateItem() {
-		text = "Save template";
-	}
 	void onAction(const event::Action &e) override {
 		APP->patch->saveTemplateDialog();
 	}
@@ -88,9 +69,6 @@ struct SaveTemplateItem : ui::MenuItem {
 
 
 struct RevertItem : ui::MenuItem {
-	RevertItem() {
-		text = "Revert";
-	}
 	void onAction(const event::Action &e) override {
 		APP->patch->revertDialog();
 	}
@@ -98,9 +76,6 @@ struct RevertItem : ui::MenuItem {
 
 
 struct DisconnectCablesItem : ui::MenuItem {
-	DisconnectCablesItem() {
-		text = "Disconnect cables";
-	}
 	void onAction(const event::Action &e) override {
 		APP->patch->disconnectDialog();
 	}
@@ -108,10 +83,6 @@ struct DisconnectCablesItem : ui::MenuItem {
 
 
 struct QuitItem : ui::MenuItem {
-	QuitItem() {
-		text = "Quit";
-		rightText = WINDOW_MOD_CTRL_NAME "+Q";
-	}
 	void onAction(const event::Action &e) override {
 		APP->window->close();
 	}
@@ -119,32 +90,52 @@ struct QuitItem : ui::MenuItem {
 
 
 struct FileButton : MenuButton {
-	FileButton() {
-		text = "File";
-	}
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(new NewItem);
-		menu->addChild(new OpenItem);
-		menu->addChild(new SaveItem);
-		menu->addChild(new SaveAsItem);
-		menu->addChild(new SaveTemplateItem);
-		menu->addChild(new RevertItem);
-		menu->addChild(new DisconnectCablesItem);
-		menu->addChild(new QuitItem);
+		NewItem *newItem = new NewItem;
+		newItem->text = "New";
+		newItem->rightText = WINDOW_MOD_CTRL_NAME "+N";
+		menu->addChild(newItem);
+
+		OpenItem *openItem = new OpenItem;
+		openItem->text = "Open";
+		openItem->rightText = WINDOW_MOD_CTRL_NAME "+O";
+		menu->addChild(openItem);
+
+		SaveItem *saveItem = new SaveItem;
+		saveItem->text = "Save";
+		saveItem->rightText = WINDOW_MOD_CTRL_NAME "+S";
+		menu->addChild(saveItem);
+
+		SaveAsItem *saveAsItem = new SaveAsItem;
+		saveAsItem->text = "Save as";
+		saveAsItem->rightText = WINDOW_MOD_CTRL_NAME "+Shift+S";
+		menu->addChild(saveAsItem);
+
+		SaveTemplateItem *saveTemplateItem = new SaveTemplateItem;
+		saveTemplateItem->text = "Save template";
+		menu->addChild(saveTemplateItem);
+
+		RevertItem *revertItem = new RevertItem;
+		revertItem->text = "Revert";
+		menu->addChild(revertItem);
+
+		DisconnectCablesItem *disconnectCablesItem = new DisconnectCablesItem;
+		disconnectCablesItem->text = "Disconnect cables";
+		menu->addChild(disconnectCablesItem);
+
+		QuitItem *quitItem = new QuitItem;
+		quitItem->text = "Quit";
+		quitItem->rightText = WINDOW_MOD_CTRL_NAME "+Q";
+		menu->addChild(quitItem);
 	}
 };
 
 
 struct UndoItem : ui::MenuItem {
-	UndoItem() {
-		text = "Undo " + APP->history->getUndoName();
-		rightText = WINDOW_MOD_CTRL_NAME "+Z";
-		disabled = !APP->history->canUndo();
-	}
 	void onAction(const event::Action &e) override {
 		APP->history->undo();
 	}
@@ -152,11 +143,6 @@ struct UndoItem : ui::MenuItem {
 
 
 struct RedoItem : ui::MenuItem {
-	RedoItem() {
-		text = "Redo " + APP->history->getRedoName();
-		rightText = WINDOW_MOD_CTRL_NAME "+" WINDOW_MOD_SHIFT_NAME "+Z";
-		disabled = !APP->history->canRedo();
-	}
 	void onAction(const event::Action &e) override {
 		APP->history->redo();
 	}
@@ -164,16 +150,22 @@ struct RedoItem : ui::MenuItem {
 
 
 struct EditButton : MenuButton {
-	EditButton() {
-		text = "Edit";
-	}
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(new UndoItem);
-		menu->addChild(new RedoItem);
+		UndoItem *undoItem = new UndoItem;
+		undoItem->text = "Undo " + APP->history->getUndoName();
+		undoItem->rightText = WINDOW_MOD_CTRL_NAME "+Z";
+		undoItem->disabled = !APP->history->canUndo();
+		menu->addChild(undoItem);
+
+		RedoItem *redoItem = new RedoItem;
+		redoItem->text = "Redo " + APP->history->getRedoName();
+		redoItem->rightText = WINDOW_MOD_CTRL_NAME "+" WINDOW_MOD_SHIFT_NAME "+Z";
+		redoItem->disabled = !APP->history->canRedo();
+		menu->addChild(redoItem);
 	}
 };
 
@@ -225,10 +217,6 @@ struct CableTensionQuantity : ui::Quantity {
 
 
 struct CpuMeterItem : ui::MenuItem {
-	CpuMeterItem() {
-		text = "CPU meter";
-		rightText = CHECKMARK(settings.cpuMeter);
-	}
 	void onAction(const event::Action &e) override {
 		settings.cpuMeter ^= true;
 	}
@@ -236,10 +224,6 @@ struct CpuMeterItem : ui::MenuItem {
 
 
 struct ParamTooltipItem : ui::MenuItem {
-	ParamTooltipItem() {
-		text = "Parameter tooltips";
-		rightText = CHECKMARK(settings.paramTooltip);
-	}
 	void onAction(const event::Action &e) override {
 		settings.paramTooltip ^= true;
 	}
@@ -247,10 +231,6 @@ struct ParamTooltipItem : ui::MenuItem {
 
 
 struct LockModulesItem : ui::MenuItem {
-	LockModulesItem() {
-		text = "Lock modules";
-		rightText = CHECKMARK(settings.lockModules);
-	}
 	void onAction(const event::Action &e) override {
 		settings.lockModules ^= true;
 	}
@@ -258,10 +238,6 @@ struct LockModulesItem : ui::MenuItem {
 
 
 struct EnginePauseItem : ui::MenuItem {
-	EnginePauseItem() {
-		text = "Pause engine";
-		rightText = CHECKMARK(APP->engine->isPaused());
-	}
 	void onAction(const event::Action &e) override {
 		APP->engine->setPaused(!APP->engine->isPaused());
 	}
@@ -270,11 +246,6 @@ struct EnginePauseItem : ui::MenuItem {
 
 struct SampleRateValueItem : ui::MenuItem {
 	float sampleRate;
-	void setSampleRate(float sampleRate) {
-		this->sampleRate = sampleRate;
-		text = string::f("%.0f Hz", sampleRate);
-		rightText = CHECKMARK(APP->engine->getSampleRate() == sampleRate);
-	}
 	void onAction(const event::Action &e) override {
 		APP->engine->setSampleRate(sampleRate);
 		APP->engine->setPaused(false);
@@ -283,28 +254,28 @@ struct SampleRateValueItem : ui::MenuItem {
 
 
 struct SampleRateItem : ui::MenuItem {
-	SampleRateItem() {
-		text = "Engine sample rate";
-	}
 	ui::Menu *createChildMenu() override {
 		ui::Menu *menu = new ui::Menu;
 
-		menu->addChild(new EnginePauseItem);
+		EnginePauseItem *enginePauseItem = new EnginePauseItem;
+		enginePauseItem->text = "Pause engine";
+		enginePauseItem->rightText = CHECKMARK(APP->engine->isPaused());
+		menu->addChild(enginePauseItem);
 
 		for (int i = 0; i <= 4; i++) {
-			int oversample = 1 << i;
+			for (int j = 0; j < 2; j++) {
+				int oversample = 1 << i;
+				float sampleRate = (j == 0) ? 44100.f : 48000.f;
+				sampleRate *= oversample;
 
-			SampleRateValueItem *item = new SampleRateValueItem;
-			item->setSampleRate(44100.f * oversample);
-			if (oversample > 1)
-				item->text += string::f(" (%dx)", oversample);
-			menu->addChild(item);
-
-			item = new SampleRateValueItem;
-			item->setSampleRate(48000.f * oversample);
-			if (oversample > 1)
-				item->text += string::f(" (%dx)", oversample);
-			menu->addChild(item);
+				SampleRateValueItem *item = new SampleRateValueItem;
+				item->sampleRate = sampleRate;
+				item->text = string::f("%.0f Hz", sampleRate);
+				if (oversample > 1)
+					item->text += string::f(" (%dx)", oversample);
+				item->rightText = CHECKMARK(APP->engine->getSampleRate() == sampleRate);
+				menu->addChild(item);
+			}
 		}
 		return menu;
 	}
@@ -329,9 +300,6 @@ struct ThreadCountValueItem : ui::MenuItem {
 
 
 struct ThreadCount : ui::MenuItem {
-	ThreadCount() {
-		text = "Thread count";
-	}
 	ui::Menu *createChildMenu() override {
 		ui::Menu *menu = new ui::Menu;
 
@@ -347,12 +315,6 @@ struct ThreadCount : ui::MenuItem {
 
 
 struct FullscreenItem : ui::MenuItem {
-	FullscreenItem() {
-		text = "Fullscreen";
-		rightText = "F11";
-		if (APP->window->isFullScreen())
-			rightText = CHECKMARK_STRING " " + rightText;
-	}
 	void onAction(const event::Action &e) override {
 		APP->window->setFullScreen(!APP->window->isFullScreen());
 	}
@@ -360,20 +322,42 @@ struct FullscreenItem : ui::MenuItem {
 
 
 struct SettingsButton : MenuButton {
-	SettingsButton() {
-		text = "Settings";
-	}
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(new ParamTooltipItem);
-		menu->addChild(new CpuMeterItem);
-		menu->addChild(new LockModulesItem);
-		menu->addChild(new SampleRateItem);
-		menu->addChild(new ThreadCount);
-		menu->addChild(new FullscreenItem);
+		ParamTooltipItem *paramTooltipItem = new ParamTooltipItem;
+		paramTooltipItem->text = "Parameter tooltips";
+		paramTooltipItem->rightText = CHECKMARK(settings.paramTooltip);
+		menu->addChild(paramTooltipItem);
+
+		CpuMeterItem *cpuMeterItem = new CpuMeterItem;
+		cpuMeterItem->text = "CPU meter";
+		cpuMeterItem->rightText = CHECKMARK(settings.cpuMeter);
+		menu->addChild(cpuMeterItem);
+
+		LockModulesItem *lockModulesItem = new LockModulesItem;
+		lockModulesItem->text = "Lock modules";
+		lockModulesItem->rightText = CHECKMARK(settings.lockModules);
+		menu->addChild(lockModulesItem);
+
+		SampleRateItem *sampleRateItem = new SampleRateItem;
+		sampleRateItem->text = "Engine sample rate";
+		sampleRateItem->rightText = RIGHT_ARROW;
+		menu->addChild(sampleRateItem);
+
+		ThreadCount *threadCount = new ThreadCount;
+		threadCount->text = "Thread count";
+		threadCount->rightText = RIGHT_ARROW;
+		menu->addChild(threadCount);
+
+		FullscreenItem *fullscreenItem = new FullscreenItem;
+		fullscreenItem->text = "Fullscreen";
+		fullscreenItem->rightText = "F11";
+		if (APP->window->isFullScreen())
+			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
+		menu->addChild(fullscreenItem);
 
 		ui::Slider *zoomSlider = new ui::Slider;
 		zoomSlider->box.size.x = 200.0;
@@ -394,9 +378,6 @@ struct SettingsButton : MenuButton {
 
 
 struct RegisterItem : ui::MenuItem {
-	RegisterItem() {
-		text = "Register VCV account";
-	}
 	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/");
@@ -408,9 +389,6 @@ struct RegisterItem : ui::MenuItem {
 
 struct AccountEmailField : ui::TextField {
 	ui::TextField *passwordField;
-	AccountEmailField() {
-		placeholder = "Email";
-	}
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
 			APP->event->selectedWidget = passwordField;
@@ -425,9 +403,6 @@ struct AccountEmailField : ui::TextField {
 
 struct AccountPasswordField : ui::PasswordField {
 	ui::MenuItem *logInItem;
-	AccountPasswordField() {
-		placeholder = "Password";
-	}
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			logInItem->doAction();
@@ -443,9 +418,6 @@ struct AccountPasswordField : ui::PasswordField {
 struct LogInItem : ui::MenuItem {
 	ui::TextField *emailField;
 	ui::TextField *passwordField;
-	LogInItem() {
-		text = "Log in";
-	}
 	void onAction(const event::Action &e) override {
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
@@ -459,7 +431,6 @@ struct LogInItem : ui::MenuItem {
 
 struct ManageItem : ui::MenuItem {
 	ManageItem() {
-		text = "Manage plugins";
 	}
 	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
@@ -471,10 +442,6 @@ struct ManageItem : ui::MenuItem {
 
 
 struct SyncItem : ui::MenuItem {
-	SyncItem() {
-		text = "Sync plugins";
-		disabled = true;
-	}
 	void onAction(const event::Action &e) override {
 	}
 };
@@ -517,9 +484,6 @@ struct SyncItem : ui::MenuItem {
 
 
 struct LogOutItem : ui::MenuItem {
-	LogOutItem() {
-		text = "Log out";
-	}
 	void onAction(const event::Action &e) override {
 		plugin::logOut();
 	}
@@ -546,9 +510,6 @@ struct DownloadQuantity : ui::Quantity {
 
 
 struct PluginsButton : MenuButton {
-	PluginsButton() {
-		text = "Plugins";
-	}
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
@@ -561,20 +522,37 @@ struct PluginsButton : MenuButton {
 			menu->addChild(downloadProgressBar);
 		}
 		else if (plugin::isLoggedIn()) {
-			menu->addChild(new ManageItem);
-			menu->addChild(new SyncItem);
-			menu->addChild(new LogOutItem);
+			ManageItem *manageItem = new ManageItem;
+			manageItem->text = "Manage plugins";
+			menu->addChild(manageItem);
+
+			SyncItem *syncItem = new SyncItem;
+			syncItem->text = "Sync plugins";
+			syncItem->disabled = true;
+			menu->addChild(syncItem);
+
+			LogOutItem *logOutItem = new LogOutItem;
+			logOutItem->text = "Log out";
+			menu->addChild(logOutItem);
 		}
 		else {
-			menu->addChild(new RegisterItem);
+			RegisterItem *registerItem = new RegisterItem;
+			registerItem->text = "Register VCV account";
+			menu->addChild(registerItem);
+
 			AccountEmailField *emailField = new AccountEmailField;
+			emailField->placeholder = "Email";
 			emailField->box.size.x = 200.0;
 			menu->addChild(emailField);
+
 			AccountPasswordField *passwordField = new AccountPasswordField;
+			passwordField->placeholder = "Password";
 			passwordField->box.size.x = 200.0;
 			emailField->passwordField = passwordField;
 			menu->addChild(passwordField);
+
 			LogInItem *logInItem = new LogInItem;
+			logInItem->text = "Log in";
 			logInItem->emailField = emailField;
 			logInItem->passwordField = passwordField;
 			passwordField->logInItem = logInItem;
@@ -598,10 +576,6 @@ struct PluginsButton : MenuButton {
 
 
 struct ManualItem : ui::MenuItem {
-	ManualItem() {
-		text = "Manual";
-		rightText = "F1";
-	}
 	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/manual/");
@@ -612,9 +586,6 @@ struct ManualItem : ui::MenuItem {
 
 
 struct WebsiteItem : ui::MenuItem {
-	WebsiteItem() {
-		text = "VCVRack.com";
-	}
 	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/");
@@ -625,10 +596,6 @@ struct WebsiteItem : ui::MenuItem {
 
 
 struct CheckVersionItem : ui::MenuItem {
-	CheckVersionItem() {
-		text = "Check version on launch";
-		rightText = CHECKMARK(settings.checkVersion);
-	}
 	void onAction(const event::Action &e) override {
 		settings.checkVersion ^= true;
 	}
@@ -636,17 +603,24 @@ struct CheckVersionItem : ui::MenuItem {
 
 
 struct HelpButton : MenuButton {
-	HelpButton() {
-		text = "Help";
-	}
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		menu->addChild(new ManualItem);
-		menu->addChild(new WebsiteItem);
-		menu->addChild(new CheckVersionItem);
+		ManualItem *manualItem = new ManualItem;
+		manualItem->text = "Manual";
+		manualItem->rightText = "F1";
+		menu->addChild(manualItem);
+
+		WebsiteItem *websiteItem = new WebsiteItem;
+		websiteItem->text = "VCVRack.com";
+		menu->addChild(websiteItem);
+
+		CheckVersionItem *checkVersionItem = new CheckVersionItem;
+		checkVersionItem->text = "Check version on launch";
+		checkVersionItem->rightText = CHECKMARK(settings.checkVersion);
+		menu->addChild(checkVersionItem);
 	}
 };
 
@@ -661,18 +635,23 @@ Toolbar::Toolbar() {
 	addChild(layout);
 
 	FileButton *fileButton = new FileButton;
+	fileButton->text = "File";
 	layout->addChild(fileButton);
 
 	EditButton *editButton = new EditButton;
+	editButton->text = "Edit";
 	layout->addChild(editButton);
 
 	SettingsButton *settingsButton = new SettingsButton;
+	settingsButton->text = "Settings";
 	layout->addChild(settingsButton);
 
 	PluginsButton *pluginsButton = new PluginsButton;
+	pluginsButton->text = "Plugins";
 	layout->addChild(pluginsButton);
 
 	HelpButton *helpButton = new HelpButton;
+	helpButton->text = "Help";
 	layout->addChild(helpButton);
 }
 

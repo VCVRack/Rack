@@ -742,6 +742,7 @@ void ModuleWidget::createContextMenu() {
 
 	ModulePluginItem *pluginItem = new ModulePluginItem;
 	pluginItem->text = model->plugin->name;
+	pluginItem->rightText = RIGHT_ARROW;
 	pluginItem->plugin = model->plugin;
 	menu->addChild(pluginItem);
 
@@ -769,6 +770,14 @@ void ModuleWidget::createContextMenu() {
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
+	if (!model->presetPaths.empty()) {
+		ModuleListPresetsItem *presetsItem = new ModuleListPresetsItem;
+		presetsItem->text = "Factory presets";
+		presetsItem->rightText = RIGHT_ARROW;
+		presetsItem->moduleWidget = this;
+		menu->addChild(presetsItem);
+	}
+
 	ModuleCopyItem *copyItem = new ModuleCopyItem;
 	copyItem->text = "Copy preset";
 	copyItem->rightText = WINDOW_MOD_CTRL_NAME "+C";
@@ -790,11 +799,6 @@ void ModuleWidget::createContextMenu() {
 	saveItem->text = "Save preset as";
 	saveItem->moduleWidget = this;
 	menu->addChild(saveItem);
-
-	ModuleListPresetsItem *presetsItem = new ModuleListPresetsItem;
-	presetsItem->text = "Factory presets";
-	presetsItem->moduleWidget = this;
-	menu->addChild(presetsItem);
 
 	ModuleBypassItem *bypassItem = new ModuleBypassItem;
 	bypassItem->text = "Disable";
