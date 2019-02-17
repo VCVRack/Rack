@@ -1,5 +1,6 @@
 #include "system.hpp"
 #include "string.hpp"
+
 #include <thread>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -35,6 +36,7 @@ std::list<std::string> listEntries(const std::string &path) {
 		}
 		closedir(dir);
 	}
+	filenames.sort();
 	return filenames;
 }
 

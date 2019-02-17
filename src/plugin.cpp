@@ -116,17 +116,6 @@ static bool loadPlugin(std::string path) {
 	initCallback(plugin);
 	plugin->fromJson(rootJ);
 
-	// Normalize tags
-	for (Model *model : plugin->models) {
-		std::set<std::string> normalizedTags;
-		for (const std::string &tag : model->tags) {
-			std::string normalizedTag = normalizeTag(tag);
-			if (!normalizedTag.empty())
-				normalizedTags.insert(normalizedTag);
-		}
-		model->tags = normalizedTags;
-	}
-
 	// Check slug
 	if (!isSlugValid(plugin->slug)) {
 		WARN("Plugin slug \"%s\" is invalid", plugin->slug.c_str());
@@ -145,6 +134,26 @@ static bool loadPlugin(std::string path) {
 	// Add plugin to list
 	plugins.push_back(plugin);
 	INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
+
+	// Normalize tags
+	for (Model *model : plugin->models) {
+		std::vector<std::string> normalizedTags;
+		for (const std::string &tag : model->tags) {
+			std::string normalizedTag = normalizeTag(tag);
+			if (!normalizedTag.empty())
+				normalizedTags.push_back(normalizedTag);
+		}
+		model->tags = normalizedTags;
+	}
+
+	// Search for presets
+	for (Model *model : plugin->models) {
+		std::string presetDir = asset::plugin(plugin, "presets/" + model->slug);
+		for (const std::string &presetPath : system::listEntries(presetDir)) {
+			DEBUG("%s", presetPath.c_str());
+			model->presetPaths.push_back(presetPath);
+		}
+	}
 
 	return true;
 }

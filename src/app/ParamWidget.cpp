@@ -89,10 +89,6 @@ struct ParamLabel : ui::MenuLabel {
 
 struct ParamResetItem : ui::MenuItem {
 	ParamWidget *paramWidget;
-	ParamResetItem() {
-		text = "Initialize";
-		rightText = "Double-click";
-	}
 	void onAction(const event::Action &e) override {
 		paramWidget->resetAction();
 	}
@@ -100,19 +96,11 @@ struct ParamResetItem : ui::MenuItem {
 
 
 struct ParamFineItem : ui::MenuItem {
-	ParamFineItem() {
-		text = "Fine adjust";
-		rightText = WINDOW_MOD_CTRL_NAME "+drag";
-		disabled = true;
-	}
 };
 
 
 struct ParamUnmapItem : ui::MenuItem {
 	ParamWidget *paramWidget;
-	ParamUnmapItem() {
-		text = "Unmap";
-	}
 	void onAction(const event::Action &e) override {
 		engine::ParamHandle *paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module, paramWidget->paramQuantity->paramId);
 		if (paramHandle) {
@@ -231,15 +219,21 @@ void ParamWidget::createContextMenu() {
 	menu->addChild(paramField);
 
 	ParamResetItem *resetItem = new ParamResetItem;
+	resetItem->text = "Initialize";
+	resetItem->rightText = "Double-click";
 	resetItem->paramWidget = this;
 	menu->addChild(resetItem);
 
 	// ParamFineItem *fineItem = new ParamFineItem;
+	// fineItem->text = "Fine adjust";
+	// fineItem->rightText = WINDOW_MOD_CTRL_NAME "+drag";
+	// fineItem->disabled = true;
 	// menu->addChild(fineItem);
 
 	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module, paramQuantity->paramId) : NULL;
 	if (paramHandle) {
 		ParamUnmapItem *unmapItem = new ParamUnmapItem;
+		unmapItem->text = "Unmap";
 		unmapItem->paramWidget = this;
 		menu->addChild(unmapItem);
 	}

@@ -31,9 +31,6 @@ struct ModuleUrlItem : ui::MenuItem {
 
 struct ModulePluginItem : ui::MenuItem {
 	plugin::Plugin *plugin;
-	ModulePluginItem() {
-		disabled = true;
-	}
 	ui::Menu *createChildMenu() override {
 		ui::Menu *menu = new ui::Menu;
 
@@ -97,10 +94,6 @@ struct ModulePluginItem : ui::MenuItem {
 
 struct ModuleDisconnectItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleDisconnectItem() {
-		text = "Disconnect cables";
-		rightText = WINDOW_MOD_CTRL_NAME "+U";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->disconnectAction();
 	}
@@ -108,10 +101,6 @@ struct ModuleDisconnectItem : ui::MenuItem {
 
 struct ModuleResetItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleResetItem() {
-		text = "Initialize";
-		rightText = WINDOW_MOD_CTRL_NAME "+I";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->resetAction();
 	}
@@ -119,10 +108,6 @@ struct ModuleResetItem : ui::MenuItem {
 
 struct ModuleRandomizeItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleRandomizeItem() {
-		text = "Randomize";
-		rightText = WINDOW_MOD_CTRL_NAME "+R";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->randomizeAction();
 	}
@@ -130,10 +115,6 @@ struct ModuleRandomizeItem : ui::MenuItem {
 
 struct ModuleCopyItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleCopyItem() {
-		text = "Copy preset";
-		rightText = WINDOW_MOD_CTRL_NAME "+C";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->copyClipboard();
 	}
@@ -141,10 +122,6 @@ struct ModuleCopyItem : ui::MenuItem {
 
 struct ModulePasteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModulePasteItem() {
-		text = "Paste preset";
-		rightText = WINDOW_MOD_CTRL_NAME "+V";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->pasteClipboardAction();
 	}
@@ -152,9 +129,6 @@ struct ModulePasteItem : ui::MenuItem {
 
 struct ModuleSaveItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleSaveItem() {
-		text = "Save preset as";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->saveDialog();
 	}
@@ -162,20 +136,39 @@ struct ModuleSaveItem : ui::MenuItem {
 
 struct ModuleLoadItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleLoadItem() {
-		text = "Load preset";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->loadDialog();
 	}
 };
 
+struct ModulePresetItem : ui::MenuItem {
+	ModuleWidget *moduleWidget;
+	std::string presetPath;
+	void onAction(const event::Action &e) override {
+		moduleWidget->loadAction(presetPath);
+	}
+};
+
+struct ModuleListPresetsItem : ui::MenuItem {
+	ModuleWidget *moduleWidget;
+	ui::Menu *createChildMenu() override {
+		ui::Menu *menu = new ui::Menu;
+
+		for (const std::string &presetPath : moduleWidget->model->presetPaths) {
+			ModulePresetItem *presetItem = new ModulePresetItem;
+			std::string presetName = string::basename(string::filename(presetPath));
+			presetItem->text = presetName;
+			presetItem->presetPath = presetPath;
+			presetItem->moduleWidget = moduleWidget;
+			menu->addChild(presetItem);
+		}
+
+		return menu;
+	}
+};
+
 struct ModuleCloneItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleCloneItem() {
-		text = "Duplicate";
-		rightText = WINDOW_MOD_CTRL_NAME "+D";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->cloneAction();
 	}
@@ -183,15 +176,6 @@ struct ModuleCloneItem : ui::MenuItem {
 
 struct ModuleBypassItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleBypassItem() {
-		text = "Disable";
-	}
-	void setModule(ModuleWidget *moduleWidget) {
-		this->moduleWidget = moduleWidget;
-		rightText = WINDOW_MOD_CTRL_NAME "+E";
-		if (moduleWidget->module && moduleWidget->module->bypass)
-			rightText = CHECKMARK_STRING " " + rightText;
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->bypassAction();
 	}
@@ -199,10 +183,6 @@ struct ModuleBypassItem : ui::MenuItem {
 
 struct ModuleDeleteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	ModuleDeleteItem() {
-		text = "Delete";
-		rightText = "Backspace/Delete";
-	}
 	void onAction(const event::Action &e) override {
 		moduleWidget->removeAction();
 	}
@@ -766,42 +746,67 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(pluginItem);
 
 	ModuleResetItem *resetItem = new ModuleResetItem;
+	resetItem->text = "Initialize";
+	resetItem->rightText = WINDOW_MOD_CTRL_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->addChild(resetItem);
 
 	ModuleRandomizeItem *randomizeItem = new ModuleRandomizeItem;
+	randomizeItem->text = "Randomize";
+	randomizeItem->rightText = WINDOW_MOD_CTRL_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->addChild(randomizeItem);
 
 	ModuleDisconnectItem *disconnectItem = new ModuleDisconnectItem;
+	disconnectItem->text = "Disconnect cables";
+	disconnectItem->rightText = WINDOW_MOD_CTRL_NAME "+U";
 	disconnectItem->moduleWidget = this;
 	menu->addChild(disconnectItem);
 
 	ModuleCloneItem *cloneItem = new ModuleCloneItem;
+	cloneItem->text = "Duplicate";
+	cloneItem->rightText = WINDOW_MOD_CTRL_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
 	ModuleCopyItem *copyItem = new ModuleCopyItem;
+	copyItem->text = "Copy preset";
+	copyItem->rightText = WINDOW_MOD_CTRL_NAME "+C";
 	copyItem->moduleWidget = this;
 	menu->addChild(copyItem);
 
 	ModulePasteItem *pasteItem = new ModulePasteItem;
+	pasteItem->text = "Paste preset";
+	pasteItem->rightText = WINDOW_MOD_CTRL_NAME "+V";
 	pasteItem->moduleWidget = this;
 	menu->addChild(pasteItem);
 
 	ModuleLoadItem *loadItem = new ModuleLoadItem;
+	loadItem->text = "Open preset";
 	loadItem->moduleWidget = this;
 	menu->addChild(loadItem);
 
 	ModuleSaveItem *saveItem = new ModuleSaveItem;
+	saveItem->text = "Save preset as";
 	saveItem->moduleWidget = this;
 	menu->addChild(saveItem);
 
+	ModuleListPresetsItem *presetsItem = new ModuleListPresetsItem;
+	presetsItem->text = "Factory presets";
+	presetsItem->moduleWidget = this;
+	menu->addChild(presetsItem);
+
 	ModuleBypassItem *bypassItem = new ModuleBypassItem;
-	bypassItem->setModule(this);
+	bypassItem->text = "Disable";
+	bypassItem->rightText = WINDOW_MOD_CTRL_NAME "+E";
+	if (module && module->bypass)
+		bypassItem->rightText = CHECKMARK_STRING " " + bypassItem->rightText;
+	bypassItem->moduleWidget = this;
 	menu->addChild(bypassItem);
 
 	ModuleDeleteItem *deleteItem = new ModuleDeleteItem;
+	deleteItem->text = "Delete";
+	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;
 	menu->addChild(deleteItem);
 
