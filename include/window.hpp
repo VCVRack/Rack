@@ -74,8 +74,6 @@ DEPRECATED typedef Svg SVG;
 struct Window {
 	GLFWwindow *win = NULL;
 	NVGcontext *vg = NULL;
-	/** Secondary nanovg context for drawing to framebuffers */
-	NVGcontext *fbVg = NULL;
 	/** The scaling ratio */
 	float pixelRatio = 1.f;
 	/* The ratio between the framebuffer size and the window size reported by the OS.

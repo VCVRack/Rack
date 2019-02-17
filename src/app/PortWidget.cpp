@@ -45,6 +45,8 @@ void PortWidget::step() {
 			values[i] = module->inputs[portId].plugLights[i].getBrightness();
 	}
 	plugLight->setBrightnesses(values);
+
+	OpaqueWidget::step();
 }
 
 void PortWidget::draw(const DrawArgs &args) {
@@ -54,7 +56,7 @@ void PortWidget::draw(const DrawArgs &args) {
 		if (type == OUTPUT ? cw->outputPort : cw->inputPort)
 			nvgGlobalAlpha(args.vg, 0.5);
 	}
-	widget::Widget::draw(args);
+	Widget::draw(args);
 }
 
 void PortWidget::onButton(const event::Button &e) {

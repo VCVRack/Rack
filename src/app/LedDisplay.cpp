@@ -17,7 +17,7 @@ void LedDisplay::draw(const DrawArgs &args) {
 	nvgFill(args.vg);
 
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
-	widget::Widget::draw(args);
+	Widget::draw(args);
 	nvgResetScissor(args.vg);
 }
 

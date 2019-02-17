@@ -15,10 +15,60 @@ FramebufferWidget::~FramebufferWidget() {
 		nvgluDeleteFramebuffer(fb);
 }
 
+void FramebufferWidget::step() {
+	Widget::step();
+
+	// Render to framebuffer if dirty.
+	// Also check that scale has been set by `draw()` yet.
+	if (dirty && !scale.isZero()) {
+		// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
+		dirty = false;
+
+		fbScale = scale;
+		// Get subpixel offset in range [0, 1)
+		math::Vec offsetI = offset.floor();
+		fbOffset = offset.minus(offsetI);
+
+		math::Rect localBox;
+		if (children.empty()) {
+			localBox = box.zeroPos();
+		}
+		else {
+			localBox = getChildrenBoundingBox();
+		}
+
+		// DEBUG("%g %g %g %g, %g %g, %g %g", RECT_ARGS(localBox), VEC_ARGS(fbOffset), VEC_ARGS(fbScale));
+		// Transform to world coordinates, then expand to nearest integer coordinates
+		math::Vec min = localBox.getTopLeft().mult(fbScale).plus(fbOffset).floor();
+		math::Vec max = localBox.getBottomRight().mult(fbScale).plus(fbOffset).ceil();
+		fbBox = math::Rect::fromMinMax(min, max);
+		// DEBUG("%g %g %g %g", RECT_ARGS(fbBox));
+
+		math::Vec newFbSize = fbBox.size.mult(APP->window->pixelRatio * oversample);
+
+		// Create framebuffer if a new size is needed
+		if (!fb || !newFbSize.isEqual(fbSize)) {
+			fbSize = newFbSize;
+			// Delete old framebuffer
+			if (fb)
+				nvgluDeleteFramebuffer(fb);
+			// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
+			if (fbSize.isFinite() && !fbSize.isZero())
+				fb = nvgluCreateFramebuffer(APP->window->vg, fbSize.x, fbSize.y, 0);
+		}
+
+		if (!fb)
+			return;
+
+		nvgluBindFramebuffer(fb);
+		drawFramebuffer();
+		nvgluBindFramebuffer(NULL);
+	}
+}
+
 void FramebufferWidget::draw(const DrawArgs &args) {
-	// Bypass framebuffer rendering if we're already drawing in a framebuffer
-	// In other words, disallow nested framebuffers. They look bad.
-	if (args.vg == APP->window->fbVg) {
+	// Draw directly if already drawing in a framebuffer
+	if (args.fb) {
 		Widget::draw(args);
 		return;
 	}
@@ -30,52 +80,9 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 	assert(math::isNear(xform[1], 0.f));
 	assert(math::isNear(xform[2], 0.f));
 	// Extract scale and offset from world transform
-	math::Vec scale = math::Vec(xform[0], xform[3]);
-	math::Vec offset = math::Vec(xform[4], xform[5]);
+	scale = math::Vec(xform[0], xform[3]);
+	offset = math::Vec(xform[4], xform[5]);
 	math::Vec offsetI = offset.floor();
-
-	// Render to framebuffer
-	if (dirty) {
-		dirty = false;
-
-		fbScale = scale;
-		// World coordinates, in range [0, 1)
-		fbOffset = offset.minus(offsetI);
-
-		math::Rect localBox;
-		if (children.empty()) {
-			localBox = box.zeroPos();
-		}
-		else {
-			localBox = getChildrenBoundingBox();
-		}
-
-		// DEBUG("%g %g %g %g, %g %g, %g %g", RECT_ARGS(localBox), VEC_ARGS(fbOffset), VEC_ARGS(scale));
-		// Transform to world coordinates, then expand to nearest integer coordinates
-		math::Vec min = localBox.getTopLeft().mult(scale).plus(fbOffset).floor();
-		math::Vec max = localBox.getBottomRight().mult(scale).plus(fbOffset).ceil();
-		fbBox = math::Rect::fromMinMax(min, max);
-		// DEBUG("%g %g %g %g", RECT_ARGS(fbBox));
-
-		math::Vec newFbSize = fbBox.size.mult(APP->window->pixelRatio * oversample);
-
-		if (!fb || !newFbSize.isEqual(fbSize)) {
-			fbSize = newFbSize;
-			// Delete old framebuffer
-			if (fb)
-				nvgluDeleteFramebuffer(fb);
-			// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
-			if (fbSize.isFinite() && !fbSize.isZero())
-				fb = nvgluCreateFramebuffer(args.vg, fbSize.x, fbSize.y, 0);
-		}
-
-		if (!fb)
-			return;
-
-		nvgluBindFramebuffer(fb);
-		drawFramebuffer();
-		nvgluBindFramebuffer(NULL);
-	}
 
 	if (!fb)
 		return;
@@ -106,7 +113,7 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 }
 
 void FramebufferWidget::drawFramebuffer() {
-	NVGcontext *vg = APP->window->fbVg;
+	NVGcontext *vg = APP->window->vg;
 
 	float pixelRatio = fbSize.x / fbBox.size.x;
 	nvgBeginFrame(vg, fbBox.size.x, fbBox.size.y, pixelRatio);
@@ -119,6 +126,7 @@ void FramebufferWidget::drawFramebuffer() {
 	DrawArgs args;
 	args.vg = vg;
 	args.clipBox = box.zeroPos();
+	args.fb = fb;
 	Widget::draw(args);
 
 	glViewport(0.0, 0.0, fbSize.x, fbSize.y);

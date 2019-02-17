@@ -21,7 +21,7 @@ struct ParamField : ui::TextField {
 	void step() override {
 		// Keep selected
 		APP->event->setSelected(this);
-		ui::TextField::step();
+		TextField::step();
 	}
 
 	void setParamWidget(ParamWidget *paramWidget) {
@@ -54,7 +54,7 @@ struct ParamField : ui::TextField {
 		}
 
 		if (!e.getConsumed())
-			ui::TextField::onSelectKey(e);
+			TextField::onSelectKey(e);
 	}
 };
 
@@ -73,7 +73,7 @@ struct ParamTooltip : ui::Tooltip {
 		}
 		// Position at bottom-right of parameter
 		box.pos = paramWidget->getAbsoluteOffset(paramWidget->box.size).round();
-		ui::Tooltip::step();
+		Tooltip::step();
 	}
 };
 
@@ -82,7 +82,7 @@ struct ParamLabel : ui::MenuLabel {
 	ParamWidget *paramWidget;
 	void step() override {
 		text = paramWidget->paramQuantity->getString();
-		ui::MenuLabel::step();
+		MenuLabel::step();
 	}
 };
 
@@ -138,11 +138,11 @@ void ParamWidget::step() {
 		}
 	}
 
-	widget::OpaqueWidget::step();
+	OpaqueWidget::step();
 }
 
 void ParamWidget::draw(const DrawArgs &args) {
-	widget::Widget::draw(args);
+	Widget::draw(args);
 
 	// if (paramQuantity) {
 	// 	nvgBeginPath(args.vg);
@@ -185,7 +185,7 @@ void ParamWidget::onButton(const event::Button &e) {
 	}
 
 	if (!e.getConsumed())
-		widget::OpaqueWidget::onButton(e);
+		OpaqueWidget::onButton(e);
 }
 
 void ParamWidget::onDoubleClick(const event::DoubleClick &e) {

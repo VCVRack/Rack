@@ -24,12 +24,12 @@ void RackScrollWidget::step() {
 		if (pos.y >= viewport.pos.y + viewport.size.y - margin)
 			offset.y += speed;
 	}
-	ui::ScrollWidget::step();
+	ScrollWidget::step();
 }
 
 
 void RackScrollWidget::draw(const DrawArgs &args) {
-	ui::ScrollWidget::draw(args);
+	ScrollWidget::draw(args);
 }
 
 

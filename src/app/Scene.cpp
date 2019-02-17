@@ -51,7 +51,7 @@ void Scene::step() {
 		.plus(math::Vec(500, 500))
 		.div(zoomWidget->zoom);
 
-	widget::OpaqueWidget::step();
+	OpaqueWidget::step();
 
 	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 
@@ -88,7 +88,7 @@ void Scene::step() {
 }
 
 void Scene::draw(const DrawArgs &args) {
-	widget::OpaqueWidget::draw(args);
+	OpaqueWidget::draw(args);
 }
 
 void Scene::onHoverKey(const event::HoverKey &e) {
@@ -149,7 +149,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 	}
 
 	if (!e.getConsumed())
-		widget::OpaqueWidget::onHoverKey(e);
+		OpaqueWidget::onHoverKey(e);
 }
 
 void Scene::onPathDrop(const event::PathDrop &e) {
@@ -162,7 +162,7 @@ void Scene::onPathDrop(const event::PathDrop &e) {
 	}
 
 	if (!e.getConsumed())
-		widget::OpaqueWidget::onPathDrop(e);
+		OpaqueWidget::onPathDrop(e);
 }
 
 void Scene::runCheckVersion() {

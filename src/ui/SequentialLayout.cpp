@@ -11,7 +11,7 @@ namespace ui {
 
 
 void SequentialLayout::step() {
-	widget::Widget::step();
+	Widget::step();
 
 	// Sort widgets into rows (or columns if vertical)
 	std::vector<std::vector<widget::Widget*>> rows;

@@ -15,7 +15,7 @@ void MenuLabel::step() {
 	const float rightPadding = 10.0;
 	// HACK use APP->window->vg from the window.
 	box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + rightPadding;
-	widget::Widget::step();
+	Widget::step();
 }
 
 

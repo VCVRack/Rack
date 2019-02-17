@@ -27,7 +27,7 @@ void Menu::setChildMenu(Menu *menu) {
 }
 
 void Menu::step() {
-	widget::Widget::step();
+	Widget::step();
 
 	// Set positions of children
 	box.size = math::Vec(0, 0);
@@ -51,7 +51,7 @@ void Menu::step() {
 
 void Menu::draw(const DrawArgs &args) {
 	bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE);
-	widget::Widget::draw(args);
+	Widget::draw(args);
 }
 
 void Menu::onHoverScroll(const event::HoverScroll &e) {

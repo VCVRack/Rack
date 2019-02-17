@@ -15,19 +15,24 @@ struct FramebufferWidget : Widget {
 	bool dirty = true;
 	float oversample;
 	NVGLUframebuffer *fb = NULL;
+	/** Scale relative to the world */
+	math::Vec scale;
+	/** Offset in world coordinates */
+	math::Vec offset;
 	/** Pixel dimensions of the allocated framebuffer */
 	math::Vec fbSize;
-	/** Bounding box in world coordinates of where the framebuffer should be painted
+	/** Bounding box in world coordinates of where the framebuffer should be painted.
 	Always has integer coordinates so that blitting framebuffers is pixel-perfect.
 	*/
 	math::Rect fbBox;
-	/** Local scale relative to the world scale */
+	/** Framebuffer's scale relative to the world */
 	math::Vec fbScale;
-	/** Subpixel offset of fbBox in world coordinates */
+	/** Framebuffer's subpixel offset relative to fbBox in world coordinates */
 	math::Vec fbOffset;
 
 	FramebufferWidget();
 	~FramebufferWidget();
+	void step() override;
 	void draw(const DrawArgs &args) override;
 	virtual void drawFramebuffer();
 	int getImageHandle();

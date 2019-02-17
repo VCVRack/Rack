@@ -84,6 +84,7 @@ struct Widget {
 	struct DrawArgs {
 		NVGcontext *vg;
 		math::Rect clipBox;
+		NVGLUframebuffer *fb = NULL;
 	};
 
 	/** Draws the widget to the NanoVG context */

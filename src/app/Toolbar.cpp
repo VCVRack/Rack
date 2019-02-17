@@ -25,7 +25,7 @@ namespace app {
 struct MenuButton : ui::Button {
 	void step() override {
 		box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + 1.0;
-		widget::Widget::step();
+		Widget::step();
 	}
 	void draw(const DrawArgs &args) override {
 		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
@@ -680,7 +680,7 @@ void Toolbar::draw(const DrawArgs &args) {
 	bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
 	bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 
-	widget::Widget::draw(args);
+	Widget::draw(args);
 }
 
 

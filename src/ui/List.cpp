@@ -6,7 +6,7 @@ namespace ui {
 
 
 void List::step() {
-	widget::Widget::step();
+	Widget::step();
 
 	// Set positions of children
 	box.size.y = 0.0;

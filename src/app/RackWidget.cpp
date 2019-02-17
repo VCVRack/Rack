@@ -55,14 +55,14 @@ struct ModuleContainer : widget::Widget {
 			nvgRestore(args.vg);
 		}
 
-		widget::Widget::draw(args);
+		Widget::draw(args);
 	}
 };
 
 
 struct CableContainer : widget::TransparentWidget {
 	void draw(const DrawArgs &args) override {
-		widget::Widget::draw(args);
+		Widget::draw(args);
 
 		// Draw cable plugs
 		for (widget::Widget *w : children) {
@@ -114,11 +114,11 @@ void RackWidget::step() {
 		rail->box.size = rails->box.size;
 	}
 
-	widget::Widget::step();
+	Widget::step();
 }
 
 void RackWidget::draw(const DrawArgs &args) {
-	widget::Widget::draw(args);
+	Widget::draw(args);
 }
 
 void RackWidget::onHover(const event::Hover &e) {

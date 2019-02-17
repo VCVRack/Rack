@@ -148,7 +148,7 @@ void ModuleWidget::draw(const DrawArgs &args) {
 		nvgGlobalAlpha(args.vg, 0.25);
 	}
 
-	widget::Widget::draw(args);
+	Widget::draw(args);
 
 	// Power meter
 	if (module && settings.cpuMeter) {

@@ -14,7 +14,7 @@ void MenuOverlay::step() {
 		child->box = child->box.nudge(box.zeroPos());
 	}
 
-	widget::Widget::step();
+	Widget::step();
 }
 
 void MenuOverlay::onButton(const event::Button &e) {

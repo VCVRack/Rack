@@ -29,12 +29,12 @@ void ScrollWidget::scrollTo(math::Rect r) {
 
 void ScrollWidget::draw(const DrawArgs &args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
-	widget::Widget::draw(args);
+	Widget::draw(args);
 	nvgResetScissor(args.vg);
 }
 
 void ScrollWidget::step() {
-	widget::Widget::step();
+	Widget::step();
 
 	// Clamp scroll offset
 	math::Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();

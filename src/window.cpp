@@ -275,15 +275,6 @@ Window::Window() {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
-
-#if defined NANOVG_GL2
-	fbVg = nvgCreateGL2(nvgFlags);
-#elif defined NANOVG_GL3
-	fbVg = nvgCreateGL3(nvgFlags);
-#elif defined NANOVG_GLES2
-	fbVg = nvgCreateGLES2(nvgFlags);
-#endif
-	assert(fbVg);
 }
 
 Window::~Window() {
@@ -306,14 +297,6 @@ Window::~Window() {
 	nvgDeleteGL3(vg);
 #elif defined NANOVG_GLES2
 	nvgDeleteGLES2(vg);
-#endif
-
-#if defined NANOVG_GL2
-	nvgDeleteGL2(fbVg);
-#elif defined NANOVG_GL3
-	nvgDeleteGL3(fbVg);
-#elif defined NANOVG_GLES2
-	nvgDeleteGLES2(fbVg);
 #endif
 
 	glfwDestroyWindow(win);

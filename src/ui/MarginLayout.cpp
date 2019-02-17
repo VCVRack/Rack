@@ -7,7 +7,7 @@ namespace ui {
 
 
 void MarginLayout::step() {
-	widget::Widget::step();
+	Widget::step();
 
 	math::Rect childBox = box.zeroPos().grow(margin.neg());
 	for (Widget *child : children) {

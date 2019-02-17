@@ -20,7 +20,7 @@ void SvgPanel::step() {
 		// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
 		oversample = 2.0;
 	}
-	widget::FramebufferWidget::step();
+	FramebufferWidget::step();
 }
 
 void SvgPanel::setBackground(std::shared_ptr<Svg> svg) {

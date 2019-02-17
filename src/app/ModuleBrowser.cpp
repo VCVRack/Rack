@@ -64,11 +64,11 @@ struct BrowserOverlay : widget::OpaqueWidget {
 		box = parent->box.zeroPos();
 		// Only step if visible, since there are potentially thousands of descendants that don't need to be stepped.
 		if (visible)
-			widget::OpaqueWidget::step();
+			OpaqueWidget::step();
 	}
 
 	void onButton(const event::Button &e) override {
-		widget::OpaqueWidget::onButton(e);
+		OpaqueWidget::onButton(e);
 		if (e.getConsumed() != this)
 			return;
 
@@ -189,6 +189,7 @@ struct ModelBox : widget::OpaqueWidget {
 		if (previewWidget && ++visibleFrames >= 60) {
 			deletePreview();
 		}
+		OpaqueWidget::step();
 	}
 
 	void draw(const DrawArgs &args) override {
@@ -210,7 +211,7 @@ struct ModelBox : widget::OpaqueWidget {
 		nvgFill(args.vg);
 
 		nvgScissor(args.vg, RECT_ARGS(args.clipBox));
-		widget::OpaqueWidget::draw(args);
+		OpaqueWidget::draw(args);
 		nvgResetScissor(args.vg);
 
 		// Translucent overlay when selected
@@ -239,7 +240,7 @@ struct BrowserSearchField : ui::TextField {
 	void step() override {
 		// Steal focus when step is called
 		APP->event->setSelected(this);
-		ui::TextField::step();
+		TextField::step();
 	}
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS) {
@@ -316,7 +317,7 @@ struct BrowserSidebar : widget::Widget {
 		tagScroll->box.size.y = (box.size.y - searchField->box.size.y) / 2;
 		tagScroll->box.size.x = box.size.x;
 		tagList->box.size.x = tagScroll->box.size.x;
-		widget::Widget::step();
+		Widget::step();
 	}
 };
 
@@ -363,12 +364,12 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelMargin->box.size.x = modelScroll->box.size.x;
 		modelMargin->box.size.y = modelContainer->getChildrenBoundingBox().size.y + 2 * modelMargin->margin.y;
 
-		widget::OpaqueWidget::step();
+		OpaqueWidget::step();
 	}
 
 	void draw(const DrawArgs &args) override {
 		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
-		widget::Widget::draw(args);
+		Widget::draw(args);
 	}
 
 	void setSearch(const std::string &search) {
@@ -388,7 +389,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 
 void ModelBox::onButton(const event::Button &e) {
-	widget::OpaqueWidget::onButton(e);
+	OpaqueWidget::onButton(e);
 	if (e.getConsumed() != this)
 		return;
 
