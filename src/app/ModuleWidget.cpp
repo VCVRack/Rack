@@ -1,15 +1,17 @@
 #include "app/ModuleWidget.hpp"
-#include "engine/Engine.hpp"
-#include "system.hpp"
-#include "asset.hpp"
 #include "app/Scene.hpp"
 #include "app/SvgPanel.hpp"
+#include "engine/Engine.hpp"
+#include "plugin/Plugin.hpp"
+#include "system.hpp"
+#include "asset.hpp"
 #include "helpers.hpp"
 #include "app.hpp"
 #include "settings.hpp"
 #include "history.hpp"
 
 #include "osdialog.h"
+#include <thread>
 
 
 namespace rack {
@@ -18,6 +20,80 @@ namespace app {
 
 static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 
+
+struct ModuleUrlItem : ui::MenuItem {
+	std::string url;
+	void onAction(const event::Action &e) override {
+		std::thread t(system::openBrowser, url);
+		t.detach();
+	}
+};
+
+struct ModulePluginItem : ui::MenuItem {
+	plugin::Plugin *plugin;
+	ModulePluginItem() {
+		disabled = true;
+	}
+	ui::Menu *createChildMenu() override {
+		ui::Menu *menu = new ui::Menu;
+
+		ui::MenuLabel *versionLabel = new ui::MenuLabel;
+		versionLabel->text = "v" + plugin->version;
+		menu->addChild(versionLabel);
+
+		if (!plugin->author.empty()) {
+			if (!plugin->authorUrl.empty()) {
+				ModuleUrlItem *authorItem = new ModuleUrlItem;
+				authorItem->text = plugin->author;
+				authorItem->url = plugin->authorUrl;
+				menu->addChild(authorItem);
+			}
+			else {
+				ui::MenuLabel *authorLabel = new ui::MenuLabel;
+				authorLabel->text = plugin->author;
+				menu->addChild(authorLabel);
+			}
+		}
+
+		if (!plugin->pluginUrl.empty()) {
+			ModuleUrlItem *websiteItem = new ModuleUrlItem;
+			websiteItem->text = "Website";
+			websiteItem->url = plugin->pluginUrl;
+			menu->addChild(websiteItem);
+		}
+
+		if (!plugin->manualUrl.empty()) {
+			ModuleUrlItem *manualItem = new ModuleUrlItem;
+			manualItem->text = "Manual";
+			manualItem->url = plugin->manualUrl;
+			menu->addChild(manualItem);
+		}
+
+		if (!plugin->sourceUrl.empty()) {
+			ModuleUrlItem *sourceItem = new ModuleUrlItem;
+			sourceItem->text = "Source code";
+			sourceItem->url = plugin->sourceUrl;
+			menu->addChild(sourceItem);
+		}
+
+		if (!plugin->donateUrl.empty()) {
+			ModuleUrlItem *donateItem = new ModuleUrlItem;
+			donateItem->text = "Donate";
+			donateItem->url = plugin->donateUrl;
+			menu->addChild(donateItem);
+		}
+
+		// TODO open folder location with file explorer instead of browser
+		if (!plugin->path.empty()) {
+			ModuleUrlItem *pathItem = new ModuleUrlItem;
+			pathItem->text = "Open folder";
+			pathItem->url = plugin->path;
+			menu->addChild(pathItem);
+		}
+
+		return menu;
+	}
+};
 
 struct ModuleDisconnectItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
@@ -680,9 +756,14 @@ void ModuleWidget::createContextMenu() {
 	ui::Menu *menu = createMenu();
 	assert(model);
 
-	ui::MenuLabel *menuLabel = new ui::MenuLabel;
-	menuLabel->text = model->plugin->name + " " + model->name + " v" + model->plugin->version;
-	menu->addChild(menuLabel);
+	ui::MenuLabel *modelLabel = new ui::MenuLabel;
+	modelLabel->text = model->name;
+	menu->addChild(modelLabel);
+
+	ModulePluginItem *pluginItem = new ModulePluginItem;
+	pluginItem->text = model->plugin->name;
+	pluginItem->plugin = model->plugin;
+	menu->addChild(pluginItem);
 
 	ModuleResetItem *resetItem = new ModuleResetItem;
 	resetItem->moduleWidget = this;
