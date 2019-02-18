@@ -29,6 +29,16 @@ struct ModuleUrlItem : ui::MenuItem {
 	}
 };
 
+
+struct ModuleFolderItem : ui::MenuItem {
+	std::string path;
+	void onAction(const event::Action &e) override {
+		std::thread t(system::openFolder, path);
+		t.detach();
+	}
+};
+
+
 struct ModulePluginItem : ui::MenuItem {
 	plugin::Plugin *plugin;
 	ui::Menu *createChildMenu() override {
@@ -80,17 +90,17 @@ struct ModulePluginItem : ui::MenuItem {
 			menu->addChild(donateItem);
 		}
 
-		// TODO open folder location with file explorer instead of browser
 		if (!plugin->path.empty()) {
-			ModuleUrlItem *pathItem = new ModuleUrlItem;
-			pathItem->text = "Open folder";
-			pathItem->url = plugin->path;
+			ModuleFolderItem *pathItem = new ModuleFolderItem;
+			pathItem->text = "Open plugin folder";
+			pathItem->path = plugin->path;
 			menu->addChild(pathItem);
 		}
 
 		return menu;
 	}
 };
+
 
 struct ModuleDisconnectItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
@@ -99,12 +109,14 @@ struct ModuleDisconnectItem : ui::MenuItem {
 	}
 };
 
+
 struct ModuleResetItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(const event::Action &e) override {
 		moduleWidget->resetAction();
 	}
 };
+
 
 struct ModuleRandomizeItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
@@ -113,12 +125,14 @@ struct ModuleRandomizeItem : ui::MenuItem {
 	}
 };
 
+
 struct ModuleCopyItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(const event::Action &e) override {
 		moduleWidget->copyClipboard();
 	}
 };
+
 
 struct ModulePasteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
@@ -127,12 +141,14 @@ struct ModulePasteItem : ui::MenuItem {
 	}
 };
 
+
 struct ModuleSaveItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(const event::Action &e) override {
 		moduleWidget->saveDialog();
 	}
 };
+
 
 struct ModuleLoadItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
@@ -141,6 +157,7 @@ struct ModuleLoadItem : ui::MenuItem {
 	}
 };
 
+
 struct ModulePresetItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	std::string presetPath;
@@ -148,6 +165,7 @@ struct ModulePresetItem : ui::MenuItem {
 		moduleWidget->loadAction(presetPath);
 	}
 };
+
 
 struct ModuleListPresetsItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
@@ -167,6 +185,7 @@ struct ModuleListPresetsItem : ui::MenuItem {
 	}
 };
 
+
 struct ModuleCloneItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(const event::Action &e) override {
@@ -174,12 +193,14 @@ struct ModuleCloneItem : ui::MenuItem {
 	}
 };
 
+
 struct ModuleBypassItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	void onAction(const event::Action &e) override {
 		moduleWidget->bypassAction();
 	}
 };
+
 
 struct ModuleDeleteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;

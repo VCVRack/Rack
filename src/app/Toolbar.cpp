@@ -577,9 +577,7 @@ struct PluginsButton : MenuButton {
 
 struct ManualItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
-		std::thread t([&]() {
-			system::openBrowser("https://vcvrack.com/manual/");
-		});
+		std::thread t(system::openBrowser, "https://vcvrack.com/manual/");
 		t.detach();
 	}
 };
@@ -587,9 +585,7 @@ struct ManualItem : ui::MenuItem {
 
 struct WebsiteItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
-		std::thread t([&]() {
-			system::openBrowser("https://vcvrack.com/");
-		});
+		std::thread t(system::openBrowser, "https://vcvrack.com/");
 		t.detach();
 	}
 };
@@ -598,6 +594,14 @@ struct WebsiteItem : ui::MenuItem {
 struct CheckVersionItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		settings.checkVersion ^= true;
+	}
+};
+
+
+struct UserFolderItem : ui::MenuItem {
+	void onAction(const event::Action &e) override {
+		std::thread t(system::openFolder, asset::user(""));
+		t.detach();
 	}
 };
 
@@ -621,6 +625,10 @@ struct HelpButton : MenuButton {
 		checkVersionItem->text = "Check version on launch";
 		checkVersionItem->rightText = CHECKMARK(settings.checkVersion);
 		menu->addChild(checkVersionItem);
+
+		UserFolderItem *folderItem = new UserFolderItem;
+		folderItem->text = "Open user folder";
+		menu->addChild(folderItem);
 	}
 };
 

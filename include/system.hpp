@@ -36,6 +36,7 @@ Shell injection is possible, so make sure the URL is trusted or hard coded.
 May block, so open in a new thread.
 */
 void openBrowser(const std::string &url);
+void openFolder(const std::string &path);
 
 
 } // namespace system

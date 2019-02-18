@@ -9,6 +9,7 @@
 	#include <pthread.h>
 	#include <sched.h>
 	#include <execinfo.h> // for backtrace and backtrace_symbols
+	#include <unistd.h> // for execl
 #endif
 
 #if defined ARCH_WIN
@@ -150,17 +151,28 @@ std::string getStackTrace() {
 
 void openBrowser(const std::string &url) {
 #if defined ARCH_LIN
-	std::string command = "xdg-open " + url;
+	std::string command = "xdg-open \"" + url + "\"";
 	(void) std::system(command.c_str());
 #endif
 #if defined ARCH_MAC
-	std::string command = "open " + url;
+	std::string command = "open \"" + url + "\"";
 	std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
 	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
+
+void openFolder(const std::string &path) {
+#if defined ARCH_LIN
+	std::string command = "xdg-open \"" + path + "\"";
+	(void) std::system(command.c_str());
+#endif
+#if defined ARCH_WIN
+	ShellExecute(NULL, "explorer", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
+#endif
+}
+
 
 
 } // namespace system
