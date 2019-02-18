@@ -16,6 +16,7 @@
 #include "system.hpp"
 
 #include <osdialog.h>
+#include <thread>
 #include <unistd.h> // for getopt
 #include <signal.h> // for signal
 
@@ -55,6 +56,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 	bool devMode = false;
+	bool headless = false;
 	std::string patchPath;
 
 	// Parse command line arguments
@@ -64,6 +66,9 @@ int main(int argc, char *argv[]) {
 		switch (c) {
 			case 'd': {
 				devMode = true;
+			} break;
+			case 'h': {
+				headless = true;
 			} break;
 			case 's': {
 				asset::systemDir = optarg;
@@ -101,43 +106,59 @@ int main(int argc, char *argv[]) {
 	INFO("System directory: %s", asset::systemDir.c_str());
 	INFO("User directory: %s", asset::userDir.c_str());
 
+	INFO("Initializing environment");
 	random::init();
 	midi::init();
 	rtmidiInit();
 	bridgeInit();
 	keyboard::init();
 	gamepad::init();
-	ui::init();
-	plugin::init(devMode);
-	windowInit();
-	INFO("Initialized environment");
+	plugin::init();
+	if (!headless) {
+		ui::init();
+		windowInit();
+	}
 
 	// Initialize app
+	INFO("Initializing app");
 	settings.load(asset::user("settings.json"));
-	app::init();
-	APP->scene->devMode = devMode;
-	APP->patch->init(patchPath);
+	app::init(headless);
+	if (!headless) {
+		APP->scene->devMode = devMode;
+		APP->patch->init(patchPath);
+	}
 
-	INFO("Initialized app");
-
+	INFO("Starting engine");
 	APP->engine->start();
-	APP->window->run();
-	INFO("Window closed");
+
+	if (!headless) {
+		INFO("Running window");
+		APP->window->run();
+		INFO("Stopped window");
+	}
+	else {
+		// TEMP Prove that the app doesn't crash
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+	}
+	INFO("Stopping engine");
 	APP->engine->stop();
 
 	// Destroy app
-	APP->patch->save(asset::user("autosave.vcv"));
+	// APP->patch->save(asset::user("autosave.vcv"));
+	INFO("Destroying app");
 	app::destroy();
 	settings.save(asset::user("settings.json"));
-	INFO("Cleaned up app");
 
 	// Destroy environment
-	windowDestroy();
+	INFO("Destroying environment");
+	if (!headless) {
+		windowDestroy();
+		ui::destroy();
+	}
 	plugin::destroy();
-	ui::destroy();
 	bridgeDestroy();
 	midi::destroy();
-	INFO("Cleaned up environment");
+	INFO("Destroying logger");
 	logger::destroy();
 
 	return 0;

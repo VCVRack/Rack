@@ -11,42 +11,51 @@ namespace rack {
 namespace app {
 
 
-App::App() {
-	event = new event::State;
-	history = new history::State;
-	window = new Window;
+void App::init(bool headless) {
 	engine = new engine::Engine;
-	patch = new PatchManager;
-	scene = new Scene;
-	event->rootWidget = scene;
+	if (!headless) {
+		event = new event::State;
+		history = new history::State;
+		window = new Window;
+		patch = new PatchManager;
+		scene = new Scene;
+		event->rootWidget = scene;
+	}
 }
 
 App::~App() {
 	// Set pointers to NULL so other objects will segfault when attempting to access them
-	delete scene; scene = NULL;
-	delete patch; patch = NULL;
-	delete event; event = NULL;
-	delete history; history = NULL;
-	delete engine; engine = NULL;
-	delete window; window = NULL;
+	if (scene) delete scene;
+	scene = NULL;
+	if (patch) delete patch;
+	patch = NULL;
+	if (event) delete event;
+	event = NULL;
+	if (history) delete history;
+	history = NULL;
+	if (window) delete window;
+	window = NULL;
+	if (engine) delete engine;
+	engine = NULL;
 }
 
 
-static App *c = NULL;
+static App *app = NULL;
 
-void init() {
-	assert(!c);
-	c = new App;
+void init(bool headless) {
+	assert(!app);
+	app = new App;
+	app->init(headless);
 }
 
 void destroy() {
-	assert(c);
-	delete c;
-	c = NULL;
+	assert(app);
+	delete app;
+	app = NULL;
 }
 
 App *get() {
-	return c;
+	return app;
 }
 
 

@@ -14,7 +14,7 @@ namespace rack {
 namespace plugin {
 
 
-void init(bool devMode);
+void init();
 void destroy();
 void logIn(const std::string &email, const std::string &password);
 void logOut();

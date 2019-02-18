@@ -352,7 +352,7 @@ static void extractPackages(const std::string &path) {
 // public API
 ////////////////////
 
-void init(bool devMode) {
+void init() {
 	// Load Core
 	Plugin *corePlugin = new Plugin;
 	// This function is defined in Core/plugin.cpp
