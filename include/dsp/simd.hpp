@@ -1,5 +1,6 @@
 #include "sse_mathfun.h"
 #include <cstring>
+#include <cmath>
 #include <emmintrin.h>
 
 
@@ -251,6 +252,14 @@ inline f32_4 fabs(f32_4 a) {
 
 inline f32_4 trunc(f32_4 a) {
 	return f32_4(sse_mathfun_trunc_ps(a.v));
+}
+
+inline f32_4 pow(f32_4 a, f32_4 b) {
+	return exp(b * log(a));
+}
+
+inline f32_4 pow(float a, f32_4 b) {
+	return exp(b * std::log(a));
 }
 
 
