@@ -1,5 +1,6 @@
 #include "widget/FramebufferWidget.hpp"
 #include "app.hpp"
+#include "random.hpp"
 
 
 namespace rack {
@@ -17,6 +18,9 @@ FramebufferWidget::~FramebufferWidget() {
 
 void FramebufferWidget::step() {
 	Widget::step();
+
+	// if (random::uniform() > 0.01)
+	// 	return;
 
 	// Render to framebuffer if dirty.
 	// Also check that scale has been set by `draw()` yet.
@@ -77,12 +81,19 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 	float xform[6];
 	nvgCurrentTransform(args.vg, xform);
 	// Skew and rotate is not supported
-	assert(math::isNear(xform[1], 0.f));
-	assert(math::isNear(xform[2], 0.f));
+	if (!math::isNear(xform[1], 0.f) || !math::isNear(xform[2], 0.f))
+		return;
 	// Extract scale and offset from world transform
 	scale = math::Vec(xform[0], xform[3]);
 	offset = math::Vec(xform[4], xform[5]);
 	math::Vec offsetI = offset.floor();
+
+	math::Vec scaleRatio = math::Vec(1, 1);
+	if (!fbScale.isZero() && !scale.isEqual(fbScale)) {
+		dirty = true;
+		// Continue to draw but at the wrong scale. In the next frame, the framebuffer will be redrawn.
+		scaleRatio = scale.div(fbScale);
+	}
 
 	if (!fb)
 		return;
@@ -95,11 +106,11 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 	nvgRect(args.vg,
 		offsetI.x + fbBox.pos.x,
 		offsetI.y + fbBox.pos.y,
-		fbBox.size.x, fbBox.size.y);
+		fbBox.size.x * scaleRatio.x, fbBox.size.y * scaleRatio.y);
 	NVGpaint paint = nvgImagePattern(args.vg,
 		offsetI.x + fbBox.pos.x,
 		offsetI.y + fbBox.pos.y,
-		fbBox.size.x, fbBox.size.y,
+		fbBox.size.x * scaleRatio.x, fbBox.size.y * scaleRatio.y,
 		0.0, fb->image, 1.0);
 	nvgFillPaint(args.vg, paint);
 	nvgFill(args.vg);
@@ -134,6 +145,9 @@ void FramebufferWidget::drawFramebuffer() {
 	// glClearColor(0.0, 1.0, 1.0, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	nvgEndFrame(vg);
+
+	// Clean up the NanoVG state so that calls to nvgTextBounds() etc during step() don't use a dirty state.
+	nvgReset(vg);
 }
 
 int FramebufferWidget::getImageHandle() {

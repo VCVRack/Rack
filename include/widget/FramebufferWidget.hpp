@@ -36,11 +36,6 @@ struct FramebufferWidget : Widget {
 	void draw(const DrawArgs &args) override;
 	virtual void drawFramebuffer();
 	int getImageHandle();
-
-	void onZoom(const event::Zoom &e) override {
-		dirty = true;
-		Widget::onZoom(e);
-	}
 };
 
 
