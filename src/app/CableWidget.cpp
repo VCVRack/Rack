@@ -1,6 +1,5 @@
 #include "app/CableWidget.hpp"
 #include "app/Scene.hpp"
-#include "component.hpp"
 #include "window.hpp"
 #include "event.hpp"
 #include "app.hpp"

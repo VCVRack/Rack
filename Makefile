@@ -199,5 +199,5 @@ cmdplugins:
 
 include compile.mk
 
-.PHONY: all dep run debug clean dist allplugins cleanplugins distplugins plugins
+.PHONY: all dep run debug clean dist plugins cleanplugins distplugins cmdplugins
 .DEFAULT_GOAL := all

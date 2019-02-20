@@ -12,7 +12,7 @@
 #include "app.hpp"
 #include "midi.hpp"
 #include "helpers.hpp"
-#include "component.hpp"
+#include "componentlibrary.hpp"
 
 #include "widget/Widget.hpp"
 #include "widget/TransparentWidget.hpp"
@@ -106,7 +106,7 @@ using namespace app;
 using plugin::Plugin;
 using plugin::Model;
 using namespace engine;
-using namespace component;
+using namespace componentlibrary;
 #endif
 
 

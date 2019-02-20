@@ -1,6 +1,5 @@
 #pragma once
 #include "rack.hpp"
-#include "componentlibrary.hpp"
 
 
 namespace rack {
@@ -79,7 +78,7 @@ DEPRECATED inline std::string assetPlugin(Plugin *plugin, std::string filename) 
 // color
 ////////////////////
 
-DEPRECATED inline NVGcolor colorClip(NVGcolor a) {return color::clip(a);}
+DEPRECATED inline NVGcolor colorClip(NVGcolor a) {return color::clamp(a);}
 DEPRECATED inline NVGcolor colorMinus(NVGcolor a, NVGcolor b) {return color::minus(a, b);}
 DEPRECATED inline NVGcolor colorPlus(NVGcolor a, NVGcolor b) {return color::plus(a, b);}
 DEPRECATED inline NVGcolor colorMult(NVGcolor a, NVGcolor b) {return color::mult(a, b);}
@@ -93,18 +92,18 @@ DEPRECATED inline std::string colorToHexString(NVGcolor c) {return color::toHexS
 // componentlibrary
 ////////////////////
 
-DEPRECATED static const NVGcolor COLOR_BLACK_TRANSPARENT = SCHEME_BLACK_TRANSPARENT;
-DEPRECATED static const NVGcolor COLOR_BLACK = SCHEME_BLACK;
-DEPRECATED static const NVGcolor COLOR_WHITE = SCHEME_WHITE;
-DEPRECATED static const NVGcolor COLOR_RED = SCHEME_RED;
-DEPRECATED static const NVGcolor COLOR_ORANGE = SCHEME_ORANGE;
-DEPRECATED static const NVGcolor COLOR_YELLOW = SCHEME_YELLOW;
-DEPRECATED static const NVGcolor COLOR_GREEN = SCHEME_GREEN;
-DEPRECATED static const NVGcolor COLOR_CYAN = SCHEME_CYAN;
-DEPRECATED static const NVGcolor COLOR_BLUE = SCHEME_BLUE;
-DEPRECATED static const NVGcolor COLOR_PURPLE = SCHEME_PURPLE;
-DEPRECATED static const NVGcolor COLOR_LIGHT_PANEL = SCHEME_LIGHT_PANEL;
-DEPRECATED static const NVGcolor COLOR_DARK_PANEL = SCHEME_DARK_PANEL;
+DEPRECATED static const NVGcolor COLOR_BLACK_TRANSPARENT = componentlibrary::SCHEME_BLACK_TRANSPARENT;
+DEPRECATED static const NVGcolor COLOR_BLACK = componentlibrary::SCHEME_BLACK;
+DEPRECATED static const NVGcolor COLOR_WHITE = componentlibrary::SCHEME_WHITE;
+DEPRECATED static const NVGcolor COLOR_RED = componentlibrary::SCHEME_RED;
+DEPRECATED static const NVGcolor COLOR_ORANGE = componentlibrary::SCHEME_ORANGE;
+DEPRECATED static const NVGcolor COLOR_YELLOW = componentlibrary::SCHEME_YELLOW;
+DEPRECATED static const NVGcolor COLOR_GREEN = componentlibrary::SCHEME_GREEN;
+DEPRECATED static const NVGcolor COLOR_CYAN = componentlibrary::SCHEME_CYAN;
+DEPRECATED static const NVGcolor COLOR_BLUE = componentlibrary::SCHEME_BLUE;
+DEPRECATED static const NVGcolor COLOR_PURPLE = componentlibrary::SCHEME_PURPLE;
+DEPRECATED static const NVGcolor COLOR_LIGHT_PANEL = componentlibrary::SCHEME_LIGHT_GRAY;
+DEPRECATED static const NVGcolor COLOR_DARK_PANEL = componentlibrary::SCHEME_DARK_GRAY;
 
 ////////////////////
 // helpers
