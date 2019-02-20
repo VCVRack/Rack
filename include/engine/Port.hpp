@@ -10,7 +10,7 @@ namespace engine {
 static const int PORT_MAX_CHANNELS = 16;
 
 
-struct Port {
+struct alignas(32) Port {
 	/** Voltage of the port. */
 	union {
 		/** Unstable API. Use getVoltage() and setVoltage() instead. */
