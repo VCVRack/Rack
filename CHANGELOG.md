@@ -1,4 +1,38 @@
 
+### 1.0.0 (in development)
+
+- Added plugin info sub-menu to module context menu with links to manual, website, source code, etc.
+- Added Core MIDI-Map for mapping MIDI CC parameters directly to Rack parameters
+- Added polyphony to Core MIDI-CV
+- Added MPE mode to Core MIDI-CV
+- Added sample rates up to 768,000 Hz (16 x 48,000 Hz)
+- Added multithreading to engine
+- Added polyphonic cables
+- Added Core CV-MIDI, CV-CC, and CV-Gate for sending MIDI to external devices
+- Added parameter labels, units, and descriptions
+- Added parameter tooltips for quickly viewing parameter values
+- Added parameter context menu for entering numerical values, unmapping, etc
+- Changed parameter initialization to double-click
+- Added undo history
+- Added GlWidget for rendering to an OpenGL context
+- Added ability to disable modules with a context menu item and key command
+- Added default template patch
+- Added menu item to save patch as the template
+- Added "frameRateLimit" and "frameRateSync" for setting maximum screen refresh rate and to toggle vertical sync
+- Added ability to Ctrl/Cmd-click on an input port to clone the existing cable
+- Added "Panic" button to all MIDI modules to reset performance state
+- Made CPU meter display microseconds and percentage instead of millisamples.
+- Overhauled Module Browser with visual previews of modules
+- DSP
+	- Added [`simd.hpp`](include/dsp/simd.hpp) for generically handling arithmetic and math functions for vectors of floats, accelerated with SSE
+	- Added `dsp::VuMeter2`
+	- Added `dsp::Timer` and `dsp::Counter`
+- API
+	- Overhauled event system with many new events
+- Licenses
+	- Collected all license statements into new [LICENSE.md](LICENSE.md) file
+	- Licensed Core panel graphics under CC BY-NC-ND 4.0
+
 ### 0.6.2 (2018-07-13)
 
 - Added module presets
