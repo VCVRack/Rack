@@ -1,27 +1,27 @@
 #include "sse_mathfun.h"
 #include <cstring>
 #include <cmath>
-#include <emmintrin.h>
+#include <x86intrin.h>
 
 
 namespace rack {
 namespace dsp {
 
 
-/** Casts an int to float, bitwise without conversion. */
-inline float cast_i32_f32(int i) {
-	static_assert(sizeof(int) == sizeof(float), "int and float must be the same size");
+/** Casts the literal bits of FROM to TO without type conversion.
+API copied from C++20.
+
+Usage example:
+
+	printf("%08x\n", bit_cast<int>(1.f)); // Prints 3f800000
+*/
+template <typename TO, typename FROM>
+TO bit_cast(const FROM &x) {
+	static_assert(sizeof(FROM) == sizeof(TO), "types must have equal size");
 	// Should be optimized to two `mov` instructions
-	float f;
-	std::memcpy(&f, &i, sizeof(f));
-	return f;
-}
-
-
-inline int cast_f32_i32(float f) {
-	float i;
-	std::memcpy(&i, &f, sizeof(i));
-	return i;
+	TO y;
+	std::memcpy(&y, &x, sizeof(x));
+	return y;
 }
 
 
@@ -30,6 +30,7 @@ inline int cast_f32_i32(float f) {
 This class is designed to be used just like `float` scalars, with extra features for handling bitwise logic, conditions, loading, and storing.
 
 Usage example:
+
 	float a[4], b[4];
 	f32_4 a = f32_4::load(in);
 	f32_4 b = 2.f * a / (1 - a);
@@ -117,9 +118,11 @@ DECLARE_F32_4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
 /**
 Use these to apply logic, bit masks, and conditions to elements.
+
 Examples:
 
 Subtract 1 from value if greater than or equal to 1.
+
 	x -= (x >= 1.f) & 1.f;
 */
 DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)

@@ -43,7 +43,7 @@ struct alignas(32) Port {
 
 	/** Returns the given channel's voltage if the port is polyphonic, otherwise returns the first voltage (channel 0). */
 	float getPolyVoltage(int channel) {
-		return (channels > 1) ? getVoltage(channel) : getVoltage(0);
+		return (channels == 1) ? getVoltage(0) : getVoltage(channel);
 	}
 
 	/** Returns the voltage if a cable is connected, otherwise returns the given normal voltage. */
