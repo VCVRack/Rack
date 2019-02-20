@@ -1,7 +1,8 @@
 #pragma once
 #include "plugin/Model.hpp"
-#include "ui/MenuLabel.hpp"
+#include "ui/MenuOverlay.hpp"
 #include "ui/MenuItem.hpp"
+#include "ui/MenuLabel.hpp"
 #include "ui/Menu.hpp"
 #include "app/PortWidget.hpp"
 #include "app/ParamQuantity.hpp"

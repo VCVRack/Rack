@@ -49,36 +49,55 @@ struct PeakFilter {
 
 
 struct SlewLimiter {
-	float rise = 1.f;
-	float fall = 1.f;
-	float out = 0.f;
+	float rise = 0.f;
+	float fall = 0.f;
+	float out = NAN;
 
-	void setRiseFall(float rise, float fall) {
+	float process(float deltaTime, float in) {
+		if (std::isnan(out)) {
+			out = in;
+		}
+		else if (out < in) {
+			float y = out + rise * deltaTime;
+			out = std::fmin(y, in);
+		}
+		else if (out > in) {
+			float y = out - fall * deltaTime;
+			out = std::fmax(y, in);
+		}
+		return out;
+	}
+	DEPRECATED float process(float in) {
+		return process(1.f, in);
+	}
+	DEPRECATED void setRiseFall(float rise, float fall) {
 		this->rise = rise;
 		this->fall = fall;
-	}
-	float process(float in) {
-		out = math::clamp(in, out - fall, out + rise);
-		return out;
 	}
 };
 
 
 struct ExponentialSlewLimiter {
-	float riseLambda = 1.f;
-	float fallLambda = 1.f;
-	float out = 0.f;
+	float riseLambda = 0.f;
+	float fallLambda = 0.f;
+	float out = NAN;
 
-	float process(float in) {
-		if (in > out) {
-			float y = out + (in - out) * riseLambda;
+	float process(float deltaTime, float in) {
+		if (std::isnan(out)) {
+			out = in;
+		}
+		else if (out < in) {
+			float y = out + (in - out) * riseLambda * deltaTime;
 			out = (out == y) ? in : y;
 		}
-		else if (in < out) {
-			float y = out + (in - out) * fallLambda;
+		else if (out > in) {
+			float y = out + (in - out) * fallLambda * deltaTime;
 			out = (out == y) ? in : y;
 		}
 		return out;
+	}
+	DEPRECATED float process(float in) {
+		return process(1.f, in);
 	}
 };
 
@@ -113,7 +132,9 @@ struct ExponentialFilter {
 		return out;
 	}
 
-	DEPRECATED float process(float in) {return process(1.f, in);}
+	DEPRECATED float process(float in) {
+		return process(1.f, in);
+	}
 };
 
 

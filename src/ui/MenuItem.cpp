@@ -1,8 +1,12 @@
 #include "ui/MenuItem.hpp"
+#include "ui/MenuOverlay.hpp"
 
 
 namespace rack {
 namespace ui {
+
+
+#define BND_LABEL_FONT_SIZE 13
 
 
 void MenuItem::draw(const DrawArgs &args) {
@@ -77,7 +81,7 @@ void MenuItem::doAction() {
 	if (!eActionContext.consumed)
 		return;
 
-	widget::Widget *overlay = getAncestorOfType<MenuOverlay>();
+	MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
 	if (overlay) {
 		overlay->requestedDelete = true;
 	}

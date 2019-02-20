@@ -144,7 +144,9 @@ int main(int argc, char *argv[]) {
 	APP->engine->stop();
 
 	// Destroy app
-	// APP->patch->save(asset::user("autosave.vcv"));
+	if (!headless) {
+		APP->patch->save(asset::user("autosave.vcv"));
+	}
 	INFO("Destroying app");
 	app::destroy();
 	settings.save(asset::user("settings.json"));
