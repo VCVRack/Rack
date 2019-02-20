@@ -37,11 +37,10 @@ struct Param {
 	*/
 	std::string label;
 	/** The numerical unit of measurement appended to the value.
-	Use a space before non-abbreviations to separate the numerical value.
-	e.g. " semitones", "Hz", "%", "V"
+	Use a space before units to separate the numerical value from the number (e.g. " semitones", " Hz", " V"), unless the unit should have no space (e.g. "%", "º").
 	*/
 	std::string unit;
-	/** Set to 0 for linear, nonzero for exponential. */
+	/** Set to 0 for linear, positive for exponential, negative for logarithmic. */
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
 	float displayOffset = 0.f;

@@ -85,7 +85,7 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 	}
 	else if (displayBase < 0.f) {
 		// Logarithmic
-		v = std::pow(displayBase, v);
+		v = std::pow(-displayBase, v);
 	}
 	else {
 		// Exponential
