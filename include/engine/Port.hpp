@@ -55,6 +55,20 @@ struct alignas(32) Port {
 		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
 	}
 
+	/** Reads all voltage values from an array of size `channels` */
+	void setVoltages(const float *voltages) {
+		for (int c = 0; c < channels; c++) {
+			this->voltages[c] = voltages[c];
+		}
+	}
+
+	/** Writes all voltage values to an array of size `channels` */
+	void getVoltages(float *voltages) {
+		for (int c = 0; c < channels; c++) {
+			voltages[c] = this->voltages[c];
+		}
+	}
+
 	/** Sets the number of polyphony channels. */
 	void setChannels(int channels) {
 		// Set higher channel voltages to 0
