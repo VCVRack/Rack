@@ -17,49 +17,43 @@ static Driver *driver = NULL;
 
 struct InputDevice : midi::InputDevice {
 	int deviceId;
-	std::vector<uint8_t> ccs;
-	std::vector<bool> states;
+	int8_t ccs[128] = {};
 
 	void step() {
 		if (!glfwJoystickPresent(deviceId))
 			return;
+
 		// Get gamepad state
 		int numAxes;
 		const float *axes = glfwGetJoystickAxes(deviceId, &numAxes);
 		int numButtons;
 		const unsigned char *buttons = glfwGetJoystickButtons(deviceId, &numButtons);
 
-		// Convert axes to MIDI CC
-		ccs.resize(numAxes);
-		for (int i = 0; i < numAxes; i++) {
+		// Convert axes and buttons to MIDI CC
+		int numCcs = std::min(numAxes + numButtons, 128);
+		for (int i = 0; i < numCcs; i++) {
 			// Allow CC value to go negative, but clamp at -127 instead of -128 for symmetry
-			int8_t cc = math::clamp((int) std::round(axes[i] * 127), -127, 127);
-			if (cc != ccs[i]) {
-				ccs[i] = cc;
-
-				// Send MIDI message
-				midi::Message msg;
-				// MIDI channel 1
-				msg.cmd = (0xb << 4) | 0;
-				msg.data1 = i;
-				msg.data2 = ccs[i];
-				onMessage(msg);
+			int8_t cc;
+			if (i < numAxes) {
+				// Axis
+				cc = math::clamp((int) std::round(axes[i] * 127), -127, 127);
 			}
-		}
-
-		// Convert buttons to MIDI notes
-		states.resize(numButtons);
-		for (int i = 0; i < numButtons; i++) {
-			bool state = !!buttons[i];
-			if (state != states[i]) {
-				states[i] = state;
-
-				midi::Message msg;
-				msg.cmd = ((state ? 0x9 : 0x8) << 4);
-				msg.data1 = i;
-				msg.data2 = 127;
-				onMessage(msg);
+			else {
+				// Button
+				cc = buttons[i - numAxes] ? 127 : 0;
 			}
+
+			if (cc == ccs[i])
+				continue;
+			ccs[i] = cc;
+
+			// Send MIDI message
+			midi::Message msg;
+			msg.setStatus(0xb);
+			msg.setNote(i);
+			// Allow 8th bit to be set
+			msg.data2 = cc;
+			onMessage(msg);
 		}
 	}
 };

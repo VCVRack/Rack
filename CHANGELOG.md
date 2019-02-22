@@ -2,6 +2,7 @@
 ### 1.0.0 (in development)
 
 - Added plugin info sub-menu to module context menu with links to manual, website, source code, etc.
+- Added factory preset sub-menu to module context menu if modules supplies a folder of presets
 - Added Core MIDI-Map for mapping MIDI CC parameters directly to Rack parameters
 - Added polyphony to Core MIDI-CV
 - Added MPE mode to Core MIDI-CV
@@ -23,6 +24,7 @@
 - Added "Panic" button to all MIDI modules to reset performance state
 - Made CPU meter display microseconds and percentage instead of millisamples.
 - Overhauled Module Browser with visual previews of modules
+- Made Gamepad driver generate MIDI CC instead of MIDI notes for buttons
 - DSP
 	- Added [`simd.hpp`](include/dsp/simd.hpp) for generically handling arithmetic and math functions for vectors of floats, accelerated with SSE
 	- Added `dsp::VuMeter2`
