@@ -8,7 +8,6 @@
 
 
 namespace rack {
-namespace app {
 
 
 void App::init(bool headless) {
@@ -18,7 +17,7 @@ void App::init(bool headless) {
 		history = new history::State;
 		window = new Window;
 		patch = new PatchManager;
-		scene = new Scene;
+		scene = new app::Scene;
 		event->rootWidget = scene;
 	}
 }
@@ -40,24 +39,23 @@ App::~App() {
 }
 
 
-static App *app = NULL;
+static App *appInstance = NULL;
 
-void init(bool headless) {
-	assert(!app);
-	app = new App;
-	app->init(headless);
+void appInit(bool headless) {
+	assert(!appInstance);
+	appInstance = new App;
+	appInstance->init(headless);
 }
 
-void destroy() {
-	assert(app);
-	delete app;
-	app = NULL;
+void appDestroy() {
+	assert(appInstance);
+	delete appInstance;
+	appInstance = NULL;
 }
 
-App *get() {
-	return app;
+App *appGet() {
+	return appInstance;
 }
 
 
-} // namespace app
 } // namespace rack

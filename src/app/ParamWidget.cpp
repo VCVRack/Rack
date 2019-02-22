@@ -132,18 +132,6 @@ void ParamWidget::step() {
 void ParamWidget::draw(const DrawArgs &args) {
 	Widget::draw(args);
 
-	// if (paramQuantity) {
-	// 	nvgBeginPath(args.vg);
-	// 	nvgRect(args.vg,
-	// 		box.size.x - 12, box.size.y - 12,
-	// 		12, 12);
-	// 	nvgFillColor(args.vg, nvgRGBAf(1, 0, 1, 0.9));
-	// 	nvgFill(args.vg);
-
-	// 	std::string mapText = string::f("%d", paramQuantity->paramId);
-	// 	bndLabel(args.vg, box.size.x - 17.0, box.size.y - 16.0, INFINITY, INFINITY, -1, mapText.c_str());
-	// }
-
 	// Param map indicator
 	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module, paramQuantity->paramId) : NULL;
 	if (paramHandle) {

@@ -90,14 +90,6 @@ typedef f32<4> f32_4;
 #define DECLARE_F32_4_OPERATOR_INFIX(operator, func) \
 	inline f32_4 operator(const f32_4 &a, const f32_4 &b) { \
 		return f32_4(func(a.v, b.v)); \
-	} \
-	template <typename T> \
-	f32_4 operator(const T &a, const f32_4 &b) { \
-		return operator(f32_4(a), b); \
-	} \
-	template <typename T> \
-	f32_4 operator(const f32_4 &a, const T &b) { \
-		return operator(a, f32_4(b)); \
 	}
 
 /** `a @= b` */
@@ -105,10 +97,6 @@ typedef f32<4> f32_4;
 	inline f32_4 &operator(f32_4 &a, const f32_4 &b) { \
 		a = opfunc(a, b); \
 		return a; \
-	} \
-	template <typename T> \
-	f32_4 &operator(f32_4 &a, const T &b) { \
-		return operator(a, f32_4(b)); \
 	}
 
 DECLARE_F32_4_OPERATOR_INFIX(operator+, _mm_add_ps)

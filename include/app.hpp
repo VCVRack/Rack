@@ -3,7 +3,7 @@
 
 
 /** Accesses the global App pointer */
-#define APP rack::app::get()
+#define APP rack::appGet()
 
 
 namespace rack {
@@ -28,18 +28,15 @@ struct Window;
 struct PatchManager;
 
 
-/** Rack-specific GUI widgets and functions that control and offer feedback for the rack state.
-*/
 namespace app {
-
-
-struct Scene;
+	struct Scene;
+} // namespace app
 
 
 /** Contains the application state  */
 struct App {
 	event::State *event = NULL;
-	Scene *scene = NULL;
+	app::Scene *scene = NULL;
 	engine::Engine *engine = NULL;
 	Window *window = NULL;
 	history::State *history = NULL;
@@ -50,11 +47,10 @@ struct App {
 };
 
 
-void init(bool headless);
-void destroy();
+void appInit(bool headless);
+void appDestroy();
 /** Returns the global App pointer */
-App *get();
+App *appGet();
 
 
-} // namespace app
 } // namespace rack
