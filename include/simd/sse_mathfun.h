@@ -1,3 +1,4 @@
+#pragma once
 /* Modified version of http://gruntthepeon.free.fr/ssemath/ for VCV Rack.
 
 The following changes were made.

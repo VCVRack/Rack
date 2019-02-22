@@ -134,8 +134,8 @@ inline float chop(float x, float epsilon = 1e-6f) {
 	return isNear(x, 0.f, epsilon) ? 0.f : x;
 }
 
-inline float rescale(float x, float a, float b, float yMin, float yMax) {
-	return yMin + (x - a) / (b - a) * (yMax - yMin);
+inline float rescale(float x, float xMin, float xMax, float yMin, float yMax) {
+	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
 inline float crossfade(float a, float b, float p) {

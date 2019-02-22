@@ -80,7 +80,6 @@
 #include "plugin/callbacks.hpp"
 
 #include "dsp/common.hpp"
-#include "dsp/simd.hpp"
 #include "dsp/digital.hpp"
 #include "dsp/fft.hpp"
 #include "dsp/filter.hpp"
@@ -92,6 +91,9 @@
 #include "dsp/ringbuffer.hpp"
 #include "dsp/vumeter.hpp"
 #include "dsp/window.hpp"
+
+#include "simd/vector.hpp"
+#include "simd/functions.hpp"
 
 
 namespace rack {

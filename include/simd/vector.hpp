@@ -1,11 +1,10 @@
-#include "sse_mathfun.h"
+#pragma once
 #include <cstring>
-#include <cmath>
-#include <x86intrin.h>
+#include <emmintrin.h>
 
 
 namespace rack {
-namespace dsp {
+namespace simd {
 
 
 /** Casts the literal bits of FROM to TO without type conversion.
@@ -176,83 +175,5 @@ DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
 
 
-// Math functions
-
-
-inline f32_4 fmax(f32_4 x, f32_4 b) {
-	return f32_4(_mm_max_ps(x.v, b.v));
-}
-
-inline f32_4 fmin(f32_4 x, f32_4 b) {
-	return f32_4(_mm_min_ps(x.v, b.v));
-}
-
-inline f32_4 sqrt(f32_4 x) {
-	return f32_4(_mm_sqrt_ps(x.v));
-}
-
-/** Returns the approximate reciprocal square root.
-Much faster than `1/sqrt(x)`.
-*/
-inline f32_4 rsqrt(f32_4 x) {
-	return f32_4(_mm_rsqrt_ps(x.v));
-}
-
-/** Returns the approximate reciprocal.
-Much faster than `1/x`.
-*/
-inline f32_4 rcp(f32_4 x) {
-	return f32_4(_mm_rcp_ps(x.v));
-}
-
-inline f32_4 log(f32_4 x) {
-	return f32_4(sse_mathfun_log_ps(x.v));
-}
-
-inline f32_4 exp(f32_4 x) {
-	return f32_4(sse_mathfun_exp_ps(x.v));
-}
-
-inline f32_4 sin(f32_4 x) {
-	return f32_4(sse_mathfun_sin_ps(x.v));
-}
-
-inline f32_4 cos(f32_4 x) {
-	return f32_4(sse_mathfun_cos_ps(x.v));
-}
-
-inline f32_4 floor(f32_4 a) {
-	return f32_4(sse_mathfun_floor_ps(a.v));
-}
-
-inline f32_4 ceil(f32_4 a) {
-	return f32_4(sse_mathfun_ceil_ps(a.v));
-}
-
-inline f32_4 round(f32_4 a) {
-	return f32_4(sse_mathfun_round_ps(a.v));
-}
-
-inline f32_4 fmod(f32_4 a, f32_4 b) {
-	return f32_4(sse_mathfun_fmod_ps(a.v, b.v));
-}
-
-inline f32_4 fabs(f32_4 a) {
-	return f32_4(sse_mathfun_fabs_ps(a.v));
-}
-
-inline f32_4 trunc(f32_4 a) {
-	return f32_4(sse_mathfun_trunc_ps(a.v));
-}
-
-inline f32_4 pow(f32_4 a, f32_4 b) {
-	return exp(b * log(a));
-}
-
-inline f32_4 pow(float a, f32_4 b) {
-	return exp(b * std::log(a));
-}
-
-
-} // namespace dsp
+} // namespace simd
 } // namespace rack
