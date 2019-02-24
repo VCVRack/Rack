@@ -14,6 +14,7 @@
 #include "patch.hpp"
 #include "ui.hpp"
 #include "system.hpp"
+#include "string.hpp"
 
 #include <osdialog.h>
 #include <thread>

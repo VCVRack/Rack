@@ -31,13 +31,7 @@ namespace app {
 static std::set<plugin::Model*> sFavoriteModels;
 
 
-bool isMatch(const std::string &s, const std::string &search) {
-	std::string s2 = string::lowercase(s);
-	std::string search2 = string::lowercase(search);
-	return (s2.find(search2) != std::string::npos);
-}
-
-static bool isModelMatch(plugin::Model *model, const std::string &search) {
+static float modelScore(plugin::Model *model, const std::string &search) {
 	if (search.empty())
 		return true;
 	std::string s;
@@ -50,12 +44,13 @@ static bool isModelMatch(plugin::Model *model, const std::string &search) {
 	s += model->slug;
 	s += " ";
 	s += model->name;
-	for (const std::string &tag : model->tags) {
-		// TODO Normalize tag
-		s += tag;
-		s += " ";
-	}
-	return isMatch(s, search);
+	// for (const std::string &tag : model->tags) {
+	// 	s += " ";
+	// 	s += tag;
+	// }
+	float score = string::fuzzyScore(s, search);
+	DEBUG("%s %f", s.c_str(), score);
+	return score;
 }
 
 
@@ -374,12 +369,21 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	}
 
 	void setSearch(const std::string &search) {
+		std::string searchTrimmed = string::trim(search);
+		std::map<const Widget*, float> scores;
+		// Compute scores and set visibility
 		for (Widget *w : modelContainer->children) {
 			ModelBox *modelBox = dynamic_cast<ModelBox*>(w);
 			assert(modelBox);
-			bool match = isModelMatch(modelBox->model, search);
-			modelBox->visible = match;
+			float score = modelScore(modelBox->model, searchTrimmed);
+			scores[modelBox] = score;
+			modelBox->visible = (score > 0);
 		}
+		DEBUG("");
+		// Sort by score
+		modelContainer->children.sort([&](const Widget *w1, const Widget *w2) {
+			return scores[w1] > scores[w2];
+		});
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 	}

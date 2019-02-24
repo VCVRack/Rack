@@ -243,7 +243,7 @@ def create_module(slug):
 	try:
 		tree = xml.etree.ElementTree.parse(panel_filename)
 	except FileNotFoundError:
-		raise UserException(f"Panel not found at {panel_filename}")
+		raise UserException(f"Panel not found at {panel_filename}. Run this command with no arguments for instructions to create panels.")
 
 	components = panel_to_components(tree)
 	print(f"Components extracted from {panel_filename}")
