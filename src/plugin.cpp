@@ -540,7 +540,7 @@ Model *getModel(const std::string &pluginSlug, const std::string &modelSlug) {
 All tags here should be in sentence caps for display consistency.
 However, tags are case-insensitive in plugin metadata.
 */
-const std::vector<std::string> allowedTags = {
+const std::set<std::string> allowedTags = {
 	"Arpeggiator",
 	"Attenuator", // With a level knob and not much else.
 	"Blank", // No parameters or ports. Serves no purpose except visual.
@@ -626,7 +626,7 @@ std::string normalizeTag(const std::string &tag) {
 	if (it != tagAliases.end())
 		lowercaseTag = it->second;
 	// Find allowed tag
-	for (std::string allowedTag : allowedTags) {
+	for (const std::string &allowedTag : allowedTags) {
 		if (lowercaseTag == string::lowercase(allowedTag))
 			return allowedTag;
 	}

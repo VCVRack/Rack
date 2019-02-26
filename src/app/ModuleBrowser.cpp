@@ -49,7 +49,6 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 	// 	s += tag;
 	// }
 	float score = string::fuzzyScore(s, search);
-	DEBUG("%s %f", s.c_str(), score);
 	return score;
 }
 
@@ -74,7 +73,7 @@ struct BrowserOverlay : widget::OpaqueWidget {
 };
 
 
-static const float MODEL_BOX_ZOOM = 1.0f;
+static const float MODEL_BOX_ZOOM = 0.5f;
 
 
 struct ModelBox : widget::OpaqueWidget {
@@ -277,11 +276,10 @@ struct BrowserSidebar : widget::Widget {
 		pluginList = new ui::List;
 		pluginScroll->container->addChild(pluginList);
 
-		std::vector<std::string> pluginNames;
+		std::set<std::string, string::CaseInsensitiveCompare> pluginNames;
 		for (plugin::Plugin *plugin : plugin::plugins) {
-			pluginNames.push_back(plugin->name);
+			pluginNames.insert(plugin->name);
 		}
-		std::sort(pluginNames.begin(), pluginNames.end(), string::CaseInsensitiveCompare());
 
 		for (const std::string &pluginName : pluginNames) {
 			ui::MenuItem *item = new ui::MenuItem;
@@ -347,6 +345,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				modelContainer->addChild(moduleBox);
 			}
 		}
+
+		setSearch("");
 	}
 
 	void step() override {
@@ -370,22 +370,37 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 	void setSearch(const std::string &search) {
 		std::string searchTrimmed = string::trim(search);
-		std::map<const Widget*, float> scores;
-		// Compute scores and set visibility
-		for (Widget *w : modelContainer->children) {
-			ModelBox *modelBox = dynamic_cast<ModelBox*>(w);
-			assert(modelBox);
-			float score = modelScore(modelBox->model, searchTrimmed);
-			scores[modelBox] = score;
-			modelBox->visible = (score > 0);
-		}
-		DEBUG("");
-		// Sort by score
-		modelContainer->children.sort([&](const Widget *w1, const Widget *w2) {
-			return scores[w1] > scores[w2];
-		});
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
+
+		if (searchTrimmed.empty()) {
+			for (Widget *w : modelContainer->children) {
+				w->visible = true;
+			}
+			// If no search query, sort by plugin name and module name
+			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
+				ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
+				ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
+				if (m1->model->plugin->name != m2->model->plugin->name)
+					return m1->model->plugin->name < m2->model->plugin->name;
+				return m1->model->name < m2->model->name;
+			});
+		}
+		else {
+			std::map<Widget*, float> scores;
+			// Compute scores and set visibility
+			for (Widget *w : modelContainer->children) {
+				ModelBox *m = dynamic_cast<ModelBox*>(w);
+				assert(m);
+				float score = modelScore(m->model, searchTrimmed);
+				scores[m] = score;
+				m->visible = (score > 0);
+			}
+			// Sort by score
+			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
+				return scores[w1] > scores[w2];
+			});
+		}
 	}
 };
 
@@ -393,7 +408,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 // Implementations to resolve dependencies
 
 
-void ModelBox::onButton(const event::Button &e) {
+inline void ModelBox::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.getConsumed() != this)
 		return;
@@ -419,7 +434,7 @@ void ModelBox::onButton(const event::Button &e) {
 	}
 }
 
-void BrowserSearchField::onChange(const event::Change &e) {
+inline void BrowserSearchField::onChange(const event::Change &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	browser->setSearch(text);
 }

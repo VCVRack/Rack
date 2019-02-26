@@ -29,7 +29,7 @@ std::string normalizeTag(const std::string &tag);
 bool isSlugValid(const std::string &slug);
 
 
-extern const std::vector<std::string> allowedTags;
+extern const std::set<std::string> allowedTags;
 extern std::vector<Plugin*> plugins;
 extern bool isDownloading;
 extern float downloadProgress;
