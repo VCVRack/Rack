@@ -1,6 +1,6 @@
 [submodule "ext/nanovg"]
 	path = dep/nanovg
-	url = https://github.com/memononen/nanovg.git
+	url = https://github.com/AndrewBelt/nanovg.git
 [submodule "ext/nanosvg"]
 	path = dep/nanosvg
 	url = https://github.com/memononen/nanosvg.git
