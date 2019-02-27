@@ -13,7 +13,8 @@ Events are not passed to the underlying scene.
 struct FramebufferWidget : Widget {
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
-	float oversample;
+	bool bypass = false;
+	float oversample = 1.0;
 	NVGLUframebuffer *fb = NULL;
 	/** Scale relative to the world */
 	math::Vec scale;

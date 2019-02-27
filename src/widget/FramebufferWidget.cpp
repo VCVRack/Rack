@@ -8,7 +8,6 @@ namespace widget {
 
 
 FramebufferWidget::FramebufferWidget() {
-	oversample = 1.0;
 }
 
 FramebufferWidget::~FramebufferWidget() {
@@ -27,6 +26,7 @@ void FramebufferWidget::step() {
 	if (dirty && !scale.isZero()) {
 		// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
 		dirty = false;
+		NVGcontext *vg = APP->window->vg;
 
 		fbScale = scale;
 		// Get subpixel offset in range [0, 1)
@@ -48,7 +48,7 @@ void FramebufferWidget::step() {
 		fbBox = math::Rect::fromMinMax(min, max);
 		// DEBUG("%g %g %g %g", RECT_ARGS(fbBox));
 
-		math::Vec newFbSize = fbBox.size.mult(APP->window->pixelRatio * oversample);
+		math::Vec newFbSize = fbBox.size.mult(APP->window->pixelRatio).ceil();
 
 		// Create framebuffer if a new size is needed
 		if (!fb || !newFbSize.isEqual(fbSize)) {
@@ -56,9 +56,9 @@ void FramebufferWidget::step() {
 			// Delete old framebuffer
 			if (fb)
 				nvgluDeleteFramebuffer(fb);
-			// Create a framebuffer from the main nanovg context. We will draw to this in the secondary nanovg context.
+			// Create a framebuffer at the oversampled size
 			if (fbSize.isFinite() && !fbSize.isZero())
-				fb = nvgluCreateFramebuffer(APP->window->vg, fbSize.x, fbSize.y, 0);
+				fb = nvgluCreateFramebuffer(vg, fbSize.x * oversample, fbSize.y * oversample, 0);
 		}
 
 		if (!fb)
@@ -67,12 +67,44 @@ void FramebufferWidget::step() {
 		nvgluBindFramebuffer(fb);
 		drawFramebuffer();
 		nvgluBindFramebuffer(NULL);
+
+		// If oversampling, create another framebuffer and copy it to actual size.
+		if (oversample != 1.0) {
+			NVGLUframebuffer *newFb = nvgluCreateFramebuffer(vg, fbSize.x, fbSize.y, 0);
+			if (!newFb)
+				return;
+
+			// Use NanoVG for resizing framebuffers
+			nvgluBindFramebuffer(newFb);
+
+			nvgBeginFrame(vg, fbBox.size.x, fbBox.size.y, 1.0);
+
+			// Draw oversampled framebuffer
+			nvgBeginPath(vg);
+			nvgRect(vg, 0.0, 0.0, fbSize.x, fbSize.y);
+			NVGpaint paint = nvgImagePattern(vg, 0.0, 0.0, fbSize.x, fbSize.y,
+				0.0, fb->image, 1.0);
+			nvgFillPaint(vg, paint);
+			nvgFill(vg);
+
+			glViewport(0.0, 0.0, fbSize.x, fbSize.y);
+			glClearColor(0.0, 0.0, 0.0, 0.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			nvgEndFrame(vg);
+			nvgReset(vg);
+
+			nvgluBindFramebuffer(NULL);
+
+			// Swap the framebuffers
+			nvgluDeleteFramebuffer(fb);
+			fb = newFb;
+		}
 	}
 }
 
 void FramebufferWidget::draw(const DrawArgs &args) {
 	// Draw directly if already drawing in a framebuffer
-	if (args.fb) {
+	if (bypass || args.fb) {
 		Widget::draw(args);
 		return;
 	}
@@ -126,7 +158,7 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 void FramebufferWidget::drawFramebuffer() {
 	NVGcontext *vg = APP->window->vg;
 
-	float pixelRatio = fbSize.x / fbBox.size.x;
+	float pixelRatio = fbSize.x * oversample / fbBox.size.x;
 	nvgBeginFrame(vg, fbBox.size.x, fbBox.size.y, pixelRatio);
 
 	// Use local scaling
@@ -140,7 +172,7 @@ void FramebufferWidget::drawFramebuffer() {
 	args.fb = fb;
 	Widget::draw(args);
 
-	glViewport(0.0, 0.0, fbSize.x, fbSize.y);
+	glViewport(0.0, 0.0, fbSize.x * oversample, fbSize.y * oversample);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	// glClearColor(0.0, 1.0, 1.0, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
