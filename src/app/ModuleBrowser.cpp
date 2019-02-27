@@ -237,6 +237,7 @@ struct BrowserSearchField : ui::TextField {
 		APP->event->setSelected(this);
 		TextField::step();
 	}
+
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS) {
 			if (e.key == GLFW_KEY_ESCAPE) {
@@ -249,11 +250,17 @@ struct BrowserSearchField : ui::TextField {
 		if (!e.getConsumed())
 			ui::TextField::onSelectKey(e);
 	}
+
 	void onChange(const event::Change &e) override;
+
 	void onHide(const event::Hide &e) override {
-		setText("");
 		APP->event->setSelected(NULL);
 		ui::TextField::onHide(e);
+	}
+
+	void onShow(const event::Show &e) override {
+		selectAll();
+		TextField::onShow(e);
 	}
 };
 

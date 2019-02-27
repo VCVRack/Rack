@@ -109,7 +109,7 @@ $(libcurl): $(openssl)
 	cd curl-7.63.0 && PKG_CONFIG_PATH= $(CONFIGURE) \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding \
 		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli \
-		--without-ca-bundle --with-ca-fallback --with-ssl=$(realpath $(DEP_LOCAL))
+		--without-ca-bundle --with-ca-fallback --with-ssl="$(realpath $(DEP_LOCAL))"
 	$(MAKE) -C curl-7.63.0
 	$(MAKE) -C curl-7.63.0 install
 

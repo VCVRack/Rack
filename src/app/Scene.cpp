@@ -138,7 +138,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_ENTER:
 			case GLFW_KEY_KP_ENTER: {
-				moduleBrowser->visible = true;
+				moduleBrowser->show();
 				e.consume(this);
 			} break;
 			case GLFW_KEY_F11: {
