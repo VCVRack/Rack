@@ -1,5 +1,6 @@
 #include "app/ModuleBrowser.hpp"
 #include "widget/OpaqueWidget.hpp"
+#include "widget/OverlayWidget.hpp"
 #include "widget/TransparentWidget.hpp"
 #include "widget/ZoomWidget.hpp"
 #include "ui/ScrollWidget.hpp"
@@ -53,16 +54,16 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 }
 
 
-struct BrowserOverlay : widget::OpaqueWidget {
+struct BrowserOverlay : widget::OverlayWidget {
 	void step() override {
 		box = parent->box.zeroPos();
 		// Only step if visible, since there are potentially thousands of descendants that don't need to be stepped.
 		if (visible)
-			OpaqueWidget::step();
+			OverlayWidget::step();
 	}
 
 	void onButton(const widget::ButtonEvent &e) override {
-		OpaqueWidget::onButton(e);
+		OverlayWidget::onButton(e);
 		if (e.getConsumed() != this)
 			return;
 

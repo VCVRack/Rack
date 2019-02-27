@@ -11,6 +11,7 @@ namespace widget {
 struct Widget;
 
 
+/** A per-event state shared and writable by all widgets that recursively handle an event. */
 struct EventContext {
 	/** The Widget that consumes the event.
 	This stops propagation of the event if applicable.
@@ -19,7 +20,7 @@ struct EventContext {
 };
 
 
-/** Base event class */
+/** Base class for all events. */
 struct Event {
 	EventContext *context = NULL;
 
@@ -33,12 +34,14 @@ struct Event {
 };
 
 
+/** An Event prototype with a vector position. */
 struct PositionEvent {
 	/** The pixel coordinate where the event occurred, relative to the Widget it is called on. */
 	math::Vec pos;
 };
 
 
+/** An Event prototype with a GLFW key. */
 struct KeyEvent {
 	/** GLFW_KEY_* */
 	int key;
@@ -50,12 +53,15 @@ struct KeyEvent {
 	int mods;
 };
 
-// Events
 
+/** An Event prototype with a Unicode character. */
 struct TextEvent {
 	/** Unicode code point of the character */
 	int codepoint;
 };
+
+
+// Concrete events
 
 
 /** Occurs every frame when the mouse is hovering over a Widget.
