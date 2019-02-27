@@ -41,7 +41,7 @@ void MenuItem::step() {
 	Widget::step();
 }
 
-void MenuItem::onEnter(const event::Enter &e) {
+void MenuItem::onEnter(const widget::EnterEvent &e) {
 	e.consume(this);
 	Menu *parentMenu = dynamic_cast<Menu*>(parent);
 	if (!parentMenu)
@@ -58,11 +58,11 @@ void MenuItem::onEnter(const event::Enter &e) {
 	parentMenu->setChildMenu(childMenu);
 }
 
-void MenuItem::onDragStart(const event::DragStart &e) {
+void MenuItem::onDragStart(const widget::DragStartEvent &e) {
 	e.consume(this);
 }
 
-void MenuItem::onDragDrop(const event::DragDrop &e) {
+void MenuItem::onDragDrop(const widget::DragDropEvent &e) {
 	if (e.origin != this)
 		return;
 	doAction();
@@ -72,13 +72,13 @@ void MenuItem::doAction() {
 	if (disabled)
 		return;
 
-	event::Context eActionContext;
-	event::Action eAction;
-	eAction.context = &eActionContext;
+	widget::EventContext cAction;
+	widget::ActionEvent eAction;
+	eAction.context = &cAction;
 	// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.
 	eAction.consume(this);
 	onAction(eAction);
-	if (!eActionContext.consumed)
+	if (!cAction.consumed)
 		return;
 
 	MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();

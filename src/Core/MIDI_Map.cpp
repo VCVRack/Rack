@@ -245,7 +245,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		this->module = module;
 	}
 
-	void onButton(const event::Button &e) override {
+	void onButton(const widget::ButtonEvent &e) override {
 		if (!module)
 			return;
 
@@ -259,7 +259,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelect(const event::Select &e) override {
+	void onSelect(const widget::SelectEvent &e) override {
 		if (!module)
 			return;
 
@@ -272,7 +272,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		e.consume(this);
 	}
 
-	void onDeselect(const event::Deselect &e) override {
+	void onDeselect(const widget::DeselectEvent &e) override {
 		if (!module)
 			return;
 		// Check if a ParamWidget was touched

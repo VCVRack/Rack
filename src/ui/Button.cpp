@@ -18,31 +18,31 @@ void Button::draw(const DrawArgs &args) {
 	bndToolButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str());
 }
 
-void Button::onEnter(const event::Enter &e) {
+void Button::onEnter(const widget::EnterEvent &e) {
 	state = BND_HOVER;
 	e.consume(this);
 }
 
-void Button::onLeave(const event::Leave &e) {
+void Button::onLeave(const widget::LeaveEvent &e) {
 	state = BND_DEFAULT;
 }
 
-void Button::onDragStart(const event::DragStart &e) {
+void Button::onDragStart(const widget::DragStartEvent &e) {
 	state = BND_ACTIVE;
 	if (quantity)
 		quantity->setMax();
 	e.consume(this);
 }
 
-void Button::onDragEnd(const event::DragEnd &e) {
+void Button::onDragEnd(const widget::DragEndEvent &e) {
 	state = BND_HOVER;
 	if (quantity)
 		quantity->setMin();
 }
 
-void Button::onDragDrop(const event::DragDrop &e) {
+void Button::onDragDrop(const widget::DragDropEvent &e) {
 	if (e.origin == this) {
-		event::Action eAction;
+		widget::ActionEvent eAction;
 		onAction(eAction);
 	}
 }

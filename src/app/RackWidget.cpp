@@ -121,7 +121,7 @@ void RackWidget::draw(const DrawArgs &args) {
 	Widget::draw(args);
 }
 
-void RackWidget::onHover(const event::Hover &e) {
+void RackWidget::onHover(const widget::HoverEvent &e) {
 	if (!APP->event->selectedWidget) {
 		// Scroll with arrow keys
 		float arrowSpeed = 30.0;
@@ -151,7 +151,7 @@ void RackWidget::onHover(const event::Hover &e) {
 	mousePos = e.pos;
 }
 
-void RackWidget::onHoverKey(const event::HoverKey &e) {
+void RackWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 	widget::OpaqueWidget::onHoverKey(e);
 	if (e.getConsumed() != this)
 		return;
@@ -167,12 +167,12 @@ void RackWidget::onHoverKey(const event::HoverKey &e) {
 	}
 }
 
-void RackWidget::onDragHover(const event::DragHover &e) {
+void RackWidget::onDragHover(const widget::DragHoverEvent &e) {
 	widget::OpaqueWidget::onDragHover(e);
 	mousePos = e.pos;
 }
 
-void RackWidget::onButton(const event::Button &e) {
+void RackWidget::onButton(const widget::ButtonEvent &e) {
 	widget::OpaqueWidget::onButton(e);
 	if (e.getConsumed() == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
@@ -181,7 +181,7 @@ void RackWidget::onButton(const event::Button &e) {
 	}
 }
 
-void RackWidget::onZoom(const event::Zoom &e) {
+void RackWidget::onZoom(const widget::ZoomEvent &e) {
 	rails->box.size = math::Vec();
 	widget::OpaqueWidget::onZoom(e);
 }

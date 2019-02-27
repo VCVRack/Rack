@@ -23,7 +23,7 @@ void SvgButton::addFrame(std::shared_ptr<Svg> svg) {
 	}
 }
 
-void SvgButton::onDragStart(const event::DragStart &e) {
+void SvgButton::onDragStart(const widget::DragStartEvent &e) {
 	if (frames.size() >= 2) {
 		sw->setSvg(frames[1]);
 		fb->dirty = true;
@@ -31,16 +31,16 @@ void SvgButton::onDragStart(const event::DragStart &e) {
 	e.consume(this);
 }
 
-void SvgButton::onDragEnd(const event::DragEnd &e) {
+void SvgButton::onDragEnd(const widget::DragEndEvent &e) {
 	if (frames.size() >= 1) {
 		sw->setSvg(frames[0]);
 		fb->dirty = true;
 	}
 }
 
-void SvgButton::onDragDrop(const event::DragDrop &e) {
+void SvgButton::onDragDrop(const widget::DragDropEvent &e) {
 	if (e.origin == this) {
-		event::Action eAction;
+		widget::ActionEvent eAction;
 		onAction(eAction);
 	}
 }

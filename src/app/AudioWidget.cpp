@@ -10,14 +10,14 @@ namespace app {
 struct AudioDriverItem : ui::MenuItem {
 	audio::Port *port;
 	int driver;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		port->setDriver(driver);
 	}
 };
 
 struct AudioDriverChoice : LedDisplayChoice {
 	audio::Port *port;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		if (!port)
 			return;
 
@@ -45,7 +45,7 @@ struct AudioDeviceItem : ui::MenuItem {
 	audio::Port *port;
 	int device;
 	int offset;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		port->setDevice(device, offset);
 	}
 };
@@ -55,7 +55,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 	/** Prevents devices with a ridiculous number of channels from being displayed */
 	int maxTotalChannels = 128;
 
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		if (!port)
 			return;
 
@@ -103,14 +103,14 @@ struct AudioDeviceChoice : LedDisplayChoice {
 struct AudioSampleRateItem : ui::MenuItem {
 	audio::Port *port;
 	int sampleRate;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		port->setSampleRate(sampleRate);
 	}
 };
 
 struct AudioSampleRateChoice : LedDisplayChoice {
 	audio::Port *port;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		if (!port)
 			return;
 
@@ -141,14 +141,14 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 struct AudioBlockSizeItem : ui::MenuItem {
 	audio::Port *port;
 	int blockSize;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		port->setBlockSize(blockSize);
 	}
 };
 
 struct AudioBlockSizeChoice : LedDisplayChoice {
 	audio::Port *port;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		if (!port)
 			return;
 

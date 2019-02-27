@@ -59,7 +59,7 @@ void PortWidget::draw(const DrawArgs &args) {
 	Widget::draw(args);
 }
 
-void PortWidget::onButton(const event::Button &e) {
+void PortWidget::onButton(const widget::ButtonEvent &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		CableWidget *cw = APP->scene->rackWidget->getTopCable(this);
 		if (cw) {
@@ -75,16 +75,16 @@ void PortWidget::onButton(const event::Button &e) {
 	e.consume(this);
 }
 
-void PortWidget::onEnter(const event::Enter &e) {
+void PortWidget::onEnter(const widget::EnterEvent &e) {
 	hovered = true;
 	e.consume(this);
 }
 
-void PortWidget::onLeave(const event::Leave &e) {
+void PortWidget::onLeave(const widget::LeaveEvent &e) {
 	hovered = false;
 }
 
-void PortWidget::onDragStart(const event::DragStart &e) {
+void PortWidget::onDragStart(const widget::DragStartEvent &e) {
 	CableWidget *cw = NULL;
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 		if (type == OUTPUT) {
@@ -130,7 +130,7 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 	e.consume(this);
 }
 
-void PortWidget::onDragEnd(const event::DragEnd &e) {
+void PortWidget::onDragEnd(const widget::DragEndEvent &e) {
 	CableWidget *cw = APP->scene->rackWidget->releaseIncompleteCable();
 	if (cw->isComplete()) {
 		APP->scene->rackWidget->addCable(cw);
@@ -145,7 +145,7 @@ void PortWidget::onDragEnd(const event::DragEnd &e) {
 	}
 }
 
-void PortWidget::onDragDrop(const event::DragDrop &e) {
+void PortWidget::onDragDrop(const widget::DragDropEvent &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		if (APP->scene->rackWidget->getTopCable(this))
@@ -162,7 +162,7 @@ void PortWidget::onDragDrop(const event::DragDrop &e) {
 	}
 }
 
-void PortWidget::onDragEnter(const event::DragEnter &e) {
+void PortWidget::onDragEnter(const widget::DragEnterEvent &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		if (APP->scene->rackWidget->getTopCable(this))
@@ -179,7 +179,7 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 	e.consume(this);
 }
 
-void PortWidget::onDragLeave(const event::DragLeave &e) {
+void PortWidget::onDragLeave(const widget::DragLeaveEvent &e) {
 	PortWidget *originPort = dynamic_cast<PortWidget*>(e.origin);
 	if (!originPort)
 		return;

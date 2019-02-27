@@ -93,7 +93,7 @@ struct CcChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelect(const event::Select &e) override {
+	void onSelect(const widget::SelectEvent &e) override {
 		if (!module)
 			return;
 		module->learningId = id;
@@ -101,7 +101,7 @@ struct CcChoice : LedDisplayChoice {
 		e.consume(this);
 	}
 
-	void onDeselect(const event::Deselect &e) override {
+	void onDeselect(const widget::DeselectEvent &e) override {
 		if (!module)
 			return;
 		if (module->learningId == id) {
@@ -112,7 +112,7 @@ struct CcChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelectText(const event::SelectText &e) override {
+	void onSelectText(const widget::SelectTextEvent &e) override {
 		int c = e.codepoint - '0';
 		if (0 <= c && c <= 9) {
 			if (focusCc < 0)
@@ -124,9 +124,9 @@ struct CcChoice : LedDisplayChoice {
 		e.consume(this);
 	}
 
-	void onSelectKey(const event::SelectKey &e) override {
+	void onSelectKey(const widget::SelectKeyEvent &e) override {
 		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & WINDOW_MOD_MASK) == 0) {
-			event::Deselect eDeselect;
+			widget::DeselectEvent eDeselect;
 			onDeselect(eDeselect);
 			APP->event->selectedWidget = NULL;
 			e.consume(this);
@@ -177,14 +177,14 @@ struct NoteChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelect(const event::Select &e) override {
+	void onSelect(const widget::SelectEvent &e) override {
 		if (!module)
 			return;
 		module->learningId = id;
 		e.consume(this);
 	}
 
-	void onDeselect(const event::Deselect &e) override {
+	void onDeselect(const widget::DeselectEvent &e) override {
 		if (!module)
 			return;
 		if (module->learningId == id) {

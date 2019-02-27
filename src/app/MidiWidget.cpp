@@ -10,14 +10,14 @@ namespace app {
 struct MidiDriverItem : ui::MenuItem {
 	midi::Port *port;
 	int driverId;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		port->setDriverId(driverId);
 	}
 };
 
 struct MidiDriverChoice : LedDisplayChoice {
 	midi::Port *port;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		if (!port)
 			return;
 
@@ -51,14 +51,14 @@ struct MidiDriverChoice : LedDisplayChoice {
 struct MidiDeviceItem : ui::MenuItem {
 	midi::Port *port;
 	int deviceId;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		port->setDeviceId(deviceId);
 	}
 };
 
 struct MidiDeviceChoice : LedDisplayChoice {
 	midi::Port *port;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		if (!port)
 			return;
 
@@ -100,14 +100,14 @@ struct MidiDeviceChoice : LedDisplayChoice {
 struct MidiChannelItem : ui::MenuItem {
 	midi::Port *port;
 	int channel;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		port->channel = channel;
 	}
 };
 
 struct MidiChannelChoice : LedDisplayChoice {
 	midi::Port *port;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		if (!port)
 			return;
 

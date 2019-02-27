@@ -1,7 +1,7 @@
 #pragma once
 #include "widget/OpaqueWidget.hpp"
 #include "ui/common.hpp"
-#include "event.hpp"
+#include "widget/event.hpp"
 #include "app.hpp"
 
 
@@ -22,12 +22,12 @@ struct TextField : widget::OpaqueWidget {
 
 	TextField();
 	void draw(const DrawArgs &args) override;
-	void onButton(const event::Button &e) override;
-	void onHover(const event::Hover &e) override;
-	void onEnter(const event::Enter &e) override;
-	void onSelect(const event::Select &e) override;
-	void onSelectText(const event::SelectText &e) override;
-	void onSelectKey(const event::SelectKey &e) override;
+	void onButton(const widget::ButtonEvent &e) override;
+	void onHover(const widget::HoverEvent &e) override;
+	void onEnter(const widget::EnterEvent &e) override;
+	void onSelect(const widget::SelectEvent &e) override;
+	void onSelectText(const widget::SelectTextEvent &e) override;
+	void onSelectKey(const widget::SelectKeyEvent &e) override;
 
 	/** Inserts text at the cursor, replacing the selection if necessary */
 	void insertText(std::string text);

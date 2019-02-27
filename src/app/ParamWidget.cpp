@@ -31,7 +31,7 @@ struct ParamField : ui::TextField {
 		selectAll();
 	}
 
-	void onSelectKey(const event::SelectKey &e) override {
+	void onSelectKey(const widget::SelectKeyEvent &e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			float oldValue = paramWidget->paramQuantity->getValue();
 			if (paramWidget->paramQuantity)
@@ -89,7 +89,7 @@ struct ParamLabel : ui::MenuLabel {
 
 struct ParamResetItem : ui::MenuItem {
 	ParamWidget *paramWidget;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		paramWidget->resetAction();
 	}
 };
@@ -101,7 +101,7 @@ struct ParamFineItem : ui::MenuItem {
 
 struct ParamUnmapItem : ui::MenuItem {
 	ParamWidget *paramWidget;
-	void onAction(const event::Action &e) override {
+	void onAction(const widget::ActionEvent &e) override {
 		engine::ParamHandle *paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module, paramWidget->paramQuantity->paramId);
 		if (paramHandle) {
 			APP->engine->updateParamHandle(paramHandle, -1, 0);
@@ -121,7 +121,7 @@ void ParamWidget::step() {
 		// Trigger change event when paramQuantity value changes
 		if (value != dirtyValue) {
 			dirtyValue = value;
-			event::Change eChange;
+			widget::ChangeEvent eChange;
 			onChange(eChange);
 		}
 	}
@@ -146,7 +146,7 @@ void ParamWidget::draw(const DrawArgs &args) {
 	}
 }
 
-void ParamWidget::onButton(const event::Button &e) {
+void ParamWidget::onButton(const widget::ButtonEvent &e) {
 	// Touch parameter
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == 0) {
 		if (paramQuantity) {
@@ -164,11 +164,11 @@ void ParamWidget::onButton(const event::Button &e) {
 		OpaqueWidget::onButton(e);
 }
 
-void ParamWidget::onDoubleClick(const event::DoubleClick &e) {
+void ParamWidget::onDoubleClick(const widget::DoubleClickEvent &e) {
 	resetAction();
 }
 
-void ParamWidget::onEnter(const event::Enter &e) {
+void ParamWidget::onEnter(const widget::EnterEvent &e) {
 	if (settings.paramTooltip && !tooltip && paramQuantity) {
 		ParamTooltip *paramTooltip = new ParamTooltip;
 		paramTooltip->paramWidget = this;
@@ -178,7 +178,7 @@ void ParamWidget::onEnter(const event::Enter &e) {
 	}
 }
 
-void ParamWidget::onLeave(const event::Leave &e) {
+void ParamWidget::onLeave(const widget::LeaveEvent &e) {
 	if (tooltip) {
 		APP->scene->removeChild(tooltip);
 		delete tooltip;

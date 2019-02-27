@@ -23,7 +23,7 @@ void SvgSwitch::addFrame(std::shared_ptr<Svg> svg) {
 	}
 }
 
-void SvgSwitch::onChange(const event::Change &e) {
+void SvgSwitch::onChange(const widget::ChangeEvent &e) {
 	if (!frames.empty() && paramQuantity) {
 		int index = (int) std::round(paramQuantity->getValue());
 		index = math::clamp(index, 0, (int) frames.size() - 1);

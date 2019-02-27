@@ -11,27 +11,27 @@ You can of course override the events.
 You may also call OpaqueWidget::on*() from the overridden method to continue recursing/consuming the event.
 */
 struct OpaqueWidget : Widget {
-	void onHover(const event::Hover &e) override {
+	void onHover(const HoverEvent &e) override {
 		Widget::onHover(e);
 		if (!e.getConsumed())
 			e.consume(this);
 	}
-	void onButton(const event::Button &e) override {
+	void onButton(const ButtonEvent &e) override {
 		Widget::onButton(e);
 		if (!e.getConsumed())
 			e.consume(this);
 	}
-	void onHoverKey(const event::HoverKey &e) override {
+	void onHoverKey(const HoverKeyEvent &e) override {
 		Widget::onHoverKey(e);
 		if (!e.getConsumed())
 			e.consume(this);
 	}
-	void onHoverText(const event::HoverText &e) override {
+	void onHoverText(const HoverTextEvent &e) override {
 		Widget::onHoverText(e);
 		if (!e.getConsumed())
 			e.consume(this);
 	}
-	void onDragHover(const event::DragHover &e) override {
+	void onDragHover(const DragHoverEvent &e) override {
 		Widget::onDragHover(e);
 		if (!e.getConsumed())
 			e.consume(this);

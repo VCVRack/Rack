@@ -16,13 +16,13 @@ void ScrollBar::draw(const DrawArgs &args) {
 	bndScrollBar(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }
 
-void ScrollBar::onDragStart(const event::DragStart &e) {
+void ScrollBar::onDragStart(const widget::DragStartEvent &e) {
 	state = BND_ACTIVE;
 	APP->window->cursorLock();
 	e.consume(this);
 }
 
-void ScrollBar::onDragMove(const event::DragMove &e) {
+void ScrollBar::onDragMove(const widget::DragMoveEvent &e) {
 	const float sensitivity = 1.f;
 
 	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
@@ -33,7 +33,7 @@ void ScrollBar::onDragMove(const event::DragMove &e) {
 		scrollWidget->offset.y += sensitivity * e.mouseDelta.y;
 }
 
-void ScrollBar::onDragEnd(const event::DragEnd &e) {
+void ScrollBar::onDragEnd(const widget::DragEndEvent &e) {
 	state = BND_DEFAULT;
 	APP->window->cursorUnlock();
 }

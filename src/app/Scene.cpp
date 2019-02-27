@@ -91,7 +91,7 @@ void Scene::draw(const DrawArgs &args) {
 	OpaqueWidget::draw(args);
 }
 
-void Scene::onHoverKey(const event::HoverKey &e) {
+void Scene::onHoverKey(const widget::HoverKeyEvent &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
@@ -152,7 +152,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 		OpaqueWidget::onHoverKey(e);
 }
 
-void Scene::onPathDrop(const event::PathDrop &e) {
+void Scene::onPathDrop(const widget::PathDropEvent &e) {
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
 		if (string::extension(path) == "vcv") {

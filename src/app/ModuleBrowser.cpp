@@ -61,7 +61,7 @@ struct BrowserOverlay : widget::OpaqueWidget {
 			OpaqueWidget::step();
 	}
 
-	void onButton(const event::Button &e) override {
+	void onButton(const widget::ButtonEvent &e) override {
 		OpaqueWidget::onButton(e);
 		if (e.getConsumed() != this)
 			return;
@@ -218,14 +218,14 @@ struct ModelBox : widget::OpaqueWidget {
 		nvgResetScissor(args.vg);
 	}
 
-	void onButton(const event::Button &e) override;
+	void onButton(const widget::ButtonEvent &e) override;
 
-	void onEnter(const event::Enter &e) override {
+	void onEnter(const widget::EnterEvent &e) override {
 		e.consume(this);
 		selected = true;
 	}
 
-	void onLeave(const event::Leave &e) override {
+	void onLeave(const widget::LeaveEvent &e) override {
 		selected = false;
 	}
 };
@@ -238,7 +238,7 @@ struct BrowserSearchField : ui::TextField {
 		TextField::step();
 	}
 
-	void onSelectKey(const event::SelectKey &e) override {
+	void onSelectKey(const widget::SelectKeyEvent &e) override {
 		if (e.action == GLFW_PRESS) {
 			if (e.key == GLFW_KEY_ESCAPE) {
 				BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
@@ -251,14 +251,14 @@ struct BrowserSearchField : ui::TextField {
 			ui::TextField::onSelectKey(e);
 	}
 
-	void onChange(const event::Change &e) override;
+	void onChange(const widget::ChangeEvent &e) override;
 
-	void onHide(const event::Hide &e) override {
+	void onHide(const widget::HideEvent &e) override {
 		APP->event->setSelected(NULL);
 		ui::TextField::onHide(e);
 	}
 
-	void onShow(const event::Show &e) override {
+	void onShow(const widget::ShowEvent &e) override {
 		selectAll();
 		TextField::onShow(e);
 	}
@@ -415,7 +415,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 // Implementations to resolve dependencies
 
 
-inline void ModelBox::onButton(const event::Button &e) {
+inline void ModelBox::onButton(const widget::ButtonEvent &e) {
 	OpaqueWidget::onButton(e);
 	if (e.getConsumed() != this)
 		return;
@@ -441,7 +441,7 @@ inline void ModelBox::onButton(const event::Button &e) {
 	}
 }
 
-inline void BrowserSearchField::onChange(const event::Change &e) {
+inline void BrowserSearchField::onChange(const widget::ChangeEvent &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	browser->setSearch(text);
 }

@@ -31,8 +31,8 @@ struct Scene : widget::OpaqueWidget {
 	~Scene();
 	void step() override;
 	void draw(const DrawArgs &args) override;
-	void onHoverKey(const event::HoverKey &e) override;
-	void onPathDrop(const event::PathDrop &e) override;
+	void onHoverKey(const widget::HoverKeyEvent &e) override;
+	void onPathDrop(const widget::PathDropEvent &e) override;
 
 	void runCheckVersion();
 };

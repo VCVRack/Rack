@@ -17,11 +17,11 @@ struct Button : widget::OpaqueWidget {
 	Button();
 	~Button();
 	void draw(const DrawArgs &args) override;
-	void onEnter(const event::Enter &e) override;
-	void onLeave(const event::Leave &e) override;
-	void onDragStart(const event::DragStart &e) override;
-	void onDragEnd(const event::DragEnd &e) override;
-	void onDragDrop(const event::DragDrop &e) override;
+	void onEnter(const widget::EnterEvent &e) override;
+	void onLeave(const widget::LeaveEvent &e) override;
+	void onDragStart(const widget::DragStartEvent &e) override;
+	void onDragEnd(const widget::DragEndEvent &e) override;
+	void onDragDrop(const widget::DragDropEvent &e) override;
 };
 
 

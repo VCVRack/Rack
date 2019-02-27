@@ -1,5 +1,5 @@
 #include "widget/Widget.hpp"
-#include "event.hpp"
+#include "widget/event.hpp"
 #include "app.hpp"
 #include <algorithm>
 
@@ -16,15 +16,15 @@ Widget::~Widget() {
 
 void Widget::setPos(math::Vec pos) {
 	box.pos = pos;
-	// event::Reposition
-	event::Reposition eReposition;
+	// RepositionEvent
+	RepositionEvent eReposition;
 	onReposition(eReposition);
 }
 
 void Widget::setSize(math::Vec size) {
 	box.size = size;
-	// event::Resize
-	event::Resize eResize;
+	// ResizeEvent
+	ResizeEvent eResize;
 	onResize(eResize);
 }
 
@@ -32,8 +32,8 @@ void Widget::show() {
 	if (visible)
 		return;
 	visible = true;
-	// event::Show
-	event::Show eShow;
+	// ShowEvent
+	ShowEvent eShow;
 	onShow(eShow);
 }
 
@@ -41,8 +41,8 @@ void Widget::hide() {
 	if (!visible)
 		return;
 	visible = false;
-	// event::Hide
-	event::Hide eHide;
+	// HideEvent
+	HideEvent eHide;
 	onHide(eHide);
 }
 
@@ -90,8 +90,8 @@ void Widget::addChild(Widget *child) {
 	assert(!child->parent);
 	child->parent = this;
 	children.push_back(child);
-	// event::Add
-	event::Add eAdd;
+	// AddEvent
+	AddEvent eAdd;
 	child->onAdd(eAdd);
 }
 
@@ -99,8 +99,8 @@ void Widget::removeChild(Widget *child) {
 	assert(child);
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
-	// event::Remove
-	event::Remove eRemove;
+	// RemoveEvent
+	RemoveEvent eRemove;
 	child->onRemove(eRemove);
 	// Prepare to remove widget from the event state
 	APP->event->finalizeWidget(child);
@@ -114,8 +114,8 @@ void Widget::removeChild(Widget *child) {
 
 void Widget::clearChildren() {
 	for (Widget *child : children) {
-		// event::Remove
-		event::Remove eRemove;
+		// RemoveEvent
+		RemoveEvent eRemove;
 		child->onRemove(eRemove);
 		APP->event->finalizeWidget(child);
 		child->parent = NULL;
@@ -129,8 +129,8 @@ void Widget::step() {
 		Widget *child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
-			// event::Remove
-			event::Remove eRemove;
+			// RemoveEvent
+			RemoveEvent eRemove;
 			child->onRemove(eRemove);
 			APP->event->finalizeWidget(child);
 			it = children.erase(it);

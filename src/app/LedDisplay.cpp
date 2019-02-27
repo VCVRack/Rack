@@ -1,7 +1,7 @@
 #include "app/LedDisplay.hpp"
 #include "asset.hpp"
 #include "window.hpp"
-#include "event.hpp"
+#include "widget/event.hpp"
 #include "app.hpp"
 
 
@@ -62,9 +62,9 @@ void LedDisplayChoice::draw(const DrawArgs &args) {
 	}
 }
 
-void LedDisplayChoice::onButton(const event::Button &e) {
+void LedDisplayChoice::onButton(const widget::ButtonEvent &e) {
 	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
-		event::Action eAction;
+		widget::ActionEvent eAction;
 		onAction(eAction);
 		e.consume(this);
 	}

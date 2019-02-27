@@ -35,12 +35,12 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void draw(const DrawArgs &args) override;
 	void drawShadow(const DrawArgs &args);
 
-	void onHover(const event::Hover &e) override;
-	void onButton(const event::Button &e) override;
-	void onHoverKey(const event::HoverKey &e) override;
-	void onDragStart(const event::DragStart &e) override;
-	void onDragEnd(const event::DragEnd &e) override;
-	void onDragMove(const event::DragMove &e) override;
+	void onHover(const widget::HoverEvent &e) override;
+	void onButton(const widget::ButtonEvent &e) override;
+	void onHoverKey(const widget::HoverKeyEvent &e) override;
+	void onDragStart(const widget::DragStartEvent &e) override;
+	void onDragEnd(const widget::DragEndEvent &e) override;
+	void onDragMove(const widget::DragMoveEvent &e) override;
 
 	/** Associates this ModuleWidget with the Module
 	Transfers ownership

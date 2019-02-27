@@ -3,7 +3,7 @@
 #include "app/Scene.hpp"
 #include "keyboard.hpp"
 #include "gamepad.hpp"
-#include "event.hpp"
+#include "widget/event.hpp"
 #include "app.hpp"
 #include "patch.hpp"
 #include "settings.hpp"

@@ -9,19 +9,19 @@ namespace widget {
 /** A Widget that consumes recursing events without giving a chance for children to consume.
 */
 struct ObstructWidget : Widget {
-	void onHover(const event::Hover &e) override {
+	void onHover(const HoverEvent &e) override {
 		e.consume(this);
 	}
-	void onButton(const event::Button &e) override {
+	void onButton(const ButtonEvent &e) override {
 		e.consume(this);
 	}
-	void onHoverKey(const event::HoverKey &e) override {
+	void onHoverKey(const HoverKeyEvent &e) override {
 		e.consume(this);
 	}
-	void onHoverText(const event::HoverText &e) override {
+	void onHoverText(const HoverTextEvent &e) override {
 		e.consume(this);
 	}
-	void onDragHover(const event::DragHover &e) override {
+	void onDragHover(const DragHoverEvent &e) override {
 		e.consume(this);
 	}
 };
