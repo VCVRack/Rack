@@ -176,12 +176,12 @@ struct PolyphonicMidiOutput : midi::Output {
 		}
 	}
 
-	void setStop(bool stop) {
-		if (lastStop == stop)
+	void setContinue(bool cont) {
+		if (lastCont == cont)
 			return;
-		lastStop = stop;
-		if (stop) {
-			// Stop
+		lastCont = cont;
+		if (cont) {
+			// Continue
 			midi::Message m;
 			m.size = 1;
 			m.setStatus(0xf);
@@ -190,12 +190,12 @@ struct PolyphonicMidiOutput : midi::Output {
 		}
 	}
 
-	void setContinue(bool cont) {
-		if (lastCont == cont)
+	void setStop(bool stop) {
+		if (lastStop == stop)
 			return;
-		lastCont = cont;
-		if (cont) {
-			// Continue
+		lastStop = stop;
+		if (stop) {
+			// Stop
 			midi::Message m;
 			m.size = 1;
 			m.setStatus(0xf);
