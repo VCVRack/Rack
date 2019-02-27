@@ -73,7 +73,7 @@ $(glew):
 $(glfw):
 	cd glfw && mkdir -p build
 	cd glfw/build && $(CMAKE) .. \
-		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
+		-DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
 	$(MAKE) -C glfw/build
 	$(MAKE) -C glfw/build install
 
