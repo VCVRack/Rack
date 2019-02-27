@@ -33,7 +33,6 @@ ifdef ARCH_MAC
 		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
 		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a
 	TARGET := Rack
-	BUNDLE := dist/$(TARGET).app
 endif
 
 ifdef ARCH_WIN
@@ -111,28 +110,25 @@ ifdef ARCH_LIN
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 ifdef ARCH_MAC
-	mkdir -p $(BUNDLE)
-	mkdir -p $(BUNDLE)/Contents
-	cp Info.plist $(BUNDLE)/Contents/
-	$(SED) 's/{VERSION}/$(VERSION)/g' $(BUNDLE)/Contents/Info.plist
-	mkdir -p $(BUNDLE)/Contents/MacOS
-	cp $(TARGET) $(BUNDLE)/Contents/MacOS/
-	$(STRIP) -S $(BUNDLE)/Contents/MacOS/$(TARGET)
-	mkdir -p $(BUNDLE)/Contents/Resources
-	cp -R LICENSE* res template.vcv icon.icns $(BUNDLE)/Contents/Resources
+	mkdir -p dist/$(TARGET).app
+	mkdir -p dist/$(TARGET).app/Contents
+	cp Info.plist dist/$(TARGET).app/Contents/
+	$(SED) 's/{VERSION}/$(VERSION)/g' dist/$(TARGET).app/Contents/Info.plist
+	mkdir -p dist/$(TARGET).app/Contents/MacOS
+	cp $(TARGET) dist/$(TARGET).app/Contents/MacOS/
+	$(STRIP) -S dist/$(TARGET).app/Contents/MacOS/$(TARGET)
+	mkdir -p dist/$(TARGET).app/Contents/Resources
+	cp -R LICENSE* res template.vcv icon.icns dist/$(TARGET).app/Contents/Resources
 
 	# Manually check that no nonstandard shared libraries are linked
-	otool -L $(BUNDLE)/Contents/MacOS/$(TARGET)
+	otool -L dist/$(TARGET).app/Contents/MacOS/$(TARGET)
 
-	cp plugins/Fundamental/dist/*.zip $(BUNDLE)/Contents/Resources/Fundamental.zip
+	cp plugins/Fundamental/dist/*.zip dist/$(TARGET).app/Contents/Resources/Fundamental.zip
 	# cp -R Bridge/AU/dist/VCV-Bridge.component dist/
 	# cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
 	# cp -R Bridge/VST/dist/VCV-Bridge-fx.vst dist/
-	# Make DMG image
-	cd dist && ln -s /Applications Applications
-	# cd dist && ln -s /Library/Audio/Plug-Ins/Components Components
-	# cd dist && ln -s /Library/Audio/Plug-Ins/VST VST
-	cd dist && hdiutil create -srcfolder . -volname Rack -ov -format UDZO Rack-$(VERSION)-$(ARCH).dmg
+	# Make ZIP
+	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
@@ -163,14 +159,14 @@ endif
 ifdef ARCH_WIN
 	cp libRack.a dist/Rack-SDK/
 endif
-	cd dist && zip -5 -r Rack-SDK-$(VERSION)-$(ARCH).zip Rack-SDK
+	cd dist && zip -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
 
 
 # Obviously this will only work if you have the private keys to my server
 UPLOAD_URL := vortico@vcvrack.com:files/
 upload:
 ifdef ARCH_MAC
-	rsync dist/*.{dmg,zip} $(UPLOAD_URL) -zP
+	rsync dist/*.zip $(UPLOAD_URL) -zP
 endif
 ifdef ARCH_WIN
 	rsync dist/*.{exe,zip} $(UPLOAD_URL) -P
