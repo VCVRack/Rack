@@ -15,33 +15,32 @@ namespace midi {
 
 
 struct Message {
-	uint8_t cmd = 0x00;
-	uint8_t data1 = 0x00;
-	uint8_t data2 = 0x00;
+	uint8_t size = 3;
+	uint8_t bytes[3] = {};
 
 	uint8_t getChannel() {
-		return cmd & 0xf;
+		return bytes[0] & 0xf;
 	}
 	void setChannel(uint8_t channel) {
-		cmd = (cmd & 0xf0) | (channel & 0xf);
+		bytes[0] = (bytes[0] & 0xf0) | (channel & 0xf);
 	}
 	uint8_t getStatus() {
-		return (cmd >> 4) & 0xf;
+		return (bytes[0] >> 4) & 0xf;
 	}
 	void setStatus(uint8_t status) {
-		cmd = (cmd & 0xf) | ((status << 4) & 0xf0);
+		bytes[0] = (bytes[0] & 0xf) | ((status << 4) & 0xf0);
 	}
 	uint8_t getNote() {
-		return data1 & 0x7f;
+		return bytes[1] & 0x7f;
 	}
 	void setNote(uint8_t note) {
-		data1 = note & 0x7f;
+		bytes[1] = note & 0x7f;
 	}
 	uint8_t getValue() {
-		return data2 & 0x7f;
+		return bytes[2] & 0x7f;
 	}
 	void setValue(uint8_t value) {
-		data2 = value & 0x7f;
+		bytes[2] = value & 0x7f;
 	}
 };
 

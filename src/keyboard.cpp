@@ -78,10 +78,11 @@ struct InputDevice : midi::InputDevice {
 		if (note > 127)
 			return;
 
+		// MIDI note on
 		midi::Message msg;
-		msg.cmd = 0x9 << 4;
-		msg.data1 = note;
-		msg.data2 = 127;
+		msg.setStatus(0x9);
+		msg.setNote(note);
+		msg.setValue(127);
 		onMessage(msg);
 
 		pressedNotes[key] = note;
@@ -91,10 +92,11 @@ struct InputDevice : midi::InputDevice {
 		auto it = pressedNotes.find(key);
 		if (it != pressedNotes.end()) {
 			int note = it->second;
+			// MIDI note off
 			midi::Message msg;
-			msg.cmd = 0x8 << 4;
-			msg.data1 = note;
-			msg.data2 = 127;
+			msg.setStatus(0x8);
+			msg.setNote(note);
+			msg.setValue(127);
 			onMessage(msg);
 
 			pressedNotes.erase(it);

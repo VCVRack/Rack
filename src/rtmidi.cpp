@@ -30,17 +30,21 @@ struct RtMidiInputDevice : midi::InputDevice {
 	}
 
 	static void midiInputCallback(double timeStamp, std::vector<unsigned char> *message, void *userData) {
-		if (!message) return;
-		if (!userData) return;
+		if (!message)
+			return;
+		if (!userData)
+			return;
 
 		RtMidiInputDevice *midiInputDevice = (RtMidiInputDevice*) userData;
-		if (!midiInputDevice) return;
-		if (message->size() < 3) return;
+		if (!midiInputDevice)
+			return;
 
+		assert(message->size() <= 3);
 		midi::Message msg;
-		msg.cmd = (*message)[0];
-		msg.data1 = (*message)[1];
-		msg.data2 = (*message)[2];
+		msg.size = message->size();
+		for (int i = 0; i < msg.size; i++) {
+			msg.bytes[i] = (*message)[i];
+		}
 		midiInputDevice->onMessage(msg);
 	}
 };
@@ -61,11 +65,7 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	}
 
 	void sendMessage(midi::Message message) override {
-		unsigned char msg[3];
-		msg[0] = message.cmd;
-		msg[1] = message.data1;
-		msg[2] = message.data2;
-		rtMidiOut->sendMessage(msg, 3);
+		rtMidiOut->sendMessage(message.bytes, message.size);
 	}
 };
 

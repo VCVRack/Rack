@@ -131,6 +131,7 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (clk) {
 			// Timing clock
 			midi::Message m;
+			m.size = 1;
 			m.setStatus(0xf);
 			m.setChannel(0x8);
 			sendMessage(m);
@@ -168,6 +169,7 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (start) {
 			// Start
 			midi::Message m;
+			m.size = 1;
 			m.setStatus(0xf);
 			m.setChannel(0xa);
 			sendMessage(m);
@@ -181,6 +183,7 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (stop) {
 			// Stop
 			midi::Message m;
+			m.size = 1;
 			m.setStatus(0xf);
 			m.setChannel(0xb);
 			sendMessage(m);
@@ -194,6 +197,7 @@ struct PolyphonicMidiOutput : midi::Output {
 		if (cont) {
 			// Continue
 			midi::Message m;
+			m.size = 1;
 			m.setStatus(0xf);
 			m.setChannel(0xc);
 			sendMessage(m);
