@@ -559,6 +559,7 @@ const std::set<std::string> allowedTags = {
 	"Envelope follower",
 	"Envelope generator",
 	"Equalizer",
+	"Expander", // Expands the functionality of a "mother" module when placed next to it. Expanders should inherit the tags of its mother module.
 	"External",
 	"Flanger",
 	"Function generator",

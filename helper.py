@@ -16,6 +16,11 @@ class UserException(Exception):
     pass
 
 
+def find(f, array):
+	for a in array:
+		if f(a):
+			return f
+
 def input_default(prompt, default=""):
 	str = input(f"{prompt} [{default}]: ")
 	if str == "":
@@ -65,29 +70,15 @@ def create_plugin(slug):
 	if os.path.exists(plugin_dir):
 		raise UserException(f"Directory {plugin_dir} already exists")
 
-	# Query manifest information
-	manifest = {}
-	manifest['slug'] = slug
-	manifest['name'] = input_default("Plugin name", slug)
-	manifest['version'] = input_default("Version", "1.0.0")
-	manifest['license'] = input_default("License (if open-source, use license identifier from https://spdx.org/licenses/)", "proprietary")
-	manifest['author'] = input_default("Author")
-	manifest['authorEmail'] = input_default("Author email (optional)")
-	manifest['authorUrl'] = input_default("Author website URL (optional)")
-	manifest['pluginUrl'] = input_default("Plugin website URL (optional)")
-	manifest['manualUrl'] = input_default("Manual website URL (optional)")
-	manifest['sourceUrl'] = input_default("Source code URL (optional)")
-	manifest['donateUrl'] = input_default("Donate URL (optional)")
-	manifest['modules'] = []
-
 	# Create plugin directory
 	os.mkdir(plugin_dir)
 
-	# Dump JSON
-	manifest_filename = os.path.join(plugin_dir, 'plugin.json')
-	with open(manifest_filename, "w") as f:
-		json.dump(manifest, f, indent="\t")
-	print(f"Manifest created at {manifest_filename}")
+	# Create manifest
+	try:
+		create_manifest(plugin_dir, slug)
+	except Exception as e:
+		os.rmdir(plugin_dir)
+		raise e
 
 	# Create subdirectories
 	os.mkdir(os.path.join(plugin_dir, "src"))
@@ -166,6 +157,32 @@ void init(Plugin *p) {
 	print(f"You may use `make`, `make clean`, `make dist`, `make install`, etc in the {plugin_dir} directory.")
 
 
+def create_manifest(plugin_dir, slug=None):
+	manifest = {}
+
+	# Query manifest information
+	if not slug:
+		slug = input_default("Plugin slug (unique identifier)", slug)
+	manifest['slug'] = slug
+	manifest['name'] = input_default("Plugin name", slug)
+	manifest['version'] = input_default("Version", "1.0.0")
+	manifest['license'] = input_default("License (if open-source, use license identifier from https://spdx.org/licenses/)", "proprietary")
+	manifest['author'] = input_default("Author")
+	manifest['authorEmail'] = input_default("Author email (optional)")
+	manifest['authorUrl'] = input_default("Author website URL (optional)")
+	manifest['pluginUrl'] = input_default("Plugin website URL (optional)")
+	manifest['manualUrl'] = input_default("Manual website URL (optional)")
+	manifest['sourceUrl'] = input_default("Source code URL (optional)")
+	manifest['donateUrl'] = input_default("Donate URL (optional)")
+	manifest['modules'] = []
+
+	# Dump JSON
+	manifest_filename = os.path.join(plugin_dir, 'plugin.json')
+	with open(manifest_filename, "w") as f:
+		json.dump(manifest, f, indent="\t")
+	print(f"Manifest created at {manifest_filename}")
+
+
 def usage_create_module(script):
 	text = f"""Usage: {script} createmodule <module slug>
 
@@ -208,14 +225,14 @@ def create_module(slug):
 		manifest = json.load(f)
 
 	# Check if module manifest exists
-	module_manifests = filter(lambda m: m['slug'] == slug, manifest['modules'])
-	if module_manifests:
+	module_manifest = find(lambda m: m['slug'] == slug, manifest['modules'])
+	if not module_manifest:
 		# Add module to manifest
 		module_manifest = {}
 		module_manifest['slug'] = slug
 		module_manifest['name'] = input_default("Module name", slug)
 		module_manifest['description'] = input_default("One-line description (optional)")
-		tags = input_default("Tags (comma-separated, see https://github.com/VCVRack/Rack/blob/v1/src/plugin.cpp#L543 for list)")
+		tags = input_default("Tags (comma-separated, case-insensitive, see https://github.com/VCVRack/Rack/blob/v1/src/plugin.cpp#L543 for list)")
 		tags = tags.split(",")
 		tags = [tag.strip() for tag in tags]
 		if len(tags) == 1 and tags[0] == "":
@@ -230,20 +247,25 @@ def create_module(slug):
 
 		print(f"Added {slug} to plugin.json")
 
+	else:
+		print(f"Module {slug} already exists in plugin.json. Edit this file to modify the module manifest.")
+
 	# Check filenames
 	panel_filename = f"res/{slug}.svg"
 	source_filename = f"src/{slug}.cpp"
+
+	if not os.path.exists(panel_filename):
+		print(f"Panel not found at {panel_filename}. If you wish to automatically generate a source file, run this command with no arguments for instructions for creating a panel file.")
+		return
+
+	print(f"Panel found at {panel_filename}. Generating source file.")
 
 	if os.path.exists(source_filename):
 		if input_default(f"{source_filename} already exists. Overwrite?", "n").lower() != "y":
 			return
 
 	# Read SVG XML
-	tree = None
-	try:
-		tree = xml.etree.ElementTree.parse(panel_filename)
-	except FileNotFoundError:
-		raise UserException(f"Panel not found at {panel_filename}. Run this command with no arguments for instructions to create panels.")
+	tree = xml.etree.ElementTree.parse(panel_filename)
 
 	components = panel_to_components(tree)
 	print(f"Components extracted from {panel_filename}")
@@ -254,6 +276,17 @@ def create_module(slug):
 	with open(source_filename, "w") as f:
 		f.write(source)
 	print(f"Source file generated at {source_filename}")
+
+	# Append model to plugin.hpp
+	identifier = slug_to_identifier(slug)
+
+	# Tell user to add model to plugin.hpp and plugin.cpp
+	print(f"")
+	print(f"To enable the module, add")
+	print(f"extern Model *model{identifier};")
+	print(f"to plugin.hpp, and add")
+	print(f"p->addModel(model{identifier});")
+	print(f"to the init() function in plugin.cpp.")
 
 
 def panel_to_components(tree):
@@ -322,6 +355,7 @@ def panel_to_components(tree):
 		if color == 'ffff00':
 			components['widgets'].append(c)
 
+	print(f"Found {len(components['params'])} params, {len(components['inputs'])} inputs, {len(components['outputs'])} outputs, {len(components['lights'])} lights, and {len(components['widgets'])} custom widgets.")
 	return components
 
 
@@ -483,6 +517,9 @@ def parse_args(args):
 				create_module(args[2])
 				return
 			usage_create_module(args[0])
+			return
+		if args[1] == 'createmanifest':
+			create_manifest('.')
 			return
 	usage(args[0])
 
