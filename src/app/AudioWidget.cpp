@@ -36,7 +36,7 @@ struct AudioDriverChoice : LedDisplayChoice {
 		if (port)
 			text = port->getDriverName(port->driver);
 		else
-			text = "";
+			text = "Audio driver";
 	}
 };
 
@@ -85,7 +85,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 	}
 	void step() override {
 		if (!port) {
-			text = "";
+			text = "Audio device";
 			return;
 		}
 		text = port->getDeviceDetail(port->device, port->offset);
@@ -133,7 +133,7 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		if (port)
 			text = string::f("%g kHz", port->sampleRate / 1000.f);
 		else
-			text = "";
+			text = "44.1 kHz";
 	}
 };
 
@@ -172,7 +172,7 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		if (port)
 			text = string::f("%d", port->blockSize);
 		else
-			text = "";
+			text = "256";
 	}
 };
 

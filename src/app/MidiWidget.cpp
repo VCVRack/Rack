@@ -34,7 +34,7 @@ struct MidiDriverChoice : LedDisplayChoice {
 	}
 	void step() override {
 		if (!port) {
-			text = "";
+			text = "MIDI driver";
 			return;
 		}
 		text = port->getDriverName(port->driverId);
@@ -83,7 +83,7 @@ struct MidiDeviceChoice : LedDisplayChoice {
 	}
 	void step() override {
 		if (!port) {
-			text = "";
+			text = "MIDI device";
 			return;
 		}
 		text = port->getDeviceName(port->deviceId);
@@ -126,7 +126,7 @@ struct MidiChannelChoice : LedDisplayChoice {
 		if (port)
 			text = port->getChannelName(port->channel);
 		else
-			text = "";
+			text = "MIDI channel";
 	}
 };
 

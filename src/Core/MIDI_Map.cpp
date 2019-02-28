@@ -405,13 +405,12 @@ struct MIDI_MapDisplay : MidiWidget {
 	}
 
 	void step() override {
-		if (!module)
-			return;
-
-		int mapLen = module->mapLen;
-		for (int id = 0; id < MAX_CHANNELS; id++) {
-			choices[id]->visible = (id < mapLen);
-			separators[id]->visible = (id < mapLen);
+		if (module) {
+			int mapLen = module->mapLen;
+			for (int id = 0; id < MAX_CHANNELS; id++) {
+				choices[id]->visible = (id < mapLen);
+				separators[id]->visible = (id < mapLen);
+			}
 		}
 
 		MidiWidget::step();

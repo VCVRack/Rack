@@ -74,8 +74,10 @@ struct CcChoice : LedDisplayChoice {
 	}
 
 	void step() override {
-		if (!module)
+		if (!module) {
+			text = string::f("%d", id);
 			return;
+		}
 		if (module->learningId == id) {
 			if (0 <= focusCc)
 				text = string::f("%d", focusCc);
@@ -155,8 +157,10 @@ struct NoteChoice : LedDisplayChoice {
 	}
 
 	void step() override {
-		if (!module)
+		if (!module) {
+			text = "C4";
 			return;
+		}
 		if (module->learningId == id) {
 			text = "LRN";
 			color.a = 0.5;
