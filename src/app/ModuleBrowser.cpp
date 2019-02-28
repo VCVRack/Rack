@@ -232,6 +232,16 @@ struct ModelBox : widget::OpaqueWidget {
 };
 
 
+struct AuthorItem : ui::MenuItem {
+	void onAction(const widget::ActionEvent &e) override;
+};
+
+
+struct TagItem : ui::MenuItem {
+	void onAction(const widget::ActionEvent &e) override;
+};
+
+
 struct BrowserSearchField : ui::TextField {
 	void step() override {
 		// Steal focus when step is called
@@ -268,8 +278,10 @@ struct BrowserSearchField : ui::TextField {
 
 struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
-	ui::List *pluginList;
-	ui::ScrollWidget *pluginScroll;
+	ui::Label *authorLabel;
+	ui::List *authorList;
+	ui::ScrollWidget *authorScroll;
+	ui::Label *tagLabel;
 	ui::List *tagList;
 	ui::ScrollWidget *tagScroll;
 
@@ -277,23 +289,33 @@ struct BrowserSidebar : widget::Widget {
 		searchField = new BrowserSearchField;
 		addChild(searchField);
 
+		authorLabel = new ui::Label;
+		authorLabel->color = nvgRGB(0x80, 0x80, 0x80);
+		authorLabel->text = "Authors";
+		addChild(authorLabel);
+
 		// Plugin list
-		pluginScroll = new ui::ScrollWidget;
-		addChild(pluginScroll);
+		authorScroll = new ui::ScrollWidget;
+		addChild(authorScroll);
 
-		pluginList = new ui::List;
-		pluginScroll->container->addChild(pluginList);
+		authorList = new ui::List;
+		authorScroll->container->addChild(authorList);
 
-		std::set<std::string, string::CaseInsensitiveCompare> pluginNames;
+		std::set<std::string, string::CaseInsensitiveCompare> authorNames;
 		for (plugin::Plugin *plugin : plugin::plugins) {
-			pluginNames.insert(plugin->name);
+			authorNames.insert(plugin->author);
 		}
 
-		for (const std::string &pluginName : pluginNames) {
-			ui::MenuItem *item = new ui::MenuItem;
-			item->text = pluginName;
-			pluginList->addChild(item);
+		for (const std::string &authorName : authorNames) {
+			AuthorItem *item = new AuthorItem;
+			item->text = authorName;
+			authorList->addChild(item);
 		}
+
+		tagLabel = new ui::Label;
+		tagLabel->color = nvgRGB(0x80, 0x80, 0x80);
+		tagLabel->text = "Tags";
+		addChild(tagLabel);
 
 		// Tag list
 		tagScroll = new ui::ScrollWidget;
@@ -303,22 +325,32 @@ struct BrowserSidebar : widget::Widget {
 		tagScroll->container->addChild(tagList);
 
 		for (const std::string &tag : plugin::allowedTags) {
-			ui::MenuItem *item = new ui::MenuItem;
+			TagItem *item = new TagItem;
 			item->text = tag;
 			tagList->addChild(item);
 		}
 	}
 
 	void step() override {
+		float listHeight = (box.size.y - searchField->box.size.y) / 2 - authorLabel->box.size.y;
+		listHeight = std::floor(listHeight);
+
 		searchField->box.size.x = box.size.x;
-		pluginScroll->box.pos = searchField->box.getBottomLeft();
-		pluginScroll->box.size.y = (box.size.y - searchField->box.size.y) / 2;
-		pluginScroll->box.size.x = box.size.x;
-		pluginList->box.size.x = pluginScroll->box.size.x;
-		tagScroll->box.pos = pluginScroll->box.getBottomLeft().floor();
-		tagScroll->box.size.y = (box.size.y - searchField->box.size.y) / 2;
+
+		authorLabel->box.pos = searchField->box.getBottomLeft();
+		authorLabel->box.size.x = box.size.x;
+		authorScroll->box.pos = authorLabel->box.getBottomLeft();
+		authorScroll->box.size.y = listHeight;
+		authorScroll->box.size.x = box.size.x;
+		authorList->box.size.x = authorScroll->box.size.x;
+
+		tagLabel->box.pos = authorScroll->box.getBottomLeft();
+		tagLabel->box.size.x = box.size.x;
+		tagScroll->box.pos = tagLabel->box.getBottomLeft();
+		tagScroll->box.size.y = listHeight;
 		tagScroll->box.size.x = box.size.x;
 		tagList->box.size.x = tagScroll->box.size.x;
+
 		Widget::step();
 	}
 };
@@ -329,6 +361,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	ui::ScrollWidget *modelScroll;
 	ui::MarginLayout *modelMargin;
 	ui::SequentialLayout *modelContainer;
+
+	std::string search;
+	std::string author;
+	std::string tag;
 
 	ModuleBrowser() {
 		sidebar = new BrowserSidebar;
@@ -346,6 +382,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelContainer->spacing = math::Vec(10, 10);
 		modelMargin->addChild(modelContainer);
 
+		// Add ModelBoxes for each Model
 		for (plugin::Plugin *plugin : plugin::plugins) {
 			for (plugin::Model *model : plugin->models) {
 				ModelBox *moduleBox = new ModelBox;
@@ -354,11 +391,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
-		setSearch("");
+		refreshModels();
 	}
 
 	void step() override {
-		box = parent->box.zeroPos().grow(math::Vec(-50, -50));
+		box = parent->box.zeroPos().grow(math::Vec(-70, -70));
 
 		sidebar->box.size.y = box.size.y;
 
@@ -376,16 +413,16 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		Widget::draw(args);
 	}
 
-	void setSearch(const std::string &search) {
-		std::string searchTrimmed = string::trim(search);
+	void refreshModels() {
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 
-		if (searchTrimmed.empty()) {
+		if (search.empty()) {
+			// Make all ModelBoxes visible
 			for (Widget *w : modelContainer->children) {
 				w->visible = true;
 			}
-			// If no search query, sort by plugin name and module name
+			// Sort by plugin name and then module name
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 				ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
 				ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
@@ -396,11 +433,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 		else {
 			std::map<Widget*, float> scores;
-			// Compute scores and set visibility
+			// Compute scores and filter visibility
 			for (Widget *w : modelContainer->children) {
 				ModelBox *m = dynamic_cast<ModelBox*>(w);
 				assert(m);
-				float score = modelScore(m->model, searchTrimmed);
+				float score = modelScore(m->model, search);
 				scores[m] = score;
 				m->visible = (score > 0);
 			}
@@ -408,6 +445,37 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 				return scores[w1] > scores[w2];
 			});
+		}
+
+		// Filter authors
+		if (!author.empty()) {
+			for (Widget *w : modelContainer->children) {
+				if (!w->visible)
+					continue;
+				ModelBox *m = dynamic_cast<ModelBox*>(w);
+				assert(m);
+				if (m->model->plugin->author != author)
+					m->visible = false;
+			}
+		}
+
+		// Filter tags
+		if (!tag.empty()) {
+			for (Widget *w : modelContainer->children) {
+				if (!w->visible)
+					continue;
+				ModelBox *m = dynamic_cast<ModelBox*>(w);
+				assert(m);
+				bool found = false;
+				for (const std::string &tag : m->model->tags) {
+					if (tag == this->tag) {
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					m->visible = false;
+			}
 		}
 	}
 };
@@ -442,11 +510,32 @@ inline void ModelBox::onButton(const widget::ButtonEvent &e) {
 	}
 }
 
-inline void BrowserSearchField::onChange(const widget::ChangeEvent &e) {
+
+inline void AuthorItem::onAction(const widget::ActionEvent &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
-	browser->setSearch(text);
+	if (browser->author == text)
+		browser->author = "";
+	else
+		browser->author = text;
+	browser->refreshModels();
 }
 
+
+inline void TagItem::onAction(const widget::ActionEvent &e) {
+	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+	if (browser->tag == text)
+		browser->tag = "";
+	else
+		browser->tag = text;
+	browser->refreshModels();
+}
+
+
+inline void BrowserSearchField::onChange(const widget::ChangeEvent &e) {
+	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+	browser->search = string::trim(text);
+	browser->refreshModels();
+}
 
 
 // Global functions
