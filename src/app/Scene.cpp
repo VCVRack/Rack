@@ -19,7 +19,7 @@ Scene::Scene() {
 	rackScroll = new RackScrollWidget;
 	addChild(rackScroll);
 
-	rack = rackScroll->rack;
+	rack = rackScroll->rackWidget;
 
 	toolbar = new Toolbar;
 	addChild(toolbar);

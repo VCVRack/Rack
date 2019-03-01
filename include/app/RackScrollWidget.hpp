@@ -10,8 +10,10 @@ namespace app {
 
 
 struct RackScrollWidget : ui::ScrollWidget {
-	widget::ZoomWidget *zoom;
-	RackWidget *rack;
+	widget::ZoomWidget *zoomWidget;
+	RackWidget *rackWidget;
+	/** The pivot point for zooming */
+	math::Vec zoomPos;
 
 	RackScrollWidget();
 	void step() override;

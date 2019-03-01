@@ -10,29 +10,37 @@ namespace app {
 
 
 RackScrollWidget::RackScrollWidget() {
-	zoom = new widget::ZoomWidget;
-	container->addChild(zoom);
+	zoomWidget = new widget::ZoomWidget;
+	container->addChild(zoomWidget);
 
-	rack = new RackWidget;
-	zoom->addChild(rack);
+	rackWidget = new RackWidget;
+	zoomWidget->addChild(rackWidget);
 }
 
 void RackScrollWidget::step() {
-	zoom->setZoom(std::round(settings.zoom * 100) / 100);
+	float zoom = std::round(settings.zoom * 100) / 100;
+	if (zoom != zoomWidget->zoom) {
+		// Set offset based on zoomPos
+		offset = offset.plus(zoomPos).div(zoomWidget->zoom).mult(zoom).minus(zoomPos);
+		// Set zoom
+		zoomWidget->setZoom(zoom);
+	}
+
+	zoomPos = box.size.div(2);
 
 	// Resize RackWidget to be a bit larger than the viewport
-	rack->box.size = box.size
+	rackWidget->box.size = box.size
 		.minus(container->box.pos)
 		.plus(math::Vec(500, 500))
-		.div(zoom->zoom);
+		.div(zoomWidget->zoom);
 
 	// Resize ZoomWidget
-	zoom->box.size = rack->box.size.mult(zoom->zoom);
+	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
 
 	// Scroll rack if dragging cable near the edge of the screen
 	math::Vec pos = APP->window->mousePos;
 	math::Rect viewport = getViewport(box.zeroPos());
-	if (rack->incompleteCable) {
+	if (rackWidget->incompleteCable) {
 		float margin = 20.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)
@@ -83,6 +91,11 @@ void RackScrollWidget::onHover(const widget::HoverEvent &e) {
 
 void RackScrollWidget::onHoverScroll(const widget::HoverScrollEvent &e) {
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+		// Increase zoom
+		float zoomDelta = e.scrollDelta.y / 50 / 4;
+		settings.zoom *= std::pow(2, zoomDelta);
+		settings.zoom = math::clamp(settings.zoom, 0.25f, 2.f);
+		zoomPos = e.pos;
 		e.consume(this);
 		return;
 	}
