@@ -1,9 +1,8 @@
-#include "system.hpp"
-#include "network.hpp"
 #include "app/Scene.hpp"
 #include "app/ModuleBrowser.hpp"
-#include "app/RackScrollWidget.hpp"
 #include "app.hpp"
+#include "system.hpp"
+#include "network.hpp"
 #include "history.hpp"
 #include "settings.hpp"
 #include "patch.hpp"
@@ -17,23 +16,17 @@ namespace app {
 
 
 Scene::Scene() {
-	scrollWidget = new RackScrollWidget;
-	{
-		zoomWidget = new widget::ZoomWidget;
-		{
-			rackWidget = new RackWidget;
-			zoomWidget->addChild(rackWidget);
-		}
-		scrollWidget->container->addChild(zoomWidget);
-	}
-	addChild(scrollWidget);
+	rackScroll = new RackScrollWidget;
+	addChild(rackScroll);
+
+	rack = rackScroll->rack;
 
 	toolbar = new Toolbar;
 	addChild(toolbar);
-	scrollWidget->box.pos.y = toolbar->box.size.y;
+	rackScroll->box.pos.y = toolbar->box.size.y;
 
 	moduleBrowser = moduleBrowserCreate();
-	moduleBrowser->visible = false;
+	moduleBrowser->hide();
 	addChild(moduleBrowser);
 }
 
@@ -43,17 +36,7 @@ Scene::~Scene() {
 void Scene::step() {
 	// Resize owned descendants
 	toolbar->box.size.x = box.size.x;
-	scrollWidget->box.size = box.size.minus(scrollWidget->box.pos);
-
-	// Resize to be a bit larger than the ui::ScrollWidget viewport
-	rackWidget->box.size = scrollWidget->box.size
-		.minus(scrollWidget->container->box.pos)
-		.plus(math::Vec(500, 500))
-		.div(zoomWidget->zoom);
-
-	OpaqueWidget::step();
-
-	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
+	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
 
 	// Autosave every 15 seconds
 	double time = glfwGetTime();
@@ -62,11 +45,6 @@ void Scene::step() {
 		APP->patch->save(asset::user("autosave.vcv"));
 		settings.save(asset::user("settings.json"));
 	}
-
-	// Set zoom every few frames
-	int frame = APP->window->frame;
-	if (frame % 10 == 0)
-		zoomWidget->setZoom(std::round(settings.zoom * 100) / 100);
 
 	// Request latest version from server
 	if (!devMode && checkVersion && !checkedVersion) {
@@ -85,6 +63,8 @@ void Scene::step() {
 		}
 		latestVersion = "";
 	}
+
+	OpaqueWidget::step();
 }
 
 void Scene::draw(const DrawArgs &args) {

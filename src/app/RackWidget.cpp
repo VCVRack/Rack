@@ -122,37 +122,12 @@ void RackWidget::draw(const DrawArgs &args) {
 }
 
 void RackWidget::onHover(const widget::HoverEvent &e) {
-	if (!APP->event->selectedWidget) {
-		// Scroll with arrow keys
-		float arrowSpeed = 30.0;
-		if ((APP->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
-			arrowSpeed /= 16.0;
-		else if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
-			arrowSpeed *= 4.0;
-		else if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
-			arrowSpeed /= 4.0;
-
-		ui::ScrollWidget *scrollWidget = APP->scene->scrollWidget;
-		if (glfwGetKey(APP->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
-			scrollWidget->offset.x -= arrowSpeed;
-		}
-		if (glfwGetKey(APP->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-			scrollWidget->offset.x += arrowSpeed;
-		}
-		if (glfwGetKey(APP->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
-			scrollWidget->offset.y -= arrowSpeed;
-		}
-		if (glfwGetKey(APP->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
-			scrollWidget->offset.y += arrowSpeed;
-		}
-	}
-
-	widget::OpaqueWidget::onHover(e);
 	mousePos = e.pos;
+	OpaqueWidget::onHover(e);
 }
 
 void RackWidget::onHoverKey(const widget::HoverKeyEvent &e) {
-	widget::OpaqueWidget::onHoverKey(e);
+	OpaqueWidget::onHoverKey(e);
 	if (e.getConsumed() != this)
 		return;
 
@@ -168,12 +143,12 @@ void RackWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 }
 
 void RackWidget::onDragHover(const widget::DragHoverEvent &e) {
-	widget::OpaqueWidget::onDragHover(e);
+	OpaqueWidget::onDragHover(e);
 	mousePos = e.pos;
 }
 
 void RackWidget::onButton(const widget::ButtonEvent &e) {
-	widget::OpaqueWidget::onButton(e);
+	OpaqueWidget::onButton(e);
 	if (e.getConsumed() == this) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			APP->scene->moduleBrowser->show();
@@ -183,7 +158,7 @@ void RackWidget::onButton(const widget::ButtonEvent &e) {
 
 void RackWidget::onZoom(const widget::ZoomEvent &e) {
 	rails->box.size = math::Vec();
-	widget::OpaqueWidget::onZoom(e);
+	OpaqueWidget::onZoom(e);
 }
 
 void RackWidget::clear() {

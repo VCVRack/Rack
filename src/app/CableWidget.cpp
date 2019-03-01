@@ -120,25 +120,25 @@ void CableWidget::setInput(PortWidget *inputPort) {
 
 math::Vec CableWidget::getOutputPos() {
 	if (outputPort) {
-		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), APP->scene->rack);
 	}
 	else if (hoveredOutputPort) {
-		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), APP->scene->rack);
 	}
 	else {
-		return APP->scene->rackWidget->mousePos;
+		return APP->scene->rack->mousePos;
 	}
 }
 
 math::Vec CableWidget::getInputPos() {
 	if (inputPort) {
-		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), APP->scene->rack);
 	}
 	else if (hoveredInputPort) {
-		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), APP->scene->rackWidget);
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), APP->scene->rack);
 	}
 	else {
-		return APP->scene->rackWidget->mousePos;
+		return APP->scene->rack->mousePos;
 	}
 }
 
@@ -162,14 +162,14 @@ void CableWidget::fromJson(json_t *rootJ) {
 	json_t *outputModuleIdJ = json_object_get(rootJ, "outputModuleId");
 	if (!outputModuleIdJ) return;
 	int outputModuleId = json_integer_value(outputModuleIdJ);
-	ModuleWidget *outputModule = APP->scene->rackWidget->getModule(outputModuleId);
+	ModuleWidget *outputModule = APP->scene->rack->getModule(outputModuleId);
 	if (!outputModule) return;
 
 	// inputModuleId
 	json_t *inputModuleIdJ = json_object_get(rootJ, "inputModuleId");
 	if (!inputModuleIdJ) return;
 	int inputModuleId = json_integer_value(inputModuleIdJ);
-	ModuleWidget *inputModule = APP->scene->rackWidget->getModule(inputModuleId);
+	ModuleWidget *inputModule = APP->scene->rack->getModule(inputModuleId);
 	if (!inputModule) return;
 
 	// outputId
@@ -250,7 +250,7 @@ void CableWidget::drawPlugs(const DrawArgs &args) {
 	math::Vec inputPos = getInputPos();
 
 	// Draw plug if the cable is on top, or if the cable is incomplete
-	if (!isComplete() || APP->scene->rackWidget->getTopCable(outputPort) == this) {
+	if (!isComplete() || APP->scene->rack->getTopCable(outputPort) == this) {
 		drawPlug(args.vg, outputPos, color);
 		if (isComplete()) {
 			// Draw plug light
@@ -261,7 +261,7 @@ void CableWidget::drawPlugs(const DrawArgs &args) {
 		}
 	}
 
-	if (!isComplete() || APP->scene->rackWidget->getTopCable(inputPort) == this) {
+	if (!isComplete() || APP->scene->rack->getTopCable(inputPort) == this) {
 		drawPlug(args.vg, inputPos, color);
 		if (isComplete()) {
 			nvgSave(args.vg);

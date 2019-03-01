@@ -352,7 +352,7 @@ void ModuleWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 
 void ModuleWidget::onDragStart(const widget::DragStartEvent &e) {
 	oldPos = box.pos;
-	dragPos = APP->scene->rackWidget->mousePos.minus(box.pos);
+	dragPos = APP->scene->rack->mousePos.minus(box.pos);
 	e.consume(this);
 }
 
@@ -370,8 +370,8 @@ void ModuleWidget::onDragEnd(const widget::DragEndEvent &e) {
 void ModuleWidget::onDragMove(const widget::DragMoveEvent &e) {
 	if (!settings.lockModules) {
 		math::Rect newBox = box;
-		newBox.pos = APP->scene->rackWidget->mousePos.minus(dragPos);
-		APP->scene->rackWidget->requestModuleBoxNearest(this, newBox);
+		newBox.pos = APP->scene->rack->mousePos.minus(dragPos);
+		APP->scene->rack->requestModuleBoxNearest(this, newBox);
 	}
 }
 
@@ -635,10 +635,10 @@ void ModuleWidget::saveDialog() {
 
 void ModuleWidget::disconnect() {
 	for (PortWidget *input : inputs) {
-		APP->scene->rackWidget->clearCablesOnPort(input);
+		APP->scene->rack->clearCablesOnPort(input);
 	}
 	for (PortWidget *output : outputs) {
-		APP->scene->rackWidget->clearCablesOnPort(output);
+		APP->scene->rack->clearCablesOnPort(output);
 	}
 }
 
@@ -675,7 +675,7 @@ void ModuleWidget::randomizeAction() {
 static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexAction) {
 	// Add CableRemove action for all cables attached to outputs
 	for (PortWidget* output : mw->outputs) {
-		for (CableWidget *cw : APP->scene->rackWidget->getCablesOnPort(output)) {
+		for (CableWidget *cw : APP->scene->rack->getCablesOnPort(output)) {
 			if (!cw->isComplete())
 				continue;
 			// history::CableRemove
@@ -686,7 +686,7 @@ static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexA
 	}
 	// Add CableRemove action for all cables attached to inputs
 	for (PortWidget* input : mw->inputs) {
-		for (CableWidget *cw : APP->scene->rackWidget->getCablesOnPort(input)) {
+		for (CableWidget *cw : APP->scene->rack->getCablesOnPort(input)) {
 			if (!cw->isComplete())
 				continue;
 			// Avoid creating duplicate actions for self-patched cables
@@ -717,7 +717,7 @@ void ModuleWidget::cloneAction() {
 	clonedModuleWidget->fromJson(moduleJ);
 	json_decref(moduleJ);
 
-	APP->scene->rackWidget->addModuleAtMouse(clonedModuleWidget);
+	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
 
 	// history::ModuleAdd
 	history::ModuleAdd *h = new history::ModuleAdd;
@@ -749,7 +749,7 @@ void ModuleWidget::removeAction() {
 	APP->history->push(complexAction);
 
 	// This disconnects cables, removes the module, and transfers ownership to caller
-	APP->scene->rackWidget->removeModule(this);
+	APP->scene->rack->removeModule(this);
 	delete this;
 }
 

@@ -43,7 +43,7 @@ struct ModuleResizeHandle : Widget {
 	}
 
 	void onDragStart(const widget::DragStartEvent &e) override {
-		dragX = APP->scene->rackWidget->mousePos.x;
+		dragX = APP->scene->rack->mousePos.x;
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 		originalBox = m->box;
 		e.consume(this);
@@ -52,7 +52,7 @@ struct ModuleResizeHandle : Widget {
 	void onDragMove(const widget::DragMoveEvent &e) override {
 		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
 
-		float newDragX = APP->scene->rackWidget->mousePos.x;
+		float newDragX = APP->scene->rack->mousePos.x;
 		float deltaX = newDragX - dragX;
 
 		Rect newBox = originalBox;
@@ -68,7 +68,7 @@ struct ModuleResizeHandle : Widget {
 			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
-		APP->scene->rackWidget->requestModuleBox(m, newBox);
+		APP->scene->rack->requestModuleBox(m, newBox);
 	}
 
 	void draw(const DrawArgs &args) override {

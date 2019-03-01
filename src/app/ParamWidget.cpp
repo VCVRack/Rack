@@ -150,7 +150,7 @@ void ParamWidget::onButton(const widget::ButtonEvent &e) {
 	// Touch parameter
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == 0) {
 		if (paramQuantity) {
-			APP->scene->rackWidget->touchedParam = this;
+			APP->scene->rack->touchedParam = this;
 		}
 	}
 

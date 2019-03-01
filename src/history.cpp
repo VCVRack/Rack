@@ -48,9 +48,9 @@ void ModuleAdd::setModule(app::ModuleWidget *mw) {
 }
 
 void ModuleAdd::undo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
-	APP->scene->rackWidget->removeModule(mw);
+	APP->scene->rack->removeModule(mw);
 	delete mw;
 }
 
@@ -61,31 +61,31 @@ void ModuleAdd::redo() {
 	mw->module->id = moduleId;
 	mw->box.pos = pos;
 	mw->fromJson(moduleJ);
-	APP->scene->rackWidget->addModule(mw);
+	APP->scene->rack->addModule(mw);
 }
 
 
 void ModuleMove::undo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->box.pos = oldPos;
 }
 
 void ModuleMove::redo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->box.pos = newPos;
 }
 
 
 void ModuleBypass::undo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	APP->engine->bypassModule(mw->module, !bypass);
 }
 
 void ModuleBypass::redo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	APP->engine->bypassModule(mw->module, bypass);
 }
@@ -97,26 +97,26 @@ ModuleChange::~ModuleChange() {
 }
 
 void ModuleChange::undo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->fromJson(oldModuleJ);
 }
 
 void ModuleChange::redo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->fromJson(newModuleJ);
 }
 
 
 void ParamChange::undo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->module->params[paramId].value = oldValue;
 }
 
 void ParamChange::redo() {
-	app::ModuleWidget *mw = APP->scene->rackWidget->getModule(moduleId);
+	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->module->params[paramId].value = newValue;
 }
@@ -136,8 +136,8 @@ void CableAdd::setCable(app::CableWidget *cw) {
 }
 
 void CableAdd::undo() {
-	app::CableWidget *cw = APP->scene->rackWidget->getCable(cableId);
-	APP->scene->rackWidget->removeCable(cw);
+	app::CableWidget *cw = APP->scene->rack->getCable(cableId);
+	APP->scene->rack->removeCable(cw);
 	delete cw;
 }
 
@@ -145,13 +145,13 @@ void CableAdd::redo() {
 	app::CableWidget *cw = new app::CableWidget;
 	cw->cable->id = cableId;
 
-	app::ModuleWidget *outputModule = APP->scene->rackWidget->getModule(outputModuleId);
+	app::ModuleWidget *outputModule = APP->scene->rack->getModule(outputModuleId);
 	assert(outputModule);
 	app::PortWidget *outputPort = outputModule->getOutput(outputId);
 	assert(outputPort);
 	cw->setOutput(outputPort);
 
-	app::ModuleWidget *inputModule = APP->scene->rackWidget->getModule(inputModuleId);
+	app::ModuleWidget *inputModule = APP->scene->rack->getModule(inputModuleId);
 	assert(inputModule);
 	app::PortWidget *inputPort = inputModule->getInput(inputId);
 	assert(inputPort);
@@ -159,7 +159,7 @@ void CableAdd::redo() {
 
 	cw->color = color;
 
-	APP->scene->rackWidget->addCable(cw);
+	APP->scene->rack->addCable(cw);
 }
 
 

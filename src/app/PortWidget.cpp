@@ -30,7 +30,7 @@ PortWidget::~PortWidget() {
 	delete plugLight;
 	// HACK
 	if (module)
-		APP->scene->rackWidget->clearCablesOnPort(this);
+		APP->scene->rack->clearCablesOnPort(this);
 }
 
 void PortWidget::step() {
@@ -50,7 +50,7 @@ void PortWidget::step() {
 }
 
 void PortWidget::draw(const DrawArgs &args) {
-	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
+	CableWidget *cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		// Dim the PortWidget if the active cable cannot plug into this PortWidget
 		if (type == OUTPUT ? cw->outputPort : cw->inputPort)
@@ -61,14 +61,14 @@ void PortWidget::draw(const DrawArgs &args) {
 
 void PortWidget::onButton(const widget::ButtonEvent &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		CableWidget *cw = APP->scene->rackWidget->getTopCable(this);
+		CableWidget *cw = APP->scene->rack->getTopCable(this);
 		if (cw) {
 			// history::CableRemove
 			history::CableRemove *h = new history::CableRemove;
 			h->setCable(cw);
 			APP->history->push(h);
 
-			APP->scene->rackWidget->removeCable(cw);
+			APP->scene->rack->removeCable(cw);
 			delete cw;
 		}
 	}
@@ -91,7 +91,7 @@ void PortWidget::onDragStart(const widget::DragStartEvent &e) {
 			// Keep cable NULL. Will be created below
 		}
 		else {
-			CableWidget *topCw = APP->scene->rackWidget->getTopCable(this);
+			CableWidget *topCw = APP->scene->rack->getTopCable(this);
 			if (topCw) {
 				cw = new CableWidget;
 				cw->setOutput(topCw->outputPort);
@@ -100,7 +100,7 @@ void PortWidget::onDragStart(const widget::DragStartEvent &e) {
 	}
 	else {
 		// Grab cable on top of stack
-		cw = APP->scene->rackWidget->getTopCable(this);
+		cw = APP->scene->rack->getTopCable(this);
 
 		if (cw) {
 			// history::CableRemove
@@ -109,7 +109,7 @@ void PortWidget::onDragStart(const widget::DragStartEvent &e) {
 			APP->history->push(h);
 
 			// Disconnect and reuse existing cable
-			APP->scene->rackWidget->removeCable(cw);
+			APP->scene->rack->removeCable(cw);
 			if (type == OUTPUT)
 				cw->setOutput(NULL);
 			else
@@ -126,14 +126,14 @@ void PortWidget::onDragStart(const widget::DragStartEvent &e) {
 			cw->setInput(this);
 	}
 
-	APP->scene->rackWidget->setIncompleteCable(cw);
+	APP->scene->rack->setIncompleteCable(cw);
 	e.consume(this);
 }
 
 void PortWidget::onDragEnd(const widget::DragEndEvent &e) {
-	CableWidget *cw = APP->scene->rackWidget->releaseIncompleteCable();
+	CableWidget *cw = APP->scene->rack->releaseIncompleteCable();
 	if (cw->isComplete()) {
-		APP->scene->rackWidget->addCable(cw);
+		APP->scene->rack->addCable(cw);
 
 		// history::CableAdd
 		history::CableAdd *h = new history::CableAdd;
@@ -148,11 +148,11 @@ void PortWidget::onDragEnd(const widget::DragEndEvent &e) {
 void PortWidget::onDragDrop(const widget::DragDropEvent &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
-		if (APP->scene->rackWidget->getTopCable(this))
+		if (APP->scene->rack->getTopCable(this))
 			return;
 	}
 
-	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
+	CableWidget *cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		cw->hoveredOutputPort = cw->hoveredInputPort = NULL;
 		if (type == OUTPUT)
@@ -165,11 +165,11 @@ void PortWidget::onDragDrop(const widget::DragDropEvent &e) {
 void PortWidget::onDragEnter(const widget::DragEnterEvent &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
-		if (APP->scene->rackWidget->getTopCable(this))
+		if (APP->scene->rack->getTopCable(this))
 			return;
 	}
 
-	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
+	CableWidget *cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		if (type == OUTPUT)
 			cw->hoveredOutputPort = this;
@@ -184,7 +184,7 @@ void PortWidget::onDragLeave(const widget::DragLeaveEvent &e) {
 	if (!originPort)
 		return;
 
-	CableWidget *cw = APP->scene->rackWidget->incompleteCable;
+	CableWidget *cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		if (type == OUTPUT)
 			cw->hoveredOutputPort = NULL;

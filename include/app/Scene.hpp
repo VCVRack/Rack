@@ -1,8 +1,7 @@
 #pragma once
 #include "app/common.hpp"
 #include "widget/OpaqueWidget.hpp"
-#include "widget/ZoomWidget.hpp"
-#include "ui/ScrollWidget.hpp"
+#include "app/RackScrollWidget.hpp"
 #include "app/RackWidget.hpp"
 #include "app/Toolbar.hpp"
 
@@ -13,9 +12,8 @@ namespace app {
 
 struct Scene : widget::OpaqueWidget {
 	// Convenience variables for accessing important widgets
-	ui::ScrollWidget *scrollWidget;
-	widget::ZoomWidget *zoomWidget;
-	RackWidget *rackWidget;
+	RackScrollWidget *rackScroll;
+	RackWidget *rack;
 	Toolbar *toolbar;
 	widget::Widget *moduleBrowser;
 

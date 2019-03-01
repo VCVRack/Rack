@@ -493,7 +493,7 @@ inline void ModelBox::onButton(const widget::ButtonEvent &e) {
 		// Create module
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		assert(moduleWidget);
-		APP->scene->rackWidget->addModuleAtMouse(moduleWidget);
+		APP->scene->rack->addModuleAtMouse(moduleWidget);
 
 		// Pretend the moduleWidget was clicked so it can be dragged in the RackWidget
 		e.consume(moduleWidget);

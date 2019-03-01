@@ -267,7 +267,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		scroll->scrollTo(box);
 
 		// Reset touchedParam
-		APP->scene->rackWidget->touchedParam = NULL;
+		APP->scene->rack->touchedParam = NULL;
 		module->enableLearn(id);
 		e.consume(this);
 	}
@@ -276,9 +276,9 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		if (!module)
 			return;
 		// Check if a ParamWidget was touched
-		ParamWidget *touchedParam = APP->scene->rackWidget->touchedParam;
+		ParamWidget *touchedParam = APP->scene->rack->touchedParam;
 		if (touchedParam) {
-			APP->scene->rackWidget->touchedParam = NULL;
+			APP->scene->rack->touchedParam = NULL;
 			int moduleId = touchedParam->paramQuantity->module->id;
 			int paramId = touchedParam->paramQuantity->paramId;
 			module->learnParam(id, moduleId, paramId);
@@ -343,7 +343,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		ParamHandle *paramHandle = &module->paramHandles[id];
 		if (paramHandle->moduleId < 0)
 			return "";
-		ModuleWidget *mw = APP->scene->rackWidget->getModule(paramHandle->moduleId);
+		ModuleWidget *mw = APP->scene->rack->getModule(paramHandle->moduleId);
 		if (!mw)
 			return "";
 		// Get the Module from the ModuleWidget instead of the ParamHandle.

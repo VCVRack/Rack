@@ -59,8 +59,8 @@ void PatchManager::init(std::string path) {
 
 void PatchManager::reset() {
 	APP->history->clear();
-	APP->scene->rackWidget->clear();
-	APP->scene->scrollWidget->offset = math::Vec(0, 0);
+	APP->scene->rack->clear();
+	APP->scene->rackScroll->offset = math::Vec(0, 0);
 	// Fails silently if file does not exist
 	load(asset::user("template.vcv"));
 	legacy = 0;
@@ -168,8 +168,8 @@ bool PatchManager::load(std::string path) {
 	});
 
 	APP->history->clear();
-	APP->scene->rackWidget->clear();
-	APP->scene->scrollWidget->offset = math::Vec(0, 0);
+	APP->scene->rack->clear();
+	APP->scene->rackScroll->offset = math::Vec(0, 0);
 	fromJson(rootJ);
 	return true;
 }
@@ -215,7 +215,7 @@ void PatchManager::disconnectDialog() {
 	// if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
 	// 	return;
 
-	APP->scene->rackWidget->clearCablesAction();
+	APP->scene->rack->clearCablesAction();
 }
 
 json_t *PatchManager::toJson() {
@@ -227,7 +227,7 @@ json_t *PatchManager::toJson() {
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// Merge with RackWidget JSON
-	json_t *rackJ = APP->scene->rackWidget->toJson();
+	json_t *rackJ = APP->scene->rack->toJson();
 	// Merge with rootJ
 	json_object_update(rootJ, rackJ);
 	json_decref(rackJ);
@@ -259,7 +259,7 @@ void PatchManager::fromJson(json_t *rootJ) {
 		INFO("Loading patch using legacy mode %d", legacy);
 	}
 
-	APP->scene->rackWidget->fromJson(rootJ);
+	APP->scene->rack->fromJson(rootJ);
 
 	// Display a message if we have something to say
 	if (!warningLog.empty()) {
