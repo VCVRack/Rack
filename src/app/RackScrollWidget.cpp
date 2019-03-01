@@ -18,11 +18,7 @@ RackScrollWidget::RackScrollWidget() {
 }
 
 void RackScrollWidget::step() {
-	// Set ZoomWidget's zoom every few frames
-	int frame = APP->window->frame;
-	if (frame % 10 == 0) {
-		zoom->setZoom(std::round(settings.zoom * 100) / 100);
-	}
+	zoom->setZoom(std::round(settings.zoom * 100) / 100);
 
 	// Resize RackWidget to be a bit larger than the viewport
 	rack->box.size = box.size

@@ -308,7 +308,7 @@ void Window::run() {
 
 	frame = 0;
 	while(!glfwWindowShouldClose(win)) {
-		double startTime = glfwGetTime();
+		frameTimeStart = glfwGetTime();
 
 		// Poll events
 		glfwPollEvents();
@@ -382,9 +382,9 @@ void Window::run() {
 		}
 
 		// Limit frame rate
-		double endTime = glfwGetTime();
+		double frameTimeEnd = glfwGetTime();
 		if (settings.frameRateLimit > 0.0) {
-			double frameDuration = endTime - startTime;
+			double frameDuration = frameTimeEnd - frameTimeStart;
 			double waitDuration = 1.0 / settings.frameRateLimit - frameDuration;
 			if (waitDuration > 0.0) {
 				std::this_thread::sleep_for(std::chrono::duration<double>(waitDuration));
@@ -392,7 +392,7 @@ void Window::run() {
 		}
 
 		// Compute actual frame rate
-		endTime = glfwGetTime();
+		frameTimeEnd = glfwGetTime();
 		// DEBUG("%g fps", 1 / (endTime - startTime));
 		frame++;
 	}
@@ -447,6 +447,13 @@ void Window::setFullScreen(bool fullScreen) {
 bool Window::isFullScreen() {
 	GLFWmonitor *monitor = glfwGetWindowMonitor(win);
 	return monitor != NULL;
+}
+
+bool Window::isFrameOverdue() {
+	if (settings.frameRateLimit == 0.0)
+		return false;
+	double frameDuration = glfwGetTime() - frameTimeStart;
+	return frameDuration > 1.0 / settings.frameRateLimit;
 }
 
 std::shared_ptr<Font> Window::loadFont(const std::string &filename) {

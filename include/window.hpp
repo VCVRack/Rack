@@ -84,6 +84,7 @@ struct Window {
 	/** The last known absolute mouse position in the window */
 	math::Vec mousePos;
 	std::shared_ptr<Font> uiFont;
+	double frameTimeStart = 0.f;
 
 	struct Internal;
 	Internal *internal;
@@ -100,6 +101,7 @@ struct Window {
 	int getMods();
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
+	bool isFrameOverdue();
 
 	std::shared_ptr<Font> loadFont(const std::string &filename);
 	std::shared_ptr<Image> loadImage(const std::string &filename);
