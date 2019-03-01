@@ -190,25 +190,7 @@ Must be called in a plugin directory.
 A panel file must exist in res/<module slug>.svg.
 A source file will be created at src/<module slug>.cpp.
 
-Instructions for creating a panel:
-- Only Inkscape is supported by this script and Rack's SVG renderer.
-- Create a document with units in "mm", height of 128.5 mm, and width of a multiple of 5.08 mm (1 HP in Eurorack).
-- Design the panel.
-- Create a layer named "widgets".
-- For each component, create a shape on the widgets layer.
-	- Use a circle to place a component by its center.
-		The size of the circle does not matter, only the center point.
-		A `create*Centered()` call is generated in C++.
-	- Use a rectangle to to place a component by its top-left point.
-		This should only be used when the shape's size is equal to the component's size in C++.
-		A `create*()` call is generated in C++.
-- Set the color of each shape depending on the component's type.
-	- Param: red #ff0000
-	- Input: green #00ff00
-	- Output: blue #0000ff
-	- Light: magenta #ff00ff
-	- Custom widgets: yellow #ffff00
-- Hide the widgets layer and save to res/<module slug>.svg.
+See https://vcvrack.com/manual/PanelTutorial.html for creating SVG panel files.
 """
 	print(text)
 
@@ -295,16 +277,16 @@ def panel_to_components(tree):
 		"inkscape": "http://www.inkscape.org/namespaces/inkscape",
 	}
 
-	# Get widgets layer
+	# Get components layer
 	root = tree.getroot()
-	groups = root.findall(".//svg:g[@inkscape:label='widgets']", ns)
+	groups = root.findall(".//svg:g[@inkscape:label='components']", ns)
 	if len(groups) < 1:
-		raise UserException("Could not find \"widgets\" layer on panel")
+		raise UserException("Could not find \"components\" layer on panel")
 
 	# Get circles and rects
-	widgets_group = groups[0]
-	circles = widgets_group.findall(".//svg:circle", ns)
-	rects = widgets_group.findall(".//svg:rect", ns)
+	components_group = groups[0]
+	circles = components_group.findall(".//svg:circle", ns)
+	rects = components_group.findall(".//svg:rect", ns)
 
 	components = {}
 	components['params'] = []
@@ -338,6 +320,8 @@ def panel_to_components(tree):
 			c['y'] = round(y, 3)
 			c['width'] = round(width, 3)
 			c['height'] = round(height, 3)
+			c['cx'] = round(x + width / 2, 3)
+			c['cy'] = round(y + height / 2, 3)
 		elif el.tag == "{http://www.w3.org/2000/svg}circle":
 			cx = float(el.get('cx'))
 			cy = float(el.get('cy'))
@@ -354,6 +338,14 @@ def panel_to_components(tree):
 			components['lights'].append(c)
 		if color == 'ffff00':
 			components['widgets'].append(c)
+
+	# Sort components
+	top_left_sort = lambda w: (w['cy'], w['cx'])
+	components['params'] = sorted(components['params'], key=top_left_sort)
+	components['inputs'] = sorted(components['inputs'], key=top_left_sort)
+	components['outputs'] = sorted(components['outputs'], key=top_left_sort)
+	components['lights'] = sorted(components['lights'], key=top_left_sort)
+	components['widgets'] = sorted(components['widgets'], key=top_left_sort)
 
 	print(f"Found {len(components['params'])} params, {len(components['inputs'])} inputs, {len(components['outputs'])} outputs, {len(components['lights'])} lights, and {len(components['widgets'])} custom widgets.")
 	return components
@@ -442,56 +434,56 @@ struct {identifier}Widget : ModuleWidget {{
 	if len(components['params']) > 0:
 		source += "\n"
 	for c in components['params']:
-		if 'cx' in c:
-			source += f"""
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_PARAM));"""
-		else:
+		if 'x' in c:
 			source += f"""
 		addParam(createParam<RoundBlackKnob>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_PARAM));"""
+		else:
+			source += f"""
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_PARAM));"""
 
 	# Inputs
 	if len(components['inputs']) > 0:
 		source += "\n"
 	for c in components['inputs']:
-		if 'cx' in c:
-			source += f"""
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_INPUT));"""
-		else:
+		if 'x' in c:
 			source += f"""
 		addInput(createInput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_INPUT));"""
+		else:
+			source += f"""
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_INPUT));"""
 
 	# Outputs
 	if len(components['outputs']) > 0:
 		source += "\n"
 	for c in components['outputs']:
-		if 'cx' in c:
-			source += f"""
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_OUTPUT));"""
-		else:
+		if 'x' in c:
 			source += f"""
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_OUTPUT));"""
+		else:
+			source += f"""
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_OUTPUT));"""
 
 	# Lights
 	if len(components['lights']) > 0:
 		source += "\n"
 	for c in components['lights']:
-		if 'cx' in c:
-			source += f"""
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_LIGHT));"""
-		else:
+		if 'x' in c:
 			source += f"""
 		addChild(createLight<MediumLight<RedLight>>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_LIGHT));"""
+		else:
+			source += f"""
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_LIGHT));"""
 
 	# Widgets
 	if len(components['widgets']) > 0:
 		source += "\n"
 	for c in components['widgets']:
-		if 'cx' in c:
-			source += f"""
-		addChild(createWidgetCentered<Widget>(mm2px(Vec({c['cx']}, {c['cy']}))));"""
 		else:
 			source += f"""
 		// mm2px(Vec({c['width']}, {c['height']}))
+		if 'x' in c:
+			source += f"""
+		addChild(createWidgetCentered<Widget>(mm2px(Vec({c['cx']}, {c['cy']}))));"""
 		addChild(createWidget<Widget>(mm2px(Vec({c['x']}, {c['y']}))));"""
 
 	source += f"""
