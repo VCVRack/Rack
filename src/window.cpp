@@ -23,7 +23,7 @@
 namespace rack {
 
 
-Font::Font(NVGcontext *vg, const std::string &filename) {
+void Font::loadFile(const std::string &filename, NVGcontext *vg) {
 	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		INFO("Loaded font %s", filename.c_str());
@@ -41,7 +41,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 	return APP->window->loadFont(filename);
 }
 
-Image::Image(NVGcontext *vg, const std::string &filename) {
+void Image::loadFile(const std::string &filename, NVGcontext *vg) {
 	handle = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		INFO("Loaded image %s", filename.c_str());
@@ -53,14 +53,15 @@ Image::Image(NVGcontext *vg, const std::string &filename) {
 
 Image::~Image() {
 	// TODO What if handle is invalid?
-	nvgDeleteImage(vg, handle);
+	if (handle >= 0)
+		nvgDeleteImage(vg, handle);
 }
 
 std::shared_ptr<Image> Image::load(const std::string &filename) {
 	return APP->window->loadImage(filename);
 }
 
-Svg::Svg(const std::string &filename) {
+void Svg::loadFile(const std::string &filename) {
 	handle = nsvgParseFromFile(filename.c_str(), "px", app::SVG_DPI);
 	if (handle) {
 		INFO("Loaded SVG %s", filename.c_str());
@@ -71,7 +72,8 @@ Svg::Svg(const std::string &filename) {
 }
 
 Svg::~Svg() {
-	nsvgDelete(handle);
+	if (handle)
+		nsvgDelete(handle);
 }
 
 std::shared_ptr<Svg> Svg::load(const std::string &filename) {
@@ -86,10 +88,6 @@ struct Window::Internal {
 	int lastWindowY = 0;
 	int lastWindowWidth = 0;
 	int lastWindowHeight = 0;
-
-	std::map<std::string, std::weak_ptr<Font>> fontCache;
-	std::map<std::string, std::weak_ptr<Image>> imageCache;
-	std::map<std::string, std::weak_ptr<Svg>> svgCache;
 };
 
 
@@ -457,27 +455,31 @@ bool Window::isFrameOverdue() {
 }
 
 std::shared_ptr<Font> Window::loadFont(const std::string &filename) {
-	auto sp = internal->fontCache[filename].lock();
-	if (!sp)
-		internal->fontCache[filename] = sp = std::make_shared<Font>(vg, filename);
+	auto sp = fontCache[filename].lock();
+	if (!sp) {
+		fontCache[filename] = sp = std::make_shared<Font>();
+		sp->loadFile(filename, vg);
+	}
 	return sp;
 }
 
 std::shared_ptr<Image> Window::loadImage(const std::string &filename) {
-	auto sp = internal->imageCache[filename].lock();
-	if (!sp)
-		internal->imageCache[filename] = sp = std::make_shared<Image>(vg, filename);
+	auto sp = imageCache[filename].lock();
+	if (!sp) {
+		imageCache[filename] = sp = std::make_shared<Image>();
+		sp->loadFile(filename, vg);
+	}
 	return sp;
 }
 
 std::shared_ptr<Svg> Window::loadSvg(const std::string &filename) {
-	auto sp = internal->svgCache[filename].lock();
-	if (!sp)
-		internal->svgCache[filename] = sp = std::make_shared<Svg>(filename);
+	auto sp = svgCache[filename].lock();
+	if (!sp) {
+		svgCache[filename] = sp = std::make_shared<Svg>();
+		sp->loadFile(filename);
+	}
 	return sp;
 }
-
-
 
 
 void windowInit() {

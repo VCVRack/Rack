@@ -3,6 +3,7 @@
 #include "math.hpp"
 
 #include <memory>
+#include <map>
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -41,9 +42,9 @@ namespace rack {
 
 struct Font {
 	NVGcontext *vg;
-	int handle;
+	int handle = -1;
 	/** Don't call this directly but instead use `APP->window->loadFont()` */
-	Font(NVGcontext *vg, const std::string &filename);
+	void loadFile(const std::string &filename, NVGcontext *vg);
 	~Font();
 	/** Use `APP->window->loadFont()` instead. */
 	DEPRECATED static std::shared_ptr<Font> load(const std::string &filename);
@@ -51,18 +52,18 @@ struct Font {
 
 struct Image {
 	NVGcontext *vg;
-	int handle;
+	int handle = -1;
 	/** Don't call this directly but instead use `APP->window->loadImage()` */
-	Image(NVGcontext *vg, const std::string &filename);
+	void loadFile(const std::string &filename, NVGcontext *vg);
 	~Image();
 	/** Use `APP->window->loadImage()` instead. */
 	DEPRECATED static std::shared_ptr<Image> load(const std::string &filename);
 };
 
 struct Svg {
-	NSVGimage *handle;
+	NSVGimage *handle = NULL;
 	/** Don't call this directly but instead use `APP->window->loadSvg()` */
-	Svg(const std::string &filename);
+	void loadFile(const std::string &filename);
 	~Svg();
 	/** Use `APP->window->loadSvg()` instead. */
 	DEPRECATED static std::shared_ptr<Svg> load(const std::string &filename);
@@ -85,6 +86,11 @@ struct Window {
 	math::Vec mousePos;
 	std::shared_ptr<Font> uiFont;
 	double frameTimeStart = 0.f;
+
+	/** Use load*() instead of modifying these directly. */
+	std::map<std::string, std::weak_ptr<Font>> fontCache;
+	std::map<std::string, std::weak_ptr<Image>> imageCache;
+	std::map<std::string, std::weak_ptr<Svg>> svgCache;
 
 	struct Internal;
 	Internal *internal;
