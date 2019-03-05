@@ -25,6 +25,8 @@ json_t *Settings::toJson() {
 
 	json_object_set_new(rootJ, "zoom", json_real(zoom));
 
+	json_object_set_new(rootJ, "invertZoom", json_boolean(invertZoom));
+
 	json_object_set_new(rootJ, "cableOpacity", json_real(cableOpacity));
 
 	json_object_set_new(rootJ, "cableTension", json_real(cableTension));
@@ -80,6 +82,10 @@ void Settings::fromJson(json_t *rootJ) {
 	json_t *zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ)
 		zoom = json_number_value(zoomJ);
+
+	json_t *invertZoomJ = json_object_get(rootJ, "invertZoom");
+	if (invertZoomJ)
+		invertZoom = json_boolean_value(invertZoomJ);
 
 	json_t *cableOpacityJ = json_object_get(rootJ, "cableOpacity");
 	if (cableOpacityJ)

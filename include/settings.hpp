@@ -12,6 +12,7 @@ struct Settings {
 	math::Vec windowSize;
 	math::Vec windowPos;
 	float zoom = 1.0;
+	bool invertZoom = false;
 	float cableOpacity = 0.5;
 	float cableTension = 0.5;
 	bool allowCursorLock = true;

@@ -93,6 +93,8 @@ void RackScrollWidget::onHoverScroll(const widget::HoverScrollEvent &e) {
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 		// Increase zoom
 		float zoomDelta = e.scrollDelta.y / 50 / 4;
+		if (settings.invertZoom)
+			zoomDelta *= -1;
 		settings.zoom *= std::pow(2, zoomDelta);
 		settings.zoom = math::clamp(settings.zoom, 0.25f, 2.f);
 		zoomPos = e.pos;

@@ -35,6 +35,9 @@ void FramebufferWidget::step() {
 	NVGcontext *vg = APP->window->vg;
 
 	fbScale = scale;
+	// Set scale to zero so we must wait for the next draw() call before drawing the framebuffer again.
+	// Otherwise, if the zoom level is changed while the FramebufferWidget is off-screen, the next draw() call will be skipped, the `dirty` flag will be true, and the framebuffer will be redrawn, but at the wrong scale, since it was not set in draw().
+	scale = math::Vec();
 	// Get subpixel offset in range [0, 1)
 	math::Vec offsetI = offset.floor();
 	fbOffset = offset.minus(offsetI);
