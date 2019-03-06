@@ -162,7 +162,7 @@ def create_manifest(plugin_dir, slug=None):
 
 	# Query manifest information
 	if not slug:
-		slug = input_default("Plugin slug (unique identifier)", slug)
+		slug = input_default("Plugin slug (unique identifier)")
 	manifest['slug'] = slug
 	manifest['name'] = input_default("Plugin name", slug)
 	manifest['version'] = input_default("Version", "1.0.0")
@@ -478,13 +478,13 @@ struct {identifier}Widget : ModuleWidget {{
 	if len(components['widgets']) > 0:
 		source += "\n"
 	for c in components['widgets']:
-		else:
-			source += f"""
-		// mm2px(Vec({c['width']}, {c['height']}))
 		if 'x' in c:
 			source += f"""
-		addChild(createWidgetCentered<Widget>(mm2px(Vec({c['cx']}, {c['cy']}))));"""
+		// mm2px(Vec({c['width']}, {c['height']}))
 		addChild(createWidget<Widget>(mm2px(Vec({c['x']}, {c['y']}))));"""
+		else:
+			source += f"""
+		addChild(createWidgetCentered<Widget>(mm2px(Vec({c['cx']}, {c['cy']}))));"""
 
 	source += f"""
 	}}
