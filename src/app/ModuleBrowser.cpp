@@ -447,7 +447,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			});
 		}
 
-		// Filter authors
+		// Filter ModelBoxes by author
 		if (!author.empty()) {
 			for (Widget *w : modelContainer->children) {
 				if (!w->visible)
@@ -459,7 +459,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
-		// Filter tags
+		// Filter ModelBoxes by tag
 		if (!tag.empty()) {
 			for (Widget *w : modelContainer->children) {
 				if (!w->visible)
@@ -476,6 +476,35 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				if (!found)
 					m->visible = false;
 			}
+		}
+
+		std::set<std::string> enabledAuthors;
+		std::set<std::string> enabledTags;
+
+		// Get list of enabled authors and tags for sidebar
+		for (Widget *w : modelContainer->children) {
+			ModelBox *m = dynamic_cast<ModelBox*>(w);
+			assert(m);
+			if (!m->visible)
+				continue;
+			enabledAuthors.insert(m->model->plugin->author);
+			for (const std::string &tag : m->model->tags) {
+				enabledTags.insert(tag);
+			}
+		}
+
+		// Enable author and tag items that are available in visible ModelBoxes
+		for (Widget *w : sidebar->authorList->children) {
+			AuthorItem *item = dynamic_cast<AuthorItem*>(w);
+			assert(item);
+			auto it = enabledAuthors.find(item->text);
+			item->disabled = (it == enabledAuthors.end());
+		}
+		for (Widget *w : sidebar->tagList->children) {
+			TagItem *item = dynamic_cast<TagItem*>(w);
+			assert(item);
+			auto it = enabledTags.find(item->text);
+			item->disabled = (it == enabledTags.end());
 		}
 	}
 };
