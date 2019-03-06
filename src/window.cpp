@@ -364,6 +364,7 @@ void Window::run() {
 		if (visible) {
 			// Update and render
 			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
+			nvgReset(vg);
 			nvgScale(vg, pixelRatio, pixelRatio);
 
 			widget::Widget::DrawArgs args;
