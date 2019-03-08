@@ -15,33 +15,35 @@ RadioButton::~RadioButton() {
 }
 
 void RadioButton::draw(const DrawArgs &args) {
+	BNDwidgetState state = this->state;
 	std::string label;
-	if (quantity)
+	if (quantity) {
 		label = quantity->getLabel();
+		if (quantity->isMax())
+			state = BND_ACTIVE;
+	}
 	bndRadioButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
 }
 
 void RadioButton::onEnter(const widget::EnterEvent &e) {
-	if (state != BND_ACTIVE)
-		state = BND_HOVER;
+	state = BND_HOVER;
 	e.consume(this);
 }
 
 void RadioButton::onLeave(const widget::LeaveEvent &e) {
-	if (state != BND_ACTIVE)
-		state = BND_DEFAULT;
+	state = BND_DEFAULT;
+}
+
+void RadioButton::onDragStart(const widget::DragStartEvent &e) {
+	e.consume(this);
 }
 
 void RadioButton::onDragDrop(const widget::DragDropEvent &e) {
 	if (e.origin == this) {
-		if (state == BND_ACTIVE) {
-			state = BND_HOVER;
-			if (quantity)
+		if (quantity) {
+			if (quantity->isMax())
 				quantity->setMin();
-		}
-		else {
-			state = BND_ACTIVE;
-			if (quantity)
+			else
 				quantity->setMax();
 		}
 

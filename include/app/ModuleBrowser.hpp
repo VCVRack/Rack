@@ -8,8 +8,6 @@ namespace app {
 
 
 widget::Widget *moduleBrowserCreate();
-json_t *moduleBrowserToJson();
-void moduleBrowserFromJson(json_t *rootJ);
 
 
 } // namespace app

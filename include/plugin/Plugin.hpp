@@ -55,7 +55,7 @@ struct Plugin {
 	*/
 	std::string donateUrl;
 
-	virtual ~Plugin();
+	~Plugin();
 	void addModel(Model *model);
 	Model *getModel(std::string slug);
 	void fromJson(json_t *rootJ);

@@ -12,6 +12,7 @@
 #include "ui/List.hpp"
 #include "ui/MenuItem.hpp"
 #include "ui/Button.hpp"
+#include "ui/RadioButton.hpp"
 #include "ui/ChoiceButton.hpp"
 #include "app/ModuleWidget.hpp"
 #include "app/Scene.hpp"
@@ -20,6 +21,7 @@
 #include "plugin/Model.hpp"
 #include "string.hpp"
 #include "history.hpp"
+#include "settings.hpp"
 
 #include <set>
 #include <algorithm>
@@ -27,9 +29,6 @@
 
 namespace rack {
 namespace app {
-
-
-static std::set<plugin::Model*> sFavoriteModels;
 
 
 static float modelScore(plugin::Model *model, const std::string &search) {
@@ -74,17 +73,86 @@ struct BrowserOverlay : widget::OverlayWidget {
 };
 
 
+struct InfoBox : widget::Widget {
+	void setModel(plugin::Model *model) {
+		math::Vec pos;
+
+		// Name label
+		ui::Label *nameLabel = new ui::Label;
+		// nameLabel->box.size.x = box.size.x;
+		nameLabel->box.pos = pos;
+		nameLabel->text = model->name;
+		addChild(nameLabel);
+		pos = nameLabel->box.getBottomLeft();
+
+		// Plugin label
+		ui::Label *pluginLabel = new ui::Label;
+		// pluginLabel->box.size.x = box.size.x;
+		pluginLabel->box.pos = pos;
+		pluginLabel->text = model->plugin->name;
+		addChild(pluginLabel);
+		pos = pluginLabel->box.getBottomLeft();
+
+		ui::Label *descriptionLabel = new ui::Label;
+		descriptionLabel->box.size.x = box.size.x;
+		descriptionLabel->box.pos = pos;
+		descriptionLabel->text = model->description;
+		addChild(descriptionLabel);
+		pos = descriptionLabel->box.getBottomLeft();
+
+		// for (const std::string &tag : model->tags) {
+		// 	ui::Button *tagButton = new ui::Button;
+		// 	tagButton->box.size.x = box.size.x;
+		// 	tagButton->box.pos = pos;
+		// 	tagButton->text = tag;
+		// 	addChild(tagButton);
+		// 	pos = tagButton->box.getTopLeft();
+		// }
+	}
+
+	void draw(const DrawArgs &args) override {
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+		nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.5));
+		nvgFill(args.vg);
+
+		Widget::draw(args);
+	}
+};
+
+
+struct ModelFavoriteQuantity : ui::Quantity {
+	plugin::Model *model;
+	std::string getLabel() override {return "★";}
+	void setValue(float value) override {
+		if (value) {
+			settings.favoriteModels.insert(model);
+		}
+		else {
+			auto it = settings.favoriteModels.find(model);
+			if (it != settings.favoriteModels.end())
+				settings.favoriteModels.erase(it);
+		}
+	}
+	float getValue() override {
+		auto it = settings.favoriteModels.find(model);
+		return (it != settings.favoriteModels.end());
+	}
+};
+
+
 static const float MODEL_BOX_ZOOM = 0.5f;
 
 
 struct ModelBox : widget::OpaqueWidget {
 	plugin::Model *model;
-	widget::Widget *infoWidget;
+	InfoBox *infoBox;
+	widget::Widget *previewWidget;
+	ui::RadioButton *favoriteButton;
 	/** Lazily created */
-	widget::Widget *previewWidget = NULL;
+	widget::FramebufferWidget *previewFb = NULL;
 	/** Number of frames since draw() has been called */
 	int visibleFrames = 0;
-	bool selected = false;
 
 	ModelBox() {
 		// Approximate size as 10HP before we know the actual size.
@@ -97,70 +165,37 @@ struct ModelBox : widget::OpaqueWidget {
 	void setModel(plugin::Model *model) {
 		this->model = model;
 
-		infoWidget = new widget::Widget;
-		infoWidget->hide();
-		addChild(infoWidget);
-
-		math::Vec pos;
-
-		// Name label
-		ui::Label *nameLabel = new ui::Label;
-		// nameLabel->box.size.x = infoWidget->box.size.x;
-		nameLabel->box.pos = pos;
-		nameLabel->text = model->name;
-		infoWidget->addChild(nameLabel);
-		pos = nameLabel->box.getBottomLeft();
-
-		// Plugin label
-		ui::Label *pluginLabel = new ui::Label;
-		// pluginLabel->box.size.x = infoWidget->box.size.x;
-		pluginLabel->box.pos = pos;
-		pluginLabel->text = model->plugin->name;
-		infoWidget->addChild(pluginLabel);
-		pos = pluginLabel->box.getBottomLeft();
-
-		ui::Label *descriptionLabel = new ui::Label;
-		descriptionLabel->box.size.x = infoWidget->box.size.x;
-		descriptionLabel->box.pos = pos;
-		descriptionLabel->text = model->description;
-		infoWidget->addChild(descriptionLabel);
-		pos = descriptionLabel->box.getBottomLeft();
-
-		// for (const std::string &tag : model->tags) {
-		// 	ui::Button *tagButton = new ui::Button;
-		// 	tagButton->box.size.x = infoWidget->box.size.x;
-		// 	tagButton->box.pos = pos;
-		// 	tagButton->text = tag;
-		// 	infoWidget->addChild(tagButton);
-		// 	pos = tagButton->box.getTopLeft();
-		// }
-
-		// // Favorite button
-		// ui::Button *favoriteButton = new ui::Button;
-		// favoriteButton->box.size.x = box.size.x;
-		// favoriteButton->box.pos = pos;
-		// favoriteButton->box.pos.y -= favoriteButton->box.size.y;
-		// favoriteButton->text = "★";
-		// addChild(favoriteButton);
-		// pos = favoriteButton->box.getTopLeft();
-	}
-
-	void createPreview() {
-		assert(!previewWidget);
 		previewWidget = new widget::TransparentWidget;
 		previewWidget->box.size.y = std::ceil(RACK_GRID_HEIGHT * MODEL_BOX_ZOOM);
 		addChild(previewWidget);
 
-		widget::FramebufferWidget *fbWidget = new widget::FramebufferWidget;
+		infoBox = new InfoBox;
+		infoBox->box.size = math::Vec(100, 100);
+		// infoBox->setModel(model);
+		infoBox->hide();
+		addChild(infoBox);
+
+		// Favorite button
+		favoriteButton = new ui::RadioButton;
+		ModelFavoriteQuantity *favoriteQuantity = new ModelFavoriteQuantity;
+		favoriteQuantity->model = model;
+		favoriteButton->quantity = favoriteQuantity;
+		favoriteButton->box.pos.y = box.size.y;
+		box.size.y += favoriteButton->box.size.y;
+		addChild(favoriteButton);
+	}
+
+	void createPreview() {
+		previewFb = new widget::FramebufferWidget;
 		if (math::isNear(APP->window->pixelRatio, 1.0)) {
 			// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
-			fbWidget->oversample = 2.0;
+			previewFb->oversample = 2.0;
 		}
-		previewWidget->addChild(fbWidget);
+		previewWidget->addChild(previewFb);
 
 		widget::ZoomWidget *zoomWidget = new widget::ZoomWidget;
 		zoomWidget->setZoom(MODEL_BOX_ZOOM);
-		fbWidget->addChild(zoomWidget);
+		previewFb->addChild(zoomWidget);
 
 		ModuleWidget *moduleWidget = model->createModuleWidgetNull();
 		zoomWidget->addChild(moduleWidget);
@@ -169,19 +204,20 @@ struct ModelBox : widget::OpaqueWidget {
 		zoomWidget->box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
 		previewWidget->box.size.x = std::ceil(zoomWidget->box.size.x);
 
-		infoWidget->box.size = previewWidget->box.size;
+		infoBox->box.size = previewWidget->box.size;
+		favoriteButton->box.size.x = previewWidget->box.size.x;
 		box.size.x = previewWidget->box.size.x;
 	}
 
 	void deletePreview() {
-		assert(previewWidget);
-		removeChild(previewWidget);
-		delete previewWidget;
-		previewWidget = NULL;
+		assert(previewFb);
+		previewWidget->removeChild(previewFb);
+		delete previewFb;
+		previewFb = NULL;
 	}
 
 	void step() override {
-		if (previewWidget && ++visibleFrames >= 60) {
+		if (previewFb && ++visibleFrames >= 60) {
 			deletePreview();
 		}
 		OpaqueWidget::step();
@@ -191,7 +227,7 @@ struct ModelBox : widget::OpaqueWidget {
 		visibleFrames = 0;
 
 		// Lazily create preview when drawn
-		if (!previewWidget) {
+		if (!previewFb) {
 			createPreview();
 		}
 
@@ -205,29 +241,18 @@ struct ModelBox : widget::OpaqueWidget {
 		nvgFillPaint(args.vg, nvgBoxGradient(args.vg, 0, 0, box.size.x, box.size.y, c, r, shadowColor, transparentColor));
 		nvgFill(args.vg);
 
-		nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 		OpaqueWidget::draw(args);
-
-		// Translucent overlay when selected
-		if (selected) {
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
-			nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.25));
-			nvgFill(args.vg);
-		}
-
-		nvgResetScissor(args.vg);
 	}
 
 	void onButton(const widget::ButtonEvent &e) override;
 
 	void onEnter(const widget::EnterEvent &e) override {
 		e.consume(this);
-		selected = true;
+		infoBox->show();
 	}
 
 	void onLeave(const widget::LeaveEvent &e) override {
-		selected = false;
+		infoBox->hide();
 	}
 };
 
@@ -276,8 +301,17 @@ struct BrowserSearchField : ui::TextField {
 };
 
 
+struct ShowFavoritesQuantity : ui::Quantity {
+	widget::Widget *widget;
+	std::string getLabel() override {return "Only show favorites";}
+	void setValue(float value) override;
+	float getValue() override;
+};
+
+
 struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
+	ui::RadioButton *favoriteButton;
 	ui::Label *authorLabel;
 	ui::List *authorList;
 	ui::ScrollWidget *authorScroll;
@@ -288,6 +322,12 @@ struct BrowserSidebar : widget::Widget {
 	BrowserSidebar() {
 		searchField = new BrowserSearchField;
 		addChild(searchField);
+
+		favoriteButton = new ui::RadioButton;
+		ShowFavoritesQuantity *favoriteQuantity = new ShowFavoritesQuantity;
+		favoriteQuantity->widget = favoriteButton;
+		favoriteButton->quantity = favoriteQuantity;
+		addChild(favoriteButton);
 
 		authorLabel = new ui::Label;
 		authorLabel->color = nvgRGB(0x80, 0x80, 0x80);
@@ -332,22 +372,25 @@ struct BrowserSidebar : widget::Widget {
 	}
 
 	void step() override {
-		float listHeight = (box.size.y - searchField->box.size.y) / 2 - authorLabel->box.size.y;
-		listHeight = std::floor(listHeight);
 
 		searchField->box.size.x = box.size.x;
+		favoriteButton->box.pos = searchField->box.getBottomLeft();
+		favoriteButton->box.size.x = box.size.x;
 
-		authorLabel->box.pos = searchField->box.getBottomLeft();
+		float listHeight = (box.size.y - favoriteButton->box.getBottom()) / 2;
+		listHeight = std::floor(listHeight);
+
+		authorLabel->box.pos = favoriteButton->box.getBottomLeft();
 		authorLabel->box.size.x = box.size.x;
 		authorScroll->box.pos = authorLabel->box.getBottomLeft();
-		authorScroll->box.size.y = listHeight;
+		authorScroll->box.size.y = listHeight - authorLabel->box.size.y;
 		authorScroll->box.size.x = box.size.x;
 		authorList->box.size.x = authorScroll->box.size.x;
 
 		tagLabel->box.pos = authorScroll->box.getBottomLeft();
 		tagLabel->box.size.x = box.size.x;
 		tagScroll->box.pos = tagLabel->box.getBottomLeft();
-		tagScroll->box.size.y = listHeight;
+		tagScroll->box.size.y = listHeight - tagLabel->box.size.y;
 		tagScroll->box.size.x = box.size.x;
 		tagList->box.size.x = tagScroll->box.size.x;
 
@@ -359,12 +402,14 @@ struct BrowserSidebar : widget::Widget {
 struct ModuleBrowser : widget::OpaqueWidget {
 	BrowserSidebar *sidebar;
 	ui::ScrollWidget *modelScroll;
+	ui::Label *modelLabel;
 	ui::MarginLayout *modelMargin;
 	ui::SequentialLayout *modelContainer;
 
 	std::string search;
 	std::string author;
 	std::string tag;
+	bool favorites = false;
 
 	ModuleBrowser() {
 		sidebar = new BrowserSidebar;
@@ -374,7 +419,12 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelScroll = new ui::ScrollWidget;
 		addChild(modelScroll);
 
+		modelLabel = new ui::Label;
+		modelLabel->box.pos = math::Vec(10, 10);
+		modelScroll->container->addChild(modelLabel);
+
 		modelMargin = new ui::MarginLayout;
+		modelMargin->box.pos = modelLabel->box.getBottomLeft();
 		modelMargin->margin = math::Vec(10, 10);
 		modelScroll->container->addChild(modelMargin);
 
@@ -391,7 +441,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
-		refreshModels();
+		refresh();
 	}
 
 	void step() override {
@@ -413,15 +463,23 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		Widget::draw(args);
 	}
 
-	void refreshModels() {
+	void refresh() {
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 
-		if (search.empty()) {
-			// Make all ModelBoxes visible
-			for (Widget *w : modelContainer->children) {
+		// Show all or only favorites
+		for (Widget *w : modelContainer->children) {
+			if (favorites) {
+				ModelBox *m = dynamic_cast<ModelBox*>(w);
+				auto it = settings.favoriteModels.find(m->model);
+				w->visible = (it != settings.favoriteModels.end());
+			}
+			else {
 				w->visible = true;
 			}
+		}
+
+		if (search.empty()) {
 			// Sort by plugin name and then module name
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 				ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
@@ -437,9 +495,12 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			for (Widget *w : modelContainer->children) {
 				ModelBox *m = dynamic_cast<ModelBox*>(w);
 				assert(m);
-				float score = modelScore(m->model, search);
+				float score = 0.f;
+				if (m->visible) {
+					modelScore(m->model, search);
+					m->visible = (score > 0);
+				}
 				scores[m] = score;
-				m->visible = (score > 0);
 			}
 			// Sort by score
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
@@ -493,19 +554,36 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
+		// Count models
+		int modelsLen = 0;
+		for (Widget *w : modelContainer->children) {
+			if (w->visible)
+				modelsLen++;
+		}
+		modelLabel->text = string::f("Modules (%d)", modelsLen);
+
 		// Enable author and tag items that are available in visible ModelBoxes
+		int authorsLen = 0;
 		for (Widget *w : sidebar->authorList->children) {
 			AuthorItem *item = dynamic_cast<AuthorItem*>(w);
 			assert(item);
 			auto it = enabledAuthors.find(item->text);
 			item->disabled = (it == enabledAuthors.end());
+			if (!item->disabled)
+				authorsLen++;
 		}
+		sidebar->authorLabel->text = string::f("Authors (%d)", authorsLen);
+
+		int tagsLen = 0;
 		for (Widget *w : sidebar->tagList->children) {
 			TagItem *item = dynamic_cast<TagItem*>(w);
 			assert(item);
 			auto it = enabledTags.find(item->text);
 			item->disabled = (it == enabledTags.end());
+			if (!item->disabled)
+				tagsLen++;
 		}
+		sidebar->tagLabel->text = string::f("Tags (%d)", tagsLen);
 	}
 };
 
@@ -546,7 +624,7 @@ inline void AuthorItem::onAction(const widget::ActionEvent &e) {
 		browser->author = "";
 	else
 		browser->author = text;
-	browser->refreshModels();
+	browser->refresh();
 }
 
 
@@ -556,14 +634,25 @@ inline void TagItem::onAction(const widget::ActionEvent &e) {
 		browser->tag = "";
 	else
 		browser->tag = text;
-	browser->refreshModels();
+	browser->refresh();
 }
 
 
 inline void BrowserSearchField::onChange(const widget::ChangeEvent &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	browser->search = string::trim(text);
-	browser->refreshModels();
+	browser->refresh();
+}
+
+inline void ShowFavoritesQuantity::setValue(float value) {
+	ModuleBrowser *browser = widget->getAncestorOfType<ModuleBrowser>();
+	browser->favorites = (bool) value;
+	browser->refresh();
+}
+
+inline float ShowFavoritesQuantity::getValue() {
+	ModuleBrowser *browser = widget->getAncestorOfType<ModuleBrowser>();
+	return browser->favorites;
 }
 
 
@@ -577,41 +666,6 @@ widget::Widget *moduleBrowserCreate() {
 	overlay->addChild(browser);
 
 	return overlay;
-}
-
-json_t *moduleBrowserToJson() {
-	json_t *rootJ = json_object();
-
-	json_t *favoritesJ = json_array();
-	for (plugin::Model *model : sFavoriteModels) {
-		json_t *modelJ = json_object();
-		json_object_set_new(modelJ, "plugin", json_string(model->plugin->slug.c_str()));
-		json_object_set_new(modelJ, "model", json_string(model->slug.c_str()));
-		json_array_append_new(favoritesJ, modelJ);
-	}
-	json_object_set_new(rootJ, "favorites", favoritesJ);
-
-	return rootJ;
-}
-
-void moduleBrowserFromJson(json_t *rootJ) {
-	json_t *favoritesJ = json_object_get(rootJ, "favorites");
-	if (favoritesJ) {
-		size_t i;
-		json_t *favoriteJ;
-		json_array_foreach(favoritesJ, i, favoriteJ) {
-			json_t *pluginJ = json_object_get(favoriteJ, "plugin");
-			json_t *modelJ = json_object_get(favoriteJ, "model");
-			if (!pluginJ || !modelJ)
-				continue;
-			std::string pluginSlug = json_string_value(pluginJ);
-			std::string modelSlug = json_string_value(modelJ);
-			plugin::Model *model = plugin::getModel(pluginSlug, modelSlug);
-			if (!model)
-				continue;
-			sFavoriteModels.insert(model);
-		}
-	}
 }
 
 

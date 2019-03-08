@@ -1,6 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "math.hpp"
+#include "plugin/Model.hpp"
 #include <jansson.h>
 
 
@@ -26,6 +27,7 @@ struct Settings {
 	bool frameRateSync = true;
 	bool skipLoadOnLaunch = false;
 	std::string patchPath;
+	std::set<plugin::Model*> favoriteModels;
 
 	json_t *toJson();
 	void fromJson(json_t *rootJ);

@@ -55,7 +55,14 @@ json_t *Settings::toJson() {
 
 	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
 
-	json_object_set_new(rootJ, "moduleBrowser", app::moduleBrowserToJson());
+	json_t *favoriteModelsJ = json_array();
+	for (plugin::Model *model : favoriteModels) {
+		json_t *modelJ = json_object();
+		json_object_set_new(modelJ, "plugin", json_string(model->plugin->slug.c_str()));
+		json_object_set_new(modelJ, "model", json_string(model->slug.c_str()));
+		json_array_append_new(favoriteModelsJ, modelJ);
+	}
+	json_object_set_new(rootJ, "favoriteModels", favoriteModelsJ);
 
 	return rootJ;
 }
@@ -139,28 +146,49 @@ void Settings::fromJson(json_t *rootJ) {
 	if (patchPathJ)
 		patchPath = json_string_value(patchPathJ);
 
-	json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
-	if (moduleBrowserJ)
-		app::moduleBrowserFromJson(moduleBrowserJ);
+
+	json_t *favoriteModelsJ = json_object_get(rootJ, "favoriteModels");
+	// Legacy: "favorites" was defined under "moduleBrowser" until 1.0.
+	if (!favoriteModelsJ) {
+		json_t *moduleBrowserJ = json_object_get(rootJ, "moduleBrowser");
+		if (moduleBrowserJ)
+			favoriteModelsJ = json_object_get(rootJ, "favorites");
+	}
+	if (favoriteModelsJ) {
+		size_t i;
+		json_t *favoriteJ;
+		json_array_foreach(favoriteModelsJ, i, favoriteJ) {
+			json_t *pluginJ = json_object_get(favoriteJ, "plugin");
+			json_t *modelJ = json_object_get(favoriteJ, "model");
+			if (!pluginJ || !modelJ)
+				continue;
+			std::string pluginSlug = json_string_value(pluginJ);
+			std::string modelSlug = json_string_value(modelJ);
+			plugin::Model *model = plugin::getModel(pluginSlug, modelSlug);
+			if (!model)
+				continue;
+			favoriteModels.insert(model);
+		}
+	}
 }
 
 void Settings::save(std::string filename) {
 	INFO("Saving settings %s", filename.c_str());
 	json_t *rootJ = toJson();
 	if (rootJ) {
-		FILE *file = fopen(filename.c_str(), "w");
+		FILE *file = std::fopen(filename.c_str(), "w");
 		if (!file)
 			return;
 
 		json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 		json_decref(rootJ);
-		fclose(file);
+		std::fclose(file);
 	}
 }
 
 void Settings::load(std::string filename) {
 	INFO("Loading settings %s", filename.c_str());
-	FILE *file = fopen(filename.c_str(), "r");
+	FILE *file = std::fopen(filename.c_str(), "r");
 	if (!file)
 		return;
 
@@ -174,7 +202,7 @@ void Settings::load(std::string filename) {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	}
 
-	fclose(file);
+	std::fclose(file);
 }
 
 
