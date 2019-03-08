@@ -1,0 +1,171 @@
+
++ AmalgamatedHarmonics 0.6.5  (from 0.6.1)
+   + add AmalgamatedHarmonics.Arp31
+   + add AmalgamatedHarmonics.Arp32
+   + add AmalgamatedHarmonics.Bombe
+   + add AmalgamatedHarmonics.Chord
+   + add AmalgamatedHarmonics.Galaxy
+   + add AmalgamatedHarmonics.Generative
++ Alikins 0.6.6         (from 0.6.0)
+   + add Alikins.Reference
+   + add Alikins.HoveredValue
+   + add Alikins.InjectValue
+   + add Alikins.ShiftPedal
+   + add Alikins.ValueSaver
++ AS 0.6.13            (from 0.6.9)
+   + add AS.Mixer2ch
+   + add AS.Mixer4ch
+   + add AS.BPMCalc2
+   + add AS.ZeroCV2T
++ Bidoo 0.6.27  (from 0.6.10)
+   + add Bidoo.ZOUMAI
+   + add Bidoo.MS
+   + add Bidoo.EMILE
+   + add Bidoo.GARCON
+   + add Bidoo.PENEQUE
+   + add Bidoo.LIMONADE
+   + add Bidoo.FFILTR
+   + add Bidoo.HCTIP
+   + add Bidoo.REI
+   + add Bidoo.CURT
+   + add Bidoo.BISTROT
++ Fundamental 0.6.2  (from 0.6.0p)
+   + add Fundamental.Octave
++ Bogaudio 0.6.13  (from 0.6.7)
+   + add Bogaudio.AnalyzerXL
+   + add Bogaudio.Blank3
+   + add Bogaudio.Blank6
+   + add Bogaudio.Clpr
+   + add Bogaudio.Cmp
+   + add Bogaudio.LLFO
+   + add Bogaudio.Lmtr
+   + add Bogaudio.Mute8
+   + add Bogaudio.Nsgt
+   + add Bogaudio.Pressor
+   + add Bogaudio.Slew
++ cf 0.6.8             (from 0.6.7)
+   + add cf.CUTS
+- computerscare 0.6.6   (from 0.6.2)
++ DHE-Modules 0.6.4     (from 0.6.0?)
+   + add DHE-Modules.Func
+   + add DHE-Modules.Func6
+   + add DHE-Modules.Ranger
+   + add DHE-Modules.Tapers
+   + add DHE-Modules.Xycloid
++ Geodesics 0.6.6       (from 0.6.1)
+   + add Geodesics.Entropia
++ ImpromptuModular 0.6.16   (from 0.6.10)
+   + add ImpromptuModular.BigButtonSeq2
+   + add ImpromptuModular.Foundry
+   + add ImpromptuModular.FourView
+   + add ImpromptuModular.Tact1
++ JW-Modules 0.6.3      (from 0.6.1)
+   + add JW-Modules.BlankPanelSmall
+   + add JW-Modules.BlankPanelMedium
+   + add JW-Modules.BlankPanelLarge
++ LindenbergResearch 0.6.4  (from 0.6.2b)
+   + add LindenbergResearch.Korg35 (WIP)
+   + add LindenbergResearch.DiodeVCF
+   + add LindenbergResearch.Speck (WIP)
++ ML_modules 0.6.4      (from 0.6.2)
+   + add ML_modules.OctaPlus
+   + add ML_modules.OctaTimes
++ moDllz 0.6.6          (from 0.6.2)
+   x add moDllz.MIDI8MPE (crashes)
++ modular80 0.6.4       (from 0.6.0)
+   + add modular80.Nosering
+   + add modular80.RadioMusic
++ RJModules 0.6.1       (from 0.6.0)
+   + add RJModules.ThreeXOSC
+   + add RJModules.BPF
+   + add RJModules.Buffers
+   + add RJModules.Chord
+   + add RJModules.ChordSeq
+   + add RJModules.Glides
+   + add RJModules.MetaKnob
+   + add RJModules.Octaves
+   + add RJModules.RandomFilter
+   + add RJModules.Riser
++ SonusModular 0.6.2  (from 0.6.1)
++ Squinkylabs 0.6.14   (from 0.6.9)
+   ! https://github.com/squinkylabs/SquinkyVCV/
+   x add Squinkylabs.CHB (broken)
+   ! Super broken (remove)
+   x add Squinkylabs.CH10 (broken)
+   + add Squinkylabs.CHBg ("old")
+   + add Squinkylabs.KS
+   + add Squinkylabs.Sequencer
++ Valley 0.6.16  (from 0.6.4)
+   + add Valley.Amalgam
+   + add Valley.Interzone
++ NauModular 0.6.1  (from 0.6.0)
+   + add NauModular.Mrcheb
+   + add NauModular.Pith
++ arjo_modules
+   ! https://github.com/ArjoNagelhout/arjo_modules
+   + add arjo_modules.Seq
+   + add arjo_modules.Count
+   + add arjo_modules.Switch
++ Bark
+   ! https://github.com/Coirt/Bark
+   + add Bark.TrimLFO
+   + add Bark.TrimLFObpm
+   + add Bark.QuadLogic
+   + add Bark.Panel6
+   + add Bark.OneBand
++ Skylights
+   ! https://github.com/Skrylar/skylights-vcv/
+   + add Skylights.whatnote
+   + add Skylights.turing
+   + add Skylights.turing_volts
+   + add Skylights.turing_pulse
+   + add Skylights.turing_vactrol
++ rcm
+   ! https://github.com/Rcomian/rcm-modules
+   + add rcm.CV0to10Module
+   + add rcm.CV5to5Module
+   + add rcm.CVMmtModule
+   + add rcm.CVS0to10Module
+   + add rcm.CVTglModule
+   + add rcm.DuckModule
+   + add rcm.LoadCounter
+   + add rcm.PianoRollModule
+? submarineutility
+   ! https://github.com/david-c14/SubmarineUtility
++ quantal_audio
+   ! https://github.com/sumpygump/quantal-audio
+   + add QuantalAudio.MasterMixer
+   + add QuantalAudio.BufferedMult
+   + add QuantalAudio.UnityMix
+   + add QuantalAudio.DaisyChannel
+   + add QuantalAudio.DaisyMaster
+   + add QuantalAudio.Horsehair
+   + add QuantalAudio.Blank1
+   + add QuantalAudio.Blank3
+   + add QuantalAudio.Blank5
++ noobhour
+   ! https://github.com/NicolasNeubauer/noobhour_modules
+   + add noobhour.Baseliner
+   + add noobhour.Bsl1r
+   + add noobhour.Customscaler
++ MicMusic
+   ! https://github.com/very-cool-name/MicMusic-VCV
+   + add MicMusic.Distortion
+   + add MicMusic.Adder
++ LabSeven
+   ! https://github.com/LabSevenDevVCVRack/LabSeven_VCVRack_modules
+   + add LabSeven.LS3340VCO
++ EH_modules (eh2k)
+   ! https://github.com/eh2k/fv1-emu
+   + add EH_modules.FV1Emu
++ Edge
+   ! https://github.com/Edge-Modules/Edge/
+   + add Edge.WTFDoveVCO
+   + add Edge.K_Rush
+
+
+
+
+
+
+

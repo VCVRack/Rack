@@ -5,7 +5,7 @@
 
 # n=32bit build ("x86", jit)
 # y=64bit build ("amd64", no jit)
-BUILD_64=n
+BUILD_64=y
 
 MK=msvc
 
