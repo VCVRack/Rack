@@ -303,7 +303,10 @@ struct BrowserSearchField : ui::TextField {
 
 struct ShowFavoritesQuantity : ui::Quantity {
 	widget::Widget *widget;
-	std::string getLabel() override {return "Only show favorites";}
+	std::string getLabel() override {
+		int favoritesLen = settings.favoriteModels.size();
+		return string::f("Only show favorites (%d)", favoritesLen);
+	}
 	void setValue(float value) override;
 	float getValue() override;
 };
@@ -330,6 +333,7 @@ struct BrowserSidebar : widget::Widget {
 		addChild(favoriteButton);
 
 		authorLabel = new ui::Label;
+		// authorLabel->fontSize = 16;
 		authorLabel->color = nvgRGB(0x80, 0x80, 0x80);
 		authorLabel->text = "Authors";
 		addChild(authorLabel);
@@ -353,6 +357,7 @@ struct BrowserSidebar : widget::Widget {
 		}
 
 		tagLabel = new ui::Label;
+		// tagLabel->fontSize = 16;
 		tagLabel->color = nvgRGB(0x80, 0x80, 0x80);
 		tagLabel->text = "Tags";
 		addChild(tagLabel);
@@ -420,6 +425,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		addChild(modelScroll);
 
 		modelLabel = new ui::Label;
+		// modelLabel->fontSize = 16;
 		modelLabel->box.pos = math::Vec(10, 10);
 		modelScroll->container->addChild(modelLabel);
 
@@ -497,7 +503,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				assert(m);
 				float score = 0.f;
 				if (m->visible) {
-					modelScore(m->model, search);
+					score = modelScore(m->model, search);
 					m->visible = (score > 0);
 				}
 				scores[m] = score;
