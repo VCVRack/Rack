@@ -317,6 +317,35 @@ void RackWidget::pastePresetClipboardAction() {
 	}
 }
 
+static void RackWidget_updateAdjacent(RackWidget *that) {
+	// TODO This can be better than O(n^2)
+	for (widget::Widget *w : that->moduleContainer->children) {
+		ModuleWidget *m = dynamic_cast<ModuleWidget*>(w);
+		math::Vec pRight = m->box.getTopRight().div(RACK_GRID_SIZE).round();
+		bool found = false;
+
+		for (widget::Widget *w2 : that->moduleContainer->children) {
+			ModuleWidget *m2 = dynamic_cast<ModuleWidget*>(w2);
+
+			if (m == m2)
+				continue;
+			math::Vec p2 = m->box.pos.div(RACK_GRID_SIZE).round();
+
+			// Check if m is to the right of m2
+			if (pRight.isEqual(p2)) {
+				m->module->leftModuleId = m2->module->id;
+				m2->module->rightModuleId = m->module->id;
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			m->module->leftModuleId = -1;
+		}
+	}
+}
+
 void RackWidget::addModule(ModuleWidget *m) {
 	// Add module to ModuleContainer
 	assert(m);
@@ -326,6 +355,7 @@ void RackWidget::addModule(ModuleWidget *m) {
 		// Add module to Engine
 		APP->engine->addModule(m->module);
 	}
+	RackWidget_updateAdjacent(this);
 }
 
 void RackWidget::addModuleAtMouse(ModuleWidget *m) {
@@ -373,6 +403,7 @@ bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect requestedBox) {
 
 	// Accept requested position
 	m->box = requestedBox;
+	RackWidget_updateAdjacent(this);
 	return true;
 }
 

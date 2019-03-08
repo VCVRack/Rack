@@ -185,8 +185,8 @@ Engine::~Engine() {
 	delete internal;
 }
 
-static void Engine_stepModules(Engine *engine, int threadId) {
-	Engine::Internal *internal = engine->internal;
+static void Engine_stepModules(Engine *that, int threadId) {
+	Engine::Internal *internal = that->internal;
 
 	// int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
@@ -233,8 +233,8 @@ static void Engine_stepModules(Engine *engine, int threadId) {
 	}
 }
 
-static void Engine_step(Engine *engine) {
-	Engine::Internal *internal = engine->internal;
+static void Engine_step(Engine *that) {
+	Engine::Internal *internal = that->internal;
 
 	// Param smoothing
 	Module *smoothModule = internal->smoothModule;
@@ -260,44 +260,70 @@ static void Engine_step(Engine *engine) {
 	// Step modules along with workers
 	internal->workerModuleIndex = 0;
 	internal->engineBarrier.wait();
-	Engine_stepModules(engine, 0);
+	Engine_stepModules(that, 0);
 	internal->workerBarrier.wait();
 
 	// Step cables
-	for (Cable *cable : engine->internal->cables) {
+	for (Cable *cable : that->internal->cables) {
 		cable->step();
 	}
 }
 
-static void Engine_run(Engine *engine) {
+static void Engine_updateAdjacent(Engine *that, Module *m) {
+	// Sync leftModule
+	if (m->leftModuleId >= 0) {
+		if (!m->leftModule || m->leftModule->id != m->leftModuleId) {
+			m->leftModule = that->getModule(m->leftModuleId);
+		}
+	}
+	else {
+		if (m->leftModule) {
+			m->leftModule = NULL;
+		}
+	}
+
+	// Sync rightModule
+	if (m->rightModuleId >= 0) {
+		if (!m->rightModule || m->rightModule->id != m->rightModuleId) {
+			m->rightModule = that->getModule(m->rightModuleId);
+		}
+	}
+	else {
+		if (m->rightModule) {
+			m->rightModule = NULL;
+		}
+	}
+}
+
+static void Engine_run(Engine *that) {
 	// Set up thread
 	system::setThreadName("Engine");
 	system::setThreadRealTime();
 	disableDenormals();
 
-	// Every time the engine waits and locks a mutex, it steps this many frames
-	const int mutexSteps = 64;
-	// Time in seconds that the engine is rushing ahead of the estimated clock time
+	// Every time the that waits and locks a mutex, it steps this many frames
+	const int mutexSteps = 128;
+	// Time in seconds that the that is rushing ahead of the estimated clock time
 	double ahead = 0.0;
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
-	while (engine->internal->running) {
-		engine->internal->vipMutex.wait();
+	while (that->internal->running) {
+		that->internal->vipMutex.wait();
 
-		if (!engine->internal->paused) {
-			std::lock_guard<std::recursive_mutex> lock(engine->internal->mutex);
-			// auto startTime = std::chrono::high_resolution_clock::now();
+		if (!that->internal->paused) {
+			std::lock_guard<std::recursive_mutex> lock(that->internal->mutex);
 
-			for (int i = 0; i < mutexSteps; i++) {
-				Engine_step(engine);
+			for (Module *module : that->internal->modules) {
+				Engine_updateAdjacent(that, module);
 			}
 
-			// auto stopTime = std::chrono::high_resolution_clock::now();
-			// float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
-			// DEBUG("%g", cpuTime / mutexSteps * 44100);
+			// Step modules
+			for (int i = 0; i < mutexSteps; i++) {
+				Engine_step(that);
+			}
 		}
 
-		double stepTime = mutexSteps * engine->internal->sampleTime;
+		double stepTime = mutexSteps * that->internal->sampleTime;
 		ahead += stepTime;
 		auto currTime = std::chrono::high_resolution_clock::now();
 		const double aheadFactor = 2.0;
@@ -441,6 +467,17 @@ void Engine::removeModule(Module *module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = NULL;
 	}
+	// Update adjacent modules
+	for (Module *module : internal->modules) {
+		if (module->leftModule == module) {
+			module->leftModuleId = -1;
+			module->leftModule = NULL;
+		}
+		if (module->rightModule == module) {
+			module->rightModuleId = -1;
+			module->rightModule = NULL;
+		}
+	}
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it != internal->modules.end());
@@ -496,9 +533,9 @@ void Engine::bypassModule(Module *module, bool bypass) {
 	module->bypass = bypass;
 }
 
-static void Engine_updateConnected(Engine *engine) {
+static void Engine_updateConnected(Engine *that) {
 	// Set everything to unconnected
-	for (Module *module : engine->internal->modules) {
+	for (Module *module : that->internal->modules) {
 		for (Input &input : module->inputs) {
 			input.active = false;
 		}
@@ -507,7 +544,7 @@ static void Engine_updateConnected(Engine *engine) {
 		}
 	}
 	// Set inputs/outputs to active
-	for (Cable *cable : engine->internal->cables) {
+	for (Cable *cable : that->internal->cables) {
 		cable->outputModule->outputs[cable->outputId].active = true;
 		cable->inputModule->inputs[cable->inputId].active = true;
 	}
