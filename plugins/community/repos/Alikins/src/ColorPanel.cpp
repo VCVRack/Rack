@@ -211,20 +211,7 @@ ColorPanelWidget::ColorPanelWidget(ColorPanel *module) : ModuleWidget(module) {
     addChild(leftHandle);
     addChild(rightHandle);
 
-    /*
-    addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-    addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-    topRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0));
-    bottomRightScrew = Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365));
-    addChild(topRightScrew);
-    addChild(bottomRightScrew);
-    */
-
-    debug("box.size (%f, %f)", box.size.x, box.size.y);
-
-    //debug("port box.size %f %f", Port::PJ301MPort.box.size.x, PJ301MPort.box.size.y);
-    // this type of port is 24.672108 x 24.672136 by default
-    // FIXME: how do I figure that out before creating the instance?i
+    // FIXME: how do I figure that out before creating the instance?
     float port_width = 24.672108f;
     float empty_space = box.size.x - (3.0f * port_width);
     float interstitial = empty_space / 5.0f;
@@ -342,7 +329,7 @@ Menu *ColorPanelWidget::createContextMenu() {
     InputRangeItem *fiveFiveItem = new InputRangeItem();
     fiveFiveItem->text = "-5 - +5V (bi)";
     fiveFiveItem->colorPanel = colorPanel;
-    fiveFiveItem->inputRange = ColorPanel::MINUS_PLUS_FIVE;;
+    fiveFiveItem->inputRange = ColorPanel::MINUS_PLUS_FIVE;
     menu->addChild(fiveFiveItem);
 
     return menu;

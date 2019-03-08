@@ -74,7 +74,7 @@ struct ShaperWidget : ModuleWidget {
 		Shaper* shaper = dynamic_cast<Shaper*>(module);
 		assert(shaper);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new TriggerOnLoadMenuItem(shaper, "Resume Loop on Load"));
+		menu->addChild(new TriggerOnLoadMenuItem(shaper, "Resume loop on load"));
 	}
 };
 

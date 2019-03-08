@@ -2,7 +2,16 @@
 
 
 #include "FunVCO.h"
-//#define _ORIGVCO
+
+#include "IComposite.h"
+
+template <class TBase>
+class FunDescription : public IComposite
+{
+public:
+    Config getParam(int i) override;
+    int getNumParams() override;
+};
 
 template <class TBase>
 class FunVCOComposite : public TBase
@@ -48,6 +57,12 @@ public:
         NUM_LIGHTS
     };
 
+    /** Implement IComposite
+     */
+    static std::shared_ptr<IComposite> getDescription()
+    {
+        return std::make_shared<FunDescription<TBase>>();
+    }
 
     void step() override;
     void init()
@@ -68,16 +83,56 @@ private:
 #endif
 };
 
+
+template <class TBase>
+int FunDescription<TBase>::getNumParams()
+{
+    return FunVCOComposite<TBase>::NUM_PARAMS;
+}
+
+template <class TBase>
+inline IComposite::Config FunDescription<TBase>::getParam(int i)
+{
+    Config ret(0, 1, 0, "");
+    switch(i) {
+        case FunVCOComposite<TBase>::MODE_PARAM:
+            ret = {0.0f, 1.0f, 1.0f, "Analog/digital mode"};
+            break;
+        case FunVCOComposite<TBase>::SYNC_PARAM:
+            ret = {0.0f, 1.0f, 1.0f, "Sync hard/soft"};
+            break;
+        case FunVCOComposite<TBase>::FREQ_PARAM:
+            ret = {-54.0f, 54.0f, 0.0f, "Frequency"};
+            break;
+        case FunVCOComposite<TBase>::FINE_PARAM:
+            ret = {-1.0f, 1.0f, 0.0f, "Fine frequency"};
+            break;
+        case FunVCOComposite<TBase>::FM_PARAM:
+            ret = {0.0f, 1.0f, 0.0f, "Pitch modulation depth"};
+            break;
+        case FunVCOComposite<TBase>::PW_PARAM:
+            ret = {0.0f, 1.0f, 0.5f, "Pulse width"};
+            break;
+        case FunVCOComposite<TBase>::PWM_PARAM:
+            ret = {0.0f, 1.0f, 0.0f, "Pulse width modulation depth"};
+            break;
+        default:
+            assert(false);
+    }
+    return ret;
+}
+
+
 template <class TBase>
 inline void FunVCOComposite<TBase>::step()
 {
     oscillator.analog = TBase::params[MODE_PARAM].value > 0.0f;
     oscillator.soft = TBase::params[SYNC_PARAM].value <= 0.0f;
 
-    float pitchFine = 3.0f * quadraticBipolar(TBase::params[FINE_PARAM].value);
+    float pitchFine = 3.0f * sq::quadraticBipolar(TBase::params[FINE_PARAM].value);
     float pitchCv = 12.0f * TBase::inputs[PITCH_INPUT].value;
     if (TBase::inputs[FM_INPUT].active) {
-        pitchCv += quadraticBipolar(TBase::params[FM_PARAM].value) * 12.0f * TBase::inputs[FM_INPUT].value;
+        pitchCv += sq::quadraticBipolar(TBase::params[FM_PARAM].value) * 12.0f * TBase::inputs[FM_INPUT].value;
     }
 
     oscillator.setPitch(TBase::params[FREQ_PARAM].value, pitchFine + pitchCv);

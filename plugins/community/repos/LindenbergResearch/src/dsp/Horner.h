@@ -22,57 +22,57 @@
 
 namespace dsp {
 
-    template<typename Float, class Tag, unsigned int order>
-    struct Polynomial {
-        static inline Float Coeff();
-        static inline Float Coeff(const Float x);
-    };
+template<typename Float, class Tag, unsigned int order>
+struct Polynomial {
+    static inline Float Coeff();
+    static inline Float Coeff(const Float x);
+};
 
 
-    template<typename Float, class Tag, unsigned int order>
-    struct Horner {
-        static Float Recurse(const Float term, const Float x) {
-            return Horner<Float, Tag, order - 1>::Recurse(term * x + Polynomial<Float, Tag, order>::Coeff(), x);
-        }
+template<typename Float, class Tag, unsigned int order>
+struct Horner {
+    static Float Recurse(const Float term, const Float x) {
+        return Horner<Float, Tag, order - 1>::Recurse(term * x + Polynomial<Float, Tag, order>::Coeff(), x);
+    }
 
 
-        static Float RecurseAlt(const Float term, const Float x) {
-            return Horner<Float, Tag, order - 1>::RecurseAlt(Polynomial<Float, Tag, order>::Coeff() + x * term, x);
-        }
+    static Float RecurseAlt(const Float term, const Float x) {
+        return Horner<Float, Tag, order - 1>::RecurseAlt(Polynomial<Float, Tag, order>::Coeff() + x * term, x);
+    }
 
 
-        static Float Eval(const Float x) { return Horner<Float, Tag, order - 1>::Recurse(Polynomial<Float, Tag, order>::Coeff(), x); }
+    static Float Eval(const Float x) { return Horner<Float, Tag, order - 1>::Recurse(Polynomial<Float, Tag, order>::Coeff(), x); }
 
 
-        static Float EvalAlt(const Float x) { return Horner<Float, Tag, order - 1>::RecurseAlt(Polynomial<Float, Tag, order>::Coeff(), x); }
+    static Float EvalAlt(const Float x) { return Horner<Float, Tag, order - 1>::RecurseAlt(Polynomial<Float, Tag, order>::Coeff(), x); }
 
 
-        //
-        static Float Recurse(const Float term, const Float x, const Float y) {
-            return Horner<Float, Tag, order - 1>::Recurse(term * x + Polynomial<Float, Tag, order>::Coeff(y), x, y);
-        }
+    //
+    static Float Recurse(const Float term, const Float x, const Float y) {
+        return Horner<Float, Tag, order - 1>::Recurse(term * x + Polynomial<Float, Tag, order>::Coeff(y), x, y);
+    }
 
 
-        static Float Eval(const Float x, const Float y) {
-            return Horner<Float, Tag, order - 1>::Recurse(Polynomial<Float, Tag, order>::Coeff(y), x, y);
-        }
-    };
+    static Float Eval(const Float x, const Float y) {
+        return Horner<Float, Tag, order - 1>::Recurse(Polynomial<Float, Tag, order>::Coeff(y), x, y);
+    }
+};
 
 
-    template<typename Float, class Tag>
-    struct Horner<Float, Tag, 0> {
-        static Float Recurse(const Float term, const Float x) { return term * x + Polynomial<Float, Tag, 0>::Coeff(); }
+template<typename Float, class Tag>
+struct Horner<Float, Tag, 0> {
+    static Float Recurse(const Float term, const Float x) { return term * x + Polynomial<Float, Tag, 0>::Coeff(); }
 
 
-        static Float Eval(const Float x) { return Polynomial<Float, Tag, 0>::Coeff(); }
+    static Float Eval(const Float x) { return Polynomial<Float, Tag, 0>::Coeff(); }
 
 
-        //
-        static Float Recurse(const Float term, const Float x, const Float y) { return term * x + Polynomial<Float, Tag, 0>::Coeff(y); }
+    //
+    static Float Recurse(const Float term, const Float x, const Float y) { return term * x + Polynomial<Float, Tag, 0>::Coeff(y); }
 
 
-        static Float Eval(const Float x, const Float y) { return Polynomial<Float, Tag, 0>::Coeff(y); }
-    };
+    static Float Eval(const Float x, const Float y) { return Polynomial<Float, Tag, 0>::Coeff(y); }
+};
 
 
 #define HORNER_COEFF(_Tag_, _i_, _c_)  \

@@ -17,6 +17,11 @@ struct TOCANTE : Module {
 		NUM_PARAMS
 	};
 	enum InputIds {
+		BPM_INPUT,
+		BPMFINE_INPUT,
+		BEATS_INPUT,
+		REF_INPUT,
+		RUN_INPUT,
 		RESET_INPUT,
 		NUM_INPUTS
 	};
@@ -84,35 +89,37 @@ void TOCANTE::step() {
 		currentStep = 0;
 	}
 
-	ref = clamp(powf(2.0f,params[REF_PARAM].value),2.0f,16.0f);
-	beats = clamp(params[BEATS_PARAM].value,1.0f,32.0f);
-	bpm = clamp(round(params[BPM_PARAM].value) + round(100*params[BPMFINE_PARAM].value)/100, 1.0f, 350.0f);
+	float invESR = 1 / engineGetSampleRate();
+
+	ref = clamp(powf(2.0f,params[REF_PARAM].value+(int)rescale(clamp(inputs[REF_INPUT].value,0.0f,10.0f),0.0f,10.0f,0.0f,3.0f)),2.0f,16.0f);
+	beats = clamp(params[BEATS_PARAM].value+rescale(clamp(inputs[BEATS_INPUT].value,0.0f,10.0f),0.0f,10.0f,0.0f,32.0f),1.0f,32.0f);
+	bpm = clamp(round(params[BPM_PARAM].value+rescale(clamp(inputs[BPM_INPUT].value,0.0f,10.0f),0.0f,10.0f,0.0f,350.0f)) + round(100*(params[BPMFINE_PARAM].value+rescale(clamp(inputs[BPMFINE_INPUT].value,0.0f,10.0f),0.0f,10.0f,0.0f,0.99f))) * 0.01f, 1.0f, 350.0f);
 	stepsPerSixteenth =  floor(engineGetSampleRate() / bpm * 60 * ref / 32) * 2;
 	stepsPerEighth = stepsPerSixteenth * 2;
 	stepsPerQuarter = stepsPerEighth * 2;
-	stepsPerTriplet = floor(stepsPerQuarter/3);
+	stepsPerTriplet = floor(stepsPerQuarter / 3);
 	stepsPerBeat = stepsPerSixteenth * 16 / ref;
 	stepsPerMeasure = beats*stepsPerBeat;
 
-	if ((stepsPerSixteenth>0) && ((currentStep%stepsPerSixteenth) == 0)) {
-		gatePulse.trigger(10 / engineGetSampleRate());
+	if ((stepsPerSixteenth>0) && ((currentStep % stepsPerSixteenth) == 0)) {
+		gatePulse.trigger(1e-3f);
 	}
 
-	if ((stepsPerTriplet>0) && ((currentStep%stepsPerTriplet) == 0) && (currentStep <= (stepsPerMeasure-100))) {
-		gatePulse_triplets.trigger(10 / engineGetSampleRate());
+	if ((stepsPerTriplet>0) && ((currentStep % stepsPerTriplet) == 0) && (currentStep <= (stepsPerMeasure-100))) {
+		gatePulse_triplets.trigger(1e-3f);
 	}
 
-	pulseEven = gatePulse.process(1 / engineGetSampleRate());
-	pulseTriplets = gatePulse_triplets.process(1 / engineGetSampleRate());
+	pulseEven = gatePulse.process(invESR);
+	pulseTriplets = gatePulse_triplets.process(invESR);
 
 	outputs[OUT_MEASURE].value = (currentStep == 0) ? 10.0f : 0.0f;
-	outputs[OUT_BEAT].value = (pulseEven && (currentStep%stepsPerBeat == 0)) ? 10.0f : 0.0f;
-	outputs[OUT_TRIPLET].value = (pulseTriplets && (currentStep%stepsPerTriplet == 0)) ? 10.0f : 0.0f;
-	outputs[OUT_QUARTER].value = (pulseEven && (currentStep%stepsPerQuarter == 0)) ? 10.0f : 0.0f;
-	outputs[OUT_EIGHTH].value = (pulseEven && (currentStep%stepsPerEighth == 0)) ? 10.0f : 0.0f;
-	outputs[OUT_SIXTEENTH].value = (pulseEven && (currentStep%stepsPerSixteenth == 0)) ? 10.0f : 0.0f;
+	outputs[OUT_BEAT].value = (pulseEven && (currentStep % stepsPerBeat == 0)) ? 10.0f : 0.0f;
+	outputs[OUT_TRIPLET].value = (pulseTriplets && (currentStep % stepsPerTriplet == 0)) ? 10.0f : 0.0f;
+	outputs[OUT_QUARTER].value = (pulseEven && (currentStep % stepsPerQuarter == 0)) ? 10.0f : 0.0f;
+	outputs[OUT_EIGHTH].value = (pulseEven && (currentStep % stepsPerEighth == 0)) ? 10.0f : 0.0f;
+	outputs[OUT_SIXTEENTH].value = (pulseEven && (currentStep % stepsPerSixteenth == 0)) ? 10.0f : 0.0f;
 	if (running) {
-		currentStep = floor((currentStep + 1)%stepsPerMeasure);
+		currentStep = floor((currentStep + 1) % stepsPerMeasure);
 	}
 	lights[RUNNING_LIGHT].value = running ? 1.0 : 0.0;
 }
@@ -154,8 +161,8 @@ struct TOCANTEWidget : ModuleWidget {
 		display->box.size = Vec(50.0f, 85.0f);
 		addChild(display);
 
-		addParam(ParamWidget::create<LEDButton>(Vec(44, 140), module, TOCANTE::RUN_PARAM, 0.0, 1.0, 0.0));
-		addChild(ModuleLightWidget::create<SmallLight<BlueLight>>(Vec(50, 145), module, TOCANTE::RUNNING_LIGHT));
+		addParam(ParamWidget::create<LEDButton>(Vec(78, 185), module, TOCANTE::RUN_PARAM, 0.0, 1.0, 0.0));
+		addChild(ModuleLightWidget::create<SmallLight<BlueLight>>(Vec(84, 190), module, TOCANTE::RUNNING_LIGHT));
 		addParam(ParamWidget::create<BlueCKD6>(Vec(39, 180), module, TOCANTE::RESET_PARAM, 0.0, 1.0, 0.0));
 
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -163,10 +170,15 @@ struct TOCANTEWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(ParamWidget::create<BPMBlueKnob>(Vec(5.0f,90.0f), module, TOCANTE::BPM_PARAM, 1.0f, 350.0f, 60.0f));
-		addParam(ParamWidget::create<BPMBlueKnob>(Vec(5.0f,125.0f), module, TOCANTE::BPMFINE_PARAM, 0.0f, 0.99f, 0.0f));
-		addParam(ParamWidget::create<BidooBlueSnapKnob>(Vec(38.0f,90.0f), module, TOCANTE::BEATS_PARAM, 1.0f, 32.0f, 4.0f));
+		addParam(ParamWidget::create<BPMBlueKnob>(Vec(3.0f,90.0f), module, TOCANTE::BPM_PARAM, 1.0f, 350.0f, 60.0f));
+		addParam(ParamWidget::create<BPMBlueKnob>(Vec(3.0f,155.0f), module, TOCANTE::BPMFINE_PARAM, 0.0f, 0.99f, 0.0f));
+		addParam(ParamWidget::create<BidooBlueSnapKnob>(Vec(37.0f,90.0f), module, TOCANTE::BEATS_PARAM, 1.0f, 32.0f, 4.0f));
 		addParam(ParamWidget::create<BidooBlueSnapKnob>(Vec(72.0f,90.0f), module, TOCANTE::REF_PARAM, 1.0f, 4.0f, 2.0f));
+
+		addInput(Port::create<TinyPJ301MPort>(Vec(10, 125), Port::INPUT, module, TOCANTE::BPM_INPUT));
+		addInput(Port::create<TinyPJ301MPort>(Vec(10, 190), Port::INPUT, module, TOCANTE::BPMFINE_INPUT));
+		addInput(Port::create<TinyPJ301MPort>(Vec(45, 125), Port::INPUT, module, TOCANTE::BEATS_INPUT));
+		addInput(Port::create<TinyPJ301MPort>(Vec(80, 125), Port::INPUT, module, TOCANTE::REF_INPUT));
 
 		addOutput(Port::create<PJ301MPort>(Vec(18.0f, 230.0f), Port::OUTPUT, module, TOCANTE::OUT_MEASURE));
 		addOutput(Port::create<PJ301MPort>(Vec(62.0f, 230.0f), Port::OUTPUT, module, TOCANTE::OUT_BEAT));

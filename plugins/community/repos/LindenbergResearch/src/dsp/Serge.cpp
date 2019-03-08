@@ -3,7 +3,6 @@
 
 using namespace dsp;
 
-
 double SergeWFStage::compute(double x) {
     double out;
     double l, u, ln, fn, xn;

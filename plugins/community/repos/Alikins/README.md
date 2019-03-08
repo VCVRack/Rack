@@ -7,7 +7,282 @@ Plugins for use with VCV Rack virtual module synthesizer (https://github.com/VCV
 
 ## Modules
 
+### Specific Value
+
+![specific_value](./screenshots/specific_value.png)
+
+#### What
+
+A controller module for outputting a specific voltage
+with displays and text input fields for:
+
+- CV voltage,
+- frequency (hz)
+- note name ('C3' etc)
+- note detune (cents)
+- LFO (bpm)
+- LFO (hz)
+
+A specific value can be chosen with the knob widget
+or can entering values into any of the text fields.
+
+Can also be used as a 'meter' displaying all of
+the above info for CV voltages fed into the IN
+input. This includes animation of the controller
+dial.
+
+##### Note Input
+
+A specific note can be entered into the note text
+field.
+
+The note format includes a note a letter and a
+positive or negative 'octave'.
+
+Examples of valid formats include:
+
+- `C4`   (C in the 4th octave)
+- `c3`   (note names can be upper or lower case)
+- `F#2`  (sharps are indicated by a'#' in the second field)
+- `Ab0`  (flats are indicated by a 'b' in the second field).
+          Note that flats are currently converted to the equivalent sharp for display)
+- `C-2`  (The C six octaves below C4)
+
+For notes that are slighty sharp or flat from a A440 tuning, the
+Cents display shows how the amount of detuning.
+
+##### LFO values
+
+The LFO fields show the hz and bpm (beats per minute) corresponding to
+the current voltage, based on the standard at
+https://vcvrack.com/manual/VoltageStandards.html#pitch-and-frequencies
+
+##### HZ
+
+The HZ fields shows the hz corresponding to the current voltage for a
+VCO, based on the standard at https://vcvrack.com/manual/VoltageStandards.html#pitch-and-frequencies
+
+##### Using the text fields
+
+Values can be typed into the text fields
+directly.
+
+Left and Right arrow keys move the text cursor
+as normal when editing text.
+
+To select all text to replace, use Ctrl/Command + 'a',
+or doubleclick on the field.
+
+
+Up and Down arrow keys change the value as follows:
+
+
+| Key or mouse         | Modifier     | Action                             |
+| -------------------- | ------------ | ---------------------------------- |
+| Up arrow key         |              | increment                          |
+| Up arrow key         | Shift        | increment by "large" amount        |
+| Up arrow key         | Ctrl/Command | increment by "small" amount        |
+| Down arrow key       |              | decrement by default amount        |
+| Down arrow key       | Shift        | decrement by "large" amount        |
+| Down arrow key       | Ctrl/Command | decrement by "small" amount        |
+| Esc                  |              | "undo" and reset to original value |
+
+To change the value using the mouse, click on a field and 'drag' it up
+to increment and drag it 'down' to decrement. To change the value in
+larger steps, hold 'Shift' while dragging. To use small steps, hold
+the mod key ('Ctrl' or 'Command') while dragging.
+
+The default, "large", or "small" increment depends on which field
+is being used.
+
+| Field           | default  | mod (small) | shift (large)  |
+| --------------- | -------- | ----------- | -------------- |
+| Volts           | 0.01 V   | 0.1 V       | 0.001 V        |
+| Frequency (hz)  | 1.0  hz  | 10.0 hz     | 0.1 hz         |
+| LFO (hz)        | 0.01 hz  | 0.1 hz      | 0.001 hz       |
+| LFO (bpm)       | 1.0  bpm | 1.0 bpm     | 0.1 bpm        |
+| Note            | 1 step   | 1 octave    | 1 cent         |
+| Cents           | 0.1 cent | 1.0 cent    | .01 cent       |
+
+### Hovered Value
+
+![hovered_value](./screenshots/hovered_value.png)
+
+#### What
+
+Hovered Value detects the widget or port that your cursor
+is hovered over and displays and outputs that value.
+
+#### Why
+
+Use for figuring out what the range or value of an on screen
+widget.
+
+If an LFO has multiple outputs, hover the cursor over each one
+to sample the output.
+
+Use in combo with 'Specific Value' to quickly determine what
+note each of the outputs or controls is set to.
+
+This module was inspired by a question and discussion on the
+Facebook 'VCV Rack Official User Group':
+
+   ["Hi Folks, Just wondering, is it possible to see control parameter values in VCVRack?"](https://www.facebook.com/groups/vcvrack/permalink/286752278651590/)
+
+
+##### Virtual circuit bending
+
+Simulate virtual circuit bending by hovering over any widget on
+screen and using it's CV output. Hook up the output to your clock
+bpm and wiggle the cursor across the screen.
+
+Think of it as the Rack equilivent of using a Radio Shack Telephone
+Pickup to listen to a Sony Discman.
+
+Tap into the machine and read it's mind. Investigate which
+modules have real resonance.
+
+Worship the glitch.
+
+#### Outputs
+
+There are two outputs. The lower purple 'OUT' output
+will send the raw param widget value. Note that this
+output may send values outside the normal -10V/+10V
+range.
+
+The second output (light blue in 'Scaled Output' section')
+scales the output signal to one of three voltage ranges:
+-5V/+5V (BI), 0V/+10V (UNI), or -10V/+10V.
+
+#### Tooltips
+
+By default, 'Hovered Value' will how a tooltip showing the value
+above the hovered widget.
+
+On the right click context menu, there is an option to disable
+this.
+
+#### The On Switch
+
+The bottom left 3way switch determines when the module runs.
+
+The default is 'w/shift'. To read the value from a param,
+hold down 'Shift' key while hovering.
+
+The 'On' option always reads the value from the currently
+hovered widget.
+
+#### Cautions To Be Ignored
+
+The 'out' output is currently not clamped or limitied and may produce
+values outside of the -10/+10 V range.
+
+The values of the hovered widget are sampled at the gui display rate,
+not at the audio or sound engine rate. This is typically ~60hz, so
+audio signals that are tapped will be reproduced with 'character'.
+
+### Inject Value
+
+![inject_value](./screenshots/inject_value.png)
+
+#### What
+
+Inject Value is used to control the currently hovered widget with CV.
+Where 'Hovered Value' can read a param vaule, 'Inject Value' can write/change it.
+
+The 'IN' port accepts a CV input and that value is sent to the currently hovered
+widget. This allows CV control of param widgets, even if the hovered module doesn't
+provide a CV input.
+
+#### Use
+
+Hook up a CV source (like the output of a LFO) to the 'IN'
+and set 'INPUT RANGE' approriately (0/+10V for a 'UNI' LFO).
+
+Select how/when 'Inject Value' is enabled. For example, choosing
+'W/ SHIFT' on the bottom 3way switch.
+
+Then move the cursor over any paramater widget like a knob,
+slider, or switch and hold down 'Shift'. The hovered widget
+will move to match the 'IN' value.
+
+The input values are automatically mapped to the range of
+values supported by the hovered widget.
+
+Note this can control widgets that normall don't have
+CV control. For example, the 'X SCL' knob on a Fundamental
+Scope module.
+
+#### Cautions To Be Ignored
+
+For widgets that normally expect a subset of possible values
+(like switch widgets for example), 'Inject Value' can end up
+setting the params to unexpected values. For a switch, this could
+be a float between 0.0 and 1.0, 1.512 for example. Some modules
+get a little confused if a param value is not exactly an
+expected value, so be cautious changing switch values with
+continuously variable inputs.
+
+The values of the hovered widget are sampled at the gui display rate,
+not at the audio or sound engine rate. This is typically ~60hz, so
+audio signals that are tapped will be reproduced with 'character'.
+
+### Shift Pedal
+
+![shift_pedal](./screenshots/shift_pedal.png)
+
+#### What
+
+'Shift Pedal' allows the 'Shift', 'Ctrl', 'Alt/Option',
+or 'Super/Windows/Command' keys to be used to generate gates.
+
+For example, using the 'Shift' key to send a gate to control
+the sustain pedal param of a VST in Host.
+
+#### How
+
+For each modifier key supported, either the 'left', 'right'
+or 'either' can be used to control the gate output.
+
+The 'left' modifier key will send a gate to the 'left' output port under
+each key in the ui.
+
+The 'right' modifier key will send a gate to the 'right' output port under
+each key in the ui.
+
+Pressing either the 'right' or 'left' version of the modifier keys will
+also send a gate from the middle 'either' output port.
+
+#### Notes
+
+The interaction with using the Core 'Midi-1' with the 'Computer Keyboard'
+drive is not great. The 'Computer Keyboard' driver ignores keyboard input
+if a modifier key is held, so using QWERTY midi input and then holding
+shift doesn't work as may be expected.
+
+### Value Saver
+
+![value_saver](./screenshots/value_saver.png)
+
+#### What
+
+The last know value of a signal sent through 'Value Saver' will
+be remembered.
+
+If you patch an input through it, it will remember and output the last value
+read from the input, even after the input is disconnected. Or on patch open,
+if the input value is a steady 0.0f it will output the value it was saved with.
+
+Intended to help with cases like a Midi-1 CV output after module load but before
+anything is sent.
+
+A label field is provided for each input for labeling what those
+inputs are used for.
+
 ### IdleSwitch
+
+![idle_switch](./screenshots/idle_switch.png)
 
 #### What
 
@@ -125,6 +400,8 @@ make weird noises.
 
 ### ColorPanel
 
+![color_panel](./screenshots/color_panel.png)
+
 A CV controlled RGB/HSL color "blank" panel.
 
 Supports selectable input ranges (0V to 10V or -5V to 5V) via right click context menu
@@ -133,6 +410,8 @@ The color input mode is also selectable via the context menu.
 Module is resizable.
 
 ### BigMuteButton
+
+![big_mute_button](./screenshots/big_mute_button.png)
 
 A big mute button.
 
@@ -146,7 +425,27 @@ the tiny mute button on mixers.
 
 ### MomentaryOnButtons
 
+![momentary_on_buttons](./screenshots/momentary_on_buttons.png)
+
 A set of GUI buttons that send a +10V output while pressed.
+
+### Gate Length
+
+![gate_length](./screenshots/gate_length.png)
+
+Change the length of a gate between 0 and 10 seconds.
+Length of gate is CV controllable.
+
+This module was inspired by the question and discussion at:
+Facebook 'VCV Rack Official User Group':
+
+   ["Okay , Rackheads... ;) Looking for a module that can "stretch" the length , extend the duration , of a gate/ trigger pulse."](https://www.facebook.com/groups/vcvrack/permalink/161960391130780/)
+
+### Reference Voltages
+
+![reference_voltages](./screenshots/reference_voltages.png)
+
+Output some useful reference voltags: -10V, -5V, -1V, 0V, 1V, 5V, 10V
 
 ## License
 

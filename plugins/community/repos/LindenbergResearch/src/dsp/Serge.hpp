@@ -12,32 +12,33 @@
 
 namespace dsp {
 
-   struct SergeWFStage {
-   private:
-      double fn1, xn1;
+struct SergeWFStage {
+private:
+    double fn1, xn1;
 
-   public:
-      SergeWFStage();
-      double compute(double x);
-   };
-
-
-   struct SergeWavefolder : WaveShaper {
-
-   private:
-      SergeWFStage sg1, sg2, sg3, sg4, sg5, sg6;
-      //   DCBlocker *dc = new DCBlocker(DCBLOCK_ALPHA);
-      HQTanh *tanh1;
-      bool blockDC = false;
+public:
+    SergeWFStage();
+    double compute(double x);
+};
 
 
-   public:
-      explicit SergeWavefolder(float sr);
+struct SergeWavefolder : WaveShaper {
 
-      void init() override;
-      void process() override;
-      double compute(double x) override;
+private:
+    SergeWFStage sg1, sg2, sg3, sg4, sg5, sg6;
+    //   DCBlocker *dc = new DCBlocker(DCBLOCK_ALPHA);
+    HQTanh *tanh1;
+    bool blockDC = false;
 
-   };
+
+public:
+    explicit SergeWavefolder(float sr);
+
+    void init() override;
+    void process() override;
+    double compute(double x) override;
+
+};
+
 
 }

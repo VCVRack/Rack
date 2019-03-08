@@ -50,6 +50,10 @@ struct Port24 : SVGPort {
 	Port24();
 };
 
+struct BlankPort24 : Port24 {
+	BlankPort24();
+};
+
 struct SliderSwitch : SVGSwitch, ToggleSwitch {
 	CircularShadow* shadow = NULL;
 	SliderSwitch();

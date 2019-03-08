@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg6"
+   viewBox="0 0 6.0 11.160888888888891"
+   height="11.160888888888891mm"
+   width="6.0mm"
+   version="1.1">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <g
+     id="text2"
+     style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+     aria-label="0–10">
+    <path
+       id="path14"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="m 0.422863,0.79101243 c 0,0.40775467 0.20150667,0.81788007 0.654304,0.81788007 0.4504267,0 0.654304,-0.4101254 0.654304,-0.81788007 0,-0.40775468 -0.2038773,-0.81550936 -0.654304,-0.81550936 -0.45279733,0 -0.654304,0.40775468 -0.654304,0.81550936 z m 0.9648614,0 c 0,0.29159197 -0.085344,0.51917597 -0.3105574,0.51917597 -0.22758399,0 -0.31292799,-0.227584 -0.31292799,-0.51917597 0,-0.29159201 0.085344,-0.51680535 0.31292799,-0.51680535 0.2252134,0 0.3105574,0.22521334 0.3105574,0.51680535 z" />
+    <path
+       id="path16"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="M 1.8811564,1.1347591 H 3.1447218 V 0.8787271 H 1.8811564 Z" />
+    <path
+       id="path18"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="M 3.6988652,1.5804445 H 4.0354999 V -7.9026198e-4 H 3.7415372 L 3.2436972,0.49942042 3.4357212,0.70092709 3.6988652,0.43304175 Z" />
+    <path
+       id="path20"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="m 4.2705662,0.79101243 c 0,0.40775467 0.2015067,0.81788007 0.654304,0.81788007 0.4504267,0 0.6543041,-0.4101254 0.6543041,-0.81788007 0,-0.40775468 -0.2038774,-0.81550936 -0.6543041,-0.81550936 -0.4527973,0 -0.654304,0.40775468 -0.654304,0.81550936 z m 0.9648614,0 c 0,0.29159197 -0.085344,0.51917597 -0.3105574,0.51917597 -0.227584,0 -0.312928,-0.227584 -0.312928,-0.51917597 0,-0.29159201 0.085344,-0.51680535 0.312928,-0.51680535 0.2252134,0 0.3105574,0.22521334 0.3105574,0.51680535 z" />
+  </g>
+  <circle
+     id="circle4"
+     stroke="#0044cc"
+     fill="#0044cc"
+     stroke-width="1.0"
+     r="2.5"
+     cy="5.580444444444446"
+     cx="3.0" />
+</svg>

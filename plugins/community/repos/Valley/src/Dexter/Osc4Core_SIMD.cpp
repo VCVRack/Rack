@@ -36,6 +36,7 @@
 #include "sawGap2_wavetable/sawGap2_wavetable.h"
 #include "vgame_wavetable/vgame_wavetable.h"
 
+
 static float** wavetables[NUM_WAVEBANKS] = {
     wavetable_opal, wavetable_basic, wavetable_TeeEks, wavetable_sineHarmonics, wavetable_additiveSine, wavetable_amHarmonic,
     wavetable_sweepHarmonic, wavetable_additiveSaw, wavetable_additiveSquare, wavetable_additiveBank,
@@ -68,6 +69,7 @@ static int32_t wavetable_sizes[NUM_WAVEBANKS] = {
     WAVETABLE_VOICE3_NUM, WAVETABLE_VOICE4_NUM, WAVETABLE_VOICE5_NUM, WAVETABLE_PWM_NUM,
     WAVETABLE_BIPULSE_NUM, WAVETABLE_SAWGAP_NUM, WAVETABLE_SAWGAP2_NUM, WAVETABLE_VGAME_NUM
 };
+
 
 FourVoiceOPCore::FourVoiceOPCore() {
     _algorithm = -1;

@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run in Rack" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-d -g /Applications/Rack.app/Contents/Resources -l $PROJECT_DIR$/cmake-build-debug/rack" PASS_PARENT_ENVS_2="true" PROJECT_NAME="DHE-Modules" TARGET_NAME="plugin" CONFIG_NAME="Debug" RUN_PATH="/Applications/Rack.app/Contents/MacOS/Rack">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      <option name="CMake.Install" enabled="true" />
+    </method>
+  </configuration>
+</component>

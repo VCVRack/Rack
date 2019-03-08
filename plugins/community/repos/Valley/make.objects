@@ -1,13 +1,22 @@
 ALL_OBJ= \
+	src/Amalgam/Amalgam.o \
+	src/Amalgam/DiodeRingMod.o \
+	src/Amalgam/VecAmalgam.o \
+	src/Amalgam/VecDiodeRingMod.o \
 	src/Common/Metronome.o \
 	src/Common/Oneshot.o \
+	src/Common/SIMD/VecOnePoleFilters.o \
+	src/Common/SIMD/VecOTAFilter.o \
+	src/Common/Utilities.o \
+	src/Common/DSP/OnePoleFilters.o \
+	src/Common/DSP/OTAFilter.o \
 	src/Dexter/Dexter.o \
 	src/Dexter/FreqLUT.o \
 	src/Dexter/Osc4Core_SIMD.o \
 	src/Dexter/QuadOsc.o \
 	src/Dexter/RoutingMatrix.o \
+	src/Interzone/Interzone.o \
 	src/Plateau/Dattorro.o \
-	src/Plateau/OnePoleFilters.o \
 	src/Plateau/Plateau.o \
 	src/Topograph/Topograph.o \
 	src/Topograph/TopographPatternGenerator.o \
@@ -18,4 +27,5 @@ ALL_OBJ= \
 	src/DynamicPanelWidget.o \
 	src/DynamicSVGSwitch.o \
 	src/DynamicText.o \
+	src/SteppedSlider.o \
 	src/Valley.o

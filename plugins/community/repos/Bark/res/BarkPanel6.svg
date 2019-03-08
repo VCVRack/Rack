@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="90"
+   height="380"
+   viewBox="0 0 23.8125 100.54167"
+   version="1.1"
+   id="svg4532"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="BarkPanel6.svg">
+  <title
+     id="title5077">90x380</title>
+  <defs
+     id="defs4526">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath3966">
+      <use
+         x="0"
+         y="0"
+         xlink:href="#g3962"
+         id="use3968"
+         width="100%"
+         height="100%" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2"
+     inkscape:cx="-50.095262"
+     inkscape:cy="258.98709"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:snap-global="false"
+     units="px"
+     inkscape:showpageshadow="false"
+     guidecolor="#0000e4"
+     guideopacity="0.49803922"
+     guidehicolor="#eae565"
+     guidehiopacity="0.40784314" />
+  <metadata
+     id="metadata4529">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>90x380</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-196.45833)">
+    <g
+       id="g3964"
+       clip-path="url(#clipPath3966)"
+       transform="matrix(0.59904931,0,0,0.99992553,28.944835,-0.37847154)"
+       style="fill:#383838;fill-opacity:1">
+      <g
+         inkscape:label="Clip"
+         id="g3962"
+         style="fill:#383838;fill-opacity:1">
+        <g
+           style="fill:#383838;fill-opacity:1"
+           inkscape:label="Layer 1"
+           id="layer1-1"
+           transform="translate(-48.286459,0.39687124)">
+          <rect
+             ry="0"
+             y="196.45459"
+             x="-0.031491905"
+             height="100.54916"
+             width="39.750484"
+             id="rect1342-0"
+             style="opacity:1;fill:#383838;fill-opacity:1;stroke-width:0.26458335" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

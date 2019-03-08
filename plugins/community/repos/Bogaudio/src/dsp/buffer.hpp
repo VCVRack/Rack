@@ -11,14 +11,16 @@ template<typename T>
 struct OverlappingBuffer {
 	const int _size;
 	const int _overlap;
+	const bool _autoProcess;
 	const int _overlapN;
 	const int _samplesN;
 	T* _samples;
 	int _sample;
 
-	OverlappingBuffer(int size, int o)
+	OverlappingBuffer(int size, int o, bool autoProcess = true)
 	: _size(size)
 	, _overlap(o)
+	, _autoProcess(autoProcess)
 	, _overlapN(_size / _overlap)
 	, _samplesN(2*_size - _overlapN)
 	, _samples(new T[_samplesN])
@@ -31,23 +33,27 @@ struct OverlappingBuffer {
 		delete[] _samples;
 	}
 
-	virtual void process(T* samples) = 0;
+	inline void process() { processBuffer(_samples + _sample - _size); }
+	virtual void processBuffer(T* samples) = 0;
+	void postProcess() {
+		if (_overlap == 1) {
+			_sample = 0;
+		}
+		else if (_sample == _samplesN) {
+			std::copy(_samples + _size, _samples + _samplesN, _samples);
+			_sample = _samplesN - _size;
+		}
+	}
 
 	virtual bool step(T sample) {
 		_samples[_sample++] = sample;
 		assert(_sample <= _samplesN);
 
 		if (_sample >= _size && _sample % _overlapN == 0) {
-			process(_samples + _sample - _size);
-
-			if (_overlap == 1) {
-				_sample = 0;
+			if (_autoProcess) {
+				process();
+				postProcess();
 			}
-			else if (_sample == _samplesN) {
-				std::copy(_samples + _size, _samples + _samplesN, _samples);
-				_sample = _samplesN - _size;
-			}
-
 			return true;
 		}
 		return false;
@@ -78,7 +84,7 @@ struct AveragingBuffer {
 	, _averages(new T[_size] {})
 	, _frames(new T[_size * _framesN] {})
 	, _currentFrame(0)
-	, _resetsPerCommit(_size / 1000)
+	, _resetsPerCommit(std::max(_size / 100, 10))
 	, _currentReset(0)
 	{
 		assert(framesToAverage > 0);

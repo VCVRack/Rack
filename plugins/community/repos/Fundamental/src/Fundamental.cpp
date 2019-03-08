@@ -17,9 +17,13 @@ RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCF);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCMixer);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCO);
 RACK_PLUGIN_MODEL_DECLARE(Fundamental, VCO2);
+RACK_PLUGIN_MODEL_DECLARE(Fundamental, Octave);
 
 RACK_PLUGIN_INIT(Fundamental) {
    RACK_PLUGIN_INIT_ID();
+
+   RACK_PLUGIN_INIT_WEBSITE("https://github.com/VCVRack/Fundamental");
+   RACK_PLUGIN_INIT_VERSION("0.6.2");
 
 	RACK_PLUGIN_MODEL_ADD(Fundamental, VCO);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, VCO2);
@@ -38,4 +42,5 @@ RACK_PLUGIN_INIT(Fundamental) {
 	RACK_PLUGIN_MODEL_ADD(Fundamental, SEQ3);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, SequentialSwitch1);
 	RACK_PLUGIN_MODEL_ADD(Fundamental, SequentialSwitch2);
+	RACK_PLUGIN_MODEL_ADD(Fundamental, Octave);
 }

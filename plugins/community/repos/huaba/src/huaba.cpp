@@ -8,6 +8,8 @@ RACK_PLUGIN_MODEL_DECLARE(huaba, ABBus);
 RACK_PLUGIN_INIT(huaba) {
    RACK_PLUGIN_INIT_ID();
 
+   // https://github.com/dhuber81/huaba
+
    RACK_PLUGIN_MODEL_ADD(huaba, EQ3);
    RACK_PLUGIN_MODEL_ADD(huaba, ABBus);
 }

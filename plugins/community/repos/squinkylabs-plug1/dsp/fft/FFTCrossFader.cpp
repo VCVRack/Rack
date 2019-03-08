@@ -10,7 +10,6 @@ NoiseMessage* FFTCrossFader::step(float* out)
         // just one frame - play it;
         *out = dataFrames[0]->dataBuffer->get(curPlayOffset[0]);
         advance(0);
-
     } else if (dataFrames[0] && dataFrames[1]) {
         // curPlayOffset1 is the index into buffer 1, but also the crossfade index
         assert(curPlayOffset[1] < crossfadeSamples);
@@ -49,7 +48,6 @@ NoiseMessage* FFTCrossFader::step(float* out)
             dataFrames[1] = nullptr;
             curPlayOffset[1] = 0;
         }
-
     } else {
         *out = 0;
     }

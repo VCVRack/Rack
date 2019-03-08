@@ -19,7 +19,7 @@ public:
     }
     ~FractionalDelay()
     {
-        delete delayMemory;
+        delete[] delayMemory;
     }
 
     void setDelay(float samples)

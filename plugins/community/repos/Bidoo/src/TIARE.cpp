@@ -218,11 +218,11 @@ struct TIARE : Module {
 	void fromJson(json_t *rootJ) override {
 		json_t *phaseDistXJ = json_object_get(rootJ, "phaseDistX");
 		if (phaseDistXJ) {
-			phaseDistX = json_real_value(phaseDistXJ);
+			phaseDistX = json_number_value(phaseDistXJ);
 		}
 		json_t *phaseDistYJ = json_object_get(rootJ, "phaseDistY");
 		if (phaseDistYJ) {
-			phaseDistY = json_real_value(phaseDistYJ);
+			phaseDistY = json_number_value(phaseDistYJ);
 		}
 		json_t *freqFactorJ = json_object_get(rootJ, "freqFactor");
 		if (freqFactorJ) {

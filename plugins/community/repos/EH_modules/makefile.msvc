@@ -1,0 +1,9 @@
+SLUG=EH_modules
+
+include ../../../build_plugin_pre_msvc.mk
+
+include make.objects
+
+ALL_OBJ= $(COMMON_OBJ) $(WIN32_OBJ)
+
+include ../../../build_plugin_post_msvc.mk

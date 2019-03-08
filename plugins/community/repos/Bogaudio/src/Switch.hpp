@@ -9,6 +9,7 @@ namespace bogaudio {
 struct Switch : Module {
 	enum ParamsIds {
 		GATE_PARAM,
+		LATCH_PARAM,
 		NUM_PARAMS
 	};
 
@@ -28,10 +29,12 @@ struct Switch : Module {
 	};
 
 	enum LightsIds {
+		LATCH_LIGHT,
 		NUM_LIGHTS
 	};
 
-	SchmittTrigger _trigger;
+	Trigger _trigger;
+	bool _latchedHigh = false;
 
 	Switch() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();

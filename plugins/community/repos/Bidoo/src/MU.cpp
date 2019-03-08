@@ -91,13 +91,12 @@ struct MU : Module {
 	void step() override;
 };
 
-
 void MU::step() {
-
-	const float lightLambda = 0.075f;
+	const float invLightLambda = 13.333333333333333333333f;
+	float invESR = 1 / engineGetSampleRate();
 
 	bpm = inputs[BPM_INPUT].active ? rescale(clamp(inputs[BPM_INPUT].value,0.0f,10.0f),0.0f,10.0f,1.0f,800.99f) : (round(params[BPM_PARAM].value)+round(100*params[BPMFINE_PARAM].value)/100);
-	displayLength = round(params[STEPLENGTH_PARAM].value) + round(params[STEPLENGTHFINE_PARAM].value*100)/100;
+	displayLength = round(params[STEPLENGTH_PARAM].value) + round(params[STEPLENGTHFINE_PARAM].value*100) * 0.01f;
 
 	bool wasActive = isActive;
 	if (startTrigger.process(params[START_PARAM].value))
@@ -159,7 +158,7 @@ void MU::step() {
 			outputs[CVBRIDGE_OUTPUT].value = 0.0f;
 		}
 		else {
-			int offset = displayOffset * initTicks / 100;
+			int offset = displayOffset * initTicks * 0.01f;
 			int mult = ((distRetrig > 0) && (count>offset))  ? ((count-offset) / distRetrig) : 0;
 			if (play && (mult < numTrigs) && (count >= (offset + mult * distRetrig)) && (count <= (offset + (mult * distRetrig) + gateTicks))) {
 				outputs[GATEBRIDGE_OUTPUT].value = mute ? 0.0f : 10.0f;
@@ -189,12 +188,12 @@ void MU::step() {
 	outputs[ALTEOSTEP_OUTPUT].value = alt ? (pulse ? 10.0f : 0.0f) : 0.0f;
 	outputs[BPM_OUTPUT].value = rescale(bpm,1.0f,800.99f,0.0f,10.0f);
 
-	lights[NORMEOS_LIGHT].value = (!alt && pulse) ? 10.0f : (lights[NORMEOS_LIGHT].value - lights[NORMEOS_LIGHT].value / lightLambda / engineGetSampleRate());
-	lights[ALTEOS_LIGHT].value = (alt && pulse) ? 10.0f : (lights[ALTEOS_LIGHT].value - lights[ALTEOS_LIGHT].value / lightLambda / engineGetSampleRate());
-	lights[START_LIGHT].value = lights[START_LIGHT].value - lights[START_LIGHT].value / lightLambda / engineGetSampleRate();
-	if (outputs[GATEBRIDGE_OUTPUT].value == 0.0f) lights[GATE_LIGHT].value -= 4 * lights[GATE_LIGHT].value / lightLambda / engineGetSampleRate();
-	if (!isActive) lights[GATE_LIGHT+2].value -= 4 * lights[GATE_LIGHT+2].value / lightLambda / engineGetSampleRate();
-	if (!isActive) lights[GATE_LIGHT].value -= 4 * lights[GATE_LIGHT].value / lightLambda / engineGetSampleRate();
+	lights[NORMEOS_LIGHT].value = (!alt && pulse) ? 10.0f : (lights[NORMEOS_LIGHT].value - lights[NORMEOS_LIGHT].value * invLightLambda * invESR);
+	lights[ALTEOS_LIGHT].value = (alt && pulse) ? 10.0f : (lights[ALTEOS_LIGHT].value - lights[ALTEOS_LIGHT].value * invLightLambda * invESR);
+	lights[START_LIGHT].value = lights[START_LIGHT].value - lights[START_LIGHT].value * invLightLambda * invESR;
+	if (outputs[GATEBRIDGE_OUTPUT].value == 0.0f) lights[GATE_LIGHT].value -= 4 * lights[GATE_LIGHT].value * invLightLambda * invESR;
+	if (!isActive) lights[GATE_LIGHT+2].value -= 4 * lights[GATE_LIGHT+2].value * invLightLambda * invESR;
+	if (!isActive) lights[GATE_LIGHT].value -= 4 * lights[GATE_LIGHT].value * invLightLambda * invESR;
 	lights[MUTE_LIGHT].value = mute ? 10.0f : 0.0f;
 	lights[CVSTACK_LIGHT].value = cvStack ? 10.0f : 0.0f;
 	lights[TRIGSTACK_LIGHT].value = trigStack ? 10.0f : 0.0f;

@@ -33,7 +33,7 @@ struct Manual : TriggerOnLoadModule {
 	};
 
 	bool _firstStep = true;
-	SchmittTrigger _trigger;
+	Trigger _trigger;
 	PulseGenerator _pulse;
 
 	Manual() : TriggerOnLoadModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {

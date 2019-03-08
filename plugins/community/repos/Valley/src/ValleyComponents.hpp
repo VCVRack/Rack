@@ -33,6 +33,12 @@ struct RoganMedWhite : Rogan {
     }
 };
 
+struct RoganMedSmallWhite : Rogan {
+    RoganMedSmallWhite() {
+        setSVG(SVG::load(assetPlugin(plugin, "res/Rogan1PSWhiteMedSmall.svg")));
+    }
+};
+
 struct RoganSmallWhite : Rogan {
     RoganSmallWhite() {
         setSVG(SVG::load(assetPlugin(plugin, "res/Rogan1PSWhiteSmall.svg")));
@@ -233,6 +239,80 @@ struct PJ301MDarkSmallOut : SVGPort {
 		box.size = background->box.size;
         shadow->box.size = background->box.size;
     	shadow->box.pos = Vec(0, background->box.size.y * 0.1);
+	}
+};
+
+struct ValleySlider : SVGFader {
+    Vec margin = Vec(-1, -0.55);
+    ValleySlider() {
+        background->svg = SVG::load(assetPlugin(plugin,"res/valleySliderBackground.svg"));
+		background->wrap();
+		background->box.pos = margin;
+		box.size = background->box.size.plus(margin.mult(2));
+    }
+};
+
+struct ValleyStepSlider : SVGStepSlider {
+    Vec margin = Vec(-1, -0.55);
+    ValleyStepSlider() {
+        background->svg = SVG::load(assetPlugin(plugin,"res/valleySliderBackground.svg"));
+		background->wrap();
+		background->box.pos = margin;
+		box.size = background->box.size.plus(margin.mult(2));
+    }
+};
+
+struct RedSlider : ValleySlider {
+	RedSlider() {
+		handle->svg = SVG::load(assetPlugin(plugin,"res/sliderRed.svg"));
+		handle->wrap();
+        maxHandlePos = Vec((float)handle->box.size.x * 0.45, 1.5).plus(margin);
+		minHandlePos = Vec((float)handle->box.size.x * 0.45, 61.5).plus(margin);
+	}
+};
+
+struct OrangeSlider : ValleySlider {
+	OrangeSlider() {
+		handle->svg = SVG::load(assetPlugin(plugin,"res/sliderOrange.svg"));
+		handle->wrap();
+        maxHandlePos = Vec((float)handle->box.size.x * 0.45, 1.5).plus(margin);
+		minHandlePos = Vec((float)handle->box.size.x * 0.45, 61.5).plus(margin);
+	}
+};
+
+struct YellowSlider : ValleySlider {
+	YellowSlider() {
+		handle->svg = SVG::load(assetPlugin(plugin,"res/sliderGreen.svg"));
+		handle->wrap();
+        maxHandlePos = Vec((float)handle->box.size.x * 0.45, 1.5).plus(margin);
+		minHandlePos = Vec((float)handle->box.size.x * 0.45, 61.5).plus(margin);
+	}
+};
+
+struct GreenSlider : ValleySlider {
+	GreenSlider() {
+		handle->svg = SVG::load(assetPlugin(plugin,"res/sliderGreen.svg"));
+		handle->wrap();
+        maxHandlePos = Vec((float)handle->box.size.x * 0.45, 1.5).plus(margin);
+		minHandlePos = Vec((float)handle->box.size.x * 0.45, 61.5).plus(margin);
+	}
+};
+
+struct BlueSlider : ValleySlider {
+	BlueSlider() {
+		handle->svg = SVG::load(assetPlugin(plugin,"res/sliderBlue.svg"));
+		handle->wrap();
+        maxHandlePos = Vec((float)handle->box.size.x * 0.45, 1.5).plus(margin);
+		minHandlePos = Vec((float)handle->box.size.x * 0.45, 61.5).plus(margin);
+	}
+};
+
+struct YellowStepSlider : ValleyStepSlider {
+	YellowStepSlider() {
+		handle->svg = SVG::load(assetPlugin(plugin,"res/sliderYellow.svg"));
+		handle->wrap();
+        maxHandlePos = Vec((float)handle->box.size.x * 0.45, 0.5).plus(margin);
+		minHandlePos = Vec((float)handle->box.size.x * 0.45, 61.5).plus(margin);
 	}
 };
 

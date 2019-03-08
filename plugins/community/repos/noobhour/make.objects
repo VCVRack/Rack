@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	src/Baseliner.o \
+	src/Customscaler.o \
+	src/Noobhour.o

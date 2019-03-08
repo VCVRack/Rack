@@ -17,6 +17,7 @@ public:
     // freq is normalized f / sr
     static void generateSin(T * output, int numSamples, T freq);
     static double getRMS(const T * signal, int numSamples);
+    static double getDC(const T * signal, int numSamples);
 
     /**
      * Measure the gain of a processing lambda at a specificed frequency
@@ -56,6 +57,17 @@ inline double TestSignal<T>::getRMS(const T * signal, int numSamples)
         sumSq += double(signal[i]) * signal[i];
     }
     return std::sqrt(sumSq / numSamples);
+}
+
+template <typename T>
+inline double TestSignal<T>::getDC(const T * signal, int numSamples)
+{
+    assert(numSamples > 0);
+    double sum = 0;
+    for (int i = 0; i < numSamples; ++i) {
+        sum += signal[i];
+    }
+    return sum / numSamples;
 }
 
 template <typename T>

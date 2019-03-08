@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="99.397003"
+   height="5.77"
+   viewBox="0 0 99.396999 5.77"
+   version="1.1"
+   id="svg2199"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="BarkSlider1.svg">
+  <defs
+     id="defs2193">
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient11007"
+       id="radialGradient5464"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.68547263,0,0,0.03032891,438.13084,886.32769)"
+       cx="75.114998"
+       cy="316.04288"
+       fx="75.114998"
+       fy="316.04288"
+       r="74.254593" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient11007">
+      <stop
+         style="stop-color:#ffffe1;stop-opacity:1;"
+         offset="0"
+         id="stop11003" />
+      <stop
+         style="stop-color:#ffffe1;stop-opacity:0;"
+         offset="1"
+         id="stop11005" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.919596"
+     inkscape:cx="20.46988"
+     inkscape:cy="16.21821"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:snap-global="false"
+     units="px" />
+  <metadata
+     id="metadata2196">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-439.92161,-905.49914)">
+    <path
+       inkscape:connector-curvature="0"
+       id="path5462-0"
+       d="m 439.92161,895.41293 h 99.397 v 1 h -99.397 z"
+       style="display:inline;opacity:0.66799999;fill:url(#radialGradient5464);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.93965864" />
+  </g>
+</svg>

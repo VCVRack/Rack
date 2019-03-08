@@ -49,61 +49,42 @@ struct Pulsars : Module {
 	// Constants
 	static constexpr float epsilon = 0.0001f;// pulsar crossovers at epsilon and 1-epsilon in 0.0f to 1.0f space
 
-	// Need to save, with reset
+	
+	// Need to save
+	int panelTheme = 0;
+	int cvMode;// 0 is -5v to 5v, 1 is 0v to 10v; bit 0 is upper Pulsar, bit 1 is lower Pulsar
 	bool isVoid[2];
 	bool isReverse[2];
 	bool isRandom[2];
-	int cvMode;// 0 is -5v to 5v, 1 is -10v to 10v; bit 0 is upper Pulsar, bit 1 is lower Pulsar
 	
-	// Need to save, no reset
-	int panelTheme;
 	
-	// No need to save, with reset
+	// No need to save
+	bool topCross[2];
 	int posA;// always between 0 and 7
 	int posB;// always between 0 and 7
 	int posAnext;// always between 0 and 7
 	int posBnext;// always between 0 and 7
-	bool topCross[2];
-	
-	// No need to save, no reset
-	SchmittTrigger voidTriggers[2];
-	SchmittTrigger revTriggers[2];
-	SchmittTrigger rndTriggers[2];
-	SchmittTrigger cvLevelTriggers[2];
-	float lfoLights[2];
+	Trigger voidTriggers[2];
+	Trigger revTriggers[2];
+	Trigger rndTriggers[2];
+	Trigger cvLevelTriggers[2];
+	float lfoLights[2] = {0.0f, 0.0f};
+	unsigned int lightRefreshCounter = 0;
 
 	
 	Pulsars() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		// Need to save, no reset
-		panelTheme = 0;
-		
-		// No need to save, no reset		
-		for (int i = 0; i < 2; i++) {
-			lfoLights[i] = 0.0f;
-			voidTriggers[i].reset();
-			revTriggers[i].reset();
-			rndTriggers[i].reset();
-		}
-		
 		onReset();
 	}
 
 	
-	// widgets are not yet created when module is created 
-	// even if widgets not created yet, can use params[] and should handle 0.0f value since step may call 
-	//   this before widget creation anyways
-	// called from the main thread if by constructor, called by engine thread if right-click initialization
-	//   when called by constructor, module is created before the first step() is called
 	void onReset() override {
-		// Need to save, with reset
 		cvMode = 0;
 		for (int i = 0; i < 2; i++) {
-			topCross[i] = false;
 			isVoid[i] = false;
 			isReverse[i] = false;
 			isRandom[i] = false;
+			topCross[i] = false;
 		}
-		// No need to save, with reset
 		posA = 0;// no need to check isVoid here, will be checked in step()
 		posB = 0;// no need to check isVoid here, will be checked in step()
 		posAnext = 1;// no need to check isVoid here, will be checked in step()
@@ -111,16 +92,12 @@ struct Pulsars : Module {
 	}
 
 	
-	// widgets randomized before onRandomize() is called
-	// called by engine thread if right-click randomize
 	void onRandomize() override {
-		// Need to save, with reset
 		for (int i = 0; i < 2; i++) {
 			isVoid[i] = (randomu32() % 2) > 0;
 			isReverse[i] = (randomu32() % 2) > 0;
 			isRandom[i] = (randomu32() % 2) > 0;
 		}
-		// No need to save, with reset
 		posA = randomu32() % 8;// no need to check isVoid here, will be checked in step()
 		posB = randomu32() % 8;// no need to check isVoid here, will be checked in step()
 		posAnext = (posA + (isReverse[0] ? 7 : 1)) % 8;// no need to check isVoid here, will be checked in step()
@@ -128,10 +105,8 @@ struct Pulsars : Module {
 	}
 
 	
-	// called by main thread
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		// Need to save (reset or not)
 
 		// isVoid
 		json_object_set_new(rootJ, "isVoid0", json_real(isVoid[0]));
@@ -155,34 +130,30 @@ struct Pulsars : Module {
 	}
 
 	
-	// widgets have their fromJson() called before this fromJson() is called
-	// called by main thread
 	void fromJson(json_t *rootJ) override {
-		// Need to save (reset or not)
-
 		// isVoid
 		json_t *isVoid0J = json_object_get(rootJ, "isVoid0");
 		if (isVoid0J)
-			isVoid[0] = json_real_value(isVoid0J);
+			isVoid[0] = json_number_value(isVoid0J);
 		json_t *isVoid1J = json_object_get(rootJ, "isVoid1");
 		if (isVoid1J)
-			isVoid[1] = json_real_value(isVoid1J);
+			isVoid[1] = json_number_value(isVoid1J);
 
 		// isReverse
 		json_t *isReverse0J = json_object_get(rootJ, "isReverse0");
 		if (isReverse0J)
-			isReverse[0] = json_real_value(isReverse0J);
+			isReverse[0] = json_number_value(isReverse0J);
 		json_t *isReverse1J = json_object_get(rootJ, "isReverse1");
 		if (isReverse1J)
-			isReverse[1] = json_real_value(isReverse1J);
+			isReverse[1] = json_number_value(isReverse1J);
 
 		// isRandom
 		json_t *isRandom0J = json_object_get(rootJ, "isRandom0");
 		if (isRandom0J)
-			isRandom[0] = json_real_value(isRandom0J);
+			isRandom[0] = json_number_value(isRandom0J);
 		json_t *isRandom1J = json_object_get(rootJ, "isRandom1");
 		if (isRandom1J)
-			isRandom[1] = json_real_value(isRandom1J);
+			isRandom[1] = json_number_value(isRandom1J);
 
 		// panelTheme
 		json_t *panelThemeJ = json_object_get(rootJ, "panelTheme");
@@ -194,7 +165,6 @@ struct Pulsars : Module {
 		if (cvModeJ)
 			cvMode = json_integer_value(cvModeJ);
 
-		// No need to save, with reset
 		posA = 0;// no need to check isVoid here, will be checked in step()
 		posB = 0;// no need to check isVoid here, will be checked in step()
 		posAnext = (posA + (isReverse[0] ? 7 : 1)) % 8;// no need to check isVoid here, will be checked in step()
@@ -202,26 +172,30 @@ struct Pulsars : Module {
 	}
 
 	
-	// Advances the module by 1 audio frame with duration 1.0 / engineGetSampleRate()
 	void step() override {		
-		// Void, Reverse and Random buttons
-		for (int i = 0; i < 2; i++) {
-			if (voidTriggers[i].process(params[VOID_PARAMS + i].value + inputs[VOID_INPUTS + i].value)) {
-				isVoid[i] = !isVoid[i];
-			}
-			if (revTriggers[i].process(params[REV_PARAMS + i].value + inputs[REV_INPUTS + i].value)) {
-				isReverse[i] = !isReverse[i];
-			}
-			if (rndTriggers[i].process(params[RND_PARAMS + i].value)) {// + inputs[RND_INPUTS + i].value)) {
-				isRandom[i] = !isRandom[i];
-			}
-		}
 		
-		// CV Level buttons
-		for (int i = 0; i < 2; i++) {
-			if (cvLevelTriggers[i].process(params[CVLEVEL_PARAMS + i].value))
-				cvMode ^= (0x1 << i);
-		}
+		if ((lightRefreshCounter & userInputsStepSkipMask) == 0) {
+
+			// Void, Reverse and Random buttons
+			for (int i = 0; i < 2; i++) {
+				if (voidTriggers[i].process(params[VOID_PARAMS + i].value + inputs[VOID_INPUTS + i].value)) {
+					isVoid[i] = !isVoid[i];
+				}
+				if (revTriggers[i].process(params[REV_PARAMS + i].value + inputs[REV_INPUTS + i].value)) {
+					isReverse[i] = !isReverse[i];
+				}
+				if (rndTriggers[i].process(params[RND_PARAMS + i].value)) {// + inputs[RND_INPUTS + i].value)) {
+					isRandom[i] = !isRandom[i];
+				}
+			}
+			
+			// CV Level buttons
+			for (int i = 0; i < 2; i++) {
+				if (cvLevelTriggers[i].process(params[CVLEVEL_PARAMS + i].value))
+					cvMode ^= (0x1 << i);
+			}
+			
+		}// userInputs refresh
 
 		// LFO values (normalized to 0.0f to 1.0f space, clamped and offset adjusted depending cvMode)
 		float lfoVal[2];
@@ -229,6 +203,7 @@ struct Pulsars : Module {
 		lfoVal[1] = inputs[LFO_INPUTS + 1].active ? inputs[LFO_INPUTS + 1].value : lfoVal[0];
 		for (int i = 0; i < 2; i++)
 			lfoVal[i] = clamp( (lfoVal[i] + ((cvMode & (0x1 << i)) == 0 ? 5.0f : 0.0f)) / 10.0f , 0.0f , 1.0f);
+		
 		
 		// Pulsar A
 		bool active8[8];
@@ -308,24 +283,33 @@ struct Pulsars : Module {
 		}
 
 		
-		// Void, Reverse and Random lights
-		for (int i = 0; i < 2; i++) {
-			lights[VOID_LIGHTS + i].value = isVoid[i] ? 1.0f : 0.0f;
-			lights[REV_LIGHTS + i].value = isReverse[i] ? 1.0f : 0.0f;
-			lights[RND_LIGHTS + i].value = isRandom[i] ? 1.0f : 0.0f;
-		}
-		
-		// CV Level lights
-		lights[CVALEVEL_LIGHTS + 0].value = (cvMode & 0x1) == 0 ? 1.0f : 0.0f;
-		lights[CVALEVEL_LIGHTS + 1].value = 1.0f - lights[CVALEVEL_LIGHTS + 0].value;
-		lights[CVBLEVEL_LIGHTS + 0].value = (cvMode & 0x2) == 0 ? 1.0f : 0.0f;
-		lights[CVBLEVEL_LIGHTS + 1].value = 1.0f - lights[CVBLEVEL_LIGHTS + 0].value;
+		lightRefreshCounter++;
+		if (lightRefreshCounter >= displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
 
-		// LFO lights
-		for (int i = 0; i < 2; i++) {
-			lights[LFO_LIGHTS + i].value = lfoLights[i];
-			lfoLights[i] -= (lfoLights[i] / lightLambda) * (float)engineGetSampleTime();
-		}
+			// Void, Reverse and Random lights
+			for (int i = 0; i < 2; i++) {
+				lights[VOID_LIGHTS + i].value = isVoid[i] ? 1.0f : 0.0f;
+				lights[REV_LIGHTS + i].value = isReverse[i] ? 1.0f : 0.0f;
+				lights[RND_LIGHTS + i].value = isRandom[i] ? 1.0f : 0.0f;
+			}
+			
+			// CV Level lights
+			bool isBiolar = (cvMode & 0x1) == 0;
+			lights[CVALEVEL_LIGHTS + 0].value = isBiolar ? 1.0f : 0.0f;
+			lights[CVALEVEL_LIGHTS + 1].value = isBiolar ? 0.0f : 1.0f;
+			isBiolar = (cvMode & 0x2) == 0;
+			lights[CVBLEVEL_LIGHTS + 0].value = isBiolar ? 1.0f : 0.0f;
+			lights[CVBLEVEL_LIGHTS + 1].value = isBiolar ? 0.0f : 1.0f;
+
+			// LFO lights
+			for (int i = 0; i < 2; i++) {
+				lights[LFO_LIGHTS + i].value = lfoLights[i];
+				lfoLights[i] -= (lfoLights[i] / lightLambda) * (float)engineGetSampleTime() * displayRefreshStepSkips;
+			}
+			
+		}// lightRefreshCounter
+		
 	}// step()
 	
 	
@@ -374,7 +358,6 @@ struct Pulsars : Module {
 		}
 		return posNext;
 	}
-
 };
 
 
@@ -413,7 +396,7 @@ struct PulsarsWidget : ModuleWidget {
 		darkItem->text = darkPanelID;// Geodesics.hpp
 		darkItem->module = module;
 		darkItem->theme = 1;
-		//menu->addChild(darkItem);
+		menu->addChild(darkItem);
 		
 		return menu;
 	}	
@@ -421,8 +404,8 @@ struct PulsarsWidget : ModuleWidget {
 	PulsarsWidget(Pulsars *module) : ModuleWidget(module) {
 		// Main panel from Inkscape
         DynamicSVGPanel *panel = new DynamicSVGPanel();
-        panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/PulsarsBG-01.svg")));
-        //panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/PulsarsBG-02.svg")));// no dark pannel for now
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/WhiteLight/Pulsars-WL.svg")));
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/DarkMatter/Pulsars-DM.svg")));
         box.size = panel->box.size;
         panel->mode = &module->panelTheme;
         addChild(panel);
@@ -559,6 +542,10 @@ RACK_PLUGIN_MODEL_INIT(Geodesics, Pulsars) {
 }
 
 /*CHANGE LOG
+
+0.6.5:
+input refresh optimization
+step optimization of lights refresh
 
 0.6.1:
 add CV level modes buttons and lights, remove from right-click menu

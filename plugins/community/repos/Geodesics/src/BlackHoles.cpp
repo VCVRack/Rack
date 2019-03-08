@@ -33,7 +33,7 @@ struct BlackHoles : Module {
 	};
 	enum LightIds {
 		ENUMS(EXP_LIGHTS, 2),
-		ENUMS(WORMHOLE_LIGHT, 2),// room for WhiteRed
+		WORMHOLE_LIGHT,
 		ENUMS(CVALEVEL_LIGHTS, 2),// White, but two lights (light 0 is cvMode bit = 0, light 1 is cvMode bit = 1)
 		ENUMS(CVBLEVEL_LIGHTS, 2),// White, but two lights
 		NUM_LIGHTS
@@ -43,70 +43,44 @@ struct BlackHoles : Module {
 	// Constants
 	static constexpr float expBase = 50.0f;
 
-	// Need to save, with reset
+	
+	// Need to save
+	int panelTheme = 0;
 	bool isExponential[2];
 	bool wormhole;
 	int cvMode;// 0 is -5v to 5v, 1 is -10v to 10v; bit 0 is upper BH, bit 1 is lower BH
 	
-	// Need to save, no reset
-	int panelTheme;
 	
-	// No need to save, with reset
-	// none
-	
-	// No need to save, no reset
-	SchmittTrigger expTriggers[2];
-	SchmittTrigger cvLevelTriggers[2];
-	SchmittTrigger wormholeTrigger;
+	// No need to save
+	Trigger expTriggers[2];
+	Trigger cvLevelTriggers[2];
+	Trigger wormholeTrigger;
+	unsigned int lightRefreshCounter = 0;
 
 	
 	BlackHoles() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		// Need to save, no reset
-		panelTheme = 0;
-
-		// No need to save, no reset		
-		expTriggers[0].reset();
-		expTriggers[1].reset();
-		
 		onReset();
 	}
 
 	
-	// widgets are not yet created when module is created 
-	// even if widgets not created yet, can use params[] and should handle 0.0f value since step may call 
-	//   this before widget creation anyways
-	// called from the main thread if by constructor, called by engine thread if right-click initialization
-	//   when called by constructor, module is created before the first step() is called
 	void onReset() override {
-		// Need to save, with reset
-		cvMode = 0x3;
 		isExponential[0] = false;
 		isExponential[1] = false;
 		wormhole = true;
-		
-		// No need to save, with reset
-		// none
+		cvMode = 0x3;
 	}
 
 	
-	// widgets randomized before onRandomize() is called
-	// called by engine thread if right-click randomize
 	void onRandomize() override {
-		// Need to save, with reset
 		for (int i = 0; i < 2; i++) {
 			isExponential[i] = (randomu32() % 2) > 0;
 		}
 		wormhole = (randomu32() % 2) > 0;
-		
-		// No need to save, with reset
-		// none
 	}
 
 	
-	// called by main thread
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		// Need to save (reset or not)
 
 		// isExponential
 		json_object_set_new(rootJ, "isExponential0", json_real(isExponential[0]));
@@ -125,18 +99,14 @@ struct BlackHoles : Module {
 	}
 
 	
-	// widgets have their fromJson() called before this fromJson() is called
-	// called by main thread
 	void fromJson(json_t *rootJ) override {
-		// Need to save (reset or not)
-
 		// isExponential
 		json_t *isExponential0J = json_object_get(rootJ, "isExponential0");
 		if (isExponential0J)
-			isExponential[0] = json_real_value(isExponential0J);
+			isExponential[0] = json_number_value(isExponential0J);
 		json_t *isExponential1J = json_object_get(rootJ, "isExponential1");
 		if (isExponential1J)
-			isExponential[1] = json_real_value(isExponential1J);
+			isExponential[1] = json_number_value(isExponential1J);
 
 		// wormhole
 		json_t *wormholeJ = json_object_get(rootJ, "wormhole");
@@ -152,31 +122,30 @@ struct BlackHoles : Module {
 		json_t *cvModeJ = json_object_get(rootJ, "cvMode");
 		if (cvModeJ)
 			cvMode = json_integer_value(cvModeJ);
-
-		// No need to save, with reset
-		// none
 	}
 
 	
-	// Advances the module by 1 audio frame with duration 1.0 / engineGetSampleRate()
 	void step() override {		
-		// Exponential buttons
-		for (int i = 0; i < 2; i++)
-			if (expTriggers[i].process(params[EXP_PARAMS + i].value)) {
-				isExponential[i] = !isExponential[i];
-		}
-		
-		// Wormhole buttons
-		if (wormholeTrigger.process(params[WORMHOLE_PARAM].value)) {
-			wormhole = ! wormhole;
-		}
+		if ((lightRefreshCounter & userInputsStepSkipMask) == 0) {
 
-		// CV Level buttons
-		for (int i = 0; i < 2; i++) {
-			if (cvLevelTriggers[i].process(params[CVLEVEL_PARAMS + i].value))
-				cvMode ^= (0x1 << i);
-		}
+			// Exponential buttons
+			for (int i = 0; i < 2; i++)
+				if (expTriggers[i].process(params[EXP_PARAMS + i].value)) {
+					isExponential[i] = !isExponential[i];
+			}
+			
+			// Wormhole buttons
+			if (wormholeTrigger.process(params[WORMHOLE_PARAM].value)) {
+				wormhole = ! wormhole;
+			}
+
+			// CV Level buttons
+			for (int i = 0; i < 2; i++) {
+				if (cvLevelTriggers[i].process(params[CVLEVEL_PARAMS + i].value))
+					cvMode ^= (0x1 << i);
+			}
 		
+		}// userInputs refresh
 		
 		// BlackHole 0 all outputs
 		float blackHole0 = 0.0f;
@@ -195,15 +164,12 @@ struct BlackHoles : Module {
 		// BlackHole 1 all outputs
 		float blackHole1 = 0.0f;
 		float inputs1[4] = {10.0f, 10.0f, 10.0f, 10.0f};// default to generate CV when no input connected
-		bool allUnconnected = true;
-		for (int i = 0; i < 4; i++) 
-			if (inputs[IN_INPUTS + i + 4].active) {
+		for (int i = 0; i < 4; i++) {
+			if (inputs[IN_INPUTS + i + 4].active)
 				inputs1[i] = inputs[IN_INPUTS + i + 4].value;
-				allUnconnected = false;
-			}
-		if (allUnconnected && wormhole)
-			for (int i = 0; i < 4; i++)
+			else if (wormhole)
 				inputs1[i] = blackHole0;
+		}
 		for (int i = 0; i < 4; i++) {
 			float chanVal = calcChannel(inputs1[i], params[LEVEL_PARAMS + i + 4], inputs[LEVELCV_INPUTS + i + 4], isExponential[1], cvMode >> 1);
 			outputs[OUT_OUTPUTS + i + 4].value = chanVal;
@@ -211,27 +177,34 @@ struct BlackHoles : Module {
 		}
 		outputs[BLACKHOLE_OUTPUTS + 1].value = clamp(blackHole1, -10.0f, 10.0f);
 
-		// Wormhole light
-		lights[WORMHOLE_LIGHT + 0].value = ((wormhole && allUnconnected) ? 1.0f : 0.0f);
-		lights[WORMHOLE_LIGHT + 1].value = ((wormhole && !allUnconnected) ? 1.0f : 0.0f);
-				
-		// isExponential lights
-		for (int i = 0; i < 2; i++)
-			lights[EXP_LIGHTS + i].value = isExponential[i] ? 1.0f : 0.0f;
+		lightRefreshCounter++;
+		if (lightRefreshCounter >= displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
+
+			// Wormhole light
+			lights[WORMHOLE_LIGHT].value = (wormhole ? 1.0f : 0.0f);
+					
+			// isExponential lights
+			for (int i = 0; i < 2; i++)
+				lights[EXP_LIGHTS + i].value = isExponential[i] ? 1.0f : 0.0f;
+			
+			// CV Level lights
+			bool is5V = (cvMode & 0x1) == 0;
+			lights[CVALEVEL_LIGHTS + 0].value = is5V ? 1.0f : 0.0f;
+			lights[CVALEVEL_LIGHTS + 1].value = is5V ? 0.0f : 1.0f;
+			is5V = (cvMode & 0x2) == 0;
+			lights[CVBLEVEL_LIGHTS + 0].value = is5V ? 1.0f : 0.0f;
+			lights[CVBLEVEL_LIGHTS + 1].value = is5V ? 0.0f : 1.0f;
+
+		}// lightRefreshCounter
 		
-		// CV Level lights
-		lights[CVALEVEL_LIGHTS + 0].value = (cvMode & 0x1) == 0 ? 1.0f : 0.0f;
-		lights[CVALEVEL_LIGHTS + 1].value = 1.0f - lights[CVALEVEL_LIGHTS + 0].value;
-		lights[CVBLEVEL_LIGHTS + 0].value = (cvMode & 0x2) == 0 ? 1.0f : 0.0f;
-		lights[CVBLEVEL_LIGHTS + 1].value = 1.0f - lights[CVBLEVEL_LIGHTS + 0].value;
-	
 	}// step()
 	
-	float calcChannel(float in, Param &level, Input &levelCV, bool isExp, int cvMode) {
-		float levCv = levelCV.active ? (levelCV.value / (cvMode != 0 ? 10.0f : 5.0f)) : 0.0f;
+	inline float calcChannel(float in, Param &level, Input &levelCV, bool isExp, int cvMode) {
+		float levCv = levelCV.active ? (levelCV.value * (cvMode != 0 ? 0.1f : 0.2f)) : 0.0f;
 		float lev = clamp(level.value + levCv, -1.0f, 1.0f);
 		if (isExp) {
-			float newlev = rescale(powf(expBase, fabs(lev)), 1.0f, expBase, 0.0f, 1.0f);
+			float newlev = rescale(powf(expBase, fabsf(lev)), 1.0f, expBase, 0.0f, 1.0f);
 			if (lev < 0.0f)
 				newlev *= -1.0f;
 			lev = newlev;
@@ -277,7 +250,7 @@ struct BlackHolesWidget : ModuleWidget {
 		darkItem->text = darkPanelID;// Geodesics.hpp
 		darkItem->module = module;
 		darkItem->theme = 1;
-		//menu->addChild(darkItem);
+		menu->addChild(darkItem);
 
 		return menu;
 	}	
@@ -285,8 +258,8 @@ struct BlackHolesWidget : ModuleWidget {
 	BlackHolesWidget(BlackHoles *module) : ModuleWidget(module) {
 		// Main panel from Inkscape
         DynamicSVGPanel *panel = new DynamicSVGPanel();
-        panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BlackHolesBG-01.svg")));
-        //panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BlackHolesBG-02.svg")));// no dark pannel for now
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/WhiteLight/BlackHoles-WL.svg")));
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/DarkMatter/BlackHoles-DM.svg")));
         box.size = panel->box.size;
         panel->mode = &module->panelTheme;
         addChild(panel);
@@ -374,7 +347,7 @@ struct BlackHolesWidget : ModuleWidget {
 		
 		// Wormhole button and light
 		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter - offsetButtonsX, rowRulerBlack1 - offsetButtonsY), module, BlackHoles::WORMHOLE_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));
-		addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter - offsetButtonsX + offsetLedVsBut, rowRulerBlack1 - offsetButtonsY + offsetLedVsBut), module, BlackHoles::WORMHOLE_LIGHT));
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(colRulerCenter - offsetButtonsX + offsetLedVsBut, rowRulerBlack1 - offsetButtonsY + offsetLedVsBut), module, BlackHoles::WORMHOLE_LIGHT));
 		
 		
 		// CV Level A button and light
@@ -401,6 +374,13 @@ RACK_PLUGIN_MODEL_INIT(Geodesics, BlackHoles) {
 }
 
 /*CHANGE LOG
+
+0.6.5:
+input refresh optimization
+step optimization of lights refresh
+
+0.6.3:
+change wormhole behvior, simplified (no all unconnected criteria)
 
 0.6.1:
 add CV level modes buttons and lights

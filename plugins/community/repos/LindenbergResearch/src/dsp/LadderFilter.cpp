@@ -83,7 +83,7 @@ void LadderFilter::setFrequency(float frequency) {
         LadderFilter::frequency = frequency;
         // translate frequency to logarithmic scale
         freqHz = 20.f * powf(1000.f, frequency);
-        freqExp = clamp(freqHz * (1.f / (sr * OVERSAMPLE / 2.f)), 0.f, 1.f);
+        freqExp = clamp(freqHz * (1.f / (sr * OVERSAMPLE / 2.f)), 0.f, 0.9f);
 
         updateResExp();
         invalidate();

@@ -1,5 +1,5 @@
 SLUG = RJModules
-VERSION = 0.6.0
+VERSION = 0.6.1
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=

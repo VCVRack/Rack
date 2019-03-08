@@ -1,11 +1,15 @@
 #include "ValleyWidgets.hpp"
 
  DynamicText::DynamicText() {
-    font = Font::load(assetPlugin(plugin, "res/din1451alt.ttf"));
+    setFont(FONT_MODE_ALTEDIN);
     size = 16;
+    blur = 0.f;
     visibility = nullptr;
     colorHandle = nullptr;
     viewMode = ACTIVE_HIGH_VIEW;
+    horzAlignment = NVG_ALIGN_CENTER;
+    vertAlignment = NVG_ALIGN_TOP;
+    customColor = nvgRGB(0xFF,0xFF,0xFF);
 }
 
 void DynamicText::draw(NVGcontext* vg) {
@@ -16,16 +20,18 @@ void DynamicText::draw(NVGcontext* vg) {
     if(colorHandle != nullptr) {
         switch((ColorMode)*colorHandle) {
             case COLOR_MODE_WHITE: textColor = nvgRGB(0xFF,0xFF,0xFF); break;
-            case COLOR_MODE_BLACK: textColor = nvgRGB(0x14,0x14, 0x14); break;
-            default: textColor = nvgRGB(0xFF,0xFF,0xFF);
+            case COLOR_MODE_BLACK: textColor = nvgRGB(0x14,0x14,0x14); break;
+            case COLOR_MODE_RED: textColor = nvgRGB(0xFF,0x00,0x00); break;
+            default: textColor = customColor;
         }
     }
     else {
-        textColor = nvgRGB(0xFF,0xFF,0xFF);
+        textColor = customColor;
     }
 
     nvgFillColor(vg, textColor);
-    nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+    nvgTextAlign(vg, horzAlignment | vertAlignment);
+    nvgFontBlur(vg, blur);
     nvgText(vg, textPos.x, textPos.y, text->c_str(), NULL);
 }
 
@@ -40,6 +46,19 @@ void DynamicText::step() {
         if(viewMode == ACTIVE_LOW_VIEW) {
             visible = !visible;
         }
+    }
+}
+
+void DynamicText::setFont(const FontMode& newFontMode) {
+    switch(newFontMode) {
+        case FONT_MODE_ALTEDIN:
+            font = Font::load(assetPlugin(plugin, "res/din1451alt.ttf"));
+            break;
+        case FONT_MODE_7SEG:
+            font = Font::load(assetPlugin(plugin, "res/DSEG14Classic-Italic.ttf"));
+            break;
+        default:
+            font = Font::load(assetPlugin(plugin, "res/din1451alt.ttf"));
     }
 }
 
@@ -116,15 +135,17 @@ void DynamicFrameText::draw(NVGcontext* vg) {
             switch((ColorMode)*colorHandle) {
                 case COLOR_MODE_WHITE: textColor = nvgRGB(0xFF,0xFF,0xFF); break;
                 case COLOR_MODE_BLACK: textColor = nvgRGB(0x14,0x14, 0x14); break;
-                default: textColor = nvgRGB(0xFF,0xFF,0xFF);
+                case COLOR_MODE_RED: textColor = nvgRGB(0xFF,0x00, 0x00); break;
+                default: textColor = customColor;
             }
         }
         else {
-            textColor = nvgRGB(0xFF,0xFF,0xFF);
+            textColor = customColor;
         }
 
         nvgFillColor(vg, textColor);
-        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+        nvgTextAlign(vg, horzAlignment | vertAlignment);
+        nvgFontBlur(vg, blur);
         nvgText(vg, textPos.x, textPos.y, textItem[item].c_str(), NULL);
     }
 }

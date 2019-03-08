@@ -79,7 +79,7 @@ struct BlankInfoWidget : ModuleWidget {
 		darkItem->text = darkPanelID;// Geodesics.hpp
 		darkItem->module = module;
 		darkItem->theme = 1;
-		//menu->addChild(darkItem);
+		menu->addChild(darkItem);
 
 		return menu;
 	}	
@@ -88,8 +88,8 @@ struct BlankInfoWidget : ModuleWidget {
 	BlankInfoWidget(BlankInfo *module) : ModuleWidget(module) {
 		// Main panel from Inkscape
         DynamicSVGPanel *panel = new DynamicSVGPanel();
-        panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BlankInfo-01.svg")));
-        //panel->addPanel(SVG::load(assetPlugin(plugin, "res/dark/BlankInfo-02.svg")));// no dark pannel for now
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/WhiteLight/BlankInfo-WL.svg")));
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/DarkMatter/BlankInfo-DM.svg")));
         box.size = panel->box.size;
         panel->mode = &module->panelTheme;
         addChild(panel);

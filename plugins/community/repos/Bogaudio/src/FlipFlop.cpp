@@ -37,7 +37,7 @@ void FlipFlop::channelStep(
 	Output& aOutput,
 	Output& bOutput,
 	PositiveZeroCrossing& trigger,
-	SchmittTrigger& resetTrigger,
+	Trigger& resetTrigger,
 	bool& flipped
 ) {
 	bool triggered = trigger.next(triggerInput.value);

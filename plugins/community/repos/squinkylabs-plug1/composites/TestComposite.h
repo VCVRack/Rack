@@ -11,8 +11,8 @@ class TestComposite
 {
 public:
     TestComposite() :
-        inputs(20),
-        outputs(20),
+        inputs(40),
+        outputs(40),
         params(40),
         lights(20)
     {

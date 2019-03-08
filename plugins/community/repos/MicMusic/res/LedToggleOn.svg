@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="10" height="10" viewBox="0 0 5 5" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <g id="layer1"/>
+  <circle style="fill: rgb(216, 216, 216);" cx="2.5" cy="2.5" r="2.5"/>
+  <circle style="fill: rgb(255, 30, 30);" cx="2.5" cy="2.5" r="2"/>
+</svg>

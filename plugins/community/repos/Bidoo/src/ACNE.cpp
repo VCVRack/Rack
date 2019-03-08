@@ -14,7 +14,11 @@ struct ACNE : Module {
 	  COPY_PARAM,
 		MAIN_OUT_GAIN_PARAM,
 		RAMP_PARAM,
-		OUT_MUTE_PARAMS,
+		MUTE_PARAM,
+		SOLO_PARAM,
+		SEND_MUTE_PARAM,
+		TRACKLINK_PARAMS,
+		OUT_MUTE_PARAMS = TRACKLINK_PARAMS + 8,
 		IN_MUTE_PARAMS = OUT_MUTE_PARAMS + ACNE_NB_OUTS,
 		IN_SOLO_PARAMS = IN_MUTE_PARAMS + ACNE_NB_TRACKS,
 		SNAPSHOT_PARAMS = IN_SOLO_PARAMS + ACNE_NB_TRACKS,
@@ -32,7 +36,8 @@ struct ACNE : Module {
 	};
 	enum LightIds {
 		COPY_LIGHT,
-		OUT_MUTE_LIGHTS,
+		TRACKLINK_LIGHTS,
+		OUT_MUTE_LIGHTS = TRACKLINK_LIGHTS + 8,
 		IN_MUTE_LIGHTS = OUT_MUTE_LIGHTS + ACNE_NB_OUTS,
 		IN_SOLO_LIGHTS = IN_MUTE_LIGHTS + ACNE_NB_TRACKS,
 		SNAPSHOT_LIGHTS = IN_SOLO_LIGHTS + ACNE_NB_TRACKS,
@@ -51,10 +56,14 @@ struct ACNE : Module {
 	SchmittTrigger inMutesTriggers[ACNE_NB_TRACKS];
 	SchmittTrigger inSoloTriggers[ACNE_NB_TRACKS];
 	SchmittTrigger snapshotTriggers[ACNE_NB_SNAPSHOTS];
+	SchmittTrigger muteTrigger;
+	SchmittTrigger soloTrigger;
 	int rampSteps = 0;
 	int rampSize = 1;
 	float rampedValue = 0.0;
 	int version = 0;
+	SchmittTrigger linksTriggers[8];
+	bool links[8] = {0,0,0,0,0,0,0,0};
 
 	ACNE() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {	}
 
@@ -78,6 +87,10 @@ struct ACNE : Module {
 		}
 		json_object_set_new(rootJ, "snapshots", snapShotsJ);
 
+		for (int i = 0; i < 8; i++) {
+			json_object_set_new(rootJ, ("link" + to_string(i)).c_str(), json_boolean(links[i]));
+		}
+
 		return rootJ;
 	}
 
@@ -94,13 +107,19 @@ struct ACNE : Module {
 							for (int k = 0; k < ACNE_NB_TRACKS; k++) {
 								json_t *inJ = json_array_get(outJ, k);
 								if (inJ) {
-									snapshots[i][j][k] = json_real_value(inJ);
+									snapshots[i][j][k] = json_number_value(inJ);
 								}
 							}
 						}
 					}
 				}
 			}
+		}
+
+		for (int i = 0; i < 8; i++) {
+			json_t *linkJ = json_object_get(rootJ, ("link" + to_string(i)).c_str());
+			if (linkJ)
+				links[i] = json_is_true(linkJ);
 		}
 	}
 
@@ -119,7 +138,7 @@ void ACNE::step() {
 	rampSize = static_cast<int>(engineGetSampleRate()*params[RAMP_PARAM].value);
 
 	if (inputs[SNAPSHOT_INPUT].active) {
-		int newSnapshot = clamp((int)(inputs[SNAPSHOT_INPUT].value * 16 / 10),0,ACNE_NB_SNAPSHOTS-1);
+		int newSnapshot = clamp((int)(inputs[SNAPSHOT_INPUT].value * 16 * 0.1f),0,ACNE_NB_SNAPSHOTS-1);
 		if (currentSnapshot != newSnapshot) {
 			previousSnapshot = currentSnapshot;
 			currentSnapshot = newSnapshot;
@@ -144,12 +163,51 @@ void ACNE::step() {
 		}
 	}
 
+	for (int i = 0; i < 8; i++) {
+		if (linksTriggers[i].process(params[TRACKLINK_PARAMS + i].value))
+			links[i] = !links[i];
+
+		lights[TRACKLINK_LIGHTS + i].value = (links[i] == true) ? 1 : 0;
+	}
+
 	for (int i = 0; i < ACNE_NB_TRACKS; i++) {
+		int linkIndex = i/2;
+		int linkSwitch = i%2;
 		if (inMutesTriggers[i].process(params[IN_MUTE_PARAMS + i].value)) {
 			inMutes[i] = !inMutes[i];
+			if (links[linkIndex]) {
+				if (linkSwitch == 0)
+					inMutes[i+1] = inMutes[i];
+				else
+					inMutes[i-1] = inMutes[i];
+			}
 		}
 		if (inSoloTriggers[i].process(params[IN_SOLO_PARAMS + i].value)) {
 			inSolo[i] = !inSolo[i];
+			if (links[linkIndex]) {
+				if (linkSwitch == 0)
+					inSolo[i+1] = inSolo[i];
+				else
+					inSolo[i-1] = inSolo[i];
+			}
+		}
+	}
+
+	if (muteTrigger.process(params[MUTE_PARAM].value)) {
+		for (int i = 0; i < ACNE_NB_TRACKS; i++) {
+			inMutes[i] = false;
+		}
+	}
+
+	if (muteTrigger.process(params[SEND_MUTE_PARAM].value)) {
+		for (int i = 0; i < ACNE_NB_OUTS; i++) {
+			outMutes[i] = false;
+		}
+	}
+
+	if (soloTrigger.process(params[SOLO_PARAM].value)) {
+		for (int i = 0; i < ACNE_NB_TRACKS; i++) {
+			inSolo[i] = false;
 		}
 	}
 
@@ -163,7 +221,7 @@ void ACNE::step() {
 			if (sum > 0) {
 				for (int j = 0; j < ACNE_NB_TRACKS; j ++) {
 					if ((inputs[TRACKS_INPUTS + j].active) && (inSolo[j])) {
-						outputs[TRACKS_OUTPUTS + i].value = outputs[TRACKS_OUTPUTS + i].value + (getRampedValue(i,j) / 10) * inputs[TRACKS_INPUTS + j].value / 32768.0f;
+						outputs[TRACKS_OUTPUTS + i].value += (getRampedValue(i,j) * 0.1f) * inputs[TRACKS_INPUTS + j].value * 30517578125e-15f;
 					}
 				}
 			}
@@ -176,7 +234,7 @@ void ACNE::step() {
 						else {
 							rampedValue = snapshots[currentSnapshot][i][j];
 						}
-						outputs[TRACKS_OUTPUTS + i].value = outputs[TRACKS_OUTPUTS + i].value + (getRampedValue(i,j) / 10) * inputs[TRACKS_INPUTS + j].value / 32768.0f;
+						outputs[TRACKS_OUTPUTS + i].value += (getRampedValue(i,j) * 0.1f) * inputs[TRACKS_INPUTS + j].value * 30517578125e-15f;
 					}
 				}
 			}
@@ -187,8 +245,8 @@ void ACNE::step() {
 	if (rampSteps > 0)
 		rampSteps--;
 
-	outputs[TRACKS_OUTPUTS].value = outputs[TRACKS_OUTPUTS].value * params[MAIN_OUT_GAIN_PARAM].value / 10;
-	outputs[TRACKS_OUTPUTS + 1].value = outputs[TRACKS_OUTPUTS + 1].value * params[MAIN_OUT_GAIN_PARAM].value / 10;
+	outputs[TRACKS_OUTPUTS].value = outputs[TRACKS_OUTPUTS].value * params[MAIN_OUT_GAIN_PARAM].value * 0.1f;
+	outputs[TRACKS_OUTPUTS + 1].value = outputs[TRACKS_OUTPUTS + 1].value * params[MAIN_OUT_GAIN_PARAM].value * 0.1f;
 
 	lights[COPY_LIGHT].value = (copyState == true) ? 1 : 0;
 	for (int i = 0; i < ACNE_NB_OUTS; i++) {
@@ -217,7 +275,7 @@ struct ACNETrimPot : BidooColoredTrimpot {
 			ACNEWidget *parent = dynamic_cast<ACNEWidget*>(this->parent);
 			ACNE *module = dynamic_cast<ACNE*>(this->module);
 			if (parent && module) {
-				module->snapshots[module->currentSnapshot][(int)((this->paramId - ACNE::FADERS_PARAMS)/ACNE_NB_TRACKS)][(this->paramId - ACNE::FADERS_PARAMS)%ACNE_NB_TRACKS] = value;
+				module->snapshots[module->currentSnapshot][(int)((this->paramId - ACNE::FADERS_PARAMS) / ACNE_NB_TRACKS)][(this->paramId - ACNE::FADERS_PARAMS) % ACNE_NB_TRACKS] = value;
 			}
 			BidooColoredTrimpot::onChange(e);
 	}
@@ -229,7 +287,7 @@ struct ACNETrimPot : BidooColoredTrimpot {
 		if (parent && module) {
 			if ((e.button == RACK_MOUSE_BUTTON_MIDDLE) || ((e.button == RACK_MOUSE_BUTTON_LEFT) && (windowIsShiftPressed()))) {
 				this->setValue(10);
-				module->snapshots[module->currentSnapshot][(int)((this->paramId - ACNE::FADERS_PARAMS)/ACNE_NB_TRACKS)][(this->paramId - ACNE::FADERS_PARAMS)%ACNE_NB_TRACKS] = 10;
+				module->snapshots[module->currentSnapshot][(int)((this->paramId - ACNE::FADERS_PARAMS) / ACNE_NB_TRACKS)][(this->paramId - ACNE::FADERS_PARAMS) % ACNE_NB_TRACKS] = 10;
 			}
 		}
 	}
@@ -286,6 +344,10 @@ ACNEWidget::ACNEWidget(ACNE *module) : ModuleWidget(module) {
 
 	addInput(Port::create<TinyPJ301MPort>(Vec(58.0f, 30.0f), Port::INPUT, module, ACNE::SNAPSHOT_INPUT));
 
+	addParam(ParamWidget::create<MuteBtn>(Vec(2.0f, 293.0f), module, ACNE::SEND_MUTE_PARAM, 0.0f, 1.0f, 0.0f));
+	addParam(ParamWidget::create<MuteBtn>(Vec(21.0f, 293.0f), module, ACNE::MUTE_PARAM, 0.0f, 1.0f, 0.0f));
+	addParam(ParamWidget::create<SoloBtn>(Vec(11.0f, 314.0f), module, ACNE::SOLO_PARAM, 0.0f, 1.0f, 0.0f));
+
 	for (int i = 0; i < ACNE_NB_OUTS; i++) {
 		addOutput(Port::create<TinyPJ301MPort>(Vec(482.0f, 79.0f+i*27.0f),Port::OUTPUT, module, ACNE::TRACKS_OUTPUTS + i));
 
@@ -304,6 +366,11 @@ ACNEWidget::ACNEWidget(ACNE *module) : ModuleWidget(module) {
 
 		addParam(ParamWidget::create<LEDButton>(Vec(43.0f+i*27.0f, 314.0f), module, ACNE::IN_SOLO_PARAMS + i, 0.0f, 1.0f,  0.0f));
 		addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(49.0f+i*27.0f, 320.0f), module, ACNE::IN_SOLO_LIGHTS + i));
+	}
+
+	for (int i = 0; i < 8; i++) {
+		addParam(ParamWidget::create<MiniLEDButton>(Vec(62.0f+i*54.0f, 309.0f), module, ACNE::TRACKLINK_PARAMS + i, 0.0f, 10.0f,  0.0f));
+		addChild(ModuleLightWidget::create<SmallLight<BlueLight>>(Vec(62.0f+i*54.0f, 309.0f), module, ACNE::TRACKLINK_LIGHTS + i));
 	}
 
 	for (int i = 0; i < ACNE_NB_OUTS; i++) {

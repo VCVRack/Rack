@@ -82,17 +82,17 @@ DGWidget::DGWidget(DGModule *module) :
         addChild(panel);
     }
 
-     addLabel(Vec(35, 20), "Daveguide");
+    addLabel(Vec(35, 20), "Daveguide");
 
     addInput(createInputCentered<PJ301MPort>(
-            Vec(40,340),
-            module,
-            Daveguide<WidgetComposite>::AUDIO_INPUT));
+        Vec(40, 340),
+        module,
+        Daveguide<WidgetComposite>::AUDIO_INPUT));
 
     addOutput(createOutputCentered<PJ301MPort>(
-            Vec(120,340),
-            module,
-            Daveguide<WidgetComposite>::AUDIO_OUTPUT));
+        Vec(120, 340),
+        module,
+        Daveguide<WidgetComposite>::AUDIO_OUTPUT));
 
 
     const float labelDeltaY = 25;
@@ -105,31 +105,31 @@ DGWidget::DGWidget(DGModule *module) :
     addParam(createParamCentered<Rogan1PSBlue>(
         Vec(gainX, y),
         module, Daveguide<WidgetComposite>::OCTAVE_PARAM, -5, 5, 0));
-    addLabel(Vec(gainX+labelDeltaX, y + labelDeltaY), "octave");
+    addLabel(Vec(gainX + labelDeltaX, y + labelDeltaY), "octave");
 
     addParam(createParamCentered<Rogan1PSBlue>(
         Vec(offsetX, y),
         module, Daveguide<WidgetComposite>::TUNE_PARAM, -5, 5, 0));
-    addLabel(Vec(offsetX+labelDeltaX,  y + labelDeltaY), "tune");
+    addLabel(Vec(offsetX + labelDeltaX, y + labelDeltaY), "tune");
 
-     addParam(createParamCentered<Rogan1PSBlue>(
+    addParam(createParamCentered<Rogan1PSBlue>(
         Vec(gainX, y2),
         module, Daveguide<WidgetComposite>::DECAY_PARAM, -5, 5, 0));
-    addLabel(Vec(gainX+labelDeltaX, y2 + labelDeltaY), "decay");
+    addLabel(Vec(gainX + labelDeltaX, y2 + labelDeltaY), "decay");
 
     addParam(createParamCentered<Rogan1PSBlue>(
         Vec(offsetX, y2),
         module, Daveguide<WidgetComposite>::FC_PARAM, -5, 5, 0));
-    addLabel(Vec(offsetX+labelDeltaX,  y2 + labelDeltaY), "filter");
+    addLabel(Vec(offsetX + labelDeltaX, y2 + labelDeltaY), "filter");
 
 
 
- 
+
     // screws
     addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
     addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
     addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-    addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH))); 
+    addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 }
 
 RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, DG) {

@@ -1,7 +1,10 @@
 ALL_OBJ= \
+	src/dsp/DiodeLadder.o \
 	src/dsp/DSPMath.o \
 	src/dsp/FastTanWF.o \
 	src/dsp/Hardclip.o \
+	src/dsp/kiss_fft/kiss_fft.o \
+	src/dsp/Korg35Filter.o \
 	src/dsp/LadderFilter.o \
 	src/dsp/LambertW.o \
 	src/dsp/Lockhart.o \
@@ -12,20 +15,32 @@ ALL_OBJ= \
 	src/dsp/Saturator.o \
 	src/dsp/Serge.o \
 	src/dsp/WaveShaper.o \
+	src/LRModule.o \
+	src/LRModuleWidget.o \
+	src/widgets/FontIconWidget.o \
 	src/widgets/LRCVIndicator.o \
 	src/widgets/LRKnob.o \
+	src/widgets/LRGradientWidget.o \
 	src/widgets/LRLCDWidget.o \
 	src/widgets/LRLight.o \
 	src/widgets/LRPanel.o \
+	src/widgets/LRPatinaWidget.o \
 	src/widgets/LRShadow.o \
 	src/widgets/LRSVGRotator.o \
-	src/AlmaFilter.o \
-	src/BlankPanel.o \
-	src/BlankPanelM1.o \
-	src/LindenbergResearch.o \
-	src/MS20Filter.o \
-	src/QuickMix.o \
-	src/ReShaper.o \
-	src/SimpleFilter.o \
-	src/VCO.o \
-	src/Westcoast.o
+	src/modules/AlmaFilter.o \
+	src/modules/BlankPanel.o \
+	src/modules/BlankPanelEmpty.o \
+	src/modules/BlankPanelSmall.o \
+	src/modules/BlankPanelWood.o \
+	src/modules/DiodeVCF.o \
+	src/modules/Korg35.o \
+	src/modules/MS20Filter.o \
+	src/modules/QuickMix.o \
+	src/modules/ReShaper.o \
+	src/modules/SimpleFilter.o \
+	src/modules/Speck.o \
+	src/modules/VCO.o \
+	src/modules/Westcoast.o \
+	src/LindenbergResearch.o
+
+#	src/modules/BlankPanelM1.o

@@ -3,6 +3,13 @@
 #include "alikins.hpp"
 #include "MsDisplayWidget.hpp"
 
+/*
+    This module was inspired by the question and discussion at:
+    https://www.facebook.com/groups/vcvrack/permalink/161960391130780/
+
+    "Okay , Rackheads... ;) Looking for a module that can "stretch" the length , extend the duration , of a gate/ trigger pulse."
+*/
+
 namespace rack_plugin_Alikins {
 
 struct GateLength : Module {
@@ -46,7 +53,7 @@ struct GateLength : Module {
     PulseGenerator gateGenerator[GATE_LENGTH_INPUTS];
 
     GateLength() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
-    
+
     void step() override;
 
     void onReset() override {
@@ -58,10 +65,10 @@ void GateLength::step() {
     // FIXME: add way to support >10.0s gate length
 
     float sample_time = engineGetSampleTime();
-    
+
     for (int i = 0; i < GATE_LENGTH_INPUTS; i++) {
         gate_length[i] = clamp(params[GATE_LENGTH_PARAM1 + i].value + inputs[GATE_LENGTH_INPUT1 + i].value, 0.0f, 10.0f);
-    
+
         if (inputOnTrigger[i].process(inputs[TRIGGER_INPUT1 + i].value)) {
             // debug("GL INPUT ON TRIGGER %d gate_length: %f", i, gate_length[i]);
             gateGenerator[i].trigger(gate_length[i]);
@@ -81,7 +88,7 @@ GateLengthWidget::GateLengthWidget(GateLength *module) : ModuleWidget(module) {
     setPanel(SVG::load(assetPlugin(plugin, "res/GateLength.svg")));
 
     float y_pos = 2.0f;
-    
+
     for (int i = 0; i < GATE_LENGTH_INPUTS; i++) {
         float x_pos = 4.0f;
         y_pos += 39.0f;

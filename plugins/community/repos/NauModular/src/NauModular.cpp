@@ -12,6 +12,7 @@ RACK_PLUGIN_INIT(NauModular) {
 
    RACK_PLUGIN_INIT_WEBSITE("http://naus3a.github.io/NauModular");
    RACK_PLUGIN_INIT_MANUAL("http://naus3a.github.io/NauModular");
+   // https://github.com/naus3a/NauModular
 
    RACK_PLUGIN_MODEL_ADD(NauModular, Tension);
    RACK_PLUGIN_MODEL_ADD(NauModular, Function);

@@ -94,6 +94,8 @@ static void printStats(const char * label, const LowpassStats& stats)
     printf("%s band=%.2f,%.2f atten=%.2f\n", label, stats.passBandStop, stats.stopBandStart, stats.stopBandAttenuation);
 }
 
+
+// Does this really work?
 static void testButter4Hi()
 {
     const float Fc = 100;
@@ -140,30 +142,36 @@ static void testButter6()
 #endif
 }
 
-static void testButter6Obj()
+static void testButter6Obj(float div, float fcTolerance)
 {
-    const float fc = sampleRate / 64;
-  //  BiquadParams<float, 3> params;
-    auto params = ObjectCache<float>::get6PLPParams(1.f / 64.f);
+    const float fc = sampleRate / div;
+    auto params = ObjectCache<float>::get6PLPParams(1.f / div);
     BiquadState<float, 3> state;
-
-   // ButterworthFilterDesigner<float>::designSixPoleLowpass(
-   //     params, Fc / sampleRate);
 
     std::function<float(float)> filter = [&state, &params](float x) {
         x = (float) BiquadFilter<float>::run(x, state, *params);
         return x;
     };
-
-    
+ 
     const LowpassStats stats = characterizeLowpassFilter(filter, -60);
-    assertClose(stats.stopBandStart, fc * 3.17, 20);
+
+    assertClose(stats.stopBandStart, fc * 3.17, fcTolerance);
     assertClose(stats.passBandStop, fc, 5);
 #ifdef _LOG
     printStats("butter6/obj64", stats);
 #endif
 }
 
+static void testButter6Obj16()
+{
+    // looser tolerance because of high freq warp of z-transform
+    testButter6Obj(16, 1000);
+}
+
+static void testButter6Obj64()
+{
+    testButter6Obj(64, 20);
+}
 static void testButter8()
 {
     const float Fc = 100;
@@ -240,10 +248,10 @@ static void testCheby6_3()
 
 void testFilterDesign()
 {
-   
     testButter6();
     testButter4Hi();
-    testButter6Obj();
+    testButter6Obj64();
+    testButter6Obj16();
     testButter8();
     testCheby6_1();
     testCheby6_3();

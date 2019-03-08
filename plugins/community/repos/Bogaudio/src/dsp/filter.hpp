@@ -186,5 +186,6 @@ struct CICInterpolator : Interpolator {
 	void setParams(float sampleRate, int factor) override;
 	void next(float sample, float* buf) override;
 };
+
 } // namespace dsp
 } // namespace bogaudio

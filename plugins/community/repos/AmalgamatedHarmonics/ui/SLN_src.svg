@@ -14,7 +14,7 @@
    height="380"
    id="svg11791"
    version="1.1"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="SLN_src.svg"
    inkscape:export-filename="/home/vortico/src/cpp/VCV/Rack/plugins/Befaco/res/Rampage.png"
    inkscape:export-xdpi="80.124367"
@@ -954,16 +954,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.6894737"
-     inkscape:cx="-30.085648"
+     inkscape:zoom="1.6763158"
+     inkscape:cx="22.5"
      inkscape:cy="190"
      inkscape:current-layer="layer2"
      showgrid="false"
      units="mm"
-     inkscape:window-width="1440"
-     inkscape:window-height="856"
-     inkscape:window-x="161"
-     inkscape:window-y="12"
+     inkscape:window-width="790"
+     inkscape:window-height="860"
+     inkscape:window-x="959"
+     inkscape:window-y="15"
      inkscape:window-maximized="0"
      showguides="false"
      inkscape:guide-bbox="true"
@@ -1411,13 +1411,13 @@
          sodipodi:role="line" /></text>
     <rect
        transform="scale(1,-1)"
-       ry="4.2187495"
-       y="-376.38678"
+       ry="9.468749"
+       y="-432.38678"
        x="4.9882445"
-       height="45"
+       height="101"
        width="35"
        id="rect1115"
-       style="display:inline;fill:#d4af37;fill-opacity:1;stroke-width:0.78504759" />
+       style="display:inline;fill:#d4af37;fill-opacity:1;stroke-width:1.1761167" />
     <text
        transform="scale(0.99420903,1.0058247)"
        id="text1119"
@@ -1442,24 +1442,15 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:39.76836014px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#d4af37;fill-opacity:1;stroke:none;stroke-width:0.99420899"
-       x="9.1922321"
+       x="2.5667605"
        y="115.71272"
        id="text2688-4"
        transform="scale(0.99420903,1.0058247)"><tspan
          sodipodi:role="line"
          id="tspan2686"
-         x="9.1922321"
+         x="2.5667605"
          y="115.71272"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#d4af37;fill-opacity:1;stroke-width:0.99420899">HOLD</tspan></text>
-    <rect
-       style="display:inline;fill:#d4af37;fill-opacity:1;stroke-width:0.78504759"
-       id="rect2086"
-       width="35"
-       height="45"
-       x="4.9882445"
-       y="-432.38678"
-       ry="4.2187495"
-       transform="scale(1,-1)" />
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#d4af37;fill-opacity:1;stroke-width:0.99420899">SAMPLE</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:39.76836014px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.99420899"
@@ -1472,68 +1463,53 @@
          x="7.8174276"
          y="396.01752"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:0.99420899">NOISE</tspan></text>
-    <rect
-       transform="scale(1,-1)"
-       ry="4.2187495"
-       y="-320.38678"
-       x="4.9882445"
-       height="45"
-       width="35"
-       id="rect2092"
-       style="display:inline;fill:#000000;fill-opacity:1;stroke-width:0.78504759" />
     <text
        transform="scale(0.99420903,1.0058247)"
        id="text2096"
-       y="282.73981"
-       x="2.8515604"
+       y="248.93628"
+       x="3.614954"
        style="font-style:normal;font-weight:normal;font-size:39.76836014px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#d4af37;fill-opacity:1;stroke:none;stroke-width:0.99420899"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#d4af37;fill-opacity:1;stroke-width:0.99420899"
-         y="282.73981"
-         x="2.8515604"
+         y="248.93628"
+         x="3.614954"
          id="tspan2094"
-         sodipodi:role="line">COLOUR</tspan></text>
-    <rect
-       style="display:inline;fill:#000000;fill-opacity:1;stroke-width:0.78504759"
-       id="rect2098"
-       width="35"
-       height="45"
-       x="4.9882445"
-       y="-264.38678"
-       ry="4.2187495"
-       transform="scale(1,-1)" />
+         sodipodi:role="line">CL</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:39.76836014px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#d4af37;fill-opacity:1;stroke:none;stroke-width:0.99420899"
-       x="7.247828"
-       y="227.06407"
+       x="29.375875"
+       y="215.13318"
        id="text2102"
        transform="scale(0.99420903,1.0058247)"><tspan
          sodipodi:role="line"
          id="tspan2100"
-         x="7.247828"
-         y="227.06407"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#d4af37;fill-opacity:1;stroke-width:0.99420899">SLOPE</tspan></text>
-    <rect
-       transform="scale(1,-1)"
-       ry="4.2187495"
-       y="-208.38676"
-       x="4.9882445"
-       height="45"
-       width="35"
-       id="rect2104"
-       style="display:inline;fill:#000000;fill-opacity:1;stroke-width:0.78504759" />
+         x="29.375875"
+         y="215.13318"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#d4af37;fill-opacity:1;stroke-width:0.99420899">SL</tspan></text>
     <text
        transform="scale(0.99420903,1.0058247)"
        id="text2108"
-       y="171.38837"
-       x="6.913836"
+       y="179.34215"
+       x="3.3508673"
        style="font-style:normal;font-weight:normal;font-size:39.76836014px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#d4af37;fill-opacity:1;stroke:none;stroke-width:0.99420899"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#d4af37;fill-opacity:1;stroke-width:0.99420899"
-         y="171.38837"
-         x="6.913836"
+         y="179.34215"
+         x="3.3508673"
          id="tspan2106"
-         sodipodi:role="line">SPEED</tspan></text>
+         sodipodi:role="line">IN</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:39.76836014px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#d4af37;fill-opacity:1;stroke:none;stroke-width:0.99420899"
+       x="28.728909"
+       y="284.7283"
+       id="text4293"
+       transform="scale(0.99420903,1.0058247)"><tspan
+         sodipodi:role="line"
+         id="tspan4291"
+         x="28.728909"
+         y="284.7283"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.60489655px;font-family:Eurostile;-inkscape-font-specification:'Eurostile, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#d4af37;fill-opacity:1;stroke-width:0.99420899">AT</tspan></text>
   </g>
 </svg>

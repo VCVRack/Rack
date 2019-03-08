@@ -1,5 +1,5 @@
 SLUG = SonusModular
-VERSION = 0.6.1
+VERSION = 0.6.2
 
 FLAGS += -fomit-frame-pointer -pipe -O2
 CFLAGS +=

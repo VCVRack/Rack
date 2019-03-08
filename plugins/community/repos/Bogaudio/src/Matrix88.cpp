@@ -3,17 +3,12 @@
 
 void Matrix88::step() {
 	for (int i = 0; i < 8; ++i) {
-		_inputs[i] = inputs[IN1_INPUT + i].active ? inputs[IN1_INPUT + i].value : 5.0f;
-	}
-	for (int i = 0; i < 8; ++i) {
-		if (outputs[OUT1_OUTPUT + i].active) {
-			int paramOffset = MIX11_PARAM + i * 8;
-			float out = 0.0f;
-			for (int j = 0; j < 8; ++j) {
-				out += _inputs[j] * params[paramOffset + j].value;
-			}
-			outputs[OUT1_OUTPUT + i].value = _saturators[i].next(params[LEVEL_PARAM].value * out);
+		int paramOffset = MIX11_PARAM + i * 8;
+		float out = 0.0f;
+		for (int j = 0; j < 8; ++j) {
+			out += inputs[IN1_INPUT + j].value * params[paramOffset + j].value;
 		}
+		outputs[OUT1_OUTPUT + i].value = _saturators[i].next(params[LEVEL_PARAM].value * out);
 	}
 }
 

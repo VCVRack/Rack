@@ -103,7 +103,7 @@ struct ChordDef {
 
 struct Core {
 
-	static constexpr float TRIGGER = 5e-4f;
+	static constexpr float TRIGGER = 1e-3f;
 
  	static constexpr float SEMITONE = 1.0f / 12.0f;
 
@@ -242,12 +242,12 @@ struct Core {
 	};
 	
 	std::string modeNames[7] {
-		"Ionian (Major)",
+		"Ionian (M)",
 		"Dorian",
 		"Phrygian",
 		"Lydian",
 		"Mixolydian",
-		"Aeolian (Natural Minor)",
+		"Aeolian (m)",
 		"Locrian"
 	};
 
@@ -293,7 +293,7 @@ struct Core {
 		NUM_INV
 	};
 	
-	std::string inversionNames[5] {
+	std::string inversionNames[3] {
 		"",
 		"(1)",
 		"(2)"
@@ -319,7 +319,7 @@ struct Core {
 		
 	bool debug = false;
 	int poll = 100000;
-	int stepX = 0;  // debugging
+	int stepX = 0;
 	
 	/*
 	* Convert a V/OCT voltage to a quantized pitch, key and scale, and calculate various information about the quantised note.
@@ -332,7 +332,7 @@ struct Core {
 	/*
  	 * Convert a root note (relative to C, C=0) and positive semi-tone offset from that root to a voltage (1V/OCT, 0V = C4 (or 3??))
 	 */
-	float getVoltsFromPitch(int inNote, int inRoot){	
+	float getVoltsFromPitch(int inRoot, int inNote){	
 		return (inRoot + inNote) * SEMITONE;
 	}
 	

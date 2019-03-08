@@ -1,6 +1,6 @@
 
 SLUG=Bogaudio
-VERSION=0.6.7
+VERSION=0.6.13
 FLAGS += -DSLUG=$(SLUG) -DVERSION=$(VERSION)
 
 ifdef REQUIRE_VERSION
@@ -41,4 +41,17 @@ testmain: $(TESTMAIN_OBJECTS)
 testmain_clean:
 	rm -f testmain $(TESTMAIN_OBJECTS)
 
-clean: benchmark_clean testmain_clean
+PLOT_SOURCES = $(wildcard test/plot.cpp src/dsp/*cpp)
+PLOT_OBJECTS = $(patsubst %, build/%.o, $(PLOT_SOURCES))
+PLOT_DEPS = $(patsubst %, build/%.d, $(PLOT_SOURCES))
+-include $(PLOT_DEPS)
+plot: $(PLOT_OBJECTS)
+	$(CXX) -o $@ $^
+plotrun: plot
+	./plot
+plotrungp: plot
+	./plot > plot.tmp && gnuplot -e "set yrange [0:1.1]; plot 'plot.tmp' using 1:2 with lines"
+plot_clean:
+	rm -f plot $(PLOT_OBJECTS)
+
+clean: benchmark_clean testmain_clean plot_clean

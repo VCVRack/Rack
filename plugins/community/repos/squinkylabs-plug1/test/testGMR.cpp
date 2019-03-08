@@ -5,9 +5,7 @@
 
 #include <set>
 
-
 using G = GMR<TestComposite>;
-
 
 // test that we get triggers out
 static void test0()

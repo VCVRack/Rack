@@ -199,12 +199,33 @@ None of them actually exist yet, but I'm hoping this will project eventually con
   * Harmonic Saturator
   * Ring Modulator
   * Granulator
+  * Shepard Tone Generator
+  * BPM LFO - LFO with integrated divisible BPM (including triplets), for triplet wubs
+  * Wobbler - Selectable classic wobble automation shapes
+  * 3xOSC - The classic, RJ style
+  * MIDI Recorder - record MIDI notes to a MIDI file
+  * Metaknob - One Knob To Rule Them All
+  * Wubber - Integrated LCA + LFO with adjustable pulse width and clock divider
+  * Memory - Record a signal to a buffer, loop/trigger it back. Integrated knob. 4 banks.
+  * XYFX - Kaos Pad-inspired multi-FX rack.
+  * OscPhrase - Phrase generation based on a slow LFO
+  * LFOArp - Arp with LFO for controlling speed
+  * Band Splitter - Split into L/M/H bands
 
 ## Building
 
-First, clone and [make Rack for yourself](https://github.com/VCVRack/Rack#building).
+~~~First, clone and [make Rack for yourself](https://github.com/VCVRack/Rack#building).~~~
+~~~Then, clone this repo into the `plugins` directory and run `make` from this directory.~~~
 
-Then, clone this repo into the `plugins` directory and run `make` from this directory.
+Steps since 0.6.0 (Mac):
+   * Download and install Rack to Applications
+   * Download the Rack SDK
+   * Clone this repo
+   * `RACK_DIR=~/Downloads/Rack-SDK/ make dist` 
+   * `mkdir -p /Applications/Rack.app/Contents/Resources/plugins`
+   * `copy -r dist RJModules /Applications/Rack.app/Contents/Resources/RJModules`
+   * `/Applications/Rack.app/Contents/MacOS/Rack -d`
+
 
 ## Related Projects
 

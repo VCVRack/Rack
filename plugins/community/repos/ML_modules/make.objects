@@ -7,7 +7,9 @@ ALL_OBJ= \
 	src/ML_components.o \
 	src/ML_modules.o \
 	src/OctaFlop.o \
+	src/OctaPlus.o \
 	src/OctaSwitch.o \
+	src/OctaTimes.o \
 	src/OctaTrig.o \
 	src/Quant.o \
 	src/Quantum.o \

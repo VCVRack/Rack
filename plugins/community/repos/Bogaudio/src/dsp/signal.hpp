@@ -25,7 +25,7 @@ struct Amplifier {
 		LevelTable(int n) : Table(n) {}
 		void _generate() override;
 	};
-	struct StaticLevelTable : StaticTable<LevelTable, 11> {};
+	struct StaticLevelTable : StaticTable<LevelTable, 13> {};
 
 	float _db = 0.0f;
 	float _level;
@@ -123,8 +123,11 @@ struct SlewLimiter {
 		setParams(sampleRate, milliseconds, range);
 	}
 
-	void setParams(float sampleRate, float milliseconds = 1.0f, float range = 10.0f);
-	float next(float sample);
+	void setParams(float sampleRate = 1000.0f, float milliseconds = 1.0f, float range = 10.0f);
+	inline float next(float sample) {
+		return _last = next(sample, _last);
+	}
+	float next(float sample, float last);
 };
 
 struct ShapedSlewLimiter {
@@ -223,6 +226,16 @@ struct Saturator {
 	static const float limit;
 
 	float next(float sample);
+};
+
+struct Compressor {
+	static const float maxEffectiveRatio;
+	float compressionDb(float detectorDb, float thresholdDb, float ratio, bool softKnee);
+};
+
+struct NoiseGate {
+	static const float maxEffectiveRatio;
+	float compressionDb(float detectorDb, float thresholdDb, float ratio, bool softKnee);
 };
 
 } // namespace dsp

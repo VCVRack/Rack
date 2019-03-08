@@ -1,0 +1,20 @@
+---v0.6.5---
+Slightly tweaked In port colour, red circles on the ports should now look nicer when scale is smaller than 1.1
+Enabled mod inputs on 1 band, also tweaked internal code.
+uploaded new panel for TrimLFO.
+default frequecny is now 2 Hz on Trim LFO.
+added a manual reset button on Trim LFO (both BPM/Hz versions), when you click on the reset label "RST" the phase will be reset.
+
+-----------------------------
+---v0.6.4---
+Trim LFO----
+updated panel
+fixed slider anchor showing at abitrary zoom levels
+
+new modules--
+BMP LFO- Trim LFO with a "BPM" value instead of "Hz". Features include snap enabled knob for Halving/Doubling 
+the frequency value and fine tune.
+
+1 Band- A dual mono 1 band parametric EQ and Amplifier. Features include swaping L/R channels, built in Peak meter, listen to the EQ
+processing, bypass EQ, frequency control via mod source (play the frequencies with a sequencer or LFO), dynamics control with the Gain 
+mod source.

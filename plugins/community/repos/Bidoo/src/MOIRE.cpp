@@ -88,7 +88,7 @@ struct MOIRE : Module {
 					for (int j = 0; j < 16; j++) {
 						json_t *controlJ = json_array_get(sceneJ, j);
 						if (controlJ) {
-							scenes[i][j] = json_real_value(controlJ);
+							scenes[i][j] = json_number_value(controlJ);
 						}
 					}
 				}

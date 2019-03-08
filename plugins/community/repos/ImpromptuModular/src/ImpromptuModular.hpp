@@ -20,18 +20,17 @@ using namespace rack;
 #define plugin "ImpromptuModular"
 
 // General constants
+static const bool clockIgnoreOnRun = false;
+static const bool retrigGatesOnReset = true;
+static constexpr float clockIgnoreOnResetDuration = 0.001f;// disable clock on powerup and reset for 1 ms (so that the first step plays)
 static const float lightLambda = 0.075f;
+static const int displayAlpha = 23;
 static const std::string lightPanelID = "Classic";
 static const std::string darkPanelID = "Dark-valor";
-static const std::string expansionMenuLabel = "Extra CVs (requires +4HP to the right!)";
-static const int displayRefreshStepSkips = 200;
-
-
-// Constants for displaying notes
-
-static const char noteLettersSharp[12] = {'C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'};
-static const char noteLettersFlat [12] = {'C', 'D', 'D', 'E', 'E', 'F', 'G', 'G', 'A', 'A', 'B', 'B'};
-static const char isBlackKey      [12] = { 0,   1,   0,   1,   0,   0,   1,   0,   1,   0,   1,   0 };
+static const std::string expansionMenuLabel = "Extra CVs (requires +4HP to the right!)";// note: PS32EX detects '4' and replaces it with '7'
+static const unsigned int displayRefreshStepSkips = 256;
+static const unsigned int userInputsStepSkipMask = 0xF;// sub interval of displayRefreshStepSkips, since inputs should be more responsive than lights
+// above value should make it such that inputs are sampled > 1kHz so as to not miss 1ms triggers
 
 
 // Component offset constants
@@ -73,7 +72,8 @@ struct IMScrew : DynamicSVGScrew {
 
 struct IMPort : DynamicSVGPort {
 	IMPort() {
-		addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PJ301M.svg")));
+		//addFrame(SVG::load(assetGlobal("res/ComponentLibrary/PJ301M.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/light/comp/PJ301M.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/dark/comp/PJ301M.svg")));
 		shadow->blurRadius = 10.0;
 		shadow->opacity = 0.8;
@@ -83,10 +83,30 @@ struct IMPort : DynamicSVGPort {
 
 // Buttons and switches
 
+struct CKSSNoRandom : CKSS {
+	CKSSNoRandom() {}
+	void randomize() override {}
+};
+
 struct CKSSH : SVGSwitch, ToggleSwitch {
 	CKSSH() {
 		addFrame(SVG::load(assetPlugin(plugin, "res/comp/CKSSH_0.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/comp/CKSSH_1.svg")));
+		sw->wrap();
+		box.size = sw->box.size;
+	}
+};
+
+struct CKSSHNoRandom : CKSSH {
+	CKSSHNoRandom() {}
+	void randomize() override {}
+};
+
+struct CKSSHThree : SVGSwitch, ToggleSwitch {
+	CKSSHThree() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/comp/CKSSHThree_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/comp/CKSSHThree_1.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/comp/CKSSHThree_2.svg")));
 		sw->wrap();
 		box.size = sw->box.size;
 	}
@@ -100,12 +120,31 @@ struct CKSSThreeInv : SVGSwitch, ToggleSwitch {
 	}
 };
 
+struct CKSSThreeInvNoRandom : CKSSThreeInv {
+	CKSSThreeInvNoRandom() {}
+	void randomize() override {}
+};
+
 struct IMBigPushButton : DynamicSVGSwitch, MomentarySwitch {
 	IMBigPushButton() {
 		addFrameAll(SVG::load(assetPlugin(plugin, "res/light/comp/CKD6b_0.svg")));
 		addFrameAll(SVG::load(assetPlugin(plugin, "res/light/comp/CKD6b_1.svg")));
 		addFrameAll(SVG::load(assetPlugin(plugin, "res/dark/comp/CKD6b_0.svg")));
 		addFrameAll(SVG::load(assetPlugin(plugin, "res/dark/comp/CKD6b_1.svg")));	
+	}
+};
+
+struct IMBigPushButtonWithRClick : IMBigPushButton {// with right click that sets value to 2.0 instead of 1.0
+	void onMouseDown(EventMouseDown &e) override;
+	void onMouseUp(EventMouseUp &e) override;
+};
+
+struct IMPushButton : DynamicSVGSwitch, MomentarySwitch {
+	IMPushButton() {
+		addFrameAll(SVG::load(assetPlugin(plugin, "res/light/comp/TL1105_0.svg")));
+		addFrameAll(SVG::load(assetPlugin(plugin, "res/light/comp/TL1105_1.svg")));
+		addFrameAll(SVG::load(assetPlugin(plugin, "res/dark/comp/TL1105_0.svg")));
+		addFrameAll(SVG::load(assetPlugin(plugin, "res/dark/comp/TL1105_1.svg")));	
 	}
 };
 
@@ -138,6 +177,7 @@ struct IMBigSnapKnob : IMBigKnob {
 		snap = true;
 		smooth = false;
 	}
+	void randomize() override {}
 };
 
 struct IMBigKnobInf : IMKnob {
@@ -166,6 +206,17 @@ struct IMSmallSnapKnob : IMSmallKnob {
 	}
 };
 
+struct IMMediumKnobInf : IMKnob {
+	IMMediumKnobInf() {
+		addFrameAll(SVG::load(assetPlugin(plugin, "res/light/comp/RoundMediumBlackKnobNoMark.svg")));
+		addFrameAll(SVG::load(assetPlugin(plugin, "res/dark/comp/RoundMediumBlackKnobNoMark.svg")));
+		addEffect(SVG::load(assetPlugin(plugin, "res/dark/comp/RoundMediumBlackKnobNoMarkEffects.svg")));
+		shadow->box.pos = Vec(0.0, box.size.y * 0.15);
+		speed = 0.9f;				
+		//smooth = false;
+	}
+};
+
 struct IMFivePosSmallKnob : IMSmallSnapKnob {
 	IMFivePosSmallKnob() {
 		minAngle = -0.5*M_PI;
@@ -178,6 +229,7 @@ struct IMSixPosBigKnob : IMBigSnapKnob {
 		minAngle = -0.4*M_PI;
 		maxAngle = 0.4*M_PI;
 	}
+	void randomize() override {}
 };
 
 struct IMTactile : DynamicIMTactile {
@@ -193,6 +245,13 @@ struct IMTactile : DynamicIMTactile {
 struct OrangeLight : GrayModuleLightWidget {
 	OrangeLight() {
 		addBaseColor(COLOR_ORANGE);
+	}
+};
+struct GreenRedWhiteLight : GrayModuleLightWidget {
+	GreenRedWhiteLight() {
+		addBaseColor(COLOR_GREEN);
+		addBaseColor(COLOR_RED);
+		addBaseColor(COLOR_WHITE);
 	}
 };
 
@@ -233,6 +292,12 @@ struct InvisibleKeySmall : MomentarySwitch {
 	void onMouseUp(EventMouseUp &e) override;
 };
 
+struct LEDButtonWithRClick : LEDButton {// with right click that sets value to 2.0 instead of 1.0
+	void onMouseDown(EventMouseDown &e) override;
+	void onMouseUp(EventMouseUp &e) override;
+};
+
+
 struct ScrewSilverRandomRot : FramebufferWidget {// location: include/app.hpp and src/app/SVGScrew.cpp [some code also from src/app/SVGKnob.cpp]
 	SVGWidget *sw;
 	TransformWidget *tw;
@@ -248,6 +313,35 @@ struct ScrewHole : TransparentWidget {
 
 
 // Other
+
+struct Trigger : SchmittTrigger {
+	// implements a 0.1V - 1.0V SchmittTrigger (include/dsp/digital.hpp) instead of 
+	//   calling SchmittTriggerInstance.process(math::rescale(in, 0.1f, 1.f, 0.f, 1.f))
+	bool process(float in) {
+		switch (state) {
+			case LOW:
+				if (in >= 1.0f) {
+					state = HIGH;
+					return true;
+				}
+				break;
+			case HIGH:
+				if (in <= 0.1f) {
+					state = LOW;
+				}
+				break;
+			default:
+				if (in >= 1.0f) {
+					state = HIGH;
+				}
+				else if (in <= 0.1f) {
+					state = LOW;
+				}
+				break;
+		}
+		return false;
+	}	
+};	
 
 struct HoldDetect {
 	long modeHoldDetect;// 0 when not detecting, downward counter when detecting
@@ -276,7 +370,17 @@ struct HoldDetect {
 	}
 };
 
-NVGcolor prepareDisplay(NVGcontext *vg, Rect *box);
-bool calcWarningFlash(long count, long countInit);
+inline bool calcWarningFlash(long count, long countInit) {
+	if ( (count > (countInit * 2l / 4l) && count < (countInit * 3l / 4l)) || (count < (countInit * 1l / 4l)) )
+		return false;
+	return true;
+}	
+
+
+
+NVGcolor prepareDisplay(NVGcontext *vg, Rect *box, int fontSize);
+void printNote(float cvVal, char* text, bool sharp);
+int moveIndex(int index, int indexNext, int numSteps);
+
 
 #endif

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="15"
+   height="40"
+   viewBox="0 0 3.96875 10.583333"
+   version="1.1"
+   id="svg2419"
+   inkscape:version="0.92.4 (ca053d0, 2019-01-16)"
+   sodipodi:docname="LabSeven_101SlidePotGreen.svg">
+  <defs
+     id="defs2413" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="7.4064916"
+     inkscape:cy="-1.3082099"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1853"
+     inkscape:window-height="1025"
+     inkscape:window-x="67"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata2416">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-286.41667)">
+    <g
+       id="g8431-6"
+       transform="translate(-6.8791669,53.975009)">
+      <rect
+         ry="0.19021411"
+         rx="0.09959203"
+         y="232.44894"
+         x="6.8880749"
+         height="10.568767"
+         width="3.952559"
+         id="rect7775-0"
+         style="opacity:1;fill:#1a1a1a;fill-opacity:1;stroke:#333333;stroke-width:0.01456652;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         ry="0.047487941"
+         rx="0.099775471"
+         y="236.41405"
+         x="6.8844347"
+         height="2.6385477"
+         width="3.9598391"
+         id="rect7775-3-2"
+         style="opacity:1;fill:#333333;fill-opacity:1;stroke:#333333;stroke-width:0.00728494;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path8189-69"
+         d="M 6.8807928,237.73332 H 10.847916"
+         style="fill:#78984d;fill-opacity:1;stroke:#32851e;stroke-width:0.52905828;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         ry="0.0094652381"
+         rx="0.099877022"
+         y="239.05624"
+         x="6.8807936"
+         height="0.52591217"
+         width="3.9638693"
+         id="rect7775-3-5-30"
+         style="opacity:1;fill:#0d0d0d;fill-opacity:1;stroke:#333333;stroke-width:0.00325402;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>

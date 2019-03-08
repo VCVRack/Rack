@@ -6,10 +6,11 @@ void AMRM::step() {
 		return;
 	}
 
-	float rectify = 1.0f - params[RECTIFY_PARAM].value;
+	float rectify = params[RECTIFY_PARAM].value;
 	if (inputs[RECTIFY_INPUT].active) {
 		rectify = clamp(rectify + inputs[RECTIFY_INPUT].value / 10.0f, 0.0f, 1.0f);
 	}
+	rectify = 1.0f - rectify;
 
 	float depth = params[DRYWET_PARAM].value;
 	if (inputs[DRYWET_INPUT].active) {

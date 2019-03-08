@@ -203,23 +203,24 @@ void Imperfect2::step() {
 			delayState[i] = false;
 		}
 
-		lights[OUT_LIGHT + i * 2].value = 0.0f;
-		lights[OUT_LIGHT + i * 2 + 1].value = 0.0f;
 		
 		if (gatePhase[i].process(delta)) {
 			outputs[OUT_OUTPUT + i].value = 10.0f;
 
-			lights[OUT_LIGHT + i * 2].value = 1.0f;
-			lights[OUT_LIGHT + i * 2 + 1].value = 0.0f;
+			lights[OUT_LIGHT + i * 2].setBrightnessSmooth(1.0f);
+			lights[OUT_LIGHT + i * 2 + 1].setBrightnessSmooth(0.0f);
 
 		} else {
 			outputs[OUT_OUTPUT + i].value = 0.0f;
 			gateState[i] = false;
 
 			if (delayState[i]) {
-				lights[OUT_LIGHT + i * 2].value = 0.0f;
-				lights[OUT_LIGHT + i * 2 + 1].value = 1.0f;
-			} 
+				lights[OUT_LIGHT + i * 2].setBrightnessSmooth(0.0f);
+				lights[OUT_LIGHT + i * 2 + 1].setBrightnessSmooth(1.0f);
+			} else {
+				lights[OUT_LIGHT + i * 2].setBrightnessSmooth(0.0f);
+				lights[OUT_LIGHT + i * 2 + 1].setBrightnessSmooth(0.0f);
+			}
 			
 		}
 			
@@ -313,11 +314,6 @@ Imperfect2Widget::Imperfect2Widget(Imperfect2 *module) : ModuleWidget(module) {
 		addChild(panel);
 	}
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
-	
 	{
 		Imperfect2Box *display = new Imperfect2Box();
 		display->module = module;

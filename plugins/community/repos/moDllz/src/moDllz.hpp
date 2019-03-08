@@ -1,7 +1,6 @@
 #include "rack.hpp"
 #define FONT_FILE  assetPlugin(plugin, "res/bold_led_board-7.ttf")
-//#define mFONT_FILE  assetPlugin(plugin, "res/DIN Condensed Bold.ttf")
-#define mFONT_FILE  assetPlugin(plugin, "res/Munro.ttf")
+#define mFONT_FILE  assetPlugin(plugin, "res/ShareTechMono-Regular.ttf")
 #include <iomanip> // setprecision
 #include <sstream> // stringstream
 
@@ -47,6 +46,16 @@ struct moDllzKnob26 : SVGKnob {
     }
 };
 
+struct moDllzKnob22 : SVGKnob {
+	moDllzKnob22() {
+		//  box.size = Vec(32, 32);
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
+		setSVG(SVG::load(assetPlugin(plugin, "res/moDllzKnob22.svg")));
+		shadow->opacity = 0.f;
+	}
+};
+
 ///TinyTrim
 struct moDllzTTrim : SVGKnob {
   
@@ -85,20 +94,6 @@ struct moDllzSmSelector : SVGKnob{
         shadow->opacity = 0.f;
     }
 };
-
-//struct moDllzHFader : SVGFader {
-//    moDllzHFader() {
-//       // Vec margin = Vec(3.5, 3.5);
-//        maxHandlePos = Vec(90, 0);//.plus(margin);
-//        minHandlePos = Vec(0, 0);//.plus(margin);
-//        background->svg = SVG::load(assetPlugin(plugin, "res/moDllzHFaderBck.svg"));
-//        background->wrap();
-//        //background->box.pos = margin;
-//        box.size = background->box.size;
-//        handle->svg = SVG::load(assetPlugin(plugin, "res/moDllzHFader.svg"));
-//        handle->wrap();
-//    }
-//};
 
 ///switch
 struct moDllzSwitch : SVGSwitch, ToggleSwitch {
@@ -141,6 +136,18 @@ struct moDllzSwitchLedHT : SVGSwitch, ToggleSwitch {
         addFrame(SVG::load(assetPlugin(plugin, "res/moDllzSwitchLedHT_2.svg")));
     }
 };
+
+/// Transp Light over led switches
+struct TranspOffLight : ModuleLightWidget {
+	TranspOffLight() {
+		box.size = Vec(10.f,10.f);
+		bgColor = COLOR_BLACK_TRANSPARENT;
+		borderColor =COLOR_BLACK_TRANSPARENT;
+		//addBaseColor(nvgRGBA(0xFF, 0, 0, 0x80));//borderColor = nvgRGBA(0, 0, 0, 0x60);
+	}
+};
+
+
 ///switch TriState
 struct moDllzSwitchT : SVGSwitch, ToggleSwitch {
     moDllzSwitchT() {
@@ -219,11 +226,40 @@ struct moDllzMuteGP : SVGSwitch, MomentarySwitch {
 ///MIDIPanic
 struct moDllzMidiPanic : SVGSwitch, MomentarySwitch {
     moDllzMidiPanic() {
-   //     box.size = Vec(48, 14);
-        addFrame(SVG::load(assetPlugin(plugin, "res/moDllzMidiPanic.svg")));
+   //     box.size = Vec(38, 12);
+        addFrame(SVG::load(assetPlugin(plugin, "res/midireset3812.svg")));
     }
 };
 
+
+/// Cursor  Buttons L R
+
+struct moDllzcursorL : SVGSwitch, MomentarySwitch {
+	moDllzcursorL() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/cursorL_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/cursorL_1.svg")));
+	}
+};
+struct moDllzcursorR : SVGSwitch, MomentarySwitch {
+	moDllzcursorR() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/cursorR_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/cursorR_1.svg")));
+	}
+};
+/// UpDown + - Buttons
+
+struct minusButton : SVGSwitch, MomentarySwitch {
+	minusButton() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/minusButton_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/minusButton_1.svg")));
+	}
+};
+struct plusButton : SVGSwitch, MomentarySwitch {
+	plusButton() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/plusButton_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/plusButton_1.svg")));
+	}
+};
 
 
 ///Jacks
@@ -241,3 +277,34 @@ struct moDllzPortDark : SVGPort {
         box.size = background->box.size;
     }
 };
+
+
+/////////////////////////////////////////////
+///// TEST DISPLAY //////
+//
+//struct testDisplay : TransparentWidget {
+//    testDisplay() {
+//        font = Font::load(FONT_FILE);
+//    }
+//    float mdfontSize = 16.f;
+//    std::shared_ptr<Font> font;
+//    std::string displayedVal;
+//    float *valP;
+//    float val = 0.f;
+//    void draw(NVGcontext* vg)
+//    {
+//        val = *valP;
+//        displayedVal = std::to_string(val);
+//        nvgFillColor(vg, nvgRGB(0xFF,0xFF,0x00));
+//        nvgFontSize(vg, mdfontSize);
+//        //nvgTextLetterSpacing(vg, 2.0f);
+//        //nvgTextAlign(vg, NVG_ALIGN_CENTER);
+//        nvgTextBox(vg, 0.0f, 20.0f, box.size.x, displayedVal.c_str(), NULL);
+//
+//    }
+//
+//};
+////////////////////////////////////////////
+///////////////////////////////////////////
+
+

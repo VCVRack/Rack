@@ -243,11 +243,11 @@ struct CLACOS : Module {
 		for (int i=0; i<4; i++) {
 			json_t *phaseDistXJ = json_object_get(rootJ, ("phaseDistX" + to_string(i)).c_str());
 			if (phaseDistXJ) {
-				phaseDistX[i] = json_real_value(phaseDistXJ);
+				phaseDistX[i] = json_number_value(phaseDistXJ);
 			}
 			json_t *phaseDistYJ = json_object_get(rootJ, ("phaseDistY" + to_string(i)).c_str());
 			if (phaseDistYJ) {
-				phaseDistY[i] = json_real_value(phaseDistYJ);
+				phaseDistY[i] = json_number_value(phaseDistYJ);
 			}
 		}
 	}

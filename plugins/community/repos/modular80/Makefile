@@ -1,5 +1,5 @@
 SLUG = modular80
-VERSION = 0.6.0
+VERSION = 0.6.4
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=

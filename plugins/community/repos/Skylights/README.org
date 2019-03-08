@@ -1,0 +1,149 @@
+* Modules
+
+** What Note?
+The =What Note?= is a CV tuner with a digital display. It shows the
+semitone, octave, cents and absolute voltage of the signal which
+enters its port.
+
+** ALAN
+The =ALAN= is an SK version of [[https://musicthing.co.uk/collateral/TuringRev1Docs.pdf][Tom Whitwell's Turing Machine]].
+
+While a turing machine sequencer is not designed to hold on to state
+forever, the ALAN does save its internal sequence to VCV files. Right
+click and choose =Save preset= if you want to keep a locked sequence,
+and a sequence is also persisted in to any saved .vcv file.
+
+*** Controls
+**** Lock knob
+Use of the lock knob is the primary way to control a Turing Machine
+sequencer. Rotating the knob places it in to a different "mode" which
+determines how much variation will be introduced to the existing
+sequence over time.
+
+ - Beta side: sequence loops indefinitely.
+ - 55-90%: around one in eight bits is changed.
+ - 10-54%: approximately every other bit is flipped.
+ - Alpha side: every bit is flipped.
+
+There is a CV port beneath the lock kob. When a patch cable is
+connected to this, the knob is ignored and the control voltage takes
+its place. CV signals should be within [0V, 10V].
+
+**** Out
+Out will perform an analogue to digital encoding of the 8 visible bits
+on the display, scale the signal through the =Scale= knob and perform
+a polarity shift depending on the =UNI/BI= switch.
+
+**** XPND
+See [[*XPND Ports][XPND Ports]].
+
+**** Gate
+When the bit on the far right of the display is set (the light is
+blue), gate will output a high signal. Otherwise gate will output a
+low signal.
+
+**** Write
+When the write switch is set, bits are always set to zero when they
+scroll past the right side of the display. This can be used to
+manually clean up a busy sequence or to clear the sequencer after
+enough steps pass.
+
+**** Pole
+The pole switch allows you to set the module output between unipolar
+[0V, 10V] or bipolar [-5V, 5V] modes.
+
+**** Scale
+The scale knob allows you to attenuate or boost the output signal. By
+default this is set to 1, which covers a single octave in unipolar
+mode.
+
+*** Patching ideas
+Turing sequencers can drive an entire synthesizer cabinet; an external
+clock feeds pulses in, while =Out= and =Gate= produce notes or
+rhythms. Connecting =Out= to a note quantizer and further to a VCO can
+produce melodies over time. Using two turing sequencers, you can have
+a separately generated melody and rhythm that are independently
+evolvable.
+
+When an oscillator is used as the clock, turing sequencers are driven
+at audio rates and behave similar to 8-bit wavetable
+synthesizers. Placing the lock knob will then control the amount of
+"grit" present in the sound, from 8-bit white noise to a more normal
+waveform.
+
+** Volts (Turing Expander)
+Volts is an expander for the ALAN, based on [[https://musicthing.co.uk/pages/volts.html][Tom Whitwell's own "Volts" expansion module]].
+
+It reads the last five bits in the sequence, attenuates them through
+parallel control pots and sums the result. This allows creating
+complimentary patterns that are still related to a turing sequencer's
+state, and so will mutate as the master pattern does.
+
+*** Controls
+
+**** XPND
+See [[#xpnd-ports][XPND Ports]].
+
+**** Knobs 1-5
+Each knob ranges from [-1V, 1V] and defaults to 0V. Rotating the knob
+sets the "weight" of 
+
+**** Out
+Output from the module is not normalized, though it cannot output
+outside the range [-5V, 5V]. 
+
+** Pulses (Turing Expander)
+
+*** Controls
+
+**** CLK
+When a clock signal is connected, outputs from this module only happen
+both at the correct steps and when the incoming clock signal is
+high. If you do not have a cable plugged in to this port the outputs
+operate as gates instead of pulses.
+
+**** XPND
+See [[#xpnd-ports][XPND Ports]].
+
+** Vactrol (Turing Expander)
+The Vactrol mixer accepts four incoming signals, passes them through
+four independent attenuvators, then outputs them to the left and/or
+right output channels depending on the state of a turing machine
+connected via the =XPND= port.
+
+*** Ports
+**** XPND
+See [[#xpnd-ports][XPND Ports]].
+
+**** IN
+Single channel audio signals going in to the mixer.
+
+**** OUT
+The left and right output channels from the mixer.
+
+*** Controls
+Each knob controls an internal attenuvator; the knobs from top to
+bottom represent the same input as the input jacks from top to bottom.
+
+** XPND Ports
+The expansion port encodes the internal 16-bit sequence of an ALAN to
+a [0V, 10V] control voltage. =XPND= does not obey any scale or pole
+settings. You /can/ use this to drive other modules in your patch,
+but its primary purpose is connecting to expanders.
+
+Internally an unsigned 16-bit integer is converted to a double and
+divided against 65,535.0 and then normalized to 10V. Expansion modules
+perform these steps in reverse to regain access to individual rhythm
+bits.
+
+Note that Volts only reads the five least significant bits of the
+sequence regardless of however many are live.
+
+* Licenses
+Skylights itself is available under the BSD license.
+
+Custom graphics were designed by github user [[https://github.com/infamedavid][@infamedavid (David
+Rodriguez)]], provided under CC-BY.
+
+Skylights is based on the Rack plugin template, which was provided
+under CC-0.

@@ -76,16 +76,16 @@ void BAR::step() {
 	buffR[lookAheadWriteIndex]=inputs[IN_R_INPUT].value;
 
 	if (!inputs[SC_L_INPUT].active && inputs[IN_L_INPUT].active)
-		in_L_dBFS = max(20.0f*log10((abs(inputs[IN_L_INPUT].value)+1e-6f)/5.0f), -96.3f);
+		in_L_dBFS = max(20.0f*log10((abs(inputs[IN_L_INPUT].value)+1e-6f) * 0.2f), -96.3f);
 	else if (inputs[SC_L_INPUT].active)
-		in_L_dBFS = max(20.0f*log10((abs(inputs[SC_L_INPUT].value)+1e-6f)/5.0f), -96.3f);
+		in_L_dBFS = max(20.0f*log10((abs(inputs[SC_L_INPUT].value)+1e-6f) * 0.2f), -96.3f);
 	else
 		in_L_dBFS = -96.3f;
 
 	if (!inputs[SC_R_INPUT].active && inputs[IN_R_INPUT].active)
-		in_R_dBFS = max(20.0f*log10((abs(inputs[IN_R_INPUT].value)+1e-6f)/5.0f), -96.3f);
+		in_R_dBFS = max(20.0f*log10((abs(inputs[IN_R_INPUT].value)+1e-6f) * 0.2f), -96.3f);
 	else if (inputs[SC_R_INPUT].active)
-		in_R_dBFS = max(20.0f*log10((abs(inputs[SC_R_INPUT].value)+1e-6f)/5.0f), -96.3f);
+		in_R_dBFS = max(20.0f*log10((abs(inputs[SC_R_INPUT].value)+1e-6f) * 0.2f), -96.3f);
 	else
 		in_R_dBFS = -96.3f;
 
@@ -138,16 +138,16 @@ void BAR::step() {
 
 	if (dist<-1.0f*knee/2.0f)
 		gcurve = maxIn;
-	else if ((dist > -1.0f*knee/2.0f) && (dist < knee/2.0f)) {
-		gcurve = maxIn + slope * pow(dist + knee/2.0f,2.0f)/(2.0f * knee);
+	else if ((dist > -1.0f * knee * 0.5f) && (dist < knee * 0.5f)) {
+		gcurve = maxIn + slope * pow(dist + knee *0.5f, 2.0f) / (2.0f * knee);
 	} else {
 		gcurve = maxIn + slope * dist;
 	}
 
 	float preGain = gcurve - maxIn;
 	float postGain = 0.0f;
-	float cAtt = exp(-1.0f/(attackTime*engineGetSampleRate()/1000.0f));
-	float cRel = exp(-1.0f/(releaseTime*engineGetSampleRate()/1000.0f));
+	float cAtt = exp(-1.0f/(attackTime*engineGetSampleRate() * 0.001f));
+	float cRel = exp(-1.0f/(releaseTime*engineGetSampleRate() * 0.001f));
 
 	if (preGain>previousPostGain) {
 		postGain = cAtt * previousPostGain + (1.0f-cAtt) * preGain;
@@ -162,7 +162,7 @@ void BAR::step() {
 	mix = params[MIX_PARAM].value;
 	lookAhead = params[LOOKAHEAD_PARAM].value;
 
-	int nbSamples = clamp(floor(lookAhead*attackTime*engineGetSampleRate()/100000),0.0f,19999.0f);
+	int nbSamples = clamp(floor(lookAhead * attackTime * engineGetSampleRate() * 0.000001f),0.0f,19999.0f);
 	int readIndex;
 	if (lookAheadWriteIndex-nbSamples>=0)
 	  readIndex = (lookAheadWriteIndex-nbSamples)%20000;
@@ -170,8 +170,8 @@ void BAR::step() {
 		readIndex = 20000 - abs(lookAheadWriteIndex-nbSamples);
 	}
 
-	outputs[OUT_L_OUTPUT].value = buffL[readIndex] * (gain*mix + (1.0f-mix));
-	outputs[OUT_R_OUTPUT].value = buffR[readIndex] * (gain*mix + (1.0f-mix));
+	outputs[OUT_L_OUTPUT].value = buffL[readIndex] * (gain*mix + (1.0f - mix));
+	outputs[OUT_R_OUTPUT].value = buffR[readIndex] * (gain*mix + (1.0f - mix));
 
 	lookAheadWriteIndex = (lookAheadWriteIndex+1)%20000;
 }
@@ -198,6 +198,7 @@ void draw(NVGcontext *vg) override {
 	float peakR = rescale(module->peakR,0.0f,-97.0f,0.0f,height);
 	float inL = rescale(module->in_L_dBFS,-97.0f,0.0f,0.0f,height);
 	float inR = rescale(module->in_R_dBFS,-97.0f,0.0f,0.0f,height);
+	nvgSave(vg);
 	nvgStrokeWidth(vg, 0.0f);
 	nvgBeginPath(vg);
 	nvgFillColor(vg, BLUE_BIDOO);
@@ -284,6 +285,7 @@ void draw(NVGcontext *vg) override {
 	nvgText(vg, 40.0f, height+63.0f, tMakeUp, NULL);
 	nvgText(vg, 75.0f, height+63.0f, tMix, NULL);
 	nvgText(vg, 107.0f, height+63.0f, tLookAhead, NULL);
+	nvgRestore(vg);
 }
 };
 

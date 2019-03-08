@@ -47,7 +47,9 @@ int osdialog_message(osdialog_message_level level, osdialog_message_buttons butt
 
 
 char *osdialog_file(osdialog_file_action action, const char *path, const char *filename, osdialog_filters *filters) {
+   printf("xxx osdialog_file: 1\n");
 	assert(gtk_init_check(NULL, NULL));
+   printf("xxx osdialog_file: 2\n");
 
 	GtkFileChooserAction gtkAction;
 	const char *title;
@@ -68,6 +70,8 @@ char *osdialog_file(osdialog_file_action action, const char *path, const char *f
 		gtkAction = GTK_FILE_CHOOSER_ACTION_SAVE;
 	}
 
+   printf("xxx osdialog_file: 3\n");
+
 	GtkWidget *dialog = gtk_file_chooser_dialog_new(
 		title,
 		NULL,
@@ -75,6 +79,8 @@ char *osdialog_file(osdialog_file_action action, const char *path, const char *f
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 		acceptText, GTK_RESPONSE_ACCEPT,
 		NULL);
+
+   printf("xxx osdialog_file: 4\n");
 
 	for (; filters; filters = filters->next) {
 		GtkFileFilter *fileFilter = gtk_file_filter_new();
@@ -87,23 +93,37 @@ char *osdialog_file(osdialog_file_action action, const char *path, const char *f
 		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), fileFilter);
 	}
 
+   printf("xxx osdialog_file: 5\n");
+
 	if (action == OSDIALOG_SAVE)
 		gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dialog), TRUE);
 
 	if (path)
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), path);
 
+   printf("xxx osdialog_file: 6\n");
+
 	if (action == OSDIALOG_SAVE && filename)
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), filename);
+
+   printf("xxx osdialog_file: 7\n");
+
+	gtk_widget_show(dialog);  // [bsp] 26Oct2018
+
+   printf("xxx osdialog_file: 8\n");
 
 	char *result = NULL;
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
 		result = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 	}
+   printf("xxx osdialog_file: 9\n");
 	gtk_widget_destroy(dialog);
+
+   printf("xxx osdialog_file: 10\n");
 
 	while (gtk_events_pending())
 		gtk_main_iteration();
+   printf("xxx osdialog_file: 11\n");
 	return result;
 }
 

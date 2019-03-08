@@ -119,7 +119,7 @@ struct DGateWidget : ModuleWidget {
 	  DGate* dgate = dynamic_cast<DGate*>(module);
 		assert(dgate);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new TriggerOnLoadMenuItem(dgate, "Resume Loop on Load"));
+		menu->addChild(new TriggerOnLoadMenuItem(dgate, "Resume loop on load"));
 	}
 };
 

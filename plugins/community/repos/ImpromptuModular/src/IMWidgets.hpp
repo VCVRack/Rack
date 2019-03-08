@@ -8,6 +8,7 @@
 #ifndef IM_WIDGETS_HPP
 #define IM_WIDGETS_HPP
 
+
 #include "rack.hpp"
 #include "window.hpp"
 
@@ -20,7 +21,7 @@ using namespace rack;
 // General Dynamic Screw creation
 template <class TWidget>
 TWidget* createDynamicScrew(Vec pos, int* mode) {
-	TWidget *dynScrew = Widget::create<TWidget>(pos);
+	TWidget *dynScrew = createWidget<TWidget>(pos);
 	dynScrew->mode = mode;
 	return dynScrew;
 }
@@ -64,6 +65,7 @@ struct DynamicSVGPanel : FramebufferWidget { // like SVGPanel (in app.hpp and SV
     PanelBorderWidget_Impromptu* border;
     DynamicSVGPanel();
     void addPanel(std::shared_ptr<SVG> svg);
+    void dupPanel();
     void step() override;
 };
 
@@ -75,8 +77,20 @@ struct DynamicSVGPanel : FramebufferWidget { // like SVGPanel (in app.hpp and SV
 template <class TDynamicPort>
 TDynamicPort* createDynamicPort(Vec pos, Port::PortType type, Module *module, int portId,
                                                int* mode) {
-	TDynamicPort *dynPort = Port::create<TDynamicPort>(pos, type, module, portId);
+	TDynamicPort *dynPort = type == Port::INPUT ? 
+		createInput<TDynamicPort>(pos, module, portId) :
+		createOutput<TDynamicPort>(pos, module, portId);
 	dynPort->mode = mode;
+	return dynPort;
+}
+template <class TDynamicPort>
+TDynamicPort* createDynamicPortCentered(Vec pos, Port::PortType type, Module *module, int portId,
+                                               int* mode) {
+	TDynamicPort *dynPort = type == Port::INPUT ? 
+		createInput<TDynamicPort>(pos, module, portId) :
+		createOutput<TDynamicPort>(pos, module, portId);
+	dynPort->mode = mode;
+	dynPort->box.pos = dynPort->box.pos.minus(dynPort->box.size.div(2));// centering
 	return dynPort;
 }
 
@@ -99,8 +113,16 @@ struct DynamicSVGPort : SVGPort {
 template <class TDynamicParam>
 TDynamicParam* createDynamicParam(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue,
                                                int* mode) {
-	TDynamicParam *dynParam = ParamWidget::create<TDynamicParam>(pos, module, paramId, minValue, maxValue, defaultValue);
+	TDynamicParam *dynParam = createParam<TDynamicParam>(pos, module, paramId, minValue, maxValue, defaultValue);
 	dynParam->mode = mode;
+	return dynParam;
+}
+template <class TDynamicParam>
+TDynamicParam* createDynamicParamCentered(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue,
+                                               int* mode) {
+	TDynamicParam *dynParam = createParam<TDynamicParam>(pos, module, paramId, minValue, maxValue, defaultValue);
+	dynParam->mode = mode;
+	dynParam->box.pos = dynParam->box.pos.minus(dynParam->box.size.div(2));// centering
 	return dynParam;
 }
 
@@ -134,7 +156,7 @@ struct DynamicSVGKnob : SVGKnob {
 template <class TDynamicParam>
 TDynamicParam* createDynamicParam2(Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue,
                                                float* wider, float* paramReadRequest) {
-	TDynamicParam *dynParam = ParamWidget::create<TDynamicParam>(pos, module, paramId, minValue, maxValue, defaultValue);
+	TDynamicParam *dynParam = createParam<TDynamicParam>(pos, module, paramId, minValue, maxValue, defaultValue);
 	dynParam->wider = wider;
 	dynParam->paramReadRequest = paramReadRequest;
 	return dynParam;
@@ -158,7 +180,6 @@ struct DynamicIMTactile : ParamWidget, FramebufferWidget {
 	void onDragStart(EventDragStart &e) override;
 	void onDragMove(EventDragMove &e) override;	
 	void onMouseDown(EventMouseDown &e) override;
-	//void changeValue(float newVal);
 };
 
 

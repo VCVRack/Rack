@@ -1,0 +1,7 @@
+SLUG=noobhour
+
+include ../../../build_plugin_pre_linux.mk
+
+include make.objects
+
+include ../../../build_plugin_post_linux.mk

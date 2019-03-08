@@ -27,8 +27,9 @@ namespace std {
 
 //#include "math.hpp"
 
+#include "SqBlep.h"
+#include "SqMath.h"
 
-#include "dsp/minblep.hpp"
 #include "dsp/filter.hpp"
 #include "AudioMath.h"
 #include "ObjectCache.h"
@@ -122,14 +123,12 @@ private:
     int loopCounter = 0;        // still used?
     float pulseWidth = .5;
 
+    SqBlep syncMinBLEP;
+    SqBlep aMinBLEP;
+    SqBlep bMinBLEP;
 
-    rack::MinBLEP<16> syncMinBLEP;
-    rack::MinBLEP<16> aMinBLEP;
-    rack::MinBLEP<16> bMinBLEP;
     bool aIsNext = false;
-    rack::MinBLEP<16>* getNextMinBLEP();
-
-
+    SqBlep* getNextMinBLEP();
 
     /**
      * Waveform generation helper
@@ -153,17 +152,18 @@ private:
     bool isSqHigh() const;
 };
 
+// Let's by lazy and use "using" to solve some v1/v6 issues/
+#ifdef __V1
+using namespace rack::dsp;
+#else
+using namespace rack;
+#endif
+
 inline MinBLEPVCO::MinBLEPVCO()
 {
-    syncMinBLEP.minblep = rack::minblep_16_32;
-    syncMinBLEP.oversample = 32;
-    aMinBLEP.minblep = rack::minblep_16_32;
-    aMinBLEP.oversample = 32;
-    bMinBLEP.minblep = rack::minblep_16_32;
-    bMinBLEP.oversample = 32;
 }
 
-inline  rack::MinBLEP<16>* MinBLEPVCO::getNextMinBLEP()
+inline  SqBlep* MinBLEPVCO::getNextMinBLEP()
 {
     aIsNext = !aIsNext;
     return aIsNext ? &aMinBLEP : &bMinBLEP;

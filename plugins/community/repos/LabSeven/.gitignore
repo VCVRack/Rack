@@ -1,0 +1,5 @@
+LabSevenModules.*
+*.so
+/build/*
+/dist/*
+/devstuff/*

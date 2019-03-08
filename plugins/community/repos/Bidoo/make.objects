@@ -3,35 +3,46 @@ ALL_OBJ= \
 	src/ANTN.o \
 	src/BAR.o \
 	src/Bidoo.o \
+	src/BISTROT.o \
 	src/BORDL.o \
 	src/CANARD.o \
 	src/CHUTE.o \
 	src/CLACOS.o \
+	src/CURT.o \
 	src/DFUZE.o \
+	src/EMILE.o \
 	src/dep/filters/biquad.o \
-	src/dep/filters/smbPitchShift.o \
 	src/DTROY.o \
 	src/DUKE.o \
+	src/FFILTR.o \
 	src/FORK.o \
+	src/GARCON.o \
+	src/HCTIP.o \
 	src/LATE.o \
 	src/LIMBO.o \
+	src/LIMONADE.o \
 	src/LOURDE.o \
 	src/MOIRE.o \
+	src/MS.o \
 	src/MU.o \
 	src/OUAIVE.o \
+	src/PENEQUE.o \
 	src/PERCO.o \
 	src/RABBIT.o \
+	src/REI.o \
 	src/SIGMA.o \
 	src/TIARE.o \
 	src/TOCANTE.o \
 	src/VOID.o \
 	src/ZINC.o \
+	src/ZOUMAI.o \
+	src/dep/lodepng/lodepng.o \
 	src/dep/freeverb/allpass.o \
 	src/dep/freeverb/comb.o \
 	src/dep/freeverb/revmodel.o
 
 #	src/dep/minimp3/minimp3_test.o
-
+#	src/dep/filters/smbPitchShift.o 
 
 #	src/dep/kiss_fft130/kiss_fft.o
 

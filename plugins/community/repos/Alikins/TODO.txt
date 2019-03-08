@@ -2,9 +2,6 @@ plugin ideas:
 - Mult with labels
   - so I can route a distance output to mult and label
     it as 'main seq gate output' to avoid tracing cables
-- seq with start/stop/reset triggers (ie, one shot sequencer)
-  (or 'play', 'pause', 'go to begin')
-  - solve 'how do I run a sequence once?' FAQ
 - event log
   - visualization of past triggers/gates
   - time series or sparkline-ish
@@ -20,7 +17,7 @@ plugin ideas:
     - 1x speed or faster/slower
     - scrubbing?
   - multiple channels of events
-- table module
+- Table module
   - "an oscillator is a phasor and a table"
   - phasor input  (0.0 -> 1.0) or other scaled
   - value output
@@ -34,6 +31,8 @@ plugin ideas:
             - end range
         - output value
     - buttons to add delete entry
+    - a x, y graph display showing phasor in volts on X
+      and table volts out on Y
   - load table from json in context menu
   - uses:
     - feed a sawtooth osc output into it to
@@ -101,20 +100,24 @@ plugin ideas:
   - uses
     - generative patches that need a 'press play to start'
 - specific values
-  - module with just text entrie fields for entering a float value
+  X - (mostly implemented in 'Specific Value' module)
+  X - module with just text entrie fields for entering a float value
     and an output for that value
   - possibly with text widget in combo with a dial or inc/dec
     buttons (spinbox widget)
-    - or 'click and drag to change value'
-      - up/down for small value
-      - left/right for multiplier (middle = 1x, left = 0..1.0x, right >1.0x multi)
-      - 'up and to the left' for fine grained adjustments
-  - fancy
-    - maybe automatically also show CV v/oct freq or note equiv
+    X - or 'click and drag to change value'
+      X - up/down for small value
+      X - left/right for multiplier (middle = 1x, left = 0..1.0x, right >1.0x multi)
+      X - 'up and to the left' for fine grained adjustments
+  X - fancy
+    X - maybe automatically also show CV v/oct freq or note equiv
+  - incremental mode for voltage dial, to jump between quantized values,
+    in particular between note values. Built in quantizer basically.
   - maybe gate out and button to click to send value and gate output together
 - Seq with per step gate length and rest length between steps
  - 'rest' steps basically
 - A cv 1v/oct display -> freq hz -> period secs -> bpm.
+  - (more or less a multiple version of 'Specific Value')
   - ( could display v passed through and/or let you specify as text)
   - CV out
   - button to send gate
@@ -126,6 +129,20 @@ plugin ideas:
     - interval from a root ( third, flat fifth, etc)
     - staff / note
     - bpm (for a LFO or general nerdery)
+- SpecificNote
+  - choose a specific note from options
+  - possible UI that could be implemented like a
+    imagemap (ie, use x,y of where clicked to pick note)
+    - piano keyboard image
+    - piano key style but 2d, with stacked one
+      octave keys (kind of accordian-ish)
+    - musical staffs
+      - possibly with areas along X to indicate note length?
+      - maybe left side of X axis for flat, middle for natural, right
+        for sharp
+    - just a grid
+    - various alternative keyboard styles (hex, axis64, starrlab, jammer keyboard)
+  - could use multiple instances and a 'Whats New Now' to combine them
 - generic voltage quantizer
   - based on 'table' module
   - except input CV is 'rounded' to edge of maps
@@ -134,24 +151,24 @@ plugin ideas:
   - GUI file picker
   - add base64 of file to data to store in plugin Json.
   - Could be a list
+  - would need to sort out how to only serialize/persist on 'real' save
+    vs autosave (to avoid constantly saving the whole thing to autosave.vcv)
+- 'Attached Preset' module
+  - more or less 'Attached File' but tweaked for including vcvm presets
+  - automatically write out presets to current presets folder?
+    - well, not automatically, but more or less just one interactive step
+      like a 'save to presets folder' button
+  - can a ModuleWidget subclass customize fromJson to allow a module to
+    accept 'paste preset' from any plugin?
+    - would be easiest UI for attaching a preset
 - 'Maze Table'
   - wave table, but with a maze
   - instead of phasor indexing an array, would "index" into
     a path along the maze graph
-  - could have breath first and depth first paths as options
+  - could have breadth first and depth first paths as options
   - use DAG style mazes (one and only one path out, no loops or cycles)
   - though cycles in maze could be analog for loops in waveform playback
   - maybe something hilbert curve esque?
-- scmhidtt trigger / pulse generator banks
-  - just ui to a set of SchmittTriggers
-  - each strip
-    - input
-    - attentuator for process()'ed value
-    - output trigger
-  - for generator strip
-    - trigger input
-    - knob/cv in/param for duration
-    - gate output
 - Matrix clock
   - N x N matrix
   - each row defaults to a clock division
@@ -176,7 +193,7 @@ plugin ideas:
     of each output
   - maybe a per cross mute/solo
   - Much like the movies, the first one was the best.
-- Notes module with CV/trigger control and multiple messages
+- text Notes module with CV/trigger control and multiple messages
   - like a plain notes module, but can react to input from
     patch
   - use case would be describing stages of a generative patch
@@ -201,3 +218,133 @@ plugin ideas:
     "JOURNAL OF THE AUDIO ENGINEERING SOCIETY, October 1973"
     (https://pdfs.semanticscholar.org/6b9c/30f94551aaf05f077aa491f31b196898cd90.pdf)
   - "Sequency" - theres a module name if I ever heard one.
+- Add DC blocker option to Big Mute Button ?
+- Whats New Now
+  - multiple inputs, detect, choose and output the most recently change value
+  - use to multiple multiple controllers (like Specific Value) together and
+    use the 'active' one
+  - for each input, track previous (N?) input value[s]
+     - on each step, compare current value to previous
+     - if different, it's 'new'
+     - compare to some value precision (ie, the epsilon to use when comparing floats)
+     - compare to some time precision (running average of last N values?)
+     - if only one new/changed input, send the new value to the output
+     - if multiple new/changed inputs, need to pick which to use
+       - most recently chosen for output? ie, stick with input that first started changing
+       - least recently chosen?  kind of round robin
+       - value that most recently started changing? (track how long each input has been changing,
+         and choose the one that just "woke up")
+  - output a trigger when output value is changing (for ex, a new cv note was detected, send a trigger
+    to potentially start a gate...)
+  - almost surely already exists with different name/terminology
+     - maybe envelope followers and logic?
+  - uses:
+    - allow multiple CV controllers to be used (ie, a midi-to-cv, a SpecificValue, a TwelveKeys) with
+      the final output being DWIM for user (ie, whatever changed last)
+    - kind of multiplexing?
+    - bet it would make weird noises at audio rate
+  - options:
+    - way to avoid discont/aliasing in output?
+      - interpolation?
+      - miniblep?
+    - gate out for 'something is changing right now'
+    - default output value (0?) if nothing is changing?
+- Blocked In DC!
+  - just DC blocker, but I like the name
+- The Big VUte Button
+  - The Big Mute Button, but with clickable
+    stereo VU meters
+- CV Key Splitter Switch
+  - one CV input
+  - 12 (* N) outputs, one for each chromatic note
+  - if CV in is 1.0V, then only the 'C' output sends signal
+  - split a CV into output for each note
+  - one octave 'small' version could do it for any octave
+    (ie, C0, C-4, C5 all go out the C output)
+  - larger versions
+    - 5X 5x12 outputs
+    - outputs correspond to specific note@octave
+    - ie, C0 goes to C0 out, C4 goes to C4 out
+    - 10X 10x12 outputs, for -5.0V to 5.0V coverage
+  - possibly include a oct adjustment
+  - maybe a fine tune
+    - ie, a440 vs a437 etc
+    - SpecificValue style text box?
+  - possibly note-on/note-off style trigger outputs
+  - ditto for a gate
+     - start gate when new output is chosen, end it
+       when the next note is detected
+  - maybe some sort of keyboard like widget?
+- CV Key Range
+  - like CV Key Splitter Switch except outputs to a set
+    of range/group outputs
+  - each note has choice of which group/range it goes to
+    - set of N (4?) buttons?  (could go to more than one range...)
+    - a knob with detents?
+  - in some way range would just be a more specific version the
+    Table module with CV/note specific UI
+    (ie, a map of an input to one or more output values)
+  - incoming CV split into N ranges
+    (bass/treble, bass/baritone/alto/soprano)
+  - ranges can overlap
+  - two knob/param for each range (low and high)
+  - could use FloatFiend/NoteName field from SpecificValue
+    for text entry
+  - presets/default for
+    - bass/treble
+    - bass/baritone/alto/soprano/tenor
+    - rumble or sub bass / bass / treble
+    - below human / human / above human
+- Audio Key Splitter/Range
+  - like CV Key stuff, except with audio inputs
+  - needs fft magic likely (or at least filters)
+  - detect the main harmonics of audio and send output to
+    note specific output
+    - possibly more than one harmonic
+    - ie, audio with fundamental at C4, and another strong harmonic at
+      G5 would output from C4 and G5 outputs
+  - outputs could be trigger/gate or corresponding CV value
+  - or out to some set/group/range of outputs
+  - CV value would be Pitch-To-CV
+- Etch-a-Sketch like visualizer
+  - X and Y inputs
+  - trigger in for 'turn upside down and shake' / reset
+  - more or less stylized oscilliscope
+- Timing tuner / temporal heatmap
+  - visualizer of where in a 'beat' different inputs (gates/triggers) happen
+  - display would be bar graph / histogram like
+    - X range would be time between beats
+    - X=0 start of clock beat, x=1.0 end of clock beat (assuming 0->1,0 for
+      arbitrary range)
+    - Y value would be count of other event inputs
+  - kind of specialized oscillioscope that accumulates values and is
+    triggered for each clock pulse
+  - why?
+    - might look neat?
+    - use for 'tuning' / tweak multiple event sources
+  - Timing Chart? Beat Map? Splay Visualizer? Beat Tuner?
+- 2d Scatter Plot
+  - visualizer
+  - 2 CV/audio inputs (X, Y)
+  - Clock or trigger input
+    - on trigger, grab the values of each input, plot on graph
+  - more or less just an oscillioscope with very short sample
+- Increment / Counter
+ - dedicated 'count triggers since reset' module
+ - freq counter-ish
+ - can be implemented with other modules, but dedicate UX might
+   be useful (seems to be a commonly asked question)
+- CV Value to trigger
+  - converts cv value into distinct trigger outputs
+  - CV in
+  - Range param
+  - Increment param / Divisions
+  - Some large number of trigger outs
+  - for ex, range of 4, increment of .25.
+    - CV in of 0.0 would send trigger to out 1
+    - CV in of 1.25 would send trigger out 5
+- Triggers to CV value
+  - opposite of CV Value To Trigger
+  - lots of trigger inputs
+  - one CV output
+  - for values above, input on trigger 5 would send 1.25, etc

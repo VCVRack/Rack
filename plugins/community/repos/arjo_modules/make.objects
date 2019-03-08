@@ -1,0 +1,5 @@
+ALL_OBJ= \
+	./src/arjo_modules.o \
+	./src/Count.o \
+	./src/Seq.o \
+	./src/Switch.o

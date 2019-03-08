@@ -60,6 +60,12 @@ Port24::Port24() {
 }
 
 
+BlankPort24::BlankPort24() {
+	setSVG(NULL);
+	box.size = Vec(24, 24);
+}
+
+
 SliderSwitch::SliderSwitch() {
 	shadow = new CircularShadow();
 	addChild(shadow);

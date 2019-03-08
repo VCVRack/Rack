@@ -3,18 +3,22 @@ ALL_OBJ= \
 	src/AS.o \
 	src/AtNuVrTr.o \
 	src/BPMCalc.o \
+	src/BPMCalc2.o \
 	src/BPMClock.o \
 	src/BlankPanel4.o \
 	src/BlankPanel6.o \
 	src/BlankPanel8.o \
 	src/BlankPanelSpecial.o \
 	src/CV2T.o \
+	src/ZeroCV2T.o \
 	src/DelayPlus.o \
 	src/DelayPlusStereo.o \
 	src/Flow.o \
 	src/KillGate.o \
 	src/LaunchGate.o \
 	src/Merge2_5.o \
+	src/Mixer2ch.o \
+	src/Mixer4ch.o \
 	src/Mixer8ch.o \
 	src/MonoVUmeter.o \
 	src/Multiple2_5.o \

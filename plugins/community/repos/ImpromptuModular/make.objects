@@ -1,7 +1,12 @@
 ALL_OBJ= \
 	src/BigButtonSeq.o \
+	src/BigButtonSeq2.o \
 	src/BlankPanel.o \
 	src/Clocked.o \
+	src/Foundry.o \
+	src/FoundrySequencer.o \
+	src/FoundrySequencerKernel.o \
+	src/FourView.o \
 	src/FundamentalUtil.o \
 	src/GateSeq64.o \
 	src/ImpromptuModular.o \

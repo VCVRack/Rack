@@ -43,11 +43,6 @@
       </g>
     </symbol>
 
-    <symbol id="switch" viewBox="0 0 14px 24px">
-      <rect width="14px" height="24px" stroke-width="1" stroke="#000" fill="#ddd" />
-      <rect width="14px" height="12px" stroke-width="0" fill="#000" />
-    </symbol>
-
     <symbol id="input" viewBox="0 0 24px 24px">
       <g transform="translate(12 12)">
         <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
@@ -80,16 +75,18 @@
 
   <g transform="translate(0 18)">
     <g transform="translate(5.5 0)">
-      <rect width="34" height="10" fill="#fafafa" transform="translate(0 172)" />
-      <rect width="34" height="182" rx="5" fill="#fafafa" />
+      <rect width="34" height="10" fill="#fafafa" transform="translate(0 232)" />
+      <rect width="34" height="242" rx="5" fill="#fafafa" />
       <use id="IN1_INPUT" xlink:href="#input" transform="translate(5 5)" />
       <use id="IN2_INPUT" xlink:href="#input" transform="translate(5 35)" />
       <use id="IN3_INPUT" xlink:href="#input" transform="translate(5 65)" />
       <use id="IN4_INPUT" xlink:href="#input" transform="translate(5 95)" />
       <use id="IN5_INPUT" xlink:href="#input" transform="translate(5 125)" />
       <use id="IN6_INPUT" xlink:href="#input" transform="translate(5 155)" />
+      <use id="IN7_INPUT" xlink:href="#input" transform="translate(5 185)" />
+      <use id="IN8_INPUT" xlink:href="#input" transform="translate(5 215)" />
     </g>
-    <g transform="translate(5.5 185)">
+    <g transform="translate(5.5 245)">
       <rect width="34" height="10" fill="#bbb" transform="translate(0 -3)" />
       <rect width="34" height="36" rx="5" fill="#bbb" />
       <use id="OUT_OUTPUT" xlink:href="#output" transform="translate(5 0)" />
@@ -97,13 +94,7 @@
     </g>
   </g>
 
-  <g transform="translate(15.5 254)">
-    <text font-size="5pt" letter-spacing="2px" transform="translate(-2 -1)">SUM</text>
-    <use id="MODE_PARAM" xlink:href="#switch" transform="translate(0 2)" />
-    <text font-size="5pt" letter-spacing="2px" transform="translate(-1 34)">AVG</text>
-  </g>
-
-  <g transform="translate(0 305)">
+  <g transform="translate(0 311)">
     <text font-size="6pt" letter-spacing="2px" transform="translate(7 0)">LEVEL</text>
     <use id="LEVEL_PARAM" xlink:href="#knob-small" transform="translate(0 -5)" />
     <use xlink:href="#knobguide-maxtick" transform="translate(2.2 -2.5)" />

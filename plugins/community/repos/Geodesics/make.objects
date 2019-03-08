@@ -3,6 +3,7 @@ ALL_OBJ=\
 	src/BlankInfo.o \
 	src/BlankLogo.o \
 	src/Branes.o \
+	src/Entropia.o \
 	src/Geodesics.o \
 	src/GeoWidgets.o \
 	src/Ions.o \

@@ -56,7 +56,7 @@ struct VCAmpWidget : ModuleWidget {
 			VCAmp::LEVEL_PARAM,
 			0.0,
 			1.0,
-			abs(module->minDecibels) / (module->maxDecibels - module->minDecibels)
+			fabs(module->minDecibels) / (module->maxDecibels - module->minDecibels)
 		);
 		dynamic_cast<VUSlider*>(slider)->setVULevel(&(module->_rmsLevel));
 		addParam(slider);

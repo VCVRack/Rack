@@ -126,8 +126,7 @@ struct QuadVCAWidget : ModuleWidget
 
 QuadVCAWidget::QuadVCAWidget(QuadVCA *module) : ModuleWidget(module) {
 
-   setPanel(SVG::load(assetPlugin(plugin, "res/QuadVCA.svg")));
-
+  setPanel(SVG::load(assetPlugin(plugin, "res/QuadVCA.svg")));
 	//SCREWS
 	addChild(Widget::create<as_HexScrew>(Vec(RACK_GRID_WIDTH, 0)));
 	addChild(Widget::create<as_HexScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

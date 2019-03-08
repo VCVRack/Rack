@@ -241,7 +241,7 @@ struct PhaserFxWidget : ModuleWidget
 
 PhaserFxWidget::PhaserFxWidget(PhaserFx *module) : ModuleWidget(module) {
 
-   setPanel(SVG::load(assetPlugin(plugin, "res/Phaser.svg")));
+  setPanel(SVG::load(assetPlugin(plugin, "res/Phaser.svg")));
   
 	//SCREWS
 	addChild(Widget::create<as_HexScrew>(Vec(RACK_GRID_WIDTH, 0)));

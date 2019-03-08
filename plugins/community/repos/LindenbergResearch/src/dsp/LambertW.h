@@ -24,21 +24,23 @@
 
 namespace dsp {
 
-   template<int branch>
-      double LambertW(const double x);
+template<int branch>
+double LambertW(const double x);
 
 
-   inline
-      double
-      LambertW(const int branch, const double x) {
-      switch (branch) {
-         case -1:
+inline
+double
+LambertW(const int branch, const double x) {
+    switch (branch) {
+        case -1:
             return LambertW<-1>(x);
-         case 0:
+        case 0:
             return LambertW<0>(x);
-         default:
+        default:
             return std::numeric_limits<double>::quiet_NaN();
-      }
-   }
+    }
+}
 
 }
+
+

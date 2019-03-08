@@ -70,6 +70,7 @@ void Counter::step() {
 	if( stopTrigger.process(inputs[STOP_INPUT].normalize(0.0) + params[STOP_PARAM].value ))   {
 		state=false; 
 		counter=0;
+		stopPulse.trigger(0.001);
 	};
 
 	if( gateTrigger.process(inputs[GATE_INPUT].normalize(0.0) ) ) {

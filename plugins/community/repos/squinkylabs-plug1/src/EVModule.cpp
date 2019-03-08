@@ -27,10 +27,6 @@ private:
 
 void EVModule::onSampleRateChange()
 {
-    // TODO
-   // float rate = engineGetSampleRate();
-    //vco.setSampleRate(rate);
-    printf("on sample rate change\n"); fflush(stdout);
 }
 
 EVModule::EVModule()
@@ -41,8 +37,6 @@ EVModule::EVModule()
     vco(this)
 {
     onSampleRateChange();
-   // vco.init();
-    printf("ctor\n"); fflush(stdout);
 }
 
 void EVModule::step()
@@ -78,79 +72,79 @@ struct EVWidget : ModuleWidget
     int lastOctave = -100;
 };
 
- void EVWidget::draw(NVGcontext *vg)
+void EVWidget::draw(NVGcontext *vg)
 {
     float value = octaveKnob->value;
     int oct = roundf(value);
     if (oct != lastOctave) {
-        const char * val="yy";  
-        switch(oct) {
-            case -5: 
+        const char * val = "yy";
+        switch (oct) {
+            case -5:
                 val = "32'";
                 break;
-            case -4: 
+            case -4:
                 val = "16'";
                 break;
-            case -3: 
+            case -3:
                 val = "8'";
                 break;
-            case -2: 
+            case -2:
                 val = "4'";
                 break;
-            case -1: 
+            case -1:
                 val = "2'";
                 break;
-            case 0: 
+            case 0:
                 val = "1'";
                 break;
-            case 1: 
+            case 1:
                 val = "1/2'";
                 break;
-            case 2: 
+            case 2:
                 val = "1/4'";
                 break;
-            case 3: 
+            case 3:
                 val = "1/8'";
                 break;
-            case 4: 
+            case 4:
                 val = "1/16'";
                 break;
         }
-        
-        
+
+
 
         octaveLabel->text = val;
     }
- 
+
     ModuleWidget::draw(vg);
 }
 
 void EVWidget::addPWM(EVModule * module, float verticalShift)
 {
-    addInput(Port::create<PJ301MPort>(Vec(72, 236+verticalShift),
+    addInput(Port::create<PJ301MPort>(Vec(72, 236 + verticalShift),
         Port::INPUT, module, module->vco.PWM_INPUT));
 
-    addParam(ParamWidget::create<Rogan1PBlue>(Vec(16, 212+verticalShift),
+    addParam(ParamWidget::create<Rogan1PBlue>(Vec(16, 212 + verticalShift),
         module, module->vco.PWM_PARAM, -1.0, 1.0, 0.0));
 
-    addLabel(Vec(30, 246+verticalShift), "pwm");
+    addLabel(Vec(30, 246 + verticalShift), "pwm");
 }
 
 void EVWidget::addMiddle(EVModule * module, float verticalShift)
 {
-    addParam(ParamWidget::create<Rogan1PBlue>(Vec(73, 125+verticalShift),
+    addParam(ParamWidget::create<Rogan1PBlue>(Vec(73, 125 + verticalShift),
         module, module->vco.TUNE_PARAM, -7.0, 7.0, 0.0));
     addLabel(Vec(69, 164 + verticalShift), "tune");
 
-    addInput(Port::create<PJ301MPort>(Vec(10, 124+verticalShift),
+    addInput(Port::create<PJ301MPort>(Vec(10, 124 + verticalShift),
         Port::INPUT, module, module->vco.PITCH1_INPUT));
 
-    addInput(Port::create<PJ301MPort>(Vec(34, 160+verticalShift),
+    addInput(Port::create<PJ301MPort>(Vec(34, 160 + verticalShift),
         Port::INPUT, module, module->vco.PITCH2_INPUT));
-    addLabel(Vec(6, 164+verticalShift), "cv");
-    addInput(Port::create<PJ301MPort>(Vec(62, 194+verticalShift),
+    addLabel(Vec(6, 164 + verticalShift), "cv");
+    addInput(Port::create<PJ301MPort>(Vec(62, 194 + verticalShift),
         Port::INPUT, module, module->vco.FM_INPUT));
-    addLabel(Vec(84, 200+verticalShift), "fm");
+    addLabel(Vec(84, 200 + verticalShift), "fm");
 //	addInput(Port::create<PJ301MPort>(Vec(86, 189), Port::INPUT, module, module->vco.SYNC_INPUT));
 
 
@@ -159,14 +153,14 @@ void EVWidget::addMiddle(EVModule * module, float verticalShift)
 void EVWidget::addOutputs(EVModule * module, float verticalShift)
 {
     const float penultimateRow = 273 + verticalShift;
-    const float penultimateLabelRow = penultimateRow + 24; 
-    
+    const float penultimateLabelRow = penultimateRow + 24;
+
     addOutput(Port::create<PJ301MPort>(Vec(10, penultimateRow), Port::OUTPUT, module, module->vco.TRI_OUTPUT));
     addLabel(Vec(8, penultimateLabelRow), "tri");
 
     addOutput(Port::create<PJ301MPort>(Vec(87, penultimateRow), Port::OUTPUT, module, module->vco.SINE_OUTPUT));
     addLabel(Vec(84, penultimateLabelRow), "sin");
-    
+
     const float bottomRow = 317 + verticalShift;            // 320 -> 317 to make room?
     const float bottomLabelRow = bottomRow + 24;
 

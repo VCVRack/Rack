@@ -11,8 +11,7 @@ public:
         inputs(parent->inputs),
         outputs(parent->outputs),
         params(parent->params),
-        lights(parent->lights),
-        module(parent)
+        lights(parent->lights)
     {
     }
     virtual void step()
@@ -20,11 +19,20 @@ public:
     };
     float engineGetSampleRate()
     {
+#ifdef __V1
+        return APP->engine->getSampleRate();
+#else  
         return ::engineGetSampleRate();
+#endif
     }
+    
     float engineGetSampleTime()
     {
+#ifdef __V1
+        return APP->engine->getSampleTime();
+#else  
         return ::engineGetSampleTime();
+#endif
     }
 protected:
     std::vector<Input>& inputs;
@@ -32,5 +40,4 @@ protected:
     std::vector<Param>& params;
     std::vector<Light>& lights;
 private:
-    Module * const module;
 };

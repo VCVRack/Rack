@@ -168,7 +168,7 @@ Widget = Struct.new(:id, :x, :y, :width, :height) do
   end
 end
 widgets_by_type = {}
-widget_re = %r{^(\w+_(PARAM|INPUT|OUTPUT|LIGHT)),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?)}
+widget_re = %r{^(\w+_(WIDGET|PARAM|INPUT|OUTPUT|LIGHT)),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?),(\d+(?:\.\d+)?)}
 lines.split.each do |line|
   if m = widget_re.match(line)
     widget = Widget.new(
@@ -183,7 +183,7 @@ lines.split.each do |line|
 end
 
 if options[:sort]
-  %w(params inputs outputs lights).each do |type|
+  %w(widgets params inputs outputs lights).each do |type|
     next unless widgets_by_type.key?(type)
     widgets_by_type[type].sort! do |a, b|
       case options[:sort]
@@ -332,7 +332,9 @@ when 'hpp'
 when 'cpp'
   puts make_stub(widgets_by_type, cpp_template, options)
 else
-  puts "Params:"
+	puts "Widgets:"
+  puts widgets_by_type['widgets']
+  puts "\nParams:"
   puts widgets_by_type['params']
   puts "\nInputs:"
   puts widgets_by_type['inputs']

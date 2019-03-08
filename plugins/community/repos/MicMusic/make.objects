@@ -1,0 +1,5 @@
+ALL_OBJ= \
+	src/Adder.o \
+	src/Distortion.o \
+	src/LedToggle.o \
+	src/MicMusic.o

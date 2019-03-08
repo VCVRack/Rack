@@ -1,22 +1,20 @@
 #pragma once
 
 #include "bogaudio.hpp"
-#include "dsp/analyzer.hpp"
-
-using namespace bogaudio::dsp;
+#include "analyzer_base.hpp"
 
 extern Model* modelAnalyzer;
 
 namespace bogaudio {
 
-struct ChannelAnalyzer;
-
-struct Analyzer : Module {
+struct Analyzer : AnalyzerBase {
 	enum ParamsIds {
-		RANGE_PARAM,
+		RANGE_PARAM, // no longer used
 		SMOOTH_PARAM,
 		QUALITY_PARAM,
-		POWER_PARAM,
+		POWER_PARAM,  // no longer used
+		WINDOW_PARAM,
+		RANGE2_PARAM,
 		NUM_PARAMS
 	};
 
@@ -40,27 +38,17 @@ struct Analyzer : Module {
 		QUALITY_HIGH_LIGHT,
 		QUALITY_GOOD_LIGHT,
 		POWER_ON_LIGHT,
+		QUALITY_ULTRA_LIGHT,
+		WINDOW_NONE_LIGHT,
+		WINDOW_HAMMING_LIGHT,
+		WINDOW_KAISER_LIGHT,
 		NUM_LIGHTS
 	};
 
-	enum Quality {
-		QUALITY_HIGH,
-		QUALITY_GOOD
-	};
+	const int modulationSteps = 100;
+	int _modulationStep = 0;
 
-	bool _running = false;
-	int _averageN;
-	ChannelAnalyzer* _channelA = NULL;
-	ChannelAnalyzer* _channelB = NULL;
-	ChannelAnalyzer* _channelC = NULL;
-	ChannelAnalyzer* _channelD = NULL;
-	float _range = 0.0;
-	float _smooth = 0.0;
-	Quality _quality = QUALITY_GOOD;
-	const SpectrumAnalyzer::Overlap _overlap = SpectrumAnalyzer::OVERLAP_2;
-	const int _binAverageN = 2;
-
-	Analyzer() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	Analyzer() : AnalyzerBase(4, NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();
 	}
 	virtual ~Analyzer() {
@@ -69,10 +57,9 @@ struct Analyzer : Module {
 
 	void onReset() override;
 	void onSampleRateChange() override;
-	void resetChannels();
-	SpectrumAnalyzer::Size size();
+	json_t* toJson() override;
+	void fromJson(json_t* root) override;
 	void step() override;
-	void stepChannel(ChannelAnalyzer*& channelPointer, bool running, Input& input, Output& output);
 };
 
 } // namespace bogaudio

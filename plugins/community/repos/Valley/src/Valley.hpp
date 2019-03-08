@@ -3,7 +3,7 @@ using namespace rack;
 
 #include <iomanip> // setprecision
 #include <sstream> // stringstream
-
+#define VALLEY_NAME "ValleyDev"
 namespace rack_plugin_Valley {
 
 RACK_PLUGIN_DECLARE(Valley);

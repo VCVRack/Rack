@@ -27,6 +27,7 @@ RACK_PLUGIN_MODEL_DECLARE(dBiz, DAOSC);
 
 RACK_PLUGIN_INIT(dBiz) {
    RACK_PLUGIN_INIT_ID();
+   // https://github.com/dBiz/dBiz
 
    RACK_PLUGIN_MODEL_ADD(dBiz, FourSeq);
    RACK_PLUGIN_MODEL_ADD(dBiz, dBizBlank);

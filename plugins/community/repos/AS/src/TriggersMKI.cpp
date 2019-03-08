@@ -40,6 +40,9 @@ struct TriggersMKI: Module {
     float display_volts = 0.0f;
     bool negative_volts = false;
 
+    PulseGenerator triggerPulse;
+    bool trg_pulse = false;
+
     TriggersMKI() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
     void step() override;
 
@@ -103,17 +106,20 @@ void TriggersMKI::step() {
     }
 
     //MOMENTARY TRIGGER
-    //EXTERNAL TRIGGER
+    //updated to use pulses
     if (BtnTrigger.process(params[MOMENTARY_SWITCH].value)) {
         resetLight = 1.0;
         if (!running) {
-            outputs[TRIGGER_OUT].value = volts;
-        }
-    }else{
-        if (!running) {
-             outputs[TRIGGER_OUT].value = 0.0f;
+            triggerPulse.trigger(1e-3f);
+
         }
     }
+    if(!running){
+        trg_pulse = triggerPulse.process(1.0 / engineGetSampleRate());
+        outputs[TRIGGER_OUT].value = (trg_pulse ? volts : 0.0f);
+    }
+
+
     resetLight -= resetLight / lightLambda / engineGetSampleRate();
     lights[MOMENTARY_LED].value = resetLight;
 

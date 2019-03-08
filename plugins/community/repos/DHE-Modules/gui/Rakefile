@@ -1,67 +1,127 @@
-require 'rake'
 require 'rake/clean'
 require 'pathname'
 
-build_dir = Pathname('_build')
-module_dest_dir = Pathname('../res')
-image_dest_dir = Pathname('../images')
-
-directory module_dest_dir
-directory image_dest_dir
-
-control_build_dir = build_dir / 'controls'
-control_build_files = "#{control_build_dir}/**/*.svg"
-control_build_file_to_dest_file = "%{^#{control_build_dir}/,#{module_dest_dir}/}p"
-
-image_build_dir = build_dir / 'images'
-image_build_files = "#{image_build_dir}/**/*.svg"
-image_build_file_to_dest_file = "%{^#{image_build_dir}/,#{image_dest_dir}/}p"
-
-panel_build_dir = build_dir / 'panels'
-panel_build_files = "#{panel_build_dir}/**/*.svg"
-panel_build_file_to_dest_file = "%{^#{panel_build_dir}/,#{module_dest_dir}/}X/panel.svg"
-
-module_source_dir = 'panels'
-module_source_files = FileList["#{module_source_dir}/**/*.svg"]
-module_source_file_to_dest_dir = "%{^#{module_source_dir}/,#{module_dest_dir}/}X"
-module_dest_dirs = module_source_files.pathmap(module_source_file_to_dest_dir)
-module_dest_dirs.each { |dir| directory dir }
-
-desc 'Compile the SVG images'
-task :compile do
-  sh 'bundle exec jekyll b --trace'
+def inkscape(from:, to:)
+  from = from.expand_path.to_s
+  to = to.expand_path.to_s
+  sh '/Applications/Inkscape.app/Contents/Resources/script', '--export-text-to-path', "--export-plain-svg=#{to}", from
 end
 
-task controls: [:compile] + module_dest_dirs do
-  FileList[control_build_files].each do |build_file|
-    dest_file = build_file.pathmap(control_build_file_to_dest_file)
-    sh "xmllint --format #{build_file} > #{dest_file}"
+MODULE_TO_FILENAME = {}
+
+$modules_dir = Pathname('lib/modules')
+
+# Each file instantiates a module, which adds itself to MODULE_TO_FILENAME
+FileList.new($modules_dir / '*.rb')
+    .each {|file| require_relative file}
+
+$modules = MODULE_TO_FILENAME.keys
+
+$svg_build_dir = Pathname('_svg')
+directory $svg_build_dir
+
+$svg_install_dir = Pathname('../svg')
+directory $svg_install_dir
+
+$faceplate_file_to_module = Hash[$modules.map {|m| [m.faceplate_file, m]}]
+$faceplate_files = $faceplate_file_to_module.keys
+$faceplate_build_files = []
+$faceplate_install_files = []
+
+$faceplate_files.each do |faceplate_file|
+  m = $faceplate_file_to_module[faceplate_file]
+  module_source_file = MODULE_TO_FILENAME[m]
+  faceplate_build_file = $svg_build_dir / faceplate_file.path
+  $faceplate_build_files << faceplate_build_file
+
+  file faceplate_build_file => [$svg_build_dir, module_source_file] do
+    faceplate_file.write($svg_build_dir)
+  end
+
+  faceplate_install_file = $svg_install_dir / faceplate_file.path
+  $faceplate_install_files << faceplate_install_file
+  file faceplate_install_file => [$svg_install_dir, faceplate_build_file] do
+    inkscape(from: faceplate_build_file, to: faceplate_install_file)
   end
 end
 
-task panels: [:compile] + module_dest_dirs do
-  FileList[panel_build_files].each do |build_file|
-    dest_file = build_file.pathmap(panel_build_file_to_dest_file)
-    convert_text_to_paths(build_file, dest_file)
+$image_install_dir = Pathname('../images')
+directory $image_install_dir
+
+$image_build_dir = Pathname('_images')
+directory $image_build_dir
+
+$image_file_to_module = Hash[$modules.map {|m| [m.image_file, m]}]
+$image_files = $image_file_to_module.keys
+$image_build_files = []
+$image_install_files = []
+
+$image_files.each do |image_file|
+  m = $image_file_to_module[image_file]
+  module_source_file = MODULE_TO_FILENAME[m]
+  image_build_file = $image_build_dir / image_file.path
+  $image_build_files << image_build_file
+
+  file image_build_file => [$image_build_dir, module_source_file] do
+    image_file.write($image_build_dir)
+  end
+
+  image_install_file = $image_install_dir / image_file.path
+  $image_install_files << image_install_file
+  file image_install_file => [$image_install_dir, image_build_file] do
+    inkscape(from: image_build_file, to: image_install_file)
   end
 end
 
-task images: [:compile, image_dest_dir] do
-  FileList[image_build_files].each do |build_file|
-    dest_file = build_file.pathmap(image_build_file_to_dest_file)
-    convert_text_to_paths(build_file, dest_file)
+$controls = $modules.flat_map(&:controls)
+$control_to_module = Hash[$controls.collect {|c| [c, c.faceplate]}]
+$control_file_to_control = Hash[
+    $controls
+        .flat_map {|control| control.svg_files.map {|svg_file| [svg_file, control]}}
+        .uniq {|pair| pair.first.path}
+]
+$control_files = $control_file_to_control.keys
+$control_build_files = []
+$control_install_files = []
+
+$control_files.each do |control_file|
+  control = $control_file_to_control[control_file]
+  m = $control_to_module[control]
+  module_source_file = MODULE_TO_FILENAME[m]
+
+  control_build_file = $svg_build_dir / control_file.path
+  $control_build_files << control_build_file
+  control_install_file = $svg_install_dir / control_file.path
+  $control_install_files << control_install_file
+
+  directory control_build_file.parent
+  file control_build_file => [module_source_file, control_build_file.parent] do
+    control_file.write($svg_build_dir)
+  end
+
+  directory control_install_file.parent
+  file control_install_file => [control_install_file.parent, control_build_file] do
+    if control_file.has_text
+      inkscape(from: control_build_file, to: control_install_file)
+    else
+      cp control_build_file, control_install_file
+    end
   end
 end
 
-task all: [:controls, :panels, :images]
-task default: :all
+desc 'Build SVG files (does not install)'
+task build: $control_build_files + $faceplate_build_files + $image_build_files
 
-CLEAN.include build_dir
-CLOBBER.include module_dest_dir, image_dest_dir
+desc 'Install SVG files'
+task install: $control_install_files + $faceplate_install_files + $image_install_files
 
-def convert_text_to_paths(source, dest)
-  source = Pathname(source).expand_path.to_s
-  dest = Pathname(dest).expand_path.to_s
-  sh "/Applications/Inkscape.app/Contents/Resources/script --export-text-to-path --export-plain-svg=#{dest} #{source}"
-end
+desc 'Remove and rebuild SVG files (does not install)'
+task fresh: [:clean, :default]
 
+desc 'Remove, rebuild, and reinstall SVG files'
+task reinstall: [:clobber, :install]
+
+task default: [:build]
+
+CLEAN.include $image_build_dir, $svg_build_dir
+CLOBBER.include $image_install_dir, $svg_install_dir

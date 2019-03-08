@@ -9,6 +9,7 @@
 #include "BiquadState.h"
 #include "BiquadFilter.h"
 #include "ObjectCache.h"
+#include "IComposite.h"
 #include <random>
 
 /**
@@ -53,6 +54,14 @@
  */
 
 template <class TBase>
+class LFNDescription : public IComposite
+{
+public:
+    Config getParam(int i) override;
+    int getNumParams() override;
+};
+
+template <class TBase>
 class LFN : public TBase
 {
 public:
@@ -62,6 +71,13 @@ public:
     }
     LFN() : TBase()
     {
+    }
+
+    /** Implement IComposite
+     */
+    static std::shared_ptr<IComposite> getDescription()
+    {
+        return std::make_shared<LFNDescription<TBase>>();
     }
 
     void setSampleTime(float time)
@@ -86,6 +102,7 @@ public:
         EQ3_PARAM,
         EQ4_PARAM,
         FREQ_RANGE_PARAM,
+        XLFN_PARAM,
         NUM_PARAMS
     };
 
@@ -120,6 +137,11 @@ public:
         return baseFrequency;
     }
 
+    bool isXLFN() const
+    {
+        return  TBase::params[XLFN_PARAM].value > .5;
+    }
+
     /**
      * This lets the butterworth get re-calculated on the UI thread.
      * We can't do it on the audio thread, because it calls malloc.
@@ -152,13 +174,17 @@ private:
     * done on the UI thread.
     */
     float lastBaseFrequencyParamValue = -100;
+    float lastXLFMParamValue = -1;
 
     std::default_random_engine generator{57};
     std::normal_distribution<double> distribution{-1.0, 1.0};
+
     float noise()
     {
         return  (float) distribution(generator);
     }
+
+    int controlUpdateCount = 0;
 
     /**
      * Must be called after baseFrequency is updated.
@@ -171,22 +197,72 @@ private:
      * map knob range from .1 Hz to 2.0 Hz
      */
     std::function<double(double)> rangeFunc =
-        {AudioMath::makeFunc_Exp(-5, 5, .1, 2)};
+    {AudioMath::makeFunc_Exp(-5, 5, .1, 2)};
 
-    /**
-     * Audio taper for the EQ gains. Arbitrary max value selected
-     * to give "good" output level.
-     */
+/**
+ * Audio taper for the EQ gains. Arbitrary max value selected
+ * to give "good" output level.
+ */
     AudioMath::SimpleScaleFun<float> gainScale =
-        {AudioMath::makeSimpleScalerAudioTaper(0, 35)};
+    {AudioMath::makeSimpleScalerAudioTaper(0, 35)};
 };
+
+
+
+template <class TBase>
+int LFNDescription<TBase>::getNumParams()
+{
+    return LFN<TBase>::NUM_PARAMS;
+}
+
+template <class TBase>
+inline IComposite::Config LFNDescription<TBase>::getParam(int i)
+{
+    const float gmin = -5;
+    const float gmax = 5;
+    const float gdef = 0;
+    Config ret(0, 1, 0, "");
+    switch(i) {
+        case LFN<TBase>::EQ0_PARAM:
+            ret = { gmin, gmax, gdef, "Low freq mix"};
+            break;
+        case LFN<TBase>::EQ1_PARAM:
+            ret = { gmin, gmax, gdef, "Mid-low freq fix"};
+            break;
+        case LFN<TBase>::EQ2_PARAM:
+            ret = { gmin, gmax, gdef, "Mid freq mix"};
+            break;
+        case LFN<TBase>::EQ3_PARAM:
+            ret = { gmin, gmax, gdef, "Mid-high freq mix"};
+            break;
+        case LFN<TBase>::EQ4_PARAM:
+            ret = { gmin, gmax, gdef, "High freq mix"};
+            break;
+        case LFN<TBase>::FREQ_RANGE_PARAM:
+            ret = {  -5, 5, 0, "Base frequency"};
+            break;
+        case LFN<TBase>::XLFN_PARAM:
+            ret = { 0, 1, 0, "Extra low frequency"};
+            break;
+        default:
+            assert(false);
+    }
+    return ret;
+}
 
 template <class TBase>
 inline void LFN<TBase>::pollForChangeOnUIThread()
 {
-    if (lastBaseFrequencyParamValue != TBase::params[FREQ_RANGE_PARAM].value) {
+    if ((lastBaseFrequencyParamValue != TBase::params[FREQ_RANGE_PARAM].value) ||
+        (lastXLFMParamValue != TBase::params[XLFN_PARAM].value)) {
+
         lastBaseFrequencyParamValue = TBase::params[FREQ_RANGE_PARAM].value;
+        lastXLFMParamValue = TBase::params[XLFN_PARAM].value;
+
         baseFrequency = float(rangeFunc(lastBaseFrequencyParamValue));
+        if (TBase::params[XLFN_PARAM].value > .5f) {
+            baseFrequency /= 10.f;
+        }
 
         updateLPF();         // now get the filters updated
     }
@@ -204,7 +280,8 @@ inline void LFN<TBase>::updateLPF()
     assert(reciprocalSampleRate > 0);
     // decimation must be 100hz (what our EQ is designed at)
     // divided by base.
-    const float decimationDivider = float(100.0 / baseFrequency);
+    float decimationDivider = float(100.0 / baseFrequency);
+
     decimator.setDecimationRate(decimationDivider);
 
     // calculate lpFc ( Fc / sr)
@@ -220,9 +297,8 @@ inline void LFN<TBase>::step()
 {
     // Let's only check the inputs every 4 samples. Still plenty fast, but
     // get the CPU usage down really far.
-    static int count = 0;
-    if (count++ > 4) {
-        count = 0;
+    if (controlUpdateCount++ > 4) {
+        controlUpdateCount = 0;
         const int numEqStages = geq.getNumStages();
         for (int i = 0; i < numEqStages; ++i) {
             auto paramNum = i + EQ0_PARAM;

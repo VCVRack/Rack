@@ -16,6 +16,7 @@ public:
     static void designFourPoleHighpass(BiquadParams<T, 2>& pOut, T frequency);
     static void designFivePoleLowpass(BiquadParams<T, 3>& pOut, T frequency);
     static void designTwoPoleLowpass(BiquadParams<T, 1>& pOut, T frequency);
+    static void designTwoPoleHighpass(BiquadParams<T, 1>& pOut, T frequency);
 
     static void designSixPoleElliptic(BiquadParams<T, 3>& pOut, T frequency, T rippleDb, T stopbandAttenDb);
     static void designEightPoleElliptic(BiquadParams<T, 4>& pOut, T frequency, T rippleDb, T stopbandAttenDb);

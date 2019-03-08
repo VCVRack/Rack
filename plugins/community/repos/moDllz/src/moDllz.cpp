@@ -1,5 +1,6 @@
 #include "moDllz.hpp"
 
+// RACK_PLUGIN_MODEL_DECLARE(moDllz, MIDI8MPE); // crashes
 RACK_PLUGIN_MODEL_DECLARE(moDllz, MIDIPoly);
 RACK_PLUGIN_MODEL_DECLARE(moDllz, TwinGlider);
 RACK_PLUGIN_MODEL_DECLARE(moDllz, MIDIdualCV);
@@ -7,7 +8,10 @@ RACK_PLUGIN_MODEL_DECLARE(moDllz, XBender);
 
 RACK_PLUGIN_INIT(moDllz) {
    RACK_PLUGIN_INIT_ID();
+   RACK_PLUGIN_INIT_VERSION("0.6.6");
+   RACK_PLUGIN_INIT_WEBSITE("https://github.com/dllmusic/moDllz");
 
+   // RACK_PLUGIN_MODEL_ADD(moDllz, MIDI8MPE);
    RACK_PLUGIN_MODEL_ADD(moDllz, MIDIPoly);
    RACK_PLUGIN_MODEL_ADD(moDllz, TwinGlider);
    RACK_PLUGIN_MODEL_ADD(moDllz, MIDIdualCV);

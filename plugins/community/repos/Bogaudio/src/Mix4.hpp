@@ -25,6 +25,7 @@ struct Mix4 : Module {
 		PAN4_PARAM,
 		MUTE4_PARAM,
 		MIX_PARAM,
+		MIX_MUTE_PARAM,
 		NUM_PARAMS
 	};
 

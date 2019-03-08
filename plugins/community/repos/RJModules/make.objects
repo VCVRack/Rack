@@ -1,8 +1,13 @@
 ALL_OBJ= \
+	src/3xOSC.o \
 	src/BigButton.o \
 	src/BitCrush.o \
+	src/BPF.o \
 	src/BPM.o \
+	src/Buffers.o \
 	src/Buttons.o \
+	src/Chord.o \
+	src/ChordSeq.o \
 	src/common.o \
 	src/Displays.o \
 	src/DSPUtilities.o \
@@ -11,16 +16,21 @@ ALL_OBJ= \
 	src/FilterDelay.o \
 	src/Filters.o \
 	src/Floats.o \
+	src/Glides.o \
 	src/Integers.o \
 	src/LRMixer.o \
+	src/MetaKnob.o \
 	src/Mono.o \
 	src/Noise.o \
 	src/Notch.o \
+	src/Octaves.o \
 	src/Panner.o \
 	src/Panners.o \
+	src/RandomFilter.o \
 	src/Randoms.o \
 	src/Range.o \
 	src/RangeLFO.o \
+	src/Riser.o \
 	src/RJModules.o \
 	src/Sidechain.o \
 	src/Splitter.o \

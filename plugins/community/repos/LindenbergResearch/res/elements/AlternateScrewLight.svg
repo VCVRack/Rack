@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:serif="http://www.serif.com/" width="14px" height="14px" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-miterlimit:10;">
+    <g transform="matrix(1.29585,0,0,1.29585,-1.58727,-1.58697)">
+        <circle cx="7.001"
+                cy="7"
+                r="5.016"
+                style="fill-opacity:0.607843;"/>
+    </g>
+    <circle cx="7.001" cy="7" r="5.016"/>
+    <path id="Screw"
+          d="M2.758,2.757c-2.343,2.342 -2.343,6.143 0,8.486c2.342,2.343 6.143,2.343 8.485,-0.001c2.345,-2.343 2.346,-6.142 0,-8.484c-2.343,-2.344 -6.141,-2.345 -8.485,-0.001Zm5.451,4.243l1.773,1.773l-1.208,1.207l-1.773,-1.773l-1.773,1.774l-1.208,-1.208l1.773,-1.775l-1.775,-1.771l1.208,-1.208l1.775,1.774l1.774,-1.775l1.209,1.207l-1.775,1.775Z"
+          style="fill:#5e5c5a;fill-rule:nonzero;stroke:#3d3d3d;stroke-width:1px;"/>
+</svg>

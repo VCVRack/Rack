@@ -1,0 +1,38 @@
+ALL_OBJ= \
+	src/gverb.o \
+	src/gverbdsp.o \
+	src/BaseWidget.o \
+	src/ColourDragging.o \
+	src/CV0to10.o \
+	src/CV5to5.o \
+	src/CVMmt.o \
+	src/CVS0to10.o \
+	src/CVTgl.o \
+	src/DuckModule.o \
+	src/GVerbModule.o \
+	src/LoadCounter.o \
+	src/ModuleDragType.o \
+	src/PianoRoll/Auditioner.o \
+	src/PianoRoll/DragModes.o \
+	src/PianoRoll/PatternData.o \
+	src/PianoRoll/PatternWidget.o \
+	src/PianoRoll/PianoRollModule.o \
+	src/PianoRoll/PianoRollWidget.o \
+	src/PianoRoll/RollAreaWidget.o \
+	src/PianoRoll/Transport.o \
+	src/PianoRollModule.o \
+	src/SongRoll/ClockDivControlWidget.o \
+	src/SongRoll/PatternControllerSlice.o \
+	src/SongRoll/PatternControlWidget.o \
+	src/SongRoll/PatternHeaderWidget.o \
+	src/SongRoll/RepeatControlWidget.o \
+	src/SongRoll/RollArea.o \
+	src/SongRoll/SongRollData.o \
+	src/SongRoll/SongRollModule.o \
+	src/SongRoll/SongRollWidget.o \
+	src/SongRoll/Transport.o \
+	src/SongRollModule.o \
+	src/rcm.o
+
+#./src/AudioInterface16.o
+#	src/GVerbWidget.o 

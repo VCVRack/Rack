@@ -2,8 +2,12 @@
 
 Plateau::Plateau() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
     reverb.setSampleRate(engineGetSampleRate());
+    wet = 0.5f;
+    dry = 1.f;
+    preDelay = 0.f;
+    preDelayCVSens = preDelayNormSens;
     size = 1.f;
-    diffusion;
+    diffusion = 1.f;
     decay = 0.f;
     inputDampLow = 0.f;
     inputDampHigh = 10.f;
@@ -20,11 +24,17 @@ Plateau::Plateau() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
     frozen = false;
     tunedButtonState = false;
     diffuseButtonState = false;
+    preDelayCVSensState = 0;
+    inputSensitivityState = 0;
+    outputSaturationState = 0;
 
     clear = 0;
     cleared = false;
     tuned = 0;
     diffuseInput = 1;
+
+    leftInput = 0.f;
+    rightInput = 0.f;
 }
 
 void Plateau::step() {
@@ -96,7 +106,13 @@ void Plateau::step() {
     }
 
     // CV
-    reverb.setPreDelay(params[PRE_DELAY_PARAM].value);
+    switch(preDelayCVSensState) {
+        case 0: preDelayCVSens = preDelayNormSens; break;
+        case 1: preDelayCVSens = preDelayLowSens;
+    }
+    preDelay = params[PRE_DELAY_PARAM].value;
+    preDelay += 0.5f * (powf(2.f, inputs[PRE_DELAY_CV_INPUT].value * preDelayCVSens) - 1.f);
+    reverb.setPreDelay(clamp(preDelay, 0.f, 1.f));
 
     size = inputs[SIZE_CV_INPUT].value * params[SIZE_CV_PARAM].value * 0.1f;
     size += params[SIZE_PARAM].value;
@@ -155,7 +171,7 @@ void Plateau::step() {
     modSpeed *= modSpeed;
     modSpeed = modSpeed * 99.f + 1.f;
 
-    modShape = inputs[MOD_SHAPE_CV_INPUT].value * params[MOD_DEPTH_CV_PARAM].value * 0.1f;
+    modShape = inputs[MOD_SHAPE_CV_INPUT].value * params[MOD_SHAPE_CV_PARAM].value * 0.1f;
     modShape += params[MOD_SHAPE_PARAM].value;
     modShape = rescale(modShape, 0.f, 1.f, modShapeMin, modShapeMax);
     modShape = clamp(modShape, modShapeMin, modShapeMax);
@@ -169,7 +185,17 @@ void Plateau::step() {
     reverb.modDepth = modDepth;
     reverb.setModShape(modShape);
 
-    reverb.process(inputs[LEFT_INPUT].value / 10.f, inputs[RIGHT_INPUT].value / 10.f);
+    leftInput = inputs[LEFT_INPUT].value;
+    rightInput = inputs[RIGHT_INPUT].value;
+    if(inputs[LEFT_INPUT].active == false && inputs[RIGHT_INPUT].active == true) {
+        leftInput = inputs[RIGHT_INPUT].value;
+    }
+    else if(inputs[LEFT_INPUT].active == true && inputs[RIGHT_INPUT].active == false) {
+        rightInput = inputs[LEFT_INPUT].value;
+    }
+
+    inputSensitivity = inputSensitivityState ? 0.125893f : 1.f;
+    reverb.process(leftInput * 0.1f * inputSensitivity, rightInput * 0.1f * inputSensitivity);
 
     dry = inputs[DRY_CV_INPUT].value * params[DRY_CV_PARAM].value;
     dry += params[DRY_PARAM].value;
@@ -179,10 +205,15 @@ void Plateau::step() {
     wet += params[WET_PARAM].value;
     wet = clamp(wet, 0.f, 1.f) * 10.f;
 
-    outputs[LEFT_OUTPUT].value = inputs[LEFT_INPUT].value * dry;
-    outputs[RIGHT_OUTPUT].value = inputs[LEFT_INPUT].value * dry;
+    outputs[LEFT_OUTPUT].value = leftInput * dry;
+    outputs[RIGHT_OUTPUT].value = rightInput * dry;
     outputs[LEFT_OUTPUT].value += reverb.leftOut * wet;
     outputs[RIGHT_OUTPUT].value += reverb.rightOut * wet;
+
+    if(outputSaturationState) {
+        outputs[LEFT_OUTPUT].value = tanhDriveSignal(outputs[LEFT_OUTPUT].value * 0.111f, 0.95f) * 9.999f;
+        outputs[RIGHT_OUTPUT].value = tanhDriveSignal(outputs[RIGHT_OUTPUT].value * 0.111f, 0.95f) * 9.999f;
+    }
 }
 
 void Plateau::onSampleRateChange() {
@@ -200,6 +231,9 @@ json_t* Plateau::toJson()  {
     json_object_set_new(rootJ, "panelStyle", json_integer(panelStyle));
     json_object_set_new(rootJ, "tuned", json_integer((int)tuned));
     json_object_set_new(rootJ, "diffuseInput", json_integer((int)diffuseInput));
+    json_object_set_new(rootJ, "preDelayCVSens", json_integer((int)preDelayCVSensState));
+    json_object_set_new(rootJ, "inputSensitivity", json_integer((int)inputSensitivityState));
+    json_object_set_new(rootJ, "outputSaturation", json_integer((int)outputSaturationState));
     return rootJ;
 }
 
@@ -218,6 +252,15 @@ void Plateau::fromJson(json_t *rootJ) {
 
     json_t *diffuseInputJ = json_object_get(rootJ, "diffuseInput");
     diffuseInput = json_integer_value(diffuseInputJ);
+
+    json_t *preDelayCVSensJ = json_object_get(rootJ, "preDelayCVSens");
+    preDelayCVSensState = json_integer_value(preDelayCVSensJ);
+
+    json_t *inputSensitivityJ = json_object_get(rootJ, "inputSensitivity");
+    inputSensitivityState = json_integer_value(inputSensitivityJ);
+
+    json_t *outputSaturationJ = json_object_get(rootJ, "outputSaturation");
+    outputSaturationState = json_integer_value(outputSaturationJ);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,6 +271,33 @@ void PlateauPanelStyleItem::onAction(EventAction &e) {
 
 void PlateauPanelStyleItem::step() {
     rightText = (module->panelStyle == panelStyle) ? "✔" : "";
+    MenuItem::step();
+}
+
+void PlateauPreDelayCVSensItem::onAction(EventAction &e) {
+    module->preDelayCVSensState = preDelayCVSensState;
+}
+
+void PlateauPreDelayCVSensItem::step() {
+    rightText = (module->preDelayCVSensState == preDelayCVSensState) ? "✔" : "";
+    MenuItem::step();
+}
+
+void PlateauInputSensItem::onAction(EventAction &e) {
+    module->inputSensitivityState = inputSensitivityState;
+}
+
+void PlateauInputSensItem::step() {
+    rightText = (module->inputSensitivityState == inputSensitivityState) ? "✔" : "";
+    MenuItem::step();
+}
+
+void PlateauOutputSaturationItem::onAction(EventAction &e) {
+    module->outputSaturationState = outputSaturationState;
+}
+
+void PlateauOutputSaturationItem::step() {
+    rightText = (module->outputSaturationState == outputSaturationState) ? "✔" : "";
     MenuItem::step();
 }
 
@@ -252,6 +322,7 @@ PlateauWidget::PlateauWidget(Plateau* module) : ModuleWidget(module) {
     addInput(Port::create<PJ301MDarkSmall>(module->rightInputPos, Port::INPUT, module, Plateau::RIGHT_INPUT));
     addInput(Port::create<PJ301MDarkSmall>(module->dryCVPos, Port::INPUT, module, Plateau::DRY_CV_INPUT));
     addInput(Port::create<PJ301MDarkSmall>(module->wetCVPos, Port::INPUT, module, Plateau::WET_CV_INPUT));
+    addInput(Port::create<PJ301MDarkSmall>(module->preDelayCVPos, Port::INPUT, module, Plateau::PRE_DELAY_CV_INPUT));
     addInput(Port::create<PJ301MDarkSmall>(module->inputLowDampCVPos, Port::INPUT, module, Plateau::INPUT_LOW_DAMP_CV_INPUT));
     addInput(Port::create<PJ301MDarkSmall>(module->inputHighDampCVPos, Port::INPUT, module, Plateau::INPUT_HIGH_DAMP_CV_INPUT));
 
@@ -275,37 +346,37 @@ PlateauWidget::PlateauWidget(Plateau* module) : ModuleWidget(module) {
 
     float minAngle = -0.77f * M_PI;
     float maxAngle = 0.77f * M_PI;
-    addParam(createValleyKnob<RoganMedWhite>(module->dryPos, module, Plateau::DRY_PARAM, 0.0f, 1.f, 1.f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedWhite>(module->wetPos, module, Plateau::WET_PARAM, 0.0f, 1.f, 0.5f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganSmallWhite>(module->preDelayPos, module, Plateau::PRE_DELAY_PARAM, 0.f, 0.500f, 0.f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedGreen>(module->inputLowDampPos, module, Plateau::INPUT_LOW_DAMP_PARAM, 0.f, 10.f, 10.f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedGreen>(module->inputHighDampPos, module, Plateau::INPUT_HIGH_DAMP_PARAM, 0.f, 10.f, 10.f, minAngle, maxAngle));
+    addParam(createValleyKnob<RoganMedSmallWhite>(module->dryPos, module, Plateau::DRY_PARAM, 0.0f, 1.f, 1.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedSmallWhite>(module->wetPos, module, Plateau::WET_PARAM, 0.0f, 1.f, 0.5f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganSmallWhite>(module->preDelayPos, module, Plateau::PRE_DELAY_PARAM, 0.f, 0.500f, 0.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedGreen>(module->inputLowDampPos, module, Plateau::INPUT_LOW_DAMP_PARAM, 0.f, 10.f, 10.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedGreen>(module->inputHighDampPos, module, Plateau::INPUT_HIGH_DAMP_PARAM, 0.f, 10.f, 10.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
 
-    addParam(createValleyKnob<RoganMedBlue>(module->sizePos, module, Plateau::SIZE_PARAM, 0.f, 1.f, 0.5f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedBlue>(module->diffPos, module, Plateau::DIFFUSION_PARAM, 0.f, 10.f, 10.f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedBlue>(module->decayPos, module, Plateau::DECAY_PARAM, 0.1f, 0.9999f, 0.54995f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedGreen>(module->reverbLowDampPos, module, Plateau::REVERB_LOW_DAMP_PARAM, 0.0f, 10.f, 10.f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedGreen>(module->reverbHighDampPos, module, Plateau::REVERB_HIGH_DAMP_PARAM, 0.0f, 10.f, 10.f, minAngle, maxAngle));
+    addParam(createValleyKnob<RoganMedBlue>(module->sizePos, module, Plateau::SIZE_PARAM, 0.f, 1.f, 0.5f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedBlue>(module->diffPos, module, Plateau::DIFFUSION_PARAM, 0.f, 10.f, 10.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedBlue>(module->decayPos, module, Plateau::DECAY_PARAM, 0.1f, 0.9999f, 0.54995f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedGreen>(module->reverbLowDampPos, module, Plateau::REVERB_LOW_DAMP_PARAM, 0.0f, 10.f, 10.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedGreen>(module->reverbHighDampPos, module, Plateau::REVERB_HIGH_DAMP_PARAM, 0.0f, 10.f, 10.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
 
-    addParam(createValleyKnob<RoganMedRed>(module->modRatePos, module, Plateau::MOD_SPEED_PARAM, 0.f, 1.f, 0.f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedRed>(module->modDepthPos, module, Plateau::MOD_DEPTH_PARAM, 0.f, 16.f, 0.5f, minAngle, maxAngle));
-    addParam(createValleyKnob<RoganMedRed>(module->modShapePos, module, Plateau::MOD_SHAPE_PARAM, 0.f, 1.f, 0.5f, minAngle, maxAngle));
+    addParam(createValleyKnob<RoganMedRed>(module->modRatePos, module, Plateau::MOD_SPEED_PARAM, 0.f, 1.f, 0.f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedRed>(module->modDepthPos, module, Plateau::MOD_DEPTH_PARAM, 0.f, 16.f, 0.5f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
+    addParam(createValleyKnob<RoganMedRed>(module->modShapePos, module, Plateau::MOD_SHAPE_PARAM, 0.f, 1.f, 0.5f, minAngle, maxAngle, DynamicKnobMotion::SMOOTH_MOTION));
 
     // Make Attenuverters
-    addParam(ParamWidget::create<RoganSmallWhite>(module->dryAttenPos, module, Plateau::DRY_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallWhite>(module->wetAttenPos, module, Plateau::WET_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallGreen>(module->inputLowDampAttenPos, module, Plateau::INPUT_LOW_DAMP_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallGreen>(module->inputHighDampAttenPos, module, Plateau::INPUT_HIGH_DAMP_CV_PARAM, -1.f, 1.f, 1.f));
+    addParam(ParamWidget::create<RoganSmallWhite>(module->dryAttenPos, module, Plateau::DRY_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallWhite>(module->wetAttenPos, module, Plateau::WET_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallGreen>(module->inputLowDampAttenPos, module, Plateau::INPUT_LOW_DAMP_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallGreen>(module->inputHighDampAttenPos, module, Plateau::INPUT_HIGH_DAMP_CV_PARAM, -1.f, 1.f, 0.f));
 
-    addParam(ParamWidget::create<RoganSmallBlue>(module->sizeAttenPos, module, Plateau::SIZE_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallBlue>(module->diffAttenPos, module, Plateau::DIFFUSION_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallBlue>(module->decayAttenPos, module, Plateau::DECAY_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallGreen>(module->reverbLowDampAttenPos, module, Plateau::REVERB_LOW_DAMP_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallGreen>(module->reverbHighDampAttenPos, module, Plateau::REVERB_HIGH_DAMP_CV_PARAM, -1.f, 1.f, 1.f));
+    addParam(ParamWidget::create<RoganSmallBlue>(module->sizeAttenPos, module, Plateau::SIZE_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallBlue>(module->diffAttenPos, module, Plateau::DIFFUSION_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallBlue>(module->decayAttenPos, module, Plateau::DECAY_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallGreen>(module->reverbLowDampAttenPos, module, Plateau::REVERB_LOW_DAMP_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallGreen>(module->reverbHighDampAttenPos, module, Plateau::REVERB_HIGH_DAMP_CV_PARAM, -1.f, 1.f, 0.f));
 
-    addParam(ParamWidget::create<RoganSmallRed>(module->modRateAttenPos, module, Plateau::MOD_SPEED_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallRed>(module->modShapeAttenPos, module, Plateau::MOD_DEPTH_CV_PARAM, -1.f, 1.f, 1.f));
-    addParam(ParamWidget::create<RoganSmallRed>(module->modDepthAttenPos, module, Plateau::MOD_SHAPE_CV_PARAM, -1.f, 1.f, 1.f));
+    addParam(ParamWidget::create<RoganSmallRed>(module->modRateAttenPos, module, Plateau::MOD_SPEED_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallRed>(module->modShapeAttenPos, module, Plateau::MOD_SHAPE_CV_PARAM, -1.f, 1.f, 0.f));
+    addParam(ParamWidget::create<RoganSmallRed>(module->modDepthAttenPos, module, Plateau::MOD_DEPTH_CV_PARAM, -1.f, 1.f, 0.f));
 
     // Make buttons
     addParam(ParamWidget::create<LightLEDButton>(Vec(7.875, 244.85), module, Plateau::FREEZE_PARAM, 0.f, 10.f, 0.f));
@@ -317,11 +388,11 @@ PlateauWidget::PlateauWidget(Plateau* module) : ModuleWidget(module) {
     addParam(ParamWidget::create<LightLEDButton>(Vec(157.875, 244.85), module, Plateau::CLEAR_PARAM, 0.f, 10.f, 0.f));
     addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(160.375, 247.35), module, Plateau::CLEAR_LIGHT));
 
-    addParam(ParamWidget::create<LightLEDButton>(Vec(13.875, 123.35), module, Plateau::TUNED_MODE_PARAM, 0.f, 10.f, 0.f));
-    addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(16.375, 125.85), module, Plateau::TUNED_MODE_LIGHT));
+    addParam(ParamWidget::create<LightLEDButton>(Vec(13.875, 127.35), module, Plateau::TUNED_MODE_PARAM, 0.f, 10.f, 0.f));
+    addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(16.375, 129.85), module, Plateau::TUNED_MODE_LIGHT));
 
-    addParam(ParamWidget::create<LightLEDButton>(Vec(151.875, 123.35), module, Plateau::DIFFUSE_INPUT_PARAM, 0.f, 10.f, 0.f));
-    addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(154.375, 125.85), module, Plateau::DIFFUSE_INPUT_LIGHT));
+    addParam(ParamWidget::create<LightLEDButton>(Vec(151.875, 127.35), module, Plateau::DIFFUSE_INPUT_PARAM, 0.f, 10.f, 0.f));
+    addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(154.375, 129.85), module, Plateau::DIFFUSE_INPUT_LIGHT));
 }
 
 void PlateauWidget::appendContextMenu(Menu *menu) {
@@ -334,10 +405,30 @@ void PlateauWidget::appendContextMenu(Menu *menu) {
                                                     module, &PlateauPanelStyleItem::panelStyle, 0));
     menu->addChild(construct<PlateauPanelStyleItem>(&MenuItem::text, "Light", &PlateauPanelStyleItem::module,
                                                       module, &PlateauPanelStyleItem::panelStyle, 1));
+
+    menu->addChild(construct<MenuLabel>());
+    menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Predelay CV Sensitivity"));
+    menu->addChild(construct<PlateauPreDelayCVSensItem>(&MenuItem::text, "Normal (1x)", &PlateauPreDelayCVSensItem::module,
+                                                        module, &PlateauPreDelayCVSensItem::preDelayCVSensState, 0));
+    menu->addChild(construct<PlateauPreDelayCVSensItem>(&MenuItem::text, "Low (0.5x)", &PlateauPreDelayCVSensItem::module,
+                                                        module, &PlateauPreDelayCVSensItem::preDelayCVSensState, 1));
+
+    menu->addChild(construct<MenuLabel>());
+    menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Input Sensitivity"));
+    menu->addChild(construct<PlateauInputSensItem>(&MenuItem::text, "0 dB", &PlateauInputSensItem::module,
+                                                        module, &PlateauInputSensItem::inputSensitivityState, 0));
+    menu->addChild(construct<PlateauInputSensItem>(&MenuItem::text, "-18 dB", &PlateauInputSensItem::module,
+                                                        module, &PlateauInputSensItem::inputSensitivityState, 1));
+
+    menu->addChild(construct<MenuLabel>());
+    menu->addChild(construct<MenuLabel>(&MenuLabel::text, "Output Saturation"));
+    menu->addChild(construct<PlateauOutputSaturationItem>(&MenuItem::text, "Off", &PlateauOutputSaturationItem::module,
+                                                          module, &PlateauOutputSaturationItem::outputSaturationState, 0));
+    menu->addChild(construct<PlateauOutputSaturationItem>(&MenuItem::text, "On", &PlateauOutputSaturationItem::module,
+                                                          module, &PlateauOutputSaturationItem::outputSaturationState, 1));
 }
 
 RACK_PLUGIN_MODEL_INIT(Valley, Plateau) {
-   Model *modelPlateau = Model::create<Plateau, PlateauWidget>(TOSTRING(SLUG), "Plateau", "Plateau",
-                                                               REVERB_TAG);
+   Model *modelPlateau = Model::create<Plateau, PlateauWidget>(TOSTRING(SLUG), "Plateau", "Plateau", REVERB_TAG);
    return modelPlateau;
 }

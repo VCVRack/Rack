@@ -1,0 +1,345 @@
+//
+//  VecAmalgam.cpp
+//  BitCombiner
+//
+//  Created by Dale Johnson on 26/11/2018.
+//  Copyright © 2018 Dale Johnson. All rights reserved.
+//
+
+#include "VecAmalgam.hpp"
+
+VecAmalgam::VecAmalgam() {
+    __zeros = _mm_set1_ps(0.f);
+    __ones = _mm_set1_ps(1.f);
+    __ffTarget = __zeros;
+    __high = _mm_set1_epi32(0xFFFFFFFF);
+
+    __zero16 = _mm_set1_pi16(0);
+    __one16 = _mm_set1_pi16(1);
+    __a = __zero16;
+    __b = __zero16;
+    __c = __zero16;
+    __aPrev = __zero16;
+    __bPrev = __zero16;
+    __aREdge = __zero16;
+    __bREdge = __zero16;
+
+    __count = _mm_set1_pi16(0xFFFF);
+
+    _step = 1.f;
+
+    p[RING_MOD_1_MODE] = &VecAmalgam::ringMod1;
+    p[RING_MOD_2_MODE] = &VecAmalgam::ringMod2;
+    p[DIODE_RING_MOD_MODE] = &VecAmalgam::diodeRingMod;
+    p[MAX_MODE] = &VecAmalgam::max;
+    p[MIN_MODE] = &VecAmalgam::min;
+    p[MIN_MAX_MODE] = &VecAmalgam::minMax;
+    p[FLIP_FLOP_MODE] = &VecAmalgam::flipFlop;
+    p[BIT_AND_MODE] = &VecAmalgam::bitAND;
+    p[BIT_XOR_MODE] = &VecAmalgam::bitXOR;
+    p[BIT_INTERLEAVE_MODE] = &VecAmalgam::bitInterleave;
+    p[BIT_HACK_MODE] = &VecAmalgam::bitHack;
+
+    p[BIT_SHIFT_MODE] = &VecAmalgam::bitShift;
+    p[BIT_SHIFT_AND_MODE] = &VecAmalgam::bitShiftAND;
+    p[BIT_SHIFT_XOR_MODE] = &VecAmalgam::bitShiftXOR;
+    p[BIT_ROTATE_MODE] = &VecAmalgam::bitRotate;
+    p[BIT_ROTATE_AND_MODE] = &VecAmalgam::bitRotateAND;
+    p[BIT_ROTATE_XOR_MODE] = &VecAmalgam::bitRotateXOR;
+    p[BIT_SHIFT_VARIABLE_MODE] = &VecAmalgam::bitShiftVariable;
+
+    _mode = RING_MOD_1_MODE;
+
+    std::srand(std::time(NULL));
+    for(auto i = 0; i < 4; ++i) {
+        _z[i] = std::rand();
+        _w[i] = std::rand();
+        _k[i] = 0;
+    }
+    setSampleRate(44100.f);
+
+}
+
+void VecAmalgam::setMode(int mode) {
+    _mode = mode;
+    if(_mode < 0) {
+        _mode = 0;
+    }
+    else if(_mode >= NUM_MODES) {
+        _mode = NUM_MODES - 1;
+    }
+}
+
+void VecAmalgam::setSampleRate(float sampleRate) {
+    _engineSampleRate = sampleRate;
+    _quarterNyquist = _engineSampleRate / 32.f;
+    calcStepSize();
+}
+
+void VecAmalgam::calcStepSize() {
+    _internalSampleRate = _quarterNyquist * powf(2.f, (_updateRate * 5.f));
+    _stepSize = _internalSampleRate / _engineSampleRate;
+}
+
+__m128 VecAmalgam::ringMod1(const __m128& x, const __m128& y, float paramA, float paramB) {
+    __xFolded = _mm_add_ps(_mm_mul_ps(x, _mm_set1_ps(0.5f)), _mm_set1_ps(0.5f));
+    __yFolded = _mm_add_ps(_mm_mul_ps(y, _mm_set1_ps(0.5f)), _mm_set1_ps(0.5f));
+    __xFolded = _mm_mirror_ps(__xFolded, _mm_set1_ps(paramA));
+    __yFolded = _mm_mirror_ps(__yFolded, _mm_set1_ps(paramB));
+    __xFolded = _mm_mul_ps(_mm_add_ps(__xFolded, _mm_set1_ps(-0.5f)),_mm_set1_ps(2.f));
+    __yFolded = _mm_mul_ps(_mm_add_ps(__yFolded, _mm_set1_ps(-0.5f)),_mm_set1_ps(2.f));
+
+    return _mm_mul_ps(__xFolded, __yFolded);
+}
+
+__m128 VecAmalgam::ringMod2(const __m128& x, const __m128& y, float paramA, float paramB) {
+    __xFolded = _mm_add_ps(_mm_mul_ps(x, _mm_set1_ps(0.5f)), _mm_set1_ps(0.5f));
+    __yFolded = _mm_add_ps(_mm_mul_ps(y, _mm_set1_ps(-0.5f)), _mm_set1_ps(0.5f));
+    __xFolded = _mm_mirror_ps(__xFolded, _mm_set1_ps(paramA));
+    __yFolded = _mm_mirror_ps(__yFolded, _mm_set1_ps(paramA));
+    __xFolded = _mm_mul_ps(_mm_add_ps(__xFolded, _mm_set1_ps(-0.5f)),_mm_set1_ps(2.f));
+    __yFolded = _mm_mul_ps(_mm_add_ps(__yFolded, _mm_set1_ps(-0.5f)),_mm_set1_ps(-2.f));
+
+    __xLogic = _mm_cmpgt_ps(__xFolded, __zeros);
+    __yLogic = _mm_cmpgt_ps(__yFolded, __zeros);
+    __zLogic = _mm_xor_ps(__xLogic, __yLogic);
+    __z = _mm_and_ps(__zLogic, __ones);
+    __z = _mm_add_ps(_mm_mul_ps(__z, _mm_set1_ps(-2.f)), _mm_set1_ps(1.f));
+
+    return _mm_linterp_ps(_mm_mul_ps(__xFolded, __yFolded), __z, _mm_set1_ps(paramB));
+}
+
+__m128 VecAmalgam::diodeRingMod(const __m128& x, const __m128& y, float paramA, float paramB) {
+    return _d.process(x, y, paramA, paramB);
+}
+
+__m128 VecAmalgam::VecAmalgam::max(const __m128& x, const __m128& y, float paramA, float paramB) {
+    return _mm_switch_ps(y, x, _mm_cmpgt_ps(x, y));
+}
+
+__m128 VecAmalgam::min(const __m128& x, const __m128& y, float paramA, float paramB) {
+    return _mm_switch_ps(x, y, _mm_cmpgt_ps(x, y));
+}
+
+__m128 VecAmalgam::minMax(const __m128& x, const __m128& y, float paramA, float paramB) {
+    return _mm_add_ps(_mm_and_ps(x, _mm_cmpge_ps(x,__zeros)), _mm_and_ps(y, _mm_cmplt_ps(y,__zeros)));
+}
+
+__m128 VecAmalgam::flipFlop(const __m128& x, const __m128& y, float paramA, float paramB) {
+    for(auto i = 0; i < 4; ++i) {
+        _k[i] = (float)mwcRand(_z[i], _w[i]) / (float)UINT32_MAX;
+    }
+    __chance = _mm_loadu_ps(_k);
+    __chance = _mm_and_ps(_mm_cmpgt_ps(__chance, _mm_set1_ps(1.f - paramA)), __high);
+
+    __xREdge = _mm_and_ps(_mm_cmpgt_ps(x, __zeros), _mm_cmple_ps(__xPrev, __zeros));
+    __yREdge = _mm_and_ps(_mm_cmpgt_ps(y, __zeros), _mm_cmple_ps(__yPrev, __zeros));
+    __xREdge = _mm_and_ps(__xREdge, __chance);
+    __yREdge = _mm_and_ps(__yREdge, __chance);
+
+    __ffTarget = _mm_switch_ps(__ffTarget, __zeros, __xREdge);
+    __ffTarget = _mm_switch_ps(__ffTarget, __high, __yREdge);
+    __xPrev = x;
+    __yPrev = y;
+    return _mm_switch_ps(x, y, __ffTarget);
+}
+
+__m128 VecAmalgam::bitAND(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __andMask = _mm_set1_pi16((1 << (short)(paramA * 16.f)) - 1);
+    __c = (__a & __b) & ~__andMask;
+    __c |= (__a ^ __b) & __andMask;
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitXOR(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __c = _mm_xor_si64(__a, __b);
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitInterleave(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __c = _mm_or_si64(_mm_and_si64(__a, _mm_set1_pi16(0x5555)), _mm_and_si64(__b, _mm_set1_pi16(0xAAAA)));
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitHack(const __m128& x, const __m128& y, float paramA, float paramB) {
+    __chance16 = _mm_set1_pi16(0xFFFF);
+    int random = 0;
+    for(auto i = 0; i < 4; ++i) {
+        random = mwcRand(_z[i], _w[i]);
+        _k16[i] = (float)random / (float)UINT32_MAX > (0.5f - paramA * paramA * 0.5f) ? random >> 16 : 0xFFFF;
+    }
+    __chance16 = _mm_setr_pi16(_k16[3], _k16[2], _k16[1], _k16[0]);
+
+    convertXYto16Bit(x, y);
+    __c = _mm_and_si64(_mm_or_si64(__c, _mm_and_si64(__a, __b)), __chance16); // Make 1 if a == 1 AND b == 1
+    __c = _mm_and_si64(__c, ~_mm_and_si64(_mm_and_si64(~__a, ~__b), __chance16)); // Make 0 if a == 0 AND b == 0
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitShift(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __bREdge = _mm_and_si64(_mm_cmpgt_pi16(__b, __zero16), _mm_or_si64(_mm_cmpgt_pi16(__zero16, __bPrev), _mm_cmpeq_pi16(__zero16, __bPrev)));
+
+    /*__count = _mm_add_pi16(__count, _mm_and_si64(__one16, __bREdge));
+    __count = _mm_switch_si64(__count, __zero16, _mm_cmpgt_pi16(__count, __one16));*/
+
+    __count = _mm_switch_si64(_mm_set1_pi16(0), _mm_set1_pi16(0xFFFF), _mm_cmpgt_pi16(__b, __zero16));
+
+    // Do stupid, dirty, branching bit shift because MMX has
+    // unintuitive bit-shift ops!
+    long long a64 = _mm_cvtm64_si64(__a);
+    //long long shift64 = _mm_cvtm64_si64(_mm_set1_pi16((short)(paramA * 15.f)));
+    long long shift64 = _mm_cvtm64_si64(_mm_and_si64(_mm_set1_pi16((short)(paramA * 15.f)), __count));
+    long long a64Shifted = 0;
+    for(auto i = 0; i < 4; ++i) {
+        a64Shifted |= ((a64 >> i * 16) << (shift64 >> i * 16) & 0xFFFF) << i * 16;
+    }
+    __c = _mm_cvtsi64_m64(a64Shifted);
+
+    __bPrev = __b;
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitShiftAND(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __bREdge = _mm_and_si64(_mm_cmpgt_pi16(__b, __zero16), _mm_or_si64(_mm_cmpgt_pi16(__zero16, __bPrev), _mm_cmpeq_pi16(__zero16, __bPrev)));
+
+    __count = _mm_add_pi16(__count, _mm_and_si64(__one16, __bREdge));
+    __count = _mm_switch_si64(__count, __zero16, _mm_cmpgt_pi16(__count, __one16));
+
+    // Do stupid, dirty, branching bit shift because MMX has
+    // unintuitive bit-shift ops!
+    long long a64 = _mm_cvtm64_si64(__a);
+    long long shift64 = _mm_cvtm64_si64(_mm_set1_pi16((short)(paramA * 15.f)));
+    long long a64Shifted = 0;
+    for(auto i = 0; i < 4; ++i) {
+        a64Shifted |= ((a64 >> i * 16) << (shift64 >> i * 16) & 0xFFFF) << i * 16;
+    }
+    __c = _mm_cvtsi64_m64(a64Shifted) & __b;
+
+    __bPrev = __b;
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitShiftXOR(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __bREdge = _mm_and_si64(_mm_cmpgt_pi16(__b, __zero16), _mm_or_si64(_mm_cmpgt_pi16(__zero16, __bPrev), _mm_cmpeq_pi16(__zero16, __bPrev)));
+
+    __count = _mm_add_pi16(__count, _mm_and_si64(__one16, __bREdge));
+    __count = _mm_switch_si64(__count, __zero16, _mm_cmpgt_pi16(__count, __one16));
+
+    // Do stupid, dirty, branching bit shift because MMX has
+    // unintuitive bit-shift ops!
+    long long a64 = _mm_cvtm64_si64(__a);
+    long long shift64 = _mm_cvtm64_si64(_mm_set1_pi16((short)(paramA * 15.f)));
+    long long a64Shifted = 0;
+    for(auto i = 0; i < 4; ++i) {
+        a64Shifted |= ((a64 >> i * 16) << (shift64 >> i * 16) & 0xFFFF) << i * 16;
+    }
+    __c = _mm_cvtsi64_m64(a64Shifted) ^ __b;
+
+    __bPrev = __b;
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitRotate(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __bREdge = _mm_and_si64(_mm_cmpgt_pi16(__b, __zero16), _mm_or_si64(_mm_cmpgt_pi16(__zero16, __bPrev), _mm_cmpeq_pi16(__zero16, __bPrev)));
+
+    /*__count = _mm_add_pi16(__count, _mm_and_si64(__one16, __bREdge));
+     __count = _mm_switch_si64(__count, __zero16, _mm_cmpgt_pi16(__count, __one16));*/
+
+    //__count = _mm_switch_si64(__count, ~__count, __bREdge);
+    __count = _mm_switch_si64(_mm_set1_pi16(0), _mm_set1_pi16(0xFFFF), _mm_cmpgt_pi16(__b, __zero16));
+
+    // Do stupid, dirty, branching bit shift because MMX has
+    // unintuitive bit-shift ops!
+    long long a64 = _mm_cvtm64_si64(__a);
+    long long shift64 = _mm_cvtm64_si64(_mm_and_si64(_mm_set1_pi16((short)(paramA * 15.f)), __count));
+    long long a64Shifted = 0;
+    for(auto i = 0; i < 4; ++i) {
+        a64Shifted |= ((a64 >> i * 16) << (shift64 >> i * 16) & 0xFFFF) << i * 16;
+        a64Shifted |= ((a64 >> i * 16) >> (16 - (shift64 >> i * 16)) & 0xFFFF) << i * 16;
+    }
+    __c = _mm_cvtsi64_m64(a64Shifted);
+
+    __bPrev = __b;
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitRotateAND(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __bREdge = _mm_and_si64(_mm_cmpgt_pi16(__b, __zero16), _mm_or_si64(_mm_cmpgt_pi16(__zero16, __bPrev), _mm_cmpeq_pi16(__zero16, __bPrev)));
+
+    __count = _mm_add_pi16(__count, _mm_and_si64(__one16, __bREdge));
+    __count = _mm_switch_si64(__count, __zero16, _mm_cmpgt_pi16(__count, __one16));
+
+    // Do stupid, dirty, branching bit shift because MMX has
+    // unintuitive bit-shift ops!
+    long long a64 = _mm_cvtm64_si64(__a);
+    long long shift64 = _mm_cvtm64_si64(_mm_set1_pi16((short)(paramA * 15.f)));
+    long long a64Shifted = 0;
+    for(auto i = 0; i < 4; ++i) {
+        a64Shifted |= ((a64 >> i * 16) << (shift64 >> i * 16) & 0xFFFF) << i * 16;
+        a64Shifted |= ((a64 >> i * 16) >> (16 - (shift64 >> i * 16)) & 0xFFFF) << i * 16;
+    }
+    __c = _mm_cvtsi64_m64(a64Shifted) & __b;
+
+    __bPrev = __b;
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitRotateXOR(const __m128& x, const __m128& y, float paramA, float paramB) {
+    convertXYto16Bit(x, y);
+    __bREdge = _mm_and_si64(_mm_cmpgt_pi16(__b, __zero16), _mm_or_si64(_mm_cmpgt_pi16(__zero16, __bPrev), _mm_cmpeq_pi16(__zero16, __bPrev)));
+
+    /*__count = _mm_add_pi16(__count, _mm_and_si64(__one16, __bREdge));
+    __count = _mm_switch_si64(__count, __zero16, _mm_cmpgt_pi16(__count, __one16));*/
+
+    __count = _mm_switch_si64(__count, ~__count, __bREdge);
+
+    // Do stupid, dirty, branching bit shift because MMX has
+    // unintuitive bit-shift ops!
+    long long a64 = _mm_cvtm64_si64(__a);
+    long long shift64 = _mm_cvtm64_si64(_mm_and_si64(_mm_set1_pi16((short)(paramA * 15.f)), __count));
+    long long a64Shifted = 0;
+    for(auto i = 0; i < 4; ++i) {
+        a64Shifted |= ((a64 >> i * 16) << (shift64 >> i * 16) & 0xFFFF) << i * 16;
+        a64Shifted |= ((a64 >> i * 16) >> (16 - (shift64 >> i * 16)) & 0xFFFF) << i * 16;
+    }
+    __c = _mm_cvtsi64_m64(a64Shifted) ^ __b;
+
+    __bPrev = __b;
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+__m128 VecAmalgam::bitShiftVariable(const __m128& x, const __m128& y, float paramA, float paramB) {
+    __a = _mm_cvtps_pi16(_mm_mul_ps(x, _mm_set1_ps(32767.f)));
+    __b = _mm_cvtps_pi16(_mm_mul_ps(y, _mm_set1_ps(paramA * 8.f)));
+
+    // Do stupid, dirty, branching bit shift because MMX has
+    // unintuitive bit-shift ops!
+    long long a64 = _mm_cvtm64_si64(__a);
+    long long shift64 = _mm_cvtm64_si64(__b);
+    long long a64Shifted = 0;
+
+    short a = 0;
+    short mask = 0;
+    for(auto i = 0; i < 4; ++i) {
+        a = (short)(shift64 >> i * 16);
+        mask = a >> sizeof(int16_t) * CHAR_BIT - 1;
+        a = (a + mask) ^ mask;
+        a64Shifted |= ((a64 >> i * 16) << (a) & 0xFFFF) << i * 16;
+    }
+
+    __c = _mm_cvtsi64_m64(a64Shifted);
+    return _mm_mul_ps(_mm_cvtpi16_ps(__c), _mm_set1_ps(0.0000305185f));
+}
+
+void VecAmalgam::convertXYto16Bit(const __m128& x, const __m128& y) {
+    __a = _mm_switch_si64(__a, _mm_cvtps_pi16(_mm_mul_ps(x, _mm_set1_ps(32767.f))), __sample);
+    __b = _mm_switch_si64(__b, _mm_cvtps_pi16(_mm_mul_ps(y, _mm_set1_ps(32767.f))), __sample);
+}

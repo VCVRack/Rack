@@ -702,7 +702,15 @@ void Arpeggiator2::step() {
 			newCycle = COUNTDOWN;
 		}
 	}
-	
+
+	// Received trigger before EOS, fire EOS gate anyway
+	if (triggerStatus && isRunning && !currPatt->isPatternFinished()) {
+			// Pulse the EOS gate
+		eosPulse.trigger(Core::TRIGGER);
+		if (debugEnabled()) { std::cout << stepX << " " << id  << " Short sequence" << std::endl; }
+	}
+
+
 	// So this is where the free-running could be triggered
 	if (isClocked && !isRunning) { // Must have a clock and not be already running
 		if (!trigActive) { // If nothing plugged into the TRIG input
@@ -949,11 +957,6 @@ Arpeggiator2Widget::Arpeggiator2Widget(Arpeggiator2 *module) : ModuleWidget(modu
 		panel->setBackground(SVG::load(assetPlugin(plugin, "res/Arpeggiator2.svg")));
 		addChild(panel);
 	}
-
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 30, 365)));
 
 	{
 		Arpeggiator2Display *display = new Arpeggiator2Display();

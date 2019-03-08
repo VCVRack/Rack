@@ -1,5 +1,5 @@
 //***********************************************************************************************
-//Impromptu Modular: Modules for VCV Rack by Marc Boulé
+//Impromptu Modular: Modules for VCV Rack by Marc Boulé 
 //
 //Based on code from Valley Rack Free by Dale Johnson
 //See ./LICENSE.txt for all licenses
@@ -17,9 +17,10 @@ ScrewCircle::ScrewCircle(float _angle) {
 	static const float highRadius = 1.4f;// radius for 0 degrees (screw looks like a +)
 	static const float lowRadius = 1.1f;// radius for 45 degrees (screw looks like an x)
 	angle = _angle;
-	_angle = fabs(angle - M_PI/4.0f);
+	_angle = fabsf(angle - ((float)M_PI)/4.0f);
 	radius = ((highRadius - lowRadius)/(M_PI/4.0f)) * _angle + lowRadius;
 }
+
 void ScrewCircle::draw(NVGcontext *vg) {
 	NVGcolor backgroundColor = nvgRGB(0x72, 0x72, 0x72); 
 	NVGcolor borderColor = nvgRGB(0x72, 0x72, 0x72);
@@ -31,6 +32,7 @@ void ScrewCircle::draw(NVGcontext *vg) {
 	nvgStrokeColor(vg, borderColor);
 	nvgStroke(vg);
 }
+
 DynamicSVGScrew::DynamicSVGScrew() {
     mode = nullptr;
     oldMode = -1;
@@ -136,6 +138,9 @@ void DynamicSVGPanel::addPanel(std::shared_ptr<SVG> svg) {
         border->box.size = box.size;
     }
 }
+void DynamicSVGPanel::dupPanel() {
+    panels.push_back(panels[panels.size() - 1]);
+}
 
 void DynamicSVGPanel::step() { // all code except middle if() from SVGPanel::step() in SVGPanel.cpp
     if (isNear(rack::global_ui->window.gPixelRatio, 1.0)) {
@@ -172,7 +177,7 @@ void DynamicSVGPort::step() {
         oversample = 2.f;
     }
     if(mode != nullptr && *mode != oldMode) {
-        background->setSVG(frames[*mode]);
+        background->setSVG(frames[min(*mode, frames.size() - 1)]);
         oldMode = *mode;
         dirty = true;
     }
@@ -317,9 +322,4 @@ void DynamicIMTactile::onMouseDown(EventMouseDown &e) {
 	setValue(val);
 	ParamWidget::onMouseDown(e);
 }
-
-//void DynamicIMTactile::changeValue(float newVal) {
-//	setValue(newVal);
-//}
-
 

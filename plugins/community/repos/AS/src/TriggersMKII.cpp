@@ -47,6 +47,12 @@ struct TriggersMKII: Module {
 
     int label_num1 = 0;
     int label_num2 = 0;
+
+    PulseGenerator triggerPulse1;
+    bool trg_pulse1 = false;
+
+    PulseGenerator triggerPulse2;
+    bool trg_pulse2 = false;
  
     TriggersMKII() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
     void step() override;
@@ -59,38 +65,26 @@ void TriggersMKII::step() {
     label_num1 = roundf(params[LABEL_PARAM_1].value);
     label_num2 = roundf(params[LABEL_PARAM_2].value);
 
-
-    outputs[TRIGGER_OUT1].value = 0.0f;
-    outputs[MOMENTARY_OUT2].value = 0.0f;
-
     //TRIGGER 1
-    //EXTERNAL TRIGGER
-    if (btnTrigger1.process(params[TRIGGER_SWITCH_1].value)) {
+    if (btnTrigger1.process(params[TRIGGER_SWITCH_1].value)||extTrigger1.process(inputs[CV_TRIG_INPUT_1].value)) {
         resetLight1 = 1.0;
-        outputs[TRIGGER_OUT1].value = 10.0f;
-    //INTERNAL TRIGGER
-    }else if (extTrigger1.process(inputs[CV_TRIG_INPUT_1].value)) {
-        resetLight1 = 1.0;
-        outputs[TRIGGER_OUT1].value = 10.0f;
-    }else{
-        outputs[TRIGGER_OUT1].value = 0.0f;
+        triggerPulse1.trigger(1e-3f);
     }
+
+    trg_pulse1 = triggerPulse1.process(1.0 / engineGetSampleRate());
+    outputs[TRIGGER_OUT1].value = (trg_pulse1 ? 10.0f : 0.0f);
+
     resetLight1 -= resetLight1 / lightLambda / engineGetSampleRate();
     lights[TRIGGER_LED_1].value = resetLight1;
 
     //TRIGGER 2
-    //EXTERNAL TRIGGER
- 
-    if (btnTrigger2.process(params[MOMENTARY_SWITCH_2].value)) {
+    if (btnTrigger2.process(params[MOMENTARY_SWITCH_2].value)||extTrigger2.process(inputs[CV_TRIG_INPUT_2].value)) {
         resetLight2 = 1.0;
-        outputs[MOMENTARY_OUT2].value = 10.0f;
-    //INTERNAL TRIGGER
-    }else if (extTrigger2.process(inputs[CV_TRIG_INPUT_2].value)) {
-        resetLight2 = 1.0;
-        outputs[MOMENTARY_OUT2].value = 10.0f;
-    }else{
-        outputs[MOMENTARY_OUT2].value = 0.0f;
+        triggerPulse2.trigger(1e-3f);
     }
+    trg_pulse2 = triggerPulse2.process(1.0 / engineGetSampleRate());
+    outputs[MOMENTARY_OUT2].value = (trg_pulse2 ? 10.0f : 0.0f);
+
     resetLight2 -= resetLight2 / lightLambda / engineGetSampleRate();
     lights[MOMENTARY_LED_2].value = resetLight2;
     

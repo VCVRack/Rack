@@ -25,7 +25,7 @@ struct Notch: Module {
         NUM_OUTPUTS
     };
 
-    VAStateVariableFilter *notchFilter = new VAStateVariableFilter() ; // create a hpFilter;
+    VAStateVariableFilter *notchFilter = new VAStateVariableFilter();
 
 
     Notch() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS) {}
@@ -41,9 +41,9 @@ void Notch::step() {
 
     notchFilter->setFilterType(5);
 
-    notchFilter->setCutoffFreq(params[FREQ_PARAM].value *  clamp(inputs[FREQ_CV_INPUT].normalize(10.0f) / 10.0f, 0.0f, 1.0f));
-    notchFilter->setShelfGain(params[VOL_PARAM].value *  clamp(inputs[VOL_CV_INPUT].normalize(10.0f) / 10.0f, 0.0f, 1.0f));
-    notchFilter->setResonance(params[WIDTH_PARAM].value*  clamp(inputs[WIDTH_CV_INPUT].normalize(10.0f) / 10.0f, 0.0f, 1.0f));
+    notchFilter->setCutoffFreq(params[FREQ_PARAM].value * clamp(inputs[FREQ_CV_INPUT].normalize(10.0f) / 10.0f, 0.0f, 1.0f));
+    notchFilter->setShelfGain(params[VOL_PARAM].value * clamp(inputs[VOL_CV_INPUT].normalize(10.0f) / 10.0f, 0.0f, 1.0f));
+    notchFilter->setResonance(params[WIDTH_PARAM].value * clamp(inputs[WIDTH_CV_INPUT].normalize(10.0f) / 10.0f, 0.0f, 1.0f));
     notchFilter->setSampleRate(engineGetSampleRate());
 
     wet = notchFilter->processAudioSample(dry, 1);

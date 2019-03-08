@@ -1,6 +1,6 @@
 # About SquinkyVCV
 
-This project is a growing collection of modules for the VCV Rack vritual modular synthesizer. You can find more information about VCV Rack [here](https://vcvrack.com/).
+This project is a growing collection of modules for the VCV Rack virtual modular synthesizer. You can find more information about VCV Rack [here](https://vcvrack.com/).
 
 You can find us on Facebook [here](https://www.facebook.com/SquinkyLabs).
 
@@ -9,6 +9,19 @@ You can find us on Facebook [here](https://www.facebook.com/SquinkyLabs).
 Here is the user's manual for our modules: [instruction manual](./docs/booty-shifter.md). It contains descriptions of all of them.
 
 The [release notes](./docs/release-notes.md) describe recent changes.
+
+## Credits
+
+Beta testing by:
+
+* Espen Storø
+* [Dave Phillips](https://www.youtube.com/channel/UC4Kw67XwyKACygelcd-D2-g)
+* [Artem Leonov](https://www.youtube.com/vcvrackideas)
+* [Norbert Denninger](https://www.youtube.com/c/Wavesunlimited)
+* [Omri Cohen](https://www.youtube.com/channel/UCuWKHSHTHMV_nVSeNH4gYAg)
+* Lars Bjerregaard
+
+All third party software copyright information is in [LICENSE-dist.txt](./LICENSE-dist.txt)
 
 ## Contributing
 

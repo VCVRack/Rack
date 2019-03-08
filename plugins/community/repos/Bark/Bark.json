@@ -1,0 +1,13 @@
+{
+  "name": "Bark",
+  "author": "Coirt",
+  "license": "BSD-4-Cluase",
+  "pluginUrl": "https://github.com/Coirt/Bark",
+  "authorUrl": "https://github.com/Coirt",
+  "authorEmail": "philg@live.ie",
+  "manualUrl": "https://github.com/Coirt/Bark/wiki",
+  "sourceUrl": "https://github.com/Coirt/Bark",
+  "donateUrl": "https://www.paypal.me/philgolden",
+  "latestVersion": "0.6.5",
+  "status": "available"
+}

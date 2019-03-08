@@ -4,3 +4,5 @@ ALL_OBJ= \
 	src/moDllz.o \
 	src/TwinGlider.o \
 	src/XBender.o
+
+#	src/MIDI8MPE.o

@@ -1,0 +1,11 @@
+ALL_OBJ= \
+	src/Blank1.o \
+	src/Blank3.o \
+	src/Blank5.o \
+	src/BufferedMult.o \
+	src/DaisyChannel.o \
+	src/DaisyMaster.o \
+	src/Horsehair.o \
+	src/MasterMixer.o \
+	src/QuantalAudio.o \
+	src/UnityMix.o

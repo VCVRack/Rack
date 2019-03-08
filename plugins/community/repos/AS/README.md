@@ -57,6 +57,21 @@ V 0.6.4: First relase of this module.
 
 V 0.6.5: Added an external input to detect a BPM from a LFO or some other sources, BPM detection code based on Koralfx Beatovnik from Tomek Sosnowski, nice work Tomek!.
 
+### BPM to delay/ms calculator
+New slimmed down BPM Delay/MS Calculator module, just like the old BPM to delay/hz calculator module but without the calc values display to free some HP space.
+
+V 0.6.11: First relase of this module.
+
+### 2 Channel Mixer
+Same as 8 channel mixer, but 2 channels only for those small setups(OmriCohen request).
+
+V 0.6.13: First relase of this module.
+
+### 4 Channel Mixer
+Same as 8 channel mixer, but 4 channels only for those small setups(OmriCohen request).
+
+V 0.6.13: First relase of this module.
+
 ### 8 Channel Mixer
 Fundamental/Autodafe mixer module. Mods: graphics, sliders for channel volume, stereo or mono output(L channel outputs L+R signal if R channel is not active). Now with main mix mute button. Beware,the default setting for each channel volume is at 70% in stead of 0%.
 
@@ -66,6 +81,8 @@ V 0.5.2: added MIX L & R input to chain mixers without giving up 2 mixer channel
 2x5 Signal multiplier.
 
 V 0.5.7 Module size reduced to 5HP
+
+V 0.6.13 New feature: If the input 2 is not active the second row of outputs takes the value of input 1 so the module becomes a multi 1 x 10, nice and simple idea! requested by MarcBroule.
 
 ### Merge 2x5
 2x5 CV Signal merger.
@@ -96,10 +113,14 @@ V 0.5.5 Extendend the freq range 1 octave below.
 
 V 0.5.7 Module size reduced to 4HP
 
+V 0.6.10 Added a base frequency switch to change from A (original and default) to C (to match the current VCV standard).
+
 ### TinySine
 VCV tutorial module. Mods: graphics, proper sine wave.
 
 V 0.5.7 Module size reduced to 4HP
+
+V 0.6.10 Added a base frequency switch to change from A (original and default) to C (to match the current VCV standard).
 
 ### TriLFO
 Fundamental LFO module. Mods:graphics, controls stripped to the basics but you get 3 LFOS on the same space.
@@ -188,6 +209,11 @@ V 0.6,9: Small fix on the ms CV input to take the proper values fron BPM calc mo
 CV to Trigger module. Feed a midi signal to the CV inputs and it will output one trigger signal when the incoming signal rises above 0v, and another trigger signal when the incoming signal returns to 0v. Useful to use your external hardware controller/keyboard as a trigger.
 
 V 0.6.7: First relase of this module.
+
+### Zero Crossing CV 2 T
+Zero crossing CV to Trigger module. Each time a CV input hits 0v it will generate a trigger signal on the respective output. User request.
+
+V 0.6.10: First relase of this module.
 
 ### Delay Plus
 Fundamental Delay module. Mods: graphics, digital display to show delay time in MS , wet signal send & return, bypass switch.

@@ -23,6 +23,7 @@ RACK_PLUGIN_INIT(BaconMusic) {
    RACK_PLUGIN_INIT_ID();
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/baconpaul/Bacon Music");
+   // https://github.com/baconpaul/BaconPlugs
   
    // RACK_PLUGIN_MODEL_ADD(BaconMusic, HarMoNee);  // crashes
    RACK_PLUGIN_MODEL_ADD(BaconMusic, Glissinator);

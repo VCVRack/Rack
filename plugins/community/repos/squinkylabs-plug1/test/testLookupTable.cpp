@@ -1,12 +1,15 @@
 
-#include <assert.h>
-#include <iostream>
-
+#include "NonUniformLookupTable.h"
 #include "asserts.h"
 #include "AudioMath.h"
 #include "LookupTable.h"
 #include "LookupTableFactory.h"
+#include "NonUniformLookupTable.h"
 #include "ObjectCache.h"
+#include "Super.h"
+
+#include <assert.h>
+#include <iostream>
 
 using namespace std;
 
@@ -365,6 +368,107 @@ static void testAudioTaperTolerance()
     }
 }
 
+/**
+ * Tests for non-uniform lookup
+ */
+
+template <typename T>
+static void testNonUniform1()
+{
+    NonUniformLookupTableParams<T> params;
+    NonUniformLookupTable<T>::addPoint(params, 0, 0);
+    NonUniformLookupTable<T>::addPoint(params, 1, 1);
+    NonUniformLookupTable<T>::addPoint(params, 2, 2);
+    NonUniformLookupTable<T>::finalize(params);
+
+    const T result = NonUniformLookupTable<T>::lookup(params, 1);
+    assertClose(result, 1, .000001);
+}
+
+template <typename T>
+static void testNonUniform2()
+{
+    NonUniformLookupTableParams<T> params;
+    NonUniformLookupTable<T>::addPoint(params, 0, 0);
+    NonUniformLookupTable<T>::addPoint(params, 1, 1);
+    NonUniformLookupTable<T>::addPoint(params, 2, 2);
+    NonUniformLookupTable<T>::finalize(params);
+
+    const T result = NonUniformLookupTable<T>::lookup(params, 1.1f);
+    assertClose(result, 1.1f, .000001);
+}
+
+template <typename T>
+static void testNonUniform3()
+{
+    NonUniformLookupTableParams<T> params;
+    NonUniformLookupTable<T>::addPoint(params, 0, 0);
+    NonUniformLookupTable<T>::addPoint(params, 1, 1);
+    NonUniformLookupTable<T>::addPoint(params, 2, 2);
+    NonUniformLookupTable<T>::finalize(params);
+
+    T result = NonUniformLookupTable<T>::lookup(params, -100);
+    assertClose(result, 0, .000001);
+    result = NonUniformLookupTable<T>::lookup(params, -.1f);
+    assertClose(result, 0, .000001);
+
+    result = NonUniformLookupTable<T>::lookup(params, 100);
+    assertClose(result, 2, .000001);
+    result = NonUniformLookupTable<T>::lookup(params, 2.1f);
+    assertClose(result, 2, .000001);
+
+    result = NonUniformLookupTable<T>::lookup(params, 2);
+    assertClose(result, 2, .000001);
+
+    result = NonUniformLookupTable<T>::lookup(params, 0);
+    assertClose(result, 0, .000001);
+
+    result = NonUniformLookupTable<T>::lookup(params, .1f);
+    assertClose(result, .1f, .000001);
+
+    result = NonUniformLookupTable<T>::lookup(params, 1);
+    assertClose(result, 1, .000001);
+
+    result = NonUniformLookupTable<T>::lookup(params, 1.9f);
+    assertClose(result, 1.9f, .000001);
+}
+
+template <typename T>
+static void testNonUniform4()
+{
+    NonUniformLookupTableParams<T> params;
+    NonUniformLookupTable<T>::addPoint(params, 0, 0);
+    NonUniformLookupTable<T>::addPoint(params, 1, 1);
+    NonUniformLookupTable<T>::addPoint(params, 2, 21);
+    NonUniformLookupTable<T>::finalize(params);
+
+    const T result = NonUniformLookupTable<T>::lookup(params, 1.5f);
+    assertClose(result, 11.f, .000001);
+}
+
+
+static void testDetune()
+{
+    SawtoothDetuneCurve curve;
+
+    float x = curve.getDetuneFactor(0);
+    assertEQ(x, 0);
+    x = curve.getDetuneFactor(1);
+    assertEQ(x, 1);
+
+    x = curve.getDetuneFactor(.5);
+    assertLT(x, .1);
+
+    float last =  - .00001f;
+    for (float f = 0; f <= 1; f += .05f) {
+        x = curve.getDetuneFactor(f);
+        assertGT(x, last);
+        last = x;
+    }
+}
+
+
+
 template<typename T>
 static void test()
 {
@@ -387,11 +491,15 @@ static void test()
     testBipolarTolerance<T>();
     testAudioTaperSimpleLookup<T>();
     testAudioTaperTolerance<T>();
+    testNonUniform1<T>();
+    testNonUniform2<T>();
+    testNonUniform3<T>();
+    testNonUniform4<T>();   
 }
 
 void testLookupTable()
 {
-
     test<double>();
     test<float>();
+    testDetune();
 }

@@ -62,9 +62,9 @@ struct BigSwitchLEDButton : SVGSwitch, MomentarySwitch {
 };
 
 template <typename BASE>
-struct GiantLight : BASE {
-        GiantLight() {
-                this->box.size = mm2px(Vec(16, 16));
+struct BigOlLight : BASE {
+        BigOlLight() {
+                this->box.size = mm2px(Vec(16.0, 16.0));
         }
 };
 
@@ -146,7 +146,7 @@ StutterWidget::StutterWidget(Stutter *module) : ModuleWidget(module) {
 
     //addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(47, 61), module, Stutter::ONOFF_PARAM, 0.0, 1.0, 1.0));
     addParam(ParamWidget::create<BigSwitchLEDButton>(Vec(47, 61), module, Stutter::ONOFF_PARAM, 0.0, 1.0, 0.0));
-    addChild(ModuleLightWidget::create<GiantLight<GreenLight>>(Vec(53, 67), module, Stutter::RESET_LIGHT));
+    addChild(ModuleLightWidget::create<BigOlLight<GreenLight>>(Vec(53, 67), module, Stutter::RESET_LIGHT));
 
     addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(47, 143), module, Stutter::TIME_PARAM, 0, 36000, 4000));
     addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(47, 228), module, Stutter::MIX_PARAM, 0.0, 1.0, 1.0));

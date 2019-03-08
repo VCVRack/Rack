@@ -20,6 +20,9 @@ template <class TBase>
 
 /**
  * Implementation of the "Colors" noises generator
+ *
+ * Original CPI = 11.7
+ * service thread less often and iput less often -> 5.6
  */
 class ColoredNoise : public TBase
 {
@@ -86,6 +89,7 @@ private:
 
     AudioMath::ScaleFun<T> cv_scaler;
     bool isRequestPending = false;
+    int cycleCount = 1;
 
     /**
      * crossFader generates the audio, but we must
@@ -303,7 +307,15 @@ void ColoredNoise<TBase>::serviceInputs()
 template <class TBase>
 void ColoredNoise<TBase>::step()
 {
-    serviceFFTServer();
+    if (--cycleCount < 0) {
+        cycleCount = 3;
+    }
+
+    // These don't need frequent service
+    if (cycleCount == 0) {
+        serviceFFTServer();
+        serviceInputs();
+    }
+
     serviceAudio();
-    serviceInputs();
 }

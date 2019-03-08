@@ -2,7 +2,7 @@
 SLUG = ImpromptuModular
 
 # Must follow the format in the Versioning section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-VERSION = 0.6.10
+VERSION = 0.6.16
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
@@ -14,7 +14,8 @@ CXXFLAGS +=
 LDFLAGS +=
 
 # Add .cpp and .c files to the build
-SOURCES += $(wildcard src/*.cpp src/midifile/*.cpp)
+# SOURCES += $(wildcard src/*.cpp src/midifile/*.cpp)
+SOURCES += $(wildcard src/*.cpp)
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin is automatically added.

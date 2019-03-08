@@ -10,6 +10,7 @@ namespace rack_plugin_Bidoo {
 struct LATE : Module {
 	enum ParamIds {
 		SWING_PARAM,
+		CVCOEFF_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -61,7 +62,7 @@ void LATE::step() {
 		}
 	}
 
-	float lag = rescale(clamp(params[SWING_PARAM].value + inputs[SWING_INPUT].value,0.0f,9.0f),0.0f,10.0f,0.0f,(float)tCurrent-(float)tPrevious);
+	float lag = rescale(clamp(params[SWING_PARAM].value + params[CVCOEFF_PARAM].value * inputs[SWING_INPUT].value,0.0f,9.0f),0.0f,10.0f,0.0f,(float)tCurrent-(float)tPrevious);
 
 	if (armed && !odd && (((float)now - (float)tCurrent) >= lag)) {
 		outputs[CLOCK_OUTPUT].value = 10.0f;
@@ -81,11 +82,13 @@ struct LATEWidget : ModuleWidget {
 
 
 		addParam(ParamWidget::create<BidooBlueKnob>(Vec(8, 70), module, LATE::SWING_PARAM, 0, 9, 0));
-		addInput(Port::create<PJ301MPort>(Vec(10, 110), Port::INPUT, module, LATE::SWING_INPUT));
+		addParam(ParamWidget::create<BidooBlueTrimpot>(Vec(13, 105), module, LATE::CVCOEFF_PARAM, -1.0f, 1.0f, 0.0f));
 
-		addInput(Port::create<PJ301MPort>(Vec(10, 173), Port::INPUT, module, LATE::RESET_INPUT));
+		addInput(Port::create<PJ301MPort>(Vec(10, 130), Port::INPUT, module, LATE::SWING_INPUT));
 
-		addInput(Port::create<PJ301MPort>(Vec(10, 235), Port::INPUT, module, LATE::CLOCK_INPUT));
+		addInput(Port::create<PJ301MPort>(Vec(10, 186.33f), Port::INPUT, module, LATE::RESET_INPUT));
+
+		addInput(Port::create<PJ301MPort>(Vec(10, 242.66f), Port::INPUT, module, LATE::CLOCK_INPUT));
 
 		addOutput(Port::create<PJ301MPort>(Vec(10, 299), Port::OUTPUT, module, LATE::CLOCK_OUTPUT));
 	}

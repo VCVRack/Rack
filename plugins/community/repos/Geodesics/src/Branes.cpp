@@ -61,12 +61,16 @@ struct PinkFilter {
 struct Branes : Module {
 	enum ParamIds {
 		ENUMS(TRIG_BYPASS_PARAMS, 2),
+		// -- 0.6.3 ^^
+		ENUMS(NOISE_RANGE_PARAMS, 2),
 		NUM_PARAMS
 	};
 	enum InputIds {
 		ENUMS(IN_INPUTS, 14),
 		ENUMS(TRIG_INPUTS, 2),
 		ENUMS(TRIG_BYPASS_INPUTS, 2),
+		// -- 0.6.3 ^^
+		ENUMS(NOISE_RANGE_INPUTS, 2),
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -74,8 +78,10 @@ struct Branes : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ENUMS(BYPASS_CV_LIGHTS, 2 * 2),// room for white-red
+		ENUMS(UNUSED1, 2 * 2),// no longer used
 		ENUMS(BYPASS_TRIG_LIGHTS, 2 * 2),// room for white-red
+		// -- 0.6.3 ^^
+		ENUMS(NOISE_RANGE_LIGHTS, 2),
 		NUM_LIGHTS
 	};
 	
@@ -84,82 +90,78 @@ struct Branes : Module {
 	// S&H are numbered 0 to 6 in BraneA from lower left to lower right
 	// S&H are numbered 7 to 13 in BraneB from top right to top left
 	enum NoiseId {NONE, WHITE, PINK, RED, BLUE};//use negative value for inv phase
-	int noiseSources[14] = {PINK, RED, BLUE, WHITE, -BLUE, -RED, -PINK,   -PINK, -RED, -BLUE, WHITE, BLUE, RED, PINK};
-	static constexpr float nullNoise = 100.0f;// when a noise has not been generated for the current step
+	int noiseSources[14] = {PINK, RED, BLUE, WHITE, BLUE, RED, PINK,   PINK, RED, BLUE, WHITE, BLUE, RED, PINK};
 
+	
 	// Need to save, with reset
+	int panelTheme = 0;
 	bool trigBypass[2];
+	bool noiseRange[2];
 	
-	// Need to save, no reset
-	int panelTheme;
 	
-	// No need to save, with reset
+	// No need to save
 	float heldOuts[14];
 	
-	// No need to save, no reset
-	SchmittTrigger sampleTriggers[2];
-	SchmittTrigger trigBypassTriggers[2];
+	
+	// No need to save
+	Trigger sampleTriggers[2];
+	Trigger trigBypassTriggers[2];
+	Trigger noiseRangeTriggers[2];
+	float trigLights[2] = {0.0f, 0.0f};
 	NoiseGenerator whiteNoise;
-	PinkFilter pinkFilter;
-	RCFilter redFilter;
-	RCFilter blueFilter;
-	float trigLights[2];
+	PinkFilter pinkFilter[2];
+	RCFilter redFilter[2];
+	RCFilter blueFilter[2];
+	PinkFilter pinkForBlueFilter[2];
+	bool cacheHitRed[2];// no need to init; index is braneIndex
+	float cacheValRed[2];
+	bool cacheHitBlue[2];// no need to init; index is braneIndex
+	float cacheValBlue[2];
+	bool cacheHitPink[2];// no need to init; index is braneIndex
+	float cacheValPink[2];
+	unsigned int lightRefreshCounter = 0;
 
 	
 	Branes() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		// Need to save, no reset
-		panelTheme = 0;
-		
-		// No need to save, no reset		
-		for (int i = 0; i < 2; i++) {
-			sampleTriggers[i].reset();
-			trigBypassTriggers[i].reset();
-			trigLights[i] = 0.0f;
-		}
-		redFilter.setCutoff(441.0f / engineGetSampleRate());
-		blueFilter.setCutoff(44100.0f / engineGetSampleRate());
+		redFilter[0].setCutoff(441.0f / engineGetSampleRate());
+		redFilter[1].setCutoff(441.0f / engineGetSampleRate());
+		blueFilter[0].setCutoff(44100.0f / engineGetSampleRate());
+		blueFilter[1].setCutoff(44100.0f / engineGetSampleRate());
 		
 		onReset();
 	}
 
 	
-	// widgets are not yet created when module is created 
-	// even if widgets not created yet, can use params[] and should handle 0.0f value since step may call 
-	//   this before widget creation anyways
-	// called from the main thread if by constructor, called by engine thread if right-click initialization
-	//   when called by constructor, module is created before the first step() is called
 	void onReset() override {
-		// Need to save, with reset
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++) {
 			trigBypass[i] = false;
-		
-		// No need to save, with reset
+			noiseRange[i] = false;
+		}
 		for (int i = 0; i < 14; i++)
 			heldOuts[i] = 0.0f;
 	}
 
 	
-	// widgets randomized before onRandomize() is called
-	// called by engine thread if right-click randomize
 	void onRandomize() override {
-		// Need to save, with reset
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++) {
 			trigBypass[i] = (randomu32() % 2) > 0;
-		
-		// No need to save, with reset
+			noiseRange[i] = (randomu32() % 2) > 0;
+		}
 		for (int i = 0; i < 14; i++)
 			heldOuts[i] = 0.0f;
 	}
 
 	
-	// called by main thread
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		// Need to save (reset or not)
 
 		// trigBypass
 		json_object_set_new(rootJ, "trigBypass0", json_real(trigBypass[0]));
 		json_object_set_new(rootJ, "trigBypass1", json_real(trigBypass[1]));
+
+		// noiseRange
+		json_object_set_new(rootJ, "noiseRange0", json_real(noiseRange[0]));
+		json_object_set_new(rootJ, "noiseRange1", json_real(noiseRange[1]));
 
 		// panelTheme
 		json_object_set_new(rootJ, "panelTheme", json_integer(panelTheme));
@@ -168,40 +170,52 @@ struct Branes : Module {
 	}
 
 	
-	// widgets have their fromJson() called before this fromJson() is called
-	// called by main thread
 	void fromJson(json_t *rootJ) override {
-		// Need to save (reset or not)
-
 		// trigBypass
 		json_t *trigBypass0J = json_object_get(rootJ, "trigBypass0");
 		if (trigBypass0J)
-			trigBypass[0] = json_real_value(trigBypass0J);
+			trigBypass[0] = json_number_value(trigBypass0J);
 		json_t *trigBypass1J = json_object_get(rootJ, "trigBypass1");
 		if (trigBypass1J)
-			trigBypass[1] = json_real_value(trigBypass1J);
+			trigBypass[1] = json_number_value(trigBypass1J);
+
+		// noiseRange
+		json_t *noiseRange0J = json_object_get(rootJ, "noiseRange0");
+		if (noiseRange0J)
+			noiseRange[0] = json_number_value(noiseRange0J);
+		json_t *noiseRange1J = json_object_get(rootJ, "noiseRange1");
+		if (noiseRange1J)
+			noiseRange[1] = json_number_value(noiseRange1J);
 
 		// panelTheme
 		json_t *panelThemeJ = json_object_get(rootJ, "panelTheme");
 		if (panelThemeJ)
 			panelTheme = json_integer_value(panelThemeJ);
 
-		// No need to save, with reset
 		for (int i = 0; i < 14; i++)
 			heldOuts[i] = 0.0f;
 	}
 
 	
-	// Advances the module by 1 audio frame with duration 1.0 / engineGetSampleRate()
 	void step() override {		
-		float stepNoises[6] = {nullNoise, nullNoise, nullNoise, nullNoise, nullNoise, 0.0f};// order is whiteBase (-1 to 1), white, pink, red, blue, pink_processed (1.0f or 0.0f)
-		
-		// trigBypass buttons and cv inputs
-		for (int i = 0; i < 2; i++) {
-			if (trigBypassTriggers[i].process(params[TRIG_BYPASS_PARAMS + i].value + inputs[TRIG_BYPASS_INPUTS + i].value)) {
-				trigBypass[i] = !trigBypass[i];
+	
+		if ((lightRefreshCounter & userInputsStepSkipMask) == 0) {
+			
+			// trigBypass buttons and cv inputs
+			for (int i = 0; i < 2; i++) {
+				if (trigBypassTriggers[i].process(params[TRIG_BYPASS_PARAMS + i].value + inputs[TRIG_BYPASS_INPUTS + i].value)) {
+					trigBypass[i] = !trigBypass[i];
+				}
 			}
-		}
+			
+			// noiseRange buttons and cv inputs
+			for (int i = 0; i < 2; i++) {
+				if (noiseRangeTriggers[i].process(params[NOISE_RANGE_PARAMS + i].value + inputs[NOISE_RANGE_INPUTS + i].value)) {
+					noiseRange[i] = !noiseRange[i];
+				}
+			}
+		
+		}// userInputs refresh
 
 		// trig inputs
 		bool trigs[2];
@@ -213,74 +227,127 @@ struct Branes : Module {
 			trigInputsActive[i] = trigBypass[i] ? false : inputs[TRIG_INPUTS + i].active;
 		}
 		
-		// sample and hold outputs
-		for (int sh = 0; sh < 14; sh++) {
-			if (trigInputsActive[sh / 7] || (sh == 13 && trigInputsActive[0]) || (sh == 6 && trigInputsActive[1])) {// trig connected (with crosstrigger mechanism)
-				if (trigs[sh / 7] || (sh == 13 && trigs[0]) || (sh == 6 && trigs[1])) {
-					if (inputs[IN_INPUTS + sh].active)// if input cable
-						heldOuts[sh] = inputs[IN_INPUTS + sh].value;// sample and hold input
-					else {
-						int noiseIndex = prepareNoise(stepNoises, sh);// sample and hold noise
-						heldOuts[sh] = stepNoises[noiseIndex] * (noiseSources[sh] > 0 ? 1.0f : -1.0f);
-					}
-				}
-			}
-			else { // no trig connected
-				if (inputs[IN_INPUTS + sh].active) {
-					heldOuts[sh] = inputs[IN_INPUTS + sh].value;// copy of input if no trig and no input
-				}
-				else {
-					heldOuts[sh] = 0.0f;
-					if (outputs[OUT_OUTPUTS + sh].active) {
-						int noiseIndex = prepareNoise(stepNoises, sh);
-						heldOuts[sh] = stepNoises[noiseIndex] * (noiseSources[sh] > 0 ? 1.0f : -1.0f);
-					}
-				}
-			}
-			outputs[OUT_OUTPUTS + sh].value = heldOuts[sh];
+		for (int i = 0; i < 2; i++) {
+			cacheHitRed[i] = false;
+			cacheHitBlue[i] = false;
+			cacheHitPink[i] = false;
 		}
 		
-		// Lights
-		for (int i = 0; i < 2; i++) {
-			float red = trigBypass[i] ? 1.0f : 0.0f;
-			float white = !trigBypass[i] ? trigLights[i] : 0.0f;
-			lights[BYPASS_CV_LIGHTS + i * 2 + 0].value = white;
-			lights[BYPASS_CV_LIGHTS + i * 2 + 1].value = red;
-			lights[BYPASS_TRIG_LIGHTS + i * 2 + 0].value = white;
-			lights[BYPASS_TRIG_LIGHTS + i * 2 + 1].value = red;
-			trigLights[i] -= (trigLights[i] / lightLambda) * (float)engineGetSampleTime();
+		// detect unused brane and avoid noise when so (unused = not a single output connected)
+		int startSh = 7;
+		int endSh = 7;
+		for (int sh = 0; sh < 7; sh++) {
+			if (outputs[OUT_OUTPUTS + sh].active) {
+				startSh = 0;
+				break;
+			}
 		}
+		for (int sh = 7; sh < 14; sh++) {
+			if (outputs[OUT_OUTPUTS + sh].active) {
+				endSh = 14;
+				break;
+			}
+		}
+			
+		
+		// sample and hold outputs (noise continually generated or else stepping non-white on S&H only will not work well because of filters)
+		float noises[14];
+		for (int sh = startSh; sh < endSh; sh++) {
+			noises[sh] = getNoise(sh);
+			if (outputs[OUT_OUTPUTS + sh].active) {
+				int braneIndex = sh < 7 ? 0 : 1;
+				if (trigInputsActive[braneIndex] || (sh == 13 && trigInputsActive[0]) || (sh == 6 && trigInputsActive[1])) {// if trigs connected (with crosstrigger mechanism)
+					if ((trigInputsActive[braneIndex] && trigs[braneIndex]) || (sh == 13 && trigInputsActive[0] && trigs[0]) || (sh == 6 && trigInputsActive[1] && trigs[1])) {// if trig rising edge
+						if (inputs[IN_INPUTS + sh].active)// if input cable
+							heldOuts[sh] = inputs[IN_INPUTS + sh].value;// sample and hold input
+						else
+							heldOuts[sh] = noises[sh];// sample and hold noise
+					}
+					// else no rising edge, so simply preserve heldOuts[sh], nothing to do
+				}
+				else { // no trig connected
+					if (inputs[IN_INPUTS + sh].active)
+						heldOuts[sh] = inputs[IN_INPUTS + sh].value;// copy of input if no trig and input
+					else
+						heldOuts[sh] = noises[sh];// continuous noise if no trig and no input
+				}
+				outputs[OUT_OUTPUTS + sh].value = heldOuts[sh];
+			}
+		}
+		
+		lightRefreshCounter++;
+		if (lightRefreshCounter >= displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
+
+			// Lights
+			for (int i = 0; i < 2; i++) {
+				float red = trigBypass[i] ? 1.0f : 0.0f;
+				float white = !trigBypass[i] ? trigLights[i] : 0.0f;
+				lights[BYPASS_TRIG_LIGHTS + i * 2 + 0].value = white;
+				lights[BYPASS_TRIG_LIGHTS + i * 2 + 1].value = red;
+				lights[NOISE_RANGE_LIGHTS + i].value = noiseRange[i] ? 1.0f : 0.0f;
+				trigLights[i] -= (trigLights[i] / lightLambda) * (float)engineGetSampleTime() * displayRefreshStepSkips;
+			}
+			
+		}// lightRefreshCounter
 		
 	}// step()
 	
-	int prepareNoise(float* stepNoises, int sh) {
-		int noiseIndex = abs( noiseSources[sh] );
-		if (stepNoises[noiseIndex] == nullNoise) {
-			if (stepNoises[0] == nullNoise)
-				stepNoises[0] = whiteNoise.white();
-			if ((noiseIndex == PINK || noiseIndex == BLUE) && stepNoises[5] == 0.0f) {
-				pinkFilter.process(stepNoises[0]);
-				stepNoises[5] = 1.0f;
-			}
-			switch (noiseIndex) {
-				// most of the code in here is from Joel Robichaud - Nohmad Noise module
-				case (PINK) :
-					stepNoises[noiseIndex] = 5.0f * clamp(0.18f * pinkFilter.pink(), -1.0f, 1.0f);
-				break;
-				case (RED) :
-					redFilter.process(stepNoises[0]);
-					stepNoises[noiseIndex] = 5.0f * clamp(7.8f * redFilter.lowpass(), -1.0f, 1.0f);
-				break;
-				case (BLUE) :
-					blueFilter.process(pinkFilter.pink());
-					stepNoises[noiseIndex] = 5.0f * clamp(0.64f * blueFilter.highpass(), -1.0f, 1.0f);
-				break;
-				default ://(WHITE)
-					stepNoises[noiseIndex] = 5.0f * stepNoises[0];
-				break;
+	float getNoise(int sh) {
+		// some of the code in here is from Joel Robichaud - Nohmad Noise module
+		float ret = 0.0f;
+		int braneIndex = sh < 7 ? 0 : 1;
+		int noiseIndex = noiseSources[sh];
+		if (noiseIndex == WHITE) {
+			ret = 5.0f * whiteNoise.white();
+		}
+		else if (noiseIndex == RED) {
+			if (cacheHitRed[braneIndex])
+				ret = -1.0 * cacheValRed[braneIndex];
+			else {
+				redFilter[braneIndex].process(whiteNoise.white());
+				cacheValRed[braneIndex] = 5.0f * clamp(7.8f * redFilter[braneIndex].lowpass(), -1.0f, 1.0f);
+				cacheHitRed[braneIndex] = true;
+				ret = cacheValRed[braneIndex];
 			}
 		}
-		return noiseIndex;
+		else if (noiseIndex == PINK) {
+			if (cacheHitPink[braneIndex])
+				ret = -1.0 * cacheValPink[braneIndex];
+			else {
+				pinkFilter[braneIndex].process(whiteNoise.white());
+				cacheValPink[braneIndex] = 5.0f * clamp(0.18f * pinkFilter[braneIndex].pink(), -1.0f, 1.0f);
+				cacheHitPink[braneIndex] = true;
+				ret = cacheValPink[braneIndex];
+			}
+		}
+		else {// noiseIndex == BLUE
+			if (cacheHitBlue[braneIndex])
+				ret = -1.0 * cacheValBlue[braneIndex];
+			else {
+				pinkForBlueFilter[braneIndex].process(whiteNoise.white());
+				blueFilter[braneIndex].process(pinkForBlueFilter[braneIndex].pink());
+				cacheValBlue[braneIndex] = 5.0f * clamp(0.64f * blueFilter[braneIndex].highpass(), -1.0f, 1.0f);
+				cacheHitBlue[braneIndex] = true;
+				ret = cacheValBlue[braneIndex];
+			}
+		}
+		
+		// noise ranges
+		if (noiseRange[0]) {
+			if (sh >= 3 && sh <= 6)// 0 to 10 instead of -5 to 5
+				ret += 5.0f;
+		}
+		if (noiseRange[1]) {
+			if (sh >= 7 && sh <= 10) {// 0 to 1 instead of -5 to 5
+				ret += 5.0f;
+				ret *= 0.1f;
+			}
+			else if (sh >= 11) {// -1 to 1 instead of -5 to 5
+				ret *= 0.2f;
+			}	
+		}
+		return ret;
 	}
 };
 
@@ -320,7 +387,7 @@ struct BranesWidget : ModuleWidget {
 		darkItem->text = darkPanelID;// Geodesics.hpp
 		darkItem->module = module;
 		darkItem->theme = 1;
-		//menu->addChild(darkItem);
+		menu->addChild(darkItem);
 
 		return menu;
 	}	
@@ -328,8 +395,8 @@ struct BranesWidget : ModuleWidget {
 	BranesWidget(Branes *module) : ModuleWidget(module) {
 		// Main panel from Inkscape
         DynamicSVGPanel *panel = new DynamicSVGPanel();
-        panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BranesBG-01.svg")));
-        //panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BranesBG-02.svg")));// no dark pannel for now
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/WhiteLight/Branes-WL.svg")));
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/DarkMatter/Branes-DM.svg")));
         box.size = panel->box.size;
         panel->mode = &module->panelTheme;
         addChild(panel);
@@ -338,8 +405,8 @@ struct BranesWidget : ModuleWidget {
 		// part of svg panel, no code required
 		
 		float colRulerCenter = box.size.x / 2.0f;
-		static constexpr float rowRulerHoldA = 119.5;
-		static constexpr float rowRulerHoldB = 248.5f;
+		static constexpr float rowRulerHoldA = 132.5;
+		static constexpr float rowRulerHoldB = 261.5f;
 		static constexpr float radiusIn = 35.0f;
 		static constexpr float radiusOut = 64.0f;
 		static constexpr float offsetIn = 25.0f;
@@ -391,21 +458,31 @@ struct BranesWidget : ModuleWidget {
 		addOutput(createDynamicPort<GeoPort>(Vec(colRulerCenter - offsetOut, rowRulerHoldB - offsetOut), Port::OUTPUT, module, Branes::OUT_OUTPUTS + 13, &module->panelTheme));
 		
 		
-		static constexpr float rowRulerBypass = 345.5f;
+		// Trigger bypass (aka Vibrations)
+		// Bypass buttons
+		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter + 40.0f, 380.0f - 334.5f), module, Branes::TRIG_BYPASS_PARAMS + 0, 0.0f, 1.0f, 0.0f, &module->panelTheme));
+		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter + 40.0f, 380.0f - 31.5f), module, Branes::TRIG_BYPASS_PARAMS + 1, 0.0f, 1.0f, 0.0f, &module->panelTheme));
+		// Bypass cv inputs
+		addInput(createDynamicPort<GeoPort>(Vec(colRulerCenter + 68.0f, 380.0f - 315.5f), Port::INPUT, module, Branes::TRIG_BYPASS_INPUTS + 0, &module->panelTheme));
+		addInput(createDynamicPort<GeoPort>(Vec(colRulerCenter + 68.0f, 380.0f - 50.5f), Port::INPUT, module, Branes::TRIG_BYPASS_INPUTS + 1, &module->panelTheme));
+		// Bypass LEDs near buttons
+		addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter + 53.0f, 380.0f - 327.5f), module, Branes::BYPASS_TRIG_LIGHTS + 0 * 2));
+		addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter + 53.0f, 380.0f - 38.5f), module, Branes::BYPASS_TRIG_LIGHTS + 1 * 2));
+				
+		// Bypass LEDs in branes
+		// addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter + 5.5f, rowRulerHoldA + 19.5f), module, Branes::BYPASS_TRIG_LIGHTS + 0 * 2));
+		// addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter - 5.5f, rowRulerHoldB - 19.5f), module, Branes::BYPASS_TRIG_LIGHTS + 1 * 2));
 		
-		// Trigger bypass
-		// buttons
-		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter - 32.0f, rowRulerBypass), module, Branes::TRIG_BYPASS_PARAMS + 0, 0.0f, 1.0f, 0.0f, &module->panelTheme));
-		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter + 32.0f, rowRulerBypass), module, Branes::TRIG_BYPASS_PARAMS + 1, 0.0f, 1.0f, 0.0f, &module->panelTheme));
-		// cv inputs
-		addInput(createDynamicPort<GeoPort>(Vec(colRulerCenter - 65.0f, rowRulerBypass), Port::INPUT, module, Branes::TRIG_BYPASS_INPUTS + 0, &module->panelTheme));
-		addInput(createDynamicPort<GeoPort>(Vec(colRulerCenter + 65.0f, rowRulerBypass), Port::INPUT, module, Branes::TRIG_BYPASS_INPUTS + 1, &module->panelTheme));
-		// LEDs bottom
-		addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter - 46.5f, rowRulerBypass), module, Branes::BYPASS_CV_LIGHTS + 0 * 2));
-		addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter + 46.5f, rowRulerBypass), module, Branes::BYPASS_CV_LIGHTS + 1 * 2));
-		// LEDs top
-		addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter + 5.5f, rowRulerHoldA + 19.5f), module, Branes::BYPASS_TRIG_LIGHTS + 0 * 2));
-		addChild(createLightCentered<SmallLight<GeoWhiteRedLight>>(Vec(colRulerCenter - 5.5f, rowRulerHoldB - 19.5f), module, Branes::BYPASS_TRIG_LIGHTS + 1 * 2));
+		// Noise range
+		// Range buttons
+		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter - 40.0f, 380.0f - 334.5f), module, Branes::NOISE_RANGE_PARAMS + 0, 0.0f, 1.0f, 0.0f, &module->panelTheme));
+		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter - 40.0f, 380.0f - 31.5f), module, Branes::NOISE_RANGE_PARAMS + 1, 0.0f, 1.0f, 0.0f, &module->panelTheme));
+		// Range cv inputs
+		addInput(createDynamicPort<GeoPort>(Vec(colRulerCenter - 68.0f, 380.0f - 315.5f), Port::INPUT, module, Branes::NOISE_RANGE_INPUTS + 0, &module->panelTheme));
+		addInput(createDynamicPort<GeoPort>(Vec(colRulerCenter - 68.0f, 380.0f - 50.5f), Port::INPUT, module, Branes::NOISE_RANGE_INPUTS + 1, &module->panelTheme));
+		// Range LEDs near buttons
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(colRulerCenter - 53.0f, 380.0f - 327.5f), module, Branes::NOISE_RANGE_LIGHTS + 0));
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(colRulerCenter - 53.0f, 380.0f - 38.5f), module, Branes::NOISE_RANGE_LIGHTS + 1));
 
 	}
 };
@@ -420,6 +497,20 @@ RACK_PLUGIN_MODEL_INIT(Geodesics, Branes) {
 }
 
 /*CHANGE LOG
+
+0.6.6:
+swap noise range and trigger bypass and add new svg showing noise range settings
+
+0.6.5:
+input refresh optimization
+step optimization of lights refresh
+optimize unused brane (turn of noise of a brane when all outputs of the given brane are unconnected)
+
+0.6.4:
+add noise range buttons
+
+0.6.2: 
+bug fix for stuck outputs, improve random noise non-correlation 
 
 0.6.0:
 created

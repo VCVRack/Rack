@@ -285,7 +285,7 @@ struct FMOpWidget : ModuleWidget {
 	  FMOp* fmop = dynamic_cast<FMOp*>(module);
 		assert(fmop);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new LinearLevelMenuItem(fmop, "Linear Level Response"));
+		menu->addChild(new LinearLevelMenuItem(fmop, "Linear level response"));
 	}
 };
 

@@ -1,0 +1,12 @@
+{
+  "name": "EH_modules",
+  "author": "Eduard Heidt",
+  "license": "GPL",
+  "pluginUrl": "https://github.com/eh2k/fv1-emu",
+  "authorUrl": "https://github.com/eh2k",
+  "authorEmail": "https://github.com/eh2k",
+  "manualUrl": "https://github.com/eh2k/fv1-emu/blob/master/README.md",
+  "sourceUrl": "https://github.com/eh2k/fv1-emu",
+  "latestVersion": "0.6.0",
+  "status": "available"
+}

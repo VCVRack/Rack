@@ -16,10 +16,11 @@
 #pragma warning ( disable: 4244 4267 )
 #endif
 
-#include "dsp/minblep.hpp"
-#include "dsp/filter.hpp"
+#include "SqMath.h"
+#include "SqBlep.h"
 #include "AudioMath.h"
 #include "ObjectCache.h"
+
 
 
 using namespace rack;
@@ -72,12 +73,12 @@ struct EvenVCO : TBase
     /** Whether we are past the pulse width already */
     bool halfPhase = false;
 
-    MinBLEP<16> triSquareMinBLEP;
-    MinBLEP<16> triMinBLEP;
-    MinBLEP<16> sineMinBLEP;
-    MinBLEP<16> doubleSawMinBLEP;
-    MinBLEP<16> sawMinBLEP;
-    MinBLEP<16> squareMinBLEP;
+    SqBlep triSquareMinBLEP;
+    SqBlep  triMinBLEP;
+    SqBlep  sineMinBLEP;
+    SqBlep  doubleSawMinBLEP;
+    SqBlep  sawMinBLEP;
+    SqBlep  squareMinBLEP;
 
     void step() override;
     void step_even(float deltaPhase);
@@ -122,10 +123,17 @@ inline EvenVCO<TBase>::EvenVCO(struct Module * module) : TBase(module)
     initialize();
 }
 
+#ifdef __V1
+using namespace rack::dsp;
+#else
+using namespace rack;
+#endif
+
 template <class TBase>
 inline void EvenVCO<TBase>::initialize()
 {
-    triSquareMinBLEP.minblep = rack::minblep_16_32;
+#if 0
+    triSquareMinBLEP.minblep = minblep_16_32;
     triSquareMinBLEP.oversample = 32;
     triMinBLEP.minblep = minblep_16_32;
     triMinBLEP.oversample = 32;
@@ -137,6 +145,7 @@ inline void EvenVCO<TBase>::initialize()
     sawMinBLEP.oversample = 32;
     squareMinBLEP.minblep = minblep_16_32;
     squareMinBLEP.oversample = 32;
+#endif
 
     sinLookup = ObjectCache<float>::getSinLookup();
     expLookup = ObjectCache<float>::getExp2Ex();
@@ -277,7 +286,7 @@ inline void EvenVCO<TBase>::step_sq(float deltaPhase)
     if (doSq) {
         pw = TBase::params[PWM_PARAM].value + TBase::inputs[PWM_INPUT].value / 5.0;
         const float minPw = 0.05f;
-        pw = rescale(clamp(pw, -1.0f, 1.0f), -1.0f, 1.0f, minPw, 1.0f - minPw);
+        pw = sq::rescale(sq::clamp(pw, -1.0f, 1.0f), -1.0f, 1.0f, minPw, 1.0f - minPw);
 
         if (!halfPhase && phase >= pw) {
             float crossing = -(phase - pw) / deltaPhase;
@@ -349,7 +358,7 @@ inline void EvenVCO<TBase>::step()
 
     // Advance phase
     float f = (_testFreq) ? _testFreq : _freq;
-    float deltaPhase = clamp(f * TBase::engineGetSampleTime(), 1e-6f, 0.5f);
+    float deltaPhase = sq::clamp(f * TBase::engineGetSampleTime(), 1e-6f, 0.5f);
 
     // call the dedicated dispatch routines for the special case waveforms.
     switch (dispatcher) {
@@ -401,7 +410,7 @@ inline void EvenVCO<TBase>::step_all(float deltaPhase)
     if (doSq) {
         pw = TBase::params[PWM_PARAM].value + TBase::inputs[PWM_INPUT].value / 5.0;
         const float minPw = 0.05f;
-        pw = rescale(clamp(pw, -1.0f, 1.0f), -1.0f, 1.0f, minPw, 1.0f - minPw);
+        pw = sq::rescale(sq::clamp(pw, -1.0f, 1.0f), -1.0f, 1.0f, minPw, 1.0f - minPw);
 
         if (!halfPhase && phase >= pw) {
             const float crossing = -(phase - pw) / deltaPhase;

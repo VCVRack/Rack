@@ -24,7 +24,8 @@
  * ---- info   : This is part of the "lglw" package.
  * ----
  * ---- created: 04Aug2018
- * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018
+ * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018, 07Mar2019
+ * ----
  * ----
  * ----
  */
@@ -38,8 +39,8 @@
 #include <windows.h>
 #include <windowsx.h>
 
-// #define Dprintf if(0);else printf
-#define Dprintf if(1);else printf
+#define Dprintf if(0);else printf
+// #define Dprintf if(1);else printf
 
 // ---------------------------------------------------------------------------- macros and defines
 #define LGLW(a) lglw_int_t *lglw = ((lglw_int_t*)(a))
@@ -1344,7 +1345,7 @@ static LRESULT CALLBACK loc_LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARA
                      // Dprintf("xxx lglw:loc_LowLevelKeyboardProc<down>: VK_LCONTROL\n");
                      khook_lglw->keyboard.kmod_state |= LGLW_KMOD_LCTRL;
                      bHandled = loc_handle_key(khook_lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_LCTRL);
-                           bHandled = LGLW_FALSE;
+                     bHandled = LGLW_FALSE;
                      break;
 
                   case VK_RCONTROL:
@@ -1354,15 +1355,35 @@ static LRESULT CALLBACK loc_LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARA
                      bHandled = LGLW_FALSE;
                      break;
 
-                     //case VK_RWIN:
-                     //case VK_F1:
-                  case VK_LMENU: // alt
-                     // not received
-                     // Dprintf("xxx lglw:loc_LowLevelKeyboardProc<down>: VK_LMENU\n");
+                  case VK_LMENU:
+                     // Dprintf("xxx lglw:loc_LowLevelKeyboardProc<down>: VK_LALT\n");
+                     khook_lglw->keyboard.kmod_state |= LGLW_KMOD_LALT;
+                     bHandled = loc_handle_key(khook_lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_LALT);
+                     bHandled = LGLW_FALSE;
                      break;
 
                   case VK_RMENU:
+                     // Dprintf("xxx lglw:loc_LowLevelKeyboardProc<down>: VK_RALT\n");
+                     khook_lglw->keyboard.kmod_state |= LGLW_KMOD_RALT;
+                     bHandled = loc_handle_key(khook_lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_RALT);
+                     bHandled = LGLW_FALSE;
+                     break;
+
+                  //    //case VK_RWIN:
+                  //    //case VK_F1:
+                  // case VK_LMENU:
+                  //    // not received
+                  //    // Dprintf("xxx lglw:loc_LowLevelKeyboardProc<down>: VK_LMENU\n");
+                  //    khook_lglw->keyboard.kmod_state |= LGLW_KMOD_LSUPER;
+                  //    bHandled = loc_handle_key(khook_lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_LSUPER);
+                  //    bHandled = LGLW_FALSE;
+                  //    break;
+
+                  case 0x5D/*VK_CONTEXTKEY*/:
                      // Dprintf("xxx lglw:loc_LowLevelKeyboardProc<down>: VK_RMENU\n");
+                     khook_lglw->keyboard.kmod_state |= LGLW_KMOD_RSUPER;
+                     bHandled = loc_handle_key(khook_lglw, LGLW_TRUE/*bPressed*/, LGLW_VKEY_RSUPER);
+                     bHandled = LGLW_FALSE;
                      break;
                }
 
@@ -1432,6 +1453,30 @@ static LRESULT CALLBACK loc_LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARA
                   case VK_RCONTROL:
                      khook_lglw->keyboard.kmod_state &= ~LGLW_KMOD_RCTRL;
                      bHandled = loc_handle_key(khook_lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RCTRL);
+                     bHandled = LGLW_FALSE;
+                     break;
+
+                  case VK_LMENU:
+                     khook_lglw->keyboard.kmod_state &= ~LGLW_KMOD_LALT;
+                     bHandled = loc_handle_key(khook_lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_LALT);
+                     bHandled = LGLW_FALSE;
+                     break;
+
+                  case VK_RMENU:
+                     khook_lglw->keyboard.kmod_state &= ~LGLW_KMOD_RALT;
+                     bHandled = loc_handle_key(khook_lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RALT);
+                     bHandled = LGLW_FALSE;
+                     break;
+
+                  // case VK_LMENU:  // not revc'd
+                  //    khook_lglw->keyboard.kmod_state &= ~LGLW_KMOD_LSUPER;
+                  //    bHandled = loc_handle_key(khook_lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_LSUPER);
+                  //    bHandled = LGLW_FALSE;
+                  //    break;
+
+                  case 0x5D/*VK_CONTEXTKEY*/:
+                     khook_lglw->keyboard.kmod_state &= ~LGLW_KMOD_RSUPER;
+                     bHandled = loc_handle_key(khook_lglw, LGLW_FALSE/*bPressed*/, LGLW_VKEY_RSUPER);
                      bHandled = LGLW_FALSE;
                      break;
                }

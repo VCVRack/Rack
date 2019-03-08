@@ -34,7 +34,7 @@ static void stepChannel(Input &in, Param &level, Input &lin, Input &exp, Output 
 	const float expBase = 50.0f;
 	if (exp.active)
 		v *= rescale(powf(expBase, clamp(exp.value / 10.0f, 0.0f, 1.0f)), 1.0f, expBase, 0.0f, 1.0f);
-   out.value = v;
+	out.value = v;
 }
 
 void VCA::step() {
@@ -55,8 +55,8 @@ VCAWidget::VCAWidget(VCA *module) : ModuleWidget(module) {
 	addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 	addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-	addParam(ParamWidget::create<RoundLargeBlackKnob>(mm2px(Vec(6.35, 19.11753)), module, VCA::LEVEL1_PARAM, 0.0, 1.0, 0.5));
-	addParam(ParamWidget::create<RoundLargeBlackKnob>(mm2px(Vec(6.35, 74.80544)), module, VCA::LEVEL2_PARAM, 0.0, 1.0, 0.5));
+	addParam(ParamWidget::create<RoundLargeBlackKnob>(mm2px(Vec(6.35, 19.11753)), module, VCA::LEVEL1_PARAM, 0.0, 1.0, 0.0));
+	addParam(ParamWidget::create<RoundLargeBlackKnob>(mm2px(Vec(6.35, 74.80544)), module, VCA::LEVEL2_PARAM, 0.0, 1.0, 0.0));
 
 	addInput(Port::create<PJ301MPort>(mm2px(Vec(2.5907, 38.19371)), Port::INPUT, module, VCA::EXP1_INPUT));
 	addInput(Port::create<PJ301MPort>(mm2px(Vec(14.59752, 38.19371)), Port::INPUT, module, VCA::LIN1_INPUT));
@@ -68,6 +68,7 @@ VCAWidget::VCAWidget(VCA *module) : ModuleWidget(module) {
 	addOutput(Port::create<PJ301MPort>(mm2px(Vec(14.59752, 52.80642)), Port::OUTPUT, module, VCA::OUT1_OUTPUT));
 	addOutput(Port::create<PJ301MPort>(mm2px(Vec(14.59752, 108.14706)), Port::OUTPUT, module, VCA::OUT2_OUTPUT));
 }
+
 
 struct VCA_1 : Module {
 	enum ParamIds {
@@ -150,7 +151,7 @@ struct VCA_1Widget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(ParamWidget::create<VCA_1VUKnob>(mm2px(Vec(2.62103, 12.31692)), module, VCA_1::LEVEL_PARAM, 0.0, 1.0, 0.5));
+		addParam(ParamWidget::create<VCA_1VUKnob>(mm2px(Vec(2.62103, 12.31692)), module, VCA_1::LEVEL_PARAM, 0.0, 1.0, 1.0));
 		addParam(ParamWidget::create<CKSS>(mm2px(Vec(5.24619, 79.9593)), module, VCA_1::EXP_PARAM, 0.0, 1.0, 1.0));
 
 		addInput(Port::create<PJ301MPort>(mm2px(Vec(3.51261, 60.4008)), Port::INPUT, module, VCA_1::CV_INPUT));

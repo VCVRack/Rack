@@ -579,7 +579,6 @@ UGraphWidget::UGraphWidget(UGraph *module) : ModuleWidget(module){
     addChild(Widget::create<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(Widget::create<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    auto intToText = [](int a) {return std::to_string(a);};
     auto floatToTempoText = [](float a){
         std::stringstream stream;
         stream << std::fixed << std::setprecision(1) << a;

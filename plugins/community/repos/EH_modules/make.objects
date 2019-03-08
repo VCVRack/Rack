@@ -1,0 +1,7 @@
+COMMON_OBJ= \
+	src/EH_modules.o \
+	src/FV1EmuVCVPlugIn.o
+
+WIN32_OBJ= \
+	src/dirent_win32/dirent.o
+

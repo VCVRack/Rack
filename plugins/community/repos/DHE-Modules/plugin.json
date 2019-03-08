@@ -1,0 +1,88 @@
+{
+  "name": "DHE Modules",
+  "version": "1.0.0",
+	"slug": "DHE-Modules",
+  "sourceUrl": "https://github.com/dhemery/DHE-Modules/",
+  "license": "MIT",
+  "author": "Dale Emery",
+  "authorEmail": "dale@dhemery.com",
+  "authorUrl": "https://dhemery.github.io/DHE-Modules/",
+  "donateUrl": "https://paypal.me/DaleHEmery/",
+	"modules": {
+    {
+      "Booster-Stage": {
+        "name": "Booster Stage",
+        "description": "Generates a single envelope stage",
+        "tags": ["Envelope Generator"]
+      }
+    },
+    {
+      "Cubic": {
+        "name": "Cubic",
+        "description": "Offsets, scales, squares, and cubes its input signal",
+        "tags": ["Waveshaper"]
+      }
+    },
+    {
+      "Func": {
+        "name": "Func",
+        "description": "A knob with a selectable range to offset or scale its input signal",
+        "tags": ["Utility"]
+      }
+    },
+    {
+      "Func6": {
+        "name": "Func 6",
+        "description": "A chain of knobs with selectable ranges to offset and scale input signals",
+        "tags": ["Utility"]
+      }
+    },
+    {
+      "Hostage": {
+        "name": "Hostage",
+        "description": "Generates a hold or sustain envelope stage",
+        "tags": ["Envelope Generator"]
+      }
+    },
+    {
+      "Ranger": {
+        "name": "Ranger",
+        "description": "A modulatable knob with an adjustable, modulatable range",
+        "tags": ["Utility"]
+      }
+    },
+    {
+      "Stage": {
+        "name": "Stage",
+        "description": "Generates a single envelope stage",
+        "tags": ["Envelope Generator"]
+      }
+    },
+    {
+      "Swave": {
+        "name": "Swave",
+        "description": "A waveshaper with a unique sigmoid transfer function",
+        "tags": ["Waveshaper"]
+      }
+    },
+    {
+      "Tapers": {
+        "name": "Tapers",
+        "description": "A pair of modulatable knobs with adjustable, modulatable tapers",
+        "tags": ["Utility"]
+      }
+    },
+    {
+      "Upstage": {
+        "name": "Upstage",
+        "description": "Special-purpose envelope controls",
+        "tags": ["Envelope Generator"]
+      }
+    },
+    "Xycloid": {
+      "name": "Xycloid",
+      "description": "Generates a pair of complex, evolving, pulsing LFO signals",
+      "tags": ["LFO"]
+    }
+	}
+}

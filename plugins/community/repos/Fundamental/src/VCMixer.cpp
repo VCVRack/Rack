@@ -26,12 +26,14 @@ struct VCMixer : Module {
 		for (int i = 0; i < 4; i++) {
 			float ch = inputs[CH_INPUT + i].value;
 			ch *= powf(params[LVL_PARAM + i].value, 2.f);
-			ch *= clamp(inputs[CV_INPUT + i].normalize(10.f) / 10.f, 0.f, 1.f);
+			if (inputs[CV_INPUT + i].active)
+				ch *= clamp(inputs[CV_INPUT + i].value / 10.f, 0.f, 1.f);
 			outputs[CH_OUTPUT + i].value = ch;
 			mix += ch;
 		}
 		mix *= params[MIX_LVL_PARAM].value;
-		mix *= clamp(inputs[MIX_CV_INPUT].normalize(10.f) / 10.f, 0.f, 1.f);
+		if (inputs[MIX_CV_INPUT].active)
+			mix *= clamp(inputs[MIX_CV_INPUT].value / 10.f, 0.f, 1.f);
 		outputs[MIX_OUTPUT].value = mix;
 	}
 };

@@ -71,23 +71,22 @@
 
         <g transform="rotate(-90) translate(19 0)">
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
-          <text font-size="7.0pt" transform="translate(14 0) rotate(90) translate(-2.7 3.5)">0</text>
+          <text font-size="7.0pt" transform="translate(14 0) rotate(90) translate(-2.7 3.5)">1</text>
         </g>
 
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-75) translate(22 0)" />
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-60) translate(22 0)" />
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-45) translate(22 0)" />
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-30) translate(22 0)" />
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-73.33) translate(22 0)" />
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-56.67) translate(22 0)" />
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-40) translate(22 0)" />
 
-        <g transform="rotate(-15) translate(19 0)">
+        <g transform="rotate(-23.33) translate(19 0)">
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
-          <text font-size="7.0pt" transform="translate(14 0) rotate(15) translate(-2.7 3.5)">5</text>
+          <text font-size="7.0pt" transform="translate(14 0) rotate(23.33) translate(-2.7 3.5)">5</text>
         </g>
 
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(0) translate(22 0)" />
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(15) translate(22 0)" />
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(30) translate(22 0)" />
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(45) translate(22 0)" />
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-6.67) translate(22 0)" />
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(10) translate(22 0)" />
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(26.67) translate(22 0)" />
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(43.33) translate(22 0)" />
 
         <g transform="rotate(60) translate(19 0)">
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />

@@ -37,6 +37,7 @@ struct Mix8 : Module {
 		MUTE8_PARAM,
 		PAN8_PARAM,
 		MIX_PARAM,
+		MIX_MUTE_PARAM,
 		NUM_PARAMS
 	};
 
@@ -99,10 +100,10 @@ struct Mix8 : Module {
 	, _channel2(params[LEVEL2_PARAM], params[PAN2_PARAM], params[MUTE2_PARAM], inputs[IN2_INPUT], inputs[CV2_INPUT], inputs[PAN2_INPUT])
 	, _channel3(params[LEVEL3_PARAM], params[PAN3_PARAM], params[MUTE3_PARAM], inputs[IN3_INPUT], inputs[CV3_INPUT], inputs[PAN3_INPUT])
 	, _channel4(params[LEVEL4_PARAM], params[PAN4_PARAM], params[MUTE4_PARAM], inputs[IN4_INPUT], inputs[CV4_INPUT], inputs[PAN4_INPUT])
-	, _channel5(params[LEVEL5_PARAM], params[PAN5_PARAM], params[MUTE5_PARAM], inputs[IN5_INPUT], inputs[CV4_INPUT], inputs[PAN5_INPUT])
-	, _channel6(params[LEVEL6_PARAM], params[PAN6_PARAM], params[MUTE6_PARAM], inputs[IN6_INPUT], inputs[CV4_INPUT], inputs[PAN6_INPUT])
-	, _channel7(params[LEVEL7_PARAM], params[PAN7_PARAM], params[MUTE7_PARAM], inputs[IN7_INPUT], inputs[CV4_INPUT], inputs[PAN7_INPUT])
-	, _channel8(params[LEVEL8_PARAM], params[PAN8_PARAM], params[MUTE8_PARAM], inputs[IN8_INPUT], inputs[CV4_INPUT], inputs[PAN8_INPUT])
+	, _channel5(params[LEVEL5_PARAM], params[PAN5_PARAM], params[MUTE5_PARAM], inputs[IN5_INPUT], inputs[CV5_INPUT], inputs[PAN5_INPUT])
+	, _channel6(params[LEVEL6_PARAM], params[PAN6_PARAM], params[MUTE6_PARAM], inputs[IN6_INPUT], inputs[CV6_INPUT], inputs[PAN6_INPUT])
+	, _channel7(params[LEVEL7_PARAM], params[PAN7_PARAM], params[MUTE7_PARAM], inputs[IN7_INPUT], inputs[CV7_INPUT], inputs[PAN7_INPUT])
+	, _channel8(params[LEVEL8_PARAM], params[PAN8_PARAM], params[MUTE8_PARAM], inputs[IN8_INPUT], inputs[CV8_INPUT], inputs[PAN8_INPUT])
 	{
 		onSampleRateChange();
 		_rms.setSensitivity(0.05f);

@@ -9,6 +9,7 @@
 struct SineOsc : Module {
 	enum ParamIds {
 		FREQ_PARAM,
+		BASE_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -27,6 +28,8 @@ struct SineOsc : Module {
 
 	float phase = 0.0f;
 	float blinkPhase = 0.0f;
+	float freq = 0.0f;
+	int base_freq = 0;
 
 	SineOsc() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -36,10 +39,18 @@ struct SineOsc : Module {
 void SineOsc::step() {
 	// Implement a simple sine oscillator
 	// Compute the frequency from the pitch parameter and input
+	base_freq = params[BASE_PARAM].value;
 	float pitch = params[FREQ_PARAM].value;
 	pitch += inputs[FREQ_CV].value;
 	pitch = clamp(pitch, -4.0f, 4.0f);
-	float freq = 440.0f * powf(2.0f, pitch);
+
+	if(base_freq==1){
+		//Note A4
+		freq = 440.0f * powf(2.0f, pitch);
+	}else{
+		// Note C4
+		freq = 261.626f * powf(2.0f, pitch);
+	}
 	// Accumulate the phase
 	phase += freq / engineGetSampleRate();
 	if (phase >= 1.0f)
@@ -51,6 +62,7 @@ void SineOsc::step() {
 	//float sine = sinf(2 * M_PI * phase)+ sinf(2 * M_PI * phase * 2)*5;
 	//mod,like this it gives  a unipolar saw-ish wave
 	//float sine = sinf(2.0 * M_PI * (phase * 0.125)) * 5.0;
+
 	outputs[OSC_OUTPUT].value = sine;
     lights[FREQ_LIGHT].value = (outputs[OSC_OUTPUT].value > 0.0f) ? 1.0f : 0.0f;
 
@@ -64,7 +76,7 @@ struct SineOscWidget : ModuleWidget
 
 SineOscWidget::SineOscWidget(SineOsc *module) : ModuleWidget(module) {
 
-   setPanel(SVG::load(assetPlugin(plugin, "res/SineOSC.svg")));
+  setPanel(SVG::load(assetPlugin(plugin, "res/SineOSC.svg")));
   
 	//SCREWS - SPECIAL SPACING FOR RACK WIDTH*4
 	addChild(Widget::create<as_HexScrew>(Vec(0, 0)));
@@ -74,7 +86,12 @@ SineOscWidget::SineOscWidget(SineOsc *module) : ModuleWidget(module) {
 	//LIGHT
 	addChild(ModuleLightWidget::create<SmallLight<RedLight>>(Vec(22-15, 57), module, SineOsc::FREQ_LIGHT));
 	//PARAMS
+	//addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 60), module, SineOsc::FREQ_PARAM, -3.75f, 3.75f, -0.75f));
+	//addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 60), module, SineOsc::FREQ_PARAM, -3.0f, 2.999934f, -0.000066f));
 	addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 60), module, SineOsc::FREQ_PARAM, -3.0f, 3.0f, 0.0f));
+
+	//BASE FREQ SWITCH
+	addParam(ParamWidget::create<as_CKSSH>(Vec(18, 220), module, SineOsc::BASE_PARAM, 0.0f, 1.0f, 1.0f));
 	//INPUTS
 	addInput(Port::create<as_PJ301MPort>(Vec(33-15, 260), Port::INPUT, module, SineOsc::FREQ_CV));
 	//OUTPUTS

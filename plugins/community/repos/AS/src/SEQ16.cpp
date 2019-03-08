@@ -348,7 +348,7 @@ struct SEQ16Widget : ModuleWidget {
 
 SEQ16Widget::SEQ16Widget(SEQ16 *module) : ModuleWidget(module) {
 
-   setPanel(SVG::load(assetPlugin(plugin, "res/SEQ16.svg")));
+  setPanel(SVG::load(assetPlugin(plugin, "res/SEQ16.svg")));
   
 	//LCD STEPS SCREEN
 	StepsDisplayWidget *display = new StepsDisplayWidget();

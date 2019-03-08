@@ -9,6 +9,7 @@
 struct SawOsc : Module {
 	enum ParamIds {
 		PITCH_PARAM,
+		BASE_PARAM,
 		 PW_PARAM,
 		NUM_PARAMS
 	};
@@ -28,6 +29,8 @@ struct SawOsc : Module {
 
 	float phase = 0.0f;
 	float blinkPhase = 0.0f;
+	float freq = 0.0f;
+	int base_freq = 0;
 
 	SawOsc() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -37,10 +40,18 @@ void SawOsc::step() {
 	// Implement a simple sine oscillator
 	float deltaTime = 1.0f / engineGetSampleRate();
 	// Compute the frequency from the pitch parameter and input
+	base_freq = params[BASE_PARAM].value;
 	float pitch = params[PITCH_PARAM].value;
 	pitch += inputs[PITCH_INPUT].value;
 	pitch = clamp(pitch, -4.0f, 4.0f);
-	float freq = 440.0f * powf(2.0f, pitch);
+
+	if(base_freq==1){
+		//Note A4
+		freq = 440.0f * powf(2.0f, pitch);
+	}else{
+		// Note C4
+		freq = 261.626f * powf(2.0f, pitch);
+	}
 
 	// Accumulate the phase
 	phase += freq * deltaTime;
@@ -81,7 +92,7 @@ struct SawOscWidget : ModuleWidget
 
 SawOscWidget::SawOscWidget(SawOsc *module) : ModuleWidget(module) {
 
-   setPanel(SVG::load(assetPlugin(plugin, "res/SawOSC.svg")));
+  setPanel(SVG::load(assetPlugin(plugin, "res/SawOSC.svg")));
   
 	//SCREWS - SPECIAL SPACING FOR RACK WIDTH*4
 	addChild(Widget::create<as_HexScrew>(Vec(0, 0)));
@@ -91,12 +102,17 @@ SawOscWidget::SawOscWidget(SawOsc *module) : ModuleWidget(module) {
 	//LIGHT
 	addChild(ModuleLightWidget::create<SmallLight<RedLight>>(Vec(22-15, 57), module, SawOsc::FREQ_LIGHT));
 	//PARAMS
-	//addParam(ParamWidget::create<as_KnobBlack>(Vec(26, 60), module, SawOsc::PITCH_PARAM, -3.0, 3.0, 0.0));
-	addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 60), module, SawOsc::PITCH_PARAM, -4.0, 4.0, 0.0));
+	//addParam(ParamWidget::create<as_KnobBlack>(Vec(26, 60), module, SawOsc::PITCH_PARAM, -3.0f, 3.0f, 0.0f));
+	addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 60), module, SawOsc::PITCH_PARAM, -3.0f, 3.0f, 0.0f));
+//addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 60), module, SawOsc::PITCH_PARAM, -4.75f, 4.75f, -0.75f));
+
 	//addParam(ParamWidget::create<as_KnobBlack>(Vec(26, 125), module, SawOsc::PW_PARAM, -4.0, 5.0, -4.0));
-	addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 125), module, SawOsc::PW_PARAM, -4.2, 5.0, -4.2));
+	addParam(ParamWidget::create<as_KnobBlack>(Vec(26-15, 120), module, SawOsc::PW_PARAM, -4.2f, 5.0f, -4.2f));
+
+		//BASE FREQ SWITCH
+	addParam(ParamWidget::create<as_CKSSH>(Vec(18, 220), module, SawOsc::BASE_PARAM, 0.0f, 1.0f, 1.0f));
 	//INPUTS
-	addInput(Port::create<as_PJ301MPort>(Vec(33-15, 200), Port::INPUT, module, SawOsc::PW_INPUT));
+	addInput(Port::create<as_PJ301MPort>(Vec(33-15, 180), Port::INPUT, module, SawOsc::PW_INPUT));
 	addInput(Port::create<as_PJ301MPort>(Vec(33-15, 260), Port::INPUT, module, SawOsc::PITCH_INPUT));
 	//OUTPUTS
 	addOutput(Port::create<as_PJ301MPort>(Vec(33-15, 310), Port::OUTPUT, module, SawOsc::OSC_OUTPUT));

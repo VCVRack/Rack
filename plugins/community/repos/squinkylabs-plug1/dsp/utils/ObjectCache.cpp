@@ -150,14 +150,25 @@ std::shared_ptr<BiquadParams<float, 3>> ObjectCache<T>::get6PLPParams(float norm
             lowpass16 = ret;
         }
         return ret;
+    } else if (div == 32) {
+        std::shared_ptr < BiquadParams<float, 3>> ret = lowpass32.lock();
+        if (!ret) {
+            ret = std::make_shared<BiquadParams<float, 3>>();
+            ButterworthFilterDesigner<float>::designSixPoleLowpass(*ret, normalizedFc);
+            lowpass32 = ret;
+        }
+        return ret;
+    } else {
+        assert(false);
     }
-    else assert(false);
     return nullptr;
-}
+};
 
 // The weak pointers that hold our singletons.
 template <typename T>
 std::weak_ptr< BiquadParams<float, 3> >  ObjectCache<T>::lowpass64;
+template <typename T>
+std::weak_ptr< BiquadParams<float, 3> >  ObjectCache<T>::lowpass32;
 template <typename T>
 std::weak_ptr< BiquadParams<float, 3> >  ObjectCache<T>::lowpass16;
 

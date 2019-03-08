@@ -23,9 +23,11 @@ struct Ions : Module {
 		LEAP_PARAM,
 		ENUMS(STATE_PARAMS, 2),// 3 states : global, local, global+local
 		PLANK_PARAM,
-		uncertainty_PARAM,
+		UNCERTANTY_PARAM,
 		RESETONRUN_PARAM,
 		STEPCLOCKS_PARAM,
+		// -- 0.6.3 ^^
+		PLANK2_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -36,6 +38,9 @@ struct Ions : Module {
 		PROB_INPUT,// CV_value/10  is added to PROB_PARAM, which is a 0 to 1 knob
 		ENUMS(OCTCV_INPUTS, 2),
 		ENUMS(STATECV_INPUTS, 2),
+		// -- 0.6.3 ^^
+		LEAP_INPUT,
+		UNCERTANTY_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -53,8 +58,8 @@ struct Ions : Module {
 		LEAP_LIGHT,
 		ENUMS(OCTA_LIGHTS, 3),// 0 is center, 1 is inside mirrors, 2 is outside mirrors
 		ENUMS(OCTB_LIGHTS, 3),
-		ENUMS(PLANK_LIGHT, 3),// room for blue, yellow, white
-		uncertainty_LIGHT,
+		ENUMS(PLANK_LIGHTS, 2),// blue, yellow (both white leds) (modified for 0.6.4 but no effect on patches)
+		UNCERTANTY_LIGHT,
 		ENUMS(JUMP_LIGHTS, 2),
 		RESETONRUN_LIGHT,
 		STEPCLOCKS_LIGHT,
@@ -63,15 +68,15 @@ struct Ions : Module {
 	
 	
 	// Constants
-	static constexpr float clockIgnoreOnResetDuration = 0.001f;// disable clock on powerup and reset for 1 ms (so that the first step plays)
 	const int cvMap[2][16] = {{0, 1, 2, 3, 4, 5, 6, 7, 0, 8, 9, 10, 11, 12, 13, 14},
 							  {0, 8, 9 ,10, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7}};// map each of the 16 steps of a sequence step to a CV knob index (0-14)
 
+							  
 	// Need to save, with reset
+	int panelTheme = 0;
 	bool running;
 	bool resetOnRun;
-	int quantize;// a.k.a. plank constant, 0 = none, 1 = blue, 2 = yellow, 3 = white (both)
-	//bool symmetry;
+	int quantize;// a.k.a. plank constant, bit0 = blue, bit1 = yellow
 	bool uncertainty;
 	int stepIndexes[2];// position of electrons (sequencers)
 	int states[2];// which clocks to use (0 = global, 1 = local, 2 = both)
@@ -79,30 +84,27 @@ struct Ions : Module {
 	bool leap;
 	
 	
-	// Need to save, no reset
-	int panelTheme;
-	
-	// No need to save, with reset
+	// No need to save
 	long clockIgnoreOnReset;
 	float resetLight;
-	bool rangeInc[2];// true when 1-3-5 increasing, false when 5-3-1 decreasing
-	
-	// No need to save, no reset
-	SchmittTrigger runningTrigger;
-	SchmittTrigger clockTrigger;
-	SchmittTrigger clocksTriggers[2];
-	SchmittTrigger resetTrigger;
-	SchmittTrigger stateTriggers[2];
-	SchmittTrigger octTriggers[2];
-	SchmittTrigger stateCVTriggers[2];
-	SchmittTrigger leapTrigger;
-	SchmittTrigger plankTrigger;
-	SchmittTrigger uncertaintyTrigger;
-	SchmittTrigger resetOnRunTrigger;
-	SchmittTrigger stepClocksTrigger;
+	bool rangeInc[2] = {true, true};// true when 1-3-5 increasing, false when 5-3-1 decreasing
+	Trigger runningTrigger;
+	Trigger clockTrigger;
+	Trigger clocksTriggers[2];
+	Trigger resetTrigger;
+	Trigger stateTriggers[2];
+	Trigger octTriggers[2];
+	Trigger stateCVTriggers[2];
+	Trigger leapTrigger;
+	Trigger plankTrigger;
+	Trigger plank2Trigger;
+	Trigger uncertaintyTrigger;
+	Trigger resetOnRunTrigger;
+	Trigger stepClocksTrigger;
 	PulseGenerator jumpPulses[2];
-	float jumpLights[2];
-	float stepClocksLight;
+	float jumpLights[2] = {0.0f, 0.0f};
+	float stepClocksLight = 0.0f;
+	unsigned int lightRefreshCounter = 0;
 
 	
 	inline float quantizeCV(float cv) {return roundf(cv * 12.0f) / 12.0f;}
@@ -110,100 +112,41 @@ struct Ions : Module {
 	
 	
 	Ions() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		// Need to save, no reset
-		panelTheme = 0;
-		
-		// No need to save, no reset		
-		runningTrigger.reset();
-		clockTrigger.reset();
-		for (int i = 0; i < 2; i++) {
-			clocksTriggers[i].reset();
-			stateTriggers[i].reset();
-			octTriggers[i].reset();
-			stateCVTriggers[i].reset();
-			jumpPulses[i].reset();
-			jumpLights[i] = 0.0f;
-		}
-		stepClocksLight = 0.0f;
-		resetTrigger.reset();
-		leapTrigger.reset();
-		plankTrigger.reset();
-		uncertaintyTrigger.reset();
-		resetOnRunTrigger.reset();
-		stepClocksTrigger.reset();
-		
 		onReset();
 	}
 
 	
-	// widgets are not yet created when module is created 
-	// even if widgets not created yet, can use params[] and should handle 0.0f value since step may call 
-	//   this before widget creation anyways
-	// called from the main thread if by constructor, called by engine thread if right-click initialization
-	//   when called by constructor, module is created before the first step() is called
 	void onReset() override {
-		// Need to save, with reset
-		running = false;
+		running = true;
 		resetOnRun = false;
 		quantize = 3;
-		//symmetry = false;
 		uncertainty = false;
 		for (int i = 0; i < 2; i++) {
 			states[i] = 0;
 			ranges[i] = 1;
 		}
 		leap = false;
-		initRun(true, false);
-		
-		// No need to save, with reset
-		for (int i = 0; i < 2; i++) {
-			rangeInc[i] = true;
-		}
-	}
-
-	
-	// widgets randomized before onRandomize() is called
-	// called by engine thread if right-click randomize
-	void onRandomize() override {
-		// Need to save, with reset
-		running = false;
-		resetOnRun = false;
-		quantize = randomu32() % 4;
-		//symmetry = false;
-		uncertainty = false;
-		for (int i = 0; i < 2; i++) {
-			states[i] = randomu32() % 3;
-			ranges[i] = randomu32() % 3;
-		}
-		leap = (randomu32() % 2) > 0;
-		initRun(true, true);
-		
-		// No need to save, with reset
-		for (int i = 0; i < 2; i++) {
-			rangeInc[i] = true;
-		}
-	}
-	
-
-	void initRun(bool hard, bool randomize) {// run button activated or run edge in run input jack
-		if (hard) {
-			if (randomize) {
-				stepIndexes[0] = randomu32() % 16;
-				stepIndexes[1] = randomu32() % 16;
-			}
-			else {
-				stepIndexes[0] = 0;
-				stepIndexes[1] = 0;
-			}
-		}
+		initRun(true);
 		clockIgnoreOnReset = (long) (clockIgnoreOnResetDuration * engineGetSampleRate());
+	}
+
+	
+	void onRandomize() override {
+		initRun(true);
+	}
+	
+
+	void initRun(bool hard) {// run button activated or run edge in run input jack
+		if (hard) {
+			stepIndexes[0] = 0;
+			stepIndexes[1] = 0;
+		}
 		resetLight = 0.0f;
 	}
 	
-	// called by main thread
+
 	json_t *toJson() override {
 		json_t *rootJ = json_object();
-		// Need to save (reset or not)
 
 		// panelTheme
 		json_object_set_new(rootJ, "panelTheme", json_integer(panelTheme));
@@ -213,9 +156,6 @@ struct Ions : Module {
 		
 		// quantize
 		json_object_set_new(rootJ, "quantize", json_integer(quantize));
-		
-		// symmetry
-		//json_object_set_new(rootJ, "symmetry", json_boolean(symmetry));
 		
 		// uncertainty
 		json_object_set_new(rootJ, "uncertainty", json_boolean(uncertainty));
@@ -242,11 +182,7 @@ struct Ions : Module {
 	}
 
 	
-	// widgets have their fromJson() called before this fromJson() is called
-	// called by main thread
 	void fromJson(json_t *rootJ) override {
-		// Need to save (reset or not)
-
 		// panelTheme
 		json_t *panelThemeJ = json_object_get(rootJ, "panelTheme");
 		if (panelThemeJ)
@@ -261,11 +197,6 @@ struct Ions : Module {
 		json_t *quantizeJ = json_object_get(rootJ, "quantize");
 		if (quantizeJ)
 			quantize = json_integer_value(quantizeJ);
-
-		// symmetry
-		//json_t *symmetryJ = json_object_get(rootJ, "symmetry");
-		//if (symmetryJ)
-			//symmetry = json_is_true(symmetryJ);
 
 		// uncertainty
 		json_t *uncertaintyJ = json_object_get(rootJ, "uncertainty");
@@ -306,102 +237,107 @@ struct Ions : Module {
 		if (leapJ)
 			leap = json_is_true(leapJ);
 
-		// No need to save, with reset
-		initRun(true, false);
 		rangeInc[0] = true;
 		rangeInc[1] = true;
 	}
 
 	
-	// Advances the module by 1 audio frame with duration 1.0 / engineGetSampleRate()
 	void step() override {	
 		float sampleTime = engineGetSampleTime();
 	
 		//********** Buttons, knobs, switches and inputs **********
 	
 		// Run button
-		if (runningTrigger.process(params[RUN_PARAM].value + inputs[RUN_INPUT].value)) {
+		if (runningTrigger.process(params[RUN_PARAM].value + inputs[RUN_INPUT].value)) {// no input refresh here, don't want to introduce startup skew
 			running = !running;
-			if (running)
-				initRun(resetOnRun, false);
-		}
-		
-		// Leap button
-		if (leapTrigger.process(params[LEAP_PARAM].value)) {
-			leap = !leap;
-		}
-
-		// Plank button (quatize)
-		if (plankTrigger.process(params[PLANK_PARAM].value)) {
-			quantize++;
-			if (quantize >= 4)
-				quantize = 0;
-		}
-
-		// uncertainty button
-		if (uncertaintyTrigger.process(params[uncertainty_PARAM].value)) {
-			uncertainty = !uncertainty;
-		}
-
-		// Reset on Run button
-		if (resetOnRunTrigger.process(params[RESETONRUN_PARAM].value)) {
-			resetOnRun = !resetOnRun;
-		}
-
-		// State buttons and CV inputs (state: 0 = global, 1 = local, 2 = both)
-		for (int i = 0; i < 2; i++) {
-			int stateTrig = stateTriggers[i].process(params[STATE_PARAMS + i].value);
-			if (inputs[STATECV_INPUTS + i].active) {
-				if (inputs[STATECV_INPUTS + i].value <= -1.0f)
-					states[i] = 1;
-				else if (inputs[STATECV_INPUTS + i].value < 1.0f)
-					states[i] = 2;
-				else 
-					states[i] = 0;
-			}
-			else if (stateTrig) {
-				states[i]++;
-				if (states[i] >= 3)
-					states[i] = 0;
+			if (running ) {
+				if (resetOnRun)
+					initRun(true);
+				if (resetOnRun || clockIgnoreOnRun)
+					clockIgnoreOnReset = (long) (clockIgnoreOnResetDuration * engineGetSampleRate());
 			}
 		}
 		
-		// Range buttons and CV inputs
-		for (int i = 0; i < 2; i++) {
-			int rangeTrig = octTriggers[i].process(params[OCT_PARAMS + i].value);
-			if (inputs[OCTCV_INPUTS + i].active) {
-				if (inputs[OCTCV_INPUTS + i].value <= -1.0f)
-					ranges[i] = 0;
-				else if (inputs[OCTCV_INPUTS + i].value < 1.0f)
-					ranges[i] = 1;
-				else 
-					ranges[i] = 2;
-			}
-			else if (rangeTrig) {
-				if (rangeInc[i]) {
-					ranges[i]++;
-					if (ranges[i] >= 3) {
-						ranges[i] = 1;
-						rangeInc[i] = false;
-					}
-				}
-				else {
-					ranges[i]--;
-					if (ranges[i] < 0) {
-						ranges[i] = 1;
-						rangeInc[i] = true;
-					}
-				}
-			}
-		}
+		if ((lightRefreshCounter & userInputsStepSkipMask) == 0) {
 
+			// Leap button
+			if (leapTrigger.process(params[LEAP_PARAM].value + inputs[LEAP_INPUT].value)) {
+				leap = !leap;
+			}
+
+			// Plank buttons (quatize)
+			if (plankTrigger.process(params[PLANK_PARAM].value))
+				quantize ^= 0x1;
+			if (plank2Trigger.process(params[PLANK2_PARAM].value))
+				quantize ^= 0x2;
+
+			// uncertainty button
+			if (uncertaintyTrigger.process(params[UNCERTANTY_PARAM].value + inputs[UNCERTANTY_INPUT].value)) {
+				uncertainty = !uncertainty;
+			}
+
+			// Reset on Run button
+			if (resetOnRunTrigger.process(params[RESETONRUN_PARAM].value)) {
+				resetOnRun = !resetOnRun;
+			}
+
+			// State buttons and CV inputs (state: 0 = global, 1 = local, 2 = both)
+			for (int i = 0; i < 2; i++) {
+				int stateTrig = stateTriggers[i].process(params[STATE_PARAMS + i].value);
+				if (inputs[STATECV_INPUTS + i].active) {
+					if (inputs[STATECV_INPUTS + i].value <= -1.0f)
+						states[i] = 1;
+					else if (inputs[STATECV_INPUTS + i].value < 1.0f)
+						states[i] = 2;
+					else 
+						states[i] = 0;
+				}
+				else if (stateTrig) {
+					states[i]++;
+					if (states[i] >= 3)
+						states[i] = 0;
+				}
+			}
+			
+			// Range buttons and CV inputs
+			for (int i = 0; i < 2; i++) {
+				bool rangeTrig = octTriggers[i].process(params[OCT_PARAMS + i].value);
+				if (inputs[OCTCV_INPUTS + i].active) {
+					if (inputs[OCTCV_INPUTS + i].value <= -1.0f)
+						ranges[i] = 0;
+					else if (inputs[OCTCV_INPUTS + i].value < 1.0f)
+						ranges[i] = 1;
+					else 
+						ranges[i] = 2;
+				}
+				else if (rangeTrig) {
+					if (rangeInc[i]) {
+						ranges[i]++;
+						if (ranges[i] >= 3) {
+							ranges[i] = 1;
+							rangeInc[i] = false;
+						}
+					}
+					else {
+						ranges[i]--;
+						if (ranges[i] < 0) {
+							ranges[i] = 1;
+							rangeInc[i] = true;
+						}
+					}
+				}
+			}
+
+		}// userInputs refresh
 		
 
 		//********** Clock and reset **********
 		
 		// Clocks
-		bool globalClockTrig = clockTrigger.process(inputs[CLK_INPUT].value);
 		bool stepClocksTrig = stepClocksTrigger.process(params[STEPCLOCKS_PARAM].value);
+		bool globalClockTrig = false;
+		if (running && clockIgnoreOnReset == 0l)
+			globalClockTrig = clockTrigger.process(inputs[CLK_INPUT].value);// keep outside of loop, only need to call once per step()
 		for (int i = 0; i < 2; i++) {
 			int jumpCount = 0;
 			
@@ -412,23 +348,7 @@ struct Ions : Module {
 				localClockTrig &= (states[i] >= 1);
 				if (localClockTrig) {
 					if (uncertainty) {// local clock modified by uncertainty
-						int numSteps = 8;
-						int	prob = randomu32() % 1000;
-						if (prob < 175)
-							numSteps = 1;
-						else if (prob < 330) // 175 + 155
-							numSteps = 2;
-						else if (prob < 475) // 175 + 155 + 145
-							numSteps = 3;
-						else if (prob < 610) // 175 + 155 + 145 + 135
-							numSteps = 4;
-						else if (prob < 725) // 175 + 155 + 145 + 135 + 115
-							numSteps = 5;
-						else if (prob < 830) // 175 + 155 + 145 + 135 + 115 + 105
-							numSteps = 6;
-						else if (prob < 925) // 175 + 155 + 145 + 135 + 115 + 105 + 95
-							numSteps = 7;
-						for (int n = 0; n < numSteps; n++)
+						for (int n = 0; n < getWeighted1to8random(); n++)
 							jumpCount += stepElectron(i, leap);
 					}
 					else 
@@ -443,8 +363,10 @@ struct Ions : Module {
 			}
 			
 			// Magnetic clock (step clock)
-			if (stepClocksTrig)
+			if (stepClocksTrig) {
+				stepClocksLight = 1.0f;// will be done twice, but no problem
 				jumpCount += stepElectron(i, leap);
+			}
 			
 			// Jump occurred feedback
 			if ((jumpCount & 0x1) != 0) {
@@ -452,17 +374,17 @@ struct Ions : Module {
 				jumpLights[i] = 1.0f;				
 			}
 		}
-		//if (symmetry)
-			//stepIndexes[1] = stepIndexes[0];
+		
 		
 		// Reset
 		if (resetTrigger.process(inputs[RESET_INPUT].value + params[RESET_PARAM].value)) {
-			initRun(true, uncertainty);
+			initRun(true);
 			resetLight = 1.0f;
+			clockIgnoreOnReset = (long) (clockIgnoreOnResetDuration * engineGetSampleRate());
 			clockTrigger.reset();
+			clocksTriggers[0].reset();
+			clocksTriggers[1].reset();
 		}
-		else
-			resetLight -= (resetLight / lightLambda) * sampleTime;
 		
 		
 		//********** Outputs and lights **********
@@ -481,53 +403,56 @@ struct Ions : Module {
 				cv = knobVal * (float)(maxCV * 2) - (float)maxCV;
 			}
 			outputs[SEQ_OUTPUTS + i].value = cv;
-			outputs[JUMP_OUTPUTS + i].value = jumpPulses[i].process((float)sampleTime);
+			outputs[JUMP_OUTPUTS + i].value = jumpPulses[i].process((float)sampleTime) ? 10.0f : 0.0f;
 		}
 		
-		// Blue and Yellow lights
-		for (int i = 0; i < 16; i++) {
-			lights[BLUE_LIGHTS + i].value = (stepIndexes[0] == i ? 1.0f : 0.0f);
-			lights[YELLOW_LIGHTS + i].value = (stepIndexes[1] == i ? 1.0f : 0.0f);
-		}
-		
-		// Reset light
-		lights[RESET_LIGHT].value =	resetLight;	
-		
-		// Run light
-		lights[RUN_LIGHT].value = running ? 1.0f : 0.0f;
+		lightRefreshCounter++;
+		if (lightRefreshCounter >= displayRefreshStepSkips) {
+			lightRefreshCounter = 0;
 
-		// State lights
-		for (int i = 0; i < 2; i++) {
-			lights[GLOBAL_LIGHTS + i].value = (states[i] & 0x1) == 0 ? 0.5f : 0.0f;
-			lights[LOCAL_LIGHTS + i].value = states[i] >= 1 ? 0.5f : 0.0f;
-		}
-		
-		// Leap, Plank, uncertainty and ResetOnRun lights
-		lights[LEAP_LIGHT].value = leap ? 1.0f : 0.0f;
-		lights[PLANK_LIGHT + 0].value = (quantize == 1) ? 1.0f : 0.0f;// Blue
-		lights[PLANK_LIGHT + 1].value = (quantize == 2) ? 1.0f : 0.0f;// Yellow
-		lights[PLANK_LIGHT + 2].value = (quantize == 3) ? 1.0f : 0.0f;// White
-		lights[uncertainty_LIGHT].value = uncertainty ? 1.0f : 0.0f;
-		lights[RESETONRUN_LIGHT].value = resetOnRun ? 1.0f : 0.0f;
-		
-		// Range lights
-		for (int i = 0; i < 3; i++) {
-			lights[OCTA_LIGHTS + i].value = (i <= ranges[0] ? 1.0f : 0.0f);
-			lights[OCTB_LIGHTS + i].value = (i <= ranges[1] ? 1.0f : 0.0f);
-		}
+			// Blue and Yellow lights
+			for (int i = 0; i < 16; i++) {
+				lights[BLUE_LIGHTS + i].value = (stepIndexes[0] == i ? 1.0f : 0.0f);
+				lights[YELLOW_LIGHTS + i].value = (stepIndexes[1] == i ? 1.0f : 0.0f);
+			}
+			
+			// Reset light
+			lights[RESET_LIGHT].value =	resetLight;	
+			resetLight -= (resetLight / lightLambda) * sampleTime * displayRefreshStepSkips;	
+			
+			// Run light
+			lights[RUN_LIGHT].value = running ? 1.0f : 0.0f;
 
-		// Jump lights
-		for (int i = 0; i < 2; i++) {
-			lights[JUMP_LIGHTS + i].value = jumpLights[i];
-			jumpLights[i] -= (jumpLights[i] / lightLambda) * sampleTime;
-		}
+			// State lights
+			for (int i = 0; i < 2; i++) {
+				lights[GLOBAL_LIGHTS + i].value = (states[i] & 0x1) == 0 ? 0.5f : 0.0f;
+				lights[LOCAL_LIGHTS + i].value = states[i] >= 1 ? 0.5f : 0.0f;
+			}
+			
+			// Leap, Plank, uncertainty and ResetOnRun lights
+			lights[LEAP_LIGHT].value = leap ? 1.0f : 0.0f;
+			lights[PLANK_LIGHTS + 0].value = (quantize & 0x1) ? 1.0f : 0.0f;// Blue
+			lights[PLANK_LIGHTS + 1].value = (quantize & 0x2) ? 1.0f : 0.0f;// Yellow
+			lights[UNCERTANTY_LIGHT].value = uncertainty ? 1.0f : 0.0f;
+			lights[RESETONRUN_LIGHT].value = resetOnRun ? 1.0f : 0.0f;
+			
+			// Range lights
+			for (int i = 0; i < 3; i++) {
+				lights[OCTA_LIGHTS + i].value = (i <= ranges[0] ? 1.0f : 0.0f);
+				lights[OCTB_LIGHTS + i].value = (i <= ranges[1] ? 1.0f : 0.0f);
+			}
 
-		// Step clocks light
-		if (stepClocksTrig)
-			stepClocksLight = 1.0f;
-		else
-			stepClocksLight -= (stepClocksLight / lightLambda) * sampleTime;
-		lights[STEPCLOCKS_LIGHT].value = stepClocksLight;
+			// Jump lights
+			for (int i = 0; i < 2; i++) {
+				lights[JUMP_LIGHTS + i].value = jumpLights[i];
+				jumpLights[i] -= (jumpLights[i] / lightLambda) * sampleTime * displayRefreshStepSkips;
+			}
+
+			// Step clocks light
+			lights[STEPCLOCKS_LIGHT].value = stepClocksLight;
+			stepClocksLight -= (stepClocksLight / lightLambda) * sampleTime * displayRefreshStepSkips;
+		
+		}// lightRefreshCounter
 		
 		if (clockIgnoreOnReset > 0l)
 			clockIgnoreOnReset--;
@@ -586,7 +511,7 @@ struct IonsWidget : ModuleWidget {
 		darkItem->text = darkPanelID;// Geodesics.hpp
 		darkItem->module = module;
 		darkItem->theme = 1;
-		//menu->addChild(darkItem);
+		menu->addChild(darkItem);
 
 		return menu;
 	}	
@@ -594,8 +519,8 @@ struct IonsWidget : ModuleWidget {
 	IonsWidget(Ions *module) : ModuleWidget(module) {
 		// Main panel from Inkscape
         DynamicSVGPanel *panel = new DynamicSVGPanel();
-        panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/IonsBG-01.svg")));
-        //panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/IonsBG-02.svg")));// no dark pannel for now
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/WhiteLight/Ions-WL.svg")));
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/DarkMatter/Ions-DM.svg")));
         box.size = panel->box.size;
         panel->mode = &module->panelTheme;
         addChild(panel);
@@ -604,8 +529,8 @@ struct IonsWidget : ModuleWidget {
 		// part of svg panel, no code required
 		
 		float colRulerCenter = box.size.x / 2.0f;
-		static constexpr float rowRulerAtomA = 125.5;
-		static constexpr float rowRulerAtomB = 251.5f;
+		static constexpr float rowRulerAtomA = 116.5;
+		static constexpr float rowRulerAtomB = 242.5f;
 		static constexpr float radius1 = 21.0f;
 		static constexpr float offset1 = 14.0f;
 		static constexpr float radius2 = 35.0f;
@@ -642,19 +567,18 @@ struct IonsWidget : ModuleWidget {
 		addInput(createDynamicPort<GeoPort>(Vec(probX + 32.0f, probY), Port::INPUT, module, Ions::PROB_INPUT, &module->panelTheme));
 		
 		// Jump pulses
-		addOutput(createDynamicPort<GeoPort>(Vec(probX + 18.0f, probY - 37.0f), Port::OUTPUT, module, Ions::JUMP_OUTPUTS + 0, &module->panelTheme));		
-		addOutput(createDynamicPort<GeoPort>(Vec(probX + 18.0f, probY + 37.0f), Port::OUTPUT, module, Ions::JUMP_OUTPUTS + 1, &module->panelTheme));		
+		addOutput(createDynamicPort<GeoPort>(Vec(probX + 18.0f, probY - 37.2f), Port::OUTPUT, module, Ions::JUMP_OUTPUTS + 0, &module->panelTheme));		
+		addOutput(createDynamicPort<GeoPort>(Vec(probX + 18.0f, probY + 36.7f), Port::OUTPUT, module, Ions::JUMP_OUTPUTS + 1, &module->panelTheme));		
 		// Jump lights
-		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(probX, probY - 46.0f), module, Ions::JUMP_LIGHTS + 0));
-		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(probX, probY + 46.0f), module, Ions::JUMP_LIGHTS + 1));
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(probX - 3.0f, probY - 37.2f - 4.8f), module, Ions::JUMP_LIGHTS + 0));
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(probX - 3.0f, probY + 36.7f + 5.0f), module, Ions::JUMP_LIGHTS + 1));
 		
-		// Leap light and button
-		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(colRulerCenter - 86.5f, 62.5f), module, Ions::LEAP_LIGHT));
-		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter - 77.5f, 50.5f), module, Ions::LEAP_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));	
-
-		// Plank light and button
-		addChild(createLightCentered<SmallLight<GeoBlueYellowWhiteLight>>(Vec(colRulerCenter + 86.5f, 62.5f), module, Ions::PLANK_LIGHT));
-		addParam(createDynamicParam<GeoPushButton>(Vec(colRulerCenter + 77.5f, 50.5f), module, Ions::PLANK_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));	
+		// Plank light and button (top)
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(233.5f, 60.5f), module, Ions::PLANK_LIGHTS + 0));
+		addParam(createDynamicParam<GeoPushButton>(Vec(225.5f, 48.5f), module, Ions::PLANK_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));	
+		// Plank light and button (bottom)
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(233.5f, 298.5f), module, Ions::PLANK_LIGHTS + 1));
+		addParam(createDynamicParam<GeoPushButton>(Vec(225.5f, 310.5f), module, Ions::PLANK2_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));	
 
 		// Octave buttons and lights
 		float octX = colRulerCenter + 107.0f;
@@ -676,8 +600,8 @@ struct IonsWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<GeoYellowLight>>(Vec(octX - 3.0f, octYB + 13.5f), module, Ions::OCTB_LIGHTS + 2));
 		addChild(createLightCentered<SmallLight<GeoYellowLight>>(Vec(octX + 0.0f, octYB - 15.0f), module, Ions::OCTB_LIGHTS + 2));
 		// Oct CV inputs
-		addInput(createDynamicPort<GeoPort>(Vec(octX - 9.0f, octYA - 34.5), Port::INPUT, module, Ions::OCTCV_INPUTS + 0, &module->panelTheme));
-		addInput(createDynamicPort<GeoPort>(Vec(octX - 9.0f, octYB + 34.5), Port::INPUT, module, Ions::OCTCV_INPUTS + 1, &module->panelTheme));
+		addInput(createDynamicPort<GeoPort>(Vec(octX - 7.0f, octYA - 31.0f), Port::INPUT, module, Ions::OCTCV_INPUTS + 0, &module->panelTheme));
+		addInput(createDynamicPort<GeoPort>(Vec(octX - 7.0f, octYB + 31.0f), Port::INPUT, module, Ions::OCTCV_INPUTS + 1, &module->panelTheme));
 		
 		// Blue electron lights
 		// top blue
@@ -720,7 +644,7 @@ struct IonsWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<GeoYellowLight>>(Vec(colRulerCenter - offset1, rowRulerAtomA + offset1), module, Ions::YELLOW_LIGHTS + 15));
 
 		// Run jack, light and button
-		static constexpr float rowRulerRunJack = 344.5f;
+		static constexpr float rowRulerRunJack = 348.5f;
 		static constexpr float offsetRunJackX = 119.5f;
 		addInput(createDynamicPort<GeoPort>(Vec(colRulerCenter - offsetRunJackX, rowRulerRunJack), Port::INPUT, module, Ions::RUN_INPUT, &module->panelTheme));
 		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(colRulerCenter - offsetRunJackX + 18.0f, rowRulerRunJack), module, Ions::RUN_LIGHT));
@@ -757,12 +681,18 @@ struct IonsWidget : ModuleWidget {
 		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 21.0f, gclkY - 72.0f), Port::INPUT, module, Ions::CLK_INPUTS + 0, &module->panelTheme));
 		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 21.0f, gclkY + 72.0f), Port::INPUT, module, Ions::CLK_INPUTS + 1, &module->panelTheme));
 		// state inputs
-		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 11.0f, gclkY - 107.0f), Port::INPUT, module, Ions::STATECV_INPUTS + 0, &module->panelTheme));
-		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 11.0f, gclkY + 107.0f), Port::INPUT, module, Ions::STATECV_INPUTS + 1, &module->panelTheme));
+		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 39.0f, gclkY - 28.0f), Port::INPUT, module, Ions::STATECV_INPUTS + 0, &module->panelTheme));
+		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 39.0f, gclkY + 28.0f), Port::INPUT, module, Ions::STATECV_INPUTS + 1, &module->panelTheme));
 		
-		// uncertainty light and button
-		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(gclkX - 20.0f, gclkY), module, Ions::uncertainty_LIGHT));
-		addParam(createDynamicParam<GeoPushButton>(Vec(gclkX - 34.0f, gclkY), module, Ions::uncertainty_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));	
+		// Leap light, button and CV input
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(gclkX - 5.0f, 60.5f), module, Ions::LEAP_LIGHT));
+		addParam(createDynamicParam<GeoPushButton>(Vec(gclkX + 3.0f, 48.5f), module, Ions::LEAP_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));	
+		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 14.0f, 76.5f), Port::INPUT, module, Ions::LEAP_INPUT, &module->panelTheme));
+
+		// uncertainty light, button and CV input
+		addChild(createLightCentered<SmallLight<GeoWhiteLight>>(Vec(gclkX - 5.0f, 298.5f), module, Ions::UNCERTANTY_LIGHT));
+		addParam(createDynamicParam<GeoPushButton>(Vec(gclkX + 3.0f, 310.5f), module, Ions::UNCERTANTY_PARAM, 0.0f, 1.0f, 0.0f, &module->panelTheme));	
+		addInput(createDynamicPort<GeoPort>(Vec(gclkX - 14.0f, 282.5f), Port::INPUT, module, Ions::UNCERTANTY_INPUT, &module->panelTheme));
 
 	}
 };
@@ -777,6 +707,17 @@ RACK_PLUGIN_MODEL_INIT(Geodesics, Ions) {
 }
 
 /*CHANGE LOG
+
+0.6.5:
+input refresh optimization
+step optimization of lights refresh
+
+0.6.4:
+make separate buttons for plank constant (quantize)
+add cv inputs for uncertanty and quantum leap
+
+0.6.3:
+make jump triggers outputs 10V triggers instead of 1V triggers
 
 0.6.1:
 Ions reloaded (many changes)

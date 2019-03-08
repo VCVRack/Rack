@@ -57,7 +57,11 @@ struct Quantum : Module {
 		DOWN
 	};
 
-	Mode mode = LAST;
+
+
+	Mode mode = CLOSEST_UP;
+
+	bool transpose_select = true;
 
 	Quantum() : Module( NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) { reset(); };
 
@@ -75,6 +79,7 @@ struct Quantum : Module {
             semiState[i] = false;
 			semiLight[i] = 0.0;
         }
+		mode = CLOSEST_UP;
 		last_octave = 0;
 		last_semi   = 0;
 	}
@@ -99,6 +104,7 @@ struct Quantum : Module {
             }
             json_object_set_new(rootJ, "scale", scaleJ);
             json_object_set_new(rootJ, "mode", json_integer(mode));
+            json_object_set_new(rootJ, "transpose_select", json_integer(transpose_select));
 
         return rootJ;
     }
@@ -112,6 +118,10 @@ struct Quantum : Module {
         }
         json_t *modeJ = json_object_get(rootJ, "mode");
         if(modeJ) mode = (Mode) json_integer_value(modeJ);
+
+        json_t *transJ = json_object_get(rootJ, "transpose_select");
+        if(transJ) transpose_select = (bool) json_integer_value(transJ);
+
     }
 
 	int modulo(int a, int b) {
@@ -152,7 +162,7 @@ void Quantum::step() {
 
 	int octave   = semi_full/12;
 
-	int semi =semi_full % 12;
+	int semi = semi_full % 12;
 
 	if (semi<0) {
 		semi+=12;
@@ -174,7 +184,7 @@ void Quantum::step() {
 		if( setTrigger.process(inputs[SET_INPUT].value ) ) {
 
 			float n=inputs[NOTE_INPUT].normalize(0.0);
-			int semi_n = round( 12.0*(n - 1.0*round(n)) ) - semi_t;
+			int semi_n = round( 12.0f*(n - 1.0f*round(n)) ) - (transpose_select?semi_t:0);
 			if(semi_n<0) semi_n+=12;
 
 			semiState[semi_n] = !semiState[semi_n];
@@ -271,6 +281,20 @@ struct QuantumModeItem : MenuItem {
 
 };
 
+struct QuantumTranposeModeItem : MenuItem {
+
+	Quantum *quantum;
+	bool transpose_select;
+
+    void onAction(EventAction &e) override {
+            quantum->transpose_select = transpose_select;
+  	};
+
+    void step() override {
+            rightText = (quantum->transpose_select == transpose_select)? "✔" : "";
+    };
+
+};
 
 struct QuantumWidget : ModuleWidget {
 	QuantumWidget(Quantum *module);
@@ -290,7 +314,7 @@ Menu *QuantumWidget::createContextMenu() {
         assert(quantum);
 
         MenuLabel *modeLabel = new MenuLabel();
-        modeLabel->text = "Mode";
+        modeLabel->text = "Quantizer Mode";
         menu->addChild(modeLabel);
 
         QuantumModeItem *last_Item = new QuantumModeItem();
@@ -322,6 +346,24 @@ Menu *QuantumWidget::createContextMenu() {
         cl_dn_Item->quantum = quantum;
         cl_dn_Item->mode = Quantum::CLOSEST_DOWN;
         menu->addChild(cl_dn_Item);
+
+		MenuLabel *selectLabel = new MenuLabel();
+        selectLabel->text = "Note Select";
+        menu->addChild(selectLabel);
+
+		QuantumTranposeModeItem *trans_select_on_Item = new QuantumTranposeModeItem();
+		trans_select_on_Item->text = "Transpose";
+		trans_select_on_Item->quantum = quantum;
+		trans_select_on_Item->transpose_select = true;
+		menu->addChild(trans_select_on_Item);
+
+		QuantumTranposeModeItem *trans_select_off_Item = new QuantumTranposeModeItem();
+		trans_select_off_Item->text = "Don't Transpose";
+		trans_select_off_Item->quantum = quantum;
+		trans_select_off_Item->transpose_select = false;
+		menu->addChild(trans_select_off_Item);
+
+
 
 	return menu;
 };

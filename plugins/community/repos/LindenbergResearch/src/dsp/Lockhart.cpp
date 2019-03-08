@@ -4,6 +4,21 @@
 using namespace dsp;
 
 
+/**
+ * @brief TODO: optimized lambert function
+ * @param x
+ * @return
+ */
+double lambertopt(double x) {
+    /*if (x > 7.6667) {
+        return log(x) - log(log(x));
+    }*/
+
+    return log(x + 1);
+//    return LambertW<0>(x);
+}
+
+
 double LockhartWFStage::compute(double x) {
     double out;
     double l, u, ln, fn, xn;
@@ -72,7 +87,7 @@ double LockhartWavefolder::compute(double x) {
     in = lh4.compute(in);
 
     in = tanh1->next(in) * 2.f;
-    if (blockDC) in = dc->filter(in);
+    //if (blockDC) in = dc->filter(in);
 
     out = in * 10;
 

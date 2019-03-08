@@ -96,7 +96,7 @@ struct ShaperPlusWidget : ModuleWidget {
 		ShaperPlus* shaperPlus = dynamic_cast<ShaperPlus*>(module);
 		assert(shaperPlus);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new TriggerOnLoadMenuItem(shaperPlus, "Resume Loop on Load"));
+		menu->addChild(new TriggerOnLoadMenuItem(shaperPlus, "Resume loop on load"));
 	}
 };
 

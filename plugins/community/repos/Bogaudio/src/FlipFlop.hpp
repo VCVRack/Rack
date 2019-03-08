@@ -37,9 +37,9 @@ struct FlipFlop : Module {
 	bool _flipped1;
 	bool _flipped2;
 	PositiveZeroCrossing _trigger1;
-	SchmittTrigger _resetTrigger1;
+	Trigger _resetTrigger1;
 	PositiveZeroCrossing _trigger2;
-	SchmittTrigger _resetTrigger2;
+	Trigger _resetTrigger2;
 
 	FlipFlop() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();
@@ -53,7 +53,7 @@ struct FlipFlop : Module {
 		Output& aOutput,
 		Output& bOutput,
 		PositiveZeroCrossing& trigger,
-		SchmittTrigger& resetTrigger,
+		Trigger& resetTrigger,
 		bool& flipped
 	);
 };

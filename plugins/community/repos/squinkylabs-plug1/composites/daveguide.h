@@ -54,7 +54,7 @@ private:
     RecirculatingFractionalDelay delay;
 
     //static std::function<double(double)> makeFunc_Exp(double xMin, double xMax, double yMin, double yMax);
-    
+
    // std::function<double(double)> delayScale = AudioMath::makeFunc_Exp(-5, 5, 1, 500);
 
   //  AudioMath::ScaleFun<float> feedbackScale = AudioMath::makeLinearScaler(0.f, 1.f);
@@ -103,7 +103,7 @@ void  Daveguide<TBase>::step()
     const float output = delay.run(input);
     TBase::outputs[AUDIO_OUTPUT].value = output;
 
-   
+
 
 
 

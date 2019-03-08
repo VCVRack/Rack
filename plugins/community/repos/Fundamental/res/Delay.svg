@@ -15,7 +15,7 @@
    version="1.1"
    id="svg4541"
    sodipodi:docname="Delay.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
   <defs
      id="defs4535" />
   <sodipodi:namedview
@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="-317.90567"
+     inkscape:cx="-149.71527"
      inkscape:cy="99.928557"
      inkscape:document-units="mm"
      inkscape:current-layer="g13271"
@@ -35,11 +35,11 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1137"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-width="2560"
+     inkscape:window-height="1440"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      units="px" />
   <metadata
      id="metadata4538">
@@ -49,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -82,6 +82,26 @@
                inkscape:export-filename="/home/vortico/src/cpp/VCV/Rack/plugins/Fundamental/res/Delay.png"
                inkscape:export-xdpi="100.2962"
                inkscape:export-ydpi="100.2962" />
+            <path
+               style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.84423596"
+               d="m -627.00395,352.50781 c -0.33203,0 -0.63281,-0.1875 -0.78125,-0.48437 l -2.83984,-5.6836 c -0.21875,-0.42968 -0.043,-0.95703 0.39062,-1.17187 0.42969,-0.21484 0.95703,-0.0391 1.17188,0.39062 l 2.05859,4.1211 2.05859,-4.1211 c 0.21485,-0.42968 0.74219,-0.60546 1.17188,-0.39062 0.43359,0.21484 0.60937,0.74219 0.39453,1.17187 l -2.84375,5.6836 c -0.14844,0.29687 -0.44922,0.48437 -0.78125,0.48437"
+               id="path25369"
+               inkscape:connector-curvature="0" />
+            <path
+               style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.84423596"
+               d="m -611.39848,352.50781 c -0.32813,0 -0.63281,-0.1875 -0.78125,-0.48437 l -2.83985,-5.6836 c -0.21484,-0.42968 -0.043,-0.95703 0.39063,-1.17187 0.42969,-0.21484 0.95703,-0.0391 1.17187,0.39062 l 2.0586,4.1211 2.0625,-4.1211 c 0.21484,-0.42968 0.73828,-0.60546 1.17187,-0.39062 0.42969,0.21484 0.60547,0.74219 0.39063,1.17187 l -2.83985,5.6836 c -0.14843,0.29687 -0.45312,0.48437 -0.78515,0.48437"
+               id="path25371"
+               inkscape:connector-curvature="0" />
+            <path
+               style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.84423596"
+               d="m -618.77739,352.50781 c -2.04687,0 -3.71484,-1.66797 -3.71484,-3.71484 0,-2.05078 1.66797,-3.71875 3.71484,-3.71875 0.8125,0 1.58594,0.25781 2.23047,0.74609 0.38672,0.28907 0.46484,0.83594 0.17578,1.22266 -0.28906,0.38672 -0.83984,0.46484 -1.22656,0.17578 -0.33984,-0.25781 -0.75,-0.39453 -1.17969,-0.39453 -1.08203,0 -1.96484,0.88281 -1.96484,1.96875 0,1.08203 0.88281,1.96484 1.96484,1.96484 0.42969,0 0.83985,-0.13672 1.17969,-0.39062 0.38672,-0.29297 0.9375,-0.21485 1.22656,0.17187 0.28906,0.38672 0.21094,0.9336 -0.17578,1.22657 -0.64453,0.48437 -1.41797,0.74218 -2.23047,0.74218"
+               id="path25373"
+               inkscape:connector-curvature="0" />
+            <path
+               style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.84423596"
+               d="m -617.58208,348.74609 c 0,0.62891 -0.50781,1.13672 -1.13671,1.13672 -0.62891,0 -1.13672,-0.50781 -1.13672,-1.13672 0,-0.625 0.50781,-1.13671 1.13672,-1.13671 0.6289,0 1.13671,0.51171 1.13671,1.13671"
+               id="path25375"
+               inkscape:connector-curvature="0" />
             <path
                style="fill:#212121;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.84423596"
                d="m -581.26958,297.40625 c 0,-1.55859 -1.27734,-2.83203 -2.83593,-2.83203 h -21.77344 c -1.55859,0 -2.83594,1.27344 -2.83594,2.83203 v 33.08984 c 0,1.5586 1.27735,2.83594 2.83594,2.83594 h 21.77344 c 1.55859,0 2.83593,-1.27734 2.83593,-2.83594 z m 0,0"

@@ -82,6 +82,7 @@ struct Flow: Module {
 void Flow::step() {
 
     if (params[MODE_PARAM].value){
+        //switch lights turn on when the switch is enabled
         light_inverted = false;
 	}else{
         //switch lights turn off when the switch is enabled

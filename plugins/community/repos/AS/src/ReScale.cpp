@@ -128,6 +128,8 @@ ReScaleWidget::ReScaleWidget(ReScale *module) : ModuleWidget(module) {
 	addParam(ParamWidget::create<as_KnobBlackSnap4>(Vec(12, 230), module, ReScale::CONVERT_PARAM, 0.0f, 3.0f, 0.0f));
 
 	addOutput(Port::create<as_PJ301MPort>(Vec(18, 280), Port::OUTPUT, module, ReScale::OUTPUT));
+
+
 }
 
 RACK_PLUGIN_MODEL_INIT(AS, ReScale) {

@@ -21,6 +21,7 @@ RACK_PLUGIN_MODEL_DECLARE(AudibleInstruments, Stages);
 RACK_PLUGIN_INIT(AudibleInstruments) {
    RACK_PLUGIN_INIT_ID();
    RACK_PLUGIN_INIT_VERSION("0.6.3");
+   // https://github.com/VCVRack/AudibleInstruments
 
 	RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Braids);
 	RACK_PLUGIN_MODEL_ADD(AudibleInstruments, Elements);

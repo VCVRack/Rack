@@ -39,6 +39,12 @@ public:
         return std::exp(Ln10 * db / 20.0);
     }
 
+    static float quadraticBipolar(float x)
+    {
+        float x2 = x * x;
+        return (x >= 0.f) ? x2 : -x2;
+    }
+
     /**
      * Returns a function that generates one period of sin for x = {0..1}.
      * Range (output) is -1 to 1.

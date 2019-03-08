@@ -400,15 +400,15 @@ void Progress::step() {
 		
 		outputs[GATE_OUTPUT + i].value = gateOn ? 10.0f : 0.0f;	
 		
-		if (gateOn && i == index) {
+		if (i == index) {
 			if (gates[i]) {
 				// Gate is on and active = flash green
 				lights[GATE_LIGHTS + i * 2].setBrightnessSmooth(1.0f);
 				lights[GATE_LIGHTS + i * 2 + 1].setBrightnessSmooth(0.0f);
 			} else {
-				// Gate is off and active = flash red - this seems to not have any effect :(
-				lights[GATE_LIGHTS + i * 2].setBrightnessSmooth(0.0);
-				lights[GATE_LIGHTS + i * 2 + 1].setBrightnessSmooth(0.33f);
+				// Gate is off and active = flash dull yellow
+				lights[GATE_LIGHTS + i * 2].setBrightnessSmooth(0.20f);
+				lights[GATE_LIGHTS + i * 2 + 1].setBrightnessSmooth(0.20f);
 			}
 		} else {
 			if (gates[i]) {
@@ -461,11 +461,6 @@ ProgressWidget::ProgressWidget(Progress *module) : ModuleWidget(module) {
 		addChild(panel);
 	}
 
-	addChild(Widget::create<ScrewSilver>(Vec(15, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 0)));
-	addChild(Widget::create<ScrewSilver>(Vec(15, 365)));
-	addChild(Widget::create<ScrewSilver>(Vec(box.size.x-30, 365)));
-	
 	{
 		StateDisplay *display = new StateDisplay();
 		display->module = module;

@@ -274,34 +274,6 @@ void TwinGlider::step() {
   
 }//closing STEP
 
-/////////////////////////////////////////////
-///// TEST DISPLAY //////
-
-//struct testDisplay : TransparentWidget {
-//    testDisplay() {
-//        font = Font::load(FONT_FILE);
-//    }
-//    float mdfontSize = 16.f;
-//    std::shared_ptr<Font> font;
-//    std::string displayedVal;
-//    int *valP;
-//    int val = 0;
-//    void draw(NVGcontext* vg)
-//    {
-//        val = *valP;
-//        displayedVal = std::to_string(val);
-//        nvgFillColor(vg, nvgRGB(0xFF,0xFF,0x00));
-//        nvgFontSize(vg, mdfontSize);
-//        //nvgTextLetterSpacing(vg, 2.0f);
-//        //nvgTextAlign(vg, NVG_ALIGN_CENTER);
-//        nvgTextBox(vg, 0.0f, 20.0f, 165.0f, displayedVal.c_str(), NULL);
-//
-//    }
-//
-//};
-////////////////////////////////////////////
-///////////////////////////////////////////
-
 struct TwinGliderWidget : ModuleWidget {
     
     TwinGliderWidget(TwinGlider *module): ModuleWidget(module){
@@ -375,9 +347,6 @@ struct TwinGliderWidget : ModuleWidget {
 //    }
     }
 };
-//void TwinGliderWidget::step() {
-//    ModuleWidget::step();
-//}
 
 // Specify the Module and ModuleWidget subclass, human-readable
 // manufacturer name for categorization, module slug (should never

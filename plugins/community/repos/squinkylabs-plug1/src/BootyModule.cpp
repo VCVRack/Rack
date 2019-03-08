@@ -2,7 +2,9 @@
 #include "Squinky.hpp"
 #include "FrequencyShifter.h"
 #include "WidgetComposite.h"
-#include "global_ui.hpp"
+#include "ctrl/SqMenuItem.h"
+
+#ifdef _BOOTY
 
 /**
  * Implementation class for BootyModule
@@ -65,7 +67,6 @@ void BootyModule::fromJson(json_t *rootJ)
             }
         }
         shifter.freqRange = rg;
-        fflush(stdout);
     }
 }
 
@@ -148,6 +149,7 @@ struct RangeChoice : ChoiceButton
 struct BootyWidget : ModuleWidget
 {
     BootyWidget(BootyModule *);
+    Menu* createContextMenu() override;
 };
 
 /**
@@ -206,6 +208,14 @@ BootyWidget::BootyWidget(BootyModule *module) : ModuleWidget(module)
     addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 }
 
+inline Menu* BootyWidget::createContextMenu()
+{
+    Menu* theMenu = ModuleWidget::createContextMenu();
+    ManualMenuItem* manual = new ManualMenuItem(
+        "https://github.com/squinkylabs/SquinkyVCV/blob/master/docs/shifter.md");
+    theMenu->addChild(manual);
+    return theMenu;
+}
 // Specify the Module and ModuleWidget subclass, human-readable
 // manufacturer name for categorization, module slug (should never
 // change), human-readable module name, and any number of tags
@@ -216,4 +226,4 @@ RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, Booty) {
                                                                      "Booty Shifter: Frequency Shifter", EFFECT_TAG, RING_MODULATOR_TAG);
    return modelBootyModule;
 }
-
+#endif

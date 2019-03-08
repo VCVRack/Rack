@@ -1,0 +1,210 @@
+This is a log of my development of dr_opus - a single file public domain Opus decoder in C. The purpose of this log is
+to track the development of the project and log how I solved various problems.
+
+References:
+    RFC 6716 - https://tools.ietf.org/html/rfc6716 - Definition of the Opus Audio Codec
+    RFC 7845 - https://tools.ietf.org/html/rfc7845 - Ogg Encapsulation for the Opus Audio Codec
+    
+    
+The main reference for development is RFC 6716. An important detail with this specification is in Section 1
+
+   The primary normative part of this specification is provided by the
+   source code in Appendix A.  Only the decoder portion of this software
+   is normative, though a significant amount of code is shared by both
+   the encoder and decoder.  Section 6 provides a decoder conformance
+   test.  The decoder contains a great deal of integer and fixed-point
+   arithmetic that needs to be performed exactly, including all rounding
+   considerations, so any useful specification requires domain-specific
+   symbolic language to adequately define these operations.
+   Additionally, any conflict between the symbolic representation and
+   the included reference implementation must be resolved.  For the
+   practical reasons of compatibility and testability, it would be
+   advantageous to give the reference implementation priority in any
+   disagreement.  The C language is also one of the most widely
+   understood, human-readable symbolic representations for machine
+   behavior.  For these reasons, this RFC uses the reference
+   implementation as the sole symbolic representation of the codec.
+
+What this is basically saying is that the source code should be considered the main point of reference for the format of
+the Opus bit stream. We cannot, however, just willy nilly take code from the reference implementation because that would
+cause licensing problems. However, I'm going to make a prediction before I even begin: I think RFC 6716 with a bit
+intuition, problem solving and help from others it can be figured out. Indeed, I think RFC 6716 may even be enough, and
+that perhaps the authors of said specification refer to the source code as a self-defence mechanism to guard themselves
+from possible subtle errors in the specification. If I'm wrong, the log below will track it.
+
+Lets begin...
+
+
+2018/11/30 6:55 PM
+==================
+- Inserted skeleton code with licensing information. Dual licensed as Public Domain _or_ MIT, whichever you prefer. API
+  is undecided as of yet.
+- Decided on supporting C89. Not yet decided on how the standard library will be used.
+- Deciding for now to use the init() style of API from dr_wav and dr_mp3 which takes a pre-allocated decoder object. May
+  need to change this to dr_flac style open() (or perhaps new()/delete()) if the size of the structure is too big.
+- dr_wav, etc. use booleans for results status so I'm copying that for consistency.
+- Added boilerplate for standard sized types (copied from mini_al).
+- Added a comment at the top of the file to show that this isn't complete (even though it's in the "wip" folder!).
+- Added boilerplate for read and seek callbacks (copied from dr_flac).
+- Added shell APIs:
+  - dropus_init()
+    - Not requiring onSeek for the moment because I'm hoping that we can make that optional somehow, with restriction.
+  - dropus_uninit()
+    - Does nothing at the moment, but in future will need to close a file when the decoder is opened against a file.
+- Added some common overrideable macros (taken from dr_flac):
+  - DROPUS_ASSERT
+  - DROPUS_COPY_MEMORY
+  - DROPUS_ZERO_MEMORY
+  - DROPUS_ZERO_OBJECT
+- Decided to use the C standard library for now. This simplifies things like memset() and assert(). Currently using the
+  following headers:
+  - stddef.h
+  - stdint.h
+  - stdlib.h
+  - string.h
+  - assert.h
+- Added some infrastructure for future APIs: dropus_init_file() and dropus_init_memory()
+  - In dr_flac, dr_wav and dr_mp3, a mistake was made with how the internal file handle is managed by the decoder. In
+    these libraries the pUserData member of the decoder structure is recycled to hold the FILE pointer. dr_opus is
+    changing this to be it's own member of the main decoder structure.
+  - The internal members for use with dropus_init_memory() use the same system as dr_mp3. See drmp3.memory.
+- Added dropus_init_file()
+  - All init() APIs call dropus_init_internal() which is where the main initialization work is done.
+  - This is using the stdio FILE API.
+  - dropus_uninit() has been updated to close the file.
+  - Added dropus_fopen() for compiler compatibility. Taken from dr_flac, but added the "mode" parameter for consistency
+    with fopen().
+  - Added dropus_fclose() for namespace consistency with dropus_fopen().
+- Added dropus_init_memory()
+  - onRead and onSeek callbacks taken from dr_mp3.
+- INITIAL COMMIT
+
+2018/12/01 12:46 PM
+===================
+- Downloading all official test vectors in preparation for future testing.
+
+2018/12/01 03:58 PM
+===================
+- Decided to figure out the different encapsulations for Opus so I can figure out a design for data flow.
+  - Ogg: https://tools.ietf.org/html/rfc7845
+  - Matroska: https://wiki.xiph.org/MatroskaOpus
+  - WebM: https://www.webmproject.org/docs/container/
+  - MPEG-TS: https://wiki.xiph.org/OpusTS
+  - Mysterious encapsulation used by the official test vectors. Looking at this it's hard to tell what they are using for
+    this, but I'm assuming it's not documented. Will need to figure that one out for myself later.
+- Since WebM is a subset of Matroska, can we combine those together to avoid code duplication?
+- Upon reading into Ogg and MPEG-TS encapsulation (not looked into Matroska in detail yet) it looks like handling large
+  channel counts is going to be a pain. It can support up to 255 channels, which are made up of multiple streams. My
+  instict is telling me that we won't be able to use a fixed sized data structure and instead might require dynamic
+  allocations. Darn...
+- Leaning towards a two-tier architecture - a low-level decoder for raw Opus streams, and a high-level API for encapsulated
+  streams. Opus packets support only 1 or 2 channels which means the size of the structure _can_ be fixed.
+  - Currently I'm thinking something like the following:
+    - struct dropus_stream - low-level Opus stream decoding
+    - struct dropus        - high-level encapsulated Opus stream decoding
+      - struct dropus_ogg (Ogg Opus)
+      - struct dropus_mk (Matroska)
+      - struct dropus_ts (MPEG-TS)
+      - struct dropus_tv (That annoying non-standard and undocumented encapsulation used by the test vectors)
+- The maximum number of samples per frame (per-channel) is 960 because:
+  - The maximum frame size for wideband (16kHz) is 60: 16*60 = 960
+  - The maximum frame size for fullband (48kHz) is 20: 48*20 = 960
+  - To account for stereo frames we would need to multiply 960 by 2: 960*2 = 1920
+  - This is small enough that it can be stored statically inside the dropus_stream structure.
+- It looks like low level Opus streams won't be able to do efficient seeking without an encapsulation.
+- An Opus stream is made up of packets. Each packet has 1 or more frames. Each frame can be made up of 1 or 2 channels.
+- The size of the packet in bytes is unknown at the Opus stream level - it depends on the encapsulation to know the
+  size of the packet. This could be a bit of a problem because we may need to know the size of a frame in order to know
+  how much data we need from the client. I'm wondering if the low-level API should look something like the following:
+  - dropus_result dropus_stream_decode_packet(dropus_stream* pOpusStream, const void* pCompressedData, size_t compressedDataSize);
+    - This will require the caller to have information on the size of the packet.
+- Added struct dropus_stream_packet, dropus_stream_frame.
+- Each packet contains a byte that defines the structure of the packet. It's called the TOC byte
+  (Section 3.1.  The TOC Byte) in the RFC 6716.
+- Added skeleton implementations for dropus_stream_init() and dropus_stream_decode_packet().
+- Added helpers for decoding the different parts of TOC byte.
+  - dropus_toc_config(), dropus_toc_s() and dropus_toc_c()
+- Added enum for the three different modes as outlined in Section 3.1 of RFC 6716. Also added an API to extract this
+  mode from the config component of the TOC: dropus_toc_config_mode() and dropus_toc_mode().
+- Added API to extract sample rate from the TOC: dropus_toc_config_sample_rate() and dropus_toc_sample_rate()
+- Added API to extract the size of an Opus frame in PCM frames from the TOC: 
+  - dropus_toc_config_frame_size_in_pcm_frames() and dropus_toc_frame_size_in_pcm_frames().
+- COMMIT
+
+2018/12/02 09:45 AM
+===================
+- Compiling for the first time. Targetting C89 so need to get it all working property right from the start.
+- "test" folder added to my local repository. Not version controlled yet as I'm not sure I want to include all of
+  the test stuff in the repository. Will definitely not be version controlling the test vectors. Perhaps use a submodule?
+- Have decided to not support the mysterious encapsulation format used by the test vectors in dr_opus itself. Instead
+  I'm just doing it manually in the test program.
+- After attempting to build the C++ version, it appears Clang will attempt to #include stdint.h from Visual Studio's
+  standard library which fails. May need to come up with a way to avoid the dependency on stdint.h. Same thing also
+  happens with stdlib.h.
+- Have cleaned up the sized types stuff for Clang to avoid the dependency on stdint, however errors are still happening
+  due to the use of stdlib.h. Leaving the Clang C++ issue for now. It's technically a Clang issue rather than dr_opus.
+- COMMIT
+- Have decided to version control test programs, but not test vectors. Instead I'm putting a note in a readme about
+  where to download and place the test vectors.
+- In my experience I have found that having a testing infrastructure set up earlier saves a lot of time in the long run
+  so the next thing I have decided to work on is a test program. It makes sense to test against the official test vectors,
+  so the first thing is to figure out this undocumented encapsulation format...
+  
+Test Vector Encapsulation Format
+--------------------------------
+- All test vectors seem to start with two bytes of 0x00.
+  - This does not feel like a magic number or identifier.
+- Noticed that first 4 bytes add up to a relatively small number. A counter of some kind in little endian format?
+- A pattern can be seen in testvector02.bit:
+  - The bytes 00 00 00 XX can been seen repeating. This indicates some kind of blocking.
+  - From the first 4 bytes you see the hex value of 0x0000001E which equals 30 in decimal
+  - Counting forward 30 bytes brings us 4 bytes before the next set of 00 00 00 XX bytes. Definitely starting to feel like
+    the first 4 bytes are a byte counter.
+  - Skipping past those four bytes and looking at the next 00 00 00 XX bytes we get 0x0000001D which is 29 in decimal.
+  - Again, counting forward by that number of bytes brings us to 4 bytes prior to the next 00 00 00 XX block. First 4
+    bytes are definitely a byte counter.
+- It makes sense that each of these blocks are an Opus packet.
+- Still don't know what the second set of 4 bytes could represent... Does it matter for our purposes? All we care about
+  is the raw Opus bit stream.
+  - A Google search for "opus test vector format" brings up the following result (a PDF document):
+    - https://www.ietf.org/proceedings/82/slides/codec-4.pdf
+    - From the "Force Multipliers" page:
+      - "The range coder has 32 bits of state which must match between the encoder and decoder"
+      - "Provides a checksum of all encoding and decoding decisions"
+      - "opus_demo bitstreams include the range value with every packet and test for mismatches"
+    - Willing to bet that the extra 4 bytes are that "32 bits of state". This is actually good for dr_opus.
+- I think the format is just a list of Opus packets with 8 bytes of header data for each one:
+    4 bytes: Opus packet size in bytes
+    4 bytes: 32 bit of range coder state
+    [Opus Packet]
+--------------------------------
+
+- The test program can either hard code a list of vector files or we can enumerate over files in known directories. I'm
+  preferring the latter to make it easier to add new vectors. It's also consistent with the way dr_flac does it which has
+  been pretty good in the past.
+- Started work on a "common" lib for test programs. First thing is the new file iterator.
+  - File iterator now done, but only supporting Windows currently.
+- Have implemented the logic for loading test vectors and the byte counter (and I'm assuming the range state) is actually
+  in big-endian, not little-endian. I'm an idiot!
+- Copying endian management APIs from dr_flac over to dr_opus.
+- Basic infrastructure for testing against the standard test vectors is now done.
+- COMMIT
+
+2018/12/03 6:15 PM
+==================
+- The packet enumeration in the test program seems to work so far, but I'm still not 100% sure that my assumptions are
+  correct. Adding more validation to dropus_stream_decode_packet() to increase my certainty. The next stage is to
+  implement all of the main packet validation.
+- Question for later. How are "Discontinuous Transmission (DTX) or lost packet" handled? Should
+  dropus_stream_decode_packet() return an error in this case?
+- Code for validating packet codes 0, 1 and 2 are now in, however untested so far. Code 3 is a bit more complicated and
+  right now I need to eat dinner...
+- COMMIT
+
+2018/12/03 6:40 PM
+==================
+- Code 3 CBR is done (no VBR yet). Still untested.
+- Code 3 VBR is done. Still untested.
+- Testing and debugging against the standard test vectors coming next.
+- Fixed a few compiler warnings.
+- COMMIT

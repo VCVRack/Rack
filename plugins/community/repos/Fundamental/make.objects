@@ -5,6 +5,7 @@ PLUGIN_OBJ = \
 	src/Fundamental.o \
 	src/LFO.o \
 	src/Mutes.o \
+	src/Octave.o \
 	src/SEQ3.o \
 	src/Scope.o \
 	src/SequentialSwitch.o \

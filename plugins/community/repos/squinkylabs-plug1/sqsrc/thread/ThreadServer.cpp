@@ -3,16 +3,16 @@
 #include "ThreadServer.h"
 #include "ThreadSharedState.h"
 
-int ThreadServer::_count = 0;
+int ThreadServer::_instanceCount = 0;
 ThreadServer::ThreadServer(std::shared_ptr<ThreadSharedState> state) : 
     sharedState(state)
 {
-    ++_count;
+    ++_instanceCount;
 }
 
 ThreadServer::~ThreadServer()
 {
-    --_count;
+    --_instanceCount;
 }
 
 void ThreadServer::start()

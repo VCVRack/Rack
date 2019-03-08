@@ -40,6 +40,7 @@ static std::string waveTableNames[NUM_WAVEBANKS] = {
     "BiPls", "SawGap1", "SawGap2", "VGame"
 };
 
+
 class FourVoiceOPCore {
 public:
     enum OpSyncSource {

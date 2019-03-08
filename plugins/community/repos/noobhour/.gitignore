@@ -1,0 +1,12 @@
+/build
+/dist
+/plugin.dylib
+/plugin.dll
+/plugin.so
+.DS_Store
+*.*~
+*~
+dist.sh
+res_bak
+*#
+*.bak

@@ -6,21 +6,21 @@
 
 namespace dsp {
 
-    struct Hardclip : WaveShaper {
+struct Hardclip : WaveShaper {
 
-        Noise *noise;
-        HQClip *hqclip;
+    Noise *noise;
+    HQClip *hqclip;
 
 
-    public:
+public:
 
-        explicit Hardclip(float sr);
+    explicit Hardclip(float sr);
 
-        void init() override;
-        void invalidate() override;
-        void process() override;
-        double compute(double x) override;
+    void init() override;
+    void invalidate() override;
+    void process() override;
+    double compute(double x) override;
 
-    };
+};
 
 }

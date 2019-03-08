@@ -62,9 +62,9 @@ void EightFO::step() {
 			_sampleSteps = 1;
 		}
 		else {
-			float sample = abs(params[SAMPLE_PWM_PARAM].value);
+			float sample = fabsf(params[SAMPLE_PWM_PARAM].value);
 			if (inputs[SAMPLE_PWM_INPUT].active) {
-				sample *= clamp(abs(inputs[SAMPLE_PWM_INPUT].value) / 5.0f, 0.0f, 1.0f);
+				sample *= clamp(fabsf(inputs[SAMPLE_PWM_INPUT].value) / 5.0f, 0.0f, 1.0f);
 			}
 			float maxSampleSteps = (_phasor._sampleRate / _phasor._frequency) / 4.0f;
 			_sampleSteps = clamp((int)(sample * maxSampleSteps), 1, (int)maxSampleSteps);

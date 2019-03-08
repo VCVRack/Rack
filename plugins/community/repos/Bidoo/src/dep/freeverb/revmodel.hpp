@@ -20,7 +20,7 @@ public:
 			void	mute();
 			void	processmix(float *inputL, float *inputR, float *outputL, float *outputR, long numsamples, int skip);
 			void	processreplace(float *inputL, float *inputR, float *outputL, float *outputR, long numsamples, int skip);
-			void  process(const float inL, const float inR, const float fbInL, const float fbInR, float &outputL, float &outputR, float &wOutputL, float &wOutputR);
+			void  process(const float inL, const float inR, const float fbIn, float &outputL, float &outputR, float &wOutputL, float &wOutputR);
 			void	setroomsize(float value);
 			float	getroomsize();
 			void	setdamp(float value);

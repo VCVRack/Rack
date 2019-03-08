@@ -101,14 +101,14 @@ struct LIMBO : Module {
 };
 
 void LIMBO::step() {
-	float cfreq = pow(2.0f,rescale(clamp(params[CUTOFF_PARAM].value + params[CMOD_PARAM].value * inputs[CUTOFF_INPUT].value / 5.0f,0.0f,1.0f),0.0f,1.0f,4.5f,13.0f));
-	float q = 3.5f * clamp(params[Q_PARAM].value + inputs[Q_INPUT].value / 5.0f, 0.0f, 1.0f);
-	float g = pow(2.0f,rescale(clamp(params[MUG_PARAM].value + inputs[MUG_INPUT].value / 5.0f,0.0f,1.0f),0.0f,1.0f,0.0f,3.0f));
+	float cfreq = pow(2.0f,rescale(clamp(params[CUTOFF_PARAM].value + params[CMOD_PARAM].value * inputs[CUTOFF_INPUT].value * 0.2f,0.0f,1.0f),0.0f,1.0f,4.5f,14.0f));
+	float q = 3.5f * clamp(params[Q_PARAM].value + inputs[Q_INPUT].value * 0.2f, 0.0f, 1.0f);
+	float g = pow(2.0f,rescale(clamp(params[MUG_PARAM].value + inputs[MUG_INPUT].value * 0.2f,0.0f,1.0f),0.0f,1.0f,0.0f,3.0f));
 	int mode = (int)params[MODE_PARAM].value;
-	lFilter.setParams(cfreq,q,engineGetSampleRate(),g/3,mode);
-	rFilter.setParams(cfreq,q,engineGetSampleRate(),g/3,mode);
-	float inL = inputs[IN_L].value/5.0f; //normalise to -1/+1 we consider VCV Rack standard is #+5/-5V on VCO1
-	float inR = inputs[IN_R].value/5.0f;
+	lFilter.setParams(cfreq,q,engineGetSampleRate(), g / 3,mode);
+	rFilter.setParams(cfreq,q,engineGetSampleRate(), g / 3,mode);
+	float inL = inputs[IN_L].value * 0.2f;
+	float inR = inputs[IN_R].value * 0.2f;
 	inL = lFilter.calcOutput(inL)*5.0f*(mode == 0 ? g : 1);
 	inR = rFilter.calcOutput(inR)*5.0f*(mode == 0 ? g : 1);
 	outputs[OUT_L].value = inL;

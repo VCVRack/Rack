@@ -42,9 +42,22 @@ RACK_PLUGIN_MODEL_DECLARE(RJModules, Splitters);
 RACK_PLUGIN_MODEL_DECLARE(RJModules, Displays);
 RACK_PLUGIN_MODEL_DECLARE(RJModules, Range);
 
+// 0.6.1:
+RACK_PLUGIN_MODEL_DECLARE(RJModules, ThreeXOSC);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, BPF);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, Buffers);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, Chord);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, ChordSeq);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, Glides);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, MetaKnob);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, Octaves);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, RandomFilter);
+RACK_PLUGIN_MODEL_DECLARE(RJModules, Riser);
+
 RACK_PLUGIN_INIT(RJModules) {
    RACK_PLUGIN_INIT_ID();
 
+   RACK_PLUGIN_INIT_VERSION("0.6.1");
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/Miserlou/RJModules");
 
    // Generators
@@ -87,4 +100,16 @@ RACK_PLUGIN_INIT(RJModules) {
    RACK_PLUGIN_MODEL_ADD(RJModules, Splitters);
    RACK_PLUGIN_MODEL_ADD(RJModules, Displays);
    RACK_PLUGIN_MODEL_ADD(RJModules, Range);
+
+   // 0.6.1:
+   RACK_PLUGIN_MODEL_ADD(RJModules, ThreeXOSC);
+   RACK_PLUGIN_MODEL_ADD(RJModules, BPF);
+   RACK_PLUGIN_MODEL_ADD(RJModules, Buffers);
+   RACK_PLUGIN_MODEL_ADD(RJModules, Chord);
+   RACK_PLUGIN_MODEL_ADD(RJModules, ChordSeq);
+   RACK_PLUGIN_MODEL_ADD(RJModules, Glides);
+   RACK_PLUGIN_MODEL_ADD(RJModules, MetaKnob);
+   RACK_PLUGIN_MODEL_ADD(RJModules, Octaves);
+   RACK_PLUGIN_MODEL_ADD(RJModules, RandomFilter);
+   RACK_PLUGIN_MODEL_ADD(RJModules, Riser);
 }

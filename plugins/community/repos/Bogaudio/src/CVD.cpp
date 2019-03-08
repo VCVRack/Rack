@@ -24,7 +24,7 @@ void CVD::step() {
 
 	float mix = params[MIX_PARAM].value;
 	if (inputs[MIX_INPUT].active) {
-		mix *= clamp(inputs[MIX_INPUT].value / 5.0f, -1.0f, 1.0f);
+		mix = clamp(mix + inputs[MIX_INPUT].value / 5.0f, -1.0f, 1.0f);
 	}
 	_mix.setParams(mix);
 

@@ -9,7 +9,7 @@ namespace rack_plugin_ImpromptuModular {
 
 struct BlankPanel : Module {
 
-	int panelTheme = 0;
+	int panelTheme = 1;
 
 
 	BlankPanel() : Module(0, 0, 0, 0) {
@@ -26,16 +26,16 @@ struct BlankPanel : Module {
 		json_t *rootJ = json_object();
 
 		// panelTheme
-		json_object_set_new(rootJ, "panelTheme", json_integer(panelTheme));
+		// json_object_set_new(rootJ, "panelTheme", json_integer(panelTheme));
 
 		return rootJ;
 	}
 
 	void fromJson(json_t *rootJ) override {
 		// panelTheme
-		json_t *panelThemeJ = json_object_get(rootJ, "panelTheme");
-		if (panelThemeJ)
-			panelTheme = json_integer_value(panelThemeJ);
+		// json_t *panelThemeJ = json_object_get(rootJ, "panelTheme");
+		// if (panelThemeJ)
+			// panelTheme = json_integer_value(panelThemeJ);
 	}
 
 	
@@ -47,40 +47,40 @@ struct BlankPanel : Module {
 
 struct BlankPanelWidget : ModuleWidget {
 
-	struct PanelThemeItem : MenuItem {
-		BlankPanel *module;
-		int theme;
-		void onAction(EventAction &e) override {
-			module->panelTheme = theme;
-		}
-		void step() override {
-			rightText = (module->panelTheme == theme) ? "✔" : "";
-		}
-	};
+	// struct PanelThemeItem : MenuItem {
+		// BlankPanel *module;
+		// int theme;
+		// void onAction(EventAction &e) override {
+			// module->panelTheme = theme;
+		// }
+		// void step() override {
+			// rightText = (module->panelTheme == theme) ? "✔" : "";
+		// }
+	// };
 	Menu *createContextMenu() override {
 		Menu *menu = ModuleWidget::createContextMenu();
-
-		MenuLabel *spacerLabel = new MenuLabel();
-		menu->addChild(spacerLabel);
 
 		BlankPanel *module = dynamic_cast<BlankPanel*>(this->module);
 		assert(module);
 
-		MenuLabel *themeLabel = new MenuLabel();
-		themeLabel->text = "Panel Theme";
-		menu->addChild(themeLabel);
+		// MenuLabel *spacerLabel = new MenuLabel();
+		// menu->addChild(spacerLabel);
 
-		PanelThemeItem *lightItem = new PanelThemeItem();
-		lightItem->text = lightPanelID;// ImpromptuModular.hpp
-		lightItem->module = module;
-		lightItem->theme = 0;
-		menu->addChild(lightItem);
+		// MenuLabel *themeLabel = new MenuLabel();
+		// themeLabel->text = "Panel Theme";
+		// menu->addChild(themeLabel);
 
-		PanelThemeItem *darkItem = new PanelThemeItem();
-		darkItem->text = darkPanelID;// ImpromptuModular.hpp
-		darkItem->module = module;
-		darkItem->theme = 1;
-		menu->addChild(darkItem);
+		// PanelThemeItem *lightItem = new PanelThemeItem();
+		// lightItem->text = lightPanelID;// ImpromptuModular.hpp
+		// lightItem->module = module;
+		// lightItem->theme = 0;
+		// menu->addChild(lightItem);
+
+		// PanelThemeItem *darkItem = new PanelThemeItem();
+		// darkItem->text = darkPanelID;// ImpromptuModular.hpp
+		// darkItem->module = module;
+		// darkItem->theme = 1;
+		// menu->addChild(darkItem);
 
 		return menu;
 	}	
@@ -89,11 +89,12 @@ struct BlankPanelWidget : ModuleWidget {
 	BlankPanelWidget(BlankPanel *module) : ModuleWidget(module) {
 		// Main panel from Inkscape
         DynamicSVGPanel *panel = new DynamicSVGPanel();
-        panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BlankPanel.svg")));
+        //panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BlankPanel.svg")));
         panel->addPanel(SVG::load(assetPlugin(plugin, "res/dark/BlankPanel_dark.svg")));
         box.size = panel->box.size;
-        panel->mode = &module->panelTheme;
+        //panel->mode = &module->panelTheme;
         addChild(panel);
+
 
 		// Screws
 		addChild(createDynamicScrew<IMScrew>(Vec(15, 0), &module->panelTheme));

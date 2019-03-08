@@ -49,7 +49,7 @@ struct ShaperCore {
 	bool _firstStep = true;
 	bool& _triggerOnLoad;
 	bool& _shouldTriggerOnLoad;
-	SchmittTrigger _trigger;
+	Trigger _trigger;
 	PulseGenerator _triggerOuptutPulseGen;
 	Stage _stage;
 	float _stageProgress;

@@ -29,6 +29,16 @@
       </g>
     </symbol>
 
+    <symbol id="button-small" viewBox="0 0 9px 9px">
+      <g transform="translate(4.5 4.5)">
+        <circle cx="0" cy="0" r="4.1" stroke-width="1" stroke="#00f" fill="#f00" />
+      </g>
+    </symbol>
+
+    <symbol id="light-small" viewBox="0 0 6.4px 6.4px">
+      <rect width="6.4" height="6.4" fill="#0f0" />
+    </symbol>
+
     <symbol id="input" viewBox="0 0 24px 24px">
       <g transform="translate(12 12)">
         <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
@@ -55,7 +65,7 @@
   <!-- <rect width="45" height="7" fill="#0f0" transform="translate(0 318)" /> -->
 
   <g transform="rotate(-90) translate(-376 13)">
-    <text class="title" font-size="7pt" letter-spacing="2.5px">SWITCH</text>
+    <text class="title" font-size="7pt" letter-spacing="2.5px">SWTCH</text>
     <g transform="translate(0 12)">
       <text class="brand" font-size="7pt" letter-spacing="2px">BGA</text>
       <rect width="3.0" height="3" fill="#ddd" transform="translate(11.5 -5)" />
@@ -70,7 +80,13 @@
       <text font-size="5pt" letter-spacing="2px" transform="translate(5.5 58)">GATE</text>
     </g>
 
-    <g transform="translate(0 69)">
+    <g transform="translate(4 66)">
+      <use id="LATCH_LIGHT" xlink:href="#light-small" transform="translate(0 0.5)" />
+      <text font-size="5pt" letter-spacing="1px" transform="translate(8 6)">LTCH</text>
+      <use id="LATCH_PARAM" xlink:href="#button-small" transform="translate(29 -1)" />
+    </g>
+
+    <g transform="translate(0 79)">
       <g transform="translate(5.5 0)">
         <rect width="34" height="10" fill="#fafafa" transform="translate(0 29)" />
         <rect width="34" height="35" rx="5" fill="#fafafa" />
@@ -91,7 +107,7 @@
       </g>
     </g>
 
-    <g transform="translate(0 188)">
+    <g transform="translate(0 196)">
       <g transform="translate(5.5 0)">
         <rect width="34" height="10" fill="#fafafa" transform="translate(0 29)" />
         <rect width="34" height="35" rx="5" fill="#fafafa" />

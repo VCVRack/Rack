@@ -4,4 +4,4 @@ You are allowed to:
 1. Remove rake task
 2. Add existing rake tasks
 To add existing rake tasks automatically delete this file and reload the project.
---><RakeGroup description="" fullCmd="" taksId="rake"><RakeTask description="Remove any temporary products" fullCmd="clean" taksId="clean" /><RakeTask description="Remove any generated files" fullCmd="clobber" taksId="clobber" /><RakeTask description="Compile the SVG images" fullCmd="compile" taksId="compile" /><RakeTask description="" fullCmd=".." taksId=".." /><RakeTask description="" fullCmd="../images" taksId="../images" /><RakeTask description="" fullCmd="../res" taksId="../res" /><RakeTask description="" fullCmd="all" taksId="all" /><RakeTask description="" fullCmd="controls" taksId="controls" /><RakeTask description="" fullCmd="default" taksId="default" /><RakeTask description="" fullCmd="images" taksId="images" /><RakeTask description="" fullCmd="panels" taksId="panels" /></RakeGroup></Settings>
+--><RakeGroup description="" fullCmd="" taksId="rake" /></Settings>

@@ -1,7 +1,7 @@
 # Bidoo's plugins for [VCVRack](https://vcvrack.com)
 
 <!-- Version and License Badges -->
-![Version](https://img.shields.io/badge/version-0.6.10-green.svg?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.6.27-green.svg?style=flat-square)
 ![License](https://img.shields.io/badge/license-BSD3-blue.svg?style=flat-square)
 ![Language](https://img.shields.io/badge/language-C++-yellow.svg?style=flat-square)
 
@@ -13,31 +13,52 @@ You can find information on that plugins pack in the [wiki](https://github.com/s
 
 ## Last changes
 
-21/08/2018 => 0.6.10
+13/02/2019 => 0.6.26
+**bordL** pitch calibration and KEY input fix.
+**REI** reverberator (based on freeverb with a pitchshifter in the feedback loop) has been redesigned and the control calibration is better than before, it still needs some adjustments.
+**OUAIve** has a new input in the top right corner. When this input is triggered it overrides the sample position and take it back to 0 (I use it with **OUAIve** in grid mode without any POS input signal, so slices are read one after another at each trig, if I need to go back to 0 to sync with a sequencer I trig the new input :)).
+**FFILTR** low pass filter based on FFT has a resonance control now.
 
-rabBIT redesign
+20/11/2018 => 0.6.23
 
-20/08/2018 => 0.6.9
+*NEW* **liMonADe** additive osc + wavetable synth. On the right side stand the usual controls for the oscillator. On the left side stand commands to manipulate the frames and the wavetable. From top to bottom and left to right :
+* samples per frame (textbox) - frame selector
+* load sample into wavetable - load png into wavetable - load sample into frame
+* morph frames - morph spectrum - morph spectrum phase constant - delete morphing
+* normalize all frames - remove DC offset of all frames - normalize wavetable - normalize frame
+* window wavetable - smooth wavetable - window frame - smooth frame
+* add frame - remove frame
+* number of voices - voices detuning (voices detuning input)
 
-rabBIT is a 8 bit reducer/reverser
+there is one unused input it will be the entry point for sampling.
 
-09/07/2018
+05/10/2018 => 0.6.19
 
-Changed the way wav files are loaded and saved => OUAIve and cANARd. Changed the way onsets are detected in cANARd. Fix play mode saving on close for OUAIve.
+*NEW* **PeNEqUe** additive osc. To scroll horizontally in bins => Shift + mouse. To set a bin to 0 Ctrl + Click. Top chart is magnitude and middle chart is phase.
 
-This version is compliant with the last version I have of Rack SDK so maybe my pack will be available thru Rack again in 0.6.2.
+*UPDATE* **dFUZE** has no shimmer param anymore, I was unsatisfied with the pitch shifting part of the plugin.
 
-13/05/2018 => 0.6.6
+*UPDATE* **Garçon** flagged as VISUAL.
 
-antN goes away from mpg123 and is based now on minimp3 so maybe my pack will be available thru Rack again.
+*UPDATE* **EMILE** does not use a sin wave table anymore, it is now based on IDFT.
 
-Some changes on μ that has an offset param now. I changed the fine tuning of step length so it is easier to setup. Step length is 100% by default.
+*NEW* **HCTIP** pitch shifter, it is a test on fft pitch shifting technique.
 
-11/05/2018 => 0.6.5
+23/09/2018 => 0.6.18
 
-μ. can be viewed as a step in a sequence. Link some of them and you will build a full sequence path. When moving the cursor over the knobs and ports the display shows a description and the current value of the focused object. As usual black ports are inputs and the red ones outputs. To start experimenting link some units with bpm ports so the first one will become the master tempo for the chain. Link gate and CV at the bottom to create the path for the signal. Link step end ports with step start ones to build the order of steps. At that stage you can use the alternate end of step output port to fork the path and adjust the corresponding probability. Maybe you need that under some circumstances a step is stopped .. use the inhibit port. Once the chain is made set the tempo with the first step (one fast knob and a dedicated one for decimals). Then set the length of each step (two controls too as for bpm) 100% means a quarter for a 4/4 signature, 50% one eighth, 200% an half etc... To introduce swing use decimal values for the step length. Now choose the length of the trigs in percentage of the step length, the CV value, the probability of the trig to be played, the probability of the alternate port to be use instead of the standard end of step port, the trig repeat count and the distance between retrigs. If the trig length is greater than the distance then the trigs will merge. You have two small led buttons between gate and CV in and out ports. They activate the stack mode on those ports. By default a step plays its trigs when active and let the signal pass thru the ports when not active. If you activate the stack mode the incoming signal will be added to the trigs data when the step is active. You can manually launch a step with the left top led button and mute the step with the right one. Modulation ports are available for almost all parameters.
+*NEW* **zOù MAï** sequencer first candidate. 8 patterns x 8 tracks x 64 steps with trim and probability/condition. Global swing per track is not implemented. For tracks and trigs select = left click and activate = right click. I will make a video asap in order to explain.
 
-This release comes with another module Σ which is a simple merge tool .. essential with μ in order to merge end of steps ports or gate and CV ones.
+10/09/2018 => 0.6.17
+
+*UPDATE* **dTrOY** and **bordL** fix quantization issue.
+
+09/09/2018 => 0.6.16
+
+*UPDATE* **lIMbO** cutoff frequency max value changed (calibration).
+
+*UPDATE* **dTrOY** and **bordL** phase calculation now based on engine sample rate instead of clock() from ctime. V/Oct can't be synced with gates anymore it is continuous now. Quantization issue has been fixed. New input "Transpose" that comes after quantization (it is rescaled -4/+4 octaves on -10/+10V and sliced per 1/12 Volt). Copy/Paste is available in the UI => exit right click menu. "SHIFTS" allows you to move patterns left and right and pitch up and down.
+
+*UPDATE* **LoURdE** threshold and factors displays are now yellow on black background.
 
 ## License
 

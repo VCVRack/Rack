@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="6.8129997"
+   height="6.8129997"
+   viewBox="0 0 1.8026062 1.8026062"
+   version="1.1"
+   id="svg4598"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="BarkKnobLine.svg">
+  <defs
+     id="defs4592">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath4577">
+      <rect
+         style="opacity:1;fill:#ff0000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.36660397;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+         id="rect4579"
+         width="9.1040001"
+         height="7.2091045"
+         x="70.975845"
+         y="-775.68719"
+         transform="scale(1,-1)" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="32"
+     inkscape:cx="1.9071733"
+     inkscape:cy="4.8279466"
+     inkscape:document-units="px"
+     inkscape:current-layer="g5161"
+     showgrid="false"
+     inkscape:snap-global="false"
+     units="px" />
+  <metadata
+     id="metadata4595">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-153.26876,-206.79712)">
+    <g
+       id="g5161">
+      <path
+         id="path5155"
+         style="opacity:1;fill:#383838;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.34500515;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+         sodipodi:type="arc"
+         sodipodi:cx="154.17006"
+         sodipodi:cy="207.69843"
+         sodipodi:rx="0.90130311"
+         sodipodi:ry="0.90130311"
+         sodipodi:start="0"
+         sodipodi:end="3.132333"
+         d="m 155.07136,207.69843 a 0.90130311,0.90130311 0 0 1 -0.89713,0.90129 0.90130311,0.90130311 0 0 1 -0.90544,-0.89295 l 0.90127,-0.008 z" />
+      <rect
+         transform="matrix(0.26458333,0,0,0.12501554,134.27935,110.67593)"
+         style="display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.53224289;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+         id="rect5157"
+         width="1.03125"
+         height="13.621094"
+         x="74.661873"
+         y="768.87396"
+         clip-path="url(#clipPath4577)"
+         inkscape:transform-center-y="-0.0032294139" />
+    </g>
+  </g>
+</svg>

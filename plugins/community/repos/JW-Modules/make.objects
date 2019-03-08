@@ -1,4 +1,5 @@
 ALL_OBJ= \
+	src/BlankPanel.o \
 	src/BouncyBalls.o \
 	src/Cat.o \
 	src/FullScope.o \

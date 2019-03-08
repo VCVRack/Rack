@@ -44,7 +44,7 @@ struct AD : Module {
 	int _modulationStep = 0;
 	bool _loopMode = false;
 	bool _linearMode = false;
-	SchmittTrigger _trigger;
+	Trigger _trigger;
 	PulseGenerator _eocPulseGen;
 	bool _on = false;
 	ADSR _envelope;

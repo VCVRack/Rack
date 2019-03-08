@@ -1,0 +1,7 @@
+The following characters were modified for Impromptu Modular by Marc Boulé:
+{
+}
+b
+E
+F
+.

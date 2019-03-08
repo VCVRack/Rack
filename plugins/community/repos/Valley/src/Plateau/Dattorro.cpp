@@ -3,7 +3,7 @@
 Dattorro::Dattorro() {
     _dattorroScaleFactor = _sampleRate / _dattorroSampleRate;
 
-    _preDelay = InterpDelay<double>(192000, 0);
+    _preDelay = InterpDelay<double>(192010, 0);
 
     _inputLpf = OnePoleLPFilter(22000.0);
     _inputHpf = OnePoleHPFilter(0.0);
@@ -92,13 +92,12 @@ void Dattorro::process(double leftInput, double rightInput) {
     _inputHpf.input = _inputLpf.process();
     _inputHpf.process();
     _preDelay.input = _inputHpf.output;
-    _inApf1.input = _preDelay.process();
+    _preDelay.process();
+    _inApf1.input = _preDelay.output;
     _inApf2.input = _inApf1.process();
     _inApf3.input = _inApf2.process();
     _inApf4.input = _inApf3.process();
-    //_leftSum += _inApf4.process();
-    //_rightSum += _inApf4.output;
-    _tankFeed = _inputHpf.output * (1.0 - diffuseInput) + _inApf4.process() * diffuseInput;
+    _tankFeed = _preDelay.output * (1.0 - diffuseInput) + _inApf4.process() * diffuseInput;
     _leftSum += _tankFeed;
     _rightSum += _tankFeed;
 
@@ -121,25 +120,25 @@ void Dattorro::process(double leftInput, double rightInput) {
     _rightSum = _leftDelay2.output * _decay;
     _leftSum = _rightDelay2.output * _decay;
 
-    _leftOutDCBlock.input = _leftApf1.output * 0.5;
-    _leftOutDCBlock.input += _leftDelay1.tap(_scaledLeftTaps[0]) * 0.5;
-    _leftOutDCBlock.input += _leftDelay1.tap(_scaledLeftTaps[1]) * 0.5;
-    _leftOutDCBlock.input -= _leftApf2.delay.tap(_scaledLeftTaps[2]) * 0.5;
-    _leftOutDCBlock.input += _leftDelay2.tap(_scaledLeftTaps[3]) * 0.5;
-    _leftOutDCBlock.input -= _rightDelay1.tap(_scaledLeftTaps[4]) * 0.5;
-    _leftOutDCBlock.input -= _rightApf2.delay.tap(_scaledLeftTaps[5]) * 0.5;
-    _leftOutDCBlock.input -= _rightDelay2.tap(_scaledLeftTaps[6]) * 0.5;
+    _leftOutDCBlock.input = _leftApf1.output;
+    _leftOutDCBlock.input += _leftDelay1.tap(_scaledLeftTaps[0]);
+    _leftOutDCBlock.input += _leftDelay1.tap(_scaledLeftTaps[1]);
+    _leftOutDCBlock.input -= _leftApf2.delay.tap(_scaledLeftTaps[2]);
+    _leftOutDCBlock.input += _leftDelay2.tap(_scaledLeftTaps[3]);
+    _leftOutDCBlock.input -= _rightDelay1.tap(_scaledLeftTaps[4]);
+    _leftOutDCBlock.input -= _rightApf2.delay.tap(_scaledLeftTaps[5]);
+    _leftOutDCBlock.input -= _rightDelay2.tap(_scaledLeftTaps[6]);
 
-    _rightOutDCBlock.input = _rightApf1.output * 0.5;
-    _rightOutDCBlock.input += _rightDelay1.tap(_scaledRightTaps[0]) * 0.5;
-    _rightOutDCBlock.input += _rightDelay1.tap(_scaledRightTaps[1]) * 0.5;
-    _rightOutDCBlock.input -= _rightApf2.delay.tap(_scaledRightTaps[2]) * 0.5;
-    _rightOutDCBlock.input += _rightDelay2.tap(_scaledRightTaps[3]) * 0.5;
-    _rightOutDCBlock.input -= _leftDelay1.tap(_scaledRightTaps[4]) * 0.5;
-    _rightOutDCBlock.input -= _leftApf2.delay.tap(_scaledRightTaps[5]) * 0.5;
-    _rightOutDCBlock.input -= _leftDelay2.tap(_scaledRightTaps[6]) * 0.5;
-    leftOut = _leftOutDCBlock.process();
-    rightOut = _rightOutDCBlock.process();
+    _rightOutDCBlock.input = _rightApf1.output;
+    _rightOutDCBlock.input += _rightDelay1.tap(_scaledRightTaps[0]);
+    _rightOutDCBlock.input += _rightDelay1.tap(_scaledRightTaps[1]);
+    _rightOutDCBlock.input -= _rightApf2.delay.tap(_scaledRightTaps[2]);
+    _rightOutDCBlock.input += _rightDelay2.tap(_scaledRightTaps[3]);
+    _rightOutDCBlock.input -= _leftDelay1.tap(_scaledRightTaps[4]);
+    _rightOutDCBlock.input -= _leftApf2.delay.tap(_scaledRightTaps[5]);
+    _rightOutDCBlock.input -= _leftDelay2.tap(_scaledRightTaps[6]);
+    leftOut = _leftOutDCBlock.process() * 0.5;
+    rightOut = _rightOutDCBlock.process() * 0.5;
 
     _fade += _fadeStep * _fadeDir;
     _fade = (_fade < 0.0) ? 0.0 : ((_fade > 1.0) ? 1.0 : _fade);

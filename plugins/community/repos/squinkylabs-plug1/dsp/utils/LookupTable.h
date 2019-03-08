@@ -1,12 +1,13 @@
 #pragma once
 
+#include "AudioMath.h"
+
 #include <algorithm>
+#include <assert.h>
 #include <cmath>
 #include <memory>
 #include <emmintrin.h>
 #include <functional>
-
-#include "AudioMath.h"
 
 template <typename T> class LookupTableParams;
 /* Lookup table with evenly spaced lookup "bins"

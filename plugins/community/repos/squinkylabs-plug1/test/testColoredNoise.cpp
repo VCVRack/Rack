@@ -10,7 +10,7 @@ using Noise = ColoredNoise<TestComposite>;
 // bring it up and process a bit.
 static void test0()
 {
-    assertEQ(ThreadServer::_count, 0);
+    assertEQ(ThreadServer::_instanceCount, 0);
     assertEQ(FFTDataCpx::_count, 0);
     {
         Noise cn;
@@ -22,7 +22,7 @@ static void test0()
 
         }
     }
-    assertEQ(ThreadServer::_count, 0);
+    assertEQ(ThreadServer::_instanceCount, 0);
     assertEQ(FFTDataCpx::_count, 0);
 }
 

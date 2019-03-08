@@ -1,5 +1,8 @@
 #include "JWModules.hpp"
 
+RACK_PLUGIN_MODEL_DECLARE(JW_Modules, BlankPanelSmall);
+RACK_PLUGIN_MODEL_DECLARE(JW_Modules, BlankPanelMedium);
+RACK_PLUGIN_MODEL_DECLARE(JW_Modules, BlankPanelLarge);
 RACK_PLUGIN_MODEL_DECLARE(JW_Modules, Cat);
 RACK_PLUGIN_MODEL_DECLARE(JW_Modules, BouncyBalls);
 RACK_PLUGIN_MODEL_DECLARE(JW_Modules, FullScope);
@@ -14,7 +17,12 @@ RACK_PLUGIN_MODEL_DECLARE(JW_Modules, XYPad);
 
 RACK_PLUGIN_INIT(JW_Modules) {
    RACK_PLUGIN_INIT_ID();
+   RACK_PLUGIN_INIT_VERSION("0.6.3");
+   RACK_PLUGIN_INIT_WEBSITE("https://github.com/jeremywen/JW-Modules");
 
+	RACK_PLUGIN_MODEL_ADD(JW_Modules, BlankPanelSmall);
+	RACK_PLUGIN_MODEL_ADD(JW_Modules, BlankPanelMedium);
+	RACK_PLUGIN_MODEL_ADD(JW_Modules, BlankPanelLarge);
 	RACK_PLUGIN_MODEL_ADD(JW_Modules, Cat);
 	RACK_PLUGIN_MODEL_ADD(JW_Modules, BouncyBalls);
 	RACK_PLUGIN_MODEL_ADD(JW_Modules, FullScope);

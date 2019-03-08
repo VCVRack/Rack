@@ -1,7 +1,11 @@
+//
+// This plate reverb is based upon Jon Dattorro's 1997 reverb algorithm.
+//
+
 #pragma once
-#include "AllpassFilter.hpp"
-#include "OnePoleFilters.hpp"
-#include "LFO.hpp"
+#include "../Common/DSP/AllpassFilter.hpp"
+#include "../Common/DSP/OnePoleFilters.hpp"
+#include "../Common/DSP/LFO.hpp"
 #include <iostream>
 
 class Dattorro {

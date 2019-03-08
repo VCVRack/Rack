@@ -39,7 +39,7 @@ struct DGate : TriggerOnLoadModule {
 	};
 
 	bool _firstStep = true;
-	SchmittTrigger _trigger;
+	Trigger _trigger;
 	PulseGenerator _triggerOuptutPulseGen;
 	Stage _stage;
 	float _stageProgress;

@@ -41,6 +41,15 @@ public:
      */
     T getAtIndex(int index);
     void setAtIndex(T x, int index);
+
+    /**
+     * Direct access to see all taps
+     * as a contiguous vector.
+     */
+    const T* taps() const
+    {
+        return _taps;
+    }
 private:
     T _taps[5 * N];
 };

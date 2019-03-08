@@ -9,6 +9,8 @@
 #include "GateTrigger.h"
 
 /**
+ * CPU usage was 15
+ * down to 7.2 with /4 subsample
  */
 template <class TBase>
 class Tremolo : public TBase
@@ -74,6 +76,17 @@ public:
     void step() override;
 
 private:
+    int inputSubSampleCounter = 1;
+    const static int inputSubSample = 4;    // only look at knob/cv every 4
+    float skew = .1f;
+    float phase = 0;
+    float shape = 0;
+    float modDepth = 0;
+    float shapeMul = 0;
+    float gain = 0;
+
+
+    void stepInput();
 
     ClockMult clock;
     std::shared_ptr<LookupTableParams<float>> tanhLookup;
@@ -105,16 +118,13 @@ inline void Tremolo<TBase>::init()
     scale_shape = AudioMath::makeLinearScaler(0.f, 1.f);
     scale_depth = AudioMath::makeLinearScaler(0.f, 1.f);
     scale_phase = AudioMath::makeLinearScaler(-1.f, 1.f);
+
+    stepInput();            // call once to init
 }
 
 template <class TBase>
-inline void Tremolo<TBase>::step()
+inline void Tremolo<TBase>::stepInput()
 {
-    gateTrigger.go(TBase::inputs[CLOCK_INPUT].value);
-    if (gateTrigger.trigger()) {
-        clock.refClock();
-    }
-
     int clockMul = (int) round(TBase::params[CLOCK_MULT_PARAM].value);
 
     // UI is shifted
@@ -123,31 +133,34 @@ inline void Tremolo<TBase>::step()
         clockMul = 0;
     }
 
-
-
     clock.setMultiplier(clockMul);
 
-
-    const float shape = scale_shape(
+    // second look at knowb and CV
+    shape = scale_shape(
         TBase::inputs[LFO_SHAPE_INPUT].value,
         TBase::params[LFO_SHAPE_PARAM].value,
         TBase::params[LFO_SHAPE_TRIM_PARAM].value);
 
-    const float skew = scale_skew(
+    skew = scale_skew(
         TBase::inputs[LFO_SKEW_INPUT].value,
         TBase::params[LFO_SKEW_PARAM].value,
         TBase::params[LFO_SKEW_TRIM_PARAM].value);
 
-    const float phase = scale_phase(
+    phase = scale_phase(
         TBase::inputs[LFO_PHASE_INPUT].value,
         TBase::params[LFO_PHASE_PARAM].value,
         TBase::params[LFO_PHASE_TRIM_PARAM].value);
 
-    const float modDepth = scale_depth(
+    modDepth = scale_depth(
         TBase::inputs[MOD_DEPTH_INPUT].value,
         TBase::params[MOD_DEPTH_PARAM].value,
         TBase::params[MOD_DEPTH_TRIM_PARAM].value);
 
+    shapeMul = std::max(.25f, 10 * shape);
+    gain = modDepth /
+        LookupTable<float>::lookup(*tanhLookup.get(), (shapeMul / 2));
+
+    // update internal clock from knob
     if (clockMul == 0)          // only calc rate for internal
     {
         const float logRate = scale_rate(
@@ -160,10 +173,23 @@ inline void Tremolo<TBase>::step()
         clock.setFreeRunFreq(scaledRate * reciprocalSampleRate);
     }
 
-
-
-    // For now, call setup every sample. will eat a lot of cpu
     AsymRampShaper::setup(rampShaper, skew, phase);
+}
+
+template <class TBase>
+inline void Tremolo<TBase>::step()
+{
+    if (--inputSubSampleCounter <= 0) {
+        inputSubSampleCounter = inputSubSample;
+        stepInput();
+    }
+
+    // First: external clock proc
+    gateTrigger.go(TBase::inputs[CLOCK_INPUT].value);
+    if (gateTrigger.trigger()) {
+        clock.refClock();
+    }
+
 
     // ------------ now generate the lfo waveform
     clock.sampleClock();
@@ -173,15 +199,17 @@ inline void Tremolo<TBase>::step()
     // now we have a skewed saw -.5 to .5
     TBase::outputs[SAW_OUTPUT].value = mod;
 
-    // TODO: don't scale twice - just get it right the first tme
-    const float shapeMul = std::max(.25f, 10 * shape);
+    // TODO: don't scale twice - just get it right the first time
+  //  const float shapeMul = std::max(.25f, 10 * shape);
     mod *= shapeMul;
 
     mod = LookupTable<float>::lookup(*tanhLookup.get(), mod);
     TBase::outputs[LFO_OUTPUT].value = mod;
 
-    const float gain = modDepth /
-        LookupTable<float>::lookup(*tanhLookup.get(), (shapeMul / 2));
+
+    // TODO: move this intp input proc
+   // const float gain = modDepth /
+   //     LookupTable<float>::lookup(*tanhLookup.get(), (shapeMul / 2));
     const float finalMod = gain * mod + 1;      // TODO: this offset by 1 is pretty good, but we 
                                                 // could add an offset control to make it really "chop" off
 

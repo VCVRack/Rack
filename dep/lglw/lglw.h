@@ -87,11 +87,17 @@ typedef struct lglw_vec2i_s {
 // Modifier keys
 #define LGLW_KMOD_LCTRL   (1u << 0)
 #define LGLW_KMOD_LSHIFT  (1u << 1)
-#define LGLW_KMOD_RCTRL   (1u << 2)
-#define LGLW_KMOD_RSHIFT  (1u << 3)
+#define LGLW_KMOD_LALT    (1u << 2)
+#define LGLW_KMOD_LSUPER  (1u << 3)  // (note) unused (on Windows)
+#define LGLW_KMOD_RCTRL   (1u << 4)
+#define LGLW_KMOD_RSHIFT  (1u << 5)
+#define LGLW_KMOD_RALT    (1u << 6)
+#define LGLW_KMOD_RSUPER  (1u << 7)  // (note) right windows key
 
-#define LGLW_KMOD_CTRL    (LGLW_KMOD_LCTRL | LGLW_KMOD_RCTRL)
+#define LGLW_KMOD_CTRL    (LGLW_KMOD_LCTRL  | LGLW_KMOD_RCTRL)
 #define LGLW_KMOD_SHIFT   (LGLW_KMOD_LSHIFT | LGLW_KMOD_RSHIFT)
+#define LGLW_KMOD_ALT     (LGLW_KMOD_LALT   | LGLW_KMOD_RALT)
+#define LGLW_KMOD_SUPER   (LGLW_KMOD_LSUPER | LGLW_KMOD_RSUPER)
 
 // Special (non-unicode) keys
 #define LGLW_VKEY_EXT        (0x10000000u)
@@ -127,6 +133,10 @@ typedef struct lglw_vec2i_s {
 #define LGLW_VKEY_RSHIFT     (LGLW_VKEY_EXT | 0xa1u)
 #define LGLW_VKEY_LCTRL      (LGLW_VKEY_EXT | 0xa2u)
 #define LGLW_VKEY_RCTRL      (LGLW_VKEY_EXT | 0xa3u)
+#define LGLW_VKEY_LALT       (LGLW_VKEY_EXT | 0xa4u)
+#define LGLW_VKEY_RALT       (LGLW_VKEY_EXT | 0xa5u)
+#define LGLW_VKEY_LSUPER     (LGLW_VKEY_EXT | 0x5bu)  // start menu
+#define LGLW_VKEY_RSUPER     (LGLW_VKEY_EXT | 0x5du)  // context menu
 
 // Keyboard utility macros
 #define LGLW_IS_CHAR_KEY(a)     (0u == ((a) & LGLW_VKEY_EXT))

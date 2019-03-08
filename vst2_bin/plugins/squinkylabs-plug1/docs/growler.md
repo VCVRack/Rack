@@ -30,7 +30,7 @@ The **Q** control does just what it says - controls the Q (resonance) of the fil
 
 The **Modulation Depth** controls how much of the summed LFOs get to each filter. Again, the lower filters move farther, and the top filter is fixed.
 
-The smaller knobs next to the main knobs are **attenuverters**, which scale control voltages. For more on attenuverters, [see below](#atten)
+The smaller knobs next to the main knobs are **attenuverters**, which scale control voltages.
 
 There are three LFO outputs next to the blinking LFOs. These may be used to modulate other modules, or as semi-random voltage sources.
 

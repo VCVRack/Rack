@@ -2,7 +2,7 @@
 SLUG = squinkylabs-plug1
 
 # Must follow the format in the Versioning section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-VERSION = 0.6.9
+VERSION = 0.6.14
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS += -I./dsp/generators -I./dsp/utils -I./dsp/filters
@@ -10,15 +10,17 @@ FLAGS += -I./dsp/third-party/falco -I./dsp/third-party/kiss_fft130
 FLAGS += -I./dsp/third-party/kiss_fft130/tools -I./dsp/third-party/src
 FLAGS += -I./sqsrc/thread -I./dsp/fft -I./composites
 FLAGS += -I./sqsrc/noise -I./sqsrc/util -I./sqsrc/clock -I./sqsrc/grammar -I./sqsrc/delay
+FLAGS += -I./midi/model -I./midi/view -I./midi/controller -I./util
+FLAGS += -I./src/third-party -I.src/ctrl
 CFLAGS +=
 CXXFLAGS +=
+
+# For now, this branch is always V1
+# FLAGS += -D __V1
 
 # Command line variable to turn on "experimental" modules
 ifdef _EXP
 	FLAGS += -D _EXP
-endif
-ifdef _CPU_HOG
-	FLAGS += -D _CPU_HOG
 endif
 # Macro to use on any target where we don't normally want asserts
 ASSERTOFF = -D NDEBUG
@@ -40,6 +42,9 @@ xxSOURCES += dsp/third-party/src/minblep.cpp
 SOURCES += dsp/third-party/kiss_fft130/kiss_fft.c
 SOURCES += dsp/third-party/kiss_fft130/tools/kiss_fftr.c
 SOURCES += $(wildcard sqsrc/**/*.cpp)
+SOURCES += $(wildcard midi/**/*.cpp)
+SOURCES += $(wildcard src/third-party/*.cpp)
+SOURCES += $(wildcard src/seq/*.cpp)
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin is automatically added.
@@ -53,6 +58,11 @@ include $(RACK_DIR)/plugin.mk
 
 # This turns asserts off for make (plugin), not for test or perf
 $(TARGET) :  FLAGS += $(ASSERTOFF)
+
+# mac does not like this argument
+ifdef ARCH_WIN
+	FLAGS += -fmax-errors=5
+endif
 
 include test.mk
 

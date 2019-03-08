@@ -1,10 +1,22 @@
 #pragma once
 
+
+#include "AsymWaveShaper.h"
+#include "ButterworthFilterDesigner.h"
+#include "IComposite.h"
 #include "IIRUpsampler.h"
 #include "IIRDecimator.h"
 #include "LookupTable.h"
-#include "AsymWaveShaper.h"
 #include "ObjectCache.h"
+
+
+template <class TBase>
+class ShaperDescription : public IComposite
+{
+public:
+    Config getParam(int i) override;
+    int getNumParams() override;
+};
 
 /**
 Version 1, cpu usage:
@@ -43,6 +55,8 @@ public:
         init();
     }
 
+    void onSampleRateChange();
+
     enum class Shapes
     {
         AsymSpline,
@@ -66,6 +80,7 @@ public:
         PARAM_OFFSET,
         PARAM_OFFSET_TRIM,
         PARAM_OVERSAMPLE,
+        PARAM_ACDC,
         NUM_PARAMS
     };
 
@@ -88,6 +103,13 @@ public:
         NUM_LIGHTS
     };
 
+    /** Implement IComposite
+     */
+    static std::shared_ptr<IComposite> getDescription()
+    {
+        return std::make_shared<ShaperDescription<TBase>>();
+    }
+
     /**
      * Main processing entry point. Called every sample
      */
@@ -103,9 +125,6 @@ private:
     AudioMath::ScaleFun<float> scaleGain = AudioMath::makeLinearScaler<float>(0, 1);
     AudioMath::ScaleFun<float> scaleOffset = AudioMath::makeLinearScaler<float>(-5, 5);
 
-    // domain starts at 2.
-   // std::shared_ptr<LookupTableParams<float>> exp2Lookup = {ObjectCache<float>::getExp2()};
-
     const static int maxOversample = 16;
     int curOversample = 16;
     void init();
@@ -116,6 +135,14 @@ private:
     int cycleCount = 0;
     Shapes shape = Shapes::Clip;
     int asymCurveindex = 0;
+
+    /**
+     * 4 pole butterworth HP
+     */
+    using Thpf = double;
+    BiquadParams<Thpf, 2> dcBlockParams;
+    BiquadState<Thpf, 2> dcBlockState;
+
 
     void processCV();
     void setOversample();
@@ -162,6 +189,7 @@ const char* Shaper<TBase>::getString(Shapes shape)
 template <class TBase>
 void  Shaper<TBase>::init()
 {
+    onSampleRateChange();
     setOversample();
     tanhLookup = ObjectCache<float>::getTanh5();
 }
@@ -172,6 +200,15 @@ void  Shaper<TBase>::setOversample()
     //   float fc = .25 / float(oversample);
     up.setup(curOversample);
     dec.setup(curOversample);
+}
+
+template <class TBase>
+void  Shaper<TBase>::onSampleRateChange()
+{
+    const float cutoffHz = 20.f;
+    float fcNormalized = cutoffHz * this->engineGetSampleTime();
+    assert((fcNormalized > 0) && (fcNormalized < .1));
+    ButterworthFilterDesigner<Thpf>::designFourPoleHighpass(dcBlockParams, fcNormalized);
 }
 
 template <class TBase>
@@ -201,7 +238,7 @@ void Shaper<TBase>::processCV()
         TBase::params[PARAM_GAIN_TRIM].value);
 
     _gain = 5 * LookupTable<float>::lookup(*audioTaper, _gainInput, false);
-  
+
 
     // -5 .. 5
     const float offsetInput = scaleOffset(
@@ -251,11 +288,14 @@ void  Shaper<TBase>::step()
     } else {
         output = buffer[0];
     }
+
+    if (TBase::params[PARAM_ACDC].value < .5) {
+        output = float(BiquadFilter<Thpf>::run(output, dcBlockState, dcBlockParams));
+    }
     TBase::outputs[OUTPUT_AUDIO].value = output;
-   // printf("in step input = %f, output = %f\n", input, output);
 }
 
-#if 1
+
 template <class TBase>
 void  Shaper<TBase>::processBuffer(float* buffer) const
 {
@@ -264,6 +304,7 @@ void  Shaper<TBase>::processBuffer(float* buffer) const
             for (int i = 0; i < curOversample; ++i) {
                 float x = buffer[i];
                 x = std::abs(x);
+                x *= 1.94f;
                 x = std::min(x, 10.f);
                 buffer[i] = x;
             }
@@ -301,7 +342,7 @@ void  Shaper<TBase>::processBuffer(float* buffer) const
             for (int i = 0; i < curOversample; ++i) {
                 float x = buffer[i];
                 x = std::max(0.f, x);
-                x *= 1.4f;
+                x *= 1.4f * 1.26f;
                 x = std::min(x, 10.f);
                 buffer[i] = x;
             }
@@ -332,52 +373,66 @@ void  Shaper<TBase>::processBuffer(float* buffer) const
         case Shapes::Crush:
         {
             float invGain = 1 + (1 - _gainInput) * 100; //0..10
-            invGain *= .01f;   
+            invGain *= .01f;
             invGain = std::max(invGain, .09f);
-            assert(invGain >=  .09);
+            assert(invGain >= .09);
             for (int i = 0; i < curOversample; ++i) {
                 float x = buffer[i];            // for crush, no gain has been applied
 
-#if 0
-                if (invGain < 1) {
-                    printf("invg gain = %f\n", invGain);
-                    fflush(stdout);
-                    invGain = 1;
-
-                }
-#endif
-             // printf("crush, x=%.2f, gi=%.2f invGain = %.2f", x, _gainInput, invGain);
-
                 x *= invGain;
                 x = std::round(x + .5f) - .5f;
-
-            // printf("invGain = %f, x = %f\n", invGain, x);
-                //  printf(" mult=%.2f", x);
                 x /= invGain;
-             // printf("after div back %f\n", x); fflush(stdout);
-                //   printf(" dv=%.2f\n", x);    fflush(stdout);
                 buffer[i] = x;
             }
         }
         break;
-
-
 
         default:
             assert(false);
     }
 
 }
-#else
+
 template <class TBase>
-void  Shaper<TBase>::step()
+int ShaperDescription<TBase>::getNumParams()
 {
-    float buffer[oversample];
-    float input = TBase::inputs[INPUT_AUDIO].value;
-
-    up.process(buffer, input);
-
-    const float output = dec.process(buffer);
-    TBase::outputs[OUTPUT_AUDIO].value = output;
+    return Shaper<TBase>::NUM_PARAMS;
 }
-#endif
+
+template <class TBase>
+IComposite::Config ShaperDescription<TBase>::getParam(int i)
+{
+    Config ret(0, 1, 0, "");
+
+    switch (i) {
+        case Shaper<TBase>::PARAM_SHAPE:
+            ret = {0,
+                float(Shaper<TBase>::Shapes::Invalid) - 1,
+                0,
+                "Shape"};
+            break;
+
+        case Shaper<TBase>::PARAM_GAIN:
+            ret = {-5, 5, 0, "Gain"};
+            break;
+        case Shaper<TBase>::PARAM_GAIN_TRIM:
+            ret = {-1, 1, 0, "Gain trim"};
+            break;
+        case Shaper<TBase>::PARAM_OFFSET:
+            ret = {-5, 5, 0, "Offset/Bias"};
+            break;
+        case Shaper<TBase>::PARAM_OFFSET_TRIM:
+            ret = {-1, 1, 0, "Offset trim"};
+            break;
+        case Shaper<TBase>::PARAM_OVERSAMPLE:
+            ret = {0.0f, 2.f, 0, "Oversample"};
+            break;
+        case Shaper<TBase>::PARAM_ACDC:
+            ret = {0.0f, 1.f, 0, "AC/DC"};
+            break;
+        default:
+            assert(false);
+    }
+
+    return ret;
+}

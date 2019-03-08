@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg6"
+   viewBox="0 0 6.0 11.160888888888891"
+   height="11.160888888888891mm"
+   width="6.0mm"
+   version="1.1">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <g
+     id="text2"
+     style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+     aria-label="±10">
+    <path
+       id="path14"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="M 1.8843605,0.8076071 H 2.3087099 V 0.62269509 H 1.8843605 V 0.15567374 h -0.206248 v 0.46702135 h -0.42672 V 0.8076071 h 0.42672 v 0.483616 h 0.206248 z M 1.2513925,1.5804445 H 2.3087099 V 1.3955324 H 1.2513925 Z" />
+    <path
+       id="path16"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="M 2.8584823,1.5804445 H 3.195117 V -7.9026198e-4 H 2.9011543 L 2.4033143,0.49942042 2.5953383,0.70092709 2.8584823,0.43304175 Z" />
+    <path
+       id="path18"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="m 3.4301834,0.79101243 c 0,0.40775467 0.2015067,0.81788007 0.6543041,0.81788007 0.4504266,0 0.654304,-0.4101254 0.654304,-0.81788007 0,-0.40775468 -0.2038774,-0.81550936 -0.654304,-0.81550936 -0.4527974,0 -0.6543041,0.40775468 -0.6543041,0.81550936 z m 0.9648614,0 c 0,0.29159197 -0.085344,0.51917597 -0.3105573,0.51917597 -0.2275841,0 -0.3129281,-0.227584 -0.3129281,-0.51917597 0,-0.29159201 0.085344,-0.51680535 0.3129281,-0.51680535 0.2252133,0 0.3105573,0.22521334 0.3105573,0.51680535 z" />
+  </g>
+  <circle
+     id="circle4"
+     stroke="#0044cc"
+     fill="#0044cc"
+     stroke-width="1.0"
+     r="2.5"
+     cy="5.580444444444446"
+     cx="3.0" />
+</svg>

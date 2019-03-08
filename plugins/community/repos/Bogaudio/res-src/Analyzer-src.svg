@@ -37,48 +37,21 @@
 
     <symbol id="knobguide-range" viewBox="0 0 100px 100px">
       <g transform="translate(50.5 50.5)">
-        <g transform="rotate(-210) translate(30 0)">
-          <g transform="translate(2 0) rotate(210)">
-            <text font-size="7pt" transform="translate(-10 4)">0.1</text>
-          </g>
-        </g>
-        <g transform="rotate(-180) translate(30 0)">
-          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(-150) translate(30 0)">
-          <polyline points="0,0 5,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(-120) translate(30 0)">
-          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(-90) translate(30 0)">
-          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(-60) translate(30 0)">
-          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(-30) translate(30 0)">
-          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(0) translate(30 0)">
-          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(30) translate(30 0)">
-          <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
-        </g>
-        <g transform="rotate(60) translate(30 0)">
-          <g transform="translate(2 0) rotate(-60)">
-            <text font-size="7pt" transform="translate(-5 4.5)">1.0</text>
-          </g>
+        <path d="M 0 -32 A 32 32 0 0 1 32 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(15)" />
+        <path d="M 0 -32 A 32 32 0 0 1 32 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(50)" />
+        <path d="M 0 -32 A 32 32 0 0 0 -32 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(-15)" />
+        <path d="M 0 -32 A 32 32 0 0 0 -32 0" stroke="#333" stroke-width="0.5" stroke-linecap="round" fill="none" transform="rotate(-50)" />
+        <g transform="rotate(-90) translate(29 0)">
+          <polyline points="0,0 6,0" stroke-width="1.5" stroke="#333" />
         </g>
       </g>
     </symbol>
 
     <symbol id="knobguide-smooth" viewBox="0 0 100px 100px">
       <g transform="translate(50.5 50.5)">
-        <g transform="rotate(-240) translate(30 0)">
+        <g transform="rotate(-240) translate(31 0)">
           <g transform="translate(2 0) rotate(240)">
-            <text font-size="7pt" transform="translate(-3.2 4)">0</text>
+            <text font-size="7pt" transform="translate(-4 4)">0</text>
           </g>
         </g>
         <g transform="rotate(-210) translate(30 0)">
@@ -108,9 +81,9 @@
         <g transform="rotate(30) translate(30 0)">
           <polyline points="0,0 4,0" stroke-width="0.5" stroke="#333" />
         </g>
-        <g transform="rotate(60) translate(30 0)">
+        <g transform="rotate(60) translate(31 0)">
           <g transform="translate(2 0) rotate(-60)">
-            <text font-size="7pt" transform="translate(-7 4.3)">0.5s</text>
+            <text font-size="7pt" transform="translate(-5 4.3)">0.5s</text>
           </g>
         </g>
       </g>
@@ -156,90 +129,108 @@
     <use id="DISPLAY_WIDGET" xlink:href="#display" />
   </g>
 
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(10 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(82.5 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(155 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(227 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(290 0)" /> -->
+  <!-- <polyline points="0,0 0,380" stroke="#f00" stroke-width="1" fill="none" transform="translate(150 0)" /> -->
   <g transform="translate(0 320)">
-    <g transform="translate(11 0)">
-      <rect width="58" height="40" rx="5" fill="#fafafa" />
-      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
-      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
-      <use id="SIGNALA_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
-      <use id="SIGNALA_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
-      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
-      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    <g transform="translate(10 0)">
+      <rect width="62" height="40" rx="5" fill="#fafafa" />
+      <rect width="23" height="40" rx="5" fill="#bbb" transform="translate(40)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(31)" />
+      <use id="SIGNALA_INPUT" xlink:href="#input" transform="translate(3.5 3)" />
+      <use id="SIGNALA_OUTPUT" xlink:href="#output" transform="translate(34.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(10.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(33.5 36)">THRU</text>
     </g>
 
-    <g transform="translate(84 0)">
-      <rect width="58" height="40" rx="5" fill="#fafafa" />
-      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
-      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
-      <use id="SIGNALB_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
-      <use id="SIGNALB_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
-      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
-      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    <g transform="translate(82.5 0)">
+      <rect width="62" height="40" rx="5" fill="#fafafa" />
+      <rect width="23" height="40" rx="5" fill="#bbb" transform="translate(40)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(31)" />
+      <use id="SIGNALB_INPUT" xlink:href="#input" transform="translate(3.5 3)" />
+      <use id="SIGNALB_OUTPUT" xlink:href="#output" transform="translate(34.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(10.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(33.5 36)">THRU</text>
     </g>
 
-    <g transform="translate(158 0)">
-      <rect width="58" height="40" rx="5" fill="#fafafa" />
-      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
-      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
-      <use id="SIGNALC_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
-      <use id="SIGNALC_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
-      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
-      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    <g transform="translate(155 0)">
+      <rect width="62" height="40" rx="5" fill="#fafafa" />
+      <rect width="23" height="40" rx="5" fill="#bbb" transform="translate(40)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(31)" />
+      <use id="SIGNALC_INPUT" xlink:href="#input" transform="translate(3.5 3)" />
+      <use id="SIGNALC_OUTPUT" xlink:href="#output" transform="translate(34.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(10.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(33.5 36)">THRU</text>
     </g>
 
-    <g transform="translate(231 0)">
-      <rect width="58" height="40" rx="5" fill="#fafafa" />
-      <rect width="21" height="40" rx="5" fill="#bbb" transform="translate(38)" />
-      <rect width="20" height="40" fill="#bbb" transform="translate(29)" />
-      <use id="SIGNALD_INPUT" xlink:href="#input" transform="translate(2.5 3)" />
-      <use id="SIGNALD_OUTPUT" xlink:href="#output" transform="translate(31.5 3)" />
-      <text font-size="6pt" letter-spacing="2px" transform="translate(9.5 36)">IN</text>
-      <text font-size="6pt" letter-spacing="2px" transform="translate(30 36)">THRU</text>
+    <g transform="translate(227 0)">
+      <rect width="62" height="40" rx="5" fill="#fafafa" />
+      <rect width="23" height="40" rx="5" fill="#bbb" transform="translate(40)" />
+      <rect width="20" height="40" fill="#bbb" transform="translate(31)" />
+      <use id="SIGNALD_INPUT" xlink:href="#input" transform="translate(3.5 3)" />
+      <use id="SIGNALD_OUTPUT" xlink:href="#output" transform="translate(34.5 3)" />
+      <text font-size="6pt" letter-spacing="2px" transform="translate(10.5 36)">IN</text>
+      <text font-size="6pt" letter-spacing="2px" transform="translate(33.5 36)">THRU</text>
     </g>
   </g>
 
   <g transform="translate(0 271)">
-    <g transform="translate(35 0)">
-      <use id="RANGE_PARAM" xlink:href="#knob" transform="translate(0 0) scale(0.38)" />
+    <g transform="translate(30 0)">
+      <use id="RANGE2_PARAM" xlink:href="#knob" transform="translate(0 0) scale(0.38)" />
       <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-38 -11)">RANGE</text>
     </g>
 
-    <g transform="translate(109 0)">
+    <g transform="translate(103 0)">
       <use id="SMOOTH_PARAM" xlink:href="#knob" transform="translate(0 0) scale(0.38)" />
       <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-44 -11)">SMOOTH</text>
     </g>
 
-    <g transform="translate(182 0)">
-      <g transform="translate(-3 -1)">
-        <g transform="translate(0 3)">
+    <g transform="translate(175 0)">
+      <g transform="translate(-5 -5)">
+        <g transform="translate(0 1)">
+          <use id="QUALITY_ULTRA_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+          <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">ULTRA</text>
+        </g>
+        <g transform="translate(0 15)">
           <use id="QUALITY_HIGH_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
           <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">HIGH</text>
         </g>
-        <g transform="translate(0 18)">
+        <g transform="translate(0 29)">
           <use id="QUALITY_GOOD_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
           <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">GOOD</text>
         </g>
-        <g transform="translate(9 30)">
+        <g transform="translate(9 40)">
           <use id="QUALITY_PARAM" xlink:href="#button" transform="scale(0.1)" />
         </g>
       </g>
       <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-45 -11)">QUALITY</text>
     </g>
 
-    <g transform="translate(255 0)">
-      <g transform="translate(-3 -1)">
-        <g transform="translate(0 18)">
-          <use id="POWER_ON_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
-          <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">ON</text>
+    <g transform="translate(247 0)">
+      <g transform="translate(-6 -5)">
+        <g transform="translate(0 1)">
+          <use id="WINDOW_NONE_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+          <text font-size="6pt" letter-spacing="2px" transform="translate(9 6.1)">NONE</text>
         </g>
-        <g transform="translate(9 30)">
-          <use id="POWER_PARAM" xlink:href="#button" transform="scale(0.1)" />
+        <g transform="translate(0 15)">
+          <use id="WINDOW_HAMMING_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+          <text font-size="6pt" letter-spacing="0.5px" transform="translate(9 6.1)">HAMMING</text>
+        </g>
+        <g transform="translate(0 29)">
+          <use id="WINDOW_KAISER_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
+          <text font-size="6pt" letter-spacing="1px" transform="translate(9 6.1)">KAISER</text>
+        </g>
+        <g transform="translate(9 40)">
+          <use id="WINDOW_PARAM" xlink:href="#button" transform="scale(0.1)" />
         </g>
       </g>
-      <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-40 -11)">POWER</text>
+      <text font-size="7pt" letter-spacing="2px" transform="rotate(-90) translate(-43.5 -11)">WINDOW</text>
     </g>
   </g>
 
-  <use xlink:href="#knobguide-range" transform=" translate(16.3 252) scale(0.75)" />
-  <use xlink:href="#knobguide-smooth" transform=" translate(90.3 252) scale(0.75)" />
+  <use xlink:href="#knobguide-range" transform=" translate(11.3 252) scale(0.75)" />
+  <use xlink:href="#knobguide-smooth" transform=" translate(84.3 252) scale(0.75)" />
 </svg>

@@ -2,7 +2,7 @@ SLUG=DHE-Modules
 
 include ../../../build_plugin_pre_linux.mk
 
-EXTRAFLAGS+= -Isrc/
+EXTRAFLAGS+= -Iplugin/include
 
 include make.objects
 

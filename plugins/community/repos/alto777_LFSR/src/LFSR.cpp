@@ -28,6 +28,7 @@ RACK_PLUGIN_INIT(alto777_LFSR) {
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/alto777/LFSR");
    RACK_PLUGIN_INIT_MANUAL("https://github.com/alto777/LFSR/README.md");
+   // 0.6.21
 
 	RACK_PLUGIN_MODEL_ADD(alto777_LFSR, FG8);
 	RACK_PLUGIN_MODEL_ADD(alto777_LFSR, Psychtone);

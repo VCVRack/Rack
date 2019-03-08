@@ -13,7 +13,6 @@
 #include "BiquadState.h"
 #include "BiquadState.h"
 
-
 template<typename T, int N>
 static void testState_0()
 {
@@ -41,7 +40,6 @@ static void testState_0()
 template<typename T, int N>
 static void testParam_0()
 {
-
     BiquadParams<T, N> p;
     for (int i = 0; i < N; ++i) {
         assert(p.A2(i) == 0);

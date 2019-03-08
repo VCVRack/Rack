@@ -4,6 +4,7 @@ include $(RACK_DIR)/arch.mk
 
 TEST_SOURCES = $(wildcard test/*.cpp)
 TEST_SOURCES += $(wildcard dsp/**/*.cpp)
+TEST_SOURCES += $(wildcard midi/**/*.cpp)
 TEST_SOURCES += $(wildcard dsp/third-party/falco/*.cpp)
 TEST_SOURCES += $(wildcard sqsrc/**/*.cpp)
 TEST_SOURCES += dsp/third-party/src/minblep.cpp

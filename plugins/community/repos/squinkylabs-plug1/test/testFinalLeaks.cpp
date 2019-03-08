@@ -13,7 +13,7 @@ void testFinalLeaks()
     assertEQ(FFTDataReal::_count, 0);
     assertEQ(FFTDataCpx::_count, 0);
     assertEQ(ThreadSharedState::_dbgCount, 0);
-    assertEQ(ThreadServer::_count, 0);
+    assertEQ(ThreadServer::_instanceCount, 0);
     assertEQ(_numLookupParams, 0);
     assertEQ(_numBiquads, 0)
 }

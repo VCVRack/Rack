@@ -8,7 +8,8 @@
 using Spline = std::vector< std::pair<double, double> >;
 
 
-
+/** Why does this class exist when we also have NonUniformLookupTable?
+*/
 class NonUniformLookup
 {
 public:
@@ -23,8 +24,14 @@ public:
         assert(l != data.end());
         // printf("lower = %f, %f\n", l->first, l->second);
         auto p = l;
+        if (p == data.begin()) {
+            // mac was crashing decrementing past begin
+            assert(l->first == x);
+            return l->second;
+        }
         p--;
         if (p == data.end()) {
+            assert(false);      // should never happen
             assert(l->first == x);
             return l->second;
         }

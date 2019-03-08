@@ -11,11 +11,13 @@ ALL_OBJ= \
 	src/luppolo.o \
 	src/luppolo3.o \
 	src/micromacro.o \
+	src/mrcheb.o \
 	src/multimulti.o \
 	src/oktagon.o \
 	src/osculum.o \
 	src/paramath.o \
 	src/piconoise.o \
+	src/pith.o \
 	src/pusher.o \
 	src/ringo.o \
 	src/scramblase.o \

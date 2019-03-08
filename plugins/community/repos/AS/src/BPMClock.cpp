@@ -161,6 +161,7 @@ void BPMClock::step() {
   time_sig_top = std::round(params[TIMESIGTOP_PARAM].value);
   time_sig_bottom = std::round(params[TIMESIGBOTTOM_PARAM].value);
   time_sig_bottom = std::pow(2,time_sig_bottom+1);
+  
  
   frequency = tempo/60.0f;
 
@@ -195,13 +196,15 @@ void BPMClock::step() {
     if (time_sig_top == time_sig_bottom){
       quarters_count_limit = 4;
       eighths_count_limit = 2;
-      bars_count_limit = 16;    
+      bars_count_limit = 16; 
       clock.setFreq(frequency*4);   
     }else{
+      //clock divisions
       if(time_sig_bottom == 4){
+        //debug("time sig bottom = %i", time_sig_bottom);
         quarters_count_limit = 4;
         eighths_count_limit = 2;
-        bars_count_limit = time_sig_top * 4;  
+        bars_count_limit = time_sig_top * 4; 
         clock.setFreq(frequency*4);
       }
       if(time_sig_bottom == 8){
@@ -330,6 +333,8 @@ struct SigDisplayWidget : TransparentWidget {
 
   SigDisplayWidget() {
     font = Font::load(assetPlugin(plugin, "res/Segment7Standard.ttf"));
+    
+    
   };
 
   void draw(NVGcontext *vg) override

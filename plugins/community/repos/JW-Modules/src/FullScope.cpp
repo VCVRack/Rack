@@ -255,7 +255,8 @@ struct FullScopeDisplay : TransparentWidget {
 
 struct FullScopeWidget : ModuleWidget {
 	Panel *panel;
-	Widget *rightHandle;
+	JWModuleResizeHandle *leftHandle;
+	JWModuleResizeHandle *rightHandle;
 	TransparentWidget *display;
 	FullScopeWidget(FullScope *module);
 	void step() override;
@@ -274,10 +275,9 @@ FullScopeWidget::FullScopeWidget(FullScope *module) : ModuleWidget(module) {
 		addChild(panel);
 	}
 
-	JWModuleResizeHandle *leftHandle = new JWModuleResizeHandle(box.size.x);
-	JWModuleResizeHandle *rightHandle = new JWModuleResizeHandle(box.size.x);
+	leftHandle = new JWModuleResizeHandle(box.size.x);
+	rightHandle = new JWModuleResizeHandle(box.size.x);
 	rightHandle->right = true;
-	this->rightHandle = rightHandle;
 	addChild(leftHandle);
 	addChild(rightHandle);
 
@@ -285,39 +285,42 @@ FullScopeWidget::FullScopeWidget(FullScope *module) : ModuleWidget(module) {
 		FullScopeDisplay *display = new FullScopeDisplay();
 		display->module = module;
 		display->box.pos = Vec(0, 0);
-		display->box.size = Vec(box.size.x, RACK_GRID_HEIGHT);
+		display->box.size = Vec(box.size.x, box.size.y);
 		addChild(display);
 		this->display = display;
 	}
 
-	int compX = -15, adder = 19;
-	addInput(Port::create<TinyPJ301MPort>(Vec(compX+=adder, 360), Port::INPUT, module, FullScope::X_INPUT));
-	addInput(Port::create<TinyPJ301MPort>(Vec(compX+=adder, 360), Port::INPUT, module, FullScope::Y_INPUT));
-	addInput(Port::create<TinyPJ301MPort>(Vec(compX+=adder, 360), Port::INPUT, module, FullScope::COLOR_INPUT));
-	addInput(Port::create<TinyPJ301MPort>(Vec(compX+=adder, 360), Port::INPUT, module, FullScope::ROTATION_INPUT));
-	addInput(Port::create<TinyPJ301MPort>(Vec(compX+=adder, 360), Port::INPUT, module, FullScope::TIME_INPUT));
+	int compX = 5, compY = -15, adder = 20;
+	addInput(Port::create<TinyPJ301MPort>(Vec(compX, compY+=adder), Port::INPUT, module, FullScope::X_INPUT));
+	addInput(Port::create<TinyPJ301MPort>(Vec(compX, compY+=adder), Port::INPUT, module, FullScope::Y_INPUT));
+	addInput(Port::create<TinyPJ301MPort>(Vec(compX, compY+=adder), Port::INPUT, module, FullScope::COLOR_INPUT));
+	addInput(Port::create<TinyPJ301MPort>(Vec(compX, compY+=adder), Port::INPUT, module, FullScope::ROTATION_INPUT));
+	addInput(Port::create<TinyPJ301MPort>(Vec(compX, compY+=adder), Port::INPUT, module, FullScope::TIME_INPUT));
 
-	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX+=adder, 360), module, FullScope::X_POS_PARAM, -10.0, 10.0, 0.0));
-	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX+=adder, 360), module, FullScope::Y_POS_PARAM, -10.0, 10.0, 0.0));
-	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX+=adder, 360), module, FullScope::X_SCALE_PARAM, -2.0, 8.0, 1.0));
-	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX+=adder, 360), module, FullScope::Y_SCALE_PARAM, -2.0, 8.0, 1.0));
-	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX+=adder, 360), module, FullScope::ROTATION_PARAM, -10.0, 10.0, 0));
-	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX+=adder, 360), module, FullScope::TIME_PARAM, -6.0, -16.0, -14.0));
+	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX, compY+=adder), module, FullScope::X_POS_PARAM, -10.0, 10.0, 0.0));
+	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX, compY+=adder), module, FullScope::Y_POS_PARAM, -10.0, 10.0, 0.0));
+	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX, compY+=adder), module, FullScope::X_SCALE_PARAM, -2.0, 8.0, 1.0));
+	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX, compY+=adder), module, FullScope::Y_SCALE_PARAM, -2.0, 8.0, 1.0));
+	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX, compY+=adder), module, FullScope::ROTATION_PARAM, -10.0, 10.0, 0));
+	addParam(ParamWidget::create<JwTinyKnob>(Vec(compX, compY+=adder), module, FullScope::TIME_PARAM, -6.0, -16.0, -14.0));
 
-	addChild(Widget::create<Screw_J>(Vec(compX+25, 362)));
-	addChild(Widget::create<Screw_W>(Vec(compX+40, 362)));
+	addChild(Widget::create<Screw_J>(Vec(compX+2, compY+=adder)));
+	addChild(Widget::create<Screw_W>(Vec(compX+2, compY+=adder-5)));
 }
 
 void FullScopeWidget::step() {
 	panel->box.size = box.size;
-	display->box.size = Vec(box.size.x, RACK_GRID_HEIGHT);
+	display->box.size = Vec(box.size.x, box.size.y);
 	rightHandle->box.pos.x = box.size.x - rightHandle->box.size.x;
+	rightHandle->box.pos.y = box.size.y - rightHandle->box.size.y;
+	leftHandle->box.pos.y = box.size.y - leftHandle->box.size.y;
 	ModuleWidget::step();
 }
 
 json_t *FullScopeWidget::toJson() {
 	json_t *rootJ = ModuleWidget::toJson();
 	json_object_set_new(rootJ, "width", json_real(box.size.x));
+	json_object_set_new(rootJ, "height", json_real(box.size.y));
 	return rootJ;
 }
 
@@ -326,6 +329,9 @@ void FullScopeWidget::fromJson(json_t *rootJ) {
 	json_t *widthJ = json_object_get(rootJ, "width");
 	if (widthJ)
 		box.size.x = json_number_value(widthJ);
+	json_t *heightJ = json_object_get(rootJ, "height");
+	if (heightJ)
+		box.size.y = json_number_value(heightJ);
 }
 
 struct FullScopeLissajousModeMenuItem : MenuItem {

@@ -136,24 +136,43 @@ DynamicKnob* createDynamicKnob(const Vec& pos,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+struct SVGStepSlider : SVGSlider {
+	void step() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dynamic text
+
 struct DynamicText : TransparentWidget {
     std::shared_ptr<std::string> text;
     std::shared_ptr<Font> font;
     int size;
+    float blur;
     int* visibility;
     DynamicViewMode viewMode;
 
     enum ColorMode {
         COLOR_MODE_WHITE = 0,
-        COLOR_MODE_BLACK
+        COLOR_MODE_BLACK,
+        COLOR_MODE_RED
     };
+
+    enum FontMode {
+        FONT_MODE_ALTEDIN = 0,
+        FONT_MODE_7SEG
+    };
+
     int* colorHandle;
     NVGcolor textColor;
+    NVGcolor customColor;
+    NVGalign horzAlignment;
+    NVGalign vertAlignment;
 
     DynamicText();
     virtual void draw(NVGcontext* vg) override;
     void step() override;
+    void setFont(const FontMode& newFontMode);
 };
 
 DynamicText* createDynamicText(const Vec& pos, int size, std::string text,
@@ -273,13 +292,16 @@ DynamicChoice* createDynamicChoice(const Vec& pos,
 
 template<typename T = SVGKnob>
 T *createValleyKnob(Vec pos, Module *module, int paramId, float minValue, float maxValue,
-                    float defaultValue, float minAngle, float maxAngle) {
+                    float defaultValue, float minAngle, float maxAngle, DynamicKnobMotion motion) {
     T *o = Component::create<T>(pos, module);
 	o->paramId = paramId;
 	o->setLimits(minValue, maxValue);
 	o->setDefaultValue(defaultValue);
     o->minAngle = minAngle;
     o->maxAngle = maxAngle;
+    if(motion == SNAP_MOTION) {
+        o->snap = true;
+    }
 	return o;
 }
 

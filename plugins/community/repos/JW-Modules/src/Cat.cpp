@@ -74,21 +74,6 @@ void CatWidget::step() {
 			hairballs[i]->box.pos.y += randomUniform()*10;
 		}
 	}
-
-	if(!bool(cat->params[Cat::BOWL_PARAM].value)){
-		if(randomUniform() < 0.008){
-			WireWidget *wire = RACK_PLUGIN_UI_RACKWIDGET->getFirstDescendantOfType<WireWidget>();
-			if(wire){
-				// printf("wire!!!!! \n");
-				wire->parent->removeChild(wire);
-				wire->inputPort = NULL;
-				wire->outputPort = NULL;
-				wire->updateWire();
-			} else {
-				// printf("no wire :(");
-			}
-		}
-	}
 };
 
 CatWidget::CatWidget(Cat *module) : ModuleWidget(module) {

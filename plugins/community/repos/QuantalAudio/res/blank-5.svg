@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="75" height="380">
+    <g id="base">
+        <path d="M0 0h75v380H0z" fill="#060606"/>
+        <path d="M.3.3h74.4v379.4H0z" fill="#556746"/>
+    </g>
+    <g id="logo">
+        <circle cx="37.5" cy="360" r="7" style="fill: #e6e6e6;"/>
+    	<circle cx="39.5" cy="362" r="5" style="fill: #556746;"/>
+    	<circle cx="41.5" cy="364" r="3" style="fill: #e6e6e6;"/>
+    </g>
+</svg>

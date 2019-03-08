@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="40"
+   height="40.000889"
+   viewBox="0 0 10.583333 10.583569"
+   version="1.1"
+   id="svg5280"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="BarkKnob40.svg">
+  <defs
+     id="defs5274" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="22.4"
+     inkscape:cx="19.550243"
+     inkscape:cy="28.18596"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:snap-global="false" />
+  <metadata
+     id="metadata5277">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-155.88291,-250.73004)">
+    <g
+       id="g6400"
+       transform="matrix(1.025641,0,0,1.025641,-3.996999,-6.700351)">
+      <path
+         style="opacity:1;fill:#373737;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.15036647;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+         d="m 161.03651,251.37485 -0.0264,0.0947 -0.003,-6.6e-4 -1e-5,4.99609 c 2e-5,0.008 0.006,0.0135 0.0141,0.0135 l 0.0422,2e-5 c 0.008,-10e-6 0.0141,-0.006 0.0141,-0.0135 v -4.9961 l -0.003,4.9e-4 -0.0264,-0.0948 z"
+         id="path5072"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.05893935;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+         d="m 161.60321,250.99464 -0.49651,5.25679 -0.12871,9e-5 -0.50058,-5.25254 a 5.1760431,5.1595171 89.977372 0 0 -4.59449,5.14065 5.1760431,5.1595171 89.977372 0 0 5.16138,5.17399 5.1760431,5.1595171 89.977372 0 0 5.15737,-5.17799 5.1760431,5.1595171 89.977372 0 0 -4.59847,-5.14098 z"
+         id="path5074" />
+    </g>
+  </g>
+</svg>

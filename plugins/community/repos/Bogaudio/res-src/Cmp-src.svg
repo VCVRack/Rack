@@ -204,9 +204,17 @@
   <g transform="translate(11 279)">
     <rect width="68" height="77" rx="5" fill="#bbb" />
     <use id="GREATER_OUTPUT" xlink:href="#output" transform="translate(5 4)" />
-    <text font-size="8pt" letter-spacing="2px" style="font-weight: normal" transform="translate(15 36.5)">&gt;</text>
+    <g transform="translate(9 36.5)">
+      <text font-size="5pt" transform="translate(0 0)">A</text>
+      <text font-size="8pt" style="font-weight: normal" transform="translate(6 1)">&gt;</text>
+      <text font-size="5pt" transform="translate(13 0)">B</text>
+    </g>
     <use id="LESS_OUTPUT" xlink:href="#output" transform="translate(39 4)" />
-    <text font-size="8pt" letter-spacing="2px" style="font-weight: normal" transform="translate(48 36.5)">&lt;</text>
+    <g transform="translate(43 36.5)">
+      <text font-size="5pt" transform="translate(0 0)">A</text>
+      <text font-size="8pt" style="font-weight: normal" transform="translate(6 1)">&lt;</text>
+      <text font-size="5pt" transform="translate(13 0)">B</text>
+    </g>
     <use id="EQUAL_OUTPUT" xlink:href="#output" transform="translate(5 40)" />
     <text font-size="5pt" letter-spacing="2px" transform="translate(12 72)">EQ</text>
     <use id="NOT_EQUAL_OUTPUT" xlink:href="#output" transform="translate(39 40)" />

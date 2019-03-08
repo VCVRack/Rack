@@ -18,6 +18,8 @@ RACK_PLUGIN_MODEL_DECLARE(ML_modules, TrigDelay);
 RACK_PLUGIN_MODEL_DECLARE(ML_modules, BPMdetect);
 RACK_PLUGIN_MODEL_DECLARE(ML_modules, VoltMeter);
 RACK_PLUGIN_MODEL_DECLARE(ML_modules, OctaFlop);
+RACK_PLUGIN_MODEL_DECLARE(ML_modules, OctaPlus);
+RACK_PLUGIN_MODEL_DECLARE(ML_modules, OctaTimes);
 RACK_PLUGIN_MODEL_DECLARE(ML_modules, OctaTrig);
 RACK_PLUGIN_MODEL_DECLARE(ML_modules, OctaSwitch);
 RACK_PLUGIN_MODEL_DECLARE(ML_modules, TrigSwitch);
@@ -27,6 +29,9 @@ RACK_PLUGIN_MODEL_DECLARE(ML_modules, TrigSwitch3_2);
 
 RACK_PLUGIN_INIT(ML_modules) {
    RACK_PLUGIN_INIT_ID();
+
+   RACK_PLUGIN_INIT_VERSION("0.6.4");
+   RACK_PLUGIN_INIT_WEBSITE("https://github.com/martin-lueders/ML_modules");
 
  	RACK_PLUGIN_MODEL_ADD(ML_modules, Quantizer);
  	RACK_PLUGIN_MODEL_ADD(ML_modules, Quantum);
@@ -45,6 +50,8 @@ RACK_PLUGIN_INIT(ML_modules) {
 	RACK_PLUGIN_MODEL_ADD(ML_modules, BPMdetect);
 	RACK_PLUGIN_MODEL_ADD(ML_modules, VoltMeter);
 	RACK_PLUGIN_MODEL_ADD(ML_modules, OctaFlop);
+	RACK_PLUGIN_MODEL_ADD(ML_modules, OctaPlus);
+	RACK_PLUGIN_MODEL_ADD(ML_modules, OctaTimes);
 	RACK_PLUGIN_MODEL_ADD(ML_modules, OctaTrig);
 	RACK_PLUGIN_MODEL_ADD(ML_modules, OctaSwitch);
 	RACK_PLUGIN_MODEL_ADD(ML_modules, TrigSwitch);

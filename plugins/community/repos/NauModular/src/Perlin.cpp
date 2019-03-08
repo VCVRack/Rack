@@ -4,6 +4,7 @@
 #include <iostream>
 #include <limits.h>
 #endif
+#include <float.h>
 
 #define FASTFLOOR(x) ( ((x)>0) ? ((int)x) : (((int)x)-1) )
 
@@ -156,6 +157,8 @@ float Perlin::getMixed(float & _val0, float & _val1, float & _mix){
 }
 
 void Perlin::step(){
+    const float maxTime = 511;//FLT_MAX-1000; <-- this needs some more love
+    if(curTime>maxTime)curTime=0;
     float deltaTime = 1.0/engineGetSampleRate();
     curTime += deltaTime;
 /*      
@@ -190,9 +193,7 @@ void Perlin::step(){
     }
 
     mixOctaves(noise);
-
-    //std::cout<<"cippa "<<curTime<<std::endl;
-
+    //std::cout<<"curTime: "<<curTime<<std::endl;
 }
 
 struct PerlinWidget : ModuleWidget{

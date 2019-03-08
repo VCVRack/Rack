@@ -4,8 +4,8 @@
   "name": "Valley",
   "author": "ValleyAudio",
   "license": "GPL-3.0 and BSD-3-Clause",
-  "version": "0.6.0",
-  "manual": "https://github.com/ValleyAudio/ValleyRackFree/",
+  "version": "0.6.10",
+  "manual": "https://valleyaudio.github.io",
   "source": "https://github.com/ValleyAudio/ValleyRackFree/",
   "donation": "https://www.paypal.me/valleyvcv",
   "downloads": {

@@ -13,6 +13,7 @@ RACK_PLUGIN_INIT(Koralfx) {
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/koralfx/Koralfx-Modules");
    RACK_PLUGIN_INIT_MANUAL("https://github.com/koralfx/Koralfx-Modules/blob/master/README.md");
+   // 0.6.9
 
    RACK_PLUGIN_MODEL_ADD(Koralfx, Beatovnik);
    RACK_PLUGIN_MODEL_ADD(Koralfx, Mixovnik);

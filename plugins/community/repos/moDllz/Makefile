@@ -1,5 +1,5 @@
 SLUG = moDllz
-VERSION = 0.6.2
+VERSION = 0.6.6
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=

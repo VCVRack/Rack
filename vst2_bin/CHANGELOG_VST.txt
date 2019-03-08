@@ -1,12 +1,148 @@
 
-** November ??, 2018
-- update cf modules to v0.6.7
+** March 8th, 2019
+- update AmalgamatedHarmonics.* 0.6.1  => 0.6.5
+- update Alikins.*              0.6.0  => 0.6.6
+- update AS.*                   0.6.9  => 0.6.13
+- update Bidoo.*                0.6.10 => 0.6.27
+- update Fundamental.*          0.6.0p => 0.6.2
+- update Bogaudio.*             0.6.7  => 0.6.13
+- update cf.*                   0.6.?  => 0.6.8
+- update computerscare.*        0.6.2  => 0.6.6
+- update DHE-Modules.*          0.6.0  => 0.6.4
+- update Geodesics.*            0.6.1  => 0.6.6
+- update ImpromptuModular.*     0.6.10 => 0.6.16
+- update JW-Modules.*           0.6.1  => 0.6.3
+- update LindenbergResearch.*   0.6.2b => 0.6.4
+- update ML_modules.*           0.6.2  => 0.6.4
+- update moDllz.*               0.6.2  => 0.6.6
+- update modular80.*            0.6.0  => 0.6.4
+- update RJModules.*            0.6.0  => 0.6.1
+- update SonusModular.*         0.6.1  => 0.6.2
+- update Squinkylabs.*          0.6.9  => 0.6.14
+- update Valley.*               0.6.4  => 0.6.16
+- update NauModular.*           0.6.0  => 0.6.1
+- add module arjo_modules.Seq
+- add module arjo_modules.Count
+- add module arjo_modules.Switch
+- add module Alikins.Reference
+- add module Alikins.HoveredValue
+- add module Alikins.InjectValue
+- add module Alikins.ShiftPedal
+- add module Alikins.ValueSaver
+- add module AmalgamatedHarmonics.Arp31
+- add module AmalgamatedHarmonics.Arp32
+- add module AmalgamatedHarmonics.Bombe
+- add module AmalgamatedHarmonics.Chord
+- add module AmalgamatedHarmonics.Galaxy
+- add module AmalgamatedHarmonics.Generative
+- add module AS.Mixer2ch
+- add module AS.Mixer4ch
+- add module AS.BPMCalc2
+- add module AS.ZeroCV2T
+- add module Bark.TrimLFO
+- add module Bark.TrimLFObpm
+- add module Bark.QuadLogic
+- add module Bark.Panel6
+- add module Bark.OneBand
+- add module Bidoo.ZOUMAI
+- add module Bidoo.MS
+- add module Bidoo.EMILE
+- add module Bidoo.GARCON
+- add module Bidoo.PENEQUE
+- add module Bidoo.LIMONADE
+- add module Bidoo.FFILTR
+- add module Bidoo.HCTIP
+- add module Bidoo.REI
+- add module Bidoo.CURT
+- add module Bidoo.BISTROT
+- add module Bogaudio.AnalyzerXL
+- add module Bogaudio.Blank3
+- add module Bogaudio.Blank6
+- add module Bogaudio.Clpr
+- add module Bogaudio.Cmp
+- add module Bogaudio.LLFO
+- add module Bogaudio.Lmtr
+- add module Bogaudio.Mute8
+- add module Bogaudio.Nsgt
+- add module Bogaudio.Pressor
+- add module Bogaudio.Slew
 - add module cf.ALGEBRA
 - add module cf.BUFFER
 - add module cf.CHOKE
+- add module cf.CUTS
 - add module cf.DISTO
 - add module cf.PLAY
 - add module cf.VARIABLE
+- add module DHE-Modules.Func
+- add module DHE-Modules.Func6
+- add module DHE-Modules.Ranger
+- add module DHE-Modules.Tapers
+- add module DHE-Modules.Xycloid
+- add module Edge.WTFDoveVCO
+- add module Edge.K_Rush
+- add module EH_modules.FV1Emu
+- add module Fundamental.Octave
+- add module Geodesics.Entropia
+- add module ImpromptuModular.BigButtonSeq2
+- add module ImpromptuModular.Foundry
+- add module ImpromptuModular.FourView
+- add module ImpromptuModular.Tact1
+- add module JW-Modules.BlankPanelSmall
+- add module JW-Modules.BlankPanelMedium
+- add module JW-Modules.BlankPanelLarge
+- add module LabSeven.LS3340VCO
+- add module LindenbergResearch.Korg35 (WIP)
+- add module LindenbergResearch.DiodeVCF
+- add module LindenbergResearch.Speck (WIP)
+- add module MicMusic.Distortion
+- add module MicMusic.Adder
+- add module ML_modules.OctaPlus
+- add module ML_modules.OctaTimes
+- add module modular80.Nosering
+- add module modular80.RadioMusic
+- add module NauModular.Mrcheb
+- add module NauModular.Pith
+- add module noobhour.Baseliner
+- add module noobhour.Bsl1r
+- add module noobhour.Customscaler
+- add module QuantalAudio.MasterMixer
+- add module QuantalAudio.BufferedMult
+- add module QuantalAudio.UnityMix
+- add module QuantalAudio.DaisyChannel
+- add module QuantalAudio.DaisyMaster
+- add module QuantalAudio.Horsehair
+- add module QuantalAudio.Blank1
+- add module QuantalAudio.Blank3
+- add module QuantalAudio.Blank5
+- add module rcm.CV0to10Module
+- add module rcm.CV5to5Module
+- add module rcm.CVMmtModule
+- add module rcm.CVS0to10Module
+- add module rcm.CVTglModule
+- add module rcm.DuckModule
+- add module rcm.LoadCounter
+- add module rcm.PianoRollModule
+- add module RJModules.ThreeXOSC
+- add module RJModules.BPF
+- add module RJModules.Buffers
+- add module RJModules.Chord
+- add module RJModules.ChordSeq
+- add module RJModules.Glides
+- add module RJModules.MetaKnob
+- add module RJModules.Octaves
+- add module RJModules.RandomFilter
+- add module RJModules.Riser
+- add module Skylights.whatnote
+- add module Skylights.turing
+- add module Skylights.turing_volts
+- add module Skylights.turing_pulse
+- add module Skylights.turing_vactrol
+- add module Squinkylabs.CHBg
+- add module Squinkylabs.KS
+- add module Squinkylabs.Sequencer
+- add module Valley.Amalgam
+- add module Valley.Interzone
+
 
 
 ** October 31st, 2018

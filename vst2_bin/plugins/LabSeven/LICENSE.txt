@@ -1,0 +1,32 @@
+***
+	The LabSeven plugin for VCV Rack is available for free and open source. 
+	If you like it, please consider a donation (https://paypal.me/labseven).
+	Any amount is greatly appreciated. Thanks!
+***
+
+The LabSeven plugin is licensed under the
+	Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+license, referred to as "the license" see 
+	https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+and
+	https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Attribution:
+
+In case an attribution is required according to the license, please mention the relevant
+parts of the LabSeven plugin used by you (what did you take/use?), my name (Gernot Wurst) 
+and the LabSeven URL http://labseven.prospectum.com.
+
+Exceptions:
+
+Exceptions from the restrictions of the license, e.g. commercial use of the plugin or its components,
+may be negotiated individually. Please contact me.
+
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

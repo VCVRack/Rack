@@ -17,6 +17,7 @@
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
++ comes with 825 prebuilt modules
 
 **Windows** version tested in:
   - Eureka (my own work-in-progress VST host)
@@ -27,6 +28,7 @@
   - Jeskola Buzz 1.2 (build 1503 / x64)
   - Bitwig Studio
   - FLStudio
+  - Studio One 4.1.1
   - according to users: works in Nuendo
   - according to users: works in Ableton Live
 
@@ -111,7 +113,7 @@ The binary distribution contains the following (32) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (670) add-on modules are statically linked with the VST plugin:
+The following (793) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -120,6 +122,11 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - Alikins.ColorPanel
  - Alikins.GateLength
  - Alikins.SpecificValue
+ - Alikins.Reference
+ - Alikins.HoveredValue
+ - Alikins.InjectValue
+ - Alikins.ShiftPedal
+ - Alikins.ValueSaver
  - alto777_LFSR.FG8
  - alto777_LFSR.Psychtone
  - alto777_LFSR.Amuse
@@ -137,6 +144,15 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - AmalgamatedHarmonics.ScaleQuantizer
  - AmalgamatedHarmonics.ScaleQuantizer2
  - AmalgamatedHarmonics.SLN
+ - AmalgamatedHarmonics.Arp31
+ - AmalgamatedHarmonics.Arp32
+ - AmalgamatedHarmonics.Bombe
+ - AmalgamatedHarmonics.Chord
+ - AmalgamatedHarmonics.Galaxy
+ - AmalgamatedHarmonics.Generative
+ - arjo_modules.Seq
+ - arjo_modules.Count
+ - arjo_modules.Switch
  - AS.ADSR
  - AS.AtNuVrTr
  - AS.BPMCalc
@@ -175,6 +191,10 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - AS.VCA
  - AS.WaveShaper
  - AS.StereoVUmeter
+ - AS.Mixer2ch
+ - AS.Mixer4ch
+ - AS.BPMCalc2
+ - AS.ZeroCV2T
  - AudibleInstruments.Blinds
  - AudibleInstruments.Braids
  - AudibleInstruments.Branches
@@ -219,6 +239,11 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - BaconMusic.KarplusStrongPoly
  - BaconMusic.ALingADing
  - BaconMusic.Bitulator
+ - Bark.TrimLFO
+ - Bark.TrimLFObpm
+ - Bark.QuadLogic
+ - Bark.Panel6
+ - Bark.OneBand
  - Befaco.ABC
  - Befaco.DualAtenuverter
  - Befaco.EvenVCO
@@ -250,6 +275,17 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - Bidoo.DFUZE
  - Bidoo.OUAIVE
  - Bidoo.RABBIT
+ - Bidoo.ZOUMAI
+ - Bidoo.MS
+ - Bidoo.EMILE
+ - Bidoo.GARCON
+ - Bidoo.PENEQUE
+ - Bidoo.LIMONADE
+ - Bidoo.FFILTR
+ - Bidoo.HCTIP
+ - Bidoo.REI
+ - Bidoo.CURT
+ - Bidoo.BISTROT
  - Bogaudio.VCO
  - Bogaudio.XCO
  - Bogaudio.Additator
@@ -304,6 +340,17 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - BogAudio.AMRM
  - BogAudio.Matrix88
  - BogAudio.UMix
+ - Bogaudio.AnalyzerXL
+ - Bogaudio.Blank3
+ - Bogaudio.Blank6
+ - Bogaudio.Clpr
+ - Bogaudio.Cmp
+ - Bogaudio.LLFO
+ - Bogaudio.Lmtr
+ - Bogaudio.Mute8
+ - Bogaudio.Nsgt
+ - Bogaudio.Pressor
+ - Bogaudio.Slew
  - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ
@@ -323,6 +370,13 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - cf.PATCH
  - cf.LEDS
  - cf.DAVE
+ - cf.ALGEBRA
+ - cf.BUFFER
+ - cf.CHOKE
+ - cf.CUTS
+ - cf.DISTO
+ - cf.PLAY
+ - cf.VARIABLE
  - com-soundchasing-stochasm.Resonator
  - computerscare.ComputerscareDebug
  - computerscare.ComputerscarePatchSequencer
@@ -332,11 +386,19 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - DHE-Modules.Stage
  - DHE-Modules.Swave
  - DHE-Modules.Upstage
+ - DHE-Modules.Func
+ - DHE-Modules.Func6
+ - DHE-Modules.Ranger
+ - DHE-Modules.Tapers
+ - DHE-Modules.Xycloid
  - DrumKit.BD9
  - DrumKit.Snare
  - DrumKit.ClosedHH
  - DrumKit.OpenHH
  - DrumKit.DMX
+ - Edge.WTFDoveVCO
+ - Edge.K_Rush
+ - EH_modules.FV1Emu
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
@@ -375,12 +437,14 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - Fundamental.VCMixer
  - Fundamental.VCO
  - Fundamental.VCO2
+ - Fundamental.Octave
  - Geodesics.BlackHoles
  - Geodesics.Pulsars
  - Geodesics.Branes
  - Geodesics.Ions
  - Geodesics.BlankLogo
  - Geodesics.BlankInfo
+ - Geodesics.Entropia
  - Gratrix.VCO_F1
  - Gratrix.VCO_F2
  - Gratrix.VCF_F1
@@ -433,6 +497,10 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - ImpromptuModular.BigButtonSeq
  - ImpromptuModular.SemiModularSynth
  - ImpromptuModular.BlankPanel
+ - ImpromptuModular.BigButtonSeq2
+ - ImpromptuModular.Foundry
+ - ImpromptuModular.FourView
+ - ImpromptuModular.Tact1
  - JE.SimpleWaveFolder
  - JE.RingModulator
  - JW_Modules.Cat
@@ -446,6 +514,9 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - JW_Modules.ThingThing
  - JW_Modules.WavHead
  - JW_Modules.XYPad
+ - JW-Modules.BlankPanelSmall
+ - JW-Modules.BlankPanelMedium
+ - JW-Modules.BlankPanelLarge
  - Koralfx.Beatovnik
  - Koralfx.Mixovnik
  - Koralfx.Nullovnik4
@@ -453,6 +524,7 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - Koralfx.Presetovnik
  - Koralfx.Quantovnik
  - Koralfx.Scorovnik
+ - LabSeven.LS3340VCO
  - LindenbergResearch.SimpleFilter
  - LindenbergResearch.MS20Filter
  - LindenbergResearch.AlmaFilter
@@ -462,6 +534,9 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - LindenbergResearch.BlankPanelWood
  - LindenbergResearch.VCO
  - LindenbergResearch.Westcoast (preview)
+ - LindenbergResearch.Korg35 (WIP)
+ - LindenbergResearch.DiodeVCF
+ - LindenbergResearch.Speck (WIP)
  - LOGinstruments.constant
  - LOGinstruments.constant2
  - LOGinstruments.Speck
@@ -497,11 +572,17 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - mental.MentalPatchNotes
  - mental.MentalQuadLFO
  - mental.MentalRadioButtons
+ - MicMusic.Distortion
+ - MicMusic.Adder
+ - ML_modules.OctaPlus
+ - ML_modules.OctaTimes
  - moDllz.MIDIPoly
  - moDllz.TwinGlider
  - moDllz.MIDIdualCV
  - moDllz.XBender
  - modular80.Logistiker
+ - modular80.Nosering
+ - modular80.RadioMusic
  - mscHack.MasterClockx4
  - mscHack.Seq_3x16x16
  - mscHack.SEQ_6x32x16
@@ -531,12 +612,6 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - mtsch_plugins.Sum
  - mtsch_plugins.Rationals
  - mtsch_plugins.TriggerPanic
- - NauModular.Tension
- - NauModular.Function
- - NauModular.Perlin
- - NauModular.S_h_it
- - NauModular.BitHammer
- - NauModular.Osc
  - ML_modules.Quantizer
  - ML_modules.Quantum
  - ML_modules.TrigBuf
@@ -560,8 +635,19 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - ML_modules.TrigSwitch2
  - ML_modules.TrigSwitch3
  - ML_modules.TrigSwitch3_2
+ - NauModular.Tension
+ - NauModular.Function
+ - NauModular.Perlin
+ - NauModular.S_h_it
+ - NauModular.BitHammer
+ - NauModular.Osc
+ - NauModular.Mrcheb
+ - NauModular.Pith
  - Nohmad.Noise
  - Nohmad.StrangeAttractors
+ - noobhour.Baseliner
+ - noobhour.Bsl1r
+ - noobhour.Customscaler
  - Ohmer.KlokSpid
  - Ohmer.RKD
  - Ohmer.RKDBRK
@@ -573,15 +659,24 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - Ohmer.BlankPanel8
  - Ohmer.BlankPanel16
  - Ohmer.BlankPanel32
- - add PG-Instruments.PGSEQ3
- - add PG-Instruments.PGPanner
- - add PG-Instruments.PGQuadPanner
- - add PG-Instruments.PGOctPanner
- - add PG-Instruments.PGVCF
- - add PG-Instruments.PGStereoVCF
- - add PG-Instruments.PGEcho
- - add PG-Instruments.PGStereoEcho
- - add PG-Instruments.PGStereoPingPongEcho
+ - PG-Instruments.PGSEQ3
+ - PG-Instruments.PGPanner
+ - PG-Instruments.PGQuadPanner
+ - PG-Instruments.PGOctPanner
+ - PG-Instruments.PGVCF
+ - PG-Instruments.PGStereoVCF
+ - PG-Instruments.PGEcho
+ - PG-Instruments.PGStereoEcho
+ - PG-Instruments.PGStereoPingPongEcho
+ - QuantalAudio.MasterMixer
+ - QuantalAudio.BufferedMult
+ - QuantalAudio.UnityMix
+ - QuantalAudio.DaisyChannel
+ - QuantalAudio.DaisyMaster
+ - QuantalAudio.Horsehair
+ - QuantalAudio.Blank1
+ - QuantalAudio.Blank3
+ - QuantalAudio.Blank5
  - Qwelk.Automaton
  - Qwelk.Byte
  - Qwelk.Chaos
@@ -595,6 +690,14 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - Qwelk.Scaler
  - Qwelk.Wrap
  - Qwelk.XFade
+ - rcm.CV0to10Module
+ - rcm.CV5to5Module
+ - rcm.CVMmtModule
+ - rcm.CVS0to10Module
+ - rcm.CVTglModule
+ - rcm.DuckModule
+ - rcm.LoadCounter
+ - rcm.PianoRollModule
  - RJModules.Supersaw
  - RJModules.TwinLFO
  - RJModules.Noise
@@ -622,7 +725,22 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - RJModules.Splitters
  - RJModules.Displays
  - RJModules.Range
+ - RJModules.ThreeXOSC
+ - RJModules.BPF
+ - RJModules.Buffers
+ - RJModules.Chord
+ - RJModules.ChordSeq
+ - RJModules.Glides
+ - RJModules.MetaKnob
+ - RJModules.Octaves
+ - RJModules.RandomFilter
+ - RJModules.Riser
  - SerialRacker.MidiMultiplexer
+ - Skylights.whatnote
+ - Skylights.turing
+ - Skylights.turing_volts
+ - Skylights.turing_pulse
+ - Skylights.turing_vactrol
  - SonusModular.Addiction
  - SonusModular.Bitter
  - SonusModular.Bymidside
@@ -683,14 +801,19 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - squinkylabs-plug1.DG
  - squinkylabs-plug1.EV
  - squinkylabs-plug1.EV3
+ - squinkylabs-plug1.FunV (crash)
  - squinkylabs-plug1.GMR
  - squinkylabs-plug1.Gray
  - squinkylabs-plug1.LFN
+ - squinkylabs-plug1.Shaper (crash)
  - squinkylabs-plug1.Super
  - squinkylabs-plug1.ThreadBoost
  - squinkylabs-plug1.Tremolo
  - squinkylabs-plug1.Vocal
  - squinkylabs-plug1.VocalFilter
+ - squinkylabs-plug1.CHBg
+ - squinkylabs-plug1.KS
+ - squinkylabs-plug1.Sequencer
  - SubmarineFree.AG104
  - SubmarineFree.AG106
  - SubmarineFree.AO106
@@ -782,6 +905,8 @@ The following (670) add-on modules are statically linked with the VST plugin:
  - Valley.UGraph
  - Valley.Dexter
  - Valley.Plateau
+ - Valley.Amalgam
+ - Valley.Interzone
 
 
 # License

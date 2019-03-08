@@ -1,0 +1,10 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23">
+  <title>Jack</title>
+  <circle cx="11.5" cy="11.5" r="11.5" style="fill: #878787"/>
+  <circle cx="11.5" cy="11.5" r="10.93433" style="fill: #e5e5e5"/>
+  <path d="M11.5,20.64583A9.14583,9.14583,0,1,0,2.35368,11.5,9.14583,9.14583,0,0,0,11.5,20.64583" transform="translate(0)" style="fill: #878787"/>
+  <circle cx="11.49998" cy="11.5" r="8.60165" style="fill: #141414"/>
+  <circle cx="11.49998" cy="11.5" r="7.84375" style="fill: #3d3d3d"/>
+  <path d="M11.5,16.877A5.37671,5.37671,0,1,1,16.877,11.5,5.3767,5.3767,0,0,1,11.5,16.877Z" transform="translate(0)" style="fill: #515151"/>
+  <path d="M11.5,6.689a4.8108,4.8108,0,1,0,4.81055,4.81105v0A4.81646,4.81646,0,0,0,11.5,6.689Z" transform="translate(0)" style="fill: #141414"/>
+</svg>

@@ -107,7 +107,6 @@ struct Matrix88 : Module {
 		NUM_LIGHTS
 	};
 
-	float _inputs[8] {};
 	Saturator _saturators[8];
 
 	Matrix88() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {

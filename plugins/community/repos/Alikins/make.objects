@@ -5,4 +5,10 @@ ALL_OBJ= \
 	./src/GateLength.o \
 	./src/IdleSwitch.o \
 	./src/MomentaryOnButtons.o \
-	./src/SpecificValue.o
+	./src/ParamFloatField.o \
+	./src/Reference.o \
+	./src/HoveredValue.o \
+	./src/InjectValue.o \
+	./src/ShiftPedal.o \
+	./src/SpecificValue.o \
+	./src/ValueSaver.o

@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	./src/Edge.o \
+	./src/K_Rush.o \
+	./src/WTFDoveVCO.o

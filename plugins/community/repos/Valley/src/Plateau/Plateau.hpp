@@ -20,6 +20,10 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
+//
+// Plateau is based on the venerable Dattorro (1997) reverb algorithm.
+// Reference: Dattorro, J. (1997). Effect design part 1: Reverberator and other filters, J. Audio
+// Eng. Soc, 45(9), 660-684.
 
 #ifndef DSJ_PLATEAU_HPP
 #define DSJ_PLATEAU_HPP
@@ -27,6 +31,7 @@
 #include "../Valley.hpp"
 #include "../ValleyComponents.hpp"
 #include "Dattorro.hpp"
+#include "../Common/DSP/NonLinear.hpp"
 #include <vector>
 
 struct Plateau : Module {
@@ -116,8 +121,8 @@ struct Plateau : Module {
     };
 
     // Control positions
-    Vec dryPos = Vec(53.1, 56.1);
-    Vec wetPos = Vec(95.1, 56.1);
+    Vec dryPos = Vec(52.1, 61.6);
+    Vec wetPos = Vec(102.6, 61.6);
     Vec preDelayPos = Vec(80.106, 26.106);
     Vec inputLowDampPos = Vec(53.1, 113.1);
     Vec inputHighDampPos = Vec(95.1, 113.1);
@@ -136,10 +141,10 @@ struct Plateau : Module {
     Vec clearButtonPos = Vec(157.875, 244.85);
 
     // Attenuverter positions
-    Vec dryAttenPos = Vec(29.53, 68.6);
-    Vec wetAttenPos = Vec(131.01, 68.6);
-    Vec inputLowDampAttenPos = Vec(29.53, 109.09);
-    Vec inputHighDampAttenPos = Vec(131.01, 109.09);
+    Vec dryAttenPos = Vec(28.53, 72.6);
+    Vec wetAttenPos = Vec(132.01, 72.6);
+    Vec inputLowDampAttenPos = Vec(29.53, 111.59);
+    Vec inputHighDampAttenPos = Vec(131.01, 111.59);
 
     Vec sizeAttenPos = Vec(5.1, 164.1);
     Vec diffAttenPos = Vec(65.11, 158.51);
@@ -157,10 +162,11 @@ struct Plateau : Module {
     Vec leftOutputPos = Vec(127.395, 28.385);
     Vec rightOutputPos = Vec(154.395, 28.385);
 
-    Vec dryCVPos = Vec(4.395, 73.397);
-    Vec wetCVPos = Vec(154.395, 73.397);
-    Vec inputLowDampCVPos = Vec(4.395, 100.426);
-    Vec inputHighDampCVPos = Vec(154.395, 100.426);
+    Vec dryCVPos = Vec(4.395, 78.397);
+    Vec wetCVPos = Vec(154.395, 78.397);
+    Vec preDelayCVPos = Vec(79.106, 67.0);
+    Vec inputLowDampCVPos = Vec(4.395, 103.926);
+    Vec inputHighDampCVPos = Vec(154.395, 103.926);
 
     Vec sizeCVPos = Vec(4.395, 190.395);
     Vec diffCVPos = Vec(94.395, 157.794);
@@ -180,6 +186,8 @@ struct Plateau : Module {
     const float dryMax = 1.f;
     const float wetMin = 0.f;
     const float wetMax = 1.f;
+    const float preDelayNormSens = 0.1f;
+    const float preDelayLowSens = 0.05f;
     const float sizeMin = 0.0025f;
     const float sizeMax = 4.0f;
     const float diffMin = 0.f;
@@ -199,9 +207,12 @@ struct Plateau : Module {
 
     float wet;
     float dry;
+    float preDelay;
+    float preDelayCVSens;
     float size;
     float diffusion;
     float decay;
+    float inputSensitivity;
     float inputDampLow;
     float inputDampHigh;
     float reverbDampLow;
@@ -217,10 +228,14 @@ struct Plateau : Module {
     bool frozen;
     bool tunedButtonState;
     bool diffuseButtonState;
+    int preDelayCVSensState;
+    int inputSensitivityState;
+    int outputSaturationState;
 
     int clear;
     bool cleared;
 
+    float leftInput, rightInput;
     Dattorro reverb;
 
     int panelStyle = 0;
@@ -238,6 +253,27 @@ struct Plateau : Module {
 struct PlateauPanelStyleItem : MenuItem {
     Plateau* module;
     int panelStyle;
+    void onAction(EventAction &e) override;
+    void step() override;
+};
+
+struct PlateauPreDelayCVSensItem : MenuItem {
+    Plateau* module;
+    int preDelayCVSensState;
+    void onAction(EventAction &e) override;
+    void step() override;
+};
+
+struct PlateauInputSensItem : MenuItem {
+    Plateau* module;
+    int inputSensitivityState;
+    void onAction(EventAction &e) override;
+    void step() override;
+};
+
+struct PlateauOutputSaturationItem : MenuItem {
+    Plateau* module;
+    int outputSaturationState;
     void onAction(EventAction &e) override;
     void step() override;
 };

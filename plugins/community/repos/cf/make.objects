@@ -3,6 +3,7 @@ COMMON_OBJ= \
    src/BUFFER.o \
    src/CHOKE.o \
 	src/CUBE.o \
+	src/CUTS.o \
 	src/DAVE.o \
 	src/DISTO.o \
 	src/EACH.o \

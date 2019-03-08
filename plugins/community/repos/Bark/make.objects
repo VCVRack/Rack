@@ -1,0 +1,8 @@
+ALL_OBJ= \
+	./src/Bark.o \
+	./src/BarkPanel6.o \
+	./src/dependancies/filt/biquad.o \
+	./src/dependancies/filt/lp24.o \
+	./src/OneBand.o \
+	./src/QuadLogic.o \
+	./src/TrimLFO.o

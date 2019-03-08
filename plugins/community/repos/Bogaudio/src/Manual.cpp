@@ -74,7 +74,7 @@ struct ManualWidget : ModuleWidget {
 		Manual* manual = dynamic_cast<Manual*>(module);
 		assert(manual);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new TriggerOnLoadMenuItem(manual, "Trigger on Load"));
+		menu->addChild(new TriggerOnLoadMenuItem(manual, "Trigger on load"));
 	}
 };
 

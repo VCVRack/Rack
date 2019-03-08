@@ -15,6 +15,18 @@ struct BidooBlueKnob : RoundKnob {
 	}
 };
 
+struct BidooGreenKnob : RoundKnob {
+	BidooGreenKnob() {
+		setSVG(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/GreenKnobBidoo.svg")));
+	}
+};
+
+struct BidooRedKnob : RoundKnob {
+	BidooRedKnob() {
+		setSVG(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/RedKnobBidoo.svg")));
+	}
+};
+
 struct BidooHugeBlueKnob : RoundKnob {
 	BidooHugeBlueKnob() {
 		setSVG(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/HugeBlueKnobBidoo.svg")));
@@ -39,6 +51,14 @@ struct BidooBlueSnapKnob : RoundBlackSnapKnob  {
 	}
 };
 
+struct BidooBlueSnapTrimpot : Trimpot  {
+	BidooBlueSnapTrimpot() {
+		setSVG(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/BlueTrimpotBidoo.svg")));
+		snap = true;
+		smooth = false;
+	}
+};
+
 struct BidooBlueTrimpot : Trimpot {
 	BidooBlueTrimpot() {
 		setSVG(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/BlueTrimpotBidoo.svg")));
@@ -49,6 +69,88 @@ struct BlueCKD6 : SVGSwitch, MomentarySwitch {
 	BlueCKD6() {
 		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/BlueCKD6_0.svg")));
 		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/BlueCKD6_1.svg")));
+	}
+};
+
+struct BlueBtn : SVGSwitch, MomentarySwitch {
+	string caption;
+	shared_ptr<Font> font;
+
+	BlueBtn() {
+		font = Font::load(assetPlugin(plugin, "res/DejaVuSansMono.ttf"));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/BlueBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/BlueBtn_1.svg")));
+	}
+
+	void draw(NVGcontext *vg) override {
+		SVGSwitch::draw(vg);
+		nvgFontSize(vg, 12.0f);
+		nvgFontFaceId(vg, font->handle);
+		nvgTextAlign(vg, NVG_ALIGN_CENTER);
+		nvgText(vg, 8.0f, 12.0f, (caption).c_str(), NULL);
+		nvgStroke(vg);
+	}
+};
+
+struct RedBtn : SVGSwitch, MomentarySwitch {
+	string caption;
+	shared_ptr<Font> font;
+
+	RedBtn() {
+		font = Font::load(assetPlugin(plugin, "res/DejaVuSansMono.ttf"));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/RedBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/RedBtn_1.svg")));
+	}
+
+	void draw(NVGcontext *vg) override {
+		SVGSwitch::draw(vg);
+		nvgFontSize(vg, 12.0f);
+		nvgFontFaceId(vg, font->handle);
+		nvgTextAlign(vg, NVG_ALIGN_CENTER);
+		nvgText(vg, 8.0f, 12.0f, (caption).c_str(), NULL);
+		nvgStroke(vg);
+	}
+};
+
+struct MuteBtn : SVGSwitch, MomentarySwitch {
+	MuteBtn() {
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/MuteBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/MuteBtn_1.svg")));
+	}
+};
+
+struct SoloBtn : SVGSwitch, MomentarySwitch {
+	SoloBtn() {
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/SoloBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/SoloBtn_1.svg")));
+	}
+};
+
+struct LeftBtn : SVGSwitch, MomentarySwitch {
+	LeftBtn() {
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/LeftBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/LeftBtn_1.svg")));
+	}
+};
+
+struct RightBtn : SVGSwitch, MomentarySwitch {
+	RightBtn() {
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/RightBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/RightBtn_1.svg")));
+	}
+};
+
+struct UpBtn : SVGSwitch, MomentarySwitch {
+	UpBtn() {
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/UpBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/UpBtn_1.svg")));
+	}
+};
+
+struct DownBtn : SVGSwitch, MomentarySwitch {
+	DownBtn() {
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/DownBtn_0.svg")));
+		addFrame(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/DownBtn_1.svg")));
 	}
 };
 

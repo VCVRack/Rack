@@ -1,0 +1,43 @@
+{
+	"slug": "squinkylabs-plug1",
+	"name": "Squinky Labs",
+	"author": "Squinky Labs",
+	"license": "CC0-1.0",
+	"authorEmail": "contact@vcvrack.com",
+	"authorUrl": "https://github.com/squinkylabs/SquinkyVCV/README.md",
+	"sourceUrl": "https://github.com/squinkylabs/SquinkyVCV",
+	"version": "1.0.0",
+	"modules": {
+		"fun1": {
+			"name": "fun1",
+			"description": "A multi-function VCO with low aliasing",
+			"tags": ["VCO"],
+			"manualUrl":  "https://github.com/squinkylabs/SquinkyVCV/blob/master/docs/functional-vco-1.md"
+		},
+		"lfn": {
+			"name": "lfn",
+			"description": "Low frequency random voltage generator",
+			"tags": ["NOISE", "RANDOM", "LFO"]
+		},
+		"growler": {
+			"name": "growler",
+			"description": "Formants: Vocal Filter",
+			"tags":  ["EFFECT", "FILTER"]
+		},
+		"cheby": {
+			"name": "cheby",
+			"description": "Chebyshev II: Waveshaper VCO",
+			"tags": ["VCO"]
+		},
+		"shaper": {
+			"name": "shaper",
+			"description": "Shaper: Precision Wave Shaper",
+			"tags": ["EFFECT", "OSCILLATOR", "WAVESHAPER"]
+		},
+		"gray": {
+			"name": "gray",
+			"description": "Gray Code: Eclectic clock divider",
+			"tags": [ "CLOCK_MODULATOR", "RANDOM"]
+		}
+	}
+}

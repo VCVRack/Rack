@@ -11,7 +11,6 @@ namespace bogaudio {
 
 struct UMix : Module {
 	enum ParamsIds {
-		MODE_PARAM,
 		LEVEL_PARAM,
 		NUM_PARAMS
 	};
@@ -23,6 +22,8 @@ struct UMix : Module {
 		IN4_INPUT,
 		IN5_INPUT,
 		IN6_INPUT,
+		IN7_INPUT,
+		IN8_INPUT,
 		NUM_INPUTS
 	};
 
@@ -35,11 +36,14 @@ struct UMix : Module {
 		NUM_LIGHTS
 	};
 
+	bool _sum = true;
 	Saturator _saturator;
 
 	UMix() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 	}
 
+	json_t* toJson() override;
+	void fromJson(json_t* root) override;
 	void step() override;
 };
 

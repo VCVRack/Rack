@@ -9,83 +9,85 @@
 
 namespace dsp {
 
-   /**
-    * @brief Basic WaveShaper class with build-in dynamic oversampling
-    * @tparam OVERSAMPLE
-    */
-   struct WaveShaper : DSPEffect {
-      /* oversampling channel */
-      static const int STD_CHANNEL = 0;
-      static constexpr double SHAPER_MAX_BIAS = 12.0; // +/- 5V
+/**
+ * @brief Basic WaveShaper class with build-in dynamic oversampling
+ * @tparam OVERSAMPLE
+ */
+struct WaveShaper : DSPEffect {
+    /* oversampling channel */
+    static const int STD_CHANNEL = 0;
+    static constexpr double SHAPER_MAX_BIAS = 12.0; // +/- 5V
 
-   protected:
-      Resampler<1> *rs;
+protected:
+    Resampler<1> *rs;
 
-      DCBlocker *dc = new DCBlocker(DCBLOCK_ALPHA);
-      HQTanh *tanh1;
-      bool blockDC = false;
+    DCBlocker *dc = new DCBlocker(DCBLOCK_ALPHA);
+    HQTanh *tanh1;
+    bool blockDC = false;
 
-      double in, gain, bias, k;
-      double out;
-      Vec amp;
+    double in, gain, bias, k;
+    double out;
+    Vec amp;
 
-   public:
+public:
 
-      WaveShaper(float sr);
+    WaveShaper(float sr);
 
-      double getIn() const;
-      void setIn(double in);
-      double getGain() const;
-      void setGain(double gain);
-      double getBias() const;
-      void setBias(double bias);
-      double getK() const;
-      void setK(double k);
-      double getOut() const;
-      void setOut(double out);
-
-
-      /**
-       * @brief Returns the actual sample-rate which is used by oversampled computation
-       * @return
-       */
-      double getOversampledRate() {
-         return sr * rs->getFactor();
-      }
+    double getIn() const;
+    void setIn(double in);
+    double getGain() const;
+    void setGain(double gain);
+    double getBias() const;
+    void setBias(double bias);
+    double getK() const;
+    void setK(double k);
+    double getOut() const;
+    void setOut(double out);
 
 
-      void setAmplitude(double kpos, double kneg) {
-         amp = Vec(kpos, kneg);
-      }
+    /**
+     * @brief Returns the actual sample-rate which is used by oversampled computation
+     * @return
+     */
+    double getOversampledRate() {
+        return sr * rs->getFactor();
+    }
 
 
-      const Vec &getAmplitude() const;
-
-      bool isBlockDC() const;
-      void setBlockDC(bool blockDC);
-
-      /**
-       * @brief Implements the oversamping of compute method
-       */
-      void process() override;
+    void setAmplitude(double kpos, double kneg) {
+        amp = Vec(kpos, kneg);
+    }
 
 
-      void init() override {
-         gain = 0;
-         out = 0;
-         k = 0;
-         bias = 0;
-         amp = Vec(0, 0);
-      }
+    const Vec &getAmplitude() const;
+
+    bool isBlockDC() const;
+    void setBlockDC(bool blockDC);
+
+    /**
+     * @brief Implements the oversamping of compute method
+     */
+    void process() override;
 
 
-      /**
-       * @brief To be implemented by subclass, automaticaly oversampled
-       *
-       * @param x Input sample
-       * @return Output sample
-       */
-      virtual double compute(double x) { return x; }
-   };
+    void init() override {
+        gain = 0;
+        out = 0;
+        k = 0;
+        bias = 0;
+        amp = Vec(0, 0);
+    }
+
+
+    /**
+     * @brief To be implemented by subclass, automaticaly oversampled
+     *
+     * @param x Input sample
+     * @return Output sample
+     */
+    virtual double compute(double x) { return x; }
+};
+
 
 }
+

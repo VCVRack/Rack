@@ -120,7 +120,7 @@ struct DADSRHPlusWidget : ModuleWidget {
 		DADSRHPlus* dadsrhPlus = dynamic_cast<DADSRHPlus*>(module);
 		assert(dadsrhPlus);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new TriggerOnLoadMenuItem(dadsrhPlus, "Resume Loop on Load"));
+		menu->addChild(new TriggerOnLoadMenuItem(dadsrhPlus, "Resume loop on load"));
 	}
 };
 

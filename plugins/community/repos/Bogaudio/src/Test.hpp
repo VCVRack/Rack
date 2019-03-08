@@ -212,7 +212,7 @@ struct Test : Module {
 	PucketteEnvelopeFollower _pef;
 #elif RAVG
 	RunningAverage _average;
-	SchmittTrigger _reset;
+	Trigger _reset;
 #elif SATURATOR
 	Saturator _saturator;
 #endif

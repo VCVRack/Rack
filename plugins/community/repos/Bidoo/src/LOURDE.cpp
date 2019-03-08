@@ -57,18 +57,14 @@ struct LabelDisplayWidget : TransparentWidget {
   void draw(NVGcontext *vg) override
   {
       // text
-    nvgFontSize(vg, 18);
-    nvgFontFaceId(vg, font->handle);
-    nvgTextLetterSpacing(vg, 2.0);
-
 		char display[128];
 		snprintf(display, sizeof(display), "%2.2f", *value);
-		nvgFontSize(vg, 12.0f);
+		nvgFontSize(vg, 14.0f);
 		nvgFontFaceId(vg, font->handle);
 		nvgTextLetterSpacing(vg, -2.0f);
-		nvgFillColor(vg, BLUE_BIDOO);
+		nvgFillColor(vg, YELLOW_BIDOO);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgRotate(vg,-45.0f);
+		nvgRotate(vg,-1.0f * M_PI_2);
 		nvgText(vg, 0.0f, 0.0f, display, NULL);
 
   }
@@ -96,24 +92,24 @@ struct LOURDEWidget : ModuleWidget {
     addParam(ParamWidget::create<BidooBlueKnob>(Vec(22.5,190), module, LOURDE::WEIGHT3, -5.0f, 5.0f, 0.0f));
 
 		LabelDisplayWidget *displayW1 = new LabelDisplayWidget();
-		displayW1->box.pos = Vec(20,55);
+		displayW1->box.pos = Vec(15,65);
 		displayW1->value = &module->params[LOURDE::WEIGHT1].value;
 		addChild(displayW1);
 
 		LabelDisplayWidget *displayW2 = new LabelDisplayWidget();
-		displayW2->box.pos = Vec(20,125);
+		displayW2->box.pos = Vec(15,135);
 		displayW2->value = &module->params[LOURDE::WEIGHT2].value;
 		addChild(displayW2);
 
 		LabelDisplayWidget *displayW3 = new LabelDisplayWidget();
-		displayW3->box.pos = Vec(20,195);
+		displayW3->box.pos = Vec(15,205);
 		displayW3->value = &module->params[LOURDE::WEIGHT3].value;
 		addChild(displayW3);
 
     addParam(ParamWidget::create<BidooBlueKnob>(Vec(22.5,270), module, LOURDE::OUTFLOOR, -10.0f, 10.0f, 0.0f));
 
 		LabelDisplayWidget *displayOF = new LabelDisplayWidget();
-		displayOF->box.pos = Vec(20,275);
+		displayOF->box.pos = Vec(15,285);
 		displayOF->value = &module->params[LOURDE::OUTFLOOR].value;
 		addChild(displayOF);
 

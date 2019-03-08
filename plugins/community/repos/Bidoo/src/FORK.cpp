@@ -141,7 +141,7 @@ void FORK::step() {
 	 +0.7f*a2*(f0/f2)*formant(p0,120.0f*un_f0)*porteuse(f2*un_f0,p0)
 	 +     a3*(f0/f3)*formant(p0,150.0f*un_f0)*porteuse(f3*un_f0,p0)
 	 +     a4*(f0/f4)*formant(p0,300.0f*un_f0)*porteuse(f4*un_f0,p0);
-	outputs[SIGNAL_OUTPUT].value =10.0f*out;
+	outputs[SIGNAL_OUTPUT].value = 5.0f*out;
 }
 
 struct FORKWidget : ModuleWidget {

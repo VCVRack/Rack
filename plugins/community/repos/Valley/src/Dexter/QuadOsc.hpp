@@ -13,59 +13,7 @@
 #include <cmath>
 #include <cstdint>
 #include <vector>
-
-#ifdef _WIN32
-    inline void* aligned_alloc_16(size_t __size) {
-        return _aligned_malloc(__size, 16);
-    }
-
-    inline void aligned_free_16(void* ptr) {
-        _aligned_free(ptr);
-    }
-#elif __APPLE__
-    inline void* aligned_alloc_16(size_t __size) {
-        return malloc(__size);
-    }
-
-    inline void aligned_free_16(void* ptr) {
-        free(ptr);
-    }
-#elif __linux__
-    inline void* aligned_alloc_16(size_t __size) {
-        return aligned_alloc(16, __size);
-    }
-
-    inline void aligned_free_16(void* ptr) {
-        free(ptr);
-    }
-#endif
-
-inline __m128 _mm_linterp_ps(const __m128& a, const __m128& b, const __m128& frac) {
-    return _mm_add_ps(a, _mm_mul_ps(frac, _mm_sub_ps(b, a)));
-}
-
-inline __m128 _mm_abs_ps(const __m128& a) {
-    __m128 mask = _mm_castsi128_ps(_mm_set1_epi32(0x7FFFFFFF));
-    return _mm_and_ps(a,mask);
-}
-
-inline __m128 _mm_switch_ps(const __m128& a, const __m128& b, const __m128& cond) {
-    return _mm_or_ps(_mm_andnot_ps(cond, a), _mm_and_ps(cond, b));
-}
-
-inline __m128i _mm_switch_int32(const __m128i& a, const __m128i& b, const __m128i& cond) {
-    return _mm_or_si128(_mm_andnot_si128(cond, a), _mm_and_si128(cond, b));
-}
-
-inline __m128 _mm_clamp_ps(const __m128& a, const __m128& min, const __m128& max) {
-    return _mm_min_ps(_mm_max_ps(a, min), max);
-}
-
-inline __m128i _mm_clamp_int32(const __m128i& a, const __m128i& min, const __m128i& max) {
-    return _mm_switch_int32(_mm_switch_int32(a, min, _mm_cmplt_epi32(a, min)), max, _mm_cmpgt_epi32(a, max));
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../Common/SIMD/SIMDUtilities.hpp"
 
 class Shaper {
 public:

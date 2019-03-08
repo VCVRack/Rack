@@ -1,0 +1,17 @@
+#include "Edge.hpp"
+
+using namespace rack_plugin_Edge;
+
+RACK_PLUGIN_MODEL_DECLARE(Edge, WTFDoveVCO);
+// RACK_PLUGIN_MODEL_DECLARE(Edge, WTFDoveVCO_IIR);
+RACK_PLUGIN_MODEL_DECLARE(Edge, K_Rush);
+
+RACK_PLUGIN_INIT(Edge) {
+   RACK_PLUGIN_INIT_ID();
+   RACK_PLUGIN_INIT_VERSION("0.6.3");
+   RACK_PLUGIN_INIT_WEBSITE("https://github.com/Edge-Modules/Edge/");
+
+	RACK_PLUGIN_MODEL_ADD(Edge, WTFDoveVCO);
+	// RACK_PLUGIN_MODEL_ADD(Edge, WTFDoveVCO_IIR);
+	RACK_PLUGIN_MODEL_ADD(Edge, K_Rush);
+}

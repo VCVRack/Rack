@@ -62,8 +62,10 @@ struct SampleRateConverter {
 		if (channels > 0 && inRate != outRate) {
 			int err;
 			st = speex_resampler_init(channels, inRate, outRate, quality, &err);
+#if 0
 			assert(st);
 			assert(err == RESAMPLER_ERR_SUCCESS);
+#endif
 
 			speex_resampler_set_input_stride(st, CHANNELS);
 			speex_resampler_set_output_stride(st, CHANNELS);
@@ -72,10 +74,12 @@ struct SampleRateConverter {
 
 	/** `in` and `out` are interlaced with the number of channels */
 	void process(const Frame<CHANNELS> *in, int *inFrames, Frame<CHANNELS> *out, int *outFrames) {
+#if 0
 		assert(in);
 		assert(inFrames);
 		assert(out);
 		assert(outFrames);
+#endif
 		if (st) {
 			// Resample each channel at a time
 			spx_uint32_t inLen;
@@ -84,7 +88,9 @@ struct SampleRateConverter {
 				inLen = *inFrames;
 				outLen = *outFrames;
 				int err = speex_resampler_process_float(st, i, ((const float*) in) + i, &inLen, ((float*) out) + i, &outLen);
+#if 0
 				assert(err == RESAMPLER_ERR_SUCCESS);
+#endif
 			}
 			*inFrames = inLen;
 			*outFrames = outLen;

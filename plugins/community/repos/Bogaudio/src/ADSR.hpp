@@ -39,7 +39,7 @@ struct ADSR : Module {
 	const int modulationSteps = 100;
 	int _modulationStep = 0;
 	bool _linearMode = false;
-	SchmittTrigger _gateTrigger;
+	Trigger _gateTrigger;
 	bogaudio::dsp::ADSR _envelope;
 
 	ADSR() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {

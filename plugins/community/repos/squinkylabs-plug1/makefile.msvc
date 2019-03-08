@@ -2,12 +2,25 @@ SLUG=squinkylabs-plug1
 
 include ../../../build_plugin_pre_msvc.mk
 
-EXTRAFLAGS += -Icomposites/ -Idsp/utils/ -Idsp/third-party/kiss_fft130/ -Idsp/third-party/kiss_fft130/tools/ -Idsp/third-party/src -Isqsrc/util/ -Isqsrc/thread/ -Idsp/third-party/falco/ -Idsp/generators/ -Idsp/filters/ -Idsp/fft/ -Isqsrc/clock/ -Isqsrc/grammar -Isqsrc/delay
+EXTRAFLAGS += -Icomposites/ -Idsp/utils/ -Idsp/third-party/kiss_fft130/ -Idsp/third-party/kiss_fft130/tools/ -Idsp/third-party/src -Isqsrc/util/ -Isqsrc/thread/ -Idsp/third-party/falco/ -Idsp/generators/ -Idsp/filters/ -Idsp/fft/ -Isqsrc/clock/ -Isqsrc/grammar -Isqsrc/delay -Isrc/third-party/ -Imidi/model/ -Imidi/view/ -Imidi/controller/ -Iutil/
 #EXTRAFLAGS += -D_CHB
 #EXTRAFLAGS += -D_DG
 #EXTRAFLAGS += -D_EV3
 #EXTRAFLAGS += -D_EV
 #EXTRAFLAGS += -D_GMR
+EXTRAFLAGS += -D_BOOTY
+# EXTRAFLAGS += -D_CH10
+EXTRAFLAGS += -D_CHBG
+EXTRAFLAGS += -D_FUN
+EXTRAFLAGS += -D_GRAY
+EXTRAFLAGS += -D_KS
+EXTRAFLAGS += -D_LFN
+EXTRAFLAGS += -D_SEQ
+EXTRAFLAGS += -D_SHAPER
+# EXTRAFLAGS += -D_SUPER
+EXTRAFLAGS += -D_TREM
+EXTRAFLAGS += -D_FORMANTS
+EXTRAFLAGS += -D_GROWLER
 
 include make.objects
 

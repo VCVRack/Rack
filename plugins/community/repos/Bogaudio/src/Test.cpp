@@ -277,6 +277,7 @@ void Test::step() {
 	_saw.setQuality(quality);
 	_decimator.setParams(sampleRate, FACTOR);
 	_interpolator.setParams(sampleRate, FACTOR);
+
 	if (_steps >= FACTOR) {
 		_steps = 0;
 		for (int i = 0; i < FACTOR; ++i) {

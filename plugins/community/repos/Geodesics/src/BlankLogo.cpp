@@ -57,7 +57,7 @@ struct BlankLogo : Module {
 	float song[5] = {7.0f/12.0f, 9.0f/12.0f, 5.0f/12.0f, 5.0f/12.0f - 1.0f, 0.0f/12.0f};
 
 	LowFrequencyOscillator oscillatorClk;
-	SchmittTrigger clkTrigger;
+	Trigger clkTrigger;
 	
 	
 	BlankLogo() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
@@ -144,7 +144,7 @@ struct BlankLogoWidget : ModuleWidget {
 		darkItem->text = darkPanelID;// Geodesics.hpp
 		darkItem->module = module;
 		darkItem->theme = 1;
-		//menu->addChild(darkItem);
+		menu->addChild(darkItem);
 
 		return menu;
 	}	
@@ -153,8 +153,8 @@ struct BlankLogoWidget : ModuleWidget {
 	BlankLogoWidget(BlankLogo *module) : ModuleWidget(module) {
 		// Main panel from Inkscape
         DynamicSVGPanel *panel = new DynamicSVGPanel();
-        panel->addPanel(SVG::load(assetPlugin(plugin, "res/light/BlankLogoBG-01.svg")));
-        //panel->addPanel(SVG::load(assetPlugin(plugin, "res/dark/BlankLogo-02.svg")));// no dark pannel for now
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/WhiteLight/BlankLogo-WL.svg")));
+        panel->addPanel(SVG::load(assetPlugin(plugin, "res/DarkMatter/BlankLogo-DM.svg")));
         box.size = panel->box.size;
         panel->mode = &module->panelTheme;
         addChild(panel);
@@ -162,7 +162,7 @@ struct BlankLogoWidget : ModuleWidget {
 		// Screws
 		// part of svg panel, no code required
 		
-		addParam(createParamCentered<BlankCKnob>(Vec(29.5f,74.2f), module, BlankLogo::CLK_FREQ_PARAM, -2.0f, 4.0f, 1.0f));// 120 BMP when default value
+		addParam(createDynamicParam<BlankCKnob>(Vec(29.5f,74.2f), module, BlankLogo::CLK_FREQ_PARAM, -2.0f, 4.0f, 1.0f, &module->panelTheme));// 120 BMP when default value
 		addOutput(createOutputCentered<BlankPort>(Vec(29.5f,187.5f), module, BlankLogo::OUT_OUTPUT));
 		
 	}

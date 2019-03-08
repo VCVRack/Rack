@@ -212,6 +212,7 @@ void CANARD::step() {
 			mylock.lock();
 			playBuffer[0].clear();
 			playBuffer[1].clear();
+			totalSampleCount = 0;
 			slices.clear();
 			mylock.unlock();
 			lastPath = "";
@@ -275,7 +276,6 @@ void CANARD::step() {
 
 		if (recordTrigger.process(inputs[RECORD_INPUT].value + params[RECORD_PARAM].value))
 		{
-			lights[REC_LIGHT].value = 10.0f;
 			if(record) {
 				if (floor(params[MODE_PARAM].value) == 0) {
 					mylock.lock();
@@ -312,6 +312,7 @@ void CANARD::step() {
 		}
 
 		if (record) {
+			lights[REC_LIGHT].value = 10.0f;
 			mylock.lock();
 			recordBuffer[0].push_back(inputs[INL_INPUT].value/10);
 			recordBuffer[1].push_back(inputs[INR_INPUT].value/10);
@@ -420,8 +421,8 @@ void CANARD::step() {
 				else
 					fadeCoeff = 1.0f;
 
-				outputs[OUTL_OUTPUT].value = playBuffer[0][floor(samplePos)]*fadeCoeff*10;
-				outputs[OUTR_OUTPUT].value = playBuffer[1][floor(samplePos)]*fadeCoeff*10;
+				outputs[OUTL_OUTPUT].value = playBuffer[0][floor(samplePos)]*fadeCoeff*5;
+				outputs[OUTR_OUTPUT].value = playBuffer[1][floor(samplePos)]*fadeCoeff*5;
 			}
 		}
 		else {
@@ -504,12 +505,12 @@ struct CANARDDisplay : OpaqueWidget {
 		size_t nbSample = vL.size();
 
 		// Draw play line
-		if ((module->play) && (!module->loading)) {
+		if (!module->loading) {
 			nvgStrokeColor(vg, LIGHTBLUE_BIDOO);
 			{
 				nvgBeginPath(vg);
 				nvgStrokeWidth(vg, 2);
-				if (module->totalSampleCount>0) {
+				if (nbSample>0) {
 					nvgMoveTo(vg, module->samplePos * zoomWidth / nbSample + zoomLeftAnchor, 0);
 					nvgLineTo(vg, module->samplePos * zoomWidth / nbSample + zoomLeftAnchor, 2*height+10);
 				}
@@ -537,8 +538,8 @@ struct CANARDDisplay : OpaqueWidget {
 		nvgStrokeWidth(vg, 1);
 		{
 			nvgBeginPath(vg);
-			nvgMoveTo(vg, 0, 3*height/2+10);
-			nvgLineTo(vg, width, 3*height/2+10);
+			nvgMoveTo(vg, 0, 3*height*0.5f+10);
+			nvgLineTo(vg, width, 3*height*0.5f+10);
 			nvgClosePath(vg);
 		}
 		nvgStroke(vg);
@@ -577,15 +578,18 @@ struct CANARDDisplay : OpaqueWidget {
 			}
 
 			// Draw waveform
+
+			if (nbSample>0) {
 			nvgStrokeColor(vg, PINK_BIDOO);
 			nvgSave(vg);
 			Rect b = Rect(Vec(zoomLeftAnchor, 0), Vec(zoomWidth, height));
 			nvgScissor(vg, 0, b.pos.y, width, height);
+			float invNbSample = 1.0f / nbSample;
 			nvgBeginPath(vg);
 			for (size_t i = 0; i < vL.size(); i++) {
 				float x, y;
-				x = (float)i/vL.size();
-				y = vL[i] / 2.0f + 0.5f;
+				x = (float)i * invNbSample ;
+				y = vL[i] * 0.5f + 0.5f;
 				Vec p;
 				p.x = b.pos.x + b.size.x * x;
 				p.y = b.pos.y + b.size.y * (1.0f - y);
@@ -596,6 +600,7 @@ struct CANARDDisplay : OpaqueWidget {
 					nvgLineTo(vg, p.x, p.y);
 				}
 			}
+			//nvgClosePath(vg);
 			nvgLineCap(vg, NVG_MITER);
 			nvgStrokeWidth(vg, 1);
 			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
@@ -606,21 +611,24 @@ struct CANARDDisplay : OpaqueWidget {
 			nvgBeginPath(vg);
 			for (size_t i = 0; i < vR.size(); i++) {
 				float x, y;
-				x = (float)i/vR.size();
-				y = vR[i] / 2.0f + 0.5f;
+				x = (float)i * invNbSample;
+				y = vR[i] * 0.5f + 0.5f;
 				Vec p;
 				p.x = b.pos.x + b.size.x * x;
 				p.y = b.pos.y + b.size.y * (1.0f - y);
 				if (i == 0)
 					nvgMoveTo(vg, p.x, p.y);
-				else
+				else {
 					nvgLineTo(vg, p.x, p.y);
+				}
 			}
+			//nvgClosePath(vg);
 			nvgLineCap(vg, NVG_MITER);
 			nvgStrokeWidth(vg, 1);
 			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 			nvgStroke(vg);
 			nvgResetScissor(vg);
+		}
 
 			//draw slices
 

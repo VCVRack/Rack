@@ -103,6 +103,36 @@
     <Filter Include="Source Files\sqsrc\delay">
       <UniqueIdentifier>{2b1546d2-0426-4a86-9aa8-0d5448be9ad0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\midi">
+      <UniqueIdentifier>{cd0f2601-02cc-4cff-8b9b-763f0847ee96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\midi\view">
+      <UniqueIdentifier>{3f59ecf1-abb1-41d0-af93-846c51ca67f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\midi">
+      <UniqueIdentifier>{959b7e4b-ce7b-471a-889c-df051c09304b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\midi\view">
+      <UniqueIdentifier>{4c14cdbc-b9f0-4e2f-931e-98d8ba661770}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\midi\model">
+      <UniqueIdentifier>{726e2058-6d3f-43a6-aa73-10cf53629bf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\midi\controller">
+      <UniqueIdentifier>{1cdfb7ce-218c-40bb-a3e0-588b110427dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NewFilter1">
+      <UniqueIdentifier>{dcbbda8f-f87e-4c9b-8692-a77e06855850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\midi\model">
+      <UniqueIdentifier>{14b5b8a1-05b8-4b58-8897-62fe9f5a8619}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\midi\controller">
+      <UniqueIdentifier>{212cabf3-1fa1-4921-911d-bbd64a09d552}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{2783a1b8-2a42-4f69-87bc-391a5bc4288e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dsp\third-party\falco\DspFilter.cpp">
@@ -275,6 +305,81 @@
     </ClCompile>
     <ClCompile Include="..\..\test\testButterLookup.cpp">
       <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testMidiDataModel.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\TestMidiViewport.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\model\MidiSong.cpp">
+      <Filter>Source Files\midi\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\model\MidiTrack.cpp">
+      <Filter>Source Files\midi\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testFilteredIterator.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testReplaceCommand.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testUndoRedo.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\controller\ReplaceDataCommand.cpp">
+      <Filter>Source Files\midi\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\controller\UndoRedoStack.cpp">
+      <Filter>Source Files\midi\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testMidiSong.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testMidiEvents.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testMidiPlayer.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\controller\MidiPlayer.cpp">
+      <Filter>Source Files\midi\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\perfTest2.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testUtils.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testIComposite.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\model\MidiSelectionModel.cpp">
+      <Filter>Source Files\midi\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\model\MidiSequencer.cpp">
+      <Filter>Source Files\midi\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testMidiControllers.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\controller\MidiEditor.cpp">
+      <Filter>Source Files\midi\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testMidiEditor.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\test\testNoteScreenScale.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\view\NoteScreenScale.cpp">
+      <Filter>Source Files\midi\view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\view\MidiEditorContext.cpp">
+      <Filter>Source Files\midi\view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\midi\controller\MidiLock.cpp">
+      <Filter>Source Files\midi\controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -489,6 +594,93 @@
       <Filter>Header Files\dsp\filters</Filter>
     </ClInclude>
     <ClInclude Include="..\..\composites\Super.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\controller\ReplaceDataCommand.h">
+      <Filter>Header Files\midi\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\controller\SqCommand.h">
+      <Filter>Header Files\midi\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\controller\UndoRedoStack.h">
+      <Filter>Header Files\midi\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\model\MidiEvent.h">
+      <Filter>Header Files\midi\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\model\MidiSong.h">
+      <Filter>Header Files\midi\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\model\MidiTrack.h">
+      <Filter>Header Files\midi\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\KSComposite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\util\asserts.h">
+      <Filter>Header Files\sqsrc\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\controller\MidiPlayer.h">
+      <Filter>Header Files\midi\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\MultiLag.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\utils\NonUniformLookupTable.h">
+      <Filter>Header Files\dsp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\SmoothedHPF.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sqsrc\util\Divider.h">
+      <Filter>Header Files\sqsrc\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\filters\StateVariable4PHP.h">
+      <Filter>Header Files\dsp\filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\CH10.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\CHBg.h">
+      <Filter>Header Files\composites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\third-party\src\FunVCO3.h">
+      <Filter>Header Files\dsp\third-party\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dsp\third-party\src\SQMath.h">
+      <Filter>Header Files\dsp\third-party\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\model\MidiSelectionModel.h">
+      <Filter>Header Files\midi\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\controller\MidiEditor.h">
+      <Filter>Header Files\midi\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\controller\MidiKeyboardHandler.h">
+      <Filter>Header Files\midi\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\view\NoteScreenScale.h">
+      <Filter>Header Files\midi\view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\model\PitchUtils.h">
+      <Filter>Header Files\midi\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\view\MidiEditorContext.h">
+      <Filter>Header Files\midi\view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\model\MidiSequencer.h">
+      <Filter>Header Files\midi\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\util\FilteredIterator.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\model\TimeUtils.h">
+      <Filter>Header Files\midi\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\midi\controller\MidiLock.h">
+      <Filter>Header Files\midi\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\composites\Seq.h">
       <Filter>Header Files\composites</Filter>
     </ClInclude>
   </ItemGroup>

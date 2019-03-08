@@ -41,7 +41,7 @@ size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 {
   struct threadReadData *pData = (struct threadReadData *) userp;
   size_t realsize = size * nmemb;
-  if ((pData->dl->load()) && (realsize < pData->dataToDecodeRingBuffer->capacity()))   //
+  if ((pData->dl->load()) && (realsize < pData->dataToDecodeRingBuffer->capacity()))
   {
     memcpy(pData->dataToDecodeRingBuffer->endData(), contents, realsize);
     pData->dataToDecodeRingBuffer->endIncr(realsize);
@@ -82,8 +82,8 @@ void * threadDecodeTask(threadDecodeData data)
             for(int i = 0; i < samples; i++) {
               if (!data.dc->load()) break;
               Frame<2> newFrame;
-              newFrame.samples[0]=(float)pcm[i]/32768;
-              newFrame.samples[1]=(float)pcm[i]/32768;
+              newFrame.samples[0]=(float)pcm[i] * 30517578125e-15f;
+              newFrame.samples[1]=(float)pcm[i] * 30517578125e-15f;
               tmpBuffer->push(newFrame);
             }
           }
@@ -91,8 +91,8 @@ void * threadDecodeTask(threadDecodeData data)
             for(int i = 0; i < 2 * samples; i=i+2) {
               if (!data.dc->load()) break;
               Frame<2> newFrame;
-              newFrame.samples[0]=(float)pcm[i]/32768;
-              newFrame.samples[1]=(float)pcm[i+1]/32768;
+              newFrame.samples[0]=(float)pcm[i] * 30517578125e-15f;
+              newFrame.samples[1]=(float)pcm[i+1] * 30517578125e-15f;
               tmpBuffer->push(newFrame);
             }
           }
@@ -301,12 +301,12 @@ void ANTN::step() {
       read = true;
    }
 
-   if (read) {
-      Frame<2> currentFrame = *dataAudioRingBuffer.startData();
-      outputs[OUTL_OUTPUT].value = 10*currentFrame.samples[0]*params[GAIN_PARAM].value;
-      outputs[OUTR_OUTPUT].value = 10*currentFrame.samples[1]*params[GAIN_PARAM].value;
-      dataAudioRingBuffer.startIncr(1);
-   }
+  if (read) {
+    Frame<2> currentFrame = *dataAudioRingBuffer.startData();
+    outputs[OUTL_OUTPUT].value = 5.0f*currentFrame.samples[0]*params[GAIN_PARAM].value;
+    outputs[OUTR_OUTPUT].value = 5.0f*currentFrame.samples[1]*params[GAIN_PARAM].value;
+    dataAudioRingBuffer.startIncr(1);
+  }
 }
 
 struct ANTNTextField : LedDisplayTextField {
@@ -315,6 +315,7 @@ struct ANTNTextField : LedDisplayTextField {
     font = Font::load(assetPlugin(plugin, "res/DejaVuSansMono.ttf"));
   	color = YELLOW_BIDOO;
   	textOffset = Vec(3, 3);
+    text = module->url;
   }
 	void onTextChange() override;
 	ANTN *module;

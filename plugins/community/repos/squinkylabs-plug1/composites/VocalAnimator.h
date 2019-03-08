@@ -12,6 +12,8 @@
 
 /**
  * Version 2 - make the math sane.
+ * was 46
+ * with mod sub-sample 2 => 26
  */
 template <class TBase>
 class VocalAnimator : public TBase
@@ -21,6 +23,7 @@ public:
     static const int numTriangle = 4;
     static const int numModOutputs = 3;
     static const int numFilters = 4;
+    static const int modulationSubSample = 2;       // do at a fraction of the audio sample rate
 
     VocalAnimator(struct Module * module) : TBase(module)
     {
@@ -92,6 +95,7 @@ public:
 
     void init();
     void step() override;
+    void stepModulation();
     T modulatorOutput[numModOutputs];
 
     // The frequency inputs to the filters, exposed for testing.
@@ -112,6 +116,8 @@ public:
     T normalizedFilterFreq[numFilters];
     bool jamModForTest = false;
     T   modValueForTest = 0;
+    int modulationSubSampleCounter = 1;
+    T filterNormalizedBandwidth = .1f;
 
     float reciprocalSampleRate;
 
@@ -153,15 +159,42 @@ inline void VocalAnimator<TBase>::init()
     expLookup = ObjectCache<T>::getExp2();
 }
 
+
 template <class TBase>
 inline void VocalAnimator<TBase>::step()
 {
+   // printf("step %d\n", modulationSubSampleCounter);
+    if (--modulationSubSampleCounter <= 0) {
+        modulationSubSampleCounter = modulationSubSample;
+        stepModulation();
+    }
+
+    // Now run the filters
+    T filterMix = 0;                // Sum the folder outputs here
+    const T input = TBase::inputs[AUDIO_INPUT].value;
+
+    for (int i = 0; i < numFilters; ++i) {
+        filterMix += StateVariableFilter<T>::run(input, filterStates[i], filterParams[i]);
+    }
+#ifdef _ANORM
+    filterMix *= filterNormalizedBandwidth * 2;
+#else
+    filterMix *= T(.3);            // attenuate to avoid clip
+#endif
+    TBase::outputs[AUDIO_OUTPUT].value = filterMix;
+
+}
+
+template <class TBase>
+inline void VocalAnimator<TBase>::stepModulation()
+{
+   // printf("step mod\n");
     const bool bass = TBase::params[BASS_EXP_PARAM].value > .5;
     const auto mode = bass ?
         StateVariableFilterParams<T>::Mode::LowPass :
         StateVariableFilterParams<T>::Mode::BandPass;
 
-    for (int i = 0; i < numFilters +1 - 1; ++i) {
+    for (int i = 0; i < numFilters + 1 - 1; ++i) {
         filterParams[i].setMode(mode);
     }
 
@@ -177,7 +210,7 @@ inline void VocalAnimator<TBase>::step()
     // Light up the LEDs with the unscaled Modulator outputs.
     for (int i = LFO0_LIGHT; i <= LFO2_LIGHT; ++i) {
         TBase::outputs[LEDOutputs[i]].value = modulatorOutput[i];
-        TBase::lights[i].value = (modulatorOutput[i]  ) * .3f;
+        TBase::lights[i].value = (modulatorOutput[i]) * .3f;
         TBase::outputs[LEDOutputs[i]].value = modulatorOutput[i];
     }
 
@@ -186,13 +219,11 @@ inline void VocalAnimator<TBase>::step()
         TBase::inputs[FILTER_Q_CV_INPUT].value,
         TBase::params[FILTER_Q_PARAM].value,
         TBase::params[FILTER_Q_TRIM_PARAM].value);
-   
 
     const T fc = scalen5_5(
         TBase::inputs[FILTER_FC_CV_INPUT].value,
         TBase::params[FILTER_FC_PARAM].value,
         TBase::params[FILTER_FC_TRIM_PARAM].value);
-
 
     // put together a mod depth parameter from all the inputs
     // range is 0..1
@@ -219,10 +250,7 @@ inline void VocalAnimator<TBase>::step()
     }
 
     // Just do the Q division once, in the outer loop
-    const T filterNormalizedBandwidth = T(1) / qFinal;
-    const T input = TBase::inputs[AUDIO_INPUT].value;
-    T filterMix = 0;                // Sum the folder outputs here
-
+    filterNormalizedBandwidth = T(1) / qFinal;
     for (int i = 0; i < numFilters; ++i) {
         T logFreq = nominalFilterCenterLog2[i];
 
@@ -274,15 +302,7 @@ inline void VocalAnimator<TBase>::step()
         filterParams[i].setFreq(normFreq);
 
         filterParams[i].setNormalizedBandwidth(filterNormalizedBandwidth);
-        filterMix += StateVariableFilter<T>::run(input, filterStates[i], filterParams[i]);
     }
-#ifdef _ANORM
-    filterMix *= filterNormalizedBandwidth * 2;
-#else
-    filterMix *= T(.3);            // attenuate to avoid clip
-#endif
-    TBase::outputs[AUDIO_OUTPUT].value = filterMix;
-
 
     int matrixMode;
     float mmParam = TBase::params[LFO_MIX_PARAM].value;
@@ -296,11 +316,14 @@ inline void VocalAnimator<TBase>::step()
     }
 
     const T spread = T(1.0);
-    modulatorParams.setRateAndSpread(
-        scalem2_2(
+
+    // scale by sub-sample rate to lfo rate sounds right.
+    const float modRate = modulationSubSample * scalem2_2(
         TBase::inputs[LFO_RATE_CV_INPUT].value,
         TBase::params[LFO_RATE_PARAM].value,
-        TBase::params[LFO_RATE_TRIM_PARAM].value),
+        TBase::params[LFO_RATE_TRIM_PARAM].value);
+    modulatorParams.setRateAndSpread(
+        modRate,
         spread,
         matrixMode,
         reciprocalSampleRate);

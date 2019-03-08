@@ -24,7 +24,7 @@ public:
 
     const ThreadServer& operator= (const ThreadServer&) = delete;
     ThreadServer(const ThreadServer&) = delete;
-    static int _count;
+    static int _instanceCount;
 protected:
     /**
      * Derived thread servers must override this to get messages.

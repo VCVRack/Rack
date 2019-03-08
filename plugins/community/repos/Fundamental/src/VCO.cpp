@@ -1,5 +1,5 @@
 #include "Fundamental.hpp"
-#include "dsp/decimator.hpp"
+#include "dsp/resampler.hpp"
 #include "dsp/filter.hpp"
 
 
@@ -346,7 +346,7 @@ VCO2Widget::VCO2Widget(VCO2 *module) : ModuleWidget(module) {
 
 	addParam(ParamWidget::create<RoundHugeBlackKnob>(Vec(17, 60), module, VCO2::FREQ_PARAM, -54.0f, 54.0f, 0.0f));
 	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(12, 143), module, VCO2::WAVE_PARAM, 0.0f, 3.0f, 1.5f));
-	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(12, 208), module, VCO2::FM_PARAM, 0.0f, 1.0f, 0.0f));
+	addParam(ParamWidget::create<RoundLargeBlackKnob>(Vec(12, 208), module, VCO2::FM_PARAM, 0.0f, 1.0f, 1.0f));
 
 	addInput(Port::create<PJ301MPort>(Vec(11, 276), Port::INPUT, module, VCO2::FM_INPUT));
 	addInput(Port::create<PJ301MPort>(Vec(54, 276), Port::INPUT, module, VCO2::SYNC_INPUT));

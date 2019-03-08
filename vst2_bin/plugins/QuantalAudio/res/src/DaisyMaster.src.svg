@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="45" height="380">
+    <g id="base">
+        <path d="M0 0h45v380H0z" fill="#ababab"/>
+        <path d="M.3.3h44.4v379.4H0z" fill="#e6e6e6"/>
+    </g>
+    <g id="label_bgs">
+        <path d="M.3 16h44.4v16H0z" fill="#c91847"/>
+        <g id="placeholder_label_bgs" style="display:none;">
+            <path d="M.3 36h74.4v12H0z" fill="#cccccc"/>
+            <path d="M.3 208h74.4v12H0z" fill="#cccccc"/>
+        </g>
+    </g>
+    <g id="logo">
+        <circle cx="22.5" cy="360" r="7" style="fill: #556746;"/>
+        <circle cx="24.5" cy="362" r="5" style="fill: #e6e6e6;"/>
+        <circle cx="26.5" cy="364" r="3" style="fill: #556746;"/>
+    </g>
+    <g id="lines">
+        <path style="fill:none;stroke:#000;stroke-width:.7;" d="M22.5 80v16"/>
+    </g>
+    <g id="plug_outlines">
+        <rect x="8" y="232" width="28.5" height="42" rx="4" ry="4" fill="#000000"/>
+        <rect x="8" y="277" width="28.5" height="71" rx="4" ry="4" fill="#1994b3"/>
+        <circle cx="22.5" cy="303" r="14" style="fill: #ffffff;"/>
+    </g>
+    <g id="text_labels">
+        <text id="heading" x="0" y="28" style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Envy Code R';-inkscape-font-specification:'Envy Code R';letter-spacing:0px;word-spacing:0px;fill: #ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;">
+            <tspan x="3" y="28" style="font-size: 12.5px;">DSY-MX</tspan>
+        </text>
+        <text id="small_labels" x="0" y="46" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Envy Code R';-inkscape-font-specification:'Envy Code R';letter-spacing:0px;word-spacing:0px;fill: #000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;">
+            <tspan x="10" y="47" style="font-size: 8px;">MASTER</tspan>
+            <tspan x="18" y="129" style="font-size: 8px;">CV</tspan>
+        </text>
+        <text id="small_labels_white" x="0" y="262" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Envy Code R';-inkscape-font-specification:'Envy Code R';letter-spacing:0px;word-spacing:0px;fill: #ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;">
+            <tspan x="15" y="242" style="font-size: 8px;">OUT</tspan>
+            <tspan x="11" y="286" style="font-size: 8px;">DAISY</tspan>
+        </text>
+    </g>
+</svg>
+

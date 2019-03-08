@@ -18,12 +18,15 @@ void Mix4::step() {
 	_channel3.next(stereo);
 	_channel4.next(stereo);
 
-	float level = params[MIX_PARAM].value;
-	if (inputs[MIX_CV_INPUT].active) {
-		level *= clamp(inputs[MIX_CV_INPUT].value / 10.0f, 0.0f, 1.0f);
+	float level = Amplifier::minDecibels;
+	if (params[MIX_MUTE_PARAM].value < 0.5f) {
+		level = params[MIX_PARAM].value;
+		if (inputs[MIX_CV_INPUT].active) {
+			level *= clamp(inputs[MIX_CV_INPUT].value / 10.0f, 0.0f, 1.0f);
+		}
+		level *= MixerChannel::maxDecibels - MixerChannel::minDecibels;
+		level += MixerChannel::minDecibels;
 	}
-	level *= MixerChannel::maxDecibels - MixerChannel::minDecibels;
-	level += MixerChannel::minDecibels;
 	_amplifier.setLevel(_slewLimiter.next(level));
 
 	float mono = 0.0f;
@@ -91,6 +94,7 @@ struct Mix4Widget : ModuleWidget {
 		auto mute4ParamPosition = Vec(146.2, 185.7);
 		auto pan4ParamPosition = Vec(147.5, 223.0);
 		auto mixParamPosition = Vec(189.5, 32.0);
+		auto mixMuteParamPosition = Vec(189.2, 185.7);
 
 		auto cv1InputPosition = Vec(14.5, 255.0);
 		auto pan1InputPosition = Vec(14.5, 290.0);
@@ -123,6 +127,7 @@ struct Mix4Widget : ModuleWidget {
 		addParam(ParamWidget::create<Knob16>(pan4ParamPosition, module, Mix4::PAN4_PARAM, -1.0, 1.0, 0.0));
 		addParam(ParamWidget::create<MuteButton>(mute4ParamPosition, module, Mix4::MUTE4_PARAM, 0.0, 1.0, 0.0));
 		addSlider(mixParamPosition, module, Mix4::MIX_PARAM, module->_rmsLevel);
+		addParam(ParamWidget::create<MuteButton>(mixMuteParamPosition, module, Mix4::MIX_MUTE_PARAM, 0.0, 1.0, 0.0));
 
 		addInput(Port::create<Port24>(cv1InputPosition, Port::INPUT, module, Mix4::CV1_INPUT));
 		addInput(Port::create<Port24>(pan1InputPosition, Port::INPUT, module, Mix4::PAN1_INPUT));
@@ -149,7 +154,7 @@ struct Mix4Widget : ModuleWidget {
 			id,
 			0.0,
 			1.0,
-			abs(MixerChannel::minDecibels) / (MixerChannel::maxDecibels - MixerChannel::minDecibels)
+			fabsf(MixerChannel::minDecibels) / (MixerChannel::maxDecibels - MixerChannel::minDecibels)
 		);
 		dynamic_cast<VUSlider*>(slider)->setVULevel(&rms);
 		addParam(slider);

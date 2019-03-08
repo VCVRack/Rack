@@ -1,15 +1,24 @@
 # BogaudioModules
+
 Modules for [VCV Rack](https://github.com/VCVRack/Rack), an open-source Eurorack-style virtual modular synthesizer:
 
   - [Oscillators](#oscillators)
   - [LFOs](#lfos)
   - [Envelopes and Envelope Utilities](#envelopes)
   - [Mixers, Panners and VCAs](#mixers)
+  - [Effects and Dynamics](#effects)
   - [Visualizers](#visualizers)
   - [Pitch CV Utilities](#pitch)
   - [Other Utilities](#utilities)
+  - [Miscellaneous](#misc)
 
-![Modules screenshot](./doc/www/modules.png)
+![modules screenshot](./doc/www/modules1.png)
+
+![modules screenshot](./doc/www/modules2.png)
+
+![modules screenshot](./doc/www/modules3.png)
+
+![modules screenshot](./doc/www/modules4.png)
 
 
 ## Builds/Releases
@@ -27,7 +36,7 @@ You'll need to be set up to build [VCV Rack](https://github.com/VCVRack/Rack) it
   make
   ```
 
-The master branch of this module currently builds against Rack's master and v0.6.1 branches.
+The master branch of this module currently builds against Rack's 0.6.* branches.
 
 
 ## Modules
@@ -101,6 +110,10 @@ LFO tracks pitch CVs at the V/OCT input four octaves lower than a normal oscilla
 
 An LFO with outputs at 8 different phases.  The phases may be set by knobs and CVs; by default they are 0, 45, 90, etc, degrees from the fundamental.  Otherwise, functionality is the same as with LFO, excepting that the wave shape is selectable, and all outputs are of the same (phase-shifted) wave.
 
+#### LLFO
+
+A 3HP LFO, with selectable waveform.  The features are a subset of LFO, with the addition of a sixth 10%-pulse waveform (since there is no pulse width control).
+
 
 ### <a name="envelopes"></a> Envelopes and Envelope Utilities
 
@@ -141,6 +154,14 @@ Features:
 #### SHAPER+
 
 SHAPER+ is a SHAPER, with the addition of CV inputs for each knob, and gate outputs for each stage (a stage's gate output will be high for the duration of the stage).
+
+#### AD
+
+An AD (attack-decay) envelope generator in 3HP.  The attack, decay and release knobs are exponentially scaled with durations up to 10 seconds.  The attack and decay times have CV inputs expecting +10V inputs; if a CV is present, the corresponding knob attenuates it.
+
+When a trigger voltage is received at the TRIG input, the envelope cycle begins, ignoring further triggers until it completes.  When the cycle completes, a trigger is output at EOC, and the cycle retriggers if the TRIG voltage is high.  If LOOP mode is enabled, the envelope cycles continuously regardless of the TRIG input.
+
+By default, the attack and decay envelope segments have an analog-ish curve; in linear mode (LIN button), the segments are linear.
 
 #### ADSR
 
@@ -189,6 +210,24 @@ Features:
 
 By default, the output is hard clipped at +/-12 volts (this is a standard in Rack).  A context menu option allows this limit to be disabled.
 
+#### UMIX
+
+A 3HP unity mixer, usable with CV (e.g. combining triggers) or audio.  Up to 8 inputs are summed to the output.  Saturation (soft clipping) is applied to the output at +/-12 volts; the LEVEL knob allows attenuation of the mix before the saturation is applied.
+
+The context (right-click) menu has an option to average, rather than sum, the inputs.
+
+#### MATRIX88
+
+An 8x8 channel matrix mixer.  Each input can be sent with an independent level to each of the eight output mixes.
+
+*Note that the matri knobs are attenuvertors, and default to zero.*  That means there will be no output, regardless of the inputs, until some knobs are changed to non-zero values.
+
+Saturation (soft clipping) is applied to each output at +/-12 volts; the LEVEL knob allows attenuation of the mix before the saturation is applied.
+
+#### MUTE8
+
+MUTE8 provides 8 independent manual or CV-controlled mutes. Each channel is muted if its button is toggled on or if there is a positive voltage at its CV input.  Otherwise the input is passed to the output.
+
 #### PAN
 
 A stereo panner with dual inputs channels.  Each channel's panner may be controlled with a +/-5 volt CV; when CV is in use, it is attenuverted the corresponding knob.  Output saturates (soft clips) to +/-12 volts.
@@ -218,6 +257,58 @@ A voltage-controlled amplifier, capable of adding 12 decibels gain to the input.
 
 The level may be controlled with a +10 volt CV; when CV is in use, it is attenuated by the corresponding slider.  The slider's toggle has a light indicating the output signal level.  The output saturates (soft clips) to +/-12 volts, where clipping becomes noticeable above +/-10 volts.
 
+### <a name="effects"></a> Effects and Dynamics
+
+![Mixers screenshot](doc/www/effects.png)
+
+#### AM/RM
+
+AM/RM is a ring- and amplitude-modulation effect and CV-controllable variable wave rectifier.
+
+  - With the default knob settings, the unit is a proper ring modulator: the MOD (modulator) and CAR (carrier) inputs are multiplied and the resulting wave is sent to the output.  MOD is passed unchanged to the RECT output.
+  - As RECTIFY goes from 0 to fully clockwise, the negative portion of the MOD input is progressively folded to positive, until at the full value the wave is fully rectified.  The modified input is output at RECT; the modified input is multiplied with the carrier input and sent to the output.
+  - The DRY/WET control mixes the otuput of the mod/carrier multiplication with the unmodified carrier input.
+
+The RECT inputs expects a bipolar (+/-5V) CV, which is added to the RECTIFY knob.  The D/W input works the same for the DRY/WET knob.
+
+Note: AM/RM is calibrated to expect +/-5V, 10V peak-to-peak signals (i.e. the output of a typical oscillator).  A modulator signal with a negative value in excess of -5V will be affected by the rectifier circuit even if the RECTIFY is zero.  To avoid this effect, you may need to attenuate a hot signal you wish to use as the modulator.
+
+#### PRESSOR
+
+PRESSOR is a stereo [compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression) and [noise gate](https://en.wikipedia.org/wiki/Noise_gate) with many controls and a sidechain input.  A compressor attenuates signals louder than a threshold level; a noise gate attenuates signals quieter than a threshold level.
+
+The module's signal path has two main components: a detector, and the compressor/gate.  The detector -- effectively an envelope follower -- analyzes the inputs (including the sidechain input, if in use), producing a control signal which is used to control the compressor/gate.  The detector signal is also output at ENV.
+
+The various controls and ports work as follows:
+  - The MODE switch sets whether the module works a compressor (COMP) or noise gate (GATE).
+  - THRESHOLD sets the threshold in decibels.  The default 0dB setting corresponds to the 10V peak-to-peak output level of a standard oscillator.  The TRSH input expects a unipolar (+10V) input; if in use this is attenuated by the knob.
+  - RATIO sets the degree of attenuation applied to a signal.  In compressor mode, higher settings attenuate the signal more as the detector output goes above the threshold; at the maximum setting, the compressor becomes a limiter.  In gate mode, higher ratios more completely attenuate inputs below the threshold.  The RATIO CV input is unipolar (+10V), attenuated by the knob
+  - The COMPRESSION meter provides a visual indication of the amount of attenuation being applied to the input at any given moment, and is proportional to the CV output at ENV.
+  - ATACK and DECAY control lag times in the the movement of the detector signal as the input changes.  Each has a corresponding unipolar (+10V) CV attenuated by the corresponding knob.
+  - The DECTECT switch toggles the detector between RMS and peak level analyzers; RMS averages the input over a short window whereas PEAK uses the instantaneous level.
+  - KNEE toggles between a slightly softer or harder response as the attenuation turns on or off as the signal crosses the threshold.
+  - IN GAIN attenuates (up to -12db) or amplifies (up to +12db) the left and right inputs.  (It does not apply to the sidechain input.)  The modified input is sent to the detector and the compressor/gate.  The IGN CV input expects a bipolar (+/-5V) signal which is added to the knob position.
+  - OUT GAIN applies up to 24db of amplification to the left and right outputs, after the compressor/gate circuit does its work.  The outputs are subject to saturation (soft limiting at +/-12V).  The IGN CV input expects a bipolar (+/-5V) signal which is added to the knob position.
+  - IN/SIDE controls the input to the detector, as a mix/crossfade between the left/right inputs (which are processed by IN GAIN, then summed), and the sidechain input.
+
+Several of the settings can take fairly extreme values (e.g. OUT GAIN); this allows the module to be used as a distortion effect.
+
+#### CLPR
+
+CLPR is a compact (6HP) [clipper](https://en.wikipedia.org/wiki/Clipping_%28audio%29).  Its controls behave the same as the corresponding controls on PRESSOR.
+
+In contrast to LMTR, CLPR chops a signal at a voltage threshold corresponding to the selected amplitude; this distorts the signal.
+
+#### LMTR
+
+LMTR is a compact (6HP) [limiter](https://en.wikipedia.org/wiki/Dynamic_range_compression).  Its controls behave the same as the corresponding controls on PRESSOR.
+
+In contrast to CLPR, LMTR does not distort the signal (or not much); it just reduces the amplitude of the signal to keep it below the threshold.
+
+#### NSGT
+
+NSGT is a compact (6HP) [noise gate](https://en.wikipedia.org/wiki/Noise_gate).  Its controls behave the same as the corresponding controls on PRESSOR.
+
 ### <a name="visualizers"></a> Visualizers
 
 #### ANALYZER
@@ -227,11 +318,16 @@ A four-channel spectrum analyzer.
 ![Analyzer screenshot](doc/www/visualizers.png)
 
 Features:
-  - Range setting: smoothly scrolls the displayed frequency range, from just the lower tenth, to the entire range (up to half the sampling rate).
+  - Range setting: smoothly scrolls the displayed frequency range, from just the lower 10% at full counter-clockwise, to the entire range (up to half the sampling rate) at noon, to the upper 20% at full clockwise.
   - Smooth setting: controls how many analysis frames will be averaged to drive the display.  A higher setting reduces jitter, at the expense of time lag.  For convenience, the knob setting is time-valued, from zero to half a second (internally this is converted to an integer averaging factor based on the sample rate and other settings).
-  - Quality setting: switch between good (1024-sample) and better (4096-sample) FFT window sizes.  The higher setting yields finer frequency resolution at a higher CPU cost.
-  - Off button: turn the unit off to save some CPU without unpatching.
+  - Quality setting: changes the FFT window size.  Higher settings yield finer frequency resolution, at a higher CPU cost.  The levels and sizes are: GOOD (1024 samples), HIGH (2048 samples) and ULTRA (4096 samples).  If Rack's sample rate is 96khz or higher, the sizes are doubled.
+  - Window setting: sets the window function applied to the input to the FFT.  The options are Kaiser, Hamming and none/square.  The default, Kaiser, is probably best for most purposes.
   - Each channel has a THRU output, which passes the corresponding input through unchanged.
+  - On the context (right-click) menu, the display vertical (amplitude) range can be set to extend down to -120dB (the default is -60dB).
+
+#### ANALYZER-XL
+
+An eight-channel, 42HP version of ANALYZER, with edge-to-edge-screen type of design.  Options corresponding to ANALYZER's panel controls are available on the context (right-click) menu.
 
 #### VU
 
@@ -260,7 +356,7 @@ A tuner that outputs a selectable (Western, chromatic) pitch as CV (1v/octave, f
 
 ### <a name="utilities"></a> Utilities
 
-Miscellaneous utilities.
+Various utilities.
 
 ![Utilities screenshot](doc/www/utilities.png)
 
@@ -268,9 +364,22 @@ Miscellaneous utilities.
 
 A boolean logic utility.  Inputs are considered true if the input voltage is greater than 1.  The top section takes two inputs and computes AND, OR and XOR at the outputs.  The lower section computes the negation of its input.  Output is 5 volts if an output is true, 0 otherwise.
 
+#### CMP
+
+CMP is window comparator utility.  It takes two inputs, A and B, which normal to 0V.  Each is summed with the value of its corresponding offset knob and clipped to +/-12V.  The four outputs indicate the relative values of A and B:
+
+ - A>B will output high if A is greater than or exactly equal to B.
+ - A<B will output high if A is less than B.
+ - EQ will output high if the difference between A and B are less than or equal to the window voltage.
+ - NOT will output high if EQ is low.
+
+The WINDOW knob specifies the window voltage.  LAG specifies a time of up to one second by which a change in the output will lag a change in the inputs states; if the input state switches back before the lag expires, the output does not change. WINDOW and LAG each take a unipolar (+10) voltage, each of which is attenuated by the corresponding knob.
+
+The OUTPUT switch sets the high and low voltage values for the outputs: 0V low/+10V high, or -5V low/+5V high.
+
 #### CVD
 
-A simple delay designed for use with CV.  Use it to delay triggers or gates, create a flip-flop that resets itself after a time, make a sequence run for a while then stop, to double up an envelope, or what have you.
+A simple delay designed for use with CV (though it works fine with audio).  Use it to delay triggers or gates, create a flip-flop that resets itself after a time, make a sequence run for a while then stop, to double up an envelope, or what have you.
 
 The large TIME knob sets the delay time, as scaled by the small knob (up to 0.1, 1 or 10 seconds); TIME takes a +10 CV, attenuated by the knob.  Reducing time truncates the internal delay buffer.  The DRY/WET knob sets the mix of the original and delayed signals at the output, with a +/-5 CV input.
 
@@ -302,7 +411,17 @@ By default, the output is capped at +/-12 volts (this is a standard in Rack).  A
 
 #### S&H
 
-A dual sample-and-hold.  Sampling may be triggered by CV or button press.  If nothing is connected to an IN port, sampling for that channel is from an internal white noise source (range 0-10).
+A dual sample-and-hold and trigger-and-hold.  Sampling may be triggered by CV (on the rising edge of a trigger or gate) or button press.  If nothing is connected to an IN port, sampling for that channel is from an internal white noise source (range 0-10V).
+
+Each channel can be toggled into track-and-hold mode.  In this mode, when the input at GATE is high, or the button is held, the input is copied to the output.  When the gate goes low, the input is sampled and held until the next gate.
+
+#### SLEW
+
+A slew limiter - when the input changes rapidly, the output changes less rapidly, lagging the input.
+
+The rising and falling slew rates and shapes are set independently.  The RISE and FALL time knobs are calibrated to set the time the output would need to catch up to a 10V change in the input.
+
+The RISE and FALL shape knobs affect the movement of the output as it catches up to the input (the shape it would draw on a scope). The shapes vary between log, linear and exponential curves.
 
 #### SUMS
 
@@ -314,6 +433,19 @@ By default, the output is capped at +/-12 volts (this is a standard in Rack).  A
 
 A signal-routing module with two through channels.  If the button is held or the GATE input is high, the HIGH input for each channel is routed to the corresponding OUT.  Otherwise, each LOW input is routed to each OUT.
 
+If LTCH (latch) mode is enabled, a button click or trigger pulse at GATE will toggle the output to HIGH; a second click or trigger resets it to LOW.
+
+### <a name="misc"></a> Miscellaneous
+
+![Miscellaneous screenshot](doc/www/misc.png)
+
+#### BLANK3
+
+A 3HP blank panel.
+
+#### BLANK6
+
+A 6HP blank panel.
 
 ## Other Notes
 

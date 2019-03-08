@@ -1,9 +1,15 @@
 ALL_OBJ= \
 	src/AH.o \
+	src/Arp31c.o \
+	src/Arp32p.o \
 	src/Arpeggiator.o \
 	src/ArpeggiatorMkII.o \
+	src/Bombe.o \
+	src/Chord.o \
 	src/Circle.o \
 	src/Core.o \
+	src/Galaxy.o \
+	src/Generative.o \
 	src/Imperfect.o \
 	src/Imperfect2.o \
 	src/Progress.o \

@@ -1,6 +1,9 @@
 #include "Squinky.hpp"
+
+#ifdef _GROWLER
 #include "WidgetComposite.h"
 #include "VocalAnimator.h"
+#include "ctrl/SqMenuItem.h"
 
 /**
  * Implementation class for VocalWidget
@@ -45,7 +48,17 @@ void VocalModule::step()
 struct VocalWidget : ModuleWidget
 {
     VocalWidget(VocalModule *);
+    Menu* createContextMenu() override;
 };
+
+inline Menu* VocalWidget::createContextMenu()
+{
+    Menu* theMenu = ModuleWidget::createContextMenu();
+    ManualMenuItem* manual = new ManualMenuItem(
+        "https://github.com/squinkylabs/SquinkyVCV/blob/master/docs/growler.md");
+    theMenu->addChild(manual);
+    return theMenu;
+}
 
 template <typename BASE>
 struct MuteLight : BASE
@@ -70,8 +83,14 @@ struct NKK2 : SVGSwitch, ToggleSwitch
  * provide meta-data.
  * This is not shared by all modules in the DLL, just one
  */
+#ifdef __V1
+VocalWidget::VocalWidget(VocalModule *module)
+{
+    setModule(module);
+#else
 VocalWidget::VocalWidget(VocalModule *module) : ModuleWidget(module)
 {
+#endif
     const float width = 14 * RACK_GRID_WIDTH;
     box.size = Vec(width, RACK_GRID_HEIGHT);
     {
@@ -198,3 +217,6 @@ RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, Vocal) {
                                                                      "Growler: Vocal Animator", EFFECT_TAG, FILTER_TAG, LFO_TAG, RANDOM_TAG);
    return modelVocalModule;
 }
+
+#endif
+

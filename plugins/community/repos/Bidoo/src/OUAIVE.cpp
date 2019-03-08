@@ -8,6 +8,7 @@
 #include "cmath"
 #include <iomanip> // setprecision
 #include <sstream> // stringstream
+#include "window.hpp"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ struct OUAIVE : Module {
 		TRIG_MODE_PARAM,
 		READ_MODE_PARAM,
 		SPEED_PARAM,
+		CVSLICES_PARAM,
+		CVSPEED_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -27,6 +30,7 @@ struct OUAIVE : Module {
 		NB_SLICES_INPUT,
 		READ_MODE_INPUT,
 		SPEED_INPUT,
+		POS_RESET_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -39,33 +43,34 @@ struct OUAIVE : Module {
 	};
 
 	bool play = false;
-	string lastPath;
 	unsigned int channels;
   unsigned int sampleRate;
   drwav_uint64 totalSampleCount;
-	float* pSampleData;
+
 	float samplePos = 0.0f;
-	vector<double> displayBuffL;
-	vector<double> displayBuffR;
-	string fileDesc;
-	bool fileLoaded = false;
+	vector<vector<float>> playBuffer;
+	string lastPath;
+	string waveFileName;
+	string waveExtension;
+	bool loading = false;
 	int trigMode = 0; // 0 trig 1 gate, 2 sliced
 	int sliceIndex = -1;
 	int sliceLength = 0;
 	int nbSlices = 1;
 	int readMode = 0; // 0 formward, 1 backward, 2 repeat
 	float speed;
-	string displayParams = "";
-	string displayReadMode = "";
-	string displaySlices = "";
-	string displaySpeed;
 	SchmittTrigger playTrigger;
 	SchmittTrigger trigModeTrigger;
 	SchmittTrigger readModeTrigger;
+	SchmittTrigger posResetTrigger;
 	std::mutex mylock;
 
 
-	OUAIVE() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {	}
+	OUAIVE() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		playBuffer.resize(2);
+		playBuffer[0].resize(0);
+		playBuffer[1].resize(0);
+	}
 
 	void step() override;
 
@@ -101,26 +106,31 @@ struct OUAIVE : Module {
 };
 
 void OUAIVE::loadSample(std::string path) {
-	mylock.lock();
-	fileLoaded = false;
-	drwav_free(pSampleData);
-  pSampleData = drwav_open_and_read_file_f32(path.c_str(), &channels, &sampleRate, &totalSampleCount);
-  if (pSampleData == NULL) {
-      fileLoaded = false;
-  }
-	else {
-		vector<double>().swap(displayBuffL);
-		vector<double>().swap(displayBuffR);
-		for (unsigned int i=0; i < totalSampleCount; i = i + floor(totalSampleCount/125)) {
-			displayBuffL.push_back(pSampleData[i]);
+	loading = true;
+	unsigned int c;
+  unsigned int sr;
+  drwav_uint64 sc;
+	float* pSampleData;
+  pSampleData = drwav_open_and_read_file_f32(path.c_str(), &c, &sr, &sc);
+  if (pSampleData != NULL)  {
+		lastPath = path;
+		waveFileName = stringFilename(path);
+		waveExtension = stringExtension(path);
+		channels = c;
+		sampleRate = sr;
+		playBuffer[0].clear();
+		playBuffer[1].clear();
+		for (unsigned int i=0; i < sc; i = i + c) {
+			playBuffer[0].push_back(pSampleData[i]);
 			if (channels == 2)
-				displayBuffR.push_back(pSampleData[i+1]);
+				playBuffer[1].push_back((float)pSampleData[i+1]);
+			else
+				playBuffer[1].push_back((float)pSampleData[i]);
 		}
-		fileDesc = (stringFilename(path)).substr(0,20) + ((stringFilename(path)).length() >=20  ? "...\n" :  "\n");
-		fileDesc += std::to_string(sampleRate) + " Hz\n";
-		fileLoaded = true;
+		totalSampleCount = playBuffer[0].size();
+		drwav_free(pSampleData);
 	}
-	mylock.unlock();
+	loading = false;
 }
 
 void OUAIVE::step() {
@@ -132,51 +142,29 @@ void OUAIVE::step() {
 	} else if (readModeTrigger.process(params[READ_MODE_PARAM].value + inputs[READ_MODE_INPUT].value)) {
 		readMode = (((int)readMode + 1) % 3);
 	}
-	nbSlices = clamp(roundl(params[NB_SLICES_PARAM].value + inputs[NB_SLICES_INPUT].value), 1, 128);
-	speed = clamp(params[SPEED_PARAM].value + inputs[SPEED_INPUT].value, 0.2f, 10.0f);
-	stringstream stream;
-	stream << fixed << setprecision(1) << speed;
-	string s = stream.str();
-	displaySpeed = "x" + s;
-	if (trigMode == 0) {
-		displayParams = "TRIG";
-		if (readMode == 0) {
-			displayReadMode = "►";
-		} else if (readMode == 2) {
-			displayReadMode = "►►";
-		}
-		else {
-			displayReadMode = "◄";
-		}
-	}	else if (trigMode == 1) {
-		displayParams = "GATE";
-	} else if (trigMode == 2) {
-		displayParams = "SLICE ";
-		displaySlices = "|" + std::to_string(nbSlices) + "|";
-		if (readMode == 0) {
-			displayReadMode = "►";
-		} else if (readMode == 2) {
-			displayReadMode = "►►";
-		}
-		else {
-			displayReadMode = "◄";
-		}
-	}
+	nbSlices = clamp(roundl(params[NB_SLICES_PARAM].value + params[CVSLICES_PARAM].value * inputs[NB_SLICES_INPUT].value), 1, 128);
+	speed = clamp(params[SPEED_PARAM].value + params[CVSPEED_PARAM].value * inputs[SPEED_INPUT].value, 0.2f, 10.0f);
 
-
-	if (fileLoaded) {
+	if (!loading) {
 		sliceLength = clamp(totalSampleCount / nbSlices, 1, totalSampleCount);
 
 		if ((trigMode == 0) && (playTrigger.process(inputs[GATE_INPUT].value))) {
 			play = true;
-			samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount / 10), 0 , totalSampleCount - 1);
+			if (inputs[POS_INPUT].active)
+				samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount * 0.1f), 0 , totalSampleCount - 1);
+			else {
+				if (readMode != 1)
+					samplePos = 0;
+				else
+					samplePos = totalSampleCount - 1;
+			}
 		}	else if (trigMode == 1) {
 			play = (inputs[GATE_INPUT].value > 0);
-			samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount / 10), 0 , totalSampleCount - 1);
+			samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount * 0.1f), 0 , totalSampleCount - 1);
 		} else if ((trigMode == 2) && (playTrigger.process(inputs[GATE_INPUT].value))) {
 			play = true;
 			if (inputs[POS_INPUT].active)
-				sliceIndex = clamp((int)(inputs[POS_INPUT].value * nbSlices / 10), 0, nbSlices);
+				sliceIndex = clamp((int)(inputs[POS_INPUT].value * nbSlices * 0.1f), 0, nbSlices);
 			 else
 				sliceIndex = (sliceIndex+1)%nbSlices;
 			if (readMode != 1)
@@ -185,26 +173,27 @@ void OUAIVE::step() {
 				samplePos = clamp((sliceIndex + 1) * sliceLength - 1, 0 , totalSampleCount);
 		}
 
-		if ((play) && (samplePos>=0) && (samplePos < totalSampleCount)) {
-			mylock.lock();
-			//calulate outputs
+		if (posResetTrigger.process(inputs[POS_RESET_INPUT].value)) {
+			sliceIndex = 0;
+			samplePos = 0;
+		}
+
+		if ((!loading) && (play) && (samplePos>=0) && (samplePos < totalSampleCount)) {
 			if (channels == 1) {
-				outputs[OUTL_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)];
-				outputs[OUTR_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)];
+				outputs[OUTL_OUTPUT].value = 5.0f * playBuffer[0][floor(samplePos)];
+				outputs[OUTR_OUTPUT].value = 5.0f * playBuffer[0][floor(samplePos)];
 			}
 			else if (channels == 2) {
 				if (outputs[OUTL_OUTPUT].active && outputs[OUTR_OUTPUT].active) {
-					outputs[OUTL_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)];
-					outputs[OUTR_OUTPUT].value = 10.0f * pSampleData[(unsigned int)floor(samplePos)+1];
+					outputs[OUTL_OUTPUT].value = 5.0f * playBuffer[0][floor(samplePos)];
+					outputs[OUTR_OUTPUT].value = 5.0f * playBuffer[1][floor(samplePos)];
 				}
 				else {
-					outputs[OUTL_OUTPUT].value = 10.0f * (pSampleData[(unsigned int)floor(samplePos)] + pSampleData[(unsigned int)floor(samplePos)+1]) / 2;
-					outputs[OUTR_OUTPUT].value = 10.0f * (pSampleData[(unsigned int)floor(samplePos)] + pSampleData[(unsigned int)floor(samplePos)+1]) / 2;
+					outputs[OUTL_OUTPUT].value = 5.0f * (playBuffer[0][floor(samplePos)] + playBuffer[1][floor(samplePos)]);
+					outputs[OUTR_OUTPUT].value = 5.0f * (playBuffer[0][floor(samplePos)] + playBuffer[1][floor(samplePos)]);
 				}
 			}
-			mylock.unlock();
 
-			//shift samplePos
 			if (trigMode == 0) {
 				if (readMode != 1)
 					samplePos = samplePos + speed * channels;
@@ -216,7 +205,7 @@ void OUAIVE::step() {
 				else if ((readMode == 1) && (samplePos <=0))
 						play = false;
 				else if ((readMode == 2) && (samplePos >= totalSampleCount))
-					samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount / 10), 0 , totalSampleCount -1);
+					samplePos = clamp((int)(inputs[POS_INPUT].value * totalSampleCount * 0.1f), 0 , totalSampleCount -1);
 			}
 			else if (trigMode == 2)
 			{
@@ -224,8 +213,7 @@ void OUAIVE::step() {
 					samplePos = samplePos + speed * channels;
 				else
 					samplePos = samplePos - speed * channels;
-				//update diplay slices
-				displaySlices = "|" + std::to_string(nbSlices) + "|";
+
 				//manage eof readMode
 				if ((readMode == 0) && ((samplePos >= (sliceIndex+1) * sliceLength) || (samplePos >= totalSampleCount)))
 						play = false;
@@ -240,165 +228,195 @@ void OUAIVE::step() {
 	}
 }
 
-struct OUAIVEDisplay : TransparentWidget {
+struct OUAIVEDisplay : OpaqueWidget {
 	OUAIVE *module;
-	int frame = 0;
 	shared_ptr<Font> font;
-	string displayParams;
+	const float width = 125.0f;
+	const float height = 50.0f;
+	float zoomWidth = 125.0f;
+	float zoomLeftAnchor = 0.0f;
+	int refIdx = 0;
+	float refX = 0.0f;
 
 	OUAIVEDisplay() {
 		font = Font::load(assetPlugin(plugin, "res/DejaVuSansMono.ttf"));
 	}
 
+	void onDragStart(EventDragStart &e) override {
+		windowCursorLock();
+		OpaqueWidget::onDragStart(e);
+	}
+
+	void onDragMove(EventDragMove &e) override {
+		float zoom = 1.0f;
+		if (e.mouseRel.y > 0.0f) {
+			zoom = 1.0f/(windowIsShiftPressed() ? 2.0f : 1.1f);
+		}
+		else if (e.mouseRel.y < 0.0f) {
+			zoom = windowIsShiftPressed() ? 2.0f : 1.1f;
+		}
+		zoomWidth = clamp(zoomWidth*zoom,width,zoomWidth*(windowIsShiftPressed() ? 2.0f : 1.1f));
+		zoomLeftAnchor = clamp(refX - (refX - zoomLeftAnchor)*zoom + e.mouseRel.x, width - zoomWidth,0.0f);
+		OpaqueWidget::onDragMove(e);
+	}
+
+	void onDragEnd(EventDragEnd &e) override {
+		windowCursorUnlock();
+		OpaqueWidget::onDragEnd(e);
+	}
+
 	void draw(NVGcontext *vg) override {
-		nvgFontSize(vg, 12);
-		nvgFontFaceId(vg, font->handle);
-		nvgStrokeWidth(vg, 1);
-		nvgTextLetterSpacing(vg, -2);
-		nvgFillColor(vg, YELLOW_BIDOO);
-		nvgTextBox(vg, 5, 3,120, module->fileDesc.c_str(), NULL);
+		module->mylock.lock();
+		std::vector<float> vL(module->playBuffer[0]);
+		std::vector<float> vR(module->playBuffer[1]);
+		module->mylock.unlock();
+		size_t nbSample = vL.size();
 
 		nvgFontSize(vg, 14);
 		nvgFillColor(vg, YELLOW_BIDOO);
-		nvgTextBox(vg, 5, 55,40, module->displayParams.c_str(), NULL);
-		if (module->trigMode != 1)
-			nvgTextBox(vg, 95, 55,30, module->displaySpeed.c_str(), NULL);
 
+		string trigMode = "";
+		string slices = "";
 		if (module->trigMode == 0) {
-			nvgTextBox(vg, 45, 55,20, module->displayReadMode.c_str(), NULL);
+			trigMode = "TRIG ";
+		}
+		else if (module->trigMode==1)	{
+			trigMode = "GATE ";
+		}
+		else {
+			trigMode = "SLICE ";
+			slices = "|" + to_string(module->nbSlices) + "|";
 		}
 
-		if (module->trigMode == 2) {
-			nvgTextBox(vg, 45, 55,20, module->displayReadMode.c_str(), NULL);
-			nvgTextBox(vg, 62, 55,40, module->displaySlices.c_str(), NULL);
+		nvgTextBox(vg, 3, -15, 40, trigMode.c_str(), NULL);
+		nvgTextBox(vg, 59, -15, 40, slices.c_str(), NULL);
+
+		string readMode = "";
+		if (module->readMode == 0) {
+			readMode = "►";
+		}
+		else if (module->readMode == 2) {
+			readMode = "►►";
+		}
+		else {
+			readMode = "◄";
 		}
 
+		nvgTextBox(vg, 40, -15, 40, readMode.c_str(), NULL);
 
-		if (module->fileLoaded) {
-				// Draw play line
-				nvgStrokeColor(vg, LIGHTBLUE_BIDOO);
-				{
-					nvgBeginPath(vg);
-					nvgStrokeWidth(vg, 2);
-					nvgMoveTo(vg, (int)(module->samplePos * 125 / module->totalSampleCount) , 70);
-					nvgLineTo(vg, (int)(module->samplePos * 125 / module->totalSampleCount) , 150);
-					nvgClosePath(vg);
-				}
-				nvgStroke(vg);
+		stringstream stream;
+		stream << fixed << setprecision(1) << module->speed;
+		string s = stream.str();
+		string speed = "x" + s;
 
-				if (module->channels == 1) {
-					// Draw ref line
-					nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x30));
-					nvgStrokeWidth(vg, 1);
-					{
-						nvgBeginPath(vg);
-						nvgMoveTo(vg, 0, 110);
-						nvgLineTo(vg, 130, 110);
-						nvgClosePath(vg);
-					}
-					nvgStroke(vg);
+		nvgTextBox(vg, 90, -15, 40, speed.c_str(), NULL);
 
-					// Draw waveform
-					nvgStrokeColor(vg, PINK_BIDOO);
-					nvgSave(vg);
-					Rect b = Rect(Vec(0, 70), Vec(125, 80));
-					nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-					nvgBeginPath(vg);
-					for (unsigned int i = 0; i < module->displayBuffL.size(); i++) {
-						float x, y;
-						x = (float)i / (module->displayBuffL.size() - 1.0f);
-						y = module->displayBuffL[i] / 2.0f + 0.5f;
-						Vec p;
-						p.x = b.pos.x + b.size.x * x;
-						p.y = b.pos.y + b.size.y * (1.0f - y);
-						if (i == 0)
-							nvgMoveTo(vg, p.x, p.y);
-						else
-							nvgLineTo(vg, p.x, p.y);
-					}
-					nvgLineCap(vg, NVG_ROUND);
-					nvgMiterLimit(vg, 2.0);
-					nvgStrokeWidth(vg, 1);
-					nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-					nvgStroke(vg);
-					nvgResetScissor(vg);
-					nvgRestore(vg);
+		//Draw play line
+		if ((module->play) && (!module->loading)) {
+			nvgStrokeColor(vg, LIGHTBLUE_BIDOO);
+			{
+				nvgBeginPath(vg);
+				nvgStrokeWidth(vg, 2);
+				if (module->totalSampleCount>0) {
+					nvgMoveTo(vg, module->samplePos * zoomWidth / nbSample + zoomLeftAnchor, 0);
+					nvgLineTo(vg, module->samplePos * zoomWidth / nbSample + zoomLeftAnchor, 2 * height+10);
 				}
 				else {
-					// Draw ref line
-					nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x30));
-					{
-						nvgBeginPath(vg);
-						nvgMoveTo(vg, 0, 90);
-						nvgLineTo(vg, 130, 90);
-						nvgMoveTo(vg, 0, 130);
-						nvgLineTo(vg, 130, 130);
-						nvgClosePath(vg);
-					}
-					nvgStroke(vg);
-
-					// Draw waveform
-					nvgStrokeColor(vg, PINK_BIDOO);
-					nvgSave(vg);
-					Rect b = Rect(Vec(0, 70), Vec(125, 40));
-					nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-					nvgBeginPath(vg);
-					for (unsigned int i = 0; i < module->displayBuffL.size(); i++) {
-						float x, y;
-						x = (float)i / (module->displayBuffL.size() - 1.0f);
-						y = module->displayBuffL[i] / 2.0f + 0.5f;
-						Vec p;
-						p.x = b.pos.x + b.size.x * x;
-						p.y = b.pos.y + b.size.y * (1.0f - y);
-						if (i == 0)
-							nvgMoveTo(vg, p.x, p.y);
-						else
-							nvgLineTo(vg, p.x, p.y);
-					}
-					nvgLineCap(vg, NVG_ROUND);
-					nvgMiterLimit(vg, 2.0);
-					nvgStrokeWidth(vg, 1);
-					nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-					nvgStroke(vg);
-
-					b = Rect(Vec(0, 110), Vec(125, 40));
-					nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-					nvgBeginPath(vg);
-					for (unsigned int i = 0; i < module->displayBuffR.size(); i++) {
-						float x, y;
-						x = (float)i / (module->displayBuffR.size() - 1.0f);
-						y = module->displayBuffR[i] / 2.0f + 0.5f;
-						Vec p;
-						p.x = b.pos.x + b.size.x * x;
-						p.y = b.pos.y + b.size.y * (1.0f - y);
-						if (i == 0)
-							nvgMoveTo(vg, p.x, p.y);
-						else
-							nvgLineTo(vg, p.x, p.y);
-					}
-					nvgLineCap(vg, NVG_ROUND);
-					nvgMiterLimit(vg, 2.0f);
-					nvgStrokeWidth(vg, 1);
-					nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-					nvgStroke(vg);
-					nvgResetScissor(vg);
-					nvgRestore(vg);
+					nvgMoveTo(vg, 0, 0);
+					nvgLineTo(vg, 0, 2 * height+10);
 				}
+				nvgClosePath(vg);
+			}
+			nvgStroke(vg);
+		}
 
-			//draw slices
-			if (module->trigMode == 2) {
-				for (int i = 1; i < module->nbSlices; i++) {
-					nvgStrokeColor(vg, YELLOW_BIDOO);
-					{
-						nvgBeginPath(vg);
-						nvgStrokeWidth(vg, 1);
-						nvgMoveTo(vg, (int)(i * module->sliceLength * 125 / module->totalSampleCount) , 70);
-						nvgLineTo(vg, (int)(i * module->sliceLength * 125 / module->totalSampleCount) , 150);
-						nvgClosePath(vg);
-					}
-					nvgStroke(vg);
+		//Draw ref line
+		nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x30));
+		nvgStrokeWidth(vg, 1);
+		{
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 0, height * 0.5f);
+			nvgLineTo(vg, width, height * 0.5f);
+			nvgClosePath(vg);
+		}
+		nvgStroke(vg);
+
+		nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x30));
+		nvgStrokeWidth(vg, 1);
+		{
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 0, 3*height * 0.5f + 10);
+			nvgLineTo(vg, width, 3*height * 0.5f + 10);
+			nvgClosePath(vg);
+		}
+		nvgStroke(vg);
+
+		if ((!module->loading) && (vL.size()>0)) {
+			//Draw waveform
+			nvgStrokeColor(vg, PINK_BIDOO);
+			nvgSave(vg);
+			Rect b = Rect(Vec(zoomLeftAnchor, 0), Vec(zoomWidth, height));
+			nvgScissor(vg, 0, b.pos.y, width, height);
+			nvgBeginPath(vg);
+			for (size_t i = 0; i < vL.size(); i++) {
+				float x, y;
+				x = (float)i/vL.size();
+				y = vL[i] / 2.0f + 0.5f;
+				Vec p;
+				p.x = b.pos.x + b.size.x * x;
+				p.y = b.pos.y + b.size.y * (1.0f - y);
+				if (i == 0) {
+					nvgMoveTo(vg, p.x, p.y);
+				}
+				else {
+					nvgLineTo(vg, p.x, p.y);
 				}
 			}
+			nvgLineCap(vg, NVG_MITER);
+			nvgStrokeWidth(vg, 1);
+			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+			nvgStroke(vg);
+
+			b = Rect(Vec(zoomLeftAnchor, height+10), Vec(zoomWidth, height));
+			nvgScissor(vg, 0, b.pos.y, width, height);
+			nvgBeginPath(vg);
+			for (size_t i = 0; i < vR.size(); i++) {
+				float x, y;
+				x = (float)i/vR.size();
+				y = vR[i] / 2.0f + 0.5f;
+				Vec p;
+				p.x = b.pos.x + b.size.x * x;
+				p.y = b.pos.y + b.size.y * (1.0f - y);
+				if (i == 0)
+					nvgMoveTo(vg, p.x, p.y);
+				else
+					nvgLineTo(vg, p.x, p.y);
+			}
+			nvgLineCap(vg, NVG_MITER);
+			nvgStrokeWidth(vg, 1);
+			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+			nvgStroke(vg);
+			nvgResetScissor(vg);
+
+			//draw slices
+
+			if (module->trigMode == 2) {
+				nvgScissor(vg, 0, 0, width, 2*height+10);
+				for (int i = 1; i < module->nbSlices; i++) {
+					nvgStrokeColor(vg, YELLOW_BIDOO);
+					nvgStrokeWidth(vg, 1);
+					{
+						nvgBeginPath(vg);
+						nvgMoveTo(vg, (int)(i * module->sliceLength * zoomWidth / nbSample + zoomLeftAnchor) , 0);
+						nvgLineTo(vg, (int)(i * module->sliceLength * zoomWidth / nbSample + zoomLeftAnchor) , 2*height+10);
+						nvgClosePath(vg);
+					}
+					nvgStroke(vg);
+				}
+				nvgResetScissor(vg);
+			}
+
+			nvgRestore(vg);
 		}
 	}
 };
@@ -417,12 +435,14 @@ struct OUAIVEWidget : ModuleWidget {
 		{
 			OUAIVEDisplay *display = new OUAIVEDisplay();
 			display->module = module;
-			display->box.pos = Vec(5, 40);
-			display->box.size = Vec(130, 250);
+			display->box.pos = Vec(5, 70);
+			display->box.size = Vec(125, 110);
 			addChild(display);
 		}
 
 		static const float portX0[4] = {34, 67, 101};
+
+		addInput(Port::create<TinyPJ301MPort>(Vec(10, 18), Port::INPUT, module, OUAIVE::POS_RESET_INPUT));
 
 		addParam(ParamWidget::create<BlueCKD6>(Vec(portX0[0]-25, 215), module, OUAIVE::TRIG_MODE_PARAM, 0.0, 2.0, 0.0));
 
@@ -430,9 +450,11 @@ struct OUAIVEWidget : ModuleWidget {
 		addInput(Port::create<TinyPJ301MPort>(Vec(portX0[2]+5, 222), Port::INPUT, module, OUAIVE::READ_MODE_INPUT));
 
 		addParam(ParamWidget::create<BidooBlueTrimpot>(Vec(portX0[1]-9, 250), module, OUAIVE::NB_SLICES_PARAM, 1.0, 128.01, 1.0));
+		addParam(ParamWidget::create<BidooBlueTrimpot>(Vec(portX0[1]+15, 250), module, OUAIVE::CVSLICES_PARAM, -1.0f, 1.0f, 0.0f));
 		addInput(Port::create<TinyPJ301MPort>(Vec(portX0[2]+5, 252), Port::INPUT, module, OUAIVE::NB_SLICES_INPUT));
 
 		addParam(ParamWidget::create<BidooBlueTrimpot>(Vec(portX0[1]-9, 275), module, OUAIVE::SPEED_PARAM, -0.05, 10, 1.0));
+		addParam(ParamWidget::create<BidooBlueTrimpot>(Vec(portX0[1]+15, 275), module, OUAIVE::CVSPEED_PARAM, -1.0f, 1.0f, 0.0f));
 		addInput(Port::create<TinyPJ301MPort>(Vec(portX0[2]+5, 277), Port::INPUT, module, OUAIVE::SPEED_INPUT));
 
 		addInput(Port::create<PJ301MPort>(Vec(portX0[0]-25, 321), Port::INPUT, module, OUAIVE::GATE_INPUT));
@@ -450,7 +472,6 @@ struct OUAIVEItem : MenuItem {
 		char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, NULL);
 		if (path) {
 			ouaive->play = false;
-			ouaive->fileLoaded = false;
 			ouaive->loadSample(path);
 			ouaive->samplePos = 0;
 			ouaive->lastPath = path;

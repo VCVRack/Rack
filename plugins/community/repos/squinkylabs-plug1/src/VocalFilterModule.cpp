@@ -1,9 +1,12 @@
 
 #include "Squinky.hpp"
 
+#ifdef _FORMANTS
 #include "WidgetComposite.h"
 #include "VocalFilter.h"
+#include "ctrl/SqMenuItem.h"
 
+using Comp = VocalFilter<WidgetComposite>;
 /**
  * Implementation class for VocalWidget
  */
@@ -18,21 +21,35 @@ struct VocalFilterModule : Module
     void step() override;
     void onSampleRateChange() override;
 
-    VocalFilter<WidgetComposite> vocalFilter;
+    Comp vocalFilter;
 private:
     typedef float T;
 };
 
-VocalFilterModule::VocalFilterModule() : Module(vocalFilter.NUM_PARAMS, vocalFilter.NUM_INPUTS, vocalFilter.NUM_OUTPUTS, vocalFilter.NUM_LIGHTS),
-vocalFilter(this)
+#ifdef __V1
+VocalFilterModule::VocalFilterModule() :
+    vocalFilter(this)
+{
+    config(Comp::NUM_PARAMS, Comp::NUM_INPUTS, Comp::NUM_OUTPUTS, Comp::NUM_LIGHTS);
+    onSampleRateChange();
+    vocalFilter.init();
+    std::shared_ptr<IComposite> icomp = Comp::getDescription();
+    SqHelper::setupParams(icomp, this);
+}
+#else
+VocalFilterModule::VocalFilterModule() : 
+    Module(vocalFilter.NUM_PARAMS, vocalFilter.NUM_INPUTS, vocalFilter.NUM_OUTPUTS, vocalFilter.NUM_LIGHTS),
+    vocalFilter(this)
 {
     onSampleRateChange();
     vocalFilter.init();
 }
 
+#endif
+
 void VocalFilterModule::onSampleRateChange()
 {
-    T rate = engineGetSampleRate();
+    T rate = SqHelper::engineGetSampleRate();
     vocalFilter.setSampleRate(rate);
 }
 
@@ -48,10 +65,23 @@ void VocalFilterModule::step()
 struct VocalFilterWidget : ModuleWidget
 {
     VocalFilterWidget(VocalFilterModule *);
+#ifndef __V1
+    Menu* createContextMenu() override;
+#endif
     void addVowelLabels();
-    void addModelKnob(VocalFilterModule *module, float x, float y);
+    void addModelKnob(std::shared_ptr<IComposite>, VocalFilterModule *module, float x, float y);
 };
 
+#ifndef __V1
+inline Menu* VocalFilterWidget::createContextMenu()
+{
+    Menu* theMenu = ModuleWidget::createContextMenu();
+    ManualMenuItem* manual = new ManualMenuItem(
+        "https://github.com/squinkylabs/SquinkyVCV/blob/master/docs/formants.md");
+    theMenu->addChild(manual);
+    return theMenu;
+}
+#endif
 void VocalFilterWidget::addVowelLabels()
 {
     const float ledX = 20;
@@ -84,51 +114,57 @@ void VocalFilterWidget::addVowelLabels()
         }
         Label * label = nullptr; label = new Label();
         label->text = ltext;
-        label->color = COLOR_BLACK;
+        label->color = SqHelper::COLOR_BLACK;
         label->box.pos = Vec(ledX + vOffsetX + i * ledDx, ledY + vOffsetY);
 
         addChild(label);
 
-        addChild(ModuleLightWidget::create<MediumLight<GreenLight>>(
+//addChild(createLight<MediumLight<RedLight>>(Vec(41, 59), module, MyModule::BLINK_LIGHT));
+	
+        addChild(createLight<MediumLight<GreenLight>>(
             Vec(ledX + i * ledDx, ledY), module, id));
     }
 }
 
-void VocalFilterWidget::addModelKnob(VocalFilterModule *module, float x, float y)
+void VocalFilterWidget::addModelKnob(std::shared_ptr<IComposite> icomp, VocalFilterModule *module, float x, float y)
 {
    // 5 pos vocal model
    // 0(bass)  1(tenor) 2(countertenor) 3(alto)  4(soprano)
     Label* label = new Label();
     label->box.pos = Vec(x - 18, y + 24);
     label->text = "B";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
 
     label = new Label();
     label->box.pos = Vec(x - 20, y + 0);
     label->text = "T";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
 
     label = new Label();
     label->box.pos = Vec(x - 2, y - 20);
     label->text = "CT";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
 
     label = new Label();
     label->box.pos = Vec(x + 30, y + 0);
     label->text = "A";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
 
     label = new Label();
     label->box.pos = Vec(x + 23, y + 24);
     label->text = "S";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
 
-    addParam(ParamWidget::create<RoundBlackSnapKnob>(Vec(x - .5, y), module, module->vocalFilter.FILTER_MODEL_SELECT_PARAM, 0.0f, 4.0f, 2.0f));
+    addParam(SqHelper::createParam<RoundBlackSnapKnob>(
+        icomp,
+        Vec(x - .5, y),
+        module,
+        Comp::FILTER_MODEL_SELECT_PARAM));
 }
 
 /**
@@ -143,9 +179,10 @@ VocalFilterWidget::VocalFilterWidget(VocalFilterModule *module) : ModuleWidget(m
     {
         SVGPanel *panel = new SVGPanel();
         panel->box.size = box.size;
-        panel->setBackground(SVG::load(assetPlugin(plugin, "res/formants_panel.svg")));
+        panel->setBackground(SVG::load(SqHelper::assetPlugin(plugin, "res/formants_panel.svg")));
         addChild(panel);
     }
+    std::shared_ptr<IComposite> icomp = Comp::getDescription();
 
     addVowelLabels();
 
@@ -171,63 +208,81 @@ VocalFilterWidget::VocalFilterWidget(VocalFilterModule *module) : ModuleWidget(m
     const float trimDx = 3;             // move to the right to match input
     Label* label;
 
-    addParam(ParamWidget::create<Rogan1PSBlue>(
+    addParam(SqHelper::createParam<Rogan1PSBlue>(
+        icomp,
         Vec(col2, row2L),
-        module, module->vocalFilter.FILTER_VOWEL_PARAM, -5.0, 5.0, 0.0));
-    addInput(Port::create<PJ301MPort>(
+        module, Comp::FILTER_VOWEL_PARAM));
+
+    addInput(createInput<PJ301MPort>(
         Vec(col1, row2L + dyDn),
-        Port::INPUT, module, module->vocalFilter.FILTER_VOWEL_CV_INPUT));
-    addParam(ParamWidget::create<Trimpot>(
+        module, Comp::FILTER_VOWEL_CV_INPUT));
+
+    addParam(SqHelper::createParam<Trimpot>(
+        icomp,
         Vec(col1 + trimDx, row2L + trimDyL),
-        module, module->vocalFilter.FILTER_VOWEL_TRIM_PARAM, -1.0, 1.0, 1.0));
+        module,Comp::FILTER_VOWEL_TRIM_PARAM));
 
     // Fc
     label = new Label();
     label->box.pos = Vec(col3, row2R + labelOffset);
     label->text = "Fc";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
-    addParam(ParamWidget::create<Rogan1PSBlue>(Vec(col3, row2R), module, module->vocalFilter.FILTER_FC_PARAM, -5.0, 5.0, 0.0));
-    addInput(Port::create<PJ301MPort>(
+
+    addParam(SqHelper::createParam<Rogan1PSBlue>(
+        icomp,
+        Vec(col3, row2R), module, Comp::FILTER_FC_PARAM));
+
+    addInput(createInput<PJ301MPort>(
         Vec(col4, row2R + dyUp),
-        Port::INPUT, module, module->vocalFilter.FILTER_FC_CV_INPUT));
-    addParam(ParamWidget::create<Trimpot>(
+        module, Comp::FILTER_FC_CV_INPUT));
+
+    addParam(SqHelper::createParam<Trimpot>(
+        icomp,
         Vec(col4 + trimDx, row2R + trimDyR),
-        module, module->vocalFilter.FILTER_FC_TRIM_PARAM, -1.0, 1.0, 1.0));
+        module, Comp::FILTER_FC_TRIM_PARAM));
 
    // Q
     label = new Label();
     label->box.pos = Vec(col2, row3L + labelOffset);
     label->text = "Q";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
-    addParam(ParamWidget::create<Rogan1PSBlue>(
+
+    addParam(SqHelper::createParam<Rogan1PSBlue>(
+        icomp,
         Vec(col2, row3L),
-        module, module->vocalFilter.FILTER_Q_PARAM, -5.0, 5.0, 0.0));
-    addInput(Port::create<PJ301MPort>(
+        module, Comp::FILTER_Q_PARAM));
+
+    addInput(createInput<PJ301MPort>(
         Vec(col1, row3L + dyDn),
-        Port::INPUT, module, module->vocalFilter.FILTER_Q_CV_INPUT));
-    addParam(ParamWidget::create<Trimpot>(
+        module, Comp::FILTER_Q_CV_INPUT));
+
+    addParam(SqHelper::createParam<Trimpot>(
+        icomp,
         Vec(col1 + trimDx, row3L + trimDyL),
-        module, module->vocalFilter.FILTER_Q_TRIM_PARAM, -1.0, 1.0, 1.0));
+        module, Comp::FILTER_Q_TRIM_PARAM));
 
    // Brightness
     label = new Label();
     label->box.pos = Vec(col3, row3R + labelOffset);
     label->text = "Brite";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
-    addParam(ParamWidget::create<Rogan1PSBlue>(
+    addParam(SqHelper::createParam<Rogan1PSBlue>(
+        icomp,
         Vec(col3, row3R),
-        module, module->vocalFilter.FILTER_BRIGHTNESS_PARAM, -5.0, 5.0, 0.0));
-    addInput(Port::create<PJ301MPort>(
-        Vec(col4, row3R + dyUp),
-        Port::INPUT, module, module->vocalFilter.FILTER_BRIGHTNESS_INPUT));
-    addParam(ParamWidget::create<Trimpot>(
-        Vec(col4 + trimDx, row3R + trimDyR),
-        module, module->vocalFilter.FILTER_BRIGHTNESS_TRIM_PARAM, -1.0, 1.0, 1.0));
+        module, Comp::FILTER_BRIGHTNESS_PARAM));
 
-    addModelKnob(module, 71, 274);
+    addInput(createInput<PJ301MPort>(
+        Vec(col4, row3R + dyUp),
+        module, Comp::FILTER_BRIGHTNESS_INPUT));
+    addParam(SqHelper::createParam<Trimpot>(
+        icomp,
+        Vec(col4 + trimDx, row3R + trimDyR),
+        module, Comp::FILTER_BRIGHTNESS_TRIM_PARAM));
+
+    addModelKnob(icomp, module, 71, 274);
 
     // I.O on row bottom
     const float AudioInputX = 10.0;
@@ -238,23 +293,29 @@ VocalFilterWidget::VocalFilterWidget(VocalFilterModule *module) : ModuleWidget(m
     label = new Label();
     label->box.pos = Vec(outputX - 6, iOrow + ioLabelOffset);
     label->text = "Out";
-    label->color = COLOR_WHITE;
+    label->color = SqHelper::COLOR_WHITE;
     addChild(label);
     label = new Label();
     label->box.pos = Vec(AudioInputX - 1, iOrow + ioLabelOffset);
     label->text = "In";
-    label->color = COLOR_BLACK;
+    label->color = SqHelper::COLOR_BLACK;
     addChild(label);
-    addInput(Port::create<PJ301MPort>(Vec(AudioInputX, iOrow), Port::INPUT, module, module->vocalFilter.AUDIO_INPUT));
-    addOutput(Port::create<PJ301MPort>(Vec(outputX, iOrow), Port::OUTPUT, module, module->vocalFilter.AUDIO_OUTPUT));
+
+    addInput(createInput<PJ301MPort>(
+        Vec(AudioInputX, iOrow),
+        module, Comp::AUDIO_INPUT));
+    addOutput(createOutput<PJ301MPort>(
+        Vec(outputX, iOrow),
+        module,
+        Comp::AUDIO_OUTPUT));
 
     /*************************************************
      *  screws
      */
-    addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-    addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-    addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-    addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 }
 
 RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, VocalFilter) {
@@ -263,3 +324,5 @@ RACK_PLUGIN_MODEL_INIT(squinkylabs_plug1, VocalFilter) {
                                                                                        "Formants: Vocal Filter", EFFECT_TAG, FILTER_TAG);
    return modelVocalFilterModule;
 }
+
+#endif

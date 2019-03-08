@@ -51,7 +51,7 @@ void Cmp::step() {
 		outputs[LESS_OUTPUT]
 	);
 	stepChannel(
-		abs(a - b) <= window,
+		fabsf(a - b) <= window,
 		high,
 		low,
 		_windowState,
@@ -213,4 +213,7 @@ struct CmpWidget : ModuleWidget {
 	}
 };
 
-Model* modelCmp = createModel<Cmp, CmpWidget>("Bogaudio-Cmp", "CMP", "comparator", LOGIC_TAG);
+RACK_PLUGIN_MODEL_INIT(Bogaudio, Cmp) {
+   Model *modelCmp = createModel<Cmp, CmpWidget>("Bogaudio-Cmp", "CMP", "comparator", LOGIC_TAG);
+   return modelCmp;
+}

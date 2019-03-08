@@ -64,7 +64,7 @@ struct Test2 : Module {
 	int _steps = maxSteps;
 #elif ADSR_ENVELOPE
 	ADSR _adsr;
-	SchmittTrigger _trigger;
+	Trigger _trigger;
 #elif LIMITER
 	Limiter _limiter;
 #endif

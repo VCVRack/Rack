@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="7.5000005"
+   height="7.4653606"
+   viewBox="0 0 1.9843751 1.97521"
+   version="1.1"
+   id="svg1656"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   sodipodi:docname="BarkKnob7.5.svg">
+  <defs
+     id="defs1650" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="22.627417"
+     inkscape:cx="7.2435622"
+     inkscape:cy="14.043264"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:snap-global="false" />
+  <metadata
+     id="metadata1653">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-68.640472,-212.76254)"
+     style="display:inline">
+    <path
+       inkscape:connector-curvature="0"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.01133465;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       d="m 69.803375,212.76254 -0.145179,0.99841 h -0.05107 l -0.144851,-0.99677 a 0.99540653,0.99222839 89.977372 0 0 -0.821803,0.9786 0.99540653,0.99222839 89.977372 0 0 0.992515,0.99497 0.99540653,0.99222839 89.977372 0 0 0.99186,-0.99579 0.99540653,0.99222839 89.977372 0 0 -0.821476,-0.97942 z"
+       id="path4301" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer9"
+     inkscape:label="Neddle"
+     style="display:none"
+     transform="translate(4e-6,-4.31386)">
+    <path
+       transform="translate(-68.640476,-208.44868)"
+       inkscape:connector-curvature="0"
+       id="path2793"
+       d="m 71.797293,208.8068 -0.02072,0.0554 -0.0022,-3.7e-4 -10e-7,2.91725 c 1.4e-5,0.005 0.0047,0.009 0.01105,0.009 l 0.03311,1e-5 c 0.0062,0 0.01105,-0.004 0.01105,-0.009 l -10e-7,-2.91726 -0.0027,2.8e-4 -0.02067,-0.0555 z"
+       style="opacity:1;fill:#373737;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.10176518;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke" />
+  </g>
+</svg>

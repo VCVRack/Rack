@@ -72,7 +72,7 @@ struct FMOp : Module {
 	Phasor _phasor;
 	SineTableOscillator _sineTable;
 	CICDecimator _decimator;
-	SchmittTrigger _gateTrigger;
+	Trigger _gateTrigger;
 	SlewLimiter _feedbackSL;
 	SlewLimiter _depthSL;
 	SlewLimiter _levelSL;

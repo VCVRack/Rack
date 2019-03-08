@@ -37,8 +37,6 @@ int Analyzer::getMaxExcluding(const FFTDataCpx& data, std::set<int> exclusions)
     return maxBin;
 }
 
-static int getMaxExcluding(const FFTDataCpx&, int excludeBin);
-
 float Analyzer::getSlope(const FFTDataCpx& response, float fTest, float sampleRate)
 {
     const int bin1 = FFT::freqToBin(fTest, sampleRate, response.size());
@@ -148,11 +146,13 @@ std::vector<Analyzer::FPoint> Analyzer::getPeaks(const FFTDataCpx& data, float s
                 }
                 average -= mag;             // subtract out our contribution
                 average /= 4.0;
+#if 0
                 double a = std::abs(data.get(i - 2));
                 double b = std::abs(data.get(i - 1));
                 double c = std::abs(data.get(i - 0));
                 double d = std::abs(data.get(i + 1));
                 double e = std::abs(data.get(i + 2));
+#endif
                 isPeak = (mag > (average * 2));
 #else
                 //this way average db

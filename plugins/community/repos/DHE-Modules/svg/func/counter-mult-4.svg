@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg6"
+   viewBox="0 0 6.000000000000001 11.160888888888877"
+   height="11.160888888888877mm"
+   width="6.000000000000001mm"
+   version="1.1">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <g
+     id="text2"
+     style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+     aria-label="±2">
+    <path
+       id="path14"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="M 2.3936835,0.8076071 H 2.8180328 V 0.62269509 H 2.3936835 V 0.15567374 H 2.1874355 V 0.62269509 H 1.7607154 V 0.8076071 h 0.4267201 v 0.483616 h 0.206248 z M 1.7607154,1.5804445 H 2.8180328 V 1.3955324 H 1.7607154 Z" />
+    <path
+       id="path16"
+       style="font-weight:bold;font-size:2.37066674px;font-family:'Proxima Nova';dominant-baseline:alphabetic;text-anchor:middle;fill:#0044cc"
+       d="M 2.9979812,1.5804445 H 4.1880559 V 1.2841111 H 3.5432346 c 0.4101253,-0.298704 0.632968,-0.5334 0.632968,-0.80365601 0,-0.31529868 -0.2678853,-0.50495202 -0.60452,-0.50495202 -0.220472,0 -0.455168,0.08060267 -0.6092614,0.25840268 l 0.192024,0.22284267 c 0.10668,-0.11142134 0.2441787,-0.18254134 0.4243494,-0.18254134 0.1303867,0 0.256032,0.0687493 0.256032,0.20624801 0,0.19439467 -0.1896534,0.35797067 -0.8368454,0.83447471 z" />
+  </g>
+  <circle
+     id="circle4"
+     stroke="#0044cc"
+     fill="#0044cc"
+     stroke-width="1.0"
+     r="2.5"
+     cy="5.5804444444444385"
+     cx="3.0000000000000004" />
+</svg>

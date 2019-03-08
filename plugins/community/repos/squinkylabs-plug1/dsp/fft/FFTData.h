@@ -7,6 +7,7 @@
 
 class FFT;
 
+
 /**
  * Our wrapper api uses std::complex, so we don't need to expose kiss_fft_cpx
  * outside. Our implementation assumes the two are equivalent, and that a
@@ -56,7 +57,7 @@ private:
 using FFTDataReal = FFTData<float>;
 using FFTDataCpx = FFTData<cpx>;
 
-//int FFTDataCpx::_count = 0;
+template<typename T> int FFTData<T>::_count = 0;
 
 template <typename T>
 inline FFTData<T>::FFTData(int numBins) :

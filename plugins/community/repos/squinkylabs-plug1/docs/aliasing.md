@@ -26,7 +26,7 @@ As an example we will show the effect of changing the oversample rate in our “
 
 ![clipping image](./clip-collage.png)
 
-This image shows the output of Shaper on the spectrum analyzer at 1X (left), 4X, and 16X (on the right). You can easily see the alising in the 1X image. At this setting there is no visible difference between 4X and 16X. No doubt there would be if the analyzer were more sensitive, but it’s worth noting here that at 1X the alias components are getting pretty high compared to the harmonics in the 10k region. But down in the 1-2k  area the alias is below the fundamental by a bit more than 50 db. Also notice that there are alias components below the fundamental frequency.
+This image shows the output of Shaper on the spectrum analyzer at 1X (left), 4X, and 16X (on the right). You can easily see the aliasing in the 1X image. At this setting there is no visible difference between 4X and 16X. No doubt there would be if the analyzer were more sensitive, but it’s worth noting here that at 1X the alias components are getting pretty high compared to the harmonics in the 10k region. But down in the 1-2k  area the alias is below the fundamental by a bit more than 50 db. Also notice that there are alias components below the fundamental frequency.
 
 This next image is the same test, but with the “Folder” setting. Again, the gain is pretty high, and there is some offset to bring in even harmonics.
 

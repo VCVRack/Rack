@@ -1,0 +1,143 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="90"
+  height="380"
+  viewBox="0 0 90 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="knob38" viewBox="0 0 38px 38px">
+      <g transform="translate(19 19)">
+        <polyline points="-5,0 5,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-5 0,5" stroke-width="1" stroke="#00f" />
+        <circle cx="0" cy="0" r="18.5" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-threshold38" viewBox="0 0 70px 70px">
+      <g transform="translate(35 35)">
+        <text font-size="6.0pt" transform="rotate(-240) translate(25 0) rotate(240) translate(-10 2.5)">-24</text>
+        <polyline points="0,0 3,0" stroke-width="0.3" stroke="#333" transform="rotate(-210) translate(21 0)" />
+        <text font-size="6.0pt" transform="rotate(-180) translate(25 0) rotate(180) translate(-10 2.5)">-18</text>
+        <polyline points="0,0 3,0" stroke-width="0.3" stroke="#333" transform="rotate(-150) translate(21 0)" />
+        <text font-size="6.0pt" transform="rotate(-120) translate(25 0) rotate(120) translate(-10 2.5)">-12</text>
+        <polyline points="0,0 3,0" stroke-width="0.3" stroke="#333" transform="rotate(-90) translate(21 0)" />
+        <text font-size="6.0pt" transform="rotate(-60) translate(25 0) rotate(60) translate(-2.3 2.5)">-6</text>
+        <polyline points="0,0 3,0" stroke-width="0.3" stroke="#333" transform="rotate(-30) translate(21 0)" />
+        <text font-size="6.0pt" transform="rotate(0) translate(25 0) rotate(0) translate(-2.3 2.5)">0</text>
+        <polyline points="0,0 3,0" stroke-width="0.3" stroke="#333" transform="rotate(30) translate(21 0)" />
+        <text font-size="6.0pt" transform="rotate(60) translate(25 0) rotate(-60) translate(-2.3 2.5)">6</text>
+        <text font-size="6.0pt" transform="rotate(90) translate(29 0) rotate(-90) translate(-4.7 2.2)">dB</text>
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-ratio38" viewBox="0 0 70px 70px">
+      <g transform="translate(35 35)">
+        <text font-size="6.0pt" transform="rotate(-240) translate(25 0) rotate(240) translate(-2.5 2.5)">1</text>
+        <text font-size="6.0pt" transform="rotate(-193.72) translate(25 0) rotate(193.72) translate(-8 2.5)">1.1</text>
+        <text font-size="6.0pt" transform="rotate(-149.70) translate(25 0) rotate(149.70) translate(-9 2.5)">1.3</text>
+        <text font-size="6.0pt" transform="rotate(-108.93) translate(25 0) rotate(108.93) translate(-9 2.5)">1.6</text>
+        <text font-size="6.0pt" transform="rotate(-74.52) translate(25 0) rotate(74.52) translate(-2.3 2.5)">2</text>
+        <text font-size="6.0pt" transform="rotate(-47.12) translate(25 0) rotate(47.12) translate(-2.3 2.5)">2.5</text>
+        <text font-size="6.0pt" transform="rotate(-6.18) translate(25 0) rotate(6.18) translate(-2.3 2.5)">4</text>
+        <text font-size="6.0pt" transform="rotate(31.11) translate(25 0) rotate(-31.11) translate(-2.3 2.5)">9</text>
+        <text font-size="6.0pt" transform="rotate(60) translate(25 0) rotate(-60) translate(-4 2.2)">&#8734;</text>
+      </g>
+    </symbol>
+
+    <symbol id="switch" viewBox="0 0 14px 24px">
+      <rect width="14px" height="24px" stroke-width="1" stroke="#000" fill="#ddd" />
+      <rect width="14px" height="12px" stroke-width="0" fill="#000" />
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 89,1 89,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 89.5,0.5 89.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 90,0 90,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <text class="title" x="38" y="17" font-size="9pt" letter-spacing="3px">NSGT</text>
+  <g transform="translate(5.5 374)">
+    <text class="brand" font-size="6.5pt" letter-spacing="2px">BOGAUDIO</text>
+    <rect width="1.5" height="2" fill="#ddd" transform="translate(21 -4)" />
+  </g>
+
+  <!-- <polyline points="0,0 0,380" stroke="#0f0" stroke-width="1" fill="none" transform="translate(45 0)" /> -->
+  <!-- <rect width="90" height="15" fill="#0f0" transform="translate(0 18)" /> -->
+  <!-- <rect width="90" height="15" fill="#0f0" transform="translate(0 102)" /> -->
+  <!-- <rect width="90" height="7" fill="#0f0" transform="translate(0 185)" /> -->
+  <!-- <rect width="90" height="7" fill="#0f0" transform="translate(0 232)" /> -->
+
+  <g transform="translate(0 40)">
+    <text font-size="8pt" letter-spacing="2px" transform="translate(8 0)">THRESHOLD</text>
+    <use id="THRESHOLD_PARAM" xlink:href="#knob38" transform="translate(26 12)" />
+    <use xlink:href="#knobguide-threshold38" transform="translate(10 -4)" />
+  </g>
+
+  <g transform="translate(0 122)">
+    <text font-size="8pt" letter-spacing="2px" transform="translate(25.5 0)">RATIO</text>
+    <use id="RATIO_PARAM" xlink:href="#knob38" transform="translate(26 13)" />
+    <use xlink:href="#knobguide-ratio38" transform="translate(10 -3)" />
+  </g>
+
+  <g transform="translate(40 198)">
+    <text font-size="5pt" letter-spacing="2px" transform="translate(-8 25.5) rotate(270)">KNEE</text>
+    <text font-size="5pt" letter-spacing="2px" transform="translate(-4 -1)">SOFT</text>
+    <use id="KNEE_PARAM" xlink:href="#switch" transform="translate(0 2)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(-5 34)">HARD</text>
+  </g>
+
+  <g transform="translate(11 240)">
+    <g transform="translate(0 0)">
+      <rect width="68" height="10" fill="#fafafa" transform="translate(0 66)" />
+      <rect width="68" height="73" rx="5" fill="#fafafa" />
+      <use id="LEFT_INPUT" xlink:href="#input" transform="translate(5 4)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(15.5 36)">L</text>
+      <use id="RIGHT_INPUT" xlink:href="#input" transform="translate(39 4)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(49 36)">R</text>
+      <use id="THRESHOLD_INPUT" xlink:href="#input" transform="translate(5 40)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(5.5 72)">TRSH</text>
+      <use id="RATIO_INPUT" xlink:href="#input" transform="translate(39 40)" />
+      <text font-size="5pt" letter-spacing="1px" transform="translate(39.5 72)">RATIO</text>
+    </g>
+    <g transform="translate(0 79)">
+      <rect width="68" height="10" fill="#bbb" transform="translate(0 -3)" />
+      <rect width="68" height="37" rx="5" fill="#bbb" />
+      <use id="LEFT_OUTPUT" xlink:href="#output" transform="translate(5 1)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(15.5 33)">L</text>
+      <use id="RIGHT_OUTPUT" xlink:href="#output" transform="translate(39 1)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(49 33)">R</text>
+    </g>
+  </g>
+</svg>

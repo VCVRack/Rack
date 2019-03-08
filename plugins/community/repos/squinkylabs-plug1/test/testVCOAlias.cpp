@@ -378,7 +378,7 @@ static void testEven(double normalizedFreq)
     fflush(stdout);
 }
 
-
+#if 0 // most builds don't have orig
 static void testAliasFunOrig(double normalizedFreq)
 {
     // adjust the freq to even
@@ -395,6 +395,7 @@ static void testAliasFunOrig(double normalizedFreq)
         return 15 * vco.saw();
         }, freq, numSamples);
 }
+#endif
 
 
 static void testAliasFun(double normalizedFreq)

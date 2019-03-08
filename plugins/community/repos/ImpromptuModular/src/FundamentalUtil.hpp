@@ -5,12 +5,14 @@
 //See ./LICENSE.txt for all licenses and see below for the filter code license
 //***********************************************************************************************
 
+#ifndef FUNDAMENTAL_UTIL_HPP
+#define FUNDAMENTAL_UTIL_HPP
 #include "rack.hpp"
 #include "dsp/functions.hpp"
 #include "dsp/resampler.hpp"
 #include "dsp/ode.hpp"
 #include "dsp/filter.hpp"
-#include "dsp/digital.hpp"
+#include "ImpromptuModular.hpp"
 
 
 using namespace rack;
@@ -106,7 +108,7 @@ struct LowFrequencyOscillator {
 	float freq = 1.0f;
 	bool offset = false;
 	bool invert = false;
-	SchmittTrigger resetTrigger;
+	Trigger resetTrigger;
 
 	LowFrequencyOscillator() {}
 	void setPitch(float pitch) {
@@ -162,3 +164,4 @@ struct LowFrequencyOscillator {
 };
 
 } // namespace rack_plugin_ImpromptuModular
+#endif

@@ -42,7 +42,7 @@ struct DisableOutputLimitModuleWidget : ModuleWidget {
 		DisableOutputLimitModule* dolm = dynamic_cast<DisableOutputLimitModule*>(module);
 		assert(dolm);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new DisableOutputLimitMenuItem(dolm, "Diable Output Limit"));
+		menu->addChild(new DisableOutputLimitMenuItem(dolm, "Disable output limit"));
 	}
 };
 

@@ -1,9 +1,12 @@
 ALL_OBJ= \
-	src/gui/booster-stage-widget.o \
-	src/gui/cubic-widget.o \
-	src/gui/hostage-widget.o \
-	src/gui/module-widget.o \
-	src/gui/stage-widget.o \
-	src/gui/swave-widget.o \
-	src/gui/upstage-widget.o \
-	src/plugin/dhe-modules.o
+	plugin/src/booster-stage.o \
+	plugin/src/cubic.o \
+	plugin/src/dhe-modules.o \
+	plugin/src/func.o \
+	plugin/src/hostage.o \
+	plugin/src/ranger.o \
+	plugin/src/stage.o \
+	plugin/src/swave.o \
+	plugin/src/tapers.o \
+	plugin/src/upstage.o \
+	plugin/src/xycloid.o

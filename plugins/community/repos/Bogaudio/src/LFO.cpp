@@ -102,10 +102,11 @@ void LFO::updateOutput(Phasor& wave, bool useSample, bool invert, Output& output
 			output.value = sample;
 		}
 		else {
-			sample = wave.nextFromPhasor(_phasor) * amplitude * _scale + (invert ? -_offset : _offset);
+			sample = wave.nextFromPhasor(_phasor) * amplitude * _scale;
 			if (invert) {
 				sample = -sample;
 			}
+			sample += _offset;
 			output.value = sample;
 		}
 		active = true;

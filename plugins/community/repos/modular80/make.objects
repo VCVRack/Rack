@@ -1,3 +1,5 @@
 ALL_OBJ= \
 	./src/Logistiker.o \
+	./src/Nosering.o \
+	./src/RadioMusic.o \
 	./src/modular80.o

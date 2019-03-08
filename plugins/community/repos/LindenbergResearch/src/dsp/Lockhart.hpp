@@ -13,38 +13,38 @@
 
 namespace dsp {
 
-   /**
-    * @brief Represents one stage of the Lockhart Wavefolder
-    */
-   struct LockhartWFStage {
-   private:
+/**
+ * @brief Represents one stage of the Lockhart Wavefolder
+ */
+struct LockhartWFStage {
+private:
 
-      double fn1, xn1;
-      double a, b, d;
+    double fn1, xn1;
+    double a, b, d;
 
-   public:
+public:
 
-      LockhartWFStage();
+    LockhartWFStage();
 
-      double compute(double x);
-   };
+    double compute(double x);
+};
 
 
-   /**
-    * Lockhart Wavefolder class
-    */
-   struct LockhartWavefolder : WaveShaper {
+/**
+ * Lockhart Wavefolder class
+ */
+struct LockhartWavefolder : WaveShaper {
 
-   private:
-      LockhartWFStage lh1, lh2, lh3, lh4;
+private:
+    LockhartWFStage lh1, lh2, lh3, lh4;
 
-   public:
-      explicit LockhartWavefolder(float sr);
+public:
+    explicit LockhartWavefolder(float sr);
 
-      void init() override;
-      void invalidate() override;
-      void process() override;
-      double compute(double x) override;
-   };
+    void init() override;
+    void invalidate() override;
+    void process() override;
+    double compute(double x) override;
+};
 
 }

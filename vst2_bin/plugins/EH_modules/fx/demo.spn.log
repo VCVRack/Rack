@@ -1,0 +1,225 @@
+0:                                      ;http://www.spinsemi.com/get_spn.php?spn=dance_ir_h_l.spn&prodnum=SPN1001
+0:                                      ;dance patchfor disco mixers:
+0:                                      ;pot 1 = Reverb to infinite RT, scales in and out levels
+0:                                      ;pot 2 = High pass filter (2 pole peaking, 8 ocatves)
+0:                                      ;pot 3 = Low pass filter (2 pole peaking, 8 ocatves)
+0:                                      
+0:                                      ;filters are great for actively modifying program material;
+0:                                      ;reveb can capture tonality for filter manipulation.
+0:                                      ;beware, infinite reverb turns off input!
+0:                                      
+0:  EQU KRT 32                          equ	krt	reg0
+0:  EQU KIN 33                          equ	kin	reg1
+0:  EQU KMIX 34                         equ	kmix	reg2
+0:  EQU HPAL 35                         equ	hpal	reg3
+0:  EQU HPBL 36                         equ	hpbl	reg4
+0:  EQU LPAL 37                         equ	lpal	reg5
+0:  EQU LPBL 38                         equ	lpbl	reg6
+0:  EQU HPAR 39                         equ	hpar	reg7
+0:  EQU HPBR 40                         equ	hpbr	reg8
+0:  EQU LPAR 41                         equ	lpar	reg9
+0:  EQU LPBR 42                         equ	lpbr	reg10
+0:  EQU KFH 43                          equ	kfh	reg11
+0:  EQU KFL 44                          equ	kfl	reg12
+0:  EQU TEMP 45                         equ	temp	reg13
+0:  EQU RMIXL 46                        equ	rmixl	reg14
+0:  EQU RMIXR 47                        equ	rmixr	reg15
+0:  EQU HPOUTL 48                       equ	hpoutl	reg16
+0:  EQU HPOUTR 49                       equ	hpoutr	reg17
+0:  EQU HBYP 50                         equ	hbyp	reg18
+0:  EQU LBYP 51                         equ	lbyp	reg19
+0:                                      
+0:  MEM 0 202                           mem	ap1	202
+0:  MEM 203 541                         mem	ap2	541
+0:  MEM 745 1157                        mem	ap3	1157
+0:  MEM 1903 1903                       mem	ap4	1903
+0:                                      
+0:  MEM 3807 2204                       mem	dap1a	2204
+0:  MEM 6012 3301                       mem	dap1b	3301
+0:  MEM 9314 4456                       mem	del1	4456
+0:  MEM 13771 3532                      mem	dap2a	3532
+0:  MEM 17304 3201                      mem	dap2b	3201
+0:  MEM 20506 6325                      mem	del2	6325
+0:                                      
+0:  EQU KAP 5033165                     equ	kap	0.6
+0:  EQU KQL -1677721                    equ	kql	-0.2
+0:  EQU KQH -1677721                    equ	kqh	-0.2
+0:                                      
+0:                                      ;prepare pots to affect control variables:
+0:                                      ;pot0 controls reverb time, but also affects input drive level;
+0:                                      ;reveb time is moderate up to about mid position, then increases
+0:                                      ;to infinity (or nearly) at full position.
+0:                                      ;input drive is constant, but decreases at the full pot0 position.
+0:                                      ;output mix is varied over the first half of pot0, then remains
+0:                                      ;high to the end of pot0's range.
+0:                                      
+1:  RDAX 16 8384256                     rdax	pot0,1.999	;get pot0, clip the upper half of pot0's range.
+2:  WRAX 34 0                           wrax	kmix,0		;write the output mix value
+0:                                      
+3:  RDAX 16 -4194304                    rdax	pot0,-1		;get pot0 again, 0 to -1
+4:  SOF 4194304 8380160                 sof	1,0.999		;now +1 to 0
+5:  SOF 8384256 0                       sof	1.999,0		;now +1 until midpint, then decreases to 0
+6:  WRAX 33 0                           wrax	kin,0		;write the input attenuator value
+0:                                      
+7:  RDAX 16 4194304                     rdax	pot0,1		;get pot0 again
+8:  WRAX 32 4194304                     wrax	krt,1		;save in krt, keep in ACC
+9:  SOF 4194304 -4194304                sof	1,-0.5		;subtract 1/2
+10: SKP 2 2                             skp	gez,2		;skp if pot is in upper half of range
+11: SOF 0 4194304                       sof	0,0.5		;load accumulator with +0.5
+12: WRAX 32 0                           wrax	krt,0		;overwrite if pot is in lower half of range
+0:                                      
+0:                                      ;now prepare pot1 for HP sweeping.
+0:                                      ;both frequency controls are exponential, and frequency increases
+0:                                      ;with clockwise pot rotation. Target Kf ranges are from .001 to 1.0
+0:                                      
+13: CLR                                 clr
+14: RDAX 17 4194304                     rdax	pot1,1		;get pot1
+15: SOF 2097152 -4194304                sof	0.5,-0.5	;ranges -0.5 to 0
+16: EXP 4194304 0                       exp	1,0
+17: WRAX 43 0                           wrax	kfh,0		;write to HP filter control
+0:                                      
+18: RDAX 18 4194304                     rdax	pot2,1		;get pot2
+19: SOF 2097152 -4194304                sof	0.5,-0.5	;ranges -0.5 to 0
+20: EXP 4194304 0                       exp	1,0
+21: WRAX 44 0                           wrax	kfl,0		;write to LP filter control
+0:                                      
+0:                                      ;now derive filter bypass functions (at open conditions)
+0:                                      
+22: RDAX 17 -4194304                    rdax	pot1,-1
+23: SOF 4194304 8380160                 sof	1,0.999		;ranges +1 to 0
+24: WRAX 45 4194304                     wrax	temp,1
+25: MULX 45                             mulx	temp
+26: MULX 45                             mulx	temp
+27: WRAX 50 0                           wrax	hbyp,0
+0:                                      
+0:                                      
+28: RDAX 18 4194304                     rdax	pot2,1		;read pot2 (LP) again
+29: MULX 18                             mulx 	pot2
+30: MULX 18                             mulx	pot2
+31: MULX 18                             mulx	pot2
+32: WRAX 51 0                           wrax	lbyp,0
+0:                                      
+0:                                      ;now do reverb, simple, twin loop, mono drive:
+0:                                      
+33: RDAX 20 1048576                     rdax	adcl,0.25
+34: RDAX 21 1048576                     rdax	adcr,0.25	;get inputs, leave headroom
+35: MULX 33                             mulx	kin		;scale by input attenuator
+36: RDA 202 2514944                     rda	ap1#,kap	;4 all passes:
+37: WRAP 0 -2523136                     wrap	ap1,-kap
+38: RDA 744 2514944                     rda	ap2#,kap
+39: WRAP 203 -2523136                   wrap	ap2,-kap
+40: RDA 1902 2514944                    rda	ap3#,kap
+41: WRAP 745 -2523136                   wrap	ap3,-kap
+42: RDA 3806 2514944                    rda	ap4#,kap
+43: WRAP 1903 -2523136                  wrap	ap4,-kap
+44: WRAX 45 0                           wrax	temp,0		;write ap output to temp reg
+0:                                      
+45: RDA 26831 4194304                   rda	del2#,1
+46: MULX 32                             mulx	krt
+47: RDAX 45 4194304                     rdax	temp,1
+48: RDA 6011 2514944                    rda	dap1a#,kap
+49: WRAP 3807 -2523136                  wrap	dap1a,-kap
+50: RDA 9313 2514944                    rda	dap1b#,kap
+51: WRAP 6012 -2523136                  wrap	dap1b,-kap
+52: WRA 9314 0                          wra	del1,0
+53: RDA 13770 4194304                   rda	del1#,1
+54: MULX 32                             mulx	krt
+55: RDAX 45 4194304                     rdax	temp,1
+56: RDA 17303 2514944                   rda	dap2a#,kap
+57: WRAP 13771 -2523136                 wrap	dap2a,-kap
+58: RDA 20505 2514944                   rda	dap2b#,kap
+59: WRAP 17304 -2523136                 wrap	dap2b,-kap
+60: WRA 20506 0                         wra	del2,0
+0:                                      
+0:                                      ;now mix the inputs with the reverb:
+0:                                      
+61: RDAX 20 -4194304                    rdax	adcl,-1
+62: RDA 9314 6291456                    rda	del1,1.5
+63: MULX 16                             mulx	pot0
+64: RDAX 20 4194304                     rdax	adcl,1
+65: WRAX 46 0                           wrax	rmixl,0
+0:                                      
+66: RDAX 21 -4194304                    rdax	adcr,-1
+67: RDA 20506 6291456                   rda	del2,1.5
+68: MULX 16                             mulx	pot0
+69: RDAX 21 4194304                     rdax	adcr,1
+70: WRAX 47 0                           wrax	rmixr,0
+0:                                      
+0:                                      ;Reverb outputs are at rmixl and rmixr.
+0:                                      
+0:                                      ;now do two filters, start with the high pass, stereo.
+0:                                      ;use the reveb mix for inputs, cascade the filter banks.
+0:                                      
+71: RDAX 35 4194304                     rdax	hpal,1
+72: MULX 43                             mulx	kfh
+73: RDAX 36 4194304                     rdax	hpbl,1
+74: WRAX 36 -4194304                    wrax	hpbl,-1
+75: RDAX 35 -838912                     rdax	hpal,kqh
+76: RDAX 46 4194304                     rdax	rmixl,1
+77: WRAX 48 4194304                     wrax	hpoutl,1	;HP output
+78: MULX 43                             mulx	kfh
+79: RDAX 35 4194304                     rdax	hpal,1
+80: WRAX 35 0                           wrax	hpal,0
+0:                                      
+81: RDAX 39 4194304                     rdax	hpar,1
+82: MULX 43                             mulx	kfh
+83: RDAX 40 4194304                     rdax	hpbr,1
+84: WRAX 40 -4194304                    wrax	hpbr,-1
+85: RDAX 39 -838912                     rdax	hpar,kqh
+86: RDAX 47 4194304                     rdax	rmixr,1
+87: WRAX 49 4194304                     wrax	hpoutr,1	;HP output
+88: MULX 43                             mulx	kfh
+89: RDAX 39 4194304                     rdax	hpar,1
+90: WRAX 39 0                           wrax	hpar,0
+0:                                      
+0:                                      ;bypass if pot1 is fully counterclockwise:
+0:                                      
+91: RDAX 48 -4194304                    rdax	hpoutl,-1
+92: RDAX 46 4194304                     rdax	rmixl,1
+93: MULX 50                             mulx	hbyp
+94: RDAX 48 4194304                     rdax	hpoutl,1
+95: WRAX 48 0                           wrax	hpoutl,0
+0:                                      
+96: RDAX 49 -4194304                    rdax	hpoutr,-1
+97: RDAX 47 4194304                     rdax	rmixr,1
+98: MULX 50                             mulx	hbyp
+99: RDAX 49 4194304                     rdax	hpoutr,1
+100:WRAX 49 0                           wrax	hpoutr,0
+0:                                      
+0:                                      ;now do cascaded low pass:
+0:                                      
+101:RDAX 37 4194304                     rdax	lpal,1
+102:MULX 44                             mulx	kfl
+103:RDAX 38 4194304                     rdax	lpbl,1
+104:WRAX 38 -4194304                    wrax	lpbl,-1
+105:RDAX 37 -838912                     rdax	lpal,kql
+106:RDAX 48 4194304                     rdax	hpoutl,1
+107:MULX 44                             mulx	kfl
+108:RDAX 37 4194304                     rdax	lpal,1
+109:WRAX 37 0                           wrax	lpal,0
+0:                                      
+110:RDAX 41 4194304                     rdax	lpar,1
+111:MULX 44                             mulx	kfl
+112:RDAX 42 4194304                     rdax	lpbr,1
+113:WRAX 42 -4194304                    wrax	lpbr,-1
+114:RDAX 41 -838912                     rdax	lpar,kql
+115:RDAX 49 4194304                     rdax	hpoutr,1
+116:MULX 44                             mulx	kfl
+117:RDAX 41 4194304                     rdax	lpar,1
+118:WRAX 41 0                           wrax	lpar,0
+0:                                      
+119:RDAX 38 -4194304                    rdax	lpbl,-1
+120:RDAX 48 4194304                     rdax	hpoutl,1
+121:MULX 51                             mulx	lbyp
+122:RDAX 38 4194304                     rdax	lpbl,1
+123:WRAX 22 0                           wrax	dacl,0
+0:                                      	
+124:RDAX 42 -4194304                    rdax	lpbr,-1
+125:RDAX 49 4194304                     rdax	hpoutr,1
+126:MULX 51                             mulx	lbyp
+127:RDAX 42 4194304                     rdax	lpbr,1
+128:WRAX 23 0                           wrax	dacr,0
+0:                                      
+0:                                      
+0:                                      
+0:                                      

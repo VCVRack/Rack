@@ -15,6 +15,8 @@ ALL_OBJ= \
 	sqsrc/thread/ThreadSharedState.o \
 	src/BlankModule.o \
 	src/BootyModule.o \
+	src/CH10Module.o \
+	src/CHBgModule.o \
 	src/CHBModule.o \
 	src/CPU_Hog.o \
 	src/ColoredNoiseModule.o \
@@ -24,13 +26,28 @@ ALL_OBJ= \
 	src/FunVModule.o \
 	src/GMRModule.o \
 	src/GrayModule.o \
+	src/KSModule.o \
 	src/LFNModule.o \
+	src/SequencerModule.o \
 	src/ShaperModule.o \
 	src/Squinky.o \
 	src/SuperModule.o \
 	src/ThreadBoost.o \
 	src/TremoloModule.o \
 	src/VocalFilterModule.o \
-	src/VocalModule.o
+	src/VocalModule.o \
+	midi/controller/MidiEditor.o \
+	midi/controller/MidiKeyboardHandler.o \
+	midi/controller/MidiLock.o \
+	midi/controller/MidiPlayer.o \
+	midi/controller/ReplaceDataCommand.o \
+	midi/controller/UndoRedoStack.o \
+	midi/model/MidiSelectionModel.o \
+	midi/model/MidiSequencer.o \
+	midi/model/MidiSong.o \
+	midi/model/MidiTrack.o \
+	midi/view/MidiEditorContext.o \
+	midi/view/NoteScreenScale.o \
+   src/seq/UIPrefs.o
 
 #	pboost/pboost.o 

@@ -1,6 +1,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <cmath>
 
 #include "signal.hpp"
 
@@ -184,11 +185,11 @@ void SlewLimiter::setParams(float sampleRate, float milliseconds, float range) {
 	_delta = range / ((milliseconds / 1000.0f) * sampleRate);
 }
 
-float SlewLimiter::next(float sample) {
-	if (sample > _last) {
-		return _last = std::min(_last + _delta, sample);
+float SlewLimiter::next(float sample, float last) {
+	if (sample > last) {
+		return std::min(last + _delta, sample);
 	}
-	return _last = std::max(_last - _delta, sample);
+	return std::max(last - _delta, sample);
 }
 
 
@@ -205,7 +206,7 @@ void ShapedSlewLimiter::setParams(float sampleRate, float milliseconds, float sh
 
 float ShapedSlewLimiter::next(float sample) {
 	float difference = sample - _last;
-	float ttg = abs(difference) / range;
+	float ttg = fabsf(difference) / range;
 	if (_time < 0.0001f || ttg < 0.0001f) {
 		return _last = sample;
 	}
@@ -218,7 +219,7 @@ float ShapedSlewLimiter::next(float sample) {
 	if (_shapeExponent != 0.0f) {
 		ttg = powf(ttg, _inverseShapeExponent);
 	}
-	float y = abs(difference) - ttg * range;
+	float y = fabsf(difference) - ttg * range;
 	if (difference < 0.0f) {
 		return _last = std::max(_last - y, sample);
 	}
@@ -385,7 +386,7 @@ void Limiter::setParams(float shape, float knee, float limit, float scale) {
 }
 
 float Limiter::next(float sample) {
-	float out = abs(sample);
+	float out = fabsf(sample);
 	if (out > _knee) {
 		out -= _knee;
 		out /= _scale;
@@ -397,7 +398,7 @@ float Limiter::next(float sample) {
 			x = _tanhf.value(x * _shape * M_PI) * _normalization;
 			x = std::min(x, 1.0f);
 			x *= _limit - _knee;
-			out = std::min(abs(sample) - _knee, x);
+			out = std::min(fabsf(sample) - _knee, x);
 		}
 		else {
 			out = std::min(out, _limit - _knee);
@@ -428,4 +429,69 @@ float Saturator::next(float sample) {
 		return -saturation(-x);
 	}
 	return saturation(x);
+}
+
+
+const float Compressor::maxEffectiveRatio = 1000.0f;
+
+float Compressor::compressionDb(float detectorDb, float thresholdDb, float ratio, bool softKnee) {
+	const float softKneeDb = 3.0f;
+
+	if (softKnee) {
+		float sDb = thresholdDb - softKneeDb;
+		if (detectorDb <= sDb) {
+			return 0.0f;
+		}
+
+		float ix = softKneeDb * std::min(ratio, maxEffectiveRatio) + thresholdDb;
+		float iy = softKneeDb + thresholdDb;
+		float t = (detectorDb - sDb) / (ix - thresholdDb);
+		float px = t * (ix - thresholdDb) + thresholdDb;
+		float py = t * (iy - thresholdDb) + thresholdDb;
+		float s = (py - sDb) / (px - sDb);
+		float compressionDb = detectorDb - sDb;
+		compressionDb -= s * (detectorDb - sDb);
+		return compressionDb;
+	}
+
+	if (detectorDb <= thresholdDb) {
+		return 0.0f;
+	}
+	float compressionDb = detectorDb - thresholdDb;
+	compressionDb -= compressionDb / ratio;
+	return compressionDb;
+}
+
+
+const float NoiseGate::maxEffectiveRatio = Compressor::maxEffectiveRatio;
+
+float NoiseGate::compressionDb(float detectorDb, float thresholdDb, float ratio, bool softKnee) {
+	const float softKneeDb = 6.0f;
+
+	if (softKnee) {
+		// FIXME: this acheives nothing.
+		float range = thresholdDb - Amplifier::minDecibels;
+		float ix = thresholdDb + softKneeDb;
+		float iy = 0;
+		if (detectorDb >= ix) {
+			return 0.0f;
+		}
+		float ox = thresholdDb - range / ratio;
+		if (detectorDb <= ox) {
+			return -Amplifier::minDecibels;
+		}
+		const float oy = Amplifier::minDecibels;
+		float t = (detectorDb - ox) / (ix - ox);
+		float px = t * (ix - thresholdDb) + thresholdDb;
+		float py = t * (iy - thresholdDb) + thresholdDb;
+		float s = (py - oy) / (px - ox);
+		return -(oy + s * (detectorDb - ox));
+	}
+
+	if (detectorDb >= thresholdDb) {
+		return 0.0f;
+	}
+	float differenceDb = thresholdDb - detectorDb;
+	float compressionDb = differenceDb * ratio - differenceDb;
+	return std::min(compressionDb, -Amplifier::minDecibels);
 }

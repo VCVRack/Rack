@@ -1,0 +1,4 @@
+ALL_OBJ= \
+	./src/LabSeven.o \
+	./src/LS3340VCO.o
+

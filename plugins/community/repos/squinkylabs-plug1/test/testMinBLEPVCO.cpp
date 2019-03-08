@@ -1,19 +1,12 @@
 #include <assert.h>
 
-#if !defined(M_PI)
-#define M_PI 3.14159265358979323846264338327950288
-#endif
-
 #include "asserts.h"
 #include "EV3.h"
-
-
 
 #include "MinBLEPVCO.h"
 #include "TestComposite.h"
 
 static float sampleTime = 1.0f / 44100.0f;
-
 
 class TestMB
 {
@@ -194,8 +187,6 @@ void TestMB::testSync2()
   
 }
 
-
-
 void TestMB::testSync3()
 {
     EV3<TestComposite> ev3;
@@ -220,15 +211,12 @@ void TestMB::testSync3()
 }
 
 
+// TODO: what is this??
 static void testBlepx(float crossing, float jump)
 {
     printf("BLEP crossing = %.2f, jump =%.2f\n", crossing, jump);
-    rack::MinBLEP<16> syncMinBLEP;
-
-    syncMinBLEP.minblep = rack::minblep_16_32;
-    syncMinBLEP.oversample = 32;
-
-   // syncMinBLEP.jump(-.5, -2);
+    SqBlep syncMinBLEP;
+    syncMinBLEP.jump(-.5, -2);
     syncMinBLEP.jump(crossing, jump);
     for (int i = 0; i < 32; ++i) {
     //float saw = -1.0 + 2.0*phase;
@@ -273,7 +261,6 @@ static void testOutputs()
     testOutput(MinBLEPVCO::Waveform::Sin, false);
     testOutput(MinBLEPVCO::Waveform::Tri, false);
     testOutput(MinBLEPVCO::Waveform::Even, false);
-   
 }
 
 static void testBlep()
@@ -346,7 +333,6 @@ static void testSyncIn(MinBLEPVCO::Waveform wf)
     assert(!AudioMath::closeTo(x, y, .1));
 
     // TODO: pick freq that will make this more robust
-
 }
 
 static void testSyncIn()
@@ -356,6 +342,23 @@ static void testSyncIn()
     testSyncIn(MinBLEPVCO::Waveform::Tri);
     testSyncIn(MinBLEPVCO::Waveform::Square);
     testSyncIn(MinBLEPVCO::Waveform::Even);
+}
+
+static void testNormal()
+{
+    EV3<TestComposite> ev3;
+    ev3.params[EV3<TestComposite>::MIX1_PARAM].value = 0; 
+    ev3.params[EV3<TestComposite>::MIX2_PARAM].value = 0;
+    ev3.params[EV3<TestComposite>::MIX3_PARAM].value = 0;
+    for (int i = 0; i < 4; ++i) ev3.step();
+    assert(!ev3.isLoweringVolume());
+
+    ev3.params[EV3<TestComposite>::MIX1_PARAM].value = 1;
+    ev3.params[EV3<TestComposite>::MIX2_PARAM].value = 1;
+    ev3.params[EV3<TestComposite>::MIX3_PARAM].value = 1;
+    for (int i = 0; i < 4; ++i) ev3.step();
+    assert(ev3.isLoweringVolume());
+
 }
 
 void testMinBLEPVCO()
@@ -377,4 +380,5 @@ void testMinBLEPVCO()
     testZero();
     testSyncOut();
     testSyncIn();
+    testNormal();
 }

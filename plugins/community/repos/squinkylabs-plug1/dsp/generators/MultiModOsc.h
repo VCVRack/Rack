@@ -86,7 +86,6 @@ inline void MultiModOsc<T, NOsc, NOut>::Params::setRateAndSpread(T rate, T sprea
         const T actual = x * inverseSampleRate;
         SawOscillator<T, false>::setFrequency(params[i], actual);
         this->matrixMode = inMatrixMode;
-
     }
 }
 
@@ -97,8 +96,7 @@ inline void MultiModOsc<T, NOsc, NOut>::run(T* output, State& state, const Param
     for (int i = 0; i < NOsc; ++i) {
         modulators[i] = SawOscillator<T, false>::runTri(state.states[i], params.params[i]);
     }
-    // The old implementation had a smarter algorithm, but
-    // for now hard-wiring it for 4/3 is OK
+
     if ((NOsc == 4) && (NOut == 3)) {
         switch (params.matrixMode) {
             case 0:     // classic mix
@@ -120,7 +118,6 @@ inline void MultiModOsc<T, NOsc, NOut>::run(T* output, State& state, const Param
                 break;
             default:
                 assert(false);
-
         }
     } else {
         assert(false);  // need to return something

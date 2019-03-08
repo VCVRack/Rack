@@ -143,6 +143,19 @@ struct AHKnobNoSnap : AHKnob {
 	}
 };
 
+struct AHBigKnobNoSnap : AHKnob {
+	AHBigKnobNoSnap() {
+		snap = false;
+		setSVG(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/AHBigKnob.svg")));
+	}
+};
+
+struct AHBigKnobSnap : AHKnob {
+	AHBigKnobSnap() {
+		snap = true;
+		setSVG(SVG::load(assetPlugin(plugin,"res/ComponentLibrary/AHBigKnob.svg")));
+	}
+};
 
 struct AHTrimpotSnap : AHKnob {
 	AHTrimpotSnap() {
