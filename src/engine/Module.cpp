@@ -40,6 +40,12 @@ json_t *Module::toJson() {
 		json_object_set_new(rootJ, "data", dataJ);
 	}
 
+	// leftModuleId
+	json_object_set_new(rootJ, "leftModuleId", json_integer(leftModuleId));
+
+	// rightModuleId
+	json_object_set_new(rootJ, "rightModuleId", json_integer(rightModuleId));
+
 	return rootJ;
 }
 
@@ -71,6 +77,16 @@ void Module::fromJson(json_t *rootJ) {
 	json_t *dataJ = json_object_get(rootJ, "data");
 	if (dataJ)
 		dataFromJson(dataJ);
+
+	// leftModuleId
+	json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
+	if (leftModuleIdJ)
+		leftModuleId = json_integer_value(leftModuleIdJ);
+
+	// rightModuleId
+	json_t *rightModuleIdJ = json_object_get(rootJ, "rightModuleId");
+	if (rightModuleIdJ)
+		rightModuleId = json_integer_value(rightModuleIdJ);
 }
 
 void Module::reset() {
