@@ -1,4 +1,16 @@
 ALL_OBJ= \
-	./src/Edge.o \
-	./src/K_Rush.o \
-	./src/WTFDoveVCO.o
+	src/bit-spigot.o \
+	src/cmwc.o \
+	src/recorder-module-widget.o \
+	src/recorder-module.o \
+	src/skylights.o \
+	src/turing-module-widget.o \
+	src/turing-module.o \
+	src/turing-pulse-module-widget.o \
+	src/turing-pulse-module.o \
+	src/turing-vactrol-module-widget.o \
+	src/turing-vactrol-module.o \
+	src/turing-volts-module-widget.o \
+	src/turing-volts-module.o \
+	src/whatnote-module-widget.o \
+	src/whatnote-module.o

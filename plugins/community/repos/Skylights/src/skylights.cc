@@ -8,7 +8,7 @@ RACK_PLUGIN_MODEL_DECLARE(Skylights, turing_volts_model);
 RACK_PLUGIN_MODEL_DECLARE(Skylights, turing_pulse_model);
 RACK_PLUGIN_MODEL_DECLARE(Skylights, turing_vactrol_model);
 
-RACK_PLUGIN_INIT(Edge) {
+RACK_PLUGIN_INIT(Skylights) {
    RACK_PLUGIN_INIT_ID();
    RACK_PLUGIN_INIT_VERSION("0.6.3");
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/Skrylar/skylights-vcv/");

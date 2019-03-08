@@ -109,6 +109,7 @@ extern void init_plugin_Qwelk                (rack::Plugin *p);
 extern void init_plugin_rcm                  (rack::Plugin *p);
 extern void init_plugin_RJModules            (rack::Plugin *p);
 extern void init_plugin_SerialRacker         (rack::Plugin *p);
+extern void init_plugin_Skylights            (rack::Plugin *p);
 extern void init_plugin_SonusModular         (rack::Plugin *p);
 extern void init_plugin_Southpole            (rack::Plugin *p);
 extern void init_plugin_Southpole_parasites  (rack::Plugin *p);
@@ -213,6 +214,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("rcm",                  &init_plugin_rcm);
    vst2_load_static_rack_plugin("RJModules",            &init_plugin_RJModules);
    vst2_load_static_rack_plugin("SerialRacker",         &init_plugin_SerialRacker);
+   vst2_load_static_rack_plugin("Skylights",            &init_plugin_Skylights);
    vst2_load_static_rack_plugin("SonusModular",         &init_plugin_SonusModular);
    vst2_load_static_rack_plugin("Southpole",            &init_plugin_Southpole);
    vst2_load_static_rack_plugin("Southpole_parasites",  &init_plugin_Southpole_parasites);

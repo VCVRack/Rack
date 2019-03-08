@@ -1,4 +1,4 @@
-SLUG=Edge
+SLUG=Skylights
 
 include ../../../build_plugin_pre_linux.mk
 
