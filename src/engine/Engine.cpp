@@ -267,6 +267,11 @@ static void Engine_step(Engine *that) {
 	for (Cable *cable : that->internal->cables) {
 		cable->step();
 	}
+	// Swap messages of all modules
+	for (Module *module : that->internal->modules) {
+		std::swap(module->leftProducerMessage, module->leftConsumerMessage);
+		std::swap(module->rightProducerMessage, module->rightConsumerMessage);
+	}
 }
 
 static void Engine_updateAdjacent(Engine *that, Module *m) {

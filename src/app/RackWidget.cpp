@@ -329,19 +329,19 @@ static void RackWidget_updateAdjacent(RackWidget *that) {
 
 			if (m == m2)
 				continue;
-			math::Vec p2 = m->box.pos.div(RACK_GRID_SIZE).round();
+			math::Vec p2 = m2->box.pos.div(RACK_GRID_SIZE).round();
 
-			// Check if m is to the right of m2
+			// Check if m is to the left of m2
 			if (pRight.isEqual(p2)) {
-				m->module->leftModuleId = m2->module->id;
-				m2->module->rightModuleId = m->module->id;
+				m->module->rightModuleId = m2->module->id;
+				m2->module->leftModuleId = m->module->id;
 				found = true;
 				break;
 			}
 		}
 
 		if (!found) {
-			m->module->leftModuleId = -1;
+			m->module->rightModuleId = -1;
 		}
 	}
 }
