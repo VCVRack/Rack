@@ -772,7 +772,7 @@ std::shared_ptr<Image> Image::load(const std::string &filename) {
 ////////////////////
 
 SVG::SVG(const std::string &filename) {
-   printf("xxx vstrack: SVG::SVG\n");
+   // printf("xxx vstrack: SVG::SVG\n");
    // printf("xxx SVG::SVG: ENTER\n");
 	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
    // printf("xxx SVG::SVG: handle=%p\n");

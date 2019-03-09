@@ -261,13 +261,13 @@ struct Model {
 				return module;
 			}
 			ModuleWidget *createModuleWidget() override {
-            printf("xxx createModuleWidget: ENTER\n");
+            // printf("xxx createModuleWidget: ENTER\n");
 				TModule *module = new TModule();
-            printf("xxx createModuleWidget: module=%p\n", module);
+            // printf("xxx createModuleWidget: module=%p\n", module);
 				TModuleWidget *moduleWidget = new TModuleWidget(module);
-            printf("xxx createModuleWidget: moduleWidget=%p\n", moduleWidget);
+            // printf("xxx createModuleWidget: moduleWidget=%p\n", moduleWidget);
 				moduleWidget->model = this;
-            printf("xxx createModuleWidget: LEAVE\n");
+            // printf("xxx createModuleWidget: LEAVE\n");
 				return moduleWidget;
 			}
 			ModuleWidget *createModuleWidgetNull() override {
