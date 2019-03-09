@@ -44,7 +44,9 @@ struct PitchShifter {
 		gInFIFO = (float*)calloc(fftFrameSize,sizeof(float));
 		gOutFIFO =  (float*)calloc(fftFrameSize,sizeof(float));
 		gFFTworksp = (float*)pffft_aligned_malloc(fftFrameSize*sizeof(float));
+      memset((void*)gFFTworksp, 0, sizeof(fftFrameSize*sizeof(float))); // [bsp] 09Mar2019: fix noise burst after patch loading
 		gFFTworkspOut =  (float*)pffft_aligned_malloc(fftFrameSize*sizeof(float));
+      memset((void*)gFFTworkspOut, 0, sizeof(fftFrameSize*sizeof(float))); // [bsp] 09Mar2019: fix noise burst after patch loading
 		gLastPhase = (float*)calloc((fftFrameSize/2+1),sizeof(float));
 		gSumPhase = (float*)calloc((fftFrameSize/2+1),sizeof(float));
 		gOutputAccum = (float*)calloc(2*fftFrameSize,sizeof(float));

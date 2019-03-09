@@ -54,6 +54,8 @@ struct REI : Module {
 
 	REI() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		pShifter = new PitchShifter(BUFF_SIZE, 8, engineGetSampleRate());
+      memset((void*)in_Buffer.data, 0, sizeof(in_Buffer.data));
+      memset((void*)pin_Buffer.data, 0, sizeof(pin_Buffer.data));
 	}
 
 	void step() override;
