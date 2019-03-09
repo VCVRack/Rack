@@ -41,11 +41,13 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-08Mar2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-08Mar2019b.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-08Mar2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-08Mar2019b.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-09Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-09Mar2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-09Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-09Mar2019.7z) (32bit, experimental)
 
 ## Linux
-- [veeseevstrack_0_6_1_lin64_bin-31Oct2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_lin64_bin-31Oct2018.7z) (64bit/SSE2, beta) (note: build the source to get the latest version)
+- [veeseevstrack_0_6_1_lin64_bin-08March2019b.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-08March2019b.tar.gz) (64bit) (Dave's latest build)
+- [veeseevstrack_0_6_1_lin64_bin-31Oct2018.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_lin64_bin-31Oct2018.7z) (64bit/SSE2, beta) (old build)
+! note: build the source to get the latest version
 
 ## Notes
 - The effect plugin can used be as an instrument, too. You just have to send it MIDI events !
