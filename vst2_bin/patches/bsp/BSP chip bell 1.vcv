@@ -1,0 +1,497 @@
+{
+  "version": "0.6.1",
+  "oversampleFactor": 1.0,
+  "oversampleQuality": 7.0,
+  "oversampleNumIn": 8.0,
+  "oversampleNumOut": 8.0,
+  "idleDetect": 1.0,
+  "modules": [
+    {
+      "plugin": "Core",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 1,
+      "model": "AudioInterface",
+      "pos": [
+        68,
+        0
+      ],
+      "params": [],
+      "data": {
+        "audio": {
+          "driver": 0,
+          "deviceName": "",
+          "offset": 0,
+          "maxChannels": 8,
+          "sampleRate": 44100,
+          "blockSize": 256
+        }
+      }
+    },
+    {
+      "plugin": "Core",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 2,
+      "model": "MIDIToCVInterface",
+      "pos": [
+        0,
+        0
+      ],
+      "params": [],
+      "data": {
+        "divisions": [
+          24,
+          6
+        ],
+        "midi": {
+          "driver": -17545,
+          "deviceName": "VST MIDI Input Device",
+          "channel": -1
+        }
+      }
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "vst2_unique_param_base_id": 25,
+      "model": "VCA",
+      "pos": [
+        54,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.5
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "vst2_unique_param_base_id": 28,
+      "model": "VCF",
+      "pos": [
+        38,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.488000065
+        },
+        {
+          "paramId": 1,
+          "value": 0.5
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.225000024
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "AS",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 34,
+      "model": "ADSR",
+      "pos": [
+        46,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.788000047
+        },
+        {
+          "paramId": 2,
+          "value": 0.5
+        },
+        {
+          "paramId": 3,
+          "value": 0.680000007
+        }
+      ]
+    },
+    {
+      "plugin": "AS",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 39,
+      "model": "ADSR",
+      "pos": [
+        60,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.00600000005
+        },
+        {
+          "paramId": 1,
+          "value": 0.5
+        },
+        {
+          "paramId": 2,
+          "value": 0.5
+        },
+        {
+          "paramId": 3,
+          "value": 0.749000013
+        }
+      ]
+    },
+    {
+      "plugin": "BaconMusic",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 43,
+      "model": "ChipWaves",
+      "pos": [
+        9,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 1,
+          "value": 2.4194994
+        },
+        {
+          "paramId": 0,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "BaconMusic",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 48,
+      "model": "SortaChorus",
+      "pos": [
+        62,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.661999881
+        },
+        {
+          "paramId": 1,
+          "value": 0.348499507
+        }
+      ]
+    },
+    {
+      "plugin": "BaconMusic",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 58,
+      "model": "SortaChorus",
+      "pos": [
+        72,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.28000021
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "plugin": "BaconMusic",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 66,
+      "model": "ChipYourWave",
+      "pos": [
+        5,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 6.0
+        },
+        {
+          "paramId": 2,
+          "value": 9.0
+        },
+        {
+          "paramId": 3,
+          "value": 13.0
+        },
+        {
+          "paramId": 4,
+          "value": 12.0
+        },
+        {
+          "paramId": 5,
+          "value": 11.0
+        },
+        {
+          "paramId": 6,
+          "value": 10.0
+        },
+        {
+          "paramId": 7,
+          "value": 9.0
+        },
+        {
+          "paramId": 8,
+          "value": 8.0
+        },
+        {
+          "paramId": 9,
+          "value": 7.0
+        },
+        {
+          "paramId": 10,
+          "value": 6.0
+        },
+        {
+          "paramId": 11,
+          "value": 5.0
+        },
+        {
+          "paramId": 12,
+          "value": 8.0
+        },
+        {
+          "paramId": 13,
+          "value": 3.0
+        },
+        {
+          "paramId": 14,
+          "value": 5.0
+        },
+        {
+          "paramId": 15,
+          "value": 5.0
+        },
+        {
+          "paramId": 16,
+          "value": 5.0
+        },
+        {
+          "paramId": 17,
+          "value": 0.0
+        },
+        {
+          "paramId": 18,
+          "value": 9.0
+        },
+        {
+          "paramId": 19,
+          "value": 10.0
+        },
+        {
+          "paramId": 20,
+          "value": 9.0
+        },
+        {
+          "paramId": 21,
+          "value": 8.0
+        },
+        {
+          "paramId": 22,
+          "value": 8.0
+        },
+        {
+          "paramId": 23,
+          "value": 7.0
+        },
+        {
+          "paramId": 24,
+          "value": 7.0
+        },
+        {
+          "paramId": 25,
+          "value": 6.0
+        },
+        {
+          "paramId": 26,
+          "value": 9.0
+        },
+        {
+          "paramId": 27,
+          "value": 10.0
+        },
+        {
+          "paramId": 28,
+          "value": 11.0
+        },
+        {
+          "paramId": 29,
+          "value": 10.0
+        },
+        {
+          "paramId": 30,
+          "value": 11.0
+        },
+        {
+          "paramId": 31,
+          "value": 11.0
+        },
+        {
+          "paramId": 32,
+          "value": 9.0
+        }
+      ]
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "vst2_unique_param_base_id": 100,
+      "model": "VCMixer",
+      "pos": [
+        24,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.553000033
+        },
+        {
+          "paramId": 3,
+          "value": 1.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        }
+      ]
+    }
+  ],
+  "wires": [
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 1,
+      "outputId": 1,
+      "inputModuleId": 4,
+      "inputId": 4
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 1,
+      "outputId": 1,
+      "inputModuleId": 5,
+      "inputId": 4
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 9,
+      "outputId": 0,
+      "inputModuleId": 10,
+      "inputId": 2
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 3,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 5
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 4,
+      "outputId": 0,
+      "inputModuleId": 3,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 5,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 3
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 2,
+      "outputId": 1,
+      "inputModuleId": 7,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 1,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 7,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 2,
+      "outputId": 1,
+      "inputModuleId": 8,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 8,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 1
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 1,
+      "outputId": 0,
+      "inputModuleId": 9,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 6,
+      "outputId": 1,
+      "inputModuleId": 10,
+      "inputId": 1
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 10,
+      "outputId": 0,
+      "inputModuleId": 3,
+      "inputId": 3
+    }
+  ]
+}
