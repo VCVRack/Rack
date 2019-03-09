@@ -1,4 +1,9 @@
 
+** March 9th, 2019
+- fix loud noise burst issue in Bidoo.REI module
+- add patch collection (see vst2_bin/patches/bsp/, 90 patches)
+
+
 ** March 8th, 2019
 - update AmalgamatedHarmonics.* 0.6.1  => 0.6.5
 - update Alikins.*              0.6.0  => 0.6.6
@@ -142,7 +147,6 @@
 - add module Squinkylabs.Sequencer
 - add module Valley.Amalgam
 - add module Valley.Interzone
-
 
 
 ** October 31st, 2018

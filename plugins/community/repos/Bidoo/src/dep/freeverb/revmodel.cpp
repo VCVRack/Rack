@@ -6,11 +6,43 @@
 
 #include "revmodel.hpp"
 #include <math.h>
+#include <string.h>  // memset
 
 namespace rack_plugin_Bidoo {
 
 revmodel::revmodel()
 {
+
+   // (note) still doesn't fix REI noise burst issue
+#define Dclearbuf(b) memset((void*)b, 0, sizeof(b))
+   Dclearbuf(bufcombL1);
+   Dclearbuf(bufcombR1);
+   Dclearbuf(bufcombL2);
+   Dclearbuf(bufcombR2);
+   Dclearbuf(bufcombL3);
+   Dclearbuf(bufcombR3);
+   Dclearbuf(bufcombL4);
+   Dclearbuf(bufcombR4);
+   Dclearbuf(bufcombL5);
+   Dclearbuf(bufcombR5);
+   Dclearbuf(bufcombL6);
+   Dclearbuf(bufcombR6);
+   Dclearbuf(bufcombL7);
+   Dclearbuf(bufcombR7);
+   Dclearbuf(bufcombL8);
+   Dclearbuf(bufcombR8);
+
+	// Buffers for the allpasses
+	Dclearbuf(bufallpassL1);
+	Dclearbuf(bufallpassR1);
+	Dclearbuf(bufallpassL2);
+	Dclearbuf(bufallpassR2);
+	Dclearbuf(bufallpassL3);
+	Dclearbuf(bufallpassR3);
+	Dclearbuf(bufallpassL4);
+	Dclearbuf(bufallpassR4);
+#undef Dclearbuf
+   
 	// Tie the components to their buffers
 	combL[0].setbuffer(bufcombL1,combtuningL1);
 	combR[0].setbuffer(bufcombR1,combtuningR1);

@@ -165,6 +165,9 @@
 
 
 
+------------------------------------------------------------------------
++ REI: fix noise burst issue in pitchshifter (out of bounds read)
+
 
 
 

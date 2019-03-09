@@ -26,6 +26,16 @@ struct PitchShifter {
 	double freqPerBin, expct, invOsamp, invFftFrameSize, invFftFrameSize2, invPi;
 	long fftFrameSize, osamp, i,k, qpd, index, inFifoLatency, stepSize, fftFrameSize2;
 
+   static void *my_calloc(size_t _size) {
+      // (note) same as calloc, this does not fix the noise issue in REI (edit: see below for actual fix)
+      void *r = malloc(_size);
+      if(NULL != r)
+      {
+         memset(r, 0, _size);
+      }
+      return r;
+   }
+
 	PitchShifter(long fftFrameSize, long osamp, float sampleRate) {
 		this->fftFrameSize = fftFrameSize;
 		this->osamp = osamp;
@@ -41,19 +51,19 @@ struct PitchShifter {
 		invFftFrameSize2 = 1.0f/fftFrameSize2;
 		invPi = 1.0f/M_PI;
 
-		gInFIFO = (float*)calloc(fftFrameSize,sizeof(float));
-		gOutFIFO =  (float*)calloc(fftFrameSize,sizeof(float));
+		gInFIFO = (float*)my_calloc(fftFrameSize * sizeof(float));
+		gOutFIFO =  (float*)my_calloc(fftFrameSize * sizeof(float));
 		gFFTworksp = (float*)pffft_aligned_malloc(fftFrameSize*sizeof(float));
-      memset((void*)gFFTworksp, 0, sizeof(fftFrameSize*sizeof(float))); // [bsp] 09Mar2019: fix noise burst after patch loading
+      memset((void*)gFFTworksp, 0, sizeof(fftFrameSize*sizeof(float)));
 		gFFTworkspOut =  (float*)pffft_aligned_malloc(fftFrameSize*sizeof(float));
-      memset((void*)gFFTworkspOut, 0, sizeof(fftFrameSize*sizeof(float))); // [bsp] 09Mar2019: fix noise burst after patch loading
-		gLastPhase = (float*)calloc((fftFrameSize/2+1),sizeof(float));
-		gSumPhase = (float*)calloc((fftFrameSize/2+1),sizeof(float));
-		gOutputAccum = (float*)calloc(2*fftFrameSize,sizeof(float));
-		gAnaFreq = (float*)calloc(fftFrameSize,sizeof(float));
-		gAnaMagn = (float*)calloc(fftFrameSize,sizeof(float));
-		gSynFreq = (float*)calloc(fftFrameSize,sizeof(float));
-		gSynMagn = (float*)calloc(fftFrameSize,sizeof(float));
+      memset((void*)gFFTworkspOut, 0, sizeof(fftFrameSize*sizeof(float)));
+		gLastPhase = (float*)my_calloc((fftFrameSize/2+1) * sizeof(float));
+		gSumPhase = (float*)my_calloc((fftFrameSize/2+1) * sizeof(float));
+		gOutputAccum = (float*)my_calloc(2*fftFrameSize * sizeof(float));
+		gAnaFreq = (float*)my_calloc(fftFrameSize * sizeof(float));
+		gAnaMagn = (float*)my_calloc(fftFrameSize * sizeof(float));
+		gSynFreq = (float*)my_calloc(fftFrameSize * sizeof(float));
+		gSynMagn = (float*)my_calloc(fftFrameSize * sizeof(float));
 	}
 
 	~PitchShifter() {
@@ -73,11 +83,15 @@ struct PitchShifter {
 
 	void process(const float pitchShift, const float *input, float *output) {
 
+
 			for (i = 0; i < fftFrameSize; i++) {
 
 				/* As long as we have not yet collected enough data just read in */
 				gInFIFO[gRover] = input[i];
-				output[i] = gOutFIFO[gRover-inFifoLatency];
+            if(gRover >= inFifoLatency)  // [bsp] 09Mar2019: this fixes the noise burst issue in REI
+               output[i] = gOutFIFO[gRover-inFifoLatency];
+            else
+               output[i] = 0.0f;
 				gRover++;
 
 				/* now we have enough data for processing */
