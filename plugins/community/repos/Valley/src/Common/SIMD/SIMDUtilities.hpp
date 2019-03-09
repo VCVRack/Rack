@@ -7,6 +7,8 @@
 //
 
 #pragma once
+
+#ifdef _MSC_VER
 #include <intrin.h>
 #include <mmintrin.h>
 #include <emmintrin.h>  // SSE2
@@ -16,6 +18,10 @@
 // #include <ivec.h>//MMX
 // #include <fvec.h>//SSE(also include ivec.h)
 // #include <dvec.h>//SSE2(also include fvec.h)
+#else
+// GCC / clang
+#include <x86intrin.h>
+#endif
 
 #ifdef BUILD_64
 // see c:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\include\mmintrin.h
