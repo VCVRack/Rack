@@ -719,7 +719,7 @@ void windowClose(void) {
 ////////////////////
 
 Font::Font(const std::string &filename) {
-   printf("xxx vstrack_plugin: Font::Font\n");
+   // printf("xxx vstrack_plugin: Font::Font\n");
 	handle = nvgCreateFont(global_ui->window.gVg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		info("Loaded font %s", filename.c_str());
@@ -745,7 +745,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 ////////////////////
 
 Image::Image(const std::string &filename) {
-   printf("xxx vstrack_plugin: Image::Image\n");
+   // printf("xxx vstrack_plugin: Image::Image\n");
 	handle = nvgCreateImage(global_ui->window.gVg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		info("Loaded image %s", filename.c_str());
