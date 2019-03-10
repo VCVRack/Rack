@@ -18,7 +18,7 @@
   "touchInput": false,
   "touchKbd": false,
   "oversampleFactor": 1.0,
-  "oversampleQuality": 0,
+  "oversampleQuality": 7,
   "oversampleOfflineFactor": 16.0,
   "oversampleOfflineQuality": 10,
   "oversampleOffline": false,
@@ -37,72 +37,108 @@
         "model": "ADSR"
       },
       {
-        "plugin": "Alikins",
-        "model": "SpecificValue"
-      },
-      {
         "plugin": "21kHz",
         "model": "kHzD_Inf"
+      },
+      {
+        "plugin": "Alikins",
+        "model": "SpecificValue"
       },
       {
         "plugin": "Core",
         "model": "Notes"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Plaits"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-SampleHold"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Clouds"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Switch"
       },
       {
-        "plugin": "AS",
-        "model": "AtNuVrTr"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Mult"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Stages"
+        "plugin": "Bidoo",
+        "model": "rabBIT"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Rings"
+        "plugin": "Bidoo",
+        "model": "lIMbO"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Elements"
+        "plugin": "Bidoo",
+        "model": "Σ"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Tides"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-XCO"
       },
       {
-        "plugin": "Autodafe",
-        "model": "Multiple 1x8"
+        "plugin": "Bidoo",
+        "model": "BISTROT"
       },
       {
-        "plugin": "AudibleInstruments",
-        "model": "Braids"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-XFade"
       },
       {
-        "plugin": "AS",
-        "model": "TriLFO"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Additator"
       },
       {
-        "plugin": "Befaco",
-        "model": "Mixer"
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-Noise"
       },
       {
-        "plugin": "Befaco",
-        "model": "SlewLimiter"
+        "plugin": "Bidoo",
+        "model": "REI"
+      },
+      {
+        "plugin": "Bogaudio",
+        "model": "Bogaudio-VCAmp"
+      },
+      {
+        "plugin": "DHE-Modules",
+        "model": "Cubic"
       },
       {
         "plugin": "Fundamental",
-        "model": "VCF"
+        "model": "VCO"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCA-1"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCMixer"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCO2"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "Scope"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "VCA"
+      },
+      {
+        "plugin": "Fundamental",
+        "model": "Delay"
       },
       {
         "plugin": "ErraticInstruments",
         "model": "MPEToCV"
+      },
+      {
+        "plugin": "FrankBussFormula",
+        "model": "FrankBussFormula"
       },
       {
         "plugin": "Fundamental",
@@ -114,39 +150,7 @@
       },
       {
         "plugin": "Fundamental",
-        "model": "Delay"
-      },
-      {
-        "plugin": "FrankBussFormula",
-        "model": "FrankBussFormula"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "Scope"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCA-1"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCO2"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCO"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCA"
-      },
-      {
-        "plugin": "Fundamental",
-        "model": "VCMixer"
-      },
-      {
-        "plugin": "JE",
-        "model": "RingModulator"
+        "model": "VCF"
       },
       {
         "plugin": "HetrickCV",
@@ -157,16 +161,8 @@
         "model": "EQ3"
       },
       {
-        "plugin": "LindenbergResearch",
-        "model": "VCO"
-      },
-      {
-        "plugin": "LindenbergResearch",
-        "model": "MS20 VCF"
-      },
-      {
-        "plugin": "LindenbergResearch",
-        "model": "DIODE VCF"
+        "plugin": "JE",
+        "model": "RingModulator"
       },
       {
         "plugin": "LindenbergResearch",
@@ -177,12 +173,72 @@
         "model": "Westcoast VCS"
       },
       {
-        "plugin": "mscHack",
-        "model": "Maude221"
+        "plugin": "LindenbergResearch",
+        "model": "MS20 VCF"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "VCO"
+      },
+      {
+        "plugin": "LindenbergResearch",
+        "model": "DIODE VCF"
       },
       {
         "plugin": "ML_modules",
         "model": "VoltMeter"
+      },
+      {
+        "plugin": "mscHack",
+        "model": "Maude221"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Plaits"
+      },
+      {
+        "plugin": "Befaco",
+        "model": "Mixer"
+      },
+      {
+        "plugin": "Autodafe",
+        "model": "Multiple 1x8"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Stages"
+      },
+      {
+        "plugin": "Befaco",
+        "model": "SlewLimiter"
+      },
+      {
+        "plugin": "AS",
+        "model": "TriLFO"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Tides"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Rings"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Braids"
+      },
+      {
+        "plugin": "AS",
+        "model": "AtNuVrTr"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Elements"
+      },
+      {
+        "plugin": "AudibleInstruments",
+        "model": "Clouds"
       },
       {
         "plugin": "PG-Instruments",
@@ -202,11 +258,11 @@
       },
       {
         "plugin": "Valley",
-        "model": "Dexter"
+        "model": "Amalgam"
       },
       {
         "plugin": "Valley",
-        "model": "Amalgam"
+        "model": "Dexter"
       },
       {
         "plugin": "Valley",
@@ -214,23 +270,7 @@
       },
       {
         "plugin": "bsp",
-        "model": "Rescaler"
-      },
-      {
-        "plugin": "bsp",
-        "model": "Scanner"
-      },
-      {
-        "plugin": "Template_shared",
-        "model": "MyModule"
-      },
-      {
-        "plugin": "bsp",
-        "model": "Sway"
-      },
-      {
-        "plugin": "bsp",
-        "model": "TunedDelayLine"
+        "model": "AttenuMixer"
       },
       {
         "plugin": "bsp",
@@ -238,11 +278,15 @@
       },
       {
         "plugin": "bsp",
-        "model": "RMS"
+        "model": "Scanner"
       },
       {
         "plugin": "bsp",
         "model": "DownSampler"
+      },
+      {
+        "plugin": "Template_shared",
+        "model": "MyModule"
       },
       {
         "plugin": "bsp",
@@ -250,63 +294,19 @@
       },
       {
         "plugin": "bsp",
-        "model": "AttenuMixer"
+        "model": "Sway"
       },
       {
-        "plugin": "Bidoo",
-        "model": "Σ"
+        "plugin": "bsp",
+        "model": "RMS"
       },
       {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-VCAmp"
+        "plugin": "bsp",
+        "model": "TunedDelayLine"
       },
       {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Noise"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-SampleHold"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Mult"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-XFade"
-      },
-      {
-        "plugin": "Bidoo",
-        "model": "BISTROT"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Switch"
-      },
-      {
-        "plugin": "Bidoo",
-        "model": "rabBIT"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-Additator"
-      },
-      {
-        "plugin": "Bidoo",
-        "model": "lIMbO"
-      },
-      {
-        "plugin": "Bidoo",
-        "model": "REI"
-      },
-      {
-        "plugin": "Bogaudio",
-        "model": "Bogaudio-XCO"
-      },
-      {
-        "plugin": "DHE-Modules",
-        "model": "Cubic"
+        "plugin": "bsp",
+        "model": "Rescaler"
       }
     ]
   },

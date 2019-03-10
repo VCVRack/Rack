@@ -53,7 +53,7 @@
 [0.003 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin PvC 0.6.1
 [0.003 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin QuantalAudio 0.6.4
 [0.003 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin Qwelk 0.6.1
-[0.004 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin rcm 0.6.12
+[0.003 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin rcm 0.6.12
 [0.004 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin RJModules 0.6.1
 [0.004 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin SerialRacker 0.6.1
 [0.004 info src/plugin_static.cpp:150] vcvrack: Loaded static plugin Skylights 0.6.3
@@ -71,7 +71,7 @@
 [0.005 info src/plugin.cpp:90] trying to load shared plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/bsp/plugin.dll.instr
 [0.006 info src/plugin.cpp:160] Loaded plugin bsp 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/bsp/plugin.dll.instr
 [0.006 info src/plugin.cpp:90] trying to load shared plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/dBiz/plugin.dll.instr
-[0.006 info src/plugin.cpp:160] Loaded plugin dBiz 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/dBiz/plugin.dll.instr
+[0.007 info src/plugin.cpp:160] Loaded plugin dBiz 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/dBiz/plugin.dll.instr
 [0.007 info src/plugin.cpp:90] trying to load shared plugin file f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Template_shared/plugin.dll.instr
 [0.008 info src/plugin.cpp:160] Loaded plugin Template_shared 0.6.1 from f:\git\VeeSeeVSTRack\vst2_bin\/plugins/Template_shared/plugin.dll.instr
 [0.008 info src/settings.cpp:475] Loading settings f:\git\VeeSeeVSTRack\vst2_bin\/settings.json
@@ -90,34 +90,34 @@
 [0.019 info src/settings.cpp:475] Loading settings f:\git\VeeSeeVSTRack\vst2_bin\/settings.json
 [0.021 info src/app/RackWidget.cpp:216] Loading patch from string
 [0.023 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/AudioInterface.svg
-[0.023 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/ScrewSilver.svg
-[0.023 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/PJ301M.svg
-[0.023 info src/window.cpp:725] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\/res/fonts/ShareTechMono-Regular.ttf
-[0.024 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/MIDIToCVInterface.svg
-[0.026 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/XCO.svg
-[0.026 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_68px.svg
-[0.026 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_16px.svg
+[0.024 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/ScrewSilver.svg
+[0.024 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/PJ301M.svg
+[0.024 info src/window.cpp:725] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\/res/fonts/ShareTechMono-Regular.ttf
+[0.025 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/MIDIToCVInterface.svg
+[0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/XCO.svg
+[0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_68px.svg
+[0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_16px.svg
 [0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_0.svg
 [0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_1.svg
 [0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_38px.svg
 [0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/slider_switch_2_14px_0.svg
 [0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/slider_switch_2_14px_1.svg
-[0.027 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/port.svg
+[0.028 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/port.svg
 [0.028 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCA.svg
 [0.028 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundLargeBlackKnob.svg
 [0.029 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/ADSR.svg
 [0.029 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-hexscrew.svg
-[0.029 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePot.svg
-[0.029 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePotHandle.svg
+[0.030 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePot.svg
+[0.030 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePotHandle.svg
 [0.030 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-PJ301M.svg
 [0.032 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/21kHz/res/Panels/D_Inf.svg
 [0.032 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/21kHz/res/Components/kHzScrew.svg
 [0.032 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/21kHz/res/Components/kHzKnobSmall.svg
 [0.032 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/21kHz/res/Components/kHzButton_0.svg
-[0.032 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/21kHz/res/Components/kHzButton_1.svg
+[0.033 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/21kHz/res/Components/kHzButton_1.svg
 [0.033 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/21kHz/res/Components/kHzPort.svg
 [0.033 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Autodafe/res/Multiple18.svg
-[0.033 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/PJ3410.svg
+[0.034 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/PJ3410.svg
 [0.062 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LabSeven/res/LabSeven_3340_VCO.svg
 [0.063 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LabSeven/res/LabSeven_Port.svg
 [0.063 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LabSeven/res/LabSeven_3340_SlidePot.svg
@@ -134,4 +134,92 @@
 [0.075 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-knob.svg
 [0.077 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/RJModules/res/Displays.svg
 [0.077 info src/window.cpp:725] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\plugins/RJModules/res/Segment7Standard.ttf
-[11.856 info src/app/RackWidget.cpp:178] Saving patch to string
+[9.907 info src/app/RackWidget.cpp:192] Loading patch F:\eureka_data\vst_patches\bsp_VeeSeeVST Rack 0.6.1 I_1983212406\MELODYZ MY MOD RACK__ORIG.vcv
+[10.053 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/MIDIToCVInterface.svg
+[10.053 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/ScrewSilver.svg
+[10.053 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/PJ301M.svg
+[10.053 info src/window.cpp:725] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\/res/fonts/ShareTechMono-Regular.ttf
+[10.054 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/Core/AudioInterface.svg
+[10.055 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/ADSR.svg
+[10.055 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/knob_29px.svg
+[10.055 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_0.svg
+[10.055 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_9px_1.svg
+[10.056 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/port.svg
+[10.065 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AudibleInstruments/res/Braids.svg
+[10.065 info src/window.cpp:725] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\plugins/AudibleInstruments/res/hdad-segment14-1.002/Segment14.ttf
+[10.065 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/Rogan2SGray.svg
+[10.066 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/Rogan2PSWhite.svg
+[10.066 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/Rogan2PSGreen.svg
+[10.066 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/Rogan2PSRed.svg
+[10.068 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/4chMixer.svg
+[10.068 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-hexscrew.svg
+[10.068 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-knobBlack.svg
+[10.068 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-FaderPot.svg
+[10.068 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-SlidePotHandle.svg
+[10.069 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/LEDBezel.svg
+[10.069 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-PJ301M.svg
+[10.070 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCA-1.svg
+[10.070 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSS_0.svg
+[10.070 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSS_1.svg
+[10.075 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/WhiteLight/Entropia-WL.svg
+[10.080 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/DarkMatter/Entropia-DM.svg
+[10.080 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/WhiteLight/Jack-WL.svg
+[10.080 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/DarkMatter/Jack-DM.svg
+[10.080 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/WhiteLight/Knob-WL.svg
+[10.081 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/DarkMatter/Knob-DM.svg
+[10.081 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/general/PushButton1_0.svg
+[10.081 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Geodesics/res/general/PushButton1_1.svg
+[10.083 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/VCF.svg
+[10.088 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/AlmaLight.svg
+[10.090 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/AlmaAged.svg
+[10.113 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/WhitePatina.svg
+[10.245 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/AlternatePatina.svg
+[10.246 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/elements/ScrewLight.svg
+[10.246 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/elements/ScrewDarkC.svg
+[10.246 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/elements/ScrewDarkLightC.svg
+[10.246 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/BigKnob.svg
+[10.246 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/AlternateBigLight.svg
+[10.246 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/MiddleKnob.svg
+[10.246 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/AlternateMiddleLight.svg
+[10.247 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/SmallKnob.svg
+[10.247 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/AlternateSmallLight.svg
+[10.247 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/elements/IOPortC.svg
+[10.247 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/elements/IOPortCLight.svg
+[10.247 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/elements/IOPortB.svg
+[10.247 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/elements/IOPortBLight.svg
+[10.248 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCO-1.svg
+[10.248 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundHugeBlackKnob.svg
+[10.248 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundLargeBlackKnob.svg
+[10.250 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bidoo/res/SIGMA.svg
+[10.250 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bidoo/res/ComponentLibrary/TinyPJ301M.svg
+[10.251 info src/window.cpp:725] Loaded font f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/digital-7.ttf
+[10.253 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/VCO.svg
+[10.256 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/Woldemar.svg
+[10.258 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/panels/WoldemarAged.svg
+[10.259 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/ToggleKnob.svg
+[10.259 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/LindenbergResearch/res/knobs/AlternateToggleKnobLight.svg
+[10.260 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as_LFO.svg
+[10.260 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as_CKSS_0.svg
+[10.260 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as_CKSS_1.svg
+[10.261 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/SampleHold.svg
+[10.261 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_18px_0.svg
+[10.261 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/button_18px_1.svg
+[10.262 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Bogaudio/res/Noise.svg
+[10.263 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/AtNuVrTr.svg
+[10.263 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/AS/res/as-knob.svg
+[10.264 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/JW-Modules/res/WavHeadPanel.svg
+[10.264 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/JW-Modules/res/Screw_J.svg
+[10.264 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/JW-Modules/res/Screw_W.svg
+[10.264 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/JW-Modules/res/SmallWhiteKnob.svg
+[10.264 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/JW-Modules/res/TinyPJ301M.svg
+[10.265 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/mental/res/MentalMults.svg
+[10.265 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/mental/res/components/InPort.svg
+[10.265 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/mental/res/components/OutPort.svg
+[10.265 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/arjo_modules/res/seq.svg
+[10.265 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/arjo_modules/res/small_port.svg
+[10.265 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/RoundSmallBlackKnob.svg
+[10.266 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/SequentialSwitch2.svg
+[10.266 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSSThree_0.svg
+[10.266 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSSThree_1.svg
+[10.266 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\/res/ComponentLibrary/CKSSThree_2.svg
+[10.267 info src/window.cpp:780] Loaded SVG f:\git\VeeSeeVSTRack\vst2_bin\plugins/Fundamental/res/VCF.svg

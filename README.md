@@ -17,7 +17,7 @@
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 825 prebuilt modules
++ comes with 827 prebuilt modules
 
 **Windows** version tested in:
   - Eureka (my own work-in-progress VST host)
@@ -41,8 +41,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-09Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-09Mar2019.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-09Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-09Mar2019.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-10Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-10Mar2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-10Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-10Mar2019.7z) (32bit, experimental)
 
 ## Linux
 - [veeseevstrack_0_6_1_lin64_bin-08March2019b.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-08March2019b.tar.gz) (64bit) (Dave's latest build)
@@ -80,11 +80,13 @@ Here are some demo videos of it:
 
 # Add-on modules
 
-The binary distribution contains the following (32) dynamically loaded add-on modules:
+The binary distribution contains the following (34) dynamically loaded add-on modules:
  - bsp.AttenuMixer
+ - bsp.Bias
  - bsp.DownSampler
  - bsp.Legato
  - bsp.Obxd_VCF
+ - bsp.Rescaler
  - bsp.RMS
  - bsp.Scanner
  - bsp.Sway
