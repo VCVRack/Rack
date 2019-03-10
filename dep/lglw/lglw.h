@@ -236,6 +236,9 @@ void lglw_keyboard_callback_set (lglw_t _lglw, lglw_keyboard_fxn_t _cbk);
 // Get current key modifier state
 uint32_t lglw_keyboard_get_modifiers (lglw_t _lglw);
 
+// Clear current key modifier state (workaround for stuck-modifier-after-dialog issue)
+void lglw_keyboard_clear_modifiers (lglw_t _lglw);
+
 // Get current mouse button state
 uint32_t lglw_mouse_get_buttons (lglw_t _lglw);
 

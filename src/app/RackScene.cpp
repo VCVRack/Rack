@@ -79,21 +79,27 @@ void RackScene::onHoverKey(EventHoverKey &e) {
 				}
             break;
 			case 'o'/*GLFW_KEY_O*/:
+			case 'O'/*GLFW_KEY_O*/:
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
+               lglw_keyboard_clear_modifiers(global_ui->window.lglw);  // workaround for stuck modifier keys
 					global_ui->app.gRackWidget->openDialog();
 					e.consumed = true;
 				}
 				if (windowIsModPressed() && windowIsShiftPressed()) {
+               lglw_keyboard_clear_modifiers(global_ui->window.lglw);  // workaround for stuck modifier keys
 					global_ui->app.gRackWidget->revert();
 					e.consumed = true;
 				}
             break;
 			case 's'/*GLFW_KEY_S*/:
+			case 'S'/*GLFW_KEY_S*/:
 				if (windowIsModPressed() && !windowIsShiftPressed()) {
+               lglw_keyboard_clear_modifiers(global_ui->window.lglw);  // workaround for stuck modifier keys
 					global_ui->app.gRackWidget->saveDialog();
 					e.consumed = true;
 				}
 				if (windowIsModPressed() && windowIsShiftPressed()) {
+               lglw_keyboard_clear_modifiers(global_ui->window.lglw);  // workaround for stuck modifier keys
 					global_ui->app.gRackWidget->saveAsDialog();
 					e.consumed = true;
 				}

@@ -90,7 +90,7 @@ struct SaveAsButton : TooltipIconButton {
 struct RevertButton : TooltipIconButton {
 	RevertButton() {
 		setSVG(SVG::load(assetGlobal("res/icons/noun_1084369_cc.svg")));
-		tooltipText = "Revert";
+		tooltipText = "Revert (" WINDOW_MOD_KEY_NAME "+Shift+O)";
 	}
 	void onAction(EventAction &e) override {
 		global_ui->app.gRackWidget->revert();

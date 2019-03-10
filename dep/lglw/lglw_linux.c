@@ -1722,6 +1722,17 @@ uint32_t lglw_keyboard_get_modifiers(lglw_t _lglw) {
 }
 
 
+// ---------------------------------------------------------------------------- lglw_keyboard_clear_modifiers
+void lglw_keyboard_clear_modifiers(lglw_t _lglw) {
+   LGLW(_lglw);
+
+   if(NULL != lglw)
+   {
+      lglw->keyboard.kmod_state = 0;
+   }
+}
+
+
 // ---------------------------------------------------------------------------- lglw_touchkeyboard_show
 void lglw_touchkeyboard_show(lglw_t _lglw, lglw_bool_t _bEnable) {
    LGLW(_lglw);

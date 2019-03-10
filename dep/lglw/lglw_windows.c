@@ -25,6 +25,7 @@
  * ----
  * ---- created: 04Aug2018
  * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018, 07Mar2019
+ * ----          10Mar2019
  * ----
  * ----
  * ----
@@ -780,6 +781,18 @@ uint32_t lglw_keyboard_get_modifiers(lglw_t _lglw) {
 
    return r;
 }
+
+
+// ---------------------------------------------------------------------------- lglw_keyboard_clear_modifiers
+void lglw_keyboard_clear_modifiers(lglw_t _lglw) {
+   LGLW(_lglw);
+
+   if(NULL != lglw)
+   {
+      lglw->keyboard.kmod_state = 0;
+   }
+}
+
 
 
 // ---------------------------------------------------------------------------- loc_touchkeyboard_get_rect
