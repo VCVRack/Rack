@@ -11,21 +11,27 @@ namespace rack {
 
 
 struct MidiMessage {
-	uint8_t cmd = 0x00;
-	uint8_t data1 = 0x00;
-	uint8_t data2 = 0x00;
+	uint8_t cmd   = 0u;
+	uint8_t data1 = 0u;
+	uint8_t data2 = 0u;
 
-	uint8_t channel() {
-		return cmd & 0xf;
+	uint8_t channel() const {
+		return cmd & 15u;
 	}
-	uint8_t status() {
-		return (cmd >> 4) & 0xf;
+	uint8_t status() const {
+		return (cmd >> 4) & 15u;
 	}
-	uint8_t note() {
-		return data1 & 0x7f;
+	uint8_t note() const {
+		return data1 & 127u;
 	}
-	uint8_t value() {
-		return data2 & 0x7f;
+	uint8_t value() const {
+		return data2 & 127u;
+	}
+	uint8_t getData1() const {
+		return data1 & 127u;
+	}
+	uint8_t getData2() const {
+		return data2 & 127u;
 	}
 };
 

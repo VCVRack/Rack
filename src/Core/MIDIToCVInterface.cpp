@@ -280,7 +280,7 @@ struct MIDIToCVInterface : Module {
 			// note on
 			case 0x9: {
 				if (msg.value() > 0) {
-					noteData[msg.note()].velocity = msg.value();
+					noteData[msg.note()].velocity = msg.getData2();
 					pressNote(msg.note());
 				}
 				else {
@@ -288,14 +288,19 @@ struct MIDIToCVInterface : Module {
 					releaseNote(msg.note());
 				}
 			} break;
-			// channel aftertouch
+			// polyphonic aftertouch
 			case 0xa: {
 				uint8_t note = msg.note();
-				noteData[note].aftertouch = msg.value();
+				noteData[note].aftertouch = msg.getData2();
 			} break;
 			// cc
 			case 0xb: {
 				processCC(msg);
+			} break;
+			// channel aftertouch
+			case 0xd: {
+				for(uint8_t noteIdx = 0u; noteIdx < 128u; noteIdx++)
+               noteData[noteIdx].aftertouch = msg.getData1();
 			} break;
 			// pitch wheel
 			case 0xe: {
