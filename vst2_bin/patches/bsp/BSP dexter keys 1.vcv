@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -12,7 +12,7 @@
       "vst2_unique_param_base_id": 1,
       "model": "AudioInterface",
       "pos": [
-        62,
+        64,
         0
       ],
       "params": [],
@@ -135,7 +135,7 @@
       "vst2_unique_param_base_id": 39,
       "model": "ADSR",
       "pos": [
-        54,
+        56,
         0
       ],
       "params": [
@@ -1061,6 +1061,22 @@
           "value": -3.84000015
         }
       ]
+    },
+    {
+      "plugin": "Bogaudio",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 254,
+      "model": "Bogaudio-VCAmp",
+      "pos": [
+        53,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        }
+      ]
     }
   ],
   "wires": [
@@ -1103,14 +1119,7 @@
       "color": "#c9b70e",
       "outputModuleId": 2,
       "outputId": 1,
-      "inputModuleId": 0,
-      "inputId": 0
-    },
-    {
-      "color": "#c91847",
-      "outputModuleId": 2,
-      "outputId": 1,
-      "inputModuleId": 0,
+      "inputModuleId": 18,
       "inputId": 1
     },
     {
@@ -1315,6 +1324,20 @@
       "outputId": 3,
       "inputModuleId": 10,
       "inputId": 5
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 18,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 18,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 1
     }
   ]
 }

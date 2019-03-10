@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -12,7 +12,7 @@
       "vst2_unique_param_base_id": 1,
       "model": "AudioInterface",
       "pos": [
-        86,
+        67,
         0
       ],
       "params": [],
@@ -55,7 +55,7 @@
       "vst2_unique_param_base_id": 25,
       "model": "VCA",
       "pos": [
-        57,
+        46,
         0
       ],
       "params": [
@@ -75,7 +75,7 @@
       "vst2_unique_param_base_id": 28,
       "model": "VCF",
       "pos": [
-        29,
+        28,
         0
       ],
       "params": [
@@ -107,7 +107,7 @@
       "vst2_unique_param_base_id": 34,
       "model": "ADSR",
       "pos": [
-        63,
+        51,
         0
       ],
       "params": [
@@ -135,7 +135,7 @@
       "vst2_unique_param_base_id": 39,
       "model": "ADSR",
       "pos": [
-        71,
+        59,
         0
       ],
       "params": [
@@ -243,7 +243,7 @@
       "vst2_unique_param_base_id": 67,
       "model": "TriLFO",
       "pos": [
-        8,
+        0,
         1
       ],
       "params": [
@@ -291,7 +291,7 @@
       "vst2_unique_param_base_id": 81,
       "model": "AtNuVrTr",
       "pos": [
-        18,
+        10,
         1
       ],
       "params": [
@@ -319,7 +319,7 @@
       "vst2_unique_param_base_id": 86,
       "model": "Σ",
       "pos": [
-        37,
+        36,
         0
       ],
       "params": []
@@ -330,7 +330,7 @@
       "vst2_unique_param_base_id": 121,
       "model": "TriLFO",
       "pos": [
-        31,
+        20,
         1
       ],
       "params": [
@@ -378,7 +378,7 @@
       "vst2_unique_param_base_id": 135,
       "model": "VCF-F1",
       "pos": [
-        41,
+        30,
         1
       ],
       "params": [
@@ -410,7 +410,7 @@
       "vst2_unique_param_base_id": 141,
       "model": "VCF-F1",
       "pos": [
-        59,
+        48,
         1
       ],
       "params": [
@@ -442,7 +442,7 @@
       "vst2_unique_param_base_id": 147,
       "model": "AtNuVrTr",
       "pos": [
-        43,
+        41,
         0
       ],
       "params": [
@@ -470,7 +470,7 @@
       "vst2_unique_param_base_id": 151,
       "model": "AtNuVrTr",
       "pos": [
-        24,
+        15,
         1
       ],
       "params": [
@@ -498,7 +498,7 @@
       "vst2_unique_param_base_id": 156,
       "model": "Bogaudio-SampleHold",
       "pos": [
-        87,
+        74,
         1
       ],
       "params": [
@@ -526,7 +526,7 @@
       "vst2_unique_param_base_id": 159,
       "model": "Bogaudio-Noise",
       "pos": [
-        79,
+        66,
         1
       ],
       "params": []
@@ -537,7 +537,7 @@
       "vst2_unique_param_base_id": 160,
       "model": "Panner",
       "pos": [
-        90,
+        77,
         1
       ],
       "params": [
@@ -553,7 +553,7 @@
       "vst2_unique_param_base_id": 163,
       "model": "AtNuVrTr",
       "pos": [
-        82,
+        69,
         1
       ],
       "params": [

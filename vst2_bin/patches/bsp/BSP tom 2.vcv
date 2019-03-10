@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {

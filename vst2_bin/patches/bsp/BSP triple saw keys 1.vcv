@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -12,7 +12,7 @@
       "vst2_unique_param_base_id": 1,
       "model": "AudioInterface",
       "pos": [
-        68,
+        54,
         0
       ],
       "params": [],
@@ -55,7 +55,7 @@
       "vst2_unique_param_base_id": 25,
       "model": "VCA",
       "pos": [
-        39,
+        27,
         0
       ],
       "params": [
@@ -75,7 +75,7 @@
       "vst2_unique_param_base_id": 34,
       "model": "ADSR",
       "pos": [
-        31,
+        19,
         0
       ],
       "params": [
@@ -85,7 +85,7 @@
         },
         {
           "paramId": 1,
-          "value": 0.190999985
+          "value": 0.772999942
         },
         {
           "paramId": 2,
@@ -103,7 +103,7 @@
       "vst2_unique_param_base_id": 39,
       "model": "ADSR",
       "pos": [
-        44,
+        32,
         0
       ],
       "params": [
@@ -131,7 +131,7 @@
       "vst2_unique_param_base_id": 46,
       "model": "Obxd_VCF",
       "pos": [
-        23,
+        11,
         0
       ],
       "params": [
@@ -214,7 +214,7 @@
       "vst2_unique_param_base_id": 67,
       "model": "Multiple 1x8",
       "pos": [
-        10,
+        7,
         1
       ],
       "params": []
@@ -277,7 +277,7 @@
       "vst2_unique_param_base_id": 77,
       "model": "VCO",
       "pos": [
-        17,
+        13,
         1
       ],
       "params": [
@@ -295,7 +295,7 @@
         },
         {
           "paramId": 3,
-          "value": 0.0
+          "value": -0.203999877
         },
         {
           "paramId": 5,
@@ -317,7 +317,7 @@
       "vst2_unique_param_base_id": 85,
       "model": "VCO",
       "pos": [
-        31,
+        26,
         1
       ],
       "params": [
@@ -357,7 +357,7 @@
       "vst2_unique_param_base_id": 93,
       "model": "VCO",
       "pos": [
-        45,
+        39,
         1
       ],
       "params": [
@@ -375,7 +375,7 @@
         },
         {
           "paramId": 3,
-          "value": 0.0
+          "value": 0.141000032
         },
         {
           "paramId": 5,
@@ -397,7 +397,7 @@
       "vst2_unique_param_base_id": 126,
       "model": "Sway",
       "pos": [
-        14,
+        10,
         1
       ],
       "params": [
@@ -433,7 +433,7 @@
       "vst2_unique_param_base_id": 133,
       "model": "Sway",
       "pos": [
-        28,
+        23,
         1
       ],
       "params": [
@@ -469,7 +469,7 @@
       "vst2_unique_param_base_id": 140,
       "model": "Sway",
       "pos": [
-        42,
+        36,
         1
       ],
       "params": [
@@ -505,7 +505,7 @@
       "vst2_unique_param_base_id": 154,
       "model": "AttenuMixer",
       "pos": [
-        20,
+        8,
         0
       ],
       "params": [
@@ -557,7 +557,7 @@
       "vst2_unique_param_base_id": 164,
       "model": "PGPanner",
       "pos": [
-        63,
+        49,
         0
       ],
       "params": [
@@ -573,7 +573,7 @@
       "vst2_unique_param_base_id": 166,
       "model": "Bogaudio-Noise",
       "pos": [
-        53,
+        40,
         0
       ],
       "params": []
@@ -584,7 +584,7 @@
       "vst2_unique_param_base_id": 167,
       "model": "Bogaudio-SampleHold",
       "pos": [
-        56,
+        43,
         0
       ],
       "params": [
@@ -612,7 +612,7 @@
       "vst2_unique_param_base_id": 170,
       "model": "AttenuMixer",
       "pos": [
-        59,
+        46,
         0
       ],
       "params": [

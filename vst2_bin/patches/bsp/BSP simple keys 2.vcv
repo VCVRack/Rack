@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -12,7 +12,7 @@
       "vst2_unique_param_base_id": 1,
       "model": "AudioInterface",
       "pos": [
-        77,
+        49,
         0
       ],
       "params": [],
@@ -55,7 +55,7 @@
       "vst2_unique_param_base_id": 25,
       "model": "VCA",
       "pos": [
-        61,
+        36,
         0
       ],
       "params": [
@@ -65,7 +65,7 @@
         },
         {
           "paramId": 1,
-          "value": 0.0804998577
+          "value": 0.824499846
         }
       ]
     },
@@ -75,7 +75,7 @@
       "vst2_unique_param_base_id": 34,
       "model": "ADSR",
       "pos": [
-        49,
+        28,
         0
       ],
       "params": [
@@ -103,7 +103,7 @@
       "vst2_unique_param_base_id": 39,
       "model": "ADSR",
       "pos": [
-        69,
+        41,
         0
       ],
       "params": [
@@ -131,7 +131,7 @@
       "vst2_unique_param_base_id": 108,
       "model": "VCMixer",
       "pos": [
-        29,
+        18,
         0
       ],
       "params": [
@@ -163,7 +163,7 @@
       "vst2_unique_param_base_id": 221,
       "model": "clACos",
       "pos": [
-        13,
+        8,
         0
       ],
       "params": [
@@ -205,9 +205,9 @@
         }
       ],
       "data": {
-        "phaseDistX0": 0.528172493,
+        "phaseDistX0": 0.0161363892,
         "phaseDistY0": 0.5,
-        "phaseDistX1": 0.528172493,
+        "phaseDistX1": 0.0132919317,
         "phaseDistY1": 0.0,
         "phaseDistX2": 0.0,
         "phaseDistY2": 0.0,
@@ -221,7 +221,7 @@
       "vst2_unique_param_base_id": 394,
       "model": "LFO",
       "pos": [
-        13,
+        8,
         1
       ],
       "params": [
@@ -261,7 +261,7 @@
       "vst2_unique_param_base_id": 402,
       "model": "LFO",
       "pos": [
-        26,
+        18,
         1
       ],
       "params": [
@@ -301,7 +301,7 @@
       "vst2_unique_param_base_id": 410,
       "model": "VCF",
       "pos": [
-        71,
+        42,
         1
       ],
       "params": [
@@ -348,7 +348,7 @@
       "vst2_unique_param_base_id": 418,
       "model": "ReShaper",
       "pos": [
-        1,
+        0,
         1
       ],
       "params": [
@@ -375,7 +375,7 @@
       "vst2_unique_param_base_id": 535,
       "model": "Mixer",
       "pos": [
-        66,
+        37,
         1
       ],
       "params": [
@@ -403,37 +403,37 @@
       "vst2_unique_param_base_id": 549,
       "model": "baR",
       "pos": [
-        38,
+        28,
         1
       ],
       "params": [
         {
           "paramId": 0,
-          "value": -75.2544327
+          "value": -49.7016144
         },
         {
           "paramId": 1,
-          "value": 1.96899939
+          "value": 1.91199887
         },
         {
           "paramId": 2,
-          "value": 36.1359749
+          "value": 74.3094788
         },
         {
           "paramId": 3,
-          "value": 135.131409
+          "value": 41.394886
         },
         {
           "paramId": 4,
-          "value": 2.76000023
+          "value": 3.19200039
         },
         {
           "paramId": 5,
-          "value": 38.340004
+          "value": 6.2099781
         },
         {
           "paramId": 6,
-          "value": 0.8125
+          "value": 0.741000175
         },
         {
           "paramId": 7,

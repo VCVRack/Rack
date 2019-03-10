@@ -252,7 +252,7 @@
       "vst2_unique_param_base_id": 73,
       "model": "Sway",
       "pos": [
-        23,
+        22,
         1
       ],
       "params": [
@@ -448,6 +448,146 @@
           "value": 0.258499861
         }
       ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 134,
+      "model": "AttenuMixer",
+      "pos": [
+        13,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.593499005
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.5
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.25
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 145,
+      "model": "AttenuMixer",
+      "pos": [
+        4,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.669999301
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.5
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.25
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "21kHz",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 156,
+      "model": "kHzD_Inf",
+      "pos": [
+        0,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        }
+      ]
     }
   ],
   "wires": [
@@ -518,7 +658,7 @@
       "color": "#c91847",
       "outputModuleId": 9,
       "outputId": 3,
-      "inputModuleId": 6,
+      "inputModuleId": 15,
       "inputId": 0
     },
     {
@@ -532,7 +672,7 @@
       "color": "#0986ad",
       "outputModuleId": 1,
       "outputId": 0,
-      "inputModuleId": 7,
+      "inputModuleId": 17,
       "inputId": 1
     },
     {
@@ -575,6 +715,41 @@
       "outputModuleId": 14,
       "outputId": 0,
       "inputModuleId": 0,
+      "inputId": 1
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 15,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 1,
+      "outputId": 5,
+      "inputModuleId": 15,
+      "inputId": 1
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 17,
+      "outputId": 0,
+      "inputModuleId": 16,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 1,
+      "outputId": 4,
+      "inputModuleId": 16,
+      "inputId": 1
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 16,
+      "outputId": 0,
+      "inputModuleId": 7,
       "inputId": 1
     }
   ]

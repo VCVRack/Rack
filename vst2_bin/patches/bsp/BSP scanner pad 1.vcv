@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -12,7 +12,7 @@
       "vst2_unique_param_base_id": 1,
       "model": "AudioInterface",
       "pos": [
-        75,
+        76,
         0
       ],
       "params": [],
@@ -55,7 +55,7 @@
       "vst2_unique_param_base_id": 25,
       "model": "VCA",
       "pos": [
-        49,
+        45,
         0
       ],
       "params": [
@@ -75,7 +75,7 @@
       "vst2_unique_param_base_id": 34,
       "model": "ADSR",
       "pos": [
-        41,
+        37,
         0
       ],
       "params": [
@@ -103,7 +103,7 @@
       "vst2_unique_param_base_id": 39,
       "model": "ADSR",
       "pos": [
-        54,
+        50,
         0
       ],
       "params": [
@@ -131,7 +131,7 @@
       "vst2_unique_param_base_id": 43,
       "model": "VCA",
       "pos": [
-        28,
+        24,
         0
       ],
       "params": [
@@ -151,7 +151,7 @@
       "vst2_unique_param_base_id": 46,
       "model": "Obxd_VCF",
       "pos": [
-        33,
+        29,
         0
       ],
       "params": [
@@ -187,7 +187,7 @@
       "vst2_unique_param_base_id": 53,
       "model": "Braids",
       "pos": [
-        9,
+        8,
         0
       ],
       "params": [
@@ -252,7 +252,7 @@
       "vst2_unique_param_base_id": 61,
       "model": "Braids",
       "pos": [
-        13,
+        3,
         1
       ],
       "params": [
@@ -317,7 +317,7 @@
       "vst2_unique_param_base_id": 69,
       "model": "Braids",
       "pos": [
-        29,
+        19,
         1
       ],
       "params": [
@@ -382,7 +382,7 @@
       "vst2_unique_param_base_id": 77,
       "model": "Braids",
       "pos": [
-        45,
+        35,
         1
       ],
       "params": [
@@ -447,7 +447,7 @@
       "vst2_unique_param_base_id": 85,
       "model": "Multiple 1x8",
       "pos": [
-        9,
+        0,
         1
       ],
       "params": []
@@ -458,7 +458,7 @@
       "vst2_unique_param_base_id": 86,
       "model": "Scanner",
       "pos": [
-        61,
+        51,
         1
       ],
       "params": [
@@ -506,7 +506,7 @@
       "vst2_unique_param_base_id": 92,
       "model": "Scanner",
       "pos": [
-        74,
+        64,
         1
       ],
       "params": [
@@ -554,7 +554,7 @@
       "vst2_unique_param_base_id": 100,
       "model": "Bogaudio-XFade",
       "pos": [
-        71,
+        61,
         1
       ],
       "params": [
@@ -578,7 +578,7 @@
       "vst2_unique_param_base_id": 104,
       "model": "TriLFO",
       "pos": [
-        84,
+        74,
         1
       ],
       "params": [
@@ -730,7 +730,7 @@
       "vst2_unique_param_base_id": 150,
       "model": "FreeVerb",
       "pos": [
-        62,
+        58,
         0
       ],
       "params": [
@@ -754,7 +754,7 @@
       "vst2_unique_param_base_id": 154,
       "model": "AttenuMixer",
       "pos": [
-        69,
+        64,
         0
       ],
       "params": [
@@ -806,7 +806,7 @@
       "vst2_unique_param_base_id": 165,
       "model": "AttenuMixer",
       "pos": [
-        72,
+        67,
         0
       ],
       "params": [
@@ -849,6 +849,38 @@
         {
           "paramId": 7,
           "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "Bogaudio",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 176,
+      "model": "Bogaudio-VCAmp",
+      "pos": [
+        73,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.912833452
+        }
+      ]
+    },
+    {
+      "plugin": "Bogaudio",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 178,
+      "model": "Bogaudio-VCAmp",
+      "pos": [
+        70,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.912833452
         }
       ]
     }
@@ -1096,14 +1128,14 @@
       "color": "#c9b70e",
       "outputModuleId": 20,
       "outputId": 0,
-      "inputModuleId": 0,
-      "inputId": 0
+      "inputModuleId": 23,
+      "inputId": 1
     },
     {
       "color": "#0c8e15",
       "outputModuleId": 21,
       "outputId": 0,
-      "inputModuleId": 0,
+      "inputModuleId": 22,
       "inputId": 1
     },
     {
@@ -1119,6 +1151,20 @@
       "outputId": 1,
       "inputModuleId": 21,
       "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 23,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 22,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 1
     }
   ]
 }

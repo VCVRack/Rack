@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 0.0,
   "modules": [
     {
@@ -383,7 +383,7 @@
         }
       ],
       "data": {
-        "sequence": 894
+        "sequence": 898
       }
     },
     {
@@ -418,7 +418,7 @@
         }
       ],
       "data": {
-        "sequence": 317
+        "sequence": 2543
       }
     },
     {
@@ -555,7 +555,7 @@
       "vst2_unique_param_base_id": 118,
       "model": "SkTuringV2",
       "pos": [
-        15,
+        25,
         2
       ],
       "params": [
@@ -581,7 +581,7 @@
         }
       ],
       "data": {
-        "sequence": 712
+        "sequence": 503
       }
     },
     {
@@ -590,7 +590,7 @@
       "vst2_unique_param_base_id": 124,
       "model": "Bogaudio-XCO",
       "pos": [
-        25,
+        35,
         2
       ],
       "params": [
@@ -771,6 +771,103 @@
           "value": 0.372499973
         }
       ]
+    },
+    {
+      "plugin": "Southpole",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 162,
+      "model": "Abr",
+      "pos": [
+        6,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ],
+      "data": {
+        "swStates": [
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "plugin": "AS",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 171,
+      "model": "BPMClock",
+      "pos": [
+        0,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 119.684952
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        },
+        {
+          "paramId": 2,
+          "value": 4.0
+        },
+        {
+          "paramId": 3,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        }
+      ],
+      "data": {
+        "run": [
+          1
+        ]
+      }
     }
   ],
   "wires": [
@@ -867,8 +964,8 @@
     },
     {
       "color": "#c91847",
-      "outputModuleId": 1,
-      "outputId": 7,
+      "outputModuleId": 20,
+      "outputId": 0,
       "inputModuleId": 11,
       "inputId": 0
     },
@@ -888,8 +985,8 @@
     },
     {
       "color": "#0986ad",
-      "outputModuleId": 1,
-      "outputId": 8,
+      "outputModuleId": 20,
+      "outputId": 1,
       "inputModuleId": 12,
       "inputId": 0
     },
@@ -916,8 +1013,8 @@
     },
     {
       "color": "#0986ad",
-      "outputModuleId": 1,
-      "outputId": 7,
+      "outputModuleId": 20,
+      "outputId": 0,
       "inputModuleId": 15,
       "inputId": 0
     },
@@ -961,6 +1058,34 @@
       "outputModuleId": 19,
       "outputId": 0,
       "inputModuleId": 0,
+      "inputId": 1
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 21,
+      "outputId": 0,
+      "inputModuleId": 20,
+      "inputId": 8
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 21,
+      "outputId": 2,
+      "inputModuleId": 20,
+      "inputId": 9
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 1,
+      "outputId": 7,
+      "inputModuleId": 20,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 1,
+      "outputId": 8,
+      "inputModuleId": 20,
       "inputId": 1
     }
   ]

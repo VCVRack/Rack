@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -309,14 +309,14 @@
         }
       ],
       "data": {
-        "phaseDistX0": 0.217923149,
+        "phaseDistX0": 0.378392994,
         "phaseDistY0": 0.5,
-        "phaseDistX1": 0.159035668,
-        "phaseDistY1": 0.280009508,
-        "phaseDistX2": 0.228129297,
-        "phaseDistY2": 0.128078952,
-        "phaseDistX3": 0.280009508,
-        "phaseDistY3": 0.130015478
+        "phaseDistX1": 0.163186356,
+        "phaseDistY1": 0.314332366,
+        "phaseDistX2": 0.428206235,
+        "phaseDistY2": 0.164490938,
+        "phaseDistX3": 0.314332366,
+        "phaseDistY3": 0.247798517
       }
     },
     {

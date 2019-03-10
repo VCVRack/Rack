@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -65,7 +65,7 @@
         },
         {
           "paramId": 1,
-          "value": 0.0409999825
+          "value": 0.338
         }
       ]
     },
@@ -237,7 +237,7 @@
         }
       ],
       "data": {
-        "phaseDistX0": 0.448912919,
+        "phaseDistX0": 0.473882586,
         "phaseDistY0": 0.5,
         "phaseDistX1": 0.0,
         "phaseDistY1": 0.0,
