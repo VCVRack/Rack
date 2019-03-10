@@ -36,6 +36,7 @@ struct Bias : Module {
 	};
 	enum InputIds {
       CTL_INPUT,
+      SCALE_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -68,6 +69,12 @@ void Bias::step() {
       outVal = inVal - ctrVal;
       outVal *= params[POS_PARAM].value;
       outVal += ctrVal;
+   }
+
+   // Scale by secondary input (if connected)
+   if(inputs[SCALE_INPUT].active)
+   {
+      outVal = ((outVal - ctrVal) / 5.0f) * inputs[SCALE_INPUT].value + inputs[SCALE_INPUT].value;
    }
 
    outputs[CTL_OUTPUT].value = outVal;
@@ -105,11 +112,14 @@ BiasWidget::BiasWidget(Bias *module) : ModuleWidget(module) {
    cy = 115.0f;
 	addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(cx, cy), module, Bias::CTR_PARAM, -10.0f, 10.0f, 0.0f));
 
-   cy = 175.0f;
+   cy = 165.0f;
 	addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(cx, cy), module, Bias::NEG_PARAM, -4.0f, 4.0f, 1.0f));
 
-   cy = 235.0f;
+   cy = 215.0f;
 	addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(cx, cy), module, Bias::POS_PARAM, -4.0f, 4.0f, 1.0f));
+
+   cy = 280.0f;
+	addInput(Port::create<PJ301MPort>(Vec(11.0f, cy), Port::INPUT, module, Bias::SCALE_INPUT));
 
 	addOutput(Port::create<PJ301MPort>(Vec(11, 325), Port::OUTPUT, module, Bias::CTL_OUTPUT));
 }

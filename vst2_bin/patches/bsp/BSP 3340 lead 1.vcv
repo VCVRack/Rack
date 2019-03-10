@@ -2,8 +2,8 @@
   "version": "0.6.1",
   "oversampleFactor": 1.0,
   "oversampleQuality": 7.0,
-  "oversampleNumIn": 8.0,
-  "oversampleNumOut": 8.0,
+  "oversampleNumIn": 0.0,
+  "oversampleNumOut": 2.0,
   "idleDetect": 1.0,
   "modules": [
     {
@@ -393,7 +393,7 @@
       "vst2_unique_param_base_id": 85,
       "model": "LS3340VCO",
       "pos": [
-        24,
+        36,
         1
       ],
       "params": [
@@ -445,7 +445,7 @@
       "vst2_unique_param_base_id": 96,
       "model": "TriLFO",
       "pos": [
-        14,
+        26,
         1
       ],
       "params": [
@@ -493,7 +493,7 @@
       "vst2_unique_param_base_id": 110,
       "model": "AttenuMixer",
       "pos": [
-        41,
+        53,
         1
       ],
       "params": [
@@ -597,7 +597,7 @@
       "vst2_unique_param_base_id": 132,
       "model": "AttenuMixer",
       "pos": [
-        63,
+        64,
         1
       ],
       "params": [
@@ -701,7 +701,7 @@
       "vst2_unique_param_base_id": 154,
       "model": "AttenuMixer",
       "pos": [
-        48,
+        56,
         1
       ],
       "params": [
@@ -753,7 +753,7 @@
       "vst2_unique_param_base_id": 187,
       "model": "AtNuVrTr",
       "pos": [
-        52,
+        59,
         1
       ],
       "params": [
@@ -774,6 +774,69 @@
           "value": 0.120001793
         }
       ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 191,
+      "model": "Rescaler",
+      "pos": [
+        13,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 5.30999947
+        },
+        {
+          "paramId": 1,
+          "value": 10.0
+        },
+        {
+          "paramId": 2,
+          "value": 5.25000381
+        },
+        {
+          "paramId": 3,
+          "value": 8.19999886
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 196,
+      "model": "Bias",
+      "pos": [
+        16,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.268000126
+        },
+        {
+          "paramId": 2,
+          "value": 0.147999287
+        }
+      ]
+    },
+    {
+      "plugin": "RJModules",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 205,
+      "model": "Displays",
+      "pos": [
+        19,
+        2
+      ],
+      "params": []
     }
   ],
   "wires": [
@@ -968,8 +1031,8 @@
     },
     {
       "color": "#c9b70e",
-      "outputModuleId": 1,
-      "outputId": 2,
+      "outputModuleId": 20,
+      "outputId": 0,
       "inputModuleId": 19,
       "inputId": 5
     },
@@ -977,8 +1040,8 @@
       "color": "#c9b70e",
       "outputModuleId": 18,
       "outputId": 0,
-      "inputModuleId": 11,
-      "inputId": 0
+      "inputModuleId": 21,
+      "inputId": 1
     },
     {
       "color": "#c91847",
@@ -992,6 +1055,34 @@
       "outputModuleId": 19,
       "outputId": 0,
       "inputModuleId": 18,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 1,
+      "outputId": 2,
+      "inputModuleId": 20,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 21,
+      "outputId": 0,
+      "inputModuleId": 11,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 8,
+      "outputId": 3,
+      "inputModuleId": 21,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 21,
+      "outputId": 0,
+      "inputModuleId": 22,
       "inputId": 0
     }
   ]

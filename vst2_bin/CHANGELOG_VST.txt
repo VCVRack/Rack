@@ -3,7 +3,6 @@
 - implement MIDI channel aftertouch
 - add "fixDenorm" global setting (settings.json) (also editable via Toolbar)
 - fix "Save as" (Ctrl+Shift+S) and "Revert" (Ctrl+Shift+O) keyboard shortcuts
-- update ImpromptuModular.*     0.6.16 => 0.6.17pre
 - add module bsp.Bias
 - add module bsp.Rescaler
 - update patches

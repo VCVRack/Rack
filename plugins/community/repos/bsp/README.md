@@ -1,3 +1,6 @@
+bsp modules for VeeSeeVST Rack -- March 10th, 2019, v0.6.1
+==========================================================
+
 
 # AttenuMixer
 
@@ -27,12 +30,24 @@ Rescales incoming signals.
 
 Values below the "CTR" point are scaled by the "NEG" param, values above the "CTR" point are scaled by the "POS" param.
 
+If the lower scale input jack is connected, the scale input's current value is biased by the output value (relative to the center value). Connect the output of an envelope generator here, for example.
+
 Suggested application: Filter keyboard tracking.
 
-Example:
+Example#1:
 - Connect MIDI-1 CV output to the input
 - Connect the output to a filter's frequency input
 - Adjust center and scale values to taste
+
+Example#2:
+- Connect MIDI-1 CV output to the input
+- Connect the output of an envelope generator to the scale input
+- Connect the output to a filter's frequency input
+- Adjust center and scale values to taste (try relatively small scale values in this case)
+
+Example#3:
+- Take a look at the "BSP 3340 lead 1.vcv" example patch from the "vst2_bin/patches/bsp/" folder.
+
 
 NOTE: This can also be used as a simple asymmetric waveshaper for audio signals
 
@@ -79,17 +94,22 @@ An adaption of Filatov Vadim's excellent Ob-Xd filter. Distributed under terms o
 
 Clips the input signal to the "IN" min/max range (min=upper knob, max=lower knob), normalizes it, and scales it to the "OUT" min/max range.
 
-If the lower scale input jack is connected, the output value is scaled by the scale input's current value.
+If the lower scale input jack is connected, the output value is scaled by the scale input's current value (/10).
 
 Suggest application: Finetune velocity responses.
 
-Example:
+Example#1:
 - Connect the MIDI-1 velocity output to the main input
 - Connect the output of an envelope generator to the scale input
 - Connect the module's output to the frequency modulation input of a filter
 - Adjust the min/max knobs to taste
 
+Example#2:
+- Take a look at the "BSP 3340 lead 1.vcv" example patch from the "vst2_bin/patches/bsp/" folder.
+
+
 NOTE: This module can also be used as a clipper
+
 
 
 # RMS

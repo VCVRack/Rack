@@ -99,7 +99,7 @@ void Rescaler::step() {
    // Scale by secondary input (if connected)
    if(inputs[SCALE_INPUT].active)
    {
-      outVal *= inputs[SCALE_INPUT].value;
+      outVal *= inputs[SCALE_INPUT].value / 10.0f;
    }
 
    outputs[CTL_OUTPUT].value = outVal;
