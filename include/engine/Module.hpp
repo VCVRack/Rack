@@ -54,8 +54,6 @@ struct Module {
 	void config(int numParams, int numInputs, int numOutputs, int numLights = 0);
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
-	void reset();
-	void randomize();
 
 	struct ProcessArgs {
 		float sampleRate;

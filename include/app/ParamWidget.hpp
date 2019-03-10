@@ -28,6 +28,8 @@ struct ParamWidget : widget::OpaqueWidget {
 	void fromJson(json_t *rootJ);
 	void createContextMenu();
 	void resetAction();
+	virtual void reset() {}
+	virtual void randomize() {}
 };
 
 

@@ -48,8 +48,6 @@ struct Param {
 	/** An optional one-sentence description of the parameter. */
 	std::string description;
 	ParamQuantityFactory *paramQuantityFactory = NULL;
-	/** Determines whether this Param will be randomized when the user requests to randomize the Module. */
-	bool randomizable = true;
 
 	~Param() {
 		if (paramQuantityFactory)
@@ -93,8 +91,6 @@ struct Param {
 
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
-	void reset();
-	void randomize();
 };
 
 

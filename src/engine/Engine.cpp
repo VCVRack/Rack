@@ -507,7 +507,7 @@ void Engine::resetModule(Module *module) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
-	module->reset();
+	module->onReset();
 }
 
 void Engine::randomizeModule(Module *module) {
@@ -515,7 +515,7 @@ void Engine::randomizeModule(Module *module) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
-	module->randomize();
+	module->onRandomize();
 }
 
 void Engine::bypassModule(Module *module, bool bypass) {

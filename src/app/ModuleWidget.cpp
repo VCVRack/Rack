@@ -651,6 +651,9 @@ void ModuleWidget::resetAction() {
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
+	for (ParamWidget *param : params) {
+		param->reset();
+	}
 	APP->engine->resetModule(module);
 
 	h->newModuleJ = toJson();
@@ -666,6 +669,9 @@ void ModuleWidget::randomizeAction() {
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
+	for (ParamWidget *param : params) {
+		param->randomize();
+	}
 	APP->engine->randomizeModule(module);
 
 	h->newModuleJ = toJson();

@@ -26,18 +26,6 @@ void Param::fromJson(json_t *rootJ) {
 	}
 }
 
-void Param::reset() {
-	if (isBounded()) {
-		value = defaultValue;
-	}
-}
-
-void Param::randomize() {
-	if (isBounded()) {
-		value = math::rescale(random::uniform(), 0.f, 1.f, minValue, maxValue);
-	}
-}
-
 
 } // namespace engine
 } // namespace rack

@@ -1,6 +1,7 @@
 #include "app/Knob.hpp"
 #include "app.hpp"
 #include "app/Scene.hpp"
+#include "random.hpp"
 #include "history.hpp"
 
 
@@ -96,6 +97,21 @@ void Knob::onDragMove(const widget::DragMoveEvent &e) {
 	}
 
 	ParamWidget::onDragMove(e);
+}
+
+void Knob::reset() {
+	if (paramQuantity && paramQuantity->isBounded()) {
+		paramQuantity->reset();
+	}
+}
+
+void Knob::randomize() {
+	if (paramQuantity && paramQuantity->isBounded()) {
+		float value = math::rescale(random::uniform(), 0.f, 1.f, paramQuantity->getMinValue(), paramQuantity->getMaxValue());
+		if (snap)
+			value = std::round(value);
+		paramQuantity->setValue(value);
+	}
 }
 
 

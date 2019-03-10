@@ -89,21 +89,6 @@ void Module::fromJson(json_t *rootJ) {
 		rightModuleId = json_integer_value(rightModuleIdJ);
 }
 
-void Module::reset() {
-	for (Param &param : params) {
-		param.reset();
-	}
-	onReset();
-}
-
-void Module::randomize() {
-	for (Param &param : params) {
-		if (param.randomizable)
-			param.randomize();
-	}
-	onRandomize();
-}
-
 
 } // namespace engine
 } // namespace rack

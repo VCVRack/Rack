@@ -25,6 +25,8 @@ struct Knob : ParamWidget {
 	void onDragStart(const widget::DragStartEvent &e) override;
 	void onDragEnd(const widget::DragEndEvent &e) override;
 	void onDragMove(const widget::DragMoveEvent &e) override;
+	void reset() override;
+	void randomize() override;
 };
 
 

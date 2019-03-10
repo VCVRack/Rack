@@ -6,7 +6,6 @@
 #include "app.hpp"
 #include "engine/Engine.hpp"
 #include "settings.hpp"
-#include "random.hpp"
 #include "history.hpp"
 #include "helpers.hpp"
 
@@ -230,7 +229,7 @@ void ParamWidget::createContextMenu() {
 void ParamWidget::resetAction() {
 	if (paramQuantity && paramQuantity->isBounded()) {
 		float oldValue = paramQuantity->getValue();
-		paramQuantity->reset();
+		reset();
 		float newValue = paramQuantity->getValue();
 
 		if (oldValue != newValue) {

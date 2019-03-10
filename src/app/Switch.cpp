@@ -1,6 +1,7 @@
 #include "app/Switch.hpp"
 #include "app.hpp"
 #include "app/Scene.hpp"
+#include "random.hpp"
 #include "history.hpp"
 
 
@@ -66,6 +67,19 @@ void Switch::onDragStart(const widget::DragStartEvent &e) {
 void Switch::onDragEnd(const widget::DragEndEvent &e) {
 	if (momentary) {
 		momentaryReleased = true;
+	}
+}
+
+void Switch::reset() {
+	if (paramQuantity && !momentary) {
+		paramQuantity->reset();
+	}
+}
+
+void Switch::randomize() {
+	if (paramQuantity && !momentary) {
+		float value = paramQuantity->getMinValue() + std::floor(random::uniform() * (paramQuantity->getRange() + 1));
+		paramQuantity->setValue(value);
 	}
 }
 
