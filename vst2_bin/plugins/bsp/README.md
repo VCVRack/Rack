@@ -9,12 +9,34 @@ The default scaling factor of input 2 is calibrated to +-24 semitones (e.g. MPE 
 
 Inputs 3 and 4 use default scaling factors of 0.5 and 0.25, respectively.
 
-The switch at the top is used to enabled bipolar scaling (-1..1).
+The right switch at the top is used to enabled bipolar scaling (-1..1).
+
+The left switch enables fine offset scaling (e.g. for precise detuning).
 
 
 Suggested applications:
   - Mix pitch voltages, e.g. base pitch + pitchbend + vibrato.
   - Mix filter cutoff voltages, e.g. ADSR + LFO + modwheel
+  - Mix audio signals
+
+
+
+# Bias
+
+Rescales incoming signals.
+
+Values below the "CTR" point are scaled by the "NEG" param, values above the "CTR" point are scaled by the "POS" param.
+
+Suggested application: Filter keyboard tracking.
+
+Example:
+- Connect MIDI-1 CV output to the input
+- Connect the output to a filter's frequency input
+- Adjust center and scale values to taste
+
+NOTE: This can also be used as a simple asymmetric waveshaper for audio signals
+
+NOTE: For use as an amplifier, set "CTR" to -10, then use "POS" to set the amplification (-4..4) (negative values flip the phase)
 
 
 
@@ -53,6 +75,33 @@ An adaption of Filatov Vadim's excellent Ob-Xd filter. Distributed under terms o
 
 
 
+# Rescaler
+
+Clips the input signal to the "IN" min/max range (min=upper knob, max=lower knob), normalizes it, and scales it to the "OUT" min/max range.
+
+If the lower scale input jack is connected, the output value is scaled by the scale input's current value.
+
+Suggest application: Finetune velocity responses.
+
+Example:
+- Connect the MIDI-1 velocity output to the main input
+- Connect the output of an envelope generator to the scale input
+- Connect the module's output to the frequency modulation input of a filter
+- Adjust the min/max knobs to taste
+
+NOTE: This module can also be used as a clipper
+
+
+# RMS
+
+A Root-Mean-Square based envelope follower, coupled with a slew limiter.
+
+The rise and fall rates can be configured separately.
+
+The module can be used to derive envelopes from audio signals, e.g. to implement compressor effects.
+
+
+
 # Scanner
 
 A mixer that can seamlessly blend up to 16 input channels.
@@ -75,16 +124,6 @@ The "RND" section (right above the output port) can be used to shuffle / randomi
 The switch enables the randomizer, and the button next to it is used to generate a new random seed.
 
 NOTE: try modulating the position with the post output (feedback).
-
-
-
-# RMS
-
-A Root-Mean-Square based envelope follower, coupled with a slew limiter.
-
-The rise and fall rates can be configured separately.
-
-The module can be used to derive envelopes from audio signals, e.g. to implement compressor effects.
 
 
 

@@ -1,5 +1,5 @@
-VeeSeeVST Rack VST 2.4 Plugin -- March 8th, 2019
-================================================
+VeeSeeVST Rack VST 2.4 Plugin -- March 10th, 2019
+=================================================
 
 !!!------------------------------------------------------------------------------
 !!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
@@ -25,7 +25,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 825 prebuilt modules
++ comes with 827 prebuilt modules
 
 Here's a demo video of it: https://vimeo.com/277703414
 
@@ -48,11 +48,13 @@ Linux version tested in:
   - according to users: works in Qtractor 0.9.2
 
 
-The binary distribution contains the following (32) dynamically loaded add-on modules:
+The binary distribution contains the following (34) dynamically loaded add-on modules:
  - bsp.AttenuMixer
+ - bsp.Bias
  - bsp.DownSampler
  - bsp.Legato
  - bsp.Obxd_VCF
+ - bsp.Rescaler
  - bsp.RMS
  - bsp.Scanner
  - bsp.Sway

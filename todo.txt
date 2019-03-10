@@ -168,7 +168,27 @@
 ------------------------------------------------------------------------
 + REI: fix noise burst issue in pitchshifter (out of bounds read)
 
++ implement channel aftertouch
 
++ add "fixDenorm" option (fix denormalized floats in plugin output and clamp to [-4, 4] range)
+   + Toolbar editing
+   + save/restore to/from settings.json
 
++ bsp.Rescaler (input => [a..b])
+   + input (e.g. velocity)
+   + in min (clip) (-10..10)
+   + in max (clip) (-10..10)
+   + out min (-10..10)
+   + out max (-10..10)
+   + scale input (optional, def=1.0)  (e.g. for env output)
+   + output
 
++ bsp.idea: Bias / KeyFollow
+   + input
+   + center / break point (0=c-5) (-10..10)
+   + bias neg (-10..10)
+   + bias pos (-10..10)
+   + output
+
+- fix save/save as keyboard shortcuts
 

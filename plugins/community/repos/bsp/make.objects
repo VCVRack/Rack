@@ -1,9 +1,11 @@
 ALL_OBJ= \
 	src/AttenuMixer.o \
+	src/Bias.o \
 	src/DownSampler.o \
 	src/bsp.o \
 	src/Legato.o \
 	src/Obxd_VCF.o \
+	src/Rescaler.o \
 	src/RMS.o \
 	src/Scanner.o \
 	src/Sway.o \
