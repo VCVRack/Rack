@@ -69,12 +69,6 @@ void Rescaler::step() {
 
    float outMin = params[OUT_MIN_PARAM].value;
    float outMax = params[OUT_MAX_PARAM].value;
-   if(outMin > outMax)
-   {
-      t = outMin;
-      outMin = outMax;
-      outMax = t;
-   }
 
    // Clip input to min..max range
    if(inVal < inMin)
@@ -84,7 +78,7 @@ void Rescaler::step() {
 
    float outVal;
 
-   if((inMax > inMin) && (outMax > outMin))
+   if((inMax > inMin) && (outMax != outMin))
    {
       // Rescale to output range
       outVal = (inVal - inMin) / (inMax - inMin);
