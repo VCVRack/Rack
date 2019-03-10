@@ -18,6 +18,8 @@ extern void vst2_idle_detect_mode_get (int *_mode);
 extern void vst2_refresh_rate_set (float _hz);
 extern float vst2_refresh_rate_get (void);
 extern void vst2_window_size_set (int _width, int _height);
+extern int vst2_fix_denorm_get (void);
+extern void vst2_fix_denorm_set (int _bEnable);
 #endif // RACK_HOST
 
 namespace rack {
@@ -385,6 +387,15 @@ struct SettingsVsyncItem : MenuItem {
 	}
 };
 
+struct SettingsFixDenormItem : MenuItem {
+
+	void onAction(EventAction &e) override {
+#ifdef RACK_HOST
+      vst2_fix_denorm_set(!vst2_fix_denorm_get());
+#endif // RACK_HOST
+	}
+};
+
 struct SettingsSaveItem : MenuItem {
 
 	void onAction(EventAction &e) override {
@@ -436,6 +447,11 @@ struct SettingsButton : TooltipIconButton {
 		vsyncItem->text = "Vsync";
       vsyncItem->rightText = CHECKMARK( (0 != lglw_swap_interval_get(global_ui->window.lglw)) );
 		menu->addChild(vsyncItem);
+
+		SettingsFixDenormItem *fixDenormItem = new SettingsFixDenormItem();
+		fixDenormItem->text = "Fix denorm. floats and clip to [-4, 4]";
+      fixDenormItem->rightText = CHECKMARK( (0 != vst2_fix_denorm_get()) );
+		menu->addChild(fixDenormItem);
 
 		SettingsSaveItem *saveItem = new SettingsSaveItem();
 		saveItem->text = "Save Settings (+Favourites)";

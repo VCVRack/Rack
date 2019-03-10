@@ -1,7 +1,7 @@
 #ifdef USE_VST2
 /// vst2_main.cpp
 ///
-/// (c) 2018 bsp. very loosely based on pongasoft's "hello, world" example plugin.
+/// (c) 2018-2019 bsp. very loosely based on pongasoft's "hello, world" example plugin.
 ///
 ///   Licensed under the Apache License, Version 2.0 (the "License");
 ///   you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /// created: 25Jun2018
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
-///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018, 10Oct2018, 26Oct2018
+///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018, 10Oct2018, 26Oct2018, 10Mar2019
 ///
 ///
 
@@ -496,6 +496,8 @@ public:
    sF32 idle_output_sec_threshold;
    sUI idle_output_framecount;
    bool b_idle;
+
+   sBool b_fix_denorm;  // true=fix denormalized floats + clip to -4..4. fixes broken audio in FLStudio and Reason.
 
    ERect editor_rect;
    sBool b_editor_open;
@@ -1034,6 +1036,15 @@ public:
 #endif // VST2_EFFECT
    }
 
+   void setEnableFixDenorm(int32_t _bEnable) {
+      b_fix_denorm = (0 != _bEnable);
+      Dprintf("vst2_main:setEnableFixDenorm(%d)\n", b_fix_denorm);
+   }
+
+   int32_t getEnableFixDenorm(void) {
+      return int32_t(b_fix_denorm);
+   }
+
    sUI getProgramChunk(uint8_t**_addr) {
       setGlobals();
       vst2_set_shared_plugin_tls_globals();
@@ -1503,7 +1514,28 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
             wrapper->idle_output_framecount = 0u;
          }
 
+      } // if idle detect
+
+      // Fix denormalized floats (which can lead to silent audio in FLStudio and Reason)
+      if(wrapper->b_fix_denorm)
+      {
+         for(chIdx = 0u; chIdx < NUM_OUTPUTS; chIdx++)
+         {
+            float *d = _outputs[chIdx];
+            for(int32_t frameIdx = 0; frameIdx < sampleFrames; frameIdx++)
+            {
+               sF32 t = d[frameIdx];
+               t = t + 100.0f;
+               t = t - 100.0f;
+               if(t >= 4.0f)
+                  t = 4.0f;
+               else if(t < -4.0f)
+                  t = -4.0f;
+               d[frameIdx] = t;
+            }
+         }
       }
+
    } // if !wrapper->b_idle
    else
    {
@@ -2147,6 +2179,8 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    idle_output_sec_threshold   = 120.0f / 1000.0f;  // idle after 120ms of silence
    idle_output_framecount      = 0u;
 
+   b_fix_denorm = false;
+
    last_program_chunk_str = NULL;
 
    b_open = false;
@@ -2279,6 +2313,14 @@ void vst2_idle_detect_mode_set(int _mode) {
 
 void vst2_idle_detect_mode_get(int *_mode) {
    *_mode = int(rack::global->vst2.wrapper->idle_detect_mode);
+}
+
+int vst2_fix_denorm_get(void) {
+   return rack::global->vst2.wrapper->getEnableFixDenorm();
+}
+
+void vst2_fix_denorm_set(int _bEnable) {
+   rack::global->vst2.wrapper->setEnableFixDenorm(_bEnable);
 }
 
 

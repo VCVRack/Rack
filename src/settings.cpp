@@ -25,6 +25,8 @@ extern void vst2_idle_detect_mode_fx_set (int _mode);
 extern int vst2_idle_detect_mode_fx_get (void);
 extern void vst2_idle_detect_mode_instr_set (int _mode);
 extern int vst2_idle_detect_mode_instr_get (void);
+extern int vst2_fix_denorm_get (void);
+extern void vst2_fix_denorm_set (int _bEnable);
 #endif // RACK_HOST
 
 namespace rack {
@@ -167,6 +169,10 @@ static json_t *settingsToJson() {
 	// sampleRate
 	json_t *sampleRateJ = json_real(engineGetSampleRate());
 	json_object_set_new(rootJ, "sampleRate", sampleRateJ);
+
+	// fixDenorm
+	json_t *fixDenormJ = json_boolean(vst2_fix_denorm_get());
+	json_object_set_new(rootJ, "fixDenorm", fixDenormJ);
 
 	// lastPath
 	json_t *lastPathJ = json_string(global_ui->app.gRackWidget->lastPath.c_str());
@@ -414,6 +420,13 @@ static void settingsFromJson(json_t *rootJ, bool bWindowSizeOnly) {
       if (idleJ) {
          vst2_idle_detect_mode_fx_set(int(json_number_value(idleJ)));
       }
+   }
+
+	// fixDenorm
+	json_t *fixDenormJ = json_object_get(rootJ, "fixDenorm");
+	if (fixDenormJ)
+   {
+		vst2_fix_denorm_set(json_is_true(fixDenormJ));
    }
 #endif // RACK_HOST
 
