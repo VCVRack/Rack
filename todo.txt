@@ -174,7 +174,7 @@
    + Toolbar editing
    + save/restore to/from settings.json
 
-+ bsp.Rescaler (input => [a..b])
++ Rescaler (input => [a..b])
    + input (e.g. velocity)
    + in min (clip) (-10..10)
    + in max (clip) (-10..10)
@@ -183,12 +183,12 @@
    + scale input (optional, def=1.0)  (e.g. for env output)
    + output
 
-+ bsp.idea: Bias / KeyFollow
++ Bias / KeyFollow
    + input
    + center / break point (0=c-5) (-10..10)
    + bias neg (-10..10)
    + bias pos (-10..10)
    + output
 
-- fix save/save as keyboard shortcuts
++ fix save/save as keyboard shortcuts
 
