@@ -12,8 +12,8 @@
       "vst2_unique_param_base_id": 1,
       "model": "AudioInterface",
       "pos": [
-        76,
-        0
+        77,
+        1
       ],
       "params": [],
       "data": {
@@ -135,7 +135,7 @@
       "vst2_unique_param_base_id": 25,
       "model": "VCA",
       "pos": [
-        62,
+        59,
         0
       ],
       "params": [
@@ -215,7 +215,7 @@
       "vst2_unique_param_base_id": 39,
       "model": "ADSR",
       "pos": [
-        68,
+        72,
         0
       ],
       "params": [
@@ -233,7 +233,7 @@
         },
         {
           "paramId": 3,
-          "value": 0.491000026
+          "value": 0.566000164
         }
       ]
     },
@@ -494,6 +494,46 @@
           "value": 0.0
         }
       ]
+    },
+    {
+      "plugin": "Bogaudio",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 121,
+      "model": "Bogaudio-VCAmp",
+      "pos": [
+        64,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "plugin": "huaba",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 123,
+      "model": "EQ3",
+      "pos": [
+        68,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 2,
+          "value": 1.13199937
+        },
+        {
+          "paramId": 1,
+          "value": 1.30599928
+        },
+        {
+          "paramId": 0,
+          "value": 0.664000034
+        }
+      ]
     }
   ],
   "wires": [
@@ -529,14 +569,7 @@
       "color": "#c9b70e",
       "outputModuleId": 3,
       "outputId": 1,
-      "inputModuleId": 0,
-      "inputId": 0
-    },
-    {
-      "color": "#c91847",
-      "outputModuleId": 3,
-      "outputId": 1,
-      "inputModuleId": 0,
+      "inputModuleId": 16,
       "inputId": 1
     },
     {
@@ -636,6 +669,27 @@
       "outputId": 2,
       "inputModuleId": 2,
       "inputId": 2
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 17,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 17,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 1
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 16,
+      "outputId": 0,
+      "inputModuleId": 17,
+      "inputId": 0
     }
   ]
 }
