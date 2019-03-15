@@ -41,8 +41,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-10Mar2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-10Mar2019b.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-10Mar2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-10Mar2019b.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-15Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-15Mar2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-15Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-15Mar2019.7z) (32bit, experimental)
 
 ## Linux
 - [veeseevstrack_0_6_1_lin64_bin-10Mar2019b.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-10Mar2019b.tar.gz) (64bit) (Dave's latest build)
@@ -75,6 +75,7 @@ Here are some demo videos of it:
  - https://vimeo.com/288076107 (tuned delay line ambient pad drone)
  - https://vimeo.com/288594338 (RMS filter/pwm envelope follower + compressor demo)
  - https://vimeo.com/288968750 (DownSampler module)
+ - https://youtu.be/XTpLfcz-6Vo (a complete "one synth challenge" type track with 23 instances)
 
 
 # Add-on modules
