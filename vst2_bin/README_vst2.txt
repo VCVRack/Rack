@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- March 10th, 2019
+VeeSeeVST Rack VST 2.4 Plugin -- March 15th, 2019
 =================================================
 
 !!!------------------------------------------------------------------------------
@@ -27,7 +27,9 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
    - wake up on MIDI note on or audio input
 + comes with 827 prebuilt modules
 
-Here's a demo video of it: https://vimeo.com/277703414
+Here's an old demo video of it: https://vimeo.com/277703414
+And a newer one: https://youtu.be/XTpLfcz-6Vo
+
 
 Windows version tested in:
   - Eureka (my own work-in-progress VST host)

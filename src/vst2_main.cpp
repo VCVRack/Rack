@@ -19,6 +19,8 @@
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
 ///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018, 10Oct2018, 26Oct2018, 10Mar2019
+///          12Mar2019
+///
 ///
 ///
 
@@ -488,13 +490,16 @@ public:
    bool b_offline;  // true=offline rendering (HQ)
    bool b_check_offline;  // true=ask host if it's in offline rendering mode
 
-   sUI idle_detect_mode;
-   sUI idle_detect_mode_fx;
-   sUI idle_detect_mode_instr;
+   sUI  idle_detect_mode;
+   sUI  idle_detect_mode_fx;
+   sUI  idle_detect_mode_instr;
    sF32 idle_input_level_threshold;
    sF32 idle_output_level_threshold;
    sF32 idle_output_sec_threshold;
-   sUI idle_output_framecount;
+   sUI  idle_output_framecount;
+   sF32 idle_noteon_sec_grace;  // grace period after note on
+   sUI  idle_frames_since_noteon;
+
    bool b_idle;
 
    sBool b_fix_denorm;  // true=fix denormalized floats + clip to -4..4. fixes broken audio in FLStudio and Reason.
@@ -1020,6 +1025,7 @@ public:
       }
       b_idle = false;
       idle_output_framecount = 0u;
+      idle_frames_since_noteon = 0u;
    }
 
    void setIdleDetectModeFx(uint32_t _mode) {
@@ -1036,12 +1042,28 @@ public:
 #endif // VST2_EFFECT
    }
 
+   void setIdleGraceSec(float _sec) {
+      idle_noteon_sec_grace = _sec;
+   }
+
+   float getIdleGraceSec(void) const {
+      return idle_noteon_sec_grace;
+   }
+
+   void setIdleOutputSec(float _sec) {
+      idle_output_sec_threshold = _sec;
+   }
+
+   float getIdleOutputSec(void) const {
+      return idle_output_sec_threshold;
+   }
+
    void setEnableFixDenorm(int32_t _bEnable) {
       b_fix_denorm = (0 != _bEnable);
       Dprintf("vst2_main:setEnableFixDenorm(%d)\n", b_fix_denorm);
    }
 
-   int32_t getEnableFixDenorm(void) {
+   int32_t getEnableFixDenorm(void) const {
       return int32_t(b_fix_denorm);
    }
 
@@ -1296,8 +1318,6 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
          case VSTPluginWrapper::IDLE_DETECT_AUDIO:
             {
-               wrapper->b_idle = true;
-
                for(chIdx = 0u; chIdx < NUM_INPUTS; chIdx++)
                {           
                   if(chIdx < wrapper->oversample.num_in)
@@ -1498,15 +1518,28 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
             }
          }
 
+         if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode)
+         {
+            wrapper->idle_frames_since_noteon += sampleFrames;
+         }
+
          if(bSilence)
          {
             wrapper->idle_output_framecount += sampleFrames;
 
+            if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode)
+            {
+               bSilence = (wrapper->idle_frames_since_noteon >= sUI(wrapper->idle_noteon_sec_grace * wrapper->sample_rate));
+            }
+
             if(wrapper->idle_output_framecount >= sUI(wrapper->idle_output_sec_threshold * wrapper->sample_rate))
             {
-               // Frame threshold exceeded, become idle
-               wrapper->b_idle = true;
-               Dprintf_idle("xxx vstrack_plugin: now idle\n");
+               if(bSilence)
+               {
+                  // Frame threshold exceeded, become idle
+                  wrapper->b_idle = true;
+                  Dprintf_idle("xxx vstrack_plugin: now idle\n");
+               }
             }
          }
          else
@@ -1871,15 +1904,17 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                            Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteOffVelocity = %d\n", evIdx, mev->noteOffVelocity); // 0..127
 #endif // DEBUG_PRINT_EVENTS
 
-                           if((VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode) && wrapper->b_idle)
+                           if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode)
                            {
                               if(0x90u == (mev->midiData[0] & 0xF0u)) // Note on ?
                               {
                                  wrapper->lockAudio();
+                                 if(wrapper->b_idle)
+                                    Dprintf_idle("xxx vstrack_plugin: become active after MIDI note on\n");
                                  wrapper->b_idle = false;
                                  wrapper->idle_output_framecount = 0u;
+                                 wrapper->idle_frames_since_noteon = 0u;
                                  wrapper->unlockAudio();
-                                 Dprintf_idle("xxx vstrack_plugin: become active after MIDI note on\n");
                               }
                            }
 
@@ -2176,8 +2211,10 @@ VSTPluginWrapper::VSTPluginWrapper(audioMasterCallback vstHostCallback,
    b_idle                      = false;
    idle_input_level_threshold  = 0.00018f;//0.00007f;
    idle_output_level_threshold = 0.00018f;//0.00003f;
-   idle_output_sec_threshold   = 120.0f / 1000.0f;  // idle after 120ms of silence
+   idle_output_sec_threshold   = 0.2f;  // idle after 200ms of silence
    idle_output_framecount      = 0u;
+   idle_noteon_sec_grace       = 0.3f;  // grace period after note on
+   idle_frames_since_noteon    = 0u;
 
    b_fix_denorm = false;
 
@@ -2313,6 +2350,31 @@ void vst2_idle_detect_mode_set(int _mode) {
 
 void vst2_idle_detect_mode_get(int *_mode) {
    *_mode = int(rack::global->vst2.wrapper->idle_detect_mode);
+}
+
+void vst2_idle_grace_sec_set(float _sec) {
+   // Note-ons / MIDI idle detect mode
+   if(_sec < 0.05f)
+      _sec = 0.05f;
+   else if(_sec > 3.0f)
+      _sec = 3.0f;
+   rack::global->vst2.wrapper->setIdleGraceSec(_sec);
+}
+
+float vst2_idle_grace_sec_get(void) {
+   return rack::global->vst2.wrapper->getIdleGraceSec();
+}
+
+void vst2_idle_output_sec_set(float _sec) {
+   if(_sec < 0.05f)
+      _sec = 0.05f;
+   else if(_sec > 3.0f)
+      _sec = 3.0f;
+   rack::global->vst2.wrapper->setIdleOutputSec(_sec);
+}
+
+float vst2_idle_output_sec_get(void) {
+   return rack::global->vst2.wrapper->getIdleOutputSec();
 }
 
 int vst2_fix_denorm_get(void) {

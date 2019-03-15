@@ -1,4 +1,10 @@
 
+** March 15th, 2019
+- fix "MIDI Note On" idle detection mode
+- add configurable threshold settings for MIDI idle detection (short, default, long)
+- add new demo video: https://youtu.be/XTpLfcz-6Vo
+
+
 ** March 10th, 2019
 - implement MIDI channel aftertouch
 - add "fixDenorm" global setting (settings.json) (also editable via Toolbar)

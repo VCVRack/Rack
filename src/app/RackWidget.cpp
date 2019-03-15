@@ -16,12 +16,16 @@
 extern void vst2_set_shared_plugin_tls_globals(void);
 
 #ifdef RACK_HOST
-extern void vst2_oversample_realtime_set (float _factor, int _quality);
-extern void vst2_oversample_realtime_get (float *_factor, int *_quality);
-extern void vst2_oversample_channels_set (int _numIn, int _numOut);
-extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
-extern void vst2_idle_detect_mode_set (int _mode);
-extern void vst2_idle_detect_mode_get (int *_mode);
+extern void  vst2_oversample_realtime_set (float _factor, int _quality);
+extern void  vst2_oversample_realtime_get (float *_factor, int *_quality);
+extern void  vst2_oversample_channels_set (int _numIn, int _numOut);
+extern void  vst2_oversample_channels_get (int *_numIn, int *_numOut);
+extern void  vst2_idle_detect_mode_set (int _mode);
+extern void  vst2_idle_detect_mode_get (int *_mode);
+extern void  vst2_idle_grace_sec_set   (float _sec);
+extern float vst2_idle_grace_sec_get   (void);
+extern void  vst2_idle_output_sec_set  (float _sec);
+extern float vst2_idle_output_sec_get  (void);
 #endif // RACK_HOST
 
 #endif // USE_VST2
@@ -321,6 +325,22 @@ json_t *RackWidget::toJson() {
       json_t *idleJ = json_real(idleDetect);
       json_object_set_new(rootJ, "idleDetect", idleJ);
    }
+
+   // Idle note-on grace period (sec)
+   {
+      float sec = vst2_idle_grace_sec_get();
+      
+      json_t *idleJ = json_real(sec);
+      json_object_set_new(rootJ, "idleGraceSec", idleJ);
+   }
+
+   // Idle output silence threshold (sec)
+   {
+      float sec = vst2_idle_output_sec_get();
+      
+      json_t *idleJ = json_real(sec);
+      json_object_set_new(rootJ, "idleOutputSec", idleJ);
+   }
 #endif // RACK_HOST
 #endif // USE_VST2
 
@@ -465,6 +485,28 @@ void RackWidget::fromJson(json_t *rootJ) {
       json_t *idleJ = json_object_get(rootJ, "idleDetect");
       if (idleJ) {
          vst2_idle_detect_mode_set(int(json_number_value(idleJ)));
+      }
+   }
+
+	// Idle note-on grace period (sec)
+   {
+      json_t *idleJ = json_object_get(rootJ, "idleGraceSec");
+      if (idleJ) {
+         vst2_idle_grace_sec_set(float(json_number_value(idleJ)));
+      }
+      else {
+         vst2_idle_grace_sec_set(0.75f);
+      }
+   }
+
+	// Idle output silence threshold (sec)
+   {
+      json_t *idleJ = json_object_get(rootJ, "idleOutputSec");
+      if (idleJ) {
+         vst2_idle_output_sec_set(float(json_number_value(idleJ)));
+      }
+      else {
+         vst2_idle_output_sec_set(0.2f);
       }
    }
 #endif // RACK_HOST

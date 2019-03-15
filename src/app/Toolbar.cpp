@@ -15,6 +15,10 @@ extern void vst2_oversample_channels_set (int _numIn, int _numOut);
 extern void vst2_oversample_channels_get (int *_numIn, int *_numOut);
 extern void vst2_idle_detect_mode_set (int _mode);
 extern void vst2_idle_detect_mode_get (int *_mode);
+extern void  vst2_idle_grace_sec_set  (float _sec);
+extern float vst2_idle_grace_sec_get  (void);
+extern void  vst2_idle_output_sec_set (float _sec);
+extern float vst2_idle_output_sec_get (void);
 extern void vst2_refresh_rate_set (float _hz);
 extern float vst2_refresh_rate_get (void);
 extern void vst2_window_size_set (int _width, int _height);
@@ -214,6 +218,16 @@ struct IdleModeItem : MenuItem {
 		vst2_idle_detect_mode_set(idle_mode);
 	}
 };
+
+struct IdleTimeItem : MenuItem {
+   float idle_grace_sec;
+   float idle_output_sec;
+
+	void onAction(EventAction &e) override {
+		vst2_idle_grace_sec_set(idle_grace_sec);
+		vst2_idle_output_sec_set(idle_output_sec);
+	}
+};
 #endif // RACK_HOST
 
 
@@ -302,27 +316,57 @@ struct IdleModeButton : TooltipIconButton {
 
 		menu->addChild(MenuLabel::create("Idle Mode"));
 
-      int idleMode; vst2_idle_detect_mode_get(&idleMode);
+      {
+         int idleMode; vst2_idle_detect_mode_get(&idleMode);
 
-      IdleModeItem *item;
+         IdleModeItem *item;
 
-      item = new IdleModeItem();
-      item->text = "Always Active";
-      item->rightText = CHECKMARK(0/*IDLE_DETECT_NONE*/ == idleMode);
-      item->idle_mode = 0;
-      menu->addChild(item);
+         item = new IdleModeItem();
+         item->text = "Always Active";
+         item->rightText = CHECKMARK(0/*IDLE_DETECT_NONE*/ == idleMode);
+         item->idle_mode = 0;
+         menu->addChild(item);
 
-      item = new IdleModeItem();
-      item->text = "Wake on MIDI Note-On";
-      item->rightText = CHECKMARK(1/*IDLE_DETECT_MIDI*/ == idleMode);
-      item->idle_mode = 1;
-      menu->addChild(item);
+         item = new IdleModeItem();
+         item->text = "Wake on MIDI Note-On";
+         item->rightText = CHECKMARK(1/*IDLE_DETECT_MIDI*/ == idleMode);
+         item->idle_mode = 1;
+         menu->addChild(item);
 
-      item = new IdleModeItem();
-      item->text = "Wake on Audio Input";
-      item->rightText = CHECKMARK(2/*IDLE_DETECT_AUDIO*/ == idleMode);
-      item->idle_mode = 2;
-      menu->addChild(item);
+         item = new IdleModeItem();
+         item->text = "Wake on Audio Input";
+         item->rightText = CHECKMARK(2/*IDLE_DETECT_AUDIO*/ == idleMode);
+         item->idle_mode = 2;
+         menu->addChild(item);
+      }
+
+      {
+         float idleGraceSec = vst2_idle_grace_sec_get();
+         float idleOutputSec = vst2_idle_output_sec_get();
+         IdleTimeItem *item;
+         printf("xxx Toolbar: idleGraceSec=%f idleOutputSec=%f\n", idleGraceSec, idleOutputSec);
+
+         item = new IdleTimeItem();
+         item->text = "Idle Time: Long (Slow Attacks, 750ms)";
+         item->rightText = CHECKMARK(0.75f == idleGraceSec);
+         item->idle_grace_sec = 0.75f;
+         item->idle_output_sec = 0.2f;
+         menu->addChild(item);
+
+         item = new IdleTimeItem();
+         item->text = "Idle Time: Default (300 ms)";
+         item->rightText = CHECKMARK(0.3f == idleGraceSec);
+         item->idle_grace_sec = 0.3f;
+         item->idle_output_sec = 0.2f;
+         menu->addChild(item);
+
+         item = new IdleTimeItem();
+         item->text = "Idle Time: Short (Percussion, 150ms)";
+         item->rightText = CHECKMARK(0.15f == idleGraceSec);
+         item->idle_grace_sec = 0.15f;
+         item->idle_output_sec = 0.1f;
+         menu->addChild(item);
+      }
 #endif // RACK_HOST
 	}
 };
