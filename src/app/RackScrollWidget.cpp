@@ -14,11 +14,14 @@ RackScrollWidget::RackScrollWidget() {
 	container->addChild(zoomWidget);
 
 	rackWidget = new RackWidget;
+	rackWidget->box.size = RACK_OFFSET.mult(2);
 	zoomWidget->addChild(rackWidget);
+
+	reset();
 }
 
 void RackScrollWidget::step() {
-	float zoom = std::round(settings.zoom * 100) / 100;
+	float zoom = std::round(settings.zoom / 0.01) * 0.01;
 	if (zoom != zoomWidget->zoom) {
 		// Set offset based on zoomPos
 		offset = offset.plus(zoomPos).div(zoomWidget->zoom).mult(zoom).minus(zoomPos);
@@ -28,14 +31,20 @@ void RackScrollWidget::step() {
 
 	zoomPos = box.size.div(2);
 
-	// Resize RackWidget to be a bit larger than the viewport
-	rackWidget->box.size = box.size
-		.minus(container->box.pos)
-		.plus(math::Vec(500, 500))
-		.div(zoomWidget->zoom);
-
-	// Resize ZoomWidget
-	zoomWidget->box.size = rackWidget->box.size.mult(zoomWidget->zoom);
+	// Set zoomWidget box to module bounding box
+	math::Rect moduleBox = rackWidget->moduleContainer->getChildrenBoundingBox();
+	if (!moduleBox.size.isFinite())
+		moduleBox = math::Rect(RACK_OFFSET, math::Vec(0, 0));
+	zoomWidget->box.pos = moduleBox.pos.mult(zoomWidget->zoom);
+	zoomWidget->box.size = moduleBox.size.mult(zoomWidget->zoom);
+	// Expand to viewport
+	math::Rect viewportBox = box;
+	viewportBox.pos = viewportBox.pos.plus(offset);
+	zoomWidget->box = zoomWidget->box.expand(viewportBox);
+	// Grow a few pixels
+	zoomWidget->box = zoomWidget->box.grow(math::Vec(100, 100));
+	// Reposition rackWidget
+	rackWidget->box.pos = zoomWidget->box.pos.div(zoomWidget->zoom).neg();
 
 	// Scroll rack if dragging cable near the edge of the screen
 	math::Vec pos = APP->window->mousePos;
@@ -58,6 +67,7 @@ void RackScrollWidget::step() {
 
 
 void RackScrollWidget::draw(const DrawArgs &args) {
+	// DEBUG("%f %f %f %f", RECT_ARGS(args.clipBox));
 	ScrollWidget::draw(args);
 }
 
@@ -72,18 +82,14 @@ void RackScrollWidget::onHover(const widget::HoverEvent &e) {
 		else if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
 			arrowSpeed /= 4.0;
 
-		if (glfwGetKey(APP->window->win, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		if (glfwGetKey(APP->window->win, GLFW_KEY_LEFT) == GLFW_PRESS)
 			offset.x -= arrowSpeed;
-		}
-		if (glfwGetKey(APP->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		if (glfwGetKey(APP->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS)
 			offset.x += arrowSpeed;
-		}
-		if (glfwGetKey(APP->window->win, GLFW_KEY_UP) == GLFW_PRESS) {
+		if (glfwGetKey(APP->window->win, GLFW_KEY_UP) == GLFW_PRESS)
 			offset.y -= arrowSpeed;
-		}
-		if (glfwGetKey(APP->window->win, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		if (glfwGetKey(APP->window->win, GLFW_KEY_DOWN) == GLFW_PRESS)
 			offset.y += arrowSpeed;
-		}
 	}
 
 	ScrollWidget::onHover(e);
@@ -103,6 +109,11 @@ void RackScrollWidget::onHoverScroll(const widget::HoverScrollEvent &e) {
 	}
 
 	ScrollWidget::onHoverScroll(e);
+}
+
+void RackScrollWidget::reset() {
+	offset = RACK_OFFSET.mult(zoomWidget->zoom);
+	offset = offset.minus(math::Vec(20, 20));
 }
 
 

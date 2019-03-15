@@ -60,7 +60,7 @@ void PatchManager::init(std::string path) {
 void PatchManager::reset() {
 	APP->history->clear();
 	APP->scene->rack->clear();
-	APP->scene->rackScroll->offset = math::Vec(0, 0);
+	APP->scene->rackScroll->reset();
 	// Fails silently if file does not exist
 	load(asset::user("template.vcv"));
 	legacy = 0;
@@ -169,7 +169,7 @@ bool PatchManager::load(std::string path) {
 
 	APP->history->clear();
 	APP->scene->rack->clear();
-	APP->scene->rackScroll->offset = math::Vec(0, 0);
+	APP->scene->rackScroll->reset();
 	fromJson(rootJ);
 	return true;
 }

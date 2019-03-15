@@ -97,13 +97,7 @@ RackWidget::~RackWidget() {
 }
 
 void RackWidget::step() {
-	// Expand size to fit modules
-	math::Vec moduleSize = moduleContainer->getChildrenBoundingBox().getBottomRight();
-	// We assume that the size is reset by a parent before calling step(). Otherwise it will grow unbounded.
-	box.size = box.size.max(moduleSize);
-
 	// Adjust size and position of rails
-	widget::Widget *rail = rails->children.front();
 	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
 	if (!rails->box.isContaining(bound)) {
 		math::Vec cellMargin = math::Vec(20, 1);
@@ -111,14 +105,15 @@ void RackWidget::step() {
 		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
 		rails->dirty = true;
 
+		RackRail *rail = rails->getFirstDescendantOfType<RackRail>();
 		rail->box.size = rails->box.size;
 	}
 
-	Widget::step();
+	OpaqueWidget::step();
 }
 
 void RackWidget::draw(const DrawArgs &args) {
-	Widget::draw(args);
+	OpaqueWidget::draw(args);
 }
 
 void RackWidget::onHover(const widget::HoverEvent &e) {
@@ -157,7 +152,6 @@ void RackWidget::onButton(const widget::ButtonEvent &e) {
 }
 
 void RackWidget::onZoom(const widget::ZoomEvent &e) {
-	rails->box.size = math::Vec();
 	OpaqueWidget::onZoom(e);
 }
 
@@ -189,7 +183,8 @@ json_t *RackWidget::toJson() {
 			// id
 			json_object_set_new(moduleJ, "id", json_integer(moduleWidget->module->id));
 			// pos
-			math::Vec pos = moduleWidget->box.pos.div(RACK_GRID_SIZE).round();
+			math::Vec pos = moduleWidget->box.pos.minus(RACK_OFFSET);
+			pos = pos.div(RACK_GRID_SIZE).round();
 			json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
 			json_object_set_new(moduleJ, "pos", posJ);
 		}
@@ -252,6 +247,7 @@ void RackWidget::fromJson(json_t *rootJ) {
 			else {
 				moduleWidget->box.pos = pos.mult(RACK_GRID_SIZE);
 			}
+			moduleWidget->box.pos = moduleWidget->box.pos.plus(RACK_OFFSET);
 
 			addModule(moduleWidget);
 		}
@@ -387,10 +383,6 @@ void RackWidget::removeModule(ModuleWidget *m) {
 }
 
 bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect requestedBox) {
-	// Check bounds
-	if (requestedBox.pos.x < 0 || requestedBox.pos.y < 0)
-		return false;
-
 	// Check intersection with other modules
 	for (widget::Widget *m2 : moduleContainer->children) {
 		// Don't intersect with self
@@ -412,8 +404,8 @@ bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect requestedBo
 	int x0 = std::round(requestedBox.pos.x / RACK_GRID_WIDTH);
 	int y0 = std::round(requestedBox.pos.y / RACK_GRID_HEIGHT);
 	std::vector<math::Vec> positions;
-	for (int y = std::max(0, y0 - 8); y < y0 + 8; y++) {
-		for (int x = std::max(0, x0 - 400); x < x0 + 400; x++) {
+	for (int y = y0 - 4; y < y0 + 4; y++) {
+		for (int x = x0 - 200; x < x0 + 200; x++) {
 			positions.push_back(math::Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
 		}
 	}

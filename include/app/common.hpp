@@ -43,6 +43,7 @@ inline math::Vec mm2px(math::Vec mm) {
 static const float RACK_GRID_WIDTH = 15;
 static const float RACK_GRID_HEIGHT = 380;
 static const math::Vec RACK_GRID_SIZE = math::Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+static const math::Vec RACK_OFFSET = RACK_GRID_SIZE.mult(math::Vec(2000, 100));
 
 
 } // namespace app

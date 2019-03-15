@@ -37,22 +37,17 @@ void ScrollWidget::step() {
 	Widget::step();
 
 	// Clamp scroll offset
-	math::Vec containerCorner = container->getChildrenBoundingBox().getBottomRight();
-	math::Rect containerBox = math::Rect(math::Vec(0, 0), containerCorner.minus(box.size));
-	offset = offset.clamp(containerBox);
-	// Lock offset to top/left if no scrollbar will display
-	if (containerBox.size.x < 0.0)
-		offset.x = 0.0;
-	if (containerBox.size.y < 0.0)
-		offset.y = 0.0;
+	math::Rect containerBox = container->getChildrenBoundingBox();
+	math::Rect offsetBounds = containerBox;
+	offsetBounds.size = offsetBounds.size.minus(box.size);
+	offset = offset.clamp(offsetBounds);
 
-	// Update the container's positions from the offset
+	// Update the container's position from the offset
 	container->box.pos = offset.neg().round();
 
 	// Update scrollbar offsets and sizes
-	math::Vec viewportSize = container->getChildrenBoundingBox().getBottomRight();
-	math::Vec scrollbarOffset = offset.div(viewportSize.minus(box.size));
-	math::Vec scrollbarSize = box.size.div(viewportSize);
+	math::Vec scrollbarOffset = offset.minus(containerBox.pos).div(offsetBounds.size);
+	math::Vec scrollbarSize = box.size.div(containerBox.size);
 
 	horizontalScrollBar->visible = (0.0 < scrollbarSize.x && scrollbarSize.x < 1.0);
 	verticalScrollBar->visible = (0.0 < scrollbarSize.y && scrollbarSize.y < 1.0);
@@ -61,8 +56,8 @@ void ScrollWidget::step() {
 	horizontalScrollBar->size = scrollbarSize.x;
 	verticalScrollBar->size = scrollbarSize.y;
 
-	// Resize scroll bars
-	math::Vec inner = math::Vec(box.size.x - verticalScrollBar->box.size.x, box.size.y - horizontalScrollBar->box.size.y);
+	// Reposition and resize scroll bars
+	math::Vec inner = box.size.minus(math::Vec(verticalScrollBar->box.size.x, horizontalScrollBar->box.size.y));
 	horizontalScrollBar->box.pos.y = inner.y;
 	verticalScrollBar->box.pos.x = inner.x;
 	horizontalScrollBar->box.size.x = verticalScrollBar->visible ? inner.x : box.size.x;

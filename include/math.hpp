@@ -15,25 +15,25 @@ namespace math {
 // basic integer functions
 ////////////////////
 
-/** Returns true if x is odd */
+/** Returns true if x is odd. */
 inline bool isEven(int x) {
 	return x % 2 == 0;
 }
 
-/** Returns true if x is odd */
+/** Returns true if x is odd. */
 inline bool isOdd(int x) {
 	return x % 2 != 0;
 }
 
-/** Limits `x` between `a` and `b`
-Assumes a <= b
+/** Limits `x` between `a` and `b`.
+If b < a, returns a.
 */
 inline int clamp(int x, int a, int b) {
-	return std::min(std::max(x, a), b);
+	return std::max(std::min(x, b), a);
 }
 
-/** Limits `x` between `a` and `b`
-If a > b, switches the two values
+/** Limits `x` between `a` and `b`.
+If b < a, switches the two values.
 */
 inline int clampSafe(int x, int a, int b) {
 	return clamp(x, std::min(a, b), std::max(a, b));
@@ -72,8 +72,7 @@ inline void eucDivMod(int a, int b, int *div, int *mod) {
 	}
 }
 
-/** Returns floor(log_2(n)), or 0 if n == 1.
-*/
+/** Returns floor(log_2(n)), or 0 if n == 1. */
 inline int log2(int n) {
 	int i = 0;
 	while (n >>= 1) {
@@ -82,7 +81,7 @@ inline int log2(int n) {
 	return i;
 }
 
-/** Returns whether `n` is a power of 2 */
+/** Returns whether `n` is a power of 2. */
 inline bool isPow2(int n) {
 	return n > 0 && (n & (n - 1)) == 0;
 }
@@ -91,22 +90,22 @@ inline bool isPow2(int n) {
 // basic float functions
 ////////////////////
 
-/** Limits `x` between `a` and `b`
-Assumes a <= b
+/** Limits `x` between `a` and `b`.
+If b < a, returns a.
 */
 inline float clamp(float x, float a, float b) {
-	return std::fmin(std::fmax(x, a), b);
+	return std::fmax(std::fmin(x, b), a);
 }
 
-/** Limits `x` between `a` and `b`
-If a > b, switches the two values
+/** Limits `x` between `a` and `b`.
+If b < a, switches the two values.
 */
 inline float clampSafe(float x, float a, float b) {
 	return clamp(x, std::fmin(a, b), std::fmax(a, b));
 }
 
-/** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero
-See https://en.wikipedia.org/wiki/Sign_function
+/** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero.
+See https://en.wikipedia.org/wiki/Sign_function.
 */
 inline float sgn(float x) {
 	return x > 0.f ? 1.f : x < 0.f ? -1.f : 0.f;
@@ -118,18 +117,19 @@ inline float normalizeZero(float x) {
 }
 
 /** Euclidean modulus. Always returns 0 <= mod < b.
-See https://en.wikipedia.org/wiki/Euclidean_division
+See https://en.wikipedia.org/wiki/Euclidean_division.
 */
 inline float eucMod(float a, float base) {
 	float mod = std::fmod(a, base);
 	return (mod >= 0.f) ? mod : mod + base;
 }
 
+/** Returns whether a is within epsilon distance from b. */
 inline bool isNear(float a, float b, float epsilon = 1e-6f) {
 	return std::fabs(a - b) <= epsilon;
 }
 
-/** If the magnitude of x if less than epsilon, return 0 */
+/** If the magnitude of x if less than epsilon, return 0. */
 inline float chop(float x, float epsilon = 1e-6f) {
 	return isNear(x, 0.f, epsilon) ? 0.f : x;
 }
@@ -142,7 +142,7 @@ inline float crossfade(float a, float b, float p) {
 	return a + (b - a) * p;
 }
 
-/** Linearly interpolate an array `p` with index `x`
+/** Linearly interpolates an array `p` with index `x`.
 Assumes that the array at `p` is of length at least floor(x)+1.
 */
 inline float interpolateLinear(const float *p, float x) {
@@ -151,8 +151,8 @@ inline float interpolateLinear(const float *p, float x) {
 	return crossfade(p[xi], p[xi+1], xf);
 }
 
-/** Complex multiply c = a * b
-Arguments may be the same pointers
+/** Complex multiplies c = a * b.
+Arguments may be the same pointers.
 i.e. cmultf(&ar, &ai, ar, ai, br, bi)
 */
 inline void complexMult(float *cr, float *ci, float ar, float ai, float br, float bi) {
@@ -173,7 +173,7 @@ struct Vec {
 	Vec() {}
 	Vec(float x, float y) : x(x), y(y) {}
 
-	/** Negates the vector
+	/** Negates the vector.
 	Equivalent to a reflection across the y=-x line.
 	*/
 	Vec neg() const {
@@ -206,13 +206,13 @@ struct Vec {
 	float square() const {
 		return x * x + y * y;
 	}
-	/** Rotates counterclockwise in radians */
+	/** Rotates counterclockwise in radians. */
 	Vec rotate(float angle) {
 		float sin = std::sin(angle);
 		float cos = std::cos(angle);
 		return Vec(x * cos - y * sin, x * sin + y * cos);
 	}
-	/** Swaps the coordinates
+	/** Swaps the coordinates.
 	Equivalent to a reflection across the y=x line.
 	*/
 	Vec flip() const {
@@ -256,22 +256,23 @@ struct Rect {
 
 	Rect() {}
 	Rect(Vec pos, Vec size) : pos(pos), size(size) {}
-	/** Constructs a Rect from the upper-left position `a` and lower-right pos `b` */
+	Rect(float posX, float posY, float sizeX, float sizeY) : pos(math::Vec(posX, posY)), size(math::Vec(sizeX, sizeY)) {}
+	/** Constructs a Rect from the upper-left position `a` and lower-right pos `b`. */
 	static Rect fromMinMax(Vec a, Vec b) {
 		return Rect(a, b.minus(a));
 	}
 
-	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right */
+	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right. */
 	bool isContaining(Vec v) const {
 		return pos.x <= v.x && v.x < pos.x + size.x
 			&& pos.y <= v.y && v.y < pos.y + size.y;
 	}
-	/** Returns whether this Rect contains an entire Rect */
+	/** Returns whether this Rect contains an entire Rect. */
 	bool isContaining(Rect r) const {
 		return pos.x <= r.pos.x && r.pos.x + r.size.x <= pos.x + size.x
 			&& pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
 	}
-	/** Returns whether this Rect overlaps with another Rect */
+	/** Returns whether this Rect overlaps with another Rect. */
 	bool isIntersecting(Rect r) const {
 		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
 			&& (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
@@ -300,7 +301,7 @@ struct Rect {
 	Vec getBottomRight() const {
 		return pos.plus(size);
 	}
-	/** Clamps the edges of the rectangle to fit within a bound */
+	/** Clamps the edges of the rectangle to fit within a bound. */
 	Rect clamp(Rect bound) const {
 		Rect r;
 		r.pos.x = math::clampSafe(pos.x, bound.pos.x, bound.pos.x + bound.size.x);
@@ -309,7 +310,7 @@ struct Rect {
 		r.size.y = math::clamp(pos.y + size.y, bound.pos.y, bound.pos.y + bound.size.y) - r.pos.y;
 		return r;
 	}
-	/** Nudges the position to fix inside a bounding box */
+	/** Nudges the position to fix inside a bounding box. */
 	Rect nudge(Rect bound) const {
 		Rect r;
 		r.size = size;
@@ -317,7 +318,7 @@ struct Rect {
 		r.pos.y = math::clampSafe(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
-	/** Expands this Rect to contain `b` */
+	/** Expands this Rect to contain `b`. */
 	Rect expand(Rect b) const {
 		Rect r;
 		r.pos.x = std::fmin(pos.x, b.pos.x);
@@ -326,7 +327,7 @@ struct Rect {
 		r.size.y = std::fmax(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
 		return r;
 	}
-	/** Returns the intersection of `this` and `b` */
+	/** Returns the intersection of `this` and `b`. */
 	Rect intersect(Rect b) const {
 		Rect r;
 		r.pos.x = std::fmax(pos.x, b.pos.x);
@@ -335,11 +336,11 @@ struct Rect {
 		r.size.y = std::fmin(pos.y + size.y, b.pos.y + b.size.y) - r.pos.y;
 		return r;
 	}
-	/** Returns a Rect with its position set to zero */
+	/** Returns a Rect with its position set to zero. */
 	Rect zeroPos() const {
 		return Rect(Vec(), size);
 	}
-	/** Expands each corner
+	/** Expands each corner.
 	Use a negative delta to shrink.
 	*/
 	Rect grow(Vec delta) const {
@@ -371,7 +372,7 @@ inline Vec Vec::clampSafe(Rect bound) const {
 /** Expands a Vec and Rect into a comma-separated list.
 Useful for print debugging.
 
-	printf("%f %f %f %f", RECT_ARGS(r));
+	printf("(%f %f) (%f %f %f %f)", VEC_ARGS(v), RECT_ARGS(r));
 
 Or passing the values to a C function.
 

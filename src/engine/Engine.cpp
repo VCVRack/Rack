@@ -473,14 +473,14 @@ void Engine::removeModule(Module *module) {
 			paramHandle->module = NULL;
 	}
 	// Update adjacent modules
-	for (Module *module : internal->modules) {
-		if (module->leftModule == module) {
-			module->leftModuleId = -1;
-			module->leftModule = NULL;
+	for (Module *m : internal->modules) {
+		if (m->leftModule == module) {
+			m->leftModuleId = -1;
+			m->leftModule = NULL;
 		}
-		if (module->rightModule == module) {
-			module->rightModuleId = -1;
-			module->rightModule = NULL;
+		if (m->rightModule == module) {
+			m->rightModuleId = -1;
+			m->rightModule = NULL;
 		}
 	}
 	// Check that the module actually exists
