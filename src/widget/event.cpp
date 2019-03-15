@@ -135,7 +135,7 @@ void EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 		}
 
 		if (action == GLFW_PRESS) {
-			const double doubleClickDuration = 0.5;
+			const double doubleClickDuration = 0.3;
 			double clickTime = glfwGetTime();
 			if (clickedWidget
 				&& clickTime - lastClickTime <= doubleClickDuration
@@ -143,9 +143,14 @@ void EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 				// DoubleClickEvent
 				DoubleClickEvent eDoubleClick;
 				clickedWidget->onDoubleClick(eDoubleClick);
+				// Reset double click
+				lastClickTime = -INFINITY;
+				lastClickedWidget = NULL;
 			}
-			lastClickTime = clickTime;
-			lastClickedWidget = clickedWidget;
+			else {
+				lastClickTime = clickTime;
+				lastClickedWidget = clickedWidget;
+			}
 		}
 	}
 }

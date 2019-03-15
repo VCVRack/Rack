@@ -102,6 +102,7 @@ void Knob::onDragMove(const widget::DragMoveEvent &e) {
 void Knob::reset() {
 	if (paramQuantity && paramQuantity->isBounded()) {
 		paramQuantity->reset();
+		oldValue = snapValue = paramQuantity->getValue();
 	}
 }
 
@@ -111,6 +112,7 @@ void Knob::randomize() {
 		if (snap)
 			value = std::round(value);
 		paramQuantity->setValue(value);
+		oldValue = snapValue = paramQuantity->getValue();
 	}
 }
 

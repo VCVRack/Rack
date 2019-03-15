@@ -29,7 +29,7 @@ void ParamQuantity::setValue(float value) {
 	if (!std::isfinite(value))
 		return;
 	// This setter clamps the value
-	getParam()->setValue(value);
+	APP->engine->setParam(module, paramId, value);
 }
 
 float ParamQuantity::getValue() {
