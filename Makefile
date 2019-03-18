@@ -144,8 +144,8 @@ ifdef ARCH_WIN
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
-	# makensis installer.nsi
-	# mv Rack-setup.exe dist/Rack-$(VERSION)-$(ARCH).exe
+	makensis installer.nsi
+	mv installer.exe dist/Rack-$(VERSION)-$(ARCH).exe
 endif
 
 	# Rack SDK
