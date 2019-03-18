@@ -113,7 +113,7 @@ void RackScrollWidget::onHoverScroll(const widget::HoverScrollEvent &e) {
 
 void RackScrollWidget::reset() {
 	offset = RACK_OFFSET.mult(zoomWidget->zoom);
-	offset = offset.minus(math::Vec(20, 20));
+	offset = offset.minus(math::Vec(60, 60));
 }
 
 
