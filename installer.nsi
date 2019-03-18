@@ -1,6 +1,6 @@
 !include "MUI2.nsh"
 
-Name "VCV Rack"
+Name "VCV Rack ${VERSION}"
 OutFile "installer.exe"
 SetCompressor /solid "lzma"
 CRCCheck On
@@ -55,12 +55,15 @@ Section "VCV Rack" VCV_RACK_SECTION
 	; Write uninstaller info
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "DisplayName" "VCV Rack"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "DisplayIcon" '"$INSTDIR\Rack.exe"'
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "DisplayVersion" "${VERSION}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "UninstallString" '"$INSTDIR\Uninstall.exe"'
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "InstallLocation" '"$INSTDIR"'
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "Publisher" "VCV"
 	SectionGetSize ${VCV_RACK_SECTION} $0
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "EstimatedSize" $0
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "NoModify" 1
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "NoRepair" 1
 
 	; Create uninstaller
 	WriteUninstaller "$INSTDIR\Uninstall.exe"
