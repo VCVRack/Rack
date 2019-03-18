@@ -54,16 +54,21 @@ Section "VCV Rack" VCV_RACK_SECTION
 
 	; Write uninstaller info
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "DisplayName" "VCV Rack"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "DisplayIcon" "$\"$INSTDIR\Rack.exe$\""
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "QuietUninstallString" "$\"$INSTDIR\Uninstall.exe$\" \S"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "InstallLocation" "$\"$INSTDIR$\""
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "DisplayIcon" '"$INSTDIR\Rack.exe"'
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "UninstallString" '"$INSTDIR\Uninstall.exe"'
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "InstallLocation" '"$INSTDIR"'
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "Publisher" "VCV"
 	SectionGetSize ${VCV_RACK_SECTION} $0
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack" "EstimatedSize" $0
 
 	; Create uninstaller
 	WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+	; Associate file type
+	WriteRegStr HKLM "Software\Classes\.vcv" "" "VCVRack.Patch"
+	WriteRegStr HKLM "Software\Classes\VCVRack.Patch" "" "VCV Rack Patch"
+	WriteRegStr HKLM "Software\Classes\VCVRack.Patch\shell\open\command" "" '"$INSTDIR\Rack.exe" "%1"'
 
 	; Create shortcuts
 	CreateDirectory "$SMPROGRAMS"
@@ -83,6 +88,8 @@ Section "Uninstall"
 	DeleteRegKey HKLM "Software\VCV\Rack"
 	DeleteRegKey /ifempty HKLM "Software\VCV"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCV Rack"
+	DeleteRegKey HKLM "Software\Classes\.vcv"
+	DeleteRegKey HKLM "Software\Classes\VCVRack.Patch"
 SectionEnd
 
 
