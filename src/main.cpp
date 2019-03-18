@@ -124,6 +124,12 @@ int main(int argc, char *argv[]) {
 	INFO("Initializing app");
 	settings.load(asset::user("settings.json"));
 	appInit(headless);
+
+	const char *openedFilename = glfwGetOpenedFilename();
+	if (openedFilename) {
+		patchPath = openedFilename;
+	}
+
 	if (!headless) {
 		APP->scene->devMode = devMode;
 		APP->patch->init(patchPath);
