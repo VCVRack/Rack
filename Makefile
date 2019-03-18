@@ -19,7 +19,7 @@ SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 ifdef ARCH_LIN
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
-	LDFLAGS += -rdynamic -static-libgcc -static-libstdc++ \
+	LDFLAGS += -rdynamic \
 		dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtmidi.a dep/lib/librtaudio.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a \
 		-lpthread -lGL -ldl -lX11 -lasound -ljack \
 		$(shell pkg-config --libs gtk+-2.0)

@@ -38,7 +38,7 @@ static void fatalSignalHandler(int sig) {
 
 	FATAL("Fatal signal %d. Stack trace:\n%s", sig, system::getStackTrace().c_str());
 
-	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
+	// osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
 
 	exit(1);
 }
