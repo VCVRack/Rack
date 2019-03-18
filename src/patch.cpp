@@ -47,7 +47,15 @@ void PatchManager::init(std::string path) {
 		return;
 	}
 
-	this->path = "";
+	reset();
+}
+
+void PatchManager::reset() {
+	APP->history->clear();
+	APP->scene->rack->clear();
+	APP->scene->rackScroll->reset();
+
+	path = "";
 	if (load(asset::user("template.vcv"))) {
 		return;
 	}
@@ -55,16 +63,6 @@ void PatchManager::init(std::string path) {
 	if (load(asset::system("template.vcv"))) {
 		return;
 	}
-}
-
-void PatchManager::reset() {
-	APP->history->clear();
-	APP->scene->rack->clear();
-	APP->scene->rackScroll->reset();
-	// Fails silently if file does not exist
-	load(asset::user("template.vcv"));
-	legacy = 0;
-	path = "";
 }
 
 void PatchManager::resetDialog() {
@@ -170,6 +168,7 @@ bool PatchManager::load(std::string path) {
 	APP->history->clear();
 	APP->scene->rack->clear();
 	APP->scene->rackScroll->reset();
+	legacy = 0;
 	fromJson(rootJ);
 	return true;
 }
