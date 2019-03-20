@@ -36,7 +36,12 @@ Shell injection is possible, so make sure the URL is trusted or hard coded.
 May block, so open in a new thread.
 */
 void openBrowser(const std::string &url);
+/** Opens Explorer, Finder, etc at the folder location. */
 void openFolder(const std::string &path);
+/** Runs an executable without blocking.
+The launched process will continue running if the current process is closed.
+*/
+void runProcessAsync(const std::string &path);
 
 
 } // namespace system

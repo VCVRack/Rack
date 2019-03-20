@@ -174,6 +174,21 @@ void openFolder(const std::string &path) {
 }
 
 
+void runProcessAsync(const std::string &path) {
+#if defined ARCH_WIN
+	STARTUPINFO startupInfo;
+	PROCESS_INFORMATION processInfo;
+
+	std::memset(&startupInfo, 0, sizeof(startupInfo));
+	startupInfo.cb = sizeof(startupInfo);
+	std::memset(&processInfo, 0, sizeof(processInfo));
+
+	CreateProcessA(path.c_str(), NULL,
+		NULL, NULL, false, 0, NULL, NULL,
+		&startupInfo, &processInfo);
+#endif
+}
+
 
 } // namespace system
 } // namespace rack
