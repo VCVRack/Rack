@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- March 15th, 2019
+VeeSeeVST Rack VST 2.4 Plugin -- March 20th, 2019
 =================================================
 
 !!!------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 827 prebuilt modules
++ comes with 828 prebuilt modules
 
 Here's an old demo video of it: https://vimeo.com/277703414
 And a newer one: https://youtu.be/XTpLfcz-6Vo
@@ -87,7 +87,7 @@ The binary distribution contains the following (34) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (793) add-on modules are statically linked with the VST plugin:
+The following (794) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -768,6 +768,7 @@ The following (793) add-on modules are statically linked with the VST plugin:
  - Southpole.Wriggle
  - Southpole-parasites.Annuli
  - Southpole-parasites.Splash
+ - Southpole-parasites.Smoke
  - squinkylabs-plug1.Booty
  - squinkylabs-plug1.CHB
  - squinkylabs-plug1.ColoredNoise

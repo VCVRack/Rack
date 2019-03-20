@@ -35,7 +35,7 @@
 
 using namespace stmlib;
 
-namespace clouds
+namespace clouds_parasites
 {
   const float kOscillationMinimumGap = 0.3f;
 

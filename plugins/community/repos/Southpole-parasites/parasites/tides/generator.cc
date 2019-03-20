@@ -1399,4 +1399,4 @@ void Generator::FillBufferRandom() {
   }
 }
 
-}  // namespace tides
+}  // namespace tides_parasites

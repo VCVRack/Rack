@@ -33,7 +33,7 @@
 
 #include "clouds/drivers/codec.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 class Meter {
  public:
@@ -79,6 +79,6 @@ class Meter {
   DISALLOW_COPY_AND_ASSIGN(Meter);
 };    
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_METER_H_

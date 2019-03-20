@@ -39,7 +39,7 @@
   #include "stmlib/fft/shy_fft.h"
 #endif  // USE_ARM_FFT
 
-namespace clouds {
+namespace clouds_parasites {
 
 struct Parameters;
 
@@ -111,6 +111,6 @@ class STFT {
   DISALLOW_COPY_AND_ASSIGN(STFT);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_PVOC_STFT_H_

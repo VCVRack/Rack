@@ -35,7 +35,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 const int32_t kMaxNumTextures = 7;
 const int32_t kHighFrequencyTruncation = 16;
@@ -95,6 +95,6 @@ class FrameTransformation {
   DISALLOW_COPY_AND_ASSIGN(FrameTransformation);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_PVOC_FRAME_TRANSFORMATION_H_

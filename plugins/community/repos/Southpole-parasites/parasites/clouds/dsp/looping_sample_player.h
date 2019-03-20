@@ -41,7 +41,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 const float kCrossfadeDuration = 64.0f;
 const int kMultDivSteps = 16;
@@ -232,6 +232,6 @@ class LoopingSamplePlayer {
   DISALLOW_COPY_AND_ASSIGN(LoopingSamplePlayer);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_LOOPING_SAMPLE_PLAYER_H_

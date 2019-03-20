@@ -32,7 +32,7 @@
 
 #include "stmlib/utils/buffer_allocator.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 using namespace std;
 using namespace stmlib;
@@ -104,4 +104,4 @@ void PhaseVocoder::Buffer() {
   }
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites

@@ -44,7 +44,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 const int32_t kMaxNumGrains = 40;
 
@@ -253,6 +253,6 @@ class GranularSamplePlayer {
   DISALLOW_COPY_AND_ASSIGN(GranularSamplePlayer);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_GRANULAR_SAMPLE_PLAYER_H_

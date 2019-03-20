@@ -32,7 +32,7 @@
 
 #include "clouds/dsp/granular_processor.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 stmlib::Storage<1> storage;
 
@@ -86,4 +86,4 @@ void Settings::Save() {
   storage.ParsimoniousSave(data_, &version_token_);
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites

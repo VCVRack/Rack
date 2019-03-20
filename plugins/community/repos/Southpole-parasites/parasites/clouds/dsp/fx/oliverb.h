@@ -34,7 +34,7 @@
 #include "clouds/dsp/fx/fx_engine.h"
 #include "clouds/dsp/random_oscillator.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 class Oliverb {
  public:
@@ -259,6 +259,6 @@ class Oliverb {
   DISALLOW_COPY_AND_ASSIGN(Oliverb);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_FX_OLIVERB_H_

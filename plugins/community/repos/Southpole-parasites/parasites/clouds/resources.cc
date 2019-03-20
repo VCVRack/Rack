@@ -32,7 +32,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 const float src_filter_1x_2_31[] = {
    6.826286541e-03,  1.617306168e-02, -9.023930288e-03, -1.314720136e-02,
@@ -3062,4 +3062,4 @@ const float* lookup_table_table[] = {
 };
 
 
-}  // namespace clouds
+}  // namespace clouds_parasites

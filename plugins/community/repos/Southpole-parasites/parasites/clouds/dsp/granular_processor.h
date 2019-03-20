@@ -46,7 +46,7 @@
 #include "clouds/dsp/sample_rate_converter.h"
 #include "clouds/dsp/wsola_sample_player.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 const int32_t kDownsamplingFactor = 2;
 
@@ -219,6 +219,6 @@ class GranularProcessor {
   DISALLOW_COPY_AND_ASSIGN(GranularProcessor);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_GRANULAR_PROCESSOR_H_

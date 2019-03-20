@@ -204,6 +204,6 @@ class CvScaler {
   DISALLOW_COPY_AND_ASSIGN(CvScaler);
 };
 
-}  // namespace tides
+}  // namespace tides_parasites
 
 #endif  // TIDES_CV_SCALER_H_

@@ -79,6 +79,6 @@ class Plotter {
   DISALLOW_COPY_AND_ASSIGN(Plotter);
 };
 
-}  // namespace tides
+}  // namespace tides_parasites
 
 #endif  // TIDES_PLOTTER_H_

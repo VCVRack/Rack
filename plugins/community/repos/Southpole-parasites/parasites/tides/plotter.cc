@@ -64,4 +64,4 @@ void Plotter::NextInstruction() {
   }
 }
 
-}  // namespace tides
+}  // namespace tides_parasites

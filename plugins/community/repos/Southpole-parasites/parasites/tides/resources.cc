@@ -21504,4 +21504,4 @@ const int16_t* waveshaper_table[] = {
 };
 
 
-}  // namespace tides
+}  // namespace tides_parasites

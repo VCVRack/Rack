@@ -67,4 +67,4 @@ void CvScaler::Calibrate() {
   SaveCalibrationData();
 }
 
-}  // namespace tides
+}  // namespace tides_parasites

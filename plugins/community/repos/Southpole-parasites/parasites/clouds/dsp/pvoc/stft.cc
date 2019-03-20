@@ -33,7 +33,7 @@
 #include "clouds/dsp/pvoc/frame_transformation.h"
 #include "stmlib/dsp/dsp.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 using namespace std;
 using namespace stmlib;
@@ -207,4 +207,4 @@ void STFT::Buffer() {
   }
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites

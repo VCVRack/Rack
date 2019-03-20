@@ -33,7 +33,7 @@
 
 #include "clouds/dsp/fx/fx_engine.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 class Diffuser {
  public:
@@ -107,6 +107,6 @@ class Diffuser {
   DISALLOW_COPY_AND_ASSIGN(Diffuser);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_FX_DIFFUSER_H_

@@ -30,7 +30,7 @@
 
 #include <algorithm>
 
-namespace clouds {
+namespace clouds_parasites {
 
 using namespace std;
 
@@ -85,4 +85,4 @@ void Correlator::StartSearch(
   done_ = false;
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites

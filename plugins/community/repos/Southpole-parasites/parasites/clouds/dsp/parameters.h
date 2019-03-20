@@ -31,7 +31,7 @@
 
 #include "stmlib/stmlib.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 struct Parameters {
   float position;
@@ -64,6 +64,6 @@ struct Parameters {
   } spectral;
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_PARAMETERS_H_

@@ -37,7 +37,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 using namespace std;
 using namespace stmlib;
@@ -629,4 +629,4 @@ void GranularProcessor::Prepare() {
   }
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites

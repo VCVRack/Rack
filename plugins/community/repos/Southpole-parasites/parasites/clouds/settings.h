@@ -33,7 +33,7 @@
 
 #include "clouds/drivers/adc.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 struct CalibrationData {
   float pitch_offset;
@@ -108,6 +108,6 @@ class Settings {
   DISALLOW_COPY_AND_ASSIGN(Settings);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_SETTINGS_H_

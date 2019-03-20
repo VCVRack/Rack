@@ -37,7 +37,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 enum WindowFlags {
   WINDOW_FLAGS_HALF_DONE = 1,
@@ -120,6 +120,6 @@ class Window {
   DISALLOW_COPY_AND_ASSIGN(Window);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_WINDOW_H_

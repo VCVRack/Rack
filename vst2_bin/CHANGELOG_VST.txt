@@ -1,4 +1,8 @@
 
+** March 20th, 2019
+- add module Southpole-parasites.Smoke
+
+
 ** March 15th, 2019
 - fix "MIDI Note On" idle detection mode
 - add configurable threshold settings for MIDI idle detection (short, default, long)

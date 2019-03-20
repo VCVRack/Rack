@@ -31,7 +31,7 @@
 
 #include "stmlib/stmlib.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 // inline short MuLaw2Lin(uint8_t u_val) {
 //   int16_t t;
@@ -78,6 +78,6 @@ inline unsigned char Lin2MuLaw(int16_t pcm_val) {
   }
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_MU_LAW_H_

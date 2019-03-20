@@ -37,7 +37,7 @@
 #include "clouds/dsp/frame.h"
 #include "clouds/dsp/parameters.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 using namespace std;
 using namespace stmlib;
@@ -358,4 +358,4 @@ void FrameTransformation::ReplayMagnitudes(float* xf_polar, float position) {
   }
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites

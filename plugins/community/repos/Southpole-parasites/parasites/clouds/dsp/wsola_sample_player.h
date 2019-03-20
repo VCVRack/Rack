@@ -45,7 +45,7 @@
 #include "clouds/dsp/parameters.h"
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 const int32_t kMaxWSOLASize = 4096;
 
@@ -318,6 +318,6 @@ class WSOLASamplePlayer {
   DISALLOW_COPY_AND_ASSIGN(WSOLASamplePlayer);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_WSOLA_SAMPLE_PLAYER_H_

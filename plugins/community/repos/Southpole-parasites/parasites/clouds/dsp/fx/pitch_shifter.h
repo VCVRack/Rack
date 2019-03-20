@@ -36,7 +36,7 @@
 #include "clouds/dsp/frame.h"
 #include "clouds/dsp/fx/fx_engine.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 class PitchShifter {
  public:
@@ -127,6 +127,6 @@ class PitchShifter {
   DISALLOW_COPY_AND_ASSIGN(PitchShifter);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_FX_MINI_CHORUS_H_

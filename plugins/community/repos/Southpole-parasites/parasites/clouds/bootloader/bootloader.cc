@@ -37,7 +37,7 @@
 
 #include <cstring>
 
-using namespace clouds;
+using namespace clouds_parasites;
 using namespace stmlib;
 using namespace stm_audio_bootloader;
 

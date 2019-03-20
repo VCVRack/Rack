@@ -28,7 +28,7 @@
 
 #include "clouds/dsp/mu_law.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 /* extern */
 int16_t lut_ulaw[256] = {
@@ -66,4 +66,4 @@ int16_t lut_ulaw[256] = {
       56,     48,     40,     32,     24,     16,      8,      0
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites

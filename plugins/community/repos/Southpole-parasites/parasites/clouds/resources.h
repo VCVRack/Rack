@@ -38,7 +38,7 @@
 
 
 
-namespace clouds {
+namespace clouds_parasites {
 
 typedef uint8_t ResourceId;
 
@@ -91,6 +91,6 @@ extern const float lut_quantized_pitch[];
 #define LUT_QUANTIZED_PITCH 8
 #define LUT_QUANTIZED_PITCH_SIZE 1025
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_RESOURCES_H_

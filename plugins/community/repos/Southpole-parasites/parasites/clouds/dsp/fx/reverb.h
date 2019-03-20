@@ -33,7 +33,7 @@
 
 #include "clouds/dsp/fx/fx_engine.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 class Reverb {
  public:
@@ -175,6 +175,6 @@ class Reverb {
   DISALLOW_COPY_AND_ASSIGN(Reverb);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_FX_REVERB_H_

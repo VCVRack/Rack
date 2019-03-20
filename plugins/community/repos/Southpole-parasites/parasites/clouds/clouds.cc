@@ -36,7 +36,7 @@
 
 // #define PROFILE_INTERRUPT 1
 
-using namespace clouds;
+using namespace clouds_parasites;
 using namespace stmlib;
 
 GranularProcessor processor;

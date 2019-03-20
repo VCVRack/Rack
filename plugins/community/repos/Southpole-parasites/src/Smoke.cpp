@@ -70,7 +70,7 @@ MIX_GREEN_LIGHT, MIX_RED_LIGHT,
   DoubleRingBuffer<Frame<2>, 256> inputBuffer;
   DoubleRingBuffer<Frame<2>, 256> outputBuffer;
 
-  clouds::PlaybackMode playbackmode =  clouds::PLAYBACK_MODE_GRANULAR;
+  clouds_parasites::PlaybackMode playbackmode =  clouds_parasites::PLAYBACK_MODE_GRANULAR;
   
   
   int buffersize = 1;
@@ -79,7 +79,7 @@ MIX_GREEN_LIGHT, MIX_RED_LIGHT,
   bool mono = false;
   uint8_t *block_mem;
   uint8_t *block_ccm;
-  clouds::GranularProcessor *processor;
+  clouds_parasites::GranularProcessor *processor;
 
   bool triggered = false;
   float freezeLight = 0.0;
@@ -113,7 +113,7 @@ MIX_GREEN_LIGHT, MIX_RED_LIGHT,
 	void fromJson(json_t *rootJ) override {
 		json_t *playbackmodeJ = json_object_get(rootJ, "playbackmode");
 		if (playbackmodeJ) {
-			playbackmode = (clouds::PlaybackMode)json_integer_value(playbackmodeJ);
+			playbackmode = (clouds_parasites::PlaybackMode)json_integer_value(playbackmodeJ);
 		}
     json_t *lofiJ = json_object_get(rootJ, "lofi");
 		if (lofiJ) {
@@ -147,7 +147,7 @@ Smoke::Smoke() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
   const int ccmLen = 65536 - 128;
   block_mem = new uint8_t[memLen]();
   block_ccm = new uint8_t[ccmLen]();
-  processor = new clouds::GranularProcessor();
+  processor = new clouds_parasites::GranularProcessor();
   memset(processor, 0, sizeof(*processor));
 
   //freezeTrigger.setThresholds(0.0, 1.0);
@@ -181,7 +181,7 @@ void Smoke::step() {
 
   // Render frames
   if (outputBuffer.empty()) {
-    clouds::ShortFrame input[32] = {};
+    clouds_parasites::ShortFrame input[32] = {};
     // Convert input buffer
     {
       inputSrc.setRates(engineGetSampleRate(), 32000);
@@ -204,7 +204,7 @@ void Smoke::step() {
       int memLen = 118784*buffersize;
       const int ccmLen = 65536 - 128;
       block_mem = new uint8_t[memLen]();
-      processor = new clouds::GranularProcessor();
+      processor = new clouds_parasites::GranularProcessor();
       memset(processor, 0, sizeof(*processor));
       processor->Init(block_mem, memLen, block_ccm, ccmLen);
       currentbuffersize = buffersize;
@@ -224,7 +224,7 @@ void Smoke::step() {
     
 
     
-    clouds::Parameters* p = processor->mutable_parameters();
+    clouds_parasites::Parameters* p = processor->mutable_parameters();
     p->trigger = triggered;
     p->gate = triggered;
     p->freeze = (inputs[FREEZE_INPUT].value >= 1.0 || freeze);
@@ -247,7 +247,7 @@ void Smoke::step() {
     lights[REVERSE_LIGHT].setBrightness(p->granular.reverse ? 1.0 : 0.0);
 #endif
 
-    clouds::ShortFrame output[32];
+    clouds_parasites::ShortFrame output[32];
     processor->Process(input, output, 32);
     
     lights[FREEZE_LIGHT].setBrightness(p->freeze ? 1.0 : 0.0);
@@ -280,7 +280,7 @@ void Smoke::step() {
 
 	// Lights
   
-	clouds::Parameters *p = processor->mutable_parameters();
+	clouds_parasites::Parameters *p = processor->mutable_parameters();
 	VUMeter vuMeter;
 	vuMeter.dBInterval = 6.0;
 	Frame<2> lightFrame = p->freeze ? outputFrame : inputFrame;
@@ -452,24 +452,24 @@ void SmokeWidget::step() {
     panel5->visible = false;
     panel6->visible = false;
   #endif
-  if ( smoke->playbackmode == clouds::PLAYBACK_MODE_SPECTRAL) {
+  if ( smoke->playbackmode == clouds_parasites::PLAYBACK_MODE_SPECTRAL) {
     panel1->visible = false;
     panel2->visible = true;
   }
-  if ( smoke->playbackmode == clouds::PLAYBACK_MODE_LOOPING_DELAY) {
+  if ( smoke->playbackmode == clouds_parasites::PLAYBACK_MODE_LOOPING_DELAY) {
     panel1->visible = false;
     panel3->visible = true;
   }
-  if ( smoke->playbackmode == clouds::PLAYBACK_MODE_STRETCH) {
+  if ( smoke->playbackmode == clouds_parasites::PLAYBACK_MODE_STRETCH) {
     panel1->visible = false;
     panel4->visible = true;
   }
   #ifdef PARASITES
-    if ( smoke->playbackmode == clouds::PLAYBACK_MODE_OLIVERB) {
+    if ( smoke->playbackmode == clouds_parasites::PLAYBACK_MODE_OLIVERB) {
       panel1->visible = false;
       panel5->visible = true;    
     }
-    if ( smoke->playbackmode == clouds::PLAYBACK_MODE_RESONESTOR) {
+    if ( smoke->playbackmode == clouds_parasites::PLAYBACK_MODE_RESONESTOR) {
       panel1->visible = false;
       panel6->visible = true;
     }
@@ -480,7 +480,7 @@ void SmokeWidget::step() {
 
 struct CloudsModeItem : MenuItem {
   Smoke *clouds;
-  clouds::PlaybackMode mode;
+  clouds_parasites::PlaybackMode mode;
 
   void onAction(EventAction &e) override {
     clouds->playbackmode = mode;
@@ -538,13 +538,13 @@ Menu *SmokeWidget::createContextMenu() {
 
   menu->addChild(construct<MenuLabel>());
   menu->addChild(construct<MenuLabel>(&MenuLabel::text, "MODE"));
-  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "GRANULAR", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds::PLAYBACK_MODE_GRANULAR));
-  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "SPECTRAL", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds::PLAYBACK_MODE_SPECTRAL));
-  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "LOOPING_DELAY", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds::PLAYBACK_MODE_LOOPING_DELAY));
-  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "STRETCH", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds::PLAYBACK_MODE_STRETCH));
+  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "GRANULAR", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds_parasites::PLAYBACK_MODE_GRANULAR));
+  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "SPECTRAL", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds_parasites::PLAYBACK_MODE_SPECTRAL));
+  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "LOOPING_DELAY", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds_parasites::PLAYBACK_MODE_LOOPING_DELAY));
+  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "STRETCH", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds_parasites::PLAYBACK_MODE_STRETCH));
 #ifdef PARASITES  
-  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "OLIVERB", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds::PLAYBACK_MODE_OLIVERB));
-  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "RESONESTOR", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds::PLAYBACK_MODE_RESONESTOR));
+  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "OLIVERB", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds_parasites::PLAYBACK_MODE_OLIVERB));
+  menu->addChild(construct<CloudsModeItem>(&MenuItem::text, "RESONESTOR", &CloudsModeItem::clouds, clouds, &CloudsModeItem::mode, clouds_parasites::PLAYBACK_MODE_RESONESTOR));
 #endif     
   menu->addChild(construct<MenuItem>(&MenuItem::text, "STEREO/MONO"));
   menu->addChild(construct<CloudsMonoItem>(&MenuItem::text, "STEREO", &CloudsMonoItem::clouds, clouds, &CloudsMonoItem::setting, false));

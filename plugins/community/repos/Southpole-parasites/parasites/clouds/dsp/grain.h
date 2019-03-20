@@ -37,7 +37,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 const float slope_response[4] = { 1.3f, 1.0f, 1.0f, 1.0f };
 const float bias_response[4] = { 1.0f, 2.0f - 1.0f/500.0f, 1.0f/500.0f, 1.0f };
@@ -206,6 +206,6 @@ class Grain {
   DISALLOW_COPY_AND_ASSIGN(Grain);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_GRAIN_H_

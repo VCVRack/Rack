@@ -33,7 +33,7 @@
 
 #include "clouds/dsp/frame.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 template<int32_t ratio, int32_t filter_size, const float* coefficients>
 class SampleRateConverter {
@@ -91,6 +91,6 @@ class SampleRateConverter {
   DISALLOW_COPY_AND_ASSIGN(SampleRateConverter);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_SAMPLE_RATE_CONVERTER_H_

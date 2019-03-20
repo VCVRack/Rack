@@ -36,7 +36,7 @@
 #include "stmlib/dsp/dsp.h"
 #include "stmlib/dsp/cosine_oscillator.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 #define TAIL , -1
 
@@ -351,6 +351,6 @@ class FxEngine {
   DISALLOW_COPY_AND_ASSIGN(FxEngine);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_DSP_FX_FX_ENGINE_H_

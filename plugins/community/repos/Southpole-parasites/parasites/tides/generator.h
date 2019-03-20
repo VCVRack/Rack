@@ -300,6 +300,6 @@ class Generator {
   DISALLOW_COPY_AND_ASSIGN(Generator);
 };
 
-}  // namespace tides
+}  // namespace tides_parasites
 
 #endif  // TIDES_GENERATOR_H_

@@ -35,7 +35,7 @@
 
 #include "clouds/resources.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 using namespace std;
 
@@ -212,4 +212,4 @@ void CvScaler::Read(Parameters* parameters) {
   adc_.Convert();
 }
 
-}  // namespace clouds
+}  // namespace clouds_parasites

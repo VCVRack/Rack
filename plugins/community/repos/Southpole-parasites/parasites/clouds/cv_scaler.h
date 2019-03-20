@@ -36,7 +36,7 @@
 #include "clouds/drivers/gate_input.h"
 #include "clouds/dsp/parameters.h"
 
-namespace clouds {
+namespace clouds_parasites {
 
 enum BlendParameter {
   BLEND_PARAMETER_DRY_WET,
@@ -147,6 +147,6 @@ class CvScaler {
   DISALLOW_COPY_AND_ASSIGN(CvScaler);
 };
 
-}  // namespace clouds
+}  // namespace clouds_parasites
 
 #endif  // CLOUDS_CV_SCALER_H_
