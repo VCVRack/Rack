@@ -196,3 +196,6 @@
 + add "idleGraceSec" patch property (MIDI note-on grace period in seconds)
 + add "idleOutputSec" patch property (output silence threshold in seconds)
 + add idle grace/output Toolbar settings (short=150ms, def=300ms, long=700ms)
+
+------------------------------------------------------------------------
++ fix/add Southpole-parasites.Smoke module (Oliverb)

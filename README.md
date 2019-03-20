@@ -17,7 +17,7 @@
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 827 prebuilt modules
++ comes with 828 prebuilt modules
 
 **Windows** version tested in:
   - Eureka (my own work-in-progress VST host)
@@ -41,8 +41,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-15Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-15Mar2019.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-15Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-15Mar2019.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-20Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-20Mar2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-20Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-20Mar2019.7z) (32bit, experimental)
 
 ## Linux
 - [veeseevstrack_0_6_1_lin64_bin-15Mar2019.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-15Mar2019.tar.gz) (64bit) (Dave's latest build)
@@ -117,7 +117,7 @@ The binary distribution contains the following (34) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (793) add-on modules are statically linked with the VST plugin:
+The following (794) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -798,6 +798,7 @@ The following (793) add-on modules are statically linked with the VST plugin:
  - Southpole.Wriggle
  - Southpole-parasites.Annuli
  - Southpole-parasites.Splash
+ - Southpole-parasites.Smoke
  - squinkylabs-plug1.Booty
  - squinkylabs-plug1.CHB
  - squinkylabs-plug1.ColoredNoise
