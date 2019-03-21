@@ -215,12 +215,12 @@ Window::Window() {
 	INFO("Window content scale: %f", contentScale);
 
 	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
-	if (settings.windowSize.isZero()) {
+	if (settings::windowSize.isZero()) {
 		glfwMaximizeWindow(win);
 	}
 	else {
-		glfwSetWindowPos(win, settings.windowPos.x, settings.windowPos.y);
-		glfwSetWindowSize(win, settings.windowSize.x, settings.windowSize.y);
+		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
+		glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
 	}
 	glfwShowWindow(win);
 
@@ -229,7 +229,7 @@ Window::Window() {
 
 	glfwMakeContextCurrent(win);
 	// Enable v-sync
-	glfwSwapInterval(settings.frameRateSync ? 1 : 0);
+	glfwSwapInterval(settings::frameRateSync ? 1 : 0);
 
 	// Set window callbacks
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
@@ -275,16 +275,16 @@ Window::Window() {
 
 Window::~Window() {
 	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED)) {
-		settings.windowSize = math::Vec();
-		settings.windowPos = math::Vec();
+		settings::windowSize = math::Vec();
+		settings::windowPos = math::Vec();
 	}
 	else {
 		int winWidth, winHeight;
 		glfwGetWindowSize(win, &winWidth, &winHeight);
 		int winX, winY;
 		glfwGetWindowPos(win, &winX, &winY);
-		settings.windowSize = math::Vec(winWidth, winHeight);
-		settings.windowPos = math::Vec(winX, winY);
+		settings::windowSize = math::Vec(winWidth, winHeight);
+		settings::windowPos = math::Vec(winX, winY);
 	}
 
 #if defined NANOVG_GL2
@@ -380,9 +380,9 @@ void Window::run() {
 
 		// Limit frame rate
 		double frameTimeEnd = glfwGetTime();
-		if (settings.frameRateLimit > 0.0) {
+		if (settings::frameRateLimit > 0.0) {
 			double frameDuration = frameTimeEnd - frameTimeStart;
-			double waitDuration = 1.0 / settings.frameRateLimit - frameDuration;
+			double waitDuration = 1.0 / settings::frameRateLimit - frameDuration;
 			if (waitDuration > 0.0) {
 				std::this_thread::sleep_for(std::chrono::duration<double>(waitDuration));
 			}
@@ -400,7 +400,7 @@ void Window::close() {
 }
 
 void Window::cursorLock() {
-	if (settings.allowCursorLock) {
+	if (settings::allowCursorLock) {
 #if defined ARCH_MAC
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
@@ -410,7 +410,7 @@ void Window::cursorLock() {
 }
 
 void Window::cursorUnlock() {
-	if (settings.allowCursorLock) {
+	if (settings::allowCursorLock) {
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
@@ -447,10 +447,10 @@ bool Window::isFullScreen() {
 }
 
 bool Window::isFrameOverdue() {
-	if (settings.frameRateLimit == 0.0)
+	if (settings::frameRateLimit == 0.0)
 		return false;
 	double frameDuration = glfwGetTime() - frameTimeStart;
-	return frameDuration > 1.0 / settings.frameRateLimit;
+	return frameDuration > 1.0 / settings::frameRateLimit;
 }
 
 std::shared_ptr<Font> Window::loadFont(const std::string &filename) {

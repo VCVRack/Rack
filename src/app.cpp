@@ -13,7 +13,7 @@ namespace rack {
 
 void App::init() {
 	engine = new engine::Engine;
-	if (!settings.headless) {
+	if (!settings::headless) {
 		event = new widget::EventState;
 		history = new history::State;
 		window = new Window;

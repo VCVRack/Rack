@@ -214,8 +214,8 @@ void CableWidget::fromJson(json_t *rootJ) {
 }
 
 void CableWidget::draw(const DrawArgs &args) {
-	float opacity = settings.cableOpacity;
-	float tension = settings.cableTension;
+	float opacity = settings::cableOpacity;
+	float tension = settings::cableTension;
 	float thickness = 5;
 
 	if (isComplete()) {

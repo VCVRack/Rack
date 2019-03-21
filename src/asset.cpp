@@ -28,7 +28,7 @@ namespace asset {
 void init() {
 	// Get system dir
 	if (systemDir.empty()) {
-		if (settings.devMode) {
+		if (settings::devMode) {
 			systemDir = ".";
 		}
 		else {
@@ -58,7 +58,7 @@ void init() {
 
 	// Get user dir
 	if (userDir.empty()) {
-		if (settings.devMode) {
+		if (settings::devMode) {
 			userDir = ".";
 		}
 		else {

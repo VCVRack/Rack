@@ -126,17 +126,17 @@ struct ModelFavoriteQuantity : ui::Quantity {
 	std::string getLabel() override {return "★";}
 	void setValue(float value) override {
 		if (value) {
-			settings.favoriteModels.insert(model);
+			settings::favoriteModels.insert(model);
 		}
 		else {
-			auto it = settings.favoriteModels.find(model);
-			if (it != settings.favoriteModels.end())
-				settings.favoriteModels.erase(it);
+			auto it = settings::favoriteModels.find(model);
+			if (it != settings::favoriteModels.end())
+				settings::favoriteModels.erase(it);
 		}
 	}
 	float getValue() override {
-		auto it = settings.favoriteModels.find(model);
-		return (it != settings.favoriteModels.end());
+		auto it = settings::favoriteModels.find(model);
+		return (it != settings::favoriteModels.end());
 	}
 };
 
@@ -304,7 +304,7 @@ struct BrowserSearchField : ui::TextField {
 struct ShowFavoritesQuantity : ui::Quantity {
 	widget::Widget *widget;
 	std::string getLabel() override {
-		int favoritesLen = settings.favoriteModels.size();
+		int favoritesLen = settings::favoriteModels.size();
 		return string::f("Only show favorites (%d)", favoritesLen);
 	}
 	void setValue(float value) override;
@@ -477,8 +477,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget *w : modelContainer->children) {
 			if (favorites) {
 				ModelBox *m = dynamic_cast<ModelBox*>(w);
-				auto it = settings.favoriteModels.find(m->model);
-				w->visible = (it != settings.favoriteModels.end());
+				auto it = settings::favoriteModels.find(m->model);
+				w->visible = (it != settings::favoriteModels.end());
 			}
 			else {
 				w->visible = true;

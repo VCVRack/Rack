@@ -16,7 +16,7 @@ static std::mutex logMutex;
 
 void init() {
 	startTime = std::chrono::high_resolution_clock::now();
-	if (settings.devMode) {
+	if (settings::devMode) {
 		outputFile = stderr;
 	}
 	else {

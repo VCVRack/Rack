@@ -10,9 +10,33 @@
 
 
 namespace rack {
+namespace settings {
 
 
-json_t *Settings::toJson() {
+bool devMode = false;
+bool headless = false;
+std::string token;
+math::Vec windowSize;
+math::Vec windowPos;
+float zoom = 1.0;
+bool invertZoom = false;
+float cableOpacity = 0.5;
+float cableTension = 0.5;
+bool allowCursorLock = true;
+float sampleRate = 44100.0;
+int threadCount = 1;
+bool paramTooltip = false;
+bool cpuMeter = false;
+bool lockModules = false;
+bool checkVersion = true;
+float frameRateLimit = 70.0;
+bool frameRateSync = true;
+bool skipLoadOnLaunch = false;
+std::string patchPath;
+std::set<plugin::Model*> favoriteModels;
+
+
+json_t *toJson() {
 	json_t *rootJ = json_object();
 
 	json_object_set_new(rootJ, "token", json_string(token.c_str()));
@@ -67,7 +91,7 @@ json_t *Settings::toJson() {
 	return rootJ;
 }
 
-void Settings::fromJson(json_t *rootJ) {
+void fromJson(json_t *rootJ) {
 	json_t *tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
 		token = json_string_value(tokenJ);
@@ -172,7 +196,7 @@ void Settings::fromJson(json_t *rootJ) {
 	}
 }
 
-void Settings::save(const std::string &path) {
+void save(const std::string &path) {
 	INFO("Saving settings %s", path.c_str());
 	json_t *rootJ = toJson();
 	if (rootJ) {
@@ -186,7 +210,7 @@ void Settings::save(const std::string &path) {
 	}
 }
 
-void Settings::load(const std::string &path) {
+void load(const std::string &path) {
 	INFO("Loading settings %s", path.c_str());
 	FILE *file = std::fopen(path.c_str(), "r");
 	if (!file)
@@ -206,7 +230,5 @@ void Settings::load(const std::string &path) {
 }
 
 
-Settings settings;
-
-
+} // namespace settings
 } // namespace rack

@@ -206,7 +206,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	if (dryRun) {
 		downloadUrl += "/available";
 	}
-	downloadUrl += "?token=" + network::encodeUrl(settings.token);
+	downloadUrl += "?token=" + network::encodeUrl(settings::token);
 	downloadUrl += "&slug=" + network::encodeUrl(slug);
 	downloadUrl += "&version=" + network::encodeUrl(latestVersion);
 	downloadUrl += "&arch=" + network::encodeUrl(arch);
@@ -366,7 +366,7 @@ void init() {
 	// Copy Fundamental package to plugins directory if Fundamental is not loaded
 	std::string fundamentalSrc = asset::system("Fundamental.zip");
 	std::string fundamentalDir = asset::user("plugins/Fundamental");
-	if (!settings.devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
+	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		extractZip(fundamentalSrc.c_str(), pluginsDir.c_str());
 		loadPlugin(fundamentalDir);
 	}
@@ -409,7 +409,7 @@ void logIn(const std::string &email, const std::string &password) {
 			json_t *tokenJ = json_object_get(resJ, "token");
 			if (tokenJ) {
 				const char *tokenStr = json_string_value(tokenJ);
-				settings.token = tokenStr;
+				settings::token = tokenStr;
 				loginStatus = "";
 			}
 		}
@@ -418,11 +418,11 @@ void logIn(const std::string &email, const std::string &password) {
 }
 
 void logOut() {
-	settings.token = "";
+	settings::token = "";
 }
 
 bool sync(bool dryRun) {
-	if (settings.token.empty())
+	if (settings::token.empty())
 		return false;
 
 	bool available = false;
@@ -438,7 +438,7 @@ bool sync(bool dryRun) {
 
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
-	json_object_set(pluginsReqJ, "token", json_string(settings.token.c_str()));
+	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
 	std::string pluginsUrl = app::API_URL;
 	pluginsUrl += "/plugins";
 	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
@@ -509,7 +509,7 @@ void cancelDownload() {
 }
 
 bool isLoggedIn() {
-	return settings.token != "";
+	return settings::token != "";
 }
 
 Plugin *getPlugin(const std::string &pluginSlug) {

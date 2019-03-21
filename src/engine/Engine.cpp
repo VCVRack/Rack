@@ -166,12 +166,12 @@ Engine::Engine() {
 	internal->workerBarrier.total = 1;
 
 	setSampleRate(44100.f);
-	setThreadCount(settings.threadCount);
+	setThreadCount(settings::threadCount);
 }
 
 Engine::~Engine() {
-	settings.sampleRate = internal->sampleRate;
-	settings.threadCount = internal->threadCount;
+	settings::sampleRate = internal->sampleRate;
+	settings::threadCount = internal->threadCount;
 
 	// Stop worker threads
 	setThreadCount(1);
@@ -207,7 +207,7 @@ static void Engine_stepModules(Engine *that, int threadId) {
 		Module *module = internal->modules[i];
 		if (!module->bypass) {
 			// Step module
-			if (settings.cpuMeter) {
+			if (settings::cpuMeter) {
 				auto startTime = std::chrono::high_resolution_clock::now();
 
 				module->process(processCtx);

@@ -43,11 +43,11 @@ void Scene::step() {
 	if (time - lastAutoSaveTime >= 15.0) {
 		lastAutoSaveTime = time;
 		APP->patch->save(asset::user("autosave.vcv"));
-		settings.save(asset::user("settings.json"));
+		settings::save(asset::user("settings.json"));
 	}
 
 	// Request latest version from server
-	if (!settings.devMode && checkVersion && !checkedVersion) {
+	if (!settings::devMode && checkVersion && !checkedVersion) {
 		std::thread t(&Scene::runCheckVersion, this);
 		t.detach();
 		checkedVersion = true;

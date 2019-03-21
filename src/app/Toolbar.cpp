@@ -172,10 +172,10 @@ struct EditButton : MenuButton {
 
 struct ZoomQuantity : ui::Quantity {
 	void setValue(float value) override {
-		settings.zoom = math::clamp(value, getMinValue(), getMaxValue());
+		settings::zoom = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings.zoom;
+		return settings::zoom;
 	}
 	float getMinValue() override {return 0.25;}
 	float getMaxValue() override {return 2.0;}
@@ -189,10 +189,10 @@ struct ZoomQuantity : ui::Quantity {
 
 struct CableOpacityQuantity : ui::Quantity {
 	void setValue(float value) override {
-		settings.cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
+		settings::cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings.cableOpacity;
+		return settings::cableOpacity;
 	}
 	float getDefaultValue() override {return 0.5;}
 	float getDisplayValue() override {return getValue() * 100;}
@@ -205,10 +205,10 @@ struct CableOpacityQuantity : ui::Quantity {
 
 struct CableTensionQuantity : ui::Quantity {
 	void setValue(float value) override {
-		settings.cableTension = math::clamp(value, getMinValue(), getMaxValue());
+		settings::cableTension = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
-		return settings.cableTension;
+		return settings::cableTension;
 	}
 	float getDefaultValue() override {return 0.5;}
 	std::string getLabel() override {return "Cable tension";}
@@ -218,21 +218,21 @@ struct CableTensionQuantity : ui::Quantity {
 
 struct CpuMeterItem : ui::MenuItem {
 	void onAction(const widget::ActionEvent &e) override {
-		settings.cpuMeter ^= true;
+		settings::cpuMeter ^= true;
 	}
 };
 
 
 struct ParamTooltipItem : ui::MenuItem {
 	void onAction(const widget::ActionEvent &e) override {
-		settings.paramTooltip ^= true;
+		settings::paramTooltip ^= true;
 	}
 };
 
 
 struct LockModulesItem : ui::MenuItem {
 	void onAction(const widget::ActionEvent &e) override {
-		settings.lockModules ^= true;
+		settings::lockModules ^= true;
 	}
 };
 
@@ -329,17 +329,17 @@ struct SettingsButton : MenuButton {
 
 		ParamTooltipItem *paramTooltipItem = new ParamTooltipItem;
 		paramTooltipItem->text = "Parameter tooltips";
-		paramTooltipItem->rightText = CHECKMARK(settings.paramTooltip);
+		paramTooltipItem->rightText = CHECKMARK(settings::paramTooltip);
 		menu->addChild(paramTooltipItem);
 
 		CpuMeterItem *cpuMeterItem = new CpuMeterItem;
 		cpuMeterItem->text = "CPU meter";
-		cpuMeterItem->rightText = CHECKMARK(settings.cpuMeter);
+		cpuMeterItem->rightText = CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);
 
 		LockModulesItem *lockModulesItem = new LockModulesItem;
 		lockModulesItem->text = "Lock modules";
-		lockModulesItem->rightText = CHECKMARK(settings.lockModules);
+		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
 		menu->addChild(lockModulesItem);
 
 		SampleRateItem *sampleRateItem = new SampleRateItem;
@@ -593,7 +593,7 @@ struct WebsiteItem : ui::MenuItem {
 
 struct CheckVersionItem : ui::MenuItem {
 	void onAction(const widget::ActionEvent &e) override {
-		settings.checkVersion ^= true;
+		settings::checkVersion ^= true;
 	}
 };
 
@@ -623,7 +623,7 @@ struct HelpButton : MenuButton {
 
 		CheckVersionItem *checkVersionItem = new CheckVersionItem;
 		checkVersionItem->text = "Check version on launch";
-		checkVersionItem->rightText = CHECKMARK(settings.checkVersion);
+		checkVersionItem->rightText = CHECKMARK(settings::checkVersion);
 		menu->addChild(checkVersionItem);
 
 		UserFolderItem *folderItem = new UserFolderItem;
