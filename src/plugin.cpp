@@ -247,12 +247,8 @@ static void loadPlugins(std::string path) {
 		if (!system::isDirectory(pluginPath))
 			continue;
 		if (!loadPlugin(pluginPath)) {
-			message += string::f("Could not load plugin %s\n", pluginPath.c_str());
+			// Ignore bad plugins. They are reported in log.txt.
 		}
-	}
-	if (!message.empty()) {
-		message += "See log for details.";
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 	}
 }
 
