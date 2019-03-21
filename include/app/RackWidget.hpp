@@ -14,10 +14,10 @@ namespace app {
 
 /** Container for ModuleWidget and CableWidget. */
 struct RackWidget : widget::OpaqueWidget {
-	widget::FramebufferWidget *rails;
 	widget::Widget *moduleContainer;
 	widget::Widget *cableContainer;
 	CableWidget *incompleteCable = NULL;
+	widget::FramebufferWidget *railFb;
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
 	ParamWidget *touchedParam = NULL;

@@ -75,15 +75,15 @@ struct CableContainer : widget::TransparentWidget {
 
 
 RackWidget::RackWidget() {
-	rails = new widget::FramebufferWidget;
-	rails->box.size = math::Vec();
-	rails->oversample = 1.0;
+	railFb = new widget::FramebufferWidget;
+	railFb->box.size = math::Vec();
+	railFb->oversample = 1.0;
 	{
 		RackRail *rail = new RackRail;
 		rail->box.size = math::Vec();
-		rails->addChild(rail);
+		railFb->addChild(rail);
 	}
-	addChild(rails);
+	addChild(railFb);
 
 	moduleContainer = new ModuleContainer;
 	addChild(moduleContainer);
@@ -97,16 +97,16 @@ RackWidget::~RackWidget() {
 }
 
 void RackWidget::step() {
-	// Adjust size and position of rails
+	// Adjust size and position of railFb
 	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
-	if (!rails->box.isContaining(bound)) {
-		math::Vec cellMargin = math::Vec(20, 1);
-		rails->box.pos = bound.pos.div(RACK_GRID_SIZE).floor().minus(cellMargin).mult(RACK_GRID_SIZE);
-		rails->box.size = bound.size.plus(cellMargin.mult(RACK_GRID_SIZE).mult(2));
-		rails->dirty = true;
+	if (!railFb->box.isContaining(bound)) {
+		math::Vec margin = math::Vec(200, 200);
+		railFb->box.pos = bound.pos.minus(margin).div(RACK_GRID_SIZE).floor().mult(RACK_GRID_SIZE);
+		railFb->box.size = bound.size.plus(margin.mult(2));
+		railFb->dirty = true;
 
-		RackRail *rail = rails->getFirstDescendantOfType<RackRail>();
-		rail->box.size = rails->box.size;
+		RackRail *rail = railFb->getFirstDescendantOfType<RackRail>();
+		rail->box.size = railFb->box.size;
 	}
 
 	OpaqueWidget::step();
