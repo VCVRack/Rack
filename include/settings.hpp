@@ -6,6 +6,9 @@
 
 
 namespace rack {
+
+
+/** Process-level globals. */
 namespace settings {
 
 
