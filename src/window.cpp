@@ -99,11 +99,9 @@ static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mod
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
 #if defined ARCH_MAC
 	// Remap Ctrl-left click to right click on Mac
-	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (mods & GLFW_MOD_CONTROL) {
-			button = GLFW_MOUSE_BUTTON_RIGHT;
-			mods &= ~GLFW_MOD_CONTROL;
-		}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & GLFW_MOD_CONTROL)) {
+		button = GLFW_MOUSE_BUTTON_RIGHT;
+		mods &= ~GLFW_MOD_CONTROL;
 	}
 #endif
 
