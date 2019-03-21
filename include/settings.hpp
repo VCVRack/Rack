@@ -9,6 +9,11 @@ namespace rack {
 
 
 struct Settings {
+	/** Runtime state, not serialized. */
+	bool devMode = false;
+	bool headless = false;
+
+	/** Persistent state, serialized to settings.json. */
 	std::string token;
 	math::Vec windowSize;
 	math::Vec windowPos;
@@ -31,8 +36,8 @@ struct Settings {
 
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
-	void save(std::string filename);
-	void load(std::string filename);
+	void save(const std::string &path);
+	void load(const std::string &path);
 };
 
 

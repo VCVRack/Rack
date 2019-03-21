@@ -1,5 +1,6 @@
 #include "asset.hpp"
 #include "system.hpp"
+#include "settings.hpp"
 #include "plugin/Plugin.hpp"
 
 #if defined ARCH_MAC
@@ -24,10 +25,10 @@ namespace rack {
 namespace asset {
 
 
-void init(bool devMode) {
+void init() {
 	// Get system dir
 	if (systemDir.empty()) {
-		if (devMode) {
+		if (settings.devMode) {
 			systemDir = ".";
 		}
 		else {
@@ -57,7 +58,7 @@ void init(bool devMode) {
 
 	// Get user dir
 	if (userDir.empty()) {
-		if (devMode) {
+		if (settings.devMode) {
 			userDir = ".";
 		}
 		else {

@@ -47,7 +47,7 @@ void Scene::step() {
 	}
 
 	// Request latest version from server
-	if (!devMode && checkVersion && !checkedVersion) {
+	if (!settings.devMode && checkVersion && !checkedVersion) {
 		std::thread t(&Scene::runCheckVersion, this);
 		t.detach();
 		checkedVersion = true;

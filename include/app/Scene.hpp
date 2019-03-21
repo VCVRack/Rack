@@ -18,7 +18,6 @@ struct Scene : widget::OpaqueWidget {
 	widget::Widget *moduleBrowser;
 
 	// Version checking
-	bool devMode = false;
 	bool checkVersion = true;
 	bool checkedVersion = false;
 	std::string latestVersion;

@@ -13,7 +13,7 @@ namespace plugin {
 namespace asset {
 
 
-void init(bool devMode);
+void init();
 /** Returns the path of a system resource. Should only read files from this location. */
 std::string system(std::string filename);
 /** Returns the path of a user resource. Can read and write files to this location. */

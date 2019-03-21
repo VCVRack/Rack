@@ -1,5 +1,6 @@
 #include "common.hpp"
 #include "asset.hpp"
+#include "settings.hpp"
 #include <chrono>
 #include <mutex>
 
@@ -13,9 +14,9 @@ static std::chrono::high_resolution_clock::time_point startTime;
 static std::mutex logMutex;
 
 
-void init(bool devMode) {
+void init() {
 	startTime = std::chrono::high_resolution_clock::now();
-	if (devMode) {
+	if (settings.devMode) {
 		outputFile = stderr;
 	}
 	else {

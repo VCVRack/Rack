@@ -172,11 +172,11 @@ void Settings::fromJson(json_t *rootJ) {
 	}
 }
 
-void Settings::save(std::string filename) {
-	INFO("Saving settings %s", filename.c_str());
+void Settings::save(const std::string &path) {
+	INFO("Saving settings %s", path.c_str());
 	json_t *rootJ = toJson();
 	if (rootJ) {
-		FILE *file = std::fopen(filename.c_str(), "w");
+		FILE *file = std::fopen(path.c_str(), "w");
 		if (!file)
 			return;
 
@@ -186,9 +186,9 @@ void Settings::save(std::string filename) {
 	}
 }
 
-void Settings::load(std::string filename) {
-	INFO("Loading settings %s", filename.c_str());
-	FILE *file = std::fopen(filename.c_str(), "r");
+void Settings::load(const std::string &path) {
+	INFO("Loading settings %s", path.c_str());
+	FILE *file = std::fopen(path.c_str(), "r");
 	if (!file)
 		return;
 

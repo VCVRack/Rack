@@ -5,14 +5,15 @@
 #include "engine/Engine.hpp"
 #include "app/Scene.hpp"
 #include "history.hpp"
+#include "settings.hpp"
 
 
 namespace rack {
 
 
-void App::init(bool headless) {
+void App::init() {
 	engine = new engine::Engine;
-	if (!headless) {
+	if (!settings.headless) {
 		event = new widget::EventState;
 		history = new history::State;
 		window = new Window;
@@ -41,10 +42,10 @@ App::~App() {
 
 static App *appInstance = NULL;
 
-void appInit(bool headless) {
+void appInit() {
 	assert(!appInstance);
 	appInstance = new App;
-	appInstance->init(headless);
+	appInstance->init();
 }
 
 void appDestroy() {

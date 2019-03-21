@@ -356,20 +356,20 @@ void init() {
 	plugins.push_back(corePlugin);
 
 	// Get user plugins directory
-	std::string userPlugins = asset::user("plugins");
-	mkdir(userPlugins.c_str(), 0755);
-
-	// Copy Fundamental package to plugins directory if folder does not exist
-	std::string fundamentalSrc = asset::system("Fundamental.zip");
-	std::string fundamentalDest = asset::user("plugins/Fundamental.zip");
-	std::string fundamentalDir = asset::user("plugins/Fundamental");
-	if (system::isFile(fundamentalSrc) && !system::isFile(fundamentalDest) && !system::isDirectory(fundamentalDir)) {
-		system::copyFile(fundamentalSrc, fundamentalDest);
-	}
+	std::string pluginsDir = asset::user("plugins");
+	mkdir(pluginsDir.c_str(), 0755);
 
 	// Extract packages and load plugins
-	extractPackages(userPlugins);
-	loadPlugins(userPlugins);
+	extractPackages(pluginsDir);
+	loadPlugins(pluginsDir);
+
+	// Copy Fundamental package to plugins directory if Fundamental is not loaded
+	std::string fundamentalSrc = asset::system("Fundamental.zip");
+	std::string fundamentalDir = asset::user("plugins/Fundamental");
+	if (!settings.devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
+		extractZip(fundamentalSrc.c_str(), pluginsDir.c_str());
+		loadPlugin(fundamentalDir);
+	}
 }
 
 void destroy() {

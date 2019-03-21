@@ -56,8 +56,6 @@ int main(int argc, char *argv[]) {
 	(void) instanceMutex;
 #endif
 
-	bool devMode = false;
-	bool headless = false;
 	std::string patchPath;
 
 	// Parse command line arguments
@@ -66,10 +64,10 @@ int main(int argc, char *argv[]) {
 	while ((c = getopt(argc, argv, "ds:u:")) != -1) {
 		switch (c) {
 			case 'd': {
-				devMode = true;
+				settings.devMode = true;
 			} break;
 			case 'h': {
-				headless = true;
+				settings.headless = true;
 			} break;
 			case 's': {
 				asset::systemDir = optarg;
@@ -85,13 +83,13 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Initialize environment
-	asset::init(devMode);
-	logger::init(devMode);
+	asset::init();
+	logger::init();
 
 	// We can now install a signal handler and log the output
 	// Mac has its own decent crash handler
 #if 0
-	if (!devMode) {
+	if (!settings.devMode) {
 		signal(SIGABRT, fatalSignalHandler);
 		signal(SIGFPE, fatalSignalHandler);
 		signal(SIGILL, fatalSignalHandler);
@@ -102,7 +100,7 @@ int main(int argc, char *argv[]) {
 
 	// Log environment
 	INFO("%s v%s", app::APP_NAME, app::APP_VERSION);
-	if (devMode)
+	if (settings.devMode)
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());
 	INFO("User directory: %s", asset::userDir.c_str());
@@ -115,7 +113,7 @@ int main(int argc, char *argv[]) {
 	keyboard::init();
 	gamepad::init();
 	plugin::init();
-	if (!headless) {
+	if (!settings.headless) {
 		ui::init();
 		windowInit();
 	}
@@ -123,22 +121,21 @@ int main(int argc, char *argv[]) {
 	// Initialize app
 	INFO("Initializing app");
 	settings.load(asset::user("settings.json"));
-	appInit(headless);
+	appInit();
 
 	const char *openedFilename = glfwGetOpenedFilename();
 	if (openedFilename) {
 		patchPath = openedFilename;
 	}
 
-	if (!headless) {
-		APP->scene->devMode = devMode;
+	if (!settings.headless) {
 		APP->patch->init(patchPath);
 	}
 
 	INFO("Starting engine");
 	APP->engine->start();
 
-	if (!headless) {
+	if (!settings.headless) {
 		INFO("Running window");
 		APP->window->run();
 		INFO("Stopped window");
@@ -151,7 +148,7 @@ int main(int argc, char *argv[]) {
 	APP->engine->stop();
 
 	// Destroy app
-	if (!headless) {
+	if (!settings.headless) {
 		APP->patch->save(asset::user("autosave.vcv"));
 	}
 	INFO("Destroying app");
@@ -160,7 +157,7 @@ int main(int argc, char *argv[]) {
 
 	// Destroy environment
 	INFO("Destroying environment");
-	if (!headless) {
+	if (!settings.headless) {
 		windowDestroy();
 		ui::destroy();
 	}

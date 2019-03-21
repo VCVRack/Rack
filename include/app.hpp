@@ -42,12 +42,12 @@ struct App {
 	history::State *history = NULL;
 	PatchManager *patch = NULL;
 
-	void init(bool headless);
+	void init();
 	~App();
 };
 
 
-void appInit(bool headless);
+void appInit();
 void appDestroy();
 /** Returns the global App pointer */
 App *appGet();

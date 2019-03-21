@@ -27,7 +27,7 @@ enum Level {
 	FATAL_LEVEL
 };
 
-void init(bool devMode);
+void init();
 void destroy();
 /** Do not use this function directly. Use the macros below.
 Thread-safe.
