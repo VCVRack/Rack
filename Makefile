@@ -103,8 +103,6 @@ ifdef ARCH_LIN
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
-	mkdir -p dist/Rack/Bridge
-	# cp Bridge/VST/dist/VCV-Bridge{,-fx}.so dist/Rack/Bridge/
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
@@ -123,9 +121,6 @@ ifdef ARCH_MAC
 	otool -L dist/$(TARGET).app/Contents/MacOS/$(TARGET)
 
 	cp plugins/Fundamental/dist/*.zip dist/$(TARGET).app/Contents/Resources/Fundamental.zip
-	# cp -R Bridge/AU/dist/VCV-Bridge.component dist/
-	# cp -R Bridge/VST/dist/VCV-Bridge.vst dist/
-	# cp -R Bridge/VST/dist/VCV-Bridge-fx.vst dist/
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
 endif
@@ -138,8 +133,6 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
-	# mkdir -p dist/Rack/Bridge
-	# cp Bridge/VST/dist/VCV-Bridge-{32,64,fx-32,fx-64}.dll dist/Rack/Bridge/
 	# Make ZIP
 	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
 	# Make NSIS installer
