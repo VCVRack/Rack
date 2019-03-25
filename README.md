@@ -962,7 +962,8 @@ $ m shared_lib
 ```
 $ cd plugins/community/repos/<yourplugin>
 $ m bin
-$ mv <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll
+$ cp <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll.fx
+$ cp <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll.instr
 ```
 (and don't forget to copy the `res/` directory to `vst2_bin/plugins/`!)
 
