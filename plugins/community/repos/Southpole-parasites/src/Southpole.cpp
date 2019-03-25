@@ -12,6 +12,6 @@ RACK_PLUGIN_INIT(Southpole_parasites) {
    RACK_PLUGIN_INIT_MANUAL("https://github.com/gbrandt1/southpole-vcvrack/blob/master/README.md");
 
    RACK_PLUGIN_MODEL_ADD(Southpole_parasites, Annuli);
-   RACK_PLUGIN_MODEL_ADD(Southpole_parasites, Smoke);  // crashes
+   RACK_PLUGIN_MODEL_ADD(Southpole_parasites, Smoke);
    RACK_PLUGIN_MODEL_ADD(Southpole_parasites, Splash);
 }
