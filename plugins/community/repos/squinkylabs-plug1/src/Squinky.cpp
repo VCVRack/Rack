@@ -81,7 +81,7 @@ RACK_PLUGIN_INIT(squinkylabs_plug1) {
    RACK_PLUGIN_MODEL_ADD(squinkylabs_plug1, CHBg);
 #endif
    RACK_PLUGIN_MODEL_ADD(squinkylabs_plug1, KS);
-   RACK_PLUGIN_MODEL_ADD(squinkylabs_plug1, Sequencer);
+   // RACK_PLUGIN_MODEL_ADD(squinkylabs_plug1, Sequencer);
 }
 
 const NVGcolor SqHelper::COLOR_WHITE = nvgRGB(0xff, 0xff, 0xff);
