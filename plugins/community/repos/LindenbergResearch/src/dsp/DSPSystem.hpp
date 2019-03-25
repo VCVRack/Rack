@@ -54,8 +54,8 @@ protected:
         DSPPort output[NUM_OUT + 1];
         DSPParam param[NUM_PARAM + 1];
 #else
-        DSPPort input[NUM_IN] = {};
-        DSPPort output[NUM_OUT] = {};
+        DSPPort input[NUM_IN + 1] = {};
+        DSPPort output[NUM_OUT + 1] = {};
         DSPParam param[NUM_PARAM] = {};
 #endif
 
