@@ -942,7 +942,7 @@ Edit `dep/yac/install_msvc.mk` and adjust the `LIB_INSTALL_PREFIX`, `WINDDK_PATH
 EDIT `setenv_msvc.sh` and adjust the `VST2_SDK_DIR` as required.
 
 ```
-$ alias m="make -j 20 makefile.msvc"
+$ alias m="make -j 20 -f makefile.msvc"
 $ . setenv_msvc.sh
 $ m all
 ```
@@ -995,7 +995,7 @@ EDIT `setenv_linux.sh` and adjust the `VST2_SDK_DIR` as required.
 
 ```
 $ . setenv_linux.sh
-$ alias m="make -j 20 makefile.linux"
+$ alias m="make -j 20 -f makefile.linux"
 $ m all
 ```
 
