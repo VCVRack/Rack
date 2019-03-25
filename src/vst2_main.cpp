@@ -1910,7 +1910,9 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                               {
                                  wrapper->lockAudio();
                                  if(wrapper->b_idle)
+                                 {
                                     Dprintf_idle("xxx vstrack_plugin: become active after MIDI note on\n");
+                                 }
                                  wrapper->b_idle = false;
                                  wrapper->idle_output_framecount = 0u;
                                  wrapper->idle_frames_since_noteon = 0u;
