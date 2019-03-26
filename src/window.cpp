@@ -325,6 +325,8 @@ void Window::run() {
 		windowTitle += app::APP_VERSION;
 		if (!APP->patch->path.empty()) {
 			windowTitle += " - ";
+			if (!APP->history->isSaved())
+				windowTitle += "*";
 			windowTitle += string::filename(APP->patch->path);
 		}
 		if (windowTitle != internal->lastWindowTitle) {

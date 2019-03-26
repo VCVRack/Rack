@@ -163,6 +163,10 @@ void CableAdd::redo() {
 }
 
 
+State::State() {
+	clear();
+}
+
 State::~State() {
 	clear();
 }
@@ -173,6 +177,7 @@ void State::clear() {
 	}
 	actions.clear();
 	actionIndex = 0;
+	savedIndex = -1;
 }
 
 void State::push(Action *action) {
@@ -182,6 +187,10 @@ void State::push(Action *action) {
 	actions.resize(actionIndex);
 	actions.push_back(action);
 	actionIndex++;
+	// Unset the savedIndex if we just permanently overwrote the saved state
+	if (actionIndex == savedIndex) {
+		savedIndex = -1;
+	}
 }
 
 void State::undo() {
@@ -216,6 +225,14 @@ std::string State::getRedoName() {
 	if (!canRedo())
 		return "";
 	return actions[actionIndex]->name;
+}
+
+void State::setSaved() {
+	savedIndex = actionIndex;
+}
+
+bool State::isSaved() {
+	return actionIndex == savedIndex;
 }
 
 

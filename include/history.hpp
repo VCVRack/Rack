@@ -150,8 +150,11 @@ struct CableRemove : InverseAction<CableAdd> {
 
 struct State {
 	std::vector<Action*> actions;
-	int actionIndex = 0;
+	int actionIndex;
+	/** Action index of saved patch state. */
+	int savedIndex;
 
+	State();
 	~State();
 	void clear();
 	void push(Action *action);
@@ -161,6 +164,8 @@ struct State {
 	bool canRedo();
 	std::string getUndoName();
 	std::string getRedoName();
+	void setSaved();
+	bool isSaved();
 };
 
 

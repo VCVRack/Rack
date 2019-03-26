@@ -66,9 +66,10 @@ void PatchManager::reset() {
 }
 
 void PatchManager::resetDialog() {
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Clear patch and start over?")) {
-		reset();
-	}
+	if (!(APP->history->isSaved() || osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "The current patch is unsaved. Clear it and start a new patch?")))
+		return;
+
+	reset();
 }
 
 void PatchManager::save(std::string path) {
@@ -95,6 +96,7 @@ void PatchManager::save(std::string path) {
 void PatchManager::saveDialog() {
 	if (!path.empty()) {
 		save(path);
+		APP->history->setSaved();
 	}
 	else {
 		saveAsDialog();
@@ -124,9 +126,8 @@ void PatchManager::saveAsDialog() {
 		return;
 	}
 	DEFER({
-		free(pathC);
+		std::free(pathC);
 	});
-
 
 	std::string pathStr = pathC;
 	if (string::extension(pathStr).empty()) {
@@ -135,12 +136,15 @@ void PatchManager::saveAsDialog() {
 
 	save(pathStr);
 	path = pathStr;
+	APP->history->setSaved();
 }
 
 void PatchManager::saveTemplateDialog() {
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?")) {
-		save(asset::user("template.vcv"));
-	}
+	// Even if <user>/template.vcv doesn't exist, this message is still valid because it overrides the <system>/template.vcv patch.
+	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?"))
+		return;
+
+	save(asset::user("template.vcv"));
 }
 
 bool PatchManager::load(std::string path) {
@@ -174,6 +178,9 @@ bool PatchManager::load(std::string path) {
 }
 
 void PatchManager::loadDialog() {
+	if (!(APP->history->isSaved() || osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "The current patch is unsaved. Clear it and open a new patch?")))
+		return;
+
 	std::string dir;
 	if (path.empty()) {
 		dir = asset::user("patches");
@@ -194,26 +201,26 @@ void PatchManager::loadDialog() {
 		return;
 	}
 	DEFER({
-		free(pathC);
+		std::free(pathC);
 	});
 
 	load(pathC);
 	path = pathC;
+	APP->history->setSaved();
 }
 
 void PatchManager::revertDialog() {
 	if (path.empty())
 		return;
-	if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert patch to the last saved state?")) {
-		load(path);
-	}
+
+	if (!(APP->history->isSaved() || osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert patch to the last saved state?")))
+		return;
+
+	load(path);
+	APP->history->setSaved();
 }
 
 void PatchManager::disconnectDialog() {
-	// Since we have undo history, no need for a warning.
-	// if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, "Remove all patch cables?"))
-	// 	return;
-
 	APP->scene->rack->clearCablesAction();
 }
 
