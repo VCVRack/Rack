@@ -82,7 +82,7 @@ struct CcChoice : LedDisplayChoice {
 			if (0 <= focusCc)
 				text = string::f("%d", focusCc);
 			else
-				text = "LRN";
+				text = "--";
 			color.a = 0.5;
 		}
 		else {
@@ -162,7 +162,7 @@ struct NoteChoice : LedDisplayChoice {
 			return;
 		}
 		if (module->learningId == id) {
-			text = "LRN";
+			text = "--";
 			color.a = 0.5;
 		}
 		else {
