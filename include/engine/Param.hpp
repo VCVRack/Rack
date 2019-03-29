@@ -81,7 +81,7 @@ struct Param {
 
 	/* Clamps and sets the value. */
 	void setValue(float value) {
-		this->value = math::clamp(value, minValue, maxValue);
+		this->value = math::clampSafe(value, minValue, maxValue);
 	}
 
 	/** Returns whether the Param has finite range between minValue and maxValue. */

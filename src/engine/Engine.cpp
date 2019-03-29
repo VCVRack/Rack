@@ -17,7 +17,7 @@ namespace rack {
 namespace engine {
 
 
-void disableDenormals() {
+static void disableDenormals() {
 	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
 	// https://software.intel.com/en-us/node/682949
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);

@@ -15,7 +15,7 @@ engine::Param *ParamQuantity::getParam() {
 void ParamQuantity::setSmoothValue(float smoothValue) {
 	if (!module)
 		return;
-	smoothValue = math::clamp(smoothValue, getMinValue(), getMaxValue());
+	smoothValue = math::clampSafe(smoothValue, getMinValue(), getMaxValue());
 	APP->engine->setSmoothParam(module, paramId, smoothValue);
 }
 
