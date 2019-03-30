@@ -2,7 +2,7 @@
 #include "app/common.hpp"
 #include "widget/OpaqueWidget.hpp"
 #include "ui/Tooltip.hpp"
-#include "app/ParamQuantity.hpp"
+#include "engine/ParamQuantity.hpp"
 #include "history.hpp"
 
 
@@ -12,11 +12,10 @@ namespace app {
 
 /** Manages an engine::Param on a ModuleWidget. */
 struct ParamWidget : widget::OpaqueWidget {
-	ParamQuantity *paramQuantity = NULL;
+	engine::ParamQuantity *paramQuantity = NULL;
 	float dirtyValue = NAN;
 	ui::Tooltip *tooltip = NULL;
 
-	~ParamWidget();
 	void step() override;
 	void draw(const DrawArgs &args) override;
 	void onButton(const widget::ButtonEvent &e) override;

@@ -1,10 +1,10 @@
-#include "app/ParamQuantity.hpp"
+#include "engine/ParamQuantity.hpp"
 #include "app.hpp"
 #include "engine/Engine.hpp"
 
 
 namespace rack {
-namespace app {
+namespace engine {
 
 
 engine::Param *ParamQuantity::getParam() {
@@ -119,5 +119,5 @@ std::string ParamQuantity::getUnit() {
 }
 
 
-} // namespace app
+} // namespace engine
 } // namespace rack

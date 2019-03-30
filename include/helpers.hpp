@@ -5,10 +5,10 @@
 #include "ui/MenuLabel.hpp"
 #include "ui/Menu.hpp"
 #include "app/PortWidget.hpp"
-#include "app/ParamQuantity.hpp"
 #include "app/ParamWidget.hpp"
 #include "app/Scene.hpp"
 #include "engine/Module.hpp"
+#include "engine/ParamQuantity.hpp"
 #include "app.hpp"
 #include "window.hpp"
 
@@ -66,7 +66,7 @@ TParamWidget *createParam(math::Vec pos, engine::Module *module, int paramId) {
 		if (f)
 			o->paramQuantity = f->create();
 		else
-			o->paramQuantity = new app::ParamQuantity;
+			o->paramQuantity = new engine::ParamQuantity;
 		o->paramQuantity->module = module;
 		o->paramQuantity->paramId = paramId;
 	}

@@ -2,7 +2,6 @@
 #include "ui/MenuOverlay.hpp"
 #include "ui/TextField.hpp"
 #include "app/Scene.hpp"
-#include "app/ParamQuantity.hpp"
 #include "app.hpp"
 #include "engine/Engine.hpp"
 #include "settings.hpp"
@@ -108,11 +107,6 @@ struct ParamUnmapItem : ui::MenuItem {
 	}
 };
 
-
-ParamWidget::~ParamWidget() {
-	if (paramQuantity)
-		delete paramQuantity;
-}
 
 void ParamWidget::step() {
 	if (paramQuantity) {
