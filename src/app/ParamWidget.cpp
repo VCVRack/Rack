@@ -65,7 +65,7 @@ struct ParamTooltip : ui::Tooltip {
 			// Quantity string
 			text = paramWidget->paramQuantity->getString();
 			// Param description
-			std::string description = paramWidget->paramQuantity->getParam()->description;
+			std::string description = paramWidget->paramQuantity->description;
 			if (!description.empty())
 				text += "\n" + description;
 		}

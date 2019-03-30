@@ -79,20 +79,21 @@ struct MIDI_Map : Module {
 			// Check if CC value has been set
 			if (values[cc] < 0)
 				continue;
-			// Get module
+			// Get Module
 			Module *module = paramHandles[id].module;
 			if (!module)
 				continue;
-			// Get param
+			// Get ParamQuantity
 			int paramId = paramHandles[id].paramId;
-			Param *param = &module->params[paramId];
-			if (!param->isBounded())
+			ParamQuantity *paramQuantity = module->paramQuantities[paramId];
+			if (!paramQuantity)
 				continue;
-			// Set param
+			if (!paramQuantity->isBounded())
+				continue;
+			// Set ParamQuantity
 			float v = rescale(values[cc], 0, 127, 0.f, 1.f);
 			v = valueFilters[id].process(args.sampleTime, v);
-			v = rescale(v, 0.f, 1.f, param->minValue, param->maxValue);
-			APP->engine->setParam(module, paramId, v);
+			paramQuantity->setScaledValue(v);
 		}
 	}
 
@@ -354,11 +355,11 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		int paramId = paramHandle->paramId;
 		if (paramId >= (int) m->params.size())
 			return "";
-		Param *param = &m->params[paramId];
+		ParamQuantity *paramQuantity = m->paramQuantities[paramId];
 		std::string s;
 		s += mw->model->name;
 		s += " ";
-		s += param->label;
+		s += paramQuantity->label;
 		return s;
 	}
 };

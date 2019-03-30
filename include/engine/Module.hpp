@@ -5,6 +5,7 @@
 #include "engine/Param.hpp"
 #include "engine/Port.hpp"
 #include "engine/Light.hpp"
+#include "engine/ParamQuantity.hpp"
 #include <vector>
 #include <jansson.h>
 
@@ -29,6 +30,7 @@ struct Module {
 	std::vector<Output> outputs;
 	std::vector<Input> inputs;
 	std::vector<Light> lights;
+	std::vector<ParamQuantity*> paramQuantities;
 	/** Access to adjacent modules */
 	int leftModuleId = -1;
 	Module *leftModule = NULL;
@@ -48,12 +50,35 @@ struct Module {
 	DEPRECATED Module(int numParams, int numInputs, int numOutputs, int numLights = 0) : Module() {
 		config(numParams, numInputs, numOutputs, numLights);
 	}
-	virtual ~Module() {}
+	virtual ~Module();
 
 	/** Configures the number of Params, Outputs, Inputs, and Lights. */
 	void config(int numParams, int numInputs, int numOutputs, int numLights = 0);
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
+
+	template <class TParamQuantity = ParamQuantity>
+	void configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
+		if (paramQuantities[paramId])
+			delete paramQuantities[paramId];
+
+		Param *p = &params[paramId];
+		p->value = defaultValue;
+
+		ParamQuantity *q = new TParamQuantity;
+		q->module = this;
+		q->paramId = paramId;
+		q->minValue = minValue;
+		q->maxValue = maxValue;
+		q->defaultValue = defaultValue;
+		if (!label.empty())
+			q->label = label;
+		else
+			q->label = string::f("#%d", paramId + 1);
+		q->unit = unit;
+		q->displayBase = displayBase;
+		q->displayMultiplier = displayMultiplier;
+		q->displayOffset = displayOffset;
+		paramQuantities[paramId] = q;
+	}
 
 	struct ProcessArgs {
 		float sampleRate;
@@ -82,6 +107,9 @@ struct Module {
 	virtual void onAdd() {}
 	/** Called when the Module is removed from the Engine */
 	virtual void onRemove() {}
+
+	json_t *toJson();
+	void fromJson(json_t *rootJ);
 
 	/** Override to store extra internal data in the "data" property of the module's JSON object. */
 	virtual json_t *dataToJson() { return NULL; }

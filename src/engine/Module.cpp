@@ -8,15 +8,23 @@ namespace engine {
 Module::Module() {
 }
 
+Module::~Module() {
+	for (ParamQuantity *paramQuantity : paramQuantities) {
+		if (paramQuantity)
+			delete paramQuantity;
+	}
+}
+
 void Module::config(int numParams, int numInputs, int numOutputs, int numLights) {
 	params.resize(numParams);
-	// Create default param labels
-	for (int i = 0; i < numParams; i++) {
-		params[i].label = string::f("#%d", i + 1);
-	}
 	inputs.resize(numInputs);
 	outputs.resize(numOutputs);
 	lights.resize(numLights);
+	paramQuantities.resize(numParams);
+	// Initialize paramQuantities
+	for (int i = 0; i < numParams; i++) {
+		configParam(i, 0.f, 1.f, 0.f);
+	}
 }
 
 json_t *Module::toJson() {

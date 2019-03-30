@@ -1,6 +1,5 @@
 #pragma once
 #include "Quantity.hpp"
-#include "engine/Module.hpp"
 #include "engine/Param.hpp"
 
 
@@ -8,12 +7,38 @@ namespace rack {
 namespace engine {
 
 
+struct Module;
+
+
 /** A Quantity that wraps an engine::Param. */
 struct ParamQuantity : Quantity {
-	engine::Module *module = NULL;
+	Module *module = NULL;
 	int paramId = 0;
 
-	engine::Param *getParam();
+	/** The minimum allowed value. */
+	float minValue = 0.f;
+	/** The maximum allowed value. Must be greater than minValue. */
+	float maxValue = 1.f;
+	/** The initial value. */
+	float defaultValue = 0.f;
+
+	/** The name of the parameter, using sentence capitalization.
+	e.g. "Frequency", "Pulse width", "Alternative mode"
+	*/
+	std::string label;
+	/** The numerical unit of measurement appended to the value.
+	Units that are words should have a space to separate the numerical value from the number (e.g. " semitones", " octaves").
+	Unit abbreviations and symbols should have no space (e.g. "V", "ms", "%", "º").
+	*/
+	std::string unit;
+	/** Set to 0 for linear, positive for exponential, negative for logarithmic. */
+	float displayBase = 0.f;
+	float displayMultiplier = 1.f;
+	float displayOffset = 0.f;
+	/** An optional one-sentence description of the parameter. */
+	std::string description;
+
+	Param *getParam();
 	/** Request to the engine to smoothly set the value */
 	void setSmoothValue(float smoothValue);
 	float getSmoothValue();

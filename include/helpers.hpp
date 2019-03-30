@@ -62,13 +62,7 @@ TParamWidget *createParam(math::Vec pos, engine::Module *module, int paramId) {
 	TParamWidget *o = new TParamWidget;
 	o->box.pos = pos;
 	if (module) {
-		engine::ParamQuantityFactory *f = module->params[paramId].paramQuantityFactory;
-		if (f)
-			o->paramQuantity = f->create();
-		else
-			o->paramQuantity = new engine::ParamQuantity;
-		o->paramQuantity->module = module;
-		o->paramQuantity->paramId = paramId;
+		o->paramQuantity = module->paramQuantities[paramId];
 	}
 	return o;
 }
@@ -92,11 +86,8 @@ TPortWidget *createInput(math::Vec pos, engine::Module *module, int inputId) {
 
 template <class TPortWidget>
 TPortWidget *createInputCentered(math::Vec pos, engine::Module *module, int inputId) {
-	TPortWidget *o = new TPortWidget;
-	o->box.pos = pos.minus(o->box.size.div(2));
-	o->module = module;
-	o->type = app::PortWidget::INPUT;
-	o->portId = inputId;
+	TPortWidget *o = createInput<TPortWidget>(pos, module, inputId);
+	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
 
@@ -112,11 +103,8 @@ TPortWidget *createOutput(math::Vec pos, engine::Module *module, int outputId) {
 
 template <class TPortWidget>
 TPortWidget *createOutputCentered(math::Vec pos, engine::Module *module, int outputId) {
-	TPortWidget *o = new TPortWidget;
-	o->box.pos = pos.minus(o->box.size.div(2));
-	o->module = module;
-	o->type = app::PortWidget::OUTPUT;
-	o->portId = outputId;
+	TPortWidget *o = createOutput<TPortWidget>(pos, module, outputId);
+	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
 
@@ -131,10 +119,8 @@ TModuleLightWidget *createLight(math::Vec pos, engine::Module *module, int first
 
 template <class TModuleLightWidget>
 TModuleLightWidget *createLightCentered(math::Vec pos, engine::Module *module, int firstLightId) {
-	TModuleLightWidget *o = new TModuleLightWidget;
-	o->box.pos = pos.minus(o->box.size.div(2));
-	o->module = module;
-	o->firstLightId = firstLightId;
+	TModuleLightWidget *o = createLight<TModuleLightWidget>(pos, module, firstLightId);
+	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
 

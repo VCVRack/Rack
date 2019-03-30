@@ -246,8 +246,8 @@ static void Engine_step(Engine *that) {
 		// decay rate is 1 graphics frame
 		const float smoothLambda = 60.f;
 		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
-		if (value == newValue || !(param->minValue <= newValue && newValue <= param->maxValue)) {
-			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats), or if newValue is out of bounds
+		if (value == newValue) {
+			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
 			param->setValue(smoothValue);
 			internal->smoothModule = NULL;
 			internal->smoothParamId = 0;
