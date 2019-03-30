@@ -12,11 +12,6 @@ Slider::Slider() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
 
-Slider::~Slider() {
-	if (quantity)
-		delete quantity;
-}
-
 void Slider::draw(const DrawArgs &args) {
 	float progress = quantity ? quantity->getScaledValue() : 0.f;
 	std::string text = quantity ? quantity->getString() : "";

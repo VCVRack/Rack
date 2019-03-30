@@ -1,9 +1,8 @@
-#include "ui/Quantity.hpp"
+#include "Quantity.hpp"
 #include "string.hpp"
 
 
 namespace rack {
-namespace ui {
 
 
 int Quantity::getDisplayPrecision() {
@@ -44,5 +43,4 @@ std::string Quantity::getString() {
 }
 
 
-} // namespace ui
 } // namespace rack

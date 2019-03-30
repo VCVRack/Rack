@@ -9,11 +9,6 @@ Button::Button() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
 
-Button::~Button() {
-	if (quantity)
-		delete quantity;
-}
-
 void Button::draw(const DrawArgs &args) {
 	bndToolButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str());
 }

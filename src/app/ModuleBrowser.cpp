@@ -121,7 +121,7 @@ struct InfoBox : widget::Widget {
 };
 
 
-struct ModelFavoriteQuantity : ui::Quantity {
+struct ModelFavoriteQuantity : Quantity {
 	plugin::Model *model;
 	std::string getLabel() override {return "★";}
 	void setValue(float value) override {
@@ -141,6 +141,16 @@ struct ModelFavoriteQuantity : ui::Quantity {
 };
 
 
+struct ModelFavoriteButton : ui::RadioButton {
+	ModelFavoriteButton() {
+		quantity = new ModelFavoriteQuantity;
+	}
+	~ModelFavoriteButton() {
+		delete quantity;
+	}
+};
+
+
 static const float MODEL_BOX_ZOOM = 0.5f;
 
 
@@ -148,7 +158,7 @@ struct ModelBox : widget::OpaqueWidget {
 	plugin::Model *model;
 	InfoBox *infoBox;
 	widget::Widget *previewWidget;
-	ui::RadioButton *favoriteButton;
+	ModelFavoriteButton *favoriteButton;
 	/** Lazily created */
 	widget::FramebufferWidget *previewFb = NULL;
 	/** Number of frames since draw() has been called */
@@ -176,10 +186,8 @@ struct ModelBox : widget::OpaqueWidget {
 		addChild(infoBox);
 
 		// Favorite button
-		favoriteButton = new ui::RadioButton;
-		ModelFavoriteQuantity *favoriteQuantity = new ModelFavoriteQuantity;
-		favoriteQuantity->model = model;
-		favoriteButton->quantity = favoriteQuantity;
+		favoriteButton = new ModelFavoriteButton;
+		dynamic_cast<ModelFavoriteQuantity*>(favoriteButton->quantity)->model = model;
 		favoriteButton->box.pos.y = box.size.y;
 		box.size.y += favoriteButton->box.size.y;
 		addChild(favoriteButton);
@@ -301,7 +309,7 @@ struct BrowserSearchField : ui::TextField {
 };
 
 
-struct ShowFavoritesQuantity : ui::Quantity {
+struct ShowFavoritesQuantity : Quantity {
 	widget::Widget *widget;
 	std::string getLabel() override {
 		int favoritesLen = settings::favoriteModels.size();
@@ -312,9 +320,19 @@ struct ShowFavoritesQuantity : ui::Quantity {
 };
 
 
+struct ShowFavoritesButton : ui::RadioButton {
+	ShowFavoritesButton() {
+		quantity = new ShowFavoritesQuantity;
+	}
+	~ShowFavoritesButton() {
+		delete quantity;
+	}
+};
+
+
 struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
-	ui::RadioButton *favoriteButton;
+	ShowFavoritesButton *favoriteButton;
 	ui::Label *authorLabel;
 	ui::List *authorList;
 	ui::ScrollWidget *authorScroll;
@@ -326,10 +344,8 @@ struct BrowserSidebar : widget::Widget {
 		searchField = new BrowserSearchField;
 		addChild(searchField);
 
-		favoriteButton = new ui::RadioButton;
-		ShowFavoritesQuantity *favoriteQuantity = new ShowFavoritesQuantity;
-		favoriteQuantity->widget = favoriteButton;
-		favoriteButton->quantity = favoriteQuantity;
+		favoriteButton = new ShowFavoritesButton;
+		dynamic_cast<ShowFavoritesQuantity*>(favoriteButton->quantity)->widget = favoriteButton;
 		addChild(favoriteButton);
 
 		authorLabel = new ui::Label;

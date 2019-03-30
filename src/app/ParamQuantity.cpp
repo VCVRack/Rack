@@ -58,7 +58,7 @@ float ParamQuantity::getDefaultValue() {
 
 float ParamQuantity::getDisplayValue() {
 	if (!module)
-		return ui::Quantity::getDisplayValue();
+		return Quantity::getDisplayValue();
 	float v = getSmoothValue();
 	float displayBase = getParam()->displayBase;
 	if (displayBase == 0.f) {
@@ -95,26 +95,26 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 }
 
 int ParamQuantity::getDisplayPrecision() {
-	return ui::Quantity::getDisplayPrecision();
+	return Quantity::getDisplayPrecision();
 }
 
 std::string ParamQuantity::getDisplayValueString() {
-	return ui::Quantity::getDisplayValueString();
+	return Quantity::getDisplayValueString();
 }
 
 void ParamQuantity::setDisplayValueString(std::string s) {
-	ui::Quantity::setDisplayValueString(s);
+	Quantity::setDisplayValueString(s);
 }
 
 std::string ParamQuantity::getLabel() {
 	if (!module)
-		return ui::Quantity::getLabel();
+		return Quantity::getLabel();
 	return getParam()->label;
 }
 
 std::string ParamQuantity::getUnit() {
 	if (!module)
-		return ui::Quantity::getUnit();
+		return Quantity::getUnit();
 	return getParam()->unit;
 }
 

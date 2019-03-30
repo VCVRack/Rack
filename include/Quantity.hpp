@@ -1,10 +1,8 @@
 #pragma once
-#include "ui/common.hpp"
 #include "math.hpp"
 
 
 namespace rack {
-namespace ui {
 
 
 /** A controller for manipulating a float value (which subclasses must store somehow) with limits and labels
@@ -119,5 +117,4 @@ struct Quantity {
 };
 
 
-} // namespace ui
 } // namespace rack

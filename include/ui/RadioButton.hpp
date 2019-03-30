@@ -1,7 +1,7 @@
 #pragma once
 #include "ui/common.hpp"
 #include "widget/OpaqueWidget.hpp"
-#include "ui/Quantity.hpp"
+#include "Quantity.hpp"
 
 
 namespace rack {
@@ -10,10 +10,10 @@ namespace ui {
 
 struct RadioButton : widget::OpaqueWidget {
 	BNDwidgetState state = BND_DEFAULT;
+	/** Not owned. */
 	Quantity *quantity = NULL;
 
 	RadioButton();
-	~RadioButton();
 	void draw(const DrawArgs &args) override;
 	void onEnter(const widget::EnterEvent &e) override;
 	void onLeave(const widget::LeaveEvent &e) override;

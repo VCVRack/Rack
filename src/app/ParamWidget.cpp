@@ -63,7 +63,7 @@ struct ParamTooltip : ui::Tooltip {
 
 	void step() override {
 		if (paramWidget->paramQuantity) {
-			// ui::Quantity string
+			// Quantity string
 			text = paramWidget->paramQuantity->getString();
 			// Param description
 			std::string description = paramWidget->paramQuantity->getParam()->description;

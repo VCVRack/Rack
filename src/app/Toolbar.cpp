@@ -170,7 +170,7 @@ struct EditButton : MenuButton {
 };
 
 
-struct ZoomQuantity : ui::Quantity {
+struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
 		settings::zoom = math::clamp(value, getMinValue(), getMaxValue());
 	}
@@ -187,7 +187,17 @@ struct ZoomQuantity : ui::Quantity {
 };
 
 
-struct CableOpacityQuantity : ui::Quantity {
+struct ZoomSlider : ui::Slider {
+	ZoomSlider() {
+		quantity = new ZoomQuantity;
+	}
+	~ZoomSlider() {
+		delete quantity;
+	}
+};
+
+
+struct CableOpacityQuantity : Quantity {
 	void setValue(float value) override {
 		settings::cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
 	}
@@ -203,7 +213,17 @@ struct CableOpacityQuantity : ui::Quantity {
 
 
 
-struct CableTensionQuantity : ui::Quantity {
+struct CableOpacitySlider : ui::Slider {
+	CableOpacitySlider() {
+		quantity = new CableOpacityQuantity;
+	}
+	~CableOpacitySlider() {
+		delete quantity;
+	}
+};
+
+
+struct CableTensionQuantity : Quantity {
 	void setValue(float value) override {
 		settings::cableTension = math::clamp(value, getMinValue(), getMaxValue());
 	}
@@ -213,6 +233,16 @@ struct CableTensionQuantity : ui::Quantity {
 	float getDefaultValue() override {return 0.5;}
 	std::string getLabel() override {return "Cable tension";}
 	int getDisplayPrecision() override {return 2;}
+};
+
+
+struct CableTensionSlider : ui::Slider {
+	CableTensionSlider() {
+		quantity = new CableTensionQuantity;
+	}
+	~CableTensionSlider() {
+		delete quantity;
+	}
 };
 
 
@@ -359,19 +389,16 @@ struct SettingsButton : MenuButton {
 			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
 		menu->addChild(fullscreenItem);
 
-		ui::Slider *zoomSlider = new ui::Slider;
+		ZoomSlider *zoomSlider = new ZoomSlider;
 		zoomSlider->box.size.x = 200.0;
-		zoomSlider->quantity = new ZoomQuantity;
 		menu->addChild(zoomSlider);
 
-		ui::Slider *cableOpacitySlider = new ui::Slider;
+		CableOpacitySlider *cableOpacitySlider = new CableOpacitySlider;
 		cableOpacitySlider->box.size.x = 200.0;
-		cableOpacitySlider->quantity = new CableOpacityQuantity;
 		menu->addChild(cableOpacitySlider);
 
-		ui::Slider *cableTensionSlider = new ui::Slider;
+		CableTensionSlider *cableTensionSlider = new CableTensionSlider;
 		cableTensionSlider->box.size.x = 200.0;
-		cableTensionSlider->quantity = new CableTensionQuantity;
 		menu->addChild(cableTensionSlider);
 	}
 };
@@ -490,7 +517,7 @@ struct LogOutItem : ui::MenuItem {
 };
 
 
-struct DownloadQuantity : ui::Quantity {
+struct DownloadQuantity : Quantity {
 	float getValue() override {
 		return plugin::downloadProgress;
 	}

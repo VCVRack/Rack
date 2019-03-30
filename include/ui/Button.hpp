@@ -1,7 +1,7 @@
 #pragma once
 #include "widget/OpaqueWidget.hpp"
 #include "ui/common.hpp"
-#include "ui/Quantity.hpp"
+#include "Quantity.hpp"
 
 
 namespace rack {
@@ -11,11 +11,10 @@ namespace ui {
 struct Button : widget::OpaqueWidget {
 	std::string text;
 	BNDwidgetState state = BND_DEFAULT;
-	/** Optional, owned. Tracks the pressed state of the button.*/
+	/** Not owned. Tracks the pressed state of the button.*/
 	Quantity *quantity = NULL;
 
 	Button();
-	~Button();
 	void draw(const DrawArgs &args) override;
 	void onEnter(const widget::EnterEvent &e) override;
 	void onLeave(const widget::LeaveEvent &e) override;

@@ -9,11 +9,6 @@ RadioButton::RadioButton() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
 
-RadioButton::~RadioButton() {
-	if (quantity)
-		delete quantity;
-}
-
 void RadioButton::draw(const DrawArgs &args) {
 	BNDwidgetState state = this->state;
 	std::string label;

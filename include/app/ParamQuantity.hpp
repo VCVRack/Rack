@@ -1,5 +1,5 @@
 #pragma once
-#include "ui/Quantity.hpp"
+#include "Quantity.hpp"
 #include "engine/Module.hpp"
 #include "engine/Param.hpp"
 
@@ -8,8 +8,8 @@ namespace rack {
 namespace app {
 
 
-/** A ui::Quantity that wraps an engine::Param. */
-struct ParamQuantity : ui::Quantity {
+/** A Quantity that wraps an engine::Param. */
+struct ParamQuantity : Quantity {
 	engine::Module *module = NULL;
 	int paramId = 0;
 
