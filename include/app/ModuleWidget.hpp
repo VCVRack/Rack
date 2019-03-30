@@ -19,6 +19,8 @@ struct ModuleWidget : widget::OpaqueWidget {
 	engine::Module *module = NULL;
 
 	widget::Widget *panel = NULL;
+	/** Note that the indexes of these vectors might not correspond with the indexes of `Module::params` etc.
+	*/
 	std::vector<ParamWidget*> params;
 	std::vector<PortWidget*> outputs;
 	std::vector<PortWidget*> inputs;

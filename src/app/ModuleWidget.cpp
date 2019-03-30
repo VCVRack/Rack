@@ -415,20 +415,26 @@ void ModuleWidget::addInput(PortWidget *input) {
 }
 
 ParamWidget *ModuleWidget::getParam(int paramId) {
-	if (0 <= paramId && paramId < (int) params.size())
-		return params[paramId];
+	for (ParamWidget *param : params) {
+		if (param->paramQuantity && param->paramQuantity->paramId == paramId)
+			return param;
+	}
 	return NULL;
 }
 
 PortWidget *ModuleWidget::getOutput(int outputId) {
-	if (0 <= outputId && outputId < (int) outputs.size())
-		return outputs[outputId];
+	for (PortWidget *port : outputs) {
+		if (port->portId == outputId)
+			return port;
+	}
 	return NULL;
 }
 
 PortWidget *ModuleWidget::getInput(int inputId) {
-	if (0 <= inputId && inputId < (int) inputs.size())
-		return inputs[inputId];
+	for (PortWidget *port : inputs) {
+		if (port->portId == inputId)
+			return port;
+	}
 	return NULL;
 }
 
