@@ -1,0 +1,1487 @@
+{
+  "version": "0.6.1",
+  "oversampleFactor": 1.0,
+  "oversampleQuality": 7.0,
+  "oversampleNumIn": 8.0,
+  "oversampleNumOut": 8.0,
+  "idleDetect": 1.0,
+  "idleGraceSec": 0.150000006,
+  "idleOutputSec": 0.100000001,
+  "modules": [
+    {
+      "plugin": "Core",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 1,
+      "model": "AudioInterface",
+      "pos": [
+        69,
+        0
+      ],
+      "params": [],
+      "data": {
+        "audio": {
+          "driver": 0,
+          "deviceName": "",
+          "offset": 0,
+          "maxChannels": 8,
+          "sampleRate": 44100,
+          "blockSize": 256
+        }
+      }
+    },
+    {
+      "plugin": "Core",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 2,
+      "model": "MIDIToCVInterface",
+      "pos": [
+        0,
+        0
+      ],
+      "params": [],
+      "data": {
+        "divisions": [
+          24,
+          6
+        ],
+        "midi": {
+          "driver": -17545,
+          "deviceName": "VST MIDI Input Device",
+          "channel": -1
+        }
+      }
+    },
+    {
+      "plugin": "Bogaudio",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 7,
+      "model": "Bogaudio-XCO",
+      "pos": [
+        8,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": -1.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 1.0
+        },
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 10,
+          "value": 0.0
+        },
+        {
+          "paramId": 11,
+          "value": 0.660000265
+        },
+        {
+          "paramId": 12,
+          "value": 0.0
+        },
+        {
+          "paramId": 13,
+          "value": 0.561000109
+        },
+        {
+          "paramId": 14,
+          "value": 0.0
+        },
+        {
+          "paramId": 15,
+          "value": 0.0
+        },
+        {
+          "paramId": 16,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "vst2_unique_param_base_id": 25,
+      "model": "VCA",
+      "pos": [
+        51,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.5
+        },
+        {
+          "paramId": 1,
+          "value": 0.589999974
+        }
+      ]
+    },
+    {
+      "plugin": "AS",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 34,
+      "model": "ADSR",
+      "pos": [
+        43,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.547999859
+        },
+        {
+          "paramId": 2,
+          "value": 0.5
+        },
+        {
+          "paramId": 3,
+          "value": 0.692000091
+        }
+      ]
+    },
+    {
+      "plugin": "AS",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 39,
+      "model": "ADSR",
+      "pos": [
+        56,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.00600000005
+        },
+        {
+          "paramId": 1,
+          "value": 0.338
+        },
+        {
+          "paramId": 2,
+          "value": 0.713000119
+        },
+        {
+          "paramId": 3,
+          "value": 0.268999845
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 46,
+      "model": "Obxd_VCF",
+      "pos": [
+        35,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 5,
+          "value": 1.0
+        },
+        {
+          "paramId": 0,
+          "value": -0.0269998908
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.224999994
+        },
+        {
+          "paramId": 3,
+          "value": 0.180000186
+        },
+        {
+          "paramId": 4,
+          "value": 0.316999912
+        }
+      ]
+    },
+    {
+      "plugin": "21kHz",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 53,
+      "model": "kHzD_Inf",
+      "pos": [
+        0,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "Autodafe",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 66,
+      "model": "Multiple 1x8",
+      "pos": [
+        7,
+        1
+      ],
+      "params": []
+    },
+    {
+      "plugin": "Autodafe",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 67,
+      "model": "Multiple 1x8",
+      "pos": [
+        10,
+        1
+      ],
+      "params": []
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 67,
+      "model": "AttenuMixer",
+      "pos": [
+        4,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.796000004
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.457999706
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.25
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 78,
+      "model": "DownSampler",
+      "pos": [
+        53,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.46199834
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 80,
+      "model": "AttenuMixer",
+      "pos": [
+        50,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 0,
+          "value": 0.798000038
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.90599978
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.5
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.25
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "Valley",
+      "version": "0.6.16",
+      "vst2_unique_param_base_id": 91,
+      "model": "Amalgam",
+      "pos": [
+        33,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.36000037
+        },
+        {
+          "paramId": 1,
+          "value": 2.04400063
+        },
+        {
+          "paramId": 2,
+          "value": 0.830999851
+        },
+        {
+          "paramId": 3,
+          "value": 0.433500469
+        },
+        {
+          "paramId": 4,
+          "value": 7.62337017
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        },
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 10,
+          "value": 0.0
+        },
+        {
+          "paramId": 11,
+          "value": 0.0
+        },
+        {
+          "paramId": 12,
+          "value": 0.0
+        },
+        {
+          "paramId": 13,
+          "value": 0.0
+        }
+      ],
+      "data": {
+        "panelStyle": 0,
+        "dcCoupled": 0
+      }
+    },
+    {
+      "plugin": "Bogaudio",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 106,
+      "model": "Bogaudio-XCO",
+      "pos": [
+        13,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": -2.04049993
+        },
+        {
+          "paramId": 1,
+          "value": 0.266999483
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": -0.587820053
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.719500184
+        },
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 10,
+          "value": 0.0
+        },
+        {
+          "paramId": 11,
+          "value": 0.660000265
+        },
+        {
+          "paramId": 12,
+          "value": 0.0
+        },
+        {
+          "paramId": 13,
+          "value": 0.0
+        },
+        {
+          "paramId": 14,
+          "value": 0.0
+        },
+        {
+          "paramId": 15,
+          "value": 0.0
+        },
+        {
+          "paramId": 16,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.4",
+      "vst2_unique_param_base_id": 124,
+      "model": "MS20 VCF",
+      "pos": [
+        56,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.415000826
+        },
+        {
+          "paramId": 1,
+          "value": 0.271500021
+        },
+        {
+          "paramId": 2,
+          "value": 0.366000026
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.234899998
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 1.0
+        }
+      ],
+      "gestaltID": 1,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": -189.507919,
+      "patina_a_y": -499.644897,
+      "patina_b_x": -249.575775,
+      "patina_b_y": -34.4260368
+    },
+    {
+      "plugin": "AS",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 132,
+      "model": "TriLFO",
+      "pos": [
+        71,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 2,
+          "value": 1.16299915
+        },
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": -1.0
+        },
+        {
+          "paramId": 3,
+          "value": 1.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 8,
+          "value": -1.0
+        },
+        {
+          "paramId": 6,
+          "value": 1.0
+        },
+        {
+          "paramId": 7,
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "plugin": "AudibleInstruments",
+      "version": "0.6.3",
+      "vst2_unique_param_base_id": 146,
+      "model": "Stages",
+      "pos": [
+        33,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.5
+        },
+        {
+          "paramId": 1,
+          "value": 0.5
+        },
+        {
+          "paramId": 2,
+          "value": 0.5
+        },
+        {
+          "paramId": 3,
+          "value": 0.699999988
+        },
+        {
+          "paramId": 4,
+          "value": 0.5
+        },
+        {
+          "paramId": 5,
+          "value": 0.600000024
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        },
+        {
+          "paramId": 8,
+          "value": 0.0
+        },
+        {
+          "paramId": 9,
+          "value": 0.0
+        },
+        {
+          "paramId": 10,
+          "value": 0.0
+        },
+        {
+          "paramId": 11,
+          "value": 0.0
+        },
+        {
+          "paramId": 12,
+          "value": 0.5
+        },
+        {
+          "paramId": 13,
+          "value": 0.5
+        },
+        {
+          "paramId": 14,
+          "value": 0.0
+        },
+        {
+          "paramId": 15,
+          "value": 0.0
+        },
+        {
+          "paramId": 16,
+          "value": 0.351999938
+        },
+        {
+          "paramId": 17,
+          "value": 0.5
+        }
+      ],
+      "data": {
+        "configurations": [
+          {
+            "type": 0,
+            "loop": false
+          },
+          {
+            "type": 0,
+            "loop": false
+          },
+          {
+            "type": 0,
+            "loop": false
+          },
+          {
+            "type": 0,
+            "loop": false
+          },
+          {
+            "type": 2,
+            "loop": true
+          },
+          {
+            "type": 0,
+            "loop": false
+          }
+        ]
+      }
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.4",
+      "vst2_unique_param_base_id": 165,
+      "model": "MS20 VCF",
+      "pos": [
+        21,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.326500773
+        },
+        {
+          "paramId": 1,
+          "value": 0.271500021
+        },
+        {
+          "paramId": 2,
+          "value": 0.366000026
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.756999969
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 1.0
+        }
+      ],
+      "gestaltID": 1,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": -189.507919,
+      "patina_a_y": -499.644897,
+      "patina_b_x": -249.575775,
+      "patina_b_y": -34.4260368
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "vst2_unique_param_base_id": 205,
+      "model": "VCA",
+      "pos": [
+        64,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.5
+        },
+        {
+          "paramId": 1,
+          "value": 0.852500141
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 208,
+      "model": "Bias",
+      "pos": [
+        28,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 1.20399952
+        },
+        {
+          "paramId": 2,
+          "value": 0.147999763
+        }
+      ]
+    },
+    {
+      "plugin": "AS",
+      "version": "0.6.13",
+      "vst2_unique_param_base_id": 212,
+      "model": "TriLFO",
+      "pos": [
+        3,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 2,
+          "value": 2.56999874
+        },
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": -1.0
+        },
+        {
+          "paramId": 3,
+          "value": 1.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 8,
+          "value": 2.54899979
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 226,
+      "model": "Rescaler",
+      "pos": [
+        0,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 10.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 10.0
+        }
+      ]
+    },
+    {
+      "plugin": "squinkylabs-plug1",
+      "version": "0.6.14",
+      "vst2_unique_param_base_id": 231,
+      "model": "squinkylabs-freqshifter",
+      "pos": [
+        69,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        }
+      ],
+      "data": {
+        "range": 50
+      }
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 233,
+      "model": "Rescaler",
+      "pos": [
+        66,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 10.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 2.61999512
+        }
+      ]
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 238,
+      "model": "Rescaler",
+      "pos": [
+        32,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 3.68999672
+        },
+        {
+          "paramId": 1,
+          "value": 10.0
+        },
+        {
+          "paramId": 2,
+          "value": 3.38999939
+        },
+        {
+          "paramId": 3,
+          "value": 10.0
+        }
+      ]
+    },
+    {
+      "plugin": "Southpole",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 250,
+      "model": "Abr",
+      "pos": [
+        75,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ],
+      "data": {
+        "swStates": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "plugin": "bsp",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 259,
+      "model": "Legato",
+      "pos": [
+        14,
+        2
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.200000003
+        },
+        {
+          "paramId": 1,
+          "value": 0.411000103
+        },
+        {
+          "paramId": 2,
+          "value": 0.346500009
+        },
+        {
+          "paramId": 3,
+          "value": 0.439499736
+        },
+        {
+          "paramId": 4,
+          "value": 0.442499995
+        }
+      ]
+    },
+    {
+      "plugin": "Southpole",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 265,
+      "model": "Abr",
+      "pos": [
+        44,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ],
+      "data": {
+        "swStates": [
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    }
+  ],
+  "wires": [
+    {
+      "color": "#c91847",
+      "outputModuleId": 9,
+      "outputId": 0,
+      "inputModuleId": 4,
+      "inputId": 4
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 5,
+      "outputId": 0,
+      "inputModuleId": 3,
+      "inputId": 3
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 6,
+      "outputId": 0,
+      "inputModuleId": 3,
+      "inputId": 5
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 4,
+      "outputId": 0,
+      "inputModuleId": 25,
+      "inputId": 1
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 1,
+      "outputId": 4,
+      "inputModuleId": 10,
+      "inputId": 1
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 7,
+      "outputId": 0,
+      "inputModuleId": 10,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 1,
+      "outputId": 0,
+      "inputModuleId": 7,
+      "inputId": 1
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 1,
+      "outputId": 1,
+      "inputModuleId": 9,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 8,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 14
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 10,
+      "outputId": 0,
+      "inputModuleId": 27,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 9,
+      "outputId": 1,
+      "inputModuleId": 5,
+      "inputId": 4
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 2,
+      "outputId": 4,
+      "inputModuleId": 15,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 12,
+      "outputId": 0,
+      "inputModuleId": 19,
+      "inputId": 5
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 9,
+      "outputId": 2,
+      "inputModuleId": 11,
+      "inputId": 1
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 3,
+      "outputId": 1,
+      "inputModuleId": 12,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 11,
+      "outputId": 0,
+      "inputModuleId": 28,
+      "inputId": 8
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 3,
+      "outputId": 1,
+      "inputModuleId": 11,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 8,
+      "outputId": 1,
+      "inputModuleId": 14,
+      "inputId": 14
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 14,
+      "outputId": 4,
+      "inputModuleId": 18,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 13,
+      "outputId": 4,
+      "inputModuleId": 6,
+      "inputId": 3
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 15,
+      "outputId": 0,
+      "inputModuleId": 13,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 16,
+      "outputId": 0,
+      "inputModuleId": 15,
+      "inputId": 1
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 18,
+      "outputId": 0,
+      "inputModuleId": 13,
+      "inputId": 2
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 17,
+      "outputId": 3,
+      "inputModuleId": 18,
+      "inputId": 1
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 9,
+      "outputId": 3,
+      "inputModuleId": 17,
+      "inputId": 9
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 19,
+      "outputId": 1,
+      "inputModuleId": 23,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 5,
+      "outputId": 0,
+      "inputModuleId": 19,
+      "inputId": 4
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 8,
+      "outputId": 2,
+      "inputModuleId": 20,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 20,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 1,
+      "outputId": 3,
+      "inputModuleId": 22,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 21,
+      "outputId": 1,
+      "inputModuleId": 22,
+      "inputId": 1
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 22,
+      "outputId": 0,
+      "inputModuleId": 10,
+      "inputId": 2
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 1,
+      "outputId": 3,
+      "inputModuleId": 24,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 21,
+      "outputId": 9,
+      "inputModuleId": 24,
+      "inputId": 1
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 24,
+      "outputId": 0,
+      "inputModuleId": 23,
+      "inputId": 1
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 26,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 26,
+      "outputId": 0,
+      "inputModuleId": 0,
+      "inputId": 1
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 1,
+      "outputId": 2,
+      "inputModuleId": 25,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 25,
+      "outputId": 0,
+      "inputModuleId": 20,
+      "inputId": 1
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 19,
+      "outputId": 1,
+      "inputModuleId": 26,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 23,
+      "outputId": 0,
+      "inputModuleId": 26,
+      "inputId": 8
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 9,
+      "outputId": 4,
+      "inputModuleId": 27,
+      "inputId": 1
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 27,
+      "outputId": 0,
+      "inputModuleId": 8,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 28,
+      "outputId": 0,
+      "inputModuleId": 12,
+      "inputId": 1
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 3,
+      "outputId": 1,
+      "inputModuleId": 28,
+      "inputId": 0
+    }
+  ]
+}
