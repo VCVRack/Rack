@@ -47,7 +47,7 @@ struct Korg35 : LRModule {
     };
 
     LRKnob *frqKnob, *peakKnob, *saturateKnob;
-    Korg35Filter *filter = new Korg35Filter(engineGetSampleRate());
+    Korg35Filter *filter = new Korg35Filter(engineGetSampleRate(), Korg35Filter::LPF);
 
     Korg35() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 
@@ -55,7 +55,7 @@ struct Korg35 : LRModule {
     void step() override {
         filter->fc = params[FREQ_PARAM].value;
         filter->peak = params[PEAK_PARAM].value;
-        filter->sat = params[SAT_PARAM].value;
+        filter->sat = quadraticBipolar(params[SAT_PARAM].value);
 
         filter->in = inputs[FILTER_INPUT].value;
         filter->invalidate();
@@ -100,7 +100,7 @@ Korg35Widget::Korg35Widget(Korg35 *module) : LRModuleWidget(module) {
     // ***** MAIN KNOBS ******
     module->frqKnob = LRKnob::create<LRBigKnob>(Vec(32.5, 74.4), module, Korg35::FREQ_PARAM, 0.f, 1.f, 1.f);
     module->peakKnob = LRKnob::create<LRBigKnob>(Vec(32.5, 144.4), module, Korg35::PEAK_PARAM, 0.001f, 2.0, 0.001f);
-    module->saturateKnob = LRKnob::create<LRMiddleKnob>(Vec(40, 244.4), module, Korg35::SAT_PARAM, 1.f, 1.5, 0.0f);
+    module->saturateKnob = LRKnob::create<LRMiddleKnob>(Vec(40, 244.4), module, Korg35::SAT_PARAM, 1.f, 2.5, 1.0f);
 
     module->frqKnob->setIndicatorColors(nvgRGBAf(0.9f, 0.9f, 0.9f, 1.0f));
     module->peakKnob->setIndicatorColors(nvgRGBAf(0.9f, 0.9f, 0.9f, 1.0f));

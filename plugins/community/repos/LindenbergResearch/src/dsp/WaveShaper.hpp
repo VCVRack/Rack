@@ -86,6 +86,24 @@ public:
      * @return Output sample
      */
     virtual double compute(double x) { return x; }
+
+
+    /**
+     * @brief Virtual function called before actual oversampling is performed
+     *
+     * @param x Input sample
+     * @return Ouput sample
+     */
+    virtual double beforeComputation(double x) { return x; }
+
+
+    /**
+     * @brief Virtual function called after actual oversampling is performed
+     *
+     * @param x Input sample
+     * @return Output sample
+     */
+    virtual double afterComputation(double x) { return x; }
 };
 
 

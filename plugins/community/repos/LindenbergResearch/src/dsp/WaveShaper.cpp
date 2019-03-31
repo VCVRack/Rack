@@ -67,14 +67,14 @@ void WaveShaper::process() {
         return;
     }
 
-    rs->doUpsample(STD_CHANNEL, in);
+    rs->doUpsample(STD_CHANNEL, beforeComputation(in));
 
     for (int i = 0; i < rs->getFactor(); i++) {
         double x = rs->getUpsampled(STD_CHANNEL)[i];
         rs->data[STD_CHANNEL][i] = compute(x);
     }
 
-    out = rs->getDownsampled(STD_CHANNEL);
+    out = afterComputation(rs->getDownsampled(STD_CHANNEL));
 }
 
 

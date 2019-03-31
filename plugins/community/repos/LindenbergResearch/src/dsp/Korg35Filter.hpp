@@ -23,20 +23,22 @@
 #include "engine.hpp"
 #include "DSPMath.hpp"
 
-#define PI 3.14159265358979323846f
-
 namespace dsp {
 
+/**
+ * @brief Represents one filter stage
+ */
 struct Korg35FilterStage : DSPEffect {
     enum FilterType {
-        LPF1,   // lowpass stage
-        HPF1    // highpass stage
+        LP_STAGE,   // lowpass stage
+        HP_STAGE    // highpass stage
     };
 
     bool dedicated = false;
 
-    float fc;
     FilterType type;
+
+    float fc;
     float alpha, beta;
     float zn1;
 
@@ -56,10 +58,21 @@ struct Korg35FilterStage : DSPEffect {
 };
 
 
+/**
+ * @brief Actual Korg35 Filter Class
+ */
 struct Korg35Filter : DSPEffect {
     static constexpr float MAX_FREQUENCY = 20000.f;
 
-    Korg35FilterStage *lpf, *hpf1, *hpf2;
+    enum FilterType {
+        LPF,   // lowpass
+        HPF    // highpass
+    };
+
+
+    Korg35FilterStage *lpf1, *lpf2, *hpf1, *hpf2;
+    FilterType type;
+
     float Ga;
 
     float in, out;
@@ -68,16 +81,21 @@ struct Korg35Filter : DSPEffect {
     float fc, peak, sat;
 
 
-    Korg35Filter(float sr) : DSPEffect(sr) {
-        lpf = new Korg35FilterStage(sr, Korg35FilterStage::LPF1);
-        hpf1 = new Korg35FilterStage(sr, Korg35FilterStage::HPF1);
-        hpf2 = new Korg35FilterStage(sr, Korg35FilterStage::HPF1);
+    Korg35Filter(float sr, FilterType type) : DSPEffect(sr) {
+        Korg35Filter::type = type;
+
+        lpf1 = new Korg35FilterStage(sr, Korg35FilterStage::LP_STAGE);
+        lpf2 = new Korg35FilterStage(sr, Korg35FilterStage::LP_STAGE);
+        hpf1 = new Korg35FilterStage(sr, Korg35FilterStage::HP_STAGE);
+        hpf2 = new Korg35FilterStage(sr, Korg35FilterStage::HP_STAGE);
     }
 
 
     void init() override;
     void invalidate() override;
     void process() override;
+    void processLPF();
+    void processHPF();
     void setSamplerate(float sr) override;
 };
 

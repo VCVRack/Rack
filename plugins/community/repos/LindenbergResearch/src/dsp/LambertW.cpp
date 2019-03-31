@@ -16,7 +16,7 @@
 #include <cmath>
 #include "Horner.h"
 
-namespace dsp {
+using namespace dsp;
 
 // fork macro to keep the tree balanced
 #define Y2(d1, c12, d2) \
@@ -31,6 +31,9 @@ namespace dsp {
   Y5(d1, c12, d2, c23, d3, c34, d4, c45, Y2(d5, c56, d6))
 #define Y7(d1, c12, d2, c23, d3, c34, d4, c45, d5, c56, d6, c67, d7) \
   Y6(d1, c12, d2, c23, Y2(d3, c34, d4), c45, d5, c56, d6, c67, d7)
+
+
+namespace dsp {
 
 class BranchPoint {
 };

@@ -6,10 +6,9 @@
 #include "dsp/resampler.hpp"
 #include "DSPEffect.hpp"
 
-#define LAMBERT_W_THRESHOLD 10e-10
 using namespace rack;
 
-const static float TWOPI = (float) M_PI * 2;
+const static float TWOPI = lroundf(M_PI * 2.);
 
 namespace dsp {
 

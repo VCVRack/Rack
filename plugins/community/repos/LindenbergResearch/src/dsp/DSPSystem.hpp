@@ -50,13 +50,14 @@ struct DSPSystem {
 
 protected:
 #ifdef _MSC_VER
-        DSPPort input[NUM_IN + 1];
-        DSPPort output[NUM_OUT + 1];
-        DSPParam param[NUM_PARAM + 1];
+   // (note) +1 to avoid "illegal zero-sized array" errors
+   DSPPort input[NUM_IN + 1];
+   DSPPort output[NUM_OUT + 1];
+   DSPParam param[NUM_PARAM + 1];
 #else
-        DSPPort input[NUM_IN + 1] = {};
-        DSPPort output[NUM_OUT + 1] = {};
-        DSPParam param[NUM_PARAM] = {};
+   DSPPort input[NUM_IN] = {};
+   DSPPort output[NUM_OUT] = {};
+   DSPParam param[NUM_PARAM] = {};
 #endif
 
     float sr;
