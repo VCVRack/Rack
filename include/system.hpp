@@ -42,6 +42,7 @@ void openFolder(const std::string &path);
 The launched process will continue running if the current process is closed.
 */
 void runProcessAsync(const std::string &path);
+std::string getOperatingSystemInfo();
 
 
 } // namespace system

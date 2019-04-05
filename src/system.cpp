@@ -10,6 +10,7 @@
 	#include <sched.h>
 	#include <execinfo.h> // for backtrace and backtrace_symbols
 	#include <unistd.h> // for execl
+	#include <sys/utsname.h>
 #endif
 
 #if defined ARCH_WIN
@@ -186,6 +187,21 @@ void runProcessAsync(const std::string &path) {
 	CreateProcessA(path.c_str(), NULL,
 		NULL, NULL, false, 0, NULL, NULL,
 		&startupInfo, &processInfo);
+#endif
+}
+
+
+std::string getOperatingSystemInfo() {
+#if defined ARCH_LIN || defined ARCH_MAC
+	struct utsname u;
+	uname(&u);
+	return string::f("%s %s %s %s", u.sysname, u.release, u.version, u.machine);
+#elif defined ARCH_WIN
+	OSVERSIONINFOEX info;
+	ZeroMemory(&info, sizeof(info));
+	info.dwOSVersionInfoSize = sizeof(info);
+	GetVersionEx(&info);
+	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
 #endif
 }
 

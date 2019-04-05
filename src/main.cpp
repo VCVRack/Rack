@@ -100,6 +100,7 @@ int main(int argc, char *argv[]) {
 
 	// Log environment
 	INFO("%s v%s", app::APP_NAME, app::APP_VERSION);
+	INFO("%s", system::getOperatingSystemInfo().c_str());
 	if (settings::devMode)
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());

@@ -150,7 +150,6 @@ static bool loadPlugin(std::string path) {
 	for (Model *model : plugin->models) {
 		std::string presetDir = asset::plugin(plugin, "presets/" + model->slug);
 		for (const std::string &presetPath : system::listEntries(presetDir)) {
-			DEBUG("%s", presetPath.c_str());
 			model->presetPaths.push_back(presetPath);
 		}
 	}

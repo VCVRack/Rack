@@ -35,7 +35,7 @@ void ParamQuantity::setValue(float value) {
 float ParamQuantity::getValue() {
 	if (!module)
 		return 0.f;
-	return getParam()->getValue();
+	return APP->engine->getParam(module, paramId);
 }
 
 float ParamQuantity::getMinValue() {
