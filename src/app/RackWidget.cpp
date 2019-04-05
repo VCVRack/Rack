@@ -314,31 +314,36 @@ void RackWidget::pastePresetClipboardAction() {
 }
 
 static void RackWidget_updateAdjacent(RackWidget *that) {
-	// TODO This can be better than O(n^2)
 	for (widget::Widget *w : that->moduleContainer->children) {
-		ModuleWidget *m = dynamic_cast<ModuleWidget*>(w);
-		math::Vec pRight = m->box.getTopRight().div(RACK_GRID_SIZE).round();
-		bool found = false;
+		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
+		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
+		ModuleWidget *mwLeft = NULL;
+		ModuleWidget *mwRight = NULL;
 
+		// Find adjacent modules
 		for (widget::Widget *w2 : that->moduleContainer->children) {
-			ModuleWidget *m2 = dynamic_cast<ModuleWidget*>(w2);
-
-			if (m == m2)
+			if (w2 == w)
 				continue;
-			math::Vec p2 = m2->box.pos.div(RACK_GRID_SIZE).round();
 
-			// Check if m is to the left of m2
-			if (pRight.isEqual(p2)) {
-				m->module->rightModuleId = m2->module->id;
-				m2->module->leftModuleId = m->module->id;
-				found = true;
+			math::Vec p2Left = w2->box.pos.div(RACK_GRID_SIZE).round();
+			math::Vec p2Right = w2->box.getTopRight().div(RACK_GRID_SIZE).round();
+
+			// Check if this is a left module
+			if (p2Right.isEqual(pLeft)) {
+				mwLeft = dynamic_cast<ModuleWidget*>(w2);
+				break;
+			}
+
+			// Check if this is a right module
+			if (p2Left.isEqual(pRight)) {
+				mwRight = dynamic_cast<ModuleWidget*>(w2);
 				break;
 			}
 		}
 
-		if (!found) {
-			m->module->rightModuleId = -1;
-		}
+		ModuleWidget *mw = dynamic_cast<ModuleWidget*>(w);
+		mw->module->rightModuleId = mwRight ? mwRight->module->id : -1;
+		mw->module->leftModuleId = mwLeft ? mwLeft->module->id : -1;
 	}
 }
 
