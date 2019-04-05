@@ -49,10 +49,12 @@ json_t *Module::toJson() {
 	}
 
 	// leftModuleId
-	json_object_set_new(rootJ, "leftModuleId", json_integer(leftModuleId));
+	if (leftModuleId >= 0)
+		json_object_set_new(rootJ, "leftModuleId", json_integer(leftModuleId));
 
 	// rightModuleId
-	json_object_set_new(rootJ, "rightModuleId", json_integer(rightModuleId));
+	if (rightModuleId >= 0)
+		json_object_set_new(rootJ, "rightModuleId", json_integer(rightModuleId));
 
 	return rootJ;
 }
