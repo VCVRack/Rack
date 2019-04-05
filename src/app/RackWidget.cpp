@@ -350,6 +350,7 @@ static void RackWidget_updateAdjacent(RackWidget *that) {
 void RackWidget::addModule(ModuleWidget *m) {
 	// Add module to ModuleContainer
 	assert(m);
+	assert(m->box.size.y == RACK_GRID_HEIGHT);
 	moduleContainer->addChild(m);
 
 	if (m->module) {

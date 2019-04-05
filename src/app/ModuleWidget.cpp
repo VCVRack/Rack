@@ -393,7 +393,7 @@ void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
 	SvgPanel *svgPanel = new SvgPanel;
 	svgPanel->setBackground(svg);
 	addChild(svgPanel);
-	box.size.x = svgPanel->box.size.x;
+	box.size.x = std::round(svgPanel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 	panel = svgPanel;
 }
 
