@@ -197,10 +197,10 @@ std::string getOperatingSystemInfo() {
 	uname(&u);
 	return string::f("%s %s %s %s", u.sysname, u.release, u.version, u.machine);
 #elif defined ARCH_WIN
-	OSVERSIONINFOEX info;
+	OSVERSIONINFOA info;
 	ZeroMemory(&info, sizeof(info));
 	info.dwOSVersionInfoSize = sizeof(info);
-	GetVersionEx(&info);
+	GetVersionExA(&info);
 	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
 #endif
 }
