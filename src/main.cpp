@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 #if defined ARCH_WIN
 	// Windows global mutex to prevent multiple instances
 	// Handle will be closed by Windows when the process ends
-	HANDLE instanceMutex = CreateMutex(NULL, true, app::APP_NAME);
+	HANDLE instanceMutex = CreateMutexA(NULL, true, app::APP_NAME);
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
 		exit(1);

@@ -85,7 +85,9 @@ void copyFile(const std::string &srcPath, const std::string &destPath) {
 
 void createDirectory(const std::string &path) {
 #if defined ARCH_WIN
-	CreateDirectory(path.c_str(), NULL);
+	wchar_t pathW[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, pathW, LENGTHOF(pathW));
+	CreateDirectoryW(pathW, NULL);
 #else
 	mkdir(path.c_str(), 0755);
 #endif
@@ -160,7 +162,9 @@ void openBrowser(const std::string &url) {
 	std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	wchar_t urlW[1024];
+	MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, urlW, LENGTHOF(urlW));
+	ShellExecuteW(NULL, L"open", urlW, NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
@@ -170,21 +174,25 @@ void openFolder(const std::string &path) {
 	(void) std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	ShellExecute(NULL, "explorer", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	wchar_t pathW[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, pathW, LENGTHOF(pathW));
+	ShellExecuteW(NULL, L"explorer", pathW, NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
 
 void runProcessAsync(const std::string &path) {
 #if defined ARCH_WIN
-	STARTUPINFO startupInfo;
+	STARTUPINFOW startupInfo;
 	PROCESS_INFORMATION processInfo;
 
 	std::memset(&startupInfo, 0, sizeof(startupInfo));
 	startupInfo.cb = sizeof(startupInfo);
 	std::memset(&processInfo, 0, sizeof(processInfo));
 
-	CreateProcessA(path.c_str(), NULL,
+	wchar_t pathW[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, pathW, LENGTHOF(pathW));
+	CreateProcessW(pathW, NULL,
 		NULL, NULL, false, 0, NULL, NULL,
 		&startupInfo, &processInfo);
 #endif
@@ -197,10 +205,10 @@ std::string getOperatingSystemInfo() {
 	uname(&u);
 	return string::f("%s %s %s %s", u.sysname, u.release, u.version, u.machine);
 #elif defined ARCH_WIN
-	OSVERSIONINFOA info;
+	OSVERSIONINFOW info;
 	ZeroMemory(&info, sizeof(info));
 	info.dwOSVersionInfoSize = sizeof(info);
-	GetVersionExA(&info);
+	GetVersionExW(&info);
 	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
 #endif
 }

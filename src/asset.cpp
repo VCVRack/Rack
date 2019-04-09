@@ -43,10 +43,18 @@ void init() {
 			systemDir = resourcesBuf;
 #endif
 #if defined ARCH_WIN
-			char moduleBuf[MAX_PATH];
-			DWORD length = GetModuleFileName(NULL, moduleBuf, sizeof(moduleBuf));
+			// Get path to executable
+			wchar_t moduleBufW[MAX_PATH];
+			DWORD length = GetModuleFileNameW(NULL, moduleBufW, LENGTHOF(moduleBufW));
 			assert(length > 0);
-			PathRemoveFileSpec(moduleBuf);
+			// Get folder of executable
+			PathRemoveFileSpecW(moduleBufW);
+			// Convert to short path to avoid Unicode
+			wchar_t moduleBufShortW[MAX_PATH];
+			GetShortPathNameW(moduleBufW, moduleBufShortW, LENGTHOF(moduleBufShortW));
+			// Convert to UTF-8.
+			char moduleBuf[MAX_PATH];
+			WideCharToMultiByte(CP_UTF8, 0, moduleBufShortW, -1, moduleBuf, sizeof(moduleBuf), NULL, NULL);
 			systemDir = moduleBuf;
 #endif
 #if defined ARCH_LIN
@@ -64,9 +72,15 @@ void init() {
 		else {
 #if defined ARCH_WIN
 			// Get "My Documents" folder
+			wchar_t documentsBufW[MAX_PATH] = L".";
+			HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
+			// assert(result == S_OK);
+			// Convert to short path to avoid Unicode
+			wchar_t documentsBufShortW[MAX_PATH];
+			GetShortPathNameW(documentsBufW, documentsBufShortW, LENGTHOF(documentsBufShortW));
+			// Convert to UTF-8.
 			char documentsBuf[MAX_PATH];
-			HRESULT result = SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBuf);
-			assert(result == S_OK);
+			WideCharToMultiByte(CP_UTF8, 0, documentsBufShortW, -1, documentsBuf, sizeof(documentsBuf), NULL, NULL);
 			userDir = documentsBuf;
 			userDir += "/Rack";
 #endif
