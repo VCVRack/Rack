@@ -1,6 +1,7 @@
 #include "asset.hpp"
 #include "system.hpp"
 #include "settings.hpp"
+#include "string.hpp"
 #include "plugin/Plugin.hpp"
 
 #if defined ARCH_MAC
@@ -52,10 +53,7 @@ void init() {
 			// Convert to short path to avoid Unicode
 			wchar_t moduleBufShortW[MAX_PATH];
 			GetShortPathNameW(moduleBufW, moduleBufShortW, LENGTHOF(moduleBufShortW));
-			// Convert to UTF-8.
-			char moduleBuf[MAX_PATH];
-			WideCharToMultiByte(CP_UTF8, 0, moduleBufShortW, -1, moduleBuf, sizeof(moduleBuf), NULL, NULL);
-			systemDir = moduleBuf;
+			systemDir = string::fromWstring(moduleBufShortW);
 #endif
 #if defined ARCH_LIN
 			// Users should launch Rack from their terminal in the system directory
@@ -74,14 +72,11 @@ void init() {
 			// Get "My Documents" folder
 			wchar_t documentsBufW[MAX_PATH] = L".";
 			HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
-			// assert(result == S_OK);
+			assert(result == S_OK);
 			// Convert to short path to avoid Unicode
 			wchar_t documentsBufShortW[MAX_PATH];
 			GetShortPathNameW(documentsBufW, documentsBufShortW, LENGTHOF(documentsBufShortW));
-			// Convert to UTF-8.
-			char documentsBuf[MAX_PATH];
-			WideCharToMultiByte(CP_UTF8, 0, documentsBufShortW, -1, documentsBuf, sizeof(documentsBuf), NULL, NULL);
-			userDir = documentsBuf;
+			userDir = string::fromWstring(documentsBufShortW);
 			userDir += "/Rack";
 #endif
 #if defined ARCH_MAC

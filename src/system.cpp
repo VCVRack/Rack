@@ -85,9 +85,8 @@ void copyFile(const std::string &srcPath, const std::string &destPath) {
 
 void createDirectory(const std::string &path) {
 #if defined ARCH_WIN
-	wchar_t pathW[MAX_PATH];
-	MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, pathW, LENGTHOF(pathW));
-	CreateDirectoryW(pathW, NULL);
+	std::wstring pathW = string::toWstring(path);
+	CreateDirectoryW(pathW.c_str(), NULL);
 #else
 	mkdir(path.c_str(), 0755);
 #endif
@@ -162,9 +161,8 @@ void openBrowser(const std::string &url) {
 	std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	wchar_t urlW[1024];
-	MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, urlW, LENGTHOF(urlW));
-	ShellExecuteW(NULL, L"open", urlW, NULL, NULL, SW_SHOWNORMAL);
+	std::wstring urlW = string::toWstring(url);
+	ShellExecuteW(NULL, L"open", urlW.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
@@ -174,9 +172,8 @@ void openFolder(const std::string &path) {
 	(void) std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	wchar_t pathW[MAX_PATH];
-	MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, pathW, LENGTHOF(pathW));
-	ShellExecuteW(NULL, L"explorer", pathW, NULL, NULL, SW_SHOWNORMAL);
+	std::wstring pathW = string::toWstring(path);
+	ShellExecuteW(NULL, L"explorer", pathW.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
 }
 
@@ -190,9 +187,8 @@ void runProcessAsync(const std::string &path) {
 	startupInfo.cb = sizeof(startupInfo);
 	std::memset(&processInfo, 0, sizeof(processInfo));
 
-	wchar_t pathW[MAX_PATH];
-	MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, pathW, LENGTHOF(pathW));
-	CreateProcessW(pathW, NULL,
+	std::wstring pathW = string::toWstring(path);
+	CreateProcessW(pathW.c_str(), NULL,
 		NULL, NULL, false, 0, NULL, NULL,
 		&startupInfo, &processInfo);
 #endif

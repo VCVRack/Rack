@@ -1,4 +1,6 @@
 #include "string.hpp"
+#include <locale> // for wstring_convert
+#include <codecvt> // for codecvt_utf8_utf16
 #include <cctype> // for tolower and toupper
 #include <algorithm> // for transform
 #include <libgen.h> // for dirname and basename
@@ -7,6 +9,16 @@
 namespace rack {
 namespace string {
 
+
+std::string fromWstring(const std::wstring &s) {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.to_bytes(s);
+}
+
+std::wstring toWstring(const std::string &s) {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.from_bytes(s);
+}
 
 std::string f(const char *format, ...) {
 	va_list args;
