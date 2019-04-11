@@ -120,7 +120,7 @@ template <class TParamWidget>
 DEPRECATED TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *o = createParam<TParamWidget>(pos, module, paramId);
 	if (module) {
-		module->configParam(paramId, minValue, maxValue, defaultValue)
+		module->configParam(paramId, minValue, maxValue, defaultValue);
 	}
 	return o;
 }
