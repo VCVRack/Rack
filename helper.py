@@ -407,7 +407,7 @@ struct {identifier} : Module {{"""
 
 	for c in components['params']:
 		source += f"""
-		params[{c['name']}_PARAM].config(0.f, 1.f, 0.f, "");"""
+		configParam({c['name']}_PARAM, 0.f, 1.f, 0.f, "");"""
 
 	source += """
 	}

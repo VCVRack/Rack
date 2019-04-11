@@ -151,6 +151,10 @@ struct Counter {
 		reset();
 	}
 
+	int getCount() {
+		return count;
+	}
+
 	/** Returns true when the counter reaches `period` and resets. */
 	bool process() {
 		count++;
