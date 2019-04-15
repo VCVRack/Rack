@@ -331,13 +331,11 @@ static void RackWidget_updateAdjacent(RackWidget *that) {
 			// Check if this is a left module
 			if (p2Right.isEqual(pLeft)) {
 				mwLeft = dynamic_cast<ModuleWidget*>(w2);
-				break;
 			}
 
 			// Check if this is a right module
 			if (p2Left.isEqual(pRight)) {
 				mwRight = dynamic_cast<ModuleWidget*>(w2);
-				break;
 			}
 		}
 
