@@ -11,7 +11,7 @@ However, a free commercial license is available for plugins sold through the [VC
 Email contact@vcvrack.com for more information about licensing or the VCV Store.
 
 The **Core panel graphics** in the `res/Core` directory are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
-You may not create derivative works of these graphics.
+You may not create modified adaptations of these graphics.
 
 The **VCV logo and icon** are copyright © 2017 Andrew Belt and may not be used in derivative works.
 
