@@ -44,6 +44,10 @@ struct ModulePluginItem : ui::MenuItem {
 	ui::Menu *createChildMenu() override {
 		ui::Menu *menu = new ui::Menu;
 
+		ui::MenuLabel *pluginLabel = new ui::MenuLabel;
+		pluginLabel->text = plugin->name;
+		menu->addChild(pluginLabel);
+
 		ui::MenuLabel *versionLabel = new ui::MenuLabel;
 		versionLabel->text = "v" + plugin->version;
 		menu->addChild(versionLabel);
@@ -774,7 +778,7 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(modelLabel);
 
 	ModulePluginItem *pluginItem = new ModulePluginItem;
-	pluginItem->text = model->plugin->name;
+	pluginItem->text = "Plugin";
 	pluginItem->rightText = RIGHT_ARROW;
 	pluginItem->plugin = model->plugin;
 	menu->addChild(pluginItem);

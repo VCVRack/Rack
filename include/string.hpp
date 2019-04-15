@@ -24,6 +24,7 @@ std::string uppercase(const std::string &s);
 std::string trim(const std::string &s);
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
 std::string ellipsize(const std::string &s, size_t len);
+std::string ellipsizePrefix(const std::string &s, size_t len);
 bool startsWith(const std::string &str, const std::string &prefix);
 bool endsWith(const std::string &str, const std::string &suffix);
 /** Extracts portions of a path */

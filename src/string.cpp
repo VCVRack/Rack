@@ -67,6 +67,13 @@ std::string ellipsize(const std::string &s, size_t len) {
 		return s.substr(0, len - 3) + "...";
 }
 
+std::string ellipsizePrefix(const std::string &s, size_t len) {
+	if (s.size() <= len)
+		return s;
+	else
+		return "..." + s.substr(s.size() - (len - 3));
+}
+
 bool startsWith(const std::string &str, const std::string &prefix) {
 	return str.substr(0, prefix.size()) == prefix;
 }

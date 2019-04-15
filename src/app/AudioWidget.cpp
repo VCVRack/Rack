@@ -124,14 +124,14 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 			AudioSampleRateItem *item = new AudioSampleRateItem;
 			item->port = port;
 			item->sampleRate = sampleRate;
-			item->text = string::f("%d Hz", sampleRate);
+			item->text = string::f("%g kHz", sampleRate / 1000.0);
 			item->rightText = CHECKMARK(item->sampleRate == port->sampleRate);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
 		if (port)
-			text = string::f("%g kHz", port->sampleRate / 1000.f);
+			text = string::f("%g kHz", port->sampleRate / 1000.0);
 		else
 			text = "44.1 kHz";
 	}

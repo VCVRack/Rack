@@ -300,10 +300,11 @@ struct SampleRateItem : ui::MenuItem {
 
 				SampleRateValueItem *item = new SampleRateValueItem;
 				item->sampleRate = sampleRate;
-				item->text = string::f("%.0f Hz", sampleRate);
+				item->text = string::f("%g kHz", sampleRate / 1000.0);
 				if (oversample > 1)
-					item->text += string::f(" (%dx)", oversample);
-				item->rightText = CHECKMARK(APP->engine->getSampleRate() == sampleRate);
+					item->rightText += string::f("(%dx)", oversample);
+				item->rightText += " ";
+				item->rightText += CHECKMARK(APP->engine->getSampleRate() == sampleRate);
 				menu->addChild(item);
 			}
 		}
