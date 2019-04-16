@@ -2,6 +2,7 @@
 #include "app/common.hpp"
 #include "widget/OpaqueWidget.hpp"
 #include "widget/FramebufferWidget.hpp"
+#include "app/CircularShadow.hpp"
 #include "widget/SvgWidget.hpp"
 
 
@@ -11,6 +12,7 @@ namespace app {
 
 struct SvgButton : widget::OpaqueWidget {
 	widget::FramebufferWidget *fb;
+	CircularShadow *shadow;
 	widget::SvgWidget *sw;
 	std::vector<std::shared_ptr<Svg>> frames;
 

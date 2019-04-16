@@ -9,6 +9,10 @@ SvgButton::SvgButton() {
 	fb = new widget::FramebufferWidget;
 	addChild(fb);
 
+	shadow = new CircularShadow;
+	fb->addChild(shadow);
+	shadow->box.size = math::Vec();
+
 	sw = new widget::SvgWidget;
 	fb->addChild(sw);
 }
@@ -20,6 +24,9 @@ void SvgButton::addFrame(std::shared_ptr<Svg> svg) {
 		sw->setSvg(svg);
 		box.size = sw->box.size;
 		fb->box.size = sw->box.size;
+		// Move shadow downward by 10%
+		shadow->box.size = sw->box.size;
+		shadow->box.pos = math::Vec(0, sw->box.size.y * 0.10);
 	}
 }
 

@@ -162,7 +162,7 @@ struct ModuleLoadItem : ui::MenuItem {
 };
 
 
-struct ModulePresetItem : ui::MenuItem {
+struct ModulePresetPathItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	std::string presetPath;
 	void onAction(const widget::ActionEvent &e) override {
@@ -171,18 +171,45 @@ struct ModulePresetItem : ui::MenuItem {
 };
 
 
-struct ModuleListPresetsItem : ui::MenuItem {
+struct ModulePresetItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	ui::Menu *createChildMenu() override {
 		ui::Menu *menu = new ui::Menu;
 
-		for (const std::string &presetPath : moduleWidget->model->presetPaths) {
-			ModulePresetItem *presetItem = new ModulePresetItem;
-			std::string presetName = string::basename(string::filename(presetPath));
-			presetItem->text = presetName;
-			presetItem->presetPath = presetPath;
-			presetItem->moduleWidget = moduleWidget;
-			menu->addChild(presetItem);
+		ModuleCopyItem *copyItem = new ModuleCopyItem;
+		copyItem->text = "Copy";
+		copyItem->rightText = WINDOW_MOD_CTRL_NAME "+C";
+		copyItem->moduleWidget = moduleWidget;
+		menu->addChild(copyItem);
+
+		ModulePasteItem *pasteItem = new ModulePasteItem;
+		pasteItem->text = "Paste";
+		pasteItem->rightText = WINDOW_MOD_CTRL_NAME "+V";
+		pasteItem->moduleWidget = moduleWidget;
+		menu->addChild(pasteItem);
+
+		ModuleLoadItem *loadItem = new ModuleLoadItem;
+		loadItem->text = "Open";
+		loadItem->moduleWidget = moduleWidget;
+		menu->addChild(loadItem);
+
+		ModuleSaveItem *saveItem = new ModuleSaveItem;
+		saveItem->text = "Save as";
+		saveItem->moduleWidget = moduleWidget;
+		menu->addChild(saveItem);
+
+		if (!moduleWidget->model->presetPaths.empty()) {
+			menu->addChild(new MenuEntry);
+			menu->addChild(createMenuLabel("Factory presets"));
+
+			for (const std::string &presetPath : moduleWidget->model->presetPaths) {
+				ModulePresetPathItem *presetItem = new ModulePresetPathItem;
+				std::string presetName = string::basename(string::filename(presetPath));
+				presetItem->text = presetName;
+				presetItem->presetPath = presetPath;
+				presetItem->moduleWidget = moduleWidget;
+				menu->addChild(presetItem);
+			}
 		}
 
 		return menu;
@@ -783,6 +810,12 @@ void ModuleWidget::createContextMenu() {
 	pluginItem->plugin = model->plugin;
 	menu->addChild(pluginItem);
 
+	ModulePresetItem *presetsItem = new ModulePresetItem;
+	presetsItem->text = "Presets";
+	presetsItem->rightText = RIGHT_ARROW;
+	presetsItem->moduleWidget = this;
+	menu->addChild(presetsItem);
+
 	ModuleResetItem *resetItem = new ModuleResetItem;
 	resetItem->text = "Initialize";
 	resetItem->rightText = WINDOW_MOD_CTRL_NAME "+I";
@@ -806,36 +839,6 @@ void ModuleWidget::createContextMenu() {
 	cloneItem->rightText = WINDOW_MOD_CTRL_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
-
-	if (!model->presetPaths.empty()) {
-		ModuleListPresetsItem *presetsItem = new ModuleListPresetsItem;
-		presetsItem->text = "Factory presets";
-		presetsItem->rightText = RIGHT_ARROW;
-		presetsItem->moduleWidget = this;
-		menu->addChild(presetsItem);
-	}
-
-	ModuleCopyItem *copyItem = new ModuleCopyItem;
-	copyItem->text = "Copy preset";
-	copyItem->rightText = WINDOW_MOD_CTRL_NAME "+C";
-	copyItem->moduleWidget = this;
-	menu->addChild(copyItem);
-
-	ModulePasteItem *pasteItem = new ModulePasteItem;
-	pasteItem->text = "Paste preset";
-	pasteItem->rightText = WINDOW_MOD_CTRL_NAME "+V";
-	pasteItem->moduleWidget = this;
-	menu->addChild(pasteItem);
-
-	ModuleLoadItem *loadItem = new ModuleLoadItem;
-	loadItem->text = "Open preset";
-	loadItem->moduleWidget = this;
-	menu->addChild(loadItem);
-
-	ModuleSaveItem *saveItem = new ModuleSaveItem;
-	saveItem->text = "Save preset as";
-	saveItem->moduleWidget = this;
-	menu->addChild(saveItem);
 
 	ModuleBypassItem *bypassItem = new ModuleBypassItem;
 	bypassItem->text = "Disable";

@@ -12,8 +12,8 @@ namespace app {
 
 struct SvgPort : PortWidget {
 	widget::FramebufferWidget *fb;
-	widget::SvgWidget *sw;
 	CircularShadow *shadow;
+	widget::SvgWidget *sw;
 
 	SvgPort();
 	void setSvg(std::shared_ptr<Svg> svg);
