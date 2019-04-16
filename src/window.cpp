@@ -354,27 +354,29 @@ void Window::run() {
 
 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
 		// Resize scene
-		APP->event->rootWidget->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
+		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
 
 		// Step scene
-		APP->event->rootWidget->step();
+		APP->scene->step();
 
 		// Render scene
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
 		if (visible) {
+			glViewport(0, 0, fbWidth, fbHeight);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 			// Update and render
 			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
 			nvgReset(vg);
 			nvgScale(vg, pixelRatio, pixelRatio);
 
+			// Draw scene
 			widget::Widget::DrawArgs args;
 			args.vg = vg;
-			args.clipBox = APP->event->rootWidget->box.zeroPos();
-			APP->event->rootWidget->draw(args);
+			args.clipBox = APP->scene->box.zeroPos();
+			APP->scene->draw(args);
 
-			glViewport(0, 0, fbWidth, fbHeight);
-			glClearColor(0.0, 0.0, 0.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			nvgEndFrame(vg);
 
 			glfwSwapBuffers(win);

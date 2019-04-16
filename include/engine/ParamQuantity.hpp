@@ -27,8 +27,8 @@ struct ParamQuantity : Quantity {
 	*/
 	std::string label;
 	/** The numerical unit of measurement appended to the value.
-	Units that are words should have a space to separate the numerical value from the number (e.g. " semitones", " octaves").
-	Unit abbreviations and symbols should have no space (e.g. "V", "ms", "%", "º").
+	Unit words and abbreviations should have a space to separate the numerical value from the number (e.g. " semitones", " V", " ms").
+	Unit symbols should have no space (e.g. "%", "º").
 	*/
 	std::string unit;
 	/** Set to 0 for linear, positive for exponential, negative for logarithmic. */
