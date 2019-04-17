@@ -49,7 +49,7 @@ RACK_PLUGIN_DECLARE($(PLUGINNAME));
 5. Rewrite the static modules initializations (`Model *model$(MODULENAME)> = Model::create<..>(..);`) as functions:
 ~~~
 RACK_PLUGIN_MODEL_INIT($(PLUGINNAME), $(MODULENAME)) {
-   Model *model = Model::create<$(MODULENAME), $(MODULENAME)Widget>("cf", "$(MODULENAME)", "$(MODULEDISPLAYNAME)", ..);
+   Model *model = Model::create<$(MODULENAME), $(MODULENAME)Widget>($(PLUGINNAME), "$(MODULENAME)", "$(MODULEDISPLAYNAME)", ..);
    return model;
 }
 ~~~
