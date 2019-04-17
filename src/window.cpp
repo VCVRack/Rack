@@ -362,10 +362,6 @@ void Window::run() {
 		// Render scene
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
 		if (visible) {
-			glViewport(0, 0, fbWidth, fbHeight);
-			glClearColor(0.0, 0.0, 0.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 			// Update and render
 			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
 			nvgReset(vg);
@@ -377,6 +373,9 @@ void Window::run() {
 			args.clipBox = APP->scene->box.zeroPos();
 			APP->scene->draw(args);
 
+			glViewport(0, 0, fbWidth, fbHeight);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			nvgEndFrame(vg);
 
 			glfwSwapBuffers(win);
