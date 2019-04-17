@@ -8,7 +8,7 @@
 
 1. Either clone the GitHub repo OR download the [precompiled plugin SDK](README.md#dynamically-loaded-plugins-via-plugin-sdk)
 
-2. Study the [template_shared](plugins/community/repos/Template_shared) example plugin (also included in the plugin SDK) (you may also want to take a look at my `bsp` plugin, which is also loaded dynamically). Also take a look at `include/plugin.hpp`.
+2. Study the [template_shared](plugins/community/repos/Template_shared) example plugin (also included in the plugin SDK) (you may also want to take a look at my `bsp` plugin, which is also loaded dynamically). Also take a look at [include/plugin.hpp](include/plugin.hpp).
 
 3. Develop your module (!). Don't forget to pick a suitable license, e.g. [MIT](https://opensource.org/licenses/MIT)
 
