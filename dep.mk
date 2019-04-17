@@ -35,6 +35,8 @@ else
 endif
 SHA256 := sha256check() { echo "$$2  $$1" | $(SHA256SUM) -c; }; sha256check
 
+SED := perl -pi -e
+
 # Export environment for all dependency targets
 $(DEPS): export CFLAGS = $(DEP_CFLAGS)
 $(DEPS): export CXXFLAGS = $(DEP_CXXFLAGS)
