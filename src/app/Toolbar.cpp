@@ -364,7 +364,7 @@ struct SettingsButton : MenuButton {
 		menu->addChild(paramTooltipItem);
 
 		CpuMeterItem *cpuMeterItem = new CpuMeterItem;
-		cpuMeterItem->text = "CPU timer";
+		cpuMeterItem->text = "DSP engine timer";
 		cpuMeterItem->rightText = CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);
 
