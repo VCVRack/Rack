@@ -96,20 +96,18 @@ std::string filename(const std::string &path) {
 	return filename;
 }
 
-// libgen.h defines a `basename` macro
-#undef basename
-std::string basename(const std::string &path) {
-	size_t pos = path.rfind('.');
+std::string filenameBase(const std::string &filename) {
+	size_t pos = filename.rfind('.');
 	if (pos == std::string::npos)
-		return path;
-	return std::string(path, 0, pos);
+		return filename;
+	return std::string(filename, 0, pos);
 }
 
-std::string extension(const std::string &path) {
-	size_t pos = path.rfind('.');
+std::string filenameExtension(const std::string &filename) {
+	size_t pos = filename.rfind('.');
 	if (pos == std::string::npos)
 		return "";
-	return std::string(path, pos + 1);
+	return std::string(filename, pos + 1);
 }
 
 

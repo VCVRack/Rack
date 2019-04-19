@@ -27,13 +27,26 @@ std::string ellipsize(const std::string &s, size_t len);
 std::string ellipsizePrefix(const std::string &s, size_t len);
 bool startsWith(const std::string &str, const std::string &prefix);
 bool endsWith(const std::string &str, const std::string &suffix);
-/** Extracts portions of a path */
+/** Extracts the directory of the path.
+Example: directory("dir/file.txt") // "dir"
+Calls POSIX dirname().
+*/
 std::string directory(const std::string &path);
+/** Extracts the filename of the path.
+Example: directory("dir/file.txt") // "file.txt"
+Calls POSIX basename().
+*/
 std::string filename(const std::string &path);
-/** Extracts the portion of a path without the extension */
-std::string basename(const std::string &path);
-/** Extracts the extension of a path */
-std::string extension(const std::string &path);
+/** Extracts the portion of a filename without the extension.
+Example: filenameBase("file.txt") // "file"
+Note: Only works on filenames. Call filename(path) to get the filename of the path.
+*/
+std::string filenameBase(const std::string &filename);
+/** Extracts the extension of a filename.
+Example: filenameExtension("file.txt") // "txt"
+Note: Only works on filenames. Call filename(path) to get the filename of the path.
+*/
+std::string filenameExtension(const std::string &filename);
 /** Scores how well a query matches a string.
 A score of 0 means no match.
 The score is arbitrary and is only meaningful for sorting.

@@ -204,7 +204,7 @@ struct ModulePresetItem : ui::MenuItem {
 
 			for (const std::string &presetPath : moduleWidget->model->presetPaths) {
 				ModulePresetPathItem *presetItem = new ModulePresetPathItem;
-				std::string presetName = string::basename(string::filename(presetPath));
+				std::string presetName = string::filenameBase(string::filename(presetPath));
 				presetItem->text = presetName;
 				presetItem->presetPath = presetPath;
 				presetItem->moduleWidget = moduleWidget;
@@ -662,7 +662,7 @@ void ModuleWidget::saveDialog() {
 	});
 
 	std::string pathStr = path;
-	std::string extension = string::extension(pathStr);
+	std::string extension = string::filenameExtension(string::filename(pathStr));
 	if (extension.empty()) {
 		pathStr += ".vcvm";
 	}

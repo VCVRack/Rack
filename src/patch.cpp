@@ -130,7 +130,7 @@ void PatchManager::saveAsDialog() {
 	});
 
 	std::string pathStr = pathC;
-	if (string::extension(pathStr).empty()) {
+	if (string::filenameExtension(pathStr).empty()) {
 		pathStr += ".vcv";
 	}
 

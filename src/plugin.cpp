@@ -324,7 +324,7 @@ static void extractPackages(const std::string &path) {
 	std::string message;
 
 	for (std::string packagePath : system::listEntries(path)) {
-		if (string::extension(packagePath) != "zip")
+		if (string::filenameExtension(packagePath) != "zip")
 			continue;
 		INFO("Extracting package %s", packagePath.c_str());
 		// Extract package

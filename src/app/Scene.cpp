@@ -135,7 +135,7 @@ void Scene::onHoverKey(const widget::HoverKeyEvent &e) {
 void Scene::onPathDrop(const widget::PathDropEvent &e) {
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
-		if (string::extension(path) == "vcv") {
+		if (string::filenameExtension(string::filename(path)) == "vcv") {
 			APP->patch->load(path);
 			e.consume(this);
 		}
