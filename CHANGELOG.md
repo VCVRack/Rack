@@ -14,7 +14,7 @@
 - Added parameter tooltips for quickly viewing parameter values
 - Added parameter context menu for entering numerical values, unmapping, etc
 - Changed parameter initialization to double-click
-- Added undo history
+- Added undo/redo history
 - Added GlWidget for rendering to an OpenGL context
 - Added ability to disable modules with a context menu item and key command
 - Added default template patch

@@ -15,32 +15,32 @@ namespace math {
 // basic integer functions
 ////////////////////
 
-/** Returns true if x is odd. */
+/** Returns true if `x` is odd. */
 inline bool isEven(int x) {
 	return x % 2 == 0;
 }
 
-/** Returns true if x is odd. */
+/** Returns true if `x` is odd. */
 inline bool isOdd(int x) {
 	return x % 2 != 0;
 }
 
 /** Limits `x` between `a` and `b`.
-If b < a, returns a.
+If `b < a`, returns a.
 */
 inline int clamp(int x, int a, int b) {
 	return std::max(std::min(x, b), a);
 }
 
 /** Limits `x` between `a` and `b`.
-If b < a, switches the two values.
+If `b < a`, switches the two values.
 */
 inline int clampSafe(int x, int a, int b) {
 	return clamp(x, std::min(a, b), std::max(a, b));
 }
 
-/** Euclidean modulus. Always returns 0 <= mod < b.
-b must be positive.
+/** Euclidean modulus. Always returns `0 <= mod < b`.
+`b` must be positive.
 See https://en.wikipedia.org/wiki/Euclidean_division
 */
 inline int eucMod(int a, int b) {
@@ -52,7 +52,7 @@ inline int eucMod(int a, int b) {
 }
 
 /** Euclidean division.
-b must be positive.
+`b` must be positive.
 */
 inline int eucDiv(int a, int b) {
 	int div = a / b;
@@ -72,7 +72,7 @@ inline void eucDivMod(int a, int b, int *div, int *mod) {
 	}
 }
 
-/** Returns floor(log_2(n)), or 0 if n == 1. */
+/** Returns `floor(log_2(n))`, or 0 if `n == 1`. */
 inline int log2(int n) {
 	int i = 0;
 	while (n >>= 1) {
@@ -91,14 +91,14 @@ inline bool isPow2(int n) {
 ////////////////////
 
 /** Limits `x` between `a` and `b`.
-If b < a, returns a.
+If `b < a`, returns a.
 */
 inline float clamp(float x, float a, float b) {
 	return std::fmax(std::fmin(x, b), a);
 }
 
 /** Limits `x` between `a` and `b`.
-If b < a, switches the two values.
+If `b < a`, switches the two values.
 */
 inline float clampSafe(float x, float a, float b) {
 	return clamp(x, std::fmin(a, b), std::fmax(a, b));
@@ -116,7 +116,7 @@ inline float normalizeZero(float x) {
 	return x + 0.f;
 }
 
-/** Euclidean modulus. Always returns 0 <= mod < b.
+/** Euclidean modulus. Always returns `0 <= mod < b`.
 See https://en.wikipedia.org/wiki/Euclidean_division.
 */
 inline float eucMod(float a, float base) {
@@ -124,12 +124,12 @@ inline float eucMod(float a, float base) {
 	return (mod >= 0.f) ? mod : mod + base;
 }
 
-/** Returns whether a is within epsilon distance from b. */
+/** Returns whether `a` is within epsilon distance from `b`. */
 inline bool isNear(float a, float b, float epsilon = 1e-6f) {
 	return std::fabs(a - b) <= epsilon;
 }
 
-/** If the magnitude of x if less than epsilon, return 0. */
+/** If the magnitude of `x` if less than epsilon, return 0. */
 inline float chop(float x, float epsilon = 1e-6f) {
 	return isNear(x, 0.f, epsilon) ? 0.f : x;
 }
@@ -143,7 +143,7 @@ inline float crossfade(float a, float b, float p) {
 }
 
 /** Linearly interpolates an array `p` with index `x`.
-Assumes that the array at `p` is of length at least floor(x)+1.
+Assumes that the array at `p` is of length at least `floor(x) + 1`.
 */
 inline float interpolateLinear(const float *p, float x) {
 	int xi = x;
@@ -151,9 +151,11 @@ inline float interpolateLinear(const float *p, float x) {
 	return crossfade(p[xi], p[xi+1], xf);
 }
 
-/** Complex multiplies c = a * b.
+/** Complex multiplication `c = a * b`.
 Arguments may be the same pointers.
-i.e. cmultf(&ar, &ai, ar, ai, br, bi)
+Example:
+
+	cmultf(&ar, &ai, ar, ai, br, bi);
 */
 inline void complexMult(float *cr, float *ci, float ar, float ai, float br, float bi) {
 	*cr = ar * br - ai * bi;
@@ -174,7 +176,7 @@ struct Vec {
 	Vec(float x, float y) : x(x), y(y) {}
 
 	/** Negates the vector.
-	Equivalent to a reflection across the y=-x line.
+	Equivalent to a reflection across the `y = -x` line.
 	*/
 	Vec neg() const {
 		return Vec(-x, -y);
@@ -213,7 +215,7 @@ struct Vec {
 		return Vec(x * cos - y * sin, x * sin + y * cos);
 	}
 	/** Swaps the coordinates.
-	Equivalent to a reflection across the y=x line.
+	Equivalent to a reflection across the `y = x` line.
 	*/
 	Vec flip() const {
 		return Vec(y, x);
