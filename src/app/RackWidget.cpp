@@ -172,6 +172,15 @@ json_t *RackWidget::toJson() {
 	// root
 	json_t *rootJ = json_object();
 
+	// Get module offset so modules are aligned to (0, 0) when the patch is loaded.
+	math::Vec moduleOffset = math::Vec(INFINITY, INFINITY);
+	for (widget::Widget *w : moduleContainer->children) {
+		moduleOffset = moduleOffset.min(w->box.pos);
+	}
+	if (moduleContainer->children.empty()) {
+		moduleOffset = RACK_OFFSET;
+	}
+
 	// modules
 	json_t *modulesJ = json_array();
 	for (widget::Widget *w : moduleContainer->children) {
@@ -183,7 +192,7 @@ json_t *RackWidget::toJson() {
 			// id
 			json_object_set_new(moduleJ, "id", json_integer(moduleWidget->module->id));
 			// pos
-			math::Vec pos = moduleWidget->box.pos.minus(RACK_OFFSET);
+			math::Vec pos = moduleWidget->box.pos.minus(moduleOffset);
 			pos = pos.div(RACK_GRID_SIZE).round();
 			json_t *posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
 			json_object_set_new(moduleJ, "pos", posJ);
