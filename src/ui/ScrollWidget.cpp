@@ -96,6 +96,10 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 	if (e.isConsumed())
 		return;
 
+	// Scroll only if the scrollbars are visible
+	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+		return;
+
 	math::Vec scrollDelta = e.scrollDelta;
 	// Flip coordinates if shift is held
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
