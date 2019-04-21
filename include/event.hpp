@@ -95,8 +95,7 @@ struct TextBase {
 
 
 /** Occurs every frame when the mouse is hovering over a Widget.
-Recurses until consumed.
-If `target` is set, other events may occur on that Widget.
+Recurses.
 */
 struct Hover : Base, PositionBase {
 	/** Change in mouse position since the last frame. Can be zero. */
@@ -105,8 +104,7 @@ struct Hover : Base, PositionBase {
 
 
 /** Occurs each mouse button press or release.
-Recurses until consumed.
-If `target` is set, other events may occur on that Widget.
+Recurses.
 */
 struct Button : Base, PositionBase {
 	/** GLFW_MOUSE_BUTTON_LEFT, GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOUSE_BUTTON_MIDDLE, etc. */
@@ -118,28 +116,29 @@ struct Button : Base, PositionBase {
 };
 
 
-/** Occurs when the left mouse button is pressed the second time within a time and position window.
+/** Occurs when the left mouse button is pressed a second time on the same Widget within a time duration.
+Must set the Button target to receive this event.
 */
 struct DoubleClick : Base {
 };
 
 
 /** Occurs when a key is pressed, released, or repeated while the mouse is hovering a Widget.
-Recurses until consumed.
+Recurses.
 */
 struct HoverKey : Base, PositionBase, KeyBase {
 };
 
 
 /** Occurs when a character is typed while the mouse is hovering a Widget.
-Recurses until consumed.
+Recurses.
 */
 struct HoverText : Base, PositionBase, TextBase {
 };
 
 
 /** Occurs when the mouse scroll wheel is moved while the mouse is hovering a Widget.
-Recurses until consumed.
+Recurses.
 */
 struct HoverScroll : Base, PositionBase {
 	/** Change of scroll wheel position. */
@@ -149,25 +148,28 @@ struct HoverScroll : Base, PositionBase {
 
 /** Occurs when a Widget begins consuming the Hover event.
 Must consume to set the widget as hovered.
+Must set the Hover target to receive this event.
 */
 struct Enter : Base {
 };
 
 
 /** Occurs when a different Widget is entered.
+Must set the Enter target to receive this event.
 */
 struct Leave : Base {
 };
 
 
 /** Occurs when a Widget begins consuming the Button press event for the left mouse button.
-Must consume to set the widget as selected.
+Must set the Button target to receive this event.
 */
 struct Select : Base {
 };
 
 
 /** Occurs when a different Widget is selected.
+Must set the Select target to receive this event.
 */
 struct Deselect : Base {
 };
@@ -175,6 +177,7 @@ struct Deselect : Base {
 
 /** Occurs when a key is pressed, released, or repeated while a Widget is selected.
 If consumed, a HoverKey event will not be triggered.
+Must set the Select target to receive this event.
 */
 struct SelectKey : Base, KeyBase {
 };
@@ -182,30 +185,34 @@ struct SelectKey : Base, KeyBase {
 
 /** Occurs when text is typed while a Widget is selected.
 If consumed, a HoverText event will not be triggered.
+Must set the Select target to receive this event.
 */
 struct SelectText : Base, TextBase {
 };
 
 
 struct DragBase : Base {
-	/** The mouse button held during the drag. */
+	/** The mouse button held while dragging. */
 	int button;
 };
 
 /** Occurs when a Widget begins being dragged.
 Must consume to set the widget as dragged.
+Must set the Button target to receive this event.
 */
 struct DragStart : DragBase {
 };
 
 
 /** Occurs when a Widget stops being dragged by releasing the mouse button.
+Must set the DragStart target to receive this event.
 */
 struct DragEnd : DragBase {
 };
 
 
 /** Occurs every frame on the dragged Widget.
+Must set the DragStart target to receive this event.
 */
 struct DragMove : DragBase {
 	/** Change in mouse position since the last frame. Can be zero. */
@@ -214,7 +221,8 @@ struct DragMove : DragBase {
 
 
 /** Occurs every frame when the mouse is hovering over a Widget while another Widget (possibly the same one) is being dragged.
-Recurses until consumed.
+Recurses.
+Must set the DragStart target to receive this event.
 */
 struct DragHover : DragBase, PositionBase {
 	/** The dragged widget */
@@ -225,6 +233,7 @@ struct DragHover : DragBase, PositionBase {
 
 /** Occurs when the mouse enters a Widget while dragging.
 Must consume to set the widget as drag-hovered.
+Must set the DragStart target to receive this event.
 */
 struct DragEnter : DragBase {
 	/** The dragged widget */
@@ -233,6 +242,7 @@ struct DragEnter : DragBase {
 
 
 /** Occurs when the mouse leaves a Widget while dragging.
+Must set the DragStart target to receive this event.
 */
 struct DragLeave : DragBase {
 	/** The dragged widget */
@@ -241,6 +251,7 @@ struct DragLeave : DragBase {
 
 
 /** Occurs when the mouse button is released over a Widget while dragging.
+Must set the DragStart target to receive this event.
 */
 struct DragDrop : DragBase {
 	/** The dragged widget */
@@ -249,7 +260,7 @@ struct DragDrop : DragBase {
 
 
 /** Occurs when a selection of files from the operating system is dropped onto a Widget.
-Recurses until consumed.
+Recurses.
 */
 struct PathDrop : Base, PositionBase {
 	PathDrop(const std::vector<std::string> &paths) : paths(paths) {}
@@ -260,21 +271,21 @@ struct PathDrop : Base, PositionBase {
 
 
 /** Occurs after a certain action is triggered on a Widget.
-The concept of an "action" is dependent on the type of Widget.
+The concept of an "action" is defined by the type of Widget.
 */
 struct Action : Base {
 };
 
 
 /** Occurs after the value of a Widget changes.
-The concept of a "value" is dependent on the type of Widget.
+The concept of a "value" is defined by the type of Widget.
 */
 struct Change : Base {
 };
 
 
 /** Occurs after the zoom level of a Widget is changed.
-Recurses until consumed.
+Recurses.
 */
 struct Zoom : Base {
 };
@@ -305,12 +316,14 @@ struct Remove : Base {
 
 
 /** Occurs after a Widget is shown with Widget::show().
+Recurses.
 */
 struct Show : Base {
 };
 
 
 /** Occurs after a Widget is hidden with Widget::hide().
+Recurses.
 */
 struct Hide : Base {
 };
