@@ -42,6 +42,9 @@ struct OpaqueWidget : Widget {
 	void onDragHover(const event::DragHover &e) override {
 		Widget::onDragHover(e);
 		e.stopPropagating();
+		// Consume if not consumed by child
+		if (!e.isConsumed())
+			e.consume(this);
 	}
 	void onPathDrop(const event::PathDrop &e) override {
 		Widget::onPathDrop(e);
