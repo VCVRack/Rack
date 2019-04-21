@@ -19,6 +19,9 @@ void Slider::draw(const DrawArgs &args) {
 }
 
 void Slider::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	state = BND_ACTIVE;
 	APP->window->cursorLock();
 	e.consume(this);

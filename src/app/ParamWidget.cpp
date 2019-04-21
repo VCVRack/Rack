@@ -119,7 +119,7 @@ void ParamWidget::step() {
 		}
 	}
 
-	OpaqueWidget::step();
+	Widget::step();
 }
 
 void ParamWidget::draw(const DrawArgs &args) {
@@ -141,14 +141,13 @@ void ParamWidget::draw(const DrawArgs &args) {
 
 void ParamWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
-	if (e.getTarget() != this)
-		return;
 
 	// Touch parameter
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == 0) {
 		if (paramQuantity) {
 			APP->scene->rack->touchedParam = this;
 		}
+		e.consume(this);
 	}
 
 	// Right click to open context menu

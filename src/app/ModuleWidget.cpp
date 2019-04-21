@@ -305,8 +305,6 @@ void ModuleWidget::drawShadow(const DrawArgs &args) {
 }
 
 void ModuleWidget::onHover(const event::Hover &e) {
-	widget::OpaqueWidget::onHover(e);
-
 	if (!APP->event->selectedWidget) {
 		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 		if ((glfwGetKey(APP->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
@@ -317,11 +315,13 @@ void ModuleWidget::onHover(const event::Hover &e) {
 			return;
 		}
 	}
+
+	OpaqueWidget::onHover(e);
 }
 
 void ModuleWidget::onButton(const event::Button &e) {
-	widget::OpaqueWidget::onButton(e);
-	if (e.getTarget() != this)
+	OpaqueWidget::onButton(e);
+	if (e.isConsumed())
 		return;
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
@@ -331,8 +331,8 @@ void ModuleWidget::onButton(const event::Button &e) {
 }
 
 void ModuleWidget::onHoverKey(const event::HoverKey &e) {
-	widget::OpaqueWidget::onHoverKey(e);
-	if (e.getTarget() != this)
+	OpaqueWidget::onHoverKey(e);
+	if (e.isConsumed())
 		return;
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -384,6 +384,9 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 }
 
 void ModuleWidget::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	oldPos = box.pos;
 	dragPos = APP->scene->rack->mousePos.minus(box.pos);
 	e.consume(this);

@@ -1,6 +1,6 @@
 #pragma once
 #include "ui/common.hpp"
-#include "widget/Widget.hpp"
+#include "widget/OpaqueWidget.hpp"
 #include "ui/ScrollBar.hpp"
 
 
@@ -9,7 +9,7 @@ namespace ui {
 
 
 /** Handles a container with ScrollBar */
-struct ScrollWidget : widget::Widget {
+struct ScrollWidget : widget::OpaqueWidget {
 	widget::Widget *container;
 	ScrollBar *horizontalScrollBar;
 	ScrollBar *verticalScrollBar;
@@ -19,7 +19,9 @@ struct ScrollWidget : widget::Widget {
 	void scrollTo(math::Rect r);
 	void draw(const DrawArgs &args) override;
 	void step() override;
-	void onHover(const event::Hover &e) override;
+	void onButton(const event::Button &e) override;
+	void onDragStart(const event::DragStart &e) override;
+	void onDragMove(const event::DragMove &e) override;
 	void onHoverScroll(const event::HoverScroll &e) override;
 };
 

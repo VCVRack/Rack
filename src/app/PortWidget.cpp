@@ -46,7 +46,7 @@ void PortWidget::step() {
 	}
 	plugLight->setBrightnesses(values);
 
-	OpaqueWidget::step();
+	Widget::step();
 }
 
 void PortWidget::draw(const DrawArgs &args) {
@@ -73,6 +73,8 @@ void PortWidget::onButton(const event::Button &e) {
 			APP->scene->rack->removeCable(cw);
 			delete cw;
 		}
+
+		e.consume(this);
 	}
 }
 
@@ -86,6 +88,9 @@ void PortWidget::onLeave(const event::Leave &e) {
 }
 
 void PortWidget::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	CableWidget *cw = NULL;
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 		if (type == OUTPUT) {

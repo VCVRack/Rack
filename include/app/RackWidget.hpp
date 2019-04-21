@@ -32,7 +32,6 @@ struct RackWidget : widget::OpaqueWidget {
 	void onHoverKey(const event::HoverKey &e) override;
 	void onDragHover(const event::DragHover &e) override;
 	void onButton(const event::Button &e) override;
-	void onZoom(const event::Zoom &e) override;
 
 	/** Completely clear the rack's modules and cables */
 	void clear();

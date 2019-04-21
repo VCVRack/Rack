@@ -17,6 +17,9 @@ void ScrollBar::draw(const DrawArgs &args) {
 }
 
 void ScrollBar::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	state = BND_ACTIVE;
 	APP->window->cursorLock();
 	e.consume(this);

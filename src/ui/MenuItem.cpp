@@ -59,6 +59,9 @@ void MenuItem::onEnter(const event::Enter &e) {
 }
 
 void MenuItem::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	e.consume(this);
 }
 

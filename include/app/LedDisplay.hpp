@@ -1,7 +1,7 @@
 #pragma once
 #include "app/common.hpp"
+#include "widget/Widget.hpp"
 #include "widget/OpaqueWidget.hpp"
-#include "widget/TransparentWidget.hpp"
 #include "ui/TextField.hpp"
 
 
@@ -13,12 +13,12 @@ struct LedDisplay : widget::OpaqueWidget {
 	void draw(const DrawArgs &args) override;
 };
 
-struct LedDisplaySeparator : widget::TransparentWidget {
+struct LedDisplaySeparator : widget::Widget {
 	LedDisplaySeparator();
 	void draw(const DrawArgs &args) override;
 };
 
-struct LedDisplayChoice : widget::TransparentWidget {
+struct LedDisplayChoice : widget::OpaqueWidget {
 	std::string text;
 	std::shared_ptr<Font> font;
 	math::Vec textOffset;

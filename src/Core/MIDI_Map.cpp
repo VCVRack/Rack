@@ -247,6 +247,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 	}
 
 	void onButton(const event::Button &e) override {
+		e.stopPropagating();
 		if (!module)
 			return;
 

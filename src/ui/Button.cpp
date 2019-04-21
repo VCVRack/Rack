@@ -23,6 +23,9 @@ void Button::onLeave(const event::Leave &e) {
 }
 
 void Button::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	state = BND_ACTIVE;
 	if (quantity)
 		quantity->setMax();

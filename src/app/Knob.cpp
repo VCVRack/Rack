@@ -29,6 +29,9 @@ void Knob::onButton(const event::Button &e) {
 }
 
 void Knob::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	if (paramQuantity) {
 		oldValue = paramQuantity->getSmoothValue();
 		if (snap) {

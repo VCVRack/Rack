@@ -29,6 +29,9 @@ void Switch::onDoubleClick(const event::DoubleClick &e) {
 }
 
 void Switch::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	if (momentary) {
 		if (paramQuantity) {
 			// Set to maximum value

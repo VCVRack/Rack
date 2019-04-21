@@ -64,16 +64,16 @@ void Scene::step() {
 		latestVersion = "";
 	}
 
-	OpaqueWidget::step();
+	Widget::step();
 }
 
 void Scene::draw(const DrawArgs &args) {
-	OpaqueWidget::draw(args);
+	Widget::draw(args);
 }
 
 void Scene::onHoverKey(const event::HoverKey &e) {
 	OpaqueWidget::onHoverKey(e);
-	if (e.getTarget() != this)
+	if (e.isConsumed())
 		return;
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -135,7 +135,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 
 void Scene::onPathDrop(const event::PathDrop &e) {
 	OpaqueWidget::onPathDrop(e);
-	if (e.getTarget() != this)
+	if (e.isConsumed())
 		return;
 
 	if (e.paths.size() >= 1) {

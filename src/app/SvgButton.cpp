@@ -31,6 +31,9 @@ void SvgButton::addFrame(std::shared_ptr<Svg> svg) {
 }
 
 void SvgButton::onDragStart(const event::DragStart &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	if (frames.size() >= 2) {
 		sw->setSvg(frames[1]);
 		fb->dirty = true;

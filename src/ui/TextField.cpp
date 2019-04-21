@@ -31,7 +31,7 @@ void TextField::draw(const DrawArgs &args) {
 }
 
 void TextField::onHover(const event::Hover &e) {
-	widget::OpaqueWidget::onHover(e);
+	OpaqueWidget::onHover(e);
 
 	if (this == APP->event->draggedWidget) {
 		int pos = getTextPosition(e.pos);
@@ -42,7 +42,7 @@ void TextField::onHover(const event::Hover &e) {
 }
 
 void TextField::onButton(const event::Button &e) {
-	widget::OpaqueWidget::onButton(e);
+	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		cursor = selection = getTextPosition(e.pos);

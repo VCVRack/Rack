@@ -109,21 +109,22 @@ void RackWidget::step() {
 		rail->box.size = railFb->box.size;
 	}
 
-	OpaqueWidget::step();
+	Widget::step();
 }
 
 void RackWidget::draw(const DrawArgs &args) {
-	OpaqueWidget::draw(args);
+	Widget::draw(args);
 }
 
 void RackWidget::onHover(const event::Hover &e) {
+	// Set before calling children's onHover()
 	mousePos = e.pos;
 	OpaqueWidget::onHover(e);
 }
 
 void RackWidget::onHoverKey(const event::HoverKey &e) {
 	OpaqueWidget::onHoverKey(e);
-	if (e.getTarget() != this)
+	if (e.isConsumed())
 		return;
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -139,23 +140,20 @@ void RackWidget::onHoverKey(const event::HoverKey &e) {
 }
 
 void RackWidget::onDragHover(const event::DragHover &e) {
-	OpaqueWidget::onDragHover(e);
 	mousePos = e.pos;
+	OpaqueWidget::onDragHover(e);
 }
 
 void RackWidget::onButton(const event::Button &e) {
-	OpaqueWidget::onButton(e);
-	if (e.getTarget() != this)
+	Widget::onButton(e);
+	e.stopPropagating();
+	if (e.isConsumed())
 		return;
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		APP->scene->moduleBrowser->show();
 		e.consume(this);
 	}
-}
-
-void RackWidget::onZoom(const event::Zoom &e) {
-	OpaqueWidget::onZoom(e);
 }
 
 void RackWidget::clear() {

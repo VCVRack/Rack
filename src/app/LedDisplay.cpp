@@ -62,6 +62,8 @@ void LedDisplayChoice::draw(const DrawArgs &args) {
 }
 
 void LedDisplayChoice::onButton(const event::Button &e) {
+	OpaqueWidget::onButton(e);
+
 	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
 		event::Action eAction;
 		onAction(eAction);

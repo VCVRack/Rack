@@ -63,17 +63,37 @@ void ScrollWidget::step() {
 	verticalScrollBar->box.size.y = horizontalScrollBar->visible ? inner.y : box.size.y;
 }
 
-void ScrollWidget::onHover(const event::Hover &e) {
-	widget::Widget::onHover(e);
+void ScrollWidget::onButton(const event::Button &e) {
+	Widget::onButton(e);
+	if (e.isConsumed())
+		return;
+
+	// Consume right button only if the scrollbars are visible
+	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+		return;
+
+	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
+		e.consume(this);
+	}
+}
+
+void ScrollWidget::onDragStart(const event::DragStart &e) {
+	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
+		e.consume(this);
+	}
+}
+
+void ScrollWidget::onDragMove(const event::DragMove &e) {
+	// Scroll only if the scrollbars are visible
+	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+		return;
+
+	offset = offset.minus(e.mouseDelta);
 }
 
 void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
-	widget::Widget::onHoverScroll(e);
-	if (e.getTarget() != this)
-		return;
-
-	// Scroll only if the scrollbars are visible
-	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+	OpaqueWidget::onHoverScroll(e);
+	if (e.isConsumed())
 		return;
 
 	math::Vec scrollDelta = e.scrollDelta;
