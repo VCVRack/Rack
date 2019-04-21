@@ -51,7 +51,7 @@ struct ParamField : ui::TextField {
 			e.consume(this);
 		}
 
-		if (!e.getConsumed())
+		if (!e.getTarget())
 			TextField::onSelectKey(e);
 	}
 };
@@ -140,6 +140,10 @@ void ParamWidget::draw(const DrawArgs &args) {
 }
 
 void ParamWidget::onButton(const widget::ButtonEvent &e) {
+	OpaqueWidget::onButton(e);
+	if (e.getTarget() != this)
+		return;
+
 	// Touch parameter
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == 0) {
 		if (paramQuantity) {
@@ -152,9 +156,6 @@ void ParamWidget::onButton(const widget::ButtonEvent &e) {
 		createContextMenu();
 		e.consume(this);
 	}
-
-	if (!e.getConsumed())
-		OpaqueWidget::onButton(e);
 }
 
 void ParamWidget::onDoubleClick(const widget::DoubleClickEvent &e) {

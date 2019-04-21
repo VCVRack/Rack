@@ -72,6 +72,10 @@ void Scene::draw(const DrawArgs &args) {
 }
 
 void Scene::onHoverKey(const widget::HoverKeyEvent &e) {
+	OpaqueWidget::onHoverKey(e);
+	if (e.getTarget() != this)
+		return;
+
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
@@ -127,12 +131,13 @@ void Scene::onHoverKey(const widget::HoverKeyEvent &e) {
 			}
 		}
 	}
-
-	if (!e.getConsumed())
-		OpaqueWidget::onHoverKey(e);
 }
 
 void Scene::onPathDrop(const widget::PathDropEvent &e) {
+	OpaqueWidget::onPathDrop(e);
+	if (e.getTarget() != this)
+		return;
+
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
 		if (string::filenameExtension(string::filename(path)) == "vcv") {
@@ -140,9 +145,6 @@ void Scene::onPathDrop(const widget::PathDropEvent &e) {
 			e.consume(this);
 		}
 	}
-
-	if (!e.getConsumed())
-		OpaqueWidget::onPathDrop(e);
 }
 
 void Scene::runCheckVersion() {

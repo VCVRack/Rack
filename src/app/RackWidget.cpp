@@ -123,7 +123,7 @@ void RackWidget::onHover(const widget::HoverEvent &e) {
 
 void RackWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 	OpaqueWidget::onHoverKey(e);
-	if (e.getConsumed() != this)
+	if (e.getTarget() != this)
 		return;
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -132,6 +132,7 @@ void RackWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					pastePresetClipboardAction();
 				}
+				e.consume(this);
 			} break;
 		}
 	}
@@ -144,10 +145,12 @@ void RackWidget::onDragHover(const widget::DragHoverEvent &e) {
 
 void RackWidget::onButton(const widget::ButtonEvent &e) {
 	OpaqueWidget::onButton(e);
-	if (e.getConsumed() == this) {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			APP->scene->moduleBrowser->show();
-		}
+	if (e.getTarget() != this)
+		return;
+
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		APP->scene->moduleBrowser->show();
+		e.consume(this);
 	}
 }
 

@@ -1,6 +1,5 @@
 #include "app/ModuleBrowser.hpp"
 #include "widget/OpaqueWidget.hpp"
-#include "widget/OverlayWidget.hpp"
 #include "widget/TransparentWidget.hpp"
 #include "widget/ZoomWidget.hpp"
 #include "ui/ScrollWidget.hpp"
@@ -53,21 +52,22 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 }
 
 
-struct BrowserOverlay : widget::OverlayWidget {
+struct BrowserOverlay : widget::OpaqueWidget {
 	void step() override {
 		box = parent->box.zeroPos();
 		// Only step if visible, since there are potentially thousands of descendants that don't need to be stepped.
 		if (visible)
-			OverlayWidget::step();
+			OpaqueWidget::step();
 	}
 
 	void onButton(const widget::ButtonEvent &e) override {
-		OverlayWidget::onButton(e);
-		if (e.getConsumed() != this)
+		OpaqueWidget::onButton(e);
+		if (e.getTarget() != this)
 			return;
 
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			hide();
+			e.consume(this);
 		}
 	}
 };
@@ -291,7 +291,7 @@ struct BrowserSearchField : ui::TextField {
 			}
 		}
 
-		if (!e.getConsumed())
+		if (!e.getTarget())
 			ui::TextField::onSelectKey(e);
 	}
 
@@ -615,7 +615,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 inline void ModelBox::onButton(const widget::ButtonEvent &e) {
 	OpaqueWidget::onButton(e);
-	if (e.getConsumed() != this)
+	if (e.getTarget() != this)
 		return;
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {

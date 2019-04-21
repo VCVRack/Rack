@@ -70,7 +70,7 @@ void ScrollWidget::onHover(const widget::HoverEvent &e) {
 
 void ScrollWidget::onHoverScroll(const widget::HoverScrollEvent &e) {
 	widget::Widget::onHoverScroll(e);
-	if (e.getConsumed())
+	if (e.getTarget() != this)
 		return;
 
 	// Scroll only if the scrollbars are visible

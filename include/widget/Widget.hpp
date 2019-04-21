@@ -98,13 +98,18 @@ struct Widget {
 	template <typename TMethod, class TEvent>
 	void recurseEvent(TMethod f, const TEvent &e) {
 		for (auto it = children.rbegin(); it != children.rend(); it++) {
+			// Stop propagation if requested
+			if (!e.isPropagating())
+				break;
 			Widget *child = *it;
 			// Filter child by visibility
 			if (!child->visible)
 				continue;
 
+			// Clone event for (currently) no reason
+			TEvent e2 = e;
 			// Call child event handler
-			(child->*f)(e);
+			(child->*f)(e2);
 		}
 	}
 
@@ -112,6 +117,9 @@ struct Widget {
 	template <typename TMethod, class TEvent>
 	void recursePositionEvent(TMethod f, const TEvent &e) {
 		for (auto it = children.rbegin(); it != children.rend(); it++) {
+			// Stop propagation if requested
+			if (!e.isPropagating())
+				break;
 			Widget *child = *it;
 			// Filter child by visibility and position
 			if (!child->visible)
@@ -124,9 +132,6 @@ struct Widget {
 			e2.pos = e.pos.minus(child->box.pos);
 			// Call child event handler
 			(child->*f)(e2);
-			// Stop iterating if consumed
-			if (e.getConsumed())
-				break;
 		}
 	}
 

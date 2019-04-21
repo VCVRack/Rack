@@ -27,7 +27,7 @@ struct BlankPanel : Widget {
 };
 
 
-struct ModuleResizeHandle : Widget {
+struct ModuleResizeHandle : OpaqueWidget {
 	bool right = false;
 	float dragX;
 	Rect originalBox;
@@ -59,13 +59,13 @@ struct ModuleResizeHandle : Widget {
 		const float minWidth = 3 * RACK_GRID_WIDTH;
 		if (right) {
 			newBox.size.x += deltaX;
-			newBox.size.x = fmaxf(newBox.size.x, minWidth);
-			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+			newBox.size.x = std::fmax(newBox.size.x, minWidth);
+			newBox.size.x = std::round(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 		}
 		else {
 			newBox.size.x -= deltaX;
-			newBox.size.x = fmaxf(newBox.size.x, minWidth);
-			newBox.size.x = roundf(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+			newBox.size.x = std::fmax(newBox.size.x, minWidth);
+			newBox.size.x = std::round(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
 		APP->scene->rack->requestModuleBox(m, newBox);

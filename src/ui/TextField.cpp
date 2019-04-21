@@ -30,21 +30,23 @@ void TextField::draw(const DrawArgs &args) {
 	nvgResetScissor(args.vg);
 }
 
-void TextField::onButton(const widget::ButtonEvent &e) {
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		cursor = selection = getTextPosition(e.pos);
-	}
-	widget::OpaqueWidget::onButton(e);
-}
-
 void TextField::onHover(const widget::HoverEvent &e) {
+	widget::OpaqueWidget::onHover(e);
+
 	if (this == APP->event->draggedWidget) {
 		int pos = getTextPosition(e.pos);
 		if (pos != selection) {
 			cursor = pos;
 		}
 	}
-	widget::OpaqueWidget::onHover(e);
+}
+
+void TextField::onButton(const widget::ButtonEvent &e) {
+	widget::OpaqueWidget::onButton(e);
+
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		cursor = selection = getTextPosition(e.pos);
+	}
 }
 
 void TextField::onEnter(const widget::EnterEvent &e) {

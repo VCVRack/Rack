@@ -423,7 +423,7 @@ struct AccountEmailField : ui::TextField {
 			e.consume(this);
 		}
 
-		if (!e.getConsumed())
+		if (!e.getTarget())
 			ui::TextField::onSelectKey(e);
 	}
 };
@@ -437,7 +437,7 @@ struct AccountPasswordField : ui::PasswordField {
 			e.consume(this);
 		}
 
-		if (!e.getConsumed())
+		if (!e.getTarget())
 			ui::PasswordField::onSelectKey(e);
 	}
 };

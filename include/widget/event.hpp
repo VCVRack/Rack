@@ -13,10 +13,8 @@ struct Widget;
 
 /** A per-event state shared and writable by all widgets that recursively handle an event. */
 struct EventContext {
-	/** The Widget that consumes the event.
-	This stops propagation of the event if applicable.
-	*/
-	Widget *consumed = NULL;
+	Widget *target = NULL;
+	bool propagating = true;
 };
 
 
@@ -24,12 +22,33 @@ struct EventContext {
 struct Event {
 	EventContext *context = NULL;
 
-	void consume(Widget *w) const {
+	/** Prevents the Event from being handled by more Widgets.
+	*/
+	void stopPropagating() const {
 		if (context)
-			context->consumed = w;
+			context->propagating = false;
 	}
-	Widget *getConsumed() const {
-		return context ? context->consumed : NULL;
+	bool isPropagating() const {
+		if (context)
+			return context->propagating;
+		return true;
+	}
+	/** Tells the event handler that a particular Widget consumed the event.
+	You usually want to stop propagation as well, so call consume() instead.
+	*/
+	void setTarget(Widget *w) const {
+		if (context)
+			context->target = w;
+	}
+	Widget *getTarget() const {
+		if (context)
+			return context->target;
+		return NULL;
+	}
+	/** Sets the target Widget and stops propagation. */
+	void consume(Widget *w) const {
+		setTarget(w);
+		stopPropagating();
 	}
 };
 

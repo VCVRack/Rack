@@ -321,15 +321,20 @@ void ModuleWidget::onHover(const widget::HoverEvent &e) {
 
 void ModuleWidget::onButton(const widget::ButtonEvent &e) {
 	widget::OpaqueWidget::onButton(e);
+	if (e.getTarget() != this)
+		return;
 
-	if (e.getConsumed() == this) {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			createContextMenu();
-		}
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		createContextMenu();
+		e.consume(this);
 	}
 }
 
 void ModuleWidget::onHoverKey(const widget::HoverKeyEvent &e) {
+	widget::OpaqueWidget::onHoverKey(e);
+	if (e.getTarget() != this)
+		return;
+
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_I: {
@@ -376,9 +381,6 @@ void ModuleWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 			} break;
 		}
 	}
-
-	if (!e.getConsumed())
-		widget::OpaqueWidget::onHoverKey(e);
 }
 
 void ModuleWidget::onDragStart(const widget::DragStartEvent &e) {

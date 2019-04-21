@@ -19,16 +19,20 @@ void MenuOverlay::step() {
 
 void MenuOverlay::onButton(const widget::ButtonEvent &e) {
 	widget::OpaqueWidget::onButton(e);
+	if (e.getTarget() != this)
+		return;
 
-	if (e.getConsumed() == this && e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		requestedDelete = true;
 	}
 }
 
 void MenuOverlay::onHoverKey(const widget::HoverKeyEvent &e) {
 	widget::OpaqueWidget::onHoverKey(e);
+	if (e.getTarget() != this)
+		return;
 
-	if (e.getConsumed() == this && e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
+	if (e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
 		requestedDelete = true;
 	}
 }

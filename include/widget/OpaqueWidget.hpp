@@ -6,35 +6,43 @@ namespace rack {
 namespace widget {
 
 
-/** A Widget that consumes recursing events but gives a chance for children to consume first.
-You can of course override the events.
-You may also call OpaqueWidget::on*() from the overridden method to continue recursing/consuming the event.
+/** A Widget that stops propagation of all recursive PositionEvents but gives a chance for children to consume first.
+Remember to call these methods in your subclass if you wish to preserve default OpaqueWidget behavior.
 */
 struct OpaqueWidget : Widget {
 	void onHover(const HoverEvent &e) override {
 		Widget::onHover(e);
-		if (!e.getConsumed())
-			e.consume(this);
+		e.stopPropagating();
+		// Consume if not consumed by child
+		if (!e.getTarget())
+			e.setTarget(this);
 	}
 	void onButton(const ButtonEvent &e) override {
 		Widget::onButton(e);
-		if (!e.getConsumed())
-			e.consume(this);
+		e.stopPropagating();
+		// Consume if not consumed by child
+		if (!e.getTarget())
+			e.setTarget(this);
 	}
 	void onHoverKey(const HoverKeyEvent &e) override {
 		Widget::onHoverKey(e);
-		if (!e.getConsumed())
-			e.consume(this);
+		e.stopPropagating();
 	}
 	void onHoverText(const HoverTextEvent &e) override {
 		Widget::onHoverText(e);
-		if (!e.getConsumed())
-			e.consume(this);
+		e.stopPropagating();
+	}
+	void onHoverScroll(const HoverScrollEvent &e) override {
+		Widget::onHoverScroll(e);
+		e.stopPropagating();
 	}
 	void onDragHover(const DragHoverEvent &e) override {
 		Widget::onDragHover(e);
-		if (!e.getConsumed())
-			e.consume(this);
+		e.stopPropagating();
+	}
+	void onPathDrop(const PathDropEvent &e) override {
+		Widget::onPathDrop(e);
+		e.stopPropagating();
 	}
 };
 

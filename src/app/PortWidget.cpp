@@ -60,6 +60,8 @@ void PortWidget::draw(const DrawArgs &args) {
 }
 
 void PortWidget::onButton(const widget::ButtonEvent &e) {
+	OpaqueWidget::onButton(e);
+
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		CableWidget *cw = APP->scene->rack->getTopCable(this);
 		if (cw) {
@@ -72,7 +74,6 @@ void PortWidget::onButton(const widget::ButtonEvent &e) {
 			delete cw;
 		}
 	}
-	e.consume(this);
 }
 
 void PortWidget::onEnter(const widget::EnterEvent &e) {

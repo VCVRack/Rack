@@ -18,6 +18,7 @@ struct ParamWidget : widget::OpaqueWidget {
 
 	void step() override;
 	void draw(const DrawArgs &args) override;
+
 	void onButton(const widget::ButtonEvent &e) override;
 	void onDoubleClick(const widget::DoubleClickEvent &e) override;
 	void onEnter(const widget::EnterEvent &e) override;

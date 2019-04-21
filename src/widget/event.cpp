@@ -23,7 +23,7 @@ void EventState::setHovered(Widget *w) {
 		EnterEvent eEnter;
 		eEnter.context = &cEnter;
 		w->onEnter(eEnter);
-		hoveredWidget = cEnter.consumed;
+		hoveredWidget = cEnter.target;
 	}
 }
 
@@ -44,7 +44,7 @@ void EventState::setDragged(Widget *w) {
 		DragStartEvent eDragStart;
 		eDragStart.context = &cDragStart;
 		w->onDragStart(eDragStart);
-		draggedWidget = cDragStart.consumed;
+		draggedWidget = cDragStart.target;
 	}
 }
 
@@ -67,7 +67,7 @@ void EventState::setDragHovered(Widget *w) {
 		eDragEnter.context = &cDragEnter;
 		eDragEnter.origin = draggedWidget;
 		w->onDragEnter(eDragEnter);
-		dragHoveredWidget = cDragEnter.consumed;
+		dragHoveredWidget = cDragEnter.target;
 	}
 }
 
@@ -88,7 +88,7 @@ void EventState::setSelected(Widget *w) {
 		SelectEvent eSelect;
 		eSelect.context = &cSelect;
 		w->onSelect(eSelect);
-		selectedWidget = cSelect.consumed;
+		selectedWidget = cSelect.target;
 	}
 }
 
@@ -110,7 +110,7 @@ void EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 	eButton.action = action;
 	eButton.mods = mods;
 	rootWidget->onButton(eButton);
-	Widget *clickedWidget = cButton.consumed;
+	Widget *clickedWidget = cButton.target;
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (action == GLFW_PRESS) {
@@ -171,7 +171,7 @@ void EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		eDragHover.origin = draggedWidget;
 		rootWidget->onDragHover(eDragHover);
 
-		setDragHovered(cDragHover.consumed);
+		setDragHovered(cDragHover.target);
 
 		return;
 	}
@@ -184,7 +184,7 @@ void EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	eHover.mouseDelta = mouseDelta;
 	rootWidget->onHover(eHover);
 
-	setHovered(cHover.consumed);
+	setHovered(cHover.target);
 }
 
 void EventState::handleLeave() {
@@ -219,7 +219,7 @@ void EventState::handleText(math::Vec pos, int codepoint) {
 		eSelectText.context = &cSelectText;
 		eSelectText.codepoint = codepoint;
 		selectedWidget->onSelectText(eSelectText);
-		if (cSelectText.consumed)
+		if (cSelectText.target)
 			return;
 	}
 
@@ -243,7 +243,7 @@ void EventState::handleKey(math::Vec pos, int key, int scancode, int action, int
 		eSelectKey.action = action;
 		eSelectKey.mods = mods;
 		selectedWidget->onSelectKey(eSelectKey);
-		if (cSelectKey.consumed)
+		if (cSelectKey.target)
 			return;
 	}
 
