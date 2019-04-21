@@ -23,6 +23,7 @@ struct TextField : widget::OpaqueWidget {
 	void draw(const DrawArgs &args) override;
 	void onHover(const event::Hover &e) override;
 	void onButton(const event::Button &e) override;
+	void onDragStart(const event::DragStart &e) override;
 	void onEnter(const event::Enter &e) override;
 	void onSelect(const event::Select &e) override;
 	void onSelectText(const event::SelectText &e) override;
