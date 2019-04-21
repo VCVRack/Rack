@@ -132,11 +132,6 @@ static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
 	window->mousePos = mousePos;
 
 	APP->event->handleHover(mousePos, mouseDelta);
-
-	// Scroll if middle button is held
-	if (glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_MIDDLE)) {
-		APP->event->handleScroll(mousePos, mouseDelta);
-	}
 }
 
 static void cursorEnterCallback(GLFWwindow *win, int entered) {
