@@ -30,7 +30,7 @@ void TextField::draw(const DrawArgs &args) {
 	nvgResetScissor(args.vg);
 }
 
-void TextField::onHover(const widget::HoverEvent &e) {
+void TextField::onHover(const event::Hover &e) {
 	widget::OpaqueWidget::onHover(e);
 
 	if (this == APP->event->draggedWidget) {
@@ -41,7 +41,7 @@ void TextField::onHover(const widget::HoverEvent &e) {
 	}
 }
 
-void TextField::onButton(const widget::ButtonEvent &e) {
+void TextField::onButton(const event::Button &e) {
 	widget::OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -49,15 +49,15 @@ void TextField::onButton(const widget::ButtonEvent &e) {
 	}
 }
 
-void TextField::onEnter(const widget::EnterEvent &e) {
+void TextField::onEnter(const event::Enter &e) {
 	e.consume(this);
 }
 
-void TextField::onSelect(const widget::SelectEvent &e) {
+void TextField::onSelect(const event::Select &e) {
 	e.consume(this);
 }
 
-void TextField::onSelectText(const widget::SelectTextEvent &e) {
+void TextField::onSelectText(const event::SelectText &e) {
 	if (e.codepoint < 128) {
 		std::string newText(1, (char) e.codepoint);
 		insertText(newText);
@@ -65,7 +65,7 @@ void TextField::onSelectText(const widget::SelectTextEvent &e) {
 	e.consume(this);
 }
 
-void TextField::onSelectKey(const widget::SelectKeyEvent &e) {
+void TextField::onSelectKey(const event::SelectKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_BACKSPACE: {
@@ -73,7 +73,7 @@ void TextField::onSelectKey(const widget::SelectKeyEvent &e) {
 					cursor--;
 					if (cursor >= 0) {
 						text.erase(cursor, 1);
-						widget::ChangeEvent eChange;
+						event::Change eChange;
 						onChange(eChange);
 					}
 					selection = cursor;
@@ -81,7 +81,7 @@ void TextField::onSelectKey(const widget::SelectKeyEvent &e) {
 				else {
 					int begin = std::min(cursor, selection);
 					text.erase(begin, std::abs(selection - cursor));
-					widget::ChangeEvent eChange;
+					event::Change eChange;
 					onChange(eChange);
 					cursor = selection = begin;
 				}
@@ -89,13 +89,13 @@ void TextField::onSelectKey(const widget::SelectKeyEvent &e) {
 			case GLFW_KEY_DELETE: {
 				if (cursor == selection) {
 					text.erase(cursor, 1);
-					widget::ChangeEvent eChange;
+					event::Change eChange;
 					onChange(eChange);
 				}
 				else {
 					int begin = std::min(cursor, selection);
 					text.erase(begin, std::abs(selection - cursor));
-					widget::ChangeEvent eChange;
+					event::Change eChange;
 					onChange(eChange);
 					cursor = selection = begin;
 				}
@@ -170,7 +170,7 @@ void TextField::onSelectKey(const widget::SelectKeyEvent &e) {
 					insertText("\n");
 				}
 				else {
-					widget::ActionEvent eAction;
+					event::Action eAction;
 					onAction(eAction);
 				}
 			} break;
@@ -191,7 +191,7 @@ void TextField::insertText(std::string text) {
 	this->text.insert(cursor, text);
 	cursor += text.size();
 	selection = cursor;
-	widget::ChangeEvent eChange;
+	event::Change eChange;
 	onChange(eChange);
 }
 
@@ -200,8 +200,8 @@ void TextField::setText(std::string text) {
 	this->text = text;
 	selection = cursor = text.size();
 	if (changed) {
-		// widget::ChangeEvent
-		widget::ChangeEvent eChange;
+		// event::Change
+		event::Change eChange;
 		onChange(eChange);
 	}
 }

@@ -60,7 +60,7 @@ struct BrowserOverlay : widget::OpaqueWidget {
 			OpaqueWidget::step();
 	}
 
-	void onButton(const widget::ButtonEvent &e) override {
+	void onButton(const event::Button &e) override {
 		OpaqueWidget::onButton(e);
 		if (e.getTarget() != this)
 			return;
@@ -252,26 +252,26 @@ struct ModelBox : widget::OpaqueWidget {
 		OpaqueWidget::draw(args);
 	}
 
-	void onButton(const widget::ButtonEvent &e) override;
+	void onButton(const event::Button &e) override;
 
-	void onEnter(const widget::EnterEvent &e) override {
+	void onEnter(const event::Enter &e) override {
 		e.consume(this);
 		infoBox->show();
 	}
 
-	void onLeave(const widget::LeaveEvent &e) override {
+	void onLeave(const event::Leave &e) override {
 		infoBox->hide();
 	}
 };
 
 
 struct AuthorItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override;
+	void onAction(const event::Action &e) override;
 };
 
 
 struct TagItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override;
+	void onAction(const event::Action &e) override;
 };
 
 
@@ -282,7 +282,7 @@ struct BrowserSearchField : ui::TextField {
 		TextField::step();
 	}
 
-	void onSelectKey(const widget::SelectKeyEvent &e) override {
+	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS) {
 			if (e.key == GLFW_KEY_ESCAPE) {
 				BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
@@ -295,14 +295,14 @@ struct BrowserSearchField : ui::TextField {
 			ui::TextField::onSelectKey(e);
 	}
 
-	void onChange(const widget::ChangeEvent &e) override;
+	void onChange(const event::Change &e) override;
 
-	void onHide(const widget::HideEvent &e) override {
+	void onHide(const event::Hide &e) override {
 		APP->event->setSelected(NULL);
 		ui::TextField::onHide(e);
 	}
 
-	void onShow(const widget::ShowEvent &e) override {
+	void onShow(const event::Show &e) override {
 		selectAll();
 		TextField::onShow(e);
 	}
@@ -613,7 +613,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 // Implementations to resolve dependencies
 
 
-inline void ModelBox::onButton(const widget::ButtonEvent &e) {
+inline void ModelBox::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.getTarget() != this)
 		return;
@@ -640,7 +640,7 @@ inline void ModelBox::onButton(const widget::ButtonEvent &e) {
 }
 
 
-inline void AuthorItem::onAction(const widget::ActionEvent &e) {
+inline void AuthorItem::onAction(const event::Action &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	if (browser->author == text)
 		browser->author = "";
@@ -650,7 +650,7 @@ inline void AuthorItem::onAction(const widget::ActionEvent &e) {
 }
 
 
-inline void TagItem::onAction(const widget::ActionEvent &e) {
+inline void TagItem::onAction(const event::Action &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	if (browser->tag == text)
 		browser->tag = "";
@@ -660,7 +660,7 @@ inline void TagItem::onAction(const widget::ActionEvent &e) {
 }
 
 
-inline void BrowserSearchField::onChange(const widget::ChangeEvent &e) {
+inline void BrowserSearchField::onChange(const event::Change &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	browser->search = string::trim(text);
 	browser->refresh();

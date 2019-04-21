@@ -19,10 +19,10 @@ struct ParamWidget : widget::OpaqueWidget {
 	void step() override;
 	void draw(const DrawArgs &args) override;
 
-	void onButton(const widget::ButtonEvent &e) override;
-	void onDoubleClick(const widget::DoubleClickEvent &e) override;
-	void onEnter(const widget::EnterEvent &e) override;
-	void onLeave(const widget::LeaveEvent &e) override;
+	void onButton(const event::Button &e) override;
+	void onDoubleClick(const event::DoubleClick &e) override;
+	void onEnter(const event::Enter &e) override;
+	void onLeave(const event::Leave &e) override;
 
 	/** For legacy patch loading */
 	void fromJson(json_t *rootJ);

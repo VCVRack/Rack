@@ -20,20 +20,20 @@ void RadioButton::draw(const DrawArgs &args) {
 	bndRadioButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
 }
 
-void RadioButton::onEnter(const widget::EnterEvent &e) {
+void RadioButton::onEnter(const event::Enter &e) {
 	state = BND_HOVER;
 	e.consume(this);
 }
 
-void RadioButton::onLeave(const widget::LeaveEvent &e) {
+void RadioButton::onLeave(const event::Leave &e) {
 	state = BND_DEFAULT;
 }
 
-void RadioButton::onDragStart(const widget::DragStartEvent &e) {
+void RadioButton::onDragStart(const event::DragStart &e) {
 	e.consume(this);
 }
 
-void RadioButton::onDragDrop(const widget::DragDropEvent &e) {
+void RadioButton::onDragDrop(const event::DragDrop &e) {
 	if (e.origin == this) {
 		if (quantity) {
 			if (quantity->isMax())
@@ -42,7 +42,7 @@ void RadioButton::onDragDrop(const widget::DragDropEvent &e) {
 				quantity->setMax();
 		}
 
-		widget::ActionEvent eAction;
+		event::Action eAction;
 		onAction(eAction);
 	}
 }

@@ -24,11 +24,11 @@ void Switch::step() {
 	ParamWidget::step();
 }
 
-void Switch::onDoubleClick(const widget::DoubleClickEvent &e) {
+void Switch::onDoubleClick(const event::DoubleClick &e) {
 	// Don't reset parameter on double-click
 }
 
-void Switch::onDragStart(const widget::DragStartEvent &e) {
+void Switch::onDragStart(const event::DragStart &e) {
 	if (momentary) {
 		if (paramQuantity) {
 			// Set to maximum value
@@ -64,7 +64,7 @@ void Switch::onDragStart(const widget::DragStartEvent &e) {
 	e.consume(this);
 }
 
-void Switch::onDragEnd(const widget::DragEndEvent &e) {
+void Switch::onDragEnd(const event::DragEnd &e) {
 	if (momentary) {
 		momentaryReleased = true;
 	}

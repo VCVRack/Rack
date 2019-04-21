@@ -1,5 +1,4 @@
 #include "app.hpp"
-#include "widget/event.hpp"
 #include "window.hpp"
 #include "patch.hpp"
 #include "engine/Engine.hpp"
@@ -14,7 +13,7 @@ namespace rack {
 void App::init() {
 	engine = new engine::Engine;
 	if (!settings::headless) {
-		event = new widget::EventState;
+		event = new event::State;
 		history = new history::State;
 		window = new Window;
 		patch = new PatchManager;

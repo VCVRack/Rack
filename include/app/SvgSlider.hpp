@@ -22,7 +22,7 @@ struct SvgSlider : app::SliderKnob {
 	SvgSlider();
 	void setBackgroundSvg(std::shared_ptr<Svg> svg);
 	void setHandleSvg(std::shared_ptr<Svg> svg);
-	void onChange(const widget::ChangeEvent &e) override;
+	void onChange(const event::Change &e) override;
 
 	DEPRECATED void setBackgroundSVG(std::shared_ptr<Svg> svg) {setBackgroundSvg(svg);}
 	DEPRECATED void setHandleSVG(std::shared_ptr<Svg> svg) {setBackgroundSvg(svg);}

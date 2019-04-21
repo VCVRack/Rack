@@ -71,7 +71,7 @@ void RackScrollWidget::draw(const DrawArgs &args) {
 	ScrollWidget::draw(args);
 }
 
-void RackScrollWidget::onHover(const widget::HoverEvent &e) {
+void RackScrollWidget::onHover(const event::Hover &e) {
 	if (!APP->event->selectedWidget) {
 		// Scroll with arrow keys
 		float arrowSpeed = 30.0;
@@ -95,7 +95,7 @@ void RackScrollWidget::onHover(const widget::HoverEvent &e) {
 	ScrollWidget::onHover(e);
 }
 
-void RackScrollWidget::onHoverScroll(const widget::HoverScrollEvent &e) {
+void RackScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 		// Increase zoom
 		float zoomDelta = e.scrollDelta.y / 50 / 4;

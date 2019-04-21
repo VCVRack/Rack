@@ -10,37 +10,37 @@ namespace widget {
 Remember to call these methods in your subclass if you wish to preserve default OpaqueWidget behavior.
 */
 struct OpaqueWidget : Widget {
-	void onHover(const HoverEvent &e) override {
+	void onHover(const event::Hover &e) override {
 		Widget::onHover(e);
 		e.stopPropagating();
 		// Consume if not consumed by child
 		if (!e.getTarget())
 			e.setTarget(this);
 	}
-	void onButton(const ButtonEvent &e) override {
+	void onButton(const event::Button &e) override {
 		Widget::onButton(e);
 		e.stopPropagating();
 		// Consume if not consumed by child
 		if (!e.getTarget())
 			e.setTarget(this);
 	}
-	void onHoverKey(const HoverKeyEvent &e) override {
+	void onHoverKey(const event::HoverKey &e) override {
 		Widget::onHoverKey(e);
 		e.stopPropagating();
 	}
-	void onHoverText(const HoverTextEvent &e) override {
+	void onHoverText(const event::HoverText &e) override {
 		Widget::onHoverText(e);
 		e.stopPropagating();
 	}
-	void onHoverScroll(const HoverScrollEvent &e) override {
+	void onHoverScroll(const event::HoverScroll &e) override {
 		Widget::onHoverScroll(e);
 		e.stopPropagating();
 	}
-	void onDragHover(const DragHoverEvent &e) override {
+	void onDragHover(const event::DragHover &e) override {
 		Widget::onDragHover(e);
 		e.stopPropagating();
 	}
-	void onPathDrop(const PathDropEvent &e) override {
+	void onPathDrop(const event::PathDrop &e) override {
 		Widget::onPathDrop(e);
 		e.stopPropagating();
 	}

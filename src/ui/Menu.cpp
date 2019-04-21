@@ -54,7 +54,7 @@ void Menu::draw(const DrawArgs &args) {
 	Widget::draw(args);
 }
 
-void Menu::onHoverScroll(const widget::HoverScrollEvent &e) {
+void Menu::onHoverScroll(const event::HoverScroll &e) {
 	if (parent && !parent->box.isContaining(box))
 		box.pos.y += e.scrollDelta.y;
 }

@@ -20,7 +20,7 @@ struct SvgSwitch : Switch {
 	SvgSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<Svg> svg);
-	void onChange(const widget::ChangeEvent &e) override;
+	void onChange(const event::Change &e) override;
 };
 
 

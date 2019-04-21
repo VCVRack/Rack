@@ -34,63 +34,63 @@ struct MenuButton : ui::Button {
 
 
 struct NewItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->patch->resetDialog();
 	}
 };
 
 
 struct OpenItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->patch->loadDialog();
 	}
 };
 
 
 struct SaveItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->patch->saveDialog();
 	}
 };
 
 
 struct SaveAsItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->patch->saveAsDialog();
 	}
 };
 
 
 struct SaveTemplateItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->patch->saveTemplateDialog();
 	}
 };
 
 
 struct RevertItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->patch->revertDialog();
 	}
 };
 
 
 struct DisconnectCablesItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->patch->disconnectDialog();
 	}
 };
 
 
 struct QuitItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->window->close();
 	}
 };
 
 
 struct FileButton : MenuButton {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -136,21 +136,21 @@ struct FileButton : MenuButton {
 
 
 struct UndoItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->history->undo();
 	}
 };
 
 
 struct RedoItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->history->redo();
 	}
 };
 
 
 struct EditButton : MenuButton {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -247,28 +247,28 @@ struct CableTensionSlider : ui::Slider {
 
 
 struct CpuMeterItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		settings::cpuMeter ^= true;
 	}
 };
 
 
 struct ParamTooltipItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		settings::paramTooltip ^= true;
 	}
 };
 
 
 struct LockModulesItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		settings::lockModules ^= true;
 	}
 };
 
 
 struct EnginePauseItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->engine->setPaused(!APP->engine->isPaused());
 	}
 };
@@ -276,7 +276,7 @@ struct EnginePauseItem : ui::MenuItem {
 
 struct SampleRateValueItem : ui::MenuItem {
 	float sampleRate;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->engine->setSampleRate(sampleRate);
 		APP->engine->setPaused(false);
 	}
@@ -324,7 +324,7 @@ struct ThreadCountValueItem : ui::MenuItem {
 			text += " (lowest CPU usage)";
 		rightText = CHECKMARK(APP->engine->getThreadCount() == threadCount);
 	}
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->engine->setThreadCount(threadCount);
 	}
 };
@@ -346,14 +346,14 @@ struct ThreadCount : ui::MenuItem {
 
 
 struct FullscreenItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		APP->window->setFullScreen(!APP->window->isFullScreen());
 	}
 };
 
 
 struct SettingsButton : MenuButton {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -406,7 +406,7 @@ struct SettingsButton : MenuButton {
 
 
 struct RegisterItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/");
 		});
@@ -417,7 +417,7 @@ struct RegisterItem : ui::MenuItem {
 
 struct AccountEmailField : ui::TextField {
 	ui::TextField *passwordField;
-	void onSelectKey(const widget::SelectKeyEvent &e) override {
+	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
 			APP->event->selectedWidget = passwordField;
 			e.consume(this);
@@ -431,7 +431,7 @@ struct AccountEmailField : ui::TextField {
 
 struct AccountPasswordField : ui::PasswordField {
 	ui::MenuItem *logInItem;
-	void onSelectKey(const widget::SelectKeyEvent &e) override {
+	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			logInItem->doAction();
 			e.consume(this);
@@ -446,7 +446,7 @@ struct AccountPasswordField : ui::PasswordField {
 struct LogInItem : ui::MenuItem {
 	ui::TextField *emailField;
 	ui::TextField *passwordField;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
 		std::thread t([&, email, password]() {
@@ -460,7 +460,7 @@ struct LogInItem : ui::MenuItem {
 struct ManageItem : ui::MenuItem {
 	ManageItem() {
 	}
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/plugins.html");
 		});
@@ -470,7 +470,7 @@ struct ManageItem : ui::MenuItem {
 
 
 struct SyncItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 	}
 };
 
@@ -500,7 +500,7 @@ struct SyncItem : ui::MenuItem {
 // 			completed = false;
 // 		}
 // 	}
-// 	void onAction(const widget::ActionEvent &e) override {
+// 	void onAction(const event::Action &e) override {
 // 		available = false;
 // 		std::thread t([this]() {
 // 			if (plugin::sync(false))
@@ -512,7 +512,7 @@ struct SyncItem : ui::MenuItem {
 
 
 struct LogOutItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		plugin::logOut();
 	}
 };
@@ -538,7 +538,7 @@ struct DownloadQuantity : Quantity {
 
 
 struct PluginsButton : MenuButton {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -604,7 +604,7 @@ struct PluginsButton : MenuButton {
 
 
 struct ManualItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t(system::openBrowser, "https://vcvrack.com/manual/");
 		t.detach();
 	}
@@ -612,7 +612,7 @@ struct ManualItem : ui::MenuItem {
 
 
 struct WebsiteItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t(system::openBrowser, "https://vcvrack.com/");
 		t.detach();
 	}
@@ -620,14 +620,14 @@ struct WebsiteItem : ui::MenuItem {
 
 
 struct CheckVersionItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		settings::checkVersion ^= true;
 	}
 };
 
 
 struct UserFolderItem : ui::MenuItem {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t(system::openFolder, asset::user(""));
 		t.detach();
 	}
@@ -635,7 +635,7 @@ struct UserFolderItem : ui::MenuItem {
 
 
 struct HelpButton : MenuButton {
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;

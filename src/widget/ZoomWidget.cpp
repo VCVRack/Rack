@@ -23,8 +23,8 @@ void ZoomWidget::setZoom(float zoom) {
 		return;
 	this->zoom = zoom;
 
-	EventContext cZoom;
-	ZoomEvent eZoom;
+	event::Context cZoom;
+	event::Zoom eZoom;
 	eZoom.context = &cZoom;
 	Widget::onZoom(eZoom);
 }

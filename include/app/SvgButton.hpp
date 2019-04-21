@@ -18,9 +18,9 @@ struct SvgButton : widget::OpaqueWidget {
 
 	SvgButton();
 	void addFrame(std::shared_ptr<Svg> svg);
-	void onDragStart(const widget::DragStartEvent &e) override;
-	void onDragEnd(const widget::DragEndEvent &e) override;
-	void onDragDrop(const widget::DragDropEvent &e) override;
+	void onDragStart(const event::DragStart &e) override;
+	void onDragEnd(const event::DragEnd &e) override;
+	void onDragDrop(const event::DragDrop &e) override;
 };
 
 

@@ -28,14 +28,14 @@ struct PortWidget : widget::OpaqueWidget {
 	void step() override;
 	void draw(const DrawArgs &args) override;
 
-	void onButton(const widget::ButtonEvent &e) override;
-	void onEnter(const widget::EnterEvent &e) override;
-	void onLeave(const widget::LeaveEvent &e) override;
-	void onDragStart(const widget::DragStartEvent &e) override;
-	void onDragEnd(const widget::DragEndEvent &e) override;
-	void onDragDrop(const widget::DragDropEvent &e) override;
-	void onDragEnter(const widget::DragEnterEvent &e) override;
-	void onDragLeave(const widget::DragLeaveEvent &e) override;
+	void onButton(const event::Button &e) override;
+	void onEnter(const event::Enter &e) override;
+	void onLeave(const event::Leave &e) override;
+	void onDragStart(const event::DragStart &e) override;
+	void onDragEnd(const event::DragEnd &e) override;
+	void onDragDrop(const event::DragDrop &e) override;
+	void onDragEnter(const event::DragEnter &e) override;
+	void onDragLeave(const event::DragLeave &e) override;
 };
 
 

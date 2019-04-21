@@ -23,7 +23,7 @@ static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 
 struct ModuleUrlItem : ui::MenuItem {
 	std::string url;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t(system::openBrowser, url);
 		t.detach();
 	}
@@ -32,7 +32,7 @@ struct ModuleUrlItem : ui::MenuItem {
 
 struct ModuleFolderItem : ui::MenuItem {
 	std::string path;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		std::thread t(system::openFolder, path);
 		t.detach();
 	}
@@ -108,7 +108,7 @@ struct ModulePluginItem : ui::MenuItem {
 
 struct ModuleDisconnectItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->disconnectAction();
 	}
 };
@@ -116,7 +116,7 @@ struct ModuleDisconnectItem : ui::MenuItem {
 
 struct ModuleResetItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->resetAction();
 	}
 };
@@ -124,7 +124,7 @@ struct ModuleResetItem : ui::MenuItem {
 
 struct ModuleRandomizeItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->randomizeAction();
 	}
 };
@@ -132,7 +132,7 @@ struct ModuleRandomizeItem : ui::MenuItem {
 
 struct ModuleCopyItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->copyClipboard();
 	}
 };
@@ -140,7 +140,7 @@ struct ModuleCopyItem : ui::MenuItem {
 
 struct ModulePasteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->pasteClipboardAction();
 	}
 };
@@ -148,7 +148,7 @@ struct ModulePasteItem : ui::MenuItem {
 
 struct ModuleSaveItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->saveDialog();
 	}
 };
@@ -156,7 +156,7 @@ struct ModuleSaveItem : ui::MenuItem {
 
 struct ModuleLoadItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->loadDialog();
 	}
 };
@@ -165,7 +165,7 @@ struct ModuleLoadItem : ui::MenuItem {
 struct ModulePresetPathItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
 	std::string presetPath;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->loadAction(presetPath);
 	}
 };
@@ -219,7 +219,7 @@ struct ModulePresetItem : ui::MenuItem {
 
 struct ModuleCloneItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->cloneAction();
 	}
 };
@@ -227,7 +227,7 @@ struct ModuleCloneItem : ui::MenuItem {
 
 struct ModuleBypassItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->bypassAction();
 	}
 };
@@ -235,7 +235,7 @@ struct ModuleBypassItem : ui::MenuItem {
 
 struct ModuleDeleteItem : ui::MenuItem {
 	ModuleWidget *moduleWidget;
-	void onAction(const widget::ActionEvent &e) override {
+	void onAction(const event::Action &e) override {
 		moduleWidget->removeAction();
 	}
 };
@@ -304,7 +304,7 @@ void ModuleWidget::drawShadow(const DrawArgs &args) {
 	nvgFill(args.vg);
 }
 
-void ModuleWidget::onHover(const widget::HoverEvent &e) {
+void ModuleWidget::onHover(const event::Hover &e) {
 	widget::OpaqueWidget::onHover(e);
 
 	if (!APP->event->selectedWidget) {
@@ -319,7 +319,7 @@ void ModuleWidget::onHover(const widget::HoverEvent &e) {
 	}
 }
 
-void ModuleWidget::onButton(const widget::ButtonEvent &e) {
+void ModuleWidget::onButton(const event::Button &e) {
 	widget::OpaqueWidget::onButton(e);
 	if (e.getTarget() != this)
 		return;
@@ -330,7 +330,7 @@ void ModuleWidget::onButton(const widget::ButtonEvent &e) {
 	}
 }
 
-void ModuleWidget::onHoverKey(const widget::HoverKeyEvent &e) {
+void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 	widget::OpaqueWidget::onHoverKey(e);
 	if (e.getTarget() != this)
 		return;
@@ -383,13 +383,13 @@ void ModuleWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 	}
 }
 
-void ModuleWidget::onDragStart(const widget::DragStartEvent &e) {
+void ModuleWidget::onDragStart(const event::DragStart &e) {
 	oldPos = box.pos;
 	dragPos = APP->scene->rack->mousePos.minus(box.pos);
 	e.consume(this);
 }
 
-void ModuleWidget::onDragEnd(const widget::DragEndEvent &e) {
+void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 	if (!box.pos.isEqual(oldPos)) {
 		// history::ModuleMove
 		history::ModuleMove *h = new history::ModuleMove;
@@ -400,7 +400,7 @@ void ModuleWidget::onDragEnd(const widget::DragEndEvent &e) {
 	}
 }
 
-void ModuleWidget::onDragMove(const widget::DragMoveEvent &e) {
+void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Rect newBox = box;
 		newBox.pos = APP->scene->rack->mousePos.minus(dragPos);

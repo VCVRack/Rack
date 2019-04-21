@@ -3,7 +3,7 @@
 #include "math.hpp"
 #include "window.hpp"
 #include "color.hpp"
-#include "widget/event.hpp"
+#include "event.hpp"
 #include <list>
 
 
@@ -138,35 +138,35 @@ struct Widget {
 	/** Override these event callbacks to respond to events.
 	See events.hpp for a description of each event.
 	*/
-	virtual void onHover(const HoverEvent &e) {recursePositionEvent(&Widget::onHover, e);}
-	virtual void onButton(const ButtonEvent &e) {recursePositionEvent(&Widget::onButton, e);}
-	virtual void onDoubleClick(const DoubleClickEvent &e) {}
-	virtual void onHoverKey(const HoverKeyEvent &e) {recursePositionEvent(&Widget::onHoverKey, e);}
-	virtual void onHoverText(const HoverTextEvent &e) {recursePositionEvent(&Widget::onHoverText, e);}
-	virtual void onHoverScroll(const HoverScrollEvent &e) {recursePositionEvent(&Widget::onHoverScroll, e);}
-	virtual void onEnter(const EnterEvent &e) {}
-	virtual void onLeave(const LeaveEvent &e) {}
-	virtual void onSelect(const SelectEvent &e) {}
-	virtual void onDeselect(const DeselectEvent &e) {}
-	virtual void onSelectKey(const SelectKeyEvent &e) {}
-	virtual void onSelectText(const SelectTextEvent &e) {}
-	virtual void onDragStart(const DragStartEvent &e) {}
-	virtual void onDragEnd(const DragEndEvent &e) {}
-	virtual void onDragMove(const DragMoveEvent &e) {}
-	virtual void onDragHover(const DragHoverEvent &e) {recursePositionEvent(&Widget::onDragHover, e);}
-	virtual void onDragEnter(const DragEnterEvent &e) {}
-	virtual void onDragLeave(const DragLeaveEvent &e) {}
-	virtual void onDragDrop(const DragDropEvent &e) {}
-	virtual void onPathDrop(const PathDropEvent &e) {recursePositionEvent(&Widget::onPathDrop, e);}
-	virtual void onAction(const ActionEvent &e) {}
-	virtual void onChange(const ChangeEvent &e) {}
-	virtual void onZoom(const ZoomEvent &e) {recurseEvent(&Widget::onZoom, e);}
-	virtual void onReposition(const RepositionEvent &e) {}
-	virtual void onResize(const ResizeEvent &e) {}
-	virtual void onAdd(const AddEvent &e) {}
-	virtual void onRemove(const RemoveEvent &e) {}
-	virtual void onShow(const ShowEvent &e) {recurseEvent(&Widget::onShow, e);}
-	virtual void onHide(const HideEvent &e) {recurseEvent(&Widget::onHide, e);}
+	virtual void onHover(const event::Hover &e) {recursePositionEvent(&Widget::onHover, e);}
+	virtual void onButton(const event::Button &e) {recursePositionEvent(&Widget::onButton, e);}
+	virtual void onDoubleClick(const event::DoubleClick &e) {}
+	virtual void onHoverKey(const event::HoverKey &e) {recursePositionEvent(&Widget::onHoverKey, e);}
+	virtual void onHoverText(const event::HoverText &e) {recursePositionEvent(&Widget::onHoverText, e);}
+	virtual void onHoverScroll(const event::HoverScroll &e) {recursePositionEvent(&Widget::onHoverScroll, e);}
+	virtual void onEnter(const event::Enter &e) {}
+	virtual void onLeave(const event::Leave &e) {}
+	virtual void onSelect(const event::Select &e) {}
+	virtual void onDeselect(const event::Deselect &e) {}
+	virtual void onSelectKey(const event::SelectKey &e) {}
+	virtual void onSelectText(const event::SelectText &e) {}
+	virtual void onDragStart(const event::DragStart &e) {}
+	virtual void onDragEnd(const event::DragEnd &e) {}
+	virtual void onDragMove(const event::DragMove &e) {}
+	virtual void onDragHover(const event::DragHover &e) {recursePositionEvent(&Widget::onDragHover, e);}
+	virtual void onDragEnter(const event::DragEnter &e) {}
+	virtual void onDragLeave(const event::DragLeave &e) {}
+	virtual void onDragDrop(const event::DragDrop &e) {}
+	virtual void onPathDrop(const event::PathDrop &e) {recursePositionEvent(&Widget::onPathDrop, e);}
+	virtual void onAction(const event::Action &e) {}
+	virtual void onChange(const event::Change &e) {}
+	virtual void onZoom(const event::Zoom &e) {recurseEvent(&Widget::onZoom, e);}
+	virtual void onReposition(const event::Reposition &e) {}
+	virtual void onResize(const event::Resize &e) {}
+	virtual void onAdd(const event::Add &e) {}
+	virtual void onRemove(const event::Remove &e) {}
+	virtual void onShow(const event::Show &e) {recurseEvent(&Widget::onShow, e);}
+	virtual void onHide(const event::Hide &e) {recurseEvent(&Widget::onHide, e);}
 };
 
 

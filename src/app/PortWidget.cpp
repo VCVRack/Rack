@@ -59,7 +59,7 @@ void PortWidget::draw(const DrawArgs &args) {
 	Widget::draw(args);
 }
 
-void PortWidget::onButton(const widget::ButtonEvent &e) {
+void PortWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
@@ -76,16 +76,16 @@ void PortWidget::onButton(const widget::ButtonEvent &e) {
 	}
 }
 
-void PortWidget::onEnter(const widget::EnterEvent &e) {
+void PortWidget::onEnter(const event::Enter &e) {
 	hovered = true;
 	e.consume(this);
 }
 
-void PortWidget::onLeave(const widget::LeaveEvent &e) {
+void PortWidget::onLeave(const event::Leave &e) {
 	hovered = false;
 }
 
-void PortWidget::onDragStart(const widget::DragStartEvent &e) {
+void PortWidget::onDragStart(const event::DragStart &e) {
 	CableWidget *cw = NULL;
 	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 		if (type == OUTPUT) {
@@ -131,7 +131,7 @@ void PortWidget::onDragStart(const widget::DragStartEvent &e) {
 	e.consume(this);
 }
 
-void PortWidget::onDragEnd(const widget::DragEndEvent &e) {
+void PortWidget::onDragEnd(const event::DragEnd &e) {
 	CableWidget *cw = APP->scene->rack->releaseIncompleteCable();
 	if (cw->isComplete()) {
 		APP->scene->rack->addCable(cw);
@@ -146,7 +146,7 @@ void PortWidget::onDragEnd(const widget::DragEndEvent &e) {
 	}
 }
 
-void PortWidget::onDragDrop(const widget::DragDropEvent &e) {
+void PortWidget::onDragDrop(const event::DragDrop &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		if (APP->scene->rack->getTopCable(this))
@@ -163,7 +163,7 @@ void PortWidget::onDragDrop(const widget::DragDropEvent &e) {
 	}
 }
 
-void PortWidget::onDragEnter(const widget::DragEnterEvent &e) {
+void PortWidget::onDragEnter(const event::DragEnter &e) {
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		if (APP->scene->rack->getTopCable(this))
@@ -180,7 +180,7 @@ void PortWidget::onDragEnter(const widget::DragEnterEvent &e) {
 	e.consume(this);
 }
 
-void PortWidget::onDragLeave(const widget::DragLeaveEvent &e) {
+void PortWidget::onDragLeave(const event::DragLeave &e) {
 	PortWidget *originPort = dynamic_cast<PortWidget*>(e.origin);
 	if (!originPort)
 		return;

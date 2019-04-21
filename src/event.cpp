@@ -1,69 +1,69 @@
-#include "widget/event.hpp"
+#include "event.hpp"
 #include "widget/Widget.hpp"
 
 
 namespace rack {
-namespace widget {
+namespace event {
 
 
-void EventState::setHovered(Widget *w) {
+void State::setHovered(widget::Widget *w) {
 	if (w == hoveredWidget)
 		return;
 
 	if (hoveredWidget) {
-		// LeaveEvent
-		LeaveEvent eLeave;
+		// Leave
+		Leave eLeave;
 		hoveredWidget->onLeave(eLeave);
 		hoveredWidget = NULL;
 	}
 
 	if (w) {
-		// EnterEvent
-		EventContext cEnter;
-		EnterEvent eEnter;
+		// Enter
+		Context cEnter;
+		Enter eEnter;
 		eEnter.context = &cEnter;
 		w->onEnter(eEnter);
 		hoveredWidget = cEnter.target;
 	}
 }
 
-void EventState::setDragged(Widget *w) {
+void State::setDragged(widget::Widget *w) {
 	if (w == draggedWidget)
 		return;
 
 	if (draggedWidget) {
-		// DragEndEvent
-		DragEndEvent eDragEnd;
+		// DragEnd
+		DragEnd eDragEnd;
 		draggedWidget->onDragEnd(eDragEnd);
 		draggedWidget = NULL;
 	}
 
 	if (w) {
-		// DragStartEvent
-		EventContext cDragStart;
-		DragStartEvent eDragStart;
+		// DragStart
+		Context cDragStart;
+		DragStart eDragStart;
 		eDragStart.context = &cDragStart;
 		w->onDragStart(eDragStart);
 		draggedWidget = cDragStart.target;
 	}
 }
 
-void EventState::setDragHovered(Widget *w) {
+void State::setDragHovered(widget::Widget *w) {
 	if (w == dragHoveredWidget)
 		return;
 
 	if (dragHoveredWidget) {
-		// DragLeaveEvent
-		DragLeaveEvent eDragLeave;
+		// DragLeave
+		DragLeave eDragLeave;
 		eDragLeave.origin = draggedWidget;
 		dragHoveredWidget->onDragLeave(eDragLeave);
 		dragHoveredWidget = NULL;
 	}
 
 	if (w) {
-		// DragEnterEvent
-		EventContext cDragEnter;
-		DragEnterEvent eDragEnter;
+		// DragEnter
+		Context cDragEnter;
+		DragEnter eDragEnter;
 		eDragEnter.context = &cDragEnter;
 		eDragEnter.origin = draggedWidget;
 		w->onDragEnter(eDragEnter);
@@ -71,28 +71,28 @@ void EventState::setDragHovered(Widget *w) {
 	}
 }
 
-void EventState::setSelected(Widget *w) {
+void State::setSelected(widget::Widget *w) {
 	if (w == selectedWidget)
 		return;
 
 	if (selectedWidget) {
-		// DeselectEvent
-		DeselectEvent eDeselect;
+		// Deselect
+		Deselect eDeselect;
 		selectedWidget->onDeselect(eDeselect);
 		selectedWidget = NULL;
 	}
 
 	if (w) {
-		// SelectEvent
-		EventContext cSelect;
-		SelectEvent eSelect;
+		// Select
+		Context cSelect;
+		Select eSelect;
 		eSelect.context = &cSelect;
 		w->onSelect(eSelect);
 		selectedWidget = cSelect.target;
 	}
 }
 
-void EventState::finalizeWidget(Widget *w) {
+void State::finalizeWidget(widget::Widget *w) {
 	if (hoveredWidget == w) setHovered(NULL);
 	if (draggedWidget == w) setDragged(NULL);
 	if (dragHoveredWidget == w) setDragHovered(NULL);
@@ -100,17 +100,17 @@ void EventState::finalizeWidget(Widget *w) {
 	if (lastClickedWidget == w) lastClickedWidget = NULL;
 }
 
-void EventState::handleButton(math::Vec pos, int button, int action, int mods) {
-	// ButtonEvent
-	EventContext cButton;
-	ButtonEvent eButton;
+void State::handleButton(math::Vec pos, int button, int action, int mods) {
+	// Button
+	Context cButton;
+	Button eButton;
 	eButton.context = &cButton;
 	eButton.pos = pos;
 	eButton.button = button;
 	eButton.action = action;
 	eButton.mods = mods;
 	rootWidget->onButton(eButton);
-	Widget *clickedWidget = cButton.target;
+	widget::Widget *clickedWidget = cButton.target;
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (action == GLFW_PRESS) {
@@ -121,8 +121,8 @@ void EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 			setDragHovered(NULL);
 
 			if (clickedWidget && draggedWidget) {
-				// DragDropEvent
-				DragDropEvent eDragDrop;
+				// DragDrop
+				DragDrop eDragDrop;
 				eDragDrop.origin = draggedWidget;
 				clickedWidget->onDragDrop(eDragDrop);
 			}
@@ -140,8 +140,8 @@ void EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 			if (clickedWidget
 				&& clickTime - lastClickTime <= doubleClickDuration
 				&& lastClickedWidget == clickedWidget) {
-				// DoubleClickEvent
-				DoubleClickEvent eDoubleClick;
+				// DoubleClick
+				DoubleClick eDoubleClick;
 				clickedWidget->onDoubleClick(eDoubleClick);
 				// Reset double click
 				lastClickTime = -INFINITY;
@@ -155,16 +155,16 @@ void EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 	}
 }
 
-void EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
+void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	if (draggedWidget) {
-		// DragMoveEvent
-		DragMoveEvent eDragMove;
+		// DragMove
+		DragMove eDragMove;
 		eDragMove.mouseDelta = mouseDelta;
 		draggedWidget->onDragMove(eDragMove);
 
-		// DragHoverEvent
-		EventContext cDragHover;
-		DragHoverEvent eDragHover;
+		// DragHover
+		Context cDragHover;
+		DragHover eDragHover;
 		eDragHover.context = &cDragHover;
 		eDragHover.pos = pos;
 		eDragHover.mouseDelta = mouseDelta;
@@ -176,9 +176,9 @@ void EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		return;
 	}
 
-	// HoverEvent
-	EventContext cHover;
-	HoverEvent eHover;
+	// Hover
+	Context cHover;
+	Hover eHover;
 	eHover.context = &cHover;
 	eHover.pos = pos;
 	eHover.mouseDelta = mouseDelta;
@@ -187,35 +187,35 @@ void EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	setHovered(cHover.target);
 }
 
-void EventState::handleLeave() {
+void State::handleLeave() {
 	setDragHovered(NULL);
 	setHovered(NULL);
 }
 
-void EventState::handleScroll(math::Vec pos, math::Vec scrollDelta) {
-	// HoverScrollEvent
-	EventContext cHoverScroll;
-	HoverScrollEvent eHoverScroll;
+void State::handleScroll(math::Vec pos, math::Vec scrollDelta) {
+	// HoverScroll
+	Context cHoverScroll;
+	HoverScroll eHoverScroll;
 	eHoverScroll.context = &cHoverScroll;
 	eHoverScroll.pos = pos;
 	eHoverScroll.scrollDelta = scrollDelta;
 	rootWidget->onHoverScroll(eHoverScroll);
 }
 
-void EventState::handleDrop(math::Vec pos, const std::vector<std::string> &paths) {
-	// PathDropEvent
-	EventContext cPathDrop;
-	PathDropEvent ePathDrop(paths);
+void State::handleDrop(math::Vec pos, const std::vector<std::string> &paths) {
+	// PathDrop
+	Context cPathDrop;
+	PathDrop ePathDrop(paths);
 	ePathDrop.context = &cPathDrop;
 	ePathDrop.pos = pos;
 	rootWidget->onPathDrop(ePathDrop);
 }
 
-void EventState::handleText(math::Vec pos, int codepoint) {
+void State::handleText(math::Vec pos, int codepoint) {
 	if (selectedWidget) {
-		// SelectTextEvent
-		EventContext cSelectText;
-		SelectTextEvent eSelectText;
+		// SelectText
+		Context cSelectText;
+		SelectText eSelectText;
 		eSelectText.context = &cSelectText;
 		eSelectText.codepoint = codepoint;
 		selectedWidget->onSelectText(eSelectText);
@@ -223,20 +223,20 @@ void EventState::handleText(math::Vec pos, int codepoint) {
 			return;
 	}
 
-	// HoverTextEvent
-	EventContext cHoverText;
-	HoverTextEvent eHoverText;
+	// HoverText
+	Context cHoverText;
+	HoverText eHoverText;
 	eHoverText.context = &cHoverText;
 	eHoverText.pos = pos;
 	eHoverText.codepoint = codepoint;
 	rootWidget->onHoverText(eHoverText);
 }
 
-void EventState::handleKey(math::Vec pos, int key, int scancode, int action, int mods) {
+void State::handleKey(math::Vec pos, int key, int scancode, int action, int mods) {
 	if (selectedWidget) {
-		// SelectKeyEvent
-		EventContext cSelectKey;
-		SelectKeyEvent eSelectKey;
+		// SelectKey
+		Context cSelectKey;
+		SelectKey eSelectKey;
 		eSelectKey.context = &cSelectKey;
 		eSelectKey.key = key;
 		eSelectKey.scancode = scancode;
@@ -247,9 +247,9 @@ void EventState::handleKey(math::Vec pos, int key, int scancode, int action, int
 			return;
 	}
 
-	// HoverKeyEvent
-	EventContext cHoverKey;
-	HoverKeyEvent eHoverKey;
+	// HoverKey
+	Context cHoverKey;
+	HoverKey eHoverKey;
 	eHoverKey.context = &cHoverKey;
 	eHoverKey.pos = pos;
 	eHoverKey.key = key;
@@ -259,14 +259,14 @@ void EventState::handleKey(math::Vec pos, int key, int scancode, int action, int
 	rootWidget->onHoverKey(eHoverKey);
 }
 
-void EventState::handleZoom() {
-	// ZoomEvent
-	EventContext cZoom;
-	ZoomEvent eZoom;
+void State::handleZoom() {
+	// Zoom
+	Context cZoom;
+	Zoom eZoom;
 	eZoom.context = &cZoom;
 	rootWidget->onZoom(eZoom);
 }
 
 
-} // namespace widget
+} // namespace event
 } // namespace rack

@@ -18,24 +18,24 @@ void Slider::draw(const DrawArgs &args) {
 	bndSlider(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
 }
 
-void Slider::onDragStart(const widget::DragStartEvent &e) {
+void Slider::onDragStart(const event::DragStart &e) {
 	state = BND_ACTIVE;
 	APP->window->cursorLock();
 	e.consume(this);
 }
 
-void Slider::onDragMove(const widget::DragMoveEvent &e) {
+void Slider::onDragMove(const event::DragMove &e) {
 	if (quantity) {
 		quantity->moveScaledValue(SENSITIVITY * e.mouseDelta.x);
 	}
 }
 
-void Slider::onDragEnd(const widget::DragEndEvent &e) {
+void Slider::onDragEnd(const event::DragEnd &e) {
 	state = BND_DEFAULT;
 	APP->window->cursorUnlock();
 }
 
-void Slider::onDoubleClick(const widget::DoubleClickEvent &e) {
+void Slider::onDoubleClick(const event::DoubleClick &e) {
 	if (quantity)
 		quantity->reset();
 }

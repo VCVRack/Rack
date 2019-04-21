@@ -1,6 +1,5 @@
 #include "ui/ScrollWidget.hpp"
 #include "app.hpp"
-#include "widget/event.hpp"
 
 
 namespace rack {
@@ -64,11 +63,11 @@ void ScrollWidget::step() {
 	verticalScrollBar->box.size.y = horizontalScrollBar->visible ? inner.y : box.size.y;
 }
 
-void ScrollWidget::onHover(const widget::HoverEvent &e) {
+void ScrollWidget::onHover(const event::Hover &e) {
 	widget::Widget::onHover(e);
 }
 
-void ScrollWidget::onHoverScroll(const widget::HoverScrollEvent &e) {
+void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 	widget::Widget::onHoverScroll(e);
 	if (e.getTarget() != this)
 		return;

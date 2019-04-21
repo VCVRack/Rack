@@ -30,7 +30,7 @@ void SvgSlider::setHandleSvg(std::shared_ptr<Svg> svg) {
 	fb->dirty = true;
 }
 
-void SvgSlider::onChange(const widget::ChangeEvent &e) {
+void SvgSlider::onChange(const event::Change &e) {
 	if (paramQuantity) {
 		// Interpolate handle position
 		float v = paramQuantity->getScaledValue();

@@ -5,24 +5,28 @@
 
 
 namespace rack {
+
+
 namespace widget {
+	struct Widget;
+}
 
 
-struct Widget;
+namespace event {
 
 
 /** A per-event state shared and writable by all widgets that recursively handle an event. */
-struct EventContext {
-	Widget *target = NULL;
+struct Context {
+	widget::Widget *target = NULL;
 	bool propagating = true;
 };
 
 
 /** Base class for all events. */
-struct Event {
-	EventContext *context = NULL;
+struct Base {
+	Context *context = NULL;
 
-	/** Prevents the Event from being handled by more Widgets.
+	/** Prevents the event from being handled by more Widgets.
 	*/
 	void stopPropagating() const {
 		if (context)
@@ -36,32 +40,32 @@ struct Event {
 	/** Tells the event handler that a particular Widget consumed the event.
 	You usually want to stop propagation as well, so call consume() instead.
 	*/
-	void setTarget(Widget *w) const {
+	void setTarget(widget::Widget *w) const {
 		if (context)
 			context->target = w;
 	}
-	Widget *getTarget() const {
+	widget::Widget *getTarget() const {
 		if (context)
 			return context->target;
 		return NULL;
 	}
 	/** Sets the target Widget and stops propagation. */
-	void consume(Widget *w) const {
+	void consume(widget::Widget *w) const {
 		setTarget(w);
 		stopPropagating();
 	}
 };
 
 
-/** An Event prototype with a vector position. */
-struct PositionEvent {
+/** An event prototype with a vector position. */
+struct PositionBase {
 	/** The pixel coordinate where the event occurred, relative to the Widget it is called on. */
 	math::Vec pos;
 };
 
 
-/** An Event prototype with a GLFW key. */
-struct KeyEvent {
+/** An event prototype with a GLFW key. */
+struct KeyBase {
 	/** GLFW_KEY_* */
 	int key;
 	/** GLFW_KEY_*. You should usually use `key` instead. */
@@ -73,21 +77,18 @@ struct KeyEvent {
 };
 
 
-/** An Event prototype with a Unicode character. */
-struct TextEvent {
+/** An event prototype with a Unicode character. */
+struct TextBase {
 	/** Unicode code point of the character */
 	int codepoint;
 };
-
-
-// Concrete events
 
 
 /** Occurs every frame when the mouse is hovering over a Widget.
 Recurses until consumed.
 If `target` is set, other events may occur on that Widget.
 */
-struct HoverEvent : Event, PositionEvent {
+struct Hover : Base, PositionBase {
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
 };
@@ -97,7 +98,7 @@ struct HoverEvent : Event, PositionEvent {
 Recurses until consumed.
 If `target` is set, other events may occur on that Widget.
 */
-struct ButtonEvent : Event, PositionEvent {
+struct Button : Base, PositionBase {
 	/** GLFW_MOUSE_BUTTON_LEFT, GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOUSE_BUTTON_MIDDLE, etc. */
 	int button;
 	/** GLFW_PRESS or GLFW_RELEASE */
@@ -109,28 +110,28 @@ struct ButtonEvent : Event, PositionEvent {
 
 /** Occurs when the left mouse button is pressed the second time within a time and position window.
 */
-struct DoubleClickEvent : Event {
+struct DoubleClick : Base {
 };
 
 
 /** Occurs when a key is pressed, released, or repeated while the mouse is hovering a Widget.
 Recurses until consumed.
 */
-struct HoverKeyEvent : Event, PositionEvent, KeyEvent {
+struct HoverKey : Base, PositionBase, KeyBase {
 };
 
 
 /** Occurs when a character is typed while the mouse is hovering a Widget.
 Recurses until consumed.
 */
-struct HoverTextEvent : Event, PositionEvent, TextEvent {
+struct HoverText : Base, PositionBase, TextBase {
 };
 
 
 /** Occurs when the mouse scroll wheel is moved while the mouse is hovering a Widget.
 Recurses until consumed.
 */
-struct HoverScrollEvent : Event, PositionEvent {
+struct HoverScroll : Base, PositionBase {
 	/** Change of scroll wheel position. */
 	math::Vec scrollDelta;
 };
@@ -139,59 +140,59 @@ struct HoverScrollEvent : Event, PositionEvent {
 /** Occurs when a Widget begins consuming the Hover event.
 Must consume to set the widget as hovered.
 */
-struct EnterEvent : Event {
+struct Enter : Base {
 };
 
 
 /** Occurs when a different Widget is entered.
 */
-struct LeaveEvent : Event {
+struct Leave : Base {
 };
 
 
 /** Occurs when a Widget begins consuming the Button press event.
 Must consume to set the widget as selected.
 */
-struct SelectEvent : Event {
+struct Select : Base {
 };
 
 
 /** Occurs when a different Widget is selected.
 */
-struct DeselectEvent : Event {
+struct Deselect : Base {
 };
 
 
 /** Occurs when a key is pressed, released, or repeated while a Widget is selected.
 If consumed, a HoverKey event will not be triggered.
 */
-struct SelectKeyEvent : Event, KeyEvent {
+struct SelectKey : Base, KeyBase {
 };
 
 
 /** Occurs when text is typed while a Widget is selected.
 If consumed, a HoverText event will not be triggered.
 */
-struct SelectTextEvent : Event, TextEvent {
+struct SelectText : Base, TextBase {
 };
 
 
 /** Occurs when a Widget begins being dragged.
 Must consume to set the widget as dragged.
 */
-struct DragStartEvent : Event {
+struct DragStart : Base {
 };
 
 
 /** Occurs when a Widget stops being dragged by releasing the mouse button.
 */
-struct DragEndEvent : Event {
+struct DragEnd : Base {
 };
 
 
 /** Occurs every frame on the dragged Widget.
 */
-struct DragMoveEvent : Event {
+struct DragMove : Base {
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
 };
@@ -200,9 +201,9 @@ struct DragMoveEvent : Event {
 /** Occurs every frame when the mouse is hovering over a Widget while another Widget (possibly the same one) is being dragged.
 Recurses until consumed.
 */
-struct DragHoverEvent : Event, PositionEvent {
+struct DragHover : Base, PositionBase {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
 };
@@ -210,33 +211,33 @@ struct DragHoverEvent : Event, PositionEvent {
 /** Occurs when the mouse enters a Widget while dragging.
 Must consume to set the widget as drag-hovered.
 */
-struct DragEnterEvent : Event {
+struct DragEnter : Base {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 };
 
 
 /** Occurs when the mouse leaves a Widget while dragging.
 */
-struct DragLeaveEvent : Event {
+struct DragLeave : Base {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 };
 
 
 /** Occurs when the mouse button is released over a Widget while dragging.
 */
-struct DragDropEvent : Event {
+struct DragDrop : Base {
 	/** The dragged widget */
-	Widget *origin = NULL;
+	widget::Widget *origin = NULL;
 };
 
 
 /** Occurs when a selection of files from the operating system is dropped onto a Widget.
 Recurses until consumed.
 */
-struct PathDropEvent : Event, PositionEvent {
-	PathDropEvent(const std::vector<std::string> &paths) : paths(paths) {}
+struct PathDrop : Base, PositionBase {
+	PathDrop(const std::vector<std::string> &paths) : paths(paths) {}
 
 	/** List of file paths in the dropped selection */
 	const std::vector<std::string> &paths;
@@ -246,79 +247,79 @@ struct PathDropEvent : Event, PositionEvent {
 /** Occurs after a certain action is triggered on a Widget.
 The concept of an "action" is dependent on the type of Widget.
 */
-struct ActionEvent : Event {
+struct Action : Base {
 };
 
 
 /** Occurs after the value of a Widget changes.
 The concept of a "value" is dependent on the type of Widget.
 */
-struct ChangeEvent : Event {
+struct Change : Base {
 };
 
 
 /** Occurs after the zoom level of a Widget is changed.
 Recurses until consumed.
 */
-struct ZoomEvent : Event {
+struct Zoom : Base {
 };
 
 
 /** Occurs after a Widget's position is set by Widget::setPos().
 */
-struct RepositionEvent : Event {
+struct Reposition : Base {
 };
 
 
 /** Occurs after a Widget's size is set by Widget::setSize().
 */
-struct ResizeEvent : Event {
+struct Resize : Base {
 };
 
 
 /** Occurs after a Widget is added to a parent.
 */
-struct AddEvent : Event {
+struct Add : Base {
 };
 
 
 /** Occurs before a Widget is removed from its parent.
 */
-struct RemoveEvent : Event {
+struct Remove : Base {
 };
 
 
 /** Occurs after a Widget is shown with Widget::show().
 */
-struct ShowEvent : Event {
+struct Show : Base {
 };
 
 
 /** Occurs after a Widget is hidden with Widget::hide().
 */
-struct HideEvent : Event {
+struct Hide : Base {
 };
 
 
-struct EventState {
-	Widget *rootWidget = NULL;
+struct State {
+	widget::Widget *rootWidget = NULL;
 	/** State widgets
 	Don't set these directly unless you know what you're doing. Use the set*() methods instead.
 	*/
-	Widget *hoveredWidget = NULL;
-	Widget *draggedWidget = NULL;
-	Widget *dragHoveredWidget = NULL;
-	Widget *selectedWidget = NULL;
+	widget::Widget *hoveredWidget = NULL;
+	widget::Widget *draggedWidget = NULL;
+	widget::Widget *dragHoveredWidget = NULL;
+	widget::Widget *selectedWidget = NULL;
 	/** For double-clicking */
 	double lastClickTime = -INFINITY;
-	Widget *lastClickedWidget = NULL;
+	widget::Widget *lastClickedWidget = NULL;
 
-	void setHovered(Widget *w);
-	void setDragged(Widget *w);
-	void setDragHovered(Widget *w);
-	void setSelected(Widget *w);
+	void setHovered(widget::Widget *w);
+	void setDragged(widget::Widget *w);
+	void setDragHovered(widget::Widget *w);
+	void setSelected(widget::Widget *w);
 	/** Prepares a widget for deletion */
-	void finalizeWidget(Widget *w);
+	void finalizeWidget(widget::Widget *w);
 
 	void handleButton(math::Vec pos, int button, int action, int mods);
 	void handleHover(math::Vec pos, math::Vec mouseDelta);
@@ -331,5 +332,5 @@ struct EventState {
 };
 
 
-} // namespace widget
+} // namespace event
 } // namespace rack

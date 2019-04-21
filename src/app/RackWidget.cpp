@@ -116,12 +116,12 @@ void RackWidget::draw(const DrawArgs &args) {
 	OpaqueWidget::draw(args);
 }
 
-void RackWidget::onHover(const widget::HoverEvent &e) {
+void RackWidget::onHover(const event::Hover &e) {
 	mousePos = e.pos;
 	OpaqueWidget::onHover(e);
 }
 
-void RackWidget::onHoverKey(const widget::HoverKeyEvent &e) {
+void RackWidget::onHoverKey(const event::HoverKey &e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.getTarget() != this)
 		return;
@@ -138,12 +138,12 @@ void RackWidget::onHoverKey(const widget::HoverKeyEvent &e) {
 	}
 }
 
-void RackWidget::onDragHover(const widget::DragHoverEvent &e) {
+void RackWidget::onDragHover(const event::DragHover &e) {
 	OpaqueWidget::onDragHover(e);
 	mousePos = e.pos;
 }
 
-void RackWidget::onButton(const widget::ButtonEvent &e) {
+void RackWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.getTarget() != this)
 		return;
@@ -154,7 +154,7 @@ void RackWidget::onButton(const widget::ButtonEvent &e) {
 	}
 }
 
-void RackWidget::onZoom(const widget::ZoomEvent &e) {
+void RackWidget::onZoom(const event::Zoom &e) {
 	OpaqueWidget::onZoom(e);
 }
 

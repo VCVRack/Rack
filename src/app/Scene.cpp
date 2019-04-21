@@ -71,7 +71,7 @@ void Scene::draw(const DrawArgs &args) {
 	OpaqueWidget::draw(args);
 }
 
-void Scene::onHoverKey(const widget::HoverKeyEvent &e) {
+void Scene::onHoverKey(const event::HoverKey &e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.getTarget() != this)
 		return;
@@ -133,7 +133,7 @@ void Scene::onHoverKey(const widget::HoverKeyEvent &e) {
 	}
 }
 
-void Scene::onPathDrop(const widget::PathDropEvent &e) {
+void Scene::onPathDrop(const event::PathDrop &e) {
 	OpaqueWidget::onPathDrop(e);
 	if (e.getTarget() != this)
 		return;

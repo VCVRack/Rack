@@ -23,9 +23,9 @@ struct Window;
 struct PatchManager;
 
 
-namespace widget {
-	struct EventState;
-};
+namespace event {
+	struct State;
+} // namespace event
 
 
 namespace app {
@@ -35,7 +35,7 @@ namespace app {
 
 /** Contains the application state  */
 struct App {
-	widget::EventState *event = NULL;
+	event::State *event = NULL;
 	app::Scene *scene = NULL;
 	engine::Engine *engine = NULL;
 	Window *window = NULL;

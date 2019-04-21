@@ -12,7 +12,7 @@ namespace app {
 static const float KNOB_SENSITIVITY = 0.0015f;
 
 
-void Knob::onHover(const widget::HoverEvent &e) {
+void Knob::onHover(const event::Hover &e) {
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
 	if (dist <= c.x) {
@@ -20,7 +20,7 @@ void Knob::onHover(const widget::HoverEvent &e) {
 	}
 }
 
-void Knob::onButton(const widget::ButtonEvent &e) {
+void Knob::onButton(const event::Button &e) {
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
 	if (dist <= c.x) {
@@ -28,7 +28,7 @@ void Knob::onButton(const widget::ButtonEvent &e) {
 	}
 }
 
-void Knob::onDragStart(const widget::DragStartEvent &e) {
+void Knob::onDragStart(const event::DragStart &e) {
 	if (paramQuantity) {
 		oldValue = paramQuantity->getSmoothValue();
 		if (snap) {
@@ -40,7 +40,7 @@ void Knob::onDragStart(const widget::DragStartEvent &e) {
 	e.consume(this);
 }
 
-void Knob::onDragEnd(const widget::DragEndEvent &e) {
+void Knob::onDragEnd(const event::DragEnd &e) {
 	APP->window->cursorUnlock();
 
 	if (paramQuantity) {
@@ -58,7 +58,7 @@ void Knob::onDragEnd(const widget::DragEndEvent &e) {
 	}
 }
 
-void Knob::onDragMove(const widget::DragMoveEvent &e) {
+void Knob::onDragMove(const event::DragMove &e) {
 	if (paramQuantity) {
 		float range;
 		if (paramQuantity->isBounded()) {
