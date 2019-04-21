@@ -27,22 +27,26 @@ void State::setHovered(widget::Widget *w) {
 	}
 }
 
-void State::setDragged(widget::Widget *w) {
+void State::setDragged(widget::Widget *w, int button) {
 	if (w == draggedWidget)
 		return;
 
 	if (draggedWidget) {
 		// DragEnd
 		DragEnd eDragEnd;
+		eDragEnd.button = dragButton;
 		draggedWidget->onDragEnd(eDragEnd);
 		draggedWidget = NULL;
 	}
+
+	dragButton = button;
 
 	if (w) {
 		// DragStart
 		Context cDragStart;
 		DragStart eDragStart;
 		eDragStart.context = &cDragStart;
+		eDragStart.button = dragButton;
 		w->onDragStart(eDragStart);
 		draggedWidget = cDragStart.target;
 	}
@@ -55,6 +59,7 @@ void State::setDragHovered(widget::Widget *w) {
 	if (dragHoveredWidget) {
 		// DragLeave
 		DragLeave eDragLeave;
+		eDragLeave.button = dragButton;
 		eDragLeave.origin = draggedWidget;
 		dragHoveredWidget->onDragLeave(eDragLeave);
 		dragHoveredWidget = NULL;
@@ -65,6 +70,7 @@ void State::setDragHovered(widget::Widget *w) {
 		Context cDragEnter;
 		DragEnter eDragEnter;
 		eDragEnter.context = &cDragEnter;
+		eDragEnter.button = dragButton;
 		eDragEnter.origin = draggedWidget;
 		w->onDragEnter(eDragEnter);
 		dragHoveredWidget = cDragEnter.target;
@@ -94,7 +100,7 @@ void State::setSelected(widget::Widget *w) {
 
 void State::finalizeWidget(widget::Widget *w) {
 	if (hoveredWidget == w) setHovered(NULL);
-	if (draggedWidget == w) setDragged(NULL);
+	if (draggedWidget == w) setDragged(NULL, 0);
 	if (dragHoveredWidget == w) setDragHovered(NULL);
 	if (selectedWidget == w) setSelected(NULL);
 	if (lastClickedWidget == w) lastClickedWidget = NULL;
@@ -112,24 +118,25 @@ void State::handleButton(math::Vec pos, int button, int action, int mods) {
 	rootWidget->onButton(eButton);
 	widget::Widget *clickedWidget = cButton.target;
 
+	if (action == GLFW_PRESS) {
+		setDragged(clickedWidget, button);
+	}
+
+	if (action == GLFW_RELEASE) {
+		setDragHovered(NULL);
+
+		if (clickedWidget && draggedWidget) {
+			// DragDrop
+			DragDrop eDragDrop;
+			eDragDrop.button = dragButton;
+			eDragDrop.origin = draggedWidget;
+			clickedWidget->onDragDrop(eDragDrop);
+		}
+
+		setDragged(NULL, 0);
+	}
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (action == GLFW_PRESS) {
-			setDragged(clickedWidget);
-		}
-
-		if (action == GLFW_RELEASE) {
-			setDragHovered(NULL);
-
-			if (clickedWidget && draggedWidget) {
-				// DragDrop
-				DragDrop eDragDrop;
-				eDragDrop.origin = draggedWidget;
-				clickedWidget->onDragDrop(eDragDrop);
-			}
-
-			setDragged(NULL);
-		}
-
 		if (action == GLFW_PRESS) {
 			setSelected(clickedWidget);
 		}
@@ -159,6 +166,7 @@ void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	if (draggedWidget) {
 		// DragMove
 		DragMove eDragMove;
+		eDragMove.button = dragButton;
 		eDragMove.mouseDelta = mouseDelta;
 		draggedWidget->onDragMove(eDragMove);
 
@@ -166,6 +174,7 @@ void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		Context cDragHover;
 		DragHover eDragHover;
 		eDragHover.context = &cDragHover;
+		eDragHover.button = dragButton;
 		eDragHover.pos = pos;
 		eDragHover.mouseDelta = mouseDelta;
 		eDragHover.origin = draggedWidget;
