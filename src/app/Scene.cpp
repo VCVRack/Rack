@@ -120,6 +120,24 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 					e.consume(this);
 				}
 			} break;
+			case GLFW_KEY_MINUS: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					float z = std::log2(settings::zoom);
+					z *= 2;
+					z = std::ceil(z - 0.01) - 1;
+					z /= 2;
+					settings::zoom = std::pow(2, z);
+				}
+			} break;
+			case GLFW_KEY_EQUAL: {
+				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+					float z = std::log2(settings::zoom);
+					z *= 2;
+					z = std::floor(z + 0.01) + 1;
+					z /= 2;
+					settings::zoom = std::pow(2, z);
+				}
+			} break;
 			case GLFW_KEY_ENTER:
 			case GLFW_KEY_KP_ENTER: {
 				moduleBrowser->show();
