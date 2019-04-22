@@ -97,22 +97,19 @@ RackWidget::~RackWidget() {
 }
 
 void RackWidget::step() {
-	// Adjust size and position of railFb
-	math::Rect bound = getViewport(math::Rect(math::Vec(), box.size));
-	if (!railFb->box.isContaining(bound)) {
-		math::Vec margin = math::Vec(200, 200);
-		railFb->box.pos = bound.pos.minus(margin).div(RACK_GRID_SIZE).floor().mult(RACK_GRID_SIZE);
-		railFb->box.size = bound.size.plus(margin.mult(2));
-		railFb->dirty = true;
-
-		RackRail *rail = railFb->getFirstDescendantOfType<RackRail>();
-		rail->box.size = railFb->box.size;
-	}
-
 	Widget::step();
 }
 
 void RackWidget::draw(const DrawArgs &args) {
+	// Resize and reposition the RackRail to align on the grid.
+	math::Rect railBox;
+	railBox.pos = args.clipBox.pos.div(RACK_GRID_SIZE).floor().mult(RACK_GRID_SIZE);
+	railBox.size = args.clipBox.size.div(RACK_GRID_SIZE).floor().plus(math::Vec(25, 2)).mult(RACK_GRID_SIZE);
+	railFb->box = railBox;
+
+	RackRail *rail = railFb->getFirstDescendantOfType<RackRail>();
+	rail->box.size = railFb->box.size;
+
 	Widget::draw(args);
 }
 
@@ -140,6 +137,7 @@ void RackWidget::onHoverKey(const event::HoverKey &e) {
 }
 
 void RackWidget::onDragHover(const event::DragHover &e) {
+	// Set before calling children's onDragHover()
 	mousePos = e.pos;
 	OpaqueWidget::onDragHover(e);
 }

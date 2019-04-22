@@ -32,7 +32,7 @@ struct Widget {
 
 	virtual ~Widget();
 
-	void setPos(math::Vec pos);
+	void setPosition(math::Vec pos);
 	void setSize(math::Vec size);
 	void show();
 	void hide();

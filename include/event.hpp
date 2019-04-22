@@ -291,7 +291,7 @@ struct Zoom : Base {
 };
 
 
-/** Occurs after a Widget's position is set by Widget::setPos().
+/** Occurs after a Widget's position is set by Widget::setPosition().
 */
 struct Reposition : Base {
 };

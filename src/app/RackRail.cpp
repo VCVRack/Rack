@@ -5,19 +5,19 @@ namespace rack {
 namespace app {
 
 void RackRail::draw(const DrawArgs &args) {
-	const float railHeight = RACK_GRID_WIDTH;
+	const float railHeight = 15;
 
 	// Background color
 	nvgBeginPath(args.vg);
 	nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
-	nvgFillColor(args.vg, nvgRGBf(0.2, 0.2, 0.2));
+	nvgFillColor(args.vg, nvgRGB(0x30, 0x30, 0x30));
 	nvgFill(args.vg);
 
 	// Rails
-	nvgFillColor(args.vg, nvgRGBf(0.85, 0.85, 0.85));
+	nvgFillColor(args.vg, nvgRGB(0xc9, 0xc9, 0xc9));
 	nvgStrokeWidth(args.vg, 1.0);
-	nvgStrokeColor(args.vg, nvgRGBf(0.7, 0.7, 0.7));
-	float holeRadius = 3.5;
+	nvgStrokeColor(args.vg, nvgRGB(0x9d, 0x9f, 0xa2));
+	float holeRadius = 4.0;
 	for (float railY = 0; railY < box.size.y; railY += RACK_GRID_HEIGHT) {
 		// Top rail
 		nvgBeginPath(args.vg);

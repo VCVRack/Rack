@@ -71,7 +71,7 @@ void FramebufferWidget::step() {
 	}
 
 	if (!fb) {
-		WARN("Framebuffer of size (%f, %f) * %f could not be created for FramebufferWidget", VEC_ARGS(fbSize), oversample);
+		WARN("Framebuffer of size (%f, %f) * %f could not be created for FramebufferWidget.", VEC_ARGS(fbSize), oversample);
 		return;
 	}
 
@@ -83,7 +83,7 @@ void FramebufferWidget::step() {
 	if (oversample != 1.0) {
 		NVGLUframebuffer *newFb = nvgluCreateFramebuffer(vg, fbSize.x, fbSize.y, 0);
 		if (!newFb) {
-			WARN("Non-oversampled framebuffer of size (%f, %f) could not be created for FramebufferWidget", VEC_ARGS(fbSize));
+			WARN("Non-oversampled framebuffer of size (%f, %f) could not be created for FramebufferWidget.", VEC_ARGS(fbSize));
 			return;
 		}
 
@@ -125,8 +125,10 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 	float xform[6];
 	nvgCurrentTransform(args.vg, xform);
 	// Skew and rotate is not supported
-	if (!math::isNear(xform[1], 0.f) || !math::isNear(xform[2], 0.f))
+	if (!math::isNear(xform[1], 0.f) || !math::isNear(xform[2], 0.f)) {
+		WARN("Skew and rotation detected but not supported in FramebufferWidget.");
 		return;
+	}
 	// Extract scale and offset from world transform
 	scale = math::Vec(xform[0], xform[3]);
 	offset = math::Vec(xform[4], xform[5]);

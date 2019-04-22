@@ -13,7 +13,7 @@ Widget::~Widget() {
 	clearChildren();
 }
 
-void Widget::setPos(math::Vec pos) {
+void Widget::setPosition(math::Vec pos) {
 	box.pos = pos;
 	// event::Reposition
 	event::Reposition eReposition;
