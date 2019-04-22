@@ -70,8 +70,10 @@ void FramebufferWidget::step() {
 			fb = nvgluCreateFramebuffer(vg, fbSize.x * oversample, fbSize.y * oversample, 0);
 	}
 
-	if (!fb)
+	if (!fb) {
+		WARN("Framebuffer of size (%f, %f) * %f could not be created for FramebufferWidget", VEC_ARGS(fbSize), oversample);
 		return;
+	}
 
 	nvgluBindFramebuffer(fb);
 	drawFramebuffer();
@@ -80,8 +82,10 @@ void FramebufferWidget::step() {
 	// If oversampling, create another framebuffer and copy it to actual size.
 	if (oversample != 1.0) {
 		NVGLUframebuffer *newFb = nvgluCreateFramebuffer(vg, fbSize.x, fbSize.y, 0);
-		if (!newFb)
+		if (!newFb) {
+			WARN("Non-oversampled framebuffer of size (%f, %f) could not be created for FramebufferWidget", VEC_ARGS(fbSize));
 			return;
+		}
 
 		// Use NanoVG for resizing framebuffers
 		nvgluBindFramebuffer(newFb);

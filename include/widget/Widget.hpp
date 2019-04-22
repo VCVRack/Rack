@@ -136,7 +136,7 @@ struct Widget {
 	}
 
 	/** Override these event callbacks to respond to events.
-	See events.hpp for a description of each event.
+	See event.hpp for a description of each event.
 	*/
 	virtual void onHover(const event::Hover &e) {recursePositionEvent(&Widget::onHover, e);}
 	virtual void onButton(const event::Button &e) {recursePositionEvent(&Widget::onButton, e);}
