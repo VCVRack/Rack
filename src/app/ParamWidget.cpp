@@ -147,11 +147,6 @@ void ParamWidget::onButton(const event::Button &e) {
 		if (paramQuantity) {
 			APP->scene->rack->touchedParam = this;
 		}
-
-		// Call onAction
-		event::Action eAction;
-		onAction(eAction);
-
 		e.consume(this);
 	}
 

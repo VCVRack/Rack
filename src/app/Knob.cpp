@@ -58,6 +58,11 @@ void Knob::onDragEnd(const event::DragEnd &e) {
 			h->newValue = newValue;
 			APP->history->push(h);
 		}
+		else {
+			// Call Action if knob was not changed
+			event::Action eAction;
+			onAction(eAction);
+		}
 	}
 }
 
