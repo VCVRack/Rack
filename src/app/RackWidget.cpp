@@ -104,7 +104,10 @@ void RackWidget::draw(const DrawArgs &args) {
 	// Resize and reposition the RackRail to align on the grid.
 	math::Rect railBox;
 	railBox.pos = args.clipBox.pos.div(BUS_BOARD_GRID_SIZE).floor().mult(BUS_BOARD_GRID_SIZE);
-	railBox.size = args.clipBox.size.div(BUS_BOARD_GRID_SIZE).floor().plus(math::Vec(5, 2)).mult(BUS_BOARD_GRID_SIZE);
+	railBox.size = args.clipBox.size.div(BUS_BOARD_GRID_SIZE).ceil().plus(math::Vec(1, 1)).mult(BUS_BOARD_GRID_SIZE);
+	if (!railFb->box.size.isEqual(railBox.size)) {
+		railFb->dirty = true;
+	}
 	railFb->box = railBox;
 
 	RackRail *rail = railFb->getFirstDescendantOfType<RackRail>();
