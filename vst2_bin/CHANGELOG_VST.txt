@@ -1,4 +1,10 @@
 
+** April 23rd, 2019
+- update Bidoo.*                0.6.27 => 0.6.28
+- update LindenbergResearch.*   0.6.4 => 0.6.5
+- update patches
+
+
 ** March 20th, 2019
 - add module Southpole-parasites.Smoke
 

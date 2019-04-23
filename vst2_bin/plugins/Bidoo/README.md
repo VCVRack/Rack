@@ -1,7 +1,7 @@
 # Bidoo's plugins for [VCVRack](https://vcvrack.com)
 
 <!-- Version and License Badges -->
-![Version](https://img.shields.io/badge/version-0.6.27-green.svg?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.6.28-green.svg?style=flat-square)
 ![License](https://img.shields.io/badge/license-BSD3-blue.svg?style=flat-square)
 ![Language](https://img.shields.io/badge/language-C++-yellow.svg?style=flat-square)
 
@@ -12,6 +12,10 @@
 You can find information on that plugins pack in the [wiki](https://github.com/sebastien-bouffier/Bidoo/wiki). When doing tests it happens that I record a video so you may find some ideas on how to use those modules [here](https://www.youtube.com/bidoo).
 
 ## Last changes
+
+01/04/2019 => 0.6.28
+**REI** fix, big thanks to Bastian.
+*NEW* **cuRt** v0.1 still under dev but already operational.
 
 13/02/2019 => 0.6.26
 **bordL** pitch calibration and KEY input fix.

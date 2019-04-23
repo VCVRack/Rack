@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- March 20th, 2019
+VeeSeeVST Rack VST 2.4 Plugin -- April 23rd, 2019
 =================================================
 
 !!!------------------------------------------------------------------------------
@@ -508,9 +508,9 @@ The following (794) add-on modules are statically linked with the VST plugin:
  - LindenbergResearch.BlankPanelWood
  - LindenbergResearch.VCO
  - LindenbergResearch.Westcoast (preview)
- - LindenbergResearch.Korg35 (WIP)
+ - LindenbergResearch.Type35
  - LindenbergResearch.DiodeVCF
- - LindenbergResearch.Speck (WIP)
+ - LindenbergResearch.Speck
  - LOGinstruments.constant
  - LOGinstruments.constant2
  - LOGinstruments.Speck

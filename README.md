@@ -41,8 +41,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-20Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-20Mar2019.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-20Mar2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-20Mar2019.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-23Apr2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-23Apr2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-23Apr2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-23Apr2019.7z) (32bit, experimental)
 
 ## Linux
 - [veeseevstrack_0_6_1_lin64_bin-31Mar2019.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-31Mar2019.tar.gz) (64bit) (Dave's latest build)
@@ -538,9 +538,9 @@ The following (794) add-on modules are statically linked with the VST plugin:
  - LindenbergResearch.BlankPanelWood
  - LindenbergResearch.VCO
  - LindenbergResearch.Westcoast (preview)
- - LindenbergResearch.Korg35 (WIP)
+ - LindenbergResearch.Type35
  - LindenbergResearch.DiodeVCF
- - LindenbergResearch.Speck (WIP)
+ - LindenbergResearch.Speck
  - LOGinstruments.constant
  - LOGinstruments.constant2
  - LOGinstruments.Speck
