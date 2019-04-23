@@ -3,6 +3,9 @@
 - update Bidoo.*                0.6.27 => 0.6.28
 - update LindenbergResearch.*   0.6.4 => 0.6.5
 - update patches
+- replace std::mutex by std::recursive_mutex (stability)
+- protect setProgramChunk() by engine.mutex (stability)
+- update win32+win64 plugin SDK
 
 
 ** March 20th, 2019
