@@ -5,8 +5,6 @@
 
 using namespace bogaudio::dsp;
 
-extern Model* modelVCAmp;
-
 namespace bogaudio {
 
 struct VCAmp : Module {
