@@ -90,19 +90,14 @@ void BAR::step() {
 		in_R_dBFS = -96.3f;
 
 	float data_L = in_L_dBFS*in_L_dBFS;
+	float data_R = in_R_dBFS*in_R_dBFS;
 
 	if (!vu_L_Buffer.full()) {
 		vu_L_Buffer.push(data_L);
+		vu_R_Buffer.push(data_R);
 	}
 	if (!rms_L_Buffer.full()) {
 		rms_L_Buffer.push(data_L);
-	}
-
-	float data_R = in_R_dBFS*in_R_dBFS;
-	if (!vu_R_Buffer.full()) {
-		vu_R_Buffer.push(data_R);
-	}
-	if (!rms_R_Buffer.full()) {
 		rms_R_Buffer.push(data_R);
 	}
 
@@ -328,6 +323,6 @@ struct BARWidget : ModuleWidget {
 using namespace rack_plugin_Bidoo;
 
 RACK_PLUGIN_MODEL_INIT(Bidoo, BAR) {
-   Model *modelBAR = Model::create<BAR, BARWidget>("Bidoo", "baR", "bAR compressor", DYNAMICS_TAG);
+Model *modelBAR = Model::create<BAR, BARWidget>("Bidoo", "baR", "bAR compressor", DYNAMICS_TAG, COMPRESSOR_TAG, EFFECT_TAG);
    return modelBAR;
 }
