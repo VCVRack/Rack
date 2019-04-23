@@ -301,6 +301,10 @@ void Window::run() {
 	while(!glfwWindowShouldClose(win)) {
 		frameTimeStart = glfwGetTime();
 
+		// Make event handlers and step() have a clean nanovg context
+		nvgReset(vg);
+		bndSetFont(uiFont->handle);
+
 		// Poll events
 		glfwPollEvents();
 		// In case glfwPollEvents() set another OpenGL context
@@ -328,8 +332,6 @@ void Window::run() {
 			glfwSetWindowTitle(win, windowTitle.c_str());
 			internal->lastWindowTitle = windowTitle;
 		}
-
-		bndSetFont(uiFont->handle);
 
 		// Get desired scaling
 		float pixelRatio;
@@ -359,7 +361,6 @@ void Window::run() {
 		if (visible) {
 			// Update and render
 			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
-			nvgReset(vg);
 			nvgScale(vg, pixelRatio, pixelRatio);
 
 			// Draw scene
