@@ -1,0 +1,851 @@
+{
+  "version": "0.6.1",
+  "oversampleFactor": 1.0,
+  "oversampleQuality": 7.0,
+  "oversampleNumIn": 8.0,
+  "oversampleNumOut": 8.0,
+  "idleDetect": 1.0,
+  "idleGraceSec": 0.75,
+  "idleOutputSec": 0.200000003,
+  "modules": [
+    {
+      "plugin": "Core",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 1,
+      "model": "QuadMIDIToCVInterface",
+      "pos": [
+        0,
+        0
+      ],
+      "params": [],
+      "data": {
+        "midi": {
+          "driver": -17545,
+          "deviceName": "VST MIDI Input Device",
+          "channel": -1
+        },
+        "polyMode": 2
+      }
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 26,
+      "model": "VCF",
+      "pos": [
+        66,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.295999438
+        },
+        {
+          "paramId": 1,
+          "value": 0.189000025
+        },
+        {
+          "paramId": 2,
+          "value": 0.25
+        },
+        {
+          "paramId": 3,
+          "value": 2.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 34,
+      "model": "VCF",
+      "pos": [
+        78,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.296000063
+        },
+        {
+          "paramId": 1,
+          "value": 0.189000055
+        },
+        {
+          "paramId": 2,
+          "value": 0.250499725
+        },
+        {
+          "paramId": 3,
+          "value": 2.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 42,
+      "model": "VCF",
+      "pos": [
+        90,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.301999509
+        },
+        {
+          "paramId": 1,
+          "value": 0.18900004
+        },
+        {
+          "paramId": 2,
+          "value": 0.250499696
+        },
+        {
+          "paramId": 3,
+          "value": 2.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.5
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 50,
+      "model": "VCF",
+      "pos": [
+        102,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.301999986
+        },
+        {
+          "paramId": 1,
+          "value": 0.18900001
+        },
+        {
+          "paramId": 2,
+          "value": 0.250499994
+        },
+        {
+          "paramId": 3,
+          "value": 2.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "Gratrix",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 63,
+      "model": "ADSR-F1",
+      "pos": [
+        0,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.609499633
+        },
+        {
+          "paramId": 2,
+          "value": 0.363000095
+        },
+        {
+          "paramId": 3,
+          "value": 0.145999849
+        }
+      ]
+    },
+    {
+      "plugin": "AudibleInstruments",
+      "version": "0.6.3",
+      "vst2_unique_param_base_id": 68,
+      "model": "Veils",
+      "pos": [
+        12,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.521500051
+        },
+        {
+          "paramId": 1,
+          "value": 0.495999515
+        },
+        {
+          "paramId": 2,
+          "value": 0.510999978
+        },
+        {
+          "paramId": 3,
+          "value": 0.499000013
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": 1.0
+        },
+        {
+          "paramId": 6,
+          "value": 1.0
+        },
+        {
+          "paramId": 7,
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "vst2_unique_param_base_id": 88,
+      "model": "VCMixer",
+      "pos": [
+        24,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        },
+        {
+          "paramId": 2,
+          "value": 1.0
+        },
+        {
+          "paramId": 3,
+          "value": 1.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        }
+      ]
+    },
+    {
+      "plugin": "Core",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 94,
+      "model": "AudioInterface",
+      "pos": [
+        54,
+        1
+      ],
+      "params": [],
+      "data": {
+        "audio": {
+          "driver": 0,
+          "deviceName": "",
+          "offset": 0,
+          "maxChannels": 8,
+          "sampleRate": 44100,
+          "blockSize": 256
+        }
+      }
+    },
+    {
+      "plugin": "Gratrix",
+      "version": "0.6.1",
+      "vst2_unique_param_base_id": 95,
+      "model": "ADSR-F1",
+      "pos": [
+        42,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": 0.480499834
+        },
+        {
+          "paramId": 2,
+          "value": 0.231499732
+        },
+        {
+          "paramId": 3,
+          "value": 0.5
+        }
+      ]
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 100,
+      "model": "VCO",
+      "pos": [
+        10,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0
+        },
+        {
+          "paramId": 1,
+          "value": -1.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 109,
+      "model": "VCO",
+      "pos": [
+        24,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0629999936
+        },
+        {
+          "paramId": 1,
+          "value": -1.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 118,
+      "model": "VCO",
+      "pos": [
+        38,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.0719999969
+        },
+        {
+          "paramId": 1,
+          "value": -1.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "LindenbergResearch",
+      "version": "0.6.5",
+      "vst2_unique_param_base_id": 127,
+      "model": "VCO",
+      "pos": [
+        52,
+        0
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": -0.0360000134
+        },
+        {
+          "paramId": 1,
+          "value": -1.0
+        },
+        {
+          "paramId": 2,
+          "value": 0.0
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 4,
+          "value": 1.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        },
+        {
+          "paramId": 7,
+          "value": 0.0
+        }
+      ],
+      "gestaltID": 2,
+      "gradient": true,
+      "patina": false,
+      "patina_a_x": 0.0,
+      "patina_a_y": 0.0,
+      "patina_b_x": 0.0,
+      "patina_b_y": 0.0
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "vst2_unique_param_base_id": 195,
+      "model": "Delay",
+      "pos": [
+        34,
+        1
+      ],
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.662000716
+        },
+        {
+          "paramId": 1,
+          "value": 0.5
+        },
+        {
+          "paramId": 2,
+          "value": 0.477499962
+        },
+        {
+          "paramId": 3,
+          "value": 0.5
+        }
+      ]
+    }
+  ],
+  "wires": [
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 0,
+      "outputId": 4,
+      "inputModuleId": 5,
+      "inputId": 4
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 0,
+      "outputId": 5,
+      "inputModuleId": 5,
+      "inputId": 6
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 0,
+      "outputId": 6,
+      "inputModuleId": 5,
+      "inputId": 8
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 0,
+      "outputId": 7,
+      "inputModuleId": 5,
+      "inputId": 10
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 1,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 2,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 1
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 3,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 2
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 4,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 3
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 5,
+      "outputId": 0,
+      "inputModuleId": 6,
+      "inputId": 4
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 5,
+      "outputId": 2,
+      "inputModuleId": 6,
+      "inputId": 5
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 5,
+      "outputId": 4,
+      "inputModuleId": 6,
+      "inputId": 6
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 5,
+      "outputId": 6,
+      "inputModuleId": 6,
+      "inputId": 7
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 6,
+      "outputId": 0,
+      "inputModuleId": 7,
+      "inputId": 1
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 6,
+      "outputId": 1,
+      "inputModuleId": 7,
+      "inputId": 2
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 6,
+      "outputId": 2,
+      "inputModuleId": 7,
+      "inputId": 3
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 6,
+      "outputId": 3,
+      "inputModuleId": 7,
+      "inputId": 4
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 0,
+      "outputId": 4,
+      "inputModuleId": 9,
+      "inputId": 4
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 0,
+      "outputId": 5,
+      "inputModuleId": 9,
+      "inputId": 6
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 0,
+      "outputId": 6,
+      "inputModuleId": 9,
+      "inputId": 8
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 0,
+      "outputId": 7,
+      "inputModuleId": 9,
+      "inputId": 10
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 9,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 1
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 9,
+      "outputId": 2,
+      "inputModuleId": 2,
+      "inputId": 1
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 9,
+      "outputId": 4,
+      "inputModuleId": 3,
+      "inputId": 1
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 9,
+      "outputId": 6,
+      "inputModuleId": 4,
+      "inputId": 1
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 0,
+      "outputId": 0,
+      "inputModuleId": 10,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 10,
+      "outputId": 5,
+      "inputModuleId": 1,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 0,
+      "outputId": 1,
+      "inputModuleId": 11,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 0,
+      "outputId": 2,
+      "inputModuleId": 12,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 0,
+      "outputId": 3,
+      "inputModuleId": 13,
+      "inputId": 0
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 11,
+      "outputId": 5,
+      "inputModuleId": 2,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 12,
+      "outputId": 5,
+      "inputModuleId": 3,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
+      "outputModuleId": 13,
+      "outputId": 5,
+      "inputModuleId": 4,
+      "inputId": 0
+    },
+    {
+      "color": "#0c8e15",
+      "outputModuleId": 7,
+      "outputId": 0,
+      "inputModuleId": 14,
+      "inputId": 4
+    },
+    {
+      "color": "#0986ad",
+      "outputModuleId": 14,
+      "outputId": 0,
+      "inputModuleId": 8,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 14,
+      "outputId": 0,
+      "inputModuleId": 8,
+      "inputId": 1
+    }
+  ]
+}
