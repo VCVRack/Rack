@@ -42,7 +42,7 @@ void LadderFilter::process() {
 
         b5 = ((b4 + t2) * p - b5 * f);
 
-        // fade over filter poles from 3dB/oct (1P) => 48dB/oct (5P)
+        // fade over lpf poles from 3dB/oct (1P) => 48dB/oct (5P)
         bx = fade5(b1, b2, b3, b4, b5, slope);
 
         // saturate and add very low noise to have self oscillation with no input and high res

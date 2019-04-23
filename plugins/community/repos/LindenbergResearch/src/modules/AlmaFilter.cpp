@@ -43,7 +43,11 @@ struct AlmaFilter : LRModule {
     LRMiddleKnob *driveKnob = NULL;
 
 
-    AlmaFilter() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+    AlmaFilter() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+        frqKnob = LRKnob::create<LRBigKnob>(Vec(62, 150), this, AlmaFilter::CUTOFF_PARAM, 0.f, 1.f, 0.8f);
+        peakKnob = LRKnob::create<LRMiddleKnob>(Vec(23, 228), this, AlmaFilter::RESONANCE_PARAM, -0.f, 1.5, 0.0f);
+        driveKnob = LRKnob::create<LRMiddleKnob>(Vec(115, 227), this, AlmaFilter::DRIVE_PARAM, 0.0f, 1.f, 0.0f);
+    }
 
 
     void step() override;
@@ -117,10 +121,6 @@ AlmaFilterWidget::AlmaFilterWidget(AlmaFilter *module) : LRModuleWidget(module) 
     // ***** SCREWS **********
 
     // ***** MAIN KNOBS ******
-    module->frqKnob = LRKnob::create<LRBigKnob>(Vec(62, 150), module, AlmaFilter::CUTOFF_PARAM, 0.f, 1.f, 0.8f);
-    module->peakKnob = LRKnob::create<LRMiddleKnob>(Vec(23, 228), module, AlmaFilter::RESONANCE_PARAM, -0.f, 1.5, 0.0f);
-    module->driveKnob = LRKnob::create<LRMiddleKnob>(Vec(115, 227), module, AlmaFilter::DRIVE_PARAM, 0.0f, 1.f, 0.0f);
-
     addParam(module->frqKnob);
     addParam(module->peakKnob);
     addParam(module->driveKnob);

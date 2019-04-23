@@ -41,7 +41,7 @@ struct BlankPanelWood : LRModule {
 
 
     json_t *toJson() override {
-        json_t *rootJ = LRModule::toJson();
+        json_t *rootJ = json_object();
 
         json_object_set_new(rootJ, "AGED", json_boolean(aged));
         json_object_set_new(rootJ, "screws", json_boolean(screws));

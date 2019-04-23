@@ -8,6 +8,7 @@ using namespace lrt;
 
 using dsp::DSPBLOscillator;
 
+
 struct VCO : LRModule {
     enum ParamIds {
         FREQUENCY_PARAM,
@@ -42,11 +43,13 @@ struct VCO : LRModule {
     };
 
     dsp::DSPBLOscillator *osc = new dsp::DSPBLOscillator(engineGetSampleRate());
-    LRLCDWidget *lcd = new LRLCDWidget(10, "%00004.3f Hz", LRLCDWidget::NUMERIC);
+    LRLCDWidget *lcd = new LRLCDWidget(10, "%00004.3f Hz", LRLCDWidget::NUMERIC, LCD_FONTSIZE);
     LRBigKnob *frqKnob = NULL;
 
 
-    VCO() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+    VCO() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+        frqKnob = LRKnob::create<LRBigKnob>(Vec(126.0, 64.7), this, VCO::FREQUENCY_PARAM, -1.f, 1.f, 0.f);
+    }
 
 
     /*
@@ -69,6 +72,7 @@ struct VCO : LRModule {
 
 
     void onRandomize() override;
+
     void step() override;
     void onSampleRateChange() override;
 };
@@ -166,7 +170,7 @@ VCOWidget::VCOWidget(VCO *module) : LRModuleWidget(module) {
 
 
     // **** SETUP LCD ********
-    module->lcd->box.pos = Vec(24, 242);
+    module->lcd->box.pos = Vec(22, 222);
     module->lcd->format = "%00004.3f Hz";
     addChild(module->lcd);
     // **** SETUP LCD ********
@@ -181,8 +185,6 @@ VCOWidget::VCOWidget(VCO *module) : LRModuleWidget(module) {
 
 
     // ***** MAIN KNOBS ******
-    module->frqKnob = LRKnob::create<LRBigKnob>(Vec(126.0, 64.7), module, VCO::FREQUENCY_PARAM, -1.f, 1.f, 0.f);
-
     addParam(module->frqKnob);
     addParam(LRKnob::create<LRToggleKnob>(Vec(133, 170.5), module, VCO::OCTAVE_PARAM, -4.f, 3.f, 0.f));
 

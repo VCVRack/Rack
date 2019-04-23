@@ -19,7 +19,7 @@ DSPBLOscillator::DSPBLOscillator(float sr) : DSPSystem(sr) {
  */
 void DSPBLOscillator::invalidate() {
     incr = getPhaseIncrement(param[FREQUENCY].value);
-    n = (int) floorf(BLIT_HARMONICS / param[FREQUENCY].value);
+    n = floorf(sr * 0.5 / param[FREQUENCY].value);
 }
 
 
@@ -33,7 +33,7 @@ void DSPBLOscillator::process() {
     phase = wrapTWOPI(incr + phase);
 
     /* pulse width */
-    float w = param[PULSEWIDTH].value * (float) M_PI;
+    float w = param[PULSEWIDTH].value * PI;
 
     /* get impulse train */
     float blit1 = BLIT(n, phase);

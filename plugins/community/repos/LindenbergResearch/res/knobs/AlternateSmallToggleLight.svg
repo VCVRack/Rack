@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:serif="http://www.serif.com/"
+     width="31px"
+     height="31px"
+     version="1.1"
+     xmlns="http://www.w3.org/2000/svg"
+     xml:space="preserve"
+     style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+    <g id="BigKnob"
+       transform="matrix(0.517335,0,0,0.517306,1.01459,1.03487)">
+        <circle cx="28"
+                cy="28"
+                r="25.714"
+                style="fill:#282828;stroke:#9f9f9f;stroke-width:1.16px;"/>
+        <g transform="matrix(1.02024,0,0,1.02024,-0.566743,-0.566763)">
+            <circle cx="27.999"
+                    cy="28"
+                    r="17.999"
+                    style="fill:#585858;stroke:#b4acac;stroke-opacity:0.709804;stroke-width:0.65px;stroke-linejoin:miter;stroke-miterlimit:1.414;"/>
+        </g>
+        <g transform="matrix(2.4154,0,0,1.15664,-39.9532,-3.1862)">
+            <rect x="26.732"
+                  y="1.915"
+                  width="2.801"
+                  height="12.374"
+                  style="fill:#9d9d9d;stroke:#4b4b4b;stroke-width:0.46px;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:1.414;"/>
+        </g>
+    </g>
+</svg>

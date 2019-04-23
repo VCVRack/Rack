@@ -60,7 +60,7 @@ set(SOURCE_FILES
         src/widgets/FontIconWidget.cpp
         src/modules/BlankPanelSmall.cpp
         src/modules/Speck.cpp
-        src/widgets/LRGradientWidget.cpp src/LRModule.cpp src/LRModuleWidget.cpp src/LRModel.hpp src/widgets/LRPatinaWidget.cpp src/LRGestalt.hpp src/modules/Korg35.cpp src/dsp/Korg35Filter.cpp src/dsp/Korg35Filter.hpp)
+        src/widgets/LRGradientWidget.cpp src/LRModule.cpp src/LRModuleWidget.cpp src/LRModel.hpp src/widgets/LRPatinaWidget.cpp src/LRGestalt.hpp src/modules/Type35.cpp src/dsp/Type35Filter.cpp src/dsp/Type35Filter.hpp src/dsp/RateConverter.cpp src/dsp/RateConverter.hpp)
 
 include_directories(.)
 include_directories(src)

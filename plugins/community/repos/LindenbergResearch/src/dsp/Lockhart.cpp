@@ -87,7 +87,7 @@ double LockhartWavefolder::compute(double x) {
     in = lh4.compute(in);
 
     in = tanh1->next(in) * 2.f;
-    //if (blockDC) in = dc->filter(in);
+    //if (blockDC) in = dc->lpf(in);
 
     out = in * 10;
 

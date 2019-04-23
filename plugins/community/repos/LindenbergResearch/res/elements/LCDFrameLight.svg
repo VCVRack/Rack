@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:serif="http://www.serif.com/"
+     width="92px"
+     height="22px"
+     version="1.1"
+     xmlns="http://www.w3.org/2000/svg"
+     xml:space="preserve"
+     style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:1.5;">
+    <g id="LCD"
+       transform="matrix(0.947368,0,0,1,-91.3127,-23.8647)">
+        <g id="frame"
+           transform="matrix(1.63874,0,0,1.49051,-64.4835,-125.907)">
+            <path d="M156.782,103.333c0,-1.202 -0.937,-2.179 -2.092,-2.179l-53.787,0c-1.155,0 -2.092,0.977 -2.092,2.179l0,9.061c0,1.202 0.937,2.179 2.092,2.179l53.787,0c1.155,0 2.092,-0.977 2.092,-2.179l0,-9.061Z"
+                  style="fill:#1a1a1a;stroke:#636363;stroke-width:0.66px;"/>
+        </g>
+        <g transform="matrix(1.1857,0,0,1.16125,-32.5281,-245.177)">
+            <path d="M188.835,234.121l0.456,0.5l0,13.171l-0.462,1.211l-1.558,0.332l-55.48,0l56.508,-15.516l0.536,0.302Z"
+                  style="fill:#3b3b3b;"/>
+        </g>
+    </g>
+</svg>

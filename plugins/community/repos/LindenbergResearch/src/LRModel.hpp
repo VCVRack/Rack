@@ -70,7 +70,7 @@ struct LRModuleWidget : ModuleWidget {
 
 
     /* Gestalt ID and UI settings */
-    LRGestalt gestalt = DARK;       // DARK == default
+    LRGestalt gestalt = LIGHT;      // DARK == default
     LRGestalt prevGestalt = NIL;    // set to NIL to trigger change event on first start
 
     bool gradient = true;           // gradient used at panel

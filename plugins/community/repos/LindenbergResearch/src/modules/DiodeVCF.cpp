@@ -38,13 +38,16 @@ struct DiodeVCF : LRModule {
     };
 
 
-    DiodeVCF() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+    DiodeVCF() : LRModule(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+        frqKnob = LRKnob::create<LRBigKnob>(Vec(32.5, 74.4), this, DiodeVCF::FREQUENCY_PARAM, 0.f, 1.f, 1.f);
+        resKnob = LRKnob::create<LRBigKnob>(Vec(151.5, 74.4), this, DiodeVCF::RES_PARAM, 0.0f, 1.0, 0.0f);
+        saturateKnob = LRKnob::create<LRMiddleKnob>(Vec(99.5, 164.4), this, DiodeVCF::SATURATE_PARAM, 0.f, 1.0, 0.0f);
+    }
 
 
     void onRandomize() override;
     void updateComponents();
 
-    LRLCDWidget *lcd = new LRLCDWidget(12, "%00004.3f Hz", LRLCDWidget::NUMERIC);
     DiodeLadderFilter *lpf = new DiodeLadderFilter(engineGetSampleRate());
 
     LRBigKnob *frqKnob = NULL;
@@ -122,8 +125,6 @@ void DiodeVCF::step() {
 
     lpf->low = !hidef;
 
-    lcd->value = lpf->getFreqHz();
-
     lpf->setIn(inputs[FILTER_INPUT].value / 10.f);
     lpf->invalidate();
     lpf->process();
@@ -183,11 +184,6 @@ DiodeVCFWidget::DiodeVCFWidget(DiodeVCF *module) : LRModuleWidget(module) {
     // ***** SCREWS **********
 
     // ***** MAIN KNOBS ******
-    module->frqKnob = LRKnob::create<LRBigKnob>(Vec(32.5, 74.4), module, DiodeVCF::FREQUENCY_PARAM, 0.f, 1.f, 1.f);
-    module->resKnob = LRKnob::create<LRBigKnob>(Vec(151.5, 74.4), module, DiodeVCF::RES_PARAM, 0.0f, 1.0, 0.0f);
-    module->saturateKnob = LRKnob::create<LRMiddleKnob>(Vec(99.5, 164.4), module, DiodeVCF::SATURATE_PARAM, 0.f, 1.0,
-                                                                  0.0f);
-
     module->frqKnob->setIndicatorColors(nvgRGBAf(0.9f, 0.9f, 0.9f, 1.0f));
     module->resKnob->setIndicatorColors(nvgRGBAf(0.9f, 0.9f, 0.9f, 1.0f));
     module->saturateKnob->setIndicatorColors(nvgRGBAf(0.9f, 0.9f, 0.9f, 1.0f));

@@ -8,7 +8,8 @@
 
 using namespace rack;
 
-const static float TWOPI = lroundf(M_PI * 2.);
+const static float PI = 3.1415926535897932384626433832795;
+const static float TWOPI = PI * 2.f;
 
 namespace dsp {
 
@@ -557,7 +558,7 @@ inline float fastlog(float x) {
  * @param b exponent
  * @return
  */
-inline double fastPow(double a, double b) {
+inline float fastPow(float a, float b) {
     union {
         double d;
         int x[2];

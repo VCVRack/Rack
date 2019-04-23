@@ -124,12 +124,12 @@ public:
 };
 
 
-struct DSPBLOscillator : DSPSystem<5, 5, 10> {
+struct DSPBLOscillator : DSPSystem<5, 6, 10> {
     /**
      * Bandwidth-limited threshold in hz.
      * Should be at least SR/2 !
      * */
-    static constexpr float BLIT_HARMONICS = 18000.f;
+    //static constexpr float BLIT_HARMONICS = 22050.f;
     static constexpr float NOTE_C4 = 261.626f;
 
     enum Inputs {

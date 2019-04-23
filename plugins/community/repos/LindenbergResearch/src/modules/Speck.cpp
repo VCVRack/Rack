@@ -24,6 +24,7 @@ namespace rack_plugin_LindenbergResearch {
 using namespace rack;
 using namespace lrt;
 
+
 float cabsf_LG(kiss_fft_cpx v) {
     return sqrtf((v.r * v.r + v.i * v.i));
 }

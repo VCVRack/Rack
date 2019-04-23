@@ -4,16 +4,17 @@ ALL_OBJ= \
 	src/dsp/FastTanWF.o \
 	src/dsp/Hardclip.o \
 	src/dsp/kiss_fft/kiss_fft.o \
-	src/dsp/Korg35Filter.o \
 	src/dsp/LadderFilter.o \
 	src/dsp/LambertW.o \
 	src/dsp/Lockhart.o \
 	src/dsp/MS20zdf.o \
 	src/dsp/Oscillator.o \
 	src/dsp/Overdrive.o \
+	src/dsp/RateConverter.o \
 	src/dsp/RShaper.o \
 	src/dsp/Saturator.o \
 	src/dsp/Serge.o \
+	src/dsp/Type35Filter.o \
 	src/dsp/WaveShaper.o \
 	src/LRModule.o \
 	src/LRModuleWidget.o \
@@ -33,7 +34,7 @@ ALL_OBJ= \
 	src/modules/BlankPanelSmall.o \
 	src/modules/BlankPanelWood.o \
 	src/modules/DiodeVCF.o \
-	src/modules/Korg35.o \
+	src/modules/Type35.o \
 	src/modules/MS20Filter.o \
 	src/modules/QuickMix.o \
 	src/modules/ReShaper.o \

@@ -16,7 +16,7 @@
 **                                                                     **
 \*                                                                     */
 
-#include "Korg35Filter.hpp"
+#include "Type35Filter.hpp"
 #include "DSPEffect.hpp"
 #include "DSPMath.hpp"
 
@@ -26,7 +26,7 @@
  * @param sr SampleRate
  * @param type Lowpass / Highpass
  */
-dsp::Korg35FilterStage::Korg35FilterStage(float sr, FilterType type) : DSPEffect(sr) {
+dsp::Type35FilterStage::Type35FilterStage(float sr, FilterType type) : DSPEffect(sr) {
     this->type = type;
 }
 
@@ -34,7 +34,7 @@ dsp::Korg35FilterStage::Korg35FilterStage(float sr, FilterType type) : DSPEffect
 /**
  * @brief Init stage
  */
-void dsp::Korg35FilterStage::init() {
+void dsp::Type35FilterStage::init() {
     type = LP_STAGE;
     alpha = 1.f;
     beta = 1.f;
@@ -46,7 +46,7 @@ void dsp::Korg35FilterStage::init() {
 /**
  * @brief Recompute filter parameter
  */
-void dsp::Korg35FilterStage::invalidate() {
+void dsp::Type35FilterStage::invalidate() {
     // only process in dedicated mode
     if (!dedicated) return;
 
@@ -62,7 +62,7 @@ void dsp::Korg35FilterStage::invalidate() {
 /**
  * @brief Update filter and compute next sample
  */
-void dsp::Korg35FilterStage::process() {
+void dsp::Type35FilterStage::process() {
     // v(n)
     float vn = (in - zn1) * alpha;
 
@@ -72,7 +72,7 @@ void dsp::Korg35FilterStage::process() {
 
     float hpf = in - lpf;
 
-    // switch filter type
+    // switch lpf type
     if (type == LP_STAGE) {
         out = lpf;
     } else {
@@ -85,9 +85,11 @@ void dsp::Korg35FilterStage::process() {
 /**
  * @brief Init main filter
  */
-void dsp::Korg35Filter::init() {
+void dsp::Type35Filter::init() {
     fc = sr / 2.f;
     peak = 0.f;
+
+
 
     /* lowpass stages */
     lpf1->init();
@@ -102,8 +104,18 @@ void dsp::Korg35Filter::init() {
 /**
  * @brief Recompute filter parameter
  */
-void dsp::Korg35Filter::invalidate() {
-    float frqHz = MAX_FREQUENCY / 1000.f * powf(1000.f, fc);
+void dsp::Type35Filter::invalidate() {
+    float frqHz;
+
+    fc = clamp(fc, 0.f, 1.1f);
+    peak = clamp(peak, 0.0001, 1.1f);
+
+    if (type == LPF)
+        frqHz = (MAX_FREQUENCY / 1000.f) * powf(950.f, fc) - 20.f;
+    else
+        frqHz = (MAX_FREQUENCY / 1000.f) * powf(1000.f, fc);
+
+    peak = cubicShape(peak) * 2.f + noise.nextFloat(10e-7);
 
     float wd = TWOPI * frqHz;
     float T = 1.f / sr;
@@ -138,7 +150,7 @@ void dsp::Korg35Filter::invalidate() {
 /**
  * @brief Compute next sample for output depending on filter type
  */
-void dsp::Korg35Filter::process() {
+void dsp::Type35Filter::process() {
     type == LPF ? processLPF() : processHPF();
 }
 
@@ -146,8 +158,8 @@ void dsp::Korg35Filter::process() {
 /**
  * @brief Do the lowpass filtering and oversampling
  */
-void dsp::Korg35Filter::processLPF() {
-    lpf1->in = in;
+void dsp::Type35Filter::processLPF() {
+    lpf1->in = in + noise.nextFloat(NOISE_GAIN);;
     lpf1->process();
     float y1 = lpf1->out;
 
@@ -156,7 +168,7 @@ void dsp::Korg35Filter::processLPF() {
     float u = Ga * (y1 + s35h);
     //float y = peak * fastatan(sat * u * 0.1) * 10.f;
 
-    u = tanhf(sat * u * 0.1) * 10.f;
+    u = fastatan(sat * u * 0.1) * 10.f;
 
     lpf2->in = u;
     lpf2->process();
@@ -179,8 +191,8 @@ void dsp::Korg35Filter::processLPF() {
 /**
  * @brief Do the highpass filtering and oversampling
  */
-void dsp::Korg35Filter::processHPF() {
-    hpf1->in = in;
+void dsp::Type35Filter::processHPF() {
+    hpf1->in = in + noise.nextFloat(NOISE_GAIN);
     hpf1->process();
     float y1 = hpf1->out;
 
@@ -207,14 +219,32 @@ void dsp::Korg35Filter::processHPF() {
  * @brief Update samplerate
  * @param sr SR
  */
-void dsp::Korg35Filter::setSamplerate(float sr) {
-    DSPEffect::setSamplerate(sr);
+void dsp::Type35Filter::setSamplerate(float sr) {
+    DSPEffect::setSamplerate(sr * OVERSAMPLE);
 
     // derive samplerate change
-    lpf1->setSamplerate(sr);
-    lpf2->setSamplerate(sr);
-    hpf1->setSamplerate(sr);
-    hpf2->setSamplerate(sr);
+    lpf1->setSamplerate(sr * OVERSAMPLE);
+    lpf2->setSamplerate(sr * OVERSAMPLE);
+    hpf1->setSamplerate(sr * OVERSAMPLE);
+    hpf2->setSamplerate(sr * OVERSAMPLE);
 
     invalidate();
+}
+
+
+/**
+ * @brief Top function which handles the oversampling
+ */
+void dsp::Type35Filter::process2() {
+    rs->doUpsample(IN, in);
+
+    for (int i = 0; i < rs->getFactor(); i++) {
+        in = (float) rs->getUpsampled(IN)[i];
+
+        process();
+
+        rs->data[IN][i] = out;
+    }
+
+    out = (float) rs->getDownsampled(IN);;
 }

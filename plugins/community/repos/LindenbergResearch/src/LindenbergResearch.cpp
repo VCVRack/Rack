@@ -14,13 +14,13 @@ RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, SimpleFilter);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, VCO);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, Westcoast);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, DiodeVCF);
-RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, Korg35);
+RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, Type35);
 RACK_PLUGIN_MODEL_DECLARE(LindenbergResearch, Speck);
 
 RACK_PLUGIN_INIT(LindenbergResearch) {
    RACK_PLUGIN_INIT_ID();
 
-   RACK_PLUGIN_INIT_VERSION("0.6.4");
+   RACK_PLUGIN_INIT_VERSION("0.6.5");
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/lindenbergresearch/LRTRack");
    RACK_PLUGIN_INIT_MANUAL("https://github.com/lindenbergresearch/LRTRack");
@@ -37,6 +37,6 @@ RACK_PLUGIN_INIT(LindenbergResearch) {
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, VCO);
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, Westcoast);
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, DiodeVCF);
-   RACK_PLUGIN_MODEL_ADD(LindenbergResearch, Korg35);
+   RACK_PLUGIN_MODEL_ADD(LindenbergResearch, Type35);
    RACK_PLUGIN_MODEL_ADD(LindenbergResearch, Speck);
 }

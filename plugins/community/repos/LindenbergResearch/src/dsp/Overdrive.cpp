@@ -40,7 +40,7 @@ double Overdrive::compute(double x) {
     in = (1 + k) * (in) / (1 + k * abs(in));
 
     in *= 1 / OVERDRIVE_GAIN * 0.3;
-    // if (blockDC) in = dc->filter(in);
+    // if (blockDC) in = dc->lpf(in);
 
     out = in;
 

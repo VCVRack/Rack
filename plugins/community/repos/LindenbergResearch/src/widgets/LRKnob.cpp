@@ -40,12 +40,25 @@ void LRKnob::draw(NVGcontext *vg) {
 
     /** debug numerical values */
     if (debug) {
-        auto text = stringf("%4.2f", value);
-        nvgFontSize(vg, 15);
-        nvgFontFaceId(vg, font->handle);
+        auto text = stringf("%4.3f", value);
+        auto size = box.size.x / 2. > 15 ? 15 : box.size.x / 2.;
+        nvgFontSize(vg, size);
 
-        nvgFillColor(vg, nvgRGBAf(1.f, 1.f, 1.0f, 1.0f));
-        nvgText(vg, box.size.x - 5, box.size.y + 10, text.c_str(), NULL);
+        nvgFontFaceId(vg, font->handle);
+        nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+
+        float bounds[4];
+
+        nvgTextBounds(vg, 0, 0, text.c_str(), nullptr, bounds);
+
+        nvgBeginPath(vg);
+        nvgFillColor(vg, nvgRGBAf(0., 0.1, 0.2, 0.8));
+        nvgRoundedRect(vg, bounds[0] - 4, bounds[1] - 2, (bounds[2] - bounds[0]) + 8, (bounds[3] - bounds[1]) + 4,
+                       ((bounds[3] - bounds[1]) + 4) / 2 - 1);
+        nvgFill(vg);
+
+        nvgFillColor(vg, nvgRGBAf(1.0f, 1.0f, 1.0f, .99f));
+        nvgText(vg, 0, 0, text.c_str(), NULL);
     }
 }
 
