@@ -55,7 +55,8 @@ struct Global {
       float sampleRate;
       float sampleTime;
       
-      std::mutex mutex;
+      // std::mutex mutex;
+      std::recursive_mutex mutex;
       std::thread thread;
       VIPMutex vipMutex;
       

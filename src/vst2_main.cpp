@@ -957,7 +957,6 @@ public:
    void setEnableProcessingActive(bool _bEnable) {
       lockAudio();
       b_processing = _bEnable;
-
       unlockAudio();
    }
 
@@ -1096,6 +1095,8 @@ public:
       // Dprintf("xxx vstrack_plugin:setProgramChunk: 3\n");
       vst2_set_shared_plugin_tls_globals();
       // Dprintf("xxx vstrack_plugin:setProgramChunk: 4\n");
+      // std::lock_guard<std::mutex> lock(rack::global->engine.mutex);
+      std::lock_guard<std::recursive_mutex> lock(rack::global->engine.mutex);
 #if 0
       Dprintf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
 #endif
