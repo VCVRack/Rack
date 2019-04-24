@@ -147,7 +147,6 @@ struct HoverScroll : Base, PositionBase {
 
 
 /** Occurs when a Widget begins consuming the Hover event.
-Must consume to set the widget as hovered.
 Must set the Hover target to receive this event.
 */
 struct Enter : Base {
@@ -155,7 +154,6 @@ struct Enter : Base {
 
 
 /** Occurs when a different Widget is entered.
-Must set the Enter target to receive this event.
 */
 struct Leave : Base {
 };
@@ -169,15 +167,13 @@ struct Select : Base {
 
 
 /** Occurs when a different Widget is selected.
-Must set the Select target to receive this event.
 */
 struct Deselect : Base {
 };
 
 
 /** Occurs when a key is pressed, released, or repeated while a Widget is selected.
-If consumed, a HoverKey event will not be triggered.
-Must set the Select target to receive this event.
+Must consume to prevent HoverKey from being triggered.
 */
 struct SelectKey : Base, KeyBase {
 };
@@ -185,7 +181,6 @@ struct SelectKey : Base, KeyBase {
 
 /** Occurs when text is typed while a Widget is selected.
 If consumed, a HoverText event will not be triggered.
-Must set the Select target to receive this event.
 */
 struct SelectText : Base, TextBase {
 };
@@ -197,7 +192,6 @@ struct DragBase : Base {
 };
 
 /** Occurs when a Widget begins being dragged.
-Must consume to set the widget as dragged.
 Must set the Button target to receive this event.
 */
 struct DragStart : DragBase {
@@ -205,14 +199,14 @@ struct DragStart : DragBase {
 
 
 /** Occurs when a Widget stops being dragged by releasing the mouse button.
-Must set the DragStart target to receive this event.
+Must set the Button target to receive this event.
 */
 struct DragEnd : DragBase {
 };
 
 
 /** Occurs every frame on the dragged Widget.
-Must set the DragStart target to receive this event.
+Must set the Button target to receive this event.
 */
 struct DragMove : DragBase {
 	/** Change in mouse position since the last frame. Can be zero. */
@@ -222,7 +216,6 @@ struct DragMove : DragBase {
 
 /** Occurs every frame when the mouse is hovering over a Widget while another Widget (possibly the same one) is being dragged.
 Recurses.
-Must set the DragStart target to receive this event.
 */
 struct DragHover : DragBase, PositionBase {
 	/** The dragged widget */
@@ -232,8 +225,7 @@ struct DragHover : DragBase, PositionBase {
 };
 
 /** Occurs when the mouse enters a Widget while dragging.
-Must consume to set the widget as drag-hovered.
-Must set the DragStart target to receive this event.
+Must set the DragHover target to receive this event.
 */
 struct DragEnter : DragBase {
 	/** The dragged widget */
@@ -242,7 +234,7 @@ struct DragEnter : DragBase {
 
 
 /** Occurs when the mouse leaves a Widget while dragging.
-Must set the DragStart target to receive this event.
+Must set the DragHover target to receive this event.
 */
 struct DragLeave : DragBase {
 	/** The dragged widget */
@@ -251,7 +243,7 @@ struct DragLeave : DragBase {
 
 
 /** Occurs when the mouse button is released over a Widget while dragging.
-Must set the DragStart target to receive this event.
+Must set the DragHover target to receive this event.
 */
 struct DragDrop : DragBase {
 	/** The dragged widget */

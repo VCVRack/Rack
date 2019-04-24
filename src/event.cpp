@@ -20,6 +20,7 @@ void State::setHovered(widget::Widget *w) {
 	if (w) {
 		// Enter
 		Context cEnter;
+		cEnter.target = w;
 		Enter eEnter;
 		eEnter.context = &cEnter;
 		w->onEnter(eEnter);
@@ -44,6 +45,7 @@ void State::setDragged(widget::Widget *w, int button) {
 	if (w) {
 		// DragStart
 		Context cDragStart;
+		cDragStart.target = w;
 		DragStart eDragStart;
 		eDragStart.context = &cDragStart;
 		eDragStart.button = dragButton;
@@ -68,6 +70,7 @@ void State::setDragHovered(widget::Widget *w) {
 	if (w) {
 		// DragEnter
 		Context cDragEnter;
+		cDragEnter.target = w;
 		DragEnter eDragEnter;
 		eDragEnter.context = &cDragEnter;
 		eDragEnter.button = dragButton;
@@ -91,6 +94,7 @@ void State::setSelected(widget::Widget *w) {
 	if (w) {
 		// Select
 		Context cSelect;
+		cSelect.target = w;
 		Select eSelect;
 		eSelect.context = &cSelect;
 		w->onSelect(eSelect);
