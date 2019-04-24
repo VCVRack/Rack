@@ -29,7 +29,7 @@ struct BlankPanel : Widget {
 
 struct ModuleResizeHandle : OpaqueWidget {
 	bool right = false;
-	float dragX;
+	Vec dragPos;
 	Rect originalBox;
 
 	ModuleResizeHandle() {
@@ -40,19 +40,22 @@ struct ModuleResizeHandle : OpaqueWidget {
 		if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 			return;
 
-		dragX = APP->scene->rack->mousePos.x;
-		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
-		originalBox = m->box;
+		dragPos = APP->scene->rack->mousePos;
+		ModuleWidget *mw = getAncestorOfType<ModuleWidget>();
+		assert(mw);
+		originalBox = mw->box;
 		e.consume(this);
 	}
 
 	void onDragMove(const event::DragMove &e) override {
-		ModuleWidget *m = getAncestorOfType<ModuleWidget>();
+		ModuleWidget *mw = getAncestorOfType<ModuleWidget>();
+		assert(mw);
 
-		float newDragX = APP->scene->rack->mousePos.x;
-		float deltaX = newDragX - dragX;
+		Vec newDragPos = APP->scene->rack->mousePos;
+		float deltaX = newDragPos.x - dragPos.x;
 
 		Rect newBox = originalBox;
+		Rect oldBox = mw->box;
 		const float minWidth = 3 * RACK_GRID_WIDTH;
 		if (right) {
 			newBox.size.x += deltaX;
@@ -65,8 +68,12 @@ struct ModuleResizeHandle : OpaqueWidget {
 			newBox.size.x = std::round(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
-		// TODO
-		// APP->scene->rack->requestModuleBox(m, newBox);
+
+		// Set box and test whether it's valid
+		mw->box = newBox;
+		if (!APP->scene->rack->requestModulePos(mw, newBox.pos)) {
+			mw->box = oldBox;
+		}
 	}
 
 	void draw(const DrawArgs &args) override {
