@@ -118,7 +118,7 @@ struct EngineWorker {
 
 	void run() {
 		system::setThreadName("Engine worker");
-		system::setThreadRealTime();
+		// system::setThreadRealTime();
 		disableDenormals();
 		while (running) {
 			step();
@@ -303,7 +303,7 @@ static void Engine_updateAdjacent(Engine *that, Module *m) {
 static void Engine_run(Engine *that) {
 	// Set up thread
 	system::setThreadName("Engine");
-	system::setThreadRealTime();
+	// system::setThreadRealTime();
 	disableDenormals();
 
 	// Every time the that waits and locks a mutex, it steps this many frames
