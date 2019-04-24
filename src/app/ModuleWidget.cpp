@@ -406,7 +406,10 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Vec pos = APP->scene->rack->mousePos.minus(dragPos);
-		APP->scene->rack->requestModulePosNearest(this, pos);
+		if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
+			APP->scene->rack->setModulePosForce(this, pos);
+		else
+			APP->scene->rack->setModulePosNearest(this, pos);
 	}
 }
 

@@ -376,7 +376,7 @@ void RackWidget::addModuleAtMouse(ModuleWidget *mw) {
 	assert(mw);
 	// Move module nearest to the mouse position
 	math::Vec pos = mousePos.minus(mw->box.size.div(2));
-	requestModulePosNearest(mw, pos);
+	setModulePosNearest(mw, pos);
 	addModule(mw);
 }
 
@@ -403,15 +403,15 @@ void RackWidget::removeModule(ModuleWidget *m) {
 bool RackWidget::requestModulePos(ModuleWidget *mw, math::Vec pos) {
 	// Check intersection with other modules
 	math::Rect mwBox = math::Rect(pos, mw->box.size);
-	for (widget::Widget *mw2 : moduleContainer->children) {
+	for (widget::Widget *w2 : moduleContainer->children) {
 		// Don't intersect with self
-		if (mw == mw2)
+		if (mw == w2)
 			continue;
 		// Don't intersect with invisible modules
-		if (!mw2->visible)
+		if (!w2->visible)
 			continue;
 		// Check intersection
-		if (mwBox.isIntersecting(mw2->box)) {
+		if (mwBox.isIntersecting(w2->box)) {
 			return false;
 		}
 	}
@@ -422,7 +422,7 @@ bool RackWidget::requestModulePos(ModuleWidget *mw, math::Vec pos) {
 	return true;
 }
 
-bool RackWidget::requestModulePosNearest(ModuleWidget *mw, math::Vec pos) {
+void RackWidget::setModulePosNearest(ModuleWidget *mw, math::Vec pos) {
 	// Dijkstra's algorithm to generate a sorted list of Vecs closest to `pos`.
 
 	// Comparison of distance of Vecs to `pos`
@@ -447,7 +447,7 @@ bool RackWidget::requestModulePosNearest(ModuleWidget *mw, math::Vec pos) {
 		math::Vec testPos = queue.top();
 		// Check testPos
 		if (requestModulePos(mw, testPos))
-			return true;
+			return;
 		// Move testPos to visited set
 		queue.pop();
 		visited.insert(testPos);
@@ -469,7 +469,33 @@ bool RackWidget::requestModulePosNearest(ModuleWidget *mw, math::Vec pos) {
 
 	// We failed to find a box. This shouldn't happen on an infinite rack.
 	assert(0);
-	return false;
+}
+
+static void shoveIntersectingInvisibleModules(RackWidget *that, ModuleWidget *mw) {
+	for (widget::Widget *w2 : that->moduleContainer->children) {
+		if (w2->visible)
+			continue;
+		if (mw->box.isIntersecting(w2->box)) {
+			ModuleWidget *mw2 = dynamic_cast<ModuleWidget*>(w2);
+			mw2->visible = true;
+			that->setModulePosNearest(mw2, mw2->box.pos);
+			shoveIntersectingInvisibleModules(that, mw2);
+		}
+	}
+}
+
+void RackWidget::setModulePosForce(ModuleWidget *mw, math::Vec pos) {
+	for (widget::Widget *w2 : moduleContainer->children) {
+		w2->visible = false;
+	}
+
+	mw->visible = true;
+	mw->box.pos = pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
+	shoveIntersectingInvisibleModules(this, mw);
+
+	for (widget::Widget *w2 : moduleContainer->children) {
+		w2->visible = true;
+	}
 }
 
 ModuleWidget *RackWidget::getModule(int moduleId) {

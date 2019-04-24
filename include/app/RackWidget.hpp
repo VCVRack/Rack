@@ -51,7 +51,8 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Sets a module's box if non-colliding. Returns true if set */
 	bool requestModulePos(ModuleWidget *mw, math::Vec pos);
 	/** Moves a module to the closest non-colliding position */
-	bool requestModulePosNearest(ModuleWidget *mw, math::Vec pos);
+	void setModulePosNearest(ModuleWidget *mw, math::Vec pos);
+	void setModulePosForce(ModuleWidget *mw, math::Vec pos);
 	ModuleWidget *getModule(int moduleId);
 	bool isEmpty();
 
