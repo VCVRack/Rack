@@ -22,18 +22,10 @@ void RadioButton::draw(const DrawArgs &args) {
 
 void RadioButton::onEnter(const event::Enter &e) {
 	state = BND_HOVER;
-	e.consume(this);
 }
 
 void RadioButton::onLeave(const event::Leave &e) {
 	state = BND_DEFAULT;
-}
-
-void RadioButton::onDragStart(const event::DragStart &e) {
-	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
-		return;
-
-	e.consume(this);
 }
 
 void RadioButton::onDragDrop(const event::DragDrop &e) {

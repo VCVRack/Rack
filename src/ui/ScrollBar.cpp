@@ -22,7 +22,6 @@ void ScrollBar::onDragStart(const event::DragStart &e) {
 
 	state = BND_ACTIVE;
 	APP->window->cursorLock();
-	e.consume(this);
 }
 
 void ScrollBar::onDragMove(const event::DragMove &e) {

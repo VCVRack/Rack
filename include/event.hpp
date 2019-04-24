@@ -346,14 +346,14 @@ struct State {
 	/** Prepares a widget for deletion */
 	void finalizeWidget(widget::Widget *w);
 
-	void handleButton(math::Vec pos, int button, int action, int mods);
-	void handleHover(math::Vec pos, math::Vec mouseDelta);
-	void handleLeave();
-	void handleScroll(math::Vec pos, math::Vec scrollDelta);
-	void handleText(math::Vec pos, int codepoint);
-	void handleKey(math::Vec pos, int key, int scancode, int action, int mods);
-	void handleDrop(math::Vec pos, const std::vector<std::string> &paths);
-	void handleZoom();
+	bool handleButton(math::Vec pos, int button, int action, int mods);
+	bool handleHover(math::Vec pos, math::Vec mouseDelta);
+	bool handleLeave();
+	bool handleScroll(math::Vec pos, math::Vec scrollDelta);
+	bool handleText(math::Vec pos, int codepoint);
+	bool handleKey(math::Vec pos, int key, int scancode, int action, int mods);
+	bool handleDrop(math::Vec pos, const std::vector<std::string> &paths);
+	bool handleZoom();
 };
 
 

@@ -305,15 +305,13 @@ void ModuleWidget::drawShadow(const DrawArgs &args) {
 }
 
 void ModuleWidget::onHover(const event::Hover &e) {
-	if (!APP->event->selectedWidget) {
-		// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-		if ((glfwGetKey(APP->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
-			|| glfwGetKey(APP->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
-			&& (APP->window->getMods() & WINDOW_MOD_MASK) == 0) {
-			removeAction();
-			e.consume(NULL);
-			return;
-		}
+	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
+	if ((glfwGetKey(APP->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
+		|| glfwGetKey(APP->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
+		&& (APP->window->getMods() & WINDOW_MOD_MASK) == 0) {
+		removeAction();
+		e.consume(NULL);
+		return;
 	}
 
 	OpaqueWidget::onHover(e);
@@ -326,7 +324,7 @@ void ModuleWidget::onButton(const event::Button &e) {
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		createContextMenu();
-		e.consume(this);
+		e.consume(NULL);
 	}
 }
 
@@ -389,7 +387,6 @@ void ModuleWidget::onDragStart(const event::DragStart &e) {
 
 	oldPos = box.pos;
 	dragPos = APP->scene->rack->mousePos.minus(box.pos);
-	e.consume(this);
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {

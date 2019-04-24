@@ -75,25 +75,23 @@ void RackScrollWidget::draw(const DrawArgs &args) {
 }
 
 void RackScrollWidget::onHover(const event::Hover &e) {
-	if (!APP->event->selectedWidget) {
-		// Scroll with arrow keys
-		float arrowSpeed = 30.0;
-		if ((APP->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
-			arrowSpeed /= 16.0;
-		else if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
-			arrowSpeed *= 4.0;
-		else if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
-			arrowSpeed /= 4.0;
+	// Scroll with arrow keys
+	float arrowSpeed = 30.0;
+	if ((APP->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
+		arrowSpeed /= 16.0;
+	else if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
+		arrowSpeed *= 4.0;
+	else if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
+		arrowSpeed /= 4.0;
 
-		if (glfwGetKey(APP->window->win, GLFW_KEY_LEFT) == GLFW_PRESS)
-			offset.x -= arrowSpeed;
-		if (glfwGetKey(APP->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			offset.x += arrowSpeed;
-		if (glfwGetKey(APP->window->win, GLFW_KEY_UP) == GLFW_PRESS)
-			offset.y -= arrowSpeed;
-		if (glfwGetKey(APP->window->win, GLFW_KEY_DOWN) == GLFW_PRESS)
-			offset.y += arrowSpeed;
-	}
+	if (glfwGetKey(APP->window->win, GLFW_KEY_LEFT) == GLFW_PRESS)
+		offset.x -= arrowSpeed;
+	if (glfwGetKey(APP->window->win, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		offset.x += arrowSpeed;
+	if (glfwGetKey(APP->window->win, GLFW_KEY_UP) == GLFW_PRESS)
+		offset.y -= arrowSpeed;
+	if (glfwGetKey(APP->window->win, GLFW_KEY_DOWN) == GLFW_PRESS)
+		offset.y += arrowSpeed;
 
 	ScrollWidget::onHover(e);
 }

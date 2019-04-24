@@ -40,7 +40,6 @@ void Knob::onDragStart(const event::DragStart &e) {
 	}
 
 	APP->window->cursorLock();
-	e.consume(this);
 }
 
 void Knob::onDragEnd(const event::DragEnd &e) {

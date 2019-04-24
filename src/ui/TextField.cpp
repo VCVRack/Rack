@@ -34,7 +34,6 @@ void TextField::onHover(const event::Hover &e) {
 	OpaqueWidget::onHover(e);
 
 	if (this == APP->event->draggedWidget) {
-		DEBUG("asdf");
 		int pos = getTextPosition(e.pos);
 		if (pos != selection) {
 			cursor = pos;
@@ -48,19 +47,6 @@ void TextField::onButton(const event::Button &e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		cursor = selection = getTextPosition(e.pos);
 	}
-}
-
-void TextField::onDragStart(const event::DragStart &e) {
-	// Enable dragging so onHover can set the cursor position.
-	e.consume(this);
-}
-
-void TextField::onEnter(const event::Enter &e) {
-	e.consume(this);
-}
-
-void TextField::onSelect(const event::Select &e) {
-	e.consume(this);
 }
 
 void TextField::onSelectText(const event::SelectText &e) {

@@ -133,8 +133,8 @@ void RackWidget::onHoverKey(const event::HoverKey &e) {
 			case GLFW_KEY_V: {
 				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
 					pastePresetClipboardAction();
+					e.consume(this);
 				}
-				e.consume(this);
 			} break;
 		}
 	}

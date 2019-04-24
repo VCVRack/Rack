@@ -44,7 +44,6 @@ struct ModuleResizeHandle : OpaqueWidget {
 		ModuleWidget *mw = getAncestorOfType<ModuleWidget>();
 		assert(mw);
 		originalBox = mw->box;
-		e.consume(this);
 	}
 
 	void onDragMove(const event::DragMove &e) override {

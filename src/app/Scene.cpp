@@ -127,6 +127,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 					z = std::ceil(z - 0.01) - 1;
 					z /= 2;
 					settings::zoom = std::pow(2, z);
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_EQUAL: {
@@ -136,6 +137,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 					z = std::floor(z + 0.01) + 1;
 					z /= 2;
 					settings::zoom = std::pow(2, z);
+					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_ENTER:

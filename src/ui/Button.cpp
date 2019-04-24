@@ -15,7 +15,6 @@ void Button::draw(const DrawArgs &args) {
 
 void Button::onEnter(const event::Enter &e) {
 	state = BND_HOVER;
-	e.consume(this);
 }
 
 void Button::onLeave(const event::Leave &e) {
@@ -29,7 +28,6 @@ void Button::onDragStart(const event::DragStart &e) {
 	state = BND_ACTIVE;
 	if (quantity)
 		quantity->setMax();
-	e.consume(this);
 }
 
 void Button::onDragEnd(const event::DragEnd &e) {

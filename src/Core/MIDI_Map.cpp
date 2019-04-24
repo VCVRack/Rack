@@ -271,7 +271,6 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		// Reset touchedParam
 		APP->scene->rack->touchedParam = NULL;
 		module->enableLearn(id);
-		e.consume(this);
 	}
 
 	void onDeselect(const event::Deselect &e) override {

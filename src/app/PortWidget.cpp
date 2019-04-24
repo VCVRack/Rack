@@ -74,13 +74,12 @@ void PortWidget::onButton(const event::Button &e) {
 			delete cw;
 		}
 
-		e.consume(this);
+		e.consume(NULL);
 	}
 }
 
 void PortWidget::onEnter(const event::Enter &e) {
 	hovered = true;
-	e.consume(this);
 }
 
 void PortWidget::onLeave(const event::Leave &e) {
@@ -133,7 +132,6 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 	}
 
 	APP->scene->rack->setIncompleteCable(cw);
-	e.consume(this);
 }
 
 void PortWidget::onDragEnd(const event::DragEnd &e) {
@@ -182,7 +180,6 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 		else
 			cw->hoveredInputPort = this;
 	}
-	e.consume(this);
 }
 
 void PortWidget::onDragLeave(const event::DragLeave &e) {

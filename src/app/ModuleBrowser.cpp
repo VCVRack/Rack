@@ -255,7 +255,6 @@ struct ModelBox : widget::OpaqueWidget {
 	void onButton(const event::Button &e) override;
 
 	void onEnter(const event::Enter &e) override {
-		e.consume(this);
 		infoBox->show();
 	}
 

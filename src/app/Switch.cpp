@@ -64,7 +64,6 @@ void Switch::onDragStart(const event::DragStart &e) {
 			}
 		}
 	}
-	e.consume(this);
 }
 
 void Switch::onDragEnd(const event::DragEnd &e) {

@@ -110,7 +110,7 @@ void State::finalizeWidget(widget::Widget *w) {
 	if (lastClickedWidget == w) lastClickedWidget = NULL;
 }
 
-void State::handleButton(math::Vec pos, int button, int action, int mods) {
+bool State::handleButton(math::Vec pos, int button, int action, int mods) {
 	// Button
 	Context cButton;
 	Button eButton;
@@ -164,9 +164,11 @@ void State::handleButton(math::Vec pos, int button, int action, int mods) {
 			}
 		}
 	}
+
+	return !!clickedWidget;
 }
 
-void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
+bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	if (draggedWidget) {
 		// DragMove
 		DragMove eDragMove;
@@ -185,8 +187,8 @@ void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		rootWidget->onDragHover(eDragHover);
 
 		setDragHovered(cDragHover.target);
-
-		return;
+		if (cDragHover.target)
+			return true;
 	}
 
 	// Hover
@@ -198,14 +200,16 @@ void State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	rootWidget->onHover(eHover);
 
 	setHovered(cHover.target);
+	return !!cHover.target;
 }
 
-void State::handleLeave() {
+bool State::handleLeave() {
 	setDragHovered(NULL);
 	setHovered(NULL);
+	return true;
 }
 
-void State::handleScroll(math::Vec pos, math::Vec scrollDelta) {
+bool State::handleScroll(math::Vec pos, math::Vec scrollDelta) {
 	// HoverScroll
 	Context cHoverScroll;
 	HoverScroll eHoverScroll;
@@ -213,18 +217,22 @@ void State::handleScroll(math::Vec pos, math::Vec scrollDelta) {
 	eHoverScroll.pos = pos;
 	eHoverScroll.scrollDelta = scrollDelta;
 	rootWidget->onHoverScroll(eHoverScroll);
+
+	return !!cHoverScroll.target;
 }
 
-void State::handleDrop(math::Vec pos, const std::vector<std::string> &paths) {
+bool State::handleDrop(math::Vec pos, const std::vector<std::string> &paths) {
 	// PathDrop
 	Context cPathDrop;
 	PathDrop ePathDrop(paths);
 	ePathDrop.context = &cPathDrop;
 	ePathDrop.pos = pos;
 	rootWidget->onPathDrop(ePathDrop);
+
+	return !!cPathDrop.target;
 }
 
-void State::handleText(math::Vec pos, int codepoint) {
+bool State::handleText(math::Vec pos, int codepoint) {
 	if (selectedWidget) {
 		// SelectText
 		Context cSelectText;
@@ -233,7 +241,7 @@ void State::handleText(math::Vec pos, int codepoint) {
 		eSelectText.codepoint = codepoint;
 		selectedWidget->onSelectText(eSelectText);
 		if (cSelectText.target)
-			return;
+			return true;
 	}
 
 	// HoverText
@@ -243,9 +251,11 @@ void State::handleText(math::Vec pos, int codepoint) {
 	eHoverText.pos = pos;
 	eHoverText.codepoint = codepoint;
 	rootWidget->onHoverText(eHoverText);
+
+	return !!cHoverText.target;
 }
 
-void State::handleKey(math::Vec pos, int key, int scancode, int action, int mods) {
+bool State::handleKey(math::Vec pos, int key, int scancode, int action, int mods) {
 	if (selectedWidget) {
 		// SelectKey
 		Context cSelectKey;
@@ -257,7 +267,7 @@ void State::handleKey(math::Vec pos, int key, int scancode, int action, int mods
 		eSelectKey.mods = mods;
 		selectedWidget->onSelectKey(eSelectKey);
 		if (cSelectKey.target)
-			return;
+			return true;
 	}
 
 	// HoverKey
@@ -270,14 +280,16 @@ void State::handleKey(math::Vec pos, int key, int scancode, int action, int mods
 	eHoverKey.action = action;
 	eHoverKey.mods = mods;
 	rootWidget->onHoverKey(eHoverKey);
+	return !!cHoverKey.target;
 }
 
-void State::handleZoom() {
+bool State::handleZoom() {
 	// Zoom
 	Context cZoom;
 	Zoom eZoom;
 	eZoom.context = &cZoom;
 	rootWidget->onZoom(eZoom);
+	return true;
 }
 
 
