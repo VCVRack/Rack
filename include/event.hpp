@@ -12,6 +12,8 @@ namespace widget {
 }
 
 
+/** Handles user interaction with Widget.
+*/
 namespace event {
 
 
@@ -154,6 +156,7 @@ struct Enter : Base {
 
 
 /** Occurs when a different Widget is entered.
+Must set the Hover target to receive this event.
 */
 struct Leave : Base {
 };
@@ -167,6 +170,7 @@ struct Select : Base {
 
 
 /** Occurs when a different Widget is selected.
+Must set the Button target to receive this event.
 */
 struct Deselect : Base {
 };
@@ -180,7 +184,7 @@ struct SelectKey : Base, KeyBase {
 
 
 /** Occurs when text is typed while a Widget is selected.
-If consumed, a HoverText event will not be triggered.
+Must consume to prevent HoverKey from being triggered.
 */
 struct SelectText : Base, TextBase {
 };
@@ -243,7 +247,7 @@ struct DragLeave : DragBase {
 
 
 /** Occurs when the mouse button is released over a Widget while dragging.
-Must set the DragHover target to receive this event.
+Must set the Button target to receive this event.
 */
 struct DragDrop : DragBase {
 	/** The dragged widget */
