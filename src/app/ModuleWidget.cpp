@@ -405,9 +405,8 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 
 void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
-		math::Rect newBox = box;
-		newBox.pos = APP->scene->rack->mousePos.minus(dragPos);
-		APP->scene->rack->requestModuleBoxNearest(this, newBox);
+		math::Vec pos = APP->scene->rack->mousePos.minus(dragPos);
+		APP->scene->rack->requestModulePosNearest(this, pos);
 	}
 }
 

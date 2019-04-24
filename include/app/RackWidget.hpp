@@ -49,9 +49,9 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Removes the module and transfers ownership to the caller */
 	void removeModule(ModuleWidget *mw);
 	/** Sets a module's box if non-colliding. Returns true if set */
-	bool requestModuleBox(ModuleWidget *mw, math::Rect requestedBox);
+	bool requestModulePos(ModuleWidget *mw, math::Vec pos);
 	/** Moves a module to the closest non-colliding position */
-	bool requestModuleBoxNearest(ModuleWidget *mw, math::Rect requestedBox);
+	bool requestModulePosNearest(ModuleWidget *mw, math::Vec pos);
 	ModuleWidget *getModule(int moduleId);
 	bool isEmpty();
 

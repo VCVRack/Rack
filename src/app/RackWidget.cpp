@@ -12,6 +12,7 @@
 #include "osdialog.h"
 #include <map>
 #include <algorithm>
+#include <queue>
 
 
 namespace rack {
@@ -371,12 +372,12 @@ void RackWidget::addModule(ModuleWidget *m) {
 	RackWidget_updateAdjacent(this);
 }
 
-void RackWidget::addModuleAtMouse(ModuleWidget *m) {
-	assert(m);
+void RackWidget::addModuleAtMouse(ModuleWidget *mw) {
+	assert(mw);
 	// Move module nearest to the mouse position
-	m->box.pos = mousePos.minus(m->box.size.div(2));
-	requestModuleBoxNearest(m, m->box);
-	addModule(m);
+	math::Vec pos = mousePos.minus(mw->box.size.div(2));
+	requestModulePosNearest(mw, pos);
+	addModule(mw);
 }
 
 void RackWidget::removeModule(ModuleWidget *m) {
@@ -399,47 +400,75 @@ void RackWidget::removeModule(ModuleWidget *m) {
 	moduleContainer->removeChild(m);
 }
 
-bool RackWidget::requestModuleBox(ModuleWidget *m, math::Rect requestedBox) {
+bool RackWidget::requestModulePos(ModuleWidget *mw, math::Vec pos) {
 	// Check intersection with other modules
-	for (widget::Widget *m2 : moduleContainer->children) {
+	math::Rect mwBox = math::Rect(pos, mw->box.size);
+	for (widget::Widget *mw2 : moduleContainer->children) {
 		// Don't intersect with self
-		if (m == m2)
+		if (mw == mw2)
 			continue;
-		if (requestedBox.isIntersecting(m2->box)) {
+		// Don't intersect with invisible modules
+		if (!mw2->visible)
+			continue;
+		// Check intersection
+		if (mwBox.isIntersecting(mw2->box)) {
 			return false;
 		}
 	}
 
 	// Accept requested position
-	m->box = requestedBox;
+	mw->box = mwBox;
 	RackWidget_updateAdjacent(this);
 	return true;
 }
 
-bool RackWidget::requestModuleBoxNearest(ModuleWidget *m, math::Rect requestedBox) {
-	// Create possible positions
-	int x0 = std::round(requestedBox.pos.x / RACK_GRID_WIDTH);
-	int y0 = std::round(requestedBox.pos.y / RACK_GRID_HEIGHT);
-	std::vector<math::Vec> positions;
-	for (int y = y0 - 4; y < y0 + 4; y++) {
-		for (int x = x0 - 200; x < x0 + 200; x++) {
-			positions.push_back(math::Vec(x * RACK_GRID_WIDTH, y * RACK_GRID_HEIGHT));
+bool RackWidget::requestModulePosNearest(ModuleWidget *mw, math::Vec pos) {
+	// Dijkstra's algorithm to generate a sorted list of Vecs closest to `pos`.
+
+	// Comparison of distance of Vecs to `pos`
+	auto cmpNearest = [&](const math::Vec &a, const math::Vec &b) {
+		return a.minus(pos).square() > b.minus(pos).square();
+	};
+	// Comparison of dictionary order of Vecs
+	auto cmp = [&](const math::Vec &a, const math::Vec &b) {
+		if (a.x != b.x)
+			return a.x < b.x;
+		return a.y < b.y;
+	};
+	// Priority queue sorted by distance from `pos`
+	std::priority_queue<math::Vec, std::vector<math::Vec>, decltype(cmpNearest)> queue(cmpNearest);
+	// Set of already-tested Vecs
+	std::set<math::Vec, decltype(cmp)> visited(cmp);
+	// Seed priority queue with closest Vec
+	math::Vec closestPos = pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
+	queue.push(closestPos);
+
+	while (!queue.empty()) {
+		math::Vec testPos = queue.top();
+		// Check testPos
+		if (requestModulePos(mw, testPos))
+			return true;
+		// Move testPos to visited set
+		queue.pop();
+		visited.insert(testPos);
+
+		// Add adjacent Vecs
+		static const std::vector<math::Vec> deltas = {
+			math::Vec(-1, 0).mult(RACK_GRID_SIZE),
+			math::Vec(1, 0).mult(RACK_GRID_SIZE),
+			math::Vec(0, -1).mult(RACK_GRID_SIZE),
+			math::Vec(0, 1).mult(RACK_GRID_SIZE),
+		};
+		for (math::Vec delta : deltas) {
+			math::Vec newPos = testPos.plus(delta);
+			if (visited.find(newPos) == visited.end()) {
+				queue.push(newPos);
+			}
 		}
 	}
 
-	// Sort possible positions by distance to the requested position
-	std::sort(positions.begin(), positions.end(), [requestedBox](math::Vec a, math::Vec b) {
-		return a.minus(requestedBox.pos).norm() < b.minus(requestedBox.pos).norm();
-	});
-
-	// Find a position that does not collide
-	for (math::Vec position : positions) {
-		math::Rect newBox = requestedBox;
-		newBox.pos = position;
-		if (requestModuleBox(m, newBox))
-			return true;
-	}
-	// We failed to find a box with this brute force algorithm.
+	// We failed to find a box. This shouldn't happen on an infinite rack.
+	assert(0);
 	return false;
 }
 

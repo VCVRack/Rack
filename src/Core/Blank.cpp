@@ -65,7 +65,8 @@ struct ModuleResizeHandle : OpaqueWidget {
 			newBox.size.x = std::round(newBox.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 			newBox.pos.x = originalBox.pos.x + originalBox.size.x - newBox.size.x;
 		}
-		APP->scene->rack->requestModuleBox(m, newBox);
+		// TODO
+		// APP->scene->rack->requestModuleBox(m, newBox);
 	}
 
 	void draw(const DrawArgs &args) override {
