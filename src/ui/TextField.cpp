@@ -170,8 +170,9 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 
 		cursor = math::clamp(cursor, 0, (int) text.size());
 		selection = math::clamp(selection, 0, (int) text.size());
-		e.consume(this);
 	}
+
+	e.consume(this);
 }
 
 void TextField::insertText(std::string text) {

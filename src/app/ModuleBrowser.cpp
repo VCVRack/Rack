@@ -13,6 +13,7 @@
 #include "ui/Button.hpp"
 #include "ui/RadioButton.hpp"
 #include "ui/ChoiceButton.hpp"
+#include "ui/Tooltip.hpp"
 #include "app/ModuleWidget.hpp"
 #include "app/Scene.hpp"
 #include "plugin.hpp"
@@ -73,54 +74,6 @@ struct BrowserOverlay : widget::OpaqueWidget {
 };
 
 
-struct InfoBox : widget::Widget {
-	void setModel(plugin::Model *model) {
-		math::Vec pos;
-
-		// Name label
-		ui::Label *nameLabel = new ui::Label;
-		// nameLabel->box.size.x = box.size.x;
-		nameLabel->box.pos = pos;
-		nameLabel->text = model->name;
-		addChild(nameLabel);
-		pos = nameLabel->box.getBottomLeft();
-
-		// Plugin label
-		ui::Label *pluginLabel = new ui::Label;
-		// pluginLabel->box.size.x = box.size.x;
-		pluginLabel->box.pos = pos;
-		pluginLabel->text = model->plugin->name;
-		addChild(pluginLabel);
-		pos = pluginLabel->box.getBottomLeft();
-
-		ui::Label *descriptionLabel = new ui::Label;
-		descriptionLabel->box.size.x = box.size.x;
-		descriptionLabel->box.pos = pos;
-		descriptionLabel->text = model->description;
-		addChild(descriptionLabel);
-		pos = descriptionLabel->box.getBottomLeft();
-
-		// for (const std::string &tag : model->tags) {
-		// 	ui::Button *tagButton = new ui::Button;
-		// 	tagButton->box.size.x = box.size.x;
-		// 	tagButton->box.pos = pos;
-		// 	tagButton->text = tag;
-		// 	addChild(tagButton);
-		// 	pos = tagButton->box.getTopLeft();
-		// }
-	}
-
-	void draw(const DrawArgs &args) override {
-		nvgBeginPath(args.vg);
-		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-		nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.5));
-		nvgFill(args.vg);
-
-		Widget::draw(args);
-	}
-};
-
-
 struct ModelFavoriteQuantity : Quantity {
 	plugin::Model *model;
 	std::string getLabel() override {return "★";}
@@ -156,9 +109,9 @@ static const float MODEL_BOX_ZOOM = 0.5f;
 
 struct ModelBox : widget::OpaqueWidget {
 	plugin::Model *model;
-	InfoBox *infoBox;
 	widget::Widget *previewWidget;
 	ModelFavoriteButton *favoriteButton;
+	ui::Tooltip *tooltip = NULL;
 	/** Lazily created */
 	widget::FramebufferWidget *previewFb = NULL;
 	/** Number of frames since draw() has been called */
@@ -178,12 +131,6 @@ struct ModelBox : widget::OpaqueWidget {
 		previewWidget = new widget::TransparentWidget;
 		previewWidget->box.size.y = std::ceil(RACK_GRID_HEIGHT * MODEL_BOX_ZOOM);
 		addChild(previewWidget);
-
-		infoBox = new InfoBox;
-		infoBox->box.size = math::Vec(100, 100);
-		// infoBox->setModel(model);
-		infoBox->hide();
-		addChild(infoBox);
 
 		// Favorite button
 		favoriteButton = new ModelFavoriteButton;
@@ -212,7 +159,6 @@ struct ModelBox : widget::OpaqueWidget {
 		zoomWidget->box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
 		previewWidget->box.size.x = std::ceil(zoomWidget->box.size.x);
 
-		infoBox->box.size = previewWidget->box.size;
 		favoriteButton->box.size.x = previewWidget->box.size.x;
 		box.size.x = previewWidget->box.size.x;
 	}
@@ -252,14 +198,29 @@ struct ModelBox : widget::OpaqueWidget {
 		OpaqueWidget::draw(args);
 	}
 
+	void setTooltip(ui::Tooltip *tooltip) {
+		if (this->tooltip) {
+			this->tooltip->parent->removeChild(this->tooltip);
+			delete this->tooltip;
+			this->tooltip = NULL;
+		}
+
+		if (tooltip) {
+			APP->scene->addChild(tooltip);
+			this->tooltip = tooltip;
+		}
+	}
+
 	void onButton(const event::Button &e) override;
 
 	void onEnter(const event::Enter &e) override {
-		infoBox->show();
+		ui::Tooltip *tooltip = new ui::Tooltip;
+		tooltip->text = model->plugin->name + " " + model->name;
+		setTooltip(tooltip);
 	}
 
 	void onLeave(const event::Leave &e) override {
-		infoBox->hide();
+		setTooltip(NULL);
 	}
 };
 
@@ -639,6 +600,9 @@ inline void ModelBox::onButton(const event::Button &e) {
 		return;
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		// Hide tooltip
+		setTooltip(NULL);
+
 		// Create module
 		ModuleWidget *moduleWidget = model->createModuleWidget();
 		assert(moduleWidget);

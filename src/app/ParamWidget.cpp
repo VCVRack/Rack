@@ -69,9 +69,9 @@ struct ParamTooltip : ui::Tooltip {
 			if (!description.empty())
 				text += "\n" + description;
 		}
+		Tooltip::step();
 		// Position at bottom-right of parameter
 		box.pos = paramWidget->getAbsoluteOffset(paramWidget->box.size).round();
-		Tooltip::step();
 	}
 };
 
