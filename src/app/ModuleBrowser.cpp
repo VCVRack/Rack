@@ -266,11 +266,13 @@ struct ModelBox : widget::OpaqueWidget {
 
 struct AuthorItem : ui::MenuItem {
 	void onAction(const event::Action &e) override;
+	void step() override;
 };
 
 
 struct TagItem : ui::MenuItem {
 	void onAction(const event::Action &e) override;
+	void step() override;
 };
 
 
@@ -308,6 +310,11 @@ struct BrowserSearchField : ui::TextField {
 };
 
 
+struct ClearButton : ui::Button {
+	void onAction(const event::Action &e) override;
+};
+
+
 struct ShowFavoritesQuantity : Quantity {
 	widget::Widget *widget;
 	std::string getLabel() override {
@@ -331,6 +338,7 @@ struct ShowFavoritesButton : ui::RadioButton {
 
 struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
+	ClearButton *clearButton;
 	ShowFavoritesButton *favoriteButton;
 	ui::Label *authorLabel;
 	ui::List *authorList;
@@ -342,6 +350,10 @@ struct BrowserSidebar : widget::Widget {
 	BrowserSidebar() {
 		searchField = new BrowserSearchField;
 		addChild(searchField);
+
+		clearButton = new ClearButton;
+		clearButton->text = "Reset filters";
+		addChild(clearButton);
 
 		favoriteButton = new ShowFavoritesButton;
 		dynamic_cast<ShowFavoritesQuantity*>(favoriteButton->quantity)->widget = favoriteButton;
@@ -392,9 +404,10 @@ struct BrowserSidebar : widget::Widget {
 	}
 
 	void step() override {
-
 		searchField->box.size.x = box.size.x;
-		favoriteButton->box.pos = searchField->box.getBottomLeft();
+		clearButton->box.pos = searchField->box.getBottomLeft();
+		clearButton->box.size.x = box.size.x;
+		favoriteButton->box.pos = clearButton->box.getBottomLeft();
 		favoriteButton->box.size.x = box.size.x;
 
 		float listHeight = (box.size.y - favoriteButton->box.getBottom()) / 2;
@@ -606,6 +619,14 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 		sidebar->tagLabel->text = string::f("Tags (%d)", tagsLen);
 	}
+
+	void clear() {
+		search = "";
+		sidebar->searchField->setText("");
+		author = "";
+		tag = "";
+		refresh();
+	}
 };
 
 
@@ -648,6 +669,11 @@ inline void AuthorItem::onAction(const event::Action &e) {
 	browser->refresh();
 }
 
+inline void AuthorItem::step() {
+	MenuItem::step();
+	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+	active = (browser->author == text);
+}
 
 inline void TagItem::onAction(const event::Action &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
@@ -658,11 +684,21 @@ inline void TagItem::onAction(const event::Action &e) {
 	browser->refresh();
 }
 
+inline void TagItem::step() {
+	MenuItem::step();
+	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+	active = (browser->tag == text);
+}
 
 inline void BrowserSearchField::onChange(const event::Change &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	browser->search = string::trim(text);
 	browser->refresh();
+}
+
+inline void ClearButton::onAction(const event::Action &e) {
+	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+	browser->clear();
 }
 
 inline void ShowFavoritesQuantity::setValue(float value) {

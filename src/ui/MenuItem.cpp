@@ -20,6 +20,9 @@ void MenuItem::draw(const DrawArgs &args) {
 	if (parentMenu && parentMenu->activeEntry == this)
 		state = BND_ACTIVE;
 
+	if (active)
+		state = BND_ACTIVE;
+
 	// Main text and background
 	if (!disabled)
 		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());

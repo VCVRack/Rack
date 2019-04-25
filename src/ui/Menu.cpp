@@ -14,8 +14,7 @@ Menu::~Menu() {
 
 void Menu::setChildMenu(Menu *menu) {
 	if (childMenu) {
-		if (childMenu->parent)
-			childMenu->parent->removeChild(childMenu);
+		childMenu->parent->removeChild(childMenu);
 		delete childMenu;
 		childMenu = NULL;
 	}

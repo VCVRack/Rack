@@ -188,14 +188,13 @@ void TextField::insertText(std::string text) {
 }
 
 void TextField::setText(std::string text) {
-	bool changed = (text != this->text);
-	this->text = text;
-	selection = cursor = text.size();
-	if (changed) {
+	if (this->text != text) {
+		this->text = text;
 		// event::Change
 		event::Change eChange;
 		onChange(eChange);
 	}
+	selection = cursor = text.size();
 }
 
 void TextField::selectAll() {
