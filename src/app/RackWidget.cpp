@@ -480,8 +480,8 @@ void RackWidget::setModulePosForce(ModuleWidget *mw, math::Vec pos) {
 	};
 
 	// Collect modules to the left and right of `mw`
-	std::set<widget::Widget*> leftModules;
-	std::set<widget::Widget*> rightModules;
+	std::set<widget::Widget*, decltype(cmp)> leftModules(cmp);
+	std::set<widget::Widget*, decltype(cmp)> rightModules(cmp);
 	for (widget::Widget *w2 : moduleContainer->children) {
 		if (w2 == mw)
 			continue;
