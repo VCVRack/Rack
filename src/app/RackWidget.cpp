@@ -471,30 +471,51 @@ void RackWidget::setModulePosNearest(ModuleWidget *mw, math::Vec pos) {
 	assert(0);
 }
 
-static void shoveIntersectingInvisibleModules(RackWidget *that, ModuleWidget *mw) {
-	for (widget::Widget *w2 : that->moduleContainer->children) {
-		if (w2->visible)
-			continue;
-		if (mw->box.isIntersecting(w2->box)) {
-			ModuleWidget *mw2 = dynamic_cast<ModuleWidget*>(w2);
-			mw2->visible = true;
-			that->setModulePosNearest(mw2, mw2->box.pos);
-			shoveIntersectingInvisibleModules(that, mw2);
-		}
-	}
-}
-
 void RackWidget::setModulePosForce(ModuleWidget *mw, math::Vec pos) {
+	mw->box.pos = pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
+
+	// Comparison of center X coordinates
+	auto cmp = [&](const widget::Widget *a, const widget::Widget *b) {
+		return a->box.pos.x + a->box.size.x / 2 < b->box.pos.x + b->box.size.x / 2;
+	};
+
+	// Collect modules to the left and right of `mw`
+	std::set<widget::Widget*> leftModules;
+	std::set<widget::Widget*> rightModules;
 	for (widget::Widget *w2 : moduleContainer->children) {
-		w2->visible = false;
+		if (w2 == mw)
+			continue;
+		// Modules must be on the same row as `mw`
+		if (w2->box.pos.y != mw->box.pos.y)
+			continue;
+		if (cmp(w2, mw))
+			leftModules.insert(w2);
+		else
+			rightModules.insert(w2);
 	}
 
-	mw->visible = true;
-	mw->box.pos = pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
-	shoveIntersectingInvisibleModules(this, mw);
+	// Shove left modules
+	float xLimit = mw->box.pos.x;
+	for (auto it = leftModules.rbegin(); it != leftModules.rend(); it++) {
+		widget::Widget *w = *it;
+		float x = xLimit - w->box.size.x;
+		x = std::round(x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+		if (w->box.pos.x < x)
+			break;
+		w->box.pos.x = x;
+		xLimit = x;
+	}
 
-	for (widget::Widget *w2 : moduleContainer->children) {
-		w2->visible = true;
+	// Shove right modules
+	xLimit = mw->box.pos.x + mw->box.size.x;
+	for (auto it = rightModules.begin(); it != rightModules.end(); it++) {
+		widget::Widget *w = *it;
+		float x = xLimit;
+		x = std::round(x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+		if (w->box.pos.x > x)
+			break;
+		w->box.pos.x = x;
+		xLimit = x + w->box.size.x;
 	}
 }
 
