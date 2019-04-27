@@ -870,38 +870,26 @@ public:
    bool setSampleRate(float _rate, bool _bLock = true) {
       bool r = false;
 
-      // Dprintf("xxx setSampleRate: 1 bLock=%d\n", _bLock);
+      // Dprintf("xxx setSampleRate: ENTER bLock=%d\n", _bLock);
 
       if((_rate >= float(MIN_SAMPLE_RATE)) && (_rate <= float(MAX_SAMPLE_RATE)))
       {
-         // Dprintf("xxx setSampleRate: 2\n");
          if(_bLock)
          {
-            // Dprintf("xxx setSampleRate: 2.1\n");
             setGlobals();
-            // Dprintf("xxx setSampleRate: 2.2\n");
             lockAudio();
-            // Dprintf("xxx setSampleRate: 2.3\n");
          }
 
          sample_rate = _rate;
 
-         // Dprintf("xxx setSampleRate: 3\n");
-
          vst2_set_samplerate(sample_rate * oversample.factor);  // see engine.cpp
 
-         // Dprintf("xxx setSampleRate: 4\n");
-
          destroyResamplerStates();
-
-         // Dprintf("xxx setSampleRate: 5\n");
 
          // Lazy-alloc resampler state
          if(!Dfltequal(oversample.factor, 1.0f))
          {
             int err;
-
-            // Dprintf("xxx setSampleRate: 6\n");
 
             oversample.srs_in = speex_resampler_init(NUM_INPUTS,
                                                      sUI(sample_rate),  // in rate
@@ -909,8 +897,6 @@ public:
                                                      oversample.quality,
                                                      &err
                                                      );
-
-            // Dprintf("xxx setSampleRate: 7\n");
 
             oversample.srs_out = speex_resampler_init(NUM_OUTPUTS,
                                                       sUI(sample_rate * oversample.factor),  // in rate
@@ -922,16 +908,11 @@ public:
             Dprintf("xxx vstrack_plugin: initialize speex resampler (rate=%f factor=%f quality=%d)\n", sample_rate, oversample.factor, oversample.quality);
          }
 
-         // Dprintf("xxx setSampleRate: 8\n");
-
          if(_bLock)
          {
-            // Dprintf("xxx setSampleRate: 8.1\n");
             unlockAudio();
-            // Dprintf("xxx setSampleRate: 8.2\n");
          }
 
-         // Dprintf("xxx setSampleRate: 9\n");
          r = true;
       }
 
@@ -1067,8 +1048,10 @@ public:
    }
 
    sUI getProgramChunk(uint8_t**_addr) {
+      sUI r = 0;
       setGlobals();
       vst2_set_shared_plugin_tls_globals();
+      rack::global_ui->app.mtx_param.lock();
       if(NULL != last_program_chunk_str)
       {
          ::free(last_program_chunk_str);
@@ -1077,9 +1060,10 @@ public:
       if(NULL != last_program_chunk_str)
       {
          *_addr = (uint8_t*)last_program_chunk_str;
-         return (sUI)strlen(last_program_chunk_str) + 1/*ASCIIZ*/;
+         r = (sUI)strlen(last_program_chunk_str) + 1/*ASCIIZ*/;
       }
-      return 0;
+      rack::global_ui->app.mtx_param.unlock();
+      return r;
    }
 
    bool setBankChunk(size_t _size, uint8_t *_addr) {
@@ -1088,28 +1072,23 @@ public:
    }
 
    bool setProgramChunk(size_t _size, uint8_t *_addr) {
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 1\n");
+      Dprintf("xxx vstrack_plugin:setProgramChunk: ENTER\n");
       setGlobals();
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 2\n");
+      rack::global_ui->app.mtx_param.lock();
       lockAudio();
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 3\n");
       vst2_set_shared_plugin_tls_globals();
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 4\n");
-      // std::lock_guard<std::mutex> lock(rack::global->engine.mutex);
-      std::lock_guard<std::recursive_mutex> lock(rack::global->engine.mutex);
+      rack::global->engine.mutex.lock();
 #if 0
       Dprintf("xxx vstrack_plugin:setProgramChunk: size=%u\n", _size);
 #endif
       lglw_glcontext_push(rack::global_ui->window.lglw);
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 5\n");
       bool r = rack::global_ui->app.gRackWidget->loadPatchFromString((const char*)_addr);
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 6\n");
       rack::global_ui->ui.gScene->step();  // w/o this the patch is bypassed
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 7\n");
       lglw_glcontext_pop(rack::global_ui->window.lglw);
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 8 r=%d\n", r);
+      rack::global->engine.mutex.unlock();
       unlockAudio();
-      // Dprintf("xxx vstrack_plugin:setProgramChunk: 9\n");
+      rack::global_ui->app.mtx_param.unlock();
+      Dprintf("xxx vstrack_plugin:setProgramChunk: LEAVE\n");
       return r;
    }
 
@@ -1273,10 +1252,13 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
    VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
    // Dprintf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: ENTER\n");
-   
-   wrapper->lockAudio();
+
    wrapper->setGlobals();
    vst2_set_shared_plugin_tls_globals();
+
+   vst2_handle_queued_params();
+   
+   wrapper->lockAudio();
 
    if(wrapper->b_check_offline)
    {
@@ -1287,7 +1269,6 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
    // // rack::global->engine.vipMutex.lock();
    rack::global->engine.mutex.lock();
    rack::global->vst2.last_seen_num_frames = sUI(sampleFrames);
-   vst2_handle_queued_params();
 
    //Dprintf("xxx vstrack_plugin: VSTPluginProcessReplacingFloat32: lockAudio done\n");
 
@@ -2131,9 +2112,13 @@ float VSTPluginGetParameter(VSTPlugin *vstPlugin,
    // we can get a hold to our C++ class since we stored it in the `object` field (see constructor)
    VSTPluginWrapper *wrapper = static_cast<VSTPluginWrapper *>(vstPlugin->object);
 
-   wrapper->lockAudio();  // don't query a param while the module is deleted
    wrapper->setGlobals();
+   wrapper->lockAudio();
+   rack::global->engine.mutex.lock();   // don't query a param while a module is being deleted
+
    float r = vst2_get_param(index);
+
+   rack::global->engine.mutex.unlock();
    wrapper->unlockAudio();
 
    return r;

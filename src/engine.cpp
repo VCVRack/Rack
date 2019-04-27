@@ -124,6 +124,7 @@ static void engineStep() {
 	}
 }
 
+#ifndef USE_VST2
 static void engineRun() {
 #ifdef _MSC_VER
 	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
@@ -146,7 +147,6 @@ static void engineRun() {
 		global->engine.vipMutex.wait();
 
 		if (!global->gPaused) {
-			// std::lock_guard<std::mutex> lock(global->engine.mutex);
 			std::lock_guard<std::recursive_mutex> lock(global->engine.mutex);
 			for (int i = 0; i < mutexSteps; i++) {
 				engineStep();
@@ -179,11 +179,11 @@ void engineStop() {
 	global->engine.running = false;
 	global->engine.thread.join();
 }
+#endif // USE_VST2
 
 void engineAddModule(Module *module) {
 	assert(module);
-	VIPLock vipLock(global->engine.vipMutex);
-	// std::lock_guard<std::mutex> lock(global->engine.mutex);
+	// // VIPLock vipLock(global->engine.vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(global->engine.mutex);
 	// Check that the module is not already added
 	auto it = std::find(global->gModules.begin(), global->gModules.end(), module);
@@ -197,8 +197,7 @@ void engineAddModule(Module *module) {
 
 void engineRemoveModule(Module *module) {
 	assert(module);
-	VIPLock vipLock(global->engine.vipMutex);
-	// std::lock_guard<std::mutex> lock(global->engine.mutex);
+	// // VIPLock vipLock(global->engine.vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(global->engine.mutex);
 	// If a param is being smoothed on this module, stop smoothing it immediately
 	if (module == global->engine.smoothModule) {
@@ -235,8 +234,7 @@ static void updateActive() {
 
 void engineAddWire(Wire *wire) {
 	assert(wire);
-	VIPLock vipLock(global->engine.vipMutex);
-	// std::lock_guard<std::mutex> lock(global->engine.mutex);
+	// // VIPLock vipLock(global->engine.vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(global->engine.mutex);
 	// Check wire properties
 	assert(wire->outputModule);
@@ -253,8 +251,7 @@ void engineAddWire(Wire *wire) {
 
 void engineRemoveWire(Wire *wire) {
 	assert(wire);
-	VIPLock vipLock(global->engine.vipMutex);
-	// std::lock_guard<std::mutex> lock(global->engine.mutex);
+	// // VIPLock vipLock(global->engine.vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(global->engine.mutex);
 	// Check that the wire is already added
 	auto it = std::find(global->gWires.begin(), global->gWires.end(), wire);
@@ -458,8 +455,7 @@ namespace rack {
 #endif // USE_VST2
 
 void engineSetParamSmooth(Module *module, int paramId, float value) {
-	VIPLock vipLock(global->engine.vipMutex);
-	// std::lock_guard<std::mutex> lock(global->engine.mutex);
+	// // VIPLock vipLock(global->engine.vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(global->engine.mutex);
 	// Since only one param can be smoothed at a time, if another param is currently being smoothed, skip to its final state
 	if (global->engine.smoothModule && !(global->engine.smoothModule == module && global->engine.smoothParamId == paramId)) {
@@ -471,8 +467,7 @@ void engineSetParamSmooth(Module *module, int paramId, float value) {
 }
 
 void engineSetSampleRate(float newSampleRate) {
-	VIPLock vipLock(global->engine.vipMutex);
-	// std::lock_guard<std::mutex> lock(global->engine.mutex);
+	// // VIPLock vipLock(global->engine.vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(global->engine.mutex);
 	global->engine.sampleRate = newSampleRate;
 	global->engine.sampleTime = 1.0 / global->engine.sampleRate;
