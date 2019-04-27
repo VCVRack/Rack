@@ -41,8 +41,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-23Apr2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-23Apr2019b.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-23Apr2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-23Apr2019b.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-27Apr2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-27Apr2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-27Apr2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-27Apr2019.7z) (32bit, experimental)
 
 ## Linux
 - [veeseevstrack_0_6_1_lin64_bin-31Mar2019.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-31Mar2019.tar.gz) (64bit) (Dave's latest build)

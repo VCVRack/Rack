@@ -1,4 +1,9 @@
 
+** April 27th, 2019
+- fix deadlock
+- update patches
+
+
 ** April 23rd, 2019
 - update Bidoo.*                0.6.27 => 0.6.28
 - update LindenbergResearch.*   0.6.4 => 0.6.5
