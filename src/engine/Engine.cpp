@@ -116,15 +116,7 @@ struct EngineWorker {
 		thread.join();
 	}
 
-	void run() {
-		system::setThreadName("Engine worker");
-		// system::setThreadRealTime();
-		disableDenormals();
-		while (running) {
-			step();
-		}
-	}
-
+	void run();
 	void step();
 };
 
@@ -168,6 +160,8 @@ Engine::Engine() {
 
 	internal->sampleRate = 44100.f;
 	internal->sampleTime = 1 / internal->sampleRate;
+
+	system::setThreadRealTime(false);
 }
 
 Engine::~Engine() {
@@ -300,22 +294,31 @@ static void Engine_relaunchWorkers(Engine *that) {
 	assert(1 <= internal->threadCount);
 
 	// Stop all workers
+	DEBUG("1");
 	for (EngineWorker &worker : internal->workers) {
 		worker.stop();
 	}
+	DEBUG("2");
 	internal->engineBarrier.wait();
 
 	// Destroy all workers
+	DEBUG("3");
 	for (EngineWorker &worker : internal->workers) {
 		worker.join();
 	}
+	DEBUG("4");
 	internal->workers.resize(0);
+	DEBUG("5");
+
+	// Configure main thread
+	system::setThreadRealTime(internal->realTime);
 
 	// Set barrier counts
 	internal->engineBarrier.total = internal->threadCount;
 	internal->workerBarrier.total = internal->threadCount;
 
 	// Create workers
+	DEBUG("6");
 	internal->workers.resize(internal->threadCount - 1);
 	for (int id = 1; id < internal->threadCount; id++) {
 		EngineWorker &worker = internal->workers[id - 1];
@@ -323,6 +326,7 @@ static void Engine_relaunchWorkers(Engine *that) {
 		worker.engine = that;
 		worker.start();
 	}
+	DEBUG("7");
 }
 
 static void Engine_run(Engine *that) {
@@ -351,8 +355,9 @@ static void Engine_run(Engine *that) {
 		}
 
 		// Launch workers
-		if (internal->threadCount != settings::threadCount) {
+		if (internal->threadCount != settings::threadCount || internal->realTime != settings::realTime) {
 			internal->threadCount = settings::threadCount;
+			internal->realTime = settings::realTime;
 			Engine_relaunchWorkers(that);
 		}
 
@@ -695,6 +700,15 @@ void Engine::updateParamHandle(ParamHandle *paramHandle, int moduleId, int param
 	}
 }
 
+
+void EngineWorker::run() {
+	system::setThreadName("Engine worker");
+	system::setThreadRealTime(engine->internal->realTime);
+	disableDenormals();
+	while (running) {
+		step();
+	}
+}
 
 void EngineWorker::step() {
 	engine->internal->engineBarrier.wait();

@@ -105,17 +105,37 @@ void setThreadName(const std::string &name) {
 #endif
 }
 
-void setThreadRealTime() {
+void setThreadRealTime(bool realTime) {
 #if defined ARCH_LIN || defined ARCH_MAC
-	// Round-robin scheduler policy
-	int policy = SCHED_RR;
+	int err;
+	int policy;
 	struct sched_param param;
-	param.sched_priority = sched_get_priority_max(policy);
-	pthread_setschedparam(pthread_self(), policy, &param);
+	if (realTime) {
+		// Round-robin scheduler policy
+		policy = SCHED_RR;
+		param.sched_priority = sched_get_priority_max(policy);
+	}
+	else {
+		// Default scheduler policy
+		policy = 0;
+		param.sched_priority = 0;
+	}
+	err = pthread_setschedparam(pthread_self(), policy, &param);
+	assert(!err);
+
+	// pthread_getschedparam(pthread_self(), &policy, &param);
+	// DEBUG("policy %d priority %d", policy, param.sched_priority);
+
 #elif defined ARCH_WIN
 	// Set process class first
-	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+	if (realTime) {
+		SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+	}
+	else {
+		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
+	}
 #endif
 }
 

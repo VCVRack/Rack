@@ -28,7 +28,7 @@ int getLogicalCoreCount();
 /** Sets a name of the current thread for debuggers and OS-specific process viewers. */
 void setThreadName(const std::string &name);
 /** Sets the current thread to be high-priority. */
-void setThreadRealTime();
+void setThreadRealTime(bool realTime);
 /** Returns the caller's human-readable stack trace with "\n"-separated lines. */
 std::string getStackTrace();
 /** Opens a URL, also happens to work with PDFs and folders.

@@ -211,7 +211,7 @@ static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrame
 	// Exploit the stream time to run code on startup of the audio thread
 	if (streamTime == 0.0) {
 		system::setThreadName("Audio");
-		system::setThreadRealTime();
+		// system::setThreadRealTime();
 	}
 	port->processStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
 	return 0;
