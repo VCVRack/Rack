@@ -151,6 +151,7 @@ struct Engine::Internal {
 	std::thread thread;
 	VIPMutex vipMutex;
 
+	bool realTime = false;
 	int threadCount = 1;
 	std::vector<EngineWorker> workers;
 	SpinBarrier engineBarrier;
@@ -165,17 +166,11 @@ Engine::Engine() {
 	internal->engineBarrier.total = 1;
 	internal->workerBarrier.total = 1;
 
-	setSampleRate(44100.f);
-	setThreadCount(settings::threadCount);
+	internal->sampleRate = 44100.f;
+	internal->sampleTime = 1 / internal->sampleRate;
 }
 
 Engine::~Engine() {
-	settings::sampleRate = internal->sampleRate;
-	settings::threadCount = internal->threadCount;
-
-	// Stop worker threads
-	setThreadCount(1);
-
 	// Make sure there are no cables or modules in the rack on destruction.
 	// If this happens, a module must have failed to remove itself before the RackWidget was destroyed.
 	assert(internal->cables.empty());
@@ -300,65 +295,9 @@ static void Engine_updateAdjacent(Engine *that, Module *m) {
 	}
 }
 
-static void Engine_run(Engine *that) {
-	// Set up thread
-	system::setThreadName("Engine");
-	// system::setThreadRealTime();
-	disableDenormals();
-
-	// Every time the that waits and locks a mutex, it steps this many frames
-	const int mutexSteps = 128;
-	// Time in seconds that the that is rushing ahead of the estimated clock time
-	double ahead = 0.0;
-	auto lastTime = std::chrono::high_resolution_clock::now();
-
-	while (that->internal->running) {
-		that->internal->vipMutex.wait();
-
-		if (!that->internal->paused) {
-			std::lock_guard<std::recursive_mutex> lock(that->internal->mutex);
-
-			for (Module *module : that->internal->modules) {
-				Engine_updateAdjacent(that, module);
-			}
-
-			// Step modules
-			for (int i = 0; i < mutexSteps; i++) {
-				Engine_step(that);
-			}
-		}
-
-		double stepTime = mutexSteps * that->internal->sampleTime;
-		ahead += stepTime;
-		auto currTime = std::chrono::high_resolution_clock::now();
-		const double aheadFactor = 2.0;
-		ahead -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
-		lastTime = currTime;
-		ahead = std::fmax(ahead, 0.0);
-
-		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
-		// The number of steps to wait before possibly sleeping
-		const double aheadMax = 1.0; // seconds
-		if (ahead > aheadMax) {
-			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
-		}
-	}
-}
-
-void Engine::start() {
-	internal->running = true;
-	internal->thread = std::thread(Engine_run, this);
-}
-
-void Engine::stop() {
-	internal->running = false;
-	internal->thread.join();
-}
-
-void Engine::setThreadCount(int threadCount) {
-	assert(1 <= threadCount);
-	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+static void Engine_relaunchWorkers(Engine *that) {
+	Engine::Internal *internal = that->internal;
+	assert(1 <= internal->threadCount);
 
 	// Stop all workers
 	for (EngineWorker &worker : internal->workers) {
@@ -373,23 +312,92 @@ void Engine::setThreadCount(int threadCount) {
 	internal->workers.resize(0);
 
 	// Set barrier counts
-	internal->threadCount = threadCount;
-	internal->engineBarrier.total = threadCount;
-	internal->workerBarrier.total = threadCount;
+	internal->engineBarrier.total = internal->threadCount;
+	internal->workerBarrier.total = internal->threadCount;
 
 	// Create workers
-	internal->workers.resize(threadCount - 1);
-	for (int id = 1; id < threadCount; id++) {
+	internal->workers.resize(internal->threadCount - 1);
+	for (int id = 1; id < internal->threadCount; id++) {
 		EngineWorker &worker = internal->workers[id - 1];
 		worker.id = id;
-		worker.engine = this;
+		worker.engine = that;
 		worker.start();
 	}
 }
 
-int Engine::getThreadCount() {
-	// No lock
-	return internal->threadCount;
+static void Engine_run(Engine *that) {
+	Engine::Internal *internal = that->internal;
+	// Set up thread
+	system::setThreadName("Engine");
+	// system::setThreadRealTime();
+	disableDenormals();
+
+	// Every time the that waits and locks a mutex, it steps this many frames
+	const int mutexSteps = 128;
+	// Time in seconds that the that is rushing ahead of the estimated clock time
+	double ahead = 0.0;
+	auto lastTime = std::chrono::high_resolution_clock::now();
+
+	while (internal->running) {
+		internal->vipMutex.wait();
+
+		// Set sample rate
+		if (internal->sampleRate != settings::sampleRate) {
+			internal->sampleRate = settings::sampleRate;
+			internal->sampleTime = 1 / internal->sampleRate;
+			for (Module *module : internal->modules) {
+				module->onSampleRateChange();
+			}
+		}
+
+		// Launch workers
+		if (internal->threadCount != settings::threadCount) {
+			internal->threadCount = settings::threadCount;
+			Engine_relaunchWorkers(that);
+		}
+
+		if (!internal->paused) {
+			std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+			for (Module *module : internal->modules) {
+				Engine_updateAdjacent(that, module);
+			}
+
+			// Step modules
+			for (int i = 0; i < mutexSteps; i++) {
+				Engine_step(that);
+			}
+		}
+
+		double stepTime = mutexSteps * internal->sampleTime;
+		ahead += stepTime;
+		auto currTime = std::chrono::high_resolution_clock::now();
+		const double aheadFactor = 2.0;
+		ahead -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
+		lastTime = currTime;
+		ahead = std::fmax(ahead, 0.0);
+
+		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
+		// The number of steps to wait before possibly sleeping
+		const double aheadMax = 1.0; // seconds
+		if (ahead > aheadMax) {
+			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
+		}
+	}
+
+	// Stop workers
+	internal->threadCount = 1;
+	Engine_relaunchWorkers(that);
+}
+
+void Engine::start() {
+	internal->running = true;
+	internal->thread = std::thread(Engine_run, this);
+}
+
+void Engine::stop() {
+	internal->running = false;
+	internal->thread.join();
 }
 
 void Engine::setPaused(bool paused) {
@@ -401,17 +409,6 @@ void Engine::setPaused(bool paused) {
 bool Engine::isPaused() {
 	// No lock
 	return internal->paused;
-}
-
-void Engine::setSampleRate(float sampleRate) {
-	VIPLock vipLock(internal->vipMutex);
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-
-	internal->sampleRate = sampleRate;
-	internal->sampleTime = 1 / sampleRate;
-	for (Module *module : internal->modules) {
-		module->onSampleRateChange();
-	}
 }
 
 float Engine::getSampleRate() {

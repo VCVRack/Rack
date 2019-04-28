@@ -25,6 +25,7 @@ extern bool invertZoom;
 extern float cableOpacity;
 extern float cableTension;
 extern bool allowCursorLock;
+extern bool realTime;
 extern float sampleRate;
 extern int threadCount;
 extern bool paramTooltip;

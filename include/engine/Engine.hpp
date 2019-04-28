@@ -20,11 +20,8 @@ struct Engine {
 	void start();
 	/** Stops engine thread. */
 	void stop();
-	void setThreadCount(int threadCount);
-	int getThreadCount();
 	void setPaused(bool paused);
 	bool isPaused();
-	void setSampleRate(float sampleRate);
 	float getSampleRate();
 	/** Returns the inverse of the current sample rate. */
 	float getSampleTime();

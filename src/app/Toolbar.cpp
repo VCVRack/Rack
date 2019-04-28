@@ -277,7 +277,7 @@ struct EnginePauseItem : ui::MenuItem {
 struct SampleRateValueItem : ui::MenuItem {
 	float sampleRate;
 	void onAction(const event::Action &e) override {
-		APP->engine->setSampleRate(sampleRate);
+		settings::sampleRate = sampleRate;
 		APP->engine->setPaused(false);
 	}
 };
@@ -288,7 +288,7 @@ struct SampleRateItem : ui::MenuItem {
 		ui::Menu *menu = new ui::Menu;
 
 		EnginePauseItem *enginePauseItem = new EnginePauseItem;
-		enginePauseItem->text = "Pause engine";
+		enginePauseItem->text = "Pause";
 		enginePauseItem->rightText = CHECKMARK(APP->engine->isPaused());
 		menu->addChild(enginePauseItem);
 
@@ -304,11 +304,18 @@ struct SampleRateItem : ui::MenuItem {
 				if (oversample > 1)
 					item->rightText += string::f("(%dx)", oversample);
 				item->rightText += " ";
-				item->rightText += CHECKMARK(APP->engine->getSampleRate() == sampleRate);
+				item->rightText += CHECKMARK(settings::sampleRate == sampleRate);
 				menu->addChild(item);
 			}
 		}
 		return menu;
+	}
+};
+
+
+struct RealTimeItem : ui::MenuItem {
+	void onAction(const event::Action &e) override {
+		settings::realTime ^= true;
 	}
 };
 
@@ -322,17 +329,22 @@ struct ThreadCountValueItem : ui::MenuItem {
 			text += " (most modules)";
 		else if (threadCount == 1)
 			text += " (lowest CPU usage)";
-		rightText = CHECKMARK(APP->engine->getThreadCount() == threadCount);
+		rightText = CHECKMARK(settings::threadCount == threadCount);
 	}
 	void onAction(const event::Action &e) override {
-		APP->engine->setThreadCount(threadCount);
+		settings::threadCount = threadCount;
 	}
 };
 
 
-struct ThreadCount : ui::MenuItem {
+struct ThreadCountItem : ui::MenuItem {
 	ui::Menu *createChildMenu() override {
 		ui::Menu *menu = new ui::Menu;
+
+		RealTimeItem *realTimeItem = new RealTimeItem;
+		realTimeItem->text = "Real-time priority";
+		realTimeItem->rightText = CHECKMARK(settings::realTime);
+		menu->addChild(realTimeItem);
 
 		int coreCount = system::getLogicalCoreCount();
 		for (int i = 1; i <= coreCount; i++) {
@@ -378,8 +390,8 @@ struct SettingsButton : MenuButton {
 		sampleRateItem->rightText = RIGHT_ARROW;
 		menu->addChild(sampleRateItem);
 
-		ThreadCount *threadCount = new ThreadCount;
-		threadCount->text = "Thread count";
+		ThreadCountItem *threadCount = new ThreadCountItem;
+		threadCount->text = "Engine threads";
 		threadCount->rightText = RIGHT_ARROW;
 		menu->addChild(threadCount);
 
