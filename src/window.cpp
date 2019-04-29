@@ -199,6 +199,12 @@ Window::Window() {
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
+#if defined ARCH_MAC
+	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
+	glfwWindowHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
+	glfwWindowHint(GLFW_COCOA_MENUBAR, GLFW_TRUE);
+#endif
+
 	// Create window
 	win = glfwCreateWindow(800, 600, "", NULL, NULL);
 	if (!win) {
