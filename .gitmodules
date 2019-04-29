@@ -10,10 +10,9 @@
 [submodule "dep/oui-blendish"]
 	path = dep/oui-blendish
 	url = https://github.com/AndrewBelt/oui-blendish.git
-[submodule "dep/glfw"]
-	path = dep/glfw
-	url = https://github.com/AndrewBelt/glfw.git
-	branch = openedFilename
 [submodule "dep/rtaudio"]
 	path = dep/rtaudio
 	url = https://github.com/thestk/rtaudio.git
+[submodule "dep/glfw"]
+	path = dep/glfw
+	url = https://github.com/AndrewBelt/glfw.git
