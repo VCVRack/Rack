@@ -304,19 +304,6 @@ void ModuleWidget::drawShadow(const DrawArgs &args) {
 	nvgFill(args.vg);
 }
 
-void ModuleWidget::onHover(const event::Hover &e) {
-	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
-	if ((glfwGetKey(APP->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
-		|| glfwGetKey(APP->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
-		&& (APP->window->getMods() & RACK_MOD_MASK) == 0) {
-		removeAction();
-		e.consume(NULL);
-		return;
-	}
-
-	OpaqueWidget::onHover(e);
-}
-
 void ModuleWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 	if (e.isConsumed())
@@ -375,6 +362,18 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					bypassAction();
 					e.consume(this);
+				}
+			} break;
+		}
+	}
+
+	if (e.action == RACK_HELD) {
+		switch (e.key) {
+			case GLFW_KEY_DELETE:
+			case GLFW_KEY_BACKSPACE: {
+				if ((e.mods & RACK_MOD_MASK) == 0) {
+					removeAction();
+					e.consume(NULL);
 				}
 			} break;
 		}

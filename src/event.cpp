@@ -169,6 +169,13 @@ bool State::handleButton(math::Vec pos, int button, int action, int mods) {
 }
 
 bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
+	// Fake a key RACK_HELD event for each held key
+	int mods = 0; //APP->window->getMods();
+	for (int key : heldKeys) {
+		int scancode = glfwGetKeyScancode(key);
+		handleKey(pos, key, scancode, RACK_HELD, mods);
+	}
+
 	if (draggedWidget) {
 		// DragMove
 		DragMove eDragMove;
@@ -204,6 +211,7 @@ bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 }
 
 bool State::handleLeave() {
+	heldKeys.clear();
 	setDragHovered(NULL);
 	setHovered(NULL);
 	return true;
@@ -256,6 +264,16 @@ bool State::handleText(math::Vec pos, int codepoint) {
 }
 
 bool State::handleKey(math::Vec pos, int key, int scancode, int action, int mods) {
+	// Update heldKey state
+	if (action == GLFW_PRESS) {
+		heldKeys.insert(key);
+	}
+	else if (action == GLFW_RELEASE) {
+		auto it = heldKeys.find(key);
+		if (it != heldKeys.end())
+			heldKeys.erase(it);
+	}
+
 	if (selectedWidget) {
 		// SelectKey
 		Context cSelectKey;

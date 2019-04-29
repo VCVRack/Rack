@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "math.hpp"
 #include <vector>
+#include <set>
 
 
 namespace rack {
@@ -76,13 +77,16 @@ struct PositionBase {
 };
 
 
+#define RACK_HELD 3
+
+
 /** An event prototype with a GLFW key. */
 struct KeyBase {
 	/** GLFW_KEY_* */
 	int key;
 	/** GLFW_KEY_*. You should usually use `key` instead. */
 	int scancode;
-	/** GLFW_RELEASE, GLFW_PRESS, or GLFW_REPEAT */
+	/** GLFW_RELEASE, GLFW_PRESS, GLFW_REPEAT, or RACK_HELD */
 	int action;
 	/** GLFW_MOD_* */
 	int mods;
@@ -338,6 +342,7 @@ struct State {
 	/** For double-clicking */
 	double lastClickTime = -INFINITY;
 	widget::Widget *lastClickedWidget = NULL;
+	std::set<int> heldKeys;
 
 	void setHovered(widget::Widget *w);
 	void setDragged(widget::Widget *w, int button);

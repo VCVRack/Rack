@@ -47,7 +47,7 @@ struct ParamField : ui::TextField {
 			}
 
 			ui::MenuOverlay *overlay = getAncestorOfType<ui::MenuOverlay>();
-			overlay->requestedDelete = true;
+			overlay->requestDelete();
 			e.consume(this);
 		}
 

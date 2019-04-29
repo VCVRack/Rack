@@ -23,7 +23,8 @@ void MenuOverlay::onButton(const event::Button &e) {
 		return;
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		requestedDelete = true;
+		requestDelete();
+		e.consume(this);
 	}
 }
 
@@ -33,7 +34,8 @@ void MenuOverlay::onHoverKey(const event::HoverKey &e) {
 		return;
 
 	if (e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
-		requestedDelete = true;
+		requestDelete();
+		e.consume(this);
 	}
 }
 
