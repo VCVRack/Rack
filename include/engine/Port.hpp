@@ -22,7 +22,7 @@ struct alignas(32) Port {
 	Unstable API. Use set/getChannels() instead.
 	May be 0 to PORT_MAX_CHANNELS.
 	*/
-	uint8_t channels = 0;
+	uint8_t channels = 1;
 	/** Unstable API. Use isConnected() instead. */
 	bool active = false;
 	/** For rendering plug lights on cables.
@@ -98,12 +98,7 @@ struct alignas(32) Port {
 };
 
 
-struct Output : Port {
-	Output() {
-		channels = 1;
-	}
-};
-
+struct Output : Port {};
 
 struct Input : Port {};
 

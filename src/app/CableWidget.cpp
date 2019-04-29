@@ -1,5 +1,6 @@
 #include "app/CableWidget.hpp"
 #include "app/Scene.hpp"
+#include "app/RackWidget.hpp"
 #include "window.hpp"
 #include "app.hpp"
 #include "patch.hpp"
@@ -46,6 +47,10 @@ static void drawCable(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor c
 		slump.y = (1.0 - tension) * (150.0 + 1.0*dist);
 		math::Vec pos3 = pos1.plus(pos2).div(2).plus(slump);
 
+		// Adjust pos1 and pos2 to not draw over the plug
+		pos1 = pos1.plus(pos3.minus(pos1).normalize().mult(9));
+		pos2 = pos2.plus(pos3.minus(pos2).normalize().mult(9));
+
 		nvgLineJoin(vg, NVG_ROUND);
 
 		// Shadow
@@ -81,12 +86,12 @@ static const NVGcolor cableColors[] = {
 	nvgRGB(0x0c, 0x8e, 0x15), // green
 	nvgRGB(0x09, 0x86, 0xad), // blue
 };
-static int lastCableColorId = -1;
 
 
 CableWidget::CableWidget() {
-	lastCableColorId = (lastCableColorId + 1) % LENGTHOF(cableColors);
-	color = cableColors[lastCableColorId];
+	int id = APP->scene->rack->nextCableColorId++;
+	APP->scene->rack->nextCableColorId %= LENGTHOF(cableColors);
+	color = cableColors[id];
 
 	cable = new engine::Cable;
 }
@@ -244,7 +249,6 @@ void CableWidget::draw(const DrawArgs &args) {
 }
 
 void CableWidget::drawPlugs(const DrawArgs &args) {
-	// TODO Figure out a way to draw plugs first and cables last, and cut the plug portion of the cable off.
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
 

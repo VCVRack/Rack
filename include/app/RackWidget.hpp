@@ -24,6 +24,7 @@ struct RackWidget : widget::OpaqueWidget {
 	math::Vec mousePos;
 	ParamWidget *touchedParam = NULL;
 	std::map<int, math::Vec> moduleDragPositions;
+	int nextCableColorId = 0;
 
 	RackWidget();
 	~RackWidget();

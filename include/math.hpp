@@ -205,6 +205,9 @@ struct Vec {
 	float norm() const {
 		return std::hypot(x, y);
 	}
+	Vec normalize() const {
+		return div(norm());
+	}
 	float square() const {
 		return x * x + y * y;
 	}

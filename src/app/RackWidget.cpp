@@ -63,14 +63,14 @@ struct ModuleContainer : widget::Widget {
 
 struct CableContainer : widget::TransparentWidget {
 	void draw(const DrawArgs &args) override {
-		Widget::draw(args);
-
 		// Draw cable plugs
 		for (widget::Widget *w : children) {
 			CableWidget *cw = dynamic_cast<CableWidget*>(w);
 			assert(cw);
 			cw->drawPlugs(args);
 		}
+
+		Widget::draw(args);
 	}
 };
 
