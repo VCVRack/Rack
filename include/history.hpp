@@ -53,6 +53,7 @@ struct ComplexAction : Action {
 	void undo() override;
 	void redo() override;
 	void push(Action *action);
+	bool isEmpty();
 };
 
 

@@ -32,6 +32,10 @@ void ComplexAction::push(Action *action) {
 	actions.push_back(action);
 }
 
+bool ComplexAction::isEmpty() {
+	return actions.empty();
+}
+
 
 ModuleAdd::~ModuleAdd() {
 	json_decref(moduleJ);

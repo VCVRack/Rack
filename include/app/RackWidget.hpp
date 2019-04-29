@@ -6,6 +6,8 @@
 #include "app/CableWidget.hpp"
 #include "app/PortWidget.hpp"
 #include "app/ParamWidget.hpp"
+#include "history.hpp"
+#include <map>
 
 
 namespace rack {
@@ -21,6 +23,7 @@ struct RackWidget : widget::OpaqueWidget {
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
 	ParamWidget *touchedParam = NULL;
+	std::map<int, math::Vec> moduleDragPositions;
 
 	RackWidget();
 	~RackWidget();
@@ -55,6 +58,8 @@ struct RackWidget : widget::OpaqueWidget {
 	void setModulePosForce(ModuleWidget *mw, math::Vec pos);
 	ModuleWidget *getModule(int moduleId);
 	bool isEmpty();
+	void updateModuleDragPositions();
+	history::ComplexAction *getModuleDragAction();
 
 	// Cable methods
 

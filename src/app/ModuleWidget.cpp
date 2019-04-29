@@ -386,17 +386,16 @@ void ModuleWidget::onDragStart(const event::DragStart &e) {
 
 	oldPos = box.pos;
 	dragPos = APP->scene->rack->mousePos.minus(box.pos);
+	APP->scene->rack->updateModuleDragPositions();
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {
-	if (!box.pos.isEqual(oldPos)) {
-		// history::ModuleMove
-		history::ModuleMove *h = new history::ModuleMove;
-		h->moduleId = module->id;
-		h->oldPos = oldPos;
-		h->newPos = box.pos;
-		APP->history->push(h);
+	history::ComplexAction *h = APP->scene->rack->getModuleDragAction();
+	if (!h) {
+		delete h;
+		return;
 	}
+	APP->history->push(h);
 }
 
 void ModuleWidget::onDragMove(const event::DragMove &e) {

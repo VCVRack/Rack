@@ -294,21 +294,16 @@ static void Engine_relaunchWorkers(Engine *that) {
 	assert(1 <= internal->threadCount);
 
 	// Stop all workers
-	DEBUG("1");
 	for (EngineWorker &worker : internal->workers) {
 		worker.stop();
 	}
-	DEBUG("2");
 	internal->engineBarrier.wait();
 
 	// Destroy all workers
-	DEBUG("3");
 	for (EngineWorker &worker : internal->workers) {
 		worker.join();
 	}
-	DEBUG("4");
 	internal->workers.resize(0);
-	DEBUG("5");
 
 	// Configure main thread
 	system::setThreadRealTime(internal->realTime);
@@ -318,7 +313,6 @@ static void Engine_relaunchWorkers(Engine *that) {
 	internal->workerBarrier.total = internal->threadCount;
 
 	// Create workers
-	DEBUG("6");
 	internal->workers.resize(internal->threadCount - 1);
 	for (int id = 1; id < internal->threadCount; id++) {
 		EngineWorker &worker = internal->workers[id - 1];
@@ -326,7 +320,6 @@ static void Engine_relaunchWorkers(Engine *that) {
 		worker.engine = that;
 		worker.start();
 	}
-	DEBUG("7");
 }
 
 static void Engine_run(Engine *that) {

@@ -521,10 +521,10 @@ void RackWidget::setModulePosForce(ModuleWidget *mw, math::Vec pos) {
 
 ModuleWidget *RackWidget::getModule(int moduleId) {
 	for (widget::Widget *w : moduleContainer->children) {
-		ModuleWidget *moduleWidget = dynamic_cast<ModuleWidget*>(w);
-		assert(moduleWidget);
-		if (moduleWidget->module->id == moduleId)
-			return moduleWidget;
+		ModuleWidget *mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		if (mw->module->id == moduleId)
+			return mw;
 	}
 	return NULL;
 }
@@ -532,6 +532,34 @@ ModuleWidget *RackWidget::getModule(int moduleId) {
 bool RackWidget::isEmpty() {
 	return moduleContainer->children.empty();
 }
+
+void RackWidget::updateModuleDragPositions() {
+	moduleDragPositions.clear();
+	for (widget::Widget *w : moduleContainer->children) {
+		ModuleWidget *mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		moduleDragPositions[mw->module->id] = mw->box.pos;
+	}
+}
+
+history::ComplexAction *RackWidget::getModuleDragAction() {
+	history::ComplexAction *h = new history::ComplexAction;
+
+	for (widget::Widget *w : moduleContainer->children) {
+		ModuleWidget *mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		math::Vec pos = moduleDragPositions.at(mw->module->id);
+		if (!pos.isEqual(mw->box.pos)) {
+			history::ModuleMove *mmh = new history::ModuleMove;
+			mmh->moduleId = mw->module->id;
+			mmh->oldPos = pos;
+			mmh->newPos = mw->box.pos;
+			h->push(mmh);
+		}
+	}
+	return h;
+}
+
 
 void RackWidget::clearCables() {
 	for (widget::Widget *w : cableContainer->children) {
