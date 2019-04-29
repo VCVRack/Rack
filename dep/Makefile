@@ -139,7 +139,7 @@ $(rtmidi):
 	$(WGET) "http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-4.0.0.tar.gz"
 	$(SHA256) rtmidi-4.0.0.tar.gz 370cfe710f43fbeba8d2b8c8bc310f314338c519c2cf2865e2d2737b251526cd
 	$(UNTAR) rtmidi-4.0.0.tar.gz
-	cd rtmidi-4.0.0 && $(CONFIGURE) --enable-shared=no
+	cd rtmidi-4.0.0 && $(CONFIGURE) --enable-shared=no --with-jack=no
 	$(MAKE) -C rtmidi-4.0.0
 	$(MAKE) -C rtmidi-4.0.0 install
 
