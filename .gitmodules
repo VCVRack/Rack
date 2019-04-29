@@ -1,13 +1,13 @@
-[submodule "ext/nanovg"]
+[submodule "dep/nanovg"]
 	path = dep/nanovg
-	url = https://github.com/AndrewBelt/nanovg.git
-[submodule "ext/nanosvg"]
+	url = https://github.com/memononen/nanovg.git
+[submodule "dep/nanosvg"]
 	path = dep/nanosvg
 	url = https://github.com/memononen/nanosvg.git
-[submodule "ext/osdialog"]
+[submodule "dep/osdialog"]
 	path = dep/osdialog
 	url = https://github.com/AndrewBelt/osdialog.git
-[submodule "ext/oui-blendish"]
+[submodule "dep/oui-blendish"]
 	path = dep/oui-blendish
 	url = https://github.com/AndrewBelt/oui-blendish.git
 [submodule "dep/glfw"]
