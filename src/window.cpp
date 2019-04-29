@@ -201,8 +201,6 @@ Window::Window() {
 
 #if defined ARCH_MAC
 	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
-	glfwWindowHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
-	glfwWindowHint(GLFW_COCOA_MENUBAR, GLFW_TRUE);
 #endif
 
 	// Create window
@@ -491,6 +489,11 @@ void windowInit() {
 	int err;
 
 	// Set up GLFW
+#if defined ARCH_MAC
+	glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
+	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_TRUE);
+#endif
+
 	glfwSetErrorCallback(errorCallback);
 	err = glfwInit();
 	if (err != GLFW_TRUE) {

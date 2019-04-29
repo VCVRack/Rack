@@ -106,7 +106,7 @@ void setThreadName(const std::string &name) {
 }
 
 void setThreadRealTime(bool realTime) {
-#if defined ARCH_LIN || defined ARCH_MAC
+#if defined ARCH_LIN
 	int err;
 	int policy;
 	struct sched_param param;
@@ -125,7 +125,8 @@ void setThreadRealTime(bool realTime) {
 
 	// pthread_getschedparam(pthread_self(), &policy, &param);
 	// DEBUG("policy %d priority %d", policy, param.sched_priority);
-
+#elif defined ARCH_MAC
+	// Not yet implemented
 #elif defined ARCH_WIN
 	// Set process class first
 	if (realTime) {
