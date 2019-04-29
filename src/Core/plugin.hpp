@@ -127,7 +127,7 @@ struct CcChoice : LedDisplayChoice {
 	}
 
 	void onSelectKey(const event::SelectKey &e) override {
-		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & WINDOW_MOD_MASK) == 0) {
+		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) {
 			event::Deselect eDeselect;
 			onDeselect(eDeselect);
 			APP->event->selectedWidget = NULL;

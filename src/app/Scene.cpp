@@ -79,49 +79,49 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_N: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					APP->patch->resetDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Q: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					APP->window->close();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_O: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					APP->patch->loadDialog();
 					e.consume(this);
 				}
-				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
+				if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 					APP->patch->revertDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_S: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					APP->patch->saveDialog();
 					e.consume(this);
 				}
-				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
+				if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 					APP->patch->saveAsDialog();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_Z: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					APP->history->undo();
 					e.consume(this);
 				}
-				if ((e.mods & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL | GLFW_MOD_SHIFT)) {
+				if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 					APP->history->redo();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_MINUS: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					float z = std::log2(settings::zoom);
 					z *= 2;
 					z = std::ceil(z - 0.01) - 1;
@@ -131,7 +131,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 				}
 			} break;
 			case GLFW_KEY_EQUAL: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					float z = std::log2(settings::zoom);
 					z *= 2;
 					z = std::floor(z + 0.01) + 1;

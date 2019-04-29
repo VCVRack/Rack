@@ -77,11 +77,11 @@ void RackScrollWidget::draw(const DrawArgs &args) {
 void RackScrollWidget::onHover(const event::Hover &e) {
 	// Scroll with arrow keys
 	float arrowSpeed = 30.0;
-	if ((APP->window->getMods() & WINDOW_MOD_MASK) == (WINDOW_MOD_CTRL |GLFW_MOD_SHIFT))
+	if ((APP->window->getMods() & RACK_MOD_MASK) == (RACK_MOD_CTRL |GLFW_MOD_SHIFT))
 		arrowSpeed /= 16.0;
-	else if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
+	else if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
 		arrowSpeed *= 4.0;
-	else if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
+	else if ((APP->window->getMods() & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
 		arrowSpeed /= 4.0;
 
 	if (glfwGetKey(APP->window->win, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -97,7 +97,7 @@ void RackScrollWidget::onHover(const event::Hover &e) {
 }
 
 void RackScrollWidget::onHoverScroll(const event::HoverScroll &e) {
-	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		// Increase zoom
 		float zoomDelta = e.scrollDelta.y / 50 / 4;
 		if (settings::invertZoom)

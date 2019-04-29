@@ -2,10 +2,6 @@
 #include "common.hpp"
 
 
-/** Accesses the global App pointer */
-#define APP rack::appGet()
-
-
 namespace rack {
 
 
@@ -51,6 +47,9 @@ void appInit();
 void appDestroy();
 /** Returns the global App pointer */
 App *appGet();
+
+/** Accesses the global App pointer */
+#define APP appGet()
 
 
 } // namespace rack

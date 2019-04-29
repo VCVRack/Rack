@@ -93,7 +93,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				}
 			} break;
 			case GLFW_KEY_LEFT: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					while (--cursor > 0) {
 						if (text[cursor] == ' ')
 							break;
@@ -102,12 +102,12 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				else {
 					cursor--;
 				}
-				if ((e.mods & WINDOW_MOD_MASK) == 0) {
+				if ((e.mods & RACK_MOD_MASK) == 0) {
 					selection = cursor;
 				}
 			} break;
 			case GLFW_KEY_RIGHT: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					while (++cursor < (int) text.size()) {
 						if (text[cursor] == ' ')
 							break;
@@ -116,7 +116,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				else {
 					cursor++;
 				}
-				if ((e.mods & WINDOW_MOD_MASK) == 0) {
+				if ((e.mods & RACK_MOD_MASK) == 0) {
 					selection = cursor;
 				}
 			} break;
@@ -127,14 +127,14 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				selection = cursor = text.size();
 			} break;
 			case GLFW_KEY_V: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					const char *newText = glfwGetClipboardString(APP->window->win);
 					if (newText)
 						insertText(newText);
 				}
 			} break;
 			case GLFW_KEY_X: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
@@ -144,7 +144,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				}
 			} break;
 			case GLFW_KEY_C: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					if (cursor != selection) {
 						int begin = std::min(cursor, selection);
 						std::string selectedText = text.substr(begin, std::abs(selection - cursor));
@@ -153,7 +153,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 				}
 			} break;
 			case GLFW_KEY_A: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					selectAll();
 				}
 			} break;

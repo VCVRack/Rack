@@ -97,22 +97,22 @@ struct FileButton : MenuButton {
 
 		NewItem *newItem = new NewItem;
 		newItem->text = "New";
-		newItem->rightText = WINDOW_MOD_CTRL_NAME "+N";
+		newItem->rightText = RACK_MOD_CTRL_NAME "+N";
 		menu->addChild(newItem);
 
 		OpenItem *openItem = new OpenItem;
 		openItem->text = "Open";
-		openItem->rightText = WINDOW_MOD_CTRL_NAME "+O";
+		openItem->rightText = RACK_MOD_CTRL_NAME "+O";
 		menu->addChild(openItem);
 
 		SaveItem *saveItem = new SaveItem;
 		saveItem->text = "Save";
-		saveItem->rightText = WINDOW_MOD_CTRL_NAME "+S";
+		saveItem->rightText = RACK_MOD_CTRL_NAME "+S";
 		menu->addChild(saveItem);
 
 		SaveAsItem *saveAsItem = new SaveAsItem;
 		saveAsItem->text = "Save as";
-		saveAsItem->rightText = WINDOW_MOD_CTRL_NAME "+Shift+S";
+		saveAsItem->rightText = RACK_MOD_CTRL_NAME "+Shift+S";
 		menu->addChild(saveAsItem);
 
 		SaveTemplateItem *saveTemplateItem = new SaveTemplateItem;
@@ -129,7 +129,7 @@ struct FileButton : MenuButton {
 
 		QuitItem *quitItem = new QuitItem;
 		quitItem->text = "Quit";
-		quitItem->rightText = WINDOW_MOD_CTRL_NAME "+Q";
+		quitItem->rightText = RACK_MOD_CTRL_NAME "+Q";
 		menu->addChild(quitItem);
 	}
 };
@@ -157,13 +157,13 @@ struct EditButton : MenuButton {
 
 		UndoItem *undoItem = new UndoItem;
 		undoItem->text = "Undo " + APP->history->getUndoName();
-		undoItem->rightText = WINDOW_MOD_CTRL_NAME "+Z";
+		undoItem->rightText = RACK_MOD_CTRL_NAME "+Z";
 		undoItem->disabled = !APP->history->canUndo();
 		menu->addChild(undoItem);
 
 		RedoItem *redoItem = new RedoItem;
 		redoItem->text = "Redo " + APP->history->getRedoName();
-		redoItem->rightText = WINDOW_MOD_CTRL_NAME "+" WINDOW_MOD_SHIFT_NAME "+Z";
+		redoItem->rightText = RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+Z";
 		redoItem->disabled = !APP->history->canRedo();
 		menu->addChild(redoItem);
 	}

@@ -91,7 +91,7 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 		return;
 
 	CableWidget *cw = NULL;
-	if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		if (type == OUTPUT) {
 			// Keep cable NULL. Will be created below
 		}

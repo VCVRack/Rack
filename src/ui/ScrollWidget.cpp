@@ -102,7 +102,7 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 
 	math::Vec scrollDelta = e.scrollDelta;
 	// Flip coordinates if shift is held
-	if ((APP->window->getMods() & WINDOW_MOD_MASK) == GLFW_MOD_SHIFT)
+	if ((APP->window->getMods() & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
 		scrollDelta = scrollDelta.flip();
 
 	offset = offset.minus(scrollDelta);

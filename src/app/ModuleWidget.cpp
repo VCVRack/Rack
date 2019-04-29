@@ -178,13 +178,13 @@ struct ModulePresetItem : ui::MenuItem {
 
 		ModuleCopyItem *copyItem = new ModuleCopyItem;
 		copyItem->text = "Copy";
-		copyItem->rightText = WINDOW_MOD_CTRL_NAME "+C";
+		copyItem->rightText = RACK_MOD_CTRL_NAME "+C";
 		copyItem->moduleWidget = moduleWidget;
 		menu->addChild(copyItem);
 
 		ModulePasteItem *pasteItem = new ModulePasteItem;
 		pasteItem->text = "Paste";
-		pasteItem->rightText = WINDOW_MOD_CTRL_NAME "+V";
+		pasteItem->rightText = RACK_MOD_CTRL_NAME "+V";
 		pasteItem->moduleWidget = moduleWidget;
 		menu->addChild(pasteItem);
 
@@ -308,7 +308,7 @@ void ModuleWidget::onHover(const event::Hover &e) {
 	// Instead of checking key-down events, delete the module even if key-repeat hasn't fired yet and the cursor is hovering over the widget.
 	if ((glfwGetKey(APP->window->win, GLFW_KEY_DELETE) == GLFW_PRESS
 		|| glfwGetKey(APP->window->win, GLFW_KEY_BACKSPACE) == GLFW_PRESS)
-		&& (APP->window->getMods() & WINDOW_MOD_MASK) == 0) {
+		&& (APP->window->getMods() & RACK_MOD_MASK) == 0) {
 		removeAction();
 		e.consume(NULL);
 		return;
@@ -336,43 +336,43 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_I: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					resetAction();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_R: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					randomizeAction();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_C: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					copyClipboard();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_V: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					pasteClipboardAction();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_D: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					cloneAction();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_U: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					disconnectAction();
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_E: {
-				if ((e.mods & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					bypassAction();
 					e.consume(this);
 				}
@@ -403,7 +403,7 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 void ModuleWidget::onDragMove(const event::DragMove &e) {
 	if (!settings::lockModules) {
 		math::Vec pos = APP->scene->rack->mousePos.minus(dragPos);
-		if ((APP->window->getMods() & WINDOW_MOD_MASK) == WINDOW_MOD_CTRL)
+		if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
 			APP->scene->rack->setModulePosForce(this, pos);
 		else
 			APP->scene->rack->setModulePosNearest(this, pos);
@@ -822,31 +822,31 @@ void ModuleWidget::createContextMenu() {
 
 	ModuleResetItem *resetItem = new ModuleResetItem;
 	resetItem->text = "Initialize";
-	resetItem->rightText = WINDOW_MOD_CTRL_NAME "+I";
+	resetItem->rightText = RACK_MOD_CTRL_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->addChild(resetItem);
 
 	ModuleRandomizeItem *randomizeItem = new ModuleRandomizeItem;
 	randomizeItem->text = "Randomize";
-	randomizeItem->rightText = WINDOW_MOD_CTRL_NAME "+R";
+	randomizeItem->rightText = RACK_MOD_CTRL_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->addChild(randomizeItem);
 
 	ModuleDisconnectItem *disconnectItem = new ModuleDisconnectItem;
 	disconnectItem->text = "Disconnect cables";
-	disconnectItem->rightText = WINDOW_MOD_CTRL_NAME "+U";
+	disconnectItem->rightText = RACK_MOD_CTRL_NAME "+U";
 	disconnectItem->moduleWidget = this;
 	menu->addChild(disconnectItem);
 
 	ModuleCloneItem *cloneItem = new ModuleCloneItem;
 	cloneItem->text = "Duplicate";
-	cloneItem->rightText = WINDOW_MOD_CTRL_NAME "+D";
+	cloneItem->rightText = RACK_MOD_CTRL_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
 	ModuleBypassItem *bypassItem = new ModuleBypassItem;
 	bypassItem->text = "Disable";
-	bypassItem->rightText = WINDOW_MOD_CTRL_NAME "+E";
+	bypassItem->rightText = RACK_MOD_CTRL_NAME "+E";
 	if (module && module->bypass)
 		bypassItem->rightText = CHECKMARK_STRING " " + bypassItem->rightText;
 	bypassItem->moduleWidget = this;

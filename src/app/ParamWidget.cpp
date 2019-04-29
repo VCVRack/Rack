@@ -143,7 +143,7 @@ void ParamWidget::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
 
 	// Touch parameter
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & WINDOW_MOD_MASK) == 0) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
 		if (paramQuantity) {
 			APP->scene->rack->touchedParam = this;
 		}
@@ -151,7 +151,7 @@ void ParamWidget::onButton(const event::Button &e) {
 	}
 
 	// Right click to open context menu
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & WINDOW_MOD_MASK) == 0) {
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
 		createContextMenu();
 		e.consume(this);
 	}
@@ -206,7 +206,7 @@ void ParamWidget::createContextMenu() {
 
 	// ParamFineItem *fineItem = new ParamFineItem;
 	// fineItem->text = "Fine adjust";
-	// fineItem->rightText = WINDOW_MOD_CTRL_NAME "+drag";
+	// fineItem->rightText = RACK_MOD_CTRL_NAME "+drag";
 	// fineItem->disabled = true;
 	// menu->addChild(fineItem);
 
