@@ -1,5 +1,7 @@
 #include "event.hpp"
 #include "widget/Widget.hpp"
+#include "app.hpp"
+#include "window.hpp"
 
 
 namespace rack {
@@ -170,7 +172,7 @@ bool State::handleButton(math::Vec pos, int button, int action, int mods) {
 
 bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	// Fake a key RACK_HELD event for each held key
-	int mods = 0; //APP->window->getMods();
+	int mods = APP->window->getMods();
 	for (int key : heldKeys) {
 		int scancode = glfwGetKeyScancode(key);
 		handleKey(pos, key, scancode, RACK_HELD, mods);
