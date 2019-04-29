@@ -94,33 +94,33 @@ $(libspeexdsp):
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
 $(openssl):
-	$(WGET) "https://www.openssl.org/source/openssl-1.1.1a.tar.gz"
-	$(SHA256) openssl-1.1.1a.tar.gz fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41
-	$(UNTAR) openssl-1.1.1a.tar.gz
+	$(WGET) "https://www.openssl.org/source/openssl-1.1.1b.tar.gz"
+	$(SHA256) openssl-1.1.1b.tar.gz 5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
+	$(UNTAR) openssl-1.1.1b.tar.gz
 	@# ./config ignores CFLAGS, so hack it in with CC
-	cd openssl-1.1.1a && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
-	$(MAKE) -C openssl-1.1.1a
-	$(MAKE) -C openssl-1.1.1a install_sw
+	cd openssl-1.1.1b && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
+	$(MAKE) -C openssl-1.1.1b
+	$(MAKE) -C openssl-1.1.1b install_sw
 
 $(libcurl): $(openssl)
-	$(WGET) "https://curl.haxx.se/download/curl-7.63.0.tar.gz"
-	$(SHA256) curl-7.63.0.tar.gz d483b89062832e211c887d7cf1b65c902d591b48c11fe7d174af781681580b41
-	$(UNTAR) curl-7.63.0.tar.gz
-	cd curl-7.63.0 && PKG_CONFIG_PATH= $(CONFIGURE) \
+	$(WGET) "https://curl.haxx.se/download/curl-7.64.1.tar.gz"
+	$(SHA256) curl-7.64.1.tar.gz 432d3f466644b9416bc5b649d344116a753aeaa520c8beaf024a90cba9d3d35d
+	$(UNTAR) curl-7.64.1.tar.gz
+	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding \
 		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli \
 		--without-ca-bundle --with-ca-fallback --with-ssl="$(realpath $(DEP_LOCAL))"
-	$(MAKE) -C curl-7.63.0
-	$(MAKE) -C curl-7.63.0 install
+	$(MAKE) -C curl-7.64.1
+	$(MAKE) -C curl-7.64.1 install
 
 $(libzip): $(zlib)
-	$(WGET) "https://libzip.org/download/libzip-1.5.1.tar.xz"
-	$(SHA256) libzip-1.5.1.tar.xz 04ea35b6956c7b3453f1ed3f3fe40e3ddae1f43931089124579e8384e79ed372
-	$(UNTAR) libzip-1.5.1.tar.xz
-	cd libzip-1.5.1 && mkdir -p build
-	cd libzip-1.5.1/build && $(CMAKE) .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON -DCMAKE_FIND_ROOT_PATH="$(realpath $(DEP_LOCAL))"
-	$(MAKE) -C libzip-1.5.1/build
-	$(MAKE) -C libzip-1.5.1/build install
+	$(WGET) "https://libzip.org/download/libzip-1.5.2.tar.gz"
+	$(SHA256) libzip-1.5.2.tar.gz be694a4abb2ffe5ec02074146757c8b56084dbcebf329123c84b205417435e15
+	$(UNTAR) libzip-1.5.2.tar.gz
+	cd libzip-1.5.2 && mkdir -p build
+	cd libzip-1.5.2/build && $(CMAKE) .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON -DCMAKE_FIND_ROOT_PATH="$(realpath $(DEP_LOCAL))"
+	$(MAKE) -C libzip-1.5.2/build
+	$(MAKE) -C libzip-1.5.2/build install
 
 $(zlib):
 	$(WGET) "https://www.zlib.net/zlib-1.2.11.tar.gz"
@@ -136,13 +136,14 @@ else
 endif
 
 $(rtmidi):
-	$(WGET) "https://vcvrack.com/downloads/dep/rtmidi.tgz"
-	$(SHA256) rtmidi.tgz b66ddc090eec2f3d05bdbe863760be9dce77cd525c3ca7c3a47cbabe035ebde1
-	$(UNTAR) rtmidi.tgz
-	cd rtmidi && $(CONFIGURE)
-	$(MAKE) -C rtmidi
-	$(MAKE) -C rtmidi install
+	$(WGET) "http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-4.0.0.tar.gz"
+	$(SHA256) rtmidi-4.0.0.tar.gz 370cfe710f43fbeba8d2b8c8bc310f314338c519c2cf2865e2d2737b251526cd
+	$(UNTAR) rtmidi-4.0.0.tar.gz
+	cd rtmidi-4.0.0 && $(CONFIGURE) --enable-shared=no
+	$(MAKE) -C rtmidi-4.0.0
+	$(MAKE) -C rtmidi-4.0.0 install
 
+RTAUDIO_FLAGS += -DRTAUDIO_BUILD_STATIC_LIBS=ON
 ifdef ARCH_MAC
 RTAUDIO_FLAGS += -DRTAUDIO_API_CORE=ON -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_JACK=OFF
 endif
@@ -158,7 +159,6 @@ $(rtaudio):
 	cd rtaudio/build && $(CMAKE) $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/build
 	$(MAKE) -C rtaudio/build install
-	cp lib/librtaudio_static.a lib/librtaudio.a
 
 $(nanovg): $(wildcard nanovg/src/*.h)
 	cp $^ include/
