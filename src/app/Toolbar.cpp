@@ -75,13 +75,6 @@ struct RevertItem : ui::MenuItem {
 };
 
 
-struct DisconnectCablesItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		APP->patch->disconnectDialog();
-	}
-};
-
-
 struct QuitItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->window->close();
@@ -123,10 +116,6 @@ struct FileButton : MenuButton {
 		revertItem->text = "Revert";
 		menu->addChild(revertItem);
 
-		DisconnectCablesItem *disconnectCablesItem = new DisconnectCablesItem;
-		disconnectCablesItem->text = "Disconnect cables";
-		menu->addChild(disconnectCablesItem);
-
 		QuitItem *quitItem = new QuitItem;
 		quitItem->text = "Quit";
 		quitItem->rightText = RACK_MOD_CTRL_NAME "+Q";
@@ -149,6 +138,13 @@ struct RedoItem : ui::MenuItem {
 };
 
 
+struct DisconnectCablesItem : ui::MenuItem {
+	void onAction(const event::Action &e) override {
+		APP->patch->disconnectDialog();
+	}
+};
+
+
 struct EditButton : MenuButton {
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
@@ -166,6 +162,10 @@ struct EditButton : MenuButton {
 		redoItem->rightText = RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+Z";
 		redoItem->disabled = !APP->history->canRedo();
 		menu->addChild(redoItem);
+
+		DisconnectCablesItem *disconnectCablesItem = new DisconnectCablesItem;
+		disconnectCablesItem->text = "Disconnect cables";
+		menu->addChild(disconnectCablesItem);
 	}
 };
 
@@ -246,13 +246,6 @@ struct CableTensionSlider : ui::Slider {
 };
 
 
-struct CpuMeterItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		settings::cpuMeter ^= true;
-	}
-};
-
-
 struct ParamTooltipItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		settings::paramTooltip ^= true;
@@ -263,6 +256,58 @@ struct ParamTooltipItem : ui::MenuItem {
 struct LockModulesItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		settings::lockModules ^= true;
+	}
+};
+
+
+struct FullscreenItem : ui::MenuItem {
+	void onAction(const event::Action &e) override {
+		APP->window->setFullScreen(!APP->window->isFullScreen());
+	}
+};
+
+
+struct ViewButton : MenuButton {
+	void onAction(const event::Action &e) override {
+		ui::Menu *menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		ParamTooltipItem *paramTooltipItem = new ParamTooltipItem;
+		paramTooltipItem->text = "Parameter tooltips";
+		paramTooltipItem->rightText = CHECKMARK(settings::paramTooltip);
+		menu->addChild(paramTooltipItem);
+
+		LockModulesItem *lockModulesItem = new LockModulesItem;
+		lockModulesItem->text = "Lock modules";
+		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
+		menu->addChild(lockModulesItem);
+
+		ZoomSlider *zoomSlider = new ZoomSlider;
+		zoomSlider->box.size.x = 200.0;
+		menu->addChild(zoomSlider);
+
+		CableOpacitySlider *cableOpacitySlider = new CableOpacitySlider;
+		cableOpacitySlider->box.size.x = 200.0;
+		menu->addChild(cableOpacitySlider);
+
+		CableTensionSlider *cableTensionSlider = new CableTensionSlider;
+		cableTensionSlider->box.size.x = 200.0;
+		menu->addChild(cableTensionSlider);
+
+		FullscreenItem *fullscreenItem = new FullscreenItem;
+		fullscreenItem->text = "Fullscreen";
+		fullscreenItem->rightText = "F11";
+		if (APP->window->isFullScreen())
+			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
+		menu->addChild(fullscreenItem);
+	}
+};
+
+
+struct CpuMeterItem : ui::MenuItem {
+	void onAction(const event::Action &e) override {
+		settings::cpuMeter ^= true;
 	}
 };
 
@@ -357,62 +402,26 @@ struct ThreadCountItem : ui::MenuItem {
 };
 
 
-struct FullscreenItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		APP->window->setFullScreen(!APP->window->isFullScreen());
-	}
-};
-
-
-struct SettingsButton : MenuButton {
+struct EngineButton : MenuButton {
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		ParamTooltipItem *paramTooltipItem = new ParamTooltipItem;
-		paramTooltipItem->text = "Parameter tooltips";
-		paramTooltipItem->rightText = CHECKMARK(settings::paramTooltip);
-		menu->addChild(paramTooltipItem);
-
 		CpuMeterItem *cpuMeterItem = new CpuMeterItem;
-		cpuMeterItem->text = "DSP engine timer";
+		cpuMeterItem->text = "CPU timer";
 		cpuMeterItem->rightText = CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);
 
-		LockModulesItem *lockModulesItem = new LockModulesItem;
-		lockModulesItem->text = "Lock modules";
-		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
-		menu->addChild(lockModulesItem);
-
 		SampleRateItem *sampleRateItem = new SampleRateItem;
-		sampleRateItem->text = "Engine sample rate";
+		sampleRateItem->text = "Sample rate";
 		sampleRateItem->rightText = RIGHT_ARROW;
 		menu->addChild(sampleRateItem);
 
 		ThreadCountItem *threadCount = new ThreadCountItem;
-		threadCount->text = "Engine threads";
+		threadCount->text = "Threads";
 		threadCount->rightText = RIGHT_ARROW;
 		menu->addChild(threadCount);
-
-		FullscreenItem *fullscreenItem = new FullscreenItem;
-		fullscreenItem->text = "Fullscreen";
-		fullscreenItem->rightText = "F11";
-		if (APP->window->isFullScreen())
-			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
-		menu->addChild(fullscreenItem);
-
-		ZoomSlider *zoomSlider = new ZoomSlider;
-		zoomSlider->box.size.x = 200.0;
-		menu->addChild(zoomSlider);
-
-		CableOpacitySlider *cableOpacitySlider = new CableOpacitySlider;
-		cableOpacitySlider->box.size.x = 200.0;
-		menu->addChild(cableOpacitySlider);
-
-		CableTensionSlider *cableTensionSlider = new CableTensionSlider;
-		cableTensionSlider->box.size.x = 200.0;
-		menu->addChild(cableTensionSlider);
 	}
 };
 
@@ -690,9 +699,13 @@ Toolbar::Toolbar() {
 	editButton->text = "Edit";
 	layout->addChild(editButton);
 
-	SettingsButton *settingsButton = new SettingsButton;
-	settingsButton->text = "Settings";
-	layout->addChild(settingsButton);
+	ViewButton *viewButton = new ViewButton;
+	viewButton->text = "View";
+	layout->addChild(viewButton);
+
+	EngineButton *engineButton = new EngineButton;
+	engineButton->text = "Engine";
+	layout->addChild(engineButton);
 
 	PluginsButton *pluginsButton = new PluginsButton;
 	pluginsButton->text = "Plugins";

@@ -813,7 +813,7 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(pluginItem);
 
 	ModulePresetItem *presetsItem = new ModulePresetItem;
-	presetsItem->text = "Presets";
+	presetsItem->text = "Preset";
 	presetsItem->rightText = RIGHT_ARROW;
 	presetsItem->moduleWidget = this;
 	menu->addChild(presetsItem);
