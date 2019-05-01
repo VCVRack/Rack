@@ -38,16 +38,21 @@ void RackScrollWidget::step() {
 	math::Rect moduleBox = rackWidget->moduleContainer->getChildrenBoundingBox();
 	if (!moduleBox.size.isFinite())
 		moduleBox = math::Rect(RACK_OFFSET, math::Vec(0, 0));
-	zoomWidget->box.pos = moduleBox.pos.mult(zoomWidget->zoom);
-	zoomWidget->box.size = moduleBox.size.mult(zoomWidget->zoom);
-	// Expand to viewport
-	math::Rect viewportBox = box;
-	viewportBox.pos = viewportBox.pos.plus(offset);
-	zoomWidget->box = zoomWidget->box.expand(viewportBox);
-	// Grow a few pixels
-	zoomWidget->box = zoomWidget->box.grow(math::Vec(100, 100));
-	// Reposition rackWidget
-	rackWidget->box.pos = zoomWidget->box.pos.div(zoomWidget->zoom).neg();
+	zoomWidget->box.pos = moduleBox.pos.mult(zoom);
+	zoomWidget->box.size = moduleBox.size.mult(zoom);
+
+	// Expand to moduleBox
+	math::Rect viewportBox = moduleBox.grow(RACK_GRID_SIZE.mult(math::Vec(50, 2)));
+	viewportBox.pos = viewportBox.pos.mult(zoom);
+	viewportBox.size = viewportBox.size.mult(zoom);
+	// Expand to viewport size
+	math::Vec s = box.size.minus(viewportBox.size).max(math::Vec());
+	viewportBox.pos = viewportBox.pos.minus(s.div(2));
+	viewportBox.size = viewportBox.size.plus(s);
+
+	// Reposition widgets
+	zoomWidget->box = viewportBox;
+	rackWidget->box.pos = zoomWidget->box.pos.div(zoom).neg();
 
 	// Scroll rack if dragging cable near the edge of the screen
 	math::Vec pos = APP->window->mousePos;
