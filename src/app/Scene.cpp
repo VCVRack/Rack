@@ -21,9 +21,9 @@ Scene::Scene() {
 
 	rack = rackScroll->rackWidget;
 
-	toolbar = new Toolbar;
-	addChild(toolbar);
-	rackScroll->box.pos.y = toolbar->box.size.y;
+	menuBar = new MenuBar;
+	addChild(menuBar);
+	rackScroll->box.pos.y = menuBar->box.size.y;
 
 	moduleBrowser = moduleBrowserCreate();
 	moduleBrowser->hide();
@@ -35,7 +35,7 @@ Scene::~Scene() {
 
 void Scene::step() {
 	// Resize owned descendants
-	toolbar->box.size.x = box.size.x;
+	menuBar->box.size.x = box.size.x;
 	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
 
 	// Autosave every 15 seconds

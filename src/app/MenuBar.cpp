@@ -1,4 +1,4 @@
-#include "app/Toolbar.hpp"
+#include "app/MenuBar.hpp"
 #include "window.hpp"
 #include "engine/Engine.hpp"
 #include "asset.hpp"
@@ -680,7 +680,7 @@ struct HelpButton : MenuButton {
 };
 
 
-Toolbar::Toolbar() {
+MenuBar::MenuBar() {
 	const float margin = 5;
 	box.size.y = BND_WIDGET_HEIGHT + 2*margin;
 
@@ -714,7 +714,7 @@ Toolbar::Toolbar() {
 	layout->addChild(helpButton);
 }
 
-void Toolbar::draw(const DrawArgs &args) {
+void MenuBar::draw(const DrawArgs &args) {
 	bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
 	bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 

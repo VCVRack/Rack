@@ -65,7 +65,7 @@
 #include "app/SvgScrew.hpp"
 #include "app/SvgSlider.hpp"
 #include "app/SvgSwitch.hpp"
-#include "app/Toolbar.hpp"
+#include "app/MenuBar.hpp"
 #include "app/CableWidget.hpp"
 
 #include "engine/Engine.hpp"

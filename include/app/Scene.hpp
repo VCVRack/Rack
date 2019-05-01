@@ -3,7 +3,7 @@
 #include "widget/OpaqueWidget.hpp"
 #include "app/RackScrollWidget.hpp"
 #include "app/RackWidget.hpp"
-#include "app/Toolbar.hpp"
+#include "app/MenuBar.hpp"
 
 
 namespace rack {
@@ -14,7 +14,7 @@ struct Scene : widget::OpaqueWidget {
 	// Convenience variables for accessing important widgets
 	RackScrollWidget *rackScroll;
 	RackWidget *rack;
-	Toolbar *toolbar;
+	MenuBar *menuBar;
 	widget::Widget *moduleBrowser;
 
 	// Version checking

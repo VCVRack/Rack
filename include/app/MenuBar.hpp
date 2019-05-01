@@ -7,12 +7,8 @@ namespace rack {
 namespace app {
 
 
-struct Toolbar : widget::OpaqueWidget {
-	// TODO Move these to future Rack app state
-	float cableOpacity = 0.5;
-	float cableTension = 0.5;
-
-	Toolbar();
+struct MenuBar : widget::OpaqueWidget {
+	MenuBar();
 	void draw(const DrawArgs &args) override;
 };
 
