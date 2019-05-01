@@ -1,36 +1,48 @@
 
 ### 1.0.0 (in development)
 
-- Added plugin info sub-menu to module context menu with links to manual, website, source code, etc.
-- Added factory preset sub-menu to module context menu if modules supplies a folder of presets
-- Added Core MIDI-Map for mapping MIDI CC parameters directly to Rack parameters
-- Added polyphony to Core MIDI-CV
-- Added MPE mode to Core MIDI-CV
-- Added sample rates up to 768,000 Hz (16 x 48,000 Hz)
-- Added multithreading to engine
+- Added undo/redo history
 - Added polyphonic cables
-- Added Core CV-MIDI, CV-CC, and CV-Gate for sending MIDI to external devices
+- Added multithreading to engine
+- Added module expander support
 - Added parameter labels, units, and descriptions
 - Added parameter tooltips for quickly viewing parameter values
 - Added parameter context menu for entering numerical values, unmapping, etc
 - Changed parameter initialization to double-click
-- Added undo/redo history
-- Added GlWidget for rendering to an OpenGL context
-- Added ability to disable modules with a context menu item and key command
-- Added default template patch
-- Added menu item to save patch as the template
-- Added "frameRateLimit" and "frameRateSync" for setting maximum screen refresh rate and to toggle vertical sync
-- Added ability to Ctrl/Cmd-click on an input port to clone the existing cable
-- Added "Panic" button to all MIDI modules to reset performance state
-- Made CPU meter display microseconds and percentage instead of millisamples.
+- Added ability to Ctrl-click on an input port to clone the existing cable
+- Added module "force" dragging when holding Ctrl
+- Added ability to disable modules with a context menu item and key command Ctrl-E
+- Added sample rates up to 768,000 Hz (16 x 48,000 Hz)
 - Overhauled Module Browser with visual previews of modules
-- Made Gamepad driver generate MIDI CC instead of MIDI notes for buttons
-- DSP
+- Added plugin info sub-menu to module context menu with links to manual, website, source code, etc.
+- Added factory presets to module context menu if plugin supplies a folder of presets
+- Added default template patch
+- Added menu item to save the current patch as the template
+- Added "frameRateLimit" and "frameRateSync" for setting maximum screen refresh rate and to toggle vertical sync
+- Added textual menu bar, rearranged menu items, removed icons
+- Made CPU timer display microseconds and percentage instead of millisamples
+- Added engine real-time priority setting
+- Made rack infinite in all four directions
+- Added bus board graphic to rack
+- Added key command Ctrl-- and Ctrl-=, or Ctrl-scroll, for zooming the rack
+- Fixed draw order of cable plugs and wires
+- Made Gamepad MIDI driver generate MIDI CC instead of MIDI notes for buttons
+- Fixed Unicode user directories on Windows
+
+- Core
+	- Added Core CV-MIDI, CV-CC, and CV-Gate for sending MIDI to external devices
+	- Added Core MIDI-Map for mapping MIDI CC parameters directly to Rack parameters
+	- Added polyphony to Core MIDI-CV
+	- Added MPE mode to Core MIDI-CV
+	- Added "Panic" button to all MIDI modules to reset performance state
+
+- API
 	- Added [`simd.hpp`](include/dsp/simd.hpp) for generically handling arithmetic and math functions for vectors of floats, accelerated with SSE
 	- Added `dsp::VuMeter2`
 	- Added `dsp::Timer` and `dsp::Counter`
-- API
 	- Overhauled event system with many new events
+	- etc
+
 - Licenses
 	- Collected all license statements into new [LICENSE.md](LICENSE.md) file
 	- Licensed Core panel graphics under CC BY-NC-ND 4.0
@@ -82,15 +94,10 @@
 - Added File > "Disconnect cables"
 - Released [Rack SDK](https://github.com/VCVRack/Rack/issues/258#issuecomment-376293898) for compiling plugins without compiling Rack
 
-
 ### 0.5.1 (2017-12-19)
 
 - Added Plugin Manager support
 - Fixed metadata panel in the Add Module window
-
-- Fundamental
-	- Added Sequential Switch 1 & 2
-
 
 ### 0.5.0 (2017-11-21)
 
@@ -101,21 +108,6 @@
 - New module browser with search and tags
 - Enhanced LED emulation in graphics engine
 - File > New attempts to load "template.vcv" in the "Documents/Rack" folder if it exists
-
-- New Grayscale plugin with Algorhythm, Binary, and Binary² modules
-
-- Audible Instruments
-	- Added extra blend mode functions, alternative modes, and quality settings to Texture Synthesizer
-	- Added bonus modes and "Disastrous Peace" mode to Resonator
-	- Added Low CPU mode to Macro Oscillator
-	- Merged Tidal Modulator and Wavetable Oscillator into a single module
-	- Fixed Keyframer/Mixer keyframes and channel settings saving
-
-- Fundamental
-	- Added 8vert, 8-channel attenuverter
-	- Added Unity, 2-channel mixer
-	- Changed LED functions in ADSR
-
 
 ### 0.4.0 (2017-10-13)
 
@@ -129,17 +121,6 @@
 - Support for AMD Phenom II processors
 - Use self-contained Mac app bundle, no need for a Rack folder
 
-- Fundamental
-	- Added Lissajous mode to Scope
-	- Added two LFOs and VCO-2
-
-- Befaco
-	- Added Rampage
-
-- Audible Instruments
-	- Added Keyframer/Mixer
-
-
 ### 0.3.2 (2017-09-25)
 
 - Added key commands
@@ -147,12 +128,6 @@
 - Added "allowCursorLock" to settings.json (set to "false" for touch screen support)
 - Fixed 100% CPU issue when no audio device is selected
 - Added vector scaling panels
-- Audible Instruments:
-	- Added alternative resonator models to Modal Synthesizer
-- Fundamental:
-	- Fixed Drive CV input of VCF
-	- Reverted SEQ3 to continuous gates
-
 
 ### 0.3.1 (2017-09-13)
 
@@ -163,7 +138,6 @@
 - Ctrl-click to right click on Mac
 - Fixed menu "flicker" when menu cannot fit in window
 - tweaks to Fundamental and Audible Instruments plugins
-
 
 ### 0.3.0 (2017-09-10)
 
