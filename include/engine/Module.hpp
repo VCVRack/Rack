@@ -84,6 +84,7 @@ struct Module {
 
 	template <class TParamQuantity = ParamQuantity>
 	void configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
+		assert(paramId < (int) params.size() && paramId < (int) paramQuantities.size());
 		if (paramQuantities[paramId])
 			delete paramQuantities[paramId];
 

@@ -479,8 +479,6 @@ struct LogInItem : ui::MenuItem {
 
 
 struct ManageItem : ui::MenuItem {
-	ManageItem() {
-	}
 	void onAction(const event::Action &e) override {
 		std::thread t([&]() {
 			system::openBrowser("https://vcvrack.com/plugins.html");

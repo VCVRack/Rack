@@ -16,6 +16,8 @@ Module::~Module() {
 }
 
 void Module::config(int numParams, int numInputs, int numOutputs, int numLights) {
+	// This method should only be called once.
+	assert(params.empty() && inputs.empty() && outputs.empty() && lights.empty() && paramQuantities.empty());
 	params.resize(numParams);
 	inputs.resize(numInputs);
 	outputs.resize(numOutputs);
