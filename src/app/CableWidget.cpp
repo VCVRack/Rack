@@ -80,20 +80,15 @@ static void drawCable(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor c
 }
 
 
-static const NVGcolor cableColors[] = {
-	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
-	nvgRGB(0xc9, 0x18, 0x47), // red
-	nvgRGB(0x0c, 0x8e, 0x15), // green
-	nvgRGB(0x09, 0x86, 0xad), // blue
-};
-
-
 CableWidget::CableWidget() {
-	int id = APP->scene->rack->nextCableColorId++;
-	APP->scene->rack->nextCableColorId %= LENGTHOF(cableColors);
-	color = cableColors[id];
-
 	cable = new engine::Cable;
+
+	color = color::BLACK_TRANSPARENT;
+	if (!settings::cableColors.empty()) {
+		int id = APP->scene->rack->nextCableColorId++;
+		APP->scene->rack->nextCableColorId %= settings::cableColors.size();
+		color = settings::cableColors[id];
+	}
 }
 
 CableWidget::~CableWidget() {

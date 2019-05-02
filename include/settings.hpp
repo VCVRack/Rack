@@ -2,6 +2,8 @@
 #include "common.hpp"
 #include "math.hpp"
 #include "plugin/Model.hpp"
+#include "color.hpp"
+#include <set>
 #include <jansson.h>
 
 
@@ -37,6 +39,7 @@ extern bool frameRateSync;
 extern bool skipLoadOnLaunch;
 extern std::string patchPath;
 extern std::set<plugin::Model*> favoriteModels;
+extern std::vector<NVGcolor> cableColors;
 
 json_t *toJson();
 void fromJson(json_t *rootJ);
