@@ -212,7 +212,7 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 
 	if (dryRun) {
 		// Check if available
-		json_t *availableResJ = network::requestJson(network::METHOD_GET, downloadUrl, NULL);
+		json_t *availableResJ = network::requestJson(network::GET, downloadUrl, NULL);
 		if (!availableResJ) {
 			WARN("Could not check whether download is available");
 			return false;
@@ -393,9 +393,9 @@ void logIn(const std::string &email, const std::string &password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	std::string tokenUrl = app::API_URL;
-	tokenUrl += "/token";
-	json_t *resJ = network::requestJson(network::METHOD_POST, tokenUrl, reqJ);
+	std::string url = app::API_URL;
+	url += "/token";
+	json_t *resJ = network::requestJson(network::POST, url, reqJ);
 	json_decref(reqJ);
 
 	if (resJ) {
@@ -440,7 +440,7 @@ bool sync(bool dryRun) {
 	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
 	std::string pluginsUrl = app::API_URL;
 	pluginsUrl += "/plugins";
-	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
+	json_t *pluginsResJ = network::requestJson(network::GET, pluginsUrl, pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
@@ -459,7 +459,7 @@ bool sync(bool dryRun) {
 	// Get community manifests
 	std::string manifestsUrl = app::API_URL;
 	manifestsUrl += "/community/manifests";
-	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, NULL);
+	json_t *manifestsResJ = network::requestJson(network::GET, manifestsUrl, NULL);
 	if (!manifestsResJ) {
 		WARN("Request for community manifests failed");
 		return false;

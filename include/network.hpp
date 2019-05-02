@@ -12,10 +12,10 @@ namespace network {
 
 
 enum Method {
-	METHOD_GET,
-	METHOD_POST,
-	METHOD_PUT,
-	METHOD_DELETE,
+	GET,
+	POST,
+	PUT,
+	DELETE,
 };
 
 /** Requests a JSON API URL over HTTP(S), using the data as the query (GET) or the body (POST, etc)

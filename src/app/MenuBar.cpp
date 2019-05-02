@@ -32,6 +32,9 @@ struct MenuButton : ui::Button {
 	}
 };
 
+////////////////////
+// File
+////////////////////
 
 struct NewItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -39,13 +42,11 @@ struct NewItem : ui::MenuItem {
 	}
 };
 
-
 struct OpenItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->patch->loadDialog();
 	}
 };
-
 
 struct SaveItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -53,13 +54,11 @@ struct SaveItem : ui::MenuItem {
 	}
 };
 
-
 struct SaveAsItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->patch->saveAsDialog();
 	}
 };
-
 
 struct SaveTemplateItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -67,20 +66,17 @@ struct SaveTemplateItem : ui::MenuItem {
 	}
 };
 
-
 struct RevertItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->patch->revertDialog();
 	}
 };
 
-
 struct QuitItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->window->close();
 	}
 };
-
 
 struct FileButton : MenuButton {
 	void onAction(const event::Action &e) override {
@@ -123,6 +119,9 @@ struct FileButton : MenuButton {
 	}
 };
 
+////////////////////
+// Edit
+////////////////////
 
 struct UndoItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -130,20 +129,17 @@ struct UndoItem : ui::MenuItem {
 	}
 };
 
-
 struct RedoItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->history->redo();
 	}
 };
 
-
 struct DisconnectCablesItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->patch->disconnectDialog();
 	}
 };
-
 
 struct EditButton : MenuButton {
 	void onAction(const event::Action &e) override {
@@ -169,6 +165,9 @@ struct EditButton : MenuButton {
 	}
 };
 
+////////////////////
+// View
+////////////////////
 
 struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
@@ -186,7 +185,6 @@ struct ZoomQuantity : Quantity {
 	std::string getUnit() override {return "%";}
 };
 
-
 struct ZoomSlider : ui::Slider {
 	ZoomSlider() {
 		quantity = new ZoomQuantity;
@@ -195,7 +193,6 @@ struct ZoomSlider : ui::Slider {
 		delete quantity;
 	}
 };
-
 
 struct CableOpacityQuantity : Quantity {
 	void setValue(float value) override {
@@ -211,8 +208,6 @@ struct CableOpacityQuantity : Quantity {
 	std::string getUnit() override {return "%";}
 };
 
-
-
 struct CableOpacitySlider : ui::Slider {
 	CableOpacitySlider() {
 		quantity = new CableOpacityQuantity;
@@ -221,7 +216,6 @@ struct CableOpacitySlider : ui::Slider {
 		delete quantity;
 	}
 };
-
 
 struct CableTensionQuantity : Quantity {
 	void setValue(float value) override {
@@ -235,7 +229,6 @@ struct CableTensionQuantity : Quantity {
 	int getDisplayPrecision() override {return 2;}
 };
 
-
 struct CableTensionSlider : ui::Slider {
 	CableTensionSlider() {
 		quantity = new CableTensionQuantity;
@@ -245,13 +238,11 @@ struct CableTensionSlider : ui::Slider {
 	}
 };
 
-
 struct ParamTooltipItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		settings::paramTooltip ^= true;
 	}
 };
-
 
 struct LockModulesItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -259,13 +250,11 @@ struct LockModulesItem : ui::MenuItem {
 	}
 };
 
-
 struct FullscreenItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->window->setFullScreen(!APP->window->isFullScreen());
 	}
 };
-
 
 struct ViewButton : MenuButton {
 	void onAction(const event::Action &e) override {
@@ -304,6 +293,9 @@ struct ViewButton : MenuButton {
 	}
 };
 
+////////////////////
+// Engine
+////////////////////
 
 struct CpuMeterItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -311,13 +303,11 @@ struct CpuMeterItem : ui::MenuItem {
 	}
 };
 
-
 struct EnginePauseItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->engine->setPaused(!APP->engine->isPaused());
 	}
 };
-
 
 struct SampleRateValueItem : ui::MenuItem {
 	float sampleRate;
@@ -326,7 +316,6 @@ struct SampleRateValueItem : ui::MenuItem {
 		APP->engine->setPaused(false);
 	}
 };
-
 
 struct SampleRateItem : ui::MenuItem {
 	ui::Menu *createChildMenu() override {
@@ -357,13 +346,11 @@ struct SampleRateItem : ui::MenuItem {
 	}
 };
 
-
 struct RealTimeItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		settings::realTime ^= true;
 	}
 };
-
 
 struct ThreadCountValueItem : ui::MenuItem {
 	int threadCount;
@@ -380,7 +367,6 @@ struct ThreadCountValueItem : ui::MenuItem {
 		settings::threadCount = threadCount;
 	}
 };
-
 
 struct ThreadCountItem : ui::MenuItem {
 	ui::Menu *createChildMenu() override {
@@ -400,7 +386,6 @@ struct ThreadCountItem : ui::MenuItem {
 		return menu;
 	}
 };
-
 
 struct EngineButton : MenuButton {
 	void onAction(const event::Action &e) override {
@@ -425,22 +410,52 @@ struct EngineButton : MenuButton {
 	}
 };
 
+////////////////////
+// Plugins
+////////////////////
+
+struct PluginsButton : MenuButton {
+	ui::Menu *menu;
+
+	void onAction(const event::Action &e) override {
+		menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		refresh();
+	}
+
+	void draw(const DrawArgs &args) override {
+		MenuButton::draw(args);
+
+		if (0) {
+			// Notification circle
+			nvgBeginPath(args.vg);
+			nvgCircle(args.vg, 4, 2, 4.0);
+			nvgFillColor(args.vg, nvgRGBf(1.0, 0.0, 0.0));
+			nvgFill(args.vg);
+			nvgStrokeColor(args.vg, nvgRGBf(0.5, 0.0, 0.0));
+			nvgStroke(args.vg);
+		}
+	}
+
+	void refresh();
+};
 
 struct RegisterItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
-		std::thread t([&]() {
+		std::thread t([]() {
 			system::openBrowser("https://vcvrack.com/");
 		});
 		t.detach();
 	}
 };
 
-
 struct AccountEmailField : ui::TextField {
 	ui::TextField *passwordField;
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
-			APP->event->selectedWidget = passwordField;
+			APP->event->setSelected(passwordField);
 			e.consume(this);
 		}
 
@@ -448,7 +463,6 @@ struct AccountEmailField : ui::TextField {
 			ui::TextField::onSelectKey(e);
 	}
 };
-
 
 struct AccountPasswordField : ui::PasswordField {
 	ui::MenuItem *logInItem;
@@ -463,79 +477,87 @@ struct AccountPasswordField : ui::PasswordField {
 	}
 };
 
-
 struct LogInItem : ui::MenuItem {
 	ui::TextField *emailField;
 	ui::TextField *passwordField;
 	void onAction(const event::Action &e) override {
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
-		std::thread t([&, email, password]() {
+		std::thread t([=]() {
 			plugin::logIn(email, password);
 		});
 		t.detach();
+		e.consume(NULL);
+	}
+
+	void step() override {
+		if (plugin::loginStatus != "") {
+			text = plugin::loginStatus;
+			disabled = true;
+		}
+		else {
+			text = "Log in";
+			disabled = false;
+		}
 	}
 };
 
-
 struct ManageItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
-		std::thread t([&]() {
+		std::thread t([]() {
 			system::openBrowser("https://vcvrack.com/plugins.html");
 		});
 		t.detach();
 	}
 };
 
-
 struct SyncItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 	}
 };
 
+#if 0
+struct SyncButton : ui::Button {
+	bool checked = false;
+	/** Updates are available */
+	bool available = false;
+	/** Plugins have been updated */
+	bool completed = false;
 
-// struct SyncButton : ui::Button {
-// 	bool checked = false;
-// 	/** Updates are available */
-// 	bool available = false;
-// 	/** Plugins have been updated */
-// 	bool completed = false;
-
-// 	void step() override {
-// 		// Check for plugin update on first step()
-// 		if (!checked) {
-// 			std::thread t([this]() {
-// 				if (plugin::sync(true))
-// 					available = true;
-// 			});
-// 			t.detach();
-// 			checked = true;
-// 		}
-// 		// Display message if we've completed updates
-// 		if (completed) {
-// 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
-// 				APP->window->close();
-// 			}
-// 			completed = false;
-// 		}
-// 	}
-// 	void onAction(const event::Action &e) override {
-// 		available = false;
-// 		std::thread t([this]() {
-// 			if (plugin::sync(false))
-// 				completed = true;
-// 		});
-// 		t.detach();
-// 	}
-// };
-
+	void step() override {
+		// Check for plugin update on first step()
+		if (!checked) {
+			std::thread t([this]() {
+				if (plugin::sync(true))
+					available = true;
+			});
+			t.detach();
+			checked = true;
+		}
+		// Display message if we've completed updates
+		if (completed) {
+			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
+				APP->window->close();
+			}
+			completed = false;
+		}
+	}
+	void onAction(const event::Action &e) override {
+		available = false;
+		std::thread t([this]() {
+			if (plugin::sync(false))
+				completed = true;
+		});
+		t.detach();
+	}
+};
+#endif
 
 struct LogOutItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		plugin::logOut();
 	}
 };
-
 
 struct DownloadQuantity : Quantity {
 	float getValue() override {
@@ -555,72 +577,55 @@ struct DownloadQuantity : Quantity {
 	std::string getUnit() override {return "%";}
 };
 
+void PluginsButton::refresh() {
+	menu->clearChildren();
 
-struct PluginsButton : MenuButton {
-	void onAction(const event::Action &e) override {
-		ui::Menu *menu = createMenu();
-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		// TODO Design dialog box for plugin syncing
-		if (plugin::isDownloading) {
-			ui::ProgressBar *downloadProgressBar = new ui::ProgressBar;
-			downloadProgressBar->quantity = new DownloadQuantity;
-			menu->addChild(downloadProgressBar);
-		}
-		else if (plugin::isLoggedIn()) {
-			ManageItem *manageItem = new ManageItem;
-			manageItem->text = "Manage plugins";
-			menu->addChild(manageItem);
-
-			SyncItem *syncItem = new SyncItem;
-			syncItem->text = "Sync plugins";
-			syncItem->disabled = true;
-			menu->addChild(syncItem);
-
-			LogOutItem *logOutItem = new LogOutItem;
-			logOutItem->text = "Log out";
-			menu->addChild(logOutItem);
-		}
-		else {
-			RegisterItem *registerItem = new RegisterItem;
-			registerItem->text = "Register VCV account";
-			menu->addChild(registerItem);
-
-			AccountEmailField *emailField = new AccountEmailField;
-			emailField->placeholder = "Email";
-			emailField->box.size.x = 200.0;
-			menu->addChild(emailField);
-
-			AccountPasswordField *passwordField = new AccountPasswordField;
-			passwordField->placeholder = "Password";
-			passwordField->box.size.x = 200.0;
-			emailField->passwordField = passwordField;
-			menu->addChild(passwordField);
-
-			LogInItem *logInItem = new LogInItem;
-			logInItem->text = "Log in";
-			logInItem->emailField = emailField;
-			logInItem->passwordField = passwordField;
-			passwordField->logInItem = logInItem;
-			menu->addChild(logInItem);
-		}
+	if (plugin::isDownloading) {
+		ui::ProgressBar *downloadProgressBar = new ui::ProgressBar;
+		downloadProgressBar->quantity = new DownloadQuantity;
+		menu->addChild(downloadProgressBar);
 	}
+	else if (plugin::isLoggedIn()) {
+		ManageItem *manageItem = new ManageItem;
+		manageItem->text = "Manage plugins";
+		menu->addChild(manageItem);
 
-	void draw(const DrawArgs &args) override {
-		MenuButton::draw(args);
-		// if (1) {
-		// 	// Notification circle
-		// 	nvgBeginPath(args.vg);
-		// 	nvgCircle(args.vg, box.size.x - 3, 3, 4.0);
-		// 	nvgFillColor(args.vg, nvgRGBf(1.0, 0.0, 0.0));
-		// 	nvgFill(args.vg);
-		// 	nvgStrokeColor(args.vg, nvgRGBf(0.5, 0.0, 0.0));
-		// 	nvgStroke(args.vg);
-		// }
+		SyncItem *syncItem = new SyncItem;
+		syncItem->text = "Sync plugins";
+		syncItem->disabled = true;
+		menu->addChild(syncItem);
+
+		LogOutItem *logOutItem = new LogOutItem;
+		logOutItem->text = "Log out";
+		menu->addChild(logOutItem);
 	}
-};
+	else {
+		RegisterItem *registerItem = new RegisterItem;
+		registerItem->text = "Register VCV account";
+		menu->addChild(registerItem);
 
+		AccountEmailField *emailField = new AccountEmailField;
+		emailField->placeholder = "Email";
+		emailField->box.size.x = 250.0;
+		menu->addChild(emailField);
+
+		AccountPasswordField *passwordField = new AccountPasswordField;
+		passwordField->placeholder = "Password";
+		passwordField->box.size.x = 250.0;
+		emailField->passwordField = passwordField;
+		menu->addChild(passwordField);
+
+		LogInItem *logInItem = new LogInItem;
+		logInItem->emailField = emailField;
+		logInItem->passwordField = passwordField;
+		passwordField->logInItem = logInItem;
+		menu->addChild(logInItem);
+	}
+}
+
+////////////////////
+// Help
+////////////////////
 
 struct ManualItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -629,7 +634,6 @@ struct ManualItem : ui::MenuItem {
 	}
 };
 
-
 struct WebsiteItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		std::thread t(system::openBrowser, "https://vcvrack.com/");
@@ -637,13 +641,11 @@ struct WebsiteItem : ui::MenuItem {
 	}
 };
 
-
 struct CheckVersionItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		settings::checkVersion ^= true;
 	}
 };
-
 
 struct UserFolderItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -651,7 +653,6 @@ struct UserFolderItem : ui::MenuItem {
 		t.detach();
 	}
 };
-
 
 struct HelpButton : MenuButton {
 	void onAction(const event::Action &e) override {
@@ -679,6 +680,9 @@ struct HelpButton : MenuButton {
 	}
 };
 
+////////////////////
+// MenuBar
+////////////////////
 
 MenuBar::MenuBar() {
 	const float margin = 5;

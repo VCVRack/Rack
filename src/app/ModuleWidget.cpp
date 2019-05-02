@@ -253,7 +253,7 @@ void ModuleWidget::draw(const DrawArgs &args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
 	if (module && module->bypass) {
-		nvgGlobalAlpha(args.vg, 0.25);
+		nvgGlobalAlpha(args.vg, 0.33);
 	}
 
 	Widget::draw(args);
