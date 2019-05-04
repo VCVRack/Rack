@@ -14,6 +14,7 @@ struct RackScrollWidget : ui::ScrollWidget {
 	RackWidget *rackWidget;
 	/** The pivot point for zooming */
 	math::Vec zoomPos;
+	math::Vec oldOffset;
 
 	RackScrollWidget();
 	void step() override;

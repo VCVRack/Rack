@@ -42,17 +42,24 @@ void RackScrollWidget::step() {
 	zoomWidget->box.size = moduleBox.size.mult(zoom);
 
 	// Expand to moduleBox
-	math::Rect viewportBox = moduleBox.grow(RACK_GRID_SIZE.mult(math::Vec(50, 2)));
-	viewportBox.pos = viewportBox.pos.mult(zoom);
-	viewportBox.size = viewportBox.size.mult(zoom);
+	math::Rect scrollBox = moduleBox.grow(RACK_GRID_SIZE.mult(math::Vec(50, 2)));
+	scrollBox.pos = scrollBox.pos.mult(zoom);
+	scrollBox.size = scrollBox.size.mult(zoom);
+
+	// Expand scrollBox to center the moduleBox
+	math::Vec s = box.size.minus(scrollBox.size).max(math::Vec());
+	scrollBox.pos = scrollBox.pos.minus(s.div(2));
+	scrollBox.size = scrollBox.size.plus(s);
+
 	// Expand to viewport size
-	math::Vec s = box.size.minus(viewportBox.size).max(math::Vec());
-	viewportBox.pos = viewportBox.pos.minus(s.div(2));
-	viewportBox.size = viewportBox.size.plus(s);
+	math::Rect viewportBox;
+	viewportBox.pos = oldOffset;
+	viewportBox.size = box.size;
+	scrollBox = scrollBox.expand(viewportBox);
 
 	// Reposition widgets
-	zoomWidget->box = viewportBox;
-	rackWidget->box.pos = zoomWidget->box.pos.div(zoom).neg();
+	zoomWidget->box = scrollBox;
+	rackWidget->box.pos = scrollBox.pos.div(zoom).neg();
 
 	// Scroll rack if dragging cable near the edge of the screen
 	math::Vec pos = APP->window->mousePos;
@@ -71,6 +78,7 @@ void RackScrollWidget::step() {
 	}
 
 	ScrollWidget::step();
+	oldOffset = offset;
 }
 
 
