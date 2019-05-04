@@ -13,6 +13,7 @@
 
 // Include some of the C++ stdlib for convenience
 #include <string>
+#include <stdexcept>
 
 
 namespace rack {
@@ -134,6 +135,12 @@ DeferWrapper<F> deferWrapper(F f) {
 }
 
 #define DEFER(code) auto CONCAT(_defer_, __COUNTER__) = rack::deferWrapper([&]() code)
+
+
+/** Reports a string to the user */
+struct UserException : std::runtime_error {
+	UserException(const std::string &msg) : std::runtime_error(msg) {}
+};
 
 
 } // namespace rack

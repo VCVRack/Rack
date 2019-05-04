@@ -230,34 +230,36 @@ void fromJson(json_t *rootJ) {
 void save(const std::string &path) {
 	INFO("Saving settings %s", path.c_str());
 	json_t *rootJ = toJson();
-	if (rootJ) {
-		FILE *file = std::fopen(path.c_str(), "w");
-		if (!file)
-			return;
+	if (!rootJ)
+		return;
 
-		json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-		json_decref(rootJ);
-		std::fclose(file);
-	}
+	FILE *file = fopen(path.c_str(), "w");
+	if (!file)
+		return;
+	DEFER({
+		fclose(file);
+	});
+
+	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	json_decref(rootJ);
 }
 
 void load(const std::string &path) {
 	INFO("Loading settings %s", path.c_str());
-	FILE *file = std::fopen(path.c_str(), "r");
+	FILE *file = fopen(path.c_str(), "r");
 	if (!file)
-		return;
+		throw UserException(string::f("Could not load settings file %s", path.c_str()));
+	DEFER({
+		fclose(file);
+	});
 
 	json_error_t error;
 	json_t *rootJ = json_loadf(file, 0, &error);
-	if (rootJ) {
-		fromJson(rootJ);
-		json_decref(rootJ);
-	}
-	else {
-		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-	}
+	if (!rootJ)
+		throw UserException(string::f("Settings file has invalid JSON at %d:%d %s", error.line, error.column, error.text));
 
-	std::fclose(file);
+	fromJson(rootJ);
+	json_decref(rootJ);
 }
 
 

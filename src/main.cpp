@@ -82,7 +82,6 @@ int main(int argc, char *argv[]) {
 		patchPath = argv[optind];
 	}
 
-	// Initialize environment
 	asset::init();
 	logger::init();
 
@@ -106,6 +105,19 @@ int main(int argc, char *argv[]) {
 	INFO("System directory: %s", asset::systemDir.c_str());
 	INFO("User directory: %s", asset::userDir.c_str());
 
+	// Load settings
+	try {
+		settings::load(asset::user("settings.json"));
+	}
+	catch (UserException &e) {
+		std::string msg = e.what();
+		msg += "\n\nReset settings to default?";
+		if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, msg.c_str())) {
+			exit(1);
+		}
+	}
+
+	// Check existence of the system res/ directory
 	std::string resDir = asset::system("res");
 	if (!system::isDirectory(resDir)) {
 		std::string message = string::f("Rack's resource directory \"%s\" does not exist. Make sure Rack is correctly installed and launched.", resDir.c_str());
@@ -128,7 +140,6 @@ int main(int argc, char *argv[]) {
 
 	// Initialize app
 	INFO("Initializing app");
-	settings::load(asset::user("settings.json"));
 	appInit();
 
 	const char *openedFilename = glfwGetOpenedFilename();
