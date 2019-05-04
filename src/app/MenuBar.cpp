@@ -414,33 +414,7 @@ struct EngineButton : MenuButton {
 // Plugins
 ////////////////////
 
-struct PluginsButton : MenuButton {
-	ui::Menu *menu;
-
-	void onAction(const event::Action &e) override {
-		menu = createMenu();
-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		refresh();
-	}
-
-	void draw(const DrawArgs &args) override {
-		MenuButton::draw(args);
-
-		if (0) {
-			// Notification circle
-			nvgBeginPath(args.vg);
-			nvgCircle(args.vg, 4, 2, 4.0);
-			nvgFillColor(args.vg, nvgRGBf(1.0, 0.0, 0.0));
-			nvgFill(args.vg);
-			nvgStrokeColor(args.vg, nvgRGBf(0.5, 0.0, 0.0));
-			nvgStroke(args.vg);
-		}
-	}
-
-	void refresh();
-};
+static bool isLoggingIn = false;
 
 struct RegisterItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -481,24 +455,21 @@ struct LogInItem : ui::MenuItem {
 	ui::TextField *emailField;
 	ui::TextField *passwordField;
 	void onAction(const event::Action &e) override {
+		isLoggingIn = true;
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
 		std::thread t([=]() {
 			plugin::logIn(email, password);
+			isLoggingIn = false;
 		});
 		t.detach();
 		e.consume(NULL);
 	}
 
 	void step() override {
-		if (plugin::loginStatus != "") {
-			text = plugin::loginStatus;
-			disabled = true;
-		}
-		else {
-			text = "Log in";
-			disabled = false;
-		}
+		disabled = isLoggingIn;
+		text = "Log in";
+		rightText = plugin::loginStatus;
 	}
 };
 
@@ -577,51 +548,85 @@ struct DownloadQuantity : Quantity {
 	std::string getUnit() override {return "%";}
 };
 
-void PluginsButton::refresh() {
-	menu->clearChildren();
+struct PluginsMenu : ui::Menu {
+	int state = 0;
 
-	if (plugin::isDownloading) {
-		ui::ProgressBar *downloadProgressBar = new ui::ProgressBar;
-		downloadProgressBar->quantity = new DownloadQuantity;
-		menu->addChild(downloadProgressBar);
+	PluginsMenu() {
+		refresh();
 	}
-	else if (plugin::isLoggedIn()) {
-		ManageItem *manageItem = new ManageItem;
-		manageItem->text = "Manage plugins";
-		menu->addChild(manageItem);
 
-		SyncItem *syncItem = new SyncItem;
-		syncItem->text = "Sync plugins";
-		syncItem->disabled = true;
-		menu->addChild(syncItem);
-
-		LogOutItem *logOutItem = new LogOutItem;
-		logOutItem->text = "Log out";
-		menu->addChild(logOutItem);
+	void step() override {
+		Menu::step();
 	}
-	else {
-		RegisterItem *registerItem = new RegisterItem;
-		registerItem->text = "Register VCV account";
-		menu->addChild(registerItem);
 
-		AccountEmailField *emailField = new AccountEmailField;
-		emailField->placeholder = "Email";
-		emailField->box.size.x = 250.0;
-		menu->addChild(emailField);
+	void refresh() {
+		clearChildren();
 
-		AccountPasswordField *passwordField = new AccountPasswordField;
-		passwordField->placeholder = "Password";
-		passwordField->box.size.x = 250.0;
-		emailField->passwordField = passwordField;
-		menu->addChild(passwordField);
+		if (0) {
+			ui::ProgressBar *downloadProgressBar = new ui::ProgressBar;
+			downloadProgressBar->quantity = new DownloadQuantity;
+			addChild(downloadProgressBar);
+		}
+		else if (plugin::isLoggedIn()) {
+			ManageItem *manageItem = new ManageItem;
+			manageItem->text = "Manage";
+			addChild(manageItem);
 
-		LogInItem *logInItem = new LogInItem;
-		logInItem->emailField = emailField;
-		logInItem->passwordField = passwordField;
-		passwordField->logInItem = logInItem;
-		menu->addChild(logInItem);
+			SyncItem *syncItem = new SyncItem;
+			syncItem->text = "Update all";
+			syncItem->disabled = true;
+			addChild(syncItem);
+
+			LogOutItem *logOutItem = new LogOutItem;
+			logOutItem->text = "Log out";
+			addChild(logOutItem);
+		}
+		else {
+			RegisterItem *registerItem = new RegisterItem;
+			registerItem->text = "Register VCV account";
+			addChild(registerItem);
+
+			AccountEmailField *emailField = new AccountEmailField;
+			emailField->placeholder = "Email";
+			emailField->box.size.x = 220.0;
+			addChild(emailField);
+
+			AccountPasswordField *passwordField = new AccountPasswordField;
+			passwordField->placeholder = "Password";
+			passwordField->box.size.x = 220.0;
+			emailField->passwordField = passwordField;
+			addChild(passwordField);
+
+			LogInItem *logInItem = new LogInItem;
+			logInItem->emailField = emailField;
+			logInItem->passwordField = passwordField;
+			passwordField->logInItem = logInItem;
+			addChild(logInItem);
+		}
 	}
-}
+};
+
+struct PluginsButton : MenuButton {
+	void onAction(const event::Action &e) override {
+		ui::Menu *menu = createMenu<PluginsMenu>();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+	}
+
+	void draw(const DrawArgs &args) override {
+		MenuButton::draw(args);
+
+		if (0) {
+			// Notification circle
+			nvgBeginPath(args.vg);
+			nvgCircle(args.vg, 4, 2, 4.0);
+			nvgFillColor(args.vg, nvgRGBf(1.0, 0.0, 0.0));
+			nvgFill(args.vg);
+			nvgStrokeColor(args.vg, nvgRGBf(0.5, 0.0, 0.0));
+			nvgStroke(args.vg);
+		}
+	}
+};
 
 ////////////////////
 // Help

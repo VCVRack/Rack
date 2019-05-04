@@ -139,8 +139,9 @@ TMenuItem *createMenuItem(std::string text, std::string rightText = "") {
 	return o;
 }
 
-inline ui::Menu *createMenu() {
-	ui::Menu *o = new ui::Menu;
+template <class TMenu = ui::Menu>
+TMenu *createMenu() {
+	TMenu *o = new TMenu;
 	o->box.pos = APP->window->mousePos;
 
 	ui::MenuOverlay *menuOverlay = new ui::MenuOverlay;

@@ -420,20 +420,9 @@ void logOut() {
 	settings::token = "";
 }
 
-bool sync(bool dryRun) {
+void query() {
 	if (settings::token.empty())
-		return false;
-
-	bool available = false;
-
-	if (!dryRun) {
-		isDownloading = true;
-		downloadProgress = 0.0;
-		downloadName = "Updating plugins...";
-	}
-	DEFER({
-		isDownloading = false;
-	});
+		return;
 
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
@@ -444,7 +433,7 @@ bool sync(bool dryRun) {
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
-		return false;
+		return;
 	}
 	DEFER({
 		json_decref(pluginsResJ);
@@ -453,7 +442,7 @@ bool sync(bool dryRun) {
 	json_t *errorJ = json_object_get(pluginsResJ, "error");
 	if (errorJ) {
 		WARN("Request for user's plugins returned an error: %s", json_string_value(errorJ));
-		return false;
+		return;
 	}
 
 	// Get community manifests
@@ -462,11 +451,27 @@ bool sync(bool dryRun) {
 	json_t *manifestsResJ = network::requestJson(network::GET, manifestsUrl, NULL);
 	if (!manifestsResJ) {
 		WARN("Request for community manifests failed");
-		return false;
+		return;
 	}
 	DEFER({
 		json_decref(manifestsResJ);
 	});
+
+	json_dumpf(pluginsResJ, stderr, JSON_INDENT(2));
+	json_dumpf(manifestsResJ, stderr, JSON_INDENT(2));
+}
+
+void sync() {
+#if 0
+	if (settings::token.empty())
+		return false;
+
+	bool available = false;
+
+	if (!dryRun) {
+		downloadProgress = 0.0;
+		downloadName = "Updating plugins...";
+	}
 
 	// Check each plugin in list of plugin slugs
 	json_t *pluginsJ = json_object_get(pluginsResJ, "plugins");
@@ -501,6 +506,7 @@ bool sync(bool dryRun) {
 	}
 
 	return available;
+#endif
 }
 
 void cancelDownload() {
@@ -639,10 +645,10 @@ bool isSlugValid(const std::string &slug) {
 
 
 std::vector<Plugin*> plugins;
-bool isDownloading = false;
+
+std::string loginStatus;
 float downloadProgress = 0.f;
 std::string downloadName;
-std::string loginStatus;
 
 
 } // namespace plugin
