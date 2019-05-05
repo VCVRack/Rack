@@ -1,4 +1,10 @@
 
+** May 5th, 2019
+- add Core.ParamProxy module  (redirects CV or constval to VST param)
+- add Core.HalfNotes module   (same as Core.Notes but half the width)
+- update plugin SDK
+
+
 ** April 27th, 2019
 - fix deadlock
 - update patches

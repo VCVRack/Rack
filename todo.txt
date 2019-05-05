@@ -199,3 +199,19 @@
 
 ------------------------------------------------------------------------
 + fix/add Southpole-parasites.Smoke module (Oliverb)
+
+------------------------------------------------------------------------
++ self-editing patches via Core.ParamProxy module
+   + 8 params per module
+   + per param:
+      + CV input
+      + value knob (used if there's no CV in)
+      + min / max knobs (0..1)
+      + dest. param id knob
+      + learn id from clipboard button
+         + save param id when copying value to clipboard (requires global_ui struct + pluginsdk update)
+      ? editable label (textfield)
+         + or use "Notes" module for this ? (enough space to hold additional infos)
+            + add Core.HalfNotes module
+   + when value has changed, find module+widget, unmap CV to param change and update param
+      ? limit to processing callback rate / queue ? (although: audio rate modulation is fun :-))

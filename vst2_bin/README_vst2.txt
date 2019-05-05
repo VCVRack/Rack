@@ -1,5 +1,5 @@
-VeeSeeVST Rack VST 2.4 Plugin -- April 27th, 2019
-=================================================
+VeeSeeVST Rack VST 2.4 Plugin -- May 5th, 2019
+==============================================
 
 !!!------------------------------------------------------------------------------
 !!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
@@ -16,6 +16,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
 + supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 + supports VST parameters (send / recv)
++ CV inside a patch can be redirected to VST params via the Core.ParamProxy module
 + supports internal resampling (up to 16x with configurable quality)
 + supports dynamically loaded plugin DLLs
    - the plugin.dll files are _not_ binary compatible with the VCV Rack plugins !
@@ -25,7 +26,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 828 prebuilt modules
++ comes with 838 prebuilt modules
 
 Here's an old demo video of it: https://vimeo.com/277703414
 And a newer one: https://youtu.be/XTpLfcz-6Vo
@@ -87,7 +88,7 @@ The binary distribution contains the following (34) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (794) add-on modules are statically linked with the VST plugin:
+The following (804) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -354,6 +355,16 @@ The following (794) add-on modules are statically linked with the VST plugin:
  - com-soundchasing-stochasm.Resonator
  - computerscare.ComputerscareDebug
  - computerscare.ComputerscarePatchSequencer
+ - Core.AudioInterface
+ - Core.AudioInterface
+ - Core.MIDIToCVInterface
+ - Core.QuadMIDIToCVInterface
+ - Core.MIDICCToCVInterface
+ - Core.MIDITriggerToCVInterface
+ - Core.Blank
+ - Core.Notes
+ - Core.ParamProxy
+ - Core.HalfNotes
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage

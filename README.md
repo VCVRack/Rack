@@ -9,6 +9,7 @@
 + supports VST program chunks (=> patches are saved with the DAW's project file or as .fxp files)
 + supports VST host timing (audioMasterGetTime / kVstTempoValid / kVstTransportPlaying, see Core.MIDI-1 module)
 + supports VST parameters (send / recv)
++ CV inside a patch can be redirect to VST params via the Core.ParamProxy module
 + supports dynamically loaded plugin DLLs
    - the plugin.dll files are _not_ binary compatible with the VCV Rack plugins !
    - there's a [plugin SDK](#dynamically-loaded-plugins-via-plugin-sdk) (for Microsoft Visual Studio 2017 Community Edition) which can be used to build new plugins without checking out this entire GIT repository
@@ -17,7 +18,7 @@
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 828 prebuilt modules
++ comes with 838 prebuilt modules
 
 **Windows** version tested in:
   - Eureka (my own work-in-progress VST host)
@@ -41,8 +42,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-27Apr2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-27Apr2019.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-27Apr2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-27Apr2019.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-05May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-05May2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-05May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-05May2019.7z) (32bit, experimental)
 
 ## Linux
 - [http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-27April2019.tar.gz](veeseevstrack_0_6_1_lin64_bin-27April2019.tar.gz) (64bit) (Dave's latest build)
@@ -117,7 +118,7 @@ The binary distribution contains the following (34) dynamically loaded add-on mo
  - Template_shared.MyModule
 
 
-The following (794) add-on modules are statically linked with the VST plugin:
+The following (804) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -384,6 +385,16 @@ The following (794) add-on modules are statically linked with the VST plugin:
  - com-soundchasing-stochasm.Resonator
  - computerscare.ComputerscareDebug
  - computerscare.ComputerscarePatchSequencer
+ - Core.AudioInterface
+ - Core.AudioInterface
+ - Core.MIDIToCVInterface
+ - Core.QuadMIDIToCVInterface
+ - Core.MIDICCToCVInterface
+ - Core.MIDITriggerToCVInterface
+ - Core.Blank
+ - Core.Notes
+ - Core.ParamProxy
+ - Core.HalfNotes
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage
@@ -971,7 +982,7 @@ $ cp <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll.i
 ## Dynamically loaded plugins (via plugin SDK)
 
 1. Install the `Microsoft Visual Studio 2017 Community Edition` IDE
-2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-23Apr2019.7z)
+2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-05May2019.7z)
 3. Open the solution file (`example\Template_shared\vs2017\Template_shared\Template_shared.sln`)
 4. Make sure that the `Release` / `x64` configuration is selected
 5. Rebuild the solution to create the "plugin.dll" file.
