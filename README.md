@@ -77,6 +77,7 @@ Here are some demo videos of it:
  - https://vimeo.com/288594338 (RMS filter/pwm envelope follower + compressor demo)
  - https://vimeo.com/288968750 (DownSampler module)
  - https://youtu.be/XTpLfcz-6Vo (a complete "one synth challenge" type track with 23 instances)
+ - https://youtu.be/R5npTzoZgzw (quick demo of the Core.ParamProxy module)
 
 
 # Add-on modules
