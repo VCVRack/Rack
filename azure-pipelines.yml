@@ -13,6 +13,7 @@ variables:
   XCODE_VERSION: 10.2
 
 jobs:
+  # Todo - run Linux build in a container with a more recent Ubuntu version, maybe also try CentOS and Arch builds?
   - job: Linux
     pool:
       vmImage: Ubuntu-16.04
