@@ -97,7 +97,8 @@ struct GlobalUI {
       const ParamWidget *last_param_widget;  // never dereferenced, may have already been deleted. unset after redraw().
       int last_param_gid;      // updated during redraw()
       float last_param_value;  // updated in onMouseMove() and onChange(). corresponding param may not exist anymore.
-      float value_clipboard;
+      float value_clipboard;   // last copied value
+      int   gid_clipboard;     // param GID of last copied value (-1 if none)
       TextField *tf_id;
       TextField *tf_value;
       bool b_lock;  // true=don't update info (e.g. when receiving VST parameter updates from host)
@@ -151,6 +152,7 @@ struct GlobalUI {
       param_info.last_param_gid = 0;
       param_info.last_param_value = 0.0f;
       param_info.value_clipboard = 0.0f;
+      param_info.gid_clipboard = -1;
       param_info.tf_id = NULL;
       param_info.tf_value = NULL;
       param_info.b_lock = false;

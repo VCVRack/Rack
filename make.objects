@@ -96,7 +96,9 @@ HOST_OBJ= \
 	src/Core/MIDIToCVInterface.o \
 	src/Core/MIDITriggerToCVInterface.o \
 	src/Core/Notes.o \
-	src/Core/QuadMIDIToCVInterface.o
+	src/Core/QuadMIDIToCVInterface.o \
+	src/Core/ParamProxy.o \
+	src/Core/HalfNotes.o
 
 LIB_OBJ= \
 	$(COMMON_OBJ) \

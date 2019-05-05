@@ -389,7 +389,8 @@ void ModuleWidget::onHoverKey(EventHoverKey &e) {
 		case 'w':
 			if (windowIsModPressed() && !windowIsShiftPressed()) {
             global_ui->param_info.value_clipboard = global_ui->param_info.last_param_value;
-            printf("xxx CopyParamItem: value=%f\n", global_ui->param_info.value_clipboard);
+            global_ui->param_info.gid_clipboard   = global_ui->param_info.last_param_gid;
+            printf("xxx CopyParamItem: value=%f id=%d\n", global_ui->param_info.value_clipboard, global_ui->param_info.gid_clipboard);
 				e.consumed = true;
 				return;
 			}

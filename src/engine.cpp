@@ -29,9 +29,10 @@ extern void log_printf(const char *logData, ...);
 #define Dprintf printf
 #endif // USE_LOG_PRINTF
 
+
 namespace rack {
 
-
+bool vst2_find_module_and_paramid_by_unique_paramid(int uniqueParamId, Module**retModule, int *retParamId);
 
 float Light::getBrightness() {
 	// LEDs are diodes, so don't allow reverse current.
@@ -268,7 +269,7 @@ static int loc_vst2_find_unique_param_by_module_and_paramid(Module *module, int 
    return module->vst2_unique_param_base_id + paramId;
 }
 
-static bool loc_vst2_find_module_and_paramid_by_unique_paramid(int uniqueParamId, Module**retModule, int *retParamId) {
+bool vst2_find_module_and_paramid_by_unique_paramid(int uniqueParamId, Module**retModule, int *retParamId) {
    if(uniqueParamId >= 0)
    {
       if(uniqueParamId < VST2_MAX_UNIQUE_PARAM_IDS)
@@ -360,7 +361,7 @@ void vst2_handle_queued_params(void) {
       {
          Module *module;
          int paramId;
-         if(loc_vst2_find_module_and_paramid_by_unique_paramid(qp.unique_id, &module, &paramId))
+         if(vst2_find_module_and_paramid_by_unique_paramid(qp.unique_id, &module, &paramId))
          {
             ModuleWidget *moduleWidget = global_ui->app.gRackWidget->findModuleWidgetByModule(module);
             if(NULL != moduleWidget)
@@ -412,7 +413,7 @@ void vst2_handle_queued_params(void) {
 float vst2_get_param(int uniqueParamId) {
    Module *module;
    int paramId;
-   if(loc_vst2_find_module_and_paramid_by_unique_paramid(uniqueParamId, &module, &paramId))
+   if(vst2_find_module_and_paramid_by_unique_paramid(uniqueParamId, &module, &paramId))
    {
       if(sUI(paramId) < sUI(module->params.size())) // paranoia
       {
@@ -436,10 +437,10 @@ float vst2_get_param(int uniqueParamId) {
    return 0.0f;
 }
 
-void vst2_get_param_name (int uniqueParamId, char *s, int sMaxLen) {
+void vst2_get_param_name(int uniqueParamId, char *s, int sMaxLen) {
    Module *module;
    int paramId;
-   if(loc_vst2_find_module_and_paramid_by_unique_paramid(uniqueParamId, &module, &paramId))
+   if(vst2_find_module_and_paramid_by_unique_paramid(uniqueParamId, &module, &paramId))
    {
       if(sUI(paramId) < sUI(module->params.size())) // paranoia
       {
