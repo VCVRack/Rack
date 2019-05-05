@@ -59,7 +59,7 @@ jobs:
           pushd .
           mkdir build && cd build
           conan install .. -s build_type=Debug
-          cmake .. -G Ninja
+          cmake ..
           make -j
         displayName: build VCVRack
   - job: Windows2016
