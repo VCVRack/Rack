@@ -59,7 +59,7 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           pushd .
           mkdir build && cd build
-          conan install .. -s build_type=Debug
+          conan install .. -s build_type=Debug --build=missing
           cmake ..
           make -j
         displayName: build VCVRack
