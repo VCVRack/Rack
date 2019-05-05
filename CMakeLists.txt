@@ -44,7 +44,7 @@ endif ()
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
    target_compile_definitions(${RACK_APP} PRIVATE ARCH_LIN)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-   target_compile_definitions(${RACK_APP} ARCH_MAC)
+   target_compile_definitions(${RACK_APP} PRIVATE ARCH_MAC)
 endif ()
 
 target_include_directories(${RACK_APP} PRIVATE include)
