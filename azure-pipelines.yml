@@ -1,0 +1,85 @@
+# https://docs.microsoft.com/de-de/azure/devops/pipelines/agents/hosted?view=azure-devops#software
+trigger:
+- master
+
+variables:
+  python-version: "3.7"
+  conan-pkg: "conan"
+  cpt-pkg:  "conan_package_tools"
+  bpt-pkg: "bincrafters_package_tools"
+
+  # Xcode Version overview: https://gist.github.com/yamaya/2924292
+  # available versions: https://github.com/Microsoft/azure-pipelines-image-generation/blob/master/images/macos/macos-10.14-Readme.md
+  XCODE_VERSION: 10.2
+
+jobs:
+  - job: Linux
+    pool:
+      vmImage: Ubuntu-16.04
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+         versionSpec: $(python-version)
+      - script: |
+          export PATH="$PATH:/home/vsts/.local/bin"
+          sudo apt install -y python3-setuptools
+          pip install --user --upgrade pip
+          pip install --user $(conan-pkg)
+          pip install --user $(cpt-pkg) $(bpt-pkg)
+          conan user
+          conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
+          conan remote add qno https://api.bintray.com/conan/qno/conan-public
+          conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+          pushd .
+          mkdir build && cd build
+          conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Debug
+          cmake .. -G Ninja
+          make -j
+        displayName: build VCVRack
+  - job: macOS1014
+    pool:
+      vmImage: macOS-10.14
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+         versionSpec: $(python-version)
+      - script: |
+          /bin/bash -c "sudo xcode-select -s /Applications/Xcode_$(XCODE_VERSION).app/Contents/Developer"
+          export PATH=$PATH:$HOME/.local/bin
+          pip install --upgrade pip
+          brew update || brew update
+          brew install autoconf automake libtool pkg-config
+          brew install cmake || true
+          pip install --upgrade $(conan-pkg)
+          pip install $(cpt-pkg) $(bpt-pkg)
+          conan user
+          conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
+          conan remote add qno https://api.bintray.com/conan/qno/conan-public
+          conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+          pushd .
+          mkdir build && cd build
+          conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Debug
+          cmake .. -G Ninja
+          make -j
+        displayName: build VCVRack
+  - job: Windows2016
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+         versionSpec: $(python-version)
+      - script: |
+          python -m pip install --upgrade pip
+          python -m pip install $(conan-pkg)
+          python -m pip install $(cpt-pkg) $(bpt-pkg)
+          conan user
+          conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
+          conan remote add qno https://api.bintray.com/conan/qno/conan-public
+          conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+          mkdir build
+          cd build
+          conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Debug
+          cmake -G "Visual Studio 15 Win64" ..
+          cmake --build .
+        displayName: build VCVRack
