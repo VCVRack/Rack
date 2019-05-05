@@ -36,7 +36,7 @@ jobs:
           cmake ..
           make -j
         displayName: build VCVRack
-  - job: macOS1014
+  - job: MacOS1014
     pool:
       vmImage: macOS-10.14
     steps:
