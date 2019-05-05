@@ -390,6 +390,7 @@ void destroy() {
 }
 
 void logIn(const std::string &email, const std::string &password) {
+	loginStatus = "Logging in...";
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
@@ -398,22 +399,28 @@ void logIn(const std::string &email, const std::string &password) {
 	json_t *resJ = network::requestJson(network::POST, url, reqJ);
 	json_decref(reqJ);
 
-	if (resJ) {
-		json_t *errorJ = json_object_get(resJ, "error");
-		if (errorJ) {
-			const char *errorStr = json_string_value(errorJ);
-			loginStatus = errorStr;
+	if (!resJ) {
+		loginStatus = "No response from server";
+		return;
+	}
+
+	json_t *errorJ = json_object_get(resJ, "error");
+	if (errorJ) {
+		const char *errorStr = json_string_value(errorJ);
+		loginStatus = errorStr;
+	}
+	else {
+		json_t *tokenJ = json_object_get(resJ, "token");
+		if (tokenJ) {
+			const char *tokenStr = json_string_value(tokenJ);
+			settings::token = tokenStr;
+			loginStatus = "";
 		}
 		else {
-			json_t *tokenJ = json_object_get(resJ, "token");
-			if (tokenJ) {
-				const char *tokenStr = json_string_value(tokenJ);
-				settings::token = tokenStr;
-				loginStatus = "";
-			}
+			loginStatus = "No token in response";
 		}
-		json_decref(resJ);
 	}
+	json_decref(resJ);
 }
 
 void logOut() {

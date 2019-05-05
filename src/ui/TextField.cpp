@@ -30,14 +30,12 @@ void TextField::draw(const DrawArgs &args) {
 	nvgResetScissor(args.vg);
 }
 
-void TextField::onHover(const event::Hover &e) {
-	OpaqueWidget::onHover(e);
+void TextField::onDragHover(const event::DragHover &e) {
+	OpaqueWidget::onDragHover(e);
 
-	if (this == APP->event->draggedWidget) {
+	if (e.origin == this) {
 		int pos = getTextPosition(e.pos);
-		if (pos != selection) {
-			cursor = pos;
-		}
+		cursor = pos;
 	}
 }
 
