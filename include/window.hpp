@@ -98,6 +98,8 @@ struct Window {
 	Window();
 	~Window();
 	void run();
+	/** Takes a screenshot of each module */
+	void screenshot();
 	void close();
 	void cursorLock();
 	void cursorUnlock();

@@ -7,17 +7,20 @@
 #include "app.hpp"
 #include "patch.hpp"
 #include "settings.hpp"
+#include "plugin.hpp" // used in Window::screenshot
+#include "system.hpp" // used in Window::screenshot
 
 #include <map>
 #include <queue>
 #include <thread>
 
 #if defined ARCH_MAC
-	// For CGAssociateMouseAndMouseCursorPosition
-	#include <ApplicationServices/ApplicationServices.h>
+// For CGAssociateMouseAndMouseCursorPosition
+#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 #include <osdialog.h>
+#include <stb_image_write.h>
 
 
 namespace rack {
@@ -271,6 +274,9 @@ Window::Window() {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
+
+	// Load default Blendish font
+	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
 }
 
 Window::~Window() {
@@ -300,10 +306,8 @@ Window::~Window() {
 }
 
 void Window::run() {
-	uiFont = APP->window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
-
 	frame = 0;
-	while(!glfwWindowShouldClose(win)) {
+	while (!glfwWindowShouldClose(win)) {
 		frameTimeStart = glfwGetTime();
 
 		// Make event handlers and step() have a clean nanovg context
@@ -396,6 +400,57 @@ void Window::run() {
 		frameTimeEnd = glfwGetTime();
 		// DEBUG("%g fps", 1 / (endTime - startTime));
 		frame++;
+	}
+}
+
+void Window::screenshot() {
+	// Iterate plugins and create directories
+	std::string screenshotsDir = asset::user("screenshots");
+	system::createDirectory(screenshotsDir);
+	for (plugin::Plugin *p : plugin::plugins) {
+		std::string dir = screenshotsDir + "/" + p->slug;
+		system::createDirectory(dir);
+		for (plugin::Model *model : p->models) {
+			std::string filename = dir + "/" + model->slug + ".png";
+			// Skip model if screenshot already exists
+			if (system::isFile(filename))
+				continue;
+			INFO("Screenshotting %s %s to %s", p->slug.c_str(), model->slug.c_str(), filename.c_str());
+
+			// Create widgets
+			app::ModuleWidget *mw = model->createModuleWidgetNull();
+			widget::FramebufferWidget *fb = new widget::FramebufferWidget;
+			fb->addChild(mw);
+			float zoom = 2.f;
+			fb->scale = math::Vec(zoom, zoom);
+
+			// Draw to framebuffer
+			frameTimeStart = glfwGetTime();
+			fb->step();
+			nvgluBindFramebuffer(fb->fb);
+
+			// Read pixels
+			int width, height;
+			nvgImageSize(vg, fb->getImageHandle(), &width, &height);
+			uint8_t data[height * width * 4];
+			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+			// Flip image vertically
+			for (int y = 0; y < height / 2; y++) {
+				int flipY = height - y - 1;
+				uint8_t tmp[width * 4];
+				memcpy(tmp, &data[y * width * 4], width * 4);
+				memcpy(&data[y * width * 4], &data[flipY * width * 4], width * 4);
+				memcpy(&data[flipY * width * 4], tmp, width * 4);
+			}
+
+			// Write pixels to PNG
+			stbi_write_png(filename.c_str(), width, height, 4, data, width * 4);
+
+			// Cleanup
+			nvgluBindFramebuffer(NULL);
+			delete fb;
+		}
 	}
 }
 

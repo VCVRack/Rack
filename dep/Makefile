@@ -160,7 +160,7 @@ $(rtaudio):
 	$(MAKE) -C rtaudio/build
 	$(MAKE) -C rtaudio/build install
 
-$(nanovg): $(wildcard nanovg/src/*.h)
+$(nanovg): $(wildcard nanovg/src/*.h) nanovg/example/stb_image_write.h
 	cp $^ include/
 
 $(nanosvg): $(wildcard nanosvg/src/*.h)
