@@ -33,8 +33,8 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           pushd .
           mkdir build && cd build
-          conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Debug
-          cmake ..
+          conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Release
+          cmake -DCMAKE_BUILD_TYPE=Release ..
           make -j
         displayName: build VCVRack
   - job: MacOS1014
@@ -59,8 +59,8 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           pushd .
           mkdir build && cd build
-          conan install .. -s build_type=Debug --build=missing
-          cmake ..
+          conan install .. -s build_type=Release --build=missing
+          cmake -DCMAKE_BUILD_TYPE=Release ..
           make -j
         displayName: build VCVRack
   - job: Windows2016
@@ -80,7 +80,7 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           mkdir build
           cd build
-          conan install .. -s build_type=Debug
-          cmake -G "Visual Studio 15 Win64" ..
+          conan install .. -s build_type=Release
+          cmake -G "Visual Studio 15 Win64" -DCMAKE_BUILD_TYPE=Release ..
           cmake --build .
         displayName: build VCVRack
