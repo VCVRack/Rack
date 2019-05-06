@@ -148,7 +148,10 @@ int main(int argc, char *argv[]) {
 	INFO("Initializing app");
 	appInit();
 
-	const char *openedFilename = glfwGetOpenedFilename();
+   // removed for now, see https://github.com/VCVRack/Rack/issues/1269
+	// https://stackoverflow.com/questions/22952536/how-do-i-pass-a-filename-from-finder-into-my-os-x-application
+	//const char *openedFilename = glfwGetOpenedFilename();
+	const char *openedFilename = nullptr;
 	if (openedFilename) {
 		patchPath = openedFilename;
 	}
