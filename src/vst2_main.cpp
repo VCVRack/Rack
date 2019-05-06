@@ -19,7 +19,7 @@
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
 ///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018, 10Oct2018, 26Oct2018, 10Mar2019
-///          12Mar2019
+///          12Mar2019, 07May2019
 ///
 ///
 ///
@@ -32,6 +32,7 @@
 
 // (note) causes reason to shut down when console is freed (when plugin is deleted)
 // #define USE_CONSOLE  defined
+// #define VST2_OPCODE_DEBUG  defined
 
 #undef RACK_HOST
 
@@ -754,7 +755,9 @@ public:
 
          Dprintf("xxx vstrack_plugin: destroyResamplerStates() done\n");
 
+
 #ifdef USE_CONSOLE
+         Sleep(5000);
          // FreeConsole();
 #endif // USE_CONSOLE
       }
@@ -1570,6 +1573,92 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
 
 
+#ifdef VST2_OPCODE_DEBUG
+static const char *vst2_opcode_names[] = {
+	"effOpen",
+	"effClose",
+	"effSetProgram",
+	"effGetProgram",
+	"effSetProgramName",
+	"effGetProgramName",
+   "effGetParamLabel",
+	"effGetParamDisplay",
+	"effGetParamName",
+	"DEPR_effGetVu",
+	"effSetSampleRate",
+	"effSetBlockSize",
+	"effMainsChanged",
+	"effEditGetRect",
+	"effEditOpen",
+	"effEditClose",
+	"DEPR_effEditDraw",
+	"DEPR_effEditMouse",
+	"DEPR_effEditKey",
+	"effEditIdle",
+   "DEPR_effEditTop",
+	"DEPR_effEditSleep",
+	"DEPR_effIdentify",
+   "effGetChunk",
+	"effSetChunk",
+   // extended:
+	"effProcessEvents",
+	"effCanBeAutomated",
+	"effString2Parameter",
+	"effGetNumProgramCategories",
+	"effGetProgramNameIndexed",
+   "DEPR_effCopyProgram",
+	"DEPR_effConnectInput",
+	"DEPR_effConnectOutput",
+   "effGetInputProperties",
+	"effGetOutputProperties",
+	"effGetPlugCategory",
+	"DEPR_effGetCurrentPosition",
+	"DEPR_effGetDestinationBuffer",
+	"effOfflineNotify",
+	"effOfflinePrepare",
+	"effOfflineRun",
+	"effProcessVarIo",
+	"effSetSpeakerArrangement",
+	"DEPR_effSetBlockSizeAndSampleRate",
+	"effSetBypass",
+	"effGetEffectName",
+	"DEPR_effGetErrorText",
+	"effGetVendorString",
+	"effGetProductString",
+	"effGetVendorVersion",
+	"effVendorSpecific",
+	"effCanDo",
+	"effGetTailSize",
+	"DEPR_effIdle",
+	"DEPR_effGetIcon",
+	"DEPR_effSetViewPosition",
+	"effGetParameterProperties",
+	"DEPR_effKeysRequired",
+	"effGetVstVersion",
+	"effEditKeyDown",
+	"effEditKeyUp",
+	"effSetEditKnobMode",
+	"effGetMidiProgramName",
+	"effGetCurrentMidiProgram",
+	"effGetMidiProgramCategory",
+	"effHasMidiProgramsChanged",
+	"effGetMidiKeyName",
+   "effBeginSetProgram",
+	"effEndSetProgram",
+	"effGetSpeakerArrangement",
+	"effShellGetNextPlugin",
+	"effStartProcess",
+	"effStopProcess",
+	"effSetTotalSampleToProcess",
+	"effSetPanLaw",
+   "effBeginLoadBank",
+	"effBeginLoadProgram",
+	"effSetProcessPrecision",
+	"effGetNumMidiInputChannels",
+	"effGetNumMidiOutputChannels",
+};
+#endif // VST2_OPCODE_DEBUG
+
 /**
  * This is the plugin called by the host to communicate with the plugin, mainly to request information (like the
  * vendor string, the plugin category...) or communicate state/changes (like open/close, frame rate...)
@@ -1590,7 +1679,11 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                               void      *ptr,
                               float      opt
                               ) {
-   // Dprintf("vstrack_plugin: called VSTPluginDispatcher(%d)\n", opCode);
+#ifdef VST2_OPCODE_DEBUG
+   Dprintf("vstrack_plugin: called VSTPluginDispatcher(%d) (%s)\n", opCode, vst2_opcode_names[opCode]);
+#else
+   Dprintf("vstrack_plugin: called VSTPluginDispatcher(%d)\n", opCode);
+#endif // VST2_OPCODE_DEBUG
 
    VstIntPtr r = 0;
 
@@ -1640,6 +1733,9 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
       case effGetVendorVersion:
          // request for the version
          return PLUGIN_VERSION;
+
+      case effVendorSpecific:
+         break;
 
       case effGetVstVersion:
           r = kVstVersion;
@@ -1730,11 +1826,12 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
          // "8in8out"
          // "midiProgramNames"
          // "conformsToWindowRules"
+#ifdef VST2_OPCODE_DEBUG
+         printf("xxx effCanDo \"%s\" ?\n", (char*)ptr);
+#endif // VST2_OPCODE_DEBUG
          if(!strcmp((char*)ptr, "receiveVstEvents"))
             r = 1;
          else if(!strcmp((char*)ptr, "receiveVstMidiEvent"))  // (note) required by Jeskola Buzz
-            r = 1;
-         else if(!strcmp((char*)ptr, "noRealTime"))
             r = 1;
          else
             r = 0;
