@@ -30,8 +30,9 @@
   - Bitwig Studio
   - FLStudio
   - Studio One 4.1.1
+  - Ableton Live 10.0.6
+  - Cakewalk by BandLab (2019.03 build 20) ([hotfix](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-05May2019_cakewalk_hotfix-06May2019.7z))
   - according to users: works in Nuendo
-  - according to users: works in Ableton Live
 
 **Linux** version tested in:
   - Bitwig Studio 2.4.1
