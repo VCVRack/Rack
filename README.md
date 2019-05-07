@@ -67,7 +67,7 @@ Alternatively, add the folder to your DAW's plugin directory list.
 see [vst2_bin/CHANGELOG_VST.txt](vst2_bin/CHANGELOG_VST.txt)
 
 
-# Demo Video
+# Demo Videos
 
 Here are some demo videos of it:
  - https://vimeo.com/277703414 (early version)
