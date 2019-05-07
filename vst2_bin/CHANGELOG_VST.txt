@@ -1,4 +1,9 @@
 
+** May ?th, 2019
+- fix plugin detection in Cakewalk by BandLab (64bit)
+- implement horizontal scroll lock (hold shift key)
+
+
 ** May 5th, 2019
 - add Core.ParamProxy module  (redirects CV or constval to VST param)
 - add Core.HalfNotes module   (same as Core.Notes but half the width)
