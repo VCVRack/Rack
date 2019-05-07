@@ -1,6 +1,7 @@
 #include "bsp.hpp"
 
 RACK_PLUGIN_MODEL_DECLARE(bsp, AttenuMixer);
+RACK_PLUGIN_MODEL_DECLARE(bsp, BeatFreq);
 RACK_PLUGIN_MODEL_DECLARE(bsp, Bias);
 RACK_PLUGIN_MODEL_DECLARE(bsp, DownSampler);
 RACK_PLUGIN_MODEL_DECLARE(bsp, Legato);
@@ -13,10 +14,11 @@ RACK_PLUGIN_MODEL_DECLARE(bsp, TunedDelayLine);
 
 RACK_PLUGIN_INIT(bsp) {
    RACK_PLUGIN_INIT_ID();
-   RACK_PLUGIN_INIT_VERSION("0.6.1");
+   RACK_PLUGIN_INIT_VERSION("0.6.4");
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/bsp2/VeeSeeVSTRack/tree/v0.6/plugins/community/repos/bsp");
 
    RACK_PLUGIN_MODEL_ADD(bsp, AttenuMixer);
+   RACK_PLUGIN_MODEL_ADD(bsp, BeatFreq);
    RACK_PLUGIN_MODEL_ADD(bsp, Bias);
    RACK_PLUGIN_MODEL_ADD(bsp, DownSampler);
    RACK_PLUGIN_MODEL_ADD(bsp, Legato);

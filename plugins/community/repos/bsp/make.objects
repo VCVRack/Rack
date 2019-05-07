@@ -1,5 +1,6 @@
 ALL_OBJ= \
 	src/AttenuMixer.o \
+	src/BeatFreq.o \
 	src/Bias.o \
 	src/DownSampler.o \
 	src/bsp.o \

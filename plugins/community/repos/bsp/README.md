@@ -1,5 +1,5 @@
-bsp modules for VeeSeeVST Rack -- March 10th, 2019, v0.6.1
-==========================================================
+bsp modules for VeeSeeVST Rack -- May 7th, 2019, v0.6.4
+=======================================================
 
 
 # AttenuMixer
@@ -52,6 +52,20 @@ Example#3:
 NOTE: This can also be used as a simple asymmetric waveshaper for audio signals
 
 NOTE: For use as an amplifier, set "CTR" to -10, then use "POS" to set the amplification (-4..4) (negative values flip the phase)
+
+
+# BeatFreq
+
+Tuner + note independent beat frequency generator.
+
+This module can be used to detune incoming pitch CV signals by octaves, semitones, and cents.
+
+It can also generate note independent beat frequencies which are very useful in dual oscillator patches.
+The beat frequency settings determines the "phasing speed".
+Unlike regular detuning, the phasing speed remains contains for all notes.
+
+NOTE: The octave and semitone modulation ports are additive
+NOTE: The cent and beatfreq modulation ports are multiplicative (useful for vibratos etc)
 
 
 
