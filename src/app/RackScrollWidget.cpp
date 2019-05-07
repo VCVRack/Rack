@@ -34,24 +34,18 @@ void RackScrollWidget::step() {
 
 	zoomPos = box.size.div(2);
 
-	// Set zoomWidget box to module bounding box
+	// Compute module bounding box
 	math::Rect moduleBox = rackWidget->moduleContainer->getChildrenBoundingBox();
 	if (!moduleBox.size.isFinite())
 		moduleBox = math::Rect(RACK_OFFSET, math::Vec(0, 0));
-	zoomWidget->box.pos = moduleBox.pos.mult(zoom);
-	zoomWidget->box.size = moduleBox.size.mult(zoom);
 
-	// Expand to moduleBox
-	math::Rect scrollBox = moduleBox.grow(RACK_GRID_SIZE.mult(math::Vec(50, 2)));
+	// Expand moduleBox by half a screen size
+	math::Rect scrollBox = moduleBox;
 	scrollBox.pos = scrollBox.pos.mult(zoom);
 	scrollBox.size = scrollBox.size.mult(zoom);
+	scrollBox = scrollBox.grow(box.size.div(2));
 
-	// Expand scrollBox to center the moduleBox
-	math::Vec s = box.size.minus(scrollBox.size).max(math::Vec());
-	scrollBox.pos = scrollBox.pos.minus(s.div(2));
-	scrollBox.size = scrollBox.size.plus(s);
-
-	// Expand to viewport size
+	// Expand to the current viewport box so that moving modules (and thus changing the module bounding box) doesn't clamp the scroll offset.
 	math::Rect viewportBox;
 	viewportBox.pos = oldOffset;
 	viewportBox.size = box.size;
