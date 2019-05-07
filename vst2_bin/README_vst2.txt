@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- May 5th, 2019
+VeeSeeVST Rack VST 2.4 Plugin -- May 7th, 2019
 ==============================================
 
 !!!------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 838 prebuilt modules
++ comes with 844 prebuilt modules
 
 Here's an old demo video of it: https://vimeo.com/277703414
 And a newer one: https://youtu.be/XTpLfcz-6Vo
@@ -51,44 +51,20 @@ Linux version tested in:
   - according to users: works in Qtractor 0.9.2
 
 
-The binary distribution contains the following (34) dynamically loaded add-on modules:
- - bsp.AttenuMixer
- - bsp.Bias
- - bsp.DownSampler
- - bsp.Legato
- - bsp.Obxd_VCF
- - bsp.Rescaler
- - bsp.RMS
- - bsp.Scanner
- - bsp.Sway
- - bsp.TunedDelayLine
- - dBiz.dBizBlank
- - dBiz.Contorno
- - dBiz.Chord
- - dBiz.Bene
- - dBiz.Bene2
- - dBiz.BenePads
- - dBiz.DAOSC
- - dBiz.Divider
- - dBiz.DualFilter
- - dBiz.DVCO
- - dBiz.FourSeq
- - dBiz.Multiple
- - dBiz.PerfMixer
- - dBiz.Remix
- - dBiz.SmiX
- - dBiz.SubMix
- - dBiz.SuHa
- - dBiz.Transpose
- - dBiz.TROSC
- - dBiz.Utility
- - dBiz.Util2
- - dBiz.VCA530
- - dBiz.Verbo
- - Template_shared.MyModule
+The binary distribution contains the following (10) core modules:
+ - Core.AudioInterface
+ - Core.AudioInterface
+ - Core.MIDIToCVInterface
+ - Core.QuadMIDIToCVInterface
+ - Core.MIDICCToCVInterface
+ - Core.MIDITriggerToCVInterface
+ - Core.Blank
+ - Core.Notes
+ - Core.ParamProxy
+ - Core.HalfNotes
 
 
-The following (804) add-on modules are statically linked with the VST plugin:
+The following (799) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -326,6 +302,11 @@ The following (804) add-on modules are statically linked with the VST plugin:
  - Bogaudio.Nsgt
  - Bogaudio.Pressor
  - Bogaudio.Slew
+ - BogAudio.AddrSeq
+ - BogAudio.EightOne
+ - BogAudio.OneEight
+ - BogAudio.Walk
+ - BogAudio.Walk2
  - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ
@@ -355,16 +336,6 @@ The following (804) add-on modules are statically linked with the VST plugin:
  - com-soundchasing-stochasm.Resonator
  - computerscare.ComputerscareDebug
  - computerscare.ComputerscarePatchSequencer
- - Core.AudioInterface
- - Core.AudioInterface
- - Core.MIDIToCVInterface
- - Core.QuadMIDIToCVInterface
- - Core.MIDICCToCVInterface
- - Core.MIDITriggerToCVInterface
- - Core.Blank
- - Core.Notes
- - Core.ParamProxy
- - Core.HalfNotes
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage
@@ -895,6 +866,46 @@ The following (804) add-on modules are statically linked with the VST plugin:
  - Valley.Interzone
 
 
+These (35) add-on / plugin modules can be loaded dynamically:
+ - bsp.AttenuMixer
+ - bsp.Bias
+ - bsp.BeatFreq
+ - bsp.DownSampler
+ - bsp.Legato
+ - bsp.Obxd_VCF
+ - bsp.Rescaler
+ - bsp.RMS
+ - bsp.Scanner
+ - bsp.Sway
+ - bsp.TunedDelayLine
+ - dBiz.dBizBlank
+ - dBiz.Contorno
+ - dBiz.Chord
+ - dBiz.Bene
+ - dBiz.Bene2
+ - dBiz.BenePads
+ - dBiz.DAOSC
+ - dBiz.Divider
+ - dBiz.DualFilter
+ - dBiz.DVCO
+ - dBiz.FourSeq
+ - dBiz.Multiple
+ - dBiz.PerfMixer
+ - dBiz.Remix
+ - dBiz.SmiX
+ - dBiz.SubMix
+ - dBiz.SuHa
+ - dBiz.Transpose
+ - dBiz.TROSC
+ - dBiz.Utility
+ - dBiz.Util2
+ - dBiz.VCA530
+ - dBiz.Verbo
+ - Template_shared.MyModule
+
+
+
+For more info about VSV rack, see https://github.com/bsp2/VeeSeeVSTRack/
 
 For more info about VCV rack, see https://vcvrack.com/
 

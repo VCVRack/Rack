@@ -18,7 +18,7 @@
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 838 prebuilt modules
++ comes with 844 prebuilt modules
 
 **Windows** version tested in:
   - Eureka (my own work-in-progress VST host)
@@ -31,7 +31,7 @@
   - FLStudio
   - Studio One 4.1.1
   - Ableton Live 10.0.6
-  - Cakewalk by BandLab (2019.03 build 20) ([hotfix](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-05May2019_cakewalk_hotfix-07May2019.7z))
+  - Cakewalk by BandLab (2019.03 build 20)
   - according to users: works in Nuendo
 
 **Linux** version tested in:
@@ -43,8 +43,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-05May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-05May2019.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-05May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-05May2019.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-07May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-07May2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-07May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-07May2019.7z) (32bit, experimental)
 
 ## Linux
 - [veeseevstrack_0_6_1_lin64_bin-05May2019.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-05May2019.tar.gz) (64bit) (Dave's latest build)
@@ -79,6 +79,7 @@ Here are some demo videos of it:
  - https://youtu.be/XTpLfcz-6Vo (a complete "one synth challenge" type track with 23 instances)
  - https://youtu.be/M0PrZA265Ag (Making a track with VeeSeeVST Rack VST in Ableton (VCV Rack port), by VCV Rack Ideas)
  - https://youtu.be/R5npTzoZgzw (quick demo of the Core.ParamProxy module)
+ - https://youtu.be/AZVJNArv5kM (quick demo of the bsp.BeatFreq module)
 
 
 # Modules
@@ -96,7 +97,7 @@ The binary distribution contains the following (10) core modules:
  - Core.HalfNotes
 
 
-The following (804) add-on modules are statically linked with the VST plugin:
+The following (799) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -334,6 +335,11 @@ The following (804) add-on modules are statically linked with the VST plugin:
  - Bogaudio.Nsgt
  - Bogaudio.Pressor
  - Bogaudio.Slew
+ - BogAudio.AddrSeq
+ - BogAudio.EightOne
+ - BogAudio.OneEight
+ - BogAudio.Walk
+ - BogAudio.Walk2
  - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ
@@ -893,9 +899,10 @@ The following (804) add-on modules are statically linked with the VST plugin:
  - Valley.Interzone
 
 
-These (34) add-on / plugin modules can be loaded dynamically:
+These (35) add-on / plugin modules can be loaded dynamically:
  - bsp.AttenuMixer
  - bsp.Bias
+ - bsp.BeatFreq
  - bsp.DownSampler
  - bsp.Legato
  - bsp.Obxd_VCF
@@ -928,6 +935,7 @@ These (34) add-on / plugin modules can be loaded dynamically:
  - dBiz.VCA530
  - dBiz.Verbo
  - Template_shared.MyModule
+
 
 
 # License
