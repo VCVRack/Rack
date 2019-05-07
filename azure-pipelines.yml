@@ -78,6 +78,7 @@ jobs:
           conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
           conan remote add qno https://api.bintray.com/conan/qno/conan-public
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+          mkdir "%HOMEPATH%\.conan\profiles"
           copy conan_profile_mingw8.1 "%HOMEPATH%\.conan\profiles\mingw"
           mkdir build
           cd build
