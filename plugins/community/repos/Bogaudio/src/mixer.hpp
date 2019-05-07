@@ -52,7 +52,7 @@ struct MixerChannel {
 	}
 
 	void setSampleRate(float sampleRate);
-	void next(bool stereo); // input from _in; outputs on out, left, right, rms.
+	void next(bool stereo, bool solo); // input from _in; outputs on out, left, right, rms.
 };
 
 struct MuteButton : ToggleButton {
@@ -60,6 +60,17 @@ struct MuteButton : ToggleButton {
 		addFrame(SVG::load(assetPlugin(plugin, "res/button_18px_0.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/button_18px_1_orange.svg")));
 	}
+};
+
+struct SoloMuteButton : ParamWidget, FramebufferWidget {
+	std::vector<std::shared_ptr<SVG>> _frames;
+	SVGWidget* _svgWidget; // deleted elsewhere.
+	CircularShadow* shadow = NULL;
+
+	SoloMuteButton();
+	void step() override;
+	void onMouseDown(EventMouseDown& e) override;
+	void onChange(EventChange &e) override;
 };
 
 } // namespace bogaudio

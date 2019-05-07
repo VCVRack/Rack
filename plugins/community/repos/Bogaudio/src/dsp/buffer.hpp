@@ -134,7 +134,7 @@ struct HistoryBuffer {
 
 	HistoryBuffer(int size, T initialValue)
 	: _size(size)
-	, _i(size)
+	, _i(0)
 	{
 		assert(size > 0);
 		_buf = new T[size];
@@ -146,14 +146,12 @@ struct HistoryBuffer {
 
 	inline void push(T s) {
 		++_i;
-		if (_i >= _size) {
-			_i = 0;
-		}
+		_i %= _size;
 		_buf[_i] = s;
 	}
 
 	inline T value(int i) {
-		assert(i <= 0 && -i <= _size);
+		assert(i >= 0 && i < _size);
 		int j = _i - i;
 		if (j < 0) {
 			j += _size;

@@ -99,7 +99,7 @@ struct RangeDbMenuItem : MenuItem {
 	}
 
 	void step() override {
-		rightText = _module->_rangeDb == _rangeDb ? "?" : "";
+		rightText = _module->_rangeDb == _rangeDb ? "✔" : "";
 	}
 };
 

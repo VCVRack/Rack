@@ -1,8 +1,7 @@
 #pragma once
 
 #include "bogaudio.hpp"
-#include "dsp/oscillator.hpp"
-#include "dsp/signal.hpp"
+#include "lfo_base.hpp"
 
 using namespace bogaudio::dsp;
 
@@ -10,7 +9,7 @@ extern Model* modelLFO;
 
 namespace bogaudio {
 
-struct LFO : Module {
+struct LFO : LFOBase {
 	enum ParamsIds {
 		FREQUENCY_PARAM,
 		SLOW_PARAM,
@@ -74,7 +73,7 @@ struct LFO : Module {
 	bool _rampDownActive = false;
 	bool _squareActive = false;
 
-	LFO() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	LFO() : LFOBase(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();
 		onSampleRateChange();
 	}

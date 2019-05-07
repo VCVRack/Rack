@@ -14,6 +14,7 @@
 #include "DGate.hpp"
 #include "Detune.hpp"
 #include "EightFO.hpp"
+#include "EightOne.hpp"
 #include "FMOp.hpp"
 #include "FlipFlop.hpp"
 #include "Follow.hpp"
@@ -24,13 +25,18 @@
 #include "Mix4.hpp"
 #include "Mix8.hpp"
 #include "Mult.hpp"
+#include "Mute8.hpp"
 #include "Noise.hpp"
+#include "Nsgt.hpp"
 #include "Offset.hpp"
+#include "OneEight.hpp"
 #include "Pan.hpp"
+#include "Pressor.hpp"
 #include "Reftone.hpp"
 #include "SampleHold.hpp"
 #include "Shaper.hpp"
 #include "ShaperPlus.hpp"
+#include "Slew.hpp"
 #include "Stack.hpp"
 #include "Sums.hpp"
 #include "Switch.hpp"
@@ -40,6 +46,8 @@
 #include "VCM.hpp"
 #include "VCO.hpp"
 #include "VU.hpp"
+#include "Walk.hpp"
+#include "Walk2.hpp"
 #include "XCO.hpp"
 #include "XFade.hpp"
 
@@ -130,10 +138,16 @@ RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Nsgt);
 RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Pressor);
 RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Slew);
 
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, AddrSeq);  // 0.6.14
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, EightOne);
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, OneEight);
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Walk);
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Walk2);
+
 RACK_PLUGIN_INIT(Bogaudio) {
    RACK_PLUGIN_INIT_ID();
 
-   RACK_PLUGIN_INIT_VERSION("0.6.13");
+   RACK_PLUGIN_INIT_VERSION("0.6.14");
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/bogaudio/BogaudioModules");
    RACK_PLUGIN_INIT_MANUAL("https://github.com/bogaudio/BogaudioModules/blob/master/README.md");
@@ -219,5 +233,9 @@ RACK_PLUGIN_INIT(Bogaudio) {
 	RACK_PLUGIN_MODEL_ADD(Bogaudio, Pressor);
 	RACK_PLUGIN_MODEL_ADD(Bogaudio, Slew);
 
-	//NEW_MODELS_HERE
+   RACK_PLUGIN_MODEL_ADD(Bogaudio, AddrSeq);  // 0.6.14
+   RACK_PLUGIN_MODEL_ADD(Bogaudio, EightOne);
+   RACK_PLUGIN_MODEL_ADD(Bogaudio, OneEight);
+   RACK_PLUGIN_MODEL_ADD(Bogaudio, Walk);
+   RACK_PLUGIN_MODEL_ADD(Bogaudio, Walk2);
 }

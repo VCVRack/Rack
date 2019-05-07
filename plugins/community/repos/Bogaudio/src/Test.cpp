@@ -409,6 +409,42 @@ void Test::step() {
 	float in = inputs[IN_INPUT].value;
 	outputs[OUT_OUTPUT].value = _saturator.next(in);
 	outputs[OUT2_OUTPUT].value = clamp(in, -Saturator::limit, Saturator::limit);
+
+#elif BROWNIAN
+	const float maxDiv = 1000.0f;
+	float change = clamp(1.0f - params[PARAM1_PARAM].value, 0.01f, 1.0f);
+	float smooth = clamp(params[PARAM2_PARAM].value, 0.01f, 1.0f);
+	smooth *= smooth;
+	_filter1.setParams(engineGetSampleRate(), smooth * engineGetSampleRate() * 0.49f);
+	_filter2.setParams(engineGetSampleRate(), smooth * engineGetSampleRate() * 0.49f);
+
+	_last1 = _last1 + _noise1.next() / (change * maxDiv);
+	outputs[OUT_OUTPUT].value = _filter1.next(_last1);
+	if (_last1 > 5.0f || _last1 < -5.0f) {
+		_last1 = 0.0f;
+	}
+
+	_last2 = _last2 + _noise1.next() / (change * maxDiv);
+	outputs[OUT2_OUTPUT].value = _filter2.next(_last2);
+	if (_last2 > 5.0f || _last2 < -5.0f) {
+		_last2 = 0.0f;
+	}
+
+	// // "leaky integrator"
+	// float alpha = params[PARAM1_PARAM].value;
+	// alpha = clamp(1.0f - alpha*alpha, 0.00001f, 1.0f);
+	// float sample = 5.0f * _noise1.next();
+	// _last1 = alpha*_last1 + (1.0f - alpha)*sample;
+	// outputs[OUT_OUTPUT].value = _last1;
+
+#elif RANDOMWALK
+	float change = params[PARAM1_PARAM].value;
+	change *= change;
+	change *= change;
+	_walk1.setParams(engineGetSampleRate(), change);
+	_walk2.setParams(engineGetSampleRate(), change);
+	outputs[OUT_OUTPUT].value = _walk1.next();
+	outputs[OUT2_OUTPUT].value = _walk2.next();
 #endif
 }
 
@@ -488,7 +524,4 @@ struct TestWidget : ModuleWidget {
 	}
 };
 
-RACK_PLUGIN_MODEL_INIT(Bogaudio, Test) {
-   Model *modelTest = Model::create<Test, TestWidget>("Bogaudio", "Bogaudio-Test", "Test");
-   return modelTest;
-}
+Model* modelTest = Model::create<Test, TestWidget>("Bogaudio", "Bogaudio-Test", "Test");

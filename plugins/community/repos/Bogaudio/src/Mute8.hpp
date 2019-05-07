@@ -82,7 +82,7 @@ struct Mute8 : Module {
 	void onReset() override;
 	void onSampleRateChange() override;
 	void step() override;
-	void stepChannel(int i);
+	void stepChannel(int i, bool solo);
 };
 
 } // namespace bogaudio

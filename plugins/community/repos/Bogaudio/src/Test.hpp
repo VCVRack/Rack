@@ -17,7 +17,7 @@ extern Model* modelTest;
 // #define OVERSAMPLED_BL 1
 // #define ANTIALIASING 1
 // #define DECIMATORS 1
-#define INTERPOLATOR 1
+// #define INTERPOLATOR 1
 // #define FM 1
 // #define PM 1
 // #define FEEDBACK_PM 1
@@ -27,6 +27,8 @@ extern Model* modelTest;
 // #define RMS 1
 // #define RAVG 1
 // #define SATURATOR 1
+// #define BROWNIAN 1
+#define RANDOMWALK 1
 
 #include "pitch.hpp"
 #ifdef LPF
@@ -86,6 +88,10 @@ extern Model* modelTest;
 #elif SATURATOR
 #include "dsp/oscillator.hpp"
 #include "dsp/signal.hpp"
+#elif BROWNIAN
+#include "dsp/noise.hpp"
+#elif RANDOMWALK
+#include "dsp/noise.hpp"
 #else
 #error what
 #endif
@@ -215,6 +221,16 @@ struct Test : Module {
 	Trigger _reset;
 #elif SATURATOR
 	Saturator _saturator;
+#elif BROWNIAN
+	WhiteNoiseGenerator _noise1;
+	GaussianNoiseGenerator _noise2;
+	LowPassFilter _filter1;
+	LowPassFilter _filter2;
+	float _last1 = 0.0f;
+	float _last2 = 0.0f;
+#elif RANDOMWALK
+	RandomWalk _walk1;
+	RandomWalk _walk2;
 #endif
 
 	Test()

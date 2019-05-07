@@ -45,6 +45,11 @@ struct BiquadFilter : Filter {
 		}
 	}
 
+	void reset() {
+		_x[0] = _x[1] = _x[2] = 0.0;
+		_y[0] = _y[1] = _y[2] = 0.0;
+	}
+
 	float next(float sample) override {
 		_x[2] = _x[1];
 		_x[1] = _x[0];
@@ -94,7 +99,8 @@ struct LowPassFilter : Filter {
 		setParams(sampleRate, cutoff, q);
 	}
 
-	void setParams(float sampleRate, float cutoff, float q);
+	void setParams(float sampleRate, float cutoff, float q = 0.001f);
+	void reset() { _biquad.reset(); }
 	float next(float sample) override {
 		return _biquad.next(sample);
 	}

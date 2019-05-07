@@ -60,7 +60,7 @@ struct AverageMenuItem : MenuItem {
 	}
 
 	void step() override {
-		rightText = !_module->_sum ? "?" : "";
+		rightText = !_module->_sum ? "✔" : "";
 	}
 };
 

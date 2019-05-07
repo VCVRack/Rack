@@ -156,7 +156,4 @@ struct Test2Widget : ModuleWidget {
 	}
 };
 
-RACK_PLUGIN_MODEL_INIT(Bogaudio, Test2) {
-   Model *modelTest2 = Model::create<Test2, Test2Widget>("Bogaudio", "Bogaudio-Test2", "Test2");
-   return modelTest2;
-}
+Model* modelTest2 = Model::create<Test2, Test2Widget>("Bogaudio", "Bogaudio-Test2", "Test2");

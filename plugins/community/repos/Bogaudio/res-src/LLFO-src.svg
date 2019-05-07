@@ -44,14 +44,19 @@
         <polyline points="0,0 3.5,0" stroke-width="0.7" stroke="#333" transform="rotate(-240) translate(15 0)" />
         <polyline points="0,0 3.5,0" stroke-width="0.7" stroke="#333" transform="rotate(60) translate(15 0)" />
 
-        <g transform="rotate(-148.42) translate(14 0)">
+        <g transform="rotate(-202) translate(14 0)">
           <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="translate(0 0)" />
-          <text font-size="5.0pt" transform="translate(5 0) rotate(148.42) translate(-2.2 2.3)">1</text>
+          <text font-size="5.0pt" transform="translate(5 0) rotate(202) translate(3 9.5) rotate(-90)">0.2</text>
         </g>
 
-        <g transform="rotate(-55.39) translate(14 0)">
+        <g transform="rotate(-48.68) translate(14 0)">
           <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="translate(0 0)" />
-          <text font-size="5.0pt" transform="translate(5 0) rotate(55.39) translate(-1.0 2.3)">0V</text>
+          <text font-size="5.0pt" transform="translate(5 0) rotate(48.68) translate(-1 2.3)">20</text>
+        </g>
+
+        <g transform="rotate(-124.62) translate(14 0)">
+          <polyline points="0,0 2.5,0" stroke-width="0.3" stroke="#333" transform="translate(0 0)" />
+          <text font-size="5.0pt" transform="translate(5 0) rotate(124.62) translate(-3.0 2.3)">2</text>
         </g>
 
         <g transform="rotate(27.98) translate(14 0)">

@@ -7,6 +7,7 @@ Modules for [VCV Rack](https://github.com/VCVRack/Rack), an open-source Eurorack
   - [Envelopes and Envelope Utilities](#envelopes)
   - [Mixers, Panners and VCAs](#mixers)
   - [Effects and Dynamics](#effects)
+  - [Sequential Switches and Sequencers](#sequencers)
   - [Visualizers](#visualizers)
   - [Pitch CV Utilities](#pitch)
   - [Other Utilities](#utilities)
@@ -15,6 +16,8 @@ Modules for [VCV Rack](https://github.com/VCVRack/Rack), an open-source Eurorack
 ![modules screenshot](./doc/www/modules1.png)
 
 ![modules screenshot](./doc/www/modules2.png)
+
+![modules screenshot](./doc/www/modules5.png)
 
 ![modules screenshot](./doc/www/modules3.png)
 
@@ -104,7 +107,9 @@ A standard LFO featuring:
   - Reset (hard sync) input.
   - Slow mode.
 
-LFO tracks pitch CVs at the V/OCT input four octaves lower than a normal oscillator: with a 0V input, the output frequency is note C0 (16.35HZ).  The frequency knob is calibrated in linear volts (the small ticks), and its value is added to the input V/OCT.  With no input, the frequency range is from approximately 0.1 to 400HZ; with CV the frequency may be driven up to 2000HZ or down to arbitrarily low values.  In slow mode, the output frequency tracks the controls 8 octaves lower than in normal mode.
+LFO tracks pitch CVs at the V/OCT input seven octaves lower than a normal oscillator: with a 0V input, the output frequency is note C-3 (2.04HZ).  The frequency knob is calibrated in linear volts (the small ticks), and its value is added to the input V/OCT.  With no input, the frequency range is from approximately 0.1 to 400HZ; with CV the frequency may be driven up to 2000HZ or down to arbitrarily low values.  In slow mode, the output frequency tracks the controls 11 octaves lower than in normal mode.
+
+*NOTE ON FREQUENCIES:* Previous to release 0.6.14 (April 2019), LFO tracked 0V as C0 or 16.35HZ (and 8 octaves lower in slow mode). Patches created with older versions will continue to have the old behavior.  New instances of LFO added to patches will have the new behavior.  The behavior can be toggled, in either case, on the context (right-click) menu.
 
 #### 8FO
 
@@ -191,6 +196,7 @@ Features:
   - CV-controlled stereo panners; expects +/-5 volt CV; CV is attenuverted by the corresponding knob when in use.
   - Stereo outputs; if only one is patched, the output mix is mono.
   - Performance mutes (buttons) per channel.
+  - Right-click a mute buttons solos that channel (un-mutes that channel and temporarily mutes all others).  Right or left click will un-solo, restoring the old state.  Multiple channels can be "soloed" at once.
   - Fader handles contain lights indicating the signal level out of that channel or the entire mix.
   - Output saturates (soft clips) to +/-12 volts, where the clipping effect becomes noticeable above +/-10 volts.
 
@@ -227,6 +233,8 @@ Saturation (soft clipping) is applied to each output at +/-12 volts; the LEVEL k
 #### MUTE8
 
 MUTE8 provides 8 independent manual or CV-controlled mutes. Each channel is muted if its button is toggled on or if there is a positive voltage at its CV input.  Otherwise the input is passed to the output.
+
+As with MIX4 and MIX8, a right-click on a mute button will solo that channel (pass that channel through while muting all others).  Right or left click clears this.
 
 #### PAN
 
@@ -308,6 +316,28 @@ In contrast to CLPR, LMTR does not distort the signal (or not much); it just red
 #### NSGT
 
 NSGT is a compact (6HP) [noise gate](https://en.wikipedia.org/wiki/Noise_gate).  Its controls behave the same as the corresponding controls on PRESSOR.
+
+### <a name="sequencers"></a> Sequential Switches and Sequencers
+
+![Sequencers screenshot](doc/www/sequencers.png)
+
+#### 8:1
+
+8:1 is a sequential switch and voltage-addressed switch (multiplexer) at once -- it routes 8 inputs to 1 output according to either a clock or CV input (or both).
+
+As a sequential switch, a trigger at the clock input advances the input selection -- which input is routed to the output.  Like a sequencer, it can be reset with a trigger at RESET, the number of inputs to cycle through may be set with the STEPS knob, and the direction is set with the FWD/REV switch.
+
+As a multiplexer, it routes an input to the output under control of the SELECT knob and CV.  A 0-10V CV, divided into 8 equal divisions of 1.25V, controls the input selection.  This value is summed with the knob setting; for example, setting the knob to 4 and inputting a 2.6V CV will send input 7 to the output.  When the knob-plus-CV value exceeds 8, it wraps around.
+
+Both functions may be used simultaneously: the SELECT+CV value is added to the sequential/clocked value, wrapping around.  Note that the STEPS value only affects the sequential value; for example, using a clock input and setting STEPS to 2 will yield an alternation between two adjacent inputs, but this pair can be selected with the SELECT knob or CV.
+
+#### 1:8
+
+1:8 is the opposite of 8:1 -- it routes a single input to 1 of 8 outputs.  The control circuit behavior (CLOCK, SELECT, etc) is the same.
+
+#### ADDR-SEQ
+
+ADDR-SEQ is an 8-step sequencer where the step values are set by 8 bipolar knobs able to dial in voltages from -10 to 10V.  It has the same clocked or voltage-addressed control circuit as 8:1 and 1:8.
 
 ### <a name="visualizers"></a> Visualizers
 

@@ -3,6 +3,7 @@
 #include <random>
 
 #include "base.hpp"
+#include "filter.hpp"
 
 namespace bogaudio {
 namespace dsp {
@@ -78,11 +79,38 @@ struct BlueNoiseGenerator : NoiseGenerator {
 struct GaussianNoiseGenerator : NoiseGenerator {
 	std::normal_distribution<float> _normal;
 
-	GaussianNoiseGenerator() : _normal(0, 1.0) {}
+	GaussianNoiseGenerator(float mean = 0.0f, float stdDev = 1.0f) : _normal(mean, stdDev) {}
 
 	float _next() override {
 		return _normal(_generator);
 	}
+};
+
+struct RandomWalk : Generator {
+	float _min;
+	float _max;
+	float _last = 0.0f;
+	float _lastOut = 0.0f;
+	float _damp;
+	float _bias = 0.0f;
+	WhiteNoiseGenerator _noise;
+	LowPassFilter _filter;
+
+	RandomWalk(
+		float min = -5.0f,
+		float max = 5.0f,
+		float sampleRate = 1000.0f,
+		float change = 0.5f
+	)
+	: _min(min)
+	, _max(max)
+	{
+		setParams(sampleRate, change);
+	}
+
+	void setParams(float sampleRate = 1000.0f, float change = 0.5f);
+	void jump();
+	float _next() override;
 };
 
 } // namespace dsp

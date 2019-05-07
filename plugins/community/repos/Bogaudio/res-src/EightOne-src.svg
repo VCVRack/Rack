@@ -1,0 +1,186 @@
+<svg
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="90"
+  height="380"
+  viewBox="0 0 90 380"
+>
+  <style>
+    text {
+      fill: #333;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    text.title {
+      font-family: 'Comfortaa', sans-serif;
+      font-weight: normal;
+    }
+    text.brand {
+      font-family: 'Audiowide', sans-serif;
+      font-weight: bold;
+    }
+  </style>
+
+  <defs>
+    <symbol id="knob" viewBox="0 0 45px 45px">
+      <g transform="translate(22.5 22.5)">
+        <polyline points="-5,0 5,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-5 0,5" stroke-width="1" stroke="#00f" />
+        <circle cx="0" cy="0" r="14" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-select" viewBox="0 0 45px 45px">
+      <g transform="translate(22.5 22.5)">
+        <text font-size="5.0pt" transform="rotate(-240) translate(20 0) rotate(240) translate(-2 2)">1</text>
+        <text font-size="5.0pt" transform="rotate(-197.1) translate(20 0) rotate(197.1) translate(-2 2)">2</text>
+        <text font-size="5.0pt" transform="rotate(-154.3) translate(20 0) rotate(154.3) translate(-2 2)">3</text>
+        <text font-size="5.0pt" transform="rotate(-111.4) translate(20 0) rotate(111.4) translate(-2 2)">4</text>
+        <text font-size="5.0pt" transform="rotate(-68.6) translate(20 0) rotate(68.6) translate(-2 2)">5</text>
+        <text font-size="5.0pt" transform="rotate(-25.7) translate(20 0) rotate(25.7) translate(-2 2)">6</text>
+        <text font-size="5.0pt" transform="rotate(17.1) translate(20 0) rotate(-17.1) translate(-2 2)">7</text>
+        <text font-size="5.0pt" transform="rotate(60) translate(20 0) rotate(-60) translate(-2 2)">8</text>
+      </g>
+    </symbol>
+
+    <symbol id="knob-smallest" viewBox="0 0 16px 16px">
+      <g transform="translate(8 8)">
+        <polyline points="-3,0 3,0" stroke-width="1" stroke="#00f" />
+        <polyline points="0,-3 0,3" stroke-width="1" stroke="#00f" />
+        <circle r="7.5" stroke-width="1" stroke="#00f" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="knobguide-steps" viewBox="0 0 40px 40px">
+      <g transform="translate(20 20)">
+        <text font-size="5.0pt" transform="rotate(-240) translate(13 0) rotate(240) translate(-2 2)">2</text>
+        <text font-size="5.0pt" transform="rotate(-190) translate(13 0) rotate(190) translate(-2 2)">3</text>
+        <text font-size="5.0pt" transform="rotate(-140) translate(13 0) rotate(140) translate(-2 2)">4</text>
+        <text font-size="5.0pt" transform="rotate(-90) translate(13 0) rotate(90) translate(-2 2)">5</text>
+        <text font-size="5.0pt" transform="rotate(-40) translate(13 0) rotate(40) translate(-2 2)">6</text>
+        <text font-size="5.0pt" transform="rotate(10) translate(13 0) rotate(-10) translate(-2 2)">7</text>
+        <text font-size="5.0pt" transform="rotate(60) translate(13 0) rotate(-60) translate(-2 2)">8</text>
+      </g>
+    </symbol>
+
+    <symbol id="switch" viewBox="0 0 14px 24px">
+      <rect width="14px" height="24px" stroke-width="1" stroke="#000" fill="#ddd" />
+      <rect width="14px" height="12px" stroke-width="0" fill="#000" />
+    </symbol>
+
+    <symbol id="light-small" viewBox="0 0 6.4px 6.4px">
+      <rect width="6.4" height="6.4" fill="#0f0" />
+    </symbol>
+
+    <symbol id="input" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#0f0" fill="#0f0" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#0f0" fill="none" />
+      </g>
+    </symbol>
+
+    <symbol id="output" viewBox="0 0 24px 24px">
+      <g transform="translate(12 12)">
+        <circle cx="0" cy="0" r="5" stroke-width="1" stroke="#f00" fill="#f00" />
+        <circle cx="0" cy="0" r="10.5" stroke-width="3" stroke="#f00" fill="none" />
+      </g>
+    </symbol>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#ddd" />
+  <polyline points="1,1 89,1 89,379 1,379 1,1" stroke="#e4e4e4" stroke-width="0.5" fill="none" />
+  <polyline points="0.5,0.5 89.5,0.5 89.5,379.5 0.5,379.5 0.5,0.5" stroke="#ebebeb" stroke-width="0.8" fill="none" />
+  <polyline points="0,0 90,0 90,380 0,380 0,0" stroke="#f2f2f2" stroke-width="1" fill="none" />
+
+  <text class="title" x="63" y="17" font-size="9pt" letter-spacing="3px">8:1</text>
+  <g transform="translate(5.5 374)">
+    <text class="brand" font-size="6.5pt" letter-spacing="2px">BOGAUDIO</text>
+    <rect width="1.5" height="2" fill="#ddd" transform="translate(21 -4)" />
+  </g>
+
+  <g transform="translate(6.5 32)">
+    <rect width="34" height="337" rx="5" fill="#fafafa" transform="translate(0 -9)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(12.5 0)">IN</text>
+
+    <use id="IN1_INPUT" xlink:href="#input" transform="translate(5 3)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 35)">1</text>
+    <use id="IN1_LIGHT" xlink:href="#light-small" transform="translate(17 29.5)" />
+
+    <use id="IN2_INPUT" xlink:href="#input" transform="translate(5 44.3)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 76.3)">2</text>
+    <use id="IN2_LIGHT" xlink:href="#light-small" transform="translate(17 70.8)" />
+
+    <use id="IN3_INPUT" xlink:href="#input" transform="translate(5 86.6)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 118.6)">3</text>
+    <use id="IN3_LIGHT" xlink:href="#light-small" transform="translate(17 113.1)" />
+
+    <use id="IN4_INPUT" xlink:href="#input" transform="translate(5 126.9)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 158.9)">4</text>
+    <use id="IN4_LIGHT" xlink:href="#light-small" transform="translate(17 153.4)" />
+
+    <use id="IN5_INPUT" xlink:href="#input" transform="translate(5 168.1)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 200.1)">5</text>
+    <use id="IN5_LIGHT" xlink:href="#light-small" transform="translate(17 194.6)" />
+
+    <use id="IN6_INPUT" xlink:href="#input" transform="translate(5 209.4)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 241.4)">6</text>
+    <use id="IN6_LIGHT" xlink:href="#light-small" transform="translate(17 235.9)" />
+
+    <use id="IN7_INPUT" xlink:href="#input" transform="translate(5 250.7)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 282.7)">7</text>
+    <use id="IN7_LIGHT" xlink:href="#light-small" transform="translate(17 277.2)" />
+
+    <use id="IN8_INPUT" xlink:href="#input" transform="translate(5 292)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(11 324)">8</text>
+    <use id="IN8_LIGHT" xlink:href="#light-small" transform="translate(17 318.5)" />
+  </g>
+
+  <g transform="translate(49.5 32)">
+    <rect width="34" height="39" rx="5" fill="#fafafa" />
+    <rect width="34" height="10" fill="#fafafa" transform="translate(0 30)" />
+    <use id="CLOCK_INPUT" xlink:href="#input" transform="translate(5 3)" />
+    <text font-size="5pt" letter-spacing="1px" transform="translate(4 35)">CLOCK</text>
+  </g>
+  <g transform="translate(49.5 69)">
+    <rect width="34" height="39" rx="5" fill="#fafafa" />
+    <use id="RESET_INPUT" xlink:href="#input" transform="translate(5 3)" />
+    <text font-size="5pt" letter-spacing="1px" transform="translate(5 35)">RESET</text>
+  </g>
+
+  <g transform="translate(44 121)">
+    <text font-size="6pt" letter-spacing="1.5px" transform="translate(7.5 0)">STEPS</text>
+    <use id="STEPS_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 10.5)" />
+    <use xlink:href="#knobguide-steps" transform="translate(2.5 -1)" />
+  </g>
+
+  <g transform="translate(59 166)">
+    <text font-size="5pt" letter-spacing="2px" transform="translate(-1.8 -1)">FWD</text>
+    <use id="DIRECTION_PARAM" xlink:href="#switch" transform="translate(0 2)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(-1.3 34)">REV</text>
+  </g>
+
+  <!-- <rect width="45" height="14" fill="#0f0" transform="translate(0 200)" /> -->
+  <!-- <rect width="45" height="14" fill="#0f0" transform="translate(0 307)" /> -->
+  <g transform="translate(44 220)">
+    <text font-size="6pt" letter-spacing="1.5px" transform="translate(4.5 0)">SELECT</text>
+    <use id="SELECT_PARAM" xlink:href="#knob" transform="translate(0 2)" />
+    <use xlink:href="#knobguide-select" transform="translate(0 2)" />
+    <g transform="translate(5.5 47)">
+      <rect width="34" height="39" rx="5" fill="#fafafa" />
+      <use id="SELECT_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(11.5 35)">CV</text>
+    </g>
+  </g>
+
+  <g transform="translate(49.5 321)">
+    <rect width="34" height="39" rx="5" fill="#bbb" />
+    <use id="OUT_OUTPUT" xlink:href="#output" transform="translate(5 3)" />
+    <text font-size="5pt" letter-spacing="2px" transform="translate(8 35)">OUT</text>
+  </g>
+
+  <!-- <polyline points="0,0 90,0" stroke="#f00" stroke-width="1" fill="none" transform="translate(0 47)" /> -->
+  <!-- <polyline points="0,0 90,0" stroke="#f00" stroke-width="1" fill="none" transform="translate(0 336)" /> -->
+  <!-- <polyline points="0,0 90,0" stroke="#f00" stroke-width="1" fill="none" transform="translate(0 351)" /> -->
+  <!-- <polyline points="0,0 0,360" stroke="#f00" stroke-width="1" fill="none" transform="translate(66.50 0)" /> -->
+</svg>

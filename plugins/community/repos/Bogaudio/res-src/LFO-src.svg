@@ -57,17 +57,13 @@
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
           <text font-size="7.0pt" transform="translate(14 0) rotate(171.49) translate(-11 3.5)">0.5</text>
         </g>
-        <g transform="rotate(-148.42) translate(34 0)">
+        <g transform="rotate(-71.76) translate(34 0)">
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
-          <text font-size="7.0pt" transform="translate(14 0) rotate(148.42) translate(-3 3.5)">1</text>
+          <text font-size="7.0pt" transform="translate(14 0) rotate(71.76) translate(-2 3.5)">10</text>
         </g>
-        <g transform="rotate(-94.83) translate(34 0)">
+        <g transform="rotate(-124.62) translate(34 0)">
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
-          <text font-size="7.0pt" transform="translate(14 0) rotate(94.83) translate(-3 3.5)">5</text>
-        </g>
-        <g transform="rotate(-55.39) translate(34 0)">
-          <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
-          <text font-size="7.0pt" letter-spacing="1px" transform="translate(14 0) rotate(55.39) translate(-1 3.5)">0V</text>
+          <text font-size="7.0pt" letter-spacing="1px" transform="translate(14 0) rotate(124.62) translate(-10 3.5)">0V</text>
         </g>
         <g transform="rotate(-18.17) translate(34 0)">
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
@@ -77,23 +73,29 @@
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
           <text font-size="7.0pt" transform="translate(14 0) rotate(-27.98) translate(-2 3.5)">200</text>
         </g>
-        <g transform="rotate(51.06) translate(34 0)">
+        <g transform="rotate(51.05) translate(34 0)">
           <polyline points="0,0 5,0" stroke-width="1" stroke="#333" transform="translate(3 0)" />
-          <text font-size="7.0pt" transform="translate(14 0) rotate(-51.06) translate(-2 3.5)">400HZ</text>
+          <text font-size="7.0pt" transform="translate(14 0) rotate(-51.05) translate(-2 3.5)">400HZ</text>
         </g>
 
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-240) translate(37 0)" />
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-216.92) translate(37 0)" />
+
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-193.85) translate(37 0)" />
         <!-- <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-170.77) translate(37 0)" /> -->
-        <!-- <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-147.69) translate(37 0)" /> -->
-        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-124.62) translate(37 0)" />
+
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-147.69) translate(37 0)" />
+        <!-- <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-124.62) translate(37 0)" /> -->
+
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-101.54) translate(37 0)" />
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-78.46) translate(37 0)" />
-        <!-- <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-55.38) translate(37 0)" /> -->
+
+        <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-55.38) translate(37 0)" />
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-32.31) translate(37 0)" />
+
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(-9.23) translate(37 0)" />
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(13.85) translate(37 0)" />
+
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(36.92) translate(37 0)" />
         <polyline points="0,0 3,0" stroke-width="0.7" stroke="#333" transform="rotate(60) translate(37 0)" />
       </g>
@@ -228,7 +230,7 @@
 
   <!-- <rect width="20" height="10" fill="#0f0" transform="translate(20 130)" /> -->
   <!-- <rect width="20" height="10" fill="#0f0" transform="translate(108 130)" /> -->
-  <text font-size="6pt" letter-spacing="1px" transform="translate(33 133)">0V = C0 = 16.35HZ</text>
+  <text font-size="6pt" letter-spacing="1px" transform="translate(34 133)">0V = C-3 = 2.04HZ</text>
 
   <g transform="translate(111 240)">
     <!-- <rect width="230" height="15" fill="#0f0" transform="translate(-30 -17)" /> -->

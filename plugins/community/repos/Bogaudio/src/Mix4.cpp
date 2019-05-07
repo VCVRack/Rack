@@ -13,10 +13,15 @@ void Mix4::onSampleRateChange() {
 
 void Mix4::step() {
 	bool stereo = outputs[L_OUTPUT].active && outputs[R_OUTPUT].active;
-	_channel1.next(stereo);
-	_channel2.next(stereo);
-	_channel3.next(stereo);
-	_channel4.next(stereo);
+	bool solo =
+		params[MUTE1_PARAM].value > 1.5f ||
+		params[MUTE2_PARAM].value > 1.5f ||
+		params[MUTE3_PARAM].value > 1.5f ||
+		params[MUTE4_PARAM].value > 1.5f;
+	_channel1.next(stereo, solo);
+	_channel2.next(stereo, solo);
+	_channel3.next(stereo, solo);
+	_channel4.next(stereo, solo);
 
 	float level = Amplifier::minDecibels;
 	if (params[MIX_MUTE_PARAM].value < 0.5f) {
@@ -116,16 +121,16 @@ struct Mix4Widget : ModuleWidget {
 
 		addSlider(level1ParamPosition, module, Mix4::LEVEL1_PARAM, module->_channel1.rms);
 		addParam(ParamWidget::create<Knob16>(pan1ParamPosition, module, Mix4::PAN1_PARAM, -1.0, 1.0, 0.0));
-		addParam(ParamWidget::create<MuteButton>(mute1ParamPosition, module, Mix4::MUTE1_PARAM, 0.0, 1.0, 0.0));
+		addParam(ParamWidget::create<SoloMuteButton>(mute1ParamPosition, module, Mix4::MUTE1_PARAM, 0.0, 3.0, 0.0));
 		addSlider(level2ParamPosition, module, Mix4::LEVEL2_PARAM, module->_channel2.rms);
 		addParam(ParamWidget::create<Knob16>(pan2ParamPosition, module, Mix4::PAN2_PARAM, -1.0, 1.0, 0.0));
-		addParam(ParamWidget::create<MuteButton>(mute2ParamPosition, module, Mix4::MUTE2_PARAM, 0.0, 1.0, 0.0));
+		addParam(ParamWidget::create<SoloMuteButton>(mute2ParamPosition, module, Mix4::MUTE2_PARAM, 0.0, 3.0, 0.0));
 		addSlider(level3ParamPosition, module, Mix4::LEVEL3_PARAM, module->_channel3.rms);
 		addParam(ParamWidget::create<Knob16>(pan3ParamPosition, module, Mix4::PAN3_PARAM, -1.0, 1.0, 0.0));
-		addParam(ParamWidget::create<MuteButton>(mute3ParamPosition, module, Mix4::MUTE3_PARAM, 0.0, 1.0, 0.0));
+		addParam(ParamWidget::create<SoloMuteButton>(mute3ParamPosition, module, Mix4::MUTE3_PARAM, 0.0, 3.0, 0.0));
 		addSlider(level4ParamPosition, module, Mix4::LEVEL4_PARAM, module->_channel4.rms);
 		addParam(ParamWidget::create<Knob16>(pan4ParamPosition, module, Mix4::PAN4_PARAM, -1.0, 1.0, 0.0));
-		addParam(ParamWidget::create<MuteButton>(mute4ParamPosition, module, Mix4::MUTE4_PARAM, 0.0, 1.0, 0.0));
+		addParam(ParamWidget::create<SoloMuteButton>(mute4ParamPosition, module, Mix4::MUTE4_PARAM, 0.0, 3.0, 0.0));
 		addSlider(mixParamPosition, module, Mix4::MIX_PARAM, module->_rmsLevel);
 		addParam(ParamWidget::create<MuteButton>(mixMuteParamPosition, module, Mix4::MIX_MUTE_PARAM, 0.0, 1.0, 0.0));
 
