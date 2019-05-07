@@ -2,13 +2,13 @@
 ** May 7th, 2019
 - fix plugin detection in Cakewalk by BandLab (64bit)
 - implement horizontal scroll lock (hold shift key)
-+ update BogAudio.*             0.6.13 => 0.6.14
-+ add module BogAudio.AddrSeq
-+ add module BogAudio.EightOne
-+ add module BogAudio.OneEight
-+ add module BogAudio.Walk
-+ add module BogAudio.Walk2
-+ add module bsp.BeatFreq
+- update Bogaudio.*             0.6.13 => 0.6.14
+- add module Bogaudio.AddrSeq
+- add module Bogaudio.EightOne
+- add module Bogaudio.OneEight
+- add module Bogaudio.Walk
+- add module Bogaudio.Walk2
+- add module bsp.BeatFreq
 
 
 ** May 5th, 2019
@@ -289,11 +289,11 @@
 - update module AS.Phaser
 - add module AS.TriggersMKIII
 - add module AS.ReScale
-- remove module BogAudio.RM
-- add module BogAudio.AD
-- add module BogAudio.AMRM
-- add module BogAudio.Matrix88
-- add module BogAudio.UMix
+- remove module Bogaudio.RM
+- add module Bogaudio.AD
+- add module Bogaudio.AMRM
+- add module Bogaudio.Matrix88
+- add module Bogaudio.UMix
 - update module LindenbergResearch.QuickMix
 - update module LindenbergResearch.MS20VCF
 - add module LindenbergResearch.BlankPanelWood
