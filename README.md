@@ -75,7 +75,9 @@ Here are some demo videos of it:
  - https://vimeo.com/288076107 (tuned delay line ambient pad drone)
  - https://vimeo.com/288594338 (RMS filter/pwm envelope follower + compressor demo)
  - https://vimeo.com/288968750 (DownSampler module)
+ - https://youtu.be/kY34pojMdg4 (VeeSee Modular Synth - Drone Improvisation Session, by HiEnergyMusic)
  - https://youtu.be/XTpLfcz-6Vo (a complete "one synth challenge" type track with 23 instances)
+ - https://youtu.be/M0PrZA265Ag (Making a track with VeeSeeVST Rack VST in Ableton (VCV Rack port), by VCV Rack Ideas)
  - https://youtu.be/R5npTzoZgzw (quick demo of the Core.ParamProxy module)
 
 
