@@ -35,7 +35,7 @@ jobs:
           mkdir build && cd build
           conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Release
           cmake -DCMAKE_BUILD_TYPE=Release ..
-          make -j
+          VERBOSE=1 make -j
         displayName: build VCVRack
   - job: MacOS1014
     pool:
@@ -61,7 +61,7 @@ jobs:
           mkdir build && cd build
           conan install .. -s build_type=Release --build=missing
           cmake -DCMAKE_BUILD_TYPE=Release ..
-          make -j
+          VERBOSE=1 make -j
         displayName: build VCVRack
   - job: Windows2016
     pool:
