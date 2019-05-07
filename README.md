@@ -55,8 +55,6 @@
 
 - The idle detection is enabled by default. A side effect of this is that e.g. sequencer modules will not play while the plugin is idle. Please turn off the idle detection in the toolbar menu (set it to "Always Active") in this case. Since some of the UI handling is tied to the engine, certain widgets (typically buttons, e.g. the waveform selector in the Macro Oscillator module) will not work while the plugin is idle. Play some notes (or turn off the idle detection) in this case.
 
-- The binary releases come with 828 precompiled modules.
-
 - To make the Linux version work in a [VirtualBox](https://www.virtualbox.org/) VM, the `fbo` and `fbo_shared` options in `settings.json` have to be set to `false`
 
 
