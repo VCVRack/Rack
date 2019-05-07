@@ -37,14 +37,14 @@ target_compile_definitions(${RACK_APP} PRIVATE VERSION=${RACK_BUILD_VERSION})
 
 if (MSVC)
   target_compile_definitions(${RACK_APP} PRIVATE _CRT_SECURE_NO_WARNINGS _USE_MATH_DEFINES ARCH_WIN)
-else ()
-  set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -rdynamic)
 endif ()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
    target_compile_definitions(${RACK_APP} PRIVATE ARCH_LIN)
+   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -rdynamic)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
    target_compile_definitions(${RACK_APP} PRIVATE ARCH_MAC)
+   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -export_dynamic)
 endif ()
 
 target_include_directories(${RACK_APP} PRIVATE include)
