@@ -63,7 +63,30 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release ..
           VERBOSE=1 make -j
         displayName: build VCVRack
-  - job: Windows2016
+  - job: MinGW
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+         versionSpec: $(python-version)
+      - script: |
+          python -m pip install --upgrade pip
+          python -m pip install $(conan-pkg)
+          python -m pip install $(cpt-pkg) $(bpt-pkg)
+          conan user
+          conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
+          conan remote add qno https://api.bintray.com/conan/qno/conan-public
+          conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+          mkdir build
+          cd build
+          conan profile list
+          conan install .. -s build_type=Release --profile msys2_mingw --build=missing
+          cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build .
+        displayName: build VCVRack
+
+  - job: VisualStudio
     pool:
       vmImage: vs2017-win2016
     steps:
