@@ -83,41 +83,17 @@ Here are some demo videos of it:
 
 # Add-on modules
 
-The binary distribution contains the following (34) dynamically loaded add-on modules:
- - bsp.AttenuMixer
- - bsp.Bias
- - bsp.DownSampler
- - bsp.Legato
- - bsp.Obxd_VCF
- - bsp.Rescaler
- - bsp.RMS
- - bsp.Scanner
- - bsp.Sway
- - bsp.TunedDelayLine
- - dBiz.dBizBlank
- - dBiz.Contorno
- - dBiz.Chord
- - dBiz.Bene
- - dBiz.Bene2
- - dBiz.BenePads
- - dBiz.DAOSC
- - dBiz.Divider
- - dBiz.DualFilter
- - dBiz.DVCO
- - dBiz.FourSeq
- - dBiz.Multiple
- - dBiz.PerfMixer
- - dBiz.Remix
- - dBiz.SmiX
- - dBiz.SubMix
- - dBiz.SuHa
- - dBiz.Transpose
- - dBiz.TROSC
- - dBiz.Utility
- - dBiz.Util2
- - dBiz.VCA530
- - dBiz.Verbo
- - Template_shared.MyModule
+The binary distribution contains the following (10) core modules:
+ - Core.AudioInterface
+ - Core.AudioInterface
+ - Core.MIDIToCVInterface
+ - Core.QuadMIDIToCVInterface
+ - Core.MIDICCToCVInterface
+ - Core.MIDITriggerToCVInterface
+ - Core.Blank
+ - Core.Notes
+ - Core.ParamProxy
+ - Core.HalfNotes
 
 
 The following (804) add-on modules are statically linked with the VST plugin:
@@ -387,16 +363,6 @@ The following (804) add-on modules are statically linked with the VST plugin:
  - com-soundchasing-stochasm.Resonator
  - computerscare.ComputerscareDebug
  - computerscare.ComputerscarePatchSequencer
- - Core.AudioInterface
- - Core.AudioInterface
- - Core.MIDIToCVInterface
- - Core.QuadMIDIToCVInterface
- - Core.MIDICCToCVInterface
- - Core.MIDITriggerToCVInterface
- - Core.Blank
- - Core.Notes
- - Core.ParamProxy
- - Core.HalfNotes
  - DHE-Modules.BoosterStage
  - DHE-Modules.Cubic
  - DHE-Modules.Hostage
@@ -925,6 +891,43 @@ The following (804) add-on modules are statically linked with the VST plugin:
  - Valley.Plateau
  - Valley.Amalgam
  - Valley.Interzone
+
+
+These (34) add-on / plugin modules can be loaded dynamically:
+ - bsp.AttenuMixer
+ - bsp.Bias
+ - bsp.DownSampler
+ - bsp.Legato
+ - bsp.Obxd_VCF
+ - bsp.Rescaler
+ - bsp.RMS
+ - bsp.Scanner
+ - bsp.Sway
+ - bsp.TunedDelayLine
+ - dBiz.dBizBlank
+ - dBiz.Contorno
+ - dBiz.Chord
+ - dBiz.Bene
+ - dBiz.Bene2
+ - dBiz.BenePads
+ - dBiz.DAOSC
+ - dBiz.Divider
+ - dBiz.DualFilter
+ - dBiz.DVCO
+ - dBiz.FourSeq
+ - dBiz.Multiple
+ - dBiz.PerfMixer
+ - dBiz.Remix
+ - dBiz.SmiX
+ - dBiz.SubMix
+ - dBiz.SuHa
+ - dBiz.Transpose
+ - dBiz.TROSC
+ - dBiz.Utility
+ - dBiz.Util2
+ - dBiz.VCA530
+ - dBiz.Verbo
+ - Template_shared.MyModule
 
 
 # License
