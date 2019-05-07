@@ -320,10 +320,10 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Bogaudio.TwentyTwoHP
  - Bogaudio.TwentyFiveHP
  - Bogaudio.ThirtyHP
- - BogAudio.AD
- - BogAudio.AMRM
- - BogAudio.Matrix88
- - BogAudio.UMix
+ - Bogaudio.AD
+ - Bogaudio.AMRM
+ - Bogaudio.Matrix88
+ - Bogaudio.UMix
  - Bogaudio.AnalyzerXL
  - Bogaudio.Blank3
  - Bogaudio.Blank6
@@ -335,11 +335,11 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Bogaudio.Nsgt
  - Bogaudio.Pressor
  - Bogaudio.Slew
- - BogAudio.AddrSeq
- - BogAudio.EightOne
- - BogAudio.OneEight
- - BogAudio.Walk
- - BogAudio.Walk2
+ - Bogaudio.AddrSeq
+ - Bogaudio.EightOne
+ - Bogaudio.OneEight
+ - Bogaudio.Walk
+ - Bogaudio.Walk2
  - CastleRocktronics.Cubefader
  - cf.trSEQ
  - cf.LEDSEQ
