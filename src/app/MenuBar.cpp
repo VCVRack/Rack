@@ -484,6 +484,10 @@ struct ManageItem : ui::MenuItem {
 
 struct SyncItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
+		std::thread t([=]() {
+			plugin::syncUpdates();
+		});
+		t.detach();
 	}
 };
 
@@ -583,6 +587,7 @@ struct PluginsMenu : ui::Menu {
 
 			SyncItem *syncItem = new SyncItem;
 			syncItem->text = "Update all";
+			syncItem->disabled = plugin::updates.empty();
 			addChild(syncItem);
 
 			if (!plugin::updates.empty()) {
@@ -592,7 +597,7 @@ struct PluginsMenu : ui::Menu {
 				updatesLabel->text = "Updates (click for changelog)";
 				addChild(updatesLabel);
 
-				for (plugin::Update &update : plugin::updates) {
+				for (const plugin::Update &update : plugin::updates) {
 					UpdateItem *updateItem = new UpdateItem;
 					updateItem->text = update.pluginSlug;
 					plugin::Plugin *p = plugin::getPlugin(update.pluginSlug);

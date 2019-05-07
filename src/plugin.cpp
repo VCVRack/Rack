@@ -157,40 +157,7 @@ static bool loadPlugin(std::string path) {
 	return true;
 }
 
-static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
-	// Check that "status" is "available"
-	json_t *statusJ = json_object_get(manifestJ, "status");
-	if (!statusJ) {
-		return false;
-	}
-	std::string status = json_string_value(statusJ);
-	if (status != "available") {
-		return false;
-	}
-
-	// Get latest version
-	json_t *latestVersionJ = json_object_get(manifestJ, "latestVersion");
-	if (!latestVersionJ) {
-		WARN("Could not get latest version of plugin %s", slug.c_str());
-		return false;
-	}
-	std::string latestVersion = json_string_value(latestVersionJ);
-
-	// Check whether we already have a plugin with the same slug and version
-	Plugin *plugin = getPlugin(slug);
-	if (plugin && plugin->version == latestVersion) {
-		return false;
-	}
-
-	json_t *nameJ = json_object_get(manifestJ, "name");
-	std::string name;
-	if (nameJ) {
-		name = json_string_value(nameJ);
-	}
-	else {
-		name = slug;
-	}
-
+static bool syncPlugin(std::string slug, std::string version) {
 #if defined ARCH_WIN
 	std::string arch = "win";
 #elif ARCH_MAC
@@ -199,45 +166,26 @@ static bool syncPlugin(std::string slug, json_t *manifestJ, bool dryRun) {
 	std::string arch = "lin";
 #endif
 
-	std::string downloadUrl;
-	downloadUrl = app::API_URL;
+	std::string downloadUrl = app::API_URL;
 	downloadUrl += "/download";
-	if (dryRun) {
-		downloadUrl += "/available";
-	}
 	downloadUrl += "?token=" + network::encodeUrl(settings::token);
 	downloadUrl += "&slug=" + network::encodeUrl(slug);
-	downloadUrl += "&version=" + network::encodeUrl(latestVersion);
+	downloadUrl += "&version=" + network::encodeUrl(version);
 	downloadUrl += "&arch=" + network::encodeUrl(arch);
 
-	if (dryRun) {
-		// Check if available
-		json_t *availableResJ = network::requestJson(network::GET, downloadUrl, NULL);
-		if (!availableResJ) {
-			WARN("Could not check whether download is available");
-			return false;
-		}
-		DEFER({
-			json_decref(availableResJ);
-		});
-		json_t *successJ = json_object_get(availableResJ, "success");
-		return json_boolean_value(successJ);
-	}
-	else {
-		downloadName = name;
-		downloadProgress = 0.0;
-		INFO("Downloading plugin %s %s %s", slug.c_str(), latestVersion.c_str(), arch.c_str());
+	// downloadName = name;
+	downloadProgress = 0.0;
+	INFO("Downloading plugin %s %s %s", slug.c_str(), version.c_str(), arch.c_str());
 
-		// Download zip
-		std::string pluginDest = asset::user("plugins/" + slug + ".zip");
-		if (!network::requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
-			WARN("Plugin %s download was unsuccessful", slug.c_str());
-			return false;
-		}
-
-		downloadName = "";
-		return true;
+	// Download zip
+	std::string pluginDest = asset::user("plugins/" + slug + ".zip");
+	if (!network::requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
+		WARN("Plugin %s download was unsuccessful", slug.c_str());
+		return false;
 	}
+
+	// downloadName = "";
+	return true;
 }
 
 static void loadPlugins(std::string path) {
@@ -519,50 +467,16 @@ void queryUpdates() {
 	}
 }
 
-void sync() {
-#if 0
+void syncUpdates() {
 	if (settings::token.empty())
-		return false;
+		return;
 
-	if (!dryRun) {
-		downloadProgress = 0.0;
-		downloadName = "Updating plugins...";
+	downloadProgress = 0.0;
+	downloadName = "Updating plugins...";
+
+	for (const Update &update : updates) {
+		syncPlugin(update.pluginSlug, update.version);
 	}
-
-	// Check each plugin in list of plugin slugs
-	json_t *pluginsJ = json_object_get(pluginsResJ, "plugins");
-	if (!pluginsJ) {
-		WARN("No plugins array");
-		return false;
-	}
-	json_t *manifestsJ = json_object_get(manifestsResJ, "manifests");
-	if (!manifestsJ) {
-		WARN("No manifests object");
-		return false;
-	}
-
-	size_t slugIndex;
-	json_t *slugJ;
-	json_array_foreach(pluginsJ, slugIndex, slugJ) {
-		std::string slug = json_string_value(slugJ);
-		// Search for slug in manifests
-		const char *manifestSlug;
-		json_t *manifestJ = NULL;
-		json_object_foreach(manifestsJ, manifestSlug, manifestJ) {
-			if (slug == std::string(manifestSlug))
-				break;
-		}
-
-		if (!manifestJ)
-			continue;
-
-		if (syncPlugin(slug, manifestJ, dryRun)) {
-			available = true;
-		}
-	}
-
-	return available;
-#endif
 }
 
 void cancelDownload() {
