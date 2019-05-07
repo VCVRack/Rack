@@ -81,7 +81,7 @@ Here are some demo videos of it:
  - https://youtu.be/R5npTzoZgzw (quick demo of the Core.ParamProxy module)
 
 
-# Add-on modules
+# Modules
 
 The binary distribution contains the following (10) core modules:
  - Core.AudioInterface
