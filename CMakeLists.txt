@@ -47,7 +47,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
    set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -rdynamic)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
    target_compile_definitions(${RACK_APP} PRIVATE ARCH_MAC)
-   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -export_dynamic "-undefined dynamic_lookup")
+   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS "-export_dynamic -undefined dynamic_lookup")
 endif ()
 
 target_include_directories(${RACK_APP} PRIVATE include)
