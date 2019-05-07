@@ -140,7 +140,12 @@ void ScrollWidget::onMouseMove(EventMouseMove &e) {
 }
 
 void ScrollWidget::onScroll(EventScroll &e) {
-	offset = offset.minus(e.scrollRel);
+   if(windowIsShiftPressed()) {
+      offset.x -= e.scrollRel.x;
+   }
+   else {
+      offset = offset.minus(e.scrollRel);
+   }
 	e.consumed = true;
 }
 
