@@ -369,6 +369,13 @@ void init() {
 		extractZip(fundamentalSrc.c_str(), pluginsDir.c_str());
 		loadPlugin(fundamentalDir);
 	}
+
+	// TEMP
+	// Sync in a detached thread
+	std::thread t([]{
+		queryUpdates();
+	});
+	t.detach();
 }
 
 void destroy() {
@@ -427,9 +434,10 @@ void logOut() {
 	settings::token = "";
 }
 
-void query() {
+void queryUpdates() {
 	if (settings::token.empty())
 		return;
+	updates.clear();
 
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
@@ -464,16 +472,51 @@ void query() {
 		json_decref(manifestsResJ);
 	});
 
-	json_dumpf(pluginsResJ, stderr, JSON_INDENT(2));
-	json_dumpf(manifestsResJ, stderr, JSON_INDENT(2));
+	json_t *manifestsJ = json_object_get(manifestsResJ, "manifests");
+	json_t *pluginsJ = json_object_get(pluginsResJ, "plugins");
+
+	size_t pluginIndex;
+	json_t *pluginJ;
+	json_array_foreach(pluginsJ, pluginIndex, pluginJ) {
+		Update update;
+		// Get plugin manifest
+		update.pluginSlug = json_string_value(pluginJ);
+		json_t *manifestJ = json_object_get(manifestsJ, update.pluginSlug.c_str());
+		if (!manifestJ) {
+			WARN("VCV account has plugin %s but no manifest was found", update.pluginSlug.c_str());
+			continue;
+		}
+
+		// Get version
+		// TODO Change this to "version" when API changes
+		json_t *versionJ = json_object_get(manifestJ, "latestVersion");
+		if (!versionJ) {
+			WARN("Plugin %s has no version in manifest", update.pluginSlug.c_str());
+			continue;
+		}
+		update.version = json_string_value(versionJ);
+
+		// Check status
+		json_t *statusJ = json_object_get(manifestJ, "status");
+		if (!statusJ)
+			continue;
+		std::string status = json_string_value(statusJ);
+		if (status != "available")
+			continue;
+
+		// Check if update is needed
+		Plugin *p = getPlugin(update.pluginSlug);
+		if (p && p->version == update.version)
+			continue;
+
+		updates.push_back(update);
+	}
 }
 
 void sync() {
 #if 0
 	if (settings::token.empty())
 		return false;
-
-	bool available = false;
 
 	if (!dryRun) {
 		downloadProgress = 0.0;
@@ -654,6 +697,7 @@ bool isSlugValid(const std::string &slug) {
 std::vector<Plugin*> plugins;
 
 std::string loginStatus;
+std::vector<Update> updates;
 float downloadProgress = 0.f;
 std::string downloadName;
 

@@ -562,24 +562,38 @@ struct PluginsMenu : ui::Menu {
 	void refresh() {
 		clearChildren();
 
-		if (0) {
-			ui::ProgressBar *downloadProgressBar = new ui::ProgressBar;
-			downloadProgressBar->quantity = new DownloadQuantity;
-			addChild(downloadProgressBar);
-		}
-		else if (plugin::isLoggedIn()) {
+		if (plugin::isLoggedIn()) {
 			ManageItem *manageItem = new ManageItem;
 			manageItem->text = "Manage";
 			addChild(manageItem);
 
-			SyncItem *syncItem = new SyncItem;
-			syncItem->text = "Update all";
-			syncItem->disabled = true;
-			addChild(syncItem);
-
 			LogOutItem *logOutItem = new LogOutItem;
 			logOutItem->text = "Log out";
 			addChild(logOutItem);
+
+			SyncItem *syncItem = new SyncItem;
+			syncItem->text = "Update all";
+			addChild(syncItem);
+
+			if (!plugin::updates.empty()) {
+				addChild(new ui::MenuEntry);
+
+				ui::MenuLabel *updatesLabel = new ui::MenuLabel;
+				updatesLabel->text = "Updates";
+				addChild(updatesLabel);
+
+				for (plugin::Update &update : plugin::updates) {
+					ui::MenuItem *updateItem = new ui::MenuItem;
+					updateItem->disabled = true;
+					updateItem->text = update.pluginSlug;
+					plugin::Plugin *p = plugin::getPlugin(update.pluginSlug);
+					if (p) {
+						updateItem->rightText += "v" + p->version + " → ";
+					}
+					updateItem->rightText += "v" + update.version;
+					addChild(updateItem);
+				}
+			}
 		}
 		else {
 			RegisterItem *registerItem = new RegisterItem;
