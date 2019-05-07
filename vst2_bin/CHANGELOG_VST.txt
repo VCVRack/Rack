@@ -9,6 +9,8 @@
 - add module Bogaudio.Walk
 - add module Bogaudio.Walk2
 - add module bsp.BeatFreq
+- fix crash in module FrozenWasteland.BPMLFO
+- fix crash in module FrozenWasteland.BPMLFO2
 
 
 ** May 5th, 2019
