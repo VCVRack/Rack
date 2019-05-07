@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(RACK_APP rack)
 
+set(MAC_OS_VERSION_MIN "-mmacosx-version-min=10.7")
+
 set(RACK_GIT_REV "UNKNOWN")
 
 find_package(Git)
@@ -43,8 +45,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
    target_compile_definitions(${RACK_APP} PRIVATE ARCH_LIN)
    set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -rdynamic)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-   target_compile_definitions(${RACK_APP} PRIVATE ARCH_MAC)
-   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -export_dynamic)
+   target_compile_definitions(${RACK_APP} PRIVATE ARCH_MAC ${MAC_OS_VERSION_MIN})
+   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -export_dynamic "-undefined dynamic_lookup" ${MAC_OS_VERSION_MIN})
 endif ()
 
 target_include_directories(${RACK_APP} PRIVATE include)
