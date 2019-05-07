@@ -103,7 +103,7 @@ struct LowFrequencyOscillator {
 	SchmittTrigger clockTrigger,resetTrigger,holdTrigger;
 	float divisions[DIVISIONS] = {1/64.0f,1/32.0f,1/16.0f,1/13.0f,1/11.0f,1/8.0f,1/7.0f,1/6.0f,1/5.0f,1/4.0f,1/3.0f,1/2.0f,1/1.5f,1,1.5,2,3,4,5,6,7,8,11,13,16,32,64};
 	const char* divisionNames[DIVISIONS] = {"/64","/32","/16","/13","/11","/8","/7","/6","/5","/4","/3","/2","/1.5","x 1","x 1.5","x 2","x 3","x 4","x 5","x 6","x 7","x 8","x 11","x 13","x 16","x 32","x 64"};
-	int division;
+	int division = 0;
 	float time = 0.0;
 	float duration = 0;
 	bool holding = false;
@@ -231,7 +231,6 @@ struct BPMLFOProgressDisplay : TransparentWidget {
 		nvgFontSize(vg, 28);
 		nvgFontFaceId(vg, font->handle);
 		nvgTextLetterSpacing(vg, -2);
-
 		nvgFillColor(vg, nvgRGBA(0x00, 0xff, 0x00, 0xff));
 		char text[128];
 		snprintf(text, sizeof(text), "%s", module->divisionNames[division]);
@@ -239,7 +238,6 @@ struct BPMLFOProgressDisplay : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
-		
 		drawProgress(vg,module->oscillator.progress());
 		drawDivision(vg, Vec(0, box.size.y - 153), module->division);
 	}
@@ -251,7 +249,7 @@ struct BPMLFOWidget : ModuleWidget {
 
 BPMLFOWidget::BPMLFOWidget(BPMLFO *module) : ModuleWidget(module) {
 	box.size = Vec(15*10, RACK_GRID_HEIGHT);
-	
+
 	{
 		SVGPanel *panel = new SVGPanel();
 		panel->box.size = box.size;

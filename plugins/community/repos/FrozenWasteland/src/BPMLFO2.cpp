@@ -108,7 +108,7 @@ struct LowFrequencyOscillator {
 	SchmittTrigger clockTrigger,resetTrigger,holdTrigger;
 	float divisions[DIVISIONS] = {1/64.0f,1/32.0f,1/16.0f,1/13.0f,1/11.0f,1/8.0f,1/7.0f,1/6.0f,1/5.0f,1/4.0f,1/3.0f,1/2.0f,1/1.5f,1,1.5f,2,3,4,5,6,7,8,11,13,16,32,64};
 	const char* divisionNames[DIVISIONS] = {"/64","/32","/16","/13","/11","/8","/7","/6","/5","/4","/3","/2","/1.5","x 1","x 1.5","x 2","x 3","x 4","x 5","x 6","x 7","x 8","x 11","x 13","x 16","x 32","x 64"};
-	int division;
+	int division = 0;
 	float time = 0.0;
 	float duration = 0;
 	float waveshape = 0;

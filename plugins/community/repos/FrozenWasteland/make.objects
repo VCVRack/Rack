@@ -3,7 +3,6 @@ ALL_OBJ= \
 	src/BPMLFO2.o \
 	src/CDCSeriouslySlowLFO.o \
 	src/DamianLillard.o \
-	src/dsp/noise.o \
 	src/dsp-filter/third-party/falco/DspFilter.o \
 	src/dsp-filter/utils/AudioMath.o \
 	src/dsp-noise/noise.o \
