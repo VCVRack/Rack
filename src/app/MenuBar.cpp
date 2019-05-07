@@ -487,6 +487,16 @@ struct SyncItem : ui::MenuItem {
 	}
 };
 
+struct UpdateItem : ui::MenuItem {
+	std::string changelogUrl;
+	void onAction(const event::Action &e) override {
+		std::thread t([=]() {
+			system::openBrowser(changelogUrl);
+		});
+		t.detach();
+	}
+};
+
 #if 0
 struct SyncButton : ui::Button {
 	bool checked = false;
@@ -579,18 +589,19 @@ struct PluginsMenu : ui::Menu {
 				addChild(new ui::MenuEntry);
 
 				ui::MenuLabel *updatesLabel = new ui::MenuLabel;
-				updatesLabel->text = "Updates";
+				updatesLabel->text = "Updates (click for changelog)";
 				addChild(updatesLabel);
 
 				for (plugin::Update &update : plugin::updates) {
-					ui::MenuItem *updateItem = new ui::MenuItem;
-					updateItem->disabled = true;
+					UpdateItem *updateItem = new UpdateItem;
 					updateItem->text = update.pluginSlug;
 					plugin::Plugin *p = plugin::getPlugin(update.pluginSlug);
 					if (p) {
 						updateItem->rightText += "v" + p->version + " → ";
 					}
 					updateItem->rightText += "v" + update.version;
+					updateItem->changelogUrl = update.changelogUrl;
+					updateItem->disabled = update.changelogUrl.empty();
 					addChild(updateItem);
 				}
 			}

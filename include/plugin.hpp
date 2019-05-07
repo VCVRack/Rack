@@ -17,6 +17,7 @@ namespace plugin {
 struct Update {
 	std::string pluginSlug;
 	std::string version;
+	std::string changelogUrl;
 };
 
 

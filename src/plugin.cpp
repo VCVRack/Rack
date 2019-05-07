@@ -496,6 +496,11 @@ void queryUpdates() {
 		}
 		update.version = json_string_value(versionJ);
 
+		// Check if update is needed
+		Plugin *p = getPlugin(update.pluginSlug);
+		if (p && p->version == update.version)
+			continue;
+
 		// Check status
 		json_t *statusJ = json_object_get(manifestJ, "status");
 		if (!statusJ)
@@ -504,10 +509,11 @@ void queryUpdates() {
 		if (status != "available")
 			continue;
 
-		// Check if update is needed
-		Plugin *p = getPlugin(update.pluginSlug);
-		if (p && p->version == update.version)
-			continue;
+		// Get changelog URL
+		json_t *changelogUrlJ = json_object_get(manifestJ, "changelogUrl");
+		if (changelogUrlJ) {
+			update.changelogUrl = json_string_value(changelogUrlJ);
+		}
 
 		updates.push_back(update);
 	}
