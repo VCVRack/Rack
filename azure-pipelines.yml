@@ -78,17 +78,7 @@ jobs:
           conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
           conan remote add qno https://api.bintray.com/conan/qno/conan-public
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-          conan profile new mingw
-          conan profile update settings.os=Windows mingw
-          conan profile update settings.os_build=Windows mingw
-          conan profile update settings.arch=x86_64 mingw
-          conan profile update settings.arch_build=x86_64 mingw
-          conan profile update settings.compiler=gcc mingw
-          conan profile update settings.compiler.version=8.1 mingw
-          conan profile update settings.compiler.exception=seh mingw
-          conan profile update settings.compiler.libcxx=libstdc++11 mingw
-          conan profile update settings.compiler.threads=posix mingw
-          conan profile update settings.build_type=Release mingw
+          copy conan_profile_mingw8.1 "%HOMEPATH%\.conan\profiles\mingw"
           mkdir build
           cd build
           conan install .. -s build_type=Release --profile mingw --build=missing
