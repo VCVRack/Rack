@@ -1682,7 +1682,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
 #ifdef VST2_OPCODE_DEBUG
    Dprintf("vstrack_plugin: called VSTPluginDispatcher(%d) (%s)\n", opCode, vst2_opcode_names[opCode]);
 #else
-   Dprintf("vstrack_plugin: called VSTPluginDispatcher(%d)\n", opCode);
+   // Dprintf("vstrack_plugin: called VSTPluginDispatcher(%d)\n", opCode);
 #endif // VST2_OPCODE_DEBUG
 
    VstIntPtr r = 0;
