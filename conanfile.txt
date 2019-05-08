@@ -11,7 +11,7 @@ Pffft/latest@qno/testing
 #OpenSSL/1.1.1b@conan/stable
 OpenSSL/1.0.2r@conan/stable
 
-jansson/2.11@bincrafters/stable
+jansson/2.12@bincrafters/stable
 #libcurl/7.64.1@bincrafters/stable
 libcurl/7.61.1@bincrafters/stable
 libzip/1.5.1@bincrafters/stable
