@@ -403,7 +403,7 @@ void Window::run() {
 	}
 }
 
-void Window::screenshot() {
+void Window::screenshot(float zoom) {
 	// Iterate plugins and create directories
 	std::string screenshotsDir = asset::user("screenshots");
 	system::createDirectory(screenshotsDir);
@@ -421,7 +421,6 @@ void Window::screenshot() {
 			app::ModuleWidget *mw = model->createModuleWidgetNull();
 			widget::FramebufferWidget *fb = new widget::FramebufferWidget;
 			fb->addChild(mw);
-			float zoom = 2.f;
 			fb->scale = math::Vec(zoom, zoom);
 
 			// Draw to framebuffer

@@ -99,7 +99,7 @@ struct Window {
 	~Window();
 	void run();
 	/** Takes a screenshot of each module */
-	void screenshot();
+	void screenshot(float zoom);
 	void close();
 	void cursorLock();
 	void cursorUnlock();

@@ -58,11 +58,12 @@ int main(int argc, char *argv[]) {
 
 	std::string patchPath;
 	bool screenshot = false;
+	float screenshotZoom = 1.f;
 
 	// Parse command line arguments
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "dhps:u:")) != -1) {
+	while ((c = getopt(argc, argv, "dhp:s:u:")) != -1) {
 		switch (c) {
 			case 'd': {
 				settings::devMode = true;
@@ -72,6 +73,7 @@ int main(int argc, char *argv[]) {
 			} break;
 			case 'p': {
 				screenshot = true;
+				sscanf(optarg, "%f", &screenshotZoom);
 			} break;
 			case 's': {
 				asset::systemDir = optarg;
@@ -163,7 +165,7 @@ int main(int argc, char *argv[]) {
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 	else if (screenshot) {
-		APP->window->screenshot();
+		APP->window->screenshot(screenshotZoom);
 	}
 	else {
 		INFO("Running window");
