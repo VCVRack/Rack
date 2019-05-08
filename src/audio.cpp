@@ -10,14 +10,14 @@ namespace audio {
 
 
 Port::Port() {
-	setDriver(RtAudio::UNSPECIFIED);
+	setDriverId(RtAudio::UNSPECIFIED);
 }
 
 Port::~Port() {
 	closeStream();
 }
 
-std::vector<int> Port::getDrivers() {
+std::vector<int> Port::getDriverIds() {
 	std::vector<RtAudio::Api> apis;
 	RtAudio::getCompiledApi(apis);
 	std::vector<int> drivers;
@@ -29,8 +29,8 @@ std::vector<int> Port::getDrivers() {
 	return drivers;
 }
 
-std::string Port::getDriverName(int driver) {
-	switch (driver) {
+std::string Port::getDriverName(int driverId) {
+	switch (driverId) {
 		case RtAudio::UNSPECIFIED: return "Unspecified";
 		case RtAudio::LINUX_ALSA: return "ALSA";
 		case RtAudio::LINUX_PULSE: return "PulseAudio";
@@ -46,24 +46,24 @@ std::string Port::getDriverName(int driver) {
 	}
 }
 
-void Port::setDriver(int driver) {
+void Port::setDriverId(int driverId) {
 	// Close device
-	setDevice(-1, 0);
+	setDeviceId(-1, 0);
 
 	// Close driver
 	if (rtAudio) {
 		delete rtAudio;
 		rtAudio = NULL;
 	}
-	this->driver = 0;
+	this->driverId = 0;
 
 	// Open driver
-	if (driver >= 0) {
-		rtAudio = new RtAudio((RtAudio::Api) driver);
-		this->driver = (int) rtAudio->getCurrentApi();
+	if (driverId >= 0) {
+		rtAudio = new RtAudio((RtAudio::Api) driverId);
+		this->driverId = (int) rtAudio->getCurrentApi();
 	}
-	else if (driver == BRIDGE_DRIVER) {
-		this->driver = BRIDGE_DRIVER;
+	else if (driverId == BRIDGE_DRIVER) {
+		this->driverId = BRIDGE_DRIVER;
 	}
 }
 
@@ -71,24 +71,24 @@ int Port::getDeviceCount() {
 	if (rtAudio) {
 		return rtAudio->getDeviceCount();
 	}
-	else if (driver == BRIDGE_DRIVER) {
+	else if (driverId == BRIDGE_DRIVER) {
 		return BRIDGE_NUM_PORTS;
 	}
 	return 0;
 }
 
-bool Port::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
+bool Port::getDeviceInfo(int deviceId, RtAudio::DeviceInfo *deviceInfo) {
 	if (!deviceInfo)
 		return false;
 
 	if (rtAudio) {
-		if (device == this->device) {
+		if (deviceId == this->deviceId) {
 			*deviceInfo = this->deviceInfo;
 			return true;
 		}
 		else {
 			try {
-				*deviceInfo = rtAudio->getDeviceInfo(device);
+				*deviceInfo = rtAudio->getDeviceInfo(deviceId);
 				return true;
 			}
 			catch (RtAudioError &e) {
@@ -100,43 +100,43 @@ bool Port::getDeviceInfo(int device, RtAudio::DeviceInfo *deviceInfo) {
 	return false;
 }
 
-int Port::getDeviceChannels(int device) {
-	if (device < 0)
+int Port::getDeviceChannels(int deviceId) {
+	if (deviceId < 0)
 		return 0;
 
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
-		if (getDeviceInfo(device, &deviceInfo))
+		if (getDeviceInfo(deviceId, &deviceInfo))
 			return std::max((int) deviceInfo.inputChannels, (int) deviceInfo.outputChannels);
 	}
-	else if (driver == BRIDGE_DRIVER) {
+	else if (driverId == BRIDGE_DRIVER) {
 		return std::max(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
 	}
 	return 0;
 }
 
-std::string Port::getDeviceName(int device) {
-	if (device < 0)
+std::string Port::getDeviceName(int deviceId) {
+	if (deviceId < 0)
 		return "";
 
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
-		if (getDeviceInfo(device, &deviceInfo))
+		if (getDeviceInfo(deviceId, &deviceInfo))
 			return deviceInfo.name;
 	}
-	else if (driver == BRIDGE_DRIVER) {
-		return string::f("%d", device + 1);
+	else if (driverId == BRIDGE_DRIVER) {
+		return string::f("%d", deviceId + 1);
 	}
 	return "";
 }
 
-std::string Port::getDeviceDetail(int device, int offset) {
-	if (device < 0)
+std::string Port::getDeviceDetail(int deviceId, int offset) {
+	if (deviceId < 0)
 		return "";
 
 	if (rtAudio) {
 		RtAudio::DeviceInfo deviceInfo;
-		if (getDeviceInfo(device, &deviceInfo)) {
+		if (getDeviceInfo(deviceId, &deviceInfo)) {
 			std::string deviceDetail = string::f("%s (", deviceInfo.name.c_str());
 			if (offset < (int) deviceInfo.inputChannels)
 				deviceDetail += string::f("%d-%d in", offset + 1, std::min(offset + maxChannels, (int) deviceInfo.inputChannels));
@@ -148,15 +148,15 @@ std::string Port::getDeviceDetail(int device, int offset) {
 			return deviceDetail;
 		}
 	}
-	else if (driver == BRIDGE_DRIVER) {
-		return string::f("Port %d", device + 1);
+	else if (driverId == BRIDGE_DRIVER) {
+		return string::f("Port %d", deviceId + 1);
 	}
 	return "";
 }
 
-void Port::setDevice(int device, int offset) {
+void Port::setDeviceId(int deviceId, int offset) {
 	closeStream();
-	this->device = device;
+	this->deviceId = deviceId;
 	this->offset = offset;
 	openStream();
 }
@@ -164,7 +164,7 @@ void Port::setDevice(int device, int offset) {
 std::vector<int> Port::getSampleRates() {
 	if (rtAudio) {
 		try {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(device);
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
 			std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
 			return sampleRates;
 		}
@@ -218,13 +218,13 @@ static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrame
 }
 
 void Port::openStream() {
-	if (device < 0)
+	if (deviceId < 0)
 		return;
 
 	if (rtAudio) {
 		// Open new device
 		try {
-			deviceInfo = rtAudio->getDeviceInfo(device);
+			deviceInfo = rtAudio->getDeviceInfo(deviceId);
 		}
 		catch (RtAudioError &e) {
 			WARN("Failed to query RtAudio device: %s", e.what());
@@ -237,17 +237,17 @@ void Port::openStream() {
 		setChannels(math::clamp((int) deviceInfo.outputChannels - offset, 0, maxChannels), math::clamp((int) deviceInfo.inputChannels - offset, 0, maxChannels));
 
 		if (numOutputs == 0 && numInputs == 0) {
-			WARN("RtAudio device %d has 0 inputs and 0 outputs", device);
+			WARN("RtAudio device %d has 0 inputs and 0 outputs", deviceId);
 			return;
 		}
 
 		RtAudio::StreamParameters outParameters;
-		outParameters.deviceId = device;
+		outParameters.deviceId = deviceId;
 		outParameters.nChannels = numOutputs;
 		outParameters.firstChannel = offset;
 
 		RtAudio::StreamParameters inParameters;
-		inParameters.deviceId = device;
+		inParameters.deviceId = deviceId;
 		inParameters.nChannels = numInputs;
 		inParameters.firstChannel = offset;
 
@@ -263,7 +263,7 @@ void Port::openStream() {
 		}
 
 		try {
-			INFO("Opening audio RtAudio device %d with %d in %d out", device, numInputs, numOutputs);
+			INFO("Opening audio RtAudio device %d with %d in %d out", deviceId, numInputs, numOutputs);
 			rtAudio->openStream(
 				numOutputs == 0 ? NULL : &outParameters,
 				numInputs == 0 ? NULL : &inParameters,
@@ -276,7 +276,7 @@ void Port::openStream() {
 		}
 
 		try {
-			INFO("Starting RtAudio stream %d", device);
+			INFO("Starting RtAudio stream %d", deviceId);
 			rtAudio->startStream();
 		}
 		catch (RtAudioError &e) {
@@ -288,9 +288,9 @@ void Port::openStream() {
 		this->sampleRate = rtAudio->getStreamSampleRate();
 		onOpenStream();
 	}
-	else if (driver == BRIDGE_DRIVER) {
+	else if (driverId == BRIDGE_DRIVER) {
 		setChannels(BRIDGE_OUTPUTS, BRIDGE_INPUTS);
-		bridgeAudioSubscribe(device, this);
+		bridgeAudioSubscribe(deviceId, this);
 	}
 }
 
@@ -299,7 +299,7 @@ void Port::closeStream() {
 
 	if (rtAudio) {
 		if (rtAudio->isStreamRunning()) {
-			INFO("Stopping RtAudio stream %d", device);
+			INFO("Stopping RtAudio stream %d", deviceId);
 			try {
 				rtAudio->stopStream();
 			}
@@ -308,7 +308,7 @@ void Port::closeStream() {
 			}
 		}
 		if (rtAudio->isStreamOpen()) {
-			INFO("Closing RtAudio stream %d", device);
+			INFO("Closing RtAudio stream %d", deviceId);
 			try {
 				rtAudio->closeStream();
 			}
@@ -318,8 +318,8 @@ void Port::closeStream() {
 		}
 		deviceInfo = RtAudio::DeviceInfo();
 	}
-	else if (driver == BRIDGE_DRIVER) {
-		bridgeAudioUnsubscribe(device, this);
+	else if (driverId == BRIDGE_DRIVER) {
+		bridgeAudioUnsubscribe(deviceId, this);
 	}
 
 	onCloseStream();
@@ -327,8 +327,8 @@ void Port::closeStream() {
 
 json_t *Port::toJson() {
 	json_t *rootJ = json_object();
-	json_object_set_new(rootJ, "driver", json_integer(driver));
-	std::string deviceName = getDeviceName(device);
+	json_object_set_new(rootJ, "driver", json_integer(driverId));
+	std::string deviceName = getDeviceName(deviceId);
 	if (!deviceName.empty())
 		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
 	json_object_set_new(rootJ, "offset", json_integer(offset));
@@ -343,15 +343,15 @@ void Port::fromJson(json_t *rootJ) {
 
 	json_t *driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
-		setDriver(json_number_value(driverJ));
+		setDriverId(json_number_value(driverJ));
 
 	json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
 	if (deviceNameJ) {
 		std::string deviceName = json_string_value(deviceNameJ);
 		// Search for device ID with equal name
-		for (int device = 0; device < getDeviceCount(); device++) {
-			if (getDeviceName(device) == deviceName) {
-				this->device = device;
+		for (int deviceId = 0; deviceId < getDeviceCount(); deviceId++) {
+			if (getDeviceName(deviceId) == deviceName) {
+				this->deviceId = deviceId;
 				break;
 			}
 		}

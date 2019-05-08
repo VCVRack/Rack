@@ -157,7 +157,7 @@ static bool loadPlugin(std::string path) {
 	return true;
 }
 
-static bool syncPlugin(std::string slug, std::string version) {
+static bool syncUpdate(const Update &update) {
 #if defined ARCH_WIN
 	std::string arch = "win";
 #elif ARCH_MAC
@@ -169,18 +169,18 @@ static bool syncPlugin(std::string slug, std::string version) {
 	std::string downloadUrl = app::API_URL;
 	downloadUrl += "/download";
 	downloadUrl += "?token=" + network::encodeUrl(settings::token);
-	downloadUrl += "&slug=" + network::encodeUrl(slug);
-	downloadUrl += "&version=" + network::encodeUrl(version);
+	downloadUrl += "&slug=" + network::encodeUrl(update.pluginSlug);
+	downloadUrl += "&version=" + network::encodeUrl(update.version);
 	downloadUrl += "&arch=" + network::encodeUrl(arch);
 
 	// downloadName = name;
 	downloadProgress = 0.0;
-	INFO("Downloading plugin %s %s %s", slug.c_str(), version.c_str(), arch.c_str());
+	INFO("Downloading plugin %s %s %s", update.pluginSlug.c_str(), update.version.c_str(), arch.c_str());
 
 	// Download zip
-	std::string pluginDest = asset::user("plugins/" + slug + ".zip");
+	std::string pluginDest = asset::user("plugins/" + update.pluginSlug + ".zip");
 	if (!network::requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
-		WARN("Plugin %s download was unsuccessful", slug.c_str());
+		WARN("Plugin %s download was unsuccessful", update.pluginSlug.c_str());
 		return false;
 	}
 
@@ -475,7 +475,7 @@ void syncUpdates() {
 	downloadName = "Updating plugins...";
 
 	for (const Update &update : updates) {
-		syncPlugin(update.pluginSlug, update.version);
+		syncUpdate(update);
 	}
 }
 

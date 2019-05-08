@@ -28,7 +28,7 @@ struct AudioInterfacePort : audio::Port {
 
 	~AudioInterfacePort() {
 		// Close stream here before destructing AudioInterfacePort, so the mutexes are still valid when waiting to close.
-		setDevice(-1, 0);
+		setDeviceId(-1, 0);
 	}
 
 	void processStream(const float *input, float *output, int frames) override {
@@ -227,7 +227,7 @@ struct AudioInterface : Module {
 	}
 
 	void onReset() override {
-		port.setDevice(-1, 0);
+		port.setDeviceId(-1, 0);
 	}
 };
 
