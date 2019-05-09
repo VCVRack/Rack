@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.7)
 # https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
 
-project(VCVRack)
+project(VCVRack CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -38,17 +38,35 @@ add_executable(${RACK_APP} ${SOURCES})
 
 target_compile_definitions(${RACK_APP} PRIVATE VERSION=${RACK_BUILD_VERSION})
 
-if (MSVC)
-  target_compile_definitions(${RACK_APP} PRIVATE _CRT_SECURE_NO_WARNINGS _USE_MATH_DEFINES ARCH_WIN)
+if (MINGW)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+  target_compile_definitions(${RACK_APP} PRIVATE _USE_MATH_DEFINES ARCH_WIN)
+  set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS "-mwindows")
 endif ()
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-   target_compile_definitions(${RACK_APP} PRIVATE ARCH_LIN)
-   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS -rdynamic)
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-   target_compile_definitions(${RACK_APP} PRIVATE ARCH_MAC)
-   set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS "-export_dynamic -undefined dynamic_lookup")
+if (MSVC)
+  # https://docs.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-by-category?view=vs-2019
+  # /O2 /arch:AVX2 --> https://docs.microsoft.com/de-de/cpp/build/reference/arch-x64?view=vs-2019
+  target_compile_definitions(${RACK_APP} PRIVATE _CRT_SECURE_NO_WARNINGS _USE_MATH_DEFINES ARCH_WIN)
+else ()
+  set_target_properties(${RACK_APP} PROPERTIES COMPILE_FLAGS "-march=nocona -funsafe-math-optimizations")
+endif ()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)")
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_definitions(${RACK_APP} PRIVATE ARCH_LIN)
+    set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS "-rdynamic")
+  endif()
+  set_target_properties(${RACK_APP} PROPERTIES COMPILE_FLAGS "-Wall -Wextra -Wno-unused-parameter")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  target_compile_definitions(${RACK_APP} PRIVATE ARCH_MAC)
+  set_target_properties(${RACK_APP} PROPERTIES COMPILE_FLAGS "-Wsuggest-override")
+  set_target_properties(${RACK_APP} PROPERTIES LINK_FLAGS "-export_dynamic -undefined dynamic_lookup")
 endif ()
 
 target_include_directories(${RACK_APP} PRIVATE include)
 conan_target_link_libraries(${RACK_APP})
+
+if (MINGW)
+  target_link_libraries(${RACK_APP} "shlwapi" "imagehlp")
+endif ()
