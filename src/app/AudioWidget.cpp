@@ -33,9 +33,15 @@ struct AudioDriverChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = (!port || box.size.x >= 200.0) ? "Driver: " : "";
-		if (port) {
-			text += port->getDriverName(port->driverId);
+		text = (box.size.x >= 200.0) ? "Driver: " : "";
+		std::string driverName = (port) ? port->getDriverName(port->driverId) : "";
+		if (driverName != "") {
+			text += driverName;
+			color.a = 1.f;
+		}
+		else {
+			text += "(No driver)";
+			color.a = 0.5f;
 		}
 	}
 };
@@ -84,11 +90,15 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = (!port || box.size.x >= 200.0) ? "Device: " : "";
-		if (port) {
-			std::string detail = port->getDeviceDetail(port->deviceId, port->offset);
+		text = (box.size.x >= 200.0) ? "Device: " : "";
+		std::string detail = (port) ? port->getDeviceDetail(port->deviceId, port->offset) : "";
+		if (detail != "") {
 			text += detail;
 			color.a = (detail == "") ? 0.5f : 1.f;
+		}
+		else {
+			text += "(No device)";
+			color.a = 0.5f;
 		}
 	}
 };
@@ -124,9 +134,12 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = (!port || box.size.x >= 100.0) ? "Rate: " : "";
+		text = (box.size.x >= 100.0) ? "Rate: " : "";
 		if (port) {
 			text += string::f("%g kHz", port->sampleRate / 1000.0);
+		}
+		else {
+			text += "0 kHz";
 		}
 	}
 };
@@ -163,9 +176,12 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = (!port || box.size.x >= 100.0) ? "Block size: " : "";
+		text = (box.size.x >= 100.0) ? "Block size: " : "";
 		if (port) {
 			text += string::f("%d", port->blockSize);
+		}
+		else {
+			text += "0";
 		}
 	}
 };
