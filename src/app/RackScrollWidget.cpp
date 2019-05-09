@@ -43,7 +43,7 @@ void RackScrollWidget::step() {
 	math::Rect scrollBox = moduleBox;
 	scrollBox.pos = scrollBox.pos.mult(zoom);
 	scrollBox.size = scrollBox.size.mult(zoom);
-	scrollBox = scrollBox.grow(box.size.div(2));
+	scrollBox = scrollBox.grow(box.size.mult(0.6666));
 
 	// Expand to the current viewport box so that moving modules (and thus changing the module bounding box) doesn't clamp the scroll offset.
 	math::Rect viewportBox;
