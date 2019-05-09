@@ -13,10 +13,15 @@ void init(rack::Plugin *p) {
 	p->manualUrl = "https://vcvrack.com/manual/Core.html";
 	p->sourceUrl = "https://github.com/VCVRack/Rack";
 
-	modelAudioInterface->name = "Audio";
+	modelAudioInterface->name = "Audio 8";
 	modelAudioInterface->description = "Sends audio and CV to/from an audio device";
 	modelAudioInterface->tags = {"External"};
 	p->addModel(modelAudioInterface);
+
+	modelAudioInterface16->name = "Audio 16";
+	modelAudioInterface16->description = "Sends audio and CV to/from an audio device";
+	modelAudioInterface16->tags = {"External"};
+	p->addModel(modelAudioInterface16);
 
 	modelMIDI_CV->name = "MIDI-CV";
 	modelMIDI_CV->description = "Converts MIDI from an external device to CV and gates";
