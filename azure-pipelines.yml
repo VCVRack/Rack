@@ -14,7 +14,7 @@ variables:
 
 jobs:
   # Todo - run Linux build in a container with a more recent Ubuntu version, maybe also try CentOS and Arch builds?
-  - job: Linux
+  - job: LinuxGCC
     pool:
       vmImage: Ubuntu-16.04
     steps:
@@ -34,6 +34,29 @@ jobs:
           pushd .
           mkdir build && cd build
           conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Release
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          VERBOSE=1 make -j
+        displayName: build VCVRack
+  - job: LinuxClang
+    pool:
+      vmImage: Ubuntu-16.04
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+         versionSpec: $(python-version)
+      - script: |
+          export PATH="$PATH:/home/vsts/.local/bin"
+          sudo apt install -y python3-setuptools
+          pip install --user --upgrade pip
+          pip install --user $(conan-pkg)
+          pip install --user $(cpt-pkg) $(bpt-pkg)
+          conan user
+          conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
+          conan remote add qno https://api.bintray.com/conan/qno/conan-public
+          conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+          pushd .
+          mkdir build && cd build
+          conan install .. -s build_type=Release --profile ../conan_profile_linux_clang6.0 --build=missing
           cmake -DCMAKE_BUILD_TYPE=Release ..
           VERBOSE=1 make -j
         displayName: build VCVRack
