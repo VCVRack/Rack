@@ -105,7 +105,7 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           mkdir build
           cd build
-          conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw8.2 --build=missing
+          conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8.1 --build=missing
           cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
           cmake --build .
         displayName: build VCVRack
