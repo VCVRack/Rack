@@ -46,6 +46,8 @@ jobs:
          versionSpec: $(python-version)
       - script: |
           export PATH="$PATH:/home/vsts/.local/bin"
+          export CC=clang-6.0
+          export CXX=clang++-6.0
           sudo apt install -y python3-setuptools
           pip install --user --upgrade pip
           pip install --user $(conan-pkg)
@@ -56,7 +58,7 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           pushd .
           mkdir build && cd build
-          conan install .. -s build_type=Release --profile ../conan_profile_linux_clang6.0 --build=missing
+          conan install .. -s build_type=Release --profile ../.ci/conan_profile_linux_clang6.0 --build=missing
           cmake -DCMAKE_BUILD_TYPE=Release ..
           VERBOSE=1 make -j
         displayName: build VCVRack
@@ -103,7 +105,7 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           mkdir build
           cd build
-          conan install .. -s build_type=Release --profile ../conan_profile_mingw8.1 --build=missing
+          conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw8.2 --build=missing
           cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
           cmake --build .
         displayName: build VCVRack
