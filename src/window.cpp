@@ -431,7 +431,7 @@ void Window::screenshot(float zoom) {
 			// Read pixels
 			int width, height;
 			nvgImageSize(vg, fb->getImageHandle(), &width, &height);
-			uint8_t data[height * width * 4];
+			uint8_t *data = new uint8_t[height * width * 4];
 			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 			// Flip image vertically
@@ -447,6 +447,7 @@ void Window::screenshot(float zoom) {
 			stbi_write_png(filename.c_str(), width, height, 4, data, width * 4);
 
 			// Cleanup
+			delete[] data;
 			nvgluBindFramebuffer(NULL);
 			delete fb;
 		}
