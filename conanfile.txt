@@ -16,10 +16,14 @@ jansson/2.12@bincrafters/stable
 libcurl/7.61.1@bincrafters/stable
 libzip/1.5.1@bincrafters/stable
 
+# override official glfw with VCVRack glfw version
+glfw/3.3@qno/testing
+
 #Poco/1.9.0@pocoproject/stable
 
 [generators]
 cmake
+virtualrunenv
 
 [options]
 #Poco:shared=True
