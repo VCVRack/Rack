@@ -91,6 +91,7 @@ void PatchManager::save(std::string path) {
 
 	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 	std::fclose(file);
+	std::remove(path.c_str());
 	std::rename(tmpPath.c_str(), path.c_str());
 }
 
