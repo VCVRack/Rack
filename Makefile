@@ -173,16 +173,11 @@ endif
 # Plugin helpers
 
 plugins:
+ifdef CMD
+	for f in plugins/*; do (cd "$$f" && $(CMD)); done
+else
 	for f in plugins/*; do $(MAKE) -C "$$f"; done
-
-cleanplugins:
-	for f in plugins/*; do $(MAKE) -C "$$f" clean; done
-
-distplugins:
-	for f in plugins/*; do $(MAKE) -C "$$f" dist; done
-
-cmdplugins:
-	for f in plugins/*; do (cd "$$f" && ${CMD}); done
+endif
 
 
 # Includes
