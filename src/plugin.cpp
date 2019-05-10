@@ -351,7 +351,7 @@ void logIn(const std::string &email, const std::string &password) {
 	json_object_set(reqJ, "password", json_string(password.c_str()));
 	std::string url = app::API_URL;
 	url += "/token";
-	json_t *resJ = network::requestJson(network::POST, url, reqJ);
+	json_t *resJ = network::requestJson(network::METHOD_POST, url, reqJ);
 	json_decref(reqJ);
 
 	if (!resJ) {
@@ -392,7 +392,7 @@ void queryUpdates() {
 	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
 	std::string pluginsUrl = app::API_URL;
 	pluginsUrl += "/plugins";
-	json_t *pluginsResJ = network::requestJson(network::GET, pluginsUrl, pluginsReqJ);
+	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
@@ -411,7 +411,7 @@ void queryUpdates() {
 	// Get community manifests
 	std::string manifestsUrl = app::API_URL;
 	manifestsUrl += "/community/manifests";
-	json_t *manifestsResJ = network::requestJson(network::GET, manifestsUrl, NULL);
+	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, NULL);
 	if (!manifestsResJ) {
 		WARN("Request for community manifests failed");
 		return;
