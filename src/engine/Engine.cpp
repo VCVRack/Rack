@@ -233,7 +233,7 @@ static void Engine_stepModules(Engine *that, int threadId) {
 	// Step each module
 	// for (int i = threadId; i < modulesLen; i += threadCount) {
 	while (true) {
-		// Chose module
+		// Choose next module
 		int i = internal->workerModuleIndex++;
 		if (i >= modulesLen)
 			break;
@@ -277,7 +277,7 @@ static void Engine_step(Engine *that) {
 	if (smoothModule) {
 		Param *param = &smoothModule->params[smoothParamId];
 		float value = param->value;
-		// decay rate is 1 graphics frame
+		// Decay rate is 1 graphics frame
 		const float smoothLambda = 60.f;
 		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
 		if (value == newValue) {
@@ -377,7 +377,7 @@ static void Engine_run(Engine *that) {
 	// Every time the that waits and locks a mutex, it steps this many frames
 	const int mutexSteps = 128;
 	// Time in seconds that the that is rushing ahead of the estimated clock time
-	double ahead = 0.0;
+	double aheadTime = 0.0;
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	while (internal->running) {
@@ -390,6 +390,7 @@ static void Engine_run(Engine *that) {
 			for (Module *module : internal->modules) {
 				module->onSampleRateChange();
 			}
+			aheadTime = 0.0;
 		}
 
 		// Launch workers
@@ -413,17 +414,17 @@ static void Engine_run(Engine *that) {
 		}
 
 		double stepTime = mutexSteps * internal->sampleTime;
-		ahead += stepTime;
+		aheadTime += stepTime;
 		auto currTime = std::chrono::high_resolution_clock::now();
 		const double aheadFactor = 2.0;
-		ahead -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
+		aheadTime -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
 		lastTime = currTime;
-		ahead = std::fmax(ahead, 0.0);
+		aheadTime = std::fmax(aheadTime, 0.0);
 
 		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
 		// The number of steps to wait before possibly sleeping
 		const double aheadMax = 1.0; // seconds
-		if (ahead > aheadMax) {
+		if (aheadTime > aheadMax) {
 			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
 		}
 	}
