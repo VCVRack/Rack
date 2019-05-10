@@ -96,6 +96,50 @@ struct SpinBarrier {
 };
 
 
+/** Spinlocks until all `total` threads are waiting.
+If `yield` is set to true at any time, all threads will switch to waiting on a mutex instead.
+All threads must return before beginning a new phase. Alternating between two barriers solves this problem.
+*/
+struct HybridBarrier {
+	std::atomic<int> count {0};
+	int total = 0;
+
+	std::mutex mutex;
+	std::condition_variable cv;
+
+	std::atomic<bool> yield {false};
+
+	void wait() {
+		int id = ++count;
+
+		// End and reset phase if this is the last thread
+		if (id == total) {
+			count = 0;
+			if (yield) {
+				std::unique_lock<std::mutex> lock(mutex);
+				cv.notify_all();
+				yield = false;
+			}
+			return;
+		}
+
+		// Spinlock
+		while (!yield) {
+			if (count == 0)
+				return;
+		}
+
+		// Wait on mutex
+		{
+			std::unique_lock<std::mutex> lock(mutex);
+			cv.wait(lock, [&]{
+				return count == 0;
+			});
+		}
+	}
+};
+
+
 struct EngineWorker {
 	Engine *engine;
 	int id;
@@ -117,7 +161,6 @@ struct EngineWorker {
 	}
 
 	void run();
-	void step();
 };
 
 
@@ -146,8 +189,8 @@ struct Engine::Internal {
 	bool realTime = false;
 	int threadCount = 1;
 	std::vector<EngineWorker> workers;
-	SpinBarrier engineBarrier;
-	SpinBarrier workerBarrier;
+	HybridBarrier engineBarrier;
+	HybridBarrier workerBarrier;
 	std::atomic<int> workerModuleIndex;
 };
 
@@ -415,6 +458,10 @@ float Engine::getSampleRate() {
 
 float Engine::getSampleTime() {
 	return internal->sampleTime;
+}
+
+void Engine::yieldWorkers() {
+	internal->workerBarrier.yield = true;
 }
 
 void Engine::addModule(Module *module) {
@@ -698,17 +745,14 @@ void EngineWorker::run() {
 	system::setThreadName("Engine worker");
 	system::setThreadRealTime(engine->internal->realTime);
 	disableDenormals();
-	while (running) {
-		step();
-	}
-}
 
-void EngineWorker::step() {
-	engine->internal->engineBarrier.wait();
-	if (!running)
-		return;
-	Engine_stepModules(engine, id);
-	engine->internal->workerBarrier.wait();
+	while (1) {
+		engine->internal->engineBarrier.wait();
+		if (!running)
+			return;
+		Engine_stepModules(engine, id);
+		engine->internal->workerBarrier.wait();
+	}
 }
 
 

@@ -28,6 +28,8 @@
 - Fix draw order of cable plugs and wires
 - Make Gamepad MIDI driver generate MIDI CC instead of MIDI notes for buttons
 - Fix Unicode user directories on Windows
+- Add ability to change cable colors in `settings.json`
+- Add `-p X` flag for dumping a screenshot of each available module
 
 - Core
 	- Add Core CV-MIDI, CV-CC, and CV-Gate for sending MIDI to external devices
@@ -35,6 +37,7 @@
 	- Add polyphony to Core MIDI-CV
 	- Add MPE mode to Core MIDI-CV
 	- Add "Panic" button to all MIDI modules to reset performance state
+	- Add Core Audio 16
 
 - API
 	- Add [`simd.hpp`](include/dsp/simd.hpp) for generically handling arithmetic and math functions for vectors of floats, accelerated with SSE

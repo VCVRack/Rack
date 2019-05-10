@@ -148,7 +148,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 			case GLFW_KEY_F11: {
 				APP->window->setFullScreen(!APP->window->isFullScreen());
 				e.consume(this);
-			}
+			} break;
 		}
 	}
 }

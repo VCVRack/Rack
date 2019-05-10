@@ -132,6 +132,7 @@ struct AudioInterface : Module {
 		if (port.active && port.numInputs > 0) {
 			// Wait until inputs are present
 			// Give up after a timeout in case the audio device is being unresponsive.
+			APP->engine->yieldWorkers();
 			std::unique_lock<std::mutex> lock(port.engineMutex);
 			auto cond = [&] {
 				return (!port.inputBuffer.empty());
@@ -181,6 +182,7 @@ struct AudioInterface : Module {
 			if (outputBuffer.full()) {
 				// Wait until enough outputs are consumed
 				// Give up after a timeout in case the audio device is being unresponsive.
+				APP->engine->yieldWorkers();
 				std::unique_lock<std::mutex> lock(port.engineMutex);
 				auto cond = [&] {
 					return (port.outputBuffer.size() < (size_t) port.blockSize);
