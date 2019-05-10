@@ -9,8 +9,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <atomic>
-#include <xmmintrin.h>
-#include <pmmintrin.h>
+#include <x86intrin.h>
 
 
 namespace rack {
@@ -90,7 +89,9 @@ struct SpinBarrier {
 			count = 0;
 		}
 		else {
-			while (count != 0);
+			while (count != 0) {
+				_mm_pause();
+			}
 		}
 	}
 };
@@ -127,6 +128,7 @@ struct HybridBarrier {
 		while (!yield) {
 			if (count == 0)
 				return;
+			_mm_pause();
 		}
 
 		// Wait on mutex

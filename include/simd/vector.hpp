@@ -1,6 +1,6 @@
 #pragma once
 #include <cstring>
-#include <emmintrin.h>
+#include <x86intrin.h>
 
 
 namespace rack {

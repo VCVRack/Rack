@@ -72,7 +72,8 @@ perf: $(TARGET)
 	# Requires gperftools
 	perf record --call-graph dwarf -o perf.data ./$< -d
 	# Analyze with hotspot (https://github.com/KDAB/hotspot) for example
-	# hotspot perf.data
+	hotspot perf.data
+	rm perf.data
 
 valgrind: $(TARGET)
 	# --gen-suppressions=yes
