@@ -14,13 +14,6 @@ namespace rack {
 namespace plugin {
 
 
-struct Update {
-	std::string pluginSlug;
-	std::string version;
-	std::string changelogUrl;
-};
-
-
 void init();
 void destroy();
 void logIn(const std::string &email, const std::string &password);
@@ -34,6 +27,13 @@ Model *getModel(const std::string &pluginSlug, const std::string &modelSlug);
 std::string normalizeTag(const std::string &tag);
 /** Checks that the slug contains only alphanumeric characters, "-", and "_" */
 bool isSlugValid(const std::string &slug);
+
+
+struct Update {
+	std::string pluginSlug;
+	std::string version;
+	std::string changelogUrl;
+};
 
 
 extern const std::set<std::string> allowedTags;

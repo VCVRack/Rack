@@ -11,7 +11,7 @@ namespace random {
 // xoroshiro128+
 // from http://xoroshiro.di.unimi.it/xoroshiro128plus.c
 
-static uint64_t xoroshiro128plus_state[2] = {};
+thread_local uint64_t xoroshiro128plus_state[2];
 
 static uint64_t rotl(const uint64_t x, int k) {
 	return (x << k) | (x >> (64 - k));
@@ -30,8 +30,6 @@ static uint64_t xoroshiro128plus_next(void) {
 }
 
 void init() {
-	// Only allow the seed to be initialized once during the lifetime of the program.
-	assert(xoroshiro128plus_state[0] == 0 && xoroshiro128plus_state[1] == 0);
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	xoroshiro128plus_state[0] = tv.tv_sec;

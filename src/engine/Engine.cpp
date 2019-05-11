@@ -150,6 +150,7 @@ struct EngineWorker {
 
 	void start() {
 		thread = std::thread([&] {
+			random::init();
 			run();
 		});
 	}
@@ -436,7 +437,10 @@ static void Engine_run(Engine *that) {
 
 void Engine::start() {
 	internal->running = true;
-	internal->thread = std::thread(Engine_run, this);
+	internal->thread = std::thread([&] {
+		random::init();
+		Engine_run(this);
+	});
 }
 
 void Engine::stop() {
