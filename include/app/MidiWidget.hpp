@@ -1,16 +1,10 @@
 #pragma once
 #include "app/common.hpp"
 #include "app/LedDisplay.hpp"
+#include "midi.hpp"
 
 
 namespace rack {
-
-
-namespace midi {
-	struct Port;
-}
-
-
 namespace app {
 
 

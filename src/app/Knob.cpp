@@ -43,6 +43,9 @@ void Knob::onDragStart(const event::DragStart &e) {
 }
 
 void Knob::onDragEnd(const event::DragEnd &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	APP->window->cursorUnlock();
 
 	if (paramQuantity) {
@@ -66,6 +69,9 @@ void Knob::onDragEnd(const event::DragEnd &e) {
 }
 
 void Knob::onDragMove(const event::DragMove &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	if (paramQuantity) {
 		float range;
 		if (paramQuantity->isBounded()) {

@@ -74,7 +74,7 @@ void PortWidget::onButton(const event::Button &e) {
 			delete cw;
 		}
 
-		e.consume(NULL);
+		e.consume(this);
 	}
 }
 
@@ -135,6 +135,9 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 }
 
 void PortWidget::onDragEnd(const event::DragEnd &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	CableWidget *cw = APP->scene->rack->releaseIncompleteCable();
 	if (cw->isComplete()) {
 		APP->scene->rack->addCable(cw);
@@ -150,6 +153,9 @@ void PortWidget::onDragEnd(const event::DragEnd &e) {
 }
 
 void PortWidget::onDragDrop(const event::DragDrop &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		if (APP->scene->rack->getTopCable(this))
@@ -167,6 +173,9 @@ void PortWidget::onDragDrop(const event::DragDrop &e) {
 }
 
 void PortWidget::onDragEnter(const event::DragEnter &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	// Reject ports if this is an input port and something is already plugged into it
 	if (type == INPUT) {
 		if (APP->scene->rack->getTopCable(this))
@@ -183,6 +192,9 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 }
 
 void PortWidget::onDragLeave(const event::DragLeave &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	PortWidget *originPort = dynamic_cast<PortWidget*>(e.origin);
 	if (!originPort)
 		return;

@@ -1,6 +1,5 @@
 #include "app/ModuleWidget.hpp"
 #include "app/Scene.hpp"
-#include "app/SvgPanel.hpp"
 #include "engine/Engine.hpp"
 #include "plugin/Plugin.hpp"
 #include "system.hpp"
@@ -243,6 +242,9 @@ struct ModuleDeleteItem : ui::MenuItem {
 
 ModuleWidget::ModuleWidget() {
 	box.size = math::Vec(0, RACK_GRID_HEIGHT);
+
+	panel = new SvgPanel;
+	addChild(panel);
 }
 
 ModuleWidget::~ModuleWidget() {
@@ -311,7 +313,7 @@ void ModuleWidget::onButton(const event::Button &e) {
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		createContextMenu();
-		e.consume(NULL);
+		e.consume(this);
 	}
 }
 
@@ -390,6 +392,9 @@ void ModuleWidget::onDragStart(const event::DragStart &e) {
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	history::ComplexAction *h = APP->scene->rack->getModuleDragAction();
 	if (!h) {
 		delete h;
@@ -399,6 +404,9 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 }
 
 void ModuleWidget::onDragMove(const event::DragMove &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	if (!settings::lockModules) {
 		math::Vec pos = APP->scene->rack->mousePos.minus(dragPos);
 		if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
@@ -416,18 +424,10 @@ void ModuleWidget::setModule(engine::Module *module) {
 }
 
 void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
-	// Remove old panel
-	if (panel) {
-		removeChild(panel);
-		delete panel;
-		panel = NULL;
-	}
-
-	SvgPanel *svgPanel = new SvgPanel;
-	svgPanel->setBackground(svg);
-	addChild(svgPanel);
-	box.size.x = std::round(svgPanel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
-	panel = svgPanel;
+	assert(panel);
+	panel->setBackground(svg);
+	// Set ModuleWidget size based on panel
+	box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 }
 
 void ModuleWidget::addParam(ParamWidget *param) {
