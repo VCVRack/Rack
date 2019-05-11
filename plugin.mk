@@ -62,7 +62,7 @@ endif
 	@# Copy distributables
 	cp -R $(DISTRIBUTABLES) dist/$(SLUG)/
 	@# Create ZIP package
-	cd dist && zip -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
+	cd dist && zip -q -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
 
 install: dist
 	cp dist/$(SLUG)-$(VERSION)-$(ARCH).zip $(RACK_USER_DIR)/plugins/
