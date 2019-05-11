@@ -45,6 +45,7 @@ DEPRECATED inline float rescalef(float x, float a, float b, float yMin, float yM
 DEPRECATED inline float crossf(float a, float b, float frac) {return crossfade(a, b, frac);}
 DEPRECATED inline float interpf(const float *p, float x) {return interpolateLinear(p, x);}
 DEPRECATED inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {return complexMult(cr, ci, ar, ai, br, bi);}
+DEPRECATED inline void complexMult(float *cr, float *ci, float ar, float ai, float br, float bi) {complexMult(ar, ai, br, bi, cr, ci);}
 
 ////////////////////
 // random

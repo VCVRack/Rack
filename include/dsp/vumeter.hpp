@@ -54,13 +54,9 @@ struct VuMeter2 {
 	};
 	Mode mode = PEAK;
 	/** Either the smoothed peak or the mean-square of the brightness, depending on the mode. */
-	float v;
+	float v = 0.f;
 	/** Inverse time constant in 1/seconds */
 	float lambda = 30.f;
-
-	VuMeter2() {
-		reset();
-	}
 
 	void reset() {
 		v = 0.f;

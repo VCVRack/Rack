@@ -5,7 +5,7 @@
 namespace rack {
 
 
-/** Digital signal processing routines for plugins
+/** Digital signal processing routines
 */
 namespace dsp {
 
@@ -67,6 +67,13 @@ inline float exponentialBipolar(float b, float x) {
 	const float a = b - 1.f / b;
 	return (std::pow(b, x) - std::pow(b, -x)) / a;
 }
+
+
+/** Useful for storing arrays of samples in ring buffers and casting them to `float*` to be used by interleaved processors, like SampleRateConverter */
+template <size_t CHANNELS>
+struct Frame {
+	float samples[CHANNELS];
+};
 
 
 } // namespace dsp
