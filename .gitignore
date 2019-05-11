@@ -4,6 +4,7 @@
 /libRack.a
 /dep
 /plugins
+/disabledplugins
 /build
 /dist
 /patches
