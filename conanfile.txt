@@ -2,6 +2,7 @@
 OUIBlendish/latest@qno/testing
 OSDialog/latest@qno/testing
 NanoSVG/latest@qno/testing
+stb/20180214@conan/stable
 
 SpeexDSP/1.2rc3@qno/testing
 RtAudio/5.1.0@qno/testing
