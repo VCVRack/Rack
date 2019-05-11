@@ -7,60 +7,75 @@ variables:
   conan-pkg: "conan"
   cpt-pkg:  "conan_package_tools"
   bpt-pkg: "bincrafters_package_tools"
+  linux-deps: "python3-setuptools python3-pip build-essential automake autoconf libtool cmake gcc g++ clang ninja-build git"
 
   # Xcode Version overview: https://gist.github.com/yamaya/2924292
   # available versions: https://github.com/Microsoft/azure-pipelines-image-generation/blob/master/images/macos/macos-10.14-Readme.md
   XCODE_VERSION: 10.2
 
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops&tabs=yaml
 jobs:
-  # Todo - run Linux build in a container with a more recent Ubuntu version, maybe also try CentOS and Arch builds?
+  # maybe also try CentOS and Arch builds?
   - job: LinuxGCC
     pool:
-      vmImage: Ubuntu-16.04
+      vmImage: 'ubuntu-16.04'
+    # add missing sudo to container - https://github.com/Microsoft/azure-pipelines-agent/issues/2043
+    container:
+      image: ubuntu:disco
+      options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
     steps:
-      - task: UsePythonVersion@0
-        inputs:
-         versionSpec: $(python-version)
       - script: |
-          export PATH="$PATH:/home/vsts/.local/bin"
-          sudo apt install -y python3-setuptools
-          pip install --user --upgrade pip
-          pip install --user $(conan-pkg)
-          pip install --user $(cpt-pkg) $(bpt-pkg)
+          /tmp/docker exec -t -u 0 ci-container \
+          sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
+        displayName: install sudo in container
+      - script: |
+          export PATH="$PATH:$HOME/.local/bin"
+          sudo apt install -y $(linux-deps)
+          pip3 install --user $(conan-pkg)
+          pip3 install --user $(cpt-pkg) $(bpt-pkg)
           conan user
           conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
           conan remote add qno https://api.bintray.com/conan/qno/conan-public
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+        displayName: setup dependencies
+      - script: |
+          export PATH="$PATH:$HOME/.local/bin"
           pushd .
           mkdir build && cd build
-          conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Release
-          cmake -DCMAKE_BUILD_TYPE=Release ..
-          VERBOSE=1 make -j
+          conan install .. -s compiler.libcxx=libstdc++11 -s build_type=Release --build=missing
+          cmake -DCMAKE_BUILD_TYPE=Release -G Ninja ..
+          ninja -v
         displayName: build VCVRack
   - job: LinuxClang
     pool:
-      vmImage: Ubuntu-16.04
+      vmImage: 'ubuntu-16.04'
+    container:
+      image: ubuntu:disco
+      options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
     steps:
-      - task: UsePythonVersion@0
-        inputs:
-         versionSpec: $(python-version)
       - script: |
-          export PATH="$PATH:/home/vsts/.local/bin"
-          export CC=clang-6.0
-          export CXX=clang++-6.0
-          sudo apt install -y python3-setuptools
-          pip install --user --upgrade pip
-          pip install --user $(conan-pkg)
-          pip install --user $(cpt-pkg) $(bpt-pkg)
+          /tmp/docker exec -t -u 0 ci-container \
+          sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
+        displayName: install sudo in container
+      - script: |
+          export PATH="$PATH:$HOME/.local/bin"
+          sudo apt install -y $(linux-deps)
+          pip3 install --user $(conan-pkg)
+          pip3 install --user $(cpt-pkg) $(bpt-pkg)
           conan user
           conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
           conan remote add qno https://api.bintray.com/conan/qno/conan-public
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+        displayName: setup dependencies
+      - script: |
+          export PATH="$PATH:$HOME/.local/bin"
+          export CC=clang
+          export CXX=clang++
           pushd .
           mkdir build && cd build
-          conan install .. -s build_type=Release --profile ../.ci/conan_profile_linux_clang6.0 --build=missing
-          cmake -DCMAKE_BUILD_TYPE=Release ..
-          VERBOSE=1 make -j
+          conan install .. -s build_type=Release --profile ../.ci/conan_profile_linux_clang8 --build=missing
+          cmake -DCMAKE_BUILD_TYPE=Release -G Ninja ..
+          ninja -v
         displayName: build VCVRack
   - job: MacOS1014
     pool:
@@ -71,7 +86,7 @@ jobs:
          versionSpec: $(python-version)
       - script: |
           /bin/bash -c "sudo xcode-select -s /Applications/Xcode_$(XCODE_VERSION).app/Contents/Developer"
-          export PATH=$PATH:$HOME/.local/bin
+          export PATH="$HOME/.local/bin:$PATH"
           pip install --upgrade pip
           brew update || brew update
           brew install autoconf automake libtool pkg-config
