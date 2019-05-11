@@ -13,14 +13,15 @@ namespace string {
 /** Converts a UTF-16/32 string (depending on the size of wchar_t) to a UTF-8 string. */
 std::string fromWstring(const std::wstring &s);
 std::wstring toWstring(const std::string &s);
-/** Converts a `printf()` format string and optional arguments into a std::string
-Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s.
+/** Converts a `printf()` format string and optional arguments into a std::string.
+Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s, otherwise you might get binary garbage.
 */
 std::string f(const char *format, ...);
 /** Replaces all characters to lowercase letters */
 std::string lowercase(const std::string &s);
 /** Replaces all characters to uppercase letters */
 std::string uppercase(const std::string &s);
+/** Removes whitespace from beginning and end of string. */
 std::string trim(const std::string &s);
 /** Truncates and adds "..." to a string, not exceeding `len` characters */
 std::string ellipsize(const std::string &s, size_t len);

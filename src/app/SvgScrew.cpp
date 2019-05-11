@@ -6,8 +6,18 @@ namespace app {
 
 
 SvgScrew::SvgScrew() {
+	fb = new widget::FramebufferWidget;
+	addChild(fb);
+
 	sw = new widget::SvgWidget;
-	addChild(sw);
+	fb->addChild(sw);
+}
+
+
+void SvgScrew::setSvg(std::shared_ptr<Svg> svg) {
+	sw->setSvg(svg);
+	fb->box.size = sw->box.size;
+	box.size = sw->box.size;
 }
 
 
