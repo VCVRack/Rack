@@ -21,6 +21,7 @@ namespace rack {
 
 /** Deprecation notice for functions
 E.g.
+
 	DEPRECATED void foo();
 */
 #if defined(__GNUC__) || defined(__clang__)
@@ -33,9 +34,12 @@ E.g.
 
 /** Concatenates two literals or two macros
 Example:
+
 	#define COUNT 42
 	CONCAT(myVariable, COUNT)
+
 expands to
+
 	myVariable42
 */
 #define CONCAT_LITERAL(x, y) x ## y
@@ -44,10 +48,14 @@ expands to
 
 /** Surrounds raw text with quotes
 Example:
+
 	#define NAME "world"
 	printf("Hello " TOSTRING(NAME))
+
 expands to
+
 	printf("Hello " "world")
+
 and of course the C++ lexer/parser then concatenates the string literals.
 */
 #define TOSTRING_LITERAL(x) #x
@@ -60,26 +68,35 @@ and of course the C++ lexer/parser then concatenates the string literals.
 
 /** Reserve space for `count` enums starting with `name`.
 Example:
+
 	enum Foo {
 		ENUMS(BAR, 14),
 		BAZ
 	};
 
-	BAR + 0 to BAR + 13 is reserved. BAZ has a value of 14.
+`BAR + 0` to `BAR + 13` is reserved. `BAZ` has a value of 14.
 */
 #define ENUMS(name, count) name, name ## _LAST = name + (count) - 1
 
 
 /** References binary files compiled into the program.
 For example, to include a file "Test.dat" directly into your program binary, add
+
 	BINARIES += Test.dat
+
 to your Makefile and declare
+
 	BINARY(Test_dat);
+
 at the root of a .c or .cpp source file. Note that special characters are replaced with "_". Then use
+
 	BINARY_START(Test_dat)
 	BINARY_END(Test_dat)
+
 to reference the data beginning and end as a void* array, and
+
 	BINARY_SIZE(Test_dat)
+
 to get its size in bytes.
 */
 #if defined ARCH_MAC
@@ -99,14 +116,15 @@ to get its size in bytes.
 
 /** C#-style property constructor
 Example:
+
 	Foo *foo = construct<Foo>(&Foo::greeting, "Hello world", &Foo::legs, 2);
 */
-template<typename T>
+template <typename T>
 T *construct() {
 	return new T;
 }
 
-template<typename T, typename F, typename V, typename... Args>
+template <typename T, typename F, typename V, typename... Args>
 T *construct(F f, V v, Args... args) {
 	T *o = construct<T>(args...);
 	o->*f = v;
@@ -115,21 +133,21 @@ T *construct(F f, V v, Args... args) {
 
 /** Defers code until the scope is destructed
 From http://www.gingerbill.org/article/defer-in-cpp.html
-
 Example:
+
 	file = fopen(...);
 	DEFER({
 		fclose(file);
 	});
 */
-template<typename F>
+template <typename F>
 struct DeferWrapper {
 	F f;
 	DeferWrapper(F f) : f(f) {}
 	~DeferWrapper() { f(); }
 };
 
-template<typename F>
+template <typename F>
 DeferWrapper<F> deferWrapper(F f) {
 	return DeferWrapper<F>(f);
 }
@@ -137,7 +155,7 @@ DeferWrapper<F> deferWrapper(F f) {
 #define DEFER(code) auto CONCAT(_defer_, __COUNTER__) = rack::deferWrapper([&]() code)
 
 
-/** Reports a string to the user */
+/** An exception meant to be shown to the user */
 struct UserException : std::runtime_error {
 	UserException(const std::string &msg) : std::runtime_error(msg) {}
 };

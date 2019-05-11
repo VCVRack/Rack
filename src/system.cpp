@@ -25,7 +25,7 @@ namespace rack {
 namespace system {
 
 
-std::list<std::string> listEntries(const std::string &path) {
+std::list<std::string> getEntries(const std::string &path) {
 	std::list<std::string> filenames;
 	DIR *dir = opendir(path.c_str());
 	if (dir) {
@@ -56,14 +56,23 @@ bool isDirectory(const std::string &path) {
 	return S_ISDIR(statbuf.st_mode);
 }
 
+void moveFile(const std::string &srcPath, const std::string &destPath) {
+	std::remove(destPath.c_str());
+	// Whether this overwrites existing files is implementation-defined.
+	// i.e. Mingw64 fails to overwrite.
+	// This is why we remove the file above.
+	std::rename(srcPath.c_str(), destPath.c_str());
+}
+
 void copyFile(const std::string &srcPath, const std::string &destPath) {
-	// Open files
+	// Open source
 	FILE *source = fopen(srcPath.c_str(), "rb");
 	if (!source)
 		return;
 	DEFER({
 		fclose(source);
 	});
+	// Open destination
 	FILE *dest = fopen(destPath.c_str(), "wb");
 	if (!dest)
 		return;
@@ -93,7 +102,6 @@ void createDirectory(const std::string &path) {
 }
 
 int getLogicalCoreCount() {
-	// TODO Return the physical cores, not logical cores.
 	return std::thread::hardware_concurrency();
 }
 
@@ -199,7 +207,7 @@ void openFolder(const std::string &path) {
 }
 
 
-void runProcessAsync(const std::string &path) {
+void runProcessDetached(const std::string &path) {
 #if defined ARCH_WIN
 	STARTUPINFOW startupInfo;
 	PROCESS_INFORMATION processInfo;
@@ -212,6 +220,9 @@ void runProcessAsync(const std::string &path) {
 	CreateProcessW(pathW.c_str(), NULL,
 		NULL, NULL, false, 0, NULL, NULL,
 		&startupInfo, &processInfo);
+#else
+	// Not implemented on Linux or Mac
+	assert(0);
 #endif
 }
 
@@ -226,6 +237,7 @@ std::string getOperatingSystemInfo() {
 	ZeroMemory(&info, sizeof(info));
 	info.dwOSVersionInfoSize = sizeof(info);
 	GetVersionExW(&info);
+	// See https://docs.microsoft.com/en-us/windows/desktop/api/winnt/ns-winnt-_osversioninfoa for a list of Windows version numbers.
 	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
 #endif
 }

@@ -52,8 +52,8 @@ TWidget *createWidget(math::Vec pos) {
 
 template <class TWidget>
 TWidget *createWidgetCentered(math::Vec pos) {
-	TWidget *o = new TWidget;
-	o->box.pos = pos.minus(o->box.size.div(2));;
+	TWidget *o = createWidget<TWidget>(pos);
+	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
 

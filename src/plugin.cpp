@@ -149,7 +149,7 @@ static bool loadPlugin(std::string path) {
 	// Search for presets
 	for (Model *model : plugin->models) {
 		std::string presetDir = asset::plugin(plugin, "presets/" + model->slug);
-		for (const std::string &presetPath : system::listEntries(presetDir)) {
+		for (const std::string &presetPath : system::getEntries(presetDir)) {
 			model->presetPaths.push_back(presetPath);
 		}
 	}
@@ -190,7 +190,7 @@ static bool syncUpdate(const Update &update) {
 
 static void loadPlugins(std::string path) {
 	std::string message;
-	for (std::string pluginPath : system::listEntries(path)) {
+	for (std::string pluginPath : system::getEntries(path)) {
 		if (!system::isDirectory(pluginPath))
 			continue;
 		if (!loadPlugin(pluginPath)) {
@@ -271,7 +271,7 @@ static int extractZip(const char *filename, const char *path) {
 static void extractPackages(const std::string &path) {
 	std::string message;
 
-	for (std::string packagePath : system::listEntries(path)) {
+	for (std::string packagePath : system::getEntries(path)) {
 		if (string::filenameExtension(packagePath) != "zip")
 			continue;
 		INFO("Extracting package %s", packagePath.c_str());
