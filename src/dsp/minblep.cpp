@@ -10,7 +10,7 @@ namespace dsp {
 void minBlepImpulse(int z, int o, float *output) {
 	// Symmetric sinc array with `z` zero-crossings on each side
 	int n = 2 * z * o;
-	float *x = alignedMalloc<float>(n);
+	float *x = new float[n];
 	for (int i = 0; i < n; i++) {
 		float p = math::rescale((float) i, 0.f, (float) (n - 1), (float) -z, (float) z);
 		x[i] = sinc(p);
@@ -20,7 +20,7 @@ void minBlepImpulse(int z, int o, float *output) {
 	blackmanHarrisWindow(x, n);
 
 	// Real cepstrum
-	float *fx = alignedMalloc<float>(2*n);
+	float *fx = new float[2*n];
 	RealFFT rfft(n);
 	rfft.rfft(x, fx);
 	// fx = log(abs(fx))
@@ -73,8 +73,8 @@ void minBlepImpulse(int z, int o, float *output) {
 	std::memcpy(output, x, n * sizeof(float));
 
 	// Cleanup
-	alignedFree(x);
-	alignedFree(fx);
+	delete[] x;
+	delete[] fx;
 }
 
 

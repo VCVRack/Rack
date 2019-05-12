@@ -7,24 +7,10 @@ namespace rack {
 namespace dsp {
 
 
-/** Allocates an array to 64-byte boundaries.
-Must call alignedFree() on the buffer to free.
-*/
-template <typename T>
-T *alignedMalloc(size_t len) {
-	return (T*) pffft_aligned_malloc(len * sizeof(T));
-}
-
-template <typename T>
-void alignedFree(T *p) {
-	pffft_aligned_free(p);
-}
-
-
 /** Real-valued FFT context.
 Wrapper for [PFFFT](https://bitbucket.org/jpommier/pffft/)
 `length` must be a multiple of 32.
-Buffers must be aligned to 16-byte boundaries, e.g. with alignedMalloc().
+Buffers must be aligned to 16-byte boundaries. new[] and malloc() do this for you.
 */
 struct RealFFT {
 	PFFFT_Setup *setup;
