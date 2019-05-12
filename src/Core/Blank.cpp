@@ -93,13 +93,19 @@ struct BlankWidget : ModuleWidget {
 	Widget *topRightScrew;
 	Widget *bottomRightScrew;
 	Widget *rightHandle;
+	BlankPanel *blankPanel;
 
 	BlankWidget(Module *module) {
 		setModule(module);
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
-		panel = new BlankPanel;
-		addChild(panel);
+		// Delete SvgPanel
+		removeChild(panel);
+		delete panel;
+		panel = NULL;
+
+		blankPanel = new BlankPanel;
+		addChild(blankPanel);
 
 		ModuleResizeHandle *leftHandle = new ModuleResizeHandle;
 		ModuleResizeHandle *rightHandle = new ModuleResizeHandle;
@@ -117,7 +123,7 @@ struct BlankWidget : ModuleWidget {
 	}
 
 	void step() override {
-		panel->box.size = box.size;
+		blankPanel->box.size = box.size;
 		topRightScrew->box.pos.x = box.size.x - 30;
 		bottomRightScrew->box.pos.x = box.size.x - 30;
 		if (box.size.x < RACK_GRID_WIDTH * 6) {

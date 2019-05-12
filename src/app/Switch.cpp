@@ -67,6 +67,9 @@ void Switch::onDragStart(const event::DragStart &e) {
 }
 
 void Switch::onDragEnd(const event::DragEnd &e) {
+	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
+		return;
+
 	if (momentary) {
 		momentaryReleased = true;
 	}

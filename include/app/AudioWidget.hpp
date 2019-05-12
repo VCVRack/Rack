@@ -1,16 +1,10 @@
 #pragma once
 #include "app/common.hpp"
 #include "app/LedDisplay.hpp"
+#include "audio.hpp"
 
 
 namespace rack {
-
-
-namespace audio {
-	struct Port;
-}
-
-
 namespace app {
 
 

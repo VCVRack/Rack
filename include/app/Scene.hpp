@@ -17,12 +17,12 @@ struct Scene : widget::OpaqueWidget {
 	MenuBar *menuBar;
 	widget::Widget *moduleBrowser;
 
+	double lastAutoSaveTime = 0.0;
+
 	// Version checking
 	bool checkVersion = true;
 	bool checkedVersion = false;
 	std::string latestVersion;
-
-	double lastAutoSaveTime = 0.0;
 
 	Scene();
 	~Scene();

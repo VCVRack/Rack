@@ -4,6 +4,7 @@
 #include "ui/Menu.hpp"
 #include "app/PortWidget.hpp"
 #include "app/ParamWidget.hpp"
+#include "app/SvgPanel.hpp"
 #include "plugin/Model.hpp"
 #include "engine/Module.hpp"
 
@@ -15,11 +16,11 @@ namespace app {
 /** Manages an engine::Module in the rack. */
 struct ModuleWidget : widget::OpaqueWidget {
 	plugin::Model *model = NULL;
-	/** Owns the module pointer */
+	/** Owned. */
 	engine::Module *module = NULL;
 
-	widget::Widget *panel = NULL;
-	/** Note that the indexes of these vectors might not correspond with the indexes of `Module::params` etc.
+	SvgPanel *panel = NULL;
+	/** Note that the indexes of these vectors do not necessarily correspond with the indexes of `Module::params` etc.
 	*/
 	std::vector<ParamWidget*> params;
 	std::vector<PortWidget*> outputs;
@@ -29,7 +30,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	math::Vec oldPos;
 
 	ModuleWidget();
-	DEPRECATED ModuleWidget(engine::Module *module) {
+	DEPRECATED ModuleWidget(engine::Module *module) : ModuleWidget() {
 		setModule(module);
 	}
 	~ModuleWidget();

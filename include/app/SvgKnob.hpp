@@ -18,7 +18,8 @@ struct SvgKnob : Knob {
 	widget::TransformWidget *tw;
 	widget::SvgWidget *sw;
 	/** Angles in radians */
-	float minAngle, maxAngle;
+	float minAngle = 0.f;
+	float maxAngle = M_PI;
 
 	SvgKnob();
 	void setSvg(std::shared_ptr<Svg> svg);
