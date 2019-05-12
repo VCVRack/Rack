@@ -1,4 +1,4 @@
-# this is a conan profile for MinGW GCC 8.1
+# this is a conan profile for MinGW GCC 8
 [settings]
 os=Windows
 os_build=Windows
