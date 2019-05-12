@@ -10,6 +10,7 @@ namespace app {
 struct CircularShadow : widget::TransparentWidget {
 	float blurRadius;
 	float opacity;
+
 	CircularShadow();
 	void draw(const DrawArgs &args) override;
 };
