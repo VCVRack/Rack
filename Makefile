@@ -124,7 +124,7 @@ ifdef ARCH_MAC
 	cp plugins/Fundamental/dist/*.zip dist/$(TARGET).app/Contents/Resources/Fundamental.zip
 	# Clean up and sign bundle
 	xattr -cr dist/$(TARGET).app
-	codesign --sign "VCV" --verbose dist/$(TARGET).app
+	codesign --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --verbose dist/$(TARGET).app
 	codesign --verify --verbose dist/$(TARGET).app
 	spctl --assess --verbose dist/$(TARGET).app
 	# Make ZIP
