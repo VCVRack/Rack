@@ -302,10 +302,17 @@ static void Engine_step(Engine *that) {
 	for (Cable *cable : that->internal->cables) {
 		cable->step();
 	}
-	// Swap messages of all modules
+
+	// Flip messages for each module
 	for (Module *module : that->internal->modules) {
-		std::swap(module->leftProducerMessage, module->leftConsumerMessage);
-		std::swap(module->rightProducerMessage, module->rightConsumerMessage);
+		if (module->leftMessageFlipRequested) {
+			std::swap(module->leftProducerMessage, module->leftConsumerMessage);
+			module->leftMessageFlipRequested = false;
+		}
+		if (module->rightMessageFlipRequested) {
+			std::swap(module->rightProducerMessage, module->rightConsumerMessage);
+			module->rightMessageFlipRequested = false;
+		}
 	}
 }
 
