@@ -1,9 +1,8 @@
 RACK_DIR ?= .
-VERSION = 1.dev.$(shell git rev-parse --short HEAD)
+VERSION := 1.dev.$(shell git rev-parse --short HEAD)
 
 FLAGS += -DVERSION=$(VERSION)
-FLAGS += -Iinclude
-FLAGS += -Idep/include -Idep/lib/libzip/include
+FLAGS += -Iinclude -Idep/include
 
 include arch.mk
 
