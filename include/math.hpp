@@ -120,7 +120,7 @@ inline float normalizeZero(float x) {
 See https://en.wikipedia.org/wiki/Euclidean_division.
 */
 inline float eucMod(float a, float b) {
-	int mod = std::fmod(a, b);
+	float mod = std::fmod(a, b);
 	if (mod < 0.f) {
 		mod += b;
 	}
