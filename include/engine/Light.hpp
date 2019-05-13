@@ -14,16 +14,16 @@ struct Light {
 
 	/** Sets the brightness immediately with no light decay. */
 	void setBrightness(float brightness) {
-		value = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;
+		value = (brightness > 0.f) ? brightness : 0.f;
 	}
 
 	float getBrightness() {
-		return std::sqrt(value);
+		return value;
 	}
 
 	/** Emulates light decay with slow fall but immediate rise. */
 	void setSmoothBrightness(float brightness, float deltaTime) {
-		float v = (brightness > 0.f) ? std::pow(brightness, 2) : 0.f;
+		float v = (brightness > 0.f) ? brightness : 0.f;
 		if (v < value) {
 			// Fade out light
 			const float lambda = 30.f;

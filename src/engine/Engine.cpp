@@ -495,6 +495,7 @@ void Engine::addModule(Module *module) {
 	}
 	// Add module
 	internal->modules.push_back(module);
+	// Trigger Add event
 	module->onAdd();
 	// Update ParamHandles
 	for (ParamHandle *paramHandle : internal->paramHandles) {
@@ -507,6 +508,9 @@ void Engine::removeModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	// Check that the module actually exists
+	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+	assert(it != internal->modules.end());
 	// If a param is being smoothed on this module, stop smoothing it immediately
 	if (module == internal->smoothModule) {
 		internal->smoothModule = NULL;
@@ -532,11 +536,9 @@ void Engine::removeModule(Module *module) {
 			m->rightModule = NULL;
 		}
 	}
-	// Check that the module actually exists
-	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
-	assert(it != internal->modules.end());
-	// Remove the module
+	// Trigger Remove event
 	module->onRemove();
+	// Remove module
 	internal->modules.erase(it);
 }
 
