@@ -120,31 +120,30 @@ jobs:
           mkdir build
           cd build
           # conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 --build=missing
-          # build in CI with libc++ as conan MinGW doesn't build variants with libstdc++11 for now
-          # see also - https://github.com/conan-io/conan-package-tools/issues/375
-          conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 -s compiler.libcxx=libstdc++ --build=missing
+          # build in CI with gcc 7 and libc++ as conan MinGW doesn't build variants with libstdc++11 for now
+          # as and no gcc 8 build are available, see also - https://github.com/conan-io/conan-package-tools/issues/375
+          conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 -s compiler.version=7 -s compiler.libcxx=libstdc++ --build=missing
           cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
           cmake --build .
         displayName: build VCVRack
-
-  - job: VisualStudio
-    pool:
-      vmImage: vs2017-win2016
-    steps:
-      - task: UsePythonVersion@0
-        inputs:
-         versionSpec: $(python-version)
-      - script: |
-          python -m pip install --upgrade pip
-          python -m pip install $(conan-pkg)
-          python -m pip install $(cpt-pkg) $(bpt-pkg)
-          conan user
-          conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
-          conan remote add qno https://api.bintray.com/conan/qno/conan-public
-          conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-          mkdir build
-          cd build
-          conan install .. -s build_type=Release
-          cmake -G "Visual Studio 15 Win64" -DCMAKE_BUILD_TYPE=Release ..
-          cmake --build .
-        displayName: build VCVRack
+#  - job: VisualStudio
+#    pool:
+#      vmImage: vs2017-win2016
+#    steps:
+#      - task: UsePythonVersion@0
+#        inputs:
+#         versionSpec: $(python-version)
+#      - script: |
+#          python -m pip install --upgrade pip
+#          python -m pip install $(conan-pkg)
+#          python -m pip install $(cpt-pkg) $(bpt-pkg)
+#          conan user
+#          conan remote add conan-community https://api.bintray.com/conan/conan-community/conan
+#          conan remote add qno https://api.bintray.com/conan/qno/conan-public
+#          conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+#          mkdir build
+#          cd build
+#          conan install .. -s build_type=Release
+#          cmake -G "Visual Studio 15 Win64" -DCMAKE_BUILD_TYPE=Release ..
+#          cmake --build .
+#        displayName: build VCVRack
