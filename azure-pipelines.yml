@@ -19,7 +19,6 @@ jobs:
   - job: LinuxGCC
     pool:
       vmImage: 'ubuntu-16.04'
-    # add missing sudo to container - https://github.com/Microsoft/azure-pipelines-agent/issues/2043
     container:
       image: ubuntu:disco
       options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
@@ -27,7 +26,7 @@ jobs:
       - script: |
           /tmp/docker exec -t -u 0 ci-container \
           sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
-        displayName: install sudo in container
+        displayName: add sudo to container #https://github.com/Microsoft/azure-pipelines-agent/issues/2043
       - script: |
           export PATH="$PATH:$HOME/.local/bin"
           sudo apt install -y $(linux-deps)
@@ -56,7 +55,7 @@ jobs:
       - script: |
           /tmp/docker exec -t -u 0 ci-container \
           sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
-        displayName: install sudo in container
+        displayName: add sudo to container #https://github.com/Microsoft/azure-pipelines-agent/issues/2043
       - script: |
           export PATH="$PATH:$HOME/.local/bin"
           sudo apt install -y $(linux-deps)
