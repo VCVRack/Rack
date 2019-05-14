@@ -8,7 +8,7 @@ import xml.etree.ElementTree
 
 
 # Version check
-f"Python 3.6 is required"
+f"Python 3.6+ is required"
 
 
 class UserException(Exception):

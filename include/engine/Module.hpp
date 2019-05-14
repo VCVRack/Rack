@@ -41,26 +41,32 @@ struct Module {
 	int leftModuleId = -1;
 	/** Pointer to the left Module, or NULL if nonexistent. */
 	Module *leftModule = NULL;
-	/** Double buffer for receiving messages from adjacent modules.
-	If this module receives messages from adjacent modules, allocate both message buffers with identical blocks of memory (arrays, structs, etc).
+	/** Double buffer for receiving messages from the left adjacent module.
+	If this module intends to receive messages from the left, allocate both message buffers with identical blocks of memory (arrays, structs, etc).
 	Remember to free the buffer in the Module destructor.
 	Example:
 
 		leftProducerMessage = new MyModuleMessage;
 		leftConsumerMessage = new MyModuleMessage;
 
-	At the end of each timestep, the buffers are flipped/swapped.
+	Modules must check a foreign module's `model` before attempting to write its message buffer.
+	Once the module is checked, you can reinterpret_cast its leftProducerMessage for speed.
 
-	You may choose for the Module to write to its own message buffer for consumption by other modules.
-	As long as this convention is followed by the left Module, this is fine.
+	Once you write a message, set leftMessageFlipRequested to true, to request that the messages are flipped at the end of the timestep.
+	Thus, message-passing has 1-sample latency.
+
+	You may choose for the Module to write to its own message buffer for consumption by other modules, i.e. "pull" rather than "push".
+	As long as this convention is followed by the left module, this is fine.
 	*/
 	void *leftProducerMessage = NULL;
 	void *leftConsumerMessage = NULL;
+	bool leftMessageFlipRequested = false;
 
 	int rightModuleId = -1;
 	Module *rightModule = NULL;
 	void *rightProducerMessage = NULL;
 	void *rightConsumerMessage = NULL;
+	bool rightMessageFlipRequested = true;
 
 	/** Seconds spent in the process() method, with exponential smoothing.
 	Only written when CPU timing is enabled, since time measurement is expensive.

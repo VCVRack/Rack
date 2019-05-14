@@ -1,13 +1,22 @@
 {
-  "version": "1.dev",
+  "version": "1.dev.71fab3d",
   "modules": [
     {
       "plugin": "Core",
-      "version": "1.dev",
+      "version": "1.dev.7bd9894",
       "model": "AudioInterface",
       "params": [],
       "data": {
+        "audio": {
+          "driver": 1,
+          "offset": 1,
+          "maxChannels": 8,
+          "sampleRate": 44100,
+          "blockSize": 256
+        }
       },
+      "leftModuleId": 2,
+      "rightModuleId": 8,
       "id": 1,
       "pos": [
         57,
@@ -20,21 +29,28 @@
       "model": "VCMixer",
       "params": [
         {
+          "id": 0,
           "value": 1.0
         },
         {
+          "id": 1,
           "value": 1.0
         },
         {
+          "id": 2,
           "value": 1.0
         },
         {
+          "id": 3,
           "value": 1.0
         },
         {
+          "id": 4,
           "value": 1.0
         }
       ],
+      "leftModuleId": 7,
+      "rightModuleId": 1,
       "id": 2,
       "pos": [
         47,
@@ -47,27 +63,36 @@
       "model": "VCO",
       "params": [
         {
+          "id": 0,
           "value": 1.0
         },
         {
+          "id": 1,
           "value": 1.0
         },
         {
+          "id": 2,
           "value": 0.0
         },
         {
+          "id": 3,
           "value": 0.0
         },
         {
+          "id": 4,
           "value": 0.0
         },
         {
+          "id": 5,
           "value": 0.5
         },
         {
+          "id": 6,
           "value": 0.0
         }
       ],
+      "leftModuleId": 5,
+      "rightModuleId": 4,
       "id": 3,
       "pos": [
         8,
@@ -80,21 +105,28 @@
       "model": "VCF",
       "params": [
         {
-          "value": 0.0599999949
+          "id": 0,
+          "value": 0.0464999937
         },
         {
+          "id": 1,
           "value": 0.5
         },
         {
+          "id": 2,
           "value": 0.236999944
         },
         {
+          "id": 3,
           "value": 1.0
         },
         {
+          "id": 4,
           "value": 0.0
         }
       ],
+      "leftModuleId": 3,
+      "rightModuleId": 6,
       "id": 4,
       "pos": [
         18,
@@ -103,20 +135,22 @@
     },
     {
       "plugin": "Core",
-      "version": "1.dev",
+      "version": "1.dev.7bd9894",
       "model": "MIDIToCVInterface",
       "params": [],
       "data": {
-        "divisions": [
-          24,
-          6
-        ],
+        "channels": 1,
+        "polyMode": 0,
+        "clockDivision": 24,
+        "lastPitch": 8192,
+        "lastMod": 0,
         "midi": {
           "driver": -11,
           "deviceName": "QWERTY keyboard (US)",
           "channel": -1
         }
       },
+      "rightModuleId": 3,
       "id": 5,
       "pos": [
         0,
@@ -129,18 +163,24 @@
       "model": "ADSR",
       "params": [
         {
-          "value": 0.25
+          "id": 0,
+          "value": 0.247000009
         },
         {
-          "value": 0.671000004
+          "id": 1,
+          "value": 0.725000203
         },
         {
-          "value": 0.358999938
+          "id": 2,
+          "value": 0.361999929
         },
         {
-          "value": 0.5
+          "id": 3,
+          "value": 0.55850035
         }
       ],
+      "leftModuleId": 4,
+      "rightModuleId": 7,
       "id": 6,
       "pos": [
         26,
@@ -153,27 +193,35 @@
       "model": "Scope",
       "params": [
         {
+          "id": 0,
           "value": 0.0
         },
         {
+          "id": 1,
           "value": 0.0
         },
         {
+          "id": 2,
           "value": 0.0
         },
         {
+          "id": 3,
           "value": 0.0
         },
         {
+          "id": 4,
           "value": 14.0
         },
         {
+          "id": 5,
           "value": 0.0
         },
         {
+          "id": 6,
           "value": 0.0
         },
         {
+          "id": 7,
           "value": 0.0
         }
       ],
@@ -181,6 +229,8 @@
         "lissajous": 0,
         "external": 0
       },
+      "leftModuleId": 6,
+      "rightModuleId": 2,
       "id": 7,
       "pos": [
         34,
@@ -189,10 +239,11 @@
     },
     {
       "plugin": "Core",
-      "version": "1.dev",
+      "version": "1.dev.7bd9894",
       "model": "Notes",
       "params": [],
-      "text": "Demo patch instructions:\n\n1. Choose an audio driver and device in the AUDIO module. \n\n2. Use the QWERTY and ZXCVB rows of your keyboard to generate MIDI notes and convert them to 1V/oct and GATE signals.\n\n3. Drag knobs up/down. Hold CTRL (CMD on Mac) while dragging to fine-tune. Right-click knobs to edit or reset their value. \n\n4. Drag cables to patch them between inputs and outputs. Stack multiple cables on outputs by holding CTRL (CMD on Mac) and dragging from an output.  \n",
+      "leftModuleId": 1,
+      "text": "Demo patch instructions:\n\n1. Choose an audio driver and device in the AUDIO module.\n\n2. Use the QWERTY and ZXCVB rows of your keyboard to generate MIDI notes, which are converted to 1V/oct and GATE signals.\n\n3. Drag knobs up/down. Hold Ctrl (Cmd on Mac) while dragging to fine-tune. Right-click knobs to edit, or double-click to initialize.\n\n4. Drag cables to patch them between inputs and outputs. Stack multiple cables on outputs by holding Ctrl (Cmd on Mac) and dragging from an output.\n\n5. Right-click on an empty rack space to add new modules.",
       "id": 8,
       "pos": [
         67,
@@ -200,9 +251,9 @@
       ]
     }
   ],
+  "id": 19,
   "cables": [
     {
-      "id": 1,
       "outputModuleId": 5,
       "outputId": 0,
       "inputModuleId": 3,
@@ -210,7 +261,6 @@
       "color": "#c91847"
     },
     {
-      "id": 2,
       "outputModuleId": 3,
       "outputId": 2,
       "inputModuleId": 4,
@@ -218,7 +268,6 @@
       "color": "#0c8e15"
     },
     {
-      "id": 3,
       "outputModuleId": 2,
       "outputId": 0,
       "inputModuleId": 1,
@@ -226,7 +275,6 @@
       "color": "#0986ad"
     },
     {
-      "id": 4,
       "outputModuleId": 2,
       "outputId": 0,
       "inputModuleId": 1,
@@ -234,7 +282,6 @@
       "color": "#c9b70e"
     },
     {
-      "id": 5,
       "outputModuleId": 6,
       "outputId": 0,
       "inputModuleId": 4,
@@ -242,7 +289,6 @@
       "color": "#c91847"
     },
     {
-      "id": 6,
       "outputModuleId": 5,
       "outputId": 1,
       "inputModuleId": 6,
@@ -250,7 +296,6 @@
       "color": "#c9b70e"
     },
     {
-      "id": 7,
       "outputModuleId": 6,
       "outputId": 0,
       "inputModuleId": 2,
@@ -258,7 +303,6 @@
       "color": "#0c8e15"
     },
     {
-      "id": 8,
       "outputModuleId": 4,
       "outputId": 0,
       "inputModuleId": 2,
@@ -266,7 +310,6 @@
       "color": "#0986ad"
     },
     {
-      "id": 9,
       "outputModuleId": 2,
       "outputId": 1,
       "inputModuleId": 7,
@@ -274,7 +317,6 @@
       "color": "#c9b70e"
     },
     {
-      "id": 10,
       "outputModuleId": 5,
       "outputId": 6,
       "inputModuleId": 6,
