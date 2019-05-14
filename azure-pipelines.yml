@@ -121,10 +121,13 @@ jobs:
           cd build
           # conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 --build=missing
           # build in CI with gcc 7 and libc++ as conan MinGW doesn't build variants with libstdc++11 for now
-          # as and no gcc 8 build are available, see also - https://github.com/conan-io/conan-package-tools/issues/375
+          # and no gcc 8 build are available, see also - https://github.com/conan-io/conan-package-tools/issues/375
           conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 -s compiler.version=7 -s compiler.libcxx=libstdc++ --build=missing
-          cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+          call .\activate_run.bat
+          # see https://stackoverflow.com/a/45104058 - MinGW sh.exe must NOT be in your path
+          cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_SH=CMAKE_SH-NOTFOUND ..
           cmake --build .
+          call .\deactivate_run.bat
         displayName: build VCVRack
 #  - job: VisualStudio
 #    pool:
