@@ -12,13 +12,13 @@ void ModuleLightWidget::step() {
 		assert(module->lights.size() >= firstLightId + baseColors.size());
 
 		for (size_t i = 0; i < baseColors.size(); i++) {
-			float brightness = module->lights[firstLightId + i].getBrightness();
-			if (!std::isfinite(brightness))
-				brightness = 0.f;
+			float b = module->lights[firstLightId + i].getBrightness();
+			if (!std::isfinite(b))
+				b = 0.f;
+			b = math::clamp(b, 0.f, 1.f);
 			// Because LEDs are nonlinear, this seems to look more natural.
-			brightness = std::sqrt(brightness);
-			brightness = math::clamp(brightness, 0.f, 1.f);
-			brightnesses[i] = brightness;
+			b = std::sqrt(b);
+			brightnesses[i] = b;
 		}
 	}
 	else {
