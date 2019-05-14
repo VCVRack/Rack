@@ -119,7 +119,10 @@ jobs:
           conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
           mkdir build
           cd build
-          conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 --build=missing
+          # conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 --build=missing
+          # build in CI with libc++ as conan MinGW doesn't build variants with libstdc++11 for now
+          # see also - https://github.com/conan-io/conan-package-tools/issues/375
+          conan install .. -s build_type=Release --profile ../.ci/conan_profile_mingw_gcc8 -s compiler.libcxx=libstdc++ --build=missing
           cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
           cmake --build .
         displayName: build VCVRack
