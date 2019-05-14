@@ -34,9 +34,14 @@ json_t *Module::toJson() {
 
 	// params
 	json_t *paramsJ = json_array();
-	for (Param &param : params) {
-		json_t *paramJ = param.toJson();
-		json_array_append_new(paramsJ, paramJ);
+	for (size_t paramId = 0; paramId < params.size(); paramId++) {
+		float value = params[paramId].getValue();
+		// Set value to 0 if param is unbounded
+		if (!paramQuantities[paramId]->isBounded())
+			value = 0.f;
+
+		json_t *paramJ = json_real(value);
+		json_array_insert_new(paramsJ, paramId, paramJ);
 	}
 	json_object_set_new(rootJ, "params", paramsJ);
 
@@ -67,7 +72,7 @@ void Module::fromJson(json_t *rootJ) {
 	size_t i;
 	json_t *paramJ;
 	json_array_foreach(paramsJ, i, paramJ) {
-		uint32_t paramId = i;
+		size_t paramId = i;
 		// Get paramId
 		// Legacy v0.6.0 to <v1.0
 		json_t *paramIdJ = json_object_get(paramJ, "paramId");
@@ -75,9 +80,17 @@ void Module::fromJson(json_t *rootJ) {
 			paramId = json_integer_value(paramIdJ);
 		}
 
-		if (paramId < params.size()) {
-			params[paramId].fromJson(paramJ);
-		}
+		// Check ID bounds
+		if (paramId >= params.size())
+			continue;
+
+		// Check that param is bounded
+		if (!paramQuantities[paramId]->isBounded())
+			continue;
+
+		json_t *valueJ = json_object_get(rootJ, "value");
+		if (valueJ)
+			params[paramId].setValue(json_number_value(valueJ));
 	}
 
 	// bypass
