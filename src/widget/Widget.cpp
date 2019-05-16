@@ -94,6 +94,16 @@ void Widget::addChild(Widget *child) {
 	child->onAdd(eAdd);
 }
 
+void Widget::addChildBottom(Widget *child) {
+	assert(child);
+	assert(!child->parent);
+	child->parent = this;
+	children.push_front(child);
+	// event::Add
+	event::Add eAdd;
+	child->onAdd(eAdd);
+}
+
 void Widget::removeChild(Widget *child) {
 	assert(child);
 	// Make sure `this` is the child's parent

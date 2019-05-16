@@ -211,7 +211,7 @@ def create_module(slug, panel_filename=None, source_filename=None):
 		with open(manifest_filename, "w") as f:
 			json.dump(manifest, f, indent="  ")
 
-		print(f"Added {slug} to plugin.json")
+		print(f"Added {slug} to {manifest_filename}")
 
 	# Check filenames
 	if panel_filename and source_filename:

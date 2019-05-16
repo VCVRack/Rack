@@ -99,11 +99,6 @@ struct BlankWidget : ModuleWidget {
 		setModule(module);
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
-		// Delete SvgPanel
-		removeChild(panel);
-		delete panel;
-		panel = NULL;
-
 		blankPanel = new BlankPanel;
 		addChild(blankPanel);
 

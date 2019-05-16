@@ -145,7 +145,7 @@ struct Button : Base, PositionBase {
 
 
 /** Occurs when the left mouse button is pressed a second time on the same Widget within a time duration.
-Must set the Button target to receive this event.
+Must consume the Button event (on left button press) to receive this event.
 */
 struct DoubleClick : Base {
 };
@@ -175,28 +175,28 @@ struct HoverScroll : Base, PositionBase {
 
 
 /** Occurs when a Widget begins consuming the Hover event.
-Must set the Hover target to receive this event.
+Must consume the Hover event to receive this event.
 */
 struct Enter : Base {
 };
 
 
 /** Occurs when a different Widget is entered.
-Must set the Hover target to receive this event.
+Must consume the Hover event (when a Widget is entered) to receive this event.
 */
 struct Leave : Base {
 };
 
 
 /** Occurs when a Widget begins consuming the Button press event for the left mouse button.
-Must set the Button target to receive this event.
+Must consume the Button event (on left button press) to receive this event.
 */
 struct Select : Base {
 };
 
 
 /** Occurs when a different Widget is selected.
-Must set the Button target to receive this event.
+Must consume the Button event (on left button press, when the Widget is selected) to receive this event.
 */
 struct Deselect : Base {
 };
@@ -222,21 +222,21 @@ struct DragBase : Base {
 };
 
 /** Occurs when a Widget begins being dragged.
-Must set the Button target to receive this event.
+Must consume the Button event (on press) to receive this event.
 */
 struct DragStart : DragBase {
 };
 
 
 /** Occurs when a Widget stops being dragged by releasing the mouse button.
-Must set the Button target to receive this event.
+Must consume the Button event (on press, when the Widget drag begins) to receive this event.
 */
 struct DragEnd : DragBase {
 };
 
 
 /** Occurs every frame on the dragged Widget.
-Must set the Button target to receive this event.
+Must consume the Button event (on press, when the Widget drag begins) to receive this event.
 */
 struct DragMove : DragBase {
 	/** Change in mouse position since the last frame. Can be zero. */
@@ -255,7 +255,7 @@ struct DragHover : DragBase, PositionBase {
 };
 
 /** Occurs when the mouse enters a Widget while dragging.
-Must set the DragHover target to receive this event.
+Must consume the DragHover event to receive this event.
 */
 struct DragEnter : DragBase {
 	/** The dragged widget */
@@ -264,7 +264,7 @@ struct DragEnter : DragBase {
 
 
 /** Occurs when the mouse leaves a Widget while dragging.
-Must set the DragHover target to receive this event.
+Must consume the DragHover event (when the Widget is entered) to receive this event.
 */
 struct DragLeave : DragBase {
 	/** The dragged widget */
@@ -273,7 +273,7 @@ struct DragLeave : DragBase {
 
 
 /** Occurs when the mouse button is released over a Widget while dragging.
-Must set the Button target to receive this event.
+Must consume the Button event (on release) to receive this event.
 */
 struct DragDrop : DragBase {
 	/** The dragged widget */

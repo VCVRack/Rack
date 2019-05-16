@@ -4,7 +4,6 @@
 #include "ui/Menu.hpp"
 #include "app/PortWidget.hpp"
 #include "app/ParamWidget.hpp"
-#include "app/SvgPanel.hpp"
 #include "plugin/Model.hpp"
 #include "engine/Module.hpp"
 
@@ -19,7 +18,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Owned. */
 	engine::Module *module = NULL;
 
-	SvgPanel *panel = NULL;
+	widget::Widget *panel = NULL;
 	/** Note that the indexes of these vectors do not necessarily correspond with the indexes of `Module::params` etc.
 	*/
 	std::vector<ParamWidget*> params;

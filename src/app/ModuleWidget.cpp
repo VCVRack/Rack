@@ -2,6 +2,7 @@
 #include "app/Scene.hpp"
 #include "engine/Engine.hpp"
 #include "plugin/Plugin.hpp"
+#include "app/SvgPanel.hpp"
 #include "system.hpp"
 #include "asset.hpp"
 #include "helpers.hpp"
@@ -242,9 +243,6 @@ struct ModuleDeleteItem : ui::MenuItem {
 
 ModuleWidget::ModuleWidget() {
 	box.size = math::Vec(0, RACK_GRID_HEIGHT);
-
-	panel = new SvgPanel;
-	addChild(panel);
 }
 
 ModuleWidget::~ModuleWidget() {
@@ -424,8 +422,19 @@ void ModuleWidget::setModule(engine::Module *module) {
 }
 
 void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
-	assert(panel);
-	panel->setBackground(svg);
+	// Remove existing panel
+	if (panel) {
+		removeChild(panel);
+		delete panel;
+		panel = NULL;
+	}
+
+	// Create SvgPanel
+	SvgPanel *svgPanel = new SvgPanel;
+	svgPanel->setBackground(svg);
+	panel = svgPanel;
+	addChildBottom(panel);
+
 	// Set ModuleWidget size based on panel
 	box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 }
