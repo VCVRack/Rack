@@ -61,12 +61,12 @@ json_t *Module::toJson() {
 	}
 
 	// leftModuleId
-	if (leftModuleId >= 0)
-		json_object_set_new(rootJ, "leftModuleId", json_integer(leftModuleId));
+	if (leftExpander.moduleId >= 0)
+		json_object_set_new(rootJ, "leftModuleId", json_integer(leftExpander.moduleId));
 
 	// rightModuleId
-	if (rightModuleId >= 0)
-		json_object_set_new(rootJ, "rightModuleId", json_integer(rightModuleId));
+	if (rightExpander.moduleId >= 0)
+		json_object_set_new(rootJ, "rightModuleId", json_integer(rightExpander.moduleId));
 
 	return rootJ;
 }
@@ -115,12 +115,12 @@ void Module::fromJson(json_t *rootJ) {
 	// leftModuleId
 	json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
 	if (leftModuleIdJ)
-		leftModuleId = json_integer_value(leftModuleIdJ);
+		leftExpander.moduleId = json_integer_value(leftModuleIdJ);
 
 	// rightModuleId
 	json_t *rightModuleIdJ = json_object_get(rootJ, "rightModuleId");
 	if (rightModuleIdJ)
-		rightModuleId = json_integer_value(rightModuleIdJ);
+		rightExpander.moduleId = json_integer_value(rightModuleIdJ);
 }
 
 

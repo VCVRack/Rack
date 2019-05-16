@@ -352,8 +352,8 @@ static void RackWidget_updateAdjacent(RackWidget *that) {
 		}
 
 		ModuleWidget *mw = dynamic_cast<ModuleWidget*>(w);
-		mw->module->rightModuleId = mwRight ? mwRight->module->id : -1;
-		mw->module->leftModuleId = mwLeft ? mwLeft->module->id : -1;
+		mw->module->leftExpander.moduleId = mwLeft ? mwLeft->module->id : -1;
+		mw->module->rightExpander.moduleId = mwRight ? mwRight->module->id : -1;
 	}
 }
 

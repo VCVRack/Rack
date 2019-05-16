@@ -305,39 +305,26 @@ static void Engine_step(Engine *that) {
 
 	// Flip messages for each module
 	for (Module *module : that->internal->modules) {
-		if (module->leftMessageFlipRequested) {
-			std::swap(module->leftProducerMessage, module->leftConsumerMessage);
-			module->leftMessageFlipRequested = false;
+		if (module->leftExpander.messageFlipRequested) {
+			std::swap(module->leftExpander.producerMessage, module->leftExpander.consumerMessage);
+			module->leftExpander.messageFlipRequested = false;
 		}
-		if (module->rightMessageFlipRequested) {
-			std::swap(module->rightProducerMessage, module->rightConsumerMessage);
-			module->rightMessageFlipRequested = false;
+		if (module->rightExpander.messageFlipRequested) {
+			std::swap(module->rightExpander.producerMessage, module->rightExpander.consumerMessage);
+			module->rightExpander.messageFlipRequested = false;
 		}
 	}
 }
 
-static void Engine_updateAdjacent(Engine *that, Module *m) {
-	// Sync leftModule
-	if (m->leftModuleId >= 0) {
-		if (!m->leftModule || m->leftModule->id != m->leftModuleId) {
-			m->leftModule = that->getModule(m->leftModuleId);
+static void Engine_updateExpander(Engine *that, Module::Expander *expander) {
+	if (expander->moduleId >= 0) {
+		if (!expander->module || expander->module->id != expander->moduleId) {
+			expander->module = that->getModule(expander->moduleId);
 		}
 	}
 	else {
-		if (m->leftModule) {
-			m->leftModule = NULL;
-		}
-	}
-
-	// Sync rightModule
-	if (m->rightModuleId >= 0) {
-		if (!m->rightModule || m->rightModule->id != m->rightModuleId) {
-			m->rightModule = that->getModule(m->rightModuleId);
-		}
-	}
-	else {
-		if (m->rightModule) {
-			m->rightModule = NULL;
+		if (expander->module) {
+			expander->module = NULL;
 		}
 	}
 }
@@ -411,8 +398,10 @@ static void Engine_run(Engine *that) {
 		if (!internal->paused) {
 			std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
+			// Update expander pointers
 			for (Module *module : internal->modules) {
-				Engine_updateAdjacent(that, module);
+				Engine_updateExpander(that, &module->leftExpander);
+				Engine_updateExpander(that, &module->rightExpander);
 			}
 
 			// Step modules
@@ -532,15 +521,15 @@ void Engine::removeModule(Module *module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = NULL;
 	}
-	// Update adjacent modules
+	// Update expander pointers
 	for (Module *m : internal->modules) {
-		if (m->leftModule == module) {
-			m->leftModuleId = -1;
-			m->leftModule = NULL;
+		if (m->leftExpander.module == module) {
+			m->leftExpander.moduleId = -1;
+			m->leftExpander.module = NULL;
 		}
-		if (m->rightModule == module) {
-			m->rightModuleId = -1;
-			m->rightModule = NULL;
+		if (m->rightExpander.module == module) {
+			m->rightExpander.moduleId = -1;
+			m->rightExpander.module = NULL;
 		}
 	}
 	// Trigger Remove event
