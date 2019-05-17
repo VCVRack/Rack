@@ -15,7 +15,7 @@ https://www.cs.cmu.edu/~eli/papers/icmc01-hardsync.pdf
 void minBlepImpulse(int z, int o, float *output);
 
 
-template<int Z, int O>
+template <int Z, int O>
 struct MinBlepGenerator {
 	float buf[2 * Z] = {};
 	int pos = 0;

@@ -81,16 +81,17 @@ void PatchManager::save(std::string path) {
 		json_decref(rootJ);
 	});
 
-	FILE *file = std::fopen(path.c_str(), "w");
+	// Write to temporary path and then rename it to the correct path
+	std::string tmpPath = path + ".tmp";
+	FILE *file = std::fopen(tmpPath.c_str(), "w");
 	if (!file) {
 		// Fail silently
 		return;
 	}
-	DEFER({
-		std::fclose(file);
-	});
 
 	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	std::fclose(file);
+	system::moveFile(tmpPath, path);
 }
 
 void PatchManager::saveDialog() {

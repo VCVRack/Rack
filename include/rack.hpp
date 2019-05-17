@@ -84,7 +84,6 @@
 #include "dsp/fft.hpp"
 #include "dsp/filter.hpp"
 #include "dsp/fir.hpp"
-#include "dsp/frame.hpp"
 #include "dsp/minblep.hpp"
 #include "dsp/ode.hpp"
 #include "dsp/resampler.hpp"
@@ -102,6 +101,7 @@ namespace rack {
 /** Define this macro before including this header to prevent common namespaces from being included in the main `rack::` namespace. */
 #ifndef RACK_FLATTEN_NAMESPACES
 // Import some namespaces for convenience
+using namespace logger;
 using namespace math;
 using namespace widget;
 using namespace ui;

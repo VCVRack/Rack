@@ -9,8 +9,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <atomic>
-#include <xmmintrin.h>
-#include <pmmintrin.h>
+#include <x86intrin.h>
 
 
 namespace rack {
@@ -90,7 +89,54 @@ struct SpinBarrier {
 			count = 0;
 		}
 		else {
-			while (count != 0);
+			while (count != 0) {
+				_mm_pause();
+			}
+		}
+	}
+};
+
+
+/** Spinlocks until all `total` threads are waiting.
+If `yield` is set to true at any time, all threads will switch to waiting on a mutex instead.
+All threads must return before beginning a new phase. Alternating between two barriers solves this problem.
+*/
+struct HybridBarrier {
+	std::atomic<int> count {0};
+	int total = 0;
+
+	std::mutex mutex;
+	std::condition_variable cv;
+
+	std::atomic<bool> yield {false};
+
+	void wait() {
+		int id = ++count;
+
+		// End and reset phase if this is the last thread
+		if (id == total) {
+			count = 0;
+			if (yield) {
+				std::unique_lock<std::mutex> lock(mutex);
+				cv.notify_all();
+				yield = false;
+			}
+			return;
+		}
+
+		// Spinlock
+		while (!yield) {
+			if (count == 0)
+				return;
+			_mm_pause();
+		}
+
+		// Wait on mutex
+		{
+			std::unique_lock<std::mutex> lock(mutex);
+			cv.wait(lock, [&]{
+				return count == 0;
+			});
 		}
 	}
 };
@@ -104,6 +150,7 @@ struct EngineWorker {
 
 	void start() {
 		thread = std::thread([&] {
+			random::init();
 			run();
 		});
 	}
@@ -117,7 +164,6 @@ struct EngineWorker {
 	}
 
 	void run();
-	void step();
 };
 
 
@@ -146,8 +192,8 @@ struct Engine::Internal {
 	bool realTime = false;
 	int threadCount = 1;
 	std::vector<EngineWorker> workers;
-	SpinBarrier engineBarrier;
-	SpinBarrier workerBarrier;
+	HybridBarrier engineBarrier;
+	HybridBarrier workerBarrier;
 	std::atomic<int> workerModuleIndex;
 };
 
@@ -188,7 +234,7 @@ static void Engine_stepModules(Engine *that, int threadId) {
 	// Step each module
 	// for (int i = threadId; i < modulesLen; i += threadCount) {
 	while (true) {
-		// Chose module
+		// Choose next module
 		int i = internal->workerModuleIndex++;
 		if (i >= modulesLen)
 			break;
@@ -232,7 +278,7 @@ static void Engine_step(Engine *that) {
 	if (smoothModule) {
 		Param *param = &smoothModule->params[smoothParamId];
 		float value = param->value;
-		// decay rate is 1 graphics frame
+		// Decay rate is 1 graphics frame
 		const float smoothLambda = 60.f;
 		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
 		if (value == newValue) {
@@ -256,35 +302,29 @@ static void Engine_step(Engine *that) {
 	for (Cable *cable : that->internal->cables) {
 		cable->step();
 	}
-	// Swap messages of all modules
+
+	// Flip messages for each module
 	for (Module *module : that->internal->modules) {
-		std::swap(module->leftProducerMessage, module->leftConsumerMessage);
-		std::swap(module->rightProducerMessage, module->rightConsumerMessage);
+		if (module->leftExpander.messageFlipRequested) {
+			std::swap(module->leftExpander.producerMessage, module->leftExpander.consumerMessage);
+			module->leftExpander.messageFlipRequested = false;
+		}
+		if (module->rightExpander.messageFlipRequested) {
+			std::swap(module->rightExpander.producerMessage, module->rightExpander.consumerMessage);
+			module->rightExpander.messageFlipRequested = false;
+		}
 	}
 }
 
-static void Engine_updateAdjacent(Engine *that, Module *m) {
-	// Sync leftModule
-	if (m->leftModuleId >= 0) {
-		if (!m->leftModule || m->leftModule->id != m->leftModuleId) {
-			m->leftModule = that->getModule(m->leftModuleId);
+static void Engine_updateExpander(Engine *that, Module::Expander *expander) {
+	if (expander->moduleId >= 0) {
+		if (!expander->module || expander->module->id != expander->moduleId) {
+			expander->module = that->getModule(expander->moduleId);
 		}
 	}
 	else {
-		if (m->leftModule) {
-			m->leftModule = NULL;
-		}
-	}
-
-	// Sync rightModule
-	if (m->rightModuleId >= 0) {
-		if (!m->rightModule || m->rightModule->id != m->rightModuleId) {
-			m->rightModule = that->getModule(m->rightModuleId);
-		}
-	}
-	else {
-		if (m->rightModule) {
-			m->rightModule = NULL;
+		if (expander->module) {
+			expander->module = NULL;
 		}
 	}
 }
@@ -332,7 +372,7 @@ static void Engine_run(Engine *that) {
 	// Every time the that waits and locks a mutex, it steps this many frames
 	const int mutexSteps = 128;
 	// Time in seconds that the that is rushing ahead of the estimated clock time
-	double ahead = 0.0;
+	double aheadTime = 0.0;
 	auto lastTime = std::chrono::high_resolution_clock::now();
 
 	while (internal->running) {
@@ -345,6 +385,7 @@ static void Engine_run(Engine *that) {
 			for (Module *module : internal->modules) {
 				module->onSampleRateChange();
 			}
+			aheadTime = 0.0;
 		}
 
 		// Launch workers
@@ -357,8 +398,10 @@ static void Engine_run(Engine *that) {
 		if (!internal->paused) {
 			std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
+			// Update expander pointers
 			for (Module *module : internal->modules) {
-				Engine_updateAdjacent(that, module);
+				Engine_updateExpander(that, &module->leftExpander);
+				Engine_updateExpander(that, &module->rightExpander);
 			}
 
 			// Step modules
@@ -368,17 +411,17 @@ static void Engine_run(Engine *that) {
 		}
 
 		double stepTime = mutexSteps * internal->sampleTime;
-		ahead += stepTime;
+		aheadTime += stepTime;
 		auto currTime = std::chrono::high_resolution_clock::now();
 		const double aheadFactor = 2.0;
-		ahead -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
+		aheadTime -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
 		lastTime = currTime;
-		ahead = std::fmax(ahead, 0.0);
+		aheadTime = std::fmax(aheadTime, 0.0);
 
 		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
 		// The number of steps to wait before possibly sleeping
 		const double aheadMax = 1.0; // seconds
-		if (ahead > aheadMax) {
+		if (aheadTime > aheadMax) {
 			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
 		}
 	}
@@ -390,7 +433,10 @@ static void Engine_run(Engine *that) {
 
 void Engine::start() {
 	internal->running = true;
-	internal->thread = std::thread(Engine_run, this);
+	internal->thread = std::thread([&] {
+		random::init();
+		Engine_run(this);
+	});
 }
 
 void Engine::stop() {
@@ -417,6 +463,10 @@ float Engine::getSampleTime() {
 	return internal->sampleTime;
 }
 
+void Engine::yieldWorkers() {
+	internal->workerBarrier.yield = true;
+}
+
 void Engine::addModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
@@ -441,6 +491,7 @@ void Engine::addModule(Module *module) {
 	}
 	// Add module
 	internal->modules.push_back(module);
+	// Trigger Add event
 	module->onAdd();
 	// Update ParamHandles
 	for (ParamHandle *paramHandle : internal->paramHandles) {
@@ -453,6 +504,9 @@ void Engine::removeModule(Module *module) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	// Check that the module actually exists
+	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+	assert(it != internal->modules.end());
 	// If a param is being smoothed on this module, stop smoothing it immediately
 	if (module == internal->smoothModule) {
 		internal->smoothModule = NULL;
@@ -467,22 +521,20 @@ void Engine::removeModule(Module *module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = NULL;
 	}
-	// Update adjacent modules
+	// Update expander pointers
 	for (Module *m : internal->modules) {
-		if (m->leftModule == module) {
-			m->leftModuleId = -1;
-			m->leftModule = NULL;
+		if (m->leftExpander.module == module) {
+			m->leftExpander.moduleId = -1;
+			m->leftExpander.module = NULL;
 		}
-		if (m->rightModule == module) {
-			m->rightModuleId = -1;
-			m->rightModule = NULL;
+		if (m->rightExpander.module == module) {
+			m->rightExpander.moduleId = -1;
+			m->rightExpander.module = NULL;
 		}
 	}
-	// Check that the module actually exists
-	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
-	assert(it != internal->modules.end());
-	// Remove the module
+	// Trigger Remove event
 	module->onRemove();
+	// Remove module
 	internal->modules.erase(it);
 }
 
@@ -698,17 +750,14 @@ void EngineWorker::run() {
 	system::setThreadName("Engine worker");
 	system::setThreadRealTime(engine->internal->realTime);
 	disableDenormals();
-	while (running) {
-		step();
-	}
-}
 
-void EngineWorker::step() {
-	engine->internal->engineBarrier.wait();
-	if (!running)
-		return;
-	Engine_stepModules(engine, id);
-	engine->internal->workerBarrier.wait();
+	while (1) {
+		engine->internal->engineBarrier.wait();
+		if (!running)
+			return;
+		Engine_stepModules(engine, id);
+		engine->internal->workerBarrier.wait();
+	}
 }
 
 

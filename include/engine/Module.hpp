@@ -37,30 +37,39 @@ struct Module {
 	std::vector<Light> lights;
 	std::vector<ParamQuantity*> paramQuantities;
 
-	/** ID of the Module immediately to the left, or -1 if nonexistent. */
-	int leftModuleId = -1;
-	/** Pointer to the left Module, or NULL if nonexistent. */
-	Module *leftModule = NULL;
-	/** Double buffer for receiving messages from adjacent modules.
-	If this module receives messages from adjacent modules, allocate both message buffers with identical blocks of memory (arrays, structs, etc).
-	Remember to free the buffer in the Module destructor.
-	Example:
+	/** Represents a message-passing channel for an adjacent module. */
+	struct Expander {
+		/** ID of the expander module, or -1 if nonexistent. */
+		int moduleId = -1;
+		/** Pointer to the expander Module, or NULL if nonexistent. */
+		Module *module = NULL;
+		/** Double buffer for receiving messages from the expander module.
+		If you intend to receive messages from an expander, allocate both message buffers with identical blocks of memory (arrays, structs, etc).
+		Remember to free the buffer in the Module destructor.
+		Example:
 
-		leftProducerMessage = new MyModuleMessage;
-		leftConsumerMessage = new MyModuleMessage;
+			rightExpander.producerMessage = new MyExpanderMessage;
+			rightExpander.consumerMessage = new MyExpanderMessage;
 
-	At the end of each timestep, the buffers are flipped/swapped.
+		You must check the expander module's `model` before attempting to write its message buffer.
+		Once the module is checked, you can reinterpret_cast its producerMessage at no performance cost.
 
-	You may choose for the Module to write to its own message buffer for consumption by other modules.
-	As long as this convention is followed by the left Module, this is fine.
-	*/
-	void *leftProducerMessage = NULL;
-	void *leftConsumerMessage = NULL;
+		Producer messages are intended to be write-only.
+		Consumer messages are intended to be read-only.
 
-	int rightModuleId = -1;
-	Module *rightModule = NULL;
-	void *rightProducerMessage = NULL;
-	void *rightConsumerMessage = NULL;
+		Once you write a message, set messageFlipRequested to true to request that the messages are flipped at the end of the timestep.
+		This means that message-passing has 1-sample latency.
+
+		You may choose for your Module to instead write to its own message buffer for consumption by other modules, i.e. the expander "pulls" rather than this module "pushing".
+		As long as this convention is followed by the other module, this is fine.
+		*/
+		void *producerMessage = NULL;
+		void *consumerMessage = NULL;
+		bool messageFlipRequested = false;
+	};
+
+	Expander leftExpander;
+	Expander rightExpander;
 
 	/** Seconds spent in the process() method, with exponential smoothing.
 	Only written when CPU timing is enabled, since time measurement is expensive.

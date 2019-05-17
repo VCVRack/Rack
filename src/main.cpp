@@ -57,17 +57,23 @@ int main(int argc, char *argv[]) {
 #endif
 
 	std::string patchPath;
+	bool screenshot = false;
+	float screenshotZoom = 1.f;
 
 	// Parse command line arguments
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "ds:u:")) != -1) {
+	while ((c = getopt(argc, argv, "dhp:s:u:")) != -1) {
 		switch (c) {
 			case 'd': {
 				settings::devMode = true;
 			} break;
 			case 'h': {
 				settings::headless = true;
+			} break;
+			case 'p': {
+				screenshot = true;
+				sscanf(optarg, "%f", &screenshotZoom);
 			} break;
 			case 's': {
 				asset::systemDir = optarg;
@@ -154,14 +160,18 @@ int main(int argc, char *argv[]) {
 	INFO("Starting engine");
 	APP->engine->start();
 
-	if (!settings::headless) {
+	if (settings::headless) {
+		// TEMP Prove that the app doesn't crash
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+	}
+	else if (screenshot) {
+		INFO("Taking screenshots of all modules at %gx zoom", screenshotZoom);
+		APP->window->screenshot(screenshotZoom);
+	}
+	else {
 		INFO("Running window");
 		APP->window->run();
 		INFO("Stopped window");
-	}
-	else {
-		// TEMP Prove that the app doesn't crash
-		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 	INFO("Stopping engine");
 	APP->engine->stop();

@@ -8,7 +8,7 @@ import xml.etree.ElementTree
 
 
 # Version check
-f"Python 3.6 is required"
+f"Python 3.6+ is required"
 
 
 class UserException(Exception):
@@ -39,33 +39,15 @@ def slug_to_identifier(slug):
 	return slug
 
 
-def usage(script):
-	text = f"""Usage: {script} <command> ...
-Run commands without arguments for command help.
-
-Commands:
-  createplugin <slug>
-  createmodule <module slug>
-  createmanifest
-"""
-	print(text)
-
-
-def usage_create_plugin(script):
-	text = f"""Usage: {script} createplugin <slug>
-
-A directory <slug> will be created in the current working directory and seeded with initial files.
-"""
-	print(text)
-
-
-def create_plugin(slug):
+def create_plugin(slug, plugin_dir=None):
 	# Check slug
 	if not is_valid_slug(slug):
 		raise UserException("Slug must only contain ASCII letters, numbers, '-', and '_'.")
 
+	if not plugin_dir:
+		plugin_dir = os.path.join(slug, '')
+
 	# Check if plugin directory exists
-	plugin_dir = os.path.join(slug, '')
 	if os.path.exists(plugin_dir):
 		raise UserException(f"Directory {plugin_dir} already exists")
 
@@ -74,7 +56,7 @@ def create_plugin(slug):
 
 	# Create manifest
 	try:
-		create_manifest(plugin_dir, slug)
+		create_manifest(slug, plugin_dir)
 	except Exception as e:
 		os.rmdir(plugin_dir)
 		raise e
@@ -120,6 +102,7 @@ using namespace rack;
 extern Plugin *pluginInstance;
 
 // Declare each Model, defined in each module source file
+// extern Model *modelMyModule;
 """
 	with open(os.path.join(plugin_dir, "src/plugin.hpp"), "w") as f:
 		f.write(plugin_hpp)
@@ -133,6 +116,9 @@ Plugin *pluginInstance;
 
 void init(Plugin *p) {
 	pluginInstance = p;
+
+	// Add modules here, e.g.
+	// p->addModel(modelMyModule);
 
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
@@ -156,58 +142,57 @@ void init(Plugin *p) {
 	print(f"You may use `make`, `make clean`, `make dist`, `make install`, etc in the {plugin_dir} directory.")
 
 
-def create_manifest(plugin_dir, slug=None):
-	manifest = {}
+def create_manifest(slug, plugin_dir="."):
+	# Default manifest
+	manifest = {
+		'slug': slug,
+	}
+
+	# Try to load existing manifest file
+	manifest_filename = os.path.join(plugin_dir, 'plugin.json')
+	try:
+		with open(manifest_filename, "r") as f:
+			manifest = json.load(f)
+	except:
+		pass
 
 	# Query manifest information
-	if not slug:
-		slug = input_default("Plugin slug (unique identifier)")
-	manifest['slug'] = slug
-	manifest['name'] = input_default("Plugin name", slug)
-	manifest['version'] = input_default("Version", "1.0.0")
-	manifest['license'] = input_default("License (if open-source, use license identifier from https://spdx.org/licenses/)", "proprietary")
-	manifest['author'] = input_default("Author")
-	manifest['authorEmail'] = input_default("Author email (optional)")
-	manifest['authorUrl'] = input_default("Author website URL (optional)")
-	manifest['pluginUrl'] = input_default("Plugin website URL (optional)")
-	manifest['manualUrl'] = input_default("Manual website URL (optional)")
-	manifest['sourceUrl'] = input_default("Source code URL (optional)")
-	manifest['donateUrl'] = input_default("Donate URL (optional)")
-	manifest['modules'] = []
+	manifest['name'] = input_default("Plugin name", manifest.get('name', slug))
+	manifest['version'] = input_default("Version", manifest.get('version', "1.0.0"))
+	manifest['license'] = input_default("License (if open-source, use license identifier from https://spdx.org/licenses/)", manifest.get('license', "proprietary"))
+	manifest['author'] = input_default("Author", manifest.get('author', ""))
+	manifest['authorEmail'] = input_default("Author email (optional)", manifest.get('authorEmail', ""))
+	manifest['authorUrl'] = input_default("Author website URL (optional)", manifest.get('authorUrl', ""))
+	manifest['pluginUrl'] = input_default("Plugin website URL (optional)", manifest.get('pluginUrl', ""))
+	manifest['manualUrl'] = input_default("Manual website URL (optional)", manifest.get('manualUrl', ""))
+	manifest['sourceUrl'] = input_default("Source code URL (optional)", manifest.get('sourceUrl', ""))
+	manifest['donateUrl'] = input_default("Donate URL (optional)", manifest.get('donateUrl', ""))
+
+	if 'modules' not in manifest:
+		manifest['modules'] = []
 
 	# Dump JSON
-	manifest_filename = os.path.join(plugin_dir, 'plugin.json')
 	with open(manifest_filename, "w") as f:
-		json.dump(manifest, f, indent="\t")
-	print(f"Manifest created at {manifest_filename}")
+		json.dump(manifest, f, indent="  ")
+	print(f"Manifest written to {manifest_filename}")
 
 
-def usage_create_module(script):
-	text = f"""Usage: {script} createmodule <module slug>
-
-Must be called in a plugin directory.
-A panel file must exist in res/<module slug>.svg.
-A source file will be created at src/<module slug>.cpp.
-
-See https://vcvrack.com/manual/PanelTutorial.html for creating SVG panel files.
-"""
-	print(text)
-
-
-def create_module(slug):
+def create_module(slug, panel_filename=None, source_filename=None):
 	# Check slug
 	if not is_valid_slug(slug):
 		raise UserException("Slug must only contain ASCII letters, numbers, '-', and '_'.")
 
 	# Read manifest
 	manifest_filename = 'plugin.json'
-	manifest = None
 	with open(manifest_filename, "r") as f:
 		manifest = json.load(f)
 
 	# Check if module manifest exists
 	module_manifest = find(lambda m: m['slug'] == slug, manifest['modules'])
-	if not module_manifest:
+	if module_manifest:
+		print(f"Module {slug} already exists in plugin.json. Edit this file to modify the module manifest.")
+
+	else:
 		# Add module to manifest
 		module_manifest = {}
 		module_manifest['slug'] = slug
@@ -224,50 +209,44 @@ def create_module(slug):
 
 		# Write manifest
 		with open(manifest_filename, "w") as f:
-			json.dump(manifest, f, indent="\t")
+			json.dump(manifest, f, indent="  ")
 
-		print(f"Added {slug} to plugin.json")
-
-	else:
-		print(f"Module {slug} already exists in plugin.json. Edit this file to modify the module manifest.")
+		print(f"Added {slug} to {manifest_filename}")
 
 	# Check filenames
-	panel_filename = f"res/{slug}.svg"
-	source_filename = f"src/{slug}.cpp"
+	if panel_filename and source_filename:
+		if not os.path.exists(panel_filename):
+			raise UserException(f"Panel not found at {panel_filename}.")
 
-	if not os.path.exists(panel_filename):
-		print(f"Panel not found at {panel_filename}. If you wish to automatically generate a source file, run this command with no arguments for instructions for creating a panel file.")
-		return
+		print(f"Panel found at {panel_filename}. Generating source file.")
 
-	print(f"Panel found at {panel_filename}. Generating source file.")
+		if os.path.exists(source_filename):
+			if input_default(f"{source_filename} already exists. Overwrite?", "n").lower() != "y":
+				return
 
-	if os.path.exists(source_filename):
-		if input_default(f"{source_filename} already exists. Overwrite?", "n").lower() != "y":
-			return
+		# Read SVG XML
+		tree = xml.etree.ElementTree.parse(panel_filename)
 
-	# Read SVG XML
-	tree = xml.etree.ElementTree.parse(panel_filename)
+		components = panel_to_components(tree)
+		print(f"Components extracted from {panel_filename}")
 
-	components = panel_to_components(tree)
-	print(f"Components extracted from {panel_filename}")
+		# Write source
+		source = components_to_source(components, slug)
 
-	# Write source
-	source = components_to_source(components, slug)
+		with open(source_filename, "w") as f:
+			f.write(source)
+		print(f"Source file generated at {source_filename}")
 
-	with open(source_filename, "w") as f:
-		f.write(source)
-	print(f"Source file generated at {source_filename}")
+		# Append model to plugin.hpp
+		identifier = slug_to_identifier(slug)
 
-	# Append model to plugin.hpp
-	identifier = slug_to_identifier(slug)
-
-	# Tell user to add model to plugin.hpp and plugin.cpp
-	print(f"")
-	print(f"To enable the module, add")
-	print(f"extern Model *model{identifier};")
-	print(f"to plugin.hpp, and add")
-	print(f"p->addModel(model{identifier});")
-	print(f"to the init() function in plugin.cpp.")
+		# Tell user to add model to plugin.hpp and plugin.cpp
+		print(f"""
+To enable the module, add
+extern Model *model{identifier};
+to plugin.hpp, and add
+p->addModel(model{identifier});
+to the init() function in plugin.cpp.""")
 
 
 def panel_to_components(tree):
@@ -495,24 +474,49 @@ Model *model{identifier} = createModel<{identifier}, {identifier}Widget>("{slug}
 	return source
 
 
+def usage(script):
+	text = f"""VCV Rack Plugin Helper Utility
+
+Usage: {script} <command> ...
+Commands:
+
+createplugin <slug> [plugin dir]
+
+	A directory will be created and initialized with a minimal plugin template.
+	If no plugin directory is given, the slug is used.
+
+createmanifest <slug> [plugin dir]
+
+	Creates a `plugin.json` manifest file in an existing plugin directory.
+	If no plugin directory is given, the current directory is used.
+
+createmodule <module slug> [panel file] [source file]
+
+	Adds a new module to the plugin manifest in the current directory.
+	If a panel and source file are given, generates a template source file initialized with components from a panel file.
+	Example:
+		{script} createmodule MyModule res/MyModule.svg src/MyModule.cpp
+
+	See https://vcvrack.com/manual/PanelTutorial.html for creating SVG panel files.
+"""
+	print(text)
+
+
 def parse_args(args):
-	if len(args) >= 2:
-		if args[1] == 'createplugin':
-			if len(args) >= 3:
-				create_plugin(args[2])
-				return
-			usage_create_plugin(args[0])
-			return
-		if args[1] == 'createmodule':
-			if len(args) >= 3:
-				create_module(args[2])
-				return
-			usage_create_module(args[0])
-			return
-		if args[1] == 'createmanifest':
-			create_manifest('.')
-			return
-	usage(args[0])
+	script = args.pop(0)
+	if len(args) == 0:
+		usage(script)
+		return
+
+	cmd = args.pop(0)
+	if cmd == 'createplugin':
+		create_plugin(*args)
+	elif cmd == 'createmodule':
+		create_module(*args)
+	elif cmd == 'createmanifest':
+		create_manifest(*args)
+	else:
+		print(f"Command not found: {cmd}")
 
 
 if __name__ == "__main__":

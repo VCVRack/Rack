@@ -248,7 +248,7 @@ void load(const std::string &path) {
 	INFO("Loading settings %s", path.c_str());
 	FILE *file = fopen(path.c_str(), "r");
 	if (!file)
-		throw UserException(string::f("Could not load settings file %s", path.c_str()));
+		return;
 	DEFER({
 		fclose(file);
 	});

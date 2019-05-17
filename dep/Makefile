@@ -151,7 +151,7 @@ ifdef ARCH_WIN
 RTAUDIO_FLAGS += -DRTAUDIO_API_DS=ON -DRTAUDIO_API_WASAPI=ON -DRTAUDIO_API_ASIO=ON
 endif
 ifdef ARCH_LIN
-RTAUDIO_FLAGS += -DRTAUDIO_API_ALSA=ON -DRTAUDIO_API_JACK=OFF -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_OSS=OFF
+RTAUDIO_FLAGS += -DRTAUDIO_API_ALSA=ON -DRTAUDIO_API_JACK=ON -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_OSS=OFF
 endif
 
 $(rtaudio):
@@ -160,7 +160,7 @@ $(rtaudio):
 	$(MAKE) -C rtaudio/build
 	$(MAKE) -C rtaudio/build install
 
-$(nanovg): $(wildcard nanovg/src/*.h)
+$(nanovg): $(wildcard nanovg/src/*.h) nanovg/example/stb_image_write.h
 	cp $^ include/
 
 $(nanosvg): $(wildcard nanosvg/src/*.h)

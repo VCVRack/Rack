@@ -11,7 +11,9 @@ namespace rack {
 namespace random {
 
 
-/** Seeds the RNG with the current time */
+/** Initializes the thread-local RNG state.
+Must call per-thread, otherwise the RNG will always return 0.
+*/
 void init();
 /** Returns a uniform random uint32_t from 0 to UINT32_MAX */
 uint32_t u32();

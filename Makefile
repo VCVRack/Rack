@@ -1,9 +1,8 @@
 RACK_DIR ?= .
-VERSION = 1.dev.$(shell git rev-parse --short HEAD)
+VERSION := 1.dev.$(shell git rev-parse --short HEAD)
 
 FLAGS += -DVERSION=$(VERSION)
-FLAGS += -Iinclude
-FLAGS += -Idep/include -Idep/lib/libzip/include
+FLAGS += -Iinclude -Idep/include
 
 include arch.mk
 
@@ -18,7 +17,8 @@ SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifdef ARCH_LIN
 	SOURCES += dep/osdialog/osdialog_gtk2.c
-	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
+build/dep/osdialog/osdialog_gtk2.c.o: FLAGS += $(shell pkg-config --cflags gtk+-2.0)
+
 	LDFLAGS += -rdynamic \
 		dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtmidi.a dep/lib/librtaudio.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a \
 		-lpthread -lGL -ldl -lX11 -lasound -ljack \
@@ -71,7 +71,8 @@ perf: $(TARGET)
 	# Requires gperftools
 	perf record --call-graph dwarf -o perf.data ./$< -d
 	# Analyze with hotspot (https://github.com/KDAB/hotspot) for example
-	# hotspot perf.data
+	hotspot perf.data
+	rm perf.data
 
 valgrind: $(TARGET)
 	# --gen-suppressions=yes
@@ -104,7 +105,7 @@ ifdef ARCH_LIN
 	ldd dist/Rack/$(TARGET)
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
-	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 ifdef ARCH_MAC
 	mkdir -p dist/$(TARGET).app
@@ -121,8 +122,13 @@ ifdef ARCH_MAC
 	otool -L dist/$(TARGET).app/Contents/MacOS/$(TARGET)
 
 	cp plugins/Fundamental/dist/*.zip dist/$(TARGET).app/Contents/Resources/Fundamental.zip
+	# Clean up and sign bundle
+	xattr -cr dist/$(TARGET).app
+	codesign --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --verbose dist/$(TARGET).app
+	codesign --verify --verbose dist/$(TARGET).app
+	spctl --assess --verbose dist/$(TARGET).app
 	# Make ZIP
-	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
+	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
@@ -134,7 +140,7 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
-	cd dist && zip -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
 	makensis -DVERSION=$(VERSION) installer.nsi
@@ -148,10 +154,11 @@ endif
 	cp -R include dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
+	cp helper.py dist/Rack-SDK/
 ifdef ARCH_WIN
 	cp libRack.a dist/Rack-SDK/
 endif
-	cd dist && zip -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
+	cd dist && zip -q -9 -r Rack-SDK-$(VERSION).zip Rack-SDK
 
 
 # Obviously this will only work if you have the private keys to my server
@@ -171,16 +178,11 @@ endif
 # Plugin helpers
 
 plugins:
+ifdef CMD
+	for f in plugins/*; do (cd "$$f" && $(CMD)); done
+else
 	for f in plugins/*; do $(MAKE) -C "$$f"; done
-
-cleanplugins:
-	for f in plugins/*; do $(MAKE) -C "$$f" clean; done
-
-distplugins:
-	for f in plugins/*; do $(MAKE) -C "$$f" dist; done
-
-cmdplugins:
-	for f in plugins/*; do (cd "$$f" && ${CMD}); done
+endif
 
 
 # Includes

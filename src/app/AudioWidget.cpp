@@ -1,5 +1,4 @@
 #include "app/AudioWidget.hpp"
-#include "audio.hpp"
 #include "helpers.hpp"
 
 
@@ -9,9 +8,9 @@ namespace app {
 
 struct AudioDriverItem : ui::MenuItem {
 	audio::Port *port;
-	int driver;
+	int driverId;
 	void onAction(const event::Action &e) override {
-		port->setDriver(driver);
+		port->setDriverId(driverId);
 	}
 };
 
@@ -23,30 +22,36 @@ struct AudioDriverChoice : LedDisplayChoice {
 
 		ui::Menu *menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
-		for (int driver : port->getDrivers()) {
+		for (int driverId : port->getDriverIds()) {
 			AudioDriverItem *item = new AudioDriverItem;
 			item->port = port;
-			item->driver = driver;
-			item->text = port->getDriverName(driver);
-			item->rightText = CHECKMARK(item->driver == port->driver);
+			item->driverId = driverId;
+			item->text = port->getDriverName(driverId);
+			item->rightText = CHECKMARK(item->driverId == port->driverId);
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		if (port)
-			text = port->getDriverName(port->driver);
-		else
-			text = "Audio driver";
+		text = (box.size.x >= 200.0) ? "Driver: " : "";
+		std::string driverName = (port) ? port->getDriverName(port->driverId) : "";
+		if (driverName != "") {
+			text += driverName;
+			color.a = 1.f;
+		}
+		else {
+			text += "(No driver)";
+			color.a = 0.5f;
+		}
 	}
 };
 
 
 struct AudioDeviceItem : ui::MenuItem {
 	audio::Port *port;
-	int device;
+	int deviceId;
 	int offset;
 	void onAction(const event::Action &e) override {
-		port->setDevice(device, offset);
+		port->setDeviceId(deviceId, offset);
 	}
 };
 
@@ -65,36 +70,34 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		{
 			AudioDeviceItem *item = new AudioDeviceItem;
 			item->port = port;
-			item->device = -1;
+			item->deviceId = -1;
 			item->text = "(No device)";
-			item->rightText = CHECKMARK(item->device == port->device);
+			item->rightText = CHECKMARK(item->deviceId == port->deviceId);
 			menu->addChild(item);
 		}
-		for (int device = 0; device < deviceCount; device++) {
-			int channels = std::min(maxTotalChannels, port->getDeviceChannels(device));
+		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
+			int channels = std::min(maxTotalChannels, port->getDeviceChannels(deviceId));
 			for (int offset = 0; offset < channels; offset += port->maxChannels) {
 				AudioDeviceItem *item = new AudioDeviceItem;
 				item->port = port;
-				item->device = device;
+				item->deviceId = deviceId;
 				item->offset = offset;
-				item->text = port->getDeviceDetail(device, offset);
-				item->rightText = CHECKMARK(item->device == port->device && item->offset == port->offset);
+				item->text = port->getDeviceDetail(deviceId, offset);
+				item->rightText = CHECKMARK(item->deviceId == port->deviceId && item->offset == port->offset);
 				menu->addChild(item);
 			}
 		}
 	}
 	void step() override {
-		if (!port) {
-			text = "Audio device";
-			return;
-		}
-		text = port->getDeviceDetail(port->device, port->offset);
-		if (text.empty()) {
-			text = "(No device)";
-			color.a = 0.5f;
+		text = (box.size.x >= 200.0) ? "Device: " : "";
+		std::string detail = (port) ? port->getDeviceDetail(port->deviceId, port->offset) : "";
+		if (detail != "") {
+			text += detail;
+			color.a = (detail == "") ? 0.5f : 1.f;
 		}
 		else {
-			color.a = 1.f;
+			text += "(No device)";
+			color.a = 0.5f;
 		}
 	}
 };
@@ -130,10 +133,13 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		if (port)
-			text = string::f("%g kHz", port->sampleRate / 1000.0);
-		else
-			text = "44.1 kHz";
+		text = (box.size.x >= 100.0) ? "Rate: " : "";
+		if (port) {
+			text += string::f("%g kHz", port->sampleRate / 1000.0);
+		}
+		else {
+			text += "0 kHz";
+		}
 	}
 };
 
@@ -169,10 +175,13 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		if (port)
-			text = string::f("%d", port->blockSize);
-		else
-			text = "256";
+		text = (box.size.x >= 100.0) ? "Block size: " : "";
+		if (port) {
+			text += string::f("%d", port->blockSize);
+		}
+		else {
+			text += "0";
+		}
 	}
 };
 

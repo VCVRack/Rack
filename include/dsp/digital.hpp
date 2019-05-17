@@ -6,67 +6,9 @@ namespace rack {
 namespace dsp {
 
 
-/** Turns HIGH when value reaches 1.f, turns LOW when value reaches 0.f. */
-struct SchmittTrigger {
-	enum State {
-		LOW,
-		HIGH,
-		UNKNOWN
-	};
-	State state;
-
-	SchmittTrigger() {
-		reset();
-	}
-
-	void reset() {
-		state = UNKNOWN;
-	}
-
-	/** Updates the state of the Schmitt Trigger given a value.
-	Returns true if triggered, i.e. the value increases from 0 to 1.
-	If different trigger thresholds are needed, use
-		process(math::rescale(in, low, high, 0.f, 1.f))
-	for example.
-	*/
-	bool process(float in) {
-		switch (state) {
-			case LOW:
-				if (in >= 1.f) {
-					state = HIGH;
-					return true;
-				}
-				break;
-			case HIGH:
-				if (in <= 0.f) {
-					state = LOW;
-				}
-				break;
-			default:
-				if (in >= 1.f) {
-					state = HIGH;
-				}
-				else if (in <= 0.f) {
-					state = LOW;
-				}
-				break;
-		}
-		return false;
-	}
-
-	bool isHigh() {
-		return state == HIGH;
-	}
-};
-
-
 /** Detects when a boolean changes from false to true */
 struct BooleanTrigger {
-	bool state;
-
-	BooleanTrigger() {
-		reset();
-	}
+	bool state = true;
 
 	void reset() {
 		state = true;
@@ -80,13 +22,48 @@ struct BooleanTrigger {
 };
 
 
+/** Turns HIGH when value reaches 1.f, turns LOW when value reaches 0.f. */
+struct SchmittTrigger {
+	bool state = true;
+
+	void reset() {
+		state = true;
+	}
+
+	/** Updates the state of the Schmitt Trigger given a value.
+	Returns true if triggered, i.e. the value increases from 0 to 1.
+	If different trigger thresholds are needed, use
+
+		process(rescale(in, low, high, 0.f, 1.f))
+
+	for example.
+	*/
+	bool process(float in) {
+		if (state) {
+			// HIGH to LOW
+			if (in <= 0.f) {
+				state = false;
+			}
+		}
+		else {
+			// LOW to HIGH
+			if (in >= 1.f) {
+				state = true;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool isHigh() {
+		return state;
+	}
+};
+
+
 /** When triggered, holds a high value for a specified time before going low again */
 struct PulseGenerator {
-	float remaining;
-
-	PulseGenerator() {
-		reset();
-	}
+	float remaining = 0.f;
 
 	/** Immediately disables the pulse */
 	void reset() {
@@ -113,16 +90,13 @@ struct PulseGenerator {
 
 
 struct Timer {
-	float time;
-
-	Timer() {
-		reset();
-	}
+	float time = 0.f;
 
 	void reset() {
 		time = 0.f;
 	}
 
+	/** Returns the time since last reset or initialization. */
 	float process(float deltaTime) {
 		time += deltaTime;
 		return time;
@@ -131,26 +105,22 @@ struct Timer {
 
 
 struct ClockDivider {
-	int clock;
-	int division = 1;
-
-	ClockDivider() {
-		reset();
-	}
+	uint32_t clock = 0;
+	uint32_t division = 1;
 
 	void reset() {
 		clock = 0;
 	}
 
-	void setDivision(int division) {
+	void setDivision(uint32_t division) {
 		this->division = division;
 	}
 
-	int getDivision() {
+	uint32_t getDivision() {
 		return division;
 	}
 
-	int getClock() {
+	uint32_t getClock() {
 		return clock;
 	}
 

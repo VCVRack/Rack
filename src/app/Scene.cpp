@@ -148,7 +148,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 			case GLFW_KEY_F11: {
 				APP->window->setFullScreen(!APP->window->isFullScreen());
 				e.consume(this);
-			}
+			} break;
 		}
 	}
 }
@@ -170,7 +170,7 @@ void Scene::onPathDrop(const event::PathDrop &e) {
 void Scene::runCheckVersion() {
 	std::string versionUrl = app::API_URL;
 	versionUrl += "/version";
-	json_t *versionResJ = network::requestJson(network::GET, versionUrl, NULL);
+	json_t *versionResJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
 
 	if (versionResJ) {
 		json_t *versionJ = json_object_get(versionResJ, "version");

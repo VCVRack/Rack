@@ -10,7 +10,6 @@ namespace ui {
 
 
 struct Slider : widget::OpaqueWidget {
-	BNDwidgetState state = BND_DEFAULT;
 	/** Not owned. */
 	Quantity *quantity = NULL;
 

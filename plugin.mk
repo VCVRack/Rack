@@ -23,6 +23,8 @@ ifdef ARCH_LIN
 	LDFLAGS += -shared
 	TARGET := plugin.so
 	RACK_USER_DIR ?= $(HOME)/.Rack
+	# Link to glibc 2.23
+# 	FLAGS += -include $(RACK_DIR)/include/force_link_glibc_2.23.h
 endif
 
 ifdef ARCH_MAC
@@ -62,7 +64,7 @@ endif
 	@# Copy distributables
 	cp -R $(DISTRIBUTABLES) dist/$(SLUG)/
 	@# Create ZIP package
-	cd dist && zip -5 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
+	cd dist && zip -q -9 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
 
 install: dist
 	cp dist/$(SLUG)-$(VERSION)-$(ARCH).zip $(RACK_USER_DIR)/plugins/

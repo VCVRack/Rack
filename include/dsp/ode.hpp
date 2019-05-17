@@ -26,7 +26,7 @@ For example, the following solves the system x''(t) = -x(t) using a fixed timest
 */
 
 /** Solves an ODE system using the 1st order Euler method */
-template<typename F>
+template <typename F>
 void stepEuler(float t, float dt, float x[], int len, F f) {
 	float k[len];
 
@@ -37,7 +37,7 @@ void stepEuler(float t, float dt, float x[], int len, F f) {
 }
 
 /** Solves an ODE system using the 2nd order Runge-Kutta method */
-template<typename F>
+template <typename F>
 void stepRK2(float t, float dt, float x[], int len, F f) {
 	float k1[len];
 	float k2[len];
@@ -56,7 +56,7 @@ void stepRK2(float t, float dt, float x[], int len, F f) {
 }
 
 /** Solves an ODE system using the 4th order Runge-Kutta method */
-template<typename F>
+template <typename F>
 void stepRK4(float t, float dt, float x[], int len, F f) {
 	float k1[len];
 	float k2[len];

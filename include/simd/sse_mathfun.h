@@ -45,7 +45,7 @@ This derived source file is released under the zlib license.
 */
 
 
-#include <emmintrin.h>
+#include <x86intrin.h>
 
 
 /** Generate 1.f without accessing memory */

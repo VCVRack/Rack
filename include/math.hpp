@@ -36,7 +36,7 @@ inline int clamp(int x, int a, int b) {
 If `b < a`, switches the two values.
 */
 inline int clampSafe(int x, int a, int b) {
-	return clamp(x, std::min(a, b), std::max(a, b));
+	return (a <= b) ? clamp(x, a, b) : clamp(x, b, a);
 }
 
 /** Euclidean modulus. Always returns `0 <= mod < b`.
@@ -101,14 +101,14 @@ inline float clamp(float x, float a, float b) {
 If `b < a`, switches the two values.
 */
 inline float clampSafe(float x, float a, float b) {
-	return clamp(x, std::fmin(a, b), std::fmax(a, b));
+	return (a <= b) ? clamp(x, a, b) : clamp(x, b, a);
 }
 
 /** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero.
 See https://en.wikipedia.org/wiki/Sign_function.
 */
 inline float sgn(float x) {
-	return x > 0.f ? 1.f : x < 0.f ? -1.f : 0.f;
+	return x > 0.f ? 1.f : (x < 0.f ? -1.f : 0.f);
 }
 
 /** Converts -0.f to 0.f. Leaves all other values unchanged. */
@@ -119,9 +119,12 @@ inline float normalizeZero(float x) {
 /** Euclidean modulus. Always returns `0 <= mod < b`.
 See https://en.wikipedia.org/wiki/Euclidean_division.
 */
-inline float eucMod(float a, float base) {
-	float mod = std::fmod(a, base);
-	return (mod >= 0.f) ? mod : mod + base;
+inline float eucMod(float a, float b) {
+	float mod = std::fmod(a, b);
+	if (mod < 0.f) {
+		mod += b;
+	}
+	return mod;
 }
 
 /** Returns whether `a` is within epsilon distance from `b`. */
@@ -131,7 +134,7 @@ inline bool isNear(float a, float b, float epsilon = 1e-6f) {
 
 /** If the magnitude of `x` if less than epsilon, return 0. */
 inline float chop(float x, float epsilon = 1e-6f) {
-	return isNear(x, 0.f, epsilon) ? 0.f : x;
+	return std::fabs(x) <= epsilon ? 0.f : x;
 }
 
 inline float rescale(float x, float xMin, float xMax, float yMin, float yMax) {
@@ -155,9 +158,9 @@ inline float interpolateLinear(const float *p, float x) {
 Arguments may be the same pointers.
 Example:
 
-	cmultf(&ar, &ai, ar, ai, br, bi);
+	cmultf(ar, ai, br, bi, &ar, &ai);
 */
-inline void complexMult(float *cr, float *ci, float ar, float ai, float br, float bi) {
+inline void complexMult(float ar, float ai, float br, float bi, float *cr, float *ci) {
 	*cr = ar * br - ai * bi;
 	*ci = ar * bi + ai * br;
 }
@@ -202,6 +205,9 @@ struct Vec {
 	float dot(Vec b) const {
 		return x * b.x + y * b.y;
 	}
+	float arg() const {
+		return std::atan2(y, x);
+	}
 	float norm() const {
 		return std::hypot(x, y);
 	}
@@ -228,6 +234,9 @@ struct Vec {
 	}
 	Vec max(Vec b) const {
 		return Vec(std::fmax(x, b.x), std::fmax(y, b.y));
+	}
+	Vec abs() const {
+		return Vec(std::fabs(x), std::fabs(y));
 	}
 	Vec round() const {
 		return Vec(std::round(x), std::round(y));
@@ -323,7 +332,7 @@ struct Rect {
 		r.pos.y = math::clampSafe(pos.y, bound.pos.y, bound.pos.y + bound.size.y - size.y);
 		return r;
 	}
-	/** Expands this Rect to contain `b`. */
+	/** Returns the bounding box of the union of `this` and `b`. */
 	Rect expand(Rect b) const {
 		Rect r;
 		r.pos.x = std::fmin(pos.x, b.pos.x);

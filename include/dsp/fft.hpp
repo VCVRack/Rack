@@ -7,20 +7,10 @@ namespace rack {
 namespace dsp {
 
 
-template<typename T>
-T *alignedNew(size_t len) {
-	return (T*) pffft_aligned_malloc(len * sizeof(T));
-}
-
-template<typename T>
-void alignedDelete(T *p) {
-	pffft_aligned_free(p);
-}
-
-
 /** Real-valued FFT context.
 Wrapper for [PFFFT](https://bitbucket.org/jpommier/pffft/)
 `length` must be a multiple of 32.
+Buffers must be aligned to 16-byte boundaries. new[] and malloc() do this for you.
 */
 struct RealFFT {
 	PFFFT_Setup *setup;

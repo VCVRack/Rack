@@ -15,12 +15,12 @@ struct Model;
 struct Plugin {
 	/** A list of the models available by this plugin, add with addModel() */
 	std::vector<Model*> models;
-	/** The file path of the plugin's directory */
+	/** The file path to the plugin's directory */
 	std::string path;
 	/** OS-dependent library handle */
 	void *handle = NULL;
 
-	/** Must be unique. Used for saving patches. Never change this.
+	/** Must be unique. Used for saving patches. Never change this after releasing your plugin.
 	To guarantee uniqueness, it is a good idea to prefix the slug by your "company name" if available, e.g. "MyCompany-MyPlugin"
 	*/
 	std::string slug;

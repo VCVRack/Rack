@@ -1,5 +1,4 @@
 #include "app/MidiWidget.hpp"
-#include "midi.hpp"
 #include "helpers.hpp"
 
 
@@ -33,11 +32,7 @@ struct MidiDriverChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		if (!port) {
-			text = "MIDI driver";
-			return;
-		}
-		text = port->getDriverName(port->driverId);
+		text = port ? port->getDriverName(port->driverId) : "";
 		if (text.empty()) {
 			text = "(No driver)";
 			color.a = 0.5f;
@@ -82,11 +77,7 @@ struct MidiDeviceChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		if (!port) {
-			text = "MIDI device";
-			return;
-		}
-		text = port->getDeviceName(port->deviceId);
+		text = port ? port->getDeviceName(port->deviceId) : "";
 		if (text.empty()) {
 			text = "(No device)";
 			color.a = 0.5f;
@@ -123,10 +114,7 @@ struct MidiChannelChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		if (port)
-			text = port->getChannelName(port->channel);
-		else
-			text = "MIDI channel";
+		text = port ? port->getChannelName(port->channel) : "Channel 1";
 	}
 };
 

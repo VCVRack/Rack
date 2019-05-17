@@ -300,9 +300,12 @@ struct SynthTechAlco : app::SvgKnob {
 		minAngle = -0.82*M_PI;
 		maxAngle = 0.82*M_PI;
 		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/SynthTechAlco.svg")));
+		// Add cap
+		widget::FramebufferWidget *capFb = new widget::FramebufferWidget;
 		widget::SvgWidget *cap = new widget::SvgWidget;
 		cap->setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/SynthTechAlco_cap.svg")));
-		addChild(cap);
+		capFb->addChild(cap);
+		addChild(capFb);
 	}
 };
 
@@ -460,15 +463,6 @@ struct RedGreenBlueLight : GrayModuleLightWidget {
 	}
 };
 
-struct RGBLight : app::ModuleLightWidget {
-	RGBLight() {
-		addBaseColor(nvgRGBf(1, 0, 0));
-		addBaseColor(nvgRGBf(0, 1, 0));
-		addBaseColor(nvgRGBf(0, 0, 1));
-	}
-};
-
-
 /** Based on the size of 5mm LEDs */
 template <typename BASE>
 struct LargeLight : BASE {
@@ -501,7 +495,7 @@ struct TinyLight : BASE {
 	}
 };
 
-/** A light to displayed over PB61303. Must add a color by subclassing or templating. */
+/** A light for displaying on top of PB61303. Must add a color by subclassing or templating. */
 template <typename BASE>
 struct LEDBezelLight : BASE {
 	LEDBezelLight() {
@@ -608,15 +602,13 @@ struct PB61303 : app::SvgSwitch {
 
 struct ScrewSilver : app::SvgScrew {
 	ScrewSilver() {
-		sw->setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/ScrewSilver.svg")));
-		box.size = sw->box.size;
+		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/ScrewSilver.svg")));
 	}
 };
 
 struct ScrewBlack : app::SvgScrew {
 	ScrewBlack() {
-		sw->setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/ScrewBlack.svg")));
-		box.size = sw->box.size;
+		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/ScrewBlack.svg")));
 	}
 };
 

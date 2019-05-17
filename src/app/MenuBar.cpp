@@ -28,6 +28,11 @@ struct MenuButton : ui::Button {
 		Widget::step();
 	}
 	void draw(const DrawArgs &args) override {
+		BNDwidgetState state = BND_DEFAULT;
+		if (APP->event->hoveredWidget == this)
+			state = BND_HOVER;
+		if (APP->event->draggedWidget == this)
+			state = BND_ACTIVE;
 		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
 	}
 };
@@ -484,6 +489,20 @@ struct ManageItem : ui::MenuItem {
 
 struct SyncItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
+		std::thread t([=]() {
+			plugin::syncUpdates();
+		});
+		t.detach();
+	}
+};
+
+struct UpdateItem : ui::MenuItem {
+	std::string changelogUrl;
+	void onAction(const event::Action &e) override {
+		std::thread t([=]() {
+			system::openBrowser(changelogUrl);
+		});
+		t.detach();
 	}
 };
 
@@ -562,24 +581,47 @@ struct PluginsMenu : ui::Menu {
 	void refresh() {
 		clearChildren();
 
-		if (0) {
-			ui::ProgressBar *downloadProgressBar = new ui::ProgressBar;
-			downloadProgressBar->quantity = new DownloadQuantity;
-			addChild(downloadProgressBar);
+		{
+			ui::MenuLabel *disabledLable = new ui::MenuLabel;
+			disabledLable->text = "Server not yet available";
+			addChild(disabledLable);
+			return;
 		}
-		else if (plugin::isLoggedIn()) {
+
+		if (plugin::isLoggedIn()) {
 			ManageItem *manageItem = new ManageItem;
 			manageItem->text = "Manage";
 			addChild(manageItem);
 
-			SyncItem *syncItem = new SyncItem;
-			syncItem->text = "Update all";
-			syncItem->disabled = true;
-			addChild(syncItem);
-
 			LogOutItem *logOutItem = new LogOutItem;
 			logOutItem->text = "Log out";
 			addChild(logOutItem);
+
+			SyncItem *syncItem = new SyncItem;
+			syncItem->text = "Update all";
+			syncItem->disabled = plugin::updates.empty();
+			addChild(syncItem);
+
+			if (!plugin::updates.empty()) {
+				addChild(new ui::MenuEntry);
+
+				ui::MenuLabel *updatesLabel = new ui::MenuLabel;
+				updatesLabel->text = "Updates (click for changelog)";
+				addChild(updatesLabel);
+
+				for (const plugin::Update &update : plugin::updates) {
+					UpdateItem *updateItem = new UpdateItem;
+					updateItem->text = update.pluginSlug;
+					plugin::Plugin *p = plugin::getPlugin(update.pluginSlug);
+					if (p) {
+						updateItem->rightText += "v" + p->version + " → ";
+					}
+					updateItem->rightText += "v" + update.version;
+					updateItem->changelogUrl = update.changelogUrl;
+					updateItem->disabled = update.changelogUrl.empty();
+					addChild(updateItem);
+				}
+			}
 		}
 		else {
 			RegisterItem *registerItem = new RegisterItem;

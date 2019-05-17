@@ -24,7 +24,7 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 
 	// Process data
 	if (dataJ) {
-		if (method == GET) {
+		if (method == METHOD_GET) {
 			// Append ?key=value&... to url
 			url += "?";
 			bool isFirst = true;
@@ -54,16 +54,16 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 
 	// Set HTTP method
 	switch (method) {
-		case GET:
+		case METHOD_GET:
 			// This is CURL's default
 			break;
-		case POST:
+		case METHOD_POST:
 			curl_easy_setopt(curl, CURLOPT_POST, true);
 			break;
-		case PUT:
+		case METHOD_PUT:
 			curl_easy_setopt(curl, CURLOPT_PUT, true);
 			break;
-		case DELETE:
+		case METHOD_DELETE:
 			curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
 			break;
 	}
