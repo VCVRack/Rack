@@ -314,6 +314,7 @@ void init() {
 	std::string fundamentalSrc = asset::system("Fundamental.zip");
 	std::string fundamentalDir = asset::user("plugins/Fundamental");
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
+		INFO("Extracting bundled Fundamental package");
 		extractZip(fundamentalSrc.c_str(), pluginsDir.c_str());
 		loadPlugin(fundamentalDir);
 	}

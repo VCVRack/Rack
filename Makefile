@@ -105,7 +105,7 @@ ifdef ARCH_LIN
 	ldd dist/Rack/$(TARGET)
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
-	cd dist && zip -q -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
 ifdef ARCH_MAC
 	mkdir -p dist/$(TARGET).app
@@ -128,7 +128,7 @@ ifdef ARCH_MAC
 	codesign --verify --verbose dist/$(TARGET).app
 	spctl --assess --verbose dist/$(TARGET).app
 	# Make ZIP
-	cd dist && zip -q -5 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
+	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
@@ -140,7 +140,7 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
 	# Make ZIP
-	cd dist && zip -q -5 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
 	makensis -DVERSION=$(VERSION) installer.nsi
@@ -154,10 +154,11 @@ endif
 	cp -R include dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
+	cp helper.py dist/Rack-SDK/
 ifdef ARCH_WIN
 	cp libRack.a dist/Rack-SDK/
 endif
-	cd dist && zip -q -5 -r Rack-SDK-$(VERSION).zip Rack-SDK
+	cd dist && zip -q -9 -r Rack-SDK-$(VERSION).zip Rack-SDK
 
 
 # Obviously this will only work if you have the private keys to my server
