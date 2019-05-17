@@ -12,7 +12,7 @@ All VCV Rack **source code** is copyright © 2019 Andrew Belt and licensed under
 
 This means that non-commercial plugins do not need to be licensed under the GPLv3 and can be released under any license of your choice (open-source or proprietary freeware). However, plugins that copy a significant portion of non-API source code from Rack must be licensed under GPLv3.
 
-Email contact@vcvrack.com for licensing your commercial plugin and/or for selling your plugin in the [VCV Plugin Manager](https://vcvrack.com/plugins.html).
+If you wish to release a proprietary commercial plugin, email contact@vcvrack.com for commercial licensing. A commercial license is included for plugins sold in the [VCV Plugin Manager](https://vcvrack.com/plugins.html).
 
 ---
 
