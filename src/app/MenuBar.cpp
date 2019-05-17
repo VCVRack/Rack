@@ -581,6 +581,13 @@ struct PluginsMenu : ui::Menu {
 	void refresh() {
 		clearChildren();
 
+		{
+			ui::MenuLabel *disabledLable = new ui::MenuLabel;
+			disabledLable->text = "Server not yet available";
+			addChild(disabledLable);
+			return;
+		}
+
 		if (plugin::isLoggedIn()) {
 			ManageItem *manageItem = new ManageItem;
 			manageItem->text = "Manage";
