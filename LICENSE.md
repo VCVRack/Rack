@@ -1,33 +1,27 @@
 # VCV Rack Licenses
 
-All VCV Rack **source code** is copyright © 2019 Andrew Belt and licensed under the [GNU General Public License v3.0](LICENSE-GPLv3.txt).
+All VCV Rack **source code** is copyright © 2019 Andrew Belt and licensed under the [GNU General Public License v3.0](LICENSE-GPLv3.txt) with the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
 
-```
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation.
+>#### VCV Rack Non-Commercial Plugin License Exception
+>
+>A Plugin is defined as a software library intended to be linked and executed by this software.
+>
+>You are granted the permission to use this software's Application Programming Interface (API) in your Plugin in source and binary forms, as well as link to this software with the Plugin, regardless of the Plugin's license terms even if it would otherwise violate the terms of this software's GPLv3, provided that the Plugin is distributed free of charge.
+>
+>Derived works of this software may keep or omit this Exception.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This means that non-commercial plugins do not need to be licensed under the GPLv3 and can be released under any license of your choice (open-source or proprietary freeware). However, plugins that copy a significant portion of non-API source code from Rack must be licensed under GPLv3.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-```
-
-A non-commercial plugin license exception and commercial plugin licensing are pending and will be available as soon as their texts are finalized (as of 2019-05-06).
+Email contact@vcvrack.com for licensing your commercial plugin and/or for selling your plugin in the [VCV Plugin Manager](https://vcvrack.com/plugins.html).
 
 ---
 
 Licenses of **third-party libraries** are listed in [LICENSE-dist.txt](LICENSE-dist.txt).
 
----
-
 The **Component Library graphics** in the `res/ComponentLibrary` directory are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
 You may not freely sell plugins using Component Library graphics.
-However, a free commercial license is available for plugins sold through the [VCV Store](https://vcvrack.com/plugins.html).
-Email contact@vcvrack.com for more information about licensing or the VCV Store.
+However, a free commercial license is available for plugins sold through the [VCV Plugin Manager](https://vcvrack.com/plugins.html).
+Email contact@vcvrack.com for more information about licensing or the VCV Plugin Manager.
 
 The **Core panel graphics** in the `res/Core` directory are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 You may not create modified adaptations of these graphics.
