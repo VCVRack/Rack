@@ -13,6 +13,12 @@ Slider::Slider() {
 }
 
 void Slider::draw(const DrawArgs &args) {
+	BNDwidgetState state = BND_DEFAULT;
+	if (APP->event->hoveredWidget == this)
+		state = BND_HOVER;
+	if (APP->event->draggedWidget == this)
+		state = BND_ACTIVE;
+
 	float progress = quantity ? quantity->getScaledValue() : 0.f;
 	std::string text = quantity ? quantity->getString() : "";
 	bndSlider(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
@@ -22,7 +28,6 @@ void Slider::onDragStart(const event::DragStart &e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	state = BND_ACTIVE;
 	APP->window->cursorLock();
 }
 
@@ -33,7 +38,6 @@ void Slider::onDragMove(const event::DragMove &e) {
 }
 
 void Slider::onDragEnd(const event::DragEnd &e) {
-	state = BND_DEFAULT;
 	APP->window->cursorUnlock();
 }
 

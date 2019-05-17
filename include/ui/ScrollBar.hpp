@@ -14,7 +14,6 @@ struct ScrollBar : widget::OpaqueWidget {
 		HORIZONTAL
 	};
 	Orientation orientation;
-	BNDwidgetState state = BND_DEFAULT;
 	float offset = 0.0;
 	float size = 0.0;
 

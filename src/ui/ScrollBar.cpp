@@ -13,6 +13,12 @@ ScrollBar::ScrollBar() {
 }
 
 void ScrollBar::draw(const DrawArgs &args) {
+	BNDwidgetState state = BND_DEFAULT;
+	if (APP->event->hoveredWidget == this)
+		state = BND_HOVER;
+	if (APP->event->draggedWidget == this)
+		state = BND_ACTIVE;
+
 	bndScrollBar(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }
 
@@ -20,7 +26,6 @@ void ScrollBar::onDragStart(const event::DragStart &e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	state = BND_ACTIVE;
 	APP->window->cursorLock();
 }
 
@@ -36,7 +41,6 @@ void ScrollBar::onDragMove(const event::DragMove &e) {
 }
 
 void ScrollBar::onDragEnd(const event::DragEnd &e) {
-	state = BND_DEFAULT;
 	APP->window->cursorUnlock();
 }
 

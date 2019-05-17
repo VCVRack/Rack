@@ -10,7 +10,10 @@ RadioButton::RadioButton() {
 }
 
 void RadioButton::draw(const DrawArgs &args) {
-	BNDwidgetState state = this->state;
+	BNDwidgetState state = BND_DEFAULT;
+	if (APP->event->hoveredWidget == this)
+		state = BND_HOVER;
+
 	std::string label;
 	if (quantity) {
 		label = quantity->getLabel();
@@ -18,14 +21,6 @@ void RadioButton::draw(const DrawArgs &args) {
 			state = BND_ACTIVE;
 	}
 	bndRadioButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
-}
-
-void RadioButton::onEnter(const event::Enter &e) {
-	state = BND_HOVER;
-}
-
-void RadioButton::onLeave(const event::Leave &e) {
-	state = BND_DEFAULT;
 }
 
 void RadioButton::onDragDrop(const event::DragDrop &e) {

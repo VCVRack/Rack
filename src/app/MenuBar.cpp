@@ -28,6 +28,11 @@ struct MenuButton : ui::Button {
 		Widget::step();
 	}
 	void draw(const DrawArgs &args) override {
+		BNDwidgetState state = BND_DEFAULT;
+		if (APP->event->hoveredWidget == this)
+			state = BND_HOVER;
+		if (APP->event->draggedWidget == this)
+			state = BND_ACTIVE;
 		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
 	}
 };
