@@ -7,7 +7,11 @@ namespace rack {
 namespace app {
 
 
-/** A ParamWidget that controls  */
+/** A ParamWidget that represents an integer.
+Increases by 1 each time it is clicked.
+When maxValue is reached, the next click resets to minValue.
+In momentary mode, the value is instead set to maxValue when the mouse is held and minValue when released.
+*/
 struct Switch : ParamWidget {
 	/** Return to original position when released */
 	bool momentary = false;

@@ -48,6 +48,12 @@ DEPRECATED inline void complexMult(float *cr, float *ci, float ar, float ai, flo
 DEPRECATED inline void cmultf(float *cr, float *ci, float ar, float ai, float br, float bi) {return complexMult(ar, ai, br, bi, cr, ci);}
 
 ////////////////////
+// string
+////////////////////
+
+#define stringf string::f
+
+////////////////////
 // random
 ////////////////////
 
@@ -120,6 +126,15 @@ DEPRECATED TScrew *createScrew(math::Vec pos) {
 template <class TParamWidget>
 DEPRECATED TParamWidget *createParam(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
 	TParamWidget *o = createParam<TParamWidget>(pos, module, paramId);
+	if (module) {
+		module->configParam(paramId, minValue, maxValue, defaultValue);
+	}
+	return o;
+}
+
+template <class TParamWidget>
+DEPRECATED TParamWidget *createParamCentered(math::Vec pos, Module *module, int paramId, float minValue, float maxValue, float defaultValue) {
+	TParamWidget *o = createParamCentered<TParamWidget>(pos, module, paramId);
 	if (module) {
 		module->configParam(paramId, minValue, maxValue, defaultValue);
 	}

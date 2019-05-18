@@ -35,7 +35,7 @@ struct Light {
 		}
 	}
 
-	/** Use `setSmoothBrightness(brightness, APP->engine->getSampleTime())` instead. */
+	/** Use `setSmoothBrightness(brightness, sampleTime * frames)` instead. */
 	DEPRECATED void setBrightnessSmooth(float brightness, float frames = 1.f) {
 		setSmoothBrightness(brightness, frames / 44100.f);
 	}
