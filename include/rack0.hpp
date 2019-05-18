@@ -51,8 +51,8 @@ DEPRECATED inline void cmultf(float *cr, float *ci, float ar, float ai, float br
 // random
 ////////////////////
 
-DEPRECATED inline float randomu32() {return random::u32();}
-DEPRECATED inline float randomu64() {return random::u64();}
+DEPRECATED inline uint32_t randomu32() {return random::u32();}
+DEPRECATED inline uint64_t randomu64() {return random::u64();}
 DEPRECATED inline float randomUniform() {return random::uniform();}
 DEPRECATED inline float randomNormal() {return random::normal();}
 DEPRECATED inline float randomf() {return random::uniform();}
