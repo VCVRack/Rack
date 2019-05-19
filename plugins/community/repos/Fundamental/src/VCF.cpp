@@ -3,6 +3,7 @@
 #include "dsp/resampler.hpp"
 #include "dsp/ode.hpp"
 
+namespace rack_plugin_Fundamental {
 
 inline float clip(float x) {
 	return tanhf(x);
@@ -170,6 +171,9 @@ struct VCFWidget : ModuleWidget {
 	}
 };
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, VCF) {
    Model *modelVCF = Model::create<VCF, VCFWidget>("Fundamental", "VCF", "VCF", FILTER_TAG);

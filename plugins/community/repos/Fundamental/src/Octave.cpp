@@ -1,5 +1,7 @@
 #include "Fundamental.hpp"
 
+namespace rack_plugin_Fundamental {
+
 struct Octave : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -159,6 +161,10 @@ struct OctaveWidget : ModuleWidget {
 		addChild(octaveDisplay);
 	}
 };
+
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, Octave) {
    Model *modelOctave = createModel<Octave, OctaveWidget>("Fundamental", "Octave", "Octave", UTILITY_TAG);

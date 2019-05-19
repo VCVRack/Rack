@@ -1,5 +1,6 @@
 #include "Fundamental.hpp"
 
+namespace rack_plugin_Fundamental {
 
 struct _8vert : Module {
 	enum ParamIds {
@@ -80,6 +81,9 @@ _8vertWidget::_8vertWidget(_8vert *module) : ModuleWidget(module) {
 	addChild(ModuleLightWidget::create<TinyLight<GreenRedLight>>(Vec(107.702, 319.521), module, 14));
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, 8vert) {
    Model *model = Model::create<_8vert, _8vertWidget>("Fundamental", "8vert", "8vert", ATTENUATOR_TAG);

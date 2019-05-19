@@ -2,6 +2,7 @@
 #include "Fundamental.hpp"
 #include "dsp/digital.hpp"
 
+namespace rack_plugin_Fundamental {
 
 #define BUFFER_SIZE 512
 
@@ -338,6 +339,9 @@ ScopeWidget::ScopeWidget(Scope *module) : ModuleWidget(module) {
 	addChild(ModuleLightWidget::create<SmallLight<GreenLight>>(Vec(150, 296), module, Scope::EXTERNAL_LIGHT));
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, Scope) {
    Model *modelScope = Model::create<Scope, ScopeWidget>("Fundamental", "Scope", "Scope", VISUAL_TAG);

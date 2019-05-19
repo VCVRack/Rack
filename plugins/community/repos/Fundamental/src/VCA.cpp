@@ -1,5 +1,6 @@
 #include "Fundamental.hpp"
 
+namespace rack_plugin_Fundamental {
 
 struct VCA : Module {
 	enum ParamIds {
@@ -160,6 +161,10 @@ struct VCA_1Widget : ModuleWidget {
 		addOutput(Port::create<PJ301MPort>(mm2px(Vec(3.51398, 108.64454)), Port::OUTPUT, module, VCA_1::OUT_OUTPUT));
 	}
 };
+
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, VCA_1) {
    Model *modelVCA_1 = Model::create<VCA_1, VCA_1Widget>("Fundamental", "VCA-1", "VCA-1", AMPLIFIER_TAG);

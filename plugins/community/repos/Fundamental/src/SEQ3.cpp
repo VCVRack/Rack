@@ -1,6 +1,7 @@
 #include "Fundamental.hpp"
 #include "dsp/digital.hpp"
 
+namespace rack_plugin_Fundamental {
 
 struct SEQ3 : Module {
 	enum ParamIds {
@@ -201,6 +202,9 @@ struct SEQ3Widget : ModuleWidget {
 	}
 };
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, SEQ3) {
    Model *modelSEQ3 = Model::create<SEQ3, SEQ3Widget>("Fundamental", "SEQ3", "SEQ-3", SEQUENCER_TAG);

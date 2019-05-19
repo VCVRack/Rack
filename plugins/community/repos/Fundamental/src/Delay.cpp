@@ -4,6 +4,7 @@
 #include "dsp/filter.hpp"
 #include "samplerate.h"
 
+namespace rack_plugin_Fundamental {
 
 #define HISTORY_SIZE (1<<21)
 
@@ -135,9 +136,11 @@ DelayWidget::DelayWidget(Delay *module) : ModuleWidget(module) {
 	addOutput(Port::create<PJ301MPort>(Vec(73, 320), Port::OUTPUT, module, Delay::OUT_OUTPUT));
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, Delay) {
    Model *modelDelay = Model::create<Delay, DelayWidget>("Fundamental", "Delay", "Delay", DELAY_TAG);
    return modelDelay;
 }
-

@@ -2,6 +2,7 @@
 #include "dsp/digital.hpp"
 #include "dsp/filter.hpp"
 
+namespace rack_plugin_Fundamental {
 
 template <int TYPE>
 struct SequentialSwitch : Module {
@@ -104,12 +105,6 @@ SequentialSwitch1Widget::SequentialSwitch1Widget(SequentialSwitch<1> *module) : 
 }
 
 
-RACK_PLUGIN_MODEL_INIT(Fundamental, SequentialSwitch1) {
-   Model *modelSequentialSwitch1 = Model::create<SequentialSwitch<1>, SequentialSwitch1Widget>("Fundamental", "SequentialSwitch1", "Sequential Switch 1", UTILITY_TAG);
-   return modelSequentialSwitch1;
-}
-
-
 struct SequentialSwitch2Widget : ModuleWidget {
 	SequentialSwitch2Widget(SequentialSwitch<2> *module);
 };
@@ -138,6 +133,14 @@ SequentialSwitch2Widget::SequentialSwitch2Widget(SequentialSwitch<2> *module) : 
 	addChild(ModuleLightWidget::create<TinyLight<GreenLight>>(mm2px(Vec(10.7321, 92.6276)), module, TSequentialSwitch::CHANNEL_LIGHT + 3));
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
+
+RACK_PLUGIN_MODEL_INIT(Fundamental, SequentialSwitch1) {
+   Model *modelSequentialSwitch1 = Model::create<SequentialSwitch<1>, SequentialSwitch1Widget>("Fundamental", "SequentialSwitch1", "Sequential Switch 1", UTILITY_TAG);
+   return modelSequentialSwitch1;
+}
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, SequentialSwitch2) {
    Model *modelSequentialSwitch2 = Model::create<SequentialSwitch<2>, SequentialSwitch2Widget>("Fundamental", "SequentialSwitch2", "Sequential Switch 2", UTILITY_TAG);

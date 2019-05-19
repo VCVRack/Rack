@@ -1,9 +1,9 @@
 #include "Fundamental.hpp"
 #include "dsp/digital.hpp"
 
+namespace rack_plugin_Fundamental {
 
 #define NUM_CHANNELS 10
-
 
 struct Mutes : Module {
 	enum ParamIds {
@@ -144,6 +144,9 @@ MutesWidget::MutesWidget(Mutes *module) : ModuleWidget(module) {
 	addChild(ModuleLightWidget::create<MuteLight<GreenLight>>(mm2px(Vec(17.32, 108.915)), module, Mutes::MUTE_LIGHT + 9));
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, Mutes) {
    Model *modelMutes = Model::create<Mutes, MutesWidget>("Fundamental", "Mutes", "Mutes", SWITCH_TAG);

@@ -1,6 +1,7 @@
 #include "Fundamental.hpp"
 #include "dsp/digital.hpp"
 
+namespace rack_plugin_Fundamental {
 
 struct LowFrequencyOscillator {
 	float phase = 0.0f;
@@ -155,12 +156,6 @@ LFOWidget::LFOWidget(LFO *module) : ModuleWidget(module) {
 }
 
 
-RACK_PLUGIN_MODEL_INIT(Fundamental, LFO) {
-   Model *modelLFO = Model::create<LFO, LFOWidget>("Fundamental", "LFO", "LFO-1", LFO_TAG);
-   return modelLFO;
-}
-
-
 struct LFO2 : Module {
 	enum ParamIds {
 		OFFSET_PARAM,
@@ -244,6 +239,14 @@ LFO2Widget::LFO2Widget(LFO2 *module) : ModuleWidget(module) {
 	addChild(ModuleLightWidget::create<SmallLight<GreenRedLight>>(Vec(68, 42.5f), module, LFO2::PHASE_POS_LIGHT));
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
+
+RACK_PLUGIN_MODEL_INIT(Fundamental, LFO) {
+   Model *modelLFO = Model::create<LFO, LFOWidget>("Fundamental", "LFO", "LFO-1", LFO_TAG);
+   return modelLFO;
+}
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, LFO2) {
    Model *modelLFO2 = Model::create<LFO2, LFO2Widget>("Fundamental", "LFO2", "LFO-2", LFO_TAG);

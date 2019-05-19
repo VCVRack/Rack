@@ -1,5 +1,6 @@
 #include "Fundamental.hpp"
 
+namespace rack_plugin_Fundamental {
 
 struct VCMixer : Module {
 	enum ParamIds {
@@ -73,6 +74,9 @@ struct VCMixerWidget : ModuleWidget {
 	}
 };
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, VCMixer) {
    Model *modelVCMixer = Model::create<VCMixer, VCMixerWidget>("Fundamental", "VCMixer", "Mixer", MIXER_TAG, AMPLIFIER_TAG);

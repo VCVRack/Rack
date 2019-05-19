@@ -1,6 +1,7 @@
 #include "Fundamental.hpp"
 #include "dsp/vumeter.hpp"
 
+namespace rack_plugin_Fundamental {
 
 struct Unity : Module {
 	enum ParamIds {
@@ -158,6 +159,9 @@ void UnityWidget::appendContextMenu(Menu *menu) {
 	menu->addChild(mergeItem);
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, Unity) {
    Model *modelUnity = Model::create<Unity, UnityWidget>("Fundamental", "Unity", "Unity", MIXER_TAG, UTILITY_TAG, DUAL_TAG);

@@ -1,6 +1,7 @@
 #include "Fundamental.hpp"
 #include "dsp/digital.hpp"
 
+namespace rack_plugin_Fundamental {
 
 struct ADSR : Module {
 	enum ParamIds {
@@ -134,9 +135,11 @@ ADSRWidget::ADSRWidget(ADSR *module) : ModuleWidget(module) {
 	addChild(ModuleLightWidget::create<SmallLight<RedLight>>(Vec(94, 242), module, ADSR::RELEASE_LIGHT));
 }
 
+} // namespace rack_plugin_Fundamental
+
+using namespace rack_plugin_Fundamental;
 
 RACK_PLUGIN_MODEL_INIT(Fundamental, ADSR) {
    Model *model = Model::create<ADSR, ADSRWidget>("Fundamental", "ADSR", "ADSR", ENVELOPE_GENERATOR_TAG);
    return model;
 }
-
