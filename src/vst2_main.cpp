@@ -19,7 +19,7 @@
 /// changed: 26Jun2018, 27Jun2018, 29Jun2018, 01Jul2018, 02Jul2018, 06Jul2018, 13Jul2018
 ///          26Jul2018, 04Aug2018, 05Aug2018, 06Aug2018, 07Aug2018, 09Aug2018, 11Aug2018
 ///          18Aug2018, 19Aug2018, 05Sep2018, 06Sep2018, 10Oct2018, 26Oct2018, 10Mar2019
-///          12Mar2019, 07May2019
+///          12Mar2019, 07May2019, 19May2019
 ///
 ///
 ///
@@ -1011,6 +1011,17 @@ public:
       idle_frames_since_noteon = 0u;
    }
 
+   uint32_t getCurrentIdleDetectMode(void) {
+      uint32_t r = idle_detect_mode;
+#ifdef VST2_EFFECT
+      if(0u == oversample.num_in)
+      {
+         idle_detect_mode = IDLE_DETECT_NONE;
+      }
+#endif
+      return r;
+   }
+
    void setIdleDetectModeFx(uint32_t _mode) {
       idle_detect_mode_fx = _mode;
 #ifdef VST2_EFFECT
@@ -1289,7 +1300,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
 
    if(wrapper->b_idle)
    {
-      switch(wrapper->idle_detect_mode)
+      switch(wrapper->getCurrentIdleDetectMode())
       {
          default:
          case VSTPluginWrapper::IDLE_DETECT_NONE:
@@ -1464,7 +1475,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
          }
       }
 
-      if(VSTPluginWrapper::IDLE_DETECT_NONE != wrapper->idle_detect_mode)
+      if(VSTPluginWrapper::IDLE_DETECT_NONE != wrapper->getCurrentIdleDetectMode())
       {
          bool bSilence = true;
 
@@ -1503,7 +1514,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
             }
          }
 
-         if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode)
+         if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->getCurrentIdleDetectMode())
          {
             wrapper->idle_frames_since_noteon += sampleFrames;
          }
@@ -1512,7 +1523,7 @@ void VSTPluginProcessReplacingFloat32(VSTPlugin *vstPlugin,
          {
             wrapper->idle_output_framecount += sampleFrames;
 
-            if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode)
+            if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->getCurrentIdleDetectMode())
             {
                bSilence = (wrapper->idle_frames_since_noteon >= sUI(wrapper->idle_noteon_sec_grace * wrapper->sample_rate));
             }
@@ -1983,7 +1994,7 @@ VstIntPtr VSTPluginDispatcher(VSTPlugin *vstPlugin,
                            Dprintf("vstrack_plugin:effProcessEvents<midi>: ev[%u].noteOffVelocity = %d\n", evIdx, mev->noteOffVelocity); // 0..127
 #endif // DEBUG_PRINT_EVENTS
 
-                           if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->idle_detect_mode)
+                           if(VSTPluginWrapper::IDLE_DETECT_MIDI == wrapper->getCurrentIdleDetectMode())
                            {
                               if(0x90u == (mev->midiData[0] & 0xF0u)) // Note on ?
                               {
