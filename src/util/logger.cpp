@@ -61,7 +61,7 @@ static void loggerLogVa(LoggerLevel level, const char *file, int line, const cha
 	// At least for me, this will cause a complete crash from __strlen_avx512
    // vprintf(format, args); // xxx
 
-   printf("\n"); // xxx
+   // printf("\n"); // xxx
 	fprintf(global->logger.logFile, "\n");
 	fflush(global->logger.logFile);
 #endif // RACK_HOST
