@@ -40,6 +40,7 @@ bin:
 	$(call run_make,Geodesics,bin)
 	$(call run_make,Gratrix,bin)
 	$(call run_make,HetrickCV,bin)
+	$(call run_make,Hora-Examples,bin)
 	$(call run_make,huaba,bin)
 	$(call run_make,ImpromptuModular,bin)
 	$(call run_make,JE,bin)
@@ -81,6 +82,7 @@ bin:
 	$(call run_make,unless_modules,bin)
 	$(call run_make,Valley,bin)
 #	$(call run_make,VultModules,bin)
+	$(call run_make,ZZC,bin)
 
 .PHONY: clean
 clean:
@@ -118,6 +120,7 @@ clean:
 	$(call run_make,Geodesics,clean)
 	$(call run_make,Gratrix,clean)
 	$(call run_make,HetrickCV,clean)
+	$(call run_make,Hora-Examples,clean)
 	$(call run_make,huaba,clean)
 	$(call run_make,ImpromptuModular,clean)
 	$(call run_make,JE,clean)
@@ -159,3 +162,4 @@ clean:
 	$(call run_make,unless_modules,clean)
 	$(call run_make,Valley,clean)
 #	$(call run_make,VultModules,clean)
+	$(call run_make,ZZC,clean)

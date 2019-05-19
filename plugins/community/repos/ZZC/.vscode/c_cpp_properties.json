@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "includePath": [
+                "${default}",
+                "/home/zezic/Documents/Soft/Audio/Rack-SDK/include",
+                "/home/zezic/Documents/Soft/Audio/Rack-SDK/dep/include"
+            ],
+            "compileCommands": "${workspaceFolder}/compile_commands.json"
+        }
+    ],
+    "version": 4
+}

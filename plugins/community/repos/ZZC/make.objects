@@ -1,0 +1,8 @@
+ALL_OBJ= \
+	./src/Clock.o \
+	./src/Divider.o \
+	./src/FN.o \
+	./src/SC-VCA.o \
+	./src/SH-8.o \
+	./src/SRC.o \
+	./src/ZZC.o
