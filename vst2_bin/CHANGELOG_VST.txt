@@ -1,4 +1,16 @@
 
+** May 19th, 2019
+- fix Fundamental.LFO
+- FX: auto-disable idle detection when there are no input channels
+- add module 
+- add module ZZC.Clock
+- add module ZZC.Divider
+- add module ZZC.FN3
+- add module ZZC.SCVCA
+- add module ZZC.SH8
+- add module ZZC.SRC
+
+
 ** May 7th, 2019
 - fix plugin detection in Cakewalk by BandLab (64bit)
 - implement horizontal scroll lock (hold shift key)

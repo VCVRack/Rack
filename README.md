@@ -18,7 +18,7 @@
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 844 prebuilt modules
++ comes with 850 prebuilt modules
 
 **Windows** version tested in:
   - Eureka (my own work-in-progress VST host)
@@ -43,8 +43,8 @@
 # Downloads
 
 ## Windows
-- [veeseevstrack_0_6_1_win64_bin-07May2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-07May2019b.7z) (64bit)
-- [veeseevstrack_0_6_1_win32_bin-07May2019b.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-07May2019b.7z) (32bit, experimental)
+- [veeseevstrack_0_6_1_win64_bin-19May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win64_bin-19May2019.7z) (64bit)
+- [veeseevstrack_0_6_1_win32_bin-19May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-19May2019.7z) (32bit, experimental)
 
 ## Linux
 - [veeseevstrack_0_6_1_lin64_bin-07May2019b.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-07May2019b.tar.gz) (64bit) (Dave's latest build)
@@ -899,7 +899,7 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Valley.Interzone
 
 
-These (35) add-on / plugin modules can be loaded dynamically:
+These (41) add-on / plugin modules can be loaded dynamically:
  - bsp.AttenuMixer
  - bsp.Bias
  - bsp.BeatFreq
@@ -935,6 +935,48 @@ These (35) add-on / plugin modules can be loaded dynamically:
  - dBiz.VCA530
  - dBiz.Verbo
  - Template_shared.MyModule
+These (41) add-on / plugin modules can be loaded dynamically:
+ - bsp.AttenuMixer
+ - bsp.Bias
+ - bsp.BeatFreq
+ - bsp.DownSampler
+ - bsp.Legato
+ - bsp.Obxd_VCF
+ - bsp.Rescaler
+ - bsp.RMS
+ - bsp.Scanner
+ - bsp.Sway
+ - bsp.TunedDelayLine
+ - dBiz.dBizBlank
+ - dBiz.Contorno
+ - dBiz.Chord
+ - dBiz.Bene
+ - dBiz.Bene2
+ - dBiz.BenePads
+ - dBiz.DAOSC
+ - dBiz.Divider
+ - dBiz.DualFilter
+ - dBiz.DVCO
+ - dBiz.FourSeq
+ - dBiz.Multiple
+ - dBiz.PerfMixer
+ - dBiz.Remix
+ - dBiz.SmiX
+ - dBiz.SubMix
+ - dBiz.SuHa
+ - dBiz.Transpose
+ - dBiz.TROSC
+ - dBiz.Utility
+ - dBiz.Util2
+ - dBiz.VCA530
+ - dBiz.Verbo
+ - Template_shared.MyModule
+ - ZZC.Clock
+ - ZZC.Divider
+ - ZZC.FN3
+ - ZZC.SCVCA
+ - ZZC.SH8
+ - ZZC.SRC
 
 
 
@@ -995,7 +1037,7 @@ $ cp <yourplugin.dll> ../../../../vst2_bin/plugins/<yourpluginname>/plugin.dll.i
 ## Dynamically loaded plugins (via plugin SDK)
 
 1. Install the `Microsoft Visual Studio 2017 Community Edition` IDE
-2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-05May2019.7z)
+2. Download the [VeeSeeVSTRack plugin SDK](https://github.com/bsp2/releases/raw/master/vsvr/VeeSeeVSTRack_SDK-19May2019.7z)
 3. Open the solution file (`example\Template_shared\vs2017\Template_shared\Template_shared.sln`)
 4. Make sure that the `Release` / `x64` configuration is selected
 5. Rebuild the solution to create the "plugin.dll" file.

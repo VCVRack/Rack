@@ -22,7 +22,7 @@
   "oversampleOfflineFactor": 16.0,
   "oversampleOfflineQuality": 10,
   "oversampleOffline": false,
-  "oversampleNumIn": 0.0,
+  "oversampleNumIn": 2.0,
   "oversampleNumOut": 2.0,
   "idleDetectInstr": 0,
   "idleDetectFx": 2,

@@ -1,5 +1,5 @@
-VeeSeeVST Rack VST 2.4 Plugin -- May 7th, 2019
-==============================================
+VeeSeeVST Rack VST 2.4 Plugin -- May 19th, 2019
+===============================================
 
 !!!------------------------------------------------------------------------------
 !!! ***** THIS IS NOT AN OFFICIAL VCV RACK RELEASE *****                      !!!
@@ -26,7 +26,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 844 prebuilt modules
++ comes with 850 prebuilt modules
 
 Here's an old demo video of it: https://vimeo.com/277703414
 And a newer one: https://youtu.be/XTpLfcz-6Vo
@@ -866,7 +866,7 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Valley.Interzone
 
 
-These (35) add-on / plugin modules can be loaded dynamically:
+These (41) add-on / plugin modules can be loaded dynamically:
  - bsp.AttenuMixer
  - bsp.Bias
  - bsp.BeatFreq
@@ -902,6 +902,12 @@ These (35) add-on / plugin modules can be loaded dynamically:
  - dBiz.VCA530
  - dBiz.Verbo
  - Template_shared.MyModule
+ - ZZC.Clock
+ - ZZC.Divider
+ - ZZC.FN3
+ - ZZC.SCVCA
+ - ZZC.SH8
+ - ZZC.SRC
 
 
 
