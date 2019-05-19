@@ -1,0 +1,15 @@
+ALL_OBJ= \
+	src/ControlledBuffer.o \
+	src/CvToFreq.o \
+	src/Examples.o \
+	src/FreqToRate.o \
+	src/LowPassVCF.o \
+	src/MMFilter.o \
+	src/WaveTableOsc.o \
+	src/buf.o \
+	src/clockedCounter.o \
+	src/floatToString.o \
+	src/intToString.o \
+	src/miniSeq.o \
+	src/stringMux.o \
+	src/waveTable.o

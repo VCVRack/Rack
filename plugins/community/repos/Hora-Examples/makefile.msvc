@@ -1,0 +1,12 @@
+SLUG=Hora-Examples
+
+include ../../../build_shared_plugin_pre_msvc.mk
+
+include make.objects
+
+define BIN_POST_FXN
+	cp -f $(SLUG).dll ../../../../vst2_bin/plugins/$(SLUG)/plugin.dll.fx
+	cp -f $(SLUG).dll ../../../../vst2_bin/plugins/$(SLUG)/plugin.dll.instr
+endef
+
+include ../../../build_shared_plugin_post_msvc.mk
