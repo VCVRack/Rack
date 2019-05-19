@@ -25,7 +25,7 @@
  * ----
  * ---- created: 04Aug2018
  * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018, 07Mar2019
- * ----          10Mar2019
+ * ----          10Mar2019, 19May2019
  * ----
  * ----
  * ----
@@ -1099,6 +1099,20 @@ void lglw_timer_callback_set(lglw_t _lglw, lglw_timer_fxn_t _cbk) {
    {
       lglw->timer.cbk = _cbk;
    }
+}
+
+
+// ---------------------------------------------------------------------------- lglw_time_get_millisec
+uint32_t lglw_time_get_millisec(lglw_t _lglw) {
+   uint32_t r = 0u;
+   LGLW(_lglw);
+
+   if(NULL != lglw)
+   {
+      r = GetTickCount();
+   }
+   
+   return r;
 }
 
 

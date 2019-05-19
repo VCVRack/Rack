@@ -265,6 +265,9 @@ void lglw_timer_stop (lglw_t _lglw);
 // Set periodic timer callback
 void lglw_timer_callback_set (lglw_t _lglw, lglw_timer_fxn_t _cbk);
 
+// Get milliseconds since init
+uint32_t lglw_time_get_millisec (lglw_t _lglw);
+
 // Set file drag'n'drop callback
 void lglw_dropfiles_callback_set (lglw_t _lglw, lglw_dropfiles_fxn_t _cbk);
 

@@ -24,7 +24,8 @@
  * ---- info   : This is part of the "lglw" package.
  * ----
  * ---- created: 04Aug2018
- * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018, 10Oct2018, 16Oct2018
+ * ---- changed: 05Aug2018, 06Aug2018, 07Aug2018, 08Aug2018, 09Aug2018, 18Aug2018, 10Oct2018
+ * ----          16Oct2018, 19May2019
  * ----
  * ----
  */
@@ -1981,6 +1982,20 @@ static void loc_process_timer(lglw_int_t *lglw) {
          }
       }
    }
+}
+
+
+// ---------------------------------------------------------------------------- lglw_time_get_millisec
+uint32_t lglw_time_get_millisec(lglw_t _lglw) {
+   uint32_t r = 0u;
+   LGLW(_lglw);
+
+   if(NULL != lglw)
+   {
+      r = loc_millisec_delta(lglw);
+   }
+   
+   return r;
 }
 
 
