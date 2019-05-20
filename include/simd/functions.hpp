@@ -24,101 +24,101 @@ Example:
 
 using std::fmax;
 
-inline float4 fmax(float4 x, float4 b) {
-	return float4(_mm_max_ps(x.v, b.v));
+inline float_4 fmax(float_4 x, float_4 b) {
+	return float_4(_mm_max_ps(x.v, b.v));
 }
 
 using std::fmin;
 
-inline float4 fmin(float4 x, float4 b) {
-	return float4(_mm_min_ps(x.v, b.v));
+inline float_4 fmin(float_4 x, float_4 b) {
+	return float_4(_mm_min_ps(x.v, b.v));
 }
 
 using std::sqrt;
 
-inline float4 sqrt(float4 x) {
-	return float4(_mm_sqrt_ps(x.v));
+inline float_4 sqrt(float_4 x) {
+	return float_4(_mm_sqrt_ps(x.v));
 }
 
 using std::log;
 
-inline float4 log(float4 x) {
-	return float4(sse_mathfun_log_ps(x.v));
+inline float_4 log(float_4 x) {
+	return float_4(sse_mathfun_log_ps(x.v));
 }
 
 using std::log10;
 
-inline float4 log10(float4 x) {
-	return float4(sse_mathfun_log_ps(x.v)) / std::log(10.f);
+inline float_4 log10(float_4 x) {
+	return float_4(sse_mathfun_log_ps(x.v)) / std::log(10.f);
 }
 
 using std::log2;
 
-inline float4 log2(float4 x) {
-	return float4(sse_mathfun_log_ps(x.v)) / std::log(2.f);
+inline float_4 log2(float_4 x) {
+	return float_4(sse_mathfun_log_ps(x.v)) / std::log(2.f);
 }
 
 using std::exp;
 
-inline float4 exp(float4 x) {
-	return float4(sse_mathfun_exp_ps(x.v));
+inline float_4 exp(float_4 x) {
+	return float_4(sse_mathfun_exp_ps(x.v));
 }
 
 using std::sin;
 
-inline float4 sin(float4 x) {
-	return float4(sse_mathfun_sin_ps(x.v));
+inline float_4 sin(float_4 x) {
+	return float_4(sse_mathfun_sin_ps(x.v));
 }
 
 using std::cos;
 
-inline float4 cos(float4 x) {
-	return float4(sse_mathfun_cos_ps(x.v));
+inline float_4 cos(float_4 x) {
+	return float_4(sse_mathfun_cos_ps(x.v));
 }
 
 using std::floor;
 
-inline float4 floor(float4 a) {
-	return float4(sse_mathfun_floor_ps(a.v));
+inline float_4 floor(float_4 a) {
+	return float_4(sse_mathfun_floor_ps(a.v));
 }
 
 using std::ceil;
 
-inline float4 ceil(float4 a) {
-	return float4(sse_mathfun_ceil_ps(a.v));
+inline float_4 ceil(float_4 a) {
+	return float_4(sse_mathfun_ceil_ps(a.v));
 }
 
 using std::round;
 
-inline float4 round(float4 a) {
-	return float4(sse_mathfun_round_ps(a.v));
+inline float_4 round(float_4 a) {
+	return float_4(sse_mathfun_round_ps(a.v));
 }
 
 using std::fmod;
 
-inline float4 fmod(float4 a, float4 b) {
-	return float4(sse_mathfun_fmod_ps(a.v, b.v));
+inline float_4 fmod(float_4 a, float_4 b) {
+	return float_4(sse_mathfun_fmod_ps(a.v, b.v));
 }
 
 using std::fabs;
 
-inline float4 fabs(float4 a) {
-	return float4(sse_mathfun_fabs_ps(a.v));
+inline float_4 fabs(float_4 a) {
+	return float_4(sse_mathfun_fabs_ps(a.v));
 }
 
 using std::trunc;
 
-inline float4 trunc(float4 a) {
-	return float4(sse_mathfun_trunc_ps(a.v));
+inline float_4 trunc(float_4 a) {
+	return float_4(sse_mathfun_trunc_ps(a.v));
 }
 
 using std::pow;
 
-inline float4 pow(float4 a, float4 b) {
+inline float_4 pow(float_4 a, float_4 b) {
 	return exp(b * log(a));
 }
 
-inline float4 pow(float a, float4 b) {
+inline float_4 pow(float a, float_4 b) {
 	return exp(b * std::log(a));
 }
 
@@ -129,43 +129,43 @@ inline float ifelse(bool cond, float a, float b) {
 }
 
 /** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
-inline float4 ifelse(float4 mask, float4 a, float4 b) {
+inline float_4 ifelse(float_4 mask, float_4 a, float_4 b) {
 	return (a & mask) | andnot(mask, b);
 }
 
 /** Returns the approximate reciprocal square root.
 Much faster than `1/sqrt(x)`.
 */
-inline float4 rsqrt(float4 x) {
-	return float4(_mm_rsqrt_ps(x.v));
+inline float_4 rsqrt(float_4 x) {
+	return float_4(_mm_rsqrt_ps(x.v));
 }
 
 /** Returns the approximate reciprocal.
 Much faster than `1/x`.
 */
-inline float4 rcp(float4 x) {
-	return float4(_mm_rcp_ps(x.v));
+inline float_4 rcp(float_4 x) {
+	return float_4(_mm_rcp_ps(x.v));
 }
 
 // From math.hpp
 
 using math::clamp;
 
-inline float4 clamp(float4 x, float4 a, float4 b) {
+inline float_4 clamp(float_4 x, float_4 a, float_4 b) {
 	return fmin(fmax(x, a), b);
 }
 
 using math::rescale;
 
-inline float4 rescale(float4 x, float4 xMin, float4 xMax, float4 yMin, float4 yMax) {
+inline float_4 rescale(float_4 x, float_4 xMin, float_4 xMax, float_4 yMin, float_4 yMax) {
 	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
 using math::sgn;
 
-inline float4 sgn(float4 x) {
-	float4 signbit = x & -0.f;
-	float4 nonzero = (x != 0.f);
+inline float_4 sgn(float_4 x) {
+	float_4 signbit = x & -0.f;
+	float_4 nonzero = (x != 0.f);
 	return signbit | (nonzero & 1.f);
 }
 

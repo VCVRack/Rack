@@ -35,8 +35,8 @@ This class is designed to be used just like you use scalars, with extra features
 Usage example:
 
 	float a[4], b[4];
-	float4 a = float4::load(in);
-	float4 b = 2.f * a / (1 - a);
+	float_4 a = float_4::load(in);
+	float_4 b = 2.f * a / (1 - a);
 	b *= sin(2 * M_PI * a);
 	b.store(out);
 */
@@ -86,29 +86,30 @@ struct Vector<float, 4> {
 // Typedefs
 
 
-typedef Vector<float, 4> float4;
+typedef Vector<float, 4> float_4;
+// typedef Vector<int32_t, 4> int32_4;
 
 
 // Operator overloads
 
 
 /** `a @ b` */
-#define DECLARE_FLOAT4_OPERATOR_INFIX(operator, func) \
-	inline float4 operator(const float4 &a, const float4 &b) { \
-		return float4(func(a.v, b.v)); \
+#define DECLARE_FLOAT_4_OPERATOR_INFIX(operator, func) \
+	inline float_4 operator(const float_4 &a, const float_4 &b) { \
+		return float_4(func(a.v, b.v)); \
 	}
 
 /** `a @= b` */
-#define DECLARE_FLOAT4_OPERATOR_INCREMENT(operator, opfunc) \
-	inline float4 &operator(float4 &a, const float4 &b) { \
+#define DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator, opfunc) \
+	inline float_4 &operator(float_4 &a, const float_4 &b) { \
 		a = opfunc(a, b); \
 		return a; \
 	}
 
-DECLARE_FLOAT4_OPERATOR_INFIX(operator+, _mm_add_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator-, _mm_sub_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator*, _mm_mul_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator/, _mm_div_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator+, _mm_add_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator-, _mm_sub_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator*, _mm_mul_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
 /* Use these to apply logic, bit masks, and conditions to elements.
 Boolean operators on vectors give 0x00000000 for false and 0xffffffff for true, for each vector element.
@@ -119,64 +120,64 @@ Subtract 1 from value if greater than or equal to 1.
 
 	x -= (x >= 1.f) & 1.f;
 */
-DECLARE_FLOAT4_OPERATOR_INFIX(operator^, _mm_xor_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator&, _mm_and_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator|, _mm_or_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator&, _mm_and_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator|, _mm_or_ps)
 
-DECLARE_FLOAT4_OPERATOR_INCREMENT(operator+=, operator+);
-DECLARE_FLOAT4_OPERATOR_INCREMENT(operator-=, operator-);
-DECLARE_FLOAT4_OPERATOR_INCREMENT(operator*=, operator*);
-DECLARE_FLOAT4_OPERATOR_INCREMENT(operator/=, operator/);
-DECLARE_FLOAT4_OPERATOR_INCREMENT(operator^=, operator^);
-DECLARE_FLOAT4_OPERATOR_INCREMENT(operator&=, operator&);
-DECLARE_FLOAT4_OPERATOR_INCREMENT(operator|=, operator|);
+DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator+=, operator+);
+DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator-=, operator-);
+DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator*=, operator*);
+DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator/=, operator/);
+DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator^=, operator^);
+DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator&=, operator&);
+DECLARE_FLOAT_4_OPERATOR_INCREMENT(operator|=, operator|);
 
-DECLARE_FLOAT4_OPERATOR_INFIX(operator==, _mm_cmpeq_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator>=, _mm_cmpge_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
-DECLARE_FLOAT4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator==, _mm_cmpeq_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator>=, _mm_cmpge_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
+DECLARE_FLOAT_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
 
 /** `+a` */
-inline float4 operator+(const float4 &a) {
+inline float_4 operator+(const float_4 &a) {
 	return a;
 }
 
 /** `-a` */
-inline float4 operator-(const float4 &a) {
+inline float_4 operator-(const float_4 &a) {
 	return 0.f - a;
 }
 
 /** `++a` */
-inline float4 &operator++(float4 &a) {
+inline float_4 &operator++(float_4 &a) {
 	a += 1.f;
 	return a;
 }
 
 /** `--a` */
-inline float4 &operator--(float4 &a) {
+inline float_4 &operator--(float_4 &a) {
 	a -= 1.f;
 	return a;
 }
 
 /** `a++` */
-inline float4 operator++(float4 &a, int) {
-	float4 b = a;
+inline float_4 operator++(float_4 &a, int) {
+	float_4 b = a;
 	++a;
 	return b;
 }
 
 /** `a--` */
-inline float4 operator--(float4 &a, int) {
-	float4 b = a;
+inline float_4 operator--(float_4 &a, int) {
+	float_4 b = a;
 	--a;
 	return b;
 }
 
 /** `~a` */
-inline float4 operator~(const float4 &a) {
-	float4 mask = float4::zero();
+inline float_4 operator~(const float_4 &a) {
+	float_4 mask = float_4::zero();
 	mask = (mask == mask);
 	return a ^ mask;
 }
@@ -186,8 +187,8 @@ inline float4 operator~(const float4 &a) {
 
 
 /** `~a & b` */
-inline float4 andnot(const float4 &a, const float4 &b) {
-	return float4(_mm_andnot_ps(a.v, b.v));
+inline float_4 andnot(const float_4 &a, const float_4 &b) {
+	return float_4(_mm_andnot_ps(a.v, b.v));
 }
 
 
