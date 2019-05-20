@@ -117,7 +117,7 @@ Plugin *pluginInstance;
 void init(Plugin *p) {
 	pluginInstance = p;
 
-	// Add modules here, e.g.
+	// Add modules here
 	// p->addModel(modelMyModule);
 
 	// Any other plugin initialization may go here.
@@ -396,6 +396,7 @@ struct {identifier} : Module {{"""
 };"""
 
 	source += f"""
+
 
 struct {identifier}Widget : ModuleWidget {{
 	{identifier}Widget({identifier} *module) {{

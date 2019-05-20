@@ -22,9 +22,9 @@ RackScrollWidget::RackScrollWidget() {
 
 void RackScrollWidget::step() {
 	// Clamp zoom
-	settings::zoom = math::clamp(settings::zoom, 0.25f, 2.f);
-	// Round zoom to nearest percent
-	float zoom = std::round(settings::zoom / 0.01) * 0.01;
+	settings::zoom = math::clamp(settings::zoom, -2.f, 2.f);
+	// Compute zoom from exponential zoom
+	float zoom = std::pow(2.f, settings::zoom);
 	if (zoom != zoomWidget->zoom) {
 		// Set offset based on zoomPos
 		offset = offset.plus(zoomPos).div(zoomWidget->zoom).mult(zoom).minus(zoomPos);
@@ -123,7 +123,7 @@ void RackScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 		float zoomDelta = e.scrollDelta.y / 50 / 4;
 		if (settings::invertZoom)
 			zoomDelta *= -1;
-		settings::zoom *= std::pow(2, zoomDelta);
+		settings::zoom += zoomDelta;
 		zoomPos = e.pos;
 		e.consume(this);
 		return;

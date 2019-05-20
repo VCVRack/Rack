@@ -122,21 +122,21 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 			} break;
 			case GLFW_KEY_MINUS: {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					float z = std::log2(settings::zoom);
-					z *= 2;
-					z = std::ceil(z - 0.01) - 1;
-					z /= 2;
-					settings::zoom = std::pow(2, z);
+					float zoom = settings::zoom;
+					zoom *= 2;
+					zoom = std::ceil(zoom - 0.01) - 1;
+					zoom /= 2;
+					settings::zoom = zoom;
 					e.consume(this);
 				}
 			} break;
 			case GLFW_KEY_EQUAL: {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					float z = std::log2(settings::zoom);
-					z *= 2;
-					z = std::floor(z + 0.01) + 1;
-					z /= 2;
-					settings::zoom = std::pow(2, z);
+					float zoom = settings::zoom;
+					zoom *= 2;
+					zoom = std::floor(zoom + 0.01) + 1;
+					zoom /= 2;
+					settings::zoom = zoom;
 					e.consume(this);
 				}
 			} break;
