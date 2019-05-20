@@ -46,6 +46,12 @@ inline f32_4 log(f32_4 x) {
 	return f32_4(sse_mathfun_log_ps(x.v));
 }
 
+using std::log10;
+
+inline f32_4 log10(f32_4 x) {
+	return f32_4(sse_mathfun_log_ps(x.v)) / std::log(10.f);
+}
+
 using std::exp;
 
 inline f32_4 exp(f32_4 x) {
@@ -138,6 +144,14 @@ using math::rescale;
 
 inline f32_4 rescale(f32_4 x, f32_4 xMin, f32_4 xMax, f32_4 yMin, f32_4 yMax) {
 	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
+}
+
+using math::sgn;
+
+inline f32_4 sgn(f32_4 x) {
+	f32_4 signbit = x & -0.f;
+	f32_4 nonzero = (x != 0.f);
+	return signbit | (nonzero & 1.f);
 }
 
 

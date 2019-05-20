@@ -1,6 +1,7 @@
 #pragma once
 #include <cstring>
 #include <x86intrin.h>
+#include <type_traits>
 
 
 namespace rack {
@@ -106,8 +107,8 @@ DECLARE_F32_4_OPERATOR_INFIX(operator-, _mm_sub_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator*, _mm_mul_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
-/**
-Use these to apply logic, bit masks, and conditions to elements.
+/* Use these to apply logic, bit masks, and conditions to elements.
+Boolean operators on vectors give 0x00000000 for false and 0xffffffff for true, for each vector element.
 
 Examples:
 
@@ -117,10 +118,8 @@ Subtract 1 from value if greater than or equal to 1.
 */
 DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator&, _mm_and_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator|, _mm_mul_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator|, _mm_or_ps)
 
-/** Boolean operators on vectors give 0x00000000 for false and 0xffffffff for true, for each vector element.
-*/
 DECLARE_F32_4_OPERATOR_INCREMENT(operator+=, operator+);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator-=, operator-);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator*=, operator*);
@@ -128,6 +127,13 @@ DECLARE_F32_4_OPERATOR_INCREMENT(operator/=, operator/);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator^=, operator^);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator&=, operator&);
 DECLARE_F32_4_OPERATOR_INCREMENT(operator|=, operator|);
+
+DECLARE_F32_4_OPERATOR_INFIX(operator==, _mm_cmpeq_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator>=, _mm_cmpge_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
+DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
 
 /** `+a` */
 inline f32_4 operator+(const f32_4 &a) {
@@ -167,15 +173,24 @@ inline f32_4 operator--(f32_4 &a, int) {
 
 /** `~a` */
 inline f32_4 operator~(const f32_4 &a) {
-	return f32_4(_mm_xor_ps(a.v, _mm_cmpeq_ps(a.v, a.v)));
+	f32_4 mask = f32_4::zero();
+	mask = (mask == mask);
+	return a ^ mask;
 }
 
-DECLARE_F32_4_OPERATOR_INFIX(operator==, _mm_cmpeq_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator>=, _mm_cmpge_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
+
+// helpful idioms
+
+
+/** `~a & b` */
+inline f32_4 andnot(const f32_4 &a, const f32_4 &b) {
+	return f32_4(_mm_andnot_ps(a.v, b.v));
+}
+
+/** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
+inline f32_4 ifelse(const f32_4 &mask, const f32_4 &a, const f32_4 &b) {
+	return (a & mask) | andnot(mask, b);
+}
 
 
 } // namespace simd
