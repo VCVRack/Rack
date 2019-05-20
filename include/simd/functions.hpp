@@ -52,6 +52,12 @@ inline f32_4 log10(f32_4 x) {
 	return f32_4(sse_mathfun_log_ps(x.v)) / std::log(10.f);
 }
 
+using std::log2;
+
+inline f32_4 log2(f32_4 x) {
+	return f32_4(sse_mathfun_log_ps(x.v)) / std::log(2.f);
+}
+
 using std::exp;
 
 inline f32_4 exp(f32_4 x) {
@@ -117,6 +123,16 @@ inline f32_4 pow(float a, f32_4 b) {
 }
 
 // Nonstandard functions
+
+inline float ifelse(bool cond, float a, float b) {
+	return cond ? a : b;
+}
+
+/** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
+inline f32_4 ifelse(f32_4 mask, f32_4 a, f32_4 b) {
+	return (a & mask) | andnot(mask, b);
+}
+
 
 /** Returns the approximate reciprocal square root.
 Much faster than `1/sqrt(x)`.

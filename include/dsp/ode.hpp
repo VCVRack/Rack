@@ -26,9 +26,9 @@ For example, the following solves the system x''(t) = -x(t) using a fixed timest
 */
 
 /** Solves an ODE system using the 1st order Euler method */
-template <typename F>
-void stepEuler(float t, float dt, float x[], int len, F f) {
-	float k[len];
+template <typename T, typename F>
+void stepEuler(T t, T dt, T x[], int len, F f) {
+	T k[len];
 
 	f(t, x, k);
 	for (int i = 0; i < len; i++) {
@@ -37,11 +37,11 @@ void stepEuler(float t, float dt, float x[], int len, F f) {
 }
 
 /** Solves an ODE system using the 2nd order Runge-Kutta method */
-template <typename F>
-void stepRK2(float t, float dt, float x[], int len, F f) {
-	float k1[len];
-	float k2[len];
-	float yi[len];
+template <typename T, typename F>
+void stepRK2(T t, T dt, T x[], int len, F f) {
+	T k1[len];
+	T k2[len];
+	T yi[len];
 
 	f(t, x, k1);
 
@@ -56,13 +56,13 @@ void stepRK2(float t, float dt, float x[], int len, F f) {
 }
 
 /** Solves an ODE system using the 4th order Runge-Kutta method */
-template <typename F>
-void stepRK4(float t, float dt, float x[], int len, F f) {
-	float k1[len];
-	float k2[len];
-	float k3[len];
-	float k4[len];
-	float yi[len];
+template <typename T, typename F>
+void stepRK4(T t, T dt, T x[], int len, F f) {
+	T k1[len];
+	T k2[len];
+	T k3[len];
+	T k4[len];
+	T yi[len];
 
 	f(t, x, k1);
 

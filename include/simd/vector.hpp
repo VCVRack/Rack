@@ -187,11 +187,6 @@ inline f32_4 andnot(const f32_4 &a, const f32_4 &b) {
 	return f32_4(_mm_andnot_ps(a.v, b.v));
 }
 
-/** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
-inline f32_4 ifelse(const f32_4 &mask, const f32_4 &a, const f32_4 &b) {
-	return (a & mask) | andnot(mask, b);
-}
-
 
 } // namespace simd
 } // namespace rack
