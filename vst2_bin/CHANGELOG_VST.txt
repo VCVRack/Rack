@@ -2,7 +2,6 @@
 ** May 19th, 2019
 - fix Fundamental.LFO
 - FX: auto-disable idle detection when there are no input channels
-- add module 
 - add module ZZC.Clock
 - add module ZZC.Divider
 - add module ZZC.FN3
