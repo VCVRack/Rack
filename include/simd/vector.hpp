@@ -28,52 +28,52 @@ TO bit_cast(const FROM &x) {
 }
 
 
-/** Generic class for vector float types.
+/** Generic class for vector types.
 
-This class is designed to be used just like `float` scalars, with extra features for handling bitwise logic, conditions, loading, and storing.
+This class is designed to be used just like you use scalars, with extra features for handling bitwise logic, conditions, loading, and storing.
 
 Usage example:
 
 	float a[4], b[4];
-	f32_4 a = f32_4::load(in);
-	f32_4 b = 2.f * a / (1 - a);
+	float4 a = float4::load(in);
+	float4 b = 2.f * a / (1 - a);
 	b *= sin(2 * M_PI * a);
 	b.store(out);
 */
-template <int N>
-struct f32;
+template <typename T, int N>
+struct Vector;
 
 
 /** Wrapper for `__m128` representing an aligned vector of 4 single-precision float values.
 */
 template <>
-struct f32<4> {
+struct Vector<float, 4> {
 	__m128 v;
 
 	/** Constructs an uninitialized vector. */
-	f32<4>() {}
+	Vector<float, 4>() {}
 
 	/** Constructs a vector from a native `__m128` type. */
-	f32<4>(__m128 v) : v(v) {}
+	Vector<float, 4>(__m128 v) : v(v) {}
 
 	/** Constructs a vector with all elements set to `x`. */
-	f32<4>(float x) {
+	Vector<float, 4>(float x) {
 		v = _mm_set_ps1(x);
 	}
 
 	/** Constructs a vector from four values. */
-	f32<4>(float x1, float x2, float x3, float x4) {
+	Vector<float, 4>(float x1, float x2, float x3, float x4) {
 		v = _mm_set_ps(x1, x2, x3, x4);
 	}
 
-	/** Reads an array of 4 values. */
-	static f32<4> load(const float *x) {
-		return f32<4>(_mm_loadu_ps(x));
+	/** Returns a vector initialized to zero. */
+	static Vector<float, 4> zero() {
+		return Vector<float, 4>(_mm_setzero_ps());
 	}
 
-	/** Returns a vector initialized to zero. */
-	static f32<4> zero() {
-		return f32<4>(_mm_setzero_ps());
+	/** Reads an array of 4 values. */
+	static Vector<float, 4> load(const float *x) {
+		return Vector<float, 4>(_mm_loadu_ps(x));
 	}
 
 	/** Writes an array of 4 values. */
@@ -83,29 +83,32 @@ struct f32<4> {
 };
 
 
-typedef f32<4> f32_4;
+// Typedefs
+
+
+typedef Vector<float, 4> float4;
 
 
 // Operator overloads
 
 
 /** `a @ b` */
-#define DECLARE_F32_4_OPERATOR_INFIX(operator, func) \
-	inline f32_4 operator(const f32_4 &a, const f32_4 &b) { \
-		return f32_4(func(a.v, b.v)); \
+#define DECLARE_FLOAT4_OPERATOR_INFIX(operator, func) \
+	inline float4 operator(const float4 &a, const float4 &b) { \
+		return float4(func(a.v, b.v)); \
 	}
 
 /** `a @= b` */
-#define DECLARE_F32_4_OPERATOR_INCREMENT(operator, opfunc) \
-	inline f32_4 &operator(f32_4 &a, const f32_4 &b) { \
+#define DECLARE_FLOAT4_OPERATOR_INCREMENT(operator, opfunc) \
+	inline float4 &operator(float4 &a, const float4 &b) { \
 		a = opfunc(a, b); \
 		return a; \
 	}
 
-DECLARE_F32_4_OPERATOR_INFIX(operator+, _mm_add_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator-, _mm_sub_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator*, _mm_mul_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator/, _mm_div_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator+, _mm_add_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator-, _mm_sub_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator*, _mm_mul_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
 /* Use these to apply logic, bit masks, and conditions to elements.
 Boolean operators on vectors give 0x00000000 for false and 0xffffffff for true, for each vector element.
@@ -116,75 +119,75 @@ Subtract 1 from value if greater than or equal to 1.
 
 	x -= (x >= 1.f) & 1.f;
 */
-DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator&, _mm_and_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator|, _mm_or_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator^, _mm_xor_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator&, _mm_and_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator|, _mm_or_ps)
 
-DECLARE_F32_4_OPERATOR_INCREMENT(operator+=, operator+);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator-=, operator-);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator*=, operator*);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator/=, operator/);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator^=, operator^);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator&=, operator&);
-DECLARE_F32_4_OPERATOR_INCREMENT(operator|=, operator|);
+DECLARE_FLOAT4_OPERATOR_INCREMENT(operator+=, operator+);
+DECLARE_FLOAT4_OPERATOR_INCREMENT(operator-=, operator-);
+DECLARE_FLOAT4_OPERATOR_INCREMENT(operator*=, operator*);
+DECLARE_FLOAT4_OPERATOR_INCREMENT(operator/=, operator/);
+DECLARE_FLOAT4_OPERATOR_INCREMENT(operator^=, operator^);
+DECLARE_FLOAT4_OPERATOR_INCREMENT(operator&=, operator&);
+DECLARE_FLOAT4_OPERATOR_INCREMENT(operator|=, operator|);
 
-DECLARE_F32_4_OPERATOR_INFIX(operator==, _mm_cmpeq_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator>=, _mm_cmpge_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
-DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator==, _mm_cmpeq_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator>=, _mm_cmpge_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator>, _mm_cmpgt_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator<=, _mm_cmple_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
+DECLARE_FLOAT4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
 
 /** `+a` */
-inline f32_4 operator+(const f32_4 &a) {
+inline float4 operator+(const float4 &a) {
 	return a;
 }
 
 /** `-a` */
-inline f32_4 operator-(const f32_4 &a) {
+inline float4 operator-(const float4 &a) {
 	return 0.f - a;
 }
 
 /** `++a` */
-inline f32_4 &operator++(f32_4 &a) {
+inline float4 &operator++(float4 &a) {
 	a += 1.f;
 	return a;
 }
 
 /** `--a` */
-inline f32_4 &operator--(f32_4 &a) {
+inline float4 &operator--(float4 &a) {
 	a -= 1.f;
 	return a;
 }
 
 /** `a++` */
-inline f32_4 operator++(f32_4 &a, int) {
-	f32_4 b = a;
+inline float4 operator++(float4 &a, int) {
+	float4 b = a;
 	++a;
 	return b;
 }
 
 /** `a--` */
-inline f32_4 operator--(f32_4 &a, int) {
-	f32_4 b = a;
+inline float4 operator--(float4 &a, int) {
+	float4 b = a;
 	--a;
 	return b;
 }
 
 /** `~a` */
-inline f32_4 operator~(const f32_4 &a) {
-	f32_4 mask = f32_4::zero();
+inline float4 operator~(const float4 &a) {
+	float4 mask = float4::zero();
 	mask = (mask == mask);
 	return a ^ mask;
 }
 
 
-// helpful idioms
+// Instructions not available as operators
 
 
 /** `~a & b` */
-inline f32_4 andnot(const f32_4 &a, const f32_4 &b) {
-	return f32_4(_mm_andnot_ps(a.v, b.v));
+inline float4 andnot(const float4 &a, const float4 &b) {
+	return float4(_mm_andnot_ps(a.v, b.v));
 }
 
 
