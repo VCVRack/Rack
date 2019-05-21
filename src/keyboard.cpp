@@ -25,6 +25,7 @@ static const std::vector<std::map<int, int>> deviceKeyNote = {
 	{
 		{GLFW_KEY_GRAVE_ACCENT, CMD_OCTAVE_DOWN},
 		{GLFW_KEY_1, CMD_OCTAVE_UP},
+
 		{GLFW_KEY_Z, 0},
 		{GLFW_KEY_S, 1},
 		{GLFW_KEY_X, 2},
@@ -42,6 +43,7 @@ static const std::vector<std::map<int, int>> deviceKeyNote = {
 		{GLFW_KEY_PERIOD, 14},
 		{GLFW_KEY_SEMICOLON, 15},
 		{GLFW_KEY_SLASH, 16},
+
 		{GLFW_KEY_Q, 12},
 		{GLFW_KEY_2, 13},
 		{GLFW_KEY_W, 14},
@@ -66,19 +68,23 @@ static const std::vector<std::map<int, int>> deviceKeyNote = {
 	{
 		{GLFW_KEY_KP_DIVIDE, CMD_OCTAVE_DOWN},
 		{GLFW_KEY_KP_MULTIPLY, CMD_OCTAVE_UP},
-		{GLFW_KEY_KP_7, 0},
-		{GLFW_KEY_KP_8, 1},
-		{GLFW_KEY_KP_9, 2},
-		{GLFW_KEY_KP_ADD, 3},
-		{GLFW_KEY_KP_4, 4},
-		{GLFW_KEY_KP_5, 5},
-		{GLFW_KEY_KP_6, 6},
-		{GLFW_KEY_KP_1, 8},
-		{GLFW_KEY_KP_2, 9},
-		{GLFW_KEY_KP_3, 10},
-		{GLFW_KEY_KP_ENTER, 11},
-		{GLFW_KEY_KP_0, 12},
-		{GLFW_KEY_KP_DECIMAL, 14},
+
+		{GLFW_KEY_KP_0, 0},
+		{GLFW_KEY_KP_DECIMAL, 2},
+		{GLFW_KEY_KP_ENTER, 3},
+
+		{GLFW_KEY_KP_1, 4},
+		{GLFW_KEY_KP_2, 5},
+		{GLFW_KEY_KP_3, 6},
+
+		{GLFW_KEY_KP_4, 8},
+		{GLFW_KEY_KP_5, 9},
+		{GLFW_KEY_KP_6, 10},
+		{GLFW_KEY_KP_ADD, 11},
+
+		{GLFW_KEY_KP_7, 12},
+		{GLFW_KEY_KP_8, 13},
+		{GLFW_KEY_KP_9, 14},
 	},
 };
 
@@ -89,6 +95,7 @@ struct InputDevice : midi::InputDevice {
 	std::map<int, int> pressedNotes;
 
 	void onKeyPress(int key) {
+		// Do nothing if no ports are subscribed
 		if (subscribed.empty())
 			return;
 		auto keyNote = deviceKeyNote[deviceId];
@@ -121,6 +128,7 @@ struct InputDevice : midi::InputDevice {
 	}
 
 	void onKeyRelease(int key) {
+		// Do nothing if no ports are subscribed
 		if (subscribed.empty())
 			return;
 		auto it = pressedNotes.find(key);

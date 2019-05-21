@@ -31,8 +31,10 @@ struct MIDI_Gate : Module {
 	}
 
 	void onReset() override {
-		for (int i = 0; i < 16; i++) {
-			learnedNotes[i] = i + 36;
+		for (int y = 0; y < 4; y++) {
+			for (int x = 0; x < 4; x++) {
+				learnedNotes[4 * y + x] = 36 + 4 * (3-y) + x;
+			}
 		}
 		learningId = -1;
 		panic();
