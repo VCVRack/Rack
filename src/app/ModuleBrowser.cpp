@@ -215,7 +215,7 @@ struct ModelBox : widget::OpaqueWidget {
 
 	void onEnter(const event::Enter &e) override {
 		ui::Tooltip *tooltip = new ui::Tooltip;
-		tooltip->text = model->plugin->name;
+		tooltip->text = model->plugin->author;
 		tooltip->text += " " + model->name;
 		if (model->description != "")
 			tooltip->text += "\n" + model->description;

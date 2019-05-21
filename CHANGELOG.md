@@ -27,6 +27,7 @@
 - Add key command Ctrl-- and Ctrl-=, or Ctrl-scroll, for zooming the rack
 - Fix draw order of cable plugs and wires
 - Make Gamepad MIDI driver generate MIDI CC instead of MIDI notes for buttons
+- Add Numpad keyboard MIDI device
 - Fix Unicode user directories on Windows
 - Add ability to change cable colors in `settings.json`
 - Add `-p X` flag for dumping a screenshot of each available module
