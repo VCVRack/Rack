@@ -57,7 +57,7 @@ void ParamWidget::onMouseMove(EventMouseMove &e) {
 }
 
 void ParamWidget::onMouseDown(EventMouseDown &e) {
-   printf("xxx ParamWidget::onMouseDown: e.button=%d revert_val=%f\n", e.button, revert_val);
+   // printf("xxx ParamWidget::onMouseDown: e.button=%d revert_val=%f\n", e.button, revert_val);
 	if (e.button == 1) {
       if(INVALID_REVERT_VAL != revert_val) // during mouse drag
       {
