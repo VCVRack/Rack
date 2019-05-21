@@ -115,6 +115,7 @@ extern void init_plugin_Southpole            (rack::Plugin *p);
 extern void init_plugin_Southpole_parasites  (rack::Plugin *p);
 extern void init_plugin_squinkylabs_plug1    (rack::Plugin *p);
 extern void init_plugin_SubmarineFree        (rack::Plugin *p);
+extern void init_plugin_SubmarineUtility     (rack::Plugin *p);
 extern void init_plugin_SynthKit             (rack::Plugin *p);
 extern void init_plugin_Template             (rack::Plugin *p);
 extern void init_plugin_TheXOR               (rack::Plugin *p);
@@ -220,6 +221,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("Southpole_parasites",  &init_plugin_Southpole_parasites);
    vst2_load_static_rack_plugin("squinkylabs-plug1",    &init_plugin_squinkylabs_plug1);
    vst2_load_static_rack_plugin("SubmarineFree",        &init_plugin_SubmarineFree);
+   vst2_load_static_rack_plugin("SubmarineUtility",     &init_plugin_SubmarineUtility);
    vst2_load_static_rack_plugin("SynthKit",             &init_plugin_SynthKit);
    vst2_load_static_rack_plugin("Template",             &init_plugin_Template);
    vst2_load_static_rack_plugin("TheXOR",               &init_plugin_TheXOR);

@@ -76,7 +76,8 @@ RACK_PLUGIN_MODEL_DECLARE(SubmarineFree, BP132);
 RACK_PLUGIN_INIT(SubmarineFree) {
    RACK_PLUGIN_INIT_ID();
    RACK_PLUGIN_INIT_VERSION("0.6.8");
-   // https://github.com/david-c14/SubmarineFree
+   RACK_PLUGIN_INIT_WEBSITE("https://github.com/david-c14/SubmarineFree");
+   RACK_PLUGIN_INIT_MANUAL("https://github.com/david-c14/SubmarineFree");
 
 	// Add all Models defined throughout the plugin
 	RACK_PLUGIN_MODEL_ADD(SubmarineFree, AG104);

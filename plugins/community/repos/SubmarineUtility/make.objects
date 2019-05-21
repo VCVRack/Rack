@@ -1,0 +1,5 @@
+ALL_OBJ= \
+	src/ModBrowser.o \
+	src/SubControls.o \
+	src/SubmarineUtility.o \
+	src/WireManager.o
