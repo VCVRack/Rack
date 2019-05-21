@@ -46,6 +46,8 @@ struct SVGPanel;
 static const float RACK_GRID_WIDTH = 15;
 static const float RACK_GRID_HEIGHT = 380;
 static const Vec RACK_GRID_SIZE = Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
+static const std::string PRESET_FILTERS = "VCV Rack module preset (.vcvm):vcvm";
+static const std::string PATCH_FILTERS = "VCV Rack patch (.vcv):vcv";
 
 
 struct ModuleWidget : OpaqueWidget {
@@ -172,6 +174,8 @@ struct RackWidget : OpaqueWidget {
 #endif // USE_VST2
 	json_t *toJson();
 	void fromJson(json_t *rootJ);
+	/** Creates a module and adds it to the rack */
+	ModuleWidget *moduleFromJson(json_t *moduleJ); 
 
 	void addModule(ModuleWidget *m);
 	/** Removes the module and transfers ownership to the caller */
