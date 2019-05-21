@@ -40,8 +40,8 @@
 #include <windows.h>
 #include <windowsx.h>
 
-#define Dprintf if(0);else printf
-// #define Dprintf if(1);else printf
+// #define Dprintf if(0);else printf
+#define Dprintf if(1);else printf
 
 // ---------------------------------------------------------------------------- macros and defines
 #define LGLW(a) lglw_int_t *lglw = ((lglw_int_t*)(a))
