@@ -40,6 +40,13 @@ void Plugin::fromJson(json_t *rootJ) {
 	if (nameJ)
 		name = json_string_value(nameJ);
 
+	json_t *brandJ = json_object_get(rootJ, "brand");
+	if (brandJ)
+		brand = json_string_value(brandJ);
+	// Use name for brand name by default
+	if (brand == "")
+		brand = name;
+
 	json_t *authorJ = json_object_get(rootJ, "author");
 	if (authorJ)
 		author = json_string_value(authorJ);

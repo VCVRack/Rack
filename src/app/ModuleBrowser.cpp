@@ -37,7 +37,7 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 	std::string s;
 	s += model->plugin->slug;
 	s += " ";
-	s += model->plugin->author;
+	s += model->plugin->brand;
 	s += " ";
 	s += model->plugin->name;
 	s += " ";
@@ -215,7 +215,7 @@ struct ModelBox : widget::OpaqueWidget {
 
 	void onEnter(const event::Enter &e) override {
 		ui::Tooltip *tooltip = new ui::Tooltip;
-		tooltip->text = model->plugin->author;
+		tooltip->text = model->plugin->brand;
 		tooltip->text += " " + model->name;
 		if (model->description != "")
 			tooltip->text += "\n" + model->description;
@@ -228,7 +228,7 @@ struct ModelBox : widget::OpaqueWidget {
 };
 
 
-struct AuthorItem : ui::MenuItem {
+struct BrandItem : ui::MenuItem {
 	void onAction(const event::Action &e) override;
 	void step() override;
 };
@@ -309,9 +309,9 @@ struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
 	ClearButton *clearButton;
 	ShowFavoritesButton *favoriteButton;
-	ui::Label *authorLabel;
-	ui::List *authorList;
-	ui::ScrollWidget *authorScroll;
+	ui::Label *brandLabel;
+	ui::List *brandList;
+	ui::ScrollWidget *brandScroll;
 	ui::Label *tagLabel;
 	ui::List *tagList;
 	ui::ScrollWidget *tagScroll;
@@ -328,28 +328,28 @@ struct BrowserSidebar : widget::Widget {
 		dynamic_cast<ShowFavoritesQuantity*>(favoriteButton->quantity)->widget = favoriteButton;
 		addChild(favoriteButton);
 
-		authorLabel = new ui::Label;
-		// authorLabel->fontSize = 16;
-		authorLabel->color = nvgRGB(0x80, 0x80, 0x80);
-		authorLabel->text = "Authors";
-		addChild(authorLabel);
+		brandLabel = new ui::Label;
+		// brandLabel->fontSize = 16;
+		brandLabel->color = nvgRGB(0x80, 0x80, 0x80);
+		brandLabel->text = "Brands";
+		addChild(brandLabel);
 
 		// Plugin list
-		authorScroll = new ui::ScrollWidget;
-		addChild(authorScroll);
+		brandScroll = new ui::ScrollWidget;
+		addChild(brandScroll);
 
-		authorList = new ui::List;
-		authorScroll->container->addChild(authorList);
+		brandList = new ui::List;
+		brandScroll->container->addChild(brandList);
 
-		std::set<std::string, string::CaseInsensitiveCompare> authorNames;
+		std::set<std::string, string::CaseInsensitiveCompare> brands;
 		for (plugin::Plugin *plugin : plugin::plugins) {
-			authorNames.insert(plugin->author);
+			brands.insert(plugin->brand);
 		}
 
-		for (const std::string &authorName : authorNames) {
-			AuthorItem *item = new AuthorItem;
-			item->text = authorName;
-			authorList->addChild(item);
+		for (const std::string &brand : brands) {
+			BrandItem *item = new BrandItem;
+			item->text = brand;
+			brandList->addChild(item);
 		}
 
 		tagLabel = new ui::Label;
@@ -382,14 +382,14 @@ struct BrowserSidebar : widget::Widget {
 		float listHeight = (box.size.y - favoriteButton->box.getBottom()) / 2;
 		listHeight = std::floor(listHeight);
 
-		authorLabel->box.pos = favoriteButton->box.getBottomLeft();
-		authorLabel->box.size.x = box.size.x;
-		authorScroll->box.pos = authorLabel->box.getBottomLeft();
-		authorScroll->box.size.y = listHeight - authorLabel->box.size.y;
-		authorScroll->box.size.x = box.size.x;
-		authorList->box.size.x = authorScroll->box.size.x;
+		brandLabel->box.pos = favoriteButton->box.getBottomLeft();
+		brandLabel->box.size.x = box.size.x;
+		brandScroll->box.pos = brandLabel->box.getBottomLeft();
+		brandScroll->box.size.y = listHeight - brandLabel->box.size.y;
+		brandScroll->box.size.x = box.size.x;
+		brandList->box.size.x = brandScroll->box.size.x;
 
-		tagLabel->box.pos = authorScroll->box.getBottomLeft();
+		tagLabel->box.pos = brandScroll->box.getBottomLeft();
 		tagLabel->box.size.x = box.size.x;
 		tagScroll->box.pos = tagLabel->box.getBottomLeft();
 		tagScroll->box.size.y = listHeight - tagLabel->box.size.y;
@@ -409,7 +409,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	ui::SequentialLayout *modelContainer;
 
 	std::string search;
-	std::string author;
+	std::string brand;
 	std::string tag;
 	bool favorites = false;
 
@@ -511,14 +511,14 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			});
 		}
 
-		// Filter ModelBoxes by author
-		if (!author.empty()) {
+		// Filter ModelBoxes by brand
+		if (!brand.empty()) {
 			for (Widget *w : modelContainer->children) {
 				if (!w->visible)
 					continue;
 				ModelBox *m = dynamic_cast<ModelBox*>(w);
 				assert(m);
-				if (m->model->plugin->author != author)
+				if (m->model->plugin->brand != brand)
 					m->visible = false;
 			}
 		}
@@ -542,16 +542,16 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
-		std::set<std::string> enabledAuthors;
+		std::set<std::string> enabledBrands;
 		std::set<std::string> enabledTags;
 
-		// Get list of enabled authors and tags for sidebar
+		// Get list of enabled brands and tags for sidebar
 		for (Widget *w : modelContainer->children) {
 			ModelBox *m = dynamic_cast<ModelBox*>(w);
 			assert(m);
 			if (!m->visible)
 				continue;
-			enabledAuthors.insert(m->model->plugin->author);
+			enabledBrands.insert(m->model->plugin->brand);
 			for (const std::string &tag : m->model->tags) {
 				enabledTags.insert(tag);
 			}
@@ -565,17 +565,17 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 		modelLabel->text = string::f("Modules (%d)", modelsLen);
 
-		// Enable author and tag items that are available in visible ModelBoxes
-		int authorsLen = 0;
-		for (Widget *w : sidebar->authorList->children) {
-			AuthorItem *item = dynamic_cast<AuthorItem*>(w);
+		// Enable brand and tag items that are available in visible ModelBoxes
+		int brandsLen = 0;
+		for (Widget *w : sidebar->brandList->children) {
+			BrandItem *item = dynamic_cast<BrandItem*>(w);
 			assert(item);
-			auto it = enabledAuthors.find(item->text);
-			item->disabled = (it == enabledAuthors.end());
+			auto it = enabledBrands.find(item->text);
+			item->disabled = (it == enabledBrands.end());
 			if (!item->disabled)
-				authorsLen++;
+				brandsLen++;
 		}
-		sidebar->authorLabel->text = string::f("Authors (%d)", authorsLen);
+		sidebar->brandLabel->text = string::f("Brands (%d)", brandsLen);
 
 		int tagsLen = 0;
 		for (Widget *w : sidebar->tagList->children) {
@@ -592,7 +592,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	void clear() {
 		search = "";
 		sidebar->searchField->setText("");
-		author = "";
+		brand = "";
 		tag = "";
 		refresh();
 	}
@@ -632,19 +632,19 @@ inline void ModelBox::onButton(const event::Button &e) {
 }
 
 
-inline void AuthorItem::onAction(const event::Action &e) {
+inline void BrandItem::onAction(const event::Action &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
-	if (browser->author == text)
-		browser->author = "";
+	if (browser->brand == text)
+		browser->brand = "";
 	else
-		browser->author = text;
+		browser->brand = text;
 	browser->refresh();
 }
 
-inline void AuthorItem::step() {
+inline void BrandItem::step() {
 	MenuItem::step();
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
-	active = (browser->author == text);
+	active = (browser->brand == text);
 }
 
 inline void TagItem::onAction(const event::Action &e) {

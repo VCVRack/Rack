@@ -27,12 +27,16 @@ struct Plugin {
 	/** Your plugin's latest version, using the guidelines at https://github.com/VCVRack/Rack/issues/266. Do not include the "v" prefix.
 	*/
 	std::string version;
-	/** Human-readable display name for your plugin. You can change this on a whim, unlike slugs.
-	*/
-	std::string name;
 	/** The license type of your plugin. Use "proprietary" if all rights are reserved. If your license is in the [SPDX license list](https://spdx.org/licenses/), use its abbreviation in the "Identifier" column.
 	*/
 	std::string license;
+	/** Human-readable display name for your plugin. You can change this on a whim, unlike slugs.
+	*/
+	std::string name;
+	/** Prefix of each module name in the Module Browser.
+	If blank, `name` is used.
+	*/
+	std::string brand;
 	/** Your name, company, alias, or GitHub username.
 	*/
 	std::string author;
@@ -41,11 +45,11 @@ struct Plugin {
 	std::string authorEmail;
 	/** Homepage featuring the plugin itself.
 	*/
-	std::string pluginUrl;
-	/** Homepage of the author.
-	*/
 	std::string authorUrl;
 	/** The manual of your plugin. HTML, PDF, or GitHub readme/wiki are fine.
+	*/
+	std::string pluginUrl;
+	/** Homepage of the author.
 	*/
 	std::string manualUrl;
 	/** The source code homepage. E.g. GitHub repo.
