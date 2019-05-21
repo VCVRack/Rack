@@ -14,65 +14,97 @@ struct Driver;
 static const int DRIVER = -11;
 static Driver *driver = NULL;
 
+enum {
+	CMD_OCTAVE_DOWN = -1,
+	CMD_OCTAVE_UP = -2,
+};
+
+static const int deviceCount = 2;
+
+static const std::vector<std::map<int, int>> deviceKeyNote = {
+	{
+		{GLFW_KEY_GRAVE_ACCENT, CMD_OCTAVE_DOWN},
+		{GLFW_KEY_1, CMD_OCTAVE_UP},
+		{GLFW_KEY_Z, 0},
+		{GLFW_KEY_S, 1},
+		{GLFW_KEY_X, 2},
+		{GLFW_KEY_D, 3},
+		{GLFW_KEY_C, 4},
+		{GLFW_KEY_V, 5},
+		{GLFW_KEY_G, 6},
+		{GLFW_KEY_B, 7},
+		{GLFW_KEY_H, 8},
+		{GLFW_KEY_N, 9},
+		{GLFW_KEY_J, 10},
+		{GLFW_KEY_M, 11},
+		{GLFW_KEY_COMMA, 12},
+		{GLFW_KEY_L, 13},
+		{GLFW_KEY_PERIOD, 14},
+		{GLFW_KEY_SEMICOLON, 15},
+		{GLFW_KEY_SLASH, 16},
+		{GLFW_KEY_Q, 12},
+		{GLFW_KEY_2, 13},
+		{GLFW_KEY_W, 14},
+		{GLFW_KEY_3, 15},
+		{GLFW_KEY_E, 16},
+		{GLFW_KEY_R, 17},
+		{GLFW_KEY_5, 18},
+		{GLFW_KEY_T, 19},
+		{GLFW_KEY_6, 20},
+		{GLFW_KEY_Y, 21},
+		{GLFW_KEY_7, 22},
+		{GLFW_KEY_U, 23},
+		{GLFW_KEY_I, 24},
+		{GLFW_KEY_9, 25},
+		{GLFW_KEY_O, 26},
+		{GLFW_KEY_0, 27},
+		{GLFW_KEY_P, 28},
+		{GLFW_KEY_LEFT_BRACKET, 29},
+		{GLFW_KEY_EQUAL, 30},
+		{GLFW_KEY_RIGHT_BRACKET, 31},
+	},
+	{
+		{GLFW_KEY_KP_DIVIDE, CMD_OCTAVE_DOWN},
+		{GLFW_KEY_KP_MULTIPLY, CMD_OCTAVE_UP},
+		{GLFW_KEY_KP_7, 0},
+		{GLFW_KEY_KP_8, 1},
+		{GLFW_KEY_KP_9, 2},
+		{GLFW_KEY_KP_ADD, 3},
+		{GLFW_KEY_KP_4, 4},
+		{GLFW_KEY_KP_5, 5},
+		{GLFW_KEY_KP_6, 6},
+		{GLFW_KEY_KP_1, 8},
+		{GLFW_KEY_KP_2, 9},
+		{GLFW_KEY_KP_3, 10},
+		{GLFW_KEY_KP_ENTER, 11},
+		{GLFW_KEY_KP_0, 12},
+		{GLFW_KEY_KP_DECIMAL, 14},
+	},
+};
+
 
 struct InputDevice : midi::InputDevice {
+	int deviceId;
 	int octave = 5;
 	std::map<int, int> pressedNotes;
 
 	void onKeyPress(int key) {
-		int note = -1;
-		switch (key) {
-			case GLFW_KEY_Z: note = 0; break;
-			case GLFW_KEY_S: note = 1; break;
-			case GLFW_KEY_X: note = 2; break;
-			case GLFW_KEY_D: note = 3; break;
-			case GLFW_KEY_C: note = 4; break;
-			case GLFW_KEY_V: note = 5; break;
-			case GLFW_KEY_G: note = 6; break;
-			case GLFW_KEY_B: note = 7; break;
-			case GLFW_KEY_H: note = 8; break;
-			case GLFW_KEY_N: note = 9; break;
-			case GLFW_KEY_J: note = 10; break;
-			case GLFW_KEY_M: note = 11; break;
-			case GLFW_KEY_COMMA: note = 12; break;
-			case GLFW_KEY_L: note = 13; break;
-			case GLFW_KEY_PERIOD: note = 14; break;
-			case GLFW_KEY_SEMICOLON: note = 15; break;
-			case GLFW_KEY_SLASH: note = 16; break;
-
-			case GLFW_KEY_Q: note = 12; break;
-			case GLFW_KEY_2: note = 13; break;
-			case GLFW_KEY_W: note = 14; break;
-			case GLFW_KEY_3: note = 15; break;
-			case GLFW_KEY_E: note = 16; break;
-			case GLFW_KEY_R: note = 17; break;
-			case GLFW_KEY_5: note = 18; break;
-			case GLFW_KEY_T: note = 19; break;
-			case GLFW_KEY_6: note = 20; break;
-			case GLFW_KEY_Y: note = 21; break;
-			case GLFW_KEY_7: note = 22; break;
-			case GLFW_KEY_U: note = 23; break;
-			case GLFW_KEY_I: note = 24; break;
-			case GLFW_KEY_9: note = 25; break;
-			case GLFW_KEY_O: note = 26; break;
-			case GLFW_KEY_0: note = 27; break;
-			case GLFW_KEY_P: note = 28; break;
-			case GLFW_KEY_LEFT_BRACKET: note = 29; break;
-			case GLFW_KEY_EQUAL: note = 30; break;
-			case GLFW_KEY_RIGHT_BRACKET: note = 31; break;
-
-			case GLFW_KEY_GRAVE_ACCENT: {
-				octave--;
-			} break;
-			case GLFW_KEY_1: {
-				octave++;
-			} break;
-			default: break;
-		}
-
-		octave = math::clamp(octave, 0, 9);
-		if (note < 0)
+		if (subscribed.empty())
 			return;
+		auto keyNote = deviceKeyNote[deviceId];
+		auto it = keyNote.find(key);
+		if (it == keyNote.end())
+			return;
+		int note = it->second;
+
+		if (note < 0) {
+			if (note == CMD_OCTAVE_DOWN)
+				octave--;
+			else if (note == CMD_OCTAVE_UP)
+				octave++;
+			octave = math::clamp(octave, 0, 9);
+			return;
+		}
 
 		note += 12 * octave;
 		if (note > 127)
@@ -89,49 +121,76 @@ struct InputDevice : midi::InputDevice {
 	}
 
 	void onKeyRelease(int key) {
+		if (subscribed.empty())
+			return;
 		auto it = pressedNotes.find(key);
-		if (it != pressedNotes.end()) {
-			int note = it->second;
-			// MIDI note off
-			midi::Message msg;
-			msg.setStatus(0x8);
-			msg.setNote(note);
-			msg.setValue(127);
-			onMessage(msg);
+		if (it == pressedNotes.end())
+			return;
 
-			pressedNotes.erase(it);
-		}
+		int note = it->second;
+		// MIDI note off
+		midi::Message msg;
+		msg.setStatus(0x8);
+		msg.setNote(note);
+		msg.setValue(127);
+		onMessage(msg);
+
+		pressedNotes.erase(it);
 	}
 };
 
 
 struct Driver : midi::Driver {
-	InputDevice device;
+	InputDevice devices[deviceCount];
+
+	Driver() {
+		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
+			devices[deviceId].deviceId = deviceId;
+		}
+		devices[1].octave = 3;
+	}
+
 	std::string getName() override {return "Computer keyboard";}
 
 	std::vector<int> getInputDeviceIds() override {
-		return {0};
+		std::vector<int> deviceIds;
+		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
+			deviceIds.push_back(deviceId);
+		}
+		return deviceIds;
 	}
 
 	std::string getInputDeviceName(int deviceId) override {
 		if (deviceId == 0)
 			return "QWERTY keyboard (US)";
+		else if (deviceId == 1)
+			return "Numpad keyboard (US)";
 		return "";
 	}
 
 	midi::InputDevice *subscribeInput(int deviceId, midi::Input *input) override {
-		if (deviceId != 0)
+		if (!(0 <= deviceId && deviceId < deviceCount))
 			return NULL;
-
-		device.subscribe(input);
-		return &device;
+		devices[deviceId].subscribe(input);
+		return &devices[deviceId];
 	}
 
 	void unsubscribeInput(int deviceId, midi::Input *input) override {
-		if (deviceId != 0)
+		if (!(0 <= deviceId && deviceId < deviceCount))
 			return;
+		devices[deviceId].unsubscribe(input);
+	}
 
-		device.unsubscribe(input);
+	void onKeyPress(int key) {
+		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
+			devices[deviceId].onKeyPress(key);
+		}
+	}
+
+	void onKeyRelease(int key) {
+		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
+			devices[deviceId].onKeyRelease(key);
+		}
 	}
 };
 
@@ -144,13 +203,13 @@ void init() {
 void press(int key) {
 	if (!driver)
 		return;
-	driver->device.onKeyPress(key);
+	driver->onKeyPress(key);
 }
 
 void release(int key) {
 	if (!driver)
 		return;
-	driver->device.onKeyRelease(key);
+	driver->onKeyRelease(key);
 }
 
 

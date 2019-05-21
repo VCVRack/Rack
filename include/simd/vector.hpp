@@ -87,6 +87,7 @@ struct Vector<float, 4> {
 
 
 typedef Vector<float, 4> float_4;
+// typedef Vector<double, 2> double_2;
 // typedef Vector<int32_t, 4> int32_4;
 
 

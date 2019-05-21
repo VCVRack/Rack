@@ -140,8 +140,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 					e.consume(this);
 				}
 			} break;
-			case GLFW_KEY_ENTER:
-			case GLFW_KEY_KP_ENTER: {
+			case GLFW_KEY_ENTER: {
 				moduleBrowser->show();
 				e.consume(this);
 			} break;
