@@ -48,7 +48,7 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 	// 	s += " ";
 	// 	s += tag;
 	// }
-	float score = string::fuzzyScore(s, search);
+	float score = string::fuzzyScore(string::lowercase(s), string::lowercase(search));
 	return score;
 }
 
