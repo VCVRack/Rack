@@ -812,7 +812,7 @@ void ModuleWidget::createContextMenu() {
 	assert(model);
 
 	ui::MenuLabel *modelLabel = new ui::MenuLabel;
-	modelLabel->text = model->name;
+	modelLabel->text = model->plugin->brand + " " + model->name;
 	menu->addChild(modelLabel);
 
 	ModulePluginItem *pluginItem = new ModulePluginItem;

@@ -52,6 +52,43 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 	return score;
 }
 
+static bool isModelVisible(plugin::Model *model, bool favorites, const std::string &search, const std::string &brand, const std::string &tag) {
+	// Filter favorites
+	if (favorites) {
+		auto it = settings::favoriteModels.find(model);
+		if (it != settings::favoriteModels.end())
+			return false;
+	}
+
+	// Filter search query
+	if (search != "") {
+		float score = modelScore(model, search);
+		if (score <= 0.f)
+			return false;
+	}
+
+	// Filter brand
+	if (brand != "") {
+		if (model->plugin->brand != brand)
+			return false;
+	}
+
+	// Filter tag
+	if (tag != "") {
+		bool found = false;
+		for (const std::string &modelTag : model->tags) {
+			if (modelTag == tag) {
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+			return false;
+	}
+
+	return true;
+}
+
 
 struct BrowserOverlay : widget::OpaqueWidget {
 	void step() override {
@@ -470,18 +507,14 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 
-		// Show all or only favorites
+		// Filter ModelBoxes
 		for (Widget *w : modelContainer->children) {
-			if (favorites) {
-				ModelBox *m = dynamic_cast<ModelBox*>(w);
-				auto it = settings::favoriteModels.find(m->model);
-				w->visible = (it != settings::favoriteModels.end());
-			}
-			else {
-				w->visible = true;
-			}
+			ModelBox *m = dynamic_cast<ModelBox*>(w);
+			assert(m);
+			m->visible = isModelVisible(m->model, favorites, search, brand, tag);
 		}
 
+		// Sort ModelBoxes
 		if (search.empty()) {
 			// Sort by plugin name and then module name
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
@@ -494,84 +527,46 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 		else {
 			std::map<Widget*, float> scores;
-			// Compute scores and filter visibility
+			// Compute scores
 			for (Widget *w : modelContainer->children) {
 				ModelBox *m = dynamic_cast<ModelBox*>(w);
 				assert(m);
-				float score = 0.f;
-				if (m->visible) {
-					score = modelScore(m->model, search);
-					m->visible = (score > 0);
-				}
-				scores[m] = score;
+				if (!m->visible)
+					continue;
+				scores[m] = modelScore(m->model, search);;
 			}
 			// Sort by score
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
+				// If score was not computed, scores[w] returns 0, but this doesn't matter because those widgets aren't visible.
 				return scores[w1] > scores[w2];
 			});
 		}
 
-		// Filter ModelBoxes by brand
-		if (!brand.empty()) {
-			for (Widget *w : modelContainer->children) {
-				if (!w->visible)
-					continue;
-				ModelBox *m = dynamic_cast<ModelBox*>(w);
-				assert(m);
-				if (m->model->plugin->brand != brand)
-					m->visible = false;
-			}
-		}
+		// Filter the brand and tag lists
 
-		// Filter ModelBoxes by tag
-		if (!tag.empty()) {
-			for (Widget *w : modelContainer->children) {
-				if (!w->visible)
-					continue;
-				ModelBox *m = dynamic_cast<ModelBox*>(w);
-				assert(m);
-				bool found = false;
-				for (const std::string &tag : m->model->tags) {
-					if (tag == this->tag) {
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-					m->visible = false;
-			}
-		}
-
-		std::set<std::string> enabledBrands;
-		std::set<std::string> enabledTags;
-
-		// Get list of enabled brands and tags for sidebar
+		// Get modules that would be filtered by just the favorites and search state
+		std::vector<plugin::Model*> filteredModels;
 		for (Widget *w : modelContainer->children) {
 			ModelBox *m = dynamic_cast<ModelBox*>(w);
 			assert(m);
-			if (!m->visible)
-				continue;
-			enabledBrands.insert(m->model->plugin->brand);
-			for (const std::string &tag : m->model->tags) {
-				enabledTags.insert(tag);
-			}
+			if (isModelVisible(m->model, favorites, search, "", ""))
+				filteredModels.push_back(m->model);
 		}
 
-		// Count models
-		int modelsLen = 0;
-		for (Widget *w : modelContainer->children) {
-			if (w->visible)
-				modelsLen++;
-		}
-		modelLabel->text = string::f("Modules (%d)", modelsLen);
+		auto hasModel = [&](const std::string &brand, const std::string &tag) -> bool {
+			for (plugin::Model *model : filteredModels) {
+				if (isModelVisible(model, false, "", brand, tag))
+					return true;
+			}
+			return false;
+		};
 
 		// Enable brand and tag items that are available in visible ModelBoxes
 		int brandsLen = 0;
 		for (Widget *w : sidebar->brandList->children) {
 			BrandItem *item = dynamic_cast<BrandItem*>(w);
 			assert(item);
-			auto it = enabledBrands.find(item->text);
-			item->disabled = (it == enabledBrands.end());
+			item->disabled = !hasModel(item->text, tag);
 			if (!item->disabled)
 				brandsLen++;
 		}
@@ -581,12 +576,19 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget *w : sidebar->tagList->children) {
 			TagItem *item = dynamic_cast<TagItem*>(w);
 			assert(item);
-			auto it = enabledTags.find(item->text);
-			item->disabled = (it == enabledTags.end());
+			item->disabled = !hasModel(brand, item->text);
 			if (!item->disabled)
 				tagsLen++;
 		}
 		sidebar->tagLabel->text = string::f("Tags (%d)", tagsLen);
+
+		// Count models
+		int modelsLen = 0;
+		for (Widget *w : modelContainer->children) {
+			if (w->visible)
+				modelsLen++;
+		}
+		modelLabel->text = string::f("Modules (%d)", modelsLen);
 	}
 
 	void clear() {

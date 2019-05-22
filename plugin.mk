@@ -24,7 +24,7 @@ ifdef ARCH_LIN
 	TARGET := plugin.so
 	RACK_USER_DIR ?= $(HOME)/.Rack
 	# Link to glibc 2.23
-# 	FLAGS += -include $(RACK_DIR)/include/force_link_glibc_2.23.h
+# 	FLAGS += -include force_link_glibc_2.23.h
 endif
 
 ifdef ARCH_MAC
