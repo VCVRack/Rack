@@ -456,6 +456,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		modelLabel = new ui::Label;
 		// modelLabel->fontSize = 16;
+		modelLabel->box.size.x = 200;
 		modelLabel->box.pos = math::Vec(10, 10);
 		modelScroll->container->addChild(modelLabel);
 
