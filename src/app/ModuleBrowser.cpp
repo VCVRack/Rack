@@ -33,21 +33,17 @@ namespace app {
 
 static float modelScore(plugin::Model *model, const std::string &search) {
 	if (search.empty())
-		return true;
+		return 1.f;
 	std::string s;
-	s += model->plugin->slug;
-	s += " ";
 	s += model->plugin->brand;
 	s += " ";
-	s += model->plugin->name;
+	s += model->name;
 	s += " ";
 	s += model->slug;
-	s += " ";
-	s += model->name;
-	// for (const std::string &tag : model->tags) {
-	// 	s += " ";
-	// 	s += tag;
-	// }
+	for (const std::string &tag : model->tags) {
+		s += " ";
+		s += tag;
+	}
 	float score = string::fuzzyScore(string::lowercase(s), string::lowercase(search));
 	return score;
 }
@@ -56,7 +52,7 @@ static bool isModelVisible(plugin::Model *model, bool favorites, const std::stri
 	// Filter favorites
 	if (favorites) {
 		auto it = settings::favoriteModels.find(model);
-		if (it != settings::favoriteModels.end())
+		if (it == settings::favoriteModels.end())
 			return false;
 	}
 
