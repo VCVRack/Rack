@@ -50,6 +50,9 @@ bin: $(BIN_RULES) $(ALL_OBJ)
 .cpp.o:
 	$(CC) $(CPPFLAGS) $(OPTFLAGS_PLUGIN) -c $< -Fo"$@"
 
+.cc.o:
+	$(CC) $(CPPFLAGS) $(OPTFLAGS_PLUGIN) -c $< -Fo"$@"
+
 .c.o:
 	$(CC) $(CPPFLAGS) $(OPTFLAGS_PLUGIN) -c $< -Fo"$@"
 
