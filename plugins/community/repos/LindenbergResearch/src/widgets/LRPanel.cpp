@@ -1,3 +1,4 @@
+#include "../LindenbergResearch.hpp"
 #include <window.hpp>
 #include <global_pre.hpp>
 #include <global_ui.hpp>

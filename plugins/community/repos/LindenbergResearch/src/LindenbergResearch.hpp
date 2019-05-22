@@ -2,14 +2,15 @@
 
 #include <cmath>
 #include "rack.hpp"
-#include "asset.hpp"
-#include "widgets.hpp"
-#include "LRComponents.hpp"
 
 using namespace rack;
 
 RACK_PLUGIN_DECLARE(LindenbergResearch);
 
-#ifdef USE_VST2
+#if defined(USE_VST2) && !defined(RACK_PLUGIN_SHARED)
 #define plugin "LindenbergResearch"
 #endif // USE_VST2
+
+#include "asset.hpp"
+#include "widgets.hpp"
+#include "LRComponents.hpp"

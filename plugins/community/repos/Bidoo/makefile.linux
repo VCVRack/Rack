@@ -1,6 +1,6 @@
 SLUG=Bidoo
 
-include ../../../build_plugin_pre_linux.mk
+include ../../../build_shared_plugin_pre_linux.mk
 
 EXTRAFLAGS+= -DUSE_KISS_FFT -Idep/include -I./src/dep/audiofile -I./src/dep/filters -I./src/dep/freeverb \
  -I./src/dep/gist/libs/kiss_fft130 -I./src/dep/gist/src -I./src/dep/minimp3\
@@ -9,4 +9,9 @@ EXTRAFLAGS+= -DUSE_KISS_FFT -Idep/include -I./src/dep/audiofile -I./src/dep/filt
 
 include make.objects
 
-include ../../../build_plugin_post_linux.mk
+define BIN_POST_FXN
+	cp -f $(SLUG).so ../../../../vst2_bin/plugins/$(SLUG)/plugin.so.fx
+	cp -f $(SLUG).so ../../../../vst2_bin/plugins/$(SLUG)/plugin.so.instr
+endef
+
+include ../../../build_shared_plugin_post_linux.mk

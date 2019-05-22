@@ -7,7 +7,7 @@ namespace rack_plugin_Edge {
 
 RACK_PLUGIN_DECLARE(Edge);
 
-#ifdef USE_VST2
+#if defined(USE_VST2) && !defined(RACK_PLUGIN_SHARED)
 #define plugin "Edge"
 #endif // USE_VST2
 

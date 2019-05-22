@@ -31,11 +31,11 @@ using std::string;
 using std::map;
 
 
-#ifdef USE_VST2
-#define plugin "LindenbergResearch"
-#else
-extern Plugin *plugin;
-#endif // USE_VST2
+// // #ifdef USE_VST2
+// // #define plugin "LindenbergResearch"
+// // #else
+// // extern Plugin *plugin;
+// // #endif // USE_VST2
 
 namespace lrt {
 
@@ -167,7 +167,7 @@ struct LRCVIndicator : TransparentWidget {
 struct LRShadow : TransparentWidget {
 private:
     Rect box;
-    float size = 0.65;
+    float size = 0.65f;
     float strength = 1.f;
 
     /** shadow shift */
@@ -223,7 +223,7 @@ private:
     /** position to snap */
     float snapAt = 0.0f;
     /** snap sensitivity */
-    float snapSens = 0.1;
+    float snapSens = 0.1f;
 
 protected:
     /** shader */
@@ -426,7 +426,7 @@ struct LRMiddleIncremental : LRKnob {
 
     void onChange(EventChange &e) override {
 
-        value = lround(value);
+        value = (float)lround(value);
 
         //value = round(value);
         SVGKnob::onChange(e);
@@ -453,21 +453,21 @@ struct LRBigKnob : LRKnob {
         switch (*gestalt) {
             case LRGestalt::DARK:
                 setIndicatorDistance(15);
-                setIndicatorShape(4.8, 0.12);
+                setIndicatorShape(4.8f, 0.12f);
                 shader->setShadowPosition(4, 5);
                 shader->setStrength(0.8f);
                 shader->setSize(.65f);
                 break;
             case LRGestalt::LIGHT:
                 setIndicatorDistance(17);
-                setIndicatorShape(4.1, 0.08);
+                setIndicatorShape(4.1f, 0.08f);
                 shader->setShadowPosition(4, 5);
                 shader->setStrength(0.5f);
                 shader->setSize(0.6f);
                 break;
             case LRGestalt::AGED:
                 setIndicatorDistance(17);
-                setIndicatorShape(4.1, 0.08);
+                setIndicatorShape(4.1f, 0.08f);
                 shader->setShadowPosition(4, 5);
                 shader->setStrength(0.5f);
                 shader->setSize(0.6f);
@@ -498,21 +498,21 @@ struct LRMiddleKnob : LRKnob {
         switch (*gestalt) {
             case LRGestalt::DARK:
                 setIndicatorDistance(13);
-                setIndicatorShape(5, 0.13);
+                setIndicatorShape(5.f, 0.13f);
                 shader->setShadowPosition(2, 3);
                 shader->setStrength(0.8f);
                 shader->setSize(.65f);
                 break;
             case LRGestalt::LIGHT:
                 setIndicatorDistance(11);
-                setIndicatorShape(4.3, 0.11);
+                setIndicatorShape(4.3f, 0.11f);
                 shader->setShadowPosition(2, 3);
                 shader->setStrength(0.5f);
                 shader->setSize(0.6f);
                 break;
             case LRGestalt::AGED:
                 setIndicatorDistance(11);
-                setIndicatorShape(4.3, 0.11);
+                setIndicatorShape(4.3f, 0.11f);
                 shader->setShadowPosition(2, 3);
                 shader->setStrength(0.5f);
                 shader->setSize(0.6f);
@@ -546,7 +546,7 @@ struct LRSmallKnob : LRKnob {
         switch (*gestalt) {
             case LRGestalt::DARK:
                 setIndicatorDistance(13);
-                setIndicatorShape(5, 0.13);
+                setIndicatorShape(5.f, 0.13f);
                 shader->setShadowPosition(3, 3);
                 shader->setStrength(1.f);
                 shader->setSize(.65f);
@@ -574,7 +574,7 @@ struct LRSmallKnob : LRKnob {
  * @brief LR Small Knob
  */
 struct LRSmallToggleKnob : LRKnob {
-    LRSmallToggleKnob(float length = 0.73) {
+    LRSmallToggleKnob(float length = 0.73f) {
         //TODO: parametrize start and end angle
         minAngle = -length * (float) M_PI;
         maxAngle = length * (float) M_PI;

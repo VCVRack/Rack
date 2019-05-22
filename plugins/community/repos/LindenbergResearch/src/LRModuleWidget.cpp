@@ -1,3 +1,4 @@
+#include "LindenbergResearch.hpp"
 #include "LRComponents.hpp"
 #include "LRModel.hpp"
 

@@ -167,7 +167,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("BaconMusic",           &init_plugin_BaconMusic);
    vst2_load_static_rack_plugin("Bark",                 &init_plugin_Bark);
    vst2_load_static_rack_plugin("Befaco",               &init_plugin_Befaco);
-   vst2_load_static_rack_plugin("Bidoo",                &init_plugin_Bidoo);
+   // vst2_load_static_rack_plugin("Bidoo",                &init_plugin_Bidoo); // now a DLL (22May2019) (GPL code)
    vst2_load_static_rack_plugin("Bogaudio",             &init_plugin_Bogaudio);
    // vst2_load_static_rack_plugin("bsp",                  &init_plugin_bsp);  // contains GPLv3 code from Ob-Xd (Obxd_VCF)
    // vst2_load_static_rack_plugin("BOKONTEPByteBeatMachine",   &init_plugin_BOKONTEPByteBeatMachine);
@@ -178,8 +178,8 @@ void vst2_load_static_rack_plugins(void) {
    // vst2_load_static_rack_plugin("dBiz",                 &init_plugin_dBiz);  // now a DLL (13Jul2018)
    vst2_load_static_rack_plugin("DHE-Modules",          &init_plugin_DHE_Modules);
    vst2_load_static_rack_plugin("DrumKit",              &init_plugin_DrumKit);
-   vst2_load_static_rack_plugin("Edge",                 &init_plugin_Edge);
-   vst2_load_static_rack_plugin("EH_modules",           &init_plugin_EH_modules);
+   // vst2_load_static_rack_plugin("Edge",                 &init_plugin_Edge); // now a DLL (22May2019) (GPL code)
+   // vst2_load_static_rack_plugin("EH_modules",           &init_plugin_EH_modules); // now a DLL (22May2019) (GPL code)
    vst2_load_static_rack_plugin("ErraticInstruments",   &init_plugin_ErraticInstruments);
    vst2_load_static_rack_plugin("ESeries",              &init_plugin_ESeries);
    vst2_load_static_rack_plugin("FrankBussFormula",     &init_plugin_FrankBussFormula);
@@ -190,11 +190,11 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("HetrickCV",            &init_plugin_HetrickCV);
    vst2_load_static_rack_plugin("huaba",                &init_plugin_huaba);
    vst2_load_static_rack_plugin("ImpromptuModular",     &init_plugin_ImpromptuModular);
-   vst2_load_static_rack_plugin("JE",                   &init_plugin_JE);
+   // vst2_load_static_rack_plugin("JE",                   &init_plugin_JE); // now a DLL (22May2019) (GPL code)
    vst2_load_static_rack_plugin("JW_Modules",           &init_plugin_JW_Modules);
    vst2_load_static_rack_plugin("Koralfx-Modules",      &init_plugin_Koralfx);
    vst2_load_static_rack_plugin("LabSeven",             &init_plugin_LabSeven);
-   vst2_load_static_rack_plugin("LindenbergResearch",   &init_plugin_LindenbergResearch);
+   // vst2_load_static_rack_plugin("LindenbergResearch",   &init_plugin_LindenbergResearch); // now a DLL (22May2019) (GPL code)
    vst2_load_static_rack_plugin("LOGinstruments",       &init_plugin_LOGinstruments);
    vst2_load_static_rack_plugin("mental",               &init_plugin_mental);
    vst2_load_static_rack_plugin("MicMusic",             &init_plugin_MicMusic);
@@ -212,11 +212,11 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("PvC",                  &init_plugin_PvC);
    vst2_load_static_rack_plugin("QuantalAudio",         &init_plugin_QuantalAudio);
    vst2_load_static_rack_plugin("Qwelk",                &init_plugin_Qwelk);
-   vst2_load_static_rack_plugin("rcm",                  &init_plugin_rcm);
+   // vst2_load_static_rack_plugin("rcm",                  &init_plugin_rcm); // now a DLL (22May2019) (GPL code)
    vst2_load_static_rack_plugin("RJModules",            &init_plugin_RJModules);
    vst2_load_static_rack_plugin("SerialRacker",         &init_plugin_SerialRacker);
    vst2_load_static_rack_plugin("Skylights",            &init_plugin_Skylights);
-   vst2_load_static_rack_plugin("SonusModular",         &init_plugin_SonusModular);
+   // vst2_load_static_rack_plugin("SonusModular",         &init_plugin_SonusModular); // now a DLL (22May2019) (GPL code)
    vst2_load_static_rack_plugin("Southpole",            &init_plugin_Southpole);
    vst2_load_static_rack_plugin("Southpole_parasites",  &init_plugin_Southpole_parasites);
    vst2_load_static_rack_plugin("squinkylabs-plug1",    &init_plugin_squinkylabs_plug1);
@@ -227,7 +227,7 @@ void vst2_load_static_rack_plugins(void) {
    vst2_load_static_rack_plugin("TheXOR",               &init_plugin_TheXOR);
    vst2_load_static_rack_plugin("trowaSoft",            &init_plugin_trowaSoft);
    vst2_load_static_rack_plugin("unless_modules",       &init_plugin_unless_modules);
-   vst2_load_static_rack_plugin("Valley",               &init_plugin_Valley);
+   // vst2_load_static_rack_plugin("Valley",               &init_plugin_Valley); // now a DLL (22May2019) (GPL code)
    // vst2_load_static_rack_plugin("VultModules",          &init_plugin_VultModules);
 #else
    vst2_load_static_rack_plugin("Template",             &init_plugin_Template);

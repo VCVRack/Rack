@@ -124,7 +124,7 @@ struct Decimator {
             index = (index + oversample * quality) % (oversample * quality);
             out += kernel[i] * inBuffer[index];
         }
-        return out;
+        return float(out);
     }
 };
 
@@ -163,12 +163,12 @@ struct Upsampler {
         // Naively convolve each sample
         // TODO replace with polyphase lpf hierarchy
         for (int i = 0; i < oversample; i++) {
-            float y = 0.0;
+            float y = 0.0f;
             for (int j = 0; j < quality; j++) {
                 int index = inIndex - 1 - j;
                 index = (index + quality) % quality;
                 int kernelIndex = oversample * j + i;
-                y += kernel[kernelIndex] * inBuffer[index];
+                y += float(kernel[kernelIndex] * inBuffer[index]);
             }
             out[i] = y;
         }

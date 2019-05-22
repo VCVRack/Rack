@@ -8,7 +8,7 @@
 
 using namespace rack;
 
-const static float PI = 3.1415926535897932384626433832795;
+const static float PI = 3.1415926535897932384626433832795f;
 const static float TWOPI = PI * 2.f;
 
 namespace dsp {
@@ -498,8 +498,8 @@ inline double erf(const double x) {
 inline float fastlog2(float x)  // compute log2(x) by reducing x to [0.75, 1.5)
 {
     // a*(x-1)^2 + b*(x-1) approximates log2(x) when 0.75 <= x < 1.5
-    const float a = -.6296735;
-    const float b = 1.466967;
+    const float a = -.6296735f;
+    const float b = 1.466967f;
     float signif, fexp;
     int exp;
     float lg2;
@@ -524,15 +524,15 @@ inline float fastlog2(float x)  // compute log2(x) by reducing x to [0.75, 1.5)
         // stuffing exp = 126 which corresponds to an exponent of -1
         ux2.i = (ux1.i & 0x007FFFFF) | 0x3f000000;
         signif = ux2.f;
-        fexp = exp - 126;    // 126 instead of 127 compensates for division by 2
-        signif = signif - 1.0;                    // <
+        fexp = float(exp - 126);    // 126 instead of 127 compensates for division by 2
+        signif = signif - 1.0f;                    // <
         lg2 = fexp + a * signif * signif + b * signif;  // <
     } else {
         // get signif by stuffing exp = 127 which corresponds to an exponent of 0
         ux2.i = (ux1.i & 0x007FFFFF) | 0x3f800000;
         signif = ux2.f;
-        fexp = exp - 127;
-        signif = signif - 1.0;                    // <<--
+        fexp = float(exp - 127);
+        signif = signif - 1.0f;                    // <<--
         lg2 = fexp + a * signif * signif + b * signif;  // <<--
     }
     // lines marked <<-- are common code, but optimize better
@@ -565,7 +565,7 @@ inline float fastPow(float a, float b) {
     } u = {a};
     u.x[1] = (int) (b * (u.x[1] - 1072632447) + 1072632447);
     u.x[0] = 0;
-    return u.d;
+    return float(u.d);
 }
 
 

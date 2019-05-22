@@ -1,3 +1,4 @@
+#include "../LindenbergResearch.hpp"
 #include "../LRComponents.hpp"
 
 #define ICON_FONT_GLYPHYX "res/GlyphyxOneNF.ttf"

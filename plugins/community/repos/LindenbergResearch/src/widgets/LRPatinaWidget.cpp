@@ -15,6 +15,7 @@
 **    with or without modification please see LICENSE.                 **
 **                                                                     **
 \*                                                                     */
+#include "../LindenbergResearch.hpp"
 #include "../LRComponents.hpp"
 
 using namespace lrt;

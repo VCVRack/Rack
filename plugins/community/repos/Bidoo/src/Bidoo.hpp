@@ -18,6 +18,6 @@ const NVGcolor GREEN_BIDOO = nvgRGBA(2, 195, 154, 255);
 
 RACK_PLUGIN_DECLARE(Bidoo);
 
-#ifdef USE_VST2
+#if defined(USE_VST2) && !defined(RACK_PLUGIN_SHARED)
 #define plugin "Bidoo"
 #endif // USE_VST2

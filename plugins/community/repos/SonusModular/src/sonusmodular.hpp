@@ -31,7 +31,7 @@ namespace rack_plugin_SonusModular {
 
 RACK_PLUGIN_DECLARE(SonusModular);
 
-#ifdef USE_VST2
+#if defined(USE_VST2) && !defined(RACK_PLUGIN_SHARED)
 #define plugin "SonusModular"
 #endif // USE_VST2
 

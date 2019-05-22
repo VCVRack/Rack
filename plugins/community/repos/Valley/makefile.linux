@@ -1,9 +1,15 @@
 SLUG=Valley
 
-include ../../../build_plugin_pre_linux.mk
+include ../../../build_shared_plugin_pre_linux.mk
 
 EXTRAFLAGS+= 
 
 include make.objects
 
-include ../../../build_plugin_post_linux.mk
+define BIN_POST_FXN
+	cp -f $(SLUG).so ../../../../vst2_bin/plugins/$(SLUG)/plugin.so.fx
+	cp -f $(SLUG).so ../../../../vst2_bin/plugins/$(SLUG)/plugin.so.instr
+endef
+
+include ../../../build_shared_plugin_post_linux.mk
+

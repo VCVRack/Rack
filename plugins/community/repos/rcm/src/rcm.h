@@ -9,7 +9,7 @@ namespace rack_plugin_rcm {
 
 RACK_PLUGIN_DECLARE(rcm);
 
-#ifdef USE_VST2
+#if defined(USE_VST2) && !defined(RACK_PLUGIN_SHARED)
 #define plugin "rcm"
 #endif // USE_VST2
 

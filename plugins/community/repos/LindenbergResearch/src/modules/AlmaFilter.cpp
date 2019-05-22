@@ -1,5 +1,5 @@
-#include "../dsp/LadderFilter.hpp"
 #include "../LindenbergResearch.hpp"
+#include "../dsp/LadderFilter.hpp"
 #include "../LRModel.hpp"
 
 namespace rack_plugin_LindenbergResearch {
