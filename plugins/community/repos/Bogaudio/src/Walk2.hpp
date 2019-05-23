@@ -1,8 +1,11 @@
 #pragma once
 
+#include <atomic>
+
 #include "bogaudio.hpp"
 #include "dsp/buffer.hpp"
 #include "dsp/noise.hpp"
+#include "dsp/signal.hpp"
 
 using namespace bogaudio::dsp;
 
@@ -18,32 +21,28 @@ struct Walk2 : Module {
 		OFFSET_Y_PARAM,
 		SCALE_X_PARAM,
 		SCALE_Y_PARAM,
-		TRACK_X_PARAM,
-		TRACK_Y_PARAM,
 		NUM_PARAMS
 	};
 
 	enum InputsIds {
-		HOLD_X_INPUT,
+		OFFSET_X_INPUT,
+		SCALE_X_INPUT,
 		RATE_X_INPUT,
-		HOLD_Y_INPUT,
+		OFFSET_Y_INPUT,
+		SCALE_Y_INPUT,
 		RATE_Y_INPUT,
 		JUMP_INPUT,
 		NUM_INPUTS
 	};
 
 	enum OutputsIds {
-		HOLD_X_OUTPUT,
 		OUT_X_OUTPUT,
-		HOLD_Y_OUTPUT,
 		OUT_Y_OUTPUT,
 		DISTANCE_OUTPUT,
 		NUM_OUTPUTS
 	};
 
 	enum LightsIds {
-		TRACK_X_LIGHT,
-		TRACK_Y_LIGHT,
 		NUM_LIGHTS
 	};
 
@@ -55,18 +54,29 @@ struct Walk2 : Module {
 	int _historySteps;
 	int _historyStep = 0;
 
-	Trigger _triggerX, _triggerY;
+	float _offsetX = 0.0f, _offsetY = 0.0f;
+	float _scaleX = 0.0f, _scaleY = 0.0f;
 	RandomWalk _walkX, _walkY;
+	SlewLimiter _slewX, _slewY;
 	Trigger _jumpTrigger;
-	float _holdX = 0.0f, _holdY = 0.0f;
-	HistoryBuffer<float> _outsX, _outsY, _holdsX, _holdsY;
+	HistoryBuffer<float> _outsX, _outsY;
+	std::atomic<Vec*> _jumpTo;
+
+	enum TraceColor {
+		GREEN_TRACE_COLOR,
+		ORANGE_TRACE_COLOR,
+		RED_TRACE_COLOR,
+		BLUE_TRACE_COLOR
+	};
+	bool _zoomOut = false;
+	bool _drawGrid = true;
+	TraceColor _traceColor = GREEN_TRACE_COLOR;
 
 	Walk2()
 	: Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS)
 	, _outsX(historyPoints, 0.0f)
 	, _outsY(historyPoints, 0.0f)
-	, _holdsX(historyPoints, 0.0f)
-	, _holdsY(historyPoints, 0.0f)
+	, _jumpTo(NULL)
 	{
 		onReset();
 		onSampleRateChange();
@@ -74,6 +84,8 @@ struct Walk2 : Module {
 
 	void onReset() override;
 	void onSampleRateChange() override;
+	json_t* toJson() override;
+	void fromJson(json_t* root) override;
 	void step() override;
 };
 

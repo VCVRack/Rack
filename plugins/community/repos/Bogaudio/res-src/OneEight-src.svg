@@ -54,12 +54,13 @@
 
     <symbol id="knobguide-steps" viewBox="0 0 40px 40px">
       <g transform="translate(20 20)">
-        <text font-size="5.0pt" transform="rotate(-240) translate(13 0) rotate(240) translate(-2 2)">2</text>
-        <text font-size="5.0pt" transform="rotate(-190) translate(13 0) rotate(190) translate(-2 2)">3</text>
-        <text font-size="5.0pt" transform="rotate(-140) translate(13 0) rotate(140) translate(-2 2)">4</text>
-        <text font-size="5.0pt" transform="rotate(-90) translate(13 0) rotate(90) translate(-2 2)">5</text>
-        <text font-size="5.0pt" transform="rotate(-40) translate(13 0) rotate(40) translate(-2 2)">6</text>
-        <text font-size="5.0pt" transform="rotate(10) translate(13 0) rotate(-10) translate(-2 2)">7</text>
+        <text font-size="5.0pt" transform="rotate(-240) translate(13 0) rotate(240) translate(-2 2)">1</text>
+        <text font-size="5.0pt" transform="rotate(-197.1) translate(13 0) rotate(197.1) translate(-2 2)">2</text>
+        <text font-size="5.0pt" transform="rotate(-154.3) translate(13 0) rotate(154.3) translate(-2 2)">3</text>
+        <text font-size="5.0pt" transform="rotate(-111.4) translate(13 0) rotate(111.4) translate(-2 2)">4</text>
+        <text font-size="5.0pt" transform="rotate(-68.6) translate(13 0) rotate(68.6) translate(-2 2)">5</text>
+        <text font-size="5.0pt" transform="rotate(-25.7) translate(13 0) rotate(25.7) translate(-2 2)">6</text>
+        <text font-size="5.0pt" transform="rotate(17.1) translate(13 0) rotate(-17.1) translate(-2 2)">7</text>
         <text font-size="5.0pt" transform="rotate(60) translate(13 0) rotate(-60) translate(-2 2)">8</text>
       </g>
     </symbol>

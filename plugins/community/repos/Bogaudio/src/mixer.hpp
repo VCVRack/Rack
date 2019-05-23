@@ -25,6 +25,7 @@ struct MixerChannel {
 	Input& _inInput;
 	Input& _levelInput;
 	Input& _panInput;
+	Input* _muteInput;
 
 	float out = 0.0f;
 	float left = 0.0f;
@@ -38,7 +39,8 @@ struct MixerChannel {
 		Input& in,
 		Input& levelCv,
 		Input& panCv,
-		float sampleRate = 1000.0f
+		float sampleRate = 1000.0f,
+		Input* muteCv = NULL
 	)
 	: _levelParam(level)
 	, _panParam(pan)
@@ -46,6 +48,7 @@ struct MixerChannel {
 	, _inInput(in)
 	, _levelInput(levelCv)
 	, _panInput(panCv)
+	, _muteInput(muteCv)
 	{
 		setSampleRate(sampleRate);
 		_rms.setSensitivity(0.05f);

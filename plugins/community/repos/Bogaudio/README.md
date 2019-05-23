@@ -5,6 +5,7 @@ Modules for [VCV Rack](https://github.com/VCVRack/Rack), an open-source Eurorack
   - [Oscillators](#oscillators)
   - [LFOs](#lfos)
   - [Envelopes and Envelope Utilities](#envelopes)
+  - [Noise/Random, Sample and Hold](#random)
   - [Mixers, Panners and VCAs](#mixers)
   - [Effects and Dynamics](#effects)
   - [Sequential Switches and Sequencers](#sequencers)
@@ -16,6 +17,8 @@ Modules for [VCV Rack](https://github.com/VCVRack/Rack), an open-source Eurorack
 ![modules screenshot](./doc/www/modules1.png)
 
 ![modules screenshot](./doc/www/modules2.png)
+
+![modules screenshot](./doc/www/modules6.png)
 
 ![modules screenshot](./doc/www/modules5.png)
 
@@ -180,17 +183,53 @@ An envelope follower, a utility that converts its input to a CV proportional to 
 
 With DAMP at the minimum setting and SCALE at half, the module is an effective wave rectifier (that is, it outputs the absolute value of the input).
 
+### <a name="random"></a> Noise/Random, Sample and Hold
+
+![Noise/random screenshot](doc/www/noise.png)
+
+#### NOISE
+
+A noise source, in types blue (f), white, pink (1/f), red (aka rown, 1/f^2) and Gauss (normal with mean 0 and variance 1).
+
+Additionally, NOISE has an absolute value circuit.  Patch audio into ABS to get positive CV.  For example, patch white noise into ABS to get uniform values in the range 0 to 10.
+
+#### S&H
+
+A dual sample-and-hold and trigger-and-hold.  Sampling may be triggered by CV (on the rising edge of a trigger or gate) or button press.  If nothing is connected to an IN port, sampling for that channel is from an internal white noise source (range 0-10V).
+
+Each channel can be toggled into track-and-hold mode.  In this mode, when the input at GATE is high, or the button is held, the input is copied to the output.  When the gate goes low, the input is sampled and held until the next gate.
+
+#### WALK2
+
+WALK2 provides two channels of chaotic CV, where the CV moves as a "random walk".  The two outputs are drawn as a trace, in X and Y, on the display.
+
+For each channel:
+ - RATE controls how sedately, or wildly, the CV moves around.  If CV is in use, it is attenuated by the knob.
+ - OFFSET adds or subtracts up to 5V from the base +/-5V output.  If the offset CV is in use, it is attenuverted by the knob.
+ - SCALE scales the output; if CV is in use, it is attenuated by the knob.
+
+Additionally:
+  - A trigger on the JUMP input will cause both channels to jump to a random value.  A bit of slew limitation applies to the jump to minimize popping.
+  - DIST outputs a third CV, ranging over 0-10V, related the X and Y channel outputs.  
+
+Clicking on the display will jump the outputs, X and Y, to that point (again with a bit of slew limitation).
+
+Various options on the context (right-click) menu allow customization of the display (set the range of the display to +/-10V instead of the default +/-5V; hide the grid dots; set the color of the trace).
+
+#### WALK
+
+WALK is a single-channel random walk, identical to one channel of WALK2, in 3HP.
 
 ### <a name="mixers"></a> Mixers, Panners and VCAs
 
-#### MIX4
+#### MIX8
 
-A four-channel mixer/panner with performance mutes.
+An eight-channel mixer/panner with performance mutes.
 
 ![Mixers screenshot](doc/www/mixers1.png)
 
 Features:
-  - Four input channels with decibel-calibrated level faders.
+  - Eight input channels with decibel-calibrated level faders.
   - Level fader for the output mix.
   - CV control over channel and output levels; expects +10 volt CV; CV is attenuated by the corresponding slider when in use.
   - CV-controlled stereo panners; expects +/-5 volt CV; CV is attenuverted by the corresponding knob when in use.
@@ -200,9 +239,13 @@ Features:
   - Fader handles contain lights indicating the signal level out of that channel or the entire mix.
   - Output saturates (soft clips) to +/-12 volts, where the clipping effect becomes noticeable above +/-10 volts.
 
-#### MIX8
+#### MIX4
 
-An eight-channel version of MIX4 with the same features.
+A four-channel version of MIX8 with the same features.
+
+### MIX1
+
+A 3HP fader/VCA, with mute.  
 
 #### VCM
 
@@ -218,9 +261,11 @@ By default, the output is hard clipped at +/-12 volts (this is a standard in Rac
 
 #### UMIX
 
-A 3HP unity mixer, usable with CV (e.g. combining triggers) or audio.  Up to 8 inputs are summed to the output.  Saturation (soft clipping) is applied to the output at +/-12 volts; the LEVEL knob allows attenuation of the mix before the saturation is applied.
+A 3HP unity mixer, usable with CV (e.g. combining triggers) or audio.  Up to 8 inputs are summed to the output.  Saturation (soft clipping) is applied to the output, which limits it to around +/-11V; the LEVEL knob allows attenuation of the mix before the saturation is applied.
 
 The context (right-click) menu has an option to average, rather than sum, the inputs.
+
+A second context menu option, "CV mode", disables the saturation, which allows for precise summing (or averaging) of CVs. In this case the output is hard-clipped at +/-12V.
 
 #### MATRIX88
 
@@ -331,6 +376,8 @@ As a multiplexer, it routes an input to the output under control of the SELECT k
 
 Both functions may be used simultaneously: the SELECT+CV value is added to the sequential/clocked value, wrapping around.  Note that the STEPS value only affects the sequential value; for example, using a clock input and setting STEPS to 2 will yield an alternation between two adjacent inputs, but this pair can be selected with the SELECT knob or CV.
 
+On the context (right-click) menu, if option "Select on clock" is selected, then the select value (knob and CV) is checked and used to modify the active step only when a clock is received, rather than continuously.  
+
 #### 1:8
 
 1:8 is the opposite of 8:1 -- it routes a single input to 1 of 8 outputs.  The control circuit behavior (CLOCK, SELECT, etc) is the same.
@@ -427,23 +474,11 @@ Manual may be set to output a trigger pulse on patch load (akin to a Max/Msp or 
 
 A 3 HP multiple (signal duplicator).  There are two 1-to-3 channels.  There is also a 1-to-6 mode: if nothing is patched to the second channel's input, the input to the first channel is copied to all six outputs.
 
-#### NOISE
-
-A noise source, in types blue (f), white, pink (1/f), red (aka rown, 1/f^2) and Gauss (normal with mean 0 and variance 1).
-
-Additionally, NOISE has an absolute value circuit.  Patch audio into ABS to get positive CV.  For example, patch white noise into ABS to get uniform values in the range 0 to 10.
-
 #### OFFSET
 
 An offset and scaler.  The OFFSET and SCALE knobs have CV inputs.  With an input signal, output is `(input + offset) * scale`.  With no input connected, the output is constant in the value of `offset * scale`.
 
 By default, the output is capped at +/-12 volts (this is a standard in Rack).  A context menu option allows this limit to be disabled.
-
-#### S&H
-
-A dual sample-and-hold and trigger-and-hold.  Sampling may be triggered by CV (on the rising edge of a trigger or gate) or button press.  If nothing is connected to an IN port, sampling for that channel is from an internal white noise source (range 0-10V).
-
-Each channel can be toggled into track-and-hold mode.  In this mode, when the input at GATE is high, or the button is held, the input is copied to the output.  When the gate goes low, the input is sampled and held until the next gate.
 
 #### SLEW
 

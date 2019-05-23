@@ -27,7 +27,7 @@ struct LFOBase : Module {
 
 	json_t* toJson() override;
 	void fromJson(json_t* root) override;
-	bool isCompliantPitchMode() { return _pitchMode == COMPLIANT_PITCH_MODE; }
+	bool isCompliantPitchMode() { return _pitchMode != CLASSIC_PITCH_MODE; }
 	void setPitchMode(PitchMode mode);
 	void setPitchModeListener(PitchModeListener* listener) { _pitchModeListener = listener; }
 	void setFrequency(bool slow, Param& frequency, Input& pitch, Phasor& phasor);
@@ -106,8 +106,8 @@ struct LFOBaseWidget : ModuleWidget, PitchModeListener {
 		LFOBase* lfo = dynamic_cast<LFOBase*>(module);
 		assert(lfo);
 		menu->addChild(new MenuLabel());
-		menu->addChild(new PitchModeMenuItem(lfo, "Classic pitch mode: 0V = C0 = 16.35HZ", false));
 		menu->addChild(new PitchModeMenuItem(lfo, "Standard pitch mode: 0V = C-3 = 2.04HZ", true));
+		menu->addChild(new PitchModeMenuItem(lfo, "Classic pitch mode: 0V = C0 = 16.35HZ", false));
 	}
 };
 

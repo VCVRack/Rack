@@ -37,6 +37,7 @@ ALL_OBJ= \
 	src/Lmtr.o \
 	src/Manual.o \
 	src/Matrix88.o \
+	src/Mix1.o \
 	src/Mix4.o \
 	src/Mix8.o \
 	src/Mult.o \

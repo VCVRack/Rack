@@ -495,3 +495,22 @@ float NoiseGate::compressionDb(float detectorDb, float thresholdDb, float ratio,
 	float compressionDb = differenceDb * ratio - differenceDb;
 	return std::min(compressionDb, -Amplifier::minDecibels);
 }
+
+
+void Timer::setParams(float sampleRate, float time) {
+	assert(sampleRate > 0.0f);
+	assert(time > 0.0f);
+	// FIXME: if the timer is running, should set the duration to reflect the time elapsed so far, adjusting it for the delta samplerate.
+	_durationSteps = time * sampleRate;
+}
+
+void Timer::reset() {
+	_expired = false;
+	_countSteps = 0;
+}
+
+bool Timer::next() {
+	++_countSteps;
+	_expired = _expired || _countSteps >= _durationSteps;
+	return !_expired;
+}

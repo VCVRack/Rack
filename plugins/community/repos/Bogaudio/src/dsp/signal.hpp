@@ -238,5 +238,19 @@ struct NoiseGate {
 	float compressionDb(float detectorDb, float thresholdDb, float ratio, bool softKnee);
 };
 
+struct Timer {
+	bool _expired;
+	int _countSteps;
+	int _durationSteps;
+
+	Timer(float sampleRate = 1000.0f, float time = 1.0f) {
+		setParams(sampleRate, time);
+		reset();
+	}
+
+	void setParams(float sampleRate = 1000.0f, float time = 1.0f);
+	void reset();
+	bool next();
+};
 } // namespace dsp
 } // namespace bogaudio

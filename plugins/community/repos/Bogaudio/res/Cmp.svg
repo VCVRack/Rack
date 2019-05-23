@@ -1257,12 +1257,12 @@
          id="path632" />
     </g>
     <g
-       aria-label="&gt;"
-       transform="translate(6,1)"
+       aria-label="≥"
+       transform="translate(6,0.5)"
        style="font-weight:normal;font-size:10.66666698px;font-family:Roboto, sans-serif;fill:#333333"
        id="text220">
       <path
-         d="M 4.1406251,-3.3854168 0.69791669,-4.7343751 v -0.9895834 l 4.44791681,1.9687501 v 0.7604166 l -4.44791681,1.9739584 v -1 z"
+         d="M 4.1406251,-3.6458334 0.69791669,-4.8593751 v -0.8906251 l 4.44791681,1.7708334 v 0.6822917 L 0.69791669,-1.515625 v -0.9010417 z m 0.9010417,3.64062507 H 0.69270835 V -0.79166669 H 5.0416668 Z"
          style="font-weight:normal;font-size:10.66666698px;font-family:Roboto, sans-serif;fill:#333333"
          id="path635" />
     </g>

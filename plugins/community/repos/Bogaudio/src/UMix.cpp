@@ -2,17 +2,24 @@
 #include "UMix.hpp"
 
 #define SUM "sum"
+#define CVMODE "cv_mode"
 
 json_t* UMix::toJson() {
 	json_t* root = json_object();
 	json_object_set_new(root, SUM, json_boolean(_sum));
+	json_object_set_new(root, CVMODE, json_boolean(_cvMode));
 	return root;
 }
 
 void UMix::fromJson(json_t* root) {
-	json_t* ll = json_object_get(root, SUM);
-	if (ll) {
-		_sum = json_is_true(ll);
+	json_t* s = json_object_get(root, SUM);
+	if (s) {
+		_sum = json_is_true(s);
+	}
+
+	json_t* c = json_object_get(root, CVMODE);
+	if (c) {
+		_cvMode = json_is_true(c);
 	}
 }
 
@@ -25,7 +32,13 @@ void UMix::step() {
 		for (int i = 0; i < 8; ++i) {
 			out += inputs[IN1_INPUT + i].value;
 		}
-		outputs[OUT_OUTPUT].value = _saturator.next(params[LEVEL_PARAM].value * out);
+		out *= params[LEVEL_PARAM].value;
+		if (_cvMode) {
+			outputs[OUT_OUTPUT].value = clamp(out, -12.0f, 12.0f);
+		}
+		else {
+			outputs[OUT_OUTPUT].value = _saturator.next(out);
+		}
 	}
 	else {
 		float out = 0.0f;
@@ -38,7 +51,13 @@ void UMix::step() {
 		}
 		if (active > 0) {
 			out /= (float)active;
-			outputs[OUT_OUTPUT].value = _saturator.next(params[LEVEL_PARAM].value * out);
+			out *= params[LEVEL_PARAM].value;
+			if (_cvMode) {
+				outputs[OUT_OUTPUT].value = clamp(out, -12.0f, 12.0f);
+			}
+			else {
+				outputs[OUT_OUTPUT].value = _saturator.next(out);
+			}
 		}
 		else {
 			outputs[OUT_OUTPUT].value = 0.0f;
@@ -61,6 +80,24 @@ struct AverageMenuItem : MenuItem {
 
 	void step() override {
 		rightText = !_module->_sum ? "✔" : "";
+	}
+};
+
+struct CVModeMenuItem : MenuItem {
+	UMix* _module;
+
+	CVModeMenuItem(UMix* module, const char* label)
+	: _module(module)
+	{
+		this->text = label;
+	}
+
+	void onAction(EventAction &e) override {
+		_module->_cvMode = !_module->_cvMode;
+	}
+
+	void step() override {
+		rightText = _module->_cvMode ? "✔" : "";
 	}
 };
 
@@ -114,6 +151,7 @@ struct UMixWidget : ModuleWidget {
 		assert(umix);
 		menu->addChild(new MenuLabel());
 		menu->addChild(new AverageMenuItem(umix, "Average"));
+		menu->addChild(new CVModeMenuItem(umix, "CV mode"));
 	}
 };
 

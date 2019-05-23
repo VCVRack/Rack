@@ -18,7 +18,11 @@ void MixerChannel::next(bool stereo, bool solo) {
 		return;
 	}
 
-	bool muted = solo ? _muteParam.value < 2.0f : _muteParam.value > 0.5f;
+	float mute = _muteParam.value;
+	if (_muteInput) {
+		mute += clamp(_muteInput->value, 0.0f, 10.0f);
+	}
+	bool muted = solo ? mute < 2.0f : mute > 0.5f;
 	if (muted) {
 		_amplifier.setLevel(_levelSL.next(minDecibels));
 	}

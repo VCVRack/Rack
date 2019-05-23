@@ -37,6 +37,7 @@ struct UMix : Module {
 	};
 
 	bool _sum = true;
+	bool _cvMode = false;
 	Saturator _saturator;
 
 	UMix() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {

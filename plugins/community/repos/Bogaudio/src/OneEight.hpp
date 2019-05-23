@@ -1,6 +1,9 @@
 #pragma once
 
 #include "bogaudio.hpp"
+#include "dsp/signal.hpp"
+
+using namespace bogaudio::dsp;
 
 extern Model* modelOneEight;
 
@@ -48,13 +51,20 @@ struct OneEight : Module {
 
 	Trigger _clock;
 	Trigger _reset;
+	Timer _timer;
 	int _step;
+	bool _selectOnClock = false;
+	int _select = 0;
 
 	OneEight() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		onReset();
+		onSampleRateChange();
 	}
 
 	void onReset() override;
+	void onSampleRateChange() override;
+	json_t* toJson() override;
+	void fromJson(json_t* root) override;
 	void step() override;
 };
 

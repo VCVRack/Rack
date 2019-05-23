@@ -93,6 +93,7 @@ struct RandomWalk : Generator {
 	float _lastOut = 0.0f;
 	float _damp;
 	float _bias = 0.0f;
+	float _biasDamp = 1.0f;
 	WhiteNoiseGenerator _noise;
 	LowPassFilter _filter;
 
@@ -110,6 +111,7 @@ struct RandomWalk : Generator {
 
 	void setParams(float sampleRate = 1000.0f, float change = 0.5f);
 	void jump();
+	void tell(float v);
 	float _next() override;
 };
 

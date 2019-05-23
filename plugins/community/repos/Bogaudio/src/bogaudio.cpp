@@ -144,10 +144,12 @@ RACK_PLUGIN_MODEL_DECLARE(Bogaudio, OneEight);
 RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Walk);
 RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Walk2);
 
+RACK_PLUGIN_MODEL_DECLARE(Bogaudio, Mix1);  // 0.6.16
+
 RACK_PLUGIN_INIT(Bogaudio) {
    RACK_PLUGIN_INIT_ID();
 
-   RACK_PLUGIN_INIT_VERSION("0.6.14");
+   RACK_PLUGIN_INIT_VERSION("0.6.16");
 
    RACK_PLUGIN_INIT_WEBSITE("https://github.com/bogaudio/BogaudioModules");
    RACK_PLUGIN_INIT_MANUAL("https://github.com/bogaudio/BogaudioModules/blob/master/README.md");
@@ -238,4 +240,6 @@ RACK_PLUGIN_INIT(Bogaudio) {
    RACK_PLUGIN_MODEL_ADD(Bogaudio, OneEight);
    RACK_PLUGIN_MODEL_ADD(Bogaudio, Walk);
    RACK_PLUGIN_MODEL_ADD(Bogaudio, Walk2);
+
+   RACK_PLUGIN_MODEL_ADD(Bogaudio, Mix1);  // 0.6.16
 }

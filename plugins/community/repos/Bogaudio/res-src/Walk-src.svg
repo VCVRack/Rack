@@ -123,50 +123,38 @@
     <text font-size="6pt" letter-spacing="1.5px" transform="translate(10 0)">RATE</text>
     <use id="RATE_PARAM" xlink:href="#knob-medium" transform="translate(0 3)" />
     <use xlink:href="#knobguide-change" transform="translate(0 3)" />
-    <g transform="translate(5.5 49)">
-      <rect width="34" height="39" rx="5" fill="#fafafa" />
-      <use id="RATE_INPUT" xlink:href="#input" transform="translate(5 3)" />
-      <text font-size="5pt" letter-spacing="2px" transform="translate(11 35)">CV</text>
-    </g>
   </g>
 
-  <g transform="translate(0 128)">
+  <g transform="translate(0 82)">
     <text font-size="6pt" letter-spacing="1.5px" transform="translate(4.5 0)">OFFSET</text>
     <use id="OFFSET_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 9)" />
     <use xlink:href="#knobguide-centertick" transform="translate(2.5 -3)" />
   </g>
 
-  <g transform="translate(0 169)">
+  <g transform="translate(0 121)">
     <text font-size="6pt" letter-spacing="2.0px" transform="translate(5.5 0)">SCALE</text>
     <use id="SCALE_PARAM" xlink:href="#knob-smallest" transform="translate(14.5 9)" />
     <use xlink:href="#knobguide-maxtick" transform="translate(2.5 -3)" />
   </g>
 
-  <g transform="translate(0 202)">
-    <g transform="translate(0 5)">
-      <g transform="translate(5.5 0)">
-        <rect width="34" height="10" fill="#fafafa" transform="translate(0 78)" />
-        <rect width="34" height="82" rx="5" fill="#fafafa" />
-        <use id="HOLD_INPUT" xlink:href="#input" transform="translate(5 3)" />
-        <text font-size="5pt" letter-spacing="2px" transform="translate(5.5 35)">GATE</text>
-      </g>
+  <g transform="translate(0 157)">
+    <g transform="translate(5.5 0)">
+      <rect width="34" height="10" fill="#fafafa" transform="translate(0 133)" />
+      <rect width="34" height="140" rx="5" fill="#fafafa" />
+      <use id="RATE_INPUT" xlink:href="#input" transform="translate(5 3)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(6 35)">RATE</text>
+      <use id="OFFSET_INPUT" xlink:href="#input" transform="translate(5 38)" />
+      <text font-size="5pt" letter-spacing="1.2px" transform="translate(2 70)">OFFSET</text>
+      <use id="SCALE_INPUT" xlink:href="#input" transform="translate(5 73)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(2.5 105)">SCALE</text>
+      <use id="JUMP_INPUT" xlink:href="#input" transform="translate(5 108)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(5 140)">JUMP</text>
     </g>
-
-    <g transform="translate(0 5)">
-      <g transform="translate(7 41)">
-        <use id="TRACK_PARAM" xlink:href="#button-small" transform="translate(22 -1.3)" />
-        <use id="TRACK_LIGHT" xlink:href="#light-small" transform="translate(0 0)" />
-        <text font-size="5pt" letter-spacing="0.5px" transform="translate(7.3 5.5)">TRK</text>
-      </g>
-
-      <g transform="translate(5.5 54)">
-        <rect width="34" height="10" fill="#bbb" transform="translate(0 -3)" />
-        <rect width="34" height="70" rx="5" fill="#bbb" />
-        <use id="HOLD_OUTPUT" xlink:href="#output" transform="translate(5 0)" />
-        <text font-size="5pt" letter-spacing="2px" transform="translate(5.8 32)">HOLD</text>
-        <use id="OUT_OUTPUT" xlink:href="#output" transform="translate(5 35)" />
-        <text font-size="5pt" letter-spacing="2px" transform="translate(8.3 67)">OUT</text>
-      </g>
+    <g transform="translate(5.5 146)">
+      <rect width="34" height="10" fill="#bbb" transform="translate(0 -3)" />
+      <rect width="34" height="35" rx="5" fill="#bbb" />
+      <use id="OUT_OUTPUT" xlink:href="#output" transform="translate(5 0)" />
+      <text font-size="5pt" letter-spacing="2px" transform="translate(8.3 32)">OUT</text>
     </g>
   </g>
 </svg>

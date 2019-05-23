@@ -34,20 +34,27 @@ void RandomWalk::setParams(float sampleRate, float change) {
 
 	const float maxDamp = 0.98;
 	const float minDamp = 0.9999;
-	_damp = maxDamp + (1 - change)*(minDamp - maxDamp);
+	_damp = maxDamp + (1.0f - change)*(minDamp - maxDamp);
+
+	_biasDamp = 1.0f - change*(2.0f / sampleRate);
 }
 
 void RandomWalk::jump() {
-	// FIXME
-	_bias = _noise.next() * 5.0f;
+	tell(_noise.next() * 5.0f);
+}
+
+void RandomWalk::tell(float v) {
+	assert(v >= -5.0f && v <= 5.0f);
+	_last = _bias = v;
 	_filter.reset();
 }
 
 float RandomWalk::_next() {
 	float delta = _noise.next();
-	if ((_lastOut >= _max - _bias && delta > 0.0f) || (_lastOut <= _min - _bias && delta < 0.0f)) {
+	if ((_lastOut >= _max && delta > 0.0f) || (_lastOut <= _min && delta < 0.0f)) {
 		delta = -delta;
 	}
 	_last = _damp*_last + delta;
+	_bias *= _biasDamp;
 	return _lastOut = std::min(std::max(_bias + _filter.next(_last), _min), _max);
 }

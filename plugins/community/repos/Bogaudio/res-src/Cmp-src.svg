@@ -206,7 +206,7 @@
     <use id="GREATER_OUTPUT" xlink:href="#output" transform="translate(5 4)" />
     <g transform="translate(9 36.5)">
       <text font-size="5pt" transform="translate(0 0)">A</text>
-      <text font-size="8pt" style="font-weight: normal" transform="translate(6 1)">&gt;</text>
+      <text font-size="8pt" style="font-weight: normal" transform="translate(6 0.5)">&#8805;</text>
       <text font-size="5pt" transform="translate(13 0)">B</text>
     </g>
     <use id="LESS_OUTPUT" xlink:href="#output" transform="translate(39 4)" />
