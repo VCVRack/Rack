@@ -1,0 +1,13 @@
+ALL_OBJ= \
+	src/CatroModulo.o \
+	src/CatroModulo_CM-1.o \
+	src/CatroModulo_CM-10.o \
+	src/CatroModulo_CM-2.o \
+	src/CatroModulo_CM-3.o \
+	src/CatroModulo_CM-4.o \
+	src/CatroModulo_CM-5.o \
+	src/CatroModulo_CM-6.o \
+	src/CatroModulo_CM-7.o \
+	src/CatroModulo_CM-8.o \
+	src/CatroModulo_CM-9.o \
+	src/CM_helpers.o
