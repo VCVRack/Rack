@@ -45,7 +45,7 @@ struct HCTIP : Module {
 
 
 void HCTIP::step() {
-	in_Buffer.push(inputs[INPUT].value/10.0f);
+	in_Buffer.push(inputs[INPUT].active ? inputs[INPUT].value/10.0f : 0.0f);
 
 	if (in_Buffer.full()) {
 		pShifter->process(clamp(params[PITCH_PARAM].value + inputs[PITCH_INPUT].value ,0.5f,2.0f), in_Buffer.startData(), out_Buffer.endData());
@@ -54,7 +54,7 @@ void HCTIP::step() {
 	}
 
 	if (out_Buffer.size()>0) {
-		outputs[OUTPUT].value = *out_Buffer.startData() * 5.0f;
+		outputs[OUTPUT].value = *out_Buffer.startData() * 5.0f * (inputs[INPUT].active ? 1.0f : 0.0f);
 		out_Buffer.startIncr(1);
 	}
 

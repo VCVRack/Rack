@@ -337,42 +337,49 @@ struct LIMONADE : Module {
 };
 
 inline void LIMONADE::updateWaveTable() {
-	thread t = thread(tUpdateWaveTable, std::ref(table), params[INDEX_PARAM].value);
-	t.detach();
+	tUpdateWaveTable(table, params[INDEX_PARAM].value);
+	// thread t = thread(tUpdateWaveTable, std::ref(table), params[INDEX_PARAM].value);
+	// t.detach();
 }
 
 inline void LIMONADE::fftSample() {
-	thread t = thread(tFFTSample, std::ref(table), params[INDEX_PARAM].value);
-	t.detach();
+	tFFTSample(table, params[INDEX_PARAM].value);
+	// thread t = thread(tFFTSample, std::ref(table), params[INDEX_PARAM].value);
+	// t.detach();
 }
 
 inline void LIMONADE::ifftSample() {
-	thread t = thread(tIFFTSample, std::ref(table), params[INDEX_PARAM].value);
-	t.detach();
+	tIFFTSample(table, params[INDEX_PARAM].value);
+	// thread t = thread(tIFFTSample, std::ref(table), params[INDEX_PARAM].value);
+	// t.detach();
 }
 
 inline void LIMONADE::morphWavetable() {
-	thread t = thread(tMorphWaveTable, std::ref(table));
+	//thread t = thread(tMorphWaveTable, std::ref(table));
 	morphType = 0;
-	t.detach();
+	tMorphWaveTable(table);
+	//t.detach();
 }
 
 inline void LIMONADE::morphSpectrum() {
-	thread t = thread(tMorphSpectrum, std::ref(table));
+	//thread t = thread(tMorphSpectrum, std::ref(table));
 	morphType = 1;
-	t.detach();
+	tMorphSpectrum(table);
+	//t.detach();
 }
 
 inline void LIMONADE::morphSpectrumConstantPhase() {
-	thread t = thread(tMorphSpectrumConstantPhase, std::ref(table));
+	//thread t = thread(tMorphSpectrumConstantPhase, std::ref(table));
 	morphType = 2;
-	t.detach();
+	tMorphSpectrumConstantPhase(table);
+	//t.detach();
 }
 
 inline void LIMONADE::deleteMorphing() {
-	thread t = thread(tDeleteMorphing, std::ref(table));
+	//thread t = thread(tDeleteMorphing, std::ref(table));
 	morphType = -1;
-	t.detach();
+	tDeleteMorphing(table);
+	//t.detach();
 }
 
 void LIMONADE::addFrame() {
@@ -381,21 +388,24 @@ void LIMONADE::addFrame() {
 }
 
 void LIMONADE::deleteFrame() {
-	thread t = thread(tDeleteFrame, std::ref(table), params[INDEX_PARAM].value);
-	t.detach();
+	tDeleteFrame(table, params[INDEX_PARAM].value);
+	// thread t = thread(tDeleteFrame, std::ref(table), params[INDEX_PARAM].value);
+	// t.detach();
 }
 
 void LIMONADE::resetWaveTable() {
-	thread t = thread(tResetWaveTable, std::ref(table));
-	t.detach();
+	tResetWaveTable(table);
+	// thread t = thread(tResetWaveTable, std::ref(table));
+	// t.detach();
 }
 
 void LIMONADE::loadSample() {
 	char *path = osdialog_file(OSDIALOG_OPEN, "", NULL, NULL);
 	if (path) {
 		lastPath=path;
-		thread t = thread(tLoadSample, std::ref(table), path, frameSize, true);
-		t.detach();
+		tLoadSample(table, path, frameSize, true);
+		// thread t = thread(tLoadSample, std::ref(table), path, frameSize, true);
+		// t.detach();
 		free(path);
 	}
 }
@@ -404,8 +414,9 @@ void LIMONADE::loadFrame() {
 	char *path = osdialog_file(OSDIALOG_OPEN, "", NULL, NULL);
 	if (path) {
 		lastPath=path;
-		thread t = thread(tLoadFrame, std::ref(table), path, params[INDEX_PARAM].value, true);
-		t.detach();
+		tLoadFrame(table, path, params[INDEX_PARAM].value, true);
+		// thread t = thread(tLoadFrame, std::ref(table), path, params[INDEX_PARAM].value, true);
+		// t.detach();
 		free(path);
 	}
 }
@@ -414,51 +425,60 @@ void LIMONADE::loadPNG() {
 	char *path = osdialog_file(OSDIALOG_OPEN, "", NULL, NULL);
 	if (path) {
 		lastPath=path;
-		thread t = thread(tLoadPNG, std::ref(table), path);
-		t.detach();
+		tLoadPNG(table, path);
+		// thread t = thread(tLoadPNG, std::ref(table), path);
+		// t.detach();
 		free(path);
 	}
 }
 
 void LIMONADE::windowWt() {
-	thread t = thread(tWindowWt, std::ref(table));
-	t.detach();
+	tWindowWt(table);
+	// thread t = thread(tWindowWt, std::ref(table));
+	// t.detach();
 }
 
 void LIMONADE::smoothWt() {
-	thread t = thread(tSmoothWt, std::ref(table));
-	t.detach();
+	tSmoothWt(table);
+	// thread t = thread(tSmoothWt, std::ref(table));
+	// t.detach();
 }
 
 void LIMONADE::windowFrame() {
-	thread t = thread(tWindowFrame, std::ref(table), params[INDEX_PARAM].value);
-	t.detach();
+	tWindowFrame(table, params[INDEX_PARAM].value);
+	// thread t = thread(tWindowFrame, std::ref(table), params[INDEX_PARAM].value);
+	// t.detach();
 }
 
 void LIMONADE::smoothFrame() {
-	thread t = thread(tSmoothFrame, std::ref(table), params[INDEX_PARAM].value);
-	t.detach();
+	tSmoothFrame(table, params[INDEX_PARAM].value);
+	// thread t = thread(tSmoothFrame, std::ref(table), params[INDEX_PARAM].value);
+	// t.detach();
 }
 
 void LIMONADE::removeDCOffset() {
-	thread t = thread(tRemoveDCOffset, std::ref(table));
-	t.detach();
+	tRemoveDCOffset(table);
+	// thread t = thread(tRemoveDCOffset, std::ref(table));
+	// t.detach();
 }
 
 
 void LIMONADE::normalizeFrame() {
-	thread t = thread(tNormalizeFrame, std::ref(table), params[INDEX_PARAM].value);
-	t.detach();
+	tNormalizeFrame(table, params[INDEX_PARAM].value);
+	// thread t = thread(tNormalizeFrame, std::ref(table), params[INDEX_PARAM].value);
+	// t.detach();
 }
 
 void LIMONADE::normalizeWt() {
-	thread t = thread(tNormalizeWt, std::ref(table));
-	t.detach();
+	tNormalizeWt(table);
+	// thread t = thread(tNormalizeWt, std::ref(table));
+	// t.detach();
 }
 
 void LIMONADE::normalizeAllFrames() {
-	thread t = thread(tNormalizeAllFrames, std::ref(table));
-	t.detach();
+	tNormalizeAllFrames(table);
+	// thread t = thread(tNormalizeAllFrames, std::ref(table));
+	// t.detach();
 }
 
 void LIMONADE::step() {

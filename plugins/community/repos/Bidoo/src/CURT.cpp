@@ -16,6 +16,8 @@ struct CURT : Module {
 	enum ParamIds {
 		PITCH_PARAM,
 		MODE_PARAM,
+		BUFF_SIZE_PARAM,
+		OVERLAP_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -35,12 +37,15 @@ struct CURT : Module {
 	DoubleRingBuffer<float, 2*BUFF_SIZE> out_Buffer;
 	float bins[OVERLAP][BUFF_SIZE];
 	int index=-1;
-	int readSteps=0;
-	int writeSteps=0;
+	size_t readSteps=0;
+	size_t writeSteps=0;
 	SchmittTrigger modeTrigger;
 	bool mode=0;
+	size_t overlap, buff_size;
 
 	CURT() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		overlap = OVERLAP;
+		buff_size = BUFF_SIZE;
 		for(int i=0; i<OVERLAP; i++) {
 			memset(bins[i], 0, sizeof(bins[i]));
 		}
@@ -54,6 +59,21 @@ struct CURT : Module {
 
 	~CURT() {
 
+	}
+
+	void updateBuff() {
+		while (in_Buffer.size()<buff_size) {
+			in_Buffer.push(0.0f);
+		}
+		while (in_Buffer.size()>buff_size) {
+			in_Buffer.startIncr(1);
+		}
+		while (out_Buffer.size()<2*buff_size) {
+			in_Buffer.push(0.0f);
+		}
+		while (out_Buffer.size()>2*buff_size) {
+			in_Buffer.startIncr(1);
+		}
 	}
 
 	json_t *toJson() override {
@@ -76,35 +96,43 @@ void CURT::step() {
 		mode = !mode;
 	}
 
+	if ((size_t)params[BUFF_SIZE_PARAM].value != buff_size) {
+		buff_size = pow(2.0f, params[BUFF_SIZE_PARAM].value);
+		updateBuff();
+	}
+
+	if ((size_t)params[OVERLAP_PARAM].value != overlap) {
+		overlap = params[OVERLAP_PARAM].value;
+	}
+
 	in_Buffer.startIncr(1);
 	in_Buffer.push(inputs[INPUT].value);
 
 	readSteps++;
 
-	if (readSteps>=(BUFF_SIZE/OVERLAP)) {
-		index=(index+1)%OVERLAP;
-		for(int i=0; i<BUFF_SIZE; i++) {
+	if (readSteps>=(buff_size/overlap)) {
+		index=(index+1)%overlap;
+		for(size_t i=0; i<buff_size; i++) {
 			bins[index][i]=*(in_Buffer.startData()+i);
 		}
-		blackmanHarrisWindow(bins[index],BUFF_SIZE);
+		blackmanHarrisWindow(bins[index],buff_size);
 		readSteps = 0;
 	}
 
 	writeSteps++;
 
-	if ((writeSteps>=((float)BUFF_SIZE*params[PITCH_PARAM].value/(float)OVERLAP))) {
+	if ((writeSteps>=((float)buff_size*params[PITCH_PARAM].value/(float)overlap))) {
 		if ((index%2==0) || (mode)) {
-			for(int i=0; i<BUFF_SIZE; i++) {
-				out_Buffer.data[out_Buffer.mask(out_Buffer.end-BUFF_SIZE+i)] += bins[index][i];
+			for(size_t i=0; i<buff_size; i++) {
+				out_Buffer.data[out_Buffer.mask(out_Buffer.end-buff_size+i)] += bins[index][i];
 			}
 		}
 		else
 		{
-			for(int i=0; i<BUFF_SIZE; i++) {
-				out_Buffer.data[out_Buffer.mask(out_Buffer.end-BUFF_SIZE+i)] += bins[index][BUFF_SIZE-i-1];
+			for(size_t i=0; i<buff_size; i++) {
+				out_Buffer.data[out_Buffer.mask(out_Buffer.end-buff_size+i)] += bins[index][buff_size-i-1];
 			}
 		}
-
 		writeSteps = 0;
 	}
 
@@ -123,10 +151,13 @@ struct CURTWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 
-		addParam(ParamWidget::create<BidooBlueKnob>(Vec(8, 100), module, CURT::PITCH_PARAM, 0.2f, 2.0f, 1.0f));
-		addInput(Port::create<PJ301MPort>(Vec(10, 150.0f), Port::INPUT, module, CURT::PITCH_INPUT));
-		addParam(ParamWidget::create<BlueCKD6>(Vec(8, 190.0f), module, CURT::MODE_PARAM, 0.0f, 1.0f, 0.0f));
-		addInput(Port::create<PJ301MPort>(Vec(10, 242.66f), Port::INPUT, module, CURT::INPUT));
+		addParam(ParamWidget::create<BidooBlueKnob>(Vec(8, 90), module, CURT::PITCH_PARAM, 0.2f, 2.0f, 1.0f));
+		addInput(Port::create<PJ301MPort>(Vec(10, 140.0f), Port::INPUT, module, CURT::PITCH_INPUT));
+		addParam(ParamWidget::create<BlueCKD6>(Vec(8, 175.0f), module, CURT::MODE_PARAM, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<BidooBlueSnapTrimpot>(Vec(2, 205), module, CURT::BUFF_SIZE_PARAM, 6.0f, 8.0f, 8.0f));
+		addParam(ParamWidget::create<BidooBlueSnapTrimpot>(Vec(25, 205), module, CURT::OVERLAP_PARAM, 1.0f, 4.0f, 2.0f));
+
+		addInput(Port::create<PJ301MPort>(Vec(10, 245.66f), Port::INPUT, module, CURT::INPUT));
 		addOutput(Port::create<PJ301MPort>(Vec(10, 299), Port::OUTPUT, module, CURT::OUTPUT));
 	}
 };
