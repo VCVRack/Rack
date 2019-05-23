@@ -91,7 +91,8 @@ int vst2_init(int argc, char* argv[], bool _bFX) {
    printf("xxx vst2_init: 9\n");
 	appInit(devMode);
    printf("xxx vst2_init: 10\n");
-   settingsLoad(assetLocal("settings.json"), false/*bWindowSizeOnly*/);
+   if(!settingsLoad(assetLocal("settings.json"), false/*bWindowSizeOnly*/))
+      settingsLoad(assetLocal("settings_default.json"), false/*bWindowSizeOnly*/);
    printf("xxx vst2_init: 11\n");
 
 #if 0

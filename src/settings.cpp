@@ -471,11 +471,11 @@ void settingsSave(std::string filename) {
 	}
 }
 
-void settingsLoad(std::string filename, bool bWindowSizeOnly) {
+bool settingsLoad(std::string filename, bool bWindowSizeOnly) {
 	info("Loading settings %s", filename.c_str());
 	FILE *file = fopen(filename.c_str(), "r");
 	if (!file)
-		return;
+		return false;
 
 	json_error_t error;
 	json_t *rootJ = json_loadf(file, 0, &error);
@@ -488,6 +488,7 @@ void settingsLoad(std::string filename, bool bWindowSizeOnly) {
 	}
 
 	fclose(file);
+   return true;
 }
 
 
