@@ -5,6 +5,8 @@
 - Linux: replace osdialog_gtk2 by osdialog_zenity
    (should fix Reaper file dialog issues)
    (requires zenity to be installed: "apt-get install zenity")
+- move GPL plugins to separate DLLs 
+   (Bidoo, Edge, EH_modules, JE, LindenbergResearch, rcm, SonusModular, Valley)
 - add module SubmarineUtility.ModBrowser
 - add module SubmarineUtility.WireManager
 - add module CatroModulo.CM1Module

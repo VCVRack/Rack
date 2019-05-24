@@ -1,4 +1,4 @@
-VeeSeeVST Rack VST 2.4 Plugin -- May 19th, 2019
+VeeSeeVST Rack VST 2.4 Plugin -- May 24th, 2019
 ===============================================
 
 !!!------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ This is a quick'n'dirty adaption of VCV Rack 0.6.1 for the VST2 format.
    - offline rendering uses separate settings (highest quality by default)
 + supports idle-detection
    - wake up on MIDI note on or audio input
-+ comes with 850 prebuilt modules
++ comes with 867 prebuilt modules
 
 Here's an old demo video of it: https://vimeo.com/277703414
 And a newer one: https://youtu.be/XTpLfcz-6Vo
@@ -64,7 +64,7 @@ The binary distribution contains the following (10) core modules:
  - Core.HalfNotes
 
 
-The following (799) add-on modules are statically linked with the VST plugin:
+The following (713) add-on modules are statically linked with the VST plugin:
  - 21kHz.D_Inf
  - 21kHz.PalmLoop
  - Alikins.IdleSwitch
@@ -202,41 +202,6 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Befaco.Rampage
  - Befaco.SlewLimiter
  - Befaco.SpringReverb
- - Bidoo.DTROY
- - Bidoo.BORDL
- - Bidoo.MU
- - Bidoo.TOCANTE
- - Bidoo.CHUTE
- - Bidoo.LATE
- - Bidoo.LOURDE
- - Bidoo.ACNE
- - Bidoo.DUKE
- - Bidoo.MOIRE
- - Bidoo.FORK
- - Bidoo.TIARE
- - Bidoo.CLACOS
- - Bidoo.ANTN
- - Bidoo.LIMBO
- - Bidoo.PERCO
- - Bidoo.BAR
- - Bidoo.ZINC
- - Bidoo.VOID
- - Bidoo.SIGMA
- - Bidoo.CANARD
- - Bidoo.DFUZE
- - Bidoo.OUAIVE
- - Bidoo.RABBIT
- - Bidoo.ZOUMAI
- - Bidoo.MS
- - Bidoo.EMILE
- - Bidoo.GARCON
- - Bidoo.PENEQUE
- - Bidoo.LIMONADE
- - Bidoo.FFILTR
- - Bidoo.HCTIP
- - Bidoo.REI
- - Bidoo.CURT
- - Bidoo.BISTROT
  - Bogaudio.VCO
  - Bogaudio.XCO
  - Bogaudio.Additator
@@ -352,9 +317,6 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - DrumKit.ClosedHH
  - DrumKit.OpenHH
  - DrumKit.DMX
- - Edge.WTFDoveVCO
- - Edge.K_Rush
- - EH_modules.FV1Emu
  - ESeries.E340
  - ErraticInstruments.MPEToCV
  - ErraticInstruments.QuadMPEToCV
@@ -457,8 +419,6 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - ImpromptuModular.Foundry
  - ImpromptuModular.FourView
  - ImpromptuModular.Tact1
- - JE.SimpleWaveFolder
- - JE.RingModulator
  - JW_Modules.Cat
  - JW_Modules.BouncyBalls
  - JW_Modules.FullScope
@@ -481,18 +441,6 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Koralfx.Quantovnik
  - Koralfx.Scorovnik
  - LabSeven.LS3340VCO
- - LindenbergResearch.SimpleFilter
- - LindenbergResearch.MS20Filter
- - LindenbergResearch.AlmaFilter
- - LindenbergResearch.ReShaper
- - LindenbergResearch.BlankPanel
- - LindenbergResearch.BlankPanelM1
- - LindenbergResearch.BlankPanelWood
- - LindenbergResearch.VCO
- - LindenbergResearch.Westcoast (preview)
- - LindenbergResearch.Type35
- - LindenbergResearch.DiodeVCF
- - LindenbergResearch.Speck
  - LOGinstruments.constant
  - LOGinstruments.constant2
  - LOGinstruments.Speck
@@ -646,14 +594,6 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Qwelk.Scaler
  - Qwelk.Wrap
  - Qwelk.XFade
- - rcm.CV0to10Module
- - rcm.CV5to5Module
- - rcm.CVMmtModule
- - rcm.CVS0to10Module
- - rcm.CVTglModule
- - rcm.DuckModule
- - rcm.LoadCounter
- - rcm.PianoRollModule
  - RJModules.Supersaw
  - RJModules.TwinLFO
  - RJModules.Noise
@@ -697,28 +637,6 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - Skylights.turing_volts
  - Skylights.turing_pulse
  - Skylights.turing_vactrol
- - SonusModular.Addiction
- - SonusModular.Bitter
- - SonusModular.Bymidside
- - SonusModular.Campione
- - SonusModular.Chainsaw
- - SonusModular.Ctrl
- - SonusModular.Deathcrush
- - SonusModular.Harmony
- - SonusModular.Ladrone
- - SonusModular.Luppolo
- - SonusModular.Luppolo3
- - SonusModular.Micromacro
- - SonusModular.Multimulti
- - SonusModular.Oktagon
- - SonusModular.Osculum
- - SonusModular.Paramath
- - SonusModular.Piconoise
- - SonusModular.Pusher
- - SonusModular.Ringo
- - SonusModular.Scramblase
- - SonusModular.Twoff
- - SonusModular.Yabp
  - Southpole.Abr
  - Southpole.Annuli
  - Southpole.Aux
@@ -823,6 +741,8 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - SubmarineFree.BP120
  - SubmarineFree.BP124
  - SubmarineFree.BP132
+ - SubmarineUtility.ModBrowser
+ - SubmarineUtility.WireManager
  - SynthKit.Addition
  - SynthKit.Subtraction
  - SynthKit.And
@@ -858,15 +778,44 @@ The following (799) add-on modules are statically linked with the VST plugin:
  - trowaSoft.MultiOscillator
  - unless_modules.Piong
  - unless_modules.Markov
- - Valley.Topograph
- - Valley.UGraph
- - Valley.Dexter
- - Valley.Plateau
- - Valley.Amalgam
- - Valley.Interzone
 
 
-These (41) add-on / plugin modules can be loaded dynamically:
+These (144) add-on / plugin modules can be loaded dynamically:
+ - Bidoo.DTROY
+ - Bidoo.BORDL
+ - Bidoo.MU
+ - Bidoo.TOCANTE
+ - Bidoo.CHUTE
+ - Bidoo.LATE
+ - Bidoo.LOURDE
+ - Bidoo.ACNE
+ - Bidoo.DUKE
+ - Bidoo.MOIRE
+ - Bidoo.FORK
+ - Bidoo.TIARE
+ - Bidoo.CLACOS
+ - Bidoo.ANTN
+ - Bidoo.LIMBO
+ - Bidoo.PERCO
+ - Bidoo.BAR
+ - Bidoo.ZINC
+ - Bidoo.VOID
+ - Bidoo.SIGMA
+ - Bidoo.CANARD
+ - Bidoo.DFUZE
+ - Bidoo.OUAIVE
+ - Bidoo.RABBIT
+ - Bidoo.ZOUMAI
+ - Bidoo.MS
+ - Bidoo.EMILE
+ - Bidoo.GARCON
+ - Bidoo.PENEQUE
+ - Bidoo.LIMONADE
+ - Bidoo.FFILTR
+ - Bidoo.HCTIP
+ - Bidoo.REI
+ - Bidoo.CURT
+ - Bidoo.BISTROT
  - bsp.AttenuMixer
  - bsp.Bias
  - bsp.BeatFreq
@@ -878,6 +827,17 @@ These (41) add-on / plugin modules can be loaded dynamically:
  - bsp.Scanner
  - bsp.Sway
  - bsp.TunedDelayLine
+ - CatroModulo.CM1Module
+ - CatroModulo.CM2Module
+ - CatroModulo.CM3Module
+ - CatroModulo.CM4Module
+ - CatroModulo.CM5Module
+ - CatroModulo.CM6Module
+ - CatroModulo.CM7Module
+ - CatroModulo.CM8Module
+ - CatroModulo.CM9Module
+ - CatroModulo.CM10Module
+ - CatroModulo.CatroModulo_CM7
  - dBiz.dBizBlank
  - dBiz.Contorno
  - dBiz.Chord
@@ -901,7 +861,64 @@ These (41) add-on / plugin modules can be loaded dynamically:
  - dBiz.Util2
  - dBiz.VCA530
  - dBiz.Verbo
+ - Edge.WTFDoveVCO
+ - Edge.K_Rush
+ - EH_modules.FV1Emu
+ - Hora-Examples.miniSeq
+ - Hora-Examples.WaveTableOsc
+ - Hora-Examples.LowPassVCF
+ - Hora-Examples.buf
+ - JE.SimpleWaveFolder
+ - JE.RingModulator
+ - LindenbergResearch.SimpleFilter
+ - LindenbergResearch.MS20Filter
+ - LindenbergResearch.AlmaFilter
+ - LindenbergResearch.ReShaper
+ - LindenbergResearch.BlankPanel
+ - LindenbergResearch.BlankPanelM1
+ - LindenbergResearch.BlankPanelWood
+ - LindenbergResearch.VCO
+ - LindenbergResearch.Westcoast (preview)
+ - LindenbergResearch.Type35
+ - LindenbergResearch.DiodeVCF
+ - LindenbergResearch.Speck
+ - rcm.CV0to10Module
+ - rcm.CV5to5Module
+ - rcm.CVMmtModule
+ - rcm.CVS0to10Module
+ - rcm.CVTglModule
+ - rcm.DuckModule
+ - rcm.LoadCounter
+ - rcm.PianoRollModule
+ - SonusModular.Addiction
+ - SonusModular.Bitter
+ - SonusModular.Bymidside
+ - SonusModular.Campione
+ - SonusModular.Chainsaw
+ - SonusModular.Ctrl
+ - SonusModular.Deathcrush
+ - SonusModular.Harmony
+ - SonusModular.Ladrone
+ - SonusModular.Luppolo
+ - SonusModular.Luppolo3
+ - SonusModular.Micromacro
+ - SonusModular.Multimulti
+ - SonusModular.Oktagon
+ - SonusModular.Osculum
+ - SonusModular.Paramath
+ - SonusModular.Piconoise
+ - SonusModular.Pusher
+ - SonusModular.Ringo
+ - SonusModular.Scramblase
+ - SonusModular.Twoff
+ - SonusModular.Yabp
  - Template_shared.MyModule
+ - Valley.Topograph
+ - Valley.UGraph
+ - Valley.Dexter
+ - Valley.Plateau
+ - Valley.Amalgam
+ - Valley.Interzone
  - ZZC.Clock
  - ZZC.Divider
  - ZZC.FN3
