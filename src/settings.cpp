@@ -34,7 +34,7 @@ float frameRateLimit = 70.0;
 bool frameRateSync = true;
 bool skipLoadOnLaunch = false;
 std::string patchPath;
-std::set<plugin::Model*> favoriteModels = {};
+std::map<std::tuple<std::string, std::string>, float> favoriteScores;
 std::vector<NVGcolor> cableColors = {
 	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
 	nvgRGB(0x0c, 0x8e, 0x15), // green
@@ -89,11 +89,15 @@ json_t *toJson() {
 	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
 
 	json_t *favoriteModelsJ = json_array();
-	for (plugin::Model *model : favoriteModels) {
-		json_t *modelJ = json_object();
-		json_object_set_new(modelJ, "plugin", json_string(model->plugin->slug.c_str()));
-		json_object_set_new(modelJ, "model", json_string(model->slug.c_str()));
-		json_array_append_new(favoriteModelsJ, modelJ);
+	for (auto &pair : favoriteScores) {
+		const std::string &plugin = std::get<0>(pair.first);
+		const std::string &model = std::get<1>(pair.first);
+		float score = pair.second;
+		json_t *favoriteJ = json_object();
+		json_object_set_new(favoriteJ, "plugin", json_string(plugin.c_str()));
+		json_object_set_new(favoriteJ, "model", json_string(model.c_str()));
+		json_object_set_new(favoriteJ, "score", json_real(score));
+		json_array_append_new(favoriteModelsJ, favoriteJ);
 	}
 	json_object_set_new(rootJ, "favoriteModels", favoriteModelsJ);
 
@@ -198,7 +202,7 @@ void fromJson(json_t *rootJ) {
 			favoriteModelsJ = json_object_get(rootJ, "favorites");
 	}
 	if (favoriteModelsJ) {
-		favoriteModels.clear();
+		favoriteScores.clear();
 		size_t i;
 		json_t *favoriteJ;
 		json_array_foreach(favoriteModelsJ, i, favoriteJ) {
@@ -206,12 +210,15 @@ void fromJson(json_t *rootJ) {
 			json_t *modelJ = json_object_get(favoriteJ, "model");
 			if (!pluginJ || !modelJ)
 				continue;
-			std::string pluginSlug = json_string_value(pluginJ);
-			std::string modelSlug = json_string_value(modelJ);
-			plugin::Model *model = plugin::getModel(pluginSlug, modelSlug);
-			if (!model)
-				continue;
-			favoriteModels.insert(model);
+			std::string plugin = json_string_value(pluginJ);
+			std::string model = json_string_value(modelJ);
+			// Set default score when migrating favorites from v0.6
+			float score = 1.f;
+			json_t *scoreJ = json_object_get(favoriteJ, "score");
+			if (scoreJ)
+				score = json_number_value(scoreJ);
+
+			favoriteScores[std::make_tuple(plugin, model)] = score;
 		}
 	}
 

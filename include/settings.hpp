@@ -1,9 +1,10 @@
 #pragma once
 #include "common.hpp"
 #include "math.hpp"
-#include "plugin/Model.hpp"
 #include "color.hpp"
-#include <set>
+#include <vector>
+#include <map>
+#include <tuple>
 #include <jansson.h>
 
 
@@ -38,7 +39,8 @@ extern float frameRateLimit;
 extern bool frameRateSync;
 extern bool skipLoadOnLaunch;
 extern std::string patchPath;
-extern std::set<plugin::Model*> favoriteModels;
+// (plugin, model) -> score
+extern std::map<std::tuple<std::string, std::string>, float> favoriteScores;
 extern std::vector<NVGcolor> cableColors;
 
 json_t *toJson();

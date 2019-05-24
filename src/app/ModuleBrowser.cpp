@@ -48,14 +48,7 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 	return score;
 }
 
-static bool isModelVisible(plugin::Model *model, bool favorites, const std::string &search, const std::string &brand, const std::string &tag) {
-	// Filter favorites
-	if (favorites) {
-		auto it = settings::favoriteModels.find(model);
-		if (it == settings::favoriteModels.end())
-			return false;
-	}
-
+static bool isModelVisible(plugin::Model *model, const std::string &search, const std::string &brand, const std::string &tag) {
 	// Filter search query
 	if (search != "") {
 		float score = modelScore(model, search);
@@ -85,6 +78,25 @@ static bool isModelVisible(plugin::Model *model, bool favorites, const std::stri
 	return true;
 }
 
+static void stepFavoriteScore(const std::string &plugin, const std::string &model) {
+	// Decay all scores
+	const float decayLambda = 0.1;
+	for (auto &it : settings::favoriteScores) {
+		it.second *= 1 - decayLambda;
+	}
+	// Increment favorite score by 1
+	settings::favoriteScores[std::make_tuple(plugin, model)] += 1;
+}
+
+
+template <typename K, typename V>
+V get_default(const std::map<K, V> &m, const K &key, const V &def) {
+	auto it = m.find(key);
+	if (it == m.end())
+		return def;
+	return it->second;
+}
+
 
 struct BrowserOverlay : widget::OpaqueWidget {
 	void step() override {
@@ -107,43 +119,12 @@ struct BrowserOverlay : widget::OpaqueWidget {
 };
 
 
-struct ModelFavoriteQuantity : Quantity {
-	plugin::Model *model;
-	std::string getLabel() override {return "★";}
-	void setValue(float value) override {
-		if (value) {
-			settings::favoriteModels.insert(model);
-		}
-		else {
-			auto it = settings::favoriteModels.find(model);
-			if (it != settings::favoriteModels.end())
-				settings::favoriteModels.erase(it);
-		}
-	}
-	float getValue() override {
-		auto it = settings::favoriteModels.find(model);
-		return (it != settings::favoriteModels.end());
-	}
-};
-
-
-struct ModelFavoriteButton : ui::RadioButton {
-	ModelFavoriteButton() {
-		quantity = new ModelFavoriteQuantity;
-	}
-	~ModelFavoriteButton() {
-		delete quantity;
-	}
-};
-
-
 static const float MODEL_BOX_ZOOM = 0.5f;
 
 
 struct ModelBox : widget::OpaqueWidget {
 	plugin::Model *model;
 	widget::Widget *previewWidget;
-	ModelFavoriteButton *favoriteButton;
 	ui::Tooltip *tooltip = NULL;
 	/** Lazily created */
 	widget::FramebufferWidget *previewFb = NULL;
@@ -164,13 +145,6 @@ struct ModelBox : widget::OpaqueWidget {
 		previewWidget = new widget::TransparentWidget;
 		previewWidget->box.size.y = std::ceil(RACK_GRID_HEIGHT * MODEL_BOX_ZOOM);
 		addChild(previewWidget);
-
-		// Favorite button
-		favoriteButton = new ModelFavoriteButton;
-		dynamic_cast<ModelFavoriteQuantity*>(favoriteButton->quantity)->model = model;
-		favoriteButton->box.pos.y = box.size.y;
-		box.size.y += favoriteButton->box.size.y;
-		addChild(favoriteButton);
 	}
 
 	void createPreview() {
@@ -192,7 +166,6 @@ struct ModelBox : widget::OpaqueWidget {
 		zoomWidget->box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
 		previewWidget->box.size.x = std::ceil(zoomWidget->box.size.x);
 
-		favoriteButton->box.size.x = previewWidget->box.size.x;
 		box.size.x = previewWidget->box.size.x;
 	}
 
@@ -317,31 +290,9 @@ struct ClearButton : ui::Button {
 };
 
 
-struct ShowFavoritesQuantity : Quantity {
-	widget::Widget *widget;
-	std::string getLabel() override {
-		int favoritesLen = settings::favoriteModels.size();
-		return string::f("Only show favorites (%d)", favoritesLen);
-	}
-	void setValue(float value) override;
-	float getValue() override;
-};
-
-
-struct ShowFavoritesButton : ui::RadioButton {
-	ShowFavoritesButton() {
-		quantity = new ShowFavoritesQuantity;
-	}
-	~ShowFavoritesButton() {
-		delete quantity;
-	}
-};
-
-
 struct BrowserSidebar : widget::Widget {
 	BrowserSearchField *searchField;
 	ClearButton *clearButton;
-	ShowFavoritesButton *favoriteButton;
 	ui::Label *brandLabel;
 	ui::List *brandList;
 	ui::ScrollWidget *brandScroll;
@@ -356,10 +307,6 @@ struct BrowserSidebar : widget::Widget {
 		clearButton = new ClearButton;
 		clearButton->text = "Reset filters";
 		addChild(clearButton);
-
-		favoriteButton = new ShowFavoritesButton;
-		dynamic_cast<ShowFavoritesQuantity*>(favoriteButton->quantity)->widget = favoriteButton;
-		addChild(favoriteButton);
 
 		brandLabel = new ui::Label;
 		// brandLabel->fontSize = 16;
@@ -409,13 +356,11 @@ struct BrowserSidebar : widget::Widget {
 		searchField->box.size.x = box.size.x;
 		clearButton->box.pos = searchField->box.getBottomLeft();
 		clearButton->box.size.x = box.size.x;
-		favoriteButton->box.pos = clearButton->box.getBottomLeft();
-		favoriteButton->box.size.x = box.size.x;
 
-		float listHeight = (box.size.y - favoriteButton->box.getBottom()) / 2;
+		float listHeight = (box.size.y - clearButton->box.getBottom()) / 2;
 		listHeight = std::floor(listHeight);
 
-		brandLabel->box.pos = favoriteButton->box.getBottomLeft();
+		brandLabel->box.pos = clearButton->box.getBottomLeft();
 		brandLabel->box.size.x = box.size.x;
 		brandScroll->box.pos = brandLabel->box.getBottomLeft();
 		brandScroll->box.size.y = listHeight - brandLabel->box.size.y;
@@ -444,7 +389,6 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	std::string search;
 	std::string brand;
 	std::string tag;
-	bool favorites = false;
 
 	ModuleBrowser() {
 		sidebar = new BrowserSidebar;
@@ -508,17 +452,24 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget *w : modelContainer->children) {
 			ModelBox *m = dynamic_cast<ModelBox*>(w);
 			assert(m);
-			m->visible = isModelVisible(m->model, favorites, search, brand, tag);
+			m->visible = isModelVisible(m->model, search, brand, tag);
 		}
 
 		// Sort ModelBoxes
 		if (search.empty()) {
-			// Sort by plugin name and then module name
+			// Sort by favorite score and then name
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 				ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
 				ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
+				// Sort by favorite score if either is available
+				float score1 = get_default(settings::favoriteScores, std::make_tuple(m1->model->plugin->slug, m1->model->slug), 0.f);
+				float score2 = get_default(settings::favoriteScores, std::make_tuple(m2->model->plugin->slug, m2->model->slug), 0.f);
+				if (score1 != score2)
+					return score1 > score2;
+				// Sort by plugin name
 				if (m1->model->plugin->name != m2->model->plugin->name)
 					return m1->model->plugin->name < m2->model->plugin->name;
+				// Sort by module name
 				return m1->model->name < m2->model->name;
 			});
 		}
@@ -530,7 +481,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				assert(m);
 				if (!m->visible)
 					continue;
-				scores[m] = modelScore(m->model, search);;
+				scores[m] = modelScore(m->model, search);
 			}
 			// Sort by score
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
@@ -541,18 +492,18 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		// Filter the brand and tag lists
 
-		// Get modules that would be filtered by just the favorites and search state
+		// Get modules that would be filtered by just the search query
 		std::vector<plugin::Model*> filteredModels;
 		for (Widget *w : modelContainer->children) {
 			ModelBox *m = dynamic_cast<ModelBox*>(w);
 			assert(m);
-			if (isModelVisible(m->model, favorites, search, "", ""))
+			if (isModelVisible(m->model, search, "", ""))
 				filteredModels.push_back(m->model);
 		}
 
 		auto hasModel = [&](const std::string &brand, const std::string &tag) -> bool {
 			for (plugin::Model *model : filteredModels) {
-				if (isModelVisible(model, false, "", brand, tag))
+				if (isModelVisible(model, "", brand, tag))
 					return true;
 			}
 			return false;
@@ -595,6 +546,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		tag = "";
 		refresh();
 	}
+
+	void onShow(const event::Show &e) override {
+		refresh();
+	}
 };
 
 
@@ -627,6 +582,9 @@ inline void ModelBox::onButton(const event::Button &e) {
 		h->name = "create module";
 		h->setModule(moduleWidget);
 		APP->history->push(h);
+
+		// Step favorite
+		stepFavoriteScore(model->plugin->slug, model->slug);
 	}
 }
 
@@ -670,17 +628,6 @@ inline void BrowserSearchField::onChange(const event::Change &e) {
 inline void ClearButton::onAction(const event::Action &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	browser->clear();
-}
-
-inline void ShowFavoritesQuantity::setValue(float value) {
-	ModuleBrowser *browser = widget->getAncestorOfType<ModuleBrowser>();
-	browser->favorites = (bool) value;
-	browser->refresh();
-}
-
-inline float ShowFavoritesQuantity::getValue() {
-	ModuleBrowser *browser = widget->getAncestorOfType<ModuleBrowser>();
-	return browser->favorites;
 }
 
 
