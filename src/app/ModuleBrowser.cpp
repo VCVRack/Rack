@@ -456,22 +456,24 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 
 		// Sort ModelBoxes
+		// Sort by favorite score and then name
+		modelContainer->children.sort([&](Widget *w1, Widget *w2) {
+			ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
+			ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
+			// Sort by favorite score if either is available
+			float score1 = get_default(settings::favoriteScores, std::make_tuple(m1->model->plugin->slug, m1->model->slug), 0.f);
+			float score2 = get_default(settings::favoriteScores, std::make_tuple(m2->model->plugin->slug, m2->model->slug), 0.f);
+			if (score1 != score2)
+				return score1 > score2;
+			// Sort by plugin name
+			if (m1->model->plugin->name != m2->model->plugin->name)
+				return m1->model->plugin->name < m2->model->plugin->name;
+			// Sort by module name
+			return m1->model->name < m2->model->name;
+		});
+
 		if (search.empty()) {
-			// Sort by favorite score and then name
-			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
-				ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
-				ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
-				// Sort by favorite score if either is available
-				float score1 = get_default(settings::favoriteScores, std::make_tuple(m1->model->plugin->slug, m1->model->slug), 0.f);
-				float score2 = get_default(settings::favoriteScores, std::make_tuple(m2->model->plugin->slug, m2->model->slug), 0.f);
-				if (score1 != score2)
-					return score1 > score2;
-				// Sort by plugin name
-				if (m1->model->plugin->name != m2->model->plugin->name)
-					return m1->model->plugin->name < m2->model->plugin->name;
-				// Sort by module name
-				return m1->model->name < m2->model->name;
-			});
+			// We've already sorted above
 		}
 		else {
 			std::map<Widget*, float> scores;
@@ -483,11 +485,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 					continue;
 				scores[m] = modelScore(m->model, search);
 			}
-			// Sort by score
-			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
-				// If score was not computed, scores[w] returns 0, but this doesn't matter because those widgets aren't visible.
-				return scores[w1] > scores[w2];
-			});
+			// // Sort by score
+			// modelContainer->children.sort([&](Widget *w1, Widget *w2) {
+			// 	// If score was not computed, scores[w] returns 0, but this doesn't matter because those widgets aren't visible.
+			// 	return get_default(scores, w1, 0.f) > get_default(scores, w2, 0.f);
+			// });
 		}
 
 		// Filter the brand and tag lists
