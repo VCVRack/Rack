@@ -1,4 +1,27 @@
 
+** May 24th, 2019
+- fall back to settings_default.json when settings.json does not exist, yet
+   (it is now safe to overwrite an old installation w/o losing your settings.json)
+- Linux: replace osdialog_gtk2 by osdialog_zenity
+   (should fix Reaper file dialog issues)
+   (requires zenity to be installed: "apt-get install zenity")
+- add module SubmarineUtility.ModBrowser
+- add module SubmarineUtility.WireManager
+- add module CatroModulo.CM1Module
+- add module CatroModulo.CM2Module
+- add module CatroModulo.CM3Module
+- add module CatroModulo.CM4Module
+- add module CatroModulo.CM5Module
+- add module CatroModulo.CM6Module
+- add module CatroModulo.CM7Module
+- add module CatroModulo.CM8Module
+- add module CatroModulo.CM9Module
+- add module CatroModulo.CM10Module
+- add module CatroModulo.CatroModulo_CM7
+- update Bidoo.*                0.6.28 => 0.6.29
+- update Bogaudio.*             0.6.14 => 0.6.16
+
+
 ** May 19th, 2019
 - fix Fundamental.LFO
 - FX: auto-disable idle detection when there are no input channels
