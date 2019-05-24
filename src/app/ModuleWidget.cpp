@@ -262,13 +262,15 @@ void ModuleWidget::draw(const DrawArgs &args) {
 	if (module && settings::cpuMeter) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg,
-			0, box.size.y - 20,
-			105, 20);
+			0, box.size.y - 35,
+			65, 35);
 		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
 		nvgFill(args.vg);
 
-		std::string cpuText = string::f("%.2f μs %.1f%%", module->cpuTime * 1e6f, module->cpuTime * APP->engine->getSampleRate() * 100);
-		bndLabel(args.vg, 2.0, box.size.y - 20.0, INFINITY, INFINITY, -1, cpuText.c_str());
+		float percent = module->cpuTime * APP->engine->getSampleRate() * 100;
+		float microseconds = module->cpuTime * 1e6f;
+		std::string cpuText = string::f("%.1f%%\n%.2f μs", percent, microseconds);
+		bndLabel(args.vg, 2.0, box.size.y - 34.0, INFINITY, INFINITY, -1, cpuText.c_str());
 
 		float p = math::clamp(module->cpuTime / APP->engine->getSampleTime(), 0.f, 1.f);
 		nvgBeginPath(args.vg);
