@@ -113,7 +113,9 @@ LIB_OBJ_WIN= \
 
 LIB_OBJ_LINUX= \
 	dep/lglw/lglw_linux.o \
-	dep/osdialog/osdialog_gtk2.o
+	dep/osdialog/osdialog_zenity.o
+
+# dep/osdialog/osdialog_gtk2.o
 
 SHARED_LIB_OBJ= \
 	$(COMMON_OBJ)

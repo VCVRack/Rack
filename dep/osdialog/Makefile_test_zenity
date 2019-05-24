@@ -1,0 +1,25 @@
+
+CC=gcc
+CPP=g++
+
+TARGET=test_zenity
+
+ALL_OBJ= \
+	osdialog_zenity.o \
+	test_zenity.o
+
+CPPFLAGS= -Wall
+CFLAGS= -Wall
+
+.cpp.o:
+	$(CPP) $(CPPFLAGS) -c $< -o $@ 
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@ 
+
+test_zenity: $(ALL_OBJ)
+	$(CPP) -o $(TARGET) $(ALL_OBJ)
+
+.PHONY:
+clean:
+	rm -f $(TARGET) $(ALL_OBJ)
