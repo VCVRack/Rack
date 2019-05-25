@@ -996,7 +996,7 @@
       "vst2_unique_param_base_id": 132,
       "model": "AudioInterface",
       "pos": [
-        88,
+        85,
         0
       ],
       "params": [],
@@ -1297,20 +1297,20 @@
     {
       "plugin": "ZZC",
       "version": "0.6.6",
-      "vst2_unique_param_base_id": 288,
+      "vst2_unique_param_base_id": 277,
       "model": "SC-VCA",
       "pos": [
-        81,
+        80,
         0
       ],
       "params": [
         {
           "paramId": 0,
-          "value": 0.075999625
+          "value": 0.2469998
         },
         {
           "paramId": 1,
-          "value": 10.0
+          "value": 9.42499924
         },
         {
           "paramId": 2,
@@ -1475,7 +1475,7 @@
       "inputId": 0
     },
     {
-      "color": "#c9b70e",
+      "color": "#0c8e15",
       "outputModuleId": 9,
       "outputId": 1,
       "inputModuleId": 3,

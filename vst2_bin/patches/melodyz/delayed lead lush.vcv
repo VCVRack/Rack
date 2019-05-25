@@ -296,7 +296,7 @@
         },
         {
           "paramId": 54,
-          "value": 0.922501802
+          "value": 0.909001589
         },
         {
           "paramId": 55,
@@ -941,11 +941,11 @@
         },
         {
           "paramId": 1,
-          "value": 0.804000139
+          "value": 0.852000177
         },
         {
           "paramId": 2,
-          "value": 0.80799973
+          "value": 0.85799998
         },
         {
           "paramId": 3,
@@ -973,7 +973,7 @@
         },
         {
           "paramId": 0,
-          "value": 0.800000012
+          "value": 0.240999803
         },
         {
           "paramId": 13,
@@ -996,7 +996,7 @@
       "vst2_unique_param_base_id": 132,
       "model": "AudioInterface",
       "pos": [
-        88,
+        85,
         0
       ],
       "params": [],
@@ -1027,11 +1027,11 @@
         },
         {
           "paramId": 1,
-          "value": 0.678499043
+          "value": 0.260999858
         },
         {
           "paramId": 2,
-          "value": 0.0555000417
+          "value": 0.077249974
         },
         {
           "paramId": 3,
@@ -1063,11 +1063,11 @@
         },
         {
           "paramId": 10,
-          "value": 0.0
+          "value": 0.339000016
         },
         {
           "paramId": 12,
-          "value": 0.5
+          "value": 4.14799595
         },
         {
           "paramId": 11,
@@ -1165,7 +1165,7 @@
       "params": [
         {
           "paramId": 0,
-          "value": 105.825073
+          "value": 120.314827
         }
       ]
     },
@@ -1213,7 +1213,7 @@
         },
         {
           "paramId": 8,
-          "value": 0.5
+          "value": 0.369499415
         },
         {
           "paramId": 9,
@@ -1297,16 +1297,16 @@
     {
       "plugin": "ZZC",
       "version": "0.6.6",
-      "vst2_unique_param_base_id": 288,
+      "vst2_unique_param_base_id": 277,
       "model": "SC-VCA",
       "pos": [
-        81,
+        80,
         0
       ],
       "params": [
         {
           "paramId": 0,
-          "value": 0.075999625
+          "value": 0.19299987
         },
         {
           "paramId": 1,
@@ -1358,7 +1358,7 @@
     {
       "color": "#0c8e15",
       "outputModuleId": 5,
-      "outputId": 2,
+      "outputId": 8,
       "inputModuleId": 6,
       "inputId": 0
     },
@@ -1386,7 +1386,7 @@
     {
       "color": "#0c8e15",
       "outputModuleId": 5,
-      "outputId": 6,
+      "outputId": 10,
       "inputModuleId": 6,
       "inputId": 4
     },
@@ -1468,14 +1468,21 @@
       "inputId": 10
     },
     {
-      "color": "#c9b70e",
+      "color": "#c91847",
+      "outputModuleId": 1,
+      "outputId": 7,
+      "inputModuleId": 5,
+      "inputId": 0
+    },
+    {
+      "color": "#c91847",
       "outputModuleId": 9,
       "outputId": 0,
       "inputModuleId": 3,
       "inputId": 0
     },
     {
-      "color": "#c9b70e",
+      "color": "#0986ad",
       "outputModuleId": 9,
       "outputId": 1,
       "inputModuleId": 3,
