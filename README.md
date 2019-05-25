@@ -47,7 +47,7 @@
 - [veeseevstrack_0_6_1_win32_bin-24May2019.7z](https://github.com/bsp2/releases/raw/master/vsvr/veeseevstrack_0_6_1_win32_bin-24May2019.7z) (32bit, experimental)
 
 ## Linux
-- [veeseevstrack_0_6_1_lin64_bin-19May2019.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-19May2019.tar.gz) (64bit) (Dave's latest build)
+- [veeseevstrack_0_6_1_lin64_bin-24May2019.tar.gz](http://linux-sound.org/misc/veeseevstrack_0_6_1_lin64_bin-24May2019.tar.gz) (64bit) (Dave's latest build)
   *NOTE*: for the file, message, and color picker dialogs to work, "zenity" needs to be installed, e.g. via `$ sudo apt-get install zenity`
 
 
