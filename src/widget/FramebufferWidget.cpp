@@ -1,6 +1,6 @@
-#include "widget/FramebufferWidget.hpp"
-#include "app.hpp"
-#include "random.hpp"
+#include <widget/FramebufferWidget.hpp>
+#include <app.hpp>
+#include <random.hpp>
 
 
 namespace rack {

@@ -1,12 +1,12 @@
-#include "plugin.hpp"
-#include "system.hpp"
-#include "network.hpp"
-#include "asset.hpp"
-#include "string.hpp"
-#include "app.hpp"
-#include "app/common.hpp"
-#include "plugin/callbacks.hpp"
-#include "settings.hpp"
+#include <plugin.hpp>
+#include <system.hpp>
+#include <network.hpp>
+#include <asset.hpp>
+#include <string.hpp>
+#include <app.hpp>
+#include <app/common.hpp>
+#include <plugin/callbacks.hpp>
+#include <settings.hpp>
 
 #include <unistd.h>
 #include <sys/types.h>

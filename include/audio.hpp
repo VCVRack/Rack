@@ -1,5 +1,5 @@
 #pragma once
-#include "common.hpp"
+#include <common.hpp>
 #include <jansson.h>
 
 #pragma GCC diagnostic push

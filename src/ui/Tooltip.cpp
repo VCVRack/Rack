@@ -1,6 +1,6 @@
-#include "ui/Tooltip.hpp"
-#include "app.hpp"
-#include "window.hpp"
+#include <ui/Tooltip.hpp>
+#include <app.hpp>
+#include <window.hpp>
 
 
 namespace rack {

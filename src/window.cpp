@@ -1,14 +1,14 @@
-#include "window.hpp"
-#include "asset.hpp"
-#include "app/Scene.hpp"
-#include "keyboard.hpp"
-#include "gamepad.hpp"
-#include "event.hpp"
-#include "app.hpp"
-#include "patch.hpp"
-#include "settings.hpp"
-#include "plugin.hpp" // used in Window::screenshot
-#include "system.hpp" // used in Window::screenshot
+#include <window.hpp>
+#include <asset.hpp>
+#include <app/Scene.hpp>
+#include <keyboard.hpp>
+#include <gamepad.hpp>
+#include <event.hpp>
+#include <app.hpp>
+#include <patch.hpp>
+#include <settings.hpp>
+#include <plugin.hpp> // used in Window::screenshot
+#include <system.hpp> // used in Window::screenshot
 
 #include <map>
 #include <queue>

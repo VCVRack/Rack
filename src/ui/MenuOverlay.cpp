@@ -1,4 +1,4 @@
-#include "ui/MenuOverlay.hpp"
+#include <ui/MenuOverlay.hpp>
 
 
 namespace rack {

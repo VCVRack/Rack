@@ -1,4 +1,4 @@
-#include "widget/ZoomWidget.hpp"
+#include <widget/ZoomWidget.hpp>
 
 
 namespace rack {

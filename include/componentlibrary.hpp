@@ -1,11 +1,11 @@
 #pragma once
-#include "app/SvgKnob.hpp"
-#include "app/SvgSlider.hpp"
-#include "app/SvgPort.hpp"
-#include "app/ModuleLightWidget.hpp"
-#include "app/SvgSwitch.hpp"
-#include "app/SvgScrew.hpp"
-#include "asset.hpp"
+#include <app/SvgKnob.hpp>
+#include <app/SvgSlider.hpp>
+#include <app/SvgPort.hpp>
+#include <app/ModuleLightWidget.hpp>
+#include <app/SvgSwitch.hpp>
+#include <app/SvgScrew.hpp>
+#include <asset.hpp>
 
 
 namespace rack {

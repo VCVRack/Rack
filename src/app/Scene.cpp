@@ -1,13 +1,13 @@
-#include "app/Scene.hpp"
-#include "app/ModuleBrowser.hpp"
-#include "app.hpp"
-#include "system.hpp"
-#include "network.hpp"
-#include "history.hpp"
-#include "settings.hpp"
-#include "patch.hpp"
-#include "asset.hpp"
-#include "osdialog.h"
+#include <app/Scene.hpp>
+#include <app/ModuleBrowser.hpp>
+#include <app.hpp>
+#include <system.hpp>
+#include <network.hpp>
+#include <history.hpp>
+#include <settings.hpp>
+#include <patch.hpp>
+#include <asset.hpp>
+#include <osdialog.h>
 #include <thread>
 
 

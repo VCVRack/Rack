@@ -1,14 +1,11 @@
 #include "plugin.hpp"
-#include "audio.hpp"
-#include "app.hpp"
+#include <audio.hpp>
+#include <app.hpp>
 #include <mutex>
 #include <chrono>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-
-
-using namespace rack;
 
 
 template <int AUDIO_OUTPUTS, int AUDIO_INPUTS>

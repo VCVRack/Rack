@@ -1,5 +1,5 @@
-#include "ui/MenuLabel.hpp"
-#include "app.hpp"
+#include <ui/MenuLabel.hpp>
+#include <app.hpp>
 
 
 namespace rack {

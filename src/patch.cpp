@@ -1,13 +1,13 @@
-#include "patch.hpp"
-#include "asset.hpp"
-#include "system.hpp"
-#include "app.hpp"
-#include "app/Scene.hpp"
-#include "app/RackWidget.hpp"
-#include "history.hpp"
-#include "settings.hpp"
+#include <patch.hpp>
+#include <asset.hpp>
+#include <system.hpp>
+#include <app.hpp>
+#include <app/Scene.hpp>
+#include <app/RackWidget.hpp>
+#include <history.hpp>
+#include <settings.hpp>
 
-#include "osdialog.h"
+#include <osdialog.h>
 
 
 namespace rack {

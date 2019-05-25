@@ -1,6 +1,6 @@
 #pragma once
-#include "bridgeprotocol.hpp"
-#include "audio.hpp"
+#include <bridgeprotocol.hpp>
+#include <audio.hpp>
 
 
 namespace rack {

@@ -1,4 +1,4 @@
-#include "app/SvgKnob.hpp"
+#include <app/SvgKnob.hpp>
 
 
 namespace rack {

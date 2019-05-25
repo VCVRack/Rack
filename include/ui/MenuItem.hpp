@@ -1,8 +1,8 @@
 #pragma once
-#include "ui/common.hpp"
-#include "ui/Menu.hpp"
-#include "ui/MenuEntry.hpp"
-#include "app.hpp"
+#include <ui/common.hpp>
+#include <ui/Menu.hpp>
+#include <ui/MenuEntry.hpp>
+#include <app.hpp>
 
 
 namespace rack {

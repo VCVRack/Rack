@@ -1,20 +1,20 @@
-#include "app/MenuBar.hpp"
-#include "window.hpp"
-#include "engine/Engine.hpp"
-#include "asset.hpp"
-#include "ui/Button.hpp"
-#include "ui/MenuItem.hpp"
-#include "ui/SequentialLayout.hpp"
-#include "ui/Slider.hpp"
-#include "ui/TextField.hpp"
-#include "ui/PasswordField.hpp"
-#include "ui/ProgressBar.hpp"
-#include "app.hpp"
-#include "settings.hpp"
-#include "helpers.hpp"
-#include "system.hpp"
-#include "plugin.hpp"
-#include "patch.hpp"
+#include <app/MenuBar.hpp>
+#include <window.hpp>
+#include <engine/Engine.hpp>
+#include <asset.hpp>
+#include <ui/Button.hpp>
+#include <ui/MenuItem.hpp>
+#include <ui/SequentialLayout.hpp>
+#include <ui/Slider.hpp>
+#include <ui/TextField.hpp>
+#include <ui/PasswordField.hpp>
+#include <ui/ProgressBar.hpp>
+#include <app.hpp>
+#include <settings.hpp>
+#include <helpers.hpp>
+#include <system.hpp>
+#include <plugin.hpp>
+#include <patch.hpp>
 #include <thread>
 
 

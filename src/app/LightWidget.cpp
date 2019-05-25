@@ -1,5 +1,5 @@
-#include "app/LightWidget.hpp"
-#include "color.hpp"
+#include <app/LightWidget.hpp>
+#include <color.hpp>
 
 
 namespace rack {

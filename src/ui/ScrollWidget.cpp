@@ -1,5 +1,5 @@
-#include "ui/ScrollWidget.hpp"
-#include "app.hpp"
+#include <ui/ScrollWidget.hpp>
+#include <app.hpp>
 
 
 namespace rack {

@@ -1,7 +1,7 @@
-#include "event.hpp"
-#include "widget/Widget.hpp"
-#include "app.hpp"
-#include "window.hpp"
+#include <event.hpp>
+#include <widget/Widget.hpp>
+#include <app.hpp>
+#include <window.hpp>
 
 
 namespace rack {

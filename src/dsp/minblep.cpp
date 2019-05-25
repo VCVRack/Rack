@@ -1,6 +1,6 @@
-#include "dsp/minblep.hpp"
-#include "dsp/fft.hpp"
-#include "dsp/window.hpp"
+#include <dsp/minblep.hpp>
+#include <dsp/fft.hpp>
+#include <dsp/window.hpp>
 
 
 namespace rack {

@@ -1,5 +1,5 @@
-#include "plugin/Plugin.hpp"
-#include "plugin/Model.hpp"
+#include <plugin/Plugin.hpp>
+#include <plugin/Model.hpp>
 
 
 namespace rack {

@@ -1,11 +1,11 @@
-#include "app/CableWidget.hpp"
-#include "app/Scene.hpp"
-#include "app/RackWidget.hpp"
-#include "window.hpp"
-#include "app.hpp"
-#include "patch.hpp"
-#include "settings.hpp"
-#include "engine/Port.hpp"
+#include <app/CableWidget.hpp>
+#include <app/Scene.hpp>
+#include <app/RackWidget.hpp>
+#include <window.hpp>
+#include <app.hpp>
+#include <patch.hpp>
+#include <settings.hpp>
+#include <engine/Port.hpp>
 
 
 namespace rack {

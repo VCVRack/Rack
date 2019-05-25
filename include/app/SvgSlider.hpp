@@ -1,8 +1,8 @@
 #pragma once
-#include "app/common.hpp"
-#include "app/SliderKnob.hpp"
-#include "widget/FramebufferWidget.hpp"
-#include "widget/SvgWidget.hpp"
+#include <app/common.hpp>
+#include <app/SliderKnob.hpp>
+#include <widget/FramebufferWidget.hpp>
+#include <widget/SvgWidget.hpp>
 
 
 namespace rack {

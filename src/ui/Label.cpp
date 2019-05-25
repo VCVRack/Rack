@@ -1,4 +1,4 @@
-#include "ui/Label.hpp"
+#include <ui/Label.hpp>
 
 
 namespace rack {

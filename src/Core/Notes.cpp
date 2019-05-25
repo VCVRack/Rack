@@ -1,8 +1,5 @@
 #include "plugin.hpp"
 
-using namespace rack;
-
-
 
 struct NotesWidget : ModuleWidget {
 	TextField *textField;

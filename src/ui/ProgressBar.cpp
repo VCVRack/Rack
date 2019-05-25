@@ -1,4 +1,4 @@
-#include "ui/ProgressBar.hpp"
+#include <ui/ProgressBar.hpp>
 
 
 namespace rack {

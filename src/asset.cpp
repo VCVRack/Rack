@@ -1,8 +1,8 @@
-#include "asset.hpp"
-#include "system.hpp"
-#include "settings.hpp"
-#include "string.hpp"
-#include "plugin/Plugin.hpp"
+#include <asset.hpp>
+#include <system.hpp>
+#include <settings.hpp>
+#include <string.hpp>
+#include <plugin/Plugin.hpp>
 
 #if defined ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>

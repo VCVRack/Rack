@@ -1,9 +1,9 @@
 #pragma once
-#include "app/common.hpp"
-#include "widget/OpaqueWidget.hpp"
-#include "app/RackScrollWidget.hpp"
-#include "app/RackWidget.hpp"
-#include "app/MenuBar.hpp"
+#include <app/common.hpp>
+#include <widget/OpaqueWidget.hpp>
+#include <app/RackScrollWidget.hpp>
+#include <app/RackWidget.hpp>
+#include <app/MenuBar.hpp>
 
 
 namespace rack {

@@ -1,7 +1,5 @@
 #include "plugin.hpp"
-#include "app.hpp"
-
-using namespace rack;
+#include <app.hpp>
 
 
 struct BlankPanel : Widget {

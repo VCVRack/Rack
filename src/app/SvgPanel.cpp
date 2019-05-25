@@ -1,4 +1,4 @@
-#include "app/SvgPanel.hpp"
+#include <app/SvgPanel.hpp>
 
 
 namespace rack {

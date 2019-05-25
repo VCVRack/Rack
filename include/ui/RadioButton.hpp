@@ -1,9 +1,9 @@
 #pragma once
-#include "ui/common.hpp"
-#include "widget/OpaqueWidget.hpp"
-#include "Quantity.hpp"
-#include "app.hpp"
-#include "event.hpp"
+#include <ui/common.hpp>
+#include <widget/OpaqueWidget.hpp>
+#include <Quantity.hpp>
+#include <app.hpp>
+#include <event.hpp>
 
 
 namespace rack {

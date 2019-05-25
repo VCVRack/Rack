@@ -1,4 +1,4 @@
-#include "ui/MenuSeparator.hpp"
+#include <ui/MenuSeparator.hpp>
 
 
 namespace rack {

@@ -1,4 +1,4 @@
-#include "network.hpp"
+#include <network.hpp>
 #define CURL_STATICLIB
 #include <curl/curl.h>
 #include <openssl/sha.h>

@@ -1,5 +1,5 @@
 #pragma once
-#include "plugin/Plugin.hpp"
+#include <plugin/Plugin.hpp>
 
 
 /** Called once to initialize and return the Plugin instance.

@@ -1,8 +1,8 @@
 #pragma once
-#include "common.hpp"
-#include "math.hpp"
-#include "color.hpp"
-#include "plugin/Model.hpp"
+#include <common.hpp>
+#include <math.hpp>
+#include <color.hpp>
+#include <plugin/Model.hpp>
 #include <vector>
 #include <jansson.h>
 

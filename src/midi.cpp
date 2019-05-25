@@ -1,5 +1,5 @@
-#include "midi.hpp"
-#include "string.hpp"
+#include <midi.hpp>
+#include <string.hpp>
 #include <map>
 
 

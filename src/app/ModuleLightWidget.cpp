@@ -1,4 +1,4 @@
-#include "app/ModuleLightWidget.hpp"
+#include <app/ModuleLightWidget.hpp>
 
 
 namespace rack {

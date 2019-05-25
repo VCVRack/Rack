@@ -1,9 +1,9 @@
-#include "app/PortWidget.hpp"
-#include "app/Scene.hpp"
-#include "window.hpp"
-#include "app.hpp"
-#include "history.hpp"
-#include "componentlibrary.hpp"
+#include <app/PortWidget.hpp>
+#include <app/Scene.hpp>
+#include <window.hpp>
+#include <app.hpp>
+#include <history.hpp>
+#include <componentlibrary.hpp>
 
 
 namespace rack {

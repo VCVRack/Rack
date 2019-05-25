@@ -1,7 +1,7 @@
 #pragma once
-#include "app/common.hpp"
-#include "app/MultiLightWidget.hpp"
-#include "engine/Module.hpp"
+#include <app/common.hpp>
+#include <app/MultiLightWidget.hpp>
+#include <engine/Module.hpp>
 
 
 namespace rack {

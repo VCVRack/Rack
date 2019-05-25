@@ -1,6 +1,6 @@
 #pragma once
-#include "widget/Widget.hpp"
-#include "svg.hpp"
+#include <widget/Widget.hpp>
+#include <svg.hpp>
 
 
 namespace rack {

@@ -1,4 +1,4 @@
-#include "app/SvgSwitch.hpp"
+#include <app/SvgSwitch.hpp>
 
 
 namespace rack {

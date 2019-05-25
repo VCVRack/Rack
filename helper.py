@@ -93,7 +93,7 @@ include $(RACK_DIR)/plugin.mk
 		f.write(makefile)
 
 	# Create plugin.hpp
-	plugin_hpp = """#include "rack.hpp"
+	plugin_hpp = """#include <rack.hpp>
 
 
 using namespace rack;

@@ -1,7 +1,7 @@
 #pragma once
-#include "common.hpp"
-#include "math.hpp"
-#include "color.hpp"
+#include <common.hpp>
+#include <math.hpp>
+#include <color.hpp>
 #include <vector>
 #include <map>
 #include <tuple>

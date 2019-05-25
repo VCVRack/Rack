@@ -1,5 +1,5 @@
 #pragma once
-#include "logger.hpp"
+#include <logger.hpp>
 
 // Include most of the C stdlib for convenience
 #include <cstdlib>

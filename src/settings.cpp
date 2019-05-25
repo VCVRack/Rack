@@ -1,11 +1,11 @@
-#include "settings.hpp"
-#include "window.hpp"
-#include "plugin.hpp"
-#include "app/Scene.hpp"
-#include "app/ModuleBrowser.hpp"
-#include "engine/Engine.hpp"
-#include "app.hpp"
-#include "patch.hpp"
+#include <settings.hpp>
+#include <window.hpp>
+#include <plugin.hpp>
+#include <app/Scene.hpp>
+#include <app/ModuleBrowser.hpp>
+#include <engine/Engine.hpp>
+#include <app.hpp>
+#include <patch.hpp>
 #include <jansson.h>
 
 

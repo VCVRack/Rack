@@ -1,12 +1,12 @@
-#include "app/ParamWidget.hpp"
-#include "ui/MenuOverlay.hpp"
-#include "ui/TextField.hpp"
-#include "app/Scene.hpp"
-#include "app.hpp"
-#include "engine/Engine.hpp"
-#include "settings.hpp"
-#include "history.hpp"
-#include "helpers.hpp"
+#include <app/ParamWidget.hpp>
+#include <ui/MenuOverlay.hpp>
+#include <ui/TextField.hpp>
+#include <app/Scene.hpp>
+#include <app.hpp>
+#include <engine/Engine.hpp>
+#include <settings.hpp>
+#include <history.hpp>
+#include <helpers.hpp>
 
 
 namespace rack {

@@ -1,6 +1,6 @@
 #pragma once
-#include "app/common.hpp"
-#include "app/Knob.hpp"
+#include <app/common.hpp>
+#include <app/Knob.hpp>
 
 
 namespace rack {

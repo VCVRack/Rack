@@ -1,5 +1,5 @@
-#include "random.hpp"
-#include "math.hpp"
+#include <random.hpp>
+#include <math.hpp>
 #include <time.h>
 #include <sys/time.h>
 

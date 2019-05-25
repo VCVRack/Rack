@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "plugin/Plugin.hpp"
+#include <common.hpp>
+#include <plugin/Plugin.hpp>
 #include <jansson.h>
 #include <set>
 

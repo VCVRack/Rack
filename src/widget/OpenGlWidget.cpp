@@ -1,5 +1,5 @@
-#include "widget/OpenGlWidget.hpp"
-#include "app.hpp"
+#include <widget/OpenGlWidget.hpp>
+#include <app.hpp>
 
 
 namespace rack {

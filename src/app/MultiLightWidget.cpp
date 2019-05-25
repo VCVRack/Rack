@@ -1,5 +1,5 @@
-#include "app/MultiLightWidget.hpp"
-#include "color.hpp"
+#include <app/MultiLightWidget.hpp>
+#include <color.hpp>
 
 
 namespace rack {

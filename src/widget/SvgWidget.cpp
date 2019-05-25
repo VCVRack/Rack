@@ -1,5 +1,5 @@
-#include "widget/SvgWidget.hpp"
-#include "app.hpp"
+#include <widget/SvgWidget.hpp>
+#include <app.hpp>
 
 
 namespace rack {

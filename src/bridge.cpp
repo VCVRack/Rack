@@ -1,7 +1,7 @@
-#include "bridge.hpp"
-#include "midi.hpp"
-#include "string.hpp"
-#include "dsp/ringbuffer.hpp"
+#include <bridge.hpp>
+#include <midi.hpp>
+#include <string.hpp>
+#include <dsp/ringbuffer.hpp>
 
 #include <unistd.h>
 #if defined ARCH_WIN

@@ -1,4 +1,4 @@
-#include "app/SvgSlider.hpp"
+#include <app/SvgSlider.hpp>
 
 
 namespace rack {

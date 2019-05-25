@@ -1,6 +1,6 @@
 #pragma once
-#include "math.hpp"
-#include "simd/functions.hpp"
+#include <math.hpp>
+#include <simd/functions.hpp>
 
 
 namespace rack {

@@ -1,7 +1,7 @@
 #pragma once
-#include "ui/common.hpp"
-#include "widget/OpaqueWidget.hpp"
-#include "ui/ScrollBar.hpp"
+#include <ui/common.hpp>
+#include <widget/OpaqueWidget.hpp>
+#include <ui/ScrollBar.hpp>
 
 
 namespace rack {

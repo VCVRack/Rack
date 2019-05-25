@@ -1,10 +1,10 @@
-#include "app.hpp"
-#include "window.hpp"
-#include "patch.hpp"
-#include "engine/Engine.hpp"
-#include "app/Scene.hpp"
-#include "history.hpp"
-#include "settings.hpp"
+#include <app.hpp>
+#include <window.hpp>
+#include <patch.hpp>
+#include <engine/Engine.hpp>
+#include <app/Scene.hpp>
+#include <history.hpp>
+#include <settings.hpp>
 
 
 namespace rack {

@@ -1,7 +1,7 @@
 #pragma once
-#include "app/common.hpp"
-#include "app/ParamWidget.hpp"
-#include "app.hpp"
+#include <app/common.hpp>
+#include <app/ParamWidget.hpp>
+#include <app.hpp>
 
 
 namespace rack {

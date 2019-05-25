@@ -1,7 +1,7 @@
 #pragma once
-#include "app/common.hpp"
-#include "app/LedDisplay.hpp"
-#include "audio.hpp"
+#include <app/common.hpp>
+#include <app/LedDisplay.hpp>
+#include <audio.hpp>
 
 
 namespace rack {

@@ -1,5 +1,5 @@
-#include "widget/Widget.hpp"
-#include "app.hpp"
+#include <widget/Widget.hpp>
+#include <app.hpp>
 #include <algorithm>
 
 

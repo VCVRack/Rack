@@ -1,16 +1,16 @@
 #pragma once
-#include "plugin/Model.hpp"
-#include "ui/MenuOverlay.hpp"
-#include "ui/MenuItem.hpp"
-#include "ui/MenuLabel.hpp"
-#include "ui/Menu.hpp"
-#include "app/PortWidget.hpp"
-#include "app/ParamWidget.hpp"
-#include "app/Scene.hpp"
-#include "engine/Module.hpp"
-#include "engine/ParamQuantity.hpp"
-#include "app.hpp"
-#include "window.hpp"
+#include <plugin/Model.hpp>
+#include <ui/MenuOverlay.hpp>
+#include <ui/MenuItem.hpp>
+#include <ui/MenuLabel.hpp>
+#include <ui/Menu.hpp>
+#include <app/PortWidget.hpp>
+#include <app/ParamWidget.hpp>
+#include <app/Scene.hpp>
+#include <engine/Module.hpp>
+#include <engine/ParamQuantity.hpp>
+#include <app.hpp>
+#include <window.hpp>
 
 
 namespace rack {

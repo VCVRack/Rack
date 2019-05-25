@@ -1,9 +1,9 @@
 #pragma once
-#include "app/common.hpp"
-#include "widget/OpaqueWidget.hpp"
-#include "widget/FramebufferWidget.hpp"
-#include "app/CircularShadow.hpp"
-#include "widget/SvgWidget.hpp"
+#include <app/common.hpp>
+#include <widget/OpaqueWidget.hpp>
+#include <widget/FramebufferWidget.hpp>
+#include <app/CircularShadow.hpp>
+#include <widget/SvgWidget.hpp>
 
 
 namespace rack {

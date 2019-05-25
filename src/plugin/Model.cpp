@@ -1,4 +1,4 @@
-#include "plugin/Model.hpp"
+#include <plugin/Model.hpp>
 
 
 namespace rack {

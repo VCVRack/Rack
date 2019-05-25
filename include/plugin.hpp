@@ -1,7 +1,7 @@
 #pragma once
-#include "common.hpp"
-#include "plugin/Plugin.hpp"
-#include "plugin/Model.hpp"
+#include <common.hpp>
+#include <plugin/Plugin.hpp>
+#include <plugin/Model.hpp>
 #include <vector>
 #include <set>
 

@@ -1,6 +1,6 @@
-#include "keyboard.hpp"
-#include "midi.hpp"
-#include "window.hpp"
+#include <keyboard.hpp>
+#include <midi.hpp>
+#include <window.hpp>
 #include <map>
 
 

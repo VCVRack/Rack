@@ -1,10 +1,10 @@
 #pragma once
-#include "app/common.hpp"
-#include "app/Knob.hpp"
-#include "widget/FramebufferWidget.hpp"
-#include "widget/TransformWidget.hpp"
-#include "widget/SvgWidget.hpp"
-#include "app/CircularShadow.hpp"
+#include <app/common.hpp>
+#include <app/Knob.hpp>
+#include <widget/FramebufferWidget.hpp>
+#include <widget/TransformWidget.hpp>
+#include <widget/SvgWidget.hpp>
+#include <app/CircularShadow.hpp>
 
 
 namespace rack {

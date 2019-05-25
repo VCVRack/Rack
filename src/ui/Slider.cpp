@@ -1,4 +1,4 @@
-#include "ui/Slider.hpp"
+#include <ui/Slider.hpp>
 
 
 namespace rack {

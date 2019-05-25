@@ -1,5 +1,5 @@
-#include "rtmidi.hpp"
-#include "midi.hpp"
+#include <rtmidi.hpp>
+#include <midi.hpp>
 #include <map>
 
 #pragma GCC diagnostic push

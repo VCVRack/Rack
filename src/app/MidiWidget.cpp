@@ -1,5 +1,5 @@
-#include "app/MidiWidget.hpp"
-#include "helpers.hpp"
+#include <app/MidiWidget.hpp>
+#include <helpers.hpp>
 
 
 namespace rack {

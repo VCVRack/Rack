@@ -1,8 +1,8 @@
 #pragma once
-#include "app/common.hpp"
-#include "ui/ScrollWidget.hpp"
-#include "widget/ZoomWidget.hpp"
-#include "app/RackWidget.hpp"
+#include <app/common.hpp>
+#include <ui/ScrollWidget.hpp>
+#include <widget/ZoomWidget.hpp>
+#include <app/RackWidget.hpp>
 
 
 namespace rack {

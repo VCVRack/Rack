@@ -1,16 +1,16 @@
-#include "app/ModuleWidget.hpp"
-#include "app/Scene.hpp"
-#include "engine/Engine.hpp"
-#include "plugin/Plugin.hpp"
-#include "app/SvgPanel.hpp"
-#include "system.hpp"
-#include "asset.hpp"
-#include "helpers.hpp"
-#include "app.hpp"
-#include "settings.hpp"
-#include "history.hpp"
+#include <app/ModuleWidget.hpp>
+#include <app/Scene.hpp>
+#include <engine/Engine.hpp>
+#include <plugin/Plugin.hpp>
+#include <app/SvgPanel.hpp>
+#include <system.hpp>
+#include <asset.hpp>
+#include <helpers.hpp>
+#include <app.hpp>
+#include <settings.hpp>
+#include <history.hpp>
 
-#include "osdialog.h"
+#include <osdialog.h>
 #include <thread>
 
 

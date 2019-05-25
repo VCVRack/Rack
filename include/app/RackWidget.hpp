@@ -1,12 +1,12 @@
 #pragma once
-#include "app/common.hpp"
-#include "widget/OpaqueWidget.hpp"
-#include "widget/FramebufferWidget.hpp"
-#include "app/ModuleWidget.hpp"
-#include "app/CableWidget.hpp"
-#include "app/PortWidget.hpp"
-#include "app/ParamWidget.hpp"
-#include "history.hpp"
+#include <app/common.hpp>
+#include <widget/OpaqueWidget.hpp>
+#include <widget/FramebufferWidget.hpp>
+#include <app/ModuleWidget.hpp>
+#include <app/CableWidget.hpp>
+#include <app/PortWidget.hpp>
+#include <app/ParamWidget.hpp>
+#include <history.hpp>
 #include <map>
 
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "vector.hpp"
-#include "sse_mathfun.h"
-#include "math.hpp"
+#include <simd/vector.hpp>
+#include <simd/sse_mathfun.h>
+#include <math.hpp>
 #include <cmath>
 
 
@@ -17,8 +17,7 @@ Example:
 
 	template <typename T>
 	T sin_plus_cos(T x) {
-		using namespace simd;
-		return sin(x) + cos(x);
+		return simd::sin(x) + simd::cos(x);
 	}
 */
 

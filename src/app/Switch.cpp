@@ -1,8 +1,8 @@
-#include "app/Switch.hpp"
-#include "app.hpp"
-#include "app/Scene.hpp"
-#include "random.hpp"
-#include "history.hpp"
+#include <app/Switch.hpp>
+#include <app.hpp>
+#include <app/Scene.hpp>
+#include <random.hpp>
+#include <history.hpp>
 
 
 namespace rack {

@@ -1,6 +1,6 @@
 #pragma once
-#include "ui/common.hpp"
-#include "color.hpp"
+#include <ui/common.hpp>
+#include <color.hpp>
 
 
 namespace rack {

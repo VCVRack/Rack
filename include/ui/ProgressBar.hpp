@@ -1,7 +1,7 @@
 #pragma once
-#include "ui/common.hpp"
-#include "widget/Widget.hpp"
-#include "Quantity.hpp"
+#include <ui/common.hpp>
+#include <widget/Widget.hpp>
+#include <Quantity.hpp>
 
 
 namespace rack {

@@ -1,6 +1,6 @@
 #pragma once
-#include "common.hpp"
-#include "engine/Module.hpp"
+#include <common.hpp>
+#include <engine/Module.hpp>
 
 
 namespace rack {

@@ -1,9 +1,9 @@
 #pragma once
-#include "common.hpp"
-#include "math.hpp"
-#include "window.hpp"
-#include "color.hpp"
-#include "event.hpp"
+#include <common.hpp>
+#include <math.hpp>
+#include <window.hpp>
+#include <color.hpp>
+#include <event.hpp>
 #include <list>
 
 
