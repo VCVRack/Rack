@@ -34,7 +34,6 @@ extern int threadCount;
 extern bool paramTooltip;
 extern bool cpuMeter;
 extern bool lockModules;
-extern bool checkVersion;
 extern float frameRateLimit;
 extern bool frameRateSync;
 extern bool skipLoadOnLaunch;

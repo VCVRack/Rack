@@ -166,8 +166,7 @@ static bool syncUpdate(const Update &update) {
 	std::string arch = "lin";
 #endif
 
-	std::string downloadUrl = app::API_URL;
-	downloadUrl += "/download";
+	std::string downloadUrl = app::API_URL + "/download";
 	downloadUrl += "?token=" + network::encodeUrl(settings::token);
 	downloadUrl += "&slug=" + network::encodeUrl(update.pluginSlug);
 	downloadUrl += "&version=" + network::encodeUrl(update.version);
@@ -350,8 +349,7 @@ void logIn(const std::string &email, const std::string &password) {
 	json_t *reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	std::string url = app::API_URL;
-	url += "/token";
+	std::string url = app::API_URL + "/token";
 	json_t *resJ = network::requestJson(network::METHOD_POST, url, reqJ);
 	json_decref(reqJ);
 
@@ -391,8 +389,7 @@ void queryUpdates() {
 	// Get user's plugins list
 	json_t *pluginsReqJ = json_object();
 	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
-	std::string pluginsUrl = app::API_URL;
-	pluginsUrl += "/plugins";
+	std::string pluginsUrl = app::API_URL + "/plugins";
 	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
@@ -410,8 +407,7 @@ void queryUpdates() {
 	}
 
 	// Get community manifests
-	std::string manifestsUrl = app::API_URL;
-	manifestsUrl += "/community/manifests";
+	std::string manifestsUrl = app::API_URL + "/community/manifests";
 	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, NULL);
 	if (!manifestsResJ) {
 		WARN("Request for community manifests failed");

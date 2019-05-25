@@ -21,7 +21,7 @@ Scene::Scene() {
 
 	rack = rackScroll->rackWidget;
 
-	menuBar = new MenuBar;
+	menuBar = createMenuBar();
 	addChild(menuBar);
 	rackScroll->box.pos.y = menuBar->box.size.y;
 
@@ -44,24 +44,6 @@ void Scene::step() {
 		lastAutoSaveTime = time;
 		APP->patch->save(asset::user("autosave.vcv"));
 		settings::save(asset::user("settings.json"));
-	}
-
-	// Request latest version from server
-	if (!settings::devMode && checkVersion && !checkedVersion) {
-		std::thread t(&Scene::runCheckVersion, this);
-		t.detach();
-		checkedVersion = true;
-	}
-
-	// Version popup message
-	if (!latestVersion.empty()) {
-		std::string versionMessage = string::f("Rack v%s is available.\n\nYou have Rack v%s.\n\nClose Rack and download new version on the website?", latestVersion.c_str(), app::APP_VERSION);
-		if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, versionMessage.c_str())) {
-			std::thread t(system::openBrowser, "https://vcvrack.com/");
-			t.detach();
-			APP->window->close();
-		}
-		latestVersion = "";
 	}
 
 	Widget::step();
@@ -163,23 +145,6 @@ void Scene::onPathDrop(const event::PathDrop &e) {
 			APP->patch->load(path);
 			e.consume(this);
 		}
-	}
-}
-
-void Scene::runCheckVersion() {
-	std::string versionUrl = app::API_URL;
-	versionUrl += "/version";
-	json_t *versionResJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
-
-	if (versionResJ) {
-		json_t *versionJ = json_object_get(versionResJ, "version");
-		if (versionJ) {
-			std::string version = json_string_value(versionJ);
-			if (version != app::APP_VERSION) {
-				latestVersion = version;
-			}
-		}
-		json_decref(versionResJ);
 	}
 }
 

@@ -34,6 +34,29 @@ struct MenuButton : ui::Button {
 		if (APP->event->draggedWidget == this)
 			state = BND_ACTIVE;
 		bndMenuItem(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, -1, text.c_str());
+		Widget::draw(args);
+	}
+};
+
+struct NotificationIcon : widget::Widget {
+	void draw(const DrawArgs &args) override {
+		nvgBeginPath(args.vg);
+		float radius = 4;
+		nvgCircle(args.vg, radius, radius, radius);
+		nvgFillColor(args.vg, nvgRGBf(1.0, 0.0, 0.0));
+		nvgFill(args.vg);
+		nvgStrokeColor(args.vg, nvgRGBf(0.5, 0.0, 0.0));
+		nvgStroke(args.vg);
+	}
+};
+
+struct UrlItem : ui::MenuItem {
+	std::string url;
+	void onAction(const event::Action &e) override {
+		std::thread t([=]() {
+			system::openBrowser(url);
+		});
+		t.detach();
 	}
 };
 
@@ -421,15 +444,6 @@ struct EngineButton : MenuButton {
 
 static bool isLoggingIn = false;
 
-struct RegisterItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		std::thread t([]() {
-			system::openBrowser("https://vcvrack.com/");
-		});
-		t.detach();
-	}
-};
-
 struct AccountEmailField : ui::TextField {
 	ui::TextField *passwordField;
 	void onSelectKey(const event::SelectKey &e) override {
@@ -478,29 +492,10 @@ struct LogInItem : ui::MenuItem {
 	}
 };
 
-struct ManageItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		std::thread t([]() {
-			system::openBrowser("https://vcvrack.com/plugins.html");
-		});
-		t.detach();
-	}
-};
-
 struct SyncItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		std::thread t([=]() {
 			plugin::syncUpdates();
-		});
-		t.detach();
-	}
-};
-
-struct UpdateItem : ui::MenuItem {
-	std::string changelogUrl;
-	void onAction(const event::Action &e) override {
-		std::thread t([=]() {
-			system::openBrowser(changelogUrl);
 		});
 		t.detach();
 	}
@@ -589,8 +584,9 @@ struct PluginsMenu : ui::Menu {
 		}
 
 		if (plugin::isLoggedIn()) {
-			ManageItem *manageItem = new ManageItem;
+			UrlItem *manageItem = new UrlItem;
 			manageItem->text = "Manage";
+			manageItem->url = "https://vcvrack.com/plugins.html";
 			addChild(manageItem);
 
 			LogOutItem *logOutItem = new LogOutItem;
@@ -610,22 +606,23 @@ struct PluginsMenu : ui::Menu {
 				addChild(updatesLabel);
 
 				for (const plugin::Update &update : plugin::updates) {
-					UpdateItem *updateItem = new UpdateItem;
+					UrlItem *updateItem = new UrlItem;
 					updateItem->text = update.pluginSlug;
 					plugin::Plugin *p = plugin::getPlugin(update.pluginSlug);
 					if (p) {
 						updateItem->rightText += "v" + p->version + " → ";
 					}
 					updateItem->rightText += "v" + update.version;
-					updateItem->changelogUrl = update.changelogUrl;
+					updateItem->url = update.changelogUrl;
 					updateItem->disabled = update.changelogUrl.empty();
 					addChild(updateItem);
 				}
 			}
 		}
 		else {
-			RegisterItem *registerItem = new RegisterItem;
+			UrlItem *registerItem = new UrlItem;
 			registerItem->text = "Register VCV account";
+			registerItem->url = "https://vcvrack.com/";
 			addChild(registerItem);
 
 			AccountEmailField *emailField = new AccountEmailField;
@@ -649,50 +646,29 @@ struct PluginsMenu : ui::Menu {
 };
 
 struct PluginsButton : MenuButton {
+	NotificationIcon *notification;
+
+	PluginsButton() {
+		notification = new NotificationIcon;
+		addChild(notification);
+	}
+
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu<PluginsMenu>();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 	}
 
-	void draw(const DrawArgs &args) override {
-		MenuButton::draw(args);
-
-		if (0) {
-			// Notification circle
-			nvgBeginPath(args.vg);
-			nvgCircle(args.vg, 4, 2, 4.0);
-			nvgFillColor(args.vg, nvgRGBf(1.0, 0.0, 0.0));
-			nvgFill(args.vg);
-			nvgStrokeColor(args.vg, nvgRGBf(0.5, 0.0, 0.0));
-			nvgStroke(args.vg);
-		}
+	void step() override {
+		notification->box.pos = math::Vec(0, 0);
+		notification->visible = false;
+		MenuButton::step();
 	}
 };
 
 ////////////////////
 // Help
 ////////////////////
-
-struct ManualItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		std::thread t(system::openBrowser, "https://vcvrack.com/manual/");
-		t.detach();
-	}
-};
-
-struct WebsiteItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		std::thread t(system::openBrowser, "https://vcvrack.com/");
-		t.detach();
-	}
-};
-
-struct CheckVersionItem : ui::MenuItem {
-	void onAction(const event::Action &e) override {
-		settings::checkVersion ^= true;
-	}
-};
 
 struct UserFolderItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
@@ -702,28 +678,50 @@ struct UserFolderItem : ui::MenuItem {
 };
 
 struct HelpButton : MenuButton {
+	NotificationIcon *notification;
+
+	HelpButton() {
+		notification = new NotificationIcon;
+		addChild(notification);
+	}
+
 	void onAction(const event::Action &e) override {
 		ui::Menu *menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		ManualItem *manualItem = new ManualItem;
+		UrlItem *manualItem = new UrlItem;
 		manualItem->text = "Manual";
 		manualItem->rightText = "F1";
+		manualItem->url = "https://vcvrack.com/manual/";
 		menu->addChild(manualItem);
 
-		WebsiteItem *websiteItem = new WebsiteItem;
+		UrlItem *websiteItem = new UrlItem;
 		websiteItem->text = "VCVRack.com";
+		websiteItem->url = "https://vcvrack.com/";
 		menu->addChild(websiteItem);
 
-		CheckVersionItem *checkVersionItem = new CheckVersionItem;
-		checkVersionItem->text = "Check version on launch";
-		checkVersionItem->rightText = CHECKMARK(settings::checkVersion);
-		menu->addChild(checkVersionItem);
+		if (hasUpdate()) {
+			UrlItem *updateItem = new UrlItem;
+			updateItem->text = "Update " + APP_NAME;
+			updateItem->rightText = APP_VERSION + " → " + APP_NEW_VERSION;
+			updateItem->url = "https://vcvrack.com/";
+			menu->addChild(updateItem);
+		}
 
 		UserFolderItem *folderItem = new UserFolderItem;
 		folderItem->text = "Open user folder";
 		menu->addChild(folderItem);
+	}
+
+	void step() override {
+		notification->box.pos = math::Vec(0, 0);
+		notification->visible = hasUpdate();
+		MenuButton::step();
+	}
+
+	bool hasUpdate() {
+		return !APP_NEW_VERSION.empty() && APP_NEW_VERSION != APP_VERSION;
 	}
 };
 
@@ -731,14 +729,24 @@ struct HelpButton : MenuButton {
 // MenuBar
 ////////////////////
 
-MenuBar::MenuBar() {
+void MenuBar::draw(const DrawArgs &args) {
+	bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
+	bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
+
+	Widget::draw(args);
+}
+
+
+MenuBar *createMenuBar() {
+	MenuBar *menuBar = new MenuBar;
+
 	const float margin = 5;
-	box.size.y = BND_WIDGET_HEIGHT + 2*margin;
+	menuBar->box.size.y = BND_WIDGET_HEIGHT + 2*margin;
 
 	ui::SequentialLayout *layout = new ui::SequentialLayout;
 	layout->box.pos = math::Vec(margin, margin);
 	layout->spacing = math::Vec(0, 0);
-	addChild(layout);
+	menuBar->addChild(layout);
 
 	FileButton *fileButton = new FileButton;
 	fileButton->text = "File";
@@ -763,13 +771,8 @@ MenuBar::MenuBar() {
 	HelpButton *helpButton = new HelpButton;
 	helpButton->text = "Help";
 	layout->addChild(helpButton);
-}
 
-void MenuBar::draw(const DrawArgs &args) {
-	bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
-	bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
-
-	Widget::draw(args);
+	return menuBar;
 }
 
 

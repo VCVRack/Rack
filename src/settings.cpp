@@ -29,7 +29,6 @@ int threadCount = 1;
 bool paramTooltip = false;
 bool cpuMeter = false;
 bool lockModules = false;
-bool checkVersion = true;
 float frameRateLimit = 70.0;
 bool frameRateSync = true;
 bool skipLoadOnLaunch = false;
@@ -75,8 +74,6 @@ json_t *toJson() {
 	json_object_set_new(rootJ, "cpuMeter", json_boolean(cpuMeter));
 
 	json_object_set_new(rootJ, "lockModules", json_boolean(lockModules));
-
-	json_object_set_new(rootJ, "checkVersion", json_boolean(checkVersion));
 
 	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
 
@@ -173,10 +170,6 @@ void fromJson(json_t *rootJ) {
 	json_t *lockModulesJ = json_object_get(rootJ, "lockModules");
 	if (lockModulesJ)
 		lockModules = json_boolean_value(lockModulesJ);
-
-	json_t *checkVersionJ = json_object_get(rootJ, "checkVersion");
-	if (checkVersionJ)
-		checkVersion = json_boolean_value(checkVersionJ);
 
 	json_t *frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
 	if (frameRateLimitJ)
