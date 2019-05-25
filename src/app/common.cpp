@@ -14,7 +14,7 @@ std::string APP_NEW_VERSION;
 std::string API_URL = "https://api.vcvrack.com";
 
 static void checkVersion() {
-	std::string versionUrl = app::API_URL + "/version2";
+	std::string versionUrl = app::API_URL + "/version";
 	json_t *versionResJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
 	if (!versionResJ) {
 		WARN("Request for version failed");
@@ -30,8 +30,7 @@ static void checkVersion() {
 }
 
 void init() {
-	// TODO
-	if (!settings::devMode || 1) {
+	if (!settings::devMode) {
 		std::thread t([] {
 			checkVersion();
 		});
