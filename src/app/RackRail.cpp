@@ -57,7 +57,7 @@ void RackRail::draw(const DrawArgs &args) {
 		nvgStroke(args.vg);
 
 		// Bus board
-		const float busBoardWidth = RACK_GRID_WIDTH * 20;
+		const float busBoardWidth = busBoardSvg->handle->width;
 		const float busBoardHeight = busBoardSvg->handle->height;
 		const float busBoardY = y + (RACK_GRID_HEIGHT - busBoardHeight) / 2;
 		for (float x = 0; x < box.size.x; x += busBoardWidth) {
