@@ -551,6 +551,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 	void onShow(const event::Show &e) override {
 		refresh();
+		OpaqueWidget::onShow(e);
 	}
 };
 
