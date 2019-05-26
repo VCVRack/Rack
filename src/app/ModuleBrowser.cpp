@@ -31,6 +31,9 @@ namespace rack {
 namespace app {
 
 
+// Static functions
+
+
 static float modelScore(plugin::Model *model, const std::string &search) {
 	if (search.empty())
 		return 1.f;
@@ -88,6 +91,26 @@ static void stepFavoriteScore(const std::string &plugin, const std::string &mode
 	settings::favoriteScores[std::make_tuple(plugin, model)] += 1;
 }
 
+static ModuleWidget *chooseModel(plugin::Model *model) {
+	// Create module
+	ModuleWidget *moduleWidget = model->createModuleWidget();
+	assert(moduleWidget);
+	APP->scene->rack->addModuleAtMouse(moduleWidget);
+
+	// Push ModuleAdd history action
+	history::ModuleAdd *h = new history::ModuleAdd;
+	h->name = "create module";
+	h->setModule(moduleWidget);
+	APP->history->push(h);
+
+	// Step favorite
+	stepFavoriteScore(model->plugin->slug, model->slug);
+
+	// Hide Module Browser
+	APP->scene->moduleBrowser->hide();
+
+	return moduleWidget;
+}
 
 template <typename K, typename V>
 V get_default(const std::map<K, V> &m, const K &key, const V &def) {
@@ -96,6 +119,9 @@ V get_default(const std::map<K, V> &m, const K &key, const V &def) {
 		return def;
 	return it->second;
 }
+
+
+// Widgets
 
 
 struct BrowserOverlay : widget::OpaqueWidget {
@@ -217,7 +243,18 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 	}
 
-	void onButton(const event::Button &e) override;
+	void onButton(const event::Button &e) override {
+		OpaqueWidget::onButton(e);
+		if (e.getTarget() != this)
+			return;
+
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			ModuleWidget *mw = chooseModel(model);
+
+			// Pretend the moduleWidget was clicked so it can be dragged in the RackWidget
+			e.consume(mw);
+		}
+	}
 
 	void onEnter(const event::Enter &e) override {
 		ui::Tooltip *tooltip = new ui::Tooltip;
@@ -230,6 +267,12 @@ struct ModelBox : widget::OpaqueWidget {
 
 	void onLeave(const event::Leave &e) override {
 		setTooltip(NULL);
+	}
+
+	void onHide(const event::Hide &e) override {
+		// Hide tooltip
+		setTooltip(NULL);
+		OpaqueWidget::onHide(e);
 	}
 };
 
@@ -272,6 +315,7 @@ struct BrowserSearchField : ui::TextField {
 	}
 
 	void onChange(const event::Change &e) override;
+	void onAction(const event::Action &e) override;
 
 	void onHide(const event::Hide &e) override {
 		APP->event->setSelected(NULL);
@@ -559,39 +603,6 @@ struct ModuleBrowser : widget::OpaqueWidget {
 // Implementations to resolve dependencies
 
 
-inline void ModelBox::onButton(const event::Button &e) {
-	OpaqueWidget::onButton(e);
-	if (e.getTarget() != this)
-		return;
-
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		// Hide tooltip
-		setTooltip(NULL);
-
-		// Create module
-		ModuleWidget *moduleWidget = model->createModuleWidget();
-		assert(moduleWidget);
-		APP->scene->rack->addModuleAtMouse(moduleWidget);
-
-		// Pretend the moduleWidget was clicked so it can be dragged in the RackWidget
-		e.consume(moduleWidget);
-
-		// Hide Module Browser
-		BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
-		overlay->hide();
-
-		// Push ModuleAdd history action
-		history::ModuleAdd *h = new history::ModuleAdd;
-		h->name = "create module";
-		h->setModule(moduleWidget);
-		APP->history->push(h);
-
-		// Step favorite
-		stepFavoriteScore(model->plugin->slug, model->slug);
-	}
-}
-
-
 inline void BrandItem::onAction(const event::Action &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	if (browser->brand == text)
@@ -626,6 +637,22 @@ inline void BrowserSearchField::onChange(const event::Change &e) {
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	browser->search = string::trim(text);
 	browser->refresh();
+}
+
+inline void BrowserSearchField::onAction(const event::Action &e) {
+	// Get first ModelBox
+	ModelBox *mb = NULL;
+	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+	for (Widget *w : browser->modelContainer->children) {
+		if (w->visible) {
+			mb = dynamic_cast<ModelBox*>(w);
+			break;
+		}
+	}
+
+	if (mb) {
+		chooseModel(mb->model);
+	}
 }
 
 inline void ClearButton::onAction(const event::Action &e) {
