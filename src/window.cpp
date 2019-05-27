@@ -27,6 +27,7 @@ namespace rack {
 
 
 void Font::loadFile(const std::string &filename, NVGcontext *vg) {
+	this->vg = vg;
 	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
 		INFO("Loaded font %s", filename.c_str());
@@ -45,6 +46,7 @@ std::shared_ptr<Font> Font::load(const std::string &filename) {
 }
 
 void Image::loadFile(const std::string &filename, NVGcontext *vg) {
+	this->vg = vg;
 	handle = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
 		INFO("Loaded image %s", filename.c_str());
