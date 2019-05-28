@@ -299,13 +299,8 @@ struct BrowserSearchField : ui::TextField {
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS) {
 			if (e.key == GLFW_KEY_ESCAPE) {
-				if (text != "") {
-					setText("");
-				}
-				else {
-					BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
-					overlay->hide();
-				}
+				BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
+				overlay->hide();
 				e.consume(this);
 			}
 		}
