@@ -55,18 +55,37 @@ struct alignas(32) Port {
 		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
 	}
 
-	/** Reads all voltage values from an array of size `channels` */
-	void setVoltages(const float *voltages) {
+	/** Returns a pointer to the array of voltages beginning with firstChannel.
+	The pointer can be used for reading and writing.
+	Useful for SIMD.
+	*/
+	float *getVoltages(int firstChannel = 0) {
+		return &voltages[firstChannel];
+	}
+
+	/** Copies the port's voltages to an array of size at least `channels`. */
+	void readVoltages(float *v) {
 		for (int c = 0; c < channels; c++) {
-			this->voltages[c] = voltages[c];
+			v[c] = voltages[c];
 		}
 	}
 
-	/** Writes all voltage values to an array of size `channels` */
-	void getVoltages(float *voltages) {
+	/** Copies an array of size at least `channels` to the port's voltages.
+	Remember to set the number of channels *before* calling this method.
+	*/
+	void writeVoltages(const float *v) {
 		for (int c = 0; c < channels; c++) {
-			voltages[c] = this->voltages[c];
+			voltages[c] = v[c];
 		}
+	}
+
+	/** Returns the sum of all voltages. */
+	float getVoltageSum() {
+		float sum = 0.f;
+		for (int c = 0; c < channels; c++) {
+			sum += voltages[c];
+		}
+		return sum;
 	}
 
 	/** Sets the number of polyphony channels. */
