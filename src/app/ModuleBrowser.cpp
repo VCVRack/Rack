@@ -257,11 +257,22 @@ struct ModelBox : widget::OpaqueWidget {
 	}
 
 	void onEnter(const event::Enter &e) override {
-		ui::Tooltip *tooltip = new ui::Tooltip;
-		tooltip->text = model->plugin->brand;
-		tooltip->text += " " + model->name;
+		std::string text;
+		text = model->plugin->brand;
+		text += " " + model->name;
 		if (model->description != "")
-			tooltip->text += "\n" + model->description;
+			text += "\n" + model->description;
+		// Tags
+		if (!model->tags.empty()) {
+			text += "\n";
+			for (size_t i = 0; i < model->tags.size(); i++) {
+				if (i > 0)
+					text += ", ";
+				text += model->tags[i];
+			}
+		}
+		ui::Tooltip *tooltip = new ui::Tooltip;
+		tooltip->text = text;
 		setTooltip(tooltip);
 	}
 
