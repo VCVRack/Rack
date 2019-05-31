@@ -1,5 +1,6 @@
 #include <plugin/Plugin.hpp>
 #include <plugin/Model.hpp>
+#include <plugin.hpp>
 
 
 namespace rack {
@@ -13,6 +14,7 @@ Plugin::~Plugin() {
 }
 
 void Plugin::addModel(Model *model) {
+	assert(isSlugValid(model->slug));
 	assert(!model->plugin);
 	model->plugin = this;
 	models.push_back(model);

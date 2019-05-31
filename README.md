@@ -2,4 +2,8 @@
 
 *Rack* is the engine for the VCV open-source virtual modular synthesizer.
 
-For information about the software, go to the [VCV website](https://vcvrack.com/) or the [VCV Rack manual](https://vcvrack.com/manual/).
+- [VCV website](https://vcvrack.com/)
+- [Manual](https://vcvrack.com/manual/index.html)
+- [Building](https://vcvrack.com/manual/Building.html)
+- [Communities](https://vcvrack.com/manual/Communities.html)
+- [Licenses](LICENSE.md)

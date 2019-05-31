@@ -48,32 +48,41 @@ struct Vector;
 */
 template <>
 struct Vector<float, 4> {
-	__m128 v;
+	union {
+		__m128 v;
+		float f[4];
+	};
 
 	/** Constructs an uninitialized vector. */
-	Vector<float, 4>() {}
+	Vector() {}
 
 	/** Constructs a vector from a native `__m128` type. */
-	Vector<float, 4>(__m128 v) : v(v) {}
+	Vector(__m128 v) : v(v) {}
 
 	/** Constructs a vector with all elements set to `x`. */
-	Vector<float, 4>(float x) {
+	Vector(float x) {
 		v = _mm_set_ps1(x);
 	}
 
 	/** Constructs a vector from four values. */
-	Vector<float, 4>(float x1, float x2, float x3, float x4) {
+	Vector(float x1, float x2, float x3, float x4) {
 		v = _mm_set_ps(x1, x2, x3, x4);
 	}
 
 	/** Returns a vector initialized to zero. */
-	static Vector<float, 4> zero() {
-		return Vector<float, 4>(_mm_setzero_ps());
+	static Vector zero() {
+		return Vector(_mm_setzero_ps());
+	}
+
+	/** Returns a vector with all 1 bits. */
+	static Vector mask() {
+		__m128 zero = _mm_setzero_ps();
+		return Vector(_mm_cmpeq_ps(zero, zero));
 	}
 
 	/** Reads an array of 4 values. */
-	static Vector<float, 4> load(const float *x) {
-		return Vector<float, 4>(_mm_loadu_ps(x));
+	static Vector load(const float *x) {
+		return Vector(_mm_loadu_ps(x));
 	}
 
 	/** Writes an array of 4 values. */
@@ -178,9 +187,7 @@ inline float_4 operator--(float_4 &a, int) {
 
 /** `~a` */
 inline float_4 operator~(const float_4 &a) {
-	float_4 mask = float_4::zero();
-	mask = (mask == mask);
-	return a ^ mask;
+	return a ^ float_4::mask();
 }
 
 

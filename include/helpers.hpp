@@ -17,7 +17,7 @@ namespace rack {
 
 
 template <class TModule, class TModuleWidget, typename... Tags>
-plugin::Model *createModel(std::string slug) {
+plugin::Model *createModel(const std::string &slug) {
 	struct TModel : plugin::Model {
 		engine::Module *createModule() override {
 			TModule *m = new TModule;
