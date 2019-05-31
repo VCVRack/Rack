@@ -50,7 +50,9 @@ template <>
 struct Vector<float, 4> {
 	union {
 		__m128 v;
-		float f[4];
+		/** Accessing this array of scalars is slow and defeats the purpose of vectorizing.
+		*/
+		float s[4];
 	};
 
 	/** Constructs an uninitialized vector. */
