@@ -114,6 +114,7 @@ struct AudioInterface : Module {
 
 	AudioInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		port.maxChannels = std::max(AUDIO_OUTPUTS, AUDIO_INPUTS);
 		onSampleRateChange();
 	}
 
