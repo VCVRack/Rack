@@ -27,6 +27,8 @@ Model *getModel(const std::string &pluginSlug, const std::string &modelSlug);
 std::string normalizeTag(const std::string &tag);
 /** Checks that the slug contains only alphanumeric characters, "-", and "_" */
 bool isSlugValid(const std::string &slug);
+/** Returns a string containing only the valid slug characters. */
+std::string normalizeSlug(const std::string &slug);
 
 
 struct Update {

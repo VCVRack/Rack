@@ -14,13 +14,19 @@ Plugin::~Plugin() {
 }
 
 void Plugin::addModel(Model *model) {
-	assert(isSlugValid(model->slug));
+	// Check that the model is not added to a plugin already
 	assert(!model->plugin);
+	// Check model slug
+	if (!isSlugValid(model->slug)) {
+		WARN("Module slug \"%s\" is invalid", model->slug.c_str());
+		return;
+	}
 	model->plugin = this;
 	models.push_back(model);
 }
 
 Model *Plugin::getModel(std::string slug) {
+	slug = normalizeSlug(slug);
 	for (Model *model : models) {
 		if (model->slug == slug) {
 			return model;

@@ -485,8 +485,9 @@ bool isLoggedIn() {
 }
 
 Plugin *getPlugin(const std::string &pluginSlug) {
+	std::string slug = normalizeSlug(pluginSlug);
 	for (Plugin *plugin : plugins) {
-		if (plugin->slug == pluginSlug) {
+		if (plugin->slug == slug) {
 			return plugin;
 		}
 	}
@@ -608,6 +609,16 @@ bool isSlugValid(const std::string &slug) {
 			return false;
 	}
 	return true;
+}
+
+std::string normalizeSlug(const std::string &slug) {
+	std::string s;
+	for (char c : slug) {
+		if (!(std::isalnum(c) || c == '-' || c == '_'))
+			continue;
+		s += c;
+	}
+	return s;
 }
 
 
