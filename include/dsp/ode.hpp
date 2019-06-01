@@ -8,7 +8,7 @@ namespace dsp {
 
 /** The callback function `f` in each of these stepping functions must have the signature
 
-	void f(float t, const float x[], float dxdt[])
+	void f(T t, const T x[], T dxdt[])
 
 A capturing lambda is ideal for this.
 For example, the following solves the system x''(t) = -x(t) using a fixed timestep of 0.01 and initial conditions x(0) = 1, x'(0) = 0.
