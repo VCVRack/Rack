@@ -723,7 +723,7 @@ static void Engine_refreshParamHandleCache(Engine *that) {
 	// Add active ParamHandles to cache
 	for (ParamHandle *paramHandle : that->internal->paramHandles) {
 		if (paramHandle->moduleId >= 0) {
-			that->internal->paramHandleCache[{paramHandle->moduleId, paramHandle->paramId}] = paramHandle;
+			that->internal->paramHandleCache[std::make_tuple(paramHandle->moduleId, paramHandle->paramId)] = paramHandle;
 		}
 	}
 }
