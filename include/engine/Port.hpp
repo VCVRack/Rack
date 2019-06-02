@@ -92,7 +92,11 @@ struct alignas(32) Port {
 		return sum;
 	}
 
-	/** Sets the number of polyphony channels. */
+	/** Sets the number of polyphony channels.
+	Also clears voltages of higher channels.
+	If disconnected, this does nothing (`channels` remains 0).
+	If 0 is given, `channels` is set to 1 but all voltages are cleared.
+	*/
 	void setChannels(int channels) {
 		// If disconnected, keep the number of channels at 0.
 		if (this->channels == 0) {
