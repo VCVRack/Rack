@@ -130,7 +130,9 @@ void ParamWidget::draw(const DrawArgs &args) {
 	if (paramHandle) {
 			NVGcolor color = paramHandle->color;
 			nvgBeginPath(args.vg);
-			nvgCircle(args.vg, box.size.x - 3, box.size.y - 3, 3.0);
+			const float radius = 6;
+			// nvgCircle(args.vg, box.size.x / 2, box.size.y / 2, radius);
+			nvgRect(args.vg, box.size.x - radius, box.size.y - radius, radius, radius);
 			nvgFillColor(args.vg, color);
 			nvgFill(args.vg);
 			nvgStrokeColor(args.vg, color::mult(color, 0.5));
