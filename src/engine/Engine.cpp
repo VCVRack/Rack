@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <atomic>
+#include <tuple>
 #include <x86intrin.h>
 
 
@@ -761,7 +762,7 @@ void Engine::removeParamHandle(ParamHandle *paramHandle) {
 ParamHandle *Engine::getParamHandle(int moduleId, int paramId) {
 	// Don't lock because this method is called potentially thousands of times per screen frame.
 
-	auto it = internal->paramHandleCache.find({moduleId, paramId});
+	auto it = internal->paramHandleCache.find(std::make_tuple(moduleId, paramId));
 	if (it == internal->paramHandleCache.end())
 		return NULL;
 	return it->second;
