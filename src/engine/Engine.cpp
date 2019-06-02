@@ -170,7 +170,8 @@ struct EngineWorker {
 struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
-	std::vector<ParamHandle*> paramHandles;
+	std::set<ParamHandle*> paramHandles;
+	std::map<std::tuple<int, int>, ParamHandle*> paramHandleCache;
 	bool paused = false;
 
 	bool running = false;
@@ -216,6 +217,7 @@ Engine::~Engine() {
 	assert(internal->cables.empty());
 	assert(internal->modules.empty());
 	assert(internal->paramHandles.empty());
+	assert(internal->paramHandleCache.empty());
 
 	delete internal;
 }
@@ -509,7 +511,7 @@ void Engine::addModule(Module *module) {
 	internal->modules.push_back(module);
 	// Trigger Add event
 	module->onAdd();
-	// Update ParamHandles
+	// Update ParamHandles' module pointers
 	for (ParamHandle *paramHandle : internal->paramHandles) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
@@ -532,7 +534,7 @@ void Engine::removeModule(Module *module) {
 		assert(cable->outputModule != module);
 		assert(cable->inputModule != module);
 	}
-	// Update ParamHandles
+	// Update ParamHandles' module pointers
 	for (ParamHandle *paramHandle : internal->paramHandles) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = NULL;
@@ -715,69 +717,97 @@ float Engine::getSmoothParam(Module *module, int paramId) {
 	return getParam(module, paramId);
 }
 
+static void Engine_refreshParamHandleCache(Engine *that) {
+	// Clear cache
+	that->internal->paramHandleCache.clear();
+	// Add active ParamHandles to cache
+	for (ParamHandle *paramHandle : that->internal->paramHandles) {
+		if (paramHandle->moduleId >= 0) {
+			that->internal->paramHandleCache[{paramHandle->moduleId, paramHandle->paramId}] = paramHandle;
+		}
+	}
+}
+
 void Engine::addParamHandle(ParamHandle *paramHandle) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
+	// New ParamHandles must be blank.
+	// This means we don't have to refresh the cache.
+	assert(paramHandle->moduleId < 0);
+
 	// Check that the ParamHandle is not already added
-	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
+	auto it = internal->paramHandles.find(paramHandle);
 	assert(it == internal->paramHandles.end());
 
-	// New ParamHandles must be blank
-	assert(paramHandle->moduleId < 0);
-	internal->paramHandles.push_back(paramHandle);
+	// Add it
+	internal->paramHandles.insert(paramHandle);
 }
 
 void Engine::removeParamHandle(ParamHandle *paramHandle) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
-	paramHandle->module = NULL;
 	// Check that the ParamHandle is already added
-	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
+	auto it = internal->paramHandles.find(paramHandle);
 	assert(it != internal->paramHandles.end());
+
+	// Remove it
+	paramHandle->module = NULL;
 	internal->paramHandles.erase(it);
+	Engine_refreshParamHandleCache(this);
+}
+
+ParamHandle *Engine::getParamHandle(int moduleId, int paramId) {
+	// Don't lock because this method is called potentially thousands of times per screen frame.
+
+	auto it = internal->paramHandleCache.find({moduleId, paramId});
+	if (it == internal->paramHandleCache.end())
+		return NULL;
+	return it->second;
 }
 
 ParamHandle *Engine::getParamHandle(Module *module, int paramId) {
-	// VIPLock vipLock(internal->vipMutex);
-	// std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-
-	for (ParamHandle *paramHandle : internal->paramHandles) {
-		if (paramHandle->module == module && paramHandle->paramId == paramId)
-			return paramHandle;
-	}
-	return NULL;
+	return getParamHandle(module->id, paramId);
 }
 
 void Engine::updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId, bool overwrite) {
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
+	// Check that it exists
+	auto it = internal->paramHandles.find(paramHandle);
+	assert(it != internal->paramHandles.end());
+
 	// Set IDs
 	paramHandle->moduleId = moduleId;
 	paramHandle->paramId = paramId;
 	paramHandle->module = NULL;
+	// At this point, the ParamHandle cache might be invalid.
 
-	auto it = std::find(internal->paramHandles.begin(), internal->paramHandles.end(), paramHandle);
-
-	if (it != internal->paramHandles.end() && paramHandle->moduleId >= 0) {
-		// Remove existing ParamHandles pointing to the same param
-		for (ParamHandle *p : internal->paramHandles) {
-			if (p != paramHandle && p->moduleId == moduleId && p->paramId == paramId) {
-				if (overwrite)
-					p->reset();
-				else
-					paramHandle->reset();
+	if (paramHandle->moduleId >= 0) {
+		// Replace old ParamHandle, or reset the current ParamHandle
+		ParamHandle *oldParamHandle = getParamHandle(moduleId, paramId);
+		if (oldParamHandle) {
+			if (overwrite) {
+				oldParamHandle->moduleId = -1;
+				oldParamHandle->paramId = 0;
+				oldParamHandle->module = NULL;
 			}
-		}
-		// Find module with same moduleId
-		for (Module *module : internal->modules) {
-			if (module->id == paramHandle->moduleId) {
-				paramHandle->module = module;
+			else {
+				paramHandle->moduleId = -1;
+				paramHandle->paramId = 0;
+				paramHandle->module = NULL;
 			}
 		}
 	}
+
+	// Set module pointer if the above block didn't reset it
+	if (paramHandle->moduleId >= 0) {
+		paramHandle->module = getModule(paramHandle->moduleId);
+	}
+
+	Engine_refreshParamHandleCache(this);
 }
 
 

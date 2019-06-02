@@ -100,7 +100,7 @@ struct ParamFineItem : ui::MenuItem {
 struct ParamUnmapItem : ui::MenuItem {
 	ParamWidget *paramWidget;
 	void onAction(const event::Action &e) override {
-		engine::ParamHandle *paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module, paramWidget->paramQuantity->paramId);
+		engine::ParamHandle *paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module->id, paramWidget->paramQuantity->paramId);
 		if (paramHandle) {
 			APP->engine->updateParamHandle(paramHandle, -1, 0);
 		}
@@ -126,7 +126,7 @@ void ParamWidget::draw(const DrawArgs &args) {
 	Widget::draw(args);
 
 	// Param map indicator
-	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module, paramQuantity->paramId) : NULL;
+	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
 	if (paramHandle) {
 			NVGcolor color = nvgRGB(0xff, 0x40, 0xff);
 			nvgBeginPath(args.vg);
@@ -210,7 +210,7 @@ void ParamWidget::createContextMenu() {
 	// fineItem->disabled = true;
 	// menu->addChild(fineItem);
 
-	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module, paramQuantity->paramId) : NULL;
+	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
 	if (paramHandle) {
 		ParamUnmapItem *unmapItem = new ParamUnmapItem;
 		unmapItem->text = "Unmap";

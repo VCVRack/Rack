@@ -11,21 +11,11 @@ namespace engine {
 /** A weak handle to a Param. Managed by Engine */
 struct ParamHandle {
 	/** Do not set these directly.
-	They are handled by Engine methods.
+	Use Engine ParamHandle methods.
 	*/
-	int moduleId;
-	int paramId;
-	Module *module;
-
-	ParamHandle() {
-		reset();
-	}
-
-	void reset() {
-		moduleId = -1;
-		paramId = 0;
-		module = NULL;
-	}
+	int moduleId = -1;
+	int paramId = 0;
+	Module *module = NULL;
 };
 
 
