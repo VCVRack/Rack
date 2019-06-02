@@ -171,7 +171,7 @@ struct AudioInterface : Module {
 			if (!outputBuffer.full()) {
 				dsp::Frame<AUDIO_OUTPUTS> outputFrame;
 				for (int i = 0; i < AUDIO_OUTPUTS; i++) {
-					outputFrame.samples[i] = inputs[AUDIO_INPUT + i].getVoltage() / 10.f;
+					outputFrame.samples[i] = inputs[AUDIO_INPUT + i].getVoltageSum() / 10.f;
 				}
 				outputBuffer.push(outputFrame);
 			}
