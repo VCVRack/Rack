@@ -13,7 +13,6 @@ struct Cable {
 	int outputId;
 	Module *inputModule = NULL;
 	int inputId;
-	void step();
 };
 
 

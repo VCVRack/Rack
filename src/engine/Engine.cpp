@@ -268,6 +268,17 @@ static void Engine_stepModules(Engine *that, int threadId) {
 	}
 }
 
+static void Cable_step(Cable *that) {
+	Output *output = &that->outputModule->outputs[that->outputId];
+	Input *input = &that->inputModule->inputs[that->inputId];
+	// Match number of polyphonic channels to output port
+	input->channels = output->channels;
+	// Copy all voltages from output to input
+	for (int i = 0; i < PORT_MAX_CHANNELS; i++) {
+		input->voltages[i] = output->voltages[i];
+	}
+}
+
 static void Engine_step(Engine *that) {
 	Engine::Internal *internal = that->internal;
 
@@ -292,15 +303,9 @@ static void Engine_step(Engine *that) {
 		}
 	}
 
-	// Step modules along with workers
-	internal->workerModuleIndex = 0;
-	internal->engineBarrier.wait();
-	Engine_stepModules(that, 0);
-	internal->workerBarrier.wait();
-
 	// Step cables
 	for (Cable *cable : that->internal->cables) {
-		cable->step();
+		Cable_step(cable);
 	}
 
 	// Flip messages for each module
@@ -314,6 +319,12 @@ static void Engine_step(Engine *that) {
 			module->rightExpander.messageFlipRequested = false;
 		}
 	}
+
+	// Step modules along with workers
+	internal->workerModuleIndex = 0;
+	internal->engineBarrier.wait();
+	Engine_stepModules(that, 0);
+	internal->workerBarrier.wait();
 }
 
 static void Engine_updateExpander(Engine *that, Module::Expander *expander) {
@@ -569,36 +580,58 @@ void Engine::bypassModule(Module *module, bool bypass) {
 	assert(module);
 	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-	if (bypass) {
-		for (Output &output : module->outputs) {
-			// This also zeros all voltages
-			output.setChannels(0);
-		}
-		module->cpuTime = 0.f;
+	if (module->bypass == bypass)
+		return;
+	// Clear outputs and set to 1 channel
+	for (Output &output : module->outputs) {
+		// This zeros all voltages, but the channel is set to 1 if connected
+		output.setChannels(0);
 	}
-	else {
-		// Set all outputs to 1 channel
-		for (Output &output : module->outputs) {
-			output.setChannels(1);
-		}
-	}
+	module->cpuTime = 0.f;
 	module->bypass = bypass;
 }
 
+static void Port_setDisconnected(Port *that) {
+	that->channels = 0;
+	for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
+		that->voltages[c] = 0.f;
+	}
+}
+
+static void Port_setConnected(Port *that) {
+	if (that->channels > 0)
+		return;
+	that->channels = 1;
+}
+
 static void Engine_updateConnected(Engine *that) {
-	// Set everything to unconnected
+	// Find disconnected ports
+	std::set<Port*> disconnectedPorts;
 	for (Module *module : that->internal->modules) {
-		for (Input &input : module->inputs) {
-			input.active = false;
-		}
 		for (Output &output : module->outputs) {
-			output.active = false;
+			disconnectedPorts.insert(&output);
+		}
+		for (Input &input : module->inputs) {
+			disconnectedPorts.insert(&input);
 		}
 	}
-	// Set inputs/outputs to active
 	for (Cable *cable : that->internal->cables) {
-		cable->outputModule->outputs[cable->outputId].active = true;
-		cable->inputModule->inputs[cable->inputId].active = true;
+		// Connect output
+		Output &output = cable->outputModule->outputs[cable->outputId];
+		auto outputIt = disconnectedPorts.find(&output);
+		if (outputIt != disconnectedPorts.end())
+			disconnectedPorts.erase(outputIt);
+		Port_setConnected(&output);
+		// Connect input
+		Input &input = cable->inputModule->inputs[cable->inputId];
+		auto inputIt = disconnectedPorts.find(&input);
+		if (inputIt != disconnectedPorts.end())
+			disconnectedPorts.erase(inputIt);
+		Port_setConnected(&input);
+	}
+	// Disconnect ports that have no cable
+	for (Port *port : disconnectedPorts) {
+		Port_setDisconnected(port);
 	}
 }
 
@@ -641,9 +674,6 @@ void Engine::removeCable(Cable *cable) {
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
 	assert(it != internal->cables.end());
-	// Set input to inactive
-	Input &input = cable->inputModule->inputs[cable->inputId];
-	input.setChannels(0);
 	// Remove the cable
 	internal->cables.erase(it);
 	Engine_updateConnected(this);

@@ -23,8 +23,6 @@ struct alignas(32) Port {
 	May be 0 to PORT_MAX_CHANNELS.
 	*/
 	uint8_t channels = 1;
-	/** Unstable API. Use isConnected() instead. */
-	bool active = false;
 	/** For rendering plug lights on cables.
 	Green for positive, red for negative, and blue for polyphonic.
 	*/
@@ -79,6 +77,12 @@ struct alignas(32) Port {
 		}
 	}
 
+	void clearVoltages() {
+		for (int c = 0; c < channels; c++) {
+			voltages[c] = 0.f;
+		}
+	}
+
 	/** Returns the sum of all voltages. */
 	float getVoltageSum() {
 		float sum = 0.f;
@@ -90,9 +94,17 @@ struct alignas(32) Port {
 
 	/** Sets the number of polyphony channels. */
 	void setChannels(int channels) {
+		// If disconnected, keep the number of channels at 0.
+		if (this->channels == 0) {
+			return;
+		}
 		// Set higher channel voltages to 0
 		for (int c = channels; c < this->channels; c++) {
 			voltages[c] = 0.f;
+		}
+		// Don't allow caller to set port as disconnected
+		if (channels == 0) {
+			channels = 1;
 		}
 		this->channels = channels;
 	}
@@ -105,7 +117,15 @@ struct alignas(32) Port {
 	You can use this for skipping code that generates output voltages.
 	*/
 	bool isConnected() {
-		return active;
+		return channels > 0;
+	}
+
+	bool isMonophonic() {
+		return channels == 1;
+	}
+
+	bool isPolyphonic() {
+		return channels > 1;
 	}
 
 	void process(float deltaTime);
