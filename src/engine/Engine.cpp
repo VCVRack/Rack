@@ -272,10 +272,15 @@ static void Cable_step(Cable *that) {
 	Output *output = &that->outputModule->outputs[that->outputId];
 	Input *input = &that->inputModule->inputs[that->inputId];
 	// Match number of polyphonic channels to output port
-	input->channels = output->channels;
+	int channels = output->channels;
+	input->channels = channels;
 	// Copy all voltages from output to input
-	for (int i = 0; i < PORT_MAX_CHANNELS; i++) {
+	for (int i = 0; i < channels; i++) {
 		input->voltages[i] = output->voltages[i];
+	}
+	// Clear all voltages of higher channels
+	for (int i = channels; i < PORT_MAX_CHANNELS; i++) {
+		input->voltages[i] = 0.f;
 	}
 }
 
