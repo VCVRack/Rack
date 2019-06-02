@@ -42,6 +42,7 @@ struct MIDI_Map : Module {
 	MIDI_Map() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int id = 0; id < MAX_CHANNELS; id++) {
+			paramHandles[id].color = nvgRGB(0xff, 0x40, 0xff);
 			APP->engine->addParamHandle(&paramHandles[id]);
 		}
 		onReset();
@@ -117,6 +118,7 @@ struct MIDI_Map : Module {
 			learnedCc = true;
 			commitLearn();
 			updateMapLen();
+			refreshParamHandleText(learningId);
 		}
 		values[cc] = value;
 	}
@@ -127,6 +129,7 @@ struct MIDI_Map : Module {
 		APP->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
 		valueFilters[id].reset();
 		updateMapLen();
+		refreshParamHandleText(id);
 	}
 
 	void clearMaps() {
@@ -135,6 +138,7 @@ struct MIDI_Map : Module {
 			ccs[id] = -1;
 			APP->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
 			valueFilters[id].reset();
+			refreshParamHandleText(id);
 		}
 		mapLen = 0;
 	}
@@ -191,6 +195,15 @@ struct MIDI_Map : Module {
 		updateMapLen();
 	}
 
+	void refreshParamHandleText(int id) {
+		std::string text;
+		if (ccs[id] >= 0)
+			text = string::f("CC%02d", ccs[id]);
+		else
+			text = "MIDI-Map";
+		paramHandles[id].text = text;
+	}
+
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 
@@ -225,6 +238,7 @@ struct MIDI_Map : Module {
 					continue;
 				ccs[mapIndex] = json_integer_value(ccJ);
 				APP->engine->updateParamHandle(&paramHandles[mapIndex], json_integer_value(moduleIdJ), json_integer_value(paramIdJ), false);
+				refreshParamHandleText(mapIndex);
 			}
 		}
 
@@ -313,7 +327,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		// Set text
 		text = "";
 		if (module->ccs[id] >= 0) {
-			text += string::f("CC%d ", module->ccs[id]);
+			text += string::f("CC%02d ", module->ccs[id]);
 		}
 		if (module->paramHandles[id].moduleId >= 0) {
 			text += getParamName();

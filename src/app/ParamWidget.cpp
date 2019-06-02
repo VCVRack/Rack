@@ -128,7 +128,7 @@ void ParamWidget::draw(const DrawArgs &args) {
 	// Param map indicator
 	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
 	if (paramHandle) {
-			NVGcolor color = nvgRGB(0xff, 0x40, 0xff);
+			NVGcolor color = paramHandle->color;
 			nvgBeginPath(args.vg);
 			nvgCircle(args.vg, box.size.x - 3, box.size.y - 3, 3.0);
 			nvgFillColor(args.vg, color);
@@ -214,6 +214,7 @@ void ParamWidget::createContextMenu() {
 	if (paramHandle) {
 		ParamUnmapItem *unmapItem = new ParamUnmapItem;
 		unmapItem->text = "Unmap";
+		unmapItem->rightText = paramHandle->text;
 		unmapItem->paramWidget = this;
 		menu->addChild(unmapItem);
 	}

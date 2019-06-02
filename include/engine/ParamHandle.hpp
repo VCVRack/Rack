@@ -2,6 +2,7 @@
 #include <common.hpp>
 #include <engine/Module.hpp>
 #include <engine/Param.hpp>
+#include <color.hpp>
 
 
 namespace rack {
@@ -16,6 +17,9 @@ struct ParamHandle {
 	int moduleId = -1;
 	int paramId = 0;
 	Module *module = NULL;
+
+	std::string text;
+	NVGcolor color;
 };
 
 
