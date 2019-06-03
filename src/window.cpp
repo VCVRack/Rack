@@ -164,13 +164,11 @@ static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int 
 		return;
 
 	// Keyboard MIDI driver
-	if ((mods & RACK_MOD_MASK) == 0) {
-		if (action == GLFW_PRESS) {
-			keyboard::press(key);
-		}
-		else if (action == GLFW_RELEASE) {
-			keyboard::release(key);
-		}
+	if ((mods & RACK_MOD_MASK) == 0 && action == GLFW_PRESS) {
+		keyboard::press(key);
+	}
+	if (action == GLFW_RELEASE) {
+		keyboard::release(key);
 	}
 }
 
