@@ -18,11 +18,15 @@ struct alignas(32) Port {
 		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */
 		float value;
 	};
-	/** Number of polyphonic channels
-	Unstable API. Use set/getChannels() instead.
-	May be 0 to PORT_MAX_CHANNELS.
-	*/
-	uint8_t channels = 1;
+	union {
+		/** Number of polyphonic channels
+		Unstable API. Use set/getChannels() instead.
+		May be 0 to PORT_MAX_CHANNELS.
+		*/
+		uint8_t channels = 0;
+		/** DEPRECATED. Unstable API. Use isConnected() instead. */
+		uint8_t active;
+	};
 	/** For rendering plug lights on cables.
 	Green for positive, red for negative, and blue for polyphonic.
 	*/
