@@ -10,8 +10,10 @@ namespace app {
 
 std::string APP_NAME = "VCV Rack";
 std::string APP_VERSION = TOSTRING(VERSION);
-std::string APP_NEW_VERSION;
+std::string APP_VERSION_UPDATE;
 std::string API_URL = "https://api.vcvrack.com";
+std::string API_VERSION = "1";
+
 
 static void checkVersion() {
 	std::string versionUrl = app::API_URL + "/version";
@@ -26,7 +28,7 @@ static void checkVersion() {
 
 	json_t *versionJ = json_object_get(versionResJ, "version");
 	if (versionJ)
-		APP_NEW_VERSION = json_string_value(versionJ);
+		APP_VERSION_UPDATE = json_string_value(versionJ);
 }
 
 void init() {

@@ -188,7 +188,7 @@ struct EditButton : MenuButton {
 		menu->addChild(redoItem);
 
 		DisconnectCablesItem *disconnectCablesItem = new DisconnectCablesItem;
-		disconnectCablesItem->text = "Disconnect cables";
+		disconnectCablesItem->text = "Clear cables";
 		menu->addChild(disconnectCablesItem);
 	}
 };
@@ -459,6 +459,7 @@ struct AccountEmailField : ui::TextField {
 
 struct AccountPasswordField : ui::PasswordField {
 	ui::MenuItem *logInItem;
+
 	void onSelectKey(const event::SelectKey &e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			logInItem->doAction();
@@ -489,6 +490,7 @@ struct LogInItem : ui::MenuItem {
 		disabled = isLoggingIn;
 		text = "Log in";
 		rightText = plugin::loginStatus;
+		MenuItem::step();
 	}
 };
 
@@ -498,8 +500,56 @@ struct SyncItem : ui::MenuItem {
 			plugin::syncUpdates();
 		});
 		t.detach();
+		e.consume(NULL);
 	}
 };
+
+struct PluginSyncItem : ui::MenuItem {
+	plugin::Update *update;
+
+	void setUpdate(plugin::Update *update) {
+		this->update = update;
+		text = update->pluginSlug;
+		plugin::Plugin *p = plugin::getPlugin(update->pluginSlug);
+		if (p) {
+			rightText += "v" + p->version + " → ";
+		}
+		rightText += "v" + update->version;
+	}
+
+	ui::Menu *createChildMenu() override {
+		if (update->changelogUrl != "") {
+			ui::Menu *menu = new ui::Menu;
+
+			UrlItem *changelogUrl = new UrlItem;
+			changelogUrl->text = "Changelog";
+			changelogUrl->url = update->changelogUrl;
+			menu->addChild(changelogUrl);
+
+			return menu;
+		}
+		return NULL;
+	}
+
+	void step() override {
+		if (update->progress >= 1) {
+			rightText = CHECKMARK_STRING;
+		}
+		else if (update->progress > 0) {
+			rightText = string::f("%.0f%%", update->progress * 100.f);
+		}
+		MenuItem::step();
+	}
+
+	void onAction(const event::Action &e) override {
+		std::thread t([=]() {
+			plugin::syncUpdate(update);
+		});
+		t.detach();
+		e.consume(NULL);
+	}
+};
+
 
 #if 0
 struct SyncButton : ui::Button {
@@ -544,46 +594,48 @@ struct LogOutItem : ui::MenuItem {
 	}
 };
 
-struct DownloadQuantity : Quantity {
-	float getValue() override {
-		return plugin::downloadProgress;
-	}
-
-	float getDisplayValue() override {
-		return getValue() * 100.f;
-	}
-
-	int getDisplayPrecision() override {return 0;}
-
-	std::string getLabel() override {
-		return "Downloading " + plugin::downloadName;
-	}
-
-	std::string getUnit() override {return "%";}
-};
-
 struct PluginsMenu : ui::Menu {
-	int state = 0;
+	bool loggedIn = false;
 
 	PluginsMenu() {
 		refresh();
 	}
 
 	void step() override {
+		if (!loggedIn && plugin::isLoggedIn())
+			refresh();
 		Menu::step();
 	}
 
 	void refresh() {
 		clearChildren();
 
-		{
-			ui::MenuLabel *disabledLable = new ui::MenuLabel;
-			disabledLable->text = "Server not yet available";
-			addChild(disabledLable);
-			return;
-		}
+		if (!plugin::isLoggedIn()) {
+			UrlItem *registerItem = new UrlItem;
+			registerItem->text = "Register VCV account";
+			registerItem->url = "https://vcvrack.com/";
+			addChild(registerItem);
 
-		if (plugin::isLoggedIn()) {
+			AccountEmailField *emailField = new AccountEmailField;
+			emailField->placeholder = "Email";
+			emailField->box.size.x = 240.0;
+			addChild(emailField);
+
+			AccountPasswordField *passwordField = new AccountPasswordField;
+			passwordField->placeholder = "Password";
+			passwordField->box.size.x = 240.0;
+			emailField->passwordField = passwordField;
+			addChild(passwordField);
+
+			LogInItem *logInItem = new LogInItem;
+			logInItem->emailField = emailField;
+			logInItem->passwordField = passwordField;
+			passwordField->logInItem = logInItem;
+			addChild(logInItem);
+		}
+		else {
+			loggedIn = true;
+
 			UrlItem *manageItem = new UrlItem;
 			manageItem->text = "Manage";
 			manageItem->url = "https://vcvrack.com/plugins.html";
@@ -602,48 +654,19 @@ struct PluginsMenu : ui::Menu {
 				addChild(new ui::MenuEntry);
 
 				ui::MenuLabel *updatesLabel = new ui::MenuLabel;
-				updatesLabel->text = "Updates (click for changelog)";
+				updatesLabel->text = "Updates";
 				addChild(updatesLabel);
 
-				for (const plugin::Update &update : plugin::updates) {
-					UrlItem *updateItem = new UrlItem;
-					updateItem->text = update.pluginSlug;
-					plugin::Plugin *p = plugin::getPlugin(update.pluginSlug);
-					if (p) {
-						updateItem->rightText += "v" + p->version + " → ";
-					}
-					updateItem->rightText += "v" + update.version;
-					updateItem->url = update.changelogUrl;
-					updateItem->disabled = update.changelogUrl.empty();
+				for (plugin::Update &update : plugin::updates) {
+					PluginSyncItem *updateItem = new PluginSyncItem;
+					updateItem->setUpdate(&update);
 					addChild(updateItem);
 				}
 			}
 		}
-		else {
-			UrlItem *registerItem = new UrlItem;
-			registerItem->text = "Register VCV account";
-			registerItem->url = "https://vcvrack.com/";
-			addChild(registerItem);
-
-			AccountEmailField *emailField = new AccountEmailField;
-			emailField->placeholder = "Email";
-			emailField->box.size.x = 220.0;
-			addChild(emailField);
-
-			AccountPasswordField *passwordField = new AccountPasswordField;
-			passwordField->placeholder = "Password";
-			passwordField->box.size.x = 220.0;
-			emailField->passwordField = passwordField;
-			addChild(passwordField);
-
-			LogInItem *logInItem = new LogInItem;
-			logInItem->emailField = emailField;
-			logInItem->passwordField = passwordField;
-			passwordField->logInItem = logInItem;
-			addChild(logInItem);
-		}
 	}
 };
+
 
 struct PluginsButton : MenuButton {
 	NotificationIcon *notification;
@@ -704,7 +727,7 @@ struct HelpButton : MenuButton {
 		if (hasUpdate()) {
 			UrlItem *updateItem = new UrlItem;
 			updateItem->text = "Update " + APP_NAME;
-			updateItem->rightText = APP_VERSION + " → " + APP_NEW_VERSION;
+			updateItem->rightText = APP_VERSION + " → " + APP_VERSION_UPDATE;
 			updateItem->url = "https://vcvrack.com/";
 			menu->addChild(updateItem);
 		}
@@ -721,7 +744,7 @@ struct HelpButton : MenuButton {
 	}
 
 	bool hasUpdate() {
-		return !APP_NEW_VERSION.empty() && APP_NEW_VERSION != APP_VERSION;
+		return !APP_VERSION_UPDATE.empty() && APP_VERSION_UPDATE != APP_VERSION;
 	}
 };
 

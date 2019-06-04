@@ -22,11 +22,11 @@
 #include <jansson.h>
 
 #if defined ARCH_WIN
-	#include <windows.h>
-	#include <direct.h>
-	#define mkdir(_dir, _perms) _mkdir(_dir)
+#include <windows.h>
+#include <direct.h>
+#define mkdir(_dir, _perms) _mkdir(_dir)
 #else
-	#include <dlfcn.h>
+#include <dlfcn.h>
 #endif
 #include <dirent.h>
 #include <osdialog.h>
@@ -40,42 +40,22 @@ namespace plugin {
 // private API
 ////////////////////
 
-static bool loadPlugin(std::string path) {
-	// Load plugin.json
-	std::string metadataFilename = path + "/plugin.json";
-	FILE *file = fopen(metadataFilename.c_str(), "r");
-	if (!file) {
-		WARN("Plugin metadata file %s does not exist", metadataFilename.c_str());
-		return false;
-	}
-	DEFER({
-		fclose(file);
-	});
+typedef void (*InitCallback)(Plugin*);
 
-	json_error_t error;
-	json_t *rootJ = json_loadf(file, 0, &error);
-	if (!rootJ) {
-		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		return false;
-	}
-	DEFER({
-		json_decref(rootJ);
-	});
-
+static InitCallback loadLibrary(Plugin *plugin) {
 	// Load plugin library
 	std::string libraryFilename;
 #if defined ARCH_LIN
-	libraryFilename = path + "/" + "plugin.so";
+	libraryFilename = plugin->path + "/" + "plugin.so";
 #elif defined ARCH_WIN
-	libraryFilename = path + "/" + "plugin.dll";
+	libraryFilename = plugin->path + "/" + "plugin.dll";
 #elif ARCH_MAC
-	libraryFilename = path + "/" + "plugin.dylib";
+	libraryFilename = plugin->path + "/" + "plugin.dylib";
 #endif
 
 	// Check file existence
 	if (!system::isFile(libraryFilename)) {
-		WARN("Plugin file %s does not exist", libraryFilename.c_str());
-		return false;
+		throw UserException(string::f("Library %s does not exist", libraryFilename.c_str()));
 	}
 
 	// Load dynamic/shared library
@@ -85,19 +65,17 @@ static bool loadPlugin(std::string path) {
 	SetErrorMode(0);
 	if (!handle) {
 		int error = GetLastError();
-		WARN("Failed to load library %s: code %d", libraryFilename.c_str(), error);
-		return false;
+		throw UserException(string::f("Failed to load library %s: code %d", libraryFilename.c_str(), error));
 	}
 #else
 	void *handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
 	if (!handle) {
-		WARN("Failed to load library %s: %s", libraryFilename.c_str(), dlerror());
-		return false;
+		throw UserException(string::f("Failed to load library %s: %s", libraryFilename.c_str(), dlerror()));
 	}
 #endif
+	plugin->handle = handle;
 
-	// Call plugin's init() function
-	typedef void (*InitCallback)(Plugin *);
+	// Get plugin's init() function
 	InitCallback initCallback;
 #if defined ARCH_WIN
 	initCallback = (InitCallback) GetProcAddress(handle, "init");
@@ -105,95 +83,103 @@ static bool loadPlugin(std::string path) {
 	initCallback = (InitCallback) dlsym(handle, "init");
 #endif
 	if (!initCallback) {
-		WARN("Failed to read init() symbol in %s", libraryFilename.c_str());
-		return false;
+		throw UserException(string::f("Failed to read init() symbol in %s", libraryFilename.c_str()));
 	}
 
-	// Construct and initialize Plugin instance
-	Plugin *plugin = new Plugin;
-	plugin->path = path;
-	plugin->handle = handle;
-	initCallback(plugin);
-	plugin->fromJson(rootJ);
-
-	// Check slug
-	if (!isSlugValid(plugin->slug)) {
-		WARN("Plugin slug \"%s\" is invalid", plugin->slug.c_str());
-		// TODO Fix memory leak with `plugin`
-		return false;
-	}
-
-	// Reject plugin if slug already exists
-	Plugin *oldPlugin = getPlugin(plugin->slug);
-	if (oldPlugin) {
-		WARN("Plugin \"%s\" is already loaded, not attempting to load it again", plugin->slug.c_str());
-		// TODO Fix memory leak with `plugin`
-		return false;
-	}
-
-	// Add plugin to list
-	plugins.push_back(plugin);
-	INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), libraryFilename.c_str());
-
-	// Normalize tags
-	for (Model *model : plugin->models) {
-		std::vector<std::string> normalizedTags;
-		for (const std::string &tag : model->tags) {
-			std::string normalizedTag = normalizeTag(tag);
-			if (!normalizedTag.empty())
-				normalizedTags.push_back(normalizedTag);
-		}
-		model->tags = normalizedTags;
-	}
-
-	// Search for presets
-	for (Model *model : plugin->models) {
-		std::string presetDir = asset::plugin(plugin, "presets/" + model->slug);
-		for (const std::string &presetPath : system::getEntries(presetDir)) {
-			model->presetPaths.push_back(presetPath);
-		}
-	}
-
-	return true;
+	return initCallback;
 }
 
-static bool syncUpdate(const Update &update) {
-#if defined ARCH_WIN
-	std::string arch = "win";
-#elif ARCH_MAC
-	std::string arch = "mac";
-#elif defined ARCH_LIN
-	std::string arch = "lin";
-#endif
 
-	std::string downloadUrl = app::API_URL + "/download";
-	downloadUrl += "?token=" + network::encodeUrl(settings::token);
-	downloadUrl += "&slug=" + network::encodeUrl(update.pluginSlug);
-	downloadUrl += "&version=" + network::encodeUrl(update.version);
-	downloadUrl += "&arch=" + network::encodeUrl(arch);
+/** If path is blank, loads Core */
+static Plugin *loadPlugin(std::string path) {
+	Plugin *plugin = new Plugin;
+	try {
+		plugin->path = path;
 
-	// downloadName = name;
-	downloadProgress = 0.0;
-	INFO("Downloading plugin %s %s %s", update.pluginSlug.c_str(), update.version.c_str(), arch.c_str());
+		// Load plugin.json
+		std::string metadataFilename;
+		if (path == "")
+			metadataFilename = asset::system("Core.json");
+		else
+			metadataFilename = path + "/plugin.json";
+		FILE *file = fopen(metadataFilename.c_str(), "r");
+		if (!file) {
+			throw UserException(string::f("Metadata file %s does not exist", metadataFilename.c_str()));
+		}
+		DEFER({
+			fclose(file);
+		});
 
-	// Download zip
-	std::string pluginDest = asset::user("plugins/" + update.pluginSlug + ".zip");
-	if (!network::requestDownload(downloadUrl, pluginDest, &downloadProgress)) {
-		WARN("Plugin %s download was unsuccessful", update.pluginSlug.c_str());
-		return false;
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (!rootJ) {
+			throw UserException(string::f("JSON parsing error at %s %d:%d %s", metadataFilename.c_str(), error.line, error.column, error.text));
+		}
+		DEFER({
+			json_decref(rootJ);
+		});
+
+		// Call init callback
+		InitCallback initCallback;
+		if (path == "") {
+			initCallback = ::init;
+		}
+		else {
+			initCallback = loadLibrary(plugin);
+		}
+		initCallback(plugin);
+
+		// Load manifest
+		plugin->fromJson(rootJ);
+
+		// Check slug
+		if (!isSlugValid(plugin->slug)) {
+			throw UserException(string::f("Plugin slug \"%s\" is invalid", plugin->slug.c_str()));
+		}
+
+		// Reject plugin if slug already exists
+		Plugin *oldPlugin = getPlugin(plugin->slug);
+		if (oldPlugin) {
+			throw UserException(string::f("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str()));
+		}
+
+		// Normalize tags
+		for (Model *model : plugin->models) {
+			std::vector<std::string> normalizedTags;
+			for (const std::string &tag : model->tags) {
+				std::string normalizedTag = normalizeTag(tag);
+				if (!normalizedTag.empty())
+					normalizedTags.push_back(normalizedTag);
+			}
+			model->tags = normalizedTags;
+		}
+
+		// Search for presets
+		for (Model *model : plugin->models) {
+			std::string presetDir = asset::plugin(plugin, "presets/" + model->slug);
+			for (const std::string &presetPath : system::getEntries(presetDir)) {
+				model->presetPaths.push_back(presetPath);
+			}
+		}
+
+		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), path.c_str());
+		plugins.push_back(plugin);
+
+		return plugin;
 	}
-
-	// downloadName = "";
-	return true;
+	catch (UserException &e) {
+		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
+		delete plugin;
+		return NULL;
+	}
 }
 
 static void loadPlugins(std::string path) {
-	std::string message;
 	for (std::string pluginPath : system::getEntries(path)) {
 		if (!system::isDirectory(pluginPath))
 			continue;
 		if (!loadPlugin(pluginPath)) {
-			// Ignore bad plugins. They are reported in log.txt.
+			// Ignore bad plugins. They are reported in the log.
 		}
 	}
 }
@@ -233,7 +219,7 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 				continue;
 
 			while (1) {
-				char buffer[1<<15];
+				char buffer[1 << 15];
 				int len = zip_fread(zf, buffer, sizeof(buffer));
 				if (len <= 0)
 					break;
@@ -267,7 +253,7 @@ static int extractZip(const char *filename, const char *path) {
 	return err;
 }
 
-static void extractPackages(const std::string &path) {
+static void extractPackages(std::string path) {
 	std::string message;
 
 	for (std::string packagePath : system::getEntries(path)) {
@@ -296,10 +282,7 @@ static void extractPackages(const std::string &path) {
 
 void init() {
 	// Load Core
-	Plugin *corePlugin = new Plugin;
-	// This function is defined in Core/plugin.cpp
-	::init(corePlugin);
-	plugins.push_back(corePlugin);
+	loadPlugin("");
 
 	// Get user plugins directory
 	std::string pluginsDir = asset::user("plugins");
@@ -309,7 +292,7 @@ void init() {
 	extractPackages(pluginsDir);
 	loadPlugins(pluginsDir);
 
-	// Copy Fundamental package to plugins directory if Fundamental is not loaded
+	// If Fundamental wasn't loaded, copy the bundled Fundamental package and load it
 	std::string fundamentalSrc = asset::system("Fundamental.zip");
 	std::string fundamentalDir = asset::user("plugins/Fundamental");
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
@@ -318,9 +301,8 @@ void init() {
 		loadPlugin(fundamentalDir);
 	}
 
-	// TEMP
 	// Sync in a detached thread
-	std::thread t([]{
+	std::thread t([] {
 		queryUpdates();
 	});
 	t.detach();
@@ -387,9 +369,9 @@ void queryUpdates() {
 	updates.clear();
 
 	// Get user's plugins list
+	std::string pluginsUrl = app::API_URL + "/plugins";
 	json_t *pluginsReqJ = json_object();
 	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
-	std::string pluginsUrl = app::API_URL + "/plugins";
 	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
@@ -406,11 +388,14 @@ void queryUpdates() {
 		return;
 	}
 
-	// Get community manifests
-	std::string manifestsUrl = app::API_URL + "/community/manifests";
-	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, NULL);
+	// Get library manifests
+	std::string manifestsUrl = app::API_URL + "/library/manifests";
+	json_t *manifestsReq = json_object();
+	json_object_set(manifestsReq, "version", json_string(app::API_VERSION.c_str()));
+	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
+	json_decref(manifestsReq);
 	if (!manifestsResJ) {
-		WARN("Request for community manifests failed");
+		WARN("Request for library manifests failed");
 		return;
 	}
 	DEFER({
@@ -434,7 +419,7 @@ void queryUpdates() {
 
 		// Get version
 		// TODO Change this to "version" when API changes
-		json_t *versionJ = json_object_get(manifestJ, "latestVersion");
+		json_t *versionJ = json_object_get(manifestJ, "version");
 		if (!versionJ) {
 			WARN("Plugin %s has no version in manifest", update.pluginSlug.c_str());
 			continue;
@@ -464,15 +449,37 @@ void queryUpdates() {
 	}
 }
 
+void syncUpdate(Update *update) {
+#if defined ARCH_WIN
+	std::string arch = "win";
+#elif ARCH_MAC
+	std::string arch = "mac";
+#elif defined ARCH_LIN
+	std::string arch = "lin";
+#endif
+
+	std::string downloadUrl = app::API_URL + "/download";
+	downloadUrl += "?token=" + network::encodeUrl(settings::token);
+	downloadUrl += "&slug=" + network::encodeUrl(update->pluginSlug);
+	downloadUrl += "&version=" + network::encodeUrl(update->version);
+	downloadUrl += "&arch=" + network::encodeUrl(arch);
+
+	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), arch.c_str());
+
+	// Download zip
+	std::string pluginDest = asset::user("plugins/" + update->pluginSlug + ".zip");
+	if (!network::requestDownload(downloadUrl, pluginDest, &update->progress)) {
+		WARN("Plugin %s download was unsuccessful", update->pluginSlug.c_str());
+		return;
+	}
+}
+
 void syncUpdates() {
 	if (settings::token.empty())
 		return;
 
-	downloadProgress = 0.0;
-	downloadName = "Updating plugins...";
-
-	for (const Update &update : updates) {
-		syncUpdate(update);
+	for (Update &update : updates) {
+		syncUpdate(&update);
 	}
 }
 
@@ -626,8 +633,6 @@ std::vector<Plugin*> plugins;
 
 std::string loginStatus;
 std::vector<Update> updates;
-float downloadProgress = 0.f;
-std::string downloadName;
 
 
 } // namespace plugin

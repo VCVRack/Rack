@@ -14,13 +14,21 @@ namespace rack {
 namespace plugin {
 
 
+struct Update {
+	std::string pluginSlug;
+	std::string version;
+	std::string changelogUrl;
+	float progress = 0.f;
+};
+
+
 void init();
 void destroy();
 void logIn(const std::string &email, const std::string &password);
 void logOut();
 void queryUpdates();
+void syncUpdate(Update *update);
 void syncUpdates();
-void cancelDownload();
 bool isLoggedIn();
 Plugin *getPlugin(const std::string &pluginSlug);
 Model *getModel(const std::string &pluginSlug, const std::string &modelSlug);
@@ -31,20 +39,11 @@ bool isSlugValid(const std::string &slug);
 std::string normalizeSlug(const std::string &slug);
 
 
-struct Update {
-	std::string pluginSlug;
-	std::string version;
-	std::string changelogUrl;
-};
-
-
 extern const std::set<std::string> allowedTags;
 extern std::vector<Plugin*> plugins;
 
 extern std::string loginStatus;
 extern std::vector<Update> updates;
-extern float downloadProgress;
-extern std::string downloadName;
 
 
 } // namespace plugin

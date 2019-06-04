@@ -1,6 +1,7 @@
 #include <plugin/Plugin.hpp>
 #include <plugin/Model.hpp>
 #include <plugin.hpp>
+#include <string.hpp>
 
 
 namespace rack {
@@ -18,8 +19,7 @@ void Plugin::addModel(Model *model) {
 	assert(!model->plugin);
 	// Check model slug
 	if (!isSlugValid(model->slug)) {
-		WARN("Module slug \"%s\" is invalid", model->slug.c_str());
-		return;
+		throw UserException(string::f("Module slug \"%s\" is invalid", model->slug.c_str()));
 	}
 	model->plugin = this;
 	models.push_back(model);
@@ -99,8 +99,7 @@ void Plugin::fromJson(json_t *rootJ) {
 
 			Model *model = getModel(modelSlug);
 			if (!model) {
-				WARN("plugin.json of \"%s\" contains module \"%s\" but it is not defined in the plugin", slug.c_str(), modelSlug.c_str());
-				continue;
+				throw UserException(string::f("plugin.json of \"%s\" contains module \"%s\" but it is not defined in the plugin", slug.c_str(), modelSlug.c_str()));
 			}
 
 			model->fromJson(moduleJ);
