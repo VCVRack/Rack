@@ -100,7 +100,7 @@ ifdef ARCH_LIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp -R LICENSE* res template.vcv dist/Rack/
+	cp -R LICENSE* res Core.json template.vcv dist/Rack/
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
@@ -116,7 +116,7 @@ ifdef ARCH_MAC
 	cp $(TARGET) dist/$(TARGET).app/Contents/MacOS/
 	$(STRIP) -S dist/$(TARGET).app/Contents/MacOS/$(TARGET)
 	mkdir -p dist/$(TARGET).app/Contents/Resources
-	cp -R LICENSE* res template.vcv icon.icns dist/$(TARGET).app/Contents/Resources
+	cp -R LICENSE* res Core.json template.vcv icon.icns dist/$(TARGET).app/Contents/Resources
 
 	# Manually check that no nonstandard shared libraries are linked
 	otool -L dist/$(TARGET).app/Contents/MacOS/$(TARGET)
@@ -134,7 +134,7 @@ ifdef ARCH_WIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp -R LICENSE* res template.vcv dist/Rack/
+	cp -R LICENSE* res Core.json template.vcv dist/Rack/
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
