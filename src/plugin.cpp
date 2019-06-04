@@ -143,6 +143,13 @@ static Plugin *loadPlugin(std::string path) {
 			throw UserException(string::f("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str()));
 		}
 
+		// Check that all modules have names
+		for (Model *model : plugin->models) {
+			if (model->name == "") {
+				throw UserException(string::f("Module %s has no name", model->slug.c_str()));
+			}
+		}
+
 		// Normalize tags
 		for (Model *model : plugin->models) {
 			std::vector<std::string> normalizedTags;

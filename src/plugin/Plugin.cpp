@@ -17,10 +17,6 @@ Plugin::~Plugin() {
 void Plugin::addModel(Model *model) {
 	// Check that the model is not added to a plugin already
 	assert(!model->plugin);
-	// Check model slug
-	if (!isSlugValid(model->slug)) {
-		throw UserException(string::f("Module slug \"%s\" is invalid", model->slug.c_str()));
-	}
 	model->plugin = this;
 	models.push_back(model);
 }
@@ -93,13 +89,19 @@ void Plugin::fromJson(json_t *rootJ) {
 		json_t *moduleJ;
 		json_array_foreach(modulesJ, moduleId, moduleJ) {
 			json_t *modelSlugJ = json_object_get(moduleJ, "slug");
-			if (!modelSlugJ)
-				continue;
+			if (!modelSlugJ) {
+				throw UserException(string::f("No slug found for module entry %d", moduleId));
+			}
 			std::string modelSlug = json_string_value(modelSlugJ);
+
+			// Check model slug
+			if (!isSlugValid(modelSlug)) {
+				throw UserException(string::f("Module slug \"%s\" is invalid", modelSlug.c_str()));
+			}
 
 			Model *model = getModel(modelSlug);
 			if (!model) {
-				throw UserException(string::f("plugin.json of \"%s\" contains module \"%s\" but it is not defined in the plugin", slug.c_str(), modelSlug.c_str()));
+				throw UserException(string::f("Manifest contains module %s but it is not defined in the plugin", modelSlug.c_str()));
 			}
 
 			model->fromJson(moduleJ);
