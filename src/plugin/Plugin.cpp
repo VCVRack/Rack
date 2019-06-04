@@ -88,6 +88,14 @@ void Plugin::fromJson(json_t *rootJ) {
 		size_t moduleId;
 		json_t *moduleJ;
 		json_array_foreach(modulesJ, moduleId, moduleJ) {
+			// Check if module is disabled
+			json_t *disabledJ = json_object_get(moduleJ, "disabled");
+			if (disabledJ) {
+				if (json_boolean_value(disabledJ))
+					continue;
+			}
+
+			// Get model slug
 			json_t *modelSlugJ = json_object_get(moduleJ, "slug");
 			if (!modelSlugJ) {
 				throw UserException(string::f("No slug found for module entry %d", moduleId));
@@ -99,6 +107,7 @@ void Plugin::fromJson(json_t *rootJ) {
 				throw UserException(string::f("Module slug \"%s\" is invalid", modelSlug.c_str()));
 			}
 
+			// Get model
 			Model *model = getModel(modelSlug);
 			if (!model) {
 				throw UserException(string::f("Manifest contains module %s but it is not defined in the plugin", modelSlug.c_str()));
