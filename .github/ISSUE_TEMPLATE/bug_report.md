@@ -6,7 +6,8 @@ about: Bugs, build errors, compatibility/stability issues
 
 <--
 To file a bug report, fill out the form below.
-Post screenshots if the bug is graphical.
+Post screenshots if the bug is visual.
+Use a descriptive title that best explains the bug in one sentence.
 -->
 
 ### Details
