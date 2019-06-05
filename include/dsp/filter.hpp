@@ -25,11 +25,16 @@ struct TRCFilter {
 		ystate[0] = 0.f;
 	}
 
-	/** Sets the cutoff frequency.
-	`r` is the ratio between the cutoff frequency and sample rate, i.e. r = f_c / f_s
+	/** Sets the cutoff angular frequency in radians.
 	*/
 	void setCutoff(T r) {
 		c = 2.f / r;
+	}
+	/** Sets the cutoff frequency.
+	`f` is the ratio between the cutoff frequency and sample rate, i.e. f = f_c / f_s
+	*/
+	void setCutoffFreq(T f) {
+		setCutoff(2.f * M_PI * f);
 	}
 	void process(T x) {
 		T y = (x + xstate[0] - ystate[0] * (1 - c)) / (1 + c);
