@@ -132,44 +132,10 @@ static Plugin *loadPlugin(std::string path) {
 		// Load manifest
 		plugin->fromJson(rootJ);
 
-		// Check slug
-		if (!isSlugValid(plugin->slug)) {
-			throw UserException(string::f("Plugin slug \"%s\" is invalid", plugin->slug.c_str()));
-		}
-
 		// Reject plugin if slug already exists
 		Plugin *oldPlugin = getPlugin(plugin->slug);
 		if (oldPlugin) {
 			throw UserException(string::f("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str()));
-		}
-
-		// Remove models without names
-		for (auto it = plugin->models.begin(); it != plugin->models.end();) {
-			Model *model = *it;
-			if (model->name == "") {
-				it = plugin->models.erase(it);
-				continue;
-			}
-			it++;
-		}
-
-		// Normalize tags
-		for (Model *model : plugin->models) {
-			std::vector<std::string> normalizedTags;
-			for (const std::string &tag : model->tags) {
-				std::string normalizedTag = normalizeTag(tag);
-				if (!normalizedTag.empty())
-					normalizedTags.push_back(normalizedTag);
-			}
-			model->tags = normalizedTags;
-		}
-
-		// Search for presets
-		for (Model *model : plugin->models) {
-			std::string presetDir = asset::plugin(plugin, "presets/" + model->slug);
-			for (const std::string &presetPath : system::getEntries(presetDir)) {
-				model->presetPaths.push_back(presetPath);
-			}
 		}
 
 		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), path.c_str());

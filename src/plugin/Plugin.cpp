@@ -32,18 +32,30 @@ Model *Plugin::getModel(std::string slug) {
 }
 
 void Plugin::fromJson(json_t *rootJ) {
+	// Slug
 	json_t *slugJ = json_object_get(rootJ, "slug");
 	if (slugJ)
 		slug = json_string_value(slugJ);
+	if (slug == "")
+		throw UserException("No plugin slug");
+	if (!isSlugValid(slug))
+		throw UserException(string::f("Plugin slug \"%s\" is invalid", slug.c_str()));
 
+	// Version
 	json_t *versionJ = json_object_get(rootJ, "version");
 	if (versionJ)
 		version = json_string_value(versionJ);
+	if (version == "")
+		throw UserException("No plugin version");
 
+	// Name
 	json_t *nameJ = json_object_get(rootJ, "name");
 	if (nameJ)
 		name = json_string_value(nameJ);
+	if (name == "")
+		throw UserException("No plugin name");
 
+	// Brand
 	json_t *brandJ = json_object_get(rootJ, "brand");
 	if (brandJ)
 		brand = json_string_value(brandJ);
@@ -115,6 +127,18 @@ void Plugin::fromJson(json_t *rootJ) {
 
 			model->fromJson(moduleJ);
 		}
+	}
+
+	// Remove models without names
+	// This is a hacky way of matching JSON models with C++ models.
+	for (auto it = models.begin(); it != models.end();) {
+		Model *model = *it;
+		if (model->name == "") {
+			it = models.erase(it);
+			delete model;
+			continue;
+		}
+		it++;
 	}
 }
 

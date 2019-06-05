@@ -65,7 +65,7 @@ endif
 ifdef ARCH_MAC
 	rsync -rR $(DISTRIBUTABLES) dist/$(SLUG)/
 else
-	cp -R --parents $(DISTRIBUTABLES) dist/$(SLUG)/
+	cp -r --parents $(DISTRIBUTABLES) dist/$(SLUG)/
 endif
 	@# Create ZIP package
 	cd dist && zip -q -9 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
