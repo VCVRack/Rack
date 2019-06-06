@@ -29,6 +29,7 @@ struct Engine {
 	Call this in your Module::step() method to hint that the operation will take more than ~0.1 ms.
 	*/
 	void yieldWorkers();
+	uint64_t getFrame();
 
 	// Modules
 	/** Adds a module to the rack engine.

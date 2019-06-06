@@ -178,6 +178,7 @@ struct Engine::Internal {
 	bool running = false;
 	float sampleRate;
 	float sampleTime;
+	uint64_t frame = 0;
 
 	int nextModuleId = 0;
 	int nextCableId = 0;
@@ -333,6 +334,8 @@ static void Engine_step(Engine *that) {
 	internal->engineBarrier.wait();
 	Engine_stepModules(that, 0);
 	internal->workerBarrier.wait();
+
+	internal->frame++;
 }
 
 static void Engine_updateExpander(Engine *that, Module::Expander *expander) {
@@ -388,6 +391,7 @@ static void Engine_run(Engine *that) {
 	// system::setThreadRealTime();
 	disableDenormals();
 
+	internal->frame = 0;
 	// Every time the that waits and locks a mutex, it steps this many frames
 	const int mutexSteps = 128;
 	// Time in seconds that the that is rushing ahead of the estimated clock time
@@ -484,6 +488,10 @@ float Engine::getSampleTime() {
 
 void Engine::yieldWorkers() {
 	internal->workerBarrier.yield = true;
+}
+
+uint64_t Engine::getFrame() {
+	return internal->frame;
 }
 
 void Engine::addModule(Module *module) {
