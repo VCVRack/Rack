@@ -82,8 +82,7 @@ Slow. Not recommended for parameter scaling.
 */
 template <typename T>
 T exponentialBipolar(T b, T x) {
-	T a = b - 1.f / b;
-	return (std::pow(b, x) - std::pow(b, -x)) / a;
+	return (simd::pow(b, x) - simd::pow(b, -x)) / (b - 1.f / b);
 }
 
 

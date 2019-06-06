@@ -84,6 +84,7 @@
 #include <dsp/fft.hpp>
 #include <dsp/filter.hpp>
 #include <dsp/fir.hpp>
+#include <dsp/midi.hpp>
 #include <dsp/minblep.hpp>
 #include <dsp/ode.hpp>
 #include <dsp/resampler.hpp>

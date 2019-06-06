@@ -1,207 +1,14 @@
 #include "plugin.hpp"
 
 
-template <int C>
-struct PolyphonicMidiOutput : midi::Output {
-	int vels[C];
-	int lastNotes[C];
-	int notes[C];
-	bool lastGates[C];
-	bool gates[C];
-	int lastAfts[C];
-	int lastPw;
-	int lastMw;
-	bool lastClk;
-	int lastVol;
-	int lastPan;
-	bool lastStart;
-	bool lastStop;
-	bool lastCont;
-
-	PolyphonicMidiOutput() {
-		reset();
+struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
+	void onMessage(midi::Message message) override {
+		midi::Output::sendMessage(message);
 	}
 
 	void reset() {
-		for (int c = 0; c < C; c++) {
-			vels[c] = 100;
-			lastNotes[c] = notes[c] = 60;
-			lastGates[c] = gates[c] = false;
-			lastAfts[c] = -1;
-		}
-		lastPw = 0x2000;
-		lastMw = 0;
-		lastClk = false;
-		lastVol = 127;
-		lastPan = 64;
-		lastStart = false;
-		lastStop = false;
-		lastCont = false;
-	}
-
-	void panic() {
-		reset();
-		// Send all note off commands
-		for (int note = 0; note <= 127; note++) {
-			// Note off
-			midi::Message m;
-			m.setStatus(0x8);
-			m.setNote(note);
-			m.setValue(0);
-			sendMessage(m);
-		}
-	}
-
-	void setVelocity(int vel, int c) {
-		vels[c] = vel;
-	}
-
-	void setNote(int note, int c) {
-		notes[c] = note;
-	}
-
-	void setGate(bool gate, int c) {
-		gates[c] = gate;
-	}
-
-	void stepChannel(int c) {
-		bool changedNote = gates[c] && lastGates[c] && notes[c] != lastNotes[c];
-		bool enabledGate = gates[c] && !lastGates[c];
-		bool disabledGate = !gates[c] && lastGates[c];
-		if (changedNote || enabledGate) {
-			// Note on
-			midi::Message m;
-			m.setStatus(0x9);
-			m.setNote(notes[c]);
-			m.setValue(vels[c]);
-			sendMessage(m);
-		}
-		if (changedNote || disabledGate) {
-			// Note off
-			midi::Message m;
-			m.setStatus(0x8);
-			m.setNote(lastNotes[c]);
-			m.setValue(vels[c]);
-			sendMessage(m);
-		}
-		lastNotes[c] = notes[c];
-		lastGates[c] = gates[c];
-	}
-
-	void setAftertouch(int aft, int c) {
-		if (lastAfts[c] == aft)
-			return;
-		lastAfts[c] = aft;
-		// Polyphonic key pressure
-		midi::Message m;
-		m.setStatus(0xa);
-		m.setNote(notes[c]);
-		m.setValue(aft);
-		sendMessage(m);
-	}
-
-	void setPitchWheel(int pw) {
-		if (lastPw == pw)
-			return;
-		lastPw = pw;
-		// Pitch wheel
-		midi::Message m;
-		m.setStatus(0xe);
-		m.setNote(pw & 0x7f);
-		m.setValue((pw >> 7) & 0x7f);
-		sendMessage(m);
-	}
-
-	void setModWheel(int mw) {
-		if (lastMw == mw)
-			return;
-		lastMw = mw;
-		// CC Mod wheel
-		midi::Message m;
-		m.setStatus(0xb);
-		m.setNote(0x01);
-		m.setValue(mw);
-		sendMessage(m);
-	}
-
-	void setClock(bool clk) {
-		if (lastClk == clk)
-			return;
-		lastClk = clk;
-		if (clk) {
-			// Timing clock
-			midi::Message m;
-			m.size = 1;
-			m.setStatus(0xf);
-			m.setChannel(0x8);
-			sendMessage(m);
-		}
-	}
-
-	void setVolume(int vol) {
-		if (lastVol == vol)
-			return;
-		lastVol = vol;
-		// CC Volume
-		midi::Message m;
-		m.setStatus(0xb);
-		m.setNote(0x07);
-		m.setValue(vol);
-		sendMessage(m);
-	}
-
-	void setPan(int pan) {
-		if (lastPan == pan)
-			return;
-		lastPan = pan;
-		// CC Pan
-		midi::Message m;
-		m.setStatus(0xb);
-		m.setNote(0x0a);
-		m.setValue(pan);
-		sendMessage(m);
-	}
-
-	void setStart(bool start) {
-		if (lastStart == start)
-			return;
-		lastStart = start;
-		if (start) {
-			// Start
-			midi::Message m;
-			m.size = 1;
-			m.setStatus(0xf);
-			m.setChannel(0xa);
-			sendMessage(m);
-		}
-	}
-
-	void setContinue(bool cont) {
-		if (lastCont == cont)
-			return;
-		lastCont = cont;
-		if (cont) {
-			// Continue
-			midi::Message m;
-			m.size = 1;
-			m.setStatus(0xf);
-			m.setChannel(0xb);
-			sendMessage(m);
-		}
-	}
-
-	void setStop(bool stop) {
-		if (lastStop == stop)
-			return;
-		lastStop = stop;
-		if (stop) {
-			// Stop
-			midi::Message m;
-			m.size = 1;
-			m.setStatus(0xf);
-			m.setChannel(0xc);
-			sendMessage(m);
-		}
+		Output::reset();
+		MidiGenerator::reset();
 	}
 };
 
@@ -232,7 +39,7 @@ struct CV_MIDI : Module {
 		NUM_LIGHTS
 	};
 
-	PolyphonicMidiOutput<PORT_MAX_CHANNELS> midiOutput;
+	MidiOutput midiOutput;
 	float rateLimiterPhase = 0.f;
 
 	CV_MIDI() {
@@ -242,7 +49,6 @@ struct CV_MIDI : Module {
 
 	void onReset() override {
 		midiOutput.reset();
-		midiOutput.midi::Output::reset();
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -262,16 +68,12 @@ struct CV_MIDI : Module {
 
 			int note = (int) std::round(inputs[PITCH_INPUT].getVoltage(c) * 12.f + 60.f);
 			note = clamp(note, 0, 127);
-			midiOutput.setNote(note, c);
-
 			bool gate = inputs[GATE_INPUT].getPolyVoltage(c) >= 1.f;
-			midiOutput.setGate(gate, c);
-
-			midiOutput.stepChannel(c);
+			midiOutput.setNoteGate(note, gate, c);
 
 			int aft = (int) std::round(inputs[AFT_INPUT].getPolyVoltage(c) / 10.f * 127);
 			aft = clamp(aft, 0, 127);
-			midiOutput.setAftertouch(aft, c);
+			midiOutput.setKeyPressure(aft, c);
 		}
 
 		int pw = (int) std::round((inputs[PW_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);

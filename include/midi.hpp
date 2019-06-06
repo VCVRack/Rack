@@ -18,6 +18,10 @@ struct Message {
 	uint8_t size = 3;
 	uint8_t bytes[3] = {};
 
+	void setSize(uint8_t size) {
+		assert(size <= 3);
+		this->size = size;
+	}
 	uint8_t getChannel() {
 		return bytes[0] & 0xf;
 	}
@@ -25,19 +29,19 @@ struct Message {
 		bytes[0] = (bytes[0] & 0xf0) | (channel & 0xf);
 	}
 	uint8_t getStatus() {
-		return (bytes[0] >> 4) & 0xf;
+		return bytes[0] >> 4;
 	}
 	void setStatus(uint8_t status) {
-		bytes[0] = (bytes[0] & 0xf) | ((status << 4) & 0xf0);
+		bytes[0] = (bytes[0] & 0xf) | (status << 4);
 	}
 	uint8_t getNote() {
-		return bytes[1] & 0x7f;
+		return bytes[1];
 	}
 	void setNote(uint8_t note) {
 		bytes[1] = note & 0x7f;
 	}
 	uint8_t getValue() {
-		return bytes[2] & 0x7f;
+		return bytes[2];
 	}
 	void setValue(uint8_t value) {
 		bytes[2] = value & 0x7f;
