@@ -16,7 +16,7 @@ struct MidiGenerator {
 	int8_t notes[CHANNELS];
 	bool gates[CHANNELS];
 	int8_t keyPressures[CHANNELS];
-	int8_t channelPressures[CHANNELS];
+	int8_t channelPressure;
 	int8_t ccs[128];
 	int16_t pw;
 	bool clk;
@@ -34,8 +34,8 @@ struct MidiGenerator {
 			notes[c] = 60;
 			gates[c] = false;
 			keyPressures[c] = -1;
-			channelPressures[c] = -1;
 		}
+		channelPressure = -1;
 		for (int i = 0; i < 128; i++) {
 			ccs[i] = -1;
 		}
@@ -100,10 +100,10 @@ struct MidiGenerator {
 		onMessage(m);
 	}
 
-	void setChannelPressure(int8_t val, int c) {
-		if (channelPressures[c] == val)
+	void setChannelPressure(int8_t val) {
+		if (channelPressure == val)
 			return;
-		channelPressures[c] = val;
+		channelPressure = val;
 		// Channel pressure
 		midi::Message m;
 		m.setSize(2);
@@ -124,16 +124,24 @@ struct MidiGenerator {
 		onMessage(m);
 	}
 
-	void setModWheel(int8_t mw) {
-		setCc(mw, 0x01);
+	void setModWheel(int8_t cc) {
+		setCc(cc, 0x01);
 	}
 
-	void setVolume(int8_t mw) {
-		setCc(mw, 0x07);
+	void setVolume(int8_t cc) {
+		setCc(cc, 0x07);
 	}
 
-	void setPan(int8_t mw) {
-		setCc(mw, 0x0a);
+	void setBalance(int8_t cc) {
+		setCc(cc, 0x08);
+	}
+
+	void setPan(int8_t cc) {
+		setCc(cc, 0x0a);
+	}
+
+	void setSustainPedal(int8_t cc) {
+		setCc(cc, 0x40);
 	}
 
 	void setPitchWheel(int16_t pw) {
