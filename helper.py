@@ -160,6 +160,7 @@ def create_manifest(slug, plugin_dir="."):
 	manifest['name'] = input_default("Plugin name", manifest.get('name', slug))
 	manifest['version'] = input_default("Version", manifest.get('version', "1.0.0"))
 	manifest['license'] = input_default("License (if open-source, use license identifier from https://spdx.org/licenses/)", manifest.get('license', "proprietary"))
+	manifest['brand'] = input_default("Brand (prefix for all module names)", manifest.get('brand', manifest['name']))
 	manifest['author'] = input_default("Author", manifest.get('author', ""))
 	manifest['authorEmail'] = input_default("Author email (optional)", manifest.get('authorEmail', ""))
 	manifest['authorUrl'] = input_default("Author website URL (optional)", manifest.get('authorUrl', ""))
