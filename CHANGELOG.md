@@ -46,7 +46,7 @@
 	- Add `dsp::VuMeter2`.
 	- Add `dsp::Timer` and `dsp::Counter`.
 	- Overhaul event system with many new events.
-	- etc. See more at https://vcvrack.com/manual/Migrate1.html..
+	- etc. See more at https://vcvrack.com/manual/Migrate1.html.
 
 - Licenses
 	- Relicense Rack to GPLv3 with the VCV Rack Non-Commercial Plugin License Exception and a commercial licensing option.

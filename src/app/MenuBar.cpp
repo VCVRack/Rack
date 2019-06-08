@@ -637,7 +637,7 @@ struct PluginsMenu : ui::Menu {
 			loggedIn = true;
 
 			UrlItem *manageItem = new UrlItem;
-			manageItem->text = "VCV Store";
+			manageItem->text = "VCV Plugin Manager";
 			manageItem->url = "https://vcvrack.com/plugins.html";
 			addChild(manageItem);
 
