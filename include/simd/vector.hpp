@@ -77,6 +77,11 @@ struct Vector<float, 4> {
 	void store(float *x) {
 		_mm_storeu_ps(x, v);
 	}
+
+	// Conversions
+	Vector(Vector<int32_t, 4> a);
+	// Casts
+	static Vector cast(Vector<int32_t, 4> a);
 };
 
 
@@ -111,7 +116,29 @@ struct Vector<int32_t, 4> {
 		// Use _mm_storeu_si128() because GCC doesn't support _mm_storeu_si32()
 		_mm_storeu_si128((__m128i*) x, v);
 	}
+	Vector(Vector<float, 4> a);
+	static Vector cast(Vector<float, 4> a);
 };
+
+
+// Conversions and casts
+
+
+inline Vector<float, 4>::Vector(Vector<int32_t, 4> a) {
+	v = _mm_cvtepi32_ps(a.v);
+}
+
+inline Vector<int32_t, 4>::Vector(Vector<float, 4> a) {
+	v = _mm_cvtps_epi32(a.v);
+}
+
+inline Vector<float, 4> Vector<float, 4>::cast(Vector<int32_t, 4> a) {
+	return Vector(_mm_castsi128_ps(a.v));
+}
+
+inline Vector<int32_t, 4> Vector<int32_t, 4>::cast(Vector<float, 4> a) {
+	return Vector(_mm_castps_si128(a.v));
+}
 
 
 // Instructions not available as operators
