@@ -84,6 +84,11 @@ struct Vector<float, 4> {
 
 	/** Reads an array of 4 values. */
 	static Vector load(const float *x) {
+		/*
+		My benchmarks show that _mm_loadu_ps() performs equally as fast as _mm_load_ps() when data is actually aligned.
+		This post seems to agree. https://stackoverflow.com/a/20265193/272642
+		So use _mm_loadu_ps() for generality, so you can load unaligned arrays using the same function (although it will be slower).
+		*/
 		return Vector(_mm_loadu_ps(x));
 	}
 
