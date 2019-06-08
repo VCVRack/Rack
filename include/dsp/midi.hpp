@@ -116,7 +116,7 @@ struct MidiGenerator {
 		if (ccs[id] == cc)
 			return;
 		ccs[id] = cc;
-		// Control change
+		// Continuous controller
 		midi::Message m;
 		m.setStatus(0xb);
 		m.setNote(id);

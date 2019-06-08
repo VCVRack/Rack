@@ -61,6 +61,25 @@ struct SchmittTrigger {
 };
 
 
+template <typename T>
+struct TSchmittTrigger {
+	T state;
+	TSchmittTrigger() {
+		reset();
+	}
+	void reset() {
+		state = T::mask();
+	}
+	T process(T in) {
+		T on = (in >= 1.f);
+		T off = (in <= 0.f);
+		T triggered = ~state & on;
+		state = on | (state & ~off);
+		return triggered;
+	}
+};
+
+
 /** When triggered, holds a high value for a specified time before going low again */
 struct PulseGenerator {
 	float remaining = 0.f;

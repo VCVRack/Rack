@@ -1,9 +1,9 @@
 
 ### 1.0.0 (in development)
 
-- Add undo/redo history
 - Add polyphonic cables
 - Add multithreading to engine
+- Add undo/redo history
 - Add module expander support
 - Add parameter labels, units, and descriptions
 - Add parameter tooltips for quickly viewing parameter values
@@ -33,22 +33,23 @@
 - Add `-p X` flag for dumping a screenshot of each available module
 
 - Core
-	- Add Core CV-MIDI, CV-CC, and CV-Gate for sending MIDI to external devices
-	- Add Core MIDI-Map for mapping MIDI CC parameters directly to Rack parameters
-	- Add polyphony to Core MIDI-CV
-	- Add MPE mode to Core MIDI-CV
+	- Add Audio-16 with 16/16 inputs/outputs
+	- Add CV-MIDI, CV-CC, and CV-Gate for sending MIDI to external devices
+	- Add MIDI-Map for mapping MIDI CC parameters directly to Rack parameters
+	- Add polyphony to MIDI-CV
+	- Add MPE mode to MIDI-CV
 	- Add "Panic" button to all MIDI modules to reset performance state
-	- Add Core Audio 16
 
-- API
+- Plugin API
+	- Add [`helper.py`](helper.py) for creating and manipulating plugins with the command-line
 	- Add [`simd.hpp`](include/dsp/simd.hpp) for generically handling arithmetic and math functions for vectors of floats, accelerated with SSE
 	- Add `dsp::VuMeter2`
 	- Add `dsp::Timer` and `dsp::Counter`
 	- Overhaul event system with many new events
-	- **TODO** Make audio driver use the same RtAudio device for multiple audio ports
-	- etc
+	- etc. See more at https://vcvrack.com/manual/Migrate1.html.
 
 - Licenses
+	- Relicense Rack to GPLv3 with the VCV Rack Non-Commercial Plugin License Exception and a commercial licensing option.
 	- Collect all license statements into new [LICENSE.md](LICENSE.md) file
 	- License Core panel graphics under CC BY-NC-ND 4.0
 

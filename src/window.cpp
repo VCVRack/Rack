@@ -340,12 +340,12 @@ void Window::run() {
 		}
 
 		// Get desired scaling
-		float pixelRatio;
-		glfwGetWindowContentScale(win, &pixelRatio, NULL);
-		pixelRatio = std::floor(pixelRatio + 0.5);
-		if (pixelRatio != this->pixelRatio) {
+		float newPixelRatio;
+		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
+		newPixelRatio = std::floor(newPixelRatio + 0.5);
+		if (newPixelRatio != pixelRatio) {
 			APP->event->handleZoom();
-			this->pixelRatio = pixelRatio;
+			pixelRatio = newPixelRatio;
 		}
 
 		// Get framebuffer/window ratio
