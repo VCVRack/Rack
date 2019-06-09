@@ -149,15 +149,6 @@ inline Vector<float, 4> andnot(const Vector<float, 4> &a, const Vector<float, 4>
 	return Vector<float, 4>(_mm_andnot_ps(a.v, b.v));
 }
 
-/** Shifts the entire vector (not the elements) to the left by `n` bytes (not bits) */
-inline Vector<int32_t, 4> leftByteShift(const Vector<int32_t, 4> &a, int n) {
-	return Vector<int32_t, 4>(_mm_slli_si128(a.v, n));
-}
-
-inline Vector<int32_t, 4> rightByteShift(const Vector<int32_t, 4> &a, int n) {
-	return Vector<int32_t, 4>(_mm_srli_si128(a.v, n));
-}
-
 
 // Operator overloads
 
