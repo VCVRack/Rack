@@ -564,10 +564,10 @@ struct LogOutItem : ui::MenuItem {
 	}
 };
 
-struct PluginsMenu : ui::Menu {
+struct LibraryMenu : ui::Menu {
 	bool loggedIn = false;
 
-	PluginsMenu() {
+	LibraryMenu() {
 		refresh();
 	}
 
@@ -642,16 +642,16 @@ struct PluginsMenu : ui::Menu {
 };
 
 
-struct PluginsButton : MenuButton {
+struct LibraryButton : MenuButton {
 	NotificationIcon *notification;
 
-	PluginsButton() {
+	LibraryButton() {
 		notification = new NotificationIcon;
 		addChild(notification);
 	}
 
 	void onAction(const event::Action &e) override {
-		ui::Menu *menu = createMenu<PluginsMenu>();
+		ui::Menu *menu = createMenu<LibraryMenu>();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 	}
@@ -770,9 +770,9 @@ MenuBar *createMenuBar() {
 	engineButton->text = "Engine";
 	layout->addChild(engineButton);
 
-	PluginsButton *pluginsButton = new PluginsButton;
-	pluginsButton->text = "Plugins";
-	layout->addChild(pluginsButton);
+	LibraryButton *libraryButton = new LibraryButton;
+	libraryButton->text = "Library";
+	layout->addChild(libraryButton);
 
 	HelpButton *helpButton = new HelpButton;
 	helpButton->text = "Help";
