@@ -278,10 +278,12 @@ void init() {
 	}
 
 	// Sync in a detached thread
-	std::thread t([] {
-		queryUpdates();
-	});
-	t.detach();
+	if (!settings::devMode) {
+		std::thread t([] {
+			queryUpdates();
+		});
+		t.detach();
+	}
 }
 
 void destroy() {
