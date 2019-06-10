@@ -36,6 +36,7 @@ extern bool cpuMeter;
 extern bool lockModules;
 extern float frameRateLimit;
 extern bool frameRateSync;
+extern float autosavePeriod;
 extern bool skipLoadOnLaunch;
 extern std::string patchPath;
 // (plugin, model) -> score

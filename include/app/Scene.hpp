@@ -17,7 +17,7 @@ struct Scene : widget::OpaqueWidget {
 	MenuBar *menuBar;
 	widget::Widget *moduleBrowser;
 
-	double lastAutoSaveTime = 0.0;
+	double lastAutosaveTime = 0.0;
 
 	// Version checking
 	bool checkVersion = true;

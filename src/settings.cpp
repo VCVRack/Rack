@@ -31,6 +31,7 @@ bool cpuMeter = false;
 bool lockModules = false;
 float frameRateLimit = 70.0;
 bool frameRateSync = true;
+float autosavePeriod = 15.0;
 bool skipLoadOnLaunch = false;
 std::string patchPath;
 std::map<std::tuple<std::string, std::string>, float> favoriteScores;
@@ -78,6 +79,8 @@ json_t *toJson() {
 	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
 
 	json_object_set_new(rootJ, "frameRateSync", json_boolean(frameRateSync));
+
+	json_object_set_new(rootJ, "autosavePeriod", json_real(autosavePeriod));
 
 	if (skipLoadOnLaunch) {
 		json_object_set_new(rootJ, "skipLoadOnLaunch", json_true());
@@ -178,6 +181,10 @@ void fromJson(json_t *rootJ) {
 	json_t *frameRateSyncJ = json_object_get(rootJ, "frameRateSync");
 	if (frameRateSyncJ)
 		frameRateSync = json_boolean_value(frameRateSyncJ);
+
+	json_t *autosavePeriodJ = json_object_get(rootJ, "autosavePeriod");
+	if (autosavePeriodJ)
+		autosavePeriod = json_number_value(autosavePeriodJ);
 
 	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
 	if (skipLoadOnLaunchJ)

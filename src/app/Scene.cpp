@@ -39,11 +39,13 @@ void Scene::step() {
 	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
 
 	// Autosave every 15 seconds
-	double time = glfwGetTime();
-	if (time - lastAutoSaveTime >= 15.0) {
-		lastAutoSaveTime = time;
-		APP->patch->save(asset::user("autosave.vcv"));
-		settings::save(asset::user("settings.json"));
+	if (settings::autosavePeriod > 0.0) {
+		double time = glfwGetTime();
+		if (time - lastAutosaveTime >= settings::autosavePeriod) {
+			lastAutosaveTime = time;
+			APP->patch->save(asset::user("autosave.vcv"));
+			settings::save(asset::user("settings.json"));
+		}
 	}
 
 	Widget::step();
