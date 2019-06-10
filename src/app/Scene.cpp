@@ -43,8 +43,8 @@ void Scene::step() {
 		double time = glfwGetTime();
 		if (time - lastAutosaveTime >= settings::autosavePeriod) {
 			lastAutosaveTime = time;
-			APP->patch->save(asset::user("autosave.vcv"));
-			settings::save(asset::user("settings.json"));
+			APP->patch->save(asset::autosavePath);
+			settings::save(asset::settingsPath);
 		}
 	}
 

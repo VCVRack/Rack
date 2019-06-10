@@ -13,6 +13,7 @@ std::string APP_VERSION = TOSTRING(VERSION);
 std::string APP_VERSION_UPDATE;
 std::string API_URL = "https://api.vcvrack.com";
 std::string API_VERSION = "1";
+std::string ABI_VERSION = "1";
 
 
 static void checkVersion() {

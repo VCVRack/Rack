@@ -2,6 +2,7 @@
 #include <asset.hpp>
 #include <system.hpp>
 #include <app.hpp>
+#include <app/common.hpp>
 #include <app/Scene.hpp>
 #include <app/RackWidget.hpp>
 #include <history.hpp>
@@ -35,7 +36,7 @@ void PatchManager::init(std::string path) {
 	// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
 	bool oldSkipLoadOnLaunch = settings::skipLoadOnLaunch;
 	settings::skipLoadOnLaunch = true;
-	settings::save(asset::user("settings.json"));
+	settings::save(asset::settingsPath);
 	settings::skipLoadOnLaunch = false;
 	if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
 		this->path = "";
@@ -43,7 +44,7 @@ void PatchManager::init(std::string path) {
 	}
 
 	// Load autosave
-	if (load(asset::user("autosave.vcv"))) {
+	if (load(asset::autosavePath)) {
 		return;
 	}
 
@@ -56,7 +57,7 @@ void PatchManager::reset() {
 	APP->scene->rackScroll->reset();
 
 	path = "";
-	if (load(asset::user("template.vcv"))) {
+	if (load(asset::templatePath)) {
 		return;
 	}
 
@@ -145,7 +146,7 @@ void PatchManager::saveTemplateDialog() {
 	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?"))
 		return;
 
-	save(asset::user("template.vcv"));
+	save(asset::templatePath);
 }
 
 bool PatchManager::load(std::string path) {

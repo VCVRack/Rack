@@ -3,6 +3,7 @@
 #include <settings.hpp>
 #include <string.hpp>
 #include <plugin/Plugin.hpp>
+#include <app/common.hpp>
 
 #if defined ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
@@ -102,6 +103,20 @@ void init() {
 
 	system::createDirectory(systemDir);
 	system::createDirectory(userDir);
+
+	// Set paths
+	if (settings::devMode) {
+		pluginsPath = userDir + "/plugins";
+		settingsPath = userDir + "/settings.json";
+		autosavePath = userDir + "/autosave.vcv";
+		templatePath = userDir + "/template.vcv";
+	}
+	else {
+		pluginsPath = userDir + "/plugins-v" + app::ABI_VERSION;
+		settingsPath = userDir + "/settings-v" + app::ABI_VERSION + ".json";
+		autosavePath = userDir + "/autosave-v" + app::ABI_VERSION + ".vcv";
+		templatePath = userDir + "/template-v" + app::ABI_VERSION + ".vcv";
+	}
 }
 
 
@@ -123,6 +138,11 @@ std::string plugin(plugin::Plugin *plugin, std::string filename) {
 
 std::string systemDir;
 std::string userDir;
+
+std::string pluginsPath;
+std::string settingsPath;
+std::string autosavePath;
+std::string templatePath;
 
 
 } // namespace asset

@@ -261,19 +261,18 @@ void init() {
 	loadPlugin("");
 
 	// Get user plugins directory
-	std::string pluginsDir = asset::user("plugins");
-	mkdir(pluginsDir.c_str(), 0755);
+	mkdir(asset::pluginsPath.c_str(), 0755);
 
 	// Extract packages and load plugins
-	extractPackages(pluginsDir);
-	loadPlugins(pluginsDir);
+	extractPackages(asset::pluginsPath);
+	loadPlugins(asset::pluginsPath);
 
 	// If Fundamental wasn't loaded, copy the bundled Fundamental package and load it
 	std::string fundamentalSrc = asset::system("Fundamental.zip");
-	std::string fundamentalDir = asset::user("plugins/Fundamental");
+	std::string fundamentalDir = asset::pluginsPath + "/Fundamental";
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");
-		extractZip(fundamentalSrc.c_str(), pluginsDir.c_str());
+		extractZip(fundamentalSrc.c_str(), asset::pluginsPath.c_str());
 		loadPlugin(fundamentalDir);
 	}
 
@@ -473,7 +472,7 @@ void syncUpdate(Update *update) {
 	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), arch.c_str());
 
 	// Download zip
-	std::string pluginDest = asset::user("plugins/" + update->pluginSlug + ".zip");
+	std::string pluginDest = asset::pluginsPath + "/" + update->pluginSlug + ".zip";
 	if (!network::requestDownload(downloadUrl, pluginDest, &update->progress)) {
 		WARN("Plugin %s download was unsuccessful", update->pluginSlug.c_str());
 		return;

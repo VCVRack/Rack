@@ -8,6 +8,7 @@
 #include <bridge.hpp>
 #include <settings.hpp>
 #include <engine/Engine.hpp>
+#include <app/common.hpp>
 #include <app/Scene.hpp>
 #include <plugin.hpp>
 #include <app.hpp>
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
 
 	// Load settings
 	try {
-		settings::load(asset::user("settings.json"));
+		settings::load(asset::settingsPath);
 	}
 	catch (UserException &e) {
 		std::string msg = e.what();
@@ -179,11 +180,11 @@ int main(int argc, char *argv[]) {
 
 	// Destroy app
 	if (!settings::headless) {
-		APP->patch->save(asset::user("autosave.vcv"));
+		APP->patch->save(asset::autosavePath);
 	}
 	INFO("Destroying app");
 	appDestroy();
-	settings::save(asset::user("settings.json"));
+	settings::save(asset::settingsPath);
 
 	// Destroy environment
 	INFO("Destroying environment");

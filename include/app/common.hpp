@@ -17,6 +17,7 @@ extern std::string APP_VERSION;
 extern std::string APP_VERSION_UPDATE;
 extern std::string API_URL;
 extern std::string API_VERSION;
+extern std::string ABI_VERSION;
 
 static const float SVG_DPI = 75.0;
 static const float MM_PER_IN = 25.4;
