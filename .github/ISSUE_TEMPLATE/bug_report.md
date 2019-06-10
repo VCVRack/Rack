@@ -6,8 +6,13 @@ about: Bugs, build errors, compatibility/stability issues
 
 <--
 To file a bug report, fill out the form below.
-Post screenshots if the bug is visual.
 Use a descriptive title that best explains the bug in one sentence.
+Attach screenshots if the bug is visual.
+Attach your `<Rack user dir>/log.txt` file if something is crashing or not loading.
+Surround terminal output with three tildes
+```
+like this.
+```
 -->
 
 ### Details

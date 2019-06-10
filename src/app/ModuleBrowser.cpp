@@ -515,9 +515,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			float score2 = get_default(settings::favoriteScores, std::make_tuple(m2->model->plugin->slug, m2->model->slug), 0.f);
 			if (score1 != score2)
 				return score1 > score2;
-			// Sort by plugin name
-			if (m1->model->plugin->name != m2->model->plugin->name)
-				return m1->model->plugin->name < m2->model->plugin->name;
+			// Sort by plugin brand
+			if (m1->model->plugin->brand != m2->model->plugin->brand)
+				return m1->model->plugin->brand < m2->model->plugin->brand;
 			// Sort by module name
 			return m1->model->name < m2->model->name;
 		});

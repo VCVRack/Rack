@@ -339,6 +339,10 @@ void logOut() {
 	settings::token = "";
 }
 
+bool isLoggedIn() {
+	return settings::token != "";
+}
+
 void queryUpdates() {
 	if (settings::token.empty())
 		return;
@@ -393,8 +397,12 @@ void queryUpdates() {
 			continue;
 		}
 
+		// Get plugin name
+		json_t *nameJ = json_object_get(manifestJ, "name");
+		if (nameJ)
+			update.pluginName = json_string_value(nameJ);
+
 		// Get version
-		// TODO Change this to "version" when API changes
 		json_t *versionJ = json_object_get(manifestJ, "version");
 		if (!versionJ) {
 			WARN("Plugin %s has no version in manifest", update.pluginSlug.c_str());
@@ -425,7 +433,15 @@ void queryUpdates() {
 	}
 }
 
+static bool isSyncingUpdate = false;
+static bool isSyncingUpdates = false;
+
 void syncUpdate(Update *update) {
+	isSyncingUpdate = true;
+	DEFER({
+		isSyncingUpdate = false;
+	});
+
 #if defined ARCH_WIN
 	std::string arch = "win";
 #elif ARCH_MAC
@@ -451,6 +467,11 @@ void syncUpdate(Update *update) {
 }
 
 void syncUpdates() {
+	isSyncingUpdates = true;
+	DEFER({
+		isSyncingUpdates = false;
+	});
+
 	if (settings::token.empty())
 		return;
 
@@ -459,12 +480,8 @@ void syncUpdates() {
 	}
 }
 
-void cancelDownload() {
-	// TODO
-}
-
-bool isLoggedIn() {
-	return settings::token != "";
+bool isSyncing() {
+	return isSyncingUpdate || isSyncingUpdates;
 }
 
 Plugin *getPlugin(const std::string &pluginSlug) {

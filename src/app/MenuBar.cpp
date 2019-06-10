@@ -495,6 +495,11 @@ struct LogInItem : ui::MenuItem {
 };
 
 struct SyncItem : ui::MenuItem {
+	void step() override {
+		disabled = plugin::isSyncing();
+		MenuItem::step();
+	}
+
 	void onAction(const event::Action &e) override {
 		std::thread t([=]() {
 			plugin::syncUpdates();
@@ -509,7 +514,7 @@ struct PluginSyncItem : ui::MenuItem {
 
 	void setUpdate(plugin::Update *update) {
 		this->update = update;
-		text = update->pluginSlug;
+		text = update->pluginName;
 		plugin::Plugin *p = plugin::getPlugin(update->pluginSlug);
 		if (p) {
 			rightText += "v" + p->version + " → ";
@@ -532,6 +537,7 @@ struct PluginSyncItem : ui::MenuItem {
 	}
 
 	void step() override {
+		disabled = plugin::isSyncing();
 		if (update->progress >= 1) {
 			rightText = CHECKMARK_STRING;
 		}
@@ -610,7 +616,10 @@ struct PluginsMenu : ui::Menu {
 	void refresh() {
 		clearChildren();
 
-		if (!plugin::isLoggedIn()) {
+		if (settings::devMode) {
+			addChild(createMenuLabel("Disabled in development mode"));
+		}
+		else if (!plugin::isLoggedIn()) {
 			UrlItem *registerItem = new UrlItem;
 			registerItem->text = "Register VCV account";
 			registerItem->url = "https://vcvrack.com/";
