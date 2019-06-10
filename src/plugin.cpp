@@ -315,28 +315,32 @@ void logIn(const std::string &email, const std::string &password) {
 		loginStatus = "No response from server";
 		return;
 	}
+	DEFER({
+		json_decref(resJ);
+	});
 
 	json_t *errorJ = json_object_get(resJ, "error");
 	if (errorJ) {
 		const char *errorStr = json_string_value(errorJ);
 		loginStatus = errorStr;
+		return;
 	}
-	else {
-		json_t *tokenJ = json_object_get(resJ, "token");
-		if (tokenJ) {
-			const char *tokenStr = json_string_value(tokenJ);
-			settings::token = tokenStr;
-			loginStatus = "";
-		}
-		else {
-			loginStatus = "No token in response";
-		}
+
+	json_t *tokenJ = json_object_get(resJ, "token");
+	if (!tokenJ) {
+		loginStatus = "No token in response";
+		return;
 	}
-	json_decref(resJ);
+
+	const char *tokenStr = json_string_value(tokenJ);
+	settings::token = tokenStr;
+	loginStatus = "";
+	queryUpdates();
 }
 
 void logOut() {
 	settings::token = "";
+	updates.clear();
 }
 
 bool isLoggedIn() {
@@ -433,6 +437,14 @@ void queryUpdates() {
 	}
 }
 
+bool hasUpdates() {
+	for (Update &update : updates) {
+		if (update.progress < 1.f)
+			return true;
+	}
+	return false;
+}
+
 static bool isSyncingUpdate = false;
 static bool isSyncingUpdates = false;
 
@@ -476,8 +488,10 @@ void syncUpdates() {
 		return;
 
 	for (Update &update : updates) {
-		syncUpdate(&update);
+		if (update.progress < 1.f)
+			syncUpdate(&update);
 	}
+	updatesFinished = true;
 }
 
 bool isSyncing() {
@@ -626,6 +640,7 @@ std::vector<Plugin*> plugins;
 
 std::string loginStatus;
 std::vector<Update> updates;
+bool updatesFinished = false;
 
 
 } // namespace plugin

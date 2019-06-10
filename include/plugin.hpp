@@ -29,6 +29,7 @@ void logIn(const std::string &email, const std::string &password);
 void logOut();
 bool isLoggedIn();
 void queryUpdates();
+bool hasUpdates();
 void syncUpdate(Update *update);
 void syncUpdates();
 bool isSyncing();
@@ -46,6 +47,7 @@ extern std::vector<Plugin*> plugins;
 
 extern std::string loginStatus;
 extern std::vector<Update> updates;
+extern bool updatesFinished;
 
 
 } // namespace plugin

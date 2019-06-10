@@ -108,7 +108,7 @@ static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 	float *progress = (float*) clientp;
 	if (progress) {
 		if (dltotal <= 0)
-			*progress = 1.0;
+			*progress = 0.f;
 		else
 			*progress = (float)dlnow / dltotal;
 	}
@@ -116,9 +116,6 @@ static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 }
 
 bool requestDownload(std::string url, const std::string &filename, float *progress) {
-	if (progress)
-		*progress = 0.f;
-
 	CURL *curl = curl_easy_init();
 	if (!curl)
 		return false;

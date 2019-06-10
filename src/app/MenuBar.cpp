@@ -15,6 +15,7 @@
 #include <system.hpp>
 #include <plugin.hpp>
 #include <patch.hpp>
+#include <osdialog.h>
 #include <thread>
 
 
@@ -496,7 +497,7 @@ struct LogInItem : ui::MenuItem {
 
 struct SyncItem : ui::MenuItem {
 	void step() override {
-		disabled = plugin::isSyncing();
+		disabled = !plugin::hasUpdates() || plugin::isSyncing();
 		MenuItem::step();
 	}
 
@@ -540,6 +541,7 @@ struct PluginSyncItem : ui::MenuItem {
 		disabled = plugin::isSyncing();
 		if (update->progress >= 1) {
 			rightText = CHECKMARK_STRING;
+			disabled = true;
 		}
 		else if (update->progress > 0) {
 			rightText = string::f("%.0f%%", update->progress * 100.f);
@@ -556,44 +558,6 @@ struct PluginSyncItem : ui::MenuItem {
 	}
 };
 
-
-#if 0
-struct SyncButton : ui::Button {
-	bool checked = false;
-	/** Updates are available */
-	bool available = false;
-	/** Plugins have been updated */
-	bool completed = false;
-
-	void step() override {
-		// Check for plugin update on first step()
-		if (!checked) {
-			std::thread t([this]() {
-				if (plugin::sync(true))
-					available = true;
-			});
-			t.detach();
-			checked = true;
-		}
-		// Display message if we've completed updates
-		if (completed) {
-			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been updated. Close Rack and re-launch it to load new updates.")) {
-				APP->window->close();
-			}
-			completed = false;
-		}
-	}
-	void onAction(const event::Action &e) override {
-		available = false;
-		std::thread t([this]() {
-			if (plugin::sync(false))
-				completed = true;
-		});
-		t.detach();
-	}
-};
-#endif
-
 struct LogOutItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		plugin::logOut();
@@ -608,12 +572,14 @@ struct PluginsMenu : ui::Menu {
 	}
 
 	void step() override {
+		// Refresh menu when appropriate
 		if (!loggedIn && plugin::isLoggedIn())
 			refresh();
 		Menu::step();
 	}
 
 	void refresh() {
+		setChildMenu(NULL);
 		clearChildren();
 
 		if (settings::devMode) {
@@ -646,7 +612,7 @@ struct PluginsMenu : ui::Menu {
 			loggedIn = true;
 
 			UrlItem *manageItem = new UrlItem;
-			manageItem->text = "VCV Plugin Manager";
+			manageItem->text = "Manage plugins";
 			manageItem->url = "https://vcvrack.com/plugins.html";
 			addChild(manageItem);
 
@@ -656,10 +622,9 @@ struct PluginsMenu : ui::Menu {
 
 			SyncItem *syncItem = new SyncItem;
 			syncItem->text = "Update all";
-			syncItem->disabled = plugin::updates.empty();
 			addChild(syncItem);
 
-			if (!plugin::updates.empty()) {
+			if (plugin::hasUpdates()) {
 				addChild(new ui::MenuEntry);
 
 				ui::MenuLabel *updatesLabel = new ui::MenuLabel;
@@ -693,7 +658,16 @@ struct PluginsButton : MenuButton {
 
 	void step() override {
 		notification->box.pos = math::Vec(0, 0);
-		notification->visible = false;
+		notification->visible = plugin::hasUpdates();
+
+		// Popup when updates finish downloading
+		if (plugin::updatesFinished) {
+			plugin::updatesFinished = false;
+			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been downloaded. Close and re-launch Rack to load new updates.")) {
+				APP->window->close();
+			}
+		}
+
 		MenuButton::step();
 	}
 };
