@@ -20,19 +20,19 @@ template <class TModule, class TModuleWidget, typename... Tags>
 plugin::Model *createModel(const std::string &slug) {
 	struct TModel : plugin::Model {
 		engine::Module *createModule() override {
-			TModule *m = new TModule;
+			engine::Module *m = new TModule;
 			m->model = this;
 			return m;
 		}
 		app::ModuleWidget *createModuleWidget() override {
 			TModule *m = new TModule;
-			m->model = this;
-			TModuleWidget *mw = new TModuleWidget(m);
+			m->engine::Module::model = this;
+			app::ModuleWidget *mw = new TModuleWidget(m);
 			mw->model = this;
 			return mw;
 		}
 		app::ModuleWidget *createModuleWidgetNull() override {
-			TModuleWidget *mw = new TModuleWidget(NULL);
+			app::ModuleWidget *mw = new TModuleWidget(NULL);
 			mw->model = this;
 			return mw;
 		}

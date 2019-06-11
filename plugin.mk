@@ -71,7 +71,7 @@ endif
 	cd dist && zip -q -9 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
 
 install: dist
-	cp dist/$(SLUG)-$(VERSION)-$(ARCH).zip $(RACK_USER_DIR)/plugins/
+	cp dist/$(SLUG)-$(VERSION)-$(ARCH).zip $(RACK_USER_DIR)/plugins-v1/
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all

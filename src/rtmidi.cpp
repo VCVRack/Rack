@@ -39,7 +39,10 @@ struct RtMidiInputDevice : midi::InputDevice {
 		if (!midiInputDevice)
 			return;
 
-		assert(message->size() <= 3);
+		// Users have reported that some MIDI devices can send messages >3 bytes. I don't know how this is possible, so just reject the message.
+		if (message->size() > 3)
+			return;
+
 		midi::Message msg;
 		msg.size = message->size();
 		for (int i = 0; i < msg.size; i++) {
