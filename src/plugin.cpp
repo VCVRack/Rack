@@ -351,7 +351,9 @@ bool isLoggedIn() {
 void queryUpdates() {
 	if (settings::token.empty())
 		return;
+
 	updates.clear();
+	updateStatus = "Querying for updates...";
 
 	// Get user's plugins list
 	std::string pluginsUrl = app::API_URL + "/plugins";
@@ -361,6 +363,7 @@ void queryUpdates() {
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
+		updateStatus = "Could not query updates";
 		return;
 	}
 	DEFER({
@@ -370,6 +373,7 @@ void queryUpdates() {
 	json_t *errorJ = json_object_get(pluginsResJ, "error");
 	if (errorJ) {
 		WARN("Request for user's plugins returned an error: %s", json_string_value(errorJ));
+		updateStatus = "Could not query updates";
 		return;
 	}
 
@@ -381,6 +385,7 @@ void queryUpdates() {
 	json_decref(manifestsReq);
 	if (!manifestsResJ) {
 		WARN("Request for library manifests failed");
+		updateStatus = "Could not query updates";
 		return;
 	}
 	DEFER({
@@ -436,6 +441,8 @@ void queryUpdates() {
 
 		updates.push_back(update);
 	}
+
+	updateStatus = "";
 }
 
 bool hasUpdates() {
@@ -492,7 +499,7 @@ void syncUpdates() {
 		if (update.progress < 1.f)
 			syncUpdate(&update);
 	}
-	updatesFinished = true;
+	restartRequested = true;
 }
 
 bool isSyncing() {
@@ -641,7 +648,8 @@ std::vector<Plugin*> plugins;
 
 std::string loginStatus;
 std::vector<Update> updates;
-bool updatesFinished = false;
+std::string updateStatus;
+bool restartRequested = false;
 
 
 } // namespace plugin

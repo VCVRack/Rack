@@ -47,7 +47,8 @@ extern std::vector<Plugin*> plugins;
 
 extern std::string loginStatus;
 extern std::vector<Update> updates;
-extern bool updatesFinished;
+extern std::string updateStatus;
+extern bool restartRequested;
 
 
 } // namespace plugin

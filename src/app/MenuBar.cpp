@@ -497,7 +497,20 @@ struct LogInItem : ui::MenuItem {
 
 struct SyncItem : ui::MenuItem {
 	void step() override {
-		disabled = !plugin::hasUpdates() || plugin::isSyncing();
+		disabled = true;
+		if (plugin::updateStatus != "") {
+			text = plugin::updateStatus;
+		}
+		else if (plugin::isSyncing()) {
+			text = "Updating...";
+		}
+		else if (!plugin::hasUpdates()) {
+			text = "No updates";
+		}
+		else {
+			text = "Update all";
+			disabled = false;
+		}
 		MenuItem::step();
 	}
 
@@ -661,8 +674,8 @@ struct LibraryButton : MenuButton {
 		notification->visible = plugin::hasUpdates();
 
 		// Popup when updates finish downloading
-		if (plugin::updatesFinished) {
-			plugin::updatesFinished = false;
+		if (plugin::restartRequested) {
+			plugin::restartRequested = false;
 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been downloaded. Close and re-launch Rack to load new updates.")) {
 				APP->window->close();
 			}
