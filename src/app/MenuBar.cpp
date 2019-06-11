@@ -505,7 +505,7 @@ struct SyncItem : ui::MenuItem {
 			text = "Updating...";
 		}
 		else if (!plugin::hasUpdates()) {
-			text = "No updates";
+			text = "Up-to-date";
 		}
 		else {
 			text = "Update all";
