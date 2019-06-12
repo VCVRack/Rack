@@ -115,6 +115,9 @@ struct Vector<int32_t, 4> {
 	static Vector mask() {
 		return Vector(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
 	}
+	static Vector setr(int32_t x1, int32_t x2, int32_t x3, int32_t x4) {
+		return Vector(_mm_setr_epi32(x1, x2, x3, x4));
+	}
 	static Vector load(const int32_t *x) {
 		// HACK
 		// Use _mm_loadu_si128() because GCC doesn't support _mm_loadu_si32()
