@@ -709,6 +709,14 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
+		if (hasUpdate()) {
+			UrlItem *updateItem = new UrlItem;
+			updateItem->text = "Update " + APP_NAME;
+			updateItem->rightText = APP_VERSION + " → " + APP_VERSION_UPDATE;
+			updateItem->url = "https://vcvrack.com/";
+			menu->addChild(updateItem);
+		}
+
 		UrlItem *manualItem = new UrlItem;
 		manualItem->text = "Manual";
 		manualItem->rightText = "F1";
@@ -719,14 +727,6 @@ struct HelpButton : MenuButton {
 		websiteItem->text = "VCVRack.com";
 		websiteItem->url = "https://vcvrack.com/";
 		menu->addChild(websiteItem);
-
-		if (hasUpdate()) {
-			UrlItem *updateItem = new UrlItem;
-			updateItem->text = "Update " + APP_NAME;
-			updateItem->rightText = APP_VERSION + " → " + APP_VERSION_UPDATE;
-			updateItem->url = "https://vcvrack.com/";
-			menu->addChild(updateItem);
-		}
 
 		UserFolderItem *folderItem = new UserFolderItem;
 		folderItem->text = "Open user folder";
