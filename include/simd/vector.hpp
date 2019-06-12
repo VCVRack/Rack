@@ -63,7 +63,14 @@ struct Vector<float, 4> {
     return _mm_castsi128_ps(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
 	}
 
-	/** Reads an array of 4 values. */
+	/** Constructs a vector from four values in reverse. */
+	static Vector setr(float x1, float x2, float x3, float x4) {
+		return Vector(_mm_setr_ps(x1, x2, x3, x4));
+	}
+
+	/** Reads an array of 4 values.
+	On little-endian machines (e.g. x86), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
+	*/
 	static Vector load(const float *x) {
 		/*
 		My benchmarks show that _mm_loadu_ps() performs equally as fast as _mm_load_ps() when data is actually aligned.
@@ -73,7 +80,9 @@ struct Vector<float, 4> {
 		return Vector(_mm_loadu_ps(x));
 	}
 
-	/** Writes an array of 4 values. */
+	/** Writes an array of 4 values.
+	On little-endian machines (e.g. x86), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
+	*/
 	void store(float *x) {
 		_mm_storeu_ps(x, v);
 	}

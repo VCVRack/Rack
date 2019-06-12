@@ -96,6 +96,31 @@ struct alignas(32) Port {
 		return sum;
 	}
 
+	template <typename T>
+	T getVoltageSimd(int firstChannel) {
+		return T::load(&voltages[firstChannel]);
+	}
+
+	template <typename T>
+	T getPolyVoltageSimd(int firstChannel) {
+			return (channels == 1) ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
+	}
+
+	template <typename T>
+	T getNormalVoltageSimd(T normalVoltage, int firstChannel) {
+		return isConnected() ? getVoltageSimd<T>(firstChannel) : normalVoltage;
+	}
+
+	template <typename T>
+	T getNormalPolyVoltageSimd(T normalVoltage, int firstChannel) {
+		return isConnected() ? getPolyVoltageSimd<T>(firstChannel) : normalVoltage;
+	}
+
+	template <typename T>
+	void setVoltageSimd(T voltage, int firstChannel) {
+		voltage.store(&voltages[firstChannel]);
+	}
+
 	/** Sets the number of polyphony channels.
 	Also clears voltages of higher channels.
 	If disconnected, this does nothing (`channels` remains 0).
