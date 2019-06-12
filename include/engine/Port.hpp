@@ -7,6 +7,7 @@ namespace rack {
 namespace engine {
 
 
+/** This is inspired by the number of MIDI channels. */
 static const int PORT_MAX_CHANNELS = 16;
 
 
@@ -32,6 +33,7 @@ struct alignas(32) Port {
 	*/
 	Light plugLights[3];
 
+	/** Sets the voltage of the given channel. */
 	void setVoltage(float voltage, int channel = 0) {
 		voltages[channel] = voltage;
 	}
@@ -45,7 +47,7 @@ struct alignas(32) Port {
 
 	/** Returns the given channel's voltage if the port is polyphonic, otherwise returns the first voltage (channel 0). */
 	float getPolyVoltage(int channel) {
-		return (channels == 1) ? getVoltage(0) : getVoltage(channel);
+		return isMonophonic() ? getVoltage(0) : getVoltage(channel);
 	}
 
 	/** Returns the voltage if a cable is connected, otherwise returns the given normal voltage. */
@@ -59,7 +61,6 @@ struct alignas(32) Port {
 
 	/** Returns a pointer to the array of voltages beginning with firstChannel.
 	The pointer can be used for reading and writing.
-	Useful for SIMD.
 	*/
 	float *getVoltages(int firstChannel = 0) {
 		return &voltages[firstChannel];
@@ -81,6 +82,7 @@ struct alignas(32) Port {
 		}
 	}
 
+	/** Sets all voltages to 0. */
 	void clearVoltages() {
 		for (int c = 0; c < channels; c++) {
 			voltages[c] = 0.f;
@@ -103,7 +105,7 @@ struct alignas(32) Port {
 
 	template <typename T>
 	T getPolyVoltageSimd(int firstChannel) {
-			return (channels == 1) ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
+			return isMonophonic() ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
 	}
 
 	template <typename T>
@@ -142,21 +144,26 @@ struct alignas(32) Port {
 		this->channels = channels;
 	}
 
+	/** Returns the number of channels.
+	If the port is disconnected, it has 0 channels.
+	*/
 	int getChannels() {
 		return channels;
 	}
 
-	/** Returns if a cable is connected to the Port.
+	/** Returns whether a cable is connected to the Port.
 	You can use this for skipping code that generates output voltages.
 	*/
 	bool isConnected() {
 		return channels > 0;
 	}
 
+	/** Returns whether the cable exists and has 1 channel. */
 	bool isMonophonic() {
 		return channels == 1;
 	}
 
+	/** Returns whether the cable exists and has more than 1 channel. */
 	bool isPolyphonic() {
 		return channels > 1;
 	}
