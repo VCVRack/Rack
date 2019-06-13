@@ -279,6 +279,12 @@ struct LockModulesItem : ui::MenuItem {
 	}
 };
 
+struct CursorLockItem : ui::MenuItem {
+	void onAction(const event::Action &e) override {
+		settings::allowCursorLock ^= true;
+	}
+};
+
 struct FullscreenItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		APP->window->setFullScreen(!APP->window->isFullScreen());
@@ -300,6 +306,11 @@ struct ViewButton : MenuButton {
 		lockModulesItem->text = "Lock modules";
 		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
 		menu->addChild(lockModulesItem);
+
+		CursorLockItem *cursorLockItem = new CursorLockItem;
+		cursorLockItem->text = "Hide cursor while dragging";
+		cursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
+		menu->addChild(cursorLockItem);
 
 		ZoomSlider *zoomSlider = new ZoomSlider;
 		zoomSlider->box.size.x = 200.0;
