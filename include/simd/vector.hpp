@@ -30,6 +30,9 @@ struct Vector;
 */
 template <>
 struct Vector<float, 4> {
+	typedef float T;
+	constexpr static int N = 4;
+
 	union {
 		__m128 v;
 		/** Accessing this array of scalars is slow and defeats the purpose of vectorizing.
@@ -96,6 +99,9 @@ struct Vector<float, 4> {
 
 template <>
 struct Vector<int32_t, 4> {
+	typedef int32_t T;
+	constexpr static int N = 4;
+
 	union {
 		__m128i v;
 		int32_t s[4];
