@@ -19,6 +19,7 @@
 - Add default template patch.
 - Add menu item to save the current patch as the template.
 - Add "frameRateLimit" and "frameRateSync" for setting maximum screen refresh rate and to toggle vertical sync.
+- Add "autosavePeriod" for setting the frequency of autosaves in seconds.
 - Add textual menu bar, rearranged menu items, removed icons.
 - Make CPU timer display microseconds and percentage instead of millisamples.
 - Add engine real-time priority setting.
@@ -31,6 +32,8 @@
 - Fix Unicode user directories on Windows.
 - Add ability to change cable colors in `settings.json`.
 - Add `-p X` flag for dumping a screenshot of each available module.
+- Allow user to see changelogs of plugins before updating their plugin library.
+- Allow user to update individual plugins.
 
 - Core
 	- Add Audio-16 with 16/16 inputs/outputs.
