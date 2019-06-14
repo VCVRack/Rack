@@ -366,6 +366,12 @@ struct State {
 	widget::Widget *lastClickedWidget = NULL;
 	std::set<int> heldKeys;
 
+	widget::Widget *getRootWidget() {return rootWidget;}
+	widget::Widget *getHoveredWidget() {return hoveredWidget;}
+	widget::Widget *getDraggedWidget() {return draggedWidget;}
+	widget::Widget *getDragHoveredWidget() {return dragHoveredWidget;}
+	widget::Widget *getSelectedWidget() {return selectedWidget;}
+
 	void setHovered(widget::Widget *w);
 	void setDragged(widget::Widget *w, int button);
 	void setDragHovered(widget::Widget *w);
