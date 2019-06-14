@@ -1,6 +1,5 @@
 #pragma once
 #include <dsp/common.hpp>
-#include <alloca.h>
 
 
 namespace rack {
@@ -29,7 +28,7 @@ For example, the following solves the system x''(t) = -x(t) using a fixed timest
 /** Solves an ODE system using the 1st order Euler method */
 template <typename T, typename F>
 void stepEuler(T t, T dt, T x[], int len, F f) {
-	T *k = (T*) alloca(len);
+	T k[len];
 
 	f(t, x, k);
 	for (int i = 0; i < len; i++) {
@@ -40,9 +39,9 @@ void stepEuler(T t, T dt, T x[], int len, F f) {
 /** Solves an ODE system using the 2nd order Runge-Kutta method */
 template <typename T, typename F>
 void stepRK2(T t, T dt, T x[], int len, F f) {
-	T *k1 = (T*) alloca(len);
-	T *k2 = (T*) alloca(len);
-	T *yi = (T*) alloca(len);
+	T k1[len];
+	T k2[len];
+	T yi[len];
 
 	f(t, x, k1);
 
@@ -59,11 +58,11 @@ void stepRK2(T t, T dt, T x[], int len, F f) {
 /** Solves an ODE system using the 4th order Runge-Kutta method */
 template <typename T, typename F>
 void stepRK4(T t, T dt, T x[], int len, F f) {
-	T *k1 = (T*) alloca(len);
-	T *k2 = (T*) alloca(len);
-	T *k3 = (T*) alloca(len);
-	T *k4 = (T*) alloca(len);
-	T *yi = (T*) alloca(len);
+	T k1[len];
+	T k2[len];
+	T k3[len];
+	T k4[len];
+	T yi[len];
 
 	f(t, x, k1);
 
