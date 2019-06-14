@@ -123,7 +123,7 @@ inline float_4 pow(float a, float_4 b) {
 
 template <typename T>
 T pow(T a, int b) {
-	// Optimal with `-O3 -ffast-math` when b is known at compile-time
+	// Optimal with `-O3 -funsafe-math-optimizations` when b is known at compile-time
 	T p = 1;
 	for (int i = 1; i <= b; i *= 2) {
 		if (i & b)

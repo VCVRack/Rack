@@ -103,9 +103,9 @@ struct SampleRateConverter {
 
 
 /** Downsamples by an integer factor. */
-template <int OVERSAMPLE, int QUALITY>
+template <int OVERSAMPLE, int QUALITY, typename T = float>
 struct Decimator {
-	float inBuffer[OVERSAMPLE*QUALITY];
+	T inBuffer[OVERSAMPLE*QUALITY];
 	float kernel[OVERSAMPLE*QUALITY];
 	int inIndex;
 
@@ -119,14 +119,14 @@ struct Decimator {
 		std::memset(inBuffer, 0, sizeof(inBuffer));
 	}
 	/** `in` must be length OVERSAMPLE */
-	float process(float *in) {
+	T process(T *in) {
 		// Copy input to buffer
-		std::memcpy(&inBuffer[inIndex], in, OVERSAMPLE*sizeof(float));
+		std::memcpy(&inBuffer[inIndex], in, OVERSAMPLE*sizeof(T));
 		// Advance index
 		inIndex += OVERSAMPLE;
 		inIndex %= OVERSAMPLE*QUALITY;
 		// Perform naive convolution
-		float out = 0.f;
+		T out = 0.f;
 		for (int i = 0; i < OVERSAMPLE*QUALITY; i++) {
 			int index = inIndex - 1 - i;
 			index = (index + OVERSAMPLE*QUALITY) % (OVERSAMPLE*QUALITY);
