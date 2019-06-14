@@ -217,7 +217,7 @@ Window::Window() {
 	glfwGetWindowContentScale(win, &contentScale, NULL);
 	INFO("Window content scale: %f", contentScale);
 
-	glfwSetWindowSizeLimits(win, 800, 600, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(win, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	if (settings::windowSize.isZero()) {
 		glfwMaximizeWindow(win);
 	}
