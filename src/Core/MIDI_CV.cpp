@@ -180,12 +180,12 @@ struct MIDI_CV : Module {
 			case 0xd: {
 				if (polyMode == MPE_MODE) {
 					// Set the channel aftertouch
-					aftertouches[msg.getChannel()] = msg.getValue();
+					aftertouches[msg.getChannel()] = msg.getNote();
 				}
 				else {
 					// Set all aftertouches
 					for (int c = 0; c < 16; c++) {
-						aftertouches[c] = msg.getValue();
+						aftertouches[c] = msg.getNote();
 					}
 				}
 			} break;
