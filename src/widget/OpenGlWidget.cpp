@@ -9,6 +9,7 @@ namespace widget {
 void OpenGlWidget::step() {
 	// Render every frame
 	dirty = true;
+	FramebufferWidget::step();
 }
 
 
