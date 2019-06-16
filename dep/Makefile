@@ -132,7 +132,8 @@ ifdef ARCH_WIN
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(DEP_PATH)/bin" INCLUDE_PATH="$(DEP_PATH)/include" LIBRARY_PATH="$(DEP_PATH)/lib" install
 else
-	cd zlib-1.2.11 && $(CONFIGURE)
+	# Don't use $(CONFIGURE) because this is a handwritten configure script
+	cd zlib-1.2.11 && ./configure --prefix="$(DEP_PATH)"
 	$(MAKE) -C zlib-1.2.11
 	$(MAKE) -C zlib-1.2.11 install
 endif
