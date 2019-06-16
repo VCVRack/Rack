@@ -186,6 +186,14 @@ inline float_4 sgn(float_4 x) {
 	return signbit | (nonzero & 1.f);
 }
 
+/** Given a mask `a`, returns a vector with each element either 0's or 1's depending on the mask bit. */
+template <typename T>
+inline T movemaskInverse(int a);
+
+template <>
+inline float_4 movemaskInverse<float_4>(int a) {
+	return float_4(a & (1 << 0), a & (1 << 1), a & (1 << 2), a & (1 << 3)) != float_4::zero();
+}
 
 } // namespace simd
 } // namespace rack

@@ -53,7 +53,7 @@ struct Vector<float, 4> {
 
 	/** Constructs a vector from four values. */
 	Vector(float x1, float x2, float x3, float x4) {
-		v = _mm_set_ps(x1, x2, x3, x4);
+		v = _mm_setr_ps(x1, x2, x3, x4);
 	}
 
 	/** Returns a vector initialized to zero. */
@@ -64,11 +64,6 @@ struct Vector<float, 4> {
 	/** Returns a vector with all 1 bits. */
 	static Vector mask() {
     return _mm_castsi128_ps(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
-	}
-
-	/** Constructs a vector from four values in reverse. */
-	static Vector setr(float x1, float x2, float x3, float x4) {
-		return Vector(_mm_setr_ps(x1, x2, x3, x4));
 	}
 
 	/** Reads an array of 4 values.
@@ -113,16 +108,13 @@ struct Vector<int32_t, 4> {
 		v = _mm_set1_epi32(x);
 	}
 	Vector(int32_t x1, int32_t x2, int32_t x3, int32_t x4) {
-		v = _mm_set_epi32(x1, x2, x3, x4);
+		v = _mm_setr_epi32(x1, x2, x3, x4);
 	}
 	static Vector zero() {
 		return Vector(_mm_setzero_si128());
 	}
 	static Vector mask() {
 		return Vector(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
-	}
-	static Vector setr(int32_t x1, int32_t x2, int32_t x3, int32_t x4) {
-		return Vector(_mm_setr_epi32(x1, x2, x3, x4));
 	}
 	static Vector load(const int32_t *x) {
 		// HACK
