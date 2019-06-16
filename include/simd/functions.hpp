@@ -172,6 +172,12 @@ inline float_4 rescale(float_4 x, float_4 xMin, float_4 xMax, float_4 yMin, floa
 	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
+using math::crossfade;
+
+inline float_4 crossfade(float_4 a, float_4 b, float_4 p) {
+	return a + (b - a) * p;
+}
+
 using math::sgn;
 
 inline float_4 sgn(float_4 x) {
