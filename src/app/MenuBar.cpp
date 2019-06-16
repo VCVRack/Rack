@@ -308,7 +308,7 @@ struct ViewButton : MenuButton {
 		menu->addChild(lockModulesItem);
 
 		CursorLockItem *cursorLockItem = new CursorLockItem;
-		cursorLockItem->text = "Hide cursor while dragging";
+		cursorLockItem->text = "Lock cursor while dragging";
 		cursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
 		menu->addChild(cursorLockItem);
 
