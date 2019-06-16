@@ -213,7 +213,7 @@ struct MIDI_Map : Module {
 			json_object_set_new(mapJ, "cc", json_integer(ccs[id]));
 			json_object_set_new(mapJ, "moduleId", json_integer(paramHandles[id].moduleId));
 			json_object_set_new(mapJ, "paramId", json_integer(paramHandles[id].paramId));
-			json_array_append(mapsJ, mapJ);
+			json_array_append_new(mapsJ, mapJ);
 		}
 		json_object_set_new(rootJ, "maps", mapsJ);
 
