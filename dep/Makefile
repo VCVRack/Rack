@@ -56,6 +56,8 @@ ifdef ARCH_MAC
 	DEPS += $(libomp)
 endif
 
+
+DEP_LOCAL := .
 include $(RACK_DIR)/dep.mk
 
 
@@ -98,7 +100,7 @@ $(openssl):
 	$(SHA256) openssl-1.1.1b.tar.gz 5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
 	$(UNTAR) openssl-1.1.1b.tar.gz
 	@# ./config ignores CFLAGS, so hack it in with CC
-	cd openssl-1.1.1b && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
+	cd openssl-1.1.1b && CC="$(CC) $(CFLAGS)" ./config --prefix="$(DEP_PATH)"
 	$(MAKE) -C openssl-1.1.1b
 	$(MAKE) -C openssl-1.1.1b install_sw
 
@@ -109,7 +111,7 @@ $(libcurl): $(openssl)
 	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) \
 		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding \
 		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli \
-		--without-ca-bundle --with-ca-fallback --with-ssl="$(realpath $(DEP_LOCAL))"
+		--without-ca-bundle --with-ca-fallback --with-ssl="$(DEP_PATH)"
 	$(MAKE) -C curl-7.64.1
 	$(MAKE) -C curl-7.64.1 install
 
@@ -118,7 +120,7 @@ $(libzip): $(zlib)
 	$(SHA256) libzip-1.5.2.tar.gz be694a4abb2ffe5ec02074146757c8b56084dbcebf329123c84b205417435e15
 	$(UNTAR) libzip-1.5.2.tar.gz
 	cd libzip-1.5.2 && mkdir -p build
-	cd libzip-1.5.2/build && $(CMAKE) .. -DCMAKE_FIND_ROOT_PATH="$(realpath $(DEP_LOCAL))" -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_BZIP2=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF
+	cd libzip-1.5.2/build && $(CMAKE) .. -DCMAKE_FIND_ROOT_PATH="$(DEP_PATH)" -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_BZIP2=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF
 	$(MAKE) -C libzip-1.5.2/build
 	$(MAKE) -C libzip-1.5.2/build install
 
@@ -128,7 +130,7 @@ $(zlib):
 	$(UNTAR) zlib-1.2.11.tar.gz
 ifdef ARCH_WIN
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
-	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(realpath $(DEP_LOCAL))/bin" INCLUDE_PATH="$(realpath $(DEP_LOCAL))/include" LIBRARY_PATH="$(realpath $(DEP_LOCAL))/lib" install
+	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(DEP_PATH)/bin" INCLUDE_PATH="$(DEP_PATH)/include" LIBRARY_PATH="$(DEP_PATH)/lib" install
 else
 	cd zlib-1.2.11 && $(CONFIGURE)
 	$(MAKE) -C zlib-1.2.11

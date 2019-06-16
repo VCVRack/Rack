@@ -1,8 +1,8 @@
 include $(RACK_DIR)/arch.mk
 
 # The install location for `make install`
-DEP_LOCAL ?= .
-DEP_PATH := $(shell pwd)/$(DEP_LOCAL)
+DEP_LOCAL ?= dep
+DEP_PATH := $(abspath $(DEP_LOCAL))
 
 DEP_FLAGS += -g -O3 -march=nocona
 
@@ -20,6 +20,14 @@ WGET := wget -c
 UNTAR := tar xf
 UNZIP := unzip -o
 CONFIGURE := ./configure --prefix="$(DEP_PATH)"
+ifdef ARCH_WIN
+	CONFIGURE += --build=x86_64-w64-mingw32
+else ifdef ARCH_MAC
+	CONFIGURE += --build=x86_64-apple-darwin
+else ifdef ARCH_LIN
+	CONFIGURE += --build=x86_64-unknown-linux-gnu
+endif
+
 ifdef ARCH_WIN
 	CMAKE := cmake -G 'MSYS Makefiles' -DCMAKE_INSTALL_PREFIX="$(DEP_PATH)"
 else
@@ -48,5 +56,11 @@ $(DEPS): | dep_create_dir
 
 dep_create_dir:
 	mkdir -p $(DEP_LOCAL)
+
+cleandep:
+ifeq ($(DEP_LOCAL), .)
+	$(error Refusing to clean cwd)
+endif
+	rm -rfv $(DEP_LOCAL)
 
 .PHONY: dep
