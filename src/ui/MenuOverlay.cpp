@@ -19,10 +19,10 @@ void MenuOverlay::step() {
 
 void MenuOverlay::onButton(const event::Button &e) {
 	OpaqueWidget::onButton(e);
-	if (e.getTarget() != this)
+	if (e.isConsumed() && e.getTarget() != this)
 		return;
 
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+	if (e.action == GLFW_PRESS) {
 		requestDelete();
 		e.consume(this);
 	}

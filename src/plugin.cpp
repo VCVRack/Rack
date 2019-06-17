@@ -109,7 +109,7 @@ static Plugin *loadPlugin(std::string path) {
 #endif
 			}
 		}
-		DEBUG("%lf", plugin->modifiedTimestamp);
+		// DEBUG("%lf", plugin->modifiedTimestamp);
 
 		// Load plugin.json
 		std::string metadataFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
