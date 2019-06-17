@@ -58,6 +58,9 @@ struct Plugin {
 	/** Link to donation page for users who wish to donate. E.g. PayPal URL.
 	*/
 	std::string donateUrl;
+	/** Last modified timestamp of the plugin directory.
+	*/
+	double modifiedTimestamp = -INFINITY;
 
 	~Plugin();
 	void addModel(Model *model);

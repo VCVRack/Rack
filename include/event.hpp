@@ -225,6 +225,7 @@ struct DragBase : Base {
 	int button;
 };
 
+
 /** Occurs when a Widget begins being dragged.
 Must consume the Button event (on press) to receive this event.
 The target sets `draggedWidget`, which allows DragEnd, DragMove, DragHover, DragEnter, and DragDrop to occur.
@@ -259,6 +260,7 @@ struct DragHover : DragBase, PositionBase {
 	/** Change in mouse position since the last frame. Can be zero. */
 	math::Vec mouseDelta;
 };
+
 
 /** Occurs when the mouse enters a Widget while dragging.
 Must consume the DragHover event to receive this event.

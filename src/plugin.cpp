@@ -8,9 +8,9 @@
 #include <plugin/callbacks.hpp>
 #include <settings.hpp>
 
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <sys/param.h> // for MAXPATHLEN
 #include <fcntl.h>
 #include <thread>
@@ -96,12 +96,16 @@ static Plugin *loadPlugin(std::string path) {
 	try {
 		plugin->path = path;
 
+		// Get modified timestamp
+		if (path != "") {
+			struct stat statbuf;
+			if (!stat(path.c_str(), &statbuf)) {
+				plugin->modifiedTimestamp = (double) statbuf.st_mtim.tv_sec + statbuf.st_mtim.tv_nsec * 1e-9;
+			}
+		}
+
 		// Load plugin.json
-		std::string metadataFilename;
-		if (path == "")
-			metadataFilename = asset::system("Core.json");
-		else
-			metadataFilename = path + "/plugin.json";
+		std::string metadataFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
 		FILE *file = fopen(metadataFilename.c_str(), "r");
 		if (!file) {
 			throw UserException(string::f("Metadata file %s does not exist", metadataFilename.c_str()));
@@ -140,14 +144,13 @@ static Plugin *loadPlugin(std::string path) {
 
 		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), path.c_str());
 		plugins.push_back(plugin);
-
-		return plugin;
 	}
 	catch (UserException &e) {
 		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
 		delete plugin;
-		return NULL;
+		plugin = NULL;
 	}
+	return plugin;
 }
 
 static void loadPlugins(std::string path) {
@@ -161,7 +164,7 @@ static void loadPlugins(std::string path) {
 }
 
 /** Returns 0 if successful */
-static int extractZipHandle(zip_t *za, const char *dir) {
+static int extractZipHandle(zip_t *za, std::string dir) {
 	int err;
 	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
 		zip_stat_t zs;
@@ -170,18 +173,17 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 			WARN("zip_stat_index() failed: error %d", err);
 			return err;
 		}
-		int nameLen = strlen(zs.name);
 
-		char path[MAXPATHLEN];
-		snprintf(path, sizeof(path), "%s/%s", dir, zs.name);
+		std::string path = dir + "/" + zs.name;
 
-		if (zs.name[nameLen - 1] == '/') {
-			if (mkdir(path, 0755)) {
-				if (errno != EEXIST) {
-					WARN("mkdir(%s) failed: error %d", path, errno);
-					return errno;
-				}
-			}
+		if (path[path.size() - 1] == '/') {
+			system::createDirectory(path);
+			// HACK
+			// Create and delete file to update the directory's mtime.
+			std::string tmpPath = path + "/.tmp";
+			FILE *tmpFile = fopen(tmpPath.c_str(), "w");
+			fclose(tmpFile);
+			std::remove(tmpPath.c_str());
 		}
 		else {
 			zip_file_t *zf = zip_fopen_index(za, i, 0);
@@ -190,7 +192,7 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 				return -1;
 			}
 
-			FILE *outFile = fopen(path, "wb");
+			FILE *outFile = fopen(path.c_str(), "wb");
 			if (!outFile)
 				continue;
 
@@ -214,11 +216,11 @@ static int extractZipHandle(zip_t *za, const char *dir) {
 }
 
 /** Returns 0 if successful */
-static int extractZip(const char *filename, const char *path) {
+static int extractZip(std::string filename, std::string path) {
 	int err;
-	zip_t *za = zip_open(filename, 0, &err);
+	zip_t *za = zip_open(filename.c_str(), 0, &err);
 	if (!za) {
-		WARN("Could not open zip %s: error %d", filename, err);
+		WARN("Could not open zip %s: error %d", filename.c_str(), err);
 		return err;
 	}
 	DEFER({
@@ -237,7 +239,7 @@ static void extractPackages(std::string path) {
 			continue;
 		INFO("Extracting package %s", packagePath.c_str());
 		// Extract package
-		if (extractZip(packagePath.c_str(), path.c_str())) {
+		if (extractZip(packagePath, path)) {
 			WARN("Package %s failed to extract", packagePath.c_str());
 			message += string::f("Could not extract package %s\n", packagePath.c_str());
 			continue;

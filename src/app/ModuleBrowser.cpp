@@ -511,15 +511,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
 			ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
 			// Sort by favorite score if either is available
-			float score1 = get_default(settings::favoriteScores, std::make_tuple(m1->model->plugin->slug, m1->model->slug), 0.f);
-			float score2 = get_default(settings::favoriteScores, std::make_tuple(m2->model->plugin->slug, m2->model->slug), 0.f);
-			if (score1 != score2)
-				return score1 > score2;
-			// Sort by plugin brand
-			if (m1->model->plugin->brand != m2->model->plugin->brand)
-				return m1->model->plugin->brand < m2->model->plugin->brand;
-			// Sort by module name
-			return m1->model->name < m2->model->name;
+			// float score1 = get_default(settings::favoriteScores, std::make_tuple(m1->model->plugin->slug, m1->model->slug), 0.f);
+			// float score2 = get_default(settings::favoriteScores, std::make_tuple(m2->model->plugin->slug, m2->model->slug), 0.f);
+			auto t1 = std::make_tuple(-m1->model->plugin->modifiedTimestamp, m1->model->plugin->brand, m1->model->name);
+			auto t2 = std::make_tuple(-m2->model->plugin->modifiedTimestamp, m2->model->plugin->brand, m2->model->name);
+			return t1 < t2;
 		});
 
 		if (search.empty()) {
