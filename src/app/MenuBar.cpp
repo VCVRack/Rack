@@ -54,7 +54,7 @@ struct NotificationIcon : widget::Widget {
 struct UrlItem : ui::MenuItem {
 	std::string url;
 	void onAction(const event::Action &e) override {
-		std::thread t([=]() {
+		std::thread t([=] {
 			system::openBrowser(url);
 		});
 		t.detach();
@@ -490,7 +490,7 @@ struct LogInItem : ui::MenuItem {
 		isLoggingIn = true;
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
-		std::thread t([=]() {
+		std::thread t([=] {
 			plugin::logIn(email, password);
 			isLoggingIn = false;
 		});
@@ -526,7 +526,7 @@ struct SyncItem : ui::MenuItem {
 	}
 
 	void onAction(const event::Action &e) override {
-		std::thread t([=]() {
+		std::thread t([=] {
 			plugin::syncUpdates();
 		});
 		t.detach();
@@ -574,7 +574,7 @@ struct PluginSyncItem : ui::MenuItem {
 	}
 
 	void onAction(const event::Action &e) override {
-		std::thread t([=]() {
+		std::thread t([=] {
 			plugin::syncUpdate(update);
 		});
 		t.detach();
@@ -702,7 +702,9 @@ struct LibraryButton : MenuButton {
 
 struct UserFolderItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
-		std::thread t(system::openFolder, asset::user(""));
+		std::thread t([] {
+			system::openFolder(asset::user(""));
+		});
 		t.detach();
 	}
 };

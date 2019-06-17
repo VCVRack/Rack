@@ -191,7 +191,7 @@ void openBrowser(const std::string &url) {
 #endif
 #if defined ARCH_WIN
 	std::wstring urlW = string::toWstring(url);
-	ShellExecuteW(NULL, L"open", urlW.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	ShellExecuteW(NULL, L"open", urlW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
 
@@ -202,7 +202,7 @@ void openFolder(const std::string &path) {
 #endif
 #if defined ARCH_WIN
 	std::wstring pathW = string::toWstring(path);
-	ShellExecuteW(NULL, L"explorer", pathW.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	ShellExecuteW(NULL, L"explore", pathW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
 
