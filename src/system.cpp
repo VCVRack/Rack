@@ -200,6 +200,10 @@ void openFolder(const std::string &path) {
 	std::string command = "xdg-open \"" + path + "\"";
 	(void) std::system(command.c_str());
 #endif
+#if defined ARCH_MAC
+	std::string command = "open \"" + path + "\"";
+	std::system(command.c_str());
+#endif
 #if defined ARCH_WIN
 	std::wstring pathW = string::toWstring(path);
 	ShellExecuteW(NULL, L"explore", pathW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
