@@ -124,6 +124,7 @@ struct TextBase {
 
 /** Occurs every frame when the mouse is hovering over a Widget.
 Recurses.
+Consume this event to allow Enter and Leave to occur.
 */
 struct Hover : Base, PositionBase {
 	/** Change in mouse position since the last frame. Can be zero. */
@@ -133,6 +134,7 @@ struct Hover : Base, PositionBase {
 
 /** Occurs each mouse button press or release.
 Recurses.
+Consume this event to allow DoubleClick, Select, Deselect, SelectKey, SelectText, DragStart, DragEnd, DragMove, and DragDrop to occur.
 */
 struct Button : Base, PositionBase {
 	/** GLFW_MOUSE_BUTTON_LEFT, GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOUSE_BUTTON_MIDDLE, etc. */
@@ -176,6 +178,7 @@ struct HoverScroll : Base, PositionBase {
 
 /** Occurs when a Widget begins consuming the Hover event.
 Must consume the Hover event to receive this event.
+The target sets `hoveredWidget`, which allows Leave to occur.
 */
 struct Enter : Base {
 };
@@ -190,6 +193,7 @@ struct Leave : Base {
 
 /** Occurs when a Widget begins consuming the Button press event for the left mouse button.
 Must consume the Button event (on left button press) to receive this event.
+The target sets `selectedWidget`, which allows SelectText and SelectKey to occur.
 */
 struct Select : Base {
 };
@@ -223,6 +227,7 @@ struct DragBase : Base {
 
 /** Occurs when a Widget begins being dragged.
 Must consume the Button event (on press) to receive this event.
+The target sets `draggedWidget`, which allows DragEnd, DragMove, DragHover, DragEnter, and DragDrop to occur.
 */
 struct DragStart : DragBase {
 };
@@ -246,6 +251,7 @@ struct DragMove : DragBase {
 
 /** Occurs every frame when the mouse is hovering over a Widget while another Widget (possibly the same one) is being dragged.
 Recurses.
+Consume this event to allow DragEnter and DragLeave to occur.
 */
 struct DragHover : DragBase, PositionBase {
 	/** The dragged widget */
@@ -256,6 +262,7 @@ struct DragHover : DragBase, PositionBase {
 
 /** Occurs when the mouse enters a Widget while dragging.
 Must consume the DragHover event to receive this event.
+The target sets `draggedWidget`, which allows DragLeave to occur.
 */
 struct DragEnter : DragBase {
 	/** The dragged widget */
