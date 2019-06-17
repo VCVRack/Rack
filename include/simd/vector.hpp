@@ -85,6 +85,9 @@ struct Vector<float, 4> {
 		_mm_storeu_ps(x, v);
 	}
 
+	float &operator[](int i) {return s[i];}
+	const float &operator[](int i) const {return s[i];}
+
 	// Conversions
 	Vector(Vector<int32_t, 4> a);
 	// Casts
@@ -126,6 +129,8 @@ struct Vector<int32_t, 4> {
 		// Use _mm_storeu_si128() because GCC doesn't support _mm_storeu_si32()
 		_mm_storeu_si128((__m128i*) x, v);
 	}
+	int32_t &operator[](int i) {return s[i];}
+	const int32_t &operator[](int i) const {return s[i];}
 	Vector(Vector<float, 4> a);
 	static Vector cast(Vector<float, 4> a);
 };
