@@ -81,16 +81,6 @@ static bool isModelVisible(plugin::Model *model, const std::string &search, cons
 	return true;
 }
 
-static void stepFavoriteScore(const std::string &plugin, const std::string &model) {
-	// Decay all scores
-	const float decayLambda = 0.1;
-	for (auto &it : settings::favoriteScores) {
-		it.second *= 1 - decayLambda;
-	}
-	// Increment favorite score by 1
-	settings::favoriteScores[std::make_tuple(plugin, model)] += 1;
-}
-
 static ModuleWidget *chooseModel(plugin::Model *model) {
 	// Create module
 	ModuleWidget *moduleWidget = model->createModuleWidget();
@@ -102,9 +92,6 @@ static ModuleWidget *chooseModel(plugin::Model *model) {
 	h->name = "create module";
 	h->setModule(moduleWidget);
 	APP->history->push(h);
-
-	// Step favorite
-	stepFavoriteScore(model->plugin->slug, model->slug);
 
 	// Hide Module Browser
 	APP->scene->moduleBrowser->hide();
@@ -506,13 +493,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 
 		// Sort ModelBoxes
-		// Sort by favorite score and then name
 		modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 			ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
 			ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
-			// Sort by favorite score if either is available
-			// float score1 = get_default(settings::favoriteScores, std::make_tuple(m1->model->plugin->slug, m1->model->slug), 0.f);
-			// float score2 = get_default(settings::favoriteScores, std::make_tuple(m2->model->plugin->slug, m2->model->slug), 0.f);
+			// Sort by (modifiedTimestamp descending, plugin brand, model name)
 			auto t1 = std::make_tuple(-m1->model->plugin->modifiedTimestamp, m1->model->plugin->brand, m1->model->name);
 			auto t2 = std::make_tuple(-m2->model->plugin->modifiedTimestamp, m2->model->plugin->brand, m2->model->name);
 			return t1 < t2;

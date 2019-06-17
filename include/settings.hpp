@@ -39,8 +39,6 @@ extern bool frameRateSync;
 extern float autosavePeriod;
 extern bool skipLoadOnLaunch;
 extern std::string patchPath;
-// (plugin, model) -> score
-extern std::map<std::tuple<std::string, std::string>, float> favoriteScores;
 extern std::vector<NVGcolor> cableColors;
 
 json_t *toJson();
