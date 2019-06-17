@@ -100,15 +100,16 @@ static Plugin *loadPlugin(std::string path) {
 		if (path != "") {
 			struct stat statbuf;
 			if (!stat(path.c_str(), &statbuf)) {
-				struct timespec mtime;
 #if defined ARCH_MAC
-				mtime = statbuf.st_mtimespec;
-#else
-				mtime = statbuf.st_mtim;
+				plugin->modifiedTimestamp = (double) statbuf.st_mtimespec.tv_sec + statbuf.st_mtimespec.tv_nsec * 1e-9;
+#elif defined ARCH_WIN
+				plugin->modifiedTimestamp = (double) statbuf.st_mtime;
+#elif defined ARCH_LIN
+				plugin->modifiedTimestamp = (double) statbuf.st_mtim.tv_sec + statbuf.st_mtim.tv_nsec * 1e-9;
 #endif
-				plugin->modifiedTimestamp = (double) mtime.tv_sec + mtime.tv_nsec * 1e-9;
 			}
 		}
+		DEBUG("%lf", plugin->modifiedTimestamp);
 
 		// Load plugin.json
 		std::string metadataFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
