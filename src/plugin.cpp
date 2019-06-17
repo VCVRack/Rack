@@ -100,7 +100,13 @@ static Plugin *loadPlugin(std::string path) {
 		if (path != "") {
 			struct stat statbuf;
 			if (!stat(path.c_str(), &statbuf)) {
-				plugin->modifiedTimestamp = (double) statbuf.st_mtim.tv_sec + statbuf.st_mtim.tv_nsec * 1e-9;
+				struct timespec mtime;
+#if defined ARCH_MAC
+				mtime = statbuf.st_mtimespec;
+#else
+				mtime = statbuf.st_mtim;
+#endif
+				plugin->modifiedTimestamp = (double) mtime.tv_sec + mtime.tv_nsec * 1e-9;
 			}
 		}
 
