@@ -432,17 +432,15 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		sidebar->box.size.x = 200;
 		addChild(sidebar);
 
+		modelLabel = new ui::Label;
+		// modelLabel->fontSize = 16;
+		// modelLabel->box.size.x = 400;
+		addChild(modelLabel);
+
 		modelScroll = new ui::ScrollWidget;
 		addChild(modelScroll);
 
-		modelLabel = new ui::Label;
-		// modelLabel->fontSize = 16;
-		modelLabel->box.size.x = 200;
-		modelLabel->box.pos = math::Vec(10, 10);
-		modelScroll->container->addChild(modelLabel);
-
 		modelMargin = new ui::MarginLayout;
-		modelMargin->box.pos = modelLabel->box.getBottomLeft();
 		modelMargin->margin = math::Vec(10, 10);
 		modelScroll->container->addChild(modelMargin);
 
@@ -467,9 +465,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		sidebar->box.size.y = box.size.y;
 
-		modelScroll->box.pos.x = sidebar->box.size.x;
-		modelScroll->box.size.x = box.size.x - sidebar->box.size.x;
-		modelScroll->box.size.y = box.size.y;
+		modelLabel->box.pos = sidebar->box.getTopRight().plus(math::Vec(5, 5));
+
+		modelScroll->box.pos = sidebar->box.getTopRight().plus(math::Vec(0, 30));
+		modelScroll->box.size = box.size.minus(modelScroll->box.pos);
 		modelMargin->box.size.x = modelScroll->box.size.x;
 		modelMargin->box.size.y = modelContainer->getChildrenBoundingBox().size.y + 2 * modelMargin->margin.y;
 
@@ -568,7 +567,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			if (w->visible)
 				modelsLen++;
 		}
-		modelLabel->text = string::f("Modules (%d)", modelsLen);
+		modelLabel->text = string::f("Modules (%d) Click and drag a module to place it in the rack.", modelsLen);
 	}
 
 	void clear() {
