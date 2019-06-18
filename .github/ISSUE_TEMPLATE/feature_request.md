@@ -17,4 +17,5 @@ What is the motivation for this feature? What does the feature achieve?
 
 What is one possible implementation of this feature?
 If visual, explain how the user interface should be changed. If interactive, explain the steps needed for a user to use the feature.
+Are there any corner cases where your implementation would fail?
 Are there alternative implementations?
