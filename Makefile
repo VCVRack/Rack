@@ -58,7 +58,7 @@ runr: $(TARGET)
 
 debug: $(TARGET)
 ifdef ARCH_MAC
-	lldb --args ./$< -d
+	lldb -- ./$< -d
 endif
 ifdef ARCH_WIN
 	gdb --args ./$< -d
