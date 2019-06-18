@@ -1,15 +1,15 @@
 {
-  "version": "1.dev.71fab3d",
+  "version": "1.dev.82b817e",
   "modules": [
     {
       "plugin": "Core",
-      "version": "1.dev.7bd9894",
+      "version": "1.0.0",
       "model": "AudioInterface",
       "params": [],
       "data": {
         "audio": {
           "driver": 1,
-          "offset": 1,
+          "offset": 0,
           "maxChannels": 8,
           "sampleRate": 44100,
           "blockSize": 256
@@ -106,7 +106,7 @@
       "params": [
         {
           "id": 0,
-          "value": 0.0464999937
+          "value": 0.0
         },
         {
           "id": 1,
@@ -114,7 +114,7 @@
         },
         {
           "id": 2,
-          "value": 0.236999944
+          "value": 0.234000027
         },
         {
           "id": 3,
@@ -135,7 +135,7 @@
     },
     {
       "plugin": "Core",
-      "version": "1.dev.7bd9894",
+      "version": "1.0.0",
       "model": "MIDIToCVInterface",
       "params": [],
       "data": {
@@ -164,19 +164,19 @@
       "params": [
         {
           "id": 0,
-          "value": 0.247000009
+          "value": 0.258000046
         },
         {
           "id": 1,
-          "value": 0.725000203
+          "value": 0.743000448
         },
         {
           "id": 2,
-          "value": 0.361999929
+          "value": 0.5
         },
         {
           "id": 3,
-          "value": 0.55850035
+          "value": 0.576500058
         }
       ],
       "leftModuleId": 4,
@@ -239,11 +239,11 @@
     },
     {
       "plugin": "Core",
-      "version": "1.dev.7bd9894",
+      "version": "1.0.0",
       "model": "Notes",
       "params": [],
       "leftModuleId": 1,
-      "text": "Demo patch instructions:\n\n1. Choose an audio driver and device in the AUDIO module.\n\n2. Use the QWERTY and ZXCVB rows of your keyboard to generate MIDI notes, which are converted to 1V/oct and GATE signals.\n\n3. Drag knobs up/down. Hold Ctrl (Cmd on Mac) while dragging to fine-tune. Right-click knobs to edit, or double-click to initialize.\n\n4. Drag cables to patch them between inputs and outputs. Stack multiple cables on outputs by holding Ctrl (Cmd on Mac) and dragging from an output.\n\n5. Right-click on an empty rack space to add new modules.",
+      "text": "Demo patch instructions:\n\n1. Choose an audio driver and device in the AUDIO-8 module.\n\n2. Use the QWERTY and ZXCVB rows of your keyboard to generate MIDI notes, which are converted to 1V/oct and GATE signals.\n\n3. Drag knobs up/down. Hold Ctrl (Cmd on Mac) while dragging to fine-tune. Right-click knobs to edit, or double-click to initialize.\n\n4. Drag ports to create and move cables. Stack multiple cables on outputs by holding Ctrl (Cmd on Mac) and dragging from an output.\n\n5. Right-click on an empty rack space to add new modules.",
       "id": 8,
       "pos": [
         67,
@@ -251,7 +251,7 @@
       ]
     }
   ],
-  "id": 19,
+  "id": 29,
   "cables": [
     {
       "outputModuleId": 5,
