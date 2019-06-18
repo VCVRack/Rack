@@ -139,6 +139,7 @@ struct FileButton : MenuButton {
 
 		RevertItem *revertItem = new RevertItem;
 		revertItem->text = "Revert";
+		revertItem->rightText = RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O";
 		menu->addChild(revertItem);
 
 		QuitItem *quitItem = new QuitItem;
