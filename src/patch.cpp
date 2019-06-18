@@ -66,10 +66,17 @@ void PatchManager::reset() {
 	}
 }
 
-void PatchManager::resetDialog() {
-	if (!(APP->history->isSaved() || osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "The current patch is unsaved. Clear it and start a new patch?")))
-		return;
+static bool promptClear(std::string text) {
+	if (APP->history->isSaved())
+		return true;
+	if (APP->scene->rack->isEmpty())
+		return true;
+	return osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, text.c_str());
+}
 
+void PatchManager::resetDialog() {
+	if (!promptClear("The current patch is unsaved. Clear it and start a new patch?"))
+		return;
 	reset();
 }
 
@@ -180,7 +187,7 @@ bool PatchManager::load(std::string path) {
 }
 
 void PatchManager::loadDialog() {
-	if (!(APP->history->isSaved() || osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "The current patch is unsaved. Clear it and open a new patch?")))
+	if (!promptClear("The current patch is unsaved. Clear it and open a new patch?"))
 		return;
 
 	std::string dir;
@@ -214,8 +221,7 @@ void PatchManager::loadDialog() {
 void PatchManager::revertDialog() {
 	if (path.empty())
 		return;
-
-	if (!(APP->history->isSaved() || osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Revert patch to the last saved state?")))
+	if (!promptClear("Revert patch to the last saved state?"))
 		return;
 
 	load(path);
