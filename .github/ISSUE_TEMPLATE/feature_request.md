@@ -11,8 +11,10 @@ Use a descriptive title that best explains the feature request in one sentence.
 
 ### Summary
 
-What is your proposal for a new feature in Rack? Are there any alternative designs?
+What is the motivation for this feature? What does the feature achieve?
 
-### Motivation
+### Proposed design
 
-Why should this feature be considered?
+What is one possible implementation of this feature?
+If visual, explain how the user interface should be changed. If interactive, explain the steps needed for a user to use the feature.
+Are there alternative implementations?
