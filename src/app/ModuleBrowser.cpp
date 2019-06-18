@@ -251,7 +251,7 @@ struct ModelBox : widget::OpaqueWidget {
 			text += "\n" + model->description;
 		// Tags
 		if (!model->tags.empty()) {
-			text += "\n";
+			text += "\nTags: ";
 			for (size_t i = 0; i < model->tags.size(); i++) {
 				if (i > 0)
 					text += ", ";

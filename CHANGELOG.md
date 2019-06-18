@@ -25,7 +25,7 @@
 - Add engine real-time priority setting.
 - Make rack infinite in all four directions.
 - Add bus board graphic to rack.
-- Add key command Ctrl-- and Ctrl-=, or Ctrl-scroll, for zooming the rack.
+- Add key command Ctrl-`-` and Ctrl-`=`, or Ctrl-scroll, for zooming the rack.
 - Fix draw order of cable plugs and wires.
 - Make Gamepad MIDI driver generate MIDI CC instead of MIDI notes for buttons.
 - Add Numpad keyboard MIDI device.
