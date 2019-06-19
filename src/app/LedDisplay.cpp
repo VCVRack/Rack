@@ -9,7 +9,6 @@ namespace app {
 
 
 void LedDisplay::draw(const DrawArgs &args) {
-
 	nvgBeginPath(args.vg);
 	nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
 	nvgFillColor(args.vg, nvgRGB(0x00, 0x00, 0x00));
@@ -44,6 +43,7 @@ LedDisplayChoice::LedDisplayChoice() {
 }
 
 void LedDisplayChoice::draw(const DrawArgs &args) {
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 	if (bgColor.a > 0.0) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
@@ -59,6 +59,7 @@ void LedDisplayChoice::draw(const DrawArgs &args) {
 		nvgFontSize(args.vg, 12);
 		nvgText(args.vg, textOffset.x, textOffset.y, text.c_str(), NULL);
 	}
+	nvgResetScissor(args.vg);
 }
 
 void LedDisplayChoice::onButton(const event::Button &e) {
