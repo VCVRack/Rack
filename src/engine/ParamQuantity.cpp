@@ -72,7 +72,11 @@ float ParamQuantity::getDisplayValue() {
 void ParamQuantity::setDisplayValue(float displayValue) {
 	if (!module)
 		return;
-	float v = (displayValue - displayOffset) / displayMultiplier;
+	float v = displayValue - displayOffset;
+	if (displayMultiplier == 0.f)
+		v = 0.f;
+	else
+		v /= displayMultiplier;
 	if (displayBase == 0.f) {
 		// Linear
 		// v is unchanged
