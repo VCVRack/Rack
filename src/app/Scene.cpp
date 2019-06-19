@@ -125,12 +125,25 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 				}
 			} break;
 			case GLFW_KEY_ENTER: {
-				moduleBrowser->show();
+				if ((e.mods & RACK_MOD_MASK) == 0) {
+					moduleBrowser->show();
+				}
 				e.consume(this);
 			} break;
+			case GLFW_KEY_F1: {
+				if ((e.mods & RACK_MOD_MASK) == 0) {
+					std::thread t([] {
+						system::openBrowser("https://vcvrack.com/manual/");
+					});
+					t.detach();
+					e.consume(this);
+				}
+			} break;
 			case GLFW_KEY_F11: {
-				APP->window->setFullScreen(!APP->window->isFullScreen());
-				e.consume(this);
+				if ((e.mods & RACK_MOD_MASK) == 0) {
+					APP->window->setFullScreen(!APP->window->isFullScreen());
+					e.consume(this);
+				}
 			} break;
 		}
 	}
