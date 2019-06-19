@@ -72,10 +72,14 @@ int main(int argc, char *argv[]) {
 			case 'h': {
 				settings::headless = true;
 			} break;
+			// Due to Mac app translocation and Apple adding a -psn... flag when launched, disable screenshots on Mac for now.
+#if !defined ARCH_MAC
 			case 'p': {
 				screenshot = true;
+				// If parsing number failed, use default value
 				sscanf(optarg, "%f", &screenshotZoom);
 			} break;
+#endif
 			case 's': {
 				asset::systemDir = optarg;
 			} break;
@@ -107,6 +111,12 @@ int main(int argc, char *argv[]) {
 	// Log environment
 	INFO("%s v%s", app::APP_NAME.c_str(), app::APP_VERSION.c_str());
 	INFO("%s", system::getOperatingSystemInfo().c_str());
+	std::string argsList;
+	for (int i = 0; i < argc; i++) {
+		argsList += argv[i];
+		argsList += " ";
+	}
+	INFO("Args: %s", argsList.c_str());
 	if (settings::devMode)
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());
