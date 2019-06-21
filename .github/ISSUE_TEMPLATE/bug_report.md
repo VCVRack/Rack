@@ -4,7 +4,7 @@ about: Bugs, build errors, compatibility/stability issues
 
 ---
 
-<--
+<!--
 To file a bug report, fill out the form below.
 Use a descriptive title that best explains the bug in one sentence.
 Attach screenshots if the bug is visual.
@@ -21,6 +21,10 @@ Operating system:
 Rack version: vX.X.X
 Hardware relevant to your issue (e.g. graphic card model, audio/MIDI device):
 
-### Expected behavior
+### Summary
 
-### Actual behavior
+### Steps to reproduce
+
+<!--
+If developers cannot reproduce the bug, it cannot be fixed.
+-->
