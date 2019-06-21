@@ -126,9 +126,9 @@ ifdef ARCH_MAC
 	# Clean up and sign bundle
 	xattr -cr dist/$(TARGET).app
 	# This will only work if you have the private key to my certificate
-	codesign --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --verbose dist/$(TARGET).app
+	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --deep dist/$(TARGET).app
 	codesign --verify --deep --strict --verbose=2 dist/$(TARGET).app
-	spctl -a -t exec -vv dist/$(TARGET).app
+	#spctl --assess --type execute --ignore-cache --no-cache -vv dist/$(TARGET).app
 	# Make ZIP
 	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
 endif
@@ -166,7 +166,13 @@ endif
 notarize:
 	# This will only work if you have my Apple ID password in your keychain
 ifdef ARCH_MAC
-	xcrun altool --notarize-app -f dist/Rack-$(VERSION)-$(ARCH).zip --primary-bundle-id="RACK" -u "andrewpbelt@gmail.com" -p @keychain:notarize
+	xcrun altool --notarize-app -f dist/Rack-$(VERSION)-$(ARCH).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize
+	#xcrun altool --notarization-info XXXXXXXXX -u "andrewpbelt@gmail.com" -p @keychain:notarize
+endif
+
+staple:
+ifdef ARCH_MAC
+	xcrun stapler staple dist/$(TARGET).app
 endif
 
 UPLOAD_URL := vortico@vcvrack.com:files/
