@@ -125,6 +125,7 @@ ifdef ARCH_MAC
 	cp plugins/Fundamental/dist/*.zip dist/$(TARGET).app/Contents/Resources/Fundamental.zip
 	# Clean up and sign bundle
 	xattr -cr dist/$(TARGET).app
+	# This will only work if you have the private key to my certificate
 	codesign --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --verbose dist/$(TARGET).app
 	codesign --verify --deep --strict --verbose=2 dist/$(TARGET).app
 	spctl -a -t exec -vv dist/$(TARGET).app
@@ -162,9 +163,15 @@ endif
 	cd dist && zip -q -9 -r Rack-SDK-$(VERSION).zip Rack-SDK
 
 
-# Obviously this will only work if you have the private keys to my server
+notarize:
+	# This will only work if you have my Apple ID password in your keychain
+ifdef ARCH_MAC
+	xcrun altool --notarize-app -f dist/Rack-$(VERSION)-$(ARCH).zip --primary-bundle-id="RACK" -u "andrewpbelt@gmail.com" -p @keychain:notarize
+endif
+
 UPLOAD_URL := vortico@vcvrack.com:files/
 upload:
+	# This will only work if you have a private key to my server
 ifdef ARCH_MAC
 	rsync dist/*.zip $(UPLOAD_URL) -zP
 endif
