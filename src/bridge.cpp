@@ -191,7 +191,7 @@ struct BridgeClientConnection {
 
 			case MIDI_MESSAGE_COMMAND: {
 				midi::Message message;
-				if (!recv(&message, 3)) {
+				if (!recv(&message.bytes, 3)) {
 					return;
 				}
 				processMidi(message);
