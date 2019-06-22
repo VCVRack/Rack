@@ -31,7 +31,7 @@
 	<key>NSHighResolutionCapable</key>
 	<string>YES</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>This includes line input from audio devices and interfaces.</string>
+	<string>This is required for using line input from audio interfaces.</string>
 
 	<key>CFBundleDocumentTypes</key>
 	<array>

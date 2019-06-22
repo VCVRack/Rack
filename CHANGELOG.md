@@ -1,6 +1,8 @@
+### 1.0.1 (in development)
+- Fix opening/saving UTF-8 filenames on Windows.
+- Request microphone access on Mac to prevent Mac 10.14+ from blocking audio input.
 
-### 1.0.0 (in development)
-
+### 1.0.0 (2019-06-19)
 - Add polyphonic cables.
 - Add multithreading to engine.
 - Add undo/redo history.
@@ -57,7 +59,6 @@
 	- License Core panel graphics under CC BY-NC-ND 4.0.
 
 ### 0.6.2 (2018-07-13)
-
 - Add module presets.
 - Add [command line arguments](https://vcvrack.com/manual/Installing.html#command-line-usage) for setting Rack directories.
 - Improve UI/engine communication stability.
@@ -65,7 +66,6 @@
 	- Add VST FX plugin.
 
 ### 0.6.1 (2018-06-17)
-
 - Add gamepad MIDI driver.
 - Add computer keyboard MIDI driver.
 - Add JACK support on Linux.
@@ -80,7 +80,6 @@
 	- Add DAW transport and clock.
 
 ### 0.6.0 (2018-03-29)
-
 - Release [*VCV Bridge*](https://vcvrack.com/manual/Bridge.html) for interfacing Rack with your DAW.
 	- VST/AU effect plugins (Mac and 32/64-bit Windows) for using Rack as a send/return on a DAW track.
 	- Enables future VSTi/AU instrument plugins with MIDI and DAW clock transport to be added in a later Rack 0.6.* update.
@@ -104,12 +103,10 @@
 - Release [Rack SDK](https://github.com/VCVRack/Rack/issues/258#issuecomment-376293898) for compiling plugins without compiling Rack.
 
 ### 0.5.1 (2017-12-19)
-
 - Add Plugin Manager support.
 - Fix metadata panel in the Add Module window.
 
 ### 0.5.0 (2017-11-21)
-
 - Add zoom scaling from 25% to 200%.
 - Automatically scroll when dragging cables to the edge of the screen.
 - Add Quad MIDI-to-CV Interface, CC-to-CV, Clock-to-CV, and Trigger-to-CV MIDI interfaces.
@@ -119,7 +116,6 @@
 - File > New attempts to load "template.vcv" in the "Documents/Rack" folder if it exists.
 
 ### 0.4.0 (2017-10-13)
-
 - Cables can now stack on output ports.
 - Add sub-menus for each plugin, includes optional plugin metadata like URLs.
 - Add MIDI CC-to-CV Interface, updated MIDI-to-CV Interface.
@@ -131,7 +127,6 @@
 - Use self-contained Mac app bundle, no need for a Rack folder.
 
 ### 0.3.2 (2017-09-25)
-
 - Add key commands.
 - Fix "invisible knobs/ports" rendering bug for ~2010 Macs.
 - Add "allowCursorLock" to settings.json (set to "false" for touch screen support).
@@ -139,7 +134,6 @@
 - Add vector scaling panels.
 
 ### 0.3.1 (2017-09-13)
-
 - Fix Windows open dialog current working directory graphics problem.
 - Ctrl-C/Ctrl-V to copy/paste from text and password fields.
 - Automatically remember settings and login token between launches.
@@ -149,5 +143,4 @@
 - tweaks to Fundamental and Audible Instruments plugins.
 
 ### 0.3.0 (2017-09-10)
-
 - Knobcon public Beta release.
