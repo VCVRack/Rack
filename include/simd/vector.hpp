@@ -40,8 +40,8 @@ struct Vector<float, 4> {
 		float s[4];
 	};
 
-	/** Constructs an uninitialized vector. */
-	Vector() {}
+	/** Constructs a vector initialized to zero. */
+	Vector() : v(_mm_setzero_ps()) {}
 
 	/** Constructs a vector from a native `__m128` type. */
 	Vector(__m128 v) : v(v) {}
@@ -56,9 +56,14 @@ struct Vector<float, 4> {
 		v = _mm_setr_ps(x1, x2, x3, x4);
 	}
 
+	/** Returns an uninitialized vector. */
+	static Vector undefined() {
+		return Vector(_mm_undefined_ps());
+	}
+
 	/** Returns a vector initialized to zero. */
 	static Vector zero() {
-		return Vector(_mm_setzero_ps());
+		return Vector();
 	}
 
 	/** Returns a vector with all 1 bits. */
@@ -105,7 +110,7 @@ struct Vector<int32_t, 4> {
 		int32_t s[4];
 	};
 
-	Vector() {}
+	Vector() : v(_mm_setzero_si128()) {}
 	Vector(__m128i v) : v(v) {}
 	Vector(int32_t x) {
 		v = _mm_set1_epi32(x);
@@ -113,8 +118,11 @@ struct Vector<int32_t, 4> {
 	Vector(int32_t x1, int32_t x2, int32_t x3, int32_t x4) {
 		v = _mm_setr_epi32(x1, x2, x3, x4);
 	}
+	static Vector undefined() {
+		return Vector(_mm_undefined_si128());
+	}
 	static Vector zero() {
-		return Vector(_mm_setzero_si128());
+		return Vector();
 	}
 	static Vector mask() {
 		return Vector(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
