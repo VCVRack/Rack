@@ -40,6 +40,8 @@ static float modelScore(plugin::Model *model, const std::string &search) {
 	std::string s;
 	s += model->plugin->brand;
 	s += " ";
+	s += model->plugin->name;
+	s += " ";
 	s += model->name;
 	s += " ";
 	s += model->slug;
