@@ -1,7 +1,8 @@
 #include <rack.hpp>
 
 
-using namespace rack;
+namespace rack {
+namespace core {
 
 
 extern Model *modelAudioInterface;
@@ -197,3 +198,7 @@ struct NoteChoice : LedDisplayChoice {
 		}
 	}
 };
+
+
+} // namespace core
+} // namespace rack

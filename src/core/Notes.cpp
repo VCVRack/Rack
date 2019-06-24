@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 struct NotesWidget : ModuleWidget {
 	TextField *textField;
 
@@ -40,3 +44,7 @@ struct NotesWidget : ModuleWidget {
 
 
 Model *modelNotes = createModel<Module, NotesWidget>("Notes");
+
+
+} // namespace core
+} // namespace rack

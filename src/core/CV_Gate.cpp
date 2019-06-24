@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 struct GateMidiOutput : midi::Output {
 	int vels[128];
 	bool lastGates[128];
@@ -213,3 +217,7 @@ struct CV_GateWidget : ModuleWidget {
 
 
 Model *modelCV_Gate = createModel<CV_Gate, CV_GateWidget>("CV-Gate");
+
+
+} // namespace core
+} // namespace rack

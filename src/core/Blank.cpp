@@ -2,6 +2,10 @@
 #include <app.hpp>
 
 
+namespace rack {
+namespace core {
+
+
 struct BlankPanel : Widget {
 	Widget *panelBorder;
 
@@ -150,3 +154,7 @@ struct BlankWidget : ModuleWidget {
 
 
 Model *modelBlank = createModel<Module, BlankWidget>("Blank");
+
+
+} // namespace core
+} // namespace rack

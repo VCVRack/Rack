@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 void init(rack::Plugin *p) {
 	p->addModel(modelAudioInterface);
 	p->addModel(modelAudioInterface16);
@@ -14,3 +18,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelBlank);
 	p->addModel(modelNotes);
 }
+
+
+} // namespace core
+} // namespace rack

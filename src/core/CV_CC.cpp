@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 struct CCMidiOutput : midi::Output {
 	int lastValues[128];
 
@@ -147,3 +151,7 @@ struct CV_CCWidget : ModuleWidget {
 
 
 Model *modelCV_CC = createModel<CV_CC, CV_CCWidget>("CV-CC");
+
+
+} // namespace core
+} // namespace rack

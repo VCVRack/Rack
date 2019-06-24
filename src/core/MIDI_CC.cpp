@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 struct MIDI_CC : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -181,3 +185,7 @@ struct MIDI_CCWidget : ModuleWidget {
 
 // Use legacy slug for compatibility
 Model *modelMIDI_CC = createModel<MIDI_CC, MIDI_CCWidget>("MIDICCToCVInterface");
+
+
+} // namespace core
+} // namespace rack

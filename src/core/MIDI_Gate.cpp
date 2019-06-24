@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 struct MIDI_Gate : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -220,3 +224,7 @@ struct MIDI_GateWidget : ModuleWidget {
 
 // Use legacy slug for compatibility
 Model *modelMIDI_Gate = createModel<MIDI_Gate, MIDI_GateWidget>("MIDITriggerToCVInterface");
+
+
+} // namespace core
+} // namespace rack

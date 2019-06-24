@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
 	void onMessage(midi::Message message) override {
 		midi::Output::sendMessage(message);
@@ -170,3 +174,7 @@ struct CV_MIDIWidget : ModuleWidget {
 
 
 Model *modelCV_MIDI = createModel<CV_MIDI, CV_MIDIWidget>("CV-MIDI");
+
+
+} // namespace core
+} // namespace rack

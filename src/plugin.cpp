@@ -33,6 +33,11 @@
 
 
 namespace rack {
+
+namespace core {
+void init(rack::plugin::Plugin *plugin);
+} // namespace core
+
 namespace plugin {
 
 
@@ -133,7 +138,7 @@ static Plugin *loadPlugin(std::string path) {
 		// Call init callback
 		InitCallback initCallback;
 		if (path == "") {
-			initCallback = ::init;
+			initCallback = core::init;
 		}
 		else {
 			initCallback = loadLibrary(plugin);

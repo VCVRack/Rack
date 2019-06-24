@@ -2,6 +2,10 @@
 #include <algorithm>
 
 
+namespace rack {
+namespace core {
+
+
 struct MIDI_CV : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -575,3 +579,7 @@ struct MIDI_CVWidget : ModuleWidget {
 
 // Use legacy slug for compatibility
 Model *modelMIDI_CV = createModel<MIDI_CV, MIDI_CVWidget>("MIDIToCVInterface");
+
+
+} // namespace core
+} // namespace rack

@@ -1,6 +1,10 @@
 #include "plugin.hpp"
 
 
+namespace rack {
+namespace core {
+
+
 static const int MAX_CHANNELS = 128;
 
 
@@ -453,3 +457,7 @@ struct MIDI_MapWidget : ModuleWidget {
 
 
 Model *modelMIDI_Map = createModel<MIDI_Map, MIDI_MapWidget>("MIDI-Map");
+
+
+} // namespace core
+} // namespace rack

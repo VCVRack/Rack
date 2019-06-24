@@ -8,6 +8,10 @@
 #include <condition_variable>
 
 
+namespace rack {
+namespace core {
+
+
 template <int AUDIO_OUTPUTS, int AUDIO_INPUTS>
 struct AudioInterfacePort : audio::Port {
 	std::mutex engineMutex;
@@ -350,3 +354,7 @@ struct AudioInterface16Widget : ModuleWidget {
 
 Model *modelAudioInterface = createModel<AudioInterface<8, 8>, AudioInterface8Widget>("AudioInterface");
 Model *modelAudioInterface16 = createModel<AudioInterface<16, 16>, AudioInterface16Widget>("AudioInterface16");
+
+
+} // namespace core
+} // namespace rack
