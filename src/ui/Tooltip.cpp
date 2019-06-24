@@ -1,5 +1,6 @@
 #include <ui/Tooltip.hpp>
 #include <app.hpp>
+#include <app/Scene.hpp>
 #include <window.hpp>
 
 
@@ -13,6 +14,8 @@ void Tooltip::step() {
 	box.size.y = bndLabelHeight(APP->window->vg, -1, text.c_str(), INFINITY);
 	// Position near cursor. This assumes that `this` is added to the root widget.
 	box.pos = APP->window->mousePos.plus(math::Vec(15, 15));
+	// Ensure that it fits within the window.
+	box = box.nudge(APP->scene->box);
 	Widget::step();
 }
 
