@@ -340,27 +340,31 @@ struct BrowserSidebar : widget::Widget {
 	ui::ScrollWidget *tagScroll;
 
 	BrowserSidebar() {
+		// Search
 		searchField = new BrowserSearchField;
 		addChild(searchField);
 
+		// Clear filters
 		clearButton = new ClearButton;
 		clearButton->text = "Reset filters";
 		addChild(clearButton);
 
+		// Bbrand label
 		brandLabel = new ui::Label;
 		// brandLabel->fontSize = 16;
 		brandLabel->color = nvgRGB(0x80, 0x80, 0x80);
 		brandLabel->text = "Brands";
 		addChild(brandLabel);
 
-		// Plugin list
+		// Brand list
 		brandScroll = new ui::ScrollWidget;
 		addChild(brandScroll);
 
 		brandList = new ui::List;
 		brandScroll->container->addChild(brandList);
 
-		std::set<std::string, string::CaseInsensitiveCompare> brands;
+		// Collect brands from all plugins
+		std::set<std::string> brands;
 		for (plugin::Plugin *plugin : plugin::plugins) {
 			brands.insert(plugin->brand);
 		}
@@ -371,6 +375,7 @@ struct BrowserSidebar : widget::Widget {
 			brandList->addChild(item);
 		}
 
+		// Tag label
 		tagLabel = new ui::Label;
 		// tagLabel->fontSize = 16;
 		tagLabel->color = nvgRGB(0x80, 0x80, 0x80);
