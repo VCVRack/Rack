@@ -13,6 +13,10 @@ void Tooltip::step() {
 	box.size.y = bndLabelHeight(APP->window->vg, -1, text.c_str(), INFINITY);
 	// Position near cursor. This assumes that `this` is added to the root widget.
 	box.pos = APP->window->mousePos.plus(math::Vec(15, 15));
+	// Fit inside parent
+	assert(parent);
+	box = box.nudge(parent->box.zeroPos());
+
 	Widget::step();
 }
 

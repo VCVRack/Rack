@@ -9,11 +9,6 @@ void MenuOverlay::step() {
 	// Adopt parent's size
 	box.size = parent->box.size;
 
-	// Fit all children in the box
-	for (widget::Widget *child : children) {
-		child->box = child->box.nudge(box.zeroPos());
-	}
-
 	Widget::step();
 }
 

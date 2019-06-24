@@ -46,6 +46,10 @@ void Menu::step() {
 	for (widget::Widget *child : children) {
 		child->box.size.x = box.size.x;
 	}
+
+	// Fit inside parent
+	assert(parent);
+	box = box.nudge(parent->box.zeroPos());
 }
 
 void Menu::draw(const DrawArgs &args) {
