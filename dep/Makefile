@@ -52,9 +52,6 @@ osdialog = include/osdialog.h
 pffft = include/pffft.h
 
 DEPS += $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(nanovg) $(nanosvg) $(oui-blendish) $(osdialog) $(pffft)
-ifdef ARCH_MAC
-	DEPS += $(libomp)
-endif
 
 
 DEP_LOCAL := .
