@@ -1,6 +1,10 @@
 ### 1.0.1 (in development)
-- Fix opening/saving UTF-8 filenames on Windows.
 - Request microphone access on Mac to prevent Mac 10.14+ from blocking audio input.
+- Fix MIDI receiving in Bridge MIDI driver.
+- Fix opening/saving UTF-8 filenames on Windows.
+- API
+	- Add `string::absolutePath()`.
+	- Use namespace for Core plugin to avoid name clashes.
 
 ### 1.0.0 (2019-06-19)
 - Add polyphonic cables.
