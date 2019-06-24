@@ -95,7 +95,6 @@ int main(int argc, char *argv[]) {
 
 	asset::init();
 	logger::init();
-	DEBUG("abspath: %s", system::getAbsolutePath("今日は/a").c_str());
 
 	// We can now install a signal handler and log the output
 	// Mac has its own decent crash handler

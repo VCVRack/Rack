@@ -48,6 +48,10 @@ Example: filenameExtension("file.txt") // "txt"
 Note: Only works on filenames. Call filename(path) to get the filename of the path.
 */
 std::string filenameExtension(const std::string &filename);
+/** Returns the canonicalized absolute path pointed to by `path`, following symlinks.
+Returns "" if the symbol is not found.
+*/
+std::string absolutePath(const std::string &path);
 /** Scores how well a query matches a string.
 A score of 0 means no match.
 The score is arbitrary and is only meaningful for sorting.
