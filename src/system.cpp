@@ -108,7 +108,7 @@ void createDirectory(const std::string &path) {
 
 
 std::string getAbsolutePath(const std::string &path) {
-#if defined ARCH_LIN
+#if defined ARCH_LIN || defined ARCH_MAC
 	char buf[PATH_MAX];
 	char *pathC = realpath(path.c_str(), buf);
 	if (pathC)
