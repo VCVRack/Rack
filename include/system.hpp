@@ -25,6 +25,10 @@ void copyFile(const std::string &srcPath, const std::string &destPath);
 The parent directory must exist.
 */
 void createDirectory(const std::string &path);
+/** Returns the canonicalized absolute path pointed to by `path`.
+Returns "" if the symbol is not found.
+*/
+std::string getAbsolutePath(const std::string &path);
 /** Returns the number of logical simultaneous multithreading (SMT) (e.g. Intel Hyperthreaded) threads on the CPU. */
 int getLogicalCoreCount();
 /** Sets a name of the current thread for debuggers and OS-specific process viewers. */

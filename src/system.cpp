@@ -42,12 +42,14 @@ std::list<std::string> getEntries(const std::string &path) {
 	return filenames;
 }
 
+
 bool isFile(const std::string &path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
 	return S_ISREG(statbuf.st_mode);
 }
+
 
 bool isDirectory(const std::string &path) {
 	struct stat statbuf;
@@ -56,6 +58,7 @@ bool isDirectory(const std::string &path) {
 	return S_ISDIR(statbuf.st_mode);
 }
 
+
 void moveFile(const std::string &srcPath, const std::string &destPath) {
 	std::remove(destPath.c_str());
 	// Whether this overwrites existing files is implementation-defined.
@@ -63,6 +66,7 @@ void moveFile(const std::string &srcPath, const std::string &destPath) {
 	// This is why we remove the file above.
 	std::rename(srcPath.c_str(), destPath.c_str());
 }
+
 
 void copyFile(const std::string &srcPath, const std::string &destPath) {
 	// Open source
@@ -92,6 +96,7 @@ void copyFile(const std::string &srcPath, const std::string &destPath) {
 	}
 }
 
+
 void createDirectory(const std::string &path) {
 #if defined ARCH_WIN
 	std::wstring pathW = string::toWstring(path);
@@ -101,9 +106,22 @@ void createDirectory(const std::string &path) {
 #endif
 }
 
+
+std::string getAbsolutePath(const std::string &path) {
+#if defined ARCH_LIN
+	char buf[PATH_MAX];
+	char *pathC = realpath(path.c_str(), buf);
+	if (pathC)
+		return pathC;
+#endif
+	return "";
+}
+
+
 int getLogicalCoreCount() {
 	return std::thread::hardware_concurrency();
 }
+
 
 void setThreadName(const std::string &name) {
 #if defined ARCH_LIN
@@ -112,6 +130,7 @@ void setThreadName(const std::string &name) {
 	// Unsupported on Windows
 #endif
 }
+
 
 void setThreadRealTime(bool realTime) {
 #if defined ARCH_LIN
@@ -148,6 +167,7 @@ void setThreadRealTime(bool realTime) {
 #endif
 }
 
+
 std::string getStackTrace() {
 	int stackLen = 128;
 	void *stack[stackLen];
@@ -180,6 +200,7 @@ std::string getStackTrace() {
 	return s;
 }
 
+
 void openBrowser(const std::string &url) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + url + "\"";
@@ -194,6 +215,7 @@ void openBrowser(const std::string &url) {
 	ShellExecuteW(NULL, L"open", urlW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
+
 
 void openFolder(const std::string &path) {
 #if defined ARCH_LIN
