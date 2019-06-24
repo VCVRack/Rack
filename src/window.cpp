@@ -159,7 +159,7 @@ static void charCallback(GLFWwindow *win, unsigned int codepoint) {
 }
 
 static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
-	DEBUG("key %d scancode %d name '%s'", key, scancode, glfwGetKeyName(key, scancode));
+	DEBUG("key %d scancode %d name '%s' Z scancode %d Q scancode %d 1 scancode %d", key, scancode, glfwGetKeyName(key, scancode), glfwGetKeyScancode(GLFW_KEY_Z), glfwGetKeyScancode(GLFW_KEY_Q), glfwGetKeyScancode(GLFW_KEY_1));
 
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
 	if (APP->event->handleKey(window->mousePos, key, scancode, action, mods))
