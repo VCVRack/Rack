@@ -108,7 +108,7 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					float zoom = settings::zoom;
 					zoom *= 2;
-					zoom = std::ceil(zoom - 0.01) - 1;
+					zoom = std::ceil(zoom - 0.01f) - 1;
 					zoom /= 2;
 					settings::zoom = zoom;
 					e.consume(this);
@@ -118,9 +118,15 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 					float zoom = settings::zoom;
 					zoom *= 2;
-					zoom = std::floor(zoom + 0.01) + 1;
+					zoom = std::floor(zoom + 0.01f) + 1;
 					zoom /= 2;
 					settings::zoom = zoom;
+					e.consume(this);
+				}
+			} break;
+			case GLFW_KEY_0: {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+					settings::zoom = 0.f;
 					e.consume(this);
 				}
 			} break;
