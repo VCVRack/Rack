@@ -1,4 +1,4 @@
-### 1.0.1 (in development)
+### 1.1.0 (in development)
 - Request microphone access on Mac to prevent Mac 10.14+ from blocking audio input.
 - Clear filters in Module Browser when backspace is pressed while the search field is empty.
 - Fix MIDI receiving in Bridge MIDI driver.
