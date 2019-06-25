@@ -296,19 +296,7 @@ struct BrowserSearchField : ui::TextField {
 		TextField::step();
 	}
 
-	void onSelectKey(const event::SelectKey &e) override {
-		if (e.action == GLFW_PRESS) {
-			if (e.key == GLFW_KEY_ESCAPE) {
-				BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
-				overlay->hide();
-				e.consume(this);
-			}
-		}
-
-		if (!e.getTarget())
-			ui::TextField::onSelectKey(e);
-	}
-
+	void onSelectKey(const event::SelectKey &e) override;
 	void onChange(const event::Change &e) override;
 	void onAction(const event::Action &e) override;
 
@@ -623,6 +611,28 @@ inline void TagItem::step() {
 	MenuItem::step();
 	ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
 	active = (browser->tag == text);
+}
+
+inline void BrowserSearchField::onSelectKey(const event::SelectKey &e) {
+	if (e.action == GLFW_PRESS) {
+		switch (e.key) {
+			case GLFW_KEY_ESCAPE: {
+				BrowserOverlay *overlay = getAncestorOfType<BrowserOverlay>();
+				overlay->hide();
+				e.consume(this);
+			} break;
+			case GLFW_KEY_BACKSPACE: {
+				if (text == "") {
+					ModuleBrowser *browser = getAncestorOfType<ModuleBrowser>();
+					browser->clear();
+					e.consume(this);
+				}
+			} break;
+		}
+	}
+
+	if (!e.getTarget())
+		ui::TextField::onSelectKey(e);
 }
 
 inline void BrowserSearchField::onChange(const event::Change &e) {
