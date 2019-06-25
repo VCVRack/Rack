@@ -1,6 +1,12 @@
+##### Preface
+
+In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
+
 ### 1.1.0 (in development)
 - Request microphone access on Mac to prevent Mac 10.14+ from blocking audio input.
 - Clear filters in Module Browser when backspace is pressed while the search field is empty.
+- Add Mod-0 key command to set zoom to 100%.
+- Emulate middle-click with Ctrl-shift-click on Mac.
 - Fix MIDI receiving in Bridge MIDI driver.
 - Fix opening/saving UTF-8 filenames on Windows.
 - Fix bug where cable ID's were not being set in .vcv patches.
@@ -17,9 +23,9 @@
 - Add parameter tooltips for quickly viewing parameter values.
 - Add parameter context menu for entering numerical values, unmapping, etc.
 - Change parameter initialization to double-click.
-- Add ability to Ctrl-click on an input port to clone the existing cable.
-- Add module "force" dragging when holding Ctrl.
-- Add ability to disable modules with a context menu item and key command Ctrl-E.
+- Add ability to Mod-click on an input port to clone the existing cable.
+- Add module "force" dragging when holding Mod.
+- Add ability to disable modules with a context menu item and key command Mod-E.
 - Add sample rates up to 768,000 Hz (16 x 48,000 Hz).
 - Overhaul Module Browser with visual previews of modules.
 - Add plugin info sub-menu to module context menu with links to manual, website, source code, etc..
@@ -33,7 +39,7 @@
 - Add engine real-time priority setting.
 - Make rack infinite in all four directions.
 - Add bus board graphic to rack.
-- Add key command Ctrl-`-` and Ctrl-`=`, or Ctrl-scroll, for zooming the rack.
+- Add key command Mod-`-` and Mod-`=`, or Mod-scroll, for zooming the rack.
 - Fix draw order of cable plugs and wires.
 - Make Gamepad MIDI driver generate MIDI CC instead of MIDI notes for buttons.
 - Add Numpad keyboard MIDI device.
@@ -141,10 +147,10 @@
 
 ### 0.3.1 (2017-09-13)
 - Fix Windows open dialog current working directory graphics problem.
-- Ctrl-C/Ctrl-V to copy/paste from text and password fields.
+- Mod-C/Mod-V to copy/paste from text and password fields.
 - Automatically remember settings and login token between launches.
 - Remove .zip after downloading and extracting plugin.
-- Ctrl-click to right click on Mac.
+- Mod-click to right click on Mac.
 - Fix menu "flicker" when menu cannot fit in window.
 - tweaks to Fundamental and Audible Instruments plugins.
 
