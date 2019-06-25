@@ -145,6 +145,7 @@ json_t *CableWidget::toJson() {
 	assert(isComplete());
 	json_t *rootJ = json_object();
 
+	json_object_set_new(rootJ, "id", json_integer(cable->id));
 	json_object_set_new(rootJ, "outputModuleId", json_integer(cable->outputModule->id));
 	json_object_set_new(rootJ, "outputId", json_integer(cable->outputId));
 	json_object_set_new(rootJ, "inputModuleId", json_integer(cable->inputModule->id));
@@ -180,6 +181,16 @@ void CableWidget::fromJson(json_t *rootJ) {
 	json_t *inputIdJ = json_object_get(rootJ, "inputId");
 	if (!inputIdJ) return;
 	int inputId = json_integer_value(inputIdJ);
+
+	// Only set ID if unset
+	if (cable->id < 0) {
+		// id
+		json_t *idJ = json_object_get(rootJ, "id");
+		// Before 1.0, cables IDs were not used, so just leave it as default and Engine will assign one automatically.
+		if (idJ) {
+			cable->id = json_integer_value(idJ);
+		}
+	}
 
 	// Set ports
 	if (APP->patch->isLegacy(1)) {

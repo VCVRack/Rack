@@ -32,6 +32,18 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 json_t *Module::toJson() {
 	json_t *rootJ = json_object();
 
+	// id
+	json_object_set_new(rootJ, "id", json_integer(id));
+
+	// plugin
+	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
+
+	// version
+	json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
+
+	// model
+	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
+
 	// params
 	json_t *paramsJ = json_array();
 	for (size_t paramId = 0; paramId < params.size(); paramId++) {
@@ -54,12 +66,6 @@ json_t *Module::toJson() {
 	if (bypass)
 		json_object_set_new(rootJ, "bypass", json_boolean(bypass));
 
-	// data
-	json_t *dataJ = dataToJson();
-	if (dataJ) {
-		json_object_set_new(rootJ, "data", dataJ);
-	}
-
 	// leftModuleId
 	if (leftExpander.moduleId >= 0)
 		json_object_set_new(rootJ, "leftModuleId", json_integer(leftExpander.moduleId));
@@ -68,10 +74,54 @@ json_t *Module::toJson() {
 	if (rightExpander.moduleId >= 0)
 		json_object_set_new(rootJ, "rightModuleId", json_integer(rightExpander.moduleId));
 
+	// data
+	json_t *dataJ = dataToJson();
+	if (dataJ) {
+		json_object_set_new(rootJ, "data", dataJ);
+	}
+
 	return rootJ;
 }
 
 void Module::fromJson(json_t *rootJ) {
+	// Check if plugin and model are incorrect
+	json_t *pluginJ = json_object_get(rootJ, "plugin");
+	std::string pluginSlug;
+	if (pluginJ) {
+		pluginSlug = json_string_value(pluginJ);
+		if (pluginSlug != model->plugin->slug) {
+			WARN("Plugin %s does not match Module's plugin %s.", pluginSlug.c_str(), model->plugin->slug.c_str());
+			return;
+		}
+	}
+
+	json_t *modelJ = json_object_get(rootJ, "model");
+	std::string modelSlug;
+	if (modelJ) {
+		modelSlug = json_string_value(modelJ);
+		if (modelSlug != model->slug) {
+			WARN("Model %s does not match Module's model %s.", modelSlug.c_str(), model->slug.c_str());
+			return;
+		}
+	}
+
+	// Check plugin version
+	json_t *versionJ = json_object_get(rootJ, "version");
+	if (versionJ) {
+		std::string version = json_string_value(versionJ);
+		if (version != model->plugin->version) {
+			INFO("Patch created with %s v%s, currently using v%s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
+		}
+	}
+
+	// Only set ID if unset
+	if (id < 0) {
+		// id
+		json_t *idJ = json_object_get(rootJ, "id");
+		if (idJ)
+			id = json_integer_value(idJ);
+	}
+
 	// params
 	json_t *paramsJ = json_object_get(rootJ, "params");
 	size_t i;

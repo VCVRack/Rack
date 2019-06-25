@@ -483,60 +483,17 @@ PortWidget *ModuleWidget::getInput(int inputId) {
 }
 
 json_t *ModuleWidget::toJson() {
-	json_t *rootJ = json_object();
+	if (!module)
+		return NULL;
 
-	// plugin
-	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
-	// version of plugin
-	if (!model->plugin->version.empty())
-		json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
-	// model
-	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
-
-	// Merge with module JSON
-	if (module) {
-		json_t *moduleJ = module->toJson();
-		// Merge with rootJ
-		json_object_update(rootJ, moduleJ);
-		json_decref(moduleJ);
-	}
+	json_t *rootJ = module->toJson();
 	return rootJ;
 }
 
 void ModuleWidget::fromJson(json_t *rootJ) {
-	// Check if plugin and model are incorrect
-	json_t *pluginJ = json_object_get(rootJ, "plugin");
-	std::string pluginSlug;
-	if (pluginJ) {
-		pluginSlug = json_string_value(pluginJ);
-		if (pluginSlug != model->plugin->slug) {
-			WARN("Plugin %s does not match ModuleWidget's plugin %s.", pluginSlug.c_str(), model->plugin->slug.c_str());
-			return;
-		}
-	}
-
-	json_t *modelJ = json_object_get(rootJ, "model");
-	std::string modelSlug;
-	if (modelJ) {
-		modelSlug = json_string_value(modelJ);
-		if (modelSlug != model->slug) {
-			WARN("Model %s does not match ModuleWidget's model %s.", modelSlug.c_str(), model->slug.c_str());
-			return;
-		}
-	}
-
-	// Check plugin version
-	json_t *versionJ = json_object_get(rootJ, "version");
-	if (versionJ) {
-		std::string version = json_string_value(versionJ);
-		if (version != model->plugin->version) {
-			INFO("Patch created with %s v%s, currently using v%s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
-		}
-	}
-
-	if (module) {
-		module->fromJson(rootJ);
-	}
+	if (!module)
+		return;
+	module->fromJson(rootJ);
 }
 
 void ModuleWidget::copyClipboard() {

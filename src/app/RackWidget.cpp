@@ -192,8 +192,6 @@ json_t *RackWidget::toJson() {
 		// module
 		json_t *moduleJ = moduleWidget->toJson();
 		{
-			// id
-			json_object_set_new(moduleJ, "id", json_integer(moduleWidget->module->id));
 			// pos
 			math::Vec pos = moduleWidget->box.pos.minus(moduleOffset);
 			pos = pos.div(RACK_GRID_SIZE).round();
@@ -215,12 +213,7 @@ json_t *RackWidget::toJson() {
 			continue;
 
 		json_t *cableJ = cw->toJson();
-		{
-			// id
-			json_object_set_new(rootJ, "id", json_integer(cw->cable->id));
-		}
 		json_array_append_new(cablesJ, cableJ);
-
 	}
 	json_object_set_new(rootJ, "cables", cablesJ);
 
@@ -242,10 +235,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 			if (APP->patch->isLegacy(2)) {
 				moduleWidget->module->id = moduleIndex;
 			}
-			// id
-			json_t *idJ = json_object_get(moduleJ, "id");
-			if (idJ)
-				moduleWidget->module->id = json_integer_value(idJ);
 
 			// pos
 			json_t *posJ = json_object_get(moduleJ, "pos");
@@ -288,15 +277,6 @@ void RackWidget::fromJson(json_t *rootJ) {
 			delete cw;
 			continue;
 		}
-
-		// Before 1.0, cables IDs were not used, so just use the index of the "cables" array.
-		if (APP->patch->isLegacy(2)) {
-			cw->cable->id = cableIndex;
-		}
-		// id
-		json_t *idJ = json_object_get(cableJ, "id");
-		if (idJ)
-			cw->cable->id = json_integer_value(idJ);
 		addCable(cw);
 	}
 }
