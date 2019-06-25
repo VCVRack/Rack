@@ -18,10 +18,13 @@ void init() {
 	startTime = std::chrono::high_resolution_clock::now();
 	if (settings::devMode) {
 		outputFile = stderr;
+		return;
 	}
-	else {
-		std::string logFilename = asset::user("log.txt");
-		outputFile = fopen(logFilename.c_str(), "w");
+
+	std::string logFilename = asset::user("log.txt");
+	outputFile = fopen(logFilename.c_str(), "w");
+	if (!outputFile) {
+		fprintf(stderr, "Could not open log at %s\n", logFilename.c_str());
 	}
 }
 
