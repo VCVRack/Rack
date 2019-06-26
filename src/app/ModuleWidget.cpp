@@ -730,6 +730,9 @@ void ModuleWidget::cloneAction() {
 	clonedModuleWidget->fromJson(moduleJ);
 	json_decref(moduleJ);
 
+	// Reset ID so the Engine automatically assigns a new one
+	clonedModuleWidget->module->id = -1;
+
 	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
 
 	// history::ModuleAdd
