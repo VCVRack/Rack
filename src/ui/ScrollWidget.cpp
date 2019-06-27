@@ -102,8 +102,11 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
 
 	math::Vec scrollDelta = e.scrollDelta;
 	// Flip coordinates if shift is held
+	// Mac (or GLFW?) already does this for us.
+#if !defined ARCH_MAC
 	if ((APP->window->getMods() & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
 		scrollDelta = scrollDelta.flip();
+#endif
 
 	offset = offset.minus(scrollDelta);
 	e.consume(this);
