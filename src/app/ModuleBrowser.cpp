@@ -352,7 +352,7 @@ struct BrowserSidebar : widget::Widget {
 		brandScroll->container->addChild(brandList);
 
 		// Collect brands from all plugins
-		std::set<std::string> brands;
+		std::set<std::string, string::CaseInsensitiveCompare> brands;
 		for (plugin::Plugin *plugin : plugin::plugins) {
 			brands.insert(plugin->brand);
 		}
