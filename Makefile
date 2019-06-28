@@ -163,18 +163,6 @@ endif
 	cd dist && zip -q -9 -r Rack-SDK-$(VERSION).zip Rack-SDK
 
 
-notarize:
-	# This will only work if you have my Apple ID password in your keychain
-ifdef ARCH_MAC
-	xcrun altool --notarize-app -f dist/Rack-$(VERSION)-$(ARCH).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize
-	#xcrun altool --notarization-info XXXXXXXXX -u "andrewpbelt@gmail.com" -p @keychain:notarize
-endif
-
-staple:
-ifdef ARCH_MAC
-	xcrun stapler staple dist/$(TARGET).app
-endif
-
 UPLOAD_URL := vortico@vcvrack.com:files/
 upload:
 	# This will only work if you have a private key to my server
@@ -203,5 +191,5 @@ endif
 
 include compile.mk
 
-.PHONY: all dep run debug clean dist plugins cleanplugins distplugins cmdplugins
 .DEFAULT_GOAL := all
+.PHONY: all dep run debug clean dist upload src plugins
