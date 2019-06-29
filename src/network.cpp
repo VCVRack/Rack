@@ -188,6 +188,21 @@ std::string computeSHA256File(const std::string &filename) {
 	return str;
 }
 
+std::string urlPath(const std::string &url) {
+	CURLU *curl = curl_url();
+	DEFER({
+		curl_url_cleanup(curl);
+	});
+	if (curl_url_set(curl, CURLUPART_URL, url.c_str(), 0))
+		return "";
+	char *buf;
+	if (curl_url_get(curl, CURLUPART_PATH, &buf, 0))
+		return "";
+	std::string ret = buf;
+	curl_free(buf);
+	return ret;
+}
+
 
 } // namespace network
 } // namespace rack

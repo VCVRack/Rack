@@ -28,6 +28,8 @@ bool requestDownload(std::string url, const std::string &filename, float *progre
 std::string encodeUrl(const std::string &s);
 /** Computes the SHA256 of the file at `filename` */
 std::string computeSHA256File(const std::string &filename);
+/** Gets the path portion of the URL. */
+std::string urlPath(const std::string &url);
 
 
 } // namespace network

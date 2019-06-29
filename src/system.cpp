@@ -224,17 +224,18 @@ void openFolder(const std::string &path) {
 
 void runProcessDetached(const std::string &path) {
 #if defined ARCH_WIN
-	STARTUPINFOW startupInfo;
-	PROCESS_INFORMATION processInfo;
-
-	std::memset(&startupInfo, 0, sizeof(startupInfo));
-	startupInfo.cb = sizeof(startupInfo);
-	std::memset(&processInfo, 0, sizeof(processInfo));
+	SHELLEXECUTEINFOW shExInfo;
+	ZeroMemory(&shExInfo, sizeof(shExInfo));
+	shExInfo.cbSize = sizeof(shExInfo);
+	shExInfo.lpVerb = L"runas";
 
 	std::wstring pathW = string::toWstring(path);
-	CreateProcessW(pathW.c_str(), NULL,
-		NULL, NULL, false, 0, NULL, NULL,
-		&startupInfo, &processInfo);
+	shExInfo.lpFile = pathW.c_str();
+	shExInfo.nShow = SW_SHOW;
+
+	if (ShellExecuteExW(&shExInfo)) {
+		// Do nothing
+	}
 #else
 	// Not implemented on Linux or Mac
 	assert(0);

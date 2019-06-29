@@ -5,6 +5,7 @@
 #include <system.hpp>
 #include <app.hpp>
 #include <window.hpp>
+#include <asset.hpp>
 #include <thread>
 
 
@@ -62,8 +63,11 @@ void update() {
 
 #if defined ARCH_WIN
 	// Download and launch the installer on Windows
-	std::string path = asset::user("Rack-setup.exe");
+	std::string filename = string::filename(network::urlPath(downloadUrl));
+	std::string path = asset::user(filename);
+	INFO("Download update %s to %s", downloadUrl.c_str(), path.c_str());
 	network::requestDownload(downloadUrl, path, &progress);
+	INFO("Launching update %s", path.c_str());
 	system::runProcessDetached(path);
 #else
 	// Open the browser on Mac and Linux. The user will know what to do.
