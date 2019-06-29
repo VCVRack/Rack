@@ -12,15 +12,17 @@ namespace rack {
 namespace app {
 
 
-extern std::string APP_NAME;
-extern std::string APP_VERSION;
-extern std::string APP_VERSION_UPDATE;
-extern std::string API_URL;
-extern std::string API_VERSION;
-extern std::string ABI_VERSION;
+extern const std::string APP_NAME;
+extern const std::string APP_VERSION;
+extern const std::string APP_ARCH;
 
-static const float SVG_DPI = 75.0;
-static const float MM_PER_IN = 25.4;
+extern const std::string ABI_VERSION;
+
+extern const std::string API_URL;
+extern const std::string API_VERSION;
+
+static const float SVG_DPI = 75.f;
+static const float MM_PER_IN = 25.4f;
 
 
 /** Converts inch measurements to pixels */
@@ -48,9 +50,6 @@ static const float RACK_GRID_HEIGHT = 380;
 static const math::Vec RACK_GRID_SIZE = math::Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT);
 static const math::Vec RACK_OFFSET = RACK_GRID_SIZE.mult(math::Vec(2000, 100));
 static const math::Vec BUS_BOARD_GRID_SIZE = math::Vec(RACK_GRID_WIDTH * 20, RACK_GRID_HEIGHT);
-
-
-void init();
 
 
 } // namespace app

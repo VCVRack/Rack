@@ -15,6 +15,7 @@
 #include <system.hpp>
 #include <plugin.hpp>
 #include <patch.hpp>
+#include <updater.hpp>
 #include <osdialog.h>
 #include <thread>
 
@@ -56,6 +57,16 @@ struct UrlItem : ui::MenuItem {
 	void onAction(const event::Action &e) override {
 		std::thread t([=] {
 			system::openBrowser(url);
+		});
+		t.detach();
+	}
+};
+
+struct FolderItem : ui::MenuItem {
+	std::string path;
+	void onAction(const event::Action &e) override {
+		std::thread t([=] {
+			system::openFolder(path);
 		});
 		t.detach();
 	}
@@ -701,14 +712,34 @@ struct LibraryButton : MenuButton {
 // Help
 ////////////////////
 
-struct UserFolderItem : ui::MenuItem {
+struct UpdateItem : ui::MenuItem {
+	ui::Menu *createChildMenu() override {
+		ui::Menu *menu = new ui::Menu;
+
+		UrlItem *changelogUrl = new UrlItem;
+		changelogUrl->text = "Changelog";
+		changelogUrl->url = updater::changelogUrl;
+		menu->addChild(changelogUrl);
+
+		return menu;
+	}
+
+	void step() override {
+		if (updater::progress > 0) {
+			rightText = string::f("%.0f%%", updater::progress * 100.f);
+		}
+		MenuItem::step();
+	}
+
 	void onAction(const event::Action &e) override {
-		std::thread t([] {
-			system::openFolder(asset::user(""));
+		std::thread t([=] {
+			updater::update();
 		});
 		t.detach();
+		e.consume(NULL);
 	}
 };
+
 
 struct HelpButton : MenuButton {
 	NotificationIcon *notification;
@@ -723,11 +754,10 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		if (hasUpdate()) {
-			UrlItem *updateItem = new UrlItem;
+		if (updater::isUpdateAvailable()) {
+			UpdateItem *updateItem = new UpdateItem;
 			updateItem->text = "Update " + APP_NAME;
-			updateItem->rightText = APP_VERSION + " → " + APP_VERSION_UPDATE;
-			updateItem->url = "https://vcvrack.com/";
+			updateItem->rightText = APP_VERSION + " → " + updater::version;
 			menu->addChild(updateItem);
 		}
 
@@ -742,19 +772,16 @@ struct HelpButton : MenuButton {
 		websiteItem->url = "https://vcvrack.com/";
 		menu->addChild(websiteItem);
 
-		UserFolderItem *folderItem = new UserFolderItem;
+		FolderItem *folderItem = new FolderItem;
 		folderItem->text = "Open user folder";
+		folderItem->path = asset::user("");
 		menu->addChild(folderItem);
 	}
 
 	void step() override {
 		notification->box.pos = math::Vec(0, 0);
-		notification->visible = hasUpdate();
+		notification->visible = updater::isUpdateAvailable();
 		MenuButton::step();
-	}
-
-	bool hasUpdate() {
-		return !APP_VERSION_UPDATE.empty() && APP_VERSION_UPDATE != APP_VERSION;
 	}
 };
 

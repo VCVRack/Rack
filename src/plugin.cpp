@@ -476,21 +476,13 @@ void syncUpdate(Update *update) {
 		isSyncingUpdate = false;
 	});
 
-#if defined ARCH_WIN
-	std::string arch = "win";
-#elif ARCH_MAC
-	std::string arch = "mac";
-#elif defined ARCH_LIN
-	std::string arch = "lin";
-#endif
-
 	std::string downloadUrl = app::API_URL + "/download";
 	downloadUrl += "?token=" + network::encodeUrl(settings::token);
 	downloadUrl += "&slug=" + network::encodeUrl(update->pluginSlug);
 	downloadUrl += "&version=" + network::encodeUrl(update->version);
-	downloadUrl += "&arch=" + network::encodeUrl(arch);
+	downloadUrl += "&arch=" + network::encodeUrl(app::APP_ARCH);
 
-	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), arch.c_str());
+	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), app::APP_ARCH.c_str());
 
 	// Download zip
 	std::string pluginDest = asset::pluginsPath + "/" + update->pluginSlug + ".zip";

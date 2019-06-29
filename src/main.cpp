@@ -16,6 +16,7 @@
 #include <ui.hpp>
 #include <system.hpp>
 #include <string.hpp>
+#include <updater.hpp>
 
 #include <osdialog.h>
 #include <thread>
@@ -150,7 +151,7 @@ int main(int argc, char *argv[]) {
 	keyboard::init();
 	gamepad::init();
 	plugin::init();
-	app::init();
+	updater::init();
 	if (!settings::headless) {
 		ui::init();
 		windowInit();
