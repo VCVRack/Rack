@@ -3,6 +3,7 @@
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 1.1.1 (in development)
+- Add auto-updating on Windows when Help > Update VCV Rack is clicked.
 - Fix filters in open/save dialog box on Windows.
 
 ### 1.1.0 (2019-06-27)
@@ -31,7 +32,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add ability to disable modules with a context menu item and key command Mod-E.
 - Add sample rates up to 768,000 Hz (16 x 48,000 Hz).
 - Overhaul Module Browser with visual previews of modules.
-- Add plugin info sub-menu to module context menu with links to manual, website, source code, etc..
+- Add plugin info sub-menu to module context menu with links to manual, website, source code, etc.
 - Add factory presets to module context menu if plugin supplies a folder of presets.
 - Add default template patch.
 - Add menu item to save the current patch as the template.
