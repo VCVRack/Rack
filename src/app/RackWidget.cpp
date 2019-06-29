@@ -497,6 +497,8 @@ void RackWidget::setModulePosForce(ModuleWidget *mw, math::Vec pos) {
 		w->box.pos.x = x;
 		xLimit = x + w->box.size.x;
 	}
+
+	RackWidget_updateAdjacent(this);
 }
 
 ModuleWidget *RackWidget::getModule(int moduleId) {

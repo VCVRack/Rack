@@ -5,6 +5,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 ### 1.1.1 (in development)
 - Add auto-updating on Windows when Help > Update VCV Rack is clicked.
 - Fix filters in open/save dialog box on Windows.
+- Fix expander assignment when force-dragging modules.
 
 ### 1.1.0 (2019-06-27)
 - Request microphone access on Mac to prevent Mac 10.14+ from blocking audio input.
