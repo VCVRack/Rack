@@ -43,13 +43,13 @@ struct Plugin {
 	/** Your email address for support inquiries.
 	*/
 	std::string authorEmail;
-	/** Homepage featuring the plugin itself.
+	/** Homepage of the author.
 	*/
 	std::string authorUrl;
-	/** The manual of your plugin. HTML, PDF, or GitHub readme/wiki are fine.
+	/** Homepage featuring the plugin itself.
 	*/
 	std::string pluginUrl;
-	/** Homepage of the author.
+	/** The manual of your plugin. HTML, PDF, or GitHub readme/wiki are fine.
 	*/
 	std::string manualUrl;
 	/** The source code homepage. E.g. GitHub repo.
