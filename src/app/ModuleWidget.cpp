@@ -447,13 +447,25 @@ void ModuleWidget::addParam(ParamWidget *param) {
 }
 
 void ModuleWidget::addOutput(PortWidget *output) {
+	// Check that the port is an output
 	assert(output->type == PortWidget::OUTPUT);
+	// Check that the port doesn't have a duplicate ID
+	for (PortWidget *output2 : outputs) {
+		assert(output->portId != output2->portId);
+	}
+	// Add port
 	outputs.push_back(output);
 	addChild(output);
 }
 
 void ModuleWidget::addInput(PortWidget *input) {
+	// Check that the port is an input
 	assert(input->type == PortWidget::INPUT);
+	// Check that the port doesn't have a duplicate ID
+	for (PortWidget *input2 : inputs) {
+		assert(input->portId != input2->portId);
+	}
+	// Add port
 	inputs.push_back(input);
 	addChild(input);
 }
