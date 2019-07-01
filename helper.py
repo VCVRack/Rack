@@ -277,7 +277,7 @@ def panel_to_components(tree):
 	for el in circles + rects:
 		c = {}
 		# Get name
-		name = el.get('inkscape:label')
+		name = el.get('{http://www.inkscape.org/namespaces/inkscape}label')
 		if name is None:
 			name = el.get('id')
 		name = slug_to_identifier(name).upper()
