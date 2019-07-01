@@ -422,6 +422,7 @@ void Window::screenshot(float zoom) {
 			// Create widgets
 			app::ModuleWidget *mw = model->createModuleWidgetNull();
 			widget::FramebufferWidget *fb = new widget::FramebufferWidget;
+			fb->oversample = 2;
 			fb->addChild(mw);
 			fb->scale = math::Vec(zoom, zoom);
 
