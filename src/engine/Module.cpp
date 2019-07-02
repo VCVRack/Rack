@@ -157,20 +157,21 @@ void Module::fromJson(json_t *rootJ) {
 	if (bypassJ)
 		bypass = json_boolean_value(bypassJ);
 
+	// These do not need to be deserialized, since the module positions will set them correctly when added to the rack.
+	// // leftModuleId
+	// json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
+	// if (leftModuleIdJ)
+	// 	leftExpander.moduleId = json_integer_value(leftModuleIdJ);
+
+	// // rightModuleId
+	// json_t *rightModuleIdJ = json_object_get(rootJ, "rightModuleId");
+	// if (rightModuleIdJ)
+	// 	rightExpander.moduleId = json_integer_value(rightModuleIdJ);
+
 	// data
 	json_t *dataJ = json_object_get(rootJ, "data");
 	if (dataJ)
 		dataFromJson(dataJ);
-
-	// leftModuleId
-	json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
-	if (leftModuleIdJ)
-		leftExpander.moduleId = json_integer_value(leftModuleIdJ);
-
-	// rightModuleId
-	json_t *rightModuleIdJ = json_object_get(rootJ, "rightModuleId");
-	if (rightModuleIdJ)
-		rightExpander.moduleId = json_integer_value(rightModuleIdJ);
 }
 
 
