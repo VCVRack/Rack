@@ -2,6 +2,8 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 1.dev (in development)
+
 ### 1.1.1 (2019-07-01)
 - Add auto-updating on Windows when Help > Update VCV Rack is clicked.
 - Fix extension filters in open/save dialog box on Windows.
