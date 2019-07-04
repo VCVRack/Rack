@@ -153,7 +153,11 @@ static void cursorEnterCallback(GLFWwindow *win, int entered) {
 static void scrollCallback(GLFWwindow *win, double x, double y) {
 	Window *window = (Window*) glfwGetWindowUserPointer(win);
 	math::Vec scrollDelta = math::Vec(x, y);
+#if defined ARCH_MAC
+	scrollDelta = scrollDelta.mult(10.0);
+#else
 	scrollDelta = scrollDelta.mult(50.0);
+#endif
 
 	APP->event->handleScroll(window->mousePos, scrollDelta);
 }
