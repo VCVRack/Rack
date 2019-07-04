@@ -25,6 +25,8 @@ extern math::Vec windowSize;
 extern math::Vec windowPos;
 extern float zoom;
 extern bool invertZoom;
+extern float moduleBrowserZoom;
+
 extern float cableOpacity;
 extern float cableTension;
 extern bool allowCursorLock;

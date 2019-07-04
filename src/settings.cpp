@@ -19,6 +19,7 @@ std::string token;
 math::Vec windowSize;
 math::Vec windowPos;
 float zoom = 0.0;
+float moduleBrowserZoom = 1.0;
 bool invertZoom = false;
 float cableOpacity = 0.5;
 float cableTension = 0.5;
@@ -56,6 +57,8 @@ json_t *toJson() {
 	json_object_set_new(rootJ, "zoom", json_real(zoom));
 
 	json_object_set_new(rootJ, "invertZoom", json_boolean(invertZoom));
+
+	json_object_set_new(rootJ, "moduleBrowserZoom", json_real(moduleBrowserZoom));
 
 	json_object_set_new(rootJ, "cableOpacity", json_real(cableOpacity));
 
@@ -123,6 +126,10 @@ void fromJson(json_t *rootJ) {
 	json_t *invertZoomJ = json_object_get(rootJ, "invertZoom");
 	if (invertZoomJ)
 		invertZoom = json_boolean_value(invertZoomJ);
+
+	json_t *moduleBrowserZoomJ = json_object_get(rootJ, "moduleBrowserZoom");
+	if (moduleBrowserZoomJ)
+		moduleBrowserZoom = json_number_value(moduleBrowserZoomJ);
 
 	json_t *cableOpacityJ = json_object_get(rootJ, "cableOpacity");
 	if (cableOpacityJ)

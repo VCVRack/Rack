@@ -14,6 +14,8 @@
 #include <ui/RadioButton.hpp>
 #include <ui/ChoiceButton.hpp>
 #include <ui/Tooltip.hpp>
+#include <ui/Slider.hpp>
+
 #include <app/ModuleWidget.hpp>
 #include <app/Scene.hpp>
 #include <plugin.hpp>
@@ -22,7 +24,7 @@
 #include <string.hpp>
 #include <history.hpp>
 #include <settings.hpp>
-
+#include <iostream>
 #include <set>
 #include <algorithm>
 
@@ -133,32 +135,42 @@ struct BrowserOverlay : widget::OpaqueWidget {
 	}
 };
 
-
-static const float MODEL_BOX_ZOOM = 0.5f;
-
-
 struct ModelBox : widget::OpaqueWidget {
 	plugin::Model *model;
-	widget::Widget *previewWidget;
+	widget::Widget *previewWidget = NULL;
 	ui::Tooltip *tooltip = NULL;
 	/** Lazily created */
 	widget::FramebufferWidget *previewFb = NULL;
 	/** Number of frames since draw() has been called */
 	int visibleFrames = 0;
+	float previousZoomValue = 0;
 
 	ModelBox() {
 		// Approximate size as 10HP before we know the actual size.
 		// We need a nonzero size, otherwise the parent widget will consider it not in the draw bounds, so its preview will not be lazily created.
-		box.size.x = 10 * RACK_GRID_WIDTH * MODEL_BOX_ZOOM;
-		box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
-		box.size = box.size.ceil();
+		updateZoomLevel();
+		previousZoomValue = settings::moduleBrowserZoom;
+	}
+
+	void updateZoomLevel() {
+
+		if (previousZoomValue != settings::moduleBrowserZoom) {
+			previousZoomValue = settings::moduleBrowserZoom;
+			box.size.x = 10 * RACK_GRID_WIDTH * settings::moduleBrowserZoom;
+			box.size.y = RACK_GRID_HEIGHT * settings::moduleBrowserZoom;
+			box.size = box.size.ceil();
+
+			if (previewFb) 
+				deletePreview();	
+		}
 	}
 
 	void setModel(plugin::Model *model) {
 		this->model = model;
 
 		previewWidget = new widget::TransparentWidget;
-		previewWidget->box.size.y = std::ceil(RACK_GRID_HEIGHT * MODEL_BOX_ZOOM);
+		updateZoomLevel();
+
 		addChild(previewWidget);
 	}
 
@@ -169,16 +181,17 @@ struct ModelBox : widget::OpaqueWidget {
 			previewFb->oversample = 2.0;
 		}
 		previewWidget->addChild(previewFb);
+		previewWidget->box.size.y = std::ceil(RACK_GRID_HEIGHT * settings::moduleBrowserZoom);
 
 		widget::ZoomWidget *zoomWidget = new widget::ZoomWidget;
-		zoomWidget->setZoom(MODEL_BOX_ZOOM);
+		zoomWidget->setZoom(settings::moduleBrowserZoom);
 		previewFb->addChild(zoomWidget);
 
 		ModuleWidget *moduleWidget = model->createModuleWidgetNull();
 		zoomWidget->addChild(moduleWidget);
 
-		zoomWidget->box.size.x = moduleWidget->box.size.x * MODEL_BOX_ZOOM;
-		zoomWidget->box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
+		zoomWidget->box.size.x = moduleWidget->box.size.x * settings::moduleBrowserZoom;
+		zoomWidget->box.size.y = RACK_GRID_HEIGHT * settings::moduleBrowserZoom;
 		previewWidget->box.size.x = std::ceil(zoomWidget->box.size.x);
 
 		box.size.x = previewWidget->box.size.x;
@@ -192,9 +205,13 @@ struct ModelBox : widget::OpaqueWidget {
 	}
 
 	void step() override {
+
 		if (previewFb && ++visibleFrames >= 60) {
 			deletePreview();
 		}
+		
+		updateZoomLevel();
+
 		OpaqueWidget::step();
 	}
 
@@ -410,6 +427,39 @@ struct BrowserSidebar : widget::Widget {
 	}
 };
 
+struct ModuleBrowserZoomQuantity : Quantity
+{
+	void setValue(float value) override
+	{
+		settings::moduleBrowserZoom = math::clamp(value, getMinValue(), getMaxValue());
+	}
+
+	float getValue() override
+	{
+		return settings::moduleBrowserZoom;
+	}
+
+	float getMinValue() override { return 0.5; }
+	float getMaxValue() override { return 2.0; }
+	float getDefaultValue() override { return 0.5; }
+	float getDisplayValue() override { return getValue() * 100; }
+	void setDisplayValue(float displayValue) override { setValue(displayValue); }
+	std::string getLabel() override { return "Zoom"; }
+	std::string getUnit() override { return "%"; }
+};
+
+struct ModuleBrowserZoomSlider : ui::Slider
+{
+	ModuleBrowserZoomSlider()
+	{
+		quantity = new ModuleBrowserZoomQuantity;
+	}
+
+	~ModuleBrowserZoomSlider()
+	{
+		delete quantity;
+	}
+};
 
 struct ModuleBrowser : widget::OpaqueWidget {
 	BrowserSidebar *sidebar;
@@ -417,14 +467,17 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	ui::Label *modelLabel;
 	ui::MarginLayout *modelMargin;
 	ui::SequentialLayout *modelContainer;
+	ModuleBrowserZoomSlider *moduleBrowserZoomSlider;
 
 	std::string search;
 	std::string brand;
 	std::string tag;
 
 	ModuleBrowser() {
+
 		sidebar = new BrowserSidebar;
 		sidebar->box.size.x = 200;
+
 		addChild(sidebar);
 
 		modelLabel = new ui::Label;
@@ -432,6 +485,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		// modelLabel->box.size.x = 400;
 		addChild(modelLabel);
 
+		
 		modelScroll = new ui::ScrollWidget;
 		addChild(modelScroll);
 
@@ -452,6 +506,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
+		moduleBrowserZoomSlider = new ModuleBrowserZoomSlider();
+		moduleBrowserZoomSlider->box.size.x = 200;
+		addChild(moduleBrowserZoomSlider);
+
 		refresh();
 	}
 
@@ -459,9 +517,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		box = parent->box.zeroPos().grow(math::Vec(-70, -70));
 
 		sidebar->box.size.y = box.size.y;
-
 		modelLabel->box.pos = sidebar->box.getTopRight().plus(math::Vec(5, 5));
-
+		moduleBrowserZoomSlider->box.pos = sidebar->box.getTopRight().plus(math::Vec(500, 5));
 		modelScroll->box.pos = sidebar->box.getTopRight().plus(math::Vec(0, 30));
 		modelScroll->box.size = box.size.minus(modelScroll->box.pos);
 		modelMargin->box.size.x = modelScroll->box.size.x;
