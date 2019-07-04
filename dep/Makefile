@@ -162,8 +162,15 @@ rtmidi-4.0.0:
 	$(UNTAR) rtmidi-4.0.0.tar.gz
 	rm rtmidi-4.0.0.tar.gz
 
+RTMIDI_FLAGS += --enable-shared=no
+ifdef ARCH_WIN
+RTMIDI_FLAGS += --with-jack=no
+else
+RTMIDI_FLAGS += --with-jack=yes
+endif
+
 $(rtmidi): rtmidi-4.0.0
-	cd rtmidi-4.0.0 && $(CONFIGURE) --enable-shared=no --with-jack=no
+	cd rtmidi-4.0.0 && $(CONFIGURE) $(RTMIDI_FLAGS)
 	$(MAKE) -C rtmidi-4.0.0
 	$(MAKE) -C rtmidi-4.0.0 install
 
