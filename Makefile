@@ -83,9 +83,10 @@ valgrind: $(TARGET)
 clean:
 	rm -rfv $(TARGET) libRack.a Rack.res build dist
 
-ifdef ARCH_WIN
+
 # For Windows resources
 %.res: %.rc
+ifdef ARCH_WIN
 	windres $^ -O coff -o $@
 endif
 
@@ -96,6 +97,7 @@ dist: $(TARGET)
 	mkdir -p dist
 
 	$(MAKE) -C plugins/Fundamental dist
+	$(MAKE) -C plugins/Fundamental sign-dist
 
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
@@ -126,9 +128,9 @@ ifdef ARCH_MAC
 	# Clean up and sign bundle
 	xattr -cr dist/$(TARGET).app
 	# This will only work if you have the private key to my certificate
-	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --deep dist/$(TARGET).app
+	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --deep dist/$(TARGET).app
 	codesign --verify --deep --strict --verbose=2 dist/$(TARGET).app
-	#spctl --assess --type execute --ignore-cache --no-cache -vv dist/$(TARGET).app
+# 	spctl --assess --type execute --ignore-cache --no-cache -vv dist/$(TARGET).app
 	# Make ZIP
 	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
 endif
@@ -161,6 +163,25 @@ ifdef ARCH_WIN
 	cp libRack.a dist/Rack-SDK/
 endif
 	cd dist && zip -q -9 -r Rack-SDK-$(VERSION).zip Rack-SDK
+
+
+notarize:
+ifdef ARCH_MAC
+	# This will only work if you have my Apple ID password in your keychain
+	xcrun altool --notarize-app -f dist/Rack-$(VERSION)-$(ARCH).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/UploadInfo.plist
+	# Wait for Apple's servers to approve the app
+	while true; do \
+		xcrun altool --notarization-info `/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" dist/UploadInfo.plist` -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/RequestInfo.plist ; \
+		if [ "`/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" dist/RequestInfo.plist`" != "in progress" ]; then \
+			break ; \
+		fi ; \
+		sleep 10 ; \
+	done
+	# Mark app as notarized, check, and re-zip
+	xcrun stapler staple dist/$(TARGET).app
+	spctl --assess --type execute --ignore-cache --no-cache -vv dist/$(TARGET).app
+	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
+endif
 
 
 UPLOAD_URL := vortico@vcvrack.com:files/

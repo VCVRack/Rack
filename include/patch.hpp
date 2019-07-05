@@ -24,6 +24,7 @@ struct PatchManager {
 	void saveTemplateDialog();
 	bool load(std::string path);
 	void loadDialog();
+	void loadPathDialog(std::string path);
 	/** If `lastPath` is defined, ask the user to reload it */
 	void revertDialog();
 	/** Disconnects all cables */

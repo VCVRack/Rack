@@ -156,17 +156,16 @@ void Scene::onHoverKey(const event::HoverKey &e) {
 }
 
 void Scene::onPathDrop(const event::PathDrop &e) {
-	OpaqueWidget::onPathDrop(e);
-	if (e.isConsumed())
-		return;
-
 	if (e.paths.size() >= 1) {
 		const std::string &path = e.paths[0];
 		if (string::filenameExtension(string::filename(path)) == "vcv") {
-			APP->patch->load(path);
+			APP->patch->loadPathDialog(path);
 			e.consume(this);
+			return;
 		}
 	}
+
+	OpaqueWidget::onPathDrop(e);
 }
 
 
