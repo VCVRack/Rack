@@ -24,7 +24,6 @@
 #include <string.hpp>
 #include <history.hpp>
 #include <settings.hpp>
-#include <iostream>
 #include <set>
 #include <algorithm>
 
@@ -149,6 +148,7 @@ struct ModelBox : widget::OpaqueWidget {
 		// Approximate size as 10HP before we know the actual size.
 		// We need a nonzero size, otherwise the parent widget will consider it not in the draw bounds, so its preview will not be lazily created.
 		updateZoomLevel();
+		previousZoomValue = settings::moduleBrowserZoom;
 	}
 
 	void updateZoomLevel() {
