@@ -163,10 +163,10 @@ rtmidi-4.0.0:
 	rm rtmidi-4.0.0.tar.gz
 
 RTMIDI_FLAGS += --enable-shared=no
-ifdef ARCH_WIN
-RTMIDI_FLAGS += --with-jack=no
-else
+ifdef ARCH_LIN
 RTMIDI_FLAGS += --with-jack=yes
+else
+RTMIDI_FLAGS += --with-jack=no
 endif
 
 $(rtmidi): rtmidi-4.0.0
