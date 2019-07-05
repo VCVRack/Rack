@@ -218,6 +218,15 @@ void PatchManager::loadDialog() {
 	APP->history->setSaved();
 }
 
+void PatchManager::loadPathDialog(std::string path) {
+	if (!promptClear("The current patch is unsaved. Clear it and open the new patch?"))
+		return;
+
+	load(path);
+	this->path = path;
+	APP->history->setSaved();
+}
+
 void PatchManager::revertDialog() {
 	if (path.empty())
 		return;
