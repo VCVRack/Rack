@@ -15,7 +15,6 @@
 #include <ui/ChoiceButton.hpp>
 #include <ui/Tooltip.hpp>
 #include <ui/Slider.hpp>
-
 #include <app/ModuleWidget.hpp>
 #include <app/Scene.hpp>
 #include <plugin.hpp>
@@ -26,7 +25,6 @@
 #include <settings.hpp>
 #include <set>
 #include <algorithm>
-
 
 namespace rack {
 namespace app {
@@ -447,16 +445,61 @@ struct ModuleBrowserZoomQuantity : Quantity
 	std::string getUnit() override { return "%"; }
 };
 
-struct ModuleBrowserZoomSlider : ui::Slider
+struct ZoomItem : public ui::MenuItem
 {
-	ModuleBrowserZoomSlider()
+	float value;
+	Quantity *quantity;
+
+	ZoomItem(std::string text, float value, Quantity *quantity) 
+		: value(value)
+		, quantity(quantity)
 	{
-		quantity = new ModuleBrowserZoomQuantity;
+		this->text = text;
+		this->setSize(math::Vec(60, 30));
+	}
+	
+	void onAction(const event::Action &e) override
+	{
+		quantity->setValue(value);
+	}
+};
+
+struct ModuleBrowserZoomButton : ui::ChoiceButton
+{
+	ModuleBrowserZoomButton()
+	{
+		quantity  = new ModuleBrowserZoomQuantity;
 	}
 
-	~ModuleBrowserZoomSlider()
+	~ModuleBrowserZoomButton()
 	{
 		delete quantity;
+	}
+
+	void onDragStart(const event::DragStart &e) override
+	{
+	}
+
+	void onDragEnd(const event::DragEnd &e) override
+	{
+	}
+
+	void onAction(const event::Action &e) override
+	{
+		auto menu = createMenu();
+
+		menu->setSize(math::Vec(200, 200));
+		menu->addChild(new ZoomItem("50%", 0.5f, quantity));
+		menu->addChild(new ZoomItem("75%", 0.75f, quantity));
+		menu->addChild(new ZoomItem("100%", 1.0f, quantity));
+		menu->addChild(new ZoomItem("125%", 1.25f, quantity));
+		menu->addChild(new ZoomItem("150%", 1.5f, quantity));
+		menu->addChild(new ZoomItem("175%", 1.75f, quantity));
+		menu->addChild(new ZoomItem("200%", 2.0f, quantity));
+	}
+
+	void step() override {
+		text = quantity->getString();
 	}
 };
 
@@ -466,7 +509,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	ui::Label *modelLabel;
 	ui::MarginLayout *modelMargin;
 	ui::SequentialLayout *modelContainer;
-	ModuleBrowserZoomSlider *moduleBrowserZoomSlider;
+	ModuleBrowserZoomButton *moduleBrowserZoomButton;
 
 	std::string search;
 	std::string brand;
@@ -480,11 +523,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		addChild(sidebar);
 
 		modelLabel = new ui::Label;
-		// modelLabel->fontSize = 16;
-		// modelLabel->box.size.x = 400;
 		addChild(modelLabel);
 
-		
 		modelScroll = new ui::ScrollWidget;
 		addChild(modelScroll);
 
@@ -505,9 +545,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
-		moduleBrowserZoomSlider = new ModuleBrowserZoomSlider();
-		moduleBrowserZoomSlider->box.size.x = 200;
-		addChild(moduleBrowserZoomSlider);
+		moduleBrowserZoomButton = new ModuleBrowserZoomButton();
+		moduleBrowserZoomButton->box.size.x = 200;
+		addChild(moduleBrowserZoomButton);
 
 		refresh();
 	}
@@ -517,7 +557,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		sidebar->box.size.y = box.size.y;
 		modelLabel->box.pos = sidebar->box.getTopRight().plus(math::Vec(5, 5));
-		moduleBrowserZoomSlider->box.pos = sidebar->box.getTopRight().plus(math::Vec(500, 5));
+		moduleBrowserZoomButton->box.pos = sidebar->box.getTopRight().plus(math::Vec(500, 5));
 		modelScroll->box.pos = sidebar->box.getTopRight().plus(math::Vec(0, 30));
 		modelScroll->box.size = box.size.minus(modelScroll->box.pos);
 		modelMargin->box.size.x = modelScroll->box.size.x;
