@@ -425,18 +425,13 @@ struct BrowserSidebar : widget::Widget {
 	}
 };
 
-struct ModuleBrowserZoomQuantity : Quantity
-{
-	void setValue(float value) override
-	{
+struct ModuleBrowserZoomQuantity : Quantity {
+	void setValue(float value) override {
 		settings::moduleBrowserZoom = math::clamp(value, getMinValue(), getMaxValue());
 	}
-
-	float getValue() override
-	{
+	float getValue() override {
 		return settings::moduleBrowserZoom;
 	}
-
 	float getMinValue() override { return 0.5; }
 	float getMaxValue() override { return 2.0; }
 	float getDefaultValue() override { return 0.5; }
@@ -446,47 +441,35 @@ struct ModuleBrowserZoomQuantity : Quantity
 	std::string getUnit() override { return "%"; }
 };
 
-struct ZoomItem : public ui::MenuItem
-{
+struct ZoomItem : public ui::MenuItem {
 	float value;
 	Quantity *quantity;
 
 	ZoomItem(std::string text, float value, Quantity *quantity) 
 		: value(value)
-		, quantity(quantity)
-	{
+		, quantity(quantity) {
 		this->text = text;
 		this->setSize(math::Vec(60, 30));
 	}
 	
-	void onAction(const event::Action &e) override
-	{
+	void onAction(const event::Action &e) override {
 		quantity->setValue(value);
 	}
 };
 
-struct ModuleBrowserZoomButton : ui::ChoiceButton
-{
-	ModuleBrowserZoomButton()
-	{
+struct ModuleBrowserZoomButton : ui::ChoiceButton {
+	ModuleBrowserZoomButton() {
 		quantity  = new ModuleBrowserZoomQuantity;
 	}
 
-	~ModuleBrowserZoomButton()
-	{
+	~ModuleBrowserZoomButton() {
 		delete quantity;
 	}
 
-	void onDragStart(const event::DragStart &e) override
-	{
-	}
+	void onDragStart(const event::DragStart &e) override {}
+	void onDragEnd(const event::DragEnd &e) override {}
 
-	void onDragEnd(const event::DragEnd &e) override
-	{
-	}
-
-	void onAction(const event::Action &e) override
-	{
+	void onAction(const event::Action &e) override {
 		auto menu = createMenu();
 
 		menu->setSize(math::Vec(200, 200));
