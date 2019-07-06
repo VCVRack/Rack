@@ -293,6 +293,10 @@ void RackWidget::pastePresetClipboardAction() {
 	if (moduleJ) {
 		ModuleWidget *mw = moduleFromJson(moduleJ);
 		json_decref(moduleJ);
+
+		// Reset ID so the Engine automatically assigns a new one
+		mw->module->id = -1;
+
 		addModuleAtMouse(mw);
 
 		// history::ModuleAdd
