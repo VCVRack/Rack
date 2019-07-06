@@ -25,6 +25,7 @@
 #include <settings.hpp>
 #include <set>
 #include <algorithm>
+#include <helpers.hpp>
 
 namespace rack {
 namespace app {
