@@ -260,6 +260,8 @@ def panel_to_components(tree):
 	root = tree.getroot()
 	groups = root.findall(".//svg:g[@inkscape:label='components']", ns)
 	if len(groups) < 1:
+	       groups = root.findall(".//svg:g[@id='components']", ns)
+	if len(groups) < 1:
 		raise UserException("Could not find \"components\" layer on panel")
 
 	# Get circles and rects
@@ -286,7 +288,7 @@ def panel_to_components(tree):
 		# Get color
 		style = el.get('style')
 		color_match = re.search(r'fill:\S*#(.{6});', style)
-		color = color_match.group(1)
+		color = color_match.group(1).lower()
 		c['color'] = color
 
 		# Get position
