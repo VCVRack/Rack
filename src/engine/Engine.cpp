@@ -603,7 +603,6 @@ void Engine::bypassModule(Module *module, bool bypass) {
 		// This zeros all voltages, but the channel is set to 1 if connected
 		output.setChannels(0);
 	}
-	module->cpuTime = 0.f;
 	module->bypass = bypass;
 }
 
