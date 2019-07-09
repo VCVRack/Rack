@@ -259,8 +259,9 @@ def panel_to_components(tree):
 	# Get components layer
 	root = tree.getroot()
 	groups = root.findall(".//svg:g[@inkscape:label='components']", ns)
+	# Illustrator uses `id` for the group name.
 	if len(groups) < 1:
-	       groups = root.findall(".//svg:g[@id='components']", ns)
+		groups = root.findall(".//svg:g[@id='components']", ns)
 	if len(groups) < 1:
 		raise UserException("Could not find \"components\" layer on panel")
 
