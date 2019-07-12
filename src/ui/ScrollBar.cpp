@@ -30,14 +30,13 @@ void ScrollBar::onDragStart(const event::DragStart &e) {
 }
 
 void ScrollBar::onDragMove(const event::DragMove &e) {
-	const float sensitivity = 1.f;
-
 	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
 	assert(scrollWidget);
+	math::Rect containerBox = scrollWidget->container->getChildrenBoundingBox();
 	if (orientation == HORIZONTAL)
-		scrollWidget->offset.x += sensitivity * e.mouseDelta.x;
+		scrollWidget->offset.x += (containerBox.size.x / box.size.x) * e.mouseDelta.x;
 	else
-		scrollWidget->offset.y += sensitivity * e.mouseDelta.y;
+		scrollWidget->offset.y += (containerBox.size.y / box.size.y) * e.mouseDelta.y;
 }
 
 void ScrollBar::onDragEnd(const event::DragEnd &e) {
