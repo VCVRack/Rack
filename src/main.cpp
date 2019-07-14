@@ -22,7 +22,6 @@
 #include <thread>
 #include <unistd.h> // for getopt
 #include <signal.h> // for signal
-
 #if defined ARCH_WIN
 	#include <windows.h> // for CreateMutex
 #endif
@@ -40,7 +39,7 @@ static void fatalSignalHandler(int sig) {
 
 	FATAL("Fatal signal %d. Stack trace:\n%s", sig, system::getStackTrace().c_str());
 
-	// osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
+	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
 
 	exit(1);
 }
@@ -99,7 +98,7 @@ int main(int argc, char *argv[]) {
 
 	// We can now install a signal handler and log the output
 	// Mac has its own decent crash handler
-#if 0
+#if defined ARCH_LIN
 	if (!settings::devMode) {
 		signal(SIGABRT, fatalSignalHandler);
 		signal(SIGFPE, fatalSignalHandler);
