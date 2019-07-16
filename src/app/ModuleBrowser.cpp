@@ -249,16 +249,16 @@ struct ModelBox : widget::OpaqueWidget {
 		std::string text;
 		text = model->plugin->brand;
 		text += " " + model->name;
-		if (model->description != "")
-			text += "\n" + model->description;
 		// Tags
-		if (!model->tags.empty()) {
-			text += "\nTags: ";
-			for (size_t i = 0; i < model->tags.size(); i++) {
-				if (i > 0)
-					text += ", ";
-				text += model->tags[i];
-			}
+		text += "\nTags: ";
+		for (size_t i = 0; i < model->tags.size(); i++) {
+			if (i > 0)
+				text += ", ";
+			text += model->tags[i];
+		}
+		// Description
+		if (model->description != "") {
+			text += "\n" + model->description;
 		}
 		ui::Tooltip *tooltip = new ui::Tooltip;
 		tooltip->text = text;
