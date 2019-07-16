@@ -4,6 +4,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 1.1.2 (in development)
 - Add app notarization on Mac, which removes the "Apple cannot check for malicious software" message on launch.
+- Write stack trace to log.txt and display dialog box when Rack crashes.
 - Re-enable JACK MIDI driver on Linux.
 - Fix scroll speed for mice and trackpads on Mac.
 - Fix undo history bug when dragging patch file to the Rack window.
