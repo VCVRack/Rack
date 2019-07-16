@@ -112,6 +112,7 @@ void init() {
 		templatePath = userDir + "/template.vcv";
 	}
 	else {
+		logPath = userDir + "/log.txt";
 		pluginsPath = userDir + "/plugins-v" + app::ABI_VERSION;
 		settingsPath = userDir + "/settings-v" + app::ABI_VERSION + ".json";
 		autosavePath = userDir + "/autosave-v" + app::ABI_VERSION + ".vcv";
@@ -139,6 +140,7 @@ std::string plugin(plugin::Plugin *plugin, std::string filename) {
 std::string systemDir;
 std::string userDir;
 
+std::string logPath;
 std::string pluginsPath;
 std::string settingsPath;
 std::string autosavePath;

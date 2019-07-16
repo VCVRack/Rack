@@ -39,7 +39,7 @@ static void fatalSignalHandler(int sig) {
 
 	// This might fail because we might not be in the main thread.
 	// But oh well, we're crashing anyway.
-	std::string text = app::APP_NAME + " has crashed. See log.txt for details.";
+	std::string text = app::APP_NAME + " has crashed. See " + asset::logPath + " for details.";
 	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, text.c_str());
 
 	abort();
