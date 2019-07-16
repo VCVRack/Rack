@@ -30,18 +30,19 @@ using namespace rack;
 
 
 static void fatalSignalHandler(int sig) {
-	// Only catch one signal
-	static bool caught = false;
-	bool localCaught = caught;
-	caught = true;
-	if (localCaught)
-		exit(1);
+	// Ignore this signal to avoid recursion.
+	signal(sig, NULL);
+	// Ignore abort() since we call it below.
+	signal(SIGABRT, NULL);
 
 	FATAL("Fatal signal %d. Stack trace:\n%s", sig, system::getStackTrace().c_str());
 
-	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack has crashed. See log.txt for details.");
+	// This might fail because we might not be in the main thread.
+	// But oh well, we're crashing anyway.
+	std::string text = app::APP_NAME + " has crashed. See log.txt for details.";
+	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, text.c_str());
 
-	exit(1);
+	abort();
 }
 
 
@@ -97,8 +98,7 @@ int main(int argc, char *argv[]) {
 	logger::init();
 
 	// We can now install a signal handler and log the output
-	// Mac has its own decent crash handler
-#if defined ARCH_LIN
+#if defined ARCH_LIN || defined ARCH_MAC
 	if (!settings::devMode) {
 		signal(SIGABRT, fatalSignalHandler);
 		signal(SIGFPE, fatalSignalHandler);

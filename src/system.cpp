@@ -171,10 +171,11 @@ std::string getStackTrace() {
 	// Skip the first line because it's this function.
 	for (int i = 1; i < stackLen; i++) {
 		s += string::f("%d: ", stackLen - i - 1);
+		std::string line = strings[i];
+#if 0
 		// Parse line
 		std::regex r(R"((.*)\((.*)\+(.*)\) (.*))");
 		std::smatch match;
-		std::string line = strings[i];
 		if (std::regex_search(line, match, r)) {
 			s += match[1].str();
 			s += "(";
@@ -190,6 +191,9 @@ std::string getStackTrace() {
 			s += match[3].str();
 			s += ")";
 		}
+#else
+		s += line;
+#endif
 		s += "\n";
 	}
 	free(strings);
