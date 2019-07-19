@@ -79,7 +79,6 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, reqStr);
 
 	std::string resText;
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeStringCallback);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
 
@@ -132,7 +131,6 @@ bool requestDownload(std::string url, const std::string &filename, float *progre
 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferInfoCallback);
 	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, progress);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 	// Fail on 4xx and 5xx HTTP codes
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 
