@@ -16,7 +16,6 @@ ifdef ARCH_LIN
 	zlib = lib/libz.a
 	rtmidi = lib/librtmidi.a
 	rtaudio = lib/librtaudio.a
-	openssl = lib/libssl.a
 endif
 
 ifdef ARCH_MAC
@@ -29,7 +28,6 @@ ifdef ARCH_MAC
 	zlib = lib/libz.a
 	rtmidi = lib/librtmidi.a
 	rtaudio = lib/librtaudio.a
-	openssl = lib/libssl.a
 endif
 
 ifdef ARCH_WIN
@@ -42,7 +40,6 @@ ifdef ARCH_WIN
 	zlib = lib/libz.a
 	rtmidi = lib/librtmidi.a
 	rtaudio = lib/librtaudio.a
-	openssl = lib/libssl.a
 endif
 
 nanovg = include/nanovg.h
@@ -101,18 +98,6 @@ $(libspeexdsp): speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
-openssl-1.1.1b:
-	$(WGET) "https://www.openssl.org/source/openssl-1.1.1b.tar.gz"
-	$(SHA256) openssl-1.1.1b.tar.gz 5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
-	$(UNTAR) openssl-1.1.1b.tar.gz
-	rm openssl-1.1.1b.tar.gz
-
-$(openssl): openssl-1.1.1b
-	@# ./config ignores CFLAGS, so hack it in with CC
-	cd openssl-1.1.1b && CC="$(CC) $(CFLAGS)" ./config --prefix="$(DEP_PATH)"
-	$(MAKE) -C openssl-1.1.1b
-	$(MAKE) -C openssl-1.1.1b install_sw
-
 curl-7.64.1:
 	$(WGET) "https://curl.haxx.se/download/curl-7.64.1.tar.gz"
 	$(SHA256) curl-7.64.1.tar.gz 432d3f466644b9416bc5b649d344116a753aeaa520c8beaf024a90cba9d3d35d
@@ -131,7 +116,7 @@ ifdef ARCH_LIN
 CURL_FLAGS += --with-ssl
 endif
 
-$(libcurl): $(openssl) curl-7.64.1
+$(libcurl): curl-7.64.1
 	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
 	$(MAKE) -C curl-7.64.1
 	$(MAKE) -C curl-7.64.1 install
@@ -227,7 +212,7 @@ $(pffft): jpommier-pffft-29e4f76ac53b
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1b curl-7.64.1 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog jpommier-pffft-29e4f76ac53b
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 curl-7.64.1 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog jpommier-pffft-29e4f76ac53b
 
 clean:
 	git clean -fdx
