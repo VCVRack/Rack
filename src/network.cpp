@@ -83,7 +83,7 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
 
 	// Perform request
-	// INFO("Requesting %s", url.c_str());
+	// DEBUG("Requesting %s", url.c_str());
 	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	CURLcode res = curl_easy_perform(curl);
 
@@ -153,37 +153,6 @@ std::string encodeUrl(const std::string &s) {
 	curl_free(escaped);
 	curl_easy_cleanup(curl);
 	return ret;
-}
-
-std::string computeSHA256File(const std::string &filename) {
-	FILE *f = fopen(filename.c_str(), "rb");
-	if (!f)
-		return "";
-
-	uint8_t hash[SHA256_DIGEST_LENGTH];
-	SHA256_CTX sha256;
-	SHA256_Init(&sha256);
-	const int bufferLen = 1 << 15;
-	uint8_t *buffer = new uint8_t[bufferLen];
-	int len = 0;
-	while ((len = fread(buffer, 1, bufferLen, f))) {
-		SHA256_Update(&sha256, buffer, len);
-	}
-	SHA256_Final(hash, &sha256);
-	delete[] buffer;
-	fclose(f);
-
-	// Convert binary hash to hex
-	char hashHex[64];
-	const char hexTable[] = "0123456789abcdef";
-	for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-		uint8_t h = hash[i];
-		hashHex[2*i + 0] = hexTable[h >> 4];
-		hashHex[2*i + 1] = hexTable[h & 0x0f];
-	}
-
-	std::string str(hashHex, sizeof(hashHex));
-	return str;
 }
 
 std::string urlPath(const std::string &url) {
