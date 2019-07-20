@@ -119,11 +119,20 @@ curl-7.64.1:
 	$(UNTAR) curl-7.64.1.tar.gz
 	rm curl-7.64.1.tar.gz
 
+CURL_FLAGS += --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding
+CURL_FLAGS += --without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli
+ifdef ARCH_MAC
+CURL_FLAGS += --with-secure-transport --without-ssl
+endif
+ifdef ARCH_WIN
+CURL_FLAGS += --with-schannel --without-ssl
+endif
+ifdef ARCH_LIN
+CURL_FLAGS += --with-ssl
+endif
+
 $(libcurl): $(openssl) curl-7.64.1
-	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) \
-		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding \
-		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli \
-		--with-ssl="$(DEP_PATH)"
+	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
 	$(MAKE) -C curl-7.64.1
 	$(MAKE) -C curl-7.64.1 install
 
