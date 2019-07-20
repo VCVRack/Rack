@@ -132,7 +132,7 @@ CURL_FLAGS += --with-ssl="$(DEP_PATH)"
 CURL_DEPS += $(openssl)
 endif
 ifdef ARCH_WIN
-CURL_FLAGS += --with-schannel
+CURL_FLAGS += --with-schannel --without-ssl
 endif
 
 $(libcurl): $(CURL_DEPS) curl-7.64.1

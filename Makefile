@@ -1,6 +1,6 @@
 RACK_DIR ?= .
-VERSION := 1.dev.$(shell git rev-parse --short HEAD)
-# VERSION := 1.1.1
+# VERSION := 1.dev.$(shell git rev-parse --short HEAD)
+VERSION := 1.1.2
 
 FLAGS += -DVERSION=$(VERSION)
 FLAGS += -Iinclude -Idep/include
@@ -38,8 +38,8 @@ endif
 ifdef ARCH_WIN
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a \
-		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
+		dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/librtaudio.a dep/lib/librtmidi.a \
+		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -lcrypt32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
 	TARGET := Rack.exe
 	OBJECTS += Rack.res
 endif
