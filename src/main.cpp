@@ -56,6 +56,9 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	(void) instanceMutex;
+
+	// Don't display "Assertion failed!" dialog message.
+	_set_error_mode(_OUT_TO_STDERR);
 #endif
 
 	std::string patchPath;
@@ -98,7 +101,6 @@ int main(int argc, char *argv[]) {
 	logger::init();
 
 	// We can now install a signal handler and log the output
-#if defined ARCH_LIN || defined ARCH_MAC
 	if (!settings::devMode) {
 		signal(SIGABRT, fatalSignalHandler);
 		signal(SIGFPE, fatalSignalHandler);
@@ -106,7 +108,6 @@ int main(int argc, char *argv[]) {
 		signal(SIGSEGV, fatalSignalHandler);
 		signal(SIGTERM, fatalSignalHandler);
 	}
-#endif
 
 	// Log environment
 	INFO("%s v%s", app::APP_NAME.c_str(), app::APP_VERSION.c_str());
