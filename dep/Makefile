@@ -126,9 +126,10 @@ CURL_FLAGS += --with-ssl="$(DEP_PATH)"
 CURL_DEPS += $(openssl)
 endif
 ifdef ARCH_MAC
+# Since Rack supports Mac 10.7 but Apple's Secure Transport only supports TLS 1.0 on that OS, use OpenSSL instead.
+# CURL_FLAGS += --with-secure-transport
 CURL_FLAGS += --with-ssl="$(DEP_PATH)"
 CURL_DEPS += $(openssl)
-# CURL_FLAGS += --with-secure-transport
 endif
 ifdef ARCH_WIN
 CURL_FLAGS += --with-schannel
