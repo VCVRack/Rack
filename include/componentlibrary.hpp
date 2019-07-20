@@ -447,6 +447,12 @@ struct BlueLight : GrayModuleLightWidget {
 	}
 };
 
+struct WhiteLight : GrayModuleLightWidget {
+	WhiteLight() {
+		addBaseColor(SCHEME_WHITE);
+	}
+};
+
 /** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
 struct GreenRedLight : GrayModuleLightWidget {
 	GreenRedLight() {
