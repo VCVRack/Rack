@@ -2,8 +2,10 @@
 #include <string.hpp>
 
 #include <thread>
+#include <regex>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <cxxabi.h> // for __cxxabiv1::__cxa_demangle
 
 #if defined ARCH_LIN || defined ARCH_MAC
 	#include <pthread.h>
@@ -166,10 +168,36 @@ std::string getStackTrace() {
 	stackLen = backtrace(stack, stackLen);
 	char **strings = backtrace_symbols(stack, stackLen);
 
+	// Skip the first line because it's this function.
 	for (int i = 1; i < stackLen; i++) {
-		s += string::f("%d: %s\n", stackLen - i - 1, strings[i]);
+		s += string::f("%d: ", stackLen - i - 1);
+		std::string line = strings[i];
+#if 0
+		// Parse line
+		std::regex r(R"((.*)\((.*)\+(.*)\) (.*))");
+		std::smatch match;
+		if (std::regex_search(line, match, r)) {
+			s += match[1].str();
+			s += "(";
+			std::string symbol = match[2].str();
+			// Demangle symbol
+			char *symbolD = __cxxabiv1::__cxa_demangle(symbol.c_str(), NULL, NULL, NULL);
+			if (symbolD) {
+				symbol = symbolD;
+				free(symbolD);
+			}
+			s += symbol;
+			s += "+";
+			s += match[3].str();
+			s += ")";
+		}
+#else
+		s += line;
+#endif
+		s += "\n";
 	}
 	free(strings);
+
 #elif defined ARCH_WIN
 	HANDLE process = GetCurrentProcess();
 	SymInitialize(process, NULL, true);

@@ -2,11 +2,14 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
-### 1.2.0 (in development)
-- Enable app notarization on Mac, removing the "Apple cannot check for malicious software" message on launch.
+### 1.1.2 (2019-07-20)
+- Add app notarization on Mac, which removes the "Apple cannot check for malicious software" message on launch.
+- Write stack trace to log.txt and display dialog box when Rack crashes.
 - Re-enable JACK MIDI driver on Linux.
 - Fix scroll speed for mice and trackpads on Mac.
 - Fix undo history bug when dragging patch file to the Rack window.
+- Fix crash when pasting presets to an empty rack space with Mod-V.
+- Fix module expanders being assigned incorrectly when loading presets.
 - Add check for duplicate port IDs for modules.
 
 ### 1.1.1 (2019-07-01)

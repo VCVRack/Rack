@@ -26,6 +26,7 @@ std::string plugin(plugin::Plugin *plugin, std::string filename);
 extern std::string systemDir;
 extern std::string userDir;
 
+extern std::string logPath;
 extern std::string pluginsPath;
 extern std::string settingsPath;
 extern std::string autosavePath;

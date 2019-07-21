@@ -21,10 +21,9 @@ void init() {
 		return;
 	}
 
-	std::string logFilename = asset::user("log.txt");
-	outputFile = fopen(logFilename.c_str(), "w");
+	outputFile = fopen(asset::logPath.c_str(), "w");
 	if (!outputFile) {
-		fprintf(stderr, "Could not open log at %s\n", logFilename.c_str());
+		fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
 	}
 }
 
