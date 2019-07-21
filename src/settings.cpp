@@ -24,7 +24,6 @@ float cableOpacity = 0.5;
 float cableTension = 0.5;
 bool allowCursorLock = true;
 bool realTime = false;
-bool keepPreviews = true;
 float sampleRate = 44100.0;
 int threadCount = 1;
 bool paramTooltip = false;
@@ -65,8 +64,6 @@ json_t *toJson() {
 	json_object_set_new(rootJ, "allowCursorLock", json_boolean(allowCursorLock));
 
 	json_object_set_new(rootJ, "realTime", json_boolean(realTime));
-
-	json_object_set_new(rootJ, "keepPreviews", json_boolean(keepPreviews));
 
 	json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
 
@@ -142,10 +139,6 @@ void fromJson(json_t *rootJ) {
 	json_t *realTimeJ = json_object_get(rootJ, "realTime");
 	if (realTimeJ)
 		realTime = json_boolean_value(realTimeJ);
-
-	json_t *keepPreviewsJ = json_object_get(rootJ, "keepPreviews");
-	if (keepPreviewsJ)
-		keepPreviews = json_boolean_value(keepPreviewsJ);
 
 	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ)
