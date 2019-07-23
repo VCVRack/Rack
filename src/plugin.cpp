@@ -282,7 +282,11 @@ void init() {
 	loadPlugins(asset::pluginsPath);
 
 	// If Fundamental wasn't loaded, copy the bundled Fundamental package and load it
+#if defined ARCH_MAC
+	std::string fundamentalSrc = asset::system("Fundamental.txt");
+#else
 	std::string fundamentalSrc = asset::system("Fundamental.zip");
+#endif
 	std::string fundamentalDir = asset::pluginsPath + "/Fundamental";
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");

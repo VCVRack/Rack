@@ -96,9 +96,6 @@ dist: $(TARGET)
 	rm -rf dist
 	mkdir -p dist
 
-	$(MAKE) -C plugins/Fundamental dist
-	$(MAKE) -C plugins/Fundamental sign-dist
-
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
@@ -106,7 +103,7 @@ ifdef ARCH_LIN
 	cp -R LICENSE* res Core.json template.vcv cacert.pem dist/Rack/
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
-	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
+	cp Fundamental.zip dist/Rack/
 	# Make ZIP
 	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
 endif
@@ -119,12 +116,12 @@ ifdef ARCH_MAC
 	cp $(TARGET) dist/$(TARGET).app/Contents/MacOS/
 	$(STRIP) -S dist/$(TARGET).app/Contents/MacOS/$(TARGET)
 	mkdir -p dist/$(TARGET).app/Contents/Resources
-	cp -R LICENSE* res Core.json template.vcv cacert.pem icon.icns dist/$(TARGET).app/Contents/Resources
+	cp -R LICENSE* res Core.json template.vcv cacert.pem icon.icns dist/$(TARGET).app/Contents/Resources/
 
 	# Manually check that no nonstandard shared libraries are linked
 	otool -L dist/$(TARGET).app/Contents/MacOS/$(TARGET)
 
-	cp plugins/Fundamental/dist/*.zip dist/$(TARGET).app/Contents/Resources/Fundamental.zip
+	cp Fundamental.zip dist/$(TARGET).app/Contents/Resources/Fundamental.txt
 	# Clean up and sign bundle
 	xattr -cr dist/$(TARGET).app
 	# This will only work if you have the private key to my certificate
@@ -141,7 +138,7 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
-	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
+	cp Fundamental.zip dist/Rack/
 	# Make ZIP
 	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
 	# Make NSIS installer
