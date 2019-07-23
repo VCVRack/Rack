@@ -1,10 +1,25 @@
 #include <network.hpp>
+#include <asset.hpp>
 #define CURL_STATICLIB
 #include <curl/curl.h>
 
 
 namespace rack {
 namespace network {
+
+
+static CURL *createCurl() {
+	CURL *curl = curl_easy_init();
+	assert(curl);
+
+	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+
+	std::string caPath = asset::system("cacert.pem");
+	curl_easy_setopt(curl, CURLOPT_CAINFO, caPath.c_str());
+
+	return curl;
+}
 
 
 static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
@@ -16,9 +31,7 @@ static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *us
 
 
 json_t *requestJson(Method method, std::string url, json_t *dataJ) {
-	CURL *curl = curl_easy_init();
-	assert(curl);
-
+	CURL *curl = createCurl();
 	char *reqStr = NULL;
 
 	// Process data
@@ -82,8 +95,6 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
 
 	// Perform request
-	// DEBUG("Requesting %s", url.c_str());
-	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	CURLcode res = curl_easy_perform(curl);
 
 	// Cleanup
@@ -114,22 +125,18 @@ static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 }
 
 bool requestDownload(std::string url, const std::string &filename, float *progress) {
-	CURL *curl = curl_easy_init();
-	if (!curl)
-		return false;
+	CURL *curl = createCurl();
 
 	FILE *file = fopen(filename.c_str(), "wb");
 	if (!file)
 		return false;
 
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl, CURLOPT_VERBOSE, false);
 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, false);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferInfoCallback);
 	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, progress);
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 	// Fail on 4xx and 5xx HTTP codes
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 
