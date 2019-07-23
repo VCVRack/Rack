@@ -185,13 +185,13 @@ UPLOAD_URL := vortico@vcvrack.com:files/
 upload:
 	# This will only work if you have a private key to my server
 ifdef ARCH_MAC
-	rsync dist/*.zip $(UPLOAD_URL) -zP
+	rsync dist/Rack-$(VERSION)-$(ARCH).zip $(UPLOAD_URL) -zP
 endif
 ifdef ARCH_WIN
-	rsync dist/*.{exe,zip} $(UPLOAD_URL) -P
+	rsync dist/Rack-$(VERSION)-$(ARCH).zip Rack-$(VERSION)-$(ARCH).exe Rack-SDK-$(VERSION).zip $(UPLOAD_URL) -P
 endif
 ifdef ARCH_LIN
-	rsync dist/*.zip $(UPLOAD_URL) -zP
+	rsync dist/Rack-$(VERSION)-$(ARCH).zip $(UPLOAD_URL) -zP
 endif
 
 

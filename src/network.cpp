@@ -13,7 +13,7 @@ static CURL *createCurl() {
 	assert(curl);
 
 	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+	// curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 
 	std::string caPath = asset::system("cacert.pem");
 	curl_easy_setopt(curl, CURLOPT_CAINFO, caPath.c_str());

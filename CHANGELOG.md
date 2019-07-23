@@ -2,6 +2,11 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 1.1.3 (2019-07-23)
+- Include root certificate bundle for libcurl on all OS's.
+- Revert to OpenSSL from Schannel on Windows.
+- Bundle unsigned Fundamental package on Mac.
+
 ### 1.1.2 (2019-07-20)
 - Add app notarization on Mac, which removes the "Apple cannot check for malicious software" message on launch.
 - Write stack trace to log.txt and display dialog box when Rack crashes.
