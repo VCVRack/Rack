@@ -121,21 +121,9 @@ curl-7.64.1:
 
 CURL_FLAGS += --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding
 CURL_FLAGS += --without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli
-ifdef ARCH_LIN
 CURL_FLAGS += --with-ssl="$(DEP_PATH)"
-CURL_DEPS += $(openssl)
-endif
-ifdef ARCH_MAC
-# Since Rack supports Mac 10.7 but Apple's Secure Transport only supports TLS 1.0 on that OS, use OpenSSL instead.
-# CURL_FLAGS += --with-secure-transport
-CURL_FLAGS += --with-ssl="$(DEP_PATH)"
-CURL_DEPS += $(openssl)
-endif
-ifdef ARCH_WIN
-CURL_FLAGS += --with-schannel --without-ssl
-endif
 
-$(libcurl): $(CURL_DEPS) curl-7.64.1
+$(libcurl): $(openssl) curl-7.64.1
 	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
 	$(MAKE) -C curl-7.64.1
 	$(MAKE) -C curl-7.64.1 install

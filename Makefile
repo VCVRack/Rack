@@ -38,8 +38,8 @@ endif
 ifdef ARCH_WIN
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/librtaudio.a dep/lib/librtmidi.a \
-		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -lcrypt32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
+		dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a \
+		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
 	TARGET := Rack.exe
 	OBJECTS += Rack.res
 endif
@@ -103,7 +103,7 @@ ifdef ARCH_LIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp -R LICENSE* res Core.json template.vcv dist/Rack/
+	cp -R LICENSE* res Core.json template.vcv cacert.pem dist/Rack/
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
 	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
@@ -119,7 +119,7 @@ ifdef ARCH_MAC
 	cp $(TARGET) dist/$(TARGET).app/Contents/MacOS/
 	$(STRIP) -S dist/$(TARGET).app/Contents/MacOS/$(TARGET)
 	mkdir -p dist/$(TARGET).app/Contents/Resources
-	cp -R LICENSE* res Core.json template.vcv icon.icns dist/$(TARGET).app/Contents/Resources
+	cp -R LICENSE* res Core.json template.vcv cacert.pem icon.icns dist/$(TARGET).app/Contents/Resources
 
 	# Manually check that no nonstandard shared libraries are linked
 	otool -L dist/$(TARGET).app/Contents/MacOS/$(TARGET)
@@ -137,7 +137,7 @@ ifdef ARCH_WIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp -R LICENSE* res Core.json template.vcv dist/Rack/
+	cp -R LICENSE* res Core.json template.vcv cacert.pem dist/Rack/
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
