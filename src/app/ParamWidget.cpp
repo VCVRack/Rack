@@ -226,6 +226,8 @@ void ParamWidget::resetAction() {
 	if (paramQuantity && paramQuantity->isBounded()) {
 		float oldValue = paramQuantity->getValue();
 		reset();
+		// Here's another way of doing it, but either works.
+		// paramQuantity->getParam()->reset();
 		float newValue = paramQuantity->getValue();
 
 		if (oldValue != newValue) {
@@ -238,9 +240,6 @@ void ParamWidget::resetAction() {
 			h->newValue = newValue;
 			APP->history->push(h);
 		}
-
-		// Here's another way of doing it, but either works.
-		// paramQuantity->getParam()->reset();
 	}
 }
 

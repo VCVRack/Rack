@@ -10,7 +10,7 @@
 #include <mutex>
 #include <atomic>
 #include <tuple>
-#include <x86intrin.h>
+#include <pmmintrin.h>
 
 
 namespace rack {
