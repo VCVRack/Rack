@@ -490,9 +490,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 			ModelBox *m1 = dynamic_cast<ModelBox*>(w1);
 			ModelBox *m2 = dynamic_cast<ModelBox*>(w2);
-			// Sort by (modifiedTimestamp descending, plugin brand, model name)
-			auto t1 = std::make_tuple(-m1->model->plugin->modifiedTimestamp, m1->model->plugin->brand, m1->model->name);
-			auto t2 = std::make_tuple(-m2->model->plugin->modifiedTimestamp, m2->model->plugin->brand, m2->model->name);
+			// Sort by (modifiedTimestamp descending, plugin brand)
+			auto t1 = std::make_tuple(-m1->model->plugin->modifiedTimestamp, m1->model->plugin->brand);
+			auto t2 = std::make_tuple(-m2->model->plugin->modifiedTimestamp, m2->model->plugin->brand);
 			return t1 < t2;
 		});
 
