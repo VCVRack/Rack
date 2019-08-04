@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Rack
+Comment=Open-source virtual modular synthesizer 
+Exec=rack
+Icon=rack
+Type=Application
+Categories=AudioVideo;

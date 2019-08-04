@@ -1,0 +1,43 @@
+language: cpp
+compiler: gcc
+sudo: require
+dist: xenial
+
+install:
+  - sudo apt-get -y install cmake curl xorg-dev libglu1-mesa-dev freeglut3-dev gdb jq libasound-dev libasound2-dev libgl1-mesa-dev libglew-dev libglu1-mesa-dev libgtk2.0-dev libjack-jackd2-dev libjansson-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libzip-dev mesa-common-dev zlib1g-dev libglfw3-dev
+
+script:
+  # Build Rack
+  - git submodule update --init --recursive
+  - sed -i -e 's|--with-jack|--without-jack|g' dep/Makefile
+  - make dep -j$(nproc)
+  - make -j$(nproc)
+  # make INSTALL_ROOT=appdir -j$(nproc) install ; find appdir/ # https://github.com/VCVRack/Rack/issues/1515
+  - mkdir -p appdir/usr/bin ; cp Rack appdir/usr/bin/rack ; strip appdir/usr/bin/rack # FIXME, see above
+  - mkdir -p appdir/usr/share/icons/512x512/apps ; cp res/icon.png appdir/usr/share/icons/512x512/apps/rack.png # FIXME, see above
+  - mkdir -p appdir/usr/share/applications/ ; cp res/rack.desktop appdir/usr/share/applications/ # FIXME, see above
+  - cp -r res/ appdir/usr/ # FIXME, see above; normally this should go to appdir/usr/share/rack/
+  - find appdir/
+  # Only then can we build the plugins
+  - cd plugins/
+  - git clone https://github.com/VCVRack/Fundamental
+  - cd Fundamental
+  - git submodule update --init --recursive
+  - make dep -j$(nproc)
+  - make -j$(nproc)
+  - make dist
+  - cd ../../
+  - find . -name 'Fundamental*.zip' -exec cp {} ./appdir/usr/ \;
+  - wget -c -nv "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-x86_64" -O ./appdir/AppRun ; chmod +x ./appdir/AppRun # FIXME: Would not be needed if res was loaded from a path relative to the mani binary
+  - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+  - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+  - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
+
+after_success:
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh Rack*.AppImage*
+  
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)/
