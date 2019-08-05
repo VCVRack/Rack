@@ -214,12 +214,8 @@ struct TBiquadFilter {
 
 	T process(T in) {
 		// Advance IIR
-		T out =
-			b[0] * in
-			+ b[1] * x[0]
-			+ b[2] * x[1]
-			- a[0] * y[0]
-			- a[1] * y[1];
+		T out = b[0] * in + b[1] * x[0] + b[2] * x[1]
+			- a[0] * y[0] - a[1] * y[1];
 		// Push input
 		x[1] = x[0];
 		x[0] = in;
@@ -357,22 +353,16 @@ struct TBiquadFilter {
 	f: normalized frequency
 	*/
 	float getFrequencyResponse(float f) {
-		float br = b[0];
-		float bi = 0.f;
-		float ar = 1.f;
-		float ai = 0.f;
+		// Compute sum(a_k e^(-i k f))
+		std::complex<float> bsum = b[0];
+		std::complex<float> asum = 1.f;
 		for (int i = 1; i < 3; i++) {
-			float er = std::cos(2 * M_PI * -i * f);
-			float ei = std::sin(2 * M_PI * -i * f);
-			br += b[i] * er;
-			bi += b[i] * ei;
-			ar += a[i - 1] * er;
-			ai += a[i - 1] * ei;
+			float p = 2 * M_PI * -i * f;
+			std::complex<float> e(std::cos(p), std::sin(p));
+			bsum += b[i] * e;
+			asum += a[i - 1] * e;
 		}
-		// Compute |b / a|
-		float cr = (br * ar + bi * ai) / (ar * ar + ai * ai);
-		float ci = (bi * ar - br * ai) / (ar * ar + ai * ai);
-		return std::hypot(cr, ci);
+		return std::abs(bsum / asum);
 	}
 };
 
