@@ -181,12 +181,12 @@ struct TBiquadFilter {
 	/** output state */
 	T y[2];
 
+	/** transfer function numerator coefficients: b_0, b_1, b_2 */
+	float b[3];
 	/** transfer function denominator coefficients: a_1, a_2
 	a_0 is fixed to 1.
 	*/
 	float a[2];
-	/** transfer function numerator coefficients: b_0, b_1, b_2 */
-	float b[3];
 
 	enum Type {
 		LOWPASS_1POLE,
@@ -200,11 +200,10 @@ struct TBiquadFilter {
 		NOTCH,
 		NUM_TYPES
 	};
-	Type type = LOWPASS;
 
 	TBiquadFilter() {
 		reset();
-		setParameters(0.f, 0.f, 1.f);
+		setParameters(LOWPASS, 0.f, 0.f, 1.f);
 	}
 
 	void reset() {
@@ -230,7 +229,7 @@ struct TBiquadFilter {
 	Q: quality factor
 	V: gain
 	*/
-	void setParameters(float f, float Q, float V) {
+	void setParameters(Type type, float f, float Q, float V) {
 		float K = std::tan(M_PI * f);
 		switch (type) {
 			case LOWPASS_1POLE: {
@@ -347,6 +346,14 @@ struct TBiquadFilter {
 
 			default: break;
 		}
+	}
+
+	void copyParameters(const TBiquadFilter<T> &from) {
+		b[0] = from.b[0];
+		b[1] = from.b[1];
+		b[2] = from.b[2];
+		a[0] = from.a[0];
+		a[1] = from.a[1];
 	}
 
 	/** Computes the gain of a particular frequency
