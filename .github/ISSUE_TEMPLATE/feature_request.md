@@ -5,6 +5,7 @@ about: Feature ideas, design proposals
 ---
 
 <!--
+Search existing issues before posting a new one to avoid duplicates.
 To request a feature, fill out the form below.
 Use a descriptive title that best explains the feature request in one sentence.
 -->
