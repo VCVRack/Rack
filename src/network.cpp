@@ -8,8 +8,8 @@ namespace rack {
 namespace network {
 
 
-static CURL *createCurl() {
-	CURL *curl = curl_easy_init();
+static CURL* createCurl() {
+	CURL* curl = curl_easy_init();
 	assert(curl);
 
 	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -22,17 +22,17 @@ static CURL *createCurl() {
 }
 
 
-static size_t writeStringCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-	std::string *str = (std::string*) userdata;
+static size_t writeStringCallback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+	std::string* str = (std::string*) userdata;
 	size_t len = size * nmemb;
 	str->append(ptr, len);
 	return len;
 }
 
 
-json_t *requestJson(Method method, std::string url, json_t *dataJ) {
-	CURL *curl = createCurl();
-	char *reqStr = NULL;
+json_t* requestJson(Method method, std::string url, json_t* dataJ) {
+	CURL* curl = createCurl();
+	char* reqStr = NULL;
 
 	// Process data
 	if (dataJ) {
@@ -40,17 +40,17 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 			// Append ?key=value&... to url
 			url += "?";
 			bool isFirst = true;
-			const char *key;
-			json_t *value;
+			const char* key;
+			json_t* value;
 			json_object_foreach(dataJ, key, value) {
 				if (json_is_string(value)) {
 					if (!isFirst)
 						url += "&";
 					url += key;
 					url += "=";
-					const char *str = json_string_value(value);
+					const char* str = json_string_value(value);
 					size_t len = json_string_length(value);
-					char *escapedStr = curl_easy_escape(curl, str, len);
+					char* escapedStr = curl_easy_escape(curl, str, len);
 					url += escapedStr;
 					curl_free(escapedStr);
 					isFirst = false;
@@ -81,7 +81,7 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 	}
 
 	// Set headers
-	struct curl_slist *headers = NULL;
+	struct curl_slist* headers = NULL;
 	headers = curl_slist_append(headers, "Accept: application/json");
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -106,15 +106,15 @@ json_t *requestJson(Method method, std::string url, json_t *dataJ) {
 	if (res == CURLE_OK) {
 		// Parse JSON response
 		json_error_t error;
-		json_t *rootJ = json_loads(resText.c_str(), 0, &error);
+		json_t* rootJ = json_loads(resText.c_str(), 0, &error);
 		return rootJ;
 	}
 	return NULL;
 }
 
 
-static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-	float *progress = (float*) clientp;
+static int xferInfoCallback(void* clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+	float* progress = (float*) clientp;
 	if (progress) {
 		if (dltotal <= 0)
 			*progress = 0.f;
@@ -124,10 +124,10 @@ static int xferInfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 	return 0;
 }
 
-bool requestDownload(std::string url, const std::string &filename, float *progress) {
-	CURL *curl = createCurl();
+bool requestDownload(std::string url, const std::string& filename, float* progress) {
+	CURL* curl = createCurl();
 
-	FILE *file = fopen(filename.c_str(), "wb");
+	FILE* file = fopen(filename.c_str(), "wb");
 	if (!file)
 		return false;
 
@@ -151,24 +151,24 @@ bool requestDownload(std::string url, const std::string &filename, float *progre
 	return res == CURLE_OK;
 }
 
-std::string encodeUrl(const std::string &s) {
-	CURL *curl = curl_easy_init();
+std::string encodeUrl(const std::string& s) {
+	CURL* curl = curl_easy_init();
 	assert(curl);
-	char *escaped = curl_easy_escape(curl, s.c_str(), s.size());
+	char* escaped = curl_easy_escape(curl, s.c_str(), s.size());
 	std::string ret = escaped;
 	curl_free(escaped);
 	curl_easy_cleanup(curl);
 	return ret;
 }
 
-std::string urlPath(const std::string &url) {
-	CURLU *curl = curl_url();
+std::string urlPath(const std::string& url) {
+	CURLU* curl = curl_url();
 	DEFER({
 		curl_url_cleanup(curl);
 	});
 	if (curl_url_set(curl, CURLUPART_URL, url.c_str(), 0))
 		return "";
-	char *buf;
+	char* buf;
 	if (curl_url_get(curl, CURLUPART_PATH, &buf, 0))
 		return "";
 	std::string ret = buf;

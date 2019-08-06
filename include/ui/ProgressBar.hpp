@@ -10,10 +10,10 @@ namespace ui {
 
 struct ProgressBar : widget::Widget {
 	/** Not owned. Stores the progress value and label. */
-	Quantity *quantity = NULL;
+	Quantity* quantity = NULL;
 
 	ProgressBar();
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 

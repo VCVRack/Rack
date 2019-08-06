@@ -11,7 +11,7 @@
 namespace rack {
 namespace app {
 
-static void drawPlug(NVGcontext *vg, math::Vec pos, NVGcolor color) {
+static void drawPlug(NVGcontext* vg, math::Vec pos, NVGcolor color) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Plug solid
@@ -32,7 +32,7 @@ static void drawPlug(NVGcontext *vg, math::Vec pos, NVGcolor color) {
 	nvgFill(vg);
 }
 
-static void drawCable(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
+static void drawCable(NVGcontext* vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
 	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
@@ -44,7 +44,7 @@ static void drawCable(NVGcontext *vg, math::Vec pos1, math::Vec pos2, NVGcolor c
 
 		float dist = pos1.minus(pos2).norm();
 		math::Vec slump;
-		slump.y = (1.0 - tension) * (150.0 + 1.0*dist);
+		slump.y = (1.0 - tension) * (150.0 + 1.0 * dist);
 		math::Vec pos3 = pos1.plus(pos2).div(2).plus(slump);
 
 		// Adjust pos1 and pos2 to not draw over the plug
@@ -99,7 +99,7 @@ bool CableWidget::isComplete() {
 	return outputPort && inputPort;
 }
 
-void CableWidget::setOutput(PortWidget *outputPort) {
+void CableWidget::setOutput(PortWidget* outputPort) {
 	this->outputPort = outputPort;
 	if (outputPort) {
 		assert(outputPort->type == PortWidget::OUTPUT);
@@ -108,7 +108,7 @@ void CableWidget::setOutput(PortWidget *outputPort) {
 	}
 }
 
-void CableWidget::setInput(PortWidget *inputPort) {
+void CableWidget::setInput(PortWidget* inputPort) {
 	this->inputPort = inputPort;
 	if (inputPort) {
 		assert(inputPort->type == PortWidget::INPUT);
@@ -141,9 +141,9 @@ math::Vec CableWidget::getInputPos() {
 	}
 }
 
-json_t *CableWidget::toJson() {
+json_t* CableWidget::toJson() {
 	assert(isComplete());
-	json_t *rootJ = json_object();
+	json_t* rootJ = json_object();
 
 	json_object_set_new(rootJ, "id", json_integer(cable->id));
 	json_object_set_new(rootJ, "outputModuleId", json_integer(cable->outputModule->id));
@@ -157,35 +157,41 @@ json_t *CableWidget::toJson() {
 	return rootJ;
 }
 
-void CableWidget::fromJson(json_t *rootJ) {
+void CableWidget::fromJson(json_t* rootJ) {
 	// outputModuleId
-	json_t *outputModuleIdJ = json_object_get(rootJ, "outputModuleId");
-	if (!outputModuleIdJ) return;
+	json_t* outputModuleIdJ = json_object_get(rootJ, "outputModuleId");
+	if (!outputModuleIdJ)
+		return;
 	int outputModuleId = json_integer_value(outputModuleIdJ);
-	ModuleWidget *outputModule = APP->scene->rack->getModule(outputModuleId);
-	if (!outputModule) return;
+	ModuleWidget* outputModule = APP->scene->rack->getModule(outputModuleId);
+	if (!outputModule)
+		return;
 
 	// inputModuleId
-	json_t *inputModuleIdJ = json_object_get(rootJ, "inputModuleId");
-	if (!inputModuleIdJ) return;
+	json_t* inputModuleIdJ = json_object_get(rootJ, "inputModuleId");
+	if (!inputModuleIdJ)
+		return;
 	int inputModuleId = json_integer_value(inputModuleIdJ);
-	ModuleWidget *inputModule = APP->scene->rack->getModule(inputModuleId);
-	if (!inputModule) return;
+	ModuleWidget* inputModule = APP->scene->rack->getModule(inputModuleId);
+	if (!inputModule)
+		return;
 
 	// outputId
-	json_t *outputIdJ = json_object_get(rootJ, "outputId");
-	if (!outputIdJ) return;
+	json_t* outputIdJ = json_object_get(rootJ, "outputId");
+	if (!outputIdJ)
+		return;
 	int outputId = json_integer_value(outputIdJ);
 
 	// inputId
-	json_t *inputIdJ = json_object_get(rootJ, "inputId");
-	if (!inputIdJ) return;
+	json_t* inputIdJ = json_object_get(rootJ, "inputId");
+	if (!inputIdJ)
+		return;
 	int inputId = json_integer_value(inputIdJ);
 
 	// Only set ID if unset
 	if (cable->id < 0) {
 		// id
-		json_t *idJ = json_object_get(rootJ, "id");
+		json_t* idJ = json_object_get(rootJ, "id");
 		// Before 1.0, cables IDs were not used, so just leave it as default and Engine will assign one automatically.
 		if (idJ) {
 			cable->id = json_integer_value(idJ);
@@ -199,13 +205,13 @@ void CableWidget::fromJson(json_t *rootJ) {
 		setInput(inputModule->inputs[inputId]);
 	}
 	else {
-		for (PortWidget *port : outputModule->outputs) {
+		for (PortWidget* port : outputModule->outputs) {
 			if (port->portId == outputId) {
 				setOutput(port);
 				break;
 			}
 		}
-		for (PortWidget *port : inputModule->inputs) {
+		for (PortWidget* port : inputModule->inputs) {
 			if (port->portId == inputId) {
 				setInput(port);
 				break;
@@ -215,7 +221,7 @@ void CableWidget::fromJson(json_t *rootJ) {
 	if (!isComplete())
 		return;
 
-	json_t *colorJ = json_object_get(rootJ, "color");
+	json_t* colorJ = json_object_get(rootJ, "color");
 	if (colorJ) {
 		// v0.6.0 and earlier patches use JSON objects. Just ignore them if so and use the existing cable color.
 		if (json_is_string(colorJ))
@@ -223,13 +229,13 @@ void CableWidget::fromJson(json_t *rootJ) {
 	}
 }
 
-void CableWidget::draw(const DrawArgs &args) {
+void CableWidget::draw(const DrawArgs& args) {
 	float opacity = settings::cableOpacity;
 	float tension = settings::cableTension;
 	float thickness = 5;
 
 	if (isComplete()) {
-		engine::Output *output = &cable->outputModule->outputs[cable->outputId];
+		engine::Output* output = &cable->outputModule->outputs[cable->outputId];
 		// Draw opaque if mouse is hovering over a connected port
 		if (output->channels > 1) {
 			// Increase thickness if output port is polyphonic
@@ -254,7 +260,7 @@ void CableWidget::draw(const DrawArgs &args) {
 	drawCable(args.vg, outputPos, inputPos, color, thickness, tension, opacity);
 }
 
-void CableWidget::drawPlugs(const DrawArgs &args) {
+void CableWidget::drawPlugs(const DrawArgs& args) {
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
 

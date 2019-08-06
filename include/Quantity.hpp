@@ -19,24 +19,36 @@ struct Quantity {
 	/** Returns the value
 	Override this to return the state of your subclass.
 	*/
-	virtual float getValue() {return 0.f;}
+	virtual float getValue() {
+		return 0.f;
+	}
 
 	/** Returns the minimum allowed value */
-	virtual float getMinValue() {return 0.f;}
+	virtual float getMinValue() {
+		return 0.f;
+	}
 
 	/** Returns the maximum allowed value */
-	virtual float getMaxValue() {return 1.f;}
+	virtual float getMaxValue() {
+		return 1.f;
+	}
 
 	/** Returns the default value, for resetting */
-	virtual float getDefaultValue() {return 0.f;}
+	virtual float getDefaultValue() {
+		return 0.f;
+	}
 
 	/** Returns the value, possibly transformed for displaying
 	Useful for logarithmic scaling, multiplying by 100 for percentages, etc.
 	*/
-	virtual float getDisplayValue() {return getValue();}
+	virtual float getDisplayValue() {
+		return getValue();
+	}
 
 	/** Inversely transforms the display value and sets the value */
-	virtual void setDisplayValue(float displayValue) {setValue(displayValue);}
+	virtual void setDisplayValue(float displayValue) {
+		setValue(displayValue);
+	}
 
 	/** The number of total decimal places for generating the display value string
 	*/
@@ -48,12 +60,16 @@ struct Quantity {
 	virtual void setDisplayValueString(std::string s);
 
 	/** The name of the quantity */
-	virtual std::string getLabel() {return "";}
+	virtual std::string getLabel() {
+		return "";
+	}
 
 	/** The unit abbreviation of the quantity
 	Include an initial space character if you want a space after the number, e.g. "440 Hz". This allows space-less units, like "100%".
 	*/
-	virtual std::string getUnit() {return "";}
+	virtual std::string getUnit() {
+		return "";
+	}
 
 	/** Returns a string representation of the quantity */
 	virtual std::string getString();

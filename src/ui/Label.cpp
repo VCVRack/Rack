@@ -11,7 +11,7 @@ Label::Label() {
 	color = bndGetTheme()->regularTheme.textColor;
 }
 
-void Label::draw(const DrawArgs &args) {
+void Label::draw(const DrawArgs& args) {
 	// TODO
 	// Custom font sizes do not work with right or center alignment
 	float x;

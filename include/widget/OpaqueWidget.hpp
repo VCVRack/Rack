@@ -10,14 +10,14 @@ namespace widget {
 Also consumes Hover and Button for left-clicks.
 */
 struct OpaqueWidget : Widget {
-	void onHover(const event::Hover &e) override {
+	void onHover(const event::Hover& e) override {
 		Widget::onHover(e);
 		e.stopPropagating();
 		// Consume if not consumed by child
 		if (!e.isConsumed())
 			e.consume(this);
 	}
-	void onButton(const event::Button &e) override {
+	void onButton(const event::Button& e) override {
 		Widget::onButton(e);
 		e.stopPropagating();
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -26,26 +26,26 @@ struct OpaqueWidget : Widget {
 				e.consume(this);
 		}
 	}
-	void onHoverKey(const event::HoverKey &e) override {
+	void onHoverKey(const event::HoverKey& e) override {
 		Widget::onHoverKey(e);
 		e.stopPropagating();
 	}
-	void onHoverText(const event::HoverText &e) override {
+	void onHoverText(const event::HoverText& e) override {
 		Widget::onHoverText(e);
 		e.stopPropagating();
 	}
-	void onHoverScroll(const event::HoverScroll &e) override {
+	void onHoverScroll(const event::HoverScroll& e) override {
 		Widget::onHoverScroll(e);
 		e.stopPropagating();
 	}
-	void onDragHover(const event::DragHover &e) override {
+	void onDragHover(const event::DragHover& e) override {
 		Widget::onDragHover(e);
 		e.stopPropagating();
 		// Consume if not consumed by child
 		if (!e.isConsumed())
 			e.consume(this);
 	}
-	void onPathDrop(const event::PathDrop &e) override {
+	void onPathDrop(const event::PathDrop& e) override {
 		Widget::onPathDrop(e);
 		e.stopPropagating();
 	}

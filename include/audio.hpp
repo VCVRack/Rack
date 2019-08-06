@@ -4,7 +4,7 @@
 
 #pragma GCC diagnostic push
 #ifndef __clang__
-#pragma GCC diagnostic ignored "-Wsuggest-override"
+	#pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
 #include <RtAudio.h>
 #pragma GCC diagnostic pop
@@ -28,7 +28,7 @@ struct Port {
 	int blockSize = 256;
 	int numOutputs = 0;
 	int numInputs = 0;
-	RtAudio *rtAudio = NULL;
+	RtAudio* rtAudio = NULL;
 	/** Cached */
 	RtAudio::DeviceInfo deviceInfo;
 
@@ -40,7 +40,7 @@ struct Port {
 	void setDriverId(int driverId);
 
 	int getDeviceCount();
-	bool getDeviceInfo(int deviceId, RtAudio::DeviceInfo *deviceInfo);
+	bool getDeviceInfo(int deviceId, RtAudio::DeviceInfo* deviceInfo);
 	/** Returns the number of inputs or outputs, whichever is greater */
 	int getDeviceChannels(int deviceId);
 	std::string getDeviceName(int deviceId);
@@ -58,12 +58,12 @@ struct Port {
 	void openStream();
 	void closeStream();
 
-	virtual void processStream(const float *input, float *output, int frames) {}
+	virtual void processStream(const float* input, float* output, int frames) {}
 	virtual void onCloseStream() {}
 	virtual void onOpenStream() {}
 	virtual void onChannelsChange() {}
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
 };
 
 

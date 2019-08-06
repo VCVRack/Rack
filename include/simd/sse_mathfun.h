@@ -374,7 +374,7 @@ inline __m128 sse_mathfun_cos_ps(__m128 x) { // any x
 
 /* since sin_ps and cos_ps are almost identical, sincos_ps could replace both of them..
    it is almost as fast, and gives you a free cosine with your sine */
-inline void sse_mathfun_sincos_ps(__m128 x, __m128 *s, __m128 *c) {
+inline void sse_mathfun_sincos_ps(__m128 x, __m128* s, __m128* c) {
 	__m128 xmm1, xmm2, xmm3 = _mm_setzero_ps(), sign_bit_sin, y;
 	__m128i emm0, emm2, emm4;
 	sign_bit_sin = x;

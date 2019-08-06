@@ -101,16 +101,16 @@ namespace rack {
 
 /** Define this macro before including this header to prevent common namespaces from being included in the main `rack::` namespace. */
 #ifndef RACK_FLATTEN_NAMESPACES
-// Import some namespaces for convenience
-using namespace logger;
-using namespace math;
-using namespace widget;
-using namespace ui;
-using namespace app;
-using plugin::Plugin;
-using plugin::Model;
-using namespace engine;
-using namespace componentlibrary;
+	// Import some namespaces for convenience
+	using namespace logger;
+	using namespace math;
+	using namespace widget;
+	using namespace ui;
+	using namespace app;
+	using plugin::Plugin;
+	using plugin::Model;
+	using namespace engine;
+	using namespace componentlibrary;
 #endif
 
 

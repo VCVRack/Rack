@@ -12,7 +12,7 @@ namespace app {
 static const float KNOB_SENSITIVITY = 0.0015f;
 
 
-void Knob::onHover(const event::Hover &e) {
+void Knob::onHover(const event::Hover& e) {
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
 	if (dist <= c.x) {
@@ -20,7 +20,7 @@ void Knob::onHover(const event::Hover &e) {
 	}
 }
 
-void Knob::onButton(const event::Button &e) {
+void Knob::onButton(const event::Button& e) {
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
 	if (dist <= c.x) {
@@ -28,7 +28,7 @@ void Knob::onButton(const event::Button &e) {
 	}
 }
 
-void Knob::onDragStart(const event::DragStart &e) {
+void Knob::onDragStart(const event::DragStart& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -42,7 +42,7 @@ void Knob::onDragStart(const event::DragStart &e) {
 	APP->window->cursorLock();
 }
 
-void Knob::onDragEnd(const event::DragEnd &e) {
+void Knob::onDragEnd(const event::DragEnd& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -52,7 +52,7 @@ void Knob::onDragEnd(const event::DragEnd &e) {
 		float newValue = paramQuantity->getSmoothValue();
 		if (oldValue != newValue) {
 			// Push ParamChange history action
-			history::ParamChange *h = new history::ParamChange;
+			history::ParamChange* h = new history::ParamChange;
 			h->name = "move knob";
 			h->moduleId = paramQuantity->module->id;
 			h->paramId = paramQuantity->paramId;
@@ -63,7 +63,7 @@ void Knob::onDragEnd(const event::DragEnd &e) {
 	}
 }
 
-void Knob::onDragMove(const event::DragMove &e) {
+void Knob::onDragMove(const event::DragMove& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 

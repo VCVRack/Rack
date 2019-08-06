@@ -70,7 +70,7 @@ struct MIDI_Map : Module {
 		midiInput.reset();
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
@@ -85,12 +85,12 @@ struct MIDI_Map : Module {
 			if (values[cc] < 0)
 				continue;
 			// Get Module
-			Module *module = paramHandles[id].module;
+			Module* module = paramHandles[id].module;
 			if (!module)
 				continue;
 			// Get ParamQuantity
 			int paramId = paramHandles[id].paramId;
-			ParamQuantity *paramQuantity = module->paramQuantities[paramId];
+			ParamQuantity* paramQuantity = module->paramQuantities[paramId];
 			if (!paramQuantity)
 				continue;
 			if (!paramQuantity->isBounded())
@@ -208,12 +208,12 @@ struct MIDI_Map : Module {
 		paramHandles[id].text = text;
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 
-		json_t *mapsJ = json_array();
+		json_t* mapsJ = json_array();
 		for (int id = 0; id < mapLen; id++) {
-			json_t *mapJ = json_object();
+			json_t* mapJ = json_object();
 			json_object_set_new(mapJ, "cc", json_integer(ccs[id]));
 			json_object_set_new(mapJ, "moduleId", json_integer(paramHandles[id].moduleId));
 			json_object_set_new(mapJ, "paramId", json_integer(paramHandles[id].paramId));
@@ -225,17 +225,17 @@ struct MIDI_Map : Module {
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
+	void dataFromJson(json_t* rootJ) override {
 		clearMaps();
 
-		json_t *mapsJ = json_object_get(rootJ, "maps");
+		json_t* mapsJ = json_object_get(rootJ, "maps");
 		if (mapsJ) {
-			json_t *mapJ;
+			json_t* mapJ;
 			size_t mapIndex;
 			json_array_foreach(mapsJ, mapIndex, mapJ) {
-				json_t *ccJ = json_object_get(mapJ, "cc");
-				json_t *moduleIdJ = json_object_get(mapJ, "moduleId");
-				json_t *paramIdJ = json_object_get(mapJ, "paramId");
+				json_t* ccJ = json_object_get(mapJ, "cc");
+				json_t* moduleIdJ = json_object_get(mapJ, "moduleId");
+				json_t* paramIdJ = json_object_get(mapJ, "paramId");
 				if (!(ccJ && moduleIdJ && paramIdJ))
 					continue;
 				if (mapIndex >= MAX_CHANNELS)
@@ -248,7 +248,7 @@ struct MIDI_Map : Module {
 
 		updateMapLen();
 
-		json_t *midiJ = json_object_get(rootJ, "midi");
+		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
 	}
@@ -256,15 +256,15 @@ struct MIDI_Map : Module {
 
 
 struct MIDI_MapChoice : LedDisplayChoice {
-	MIDI_Map *module;
+	MIDI_Map* module;
 	int id;
 	int disableLearnFrames = -1;
 
-	void setModule(MIDI_Map *module) {
+	void setModule(MIDI_Map* module) {
 		this->module = module;
 	}
 
-	void onButton(const event::Button &e) override {
+	void onButton(const event::Button& e) override {
 		e.stopPropagating();
 		if (!module)
 			return;
@@ -279,11 +279,11 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelect(const event::Select &e) override {
+	void onSelect(const event::Select& e) override {
 		if (!module)
 			return;
 
-		ScrollWidget *scroll = getAncestorOfType<ScrollWidget>();
+		ScrollWidget* scroll = getAncestorOfType<ScrollWidget>();
 		scroll->scrollTo(box);
 
 		// Reset touchedParam
@@ -291,11 +291,11 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		module->enableLearn(id);
 	}
 
-	void onDeselect(const event::Deselect &e) override {
+	void onDeselect(const event::Deselect& e) override {
 		if (!module)
 			return;
 		// Check if a ParamWidget was touched
-		ParamWidget *touchedParam = APP->scene->rack->touchedParam;
+		ParamWidget* touchedParam = APP->scene->rack->touchedParam;
 		if (touchedParam) {
 			APP->scene->rack->touchedParam = NULL;
 			int moduleId = touchedParam->paramQuantity->module->id;
@@ -359,21 +359,21 @@ struct MIDI_MapChoice : LedDisplayChoice {
 			return "";
 		if (id >= module->mapLen)
 			return "";
-		ParamHandle *paramHandle = &module->paramHandles[id];
+		ParamHandle* paramHandle = &module->paramHandles[id];
 		if (paramHandle->moduleId < 0)
 			return "";
-		ModuleWidget *mw = APP->scene->rack->getModule(paramHandle->moduleId);
+		ModuleWidget* mw = APP->scene->rack->getModule(paramHandle->moduleId);
 		if (!mw)
 			return "";
 		// Get the Module from the ModuleWidget instead of the ParamHandle.
 		// I think this is more elegant since this method is called in the app world instead of the engine world.
-		Module *m = mw->module;
+		Module* m = mw->module;
 		if (!m)
 			return "";
 		int paramId = paramHandle->paramId;
 		if (paramId >= (int) m->params.size())
 			return "";
-		ParamQuantity *paramQuantity = m->paramQuantities[paramId];
+		ParamQuantity* paramQuantity = m->paramQuantities[paramId];
 		std::string s;
 		s += mw->model->name;
 		s += " ";
@@ -384,12 +384,12 @@ struct MIDI_MapChoice : LedDisplayChoice {
 
 
 struct MIDI_MapDisplay : MidiWidget {
-	MIDI_Map *module;
-	ScrollWidget *scroll;
-	MIDI_MapChoice *choices[MAX_CHANNELS];
-	LedDisplaySeparator *separators[MAX_CHANNELS];
+	MIDI_Map* module;
+	ScrollWidget* scroll;
+	MIDI_MapChoice* choices[MAX_CHANNELS];
+	LedDisplaySeparator* separators[MAX_CHANNELS];
 
-	void setModule(MIDI_Map *module) {
+	void setModule(MIDI_Map* module) {
 		this->module = module;
 
 		scroll = new ScrollWidget;
@@ -398,7 +398,7 @@ struct MIDI_MapDisplay : MidiWidget {
 		scroll->box.size.y = box.size.y - scroll->box.pos.y;
 		addChild(scroll);
 
-		LedDisplaySeparator *separator = createWidget<LedDisplaySeparator>(scroll->box.pos);
+		LedDisplaySeparator* separator = createWidget<LedDisplaySeparator>(scroll->box.pos);
 		separator->box.size.x = box.size.x;
 		addChild(separator);
 		separators[0] = separator;
@@ -406,13 +406,13 @@ struct MIDI_MapDisplay : MidiWidget {
 		Vec pos;
 		for (int id = 0; id < MAX_CHANNELS; id++) {
 			if (id > 0) {
-				LedDisplaySeparator *separator = createWidget<LedDisplaySeparator>(pos);
+				LedDisplaySeparator* separator = createWidget<LedDisplaySeparator>(pos);
 				separator->box.size.x = box.size.x;
 				scroll->container->addChild(separator);
 				separators[id] = separator;
 			}
 
-			MIDI_MapChoice *choice = createWidget<MIDI_MapChoice>(pos);
+			MIDI_MapChoice* choice = createWidget<MIDI_MapChoice>(pos);
 			choice->box.size.x = box.size.x;
 			choice->id = id;
 			choice->setModule(module);
@@ -438,7 +438,7 @@ struct MIDI_MapDisplay : MidiWidget {
 
 
 struct MIDI_MapWidget : ModuleWidget {
-	MIDI_MapWidget(MIDI_Map *module) {
+	MIDI_MapWidget(MIDI_Map* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/MIDI-Map.svg")));
 
@@ -447,7 +447,7 @@ struct MIDI_MapWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		MIDI_MapDisplay *midiWidget = createWidget<MIDI_MapDisplay>(mm2px(Vec(3.41891, 14.8373)));
+		MIDI_MapDisplay* midiWidget = createWidget<MIDI_MapDisplay>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(43.999, 102.664));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
@@ -456,7 +456,7 @@ struct MIDI_MapWidget : ModuleWidget {
 };
 
 
-Model *modelMIDI_Map = createModel<MIDI_Map, MIDI_MapWidget>("MIDI-Map");
+Model* modelMIDI_Map = createModel<MIDI_Map, MIDI_MapWidget>("MIDI-Map");
 
 
 } // namespace core

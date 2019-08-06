@@ -10,7 +10,7 @@ void MarginLayout::step() {
 	Widget::step();
 
 	math::Rect childBox = box.zeroPos().grow(margin.neg());
-	for (Widget *child : children) {
+	for (Widget* child : children) {
 		child->box = childBox;
 	}
 }

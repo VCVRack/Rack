@@ -32,7 +32,7 @@ void FramebufferWidget::step() {
 
 	// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
 	dirty = false;
-	NVGcontext *vg = APP->window->vg;
+	NVGcontext* vg = APP->window->vg;
 
 	fbScale = scale;
 	// Set scale to zero so we must wait for the next draw() call before drawing the framebuffer again.
@@ -81,7 +81,7 @@ void FramebufferWidget::step() {
 
 	// If oversampling, create another framebuffer and copy it to actual size.
 	if (oversample != 1.0) {
-		NVGLUframebuffer *newFb = nvgluCreateFramebuffer(vg, fbSize.x, fbSize.y, 0);
+		NVGLUframebuffer* newFb = nvgluCreateFramebuffer(vg, fbSize.x, fbSize.y, 0);
 		if (!newFb) {
 			WARN("Non-oversampled framebuffer of size (%f, %f) could not be created for FramebufferWidget.", VEC_ARGS(fbSize));
 			return;
@@ -96,7 +96,7 @@ void FramebufferWidget::step() {
 		nvgBeginPath(vg);
 		nvgRect(vg, 0.0, 0.0, fbSize.x, fbSize.y);
 		NVGpaint paint = nvgImagePattern(vg, 0.0, 0.0, fbSize.x, fbSize.y,
-			0.0, fb->image, 1.0);
+		                                 0.0, fb->image, 1.0);
 		nvgFillPaint(vg, paint);
 		nvgFill(vg);
 
@@ -114,7 +114,7 @@ void FramebufferWidget::step() {
 	}
 }
 
-void FramebufferWidget::draw(const DrawArgs &args) {
+void FramebufferWidget::draw(const DrawArgs& args) {
 	// Draw directly if already drawing in a framebuffer
 	if (bypass || args.fb) {
 		Widget::draw(args);
@@ -150,14 +150,14 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 
 	nvgBeginPath(args.vg);
 	nvgRect(args.vg,
-		offsetI.x + fbBox.pos.x,
-		offsetI.y + fbBox.pos.y,
-		fbBox.size.x * scaleRatio.x, fbBox.size.y * scaleRatio.y);
+	        offsetI.x + fbBox.pos.x,
+	        offsetI.y + fbBox.pos.y,
+	        fbBox.size.x * scaleRatio.x, fbBox.size.y * scaleRatio.y);
 	NVGpaint paint = nvgImagePattern(args.vg,
-		offsetI.x + fbBox.pos.x,
-		offsetI.y + fbBox.pos.y,
-		fbBox.size.x * scaleRatio.x, fbBox.size.y * scaleRatio.y,
-		0.0, fb->image, 1.0);
+	                                 offsetI.x + fbBox.pos.x,
+	                                 offsetI.y + fbBox.pos.y,
+	                                 fbBox.size.x * scaleRatio.x, fbBox.size.y * scaleRatio.y,
+	                                 0.0, fb->image, 1.0);
 	nvgFillPaint(args.vg, paint);
 	nvgFill(args.vg);
 
@@ -170,7 +170,7 @@ void FramebufferWidget::draw(const DrawArgs &args) {
 }
 
 void FramebufferWidget::drawFramebuffer() {
-	NVGcontext *vg = APP->window->vg;
+	NVGcontext* vg = APP->window->vg;
 
 	float pixelRatio = fbSize.x * oversample / fbBox.size.x;
 	nvgBeginFrame(vg, fbBox.size.x, fbBox.size.y, pixelRatio);

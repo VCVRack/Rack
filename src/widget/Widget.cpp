@@ -52,7 +52,7 @@ void Widget::requestDelete() {
 math::Rect Widget::getChildrenBoundingBox() {
 	math::Vec min = math::Vec(INFINITY, INFINITY);
 	math::Vec max = math::Vec(-INFINITY, -INFINITY);
-	for (Widget *child : children) {
+	for (Widget* child : children) {
 		if (!child->visible)
 			continue;
 		min = min.min(child->box.getTopLeft());
@@ -61,7 +61,7 @@ math::Rect Widget::getChildrenBoundingBox() {
 	return math::Rect::fromMinMax(min, max);
 }
 
-math::Vec Widget::getRelativeOffset(math::Vec v, Widget *relative) {
+math::Vec Widget::getRelativeOffset(math::Vec v, Widget* relative) {
 	if (this == relative) {
 		return v;
 	}
@@ -84,7 +84,7 @@ math::Rect Widget::getViewport(math::Rect r) {
 	return r.clamp(bound);
 }
 
-void Widget::addChild(Widget *child) {
+void Widget::addChild(Widget* child) {
 	assert(child);
 	assert(!child->parent);
 	child->parent = this;
@@ -94,7 +94,7 @@ void Widget::addChild(Widget *child) {
 	child->onAdd(eAdd);
 }
 
-void Widget::addChildBottom(Widget *child) {
+void Widget::addChildBottom(Widget* child) {
 	assert(child);
 	assert(!child->parent);
 	child->parent = this;
@@ -104,7 +104,7 @@ void Widget::addChildBottom(Widget *child) {
 	child->onAdd(eAdd);
 }
 
-void Widget::removeChild(Widget *child) {
+void Widget::removeChild(Widget* child) {
 	assert(child);
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
@@ -122,7 +122,7 @@ void Widget::removeChild(Widget *child) {
 }
 
 void Widget::clearChildren() {
-	for (Widget *child : children) {
+	for (Widget* child : children) {
 		// event::Remove
 		event::Remove eRemove;
 		child->onRemove(eRemove);
@@ -135,7 +135,7 @@ void Widget::clearChildren() {
 
 void Widget::step() {
 	for (auto it = children.begin(); it != children.end();) {
-		Widget *child = *it;
+		Widget* child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
 			// event::Remove
@@ -153,9 +153,9 @@ void Widget::step() {
 	}
 }
 
-void Widget::draw(const DrawArgs &args) {
+void Widget::draw(const DrawArgs& args) {
 	// Iterate children
-	for (Widget *child : children) {
+	for (Widget* child : children) {
 		// Don't draw if invisible
 		if (!child->visible)
 			continue;

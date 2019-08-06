@@ -46,7 +46,7 @@ static void fatalSignalHandler(int sig) {
 }
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 #if defined ARCH_WIN
 	// Windows global mutex to prevent multiple instances
 	// Handle will be closed by Windows when the process ends
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
 	try {
 		settings::load(asset::settingsPath);
 	}
-	catch (UserException &e) {
+	catch (UserException& e) {
 		std::string msg = e.what();
 		msg += "\n\nReset settings to default?";
 		if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, msg.c_str())) {
@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
 	INFO("Initializing app");
 	appInit();
 
-	const char *openedFilename = glfwGetOpenedFilename();
+	const char* openedFilename = glfwGetOpenedFilename();
 	if (openedFilename) {
 		patchPath = openedFilename;
 	}

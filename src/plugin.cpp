@@ -22,11 +22,11 @@
 #include <jansson.h>
 
 #if defined ARCH_WIN
-#include <windows.h>
-#include <direct.h>
-#define mkdir(_dir, _perms) _mkdir(_dir)
+	#include <windows.h>
+	#include <direct.h>
+	#define mkdir(_dir, _perms) _mkdir(_dir)
 #else
-#include <dlfcn.h>
+	#include <dlfcn.h>
 #endif
 #include <dirent.h>
 #include <osdialog.h>
@@ -35,7 +35,7 @@
 namespace rack {
 
 namespace core {
-void init(rack::plugin::Plugin *plugin);
+void init(rack::plugin::Plugin* plugin);
 } // namespace core
 
 namespace plugin {
@@ -47,7 +47,7 @@ namespace plugin {
 
 typedef void (*InitCallback)(Plugin*);
 
-static InitCallback loadLibrary(Plugin *plugin) {
+static InitCallback loadLibrary(Plugin* plugin) {
 	// Load plugin library
 	std::string libraryFilename;
 #if defined ARCH_LIN
@@ -73,7 +73,7 @@ static InitCallback loadLibrary(Plugin *plugin) {
 		throw UserException(string::f("Failed to load library %s: code %d", libraryFilename.c_str(), error));
 	}
 #else
-	void *handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
+	void* handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
 	if (!handle) {
 		throw UserException(string::f("Failed to load library %s: %s", libraryFilename.c_str(), dlerror()));
 	}
@@ -96,8 +96,8 @@ static InitCallback loadLibrary(Plugin *plugin) {
 
 
 /** If path is blank, loads Core */
-static Plugin *loadPlugin(std::string path) {
-	Plugin *plugin = new Plugin;
+static Plugin* loadPlugin(std::string path) {
+	Plugin* plugin = new Plugin;
 	try {
 		plugin->path = path;
 
@@ -118,7 +118,7 @@ static Plugin *loadPlugin(std::string path) {
 
 		// Load plugin.json
 		std::string metadataFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
-		FILE *file = fopen(metadataFilename.c_str(), "r");
+		FILE* file = fopen(metadataFilename.c_str(), "r");
 		if (!file) {
 			throw UserException(string::f("Metadata file %s does not exist", metadataFilename.c_str()));
 		}
@@ -127,7 +127,7 @@ static Plugin *loadPlugin(std::string path) {
 		});
 
 		json_error_t error;
-		json_t *rootJ = json_loadf(file, 0, &error);
+		json_t* rootJ = json_loadf(file, 0, &error);
 		if (!rootJ) {
 			throw UserException(string::f("JSON parsing error at %s %d:%d %s", metadataFilename.c_str(), error.line, error.column, error.text));
 		}
@@ -149,7 +149,7 @@ static Plugin *loadPlugin(std::string path) {
 		plugin->fromJson(rootJ);
 
 		// Reject plugin if slug already exists
-		Plugin *oldPlugin = getPlugin(plugin->slug);
+		Plugin* oldPlugin = getPlugin(plugin->slug);
 		if (oldPlugin) {
 			throw UserException(string::f("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str()));
 		}
@@ -157,7 +157,7 @@ static Plugin *loadPlugin(std::string path) {
 		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), path.c_str());
 		plugins.push_back(plugin);
 	}
-	catch (UserException &e) {
+	catch (UserException& e) {
 		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
 		delete plugin;
 		plugin = NULL;
@@ -176,7 +176,7 @@ static void loadPlugins(std::string path) {
 }
 
 /** Returns 0 if successful */
-static int extractZipHandle(zip_t *za, std::string dir) {
+static int extractZipHandle(zip_t* za, std::string dir) {
 	int err;
 	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
 		zip_stat_t zs;
@@ -193,18 +193,18 @@ static int extractZipHandle(zip_t *za, std::string dir) {
 			// HACK
 			// Create and delete file to update the directory's mtime.
 			std::string tmpPath = path + "/.tmp";
-			FILE *tmpFile = fopen(tmpPath.c_str(), "w");
+			FILE* tmpFile = fopen(tmpPath.c_str(), "w");
 			fclose(tmpFile);
 			std::remove(tmpPath.c_str());
 		}
 		else {
-			zip_file_t *zf = zip_fopen_index(za, i, 0);
+			zip_file_t* zf = zip_fopen_index(za, i, 0);
 			if (!zf) {
 				WARN("zip_fopen_index() failed");
 				return -1;
 			}
 
-			FILE *outFile = fopen(path.c_str(), "wb");
+			FILE* outFile = fopen(path.c_str(), "wb");
 			if (!outFile)
 				continue;
 
@@ -230,7 +230,7 @@ static int extractZipHandle(zip_t *za, std::string dir) {
 /** Returns 0 if successful */
 static int extractZip(std::string filename, std::string path) {
 	int err;
-	zip_t *za = zip_open(filename.c_str(), 0, &err);
+	zip_t* za = zip_open(filename.c_str(), 0, &err);
 	if (!za) {
 		WARN("Could not open zip %s: error %d", filename.c_str(), err);
 		return err;
@@ -304,7 +304,7 @@ void init() {
 }
 
 void destroy() {
-	for (Plugin *plugin : plugins) {
+	for (Plugin* plugin : plugins) {
 		// Free library handle
 #if defined ARCH_WIN
 		if (plugin->handle)
@@ -321,13 +321,13 @@ void destroy() {
 	plugins.clear();
 }
 
-void logIn(const std::string &email, const std::string &password) {
+void logIn(const std::string& email, const std::string& password) {
 	loginStatus = "Logging in...";
-	json_t *reqJ = json_object();
+	json_t* reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
 	std::string url = app::API_URL + "/token";
-	json_t *resJ = network::requestJson(network::METHOD_POST, url, reqJ);
+	json_t* resJ = network::requestJson(network::METHOD_POST, url, reqJ);
 	json_decref(reqJ);
 
 	if (!resJ) {
@@ -338,20 +338,20 @@ void logIn(const std::string &email, const std::string &password) {
 		json_decref(resJ);
 	});
 
-	json_t *errorJ = json_object_get(resJ, "error");
+	json_t* errorJ = json_object_get(resJ, "error");
 	if (errorJ) {
-		const char *errorStr = json_string_value(errorJ);
+		const char* errorStr = json_string_value(errorJ);
 		loginStatus = errorStr;
 		return;
 	}
 
-	json_t *tokenJ = json_object_get(resJ, "token");
+	json_t* tokenJ = json_object_get(resJ, "token");
 	if (!tokenJ) {
 		loginStatus = "No token in response";
 		return;
 	}
 
-	const char *tokenStr = json_string_value(tokenJ);
+	const char* tokenStr = json_string_value(tokenJ);
 	settings::token = tokenStr;
 	loginStatus = "";
 	queryUpdates();
@@ -375,9 +375,9 @@ void queryUpdates() {
 
 	// Get user's plugins list
 	std::string pluginsUrl = app::API_URL + "/plugins";
-	json_t *pluginsReqJ = json_object();
+	json_t* pluginsReqJ = json_object();
 	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
-	json_t *pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
+	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
 	json_decref(pluginsReqJ);
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
@@ -388,7 +388,7 @@ void queryUpdates() {
 		json_decref(pluginsResJ);
 	});
 
-	json_t *errorJ = json_object_get(pluginsResJ, "error");
+	json_t* errorJ = json_object_get(pluginsResJ, "error");
 	if (errorJ) {
 		WARN("Request for user's plugins returned an error: %s", json_string_value(errorJ));
 		updateStatus = "Could not query updates";
@@ -397,9 +397,9 @@ void queryUpdates() {
 
 	// Get library manifests
 	std::string manifestsUrl = app::API_URL + "/library/manifests";
-	json_t *manifestsReq = json_object();
+	json_t* manifestsReq = json_object();
 	json_object_set(manifestsReq, "version", json_string(app::API_VERSION.c_str()));
-	json_t *manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
+	json_t* manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
 	json_decref(manifestsReq);
 	if (!manifestsResJ) {
 		WARN("Request for library manifests failed");
@@ -410,28 +410,28 @@ void queryUpdates() {
 		json_decref(manifestsResJ);
 	});
 
-	json_t *manifestsJ = json_object_get(manifestsResJ, "manifests");
-	json_t *pluginsJ = json_object_get(pluginsResJ, "plugins");
+	json_t* manifestsJ = json_object_get(manifestsResJ, "manifests");
+	json_t* pluginsJ = json_object_get(pluginsResJ, "plugins");
 
 	size_t pluginIndex;
-	json_t *pluginJ;
+	json_t* pluginJ;
 	json_array_foreach(pluginsJ, pluginIndex, pluginJ) {
 		Update update;
 		// Get plugin manifest
 		update.pluginSlug = json_string_value(pluginJ);
-		json_t *manifestJ = json_object_get(manifestsJ, update.pluginSlug.c_str());
+		json_t* manifestJ = json_object_get(manifestsJ, update.pluginSlug.c_str());
 		if (!manifestJ) {
 			WARN("VCV account has plugin %s but no manifest was found", update.pluginSlug.c_str());
 			continue;
 		}
 
 		// Get plugin name
-		json_t *nameJ = json_object_get(manifestJ, "name");
+		json_t* nameJ = json_object_get(manifestJ, "name");
 		if (nameJ)
 			update.pluginName = json_string_value(nameJ);
 
 		// Get version
-		json_t *versionJ = json_object_get(manifestJ, "version");
+		json_t* versionJ = json_object_get(manifestJ, "version");
 		if (!versionJ) {
 			WARN("Plugin %s has no version in manifest", update.pluginSlug.c_str());
 			continue;
@@ -439,12 +439,12 @@ void queryUpdates() {
 		update.version = json_string_value(versionJ);
 
 		// Check if update is needed
-		Plugin *p = getPlugin(update.pluginSlug);
+		Plugin* p = getPlugin(update.pluginSlug);
 		if (p && p->version == update.version)
 			continue;
 
 		// Check status
-		json_t *statusJ = json_object_get(manifestJ, "status");
+		json_t* statusJ = json_object_get(manifestJ, "status");
 		if (!statusJ)
 			continue;
 		std::string status = json_string_value(statusJ);
@@ -452,7 +452,7 @@ void queryUpdates() {
 			continue;
 
 		// Get changelog URL
-		json_t *changelogUrlJ = json_object_get(manifestJ, "changelogUrl");
+		json_t* changelogUrlJ = json_object_get(manifestJ, "changelogUrl");
 		if (changelogUrlJ) {
 			update.changelogUrl = json_string_value(changelogUrlJ);
 		}
@@ -464,7 +464,7 @@ void queryUpdates() {
 }
 
 bool hasUpdates() {
-	for (Update &update : updates) {
+	for (Update& update : updates) {
 		if (update.progress < 1.f)
 			return true;
 	}
@@ -474,7 +474,7 @@ bool hasUpdates() {
 static bool isSyncingUpdate = false;
 static bool isSyncingUpdates = false;
 
-void syncUpdate(Update *update) {
+void syncUpdate(Update* update) {
 	isSyncingUpdate = true;
 	DEFER({
 		isSyncingUpdate = false;
@@ -505,7 +505,7 @@ void syncUpdates() {
 	if (settings::token.empty())
 		return;
 
-	for (Update &update : updates) {
+	for (Update& update : updates) {
 		if (update.progress < 1.f)
 			syncUpdate(&update);
 	}
@@ -516,9 +516,9 @@ bool isSyncing() {
 	return isSyncingUpdate || isSyncingUpdates;
 }
 
-Plugin *getPlugin(const std::string &pluginSlug) {
+Plugin* getPlugin(const std::string& pluginSlug) {
 	std::string slug = normalizeSlug(pluginSlug);
-	for (Plugin *plugin : plugins) {
+	for (Plugin* plugin : plugins) {
 		if (plugin->slug == slug) {
 			return plugin;
 		}
@@ -526,11 +526,11 @@ Plugin *getPlugin(const std::string &pluginSlug) {
 	return NULL;
 }
 
-Model *getModel(const std::string &pluginSlug, const std::string &modelSlug) {
-	Plugin *plugin = getPlugin(pluginSlug);
+Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
+	Plugin* plugin = getPlugin(pluginSlug);
 	if (!plugin)
 		return NULL;
-	Model *model = plugin->getModel(modelSlug);
+	Model* model = plugin->getModel(modelSlug);
 	if (!model)
 		return NULL;
 	return model;
@@ -621,21 +621,21 @@ const std::map<std::string, std::string> tagAliases = {
 };
 
 
-std::string normalizeTag(const std::string &tag) {
+std::string normalizeTag(const std::string& tag) {
 	std::string lowercaseTag = string::lowercase(tag);
 	// Transform aliases
 	auto it = tagAliases.find(lowercaseTag);
 	if (it != tagAliases.end())
 		lowercaseTag = it->second;
 	// Find allowed tag
-	for (const std::string &allowedTag : allowedTags) {
+	for (const std::string& allowedTag : allowedTags) {
 		if (lowercaseTag == string::lowercase(allowedTag))
 			return allowedTag;
 	}
 	return "";
 }
 
-bool isSlugValid(const std::string &slug) {
+bool isSlugValid(const std::string& slug) {
 	for (char c : slug) {
 		if (!(std::isalnum(c) || c == '-' || c == '_'))
 			return false;
@@ -643,7 +643,7 @@ bool isSlugValid(const std::string &slug) {
 	return true;
 }
 
-std::string normalizeSlug(const std::string &slug) {
+std::string normalizeSlug(const std::string& slug) {
 	std::string s;
 	for (char c : slug) {
 		if (!(std::isalnum(c) || c == '-' || c == '_'))

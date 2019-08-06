@@ -9,7 +9,7 @@ namespace rack {
 namespace logger {
 
 
-static FILE *outputFile = NULL;
+static FILE* outputFile = NULL;
 static std::chrono::high_resolution_clock::time_point startTime;
 static std::mutex logMutex;
 
@@ -47,7 +47,7 @@ static const int levelColors[] = {
 	31
 };
 
-static void logVa(Level level, const char *filename, int line, const char *format, va_list args) {
+static void logVa(Level level, const char* filename, int line, const char* format, va_list args) {
 	std::lock_guard<std::mutex> lock(logMutex);
 
 	auto nowTime = std::chrono::high_resolution_clock::now();
@@ -62,7 +62,7 @@ static void logVa(Level level, const char *filename, int line, const char *forma
 	fflush(outputFile);
 }
 
-void log(Level level, const char *filename, int line, const char *format, ...) {
+void log(Level level, const char* filename, int line, const char* format, ...) {
 	va_list args;
 	va_start(args, format);
 	logVa(level, filename, line, format, args);

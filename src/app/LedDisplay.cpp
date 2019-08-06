@@ -8,7 +8,7 @@ namespace rack {
 namespace app {
 
 
-void LedDisplay::draw(const DrawArgs &args) {
+void LedDisplay::draw(const DrawArgs& args) {
 	nvgBeginPath(args.vg);
 	nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
 	nvgFillColor(args.vg, nvgRGB(0x00, 0x00, 0x00));
@@ -24,7 +24,7 @@ LedDisplaySeparator::LedDisplaySeparator() {
 	box.size = math::Vec();
 }
 
-void LedDisplaySeparator::draw(const DrawArgs &args) {
+void LedDisplaySeparator::draw(const DrawArgs& args) {
 	nvgBeginPath(args.vg);
 	nvgMoveTo(args.vg, 0, 0);
 	nvgLineTo(args.vg, box.size.x, box.size.y);
@@ -42,7 +42,7 @@ LedDisplayChoice::LedDisplayChoice() {
 	textOffset = math::Vec(10, 18);
 }
 
-void LedDisplayChoice::draw(const DrawArgs &args) {
+void LedDisplayChoice::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 	if (bgColor.a > 0.0) {
 		nvgBeginPath(args.vg);
@@ -62,7 +62,7 @@ void LedDisplayChoice::draw(const DrawArgs &args) {
 	nvgResetScissor(args.vg);
 }
 
-void LedDisplayChoice::onButton(const event::Button &e) {
+void LedDisplayChoice::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
@@ -80,7 +80,7 @@ LedDisplayTextField::LedDisplayTextField() {
 }
 
 
-void LedDisplayTextField::draw(const DrawArgs &args) {
+void LedDisplayTextField::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
 	// Background
@@ -98,8 +98,8 @@ void LedDisplayTextField::draw(const DrawArgs &args) {
 		int begin = std::min(cursor, selection);
 		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
 		bndIconLabelCaret(args.vg, textOffset.x, textOffset.y,
-			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-			-1, color, 12, text.c_str(), highlightColor, begin, end);
+		                  box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
+		                  -1, color, 12, text.c_str(), highlightColor, begin, end);
 
 		bndSetFont(APP->window->uiFont->handle);
 	}
@@ -110,8 +110,8 @@ void LedDisplayTextField::draw(const DrawArgs &args) {
 int LedDisplayTextField::getTextPosition(math::Vec mousePos) {
 	bndSetFont(font->handle);
 	int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
-		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-		-1, 12, text.c_str(), mousePos.x, mousePos.y);
+	                                       box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
+	                                       -1, 12, text.c_str(), mousePos.x, mousePos.y);
 	bndSetFont(APP->window->uiFont->handle);
 	return textPos;
 }

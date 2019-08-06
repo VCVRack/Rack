@@ -77,7 +77,7 @@ int Port::getDeviceCount() {
 	return 0;
 }
 
-bool Port::getDeviceInfo(int deviceId, RtAudio::DeviceInfo *deviceInfo) {
+bool Port::getDeviceInfo(int deviceId, RtAudio::DeviceInfo* deviceInfo) {
 	if (!deviceInfo)
 		return false;
 
@@ -91,7 +91,7 @@ bool Port::getDeviceInfo(int deviceId, RtAudio::DeviceInfo *deviceInfo) {
 				*deviceInfo = rtAudio->getDeviceInfo(deviceId);
 				return true;
 			}
-			catch (RtAudioError &e) {
+			catch (RtAudioError& e) {
 				WARN("Failed to query RtAudio device: %s", e.what());
 			}
 		}
@@ -168,7 +168,7 @@ std::vector<int> Port::getSampleRates() {
 			std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
 			return sampleRates;
 		}
-		catch (RtAudioError &e) {
+		catch (RtAudioError& e) {
 			WARN("Failed to query RtAudio device: %s", e.what());
 		}
 	}
@@ -205,15 +205,15 @@ void Port::setChannels(int numOutputs, int numInputs) {
 }
 
 
-static int rtCallback(void *outputBuffer, void *inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void *userData) {
-	Port *port = (Port*) userData;
+static int rtCallback(void* outputBuffer, void* inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
+	Port* port = (Port*) userData;
 	assert(port);
 	// Exploit the stream time to run code on startup of the audio thread
 	if (streamTime == 0.0) {
 		system::setThreadName("Audio");
 		// system::setThreadRealTime();
 	}
-	port->processStream((const float *) inputBuffer, (float *) outputBuffer, nFrames);
+	port->processStream((const float*) inputBuffer, (float*) outputBuffer, nFrames);
 	return 0;
 }
 
@@ -226,7 +226,7 @@ void Port::openStream() {
 		try {
 			deviceInfo = rtAudio->getDeviceInfo(deviceId);
 		}
-		catch (RtAudioError &e) {
+		catch (RtAudioError& e) {
 			WARN("Failed to query RtAudio device: %s", e.what());
 			return;
 		}
@@ -265,12 +265,12 @@ void Port::openStream() {
 		try {
 			INFO("Opening audio RtAudio device %d with %d in %d out", deviceId, numInputs, numOutputs);
 			rtAudio->openStream(
-				numOutputs == 0 ? NULL : &outParameters,
-				numInputs == 0 ? NULL : &inParameters,
-				RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize,
-				&rtCallback, this, &options, NULL);
+			  numOutputs == 0 ? NULL : &outParameters,
+			  numInputs == 0 ? NULL : &inParameters,
+			  RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize,
+			  &rtCallback, this, &options, NULL);
 		}
-		catch (RtAudioError &e) {
+		catch (RtAudioError& e) {
 			WARN("Failed to open RtAudio stream: %s", e.what());
 			return;
 		}
@@ -279,7 +279,7 @@ void Port::openStream() {
 			INFO("Starting RtAudio stream %d", deviceId);
 			rtAudio->startStream();
 		}
-		catch (RtAudioError &e) {
+		catch (RtAudioError& e) {
 			WARN("Failed to start RtAudio stream: %s", e.what());
 			return;
 		}
@@ -303,7 +303,7 @@ void Port::closeStream() {
 			try {
 				rtAudio->stopStream();
 			}
-			catch (RtAudioError &e) {
+			catch (RtAudioError& e) {
 				WARN("Failed to stop RtAudio stream %s", e.what());
 			}
 		}
@@ -312,7 +312,7 @@ void Port::closeStream() {
 			try {
 				rtAudio->closeStream();
 			}
-			catch (RtAudioError &e) {
+			catch (RtAudioError& e) {
 				WARN("Failed to close RtAudio stream %s", e.what());
 			}
 		}
@@ -325,8 +325,8 @@ void Port::closeStream() {
 	onCloseStream();
 }
 
-json_t *Port::toJson() {
-	json_t *rootJ = json_object();
+json_t* Port::toJson() {
+	json_t* rootJ = json_object();
 	json_object_set_new(rootJ, "driver", json_integer(driverId));
 	std::string deviceName = getDeviceName(deviceId);
 	if (!deviceName.empty())
@@ -338,14 +338,14 @@ json_t *Port::toJson() {
 	return rootJ;
 }
 
-void Port::fromJson(json_t *rootJ) {
+void Port::fromJson(json_t* rootJ) {
 	closeStream();
 
-	json_t *driverJ = json_object_get(rootJ, "driver");
+	json_t* driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
 		setDriverId(json_number_value(driverJ));
 
-	json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
+	json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
 	if (deviceNameJ) {
 		std::string deviceName = json_string_value(deviceNameJ);
 		// Search for device ID with equal name
@@ -357,19 +357,19 @@ void Port::fromJson(json_t *rootJ) {
 		}
 	}
 
-	json_t *offsetJ = json_object_get(rootJ, "offset");
+	json_t* offsetJ = json_object_get(rootJ, "offset");
 	if (offsetJ)
 		offset = json_integer_value(offsetJ);
 
-	json_t *maxChannelsJ = json_object_get(rootJ, "maxChannels");
+	json_t* maxChannelsJ = json_object_get(rootJ, "maxChannels");
 	if (maxChannelsJ)
 		maxChannels = json_integer_value(maxChannelsJ);
 
-	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
+	json_t* sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ)
 		sampleRate = json_integer_value(sampleRateJ);
 
-	json_t *blockSizeJ = json_object_get(rootJ, "blockSize");
+	json_t* blockSizeJ = json_object_get(rootJ, "blockSize");
 	if (blockSizeJ)
 		blockSize = json_integer_value(blockSizeJ);
 

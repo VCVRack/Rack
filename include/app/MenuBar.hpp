@@ -8,11 +8,11 @@ namespace app {
 
 
 struct MenuBar : widget::OpaqueWidget {
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 
-MenuBar *createMenuBar();
+MenuBar* createMenuBar();
 
 
 } // namespace app

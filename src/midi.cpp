@@ -16,11 +16,11 @@ static std::map<int, Driver*> drivers;
 // Device
 ////////////////////
 
-void InputDevice::subscribe(Input *input) {
+void InputDevice::subscribe(Input* input) {
 	subscribed.insert(input);
 }
 
-void InputDevice::unsubscribe(Input *input) {
+void InputDevice::unsubscribe(Input* input) {
 	// Remove Input from subscriptions
 	auto it = subscribed.find(input);
 	if (it != subscribed.end())
@@ -28,7 +28,7 @@ void InputDevice::unsubscribe(Input *input) {
 }
 
 void InputDevice::onMessage(Message message) {
-	for (Input *input : subscribed) {
+	for (Input* input : subscribed) {
 		// Filter channel
 		if (input->channel < 0 || message.getStatus() == 0xf || message.getChannel() == input->channel) {
 			input->onMessage(message);
@@ -36,11 +36,11 @@ void InputDevice::onMessage(Message message) {
 	}
 }
 
-void OutputDevice::subscribe(Output *output) {
+void OutputDevice::subscribe(Output* output) {
 	subscribed.insert(output);
 }
 
-void OutputDevice::unsubscribe(Output *output) {
+void OutputDevice::unsubscribe(Output* output) {
 	// Remove Output from subscriptions
 	auto it = subscribed.find(output);
 	if (it != subscribed.end())
@@ -90,8 +90,8 @@ void Port::setChannel(int channel) {
 	this->channel = channel;
 }
 
-json_t *Port::toJson() {
-	json_t *rootJ = json_object();
+json_t* Port::toJson() {
+	json_t* rootJ = json_object();
 	json_object_set_new(rootJ, "driver", json_integer(driverId));
 	std::string deviceName = getDeviceName(deviceId);
 	if (!deviceName.empty())
@@ -100,12 +100,12 @@ json_t *Port::toJson() {
 	return rootJ;
 }
 
-void Port::fromJson(json_t *rootJ) {
-	json_t *driverJ = json_object_get(rootJ, "driver");
+void Port::fromJson(json_t* rootJ) {
+	json_t* driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
 		setDriverId(json_integer_value(driverJ));
 
-	json_t *deviceNameJ = json_object_get(rootJ, "deviceName");
+	json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
 	if (deviceNameJ) {
 		std::string deviceName = json_string_value(deviceNameJ);
 		// Search for device with equal name
@@ -117,7 +117,7 @@ void Port::fromJson(json_t *rootJ) {
 		}
 	}
 
-	json_t *channelJ = json_object_get(rootJ, "channel");
+	json_t* channelJ = json_object_get(rootJ, "channel");
 	if (channelJ)
 		channel = json_integer_value(channelJ);
 }
@@ -185,7 +185,7 @@ void InputQueue::onMessage(Message message) {
 		queue.push(message);
 }
 
-bool InputQueue::shift(Message *message) {
+bool InputQueue::shift(Message* message) {
 	if (!message)
 		return false;
 	if (!queue.empty()) {
@@ -274,13 +274,13 @@ void init() {
 
 void destroy() {
 	driverIds.clear();
-	for (auto &pair : drivers) {
+	for (auto& pair : drivers) {
 		delete pair.second;
 	}
 	drivers.clear();
 }
 
-void addDriver(int driverId, Driver *driver) {
+void addDriver(int driverId, Driver* driver) {
 	assert(driver);
 	driverIds.push_back(driverId);
 	drivers[driverId] = driver;

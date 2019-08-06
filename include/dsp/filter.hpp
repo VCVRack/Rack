@@ -214,7 +214,7 @@ struct TBiquadFilter {
 	T process(T in) {
 		// Advance IIR
 		T out = b[0] * in + b[1] * x[0] + b[2] * x[1]
-			- a[0] * y[0] - a[1] * y[1];
+		        - a[0] * y[0] - a[1] * y[1];
 		// Push input
 		x[1] = x[0];
 		x[0] = in;
@@ -348,7 +348,7 @@ struct TBiquadFilter {
 		}
 	}
 
-	void copyParameters(const TBiquadFilter<T> &from) {
+	void copyParameters(const TBiquadFilter<T>& from) {
 		b[0] = from.b[0];
 		b[1] = from.b[1];
 		b[2] = from.b[2];

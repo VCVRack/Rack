@@ -24,11 +24,11 @@ struct BridgeMidiDriver;
 
 
 struct BridgeClientConnection;
-static BridgeClientConnection *connections[BRIDGE_NUM_PORTS] = {};
-static audio::Port *audioListeners[BRIDGE_NUM_PORTS] = {};
+static BridgeClientConnection* connections[BRIDGE_NUM_PORTS] = {};
+static audio::Port* audioListeners[BRIDGE_NUM_PORTS] = {};
 static std::thread serverThread;
 static bool serverRunning = false;
-static BridgeMidiDriver *driver = NULL;
+static BridgeMidiDriver* driver = NULL;
 
 
 struct BridgeMidiInputDevice : midi::InputDevice {
@@ -38,7 +38,9 @@ struct BridgeMidiInputDevice : midi::InputDevice {
 struct BridgeMidiDriver : midi::Driver {
 	BridgeMidiInputDevice devices[16];
 
-	std::string getName() override {return "Bridge";}
+	std::string getName() override {
+		return "Bridge";
+	}
 
 	std::vector<int> getInputDeviceIds() override {
 		std::vector<int> deviceIds;
@@ -54,7 +56,7 @@ struct BridgeMidiDriver : midi::Driver {
 		return string::f("Port %d", deviceId + 1);
 	}
 
-	midi::InputDevice *subscribeInput(int deviceId, midi::Input *input) override {
+	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < 16))
 			return NULL;
 
@@ -62,7 +64,7 @@ struct BridgeMidiDriver : midi::Driver {
 		return &devices[deviceId];
 	}
 
-	void unsubscribeInput(int deviceId, midi::Input *input) override {
+	void unsubscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < 16))
 			return;
 
@@ -83,7 +85,7 @@ struct BridgeClientConnection {
 	}
 
 	/** Returns true if successful */
-	bool send(const void *buffer, int length) {
+	bool send(const void* buffer, int length) {
 		if (length <= 0)
 			return false;
 
@@ -110,7 +112,7 @@ struct BridgeClientConnection {
 	}
 
 	/** Returns true if successful */
-	bool recv(void *buffer, int length) {
+	bool recv(void* buffer, int length) {
 		if (length <= 0)
 			return false;
 
@@ -132,7 +134,7 @@ struct BridgeClientConnection {
 	}
 
 	template <typename T>
-	bool recv(T *x) {
+	bool recv(T* x) {
 		return recv(x, sizeof(*x));
 	}
 
@@ -206,7 +208,7 @@ struct BridgeClientConnection {
 			case AUDIO_PROCESS_COMMAND: {
 				uint32_t frames = 0;
 				recv<uint32_t>(&frames);
-				if (frames == 0 || frames > (1<<16)) {
+				if (frames == 0 || frames > (1 << 16)) {
 					ready = false;
 					return;
 				}
@@ -259,7 +261,7 @@ struct BridgeClientConnection {
 		refreshAudio();
 	}
 
-	void processStream(const float *input, float *output, int frames) {
+	void processStream(const float* input, float* output, int frames) {
 		if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 			return;
 		if (!audioListeners[port])
@@ -429,7 +431,7 @@ void bridgeDestroy() {
 	serverThread.join();
 }
 
-void bridgeAudioSubscribe(int port, audio::Port *audio) {
+void bridgeAudioSubscribe(int port, audio::Port* audio) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	// Check if an Audio is already subscribed on the port
@@ -440,7 +442,7 @@ void bridgeAudioSubscribe(int port, audio::Port *audio) {
 		connections[port]->refreshAudio();
 }
 
-void bridgeAudioUnsubscribe(int port, audio::Port *audio) {
+void bridgeAudioUnsubscribe(int port, audio::Port* audio) {
 	if (!(0 <= port && port < BRIDGE_NUM_PORTS))
 		return;
 	if (audioListeners[port] != audio)

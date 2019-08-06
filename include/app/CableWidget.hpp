@@ -12,25 +12,25 @@ namespace app {
 
 
 struct CableWidget : widget::OpaqueWidget {
-	PortWidget *outputPort = NULL;
-	PortWidget *inputPort = NULL;
-	PortWidget *hoveredOutputPort = NULL;
-	PortWidget *hoveredInputPort = NULL;
+	PortWidget* outputPort = NULL;
+	PortWidget* inputPort = NULL;
+	PortWidget* hoveredOutputPort = NULL;
+	PortWidget* hoveredInputPort = NULL;
 	/** Owned. */
-	engine::Cable *cable;
+	engine::Cable* cable;
 	NVGcolor color;
 
 	CableWidget();
 	~CableWidget();
 	bool isComplete();
-	void setOutput(PortWidget *outputPort);
-	void setInput(PortWidget *inputPort);
+	void setOutput(PortWidget* outputPort);
+	void setInput(PortWidget* inputPort);
 	math::Vec getOutputPos();
 	math::Vec getInputPos();
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
-	void draw(const DrawArgs &args) override;
-	void drawPlugs(const DrawArgs &args);
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
+	void draw(const DrawArgs& args) override;
+	void drawPlugs(const DrawArgs& args);
 };
 
 

@@ -11,8 +11,8 @@ namespace rack {
 
 
 namespace app {
-	struct ModuleWidget;
-	struct CableWidget;
+struct ModuleWidget;
+struct CableWidget;
 } // namespace app
 
 
@@ -52,7 +52,7 @@ struct ComplexAction : Action {
 	~ComplexAction();
 	void undo() override;
 	void redo() override;
-	void push(Action *action);
+	void push(Action* action);
 	bool isEmpty();
 };
 
@@ -66,14 +66,14 @@ struct ModuleAction : Action {
 
 
 struct ModuleAdd : ModuleAction {
-	plugin::Model *model;
+	plugin::Model* model;
 	math::Vec pos;
-	json_t *moduleJ;
+	json_t* moduleJ;
 	ModuleAdd() {
 		name = "add module";
 	}
 	~ModuleAdd();
-	void setModule(app::ModuleWidget *mw);
+	void setModule(app::ModuleWidget* mw);
 	void undo() override;
 	void redo() override;
 };
@@ -108,8 +108,8 @@ struct ModuleBypass : ModuleAction {
 
 
 struct ModuleChange : ModuleAction {
-	json_t *oldModuleJ;
-	json_t *newModuleJ;
+	json_t* oldModuleJ;
+	json_t* newModuleJ;
 	ModuleChange() {
 		name = "change module";
 	}
@@ -138,7 +138,7 @@ struct CableAdd : Action {
 	int inputModuleId;
 	int inputId;
 	NVGcolor color;
-	void setCable(app::CableWidget *cw);
+	void setCable(app::CableWidget* cw);
 	void undo() override;
 	void redo() override;
 	CableAdd() {
@@ -163,7 +163,7 @@ struct State {
 	State();
 	~State();
 	void clear();
-	void push(Action *action);
+	void push(Action* action);
 	void undo();
 	void redo();
 	bool canUndo();
