@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
 			case 'h': {
 				settings::headless = true;
 			} break;
-			// Due to Mac app translocation and Apple adding a -psn... flag when launched, disable screenshots on Mac for now.
 #if !defined ARCH_MAC
+			// Due to Mac app translocation and Apple adding a -psn... flag when launched, disable screenshots on Mac for now.
 			case 'p': {
 				screenshot = true;
 				// If parsing number failed, use default value
