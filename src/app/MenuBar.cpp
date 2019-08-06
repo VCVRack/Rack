@@ -446,7 +446,7 @@ struct EngineButton : MenuButton {
 		menu->box.size.x = box.size.x;
 
 		CpuMeterItem *cpuMeterItem = new CpuMeterItem;
-		cpuMeterItem->text = "CPU timer";
+		cpuMeterItem->text = "Module timer";
 		cpuMeterItem->rightText = CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);
 
