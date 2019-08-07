@@ -74,8 +74,8 @@ struct MIDI_CV : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		heldNotes.reserve(128);
 		for (int c = 0; c < 16; c++) {
-			pitchFilters[c].lambda = 1 / 0.01f;
-			modFilters[c].lambda = 1 / 0.01f;
+			pitchFilters[c].setTau(1 / 30.f);
+			modFilters[c].setTau(1 / 30.f);
 		}
 		onReset();
 	}

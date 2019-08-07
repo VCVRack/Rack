@@ -25,12 +25,11 @@ struct MIDI_CC : Module {
 	int learningId;
 	int learnedCcs[16];
 	dsp::ExponentialFilter valueFilters[16];
-	int8_t lastValues[16] = {};
 
 	MIDI_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 16; i++) {
-			valueFilters[i].lambda = 1 / 0.01f;
+			valueFilters[i].setTau(1 / 30.f);
 		}
 		onReset();
 	}
@@ -57,11 +56,10 @@ struct MIDI_CC : Module {
 				continue;
 
 			int cc = learnedCcs[i];
-
-			float value = rescale(values[cc], 0, 127, 0.f, 10.f);
+			float value = values[cc] / 127.f;
 
 			// Detect behavior from MIDI buttons.
-			if ((lastValues[i] == 0 && values[cc] == 127) || (lastValues[i] == 127 && values[cc] == 0)) {
+			if (std::fabs(valueFilters[i].out - value) >= 1.f) {
 				// Jump value
 				valueFilters[i].out = value;
 			}
@@ -69,8 +67,7 @@ struct MIDI_CC : Module {
 				// Smooth value with filter
 				valueFilters[i].process(args.sampleTime, value);
 			}
-			lastValues[i] = values[cc];
-			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out);
+			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out * 10.f);
 		}
 	}
 

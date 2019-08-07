@@ -42,6 +42,8 @@ struct MIDI_Map : Module {
 	int8_t values[128];
 	/** The smoothing processor (normalized between 0 and 1) of each channel */
 	dsp::ExponentialFilter valueFilters[MAX_CHANNELS];
+	bool filterInitialized[MAX_CHANNELS] = {};
+	dsp::ClockDivider divider;
 
 	MIDI_Map() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -49,6 +51,10 @@ struct MIDI_Map : Module {
 			paramHandles[id].color = nvgRGB(0xff, 0xff, 0x40);
 			APP->engine->addParamHandle(&paramHandles[id]);
 		}
+		for (int i = 0; i < MAX_CHANNELS; i++) {
+			valueFilters[i].setTau(1 / 30.f);
+		}
+		divider.setDivision(32);
 		onReset();
 	}
 
@@ -71,38 +77,46 @@ struct MIDI_Map : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		midi::Message msg;
-		while (midiInput.shift(&msg)) {
-			processMessage(msg);
-		}
+		if (divider.process()) {
+			midi::Message msg;
+			while (midiInput.shift(&msg)) {
+				processMessage(msg);
+			}
 
-		// Step channels
-		for (int id = 0; id < mapLen; id++) {
-			int cc = ccs[id];
-			if (cc < 0)
-				continue;
-			// Check if CC value has been set
-			if (values[cc] < 0)
-				continue;
-			// Get Module
-			Module* module = paramHandles[id].module;
-			if (!module)
-				continue;
-			// Get ParamQuantity
-			int paramId = paramHandles[id].paramId;
-			ParamQuantity* paramQuantity = module->paramQuantities[paramId];
-			if (!paramQuantity)
-				continue;
-			if (!paramQuantity->isBounded())
-				continue;
-			// Set ParamQuantity
-			float v = rescale(values[cc], 0, 127, 0.f, 1.f);
-			v = valueFilters[id].process(args.sampleTime, v);
-			paramQuantity->setScaledValue(v);
+			// Step channels
+			for (int id = 0; id < mapLen; id++) {
+				int cc = ccs[id];
+				if (cc < 0)
+					continue;
+				// Get Module
+				Module* module = paramHandles[id].module;
+				if (!module)
+					continue;
+				// Get ParamQuantity
+				int paramId = paramHandles[id].paramId;
+				ParamQuantity* paramQuantity = module->paramQuantities[paramId];
+				if (!paramQuantity)
+					continue;
+				if (!paramQuantity->isBounded())
+					continue;
+				// Set filter from param value if filter is uninitialized
+				if (!filterInitialized[id]) {
+					valueFilters[id].out = paramQuantity->getScaledValue();
+					filterInitialized[id] = true;
+				}
+				// Set param if value has been initialized
+				if (values[cc] >= 0) {
+					float v = values[cc] / 127.f;
+					v = valueFilters[id].process(args.sampleTime * divider.getDivision(), v);
+					paramQuantity->setScaledValue(v);
+				}
+			}
 		}
 	}
 
 	void processMessage(midi::Message msg) {
+		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.getChannel(), msg.getNote(), msg.getValue());
+
 		switch (msg.getStatus()) {
 			// cc
 			case 0xb: {

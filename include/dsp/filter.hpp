@@ -68,6 +68,10 @@ struct TExponentialFilter {
 		this->lambda = lambda;
 	}
 
+	void setTau(T tau) {
+		this->lambda = 1 / tau;
+	}
+
 	T process(T deltaTime, T in) {
 		T y = out + (in - out) * lambda * deltaTime;
 		// If no change was made between the old and new output, assume T granularity is too small and snap output to input
@@ -96,6 +100,10 @@ struct TPeakFilter {
 
 	void setLambda(T lambda) {
 		this->lambda = lambda;
+	}
+
+	void setTau(T tau) {
+		this->lambda = 1 / tau;
 	}
 
 	T process(T deltaTime, T in) {
