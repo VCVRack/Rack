@@ -5,6 +5,10 @@
 
 # Usage:
 # astyle --suffix=none --options=.astylerc filename.cpp
+# or recursively
+# astyle --suffix=none --options=.astylerc -r 'include/*' 'src/*'
+# or using find
+# find src include -type f | xargs astyle --suffix=none --options=.astylerc
 
 style=java
 indent=tab=2

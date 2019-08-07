@@ -147,24 +147,55 @@ struct EngineWorker {
 	Engine* engine;
 	int id;
 	std::thread thread;
-	bool running = true;
+	bool running = false;
 
 	void start() {
+		assert(!running);
+		running = true;
 		thread = std::thread([&] {
 			random::init();
 			run();
 		});
 	}
 
-	void stop() {
+	void requestStop() {
 		running = false;
 	}
 
 	void join() {
+		assert(thread.joinable());
 		thread.join();
 	}
 
 	void run();
+};
+
+
+struct ProfilerWorker {
+	Engine* engine;
+	std::thread thread;
+	bool running = false;
+
+	void start() {
+		assert(!running);
+		running = true;
+		thread = std::thread([&] {
+			run();
+		});
+	}
+
+	void stop() {
+		running = false;
+		if (thread.joinable())
+			thread.join();
+	}
+
+	void run() {
+		while (running) {
+			DEBUG("sample");
+			std::this_thread::sleep_for(std::chrono::nanoseconds(100000000));
+		}
+	}
 };
 
 
@@ -193,19 +224,17 @@ struct Engine::Internal {
 	VIPMutex vipMutex;
 
 	bool realTime = false;
-	int threadCount = 1;
+	int threadCount = 0;
 	std::vector<EngineWorker> workers;
 	HybridBarrier engineBarrier;
 	HybridBarrier workerBarrier;
 	std::atomic<int> workerModuleIndex;
+	ProfilerWorker profilerWorker;
 };
 
 
 Engine::Engine() {
 	internal = new Internal;
-
-	internal->engineBarrier.total = 1;
-	internal->workerBarrier.total = 1;
 
 	internal->sampleRate = 44100.f;
 	internal->sampleTime = 1 / internal->sampleRate;
@@ -351,36 +380,49 @@ static void Engine_updateExpander(Engine* that, Module::Expander* expander) {
 	}
 }
 
-static void Engine_relaunchWorkers(Engine* that) {
+static void Engine_relaunchWorkers(Engine* that, int threadCount, bool realTime) {
 	Engine::Internal* internal = that->internal;
-	assert(1 <= internal->threadCount);
 
-	// Stop all workers
-	for (EngineWorker& worker : internal->workers) {
-		worker.stop();
+	if (internal->threadCount > 0) {
+		// Stop profiler
+		// internal->profilerWorker.stop();
+
+		// Stop engine workers
+		for (EngineWorker& worker : internal->workers) {
+			worker.requestStop();
+		}
+		internal->engineBarrier.wait();
+
+		// Join and destroy engine workers
+		for (EngineWorker& worker : internal->workers) {
+			worker.join();
+		}
+		internal->workers.resize(0);
 	}
-	internal->engineBarrier.wait();
 
-	// Destroy all workers
-	for (EngineWorker& worker : internal->workers) {
-		worker.join();
-	}
-	internal->workers.resize(0);
-
-	// Configure main thread
-	system::setThreadRealTime(internal->realTime);
+	// Configure engine
+	internal->threadCount = threadCount;
+	internal->realTime = realTime;
 
 	// Set barrier counts
-	internal->engineBarrier.total = internal->threadCount;
-	internal->workerBarrier.total = internal->threadCount;
+	internal->engineBarrier.total = threadCount;
+	internal->workerBarrier.total = threadCount;
 
-	// Create workers
-	internal->workers.resize(internal->threadCount - 1);
-	for (int id = 1; id < internal->threadCount; id++) {
-		EngineWorker& worker = internal->workers[id - 1];
-		worker.id = id;
-		worker.engine = that;
-		worker.start();
+	// Configure main thread
+	system::setThreadRealTime(realTime);
+
+	if (threadCount > 0) {
+		// Create and start engine workers
+		internal->workers.resize(threadCount - 1);
+		for (int id = 1; id < threadCount; id++) {
+			EngineWorker& worker = internal->workers[id - 1];
+			worker.id = id;
+			worker.engine = that;
+			worker.start();
+		}
+
+		// Start profiler
+		// internal->profilerWorker.start();
 	}
 }
 
@@ -413,9 +455,7 @@ static void Engine_run(Engine* that) {
 
 		// Launch workers
 		if (internal->threadCount != settings::threadCount || internal->realTime != settings::realTime) {
-			internal->threadCount = settings::threadCount;
-			internal->realTime = settings::realTime;
-			Engine_relaunchWorkers(that);
+			Engine_relaunchWorkers(that, settings::threadCount, settings::realTime);
 		}
 
 		if (!internal->paused) {
@@ -450,8 +490,7 @@ static void Engine_run(Engine* that) {
 	}
 
 	// Stop workers
-	internal->threadCount = 1;
-	Engine_relaunchWorkers(that);
+	Engine_relaunchWorkers(that, 0, false);
 }
 
 void Engine::start() {
