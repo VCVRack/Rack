@@ -91,6 +91,7 @@
 #include <dsp/ringbuffer.hpp>
 #include <dsp/vumeter.hpp>
 #include <dsp/window.hpp>
+#include <dsp/approx.hpp>
 
 #include <simd/vector.hpp>
 #include <simd/functions.hpp>
