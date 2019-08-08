@@ -2,6 +2,12 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 1.1.4 (in development)
+- Fix parameter smoothing of MIDI-Map.
+- API
+	- Add dsp::BiquadFilter.
+	- Add dsp/approx.hpp with approximate math functions.
+
 ### 1.1.3 (2019-07-23)
 - Include root certificate bundle for libcurl on all OS's.
 - Revert to OpenSSL from Schannel on Windows.
