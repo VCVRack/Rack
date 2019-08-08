@@ -22,6 +22,7 @@
 #include <string.hpp>
 #include <history.hpp>
 #include <settings.hpp>
+#include <tag.hpp>
 
 #include <set>
 #include <algorithm>
@@ -377,7 +378,7 @@ struct BrowserSidebar : widget::Widget {
 		tagList = new ui::List;
 		tagScroll->container->addChild(tagList);
 
-		for (const std::string& tag : plugin::allowedTags) {
+		for (const std::string& tag : tag::allowedTags) {
 			TagItem* item = new TagItem;
 			item->text = tag;
 			tagList->addChild(item);

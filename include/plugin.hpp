@@ -3,7 +3,6 @@
 #include <plugin/Plugin.hpp>
 #include <plugin/Model.hpp>
 #include <vector>
-#include <set>
 
 
 namespace rack {
@@ -35,14 +34,12 @@ void syncUpdates();
 bool isSyncing();
 Plugin* getPlugin(const std::string& pluginSlug);
 Model* getModel(const std::string& pluginSlug, const std::string& modelSlug);
-std::string normalizeTag(const std::string& tag);
 /** Checks that the slug contains only alphanumeric characters, "-", and "_" */
 bool isSlugValid(const std::string& slug);
 /** Returns a string containing only the valid slug characters. */
 std::string normalizeSlug(const std::string& slug);
 
 
-extern const std::set<std::string> allowedTags;
 extern std::vector<Plugin*> plugins;
 
 extern std::string loginStatus;

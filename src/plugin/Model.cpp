@@ -3,6 +3,7 @@
 #include <asset.hpp>
 #include <system.hpp>
 #include <string.hpp>
+#include <tag.hpp>
 
 
 namespace rack {
@@ -31,7 +32,7 @@ void Model::fromJson(json_t* rootJ) {
 		json_array_foreach(tagsJ, i, tagJ) {
 			std::string tag = json_string_value(tagJ);
 			// Normalize tag
-			tag = normalizeTag(tag);
+			tag = tag::normalize(tag);
 			if (tag != "")
 				tags.push_back(tag);
 		}
