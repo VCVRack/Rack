@@ -31,8 +31,10 @@ struct Model {
 	std::string slug;
 	/** Human readable name for your model, e.g. "Voltage Controlled Oscillator" */
 	std::string name;
-	/** List of tags representing the function(s) of the module */
-	std::vector<std::string> tags;
+	/** List of tag IDs representing the function(s) of the module.
+	Tag IDs are not part of the ABI and may change at any time.
+	*/
+	std::vector<int> tags;
 	/** A one-line summary of the module's purpose */
 	std::string description;
 

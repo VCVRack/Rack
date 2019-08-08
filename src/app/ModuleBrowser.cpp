@@ -46,15 +46,18 @@ static float modelScore(plugin::Model* model, const std::string& search) {
 	s += model->name;
 	s += " ";
 	s += model->slug;
-	for (const std::string& tag : model->tags) {
-		s += " ";
-		s += tag;
+	for (int tagId : model->tags) {
+		// Add all aliases of a tag
+		for (const std::string& alias : tag::tagAliases[tagId]) {
+			s += " ";
+			s += alias;
+		}
 	}
 	float score = string::fuzzyScore(string::lowercase(s), string::lowercase(search));
 	return score;
 }
 
-static bool isModelVisible(plugin::Model* model, const std::string& search, const std::string& brand, const std::string& tag) {
+static bool isModelVisible(plugin::Model* model, const std::string& search, const std::string& brand, int tagId) {
 	// Filter search query
 	if (search != "") {
 		float score = modelScore(model, search);
@@ -69,15 +72,9 @@ static bool isModelVisible(plugin::Model* model, const std::string& search, cons
 	}
 
 	// Filter tag
-	if (tag != "") {
-		bool found = false;
-		for (const std::string& modelTag : model->tags) {
-			if (modelTag == tag) {
-				found = true;
-				break;
-			}
-		}
-		if (!found)
+	if (tagId >= 0) {
+		auto it = std::find(model->tags.begin(), model->tags.end(), tagId);
+		if (it == model->tags.end())
 			return false;
 	}
 
@@ -255,7 +252,8 @@ struct ModelBox : widget::OpaqueWidget {
 		for (size_t i = 0; i < model->tags.size(); i++) {
 			if (i > 0)
 				text += ", ";
-			text += model->tags[i];
+			int tagId = model->tags[i];
+			text += tag::tagAliases[tagId][0];
 		}
 		// Description
 		if (model->description != "") {
@@ -285,6 +283,7 @@ struct BrandItem : ui::MenuItem {
 
 
 struct TagItem : ui::MenuItem {
+	int tagId;
 	void onAction(const event::Action& e) override;
 	void step() override;
 };
@@ -378,9 +377,10 @@ struct BrowserSidebar : widget::Widget {
 		tagList = new ui::List;
 		tagScroll->container->addChild(tagList);
 
-		for (const std::string& tag : tag::allowedTags) {
+		for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
 			TagItem* item = new TagItem;
-			item->text = tag;
+			item->text = tag::tagAliases[tagId][0];
+			item->tagId = tagId;
 			tagList->addChild(item);
 		}
 	}
@@ -421,7 +421,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 	std::string search;
 	std::string brand;
-	std::string tag;
+	int tagId = -1;
 
 	ModuleBrowser() {
 		sidebar = new BrowserSidebar;
@@ -453,7 +453,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 		}
 
-		refresh();
+		clear();
 	}
 
 	void step() override {
@@ -484,7 +484,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget* w : modelContainer->children) {
 			ModelBox* m = dynamic_cast<ModelBox*>(w);
 			assert(m);
-			m->visible = isModelVisible(m->model, search, brand, tag);
+			m->visible = isModelVisible(m->model, search, brand, tagId);
 		}
 
 		// Sort ModelBoxes
@@ -524,13 +524,13 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget* w : modelContainer->children) {
 			ModelBox* m = dynamic_cast<ModelBox*>(w);
 			assert(m);
-			if (isModelVisible(m->model, search, "", ""))
+			if (isModelVisible(m->model, search, "", -1))
 				filteredModels.push_back(m->model);
 		}
 
-		auto hasModel = [&](const std::string & brand, const std::string & tag) -> bool {
+		auto hasModel = [&](const std::string & brand, int tagId) -> bool {
 			for (plugin::Model* model : filteredModels) {
-				if (isModelVisible(model, "", brand, tag))
+				if (isModelVisible(model, "", brand, tagId))
 					return true;
 			}
 			return false;
@@ -541,7 +541,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget* w : sidebar->brandList->children) {
 			BrandItem* item = dynamic_cast<BrandItem*>(w);
 			assert(item);
-			item->disabled = !hasModel(item->text, tag);
+			item->disabled = !hasModel(item->text, tagId);
 			if (!item->disabled)
 				brandsLen++;
 		}
@@ -551,7 +551,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget* w : sidebar->tagList->children) {
 			TagItem* item = dynamic_cast<TagItem*>(w);
 			assert(item);
-			item->disabled = !hasModel(brand, item->text);
+			item->disabled = !hasModel(brand, item->tagId);
 			if (!item->disabled)
 				tagsLen++;
 		}
@@ -570,7 +570,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		search = "";
 		sidebar->searchField->setText("");
 		brand = "";
-		tag = "";
+		tagId = -1;
 		refresh();
 	}
 
@@ -601,17 +601,17 @@ inline void BrandItem::step() {
 
 inline void TagItem::onAction(const event::Action& e) {
 	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	if (browser->tag == text)
-		browser->tag = "";
+	if (browser->tagId == tagId)
+		browser->tagId = -1;
 	else
-		browser->tag = text;
+		browser->tagId = tagId;
 	browser->refresh();
 }
 
 inline void TagItem::step() {
 	MenuItem::step();
 	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	active = (browser->tag == text);
+	active = (browser->tagId == tagId);
 }
 
 inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {

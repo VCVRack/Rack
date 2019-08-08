@@ -31,10 +31,9 @@ void Model::fromJson(json_t* rootJ) {
 		json_t* tagJ;
 		json_array_foreach(tagsJ, i, tagJ) {
 			std::string tag = json_string_value(tagJ);
-			// Normalize tag
-			tag = tag::normalize(tag);
-			if (tag != "")
-				tags.push_back(tag);
+			int tagId = tag::findId(tag);
+			if (tagId >= 0)
+				tags.push_back(tagId);
 		}
 	}
 
