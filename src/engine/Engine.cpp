@@ -171,34 +171,6 @@ struct EngineWorker {
 };
 
 
-struct ProfilerWorker {
-	Engine* engine;
-	std::thread thread;
-	bool running = false;
-
-	void start() {
-		assert(!running);
-		running = true;
-		thread = std::thread([&] {
-			run();
-		});
-	}
-
-	void stop() {
-		running = false;
-		if (thread.joinable())
-			thread.join();
-	}
-
-	void run() {
-		while (running) {
-			DEBUG("sample");
-			std::this_thread::sleep_for(std::chrono::nanoseconds(100000000));
-		}
-	}
-};
-
-
 struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
@@ -229,7 +201,6 @@ struct Engine::Internal {
 	HybridBarrier engineBarrier;
 	HybridBarrier workerBarrier;
 	std::atomic<int> workerModuleIndex;
-	ProfilerWorker profilerWorker;
 };
 
 
@@ -276,12 +247,12 @@ static void Engine_stepModules(Engine* that, int threadId) {
 		if (!module->bypass) {
 			// Step module
 			if (settings::cpuMeter) {
-				auto startTime = std::chrono::high_resolution_clock::now();
+				double startTime = system::getThreadTime();
 
 				module->process(processCtx);
 
-				auto stopTime = std::chrono::high_resolution_clock::now();
-				float cpuTime = std::chrono::duration<float>(stopTime - startTime).count();
+				double stopTime = system::getThreadTime();
+				float cpuTime = stopTime - startTime;
 				// Smooth CPU time
 				const float cpuTau = 2.f /* seconds */;
 				module->cpuTime += (cpuTime - module->cpuTime) * sampleTime / cpuTau;
@@ -384,9 +355,6 @@ static void Engine_relaunchWorkers(Engine* that, int threadCount, bool realTime)
 	Engine::Internal* internal = that->internal;
 
 	if (internal->threadCount > 0) {
-		// Stop profiler
-		// internal->profilerWorker.stop();
-
 		// Stop engine workers
 		for (EngineWorker& worker : internal->workers) {
 			worker.requestStop();
@@ -420,9 +388,6 @@ static void Engine_relaunchWorkers(Engine* that, int threadCount, bool realTime)
 			worker.engine = that;
 			worker.start();
 		}
-
-		// Start profiler
-		// internal->profilerWorker.start();
 	}
 }
 

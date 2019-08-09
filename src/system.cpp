@@ -159,6 +159,20 @@ void setThreadRealTime(bool realTime) {
 }
 
 
+double getThreadTime() {
+#if defined ARCH_LIN || defined ARCH_MAC
+	struct timespec ts;
+	clockid_t cid;
+	pthread_getcpuclockid(pthread_self(), &cid);
+	clock_gettime(cid, &ts);
+	return ts.tv_sec + ts.tv_nsec / 1000000000.0;
+#elif defined ARCH_WIN
+	// TODO
+	return 0.0;
+#endif
+}
+
+
 std::string getStackTrace() {
 	int stackLen = 128;
 	void* stack[stackLen];

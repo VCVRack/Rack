@@ -31,6 +31,8 @@ int getLogicalCoreCount();
 void setThreadName(const std::string& name);
 /** Sets the current thread to be high-priority. */
 void setThreadRealTime(bool realTime);
+/** Returns the number of seconds the current thread has been active. */
+double getThreadTime();
 /** Returns the caller's human-readable stack trace with "\n"-separated lines. */
 std::string getStackTrace();
 /** Opens a URL, also happens to work with PDFs and folders.
