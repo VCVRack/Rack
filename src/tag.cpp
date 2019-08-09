@@ -1,23 +1,10 @@
 #include <tag.hpp>
 #include <string.hpp>
-
 #include <map>
 
 
 namespace rack {
 namespace tag {
-
-
-int findId(const std::string& tag) {
-	std::string lowercaseTag = string::lowercase(tag);
-	for (int tagId = 0; tagId < (int) tagAliases.size(); tagId++) {
-		for (const std::string& alias : tagAliases[tagId]) {
-			if (string::lowercase(alias) == lowercaseTag)
-				return tagId;
-		}
-	}
-	return -1;
-}
 
 
 const std::vector<std::vector<std::string>> tagAliases = {
@@ -77,6 +64,18 @@ const std::vector<std::vector<std::string>> tagAliases = {
 	{"Voltage-controlled amplifier", "Amplifier", "VCA", "Voltage controlled amplifier"},
 	{"Waveshaper"},
 };
+
+
+int findId(const std::string& tag) {
+	std::string lowercaseTag = string::lowercase(tag);
+	for (int tagId = 0; tagId < (int) tagAliases.size(); tagId++) {
+		for (const std::string& alias : tagAliases[tagId]) {
+			if (string::lowercase(alias) == lowercaseTag)
+				return tagId;
+		}
+	}
+	return -1;
+}
 
 
 } // namespace tag

@@ -28,10 +28,11 @@ If negative powers are needed, you may use a lower bound and rescale.
 */
 template <typename T>
 T approxExp2_taylor5(T x) {
+	// Use bit-shifting for integer part of x.
 	int xi = x;
 	x -= xi;
 	T y = 1 << xi;
-	// Fifth order expansion of 2^x around 0.4752 in Horner form.
+	// 5th order expansion of 2^x around 0.4752 in Horner form.
 	// The center is chosen so that the endpoints of [0, 1] have equal error, creating no discontinuity at integers.
 	y *= T(0.9999976457798443) + x * (T(0.6931766804601935) + x * (T(0.2400729486415728) + x * (T(0.05592817518644387) + x * (T(0.008966320633544) + x * T(0.001853512473884202)))));
 	return y;
