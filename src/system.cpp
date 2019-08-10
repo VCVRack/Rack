@@ -165,10 +165,14 @@ double getThreadTime() {
 	clockid_t cid;
 	pthread_getcpuclockid(pthread_self(), &cid);
 	clock_gettime(cid, &ts);
-	return ts.tv_sec + ts.tv_nsec / 1000000000.0;
+	return ts.tv_sec + ts.tv_nsec * 1e-9;
 #elif defined ARCH_WIN
-	// TODO
-	return 0.0;
+	FILETIME creationTime;
+	FILETIME exitTime;
+	FILETIME kernelTime;
+	FILETIME userTime;
+	GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime);
+	return ((((uint64_t) userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
 #endif
 }
 
