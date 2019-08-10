@@ -7,7 +7,7 @@ namespace core {
 
 
 struct BlankPanel : Widget {
-	Widget *panelBorder;
+	Widget* panelBorder;
 
 	BlankPanel() {
 		panelBorder = new PanelBorder;
@@ -19,7 +19,7 @@ struct BlankPanel : Widget {
 		Widget::step();
 	}
 
-	void draw(const DrawArgs &args) override {
+	void draw(const DrawArgs& args) override {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 		nvgFillColor(args.vg, nvgRGB(0xe6, 0xe6, 0xe6));
@@ -38,18 +38,18 @@ struct ModuleResizeHandle : OpaqueWidget {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
 
-	void onDragStart(const event::DragStart &e) override {
+	void onDragStart(const event::DragStart& e) override {
 		if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 			return;
 
 		dragPos = APP->scene->rack->mousePos;
-		ModuleWidget *mw = getAncestorOfType<ModuleWidget>();
+		ModuleWidget* mw = getAncestorOfType<ModuleWidget>();
 		assert(mw);
 		originalBox = mw->box;
 	}
 
-	void onDragMove(const event::DragMove &e) override {
-		ModuleWidget *mw = getAncestorOfType<ModuleWidget>();
+	void onDragMove(const event::DragMove& e) override {
+		ModuleWidget* mw = getAncestorOfType<ModuleWidget>();
 		assert(mw);
 
 		Vec newDragPos = APP->scene->rack->mousePos;
@@ -77,7 +77,7 @@ struct ModuleResizeHandle : OpaqueWidget {
 		}
 	}
 
-	void draw(const DrawArgs &args) override {
+	void draw(const DrawArgs& args) override {
 		for (float x = 5.0; x <= 10.0; x += 5.0) {
 			nvgBeginPath(args.vg);
 			const float margin = 5.0;
@@ -92,20 +92,20 @@ struct ModuleResizeHandle : OpaqueWidget {
 
 
 struct BlankWidget : ModuleWidget {
-	Widget *topRightScrew;
-	Widget *bottomRightScrew;
-	Widget *rightHandle;
-	BlankPanel *blankPanel;
+	Widget* topRightScrew;
+	Widget* bottomRightScrew;
+	Widget* rightHandle;
+	BlankPanel* blankPanel;
 
-	BlankWidget(Module *module) {
+	BlankWidget(Module* module) {
 		setModule(module);
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
 		blankPanel = new BlankPanel;
 		addChild(blankPanel);
 
-		ModuleResizeHandle *leftHandle = new ModuleResizeHandle;
-		ModuleResizeHandle *rightHandle = new ModuleResizeHandle;
+		ModuleResizeHandle* leftHandle = new ModuleResizeHandle;
+		ModuleResizeHandle* rightHandle = new ModuleResizeHandle;
 		rightHandle->right = true;
 		this->rightHandle = rightHandle;
 		addChild(leftHandle);
@@ -133,8 +133,8 @@ struct BlankWidget : ModuleWidget {
 		ModuleWidget::step();
 	}
 
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
+	json_t* toJson() override {
+		json_t* rootJ = ModuleWidget::toJson();
 
 		// width
 		json_object_set_new(rootJ, "width", json_real(box.size.x));
@@ -142,18 +142,18 @@ struct BlankWidget : ModuleWidget {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void fromJson(json_t* rootJ) override {
 		ModuleWidget::fromJson(rootJ);
 
 		// width
-		json_t *widthJ = json_object_get(rootJ, "width");
+		json_t* widthJ = json_object_get(rootJ, "width");
 		if (widthJ)
 			box.size.x = json_number_value(widthJ);
 	}
 };
 
 
-Model *modelBlank = createModel<Module, BlankWidget>("Blank");
+Model* modelBlank = createModel<Module, BlankWidget>("Blank");
 
 
 } // namespace core

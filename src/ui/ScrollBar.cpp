@@ -12,7 +12,7 @@ ScrollBar::ScrollBar() {
 	box.size = math::Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 }
 
-void ScrollBar::draw(const DrawArgs &args) {
+void ScrollBar::draw(const DrawArgs& args) {
 	BNDwidgetState state = BND_DEFAULT;
 	if (APP->event->hoveredWidget == this)
 		state = BND_HOVER;
@@ -22,15 +22,15 @@ void ScrollBar::draw(const DrawArgs &args) {
 	bndScrollBar(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, offset, size);
 }
 
-void ScrollBar::onDragStart(const event::DragStart &e) {
+void ScrollBar::onDragStart(const event::DragStart& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
 	APP->window->cursorLock();
 }
 
-void ScrollBar::onDragMove(const event::DragMove &e) {
-	ScrollWidget *scrollWidget = dynamic_cast<ScrollWidget*>(parent);
+void ScrollBar::onDragMove(const event::DragMove& e) {
+	ScrollWidget* scrollWidget = dynamic_cast<ScrollWidget*>(parent);
 	assert(scrollWidget);
 	math::Rect containerBox = scrollWidget->container->getChildrenBoundingBox();
 	if (orientation == HORIZONTAL)
@@ -39,7 +39,7 @@ void ScrollBar::onDragMove(const event::DragMove &e) {
 		scrollWidget->offset.y += (containerBox.size.y / box.size.y) * e.mouseDelta.y;
 }
 
-void ScrollBar::onDragEnd(const event::DragEnd &e) {
+void ScrollBar::onDragEnd(const event::DragEnd& e) {
 	APP->window->cursorUnlock();
 }
 

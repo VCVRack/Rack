@@ -119,11 +119,12 @@ curl-7.64.1:
 	$(UNTAR) curl-7.64.1.tar.gz
 	rm curl-7.64.1.tar.gz
 
+CURL_FLAGS += --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding
+CURL_FLAGS += --without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli
+CURL_FLAGS += --with-ssl="$(DEP_PATH)"
+
 $(libcurl): $(openssl) curl-7.64.1
-	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) \
-		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding \
-		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli \
-		--without-ca-bundle --with-ca-fallback --with-ssl="$(DEP_PATH)"
+	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
 	$(MAKE) -C curl-7.64.1
 	$(MAKE) -C curl-7.64.1 install
 
@@ -163,14 +164,14 @@ rtmidi-4.0.0:
 	rm rtmidi-4.0.0.tar.gz
 
 RTMIDI_FLAGS += --enable-shared=no
+ifdef ARCH_LIN
+RTMIDI_FLAGS += --with-jack --with-alsa
+endif
 ifdef ARCH_MAC
 RTMIDI_FLAGS += --with-core --without-jack
 endif
 ifdef ARCH_WIN
 RTMIDI_FLAGS += --with-winmm
-endif
-ifdef ARCH_LIN
-RTMIDI_FLAGS += --with-jack --with-alsa
 endif
 
 $(rtmidi): rtmidi-4.0.0
@@ -179,14 +180,14 @@ $(rtmidi): rtmidi-4.0.0
 	$(MAKE) -C rtmidi-4.0.0 install
 
 RTAUDIO_FLAGS += -DRTAUDIO_BUILD_STATIC_LIBS=ON
+ifdef ARCH_LIN
+RTAUDIO_FLAGS += -DRTAUDIO_API_ALSA=ON -DRTAUDIO_API_JACK=ON -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_OSS=OFF
+endif
 ifdef ARCH_MAC
 RTAUDIO_FLAGS += -DRTAUDIO_API_CORE=ON -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_JACK=OFF
 endif
 ifdef ARCH_WIN
 RTAUDIO_FLAGS += -DRTAUDIO_API_DS=ON -DRTAUDIO_API_WASAPI=ON -DRTAUDIO_API_ASIO=ON
-endif
-ifdef ARCH_LIN
-RTAUDIO_FLAGS += -DRTAUDIO_API_ALSA=ON -DRTAUDIO_API_JACK=ON -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_OSS=OFF
 endif
 
 $(rtaudio): rtaudio

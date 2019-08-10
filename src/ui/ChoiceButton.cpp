@@ -7,7 +7,7 @@ namespace rack {
 namespace ui {
 
 
-void ChoiceButton::draw(const DrawArgs &args) {
+void ChoiceButton::draw(const DrawArgs& args) {
 	BNDwidgetState state = BND_DEFAULT;
 	if (APP->event->hoveredWidget == this)
 		state = BND_HOVER;

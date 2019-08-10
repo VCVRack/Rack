@@ -66,7 +66,7 @@ struct CV_CC : Module {
 		midiOutput.midi::Output::reset();
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		const float rateLimiterPeriod = 0.010f;
 		rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
 		if (rateLimiterPhase >= 1.f) {
@@ -83,10 +83,10 @@ struct CV_CC : Module {
 		}
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 
-		json_t *ccsJ = json_array();
+		json_t* ccsJ = json_array();
 		for (int i = 0; i < 16; i++) {
 			json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
 		}
@@ -96,17 +96,17 @@ struct CV_CC : Module {
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *ccsJ = json_object_get(rootJ, "ccs");
+	void dataFromJson(json_t* rootJ) override {
+		json_t* ccsJ = json_object_get(rootJ, "ccs");
 		if (ccsJ) {
 			for (int i = 0; i < 16; i++) {
-				json_t *ccJ = json_array_get(ccsJ, i);
+				json_t* ccJ = json_array_get(ccsJ, i);
 				if (ccJ)
 					learnedCcs[i] = json_integer_value(ccJ);
 			}
 		}
 
-		json_t *midiJ = json_object_get(rootJ, "midi");
+		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiOutput.fromJson(midiJ);
 	}
@@ -114,7 +114,7 @@ struct CV_CC : Module {
 
 
 struct CV_CCWidget : ModuleWidget {
-	CV_CCWidget(CV_CC *module) {
+	CV_CCWidget(CV_CC* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/CV-CC.svg")));
 
@@ -141,7 +141,7 @@ struct CV_CCWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 112)), module, CV_CC::CC_INPUTS + 15));
 
 		typedef Grid16MidiWidget<CcChoice<CV_CC>> TMidiWidget;
-		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
+		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		midiWidget->setModule(module);
@@ -150,7 +150,7 @@ struct CV_CCWidget : ModuleWidget {
 };
 
 
-Model *modelCV_CC = createModel<CV_CC, CV_CCWidget>("CV-CC");
+Model* modelCV_CC = createModel<CV_CC, CV_CCWidget>("CV-CC");
 
 
 } // namespace core

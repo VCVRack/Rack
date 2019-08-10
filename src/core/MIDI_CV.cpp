@@ -74,8 +74,8 @@ struct MIDI_CV : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		heldNotes.reserve(128);
 		for (int c = 0; c < 16; c++) {
-			pitchFilters[c].lambda = 1 / 0.01f;
-			modFilters[c].lambda = 1 / 0.01f;
+			pitchFilters[c].setTau(1 / 30.f);
+			modFilters[c].setTau(1 / 30.f);
 		}
 		onReset();
 	}
@@ -106,7 +106,7 @@ struct MIDI_CV : Module {
 		heldNotes.clear();
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
@@ -129,14 +129,14 @@ struct MIDI_CV : Module {
 			for (int c = 0; c < channels; c++) {
 				outputs[PITCH_OUTPUT].setChannels(channels);
 				outputs[MOD_OUTPUT].setChannels(channels);
-				outputs[PITCH_OUTPUT].setVoltage(pitchFilters[c].process(args.sampleTime, rescale(pitches[c], 0, 1<<14, -5.f, 5.f)), c);
+				outputs[PITCH_OUTPUT].setVoltage(pitchFilters[c].process(args.sampleTime, rescale(pitches[c], 0, 1 << 14, -5.f, 5.f)), c);
 				outputs[MOD_OUTPUT].setVoltage(modFilters[c].process(args.sampleTime, rescale(mods[c], 0, 127, 0.f, 10.f)), c);
 			}
 		}
 		else {
 			outputs[PITCH_OUTPUT].setChannels(1);
 			outputs[MOD_OUTPUT].setChannels(1);
-			outputs[PITCH_OUTPUT].setVoltage(pitchFilters[0].process(args.sampleTime, rescale(pitches[0], 0, 1<<14, -5.f, 5.f)));
+			outputs[PITCH_OUTPUT].setVoltage(pitchFilters[0].process(args.sampleTime, rescale(pitches[0], 0, 1 << 14, -5.f, 5.f)));
 			outputs[MOD_OUTPUT].setVoltage(modFilters[0].process(args.sampleTime, rescale(mods[0], 0, 127, 0.f, 10.f)));
 		}
 
@@ -377,8 +377,8 @@ struct MIDI_CV : Module {
 		panic();
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "channels", json_integer(channels));
 		json_object_set_new(rootJ, "polyMode", json_integer(polyMode));
 		json_object_set_new(rootJ, "clockDivision", json_integer(clockDivision));
@@ -391,28 +391,28 @@ struct MIDI_CV : Module {
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *channelsJ = json_object_get(rootJ, "channels");
+	void dataFromJson(json_t* rootJ) override {
+		json_t* channelsJ = json_object_get(rootJ, "channels");
 		if (channelsJ)
 			setChannels(json_integer_value(channelsJ));
 
-		json_t *polyModeJ = json_object_get(rootJ, "polyMode");
+		json_t* polyModeJ = json_object_get(rootJ, "polyMode");
 		if (polyModeJ)
 			polyMode = (PolyMode) json_integer_value(polyModeJ);
 
-		json_t *clockDivisionJ = json_object_get(rootJ, "clockDivision");
+		json_t* clockDivisionJ = json_object_get(rootJ, "clockDivision");
 		if (clockDivisionJ)
 			clockDivision = json_integer_value(clockDivisionJ);
 
-		json_t *lastPitchJ = json_object_get(rootJ, "lastPitch");
+		json_t* lastPitchJ = json_object_get(rootJ, "lastPitch");
 		if (lastPitchJ)
 			pitches[0] = json_integer_value(lastPitchJ);
 
-		json_t *lastModJ = json_object_get(rootJ, "lastMod");
+		json_t* lastModJ = json_object_get(rootJ, "lastMod");
 		if (lastModJ)
 			mods[0] = json_integer_value(lastModJ);
 
-		json_t *midiJ = json_object_get(rootJ, "midi");
+		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
 	}
@@ -420,22 +420,22 @@ struct MIDI_CV : Module {
 
 
 struct ClockDivisionValueItem : MenuItem {
-	MIDI_CV *module;
+	MIDI_CV* module;
 	int clockDivision;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		module->clockDivision = clockDivision;
 	}
 };
 
 
 struct ClockDivisionItem : MenuItem {
-	MIDI_CV *module;
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu;
-		std::vector<int> divisions = {24*4, 24*2, 24, 24/2, 24/4, 24/8, 2, 1};
+	MIDI_CV* module;
+	Menu* createChildMenu() override {
+		Menu* menu = new Menu;
+		std::vector<int> divisions = {24 * 4, 24 * 2, 24, 24 / 2, 24 / 4, 24 / 8, 2, 1};
 		std::vector<std::string> divisionNames = {"Whole", "Half", "Quarter", "8th", "16th", "32nd", "12 PPQN", "24 PPQN"};
 		for (size_t i = 0; i < divisions.size(); i++) {
-			ClockDivisionValueItem *item = new ClockDivisionValueItem;
+			ClockDivisionValueItem* item = new ClockDivisionValueItem;
 			item->text = divisionNames[i];
 			item->rightText = CHECKMARK(module->clockDivision == divisions[i]);
 			item->module = module;
@@ -448,20 +448,20 @@ struct ClockDivisionItem : MenuItem {
 
 
 struct ChannelValueItem : MenuItem {
-	MIDI_CV *module;
+	MIDI_CV* module;
 	int channels;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		module->setChannels(channels);
 	}
 };
 
 
 struct ChannelItem : MenuItem {
-	MIDI_CV *module;
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu;
+	MIDI_CV* module;
+	Menu* createChildMenu() override {
+		Menu* menu = new Menu;
 		for (int channels = 1; channels <= 16; channels++) {
-			ChannelValueItem *item = new ChannelValueItem;
+			ChannelValueItem* item = new ChannelValueItem;
 			if (channels == 1)
 				item->text = "Monophonic";
 			else
@@ -477,18 +477,18 @@ struct ChannelItem : MenuItem {
 
 
 struct PolyModeValueItem : MenuItem {
-	MIDI_CV *module;
+	MIDI_CV* module;
 	MIDI_CV::PolyMode polyMode;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		module->setPolyMode(polyMode);
 	}
 };
 
 
 struct PolyModeItem : MenuItem {
-	MIDI_CV *module;
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu;
+	MIDI_CV* module;
+	Menu* createChildMenu() override {
+		Menu* menu = new Menu;
 		std::vector<std::string> polyModeNames = {
 			"Rotate",
 			"Reuse",
@@ -497,7 +497,7 @@ struct PolyModeItem : MenuItem {
 		};
 		for (int i = 0; i < MIDI_CV::NUM_POLY_MODES; i++) {
 			MIDI_CV::PolyMode polyMode = (MIDI_CV::PolyMode) i;
-			PolyModeValueItem *item = new PolyModeValueItem;
+			PolyModeValueItem* item = new PolyModeValueItem;
 			item->text = polyModeNames[i];
 			item->rightText = CHECKMARK(module->polyMode == polyMode);
 			item->module = module;
@@ -510,15 +510,15 @@ struct PolyModeItem : MenuItem {
 
 
 struct MIDI_CVPanicItem : MenuItem {
-	MIDI_CV *module;
-	void onAction(const event::Action &e) override {
+	MIDI_CV* module;
+	void onAction(const event::Action& e) override {
 		module->panic();
 	}
 };
 
 
 struct MIDI_CVWidget : ModuleWidget {
-	MIDI_CVWidget(MIDI_CV *module) {
+	MIDI_CVWidget(MIDI_CV* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/MIDI-CV.svg")));
 
@@ -540,36 +540,36 @@ struct MIDI_CVWidget : ModuleWidget {
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 108.144)), module, MIDI_CV::STOP_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 108.144)), module, MIDI_CV::CONTINUE_OUTPUT));
 
-		MidiWidget *midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
+		MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(33.840, 28));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		addChild(midiWidget);
 	}
 
-	void appendContextMenu(Menu *menu) override {
-		MIDI_CV *module = dynamic_cast<MIDI_CV*>(this->module);
+	void appendContextMenu(Menu* menu) override {
+		MIDI_CV* module = dynamic_cast<MIDI_CV*>(this->module);
 
 		menu->addChild(new MenuEntry);
 
-		ClockDivisionItem *clockDivisionItem = new ClockDivisionItem;
+		ClockDivisionItem* clockDivisionItem = new ClockDivisionItem;
 		clockDivisionItem->text = "CLK/N divider";
 		clockDivisionItem->rightText = RIGHT_ARROW;
 		clockDivisionItem->module = module;
 		menu->addChild(clockDivisionItem);
 
-		ChannelItem *channelItem = new ChannelItem;
+		ChannelItem* channelItem = new ChannelItem;
 		channelItem->text = "Polyphony channels";
-		channelItem->rightText = string::f("%d", module->channels) + " " +RIGHT_ARROW;
+		channelItem->rightText = string::f("%d", module->channels) + " " + RIGHT_ARROW;
 		channelItem->module = module;
 		menu->addChild(channelItem);
 
-		PolyModeItem *polyModeItem = new PolyModeItem;
+		PolyModeItem* polyModeItem = new PolyModeItem;
 		polyModeItem->text = "Polyphony mode";
 		polyModeItem->rightText = RIGHT_ARROW;
 		polyModeItem->module = module;
 		menu->addChild(polyModeItem);
 
-		MIDI_CVPanicItem *panicItem = new MIDI_CVPanicItem;
+		MIDI_CVPanicItem* panicItem = new MIDI_CVPanicItem;
 		panicItem->text = "Panic";
 		panicItem->module = module;
 		menu->addChild(panicItem);
@@ -578,7 +578,7 @@ struct MIDI_CVWidget : ModuleWidget {
 
 
 // Use legacy slug for compatibility
-Model *modelMIDI_CV = createModel<MIDI_CV, MIDI_CVWidget>("MIDIToCVInterface");
+Model* modelMIDI_CV = createModel<MIDI_CV, MIDI_CVWidget>("MIDIToCVInterface");
 
 
 } // namespace core

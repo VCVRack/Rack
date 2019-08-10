@@ -9,7 +9,7 @@ Module::Module() {
 }
 
 Module::~Module() {
-	for (ParamQuantity *paramQuantity : paramQuantities) {
+	for (ParamQuantity* paramQuantity : paramQuantities) {
 		if (paramQuantity)
 			delete paramQuantity;
 	}
@@ -29,8 +29,8 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 	}
 }
 
-json_t *Module::toJson() {
-	json_t *rootJ = json_object();
+json_t* Module::toJson() {
+	json_t* rootJ = json_object();
 
 	// id
 	json_object_set_new(rootJ, "id", json_integer(id));
@@ -45,13 +45,13 @@ json_t *Module::toJson() {
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 
 	// params
-	json_t *paramsJ = json_array();
+	json_t* paramsJ = json_array();
 	for (size_t paramId = 0; paramId < params.size(); paramId++) {
 		// Don't serialize unbounded Params
 		if (!paramQuantities[paramId]->isBounded())
 			continue;
 
-		json_t *paramJ = json_object();
+		json_t* paramJ = json_object();
 
 		json_object_set_new(paramJ, "id", json_integer(paramId));
 
@@ -75,7 +75,7 @@ json_t *Module::toJson() {
 		json_object_set_new(rootJ, "rightModuleId", json_integer(rightExpander.moduleId));
 
 	// data
-	json_t *dataJ = dataToJson();
+	json_t* dataJ = dataToJson();
 	if (dataJ) {
 		json_object_set_new(rootJ, "data", dataJ);
 	}
@@ -83,9 +83,9 @@ json_t *Module::toJson() {
 	return rootJ;
 }
 
-void Module::fromJson(json_t *rootJ) {
+void Module::fromJson(json_t* rootJ) {
 	// Check if plugin and model are incorrect
-	json_t *pluginJ = json_object_get(rootJ, "plugin");
+	json_t* pluginJ = json_object_get(rootJ, "plugin");
 	std::string pluginSlug;
 	if (pluginJ) {
 		pluginSlug = json_string_value(pluginJ);
@@ -95,7 +95,7 @@ void Module::fromJson(json_t *rootJ) {
 		}
 	}
 
-	json_t *modelJ = json_object_get(rootJ, "model");
+	json_t* modelJ = json_object_get(rootJ, "model");
 	std::string modelSlug;
 	if (modelJ) {
 		modelSlug = json_string_value(modelJ);
@@ -106,7 +106,7 @@ void Module::fromJson(json_t *rootJ) {
 	}
 
 	// Check plugin version
-	json_t *versionJ = json_object_get(rootJ, "version");
+	json_t* versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
 		std::string version = json_string_value(versionJ);
 		if (version != model->plugin->version) {
@@ -117,18 +117,18 @@ void Module::fromJson(json_t *rootJ) {
 	// Only set ID if unset
 	if (id < 0) {
 		// id
-		json_t *idJ = json_object_get(rootJ, "id");
+		json_t* idJ = json_object_get(rootJ, "id");
 		if (idJ)
 			id = json_integer_value(idJ);
 	}
 
 	// params
-	json_t *paramsJ = json_object_get(rootJ, "params");
+	json_t* paramsJ = json_object_get(rootJ, "params");
 	size_t i;
-	json_t *paramJ;
+	json_t* paramJ;
 	json_array_foreach(paramsJ, i, paramJ) {
 		// Get paramId
-		json_t *paramIdJ = json_object_get(paramJ, "id");
+		json_t* paramIdJ = json_object_get(paramJ, "id");
 		// Legacy v0.6 to <v1
 		if (!paramIdJ)
 			paramIdJ = json_object_get(paramJ, "paramId");
@@ -147,13 +147,13 @@ void Module::fromJson(json_t *rootJ) {
 		if (!paramQuantities[paramId]->isBounded())
 			continue;
 
-		json_t *valueJ = json_object_get(paramJ, "value");
+		json_t* valueJ = json_object_get(paramJ, "value");
 		if (valueJ)
 			params[paramId].setValue(json_number_value(valueJ));
 	}
 
 	// bypass
-	json_t *bypassJ = json_object_get(rootJ, "bypass");
+	json_t* bypassJ = json_object_get(rootJ, "bypass");
 	if (bypassJ)
 		bypass = json_boolean_value(bypassJ);
 
@@ -169,7 +169,7 @@ void Module::fromJson(json_t *rootJ) {
 	// 	rightExpander.moduleId = json_integer_value(rightModuleIdJ);
 
 	// data
-	json_t *dataJ = json_object_get(rootJ, "data");
+	json_t* dataJ = json_object_get(rootJ, "data");
 	if (dataJ)
 		dataFromJson(dataJ);
 }

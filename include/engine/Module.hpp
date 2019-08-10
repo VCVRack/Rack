@@ -14,7 +14,7 @@ namespace rack {
 
 
 namespace plugin {
-	struct Model;
+struct Model;
 }
 
 
@@ -23,7 +23,7 @@ namespace engine {
 
 /** DSP processor instance for your module. */
 struct Module {
-	plugin::Model *model = NULL;	/** Unique ID for referring to the module in the engine.
+	plugin::Model* model = NULL;	/** Unique ID for referring to the module in the engine.
 	Assigned when added to the engine.
 	*/
 	int id = -1;
@@ -42,7 +42,7 @@ struct Module {
 		/** ID of the expander module, or -1 if nonexistent. */
 		int moduleId = -1;
 		/** Pointer to the expander Module, or NULL if nonexistent. */
-		Module *module = NULL;
+		Module* module = NULL;
 		/** Double buffer for receiving messages from the expander module.
 		If you intend to receive messages from an expander, allocate both message buffers with identical blocks of memory (arrays, structs, etc).
 		Remember to free the buffer in the Module destructor.
@@ -63,8 +63,8 @@ struct Module {
 		You may choose for your Module to instead write to its own message buffer for consumption by other modules, i.e. the expander "pulls" rather than this module "pushing".
 		As long as this convention is followed by the other module, this is fine.
 		*/
-		void *producerMessage = NULL;
-		void *consumerMessage = NULL;
+		void* producerMessage = NULL;
+		void* consumerMessage = NULL;
 		bool messageFlipRequested = false;
 	};
 
@@ -97,10 +97,10 @@ struct Module {
 		if (paramQuantities[paramId])
 			delete paramQuantities[paramId];
 
-		Param *p = &params[paramId];
+		Param* p = &params[paramId];
 		p->value = defaultValue;
 
-		ParamQuantity *q = new TParamQuantity;
+		ParamQuantity* q = new TParamQuantity;
 		q->module = this;
 		q->paramId = paramId;
 		q->minValue = minValue;
@@ -125,7 +125,7 @@ struct Module {
 	/** Advances the module by one audio sample.
 	Override this method to read Inputs and Params and to write Outputs and Lights.
 	*/
-	virtual void process(const ProcessArgs &args) {
+	virtual void process(const ProcessArgs& args) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 		step();
@@ -145,12 +145,14 @@ struct Module {
 	/** Called when the Module is removed from the Engine */
 	virtual void onRemove() {}
 
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
 
 	/** Override to store extra internal data in the "data" property of the module's JSON object. */
-	virtual json_t *dataToJson() { return NULL; }
-	virtual void dataFromJson(json_t *root) {}
+	virtual json_t* dataToJson() {
+		return NULL;
+	}
+	virtual void dataFromJson(json_t* root) {}
 };
 
 

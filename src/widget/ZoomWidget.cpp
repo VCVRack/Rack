@@ -5,7 +5,7 @@ namespace rack {
 namespace widget {
 
 
-math::Vec ZoomWidget::getRelativeOffset(math::Vec v, Widget *relative) {
+math::Vec ZoomWidget::getRelativeOffset(math::Vec v, Widget* relative) {
 	return Widget::getRelativeOffset(v.mult(zoom), relative);
 }
 
@@ -29,7 +29,7 @@ void ZoomWidget::setZoom(float zoom) {
 	Widget::onZoom(eZoom);
 }
 
-void ZoomWidget::draw(const DrawArgs &args) {
+void ZoomWidget::draw(const DrawArgs& args) {
 	DrawArgs zoomCtx = args;
 	zoomCtx.clipBox.pos = zoomCtx.clipBox.pos.div(zoom);
 	zoomCtx.clipBox.size = zoomCtx.clipBox.size.div(zoom);

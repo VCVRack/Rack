@@ -23,7 +23,7 @@ static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 
 struct ModuleUrlItem : ui::MenuItem {
 	std::string url;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		std::thread t(system::openBrowser, url);
 		t.detach();
 	}
@@ -32,7 +32,7 @@ struct ModuleUrlItem : ui::MenuItem {
 
 struct ModuleFolderItem : ui::MenuItem {
 	std::string path;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		std::thread t(system::openFolder, path);
 		t.detach();
 	}
@@ -40,62 +40,62 @@ struct ModuleFolderItem : ui::MenuItem {
 
 
 struct ModulePluginItem : ui::MenuItem {
-	plugin::Plugin *plugin;
-	ui::Menu *createChildMenu() override {
-		ui::Menu *menu = new ui::Menu;
+	plugin::Plugin* plugin;
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
 
-		ui::MenuLabel *pluginLabel = new ui::MenuLabel;
+		ui::MenuLabel* pluginLabel = new ui::MenuLabel;
 		pluginLabel->text = plugin->name;
 		menu->addChild(pluginLabel);
 
-		ui::MenuLabel *versionLabel = new ui::MenuLabel;
+		ui::MenuLabel* versionLabel = new ui::MenuLabel;
 		versionLabel->text = "v" + plugin->version;
 		menu->addChild(versionLabel);
 
 		if (!plugin->author.empty()) {
 			if (!plugin->authorUrl.empty()) {
-				ModuleUrlItem *authorItem = new ModuleUrlItem;
+				ModuleUrlItem* authorItem = new ModuleUrlItem;
 				authorItem->text = plugin->author;
 				authorItem->url = plugin->authorUrl;
 				menu->addChild(authorItem);
 			}
 			else {
-				ui::MenuLabel *authorLabel = new ui::MenuLabel;
+				ui::MenuLabel* authorLabel = new ui::MenuLabel;
 				authorLabel->text = plugin->author;
 				menu->addChild(authorLabel);
 			}
 		}
 
 		if (!plugin->pluginUrl.empty()) {
-			ModuleUrlItem *websiteItem = new ModuleUrlItem;
+			ModuleUrlItem* websiteItem = new ModuleUrlItem;
 			websiteItem->text = "Website";
 			websiteItem->url = plugin->pluginUrl;
 			menu->addChild(websiteItem);
 		}
 
 		if (!plugin->manualUrl.empty()) {
-			ModuleUrlItem *manualItem = new ModuleUrlItem;
+			ModuleUrlItem* manualItem = new ModuleUrlItem;
 			manualItem->text = "Manual";
 			manualItem->url = plugin->manualUrl;
 			menu->addChild(manualItem);
 		}
 
 		if (!plugin->sourceUrl.empty()) {
-			ModuleUrlItem *sourceItem = new ModuleUrlItem;
+			ModuleUrlItem* sourceItem = new ModuleUrlItem;
 			sourceItem->text = "Source code";
 			sourceItem->url = plugin->sourceUrl;
 			menu->addChild(sourceItem);
 		}
 
 		if (!plugin->donateUrl.empty()) {
-			ModuleUrlItem *donateItem = new ModuleUrlItem;
+			ModuleUrlItem* donateItem = new ModuleUrlItem;
 			donateItem->text = "Donate";
 			donateItem->url = plugin->donateUrl;
 			menu->addChild(donateItem);
 		}
 
 		if (!plugin->path.empty()) {
-			ModuleFolderItem *pathItem = new ModuleFolderItem;
+			ModuleFolderItem* pathItem = new ModuleFolderItem;
 			pathItem->text = "Open plugin folder";
 			pathItem->path = plugin->path;
 			menu->addChild(pathItem);
@@ -107,93 +107,93 @@ struct ModulePluginItem : ui::MenuItem {
 
 
 struct ModuleDisconnectItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->disconnectAction();
 	}
 };
 
 
 struct ModuleResetItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->resetAction();
 	}
 };
 
 
 struct ModuleRandomizeItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->randomizeAction();
 	}
 };
 
 
 struct ModuleCopyItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->copyClipboard();
 	}
 };
 
 
 struct ModulePasteItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->pasteClipboardAction();
 	}
 };
 
 
 struct ModuleSaveItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->saveDialog();
 	}
 };
 
 
 struct ModuleLoadItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->loadDialog();
 	}
 };
 
 
 struct ModulePresetPathItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
+	ModuleWidget* moduleWidget;
 	std::string presetPath;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		moduleWidget->loadAction(presetPath);
 	}
 };
 
 
 struct ModulePresetItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	ui::Menu *createChildMenu() override {
-		ui::Menu *menu = new ui::Menu;
+	ModuleWidget* moduleWidget;
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
 
-		ModuleCopyItem *copyItem = new ModuleCopyItem;
+		ModuleCopyItem* copyItem = new ModuleCopyItem;
 		copyItem->text = "Copy";
 		copyItem->rightText = RACK_MOD_CTRL_NAME "+C";
 		copyItem->moduleWidget = moduleWidget;
 		menu->addChild(copyItem);
 
-		ModulePasteItem *pasteItem = new ModulePasteItem;
+		ModulePasteItem* pasteItem = new ModulePasteItem;
 		pasteItem->text = "Paste";
 		pasteItem->rightText = RACK_MOD_CTRL_NAME "+V";
 		pasteItem->moduleWidget = moduleWidget;
 		menu->addChild(pasteItem);
 
-		ModuleLoadItem *loadItem = new ModuleLoadItem;
+		ModuleLoadItem* loadItem = new ModuleLoadItem;
 		loadItem->text = "Open";
 		loadItem->moduleWidget = moduleWidget;
 		menu->addChild(loadItem);
 
-		ModuleSaveItem *saveItem = new ModuleSaveItem;
+		ModuleSaveItem* saveItem = new ModuleSaveItem;
 		saveItem->text = "Save as";
 		saveItem->moduleWidget = moduleWidget;
 		menu->addChild(saveItem);
@@ -202,8 +202,8 @@ struct ModulePresetItem : ui::MenuItem {
 			menu->addChild(new MenuEntry);
 			menu->addChild(createMenuLabel("Factory presets"));
 
-			for (const std::string &presetPath : moduleWidget->model->presetPaths) {
-				ModulePresetPathItem *presetItem = new ModulePresetPathItem;
+			for (const std::string& presetPath : moduleWidget->model->presetPaths) {
+				ModulePresetPathItem* presetItem = new ModulePresetPathItem;
 				std::string presetName = string::filenameBase(string::filename(presetPath));
 				presetItem->text = presetName;
 				presetItem->presetPath = presetPath;
@@ -218,24 +218,24 @@ struct ModulePresetItem : ui::MenuItem {
 
 
 struct ModuleCloneItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->cloneAction();
 	}
 };
 
 
 struct ModuleBypassItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->bypassAction();
 	}
 };
 
 
 struct ModuleDeleteItem : ui::MenuItem {
-	ModuleWidget *moduleWidget;
-	void onAction(const event::Action &e) override {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
 		moduleWidget->removeAction();
 	}
 };
@@ -249,7 +249,7 @@ ModuleWidget::~ModuleWidget() {
 	setModule(NULL);
 }
 
-void ModuleWidget::draw(const DrawArgs &args) {
+void ModuleWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
 	if (module && module->bypass) {
@@ -262,8 +262,8 @@ void ModuleWidget::draw(const DrawArgs &args) {
 	if (module && settings::cpuMeter && !module->bypass) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg,
-			0, box.size.y - 35,
-			65, 35);
+		        0, box.size.y - 35,
+		        65, 35);
 		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
 		nvgFill(args.vg);
 
@@ -275,8 +275,8 @@ void ModuleWidget::draw(const DrawArgs &args) {
 		float p = math::clamp(module->cpuTime / APP->engine->getSampleTime(), 0.f, 1.f);
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg,
-			0, (1.f - p) * box.size.y,
-			5, p * box.size.y);
+		        0, (1.f - p) * box.size.y,
+		        5, p * box.size.y);
 		nvgFillColor(args.vg, nvgRGBAf(1, 0, 0, 1.0));
 		nvgFill(args.vg);
 	}
@@ -294,19 +294,19 @@ void ModuleWidget::draw(const DrawArgs &args) {
 	nvgResetScissor(args.vg);
 }
 
-void ModuleWidget::drawShadow(const DrawArgs &args) {
+void ModuleWidget::drawShadow(const DrawArgs& args) {
 	nvgBeginPath(args.vg);
 	float r = 20; // Blur radius
 	float c = 20; // Corner radius
 	math::Vec b = math::Vec(-10, 30); // Offset from each corner
-	nvgRect(args.vg, b.x - r, b.y - r, box.size.x - 2*b.x + 2*r, box.size.y - 2*b.y + 2*r);
+	nvgRect(args.vg, b.x - r, b.y - r, box.size.x - 2 * b.x + 2 * r, box.size.y - 2 * b.y + 2 * r);
 	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
 	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
-	nvgFillPaint(args.vg, nvgBoxGradient(args.vg, b.x, b.y, box.size.x - 2*b.x, box.size.y - 2*b.y, c, r, shadowColor, transparentColor));
+	nvgFillPaint(args.vg, nvgBoxGradient(args.vg, b.x, b.y, box.size.x - 2 * b.x, box.size.y - 2 * b.y, c, r, shadowColor, transparentColor));
 	nvgFill(args.vg);
 }
 
-void ModuleWidget::onButton(const event::Button &e) {
+void ModuleWidget::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 	if (e.isConsumed())
 		return;
@@ -317,7 +317,7 @@ void ModuleWidget::onButton(const event::Button &e) {
 	}
 }
 
-void ModuleWidget::onHoverKey(const event::HoverKey &e) {
+void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;
@@ -382,7 +382,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey &e) {
 	}
 }
 
-void ModuleWidget::onDragStart(const event::DragStart &e) {
+void ModuleWidget::onDragStart(const event::DragStart& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -391,11 +391,11 @@ void ModuleWidget::onDragStart(const event::DragStart &e) {
 	APP->scene->rack->updateModuleDragPositions();
 }
 
-void ModuleWidget::onDragEnd(const event::DragEnd &e) {
+void ModuleWidget::onDragEnd(const event::DragEnd& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	history::ComplexAction *h = APP->scene->rack->getModuleDragAction();
+	history::ComplexAction* h = APP->scene->rack->getModuleDragAction();
 	if (!h) {
 		delete h;
 		return;
@@ -403,7 +403,7 @@ void ModuleWidget::onDragEnd(const event::DragEnd &e) {
 	APP->history->push(h);
 }
 
-void ModuleWidget::onDragMove(const event::DragMove &e) {
+void ModuleWidget::onDragMove(const event::DragMove& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -416,7 +416,7 @@ void ModuleWidget::onDragMove(const event::DragMove &e) {
 	}
 }
 
-void ModuleWidget::setModule(engine::Module *module) {
+void ModuleWidget::setModule(engine::Module* module) {
 	if (this->module) {
 		delete this->module;
 	}
@@ -432,7 +432,7 @@ void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
 	}
 
 	// Create SvgPanel
-	SvgPanel *svgPanel = new SvgPanel;
+	SvgPanel* svgPanel = new SvgPanel;
 	svgPanel->setBackground(svg);
 	panel = svgPanel;
 	addChildBottom(panel);
@@ -441,16 +441,16 @@ void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
 	box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
 }
 
-void ModuleWidget::addParam(ParamWidget *param) {
+void ModuleWidget::addParam(ParamWidget* param) {
 	params.push_back(param);
 	addChild(param);
 }
 
-void ModuleWidget::addOutput(PortWidget *output) {
+void ModuleWidget::addOutput(PortWidget* output) {
 	// Check that the port is an output
 	assert(output->type == PortWidget::OUTPUT);
 	// Check that the port doesn't have a duplicate ID
-	for (PortWidget *output2 : outputs) {
+	for (PortWidget* output2 : outputs) {
 		assert(output->portId != output2->portId);
 	}
 	// Add port
@@ -458,11 +458,11 @@ void ModuleWidget::addOutput(PortWidget *output) {
 	addChild(output);
 }
 
-void ModuleWidget::addInput(PortWidget *input) {
+void ModuleWidget::addInput(PortWidget* input) {
 	// Check that the port is an input
 	assert(input->type == PortWidget::INPUT);
 	// Check that the port doesn't have a duplicate ID
-	for (PortWidget *input2 : inputs) {
+	for (PortWidget* input2 : inputs) {
 		assert(input->portId != input2->portId);
 	}
 	// Add port
@@ -470,50 +470,50 @@ void ModuleWidget::addInput(PortWidget *input) {
 	addChild(input);
 }
 
-ParamWidget *ModuleWidget::getParam(int paramId) {
-	for (ParamWidget *param : params) {
+ParamWidget* ModuleWidget::getParam(int paramId) {
+	for (ParamWidget* param : params) {
 		if (param->paramQuantity && param->paramQuantity->paramId == paramId)
 			return param;
 	}
 	return NULL;
 }
 
-PortWidget *ModuleWidget::getOutput(int outputId) {
-	for (PortWidget *port : outputs) {
+PortWidget* ModuleWidget::getOutput(int outputId) {
+	for (PortWidget* port : outputs) {
 		if (port->portId == outputId)
 			return port;
 	}
 	return NULL;
 }
 
-PortWidget *ModuleWidget::getInput(int inputId) {
-	for (PortWidget *port : inputs) {
+PortWidget* ModuleWidget::getInput(int inputId) {
+	for (PortWidget* port : inputs) {
 		if (port->portId == inputId)
 			return port;
 	}
 	return NULL;
 }
 
-json_t *ModuleWidget::toJson() {
+json_t* ModuleWidget::toJson() {
 	if (!module)
 		return NULL;
 
-	json_t *rootJ = module->toJson();
+	json_t* rootJ = module->toJson();
 	return rootJ;
 }
 
-void ModuleWidget::fromJson(json_t *rootJ) {
+void ModuleWidget::fromJson(json_t* rootJ) {
 	if (!module)
 		return;
 	module->fromJson(rootJ);
 }
 
 void ModuleWidget::copyClipboard() {
-	json_t *moduleJ = toJson();
+	json_t* moduleJ = toJson();
 	DEFER({
 		json_decref(moduleJ);
 	});
-	char *moduleJson = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	char* moduleJson = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 	DEFER({
 		free(moduleJson);
 	});
@@ -521,14 +521,14 @@ void ModuleWidget::copyClipboard() {
 }
 
 void ModuleWidget::pasteClipboardAction() {
-	const char *moduleJson = glfwGetClipboardString(APP->window->win);
+	const char* moduleJson = glfwGetClipboardString(APP->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
 		return;
 	}
 
 	json_error_t error;
-	json_t *moduleJ = json_loads(moduleJson, 0, &error);
+	json_t* moduleJ = json_loads(moduleJson, 0, &error);
 	if (!moduleJ) {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		return;
@@ -538,7 +538,7 @@ void ModuleWidget::pasteClipboardAction() {
 	});
 
 	// history::ModuleChange
-	history::ModuleChange *h = new history::ModuleChange;
+	history::ModuleChange* h = new history::ModuleChange;
 	h->name = "paste module preset";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
@@ -552,7 +552,7 @@ void ModuleWidget::pasteClipboardAction() {
 void ModuleWidget::loadAction(std::string filename) {
 	INFO("Loading preset %s", filename.c_str());
 
-	FILE *file = fopen(filename.c_str(), "r");
+	FILE* file = fopen(filename.c_str(), "r");
 	if (!file) {
 		WARN("Could not load patch file %s", filename.c_str());
 		return;
@@ -562,7 +562,7 @@ void ModuleWidget::loadAction(std::string filename) {
 	});
 
 	json_error_t error;
-	json_t *moduleJ = json_loadf(file, 0, &error);
+	json_t* moduleJ = json_loadf(file, 0, &error);
 	if (!moduleJ) {
 		std::string message = string::f("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
@@ -573,7 +573,7 @@ void ModuleWidget::loadAction(std::string filename) {
 	});
 
 	// history::ModuleChange
-	history::ModuleChange *h = new history::ModuleChange;
+	history::ModuleChange* h = new history::ModuleChange;
 	h->name = "load module preset";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
@@ -587,13 +587,13 @@ void ModuleWidget::loadAction(std::string filename) {
 void ModuleWidget::save(std::string filename) {
 	INFO("Saving preset %s", filename.c_str());
 
-	json_t *moduleJ = toJson();
+	json_t* moduleJ = toJson();
 	assert(moduleJ);
 	DEFER({
 		json_decref(moduleJ);
 	});
 
-	FILE *file = fopen(filename.c_str(), "w");
+	FILE* file = fopen(filename.c_str(), "w");
 	if (!file) {
 		WARN("Could not write to patch file %s", filename.c_str());
 	}
@@ -608,12 +608,12 @@ void ModuleWidget::loadDialog() {
 	std::string dir = asset::user("presets");
 	system::createDirectory(dir);
 
-	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS);
+	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char *path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
+	char* path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
 	if (!path) {
 		// No path selected
 		return;
@@ -629,12 +629,12 @@ void ModuleWidget::saveDialog() {
 	std::string dir = asset::user("presets");
 	system::createDirectory(dir);
 
-	osdialog_filters *filters = osdialog_filters_parse(PRESET_FILTERS);
+	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char *path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcvm", filters);
+	char* path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcvm", filters);
 	if (!path) {
 		// No path selected
 		return;
@@ -653,10 +653,10 @@ void ModuleWidget::saveDialog() {
 }
 
 void ModuleWidget::disconnect() {
-	for (PortWidget *input : inputs) {
+	for (PortWidget* input : inputs) {
 		APP->scene->rack->clearCablesOnPort(input);
 	}
-	for (PortWidget *output : outputs) {
+	for (PortWidget* output : outputs) {
 		APP->scene->rack->clearCablesOnPort(output);
 	}
 }
@@ -665,12 +665,12 @@ void ModuleWidget::resetAction() {
 	assert(module);
 
 	// history::ModuleChange
-	history::ModuleChange *h = new history::ModuleChange;
+	history::ModuleChange* h = new history::ModuleChange;
 	h->name = "reset module";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	for (ParamWidget *param : params) {
+	for (ParamWidget* param : params) {
 		param->reset();
 	}
 	APP->engine->resetModule(module);
@@ -683,12 +683,12 @@ void ModuleWidget::randomizeAction() {
 	assert(module);
 
 	// history::ModuleChange
-	history::ModuleChange *h = new history::ModuleChange;
+	history::ModuleChange* h = new history::ModuleChange;
 	h->name = "randomize module";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	for (ParamWidget *param : params) {
+	for (ParamWidget* param : params) {
 		param->randomize();
 	}
 	APP->engine->randomizeModule(module);
@@ -697,28 +697,28 @@ void ModuleWidget::randomizeAction() {
 	APP->history->push(h);
 }
 
-static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexAction) {
+static void disconnectActions(ModuleWidget* mw, history::ComplexAction* complexAction) {
 	// Add CableRemove action for all cables attached to outputs
 	for (PortWidget* output : mw->outputs) {
-		for (CableWidget *cw : APP->scene->rack->getCablesOnPort(output)) {
+		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(output)) {
 			if (!cw->isComplete())
 				continue;
 			// history::CableRemove
-			history::CableRemove *h = new history::CableRemove;
+			history::CableRemove* h = new history::CableRemove;
 			h->setCable(cw);
 			complexAction->push(h);
 		}
 	}
 	// Add CableRemove action for all cables attached to inputs
 	for (PortWidget* input : mw->inputs) {
-		for (CableWidget *cw : APP->scene->rack->getCablesOnPort(input)) {
+		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(input)) {
 			if (!cw->isComplete())
 				continue;
 			// Avoid creating duplicate actions for self-patched cables
 			if (cw->outputPort->module == mw->module)
 				continue;
 			// history::CableRemove
-			history::CableRemove *h = new history::CableRemove;
+			history::CableRemove* h = new history::CableRemove;
 			h->setCable(cw);
 			complexAction->push(h);
 		}
@@ -726,7 +726,7 @@ static void disconnectActions(ModuleWidget *mw, history::ComplexAction *complexA
 }
 
 void ModuleWidget::disconnectAction() {
-	history::ComplexAction *complexAction = new history::ComplexAction;
+	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "disconnect cables";
 	disconnectActions(this, complexAction);
 	APP->history->push(complexAction);
@@ -735,10 +735,10 @@ void ModuleWidget::disconnectAction() {
 }
 
 void ModuleWidget::cloneAction() {
-	ModuleWidget *clonedModuleWidget = model->createModuleWidget();
+	ModuleWidget* clonedModuleWidget = model->createModuleWidget();
 	assert(clonedModuleWidget);
 	// JSON serialization is the obvious way to do this
-	json_t *moduleJ = toJson();
+	json_t* moduleJ = toJson();
 	clonedModuleWidget->fromJson(moduleJ);
 	json_decref(moduleJ);
 
@@ -748,7 +748,7 @@ void ModuleWidget::cloneAction() {
 	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
 
 	// history::ModuleAdd
-	history::ModuleAdd *h = new history::ModuleAdd;
+	history::ModuleAdd* h = new history::ModuleAdd;
 	h->name = "clone modules";
 	h->setModule(clonedModuleWidget);
 	APP->history->push(h);
@@ -757,7 +757,7 @@ void ModuleWidget::cloneAction() {
 void ModuleWidget::bypassAction() {
 	assert(module);
 	// history::ModuleBypass
-	history::ModuleBypass *h = new history::ModuleBypass;
+	history::ModuleBypass* h = new history::ModuleBypass;
 	h->moduleId = module->id;
 	h->bypass = !module->bypass;
 	APP->history->push(h);
@@ -765,12 +765,12 @@ void ModuleWidget::bypassAction() {
 }
 
 void ModuleWidget::removeAction() {
-	history::ComplexAction *complexAction = new history::ComplexAction;
+	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "remove module";
 	disconnectActions(this, complexAction);
 
 	// history::ModuleRemove
-	history::ModuleRemove *moduleRemove = new history::ModuleRemove;
+	history::ModuleRemove* moduleRemove = new history::ModuleRemove;
 	moduleRemove->setModule(this);
 	complexAction->push(moduleRemove);
 
@@ -782,50 +782,50 @@ void ModuleWidget::removeAction() {
 }
 
 void ModuleWidget::createContextMenu() {
-	ui::Menu *menu = createMenu();
+	ui::Menu* menu = createMenu();
 	assert(model);
 
-	ui::MenuLabel *modelLabel = new ui::MenuLabel;
+	ui::MenuLabel* modelLabel = new ui::MenuLabel;
 	modelLabel->text = model->plugin->brand + " " + model->name;
 	menu->addChild(modelLabel);
 
-	ModulePluginItem *pluginItem = new ModulePluginItem;
+	ModulePluginItem* pluginItem = new ModulePluginItem;
 	pluginItem->text = "Plugin";
 	pluginItem->rightText = RIGHT_ARROW;
 	pluginItem->plugin = model->plugin;
 	menu->addChild(pluginItem);
 
-	ModulePresetItem *presetsItem = new ModulePresetItem;
+	ModulePresetItem* presetsItem = new ModulePresetItem;
 	presetsItem->text = "Preset";
 	presetsItem->rightText = RIGHT_ARROW;
 	presetsItem->moduleWidget = this;
 	menu->addChild(presetsItem);
 
-	ModuleResetItem *resetItem = new ModuleResetItem;
+	ModuleResetItem* resetItem = new ModuleResetItem;
 	resetItem->text = "Initialize";
 	resetItem->rightText = RACK_MOD_CTRL_NAME "+I";
 	resetItem->moduleWidget = this;
 	menu->addChild(resetItem);
 
-	ModuleRandomizeItem *randomizeItem = new ModuleRandomizeItem;
+	ModuleRandomizeItem* randomizeItem = new ModuleRandomizeItem;
 	randomizeItem->text = "Randomize";
 	randomizeItem->rightText = RACK_MOD_CTRL_NAME "+R";
 	randomizeItem->moduleWidget = this;
 	menu->addChild(randomizeItem);
 
-	ModuleDisconnectItem *disconnectItem = new ModuleDisconnectItem;
+	ModuleDisconnectItem* disconnectItem = new ModuleDisconnectItem;
 	disconnectItem->text = "Disconnect cables";
 	disconnectItem->rightText = RACK_MOD_CTRL_NAME "+U";
 	disconnectItem->moduleWidget = this;
 	menu->addChild(disconnectItem);
 
-	ModuleCloneItem *cloneItem = new ModuleCloneItem;
+	ModuleCloneItem* cloneItem = new ModuleCloneItem;
 	cloneItem->text = "Duplicate";
 	cloneItem->rightText = RACK_MOD_CTRL_NAME "+D";
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
-	ModuleBypassItem *bypassItem = new ModuleBypassItem;
+	ModuleBypassItem* bypassItem = new ModuleBypassItem;
 	bypassItem->text = "Disable";
 	bypassItem->rightText = RACK_MOD_CTRL_NAME "+E";
 	if (module && module->bypass)
@@ -833,7 +833,7 @@ void ModuleWidget::createContextMenu() {
 	bypassItem->moduleWidget = this;
 	menu->addChild(bypassItem);
 
-	ModuleDeleteItem *deleteItem = new ModuleDeleteItem;
+	ModuleDeleteItem* deleteItem = new ModuleDeleteItem;
 	deleteItem->text = "Delete";
 	deleteItem->rightText = "Backspace/Delete";
 	deleteItem->moduleWidget = this;

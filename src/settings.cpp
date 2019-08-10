@@ -42,15 +42,15 @@ std::vector<NVGcolor> cableColors = {
 };
 
 
-json_t *toJson() {
-	json_t *rootJ = json_object();
+json_t* toJson() {
+	json_t* rootJ = json_object();
 
 	json_object_set_new(rootJ, "token", json_string(token.c_str()));
 
-	json_t *windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
+	json_t* windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
 	json_object_set_new(rootJ, "windowSize", windowSizeJ);
 
-	json_t *windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
+	json_t* windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
 	json_object_set_new(rootJ, "windowPos", windowPosJ);
 
 	json_object_set_new(rootJ, "zoom", json_real(zoom));
@@ -87,7 +87,7 @@ json_t *toJson() {
 
 	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
 
-	json_t *cableColorsJ = json_array();
+	json_t* cableColorsJ = json_array();
 	for (NVGcolor cableColor : cableColors) {
 		std::string colorStr = color::toHexString(cableColor);
 		json_array_append_new(cableColorsJ, json_string(colorStr.c_str()));
@@ -97,94 +97,94 @@ json_t *toJson() {
 	return rootJ;
 }
 
-void fromJson(json_t *rootJ) {
-	json_t *tokenJ = json_object_get(rootJ, "token");
+void fromJson(json_t* rootJ) {
+	json_t* tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
 		token = json_string_value(tokenJ);
 
-	json_t *windowSizeJ = json_object_get(rootJ, "windowSize");
+	json_t* windowSizeJ = json_object_get(rootJ, "windowSize");
 	if (windowSizeJ) {
 		double x, y;
 		json_unpack(windowSizeJ, "[F, F]", &x, &y);
 		windowSize = math::Vec(x, y);
 	}
 
-	json_t *windowPosJ = json_object_get(rootJ, "windowPos");
+	json_t* windowPosJ = json_object_get(rootJ, "windowPos");
 	if (windowPosJ) {
 		double x, y;
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
 		windowPos = math::Vec(x, y);
 	}
 
-	json_t *zoomJ = json_object_get(rootJ, "zoom");
+	json_t* zoomJ = json_object_get(rootJ, "zoom");
 	if (zoomJ)
 		zoom = json_number_value(zoomJ);
 
-	json_t *invertZoomJ = json_object_get(rootJ, "invertZoom");
+	json_t* invertZoomJ = json_object_get(rootJ, "invertZoom");
 	if (invertZoomJ)
 		invertZoom = json_boolean_value(invertZoomJ);
 
-	json_t *cableOpacityJ = json_object_get(rootJ, "cableOpacity");
+	json_t* cableOpacityJ = json_object_get(rootJ, "cableOpacity");
 	if (cableOpacityJ)
 		cableOpacity = json_number_value(cableOpacityJ);
 
-	json_t *tensionJ = json_object_get(rootJ, "cableTension");
+	json_t* tensionJ = json_object_get(rootJ, "cableTension");
 	if (tensionJ)
 		cableTension = json_number_value(tensionJ);
 
-	json_t *allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
+	json_t* allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
 		allowCursorLock = json_is_true(allowCursorLockJ);
 
-	json_t *realTimeJ = json_object_get(rootJ, "realTime");
+	json_t* realTimeJ = json_object_get(rootJ, "realTime");
 	if (realTimeJ)
 		realTime = json_boolean_value(realTimeJ);
 
-	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
+	json_t* sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ)
 		sampleRate = json_number_value(sampleRateJ);
 
-	json_t *threadCountJ = json_object_get(rootJ, "threadCount");
+	json_t* threadCountJ = json_object_get(rootJ, "threadCount");
 	if (threadCountJ)
 		threadCount = json_integer_value(threadCountJ);
 
-	json_t *paramTooltipJ = json_object_get(rootJ, "paramTooltip");
+	json_t* paramTooltipJ = json_object_get(rootJ, "paramTooltip");
 	if (paramTooltipJ)
 		paramTooltip = json_boolean_value(paramTooltipJ);
 
-	json_t *cpuMeterJ = json_object_get(rootJ, "cpuMeter");
+	json_t* cpuMeterJ = json_object_get(rootJ, "cpuMeter");
 	if (cpuMeterJ)
 		cpuMeter = json_boolean_value(cpuMeterJ);
 
-	json_t *lockModulesJ = json_object_get(rootJ, "lockModules");
+	json_t* lockModulesJ = json_object_get(rootJ, "lockModules");
 	if (lockModulesJ)
 		lockModules = json_boolean_value(lockModulesJ);
 
-	json_t *frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
+	json_t* frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
 	if (frameRateLimitJ)
 		frameRateLimit = json_number_value(frameRateLimitJ);
 
-	json_t *frameRateSyncJ = json_object_get(rootJ, "frameRateSync");
+	json_t* frameRateSyncJ = json_object_get(rootJ, "frameRateSync");
 	if (frameRateSyncJ)
 		frameRateSync = json_boolean_value(frameRateSyncJ);
 
-	json_t *autosavePeriodJ = json_object_get(rootJ, "autosavePeriod");
+	json_t* autosavePeriodJ = json_object_get(rootJ, "autosavePeriod");
 	if (autosavePeriodJ)
 		autosavePeriod = json_number_value(autosavePeriodJ);
 
-	json_t *skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
+	json_t* skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
 	if (skipLoadOnLaunchJ)
 		skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
 
-	json_t *patchPathJ = json_object_get(rootJ, "patchPath");
+	json_t* patchPathJ = json_object_get(rootJ, "patchPath");
 	if (patchPathJ)
 		patchPath = json_string_value(patchPathJ);
 
-	json_t *cableColorsJ = json_object_get(rootJ, "cableColors");
+	json_t* cableColorsJ = json_object_get(rootJ, "cableColors");
 	if (cableColorsJ) {
 		cableColors.clear();
 		size_t i;
-		json_t *cableColorJ;
+		json_t* cableColorJ;
 		json_array_foreach(cableColorsJ, i, cableColorJ) {
 			std::string colorStr = json_string_value(cableColorJ);
 			cableColors.push_back(color::fromHexString(colorStr));
@@ -192,13 +192,13 @@ void fromJson(json_t *rootJ) {
 	}
 }
 
-void save(const std::string &path) {
+void save(const std::string& path) {
 	INFO("Saving settings %s", path.c_str());
-	json_t *rootJ = toJson();
+	json_t* rootJ = toJson();
 	if (!rootJ)
 		return;
 
-	FILE *file = fopen(path.c_str(), "w");
+	FILE* file = fopen(path.c_str(), "w");
 	if (!file)
 		return;
 	DEFER({
@@ -209,9 +209,9 @@ void save(const std::string &path) {
 	json_decref(rootJ);
 }
 
-void load(const std::string &path) {
+void load(const std::string& path) {
 	INFO("Loading settings %s", path.c_str());
-	FILE *file = fopen(path.c_str(), "r");
+	FILE* file = fopen(path.c_str(), "r");
 	if (!file)
 		return;
 	DEFER({
@@ -219,7 +219,7 @@ void load(const std::string &path) {
 	});
 
 	json_error_t error;
-	json_t *rootJ = json_loadf(file, 0, &error);
+	json_t* rootJ = json_loadf(file, 0, &error);
 	if (!rootJ)
 		throw UserException(string::f("Settings file has invalid JSON at %d:%d %s", error.line, error.column, error.text));
 

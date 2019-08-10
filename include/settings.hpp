@@ -41,10 +41,10 @@ extern bool skipLoadOnLaunch;
 extern std::string patchPath;
 extern std::vector<NVGcolor> cableColors;
 
-json_t *toJson();
-void fromJson(json_t *rootJ);
-void save(const std::string &path);
-void load(const std::string &path);
+json_t* toJson();
+void fromJson(json_t* rootJ);
+void save(const std::string& path);
+void load(const std::string& path);
 
 
 } // namespace settings

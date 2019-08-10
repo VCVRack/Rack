@@ -1,0 +1,31 @@
+# astyle settings file
+
+# Requires Artistic Style 3.1
+# http://astyle.sourceforge.net/
+
+# Usage:
+# astyle --suffix=none --options=.astylerc filename.cpp
+# or recursively
+# astyle --suffix=none --options=.astylerc -r 'include/*' 'src/*'
+# or using find
+# find src include -type f | xargs astyle --suffix=none --options=.astylerc
+
+style=java
+indent=tab=2
+attach-closing-while
+indent-switches
+indent-preproc-block
+indent-preproc-define
+indent-col1-comments
+pad-oper
+pad-comma
+pad-header
+unpad-paren
+align-pointer=type
+align-reference=type
+break-closing-braces
+break-one-line-headers
+attach-return-type
+attach-return-type-decl
+keep-one-line-statements
+close-templates

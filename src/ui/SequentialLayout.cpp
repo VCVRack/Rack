@@ -17,7 +17,7 @@ void SequentialLayout::step() {
 	std::vector<std::vector<widget::Widget*>> rows;
 	rows.resize(1);
 	float rowWidth = 0.0;
-	for (widget::Widget *child : children) {
+	for (widget::Widget* child : children) {
 		if (!child->visible)
 			continue;
 
@@ -33,12 +33,12 @@ void SequentialLayout::step() {
 
 	// Position widgets
 	math::Vec p;
-	for (auto &row : rows) {
+	for (auto& row : rows) {
 		// For center and right alignment, compute offset from the left margin
 		float offset = 0.0;
 		if (alignment != LEFT_ALIGNMENT) {
 			float rowWidth = 0.0;
-			for (widget::Widget *child : row) {
+			for (widget::Widget* child : row) {
 				rowWidth += X(child->box.size) + X(spacing);
 			}
 			rowWidth -= X(spacing);
@@ -50,7 +50,7 @@ void SequentialLayout::step() {
 		}
 
 		float maxHeight = 0.0;
-		for (widget::Widget *child : row) {
+		for (widget::Widget* child : row) {
 			child->box.pos = p;
 			X(child->box.pos) += offset;
 

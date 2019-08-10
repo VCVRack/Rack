@@ -8,7 +8,7 @@ namespace rack {
 namespace event {
 
 
-void State::setHovered(widget::Widget *w) {
+void State::setHovered(widget::Widget* w) {
 	if (w == hoveredWidget)
 		return;
 
@@ -30,7 +30,7 @@ void State::setHovered(widget::Widget *w) {
 	}
 }
 
-void State::setDragged(widget::Widget *w, int button) {
+void State::setDragged(widget::Widget* w, int button) {
 	if (w == draggedWidget)
 		return;
 
@@ -56,7 +56,7 @@ void State::setDragged(widget::Widget *w, int button) {
 	}
 }
 
-void State::setDragHovered(widget::Widget *w) {
+void State::setDragHovered(widget::Widget* w) {
 	if (w == dragHoveredWidget)
 		return;
 
@@ -82,7 +82,7 @@ void State::setDragHovered(widget::Widget *w) {
 	}
 }
 
-void State::setSelected(widget::Widget *w) {
+void State::setSelected(widget::Widget* w) {
 	if (w == selectedWidget)
 		return;
 
@@ -104,12 +104,17 @@ void State::setSelected(widget::Widget *w) {
 	}
 }
 
-void State::finalizeWidget(widget::Widget *w) {
-	if (hoveredWidget == w) setHovered(NULL);
-	if (draggedWidget == w) setDragged(NULL, 0);
-	if (dragHoveredWidget == w) setDragHovered(NULL);
-	if (selectedWidget == w) setSelected(NULL);
-	if (lastClickedWidget == w) lastClickedWidget = NULL;
+void State::finalizeWidget(widget::Widget* w) {
+	if (hoveredWidget == w)
+		setHovered(NULL);
+	if (draggedWidget == w)
+		setDragged(NULL, 0);
+	if (dragHoveredWidget == w)
+		setDragHovered(NULL);
+	if (selectedWidget == w)
+		setSelected(NULL);
+	if (lastClickedWidget == w)
+		lastClickedWidget = NULL;
 }
 
 bool State::handleButton(math::Vec pos, int button, int action, int mods) {
@@ -122,7 +127,7 @@ bool State::handleButton(math::Vec pos, int button, int action, int mods) {
 	eButton.action = action;
 	eButton.mods = mods;
 	rootWidget->onButton(eButton);
-	widget::Widget *clickedWidget = cButton.target;
+	widget::Widget* clickedWidget = cButton.target;
 
 	if (action == GLFW_PRESS) {
 		setDragged(clickedWidget, button);
@@ -151,8 +156,8 @@ bool State::handleButton(math::Vec pos, int button, int action, int mods) {
 			const double doubleClickDuration = 0.3;
 			double clickTime = glfwGetTime();
 			if (clickedWidget
-				&& clickTime - lastClickTime <= doubleClickDuration
-				&& lastClickedWidget == clickedWidget) {
+			    && clickTime - lastClickTime <= doubleClickDuration
+			    && lastClickedWidget == clickedWidget) {
 				// DoubleClick
 				DoubleClick eDoubleClick;
 				clickedWidget->onDoubleClick(eDoubleClick);
@@ -231,7 +236,7 @@ bool State::handleScroll(math::Vec pos, math::Vec scrollDelta) {
 	return !!cHoverScroll.target;
 }
 
-bool State::handleDrop(math::Vec pos, const std::vector<std::string> &paths) {
+bool State::handleDrop(math::Vec pos, const std::vector<std::string>& paths) {
 	// PathDrop
 	Context cPathDrop;
 	PathDrop ePathDrop(paths);

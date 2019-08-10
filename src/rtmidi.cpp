@@ -4,7 +4,7 @@
 
 #pragma GCC diagnostic push
 #ifndef __clang__
-#pragma GCC diagnostic ignored "-Wsuggest-override"
+	#pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
 #include <rtmidi/RtMidi.h>
 #pragma GCC diagnostic pop
@@ -14,7 +14,7 @@ namespace rack {
 
 
 struct RtMidiInputDevice : midi::InputDevice {
-	RtMidiIn *rtMidiIn;
+	RtMidiIn* rtMidiIn;
 
 	RtMidiInputDevice(int driverId, int deviceId) {
 		rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
@@ -29,13 +29,13 @@ struct RtMidiInputDevice : midi::InputDevice {
 		delete rtMidiIn;
 	}
 
-	static void midiInputCallback(double timeStamp, std::vector<unsigned char> *message, void *userData) {
+	static void midiInputCallback(double timeStamp, std::vector<unsigned char>* message, void* userData) {
 		if (!message)
 			return;
 		if (!userData)
 			return;
 
-		RtMidiInputDevice *midiInputDevice = (RtMidiInputDevice*) userData;
+		RtMidiInputDevice* midiInputDevice = (RtMidiInputDevice*) userData;
 		if (!midiInputDevice)
 			return;
 
@@ -54,7 +54,7 @@ struct RtMidiInputDevice : midi::InputDevice {
 
 
 struct RtMidiOutputDevice : midi::OutputDevice {
-	RtMidiOut *rtMidiOut;
+	RtMidiOut* rtMidiOut;
 
 	RtMidiOutputDevice(int driverId, int deviceId) {
 		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
@@ -76,8 +76,8 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 struct RtMidiDriver : midi::Driver {
 	int driverId;
 	/** Just for querying MIDI driver information */
-	RtMidiIn *rtMidiIn;
-	RtMidiOut *rtMidiOut;
+	RtMidiIn* rtMidiIn;
+	RtMidiOut* rtMidiOut;
 	std::map<int, RtMidiInputDevice*> inputDevices;
 	std::map<int, RtMidiOutputDevice*> outputDevices;
 
@@ -121,10 +121,10 @@ struct RtMidiDriver : midi::Driver {
 		return "";
 	}
 
-	midi::InputDevice *subscribeInput(int deviceId, midi::Input *input) override {
+	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()))
 			return NULL;
-		RtMidiInputDevice *device = inputDevices[deviceId];
+		RtMidiInputDevice* device = inputDevices[deviceId];
 		if (!device) {
 			inputDevices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
 		}
@@ -133,11 +133,11 @@ struct RtMidiDriver : midi::Driver {
 		return device;
 	}
 
-	void unsubscribeInput(int deviceId, midi::Input *input) override {
+	void unsubscribeInput(int deviceId, midi::Input* input) override {
 		auto it = inputDevices.find(deviceId);
 		if (it == inputDevices.end())
 			return;
-		RtMidiInputDevice *device = it->second;
+		RtMidiInputDevice* device = it->second;
 		device->unsubscribe(input);
 
 		// Destroy device if nothing is subscribed anymore
@@ -162,10 +162,10 @@ struct RtMidiDriver : midi::Driver {
 		return "";
 	}
 
-	midi::OutputDevice *subscribeOutput(int deviceId, midi::Output *output) override {
+	midi::OutputDevice* subscribeOutput(int deviceId, midi::Output* output) override {
 		if (!(0 <= deviceId && deviceId < (int) rtMidiOut->getPortCount()))
 			return NULL;
-		RtMidiOutputDevice *device = outputDevices[deviceId];
+		RtMidiOutputDevice* device = outputDevices[deviceId];
 		if (!device) {
 			outputDevices[deviceId] = device = new RtMidiOutputDevice(driverId, deviceId);
 		}
@@ -174,11 +174,11 @@ struct RtMidiDriver : midi::Driver {
 		return device;
 	}
 
-	void unsubscribeOutput(int deviceId, midi::Output *output) override {
+	void unsubscribeOutput(int deviceId, midi::Output* output) override {
 		auto it = outputDevices.find(deviceId);
 		if (it == outputDevices.end())
 			return;
-		RtMidiOutputDevice *device = it->second;
+		RtMidiOutputDevice* device = it->second;
 		device->unsubscribe(output);
 
 		// Destroy device if nothing is subscribed anymore
@@ -195,7 +195,7 @@ void rtmidiInit() {
 	RtMidi::getCompiledApi(rtApis);
 	for (RtMidi::Api api : rtApis) {
 		int driverId = (int) api;
-		midi::Driver *driver = new RtMidiDriver(driverId);
+		midi::Driver* driver = new RtMidiDriver(driverId);
 		midi::addDriver(driverId, driver);
 	}
 }

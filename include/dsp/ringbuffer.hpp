@@ -18,13 +18,13 @@ struct RingBuffer {
 	size_t end = 0;
 
 	size_t mask(size_t i) const {
-			return i & (S - 1);
+		return i & (S - 1);
 	}
 	void push(T t) {
 		size_t i = mask(end++);
 		data[i] = t;
 	}
-	void pushBuffer(const T *t, int n) {
+	void pushBuffer(const T* t, int n) {
 		size_t i = mask(end);
 		size_t e1 = i + n;
 		size_t e2 = (e1 < S) ? e1 : S;
@@ -37,7 +37,7 @@ struct RingBuffer {
 	T shift() {
 		return data[mask(start++)];
 	}
-	void shiftBuffer(T *t, size_t n) {
+	void shiftBuffer(T* t, size_t n) {
 		size_t i = mask(start);
 		size_t s1 = i + n;
 		size_t s2 = (s1 < S) ? s1 : S;
@@ -70,7 +70,7 @@ Thread-safe for single producers and consumers?
 */
 template <typename T, size_t S>
 struct DoubleRingBuffer {
-	T data[S*2];
+	T data[S * 2];
 	size_t start = 0;
 	size_t end = 0;
 
@@ -104,7 +104,7 @@ struct DoubleRingBuffer {
 	If any data is appended, you must call endIncr afterwards.
 	Pointer is invalidated when any other method is called.
 	*/
-	T *endData() {
+	T* endData() {
 		return &data[mask(end)];
 	}
 	void endIncr(size_t n) {
@@ -123,7 +123,7 @@ struct DoubleRingBuffer {
 	/** Returns a pointer to S consecutive elements for consumption
 	If any data is consumed, call startIncr afterwards.
 	*/
-	const T *startData() const {
+	const T* startData() const {
 		return &data[mask(start)];
 	}
 	void startIncr(size_t n) {
@@ -174,7 +174,7 @@ struct AppleRingBuffer {
 	}
 	/** Returns a pointer to S consecutive elements for appending, requesting to append n elements.
 	*/
-	T *endData(size_t n) {
+	T* endData(size_t n) {
 		if (end + n > N) {
 			returnBuffer();
 		}
@@ -189,7 +189,7 @@ struct AppleRingBuffer {
 	/** Returns a pointer to S consecutive elements for consumption
 	If any data is consumed, call startIncr afterwards.
 	*/
-	const T *startData() const {
+	const T* startData() const {
 		return &data[start];
 	}
 	void startIncr(size_t n) {

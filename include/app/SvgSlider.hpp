@@ -13,19 +13,23 @@ namespace app {
 Can be used for horizontal or vertical linear faders.
 */
 struct SvgSlider : app::SliderKnob {
-	widget::FramebufferWidget *fb;
-	widget::SvgWidget *background;
-	widget::SvgWidget *handle;
+	widget::FramebufferWidget* fb;
+	widget::SvgWidget* background;
+	widget::SvgWidget* handle;
 	/** Intermediate positions will be interpolated between these positions */
 	math::Vec minHandlePos, maxHandlePos;
 
 	SvgSlider();
 	void setBackgroundSvg(std::shared_ptr<Svg> svg);
 	void setHandleSvg(std::shared_ptr<Svg> svg);
-	void onChange(const event::Change &e) override;
+	void onChange(const event::Change& e) override;
 
-	DEPRECATED void setBackgroundSVG(std::shared_ptr<Svg> svg) {setBackgroundSvg(svg);}
-	DEPRECATED void setHandleSVG(std::shared_ptr<Svg> svg) {setBackgroundSvg(svg);}
+	DEPRECATED void setBackgroundSVG(std::shared_ptr<Svg> svg) {
+		setBackgroundSvg(svg);
+	}
+	DEPRECATED void setHandleSVG(std::shared_ptr<Svg> svg) {
+		setBackgroundSvg(svg);
+	}
 	DEPRECATED void setSVGs(std::shared_ptr<Svg> backgroundSvg, std::shared_ptr<Svg> handleSvg) {
 		setBackgroundSvg(backgroundSvg);
 		setHandleSvg(handleSvg);

@@ -5,7 +5,7 @@ namespace rack {
 namespace ui {
 
 
-void PasswordField::draw(const DrawArgs &args) {
+void PasswordField::draw(const DrawArgs& args) {
 	std::string textTmp = text;
 	text = std::string(textTmp.size(), '*');
 	TextField::draw(args);

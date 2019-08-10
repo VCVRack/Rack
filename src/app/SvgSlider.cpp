@@ -30,13 +30,13 @@ void SvgSlider::setHandleSvg(std::shared_ptr<Svg> svg) {
 	fb->dirty = true;
 }
 
-void SvgSlider::onChange(const event::Change &e) {
+void SvgSlider::onChange(const event::Change& e) {
 	if (paramQuantity) {
 		// Interpolate handle position
 		float v = paramQuantity->getScaledValue();
 		handle->box.pos = math::Vec(
-			math::rescale(v, 0.f, 1.f, minHandlePos.x, maxHandlePos.x),
-			math::rescale(v, 0.f, 1.f, minHandlePos.y, maxHandlePos.y));
+		                    math::rescale(v, 0.f, 1.f, minHandlePos.x, maxHandlePos.x),
+		                    math::rescale(v, 0.f, 1.f, minHandlePos.y, maxHandlePos.y));
 		fb->dirty = true;
 	}
 	ParamWidget::onChange(e);

@@ -9,17 +9,17 @@ namespace ui {
 
 
 struct Menu : widget::OpaqueWidget {
-	Menu *parentMenu = NULL;
-	Menu *childMenu = NULL;
+	Menu* parentMenu = NULL;
+	Menu* childMenu = NULL;
 	/** The entry which created the child menu */
-	MenuEntry *activeEntry = NULL;
+	MenuEntry* activeEntry = NULL;
 
 	Menu();
 	~Menu();
-	void setChildMenu(Menu *menu);
+	void setChildMenu(Menu* menu);
 	void step() override;
-	void draw(const DrawArgs &args) override;
-	void onHoverScroll(const event::HoverScroll &e) override;
+	void draw(const DrawArgs& args) override;
+	void onHoverScroll(const event::HoverScroll& e) override;
 };
 
 

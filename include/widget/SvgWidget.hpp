@@ -16,9 +16,11 @@ struct SvgWidget : Widget {
 
 	/** Sets and wraps the SVG */
 	void setSvg(std::shared_ptr<Svg> svg);
-	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {setSvg(svg);}
+	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {
+		setSvg(svg);
+	}
 
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 

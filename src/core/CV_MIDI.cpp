@@ -55,7 +55,7 @@ struct CV_MIDI : Module {
 		midiOutput.reset();
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		const float rateLimiterPeriod = 0.005f;
 		rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
 		if (rateLimiterPhase >= 1.f) {
@@ -109,14 +109,14 @@ struct CV_MIDI : Module {
 		midiOutput.setContinue(cont);
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "midi", midiOutput.toJson());
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *midiJ = json_object_get(rootJ, "midi");
+	void dataFromJson(json_t* rootJ) override {
+		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiOutput.fromJson(midiJ);
 	}
@@ -124,15 +124,15 @@ struct CV_MIDI : Module {
 
 
 struct CV_MIDIPanicItem : MenuItem {
-	CV_MIDI *module;
-	void onAction(const event::Action &e) override {
+	CV_MIDI* module;
+	void onAction(const event::Action& e) override {
 		module->midiOutput.panic();
 	}
 };
 
 
 struct CV_MIDIWidget : ModuleWidget {
-	CV_MIDIWidget(CV_MIDI *module) {
+	CV_MIDIWidget(CV_MIDI* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/CV-MIDI.svg")));
 
@@ -154,18 +154,18 @@ struct CV_MIDIWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 112)), module, CV_MIDI::STOP_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32, 112)), module, CV_MIDI::CONTINUE_INPUT));
 
-		MidiWidget *midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
+		MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
 		midiWidget->box.size = mm2px(Vec(33.840, 28));
 		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		addChild(midiWidget);
 	}
 
-	void appendContextMenu(Menu *menu) override {
-		CV_MIDI *module = dynamic_cast<CV_MIDI*>(this->module);
+	void appendContextMenu(Menu* menu) override {
+		CV_MIDI* module = dynamic_cast<CV_MIDI*>(this->module);
 
 		menu->addChild(new MenuEntry);
 
-		CV_MIDIPanicItem *panicItem = new CV_MIDIPanicItem;
+		CV_MIDIPanicItem* panicItem = new CV_MIDIPanicItem;
 		panicItem->text = "Panic";
 		panicItem->module = module;
 		menu->addChild(panicItem);
@@ -173,7 +173,7 @@ struct CV_MIDIWidget : ModuleWidget {
 };
 
 
-Model *modelCV_MIDI = createModel<CV_MIDI, CV_MIDIWidget>("CV-MIDI");
+Model* modelCV_MIDI = createModel<CV_MIDI, CV_MIDIWidget>("CV-MIDI");
 
 
 } // namespace core

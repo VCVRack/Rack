@@ -7,7 +7,7 @@ namespace rack {
 namespace app {
 
 
-widget::Widget *moduleBrowserCreate();
+widget::Widget* moduleBrowserCreate();
 
 
 } // namespace app
