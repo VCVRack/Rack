@@ -93,6 +93,8 @@ struct Window::Internal {
 	int lastWindowY = 0;
 	int lastWindowWidth = 0;
 	int lastWindowHeight = 0;
+
+	bool ignoreNextMouseDelta = false;
 };
 
 
@@ -122,6 +124,13 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	math::Vec mousePos = math::Vec(xpos, ypos).div(window->pixelRatio / window->windowRatio).round();
 	math::Vec mouseDelta = mousePos.minus(window->mousePos);
+
+	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
+	if (window->internal->ignoreNextMouseDelta) {
+		window->internal->ignoreNextMouseDelta = false;
+		mouseDelta = math::Vec();
+	}
+	DEBUG("(%f %f) (%f %f)", VEC_ARGS(mouseDelta), VEC_ARGS(mousePos));
 
 	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
 	(void) cursorMode;
@@ -472,12 +481,14 @@ void Window::cursorLock() {
 #else
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
+		internal->ignoreNextMouseDelta = true;
 	}
 }
 
 void Window::cursorUnlock() {
 	if (settings::allowCursorLock) {
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		internal->ignoreNextMouseDelta = true;
 	}
 }
 
