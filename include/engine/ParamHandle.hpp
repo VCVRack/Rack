@@ -16,7 +16,7 @@ struct ParamHandle {
 	*/
 	int moduleId = -1;
 	int paramId = 0;
-	Module *module = NULL;
+	Module* module = NULL;
 
 	std::string text;
 	NVGcolor color;

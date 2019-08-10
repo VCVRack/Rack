@@ -14,7 +14,7 @@ struct MultiLightWidget : LightWidget {
 
 	void addBaseColor(NVGcolor baseColor);
 	/** Sets the color to a linear combination of the baseColors with the given weights */
-	void setBrightnesses(const std::vector<float> &brightnesses);
+	void setBrightnesses(const std::vector<float>& brightnesses);
 };
 
 

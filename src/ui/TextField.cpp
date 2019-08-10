@@ -8,7 +8,7 @@ TextField::TextField() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
 
-void TextField::draw(const DrawArgs &args) {
+void TextField::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
 	BNDwidgetState state;
@@ -30,7 +30,7 @@ void TextField::draw(const DrawArgs &args) {
 	nvgResetScissor(args.vg);
 }
 
-void TextField::onDragHover(const event::DragHover &e) {
+void TextField::onDragHover(const event::DragHover& e) {
 	OpaqueWidget::onDragHover(e);
 
 	if (e.origin == this) {
@@ -39,7 +39,7 @@ void TextField::onDragHover(const event::DragHover &e) {
 	}
 }
 
-void TextField::onButton(const event::Button &e) {
+void TextField::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -47,7 +47,7 @@ void TextField::onButton(const event::Button &e) {
 	}
 }
 
-void TextField::onSelectText(const event::SelectText &e) {
+void TextField::onSelectText(const event::SelectText& e) {
 	if (e.codepoint < 128) {
 		std::string newText(1, (char) e.codepoint);
 		insertText(newText);
@@ -55,7 +55,7 @@ void TextField::onSelectText(const event::SelectText &e) {
 	e.consume(this);
 }
 
-void TextField::onSelectKey(const event::SelectKey &e) {
+void TextField::onSelectKey(const event::SelectKey& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_BACKSPACE: {
@@ -126,7 +126,7 @@ void TextField::onSelectKey(const event::SelectKey &e) {
 			} break;
 			case GLFW_KEY_V: {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					const char *newText = glfwGetClipboardString(APP->window->win);
+					const char* newText = glfwGetClipboardString(APP->window->win);
 					if (newText)
 						insertText(newText);
 				}

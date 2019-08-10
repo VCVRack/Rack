@@ -1,6 +1,6 @@
 RACK_DIR ?= .
-VERSION := 1.dev.$(shell git rev-parse --short HEAD)
-# VERSION := 1.1.1
+# VERSION := 1.dev.$(shell git rev-parse --short HEAD)
+VERSION := 1.1.3
 
 FLAGS += -DVERSION=$(VERSION)
 FLAGS += -Iinclude -Idep/include
@@ -91,78 +91,75 @@ ifdef ARCH_WIN
 endif
 
 
+DIST_RES := LICENSE* CHANGELOG.md res cacert.pem Core.json template.vcv
+DIST_NAME := Rack-$(VERSION)-$(ARCH)
+DIST_SDK := Rack-SDK-$(VERSION).zip
+
 # This target is not intended for public use
 dist: $(TARGET)
 	rm -rf dist
 	mkdir -p dist
 
-	$(MAKE) -C plugins/Fundamental dist
-	$(MAKE) -C plugins/Fundamental sign-dist
-
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp -R LICENSE* res Core.json template.vcv dist/Rack/
+	cp -R $(DIST_RES) dist/Rack/
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
-	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
+	cp Fundamental.zip dist/Rack/
 	# Make ZIP
-	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
 endif
 ifdef ARCH_MAC
-	mkdir -p dist/$(TARGET).app
-	mkdir -p dist/$(TARGET).app/Contents
-	cp Info.plist dist/$(TARGET).app/Contents/
-	$(SED) 's/{VERSION}/$(VERSION)/g' dist/$(TARGET).app/Contents/Info.plist
-	mkdir -p dist/$(TARGET).app/Contents/MacOS
-	cp $(TARGET) dist/$(TARGET).app/Contents/MacOS/
-	$(STRIP) -S dist/$(TARGET).app/Contents/MacOS/$(TARGET)
-	mkdir -p dist/$(TARGET).app/Contents/Resources
-	cp -R LICENSE* res Core.json template.vcv icon.icns dist/$(TARGET).app/Contents/Resources
+	mkdir -p dist/Rack.app
+	mkdir -p dist/Rack.app/Contents
+	cp Info.plist dist/Rack.app/Contents/
+	$(SED) 's/{VERSION}/$(VERSION)/g' dist/Rack.app/Contents/Info.plist
+	mkdir -p dist/Rack.app/Contents/MacOS
+	cp $(TARGET) dist/Rack.app/Contents/MacOS/
+	$(STRIP) -S dist/Rack.app/Contents/MacOS/$(TARGET)
+	mkdir -p dist/Rack.app/Contents/Resources
+	cp -R $(DIST_RES) icon.icns dist/Rack.app/Contents/Resources/
 
 	# Manually check that no nonstandard shared libraries are linked
-	otool -L dist/$(TARGET).app/Contents/MacOS/$(TARGET)
+	otool -L dist/Rack.app/Contents/MacOS/$(TARGET)
 
-	cp plugins/Fundamental/dist/*.zip dist/$(TARGET).app/Contents/Resources/Fundamental.zip
+	cp Fundamental.zip dist/Rack.app/Contents/Resources/Fundamental.txt
 	# Clean up and sign bundle
-	xattr -cr dist/$(TARGET).app
+	xattr -cr dist/Rack.app
 	# This will only work if you have the private key to my certificate
-	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --deep dist/$(TARGET).app
-	codesign --verify --deep --strict --verbose=2 dist/$(TARGET).app
-# 	spctl --assess --type execute --ignore-cache --no-cache -vv dist/$(TARGET).app
+	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --deep dist/Rack.app
+	codesign --verify --deep --strict --verbose=2 dist/Rack.app
 	# Make ZIP
-	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
+	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack.app
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
-	cp -R LICENSE* res Core.json template.vcv dist/Rack/
+	cp -R $(DIST_RES) dist/Rack/
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
-	cp plugins/Fundamental/dist/*.zip dist/Rack/Fundamental.zip
+	cp Fundamental.zip dist/Rack/
 	# Make ZIP
-	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip Rack
+	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
 	makensis -DVERSION=$(VERSION) installer.nsi
-	mv installer.exe dist/Rack-$(VERSION)-$(ARCH).exe
+	mv installer.exe dist/$(DIST_NAME).exe
 endif
 
 	# Rack SDK
 	mkdir -p dist/Rack-SDK
-	cp LICENSE* dist/Rack-SDK/
-	cp *.mk dist/Rack-SDK/
-	cp -R include dist/Rack-SDK/
+	cp -R LICENSE* *.mk include helper.py dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
-	cp helper.py dist/Rack-SDK/
 ifdef ARCH_WIN
 	cp libRack.a dist/Rack-SDK/
 endif
-	cd dist && zip -q -9 -r Rack-SDK-$(VERSION).zip Rack-SDK
+	cd dist && zip -q -9 -r $(DIST_SDK) Rack-SDK
 
 
 notarize:
@@ -171,6 +168,7 @@ ifdef ARCH_MAC
 	xcrun altool --notarize-app -f dist/Rack-$(VERSION)-$(ARCH).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/UploadInfo.plist
 	# Wait for Apple's servers to approve the app
 	while true; do \
+		echo "Waiting on Apple servers..." ; \
 		xcrun altool --notarization-info `/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" dist/UploadInfo.plist` -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/RequestInfo.plist ; \
 		if [ "`/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" dist/RequestInfo.plist`" != "in progress" ]; then \
 			break ; \
@@ -178,9 +176,9 @@ ifdef ARCH_MAC
 		sleep 10 ; \
 	done
 	# Mark app as notarized, check, and re-zip
-	xcrun stapler staple dist/$(TARGET).app
-	spctl --assess --type execute --ignore-cache --no-cache -vv dist/$(TARGET).app
-	cd dist && zip -q -9 -r Rack-$(VERSION)-$(ARCH).zip $(TARGET).app
+	xcrun stapler staple dist/Rack.app
+	spctl --assess --type execute --ignore-cache --no-cache -vv dist/Rack.app
+	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack.app
 endif
 
 
@@ -188,13 +186,13 @@ UPLOAD_URL := vortico@vcvrack.com:files/
 upload:
 	# This will only work if you have a private key to my server
 ifdef ARCH_MAC
-	rsync dist/*.zip $(UPLOAD_URL) -zP
+	rsync dist/$(DIST_NAME).zip $(UPLOAD_URL) -zP
 endif
 ifdef ARCH_WIN
-	rsync dist/*.{exe,zip} $(UPLOAD_URL) -P
+	rsync dist/$(DIST_NAME).zip dist/$(DIST_NAME).exe dist/$(DIST_SDK) $(UPLOAD_URL) -P
 endif
 ifdef ARCH_LIN
-	rsync dist/*.zip $(UPLOAD_URL) -zP
+	rsync dist/$(DIST_NAME).zip $(UPLOAD_URL) -zP
 endif
 
 

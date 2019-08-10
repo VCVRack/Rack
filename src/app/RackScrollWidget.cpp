@@ -76,19 +76,19 @@ void RackScrollWidget::step() {
 }
 
 
-void RackScrollWidget::draw(const DrawArgs &args) {
+void RackScrollWidget::draw(const DrawArgs& args) {
 	// DEBUG("%f %f %f %f", RECT_ARGS(args.clipBox));
 	ScrollWidget::draw(args);
 }
 
-void RackScrollWidget::onHoverKey(const event::HoverKey &e) {
+void RackScrollWidget::onHoverKey(const event::HoverKey& e) {
 	ScrollWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;
 
 	// Scroll with arrow keys
 	float arrowSpeed = 30.0;
-	if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL |GLFW_MOD_SHIFT))
+	if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
 		arrowSpeed /= 16.0;
 	else if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
 		arrowSpeed *= 4.0;
@@ -117,7 +117,7 @@ void RackScrollWidget::onHoverKey(const event::HoverKey &e) {
 	}
 }
 
-void RackScrollWidget::onHoverScroll(const event::HoverScroll &e) {
+void RackScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		// Increase zoom
 		float zoomDelta = e.scrollDelta.y / 50 / 4;

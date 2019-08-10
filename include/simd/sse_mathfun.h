@@ -1,4 +1,3 @@
-#pragma once
 /* Modified version of http://gruntthepeon.free.fr/ssemath/ for VCV Rack.
 
 The following changes were made.
@@ -6,7 +5,7 @@ The following changes were made.
 - Make all functions inline since this is a header file.
 - Remove non-SSE2 code, since Rack assumes SSE2 CPUs.
 - Move `const static` variables to function variables for clarity. See https://stackoverflow.com/a/52139901/272642 for explanation of why the performance is not worse.
-- Change header file to <emmintrin.h> since we're using SSE2 intrinsics.
+- Change header file to <pmmintrin.h> since we're using SSE2 intrinsics.
 - Prefix functions with `sse_mathfun_`.
 - Add floor, ceil, fmod.
 
@@ -43,8 +42,7 @@ This derived source file is released under the zlib license.
 
   (this is the zlib license)
 */
-
-
+#pragma once
 #include <pmmintrin.h>
 
 
@@ -376,7 +374,7 @@ inline __m128 sse_mathfun_cos_ps(__m128 x) { // any x
 
 /* since sin_ps and cos_ps are almost identical, sincos_ps could replace both of them..
    it is almost as fast, and gives you a free cosine with your sine */
-inline void sse_mathfun_sincos_ps(__m128 x, __m128 *s, __m128 *c) {
+inline void sse_mathfun_sincos_ps(__m128 x, __m128* s, __m128* c) {
 	__m128 xmm1, xmm2, xmm3 = _mm_setzero_ps(), sign_bit_sin, y;
 	__m128i emm0, emm2, emm4;
 	sign_bit_sin = x;

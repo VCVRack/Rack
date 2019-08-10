@@ -82,16 +82,16 @@ void init() {
 #endif
 #if defined ARCH_MAC
 			// Get home directory
-			struct passwd *pw = getpwuid(getuid());
+			struct passwd* pw = getpwuid(getuid());
 			assert(pw);
 			userDir = pw->pw_dir;
 			userDir += "/Documents/Rack";
 #endif
 #if defined ARCH_LIN
 			// Get home directory
-			const char *homeBuf = getenv("HOME");
+			const char* homeBuf = getenv("HOME");
 			if (!homeBuf) {
-				struct passwd *pw = getpwuid(getuid());
+				struct passwd* pw = getpwuid(getuid());
 				assert(pw);
 				homeBuf = pw->pw_dir;
 			}
@@ -112,6 +112,7 @@ void init() {
 		templatePath = userDir + "/template.vcv";
 	}
 	else {
+		logPath = userDir + "/log.txt";
 		pluginsPath = userDir + "/plugins-v" + app::ABI_VERSION;
 		settingsPath = userDir + "/settings-v" + app::ABI_VERSION + ".json";
 		autosavePath = userDir + "/autosave-v" + app::ABI_VERSION + ".vcv";
@@ -130,7 +131,7 @@ std::string user(std::string filename) {
 }
 
 
-std::string plugin(plugin::Plugin *plugin, std::string filename) {
+std::string plugin(plugin::Plugin* plugin, std::string filename) {
 	assert(plugin);
 	return plugin->path + "/" + filename;
 }
@@ -139,6 +140,7 @@ std::string plugin(plugin::Plugin *plugin, std::string filename) {
 std::string systemDir;
 std::string userDir;
 
+std::string logPath;
 std::string pluginsPath;
 std::string settingsPath;
 std::string autosavePath;

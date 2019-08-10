@@ -10,19 +10,19 @@ namespace rack {
 namespace string {
 
 
-std::string fromWstring(const std::wstring &s) {
+std::string fromWstring(const std::wstring& s) {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.to_bytes(s);
 }
 
 
-std::wstring toWstring(const std::string &s) {
+std::wstring toWstring(const std::string& s) {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	return converter.from_bytes(s);
 }
 
 
-std::string f(const char *format, ...) {
+std::string f(const char* format, ...) {
 	va_list args;
 	va_start(args, format);
 	// Compute size of required buffer
@@ -40,21 +40,25 @@ std::string f(const char *format, ...) {
 }
 
 
-std::string lowercase(const std::string &s) {
+std::string lowercase(const std::string& s) {
 	std::string r = s;
-	std::transform(r.begin(), r.end(), r.begin(), [](unsigned char c) { return std::tolower(c); });
+	std::transform(r.begin(), r.end(), r.begin(), [](unsigned char c) {
+		return std::tolower(c);
+	});
 	return r;
 }
 
 
-std::string uppercase(const std::string &s) {
+std::string uppercase(const std::string& s) {
 	std::string r = s;
-	std::transform(r.begin(), r.end(), r.begin(), [](unsigned char c) { return std::toupper(c); });
+	std::transform(r.begin(), r.end(), r.begin(), [](unsigned char c) {
+		return std::toupper(c);
+	});
 	return r;
 }
 
 
-std::string trim(const std::string &s) {
+std::string trim(const std::string& s) {
 	const std::string whitespace = " \n\r\t";
 	size_t first = s.find_first_not_of(whitespace);
 	if (first == std::string::npos)
@@ -66,7 +70,7 @@ std::string trim(const std::string &s) {
 }
 
 
-std::string ellipsize(const std::string &s, size_t len) {
+std::string ellipsize(const std::string& s, size_t len) {
 	if (s.size() <= len)
 		return s;
 	else
@@ -74,7 +78,7 @@ std::string ellipsize(const std::string &s, size_t len) {
 }
 
 
-std::string ellipsizePrefix(const std::string &s, size_t len) {
+std::string ellipsizePrefix(const std::string& s, size_t len) {
 	if (s.size() <= len)
 		return s;
 	else
@@ -82,33 +86,33 @@ std::string ellipsizePrefix(const std::string &s, size_t len) {
 }
 
 
-bool startsWith(const std::string &str, const std::string &prefix) {
+bool startsWith(const std::string& str, const std::string& prefix) {
 	return str.substr(0, prefix.size()) == prefix;
 }
 
 
-bool endsWith(const std::string &str, const std::string &suffix) {
+bool endsWith(const std::string& str, const std::string& suffix) {
 	return str.substr(str.size() - suffix.size(), suffix.size()) == suffix;
 }
 
 
-std::string directory(const std::string &path) {
-	char *pathDup = strdup(path.c_str());
+std::string directory(const std::string& path) {
+	char* pathDup = strdup(path.c_str());
 	std::string directory = dirname(pathDup);
 	free(pathDup);
 	return directory;
 }
 
 
-std::string filename(const std::string &path) {
-	char *pathDup = strdup(path.c_str());
+std::string filename(const std::string& path) {
+	char* pathDup = strdup(path.c_str());
 	std::string filename = basename(pathDup);
 	free(pathDup);
 	return filename;
 }
 
 
-std::string filenameBase(const std::string &filename) {
+std::string filenameBase(const std::string& filename) {
 	size_t pos = filename.rfind('.');
 	if (pos == std::string::npos)
 		return filename;
@@ -116,7 +120,7 @@ std::string filenameBase(const std::string &filename) {
 }
 
 
-std::string filenameExtension(const std::string &filename) {
+std::string filenameExtension(const std::string& filename) {
 	size_t pos = filename.rfind('.');
 	if (pos == std::string::npos)
 		return "";
@@ -124,16 +128,16 @@ std::string filenameExtension(const std::string &filename) {
 }
 
 
-std::string absolutePath(const std::string &path) {
+std::string absolutePath(const std::string& path) {
 #if defined ARCH_LIN || defined ARCH_MAC
 	char buf[PATH_MAX];
-	char *absPathC = realpath(path.c_str(), buf);
+	char* absPathC = realpath(path.c_str(), buf);
 	if (absPathC)
 		return absPathC;
 #elif defined ARCH_WIN
 	std::wstring pathW = toWstring(path);
 	wchar_t buf[PATH_MAX];
-	wchar_t *absPathC = _wfullpath(buf, pathW.c_str(), PATH_MAX);
+	wchar_t* absPathC = _wfullpath(buf, pathW.c_str(), PATH_MAX);
 	if (absPathC)
 		return fromWstring(absPathC);
 #endif
@@ -141,12 +145,12 @@ std::string absolutePath(const std::string &path) {
 }
 
 
-float fuzzyScore(const std::string &s, const std::string &query) {
+float fuzzyScore(const std::string& s, const std::string& query) {
 	size_t pos = s.find(query);
 	if (pos == std::string::npos)
 		return 0.f;
 
-	return (float) (query.size() + 1) / (s.size() + 1);
+	return (float)(query.size() + 1) / (s.size() + 1);
 }
 
 

@@ -11,7 +11,7 @@ struct Tooltip : widget::Widget {
 	std::string text;
 
 	void step() override;
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 

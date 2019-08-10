@@ -20,11 +20,11 @@ struct Knob : ParamWidget {
 	/** Drag horizontally instead of vertically */
 	bool horizontal = false;
 
-	void onHover(const event::Hover &e) override;
-	void onButton(const event::Button &e) override;
-	void onDragStart(const event::DragStart &e) override;
-	void onDragEnd(const event::DragEnd &e) override;
-	void onDragMove(const event::DragMove &e) override;
+	void onHover(const event::Hover& e) override;
+	void onButton(const event::Button& e) override;
+	void onDragStart(const event::DragStart& e) override;
+	void onDragEnd(const event::DragEnd& e) override;
+	void onDragMove(const event::DragMove& e) override;
 	void reset() override;
 	void randomize() override;
 };

@@ -1,8 +1,8 @@
 #pragma once
 #include <simd/vector.hpp>
-#include <simd/sse_mathfun.h>
+#include <simd/sse_mathfun_extension.h>
+#include <common.hpp>
 #include <math.hpp>
-#include <cmath>
 
 
 namespace rack {
@@ -73,6 +73,24 @@ using std::cos;
 
 inline float_4 cos(float_4 x) {
 	return float_4(sse_mathfun_cos_ps(x.v));
+}
+
+using std::tan;
+
+inline float_4 tan(float_4 x) {
+	return float_4(sse_mathfun_tan_ps(x.v));
+}
+
+using std::atan;
+
+inline float_4 atan(float_4 x) {
+	return float_4(sse_mathfun_atan_ps(x.v));
+}
+
+using std::atan2;
+
+inline float_4 atan2(float_4 x, float_4 y) {
+	return float_4(sse_mathfun_atan2_ps(x.v, y.v));
 }
 
 using std::floor;

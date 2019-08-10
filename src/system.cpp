@@ -2,8 +2,10 @@
 #include <string.hpp>
 
 #include <thread>
+#include <regex>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <cxxabi.h> // for __cxxabiv1::__cxa_demangle
 
 #if defined ARCH_LIN || defined ARCH_MAC
 	#include <pthread.h>
@@ -25,11 +27,11 @@ namespace rack {
 namespace system {
 
 
-std::list<std::string> getEntries(const std::string &path) {
+std::list<std::string> getEntries(const std::string& path) {
 	std::list<std::string> filenames;
-	DIR *dir = opendir(path.c_str());
+	DIR* dir = opendir(path.c_str());
 	if (dir) {
-		struct dirent *d;
+		struct dirent* d;
 		while ((d = readdir(dir))) {
 			std::string filename = d->d_name;
 			if (filename == "." || filename == "..")
@@ -43,7 +45,7 @@ std::list<std::string> getEntries(const std::string &path) {
 }
 
 
-bool isFile(const std::string &path) {
+bool isFile(const std::string& path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
@@ -51,7 +53,7 @@ bool isFile(const std::string &path) {
 }
 
 
-bool isDirectory(const std::string &path) {
+bool isDirectory(const std::string& path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
@@ -59,7 +61,7 @@ bool isDirectory(const std::string &path) {
 }
 
 
-void moveFile(const std::string &srcPath, const std::string &destPath) {
+void moveFile(const std::string& srcPath, const std::string& destPath) {
 	std::remove(destPath.c_str());
 	// Whether this overwrites existing files is implementation-defined.
 	// i.e. Mingw64 fails to overwrite.
@@ -68,23 +70,23 @@ void moveFile(const std::string &srcPath, const std::string &destPath) {
 }
 
 
-void copyFile(const std::string &srcPath, const std::string &destPath) {
+void copyFile(const std::string& srcPath, const std::string& destPath) {
 	// Open source
-	FILE *source = fopen(srcPath.c_str(), "rb");
+	FILE* source = fopen(srcPath.c_str(), "rb");
 	if (!source)
 		return;
 	DEFER({
 		fclose(source);
 	});
 	// Open destination
-	FILE *dest = fopen(destPath.c_str(), "wb");
+	FILE* dest = fopen(destPath.c_str(), "wb");
 	if (!dest)
 		return;
 	DEFER({
 		fclose(dest);
 	});
 	// Copy buffer
-	const int bufferSize = (1<<15);
+	const int bufferSize = (1 << 15);
 	char buffer[bufferSize];
 	while (1) {
 		size_t size = fread(buffer, 1, bufferSize, source);
@@ -97,7 +99,7 @@ void copyFile(const std::string &srcPath, const std::string &destPath) {
 }
 
 
-void createDirectory(const std::string &path) {
+void createDirectory(const std::string& path) {
 #if defined ARCH_WIN
 	std::wstring pathW = string::toWstring(path);
 	CreateDirectoryW(pathW.c_str(), NULL);
@@ -112,7 +114,7 @@ int getLogicalCoreCount() {
 }
 
 
-void setThreadName(const std::string &name) {
+void setThreadName(const std::string& name) {
 #if defined ARCH_LIN
 	pthread_setname_np(pthread_self(), name.c_str());
 #elif defined ARCH_WIN
@@ -157,25 +159,69 @@ void setThreadRealTime(bool realTime) {
 }
 
 
+double getThreadTime() {
+#if defined ARCH_LIN || defined ARCH_MAC
+	struct timespec ts;
+	clockid_t cid;
+	pthread_getcpuclockid(pthread_self(), &cid);
+	clock_gettime(cid, &ts);
+	return ts.tv_sec + ts.tv_nsec * 1e-9;
+#elif defined ARCH_WIN
+	FILETIME creationTime;
+	FILETIME exitTime;
+	FILETIME kernelTime;
+	FILETIME userTime;
+	GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime);
+	return ((((uint64_t) userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
+#endif
+}
+
+
 std::string getStackTrace() {
 	int stackLen = 128;
-	void *stack[stackLen];
+	void* stack[stackLen];
 	std::string s;
 
 #if defined ARCH_LIN || defined ARCH_MAC
 	stackLen = backtrace(stack, stackLen);
-	char **strings = backtrace_symbols(stack, stackLen);
+	char** strings = backtrace_symbols(stack, stackLen);
 
+	// Skip the first line because it's this function.
 	for (int i = 1; i < stackLen; i++) {
-		s += string::f("%d: %s\n", stackLen - i - 1, strings[i]);
+		s += string::f("%d: ", stackLen - i - 1);
+		std::string line = strings[i];
+#if 0
+		// Parse line
+		std::regex r(R"((.*)\((.*)\+(.*)\) (.*))");
+		std::smatch match;
+		if (std::regex_search(line, match, r)) {
+			s += match[1].str();
+			s += "(";
+			std::string symbol = match[2].str();
+			// Demangle symbol
+			char* symbolD = __cxxabiv1::__cxa_demangle(symbol.c_str(), NULL, NULL, NULL);
+			if (symbolD) {
+				symbol = symbolD;
+				free(symbolD);
+			}
+			s += symbol;
+			s += "+";
+			s += match[3].str();
+			s += ")";
+		}
+#else
+		s += line;
+#endif
+		s += "\n";
 	}
 	free(strings);
+
 #elif defined ARCH_WIN
 	HANDLE process = GetCurrentProcess();
 	SymInitialize(process, NULL, true);
 	stackLen = CaptureStackBackTrace(0, stackLen, stack, NULL);
 
-	SYMBOL_INFO *symbol = (SYMBOL_INFO*) calloc(sizeof(SYMBOL_INFO) + 256, 1);
+	SYMBOL_INFO* symbol = (SYMBOL_INFO*) calloc(sizeof(SYMBOL_INFO) + 256, 1);
 	symbol->MaxNameLen = 255;
 	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
@@ -190,7 +236,7 @@ std::string getStackTrace() {
 }
 
 
-void openBrowser(const std::string &url) {
+void openBrowser(const std::string& url) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + url + "\"";
 	(void) std::system(command.c_str());
@@ -206,7 +252,7 @@ void openBrowser(const std::string &url) {
 }
 
 
-void openFolder(const std::string &path) {
+void openFolder(const std::string& path) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + path + "\"";
 	(void) std::system(command.c_str());
@@ -222,7 +268,7 @@ void openFolder(const std::string &path) {
 }
 
 
-void runProcessDetached(const std::string &path) {
+void runProcessDetached(const std::string& path) {
 #if defined ARCH_WIN
 	SHELLEXECUTEINFOW shExInfo;
 	ZeroMemory(&shExInfo, sizeof(shExInfo));

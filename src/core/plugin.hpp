@@ -5,27 +5,27 @@ namespace rack {
 namespace core {
 
 
-extern Model *modelAudioInterface;
-extern Model *modelAudioInterface16;
-extern Model *modelMIDI_CV;
-extern Model *modelMIDI_CC;
-extern Model *modelMIDI_Gate;
-extern Model *modelMIDI_Map;
-extern Model *modelCV_MIDI;
-extern Model *modelCV_CC;
-extern Model *modelCV_Gate;
-extern Model *modelBlank;
-extern Model *modelNotes;
+extern Model* modelAudioInterface;
+extern Model* modelAudioInterface16;
+extern Model* modelMIDI_CV;
+extern Model* modelMIDI_CC;
+extern Model* modelMIDI_Gate;
+extern Model* modelMIDI_Map;
+extern Model* modelCV_MIDI;
+extern Model* modelCV_CC;
+extern Model* modelCV_Gate;
+extern Model* modelBlank;
+extern Model* modelNotes;
 
 
 template <class TChoice>
 struct Grid16MidiWidget : MidiWidget {
-	LedDisplaySeparator *hSeparators[4];
-	LedDisplaySeparator *vSeparators[4];
-	TChoice *choices[4][4];
+	LedDisplaySeparator* hSeparators[4];
+	LedDisplaySeparator* vSeparators[4];
+	TChoice* choices[4][4];
 
 	template <class TModule>
-	void setModule(TModule *module) {
+	void setModule(TModule* module) {
 		Vec pos = channelChoice->box.getBottomLeft();
 		// Add vSeparators
 		for (int x = 1; x < 4; x++) {
@@ -41,7 +41,7 @@ struct Grid16MidiWidget : MidiWidget {
 			for (int x = 0; x < 4; x++) {
 				choices[x][y] = new TChoice;
 				choices[x][y]->box.pos = pos;
-				choices[x][y]->setId(4*y + x);
+				choices[x][y]->setId(4 * y + x);
 				choices[x][y]->box.size.x = box.size.x / 4;
 				choices[x][y]->box.pos.x = box.size.x / 4 * x;
 				choices[x][y]->setModule(module);
@@ -58,7 +58,7 @@ struct Grid16MidiWidget : MidiWidget {
 
 template <class TModule>
 struct CcChoice : LedDisplayChoice {
-	TModule *module;
+	TModule* module;
 	int id;
 	int focusCc;
 
@@ -67,7 +67,7 @@ struct CcChoice : LedDisplayChoice {
 		textOffset.y -= 4;
 	}
 
-	void setModule(TModule *module) {
+	void setModule(TModule* module) {
 		this->module = module;
 	}
 
@@ -97,7 +97,7 @@ struct CcChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelect(const event::Select &e) override {
+	void onSelect(const event::Select& e) override {
 		if (!module)
 			return;
 		module->learningId = id;
@@ -105,7 +105,7 @@ struct CcChoice : LedDisplayChoice {
 		e.consume(this);
 	}
 
-	void onDeselect(const event::Deselect &e) override {
+	void onDeselect(const event::Deselect& e) override {
 		if (!module)
 			return;
 		if (module->learningId == id) {
@@ -116,7 +116,7 @@ struct CcChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelectText(const event::SelectText &e) override {
+	void onSelectText(const event::SelectText& e) override {
 		int c = e.codepoint - '0';
 		if (0 <= c && c <= 9) {
 			if (focusCc < 0)
@@ -128,7 +128,7 @@ struct CcChoice : LedDisplayChoice {
 		e.consume(this);
 	}
 
-	void onSelectKey(const event::SelectKey &e) override {
+	void onSelectKey(const event::SelectKey& e) override {
 		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) {
 			event::Deselect eDeselect;
 			onDeselect(eDeselect);
@@ -141,7 +141,7 @@ struct CcChoice : LedDisplayChoice {
 
 template <class TModule>
 struct NoteChoice : LedDisplayChoice {
-	TModule *module;
+	TModule* module;
 	int id;
 
 	NoteChoice() {
@@ -154,7 +154,7 @@ struct NoteChoice : LedDisplayChoice {
 		this->id = id;
 	}
 
-	void setModule(TModule *module) {
+	void setModule(TModule* module) {
 		this->module = module;
 	}
 
@@ -169,7 +169,7 @@ struct NoteChoice : LedDisplayChoice {
 		}
 		else {
 			uint8_t note = module->learnedNotes[id];
-			static const char *noteNames[] = {
+			static const char* noteNames[] = {
 				"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
 			};
 			int oct = note / 12 - 1;
@@ -183,14 +183,14 @@ struct NoteChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelect(const event::Select &e) override {
+	void onSelect(const event::Select& e) override {
 		if (!module)
 			return;
 		module->learningId = id;
 		e.consume(this);
 	}
 
-	void onDeselect(const event::Deselect &e) override {
+	void onDeselect(const event::Deselect& e) override {
 		if (!module)
 			return;
 		if (module->learningId == id) {

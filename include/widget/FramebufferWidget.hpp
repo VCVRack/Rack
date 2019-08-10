@@ -15,7 +15,7 @@ struct FramebufferWidget : Widget {
 	bool dirty = true;
 	bool bypass = false;
 	float oversample = 1.0;
-	NVGLUframebuffer *fb = NULL;
+	NVGLUframebuffer* fb = NULL;
 	/** Scale relative to the world */
 	math::Vec scale;
 	/** Offset in world coordinates */
@@ -34,7 +34,7 @@ struct FramebufferWidget : Widget {
 	FramebufferWidget();
 	~FramebufferWidget();
 	void step() override;
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 	virtual void drawFramebuffer();
 	int getImageHandle();
 };

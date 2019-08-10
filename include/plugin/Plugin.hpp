@@ -18,7 +18,7 @@ struct Plugin {
 	/** The file path to the plugin's directory */
 	std::string path;
 	/** OS-dependent library handle */
-	void *handle = NULL;
+	void* handle = NULL;
 
 	/** Must be unique. Used for saving patches. Never change this after releasing your plugin.
 	To guarantee uniqueness, it is a good idea to prefix the slug by your "company name" if available, e.g. "MyCompany-MyPlugin"
@@ -63,9 +63,9 @@ struct Plugin {
 	double modifiedTimestamp = -INFINITY;
 
 	~Plugin();
-	void addModel(Model *model);
-	Model *getModel(std::string slug);
-	void fromJson(json_t *rootJ);
+	void addModel(Model* model);
+	Model* getModel(std::string slug);
+	void fromJson(json_t* rootJ);
 };
 
 

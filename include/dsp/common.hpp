@@ -53,23 +53,23 @@ T dbToAmplitude(T db) {
 
 template <typename T>
 T quadraticBipolar(T x) {
-	return simd::sgn(x) * (x*x);
+	return simd::sgn(x) * (x * x);
 }
 
 template <typename T>
 T cubic(T x) {
-	return x*x*x;
+	return x * x * x;
 }
 
 template <typename T>
 T quarticBipolar(T x) {
-	return simd::sgn(x) * (x*x*x*x);
+	return simd::sgn(x) * (x * x * x * x);
 }
 
 template <typename T>
 T quintic(T x) {
 	// optimal with -fassociative-math
-	return x*x*x*x*x;
+	return x * x * x * x * x;
 }
 
 template <typename T>

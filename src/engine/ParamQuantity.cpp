@@ -7,7 +7,7 @@ namespace rack {
 namespace engine {
 
 
-engine::Param *ParamQuantity::getParam() {
+engine::Param* ParamQuantity::getParam() {
 	assert(module);
 	return &module->params[paramId];
 }

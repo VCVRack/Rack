@@ -13,18 +13,20 @@ namespace app {
 
 /** A knob which rotates an SVG and caches it in a framebuffer */
 struct SvgKnob : Knob {
-	widget::FramebufferWidget *fb;
-	CircularShadow *shadow;
-	widget::TransformWidget *tw;
-	widget::SvgWidget *sw;
+	widget::FramebufferWidget* fb;
+	CircularShadow* shadow;
+	widget::TransformWidget* tw;
+	widget::SvgWidget* sw;
 	/** Angles in radians */
 	float minAngle = 0.f;
 	float maxAngle = M_PI;
 
 	SvgKnob();
 	void setSvg(std::shared_ptr<Svg> svg);
-	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {setSvg(svg);}
-	void onChange(const event::Change &e) override;
+	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {
+		setSvg(svg);
+	}
+	void onChange(const event::Change& e) override;
 };
 
 

@@ -20,7 +20,7 @@ struct Label : widget::Widget {
 	Alignment alignment = LEFT_ALIGNMENT;
 
 	Label();
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 

@@ -5,7 +5,7 @@ namespace rack {
 namespace core {
 
 
-void init(rack::Plugin *p) {
+void init(rack::Plugin* p) {
 	p->addModel(modelAudioInterface);
 	p->addModel(modelAudioInterface16);
 	p->addModel(modelMIDI_CV);

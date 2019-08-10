@@ -45,8 +45,8 @@ static const NVGcolor SCHEME_DARK_GRAY = nvgRGB(0x17, 0x17, 0x17);
 
 struct RoundKnob : app::SvgKnob {
 	RoundKnob() {
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
+		minAngle = -0.83 * M_PI;
+		maxAngle = 0.83 * M_PI;
 	}
 };
 
@@ -83,8 +83,8 @@ struct RoundBlackSnapKnob : RoundBlackKnob {
 
 struct Davies1900hKnob : app::SvgKnob {
 	Davies1900hKnob() {
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
+		minAngle = -0.83 * M_PI;
+		maxAngle = 0.83 * M_PI;
 	}
 };
 
@@ -127,8 +127,8 @@ struct Davies1900hLargeRedKnob : Davies1900hKnob {
 
 struct Rogan : app::SvgKnob {
 	Rogan() {
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
+		minAngle = -0.83 * M_PI;
+		maxAngle = 0.83 * M_PI;
 	}
 };
 
@@ -297,12 +297,12 @@ struct Rogan1PWhite : Rogan {
 
 struct SynthTechAlco : app::SvgKnob {
 	SynthTechAlco() {
-		minAngle = -0.82*M_PI;
-		maxAngle = 0.82*M_PI;
+		minAngle = -0.82 * M_PI;
+		maxAngle = 0.82 * M_PI;
 		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/SynthTechAlco.svg")));
 		// Add cap
-		widget::FramebufferWidget *capFb = new widget::FramebufferWidget;
-		widget::SvgWidget *cap = new widget::SvgWidget;
+		widget::FramebufferWidget* capFb = new widget::FramebufferWidget;
+		widget::SvgWidget* cap = new widget::SvgWidget;
 		cap->setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/SynthTechAlco_cap.svg")));
 		capFb->addChild(cap);
 		addChild(capFb);
@@ -311,16 +311,16 @@ struct SynthTechAlco : app::SvgKnob {
 
 struct Trimpot : app::SvgKnob {
 	Trimpot() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = -0.75 * M_PI;
+		maxAngle = 0.75 * M_PI;
 		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/Trimpot.svg")));
 	}
 };
 
 struct BefacoBigKnob : app::SvgKnob {
 	BefacoBigKnob() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = -0.75 * M_PI;
+		maxAngle = 0.75 * M_PI;
 		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/BefacoBigKnob.svg")));
 	}
 };
@@ -333,8 +333,8 @@ struct BefacoBigSnapKnob : BefacoBigKnob {
 
 struct BefacoTinyKnob : app::SvgKnob {
 	BefacoTinyKnob() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+		minAngle = -0.75 * M_PI;
+		maxAngle = 0.75 * M_PI;
 		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/BefacoTinyKnob.svg")));
 	}
 };
@@ -444,6 +444,12 @@ struct YellowLight : GrayModuleLightWidget {
 struct BlueLight : GrayModuleLightWidget {
 	BlueLight() {
 		addBaseColor(SCHEME_BLUE);
+	}
+};
+
+struct WhiteLight : GrayModuleLightWidget {
+	WhiteLight() {
+		addBaseColor(SCHEME_WHITE);
 	}
 };
 

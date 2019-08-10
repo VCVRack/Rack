@@ -9,9 +9,9 @@ namespace engine {
 
 struct Cable {
 	int id = -1;
-	Module *outputModule = NULL;
+	Module* outputModule = NULL;
 	int outputId;
-	Module *inputModule = NULL;
+	Module* inputModule = NULL;
 	int inputId;
 };
 

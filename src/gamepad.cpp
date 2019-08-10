@@ -12,7 +12,7 @@ struct Driver;
 
 
 static const int DRIVER = -10;
-static Driver *driver = NULL;
+static Driver* driver = NULL;
 
 
 struct InputDevice : midi::InputDevice {
@@ -25,9 +25,9 @@ struct InputDevice : midi::InputDevice {
 
 		// Get gamepad state
 		int numAxes;
-		const float *axes = glfwGetJoystickAxes(deviceId, &numAxes);
+		const float* axes = glfwGetJoystickAxes(deviceId, &numAxes);
 		int numButtons;
-		const unsigned char *buttons = glfwGetJoystickButtons(deviceId, &numButtons);
+		const unsigned char* buttons = glfwGetJoystickButtons(deviceId, &numButtons);
 
 		// Convert axes and buttons to MIDI CC
 		int numCcs = std::min(numAxes + numButtons, 128);
@@ -68,7 +68,9 @@ struct Driver : midi::Driver {
 		}
 	}
 
-	std::string getName() override {return "Gamepad";}
+	std::string getName() override {
+		return "Gamepad";
+	}
 
 	std::vector<int> getInputDeviceIds() override {
 		std::vector<int> deviceIds;
@@ -84,14 +86,14 @@ struct Driver : midi::Driver {
 		if (!(0 <= deviceId && deviceId < 16))
 			return "";
 
-		const char *name = glfwGetJoystickName(deviceId);
+		const char* name = glfwGetJoystickName(deviceId);
 		if (name) {
 			return name;
 		}
 		return string::f(" %d (unavailable)", deviceId + 1);
 	}
 
-	midi::InputDevice *subscribeInput(int deviceId, midi::Input *input) override {
+	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < 16))
 			return NULL;
 
@@ -99,7 +101,7 @@ struct Driver : midi::Driver {
 		return &devices[deviceId];
 	}
 
-	void unsubscribeInput(int deviceId, midi::Input *input) override {
+	void unsubscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < 16))
 			return;
 

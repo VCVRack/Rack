@@ -20,7 +20,7 @@ void Tooltip::step() {
 	Widget::step();
 }
 
-void Tooltip::draw(const DrawArgs &args) {
+void Tooltip::draw(const DrawArgs& args) {
 	bndTooltipBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 	bndMenuLabel(args.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
 	Widget::draw(args);

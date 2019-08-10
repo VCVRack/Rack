@@ -24,11 +24,11 @@ void Switch::step() {
 	ParamWidget::step();
 }
 
-void Switch::onDoubleClick(const event::DoubleClick &e) {
+void Switch::onDoubleClick(const event::DoubleClick& e) {
 	// Don't reset parameter on double-click
 }
 
-void Switch::onDragStart(const event::DragStart &e) {
+void Switch::onDragStart(const event::DragStart& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -54,7 +54,7 @@ void Switch::onDragStart(const event::DragStart &e) {
 			float newValue = paramQuantity->getValue();
 			if (oldValue != newValue) {
 				// Push ParamChange history action
-				history::ParamChange *h = new history::ParamChange;
+				history::ParamChange* h = new history::ParamChange;
 				h->name = "move switch";
 				h->moduleId = paramQuantity->module->id;
 				h->paramId = paramQuantity->paramId;
@@ -66,7 +66,7 @@ void Switch::onDragStart(const event::DragStart &e) {
 	}
 }
 
-void Switch::onDragEnd(const event::DragEnd &e) {
+void Switch::onDragEnd(const event::DragEnd& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
