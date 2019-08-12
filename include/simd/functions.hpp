@@ -204,9 +204,10 @@ inline float_4 sgn(float_4 x) {
 	return signbit | (nonzero & 1.f);
 }
 
-/** Given a mask `a`, returns a vector with each element either 0's or 1's depending on the mask bit. */
+/** Given a mask `a`, returns a vector with each element either 0's or 1's depending on the mask bit.
+*/
 template <typename T>
-inline T movemaskInverse(int a);
+T movemaskInverse(int a);
 
 template <>
 inline float_4 movemaskInverse<float_4>(int x) {
