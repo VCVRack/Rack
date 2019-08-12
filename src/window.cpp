@@ -130,7 +130,6 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 		window->internal->ignoreNextMouseDelta = false;
 		mouseDelta = math::Vec();
 	}
-	DEBUG("(%f %f) (%f %f)", VEC_ARGS(mouseDelta), VEC_ARGS(mousePos));
 
 	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
 	(void) cursorMode;
