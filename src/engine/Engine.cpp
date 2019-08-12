@@ -229,11 +229,21 @@ static void Engine_stepModules(Engine* that, int threadId) {
 
 	// int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
-	float sampleTime = internal->sampleTime;
 
-	Module::ProcessArgs processCtx;
-	processCtx.sampleRate = internal->sampleRate;
-	processCtx.sampleTime = internal->sampleTime;
+	Module::ProcessArgs processArgs;
+	processArgs.sampleRate = internal->sampleRate;
+	processArgs.sampleTime = internal->sampleTime;
+
+	// Set up CPU meter
+	// Prime number to avoid synchronizing with power-of-2 buffers
+	const int timerDivider = 7;
+	bool timerEnabled = settings::cpuMeter && (internal->frame % timerDivider) == 0;
+	double timerOverhead = 0.f;
+	if (timerEnabled) {
+		double startTime = system::getThreadTime();
+		double stopTime = system::getThreadTime();
+		timerOverhead = stopTime - startTime;
+	}
 
 	// Step each module
 	// for (int i = threadId; i < modulesLen; i += threadCount) {
@@ -246,28 +256,27 @@ static void Engine_stepModules(Engine* that, int threadId) {
 		Module* module = internal->modules[i];
 		if (!module->bypass) {
 			// Step module
-			if (settings::cpuMeter) {
+			if (timerEnabled) {
 				double startTime = system::getThreadTime();
-
-				module->process(processCtx);
-
+				module->process(processArgs);
 				double stopTime = system::getThreadTime();
-				float cpuTime = stopTime - startTime;
+
+				float cpuTime = std::fmax(0.f, stopTime - startTime - timerOverhead);
 				// Smooth CPU time
 				const float cpuTau = 2.f /* seconds */;
-				module->cpuTime += (cpuTime - module->cpuTime) * sampleTime / cpuTau;
+				module->cpuTime += (cpuTime - module->cpuTime) * timerDivider * processArgs.sampleTime / cpuTau;
 			}
 			else {
-				module->process(processCtx);
+				module->process(processArgs);
 			}
 		}
 
 		// Iterate ports to step plug lights
 		for (Input& input : module->inputs) {
-			input.process(sampleTime);
+			input.process(processArgs.sampleTime);
 		}
 		for (Output& output : module->outputs) {
-			output.process(sampleTime);
+			output.process(processArgs.sampleTime);
 		}
 	}
 }
