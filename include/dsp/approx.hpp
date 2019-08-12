@@ -12,9 +12,11 @@ The functionality is the first part, and the approximation methods are the follo
 
 Glossary:
 https://en.wikipedia.org/wiki/Taylor_series
+https://en.wikipedia.org/wiki/Chebyshev_polynomials
 https://en.wikipedia.org/wiki/Pad%C3%A9_approximant
 https://en.wikipedia.org/wiki/Horner%27s_method
 https://en.wikipedia.org/wiki/Estrin%27s_scheme
+https://en.wikipedia.org/wiki/CORDIC
 */
 
 
