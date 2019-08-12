@@ -15,6 +15,11 @@
 	#include <sys/utsname.h>
 #endif
 
+#if defined ARCH_MAC
+	#include <mach/mach_init.h>
+	#include <mach/thread_act.h>
+#endif
+
 #if defined ARCH_WIN
 	#include <windows.h>
 	#include <shellapi.h>
@@ -160,12 +165,20 @@ void setThreadRealTime(bool realTime) {
 
 
 double getThreadTime() {
-#if defined ARCH_LIN || defined ARCH_MAC
+#if defined ARCH_LIN
 	struct timespec ts;
 	clockid_t cid;
 	pthread_getcpuclockid(pthread_self(), &cid);
 	clock_gettime(cid, &ts);
 	return ts.tv_sec + ts.tv_nsec * 1e-9;
+#elif defined ARCH_MAC
+	mach_port_t thread = mach_thread_self();
+	mach_msg_type_number_t count = THREAD_BASIC_INFO_COUNT;
+	thread_basic_info_data_t info;
+	kern_return_t kr = thread_info(thread, THREAD_BASIC_INFO, (thread_info_t) &info, &count);
+	if (kr != KERN_SUCCESS || (info.flags & TH_FLAGS_IDLE) != 0)
+		return 0.0;
+	return info.user_time.seconds + info.user_time.microseconds * 1e-6;
 #elif defined ARCH_WIN
 	FILETIME creationTime;
 	FILETIME exitTime;
