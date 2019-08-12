@@ -152,7 +152,7 @@ inline Vector<float, 4>::Vector(Vector<int32_t, 4> a) {
 }
 
 inline Vector<int32_t, 4>::Vector(Vector<float, 4> a) {
-	v = _mm_cvtps_epi32(a.v);
+	v = _mm_cvttps_epi32(a.v);
 }
 
 inline Vector<float, 4> Vector<float, 4>::cast(Vector<int32_t, 4> a) {
@@ -344,6 +344,16 @@ inline Vector<float, 4> operator~(const Vector<float, 4>& a) {
 }
 inline Vector<int32_t, 4> operator~(const Vector<int32_t, 4>& a) {
 	return a ^ Vector<int32_t, 4>::mask();
+}
+
+/** `a << b` */
+inline Vector<int32_t, 4> operator<<(const Vector<int32_t, 4>& a, const int& b) {
+	return Vector<int32_t, 4>(_mm_slli_epi32(a.v, b));
+}
+
+/** `a >> b` */
+inline Vector<int32_t, 4> operator>>(const Vector<int32_t, 4>& a, const int& b) {
+	return Vector<int32_t, 4>(_mm_srli_epi32(a.v, b));
 }
 
 
