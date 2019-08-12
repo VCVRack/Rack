@@ -17,11 +17,15 @@ namespace rack {
 namespace engine {
 
 
-static void disableDenormals() {
+static void initMXCSR() {
 	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
 	// https://software.intel.com/en-us/node/682949
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+	// Reset other flags
+	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
+	_MM_SET_EXCEPTION_MASK(0);
+	_MM_SET_EXCEPTION_STATE(0);
 }
 
 
@@ -405,7 +409,7 @@ static void Engine_run(Engine* that) {
 	// Set up thread
 	system::setThreadName("Engine");
 	// system::setThreadRealTime();
-	disableDenormals();
+	initMXCSR();
 
 	internal->frame = 0;
 	// Every time the that waits and locks a mutex, it steps this many frames
@@ -835,7 +839,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int moduleId, int param
 void EngineWorker::run() {
 	system::setThreadName("Engine worker");
 	system::setThreadRealTime(engine->internal->realTime);
-	disableDenormals();
+	initMXCSR();
 
 	while (1) {
 		engine->internal->engineBarrier.wait();

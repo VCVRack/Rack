@@ -36,7 +36,7 @@ inline simd::float_4 approxExp2Floor(simd::float_4 x, simd::float_4* xf) {
 }
 
 template <>
-inline float approxExp2Floor<float>(float x, float* xf) {
+inline float approxExp2Floor(float x, float* xf) {
 	int xi = x;
 	if (xf)
 		*xf = x - xi;
@@ -46,7 +46,8 @@ inline float approxExp2Floor<float>(float x, float* xf) {
 
 /** Returns 2^x, assuming that x >= 0.
 Maximum 0.00024% error.
-Roughly 7x faster than `std::pow(2, x)`.
+For float, roughly 3x faster than `std::pow(2.f, x)`.
+For float_4, roughly 2x faster than `simd::pow(2.f, x)`.
 
 If negative powers are needed, you may use a lower bound and rescale.
 
