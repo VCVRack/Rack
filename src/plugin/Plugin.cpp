@@ -2,6 +2,7 @@
 #include <plugin/Model.hpp>
 #include <plugin.hpp>
 #include <string.hpp>
+#include <app/common.hpp>
 
 
 namespace rack {
@@ -45,6 +46,8 @@ void Plugin::fromJson(json_t* rootJ) {
 	json_t* versionJ = json_object_get(rootJ, "version");
 	if (versionJ)
 		version = json_string_value(versionJ);
+	if (!string::startsWith(version, app::ABI_VERSION + "."))
+		throw UserException(string::f("Plugin version %s does not match Rack ABI version %s", version.c_str(), app::ABI_VERSION.c_str()));
 	if (version == "")
 		throw UserException("No plugin version");
 

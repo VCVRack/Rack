@@ -114,13 +114,12 @@ static Plugin* loadPlugin(std::string path) {
 #endif
 			}
 		}
-		// DEBUG("%lf", plugin->modifiedTimestamp);
 
 		// Load plugin.json
-		std::string metadataFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
-		FILE* file = fopen(metadataFilename.c_str(), "r");
+		std::string manifestFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
+		FILE* file = fopen(manifestFilename.c_str(), "r");
 		if (!file) {
-			throw UserException(string::f("Metadata file %s does not exist", metadataFilename.c_str()));
+			throw UserException(string::f("Manifest file %s does not exist", manifestFilename.c_str()));
 		}
 		DEFER({
 			fclose(file);
@@ -129,7 +128,7 @@ static Plugin* loadPlugin(std::string path) {
 		json_error_t error;
 		json_t* rootJ = json_loadf(file, 0, &error);
 		if (!rootJ) {
-			throw UserException(string::f("JSON parsing error at %s %d:%d %s", metadataFilename.c_str(), error.line, error.column, error.text));
+			throw UserException(string::f("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text));
 		}
 		DEFER({
 			json_decref(rootJ);
