@@ -625,6 +625,9 @@ void RackWidget::setIncompleteCable(CableWidget* w) {
 }
 
 CableWidget* RackWidget::releaseIncompleteCable() {
+	if (!incompleteCable)
+		return NULL;
+
 	CableWidget* cw = incompleteCable;
 	cableContainer->removeChild(incompleteCable);
 	incompleteCable = NULL;

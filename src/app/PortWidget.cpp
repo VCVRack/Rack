@@ -139,6 +139,9 @@ void PortWidget::onDragEnd(const event::DragEnd& e) {
 		return;
 
 	CableWidget* cw = APP->scene->rack->releaseIncompleteCable();
+	if (!cw)
+		return;
+
 	if (cw->isComplete()) {
 		APP->scene->rack->addCable(cw);
 
