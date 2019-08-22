@@ -534,7 +534,12 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 	for (widget::Widget* w : moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
-		math::Vec pos = moduleDragPositions.at(mw->module->id);
+		// It is possible to add modules to the rack while dragging, so ignore modules that don't exist.
+		auto it = moduleDragPositions.find(mw->module->id);
+		if (it == moduleDragPositions.end())
+			continue;
+		// Create ModuleMove action if the module was moved.
+		math::Vec pos = it->second;
 		if (!pos.isEqual(mw->box.pos)) {
 			history::ModuleMove* mmh = new history::ModuleMove;
 			mmh->moduleId = mw->module->id;
