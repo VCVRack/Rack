@@ -154,5 +154,94 @@ float fuzzyScore(const std::string& s, const std::string& query) {
 }
 
 
+std::string toBase64(const uint8_t* data, size_t len) {
+	static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+	size_t numBlocks = size_t((len + 2) / 3);
+	size_t strLen = numBlocks * 4;
+	std::string str;
+	str.reserve(strLen);
+
+	for (size_t b = 0; b < numBlocks; b++) {
+		// Encode block
+		uint32_t block = 0;
+		int i;
+		for (i = 0; i < 3 && 3 * b + i < len; i++) {
+			block |= uint32_t(data[3 * b + i]) << (8 * (2 - i));
+		}
+
+		// Decode block
+		str += alphabet[(block >> 18) & 0x3f];
+		str += alphabet[(block >> 12) & 0x3f];
+		str += (i > 1) ? alphabet[(block >> 6) & 0x3f] : '=';
+		str += (i > 2) ? alphabet[(block >> 0) & 0x3f] : '=';
+	}
+	return str;
+}
+
+
+uint8_t* fromBase64(const std::string& str, size_t* outLen) {
+	size_t strLen = str.size();
+	if (strLen % 4 != 0)
+		return NULL;
+
+	size_t numBlocks = strLen / 4;
+	size_t len = numBlocks * 3;
+	if (strLen >= 4) {
+		if (str[strLen - 1] == '=')
+			len--;
+		if (str[strLen - 2] == '=')
+			len--;
+	}
+	if (outLen)
+		*outLen = len;
+
+	uint8_t* data = new uint8_t[len];
+
+	for (size_t b = 0; b < numBlocks; b++) {
+		// Encode block
+		uint32_t block = 0;
+		size_t i;
+		for (i = 0; i < 4; i++) {
+			uint8_t c = str[4 * b + i];
+			uint8_t d = 0;
+
+			if ('A' <= c && c <= 'Z') {
+				d = c - 'A';
+			}
+			else if ('a' <= c && c <= 'z') {
+				d = c - 'a' + 26;
+			}
+			else if ('0' <= c && c <= '9') {
+				d = c - '0' + 52;
+			}
+			else if (c == '+') {
+				d = 62;
+			}
+			else if (c == '/') {
+				d = 63;
+			}
+			else if (c == '=') {
+				// Padding ends block encoding
+				break;
+			}
+			else {
+				// Ignore invalid characters, such as whitespace.
+				continue;
+			}
+
+			block |= uint32_t(d) << (6 * (3 - i));
+		}
+
+		// Decode block
+		for (size_t k = 0; k < i - 1; k++) {
+			data[3 * b + k] = (block >> (8 * (2 - k))) & 0xff;
+		}
+	}
+
+	return data;
+}
+
+
 } // namespace string
 } // namespace rack

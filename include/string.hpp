@@ -57,6 +57,16 @@ A score of 0 means no match.
 The score is arbitrary and is only meaningful for sorting.
 */
 float fuzzyScore(const std::string& s, const std::string& query);
+/** Converts a byte array to a Base64-encoded string.
+https://en.wikipedia.org/wiki/Base64
+*/
+std::string toBase64(const uint8_t* data, size_t len);
+/** Converts a Base64-encoded string to a byte array.
+`outLen` is set to the length of the byte array.
+If non-NULL, caller must delete[] the result.
+*/
+uint8_t* fromBase64(const std::string& str, size_t* outLen);
+
 
 struct CaseInsensitiveCompare {
 	bool operator()(const std::string& a, const std::string& b) const {
