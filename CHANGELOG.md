@@ -2,7 +2,7 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
-### 1.1.4 (in development)
+### 1.1.4 (2019-08-22)
 - Fix parameter smoothing of MIDI-Map.
 - Sort modules within plugin in the Module Browser according to plugin rather than alphabetically.
 - Fix bug where knobs sometimes jump while dragging.
