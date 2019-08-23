@@ -180,12 +180,18 @@ double getThreadTime() {
 		return 0.0;
 	return info.user_time.seconds + info.user_time.microseconds * 1e-6;
 #elif defined ARCH_WIN
-	FILETIME creationTime;
-	FILETIME exitTime;
-	FILETIME kernelTime;
-	FILETIME userTime;
-	GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime);
-	return ((((uint64_t) userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
+	// FILETIME creationTime;
+	// FILETIME exitTime;
+	// FILETIME kernelTime;
+	// FILETIME userTime;
+	// GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime);
+	// return ((uint64_t(userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
+
+	uint64_t cycles;
+	QueryThreadCycleTime(GetCurrentThread(), &cycles);
+	// HACK Assume that the RDTSC Time-Step Counter instruction is fixed at 2.5GHz. This should only be within a factor of 2 on all PCs.
+	const double freq = 2.5e9;
+	return (double) cycles / freq;
 #endif
 }
 
