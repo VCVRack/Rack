@@ -1,0 +1,36 @@
+Clone this repository with git clone https://github.com/VCVRack/Rack.git and cd Rack. Make sure there are no spaces in your absolute path, since this breaks the Makefile-based build system.
+
+Clone submodules.
+
+git submodule update --init --recursive
+Build dependencies locally. You may add -j4 (or your number of logical cores) to your make commands to parallelize builds. This may take 15-60 minutes.
+
+make dep
+Build Rack. This may take 1-5 minutes.
+
+make
+Run Rack.
+
+make run
+Building Rack plugins
+Complete the Setting up your development environment section.
+
+Plugins can be built in two ways:
+
+Build Rack from source and build plugins in the plugins/ folder. (Recommended for advanced developers.)
+Download an official Rack build and Rack-SDK-1.1.2.zip, and build plugins anywhere you like. (Easiest/fastest.)
+Download or clone the plugin source code, e.g.
+
+git clone https://github.com/VCVRack/Fundamental.git
+Clone the git repo’s submodules.
+
+cd Fundamental
+git submodule update --init --recursive
+If using the Rack SDK, set the RACK_DIR environment variable by prefixing each of the following commands with RACK_DIR=<Rack SDK dir>.
+
+Build plugin dependencies. (Most plugins don’t require this step.)
+
+make dep
+Build the plugin.
+
+make
