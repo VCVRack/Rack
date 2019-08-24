@@ -11,13 +11,15 @@ namespace app {
 
 
 struct SvgPort : PortWidget {
-	widget::FramebufferWidget *fb;
-	CircularShadow *shadow;
-	widget::SvgWidget *sw;
+	widget::FramebufferWidget* fb;
+	CircularShadow* shadow;
+	widget::SvgWidget* sw;
 
 	SvgPort();
 	void setSvg(std::shared_ptr<Svg> svg);
-	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {setSvg(svg);}
+	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {
+		setSvg(svg);
+	}
 };
 
 

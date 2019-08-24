@@ -12,7 +12,7 @@ namespace engine {
 
 struct Engine {
 	struct Internal;
-	Internal *internal;
+	Internal* internal;
 
 	Engine();
 	~Engine();
@@ -37,12 +37,12 @@ struct Engine {
 	If the module ID is -1, an ID is automatically assigned.
 	Does not transfer pointer ownership.
 	*/
-	void addModule(Module *module);
-	void removeModule(Module *module);
-	Module *getModule(int moduleId);
-	void resetModule(Module *module);
-	void randomizeModule(Module *module);
-	void bypassModule(Module *module, bool bypass);
+	void addModule(Module* module);
+	void removeModule(Module* module);
+	Module* getModule(int moduleId);
+	void resetModule(Module* module);
+	void randomizeModule(Module* module);
+	void bypassModule(Module* module, bool bypass);
 
 	// Cables
 	/** Adds a cable to the rack engine.
@@ -50,26 +50,26 @@ struct Engine {
 	If the cable ID is -1, an ID is automatically assigned.
 	Does not transfer pointer ownership.
 	*/
-	void addCable(Cable *cable);
-	void removeCable(Cable *cable);
+	void addCable(Cable* cable);
+	void removeCable(Cable* cable);
 
 	// Params
-	void setParam(Module *module, int paramId, float value);
-	float getParam(Module *module, int paramId);
-	void setSmoothParam(Module *module, int paramId, float value);
-	float getSmoothParam(Module *module, int paramId);
+	void setParam(Module* module, int paramId, float value);
+	float getParam(Module* module, int paramId);
+	void setSmoothParam(Module* module, int paramId, float value);
+	float getSmoothParam(Module* module, int paramId);
 
 	// ParamHandles
-	void addParamHandle(ParamHandle *paramHandle);
-	void removeParamHandle(ParamHandle *paramHandle);
+	void addParamHandle(ParamHandle* paramHandle);
+	void removeParamHandle(ParamHandle* paramHandle);
 	/** Returns the unique ParamHandle for the given paramId */
-	ParamHandle *getParamHandle(int moduleId, int paramId);
+	ParamHandle* getParamHandle(int moduleId, int paramId);
 	/** Use getParamHandle(int, int) instead. */
-	DEPRECATED ParamHandle *getParamHandle(Module *module, int paramId);
+	DEPRECATED ParamHandle* getParamHandle(Module* module, int paramId);
 	/** Sets the ParamHandle IDs and module pointer.
 	If `overwrite` is true and another ParamHandle points to the same param, unsets that one and replaces it with the given handle.
 	*/
-	void updateParamHandle(ParamHandle *paramHandle, int moduleId, int paramId, bool overwrite = true);
+	void updateParamHandle(ParamHandle* paramHandle, int moduleId, int paramId, bool overwrite = true);
 };
 
 

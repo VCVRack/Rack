@@ -6,12 +6,12 @@ namespace rack {
 namespace app {
 
 
-void LightWidget::draw(const DrawArgs &args) {
+void LightWidget::draw(const DrawArgs& args) {
 	drawLight(args);
 	drawHalo(args);
 }
 
-void LightWidget::drawLight(const DrawArgs &args) {
+void LightWidget::drawLight(const DrawArgs& args) {
 	float radius = box.size.x / 2.0;
 
 	nvgBeginPath(args.vg);
@@ -37,12 +37,12 @@ void LightWidget::drawLight(const DrawArgs &args) {
 	}
 }
 
-void LightWidget::drawHalo(const DrawArgs &args) {
+void LightWidget::drawHalo(const DrawArgs& args) {
 	float radius = box.size.x / 2.0;
 	float oradius = 4.0 * radius;
 
 	nvgBeginPath(args.vg);
-	nvgRect(args.vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
+	nvgRect(args.vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
 
 	NVGpaint paint;
 	NVGcolor icol = color::mult(color, 0.07);

@@ -1,4 +1,3 @@
-#pragma once
 /* Modified version of http://gruntthepeon.free.fr/ssemath/ for VCV Rack.
 
 The following changes were made.
@@ -6,7 +5,7 @@ The following changes were made.
 - Make all functions inline since this is a header file.
 - Remove non-SSE2 code, since Rack assumes SSE2 CPUs.
 - Move `const static` variables to function variables for clarity. See https://stackoverflow.com/a/52139901/272642 for explanation of why the performance is not worse.
-- Change header file to <emmintrin.h> since we're using SSE2 intrinsics.
+- Change header file to <pmmintrin.h> since we're using SSE2 intrinsics.
 - Prefix functions with `sse_mathfun_`.
 - Add floor, ceil, fmod.
 
@@ -43,8 +42,7 @@ This derived source file is released under the zlib license.
 
   (this is the zlib license)
 */
-
-
+#pragma once
 #include <pmmintrin.h>
 
 
@@ -376,7 +374,7 @@ inline __m128 sse_mathfun_cos_ps(__m128 x) { // any x
 
 /* since sin_ps and cos_ps are almost identical, sincos_ps could replace both of them..
    it is almost as fast, and gives you a free cosine with your sine */
-inline void sse_mathfun_sincos_ps(__m128 x, __m128 *s, __m128 *c) {
+inline void sse_mathfun_sincos_ps(__m128 x, __m128* s, __m128* c) {
 	__m128 xmm1, xmm2, xmm3 = _mm_setzero_ps(), sign_bit_sin, y;
 	__m128i emm0, emm2, emm4;
 	sign_bit_sin = x;
@@ -469,46 +467,4 @@ inline void sse_mathfun_sincos_ps(__m128 x, __m128 *s, __m128 *c) {
 	/* update the sign */
 	*s = _mm_xor_ps(xmm1, sign_bit_sin);
 	*c = _mm_xor_ps(xmm2, sign_bit_cos);
-}
-
-
-inline __m128 sse_mathfun_trunc_ps(__m128 a) {
-	return _mm_cvtepi32_ps(_mm_cvttps_epi32(a));
-}
-
-
-inline __m128 sse_mathfun_floor_ps(__m128 a) {
-	__m128 b = sse_mathfun_trunc_ps(a);
-	// If b > a, subtract 1 fom b
-	b = _mm_sub_ps(b, _mm_and_ps(_mm_cmpgt_ps(b, a), sse_mathfun_one_ps()));
-	return b;
-}
-
-
-inline __m128 sse_mathfun_ceil_ps(__m128 a) {
-	__m128 b = sse_mathfun_trunc_ps(a);
-	// If b < a, add 1 to b
-	b = _mm_add_ps(b, _mm_and_ps(_mm_cmplt_ps(b, a), sse_mathfun_one_ps()));
-	return b;
-}
-
-
-inline __m128 sse_mathfun_round_ps(__m128 a) {
-	// TODO Incorrect for -0.5, -1.5, etc.
-	return sse_mathfun_floor_ps(_mm_add_ps(a, _mm_set_ps1(0.5f)));
-}
-
-
-inline __m128 sse_mathfun_fmod_ps(__m128 a, __m128 b) {
-	__m128 c = _mm_div_ps(a, b);
-	c = sse_mathfun_trunc_ps(c);
-	c = _mm_mul_ps(c, b);
-	return _mm_sub_ps(a, c);
-}
-
-
-inline __m128 sse_mathfun_fabs_ps(__m128 a) {
-	__m128i minus1 = _mm_set1_epi32(-1);
-	__m128 abs_mask = _mm_castsi128_ps(_mm_srli_epi32(minus1, 1));
-	return _mm_and_ps(abs_mask, a);
 }

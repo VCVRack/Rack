@@ -12,7 +12,7 @@ struct Driver;
 
 
 static const int DRIVER = -11;
-static Driver *driver = NULL;
+static Driver* driver = NULL;
 
 enum {
 	CMD_OCTAVE_DOWN = -1,
@@ -158,7 +158,9 @@ struct Driver : midi::Driver {
 		devices[1].octave = 3;
 	}
 
-	std::string getName() override {return "Computer keyboard";}
+	std::string getName() override {
+		return "Computer keyboard";
+	}
 
 	std::vector<int> getInputDeviceIds() override {
 		std::vector<int> deviceIds;
@@ -176,14 +178,14 @@ struct Driver : midi::Driver {
 		return "";
 	}
 
-	midi::InputDevice *subscribeInput(int deviceId, midi::Input *input) override {
+	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < deviceCount))
 			return NULL;
 		devices[deviceId].subscribe(input);
 		return &devices[deviceId];
 	}
 
-	void unsubscribeInput(int deviceId, midi::Input *input) override {
+	void unsubscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < deviceCount))
 			return;
 		devices[deviceId].unsubscribe(input);

@@ -19,9 +19,9 @@ struct AudioInterfacePort : audio::Port {
 	std::mutex audioMutex;
 	std::condition_variable audioCv;
 	// Audio thread produces, engine thread consumes
-	dsp::DoubleRingBuffer<dsp::Frame<AUDIO_INPUTS>, (1<<15)> inputBuffer;
+	dsp::DoubleRingBuffer < dsp::Frame<AUDIO_INPUTS>, (1 << 15) > inputBuffer;
 	// Audio thread consumes, engine thread produces
-	dsp::DoubleRingBuffer<dsp::Frame<AUDIO_OUTPUTS>, (1<<15)> outputBuffer;
+	dsp::DoubleRingBuffer < dsp::Frame<AUDIO_OUTPUTS>, (1 << 15) > outputBuffer;
 	bool active = false;
 
 	~AudioInterfacePort() {
@@ -29,7 +29,7 @@ struct AudioInterfacePort : audio::Port {
 		setDeviceId(-1, 0);
 	}
 
-	void processStream(const float *input, float *output, int frames) override {
+	void processStream(const float* input, float* output, int frames) override {
 		// Reactivate idle stream
 		if (!active) {
 			active = true;
@@ -60,7 +60,7 @@ struct AudioInterfacePort : audio::Port {
 				for (int i = 0; i < frames; i++) {
 					dsp::Frame<AUDIO_OUTPUTS> f = outputBuffer.shift();
 					for (int j = 0; j < numOutputs; j++) {
-						output[numOutputs*i + j] = clamp(f.samples[j], -1.f, 1.f);
+						output[numOutputs * i + j] = clamp(f.samples[j], -1.f, 1.f);
 					}
 				}
 			}
@@ -122,7 +122,7 @@ struct AudioInterface : Module {
 		onSampleRateChange();
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		// Update SRC states
 		inputSrc.setRates(port.sampleRate, args.sampleRate);
 		outputSrc.setRates(args.sampleRate, port.sampleRate);
@@ -212,19 +212,19 @@ struct AudioInterface : Module {
 
 		// Turn on light if at least one port is enabled in the nearby pair
 		for (int i = 0; i < AUDIO_INPUTS / 2; i++)
-			lights[INPUT_LIGHT + i].setBrightness(port.active && port.numOutputs >= 2*i+1);
+			lights[INPUT_LIGHT + i].setBrightness(port.active && port.numOutputs >= 2 * i + 1);
 		for (int i = 0; i < AUDIO_OUTPUTS / 2; i++)
-			lights[OUTPUT_LIGHT + i].setBrightness(port.active && port.numInputs >= 2*i+1);
+			lights[OUTPUT_LIGHT + i].setBrightness(port.active && port.numInputs >= 2 * i + 1);
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "audio", port.toJson());
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *audioJ = json_object_get(rootJ, "audio");
+	void dataFromJson(json_t* rootJ) override {
+		json_t* audioJ = json_object_get(rootJ, "audio");
 		port.fromJson(audioJ);
 	}
 
@@ -237,7 +237,7 @@ struct AudioInterface : Module {
 struct AudioInterface8Widget : ModuleWidget {
 	typedef AudioInterface<8, 8> TAudioInterface;
 
-	AudioInterface8Widget(TAudioInterface *module) {
+	AudioInterface8Widget(TAudioInterface* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface.svg")));
 
@@ -273,7 +273,7 @@ struct AudioInterface8Widget : ModuleWidget {
 		addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(12.524985, 107.17003)), module, TAudioInterface::OUTPUT_LIGHT + 2));
 		addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(35.725647, 107.17003)), module, TAudioInterface::OUTPUT_LIGHT + 3));
 
-		AudioWidget *audioWidget = createWidget<AudioWidget>(mm2px(Vec(3.2122073, 14.837339)));
+		AudioWidget* audioWidget = createWidget<AudioWidget>(mm2px(Vec(3.2122073, 14.837339)));
 		audioWidget->box.size = mm2px(Vec(44, 28));
 		audioWidget->setAudioPort(module ? &module->port : NULL);
 		addChild(audioWidget);
@@ -284,7 +284,7 @@ struct AudioInterface8Widget : ModuleWidget {
 struct AudioInterface16Widget : ModuleWidget {
 	typedef AudioInterface<16, 16> TAudioInterface;
 
-	AudioInterface16Widget(TAudioInterface *module) {
+	AudioInterface16Widget(TAudioInterface* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface16.svg")));
 
@@ -344,7 +344,7 @@ struct AudioInterface16Widget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(59.861, 108.259)), module, TAudioInterface::OUTPUT_LIGHT + 6));
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(83.061, 108.259)), module, TAudioInterface::OUTPUT_LIGHT + 7));
 
-		AudioWidget *audioWidget = createWidget<AudioWidget>(mm2px(Vec(2.57, 14.839)));
+		AudioWidget* audioWidget = createWidget<AudioWidget>(mm2px(Vec(2.57, 14.839)));
 		audioWidget->box.size = mm2px(Vec(91.382, 28.0));
 		audioWidget->setAudioPort(module ? &module->port : NULL);
 		addChild(audioWidget);
@@ -352,8 +352,8 @@ struct AudioInterface16Widget : ModuleWidget {
 };
 
 
-Model *modelAudioInterface = createModel<AudioInterface<8, 8>, AudioInterface8Widget>("AudioInterface");
-Model *modelAudioInterface16 = createModel<AudioInterface<16, 16>, AudioInterface16Widget>("AudioInterface16");
+Model* modelAudioInterface = createModel<AudioInterface<8, 8>, AudioInterface8Widget>("AudioInterface");
+Model* modelAudioInterface16 = createModel<AudioInterface<16, 16>, AudioInterface16Widget>("AudioInterface16");
 
 
 } // namespace core

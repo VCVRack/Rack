@@ -20,9 +20,9 @@ struct Switch : ParamWidget {
 	bool momentaryReleased = false;
 
 	void step() override;
-	void onDoubleClick(const event::DoubleClick &e) override;
-	void onDragStart(const event::DragStart &e) override;
-	void onDragEnd(const event::DragEnd &e) override;
+	void onDoubleClick(const event::DoubleClick& e) override;
+	void onDragStart(const event::DragStart& e) override;
+	void onDragEnd(const event::DragEnd& e) override;
 	void reset() override;
 	void randomize() override;
 };

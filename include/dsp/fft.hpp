@@ -13,7 +13,7 @@ Wrapper for [PFFFT](https://bitbucket.org/jpommier/pffft/)
 Buffers must be aligned to 16-byte boundaries. new[] and malloc() do this for you.
 */
 struct RealFFT {
-	PFFFT_Setup *setup;
+	PFFFT_Setup* setup;
 	int length;
 
 	RealFFT(size_t length) {
@@ -31,7 +31,7 @@ struct RealFFT {
 	Output is arbitrarily ordered for performance reasons.
 	However, this ordering is consistent, so element-wise multiplication with line up with other results, and the inverse FFT will return a correctly ordered result.
 	*/
-	void rfftUnordered(const float *input, float *output) {
+	void rfftUnordered(const float* input, float* output) {
 		pffft_transform(setup, input, output, NULL, PFFFT_FORWARD);
 	}
 
@@ -39,7 +39,7 @@ struct RealFFT {
 	Input is `2*length` elements. Output is `length` elements.
 	Scaling is such that IRFFT(RFFT(x)) = N*x.
 	*/
-	void irfftUnordered(const float *input, float *output) {
+	void irfftUnordered(const float* input, float* output) {
 		pffft_transform(setup, input, output, NULL, PFFFT_BACKWARD);
 	}
 
@@ -54,17 +54,17 @@ struct RealFFT {
 		output[length - 2] = real(F(n/2 - 1))
 		output[length - 1] = imag(F(n/2 - 1))
 	*/
-	void rfft(const float *input, float *output) {
+	void rfft(const float* input, float* output) {
 		pffft_transform_ordered(setup, input, output, NULL, PFFFT_FORWARD);
 	}
 
-	void irfft(const float *input, float *output) {
+	void irfft(const float* input, float* output) {
 		pffft_transform_ordered(setup, input, output, NULL, PFFFT_BACKWARD);
 	}
 
 	/** Scales the RFFT so that `scale(IFFT(FFT(x))) = x`.
 	*/
-	void scale(float *x) {
+	void scale(float* x) {
 		float a = 1.f / length;
 		for (int i = 0; i < length; i++) {
 			x[i] *= a;
@@ -77,7 +77,7 @@ struct RealFFT {
 `length` must be a multiple of 16.
 */
 struct ComplexFFT {
-	PFFFT_Setup *setup;
+	PFFFT_Setup* setup;
 	int length;
 
 	ComplexFFT(size_t length) {
@@ -93,7 +93,7 @@ struct ComplexFFT {
 	Input and output must be aligned using the above align*() functions.
 	Input is `2*length` elements. Output is `2*length` elements.
 	*/
-	void fftUnordered(const float *input, float *output) {
+	void fftUnordered(const float* input, float* output) {
 		pffft_transform(setup, input, output, NULL, PFFFT_FORWARD);
 	}
 
@@ -101,23 +101,23 @@ struct ComplexFFT {
 	Input is `2*length` elements. Output is `2*length` elements.
 	Scaling is such that FFT(IFFT(x)) = N*x.
 	*/
-	void ifftUnordered(const float *input, float *output) {
+	void ifftUnordered(const float* input, float* output) {
 		pffft_transform(setup, input, output, NULL, PFFFT_BACKWARD);
 	}
 
-	void fft(const float *input, float *output) {
+	void fft(const float* input, float* output) {
 		pffft_transform_ordered(setup, input, output, NULL, PFFFT_FORWARD);
 	}
 
-	void ifft(const float *input, float *output) {
+	void ifft(const float* input, float* output) {
 		pffft_transform_ordered(setup, input, output, NULL, PFFFT_BACKWARD);
 	}
 
-	void scale(float *x) {
+	void scale(float* x) {
 		float a = 1.f / length;
 		for (int i = 0; i < length; i++) {
-			x[2*i+0] *= a;
-			x[2*i+1] *= a;
+			x[2 * i + 0] *= a;
+			x[2 * i + 1] *= a;
 		}
 	}
 };

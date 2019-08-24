@@ -12,7 +12,7 @@ struct Module;
 
 /** A Quantity that wraps an engine::Param. */
 struct ParamQuantity : Quantity {
-	Module *module = NULL;
+	Module* module = NULL;
 	int paramId = 0;
 
 	/** The minimum allowed value. */
@@ -38,7 +38,7 @@ struct ParamQuantity : Quantity {
 	/** An optional one-sentence description of the parameter. */
 	std::string description;
 
-	Param *getParam();
+	Param* getParam();
 	/** Request to the engine to smoothly set the value */
 	void setSmoothValue(float smoothValue);
 	float getSmoothValue();

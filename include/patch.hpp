@@ -30,8 +30,8 @@ struct PatchManager {
 	/** Disconnects all cables */
 	void disconnectDialog();
 
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
 	bool isLegacy(int level);
 };
 

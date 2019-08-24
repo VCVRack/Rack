@@ -7,7 +7,7 @@
 namespace rack {
 
 
-void svgDraw(NVGcontext *vg, NSVGimage *svg);
+void svgDraw(NVGcontext* vg, NSVGimage* svg);
 
 
 } // namespace rack

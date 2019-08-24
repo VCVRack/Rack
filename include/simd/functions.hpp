@@ -1,12 +1,51 @@
 #pragma once
 #include <simd/vector.hpp>
-#include <simd/sse_mathfun.h>
+#include <simd/sse_mathfun_extension.h>
+#include <common.hpp>
 #include <math.hpp>
-#include <cmath>
 
 
 namespace rack {
 namespace simd {
+
+
+// Nonstandard functions
+
+inline float ifelse(bool cond, float a, float b) {
+	return cond ? a : b;
+}
+
+/** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
+inline float_4 ifelse(float_4 mask, float_4 a, float_4 b) {
+	return (a & mask) | andnot(mask, b);
+}
+
+/** Returns the approximate reciprocal square root.
+Much faster than `1/sqrt(x)`.
+*/
+inline float_4 rsqrt(float_4 x) {
+	return float_4(_mm_rsqrt_ps(x.v));
+}
+
+/** Returns the approximate reciprocal.
+Much faster than `1/x`.
+*/
+inline float_4 rcp(float_4 x) {
+	return float_4(_mm_rcp_ps(x.v));
+}
+
+/** Given a mask `a`, returns a vector with each element either 0's or 1's depending on the mask bit.
+*/
+template <typename T>
+T movemaskInverse(int a);
+
+template <>
+inline float_4 movemaskInverse<float_4>(int x) {
+	__m128i msk8421 = _mm_set_epi32(8, 4, 2, 1);
+	__m128i x_bc = _mm_set1_epi32(x);
+	__m128i t = _mm_and_si128(x_bc, msk8421);
+	return float_4(_mm_castsi128_ps(_mm_cmpeq_epi32(x_bc, t)));
+}
 
 
 // Standard math functions from std::
@@ -75,40 +114,66 @@ inline float_4 cos(float_4 x) {
 	return float_4(sse_mathfun_cos_ps(x.v));
 }
 
-using std::floor;
+using std::tan;
 
-inline float_4 floor(float_4 a) {
-	return float_4(sse_mathfun_floor_ps(a.v));
+inline float_4 tan(float_4 x) {
+	return float_4(sse_mathfun_tan_ps(x.v));
 }
 
-using std::ceil;
+using std::atan;
 
-inline float_4 ceil(float_4 a) {
-	return float_4(sse_mathfun_ceil_ps(a.v));
+inline float_4 atan(float_4 x) {
+	return float_4(sse_mathfun_atan_ps(x.v));
 }
 
-using std::round;
+using std::atan2;
 
-inline float_4 round(float_4 a) {
-	return float_4(sse_mathfun_round_ps(a.v));
-}
-
-using std::fmod;
-
-inline float_4 fmod(float_4 a, float_4 b) {
-	return float_4(sse_mathfun_fmod_ps(a.v, b.v));
-}
-
-using std::fabs;
-
-inline float_4 fabs(float_4 a) {
-	return float_4(sse_mathfun_fabs_ps(a.v));
+inline float_4 atan2(float_4 x, float_4 y) {
+	return float_4(sse_mathfun_atan2_ps(x.v, y.v));
 }
 
 using std::trunc;
 
 inline float_4 trunc(float_4 a) {
-	return float_4(sse_mathfun_trunc_ps(a.v));
+	return float_4(_mm_cvtepi32_ps(_mm_cvttps_epi32(a.v)));
+}
+
+using std::floor;
+
+inline float_4 floor(float_4 a) {
+	float_4 b = trunc(a);
+	b -= (b > a) & 1.f;
+	return b;
+}
+
+using std::ceil;
+
+inline float_4 ceil(float_4 a) {
+	float_4 b = trunc(a);
+	b += (b < a) & 1.f;
+	return b;
+}
+
+using std::round;
+
+inline float_4 round(float_4 a) {
+	a += ifelse(a < 0, -0.5f, 0.5f);
+	float_4 b = trunc(a);
+	return b;
+}
+
+using std::fmod;
+
+inline float_4 fmod(float_4 a, float_4 b) {
+	return a - trunc(a / b) * b;
+}
+
+using std::fabs;
+
+inline float_4 fabs(float_4 a) {
+	// Sign bit
+	int32_4 mask = ~0x80000000;
+	return a & float_4::cast(mask);
 }
 
 using std::pow;
@@ -131,31 +196,6 @@ T pow(T a, int b) {
 		a *= a;
 	}
 	return p;
-}
-
-// Nonstandard functions
-
-inline float ifelse(bool cond, float a, float b) {
-	return cond ? a : b;
-}
-
-/** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
-inline float_4 ifelse(float_4 mask, float_4 a, float_4 b) {
-	return (a & mask) | andnot(mask, b);
-}
-
-/** Returns the approximate reciprocal square root.
-Much faster than `1/sqrt(x)`.
-*/
-inline float_4 rsqrt(float_4 x) {
-	return float_4(_mm_rsqrt_ps(x.v));
-}
-
-/** Returns the approximate reciprocal.
-Much faster than `1/x`.
-*/
-inline float_4 rcp(float_4 x) {
-	return float_4(_mm_rcp_ps(x.v));
 }
 
 // From math.hpp
@@ -184,18 +224,6 @@ inline float_4 sgn(float_4 x) {
 	float_4 signbit = x & -0.f;
 	float_4 nonzero = (x != 0.f);
 	return signbit | (nonzero & 1.f);
-}
-
-/** Given a mask `a`, returns a vector with each element either 0's or 1's depending on the mask bit. */
-template <typename T>
-inline T movemaskInverse(int a);
-
-template <>
-inline float_4 movemaskInverse<float_4>(int x) {
-	__m128i msk8421 = _mm_set_epi32(8, 4, 2, 1);
-	__m128i x_bc = _mm_set1_epi32(x);
-	__m128i t = _mm_and_si128(x_bc, msk8421);
-	return float_4(_mm_castsi128_ps(_mm_cmpeq_epi32(x_bc, t)));
 }
 
 

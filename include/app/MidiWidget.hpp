@@ -9,12 +9,12 @@ namespace app {
 
 
 struct MidiWidget : LedDisplay {
-	LedDisplayChoice *driverChoice;
-	LedDisplaySeparator *driverSeparator;
-	LedDisplayChoice *deviceChoice;
-	LedDisplaySeparator *deviceSeparator;
-	LedDisplayChoice *channelChoice;
-	void setMidiPort(midi::Port *port);
+	LedDisplayChoice* driverChoice;
+	LedDisplaySeparator* driverSeparator;
+	LedDisplayChoice* deviceChoice;
+	LedDisplaySeparator* deviceSeparator;
+	LedDisplayChoice* channelChoice;
+	void setMidiPort(midi::Port* port);
 };
 
 

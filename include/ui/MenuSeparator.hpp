@@ -9,7 +9,7 @@ namespace ui {
 
 struct MenuSeparator : MenuEntry {
 	MenuSeparator();
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 

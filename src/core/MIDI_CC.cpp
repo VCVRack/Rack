@@ -25,12 +25,11 @@ struct MIDI_CC : Module {
 	int learningId;
 	int learnedCcs[16];
 	dsp::ExponentialFilter valueFilters[16];
-	int8_t lastValues[16] = {};
 
 	MIDI_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 16; i++) {
-			valueFilters[i].lambda = 1 / 0.01f;
+			valueFilters[i].setTau(1 / 30.f);
 		}
 		onReset();
 	}
@@ -46,7 +45,7 @@ struct MIDI_CC : Module {
 		midiInput.reset();
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
@@ -57,11 +56,10 @@ struct MIDI_CC : Module {
 				continue;
 
 			int cc = learnedCcs[i];
-
-			float value = rescale(values[cc], 0, 127, 0.f, 10.f);
+			float value = values[cc] / 127.f;
 
 			// Detect behavior from MIDI buttons.
-			if ((lastValues[i] == 0 && values[cc] == 127) || (lastValues[i] == 127 && values[cc] == 0)) {
+			if (std::fabs(valueFilters[i].out - value) >= 1.f) {
 				// Jump value
 				valueFilters[i].out = value;
 			}
@@ -69,8 +67,7 @@ struct MIDI_CC : Module {
 				// Smooth value with filter
 				valueFilters[i].process(args.sampleTime, value);
 			}
-			lastValues[i] = values[cc];
-			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out);
+			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out * 10.f);
 		}
 	}
 
@@ -99,17 +96,17 @@ struct MIDI_CC : Module {
 		values[cc] = value;
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 
-		json_t *ccsJ = json_array();
+		json_t* ccsJ = json_array();
 		for (int i = 0; i < 16; i++) {
 			json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
 		}
 		json_object_set_new(rootJ, "ccs", ccsJ);
 
 		// Remember values so users don't have to touch MIDI controller knobs when restarting Rack
-		json_t *valuesJ = json_array();
+		json_t* valuesJ = json_array();
 		for (int i = 0; i < 128; i++) {
 			json_array_append_new(valuesJ, json_integer(values[i]));
 		}
@@ -119,27 +116,27 @@ struct MIDI_CC : Module {
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *ccsJ = json_object_get(rootJ, "ccs");
+	void dataFromJson(json_t* rootJ) override {
+		json_t* ccsJ = json_object_get(rootJ, "ccs");
 		if (ccsJ) {
 			for (int i = 0; i < 16; i++) {
-				json_t *ccJ = json_array_get(ccsJ, i);
+				json_t* ccJ = json_array_get(ccsJ, i);
 				if (ccJ)
 					learnedCcs[i] = json_integer_value(ccJ);
 			}
 		}
 
-		json_t *valuesJ = json_object_get(rootJ, "values");
+		json_t* valuesJ = json_object_get(rootJ, "values");
 		if (valuesJ) {
 			for (int i = 0; i < 128; i++) {
-				json_t *valueJ = json_array_get(valuesJ, i);
+				json_t* valueJ = json_array_get(valuesJ, i);
 				if (valueJ) {
 					values[i] = json_integer_value(valueJ);
 				}
 			}
 		}
 
-		json_t *midiJ = json_object_get(rootJ, "midi");
+		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
 	}
@@ -147,7 +144,7 @@ struct MIDI_CC : Module {
 
 
 struct MIDI_CCWidget : ModuleWidget {
-	MIDI_CCWidget(MIDI_CC *module) {
+	MIDI_CCWidget(MIDI_CC* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/MIDI-CC.svg")));
 
@@ -174,7 +171,7 @@ struct MIDI_CCWidget : ModuleWidget {
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDI_CC::CC_OUTPUT + 15));
 
 		typedef Grid16MidiWidget<CcChoice<MIDI_CC>> TMidiWidget;
-		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
+		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
@@ -184,7 +181,7 @@ struct MIDI_CCWidget : ModuleWidget {
 
 
 // Use legacy slug for compatibility
-Model *modelMIDI_CC = createModel<MIDI_CC, MIDI_CCWidget>("MIDICCToCVInterface");
+Model* modelMIDI_CC = createModel<MIDI_CC, MIDI_CCWidget>("MIDICCToCVInterface");
 
 
 } // namespace core

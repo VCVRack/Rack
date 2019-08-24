@@ -12,7 +12,7 @@ o: oversample factor
 output: must be length `2 * z * o`.
 https://www.cs.cmu.edu/~eli/papers/icmc01-hardsync.pdf
 */
-void minBlepImpulse(int z, int o, float *output);
+void minBlepImpulse(int z, int o, float* output);
 
 
 template <int Z, int O, typename T = float>

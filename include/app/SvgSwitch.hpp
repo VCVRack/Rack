@@ -12,15 +12,15 @@ namespace app {
 
 /** A ParamWidget with multiple frames corresponding to its value */
 struct SvgSwitch : Switch {
-	widget::FramebufferWidget *fb;
-	CircularShadow *shadow;
-	widget::SvgWidget *sw;
+	widget::FramebufferWidget* fb;
+	CircularShadow* shadow;
+	widget::SvgWidget* sw;
 	std::vector<std::shared_ptr<Svg>> frames;
 
 	SvgSwitch();
 	/** Adds an SVG file to represent the next switch position */
 	void addFrame(std::shared_ptr<Svg> svg);
-	void onChange(const event::Change &e) override;
+	void onChange(const event::Change& e) override;
 };
 
 

@@ -10,12 +10,14 @@ namespace ui {
 
 
 struct IconButton : Button {
-	widget::FramebufferWidget *fw;
-	widget::SvgWidget *sw;
+	widget::FramebufferWidget* fw;
+	widget::SvgWidget* sw;
 
 	IconButton();
 	void setSvg(std::shared_ptr<Svg> svg);
-	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {setSvg(svg);}
+	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {
+		setSvg(svg);
+	}
 };
 
 

@@ -15,8 +15,8 @@
 #include <thread>
 
 #if defined ARCH_MAC
-// For CGAssociateMouseAndMouseCursorPosition
-#include <ApplicationServices/ApplicationServices.h>
+	// For CGAssociateMouseAndMouseCursorPosition
+	#include <ApplicationServices/ApplicationServices.h>
 #endif
 
 #include <osdialog.h>
@@ -26,7 +26,7 @@
 namespace rack {
 
 
-void Font::loadFile(const std::string &filename, NVGcontext *vg) {
+void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
 	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
 	if (handle >= 0) {
@@ -41,11 +41,11 @@ Font::~Font() {
 	// There is no NanoVG deleteFont() function yet, so do nothing
 }
 
-std::shared_ptr<Font> Font::load(const std::string &filename) {
+std::shared_ptr<Font> Font::load(const std::string& filename) {
 	return APP->window->loadFont(filename);
 }
 
-void Image::loadFile(const std::string &filename, NVGcontext *vg) {
+void Image::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
 	handle = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
 	if (handle > 0) {
@@ -62,11 +62,11 @@ Image::~Image() {
 		nvgDeleteImage(vg, handle);
 }
 
-std::shared_ptr<Image> Image::load(const std::string &filename) {
+std::shared_ptr<Image> Image::load(const std::string& filename) {
 	return APP->window->loadImage(filename);
 }
 
-void Svg::loadFile(const std::string &filename) {
+void Svg::loadFile(const std::string& filename) {
 	handle = nsvgParseFromFile(filename.c_str(), "px", app::SVG_DPI);
 	if (handle) {
 		INFO("Loaded SVG %s", filename.c_str());
@@ -81,7 +81,7 @@ Svg::~Svg() {
 		nsvgDelete(handle);
 }
 
-std::shared_ptr<Svg> Svg::load(const std::string &filename) {
+std::shared_ptr<Svg> Svg::load(const std::string& filename) {
 	return APP->window->loadSvg(filename);
 }
 
@@ -93,15 +93,17 @@ struct Window::Internal {
 	int lastWindowY = 0;
 	int lastWindowWidth = 0;
 	int lastWindowHeight = 0;
+
+	bool ignoreNextMouseDelta = false;
 };
 
 
-static void windowSizeCallback(GLFWwindow *win, int width, int height) {
+static void windowSizeCallback(GLFWwindow* win, int width, int height) {
 	// Do nothing. Window size is reset each frame anyway.
 }
 
-static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mods) {
-	Window *window = (Window*) glfwGetWindowUserPointer(win);
+static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods) {
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
 #if defined ARCH_MAC
 	// Remap Ctrl-left click to right click on Mac
 	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == GLFW_MOD_CONTROL) {
@@ -118,10 +120,16 @@ static void mouseButtonCallback(GLFWwindow *win, int button, int action, int mod
 	APP->event->handleButton(window->mousePos, button, action, mods);
 }
 
-static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
-	Window *window = (Window*) glfwGetWindowUserPointer(win);
+static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	math::Vec mousePos = math::Vec(xpos, ypos).div(window->pixelRatio / window->windowRatio).round();
 	math::Vec mouseDelta = mousePos.minus(window->mousePos);
+
+	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
+	if (window->internal->ignoreNextMouseDelta) {
+		window->internal->ignoreNextMouseDelta = false;
+		mouseDelta = math::Vec();
+	}
 
 	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
 	(void) cursorMode;
@@ -144,14 +152,14 @@ static void cursorPosCallback(GLFWwindow *win, double xpos, double ypos) {
 	APP->event->handleHover(mousePos, mouseDelta);
 }
 
-static void cursorEnterCallback(GLFWwindow *win, int entered) {
+static void cursorEnterCallback(GLFWwindow* win, int entered) {
 	if (!entered) {
 		APP->event->handleLeave();
 	}
 }
 
-static void scrollCallback(GLFWwindow *win, double x, double y) {
-	Window *window = (Window*) glfwGetWindowUserPointer(win);
+static void scrollCallback(GLFWwindow* win, double x, double y) {
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	math::Vec scrollDelta = math::Vec(x, y);
 #if defined ARCH_MAC
 	scrollDelta = scrollDelta.mult(10.0);
@@ -162,13 +170,13 @@ static void scrollCallback(GLFWwindow *win, double x, double y) {
 	APP->event->handleScroll(window->mousePos, scrollDelta);
 }
 
-static void charCallback(GLFWwindow *win, unsigned int codepoint) {
-	Window *window = (Window*) glfwGetWindowUserPointer(win);
+static void charCallback(GLFWwindow* win, unsigned int codepoint) {
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	APP->event->handleText(window->mousePos, codepoint);
 }
 
-static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int mods) {
-	Window *window = (Window*) glfwGetWindowUserPointer(win);
+static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	if (APP->event->handleKey(window->mousePos, key, scancode, action, mods))
 		return;
 
@@ -181,8 +189,8 @@ static void keyCallback(GLFWwindow *win, int key, int scancode, int action, int 
 	}
 }
 
-static void dropCallback(GLFWwindow *win, int count, const char **paths) {
-	Window *window = (Window*) glfwGetWindowUserPointer(win);
+static void dropCallback(GLFWwindow* win, int count, const char** paths) {
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	std::vector<std::string> pathsVec;
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
@@ -190,7 +198,7 @@ static void dropCallback(GLFWwindow *win, int count, const char **paths) {
 	APP->event->handleDrop(window->mousePos, pathsVec);
 }
 
-static void errorCallback(int error, const char *description) {
+static void errorCallback(int error, const char* description) {
 	WARN("GLFW error %d: %s", error, description);
 }
 
@@ -262,8 +270,8 @@ Window::Window() {
 		exit(1);
 	}
 
-	const GLubyte *renderer = glGetString(GL_RENDERER);
-	const GLubyte *version = glGetString(GL_VERSION);
+	const GLubyte* renderer = glGetString(GL_RENDERER);
+	const GLubyte* version = glGetString(GL_VERSION);
 	INFO("Renderer: %s", renderer);
 	INFO("OpenGL: %s", version);
 
@@ -413,10 +421,10 @@ void Window::screenshot(float zoom) {
 	// Iterate plugins and create directories
 	std::string screenshotsDir = asset::user("screenshots");
 	system::createDirectory(screenshotsDir);
-	for (plugin::Plugin *p : plugin::plugins) {
+	for (plugin::Plugin* p : plugin::plugins) {
 		std::string dir = screenshotsDir + "/" + p->slug;
 		system::createDirectory(dir);
-		for (plugin::Model *model : p->models) {
+		for (plugin::Model* model : p->models) {
 			std::string filename = dir + "/" + model->slug + ".png";
 			// Skip model if screenshot already exists
 			if (system::isFile(filename))
@@ -424,8 +432,8 @@ void Window::screenshot(float zoom) {
 			INFO("Screenshotting %s %s to %s", p->slug.c_str(), model->slug.c_str(), filename.c_str());
 
 			// Create widgets
-			app::ModuleWidget *mw = model->createModuleWidgetNull();
-			widget::FramebufferWidget *fb = new widget::FramebufferWidget;
+			app::ModuleWidget* mw = model->createModuleWidgetNull();
+			widget::FramebufferWidget* fb = new widget::FramebufferWidget;
 			fb->oversample = 2;
 			fb->addChild(mw);
 			fb->scale = math::Vec(zoom, zoom);
@@ -438,7 +446,7 @@ void Window::screenshot(float zoom) {
 			// Read pixels
 			int width, height;
 			nvgImageSize(vg, fb->getImageHandle(), &width, &height);
-			uint8_t *data = new uint8_t[height * width * 4];
+			uint8_t* data = new uint8_t[height * width * 4];
 			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 			// Flip image vertically
@@ -472,12 +480,14 @@ void Window::cursorLock() {
 #else
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
+		internal->ignoreNextMouseDelta = true;
 	}
 }
 
 void Window::cursorUnlock() {
 	if (settings::allowCursorLock) {
 		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		internal->ignoreNextMouseDelta = true;
 	}
 }
 
@@ -501,14 +511,14 @@ void Window::setFullScreen(bool fullScreen) {
 	else {
 		glfwGetWindowPos(win, &internal->lastWindowX, &internal->lastWindowY);
 		glfwGetWindowSize(win, &internal->lastWindowWidth, &internal->lastWindowHeight);
-		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 		glfwSetWindowMonitor(win, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 	}
 }
 
 bool Window::isFullScreen() {
-	GLFWmonitor *monitor = glfwGetWindowMonitor(win);
+	GLFWmonitor* monitor = glfwGetWindowMonitor(win);
 	return monitor != NULL;
 }
 
@@ -519,7 +529,7 @@ bool Window::isFrameOverdue() {
 	return frameDuration > 1.0 / settings::frameRateLimit;
 }
 
-std::shared_ptr<Font> Window::loadFont(const std::string &filename) {
+std::shared_ptr<Font> Window::loadFont(const std::string& filename) {
 	auto sp = fontCache[filename].lock();
 	if (!sp) {
 		fontCache[filename] = sp = std::make_shared<Font>();
@@ -528,7 +538,7 @@ std::shared_ptr<Font> Window::loadFont(const std::string &filename) {
 	return sp;
 }
 
-std::shared_ptr<Image> Window::loadImage(const std::string &filename) {
+std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 	auto sp = imageCache[filename].lock();
 	if (!sp) {
 		imageCache[filename] = sp = std::make_shared<Image>();
@@ -537,7 +547,7 @@ std::shared_ptr<Image> Window::loadImage(const std::string &filename) {
 	return sp;
 }
 
-std::shared_ptr<Svg> Window::loadSvg(const std::string &filename) {
+std::shared_ptr<Svg> Window::loadSvg(const std::string& filename) {
 	auto sp = svgCache[filename].lock();
 	if (!sp) {
 		svgCache[filename] = sp = std::make_shared<Svg>();

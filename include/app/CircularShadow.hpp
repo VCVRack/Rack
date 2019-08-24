@@ -12,7 +12,7 @@ struct CircularShadow : widget::TransparentWidget {
 	float opacity;
 
 	CircularShadow();
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 

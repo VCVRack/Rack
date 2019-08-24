@@ -14,7 +14,7 @@ namespace app {
 
 
 struct ParamField : ui::TextField {
-	ParamWidget *paramWidget;
+	ParamWidget* paramWidget;
 
 	void step() override {
 		// Keep selected
@@ -22,14 +22,14 @@ struct ParamField : ui::TextField {
 		TextField::step();
 	}
 
-	void setParamWidget(ParamWidget *paramWidget) {
+	void setParamWidget(ParamWidget* paramWidget) {
 		this->paramWidget = paramWidget;
 		if (paramWidget->paramQuantity)
 			text = paramWidget->paramQuantity->getDisplayValueString();
 		selectAll();
 	}
 
-	void onSelectKey(const event::SelectKey &e) override {
+	void onSelectKey(const event::SelectKey& e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			float oldValue = paramWidget->paramQuantity->getValue();
 			if (paramWidget->paramQuantity)
@@ -38,7 +38,7 @@ struct ParamField : ui::TextField {
 
 			if (oldValue != newValue) {
 				// Push ParamChange history action
-				history::ParamChange *h = new history::ParamChange;
+				history::ParamChange* h = new history::ParamChange;
 				h->moduleId = paramWidget->paramQuantity->module->id;
 				h->paramId = paramWidget->paramQuantity->paramId;
 				h->oldValue = oldValue;
@@ -46,7 +46,7 @@ struct ParamField : ui::TextField {
 				APP->history->push(h);
 			}
 
-			ui::MenuOverlay *overlay = getAncestorOfType<ui::MenuOverlay>();
+			ui::MenuOverlay* overlay = getAncestorOfType<ui::MenuOverlay>();
 			overlay->requestDelete();
 			e.consume(this);
 		}
@@ -58,7 +58,7 @@ struct ParamField : ui::TextField {
 
 
 struct ParamTooltip : ui::Tooltip {
-	ParamWidget *paramWidget;
+	ParamWidget* paramWidget;
 
 	void step() override {
 		if (paramWidget->paramQuantity) {
@@ -77,7 +77,7 @@ struct ParamTooltip : ui::Tooltip {
 
 
 struct ParamLabel : ui::MenuLabel {
-	ParamWidget *paramWidget;
+	ParamWidget* paramWidget;
 	void step() override {
 		text = paramWidget->paramQuantity->getString();
 		MenuLabel::step();
@@ -86,8 +86,8 @@ struct ParamLabel : ui::MenuLabel {
 
 
 struct ParamResetItem : ui::MenuItem {
-	ParamWidget *paramWidget;
-	void onAction(const event::Action &e) override {
+	ParamWidget* paramWidget;
+	void onAction(const event::Action& e) override {
 		paramWidget->resetAction();
 	}
 };
@@ -98,9 +98,9 @@ struct ParamFineItem : ui::MenuItem {
 
 
 struct ParamUnmapItem : ui::MenuItem {
-	ParamWidget *paramWidget;
-	void onAction(const event::Action &e) override {
-		engine::ParamHandle *paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module->id, paramWidget->paramQuantity->paramId);
+	ParamWidget* paramWidget;
+	void onAction(const event::Action& e) override {
+		engine::ParamHandle* paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module->id, paramWidget->paramQuantity->paramId);
 		if (paramHandle) {
 			APP->engine->updateParamHandle(paramHandle, -1, 0);
 		}
@@ -122,26 +122,26 @@ void ParamWidget::step() {
 	Widget::step();
 }
 
-void ParamWidget::draw(const DrawArgs &args) {
+void ParamWidget::draw(const DrawArgs& args) {
 	Widget::draw(args);
 
 	// Param map indicator
-	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
+	engine::ParamHandle* paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
 	if (paramHandle) {
-			NVGcolor color = paramHandle->color;
-			nvgBeginPath(args.vg);
-			const float radius = 6;
-			// nvgCircle(args.vg, box.size.x / 2, box.size.y / 2, radius);
-			nvgRect(args.vg, box.size.x - radius, box.size.y - radius, radius, radius);
-			nvgFillColor(args.vg, color);
-			nvgFill(args.vg);
-			nvgStrokeColor(args.vg, color::mult(color, 0.5));
-			nvgStrokeWidth(args.vg, 1.0);
-			nvgStroke(args.vg);
+		NVGcolor color = paramHandle->color;
+		nvgBeginPath(args.vg);
+		const float radius = 6;
+		// nvgCircle(args.vg, box.size.x / 2, box.size.y / 2, radius);
+		nvgRect(args.vg, box.size.x - radius, box.size.y - radius, radius, radius);
+		nvgFillColor(args.vg, color);
+		nvgFill(args.vg);
+		nvgStrokeColor(args.vg, color::mult(color, 0.5));
+		nvgStrokeWidth(args.vg, 1.0);
+		nvgStroke(args.vg);
 	}
 }
 
-void ParamWidget::onButton(const event::Button &e) {
+void ParamWidget::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 
 	// Touch parameter
@@ -159,20 +159,20 @@ void ParamWidget::onButton(const event::Button &e) {
 	}
 }
 
-void ParamWidget::onDoubleClick(const event::DoubleClick &e) {
+void ParamWidget::onDoubleClick(const event::DoubleClick& e) {
 	resetAction();
 }
 
-void ParamWidget::onEnter(const event::Enter &e) {
+void ParamWidget::onEnter(const event::Enter& e) {
 	if (settings::paramTooltip && !tooltip && paramQuantity) {
-		ParamTooltip *paramTooltip = new ParamTooltip;
+		ParamTooltip* paramTooltip = new ParamTooltip;
 		paramTooltip->paramWidget = this;
 		APP->scene->addChild(paramTooltip);
 		tooltip = paramTooltip;
 	}
 }
 
-void ParamWidget::onLeave(const event::Leave &e) {
+void ParamWidget::onLeave(const event::Leave& e) {
 	if (tooltip) {
 		APP->scene->removeChild(tooltip);
 		delete tooltip;
@@ -180,8 +180,8 @@ void ParamWidget::onLeave(const event::Leave &e) {
 	}
 }
 
-void ParamWidget::fromJson(json_t *rootJ) {
-	json_t *valueJ = json_object_get(rootJ, "value");
+void ParamWidget::fromJson(json_t* rootJ) {
+	json_t* valueJ = json_object_get(rootJ, "value");
 	if (valueJ) {
 		if (paramQuantity)
 			paramQuantity->setValue(json_number_value(valueJ));
@@ -189,18 +189,18 @@ void ParamWidget::fromJson(json_t *rootJ) {
 }
 
 void ParamWidget::createContextMenu() {
-	ui::Menu *menu = createMenu();
+	ui::Menu* menu = createMenu();
 
-	ParamLabel *paramLabel = new ParamLabel;
+	ParamLabel* paramLabel = new ParamLabel;
 	paramLabel->paramWidget = this;
 	menu->addChild(paramLabel);
 
-	ParamField *paramField = new ParamField;
+	ParamField* paramField = new ParamField;
 	paramField->box.size.x = 100;
 	paramField->setParamWidget(this);
 	menu->addChild(paramField);
 
-	ParamResetItem *resetItem = new ParamResetItem;
+	ParamResetItem* resetItem = new ParamResetItem;
 	resetItem->text = "Initialize";
 	resetItem->rightText = "Double-click";
 	resetItem->paramWidget = this;
@@ -212,9 +212,9 @@ void ParamWidget::createContextMenu() {
 	// fineItem->disabled = true;
 	// menu->addChild(fineItem);
 
-	engine::ParamHandle *paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
+	engine::ParamHandle* paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
 	if (paramHandle) {
-		ParamUnmapItem *unmapItem = new ParamUnmapItem;
+		ParamUnmapItem* unmapItem = new ParamUnmapItem;
 		unmapItem->text = "Unmap";
 		unmapItem->rightText = paramHandle->text;
 		unmapItem->paramWidget = this;
@@ -232,7 +232,7 @@ void ParamWidget::resetAction() {
 
 		if (oldValue != newValue) {
 			// Push ParamChange history action
-			history::ParamChange *h = new history::ParamChange;
+			history::ParamChange* h = new history::ParamChange;
 			h->name = "reset parameter";
 			h->moduleId = paramQuantity->module->id;
 			h->paramId = paramQuantity->paramId;

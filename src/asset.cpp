@@ -82,16 +82,16 @@ void init() {
 #endif
 #if defined ARCH_MAC
 			// Get home directory
-			struct passwd *pw = getpwuid(getuid());
+			struct passwd* pw = getpwuid(getuid());
 			assert(pw);
 			userDir = pw->pw_dir;
 			userDir += "/Documents/Rack";
 #endif
 #if defined ARCH_LIN
 			// Get home directory
-			const char *homeBuf = getenv("HOME");
+			const char* homeBuf = getenv("HOME");
 			if (!homeBuf) {
-				struct passwd *pw = getpwuid(getuid());
+				struct passwd* pw = getpwuid(getuid());
 				assert(pw);
 				homeBuf = pw->pw_dir;
 			}
@@ -131,7 +131,7 @@ std::string user(std::string filename) {
 }
 
 
-std::string plugin(plugin::Plugin *plugin, std::string filename) {
+std::string plugin(plugin::Plugin* plugin, std::string filename) {
 	assert(plugin);
 	return plugin->path + "/" + filename;
 }

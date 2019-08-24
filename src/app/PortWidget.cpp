@@ -50,8 +50,8 @@ void PortWidget::step() {
 	Widget::step();
 }
 
-void PortWidget::draw(const DrawArgs &args) {
-	CableWidget *cw = APP->scene->rack->incompleteCable;
+void PortWidget::draw(const DrawArgs& args) {
+	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		// Dim the PortWidget if the active cable cannot plug into this PortWidget
 		if (type == OUTPUT ? cw->outputPort : cw->inputPort)
@@ -60,11 +60,11 @@ void PortWidget::draw(const DrawArgs &args) {
 	Widget::draw(args);
 }
 
-void PortWidget::onButton(const event::Button &e) {
+void PortWidget::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		CableWidget *cw = APP->scene->rack->getTopCable(this);
+		CableWidget* cw = APP->scene->rack->getTopCable(this);
 		if (cw) {
 			if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 				int id = APP->scene->rack->nextCableColorId++;
@@ -86,25 +86,25 @@ void PortWidget::onButton(const event::Button &e) {
 	}
 }
 
-void PortWidget::onEnter(const event::Enter &e) {
+void PortWidget::onEnter(const event::Enter& e) {
 	hovered = true;
 }
 
-void PortWidget::onLeave(const event::Leave &e) {
+void PortWidget::onLeave(const event::Leave& e) {
 	hovered = false;
 }
 
-void PortWidget::onDragStart(const event::DragStart &e) {
+void PortWidget::onDragStart(const event::DragStart& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	CableWidget *cw = NULL;
+	CableWidget* cw = NULL;
 	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		if (type == OUTPUT) {
 			// Keep cable NULL. Will be created below
 		}
 		else {
-			CableWidget *topCw = APP->scene->rack->getTopCable(this);
+			CableWidget* topCw = APP->scene->rack->getTopCable(this);
 			if (topCw) {
 				cw = new CableWidget;
 				cw->setOutput(topCw->outputPort);
@@ -117,7 +117,7 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 
 		if (cw) {
 			// history::CableRemove
-			history::CableRemove *h = new history::CableRemove;
+			history::CableRemove* h = new history::CableRemove;
 			h->setCable(cw);
 			APP->history->push(h);
 
@@ -142,16 +142,19 @@ void PortWidget::onDragStart(const event::DragStart &e) {
 	APP->scene->rack->setIncompleteCable(cw);
 }
 
-void PortWidget::onDragEnd(const event::DragEnd &e) {
+void PortWidget::onDragEnd(const event::DragEnd& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	CableWidget *cw = APP->scene->rack->releaseIncompleteCable();
+	CableWidget* cw = APP->scene->rack->releaseIncompleteCable();
+	if (!cw)
+		return;
+
 	if (cw->isComplete()) {
 		APP->scene->rack->addCable(cw);
 
 		// history::CableAdd
-		history::CableAdd *h = new history::CableAdd;
+		history::CableAdd* h = new history::CableAdd;
 		h->setCable(cw);
 		APP->history->push(h);
 	}
@@ -160,7 +163,7 @@ void PortWidget::onDragEnd(const event::DragEnd &e) {
 	}
 }
 
-void PortWidget::onDragDrop(const event::DragDrop &e) {
+void PortWidget::onDragDrop(const event::DragDrop& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -170,7 +173,7 @@ void PortWidget::onDragDrop(const event::DragDrop &e) {
 			return;
 	}
 
-	CableWidget *cw = APP->scene->rack->incompleteCable;
+	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		cw->hoveredOutputPort = cw->hoveredInputPort = NULL;
 		if (type == OUTPUT)
@@ -180,7 +183,7 @@ void PortWidget::onDragDrop(const event::DragDrop &e) {
 	}
 }
 
-void PortWidget::onDragEnter(const event::DragEnter &e) {
+void PortWidget::onDragEnter(const event::DragEnter& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -190,7 +193,7 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 			return;
 	}
 
-	CableWidget *cw = APP->scene->rack->incompleteCable;
+	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		if (type == OUTPUT)
 			cw->hoveredOutputPort = this;
@@ -199,15 +202,15 @@ void PortWidget::onDragEnter(const event::DragEnter &e) {
 	}
 }
 
-void PortWidget::onDragLeave(const event::DragLeave &e) {
+void PortWidget::onDragLeave(const event::DragLeave& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	PortWidget *originPort = dynamic_cast<PortWidget*>(e.origin);
+	PortWidget* originPort = dynamic_cast<PortWidget*>(e.origin);
 	if (!originPort)
 		return;
 
-	CableWidget *cw = APP->scene->rack->incompleteCable;
+	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		if (type == OUTPUT)
 			cw->hoveredOutputPort = NULL;

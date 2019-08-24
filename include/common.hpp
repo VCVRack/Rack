@@ -120,13 +120,13 @@ Example:
 	Foo *foo = construct<Foo>(&Foo::greeting, "Hello world", &Foo::legs, 2);
 */
 template <typename T>
-T *construct() {
+T* construct() {
 	return new T;
 }
 
 template <typename T, typename F, typename V, typename... Args>
-T *construct(F f, V v, Args... args) {
-	T *o = construct<T>(args...);
+T* construct(F f, V v, Args... args) {
+	T* o = construct<T>(args...);
 	o->*f = v;
 	return o;
 }
@@ -144,7 +144,9 @@ template <typename F>
 struct DeferWrapper {
 	F f;
 	DeferWrapper(F f) : f(f) {}
-	~DeferWrapper() { f(); }
+	~DeferWrapper() {
+		f();
+	}
 };
 
 template <typename F>
@@ -157,7 +159,7 @@ DeferWrapper<F> deferWrapper(F f) {
 
 /** An exception meant to be shown to the user */
 struct UserException : std::runtime_error {
-	UserException(const std::string &msg) : std::runtime_error(msg) {}
+	UserException(const std::string& msg) : std::runtime_error(msg) {}
 };
 
 

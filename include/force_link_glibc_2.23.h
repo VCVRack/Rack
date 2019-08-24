@@ -501,11 +501,11 @@ __asm__(".symver __progname_full,__progname_full@GLIBC_2.2.5");
 __asm__(".symver __pthread_cleanup_routine,__pthread_cleanup_routine@GLIBC_2.3.3");
 __asm__(".symver __pthread_getspecific,__pthread_getspecific@GLIBC_2.2.5");
 #ifndef _GLIBCXX_SHARED
-#ifndef IN_LIBGCC2
-#ifdef _REENTRANT
-__asm__(".symver __pthread_key_create,__pthread_key_create@GLIBC_2.2.5");
-#endif
-#endif
+	#ifndef IN_LIBGCC2
+		#ifdef _REENTRANT
+			__asm__(".symver __pthread_key_create,__pthread_key_create@GLIBC_2.2.5");
+		#endif
+	#endif
 #endif
 __asm__(".symver __pthread_mutex_destroy,__pthread_mutex_destroy@GLIBC_2.2.5");
 __asm__(".symver __pthread_mutex_init,__pthread_mutex_init@GLIBC_2.2.5");
@@ -544,7 +544,7 @@ __asm__(".symver __realpath_chk,__realpath_chk@GLIBC_2.4");
 __asm__(".symver __recv_chk,__recv_chk@GLIBC_2.4");
 __asm__(".symver __recvfrom_chk,__recvfrom_chk@GLIBC_2.4");
 #ifdef _REENTRANT
-__asm__(".symver __register_atfork,__register_atfork@GLIBC_2.3.2");
+	__asm__(".symver __register_atfork,__register_atfork@GLIBC_2.3.2");
 #endif
 __asm__(".symver __remainder_finite,__remainder_finite@GLIBC_2.15");
 __asm__(".symver __remainderf_finite,__remainderf_finite@GLIBC_2.15");
@@ -2009,47 +2009,47 @@ __asm__(".symver pselect,pselect@GLIBC_2.2.5");
 __asm__(".symver psiginfo,psiginfo@GLIBC_2.10");
 __asm__(".symver psignal,psignal@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_destroy,pthread_attr_destroy@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_destroy,pthread_attr_destroy@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_attr_getaffinity_np,pthread_attr_getaffinity_np@GLIBC_2.3.4");
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_getdetachstate,pthread_attr_getdetachstate@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_getdetachstate,pthread_attr_getdetachstate@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_attr_getguardsize,pthread_attr_getguardsize@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_getinheritsched,pthread_attr_getinheritsched@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_getinheritsched,pthread_attr_getinheritsched@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_getschedparam,pthread_attr_getschedparam@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_getschedparam,pthread_attr_getschedparam@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_getschedpolicy,pthread_attr_getschedpolicy@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_getschedpolicy,pthread_attr_getschedpolicy@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_getscope,pthread_attr_getscope@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_getscope,pthread_attr_getscope@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_attr_getstack,pthread_attr_getstack@GLIBC_2.2.5");
 __asm__(".symver pthread_attr_getstackaddr,pthread_attr_getstackaddr@GLIBC_2.2.5");
 __asm__(".symver pthread_attr_getstacksize,pthread_attr_getstacksize@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_init,pthread_attr_init@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_init,pthread_attr_init@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_attr_setaffinity_np,pthread_attr_setaffinity_np@GLIBC_2.3.4");
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_setdetachstate,pthread_attr_setdetachstate@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_setdetachstate,pthread_attr_setdetachstate@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_attr_setguardsize,pthread_attr_setguardsize@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_setinheritsched,pthread_attr_setinheritsched@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_setinheritsched,pthread_attr_setinheritsched@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_setschedparam,pthread_attr_setschedparam@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_setschedparam,pthread_attr_setschedparam@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_setschedpolicy,pthread_attr_setschedpolicy@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_setschedpolicy,pthread_attr_setschedpolicy@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_attr_setscope,pthread_attr_setscope@GLIBC_2.2.5");
+	__asm__(".symver pthread_attr_setscope,pthread_attr_setscope@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_attr_setstack,pthread_attr_setstack@GLIBC_2.2.5");
 __asm__(".symver pthread_attr_setstackaddr,pthread_attr_setstackaddr@GLIBC_2.2.5");
@@ -2063,44 +2063,44 @@ __asm__(".symver pthread_barrierattr_init,pthread_barrierattr_init@GLIBC_2.2.5")
 __asm__(".symver pthread_barrierattr_setpshared,pthread_barrierattr_setpshared@GLIBC_2.2.5");
 __asm__(".symver pthread_cancel,pthread_cancel@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_cond_broadcast,pthread_cond_broadcast@GLIBC_2.3.2");
+	__asm__(".symver pthread_cond_broadcast,pthread_cond_broadcast@GLIBC_2.3.2");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_cond_destroy,pthread_cond_destroy@GLIBC_2.3.2");
+	__asm__(".symver pthread_cond_destroy,pthread_cond_destroy@GLIBC_2.3.2");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_cond_init,pthread_cond_init@GLIBC_2.3.2");
+	__asm__(".symver pthread_cond_init,pthread_cond_init@GLIBC_2.3.2");
 #endif
 __asm__(".symver pthread_cond_signal,pthread_cond_signal@GLIBC_2.3.2");
 #ifdef _REENTRANT
-__asm__(".symver pthread_cond_timedwait,pthread_cond_timedwait@GLIBC_2.3.2");
+	__asm__(".symver pthread_cond_timedwait,pthread_cond_timedwait@GLIBC_2.3.2");
 #endif
 __asm__(".symver pthread_cond_wait,pthread_cond_wait@GLIBC_2.3.2");
 #ifdef _REENTRANT
-__asm__(".symver pthread_condattr_destroy,pthread_condattr_destroy@GLIBC_2.2.5");
+	__asm__(".symver pthread_condattr_destroy,pthread_condattr_destroy@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_condattr_getclock,pthread_condattr_getclock@GLIBC_2.3.3");
 __asm__(".symver pthread_condattr_getpshared,pthread_condattr_getpshared@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_condattr_init,pthread_condattr_init@GLIBC_2.2.5");
+	__asm__(".symver pthread_condattr_init,pthread_condattr_init@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_condattr_setclock,pthread_condattr_setclock@GLIBC_2.3.3");
 __asm__(".symver pthread_condattr_setpshared,pthread_condattr_setpshared@GLIBC_2.2.5");
 #ifndef _GLIBCXX_SHARED
-#ifdef _REENTRANT
-__asm__(".symver pthread_create,pthread_create@GLIBC_2.2.5");
-#endif
+	#ifdef _REENTRANT
+		__asm__(".symver pthread_create,pthread_create@GLIBC_2.2.5");
+	#endif
 #endif
 #ifndef _GLIBCXX_SHARED
-#ifdef _REENTRANT
-__asm__(".symver pthread_detach,pthread_detach@GLIBC_2.2.5");
-#endif
-#endif
-#ifdef _REENTRANT
-__asm__(".symver pthread_equal,pthread_equal@GLIBC_2.2.5");
+	#ifdef _REENTRANT
+		__asm__(".symver pthread_detach,pthread_detach@GLIBC_2.2.5");
+	#endif
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_exit,pthread_exit@GLIBC_2.2.5");
+	__asm__(".symver pthread_equal,pthread_equal@GLIBC_2.2.5");
+#endif
+#ifdef _REENTRANT
+	__asm__(".symver pthread_exit,pthread_exit@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_getaffinity_np,pthread_getaffinity_np@GLIBC_2.3.4");
 __asm__(".symver pthread_getattr_default_np,pthread_getattr_default_np@GLIBC_2.18");
@@ -2109,50 +2109,50 @@ __asm__(".symver pthread_getconcurrency,pthread_getconcurrency@GLIBC_2.2.5");
 __asm__(".symver pthread_getcpuclockid,pthread_getcpuclockid@GLIBC_2.2.5");
 __asm__(".symver pthread_getname_np,pthread_getname_np@GLIBC_2.12");
 #ifdef _REENTRANT
-__asm__(".symver pthread_getschedparam,pthread_getschedparam@GLIBC_2.2.5");
+	__asm__(".symver pthread_getschedparam,pthread_getschedparam@GLIBC_2.2.5");
 #endif
 #ifndef _GLIBCXX_SHARED
-#ifndef IN_LIBGCC2
-#ifdef _REENTRANT
-__asm__(".symver pthread_getspecific,pthread_getspecific@GLIBC_2.2.5");
-#endif
-#endif
-#endif
-#ifndef _GLIBCXX_SHARED
-#ifdef _REENTRANT
-__asm__(".symver pthread_join,pthread_join@GLIBC_2.2.5");
-#endif
+	#ifndef IN_LIBGCC2
+		#ifdef _REENTRANT
+			__asm__(".symver pthread_getspecific,pthread_getspecific@GLIBC_2.2.5");
+		#endif
+	#endif
 #endif
 #ifndef _GLIBCXX_SHARED
-#ifndef IN_LIBGCC2
-#ifdef _REENTRANT
-__asm__(".symver pthread_key_create,pthread_key_create@GLIBC_2.2.5");
-#endif
-#endif
+	#ifdef _REENTRANT
+		__asm__(".symver pthread_join,pthread_join@GLIBC_2.2.5");
+	#endif
 #endif
 #ifndef _GLIBCXX_SHARED
-#ifdef _REENTRANT
-__asm__(".symver pthread_key_delete,pthread_key_delete@GLIBC_2.2.5");
+	#ifndef IN_LIBGCC2
+		#ifdef _REENTRANT
+			__asm__(".symver pthread_key_create,pthread_key_create@GLIBC_2.2.5");
+		#endif
+	#endif
 #endif
+#ifndef _GLIBCXX_SHARED
+	#ifdef _REENTRANT
+		__asm__(".symver pthread_key_delete,pthread_key_delete@GLIBC_2.2.5");
+	#endif
 #endif
 __asm__(".symver pthread_kill,pthread_kill@GLIBC_2.2.5");
 __asm__(".symver pthread_mutex_consistent,pthread_mutex_consistent@GLIBC_2.12");
 __asm__(".symver pthread_mutex_consistent_np,pthread_mutex_consistent_np@GLIBC_2.4");
 #ifdef _REENTRANT
-__asm__(".symver pthread_mutex_destroy,pthread_mutex_destroy@GLIBC_2.2.5");
+	__asm__(".symver pthread_mutex_destroy,pthread_mutex_destroy@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_mutex_getprioceiling,pthread_mutex_getprioceiling@GLIBC_2.4");
 #ifdef _REENTRANT
-__asm__(".symver pthread_mutex_init,pthread_mutex_init@GLIBC_2.2.5");
+	__asm__(".symver pthread_mutex_init,pthread_mutex_init@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_mutex_lock,pthread_mutex_lock@GLIBC_2.2.5");
+	__asm__(".symver pthread_mutex_lock,pthread_mutex_lock@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_mutex_setprioceiling,pthread_mutex_setprioceiling@GLIBC_2.4");
 __asm__(".symver pthread_mutex_timedlock,pthread_mutex_timedlock@GLIBC_2.2.5");
 __asm__(".symver pthread_mutex_trylock,pthread_mutex_trylock@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_mutex_unlock,pthread_mutex_unlock@GLIBC_2.2.5");
+	__asm__(".symver pthread_mutex_unlock,pthread_mutex_unlock@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_mutexattr_destroy,pthread_mutexattr_destroy@GLIBC_2.2.5");
 __asm__(".symver pthread_mutexattr_getkind_np,pthread_mutexattr_getkind_np@GLIBC_2.2.5");
@@ -2171,11 +2171,11 @@ __asm__(".symver pthread_mutexattr_setrobust,pthread_mutexattr_setrobust@GLIBC_2
 __asm__(".symver pthread_mutexattr_setrobust_np,pthread_mutexattr_setrobust_np@GLIBC_2.4");
 __asm__(".symver pthread_mutexattr_settype,pthread_mutexattr_settype@GLIBC_2.2.5");
 #ifndef _GLIBCXX_SHARED
-#ifndef IN_LIBGCC2
-#ifdef _REENTRANT
-__asm__(".symver pthread_once,pthread_once@GLIBC_2.2.5");
-#endif
-#endif
+	#ifndef IN_LIBGCC2
+		#ifdef _REENTRANT
+			__asm__(".symver pthread_once,pthread_once@GLIBC_2.2.5");
+		#endif
+	#endif
 #endif
 __asm__(".symver pthread_rwlock_destroy,pthread_rwlock_destroy@GLIBC_2.2.5");
 __asm__(".symver pthread_rwlock_init,pthread_rwlock_init@GLIBC_2.2.5");
@@ -2193,28 +2193,28 @@ __asm__(".symver pthread_rwlockattr_init,pthread_rwlockattr_init@GLIBC_2.2.5");
 __asm__(".symver pthread_rwlockattr_setkind_np,pthread_rwlockattr_setkind_np@GLIBC_2.2.5");
 __asm__(".symver pthread_rwlockattr_setpshared,pthread_rwlockattr_setpshared@GLIBC_2.2.5");
 #ifdef _REENTRANT
-__asm__(".symver pthread_self,pthread_self@GLIBC_2.2.5");
+	__asm__(".symver pthread_self,pthread_self@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_setaffinity_np,pthread_setaffinity_np@GLIBC_2.3.4");
 __asm__(".symver pthread_setattr_default_np,pthread_setattr_default_np@GLIBC_2.18");
 #ifdef _REENTRANT
-__asm__(".symver pthread_setcancelstate,pthread_setcancelstate@GLIBC_2.2.5");
+	__asm__(".symver pthread_setcancelstate,pthread_setcancelstate@GLIBC_2.2.5");
 #endif
 #ifdef _REENTRANT
-__asm__(".symver pthread_setcanceltype,pthread_setcanceltype@GLIBC_2.2.5");
+	__asm__(".symver pthread_setcanceltype,pthread_setcanceltype@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_setconcurrency,pthread_setconcurrency@GLIBC_2.2.5");
 __asm__(".symver pthread_setname_np,pthread_setname_np@GLIBC_2.12");
 #ifdef _REENTRANT
-__asm__(".symver pthread_setschedparam,pthread_setschedparam@GLIBC_2.2.5");
+	__asm__(".symver pthread_setschedparam,pthread_setschedparam@GLIBC_2.2.5");
 #endif
 __asm__(".symver pthread_setschedprio,pthread_setschedprio@GLIBC_2.3.4");
 #ifndef _GLIBCXX_SHARED
-#ifndef IN_LIBGCC2
-#ifdef _REENTRANT
-__asm__(".symver pthread_setspecific,pthread_setspecific@GLIBC_2.2.5");
-#endif
-#endif
+	#ifndef IN_LIBGCC2
+		#ifdef _REENTRANT
+			__asm__(".symver pthread_setspecific,pthread_setspecific@GLIBC_2.2.5");
+		#endif
+	#endif
 #endif
 __asm__(".symver pthread_sigmask,pthread_sigmask@GLIBC_2.2.5");
 __asm__(".symver pthread_sigqueue,pthread_sigqueue@GLIBC_2.11");

@@ -9,7 +9,7 @@ RadioButton::RadioButton() {
 	box.size.y = BND_WIDGET_HEIGHT;
 }
 
-void RadioButton::draw(const DrawArgs &args) {
+void RadioButton::draw(const DrawArgs& args) {
 	BNDwidgetState state = BND_DEFAULT;
 	if (APP->event->hoveredWidget == this)
 		state = BND_HOVER;
@@ -23,7 +23,7 @@ void RadioButton::draw(const DrawArgs &args) {
 	bndRadioButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
 }
 
-void RadioButton::onDragDrop(const event::DragDrop &e) {
+void RadioButton::onDragDrop(const event::DragDrop& e) {
 	if (e.origin == this) {
 		if (quantity) {
 			if (quantity->isMax())

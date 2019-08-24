@@ -26,7 +26,7 @@ void ScrollWidget::scrollTo(math::Rect r) {
 	offset = offset.clampSafe(bound);
 }
 
-void ScrollWidget::draw(const DrawArgs &args) {
+void ScrollWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 	Widget::draw(args);
 	nvgResetScissor(args.vg);
@@ -63,7 +63,7 @@ void ScrollWidget::step() {
 	verticalScrollBar->box.size.y = horizontalScrollBar->visible ? inner.y : box.size.y;
 }
 
-void ScrollWidget::onButton(const event::Button &e) {
+void ScrollWidget::onButton(const event::Button& e) {
 	Widget::onButton(e);
 	if (e.isConsumed())
 		return;
@@ -77,13 +77,13 @@ void ScrollWidget::onButton(const event::Button &e) {
 	}
 }
 
-void ScrollWidget::onDragStart(const event::DragStart &e) {
+void ScrollWidget::onDragStart(const event::DragStart& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
 		e.consume(this);
 	}
 }
 
-void ScrollWidget::onDragMove(const event::DragMove &e) {
+void ScrollWidget::onDragMove(const event::DragMove& e) {
 	// Scroll only if the scrollbars are visible
 	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
 		return;
@@ -91,7 +91,7 @@ void ScrollWidget::onDragMove(const event::DragMove &e) {
 	offset = offset.minus(e.mouseDelta);
 }
 
-void ScrollWidget::onHoverScroll(const event::HoverScroll &e) {
+void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	OpaqueWidget::onHoverScroll(e);
 	if (e.isConsumed())
 		return;

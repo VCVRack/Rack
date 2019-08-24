@@ -7,23 +7,23 @@ namespace app {
 
 
 struct MidiDriverItem : ui::MenuItem {
-	midi::Port *port;
+	midi::Port* port;
 	int driverId;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		port->setDriverId(driverId);
 	}
 };
 
 struct MidiDriverChoice : LedDisplayChoice {
-	midi::Port *port;
-	void onAction(const event::Action &e) override {
+	midi::Port* port;
+	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
 
-		ui::Menu *menu = createMenu();
+		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI driver"));
 		for (int driverId : port->getDriverIds()) {
-			MidiDriverItem *item = new MidiDriverItem;
+			MidiDriverItem* item = new MidiDriverItem;
 			item->port = port;
 			item->driverId = driverId;
 			item->text = port->getDriverName(driverId);
@@ -44,23 +44,23 @@ struct MidiDriverChoice : LedDisplayChoice {
 };
 
 struct MidiDeviceItem : ui::MenuItem {
-	midi::Port *port;
+	midi::Port* port;
 	int deviceId;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		port->setDeviceId(deviceId);
 	}
 };
 
 struct MidiDeviceChoice : LedDisplayChoice {
-	midi::Port *port;
-	void onAction(const event::Action &e) override {
+	midi::Port* port;
+	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
 
-		ui::Menu *menu = createMenu();
+		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI device"));
 		{
-			MidiDeviceItem *item = new MidiDeviceItem;
+			MidiDeviceItem* item = new MidiDeviceItem;
 			item->port = port;
 			item->deviceId = -1;
 			item->text = "(No device)";
@@ -68,7 +68,7 @@ struct MidiDeviceChoice : LedDisplayChoice {
 			menu->addChild(item);
 		}
 		for (int deviceId : port->getDeviceIds()) {
-			MidiDeviceItem *item = new MidiDeviceItem;
+			MidiDeviceItem* item = new MidiDeviceItem;
 			item->port = port;
 			item->deviceId = deviceId;
 			item->text = port->getDeviceName(deviceId);
@@ -89,23 +89,23 @@ struct MidiDeviceChoice : LedDisplayChoice {
 };
 
 struct MidiChannelItem : ui::MenuItem {
-	midi::Port *port;
+	midi::Port* port;
 	int channel;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		port->channel = channel;
 	}
 };
 
 struct MidiChannelChoice : LedDisplayChoice {
-	midi::Port *port;
-	void onAction(const event::Action &e) override {
+	midi::Port* port;
+	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
 
-		ui::Menu *menu = createMenu();
+		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI channel"));
 		for (int channel : port->getChannels()) {
-			MidiChannelItem *item = new MidiChannelItem;
+			MidiChannelItem* item = new MidiChannelItem;
 			item->port = port;
 			item->channel = channel;
 			item->text = port->getChannelName(channel);
@@ -119,12 +119,12 @@ struct MidiChannelChoice : LedDisplayChoice {
 };
 
 
-void MidiWidget::setMidiPort(midi::Port *port) {
+void MidiWidget::setMidiPort(midi::Port* port) {
 	clearChildren();
 
 	math::Vec pos;
 
-	MidiDriverChoice *driverChoice = createWidget<MidiDriverChoice>(pos);
+	MidiDriverChoice* driverChoice = createWidget<MidiDriverChoice>(pos);
 	driverChoice->box.size.x = box.size.x;
 	driverChoice->port = port;
 	addChild(driverChoice);
@@ -135,7 +135,7 @@ void MidiWidget::setMidiPort(midi::Port *port) {
 	this->driverSeparator->box.size.x = box.size.x;
 	addChild(this->driverSeparator);
 
-	MidiDeviceChoice *deviceChoice = createWidget<MidiDeviceChoice>(pos);
+	MidiDeviceChoice* deviceChoice = createWidget<MidiDeviceChoice>(pos);
 	deviceChoice->box.size.x = box.size.x;
 	deviceChoice->port = port;
 	addChild(deviceChoice);
@@ -146,7 +146,7 @@ void MidiWidget::setMidiPort(midi::Port *port) {
 	this->deviceSeparator->box.size.x = box.size.x;
 	addChild(this->deviceSeparator);
 
-	MidiChannelChoice *channelChoice = createWidget<MidiChannelChoice>(pos);
+	MidiChannelChoice* channelChoice = createWidget<MidiChannelChoice>(pos);
 	channelChoice->box.size.x = box.size.x;
 	channelChoice->port = port;
 	addChild(channelChoice);

@@ -12,7 +12,7 @@ void MenuOverlay::step() {
 	Widget::step();
 }
 
-void MenuOverlay::onButton(const event::Button &e) {
+void MenuOverlay::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 	if (e.isConsumed() && e.getTarget() != this)
 		return;
@@ -23,7 +23,7 @@ void MenuOverlay::onButton(const event::Button &e) {
 	}
 }
 
-void MenuOverlay::onHoverKey(const event::HoverKey &e) {
+void MenuOverlay::onHoverKey(const event::HoverKey& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;

@@ -13,7 +13,7 @@ RackRail::RackRail() {
 }
 
 
-void RackRail::draw(const DrawArgs &args) {
+void RackRail::draw(const DrawArgs& args) {
 	const float railHeight = 15;
 
 	// Background color

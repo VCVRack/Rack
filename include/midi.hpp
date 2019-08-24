@@ -59,17 +59,31 @@ struct Output;
 
 struct Driver {
 	virtual ~Driver() {}
-	virtual std::string getName() {return "";}
+	virtual std::string getName() {
+		return "";
+	}
 
-	virtual std::vector<int> getInputDeviceIds() {return {};}
-	virtual std::string getInputDeviceName(int deviceId) {return "";}
-	virtual InputDevice *subscribeInput(int deviceId, Input *input) {return NULL;}
-	virtual void unsubscribeInput(int deviceId, Input *input) {}
+	virtual std::vector<int> getInputDeviceIds() {
+		return {};
+	}
+	virtual std::string getInputDeviceName(int deviceId) {
+		return "";
+	}
+	virtual InputDevice* subscribeInput(int deviceId, Input* input) {
+		return NULL;
+	}
+	virtual void unsubscribeInput(int deviceId, Input* input) {}
 
-	virtual std::vector<int> getOutputDeviceIds() {return {};}
-	virtual std::string getOutputDeviceName(int deviceId) {return "";}
-	virtual OutputDevice *subscribeOutput(int deviceId, Output *output) {return NULL;}
-	virtual void unsubscribeOutput(int deviceId, Output *output) {}
+	virtual std::vector<int> getOutputDeviceIds() {
+		return {};
+	}
+	virtual std::string getOutputDeviceName(int deviceId) {
+		return "";
+	}
+	virtual OutputDevice* subscribeOutput(int deviceId, Output* output) {
+		return NULL;
+	}
+	virtual void unsubscribeOutput(int deviceId, Output* output) {}
 };
 
 ////////////////////
@@ -82,15 +96,15 @@ struct Device {
 
 struct InputDevice : Device {
 	std::set<Input*> subscribed;
-	void subscribe(Input *input);
-	void unsubscribe(Input *input);
+	void subscribe(Input* input);
+	void unsubscribe(Input* input);
 	void onMessage(Message message);
 };
 
 struct OutputDevice : Device {
 	std::set<Output*> subscribed;
-	void subscribe(Output *input);
-	void unsubscribe(Output *input);
+	void subscribe(Output* input);
+	void unsubscribe(Output* input);
 	virtual void sendMessage(Message message) {}
 };
 
@@ -108,7 +122,7 @@ struct Port {
 	*/
 	int channel = -1;
 	/** Not owned */
-	Driver *driver = NULL;
+	Driver* driver = NULL;
 
 	/** Remember to call setDriverId(-1) in subclass destructors. */
 	virtual ~Port() {}
@@ -125,14 +139,14 @@ struct Port {
 	std::string getChannelName(int channel);
 	void setChannel(int channel);
 
-	json_t *toJson();
-	void fromJson(json_t *rootJ);
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
 };
 
 
 struct Input : Port {
 	/** Not owned */
-	InputDevice *inputDevice = NULL;
+	InputDevice* inputDevice = NULL;
 
 	Input();
 	~Input();
@@ -152,13 +166,13 @@ struct InputQueue : Input {
 	std::queue<Message> queue;
 	void onMessage(Message message) override;
 	/** If a Message is available, writes `message` and return true */
-	bool shift(Message *message);
+	bool shift(Message* message);
 };
 
 
 struct Output : Port {
 	/** Not owned */
-	OutputDevice *outputDevice = NULL;
+	OutputDevice* outputDevice = NULL;
 
 	Output();
 	~Output();
@@ -176,7 +190,7 @@ struct Output : Port {
 void init();
 void destroy();
 /** Registers a new MIDI driver. Takes pointer ownership. */
-void addDriver(int driverId, Driver *driver);
+void addDriver(int driverId, Driver* driver);
 
 
 } // namespace midi
