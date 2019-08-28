@@ -21,7 +21,7 @@ ifdef ARCH_LIN
 build/dep/osdialog/osdialog_gtk2.c.o: FLAGS += $(shell pkg-config --cflags gtk+-2.0)
 
 	LDFLAGS += -rdynamic \
-		dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtmidi.a dep/lib/librtaudio.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a \
+		dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a \
 		-lpthread -lGL -ldl -lX11 -lasound -ljack \
 		$(shell pkg-config --libs gtk+-2.0)
 	TARGET := Rack

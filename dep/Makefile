@@ -10,39 +10,42 @@ ifdef ARCH_LIN
 	glew = lib/libGLEW.a
 	glfw = lib/libglfw3.a
 	jansson = lib/libjansson.a
-	libspeexdsp = lib/libspeexdsp.a
+	openssl = lib/libssl.a
 	libcurl = lib/libcurl.a
 	libzip = lib/libzip.a
 	zlib = lib/libz.a
+	libspeexdsp = lib/libspeexdsp.a
+	libsamplerate = lib/libsamplerate.a
 	rtmidi = lib/librtmidi.a
 	rtaudio = lib/librtaudio.a
-	openssl = lib/libssl.a
 endif
 
 ifdef ARCH_MAC
 	glew = lib/libGLEW.a
 	glfw = lib/libglfw3.a
 	jansson = lib/libjansson.a
-	libspeexdsp = lib/libspeexdsp.a
+	openssl = lib/libssl.a
 	libcurl = lib/libcurl.a
 	libzip = lib/libzip.a
 	zlib = lib/libz.a
+	libspeexdsp = lib/libspeexdsp.a
+	libsamplerate = lib/libsamplerate.a
 	rtmidi = lib/librtmidi.a
 	rtaudio = lib/librtaudio.a
-	openssl = lib/libssl.a
 endif
 
 ifdef ARCH_WIN
 	glew = lib/libglew32.a
 	glfw = lib/libglfw3.a
 	jansson = lib/libjansson.a
-	libspeexdsp = lib/libspeexdsp.a
+	openssl = lib/libssl.a
 	libcurl = lib/libcurl.a
 	libzip = lib/libzip.a
 	zlib = lib/libz.a
+	libspeexdsp = lib/libspeexdsp.a
+	libsamplerate = lib/libsamplerate.a
 	rtmidi = lib/librtmidi.a
 	rtaudio = lib/librtaudio.a
-	openssl = lib/libssl.a
 endif
 
 nanovg = include/nanovg.h
@@ -51,7 +54,20 @@ oui-blendish = include/blendish.h
 osdialog = include/osdialog.h
 pffft = include/pffft.h
 
-DEPS += $(glew) $(glfw) $(jansson) $(libspeexdsp) $(libcurl) $(libzip) $(rtmidi) $(rtaudio) $(nanovg) $(nanosvg) $(oui-blendish) $(osdialog) $(pffft)
+DEPS += $(glew)
+DEPS += $(glfw)
+DEPS += $(jansson)
+DEPS += $(libcurl)
+DEPS += $(libzip)
+DEPS += $(libspeexdsp)
+DEPS += $(libsamplerate)
+DEPS += $(rtmidi)
+DEPS += $(rtaudio)
+DEPS += $(nanovg)
+DEPS += $(nanosvg)
+DEPS += $(oui-blendish)
+DEPS += $(osdialog)
+DEPS += $(pffft)
 
 
 DEP_LOCAL := .
@@ -89,17 +105,6 @@ $(jansson): jansson-2.12
 	cd jansson-2.12 && $(CONFIGURE)
 	$(MAKE) -C jansson-2.12
 	$(MAKE) -C jansson-2.12 install
-
-speexdsp-SpeexDSP-1.2rc3:
-	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
-	$(SHA256) speexdsp-SpeexDSP-1.2rc3.tgz c8dded1454747f65956f981c95e7f89a06abdaa2a53e8aeaa66bab2a3d59cebd
-	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
-	rm speexdsp-SpeexDSP-1.2rc3.tgz
-
-$(libspeexdsp): speexdsp-SpeexDSP-1.2rc3
-	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
-	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
-	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
 openssl-1.1.1b:
 	$(WGET) "https://www.openssl.org/source/openssl-1.1.1b.tar.gz"
@@ -156,6 +161,28 @@ else
 	$(MAKE) -C zlib-1.2.11
 	$(MAKE) -C zlib-1.2.11 install
 endif
+
+speexdsp-SpeexDSP-1.2rc3:
+	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
+	$(SHA256) speexdsp-SpeexDSP-1.2rc3.tgz c8dded1454747f65956f981c95e7f89a06abdaa2a53e8aeaa66bab2a3d59cebd
+	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
+	rm speexdsp-SpeexDSP-1.2rc3.tgz
+
+$(libspeexdsp): speexdsp-SpeexDSP-1.2rc3
+	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
+	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
+	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
+
+libsamplerate-0.1.9:
+	$(WGET) "http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz"
+	$(SHA256) libsamplerate-0.1.9.tar.gz 0a7eb168e2f21353fb6d84da152e4512126f7dc48ccb0be80578c565413444c1
+	$(UNTAR) libsamplerate-0.1.9.tar.gz
+	rm libsamplerate-0.1.9.tar.gz
+
+$(libsamplerate): libsamplerate-0.1.9
+	cd libsamplerate-0.1.9 && $(CONFIGURE) --disable-fftw --disable-sndfile
+	$(MAKE) -C libsamplerate-0.1.9
+	$(MAKE) -C libsamplerate-0.1.9 install
 
 rtmidi-4.0.0:
 	$(WGET) "http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-4.0.0.tar.gz"
