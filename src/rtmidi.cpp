@@ -68,7 +68,10 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	}
 
 	void sendMessage(midi::Message message) override {
-		rtMidiOut->sendMessage(message.bytes, message.size);
+		if(message.size > 3)
+			rtMidiOut->sendMessage(message.longMessage, message.size);
+		else
+			rtMidiOut->sendMessage(message.bytes, message.size);
 	}
 };
 
