@@ -1,4 +1,5 @@
 # Rack
+[![Packaging status](https://repology.org/badge/tiny-repos/vcvrack.svg)](https://repology.org/project/vcvrack/versions)
 
 *Rack* is the engine for the VCV open-source virtual modular synthesizer.
 
