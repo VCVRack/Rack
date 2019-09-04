@@ -32,12 +32,19 @@ def is_valid_slug(slug):
 
 
 def slug_to_identifier(slug):
+	slug = slug.split('|')[0]
 	if len(slug) == 0 or slug[0].isdigit():
 		slug = "_" + slug
 	slug = slug[0].upper() + slug[1:]
 	slug = slug.replace('-', '_')
 	return slug
 
+def slug_to_class(slug):
+        tokens = slug.split('|')
+        if len(tokens) > 1:
+                return tokens[1]
+        else:
+                return None
 
 def create_plugin(slug, plugin_dir=None):
 	# Check slug
@@ -284,6 +291,8 @@ def panel_to_components(tree):
 		name = el.get('{http://www.inkscape.org/namespaces/inkscape}label')
 		if name is None:
 			name = el.get('id')
+		c['class'] = slug_to_class(name)
+
 		name = slug_to_identifier(name).upper()
 		c['name'] = name
 
@@ -418,45 +427,49 @@ struct {identifier}Widget : ModuleWidget {{
 	if len(components['params']) > 0:
 		source += "\n"
 	for c in components['params']:
+		class_name = c['class'] if c['class'] else "RoundBlackKnob"
 		if 'x' in c:
 			source += f"""
-		addParam(createParam<RoundBlackKnob>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_PARAM));"""
+		addParam(createParam<{class_name}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_PARAM));"""
 		else:
 			source += f"""
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_PARAM));"""
+		addParam(createParamCentered<{class_name}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_PARAM));"""
 
 	# Inputs
 	if len(components['inputs']) > 0:
 		source += "\n"
 	for c in components['inputs']:
+		class_name = c['class'] if c['class'] else "PJ301MPort"
 		if 'x' in c:
 			source += f"""
-		addInput(createInput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_INPUT));"""
+		addInput(createInput<{class_name}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_INPUT));"""
 		else:
 			source += f"""
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_INPUT));"""
+		addInput(createInputCentered<{class_name}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_INPUT));"""
 
 	# Outputs
 	if len(components['outputs']) > 0:
 		source += "\n"
 	for c in components['outputs']:
+		class_name = c['class'] if c['class'] else "PJ301MPort"
 		if 'x' in c:
 			source += f"""
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_OUTPUT));"""
+		addOutput(createOutput<{class_name}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_OUTPUT));"""
 		else:
 			source += f"""
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_OUTPUT));"""
+		addOutput(createOutputCentered<{class_name}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_OUTPUT));"""
 
 	# Lights
 	if len(components['lights']) > 0:
 		source += "\n"
 	for c in components['lights']:
+		class_name = c['class'] if c['class'] else "MediumLight<RedLight>"
 		if 'x' in c:
 			source += f"""
-		addChild(createLight<MediumLight<RedLight>>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_LIGHT));"""
+		addChild(createLight<{class_name}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_LIGHT));"""
 		else:
 			source += f"""
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_LIGHT));"""
+		addChild(createLightCentered<{class_name}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_LIGHT));"""
 
 	# Widgets
 	if len(components['widgets']) > 0:
