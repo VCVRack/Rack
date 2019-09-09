@@ -615,7 +615,7 @@ inline void TagItem::step() {
 }
 
 inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
-	if (e.action == GLFW_PRESS) {
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_ESCAPE: {
 				BrowserOverlay* overlay = getAncestorOfType<BrowserOverlay>();
