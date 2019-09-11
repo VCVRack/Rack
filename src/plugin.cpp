@@ -17,8 +17,6 @@
 #include <map>
 #include <stdexcept>
 
-#define ZIP_STATIC
-#include <zip.h>
 #include <jansson.h>
 
 #if defined ARCH_WIN
@@ -174,74 +172,6 @@ static void loadPlugins(std::string path) {
 	}
 }
 
-/** Returns 0 if successful */
-static int extractZipHandle(zip_t* za, std::string dir) {
-	int err;
-	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
-		zip_stat_t zs;
-		err = zip_stat_index(za, i, 0, &zs);
-		if (err) {
-			WARN("zip_stat_index() failed: error %d", err);
-			return err;
-		}
-
-		std::string path = dir + "/" + zs.name;
-
-		if (path[path.size() - 1] == '/') {
-			system::createDirectory(path);
-			// HACK
-			// Create and delete file to update the directory's mtime.
-			std::string tmpPath = path + "/.tmp";
-			FILE* tmpFile = fopen(tmpPath.c_str(), "w");
-			fclose(tmpFile);
-			std::remove(tmpPath.c_str());
-		}
-		else {
-			zip_file_t* zf = zip_fopen_index(za, i, 0);
-			if (!zf) {
-				WARN("zip_fopen_index() failed");
-				return -1;
-			}
-
-			FILE* outFile = fopen(path.c_str(), "wb");
-			if (!outFile)
-				continue;
-
-			while (1) {
-				char buffer[1 << 15];
-				int len = zip_fread(zf, buffer, sizeof(buffer));
-				if (len <= 0)
-					break;
-				fwrite(buffer, 1, len, outFile);
-			}
-
-			err = zip_fclose(zf);
-			if (err) {
-				WARN("zip_fclose() failed: error %d", err);
-				return err;
-			}
-			fclose(outFile);
-		}
-	}
-	return 0;
-}
-
-/** Returns 0 if successful */
-static int extractZip(std::string filename, std::string path) {
-	int err;
-	zip_t* za = zip_open(filename.c_str(), 0, &err);
-	if (!za) {
-		WARN("Could not open zip %s: error %d", filename.c_str(), err);
-		return err;
-	}
-	DEFER({
-		zip_close(za);
-	});
-
-	err = extractZipHandle(za, path);
-	return err;
-}
-
 static void extractPackages(std::string path) {
 	std::string message;
 
@@ -250,7 +180,7 @@ static void extractPackages(std::string path) {
 			continue;
 		INFO("Extracting package %s", packagePath.c_str());
 		// Extract package
-		if (extractZip(packagePath, path)) {
+		if (system::unzipToFolder(packagePath, path)) {
 			WARN("Package %s failed to extract", packagePath.c_str());
 			message += string::f("Could not extract package %s\n", packagePath.c_str());
 			continue;
@@ -289,7 +219,7 @@ void init() {
 	std::string fundamentalDir = asset::pluginsPath + "/Fundamental";
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");
-		extractZip(fundamentalSrc.c_str(), asset::pluginsPath.c_str());
+		system::unzipToFolder(fundamentalSrc.c_str(), asset::pluginsPath.c_str());
 		loadPlugin(fundamentalDir);
 	}
 
