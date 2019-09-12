@@ -2,6 +2,12 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 1.1.5 (in development)
+- Swap order of tags and brands in Module Browser.
+- Disable smoothing for MIDI CC buttons in MIDI-Map.
+- API
+	- Add libsamplerate library.
+
 ### 1.1.4 (2019-08-22)
 - Fix parameter smoothing of MIDI-Map.
 - Sort modules within plugin in the Module Browser according to plugin rather than alphabetically.
