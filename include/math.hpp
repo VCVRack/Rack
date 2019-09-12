@@ -147,7 +147,7 @@ inline float crossfade(float a, float b, float p) {
 }
 
 /** Linearly interpolates an array `p` with index `x`.
-Assumes that the array at `p` is of length at least `floor(x) + 1`.
+The array at `p` must be at least length `floor(x) + 2`.
 */
 inline float interpolateLinear(const float* p, float x) {
 	int xi = x;
