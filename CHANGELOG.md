@@ -5,6 +5,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 ### 1.1.5 (in development)
 - Swap order of tags and brands in Module Browser.
 - Disable smoothing for MIDI CC buttons in MIDI-Map.
+- Automatically unzip update on Mac.
 - API
 	- Add libsamplerate library.
 

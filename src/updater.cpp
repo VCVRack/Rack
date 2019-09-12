@@ -61,16 +61,23 @@ void update() {
 	if (downloadUrl == "")
 		return;
 
-#if defined ARCH_WIN
-	// Download and launch the installer on Windows
+#if defined ARCH_WIN || defined ARCH_MAC
+	// Download update
 	std::string filename = string::filename(network::urlPath(downloadUrl));
 	std::string path = asset::user(filename);
 	INFO("Download update %s to %s", downloadUrl.c_str(), path.c_str());
 	network::requestDownload(downloadUrl, path, &progress);
+#endif
+
+#if defined ARCH_WIN
+	// Launch the installer
 	INFO("Launching update %s", path.c_str());
 	system::runProcessDetached(path);
+#elif defined ARCH_MAC
+	// Unzip app using Apple's unzipper, since Rack's unzipper doesn't handle the metadata stuff correctly.
+	std::string cmd = "open \"" + path + "\"";
+	std::system(cmd.c_str());
 #else
-	// Open the browser on Mac and Linux. The user will know what to do.
 	system::openBrowser(downloadUrl);
 #endif
 
