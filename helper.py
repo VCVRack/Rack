@@ -100,10 +100,10 @@ include $(RACK_DIR)/plugin.mk
 using namespace rack;
 
 // Declare the Plugin, defined in plugin.cpp
-extern Plugin *pluginInstance;
+extern Plugin* pluginInstance;
 
 // Declare each Model, defined in each module source file
-// extern Model *modelMyModule;
+// extern Model* modelMyModule;
 """
 	with open(os.path.join(plugin_dir, "src/plugin.hpp"), "w") as f:
 		f.write(plugin_hpp)
@@ -112,10 +112,10 @@ extern Plugin *pluginInstance;
 	plugin_cpp = """#include "plugin.hpp"
 
 
-Plugin *pluginInstance;
+Plugin* pluginInstance;
 
 
-void init(Plugin *p) {
+void init(Plugin* p) {
 	pluginInstance = p;
 
 	// Add modules here
@@ -245,7 +245,7 @@ def create_module(slug, panel_filename=None, source_filename=None):
 		# Tell user to add model to plugin.hpp and plugin.cpp
 		print(f"""
 To enable the module, add
-extern Model *model{identifier};
+extern Model* model{identifier};
 to plugin.hpp, and add
 p->addModel(model{identifier});
 to the init() function in plugin.cpp.""")
@@ -396,7 +396,7 @@ struct {identifier} : Module {{"""
 	source += """
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 	}
 };"""
 
@@ -404,7 +404,7 @@ struct {identifier} : Module {{"""
 
 
 struct {identifier}Widget : ModuleWidget {{
-	{identifier}Widget({identifier} *module) {{
+	{identifier}Widget({identifier}* module) {{
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/{slug}.svg")));
 
@@ -475,7 +475,7 @@ struct {identifier}Widget : ModuleWidget {{
 }};
 
 
-Model *model{identifier} = createModel<{identifier}, {identifier}Widget>("{slug}");"""
+Model* model{identifier} = createModel<{identifier}, {identifier}Widget>("{slug}");"""
 
 	return source
 
