@@ -190,7 +190,7 @@ struct ModelBox : widget::OpaqueWidget {
 	}
 
 	void step() override {
-		if (!settings::keepPreviews && previewFb && ++visibleFrames >= 60) {
+		if (previewFb && ++visibleFrames >= 60) {
 			deletePreview();
 		}
 		OpaqueWidget::step();
