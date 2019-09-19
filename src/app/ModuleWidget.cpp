@@ -246,6 +246,7 @@ ModuleWidget::ModuleWidget() {
 }
 
 ModuleWidget::~ModuleWidget() {
+	clearChildren();
 	setModule(NULL);
 }
 

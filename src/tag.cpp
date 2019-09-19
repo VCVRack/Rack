@@ -8,30 +8,31 @@ namespace tag {
 
 
 const std::vector<std::vector<std::string>> tagAliases = {
-	{"Arpeggiator"},
-	{"Attenuator"}, // With a level knob and not much else.
-	{"Blank"}, // No parameters or ports. Serves no purpose except visual.
+	{"Arpeggiator"}, // With a level knob and not much else.
+	{"Attenuator"}, // No parameters or ports. Serves no purpose except visual.
+	{"Blank"},
 	{"Chorus"},
-	{"Clock generator", "Clock"},
-	{"Clock modulator"}, // Clock dividers, multipliers, etc.
-	{"Compressor"}, // With threshold, ratio, knee, etc parameters.
-	{"Controller"}, // Use only if the artist "performs" with this module. Simply having knobs is not enough. Examples: on-screen keyboard, XY pad.
+	{"Clock generator", "Clock"}, // Clock dividers, multipliers, etc.
+	{"Clock modulator"}, // With threshold, ratio, knee, etc parameters.
+	{"Compressor"}, // Use only if the artist "performs" with this module. Simply having knobs is not enough. Examples: on-screen keyboard, XY pad.
+	{"Controller"},
 	{"Delay"},
 	{"Digital"},
 	{"Distortion"},
-	{"Drum", "Drums", "Percussion"},
-	{"Dual"}, // The core functionality times two. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Dual module.
+	{"Drum", "Drums", "Percussion"}, // The core functionality times two. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Dual module.
+	{"Dual"},
 	{"Dynamics"},
 	{"Effect"},
 	{"Envelope follower"},
 	{"Envelope generator"},
-	{"Equalizer", "EQ"},
-	{"Expander"}, // Expands the functionality of a "mother" module when placed next to it. Expanders should inherit the tags of its mother module.
+	{"Equalizer", "EQ"}, // Expands the functionality of a "mother" module when placed next to it. Expanders should inherit the tags of its mother module.
+	{"Expander"},
 	{"External"},
 	{"Filter", "VCF", "Voltage controlled filter"},
 	{"Flanger"},
 	{"Function generator"},
 	{"Granular"},
+	{"Hardware clone", "Hardware"}, // Clones the functionality *and* appearance of a real-world hardware module.
 	{"Limiter"},
 	{"Logic"},
 	{"Low-frequency oscillator", "LFO", "Low frequency oscillator"},
@@ -44,8 +45,8 @@ const std::vector<std::vector<std::string>> tagAliases = {
 	{"Panning", "Pan"},
 	{"Phaser"},
 	{"Physical modeling"},
-	{"Polyphonic", "Poly"},
-	{"Quad"}, // The core functionality times four. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Quad module.
+	{"Polyphonic", "Poly"}, // The core functionality times four. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Quad module.
+	{"Quad"},
 	{"Quantizer"},
 	{"Random"},
 	{"Recording"},
@@ -55,10 +56,10 @@ const std::vector<std::vector<std::string>> tagAliases = {
 	{"Sampler"},
 	{"Sequencer"},
 	{"Slew limiter"},
-	{"Switch"},
-	{"Synth voice"}, // A synth voice must have, at the minimum, a built-in oscillator and envelope.
-	{"Tuner"},
-	{"Utility"}, // Serves only extremely basic functions, like inverting, max, min, multiplying by 2, etc.
+	{"Switch"}, // A synth voice must have, at the minimum, a built-in oscillator and envelope.
+	{"Synth voice"},
+	{"Tuner"}, // Serves only extremely basic functions, like inverting, max, min, multiplying by 2, etc.
+	{"Utility"},
 	{"Visual"},
 	{"Vocoder"},
 	{"Voltage-controlled amplifier", "Amplifier", "VCA", "Voltage controlled amplifier"},

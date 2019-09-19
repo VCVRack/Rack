@@ -320,12 +320,12 @@ struct ClearButton : ui::Button {
 struct BrowserSidebar : widget::Widget {
 	BrowserSearchField* searchField;
 	ClearButton* clearButton;
-	ui::Label* brandLabel;
-	ui::List* brandList;
-	ui::ScrollWidget* brandScroll;
 	ui::Label* tagLabel;
 	ui::List* tagList;
 	ui::ScrollWidget* tagScroll;
+	ui::Label* brandLabel;
+	ui::List* brandList;
+	ui::ScrollWidget* brandScroll;
 
 	BrowserSidebar() {
 		// Search
@@ -337,7 +337,28 @@ struct BrowserSidebar : widget::Widget {
 		clearButton->text = "Reset filters";
 		addChild(clearButton);
 
-		// Bbrand label
+		// Tag label
+		tagLabel = new ui::Label;
+		// tagLabel->fontSize = 16;
+		tagLabel->color = nvgRGB(0x80, 0x80, 0x80);
+		tagLabel->text = "Tags";
+		addChild(tagLabel);
+
+		// Tag list
+		tagScroll = new ui::ScrollWidget;
+		addChild(tagScroll);
+
+		tagList = new ui::List;
+		tagScroll->container->addChild(tagList);
+
+		for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
+			TagItem* item = new TagItem;
+			item->text = tag::tagAliases[tagId][0];
+			item->tagId = tagId;
+			tagList->addChild(item);
+		}
+
+		// Brand label
 		brandLabel = new ui::Label;
 		// brandLabel->fontSize = 16;
 		brandLabel->color = nvgRGB(0x80, 0x80, 0x80);
@@ -362,27 +383,6 @@ struct BrowserSidebar : widget::Widget {
 			item->text = brand;
 			brandList->addChild(item);
 		}
-
-		// Tag label
-		tagLabel = new ui::Label;
-		// tagLabel->fontSize = 16;
-		tagLabel->color = nvgRGB(0x80, 0x80, 0x80);
-		tagLabel->text = "Tags";
-		addChild(tagLabel);
-
-		// Tag list
-		tagScroll = new ui::ScrollWidget;
-		addChild(tagScroll);
-
-		tagList = new ui::List;
-		tagScroll->container->addChild(tagList);
-
-		for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
-			TagItem* item = new TagItem;
-			item->text = tag::tagAliases[tagId][0];
-			item->tagId = tagId;
-			tagList->addChild(item);
-		}
 	}
 
 	void step() override {
@@ -393,19 +393,19 @@ struct BrowserSidebar : widget::Widget {
 		float listHeight = (box.size.y - clearButton->box.getBottom()) / 2;
 		listHeight = std::floor(listHeight);
 
-		brandLabel->box.pos = clearButton->box.getBottomLeft();
-		brandLabel->box.size.x = box.size.x;
-		brandScroll->box.pos = brandLabel->box.getBottomLeft();
-		brandScroll->box.size.y = listHeight - brandLabel->box.size.y;
-		brandScroll->box.size.x = box.size.x;
-		brandList->box.size.x = brandScroll->box.size.x;
-
-		tagLabel->box.pos = brandScroll->box.getBottomLeft();
+		tagLabel->box.pos = clearButton->box.getBottomLeft();
 		tagLabel->box.size.x = box.size.x;
 		tagScroll->box.pos = tagLabel->box.getBottomLeft();
 		tagScroll->box.size.y = listHeight - tagLabel->box.size.y;
 		tagScroll->box.size.x = box.size.x;
 		tagList->box.size.x = tagScroll->box.size.x;
+
+		brandLabel->box.pos = tagScroll->box.getBottomLeft();
+		brandLabel->box.size.x = box.size.x;
+		brandScroll->box.pos = brandLabel->box.getBottomLeft();
+		brandScroll->box.size.y = listHeight - brandLabel->box.size.y;
+		brandScroll->box.size.x = box.size.x;
+		brandList->box.size.x = brandScroll->box.size.x;
 
 		Widget::step();
 	}
@@ -615,7 +615,7 @@ inline void TagItem::step() {
 }
 
 inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
-	if (e.action == GLFW_PRESS) {
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		switch (e.key) {
 			case GLFW_KEY_ESCAPE: {
 				BrowserOverlay* overlay = getAncestorOfType<BrowserOverlay>();
