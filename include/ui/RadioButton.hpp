@@ -12,11 +12,11 @@ namespace ui {
 
 struct RadioButton : widget::OpaqueWidget {
 	/** Not owned. */
-	Quantity *quantity = NULL;
+	Quantity* quantity = NULL;
 
 	RadioButton();
-	void draw(const DrawArgs &args) override;
-	void onDragDrop(const event::DragDrop &e) override;
+	void draw(const DrawArgs& args) override;
+	void onDragDrop(const event::DragDrop& e) override;
 };
 
 

@@ -10,7 +10,7 @@ void List::step() {
 
 	// Set positions of children
 	box.size.y = 0.0;
-	for (widget::Widget *child : children) {
+	for (widget::Widget* child : children) {
 		if (!child->visible)
 			continue;
 		// Set position of child

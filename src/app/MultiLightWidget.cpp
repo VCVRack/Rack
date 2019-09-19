@@ -10,7 +10,7 @@ void MultiLightWidget::addBaseColor(NVGcolor baseColor) {
 	baseColors.push_back(baseColor);
 }
 
-void MultiLightWidget::setBrightnesses(const std::vector<float> &brightnesses) {
+void MultiLightWidget::setBrightnesses(const std::vector<float>& brightnesses) {
 	assert(brightnesses.size() == baseColors.size());
 	color = nvgRGBAf(0, 0, 0, 0);
 	for (size_t i = 0; i < baseColors.size(); i++) {

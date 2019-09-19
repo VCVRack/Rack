@@ -9,7 +9,7 @@ MenuSeparator::MenuSeparator() {
 	box.size.y = BND_WIDGET_HEIGHT / 2;
 }
 
-void MenuSeparator::draw(const DrawArgs &args) {
+void MenuSeparator::draw(const DrawArgs& args) {
 	nvgBeginPath(args.vg);
 	const float margin = 8.0;
 	nvgMoveTo(args.vg, margin, box.size.y / 2.0);

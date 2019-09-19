@@ -10,25 +10,25 @@ namespace history {
 
 
 ComplexAction::~ComplexAction() {
-	for (Action *action : actions) {
+	for (Action* action : actions) {
 		delete action;
 	}
 }
 
 void ComplexAction::undo() {
 	for (auto it = actions.rbegin(); it != actions.rend(); it++) {
-		Action *action = *it;
+		Action* action = *it;
 		action->undo();
 	}
 }
 
 void ComplexAction::redo() {
-	for (Action *action : actions) {
+	for (Action* action : actions) {
 		action->redo();
 	}
 }
 
-void ComplexAction::push(Action *action) {
+void ComplexAction::push(Action* action) {
 	actions.push_back(action);
 }
 
@@ -41,7 +41,7 @@ ModuleAdd::~ModuleAdd() {
 	json_decref(moduleJ);
 }
 
-void ModuleAdd::setModule(app::ModuleWidget *mw) {
+void ModuleAdd::setModule(app::ModuleWidget* mw) {
 	model = mw->model;
 	assert(mw->module);
 	moduleId = mw->module->id;
@@ -52,14 +52,14 @@ void ModuleAdd::setModule(app::ModuleWidget *mw) {
 }
 
 void ModuleAdd::undo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	APP->scene->rack->removeModule(mw);
 	delete mw;
 }
 
 void ModuleAdd::redo() {
-	app::ModuleWidget *mw = model->createModuleWidget();
+	app::ModuleWidget* mw = model->createModuleWidget();
 	assert(mw);
 	assert(mw->module);
 	mw->module->id = moduleId;
@@ -70,26 +70,26 @@ void ModuleAdd::redo() {
 
 
 void ModuleMove::undo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->box.pos = oldPos;
 }
 
 void ModuleMove::redo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->box.pos = newPos;
 }
 
 
 void ModuleBypass::undo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	APP->engine->bypassModule(mw->module, !bypass);
 }
 
 void ModuleBypass::redo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	APP->engine->bypassModule(mw->module, bypass);
 }
@@ -101,32 +101,32 @@ ModuleChange::~ModuleChange() {
 }
 
 void ModuleChange::undo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->fromJson(oldModuleJ);
 }
 
 void ModuleChange::redo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->fromJson(newModuleJ);
 }
 
 
 void ParamChange::undo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->module->params[paramId].value = oldValue;
 }
 
 void ParamChange::redo() {
-	app::ModuleWidget *mw = APP->scene->rack->getModule(moduleId);
+	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
 	mw->module->params[paramId].value = newValue;
 }
 
 
-void CableAdd::setCable(app::CableWidget *cw) {
+void CableAdd::setCable(app::CableWidget* cw) {
 	assert(cw->cable);
 	assert(cw->cable->id >= 0);
 	cableId = cw->cable->id;
@@ -140,24 +140,24 @@ void CableAdd::setCable(app::CableWidget *cw) {
 }
 
 void CableAdd::undo() {
-	app::CableWidget *cw = APP->scene->rack->getCable(cableId);
+	app::CableWidget* cw = APP->scene->rack->getCable(cableId);
 	APP->scene->rack->removeCable(cw);
 	delete cw;
 }
 
 void CableAdd::redo() {
-	app::CableWidget *cw = new app::CableWidget;
+	app::CableWidget* cw = new app::CableWidget;
 	cw->cable->id = cableId;
 
-	app::ModuleWidget *outputModule = APP->scene->rack->getModule(outputModuleId);
+	app::ModuleWidget* outputModule = APP->scene->rack->getModule(outputModuleId);
 	assert(outputModule);
-	app::PortWidget *outputPort = outputModule->getOutput(outputId);
+	app::PortWidget* outputPort = outputModule->getOutput(outputId);
 	assert(outputPort);
 	cw->setOutput(outputPort);
 
-	app::ModuleWidget *inputModule = APP->scene->rack->getModule(inputModuleId);
+	app::ModuleWidget* inputModule = APP->scene->rack->getModule(inputModuleId);
 	assert(inputModule);
-	app::PortWidget *inputPort = inputModule->getInput(inputId);
+	app::PortWidget* inputPort = inputModule->getInput(inputId);
 	assert(inputPort);
 	cw->setInput(inputPort);
 
@@ -176,7 +176,7 @@ State::~State() {
 }
 
 void State::clear() {
-	for (Action *action : actions) {
+	for (Action* action : actions) {
 		delete action;
 	}
 	actions.clear();
@@ -184,7 +184,7 @@ void State::clear() {
 	savedIndex = -1;
 }
 
-void State::push(Action *action) {
+void State::push(Action* action) {
 	for (int i = actionIndex; i < (int) actions.size(); i++) {
 		delete actions[i];
 	}

@@ -5,7 +5,7 @@ namespace rack {
 namespace ui {
 
 
-void init(){
+void init() {
 	setTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
 }
 

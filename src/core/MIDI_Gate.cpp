@@ -37,7 +37,7 @@ struct MIDI_Gate : Module {
 	void onReset() override {
 		for (int y = 0; y < 4; y++) {
 			for (int x = 0; x < 4; x++) {
-				learnedNotes[4 * y + x] = 36 + 4 * (3-y) + x;
+				learnedNotes[4 * y + x] = 36 + 4 * (3 - y) + x;
 			}
 		}
 		learningId = -1;
@@ -52,7 +52,7 @@ struct MIDI_Gate : Module {
 		}
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
@@ -118,12 +118,12 @@ struct MIDI_Gate : Module {
 		}
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 
-		json_t *notesJ = json_array();
+		json_t* notesJ = json_array();
 		for (int i = 0; i < 16; i++) {
-			json_t *noteJ = json_integer(learnedNotes[i]);
+			json_t* noteJ = json_integer(learnedNotes[i]);
 			json_array_append_new(notesJ, noteJ);
 		}
 		json_object_set_new(rootJ, "notes", notesJ);
@@ -134,21 +134,21 @@ struct MIDI_Gate : Module {
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *notesJ = json_object_get(rootJ, "notes");
+	void dataFromJson(json_t* rootJ) override {
+		json_t* notesJ = json_object_get(rootJ, "notes");
 		if (notesJ) {
 			for (int i = 0; i < 16; i++) {
-				json_t *noteJ = json_array_get(notesJ, i);
+				json_t* noteJ = json_array_get(notesJ, i);
 				if (noteJ)
 					learnedNotes[i] = json_integer_value(noteJ);
 			}
 		}
 
-		json_t *velocityJ = json_object_get(rootJ, "velocity");
+		json_t* velocityJ = json_object_get(rootJ, "velocity");
 		if (velocityJ)
 			velocityMode = json_boolean_value(velocityJ);
 
-		json_t *midiJ = json_object_get(rootJ, "midi");
+		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
 	}
@@ -156,23 +156,23 @@ struct MIDI_Gate : Module {
 
 
 struct MIDI_GateVelocityItem : MenuItem {
-	MIDI_Gate *module;
-	void onAction(const event::Action &e) override {
+	MIDI_Gate* module;
+	void onAction(const event::Action& e) override {
 		module->velocityMode ^= true;
 	}
 };
 
 
 struct MIDI_GatePanicItem : MenuItem {
-	MIDI_Gate *module;
-	void onAction(const event::Action &e) override {
+	MIDI_Gate* module;
+	void onAction(const event::Action& e) override {
 		module->panic();
 	}
 };
 
 
 struct MIDI_GateWidget : ModuleWidget {
-	MIDI_GateWidget(MIDI_Gate *module) {
+	MIDI_GateWidget(MIDI_Gate* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/MIDI-Gate.svg")));
 
@@ -199,22 +199,22 @@ struct MIDI_GateWidget : ModuleWidget {
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDI_Gate::TRIG_OUTPUT + 15));
 
 		typedef Grid16MidiWidget<NoteChoice<MIDI_Gate>> TMidiWidget;
-		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
+		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 
-	void appendContextMenu(Menu *menu) override {
-		MIDI_Gate *module = dynamic_cast<MIDI_Gate*>(this->module);
+	void appendContextMenu(Menu* menu) override {
+		MIDI_Gate* module = dynamic_cast<MIDI_Gate*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		MIDI_GateVelocityItem *velocityItem = createMenuItem<MIDI_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
+		MIDI_GateVelocityItem* velocityItem = createMenuItem<MIDI_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
 
-		MIDI_GatePanicItem *panicItem = new MIDI_GatePanicItem;
+		MIDI_GatePanicItem* panicItem = new MIDI_GatePanicItem;
 		panicItem->text = "Panic";
 		panicItem->module = module;
 		menu->addChild(panicItem);
@@ -223,7 +223,7 @@ struct MIDI_GateWidget : ModuleWidget {
 
 
 // Use legacy slug for compatibility
-Model *modelMIDI_Gate = createModel<MIDI_Gate, MIDI_GateWidget>("MIDITriggerToCVInterface");
+Model* modelMIDI_Gate = createModel<MIDI_Gate, MIDI_GateWidget>("MIDITriggerToCVInterface");
 
 
 } // namespace core

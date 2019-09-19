@@ -9,14 +9,14 @@ namespace ui {
 #define BND_LABEL_FONT_SIZE 13
 
 
-void MenuItem::draw(const DrawArgs &args) {
+void MenuItem::draw(const DrawArgs& args) {
 	BNDwidgetState state = BND_DEFAULT;
 
 	if (APP->event->hoveredWidget == this)
 		state = BND_HOVER;
 
 	// Set active state if this MenuItem
-	Menu *parentMenu = dynamic_cast<Menu*>(parent);
+	Menu* parentMenu = dynamic_cast<Menu*>(parent);
 	if (parentMenu && parentMenu->activeEntry == this)
 		state = BND_ACTIVE;
 
@@ -44,15 +44,15 @@ void MenuItem::step() {
 	Widget::step();
 }
 
-void MenuItem::onEnter(const event::Enter &e) {
-	Menu *parentMenu = dynamic_cast<Menu*>(parent);
+void MenuItem::onEnter(const event::Enter& e) {
+	Menu* parentMenu = dynamic_cast<Menu*>(parent);
 	if (!parentMenu)
 		return;
 
 	parentMenu->activeEntry = NULL;
 
 	// Try to create child menu
-	Menu *childMenu = createChildMenu();
+	Menu* childMenu = createChildMenu();
 	if (childMenu) {
 		parentMenu->activeEntry = this;
 		childMenu->box.pos = parent->box.pos.plus(box.getTopRight());
@@ -60,7 +60,7 @@ void MenuItem::onEnter(const event::Enter &e) {
 	parentMenu->setChildMenu(childMenu);
 }
 
-void MenuItem::onDragDrop(const event::DragDrop &e) {
+void MenuItem::onDragDrop(const event::DragDrop& e) {
 	if (e.origin != this)
 		return;
 	doAction();
@@ -79,7 +79,7 @@ void MenuItem::doAction() {
 	if (!cAction.target)
 		return;
 
-	MenuOverlay *overlay = getAncestorOfType<MenuOverlay>();
+	MenuOverlay* overlay = getAncestorOfType<MenuOverlay>();
 	if (overlay) {
 		overlay->requestDelete();
 	}

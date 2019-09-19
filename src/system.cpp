@@ -15,6 +15,11 @@
 	#include <sys/utsname.h>
 #endif
 
+#if defined ARCH_MAC
+	#include <mach/mach_init.h>
+	#include <mach/thread_act.h>
+#endif
+
 #if defined ARCH_WIN
 	#include <windows.h>
 	#include <shellapi.h>
@@ -22,16 +27,19 @@
 	#include <dbghelp.h>
 #endif
 
+#define ZIP_STATIC
+#include <zip.h>
+
 
 namespace rack {
 namespace system {
 
 
-std::list<std::string> getEntries(const std::string &path) {
+std::list<std::string> getEntries(const std::string& path) {
 	std::list<std::string> filenames;
-	DIR *dir = opendir(path.c_str());
+	DIR* dir = opendir(path.c_str());
 	if (dir) {
-		struct dirent *d;
+		struct dirent* d;
 		while ((d = readdir(dir))) {
 			std::string filename = d->d_name;
 			if (filename == "." || filename == "..")
@@ -45,7 +53,7 @@ std::list<std::string> getEntries(const std::string &path) {
 }
 
 
-bool isFile(const std::string &path) {
+bool isFile(const std::string& path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
@@ -53,7 +61,7 @@ bool isFile(const std::string &path) {
 }
 
 
-bool isDirectory(const std::string &path) {
+bool isDirectory(const std::string& path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))
 		return false;
@@ -61,7 +69,7 @@ bool isDirectory(const std::string &path) {
 }
 
 
-void moveFile(const std::string &srcPath, const std::string &destPath) {
+void moveFile(const std::string& srcPath, const std::string& destPath) {
 	std::remove(destPath.c_str());
 	// Whether this overwrites existing files is implementation-defined.
 	// i.e. Mingw64 fails to overwrite.
@@ -70,23 +78,23 @@ void moveFile(const std::string &srcPath, const std::string &destPath) {
 }
 
 
-void copyFile(const std::string &srcPath, const std::string &destPath) {
+void copyFile(const std::string& srcPath, const std::string& destPath) {
 	// Open source
-	FILE *source = fopen(srcPath.c_str(), "rb");
+	FILE* source = fopen(srcPath.c_str(), "rb");
 	if (!source)
 		return;
 	DEFER({
 		fclose(source);
 	});
 	// Open destination
-	FILE *dest = fopen(destPath.c_str(), "wb");
+	FILE* dest = fopen(destPath.c_str(), "wb");
 	if (!dest)
 		return;
 	DEFER({
 		fclose(dest);
 	});
 	// Copy buffer
-	const int bufferSize = (1<<15);
+	const int bufferSize = (1 << 15);
 	char buffer[bufferSize];
 	while (1) {
 		size_t size = fread(buffer, 1, bufferSize, source);
@@ -99,7 +107,7 @@ void copyFile(const std::string &srcPath, const std::string &destPath) {
 }
 
 
-void createDirectory(const std::string &path) {
+void createDirectory(const std::string& path) {
 #if defined ARCH_WIN
 	std::wstring pathW = string::toWstring(path);
 	CreateDirectoryW(pathW.c_str(), NULL);
@@ -114,7 +122,7 @@ int getLogicalCoreCount() {
 }
 
 
-void setThreadName(const std::string &name) {
+void setThreadName(const std::string& name) {
 #if defined ARCH_LIN
 	pthread_setname_np(pthread_self(), name.c_str());
 #elif defined ARCH_WIN
@@ -159,14 +167,46 @@ void setThreadRealTime(bool realTime) {
 }
 
 
+double getThreadTime() {
+#if defined ARCH_LIN
+	struct timespec ts;
+	clockid_t cid;
+	pthread_getcpuclockid(pthread_self(), &cid);
+	clock_gettime(cid, &ts);
+	return ts.tv_sec + ts.tv_nsec * 1e-9;
+#elif defined ARCH_MAC
+	mach_port_t thread = mach_thread_self();
+	mach_msg_type_number_t count = THREAD_BASIC_INFO_COUNT;
+	thread_basic_info_data_t info;
+	kern_return_t kr = thread_info(thread, THREAD_BASIC_INFO, (thread_info_t) &info, &count);
+	if (kr != KERN_SUCCESS || (info.flags & TH_FLAGS_IDLE) != 0)
+		return 0.0;
+	return info.user_time.seconds + info.user_time.microseconds * 1e-6;
+#elif defined ARCH_WIN
+	// FILETIME creationTime;
+	// FILETIME exitTime;
+	// FILETIME kernelTime;
+	// FILETIME userTime;
+	// GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime);
+	// return ((uint64_t(userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
+
+	uint64_t cycles;
+	QueryThreadCycleTime(GetCurrentThread(), &cycles);
+	// HACK Assume that the RDTSC Time-Step Counter instruction is fixed at 2.5GHz. This should only be within a factor of 2 on all PCs.
+	const double freq = 2.5e9;
+	return (double) cycles / freq;
+#endif
+}
+
+
 std::string getStackTrace() {
 	int stackLen = 128;
-	void *stack[stackLen];
+	void* stack[stackLen];
 	std::string s;
 
 #if defined ARCH_LIN || defined ARCH_MAC
 	stackLen = backtrace(stack, stackLen);
-	char **strings = backtrace_symbols(stack, stackLen);
+	char** strings = backtrace_symbols(stack, stackLen);
 
 	// Skip the first line because it's this function.
 	for (int i = 1; i < stackLen; i++) {
@@ -181,7 +221,7 @@ std::string getStackTrace() {
 			s += "(";
 			std::string symbol = match[2].str();
 			// Demangle symbol
-			char *symbolD = __cxxabiv1::__cxa_demangle(symbol.c_str(), NULL, NULL, NULL);
+			char* symbolD = __cxxabiv1::__cxa_demangle(symbol.c_str(), NULL, NULL, NULL);
 			if (symbolD) {
 				symbol = symbolD;
 				free(symbolD);
@@ -203,7 +243,7 @@ std::string getStackTrace() {
 	SymInitialize(process, NULL, true);
 	stackLen = CaptureStackBackTrace(0, stackLen, stack, NULL);
 
-	SYMBOL_INFO *symbol = (SYMBOL_INFO*) calloc(sizeof(SYMBOL_INFO) + 256, 1);
+	SYMBOL_INFO* symbol = (SYMBOL_INFO*) calloc(sizeof(SYMBOL_INFO) + 256, 1);
 	symbol->MaxNameLen = 255;
 	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
@@ -218,7 +258,7 @@ std::string getStackTrace() {
 }
 
 
-void openBrowser(const std::string &url) {
+void openBrowser(const std::string& url) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + url + "\"";
 	(void) std::system(command.c_str());
@@ -234,7 +274,7 @@ void openBrowser(const std::string &url) {
 }
 
 
-void openFolder(const std::string &path) {
+void openFolder(const std::string& path) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + path + "\"";
 	(void) std::system(command.c_str());
@@ -250,7 +290,7 @@ void openFolder(const std::string &path) {
 }
 
 
-void runProcessDetached(const std::string &path) {
+void runProcessDetached(const std::string& path) {
 #if defined ARCH_WIN
 	SHELLEXECUTEINFOW shExInfo;
 	ZeroMemory(&shExInfo, sizeof(shExInfo));
@@ -284,6 +324,74 @@ std::string getOperatingSystemInfo() {
 	// See https://docs.microsoft.com/en-us/windows/desktop/api/winnt/ns-winnt-_osversioninfoa for a list of Windows version numbers.
 	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
 #endif
+}
+
+
+int unzipToFolder(const std::string& zipPath, const std::string& dir) {
+	int err;
+	// Open ZIP file
+	zip_t* za = zip_open(zipPath.c_str(), 0, &err);
+	if (!za) {
+		WARN("Could not open ZIP file %s: error %d", zipPath.c_str(), err);
+		return err;
+	}
+	DEFER({
+		zip_close(za);
+	});
+
+	// Iterate ZIP entries
+	for (int i = 0; i < zip_get_num_entries(za, 0); i++) {
+		zip_stat_t zs;
+		err = zip_stat_index(za, i, 0, &zs);
+		if (err) {
+			WARN("zip_stat_index() failed: error %d", err);
+			return err;
+		}
+
+		std::string path = dir + "/" + zs.name;
+
+		if (path[path.size() - 1] == '/') {
+			// Create directory
+			system::createDirectory(path);
+			// HACK
+			// Create and delete file to update the directory's mtime.
+			std::string tmpPath = path + "/.tmp";
+			FILE* tmpFile = fopen(tmpPath.c_str(), "w");
+			fclose(tmpFile);
+			std::remove(tmpPath.c_str());
+		}
+		else {
+			// Open ZIP entry
+			zip_file_t* zf = zip_fopen_index(za, i, 0);
+			if (!zf) {
+				WARN("zip_fopen_index() failed");
+				return -1;
+			}
+			DEFER({
+				zip_fclose(zf);
+			});
+
+			// Create file
+			FILE* outFile = fopen(path.c_str(), "wb");
+			if (!outFile) {
+				WARN("Could not create file %s", path.c_str());
+				return -1;
+			}
+			DEFER({
+				fclose(outFile);
+			});
+
+			// Read buffer and copy to file
+			while (true) {
+				char buffer[1 << 15];
+				int len = zip_fread(zf, buffer, sizeof(buffer));
+				if (len <= 0)
+					break;
+				fwrite(buffer, 1, len, outFile);
+			}
+		}
+	}
+	return 0;
 }
 
 

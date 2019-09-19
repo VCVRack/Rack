@@ -31,7 +31,7 @@ void SvgKnob::setSvg(std::shared_ptr<Svg> svg) {
 	// shadow->box = shadow->box.grow(math::Vec(2, 2));
 }
 
-void SvgKnob::onChange(const event::Change &e) {
+void SvgKnob::onChange(const event::Change& e) {
 	// Re-transform the widget::TransformWidget
 	if (paramQuantity) {
 		float angle;
@@ -41,7 +41,7 @@ void SvgKnob::onChange(const event::Change &e) {
 		else {
 			angle = math::rescale(paramQuantity->getValue(), -1.f, 1.f, minAngle, maxAngle);
 		}
-		angle = std::fmod(angle, 2*M_PI);
+		angle = std::fmod(angle, 2 * M_PI);
 		tw->identity();
 		// Rotate SVG
 		math::Vec center = sw->box.getCenter();

@@ -6,4 +6,4 @@
 You must implement this in your plugin
 */
 extern "C"
-void init(rack::plugin::Plugin *plugin);
+void init(rack::plugin::Plugin* plugin);

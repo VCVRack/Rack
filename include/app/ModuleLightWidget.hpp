@@ -12,7 +12,7 @@ namespace app {
 Will access firstLightId, firstLightId + 1, etc. for each added color
 */
 struct ModuleLightWidget : MultiLightWidget {
-	engine::Module *module = NULL;
+	engine::Module* module = NULL;
 	int firstLightId;
 
 	void step() override;

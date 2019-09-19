@@ -63,13 +63,13 @@ struct Vector<float, 4> {
 
 	/** Returns a vector with all 1 bits. */
 	static Vector mask() {
-    return _mm_castsi128_ps(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
+		return _mm_castsi128_ps(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
 	}
 
 	/** Reads an array of 4 values.
 	On little-endian machines (e.g. x86), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
 	*/
-	static Vector load(const float *x) {
+	static Vector load(const float* x) {
 		/*
 		My benchmarks show that _mm_loadu_ps() performs equally as fast as _mm_load_ps() when data is actually aligned.
 		This post seems to agree. https://stackoverflow.com/a/20265193/272642
@@ -81,12 +81,16 @@ struct Vector<float, 4> {
 	/** Writes an array of 4 values.
 	On little-endian machines (e.g. x86), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
 	*/
-	void store(float *x) {
+	void store(float* x) {
 		_mm_storeu_ps(x, v);
 	}
 
-	float &operator[](int i) {return s[i];}
-	const float &operator[](int i) const {return s[i];}
+	float& operator[](int i) {
+		return s[i];
+	}
+	const float& operator[](int i) const {
+		return s[i];
+	}
 
 	// Conversions
 	Vector(Vector<int32_t, 4> a);
@@ -119,18 +123,22 @@ struct Vector<int32_t, 4> {
 	static Vector mask() {
 		return Vector(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
 	}
-	static Vector load(const int32_t *x) {
+	static Vector load(const int32_t* x) {
 		// HACK
 		// Use _mm_loadu_si128() because GCC doesn't support _mm_loadu_si32()
 		return Vector(_mm_loadu_si128((__m128i*) x));
 	}
-	void store(int32_t *x) {
+	void store(int32_t* x) {
 		// HACK
 		// Use _mm_storeu_si128() because GCC doesn't support _mm_storeu_si32()
 		_mm_storeu_si128((__m128i*) x, v);
 	}
-	int32_t &operator[](int i) {return s[i];}
-	const int32_t &operator[](int i) const {return s[i];}
+	int32_t& operator[](int i) {
+		return s[i];
+	}
+	const int32_t& operator[](int i) const {
+		return s[i];
+	}
 	Vector(Vector<float, 4> a);
 	static Vector cast(Vector<float, 4> a);
 };
@@ -144,7 +152,7 @@ inline Vector<float, 4>::Vector(Vector<int32_t, 4> a) {
 }
 
 inline Vector<int32_t, 4>::Vector(Vector<float, 4> a) {
-	v = _mm_cvtps_epi32(a.v);
+	v = _mm_cvttps_epi32(a.v);
 }
 
 inline Vector<float, 4> Vector<float, 4>::cast(Vector<int32_t, 4> a) {
@@ -160,21 +168,21 @@ inline Vector<int32_t, 4> Vector<int32_t, 4>::cast(Vector<float, 4> a) {
 
 
 /** `~a & b` */
-inline Vector<float, 4> andnot(const Vector<float, 4> &a, const Vector<float, 4> &b) {
+inline Vector<float, 4> andnot(const Vector<float, 4>& a, const Vector<float, 4>& b) {
 	return Vector<float, 4>(_mm_andnot_ps(a.v, b.v));
 }
 
 /** Returns an integer with each bit corresponding to the most significant bit of each element.
 For example, `movemask(float_4::mask())` returns 0xf.
 */
-inline int movemask(const Vector<float, 4> &a) {
+inline int movemask(const Vector<float, 4>& a) {
 	return _mm_movemask_ps(a.v);
 }
 
 /** Returns an integer with each bit corresponding to the most significant bit of each byte.
 For example, `movemask(int32_4::mask())` returns 0xffff.
 */
-inline int movemask(const Vector<int32_t, 4> &a) {
+inline int movemask(const Vector<int32_t, 4>& a) {
 	return _mm_movemask_epi8(a.v);
 }
 
@@ -250,7 +258,7 @@ DECLARE_VECTOR_OPERATOR_INFIX(float, 4, operator==, _mm_cmpeq_ps)
 DECLARE_VECTOR_OPERATOR_INFIX(int32_t, 4, operator==, _mm_cmpeq_epi32)
 
 DECLARE_VECTOR_OPERATOR_INFIX(float, 4, operator>=, _mm_cmpge_ps)
-inline Vector<int32_t, 4> operator>=(const Vector<int32_t, 4> &a, const Vector<int32_t, 4> &b) {
+inline Vector<int32_t, 4> operator>=(const Vector<int32_t, 4>& a, const Vector<int32_t, 4>& b) {
 	return Vector<int32_t, 4>(_mm_cmpgt_epi32(a.v, b.v)) ^ Vector<int32_t, 4>::mask();
 }
 
@@ -258,7 +266,7 @@ DECLARE_VECTOR_OPERATOR_INFIX(float, 4, operator>, _mm_cmpgt_ps)
 DECLARE_VECTOR_OPERATOR_INFIX(int32_t, 4, operator>, _mm_cmpgt_epi32)
 
 DECLARE_VECTOR_OPERATOR_INFIX(float, 4, operator<=, _mm_cmple_ps)
-inline Vector<int32_t, 4> operator<=(const Vector<int32_t, 4> &a, const Vector<int32_t, 4> &b) {
+inline Vector<int32_t, 4> operator<=(const Vector<int32_t, 4>& a, const Vector<int32_t, 4>& b) {
 	return Vector<int32_t, 4>(_mm_cmplt_epi32(a.v, b.v)) ^ Vector<int32_t, 4>::mask();
 }
 
@@ -266,76 +274,86 @@ DECLARE_VECTOR_OPERATOR_INFIX(float, 4, operator<, _mm_cmplt_ps)
 DECLARE_VECTOR_OPERATOR_INFIX(int32_t, 4, operator<, _mm_cmplt_epi32)
 
 DECLARE_VECTOR_OPERATOR_INFIX(float, 4, operator!=, _mm_cmpneq_ps)
-inline Vector<int32_t, 4> operator!=(const Vector<int32_t, 4> &a, const Vector<int32_t, 4> &b) {
+inline Vector<int32_t, 4> operator!=(const Vector<int32_t, 4>& a, const Vector<int32_t, 4>& b) {
 	return Vector<int32_t, 4>(_mm_cmpeq_epi32(a.v, b.v)) ^ Vector<int32_t, 4>::mask();
 }
 
 /** `+a` */
-inline Vector<float, 4> operator+(const Vector<float, 4> &a) {
+inline Vector<float, 4> operator+(const Vector<float, 4>& a) {
 	return a;
 }
-inline Vector<int32_t, 4> operator+(const Vector<int32_t, 4> &a) {
+inline Vector<int32_t, 4> operator+(const Vector<int32_t, 4>& a) {
 	return a;
 }
 
 /** `-a` */
-inline Vector<float, 4> operator-(const Vector<float, 4> &a) {
+inline Vector<float, 4> operator-(const Vector<float, 4>& a) {
 	return 0.f - a;
 }
-inline Vector<int32_t, 4> operator-(const Vector<int32_t, 4> &a) {
+inline Vector<int32_t, 4> operator-(const Vector<int32_t, 4>& a) {
 	return 0 - a;
 }
 
 /** `++a` */
-inline Vector<float, 4> &operator++(Vector<float, 4> &a) {
+inline Vector<float, 4>& operator++(Vector<float, 4>& a) {
 	a += 1.f;
 	return a;
 }
-inline Vector<int32_t, 4> &operator++(Vector<int32_t, 4> &a) {
+inline Vector<int32_t, 4>& operator++(Vector<int32_t, 4>& a) {
 	a += 1;
 	return a;
 }
 
 /** `--a` */
-inline Vector<float, 4> &operator--(Vector<float, 4> &a) {
+inline Vector<float, 4>& operator--(Vector<float, 4>& a) {
 	a -= 1.f;
 	return a;
 }
-inline Vector<int32_t, 4> &operator--(Vector<int32_t, 4> &a) {
+inline Vector<int32_t, 4>& operator--(Vector<int32_t, 4>& a) {
 	a -= 1;
 	return a;
 }
 
 /** `a++` */
-inline Vector<float, 4> operator++(Vector<float, 4> &a, int) {
+inline Vector<float, 4> operator++(Vector<float, 4>& a, int) {
 	Vector<float, 4> b = a;
 	++a;
 	return b;
 }
-inline Vector<int32_t, 4> operator++(Vector<int32_t, 4> &a, int) {
+inline Vector<int32_t, 4> operator++(Vector<int32_t, 4>& a, int) {
 	Vector<int32_t, 4> b = a;
 	++a;
 	return b;
 }
 
 /** `a--` */
-inline Vector<float, 4> operator--(Vector<float, 4> &a, int) {
+inline Vector<float, 4> operator--(Vector<float, 4>& a, int) {
 	Vector<float, 4> b = a;
 	--a;
 	return b;
 }
-inline Vector<int32_t, 4> operator--(Vector<int32_t, 4> &a, int) {
+inline Vector<int32_t, 4> operator--(Vector<int32_t, 4>& a, int) {
 	Vector<int32_t, 4> b = a;
 	--a;
 	return b;
 }
 
 /** `~a` */
-inline Vector<float, 4> operator~(const Vector<float, 4> &a) {
+inline Vector<float, 4> operator~(const Vector<float, 4>& a) {
 	return a ^ Vector<float, 4>::mask();
 }
-inline Vector<int32_t, 4> operator~(const Vector<int32_t, 4> &a) {
+inline Vector<int32_t, 4> operator~(const Vector<int32_t, 4>& a) {
 	return a ^ Vector<int32_t, 4>::mask();
+}
+
+/** `a << b` */
+inline Vector<int32_t, 4> operator<<(const Vector<int32_t, 4>& a, const int& b) {
+	return Vector<int32_t, 4>(_mm_slli_epi32(a.v, b));
+}
+
+/** `a >> b` */
+inline Vector<int32_t, 4> operator>>(const Vector<int32_t, 4>& a, const int& b) {
+	return Vector<int32_t, 4>(_mm_srli_epi32(a.v, b));
 }
 
 

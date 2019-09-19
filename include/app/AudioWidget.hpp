@@ -9,14 +9,14 @@ namespace app {
 
 
 struct AudioWidget : LedDisplay {
-	LedDisplayChoice *driverChoice;
-	LedDisplaySeparator *driverSeparator;
-	LedDisplayChoice *deviceChoice;
-	LedDisplaySeparator *deviceSeparator;
-	LedDisplayChoice *sampleRateChoice;
-	LedDisplaySeparator *sampleRateSeparator;
-	LedDisplayChoice *bufferSizeChoice;
-	void setAudioPort(audio::Port *port);
+	LedDisplayChoice* driverChoice;
+	LedDisplaySeparator* driverSeparator;
+	LedDisplayChoice* deviceChoice;
+	LedDisplaySeparator* deviceSeparator;
+	LedDisplayChoice* sampleRateChoice;
+	LedDisplaySeparator* sampleRateSeparator;
+	LedDisplayChoice* bufferSizeChoice;
+	void setAudioPort(audio::Port* port);
 };
 
 

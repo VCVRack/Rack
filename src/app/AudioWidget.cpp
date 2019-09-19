@@ -7,23 +7,23 @@ namespace app {
 
 
 struct AudioDriverItem : ui::MenuItem {
-	audio::Port *port;
+	audio::Port* port;
 	int driverId;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		port->setDriverId(driverId);
 	}
 };
 
 struct AudioDriverChoice : LedDisplayChoice {
-	audio::Port *port;
-	void onAction(const event::Action &e) override {
+	audio::Port* port;
+	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
 
-		ui::Menu *menu = createMenu();
+		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
 		for (int driverId : port->getDriverIds()) {
-			AudioDriverItem *item = new AudioDriverItem;
+			AudioDriverItem* item = new AudioDriverItem;
 			item->port = port;
 			item->driverId = driverId;
 			item->text = port->getDriverName(driverId);
@@ -47,28 +47,28 @@ struct AudioDriverChoice : LedDisplayChoice {
 
 
 struct AudioDeviceItem : ui::MenuItem {
-	audio::Port *port;
+	audio::Port* port;
 	int deviceId;
 	int offset;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		port->setDeviceId(deviceId, offset);
 	}
 };
 
 struct AudioDeviceChoice : LedDisplayChoice {
-	audio::Port *port;
+	audio::Port* port;
 	/** Prevents devices with a ridiculous number of channels from being displayed */
 	int maxTotalChannels = 128;
 
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
 
-		ui::Menu *menu = createMenu();
+		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Audio device"));
 		int deviceCount = port->getDeviceCount();
 		{
-			AudioDeviceItem *item = new AudioDeviceItem;
+			AudioDeviceItem* item = new AudioDeviceItem;
 			item->port = port;
 			item->deviceId = -1;
 			item->text = "(No device)";
@@ -78,7 +78,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
 			int channels = std::min(maxTotalChannels, port->getDeviceChannels(deviceId));
 			for (int offset = 0; offset < channels; offset += port->maxChannels) {
-				AudioDeviceItem *item = new AudioDeviceItem;
+				AudioDeviceItem* item = new AudioDeviceItem;
 				item->port = port;
 				item->deviceId = deviceId;
 				item->offset = offset;
@@ -104,27 +104,27 @@ struct AudioDeviceChoice : LedDisplayChoice {
 
 
 struct AudioSampleRateItem : ui::MenuItem {
-	audio::Port *port;
+	audio::Port* port;
 	int sampleRate;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		port->setSampleRate(sampleRate);
 	}
 };
 
 struct AudioSampleRateChoice : LedDisplayChoice {
-	audio::Port *port;
-	void onAction(const event::Action &e) override {
+	audio::Port* port;
+	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
 
-		ui::Menu *menu = createMenu();
+		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Sample rate"));
 		std::vector<int> sampleRates = port->getSampleRates();
 		if (sampleRates.empty()) {
 			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int sampleRate : sampleRates) {
-			AudioSampleRateItem *item = new AudioSampleRateItem;
+			AudioSampleRateItem* item = new AudioSampleRateItem;
 			item->port = port;
 			item->sampleRate = sampleRate;
 			item->text = string::f("%g kHz", sampleRate / 1000.0);
@@ -145,27 +145,27 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 
 
 struct AudioBlockSizeItem : ui::MenuItem {
-	audio::Port *port;
+	audio::Port* port;
 	int blockSize;
-	void onAction(const event::Action &e) override {
+	void onAction(const event::Action& e) override {
 		port->setBlockSize(blockSize);
 	}
 };
 
 struct AudioBlockSizeChoice : LedDisplayChoice {
-	audio::Port *port;
-	void onAction(const event::Action &e) override {
+	audio::Port* port;
+	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
 
-		ui::Menu *menu = createMenu();
+		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Block size"));
 		std::vector<int> blockSizes = port->getBlockSizes();
 		if (blockSizes.empty()) {
 			menu->addChild(createMenuLabel("(Locked by device)"));
 		}
 		for (int blockSize : blockSizes) {
-			AudioBlockSizeItem *item = new AudioBlockSizeItem;
+			AudioBlockSizeItem* item = new AudioBlockSizeItem;
 			item->port = port;
 			item->blockSize = blockSize;
 			float latency = (float) blockSize / port->sampleRate * 1000.0;
@@ -186,12 +186,12 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 };
 
 
-void AudioWidget::setAudioPort(audio::Port *port) {
+void AudioWidget::setAudioPort(audio::Port* port) {
 	clearChildren();
 
 	math::Vec pos;
 
-	AudioDriverChoice *driverChoice = createWidget<AudioDriverChoice>(pos);
+	AudioDriverChoice* driverChoice = createWidget<AudioDriverChoice>(pos);
 	driverChoice->box.size.x = box.size.x;
 	driverChoice->port = port;
 	addChild(driverChoice);
@@ -202,7 +202,7 @@ void AudioWidget::setAudioPort(audio::Port *port) {
 	this->driverSeparator->box.size.x = box.size.x;
 	addChild(this->driverSeparator);
 
-	AudioDeviceChoice *deviceChoice = createWidget<AudioDeviceChoice>(pos);
+	AudioDeviceChoice* deviceChoice = createWidget<AudioDeviceChoice>(pos);
 	deviceChoice->box.size.x = box.size.x;
 	deviceChoice->port = port;
 	addChild(deviceChoice);
@@ -213,7 +213,7 @@ void AudioWidget::setAudioPort(audio::Port *port) {
 	this->deviceSeparator->box.size.x = box.size.x;
 	addChild(this->deviceSeparator);
 
-	AudioSampleRateChoice *sampleRateChoice = createWidget<AudioSampleRateChoice>(pos);
+	AudioSampleRateChoice* sampleRateChoice = createWidget<AudioSampleRateChoice>(pos);
 	sampleRateChoice->box.size.x = box.size.x / 2;
 	sampleRateChoice->port = port;
 	addChild(sampleRateChoice);
@@ -224,7 +224,7 @@ void AudioWidget::setAudioPort(audio::Port *port) {
 	this->sampleRateSeparator->box.size.y = this->sampleRateChoice->box.size.y;
 	addChild(this->sampleRateSeparator);
 
-	AudioBlockSizeChoice *bufferSizeChoice = createWidget<AudioBlockSizeChoice>(pos);
+	AudioBlockSizeChoice* bufferSizeChoice = createWidget<AudioBlockSizeChoice>(pos);
 	bufferSizeChoice->box.pos.x = box.size.x / 2;
 	bufferSizeChoice->box.size.x = box.size.x / 2;
 	bufferSizeChoice->port = port;

@@ -8,7 +8,7 @@ namespace ui {
 
 
 struct ChoiceButton : Button {
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 

@@ -23,7 +23,27 @@ struct BooleanTrigger {
 
 
 /** Turns HIGH when value reaches 1.f, turns LOW when value reaches 0.f. */
-struct SchmittTrigger {
+template <typename T = float>
+struct TSchmittTrigger {
+	T state;
+	TSchmittTrigger() {
+		reset();
+	}
+	void reset() {
+		state = T::mask();
+	}
+	T process(T in) {
+		T on = (in >= 1.f);
+		T off = (in <= 0.f);
+		T triggered = ~state & on;
+		state = on | (state & ~off);
+		return triggered;
+	}
+};
+
+
+template <>
+struct TSchmittTrigger<float> {
 	bool state = true;
 
 	void reset() {
@@ -60,24 +80,7 @@ struct SchmittTrigger {
 	}
 };
 
-
-template <typename T>
-struct TSchmittTrigger {
-	T state;
-	TSchmittTrigger() {
-		reset();
-	}
-	void reset() {
-		state = T::mask();
-	}
-	T process(T in) {
-		T on = (in >= 1.f);
-		T off = (in <= 0.f);
-		T triggered = ~state & on;
-		state = on | (state & ~off);
-		return triggered;
-	}
-};
+typedef TSchmittTrigger<> SchmittTrigger;
 
 
 /** When triggered, holds a high value for a specified time before going low again */

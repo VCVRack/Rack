@@ -1,5 +1,6 @@
 #pragma once
 #include <common.hpp>
+#include <complex>
 #include <algorithm> // for std::min, max
 
 
@@ -63,7 +64,7 @@ inline int eucDiv(int a, int b) {
 	return div;
 }
 
-inline void eucDivMod(int a, int b, int *div, int *mod) {
+inline void eucDivMod(int a, int b, int* div, int* mod) {
 	*div = a / b;
 	*mod = a % b;
 	if (*mod < 0) {
@@ -146,12 +147,12 @@ inline float crossfade(float a, float b, float p) {
 }
 
 /** Linearly interpolates an array `p` with index `x`.
-Assumes that the array at `p` is of length at least `floor(x) + 1`.
+The array at `p` must be at least length `floor(x) + 2`.
 */
-inline float interpolateLinear(const float *p, float x) {
+inline float interpolateLinear(const float* p, float x) {
 	int xi = x;
 	float xf = x - xi;
-	return crossfade(p[xi], p[xi+1], xf);
+	return crossfade(p[xi], p[xi + 1], xf);
 }
 
 /** Complex multiplication `c = a * b`.
@@ -160,7 +161,7 @@ Example:
 
 	cmultf(ar, ai, br, bi, &ar, &ai);
 */
-inline void complexMult(float ar, float ai, float br, float bi, float *cr, float *ci) {
+inline void complexMult(float ar, float ai, float br, float bi, float* cr, float* ci) {
 	*cr = ar * br - ai * bi;
 	*ci = ar * bi + ai * br;
 }
@@ -279,17 +280,17 @@ struct Rect {
 	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right. */
 	bool isContaining(Vec v) const {
 		return pos.x <= v.x && v.x < pos.x + size.x
-			&& pos.y <= v.y && v.y < pos.y + size.y;
+		       && pos.y <= v.y && v.y < pos.y + size.y;
 	}
 	/** Returns whether this Rect contains an entire Rect. */
 	bool isContaining(Rect r) const {
 		return pos.x <= r.pos.x && r.pos.x + r.size.x <= pos.x + size.x
-			&& pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
+		       && pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
 	}
 	/** Returns whether this Rect overlaps with another Rect. */
 	bool isIntersecting(Rect r) const {
 		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
-			&& (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
+		       && (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
 	}
 	bool isEqual(Rect r) const {
 		return pos.isEqual(r.pos) && size.isEqual(r.size);
@@ -364,22 +365,28 @@ struct Rect {
 		return r;
 	}
 
-	DEPRECATED bool contains(Vec v) const {return isContaining(v);}
-	DEPRECATED bool contains(Rect r) const {return isContaining(r);}
-	DEPRECATED bool intersects(Rect r) const {return isIntersecting(r);}
+	DEPRECATED bool contains(Vec v) const {
+		return isContaining(v);
+	}
+	DEPRECATED bool contains(Rect r) const {
+		return isContaining(r);
+	}
+	DEPRECATED bool intersects(Rect r) const {
+		return isIntersecting(r);
+	}
 };
 
 
 inline Vec Vec::clamp(Rect bound) const {
 	return Vec(
-		math::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
-		math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
+	         math::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
+	         math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 inline Vec Vec::clampSafe(Rect bound) const {
 	return Vec(
-		math::clampSafe(x, bound.pos.x, bound.pos.x + bound.size.x),
-		math::clampSafe(y, bound.pos.y, bound.pos.y + bound.size.y));
+	         math::clampSafe(x, bound.pos.x, bound.pos.x + bound.size.x),
+	         math::clampSafe(y, bound.pos.y, bound.pos.y + bound.size.y));
 }
 
 

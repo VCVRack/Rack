@@ -15,7 +15,7 @@ namespace dsp {
 /** Resamples by a fixed rational factor. */
 template <int MAX_CHANNELS>
 struct SampleRateConverter {
-	SpeexResamplerState *st = NULL;
+	SpeexResamplerState* st = NULL;
 	int channels = MAX_CHANNELS;
 	int quality = SPEEX_RESAMPLER_QUALITY_DEFAULT;
 	int inRate = 44100;
@@ -73,7 +73,7 @@ struct SampleRateConverter {
 	}
 
 	/** `in` and `out` are interlaced with the number of channels */
-	void process(const Frame<MAX_CHANNELS> *in, int *inFrames, Frame<MAX_CHANNELS> *out, int *outFrames) {
+	void process(const Frame<MAX_CHANNELS>* in, int* inFrames, Frame<MAX_CHANNELS>* out, int* outFrames) {
 		assert(in);
 		assert(inFrames);
 		assert(out);
@@ -105,13 +105,13 @@ struct SampleRateConverter {
 /** Downsamples by an integer factor. */
 template <int OVERSAMPLE, int QUALITY, typename T = float>
 struct Decimator {
-	T inBuffer[OVERSAMPLE*QUALITY];
-	float kernel[OVERSAMPLE*QUALITY];
+	T inBuffer[OVERSAMPLE * QUALITY];
+	float kernel[OVERSAMPLE * QUALITY];
 	int inIndex;
 
 	Decimator(float cutoff = 0.9f) {
-		boxcarLowpassIR(kernel, OVERSAMPLE*QUALITY, cutoff * 0.5f / OVERSAMPLE);
-		blackmanHarrisWindow(kernel, OVERSAMPLE*QUALITY);
+		boxcarLowpassIR(kernel, OVERSAMPLE * QUALITY, cutoff * 0.5f / OVERSAMPLE);
+		blackmanHarrisWindow(kernel, OVERSAMPLE * QUALITY);
 		reset();
 	}
 	void reset() {
@@ -119,17 +119,17 @@ struct Decimator {
 		std::memset(inBuffer, 0, sizeof(inBuffer));
 	}
 	/** `in` must be length OVERSAMPLE */
-	T process(T *in) {
+	T process(T* in) {
 		// Copy input to buffer
-		std::memcpy(&inBuffer[inIndex], in, OVERSAMPLE*sizeof(T));
+		std::memcpy(&inBuffer[inIndex], in, OVERSAMPLE * sizeof(T));
 		// Advance index
 		inIndex += OVERSAMPLE;
-		inIndex %= OVERSAMPLE*QUALITY;
+		inIndex %= OVERSAMPLE * QUALITY;
 		// Perform naive convolution
 		T out = 0.f;
-		for (int i = 0; i < OVERSAMPLE*QUALITY; i++) {
+		for (int i = 0; i < OVERSAMPLE * QUALITY; i++) {
 			int index = inIndex - 1 - i;
-			index = (index + OVERSAMPLE*QUALITY) % (OVERSAMPLE*QUALITY);
+			index = (index + OVERSAMPLE * QUALITY) % (OVERSAMPLE * QUALITY);
 			out += kernel[i] * inBuffer[index];
 		}
 		return out;
@@ -141,12 +141,12 @@ struct Decimator {
 template <int OVERSAMPLE, int QUALITY>
 struct Upsampler {
 	float inBuffer[QUALITY];
-	float kernel[OVERSAMPLE*QUALITY];
+	float kernel[OVERSAMPLE * QUALITY];
 	int inIndex;
 
 	Upsampler(float cutoff = 0.9f) {
-		boxcarLowpassIR(kernel, OVERSAMPLE*QUALITY, cutoff * 0.5f / OVERSAMPLE);
-		blackmanHarrisWindow(kernel, OVERSAMPLE*QUALITY);
+		boxcarLowpassIR(kernel, OVERSAMPLE * QUALITY, cutoff * 0.5f / OVERSAMPLE);
+		blackmanHarrisWindow(kernel, OVERSAMPLE * QUALITY);
 		reset();
 	}
 	void reset() {
@@ -154,7 +154,7 @@ struct Upsampler {
 		std::memset(inBuffer, 0, sizeof(inBuffer));
 	}
 	/** `out` must be length OVERSAMPLE */
-	void process(float in, float *out) {
+	void process(float in, float* out) {
 		// Zero-stuff input buffer
 		inBuffer[inIndex] = OVERSAMPLE * in;
 		// Advance index

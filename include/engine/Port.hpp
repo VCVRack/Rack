@@ -62,12 +62,12 @@ struct alignas(32) Port {
 	/** Returns a pointer to the array of voltages beginning with firstChannel.
 	The pointer can be used for reading and writing.
 	*/
-	float *getVoltages(int firstChannel = 0) {
+	float* getVoltages(int firstChannel = 0) {
 		return &voltages[firstChannel];
 	}
 
 	/** Copies the port's voltages to an array of size at least `channels`. */
-	void readVoltages(float *v) {
+	void readVoltages(float* v) {
 		for (int c = 0; c < channels; c++) {
 			v[c] = voltages[c];
 		}
@@ -76,7 +76,7 @@ struct alignas(32) Port {
 	/** Copies an array of size at least `channels` to the port's voltages.
 	Remember to set the number of channels *before* calling this method.
 	*/
-	void writeVoltages(const float *v) {
+	void writeVoltages(const float* v) {
 		for (int c = 0; c < channels; c++) {
 			voltages[c] = v[c];
 		}
@@ -105,7 +105,7 @@ struct alignas(32) Port {
 
 	template <typename T>
 	T getPolyVoltageSimd(int firstChannel) {
-			return isMonophonic() ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
+		return isMonophonic() ? getVoltage(0) : getVoltageSimd<T>(firstChannel);
 	}
 
 	template <typename T>

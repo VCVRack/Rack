@@ -14,11 +14,11 @@ namespace app {
 
 /** Manages an engine::Module in the rack. */
 struct ModuleWidget : widget::OpaqueWidget {
-	plugin::Model *model = NULL;
+	plugin::Model* model = NULL;
 	/** Owned. */
-	engine::Module *module = NULL;
+	engine::Module* module = NULL;
 
-	widget::Widget *panel = NULL;
+	widget::Widget* panel = NULL;
 	/** Note that the indexes of these vectors do not necessarily correspond with the indexes of `Module::params` etc.
 	*/
 	std::vector<ParamWidget*> params;
@@ -29,39 +29,39 @@ struct ModuleWidget : widget::OpaqueWidget {
 	math::Vec oldPos;
 
 	ModuleWidget();
-	DEPRECATED ModuleWidget(engine::Module *module) : ModuleWidget() {
+	DEPRECATED ModuleWidget(engine::Module* module) : ModuleWidget() {
 		setModule(module);
 	}
 	~ModuleWidget();
 
-	void draw(const DrawArgs &args) override;
-	void drawShadow(const DrawArgs &args);
+	void draw(const DrawArgs& args) override;
+	void drawShadow(const DrawArgs& args);
 
-	void onButton(const event::Button &e) override;
-	void onHoverKey(const event::HoverKey &e) override;
-	void onDragStart(const event::DragStart &e) override;
-	void onDragEnd(const event::DragEnd &e) override;
-	void onDragMove(const event::DragMove &e) override;
+	void onButton(const event::Button& e) override;
+	void onHoverKey(const event::HoverKey& e) override;
+	void onDragStart(const event::DragStart& e) override;
+	void onDragEnd(const event::DragEnd& e) override;
+	void onDragMove(const event::DragMove& e) override;
 
 	/** Associates this ModuleWidget with the Module
 	Transfers ownership
 	*/
-	void setModule(engine::Module *module);
+	void setModule(engine::Module* module);
 	void setPanel(std::shared_ptr<Svg> svg);
 
 	/** Convenience functions for adding special widgets (calls addChild()) */
-	void addParam(ParamWidget *param);
-	void addOutput(PortWidget *output);
-	void addInput(PortWidget *input);
-	ParamWidget *getParam(int paramId);
-	PortWidget *getOutput(int outputId);
-	PortWidget *getInput(int inputId);
+	void addParam(ParamWidget* param);
+	void addOutput(PortWidget* output);
+	void addInput(PortWidget* input);
+	ParamWidget* getParam(int paramId);
+	PortWidget* getOutput(int outputId);
+	PortWidget* getInput(int inputId);
 
 	/** Overriding these is deprecated.
 	Use Module::dataToJson() and dataFromJson() instead
 	*/
-	virtual json_t *toJson();
-	virtual void fromJson(json_t *rootJ);
+	virtual json_t* toJson();
+	virtual void fromJson(json_t* rootJ);
 
 	/** Serializes/unserializes the module state */
 	void copyClipboard();
@@ -93,7 +93,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Override to add context menu entries to your subclass.
 	It is recommended to add a blank ui::MenuEntry first for spacing.
 	*/
-	virtual void appendContextMenu(ui::Menu *menu) {}
+	virtual void appendContextMenu(ui::Menu* menu) {}
 };
 
 

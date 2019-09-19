@@ -82,7 +82,7 @@ void PatchManager::resetDialog() {
 
 void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
-	json_t *rootJ = toJson();
+	json_t* rootJ = toJson();
 	if (!rootJ)
 		return;
 	DEFER({
@@ -91,7 +91,7 @@ void PatchManager::save(std::string path) {
 
 	// Write to temporary path and then rename it to the correct path
 	std::string tmpPath = path + ".tmp";
-	FILE *file = std::fopen(tmpPath.c_str(), "w");
+	FILE* file = std::fopen(tmpPath.c_str(), "w");
 	if (!file) {
 		// Fail silently
 		return;
@@ -124,12 +124,12 @@ void PatchManager::saveAsDialog() {
 		filename = string::filename(path);
 	}
 
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS);
+	osdialog_filters* filters = osdialog_filters_parse(PATCH_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char *pathC = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
+	char* pathC = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
 	if (!pathC) {
 		// Fail silently
 		return;
@@ -159,7 +159,7 @@ void PatchManager::saveTemplateDialog() {
 
 bool PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
-	FILE *file = std::fopen(path.c_str(), "r");
+	FILE* file = std::fopen(path.c_str(), "r");
 	if (!file) {
 		// Exit silently
 		return false;
@@ -169,7 +169,7 @@ bool PatchManager::load(std::string path) {
 	});
 
 	json_error_t error;
-	json_t *rootJ = json_loadf(file, 0, &error);
+	json_t* rootJ = json_loadf(file, 0, &error);
 	if (!rootJ) {
 		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
@@ -200,12 +200,12 @@ void PatchManager::loadDialog() {
 		dir = string::directory(path);
 	}
 
-	osdialog_filters *filters = osdialog_filters_parse(PATCH_FILTERS);
+	osdialog_filters* filters = osdialog_filters_parse(PATCH_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char *pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
+	char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
 	if (!pathC) {
 		// Fail silently
 		return;
@@ -242,16 +242,16 @@ void PatchManager::disconnectDialog() {
 	APP->scene->rack->clearCablesAction();
 }
 
-json_t *PatchManager::toJson() {
+json_t* PatchManager::toJson() {
 	// root
-	json_t *rootJ = json_object();
+	json_t* rootJ = json_object();
 
 	// version
-	json_t *versionJ = json_string(app::APP_VERSION.c_str());
+	json_t* versionJ = json_string(app::APP_VERSION.c_str());
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// Merge with RackWidget JSON
-	json_t *rackJ = APP->scene->rack->toJson();
+	json_t* rackJ = APP->scene->rack->toJson();
 	// Merge with rootJ
 	json_object_update(rootJ, rackJ);
 	json_decref(rackJ);
@@ -259,12 +259,12 @@ json_t *PatchManager::toJson() {
 	return rootJ;
 }
 
-void PatchManager::fromJson(json_t *rootJ) {
+void PatchManager::fromJson(json_t* rootJ) {
 	legacy = 0;
 
 	// version
 	std::string version;
-	json_t *versionJ = json_object_get(rootJ, "version");
+	json_t* versionJ = json_object_get(rootJ, "version");
 	if (versionJ)
 		version = json_string_value(versionJ);
 	if (version != app::APP_VERSION) {

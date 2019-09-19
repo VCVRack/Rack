@@ -87,7 +87,7 @@ struct CV_Gate : Module {
 	void onReset() override {
 		for (int y = 0; y < 4; y++) {
 			for (int x = 0; x < 4; x++) {
-				learnedNotes[4 * y + x] = 36 + 4 * (3-y) + x;
+				learnedNotes[4 * y + x] = 36 + 4 * (3 - y) + x;
 			}
 		}
 		learningId = -1;
@@ -95,7 +95,7 @@ struct CV_Gate : Module {
 		midiOutput.midi::Output::reset();
 	}
 
-	void process(const ProcessArgs &args) override {
+	void process(const ProcessArgs& args) override {
 		for (int i = 0; i < 16; i++) {
 			int note = learnedNotes[i];
 			if (velocityMode) {
@@ -112,12 +112,12 @@ struct CV_Gate : Module {
 		}
 	}
 
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
 
-		json_t *notesJ = json_array();
+		json_t* notesJ = json_array();
 		for (int i = 0; i < 16; i++) {
-			json_t *noteJ = json_integer(learnedNotes[i]);
+			json_t* noteJ = json_integer(learnedNotes[i]);
 			json_array_append_new(notesJ, noteJ);
 		}
 		json_object_set_new(rootJ, "notes", notesJ);
@@ -128,21 +128,21 @@ struct CV_Gate : Module {
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
-		json_t *notesJ = json_object_get(rootJ, "notes");
+	void dataFromJson(json_t* rootJ) override {
+		json_t* notesJ = json_object_get(rootJ, "notes");
 		if (notesJ) {
 			for (int i = 0; i < 16; i++) {
-				json_t *noteJ = json_array_get(notesJ, i);
+				json_t* noteJ = json_array_get(notesJ, i);
 				if (noteJ)
 					learnedNotes[i] = json_integer_value(noteJ);
 			}
 		}
 
-		json_t *velocityJ = json_object_get(rootJ, "velocity");
+		json_t* velocityJ = json_object_get(rootJ, "velocity");
 		if (velocityJ)
 			velocityMode = json_boolean_value(velocityJ);
 
-		json_t *midiJ = json_object_get(rootJ, "midi");
+		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiOutput.fromJson(midiJ);
 	}
@@ -150,23 +150,23 @@ struct CV_Gate : Module {
 
 
 struct CV_GateVelocityItem : MenuItem {
-	CV_Gate *module;
-	void onAction(const event::Action &e) override {
+	CV_Gate* module;
+	void onAction(const event::Action& e) override {
 		module->velocityMode ^= true;
 	}
 };
 
 
 struct CV_GatePanicItem : MenuItem {
-	CV_Gate *module;
-	void onAction(const event::Action &e) override {
+	CV_Gate* module;
+	void onAction(const event::Action& e) override {
 		module->midiOutput.panic();
 	}
 };
 
 
 struct CV_GateWidget : ModuleWidget {
-	CV_GateWidget(CV_Gate *module) {
+	CV_GateWidget(CV_Gate* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/CV-Gate.svg")));
 
@@ -193,22 +193,22 @@ struct CV_GateWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 112)), module, CV_Gate::GATE_INPUTS + 15));
 
 		typedef Grid16MidiWidget<NoteChoice<CV_Gate>> TMidiWidget;
-		TMidiWidget *midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
+		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
 		midiWidget->box.size = mm2px(Vec(44, 54.667));
 		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 
-	void appendContextMenu(Menu *menu) override {
-		CV_Gate *module = dynamic_cast<CV_Gate*>(this->module);
+	void appendContextMenu(Menu* menu) override {
+		CV_Gate* module = dynamic_cast<CV_Gate*>(this->module);
 
 		menu->addChild(new MenuEntry);
-		CV_GateVelocityItem *velocityItem = createMenuItem<CV_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
+		CV_GateVelocityItem* velocityItem = createMenuItem<CV_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
 
-		CV_GatePanicItem *panicItem = new CV_GatePanicItem;
+		CV_GatePanicItem* panicItem = new CV_GatePanicItem;
 		panicItem->text = "Panic";
 		panicItem->module = module;
 		menu->addChild(panicItem);
@@ -216,7 +216,7 @@ struct CV_GateWidget : ModuleWidget {
 };
 
 
-Model *modelCV_Gate = createModel<CV_Gate, CV_GateWidget>("CV-Gate");
+Model* modelCV_Gate = createModel<CV_Gate, CV_GateWidget>("CV-Gate");
 
 
 } // namespace core

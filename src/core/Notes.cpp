@@ -6,9 +6,9 @@ namespace core {
 
 
 struct NotesWidget : ModuleWidget {
-	TextField *textField;
+	TextField* textField;
 
-	NotesWidget(Module *module) {
+	NotesWidget(Module* module) {
 		setModule(module);
 		setPanel(APP->window->loadSvg(asset::system("res/Core/Notes.svg")));
 
@@ -23,8 +23,8 @@ struct NotesWidget : ModuleWidget {
 		addChild(textField);
 	}
 
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
+	json_t* toJson() override {
+		json_t* rootJ = ModuleWidget::toJson();
 
 		// text
 		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
@@ -32,18 +32,18 @@ struct NotesWidget : ModuleWidget {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
+	void fromJson(json_t* rootJ) override {
 		ModuleWidget::fromJson(rootJ);
 
 		// text
-		json_t *textJ = json_object_get(rootJ, "text");
+		json_t* textJ = json_object_get(rootJ, "text");
 		if (textJ)
 			textField->text = json_string_value(textJ);
 	}
 };
 
 
-Model *modelNotes = createModel<Module, NotesWidget>("Notes");
+Model* modelNotes = createModel<Module, NotesWidget>("Notes");
 
 
 } // namespace core

@@ -11,7 +11,7 @@ struct RackRail : widget::TransparentWidget {
 	std::shared_ptr<Svg> busBoardSvg;
 
 	RackRail();
-	void draw(const DrawArgs &args) override;
+	void draw(const DrawArgs& args) override;
 };
 
 
