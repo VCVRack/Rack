@@ -53,6 +53,8 @@ static float modelScore(plugin::Model* model, const std::string& search) {
 			s += alias;
 		}
 	}
+	s += " ";
+	s += model->description;
 	float score = string::fuzzyScore(string::lowercase(s), string::lowercase(search));
 	return score;
 }
