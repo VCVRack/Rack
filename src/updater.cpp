@@ -74,8 +74,19 @@ void update() {
 	INFO("Launching update %s", path.c_str());
 	system::runProcessDetached(path);
 #elif defined ARCH_MAC
-	// Unzip app using Apple's unzipper, since Rack's unzipper doesn't handle the metadata stuff correctly.
-	std::string cmd = "open \"" + path + "\"";
+	std::string cmd;
+	// std::string appPath = asset::userDir + "/Rack.app";
+	// cmd = "rm -rf '" + appPath + "'";
+	// std::system(cmd.c_str());
+	// // Unzip app using Apple's unzipper, since Rack's unzipper doesn't handle the metadata stuff correctly.
+	// cmd = "unzip -q '" + path + "' -d '" + asset::userDir + "'";
+	// std::system(cmd.c_str());
+	// // Open app in Finder
+	// cmd = "open -R '" + appPath + "'";
+	// std::system(cmd.c_str());
+
+	// Open Archive Utility
+	cmd = "open '" + path + "'";
 	std::system(cmd.c_str());
 #else
 	system::openBrowser(downloadUrl);

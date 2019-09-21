@@ -17,6 +17,7 @@
 #include <system.hpp>
 #include <string.hpp>
 #include <updater.hpp>
+#include <network.hpp>
 
 #include <osdialog.h>
 #include <thread>
@@ -97,6 +98,7 @@ int main(int argc, char* argv[]) {
 		patchPath = argv[optind];
 	}
 
+	// Initialize environment
 	asset::init();
 	logger::init();
 
@@ -145,6 +147,7 @@ int main(int argc, char* argv[]) {
 
 	INFO("Initializing environment");
 	random::init();
+	network::init();
 	midi::init();
 	rtmidiInit();
 	bridgeInit();

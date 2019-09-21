@@ -31,6 +31,8 @@ extern std::string pluginsPath;
 extern std::string settingsPath;
 extern std::string autosavePath;
 extern std::string templatePath;
+// Only defined on Mac
+extern std::string bundlePath;
 
 
 } // namespace asset
