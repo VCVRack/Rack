@@ -106,32 +106,32 @@ $(jansson): jansson-2.12
 	$(MAKE) -C jansson-2.12
 	$(MAKE) -C jansson-2.12 install
 
-openssl-1.1.1b:
-	$(WGET) "https://www.openssl.org/source/openssl-1.1.1b.tar.gz"
-	$(SHA256) openssl-1.1.1b.tar.gz 5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
-	$(UNTAR) openssl-1.1.1b.tar.gz
-	rm openssl-1.1.1b.tar.gz
+openssl-1.1.1d:
+	$(WGET) "https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
+	$(SHA256) openssl-1.1.1d.tar.gz 1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2
+	$(UNTAR) openssl-1.1.1d.tar.gz
+	rm openssl-1.1.1d.tar.gz
 
-$(openssl): openssl-1.1.1b
+$(openssl): openssl-1.1.1d
 	@# ./config ignores CFLAGS, so hack it in with CC
-	cd openssl-1.1.1b && CC="$(CC) $(CFLAGS)" ./config --prefix="$(DEP_PATH)"
-	$(MAKE) -C openssl-1.1.1b
-	$(MAKE) -C openssl-1.1.1b install_sw
+	cd openssl-1.1.1d && CC="$(CC) $(CFLAGS)" ./config --prefix="$(DEP_PATH)"
+	$(MAKE) -C openssl-1.1.1d
+	$(MAKE) -C openssl-1.1.1d install_sw
 
-curl-7.64.1:
-	$(WGET) "https://curl.haxx.se/download/curl-7.64.1.tar.gz"
-	$(SHA256) curl-7.64.1.tar.gz 432d3f466644b9416bc5b649d344116a753aeaa520c8beaf024a90cba9d3d35d
-	$(UNTAR) curl-7.64.1.tar.gz
-	rm curl-7.64.1.tar.gz
+curl-7.66.0:
+	$(WGET) "https://curl.haxx.se/download/curl-7.66.0.tar.gz"
+	$(SHA256) curl-7.66.0.tar.gz d0393da38ac74ffac67313072d7fe75b1fa1010eb5987f63f349b024a36b7ffb
+	$(UNTAR) curl-7.66.0.tar.gz
+	rm curl-7.66.0.tar.gz
 
 CURL_FLAGS += --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding
 CURL_FLAGS += --without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli
 CURL_FLAGS += --with-ssl="$(DEP_PATH)"
 
-$(libcurl): $(openssl) curl-7.64.1
-	cd curl-7.64.1 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
-	$(MAKE) -C curl-7.64.1
-	$(MAKE) -C curl-7.64.1 install
+$(libcurl): $(openssl) curl-7.66.0
+	cd curl-7.66.0 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
+	$(MAKE) -C curl-7.66.0
+	$(MAKE) -C curl-7.66.0 install
 
 libzip-1.5.2:
 	$(WGET) "https://libzip.org/download/libzip-1.5.2.tar.gz"
@@ -246,7 +246,7 @@ $(pffft): jpommier-pffft-29e4f76ac53b
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1b curl-7.64.1 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog jpommier-pffft-29e4f76ac53b
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog jpommier-pffft-29e4f76ac53b
 
 clean:
 	git clean -fdx
