@@ -23,7 +23,6 @@ Scene::Scene() {
 
 	menuBar = createMenuBar();
 	addChild(menuBar);
-	rackScroll->box.pos.y = menuBar->box.size.y;
 
 	moduleBrowser = moduleBrowserCreate();
 	moduleBrowser->hide();
@@ -34,6 +33,10 @@ Scene::~Scene() {
 }
 
 void Scene::step() {
+	bool fullscreen = APP->window->isFullScreen();
+	menuBar->visible = !fullscreen;
+	rackScroll->box.pos.y = menuBar->visible ? menuBar->box.size.y : 0;
+
 	// Resize owned descendants
 	menuBar->box.size.x = box.size.x;
 	rackScroll->box.size = box.size.minus(rackScroll->box.pos);

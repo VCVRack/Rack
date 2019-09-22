@@ -6,6 +6,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Swap order of tags and brands in Module Browser.
 - Disable smoothing for MIDI CC buttons in MIDI-Map.
 - Automatically unzip update on Mac.
+- Stop worker threads when engine is paused to save CPU.
+- Hide menu and scrollbars when fullscreen.
 - Core
 	- Fix sustain pedal release bug when using polyphonic mode in MIDI-CV.
 - API
