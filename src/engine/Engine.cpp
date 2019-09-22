@@ -429,12 +429,12 @@ static void Engine_run(Engine* that) {
 			aheadTime = 0.0;
 		}
 
-		// Launch workers
-		if (internal->threadCount != settings::threadCount || internal->realTime != settings::realTime) {
-			Engine_relaunchWorkers(that, settings::threadCount, settings::realTime);
-		}
-
 		if (!internal->paused) {
+			// Launch workers
+			if (internal->threadCount != settings::threadCount || internal->realTime != settings::realTime) {
+				Engine_relaunchWorkers(that, settings::threadCount, settings::realTime);
+			}
+
 			std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 			// Update expander pointers
@@ -446,6 +446,12 @@ static void Engine_run(Engine* that) {
 			// Step modules
 			for (int i = 0; i < mutexSteps; i++) {
 				Engine_step(that);
+			}
+		}
+		else {
+			// Stop workers while closed
+			if (internal->threadCount != 1) {
+				Engine_relaunchWorkers(that, 1, settings::realTime);
 			}
 		}
 
