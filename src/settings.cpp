@@ -33,6 +33,7 @@ float frameRateLimit = 70.0;
 bool frameRateSync = true;
 float autosavePeriod = 15.0;
 bool skipLoadOnLaunch = false;
+bool pauseUnfocused = false;
 std::string patchPath;
 std::vector<NVGcolor> cableColors = {
 	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
@@ -64,6 +65,7 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "allowCursorLock", json_boolean(allowCursorLock));
 
 	json_object_set_new(rootJ, "realTime", json_boolean(realTime));
+	
 
 	json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
 
@@ -84,6 +86,8 @@ json_t* toJson() {
 	if (skipLoadOnLaunch) {
 		json_object_set_new(rootJ, "skipLoadOnLaunch", json_true());
 	}
+
+	json_object_set_new(rootJ, "pauseUnfocused", json_boolean(pauseUnfocused));
 
 	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
 
@@ -175,6 +179,10 @@ void fromJson(json_t* rootJ) {
 	json_t* skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
 	if (skipLoadOnLaunchJ)
 		skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
+
+	json_t *pauseUnfocusedJ = json_object_get(rootJ, "pauseUnfocused");
+	if (pauseUnfocusedJ)
+		pauseUnfocused = json_boolean_value(pauseUnfocusedJ);
 
 	json_t* patchPathJ = json_object_get(rootJ, "patchPath");
 	if (patchPathJ)

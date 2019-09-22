@@ -64,6 +64,7 @@ struct Window {
 	int frame = 0;
 	/** The last known absolute mouse position in the window */
 	math::Vec mousePos;
+	bool focused;
 	std::shared_ptr<Font> uiFont;
 	double frameTimeStart = 0.f;
 

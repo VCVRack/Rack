@@ -38,6 +38,7 @@ extern float frameRateLimit;
 extern bool frameRateSync;
 extern float autosavePeriod;
 extern bool skipLoadOnLaunch;
+extern bool pauseUnfocused;
 extern std::string patchPath;
 extern std::vector<NVGcolor> cableColors;
 

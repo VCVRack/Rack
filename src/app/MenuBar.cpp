@@ -391,6 +391,12 @@ struct EnginePauseItem : ui::MenuItem {
 	}
 };
 
+struct EnginePauseUnfocusedItem : ui::MenuItem {
+	void onAction(const event::Action& e) override {
+		settings::pauseUnfocused ^= true;
+	}
+};
+
 struct SampleRateValueItem : ui::MenuItem {
 	float sampleRate;
 	void onAction(const event::Action& e) override {
@@ -479,6 +485,11 @@ struct EngineButton : MenuButton {
 		cpuMeterItem->text = "CPU meter";
 		cpuMeterItem->rightText = CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);
+
+		EnginePauseUnfocusedItem* enginePauseUnfocusedItem = new EnginePauseUnfocusedItem;
+		enginePauseUnfocusedItem->text = "Pause unfocused";
+		enginePauseUnfocusedItem->rightText = CHECKMARK(settings::pauseUnfocused);
+		menu->addChild(enginePauseUnfocusedItem);
 
 		SampleRateItem* sampleRateItem = new SampleRateItem;
 		sampleRateItem->text = "Sample rate";
