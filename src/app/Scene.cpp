@@ -56,11 +56,6 @@ void Scene::step() {
 
 void Scene::draw(const DrawArgs& args) {
 	Widget::draw(args);
-
-	// nvgBeginPath(args.vg);
-	// nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-	// nvgFillColor(args.vg, color::mult(color::WHITE, APP->window->frame % 2));
-	// nvgFill(args.vg);
 }
 
 void Scene::onHoverKey(const event::HoverKey& e) {

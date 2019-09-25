@@ -327,6 +327,30 @@ struct CursorLockItem : ui::MenuItem {
 	}
 };
 
+struct FrameRateValueItem : ui::MenuItem {
+	int frameSwapInterval;
+	void onAction(const event::Action& e) override {
+		settings::frameSwapInterval = frameSwapInterval;
+	}
+};
+
+struct FrameRateItem : ui::MenuItem {
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
+
+		for (int i = 1; i <= 6; i++) {
+			float frameRate = 60.f / i;
+
+			FrameRateValueItem* item = new FrameRateValueItem;
+			item->frameSwapInterval = i;
+			item->text = string::f("%.0f Hz", frameRate);
+			item->rightText += CHECKMARK(settings::frameSwapInterval == i);
+			menu->addChild(item);
+		}
+		return menu;
+	}
+};
+
 struct FullscreenItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
 		APP->window->setFullScreen(!APP->window->isFullScreen());
@@ -365,6 +389,10 @@ struct ViewButton : MenuButton {
 		CableTensionSlider* cableTensionSlider = new CableTensionSlider;
 		cableTensionSlider->box.size.x = 200.0;
 		menu->addChild(cableTensionSlider);
+
+		FrameRateItem* frameRateItem = new FrameRateItem;
+		frameRateItem->text = "Frame rate";
+		menu->addChild(frameRateItem);
 
 		FullscreenItem* fullscreenItem = new FullscreenItem;
 		fullscreenItem->text = "Fullscreen";

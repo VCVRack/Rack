@@ -325,7 +325,10 @@ Window::~Window() {
 void Window::run() {
 	frame = 0;
 	while (!glfwWindowShouldClose(win)) {
-		frameTimeStart = glfwGetTime();
+		double frameTime = glfwGetTime();
+		// double frameRate = 1.0 / (frameTime - frameTimeStart);
+		// DEBUG("%g fps", frameRate);
+		frameTimeStart = frameTime;
 
 		// Make event handlers and step() have a clean nanovg context
 		nvgReset(vg);
@@ -406,9 +409,6 @@ void Window::run() {
 
 		glfwSwapBuffers(win);
 
-		// Compute actual frame rate
-		double frameTimeEnd = glfwGetTime();
-		DEBUG("%g fps", 1 / (frameTimeEnd - frameTimeStart));
 		frame++;
 	}
 }
