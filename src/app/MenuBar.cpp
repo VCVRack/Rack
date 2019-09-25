@@ -477,7 +477,8 @@ struct EngineButton : MenuButton {
 
 		CpuMeterItem* cpuMeterItem = new CpuMeterItem;
 		cpuMeterItem->text = "CPU meter";
-		cpuMeterItem->rightText = CHECKMARK(settings::cpuMeter);
+		cpuMeterItem->rightText = "F3 ";
+		cpuMeterItem->rightText += CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);
 
 		SampleRateItem* sampleRateItem = new SampleRateItem;

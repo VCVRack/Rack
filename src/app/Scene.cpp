@@ -148,6 +148,12 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 					e.consume(this);
 				}
 			} break;
+			case GLFW_KEY_F3: {
+				if ((e.mods & RACK_MOD_MASK) == 0) {
+					settings::cpuMeter ^= true;
+					e.consume(this);
+				}
+			} break;
 			case GLFW_KEY_F11: {
 				if ((e.mods & RACK_MOD_MASK) == 0) {
 					APP->window->setFullScreen(!APP->window->isFullScreen());
