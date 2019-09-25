@@ -61,13 +61,11 @@ void update() {
 	if (downloadUrl == "")
 		return;
 
-#if defined ARCH_WIN || defined ARCH_MAC
 	// Download update
 	std::string filename = string::filename(network::urlPath(downloadUrl));
 	std::string path = asset::user(filename);
-	INFO("Download update %s to %s", downloadUrl.c_str(), path.c_str());
+	INFO("Downloading update %s to %s", downloadUrl.c_str(), path.c_str());
 	network::requestDownload(downloadUrl, path, &progress);
-#endif
 
 #if defined ARCH_WIN
 	// Launch the installer
@@ -88,8 +86,8 @@ void update() {
 	// Open Archive Utility
 	cmd = "open '" + path + "'";
 	std::system(cmd.c_str());
-#else
-	system::openBrowser(downloadUrl);
+#elif defined ARCH_LIN
+	system::openFolder(asset::user(""));
 #endif
 
 	APP->window->close();
