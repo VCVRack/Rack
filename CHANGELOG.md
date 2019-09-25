@@ -9,6 +9,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Stop worker threads when engine is paused to save CPU.
 - Hide menu and scrollbars when fullscreen.
 - Add key command (F3) for engine CPU meter.
+- Add numpad key commands.
 - Core
 	- Fix sustain pedal release bug when using polyphonic mode in MIDI-CV.
 - API
