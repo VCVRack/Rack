@@ -96,6 +96,7 @@ struct Window::Internal {
 
 	bool ignoreNextMouseDelta = false;
 	int frameSwapInterval = -1;
+	double monitorRefreshRate = -1;
 };
 
 
@@ -250,6 +251,8 @@ Window::Window() {
 
 	glfwMakeContextCurrent(win);
 	glfwSwapInterval(1);
+	const GLFWvidmode* monitorMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	internal->monitorRefreshRate = monitorMode->refreshRate;
 
 	// Set window callbacks
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
@@ -522,9 +525,12 @@ bool Window::isFrameOverdue() {
 	if (settings::frameSwapInterval == 0)
 		return false;
 	double frameDuration = glfwGetTime() - frameTimeStart;
-	// This is fudged a bit because it assumes the monitor refresh rate is 60 Hz.
-	double frameDeadline = settings::frameSwapInterval / 60.0;
+	double frameDeadline = settings::frameSwapInterval / internal->monitorRefreshRate;
 	return frameDuration > frameDeadline;
+}
+
+double Window::getMonitorRefreshRate() {
+	return internal->monitorRefreshRate;
 }
 
 std::shared_ptr<Font> Window::loadFont(const std::string& filename) {

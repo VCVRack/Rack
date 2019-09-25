@@ -90,6 +90,7 @@ struct Window {
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
 	bool isFrameOverdue();
+	double getMonitorRefreshRate();
 
 	std::shared_ptr<Font> loadFont(const std::string& filename);
 	std::shared_ptr<Image> loadImage(const std::string& filename);
