@@ -29,8 +29,7 @@ int threadCount = 1;
 bool paramTooltip = false;
 bool cpuMeter = false;
 bool lockModules = false;
-float frameRateLimit = 70.0;
-bool frameRateSync = true;
+int frameSwapInterval = 1;
 float autosavePeriod = 15.0;
 bool skipLoadOnLaunch = false;
 std::string patchPath;
@@ -75,9 +74,7 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "lockModules", json_boolean(lockModules));
 
-	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
-
-	json_object_set_new(rootJ, "frameRateSync", json_boolean(frameRateSync));
+	json_object_set_new(rootJ, "frameSwapInterval", json_integer(frameSwapInterval));
 
 	json_object_set_new(rootJ, "autosavePeriod", json_real(autosavePeriod));
 
@@ -160,13 +157,9 @@ void fromJson(json_t* rootJ) {
 	if (lockModulesJ)
 		lockModules = json_boolean_value(lockModulesJ);
 
-	json_t* frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
-	if (frameRateLimitJ)
-		frameRateLimit = json_number_value(frameRateLimitJ);
-
-	json_t* frameRateSyncJ = json_object_get(rootJ, "frameRateSync");
-	if (frameRateSyncJ)
-		frameRateSync = json_boolean_value(frameRateSyncJ);
+	json_t* frameSwapIntervalJ = json_object_get(rootJ, "frameSwapInterval");
+	if (frameSwapIntervalJ)
+		frameSwapInterval = json_integer_value(frameSwapIntervalJ);
 
 	json_t* autosavePeriodJ = json_object_get(rootJ, "autosavePeriod");
 	if (autosavePeriodJ)
