@@ -635,6 +635,20 @@ struct CL1362Port : app::SvgPort {
 // Switches
 ////////////////////
 
+template <typename TSwitch>
+struct LatchingSwitch : TSwitch {
+	LatchingSwitch() {
+		this->momentary = false;
+	}
+};
+
+template <typename TSwitch>
+struct MomentarySwitch : TSwitch {
+	MomentarySwitch() {
+		this->momentary = true;
+	}
+};
+
 struct NKK : app::SvgSwitch {
 	NKK() {
 		addFrame(APP->window->loadSvg(asset::system("res/ComponentLibrary/NKK_0.svg")));
@@ -742,6 +756,46 @@ struct ScrewSilver : app::SvgScrew {
 struct ScrewBlack : app::SvgScrew {
 	ScrewBlack() {
 		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/ScrewBlack.svg")));
+	}
+};
+
+struct SegmentDisplay : widget::Widget {
+	int lightsLen = 0;
+	bool vertical = false;
+	float margin = app::mm2px(0.5);
+
+	void draw(const DrawArgs& args) override {
+		// Background
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+		nvgFillColor(args.vg, color::BLACK);
+		nvgFill(args.vg);
+		Widget::draw(args);
+	}
+
+	template <typename TLightBase = WhiteLight>
+	void setLights(engine::Module* module, int firstLightId, int lightsLen) {
+		clearChildren();
+		this->lightsLen = lightsLen;
+		float r = (vertical ? box.size.y : box.size.x) - margin;
+		for (int i = 0; i < lightsLen; i++) {
+			float p = float(i) / lightsLen;
+			app::ModuleLightWidget* light = new RectangleLight<TLightBase>;
+			if (vertical) {
+				light->box.pos.y = p * r + margin;
+				light->box.size.y = r / lightsLen - margin;
+				light->box.size.x = box.size.x;
+			}
+			else {
+				light->box.pos.x = p * r + margin;
+				light->box.size.x = r / lightsLen - margin;
+				light->box.size.y = box.size.y;
+			}
+			light->module = module;
+			light->firstLightId = firstLightId;
+			firstLightId += light->baseColors.size();
+			addChild(light);
+		}
 	}
 };
 
