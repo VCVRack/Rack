@@ -49,7 +49,7 @@ void appDestroy();
 App* appGet();
 
 /** Accesses the global App pointer */
-#define APP appGet()
+#define APP rack::appGet()
 
 
 } // namespace rack
