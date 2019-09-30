@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 	// Parse command line arguments
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "dhp:s:u:")) != -1) {
+	while ((c = getopt(argc, argv, "dht:s:u:")) != -1) {
 		switch (c) {
 			case 'd': {
 				settings::devMode = true;
@@ -77,7 +77,6 @@ int main(int argc, char* argv[]) {
 			case 'h': {
 				settings::headless = true;
 			} break;
-			// Due to Mac app translocation and Apple adding a -psn... flag when launched, disable screenshots on Mac for now.
 			case 't': {
 				screenshot = true;
 				// If parsing number failed, use default value
