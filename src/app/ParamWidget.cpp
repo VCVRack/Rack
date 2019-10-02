@@ -72,6 +72,9 @@ struct ParamTooltip : ui::Tooltip {
 		Tooltip::step();
 		// Position at bottom-right of parameter
 		box.pos = paramWidget->getAbsoluteOffset(paramWidget->box.size).round();
+		// Fit inside parent (copied from Tooltip.cpp)
+		assert(parent);
+		box = box.nudge(parent->box.zeroPos());
 	}
 };
 
