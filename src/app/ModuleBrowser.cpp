@@ -219,8 +219,7 @@ struct ModelBox : widget::OpaqueWidget {
 
 	void setTooltip(ui::Tooltip* tooltip) {
 		if (this->tooltip) {
-			this->tooltip->parent->removeChild(this->tooltip);
-			delete this->tooltip;
+			this->tooltip->requestDelete();
 			this->tooltip = NULL;
 		}
 
