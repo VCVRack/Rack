@@ -71,7 +71,7 @@ static InitCallback loadLibrary(Plugin* plugin) {
 		throw UserException(string::f("Failed to load library %s: code %d", libraryFilename.c_str(), error));
 	}
 #else
-	void* handle = dlopen(libraryFilename.c_str(), RTLD_NOW);
+	void* handle = dlopen(libraryFilename.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if (!handle) {
 		throw UserException(string::f("Failed to load library %s: %s", libraryFilename.c_str(), dlerror()));
 	}

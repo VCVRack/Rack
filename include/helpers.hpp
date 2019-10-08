@@ -124,6 +124,21 @@ TModuleLightWidget* createLightCentered(math::Vec pos, engine::Module* module, i
 	return o;
 }
 
+/** Creates a param with a light and calls setFirstLightId() on it. */
+template <class TParamWidget>
+TParamWidget* createLightParam(math::Vec pos, engine::Module* module, int paramId, int firstLightId) {
+	TParamWidget* o = createParam<TParamWidget>(pos, module, paramId);
+	o->setFirstLightId(firstLightId);
+	return o;
+}
+
+template <class TParamWidget>
+TParamWidget* createLightParamCentered(math::Vec pos, engine::Module* module, int paramId, int firstLightId) {
+	TParamWidget* o = createParamCentered<TParamWidget>(pos, module, paramId);
+	o->setFirstLightId(firstLightId);
+	return o;
+}
+
 template <class TMenuLabel = ui::MenuLabel>
 TMenuLabel * createMenuLabel(std::string text) {
 	TMenuLabel* o = new TMenuLabel;

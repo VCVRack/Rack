@@ -169,6 +169,7 @@ def create_manifest(slug, plugin_dir="."):
 	manifest['manualUrl'] = input_default("Manual website URL (optional)", manifest.get('manualUrl', ""))
 	manifest['sourceUrl'] = input_default("Source code URL (optional)", manifest.get('sourceUrl', ""))
 	manifest['donateUrl'] = input_default("Donate URL (optional)", manifest.get('donateUrl', ""))
+	manifest['changelogUrl'] = manifest.get('changelogUrl', "")
 
 	if 'modules' not in manifest:
 		manifest['modules'] = []

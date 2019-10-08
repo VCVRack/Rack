@@ -2,10 +2,20 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
-### 1.1.5 (in development)
+### ??? (in development)
+
+
+### 1.1.5 (2019-09-29)
 - Swap order of tags and brands in Module Browser.
-- Disable smoothing for MIDI CC buttons in MIDI-Map.
+- Add View > Frame rate menu bar item.
+- Hide menu and scrollbars when fullscreen.
+- Add key command (F3) for engine CPU meter.
+- Add numpad key commands.
 - Automatically unzip update on Mac.
+- Stop worker threads when engine is paused to save CPU.
+- Core
+	- Disable smoothing for MIDI CC buttons in MIDI-Map.
+	- Fix sustain pedal release bug when using polyphonic mode in MIDI-CV.
 - API
 	- Add libsamplerate library.
 

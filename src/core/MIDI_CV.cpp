@@ -158,9 +158,9 @@ struct MIDI_CV : Module {
 			// note on
 			case 0x9: {
 				if (msg.getValue() > 0) {
-					int c = (polyMode == MPE_MODE) ? msg.getChannel() : assignChannel(msg.getNote());
+					int c = msg.getChannel();
+					pressNote(msg.getNote(), &c);
 					velocities[c] = msg.getValue();
-					pressNote(msg.getNote(), c);
 				}
 				else {
 					// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
@@ -297,17 +297,24 @@ struct MIDI_CV : Module {
 		}
 	}
 
-	void pressNote(uint8_t note, int channel) {
+	void pressNote(uint8_t note, int* channel) {
 		// Remove existing similar note
 		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
 		if (it != heldNotes.end())
 			heldNotes.erase(it);
 		// Push note
 		heldNotes.push_back(note);
+		// Determine actual channel
+		if (polyMode == MPE_MODE) {
+			// Channel is already decided for us
+		}
+		else {
+			*channel = assignChannel(note);
+		}
 		// Set note
-		notes[channel] = note;
-		gates[channel] = true;
-		retriggerPulses[channel].trigger(1e-3);
+		notes[*channel] = note;
+		gates[*channel] = true;
+		retriggerPulses[*channel].trigger(1e-3);
 	}
 
 	void releaseNote(uint8_t note) {
@@ -336,29 +343,34 @@ struct MIDI_CV : Module {
 	}
 
 	void pressPedal() {
+		if (pedal)
+			return;
 		pedal = true;
 	}
 
 	void releasePedal() {
+		if (!pedal)
+			return;
 		pedal = false;
-		// Clear all gates
-		for (int c = 0; c < 16; c++) {
-			gates[c] = false;
-		}
-		// Add back only the gates from heldNotes
-		for (uint8_t note : heldNotes) {
-			// Find note's channels
-			for (int c = 0; c < channels; c++) {
-				if (notes[c] == note) {
-					gates[c] = true;
-				}
-			}
-		}
 		// Set last note if monophonic
 		if (channels == 1) {
 			if (!heldNotes.empty()) {
 				uint8_t lastNote = heldNotes.back();
 				notes[0] = lastNote;
+			}
+		}
+		// Clear notes that are not held if polyphonic
+		else {
+			for (int c = 0; c < channels; c++) {
+				if (!gates[c])
+					continue;
+				gates[c] = false;
+				for (uint8_t note : heldNotes) {
+					if (notes[c] == note) {
+						gates[c] = true;
+						break;
+					}
+				}
 			}
 		}
 	}

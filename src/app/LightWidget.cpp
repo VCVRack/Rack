@@ -12,7 +12,7 @@ void LightWidget::draw(const DrawArgs& args) {
 }
 
 void LightWidget::drawLight(const DrawArgs& args) {
-	float radius = box.size.x / 2.0;
+	float radius = std::min(box.size.x, box.size.y) / 2.0;
 
 	nvgBeginPath(args.vg);
 	nvgCircle(args.vg, radius, radius, radius);
@@ -38,7 +38,7 @@ void LightWidget::drawLight(const DrawArgs& args) {
 }
 
 void LightWidget::drawHalo(const DrawArgs& args) {
-	float radius = box.size.x / 2.0;
+	float radius = std::min(box.size.x, box.size.y) / 2.0;
 	float oradius = 4.0 * radius;
 
 	nvgBeginPath(args.vg);

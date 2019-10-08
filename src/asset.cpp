@@ -37,9 +37,19 @@ void init() {
 #if defined ARCH_MAC
 			CFBundleRef bundle = CFBundleGetMainBundle();
 			assert(bundle);
+
+			CFURLRef bundleUrl = CFBundleCopyBundleURL(bundle);
+			char bundleBuf[PATH_MAX];
+			Boolean success = CFURLGetFileSystemRepresentation(bundleUrl, TRUE, (UInt8*) bundleBuf, sizeof(bundleBuf));
+			assert(success);
+			bundlePath = bundleBuf;
+			// If the bundle path doesn't end with ".app", assume it's a fake app bundle run from the command line.
+			if (string::filenameExtension(string::filename(bundlePath)) != "app")
+				bundlePath = "";
+
 			CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
 			char resourcesBuf[PATH_MAX];
-			Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
+			success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
 			assert(success);
 			CFRelease(resourcesUrl);
 			systemDir = resourcesBuf;
@@ -145,6 +155,7 @@ std::string pluginsPath;
 std::string settingsPath;
 std::string autosavePath;
 std::string templatePath;
+std::string bundlePath;
 
 
 } // namespace asset

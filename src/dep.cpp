@@ -1,6 +1,7 @@
 // This source file compiles those annoying implementation-in-header libraries
 
 #define GLEW_STATIC
+#define GLEW_NO_GLU
 #include <GL/glew.h>
 
 #include <nanovg.h>

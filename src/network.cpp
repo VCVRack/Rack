@@ -30,6 +30,13 @@ static size_t writeStringCallback(char* ptr, size_t size, size_t nmemb, void* us
 }
 
 
+void init() {
+	// curl_easy_init() calls this automatically, but it's good to make sure this is done on the main thread before other threads are spawned.
+	// https://curl.haxx.se/libcurl/c/curl_easy_init.html
+	curl_global_init(CURL_GLOBAL_ALL);
+}
+
+
 json_t* requestJson(Method method, std::string url, json_t* dataJ) {
 	CURL* curl = createCurl();
 	char* reqStr = NULL;

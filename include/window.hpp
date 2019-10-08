@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #define GLEW_STATIC
+#define GLEW_NO_GLU
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <nanovg.h>
@@ -89,6 +90,7 @@ struct Window {
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
 	bool isFrameOverdue();
+	double getMonitorRefreshRate();
 
 	std::shared_ptr<Font> loadFont(const std::string& filename);
 	std::shared_ptr<Image> loadImage(const std::string& filename);

@@ -327,6 +327,30 @@ struct CursorLockItem : ui::MenuItem {
 	}
 };
 
+struct FrameRateValueItem : ui::MenuItem {
+	int frameSwapInterval;
+	void onAction(const event::Action& e) override {
+		settings::frameSwapInterval = frameSwapInterval;
+	}
+};
+
+struct FrameRateItem : ui::MenuItem {
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
+
+		for (int i = 1; i <= 6; i++) {
+			double frameRate = APP->window->getMonitorRefreshRate() / i;
+
+			FrameRateValueItem* item = new FrameRateValueItem;
+			item->frameSwapInterval = i;
+			item->text = string::f("%.0lf Hz", frameRate);
+			item->rightText += CHECKMARK(settings::frameSwapInterval == i);
+			menu->addChild(item);
+		}
+		return menu;
+	}
+};
+
 struct FullscreenItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
 		APP->window->setFullScreen(!APP->window->isFullScreen());
@@ -365,6 +389,10 @@ struct ViewButton : MenuButton {
 		CableTensionSlider* cableTensionSlider = new CableTensionSlider;
 		cableTensionSlider->box.size.x = 200.0;
 		menu->addChild(cableTensionSlider);
+
+		FrameRateItem* frameRateItem = new FrameRateItem;
+		frameRateItem->text = "Frame rate";
+		menu->addChild(frameRateItem);
 
 		FullscreenItem* fullscreenItem = new FullscreenItem;
 		fullscreenItem->text = "Fullscreen";
@@ -477,7 +505,8 @@ struct EngineButton : MenuButton {
 
 		CpuMeterItem* cpuMeterItem = new CpuMeterItem;
 		cpuMeterItem->text = "CPU meter";
-		cpuMeterItem->rightText = CHECKMARK(settings::cpuMeter);
+		cpuMeterItem->rightText = "F3 ";
+		cpuMeterItem->rightText += CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);
 
 		SampleRateItem* sampleRateItem = new SampleRateItem;

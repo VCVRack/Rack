@@ -92,7 +92,7 @@ struct MIDI_Map : Module {
 				Module* module = paramHandles[id].module;
 				if (!module)
 					continue;
-				// Get ParamQuantity
+				// Get ParamQuantity from ParamHandle
 				int paramId = paramHandles[id].paramId;
 				ParamQuantity* paramQuantity = module->paramQuantities[paramId];
 				if (!paramQuantity)
@@ -105,7 +105,9 @@ struct MIDI_Map : Module {
 					filterInitialized[id] = true;
 					continue;
 				}
-				// Set param if value has been initialized
+				// Check if CC has been set by the MIDI device
+				if (values[cc] < 0)
+					continue;
 				float value = values[cc] / 127.f;
 				// Detect behavior from MIDI buttons.
 				if (std::fabs(valueFilters[id].out - value) >= 1.f) {
