@@ -111,8 +111,5 @@ using plugin::Model;
 using namespace engine;
 using namespace componentlibrary;
 
-// Import namespace recursively to solve the problem of calling `rack::DEBUG(...)` which expands to `rack::rack::logger(...)`.
-namespace rack = rack;
-
 
 } // namespace rack
