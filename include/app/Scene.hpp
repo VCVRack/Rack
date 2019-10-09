@@ -16,6 +16,7 @@ struct Scene : widget::OpaqueWidget {
 	RackWidget* rack;
 	MenuBar* menuBar;
 	widget::Widget* moduleBrowser;
+	widget::Widget* frameRateWidget;
 
 	double lastAutosaveTime = 0.0;
 

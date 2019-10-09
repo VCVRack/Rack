@@ -15,6 +15,14 @@ namespace rack {
 namespace app {
 
 
+struct FrameRateWidget : widget::TransparentWidget {
+	void draw(const DrawArgs& args) override {
+		std::string text = string::f("%.2f Hz", APP->window->getLastFrameRate());
+		bndLabel(args.vg, 0.0, 0.0, INFINITY, INFINITY, -1, text.c_str());
+	}
+};
+
+
 Scene::Scene() {
 	rackScroll = new RackScrollWidget;
 	addChild(rackScroll);
@@ -27,6 +35,11 @@ Scene::Scene() {
 	moduleBrowser = moduleBrowserCreate();
 	moduleBrowser->hide();
 	addChild(moduleBrowser);
+
+	frameRateWidget = new FrameRateWidget;
+	frameRateWidget->box.size = math::Vec(80.0, 30.0);
+	frameRateWidget->hide();
+	addChild(frameRateWidget);
 }
 
 Scene::~Scene() {
@@ -36,6 +49,7 @@ void Scene::step() {
 	bool fullscreen = APP->window->isFullScreen();
 	menuBar->visible = !fullscreen;
 	rackScroll->box.pos.y = menuBar->visible ? menuBar->box.size.y : 0;
+	frameRateWidget->box.pos.x = box.size.x - frameRateWidget->box.size.x;
 
 	// Resize owned descendants
 	menuBar->box.size.x = box.size.x;
