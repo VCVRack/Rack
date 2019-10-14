@@ -161,10 +161,16 @@ int main(int argc, char* argv[]) {
 	INFO("Initializing app");
 	appInit();
 
-	const char* openedFilename = glfwGetOpenedFilename();
-	if (openedFilename) {
-		patchPath = openedFilename;
+	// On Mac, use a hacked-in GLFW addition to get the launched path.
+#if defined ARCH_MAC
+	// For some reason, launching from the command line sets glfwGetOpenedFilename(), so make sure we're running the app bundle.
+	if (asset::bundlePath != "") {
+		const char* openedFilename = glfwGetOpenedFilename();
+		if (openedFilename) {
+			patchPath = openedFilename;
+		}
 	}
+#endif
 
 	if (!settings::headless) {
 		APP->patch->init(patchPath);
