@@ -127,6 +127,9 @@ int main(int argc, char* argv[]) {
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());
 	INFO("User directory: %s", asset::userDir.c_str());
+#if defined ARCH_MAC
+	INFO("Bundle path: %s", asset::bundlePath.c_str());
+#endif
 
 	// Load settings
 	try {
