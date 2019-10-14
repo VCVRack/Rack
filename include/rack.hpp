@@ -1,6 +1,8 @@
 #pragma once
 
-// Include most Rack headers for convenience
+
+// The following headers are the "public" API of Rack.
+
 #include <common.hpp>
 #include <math.hpp>
 #include <string.hpp>

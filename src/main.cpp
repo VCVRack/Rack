@@ -27,6 +27,12 @@
 	#include <windows.h> // for CreateMutex
 #endif
 
+#if defined ARCH_MAC
+	#define GLFW_EXPOSE_NATIVE_COCOA
+	#include <GLFW/glfw3native.h> // for glfwGetOpenedFilenames()
+#endif
+
+
 using namespace rack;
 
 
