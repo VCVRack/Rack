@@ -8,6 +8,14 @@
 #define GLEW_NO_GLU
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#if defined ARCH_WIN
+	#define GLFW_EXPOSE_NATIVE_WIN32
+#elif defined ARCH_MAC
+	#define GLFW_EXPOSE_NATIVE_COCOA
+#elif defined ARCH_LIN
+	#define GLFW_EXPOSE_NATIVE_X11
+#endif
+#include <GLFW/glfw3native.h>
 #include <nanovg.h>
 #define NANOVG_GL2
 #include <nanovg_gl.h>
