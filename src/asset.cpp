@@ -7,6 +7,7 @@
 
 #if defined ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
+	#include <CoreServices/CoreServices.h>
 	#include <pwd.h>
 #endif
 
@@ -38,18 +39,20 @@ void init() {
 			CFBundleRef bundle = CFBundleGetMainBundle();
 			assert(bundle);
 
+			// Check if we're running as a command-line program or an app bundle.
 			CFURLRef bundleUrl = CFBundleCopyBundleURL(bundle);
-			char bundleBuf[PATH_MAX];
-			Boolean success = CFURLGetFileSystemRepresentation(bundleUrl, TRUE, (UInt8*) bundleBuf, sizeof(bundleBuf));
-			assert(success);
-			bundlePath = bundleBuf;
-			// If the bundle path doesn't end with ".app", assume it's a fake app bundle run from the command line.
-			if (string::filenameExtension(string::filename(bundlePath)) != "app")
-				bundlePath = "";
+			// Thanks Ken Thomases! https://stackoverflow.com/a/58369256/272642
+			CFStringRef uti;
+			if (CFURLCopyResourcePropertyForKey(bundleUrl, kCFURLTypeIdentifierKey, &uti, NULL) && uti && UTTypeConformsTo(uti, kUTTypeApplicationBundle)) {
+				char bundleBuf[PATH_MAX];
+				Boolean success = CFURLGetFileSystemRepresentation(bundleUrl, TRUE, (UInt8*) bundleBuf, sizeof(bundleBuf));
+				assert(success);
+				bundlePath = bundleBuf;
+			}
 
 			CFURLRef resourcesUrl = CFBundleCopyResourcesDirectoryURL(bundle);
 			char resourcesBuf[PATH_MAX];
-			success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
+			Boolean success = CFURLGetFileSystemRepresentation(resourcesUrl, TRUE, (UInt8*) resourcesBuf, sizeof(resourcesBuf));
 			assert(success);
 			CFRelease(resourcesUrl);
 			systemDir = resourcesBuf;
