@@ -37,9 +37,16 @@ ifdef ARCH_WIN
 	CXXFLAGS += -Wsuggest-override
 endif
 
+# Allow *appending* rather than prepending to common flags.
+# This is useful to force-redefine compiler settings instead of merely setting defaults that may be overwritten.
+FLAGS += $(EXTRA_FLAGS)
+CFLAGS += $(EXTRA_CFLAGS)
+CXXFLAGS += $(EXTRA_CXXFLAGS)
+LDFLAGS += $(EXTRA_LDFLAGS)
+
+# Apply FLAGS to language-specific flags
 CFLAGS += $(FLAGS)
 CXXFLAGS += $(FLAGS)
-
 
 # Derive object files from sources and place them before user-defined objects
 OBJECTS := $(patsubst %, build/%.o, $(SOURCES)) $(OBJECTS)
