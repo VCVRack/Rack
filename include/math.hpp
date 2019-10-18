@@ -76,9 +76,8 @@ inline void eucDivMod(int a, int b, int* div, int* mod) {
 }
 
 /** Returns `floor(log_2(n))`, or 0 if `n == 1`. */
-template <typename T>
-T log2(T n) {
-	T i = 0;
+int log2(int n) {
+	int i = 0;
 	while (n >>= 1) {
 		i++;
 	}
