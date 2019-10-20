@@ -18,13 +18,13 @@ If you wish to release a proprietary commercial plugin, email contact@vcvrack.co
 
 Licenses of **third-party libraries** are listed in [LICENSE-dist.txt](LICENSE-dist.txt).
 
-The **Component Library graphics** in the `res/ComponentLibrary` directory are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
-This means you may not freely sell plugins using Component Library graphics.
-However, a free commercial license is available for plugins sold through the [VCV Library](https://vcvrack.com/plugins.html).
-Email contact@vcvrack.com for more information about licensing or the VCV Library.
+The **Component Library graphics** for Rack are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
+Non-commercial use is allowed with appropriate credit and indication of the original license.
+Commercial use is allowed only for plugins sold through the [VCV Library](https://vcvrack.com/plugins.html) or with a commercial license.
+Email contact@vcvrack.com for more information about selling plugins through the VCV Library.
 
-The **Core panel graphics** in the `res/Core` directory are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
-This means you may not distribute modified adaptations of these graphics.
+The **visual design of the Core modules** is copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+Commercial use and derivative works are not allowed.
 
 The **VCV logo and icon** are copyright © 2017 Andrew Belt and may not be used in derivative works.
 
