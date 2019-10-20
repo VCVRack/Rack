@@ -2,8 +2,8 @@ ifndef RACK_DIR
 $(error RACK_DIR is not defined)
 endif
 
-SLUG := $(shell jq .slug plugin.json)
-VERSION := $(shell jq .version plugin.json)
+SLUG := $(shell jq -r .slug plugin.json)
+VERSION := $(shell jq -r .version plugin.json)
 
 ifndef SLUG
 $(error SLUG could not be found in manifest)
@@ -53,25 +53,25 @@ clean:
 
 dist: all
 	rm -rf dist
-	mkdir -p dist/$(SLUG)
+	mkdir -p dist/"$(SLUG)"
 	@# Strip and copy plugin binary
-	cp $(TARGET) dist/$(SLUG)/
+	cp $(TARGET) dist/"$(SLUG)"/
 ifdef ARCH_MAC
-	$(STRIP) -S dist/$(SLUG)/$(TARGET)
+	$(STRIP) -S dist/"$(SLUG)"/$(TARGET)
 else
-	$(STRIP) -s dist/$(SLUG)/$(TARGET)
+	$(STRIP) -s dist/"$(SLUG)"/$(TARGET)
 endif
 	@# Copy distributables
 ifdef ARCH_MAC
-	rsync -rR $(DISTRIBUTABLES) dist/$(SLUG)/
+	rsync -rR $(DISTRIBUTABLES) dist/"$(SLUG)"/
 else
-	cp -r --parents $(DISTRIBUTABLES) dist/$(SLUG)/
+	cp -r --parents $(DISTRIBUTABLES) dist/"$(SLUG)"/
 endif
 	@# Create ZIP package
-	cd dist && zip -q -9 -r $(SLUG)-$(VERSION)-$(ARCH).zip $(SLUG)
+	cd dist && zip -q -9 -r "$(SLUG)"-"$(VERSION)"-$(ARCH).zip "$(SLUG)"
 
 install: dist
-	cp dist/$(SLUG)-$(VERSION)-$(ARCH).zip $(RACK_USER_DIR)/plugins-v1/
+	cp dist/"$(SLUG)"-"$(VERSION)"-$(ARCH).zip $(RACK_USER_DIR)/plugins-v1/
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all
