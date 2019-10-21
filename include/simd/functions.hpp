@@ -168,12 +168,34 @@ inline float_4 fmod(float_4 a, float_4 b) {
 	return a - trunc(a / b) * b;
 }
 
+using std::hypot;
+
+inline float_4 hypot(float_4 a, float_4 b) {
+	return sqrt(a * a + b * b);
+}
+
 using std::fabs;
 
 inline float_4 fabs(float_4 a) {
 	// Sign bit
 	int32_4 mask = ~0x80000000;
 	return a & float_4::cast(mask);
+}
+
+using std::abs;
+
+inline float_4 abs(float_4 a) {
+	return fabs(a);
+}
+
+inline float_4 abs(std::complex<float_4> a) {
+	return hypot(a.real(), a.imag());
+}
+
+using std::arg;
+
+inline float_4 arg(std::complex<float_4> a) {
+	return atan2(a.imag(), a.real());
 }
 
 using std::pow;
