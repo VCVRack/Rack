@@ -77,6 +77,7 @@ int main(int argc, char* argv[]) {
 	opterr = 0;
 	while ((c = getopt(argc, argv, "dht:s:u:")) != -1) {
 		switch (c) {
+			// Note: Mac "app translocation" passes a nonsense -psn flag, so we can't use -p for anything.
 			case 'd': {
 				settings::devMode = true;
 			} break;
