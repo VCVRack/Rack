@@ -2,8 +2,13 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
-### ??? (in development)
-
+### 1.1.6 (in development)
+- Add ability for plugins to use LuaJIT on Mac.
+- Core
+	- MIDI-Map: Don't move param until the first MIDI CC command is sent.
+- API
+	- Remove support for namespaced `rack::APP`, `rack::DEBUG`, etc macros. Use namespace-less `APP`, `DEBUG`, etc instead.
+	- Add `dsp::IIRFilter`.
 
 ### 1.1.5 (2019-09-29)
 - Swap order of tags and brands in Module Browser.
