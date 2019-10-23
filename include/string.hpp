@@ -67,8 +67,7 @@ https://en.wikipedia.org/wiki/Base64
 std::string toBase64(const uint8_t* data, size_t dataLen);
 std::string toBase64(const std::vector<uint8_t>& data);
 /** Converts a Base64-encoded string to a byte array.
-`outLen` is set to the length of the byte array.
-If non-NULL, caller must delete[] the result.
+Throws std::runtime_error if string is invalid.
 */
 std::vector<uint8_t> fromBase64(const std::string& str);
 
@@ -77,6 +76,8 @@ std::vector<uint8_t> fromBase64(const std::string& str);
 std::vector<uint8_t> compress(const uint8_t* data, size_t dataLen);
 std::vector<uint8_t> compress(const std::vector<uint8_t>& data);
 /** Uncompress bytes with zlib.
+Before calling this function, set `dataLen` to the capacity of `data`.
+After returning, `dataLen` is set to the number of bytes written.
 Unfortunately the output buffer cannot be computed from the compressed data, so you may need to hard-code the maximum expected size.
 */
 void uncompress(const uint8_t* compressed, size_t compressedLen, uint8_t* data, size_t* dataLen);

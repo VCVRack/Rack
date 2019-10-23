@@ -158,7 +158,7 @@ float fuzzyScore(const std::string& s, const std::string& query) {
 std::string toBase64(const uint8_t* data, size_t dataLen) {
 	static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	size_t numBlocks = size_t((dataLen + 2) / 3);
+	size_t numBlocks = (dataLen + 2) / 3;
 	size_t strLen = numBlocks * 4;
 	std::string str;
 	str.reserve(strLen);
