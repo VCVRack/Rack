@@ -13,7 +13,6 @@
 #include <window.hpp>
 #include <app.hpp>
 #include <midi.hpp>
-#include <json.hpp>
 #include <helpers.hpp>
 #include <componentlibrary.hpp>
 
