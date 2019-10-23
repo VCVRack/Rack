@@ -249,7 +249,7 @@ std::vector<uint8_t> fromBase64(const std::string& str) {
 
 std::vector<uint8_t> compress(const uint8_t* data, size_t dataLen) {
 	std::vector<uint8_t> compressed;
-	size_t outCap = ::compressBound(dataLen);
+	uLongf outCap = ::compressBound(dataLen);
 	compressed.resize(outCap);
 	int err = ::compress2(compressed.data(), &outCap, data, dataLen, Z_BEST_COMPRESSION);
 	if (err)
@@ -265,8 +265,10 @@ std::vector<uint8_t> compress(const std::vector<uint8_t>& data) {
 
 
 void uncompress(const uint8_t* compressed, size_t compressedLen, uint8_t* data, size_t* dataLen) {
-	int err = ::uncompress(data, dataLen, compressed, compressedLen);
+	uLongf dataLenF = *dataLen;
+	int err = ::uncompress(data, &dataLenF, compressed, compressedLen);
 	(void) err;
+	*dataLen = dataLenF;
 }
 
 
