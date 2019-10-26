@@ -53,6 +53,25 @@ std::list<std::string> getEntries(const std::string& path) {
 }
 
 
+std::list<std::string> getEntriesRecursive(const std::string &path, int depth) {
+	std::list<std::string> entries = getEntries(path);
+	if (depth > 0) {
+		// Don't iterate using iterators because the list will be growing.
+		size_t limit = entries.size();
+		auto it = entries.begin();
+		for (size_t i = 0; i < limit; i++) {
+			const std::string &entry = *it++;
+			if (isDirectory(entry)) {
+				std::list<std::string> subEntries = getEntriesRecursive(entry, depth - 1);
+				// Append subEntries to entries
+				entries.splice(entries.end(), subEntries);
+			}
+		}
+	}
+	return entries;
+}
+
+
 bool isFile(const std::string& path) {
 	struct stat statbuf;
 	if (stat(path.c_str(), &statbuf))

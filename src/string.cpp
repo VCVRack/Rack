@@ -4,6 +4,7 @@
 #include <cctype> // for tolower and toupper
 #include <algorithm> // for transform
 #include <libgen.h> // for dirname and basename
+#include <zlib.h>
 
 
 namespace rack {
@@ -154,10 +155,10 @@ float fuzzyScore(const std::string& s, const std::string& query) {
 }
 
 
-std::string toBase64(const uint8_t* data, size_t len) {
+std::string toBase64(const uint8_t* data, size_t dataLen) {
 	static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	size_t numBlocks = size_t((len + 2) / 3);
+	size_t numBlocks = (dataLen + 2) / 3;
 	size_t strLen = numBlocks * 4;
 	std::string str;
 	str.reserve(strLen);
@@ -166,7 +167,7 @@ std::string toBase64(const uint8_t* data, size_t len) {
 		// Encode block
 		uint32_t block = 0;
 		int i;
-		for (i = 0; i < 3 && 3 * b + i < len; i++) {
+		for (i = 0; i < 3 && 3 * b + i < dataLen; i++) {
 			block |= uint32_t(data[3 * b + i]) << (8 * (2 - i));
 		}
 
@@ -180,10 +181,15 @@ std::string toBase64(const uint8_t* data, size_t len) {
 }
 
 
-uint8_t* fromBase64(const std::string& str, size_t* outLen) {
+std::string toBase64(const std::vector<uint8_t>& data) {
+	return toBase64(data.data(), data.size());
+}
+
+
+std::vector<uint8_t> fromBase64(const std::string& str) {
 	size_t strLen = str.size();
 	if (strLen % 4 != 0)
-		return NULL;
+		throw std::runtime_error("String length not a factor of 4");
 
 	size_t numBlocks = strLen / 4;
 	size_t len = numBlocks * 3;
@@ -193,10 +199,8 @@ uint8_t* fromBase64(const std::string& str, size_t* outLen) {
 		if (str[strLen - 2] == '=')
 			len--;
 	}
-	if (outLen)
-		*outLen = len;
 
-	uint8_t* data = new uint8_t[len];
+	std::vector<uint8_t> data(len);
 
 	for (size_t b = 0; b < numBlocks; b++) {
 		// Encode block
@@ -226,8 +230,8 @@ uint8_t* fromBase64(const std::string& str, size_t* outLen) {
 				break;
 			}
 			else {
-				// Ignore invalid characters, such as whitespace.
-				continue;
+				// Since we assumed the string was a factor of 4 bytes, fail if an invalid character, such as whitespace, was found.
+				throw std::runtime_error("String contains non-base64 character");
 			}
 
 			block |= uint32_t(d) << (6 * (3 - i));
@@ -240,6 +244,36 @@ uint8_t* fromBase64(const std::string& str, size_t* outLen) {
 	}
 
 	return data;
+}
+
+
+std::vector<uint8_t> compress(const uint8_t* data, size_t dataLen) {
+	std::vector<uint8_t> compressed;
+	uLongf outCap = ::compressBound(dataLen);
+	compressed.resize(outCap);
+	int err = ::compress2(compressed.data(), &outCap, data, dataLen, Z_BEST_COMPRESSION);
+	if (err)
+		throw std::runtime_error("Zlib error");
+	compressed.resize(outCap);
+	return compressed;
+}
+
+
+std::vector<uint8_t> compress(const std::vector<uint8_t>& data) {
+	return compress(data.data(), data.size());
+}
+
+
+void uncompress(const uint8_t* compressed, size_t compressedLen, uint8_t* data, size_t* dataLen) {
+	uLongf dataLenF = *dataLen;
+	int err = ::uncompress(data, &dataLenF, compressed, compressedLen);
+	(void) err;
+	*dataLen = dataLenF;
+}
+
+
+void uncompress(const std::vector<uint8_t>& compressed, uint8_t* data, size_t* dataLen) {
+	uncompress(compressed.data(), compressed.size(), data, dataLen);
 }
 
 

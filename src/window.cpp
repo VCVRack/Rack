@@ -96,7 +96,8 @@ struct Window::Internal {
 
 	bool ignoreNextMouseDelta = false;
 	int frameSwapInterval = -1;
-	double monitorRefreshRate = -1;
+	float monitorRefreshRate = 0.f;
+	float lastFrameRate = 0.f;
 };
 
 
@@ -329,8 +330,8 @@ void Window::run() {
 	frame = 0;
 	while (!glfwWindowShouldClose(win)) {
 		double frameTime = glfwGetTime();
-		// double frameRate = 1.0 / (frameTime - frameTimeStart);
-		// DEBUG("%g fps", frameRate);
+		internal->lastFrameRate = 1.f / float(frameTime - frameTimeStart);
+		// DEBUG("%.2f Hz", internal->lastFrameRate);
 		frameTimeStart = frameTime;
 
 		// Make event handlers and step() have a clean nanovg context
@@ -529,8 +530,12 @@ bool Window::isFrameOverdue() {
 	return frameDuration > frameDeadline;
 }
 
-double Window::getMonitorRefreshRate() {
+float Window::getMonitorRefreshRate() {
 	return internal->monitorRefreshRate;
+}
+
+float Window::getLastFrameRate() {
+	return internal->lastFrameRate;
 }
 
 std::shared_ptr<Font> Window::loadFont(const std::string& filename) {

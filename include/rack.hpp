@@ -1,6 +1,8 @@
 #pragma once
 
-// Include most Rack headers for convenience
+
+// The following headers are the "public" API of Rack.
+
 #include <common.hpp>
 #include <math.hpp>
 #include <string.hpp>
@@ -110,9 +112,6 @@ using plugin::Plugin;
 using plugin::Model;
 using namespace engine;
 using namespace componentlibrary;
-
-// Import namespace recursively to solve the problem of calling `rack::DEBUG(...)` which expands to `rack::rack::logger(...)`.
-namespace rack = rack;
 
 
 } // namespace rack

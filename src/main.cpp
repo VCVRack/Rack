@@ -27,6 +27,12 @@
 	#include <windows.h> // for CreateMutex
 #endif
 
+#if defined ARCH_MAC
+	#define GLFW_EXPOSE_NATIVE_COCOA
+	#include <GLFW/glfw3native.h> // for glfwGetOpenedFilenames()
+#endif
+
+
 using namespace rack;
 
 
@@ -71,6 +77,7 @@ int main(int argc, char* argv[]) {
 	opterr = 0;
 	while ((c = getopt(argc, argv, "dht:s:u:")) != -1) {
 		switch (c) {
+			// Note: Mac "app translocation" passes a nonsense -psn flag, so we can't use -p for anything.
 			case 'd': {
 				settings::devMode = true;
 			} break;
@@ -121,6 +128,9 @@ int main(int argc, char* argv[]) {
 		INFO("Development mode");
 	INFO("System directory: %s", asset::systemDir.c_str());
 	INFO("User directory: %s", asset::userDir.c_str());
+#if defined ARCH_MAC
+	INFO("Bundle path: %s", asset::bundlePath.c_str());
+#endif
 
 	// Load settings
 	try {
@@ -161,10 +171,16 @@ int main(int argc, char* argv[]) {
 	INFO("Initializing app");
 	appInit();
 
-	const char* openedFilename = glfwGetOpenedFilename();
-	if (openedFilename) {
-		patchPath = openedFilename;
+	// On Mac, use a hacked-in GLFW addition to get the launched path.
+#if defined ARCH_MAC
+	// For some reason, launching from the command line sets glfwGetOpenedFilenames(), so make sure we're running the app bundle.
+	if (asset::bundlePath != "") {
+		const char* const* openedFilenames = glfwGetOpenedFilenames();
+		if (openedFilenames && openedFilenames[0]) {
+			patchPath = openedFilenames[0];
+		}
 	}
+#endif
 
 	if (!settings::headless) {
 		APP->patch->init(patchPath);

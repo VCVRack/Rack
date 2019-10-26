@@ -1,5 +1,6 @@
 #pragma once
 #include <common.hpp>
+#include <vector>
 
 
 namespace rack {
@@ -28,6 +29,7 @@ std::string ellipsize(const std::string& s, size_t len);
 std::string ellipsizePrefix(const std::string& s, size_t len);
 bool startsWith(const std::string& str, const std::string& prefix);
 bool endsWith(const std::string& str, const std::string& suffix);
+
 /** Extracts the directory of the path.
 Example: directory("dir/file.txt") // "dir"
 Calls POSIX dirname().
@@ -52,20 +54,34 @@ std::string filenameExtension(const std::string& filename);
 Returns "" if the symbol is not found.
 */
 std::string absolutePath(const std::string& path);
+
 /** Scores how well a query matches a string.
 A score of 0 means no match.
 The score is arbitrary and is only meaningful for sorting.
 */
 float fuzzyScore(const std::string& s, const std::string& query);
+
 /** Converts a byte array to a Base64-encoded string.
 https://en.wikipedia.org/wiki/Base64
 */
-std::string toBase64(const uint8_t* data, size_t len);
+std::string toBase64(const uint8_t* data, size_t dataLen);
+std::string toBase64(const std::vector<uint8_t>& data);
 /** Converts a Base64-encoded string to a byte array.
-`outLen` is set to the length of the byte array.
-If non-NULL, caller must delete[] the result.
+Throws std::runtime_error if string is invalid.
 */
-uint8_t* fromBase64(const std::string& str, size_t* outLen);
+std::vector<uint8_t> fromBase64(const std::string& str);
+
+/** Compress bytes with zlib.
+*/
+std::vector<uint8_t> compress(const uint8_t* data, size_t dataLen);
+std::vector<uint8_t> compress(const std::vector<uint8_t>& data);
+/** Uncompress bytes with zlib.
+Before calling this function, set `dataLen` to the capacity of `data`.
+After returning, `dataLen` is set to the number of bytes written.
+Unfortunately the output buffer cannot be computed from the compressed data, so you may need to hard-code the maximum expected size.
+*/
+void uncompress(const uint8_t* compressed, size_t compressedLen, uint8_t* data, size_t* dataLen);
+void uncompress(const std::vector<uint8_t>& compressed, uint8_t* data, size_t* dataLen);
 
 
 struct CaseInsensitiveCompare {

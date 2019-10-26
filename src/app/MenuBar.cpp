@@ -339,11 +339,11 @@ struct FrameRateItem : ui::MenuItem {
 		ui::Menu* menu = new ui::Menu;
 
 		for (int i = 1; i <= 6; i++) {
-			double frameRate = APP->window->getMonitorRefreshRate() / i;
+			float frameRate = APP->window->getMonitorRefreshRate() / i;
 
 			FrameRateValueItem* item = new FrameRateValueItem;
 			item->frameSwapInterval = i;
-			item->text = string::f("%.0lf Hz", frameRate);
+			item->text = string::f("%.0f Hz", frameRate);
 			item->rightText += CHECKMARK(settings::frameSwapInterval == i);
 			menu->addChild(item);
 		}

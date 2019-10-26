@@ -17,12 +17,14 @@ namespace math {
 ////////////////////
 
 /** Returns true if `x` is odd. */
-inline bool isEven(int x) {
+template <typename T>
+bool isEven(T x) {
 	return x % 2 == 0;
 }
 
 /** Returns true if `x` is odd. */
-inline bool isOdd(int x) {
+template <typename T>
+bool isOdd(T x) {
 	return x % 2 != 0;
 }
 
@@ -83,8 +85,17 @@ inline int log2(int n) {
 }
 
 /** Returns whether `n` is a power of 2. */
-inline bool isPow2(int n) {
+template <typename T>
+bool isPow2(T n) {
 	return n > 0 && (n & (n - 1)) == 0;
+}
+
+/** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero.
+See https://en.wikipedia.org/wiki/Sign_function.
+*/
+template <typename T>
+T sgn(T x) {
+	return x > 0 ? 1 : (x < 0 ? -1 : 0);
 }
 
 ////////////////////
@@ -103,13 +114,6 @@ If `b < a`, switches the two values.
 */
 inline float clampSafe(float x, float a, float b) {
 	return (a <= b) ? clamp(x, a, b) : clamp(x, b, a);
-}
-
-/** Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero.
-See https://en.wikipedia.org/wiki/Sign_function.
-*/
-inline float sgn(float x) {
-	return x > 0.f ? 1.f : (x < 0.f ? -1.f : 0.f);
 }
 
 /** Converts -0.f to 0.f. Leaves all other values unchanged. */
