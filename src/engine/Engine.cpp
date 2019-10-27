@@ -539,7 +539,7 @@ void Engine::addModule(Module* module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
 	}
-	DEBUG("Added module %d to engine", module->id);
+	// DEBUG("Added module %d to engine", module->id);
 }
 
 
@@ -582,7 +582,7 @@ void Engine::removeModule(Module* module) {
 		internal->primaryModule = NULL;
 	// Remove module
 	internal->modules.erase(it);
-	DEBUG("Removed module %d to engine", module->id);
+	// DEBUG("Removed module %d to engine", module->id);
 }
 
 
@@ -736,7 +736,7 @@ void Engine::addCable(Cable* cable) {
 		e.portId = cable->outputId;
 		cable->outputModule->onPortChange(e);
 	}
-	DEBUG("Added cable %d to engine", cable->id);
+	// DEBUG("Added cable %d to engine", cable->id);
 }
 
 
@@ -772,7 +772,7 @@ void Engine::removeCable(Cable* cable) {
 		e.portId = cable->outputId;
 		cable->outputModule->onPortChange(e);
 	}
-	DEBUG("Removed cable %d to engine", cable->id);
+	// DEBUG("Removed cable %d to engine", cable->id);
 }
 
 
@@ -979,7 +979,6 @@ void Engine::fromJson(json_t* rootJ) {
 		Cable* cable = new Cable;
 		try {
 			cable->fromJson(cableJ);
-			// DEBUG("%p %d %p %d", cable->inputModule, cable->inputId, cable->)
 			addCable(cable);
 		}
 		catch (Exception& e) {

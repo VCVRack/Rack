@@ -34,12 +34,14 @@ void SvgKnob::setSvg(std::shared_ptr<Svg> svg) {
 void SvgKnob::onChange(const event::Change& e) {
 	// Re-transform the widget::TransformWidget
 	if (paramQuantity) {
+		float value = paramQuantity->getScaledValue();
 		float angle;
 		if (paramQuantity->isBounded()) {
-			angle = math::rescale(paramQuantity->getScaledValue(), 0.f, 1.f, minAngle, maxAngle);
+			angle = math::rescale(value, 0.f, 1.f, minAngle, maxAngle);
 		}
 		else {
-			angle = math::rescale(paramQuantity->getValue(), -1.f, 1.f, minAngle, maxAngle);
+			// Center unbounded knobs
+			angle = math::rescale(value, -1.f, 1.f, minAngle, maxAngle);
 		}
 		angle = std::fmod(angle, 2 * M_PI);
 		tw->identity();

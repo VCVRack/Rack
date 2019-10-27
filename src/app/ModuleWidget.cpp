@@ -668,9 +668,6 @@ void ModuleWidget::resetAction() {
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	for (ParamWidget* param : params) {
-		param->reset();
-	}
 	APP->engine->resetModule(module);
 
 	h->newModuleJ = toJson();
@@ -686,9 +683,6 @@ void ModuleWidget::randomizeAction() {
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	for (ParamWidget* param : params) {
-		param->randomize();
-	}
 	APP->engine->randomizeModule(module);
 
 	h->newModuleJ = toJson();
@@ -754,12 +748,13 @@ void ModuleWidget::cloneAction() {
 
 void ModuleWidget::disableAction() {
 	assert(module);
+	APP->engine->disableModule(module, !module->disabled);
+
 	// history::ModuleDisable
 	history::ModuleDisable* h = new history::ModuleDisable;
 	h->moduleId = module->id;
-	h->disabled = !module->disabled;
+	h->disabled = module->disabled;
 	APP->history->push(h);
-	h->redo();
 }
 
 void ModuleWidget::removeAction() {

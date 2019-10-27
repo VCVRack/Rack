@@ -573,7 +573,10 @@ void RackWidget::clearCablesAction() {
 		complexAction->push(h);
 	}
 
-	APP->history->push(complexAction);
+	if (!complexAction->isEmpty())
+		APP->history->push(complexAction);
+	else
+		delete complexAction;
 	clearCables();
 }
 

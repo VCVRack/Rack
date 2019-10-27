@@ -180,11 +180,10 @@ void Module::fromJson(json_t* rootJ) {
 
 void Module::onReset(const ResetEvent& e) {
 	// Reset all parameters
-	assert(params.size() == paramQuantities.size());
-	for (int i = 0; i < (int) params.size(); i++) {
-		if (!paramQuantities[i]->resetEnabled)
+	for (ParamQuantity* pq : paramQuantities) {
+		if (!pq->resetEnabled)
 			continue;
-		paramQuantities[i]->reset();
+		pq->reset();
 	}
 	// Call deprecated event
 	onReset();
@@ -193,11 +192,10 @@ void Module::onReset(const ResetEvent& e) {
 
 void Module::onRandomize(const RandomizeEvent& e) {
 	// Randomize all parameters
-	assert(params.size() == paramQuantities.size());
-	for (int i = 0; i < (int) params.size(); i++) {
-		if (!paramQuantities[i]->randomizeEnabled)
+	for (ParamQuantity* pq : paramQuantities) {
+		if (!pq->randomizeEnabled)
 			continue;
-		paramQuantities[i]->randomize();
+		pq->randomize();
 	}
 	// Call deprecated event
 	onRandomize();

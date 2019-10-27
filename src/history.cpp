@@ -54,11 +54,8 @@ void ModuleAdd::setModule(app::ModuleWidget* mw) {
 void ModuleAdd::undo() {
 	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
-	engine::Module* module = mw->module;
 	APP->scene->rack->removeModule(mw);
 	delete mw;
-	APP->engine->removeModule(module);
-	delete module;
 }
 
 void ModuleAdd::redo() {
@@ -66,6 +63,7 @@ void ModuleAdd::redo() {
 	module->id = moduleId;
 	module->fromJson(moduleJ);
 	APP->engine->addModule(module);
+
 	app::ModuleWidget* mw = model->createModuleWidget(module);
 	mw->box.pos = pos;
 	APP->scene->rack->addModule(mw);
@@ -130,6 +128,7 @@ void ParamChange::redo() {
 
 
 void CableAdd::setCable(app::CableWidget* cw) {
+	assert(cw);
 	assert(cw->cable);
 	assert(cw->cable->id >= 0);
 	cableId = cw->cable->id;
@@ -147,11 +146,6 @@ void CableAdd::undo() {
 	assert(cw);
 	APP->scene->rack->removeCable(cw);
 	delete cw;
-
-	engine::Cable* cable = APP->engine->getCable(cableId);
-	assert(cable);
-	APP->engine->removeCable(cable);
-	delete cable;
 }
 
 void CableAdd::redo() {

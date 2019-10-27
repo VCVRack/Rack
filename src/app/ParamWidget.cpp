@@ -113,12 +113,12 @@ struct ParamUnmapItem : ui::MenuItem {
 
 void ParamWidget::step() {
 	if (paramQuantity) {
-		float value = paramQuantity->getValue();
+		float value = paramQuantity->getSmoothValue();
 		// Trigger change event when paramQuantity value changes
-		if (value != dirtyValue) {
-			dirtyValue = value;
+		if (value != lastValue) {
 			event::Change eChange;
 			onChange(eChange);
+			lastValue = value;
 		}
 	}
 
@@ -218,11 +218,9 @@ void ParamWidget::createContextMenu() {
 }
 
 void ParamWidget::resetAction() {
-	if (paramQuantity && paramQuantity->isBounded()) {
+	if (paramQuantity && paramQuantity->resetEnabled) {
 		float oldValue = paramQuantity->getValue();
-		reset();
-		// Here's another way of doing it, but either works.
-		// paramQuantity->getParam()->reset();
+		paramQuantity->reset();
 		float newValue = paramQuantity->getValue();
 
 		if (oldValue != newValue) {

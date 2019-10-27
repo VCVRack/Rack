@@ -56,10 +56,12 @@ void CableWidget::setCable(engine::Cable* cable) {
 		app::ModuleWidget* outputModule = APP->scene->rack->getModule(cable->outputModule->id);
 		assert(outputModule);
 		outputPort = outputModule->getOutput(cable->outputId);
+		assert(outputPort);
 
 		app::ModuleWidget* inputModule = APP->scene->rack->getModule(cable->inputModule->id);
 		assert(inputModule);
 		inputPort = inputModule->getInput(cable->inputId);
+		assert(inputPort);
 	}
 	else {
 		outputPort = NULL;

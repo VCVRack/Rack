@@ -9,6 +9,17 @@ namespace rack {
 namespace app {
 
 
+void Switch::init() {
+	ParamWidget::init();
+	if (paramQuantity) {
+		paramQuantity->snapEnabled = true;
+		if (momentary) {
+			paramQuantity->resetEnabled = false;
+			paramQuantity->randomizeEnabled = false;
+		}
+	}
+}
+
 void Switch::step() {
 	if (momentaryPressed) {
 		momentaryPressed = false;
@@ -72,19 +83,6 @@ void Switch::onDragEnd(const event::DragEnd& e) {
 
 	if (momentary) {
 		momentaryReleased = true;
-	}
-}
-
-void Switch::reset() {
-	if (paramQuantity && !momentary) {
-		paramQuantity->reset();
-	}
-}
-
-void Switch::randomize() {
-	if (paramQuantity && !momentary) {
-		float value = paramQuantity->getMinValue() + std::floor(random::uniform() * (paramQuantity->getRange() + 1));
-		paramQuantity->setValue(value);
 	}
 }
 

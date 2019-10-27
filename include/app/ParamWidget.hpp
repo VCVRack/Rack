@@ -13,9 +13,11 @@ namespace app {
 /** Manages an engine::Param on a ModuleWidget. */
 struct ParamWidget : widget::OpaqueWidget {
 	engine::ParamQuantity* paramQuantity = NULL;
-	float dirtyValue = NAN;
 	ui::Tooltip* tooltip = NULL;
+	/** For triggering the Change event. `*/
+	float lastValue = NAN;
 
+	virtual void init() {}
 	void step() override;
 	void draw(const DrawArgs& args) override;
 
@@ -26,8 +28,6 @@ struct ParamWidget : widget::OpaqueWidget {
 
 	void createContextMenu();
 	void resetAction();
-	virtual void reset() {}
-	virtual void randomize() {}
 };
 
 

@@ -17,6 +17,8 @@ void ParamQuantity::setSmoothValue(float smoothValue) {
 	if (!module)
 		return;
 	smoothValue = math::clampSafe(smoothValue, getMinValue(), getMaxValue());
+	if (snapEnabled)
+		smoothValue = std::round(smoothValue);
 	APP->engine->setSmoothParam(module, paramId, smoothValue);
 }
 
@@ -30,6 +32,8 @@ void ParamQuantity::setValue(float value) {
 	if (!module)
 		return;
 	value = math::clampSafe(value, getMinValue(), getMaxValue());
+	if (snapEnabled)
+		value = std::round(value);
 	APP->engine->setParam(module, paramId, value);
 }
 

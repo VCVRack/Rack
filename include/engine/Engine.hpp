@@ -65,7 +65,9 @@ struct Engine {
 	// Params
 	void setParam(Module* module, int paramId, float value);
 	float getParam(Module* module, int paramId);
+	/** Requests the parameter to smoothly change toward `value`. */
 	void setSmoothParam(Module* module, int paramId, float value);
+	/** Returns the target value before smoothing. */
 	float getSmoothParam(Module* module, int paramId);
 
 	// ParamHandles
