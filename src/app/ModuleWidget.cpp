@@ -449,21 +449,9 @@ void ModuleWidget::addParam(ParamWidget* param) {
 	addChild(param);
 }
 
-void ModuleWidget::addOutput(PortWidget* output) {
-	// Check that the port is an output
-	assert(output->type == PortWidget::OUTPUT);
-	// Check that the port doesn't have a duplicate ID
-	for (PortWidget* output2 : outputs) {
-		assert(output->portId != output2->portId);
-	}
-	// Add port
-	outputs.push_back(output);
-	addChild(output);
-}
-
 void ModuleWidget::addInput(PortWidget* input) {
 	// Check that the port is an input
-	assert(input->type == PortWidget::INPUT);
+	assert(input->type == engine::Port::INPUT);
 	// Check that the port doesn't have a duplicate ID
 	for (PortWidget* input2 : inputs) {
 		assert(input->portId != input2->portId);
@@ -473,18 +461,22 @@ void ModuleWidget::addInput(PortWidget* input) {
 	addChild(input);
 }
 
-ParamWidget* ModuleWidget::getParam(int paramId) {
-	for (ParamWidget* param : params) {
-		if (param->paramQuantity && param->paramQuantity->paramId == paramId)
-			return param;
+void ModuleWidget::addOutput(PortWidget* output) {
+	// Check that the port is an output
+	assert(output->type == engine::Port::OUTPUT);
+	// Check that the port doesn't have a duplicate ID
+	for (PortWidget* output2 : outputs) {
+		assert(output->portId != output2->portId);
 	}
-	return NULL;
+	// Add port
+	outputs.push_back(output);
+	addChild(output);
 }
 
-PortWidget* ModuleWidget::getOutput(int outputId) {
-	for (PortWidget* port : outputs) {
-		if (port->portId == outputId)
-			return port;
+ParamWidget* ModuleWidget::getParam(int paramId) {
+	for (ParamWidget* param : params) {
+		if (param->paramId == paramId)
+			return param;
 	}
 	return NULL;
 }
@@ -492,6 +484,14 @@ PortWidget* ModuleWidget::getOutput(int outputId) {
 PortWidget* ModuleWidget::getInput(int inputId) {
 	for (PortWidget* port : inputs) {
 		if (port->portId == inputId)
+			return port;
+	}
+	return NULL;
+}
+
+PortWidget* ModuleWidget::getOutput(int outputId) {
+	for (PortWidget* port : outputs) {
+		if (port->portId == outputId)
 			return port;
 	}
 	return NULL;
@@ -690,17 +690,6 @@ void ModuleWidget::randomizeAction() {
 }
 
 static void disconnectActions(ModuleWidget* mw, history::ComplexAction* complexAction) {
-	// Add CableRemove action for all cables attached to outputs
-	for (PortWidget* output : mw->outputs) {
-		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(output)) {
-			if (!cw->isComplete())
-				continue;
-			// history::CableRemove
-			history::CableRemove* h = new history::CableRemove;
-			h->setCable(cw);
-			complexAction->push(h);
-		}
-	}
 	// Add CableRemove action for all cables attached to inputs
 	for (PortWidget* input : mw->inputs) {
 		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(input)) {
@@ -708,6 +697,17 @@ static void disconnectActions(ModuleWidget* mw, history::ComplexAction* complexA
 				continue;
 			// Avoid creating duplicate actions for self-patched cables
 			if (cw->outputPort->module == mw->module)
+				continue;
+			// history::CableRemove
+			history::CableRemove* h = new history::CableRemove;
+			h->setCable(cw);
+			complexAction->push(h);
+		}
+	}
+	// Add CableRemove action for all cables attached to outputs
+	for (PortWidget* output : mw->outputs) {
+		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(output)) {
+			if (!cw->isComplete())
 				continue;
 			// history::CableRemove
 			history::CableRemove* h = new history::CableRemove;

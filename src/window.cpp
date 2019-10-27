@@ -492,6 +492,10 @@ void Window::cursorUnlock() {
 	}
 }
 
+bool Window::isCursorLocked() {
+	return glfwGetInputMode(win, GLFW_CURSOR) != GLFW_CURSOR_NORMAL;
+}
+
 int Window::getMods() {
 	int mods = 0;
 	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)

@@ -12,12 +12,15 @@ namespace app {
 
 /** Manages an engine::Param on a ModuleWidget. */
 struct ParamWidget : widget::OpaqueWidget {
-	engine::ParamQuantity* paramQuantity = NULL;
+	engine::Module* module = NULL;
+	int paramId = 0;
+
 	ui::Tooltip* tooltip = NULL;
 	/** For triggering the Change event. `*/
 	float lastValue = NAN;
 
 	virtual void init() {}
+	engine::ParamQuantity* getParamQuantity();
 	void step() override;
 	void draw(const DrawArgs& args) override;
 

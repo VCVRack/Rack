@@ -72,6 +72,18 @@ struct MIDI_CV : Module {
 
 	MIDI_CV() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configOutput(CV_OUTPUT, "V/oct");
+		configOutput(GATE_OUTPUT, "Gate");
+		configOutput(VELOCITY_OUTPUT, "Velocity");
+		configOutput(AFTERTOUCH_OUTPUT, "Aftertouch");
+		configOutput(PITCH_OUTPUT, "Pitch wheel");
+		configOutput(MOD_OUTPUT, "Mod wheel");
+		configOutput(RETRIGGER_OUTPUT, "Retrigger");
+		configOutput(CLOCK_OUTPUT, "Clock");
+		configOutput(CLOCK_DIV_OUTPUT, "Clock divider");
+		configOutput(START_OUTPUT, "Start");
+		configOutput(STOP_OUTPUT, "Stop");
+		configOutput(CONTINUE_OUTPUT, "Continue");
 		heldNotes.reserve(128);
 		for (int c = 0; c < 16; c++) {
 			pitchFilters[c].setTau(1 / 30.f);

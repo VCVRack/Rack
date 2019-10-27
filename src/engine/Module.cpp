@@ -14,6 +14,14 @@ Module::~Module() {
 		if (paramQuantity)
 			delete paramQuantity;
 	}
+	for (PortInfo* inputInfo : inputInfos) {
+		if (inputInfo)
+			delete inputInfo;
+	}
+	for (PortInfo* outputInfo : outputInfos) {
+		if (outputInfo)
+			delete outputInfo;
+	}
 }
 
 void Module::config(int numParams, int numInputs, int numOutputs, int numLights) {
@@ -23,10 +31,19 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 	inputs.resize(numInputs);
 	outputs.resize(numOutputs);
 	lights.resize(numLights);
-	paramQuantities.resize(numParams);
 	// Initialize paramQuantities
+	paramQuantities.resize(numParams);
 	for (int i = 0; i < numParams; i++) {
 		configParam(i, 0.f, 1.f, 0.f);
+	}
+	// Initialize PortInfos
+	inputInfos.resize(numInputs);
+	for (int i = 0; i < numInputs; i++) {
+		configInput(i);
+	}
+	outputInfos.resize(numOutputs);
+	for (int i = 0; i < numOutputs; i++) {
+		configOutput(i);
 	}
 }
 

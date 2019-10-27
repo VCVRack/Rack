@@ -33,10 +33,11 @@ void SvgKnob::setSvg(std::shared_ptr<Svg> svg) {
 
 void SvgKnob::onChange(const event::Change& e) {
 	// Re-transform the widget::TransformWidget
-	if (paramQuantity) {
-		float value = paramQuantity->getScaledValue();
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
+		float value = pq->getScaledValue();
 		float angle;
-		if (paramQuantity->isBounded()) {
+		if (pq->isBounded()) {
 			angle = math::rescale(value, 0.f, 1.f, minAngle, maxAngle);
 		}
 		else {

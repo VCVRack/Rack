@@ -24,23 +24,26 @@ struct ParamField : ui::TextField {
 
 	void setParamWidget(ParamWidget* paramWidget) {
 		this->paramWidget = paramWidget;
-		if (paramWidget->paramQuantity)
-			text = paramWidget->paramQuantity->getDisplayValueString();
+		engine::ParamQuantity* pq = paramWidget->getParamQuantity();
+		if (pq)
+			text = pq->getDisplayValueString();
 		selectAll();
 	}
 
 	void onSelectKey(const event::SelectKey& e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
-			float oldValue = paramWidget->paramQuantity->getValue();
-			if (paramWidget->paramQuantity)
-				paramWidget->paramQuantity->setDisplayValueString(text);
-			float newValue = paramWidget->paramQuantity->getValue();
+			engine::ParamQuantity* pq = paramWidget->getParamQuantity();
+			assert(pq);
+			float oldValue = pq->getValue();
+			if (pq)
+				pq->setDisplayValueString(text);
+			float newValue = pq->getValue();
 
 			if (oldValue != newValue) {
 				// Push ParamChange history action
 				history::ParamChange* h = new history::ParamChange;
-				h->moduleId = paramWidget->paramQuantity->module->id;
-				h->paramId = paramWidget->paramQuantity->paramId;
+				h->moduleId = paramWidget->module->id;
+				h->paramId = paramWidget->paramId;
 				h->oldValue = oldValue;
 				h->newValue = newValue;
 				APP->history->push(h);
@@ -61,13 +64,15 @@ struct ParamTooltip : ui::Tooltip {
 	ParamWidget* paramWidget;
 
 	void step() override {
-		if (paramWidget->paramQuantity) {
+		engine::ParamQuantity* pq = paramWidget->getParamQuantity();
+		if (pq) {
 			// Quantity string
-			text = paramWidget->paramQuantity->getString();
-			// Param description
-			std::string description = paramWidget->paramQuantity->description;
-			if (!description.empty())
-				text += "\n" + description;
+			text = pq->getString();
+			// Description
+			if (pq->description != "") {
+				text += "\n";
+				text += pq->description;
+			}
 		}
 		Tooltip::step();
 		// Position at bottom-right of parameter
@@ -82,7 +87,8 @@ struct ParamTooltip : ui::Tooltip {
 struct ParamLabel : ui::MenuLabel {
 	ParamWidget* paramWidget;
 	void step() override {
-		text = paramWidget->paramQuantity->getString();
+		engine::ParamQuantity* pq = paramWidget->getParamQuantity();
+		text = pq->getString();
 		MenuLabel::step();
 	}
 };
@@ -103,7 +109,7 @@ struct ParamFineItem : ui::MenuItem {
 struct ParamUnmapItem : ui::MenuItem {
 	ParamWidget* paramWidget;
 	void onAction(const event::Action& e) override {
-		engine::ParamHandle* paramHandle = APP->engine->getParamHandle(paramWidget->paramQuantity->module->id, paramWidget->paramQuantity->paramId);
+		engine::ParamHandle* paramHandle = APP->engine->getParamHandle(paramWidget->module->id, paramWidget->paramId);
 		if (paramHandle) {
 			APP->engine->updateParamHandle(paramHandle, -1, 0);
 		}
@@ -111,10 +117,17 @@ struct ParamUnmapItem : ui::MenuItem {
 };
 
 
+engine::ParamQuantity* ParamWidget::getParamQuantity() {
+	if (!module)
+		return NULL;
+	return module->paramQuantities[paramId];
+}
+
 void ParamWidget::step() {
-	if (paramQuantity) {
-		float value = paramQuantity->getSmoothValue();
-		// Trigger change event when paramQuantity value changes
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
+		float value = pq->getSmoothValue();
+		// Trigger change event when the ParamQuantity value changes
 		if (value != lastValue) {
 			event::Change eChange;
 			onChange(eChange);
@@ -129,7 +142,7 @@ void ParamWidget::draw(const DrawArgs& args) {
 	Widget::draw(args);
 
 	// Param map indicator
-	engine::ParamHandle* paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
+	engine::ParamHandle* paramHandle = module ? APP->engine->getParamHandle(module->id, paramId) : NULL;
 	if (paramHandle) {
 		NVGcolor color = paramHandle->color;
 		nvgBeginPath(args.vg);
@@ -149,7 +162,7 @@ void ParamWidget::onButton(const event::Button& e) {
 
 	// Touch parameter
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-		if (paramQuantity) {
+		if (module) {
 			APP->scene->rack->touchedParam = this;
 		}
 		e.consume(this);
@@ -167,11 +180,11 @@ void ParamWidget::onDoubleClick(const event::DoubleClick& e) {
 }
 
 void ParamWidget::onEnter(const event::Enter& e) {
-	if (settings::paramTooltip && !tooltip && paramQuantity) {
-		ParamTooltip* paramTooltip = new ParamTooltip;
-		paramTooltip->paramWidget = this;
-		APP->scene->addChild(paramTooltip);
-		tooltip = paramTooltip;
+	if (settings::paramTooltip && !this->tooltip && module) {
+		ParamTooltip* tooltip = new ParamTooltip;
+		tooltip->paramWidget = this;
+		APP->scene->addChild(tooltip);
+		this->tooltip = tooltip;
 	}
 }
 
@@ -207,7 +220,7 @@ void ParamWidget::createContextMenu() {
 	// fineItem->disabled = true;
 	// menu->addChild(fineItem);
 
-	engine::ParamHandle* paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
+	engine::ParamHandle* paramHandle = module ? APP->engine->getParamHandle(module->id, paramId) : NULL;
 	if (paramHandle) {
 		ParamUnmapItem* unmapItem = new ParamUnmapItem;
 		unmapItem->text = "Unmap";
@@ -218,17 +231,18 @@ void ParamWidget::createContextMenu() {
 }
 
 void ParamWidget::resetAction() {
-	if (paramQuantity && paramQuantity->resetEnabled) {
-		float oldValue = paramQuantity->getValue();
-		paramQuantity->reset();
-		float newValue = paramQuantity->getValue();
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq && pq->resetEnabled) {
+		float oldValue = pq->getValue();
+		pq->reset();
+		float newValue = pq->getValue();
 
 		if (oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange* h = new history::ParamChange;
 			h->name = "reset parameter";
-			h->moduleId = paramQuantity->module->id;
-			h->paramId = paramQuantity->paramId;
+			h->moduleId = module->id;
+			h->paramId = paramId;
 			h->oldValue = oldValue;
 			h->newValue = newValue;
 			APP->history->push(h);

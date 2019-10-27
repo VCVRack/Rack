@@ -118,16 +118,21 @@ void State::finalizeWidget(widget::Widget* w) {
 }
 
 bool State::handleButton(math::Vec pos, int button, int action, int mods) {
-	// Button
-	Context cButton;
-	Button eButton;
-	eButton.context = &cButton;
-	eButton.pos = pos;
-	eButton.button = button;
-	eButton.action = action;
-	eButton.mods = mods;
-	rootWidget->onButton(eButton);
-	widget::Widget* clickedWidget = cButton.target;
+	bool cursorLocked = APP->window->isCursorLocked();
+
+	widget::Widget* clickedWidget = NULL;
+	if (!cursorLocked) {
+		// Button
+		Context cButton;
+		Button eButton;
+		eButton.context = &cButton;
+		eButton.pos = pos;
+		eButton.button = button;
+		eButton.action = action;
+		eButton.mods = mods;
+		rootWidget->onButton(eButton);
+		clickedWidget = cButton.target;
+	}
 
 	if (action == GLFW_PRESS) {
 		setDragged(clickedWidget, button);
@@ -176,11 +181,15 @@ bool State::handleButton(math::Vec pos, int button, int action, int mods) {
 }
 
 bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
+	bool cursorLocked = APP->window->isCursorLocked();
+
 	// Fake a key RACK_HELD event for each held key
-	int mods = APP->window->getMods();
-	for (int key : heldKeys) {
-		int scancode = glfwGetKeyScancode(key);
-		handleKey(pos, key, scancode, RACK_HELD, mods);
+	if (!cursorLocked) {
+		int mods = APP->window->getMods();
+		for (int key : heldKeys) {
+			int scancode = glfwGetKeyScancode(key);
+			handleKey(pos, key, scancode, RACK_HELD, mods);
+		}
 	}
 
 	if (draggedWidget) {
@@ -190,31 +199,36 @@ bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		eDragMove.mouseDelta = mouseDelta;
 		draggedWidget->onDragMove(eDragMove);
 
-		// DragHover
-		Context cDragHover;
-		DragHover eDragHover;
-		eDragHover.context = &cDragHover;
-		eDragHover.button = dragButton;
-		eDragHover.pos = pos;
-		eDragHover.mouseDelta = mouseDelta;
-		eDragHover.origin = draggedWidget;
-		rootWidget->onDragHover(eDragHover);
+		if (!cursorLocked) {
+			// DragHover
+			Context cDragHover;
+			DragHover eDragHover;
+			eDragHover.context = &cDragHover;
+			eDragHover.button = dragButton;
+			eDragHover.pos = pos;
+			eDragHover.mouseDelta = mouseDelta;
+			eDragHover.origin = draggedWidget;
+			rootWidget->onDragHover(eDragHover);
 
-		setDragHovered(cDragHover.target);
-		if (cDragHover.target)
-			return true;
+			setDragHovered(cDragHover.target);
+			if (cDragHover.target)
+				return true;
+		}
 	}
 
-	// Hover
-	Context cHover;
-	Hover eHover;
-	eHover.context = &cHover;
-	eHover.pos = pos;
-	eHover.mouseDelta = mouseDelta;
-	rootWidget->onHover(eHover);
+	if (!cursorLocked) {
+		// Hover
+		Context cHover;
+		Hover eHover;
+		eHover.context = &cHover;
+		eHover.pos = pos;
+		eHover.mouseDelta = mouseDelta;
+		rootWidget->onHover(eHover);
 
-	setHovered(cHover.target);
-	return !!cHover.target;
+		setHovered(cHover.target);
+		return !!cHover.target;
+	}
+	return false;
 }
 
 bool State::handleLeave() {

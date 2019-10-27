@@ -59,9 +59,8 @@ template <class TParamWidget>
 TParamWidget* createParam(math::Vec pos, engine::Module* module, int paramId) {
 	TParamWidget* o = new TParamWidget;
 	o->box.pos = pos;
-	if (module) {
-		o->paramQuantity = module->paramQuantities[paramId];
-	}
+	o->module = module;
+	o->paramId = paramId;
 	o->init();
 	return o;
 }
@@ -78,7 +77,7 @@ TPortWidget* createInput(math::Vec pos, engine::Module* module, int inputId) {
 	TPortWidget* o = new TPortWidget;
 	o->box.pos = pos;
 	o->module = module;
-	o->type = app::PortWidget::INPUT;
+	o->type = engine::Port::INPUT;
 	o->portId = inputId;
 	return o;
 }
@@ -95,7 +94,7 @@ TPortWidget* createOutput(math::Vec pos, engine::Module* module, int outputId) {
 	TPortWidget* o = new TPortWidget;
 	o->box.pos = pos;
 	o->module = module;
-	o->type = app::PortWidget::OUTPUT;
+	o->type = engine::Port::OUTPUT;
 	o->portId = outputId;
 	return o;
 }

@@ -51,11 +51,11 @@ struct ModuleWidget : widget::OpaqueWidget {
 
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addParam(ParamWidget* param);
-	void addOutput(PortWidget* output);
 	void addInput(PortWidget* input);
+	void addOutput(PortWidget* output);
 	ParamWidget* getParam(int paramId);
-	PortWidget* getOutput(int outputId);
 	PortWidget* getInput(int inputId);
+	PortWidget* getOutput(int outputId);
 
 	/** Serializes/unserializes the module state */
 	json_t* toJson();

@@ -555,8 +555,8 @@ void Engine::removeModule(Module* module) {
 	}
 	// Check that all cables are disconnected
 	for (Cable* cable : internal->cables) {
-		assert(cable->outputModule != module);
 		assert(cable->inputModule != module);
+		assert(cable->outputModule != module);
 	}
 	// Update ParamHandles' module pointers
 	for (ParamHandle* paramHandle : internal->paramHandles) {
@@ -657,26 +657,26 @@ static void Engine_updateConnected(Engine* that) {
 	// Find disconnected ports
 	std::set<Port*> disconnectedPorts;
 	for (Module* module : that->internal->modules) {
-		for (Output& output : module->outputs) {
-			disconnectedPorts.insert(&output);
-		}
 		for (Input& input : module->inputs) {
 			disconnectedPorts.insert(&input);
 		}
+		for (Output& output : module->outputs) {
+			disconnectedPorts.insert(&output);
+		}
 	}
 	for (Cable* cable : that->internal->cables) {
-		// Connect output
-		Output& output = cable->outputModule->outputs[cable->outputId];
-		auto outputIt = disconnectedPorts.find(&output);
-		if (outputIt != disconnectedPorts.end())
-			disconnectedPorts.erase(outputIt);
-		Port_setConnected(&output);
 		// Connect input
 		Input& input = cable->inputModule->inputs[cable->inputId];
 		auto inputIt = disconnectedPorts.find(&input);
 		if (inputIt != disconnectedPorts.end())
 			disconnectedPorts.erase(inputIt);
 		Port_setConnected(&input);
+		// Connect output
+		Output& output = cable->outputModule->outputs[cable->outputId];
+		auto outputIt = disconnectedPorts.find(&output);
+		if (outputIt != disconnectedPorts.end())
+			disconnectedPorts.erase(outputIt);
+		Port_setConnected(&output);
 	}
 	// Disconnect ports that have no cable
 	for (Port* port : disconnectedPorts) {

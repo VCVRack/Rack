@@ -83,6 +83,7 @@ struct Window {
 	void close();
 	void cursorLock();
 	void cursorUnlock();
+	bool isCursorLocked();
 	/** Gets the current keyboard mod state
 	Don't call this from a Key event. Simply use `e.mods` instead.
 	*/

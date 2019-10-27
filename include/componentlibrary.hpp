@@ -577,8 +577,7 @@ struct LightSlider : TBase {
 	}
 
 	void setFirstLightId(int firstLightId) {
-		if (this->paramQuantity)
-			light->module = this->paramQuantity->module;
+		light->module = this->module;
 		light->firstLightId = firstLightId;
 	}
 
@@ -730,8 +729,7 @@ struct LEDLightBezel : LEDBezel {
 	}
 
 	void setFirstLightId(int firstLightId) {
-		if (paramQuantity)
-			light->module = paramQuantity->module;
+		light->module = this->module;
 		light->firstLightId = firstLightId;
 	}
 };

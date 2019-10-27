@@ -14,9 +14,10 @@ static const float KNOB_SENSITIVITY = 0.0015f;
 
 void Knob::init() {
 	ParamWidget::init();
-	if (paramQuantity) {
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
 		if (snap)
-			paramQuantity->snapEnabled = true;
+			pq->snapEnabled = true;
 	}
 }
 
@@ -40,8 +41,9 @@ void Knob::onDragStart(const event::DragStart& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	if (paramQuantity) {
-		oldValue = paramQuantity->getSmoothValue();
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
+		oldValue = pq->getSmoothValue();
 		snapDelta = 0.f;
 	}
 
@@ -54,14 +56,15 @@ void Knob::onDragEnd(const event::DragEnd& e) {
 
 	APP->window->cursorUnlock();
 
-	if (paramQuantity) {
-		float newValue = paramQuantity->getSmoothValue();
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
+		float newValue = pq->getSmoothValue();
 		if (oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange* h = new history::ParamChange;
 			h->name = "move knob";
-			h->moduleId = paramQuantity->module->id;
-			h->paramId = paramQuantity->paramId;
+			h->moduleId = module->id;
+			h->paramId = paramId;
 			h->oldValue = oldValue;
 			h->newValue = newValue;
 			APP->history->push(h);
@@ -73,10 +76,11 @@ void Knob::onDragMove(const event::DragMove& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
-	if (paramQuantity) {
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
 		float range;
-		if (paramQuantity->isBounded()) {
-			range = paramQuantity->getRange();
+		if (pq->isBounded()) {
+			range = pq->getRange();
 		}
 		else {
 			// Continuous encoders scale as if their limits are +/-1
@@ -97,7 +101,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 			delta /= 256.f;
 		}
 
-		if (paramQuantity->snapEnabled) {
+		if (pq->snapEnabled) {
 			// Replace delta with an accumulated delta since the last integer knob.
 			snapDelta += delta;
 			delta = std::trunc(snapDelta);
@@ -106,10 +110,10 @@ void Knob::onDragMove(const event::DragMove& e) {
 
 		// Set value
 		if (smooth) {
-			paramQuantity->setSmoothValue(paramQuantity->getSmoothValue() + delta);
+			pq->setSmoothValue(pq->getSmoothValue() + delta);
 		}
 		else {
-			paramQuantity->setValue(paramQuantity->getValue() + delta);
+			pq->setValue(pq->getValue() + delta);
 		}
 	}
 

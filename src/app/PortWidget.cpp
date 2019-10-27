@@ -3,11 +3,49 @@
 #include <window.hpp>
 #include <app.hpp>
 #include <history.hpp>
+#include <engine/Engine.hpp>
+#include <settings.hpp>
 #include <componentlibrary.hpp>
 
 
 namespace rack {
 namespace app {
+
+
+struct PortTooltip : ui::Tooltip {
+	PortWidget* portWidget;
+
+	void step() override {
+		if (portWidget->module) {
+			engine::Port* port = portWidget->getPort();
+			engine::PortInfo* portInfo = portWidget->getPortInfo();
+			// Label
+			text = portInfo->label;
+			// Voltage, number of channels
+			int channels = port->getChannels();
+			for (int i = 0; i < channels; i++) {
+				// Add newline or comma
+				if (i % 4 == 0)
+					text += "\n";
+				else
+					text += " ";
+				text += string::f("%5gV", port->getVoltage(i));
+			}
+			// Description
+			std::string description = portInfo->description;
+			if (description != "") {
+				text += "\n";
+				text += description;
+			}
+		}
+		Tooltip::step();
+		// Position at bottom-right of parameter
+		box.pos = portWidget->getAbsoluteOffset(portWidget->box.size).round();
+		// Fit inside parent (copied from Tooltip.cpp)
+		assert(parent);
+		box = box.nudge(parent->box.zeroPos());
+	}
+};
 
 
 struct PlugLight : MultiLightWidget {
@@ -33,13 +71,48 @@ PortWidget::~PortWidget() {
 		APP->scene->rack->clearCablesOnPort(this);
 }
 
+engine::Port* PortWidget::getPort() {
+	if (!module)
+		return NULL;
+	if (type == engine::Port::INPUT)
+		return &module->inputs[portId];
+	else
+		return &module->outputs[portId];
+}
+
+engine::PortInfo* PortWidget::getPortInfo() {
+	if (!module)
+		return NULL;
+	if (type == engine::Port::INPUT)
+		return module->inputInfos[portId];
+	else
+		return module->outputInfos[portId];
+}
+
+void PortWidget::createTooltip() {
+	if (settings::paramTooltip && !this->tooltip && module) {
+		PortTooltip* tooltip = new PortTooltip;
+		tooltip->portWidget = this;
+		APP->scene->addChild(tooltip);
+		this->tooltip = tooltip;
+	}
+}
+
+void PortWidget::destroyTooltip() {
+	if (tooltip) {
+		APP->scene->removeChild(tooltip);
+		delete tooltip;
+		tooltip = NULL;
+	}
+}
+
 void PortWidget::step() {
 	if (!module)
 		return;
 
 	std::vector<float> values(3);
 	for (int i = 0; i < 3; i++) {
-		if (type == OUTPUT)
+		if (type == engine::Port::OUTPUT)
 			values[i] = module->outputs[portId].plugLights[i].getBrightness();
 		else
 			values[i] = module->inputs[portId].plugLights[i].getBrightness();
@@ -53,7 +126,7 @@ void PortWidget::draw(const DrawArgs& args) {
 	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		// Dim the PortWidget if the active cable cannot plug into this PortWidget
-		if (type == OUTPUT ? cw->outputPort : cw->inputPort)
+		if (type == engine::Port::OUTPUT ? cw->outputPort : cw->inputPort)
 			nvgGlobalAlpha(args.vg, 0.5);
 	}
 	Widget::draw(args);
@@ -80,10 +153,12 @@ void PortWidget::onButton(const event::Button& e) {
 
 void PortWidget::onEnter(const event::Enter& e) {
 	hovered = true;
+	createTooltip();
 }
 
 void PortWidget::onLeave(const event::Leave& e) {
 	hovered = false;
+	destroyTooltip();
 }
 
 void PortWidget::onDragStart(const event::DragStart& e) {
@@ -92,7 +167,7 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 
 	CableWidget* cw = NULL;
 	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-		if (type == OUTPUT) {
+		if (type == engine::Port::OUTPUT) {
 			// Ctrl-clicking an output creates a new cable.
 			// Keep cable NULL. Will be created below
 		}
@@ -118,7 +193,7 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 
 			// Disconnect and reuse existing cable
 			APP->scene->rack->removeCable(cw);
-			if (type == OUTPUT)
+			if (type == engine::Port::OUTPUT)
 				cw->outputPort = NULL;
 			else
 				cw->inputPort = NULL;
@@ -129,7 +204,7 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 	if (!cw) {
 		// Create a new cable
 		cw = new CableWidget;
-		if (type == OUTPUT)
+		if (type == engine::Port::OUTPUT)
 			cw->outputPort = this;
 		else
 			cw->inputPort = this;
@@ -165,7 +240,7 @@ void PortWidget::onDragDrop(const event::DragDrop& e) {
 		return;
 
 	// Reject ports if this is an input port and something is already plugged into it
-	if (type == INPUT) {
+	if (type == engine::Port::INPUT) {
 		if (APP->scene->rack->getTopCable(this))
 			return;
 	}
@@ -173,7 +248,7 @@ void PortWidget::onDragDrop(const event::DragDrop& e) {
 	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		cw->hoveredOutputPort = cw->hoveredInputPort = NULL;
-		if (type == OUTPUT)
+		if (type == engine::Port::OUTPUT)
 			cw->outputPort = this;
 		else
 			cw->inputPort = this;
@@ -182,18 +257,19 @@ void PortWidget::onDragDrop(const event::DragDrop& e) {
 }
 
 void PortWidget::onDragEnter(const event::DragEnter& e) {
+	createTooltip();
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
 	// Reject ports if this is an input port and something is already plugged into it
-	if (type == INPUT) {
+	if (type == engine::Port::INPUT) {
 		if (APP->scene->rack->getTopCable(this))
 			return;
 	}
 
 	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
-		if (type == OUTPUT)
+		if (type == engine::Port::OUTPUT)
 			cw->hoveredOutputPort = this;
 		else
 			cw->hoveredInputPort = this;
@@ -201,6 +277,7 @@ void PortWidget::onDragEnter(const event::DragEnter& e) {
 }
 
 void PortWidget::onDragLeave(const event::DragLeave& e) {
+	destroyTooltip();
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -210,7 +287,7 @@ void PortWidget::onDragLeave(const event::DragLeave& e) {
 
 	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
-		if (type == OUTPUT)
+		if (type == engine::Port::OUTPUT)
 			cw->hoveredOutputPort = NULL;
 		else
 			cw->hoveredInputPort = NULL;

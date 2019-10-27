@@ -31,9 +31,10 @@ void SvgSlider::setHandleSvg(std::shared_ptr<Svg> svg) {
 }
 
 void SvgSlider::onChange(const event::Change& e) {
-	if (paramQuantity) {
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
 		// Interpolate handle position
-		float v = paramQuantity->getScaledValue();
+		float v = pq->getScaledValue();
 		handle->box.pos = math::Vec(
 		                    math::rescale(v, 0.f, 1.f, minHandlePos.x, maxHandlePos.x),
 		                    math::rescale(v, 0.f, 1.f, minHandlePos.y, maxHandlePos.y));

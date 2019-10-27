@@ -31,8 +31,9 @@ void SvgSwitch::addFrame(std::shared_ptr<Svg> svg) {
 }
 
 void SvgSwitch::onChange(const event::Change& e) {
-	if (!frames.empty() && paramQuantity) {
-		int index = (int) std::round(paramQuantity->getValue() - paramQuantity->getMinValue());
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (!frames.empty() && pq) {
+		int index = (int) std::round(pq->getValue() - pq->getMinValue());
 		index = math::clamp(index, 0, (int) frames.size() - 1);
 		sw->setSvg(frames[index]);
 		fb->dirty = true;

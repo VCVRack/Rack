@@ -321,8 +321,8 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		ParamWidget* touchedParam = APP->scene->rack->touchedParam;
 		if (touchedParam) {
 			APP->scene->rack->touchedParam = NULL;
-			int moduleId = touchedParam->paramQuantity->module->id;
-			int paramId = touchedParam->paramQuantity->paramId;
+			int moduleId = touchedParam->module->id;
+			int paramId = touchedParam->paramId;
 			module->learnParam(id, moduleId, paramId);
 		}
 		else {

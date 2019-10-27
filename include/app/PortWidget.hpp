@@ -1,8 +1,10 @@
 #pragma once
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
+#include <ui/Tooltip.hpp>
 #include <app/MultiLightWidget.hpp>
 #include <engine/Module.hpp>
+#include <engine/PortInfo.hpp>
 
 
 namespace rack {
@@ -12,18 +14,20 @@ namespace app {
 /** Manages an engine::Port on a ModuleWidget. */
 struct PortWidget : widget::OpaqueWidget {
 	engine::Module* module = NULL;
-	int portId;
+	int portId = 0;
+	engine::Port::Type type = engine::Port::INPUT;
+
+	ui::Tooltip* tooltip = NULL;
 	bool hovered = false;
 
-	enum Type {
-		OUTPUT,
-		INPUT
-	};
-	Type type;
 	MultiLightWidget* plugLight;
 
 	PortWidget();
 	~PortWidget();
+	engine::Port* getPort();
+	engine::PortInfo* getPortInfo();
+	void createTooltip();
+	void destroyTooltip();
 
 	void step() override;
 	void draw(const DrawArgs& args) override;

@@ -6,6 +6,7 @@
 #include <engine/Port.hpp>
 #include <engine/Light.hpp>
 #include <engine/ParamQuantity.hpp>
+#include <engine/PortInfo.hpp>
 #include <vector>
 #include <jansson.h>
 
@@ -36,6 +37,8 @@ struct Module {
 	std::vector<Output> outputs;
 	std::vector<Light> lights;
 	std::vector<ParamQuantity*> paramQuantities;
+	std::vector<PortInfo*> inputInfos;
+	std::vector<PortInfo*> outputInfos;
 
 	/** Represents a message-passing channel for an adjacent module. */
 	struct Expander {
@@ -106,15 +109,41 @@ struct Module {
 		q->minValue = minValue;
 		q->maxValue = maxValue;
 		q->defaultValue = defaultValue;
-		if (!label.empty())
-			q->label = label;
+		if (label == "")
+			q->label = string::f("Parameter %d", paramId + 1);
 		else
-			q->label = string::f("#%d", paramId + 1);
+			q->label = label;
 		q->unit = unit;
 		q->displayBase = displayBase;
 		q->displayMultiplier = displayMultiplier;
 		q->displayOffset = displayOffset;
 		paramQuantities[paramId] = q;
+	}
+
+	void configInput(int portId, std::string label = "") {
+		assert(portId < (int) inputs.size() && portId < (int) inputInfos.size());
+		if (inputInfos[portId])
+			delete inputInfos[portId];
+
+		PortInfo* p = new PortInfo;
+		if (label == "")
+			p->label = string::f("Input %d", portId + 1);
+		else
+			p->label = label;
+		inputInfos[portId] = p;
+	}
+
+	void configOutput(int portId, std::string label = "") {
+		assert(portId < (int) outputs.size() && portId < (int) outputInfos.size());
+		if (outputInfos[portId])
+			delete outputInfos[portId];
+
+		PortInfo* p = new PortInfo;
+		if (label == "")
+			p->label = string::f("Output %d", portId + 1);
+		else
+			p->label = label;
+		outputInfos[portId] = p;
 	}
 
 	struct ProcessArgs {

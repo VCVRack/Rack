@@ -11,25 +11,27 @@ namespace app {
 
 void Switch::init() {
 	ParamWidget::init();
-	if (paramQuantity) {
-		paramQuantity->snapEnabled = true;
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
+		pq->snapEnabled = true;
 		if (momentary) {
-			paramQuantity->resetEnabled = false;
-			paramQuantity->randomizeEnabled = false;
+			pq->resetEnabled = false;
+			pq->randomizeEnabled = false;
 		}
 	}
 }
 
 void Switch::step() {
+	engine::ParamQuantity* pq = getParamQuantity();
 	if (momentaryPressed) {
 		momentaryPressed = false;
 		// Wait another frame.
 	}
 	else if (momentaryReleased) {
 		momentaryReleased = false;
-		if (paramQuantity) {
+		if (pq) {
 			// Set to minimum value
-			paramQuantity->setMin();
+			pq->setMin();
 		}
 	}
 	ParamWidget::step();
@@ -43,32 +45,33 @@ void Switch::onDragStart(const event::DragStart& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
+	engine::ParamQuantity* pq = getParamQuantity();
 	if (momentary) {
-		if (paramQuantity) {
+		if (pq) {
 			// Set to maximum value
-			paramQuantity->setMax();
+			pq->setMax();
 			momentaryPressed = true;
 		}
 	}
 	else {
-		if (paramQuantity) {
-			float oldValue = paramQuantity->getValue();
-			if (paramQuantity->isMax()) {
+		if (pq) {
+			float oldValue = pq->getValue();
+			if (pq->isMax()) {
 				// Reset value back to minimum
-				paramQuantity->setMin();
+				pq->setMin();
 			}
 			else {
 				// Increment value by 1
-				paramQuantity->setValue(std::round(paramQuantity->getValue()) + 1.f);
+				pq->setValue(std::round(pq->getValue()) + 1.f);
 			}
 
-			float newValue = paramQuantity->getValue();
+			float newValue = pq->getValue();
 			if (oldValue != newValue) {
 				// Push ParamChange history action
 				history::ParamChange* h = new history::ParamChange;
 				h->name = "move switch";
-				h->moduleId = paramQuantity->module->id;
-				h->paramId = paramQuantity->paramId;
+				h->moduleId = module->id;
+				h->paramId = paramId;
 				h->oldValue = oldValue;
 				h->newValue = newValue;
 				APP->history->push(h);
