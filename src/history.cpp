@@ -48,23 +48,26 @@ void ModuleAdd::setModule(app::ModuleWidget* mw) {
 	pos = mw->box.pos;
 	// ModuleAdd doesn't *really* need the state to be serialized, although ModuleRemove certainly does.
 	// However, creating a module may give it a nondeterministic initial state for whatever reason, so serialize anyway.
-	moduleJ = mw->toJson();
+	moduleJ = mw->module->toJson();
 }
 
 void ModuleAdd::undo() {
 	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	assert(mw);
+	engine::Module* module = mw->module;
 	APP->scene->rack->removeModule(mw);
 	delete mw;
+	APP->engine->removeModule(module);
+	delete module;
 }
 
 void ModuleAdd::redo() {
-	app::ModuleWidget* mw = model->createModuleWidget();
-	assert(mw);
-	assert(mw->module);
-	mw->module->id = moduleId;
+	engine::Module* module = model->createModule();
+	module->id = moduleId;
+	module->fromJson(moduleJ);
+	APP->engine->addModule(module);
+	app::ModuleWidget* mw = model->createModuleWidget(module);
 	mw->box.pos = pos;
-	mw->fromJson(moduleJ);
 	APP->scene->rack->addModule(mw);
 }
 
@@ -82,16 +85,16 @@ void ModuleMove::redo() {
 }
 
 
-void ModuleBypass::undo() {
-	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
-	APP->engine->bypassModule(mw->module, !bypass);
+void ModuleDisable::undo() {
+	engine::Module* module = APP->engine->getModule(moduleId);
+	assert(module);
+	APP->engine->disableModule(module, !disabled);
 }
 
-void ModuleBypass::redo() {
-	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
-	APP->engine->bypassModule(mw->module, bypass);
+void ModuleDisable::redo() {
+	engine::Module* module = APP->engine->getModule(moduleId);
+	assert(module);
+	APP->engine->disableModule(module, disabled);
 }
 
 
@@ -101,28 +104,28 @@ ModuleChange::~ModuleChange() {
 }
 
 void ModuleChange::undo() {
-	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
-	mw->fromJson(oldModuleJ);
+	engine::Module* module = APP->engine->getModule(moduleId);
+	assert(module);
+	module->fromJson(oldModuleJ);
 }
 
 void ModuleChange::redo() {
-	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
-	mw->fromJson(newModuleJ);
+	engine::Module* module = APP->engine->getModule(moduleId);
+	assert(module);
+	module->fromJson(newModuleJ);
 }
 
 
 void ParamChange::undo() {
-	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
-	mw->module->params[paramId].value = oldValue;
+	engine::Module* module = APP->engine->getModule(moduleId);
+	assert(module);
+	APP->engine->setParam(module, paramId, oldValue);
 }
 
 void ParamChange::redo() {
-	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
-	mw->module->params[paramId].value = newValue;
+	engine::Module* module = APP->engine->getModule(moduleId);
+	assert(module);
+	APP->engine->setParam(module, paramId, newValue);
 }
 
 
@@ -141,28 +144,28 @@ void CableAdd::setCable(app::CableWidget* cw) {
 
 void CableAdd::undo() {
 	app::CableWidget* cw = APP->scene->rack->getCable(cableId);
+	assert(cw);
 	APP->scene->rack->removeCable(cw);
 	delete cw;
+
+	engine::Cable* cable = APP->engine->getCable(cableId);
+	assert(cable);
+	APP->engine->removeCable(cable);
+	delete cable;
 }
 
 void CableAdd::redo() {
+	engine::Cable* cable = new engine::Cable;
+	cable->id = cableId;
+	cable->inputModule = APP->engine->getModule(inputModuleId);
+	cable->inputId = inputId;
+	cable->outputModule = APP->engine->getModule(outputModuleId);
+	cable->outputId = outputId;
+	APP->engine->addCable(cable);
+
 	app::CableWidget* cw = new app::CableWidget;
-	cw->cable->id = cableId;
-
-	app::ModuleWidget* outputModule = APP->scene->rack->getModule(outputModuleId);
-	assert(outputModule);
-	app::PortWidget* outputPort = outputModule->getOutput(outputId);
-	assert(outputPort);
-	cw->setOutput(outputPort);
-
-	app::ModuleWidget* inputModule = APP->scene->rack->getModule(inputModuleId);
-	assert(inputModule);
-	app::PortWidget* inputPort = inputModule->getInput(inputId);
-	assert(inputPort);
-	cw->setInput(inputPort);
-
+	cw->setCable(cable);
 	cw->color = color;
-
 	APP->scene->rack->addCable(cw);
 }
 

@@ -97,12 +97,12 @@ struct ModuleMove : ModuleAction {
 };
 
 
-struct ModuleBypass : ModuleAction {
-	bool bypass;
+struct ModuleDisable : ModuleAction {
+	bool disabled;
 	void undo() override;
 	void redo() override;
-	ModuleBypass() {
-		name = "bypass module";
+	ModuleDisable() {
+		name = "disable module";
 	}
 };
 
@@ -133,10 +133,10 @@ struct ParamChange : ModuleAction {
 
 struct CableAdd : Action {
 	int cableId;
-	int outputModuleId;
-	int outputId;
 	int inputModuleId;
 	int inputId;
+	int outputModuleId;
+	int outputId;
 	NVGcolor color;
 	void setCable(app::CableWidget* cw);
 	void undo() override;

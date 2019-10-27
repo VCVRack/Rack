@@ -6,6 +6,31 @@ namespace rack {
 namespace core {
 
 
+struct BlankModule : Module {
+	int width = 4;
+
+	/** Legacy for <=v1 patches */
+	void fromJson(json_t* rootJ) override {
+		Module::fromJson(rootJ);
+		json_t* widthJ = json_object_get(rootJ, "width");
+		if (widthJ)
+			width = json_number_value(widthJ) / RACK_GRID_WIDTH;
+	}
+
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "width", json_integer(width));
+		return rootJ;
+	}
+
+	void dataFromJson(json_t* rootJ) override {
+		json_t* widthJ = json_object_get(rootJ, "width");
+		if (widthJ)
+			width = json_integer_value(widthJ);
+	}
+};
+
+
 struct BlankPanel : Widget {
 	Widget* panelBorder;
 
@@ -120,6 +145,8 @@ struct BlankWidget : ModuleWidget {
 	}
 
 	void step() override {
+		// TODO Update from module
+
 		blankPanel->box.size = box.size;
 		topRightScrew->box.pos.x = box.size.x - 30;
 		bottomRightScrew->box.pos.x = box.size.x - 30;
@@ -131,24 +158,6 @@ struct BlankWidget : ModuleWidget {
 		}
 		rightHandle->box.pos.x = box.size.x - rightHandle->box.size.x;
 		ModuleWidget::step();
-	}
-
-	json_t* toJson() override {
-		json_t* rootJ = ModuleWidget::toJson();
-
-		// width
-		json_object_set_new(rootJ, "width", json_real(box.size.x));
-
-		return rootJ;
-	}
-
-	void fromJson(json_t* rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-
-		// width
-		json_t* widthJ = json_object_get(rootJ, "width");
-		if (widthJ)
-			box.size.x = json_number_value(widthJ);
 	}
 };
 

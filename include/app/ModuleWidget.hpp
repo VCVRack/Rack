@@ -22,8 +22,8 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Note that the indexes of these vectors do not necessarily correspond with the indexes of `Module::params` etc.
 	*/
 	std::vector<ParamWidget*> params;
-	std::vector<PortWidget*> outputs;
 	std::vector<PortWidget*> inputs;
+	std::vector<PortWidget*> outputs;
 	/** For RackWidget dragging */
 	math::Vec dragPos;
 	math::Vec oldPos;
@@ -57,13 +57,9 @@ struct ModuleWidget : widget::OpaqueWidget {
 	PortWidget* getOutput(int outputId);
 	PortWidget* getInput(int inputId);
 
-	/** Overriding these is deprecated.
-	Use Module::dataToJson() and dataFromJson() instead
-	*/
-	virtual json_t* toJson();
-	virtual void fromJson(json_t* rootJ);
-
 	/** Serializes/unserializes the module state */
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
 	void copyClipboard();
 	void pasteClipboardAction();
 	void loadAction(std::string filename);
@@ -86,7 +82,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void randomizeAction();
 	void disconnectAction();
 	void cloneAction();
-	void bypassAction();
+	void disableAction();
 	/** Deletes `this` */
 	void removeAction();
 	void createContextMenu();

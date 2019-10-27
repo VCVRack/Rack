@@ -16,19 +16,27 @@ struct Engine {
 
 	Engine();
 	~Engine();
-	/** Starts engine thread. */
-	void start();
-	/** Stops engine thread. */
-	void stop();
+
+	void clear();
+	/** Advances the engine by `frames` frames.
+	Only call this method from the primary module.
+	*/
+	void step(int frames);
+	void setPrimaryModule(Module* module);
+	Module* getPrimaryModule();
+
 	void setPaused(bool paused);
 	bool isPaused();
 	float getSampleRate();
-	/** Returns the inverse of the current sample rate. */
+	/** Returns the inverse of the current sample rate.
+	*/
 	float getSampleTime();
 	/** Causes worker threads to block on a mutex instead of spinlock.
 	Call this in your Module::step() method to hint that the operation will take more than ~0.1 ms.
 	*/
 	void yieldWorkers();
+	/** Returns the number of audio samples since the Engine's first sample.
+	*/
 	uint64_t getFrame();
 
 	// Modules
@@ -42,7 +50,7 @@ struct Engine {
 	Module* getModule(int moduleId);
 	void resetModule(Module* module);
 	void randomizeModule(Module* module);
-	void bypassModule(Module* module, bool bypass);
+	void disableModule(Module* module, bool disabled);
 
 	// Cables
 	/** Adds a cable to the rack engine.
@@ -52,6 +60,7 @@ struct Engine {
 	*/
 	void addCable(Cable* cable);
 	void removeCable(Cable* cable);
+	Cable* getCable(int cableId);
 
 	// Params
 	void setParam(Module* module, int paramId, float value);
@@ -70,7 +79,16 @@ struct Engine {
 	If `overwrite` is true and another ParamHandle points to the same param, unsets that one and replaces it with the given handle.
 	*/
 	void updateParamHandle(ParamHandle* paramHandle, int moduleId, int paramId, bool overwrite = true);
+
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
 };
+
+
+/** Creates a Module from a JSON module object.
+Throws an Exception if the model is not found.
+*/
+Module* moduleFromJson(json_t* moduleJ);
 
 
 } // namespace engine

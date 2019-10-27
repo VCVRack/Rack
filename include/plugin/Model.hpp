@@ -39,16 +39,14 @@ struct Model {
 	std::string description;
 
 	virtual ~Model() {}
-	/** Creates a headless Module */
+	/** Creates a Module. */
 	virtual engine::Module* createModule() {
 		return NULL;
 	}
-	/** Creates a ModuleWidget with a Module attached */
-	virtual app::ModuleWidget* createModuleWidget() {
-		return NULL;
-	}
-	/** Creates a ModuleWidget with no Module, useful for previews */
-	virtual app::ModuleWidget* createModuleWidgetNull() {
+	/** Creates a ModuleWidget with a Module attached.
+	Module may be NULL.
+	*/
+	virtual app::ModuleWidget* createModuleWidget(engine::Module* m) {
 		return NULL;
 	}
 

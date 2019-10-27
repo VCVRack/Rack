@@ -157,9 +157,9 @@ DeferWrapper<F> deferWrapper(F f) {
 #define DEFER(code) auto CONCAT(_defer_, __COUNTER__) = rack::deferWrapper([&]() code)
 
 
-/** An exception meant to be shown to the user */
-struct UserException : std::runtime_error {
-	UserException(const std::string& msg) : std::runtime_error(msg) {}
+/** An exception explicitly thrown by Rack. */
+struct Exception : std::runtime_error {
+	Exception(const std::string& msg) : std::runtime_error(msg) {}
 };
 
 

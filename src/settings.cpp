@@ -219,7 +219,7 @@ void load(const std::string& path) {
 	json_error_t error;
 	json_t* rootJ = json_loadf(file, 0, &error);
 	if (!rootJ)
-		throw UserException(string::f("Settings file has invalid JSON at %d:%d %s", error.line, error.column, error.text));
+		throw Exception(string::f("Settings file has invalid JSON at %d:%d %s", error.line, error.column, error.text));
 
 	fromJson(rootJ);
 	json_decref(rootJ);

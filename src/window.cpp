@@ -433,7 +433,7 @@ void Window::screenshot(float zoom) {
 			INFO("Screenshotting %s %s to %s", p->slug.c_str(), model->slug.c_str(), filename.c_str());
 
 			// Create widgets
-			app::ModuleWidget* mw = model->createModuleWidgetNull();
+			app::ModuleWidget* mw = model->createModuleWidget(NULL);
 			widget::FramebufferWidget* fb = new widget::FramebufferWidget;
 			fb->oversample = 2;
 			fb->addChild(mw);

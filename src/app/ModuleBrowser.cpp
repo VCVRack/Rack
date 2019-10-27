@@ -18,6 +18,7 @@
 #include <app/Scene.hpp>
 #include <plugin.hpp>
 #include <app.hpp>
+#include <engine/Engine.hpp>
 #include <plugin/Model.hpp>
 #include <string.hpp>
 #include <history.hpp>
@@ -82,9 +83,11 @@ static bool isModelVisible(plugin::Model* model, const std::string& search, cons
 }
 
 static ModuleWidget* chooseModel(plugin::Model* model) {
-	// Create module
-	ModuleWidget* moduleWidget = model->createModuleWidget();
-	assert(moduleWidget);
+	// Create Module and ModuleWidget
+	engine::Module* module = model->createModule();
+	APP->engine->addModule(module);
+
+	ModuleWidget* moduleWidget = model->createModuleWidget(module);
 	APP->scene->rack->addModuleAtMouse(moduleWidget);
 
 	// Push ModuleAdd history action
@@ -170,7 +173,7 @@ struct ModelBox : widget::OpaqueWidget {
 		zoomWidget->setZoom(MODEL_BOX_ZOOM);
 		previewFb->addChild(zoomWidget);
 
-		ModuleWidget* moduleWidget = model->createModuleWidgetNull();
+		ModuleWidget* moduleWidget = model->createModuleWidget(NULL);
 		zoomWidget->addChild(moduleWidget);
 
 		zoomWidget->box.size.x = moduleWidget->box.size.x * MODEL_BOX_ZOOM;

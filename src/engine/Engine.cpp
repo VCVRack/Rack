@@ -2,6 +2,9 @@
 #include <settings.hpp>
 #include <system.hpp>
 #include <random.hpp>
+#include <app.hpp>
+#include <patch.hpp>
+#include <plugin.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -25,38 +28,6 @@ static void initMXCSR() {
 	// Reset other flags
 	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
 }
-
-
-/** Threads which obtain a VIPLock will cause wait() to block for other less important threads.
-This does not provide the VIPs with an exclusive lock. That should be left up to another mutex shared between the less important thread.
-*/
-struct VIPMutex {
-	int count = 0;
-	std::condition_variable cv;
-	std::mutex countMutex;
-
-	/** Blocks until there are no remaining VIPLocks */
-	void wait() {
-		std::unique_lock<std::mutex> lock(countMutex);
-		while (count > 0)
-			cv.wait(lock);
-	}
-};
-
-
-struct VIPLock {
-	VIPMutex& m;
-	VIPLock(VIPMutex& m) : m(m) {
-		std::unique_lock<std::mutex> lock(m.countMutex);
-		m.count++;
-	}
-	~VIPLock() {
-		std::unique_lock<std::mutex> lock(m.countMutex);
-		m.count--;
-		lock.unlock();
-		m.cv.notify_all();
-	}
-};
 
 
 struct Barrier {
@@ -155,7 +126,6 @@ struct EngineWorker {
 		assert(!running);
 		running = true;
 		thread = std::thread([&] {
-			random::init();
 			run();
 		});
 	}
@@ -180,22 +150,20 @@ struct Engine::Internal {
 	std::map<std::tuple<int, int>, ParamHandle*> paramHandleCache;
 	bool paused = false;
 
-	bool running = false;
-	float sampleRate;
-	float sampleTime;
+	float sampleRate = 0.f;
+	float sampleTime = 0.f;
 	uint64_t frame = 0;
+	Module* primaryModule = NULL;
 
 	int nextModuleId = 0;
 	int nextCableId = 0;
 
 	// Parameter smoothing
 	Module* smoothModule = NULL;
-	int smoothParamId;
-	float smoothValue;
+	int smoothParamId = 0;
+	float smoothValue = 0.f;
 
 	std::recursive_mutex mutex;
-	std::thread thread;
-	VIPMutex vipMutex;
 
 	bool realTime = false;
 	int threadCount = 0;
@@ -206,25 +174,31 @@ struct Engine::Internal {
 };
 
 
-Engine::Engine() {
-	internal = new Internal;
-
-	internal->sampleRate = 44100.f;
-	internal->sampleTime = 1 / internal->sampleRate;
-
-	system::setThreadRealTime(false);
+static void Port_step(Port* that, float deltaTime) {
+	// Set plug lights
+	if (that->channels == 0) {
+		that->plugLights[0].setBrightness(0.f);
+		that->plugLights[1].setBrightness(0.f);
+		that->plugLights[2].setBrightness(0.f);
+	}
+	else if (that->channels == 1) {
+		float v = that->getVoltage() / 10.f;
+		that->plugLights[0].setSmoothBrightness(v, deltaTime);
+		that->plugLights[1].setSmoothBrightness(-v, deltaTime);
+		that->plugLights[2].setBrightness(0.f);
+	}
+	else {
+		float v2 = 0.f;
+		for (int c = 0; c < that->channels; c++) {
+			v2 += std::pow(that->getVoltage(c), 2);
+		}
+		float v = std::sqrt(v2) / 10.f;
+		that->plugLights[0].setBrightness(0.f);
+		that->plugLights[1].setBrightness(0.f);
+		that->plugLights[2].setSmoothBrightness(v, deltaTime);
+	}
 }
 
-Engine::~Engine() {
-	// Make sure there are no cables or modules in the rack on destruction.
-	// If this happens, a module must have failed to remove itself before the RackWidget was destroyed.
-	assert(internal->cables.empty());
-	assert(internal->modules.empty());
-	assert(internal->paramHandles.empty());
-	assert(internal->paramHandleCache.empty());
-
-	delete internal;
-}
 
 static void Engine_stepModules(Engine* that, int threadId) {
 	Engine::Internal* internal = that->internal;
@@ -236,37 +210,28 @@ static void Engine_stepModules(Engine* that, int threadId) {
 	processArgs.sampleRate = internal->sampleRate;
 	processArgs.sampleTime = internal->sampleTime;
 
-	// Set up CPU meter
-	// Prime number to avoid synchronizing with power-of-2 buffers
-	const int timerDivider = 7;
-	bool timerEnabled = settings::cpuMeter && (internal->frame % timerDivider) == 0;
-	double timerOverhead = 0.f;
-	if (timerEnabled) {
-		double startTime = system::getThreadTime();
-		double stopTime = system::getThreadTime();
-		timerOverhead = stopTime - startTime;
-	}
+	bool cpuMeter = settings::cpuMeter;
 
 	// Step each module
-	// for (int i = threadId; i < modulesLen; i += threadCount) {
 	while (true) {
 		// Choose next module
+		// First-come-first serve module-to-thread allocation algorithm
 		int i = internal->workerModuleIndex++;
 		if (i >= modulesLen)
 			break;
 
 		Module* module = internal->modules[i];
-		if (!module->bypass) {
+		if (!module->disabled) {
 			// Step module
-			if (timerEnabled) {
-				double startTime = system::getThreadTime();
+			if (cpuMeter) {
+				auto beginTime = std::chrono::high_resolution_clock::now();
 				module->process(processArgs);
-				double stopTime = system::getThreadTime();
+				auto endTime = std::chrono::high_resolution_clock::now();
+				float duration = std::chrono::duration<float>(endTime - beginTime).count();
 
-				float cpuTime = std::fmax(0.f, stopTime - startTime - timerOverhead);
 				// Smooth CPU time
 				const float cpuTau = 2.f /* seconds */;
-				module->cpuTime += (cpuTime - module->cpuTime) * timerDivider * processArgs.sampleTime / cpuTau;
+				module->cpuTime += (duration - module->cpuTime) * processArgs.sampleTime / cpuTau;
 			}
 			else {
 				module->process(processArgs);
@@ -274,14 +239,19 @@ static void Engine_stepModules(Engine* that, int threadId) {
 		}
 
 		// Iterate ports to step plug lights
-		for (Input& input : module->inputs) {
-			input.process(processArgs.sampleTime);
-		}
-		for (Output& output : module->outputs) {
-			output.process(processArgs.sampleTime);
+		const int portDivider = 8;
+		if (internal->frame % portDivider == 0) {
+			float portTime = processArgs.sampleTime * portDivider;
+			for (Input& input : module->inputs) {
+				Port_step(&input, portTime);
+			}
+			for (Output& output : module->outputs) {
+				Port_step(&output, portTime);
+			}
 		}
 	}
 }
+
 
 static void Cable_step(Cable* that) {
 	Output* output = &that->outputModule->outputs[that->outputId];
@@ -298,6 +268,7 @@ static void Cable_step(Cable* that) {
 		input->voltages[i] = 0.f;
 	}
 }
+
 
 static void Engine_step(Engine* that) {
 	Engine::Internal* internal = that->internal;
@@ -349,6 +320,7 @@ static void Engine_step(Engine* that) {
 	internal->frame++;
 }
 
+
 static void Engine_updateExpander(Engine* that, Module::Expander* expander) {
 	if (expander->moduleId >= 0) {
 		if (!expander->module || expander->module->id != expander->moduleId) {
@@ -361,6 +333,7 @@ static void Engine_updateExpander(Engine* that, Module::Expander* expander) {
 		}
 	}
 }
+
 
 static void Engine_relaunchWorkers(Engine* that, int threadCount, bool realTime) {
 	Engine::Internal* internal = that->internal;
@@ -402,122 +375,141 @@ static void Engine_relaunchWorkers(Engine* that, int threadCount, bool realTime)
 	}
 }
 
-static void Engine_run(Engine* that) {
-	Engine::Internal* internal = that->internal;
-	// Set up thread
-	system::setThreadName("Engine");
-	// system::setThreadRealTime();
+
+Engine::Engine() {
+	internal = new Internal;
+
+	internal->sampleRate = 44100.f;
+	internal->sampleTime = 1 / internal->sampleRate;
+}
+
+
+Engine::~Engine() {
+	Engine_relaunchWorkers(this, 0, false);
+	clear();
+
+	// Make sure there are no cables or modules in the rack on destruction.
+	// If this happens, a module must have failed to remove itself before the RackWidget was destroyed.
+	assert(internal->cables.empty());
+	assert(internal->modules.empty());
+	assert(internal->paramHandles.empty());
+	assert(internal->paramHandleCache.empty());
+
+	delete internal;
+}
+
+
+void Engine::clear() {
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	// Copy lists because we'll be removing while iterating
+	std::set<ParamHandle*> paramHandles = internal->paramHandles;
+	for (ParamHandle* paramHandle : paramHandles) {
+		removeParamHandle(paramHandle);
+	}
+	std::vector<Cable*> cables = internal->cables;
+	for (Cable* cable : cables) {
+		removeCable(cable);
+	}
+	std::vector<Module*> modules = internal->modules;
+	for (Module* module : modules) {
+		removeModule(module);
+	}
+	// Reset engine state
+	internal->nextModuleId = 0;
+	internal->nextCableId = 0;
+}
+
+
+void Engine::step(int frames) {
 	initMXCSR();
 
-	internal->frame = 0;
-	// Every time the that waits and locks a mutex, it steps this many frames
-	const int mutexSteps = 128;
-	// Time in seconds that the that is rushing ahead of the estimated clock time
-	double aheadTime = 0.0;
-	auto lastTime = std::chrono::high_resolution_clock::now();
-
-	while (internal->running) {
-		internal->vipMutex.wait();
-
-		// Set sample rate
-		if (internal->sampleRate != settings::sampleRate) {
-			internal->sampleRate = settings::sampleRate;
-			internal->sampleTime = 1 / internal->sampleRate;
-			for (Module* module : internal->modules) {
-				module->onSampleRateChange();
-			}
-			aheadTime = 0.0;
-		}
-
-		if (!internal->paused) {
-			// Launch workers
-			if (internal->threadCount != settings::threadCount || internal->realTime != settings::realTime) {
-				Engine_relaunchWorkers(that, settings::threadCount, settings::realTime);
-			}
-
-			std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-
-			// Update expander pointers
-			for (Module* module : internal->modules) {
-				Engine_updateExpander(that, &module->leftExpander);
-				Engine_updateExpander(that, &module->rightExpander);
-			}
-
-			// Step modules
-			for (int i = 0; i < mutexSteps; i++) {
-				Engine_step(that);
-			}
-		}
-		else {
-			// Stop workers while closed
-			if (internal->threadCount != 1) {
-				Engine_relaunchWorkers(that, 1, settings::realTime);
-			}
-		}
-
-		double stepTime = mutexSteps * internal->sampleTime;
-		aheadTime += stepTime;
-		auto currTime = std::chrono::high_resolution_clock::now();
-		const double aheadFactor = 2.0;
-		aheadTime -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
-		lastTime = currTime;
-		aheadTime = std::fmax(aheadTime, 0.0);
-
-		// Avoid pegging the CPU at 100% when there are no "blocking" modules like AudioInterface, but still step audio at a reasonable rate
-		// The number of steps to wait before possibly sleeping
-		const double aheadMax = 1.0; // seconds
-		if (aheadTime > aheadMax) {
-			std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
+	// Set sample rate
+	if (internal->sampleRate != settings::sampleRate) {
+		internal->sampleRate = settings::sampleRate;
+		internal->sampleTime = 1 / internal->sampleRate;
+		Module::SampleRateChangeEvent e;
+		e.sampleRate = internal->sampleRate;
+		e.sampleTime = internal->sampleTime;
+		for (Module* module : internal->modules) {
+			module->onSampleRateChange(e);
 		}
 	}
 
-	// Stop workers
-	Engine_relaunchWorkers(that, 0, false);
+	if (!internal->paused) {
+		// Launch workers
+		if (internal->threadCount != settings::threadCount || internal->realTime != settings::realTime) {
+			Engine_relaunchWorkers(this, settings::threadCount, settings::realTime);
+		}
+
+		std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
+		// Update expander pointers
+		for (Module* module : internal->modules) {
+			Engine_updateExpander(this, &module->leftExpander);
+			Engine_updateExpander(this, &module->rightExpander);
+		}
+
+		// Step modules
+		for (int i = 0; i < frames; i++) {
+			Engine_step(this);
+		}
+	}
+	else {
+		// Stop workers while paused
+		if (internal->threadCount != 1) {
+			Engine_relaunchWorkers(this, 1, settings::realTime);
+		}
+	}
+
+	yieldWorkers();
 }
 
-void Engine::start() {
-	internal->running = true;
-	internal->thread = std::thread([&] {
-		random::init();
-		Engine_run(this);
-	});
+
+void Engine::setPrimaryModule(Module* module) {
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	internal->primaryModule = module;
 }
 
-void Engine::stop() {
-	internal->running = false;
-	internal->thread.join();
+
+Module* Engine::getPrimaryModule() {
+	return internal->primaryModule;
 }
+
 
 void Engine::setPaused(bool paused) {
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	internal->paused = paused;
 }
+
 
 bool Engine::isPaused() {
 	// No lock
 	return internal->paused;
 }
 
+
 float Engine::getSampleRate() {
 	return internal->sampleRate;
 }
+
 
 float Engine::getSampleTime() {
 	return internal->sampleTime;
 }
 
+
 void Engine::yieldWorkers() {
 	internal->workerBarrier.yield = true;
 }
+
 
 uint64_t Engine::getFrame() {
 	return internal->frame;
 }
 
+
 void Engine::addModule(Module* module) {
 	assert(module);
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Check that the module is not already added
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -540,17 +532,19 @@ void Engine::addModule(Module* module) {
 	// Add module
 	internal->modules.push_back(module);
 	// Trigger Add event
-	module->onAdd();
+	Module::AddEvent eAdd;
+	module->onAdd(eAdd);
 	// Update ParamHandles' module pointers
 	for (ParamHandle* paramHandle : internal->paramHandles) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
 	}
+	DEBUG("Added module %d to engine", module->id);
 }
+
 
 void Engine::removeModule(Module* module) {
 	assert(module);
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -581,13 +575,18 @@ void Engine::removeModule(Module* module) {
 		}
 	}
 	// Trigger Remove event
-	module->onRemove();
+	Module::RemoveEvent eRemove;
+	module->onRemove(eRemove);
+	// Unset primary module
+	if (internal->primaryModule == module)
+		internal->primaryModule = NULL;
 	// Remove module
 	internal->modules.erase(it);
+	DEBUG("Removed module %d to engine", module->id);
 }
 
+
 Module* Engine::getModule(int moduleId) {
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Find module
 	for (Module* module : internal->modules) {
@@ -597,35 +596,47 @@ Module* Engine::getModule(int moduleId) {
 	return NULL;
 }
 
+
 void Engine::resetModule(Module* module) {
 	assert(module);
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
-	module->onReset();
+	Module::ResetEvent eReset;
+	module->onReset(eReset);
 }
+
 
 void Engine::randomizeModule(Module* module) {
 	assert(module);
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
-	module->onRandomize();
+	Module::RandomizeEvent eRandomize;
+	module->onRandomize(eRandomize);
 }
 
-void Engine::bypassModule(Module* module, bool bypass) {
+
+void Engine::disableModule(Module* module, bool disabled) {
 	assert(module);
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-	if (module->bypass == bypass)
+	if (module->disabled == disabled)
 		return;
 	// Clear outputs and set to 1 channel
 	for (Output& output : module->outputs) {
 		// This zeros all voltages, but the channel is set to 1 if connected
 		output.setChannels(0);
 	}
-	module->bypass = bypass;
+	module->disabled = disabled;
+	// Trigger event
+	if (disabled) {
+		Module::DisableEvent eDisable;
+		module->onDisable(eDisable);
+	}
+	else {
+		Module::EnableEvent eEnable;
+		module->onEnable(eEnable);
+	}
 }
+
 
 static void Port_setDisconnected(Port* that) {
 	that->channels = 0;
@@ -634,11 +645,13 @@ static void Port_setDisconnected(Port* that) {
 	}
 }
 
+
 static void Port_setConnected(Port* that) {
 	if (that->channels > 0)
 		return;
 	that->channels = 1;
 }
+
 
 static void Engine_updateConnected(Engine* that) {
 	// Find disconnected ports
@@ -671,17 +684,23 @@ static void Engine_updateConnected(Engine* that) {
 	}
 }
 
+
 void Engine::addCable(Cable* cable) {
 	assert(cable);
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Check cable properties
-	assert(cable->outputModule);
 	assert(cable->inputModule);
-	// Check that the cable is not already added, and that the input is not already used by another cable
+	assert(cable->outputModule);
+	bool outputWasConnected = false;
 	for (Cable* cable2 : internal->cables) {
+		// Check that the cable is not already added
 		assert(cable2 != cable);
+		// Check that the input is not already used by another cable
 		assert(!(cable2->inputModule == cable->inputModule && cable2->inputId == cable->inputId));
+		// Get connected status of output, to decide whether we need to call a PortChangeEvent.
+		// It's best to not trust `cable->outputModule->outputs[cable->outputId]->isConnected()`
+		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
+			outputWasConnected = true;
 	}
 	// Set ID
 	if (cable->id < 0) {
@@ -701,11 +720,28 @@ void Engine::addCable(Cable* cable) {
 	// Add the cable
 	internal->cables.push_back(cable);
 	Engine_updateConnected(this);
+	// Trigger input port event
+	{
+		Module::PortChangeEvent e;
+		e.connecting = true;
+		e.type = Port::INPUT;
+		e.portId = cable->inputId;
+		cable->inputModule->onPortChange(e);
+	}
+	// Trigger output port event if its state went from disconnected to connected.
+	if (!outputWasConnected) {
+		Module::PortChangeEvent e;
+		e.connecting = true;
+		e.type = Port::OUTPUT;
+		e.portId = cable->outputId;
+		cable->outputModule->onPortChange(e);
+	}
+	DEBUG("Added cable %d to engine", cable->id);
 }
+
 
 void Engine::removeCable(Cable* cable) {
 	assert(cable);
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
@@ -713,6 +749,41 @@ void Engine::removeCable(Cable* cable) {
 	// Remove the cable
 	internal->cables.erase(it);
 	Engine_updateConnected(this);
+	bool outputIsConnected = false;
+	for (Cable* cable2 : internal->cables) {
+		// Get connected status of output, to decide whether we need to call a PortChangeEvent.
+		// It's best to not trust `cable->outputModule->outputs[cable->outputId]->isConnected()`
+		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
+			outputIsConnected = true;
+	}
+	// Trigger input port event
+	{
+		Module::PortChangeEvent e;
+		e.connecting = false;
+		e.type = Port::INPUT;
+		e.portId = cable->inputId;
+		cable->inputModule->onPortChange(e);
+	}
+	// Trigger output port event if its state went from connected to disconnected.
+	if (!outputIsConnected) {
+		Module::PortChangeEvent e;
+		e.connecting = false;
+		e.type = Port::OUTPUT;
+		e.portId = cable->outputId;
+		cable->outputModule->onPortChange(e);
+	}
+	DEBUG("Removed cable %d to engine", cable->id);
+}
+
+
+Cable* Engine::getCable(int cableId) {
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	// Find Cable
+	for (Cable* cable : internal->cables) {
+		if (cable->id == cableId)
+			return cable;
+	}
+	return NULL;
 }
 
 void Engine::setParam(Module* module, int paramId, float value) {
@@ -725,9 +796,11 @@ void Engine::setParam(Module* module, int paramId, float value) {
 	module->params[paramId].value = value;
 }
 
+
 float Engine::getParam(Module* module, int paramId) {
 	return module->params[paramId].value;
 }
+
 
 void Engine::setSmoothParam(Module* module, int paramId, float value) {
 	// If another param is being smoothed, jump value
@@ -740,11 +813,13 @@ void Engine::setSmoothParam(Module* module, int paramId, float value) {
 	internal->smoothModule = module;
 }
 
+
 float Engine::getSmoothParam(Module* module, int paramId) {
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
 	return getParam(module, paramId);
 }
+
 
 static void Engine_refreshParamHandleCache(Engine* that) {
 	// Clear cache
@@ -757,8 +832,8 @@ static void Engine_refreshParamHandleCache(Engine* that) {
 	}
 }
 
+
 void Engine::addParamHandle(ParamHandle* paramHandle) {
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 	// New ParamHandles must be blank.
@@ -773,8 +848,8 @@ void Engine::addParamHandle(ParamHandle* paramHandle) {
 	internal->paramHandles.insert(paramHandle);
 }
 
+
 void Engine::removeParamHandle(ParamHandle* paramHandle) {
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 	// Check that the ParamHandle is already added
@@ -787,6 +862,7 @@ void Engine::removeParamHandle(ParamHandle* paramHandle) {
 	Engine_refreshParamHandleCache(this);
 }
 
+
 ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
 	// Don't lock because this method is called potentially thousands of times per screen frame.
 
@@ -796,12 +872,13 @@ ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
 	return it->second;
 }
 
+
 ParamHandle* Engine::getParamHandle(Module* module, int paramId) {
 	return getParamHandle(module->id, paramId);
 }
 
+
 void Engine::updateParamHandle(ParamHandle* paramHandle, int moduleId, int paramId, bool overwrite) {
-	VIPLock vipLock(internal->vipMutex);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 	// Check that it exists
@@ -840,18 +917,115 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int moduleId, int param
 }
 
 
-void EngineWorker::run() {
-	system::setThreadName("Engine worker");
-	system::setThreadRealTime(engine->internal->realTime);
-	initMXCSR();
+json_t* Engine::toJson() {
+	json_t* rootJ = json_object();
 
-	while (1) {
+	// modules
+	json_t* modulesJ = json_array();
+	for (Module* module : internal->modules) {
+		// module
+		json_t* moduleJ = module->toJson();
+		json_array_append_new(modulesJ, moduleJ);
+	}
+	json_object_set_new(rootJ, "modules", modulesJ);
+
+	// cables
+	json_t* cablesJ = json_array();
+	for (Cable* cable : internal->cables) {
+		// cable
+		json_t* cableJ = cable->toJson();
+		json_array_append_new(cablesJ, cableJ);
+	}
+	json_object_set_new(rootJ, "cables", cablesJ);
+
+	return rootJ;
+}
+
+
+void Engine::fromJson(json_t* rootJ) {
+	// modules
+	json_t* modulesJ = json_object_get(rootJ, "modules");
+	if (!modulesJ)
+		return;
+	size_t moduleIndex;
+	json_t* moduleJ;
+	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
+		try {
+			Module* module = moduleFromJson(moduleJ);
+
+			// Before 1.0, the module ID was the index in the "modules" array
+			if (APP->patch->isLegacy(2)) {
+				module->id = moduleIndex;
+			}
+
+			addModule(module);
+		}
+		catch (Exception& e) {
+			APP->patch->log(e.what());
+		}
+	}
+
+	// cables
+	json_t* cablesJ = json_object_get(rootJ, "cables");
+	// Before 1.0, cables were called wires
+	if (!cablesJ)
+		cablesJ = json_object_get(rootJ, "wires");
+	if (!cablesJ)
+		return;
+	size_t cableIndex;
+	json_t* cableJ;
+	json_array_foreach(cablesJ, cableIndex, cableJ) {
+		// cable
+		Cable* cable = new Cable;
+		try {
+			cable->fromJson(cableJ);
+			// DEBUG("%p %d %p %d", cable->inputModule, cable->inputId, cable->)
+			addCable(cable);
+		}
+		catch (Exception& e) {
+			delete cable;
+			// Don't log exceptions because missing modules create unnecessary complaining when cables try to connect to them.
+		}
+	}
+}
+
+
+void EngineWorker::run() {
+	system::setThreadName(string::f("Worker %d", id));
+	initMXCSR();
+	random::init();
+
+	while (true) {
 		engine->internal->engineBarrier.wait();
 		if (!running)
 			return;
 		Engine_stepModules(engine, id);
 		engine->internal->workerBarrier.wait();
 	}
+}
+
+
+Module* moduleFromJson(json_t* moduleJ) {
+	// Get slugs
+	json_t* pluginSlugJ = json_object_get(moduleJ, "plugin");
+	if (!pluginSlugJ)
+		throw Exception("\"plugin\" property not found in module JSON");
+	json_t* modelSlugJ = json_object_get(moduleJ, "model");
+	if (!modelSlugJ)
+		throw Exception("\"model\" property not found in module JSON");
+	std::string pluginSlug = json_string_value(pluginSlugJ);
+	std::string modelSlug = json_string_value(modelSlugJ);
+
+	// Get Model
+	plugin::Model* model = plugin::getModel(pluginSlug, modelSlug);
+	if (!model)
+		throw Exception(string::f("Could not find module \"%s\" of plugin \"%s\"", modelSlug.c_str(), pluginSlug.c_str()));
+
+	// Create Module
+	Module* module = model->createModule();
+	assert(module);
+	module->fromJson(moduleJ);
+	return module;
 }
 
 

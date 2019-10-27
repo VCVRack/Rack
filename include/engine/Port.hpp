@@ -33,6 +33,11 @@ struct alignas(32) Port {
 	*/
 	Light plugLights[3];
 
+	enum Type {
+		INPUT,
+		OUTPUT,
+	};
+
 	/** Sets the voltage of the given channel. */
 	void setVoltage(float voltage, int channel = 0) {
 		voltages[channel] = voltage;
@@ -167,8 +172,6 @@ struct alignas(32) Port {
 	bool isPolyphonic() {
 		return channels > 1;
 	}
-
-	void process(float deltaTime);
 
 	/** Use getNormalVoltage() instead. */
 	DEPRECATED float normalize(float normalVoltage) {

@@ -19,6 +19,9 @@ struct Param {
 	void setValue(float value) {
 		this->value = value;
 	}
+
+	json_t* toJson();
+	void fromJson(json_t* rootJ);
 };
 
 

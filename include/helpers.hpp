@@ -24,15 +24,13 @@ plugin::Model* createModel(const std::string& slug) {
 			m->model = this;
 			return m;
 		}
-		app::ModuleWidget* createModuleWidget() override {
-			TModule* m = new TModule;
-			m->engine::Module::model = this;
-			app::ModuleWidget* mw = new TModuleWidget(m);
-			mw->model = this;
-			return mw;
-		}
-		app::ModuleWidget* createModuleWidgetNull() override {
-			app::ModuleWidget* mw = new TModuleWidget(NULL);
+		app::ModuleWidget* createModuleWidget(engine::Module* m) override {
+			TModule *tm = NULL;
+			if (m) {
+				assert(m->model == this);
+				tm = dynamic_cast<TModule*>(m);
+			}
+			app::ModuleWidget* mw = new TModuleWidget(tm);
 			mw->model = this;
 			return mw;
 		}

@@ -225,10 +225,10 @@ struct ModuleCloneItem : ui::MenuItem {
 };
 
 
-struct ModuleBypassItem : ui::MenuItem {
+struct ModuleDisableItem : ui::MenuItem {
 	ModuleWidget* moduleWidget;
 	void onAction(const event::Action& e) override {
-		moduleWidget->bypassAction();
+		moduleWidget->disableAction();
 	}
 };
 
@@ -253,14 +253,14 @@ ModuleWidget::~ModuleWidget() {
 void ModuleWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
-	if (module && module->bypass) {
+	if (module && module->disabled) {
 		nvgGlobalAlpha(args.vg, 0.33);
 	}
 
 	Widget::draw(args);
 
 	// Power meter
-	if (module && settings::cpuMeter && !module->bypass) {
+	if (module && settings::cpuMeter && !module->disabled) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg,
 		        0, box.size.y - 35,
@@ -363,7 +363,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 			} break;
 			case GLFW_KEY_E: {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					bypassAction();
+					disableAction();
 					e.consume(this);
 				}
 			} break;
@@ -419,7 +419,9 @@ void ModuleWidget::onDragMove(const event::DragMove& e) {
 
 void ModuleWidget::setModule(engine::Module* module) {
 	if (this->module) {
+		APP->engine->removeModule(this->module);
 		delete this->module;
+		this->module = NULL;
 	}
 	this->module = module;
 }
@@ -496,16 +498,11 @@ PortWidget* ModuleWidget::getInput(int inputId) {
 }
 
 json_t* ModuleWidget::toJson() {
-	if (!module)
-		return NULL;
-
-	json_t* rootJ = module->toJson();
-	return rootJ;
+	json_t* moduleJ = module->toJson();
+	return moduleJ;
 }
 
 void ModuleWidget::fromJson(json_t* rootJ) {
-	if (!module)
-		return;
 	module->fromJson(rootJ);
 }
 
@@ -736,16 +733,16 @@ void ModuleWidget::disconnectAction() {
 }
 
 void ModuleWidget::cloneAction() {
-	ModuleWidget* clonedModuleWidget = model->createModuleWidget();
-	assert(clonedModuleWidget);
+	engine::Module* clonedModule = model->createModule();
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
-	clonedModuleWidget->fromJson(moduleJ);
+	clonedModule->fromJson(moduleJ);
 	json_decref(moduleJ);
-
 	// Reset ID so the Engine automatically assigns a new one
-	clonedModuleWidget->module->id = -1;
+	clonedModule->id = -1;
+	APP->engine->addModule(clonedModule);
 
+	ModuleWidget* clonedModuleWidget = model->createModuleWidget(clonedModule);
 	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
 
 	// history::ModuleAdd
@@ -755,12 +752,12 @@ void ModuleWidget::cloneAction() {
 	APP->history->push(h);
 }
 
-void ModuleWidget::bypassAction() {
+void ModuleWidget::disableAction() {
 	assert(module);
-	// history::ModuleBypass
-	history::ModuleBypass* h = new history::ModuleBypass;
+	// history::ModuleDisable
+	history::ModuleDisable* h = new history::ModuleDisable;
 	h->moduleId = module->id;
-	h->bypass = !module->bypass;
+	h->disabled = !module->disabled;
 	APP->history->push(h);
 	h->redo();
 }
@@ -826,13 +823,13 @@ void ModuleWidget::createContextMenu() {
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
-	ModuleBypassItem* bypassItem = new ModuleBypassItem;
-	bypassItem->text = "Disable";
-	bypassItem->rightText = RACK_MOD_CTRL_NAME "+E";
-	if (module && module->bypass)
-		bypassItem->rightText = CHECKMARK_STRING " " + bypassItem->rightText;
-	bypassItem->moduleWidget = this;
-	menu->addChild(bypassItem);
+	ModuleDisableItem* disableItem = new ModuleDisableItem;
+	disableItem->text = "Disable";
+	disableItem->rightText = RACK_MOD_CTRL_NAME "+E";
+	if (module && module->disabled)
+		disableItem->rightText = CHECKMARK_STRING " " + disableItem->rightText;
+	disableItem->moduleWidget = this;
+	menu->addChild(disableItem);
 
 	ModuleDeleteItem* deleteItem = new ModuleDeleteItem;
 	deleteItem->text = "Delete";

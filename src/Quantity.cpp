@@ -38,7 +38,8 @@ std::string Quantity::getString() {
 	std::string label = getLabel();
 	if (!label.empty())
 		s += label + ": ";
-	s += getDisplayValueString() + getUnit();
+	s += getDisplayValueString();
+	s += getUnit();
 	return s;
 }
 

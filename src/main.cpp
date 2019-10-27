@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
 	try {
 		settings::load(asset::settingsPath);
 	}
-	catch (UserException& e) {
+	catch (Exception& e) {
 		std::string msg = e.what();
 		msg += "\n\nReset settings to default?";
 		if (!osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK_CANCEL, msg.c_str())) {
@@ -187,9 +187,6 @@ int main(int argc, char* argv[]) {
 		APP->patch->init(patchPath);
 	}
 
-	INFO("Starting engine");
-	APP->engine->start();
-
 	if (settings::headless) {
 		// TEMP Prove that the app doesn't crash
 		std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -203,8 +200,6 @@ int main(int argc, char* argv[]) {
 		APP->window->run();
 		INFO("Stopped window");
 	}
-	INFO("Stopping engine");
-	APP->engine->stop();
 
 	// Destroy app
 	if (!settings::headless) {

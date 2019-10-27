@@ -52,20 +52,17 @@ json_t* Module::toJson() {
 		if (!paramQuantities[paramId]->isBounded())
 			continue;
 
-		json_t* paramJ = json_object();
+		json_t* paramJ = params[paramId].toJson();
 
 		json_object_set_new(paramJ, "id", json_integer(paramId));
-
-		float value = params[paramId].getValue();
-		json_object_set_new(paramJ, "value", json_real(value));
 
 		json_array_append(paramsJ, paramJ);
 	}
 	json_object_set_new(rootJ, "params", paramsJ);
 
-	// bypass
-	if (bypass)
-		json_object_set_new(rootJ, "bypass", json_boolean(bypass));
+	// disabled
+	if (disabled)
+		json_object_set_new(rootJ, "disabled", json_boolean(disabled));
 
 	// leftModuleId
 	if (leftExpander.moduleId >= 0)
@@ -155,10 +152,13 @@ void Module::fromJson(json_t* rootJ) {
 			params[paramId].setValue(json_number_value(valueJ));
 	}
 
-	// bypass
-	json_t* bypassJ = json_object_get(rootJ, "bypass");
-	if (bypassJ)
-		bypass = json_boolean_value(bypassJ);
+	// disabled
+	json_t* disabledJ = json_object_get(rootJ, "disabled");
+	// legacy bypass
+	if (!disabledJ)
+		disabledJ = json_object_get(rootJ, "bypass");
+	if (disabledJ)
+		disabled = json_boolean_value(disabledJ);
 
 	// These do not need to be deserialized, since the module positions will set them correctly when added to the rack.
 	// // leftModuleId
@@ -175,6 +175,32 @@ void Module::fromJson(json_t* rootJ) {
 	json_t* dataJ = json_object_get(rootJ, "data");
 	if (dataJ)
 		dataFromJson(dataJ);
+}
+
+
+void Module::onReset(const ResetEvent& e) {
+	// Reset all parameters
+	assert(params.size() == paramQuantities.size());
+	for (int i = 0; i < (int) params.size(); i++) {
+		if (!paramQuantities[i]->resetEnabled)
+			continue;
+		paramQuantities[i]->reset();
+	}
+	// Call deprecated event
+	onReset();
+}
+
+
+void Module::onRandomize(const RandomizeEvent& e) {
+	// Randomize all parameters
+	assert(params.size() == paramQuantities.size());
+	for (int i = 0; i < (int) params.size(); i++) {
+		if (!paramQuantities[i]->randomizeEnabled)
+			continue;
+		paramQuantities[i]->randomize();
+	}
+	// Call deprecated event
+	onRandomize();
 }
 
 

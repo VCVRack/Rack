@@ -93,13 +93,16 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 	CableWidget* cw = NULL;
 	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		if (type == OUTPUT) {
+			// Ctrl-clicking an output creates a new cable.
 			// Keep cable NULL. Will be created below
 		}
 		else {
+			// Ctrl-clicking an input clones the cable already patched to it.
 			CableWidget* topCw = APP->scene->rack->getTopCable(this);
 			if (topCw) {
 				cw = new CableWidget;
-				cw->setOutput(topCw->outputPort);
+				cw->outputPort = topCw->outputPort;
+				cw->updateCable();
 			}
 		}
 	}
@@ -116,9 +119,10 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 			// Disconnect and reuse existing cable
 			APP->scene->rack->removeCable(cw);
 			if (type == OUTPUT)
-				cw->setOutput(NULL);
+				cw->outputPort = NULL;
 			else
-				cw->setInput(NULL);
+				cw->inputPort = NULL;
+			cw->updateCable();
 		}
 	}
 
@@ -126,9 +130,10 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 		// Create a new cable
 		cw = new CableWidget;
 		if (type == OUTPUT)
-			cw->setOutput(this);
+			cw->outputPort = this;
 		else
-			cw->setInput(this);
+			cw->inputPort = this;
+		cw->updateCable();
 	}
 
 	APP->scene->rack->setIncompleteCable(cw);
@@ -169,9 +174,10 @@ void PortWidget::onDragDrop(const event::DragDrop& e) {
 	if (cw) {
 		cw->hoveredOutputPort = cw->hoveredInputPort = NULL;
 		if (type == OUTPUT)
-			cw->setOutput(this);
+			cw->outputPort = this;
 		else
-			cw->setInput(this);
+			cw->inputPort = this;
+		cw->updateCable();
 	}
 }
 

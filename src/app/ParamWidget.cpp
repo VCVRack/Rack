@@ -183,14 +183,6 @@ void ParamWidget::onLeave(const event::Leave& e) {
 	}
 }
 
-void ParamWidget::fromJson(json_t* rootJ) {
-	json_t* valueJ = json_object_get(rootJ, "value");
-	if (valueJ) {
-		if (paramQuantity)
-			paramQuantity->setValue(json_number_value(valueJ));
-	}
-}
-
 void ParamWidget::createContextMenu() {
 	ui::Menu* menu = createMenu();
 

@@ -9,6 +9,7 @@ namespace engine {
 
 engine::Param* ParamQuantity::getParam() {
 	assert(module);
+	assert(paramId < (int) module->params.size());
 	return &module->params[paramId];
 }
 
@@ -93,7 +94,7 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 }
 
 int ParamQuantity::getDisplayPrecision() {
-	return Quantity::getDisplayPrecision();
+	return displayPrecision;
 }
 
 std::string ParamQuantity::getDisplayValueString() {

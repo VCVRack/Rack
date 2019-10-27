@@ -24,8 +24,6 @@ struct ParamWidget : widget::OpaqueWidget {
 	void onEnter(const event::Enter& e) override;
 	void onLeave(const event::Leave& e) override;
 
-	/** For legacy patch loading */
-	void fromJson(json_t* rootJ);
 	void createContextMenu();
 	void resetAction();
 	virtual void reset() {}

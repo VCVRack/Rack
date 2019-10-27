@@ -39,7 +39,7 @@ struct RackWidget : widget::OpaqueWidget {
 
 	/** Completely clear the rack's modules and cables */
 	void clear();
-	json_t* toJson();
+	void mergeJson(json_t* rootJ);
 	void fromJson(json_t* rootJ);
 	void pastePresetClipboardAction();
 
@@ -68,18 +68,18 @@ struct RackWidget : widget::OpaqueWidget {
 	void clearCablesAction();
 	/** Removes all complete cables connected to the port */
 	void clearCablesOnPort(PortWidget* port);
-	/** Adds a complete cable and adds it to the Engine.
+	/** Adds a complete cable.
 	Ownership rules work like add/removeChild()
 	*/
-	void addCable(CableWidget* w);
-	void removeCable(CableWidget* w);
-	/** Takes ownership of `w` and adds it as a child if it isn't already */
-	void setIncompleteCable(CableWidget* w);
+	void addCable(CableWidget* cw);
+	void removeCable(CableWidget* cw);
+	/** Takes ownership of `cw` and adds it as a child if it isn't already. */
+	void setIncompleteCable(CableWidget* cw);
 	CableWidget* releaseIncompleteCable();
-	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack */
+	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack. */
 	CableWidget* getTopCable(PortWidget* port);
 	CableWidget* getCable(int cableId);
-	/** Returns all cables attached to port, complete or not */
+	/** Returns all cables attached to port, complete or not. */
 	std::list<CableWidget*> getCablesOnPort(PortWidget* port);
 };
 

@@ -35,8 +35,16 @@ struct ParamQuantity : Quantity {
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
 	float displayOffset = 0.f;
+	int displayPrecision = 5;
 	/** An optional one-sentence description of the parameter. */
 	std::string description;
+	/** Enables parameter resetting when the module is reset.
+	*/
+	bool resetEnabled = true;
+	/** Enables parameter randomization when the module is randomized.
+	Unbounded (infinite) parameters are not randomizable, regardless of this setting.
+	*/
+	bool randomizeEnabled = true;
 
 	Param* getParam();
 	/** Request to the engine to smoothly set the value */

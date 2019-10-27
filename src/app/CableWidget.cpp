@@ -5,11 +5,109 @@
 #include <app.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
+#include <engine/Engine.hpp>
 #include <engine/Port.hpp>
 
 
 namespace rack {
 namespace app {
+
+CableWidget::CableWidget() {
+	color = color::BLACK_TRANSPARENT;
+	if (!settings::cableColors.empty()) {
+		int id = APP->scene->rack->nextCableColorId++;
+		APP->scene->rack->nextCableColorId %= settings::cableColors.size();
+		color = settings::cableColors[id];
+	}
+}
+
+CableWidget::~CableWidget() {
+	setCable(NULL);
+}
+
+bool CableWidget::isComplete() {
+	return outputPort && inputPort;
+}
+
+void CableWidget::updateCable() {
+	if (cable) {
+		APP->engine->removeCable(cable);
+		delete cable;
+		cable = NULL;
+	}
+	if (inputPort && outputPort) {
+		cable = new engine::Cable;
+		cable->inputModule = inputPort->module;
+		cable->inputId = inputPort->portId;
+		cable->outputModule = outputPort->module;
+		cable->outputId = outputPort->portId;
+		APP->engine->addCable(cable);
+	}
+}
+
+void CableWidget::setCable(engine::Cable* cable) {
+	if (this->cable) {
+		APP->engine->removeCable(this->cable);
+		delete this->cable;
+		this->cable = NULL;
+	}
+	this->cable = cable;
+	if (cable) {
+		app::ModuleWidget* outputModule = APP->scene->rack->getModule(cable->outputModule->id);
+		assert(outputModule);
+		outputPort = outputModule->getOutput(cable->outputId);
+
+		app::ModuleWidget* inputModule = APP->scene->rack->getModule(cable->inputModule->id);
+		assert(inputModule);
+		inputPort = inputModule->getInput(cable->inputId);
+	}
+	else {
+		outputPort = NULL;
+		inputPort = NULL;
+	}
+}
+
+math::Vec CableWidget::getInputPos() {
+	if (inputPort) {
+		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), APP->scene->rack);
+	}
+	else if (hoveredInputPort) {
+		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), APP->scene->rack);
+	}
+	else {
+		return APP->scene->rack->mousePos;
+	}
+}
+
+math::Vec CableWidget::getOutputPos() {
+	if (outputPort) {
+		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), APP->scene->rack);
+	}
+	else if (hoveredOutputPort) {
+		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), APP->scene->rack);
+	}
+	else {
+		return APP->scene->rack->mousePos;
+	}
+}
+
+json_t* CableWidget::toJson() {
+	json_t* rootJ = json_object();
+
+	std::string s = color::toHexString(color);
+	json_object_set_new(rootJ, "color", json_string(s.c_str()));
+
+	return rootJ;
+}
+
+void CableWidget::fromJson(json_t* rootJ) {
+	json_t* colorJ = json_object_get(rootJ, "color");
+	if (colorJ) {
+		// v0.6.0 and earlier patches use JSON objects. Just ignore them if so and use the existing cable color.
+		if (json_is_string(colorJ))
+			color = color::fromHexString(json_string_value(colorJ));
+	}
+}
 
 static void drawPlug(NVGcontext* vg, math::Vec pos, NVGcolor color) {
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
@@ -76,156 +174,6 @@ static void drawCable(NVGcontext* vg, math::Vec pos1, math::Vec pos2, NVGcolor c
 		nvgStroke(vg);
 
 		nvgRestore(vg);
-	}
-}
-
-
-CableWidget::CableWidget() {
-	cable = new engine::Cable;
-
-	color = color::BLACK_TRANSPARENT;
-	if (!settings::cableColors.empty()) {
-		int id = APP->scene->rack->nextCableColorId++;
-		APP->scene->rack->nextCableColorId %= settings::cableColors.size();
-		color = settings::cableColors[id];
-	}
-}
-
-CableWidget::~CableWidget() {
-	delete cable;
-}
-
-bool CableWidget::isComplete() {
-	return outputPort && inputPort;
-}
-
-void CableWidget::setOutput(PortWidget* outputPort) {
-	this->outputPort = outputPort;
-	if (outputPort) {
-		assert(outputPort->type == PortWidget::OUTPUT);
-		cable->outputModule = outputPort->module;
-		cable->outputId = outputPort->portId;
-	}
-}
-
-void CableWidget::setInput(PortWidget* inputPort) {
-	this->inputPort = inputPort;
-	if (inputPort) {
-		assert(inputPort->type == PortWidget::INPUT);
-		cable->inputModule = inputPort->module;
-		cable->inputId = inputPort->portId;
-	}
-}
-
-math::Vec CableWidget::getOutputPos() {
-	if (outputPort) {
-		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), APP->scene->rack);
-	}
-	else if (hoveredOutputPort) {
-		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), APP->scene->rack);
-	}
-	else {
-		return APP->scene->rack->mousePos;
-	}
-}
-
-math::Vec CableWidget::getInputPos() {
-	if (inputPort) {
-		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), APP->scene->rack);
-	}
-	else if (hoveredInputPort) {
-		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), APP->scene->rack);
-	}
-	else {
-		return APP->scene->rack->mousePos;
-	}
-}
-
-json_t* CableWidget::toJson() {
-	assert(isComplete());
-	json_t* rootJ = json_object();
-
-	json_object_set_new(rootJ, "id", json_integer(cable->id));
-	json_object_set_new(rootJ, "outputModuleId", json_integer(cable->outputModule->id));
-	json_object_set_new(rootJ, "outputId", json_integer(cable->outputId));
-	json_object_set_new(rootJ, "inputModuleId", json_integer(cable->inputModule->id));
-	json_object_set_new(rootJ, "inputId", json_integer(cable->inputId));
-
-	std::string s = color::toHexString(color);
-	json_object_set_new(rootJ, "color", json_string(s.c_str()));
-
-	return rootJ;
-}
-
-void CableWidget::fromJson(json_t* rootJ) {
-	// outputModuleId
-	json_t* outputModuleIdJ = json_object_get(rootJ, "outputModuleId");
-	if (!outputModuleIdJ)
-		return;
-	int outputModuleId = json_integer_value(outputModuleIdJ);
-	ModuleWidget* outputModule = APP->scene->rack->getModule(outputModuleId);
-	if (!outputModule)
-		return;
-
-	// inputModuleId
-	json_t* inputModuleIdJ = json_object_get(rootJ, "inputModuleId");
-	if (!inputModuleIdJ)
-		return;
-	int inputModuleId = json_integer_value(inputModuleIdJ);
-	ModuleWidget* inputModule = APP->scene->rack->getModule(inputModuleId);
-	if (!inputModule)
-		return;
-
-	// outputId
-	json_t* outputIdJ = json_object_get(rootJ, "outputId");
-	if (!outputIdJ)
-		return;
-	int outputId = json_integer_value(outputIdJ);
-
-	// inputId
-	json_t* inputIdJ = json_object_get(rootJ, "inputId");
-	if (!inputIdJ)
-		return;
-	int inputId = json_integer_value(inputIdJ);
-
-	// Only set ID if unset
-	if (cable->id < 0) {
-		// id
-		json_t* idJ = json_object_get(rootJ, "id");
-		// Before 1.0, cables IDs were not used, so just leave it as default and Engine will assign one automatically.
-		if (idJ) {
-			cable->id = json_integer_value(idJ);
-		}
-	}
-
-	// Set ports
-	if (APP->patch->isLegacy(1)) {
-		// Before 0.6, the index of the "ports" array was the index of the PortWidget in the `outputs` and `inputs` vector.
-		setOutput(outputModule->outputs[outputId]);
-		setInput(inputModule->inputs[inputId]);
-	}
-	else {
-		for (PortWidget* port : outputModule->outputs) {
-			if (port->portId == outputId) {
-				setOutput(port);
-				break;
-			}
-		}
-		for (PortWidget* port : inputModule->inputs) {
-			if (port->portId == inputId) {
-				setInput(port);
-				break;
-			}
-		}
-	}
-	if (!isComplete())
-		return;
-
-	json_t* colorJ = json_object_get(rootJ, "color");
-	if (colorJ) {
-		// v0.6.0 and earlier patches use JSON objects. Just ignore them if so and use the existing cable color.
-		if (json_is_string(colorJ))
-			color = color::fromHexString(json_string_value(colorJ));
 	}
 }
 

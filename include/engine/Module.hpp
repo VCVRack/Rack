@@ -32,8 +32,8 @@ struct Module {
 	Initialized with config().
 	*/
 	std::vector<Param> params;
-	std::vector<Output> outputs;
 	std::vector<Input> inputs;
+	std::vector<Output> outputs;
 	std::vector<Light> lights;
 	std::vector<ParamQuantity*> paramQuantities;
 
@@ -78,7 +78,7 @@ struct Module {
 	/** Whether the Module is skipped from stepping by the engine.
 	Module subclasses should not read/write this variable.
 	*/
-	bool bypass = false;
+	bool disabled = false;
 
 	/** Constructs a Module with no params, inputs, outputs, and lights. */
 	Module();
@@ -121,38 +121,109 @@ struct Module {
 		float sampleRate;
 		float sampleTime;
 	};
-
 	/** Advances the module by one audio sample.
 	Override this method to read Inputs and Params and to write Outputs and Lights.
 	*/
 	virtual void process(const ProcessArgs& args) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 		step();
-#pragma GCC diagnostic pop
 	}
-	/** Override process(const ProcessArgs &args) instead. */
-	DEPRECATED virtual void step() {}
-
-	/** Called when the engine sample rate is changed. */
-	virtual void onSampleRateChange() {}
-	/** Called when user clicks Initialize in the module context menu. */
-	virtual void onReset() {}
-	/** Called when user clicks Randomize in the module context menu. */
-	virtual void onRandomize() {}
-	/** Called when the Module is added to the Engine */
-	virtual void onAdd() {}
-	/** Called when the Module is removed from the Engine */
-	virtual void onRemove() {}
+	/** DEPRECATED. Override `process(const ProcessArgs& args)` instead. */
+	virtual void step() {}
 
 	json_t* toJson();
-	void fromJson(json_t* rootJ);
+	/** This is virtual only for the purpose of unserializing legacy data when you could set properties of the `.modules[]` object itself.
+	Normally you should override dataFromJson().
+	Remember to call `Module::fromJson(rootJ)` within your overridden method.
+	*/
+	virtual void fromJson(json_t* rootJ);
 
 	/** Override to store extra internal data in the "data" property of the module's JSON object. */
 	virtual json_t* dataToJson() {
 		return NULL;
 	}
 	virtual void dataFromJson(json_t* root) {}
+
+	///////////////////////
+	// Events
+	///////////////////////
+
+	// All of these events are thread-safe with process().
+
+	struct AddEvent {};
+	/** Called after adding the module to the Engine.
+	*/
+	virtual void onAdd(const AddEvent& e) {
+		// Call deprecated event method by default
+		onAdd();
+	}
+
+	struct RemoveEvent {};
+	/** Called before removing the module to the Engine.
+	*/
+	virtual void onRemove(const RemoveEvent& e) {
+		// Call deprecated event method by default
+		onRemove();
+	}
+
+	struct EnableEvent {};
+	/** Called after enabling the module.
+	*/
+	virtual void onEnable(const EnableEvent& e) {}
+
+	struct DisableEvent {};
+	/** Called after disabling the module.
+	*/
+	virtual void onDisable(const DisableEvent& e) {}
+
+	struct PortChangeEvent {
+		/** True if connecting, false if disconnecting. */
+		bool connecting;
+		Port::Type type;
+		int portId;
+	};
+	/** Called after a cable connects to or disconnects from a port.
+	This event is not called for output ports if a stackable cable was added/removed and did not change the port's connected state.
+	*/
+	virtual void onPortChange(const PortChangeEvent& e) {}
+
+	struct SampleRateChangeEvent {
+		float sampleRate;
+		float sampleTime;
+	};
+	/** Called after the Engine sample rate changes.
+	*/
+	virtual void onSampleRateChange(const SampleRateChangeEvent& e) {
+		// Call deprecated event method by default
+		onSampleRateChange();
+	}
+
+	struct ExpanderChangeEvent {};
+	/** Called after the Engine sample rate changes.
+	*/
+	virtual void onExpanderChange(const ExpanderChangeEvent& e) {}
+
+	struct ResetEvent {};
+	/** Called when the user resets (initializes) the module.
+	The default implementation resets all parameters to their default value, so you must call `Module::onRandomize(e)` if you want to keep this behavior.
+	*/
+	virtual void onReset(const ResetEvent& e);
+
+	struct RandomizeEvent {};
+	/** Called when the user randomizes the module.
+	The default implementation randomizes all parameters by default, so you must call `Module::onRandomize(e)` if you want to keep this behavior.
+	*/
+	virtual void onRandomize(const RandomizeEvent& e);
+
+	/** DEPRECATED. Override `onAdd(e)` instead. */
+	virtual void onAdd() {}
+	/** DEPRECATED. Override `onRemove(e)` instead. */
+	virtual void onRemove() {}
+	/** DEPRECATED. Override `onReset(e)` instead. */
+	virtual void onReset() {}
+	/** DEPRECATED. Override `onRandomize(e)` instead. */
+	virtual void onRandomize() {}
+	/** DEPRECATED. Override `onSampleRateChange(e)` instead. */
+	virtual void onSampleRateChange() {}
 };
 
 

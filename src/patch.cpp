@@ -1,6 +1,7 @@
 #include <patch.hpp>
 #include <asset.hpp>
 #include <system.hpp>
+#include <engine/Engine.hpp>
 #include <app.hpp>
 #include <app/common.hpp>
 #include <app/Scene.hpp>
@@ -57,6 +58,7 @@ void PatchManager::reset() {
 	APP->history->clear();
 	APP->scene->rack->clear();
 	APP->scene->rackScroll->reset();
+	APP->engine->clear();
 
 	path = "";
 	if (load(asset::templatePath)) {
@@ -184,7 +186,7 @@ bool PatchManager::load(std::string path) {
 	APP->history->clear();
 	APP->scene->rack->clear();
 	APP->scene->rackScroll->reset();
-	legacy = 0;
+	APP->engine->clear();
 	fromJson(rootJ);
 	return true;
 }
@@ -252,11 +254,12 @@ json_t* PatchManager::toJson() {
 	json_t* versionJ = json_string(app::APP_VERSION.c_str());
 	json_object_set_new(rootJ, "version", versionJ);
 
-	// Merge with RackWidget JSON
-	json_t* rackJ = APP->scene->rack->toJson();
+	json_t* engineJ = APP->engine->toJson();
+	APP->scene->rack->mergeJson(engineJ);
+
 	// Merge with rootJ
-	json_object_update(rootJ, rackJ);
-	json_decref(rackJ);
+	json_object_update(rootJ, engineJ);
+	json_decref(engineJ);
 
 	return rootJ;
 }
@@ -274,8 +277,8 @@ void PatchManager::fromJson(json_t* rootJ) {
 	}
 
 	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
-	// (We now use Module::params/inputs/outputs indices.)
 	if (string::startsWith(version, "0.3.") || string::startsWith(version, "0.4.") || string::startsWith(version, "0.5.") || version == "" || version == "dev") {
+		// Use ModuleWidget::params/inputs/outputs indices instead of Module.
 		legacy = 1;
 	}
 	else if (string::startsWith(version, "0.6.")) {
@@ -285,7 +288,10 @@ void PatchManager::fromJson(json_t* rootJ) {
 		INFO("Loading patch using legacy mode %d", legacy);
 	}
 
+	APP->engine->fromJson(rootJ);
 	APP->scene->rack->fromJson(rootJ);
+	// At this point, ModuleWidgets and CableWidgets should own all Modules and Cables.
+	// TODO Assert this
 
 	// Display a message if we have something to say
 	if (!warningLog.empty()) {
@@ -296,6 +302,11 @@ void PatchManager::fromJson(json_t* rootJ) {
 
 bool PatchManager::isLegacy(int level) {
 	return legacy && legacy <= level;
+}
+
+void PatchManager::log(std::string msg) {
+	warningLog += msg;
+	warningLog += "\n";
 }
 
 
