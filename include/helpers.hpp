@@ -6,6 +6,7 @@
 #include <ui/Menu.hpp>
 #include <app/PortWidget.hpp>
 #include <app/ParamWidget.hpp>
+#include <app/ModuleLightWidget.hpp>
 #include <app/Scene.hpp>
 #include <engine/Module.hpp>
 #include <engine/ParamQuantity.hpp>
@@ -59,8 +60,8 @@ template <class TParamWidget>
 TParamWidget* createParam(math::Vec pos, engine::Module* module, int paramId) {
 	TParamWidget* o = new TParamWidget;
 	o->box.pos = pos;
-	o->module = module;
-	o->paramId = paramId;
+	o->app::ParamWidget::module = module;
+	o->app::ParamWidget::paramId = paramId;
 	o->init();
 	return o;
 }
@@ -76,9 +77,9 @@ template <class TPortWidget>
 TPortWidget* createInput(math::Vec pos, engine::Module* module, int inputId) {
 	TPortWidget* o = new TPortWidget;
 	o->box.pos = pos;
-	o->module = module;
-	o->type = engine::Port::INPUT;
-	o->portId = inputId;
+	o->app::PortWidget::module = module;
+	o->app::PortWidget::type = engine::Port::INPUT;
+	o->app::PortWidget::portId = inputId;
 	return o;
 }
 
@@ -93,9 +94,9 @@ template <class TPortWidget>
 TPortWidget* createOutput(math::Vec pos, engine::Module* module, int outputId) {
 	TPortWidget* o = new TPortWidget;
 	o->box.pos = pos;
-	o->module = module;
-	o->type = engine::Port::OUTPUT;
-	o->portId = outputId;
+	o->app::PortWidget::module = module;
+	o->app::PortWidget::type = engine::Port::OUTPUT;
+	o->app::PortWidget::portId = outputId;
 	return o;
 }
 
@@ -110,8 +111,8 @@ template <class TModuleLightWidget>
 TModuleLightWidget* createLight(math::Vec pos, engine::Module* module, int firstLightId) {
 	TModuleLightWidget* o = new TModuleLightWidget;
 	o->box.pos = pos;
-	o->module = module;
-	o->firstLightId = firstLightId;
+	o->app::ModuleLightWidget::module = module;
+	o->app::ModuleLightWidget::firstLightId = firstLightId;
 	return o;
 }
 

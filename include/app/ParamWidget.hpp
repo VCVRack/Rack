@@ -2,8 +2,8 @@
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <ui/Tooltip.hpp>
+#include <ui/Menu.hpp>
 #include <engine/ParamQuantity.hpp>
-#include <history.hpp>
 
 
 namespace rack {
@@ -30,6 +30,7 @@ struct ParamWidget : widget::OpaqueWidget {
 	void onLeave(const event::Leave& e) override;
 
 	void createContextMenu();
+	virtual void appendContextMenu(ui::Menu* menu) {}
 	void resetAction();
 };
 

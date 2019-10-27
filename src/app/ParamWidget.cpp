@@ -228,6 +228,8 @@ void ParamWidget::createContextMenu() {
 		unmapItem->paramWidget = this;
 		menu->addChild(unmapItem);
 	}
+
+	appendContextMenu(menu);
 }
 
 void ParamWidget::resetAction() {
