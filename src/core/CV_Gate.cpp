@@ -81,6 +81,8 @@ struct CV_Gate : Module {
 
 	CV_Gate() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 16; i++)
+			configInput(GATE_INPUTS + i, string::f("Cell %d", i + 1));
 		onReset();
 	}
 

@@ -28,6 +28,8 @@ struct MIDI_CC : Module {
 
 	MIDI_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 16; i++)
+			configOutput(CC_OUTPUT + i, string::f("Cell %d", i + 1));
 		for (int i = 0; i < 16; i++) {
 			valueFilters[i].setTau(1 / 30.f);
 		}

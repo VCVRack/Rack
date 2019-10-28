@@ -31,6 +31,8 @@ struct MIDI_Gate : Module {
 
 	MIDI_Gate() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 16; i++)
+			configOutput(TRIG_OUTPUT + i, string::f("Cell %d", i + 1));
 		onReset();
 	}
 

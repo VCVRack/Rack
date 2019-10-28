@@ -54,6 +54,8 @@ struct CV_CC : Module {
 
 	CV_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 16; i++)
+			configInput(CC_INPUTS + i, string::f("Cell %d", i + 1));
 		onReset();
 	}
 

@@ -12,7 +12,7 @@ namespace rack {
 namespace core {
 
 
-template <int NUM_AUDIO_OUTPUTS, int NUM_AUDIO_INPUTS>
+template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
 struct AudioInterfacePort : audio::Port {
 	// std::mutex engineMutex;
 	// std::condition_variable engineCv;
@@ -105,7 +105,7 @@ struct AudioInterfacePort : audio::Port {
 };
 
 
-template <int NUM_AUDIO_OUTPUTS, int NUM_AUDIO_INPUTS>
+template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
 struct AudioInterface : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -124,7 +124,7 @@ struct AudioInterface : Module {
 		NUM_LIGHTS
 	};
 
-	AudioInterfacePort<NUM_AUDIO_OUTPUTS, NUM_AUDIO_INPUTS> port;
+	AudioInterfacePort<NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS> port;
 	// int lastSampleRate = 0;
 	// int lastNumOutputs = -1;
 	// int lastNumInputs = -1;
@@ -138,7 +138,11 @@ struct AudioInterface : Module {
 
 	AudioInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		port.maxChannels = std::max(NUM_AUDIO_OUTPUTS, NUM_AUDIO_INPUTS);
+		for (int i = 0; i < NUM_AUDIO_INPUTS; i++)
+			configInput(AUDIO_INPUTS + i, string::f("To device %d", i + 1));
+		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++)
+			configOutput(AUDIO_OUTPUTS + i, string::f("From device %d", i + 1));
+		port.maxChannels = std::max(NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS);
 		port.module = this;
 		onSampleRateChange();
 	}
@@ -290,14 +294,14 @@ struct PrimaryModuleItem : MenuItem {
 };
 
 
-template <int NUM_AUDIO_OUTPUTS, int NUM_AUDIO_INPUTS>
+template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
 struct AudioInterfaceWidget : ModuleWidget {
-	typedef AudioInterface<NUM_AUDIO_OUTPUTS, NUM_AUDIO_INPUTS> TAudioInterface;
+	typedef AudioInterface<NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS> TAudioInterface;
 
 	AudioInterfaceWidget(TAudioInterface* module) {
 		setModule(module);
 
-		if (NUM_AUDIO_OUTPUTS == 8 && NUM_AUDIO_INPUTS == 8) {
+		if (NUM_AUDIO_INPUTS == 8 && NUM_AUDIO_OUTPUTS == 8) {
 			setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface.svg")));
 
 			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -337,7 +341,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 			audioWidget->setAudioPort(module ? &module->port : NULL);
 			addChild(audioWidget);
 		}
-		else if (NUM_AUDIO_OUTPUTS == 16 && NUM_AUDIO_INPUTS == 16) {
+		else if (NUM_AUDIO_INPUTS == 16 && NUM_AUDIO_OUTPUTS == 16) {
 			setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface16.svg")));
 
 			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));

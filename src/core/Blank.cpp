@@ -7,14 +7,14 @@ namespace core {
 
 
 struct BlankModule : Module {
-	int width = 4;
+	int width = 10;
 
 	/** Legacy for <=v1 patches */
 	void fromJson(json_t* rootJ) override {
 		Module::fromJson(rootJ);
 		json_t* widthJ = json_object_get(rootJ, "width");
 		if (widthJ)
-			width = json_number_value(widthJ) / RACK_GRID_WIDTH;
+			width = std::round(json_number_value(widthJ) / RACK_GRID_WIDTH);
 	}
 
 	json_t* dataToJson() override {
@@ -58,6 +58,7 @@ struct ModuleResizeHandle : OpaqueWidget {
 	bool right = false;
 	Vec dragPos;
 	Rect originalBox;
+	BlankModule* module;
 
 	ModuleResizeHandle() {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
@@ -100,6 +101,7 @@ struct ModuleResizeHandle : OpaqueWidget {
 		if (!APP->scene->rack->requestModulePos(mw, newBox.pos)) {
 			mw->box = oldBox;
 		}
+		module->width = std::round(mw->box.size.x / RACK_GRID_WIDTH);
 	}
 
 	void draw(const DrawArgs& args) override {
@@ -122,7 +124,7 @@ struct BlankWidget : ModuleWidget {
 	Widget* rightHandle;
 	BlankPanel* blankPanel;
 
-	BlankWidget(Module* module) {
+	BlankWidget(BlankModule* module) {
 		setModule(module);
 		box.size = Vec(RACK_GRID_WIDTH * 10, RACK_GRID_HEIGHT);
 
@@ -130,10 +132,13 @@ struct BlankWidget : ModuleWidget {
 		addChild(blankPanel);
 
 		ModuleResizeHandle* leftHandle = new ModuleResizeHandle;
+		leftHandle->module = module;
+		addChild(leftHandle);
+
 		ModuleResizeHandle* rightHandle = new ModuleResizeHandle;
 		rightHandle->right = true;
 		this->rightHandle = rightHandle;
-		addChild(leftHandle);
+		rightHandle->module = module;
 		addChild(rightHandle);
 
 		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
@@ -145,7 +150,10 @@ struct BlankWidget : ModuleWidget {
 	}
 
 	void step() override {
-		// TODO Update from module
+		BlankModule* module = dynamic_cast<BlankModule*>(this->module);
+		if (module) {
+			box.size.x = module->width * RACK_GRID_WIDTH;
+		}
 
 		blankPanel->box.size = box.size;
 		topRightScrew->box.pos.x = box.size.x - 30;
@@ -162,7 +170,7 @@ struct BlankWidget : ModuleWidget {
 };
 
 
-Model* modelBlank = createModel<Module, BlankWidget>("Blank");
+Model* modelBlank = createModel<BlankModule, BlankWidget>("Blank");
 
 
 } // namespace core
