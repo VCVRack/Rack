@@ -62,7 +62,7 @@ TParamWidget* createParam(math::Vec pos, engine::Module* module, int paramId) {
 	o->box.pos = pos;
 	o->app::ParamWidget::module = module;
 	o->app::ParamWidget::paramId = paramId;
-	o->init();
+	o->initParamQuantity();
 	return o;
 }
 

@@ -12,8 +12,8 @@ namespace app {
 static const float KNOB_SENSITIVITY = 0.0015f;
 
 
-void Knob::init() {
-	ParamWidget::init();
+void Knob::initParamQuantity() {
+	ParamWidget::initParamQuantity();
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
 		if (snap)

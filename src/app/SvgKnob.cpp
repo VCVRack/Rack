@@ -35,10 +35,10 @@ void SvgKnob::onChange(const event::Change& e) {
 	// Re-transform the widget::TransformWidget
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		float value = pq->getScaledValue();
+		float value = pq->getSmoothValue();
 		float angle;
 		if (pq->isBounded()) {
-			angle = math::rescale(value, 0.f, 1.f, minAngle, maxAngle);
+			angle = math::rescale(value, pq->getMinValue(), pq->getMaxValue(), minAngle, maxAngle);
 		}
 		else {
 			// Center unbounded knobs

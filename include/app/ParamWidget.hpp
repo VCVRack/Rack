@@ -19,7 +19,10 @@ struct ParamWidget : widget::OpaqueWidget {
 	/** For triggering the Change event. `*/
 	float lastValue = NAN;
 
-	virtual void init() {}
+	/** Configures ParamQuantity properties based on the type of ParamWidget.
+	This seems a bit hacky, but it's easier than requiring plugin developers to set `ParamQuantity::randomizeEnabled`, etc.
+	*/
+	virtual void initParamQuantity() {}
 	engine::ParamQuantity* getParamQuantity();
 	void step() override;
 	void draw(const DrawArgs& args) override;

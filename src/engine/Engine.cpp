@@ -786,9 +786,10 @@ Cable* Engine::getCable(int cableId) {
 	return NULL;
 }
 
+
 void Engine::setParam(Module* module, int paramId, float value) {
-	// TODO Does this need to be thread-safe?
-	// If being smoothed, cancel smoothing
+	// Don't lock because this is called too frequently.
+	// If param is being smoothed, cancel smoothing.
 	if (internal->smoothModule == module && internal->smoothParamId == paramId) {
 		internal->smoothModule = NULL;
 		internal->smoothParamId = 0;

@@ -19,7 +19,7 @@ struct Switch : ParamWidget {
 	bool momentaryPressed = false;
 	bool momentaryReleased = false;
 
-	void init() override;
+	void initParamQuantity() override;
 	void step() override;
 	void onDoubleClick(const event::DoubleClick& e) override;
 	void onDragStart(const event::DragStart& e) override;

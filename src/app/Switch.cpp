@@ -9,8 +9,8 @@ namespace rack {
 namespace app {
 
 
-void Switch::init() {
-	ParamWidget::init();
+void Switch::initParamQuantity() {
+	ParamWidget::initParamQuantity();
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
 		pq->snapEnabled = true;

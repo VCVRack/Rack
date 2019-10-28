@@ -24,7 +24,7 @@ struct Knob : ParamWidget {
 	/** Fractional value between the param's value and the dragged knob position. */
 	float snapDelta = 0.f;
 
-	void init() override;
+	void initParamQuantity() override;
 	void onHover(const event::Hover& e) override;
 	void onButton(const event::Button& e) override;
 	void onDragStart(const event::DragStart& e) override;

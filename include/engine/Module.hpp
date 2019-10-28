@@ -110,7 +110,7 @@ struct Module {
 		q->maxValue = maxValue;
 		q->defaultValue = defaultValue;
 		if (label == "")
-			q->label = string::f("Parameter %d", paramId + 1);
+			q->label = string::f("#%d", paramId + 1);
 		else
 			q->label = label;
 		q->unit = unit;
@@ -127,7 +127,7 @@ struct Module {
 
 		PortInfo* p = new PortInfo;
 		if (label == "")
-			p->label = string::f("Input %d", portId + 1);
+			p->label = string::f("#%d", portId + 1);
 		else
 			p->label = label;
 		inputInfos[portId] = p;
@@ -140,7 +140,7 @@ struct Module {
 
 		PortInfo* p = new PortInfo;
 		if (label == "")
-			p->label = string::f("Output %d", portId + 1);
+			p->label = string::f("#%d", portId + 1);
 		else
 			p->label = label;
 		outputInfos[portId] = p;

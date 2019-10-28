@@ -20,16 +20,17 @@ struct PortTooltip : ui::Tooltip {
 			engine::Port* port = portWidget->getPort();
 			engine::PortInfo* portInfo = portWidget->getPortInfo();
 			// Label
-			text = portInfo->label;
+			text = (portWidget->type == engine::Port::INPUT) ? "Input" : "Output";
+			text += ": ";
+			text += portInfo->label;
 			// Voltage, number of channels
 			int channels = port->getChannels();
 			for (int i = 0; i < channels; i++) {
 				// Add newline or comma
-				if (i % 4 == 0)
-					text += "\n";
-				else
-					text += " ";
-				text += string::f("%5gV", port->getVoltage(i));
+				text += "\n";
+				if (channels > 1)
+					text += string::f("%d: ", i + 1);
+				text += string::f("% .3fV", port->getVoltage(i));
 			}
 			// Description
 			std::string description = portInfo->description;
@@ -64,6 +65,8 @@ PortWidget::PortWidget() {
 }
 
 PortWidget::~PortWidget() {
+	// HACK: In case onDragDrop() is called but not onLeave() afterwards...
+	destroyTooltip();
 	// plugLight is not a child and is thus owned by the PortWidget, so we need to delete it here
 	delete plugLight;
 	// HACK
@@ -236,6 +239,10 @@ void PortWidget::onDragEnd(const event::DragEnd& e) {
 }
 
 void PortWidget::onDragDrop(const event::DragDrop& e) {
+	// HACK: Only delete tooltip if we're not (normal) dragging it.
+	if (e.origin == this)
+		createTooltip();
+
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -258,6 +265,7 @@ void PortWidget::onDragDrop(const event::DragDrop& e) {
 
 void PortWidget::onDragEnter(const event::DragEnter& e) {
 	createTooltip();
+
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -278,6 +286,7 @@ void PortWidget::onDragEnter(const event::DragEnter& e) {
 
 void PortWidget::onDragLeave(const event::DragLeave& e) {
 	destroyTooltip();
+
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
