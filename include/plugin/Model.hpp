@@ -37,6 +37,9 @@ struct Model {
 	std::vector<int> tags;
 	/** A one-line summary of the module's purpose */
 	std::string description;
+	/** The manual of the module. HTML, PDF, or GitHub readme/wiki are fine.
+	*/
+	std::string manualUrl;
 
 	virtual ~Model() {}
 	/** Creates a Module. */

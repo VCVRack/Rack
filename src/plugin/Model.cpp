@@ -37,6 +37,11 @@ void Model::fromJson(json_t* rootJ) {
 		}
 	}
 
+	// manualUrl
+	json_t* manualUrlJ = json_object_get(rootJ, "manualUrl");
+	if (manualUrlJ)
+		manualUrl = json_string_value(manualUrlJ);
+
 	// Preset paths
 	presetPaths.clear();
 	std::string presetDir = asset::plugin(plugin, "presets/" + slug);

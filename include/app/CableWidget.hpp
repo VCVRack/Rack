@@ -23,10 +23,11 @@ struct CableWidget : widget::OpaqueWidget {
 	CableWidget();
 	~CableWidget();
 	bool isComplete();
-	/** From input/output ports, re-creates a cable and adds it to the Engine. */
+	/** Based on the input/output ports, re-creates the cable and removes/adds it to the Engine. */
 	void updateCable();
 	/** From a cable, sets the input/output ports.
 	Cable must already be added to the Engine.
+	Adopts ownership.
 	*/
 	void setCable(engine::Cable* cable);
 	math::Vec getInputPos();
