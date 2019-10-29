@@ -76,25 +76,28 @@ struct CcChoice : LedDisplayChoice {
 	}
 
 	void step() override {
+		int cc;
 		if (!module) {
-			text = string::f("%d", id);
-			return;
+			cc = id;
 		}
-		if (module->learningId == id) {
-			if (0 <= focusCc)
-				text = string::f("%d", focusCc);
-			else
-				text = "--";
+		else if (module->learningId == id) {
+			cc = focusCc;
 			color.a = 0.5;
 		}
 		else {
-			text = string::f("%d", module->learnedCcs[id]);
+			cc = module->learnedCcs[id];
 			color.a = 1.0;
 
-			// HACK
-			if (APP->event->selectedWidget == this)
+			// Cancel focus if no longer learning
+			if (APP->event->getSelectedWidget() == this)
 				APP->event->setSelected(NULL);
 		}
+
+		// Set text
+		if (cc < 0)
+			text = "--";
+		else
+			text = string::f("%d", cc);
 	}
 
 	void onSelect(const event::Select& e) override {
@@ -117,14 +120,14 @@ struct CcChoice : LedDisplayChoice {
 	}
 
 	void onSelectText(const event::SelectText& e) override {
-		int c = e.codepoint - '0';
-		if (0 <= c && c <= 9) {
+		int c = e.codepoint;
+		if ('0' <= c && c <= '9') {
 			if (focusCc < 0)
 				focusCc = 0;
-			focusCc = focusCc * 10 + c;
+			focusCc = focusCc * 10 + (c - '0');
 		}
 		if (focusCc >= 128)
-			focusCc = 0;
+			focusCc = -1;
 		e.consume(this);
 	}
 
@@ -143,6 +146,7 @@ template <class TModule>
 struct NoteChoice : LedDisplayChoice {
 	TModule* module;
 	int id;
+	int focusNote;
 
 	NoteChoice() {
 		box.size.y = mm2px(6.666);
@@ -159,27 +163,32 @@ struct NoteChoice : LedDisplayChoice {
 	}
 
 	void step() override {
+		int note;
 		if (!module) {
-			text = "C4";
-			return;
+			note = id + 36;
 		}
-		if (module->learningId == id) {
-			text = "--";
+		else if (module->learningId == id) {
+			note = focusNote;
 			color.a = 0.5;
 		}
 		else {
-			uint8_t note = module->learnedNotes[id];
-			static const char* noteNames[] = {
-				"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
-			};
+			note = module->learnedNotes[id];
+			color.a = 1.0;
+
+			// Cancel focus if no longer learning
+			if (APP->event->getSelectedWidget() == this)
+				APP->event->setSelected(NULL);
+		}
+
+		// Set text
+		if (note < 0) {
+			text = "--";
+		}
+		else {
+			static const char* noteNames[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
 			int oct = note / 12 - 1;
 			int semi = note % 12;
 			text = string::f("%s%d", noteNames[semi], oct);
-			color.a = 1.0;
-
-			// HACK
-			if (APP->event->selectedWidget == this)
-				APP->event->setSelected(NULL);
 		}
 	}
 
@@ -187,6 +196,7 @@ struct NoteChoice : LedDisplayChoice {
 		if (!module)
 			return;
 		module->learningId = id;
+		focusNote = -1;
 		e.consume(this);
 	}
 
@@ -194,7 +204,41 @@ struct NoteChoice : LedDisplayChoice {
 		if (!module)
 			return;
 		if (module->learningId == id) {
+			if (0 <= focusNote && focusNote < 128) {
+				module->learnedNotes[id] = focusNote;
+			}
 			module->learningId = -1;
+		}
+	}
+
+	void onSelectText(const event::SelectText& e) override {
+		int c = e.codepoint;
+		if ('a' <= c && c <= 'g') {
+			static const int majorNotes[7] = {9, 11, 0, 2, 4, 5, 7};
+			focusNote = majorNotes[c - 'a'];
+		}
+		else if (c == '#') {
+			if (focusNote >= 0) {
+				focusNote += 1;
+			}
+		}
+		else if ('0' <= c && c <= '9') {
+			if (focusNote >= 0) {
+				focusNote = focusNote % 12;
+				focusNote += 12 * (c - '0' + 1);
+			}
+		}
+		if (focusNote >= 128)
+			focusNote = -1;
+		e.consume(this);
+	}
+
+	void onSelectKey(const event::SelectKey& e) override {
+		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) {
+			event::Deselect eDeselect;
+			onDeselect(eDeselect);
+			APP->event->selectedWidget = NULL;
+			e.consume(this);
 		}
 	}
 };
