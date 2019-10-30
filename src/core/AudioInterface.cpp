@@ -31,15 +31,11 @@ struct AudioInterface : Module, audio::Port {
 		NUM_LIGHTS
 	};
 
-	// int lastSampleRate = 0;
-	// int lastNumOutputs = -1;
-	// int lastNumInputs = -1;
+	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 8192> inputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 8192> outputBuffer;
 
-	// dsp::SampleRateConverter<NUM_AUDIO_INPUTS> inputSrc;
-	// dsp::SampleRateConverter<NUM_AUDIO_OUTPUTS> outputSrc;
-
-	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 16384> inputBuffer;
-	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 16384> outputBuffer;
+	dsp::SampleRateConverter<NUM_AUDIO_INPUTS> inputSrc;
+	dsp::SampleRateConverter<NUM_AUDIO_OUTPUTS> outputSrc;
 
 	AudioInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -48,7 +44,8 @@ struct AudioInterface : Module, audio::Port {
 		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++)
 			configOutput(AUDIO_OUTPUTS + i, string::f("From device %d", i + 1));
 		maxChannels = std::max(NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS);
-		onSampleRateChange();
+		inputSrc.setQuality(6);
+		outputSrc.setQuality(6);
 	}
 
 	~AudioInterface() {
@@ -73,93 +70,6 @@ struct AudioInterface : Module, audio::Port {
 				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * outputFrame.samples[i]);
 			}
 		}
-
-		// // Update SRC states
-		// inputSrc.setRates(port.sampleRate, args.sampleRate);
-		// outputSrc.setRates(args.sampleRate, port.sampleRate);
-
-		// inputSrc.setChannels(port.numInputs);
-		// outputSrc.setChannels(port.numOutputs);
-
-		// // Inputs: audio engine -> rack engine
-		// if (port.active && port.numInputs > 0) {
-		// 	// Wait until inputs are present
-		// 	// Give up after a timeout in case the audio device is being unresponsive.
-		// 	std::unique_lock<std::mutex> lock(port.engineMutex);
-		// 	auto cond = [&] {
-		// 		return (!port.inputBuffer.empty());
-		// 	};
-		// 	auto timeout = std::chrono::milliseconds(200);
-		// 	if (port.engineCv.wait_for(lock, timeout, cond)) {
-		// 		// Convert inputs
-		// 		int inLen = port.inputBuffer.size();
-		// 		int outLen = inputBuffer.capacity();
-		// 		inputSrc.process(port.inputBuffer.startData(), &inLen, inputBuffer.endData(), &outLen);
-		// 		port.inputBuffer.startIncr(inLen);
-		// 		inputBuffer.endIncr(outLen);
-		// 	}
-		// 	else {
-		// 		// Give up on pulling input
-		// 		port.active = false;
-		// 		// DEBUG("Audio Interface underflow");
-		// 	}
-		// }
-
-		// // Take input from buffer
-		// dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
-		// if (!inputBuffer.empty()) {
-		// 	inputFrame = inputBuffer.shift();
-		// }
-		// else {
-		// 	std::memset(&inputFrame, 0, sizeof(inputFrame));
-		// }
-		// for (int i = 0; i < port.numInputs; i++) {
-		// 	outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * inputFrame.samples[i]);
-		// }
-		// for (int i = port.numInputs; i < NUM_AUDIO_INPUTS; i++) {
-		// 	outputs[AUDIO_OUTPUTS + i].setVoltage(0.f);
-		// }
-
-		// // Outputs: rack engine -> audio engine
-		// if (port.active && port.numOutputs > 0) {
-		// 	// Get and push output SRC frame
-		// 	if (!outputBuffer.full()) {
-		// 		dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame;
-		// 		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
-		// 			outputFrame.samples[i] = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
-		// 		}
-		// 		outputBuffer.push(outputFrame);
-		// 	}
-
-		// 	if (outputBuffer.full()) {
-		// 		// Wait until enough outputs are consumed
-		// 		// Give up after a timeout in case the audio device is being unresponsive.
-		// 		auto cond = [&] {
-		// 			return (port.outputBuffer.size() < (size_t) port.blockSize);
-		// 		};
-		// 		if (!cond())
-		// 			APP->engine->yieldWorkers();
-		// 		std::unique_lock<std::mutex> lock(port.engineMutex);
-		// 		auto timeout = std::chrono::milliseconds(200);
-		// 		if (port.engineCv.wait_for(lock, timeout, cond)) {
-		// 			// Push converted output
-		// 			int inLen = outputBuffer.size();
-		// 			int outLen = port.outputBuffer.capacity();
-		// 			outputSrc.process(outputBuffer.startData(), &inLen, port.outputBuffer.endData(), &outLen);
-		// 			outputBuffer.startIncr(inLen);
-		// 			port.outputBuffer.endIncr(outLen);
-		// 		}
-		// 		else {
-		// 			// Give up on pushing output
-		// 			port.active = false;
-		// 			outputBuffer.clear();
-		// 			// DEBUG("Audio Interface underflow");
-		// 		}
-		// 	}
-
-		// 	// Notify audio thread that an output is potentially ready
-		// 	port.audioCv.notify_one();
-		// }
 
 		// Turn on light if at least one port is enabled in the nearby pair
 		for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
@@ -197,75 +107,53 @@ struct AudioInterface : Module, audio::Port {
 		// Clear output in case the audio driver uses this buffer in another thread before this method returns. (Not sure if any do this in practice.)
 		std::memset(output, 0, sizeof(float) * numOutputs * frames);
 
+		// Initialize sample rate converters
+		outputSrc.setRates((int) sampleRate, (int) APP->engine->getSampleRate());
+		outputSrc.setChannels(numInputs);
+		inputSrc.setRates((int) APP->engine->getSampleRate(), (int) sampleRate);
+		inputSrc.setChannels(numOutputs);
+
 		// audio input -> module output
+		dsp::Frame<NUM_AUDIO_OUTPUTS> inputAudioBuffer[frames];
+		std::memset(inputAudioBuffer, 0, sizeof(inputAudioBuffer));
 		for (int i = 0; i < frames; i++) {
-			if (outputBuffer.full())
-				break;
-			dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame;
-			std::memset(&outputFrame, 0, sizeof(outputFrame));
 			for (int j = 0; j < std::min(numInputs, NUM_AUDIO_OUTPUTS); j++) {
-				outputFrame.samples[j] = input[i * numInputs + j];
+				inputAudioBuffer[i].samples[j] = input[i * numInputs + j];
 			}
-			outputBuffer.push(outputFrame);
 		}
+		int inputAudioFrames = frames;
+		int outputFrames = outputBuffer.capacity();
+		outputSrc.process(inputAudioBuffer, &inputAudioFrames, outputBuffer.endData(), &outputFrames);
+		outputBuffer.endIncr(outputFrames);
 
 		// Step engine estimated number of steps
 		if (APP->engine->getPrimaryModule() == this) {
-			APP->engine->step(frames);
+			APP->engine->step(outputFrames);
 		}
 
 		// module input -> audio output
+		dsp::Frame<NUM_AUDIO_OUTPUTS> outputAudioBuffer[frames];
+		int inputFrames = inputBuffer.size();
+		int outputAudioFrames = frames;
+		inputSrc.process(inputBuffer.startData(), &inputFrames, outputAudioBuffer, &outputAudioFrames);
+		inputBuffer.startIncr(inputFrames);
 		for (int i = 0; i < frames; i++) {
-			if (inputBuffer.empty())
-				break;
-			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame = inputBuffer.shift();
 			for (int j = 0; j < std::min(numOutputs, NUM_AUDIO_INPUTS); j++) {
-				output[i * numOutputs + j] = inputFrame.samples[j];
+				output[i * numOutputs + j] = outputAudioBuffer[i].samples[j];
 			}
 		}
 
-
-		// if (numInputs > 0) {
-		// 	// TODO Do we need to wait on the input to be consumed here? Experimentally, it works fine if we don't.
-		// 	for (int i = 0; i < frames; i++) {
-		// 		if (inputBuffer.full())
-		// 			break;
-		// 		dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
-		// 		std::memset(&inputFrame, 0, sizeof(inputFrame));
-		// 		std::memcpy(&inputFrame, &input[numInputs * i], numInputs * sizeof(float));
-		// 		inputBuffer.push(inputFrame);
-		// 	}
-		// }
-
-		// if (numOutputs > 0) {
-		// 	std::unique_lock<std::mutex> lock(audioMutex);
-		// 	auto cond = [&] {
-		// 		return (outputBuffer.size() >= (size_t) frames);
-		// 	};
-		// 	auto timeout = std::chrono::milliseconds(100);
-		// 	if (audioCv.wait_for(lock, timeout, cond)) {
-		// 		// Consume audio block
-		// 		for (int i = 0; i < frames; i++) {
-		// 			dsp::Frame<NUM_AUDIO_OUTPUTS> f = outputBuffer.shift();
-		// 			for (int j = 0; j < numOutputs; j++) {
-		// 				output[numOutputs * i + j] = clamp(f.samples[j], -1.f, 1.f);
-		// 			}
-		// 		}
-		// 	}
-		// 	else {
-		// 		// Timed out, fill output with zeros
-		// 		std::memset(output, 0, frames * numOutputs * sizeof(float));
-		// 		// DEBUG("Audio Interface Port underflow");
-		// 	}
-		// }
-
-		// // Notify engine when finished processing
-		// engineCv.notify_one();
+		DEBUG("%p %d: frames %d, %d -> %d outputBuffer %d, %d -> %d inputBuffer %d",
+			this, APP->engine->getPrimaryModule() == this, frames,
+			inputAudioFrames, outputFrames, outputBuffer.size(),
+			inputFrames, outputAudioFrames, inputBuffer.size());
 	}
 
 	void onCloseStream() override {
-		// inputBuffer.clear();
-		// outputBuffer.clear();
+		// Reset outputs
+		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
+			outputs[AUDIO_OUTPUTS + i].setVoltage(0.f);
+		}
 	}
 
 	void onChannelsChange() override {
