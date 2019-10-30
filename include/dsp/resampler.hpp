@@ -80,8 +80,8 @@ struct SampleRateConverter {
 		assert(outFrames);
 		if (st) {
 			// Resample each channel at a time
-			spx_uint32_t inLen;
-			spx_uint32_t outLen;
+			spx_uint32_t inLen = 0;
+			spx_uint32_t outLen = 0;
 			for (int i = 0; i < channels; i++) {
 				inLen = *inFrames;
 				outLen = *outFrames;

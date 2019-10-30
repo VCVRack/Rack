@@ -31,8 +31,8 @@ struct AudioInterface : Module, audio::Port {
 		NUM_LIGHTS
 	};
 
-	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 8192> inputBuffer;
-	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 8192> outputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 32768> inputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 32768> outputBuffer;
 
 	dsp::SampleRateConverter<NUM_AUDIO_INPUTS> inputSrc;
 	dsp::SampleRateConverter<NUM_AUDIO_OUTPUTS> outputSrc;
@@ -51,6 +51,11 @@ struct AudioInterface : Module, audio::Port {
 	~AudioInterface() {
 		// Close stream here before destructing AudioInterfacePort, so the mutexes are still valid when waiting to close.
 		setDeviceId(-1, 0);
+	}
+
+	void onSampleRateChange(const SampleRateChangeEvent& e) override {
+		inputBuffer.clear();
+		outputBuffer.clear();
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -108,52 +113,73 @@ struct AudioInterface : Module, audio::Port {
 		std::memset(output, 0, sizeof(float) * numOutputs * frames);
 
 		// Initialize sample rate converters
-		outputSrc.setRates((int) sampleRate, (int) APP->engine->getSampleRate());
+		int engineSampleRate = (int) APP->engine->getSampleRate();
+		outputSrc.setRates((int) sampleRate, engineSampleRate);
 		outputSrc.setChannels(numInputs);
-		inputSrc.setRates((int) APP->engine->getSampleRate(), (int) sampleRate);
+		inputSrc.setRates(engineSampleRate, (int) sampleRate);
 		inputSrc.setChannels(numOutputs);
 
-		// audio input -> module output
-		dsp::Frame<NUM_AUDIO_OUTPUTS> inputAudioBuffer[frames];
-		std::memset(inputAudioBuffer, 0, sizeof(inputAudioBuffer));
-		for (int i = 0; i < frames; i++) {
-			for (int j = 0; j < std::min(numInputs, NUM_AUDIO_OUTPUTS); j++) {
-				inputAudioBuffer[i].samples[j] = input[i * numInputs + j];
+		int engineFrames = 0;
+
+		if (numInputs > 0) {
+			// audio input -> module output
+			dsp::Frame<NUM_AUDIO_OUTPUTS> inputAudioBuffer[frames];
+			std::memset(inputAudioBuffer, 0, sizeof(inputAudioBuffer));
+			for (int i = 0; i < frames; i++) {
+				for (int j = 0; j < std::min(numInputs, NUM_AUDIO_OUTPUTS); j++) {
+					inputAudioBuffer[i].samples[j] = input[i * numInputs + j];
+				}
+			}
+			int inputAudioFrames = frames;
+			int outputFrames = outputBuffer.capacity();
+			outputSrc.process(inputAudioBuffer, &inputAudioFrames, outputBuffer.endData(), &outputFrames);
+			outputBuffer.endIncr(outputFrames);
+			engineFrames = outputBuffer.size();
+		}
+		else {
+			// Upper bound on number of frames so that `outputAudioFrames >= frames` at the end of this method.
+			double ratio = (double) engineSampleRate / sampleRate;
+			engineFrames = std::ceil(frames * ratio - inputBuffer.size());
+			engineFrames = std::max(engineFrames, 0);
+		}
+
+		// Step engine to consume the entire output buffer
+		if (APP->engine->getPrimaryModule() == this && engineFrames > 0) {
+			APP->engine->step(engineFrames);
+		}
+
+		if (numOutputs > 0) {
+			// module input -> audio output
+			dsp::Frame<NUM_AUDIO_OUTPUTS> outputAudioBuffer[frames];
+			int inputFrames = inputBuffer.size();
+			int outputAudioFrames = frames;
+			inputSrc.process(inputBuffer.startData(), &inputFrames, outputAudioBuffer, &outputAudioFrames);
+			inputBuffer.startIncr(inputFrames);
+			for (int i = 0; i < outputAudioFrames; i++) {
+				for (int j = 0; j < std::min(numOutputs, NUM_AUDIO_INPUTS); j++) {
+					output[i * numOutputs + j] = outputAudioBuffer[i].samples[j];
+				}
 			}
 		}
-		int inputAudioFrames = frames;
-		int outputFrames = outputBuffer.capacity();
-		outputSrc.process(inputAudioBuffer, &inputAudioFrames, outputBuffer.endData(), &outputFrames);
-		outputBuffer.endIncr(outputFrames);
 
-		// Step engine estimated number of steps
-		if (APP->engine->getPrimaryModule() == this) {
-			APP->engine->step(outputFrames);
-		}
+		// If we're left with too many output samples, flush the buffer.
+		// if (inputBuffer.size() >= 2.f * ) {
+		// 	inputBuffer.clear();
+		// }
 
-		// module input -> audio output
-		dsp::Frame<NUM_AUDIO_OUTPUTS> outputAudioBuffer[frames];
-		int inputFrames = inputBuffer.size();
-		int outputAudioFrames = frames;
-		inputSrc.process(inputBuffer.startData(), &inputFrames, outputAudioBuffer, &outputAudioFrames);
-		inputBuffer.startIncr(inputFrames);
-		for (int i = 0; i < frames; i++) {
-			for (int j = 0; j < std::min(numOutputs, NUM_AUDIO_INPUTS); j++) {
-				output[i * numOutputs + j] = outputAudioBuffer[i].samples[j];
-			}
-		}
+		// DEBUG("%p %d: frames %d\toutputBuffer %d inputBuffer %d engineFrames %d\t",
+		// 	this, APP->engine->getPrimaryModule() == this, frames,
+		// 	outputBuffer.size(), inputBuffer.size(), engineFrames);
+	}
 
-		DEBUG("%p %d: frames %d, %d -> %d outputBuffer %d, %d -> %d inputBuffer %d",
-			this, APP->engine->getPrimaryModule() == this, frames,
-			inputAudioFrames, outputFrames, outputBuffer.size(),
-			inputFrames, outputAudioFrames, inputBuffer.size());
+	void onOpenStream() override {
+		inputBuffer.clear();
+		outputBuffer.clear();
 	}
 
 	void onCloseStream() override {
-		// Reset outputs
-		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
-			outputs[AUDIO_OUTPUTS + i].setVoltage(0.f);
-		}
+		inputBuffer.clear();
+		outputBuffer.clear();
 	}
 
 	void onChannelsChange() override {
