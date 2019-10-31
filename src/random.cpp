@@ -30,6 +30,10 @@ static uint64_t xoroshiro128plus_next(void) {
 }
 
 void init() {
+	// Do nothing if already initialized
+	if (xoroshiro128plus_state[0] || xoroshiro128plus_state[1])
+		return;
+
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	xoroshiro128plus_state[0] = tv.tv_sec;

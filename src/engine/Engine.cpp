@@ -270,7 +270,7 @@ static void Cable_step(Cable* that) {
 }
 
 
-static void Engine_step(Engine* that) {
+static void Engine_stepModules(Engine* that) {
 	Engine::Internal* internal = that->internal;
 
 	// Param smoothing
@@ -296,6 +296,12 @@ static void Engine_step(Engine* that) {
 
 	// Step cables
 	for (Cable* cable : that->internal->cables) {
+		// // Check that the output is finite
+		// float v = cable->outputModule->outputs[cable->outputId].getVoltage();
+		// if (!std::isfinite(v)) {
+		// 	// Automatically disable module
+		// 	that->disableModule(cable->outputModule, true);
+		// }
 		Cable_step(cable);
 	}
 
@@ -422,6 +428,7 @@ void Engine::clear() {
 
 void Engine::step(int frames) {
 	initMXCSR();
+	random::init();
 
 	// Set sample rate
 	if (internal->sampleRate != settings::sampleRate) {
@@ -451,7 +458,7 @@ void Engine::step(int frames) {
 
 		// Step modules
 		for (int i = 0; i < frames; i++) {
-			Engine_step(this);
+			Engine_stepModules(this);
 		}
 	}
 	else {
