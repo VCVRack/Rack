@@ -1,6 +1,6 @@
 RACK_DIR ?= .
-VERSION := 1.dev.$(shell git rev-parse --short HEAD)
-# VERSION := 1.1.6
+VERSION := 2.dev.$(shell git rev-parse --short HEAD)
+# VERSION := 2.0.0
 
 FLAGS += -DVERSION=$(VERSION)
 FLAGS += -Iinclude -Idep/include
