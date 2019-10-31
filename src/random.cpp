@@ -49,8 +49,7 @@ uint64_t u64() {
 }
 
 float uniform() {
-	// 24 bits of granularity is the best that can be done with floats while ensuring that the return value lies in [0.0, 1.0).
-	return xoroshiro128plus_next() / std::pow(2.f, 64);
+	return (xoroshiro128plus_next() >> (64 - 24)) / std::pow(2.f, 24);
 }
 
 float normal() {
