@@ -4,6 +4,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 1.1.6 (in development)
 - Add ability for plugins to use LuaJIT on Mac.
+- Fix normal random number generator possibly returning -infinity.
 - Core
 	- MIDI-Map: Don't move param until the first MIDI CC command is sent.
 - API
