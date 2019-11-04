@@ -299,8 +299,14 @@ struct Rect {
 	bool isEqual(Rect r) const {
 		return pos.isEqual(r.pos) && size.isEqual(r.size);
 	}
+	float getLeft() const {
+		return pos.x;
+	}
 	float getRight() const {
 		return pos.x + size.x;
+	}
+	float getTop() const {
+		return pos.y;
 	}
 	float getBottom() const {
 		return pos.y + size.y;
