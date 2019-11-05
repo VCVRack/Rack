@@ -2,7 +2,7 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
-### 1.1.6 (in development)
+### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
 - Fix normal random number generator possibly returning -infinity.
 - Core
