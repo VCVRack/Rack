@@ -165,7 +165,6 @@ struct Engine::Internal {
 
 	std::recursive_mutex mutex;
 
-	bool realTime = false;
 	int threadCount = 0;
 	std::vector<EngineWorker> workers;
 	HybridBarrier engineBarrier;
@@ -341,7 +340,7 @@ static void Engine_updateExpander(Engine* that, Module::Expander* expander) {
 }
 
 
-static void Engine_relaunchWorkers(Engine* that, int threadCount, bool realTime) {
+static void Engine_relaunchWorkers(Engine* that, int threadCount) {
 	Engine::Internal* internal = that->internal;
 
 	if (internal->threadCount > 0) {
@@ -360,14 +359,10 @@ static void Engine_relaunchWorkers(Engine* that, int threadCount, bool realTime)
 
 	// Configure engine
 	internal->threadCount = threadCount;
-	internal->realTime = realTime;
 
 	// Set barrier counts
 	internal->engineBarrier.total = threadCount;
 	internal->workerBarrier.total = threadCount;
-
-	// Configure main thread
-	system::setThreadRealTime(realTime);
 
 	if (threadCount > 0) {
 		// Create and start engine workers
@@ -391,7 +386,7 @@ Engine::Engine() {
 
 
 Engine::~Engine() {
-	Engine_relaunchWorkers(this, 0, false);
+	Engine_relaunchWorkers(this, 0);
 	clear();
 
 	// Make sure there are no cables or modules in the rack on destruction.
@@ -444,8 +439,8 @@ void Engine::step(int frames) {
 
 	if (!internal->paused) {
 		// Launch workers
-		if (internal->threadCount != settings::threadCount || internal->realTime != settings::realTime) {
-			Engine_relaunchWorkers(this, settings::threadCount, settings::realTime);
+		if (internal->threadCount != settings::threadCount) {
+			Engine_relaunchWorkers(this, settings::threadCount);
 		}
 
 		std::lock_guard<std::recursive_mutex> lock(internal->mutex);
@@ -464,7 +459,7 @@ void Engine::step(int frames) {
 	else {
 		// Stop workers while paused
 		if (internal->threadCount != 1) {
-			Engine_relaunchWorkers(this, 1, settings::realTime);
+			Engine_relaunchWorkers(this, 1);
 		}
 	}
 

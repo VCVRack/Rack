@@ -456,12 +456,6 @@ struct SampleRateItem : ui::MenuItem {
 	}
 };
 
-struct RealTimeItem : ui::MenuItem {
-	void onAction(const event::Action& e) override {
-		settings::realTime ^= true;
-	}
-};
-
 struct ThreadCountValueItem : ui::MenuItem {
 	int threadCount;
 	void setThreadCount(int threadCount) {
@@ -481,11 +475,6 @@ struct ThreadCountValueItem : ui::MenuItem {
 struct ThreadCountItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
-
-		RealTimeItem* realTimeItem = new RealTimeItem;
-		realTimeItem->text = "Real-time priority";
-		realTimeItem->rightText = CHECKMARK(settings::realTime);
-		menu->addChild(realTimeItem);
 
 		int coreCount = system::getLogicalCoreCount();
 		for (int i = 1; i <= coreCount; i++) {
