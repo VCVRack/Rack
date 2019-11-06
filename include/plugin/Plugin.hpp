@@ -66,6 +66,7 @@ struct Plugin {
 	void addModel(Model* model);
 	Model* getModel(std::string slug);
 	void fromJson(json_t* rootJ);
+	std::string getBrand();
 };
 
 

@@ -51,5 +51,11 @@ void Model::fromJson(json_t* rootJ) {
 }
 
 
+std::string Model::getFullName() {
+	assert(plugin);
+	return plugin->getBrand() + " " + name;
+}
+
+
 } // namespace plugin
 } // namespace rack

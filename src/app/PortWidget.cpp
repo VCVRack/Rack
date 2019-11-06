@@ -38,6 +38,18 @@ struct PortTooltip : ui::Tooltip {
 				text += "\n";
 				text += description;
 			}
+			// Connected to
+			std::list<CableWidget*> cables = APP->scene->rack->getCablesOnPort(portWidget);
+			for (CableWidget* cable : cables) {
+				PortWidget* otherPw = (portWidget->type == engine::Port::INPUT) ? cable->outputPort : cable->inputPort;
+				if (!otherPw)
+					continue;
+				text += "\n";
+				text += "Connected to ";
+				text += otherPw->module->model->getFullName();
+				text += ": ";
+				text += otherPw->getPortInfo()->label;
+			}
 		}
 		Tooltip::step();
 		// Position at bottom-right of parameter

@@ -145,5 +145,12 @@ void Plugin::fromJson(json_t* rootJ) {
 }
 
 
+std::string Plugin::getBrand() {
+	if (brand == "")
+		return name;
+	return brand;
+}
+
+
 } // namespace plugin
 } // namespace rack

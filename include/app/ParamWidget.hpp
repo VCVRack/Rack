@@ -24,6 +24,9 @@ struct ParamWidget : widget::OpaqueWidget {
 	*/
 	virtual void initParamQuantity() {}
 	engine::ParamQuantity* getParamQuantity();
+	void createTooltip();
+	void destroyTooltip();
+
 	void step() override;
 	void draw(const DrawArgs& args) override;
 

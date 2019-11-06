@@ -54,6 +54,7 @@ struct Model {
 	}
 
 	void fromJson(json_t* rootJ);
+	std::string getFullName();
 };
 
 

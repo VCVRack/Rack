@@ -123,6 +123,23 @@ engine::ParamQuantity* ParamWidget::getParamQuantity() {
 	return module->paramQuantities[paramId];
 }
 
+void ParamWidget::createTooltip() {
+	if (settings::paramTooltip && !this->tooltip && module) {
+		ParamTooltip* tooltip = new ParamTooltip;
+		tooltip->paramWidget = this;
+		APP->scene->addChild(tooltip);
+		this->tooltip = tooltip;
+	}
+}
+
+void ParamWidget::destroyTooltip() {
+	if (tooltip) {
+		APP->scene->removeChild(tooltip);
+		delete tooltip;
+		tooltip = NULL;
+	}
+}
+
 void ParamWidget::step() {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
@@ -170,6 +187,7 @@ void ParamWidget::onButton(const event::Button& e) {
 
 	// Right click to open context menu
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+		destroyTooltip();
 		createContextMenu();
 		e.consume(this);
 	}
@@ -180,20 +198,11 @@ void ParamWidget::onDoubleClick(const event::DoubleClick& e) {
 }
 
 void ParamWidget::onEnter(const event::Enter& e) {
-	if (settings::paramTooltip && !this->tooltip && module) {
-		ParamTooltip* tooltip = new ParamTooltip;
-		tooltip->paramWidget = this;
-		APP->scene->addChild(tooltip);
-		this->tooltip = tooltip;
-	}
+	createTooltip();
 }
 
 void ParamWidget::onLeave(const event::Leave& e) {
-	if (tooltip) {
-		APP->scene->removeChild(tooltip);
-		delete tooltip;
-		tooltip = NULL;
-	}
+	destroyTooltip();
 }
 
 void ParamWidget::createContextMenu() {
