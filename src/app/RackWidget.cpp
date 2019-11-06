@@ -171,7 +171,8 @@ void RackWidget::mergeJson(json_t* rootJ) {
 
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
-	assert(modulesJ);
+	if (!modulesJ)
+		return;
 	size_t moduleIndex;
 	json_t* moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
@@ -182,7 +183,8 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		int id = json_integer_value(idJ);
 		// TODO Legacy v0.6?
 		ModuleWidget* moduleWidget = getModule(id);
-		assert(moduleWidget);
+		if (!moduleWidget)
+			continue;
 
 		// pos
 		math::Vec pos = moduleWidget->box.pos.minus(moduleOffset);
@@ -193,7 +195,8 @@ void RackWidget::mergeJson(json_t* rootJ) {
 
 	// cables
 	json_t* cablesJ = json_object_get(rootJ, "cables");
-	assert(cablesJ);
+	if (!cablesJ)
+		return;
 	size_t cableIndex;
 	json_t* cableJ;
 	json_array_foreach(cablesJ, cableIndex, cableJ) {
@@ -203,7 +206,8 @@ void RackWidget::mergeJson(json_t* rootJ) {
 			continue;
 		int id = json_integer_value(idJ);
 		CableWidget* cw = getCable(id);
-		assert(cw);
+		if (!cw)
+			continue;
 
 		json_t* cwJ = cw->toJson();
 		// Merge cable JSON object
@@ -215,8 +219,7 @@ void RackWidget::mergeJson(json_t* rootJ) {
 void RackWidget::fromJson(json_t* rootJ) {
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
-	if (!modulesJ)
-		return;
+	assert(modulesJ);
 	size_t moduleIndex;
 	json_t* moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
