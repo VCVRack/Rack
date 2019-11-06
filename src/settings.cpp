@@ -43,6 +43,7 @@ std::vector<NVGcolor> cableColors = {
 	nvgRGB(0xc9, 0x18, 0x47), // red
 	nvgRGB(0x09, 0x86, 0xad), // blue
 };
+std::map<std::string, std::vector<std::string>> moduleWhitelist = {};
 
 
 json_t* toJson() {
@@ -92,6 +93,16 @@ json_t* toJson() {
 		json_array_append_new(cableColorsJ, json_string(colorStr.c_str()));
 	}
 	json_object_set_new(rootJ, "cableColors", cableColorsJ);
+
+	json_t* moduleWhitelistJ = json_object();
+	for (const auto& pair : moduleWhitelist) {
+		json_t* moduleSlugsJ = json_array();
+		for (const std::string& moduleSlug : pair.second) {
+			json_array_append_new(moduleSlugsJ, json_string(moduleSlug.c_str()));
+		}
+		json_object_set_new(moduleWhitelistJ, pair.first.c_str(), moduleSlugsJ);
+	}
+	json_object_set_new(rootJ, "moduleWhitelist", moduleWhitelistJ);
 
 	return rootJ;
 }
@@ -171,14 +182,30 @@ void fromJson(json_t* rootJ) {
 	if (patchPathJ)
 		patchPath = json_string_value(patchPathJ);
 
+	cableColors.clear();
 	json_t* cableColorsJ = json_object_get(rootJ, "cableColors");
 	if (cableColorsJ) {
-		cableColors.clear();
 		size_t i;
 		json_t* cableColorJ;
 		json_array_foreach(cableColorsJ, i, cableColorJ) {
 			std::string colorStr = json_string_value(cableColorJ);
 			cableColors.push_back(color::fromHexString(colorStr));
+		}
+	}
+
+	moduleWhitelist.clear();
+	json_t* moduleWhitelistJ = json_object_get(rootJ, "moduleWhitelist");
+	if (moduleWhitelistJ) {
+		const char* pluginSlug;
+		json_t* moduleSlugsJ;
+		json_object_foreach(moduleWhitelistJ, pluginSlug, moduleSlugsJ) {
+			auto& moduleSlugs = moduleWhitelist[pluginSlug];
+			size_t i;
+			json_t* moduleSlugJ;
+			json_array_foreach(moduleSlugsJ, i, moduleSlugJ) {
+				std::string moduleSlug = json_string_value(moduleSlugJ);
+				moduleSlugs.push_back(moduleSlug);
+			}
 		}
 	}
 }

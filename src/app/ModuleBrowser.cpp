@@ -428,16 +428,31 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelContainer->spacing = math::Vec(10, 10);
 		modelMargin->addChild(modelContainer);
 
-		// Add ModelBoxes for each Model
-		for (plugin::Plugin* plugin : plugin::plugins) {
-			for (plugin::Model* model : plugin->models) {
-				ModelBox* moduleBox = new ModelBox;
-				moduleBox->setModel(model);
-				modelContainer->addChild(moduleBox);
-			}
-		}
+		resetModelContainer();
 
 		clear();
+	}
+
+	void resetModelContainer() {
+		modelContainer->clearChildren();
+		// Iterate plugins
+		for (plugin::Plugin* plugin : plugin::plugins) {
+			// Get module slugs from module whitelist
+			const auto& pluginIt = settings::moduleWhitelist.find(plugin->slug);
+			// Iterate models in plugin
+			for (plugin::Model* model : plugin->models) {
+				// Don't show module if plugin whitelist exists but the module is not in it.
+				if (pluginIt != settings::moduleWhitelist.end()) {
+					auto moduleIt = std::find(pluginIt->second.begin(), pluginIt->second.end(), model->slug);
+					if (moduleIt == pluginIt->second.end())
+						continue;
+				}
+				// Create ModelBox
+				ModelBox* modelBox = new ModelBox;
+				modelBox->setModel(model);
+				modelContainer->addChild(modelBox);
+			}
+		}
 	}
 
 	void step() override {

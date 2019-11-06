@@ -38,6 +38,8 @@ extern float autosavePeriod;
 extern bool skipLoadOnLaunch;
 extern std::string patchPath;
 extern std::vector<NVGcolor> cableColors;
+// pluginSlug -> moduleSlugs
+extern std::map<std::string, std::vector<std::string>> moduleWhitelist;
 
 json_t* toJson();
 void fromJson(json_t* rootJ);
