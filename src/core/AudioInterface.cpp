@@ -63,7 +63,7 @@ struct AudioInterface : Module, audio::Port {
 		if (!inputBuffer.full()) {
 			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
 			for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-				inputFrame.samples[i] = inputs[AUDIO_INPUTS + i].getVoltage() / 10.f;
+				inputFrame.samples[i] = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
 			}
 			inputBuffer.push(inputFrame);
 		}
@@ -127,7 +127,8 @@ struct AudioInterface : Module, audio::Port {
 			std::memset(inputAudioBuffer, 0, sizeof(inputAudioBuffer));
 			for (int i = 0; i < frames; i++) {
 				for (int j = 0; j < std::min(numInputs, NUM_AUDIO_OUTPUTS); j++) {
-					inputAudioBuffer[i].samples[j] = input[i * numInputs + j];
+					float v = input[i * numInputs + j];
+					inputAudioBuffer[i].samples[j] = v;
 				}
 			}
 			int inputAudioFrames = frames;
@@ -157,7 +158,9 @@ struct AudioInterface : Module, audio::Port {
 			inputBuffer.startIncr(inputFrames);
 			for (int i = 0; i < outputAudioFrames; i++) {
 				for (int j = 0; j < std::min(numOutputs, NUM_AUDIO_INPUTS); j++) {
-					output[i * numOutputs + j] = outputAudioBuffer[i].samples[j];
+					float v = outputAudioBuffer[i].samples[j];
+					v = clamp(v, -1.f, 1.f);
+					output[i * numOutputs + j] = v;
 				}
 			}
 		}
