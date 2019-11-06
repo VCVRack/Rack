@@ -95,7 +95,7 @@ struct Module {
 	void config(int numParams, int numInputs, int numOutputs, int numLights = 0);
 
 	template <class TParamQuantity = ParamQuantity>
-	void configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
+	void configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
 		assert(paramId < (int) params.size() && paramId < (int) paramQuantities.size());
 		if (paramQuantities[paramId])
 			delete paramQuantities[paramId];
@@ -109,10 +109,10 @@ struct Module {
 		q->minValue = minValue;
 		q->maxValue = maxValue;
 		q->defaultValue = defaultValue;
-		if (label == "")
-			q->label = string::f("#%d", paramId + 1);
+		if (name == "")
+			q->name = string::f("#%d", paramId + 1);
 		else
-			q->label = label;
+			q->name = name;
 		q->unit = unit;
 		q->displayBase = displayBase;
 		q->displayMultiplier = displayMultiplier;
@@ -120,29 +120,29 @@ struct Module {
 		paramQuantities[paramId] = q;
 	}
 
-	void configInput(int portId, std::string label = "") {
+	void configInput(int portId, std::string name = "") {
 		assert(portId < (int) inputs.size() && portId < (int) inputInfos.size());
 		if (inputInfos[portId])
 			delete inputInfos[portId];
 
 		PortInfo* p = new PortInfo;
-		if (label == "")
-			p->label = string::f("#%d", portId + 1);
+		if (name == "")
+			p->name = string::f("#%d", portId + 1);
 		else
-			p->label = label;
+			p->name = name;
 		inputInfos[portId] = p;
 	}
 
-	void configOutput(int portId, std::string label = "") {
+	void configOutput(int portId, std::string name = "") {
 		assert(portId < (int) outputs.size() && portId < (int) outputInfos.size());
 		if (outputInfos[portId])
 			delete outputInfos[portId];
 
 		PortInfo* p = new PortInfo;
-		if (label == "")
-			p->label = string::f("#%d", portId + 1);
+		if (name == "")
+			p->name = string::f("#%d", portId + 1);
 		else
-			p->label = label;
+			p->name = name;
 		outputInfos[portId] = p;
 	}
 

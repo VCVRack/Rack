@@ -11,7 +11,7 @@ struct PortInfo {
 	/** The name of the port, using sentence capitalization.
 	e.g. "Sine", "Pitch input", "Mode CV"
 	*/
-	std::string label;
+	std::string name;
 	/** An optional one-sentence description of the parameter. */
 	std::string description;
 };

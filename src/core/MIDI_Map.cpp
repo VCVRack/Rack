@@ -400,7 +400,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		std::string s;
 		s += mw->model->name;
 		s += " ";
-		s += paramQuantity->label;
+		s += paramQuantity->name;
 		return s;
 	}
 };

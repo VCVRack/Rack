@@ -25,7 +25,7 @@ struct ParamQuantity : Quantity {
 	/** The name of the parameter, using sentence capitalization.
 	e.g. "Frequency", "Pulse width", "Alternative mode"
 	*/
-	std::string label;
+	std::string name;
 	/** The numerical unit of measurement appended to the value.
 	Unit words and abbreviations should have a space to separate the numerical value from the number (e.g. " semitones", " V", " ms").
 	Unit symbols should have no space (e.g. "%", "º").
