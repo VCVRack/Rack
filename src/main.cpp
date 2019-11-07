@@ -75,9 +75,8 @@ int main(int argc, char* argv[]) {
 	// Parse command line arguments
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "dht:s:u:")) != -1) {
+	while ((c = getopt(argc, argv, "dht:s:u:p:")) != -1) {
 		switch (c) {
-			// Note: Mac "app translocation" passes a nonsense -psn flag, so we can't use -p for anything.
 			case 'd': {
 				settings::devMode = true;
 			} break;
@@ -95,6 +94,8 @@ int main(int argc, char* argv[]) {
 			case 'u': {
 				asset::userDir = optarg;
 			} break;
+			// Mac "app translocation" passes a nonsense -psn_... flag, so -p is reserved.
+			case 'p': break;
 			default: break;
 		}
 	}
