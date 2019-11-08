@@ -399,6 +399,14 @@ struct {identifier} : Module {{"""
 		source += f"""
 		configParam({c['name']}_PARAM, 0.f, 1.f, 0.f, "");"""
 
+	for c in components['inputs']:
+		source += f"""
+		configInput({c['name']}_INPUT, "");"""
+
+	for c in components['outputs']:
+		source += f"""
+		configOutput({c['name']}_OUTPUT, "");"""
+
 	source += """
 	}
 
