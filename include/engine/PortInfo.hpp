@@ -13,9 +13,13 @@ struct PortInfo {
 	int portId;
 
 	/** The name of the port, using sentence capitalization.
-	e.g. "Sine", "Pitch input", "Mode CV"
+	e.g. "Sine", "Pitch input", "Mode CV".
+
+	Don't use the words "input" or "output" in the name.
+	Since this text is often prepended or appended to the name, the name will appear as e.g. "Sine input input", "Input: Sine input".
 	*/
 	std::string name;
+
 	/** An optional one-sentence description of the parameter. */
 	std::string description;
 

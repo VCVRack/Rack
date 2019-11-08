@@ -23,6 +23,12 @@ struct PortTooltip : ui::Tooltip {
 			text = (portWidget->type == engine::Port::INPUT) ? "Input" : "Output";
 			text += ": ";
 			text += portInfo->getName();
+			// Description
+			std::string description = portInfo->getDescription();
+			if (description != "") {
+				text += "\n";
+				text += description;
+			}
 			// Voltage, number of channels
 			int channels = port->getChannels();
 			for (int i = 0; i < channels; i++) {
@@ -31,12 +37,6 @@ struct PortTooltip : ui::Tooltip {
 				if (channels > 1)
 					text += string::f("%d: ", i + 1);
 				text += string::f("% .3fV", port->getVoltage(i));
-			}
-			// Description
-			std::string description = portInfo->getDescription();
-			if (description != "") {
-				text += "\n";
-				text += description;
 			}
 			// Connected to
 			std::list<CableWidget*> cables = APP->scene->rack->getCablesOnPort(portWidget);
