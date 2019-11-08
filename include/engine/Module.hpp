@@ -24,7 +24,8 @@ namespace engine {
 
 /** DSP processor instance for your module. */
 struct Module {
-	plugin::Model* model = NULL;	/** Unique ID for referring to the module in the engine.
+	plugin::Model* model = NULL;
+	/** Unique ID for referring to the module in the engine.
 	Assigned when added to the engine.
 	*/
 	int id = -1;
@@ -120,12 +121,16 @@ struct Module {
 		paramQuantities[paramId] = q;
 	}
 
+	template <class TPortInfo = PortInfo>
 	void configInput(int portId, std::string name = "") {
 		assert(portId < (int) inputs.size() && portId < (int) inputInfos.size());
 		if (inputInfos[portId])
 			delete inputInfos[portId];
 
-		PortInfo* p = new PortInfo;
+		PortInfo* p = new TPortInfo;
+		p->module = this;
+		p->type = Port::INPUT;
+		p->portId = portId;
 		if (name == "")
 			p->name = string::f("#%d", portId + 1);
 		else
@@ -133,12 +138,16 @@ struct Module {
 		inputInfos[portId] = p;
 	}
 
+	template <class TPortInfo = PortInfo>
 	void configOutput(int portId, std::string name = "") {
 		assert(portId < (int) outputs.size() && portId < (int) outputInfos.size());
 		if (outputInfos[portId])
 			delete outputInfos[portId];
 
-		PortInfo* p = new PortInfo;
+		PortInfo* p = new TPortInfo;
+		p->module = this;
+		p->type = Port::OUTPUT;
+		p->portId = portId;
 		if (name == "")
 			p->name = string::f("#%d", portId + 1);
 		else

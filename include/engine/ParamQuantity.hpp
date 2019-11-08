@@ -13,7 +13,7 @@ struct Module;
 /** A Quantity that wraps an engine::Param. */
 struct ParamQuantity : Quantity {
 	Module* module = NULL;
-	int paramId = 0;
+	int paramId;
 
 	/** The minimum allowed value. */
 	float minValue = 0.f;

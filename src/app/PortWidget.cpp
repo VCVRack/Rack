@@ -22,7 +22,7 @@ struct PortTooltip : ui::Tooltip {
 			// Label
 			text = (portWidget->type == engine::Port::INPUT) ? "Input" : "Output";
 			text += ": ";
-			text += portInfo->name;
+			text += portInfo->getName();
 			// Voltage, number of channels
 			int channels = port->getChannels();
 			for (int i = 0; i < channels; i++) {
@@ -33,7 +33,7 @@ struct PortTooltip : ui::Tooltip {
 				text += string::f("% .3fV", port->getVoltage(i));
 			}
 			// Description
-			std::string description = portInfo->description;
+			std::string description = portInfo->getDescription();
 			if (description != "") {
 				text += "\n";
 				text += description;
@@ -48,7 +48,7 @@ struct PortTooltip : ui::Tooltip {
 				text += "Connected to ";
 				text += otherPw->module->model->getFullName();
 				text += ": ";
-				text += otherPw->getPortInfo()->name;
+				text += otherPw->getPortInfo()->getName();
 			}
 		}
 		Tooltip::step();
