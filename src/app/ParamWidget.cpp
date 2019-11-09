@@ -69,9 +69,10 @@ struct ParamTooltip : ui::Tooltip {
 			// Quantity string
 			text = pq->getString();
 			// Description
-			if (pq->description != "") {
+			std::string description = pq->getDescription();
+			if (description != "") {
 				text += "\n";
-				text += pq->description;
+				text += description;
 			}
 		}
 		Tooltip::step();

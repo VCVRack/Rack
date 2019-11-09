@@ -110,10 +110,7 @@ struct Module {
 		q->minValue = minValue;
 		q->maxValue = maxValue;
 		q->defaultValue = defaultValue;
-		if (name == "")
-			q->name = string::f("#%d", paramId + 1);
-		else
-			q->name = name;
+		q->name = name;
 		q->unit = unit;
 		q->displayBase = displayBase;
 		q->displayMultiplier = displayMultiplier;
@@ -131,10 +128,7 @@ struct Module {
 		p->module = this;
 		p->type = Port::INPUT;
 		p->portId = portId;
-		if (name == "")
-			p->name = string::f("#%d", portId + 1);
-		else
-			p->name = name;
+		p->name = name;
 		inputInfos[portId] = p;
 	}
 
@@ -148,10 +142,7 @@ struct Module {
 		p->module = this;
 		p->type = Port::OUTPUT;
 		p->portId = portId;
-		if (name == "")
-			p->name = string::f("#%d", portId + 1);
-		else
-			p->name = name;
+		p->name = name;
 		outputInfos[portId] = p;
 	}
 

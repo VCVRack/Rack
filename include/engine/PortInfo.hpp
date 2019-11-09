@@ -7,6 +7,9 @@ namespace rack {
 namespace engine {
 
 
+struct Module;
+
+
 struct PortInfo {
 	Module* module = NULL;
 	Port::Type type;
@@ -24,12 +27,8 @@ struct PortInfo {
 	std::string description;
 
 	virtual ~PortInfo() {}
-	virtual std::string getName() {
-		return name;
-	}
-	virtual std::string getDescription() {
-		return description;
-	}
+	virtual std::string getName();
+	virtual std::string getDescription();
 };
 
 

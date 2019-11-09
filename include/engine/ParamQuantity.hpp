@@ -66,6 +66,7 @@ struct ParamQuantity : Quantity {
 	int getDisplayPrecision() override;
 	std::string getLabel() override;
 	std::string getUnit() override;
+	virtual std::string getDescription();
 };
 
 

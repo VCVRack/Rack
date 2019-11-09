@@ -110,11 +110,17 @@ void ParamQuantity::setDisplayValueString(std::string s) {
 }
 
 std::string ParamQuantity::getLabel() {
+	if (name == "")
+		return string::f("#%d", paramId + 1);
 	return name;
 }
 
 std::string ParamQuantity::getUnit() {
 	return unit;
+}
+
+std::string ParamQuantity::getDescription() {
+	return description;
 }
 
 
