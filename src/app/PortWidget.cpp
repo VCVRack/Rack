@@ -276,7 +276,10 @@ void PortWidget::onDragDrop(const event::DragDrop& e) {
 }
 
 void PortWidget::onDragEnter(const event::DragEnter& e) {
-	createTooltip();
+	PortWidget* pw = dynamic_cast<PortWidget*>(e.origin);
+	if (pw) {
+		createTooltip();
+	}
 
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;

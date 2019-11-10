@@ -224,6 +224,10 @@ struct ModelBox : widget::OpaqueWidget {
 
 			// Pretend the moduleWidget was clicked so it can be dragged in the RackWidget
 			e.consume(mw);
+
+			// Set the drag position at the center of the module
+			// TODO This doesn't work because ModuleWidget::onDragStart, which is called afterwards, overwrites this.
+			// mw->dragPos() = mw->box.size.div(2);
 		}
 	}
 

@@ -241,13 +241,27 @@ struct ModuleDeleteItem : ui::MenuItem {
 };
 
 
+struct ModuleWidget::Internal {
+	/** The position the user clicked on the module to start dragging in the RackWidget.
+	*/
+	math::Vec dragPos;
+	/** The position in the RackWidget when dragging began.
+	Used for history::ModuleMove.
+	Set by RackWidget::updateModuleOldPositions() when *any* module begins dragging, since force-dragging can move other modules around.
+	*/
+	math::Vec oldPos;
+};
+
+
 ModuleWidget::ModuleWidget() {
+	internal = new Internal;
 	box.size = math::Vec(0, RACK_GRID_HEIGHT);
 }
 
 ModuleWidget::~ModuleWidget() {
 	clearChildren();
 	setModule(NULL);
+	delete internal;
 }
 
 void ModuleWidget::draw(const DrawArgs& args) {
@@ -384,36 +398,30 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 }
 
 void ModuleWidget::onDragStart(const event::DragStart& e) {
-	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
-		return;
-
-	oldPos = box.pos;
-	dragPos = APP->scene->rack->mousePos.minus(box.pos);
-	APP->scene->rack->updateModuleDragPositions();
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		internal->dragPos = APP->scene->rack->mousePos.minus(box.pos);
+		APP->scene->rack->updateModuleOldPositions();
+	}
 }
 
 void ModuleWidget::onDragEnd(const event::DragEnd& e) {
-	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
-		return;
-
-	history::ComplexAction* h = APP->scene->rack->getModuleDragAction();
-	if (!h) {
-		delete h;
-		return;
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		history::ComplexAction* h = APP->scene->rack->getModuleDragAction();
+		if (!h)
+			return;
+		APP->history->push(h);
 	}
-	APP->history->push(h);
 }
 
 void ModuleWidget::onDragMove(const event::DragMove& e) {
-	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
-		return;
-
-	if (!settings::lockModules) {
-		math::Vec pos = APP->scene->rack->mousePos.minus(dragPos);
-		if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
-			APP->scene->rack->setModulePosForce(this, pos);
-		else
-			APP->scene->rack->setModulePosNearest(this, pos);
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (!settings::lockModules) {
+			math::Vec pos = APP->scene->rack->mousePos.minus(internal->dragPos);
+			if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
+				APP->scene->rack->setModulePosForce(this, pos);
+			else
+				APP->scene->rack->setModulePosNearest(this, pos);
+		}
 	}
 }
 
@@ -833,6 +841,15 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(deleteItem);
 
 	appendContextMenu(menu);
+}
+
+
+math::Vec& ModuleWidget::dragPos() {
+	return internal->dragPos;
+}
+
+math::Vec& ModuleWidget::oldPos() {
+	return internal->oldPos;
 }
 
 

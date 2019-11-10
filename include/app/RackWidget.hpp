@@ -23,7 +23,6 @@ struct RackWidget : widget::OpaqueWidget {
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
 	ParamWidget* touchedParam = NULL;
-	std::map<int, math::Vec> moduleDragPositions;
 	int nextCableColorId = 0;
 
 	RackWidget();
@@ -59,7 +58,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void setModulePosForce(ModuleWidget* mw, math::Vec pos);
 	ModuleWidget* getModule(int moduleId);
 	bool isEmpty();
-	void updateModuleDragPositions();
+	void updateModuleOldPositions();
 	history::ComplexAction* getModuleDragAction();
 
 	// Cable methods

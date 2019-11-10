@@ -14,6 +14,9 @@ namespace app {
 
 /** Manages an engine::Module in the rack. */
 struct ModuleWidget : widget::OpaqueWidget {
+	struct Internal;
+	Internal* internal;
+
 	plugin::Model* model = NULL;
 	/** Owned. */
 	engine::Module* module = NULL;
@@ -24,9 +27,6 @@ struct ModuleWidget : widget::OpaqueWidget {
 	std::vector<ParamWidget*> params;
 	std::vector<PortWidget*> inputs;
 	std::vector<PortWidget*> outputs;
-	/** For RackWidget dragging */
-	math::Vec dragPos;
-	math::Vec oldPos;
 
 	ModuleWidget();
 	DEPRECATED ModuleWidget(engine::Module* module) : ModuleWidget() {
@@ -90,6 +90,9 @@ struct ModuleWidget : widget::OpaqueWidget {
 	It is recommended to add a blank ui::MenuEntry first for spacing.
 	*/
 	virtual void appendContextMenu(ui::Menu* menu) {}
+
+	math::Vec& dragPos();
+	math::Vec& oldPos();
 };
 
 
