@@ -2,6 +2,21 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 2.0.0 (in development)
+- Add port tooltips with name, voltage, and list of connected ports.
+- Add math expression parsing to parameter tooltips.
+- Add module whitelist to Module Browser.
+- Restructure engine to no longer use an "engine thread".
+	- Improve engine performance and latency by no longer requiring thread synchronization between the engine thread and audio thread. The engine now runs directly on the audio thread.
+	- Add support for multiple simultaneous audio devices.
+	- Add "Primary module" context menu item to VCV Audio modules to select which audio device clocks the engine.
+	- Allow other modules such as VCV Recorder to be the primary module, to render audio faster than real-time.
+	- Remove "Real-time priority" menu item, since the thread priority is now managed elsewhere (RtAudio, etc).
+- API
+	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.
+	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.
+	- Add `.modules[].manualUrl` to plugin manifest schema.
+
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
 - Fix normal random number generator possibly returning -infinity.
