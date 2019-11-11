@@ -23,7 +23,6 @@ namespace plugin {
 
 struct Model {
 	Plugin* plugin = NULL;
-	std::vector<std::string> presetPaths;
 
 	/** Must be unique. Used for saving patches. Never change this after releasing your module.
 	The model slug must be unique within your plugin, but it doesn't need to be unique among different plugins.

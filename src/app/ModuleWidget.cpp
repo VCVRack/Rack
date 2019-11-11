@@ -9,6 +9,7 @@
 #include <app.hpp>
 #include <settings.hpp>
 #include <history.hpp>
+#include <string.hpp>
 
 #include <osdialog.h>
 #include <thread>
@@ -198,19 +199,36 @@ struct ModulePresetItem : ui::MenuItem {
 		saveItem->moduleWidget = moduleWidget;
 		menu->addChild(saveItem);
 
-		if (!moduleWidget->model->presetPaths.empty()) {
-			menu->addChild(new MenuEntry);
-			menu->addChild(createMenuLabel("Factory presets"));
+		// Create ModulePresetPathItems for each patch in a directory.
+		auto createPresetItems = [&](std::string presetDir) {
+			bool hasPresets = false;
+			// Note: This is not cached, so opening this menu each time might have a bit of latency.
+			for (const std::string& presetPath : system::getEntries(presetDir)) {
+				std::string presetFilename = string::filename(presetPath);
+				if (string::filenameExtension(presetFilename) != "vcvm")
+					continue;
+				hasPresets = true;
 
-			for (const std::string& presetPath : moduleWidget->model->presetPaths) {
 				ModulePresetPathItem* presetItem = new ModulePresetPathItem;
-				std::string presetName = string::filenameBase(string::filename(presetPath));
-				presetItem->text = presetName;
+				presetItem->text = string::filenameBase(presetFilename);
 				presetItem->presetPath = presetPath;
 				presetItem->moduleWidget = moduleWidget;
 				menu->addChild(presetItem);
 			}
-		}
+			if (!hasPresets) {
+				menu->addChild(createMenuLabel("(none)"));
+			}
+		};
+
+		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("User presets"));
+		createPresetItems(asset::user("presets/" + moduleWidget->model->plugin->slug + "/" + moduleWidget->model->slug));
+
+		// Scan `<plugin dir>/presets/<module slug>` for presets.
+		menu->addChild(new MenuEntry);
+		menu->addChild(createMenuLabel("Factory presets"));
+		createPresetItems(asset::plugin(moduleWidget->model->plugin, "presets/" + moduleWidget->model->slug));
 
 		return menu;
 	}
@@ -632,15 +650,19 @@ void ModuleWidget::loadDialog() {
 }
 
 void ModuleWidget::saveDialog() {
-	std::string dir = asset::user("presets");
-	system::createDirectory(dir);
+	std::string presetDir = asset::user("presets");
+	system::createDirectory(presetDir);
+	presetDir += "/" + model->plugin->slug;
+	system::createDirectory(presetDir);
+	presetDir += "/" + model->slug;
+	system::createDirectory(presetDir);
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char* path = osdialog_file(OSDIALOG_SAVE, dir.c_str(), "Untitled.vcvm", filters);
+	char* path = osdialog_file(OSDIALOG_SAVE, presetDir.c_str(), "Untitled.vcvm", filters);
 	if (!path) {
 		// No path selected
 		return;
