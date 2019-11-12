@@ -26,6 +26,10 @@ void copyFile(const std::string& srcPath, const std::string& destPath);
 The parent directory must exist.
 */
 void createDirectory(const std::string& path);
+/** Deletes a directory.
+The directory must be empty. Fails silently.
+*/
+void removeDirectory(const std::string& path);
 /** Returns the number of logical simultaneous multithreading (SMT) (e.g. Intel Hyperthreaded) threads on the CPU. */
 int getLogicalCoreCount();
 /** Sets a name of the current thread for debuggers and OS-specific process viewers. */

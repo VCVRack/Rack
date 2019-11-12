@@ -137,6 +137,11 @@ void createDirectory(const std::string& path) {
 }
 
 
+void removeDirectory(const std::string& path) {
+	rmdir(path.c_str());
+}
+
+
 int getLogicalCoreCount() {
 	return std::thread::hardware_concurrency();
 }

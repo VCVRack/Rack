@@ -652,17 +652,22 @@ void ModuleWidget::loadDialog() {
 void ModuleWidget::saveDialog() {
 	std::string presetDir = asset::user("presets");
 	system::createDirectory(presetDir);
-	presetDir += "/" + model->plugin->slug;
-	system::createDirectory(presetDir);
-	presetDir += "/" + model->slug;
-	system::createDirectory(presetDir);
+	std::string pluginPresetDir = presetDir + "/" + model->plugin->slug;
+	system::createDirectory(pluginPresetDir);
+	std::string modulePresetDir = pluginPresetDir + "/" + model->slug;
+	system::createDirectory(modulePresetDir);
+	// Delete directory if empty
+	DEFER({
+		system::removeDirectory(modulePresetDir);
+		system::removeDirectory(pluginPresetDir);
+	});
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char* path = osdialog_file(OSDIALOG_SAVE, presetDir.c_str(), "Untitled.vcvm", filters);
+	char* path = osdialog_file(OSDIALOG_SAVE, modulePresetDir.c_str(), "Untitled.vcvm", filters);
 	if (!path) {
 		// No path selected
 		return;
