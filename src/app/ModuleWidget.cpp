@@ -636,15 +636,17 @@ void ModuleWidget::save(std::string filename) {
 }
 
 void ModuleWidget::loadDialog() {
-	std::string dir = asset::user("presets");
-	system::createDirectory(dir);
+	std::string presetDir = asset::user("presets");
+	std::string pluginPresetDir = presetDir + "/" + model->plugin->slug;
+	std::string modulePresetDir = pluginPresetDir + "/" + model->slug;
+	system::createDirectory(modulePresetDir);
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char* path = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
+	char* path = osdialog_file(OSDIALOG_OPEN, modulePresetDir.c_str(), NULL, filters);
 	if (!path) {
 		// No path selected
 		return;
