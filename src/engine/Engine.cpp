@@ -1012,11 +1012,14 @@ Module* moduleFromJson(json_t* moduleJ) {
 	json_t* pluginSlugJ = json_object_get(moduleJ, "plugin");
 	if (!pluginSlugJ)
 		throw Exception("\"plugin\" property not found in module JSON");
+	std::string pluginSlug = json_string_value(pluginSlugJ);
+	pluginSlug = plugin::normalizeSlug(pluginSlug);
+
 	json_t* modelSlugJ = json_object_get(moduleJ, "model");
 	if (!modelSlugJ)
 		throw Exception("\"model\" property not found in module JSON");
-	std::string pluginSlug = json_string_value(pluginSlugJ);
 	std::string modelSlug = json_string_value(modelSlugJ);
+	modelSlug = plugin::normalizeSlug(modelSlug);
 
 	// Get Model
 	plugin::Model* model = plugin::getModel(pluginSlug, modelSlug);
