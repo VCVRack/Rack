@@ -79,5 +79,11 @@ int findId(const std::string& tag) {
 }
 
 
+std::string getTag(int tagId) {
+	assert(0 <= tagId && tagId < (int) tagAliases.size());
+	return tagAliases[tagId][0];
+}
+
+
 } // namespace tag
 } // namespace rack

@@ -23,6 +23,8 @@ Returns -1 if not found.
 */
 int findId(const std::string& tag);
 
+std::string getTag(int tagId);
+
 
 } // namespace tag
 } // namespace rack

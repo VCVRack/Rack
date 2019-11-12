@@ -56,7 +56,7 @@ struct ModuleInfoItem : ui::MenuItem {
 
 		for (int tagId : model->tags) {
 			ui::MenuLabel* tagLabel = new ui::MenuLabel;
-			tagLabel->text = tag::tagAliases[tagId][0];
+			tagLabel->text = tag::getTag(tagId);
 			menu->addChild(tagLabel);
 		}
 
