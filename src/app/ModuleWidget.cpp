@@ -10,6 +10,7 @@
 #include <settings.hpp>
 #include <history.hpp>
 #include <string.hpp>
+#include <tag.hpp>
 
 #include <osdialog.h>
 #include <thread>
@@ -52,6 +53,12 @@ struct ModuleInfoItem : ui::MenuItem {
 		ui::MenuLabel* versionLabel = new ui::MenuLabel;
 		versionLabel->text = "v" + model->plugin->version;
 		menu->addChild(versionLabel);
+
+		for (int tagId : model->tags) {
+			ui::MenuLabel* tagLabel = new ui::MenuLabel;
+			tagLabel->text = tag::tagAliases[tagId][0];
+			menu->addChild(tagLabel);
+		}
 
 		if (!model->plugin->author.empty()) {
 			if (!model->plugin->authorUrl.empty()) {
