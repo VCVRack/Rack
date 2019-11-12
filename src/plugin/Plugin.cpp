@@ -23,7 +23,6 @@ void Plugin::addModel(Model* model) {
 }
 
 Model* Plugin::getModel(std::string slug) {
-	slug = normalizeSlug(slug);
 	for (Model* model : models) {
 		if (model->slug == slug) {
 			return model;

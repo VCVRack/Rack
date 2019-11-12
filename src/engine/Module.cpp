@@ -1,4 +1,5 @@
 #include <engine/Module.hpp>
+#include <plugin.hpp>
 
 
 namespace rack {
@@ -89,6 +90,7 @@ void Module::fromJson(json_t* rootJ) {
 	std::string pluginSlug;
 	if (pluginJ) {
 		pluginSlug = json_string_value(pluginJ);
+		pluginSlug = plugin::normalizeSlug(pluginSlug);
 		if (pluginSlug != model->plugin->slug) {
 			WARN("Plugin %s does not match Module's plugin %s.", pluginSlug.c_str(), model->plugin->slug.c_str());
 			return;
@@ -99,6 +101,7 @@ void Module::fromJson(json_t* rootJ) {
 	std::string modelSlug;
 	if (modelJ) {
 		modelSlug = json_string_value(modelJ);
+		modelSlug = plugin::normalizeSlug(modelSlug);
 		if (modelSlug != model->slug) {
 			WARN("Model %s does not match Module's model %s.", modelSlug.c_str(), model->slug.c_str());
 			return;

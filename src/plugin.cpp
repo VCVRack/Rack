@@ -446,9 +446,8 @@ bool isSyncing() {
 }
 
 Plugin* getPlugin(const std::string& pluginSlug) {
-	std::string slug = normalizeSlug(pluginSlug);
 	for (Plugin* plugin : plugins) {
-		if (plugin->slug == slug) {
+		if (plugin->slug == pluginSlug) {
 			return plugin;
 		}
 	}

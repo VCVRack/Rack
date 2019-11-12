@@ -24,11 +24,14 @@ static ModuleWidget* moduleFromJson(json_t* moduleJ) {
 	json_t* pluginSlugJ = json_object_get(moduleJ, "plugin");
 	if (!pluginSlugJ)
 		return NULL;
+	std::string pluginSlug = json_string_value(pluginSlugJ);
+	pluginSlug = plugin::normalizeSlug(pluginSlug);
+
 	json_t* modelSlugJ = json_object_get(moduleJ, "model");
 	if (!modelSlugJ)
 		return NULL;
-	std::string pluginSlug = json_string_value(pluginSlugJ);
 	std::string modelSlug = json_string_value(modelSlugJ);
+	modelSlug = plugin::normalizeSlug(modelSlug);
 
 	// Get Model
 	plugin::Model* model = plugin::getModel(pluginSlug, modelSlug);
