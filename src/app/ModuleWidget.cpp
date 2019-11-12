@@ -40,65 +40,72 @@ struct ModuleFolderItem : ui::MenuItem {
 };
 
 
-struct ModulePluginItem : ui::MenuItem {
-	plugin::Plugin* plugin;
+struct ModuleInfoItem : ui::MenuItem {
+	plugin::Model* model;
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
 		ui::MenuLabel* pluginLabel = new ui::MenuLabel;
-		pluginLabel->text = plugin->name;
+		pluginLabel->text = model->plugin->name;
 		menu->addChild(pluginLabel);
 
 		ui::MenuLabel* versionLabel = new ui::MenuLabel;
-		versionLabel->text = "v" + plugin->version;
+		versionLabel->text = "v" + model->plugin->version;
 		menu->addChild(versionLabel);
 
-		if (!plugin->author.empty()) {
-			if (!plugin->authorUrl.empty()) {
+		if (!model->plugin->author.empty()) {
+			if (!model->plugin->authorUrl.empty()) {
 				ModuleUrlItem* authorItem = new ModuleUrlItem;
-				authorItem->text = plugin->author;
-				authorItem->url = plugin->authorUrl;
+				authorItem->text = model->plugin->author;
+				authorItem->url = model->plugin->authorUrl;
 				menu->addChild(authorItem);
 			}
 			else {
 				ui::MenuLabel* authorLabel = new ui::MenuLabel;
-				authorLabel->text = plugin->author;
+				authorLabel->text = model->plugin->author;
 				menu->addChild(authorLabel);
 			}
 		}
 
-		if (!plugin->pluginUrl.empty()) {
-			ModuleUrlItem* websiteItem = new ModuleUrlItem;
-			websiteItem->text = "Website";
-			websiteItem->url = plugin->pluginUrl;
-			menu->addChild(websiteItem);
-		}
-
-		if (!plugin->manualUrl.empty()) {
+		if (!model->manualUrl.empty()) {
 			ModuleUrlItem* manualItem = new ModuleUrlItem;
-			manualItem->text = "Manual";
-			manualItem->url = plugin->manualUrl;
+			manualItem->text = "Module manual";
+			manualItem->url = model->manualUrl;
 			menu->addChild(manualItem);
 		}
 
-		if (!plugin->sourceUrl.empty()) {
+		if (!model->plugin->manualUrl.empty()) {
+			ModuleUrlItem* manualItem = new ModuleUrlItem;
+			manualItem->text = "Plugin manual";
+			manualItem->url = model->plugin->manualUrl;
+			menu->addChild(manualItem);
+		}
+
+		if (!model->plugin->pluginUrl.empty()) {
+			ModuleUrlItem* websiteItem = new ModuleUrlItem;
+			websiteItem->text = "Plugin website";
+			websiteItem->url = model->plugin->pluginUrl;
+			menu->addChild(websiteItem);
+		}
+
+		if (!model->plugin->sourceUrl.empty()) {
 			ModuleUrlItem* sourceItem = new ModuleUrlItem;
 			sourceItem->text = "Source code";
-			sourceItem->url = plugin->sourceUrl;
+			sourceItem->url = model->plugin->sourceUrl;
 			menu->addChild(sourceItem);
 		}
 
-		if (!plugin->donateUrl.empty()) {
+		if (!model->plugin->donateUrl.empty()) {
 			ModuleUrlItem* donateItem = new ModuleUrlItem;
 			donateItem->text = "Donate";
-			donateItem->url = plugin->donateUrl;
+			donateItem->url = model->plugin->donateUrl;
 			menu->addChild(donateItem);
 		}
 
-		if (!plugin->path.empty()) {
+		if (!model->plugin->path.empty()) {
 			ModuleFolderItem* pathItem = new ModuleFolderItem;
 			pathItem->text = "Open plugin folder";
-			pathItem->path = plugin->path;
+			pathItem->path = model->plugin->path;
 			menu->addChild(pathItem);
 		}
 
@@ -817,11 +824,11 @@ void ModuleWidget::createContextMenu() {
 	modelLabel->text = model->plugin->brand + " " + model->name;
 	menu->addChild(modelLabel);
 
-	ModulePluginItem* pluginItem = new ModulePluginItem;
-	pluginItem->text = "Plugin";
-	pluginItem->rightText = RIGHT_ARROW;
-	pluginItem->plugin = model->plugin;
-	menu->addChild(pluginItem);
+	ModuleInfoItem* infoItem = new ModuleInfoItem;
+	infoItem->text = "Info";
+	infoItem->rightText = RIGHT_ARROW;
+	infoItem->model = model;
+	menu->addChild(infoItem);
 
 	ModulePresetItem* presetsItem = new ModulePresetItem;
 	presetsItem->text = "Preset";
