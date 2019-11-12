@@ -60,8 +60,8 @@ struct ModuleInfoItem : ui::MenuItem {
 			menu->addChild(tagLabel);
 		}
 
-		if (!model->plugin->author.empty()) {
-			if (!model->plugin->authorUrl.empty()) {
+		if (model->plugin->author != "") {
+			if (model->plugin->authorUrl != "") {
 				ModuleUrlItem* authorItem = new ModuleUrlItem;
 				authorItem->text = model->plugin->author;
 				authorItem->url = model->plugin->authorUrl;
@@ -74,42 +74,42 @@ struct ModuleInfoItem : ui::MenuItem {
 			}
 		}
 
-		if (!model->manualUrl.empty()) {
+		if (model->manualUrl != "") {
 			ModuleUrlItem* manualItem = new ModuleUrlItem;
 			manualItem->text = "Module manual";
 			manualItem->url = model->manualUrl;
 			menu->addChild(manualItem);
 		}
 
-		if (!model->plugin->manualUrl.empty()) {
+		if (model->plugin->manualUrl != "") {
 			ModuleUrlItem* manualItem = new ModuleUrlItem;
 			manualItem->text = "Plugin manual";
 			manualItem->url = model->plugin->manualUrl;
 			menu->addChild(manualItem);
 		}
 
-		if (!model->plugin->pluginUrl.empty()) {
+		if (model->plugin->pluginUrl != "") {
 			ModuleUrlItem* websiteItem = new ModuleUrlItem;
 			websiteItem->text = "Plugin website";
 			websiteItem->url = model->plugin->pluginUrl;
 			menu->addChild(websiteItem);
 		}
 
-		if (!model->plugin->sourceUrl.empty()) {
+		if (model->plugin->sourceUrl != "") {
 			ModuleUrlItem* sourceItem = new ModuleUrlItem;
 			sourceItem->text = "Source code";
 			sourceItem->url = model->plugin->sourceUrl;
 			menu->addChild(sourceItem);
 		}
 
-		if (!model->plugin->donateUrl.empty()) {
+		if (model->plugin->donateUrl != "") {
 			ModuleUrlItem* donateItem = new ModuleUrlItem;
 			donateItem->text = "Donate";
 			donateItem->url = model->plugin->donateUrl;
 			menu->addChild(donateItem);
 		}
 
-		if (!model->plugin->path.empty()) {
+		if (model->plugin->path != "") {
 			ModuleFolderItem* pathItem = new ModuleFolderItem;
 			pathItem->text = "Open plugin folder";
 			pathItem->path = model->plugin->path;
@@ -230,7 +230,7 @@ struct ModulePresetItem : ui::MenuItem {
 				menu->addChild(presetItem);
 			}
 			if (!hasPresets) {
-				menu->addChild(createMenuLabel("(none)"));
+				menu->addChild(createMenuLabel("(None)"));
 			}
 		};
 
@@ -694,7 +694,7 @@ void ModuleWidget::saveDialog() {
 
 	std::string pathStr = path;
 	std::string extension = string::filenameExtension(string::filename(pathStr));
-	if (extension.empty()) {
+	if (extension == "") {
 		pathStr += ".vcvm";
 	}
 
