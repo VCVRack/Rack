@@ -175,7 +175,8 @@ static void scrollCallback(GLFWwindow* win, double x, double y) {
 
 static void charCallback(GLFWwindow* win, unsigned int codepoint) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	APP->event->handleText(window->mousePos, codepoint);
+	if (APP->event->handleText(window->mousePos, codepoint))
+		return;
 }
 
 static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
