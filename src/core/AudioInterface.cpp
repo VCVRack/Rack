@@ -75,6 +75,11 @@ struct AudioInterface : Module, audio::Port {
 				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * outputFrame.samples[i]);
 			}
 		}
+		else {
+			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
+				outputs[AUDIO_OUTPUTS + i].setVoltage(0.f);
+			}
+		}
 
 		// Turn on light if at least one port is enabled in the nearby pair
 		for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
@@ -108,21 +113,30 @@ struct AudioInterface : Module, audio::Port {
 		if (!APP->engine->getPrimaryModule()) {
 			APP->engine->setPrimaryModule(this);
 		}
+		bool isPrimary = (APP->engine->getPrimaryModule() == this);
 
 		// Clear output in case the audio driver uses this buffer in another thread before this method returns. (Not sure if any do this in practice.)
 		std::memset(output, 0, sizeof(float) * numOutputs * frames);
 
 		// Initialize sample rate converters
 		int engineSampleRate = (int) APP->engine->getSampleRate();
+		double sampleRateRatio = (double) engineSampleRate / sampleRate;
 		outputSrc.setRates((int) sampleRate, engineSampleRate);
 		outputSrc.setChannels(numInputs);
 		inputSrc.setRates(engineSampleRate, (int) sampleRate);
 		inputSrc.setChannels(numOutputs);
 
-		int engineFrames = 0;
+		// Consider engine buffers "too full" if they contain a bit more than the audio device's number of frames, converted to engine sample rate.
+		int maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 1.5);
+		// If this is a secondary audio module and the engine output buffer is too full, flush it.
+		if (!isPrimary && (int) outputBuffer.size() > maxEngineFrames) {
+			outputBuffer.clear();
+			// DEBUG("%p: flushing engine output", this);
+		}
 
+		int requestedEngineFrames;
 		if (numInputs > 0) {
-			// audio input -> module output
+			// audio input -> engine output
 			dsp::Frame<NUM_AUDIO_OUTPUTS> inputAudioBuffer[frames];
 			std::memset(inputAudioBuffer, 0, sizeof(inputAudioBuffer));
 			for (int i = 0; i < frames; i++) {
@@ -135,22 +149,21 @@ struct AudioInterface : Module, audio::Port {
 			int outputFrames = outputBuffer.capacity();
 			outputSrc.process(inputAudioBuffer, &inputAudioFrames, outputBuffer.endData(), &outputFrames);
 			outputBuffer.endIncr(outputFrames);
-			engineFrames = outputBuffer.size();
+			// Request exactly as many frames as we have.
+			requestedEngineFrames = outputBuffer.size();
 		}
 		else {
 			// Upper bound on number of frames so that `outputAudioFrames >= frames` at the end of this method.
-			double ratio = (double) engineSampleRate / sampleRate;
-			engineFrames = std::ceil(frames * ratio - inputBuffer.size());
-			engineFrames = std::max(engineFrames, 0);
+			requestedEngineFrames = (int) std::ceil(frames * sampleRateRatio) - inputBuffer.size();
 		}
 
-		// Step engine to consume the entire output buffer
-		if (APP->engine->getPrimaryModule() == this && engineFrames > 0) {
-			APP->engine->step(engineFrames);
+		// Step engine
+		if (isPrimary && requestedEngineFrames > 0) {
+			APP->engine->step(requestedEngineFrames);
 		}
 
 		if (numOutputs > 0) {
-			// module input -> audio output
+			// engine input -> audio output
 			dsp::Frame<NUM_AUDIO_OUTPUTS> outputAudioBuffer[frames];
 			int inputFrames = inputBuffer.size();
 			int outputAudioFrames = frames;
@@ -165,14 +178,13 @@ struct AudioInterface : Module, audio::Port {
 			}
 		}
 
-		// If we're left with too many output samples, flush the buffer.
-		// if (inputBuffer.size() >= 2.f * ) {
-		// 	inputBuffer.clear();
-		// }
+		// If this is a secondary audio module and the engine input buffer is too full, flush it.
+		if (!isPrimary && (int) inputBuffer.size() > maxEngineFrames) {
+			inputBuffer.clear();
+			// DEBUG("%p: flushing engine input", this);
+		}
 
-		// DEBUG("%p %d: frames %d\toutputBuffer %d inputBuffer %d engineFrames %d\t",
-		// 	this, APP->engine->getPrimaryModule() == this, frames,
-		// 	outputBuffer.size(), inputBuffer.size(), engineFrames);
+		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d inputBuffer %d\t", this, isPrimary ? "primary" : "secondary", frames, requestedEngineFrames, outputBuffer.size(), inputBuffer.size());
 	}
 
 	void onOpenStream() override {

@@ -422,6 +422,7 @@ void Engine::clear() {
 
 
 void Engine::step(int frames) {
+	// Configure thread
 	initMXCSR();
 	random::init();
 
@@ -993,6 +994,7 @@ void Engine::fromJson(json_t* rootJ) {
 
 
 void EngineWorker::run() {
+	// Configure thread
 	system::setThreadName(string::f("Worker %d", id));
 	initMXCSR();
 	random::init();
