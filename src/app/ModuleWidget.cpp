@@ -778,6 +778,10 @@ void ModuleWidget::disconnectAction() {
 }
 
 void ModuleWidget::cloneAction() {
+	// history::ComplexAction
+	history::ComplexAction* h = new history::ComplexAction;
+
+	// Clone Module
 	engine::Module* clonedModule = model->createModule();
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
@@ -787,13 +791,45 @@ void ModuleWidget::cloneAction() {
 	clonedModule->id = -1;
 	APP->engine->addModule(clonedModule);
 
+	// Clone ModuleWidget
 	ModuleWidget* clonedModuleWidget = model->createModuleWidget(clonedModule);
 	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
 
 	// history::ModuleAdd
-	history::ModuleAdd* h = new history::ModuleAdd;
-	h->name = "clone modules";
-	h->setModule(clonedModuleWidget);
+	history::ModuleAdd* hma = new history::ModuleAdd;
+	hma->name = "clone modules";
+	hma->setModule(clonedModuleWidget);
+	h->push(hma);
+
+	// Clone cables attached to input ports
+	for (PortWidget* pw : inputs) {
+		std::list<CableWidget*> cables = APP->scene->rack->getCablesOnPort(pw);
+		for (CableWidget* cw : cables) {
+			// Create cable attached to cloned ModuleWidget's input
+			engine::Cable* clonedCable = new engine::Cable;
+			clonedCable->id = -1;
+			clonedCable->inputModule = clonedModule;
+			clonedCable->inputId = cw->cable->inputId;
+			// If cable is self-patched, attach to cloned module instead
+			if (cw->cable->outputModule == module)
+				clonedCable->outputModule = clonedModule;
+			else
+				clonedCable->outputModule = cw->cable->outputModule;
+			clonedCable->outputId = cw->cable->outputId;
+			APP->engine->addCable(clonedCable);
+
+			app::CableWidget* clonedCw = new app::CableWidget;
+			clonedCw->setCable(clonedCable);
+			clonedCw->color = cw->color;
+			APP->scene->rack->addCable(clonedCw);
+
+			// history::CableAdd
+			history::CableAdd* hca = new history::CableAdd;
+			hca->setCable(clonedCw);
+			h->push(hca);
+		}
+	}
+
 	APP->history->push(h);
 }
 

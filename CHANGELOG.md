@@ -12,6 +12,10 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add "Primary module" context menu item to VCV Audio modules to select which audio device clocks the engine.
 	- Allow other modules such as VCV Recorder to be the primary module, to render audio faster than real-time.
 	- Remove "Real-time priority" menu item, since the thread priority is now managed elsewhere (RtAudio, etc).
+- Duplicate cables patched to inputs when a module is duplicated.
+- Add module tags to module context menu.
+- Add module manual URL (if plugin developer supplies it) to module context menu item.
+- Add quick access to user module patches from `<Rack user dir>/presets/<plugin slug>/<module slug>` to module context menu.
 - API
 	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.
 	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.

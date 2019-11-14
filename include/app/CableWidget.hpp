@@ -12,13 +12,13 @@ namespace app {
 
 
 struct CableWidget : widget::OpaqueWidget {
+	/** Owned. */
+	engine::Cable* cable = NULL;
+	NVGcolor color;
 	PortWidget* inputPort = NULL;
 	PortWidget* outputPort = NULL;
 	PortWidget* hoveredInputPort = NULL;
 	PortWidget* hoveredOutputPort = NULL;
-	/** Owned. */
-	engine::Cable* cable = NULL;
-	NVGcolor color;
 
 	CableWidget();
 	~CableWidget();
