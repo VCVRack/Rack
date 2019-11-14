@@ -23,6 +23,7 @@ struct ScrollWidget : widget::OpaqueWidget {
 	void onDragStart(const event::DragStart& e) override;
 	void onDragMove(const event::DragMove& e) override;
 	void onHoverScroll(const event::HoverScroll& e) override;
+	void onHoverKey(const event::HoverKey& e) override;
 };
 
 

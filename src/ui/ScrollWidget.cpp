@@ -112,6 +112,51 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	e.consume(this);
 }
 
+void ScrollWidget::onHoverKey(const event::HoverKey& e) {
+	OpaqueWidget::onHoverKey(e);
+	if (e.isConsumed())
+		return;
+
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+		if (e.key == GLFW_KEY_PAGE_UP && (e.mods & RACK_MOD_MASK) == 0) {
+			offset.y -= box.size.y * 0.5;
+			e.consume(this);
+		}
+		else if (e.key == GLFW_KEY_PAGE_UP && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+			offset.x -= box.size.x * 0.5;
+			e.consume(this);
+		}
+		else if (e.key == GLFW_KEY_PAGE_DOWN && (e.mods & RACK_MOD_MASK) == 0) {
+			offset.y += box.size.y * 0.5;
+			e.consume(this);
+		}
+		else if (e.key == GLFW_KEY_PAGE_DOWN && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+			offset.x += box.size.x * 0.5;
+			e.consume(this);
+		}
+		else if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == 0) {
+			math::Rect containerBox = container->getChildrenBoundingBox();
+			offset.y = containerBox.getTop();
+			e.consume(this);
+		}
+		else if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+			math::Rect containerBox = container->getChildrenBoundingBox();
+			offset.x = containerBox.getLeft();
+			e.consume(this);
+		}
+		else if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == 0) {
+			math::Rect containerBox = container->getChildrenBoundingBox();
+			offset.y = containerBox.getBottom();
+			e.consume(this);
+		}
+		else if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+			math::Rect containerBox = container->getChildrenBoundingBox();
+			offset.x = containerBox.getRight();
+			e.consume(this);
+		}
+	}
+}
+
 
 } // namespace ui
 } // namespace rack
