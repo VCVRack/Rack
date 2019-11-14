@@ -83,16 +83,16 @@ void ModuleMove::redo() {
 }
 
 
-void ModuleDisable::undo() {
+void ModuleBypass::undo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
 	assert(module);
-	APP->engine->disableModule(module, !disabled);
+	APP->engine->bypassModule(module, !bypassed);
 }
 
-void ModuleDisable::redo() {
+void ModuleBypass::redo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
 	assert(module);
-	APP->engine->disableModule(module, disabled);
+	APP->engine->bypassModule(module, bypassed);
 }
 
 

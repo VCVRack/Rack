@@ -257,10 +257,10 @@ struct ModuleCloneItem : ui::MenuItem {
 };
 
 
-struct ModuleDisableItem : ui::MenuItem {
+struct ModuleBypassItem : ui::MenuItem {
 	ModuleWidget* moduleWidget;
 	void onAction(const event::Action& e) override {
-		moduleWidget->disableAction();
+		moduleWidget->bypassAction();
 	}
 };
 
@@ -299,7 +299,7 @@ ModuleWidget::~ModuleWidget() {
 void ModuleWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
-	if (module && module->disabled) {
+	if (module && module->bypassed) {
 		nvgGlobalAlpha(args.vg, 0.33);
 	}
 
@@ -409,7 +409,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 			} break;
 			case GLFW_KEY_E: {
 				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					disableAction();
+					bypassAction();
 					e.consume(this);
 				}
 			} break;
@@ -833,14 +833,14 @@ void ModuleWidget::cloneAction() {
 	APP->history->push(h);
 }
 
-void ModuleWidget::disableAction() {
+void ModuleWidget::bypassAction() {
 	assert(module);
-	APP->engine->disableModule(module, !module->disabled);
+	APP->engine->bypassModule(module, !module->bypassed);
 
-	// history::ModuleDisable
-	history::ModuleDisable* h = new history::ModuleDisable;
+	// history::ModuleBypass
+	history::ModuleBypass* h = new history::ModuleBypass;
 	h->moduleId = module->id;
-	h->disabled = module->disabled;
+	h->bypassed = module->bypassed;
 	APP->history->push(h);
 }
 
@@ -905,13 +905,13 @@ void ModuleWidget::createContextMenu() {
 	cloneItem->moduleWidget = this;
 	menu->addChild(cloneItem);
 
-	ModuleDisableItem* disableItem = new ModuleDisableItem;
-	disableItem->text = "Disable";
-	disableItem->rightText = RACK_MOD_CTRL_NAME "+E";
-	if (module && module->disabled)
-		disableItem->rightText = CHECKMARK_STRING " " + disableItem->rightText;
-	disableItem->moduleWidget = this;
-	menu->addChild(disableItem);
+	ModuleBypassItem* bypassItem = new ModuleBypassItem;
+	bypassItem->text = "Bypass";
+	bypassItem->rightText = RACK_MOD_CTRL_NAME "+E";
+	if (module && module->bypassed)
+		bypassItem->rightText = CHECKMARK_STRING " " + bypassItem->rightText;
+	bypassItem->moduleWidget = this;
+	menu->addChild(bypassItem);
 
 	ModuleDeleteItem* deleteItem = new ModuleDeleteItem;
 	deleteItem->text = "Delete";

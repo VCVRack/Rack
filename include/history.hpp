@@ -97,12 +97,12 @@ struct ModuleMove : ModuleAction {
 };
 
 
-struct ModuleDisable : ModuleAction {
-	bool disabled;
+struct ModuleBypass : ModuleAction {
+	bool bypassed;
 	void undo() override;
 	void redo() override;
-	ModuleDisable() {
-		name = "disable module";
+	ModuleBypass() {
+		name = "bypass module";
 	}
 };
 

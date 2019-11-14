@@ -50,7 +50,7 @@ struct Engine {
 	Module* getModule(int moduleId);
 	void resetModule(Module* module);
 	void randomizeModule(Module* module);
-	void disableModule(Module* module, bool disabled);
+	void bypassModule(Module* module, bool bypassed);
 
 	// Cables
 	/** Adds a cable to the rack engine.

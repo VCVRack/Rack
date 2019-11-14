@@ -85,10 +85,7 @@ struct Module {
 	Only written when CPU timing is enabled, since time measurement is expensive.
 	*/
 	float cpuTime = 0.f;
-	/** Whether the Module is skipped from stepping by the engine.
-	Module subclasses should not read/write this variable.
-	*/
-	bool disabled = false;
+	bool bypassed = false;
 
 	/** Constructs a Module with no params, inputs, outputs, and lights. */
 	Module();
@@ -181,6 +178,7 @@ struct Module {
 	virtual void step() {}
 	/** Called instead of process() when Module is bypassed.
 	Typically you do not need to override this. Use configBypass() instead.
+	If you do override it, avoid reading param values, since the state of the module should have no effect on routing.
 	*/
 	virtual void processBypass(const ProcessArgs& args);
 
@@ -219,15 +217,15 @@ struct Module {
 		onRemove();
 	}
 
-	struct EnableEvent {};
+	struct BypassEvent {};
+	/** Called after bypassing the module.
+	*/
+	virtual void onBypass(const BypassEvent& e) {}
+
+	struct UnBypassEvent {};
 	/** Called after enabling the module.
 	*/
-	virtual void onEnable(const EnableEvent& e) {}
-
-	struct DisableEvent {};
-	/** Called after disabling the module.
-	*/
-	virtual void onDisable(const DisableEvent& e) {}
+	virtual void onUnBypass(const UnBypassEvent& e) {}
 
 	struct PortChangeEvent {
 		/** True if connecting, false if disconnecting. */

@@ -229,7 +229,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		}
 
 		// Step module
-		if (!module->disabled)
+		if (!module->bypassed)
 			module->process(processArgs);
 		else
 			module->processBypass(processArgs);
@@ -626,25 +626,25 @@ void Engine::randomizeModule(Module* module) {
 }
 
 
-void Engine::disableModule(Module* module, bool disabled) {
+void Engine::bypassModule(Module* module, bool bypassed) {
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	assert(module);
-	if (module->disabled == disabled)
+	if (module->bypassed == bypassed)
 		return;
 	// Clear outputs and set to 1 channel
 	for (Output& output : module->outputs) {
 		// This zeros all voltages, but the channel is set to 1 if connected
 		output.setChannels(0);
 	}
-	module->disabled = disabled;
+	module->bypassed = bypassed;
 	// Trigger event
-	if (disabled) {
-		Module::DisableEvent eDisable;
-		module->onDisable(eDisable);
+	if (bypassed) {
+		Module::BypassEvent eBypass;
+		module->onBypass(eBypass);
 	}
 	else {
-		Module::EnableEvent eEnable;
-		module->onEnable(eEnable);
+		Module::UnBypassEvent eUnBypass;
+		module->onUnBypass(eUnBypass);
 	}
 }
 

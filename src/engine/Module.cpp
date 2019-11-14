@@ -91,9 +91,9 @@ json_t* Module::toJson() {
 	}
 	json_object_set_new(rootJ, "params", paramsJ);
 
-	// disabled
-	if (disabled)
-		json_object_set_new(rootJ, "disabled", json_boolean(disabled));
+	// bypassed
+	if (bypassed)
+		json_object_set_new(rootJ, "bypassed", json_boolean(bypassed));
 
 	// leftModuleId
 	if (leftExpander.moduleId >= 0)
@@ -183,13 +183,16 @@ void Module::fromJson(json_t* rootJ) {
 			params[paramId].setValue(json_number_value(valueJ));
 	}
 
-	// disabled
-	json_t* disabledJ = json_object_get(rootJ, "disabled");
-	// legacy bypass
-	if (!disabledJ)
-		disabledJ = json_object_get(rootJ, "bypass");
-	if (disabledJ)
-		disabled = json_boolean_value(disabledJ);
+	// bypassed
+	json_t* bypassedJ = json_object_get(rootJ, "bypassed");
+	// legacy "bypass" in v0.6 or early v1 (don't remember)
+	if (!bypassedJ)
+		bypassedJ = json_object_get(rootJ, "bypass");
+	// legacy "disabled" in v1
+	if (!bypassedJ)
+		bypassedJ = json_object_get(rootJ, "disabled");
+	if (bypassedJ)
+		bypassed = json_boolean_value(bypassedJ);
 
 	// These do not need to be deserialized, since the module positions will set them correctly when added to the rack.
 	// // leftModuleId

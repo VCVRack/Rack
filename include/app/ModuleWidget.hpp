@@ -82,7 +82,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void randomizeAction();
 	void disconnectAction();
 	void cloneAction();
-	void disableAction();
+	void bypassAction();
 	/** Deletes `this` */
 	void removeAction();
 	void createContextMenu();
