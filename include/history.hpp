@@ -4,6 +4,7 @@
 #include <color.hpp>
 #include <plugin/Model.hpp>
 #include <vector>
+#include <deque>
 #include <jansson.h>
 
 
@@ -155,7 +156,7 @@ struct CableRemove : InverseAction<CableAdd> {
 
 
 struct State {
-	std::vector<Action*> actions;
+	std::deque<Action*> actions;
 	int actionIndex;
 	/** Action index of saved patch state. */
 	int savedIndex;

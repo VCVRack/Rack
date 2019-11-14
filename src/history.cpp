@@ -182,10 +182,23 @@ void State::clear() {
 }
 
 void State::push(Action* action) {
+	// Delete all future actions (if we have undone some actions)
 	for (int i = actionIndex; i < (int) actions.size(); i++) {
 		delete actions[i];
 	}
 	actions.resize(actionIndex);
+	// Delete actions from beginning if limit is reached
+	static const int limit = 500;
+	int n = (int) actions.size() - limit + 1;
+	if (n > 0) {
+		for (int i = 0; i < n; i++) {
+			delete actions[i];
+		}
+		actions.erase(actions.begin(), actions.begin() + n);
+		actionIndex -= n;
+		savedIndex -= n;
+	}
+	// Push action
 	actions.push_back(action);
 	actionIndex++;
 	// Unset the savedIndex if we just permanently overwrote the saved state
