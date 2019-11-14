@@ -141,8 +141,6 @@ struct ModelBox : widget::OpaqueWidget {
 	ui::Tooltip* tooltip = NULL;
 	/** Lazily created */
 	widget::FramebufferWidget* previewFb = NULL;
-	/** Number of frames since draw() has been called */
-	int visibleFrames = 0;
 
 	ModelBox() {
 		// Approximate size as 10HP before we know the actual size.
@@ -189,16 +187,7 @@ struct ModelBox : widget::OpaqueWidget {
 		previewFb = NULL;
 	}
 
-	void step() override {
-		if (previewFb && ++visibleFrames >= 60) {
-			deletePreview();
-		}
-		OpaqueWidget::step();
-	}
-
 	void draw(const DrawArgs& args) override {
-		visibleFrames = 0;
-
 		// Lazily create preview when drawn
 		if (!previewFb) {
 			createPreview();
