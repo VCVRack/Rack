@@ -199,7 +199,7 @@ static void Port_step(Port* that, float deltaTime) {
 }
 
 
-static void Engine_stepModules(Engine* that, int threadId) {
+static void Engine_stepModulesWorker(Engine* that, int threadId) {
 	Engine::Internal* internal = that->internal;
 
 	// int threadCount = internal->threadCount;
@@ -257,15 +257,19 @@ static void Cable_step(Cable* that) {
 	Input* input = &that->inputModule->inputs[that->inputId];
 	// Match number of polyphonic channels to output port
 	int channels = output->channels;
-	input->channels = channels;
 	// Copy all voltages from output to input
-	for (int i = 0; i < channels; i++) {
-		input->voltages[i] = output->voltages[i];
+	for (int c = 0; c < channels; c++) {
+		float v = output->voltages[c];
+		// Set 0V if infinite or NaN
+		if (!std::isfinite(v))
+			v = 0.f;
+		input->voltages[c] = v;
 	}
-	// Clear all voltages of higher channels
-	for (int i = channels; i < PORT_MAX_CHANNELS; i++) {
-		input->voltages[i] = 0.f;
+	// Set higher channel voltages to 0
+	for (int c = channels; c < input->channels; c++) {
+		input->voltages[c] = 0.f;
 	}
+	input->channels = channels;
 }
 
 
@@ -295,12 +299,6 @@ static void Engine_stepModules(Engine* that) {
 
 	// Step cables
 	for (Cable* cable : that->internal->cables) {
-		// // Check that the output is finite
-		// float v = cable->outputModule->outputs[cable->outputId].getVoltage();
-		// if (!std::isfinite(v)) {
-		// 	// Automatically disable module
-		// 	that->disableModule(cable->outputModule, true);
-		// }
 		Cable_step(cable);
 	}
 
@@ -319,7 +317,7 @@ static void Engine_stepModules(Engine* that) {
 	// Step modules along with workers
 	internal->workerModuleIndex = 0;
 	internal->engineBarrier.wait();
-	Engine_stepModules(that, 0);
+	Engine_stepModulesWorker(that, 0);
 	internal->workerBarrier.wait();
 
 	internal->frame++;
@@ -1011,7 +1009,7 @@ void EngineWorker::run() {
 		engine->internal->engineBarrier.wait();
 		if (!running)
 			return;
-		Engine_stepModules(engine, id);
+		Engine_stepModulesWorker(engine, id);
 		engine->internal->workerBarrier.wait();
 	}
 }
