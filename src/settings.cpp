@@ -29,7 +29,12 @@ int threadCount = 1;
 bool paramTooltip = false;
 bool cpuMeter = false;
 bool lockModules = false;
-int frameSwapInterval = 1;
+#if defined ARCH_MAC
+	// Most Mac GPUs can't handle rendering the screen every frame, so use ~30 Hz by default.
+	int frameSwapInterval = 2;
+#else
+	int frameSwapInterval = 1;
+#endif
 float autosavePeriod = 15.0;
 bool skipLoadOnLaunch = false;
 std::string patchPath;
