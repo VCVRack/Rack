@@ -6,7 +6,16 @@ namespace rack {
 namespace engine {
 
 
+struct Module::Internal {
+	/** Seconds spent in the process() method, with exponential smoothing.
+	Only written when CPU timing is enabled, since time measurement is expensive.
+	*/
+	float cpuTime = 0.f;
+	bool bypassed = false;
+};
+
 Module::Module() {
+	internal = new Internal;
 }
 
 Module::~Module() {
@@ -22,6 +31,7 @@ Module::~Module() {
 		if (outputInfo)
 			delete outputInfo;
 	}
+	delete internal;
 }
 
 void Module::config(int numParams, int numInputs, int numOutputs, int numLights) {
@@ -92,8 +102,8 @@ json_t* Module::toJson() {
 	json_object_set_new(rootJ, "params", paramsJ);
 
 	// bypassed
-	if (bypassed)
-		json_object_set_new(rootJ, "bypassed", json_boolean(bypassed));
+	if (internal->bypassed)
+		json_object_set_new(rootJ, "bypassed", json_boolean(true));
 
 	// leftModuleId
 	if (leftExpander.moduleId >= 0)
@@ -192,7 +202,7 @@ void Module::fromJson(json_t* rootJ) {
 	if (!bypassedJ)
 		bypassedJ = json_object_get(rootJ, "disabled");
 	if (bypassedJ)
-		bypassed = json_boolean_value(bypassedJ);
+		internal->bypassed = json_boolean_value(bypassedJ);
 
 	// These do not need to be deserialized, since the module positions will set them correctly when added to the rack.
 	// // leftModuleId
@@ -233,6 +243,16 @@ void Module::onRandomize(const RandomizeEvent& e) {
 	}
 	// Call deprecated event
 	onRandomize();
+}
+
+
+float& Module::cpuTime() {
+	return internal->cpuTime;
+}
+
+
+bool& Module::bypassed() {
+	return internal->bypassed;
 }
 
 

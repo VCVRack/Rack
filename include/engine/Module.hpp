@@ -24,6 +24,9 @@ namespace engine {
 
 /** DSP processor instance for your module. */
 struct Module {
+	struct Internal;
+	Internal* internal;
+
 	plugin::Model* model = NULL;
 	/** Unique ID for referring to the module in the engine.
 	Assigned when added to the engine.
@@ -80,12 +83,6 @@ struct Module {
 		int outputId = -1;
 	};
 	std::vector<BypassRoute> bypassRoutes;
-
-	/** Seconds spent in the process() method, with exponential smoothing.
-	Only written when CPU timing is enabled, since time measurement is expensive.
-	*/
-	float cpuTime = 0.f;
-	bool bypassed = false;
 
 	/** Constructs a Module with no params, inputs, outputs, and lights. */
 	Module();
@@ -276,6 +273,10 @@ struct Module {
 	virtual void onRandomize() {}
 	/** DEPRECATED. Override `onSampleRateChange(e)` instead. */
 	virtual void onSampleRateChange() {}
+
+	// private
+	float& cpuTime();
+	bool& bypassed();
 };
 
 

@@ -229,7 +229,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		}
 
 		// Step module
-		if (!module->bypassed)
+		if (!module->bypassed())
 			module->process(processArgs);
 		else
 			module->processBypass(processArgs);
@@ -241,7 +241,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 
 			// Smooth CPU time
 			const float cpuTau = 2.f /* seconds */;
-			module->cpuTime += (duration - module->cpuTime) * processArgs.sampleTime / cpuTau;
+			module->cpuTime() += (duration - module->cpuTime()) * processArgs.sampleTime / cpuTau;
 		}
 
 		// Iterate ports to step plug lights
@@ -629,14 +629,14 @@ void Engine::randomizeModule(Module* module) {
 void Engine::bypassModule(Module* module, bool bypassed) {
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	assert(module);
-	if (module->bypassed == bypassed)
+	if (module->bypassed() == bypassed)
 		return;
 	// Clear outputs and set to 1 channel
 	for (Output& output : module->outputs) {
 		// This zeros all voltages, but the channel is set to 1 if connected
 		output.setChannels(0);
 	}
-	module->bypassed = bypassed;
+	module->bypassed() = bypassed;
 	// Trigger event
 	if (bypassed) {
 		Module::BypassEvent eBypass;

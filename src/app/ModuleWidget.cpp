@@ -299,7 +299,7 @@ ModuleWidget::~ModuleWidget() {
 void ModuleWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
-	if (module && module->bypassed) {
+	if (module && module->bypassed()) {
 		nvgGlobalAlpha(args.vg, 0.33);
 	}
 
@@ -314,12 +314,12 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
 		nvgFill(args.vg);
 
-		float percent = module->cpuTime * APP->engine->getSampleRate() * 100;
-		float microseconds = module->cpuTime * 1e6f;
+		float percent = module->cpuTime() * APP->engine->getSampleRate() * 100;
+		float microseconds = module->cpuTime() * 1e6f;
 		std::string cpuText = string::f("%.1f%%\n%.2f μs", percent, microseconds);
 		bndLabel(args.vg, 2.0, box.size.y - 34.0, INFINITY, INFINITY, -1, cpuText.c_str());
 
-		float p = math::clamp(module->cpuTime / APP->engine->getSampleTime(), 0.f, 1.f);
+		float p = math::clamp(module->cpuTime() / APP->engine->getSampleTime(), 0.f, 1.f);
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg,
 		        0, (1.f - p) * box.size.y,
@@ -835,12 +835,12 @@ void ModuleWidget::cloneAction() {
 
 void ModuleWidget::bypassAction() {
 	assert(module);
-	APP->engine->bypassModule(module, !module->bypassed);
+	APP->engine->bypassModule(module, !module->bypassed());
 
 	// history::ModuleBypass
 	history::ModuleBypass* h = new history::ModuleBypass;
 	h->moduleId = module->id;
-	h->bypassed = module->bypassed;
+	h->bypassed = module->bypassed();
 	APP->history->push(h);
 }
 
@@ -908,7 +908,7 @@ void ModuleWidget::createContextMenu() {
 	ModuleBypassItem* bypassItem = new ModuleBypassItem;
 	bypassItem->text = "Bypass";
 	bypassItem->rightText = RACK_MOD_CTRL_NAME "+E";
-	if (module && module->bypassed)
+	if (module && module->bypassed())
 		bypassItem->rightText = CHECKMARK_STRING " " + bypassItem->rightText;
 	bypassItem->moduleWidget = this;
 	menu->addChild(bypassItem);
