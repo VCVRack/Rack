@@ -306,7 +306,7 @@ void ModuleWidget::draw(const DrawArgs& args) {
 	Widget::draw(args);
 
 	// Power meter
-	if (module && settings::cpuMeter && !module->disabled) {
+	if (module && settings::cpuMeter) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg,
 		        0, box.size.y - 35,

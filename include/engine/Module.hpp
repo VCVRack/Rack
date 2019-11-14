@@ -75,6 +75,12 @@ struct Module {
 	Expander leftExpander;
 	Expander rightExpander;
 
+	struct BypassRoute {
+		int inputId = -1;
+		int outputId = -1;
+	};
+	std::vector<BypassRoute> bypassRoutes;
+
 	/** Seconds spent in the process() method, with exponential smoothing.
 	Only written when CPU timing is enabled, since time measurement is expensive.
 	*/
@@ -146,6 +152,21 @@ struct Module {
 		outputInfos[portId] = p;
 	}
 
+	/** Adds a direct route from an input to an output when the module is bypassed. */
+	void configBypass(int inputId, int outputId) {
+		assert(inputId < (int) inputs.size());
+		assert(outputId < (int) outputs.size());
+		// Check that output is not yet routed
+		for (BypassRoute& br : bypassRoutes) {
+			assert(br.outputId != outputId);
+		}
+
+		BypassRoute br;
+		br.inputId = inputId;
+		br.outputId = outputId;
+		bypassRoutes.push_back(br);
+	}
+
 	struct ProcessArgs {
 		float sampleRate;
 		float sampleTime;
@@ -158,6 +179,10 @@ struct Module {
 	}
 	/** DEPRECATED. Override `process(const ProcessArgs& args)` instead. */
 	virtual void step() {}
+	/** Called instead of process() when Module is bypassed.
+	Typically you do not need to override this. Use configBypass() instead.
+	*/
+	virtual void processBypass(const ProcessArgs& args);
 
 	json_t* toJson();
 	/** This is virtual only for the purpose of unserializing legacy data when you could set properties of the `.modules[]` object itself.

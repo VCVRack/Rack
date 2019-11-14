@@ -220,21 +220,28 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 			break;
 
 		Module* module = internal->modules[i];
-		if (!module->disabled) {
-			// Step module
-			if (cpuMeter) {
-				auto beginTime = std::chrono::high_resolution_clock::now();
-				module->process(processArgs);
-				auto endTime = std::chrono::high_resolution_clock::now();
-				float duration = std::chrono::duration<float>(endTime - beginTime).count();
 
-				// Smooth CPU time
-				const float cpuTau = 2.f /* seconds */;
-				module->cpuTime += (duration - module->cpuTime) * processArgs.sampleTime / cpuTau;
-			}
-			else {
-				module->process(processArgs);
-			}
+		// Start CPU timer
+		using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
+		time_point beginTime;
+		if (cpuMeter) {
+			beginTime = std::chrono::high_resolution_clock::now();
+		}
+
+		// Step module
+		if (!module->disabled)
+			module->process(processArgs);
+		else
+			module->processBypass(processArgs);
+
+		// Stop CPU timer
+		if (cpuMeter) {
+			time_point endTime = std::chrono::high_resolution_clock::now();
+			float duration = std::chrono::duration<float>(endTime - beginTime).count();
+
+			// Smooth CPU time
+			const float cpuTau = 2.f /* seconds */;
+			module->cpuTime += (duration - module->cpuTime) * processArgs.sampleTime / cpuTau;
 		}
 
 		// Iterate ports to step plug lights

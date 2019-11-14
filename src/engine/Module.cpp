@@ -47,6 +47,20 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 	}
 }
 
+void Module::processBypass(const ProcessArgs& args) {
+	for (BypassRoute& bypassRoute : bypassRoutes) {
+		// Route input voltages to output
+		Input& input = inputs[bypassRoute.inputId];
+		Output& output = outputs[bypassRoute.outputId];
+		int channels = input.getChannels();
+		for (int c = 0; c < channels; c++) {
+			float v = input.getVoltage(c);
+			output.setVoltage(v, c);
+		}
+		output.setChannels(channels);
+	}
+}
+
 json_t* Module::toJson() {
 	json_t* rootJ = json_object();
 
