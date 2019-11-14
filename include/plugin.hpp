@@ -34,6 +34,10 @@ void syncUpdates();
 bool isSyncing();
 Plugin* getPlugin(const std::string& pluginSlug);
 Model* getModel(const std::string& pluginSlug, const std::string& modelSlug);
+/** Creates a Module from a JSON module object.
+Throws an Exception if the model is not found.
+*/
+engine::Module* moduleFromJson(json_t* moduleJ);
 /** Checks that the slug contains only alphanumeric characters, "-", and "_" */
 bool isSlugValid(const std::string& slug);
 /** Returns a string containing only the valid slug characters. */

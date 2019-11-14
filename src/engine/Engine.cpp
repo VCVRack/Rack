@@ -422,6 +422,7 @@ void Engine::clear() {
 
 
 void Engine::step(int frames) {
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// Configure thread
 	initMXCSR();
 	random::init();
@@ -443,8 +444,6 @@ void Engine::step(int frames) {
 		if (internal->threadCount != settings::threadCount) {
 			Engine_relaunchWorkers(this, settings::threadCount);
 		}
-
-		std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 
 		// Update expander pointers
 		for (Module* module : internal->modules) {
@@ -475,6 +474,7 @@ void Engine::setPrimaryModule(Module* module) {
 
 
 Module* Engine::getPrimaryModule() {
+	// No lock, for performance
 	return internal->primaryModule;
 }
 
@@ -486,17 +486,19 @@ void Engine::setPaused(bool paused) {
 
 
 bool Engine::isPaused() {
-	// No lock
+	// No lock, for performance
 	return internal->paused;
 }
 
 
 float Engine::getSampleRate() {
+	// No lock, for performance
 	return internal->sampleRate;
 }
 
 
 float Engine::getSampleTime() {
+	// No lock, for performance
 	return internal->sampleTime;
 }
 
@@ -507,13 +509,14 @@ void Engine::yieldWorkers() {
 
 
 uint64_t Engine::getFrame() {
+	// No lock, for performance
 	return internal->frame;
 }
 
 
 void Engine::addModule(Module* module) {
-	assert(module);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	assert(module);
 	// Check that the module is not already added
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it == internal->modules.end());
@@ -547,8 +550,8 @@ void Engine::addModule(Module* module) {
 
 
 void Engine::removeModule(Module* module) {
-	assert(module);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	assert(module);
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it != internal->modules.end());
@@ -601,8 +604,8 @@ Module* Engine::getModule(int moduleId) {
 
 
 void Engine::resetModule(Module* module) {
-	assert(module);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	assert(module);
 
 	Module::ResetEvent eReset;
 	module->onReset(eReset);
@@ -610,8 +613,8 @@ void Engine::resetModule(Module* module) {
 
 
 void Engine::randomizeModule(Module* module) {
-	assert(module);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	assert(module);
 
 	Module::RandomizeEvent eRandomize;
 	module->onRandomize(eRandomize);
@@ -619,8 +622,8 @@ void Engine::randomizeModule(Module* module) {
 
 
 void Engine::disableModule(Module* module, bool disabled) {
-	assert(module);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	assert(module);
 	if (module->disabled == disabled)
 		return;
 	// Clear outputs and set to 1 channel
@@ -689,8 +692,8 @@ static void Engine_updateConnected(Engine* that) {
 
 
 void Engine::addCable(Cable* cable) {
-	assert(cable);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	assert(cable);
 	// Check cable properties
 	assert(cable->inputModule);
 	assert(cable->outputModule);
@@ -744,8 +747,8 @@ void Engine::addCable(Cable* cable) {
 
 
 void Engine::removeCable(Cable* cable) {
-	assert(cable);
 	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	assert(cable);
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
 	assert(it != internal->cables.end());
@@ -791,7 +794,7 @@ Cable* Engine::getCable(int cableId) {
 
 
 void Engine::setParam(Module* module, int paramId, float value) {
-	// Don't lock because this is called too frequently.
+	// No lock, for performance
 	// If param is being smoothed, cancel smoothing.
 	if (internal->smoothModule == module && internal->smoothParamId == paramId) {
 		internal->smoothModule = NULL;
@@ -802,11 +805,13 @@ void Engine::setParam(Module* module, int paramId, float value) {
 
 
 float Engine::getParam(Module* module, int paramId) {
+	// No lock, for performance
 	return module->params[paramId].value;
 }
 
 
 void Engine::setSmoothParam(Module* module, int paramId, float value) {
+	// No lock, for performance
 	// If another param is being smoothed, jump value
 	if (internal->smoothModule && !(internal->smoothModule == module && internal->smoothParamId == paramId)) {
 		internal->smoothModule->params[internal->smoothParamId].value = internal->smoothValue;
@@ -819,6 +824,7 @@ void Engine::setSmoothParam(Module* module, int paramId, float value) {
 
 
 float Engine::getSmoothParam(Module* module, int paramId) {
+	// No lock, for performance
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
 	return getParam(module, paramId);
@@ -868,8 +874,7 @@ void Engine::removeParamHandle(ParamHandle* paramHandle) {
 
 
 ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
-	// Don't lock because this method is called potentially thousands of times per screen frame.
-
+	// No lock, for performance
 	auto it = internal->paramHandleCache.find(std::make_tuple(moduleId, paramId));
 	if (it == internal->paramHandleCache.end())
 		return NULL;
@@ -878,6 +883,7 @@ ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
 
 
 ParamHandle* Engine::getParamHandle(Module* module, int paramId) {
+	// No lock, for performance
 	return getParamHandle(module->id, paramId);
 }
 
@@ -922,6 +928,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int moduleId, int param
 
 
 json_t* Engine::toJson() {
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	json_t* rootJ = json_object();
 
 	// modules
@@ -947,6 +954,7 @@ json_t* Engine::toJson() {
 
 
 void Engine::fromJson(json_t* rootJ) {
+	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
@@ -955,7 +963,7 @@ void Engine::fromJson(json_t* rootJ) {
 	json_t* moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
 		try {
-			Module* module = moduleFromJson(moduleJ);
+			Module* module = plugin::moduleFromJson(moduleJ);
 
 			// Before 1.0, the module ID was the index in the "modules" array
 			if (APP->patch->isLegacy(2)) {
@@ -1006,33 +1014,6 @@ void EngineWorker::run() {
 		Engine_stepModules(engine, id);
 		engine->internal->workerBarrier.wait();
 	}
-}
-
-
-Module* moduleFromJson(json_t* moduleJ) {
-	// Get slugs
-	json_t* pluginSlugJ = json_object_get(moduleJ, "plugin");
-	if (!pluginSlugJ)
-		throw Exception("\"plugin\" property not found in module JSON");
-	std::string pluginSlug = json_string_value(pluginSlugJ);
-	pluginSlug = plugin::normalizeSlug(pluginSlug);
-
-	json_t* modelSlugJ = json_object_get(moduleJ, "model");
-	if (!modelSlugJ)
-		throw Exception("\"model\" property not found in module JSON");
-	std::string modelSlug = json_string_value(modelSlugJ);
-	modelSlug = plugin::normalizeSlug(modelSlug);
-
-	// Get Model
-	plugin::Model* model = plugin::getModel(pluginSlug, modelSlug);
-	if (!model)
-		throw Exception(string::f("Could not find module \"%s\" of plugin \"%s\"", modelSlug.c_str(), pluginSlug.c_str()));
-
-	// Create Module
-	Module* module = model->createModule();
-	assert(module);
-	module->fromJson(moduleJ);
-	return module;
 }
 
 

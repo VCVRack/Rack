@@ -21,7 +21,7 @@ namespace app {
 
 /** Creates a new Module and ModuleWidget */
 ModuleWidget* moduleWidgetFromJson(json_t* moduleJ) {
-	engine::Module* module = engine::moduleFromJson(moduleJ);
+	engine::Module* module = plugin::moduleFromJson(moduleJ);
 	assert(module);
 
 	// Create ModuleWidget
@@ -301,7 +301,7 @@ void RackWidget::pastePresetClipboardAction() {
 	});
 
 	try {
-		engine::Module* module = engine::moduleFromJson(moduleJ);
+		engine::Module* module = plugin::moduleFromJson(moduleJ);
 		// Reset ID so the Engine automatically assigns a new one
 		module->id = -1;
 		APP->engine->addModule(module);

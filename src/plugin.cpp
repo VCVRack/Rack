@@ -7,6 +7,7 @@
 #include <app/common.hpp>
 #include <plugin/callbacks.hpp>
 #include <settings.hpp>
+#include <engine/Module.hpp>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -162,6 +163,7 @@ static Plugin* loadPlugin(std::string path) {
 	return plugin;
 }
 
+
 static void loadPlugins(std::string path) {
 	for (std::string pluginPath : system::getEntries(path)) {
 		if (!system::isDirectory(pluginPath))
@@ -171,6 +173,7 @@ static void loadPlugins(std::string path) {
 		}
 	}
 }
+
 
 static void extractPackages(std::string path) {
 	std::string message;
@@ -232,6 +235,7 @@ void init() {
 	}
 }
 
+
 void destroy() {
 	for (Plugin* plugin : plugins) {
 		// Free library handle
@@ -249,6 +253,7 @@ void destroy() {
 	}
 	plugins.clear();
 }
+
 
 void logIn(const std::string& email, const std::string& password) {
 	loginStatus = "Logging in...";
@@ -286,14 +291,17 @@ void logIn(const std::string& email, const std::string& password) {
 	queryUpdates();
 }
 
+
 void logOut() {
 	settings::token = "";
 	updates.clear();
 }
 
+
 bool isLoggedIn() {
 	return settings::token != "";
 }
+
 
 void queryUpdates() {
 	if (settings::token.empty())
@@ -392,6 +400,7 @@ void queryUpdates() {
 	updateStatus = "";
 }
 
+
 bool hasUpdates() {
 	for (Update& update : updates) {
 		if (update.progress < 1.f)
@@ -400,8 +409,10 @@ bool hasUpdates() {
 	return false;
 }
 
+
 static bool isSyncingUpdate = false;
 static bool isSyncingUpdates = false;
+
 
 void syncUpdate(Update* update) {
 	isSyncingUpdate = true;
@@ -425,6 +436,7 @@ void syncUpdate(Update* update) {
 	}
 }
 
+
 void syncUpdates() {
 	isSyncingUpdates = true;
 	DEFER({
@@ -441,9 +453,11 @@ void syncUpdates() {
 	restartRequested = true;
 }
 
+
 bool isSyncing() {
 	return isSyncingUpdate || isSyncingUpdates;
 }
+
 
 Plugin* getPlugin(const std::string& pluginSlug) {
 	for (Plugin* plugin : plugins) {
@@ -453,6 +467,7 @@ Plugin* getPlugin(const std::string& pluginSlug) {
 	}
 	return NULL;
 }
+
 
 Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
 	Plugin* plugin = getPlugin(pluginSlug);
@@ -464,6 +479,34 @@ Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
 	return model;
 }
 
+
+engine::Module* moduleFromJson(json_t* moduleJ) {
+	// Get slugs
+	json_t* pluginSlugJ = json_object_get(moduleJ, "plugin");
+	if (!pluginSlugJ)
+		throw Exception("\"plugin\" property not found in module JSON");
+	std::string pluginSlug = json_string_value(pluginSlugJ);
+	pluginSlug = normalizeSlug(pluginSlug);
+
+	json_t* modelSlugJ = json_object_get(moduleJ, "model");
+	if (!modelSlugJ)
+		throw Exception("\"model\" property not found in module JSON");
+	std::string modelSlug = json_string_value(modelSlugJ);
+	modelSlug = normalizeSlug(modelSlug);
+
+	// Get Model
+	Model* model = getModel(pluginSlug, modelSlug);
+	if (!model)
+		throw Exception(string::f("Could not find module \"%s\" of plugin \"%s\"", modelSlug.c_str(), pluginSlug.c_str()));
+
+	// Create Module
+	engine::Module* module = model->createModule();
+	assert(module);
+	module->fromJson(moduleJ);
+	return module;
+}
+
+
 bool isSlugValid(const std::string& slug) {
 	for (char c : slug) {
 		if (!(std::isalnum(c) || c == '-' || c == '_'))
@@ -471,6 +514,7 @@ bool isSlugValid(const std::string& slug) {
 	}
 	return true;
 }
+
 
 std::string normalizeSlug(const std::string& slug) {
 	std::string s;

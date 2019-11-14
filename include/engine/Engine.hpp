@@ -87,11 +87,5 @@ struct Engine {
 };
 
 
-/** Creates a Module from a JSON module object.
-Throws an Exception if the model is not found.
-*/
-Module* moduleFromJson(json_t* moduleJ);
-
-
 } // namespace engine
 } // namespace rack
