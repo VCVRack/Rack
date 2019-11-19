@@ -251,6 +251,29 @@ to plugin.hpp, and add
 p->addModel(model{identifier});
 to the init() function in plugin.cpp.""")
 
+		
+def export_template(slug, panel_filename=None):
+	# Check slug
+	if not is_valid_slug(slug):
+		raise UserException("Slug must only contain ASCII letters, numbers, '-', and '_'.")
+
+	# Check filenames
+	if panel_filename:
+		if not os.path.exists(panel_filename):
+			raise UserException(f"Panel not found at {panel_filename}.")
+
+		print(f"Panel found at {panel_filename}. Generating source code.")
+
+		# Read SVG XML
+		tree = xml.etree.ElementTree.parse(panel_filename)
+
+		components = panel_to_components(tree)
+		print(f"Components extracted from {panel_filename}")
+
+		# Write source
+		source = components_to_source(components, slug)
+
+		print(source)
 
 def panel_to_components(tree):
 	ns = {
@@ -505,6 +528,13 @@ createmodule <module slug> [panel file] [source file]
 		{script} createmodule MyModule res/MyModule.svg src/MyModule.cpp
 
 	See https://vcvrack.com/manual/PanelTutorial.html for creating SVG panel files.
+
+exporttemplate <slug> [panel file]
+
+	Outputs the templated part of the module source without rewriting the panel source file.
+	This is handy for position updates in the component layer. One can then just copy paste the ModuleWidget part.
+	Example:
+		{script} createmodule MyModule res/MyModule.svg
 """
 	print(text)
 
@@ -522,6 +552,8 @@ def parse_args(args):
 		create_module(*args)
 	elif cmd == 'createmanifest':
 		create_manifest(*args)
+	elif cmd == 'exporttemplate':
+		export_template(*args)
 	else:
 		print(f"Command not found: {cmd}")
 
