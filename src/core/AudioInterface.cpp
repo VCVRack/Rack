@@ -26,8 +26,8 @@ struct AudioInterface : Module, audio::Port {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ENUMS(INPUT_LIGHTS, NUM_AUDIO_INPUTS / 2),
-		ENUMS(OUTPUT_LIGHTS, NUM_AUDIO_OUTPUTS / 2),
+		ENUMS(INPUT_LIGHTS, NUM_AUDIO_INPUTS / 2 * 2),
+		ENUMS(OUTPUT_LIGHTS, NUM_AUDIO_OUTPUTS / 2 * 2),
 		NUM_LIGHTS
 	};
 
@@ -38,6 +38,9 @@ struct AudioInterface : Module, audio::Port {
 	dsp::SampleRateConverter<NUM_AUDIO_OUTPUTS> outputSrc;
 
 	dsp::ClockDivider lightDivider;
+	// For each pair of inputs/outputs
+	float inputClipTimers[NUM_AUDIO_INPUTS / 2] = {};
+	float outputClipTimers[NUM_AUDIO_OUTPUTS / 2] = {};
 
 	// Port variables
 	int requestedEngineFrames = 0;
@@ -71,11 +74,16 @@ struct AudioInterface : Module, audio::Port {
 	}
 
 	void process(const ProcessArgs& args) override {
+		const float clipTime = 0.25f;
+
 		// Push inputs to buffer
 		if (!inputBuffer.full()) {
 			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
 			for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-				inputFrame.samples[i] = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
+				float v = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
+				inputFrame.samples[i] = v;
+				if (std::fabs(v) >= 1.f)
+					inputClipTimers[i / 2] = clipTime;
 			}
 			inputBuffer.push(inputFrame);
 		}
@@ -84,7 +92,10 @@ struct AudioInterface : Module, audio::Port {
 		if (!outputBuffer.empty()) {
 			dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame = outputBuffer.shift();
 			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
-				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * outputFrame.samples[i]);
+				float v = outputFrame.samples[i];
+				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * v);
+				if (std::fabs(v) >= 1.f)
+					outputClipTimers[i / 2] = clipTime;
 			}
 		}
 		else {
@@ -94,14 +105,25 @@ struct AudioInterface : Module, audio::Port {
 		}
 
 		if (lightDivider.process()) {
-			// Turn on light if at least one port is enabled in the nearby pair
-			int numInputs = getNumInputs();
-			int numOutputs = getNumOutputs();
+			float lightTime = args.sampleTime * lightDivider.getDivision();
+			int numDeviceInputs = getNumInputs();
+			int numDeviceOutputs = getNumOutputs();
+			// Turn on light if at least one port is enabled in the nearby pair.
 			for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
-				lights[INPUT_LIGHTS + i].setBrightness(numOutputs >= 2 * i + 1);
+				bool active = numDeviceOutputs >= 2 * i + 1;
+				bool clip = inputClipTimers[i] > 0.f;
+				if (clip)
+					inputClipTimers[i] -= lightTime;
+				lights[INPUT_LIGHTS + i * 2 + 0].setBrightness(active && !clip);
+				lights[INPUT_LIGHTS + i * 2 + 1].setBrightness(active && clip);
 			}
 			for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
-				lights[OUTPUT_LIGHTS + i].setBrightness(numInputs >= 2 * i + 1);
+				bool active = numDeviceInputs >= 2 * i + 1;
+				bool clip = outputClipTimers[i] > 0.f;
+				if (clip)
+					outputClipTimers[i] -= lightTime;
+				lights[OUTPUT_LIGHTS + i * 2 + 0].setBrightness(active & !clip);
+				lights[OUTPUT_LIGHTS + i * 2 + 1].setBrightness(active & clip);
 			}
 		}
 	}
@@ -262,14 +284,14 @@ struct AudioInterfaceWidget : ModuleWidget {
 			addOutput(createOutput<PJ301MPort>(mm2px(Vec(26.906193, 108.1443)), module, TAudioInterface::AUDIO_OUTPUTS + 6));
 			addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.506523, 108.1443)), module, TAudioInterface::AUDIO_OUTPUTS + 7));
 
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(12.524985, 54.577202)), module, TAudioInterface::INPUT_LIGHTS + 0));
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(35.725647, 54.577202)), module, TAudioInterface::INPUT_LIGHTS + 1));
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(12.524985, 69.158226)), module, TAudioInterface::INPUT_LIGHTS + 2));
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(35.725647, 69.158226)), module, TAudioInterface::INPUT_LIGHTS + 3));
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(12.524985, 91.147583)), module, TAudioInterface::OUTPUT_LIGHTS + 0));
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(35.725647, 91.147583)), module, TAudioInterface::OUTPUT_LIGHTS + 1));
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(12.524985, 107.17003)), module, TAudioInterface::OUTPUT_LIGHTS + 2));
-			addChild(createLight<SmallLight<GreenLight>>(mm2px(Vec(35.725647, 107.17003)), module, TAudioInterface::OUTPUT_LIGHTS + 3));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(12.524985, 54.577202)), module, TAudioInterface::INPUT_LIGHTS + 0 * 2));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(35.725647, 54.577202)), module, TAudioInterface::INPUT_LIGHTS + 1 * 2));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(12.524985, 69.158226)), module, TAudioInterface::INPUT_LIGHTS + 2 * 2));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(35.725647, 69.158226)), module, TAudioInterface::INPUT_LIGHTS + 3 * 2));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(12.524985, 91.147583)), module, TAudioInterface::OUTPUT_LIGHTS + 0));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(35.725647, 91.147583)), module, TAudioInterface::OUTPUT_LIGHTS + 1));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(12.524985, 107.17003)), module, TAudioInterface::OUTPUT_LIGHTS + 2));
+			addChild(createLight<SmallLight<GreenRedLight>>(mm2px(Vec(35.725647, 107.17003)), module, TAudioInterface::OUTPUT_LIGHTS + 3));
 
 			AudioWidget* audioWidget = createWidget<AudioWidget>(mm2px(Vec(3.2122073, 14.837339)));
 			audioWidget->box.size = mm2px(Vec(44, 28));
@@ -318,22 +340,22 @@ struct AudioInterfaceWidget : ModuleWidget {
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(77.26, 112.252)), module, TAudioInterface::AUDIO_OUTPUTS + 14));
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(88.86, 112.252)), module, TAudioInterface::AUDIO_OUTPUTS + 15));
 
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(13.46, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 0));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(36.661, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 1));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(59.861, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 2));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(83.061, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 3));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(13.46, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 4));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(36.661, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 5));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(59.861, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 6));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(83.061, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 7));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(13.46, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 0));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(36.661, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 1));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(59.861, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 2));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(83.061, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 3));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(13.46, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 4));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(36.661, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 5));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(59.861, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 6));
-			addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(83.061, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 7));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(13.46, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 0 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(36.661, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 1 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(59.861, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 2 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(83.061, 55.667)), module, TAudioInterface::INPUT_LIGHTS + 3 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(13.46, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 4 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(36.661, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 5 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(59.861, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 6 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(83.061, 70.248)), module, TAudioInterface::INPUT_LIGHTS + 7 * 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(13.46, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 0));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(36.661, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 1));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(59.861, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 2));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(83.061, 92.238)), module, TAudioInterface::OUTPUT_LIGHTS + 3));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(13.46, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 4));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(36.661, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 5));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(59.861, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 6));
+			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(83.061, 108.259)), module, TAudioInterface::OUTPUT_LIGHTS + 7));
 
 			AudioWidget* audioWidget = createWidget<AudioWidget>(mm2px(Vec(2.57, 14.839)));
 			audioWidget->box.size = mm2px(Vec(91.382, 28.0));
