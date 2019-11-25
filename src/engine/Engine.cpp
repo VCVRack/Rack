@@ -959,7 +959,9 @@ json_t* Engine::toJson() {
 
 
 void Engine::fromJson(json_t* rootJ) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	// Don't lock here because Module::fromJson for example might deadlock, and we actually don't really need thread safety other than the addModule() and addCable() calls, which are already behind locks.
+	// std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)

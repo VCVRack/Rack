@@ -76,8 +76,8 @@ struct RtAudioDevice : audio::Device {
 			}
 		}
 
+		INFO("Opening audio RtAudio device %d with %d in %d out", deviceId, inputParameters.nChannels, outputParameters.nChannels);
 		try {
-			INFO("Opening audio RtAudio device %d with %d in %d out", deviceId, inputParameters.nChannels, outputParameters.nChannels);
 			rtAudio->openStream(
 			  outputParameters.nChannels == 0 ? NULL : &outputParameters,
 			  inputParameters.nChannels == 0 ? NULL : &inputParameters,
@@ -89,8 +89,8 @@ struct RtAudioDevice : audio::Device {
 			return;
 		}
 
+		INFO("Starting RtAudio stream %d", deviceId);
 		try {
-			INFO("Starting RtAudio stream %d", deviceId);
 			rtAudio->startStream();
 		}
 		catch (RtAudioError& e) {
@@ -100,6 +100,7 @@ struct RtAudioDevice : audio::Device {
 
 		// Update sample rate to actual value
 		sampleRate = rtAudio->getStreamSampleRate();
+		INFO("Opened RtAudio stream");
 		onOpenStream();
 	}
 
@@ -122,6 +123,7 @@ struct RtAudioDevice : audio::Device {
 				WARN("Failed to close RtAudio stream %s", e.what());
 			}
 		}
+		INFO("Closed RtAudio stream");
 		onCloseStream();
 	}
 

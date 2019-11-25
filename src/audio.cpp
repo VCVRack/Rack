@@ -136,19 +136,22 @@ int Port::getNumOutputs() {
 
 json_t* Port::toJson() {
 	json_t* rootJ = json_object();
-	if (driver) {
-		json_object_set_new(rootJ, "driver", json_integer(getDriverId()));
-		std::string deviceName = driver->getDeviceName(getDeviceId());
-		if (!deviceName.empty())
-			json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
-		json_object_set_new(rootJ, "sampleRate", json_integer(getSampleRate()));
-		json_object_set_new(rootJ, "blockSize", json_integer(getBlockSize()));
-		json_object_set_new(rootJ, "offset", json_integer(offset));
+	json_object_set_new(rootJ, "driver", json_integer(getDriverId()));
+
+	if (device) {
+		std::string deviceName = device->getName();
+		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
 	}
+
+	json_object_set_new(rootJ, "sampleRate", json_integer(getSampleRate()));
+	json_object_set_new(rootJ, "blockSize", json_integer(getBlockSize()));
+	json_object_set_new(rootJ, "offset", json_integer(offset));
 	return rootJ;
 }
 
 void Port::fromJson(json_t* rootJ) {
+	setDriverId(-1);
+
 	json_t* driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
 		setDriverId(json_number_value(driverJ));
