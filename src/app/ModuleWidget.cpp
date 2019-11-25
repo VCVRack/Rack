@@ -3,6 +3,7 @@
 #include <engine/Engine.hpp>
 #include <plugin/Plugin.hpp>
 #include <app/SvgPanel.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <system.hpp>
 #include <asset.hpp>
 #include <helpers.hpp>
@@ -235,12 +236,12 @@ struct ModulePresetItem : ui::MenuItem {
 		};
 
 		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
-		menu->addChild(new MenuEntry);
+		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("User presets"));
 		createPresetItems(asset::user("presets/" + moduleWidget->model->plugin->slug + "/" + moduleWidget->model->slug));
 
 		// Scan `<plugin dir>/presets/<module slug>` for presets.
-		menu->addChild(new MenuEntry);
+		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Factory presets"));
 		createPresetItems(asset::plugin(moduleWidget->model->plugin, "presets/" + moduleWidget->model->slug));
 

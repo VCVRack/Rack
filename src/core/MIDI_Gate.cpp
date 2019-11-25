@@ -211,7 +211,7 @@ struct MIDI_GateWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		MIDI_Gate* module = dynamic_cast<MIDI_Gate*>(this->module);
 
-		menu->addChild(new MenuEntry);
+		menu->addChild(new MenuSeparator);
 		MIDI_GateVelocityItem* velocityItem = createMenuItem<MIDI_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);

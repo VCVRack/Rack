@@ -4,6 +4,7 @@
 #include <asset.hpp>
 #include <ui/Button.hpp>
 #include <ui/MenuItem.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <ui/SequentialLayout.hpp>
 #include <ui/Slider.hpp>
 #include <ui/TextField.hpp>
@@ -709,7 +710,7 @@ struct LibraryMenu : ui::Menu {
 			addChild(syncItem);
 
 			if (plugin::hasUpdates()) {
-				addChild(new ui::MenuEntry);
+				addChild(new ui::MenuSeparator);
 
 				ui::MenuLabel* updatesLabel = new ui::MenuLabel;
 				updatesLabel->text = "Updates";

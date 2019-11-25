@@ -367,7 +367,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		TAudioInterface* module = dynamic_cast<TAudioInterface*>(this->module);
 
-		menu->addChild(new MenuEntry);
+		menu->addChild(new MenuSeparator);
 
 		PrimaryModuleItem<TAudioInterface>* primaryModuleItem = new PrimaryModuleItem<TAudioInterface>;
 		primaryModuleItem->text = "Primary audio module";

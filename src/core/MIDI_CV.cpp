@@ -573,7 +573,7 @@ struct MIDI_CVWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		MIDI_CV* module = dynamic_cast<MIDI_CV*>(this->module);
 
-		menu->addChild(new MenuEntry);
+		menu->addChild(new MenuSeparator);
 
 		ClockDivisionItem* clockDivisionItem = new ClockDivisionItem;
 		clockDivisionItem->text = "CLK/N divider";

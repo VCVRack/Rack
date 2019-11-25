@@ -175,7 +175,7 @@ struct CV_MIDIWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		CV_MIDI* module = dynamic_cast<CV_MIDI*>(this->module);
 
-		menu->addChild(new MenuEntry);
+		menu->addChild(new MenuSeparator);
 
 		CV_MIDIPanicItem* panicItem = new CV_MIDIPanicItem;
 		panicItem->text = "Panic";

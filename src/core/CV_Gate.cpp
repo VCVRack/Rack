@@ -205,7 +205,7 @@ struct CV_GateWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		CV_Gate* module = dynamic_cast<CV_Gate*>(this->module);
 
-		menu->addChild(new MenuEntry);
+		menu->addChild(new MenuSeparator);
 		CV_GateVelocityItem* velocityItem = createMenuItem<CV_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
