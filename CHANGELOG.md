@@ -4,7 +4,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 2.0.0 (in development)
 - Add port tooltips with name, voltage, and list of connected ports.
-- Add math expression parsing to parameter tooltips.
+- Evaluate mathematical expressions (such as `1+2*3`) in parameter context menu fields.
 - Add module whitelist to Module Browser.
 - Restructure engine to no longer use an "engine thread".
 	- Improve engine performance and latency by no longer requiring thread synchronization between the engine thread and audio thread. The engine now runs directly on the audio thread.
@@ -17,10 +17,14 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add module tags to module context menu.
 - Add module manual URL (if plugin developer supplies it) to module context menu item.
 - Add quick access to user module patches from `<Rack user dir>/presets/<plugin slug>/<module slug>` to module context menu.
+- Add infinity and NaN protection to cables, so they won't propagate non-finite values from badly behaving modules.
+- Core
+	- Add red clip lights to VCV Audio-8/16 when signal reaches beyond ±10V.
 - API
 	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.
 	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.
 	- Add `.modules[].manualUrl` to plugin manifest schema.
+	- Add `appendAudioMenu()` and `appendMidiMenu()` so plugin developers can develop custom audio/MIDI interfaces without adding an `AudioWidget/MidiWidget` to their panel.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
