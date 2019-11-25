@@ -94,16 +94,15 @@ void Port::setDriverId(int driverId) {
 	driver = NULL;
 	this->driverId = -1;
 
-	if (driverId == -1) {
+	// Find driver by ID
+	driver = audio::getDriver(driverId);
+	if (driver) {
+		this->driverId = driverId;
+	}
+	else {
 		// Set first driver as default
 		driver = drivers[0].second;
 		this->driverId = drivers[0].first;
-	}
-	else {
-		// Find driver by ID
-		driver = audio::getDriver(driverId);
-		if (driver)
-			this->driverId = driverId;
 	}
 }
 
