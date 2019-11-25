@@ -1,6 +1,7 @@
 #pragma once
 #include <app/common.hpp>
 #include <app/LedDisplay.hpp>
+#include <ui/Menu.hpp>
 #include <midi.hpp>
 
 
@@ -16,6 +17,12 @@ struct MidiWidget : LedDisplay {
 	LedDisplayChoice* channelChoice;
 	void setMidiPort(midi::Port* port);
 };
+
+
+/** Appends menu items to the given menu with driver, device, etc.
+Useful alternative to putting a MidiWidget on your module's panel.
+*/
+void appendMidiMenu(ui::Menu* menu, midi::Port* port);
 
 
 } // namespace app
