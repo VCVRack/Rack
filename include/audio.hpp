@@ -27,9 +27,19 @@ struct Driver {
 	virtual std::vector<int> getDeviceIds() {
 		return {};
 	}
+
+	/** Gets the name of a device without subscribing to it. */
 	virtual std::string getDeviceName(int deviceId) {
 		return "";
 	}
+	virtual int getDeviceNumInputs(int deviceId) {
+		return 0;
+	}
+	virtual int getDeviceNumOutputs(int deviceId) {
+		return 0;
+	}
+	std::string getDeviceDetail(int deviceId, int offset, int maxChannels);
+
 	virtual Device* subscribe(int deviceId, Port* port) {
 		return NULL;
 	}
@@ -47,7 +57,17 @@ struct Device {
 	void subscribe(Port* port);
 	void unsubscribe(Port* port);
 
-	// Called by Port.
+	virtual std::string getName() {
+		return "";
+	}
+	virtual int getNumInputs() {
+		return 0;
+	}
+	virtual int getNumOutputs() {
+		return 0;
+	}
+	std::string getDetail(int offset, int maxChannels);
+
 	virtual std::vector<int> getSampleRates() {
 		return {};
 	}
@@ -64,13 +84,6 @@ struct Device {
 	}
 	virtual void setBlockSize(int blockSize) {}
 
-	virtual int getNumInputs() {
-		return 0;
-	}
-	virtual int getNumOutputs() {
-		return 0;
-	}
-
 	// Called by this Device class, forwards to subscribed Ports.
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames);
 	void onOpenStream();
@@ -82,44 +95,34 @@ struct Device {
 ////////////////////
 
 struct Port {
-	/** Not owned */
-	Driver* driver = NULL;
-	Device* device = NULL;
-
-	// Port settings
 	int offset = 0;
 	int maxChannels = 8;
 
 	// private
 	int driverId = -1;
 	int deviceId = -1;
+	/** Not owned */
+	Driver* driver = NULL;
+	Device* device = NULL;
 
 	Port();
 	virtual ~Port();
 
-	std::vector<int> getDriverIds();
+	Driver* getDriver() {
+		return driver;
+	}
 	int getDriverId() {
 		return driverId;
 	}
 	void setDriverId(int driverId);
-	std::string getDriverName(int driverId);
 
-	std::vector<int> getDeviceIds() {
-		if (!driver)
-			return {};
-		return driver->getDeviceIds();
+	Device* getDevice() {
+		return device;
 	}
 	int getDeviceId() {
 		return deviceId;
 	}
 	void setDeviceId(int deviceId);
-
-	std::string getDeviceName(int deviceId) {
-		if (!driver)
-			return "";
-		return driver->getDeviceName(deviceId);
-	}
-	std::string getDeviceDetail(int deviceId, int offset);
 
 	std::vector<int> getSampleRates() {
 		if (!device)
@@ -178,6 +181,8 @@ void init();
 void destroy();
 /** Registers a new audio driver. Takes pointer ownership. */
 void addDriver(int driverId, Driver* driver);
+std::vector<int> getDriverIds();
+Driver* getDriver(int driverId);
 
 
 } // namespace audio

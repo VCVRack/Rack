@@ -125,6 +125,16 @@ struct RtAudioDevice : audio::Device {
 		onCloseStream();
 	}
 
+	std::string getName() override {
+		return deviceInfo.name;
+	}
+	int getNumInputs() override {
+		return inputParameters.nChannels;
+	}
+	int getNumOutputs() override {
+		return outputParameters.nChannels;
+	}
+
 	std::vector<int> getSampleRates() override {
 		std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
 		return sampleRates;
@@ -139,7 +149,13 @@ struct RtAudioDevice : audio::Device {
 	}
 
 	std::vector<int> getBlockSizes() override {
-		return {32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096};
+		std::vector<int> blockSizes;
+		for (int i = 5; i < 12; i++) {
+			blockSizes.push_back(1 << i);
+			blockSizes.push_back((1 << i) / 2 * 3);
+		}
+		blockSizes.push_back(1 << 12);
+		return blockSizes;
 	}
 	int getBlockSize() override {
 		return blockSize;
@@ -148,13 +164,6 @@ struct RtAudioDevice : audio::Device {
 		closeStream();
 		this->blockSize = blockSize;
 		openStream();
-	}
-
-	int getNumInputs() override {
-		return inputParameters.nChannels;
-	}
-	int getNumOutputs() override {
-		return outputParameters.nChannels;
 	}
 
 	static int rtAudioCallback(void* outputBuffer, void* inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
@@ -204,11 +213,37 @@ struct RtAudioDriver : audio::Driver {
 		return "";
 	}
 
+	int getDeviceNumInputs(int deviceId) override {
+		if (deviceId >= 0) {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+			return deviceInfo.inputChannels;
+		}
+		return 0;
+	}
+
+	int getDeviceNumOutputs(int deviceId) override {
+		if (deviceId >= 0) {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+			return deviceInfo.outputChannels;
+		}
+		return 0;
+	}
+
 	audio::Device* subscribe(int deviceId, audio::Port* port) override {
-		RtAudioDevice* device = devices[deviceId];
-		if (!device) {
-			devices[deviceId] = device = new RtAudioDevice(rtAudio->getCurrentApi(), deviceId);
-			// TODO Error check
+		RtAudioDevice* device;
+		auto it = devices.find(deviceId);
+		if (it == devices.end()) {
+			try {
+				device = new RtAudioDevice(rtAudio->getCurrentApi(), deviceId);
+				devices[deviceId] = device;
+			}
+			catch (Exception& e) {
+				WARN("Could not subscribe to audio device: %s", e.what());
+				return NULL;
+			}
+		}
+		else {
+			device = it->second;
 		}
 
 		device->subscribe(port);

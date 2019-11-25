@@ -22,25 +22,27 @@ struct AudioDriverChoice : LedDisplayChoice {
 
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
-		for (int driverId : port->getDriverIds()) {
+		for (int driverId : audio::getDriverIds()) {
 			AudioDriverItem* item = new AudioDriverItem;
 			item->port = port;
 			item->driverId = driverId;
-			item->text = port->getDriverName(driverId);
+			item->text = audio::getDriver(driverId)->getName();
 			item->rightText = CHECKMARK(item->driverId == port->getDriverId());
 			menu->addChild(item);
 		}
 	}
 	void step() override {
-		text = (box.size.x >= 200.0) ? "Driver: " : "";
-		std::string driverName = port ? port->getDriverName(port->getDriverId()) : "";
+		text = "";
+		if (box.size.x >= 200.0)
+			text += "Driver: ";
+		std::string driverName = (port && port->driver) ? port->getDriver()->getName() : "";
 		if (driverName != "") {
 			text += driverName;
-			color.a = 1.f;
+			color.a = 1.0;
 		}
 		else {
 			text += "(No driver)";
-			color.a = 0.5f;
+			color.a = 0.5;
 		}
 	}
 };
@@ -60,7 +62,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 	audio::Port* port;
 
 	void onAction(const event::Action& e) override {
-		if (!port)
+		if (!port || !port->driver)
 			return;
 
 		ui::Menu* menu = createMenu();
@@ -70,12 +72,12 @@ struct AudioDeviceChoice : LedDisplayChoice {
 			item->port = port;
 			item->deviceId = -1;
 			item->text = "(No device)";
-			item->rightText = CHECKMARK(item->deviceId == port->getDeviceId());
+			item->rightText = CHECKMARK(port->getDeviceId() == -1);
 			menu->addChild(item);
 		}
-		for (int deviceId : port->getDeviceIds()) {
-			int channels = std::max(port->getNumInputs(), port->getNumOutputs());
-			/** Prevents devices with a ridiculous number of channels from being displayed */
+		for (int deviceId : port->driver->getDeviceIds()) {
+			int channels = std::max(port->driver->getDeviceNumInputs(deviceId), port->driver->getDeviceNumOutputs(deviceId));
+			// Prevents devices with a ridiculous number of channels from being displayed
 			const int maxTotalChannels = 128;
 			channels = std::min(maxTotalChannels, channels);
 
@@ -84,22 +86,24 @@ struct AudioDeviceChoice : LedDisplayChoice {
 				item->port = port;
 				item->deviceId = deviceId;
 				item->offset = offset;
-				item->text = port->getDeviceDetail(deviceId, offset);
+				item->text = port->driver->getDeviceDetail(deviceId, offset, port->maxChannels);
 				item->rightText = CHECKMARK(item->deviceId == port->getDeviceId() && item->offset == port->offset);
 				menu->addChild(item);
 			}
 		}
 	}
 	void step() override {
-		text = (box.size.x >= 200.0) ? "Device: " : "";
-		std::string detail = (port) ? port->getDeviceDetail(port->deviceId, port->offset) : "";
+		text = "";
+		if (box.size.x >= 200.0)
+			text += "Device: ";
+		std::string detail = (port && port->device) ? port->device->getDetail(port->offset, port->maxChannels) : "";
 		if (detail != "") {
 			text += detail;
-			color.a = (detail == "") ? 0.5f : 1.f;
+			color.a = 1.0;
 		}
 		else {
 			text += "(No device)";
-			color.a = 0.5f;
+			color.a = 0.5;
 		}
 	}
 };
@@ -135,13 +139,19 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = (box.size.x >= 100.0) ? "Rate: " : "";
-		if (port) {
-			text += string::f("%g kHz", port->getSampleRate() / 1000.0);
+		text = "";
+		if (box.size.x >= 100.0)
+			text += "Rate: ";
+		int sampleRate = port ? port->getSampleRate() : 0;
+		if (sampleRate > 0) {
+			text += string::f("%g", sampleRate / 1000.0);
+			color.a = 1.0;
 		}
 		else {
-			text += "0 kHz";
+			text += "---";
+			color.a = 0.5;
 		}
+		text += " kHz";
 	}
 };
 
@@ -177,12 +187,17 @@ struct AudioBlockSizeChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
-		text = (box.size.x >= 100.0) ? "Block size: " : "";
-		if (port) {
-			text += string::f("%d", port->getBlockSize());
+		text = "";
+		if (box.size.x >= 100.0)
+			text += "Block size: ";
+		int blockSize = port ? port->getBlockSize() : 0;
+		if (blockSize > 0) {
+			text += string::f("%d", blockSize);
+			color.a = 1.0;
 		}
 		else {
-			text += "0";
+			text += "---";
+			color.a = 0.5;
 		}
 	}
 };

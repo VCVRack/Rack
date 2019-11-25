@@ -8,6 +8,31 @@ namespace audio {
 
 static std::vector<std::pair<int, Driver*>> drivers;
 
+static std::string getDetailTemplate(std::string name, int numInputs, int numOutputs, int offset, int maxChannels) {
+	std::string text = name;
+	text += " (";
+	if (offset < numInputs) {
+		text += string::f("%d-%d in", offset + 1, std::min(offset + maxChannels, numInputs));
+	}
+	if (offset < numInputs && offset < numOutputs) {
+		text += ", ";
+	}
+	if (offset < numOutputs) {
+		text += string::f("%d-%d out", offset + 1, std::min(offset + maxChannels, numOutputs));
+	}
+	text += ")";
+	return text;
+}
+
+////////////////////
+// Driver
+////////////////////
+
+std::string Driver::getDeviceDetail(int deviceId, int offset, int maxChannels) {
+	if (deviceId < 0)
+		return "";
+	return getDetailTemplate(getDeviceName(deviceId), getDeviceNumInputs(deviceId), getDeviceNumOutputs(deviceId), offset, maxChannels);
+}
 
 ////////////////////
 // Device
@@ -21,6 +46,10 @@ void Device::unsubscribe(Port* port) {
 	auto it = subscribed.find(port);
 	if (it != subscribed.end())
 		subscribed.erase(it);
+}
+
+std::string Device::getDetail(int offset, int maxChannels) {
+	return getDetailTemplate(getName(), getNumInputs(), getNumOutputs(), offset, maxChannels);
 }
 
 void Device::processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) {
@@ -59,14 +88,6 @@ Port::~Port() {
 	setDriverId(-1);
 }
 
-std::vector<int> Port::getDriverIds() {
-	std::vector<int> driverIds;
-	for (auto& pair : drivers) {
-		driverIds.push_back(pair.first);
-	}
-	return driverIds;
-}
-
 void Port::setDriverId(int driverId) {
 	// Unset device and driver
 	setDeviceId(-1);
@@ -75,30 +96,15 @@ void Port::setDriverId(int driverId) {
 
 	if (driverId == -1) {
 		// Set first driver as default
-		if (!drivers.empty()) {
-			driver = drivers[0].second;
-			this->driverId = drivers[0].first;
-		}
+		driver = drivers[0].second;
+		this->driverId = drivers[0].first;
 	}
 	else {
-		// Set driver with driverId
-		for (auto& pair : drivers) {
-			if (pair.first == driverId) {
-				driver = pair.second;
-				this->driverId = driverId;
-				break;
-			}
-		}
+		// Find driver by ID
+		driver = audio::getDriver(driverId);
+		if (driver)
+			this->driverId = driverId;
 	}
-}
-
-std::string Port::getDriverName(int driverId) {
-	for (auto& pair : drivers) {
-		if (pair.first == driverId) {
-			return pair.second->getName();
-		}
-	}
-	return "";
 }
 
 void Port::setDeviceId(int deviceId) {
@@ -116,26 +122,6 @@ void Port::setDeviceId(int deviceId) {
 	}
 }
 
-std::string Port::getDeviceDetail(int deviceId, int offset) {
-	if (!driver || !device)
-		return "";
-	std::string text = getDeviceName(getDeviceId());
-	text += " (";
-	int numInputs = device->getNumInputs();
-	int numOutputs = device->getNumOutputs();
-	if (offset < numInputs) {
-		text += string::f("%d-%d in", offset + 1, std::min(offset + maxChannels, numInputs));
-	}
-	if (offset < numInputs && offset < numOutputs) {
-		text += ", ";
-	}
-	if (offset < numOutputs) {
-		text += string::f("%d-%d out", offset + 1, std::min(offset + maxChannels, numOutputs));
-	}
-	text += ")";
-	return text;
-}
-
 int Port::getNumInputs() {
 	if (!device)
 		return 0;
@@ -150,13 +136,15 @@ int Port::getNumOutputs() {
 
 json_t* Port::toJson() {
 	json_t* rootJ = json_object();
-	json_object_set_new(rootJ, "driver", json_integer(getDriverId()));
-	std::string deviceName = getDeviceName(getDeviceId());
-	if (!deviceName.empty())
-		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
-	json_object_set_new(rootJ, "sampleRate", json_integer(getSampleRate()));
-	json_object_set_new(rootJ, "blockSize", json_integer(getBlockSize()));
-	json_object_set_new(rootJ, "offset", json_integer(offset));
+	if (driver) {
+		json_object_set_new(rootJ, "driver", json_integer(getDriverId()));
+		std::string deviceName = driver->getDeviceName(getDeviceId());
+		if (!deviceName.empty())
+			json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+		json_object_set_new(rootJ, "sampleRate", json_integer(getSampleRate()));
+		json_object_set_new(rootJ, "blockSize", json_integer(getBlockSize()));
+		json_object_set_new(rootJ, "offset", json_integer(offset));
+	}
 	return rootJ;
 }
 
@@ -165,14 +153,16 @@ void Port::fromJson(json_t* rootJ) {
 	if (driverJ)
 		setDriverId(json_number_value(driverJ));
 
-	json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
-	if (deviceNameJ) {
-		std::string deviceName = json_string_value(deviceNameJ);
-		// Search for device ID with equal name
-		for (int deviceId : getDeviceIds()) {
-			if (getDeviceName(deviceId) == deviceName) {
-				setDeviceId(deviceId);
-				break;
+	if (driver) {
+		json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
+		if (deviceNameJ) {
+			std::string deviceName = json_string_value(deviceNameJ);
+			// Search for device ID with equal name
+			for (int deviceId : driver->getDeviceIds()) {
+				if (driver->getDeviceName(deviceId) == deviceName) {
+					setDeviceId(deviceId);
+					break;
+				}
 			}
 		}
 	}
@@ -208,6 +198,22 @@ void destroy() {
 void addDriver(int driverId, Driver* driver) {
 	assert(driver);
 	drivers.push_back(std::make_pair(driverId, driver));
+}
+
+std::vector<int> getDriverIds() {
+	std::vector<int> driverIds;
+	for (auto& pair : drivers) {
+		driverIds.push_back(pair.first);
+	}
+	return driverIds;
+}
+
+Driver* getDriver(int driverId) {
+	for (auto& pair : drivers) {
+		if (pair.first == driverId)
+			return pair.second;
+	}
+	return NULL;
 }
 
 
