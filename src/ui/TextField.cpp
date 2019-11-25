@@ -164,7 +164,7 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			selectAll();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_ENTER && (e.mods & RACK_MOD_MASK) == 0) {
+		else if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
 			if (multiline) {
 				insertText("\n");
 			}
