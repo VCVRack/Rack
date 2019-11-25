@@ -4,6 +4,7 @@
 #include <math.hpp>
 #include <system.hpp>
 #include <map>
+#include <algorithm>
 
 #pragma GCC diagnostic push
 #ifndef __clang__
@@ -23,7 +24,7 @@ struct RtAudioDevice : audio::Device {
 	RtAudio::StreamParameters inputParameters;
 	RtAudio::StreamParameters outputParameters;
 	RtAudio::StreamOptions options;
-	int blockSize = 256;
+	int blockSize = 0;
 	int sampleRate = 44100;
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
@@ -31,6 +32,8 @@ struct RtAudioDevice : audio::Device {
 		if (!rtAudio) {
 			throw Exception(string::f("Failed to create RtAudio driver %d", api));
 		}
+		rtAudio->showWarnings(false);
+
 		try {
 			deviceInfo = rtAudio->getDeviceInfo(deviceId);
 		}
@@ -70,17 +73,24 @@ struct RtAudioDevice : audio::Device {
 		options.streamName = "VCV Rack";
 
 		int closestSampleRate = deviceInfo.preferredSampleRate;
-		for (int sr : deviceInfo.sampleRates) {
-			if (std::abs(sr - sampleRate) < std::abs(closestSampleRate - sampleRate)) {
-				closestSampleRate = sr;
+		if (sampleRate > 0) {
+			// Find the closest sample rate to the requested one.
+			for (int sr : deviceInfo.sampleRates) {
+				if (std::abs(sr - sampleRate) < std::abs(closestSampleRate - sampleRate)) {
+					closestSampleRate = sr;
+				}
 			}
+		}
+
+		if (blockSize <= 0) {
+			blockSize = 256;
 		}
 
 		INFO("Opening audio RtAudio device %d with %d in %d out", deviceId, inputParameters.nChannels, outputParameters.nChannels);
 		try {
 			rtAudio->openStream(
-			  outputParameters.nChannels == 0 ? NULL : &outputParameters,
-			  inputParameters.nChannels == 0 ? NULL : &inputParameters,
+			  outputParameters.nChannels > 0 ? &outputParameters : NULL,
+			  inputParameters.nChannels > 0 ? &inputParameters : NULL,
 			  RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize,
 			  &rtAudioCallback, this, &options, NULL);
 		}
@@ -270,9 +280,24 @@ struct RtAudioDriver : audio::Driver {
 void rtaudioInit() {
 	std::vector<RtAudio::Api> apis;
 	RtAudio::getCompiledApi(apis);
-	for (RtAudio::Api api : apis) {
-		RtAudioDriver* driver = new RtAudioDriver(api);
-		audio::addDriver((int) api, driver);
+
+	// I don't like the order returned by getCompiledApi(), so reorder it here.
+	std::vector<RtAudio::Api> orderedApis = {
+		RtAudio::LINUX_ALSA,
+		RtAudio::UNIX_JACK,
+		RtAudio::LINUX_PULSE,
+		RtAudio::LINUX_OSS,
+		RtAudio::WINDOWS_WASAPI,
+		RtAudio::WINDOWS_ASIO,
+		RtAudio::WINDOWS_DS,
+		RtAudio::MACOSX_CORE,
+	};
+	for (RtAudio::Api api : orderedApis) {
+		auto it = std::find(apis.begin(), apis.end(), api);
+		if (it != apis.end()) {
+			RtAudioDriver* driver = new RtAudioDriver(api);
+			audio::addDriver((int) api, driver);
+		}
 	}
 }
 
