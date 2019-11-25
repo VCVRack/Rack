@@ -62,7 +62,6 @@ struct Driver {
 	virtual std::string getName() {
 		return "";
 	}
-
 	virtual std::vector<int> getInputDeviceIds() {
 		return {};
 	}

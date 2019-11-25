@@ -1,15 +1,14 @@
 #include <midi.hpp>
 #include <string.hpp>
 #include <map>
+#include <utility>
 
 
 namespace rack {
 namespace midi {
 
 
-/** Preserves the order of IDs */
-static std::vector<int> driverIds;
-static std::map<int, Driver*> drivers;
+static std::vector<std::pair<int, Driver*>> drivers;
 
 
 ////////////////////
@@ -41,7 +40,6 @@ void OutputDevice::subscribe(Output* output) {
 }
 
 void OutputDevice::unsubscribe(Output* output) {
-	// Remove Output from subscriptions
 	auto it = subscribed.find(output);
 	if (it != subscribed.end())
 		subscribed.erase(it);
@@ -52,30 +50,35 @@ void OutputDevice::unsubscribe(Output* output) {
 ////////////////////
 
 std::vector<int> Port::getDriverIds() {
+	std::vector<int> driverIds;
+	for (auto& pair : drivers) {
+		driverIds.push_back(pair.first);
+	}
 	return driverIds;
 }
 
 std::string Port::getDriverName(int driverId) {
-	auto it = drivers.find(driverId);
-	if (it == drivers.end())
-		return "";
-
-	return it->second->getName();
+	for (auto& pair : drivers) {
+		if (pair.first == driverId) {
+			return pair.second->getName();
+		}
+	}
+	return "";
 }
 
 void Port::setDriverId(int driverId) {
 	// Unset device and driver
 	setDeviceId(-1);
-	if (driver) {
-		driver = NULL;
-	}
+	driver = NULL;
 	this->driverId = -1;
 
 	// Set driver
-	auto it = drivers.find(driverId);
-	if (it != drivers.end()) {
-		driver = it->second;
-		this->driverId = driverId;
+	for (auto& pair : drivers) {
+		if (pair.first == driverId) {
+			driver = pair.second;
+			this->driverId = driverId;
+			break;
+		}
 	}
 }
 
@@ -137,8 +140,8 @@ Input::~Input() {
 void Input::reset() {
 	channel = -1;
 	// Set first driver as default
-	if (driverIds.size() >= 1) {
-		setDriverId(driverIds[0]);
+	if (drivers.size() >= 1) {
+		setDriverId(drivers[0].first);
 	}
 }
 
@@ -160,8 +163,8 @@ void Input::setDeviceId(int deviceId) {
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
 		driver->unsubscribeInput(this->deviceId, this);
-		inputDevice = NULL;
 	}
+	inputDevice = NULL;
 	this->deviceId = -1;
 
 	// Create device
@@ -211,8 +214,8 @@ Output::~Output() {
 void Output::reset() {
 	channel = 0;
 	// Set first driver as default
-	if (driverIds.size() >= 1) {
-		setDriverId(driverIds[0]);
+	if (drivers.size() >= 1) {
+		setDriverId(drivers[0].first);
 	}
 }
 
@@ -234,8 +237,8 @@ void Output::setDeviceId(int deviceId) {
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
 		driver->unsubscribeOutput(this->deviceId, this);
-		outputDevice = NULL;
 	}
+	outputDevice = NULL;
 	this->deviceId = -1;
 
 	// Create device
@@ -273,7 +276,6 @@ void init() {
 }
 
 void destroy() {
-	driverIds.clear();
 	for (auto& pair : drivers) {
 		delete pair.second;
 	}
@@ -282,8 +284,7 @@ void destroy() {
 
 void addDriver(int driverId, Driver* driver) {
 	assert(driver);
-	driverIds.push_back(driverId);
-	drivers[driverId] = driver;
+	drivers.push_back(std::make_pair(driverId, driver));
 }
 
 

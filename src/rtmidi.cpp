@@ -90,6 +90,8 @@ struct RtMidiDriver : midi::Driver {
 	}
 
 	~RtMidiDriver() {
+		assert(inputDevices.empty());
+		assert(outputDevices.empty());
 		delete rtMidiIn;
 		delete rtMidiOut;
 	}

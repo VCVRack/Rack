@@ -1,6 +1,8 @@
 #include <common.hpp>
 #include <random.hpp>
 #include <asset.hpp>
+#include <audio.hpp>
+#include <rtaudio.hpp>
 #include <midi.hpp>
 #include <rtmidi.hpp>
 #include <keyboard.hpp>
@@ -155,6 +157,8 @@ int main(int argc, char* argv[]) {
 	INFO("Initializing environment");
 	random::init();
 	network::init();
+	audio::init();
+	rtaudioInit();
 	midi::init();
 	rtmidiInit();
 	keyboard::init();
@@ -215,6 +219,7 @@ int main(int argc, char* argv[]) {
 	}
 	plugin::destroy();
 	midi::destroy();
+	audio::destroy();
 	INFO("Destroying logger");
 	logger::destroy();
 

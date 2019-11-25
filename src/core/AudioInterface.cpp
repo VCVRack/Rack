@@ -37,20 +37,32 @@ struct AudioInterface : Module, audio::Port {
 	dsp::SampleRateConverter<NUM_AUDIO_INPUTS> inputSrc;
 	dsp::SampleRateConverter<NUM_AUDIO_OUTPUTS> outputSrc;
 
+	dsp::ClockDivider lightDivider;
+
+	// Port variables
+	int requestedEngineFrames = 0;
+	int maxEngineFrames = 0;
+
 	AudioInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < NUM_AUDIO_INPUTS; i++)
 			configInput(AUDIO_INPUTS + i, string::f("To device %d", i + 1));
 		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++)
 			configOutput(AUDIO_OUTPUTS + i, string::f("From device %d", i + 1));
+
+		lightDivider.setDivision(512);
 		maxChannels = std::max(NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS);
 		inputSrc.setQuality(6);
 		outputSrc.setQuality(6);
 	}
 
 	~AudioInterface() {
-		// Close stream here before destructing AudioInterfacePort, so the mutexes are still valid when waiting to close.
-		setDeviceId(-1, 0);
+		// Close stream here before destructing AudioInterfacePort, so processBuffer() etc are not called on another thread while destructing.
+		setDriverId(-1);
+	}
+
+	void onReset() override {
+		setDriverId(-1);
 	}
 
 	void onSampleRateChange(const SampleRateChangeEvent& e) override {
@@ -59,7 +71,7 @@ struct AudioInterface : Module, audio::Port {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Get inputs
+		// Push inputs to buffer
 		if (!inputBuffer.full()) {
 			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
 			for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
@@ -68,7 +80,7 @@ struct AudioInterface : Module, audio::Port {
 			inputBuffer.push(inputFrame);
 		}
 
-		// Set outputs
+		// Pull outputs from buffer
 		if (!outputBuffer.empty()) {
 			dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame = outputBuffer.shift();
 			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
@@ -81,12 +93,16 @@ struct AudioInterface : Module, audio::Port {
 			}
 		}
 
-		// Turn on light if at least one port is enabled in the nearby pair
-		for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
-			lights[INPUT_LIGHTS + i].setBrightness(numOutputs >= 2 * i + 1);
-		}
-		for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
-			lights[OUTPUT_LIGHTS + i].setBrightness(numInputs >= 2 * i + 1);
+		if (lightDivider.process()) {
+			// Turn on light if at least one port is enabled in the nearby pair
+			int numInputs = getNumInputs();
+			int numOutputs = getNumOutputs();
+			for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
+				lights[INPUT_LIGHTS + i].setBrightness(numOutputs >= 2 * i + 1);
+			}
+			for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
+				lights[OUTPUT_LIGHTS + i].setBrightness(numInputs >= 2 * i + 1);
+			}
 		}
 	}
 
@@ -102,46 +118,38 @@ struct AudioInterface : Module, audio::Port {
 			audio::Port::fromJson(audioJ);
 	}
 
-	void onReset() override {
-		setDeviceId(-1, 0);
-	}
-
 	// audio::Port
 
-	void processStream(const float* input, float* output, int frames) override {
+	void processInput(const float* input, int inputStride, int frames) override {
 		// Claim primary module if there is none
 		if (!APP->engine->getPrimaryModule()) {
 			APP->engine->setPrimaryModule(this);
 		}
 		bool isPrimary = (APP->engine->getPrimaryModule() == this);
 
-		// Clear output in case the audio driver uses this buffer in another thread before this method returns. (Not sure if any do this in practice.)
-		std::memset(output, 0, sizeof(float) * numOutputs * frames);
-
 		// Initialize sample rate converters
+		int numInputs = getNumInputs();
 		int engineSampleRate = (int) APP->engine->getSampleRate();
+		int sampleRate = getSampleRate();
 		double sampleRateRatio = (double) engineSampleRate / sampleRate;
-		outputSrc.setRates((int) sampleRate, engineSampleRate);
+		outputSrc.setRates(sampleRate, engineSampleRate);
 		outputSrc.setChannels(numInputs);
-		inputSrc.setRates(engineSampleRate, (int) sampleRate);
-		inputSrc.setChannels(numOutputs);
 
 		// Consider engine buffers "too full" if they contain a bit more than the audio device's number of frames, converted to engine sample rate.
-		int maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 1.5);
+		maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 1.5);
 		// If this is a secondary audio module and the engine output buffer is too full, flush it.
 		if (!isPrimary && (int) outputBuffer.size() > maxEngineFrames) {
 			outputBuffer.clear();
 			// DEBUG("%p: flushing engine output", this);
 		}
 
-		int requestedEngineFrames;
 		if (numInputs > 0) {
 			// audio input -> engine output
 			dsp::Frame<NUM_AUDIO_OUTPUTS> inputAudioBuffer[frames];
 			std::memset(inputAudioBuffer, 0, sizeof(inputAudioBuffer));
 			for (int i = 0; i < frames; i++) {
 				for (int j = 0; j < std::min(numInputs, NUM_AUDIO_OUTPUTS); j++) {
-					float v = input[i * numInputs + j];
+					float v = input[i * inputStride + j];
 					inputAudioBuffer[i].samples[j] = v;
 				}
 			}
@@ -156,11 +164,23 @@ struct AudioInterface : Module, audio::Port {
 			// Upper bound on number of frames so that `outputAudioFrames >= frames` at the end of this method.
 			requestedEngineFrames = (int) std::ceil(frames * sampleRateRatio) - inputBuffer.size();
 		}
+	}
 
+	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) override {
+		bool isPrimary = (APP->engine->getPrimaryModule() == this);
 		// Step engine
 		if (isPrimary && requestedEngineFrames > 0) {
 			APP->engine->step(requestedEngineFrames);
 		}
+	}
+
+	void processOutput(float* output, int outputStride, int frames) override {
+		bool isPrimary = (APP->engine->getPrimaryModule() == this);
+		int numOutputs = getNumOutputs();
+		int engineSampleRate = (int) APP->engine->getSampleRate();
+		int sampleRate = getSampleRate();
+		inputSrc.setRates(engineSampleRate, sampleRate);
+		inputSrc.setChannels(numOutputs);
 
 		if (numOutputs > 0) {
 			// engine input -> audio output
@@ -173,7 +193,7 @@ struct AudioInterface : Module, audio::Port {
 				for (int j = 0; j < std::min(numOutputs, NUM_AUDIO_INPUTS); j++) {
 					float v = outputAudioBuffer[i].samples[j];
 					v = clamp(v, -1.f, 1.f);
-					output[i * numOutputs + j] = v;
+					output[i * outputStride + j] = v;
 				}
 			}
 		}
@@ -195,9 +215,6 @@ struct AudioInterface : Module, audio::Port {
 	void onCloseStream() override {
 		inputBuffer.clear();
 		outputBuffer.clear();
-	}
-
-	void onChannelsChange() override {
 	}
 };
 
