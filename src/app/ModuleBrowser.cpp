@@ -180,13 +180,6 @@ struct ModelBox : widget::OpaqueWidget {
 		box.size.x = previewWidget->box.size.x;
 	}
 
-	void deletePreview() {
-		assert(previewFb);
-		previewWidget->removeChild(previewFb);
-		delete previewFb;
-		previewFb = NULL;
-	}
-
 	void draw(const DrawArgs& args) override {
 		// Lazily create preview when drawn
 		if (!previewFb) {
