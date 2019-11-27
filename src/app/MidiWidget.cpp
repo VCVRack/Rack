@@ -53,6 +53,7 @@ struct MidiDeviceItem : ui::MenuItem {
 
 struct MidiDeviceChoice : LedDisplayChoice {
 	midi::Port* port;
+	int chosenDeviceId;
 	void onAction(const event::Action& e) override {
 		if (!port)
 			return;
@@ -77,12 +78,18 @@ struct MidiDeviceChoice : LedDisplayChoice {
 		}
 	}
 	void step() override {
+		// cache the device name until the deviceId changes.
+		if (!text.empty() && port && chosenDeviceId == port->deviceId)
+			return;
+
 		text = port ? port->getDeviceName(port->deviceId) : "";
 		if (text.empty()) {
 			text = "(No device)";
+			chosenDeviceId = NULL;
 			color.a = 0.5f;
 		}
 		else {
+			chosenDeviceId = port->deviceId;
 			color.a = 1.f;
 		}
 	}
