@@ -16,6 +16,7 @@ struct CCMidiOutput : midi::Output {
 		for (int n = 0; n < 128; n++) {
 			lastValues[n] = -1;
 		}
+		Output::reset();
 	}
 
 	void setValue(int value, int cc) {

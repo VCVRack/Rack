@@ -81,11 +81,16 @@ void Device::onCloseStream() {
 ////////////////////
 
 Port::Port() {
-	setDriverId(-1);
+	reset();
 }
 
 Port::~Port() {
 	setDriverId(-1);
+}
+
+void Port::reset() {
+	setDriverId(-1);
+	offset = 0;
 }
 
 void Port::setDriverId(int driverId) {

@@ -18,12 +18,12 @@ static void appendMidiDriverMenu(ui::Menu* menu, midi::Port* port) {
 	if (!port)
 		return;
 
-	for (int driverId : port->getDriverIds()) {
+	for (int driverId : midi::getDriverIds()) {
 		MidiDriverValueItem* item = new MidiDriverValueItem;
 		item->port = port;
 		item->driverId = driverId;
-		item->text = port->getDriverName(driverId);
-		item->rightText = CHECKMARK(item->driverId == port->driverId);
+		item->text = midi::getDriver(driverId)->getName();
+		item->rightText = CHECKMARK(item->driverId == port->getDriverId());
 		menu->addChild(item);
 	}
 }
@@ -36,7 +36,7 @@ struct MidiDriverChoice : LedDisplayChoice {
 		appendMidiDriverMenu(menu, port);
 	}
 	void step() override {
-		text = port ? port->getDriverName(port->driverId) : "";
+		text = (port && port->driver) ? port->getDriver()->getName() : "";
 		if (text.empty()) {
 			text = "(No driver)";
 			color.a = 0.5f;
@@ -74,7 +74,7 @@ static void appendMidiDeviceMenu(ui::Menu* menu, midi::Port* port) {
 		item->port = port;
 		item->deviceId = -1;
 		item->text = "(No device)";
-		item->rightText = CHECKMARK(item->deviceId == port->deviceId);
+		item->rightText = CHECKMARK(item->deviceId == port->getDeviceId());
 		menu->addChild(item);
 	}
 
@@ -83,7 +83,7 @@ static void appendMidiDeviceMenu(ui::Menu* menu, midi::Port* port) {
 		item->port = port;
 		item->deviceId = deviceId;
 		item->text = port->getDeviceName(deviceId);
-		item->rightText = CHECKMARK(item->deviceId == port->deviceId);
+		item->rightText = CHECKMARK(item->deviceId == port->getDeviceId());
 		menu->addChild(item);
 	}
 }
@@ -96,7 +96,7 @@ struct MidiDeviceChoice : LedDisplayChoice {
 		appendMidiDeviceMenu(menu, port);
 	}
 	void step() override {
-		text = port ? port->getDeviceName(port->deviceId) : "";
+		text = (port && port->device) ? port->getDevice()->getName() : "";
 		if (text.empty()) {
 			text = "(No device)";
 			color.a = 0.5f;
@@ -121,7 +121,7 @@ struct MidiChannelValueItem : ui::MenuItem {
 	midi::Port* port;
 	int channel;
 	void onAction(const event::Action& e) override {
-		port->channel = channel;
+		port->setChannel(channel);
 	}
 };
 
@@ -134,7 +134,7 @@ static void appendMidiChannelMenu(ui::Menu* menu, midi::Port* port) {
 		item->port = port;
 		item->channel = channel;
 		item->text = port->getChannelName(channel);
-		item->rightText = CHECKMARK(item->channel == port->channel);
+		item->rightText = CHECKMARK(item->channel == port->getChannel());
 		menu->addChild(item);
 	}
 }
@@ -147,7 +147,7 @@ struct MidiChannelChoice : LedDisplayChoice {
 		appendMidiChannelMenu(menu, port);
 	}
 	void step() override {
-		text = port ? port->getChannelName(port->channel) : "Channel 1";
+		text = port ? port->getChannelName(port->getChannel()) : "Channel 1";
 	}
 };
 

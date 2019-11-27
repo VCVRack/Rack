@@ -15,18 +15,24 @@ namespace rack {
 
 struct RtMidiInputDevice : midi::InputDevice {
 	RtMidiIn* rtMidiIn;
+	std::string name;
 
 	RtMidiInputDevice(int driverId, int deviceId) {
 		rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
 		assert(rtMidiIn);
 		rtMidiIn->ignoreTypes(false, false, false);
 		rtMidiIn->setCallback(midiInputCallback, this);
+		name = rtMidiIn->getPortName(deviceId);
 		rtMidiIn->openPort(deviceId, "VCV Rack input");
 	}
 
 	~RtMidiInputDevice() {
 		rtMidiIn->closePort();
 		delete rtMidiIn;
+	}
+
+	std::string getName() override {
+		return name;
 	}
 
 	static void midiInputCallback(double timeStamp, std::vector<unsigned char>* message, void* userData) {
@@ -55,16 +61,22 @@ struct RtMidiInputDevice : midi::InputDevice {
 
 struct RtMidiOutputDevice : midi::OutputDevice {
 	RtMidiOut* rtMidiOut;
+	std::string name;
 
 	RtMidiOutputDevice(int driverId, int deviceId) {
 		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
 		assert(rtMidiOut);
+		name = rtMidiOut->getPortName(deviceId);
 		rtMidiOut->openPort(deviceId, "VCV Rack output");
 	}
 
 	~RtMidiOutputDevice() {
 		rtMidiOut->closePort();
 		delete rtMidiOut;
+	}
+
+	std::string getName() override {
+		return name;
 	}
 
 	void sendMessage(midi::Message message) override {

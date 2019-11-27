@@ -16,8 +16,8 @@ namespace audio {
 // Driver
 ////////////////////
 
-struct Port;
 struct Device;
+struct Port;
 
 struct Driver {
 	virtual ~Driver() {}
@@ -95,7 +95,9 @@ struct Device {
 ////////////////////
 
 struct Port {
+	/** The first channel index of the device to process. */
 	int offset = 0;
+	/** Maximum number of channels to process. */
 	int maxChannels = 8;
 
 	// private
@@ -107,6 +109,7 @@ struct Port {
 
 	Port();
 	virtual ~Port();
+	void reset();
 
 	Driver* getDriver() {
 		return driver;

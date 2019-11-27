@@ -80,7 +80,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 		item->port = port;
 		item->deviceId = -1;
 		item->text = "(No device)";
-		item->rightText = CHECKMARK(port->getDeviceId() == -1);
+		item->rightText = CHECKMARK(item->deviceId == port->getDeviceId());
 		menu->addChild(item);
 	}
 

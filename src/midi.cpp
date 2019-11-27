@@ -10,7 +10,6 @@ namespace midi {
 
 static std::vector<std::pair<int, Driver*>> drivers;
 
-
 ////////////////////
 // Device
 ////////////////////
@@ -49,21 +48,10 @@ void OutputDevice::unsubscribe(Output* output) {
 // Port
 ////////////////////
 
-std::vector<int> Port::getDriverIds() {
-	std::vector<int> driverIds;
-	for (auto& pair : drivers) {
-		driverIds.push_back(pair.first);
-	}
-	return driverIds;
+Port::Port() {
 }
 
-std::string Port::getDriverName(int driverId) {
-	for (auto& pair : drivers) {
-		if (pair.first == driverId) {
-			return pair.second->getName();
-		}
-	}
-	return "";
+Port::~Port() {
 }
 
 void Port::setDriverId(int driverId) {
@@ -72,50 +60,60 @@ void Port::setDriverId(int driverId) {
 	driver = NULL;
 	this->driverId = -1;
 
-	// Set driver
-	for (auto& pair : drivers) {
-		if (pair.first == driverId) {
-			driver = pair.second;
-			this->driverId = driverId;
-			break;
-		}
+	// Find driver by ID
+	driver = midi::getDriver(driverId);
+	if (driver) {
+		this->driverId = driverId;
 	}
-}
-
-std::string Port::getChannelName(int channel) {
-	if (channel == -1)
-		return "All channels";
-	else
-		return string::f("Channel %d", channel + 1);
+	else {
+		// Set first driver as default
+		driver = drivers[0].second;
+		this->driverId = drivers[0].first;
+	}
 }
 
 void Port::setChannel(int channel) {
 	this->channel = channel;
 }
 
+std::string Port::getChannelName(int channel) {
+	if (channel < 0)
+		return "All channels";
+	else
+		return string::f("Channel %d", channel + 1);
+}
+
 json_t* Port::toJson() {
 	json_t* rootJ = json_object();
-	json_object_set_new(rootJ, "driver", json_integer(driverId));
-	std::string deviceName = getDeviceName(deviceId);
-	if (!deviceName.empty())
-		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
-	json_object_set_new(rootJ, "channel", json_integer(channel));
+	json_object_set_new(rootJ, "driver", json_integer(getDriverId()));
+
+	if (device) {
+		std::string deviceName = device->getName();
+		if (!deviceName.empty())
+			json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+	}
+
+	json_object_set_new(rootJ, "channel", json_integer(getChannel()));
 	return rootJ;
 }
 
 void Port::fromJson(json_t* rootJ) {
+	setDriverId(-1);
+
 	json_t* driverJ = json_object_get(rootJ, "driver");
 	if (driverJ)
 		setDriverId(json_integer_value(driverJ));
 
-	json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
-	if (deviceNameJ) {
-		std::string deviceName = json_string_value(deviceNameJ);
-		// Search for device with equal name
-		for (int deviceId : getDeviceIds()) {
-			if (getDeviceName(deviceId) == deviceName) {
-				setDeviceId(deviceId);
-				break;
+	if (driver) {
+		json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
+		if (deviceNameJ) {
+			std::string deviceName = json_string_value(deviceNameJ);
+			// Search for device ID with equal name
+			for (int deviceId : getDeviceIds()) {
+				if (getDeviceName(deviceId) == deviceName) {
+					setDeviceId(deviceId);
+					break;
+				}
 			}
 		}
 	}
@@ -138,25 +136,8 @@ Input::~Input() {
 }
 
 void Input::reset() {
+	setDriverId(-1);
 	channel = -1;
-	// Set first driver as default
-	if (drivers.size() >= 1) {
-		setDriverId(drivers[0].first);
-	}
-}
-
-std::vector<int> Input::getDeviceIds() {
-	if (driver) {
-		return driver->getInputDeviceIds();
-	}
-	return {};
-}
-
-std::string Input::getDeviceName(int deviceId) {
-	if (driver) {
-		return driver->getInputDeviceName(deviceId);
-	}
-	return "";
 }
 
 void Input::setDeviceId(int deviceId) {
@@ -164,12 +145,12 @@ void Input::setDeviceId(int deviceId) {
 	if (driver && this->deviceId >= 0) {
 		driver->unsubscribeInput(this->deviceId, this);
 	}
-	inputDevice = NULL;
+	device = inputDevice = NULL;
 	this->deviceId = -1;
 
 	// Create device
 	if (driver && deviceId >= 0) {
-		inputDevice = driver->subscribeInput(deviceId, this);
+		device = inputDevice = driver->subscribeInput(deviceId, this);
 		this->deviceId = deviceId;
 	}
 }
@@ -212,25 +193,8 @@ Output::~Output() {
 }
 
 void Output::reset() {
+	setDriverId(-1);
 	channel = 0;
-	// Set first driver as default
-	if (drivers.size() >= 1) {
-		setDriverId(drivers[0].first);
-	}
-}
-
-std::vector<int> Output::getDeviceIds() {
-	if (driver) {
-		return driver->getOutputDeviceIds();
-	}
-	return {};
-}
-
-std::string Output::getDeviceName(int deviceId) {
-	if (driver) {
-		return driver->getOutputDeviceName(deviceId);
-	}
-	return "";
 }
 
 void Output::setDeviceId(int deviceId) {
@@ -238,12 +202,12 @@ void Output::setDeviceId(int deviceId) {
 	if (driver && this->deviceId >= 0) {
 		driver->unsubscribeOutput(this->deviceId, this);
 	}
-	outputDevice = NULL;
+	device = outputDevice = NULL;
 	this->deviceId = -1;
 
 	// Create device
 	if (driver && deviceId >= 0) {
-		outputDevice = driver->subscribeOutput(deviceId, this);
+		device = outputDevice = driver->subscribeOutput(deviceId, this);
 		this->deviceId = deviceId;
 	}
 }
@@ -257,14 +221,15 @@ std::vector<int> Output::getChannels() {
 }
 
 void Output::sendMessage(Message message) {
+	if (!outputDevice)
+		return;
+
 	// Set channel
 	if (message.getStatus() != 0xf) {
 		message.setChannel(channel);
 	}
 	// DEBUG("sendMessage %02x %02x %02x", message.cmd, message.data1, message.data2);
-	if (outputDevice) {
-		outputDevice->sendMessage(message);
-	}
+	outputDevice->sendMessage(message);
 }
 
 
@@ -285,6 +250,22 @@ void destroy() {
 void addDriver(int driverId, Driver* driver) {
 	assert(driver);
 	drivers.push_back(std::make_pair(driverId, driver));
+}
+
+std::vector<int> getDriverIds() {
+	std::vector<int> driverIds;
+	for (auto& pair : drivers) {
+		driverIds.push_back(pair.first);
+	}
+	return driverIds;
+}
+
+Driver* getDriver(int driverId) {
+	for (auto& pair : drivers) {
+		if (pair.first == driverId)
+			return pair.second;
+	}
+	return NULL;
 }
 
 

@@ -18,6 +18,9 @@ struct Message {
 	uint8_t size = 3;
 	uint8_t bytes[3] = {};
 
+	uint8_t getSize() {
+		return size;
+	}
 	void setSize(uint8_t size) {
 		assert(size <= 3);
 		this->size = size;
@@ -91,6 +94,9 @@ struct Driver {
 
 struct Device {
 	virtual ~Device() {}
+	virtual std::string getName() {
+		return "";
+	}
 };
 
 struct InputDevice : Device {
@@ -112,31 +118,47 @@ struct OutputDevice : Device {
 ////////////////////
 
 struct Port {
-	int driverId = -1;
-	int deviceId = -1;
 	/* For MIDI output, the channel to output messages.
 	For MIDI input, the channel to filter.
 	Set to -1 to allow all MIDI channels (for input).
 	Zero indexed.
 	*/
 	int channel = -1;
+
+	// private
+	int driverId = -1;
+	int deviceId = -1;
 	/** Not owned */
 	Driver* driver = NULL;
+	Device* device = NULL;
 
-	/** Remember to call setDriverId(-1) in subclass destructors. */
-	virtual ~Port() {}
+	Port();
+	virtual ~Port();
 
-	std::vector<int> getDriverIds();
-	std::string getDriverName(int driverId);
+	Driver* getDriver() {
+		return driver;
+	}
+	int getDriverId() {
+		return driverId;
+	}
 	void setDriverId(int driverId);
 
+	Device* getDevice() {
+		return device;
+	}
 	virtual std::vector<int> getDeviceIds() = 0;
-	virtual std::string getDeviceName(int deviceId) = 0;
+	int getDeviceId() {
+		return deviceId;
+	}
 	virtual void setDeviceId(int deviceId) = 0;
+	virtual std::string getDeviceName(int deviceId) = 0;
 
 	virtual std::vector<int> getChannels() = 0;
-	std::string getChannelName(int channel);
+	int getChannel() {
+		return channel;
+	}
 	void setChannel(int channel);
+	std::string getChannelName(int channel);
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
@@ -149,11 +171,20 @@ struct Input : Port {
 
 	Input();
 	~Input();
-
 	void reset();
-	std::vector<int> getDeviceIds() override;
-	std::string getDeviceName(int deviceId) override;
+
+	std::vector<int> getDeviceIds() override {
+		if (driver)
+			return driver->getInputDeviceIds();
+		return {};
+	}
 	void setDeviceId(int deviceId) override;
+	std::string getDeviceName(int deviceId) override {
+		if (driver)
+			return driver->getInputDeviceName(deviceId);
+		return "";
+	}
+
 	std::vector<int> getChannels() override;
 
 	virtual void onMessage(Message message) {}
@@ -175,11 +206,20 @@ struct Output : Port {
 
 	Output();
 	~Output();
-
 	void reset();
-	std::vector<int> getDeviceIds() override;
-	std::string getDeviceName(int deviceId) override;
+
+	std::vector<int> getDeviceIds() override {
+		if (driver)
+			return driver->getOutputDeviceIds();
+		return {};
+	}
 	void setDeviceId(int deviceId) override;
+	std::string getDeviceName(int deviceId) override {
+		if (driver)
+			return driver->getInputDeviceName(deviceId);
+		return "";
+	}
+
 	std::vector<int> getChannels() override;
 
 	void sendMessage(Message message);
@@ -190,6 +230,8 @@ void init();
 void destroy();
 /** Registers a new MIDI driver. Takes pointer ownership. */
 void addDriver(int driverId, Driver* driver);
+std::vector<int> getDriverIds();
+Driver* getDriver(int driverId);
 
 
 } // namespace midi

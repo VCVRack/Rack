@@ -18,10 +18,10 @@ struct GateMidiOutput : midi::Output {
 			vels[note] = 100;
 			lastGates[note] = false;
 		}
+		Output::reset();
 	}
 
 	void panic() {
-		reset();
 		// Send all note off commands
 		for (int note = 0; note < 128; note++) {
 			// Note off
@@ -30,6 +30,7 @@ struct GateMidiOutput : midi::Output {
 			m.setNote(note);
 			m.setValue(0);
 			sendMessage(m);
+			lastGates[note] = false;
 		}
 	}
 
