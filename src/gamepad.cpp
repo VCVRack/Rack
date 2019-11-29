@@ -19,6 +19,13 @@ struct InputDevice : midi::InputDevice {
 	int deviceId;
 	int8_t ccs[128] = {};
 
+	std::string getName() override {
+		const char* name = glfwGetJoystickName(deviceId);
+		if (!name)
+			return "";
+		return name;
+	}
+
 	void step() {
 		if (!glfwJoystickPresent(deviceId))
 			return;
