@@ -15,38 +15,59 @@ namespace midi {
 
 
 struct Message {
-	uint8_t size = 3;
-	uint8_t bytes[3] = {};
+	/** Initialized to 3 empty bytes. */
+	std::vector<uint8_t> bytes;
 
-	uint8_t getSize() {
-		return size;
+	Message() : bytes(3) {}
+
+	int getSize() const {
+		return bytes.size();
 	}
-	void setSize(uint8_t size) {
-		assert(size <= 3);
-		this->size = size;
+	void setSize(int size) {
+		bytes.resize(size);
 	}
-	uint8_t getChannel() {
+
+	uint8_t getChannel() const {
+		if (bytes.size() < 1)
+			return 0;
 		return bytes[0] & 0xf;
 	}
 	void setChannel(uint8_t channel) {
+		if (bytes.size() < 1)
+			return;
 		bytes[0] = (bytes[0] & 0xf0) | (channel & 0xf);
 	}
-	uint8_t getStatus() {
+
+	uint8_t getStatus() const {
+		if (bytes.size() < 1)
+			return 0;
 		return bytes[0] >> 4;
 	}
 	void setStatus(uint8_t status) {
+		if (bytes.size() < 1)
+			return;
 		bytes[0] = (bytes[0] & 0xf) | (status << 4);
 	}
-	uint8_t getNote() {
+
+	uint8_t getNote() const {
+		if (bytes.size() < 2)
+			return 0;
 		return bytes[1];
 	}
 	void setNote(uint8_t note) {
+		if (bytes.size() < 2)
+			return;
 		bytes[1] = note & 0x7f;
 	}
-	uint8_t getValue() {
+
+	uint8_t getValue() const {
+		if (bytes.size() < 3)
+			return 0;
 		return bytes[2];
 	}
 	void setValue(uint8_t value) {
+		if (bytes.size() < 3)
+			return;
 		bytes[2] = value & 0x7f;
 	}
 };
@@ -103,14 +124,14 @@ struct InputDevice : Device {
 	std::set<Input*> subscribed;
 	void subscribe(Input* input);
 	void unsubscribe(Input* input);
-	void onMessage(Message message);
+	void onMessage(const Message &message);
 };
 
 struct OutputDevice : Device {
 	std::set<Output*> subscribed;
 	void subscribe(Output* input);
 	void unsubscribe(Output* input);
-	virtual void sendMessage(Message message) {}
+	virtual void sendMessage(const Message &message) {}
 };
 
 ////////////////////
@@ -187,16 +208,19 @@ struct Input : Port {
 
 	std::vector<int> getChannels() override;
 
-	virtual void onMessage(Message message) {}
+	virtual void onMessage(const Message &message) {}
 };
 
 
 struct InputQueue : Input {
 	int queueMaxSize = 8192;
 	std::queue<Message> queue;
-	void onMessage(Message message) override;
-	/** If a Message is available, writes `message` and return true */
-	bool shift(Message* message);
+	void onMessage(const Message &message) override;
+	bool empty();
+	/** Returns Message from first in queue.
+	You must check empty(). If the queue is empty, the behavior of this method is undefined.
+	*/
+	Message shift();
 };
 
 
@@ -222,7 +246,7 @@ struct Output : Port {
 
 	std::vector<int> getChannels() override;
 
-	void sendMessage(Message message);
+	void sendMessage(const Message &message);
 };
 
 

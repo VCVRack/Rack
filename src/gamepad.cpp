@@ -51,7 +51,7 @@ struct InputDevice : midi::InputDevice {
 			midi::Message msg;
 			msg.setStatus(0xb);
 			msg.setNote(i);
-			// Allow 8th bit to be set
+			// Allow 8th bit to be set to allow bipolar value hack.
 			msg.bytes[2] = cc;
 			onMessage(msg);
 		}

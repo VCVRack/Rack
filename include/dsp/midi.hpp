@@ -212,7 +212,7 @@ struct MidiGenerator {
 		}
 	}
 
-	virtual void onMessage(midi::Message message) {}
+	virtual void onMessage(const midi::Message &message) {}
 };
 
 

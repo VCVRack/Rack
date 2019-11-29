@@ -45,15 +45,8 @@ struct RtMidiInputDevice : midi::InputDevice {
 		if (!midiInputDevice)
 			return;
 
-		// Users have reported that some MIDI devices can send messages >3 bytes. I don't know how this is possible, so just reject the message.
-		if (message->size() > 3)
-			return;
-
 		midi::Message msg;
-		msg.size = message->size();
-		for (int i = 0; i < msg.size; i++) {
-			msg.bytes[i] = (*message)[i];
-		}
+		msg.bytes = std::vector<uint8_t>(message->begin(), message->end());
 		midiInputDevice->onMessage(msg);
 	}
 };
@@ -79,8 +72,9 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 		return name;
 	}
 
-	void sendMessage(midi::Message message) override {
-		rtMidiOut->sendMessage(message.bytes, message.size);
+	void sendMessage(const midi::Message &message) override {
+		std::vector<unsigned char> bytes(message.bytes.begin(), message.bytes.end());
+		rtMidiOut->sendMessage(&bytes);
 	}
 };
 

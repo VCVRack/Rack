@@ -6,7 +6,7 @@ namespace core {
 
 
 struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
-	void onMessage(midi::Message message) override {
+	void onMessage(const midi::Message &message) override {
 		Output::sendMessage(message);
 	}
 

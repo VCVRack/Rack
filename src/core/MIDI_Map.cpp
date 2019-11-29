@@ -78,8 +78,8 @@ struct MIDI_Map : Module {
 
 	void process(const ProcessArgs& args) override {
 		if (divider.process()) {
-			midi::Message msg;
-			while (midiInput.shift(&msg)) {
+			while (!midiInput.empty()) {
+				midi::Message msg = midiInput.shift();
 				processMessage(msg);
 			}
 
@@ -123,7 +123,7 @@ struct MIDI_Map : Module {
 		}
 	}
 
-	void processMessage(midi::Message msg) {
+	void processMessage(const midi::Message &msg) {
 		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.getChannel(), msg.getNote(), msg.getValue());
 
 		switch (msg.getStatus()) {
@@ -135,7 +135,7 @@ struct MIDI_Map : Module {
 		}
 	}
 
-	void processCC(midi::Message msg) {
+	void processCC(const midi::Message &msg) {
 		uint8_t cc = msg.getNote();
 		int8_t value = msg.getValue();
 		// Learn

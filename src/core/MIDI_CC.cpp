@@ -48,8 +48,8 @@ struct MIDI_CC : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		midi::Message msg;
-		while (midiInput.shift(&msg)) {
+		while (!midiInput.empty()) {
+			midi::Message msg = midiInput.shift();
 			processMessage(msg);
 		}
 
@@ -73,7 +73,7 @@ struct MIDI_CC : Module {
 		}
 	}
 
-	void processMessage(midi::Message msg) {
+	void processMessage(const midi::Message &msg) {
 		switch (msg.getStatus()) {
 			// cc
 			case 0xb: {
@@ -83,8 +83,10 @@ struct MIDI_CC : Module {
 		}
 	}
 
-	void processCC(midi::Message msg) {
+	void processCC(const midi::Message &msg) {
 		uint8_t cc = msg.getNote();
+		if (msg.bytes.size() < 2)
+			return;
 		// Allow CC to be negative if the 8th bit is set.
 		// The gamepad driver abuses this, for example.
 		// Cast uint8_t to int8_t

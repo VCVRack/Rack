@@ -55,8 +55,8 @@ struct MIDI_Gate : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		midi::Message msg;
-		while (midiInput.shift(&msg)) {
+		while (!midiInput.empty()) {
+			midi::Message msg = midiInput.shift();
 			processMessage(msg);
 		}
 
@@ -75,7 +75,7 @@ struct MIDI_Gate : Module {
 		}
 	}
 
-	void processMessage(midi::Message msg) {
+	void processMessage(const midi::Message &msg) {
 		switch (msg.getStatus()) {
 			// note off
 			case 0x8: {

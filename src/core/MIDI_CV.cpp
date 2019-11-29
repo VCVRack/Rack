@@ -119,8 +119,8 @@ struct MIDI_CV : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		midi::Message msg;
-		while (midiInput.shift(&msg)) {
+		while (!midiInput.empty()) {
+			midi::Message msg = midiInput.shift();
 			processMessage(msg);
 		}
 
@@ -159,7 +159,7 @@ struct MIDI_CV : Module {
 		outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(args.sampleTime) ? 10.f : 0.f);
 	}
 
-	void processMessage(midi::Message msg) {
+	void processMessage(const midi::Message &msg) {
 		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.getChannel(), msg.getNote(), msg.getValue());
 
 		switch (msg.getStatus()) {
@@ -217,7 +217,7 @@ struct MIDI_CV : Module {
 		}
 	}
 
-	void processCC(midi::Message msg) {
+	void processCC(const midi::Message &msg) {
 		switch (msg.getNote()) {
 			// mod
 			case 0x01: {
@@ -235,7 +235,7 @@ struct MIDI_CV : Module {
 		}
 	}
 
-	void processSystem(midi::Message msg) {
+	void processSystem(const midi::Message &msg) {
 		switch (msg.getChannel()) {
 			// Timing
 			case 0x8: {

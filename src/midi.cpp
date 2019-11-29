@@ -25,7 +25,7 @@ void InputDevice::unsubscribe(Input* input) {
 		subscribed.erase(it);
 }
 
-void InputDevice::onMessage(Message message) {
+void InputDevice::onMessage(const Message &message) {
 	for (Input* input : subscribed) {
 		// Filter channel
 		if (input->channel < 0 || message.getStatus() == 0xf || message.getChannel() == input->channel) {
@@ -163,21 +163,21 @@ std::vector<int> Input::getChannels() {
 	return channels;
 }
 
-void InputQueue::onMessage(Message message) {
+void InputQueue::onMessage(const Message &message) {
+	if ((int) queue.size() >= queueMaxSize)
+		return;
 	// Push to queue
-	if ((int) queue.size() < queueMaxSize)
-		queue.push(message);
+	queue.push(message);
 }
 
-bool InputQueue::shift(Message* message) {
-	if (!message)
-		return false;
-	if (!queue.empty()) {
-		*message = queue.front();
-		queue.pop();
-		return true;
-	}
-	return false;
+bool InputQueue::empty() {
+	return queue.empty();
+}
+
+Message InputQueue::shift() {
+	Message msg = queue.front();
+	queue.pop();
+	return msg;
 }
 
 ////////////////////
@@ -220,16 +220,17 @@ std::vector<int> Output::getChannels() {
 	return channels;
 }
 
-void Output::sendMessage(Message message) {
+void Output::sendMessage(const Message &message) {
 	if (!outputDevice)
 		return;
 
 	// Set channel
-	if (message.getStatus() != 0xf) {
-		message.setChannel(channel);
+	Message msg = message;
+	if (msg.getStatus() != 0xf) {
+		msg.setChannel(channel);
 	}
-	// DEBUG("sendMessage %02x %02x %02x", message.cmd, message.data1, message.data2);
-	outputDevice->sendMessage(message);
+	// DEBUG("sendMessage %02x %02x %02x", msg.cmd, msg.data1, msg.data2);
+	outputDevice->sendMessage(msg);
 }
 
 
