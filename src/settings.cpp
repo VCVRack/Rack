@@ -142,7 +142,7 @@ void fromJson(json_t* rootJ) {
 	if (realTimeJ)
 		realTime = json_boolean_value(realTimeJ);
 
-	json_t* sampleRateJ = json_object_get(rootJ, "sampleRate");
+	json_t *sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ)
 		sampleRate = json_number_value(sampleRateJ);
 

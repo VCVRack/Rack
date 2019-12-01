@@ -7,10 +7,16 @@
 /disabledplugins
 /build
 /dist
+/dep
 /patches
 .DS_Store
 /autosave.vcv
 /settings.json
 /screenshots
 .vs/
+<<<<<<< HEAD
 Fundamental.zip
+=======
+_ReSharper.Caches/
+*.zip
+>>>>>>> XCUR

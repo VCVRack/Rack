@@ -4,6 +4,7 @@
 #include <app.hpp>
 #include <history.hpp>
 #include <componentlibrary.hpp>
+#include <settings.hpp> 
 
 
 namespace rack {
@@ -65,13 +66,20 @@ void PortWidget::onButton(const event::Button& e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		CableWidget* cw = APP->scene->rack->getTopCable(this);
 		if (cw) {
-			// history::CableRemove
-			history::CableRemove* h = new history::CableRemove;
-			h->setCable(cw);
-			APP->history->push(h);
+			if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+				int id = APP->scene->rack->nextCableColorId++;
+				APP->scene->rack->nextCableColorId %= settings::cableColors.size();
+				cw->color = settings::cableColors[id];
+			} else 
+			{
+				// history::CableRemove
+				history::CableRemove *h = new history::CableRemove;
+				h->setCable(cw);
+				APP->history->push(h);
 
-			APP->scene->rack->removeCable(cw);
-			delete cw;
+				APP->scene->rack->removeCable(cw);
+				delete cw;
+			}
 		}
 
 		e.consume(this);

@@ -17,6 +17,13 @@ namespace midi {
 struct Message {
 	uint8_t size = 3;
 	uint8_t bytes[3] = {};
+	uint8_t *longMessage = NULL;
+
+	void setSysex(uint8_t *msg, uint8_t len)
+	{
+		size=len;
+		longMessage = msg;
+	}
 
 	void setSize(uint8_t size) {
 		assert(size <= 3);
