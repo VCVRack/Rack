@@ -316,15 +316,39 @@ struct ParamTooltipItem : ui::MenuItem {
 	}
 };
 
-struct LockModulesItem : ui::MenuItem {
+struct KnobModeValueItem : ui::MenuItem {
+	settings::KnobMode knobMode;
 	void onAction(const event::Action& e) override {
-		settings::lockModules ^= true;
+		settings::knobMode = knobMode;
 	}
 };
 
-struct CursorLockItem : ui::MenuItem {
+struct KnobModeItem : ui::MenuItem {
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
+
+		static const std::string knobModeNames[] = {
+			"Linear (locked cursor)",
+			"Linear",
+			"Adjustable linear (locked cursor)",
+			"Adjustable linear",
+			"Absolute rotary",
+			"Relative rotary",
+		};
+		for (int i = 0; i < (int) LENGTHOF(knobModeNames); i++) {
+			KnobModeValueItem* item = new KnobModeValueItem;
+			item->knobMode = (settings::KnobMode) i;
+			item->text = knobModeNames[i];
+			item->rightText = CHECKMARK(settings::knobMode == i);
+			menu->addChild(item);
+		}
+		return menu;
+	}
+};
+
+struct LockModulesItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
-		settings::allowCursorLock ^= true;
+		settings::lockModules ^= true;
 	}
 };
 
@@ -365,19 +389,19 @@ struct ViewButton : MenuButton {
 		menu->box.size.x = box.size.x;
 
 		ParamTooltipItem* paramTooltipItem = new ParamTooltipItem;
-		paramTooltipItem->text = "Parameter tooltips";
+		paramTooltipItem->text = "Show tooltips";
 		paramTooltipItem->rightText = CHECKMARK(settings::paramTooltip);
 		menu->addChild(paramTooltipItem);
+
+		KnobModeItem* knobModeItem = new KnobModeItem;
+		knobModeItem->text = "Knob mode";
+		knobModeItem->rightText = RIGHT_ARROW;
+		menu->addChild(knobModeItem);
 
 		LockModulesItem* lockModulesItem = new LockModulesItem;
 		lockModulesItem->text = "Lock modules";
 		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
 		menu->addChild(lockModulesItem);
-
-		CursorLockItem* cursorLockItem = new CursorLockItem;
-		cursorLockItem->text = "Lock cursor while dragging";
-		cursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
-		menu->addChild(cursorLockItem);
 
 		ZoomSlider* zoomSlider = new ZoomSlider;
 		zoomSlider->box.size.x = 200.0;
@@ -393,6 +417,7 @@ struct ViewButton : MenuButton {
 
 		FrameRateItem* frameRateItem = new FrameRateItem;
 		frameRateItem->text = "Frame rate";
+		frameRateItem->rightText = RIGHT_ARROW;
 		menu->addChild(frameRateItem);
 
 		FullscreenItem* fullscreenItem = new FullscreenItem;

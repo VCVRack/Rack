@@ -478,21 +478,17 @@ void Window::close() {
 }
 
 void Window::cursorLock() {
-	if (settings::allowCursorLock) {
 #if defined ARCH_MAC
-		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
-		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
-		internal->ignoreNextMouseDelta = true;
-	}
+	internal->ignoreNextMouseDelta = true;
 }
 
 void Window::cursorUnlock() {
-	if (settings::allowCursorLock) {
-		glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		internal->ignoreNextMouseDelta = true;
-	}
+	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	internal->ignoreNextMouseDelta = true;
 }
 
 bool Window::isCursorLocked() {

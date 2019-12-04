@@ -27,7 +27,15 @@ extern float zoom;
 extern bool invertZoom;
 extern float cableOpacity;
 extern float cableTension;
-extern bool allowCursorLock;
+enum KnobMode {
+	KNOB_MODE_LINEAR,
+	KNOB_MODE_LINEAR_UNLOCKED,
+	KNOB_MODE_LINEAR_SPEED,
+	KNOB_MODE_LINEAR_SPEED_UNLOCKED,
+	KNOB_MODE_CIRCULAR_ABSOLUTE,
+	KNOB_MODE_CIRCULAR_RELATIVE,
+};
+extern KnobMode knobMode;
 extern float sampleRate;
 extern int threadCount;
 extern bool paramTooltip;

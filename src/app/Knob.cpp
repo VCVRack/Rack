@@ -12,6 +12,22 @@ namespace app {
 static const float KNOB_SENSITIVITY = 0.0015f;
 
 
+struct Knob::Internal {
+	/** Value of the knob before dragging. */
+	float oldValue = 0.f;
+	/** Fractional value between the param's value and the dragged knob position. */
+	float snapDelta = 0.f;
+};
+
+
+Knob::Knob() {
+	internal = new Internal;
+}
+
+Knob::~Knob() {
+	delete internal;
+}
+
 void Knob::initParamQuantity() {
 	ParamWidget::initParamQuantity();
 	engine::ParamQuantity* pq = getParamQuantity();
@@ -43,8 +59,8 @@ void Knob::onDragStart(const event::DragStart& e) {
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		oldValue = pq->getSmoothValue();
-		snapDelta = 0.f;
+		internal->oldValue = pq->getSmoothValue();
+		internal->snapDelta = 0.f;
 	}
 
 	APP->window->cursorLock();
@@ -59,13 +75,13 @@ void Knob::onDragEnd(const event::DragEnd& e) {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
 		float newValue = pq->getSmoothValue();
-		if (oldValue != newValue) {
+		if (internal->oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange* h = new history::ParamChange;
 			h->name = "move knob";
 			h->moduleId = module->id;
 			h->paramId = paramId;
-			h->oldValue = oldValue;
+			h->oldValue = internal->oldValue;
 			h->newValue = newValue;
 			APP->history->push(h);
 		}
@@ -103,9 +119,9 @@ void Knob::onDragMove(const event::DragMove& e) {
 
 		if (pq->snapEnabled) {
 			// Replace delta with an accumulated delta since the last integer knob.
-			snapDelta += delta;
-			delta = std::trunc(snapDelta);
-			snapDelta -= delta;
+			internal->snapDelta += delta;
+			delta = std::trunc(internal->snapDelta);
+			internal->snapDelta -= delta;
 		}
 
 		// Set value

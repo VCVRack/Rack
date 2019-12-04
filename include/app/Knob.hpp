@@ -10,6 +10,9 @@ namespace app {
 
 /** Implements vertical dragging behavior for ParamWidgets */
 struct Knob : ParamWidget {
+	struct Internal;
+	Internal* internal;
+
 	/** Multiplier for mouse movement to adjust knob value */
 	float speed = 1.0;
 	/** Drag horizontally instead of vertically. */
@@ -19,11 +22,8 @@ struct Knob : ParamWidget {
 	/** DEPRECATED. Use `ParamQuantity::snapEnabled`. */
 	bool snap = false;
 
-	/** Value of the knob before dragging. */
-	float oldValue = 0.f;
-	/** Fractional value between the param's value and the dragged knob position. */
-	float snapDelta = 0.f;
-
+	Knob();
+	~Knob();
 	void initParamQuantity() override;
 	void onHover(const event::Hover& e) override;
 	void onButton(const event::Button& e) override;
