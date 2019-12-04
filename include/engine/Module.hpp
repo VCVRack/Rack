@@ -101,9 +101,6 @@ struct Module {
 		if (paramQuantities[paramId])
 			delete paramQuantities[paramId];
 
-		Param* p = &params[paramId];
-		p->value = defaultValue;
-
 		ParamQuantity* q = new TParamQuantity;
 		q->module = this;
 		q->paramId = paramId;
@@ -116,6 +113,9 @@ struct Module {
 		q->displayMultiplier = displayMultiplier;
 		q->displayOffset = displayOffset;
 		paramQuantities[paramId] = q;
+
+		Param* p = &params[paramId];
+		p->value = q->getDefaultValue();
 	}
 
 	template <class TPortInfo = PortInfo>
