@@ -21,7 +21,6 @@
 #endif
 
 #if defined ARCH_WIN
-	#define _WIN32_WINNT _WIN32_WINNT_VISTA // for QueryThreadCycleTime
 	#include <windows.h>
 	#include <shellapi.h>
 	#include <processthreadsapi.h>
@@ -152,74 +151,6 @@ void setThreadName(const std::string& name) {
 	pthread_setname_np(pthread_self(), name.c_str());
 #elif defined ARCH_WIN
 	// Unsupported on Windows
-#endif
-}
-
-
-void setThreadRealTime(bool realTime) {
-#if defined ARCH_LIN
-	int err;
-	int policy;
-	struct sched_param param;
-	if (realTime) {
-		// Round-robin scheduler policy
-		policy = SCHED_RR;
-		param.sched_priority = sched_get_priority_max(policy);
-	}
-	else {
-		// Default scheduler policy
-		policy = 0;
-		param.sched_priority = 0;
-	}
-	err = pthread_setschedparam(pthread_self(), policy, &param);
-	assert(!err);
-
-	// pthread_getschedparam(pthread_self(), &policy, &param);
-	// DEBUG("policy %d priority %d", policy, param.sched_priority);
-#elif defined ARCH_MAC
-	// Not yet implemented
-#elif defined ARCH_WIN
-	// Set process class first
-	if (realTime) {
-		SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
-	}
-	else {
-		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
-		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
-	}
-#endif
-}
-
-
-double getThreadTime() {
-#if defined ARCH_LIN
-	struct timespec ts;
-	clockid_t cid;
-	pthread_getcpuclockid(pthread_self(), &cid);
-	clock_gettime(cid, &ts);
-	return ts.tv_sec + ts.tv_nsec * 1e-9;
-#elif defined ARCH_MAC
-	mach_port_t thread = mach_thread_self();
-	mach_msg_type_number_t count = THREAD_BASIC_INFO_COUNT;
-	thread_basic_info_data_t info;
-	kern_return_t kr = thread_info(thread, THREAD_BASIC_INFO, (thread_info_t) &info, &count);
-	if (kr != KERN_SUCCESS || (info.flags & TH_FLAGS_IDLE) != 0)
-		return 0.0;
-	return info.user_time.seconds + info.user_time.microseconds * 1e-6;
-#elif defined ARCH_WIN
-	// FILETIME creationTime;
-	// FILETIME exitTime;
-	// FILETIME kernelTime;
-	// FILETIME userTime;
-	// GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime);
-	// return ((uint64_t(userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
-
-	uint64_t cycles;
-	QueryThreadCycleTime(GetCurrentThread(), &cycles);
-	// HACK Assume that the RDTSC Time-Step Counter instruction is fixed at 2.5GHz. This should only be within a factor of 2 on all PCs.
-	const double freq = 2.5e9;
-	return (double) cycles / freq;
 #endif
 }
 
