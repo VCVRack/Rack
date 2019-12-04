@@ -11,6 +11,9 @@ namespace app {
 
 
 struct Scene : widget::OpaqueWidget {
+	struct Internal;
+	Internal* internal;
+
 	// Convenience variables for accessing important widgets
 	RackScrollWidget* rackScroll;
 	RackWidget* rack;
@@ -19,16 +22,15 @@ struct Scene : widget::OpaqueWidget {
 	widget::Widget* frameRateWidget;
 
 	double lastAutosaveTime = 0.0;
-
-	// Version checking
-	bool checkVersion = true;
-	bool checkedVersion = false;
-	std::string latestVersion;
+	/** The last mouse position in the Scene */
+	math::Vec mousePos;
 
 	Scene();
 	~Scene();
 	void step() override;
 	void draw(const DrawArgs& args) override;
+	void onHover(const event::Hover& e) override;
+	void onDragHover(const event::DragHover& e) override;
 	void onHoverKey(const event::HoverKey& e) override;
 	void onPathDrop(const event::PathDrop& e) override;
 

@@ -98,6 +98,8 @@ struct Window::Internal {
 	int frameSwapInterval = -1;
 	float monitorRefreshRate = 0.f;
 	float lastFrameRate = 0.f;
+
+	math::Vec lastMousePos;
 };
 
 
@@ -120,13 +122,13 @@ static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mod
 	}
 #endif
 
-	APP->event->handleButton(window->mousePos, button, action, mods);
+	APP->event->handleButton(window->internal->lastMousePos, button, action, mods);
 }
 
 static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	math::Vec mousePos = math::Vec(xpos, ypos).div(window->pixelRatio / window->windowRatio).round();
-	math::Vec mouseDelta = mousePos.minus(window->mousePos);
+	math::Vec mouseDelta = mousePos.minus(window->internal->lastMousePos);
 
 	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
 	if (window->internal->ignoreNextMouseDelta) {
@@ -142,15 +144,15 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
-		glfwSetCursorPos(win, window->mousePos.x, window->mousePos.y);
+		glfwSetCursorPos(win, window->internal->lastMousePos.x, window->internal->lastMousePos.y);
 		CGAssociateMouseAndMouseCursorPosition(true);
-		mousePos = window->mousePos;
+		mousePos = window->internal->lastMousePos;
 	}
 	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
 	glfwSetCursor(win, NULL);
 #endif
 
-	window->mousePos = mousePos;
+	window->internal->lastMousePos = mousePos;
 
 	APP->event->handleHover(mousePos, mouseDelta);
 }
@@ -170,18 +172,18 @@ static void scrollCallback(GLFWwindow* win, double x, double y) {
 	scrollDelta = scrollDelta.mult(50.0);
 #endif
 
-	APP->event->handleScroll(window->mousePos, scrollDelta);
+	APP->event->handleScroll(window->internal->lastMousePos, scrollDelta);
 }
 
 static void charCallback(GLFWwindow* win, unsigned int codepoint) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	if (APP->event->handleText(window->mousePos, codepoint))
+	if (APP->event->handleText(window->internal->lastMousePos, codepoint))
 		return;
 }
 
 static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	if (APP->event->handleKey(window->mousePos, key, scancode, action, mods))
+	if (APP->event->handleKey(window->internal->lastMousePos, key, scancode, action, mods))
 		return;
 
 	// Keyboard MIDI driver
@@ -199,7 +201,7 @@ static void dropCallback(GLFWwindow* win, int count, const char** paths) {
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
 	}
-	APP->event->handleDrop(window->mousePos, pathsVec);
+	APP->event->handleDrop(window->internal->lastMousePos, pathsVec);
 }
 
 static void errorCallback(int error, const char* description) {

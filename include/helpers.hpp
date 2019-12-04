@@ -11,7 +11,6 @@
 #include <engine/Module.hpp>
 #include <engine/ParamQuantity.hpp>
 #include <app.hpp>
-#include <window.hpp>
 
 
 namespace rack {
@@ -156,7 +155,7 @@ TMenuItem * createMenuItem(std::string text, std::string rightText = "") {
 template <class TMenu = ui::Menu>
 TMenu * createMenu() {
 	TMenu* o = new TMenu;
-	o->box.pos = APP->window->mousePos;
+	o->box.pos = APP->scene->mousePos;
 
 	ui::MenuOverlay* menuOverlay = new ui::MenuOverlay;
 	menuOverlay->addChild(o);

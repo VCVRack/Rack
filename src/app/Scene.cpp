@@ -15,6 +15,10 @@ namespace rack {
 namespace app {
 
 
+struct Scene::Internal {
+};
+
+
 struct FrameRateWidget : widget::TransparentWidget {
 	void draw(const DrawArgs& args) override {
 		std::string text = string::f("%.2f Hz", APP->window->getLastFrameRate());
@@ -24,6 +28,8 @@ struct FrameRateWidget : widget::TransparentWidget {
 
 
 Scene::Scene() {
+	internal = new Internal;
+
 	rackScroll = new RackScrollWidget;
 	addChild(rackScroll);
 
@@ -43,6 +49,7 @@ Scene::Scene() {
 }
 
 Scene::~Scene() {
+	delete internal;
 }
 
 void Scene::step() {
@@ -70,6 +77,16 @@ void Scene::step() {
 
 void Scene::draw(const DrawArgs& args) {
 	Widget::draw(args);
+}
+
+void Scene::onHover(const event::Hover& e) {
+	mousePos = e.pos;
+	OpaqueWidget::onHover(e);
+}
+
+void Scene::onDragHover(const event::DragHover& e) {
+	mousePos = e.pos;
+	OpaqueWidget::onDragHover(e);
 }
 
 void Scene::onHoverKey(const event::HoverKey& e) {

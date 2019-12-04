@@ -1,6 +1,6 @@
 #include <ui/Tooltip.hpp>
 #include <app.hpp>
-#include <window.hpp>
+#include <app/Scene.hpp>
 
 
 namespace rack {
@@ -12,7 +12,7 @@ void Tooltip::step() {
 	box.size.x = bndLabelWidth(APP->window->vg, -1, text.c_str()) + 10.0;
 	box.size.y = bndLabelHeight(APP->window->vg, -1, text.c_str(), INFINITY);
 	// Position near cursor. This assumes that `this` is added to the root widget.
-	box.pos = APP->window->mousePos.plus(math::Vec(15, 15));
+	box.pos = APP->scene->mousePos.plus(math::Vec(15, 15));
 	// Fit inside parent
 	assert(parent);
 	box = box.nudge(parent->box.zeroPos());

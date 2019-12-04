@@ -56,7 +56,7 @@ void RackScrollWidget::step() {
 	rackWidget->box.pos = scrollBox.pos.div(zoom).neg();
 
 	// Scroll rack if dragging cable near the edge of the screen
-	math::Vec pos = APP->window->mousePos;
+	math::Vec pos = APP->scene->mousePos;
 	math::Rect viewport = getViewport(box.zeroPos());
 	if (rackWidget->incompleteCable) {
 		float margin = 20.0;

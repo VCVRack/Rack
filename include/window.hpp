@@ -53,6 +53,9 @@ DEPRECATED typedef Svg SVG;
 
 
 struct Window {
+	struct Internal;
+	Internal* internal;
+
 	GLFWwindow* win = NULL;
 	NVGcontext* vg = NULL;
 	/** The scaling ratio */
@@ -62,8 +65,6 @@ struct Window {
 	*/
 	float windowRatio = 1.f;
 	int frame = 0;
-	/** The last known absolute mouse position in the window */
-	math::Vec mousePos;
 	std::shared_ptr<Font> uiFont;
 	double frameTimeStart = 0.f;
 
@@ -71,9 +72,6 @@ struct Window {
 	std::map<std::string, std::weak_ptr<Font>> fontCache;
 	std::map<std::string, std::weak_ptr<Image>> imageCache;
 	std::map<std::string, std::weak_ptr<Svg>> svgCache;
-
-	struct Internal;
-	Internal* internal;
 
 	Window();
 	~Window();
