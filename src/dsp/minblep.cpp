@@ -21,6 +21,8 @@ void minBlepImpulse(int z, int o, float* output) {
 
 	// Real cepstrum
 	float* fx = new float[2 * n];
+	// Valgrind complains that the array is uninitialized for some reason, unless we clear it.
+	std::memset(fx, 0, sizeof(float) * 2 * n);
 	RealFFT rfft(n);
 	rfft.rfft(x, fx);
 	// fx = log(abs(fx))
