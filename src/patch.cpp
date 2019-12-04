@@ -55,9 +55,11 @@ void PatchManager::init(std::string path) {
 }
 
 void PatchManager::reset() {
-	APP->history->clear();
-	APP->scene->rack->clear();
-	APP->scene->rackScroll->reset();
+	if (!settings::headless) {
+		APP->history->clear();
+		APP->scene->rack->clear();
+		APP->scene->rackScroll->reset();
+	}
 	APP->engine->clear();
 
 	path = "";
@@ -183,9 +185,11 @@ bool PatchManager::load(std::string path) {
 		json_decref(rootJ);
 	});
 
-	APP->history->clear();
-	APP->scene->rack->clear();
-	APP->scene->rackScroll->reset();
+	if (!settings::headless) {
+		APP->history->clear();
+		APP->scene->rack->clear();
+		APP->scene->rackScroll->reset();
+	}
 	APP->engine->clear();
 	fromJson(rootJ);
 	return true;
@@ -255,7 +259,9 @@ json_t* PatchManager::toJson() {
 	json_object_set_new(rootJ, "version", versionJ);
 
 	json_t* engineJ = APP->engine->toJson();
-	APP->scene->rack->mergeJson(engineJ);
+	if (!settings::headless) {
+		APP->scene->rack->mergeJson(engineJ);
+	}
 
 	// Merge with rootJ
 	json_object_update(rootJ, engineJ);
@@ -289,7 +295,9 @@ void PatchManager::fromJson(json_t* rootJ) {
 	}
 
 	APP->engine->fromJson(rootJ);
-	APP->scene->rack->fromJson(rootJ);
+	if (!settings::headless) {
+		APP->scene->rack->fromJson(rootJ);
+	}
 	// At this point, ModuleWidgets and CableWidgets should own all Modules and Cables.
 	// TODO Assert this
 

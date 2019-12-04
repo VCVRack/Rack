@@ -12,11 +12,11 @@ namespace rack {
 
 void App::init() {
 	engine = new engine::Engine;
+	patch = new PatchManager;
 	if (!settings::headless) {
 		event = new event::State;
 		history = new history::State;
 		window = new Window;
-		patch = new PatchManager;
 		scene = new app::Scene;
 		event->rootWidget = scene;
 	}
@@ -27,9 +27,6 @@ App::~App() {
 	if (scene)
 		delete scene;
 	scene = NULL;
-	if (patch)
-		delete patch;
-	patch = NULL;
 	if (event)
 		delete event;
 	event = NULL;
@@ -39,6 +36,9 @@ App::~App() {
 	if (window)
 		delete window;
 	window = NULL;
+	if (patch)
+		delete patch;
+	patch = NULL;
 	if (engine)
 		delete engine;
 	engine = NULL;

@@ -185,13 +185,11 @@ int main(int argc, char* argv[]) {
 	}
 #endif
 
-	if (!settings::headless) {
-		APP->patch->init(patchPath);
-	}
+	APP->patch->init(patchPath);
 
 	if (settings::headless) {
-		// TEMP Prove that the app doesn't crash
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		printf("Press enter to exit.\n");
+		getchar();
 	}
 	else if (screenshot) {
 		INFO("Taking screenshots of all modules at %gx zoom", screenshotZoom);
@@ -209,7 +207,9 @@ int main(int argc, char* argv[]) {
 	}
 	INFO("Destroying app");
 	appDestroy();
-	settings::save(asset::settingsPath);
+	if (!settings::headless) {
+		settings::save(asset::settingsPath);
+	}
 
 	// Destroy environment
 	INFO("Destroying environment");

@@ -411,14 +411,17 @@ void Engine::clear() {
 	std::set<ParamHandle*> paramHandles = internal->paramHandles;
 	for (ParamHandle* paramHandle : paramHandles) {
 		removeParamHandle(paramHandle);
+		// Don't delete paramHandle because they're owned by other things (e.g. Modules)
 	}
 	std::vector<Cable*> cables = internal->cables;
 	for (Cable* cable : cables) {
 		removeCable(cable);
+		delete cable;
 	}
 	std::vector<Module*> modules = internal->modules;
 	for (Module* module : modules) {
 		removeModule(module);
+		delete module;
 	}
 	// Reset engine state
 	internal->nextModuleId = 0;

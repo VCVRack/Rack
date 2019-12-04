@@ -81,9 +81,8 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "autosavePeriod", json_real(autosavePeriod));
 
-	if (skipLoadOnLaunch) {
-		json_object_set_new(rootJ, "skipLoadOnLaunch", json_true());
-	}
+	if (skipLoadOnLaunch)
+		json_object_set_new(rootJ, "skipLoadOnLaunch", json_boolean(true));
 
 	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
 
