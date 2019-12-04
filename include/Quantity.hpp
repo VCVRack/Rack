@@ -42,14 +42,10 @@ struct Quantity {
 	/** Returns the value, possibly transformed for displaying.
 	Useful for logarithmic scaling, multiplying by 100 for percentages, etc.
 	*/
-	virtual float getDisplayValue() {
-		return getValue();
-	}
+	virtual float getDisplayValue();
 
 	/** Inversely transforms the display value and sets the value. */
-	virtual void setDisplayValue(float displayValue) {
-		setValue(displayValue);
-	}
+	virtual void setDisplayValue(float displayValue);
 
 	/** The number of total decimal places for generating the display value string. */
 	virtual int getDisplayPrecision();
@@ -57,6 +53,7 @@ struct Quantity {
 	/** Returns a string representation of the display value. */
 	virtual std::string getDisplayValueString();
 
+	/** Sets the value from a display string. */
 	virtual void setDisplayValueString(std::string s);
 
 	/** The name of the quantity. */
@@ -77,65 +74,29 @@ struct Quantity {
 	// Helper methods
 
 	/** Resets the value to the default value. */
-	void reset() {
-		setValue(getDefaultValue());
-	}
-
+	void reset();
 	/** Sets the value to a uniform random value between the bounds. */
-	void randomize() {
-		if (isBounded())
-			setScaledValue(random::uniform());
-	}
-
+	void randomize();
 	/** Checks whether the value is at the min value. */
-	bool isMin() {
-		return getValue() <= getMinValue();
-	}
-
+	bool isMin();
 	/** Checks whether the value is at the max value. */
-	bool isMax() {
-		return getValue() >= getMaxValue();
-	}
-
+	bool isMax();
 	/** Sets the value to the min value. */
-	void setMin() {
-		setValue(getMinValue());
-	}
-
+	void setMin();
 	/** Sets the value to the max value. */
-	void setMax() {
-		setValue(getMaxValue());
-	}
-
+	void setMax();
 	/** Sets value from the range 0 to 1. */
-	void setScaledValue(float scaledValue) {
-		setValue(math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
-	}
-
+	void setScaledValue(float scaledValue);
 	/** Returns the value rescaled to the range 0 to 1. */
-	float getScaledValue() {
-		return math::rescale(getValue(), getMinValue(), getMaxValue(), 0.f, 1.f);
-	}
-
+	float getScaledValue();
 	/** The difference between the max and min values. */
-	float getRange() {
-		return getMaxValue() - getMinValue();
-	}
-
+	float getRange();
 	/** Checks whether the bounds are finite. */
-	bool isBounded() {
-		return std::isfinite(getMinValue()) && std::isfinite(getMaxValue());
-	}
-
+	bool isBounded();
 	/** Adds an amount to the value. */
-	void moveValue(float deltaValue) {
-		setValue(getValue() + deltaValue);
-	}
-
+	void moveValue(float deltaValue);
 	/** Adds an amount to the value scaled to the range 0 to 1. */
-	void moveScaledValue(float deltaScaledValue) {
-		moveValue(deltaScaledValue * getRange());
-	}
+	void moveScaledValue(float deltaScaledValue);
 };
 
 

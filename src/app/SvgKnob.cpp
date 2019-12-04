@@ -37,12 +37,16 @@ void SvgKnob::onChange(const event::Change& e) {
 	if (pq) {
 		float value = pq->getSmoothValue();
 		float angle;
-		if (pq->isBounded()) {
-			angle = math::rescale(value, pq->getMinValue(), pq->getMaxValue(), minAngle, maxAngle);
-		}
-		else {
+		if (!pq->isBounded()) {
 			// Center unbounded knobs
 			angle = math::rescale(value, -1.f, 1.f, minAngle, maxAngle);
+		}
+		else if (pq->getMinValue() == pq->getMaxValue()) {
+			// Center 0 range
+			angle = math::rescale(0.f, -1.f, 1.f, minAngle, maxAngle);
+		}
+		else {
+			angle = math::rescale(value, pq->getMinValue(), pq->getMaxValue(), minAngle, maxAngle);
 		}
 		angle = std::fmod(angle, 2 * M_PI);
 		tw->identity();

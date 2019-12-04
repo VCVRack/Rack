@@ -6,6 +6,14 @@
 namespace rack {
 
 
+float Quantity::getDisplayValue() {
+	return getValue();
+}
+
+void Quantity::setDisplayValue(float displayValue) {
+	setValue(displayValue);
+}
+
 int Quantity::getDisplayPrecision() {
 	return 5;
 }
@@ -29,6 +37,66 @@ std::string Quantity::getString() {
 	s += getDisplayValueString();
 	s += getUnit();
 	return s;
+}
+
+void Quantity::reset() {
+	setValue(getDefaultValue());
+}
+
+void Quantity::randomize() {
+	if (isBounded())
+		setScaledValue(random::uniform());
+}
+
+bool Quantity::isMin() {
+	return getValue() <= getMinValue();
+}
+
+bool Quantity::isMax() {
+	return getValue() >= getMaxValue();
+}
+
+void Quantity::setMin() {
+	setValue(getMinValue());
+}
+
+void Quantity::setMax() {
+	setValue(getMaxValue());
+}
+
+void Quantity::setScaledValue(float scaledValue) {
+	if (!isBounded())
+		setValue(scaledValue);
+	else
+		setValue(math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
+}
+
+float Quantity::getScaledValue() {
+	if (!isBounded())
+		return getValue();
+	else if (getMinValue() == getMaxValue())
+		return 0.f;
+	else
+		return math::rescale(getValue(), getMinValue(), getMaxValue(), 0.f, 1.f);
+}
+
+float Quantity::getRange() {
+	return getMaxValue() - getMinValue();
+}
+
+bool Quantity::isBounded() {
+	return std::isfinite(getMinValue()) && std::isfinite(getMaxValue());
+}
+
+void Quantity::moveValue(float deltaValue) {
+	setValue(getValue() + deltaValue);
+}
+
+void Quantity::moveScaledValue(float deltaScaledValue) {
+	if (!isBounded())
+		moveValue(deltaScaledValue);
+	else
+		moveValue(deltaScaledValue * getRange());
 }
 
 
