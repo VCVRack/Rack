@@ -19,6 +19,7 @@
 #include <updater.hpp>
 #include <osdialog.h>
 #include <thread>
+#include <utility>
 
 
 namespace rack {
@@ -327,19 +328,19 @@ struct KnobModeItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
-		static const std::string knobModeNames[] = {
-			"Linear (locked cursor)",
-			"Linear",
-			"Adjustable linear (locked cursor)",
-			"Adjustable linear",
-			"Absolute rotary",
-			"Relative rotary",
+		static const std::vector<std::pair<settings::KnobMode, std::string>> knobModes = {
+			{settings::KNOB_MODE_LINEAR_LOCKED, "Linear (locked cursor)"},
+			{settings::KNOB_MODE_LINEAR, "Linear"},
+			{settings::KNOB_MODE_SCALED_LINEAR_LOCKED, "Scaled linear (locked cursor)"},
+			{settings::KNOB_MODE_SCALED_LINEAR, "Scaled linear"},
+			{settings::KNOB_MODE_ROTARY_ABSOLUTE, "Absolute rotary"},
+			{settings::KNOB_MODE_ROTARY_RELATIVE, "Relative rotary"},
 		};
-		for (int i = 0; i < (int) LENGTHOF(knobModeNames); i++) {
+		for (const auto& pair : knobModes) {
 			KnobModeValueItem* item = new KnobModeValueItem;
-			item->knobMode = (settings::KnobMode) i;
-			item->text = knobModeNames[i];
-			item->rightText = CHECKMARK(settings::knobMode == i);
+			item->knobMode = pair.first;
+			item->text = pair.second;
+			item->rightText = CHECKMARK(settings::knobMode == pair.first);
 			menu->addChild(item);
 		}
 		return menu;

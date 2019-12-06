@@ -17,9 +17,6 @@ struct SvgKnob : Knob {
 	CircularShadow* shadow;
 	widget::TransformWidget* tw;
 	widget::SvgWidget* sw;
-	/** Angles in radians */
-	float minAngle = 0.f;
-	float maxAngle = M_PI;
 
 	SvgKnob();
 	void setSvg(std::shared_ptr<Svg> svg);

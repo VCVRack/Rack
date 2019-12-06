@@ -233,8 +233,9 @@ bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 
 bool State::handleLeave() {
 	heldKeys.clear();
-	setDragHovered(NULL);
-	setHovered(NULL);
+	// When leaving the window, don't un-hover widgets because the mouse might be dragging.
+	// setDragHovered(NULL);
+	// setHovered(NULL);
 	return true;
 }
 

@@ -22,7 +22,7 @@ float zoom = 0.0;
 bool invertZoom = false;
 float cableOpacity = 0.5;
 float cableTension = 0.5;
-KnobMode knobMode = KNOB_MODE_LINEAR;
+KnobMode knobMode = KNOB_MODE_LINEAR_LOCKED;
 float sampleRate = 44100.0;
 int threadCount = 1;
 bool paramTooltip = false;
@@ -145,7 +145,7 @@ void fromJson(json_t* rootJ) {
 	json_t* allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ) {
 		if (json_is_false(allowCursorLockJ))
-			knobMode = KNOB_MODE_LINEAR_UNLOCKED;
+			knobMode = KNOB_MODE_LINEAR;
 	}
 
 	json_t* knobModeJ = json_object_get(rootJ, "knobMode");

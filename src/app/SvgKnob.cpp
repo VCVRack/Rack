@@ -38,14 +38,15 @@ void SvgKnob::onChange(const event::Change& e) {
 		float value = pq->getSmoothValue();
 		float angle;
 		if (!pq->isBounded()) {
-			// Center unbounded knobs
-			angle = math::rescale(value, -1.f, 1.f, minAngle, maxAngle);
+			// Number of rotations equals value for unbounded range
+			angle = value * (2 * M_PI);
 		}
-		else if (pq->getMinValue() == pq->getMaxValue()) {
-			// Center 0 range
-			angle = math::rescale(0.f, -1.f, 1.f, minAngle, maxAngle);
+		else if (pq->getRange() == 0.f) {
+			// Center angle for zero range
+			angle = (minAngle + maxAngle) / 2.f;
 		}
 		else {
+			// Proportional angle for finite range
 			angle = math::rescale(value, pq->getMinValue(), pq->getMaxValue(), minAngle, maxAngle);
 		}
 		angle = std::fmod(angle, 2 * M_PI);

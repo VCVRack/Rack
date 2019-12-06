@@ -13,14 +13,19 @@ struct Knob : ParamWidget {
 	struct Internal;
 	Internal* internal;
 
-	/** Multiplier for mouse movement to adjust knob value */
-	float speed = 1.0;
 	/** Drag horizontally instead of vertically. */
 	bool horizontal = false;
 	/** Enables per-sample value smoothing while dragging. */
 	bool smooth = true;
 	/** DEPRECATED. Use `ParamQuantity::snapEnabled`. */
 	bool snap = false;
+	/** Multiplier for mouse movement to adjust knob value */
+	float speed = 1.f;
+	/** Force dragging to linear, e.g. for sliders. */
+	bool forceLinear = false;
+	/** Angles in radians. */
+	float minAngle = -M_PI;
+	float maxAngle = M_PI;
 
 	Knob();
 	~Knob();
@@ -30,6 +35,7 @@ struct Knob : ParamWidget {
 	void onDragStart(const event::DragStart& e) override;
 	void onDragEnd(const event::DragEnd& e) override;
 	void onDragMove(const event::DragMove& e) override;
+	void onDragLeave(const event::DragLeave& e) override;
 };
 
 
