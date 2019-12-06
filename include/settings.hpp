@@ -36,6 +36,7 @@ enum KnobMode {
 	KNOB_MODE_ROTARY_RELATIVE,
 };
 extern KnobMode knobMode;
+extern float knobLinearSensitivity;
 extern float sampleRate;
 extern int threadCount;
 extern bool paramTooltip;

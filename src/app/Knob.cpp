@@ -145,9 +145,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 
 		if (linearMode) {
 			float delta = (horizontal ? e.mouseDelta.x : -e.mouseDelta.y);
-			// TODO Put this in settings
-			const float linearSensitivity = 1 / 1000.f;
-			delta *= linearSensitivity;
+			delta *= settings::knobLinearSensitivity;
 			delta *= modScale;
 			delta *= rangeRatio;
 
