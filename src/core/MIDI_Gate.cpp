@@ -55,9 +55,15 @@ struct MIDI_Gate : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		while (!midiInput.empty()) {
-			midi::Message msg = midiInput.shift();
+		// Process MIDI messages only if they arrived `stepFrames` frames ago.
+		while (!midiInput.queue.empty()) {
+			midi::Message& msg = midiInput.queue.front();
+			long msgTime = msg.timestamp + long(APP->engine->getStepFrames() * APP->engine->getSampleTime() * 1e9);
+			long frameTime = APP->engine->getStepTime() + long((APP->engine->getFrame() - APP->engine->getStepFrame()) * APP->engine->getSampleTime() * 1e9);
+			if (msgTime > frameTime)
+				break;
 			processMessage(msg);
+			midiInput.queue.pop();
 		}
 
 		for (int i = 0; i < 16; i++) {

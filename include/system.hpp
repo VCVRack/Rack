@@ -36,7 +36,7 @@ int getLogicalCoreCount();
 void setThreadName(const std::string& name);
 /** Returns the caller's human-readable stack trace with "\n"-separated lines. */
 std::string getStackTrace();
-/** Gets the current number of nanoseconds since the epoch.
+/** Returns the current number of nanoseconds since the epoch.
 Currently uses std::chrono::high_resolution_clock.
 */
 long getNanoseconds();

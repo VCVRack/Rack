@@ -1,5 +1,6 @@
 #include <midi.hpp>
 #include <string.hpp>
+#include <system.hpp>
 #include <map>
 #include <utility>
 
@@ -26,10 +27,15 @@ void InputDevice::unsubscribe(Input* input) {
 }
 
 void InputDevice::onMessage(const Message &message) {
+	// Set timestamp if unset
+	Message msg = message;
+	if (msg.timestamp < 0)
+		msg.timestamp = system::getNanoseconds();
+
 	for (Input* input : subscribed) {
 		// Filter channel
-		if (input->channel < 0 || message.getStatus() == 0xf || message.getChannel() == input->channel) {
-			input->onMessage(message);
+		if (input->channel < 0 || msg.getStatus() == 0xf || msg.getChannel() == input->channel) {
+			input->onMessage(msg);
 		}
 	}
 }
@@ -168,16 +174,6 @@ void InputQueue::onMessage(const Message &message) {
 		return;
 	// Push to queue
 	queue.push(message);
-}
-
-bool InputQueue::empty() {
-	return queue.empty();
-}
-
-Message InputQueue::shift() {
-	Message msg = queue.front();
-	queue.pop();
-	return msg;
 }
 
 ////////////////////

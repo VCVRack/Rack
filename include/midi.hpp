@@ -17,6 +17,8 @@ namespace midi {
 struct Message {
 	/** Initialized to 3 empty bytes. */
 	std::vector<uint8_t> bytes;
+	/** Timestamp of MIDI message in nanoseconds. Negative if not set. */
+	long timestamp = -1;
 
 	Message() : bytes(3) {}
 
@@ -216,11 +218,6 @@ struct InputQueue : Input {
 	int queueMaxSize = 8192;
 	std::queue<Message> queue;
 	void onMessage(const Message &message) override;
-	bool empty();
-	/** Returns Message from first in queue.
-	You must check empty(). If the queue is empty, the behavior of this method is undefined.
-	*/
-	Message shift();
 };
 
 

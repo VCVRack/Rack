@@ -151,7 +151,10 @@ struct Engine::Internal {
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
-	uint64_t frame = 0;
+	long frame = 0;
+	long stepFrame = 0;
+	long stepTime = 0;
+	int stepFrames = 0;
 	Module* primaryModule = NULL;
 
 	int nextModuleId = 0;
@@ -433,6 +436,10 @@ void Engine::step(int frames) {
 	initMXCSR();
 	random::init();
 
+	internal->stepFrame = internal->frame;
+	internal->stepTime = system::getNanoseconds();
+	internal->stepFrames = frames;
+
 	// Set sample rate
 	if (internal->sampleRate != settings::sampleRate) {
 		internal->sampleRate = settings::sampleRate;
@@ -514,9 +521,24 @@ void Engine::yieldWorkers() {
 }
 
 
-uint64_t Engine::getFrame() {
+long Engine::getFrame() {
 	// No lock, for performance
 	return internal->frame;
+}
+
+
+long Engine::getStepFrame() {
+	return internal->stepFrame;
+}
+
+
+long Engine::getStepTime() {
+	return internal->stepTime;
+}
+
+
+int Engine::getStepFrames() {
+	return internal->stepFrames;
 }
 
 

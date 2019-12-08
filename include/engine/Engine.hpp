@@ -37,7 +37,13 @@ struct Engine {
 	void yieldWorkers();
 	/** Returns the number of audio samples since the Engine's first sample.
 	*/
-	uint64_t getFrame();
+	long getFrame();
+	/** Returns the frame when step() was last called. */
+	long getStepFrame();
+	/** Returns the timestamp in nanoseconds when step() was last called. */
+	long getStepTime();
+	/** Returns the total number of frames in the current step() call. */
+	int getStepFrames();
 
 	// Modules
 	/** Adds a module to the rack engine.
