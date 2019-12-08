@@ -36,6 +36,10 @@ int getLogicalCoreCount();
 void setThreadName(const std::string& name);
 /** Returns the caller's human-readable stack trace with "\n"-separated lines. */
 std::string getStackTrace();
+/** Gets the current number of nanoseconds since the epoch.
+Currently uses std::chrono::high_resolution_clock.
+*/
+long getNanoseconds();
 /** Opens a URL, also happens to work with PDFs and folders.
 Shell injection is possible, so make sure the URL is trusted or hard coded.
 May block, so open in a new thread.

@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <regex>
+#include <chrono>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <cxxabi.h> // for __cxxabiv1::__cxa_demangle
@@ -211,6 +212,16 @@ std::string getStackTrace() {
 #endif
 
 	return s;
+}
+
+
+long getNanoseconds() {
+	using clock = std::chrono::high_resolution_clock;
+	using time_point = std::chrono::time_point<clock>;
+	time_point now = clock::now();
+	using duration = std::chrono::duration<long, std::nano>;
+	duration d = now.time_since_epoch();
+	return d.count();
 }
 
 

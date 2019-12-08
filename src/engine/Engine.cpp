@@ -7,7 +7,6 @@
 #include <plugin.hpp>
 
 #include <algorithm>
-#include <chrono>
 #include <thread>
 #include <condition_variable>
 #include <mutex>
@@ -222,10 +221,9 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		Module* module = internal->modules[i];
 
 		// Start CPU timer
-		using time_point = std::chrono::time_point<std::chrono::high_resolution_clock>;
-		time_point beginTime;
+		long startTime;
 		if (cpuMeter) {
-			beginTime = std::chrono::high_resolution_clock::now();
+			startTime = system::getNanoseconds();
 		}
 
 		// Step module
@@ -236,8 +234,8 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 
 		// Stop CPU timer
 		if (cpuMeter) {
-			time_point endTime = std::chrono::high_resolution_clock::now();
-			float duration = std::chrono::duration<float>(endTime - beginTime).count();
+			long endTime = system::getNanoseconds();
+			float duration = (endTime - startTime) / 1e9;
 
 			// Smooth CPU time
 			const float cpuTau = 2.f /* seconds */;

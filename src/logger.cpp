@@ -1,7 +1,7 @@
 #include <common.hpp>
 #include <asset.hpp>
 #include <settings.hpp>
-#include <chrono>
+#include <system.hpp>
 #include <mutex>
 
 
@@ -10,12 +10,12 @@ namespace logger {
 
 
 static FILE* outputFile = NULL;
-static std::chrono::high_resolution_clock::time_point startTime;
+static long startTime = 0;
 static std::mutex logMutex;
 
 
 void init() {
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = system::getNanoseconds();
 	if (settings::devMode) {
 		outputFile = stderr;
 		return;
@@ -50,11 +50,11 @@ static const int levelColors[] = {
 static void logVa(Level level, const char* filename, int line, const char* format, va_list args) {
 	std::lock_guard<std::mutex> lock(logMutex);
 
-	auto nowTime = std::chrono::high_resolution_clock::now();
-	int duration = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime - startTime).count();
+	long nowTime = system::getNanoseconds();
+	double duration = (nowTime - startTime) / 1e9;
 	if (outputFile == stderr)
 		fprintf(outputFile, "\x1B[%dm", levelColors[level]);
-	fprintf(outputFile, "[%.03f %s %s:%d] ", duration / 1000.0, levelLabels[level], filename, line);
+	fprintf(outputFile, "[%.03f %s %s:%d] ", duration, levelLabels[level], filename, line);
 	if (outputFile == stderr)
 		fprintf(outputFile, "\x1B[0m");
 	vfprintf(outputFile, format, args);
