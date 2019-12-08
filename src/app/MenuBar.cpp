@@ -400,7 +400,7 @@ struct ViewButton : MenuButton {
 		menu->addChild(knobModeItem);
 
 		LockModulesItem* lockModulesItem = new LockModulesItem;
-		lockModulesItem->text = "Lock modules";
+		lockModulesItem->text = "Lock module positions";
 		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
 		menu->addChild(lockModulesItem);
 
