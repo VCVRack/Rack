@@ -64,7 +64,7 @@ void ScrollWidget::step() {
 }
 
 void ScrollWidget::onButton(const event::Button& e) {
-	Widget::onButton(e);
+	OpaqueWidget::onButton(e);
 	if (e.isConsumed())
 		return;
 
@@ -78,7 +78,7 @@ void ScrollWidget::onButton(const event::Button& e) {
 }
 
 void ScrollWidget::onDragStart(const event::DragStart& e) {
-	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
 		e.consume(this);
 	}
 }

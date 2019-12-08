@@ -75,7 +75,6 @@ void RackScrollWidget::step() {
 	oldOffset = offset;
 }
 
-
 void RackScrollWidget::draw(const DrawArgs& args) {
 	// Hide scrollbars if full screen
 	bool fullscreen = APP->window->isFullScreen();

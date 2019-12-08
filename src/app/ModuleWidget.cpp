@@ -355,7 +355,12 @@ void ModuleWidget::drawShadow(const DrawArgs& args) {
 }
 
 void ModuleWidget::onButton(const event::Button& e) {
-	OpaqueWidget::onButton(e);
+	// Don't consume left button if `lockModules` is enabled.
+	if (settings::lockModules)
+		Widget::onButton(e);
+	else
+		OpaqueWidget::onButton(e);
+
 	if (e.isConsumed())
 		return;
 

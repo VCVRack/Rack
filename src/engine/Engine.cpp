@@ -528,16 +528,19 @@ long Engine::getFrame() {
 
 
 long Engine::getStepFrame() {
+	// No lock, for performance
 	return internal->stepFrame;
 }
 
 
 long Engine::getStepTime() {
+	// No lock, for performance
 	return internal->stepTime;
 }
 
 
 int Engine::getStepFrames() {
+	// No lock, for performance
 	return internal->stepFrames;
 }
 
