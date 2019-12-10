@@ -26,7 +26,7 @@ KnobMode knobMode = KNOB_MODE_LINEAR_LOCKED;
 float knobLinearSensitivity = 0.001f;
 float sampleRate = 44100.0;
 int threadCount = 1;
-bool paramTooltip = false;
+bool paramTooltip = true;
 bool cpuMeter = false;
 bool lockModules = false;
 #if defined ARCH_MAC
