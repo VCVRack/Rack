@@ -71,7 +71,7 @@ void Knob::onDragStart(const event::DragStart& e) {
 	}
 
 	settings::KnobMode km = settings::knobMode;
-	if (km == settings::KNOB_MODE_LINEAR_LOCKED || km == settings::KNOB_MODE_SCALED_LINEAR_LOCKED) {
+	if (km == settings::KNOB_MODE_LINEAR || km == settings::KNOB_MODE_SCALED_LINEAR) {
 		APP->window->cursorLock();
 	}
 	// Only changed for KNOB_MODE_LINEAR_*.
@@ -88,7 +88,7 @@ void Knob::onDragEnd(const event::DragEnd& e) {
 		return;
 
 	settings::KnobMode km = settings::knobMode;
-	if (km == settings::KNOB_MODE_LINEAR_LOCKED || km == settings::KNOB_MODE_SCALED_LINEAR_LOCKED) {
+	if (km == settings::KNOB_MODE_LINEAR || km == settings::KNOB_MODE_SCALED_LINEAR) {
 		APP->window->cursorUnlock();
 	}
 
@@ -115,7 +115,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 		return;
 
 	settings::KnobMode km = settings::knobMode;
-	bool linearMode = (km < settings::KNOB_MODE_ROTARY_ABSOLUTE) || forceLinear;
+	bool linearMode = (km == settings::KNOB_MODE_LINEAR || km == settings::KNOB_MODE_SCALED_LINEAR) || forceLinear;
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
@@ -150,7 +150,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 			delta *= rangeRatio;
 
 			// Scale delta if in scaled linear knob mode
-			if (km == settings::KNOB_MODE_SCALED_LINEAR_LOCKED || km == settings::KNOB_MODE_SCALED_LINEAR) {
+			if (km == settings::KNOB_MODE_SCALED_LINEAR) {
 				float deltaY = (horizontal ? -e.mouseDelta.y : -e.mouseDelta.x);
 				const float pixelTau = 200.f;
 				internal->linearScale *= std::pow(2.f, deltaY / pixelTau);

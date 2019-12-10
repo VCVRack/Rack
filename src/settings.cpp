@@ -22,7 +22,8 @@ float zoom = 0.0;
 bool invertZoom = false;
 float cableOpacity = 0.5;
 float cableTension = 0.5;
-KnobMode knobMode = KNOB_MODE_LINEAR_LOCKED;
+bool allowCursorLock = true;
+KnobMode knobMode = KNOB_MODE_LINEAR;
 float knobLinearSensitivity = 0.001f;
 float sampleRate = 44100.0;
 int threadCount = 1;
@@ -65,6 +66,8 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "cableOpacity", json_real(cableOpacity));
 
 	json_object_set_new(rootJ, "cableTension", json_real(cableTension));
+
+	json_object_set_new(rootJ, "allowCursorLock", json_boolean(allowCursorLock));
 
 	json_object_set_new(rootJ, "knobMode", json_integer((int) knobMode));
 
@@ -144,12 +147,9 @@ void fromJson(json_t* rootJ) {
 	if (cableTensionJ)
 		cableTension = json_number_value(cableTensionJ);
 
-	// legacy v1
 	json_t* allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
-	if (allowCursorLockJ) {
-		if (json_is_false(allowCursorLockJ))
-			knobMode = KNOB_MODE_LINEAR;
-	}
+	if (allowCursorLockJ)
+		allowCursorLock = json_boolean_value(allowCursorLockJ);
 
 	json_t* knobModeJ = json_object_get(rootJ, "knobMode");
 	if (knobModeJ)

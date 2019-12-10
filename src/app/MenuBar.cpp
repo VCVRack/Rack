@@ -317,6 +317,12 @@ struct ParamTooltipItem : ui::MenuItem {
 	}
 };
 
+struct AllowCursorLockItem : ui::MenuItem {
+	void onAction(const event::Action& e) override {
+		settings::allowCursorLock ^= true;
+	}
+};
+
 struct KnobModeValueItem : ui::MenuItem {
 	settings::KnobMode knobMode;
 	void onAction(const event::Action& e) override {
@@ -329,9 +335,7 @@ struct KnobModeItem : ui::MenuItem {
 		ui::Menu* menu = new ui::Menu;
 
 		static const std::vector<std::pair<settings::KnobMode, std::string>> knobModes = {
-			{settings::KNOB_MODE_LINEAR_LOCKED, "Linear (locked cursor)"},
 			{settings::KNOB_MODE_LINEAR, "Linear"},
-			{settings::KNOB_MODE_SCALED_LINEAR_LOCKED, "Scaled linear (locked cursor)"},
 			{settings::KNOB_MODE_SCALED_LINEAR, "Scaled linear"},
 			{settings::KNOB_MODE_ROTARY_ABSOLUTE, "Absolute rotary"},
 			{settings::KNOB_MODE_ROTARY_RELATIVE, "Relative rotary"},
@@ -393,6 +397,11 @@ struct ViewButton : MenuButton {
 		paramTooltipItem->text = "Show tooltips";
 		paramTooltipItem->rightText = CHECKMARK(settings::paramTooltip);
 		menu->addChild(paramTooltipItem);
+
+		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
+		allowCursorLockItem->text = "Allow cursor lock";
+		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
+		menu->addChild(allowCursorLockItem);
 
 		KnobModeItem* knobModeItem = new KnobModeItem;
 		knobModeItem->text = "Knob mode";

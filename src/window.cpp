@@ -478,6 +478,9 @@ void Window::close() {
 }
 
 void Window::cursorLock() {
+	if (!settings::allowCursorLock)
+		return;
+
 #if defined ARCH_MAC
 	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 #else
@@ -487,6 +490,9 @@ void Window::cursorLock() {
 }
 
 void Window::cursorUnlock() {
+	if (!settings::allowCursorLock)
+		return;
+
 	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	internal->ignoreNextMouseDelta = true;
 }
