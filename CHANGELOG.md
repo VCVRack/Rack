@@ -18,6 +18,12 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add module manual URL (if plugin developer supplies it) to module context menu item.
 - Add quick access to user module patches from `<Rack user dir>/presets/<plugin slug>/<module slug>` to module context menu.
 - Add infinity and NaN protection to cables, so they won't propagate non-finite values from badly behaving modules.
+- Add basic headless support with the `-h` flag.
+- Add multiple knob modes: scaled linear, absolute rotary, and relative rotary.
+- Add "knobLinearSensitivity" property to settings.
+- Add timestamps to MIDI messages.
+- Allow sending and receiving SysEx messages through MIDI drivers.
+- Add ability to scroll the rack and other scroll containers using the left mouse button.
 - Core
 	- Add red clip lights to VCV Audio-8/16 when signal reaches beyond ±10V.
 - API
@@ -25,6 +31,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.
 	- Add `.modules[].manualUrl` to plugin manifest schema.
 	- Add `appendAudioMenu()` and `appendMidiMenu()` so plugin developers can develop custom audio/MIDI interfaces without adding an `AudioWidget/MidiWidget` to their panel.
+	- Use MIDI timestamps in MIDI-CV, MIDI-CC, MIDI-Gate, and MIDI-Map to improve overall timing and drastically reduce clock jitter.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
