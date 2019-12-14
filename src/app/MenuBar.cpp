@@ -90,6 +90,28 @@ struct OpenItem : ui::MenuItem {
 	}
 };
 
+struct OpenPathItem : ui::MenuItem {
+	std::string path;
+	void onAction(const event::Action& e) override {
+		APP->patch->loadPathDialog(path);
+	}
+};
+
+struct OpenRecentItem : ui::MenuItem {
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
+
+		for (const std::string& path : settings::recentPatchPaths) {
+			OpenPathItem* item = new OpenPathItem;
+			item->text = string::filename(path);
+			item->path = path;
+			menu->addChild(item);
+		}
+
+		return menu;
+	}
+};
+
 struct SaveItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
 		APP->patch->saveDialog();
@@ -135,6 +157,11 @@ struct FileButton : MenuButton {
 		openItem->text = "Open";
 		openItem->rightText = RACK_MOD_CTRL_NAME "+O";
 		menu->addChild(openItem);
+
+		OpenRecentItem* openRecentItem = new OpenRecentItem;
+		openRecentItem->text = "Open recent";
+		openRecentItem->rightText = RIGHT_ARROW;
+		menu->addChild(openRecentItem);
 
 		SaveItem* saveItem = new SaveItem;
 		saveItem->text = "Save";

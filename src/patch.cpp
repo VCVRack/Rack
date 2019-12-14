@@ -8,6 +8,7 @@
 #include <app/RackWidget.hpp>
 #include <history.hpp>
 #include <settings.hpp>
+#include <algorithm>
 
 #include <osdialog.h>
 
@@ -47,7 +48,7 @@ void PatchManager::init(std::string path) {
 	}
 
 	// Load autosave
-	if (load(asset::autosavePath)) {
+	if (load("")) {
 		return;
 	}
 
@@ -164,8 +165,10 @@ void PatchManager::saveTemplateDialog() {
 }
 
 bool PatchManager::load(std::string path) {
-	INFO("Loading patch %s", path.c_str());
-	FILE* file = std::fopen(path.c_str(), "r");
+	std::string actualPath = (path != "") ? path : asset::autosavePath;
+
+	INFO("Loading patch %s", actualPath.c_str());
+	FILE* file = std::fopen(actualPath.c_str(), "r");
 	if (!file) {
 		// Exit silently
 		return false;
@@ -192,6 +195,18 @@ bool PatchManager::load(std::string path) {
 	}
 	APP->engine->clear();
 	fromJson(rootJ);
+
+	// Update recent patches
+	if (path != "") {
+		auto& recent = settings::recentPatchPaths;
+		// Remove path from recent patches (if exists)
+		recent.erase(std::remove(recent.begin(), recent.end(), path), recent.end());
+		// Add path to top of recent patches
+		recent.push_front(path);
+		// Limit recent patches size
+		recent.resize(std::min((int) recent.size(), 10));
+	}
+
 	return true;
 }
 

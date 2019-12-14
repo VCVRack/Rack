@@ -39,6 +39,7 @@ bool lockModules = false;
 float autosavePeriod = 15.0;
 bool skipLoadOnLaunch = false;
 std::string patchPath;
+std::list<std::string> recentPatchPaths;
 std::vector<NVGcolor> cableColors = {
 	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
 	nvgRGB(0x0c, 0x8e, 0x15), // green
@@ -91,6 +92,12 @@ json_t* toJson() {
 		json_object_set_new(rootJ, "skipLoadOnLaunch", json_boolean(true));
 
 	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
+
+	json_t* recentPatchPathsJ = json_array();
+	for (const std::string& path : recentPatchPaths) {
+		json_array_append_new(recentPatchPathsJ, json_string(path.c_str()));
+	}
+	json_object_set_new(rootJ, "recentPatchPaths", recentPatchPathsJ);
 
 	json_t* cableColorsJ = json_array();
 	for (NVGcolor cableColor : cableColors) {
@@ -194,6 +201,17 @@ void fromJson(json_t* rootJ) {
 	json_t* patchPathJ = json_object_get(rootJ, "patchPath");
 	if (patchPathJ)
 		patchPath = json_string_value(patchPathJ);
+
+	recentPatchPaths.clear();
+	json_t* recentPatchPathsJ = json_object_get(rootJ, "recentPatchPaths");
+	if (recentPatchPathsJ) {
+		size_t i;
+		json_t* pathJ;
+		json_array_foreach(recentPatchPathsJ, i, pathJ) {
+			std::string path = json_string_value(pathJ);
+			recentPatchPaths.push_back(path);
+		}
+	}
 
 	cableColors.clear();
 	json_t* cableColorsJ = json_object_get(rootJ, "cableColors");

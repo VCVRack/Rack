@@ -4,6 +4,7 @@
 #include <color.hpp>
 #include <vector>
 #include <map>
+#include <list>
 #include <tuple>
 #include <jansson.h>
 
@@ -45,6 +46,7 @@ extern int frameSwapInterval;
 extern float autosavePeriod;
 extern bool skipLoadOnLaunch;
 extern std::string patchPath;
+extern std::list<std::string> recentPatchPaths;
 extern std::vector<NVGcolor> cableColors;
 // pluginSlug -> moduleSlugs
 extern std::map<std::string, std::vector<std::string>> moduleWhitelist;
