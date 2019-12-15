@@ -12,6 +12,7 @@ namespace random {
 // from http://xoroshiro.di.unimi.it/xoroshiro128plus.c
 
 thread_local uint64_t xoroshiro128plus_state[2];
+static int threadCounter = 0;
 
 static uint64_t rotl(const uint64_t x, int k) {
 	return (x << k) | (x >> (64 - k));
@@ -36,9 +37,9 @@ void init() {
 
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	xoroshiro128plus_state[0] = tv.tv_sec;
-	xoroshiro128plus_state[1] = tv.tv_usec;
-	// Generate a few times to fix the fact that the time is not a uniform u64
+	xoroshiro128plus_state[0] = uint64_t(tv.tv_sec) * 1000000 + tv.tv_usec;
+	xoroshiro128plus_state[1] = threadCounter++;
+	// Shift a few times to fix the fact that the seed is not a uniform u64
 	for (int i = 0; i < 10; i++) {
 		xoroshiro128plus_next();
 	}
@@ -53,6 +54,7 @@ uint64_t u64() {
 }
 
 float uniform() {
+	// Make sure to only use 24 bits so it's impossible to round up to 1.f.
 	return (xoroshiro128plus_next() >> (64 - 24)) / std::pow(2.f, 24);
 }
 
