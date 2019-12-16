@@ -2,6 +2,7 @@
 #include <math.hpp>
 #include <time.h>
 #include <sys/time.h>
+#include <atomic>
 
 
 namespace rack {
@@ -12,7 +13,7 @@ namespace random {
 // from http://xoroshiro.di.unimi.it/xoroshiro128plus.c
 
 thread_local uint64_t xoroshiro128plus_state[2];
-static int threadCounter = 0;
+static std::atomic<uint64_t> threadCounter {0};
 
 static uint64_t rotl(const uint64_t x, int k) {
 	return (x << k) | (x >> (64 - k));
