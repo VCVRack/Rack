@@ -215,13 +215,24 @@ std::string getStackTrace() {
 }
 
 
-long getNanoseconds() {
+int64_t getNanoseconds() {
+#if defined ARCH_WIN
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+	// TODO Check if this is always an integer factor on all CPUs
+	int64_t nsPerTick = 1000000000LL / frequency.QuadPart;
+	int64_t time = counter.QuadPart * nsPerTick;
+	return time;
+#else
 	using clock = std::chrono::high_resolution_clock;
 	using time_point = std::chrono::time_point<clock>;
 	time_point now = clock::now();
-	using duration = std::chrono::duration<long, std::nano>;
+	using duration = std::chrono::duration<int64_t, std::nano>;
 	duration d = now.time_since_epoch();
 	return d.count();
+#endif
 }
 
 

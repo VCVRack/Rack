@@ -151,9 +151,9 @@ struct Engine::Internal {
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
-	long frame = 0;
-	long stepFrame = 0;
-	long stepTime = 0;
+	int64_t frame = 0;
+	int64_t stepFrame = 0;
+	int64_t stepTime = 0;
 	int stepFrames = 0;
 	Module* primaryModule = NULL;
 
@@ -224,7 +224,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		Module* module = internal->modules[i];
 
 		// Start CPU timer
-		long startTime;
+		int64_t startTime;
 		if (cpuMeter) {
 			startTime = system::getNanoseconds();
 		}
@@ -237,8 +237,8 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 
 		// Stop CPU timer
 		if (cpuMeter) {
-			long endTime = system::getNanoseconds();
-			float duration = (endTime - startTime) / 1e9;
+			int64_t endTime = system::getNanoseconds();
+			float duration = (endTime - startTime) * 1e-9f;
 
 			// Smooth CPU time
 			const float cpuTau = 2.f /* seconds */;
@@ -521,19 +521,19 @@ void Engine::yieldWorkers() {
 }
 
 
-long Engine::getFrame() {
+int64_t Engine::getFrame() {
 	// No lock, for performance
 	return internal->frame;
 }
 
 
-long Engine::getStepFrame() {
+int64_t Engine::getStepFrame() {
 	// No lock, for performance
 	return internal->stepFrame;
 }
 
 
-long Engine::getStepTime() {
+int64_t Engine::getStepTime() {
 	// No lock, for performance
 	return internal->stepTime;
 }

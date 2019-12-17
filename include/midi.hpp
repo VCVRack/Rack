@@ -18,7 +18,7 @@ struct Message {
 	/** Initialized to 3 empty bytes. */
 	std::vector<uint8_t> bytes;
 	/** Timestamp of MIDI message in nanoseconds. Negative if not set. */
-	long timestamp = -1;
+	int64_t timestamp = -1;
 
 	Message() : bytes(3) {}
 

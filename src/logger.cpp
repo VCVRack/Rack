@@ -10,7 +10,7 @@ namespace logger {
 
 
 static FILE* outputFile = NULL;
-static long startTime = 0;
+static int64_t startTime = 0;
 static std::mutex logMutex;
 
 
@@ -50,7 +50,7 @@ static const int levelColors[] = {
 static void logVa(Level level, const char* filename, int line, const char* format, va_list args) {
 	std::lock_guard<std::mutex> lock(logMutex);
 
-	long nowTime = system::getNanoseconds();
+	int64_t nowTime = system::getNanoseconds();
 	double duration = (nowTime - startTime) / 1e9;
 	if (outputFile == stderr)
 		fprintf(outputFile, "\x1B[%dm", levelColors[level]);

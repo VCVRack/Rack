@@ -51,8 +51,8 @@ struct MIDI_CC : Module {
 		// Process MIDI messages only if they arrived `stepFrames` frames ago.
 		while (!midiInput.queue.empty()) {
 			midi::Message& msg = midiInput.queue.front();
-			long msgTime = msg.timestamp + long(APP->engine->getStepFrames() * APP->engine->getSampleTime() * 1e9);
-			long frameTime = APP->engine->getStepTime() + long((APP->engine->getFrame() - APP->engine->getStepFrame()) * APP->engine->getSampleTime() * 1e9);
+			int64_t msgTime = msg.timestamp + int64_t(APP->engine->getStepFrames() * APP->engine->getSampleTime() * 1e9);
+			int64_t frameTime = APP->engine->getStepTime() + int64_t((APP->engine->getFrame() - APP->engine->getStepFrame()) * APP->engine->getSampleTime() * 1e9);
 			if (msgTime > frameTime)
 				break;
 			processMessage(msg);
