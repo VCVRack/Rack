@@ -20,9 +20,9 @@ struct PortTooltip : ui::Tooltip {
 			engine::Port* port = portWidget->getPort();
 			engine::PortInfo* portInfo = portWidget->getPortInfo();
 			// Label
-			text = (portWidget->type == engine::Port::INPUT) ? "Input" : "Output";
-			text += ": ";
-			text += portInfo->getName();
+			text = portInfo->getName();
+			text += " ";
+			text += (portWidget->type == engine::Port::INPUT) ? "input" : "output";
 			// Description
 			std::string description = portInfo->getDescription();
 			if (description != "") {
@@ -49,6 +49,8 @@ struct PortTooltip : ui::Tooltip {
 				text += otherPw->module->model->getFullName();
 				text += ": ";
 				text += otherPw->getPortInfo()->getName();
+				text += " ";
+				text += (otherPw->type == engine::Port::INPUT) ? "input" : "output";
 			}
 		}
 		Tooltip::step();
