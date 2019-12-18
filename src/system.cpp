@@ -225,7 +225,14 @@ int64_t getNanoseconds() {
 	int64_t nsPerTick = 1000000000LL / frequency.QuadPart;
 	int64_t time = counter.QuadPart * nsPerTick;
 	return time;
-#else
+#endif
+#if defined ARCH_LIN
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+	int64_t time = int64_t(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
+	return time;
+#endif
+#if defined ARCH_MAC
 	using clock = std::chrono::high_resolution_clock;
 	using time_point = std::chrono::time_point<clock>;
 	time_point now = clock::now();

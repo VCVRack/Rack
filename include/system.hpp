@@ -36,8 +36,9 @@ int getLogicalCoreCount();
 void setThreadName(const std::string& name);
 /** Returns the caller's human-readable stack trace with "\n"-separated lines. */
 std::string getStackTrace();
-/** Returns the current number of nanoseconds since the epoch with the highest precion available on the OS.
-The epoch is undefined and could be the UNIX epoch, time since boot, time since launch, etc.
+/** Returns the current number of nanoseconds since the epoch.
+The goal of this function is to give the most precise (fine-grained) time available on the OS for benchmarking purposes, while being fast to compute.
+The epoch is undefined. Do not use this function to get absolute time, as it is different on each OS.
 */
 int64_t getNanoseconds();
 /** Opens a URL, also happens to work with PDFs and folders.
