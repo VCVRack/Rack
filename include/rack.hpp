@@ -13,6 +13,7 @@
 #include <window.hpp>
 #include <app.hpp>
 #include <midi.hpp>
+#include <settings.hpp>
 #include <helpers.hpp>
 #include <componentlibrary.hpp>
 

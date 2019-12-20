@@ -42,6 +42,7 @@ extern int threadCount;
 extern bool paramTooltip;
 extern bool cpuMeter;
 extern bool lockModules;
+extern bool darkMode;
 extern int frameSwapInterval;
 extern float autosavePeriod;
 extern bool skipLoadOnLaunch;
@@ -55,6 +56,9 @@ json_t* toJson();
 void fromJson(json_t* rootJ);
 void save(const std::string& path);
 void load(const std::string& path);
+
+// Getters, for ensuring API/ABI compatibility for plugins
+bool isDarkMode();
 
 
 } // namespace settings

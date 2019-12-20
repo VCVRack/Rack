@@ -30,6 +30,7 @@ int threadCount = 1;
 bool paramTooltip = true;
 bool cpuMeter = false;
 bool lockModules = false;
+bool darkMode = false;
 #if defined ARCH_MAC
 	// Most Mac GPUs can't handle rendering the screen every frame, so use ~30 Hz by default.
 	int frameSwapInterval = 2;
@@ -41,10 +42,12 @@ bool skipLoadOnLaunch = false;
 std::string patchPath;
 std::list<std::string> recentPatchPaths;
 std::vector<NVGcolor> cableColors = {
-	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
-	nvgRGB(0x0c, 0x8e, 0x15), // green
-	nvgRGB(0xc9, 0x18, 0x47), // red
-	nvgRGB(0x09, 0x86, 0xad), // blue
+	color::fromHexString("#fc2d5aff"), // red
+	color::fromHexString("#f9b130ff"), // orange
+	// color::fromHexString("#f7da31ff"), // yellow
+	color::fromHexString("#67c12dff"), // green
+	color::fromHexString("#0f8df4ff"), // blue
+	color::fromHexString("#8c1889ff"), // purple
 };
 std::map<std::string, std::vector<std::string>> moduleWhitelist = {};
 
@@ -83,6 +86,8 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "cpuMeter", json_boolean(cpuMeter));
 
 	json_object_set_new(rootJ, "lockModules", json_boolean(lockModules));
+
+	json_object_set_new(rootJ, "darkMode", json_boolean(darkMode));
 
 	json_object_set_new(rootJ, "frameSwapInterval", json_integer(frameSwapInterval));
 
@@ -186,6 +191,10 @@ void fromJson(json_t* rootJ) {
 	if (lockModulesJ)
 		lockModules = json_boolean_value(lockModulesJ);
 
+	json_t* darkModeJ = json_object_get(rootJ, "darkMode");
+	if (darkModeJ)
+		darkMode = json_boolean_value(darkModeJ);
+
 	json_t* frameSwapIntervalJ = json_object_get(rootJ, "frameSwapInterval");
 	if (frameSwapIntervalJ)
 		frameSwapInterval = json_integer_value(frameSwapIntervalJ);
@@ -274,6 +283,11 @@ void load(const std::string& path) {
 
 	fromJson(rootJ);
 	json_decref(rootJ);
+}
+
+
+bool isDarkMode() {
+	return darkMode;
 }
 
 
