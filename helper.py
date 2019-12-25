@@ -31,12 +31,17 @@ def is_valid_slug(slug):
 	return re.match(r'^[a-zA-Z0-9_\-]+$', slug) != None
 
 
-def slug_to_identifier(slug):
-	if len(slug) == 0 or slug[0].isdigit():
-		slug = "_" + slug
-	slug = slug[0].upper() + slug[1:]
-	slug = slug.replace('-', '_')
-	return slug
+def str_to_identifier(s):
+	if not s:
+		return "_"
+	# Identifiers can't start with a number
+	if s[0].isdigit():
+		s = "_" + s
+	# Capitalize first letter
+	s = s[0].upper() + s[1:]
+	# Replace special characters with underscore
+	s = re.sub(r'\W', '_', s)
+	return s
 
 
 def create_plugin(slug, plugin_dir=None):
@@ -241,7 +246,7 @@ def create_module(slug, panel_filename=None, source_filename=None):
 		print(f"Source file generated at {source_filename}")
 
 		# Append model to plugin.hpp
-		identifier = slug_to_identifier(slug)
+		identifier = str_to_identifier(slug)
 
 		# Tell user to add model to plugin.hpp and plugin.cpp
 		print(f"""
@@ -285,7 +290,7 @@ def panel_to_components(tree):
 		name = el.get('{http://www.inkscape.org/namespaces/inkscape}label')
 		if name is None:
 			name = el.get('id')
-		name = slug_to_identifier(name).upper()
+		name = str_to_identifier(name).upper()
 		c['name'] = name
 
 		# Get color
@@ -336,7 +341,7 @@ def panel_to_components(tree):
 
 
 def components_to_source(components, slug):
-	identifier = slug_to_identifier(slug)
+	identifier = str_to_identifier(slug)
 	source = ""
 
 	source += f"""#include "plugin.hpp"
