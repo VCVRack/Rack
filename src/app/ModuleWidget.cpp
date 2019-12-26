@@ -283,6 +283,8 @@ struct ModuleWidget::Internal {
 	Set by RackWidget::updateModuleOldPositions() when *any* module begins dragging, since force-dragging can move other modules around.
 	*/
 	math::Vec oldPos;
+
+	widget::Widget* panel = NULL;
 };
 
 
@@ -472,22 +474,26 @@ void ModuleWidget::setModule(engine::Module* module) {
 	this->module = module;
 }
 
-void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
+void ModuleWidget::setPanel(widget::Widget* panel) {
 	// Remove existing panel
-	if (panel) {
-		removeChild(panel);
-		delete panel;
-		panel = NULL;
+	if (internal->panel) {
+		removeChild(internal->panel);
+		delete internal->panel;
+		internal->panel = NULL;
 	}
 
-	// Create SvgPanel
-	SvgPanel* svgPanel = new SvgPanel;
-	svgPanel->setBackground(svg);
-	panel = svgPanel;
-	addChildBottom(panel);
+	if (panel) {
+		addChildBottom(panel);
+		internal->panel = panel;
+		box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+	}
+}
 
-	// Set ModuleWidget size based on panel
-	box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
+	// Create SvgPanel
+	SvgPanel* panel = new SvgPanel;
+	panel->setBackground(svg);
+	setPanel(panel);
 }
 
 void ModuleWidget::addParam(ParamWidget* param) {

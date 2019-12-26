@@ -21,7 +21,6 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Owned. */
 	engine::Module* module = NULL;
 
-	widget::Widget* panel = NULL;
 	/** Note that the indexes of these vectors do not necessarily correspond with the indexes of `Module::params` etc.
 	*/
 	std::vector<ParamWidget*> params;
@@ -43,11 +42,16 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void onDragEnd(const event::DragEnd& e) override;
 	void onDragMove(const event::DragMove& e) override;
 
-	/** Associates this ModuleWidget with the Module
-	Transfers ownership
+	/** Associates this ModuleWidget with the Module.
+	Transfers ownership.
 	*/
 	void setModule(engine::Module* module);
-	void setPanel(std::shared_ptr<Svg> svg);
+	/** Sets the panel and sets the size of the ModuleWidget from the panel.
+	Transfers ownership.
+	*/
+	void setPanel(widget::Widget* panel);
+	/** Use `setPanel(createPanel(svg))` instead. */
+	DEPRECATED void setPanel(std::shared_ptr<Svg> svg);
 
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addParam(ParamWidget* param);

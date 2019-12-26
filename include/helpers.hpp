@@ -8,6 +8,7 @@
 #include <app/ParamWidget.hpp>
 #include <app/ModuleLightWidget.hpp>
 #include <app/Scene.hpp>
+#include <app/SvgPanel.hpp>
 #include <engine/Module.hpp>
 #include <engine/ParamQuantity.hpp>
 #include <app.hpp>
@@ -53,6 +54,16 @@ TWidget* createWidgetCentered(math::Vec pos) {
 	TWidget* o = createWidget<TWidget>(pos);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
+}
+
+inline app::SvgPanel* createPanel(std::string svgPath, std::string darkSvgPath = "") {
+	app::SvgPanel* panel = new app::SvgPanel;
+	std::shared_ptr<Svg> svg = APP->window->loadSvg(svgPath);
+	std::shared_ptr<Svg> darkSvg;
+	if (darkSvgPath != "")
+		darkSvg = APP->window->loadSvg(darkSvgPath);
+	panel->setBackground(svg, darkSvg);
+	return panel;
 }
 
 template <class TParamWidget>
