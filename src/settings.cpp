@@ -30,7 +30,6 @@ int threadCount = 1;
 bool paramTooltip = true;
 bool cpuMeter = false;
 bool lockModules = false;
-bool darkMode = false;
 #if defined ARCH_MAC
 	// Most Mac GPUs can't handle rendering the screen every frame, so use ~30 Hz by default.
 	int frameSwapInterval = 2;
@@ -86,8 +85,6 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "cpuMeter", json_boolean(cpuMeter));
 
 	json_object_set_new(rootJ, "lockModules", json_boolean(lockModules));
-
-	json_object_set_new(rootJ, "darkMode", json_boolean(darkMode));
 
 	json_object_set_new(rootJ, "frameSwapInterval", json_integer(frameSwapInterval));
 
@@ -191,10 +188,6 @@ void fromJson(json_t* rootJ) {
 	if (lockModulesJ)
 		lockModules = json_boolean_value(lockModulesJ);
 
-	json_t* darkModeJ = json_object_get(rootJ, "darkMode");
-	if (darkModeJ)
-		darkMode = json_boolean_value(darkModeJ);
-
 	json_t* frameSwapIntervalJ = json_object_get(rootJ, "frameSwapInterval");
 	if (frameSwapIntervalJ)
 		frameSwapInterval = json_integer_value(frameSwapIntervalJ);
@@ -283,11 +276,6 @@ void load(const std::string& path) {
 
 	fromJson(rootJ);
 	json_decref(rootJ);
-}
-
-
-bool isDarkMode() {
-	return darkMode;
 }
 
 

@@ -51,7 +51,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	*/
 	void setPanel(widget::Widget* panel);
 	/** Use `setPanel(createPanel(svg))` instead. */
-	DEPRECATED void setPanel(std::shared_ptr<Svg> svg);
+	void setPanel(std::shared_ptr<Svg> svg);
 
 	/** Convenience functions for adding special widgets (calls addChild()) */
 	void addParam(ParamWidget* param);

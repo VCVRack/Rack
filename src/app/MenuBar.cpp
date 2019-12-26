@@ -384,12 +384,6 @@ struct LockModulesItem : ui::MenuItem {
 	}
 };
 
-struct DarkModeItem : ui::MenuItem {
-	void onAction(const event::Action& e) override {
-		settings::darkMode ^= true;
-	}
-};
-
 struct FrameRateValueItem : ui::MenuItem {
 	int frameSwapInterval;
 	void onAction(const event::Action& e) override {
@@ -457,11 +451,6 @@ struct ViewButton : MenuButton {
 		CableTensionSlider* cableTensionSlider = new CableTensionSlider;
 		cableTensionSlider->box.size.x = 200.0;
 		menu->addChild(cableTensionSlider);
-
-		DarkModeItem* darkModeItem = new DarkModeItem;
-		darkModeItem->text = "Dark mode";
-		darkModeItem->rightText = CHECKMARK(settings::darkMode);
-		menu->addChild(darkModeItem);
 
 		FrameRateItem* frameRateItem = new FrameRateItem;
 		frameRateItem->text = "Frame rate";

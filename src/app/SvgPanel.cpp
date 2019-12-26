@@ -34,20 +34,11 @@ void SvgPanel::step() {
 		fb->oversample = 2.0;
 	}
 
-	std::shared_ptr<Svg> svg = this->svg;
-	if (settings::isDarkMode() && this->darkSvg)
-		svg = this->darkSvg;
-	if (sw->svg != svg) {
-		sw->setSvg(svg);
-		fb->dirty = true;
-	}
-
 	Widget::step();
 }
 
-void SvgPanel::setBackground(std::shared_ptr<Svg> svg, std::shared_ptr<Svg> darkSvg) {
+void SvgPanel::setBackground(std::shared_ptr<Svg> svg) {
 	this->svg = svg;
-	this->darkSvg = darkSvg;
 
 	sw->setSvg(svg);
 	fb->box.size = sw->box.size.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);

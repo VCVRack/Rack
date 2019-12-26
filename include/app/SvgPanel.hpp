@@ -20,11 +20,10 @@ struct SvgPanel : widget::Widget {
 	widget::SvgWidget* sw;
 	PanelBorder* panelBorder;
 	std::shared_ptr<Svg> svg;
-	std::shared_ptr<Svg> darkSvg;
 
 	SvgPanel();
 	void step() override;
-	void setBackground(std::shared_ptr<Svg> svg, std::shared_ptr<Svg> darkSvg = NULL);
+	void setBackground(std::shared_ptr<Svg> svg);
 };
 
 

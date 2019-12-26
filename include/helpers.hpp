@@ -56,13 +56,10 @@ TWidget* createWidgetCentered(math::Vec pos) {
 	return o;
 }
 
-inline app::SvgPanel* createPanel(std::string svgPath, std::string darkSvgPath = "") {
+inline app::SvgPanel* createPanel(std::string svgPath) {
 	app::SvgPanel* panel = new app::SvgPanel;
 	std::shared_ptr<Svg> svg = APP->window->loadSvg(svgPath);
-	std::shared_ptr<Svg> darkSvg;
-	if (darkSvgPath != "")
-		darkSvg = APP->window->loadSvg(darkSvgPath);
-	panel->setBackground(svg, darkSvg);
+	panel->setBackground(svg);
 	return panel;
 }
 
