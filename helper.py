@@ -354,7 +354,7 @@ struct {identifier} : Module {{"""
 	enum ParamIds {"""
 	for c in components['params']:
 		source += f"""
-		PARAM_{c['name']},"""
+		{c['name']}_PARAM,"""
 	source += """
 		PARAMS_LEN
 	};"""
@@ -364,7 +364,7 @@ struct {identifier} : Module {{"""
 	enum InputIds {"""
 	for c in components['inputs']:
 		source += f"""
-		INPUT_{c['name']},"""
+		{c['name']}_INPUT,"""
 	source += """
 		INPUTS_LEN
 	};"""
@@ -374,7 +374,7 @@ struct {identifier} : Module {{"""
 	enum OutputIds {"""
 	for c in components['outputs']:
 		source += f"""
-		OUTPUT_{c['name']},"""
+		{c['name']}_OUTPUT,"""
 	source += """
 		OUTPUTS_LEN
 	};"""
@@ -384,7 +384,7 @@ struct {identifier} : Module {{"""
 	enum LightIds {"""
 	for c in components['lights']:
 		source += f"""
-		LIGHT_{c['name']},"""
+		{c['name']}_LIGHT,"""
 	source += """
 		LIGHTS_LEN
 	};"""
@@ -397,15 +397,15 @@ struct {identifier} : Module {{"""
 
 	for c in components['params']:
 		source += f"""
-		configParam(PARAM_{c['name']}, 0.f, 1.f, 0.f, "");"""
+		configParam({c['name']}_PARAM, 0.f, 1.f, 0.f, "");"""
 
 	for c in components['inputs']:
 		source += f"""
-		configInput(INPUT_{c['name']}, "");"""
+		configInput({c['name']}_INPUT, "");"""
 
 	for c in components['outputs']:
 		source += f"""
-		configOutput(OUTPUT_{c['name']}, "");"""
+		configOutput({c['name']}_OUTPUT, "");"""
 
 	source += """
 	}
@@ -434,10 +434,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['params']:
 		if 'x' in c:
 			source += f"""
-		addParam(createParam<RoundBlackKnob>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::PARAM_{c['name']}));"""
+		addParam(createParam<RoundBlackKnob>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_PARAM));"""
 		else:
 			source += f"""
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::PARAM_{c['name']}));"""
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_PARAM));"""
 
 	# Inputs
 	if len(components['inputs']) > 0:
@@ -445,10 +445,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['inputs']:
 		if 'x' in c:
 			source += f"""
-		addInput(createInput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::INPUT_{c['name']}));"""
+		addInput(createInput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_INPUT));"""
 		else:
 			source += f"""
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::INPUT_{c['name']}));"""
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_INPUT));"""
 
 	# Outputs
 	if len(components['outputs']) > 0:
@@ -456,10 +456,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['outputs']:
 		if 'x' in c:
 			source += f"""
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::OUTPUT_{c['name']}));"""
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_OUTPUT));"""
 		else:
 			source += f"""
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::OUTPUT_{c['name']}));"""
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_OUTPUT));"""
 
 	# Lights
 	if len(components['lights']) > 0:
@@ -467,10 +467,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['lights']:
 		if 'x' in c:
 			source += f"""
-		addChild(createLight<MediumLight<RedLight>>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::LIGHT_{c['name']}));"""
+		addChild(createLight<MediumLight<RedLight>>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_LIGHT));"""
 		else:
 			source += f"""
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::LIGHT_{c['name']}));"""
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_LIGHT));"""
 
 	# Widgets
 	if len(components['widgets']) > 0:
@@ -495,7 +495,7 @@ Model* model{identifier} = createModel<{identifier}, {identifier}Widget>("{slug}
 
 
 def usage(script):
-	text = f"""VCV Rack Plugin Helper Utility
+	text = f"""VCV Rack Plugin Development Helper
 
 Usage: {script} <command> ...
 Commands:
