@@ -329,7 +329,7 @@ def panel_to_components(tree):
 			components['widgets'].append(c)
 
 	# Sort components
-	top_left_sort = lambda w: (w['cy'], w['cx'])
+	top_left_sort = lambda w: w['cy'] + 0.01 * w['cx']
 	components['params'] = sorted(components['params'], key=top_left_sort)
 	components['inputs'] = sorted(components['inputs'], key=top_left_sort)
 	components['outputs'] = sorted(components['outputs'], key=top_left_sort)
