@@ -53,7 +53,10 @@ struct Model {
 	}
 
 	void fromJson(json_t* rootJ);
+	/** Returns the branded name of the model, e.g. VCV VCO-1. */
 	std::string getFullName();
+	std::string getFactoryPresetDir();
+	std::string getUserPresetDir();
 };
 
 

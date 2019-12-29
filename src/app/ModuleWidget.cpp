@@ -170,6 +170,14 @@ struct ModuleSaveItem : ui::MenuItem {
 };
 
 
+struct ModuleSaveTemplateItem : ui::MenuItem {
+	ModuleWidget* moduleWidget;
+	void onAction(const event::Action& e) override {
+		moduleWidget->saveTemplate();
+	}
+};
+
+
 struct ModuleLoadItem : ui::MenuItem {
 	ModuleWidget* moduleWidget;
 	void onAction(const event::Action& e) override {
@@ -182,7 +190,12 @@ struct ModulePresetPathItem : ui::MenuItem {
 	ModuleWidget* moduleWidget;
 	std::string presetPath;
 	void onAction(const event::Action& e) override {
-		moduleWidget->loadAction(presetPath);
+		try {
+			moduleWidget->loadAction(presetPath);
+		}
+		catch (Exception& e) {
+			osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
+		}
 	}
 };
 
@@ -214,6 +227,11 @@ struct ModulePresetItem : ui::MenuItem {
 		saveItem->moduleWidget = moduleWidget;
 		menu->addChild(saveItem);
 
+		ModuleSaveTemplateItem* saveTemplateItem = new ModuleSaveTemplateItem;
+		saveTemplateItem->text = "Save template";
+		saveTemplateItem->moduleWidget = moduleWidget;
+		menu->addChild(saveTemplateItem);
+
 		// Create ModulePresetPathItems for each patch in a directory.
 		auto createPresetItems = [&](std::string presetDir) {
 			bool hasPresets = false;
@@ -238,12 +256,12 @@ struct ModulePresetItem : ui::MenuItem {
 		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("User presets"));
-		createPresetItems(asset::user("presets/" + moduleWidget->model->plugin->slug + "/" + moduleWidget->model->slug));
+		createPresetItems(moduleWidget->model->getUserPresetDir());
 
 		// Scan `<plugin dir>/presets/<module slug>` for presets.
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Factory presets"));
-		createPresetItems(asset::plugin(moduleWidget->model->plugin, "presets/" + moduleWidget->model->slug));
+		createPresetItems(moduleWidget->model->getFactoryPresetDir());
 
 		return menu;
 	}
@@ -599,39 +617,85 @@ void ModuleWidget::pasteClipboardAction() {
 	APP->history->push(h);
 }
 
-void ModuleWidget::loadAction(std::string filename) {
-	INFO("Loading preset %s", filename.c_str());
-
-	FILE* file = fopen(filename.c_str(), "r");
-	if (!file) {
-		WARN("Could not load patch file %s", filename.c_str());
-		return;
-	}
+void ModuleWidget::load(std::string filename) {
+	FILE* file = std::fopen(filename.c_str(), "r");
+	if (!file)
+		throw Exception(string::f("Could not load patch file %s", filename.c_str()));
 	DEFER({
-		fclose(file);
+		std::fclose(file);
 	});
+
+	INFO("Loading preset %s", filename.c_str());
 
 	json_error_t error;
 	json_t* moduleJ = json_loadf(file, 0, &error);
-	if (!moduleJ) {
-		std::string message = string::f("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
-		return;
-	}
+	if (!moduleJ)
+		throw Exception(string::f("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text));
 	DEFER({
 		json_decref(moduleJ);
 	});
 
+	fromJson(moduleJ);
+}
+
+void ModuleWidget::loadAction(std::string filename) {
 	// history::ModuleChange
 	history::ModuleChange* h = new history::ModuleChange;
 	h->name = "load module preset";
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	fromJson(moduleJ);
+	try {
+		load(filename);
+	}
+	catch (Exception& e) {
+		delete h;
+		throw;
+	}
 
 	h->newModuleJ = toJson();
 	APP->history->push(h);
+}
+
+void ModuleWidget::loadTemplate() {
+	std::string templatePath = model->getUserPresetDir() + "/" + "template.vcvm";
+	try {
+		load(templatePath);
+	}
+	catch (Exception& e) {
+		// Do nothing
+	}
+}
+
+void ModuleWidget::loadDialog() {
+	std::string presetDir = model->getUserPresetDir();
+	system::createDirectories(presetDir);
+
+	// Delete directories if empty
+	DEFER({
+		system::removeDirectories(presetDir);
+	});
+
+	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
+	DEFER({
+		osdialog_filters_free(filters);
+	});
+
+	char* path = osdialog_file(OSDIALOG_OPEN, presetDir.c_str(), NULL, filters);
+	if (!path) {
+		// No path selected
+		return;
+	}
+	DEFER({
+		free(path);
+	});
+
+	try {
+		loadAction(path);
+	}
+	catch (Exception& e) {
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
+	}
 }
 
 void ModuleWidget::save(std::string filename) {
@@ -654,40 +718,21 @@ void ModuleWidget::save(std::string filename) {
 	json_dumpf(moduleJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 }
 
-void ModuleWidget::loadDialog() {
-	std::string presetDir = asset::user("presets");
-	std::string pluginPresetDir = presetDir + "/" + model->plugin->slug;
-	std::string modulePresetDir = pluginPresetDir + "/" + model->slug;
-	system::createDirectory(modulePresetDir);
+void ModuleWidget::saveTemplate() {
+	std::string presetDir = model->getUserPresetDir();
+	system::createDirectories(presetDir);
 
-	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
-	DEFER({
-		osdialog_filters_free(filters);
-	});
-
-	char* path = osdialog_file(OSDIALOG_OPEN, modulePresetDir.c_str(), NULL, filters);
-	if (!path) {
-		// No path selected
-		return;
-	}
-	DEFER({
-		free(path);
-	});
-
-	loadAction(path);
+	std::string templatePath = presetDir + "/" + "template.vcvm";
+	save(templatePath);
 }
 
 void ModuleWidget::saveDialog() {
-	std::string presetDir = asset::user("presets");
-	system::createDirectory(presetDir);
-	std::string pluginPresetDir = presetDir + "/" + model->plugin->slug;
-	system::createDirectory(pluginPresetDir);
-	std::string modulePresetDir = pluginPresetDir + "/" + model->slug;
-	system::createDirectory(modulePresetDir);
-	// Delete directory if empty
+	std::string presetDir = model->getUserPresetDir();
+	system::createDirectories(presetDir);
+
+	// Delete directories if empty
 	DEFER({
-		system::removeDirectory(modulePresetDir);
-		system::removeDirectory(pluginPresetDir);
+		system::removeDirectories(presetDir);
 	});
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
@@ -695,7 +740,7 @@ void ModuleWidget::saveDialog() {
 		osdialog_filters_free(filters);
 	});
 
-	char* path = osdialog_file(OSDIALOG_SAVE, modulePresetDir.c_str(), "Untitled.vcvm", filters);
+	char* path = osdialog_file(OSDIALOG_SAVE, presetDir.c_str(), "Untitled.vcvm", filters);
 	if (!path) {
 		// No path selected
 		return;

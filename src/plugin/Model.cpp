@@ -50,5 +50,17 @@ std::string Model::getFullName() {
 }
 
 
+std::string Model::getFactoryPresetDir() {
+	return asset::plugin(plugin, "presets/" + slug);
+}
+
+
+std::string Model::getUserPresetDir() {
+	return asset::user("presets/" + plugin->slug + "/" + slug);
+}
+
+
+
+
 } // namespace plugin
 } // namespace rack

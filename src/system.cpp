@@ -137,8 +137,28 @@ void createDirectory(const std::string& path) {
 }
 
 
+void createDirectories(const std::string& path) {
+	for (size_t i = 1; i < path.size(); i++) {
+		char c = path[i];
+		if (c == '/' || c == '\\')
+			createDirectory(path.substr(0, i));
+	}
+	createDirectory(path);
+}
+
+
 void removeDirectory(const std::string& path) {
 	rmdir(path.c_str());
+}
+
+
+void removeDirectories(const std::string& path) {
+	removeDirectory(path);
+	for (size_t i = path.size() - 1; i >= 1; i--) {
+		char c = path[i];
+		if (c == '/' || c == '\\')
+			removeDirectory(path.substr(0, i));
+	}
 }
 
 

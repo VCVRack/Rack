@@ -90,9 +90,13 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 	ModuleWidget* moduleWidget = model->createModuleWidget(module);
 	APP->scene->rack->addModuleAtMouse(moduleWidget);
 
-	// Push ModuleAdd history action
+	// Load template preset
+	moduleWidget->loadTemplate();
+
+	// history::ModuleAdd
 	history::ModuleAdd* h = new history::ModuleAdd;
 	h->name = "create module";
+	// This serializes the module so redoing returns to the current state.
 	h->setModule(moduleWidget);
 	APP->history->push(h);
 

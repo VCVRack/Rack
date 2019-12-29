@@ -66,9 +66,12 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void fromJson(json_t* rootJ);
 	void copyClipboard();
 	void pasteClipboardAction();
+	void load(std::string filename);
 	void loadAction(std::string filename);
-	void save(std::string filename);
+	void loadTemplate();
 	void loadDialog();
+	void save(std::string filename);
+	void saveTemplate();
 	void saveDialog();
 
 	/** Disconnects cables from all ports
