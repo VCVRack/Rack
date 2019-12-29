@@ -56,6 +56,7 @@ const std::vector<std::vector<std::string>> tagAliases = {
 	{"Sampler"},
 	{"Sequencer"},
 	{"Slew limiter"},
+	{"Speech"},
 	{"Switch"}, // A synth voice must have, at the minimum, a built-in oscillator and envelope.
 	{"Synth voice"},
 	{"Tuner"}, // Serves only extremely basic functions, like inverting, max, min, multiplying by 2, etc.
