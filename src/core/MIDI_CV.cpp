@@ -44,21 +44,6 @@ struct MIDI_CV : Module {
 	};
 	PolyMode polyMode;
 
-	enum PitchwheelSlew {
-		PITCHWHEEL_SLEW_SLOW,
-		PITCHWHEEL_SLEW_MEDIUM,
-		PITCHWHEEL_SLEW_FAST,
-		PITCHWHEEL_SLEW_OFF,
-		NUM_PITCHWHEEL_SLEWS
-	};
-	PitchwheelSlew pitchwheelSlew;
-	float pitchwheelSlews[4] = {
-		1.f,
-		3.f,
-		10.f,
-		0.f
-	};
-
 	uint32_t clock = 0;
 	int clockDivision;
 
@@ -75,7 +60,6 @@ struct MIDI_CV : Module {
 	// 16 channels for MPE. When MPE is disabled, only the first channel is used.
 	uint16_t pitches[16];
 	uint8_t mods[16];
-	dsp::ExponentialFilter pitchFilters[16];
 	dsp::ExponentialFilter modFilters[16];
 
 	dsp::PulseGenerator clockPulse;
@@ -89,7 +73,6 @@ struct MIDI_CV : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		heldNotes.reserve(128);
 		for (int c = 0; c < 16; c++) {
-			pitchFilters[c].setTau(1 / 30.f);
 			modFilters[c].setTau(1 / 30.f);
 		}
 		onReset();
@@ -98,7 +81,6 @@ struct MIDI_CV : Module {
 	void onReset() override {
 		channels = 1;
 		polyMode = ROTATE_MODE;
-		pitchwheelSlew = PITCHWHEEL_SLEW_SLOW;
 		clockDivision = 24;
 		panic();
 		midiInput.reset();
@@ -114,7 +96,6 @@ struct MIDI_CV : Module {
 			aftertouches[c] = 0;
 			pitches[c] = 8192;
 			mods[c] = 0;
-			pitchFilters[c].reset();
 			modFilters[c].reset();
 		}
 		pedal = false;
@@ -145,14 +126,14 @@ struct MIDI_CV : Module {
 			for (int c = 0; c < channels; c++) {
 				outputs[PITCH_OUTPUT].setChannels(channels);
 				outputs[MOD_OUTPUT].setChannels(channels);
-				outputs[PITCH_OUTPUT].setVoltage(pitchFilters[c].process(args.sampleTime * pitchwheelSlews[pitchwheelSlew], rescale(pitches[c], 0, 1 << 14, -5.f, 5.f)), c);
+				outputs[PITCH_OUTPUT].setVoltage(rescale(pitches[c], 0, 1 << 14, -5.f, 5.f), c);
 				outputs[MOD_OUTPUT].setVoltage(modFilters[c].process(args.sampleTime, rescale(mods[c], 0, 127, 0.f, 10.f)), c);
 			}
 		}
 		else {
 			outputs[PITCH_OUTPUT].setChannels(1);
 			outputs[MOD_OUTPUT].setChannels(1);
-			outputs[PITCH_OUTPUT].setVoltage(pitchFilters[0].process(args.sampleTime * pitchwheelSlews[pitchwheelSlew], rescale(pitches[0], 0, 1 << 14, -5.f, 5.f)));
+			outputs[PITCH_OUTPUT].setVoltage(rescale(pitches[0], 0, 1 << 14, -5.f, 5.f));
 			outputs[MOD_OUTPUT].setVoltage(modFilters[0].process(args.sampleTime, rescale(mods[0], 0, 127, 0.f, 10.f)));
 		}
 
@@ -405,13 +386,6 @@ struct MIDI_CV : Module {
 		panic();
 	}
 
-	void setPitchwheelSlew(PitchwheelSlew pitchwheelSlew) {
-		if (pitchwheelSlew == this->pitchwheelSlew)
-			return;
-		this->pitchwheelSlew = pitchwheelSlew;
-		panic();
-	}
-
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "channels", json_integer(channels));
@@ -543,36 +517,6 @@ struct PolyModeItem : MenuItem {
 	}
 };
 
-struct PitchwheelSlewValueItem : MenuItem {
-	MIDI_CV* module;
-	MIDI_CV::PitchwheelSlew pitchwheelSlew;
-	void onAction(const event::Action& e) override {
-		module->setPitchwheelSlew(pitchwheelSlew);
-	}
-};
-
-struct PitchwheelSlewItem : MenuItem {
-	MIDI_CV* module;
-	Menu* createChildMenu() override {
-		Menu* menu = new Menu;
-		std::vector<std::string> pitchwheelSlewNames = {
-			"slow",
-			"medium",
-			"fast",
-			"off",
-		};
-		for (int i = 0; i < MIDI_CV::NUM_PITCHWHEEL_SLEWS; i++) {
-			MIDI_CV::PitchwheelSlew pitchwheelSlew = (MIDI_CV::PitchwheelSlew) i;
-			PitchwheelSlewValueItem* item = new PitchwheelSlewValueItem;
-			item->text = pitchwheelSlewNames[i];
-			item->rightText = CHECKMARK(module->pitchwheelSlew == pitchwheelSlew);
-			item->module = module;
-			item->pitchwheelSlew = pitchwheelSlew;
-			menu->addChild(item);
-		}
-		return menu;
-	}
-};
 
 struct MIDI_CVPanicItem : MenuItem {
 	MIDI_CV* module;
@@ -633,12 +577,6 @@ struct MIDI_CVWidget : ModuleWidget {
 		polyModeItem->rightText = RIGHT_ARROW;
 		polyModeItem->module = module;
 		menu->addChild(polyModeItem);
-
-		PitchwheelSlewItem* pitchwheelSlewItem = new PitchwheelSlewItem;
-		pitchwheelSlewItem->text = "Pitchwheel slew";
-		pitchwheelSlewItem->rightText = RIGHT_ARROW;
-		pitchwheelSlewItem->module = module;
-		menu->addChild(pitchwheelSlewItem);
 
 		MIDI_CVPanicItem* panicItem = new MIDI_CVPanicItem;
 		panicItem->text = "Panic";
