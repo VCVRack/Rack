@@ -1,5 +1,5 @@
 {
-  "version": "2.dev.bfce9cc",
+  "version": "2.dev.509a066",
   "modules": [
     {
       "id": 1,
@@ -7,19 +7,18 @@
       "version": "2.0.0",
       "model": "AudioInterface",
       "params": [],
-      "leftModuleId": 2,
-      "rightModuleId": 8,
+      "leftModuleId": 7,
       "data": {
         "audio": {
           "driver": 1,
-          "offset": 0,
-          "maxChannels": 8,
+          "deviceName": "hw:HDA Intel PCH,0",
           "sampleRate": 44100,
-          "blockSize": 256
+          "blockSize": 256,
+          "offset": 0
         }
       },
       "pos": [
-        57,
+        63,
         0
       ]
     },
@@ -42,61 +41,19 @@
           "id": 2
         },
         {
-          "value": 1.0,
+          "value": 0.932117701,
           "id": 3
         },
         {
-          "value": 1.0,
+          "value": 0.383251905,
           "id": 4
         }
       ],
-      "leftModuleId": 7,
-      "rightModuleId": 1,
-      "pos": [
-        47,
-        0
-      ]
-    },
-    {
-      "id": 3,
-      "plugin": "Fundamental",
-      "version": "2.0.0",
-      "model": "VCO",
-      "params": [
-        {
-          "value": 1.0,
-          "id": 0
-        },
-        {
-          "value": 1.0,
-          "id": 1
-        },
-        {
-          "value": 0.0,
-          "id": 2
-        },
-        {
-          "value": 0.0,
-          "id": 3
-        },
-        {
-          "value": 0.0,
-          "id": 4
-        },
-        {
-          "value": 0.5,
-          "id": 5
-        },
-        {
-          "value": 0.0,
-          "id": 6
-        }
-      ],
-      "leftModuleId": 5,
+      "leftModuleId": 19,
       "rightModuleId": 4,
       "pos": [
-        8,
-        0
+        39,
+        1
       ]
     },
     {
@@ -114,7 +71,7 @@
           "id": 1
         },
         {
-          "value": 0.234000027,
+          "value": 0.270144522,
           "id": 2
         },
         {
@@ -126,11 +83,11 @@
           "id": 4
         }
       ],
-      "leftModuleId": 3,
-      "rightModuleId": 6,
+      "leftModuleId": 2,
+      "rightModuleId": 9,
       "pos": [
-        18,
-        0
+        49,
+        1
       ]
     },
     {
@@ -139,7 +96,8 @@
       "version": "2.0.0",
       "model": "MIDIToCVInterface",
       "params": [],
-      "rightModuleId": 3,
+      "leftModuleId": 8,
+      "rightModuleId": 22,
       "data": {
         "channels": 1,
         "polyMode": 0,
@@ -153,7 +111,7 @@
         }
       },
       "pos": [
-        0,
+        16,
         0
       ]
     },
@@ -180,11 +138,10 @@
           "id": 3
         }
       ],
-      "leftModuleId": 4,
-      "rightModuleId": 7,
+      "leftModuleId": 9,
       "pos": [
-        26,
-        0
+        65,
+        1
       ]
     },
     {
@@ -210,7 +167,7 @@
           "id": 3
         },
         {
-          "value": 14.0,
+          "value": 16.0,
           "id": 4
         },
         {
@@ -226,14 +183,14 @@
           "id": 7
         }
       ],
-      "leftModuleId": 6,
-      "rightModuleId": 2,
+      "leftModuleId": 25,
+      "rightModuleId": 1,
       "data": {
         "lissajous": 0,
-        "external": 0
+        "external": 1
       },
       "pos": [
-        34,
+        50,
         0
       ]
     },
@@ -243,96 +200,508 @@
       "version": "2.0.0",
       "model": "Notes",
       "params": [],
-      "leftModuleId": 1,
+      "rightModuleId": 5,
       "data": {
-        "text": "Demo patch instructions:\n\n1. Choose an audio driver and device in the AUDIO-8 module.\n\n2. Use the QWERTY and ZXCVB rows of your keyboard to generate MIDI notes, which are converted to 1V/oct and GATE signals.\n\n3. Drag knobs up/down. Hold Ctrl (Cmd on Mac) while dragging to fine-tune. Right-click knobs to edit, or double-click to initialize.\n\n4. Drag ports to create and move cables. Stack multiple cables on outputs by holding Ctrl (Cmd on Mac) and dragging from an output.\n\n5. Right-click on an empty rack space to add new modules."
+        "text": "Demo patch instructions:\n\n1. Choose an audio driver and device in the AUDIO-8 module.\n\n2. Use the QWERTY and ZXCVB rows of your keyboard to generate MIDI notes, which are converted to 1V/oct and GATE signals.\n\n3. Drag knobs up/down to rotate. Hold Ctrl (Cmd on Mac) while dragging to fine-tune. Right-click knobs to edit, and double-click to initialize.\n\n4. Drag ports to create and move cables. Stack multiple cables on outputs by holding Ctrl (Cmd on Mac) and dragging from an output.\n\n5. Right-click on an empty rack space to add new modules."
       },
       "pos": [
-        67,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 9,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "ADSR",
+      "params": [
+        {
+          "value": 0.258000046,
+          "id": 0
+        },
+        {
+          "value": 0.743000448,
+          "id": 1
+        },
+        {
+          "value": 0.5,
+          "id": 2
+        },
+        {
+          "value": 0.576500058,
+          "id": 3
+        }
+      ],
+      "leftModuleId": 4,
+      "rightModuleId": 6,
+      "pos": [
+        57,
+        1
+      ]
+    },
+    {
+      "id": 14,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "VCO",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 0.0614457838,
+          "id": 4
+        },
+        {
+          "value": 0.5,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        }
+      ],
+      "rightModuleId": 18,
+      "pos": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": 15,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "VCO",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": -0.139759019,
+          "id": 3
+        },
+        {
+          "value": 0.0674698725,
+          "id": 4
+        },
+        {
+          "value": 0.298096538,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        }
+      ],
+      "leftModuleId": 18,
+      "rightModuleId": 17,
+      "pos": [
+        13,
+        1
+      ]
+    },
+    {
+      "id": 16,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "VCO",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        },
+        {
+          "value": 0.0,
+          "id": 2
+        },
+        {
+          "value": 0.0530120172,
+          "id": 3
+        },
+        {
+          "value": 0.0650602281,
+          "id": 4
+        },
+        {
+          "value": 0.151686758,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        }
+      ],
+      "leftModuleId": 17,
+      "rightModuleId": 19,
+      "pos": [
+        26,
+        1
+      ]
+    },
+    {
+      "id": 17,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "Octave",
+      "params": [
+        {
+          "value": -1.0,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 15,
+      "rightModuleId": 16,
+      "pos": [
+        23,
+        1
+      ]
+    },
+    {
+      "id": 18,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "Octave",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        }
+      ],
+      "leftModuleId": 14,
+      "rightModuleId": 15,
+      "pos": [
+        10,
+        1
+      ]
+    },
+    {
+      "id": 19,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "Noise",
+      "params": [],
+      "leftModuleId": 16,
+      "rightModuleId": 2,
+      "pos": [
+        36,
+        1
+      ]
+    },
+    {
+      "id": 22,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "LFO",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        },
+        {
+          "value": 2.65002322,
+          "id": 2
+        },
+        {
+          "value": 0.0,
+          "id": 3
+        },
+        {
+          "value": 0.0,
+          "id": 4
+        },
+        {
+          "value": 0.5,
+          "id": 5
+        },
+        {
+          "value": 0.0,
+          "id": 6
+        }
+      ],
+      "leftModuleId": 5,
+      "rightModuleId": 23,
+      "pos": [
+        24,
+        0
+      ]
+    },
+    {
+      "id": 23,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "VCA-1",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        }
+      ],
+      "leftModuleId": 22,
+      "pos": [
+        34,
+        0
+      ]
+    },
+    {
+      "id": 25,
+      "plugin": "Fundamental",
+      "version": "2.0.0",
+      "model": "VCMixer",
+      "params": [
+        {
+          "value": 1.0,
+          "id": 0
+        },
+        {
+          "value": 1.0,
+          "id": 1
+        },
+        {
+          "value": 1.0,
+          "id": 2
+        },
+        {
+          "value": 1.0,
+          "id": 3
+        },
+        {
+          "value": 1.0,
+          "id": 4
+        }
+      ],
+      "rightModuleId": 7,
+      "pos": [
+        40,
         0
       ]
     }
   ],
   "cables": [
     {
-      "id": 0,
+      "id": 20,
       "outputModuleId": 5,
-      "outputId": 0,
-      "inputModuleId": 3,
-      "inputId": 0,
-      "color": "#c9b70e"
+      "outputId": 1,
+      "inputModuleId": 9,
+      "inputId": 4,
+      "color": "#8c1889"
     },
     {
-      "id": 1,
-      "outputModuleId": 3,
-      "outputId": 2,
-      "inputModuleId": 4,
-      "inputId": 3,
-      "color": "#0c8e15"
-    },
-    {
-      "id": 2,
-      "outputModuleId": 2,
-      "outputId": 0,
-      "inputModuleId": 1,
-      "inputId": 0,
-      "color": "#c91847"
-    },
-    {
-      "id": 3,
-      "outputModuleId": 2,
-      "outputId": 0,
-      "inputModuleId": 1,
-      "inputId": 1,
-      "color": "#0986ad"
-    },
-    {
-      "id": 4,
-      "outputModuleId": 6,
-      "outputId": 0,
-      "inputModuleId": 4,
-      "inputId": 0,
-      "color": "#c9b70e"
-    },
-    {
-      "id": 5,
+      "id": 21,
       "outputModuleId": 5,
       "outputId": 1,
       "inputModuleId": 6,
       "inputId": 4,
-      "color": "#0c8e15"
+      "color": "#fc2d5a"
     },
     {
-      "id": 6,
+      "id": 22,
+      "outputModuleId": 9,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 0,
+      "color": "#f9b130"
+    },
+    {
+      "id": 23,
       "outputModuleId": 6,
       "outputId": 0,
-      "inputModuleId": 2,
-      "inputId": 5,
-      "color": "#c91847"
+      "inputModuleId": 4,
+      "inputId": 0,
+      "color": "#f7da31"
     },
     {
-      "id": 7,
-      "outputModuleId": 4,
+      "id": 24,
+      "outputModuleId": 2,
       "outputId": 0,
+      "inputModuleId": 4,
+      "inputId": 3,
+      "color": "#67c12d"
+    },
+    {
+      "id": 25,
+      "outputModuleId": 14,
+      "outputId": 2,
       "inputModuleId": 2,
       "inputId": 1,
-      "color": "#0986ad"
+      "color": "#0f8df4"
     },
     {
-      "id": 8,
-      "outputModuleId": 2,
+      "id": 28,
+      "outputModuleId": 5,
+      "outputId": 0,
+      "inputModuleId": 14,
+      "inputId": 0,
+      "color": "#f9b130"
+    },
+    {
+      "id": 29,
+      "outputModuleId": 5,
+      "outputId": 0,
+      "inputModuleId": 18,
+      "inputId": 0,
+      "color": "#f7da31"
+    },
+    {
+      "id": 31,
+      "outputModuleId": 18,
+      "outputId": 0,
+      "inputModuleId": 15,
+      "inputId": 0,
+      "color": "#67c12d"
+    },
+    {
+      "id": 32,
+      "outputModuleId": 5,
+      "outputId": 0,
+      "inputModuleId": 17,
+      "inputId": 0,
+      "color": "#0f8df4"
+    },
+    {
+      "id": 33,
+      "outputModuleId": 17,
+      "outputId": 0,
+      "inputModuleId": 16,
+      "inputId": 0,
+      "color": "#8c1889"
+    },
+    {
+      "id": 34,
+      "outputModuleId": 16,
+      "outputId": 2,
+      "inputModuleId": 2,
+      "inputId": 3,
+      "color": "#fc2d5a"
+    },
+    {
+      "id": 35,
+      "outputModuleId": 15,
+      "outputId": 3,
+      "inputModuleId": 2,
+      "inputId": 2,
+      "color": "#8c1889"
+    },
+    {
+      "id": 36,
+      "outputModuleId": 19,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 4,
+      "color": "#fc2d5a"
+    },
+    {
+      "id": 37,
+      "outputModuleId": 23,
+      "outputId": 0,
+      "inputModuleId": 14,
+      "inputId": 1,
+      "color": "#8c1889"
+    },
+    {
+      "id": 38,
+      "outputModuleId": 23,
+      "outputId": 0,
+      "inputModuleId": 15,
+      "inputId": 1,
+      "color": "#fc2d5a"
+    },
+    {
+      "id": 39,
+      "outputModuleId": 23,
+      "outputId": 0,
+      "inputModuleId": 16,
+      "inputId": 1,
+      "color": "#f9b130"
+    },
+    {
+      "id": 40,
+      "outputModuleId": 22,
+      "outputId": 0,
+      "inputModuleId": 23,
+      "inputId": 1,
+      "color": "#f7da31"
+    },
+    {
+      "id": 47,
+      "outputModuleId": 25,
       "outputId": 1,
       "inputModuleId": 7,
       "inputId": 0,
-      "color": "#c9b70e"
+      "color": "#67c12d"
     },
     {
-      "id": 9,
+      "id": 49,
+      "outputModuleId": 25,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 0,
+      "color": "#8c1889"
+    },
+    {
+      "id": 50,
+      "outputModuleId": 25,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 1,
+      "color": "#fc2d5a"
+    },
+    {
+      "id": 51,
+      "outputModuleId": 4,
+      "outputId": 0,
+      "inputModuleId": 25,
+      "inputId": 1,
+      "color": "#f9b130"
+    },
+    {
+      "id": 52,
+      "outputModuleId": 25,
+      "outputId": 2,
+      "inputModuleId": 7,
+      "inputId": 1,
+      "color": "#f7da31"
+    },
+    {
+      "id": 53,
       "outputModuleId": 5,
-      "outputId": 6,
-      "inputModuleId": 6,
-      "inputId": 5,
-      "color": "#0c8e15"
+      "outputId": 5,
+      "inputModuleId": 23,
+      "inputId": 0,
+      "color": "#67c12d"
     }
   ]
 }
