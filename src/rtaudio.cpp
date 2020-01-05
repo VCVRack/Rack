@@ -204,7 +204,19 @@ struct RtAudioDriver : audio::Driver {
 	}
 
 	std::string getName() override {
-		return RtAudio::getApiDisplayName(rtAudio->getCurrentApi());
+		static const std::map<RtAudio::Api, std::string> apiNames = {
+			{RtAudio::LINUX_ALSA, "ALSA"},
+			{RtAudio::UNIX_JACK, "JACK (unsupported)"},
+			{RtAudio::LINUX_PULSE, "PulseAudio"},
+			{RtAudio::LINUX_OSS, "OSS"},
+			{RtAudio::WINDOWS_WASAPI, "WASAPI"},
+			{RtAudio::WINDOWS_ASIO, "ASIO"},
+			{RtAudio::WINDOWS_DS, "DirectSound"},
+			{RtAudio::MACOSX_CORE, "CoreAudio"},
+			{RtAudio::RTAUDIO_DUMMY, "Dummy"},
+			{RtAudio::UNSPECIFIED, "Unspecified"},
+		};
+		return apiNames.at(rtAudio->getCurrentApi());
 	}
 
 	std::vector<int> getDeviceIds() override {
