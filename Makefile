@@ -77,7 +77,7 @@ ifdef ARCH_LIN
 endif
 
 perf: $(TARGET)
-	# Requires gperftools
+	# Requires perf
 	perf record --call-graph dwarf -o perf.data ./$< -d
 	# Analyze with hotspot (https://github.com/KDAB/hotspot) for example
 	hotspot perf.data
