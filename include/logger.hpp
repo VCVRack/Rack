@@ -36,6 +36,10 @@ void destroy();
 Thread-safe, meaning messages cannot overlap each other in the log.
 */
 void log(Level level, const char* filename, int line, const char* format, ...);
+/** Returns whether the current log file failed to end properly, due to a possible crash.
+Must be called *before* init().
+*/
+bool isTruncated();
 
 
 } // namespace logger

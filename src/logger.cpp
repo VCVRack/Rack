@@ -18,17 +18,19 @@ void init() {
 	startTime = system::getNanoseconds();
 	if (settings::devMode) {
 		outputFile = stderr;
-		return;
 	}
-
-	outputFile = fopen(asset::logPath.c_str(), "w");
-	if (!outputFile) {
-		fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
+	else {
+		outputFile = fopen(asset::logPath.c_str(), "w");
+		if (!outputFile) {
+			fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
+		}
 	}
 }
 
 void destroy() {
-	if (outputFile != stderr) {
+	if (outputFile && outputFile != stderr) {
+		// Print end token so we know if the logger exited cleanly.
+		fprintf(outputFile, "END");
 		fclose(outputFile);
 	}
 }
@@ -49,6 +51,8 @@ static const int levelColors[] = {
 
 static void logVa(Level level, const char* filename, int line, const char* format, va_list args) {
 	std::lock_guard<std::mutex> lock(logMutex);
+	if (!outputFile)
+		return;
 
 	int64_t nowTime = system::getNanoseconds();
 	double duration = (nowTime - startTime) / 1e9;
@@ -67,6 +71,27 @@ void log(Level level, const char* filename, int line, const char* format, ...) {
 	va_start(args, format);
 	logVa(level, filename, line, format, args);
 	va_end(args);
+}
+
+bool isTruncated() {
+	if (settings::devMode)
+		return false;
+
+	// Open existing log file
+	FILE* file = fopen(asset::logPath.c_str(), "r");
+	if (!file)
+		return false;
+	DEFER({
+		fclose(file);
+	});
+
+	// Seek to last 3 characters
+	fseek(file, -3, SEEK_END);
+	char str[4];
+	if (fread(str, 1, 3, file) != 3)
+		return true;
+	if (memcmp(str, "END", 3) != 0)
+		return true;
 }
 
 
