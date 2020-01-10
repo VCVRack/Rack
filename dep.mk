@@ -6,6 +6,9 @@ $(shell mkdir -p $(DEP_LOCAL))
 DEP_PATH := $(abspath $(DEP_LOCAL))
 
 DEP_FLAGS += -g -O3 -march=nocona
+# This is needed for Rack for DAWs.
+# Static libs don't usually compiled with -fPIC, but since we're including them in a shared library, it's needed.
+DEP_FLAGS += -fPIC
 
 ifeq ($(ARCH), mac)
 	DEP_MAC_SDK_FLAGS := -mmacosx-version-min=10.7
