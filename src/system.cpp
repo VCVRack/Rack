@@ -130,7 +130,7 @@ void copyFile(const std::string& srcPath, const std::string& destPath) {
 void createDirectory(const std::string& path) {
 #if defined ARCH_WIN
 	std::wstring pathW = string::toWstring(path);
-	CreateDirectoryW(pathW.c_str(), NULL);
+	_wmkdir(pathW.c_str());
 #else
 	mkdir(path.c_str(), 0755);
 #endif
@@ -148,7 +148,12 @@ void createDirectories(const std::string& path) {
 
 
 void removeDirectory(const std::string& path) {
+#if defined ARCH_WIN
+	std::wstring pathW = string::toWstring(path);
+	_wrmdir(pathW.c_str());
+#else
 	rmdir(path.c_str());
+#endif
 }
 
 

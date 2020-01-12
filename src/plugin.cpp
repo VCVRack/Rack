@@ -23,7 +23,6 @@
 #if defined ARCH_WIN
 	#include <windows.h>
 	#include <direct.h>
-	#define mkdir(_dir, _perms) _mkdir(_dir)
 #else
 	#include <dlfcn.h>
 #endif
@@ -65,7 +64,8 @@ static InitCallback loadLibrary(Plugin* plugin) {
 	// Load dynamic/shared library
 #if defined ARCH_WIN
 	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
-	HINSTANCE handle = LoadLibrary(libraryFilename.c_str());
+	std::wstring libraryFilenameW = string::toWstring(libraryFilename);
+	HINSTANCE handle = LoadLibraryW(libraryFilenameW.c_str());
 	SetErrorMode(0);
 	if (!handle) {
 		int error = GetLastError();
@@ -207,7 +207,7 @@ void init() {
 	loadPlugin("");
 
 	// Get user plugins directory
-	mkdir(asset::pluginsPath.c_str(), 0755);
+	system::createDirectory(asset::pluginsPath);
 
 	// Extract packages and load plugins
 	extractPackages(asset::pluginsPath);

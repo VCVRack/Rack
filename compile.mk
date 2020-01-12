@@ -34,6 +34,7 @@ endif
 ifdef ARCH_WIN
 	FLAGS += -DARCH_WIN
 	FLAGS += -D_USE_MATH_DEFINES
+	FLAGS += -municode
 	CXXFLAGS += -Wsuggest-override
 endif
 
