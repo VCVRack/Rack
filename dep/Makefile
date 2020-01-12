@@ -225,15 +225,19 @@ $(rtaudio): | rtaudio
 	$(MAKE) -C rtaudio/build install
 
 $(nanovg): $(wildcard nanovg/src/*.h) nanovg/example/stb_image_write.h
+	mkdir -p include
 	cp $^ include/
 
 $(nanosvg): $(wildcard nanosvg/src/*.h)
+	mkdir -p include
 	cp $^ include/
 
 $(oui-blendish): $(wildcard oui-blendish/*.h)
+	mkdir -p include
 	cp $^ include/
 
 $(osdialog): $(wildcard osdialog/*.h)
+	mkdir -p include
 	cp $^ include/
 
 jpommier-pffft-29e4f76ac53b:
@@ -243,6 +247,7 @@ jpommier-pffft-29e4f76ac53b:
 	rm 29e4f76ac53b.zip
 
 $(pffft): | jpommier-pffft-29e4f76ac53b
+	mkdir -p include
 	cp jpommier-pffft-29e4f76ac53b/*.h include/
 
 # Helpers
