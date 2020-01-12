@@ -75,6 +75,7 @@ include $(RACK_DIR)/dep.mk
 
 
 # Targets
+# These targets are all order-only "|" because we usually don't care if a library was built before or after other libraries.
 
 glew-2.1.0:
 	$(WGET) "https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz"
@@ -82,13 +83,13 @@ glew-2.1.0:
 	$(UNTAR) glew-2.1.0.tgz
 	rm glew-2.1.0.tgz
 
-$(glew): glew-2.1.0
+$(glew): | glew-2.1.0
 	cd glew-2.1.0 && mkdir -p build
 	cd glew-2.1.0/build && $(CMAKE) ./cmake
 	$(MAKE) -C glew-2.1.0/build
 	$(MAKE) -C glew-2.1.0/build install
 
-$(glfw): glfw
+$(glfw): | glfw
 	cd glfw && mkdir -p build
 	cd glfw/build && $(CMAKE) .. \
 		-DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
@@ -101,7 +102,7 @@ jansson-2.12:
 	$(UNTAR) jansson-2.12.tar.gz
 	rm jansson-2.12.tar.gz
 
-$(jansson): jansson-2.12
+$(jansson): | jansson-2.12
 	cd jansson-2.12 && $(CONFIGURE)
 	$(MAKE) -C jansson-2.12
 	$(MAKE) -C jansson-2.12 install
@@ -112,7 +113,7 @@ openssl-1.1.1d:
 	$(UNTAR) openssl-1.1.1d.tar.gz
 	rm openssl-1.1.1d.tar.gz
 
-$(openssl): openssl-1.1.1d
+$(openssl): | openssl-1.1.1d
 	@# ./config ignores CFLAGS, so hack it in with CC
 	cd openssl-1.1.1d && CC="$(CC) $(CFLAGS)" ./config --prefix="$(DEP_PATH)"
 	$(MAKE) -C openssl-1.1.1d
@@ -128,7 +129,7 @@ CURL_FLAGS += --disable-ftp --disable-file --disable-ldap --disable-ldaps --disa
 CURL_FLAGS += --without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli
 CURL_FLAGS += --with-ssl="$(DEP_PATH)"
 
-$(libcurl): $(openssl) curl-7.66.0
+$(libcurl): | $(openssl) curl-7.66.0
 	cd curl-7.66.0 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
 	$(MAKE) -C curl-7.66.0
 	$(MAKE) -C curl-7.66.0 install
@@ -139,7 +140,7 @@ libzip-1.5.2:
 	$(UNTAR) libzip-1.5.2.tar.gz
 	rm libzip-1.5.2.tar.gz
 
-$(libzip): $(zlib) libzip-1.5.2
+$(libzip): | $(zlib) libzip-1.5.2
 	cd libzip-1.5.2 && mkdir -p build
 	cd libzip-1.5.2/build && $(CMAKE) .. -DCMAKE_FIND_ROOT_PATH="$(DEP_PATH)" -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_BZIP2=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF
 	$(MAKE) -C libzip-1.5.2/build
@@ -151,7 +152,7 @@ zlib-1.2.11:
 	$(UNTAR) zlib-1.2.11.tar.gz
 	rm zlib-1.2.11.tar.gz
 
-$(zlib): zlib-1.2.11
+$(zlib): | zlib-1.2.11
 ifdef ARCH_WIN
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
 	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(DEP_PATH)/bin" INCLUDE_PATH="$(DEP_PATH)/include" LIBRARY_PATH="$(DEP_PATH)/lib" install
@@ -168,7 +169,7 @@ speexdsp-SpeexDSP-1.2rc3:
 	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
 	rm speexdsp-SpeexDSP-1.2rc3.tgz
 
-$(libspeexdsp): speexdsp-SpeexDSP-1.2rc3
+$(libspeexdsp): | speexdsp-SpeexDSP-1.2rc3
 	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
@@ -179,7 +180,7 @@ libsamplerate-0.1.9:
 	$(UNTAR) libsamplerate-0.1.9.tar.gz
 	rm libsamplerate-0.1.9.tar.gz
 
-$(libsamplerate): libsamplerate-0.1.9
+$(libsamplerate): | libsamplerate-0.1.9
 	cd libsamplerate-0.1.9 && $(CONFIGURE) --disable-fftw --disable-sndfile
 	$(MAKE) -C libsamplerate-0.1.9
 	$(MAKE) -C libsamplerate-0.1.9 install
@@ -201,7 +202,7 @@ ifdef ARCH_WIN
 RTMIDI_FLAGS += --with-winmm
 endif
 
-$(rtmidi): rtmidi-4.0.0
+$(rtmidi): | rtmidi-4.0.0
 	cd rtmidi-4.0.0 && $(CONFIGURE) $(RTMIDI_FLAGS)
 	$(MAKE) -C rtmidi-4.0.0
 	$(MAKE) -C rtmidi-4.0.0 install
@@ -217,7 +218,7 @@ ifdef ARCH_WIN
 RTAUDIO_FLAGS += -DRTAUDIO_API_DS=ON -DRTAUDIO_API_WASAPI=ON -DRTAUDIO_API_ASIO=ON
 endif
 
-$(rtaudio): rtaudio
+$(rtaudio): | rtaudio
 	cd rtaudio && mkdir -p build
 	cd rtaudio/build && $(CMAKE) $(RTAUDIO_FLAGS) ..
 	$(MAKE) -C rtaudio/build
@@ -241,7 +242,7 @@ jpommier-pffft-29e4f76ac53b:
 	$(UNZIP) 29e4f76ac53b.zip
 	rm 29e4f76ac53b.zip
 
-$(pffft): jpommier-pffft-29e4f76ac53b
+$(pffft): | jpommier-pffft-29e4f76ac53b
 	cp jpommier-pffft-29e4f76ac53b/*.h include/
 
 # Helpers
