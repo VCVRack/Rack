@@ -187,62 +187,53 @@ std::string toBase64(const std::vector<uint8_t>& data) {
 
 
 std::vector<uint8_t> fromBase64(const std::string& str) {
-	size_t strLen = str.size();
-	if (strLen % 4 != 0)
-		throw std::runtime_error("String length not a factor of 4");
+	std::vector<uint8_t> data;
+	uint32_t block = 0;
+	int i = 0;
+	int padding = 0;
 
-	size_t numBlocks = strLen / 4;
-	size_t len = numBlocks * 3;
-	if (strLen >= 4) {
-		if (str[strLen - 1] == '=')
-			len--;
-		if (str[strLen - 2] == '=')
-			len--;
-	}
+	for (char c : str) {
+		uint8_t d = 0;
 
-	std::vector<uint8_t> data(len);
-
-	for (size_t b = 0; b < numBlocks; b++) {
-		// Encode block
-		uint32_t block = 0;
-		size_t i;
-		for (i = 0; i < 4; i++) {
-			uint8_t c = str[4 * b + i];
-			uint8_t d = 0;
-
-			if ('A' <= c && c <= 'Z') {
-				d = c - 'A';
-			}
-			else if ('a' <= c && c <= 'z') {
-				d = c - 'a' + 26;
-			}
-			else if ('0' <= c && c <= '9') {
-				d = c - '0' + 52;
-			}
-			else if (c == '+') {
-				d = 62;
-			}
-			else if (c == '/') {
-				d = 63;
-			}
-			else if (c == '=') {
-				// Padding ends block encoding
-				break;
-			}
-			else {
-				// Since we assumed the string was a factor of 4 bytes, fail if an invalid character, such as whitespace, was found.
-				throw std::runtime_error("String contains non-base64 character");
-			}
-
-			block |= uint32_t(d) << (6 * (3 - i));
+		if ('A' <= c && c <= 'Z') {
+			d = c - 'A';
+		}
+		else if ('a' <= c && c <= 'z') {
+			d = c - 'a' + 26;
+		}
+		else if ('0' <= c && c <= '9') {
+			d = c - '0' + 52;
+		}
+		else if (c == '+') {
+			d = 62;
+		}
+		else if (c == '/') {
+			d = 63;
+		}
+		else if (c == '=') {
+			padding++;
+		}
+		else {
+			// Ignore whitespace and non-base64 characters
+			continue;
 		}
 
-		// Decode block
-		for (size_t k = 0; k < i - 1; k++) {
-			data[3 * b + k] = (block >> (8 * (2 - k))) & 0xff;
+		block |= uint32_t(d) << (6 * (3 - i));
+		i++;
+
+		if (i >= 4) {
+			// Decode block
+			data.push_back((block >> (8 * (2 - 0))) & 0xff);
+			if (padding < 2)
+				data.push_back((block >> (8 * (2 - 1))) & 0xff);
+			if (padding < 1)
+				data.push_back((block >> (8 * (2 - 2))) & 0xff);
+			// Reset block
+			block = 0;
+			i = 0;
+			padding = 0;
 		}
 	}
-
 	return data;
 }
 
