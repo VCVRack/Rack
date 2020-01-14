@@ -20,57 +20,26 @@ static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 
 
 PatchManager::PatchManager() {
-	path = settings::patchPath;
 }
 
 PatchManager::~PatchManager() {
-	settings::patchPath = path;
-}
-
-void PatchManager::init(std::string path) {
-	if (!path.empty()) {
-		// Load patch
-		load(path);
-		this->path = path;
-		return;
-	}
-
-	if (!settings::devMode) {
-		// To prevent launch crashes, if Rack crashes between now and 15 seconds from now, the "skipAutosaveOnLaunch" property will remain in settings.json, so that in the next launch, the broken autosave will not be loaded.
-		bool oldSkipLoadOnLaunch = settings::skipLoadOnLaunch;
-		settings::skipLoadOnLaunch = true;
-		settings::save(asset::settingsPath);
-		settings::skipLoadOnLaunch = false;
-		if (oldSkipLoadOnLaunch && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack has recovered from a crash, possibly caused by a faulty module in your patch. Clear your patch and start over?")) {
-			this->path = "";
-			return;
-		}
-	}
-
-	// Load autosave
-	if (load("")) {
-		return;
-	}
-
-	reset();
 }
 
 void PatchManager::reset() {
-	if (!settings::headless) {
+	if (APP->history) {
 		APP->history->clear();
-		APP->scene->rack->clear();
+	}
+	if (APP->scene) {
 		APP->scene->rackScroll->reset();
 	}
+}
+
+void PatchManager::clear() {
+	if (APP->scene) {
+		APP->scene->rack->clear();
+	}
 	APP->engine->clear();
-
-	path = "";
-	if (load(asset::templatePath)) {
-		return;
-	}
-
-	if (load(asset::system("template.vcv"))) {
-		return;
-	}
+	reset();
 }
 
 static bool promptClear(std::string text) {
@@ -79,12 +48,6 @@ static bool promptClear(std::string text) {
 	if (APP->scene->rack->isEmpty())
 		return true;
 	return osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, text.c_str());
-}
-
-void PatchManager::resetDialog() {
-	if (!promptClear("The current patch is unsaved. Clear it and start a new patch?"))
-		return;
-	reset();
 }
 
 void PatchManager::save(std::string path) {
@@ -110,25 +73,25 @@ void PatchManager::save(std::string path) {
 }
 
 void PatchManager::saveDialog() {
-	if (!path.empty()) {
-		save(path);
-		APP->history->setSaved();
+	if (path == "") {
+		saveAsDialog();
 	}
 	else {
-		saveAsDialog();
+		save(path);
+		APP->history->setSaved();
 	}
 }
 
 void PatchManager::saveAsDialog() {
 	std::string dir;
 	std::string filename;
-	if (path.empty()) {
+	if (this->path == "") {
 		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
-		dir = string::directory(path);
-		filename = string::filename(path);
+		dir = string::directory(this->path);
+		filename = string::filename(this->path);
 	}
 
 	osdialog_filters* filters = osdialog_filters_parse(PATCH_FILTERS);
@@ -146,14 +109,15 @@ void PatchManager::saveAsDialog() {
 	});
 
 	// Append .vcv extension if no extension was given.
-	std::string pathStr = pathC;
-	if (string::filenameExtension(string::filename(pathStr)) == "") {
-		pathStr += ".vcv";
+	std::string path = pathC;
+	if (string::filenameExtension(string::filename(path)) == "") {
+		path += ".vcv";
 	}
 
-	save(pathStr);
-	path = pathStr;
+	save(path);
+	this->path = path;
 	APP->history->setSaved();
+	pushRecentPath(path);
 }
 
 void PatchManager::saveTemplateDialog() {
@@ -164,11 +128,13 @@ void PatchManager::saveTemplateDialog() {
 	save(asset::templatePath);
 }
 
-bool PatchManager::load(std::string path) {
-	std::string actualPath = (path != "") ? path : asset::autosavePath;
+void PatchManager::saveAutosave() {
+	save(asset::autosavePath);
+}
 
-	INFO("Loading patch %s", actualPath.c_str());
-	FILE* file = std::fopen(actualPath.c_str(), "r");
+bool PatchManager::load(std::string path) {
+	INFO("Loading patch %s", path.c_str());
+	FILE* file = std::fopen(path.c_str(), "r");
 	if (!file) {
 		// Exit silently
 		return false;
@@ -180,7 +146,7 @@ bool PatchManager::load(std::string path) {
 	json_error_t error;
 	json_t* rootJ = json_loadf(file, 0, &error);
 	if (!rootJ) {
-		std::string message = string::f("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = string::f("Failed to load patch. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 		return false;
 	}
@@ -188,26 +154,47 @@ bool PatchManager::load(std::string path) {
 		json_decref(rootJ);
 	});
 
-	if (!settings::headless) {
-		APP->history->clear();
-		APP->scene->rack->clear();
-		APP->scene->rackScroll->reset();
-	}
-	APP->engine->clear();
+	clear();
 	fromJson(rootJ);
+	return true;
+}
 
-	// Update recent patches
-	if (path != "") {
-		auto& recent = settings::recentPatchPaths;
-		// Remove path from recent patches (if exists)
-		recent.erase(std::remove(recent.begin(), recent.end(), path), recent.end());
-		// Add path to top of recent patches
-		recent.push_front(path);
-		// Limit recent patches size
-		recent.resize(std::min((int) recent.size(), 10));
+void PatchManager::loadTemplate() {
+	this->path = "";
+	APP->history->setSaved();
+
+	if (load(asset::templatePath)) {
+		return;
 	}
 
-	return true;
+	if (load(asset::system("template.vcv"))) {
+		return;
+	}
+
+	clear();
+}
+
+void PatchManager::loadTemplateDialog() {
+	if (!promptClear("The current patch is unsaved. Clear it and start a new patch?")) {
+		return;
+	}
+	loadTemplate();
+}
+
+void PatchManager::loadAutosave() {
+	if (load(asset::autosavePath)) {
+		return;
+	}
+	loadTemplate();
+}
+
+void PatchManager::loadAction(std::string path) {
+	if (!load(path)) {
+		return;
+	}
+	this->path = path;
+	APP->history->setSaved();
+	pushRecentPath(path);
 }
 
 void PatchManager::loadDialog() {
@@ -215,12 +202,12 @@ void PatchManager::loadDialog() {
 		return;
 
 	std::string dir;
-	if (path.empty()) {
+	if (this->path == "") {
 		dir = asset::user("patches");
 		system::createDirectory(dir);
 	}
 	else {
-		dir = string::directory(path);
+		dir = string::directory(this->path);
 	}
 
 	osdialog_filters* filters = osdialog_filters_parse(PATCH_FILTERS);
@@ -233,32 +220,37 @@ void PatchManager::loadDialog() {
 		// Fail silently
 		return;
 	}
-	DEFER({
-		std::free(pathC);
-	});
+	std::string path = pathC;
+	std::free(pathC);
 
-	load(pathC);
-	path = pathC;
-	APP->history->setSaved();
+	loadAction(path);
 }
 
 void PatchManager::loadPathDialog(std::string path) {
 	if (!promptClear("The current patch is unsaved. Clear it and open the new patch?"))
 		return;
 
-	load(path);
-	this->path = path;
-	APP->history->setSaved();
+	loadAction(path);
 }
 
 void PatchManager::revertDialog() {
-	if (path.empty())
+	if (path == "")
 		return;
 	if (!promptClear("Revert patch to the last saved state?"))
 		return;
 
 	load(path);
 	APP->history->setSaved();
+}
+
+void PatchManager::pushRecentPath(std::string path) {
+	auto& recent = settings::recentPatchPaths;
+	// Remove path from recent patches (if exists)
+	recent.erase(std::remove(recent.begin(), recent.end(), path), recent.end());
+	// Add path to top of recent patches
+	recent.push_front(path);
+	// Limit recent patches size
+	recent.resize(std::min((int) recent.size(), 10));
 }
 
 void PatchManager::disconnectDialog() {
@@ -274,7 +266,7 @@ json_t* PatchManager::toJson() {
 	json_object_set_new(rootJ, "version", versionJ);
 
 	json_t* engineJ = APP->engine->toJson();
-	if (!settings::headless) {
+	if (APP->scene) {
 		APP->scene->rack->mergeJson(engineJ);
 	}
 
@@ -310,14 +302,14 @@ void PatchManager::fromJson(json_t* rootJ) {
 	}
 
 	APP->engine->fromJson(rootJ);
-	if (!settings::headless) {
+	if (APP->scene) {
 		APP->scene->rack->fromJson(rootJ);
 	}
 	// At this point, ModuleWidgets and CableWidgets should own all Modules and Cables.
 	// TODO Assert this
 
-	// Display a message if we have something to say
-	if (!warningLog.empty()) {
+	// Display a message if we have something to say.
+	if (warningLog != "") {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, warningLog.c_str());
 	}
 	warningLog = "";

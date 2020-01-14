@@ -80,7 +80,7 @@ struct FolderItem : ui::MenuItem {
 
 struct NewItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
-		APP->patch->resetDialog();
+		APP->patch->loadTemplateDialog();
 	}
 };
 

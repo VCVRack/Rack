@@ -362,7 +362,7 @@ void Window::run() {
 
 		// Set window title
 		std::string windowTitle = APP_NAME + " v" + APP_VERSION;
-		if (!APP->patch->path.empty()) {
+		if (APP->patch->path != "") {
 			windowTitle += " - ";
 			if (!APP->history->isSaved())
 				windowTitle += "*";

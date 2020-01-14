@@ -62,12 +62,12 @@ void Scene::step() {
 	menuBar->box.size.x = box.size.x;
 	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
 
-	// Autosave every 15 seconds
+	// Autosave periodically
 	if (settings::autosavePeriod > 0.0) {
 		double time = glfwGetTime();
 		if (time - lastAutosaveTime >= settings::autosavePeriod) {
 			lastAutosaveTime = time;
-			APP->patch->save(asset::autosavePath);
+			APP->patch->saveAutosave();
 			settings::save(asset::settingsPath);
 		}
 	}
@@ -96,7 +96,7 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		if (e.key == GLFW_KEY_N && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			APP->patch->resetDialog();
+			APP->patch->loadTemplateDialog();
 			e.consume(this);
 		}
 		else if (e.key == GLFW_KEY_Q && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {

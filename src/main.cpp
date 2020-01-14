@@ -106,6 +106,7 @@ int main(int argc, char* argv[]) {
 
 	// Initialize environment
 	asset::init();
+	bool loggerWasTruncated = logger::isTruncated();
 	logger::init();
 
 	// We can now install a signal handler and log the output
@@ -185,8 +186,20 @@ int main(int argc, char* argv[]) {
 	}
 #endif
 
-	APP->patch->init(patchPath);
+	// Initialize patch
+	if (loggerWasTruncated && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack crashed during the last session, possibly due to a buggy module in your patch. Clear your patch and start over?")) {
+		// This is the default state, but just call clear() to be explicit.
+		APP->patch->clear();
+	}
+	else if (patchPath != "") {
+		APP->patch->loadAction(patchPath);
+	}
+	else {
+		APP->patch->path = settings::patchPath;
+		APP->patch->loadAutosave();
+	}
 
+	// Run context
 	if (settings::headless) {
 		printf("Press enter to exit.\n");
 		getchar();
@@ -203,7 +216,9 @@ int main(int argc, char* argv[]) {
 
 	// Destroy context
 	if (!settings::headless) {
-		APP->patch->save(asset::autosavePath);
+		APP->patch->saveAutosave();
+		// TODO If Rack crashes, the settings' patch path won't be changed although the autosave will. This could possibly cause the user to overwrite their old patch with the unrelated autosave.
+		settings::patchPath = APP->patch->path;
 	}
 	INFO("Destroying context");
 	contextDestroy();
