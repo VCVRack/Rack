@@ -43,8 +43,6 @@ struct Context {
 };
 
 
-void contextInit();
-void contextDestroy();
 /** Returns the global Context pointer */
 Context* contextGet();
 /** Sets the context for this thread.
