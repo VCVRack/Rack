@@ -47,7 +47,7 @@ static void fatalSignalHandler(int sig) {
 
 	// This might fail because we might not be in the main thread.
 	// But oh well, we're crashing anyway.
-	std::string text = app::APP_NAME + " has crashed. See " + asset::logPath + " for details.";
+	std::string text = APP_NAME + " has crashed. See " + asset::logPath + " for details.";
 	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, text.c_str());
 
 	abort();
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 #if defined ARCH_WIN
 	// Windows global mutex to prevent multiple instances
 	// Handle will be closed by Windows when the process ends
-	HANDLE instanceMutex = CreateMutexW(NULL, true, string::toWstring(app::APP_NAME).c_str());
+	HANDLE instanceMutex = CreateMutexW(NULL, true, string::toWstring(APP_NAME).c_str());
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
 		exit(1);
@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Log environment
-	INFO("%s v%s", app::APP_NAME.c_str(), app::APP_VERSION.c_str());
+	INFO("%s v%s", APP_NAME.c_str(), APP_VERSION.c_str());
 	INFO("%s", system::getOperatingSystemInfo().c_str());
 	std::string argsList;
 	for (int i = 0; i < argc; i++) {

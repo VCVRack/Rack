@@ -163,6 +163,18 @@ struct Exception : std::runtime_error {
 };
 
 
+// config
+
+extern const std::string APP_NAME;
+extern const std::string APP_VERSION;
+extern const std::string APP_ARCH;
+
+extern const std::string ABI_VERSION;
+
+extern const std::string API_URL;
+extern const std::string API_VERSION;
+
+
 } // namespace rack
 
 

@@ -126,10 +126,10 @@ void init() {
 	}
 	else {
 		logPath = userDir + "/log.txt";
-		pluginsPath = userDir + "/plugins-v" + app::ABI_VERSION;
-		settingsPath = userDir + "/settings-v" + app::ABI_VERSION + ".json";
-		autosavePath = userDir + "/autosave-v" + app::ABI_VERSION + ".vcv";
-		templatePath = userDir + "/template-v" + app::ABI_VERSION + ".vcv";
+		pluginsPath = userDir + "/plugins-v" + ABI_VERSION;
+		settingsPath = userDir + "/settings-v" + ABI_VERSION + ".json";
+		autosavePath = userDir + "/autosave-v" + ABI_VERSION + ".vcv";
+		templatePath = userDir + "/template-v" + ABI_VERSION + ".vcv";
 	}
 }
 

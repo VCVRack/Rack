@@ -20,7 +20,7 @@ static std::string downloadUrl;
 
 
 static void checkVersion() {
-	std::string versionUrl = app::API_URL + "/version";
+	std::string versionUrl = API_URL + "/version";
 	json_t* resJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
 	if (!resJ) {
 		WARN("Request for version failed");
@@ -40,7 +40,7 @@ static void checkVersion() {
 
 	json_t* downloadUrlsJ = json_object_get(resJ, "downloadUrls");
 	if (downloadUrlsJ) {
-		json_t* downloadUrlJ = json_object_get(downloadUrlsJ, app::APP_ARCH.c_str());
+		json_t* downloadUrlJ = json_object_get(downloadUrlsJ, APP_ARCH.c_str());
 		if (downloadUrlJ)
 			downloadUrl = json_string_value(downloadUrlJ);
 	}
@@ -95,7 +95,7 @@ void update() {
 
 
 bool isUpdateAvailable() {
-	return (version != "") && (version != app::APP_VERSION);
+	return (version != "") && (version != APP_VERSION);
 }
 
 

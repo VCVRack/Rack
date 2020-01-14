@@ -12,15 +12,6 @@ namespace rack {
 namespace app {
 
 
-extern const std::string APP_NAME;
-extern const std::string APP_VERSION;
-extern const std::string APP_ARCH;
-
-extern const std::string ABI_VERSION;
-
-extern const std::string API_URL;
-extern const std::string API_VERSION;
-
 static const float SVG_DPI = 75.f;
 static const float MM_PER_IN = 25.4f;
 

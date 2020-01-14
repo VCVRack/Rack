@@ -260,7 +260,7 @@ void logIn(const std::string& email, const std::string& password) {
 	json_t* reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
 	json_object_set(reqJ, "password", json_string(password.c_str()));
-	std::string url = app::API_URL + "/token";
+	std::string url = API_URL + "/token";
 	json_t* resJ = network::requestJson(network::METHOD_POST, url, reqJ);
 	json_decref(reqJ);
 
@@ -311,7 +311,7 @@ void queryUpdates() {
 	updateStatus = "Querying for updates...";
 
 	// Get user's plugins list
-	std::string pluginsUrl = app::API_URL + "/plugins";
+	std::string pluginsUrl = API_URL + "/plugins";
 	json_t* pluginsReqJ = json_object();
 	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
 	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
@@ -333,9 +333,9 @@ void queryUpdates() {
 	}
 
 	// Get library manifests
-	std::string manifestsUrl = app::API_URL + "/library/manifests";
+	std::string manifestsUrl = API_URL + "/library/manifests";
 	json_t* manifestsReq = json_object();
-	json_object_set(manifestsReq, "version", json_string(app::API_VERSION.c_str()));
+	json_object_set(manifestsReq, "version", json_string(API_VERSION.c_str()));
 	json_t* manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
 	json_decref(manifestsReq);
 	if (!manifestsResJ) {
@@ -420,13 +420,13 @@ void syncUpdate(Update* update) {
 		isSyncingUpdate = false;
 	});
 
-	std::string downloadUrl = app::API_URL + "/download";
+	std::string downloadUrl = API_URL + "/download";
 	downloadUrl += "?token=" + network::encodeUrl(settings::token);
 	downloadUrl += "&slug=" + network::encodeUrl(update->pluginSlug);
 	downloadUrl += "&version=" + network::encodeUrl(update->version);
-	downloadUrl += "&arch=" + network::encodeUrl(app::APP_ARCH);
+	downloadUrl += "&arch=" + network::encodeUrl(APP_ARCH);
 
-	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), app::APP_ARCH.c_str());
+	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), APP_ARCH.c_str());
 
 	// Download zip
 	std::string pluginDest = asset::pluginsPath + "/" + update->pluginSlug + ".zip";
