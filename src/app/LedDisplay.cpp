@@ -1,7 +1,7 @@
 #include <app/LedDisplay.hpp>
 #include <asset.hpp>
 #include <window.hpp>
-#include <app.hpp>
+#include <context.hpp>
 
 
 namespace rack {

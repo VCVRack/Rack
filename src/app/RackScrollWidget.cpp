@@ -1,7 +1,7 @@
 #include <app/RackScrollWidget.hpp>
 #include <app/Scene.hpp>
 #include <window.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <settings.hpp>
 
 

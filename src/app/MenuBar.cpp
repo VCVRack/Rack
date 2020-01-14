@@ -10,7 +10,7 @@
 #include <ui/TextField.hpp>
 #include <ui/PasswordField.hpp>
 #include <ui/ProgressBar.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <settings.hpp>
 #include <helpers.hpp>
 #include <system.hpp>

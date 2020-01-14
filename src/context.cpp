@@ -1,4 +1,4 @@
-#include <app.hpp>
+#include <context.hpp>
 #include <window.hpp>
 #include <patch.hpp>
 #include <engine/Engine.hpp>
@@ -10,7 +10,7 @@
 namespace rack {
 
 
-void App::init() {
+void Context::init() {
 	engine = new engine::Engine;
 	patch = new PatchManager;
 	if (!settings::headless) {
@@ -22,7 +22,7 @@ void App::init() {
 	}
 }
 
-App::~App() {
+Context::~Context() {
 	// Set pointers to NULL so other objects will segfault when attempting to access them
 	if (scene)
 		delete scene;
@@ -45,22 +45,22 @@ App::~App() {
 }
 
 
-static App* appInstance = NULL;
+static Context* context = NULL;
 
-void appInit() {
-	assert(!appInstance);
-	appInstance = new App;
-	appInstance->init();
+void contextInit() {
+	assert(!context);
+	context = new Context;
+	context->init();
 }
 
-void appDestroy() {
-	assert(appInstance);
-	delete appInstance;
-	appInstance = NULL;
+void contextDestroy() {
+	assert(context);
+	delete context;
+	context = NULL;
 }
 
-App* appGet() {
-	return appInstance;
+Context* contextGet() {
+	return context;
 }
 
 

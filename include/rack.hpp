@@ -11,7 +11,7 @@
 #include <network.hpp>
 #include <asset.hpp>
 #include <window.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <midi.hpp>
 #include <settings.hpp>
 #include <helpers.hpp>

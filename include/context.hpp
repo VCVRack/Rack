@@ -30,7 +30,7 @@ struct Scene;
 
 
 /** Contains the application state  */
-struct App {
+struct Context {
 	event::State* event = NULL;
 	app::Scene* scene = NULL;
 	engine::Engine* engine = NULL;
@@ -39,17 +39,17 @@ struct App {
 	PatchManager* patch = NULL;
 
 	void init();
-	~App();
+	~Context();
 };
 
 
-void appInit();
-void appDestroy();
-/** Returns the global App pointer */
-App* appGet();
+void contextInit();
+void contextDestroy();
+/** Returns the global Context pointer */
+Context* contextGet();
 
-/** Accesses the global App pointer */
-#define APP rack::appGet()
+/** Accesses the global Context pointer */
+#define APP rack::contextGet()
 
 
 } // namespace rack

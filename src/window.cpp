@@ -4,7 +4,7 @@
 #include <keyboard.hpp>
 #include <gamepad.hpp>
 #include <event.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
 #include <plugin.hpp> // used in Window::screenshot

@@ -2,7 +2,7 @@
 #include <app/Scene.hpp>
 #include <app/RackWidget.hpp>
 #include <window.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
 #include <engine/Engine.hpp>

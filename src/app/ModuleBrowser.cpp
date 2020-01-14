@@ -17,7 +17,7 @@
 #include <app/ModuleWidget.hpp>
 #include <app/Scene.hpp>
 #include <plugin.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <engine/Engine.hpp>
 #include <plugin/Model.hpp>
 #include <string.hpp>

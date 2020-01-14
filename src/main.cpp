@@ -12,7 +12,7 @@
 #include <app/common.hpp>
 #include <app/Scene.hpp>
 #include <plugin.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <patch.hpp>
 #include <ui.hpp>
 #include <system.hpp>
@@ -172,7 +172,7 @@ int main(int argc, char* argv[]) {
 
 	// Initialize app
 	INFO("Initializing app");
-	appInit();
+	contextInit();
 
 	// On Mac, use a hacked-in GLFW addition to get the launched path.
 #if defined ARCH_MAC
@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
 		APP->patch->save(asset::autosavePath);
 	}
 	INFO("Destroying app");
-	appDestroy();
+	contextDestroy();
 	if (!settings::headless) {
 		settings::save(asset::settingsPath);
 	}

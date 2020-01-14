@@ -3,7 +3,7 @@
 #include <widget/TransparentWidget.hpp>
 #include <widget/FramebufferWidget.hpp>
 #include <widget/SvgWidget.hpp>
-#include <app.hpp>
+#include <context.hpp>
 
 
 namespace rack {

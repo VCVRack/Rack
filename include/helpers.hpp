@@ -11,7 +11,7 @@
 #include <app/SvgPanel.hpp>
 #include <engine/Module.hpp>
 #include <engine/ParamQuantity.hpp>
-#include <app.hpp>
+#include <context.hpp>
 
 
 namespace rack {

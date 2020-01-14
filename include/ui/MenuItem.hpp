@@ -2,7 +2,7 @@
 #include <ui/common.hpp>
 #include <ui/Menu.hpp>
 #include <ui/MenuEntry.hpp>
-#include <app.hpp>
+#include <context.hpp>
 
 
 namespace rack {

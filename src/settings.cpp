@@ -4,7 +4,7 @@
 #include <app/Scene.hpp>
 #include <app/ModuleBrowser.hpp>
 #include <engine/Engine.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <patch.hpp>
 #include <jansson.h>
 

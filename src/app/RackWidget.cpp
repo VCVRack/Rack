@@ -6,7 +6,7 @@
 #include <settings.hpp>
 #include <plugin.hpp>
 #include <engine/Engine.hpp>
-#include <app.hpp>
+#include <context.hpp>
 #include <asset.hpp>
 #include <patch.hpp>
 #include <osdialog.h>
