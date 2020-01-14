@@ -20,9 +20,9 @@ void init() {
 		outputFile = stderr;
 	}
 	else {
-		outputFile = fopen(asset::logPath.c_str(), "w");
+		outputFile = std::fopen(asset::logPath.c_str(), "w");
 		if (!outputFile) {
-			fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
+			std::fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
 		}
 	}
 }
@@ -30,8 +30,8 @@ void init() {
 void destroy() {
 	if (outputFile && outputFile != stderr) {
 		// Print end token so we know if the logger exited cleanly.
-		fprintf(outputFile, "END");
-		fclose(outputFile);
+		std::fprintf(outputFile, "END");
+		std::fclose(outputFile);
 	}
 }
 
@@ -57,13 +57,13 @@ static void logVa(Level level, const char* filename, int line, const char* forma
 	int64_t nowTime = system::getNanoseconds();
 	double duration = (nowTime - startTime) / 1e9;
 	if (outputFile == stderr)
-		fprintf(outputFile, "\x1B[%dm", levelColors[level]);
-	fprintf(outputFile, "[%.03f %s %s:%d] ", duration, levelLabels[level], filename, line);
+		std::fprintf(outputFile, "\x1B[%dm", levelColors[level]);
+	std::fprintf(outputFile, "[%.03f %s %s:%d] ", duration, levelLabels[level], filename, line);
 	if (outputFile == stderr)
-		fprintf(outputFile, "\x1B[0m");
-	vfprintf(outputFile, format, args);
-	fprintf(outputFile, "\n");
-	fflush(outputFile);
+		std::fprintf(outputFile, "\x1B[0m");
+	std::vfprintf(outputFile, format, args);
+	std::fprintf(outputFile, "\n");
+	std::fflush(outputFile);
 }
 
 void log(Level level, const char* filename, int line, const char* format, ...) {
@@ -78,20 +78,21 @@ bool isTruncated() {
 		return false;
 
 	// Open existing log file
-	FILE* file = fopen(asset::logPath.c_str(), "r");
+	FILE* file = std::fopen(asset::logPath.c_str(), "r");
 	if (!file)
 		return false;
 	DEFER({
-		fclose(file);
+		std::fclose(file);
 	});
 
 	// Seek to last 3 characters
-	fseek(file, -3, SEEK_END);
-	char str[4];
-	if (fread(str, 1, 3, file) != 3)
+	std::fseek(file, -3, SEEK_END);
+	char str[3];
+	if (std::fread(str, 1, 3, file) != 3)
 		return true;
-	if (memcmp(str, "END", 3) != 0)
+	if (std::memcmp(str, "END", 3) != 0)
 		return true;
+	return false;
 }
 
 
