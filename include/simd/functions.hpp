@@ -44,7 +44,7 @@ inline float_4 movemaskInverse<float_4>(int x) {
 	__m128i msk8421 = _mm_set_epi32(8, 4, 2, 1);
 	__m128i x_bc = _mm_set1_epi32(x);
 	__m128i t = _mm_and_si128(x_bc, msk8421);
-	return float_4(_mm_castsi128_ps(_mm_cmpeq_epi32(x_bc, t)));
+	return float_4(_mm_castsi128_ps(_mm_cmpeq_epi32(msk8421, t)));
 }
 
 
