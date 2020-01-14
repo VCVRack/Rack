@@ -33,6 +33,7 @@ void InputDevice::onMessage(const Message &message) {
 		msg.timestamp = system::getNanoseconds();
 
 	for (Input* input : subscribed) {
+		contextSet(input->context);
 		// Filter channel
 		if (input->channel < 0 || msg.getStatus() == 0xf || msg.getChannel() == input->channel) {
 			input->onMessage(msg);
@@ -55,6 +56,7 @@ void OutputDevice::unsubscribe(Output* output) {
 ////////////////////
 
 Port::Port() {
+	context = contextGet();
 }
 
 Port::~Port() {

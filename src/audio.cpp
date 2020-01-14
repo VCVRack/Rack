@@ -54,24 +54,30 @@ std::string Device::getDetail(int offset, int maxChannels) {
 
 void Device::processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) {
 	for (Port* port : subscribed) {
+		// Setting the thread context should probably be the responsibility of Port, but because processInput() etc are overridden, this is the only good place for it.
+		contextSet(port->context);
 		port->processInput(input + port->offset, inputStride, frames);
 	}
 	for (Port* port : subscribed) {
+		contextSet(port->context);
 		port->processBuffer(input + port->offset, inputStride, output + port->offset, outputStride, frames);
 	}
 	for (Port* port : subscribed) {
+		contextSet(port->context);
 		port->processOutput(output + port->offset, outputStride, frames);
 	}
 }
 
 void Device::onOpenStream() {
 	for (Port* port : subscribed) {
+		contextSet(port->context);
 		port->onOpenStream();
 	}
 }
 
 void Device::onCloseStream() {
 	for (Port* port : subscribed) {
+		contextSet(port->context);
 		port->onCloseStream();
 	}
 }
@@ -82,6 +88,7 @@ void Device::onCloseStream() {
 
 Port::Port() {
 	reset();
+	context = contextGet();
 }
 
 Port::~Port() {

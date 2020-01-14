@@ -47,6 +47,10 @@ void contextInit();
 void contextDestroy();
 /** Returns the global Context pointer */
 Context* contextGet();
+/** Sets the context for this thread.
+You must call this every thread if you want to use the APP macro in that thread.
+*/
+void contextSet(Context* context);
 
 /** Accesses the global Context pointer */
 #define APP rack::contextGet()

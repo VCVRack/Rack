@@ -170,8 +170,8 @@ int main(int argc, char* argv[]) {
 		windowInit();
 	}
 
-	// Initialize app
-	INFO("Initializing app");
+	// Initialize context
+	INFO("Initializing context");
 	contextInit();
 
 	// On Mac, use a hacked-in GLFW addition to get the launched path.
@@ -201,11 +201,11 @@ int main(int argc, char* argv[]) {
 		INFO("Stopped window");
 	}
 
-	// Destroy app
+	// Destroy context
 	if (!settings::headless) {
 		APP->patch->save(asset::autosavePath);
 	}
-	INFO("Destroying app");
+	INFO("Destroying context");
 	contextDestroy();
 	if (!settings::headless) {
 		settings::save(asset::settingsPath);

@@ -45,7 +45,7 @@ Context::~Context() {
 }
 
 
-static Context* context = NULL;
+static thread_local Context* context = NULL;
 
 void contextInit() {
 	assert(!context);
@@ -60,7 +60,12 @@ void contextDestroy() {
 }
 
 Context* contextGet() {
+	assert(context);
 	return context;
+}
+
+void contextSet(Context* context) {
+	rack::context = context;
 }
 
 

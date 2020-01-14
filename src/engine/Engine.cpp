@@ -172,6 +172,7 @@ struct Engine::Internal {
 	HybridBarrier engineBarrier;
 	HybridBarrier workerBarrier;
 	std::atomic<int> workerModuleIndex;
+	Context* context;
 };
 
 
@@ -386,6 +387,7 @@ static void Engine_relaunchWorkers(Engine* that, int threadCount) {
 Engine::Engine() {
 	internal = new Internal;
 
+	internal->context = contextGet();
 	internal->sampleRate = 44100.f;
 	internal->sampleTime = 1 / internal->sampleRate;
 }
@@ -1036,6 +1038,7 @@ void Engine::fromJson(json_t* rootJ) {
 
 void EngineWorker::run() {
 	// Configure thread
+	contextSet(engine->internal->context);
 	system::setThreadName(string::f("Worker %d", id));
 	initMXCSR();
 	random::init();

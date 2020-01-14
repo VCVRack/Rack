@@ -1,5 +1,6 @@
 #pragma once
 #include <common.hpp>
+#include <context.hpp>
 #include <vector>
 #include <queue>
 #include <set>
@@ -154,6 +155,7 @@ struct Port {
 	/** Not owned */
 	Driver* driver = NULL;
 	Device* device = NULL;
+	Context* context;
 
 	Port();
 	virtual ~Port();

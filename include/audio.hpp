@@ -1,5 +1,6 @@
 #pragma once
 #include <common.hpp>
+#include <context.hpp>
 #include <jansson.h>
 #include <vector>
 #include <set>
@@ -106,6 +107,7 @@ struct Port {
 	/** Not owned */
 	Driver* driver = NULL;
 	Device* device = NULL;
+	Context* context;
 
 	Port();
 	virtual ~Port();
