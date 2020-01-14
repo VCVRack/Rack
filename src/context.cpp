@@ -47,18 +47,6 @@ Context::~Context() {
 
 static thread_local Context* context = NULL;
 
-void contextInit() {
-	assert(!context);
-	context = new Context;
-	context->init();
-}
-
-void contextDestroy() {
-	assert(context);
-	delete context;
-	context = NULL;
-}
-
 Context* contextGet() {
 	assert(context);
 	return context;

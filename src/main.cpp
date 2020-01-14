@@ -173,7 +173,8 @@ int main(int argc, char* argv[]) {
 
 	// Initialize context
 	INFO("Initializing context");
-	contextInit();
+	contextSet(new Context);
+	APP->init();
 
 	// On Mac, use a hacked-in GLFW addition to get the launched path.
 #if defined ARCH_MAC
@@ -221,7 +222,8 @@ int main(int argc, char* argv[]) {
 		settings::patchPath = APP->patch->path;
 	}
 	INFO("Destroying context");
-	contextDestroy();
+	delete APP;
+	contextSet(NULL);
 	if (!settings::headless) {
 		settings::save(asset::settingsPath);
 	}
