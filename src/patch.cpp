@@ -265,14 +265,14 @@ json_t* PatchManager::toJson() {
 	json_t* versionJ = json_string(APP_VERSION.c_str());
 	json_object_set_new(rootJ, "version", versionJ);
 
-	json_t* engineJ = APP->engine->toJson();
-	if (APP->scene) {
-		APP->scene->rack->mergeJson(engineJ);
-	}
-
 	// Merge with rootJ
+	json_t* engineJ = APP->engine->toJson();
 	json_object_update(rootJ, engineJ);
 	json_decref(engineJ);
+
+	if (APP->scene) {
+		APP->scene->rack->mergeJson(rootJ);
+	}
 
 	return rootJ;
 }

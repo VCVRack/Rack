@@ -242,18 +242,18 @@ void init() {
 
 void destroy() {
 	for (Plugin* plugin : plugins) {
+		// We must delete the plugin *before* freeing the library, because the vtable of Model subclasses are static in the plugin, and we need it for the virtual destructor.
+		void* handle = plugin->handle;
+		delete plugin;
+
 		// Free library handle
-		if (plugin->handle) {
+		if (handle) {
 #if defined ARCH_WIN
-			FreeLibrary((HINSTANCE) plugin->handle);
+			FreeLibrary((HINSTANCE) handle);
 #else
-			dlclose(plugin->handle);
+			dlclose(handle);
 #endif
 		}
-
-		// For some reason this segfaults.
-		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
-		// delete plugin;
 	}
 	plugins.clear();
 }

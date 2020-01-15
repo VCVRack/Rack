@@ -12,6 +12,7 @@ struct Driver;
 
 
 static const int DRIVER = -10;
+static Driver* driver = NULL;
 
 
 struct InputDevice : midi::InputDevice {
@@ -116,17 +117,17 @@ struct Driver : midi::Driver {
 };
 
 
-static Driver driver;
 
 
 void init() {
-	midi::addDriver(DRIVER, &driver);
+	driver = new Driver;
+	midi::addDriver(DRIVER, driver);
 }
 
 void step() {
 	for (int i = 0; i < 16; i++) {
 		if (glfwJoystickPresent(i)) {
-			driver.devices[i].step();
+			driver->devices[i].step();
 		}
 	}
 }
