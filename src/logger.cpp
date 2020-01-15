@@ -18,12 +18,13 @@ void init() {
 	startTime = system::getNanoseconds();
 	if (settings::devMode) {
 		outputFile = stderr;
+		return;
 	}
-	else {
-		outputFile = std::fopen(asset::logPath.c_str(), "w");
-		if (!outputFile) {
-			std::fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
-		}
+
+	assert(!outputFile);
+	outputFile = std::fopen(asset::logPath.c_str(), "w");
+	if (!outputFile) {
+		std::fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
 	}
 }
 

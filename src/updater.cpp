@@ -48,12 +48,13 @@ static void checkVersion() {
 
 
 void init() {
-	if (!settings::devMode) {
-		std::thread t([] {
-			checkVersion();
-		});
-		t.detach();
-	}
+	if (settings::devMode)
+		return;
+
+	std::thread t([]() {
+		checkVersion();
+	});
+	t.detach();
 }
 
 

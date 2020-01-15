@@ -203,6 +203,10 @@ static void extractPackages(std::string path) {
 ////////////////////
 
 void init() {
+	// Don't re-initialize
+	if (!plugins.empty())
+		return;
+
 	// Load Core
 	loadPlugin("");
 
@@ -239,13 +243,13 @@ void init() {
 void destroy() {
 	for (Plugin* plugin : plugins) {
 		// Free library handle
+		if (plugin->handle) {
 #if defined ARCH_WIN
-		if (plugin->handle)
 			FreeLibrary((HINSTANCE) plugin->handle);
 #else
-		if (plugin->handle)
 			dlclose(plugin->handle);
 #endif
+		}
 
 		// For some reason this segfaults.
 		// It might be best to let them leak anyway, because "crash on exit" issues would occur with badly-written plugins.
