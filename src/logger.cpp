@@ -34,6 +34,7 @@ void destroy() {
 		std::fprintf(outputFile, "END");
 		std::fclose(outputFile);
 	}
+	outputFile = NULL;
 }
 
 static const char* const levelLabels[] = {
