@@ -102,7 +102,6 @@ struct MIDI_CV : Module {
 
 	/** Resets performance state */
 	void panic() {
-		pedal = false;
 		for (int c = 0; c < 16; c++) {
 			notes[c] = 60;
 			gates[c] = false;
@@ -236,6 +235,12 @@ struct MIDI_CV : Module {
 					pressPedal();
 				else
 					releasePedal();
+			} break;
+			// all notes off (panic)
+			case 0x7b: {
+				if (msg.getValue() == 0) {
+					panic();
+				}
 			} break;
 			default: break;
 		}

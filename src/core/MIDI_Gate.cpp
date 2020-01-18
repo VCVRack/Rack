@@ -93,8 +93,14 @@ struct MIDI_Gate : Module {
 					pressNote(msg.getNote(), msg.getValue());
 				}
 				else {
-					// Many stupid keyboards send a "note on" command with 0 velocity to mean "note release"
+					// I don't know why, but many keyboards send a "note on" command with 0 velocity to mean "note release"
 					releaseNote(msg.getNote());
+				}
+			} break;
+			// all notes off (panic)
+			case 0x7b: {
+				if (msg.getValue() == 0) {
+					panic();
 				}
 			} break;
 			default: break;
