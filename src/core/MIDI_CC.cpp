@@ -21,30 +21,39 @@ struct MIDI_CC : Module {
 	};
 
 	midi::InputQueue midiInput;
-	int8_t values[128];
+	/** [cc][channel] */
+	int8_t values[128][16];
 	int learningId;
 	int learnedCcs[16];
-	dsp::ExponentialFilter valueFilters[16];
+	/** [cell][channel] */
+	dsp::ExponentialFilter valueFilters[16][16];
+	bool mpeMode;
 
 	MIDI_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 16; i++)
 			configOutput(CC_OUTPUT + i, string::f("Cell %d", i + 1));
+
 		for (int i = 0; i < 16; i++) {
-			valueFilters[i].setTau(1 / 30.f);
+			for (int c = 0; c < 16; c++) {
+				valueFilters[i][c].setTau(1 / 30.f);
+			}
 		}
 		onReset();
 	}
 
 	void onReset() override {
 		for (int i = 0; i < 128; i++) {
-			values[i] = 0;
+			for (int c = 0; c < 16; c++) {
+				values[i][c] = 0;
+			}
 		}
 		for (int i = 0; i < 16; i++) {
 			learnedCcs[i] = i;
 		}
 		learningId = -1;
 		midiInput.reset();
+		mpeMode = false;
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -59,23 +68,28 @@ struct MIDI_CC : Module {
 			midiInput.queue.pop();
 		}
 
+		int channels = mpeMode ? 16 : 1;
 		for (int i = 0; i < 16; i++) {
 			if (!outputs[CC_OUTPUT + i].isConnected())
 				continue;
+			outputs[CC_OUTPUT + i].setChannels(channels);
 
 			int cc = learnedCcs[i];
-			float value = values[cc] / 127.f;
 
-			// Detect behavior from MIDI buttons.
-			if (std::fabs(valueFilters[i].out - value) >= 1.f) {
-				// Jump value
-				valueFilters[i].out = value;
+			for (int c = 0; c < channels; c++) {
+				float value = values[cc][c] / 127.f;
+
+				// Detect behavior from MIDI buttons.
+				if (std::fabs(valueFilters[i][c].out - value) >= 1.f) {
+					// Jump value
+					valueFilters[i][c].out = value;
+				}
+				else {
+					// Smooth value with filter
+					valueFilters[i][c].process(args.sampleTime, value);
+				}
+				outputs[CC_OUTPUT + i].setVoltage(valueFilters[i][c].out * 10.f, c);
 			}
-			else {
-				// Smooth value with filter
-				valueFilters[i].process(args.sampleTime, value);
-			}
-			outputs[CC_OUTPUT + i].setVoltage(valueFilters[i].out * 10.f);
 		}
 	}
 
@@ -90,20 +104,21 @@ struct MIDI_CC : Module {
 	}
 
 	void processCC(const midi::Message &msg) {
+		uint8_t c = mpeMode ? msg.getChannel() : 0;
 		uint8_t cc = msg.getNote();
-		if (msg.bytes.size() < 2)
-			return;
 		// Allow CC to be negative if the 8th bit is set.
 		// The gamepad driver abuses this, for example.
 		// Cast uint8_t to int8_t
+		if (msg.bytes.size() < 2)
+			return;
 		int8_t value = msg.bytes[2];
 		value = clamp(value, -127, 127);
 		// Learn
-		if (learningId >= 0 && values[cc] != value) {
+		if (learningId >= 0 && values[cc][c] != value) {
 			learnedCcs[learningId] = cc;
 			learningId = -1;
 		}
-		values[cc] = value;
+		values[cc][c] = value;
 	}
 
 	json_t* dataToJson() override {
@@ -118,11 +133,14 @@ struct MIDI_CC : Module {
 		// Remember values so users don't have to touch MIDI controller knobs when restarting Rack
 		json_t* valuesJ = json_array();
 		for (int i = 0; i < 128; i++) {
-			json_array_append_new(valuesJ, json_integer(values[i]));
+			// Note: Only save channel 0. Since MPE mode won't be commonly used, it's pointless to save all 16 channels.
+			json_array_append_new(valuesJ, json_integer(values[i][0]));
 		}
 		json_object_set_new(rootJ, "values", valuesJ);
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
+
+		json_object_set_new(rootJ, "mpeMode", json_boolean(mpeMode));
 		return rootJ;
 	}
 
@@ -141,7 +159,7 @@ struct MIDI_CC : Module {
 			for (int i = 0; i < 128; i++) {
 				json_t* valueJ = json_array_get(valuesJ, i);
 				if (valueJ) {
-					values[i] = json_integer_value(valueJ);
+					values[i][0] = json_integer_value(valueJ);
 				}
 			}
 		}
@@ -149,6 +167,18 @@ struct MIDI_CC : Module {
 		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
+
+		json_t* mpeModeJ = json_object_get(rootJ, "mpeMode");
+		if (mpeModeJ)
+			mpeMode = json_boolean_value(mpeModeJ);
+	}
+};
+
+
+struct MIDI_CCMpeModeItem : MenuItem {
+	MIDI_CC* module;
+	void onAction(const event::Action& e) override {
+		module->mpeMode ^= true;
 	}
 };
 
@@ -186,6 +216,18 @@ struct MIDI_CCWidget : ModuleWidget {
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
+	}
+
+	void appendContextMenu(Menu* menu) override {
+		MIDI_CC* module = dynamic_cast<MIDI_CC*>(this->module);
+
+		menu->addChild(new MenuSeparator);
+
+		MIDI_CCMpeModeItem* mpeModeItem = new MIDI_CCMpeModeItem;
+		mpeModeItem->text = "MPE mode";
+		mpeModeItem->rightText = CHECKMARK(module->mpeMode);
+		mpeModeItem->module = module;
+		menu->addChild(mpeModeItem);
 	}
 };
 

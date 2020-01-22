@@ -22,17 +22,22 @@ struct MIDI_Gate : Module {
 
 	midi::InputQueue midiInput;
 
-	bool gates[16];
-	float gateTimes[16];
-	uint8_t velocities[16];
+	/** [cell][c] */
+	bool gates[16][16];
+	/** [cell][c] */
+	float gateTimes[16][16];
+	/** [cell][c] */
+	uint8_t velocities[16][16];
 	int learningId = -1;
 	uint8_t learnedNotes[16] = {};
 	bool velocityMode = false;
+	bool mpeMode = false;
 
 	MIDI_Gate() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 16; i++)
 			configOutput(TRIG_OUTPUT + i, string::f("Cell %d", i + 1));
+
 		onReset();
 	}
 
@@ -45,12 +50,16 @@ struct MIDI_Gate : Module {
 		learningId = -1;
 		panic();
 		midiInput.reset();
+		velocityMode = false;
+		mpeMode = false;
 	}
 
 	void panic() {
 		for (int i = 0; i < 16; i++) {
-			gates[i] = false;
-			gateTimes[i] = 0.f;
+			for (int c = 0; c < 16; c++) {
+				gates[i][c] = false;
+				gateTimes[i][c] = 0.f;
+			}
 		}
 	}
 
@@ -66,17 +75,20 @@ struct MIDI_Gate : Module {
 			midiInput.queue.pop();
 		}
 
+		int channels = mpeMode ? 16 : 1;
+
 		for (int i = 0; i < 16; i++) {
-			if (gateTimes[i] > 0.f) {
-				outputs[TRIG_OUTPUT + i].setVoltage(velocityMode ? rescale(velocities[i], 0, 127, 0.f, 10.f) : 10.f);
-				// If the gate is off, wait 1 ms before turning the pulse off.
-				// This avoids drum controllers sending a pulse with 0 ms duration.
-				if (!gates[i]) {
-					gateTimes[i] -= args.sampleTime;
+			outputs[TRIG_OUTPUT + i].setChannels(channels);
+			for (int c = 0; c < channels; c++) {
+				// Make sure all pulses last longer than 1ms
+				if (gates[i][c] || gateTimes[i][c] > 0.f) {
+					float velocity = velocityMode ? (velocities[i][c] / 127.f) : 1.f;
+					outputs[TRIG_OUTPUT + i].setVoltage(velocity * 10.f, c);
+					gateTimes[i][c] -= args.sampleTime;
 				}
-			}
-			else {
-				outputs[TRIG_OUTPUT + i].setVoltage(0.f);
+				else {
+					outputs[TRIG_OUTPUT + i].setVoltage(0.f, c);
+				}
 			}
 		}
 	}
@@ -85,29 +97,24 @@ struct MIDI_Gate : Module {
 		switch (msg.getStatus()) {
 			// note off
 			case 0x8: {
-				releaseNote(msg.getNote());
+				releaseNote(msg.getChannel(), msg.getNote());
 			} break;
 			// note on
 			case 0x9: {
 				if (msg.getValue() > 0) {
-					pressNote(msg.getNote(), msg.getValue());
+					pressNote(msg.getChannel(), msg.getNote(), msg.getValue());
 				}
 				else {
-					// I don't know why, but many keyboards send a "note on" command with 0 velocity to mean "note release"
-					releaseNote(msg.getNote());
-				}
-			} break;
-			// all notes off (panic)
-			case 0x7b: {
-				if (msg.getValue() == 0) {
-					panic();
+					// Many stupid keyboards send a "note on" command with 0 velocity to mean "note release"
+					releaseNote(msg.getChannel(), msg.getNote());
 				}
 			} break;
 			default: break;
 		}
 	}
 
-	void pressNote(uint8_t note, uint8_t vel) {
+	void pressNote(uint8_t channel, uint8_t note, uint8_t vel) {
+		int c = mpeMode ? channel : 0;
 		// Learn
 		if (learningId >= 0) {
 			learnedNotes[learningId] = note;
@@ -116,18 +123,19 @@ struct MIDI_Gate : Module {
 		// Find id
 		for (int i = 0; i < 16; i++) {
 			if (learnedNotes[i] == note) {
-				gates[i] = true;
-				gateTimes[i] = 1e-3f;
-				velocities[i] = vel;
+				gates[i][c] = true;
+				gateTimes[i][c] = 1e-3f;
+				velocities[i][c] = vel;
 			}
 		}
 	}
 
-	void releaseNote(uint8_t note) {
+	void releaseNote(uint8_t channel, uint8_t note) {
+		int c = mpeMode ? channel : 0;
 		// Find id
 		for (int i = 0; i < 16; i++) {
 			if (learnedNotes[i] == note) {
-				gates[i] = false;
+				gates[i][c] = false;
 			}
 		}
 	}
@@ -145,6 +153,8 @@ struct MIDI_Gate : Module {
 		json_object_set_new(rootJ, "velocity", json_boolean(velocityMode));
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
+
+		json_object_set_new(rootJ, "mpeMode", json_boolean(mpeMode));
 		return rootJ;
 	}
 
@@ -165,6 +175,10 @@ struct MIDI_Gate : Module {
 		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
+
+		json_t* mpeModeJ = json_object_get(rootJ, "mpeMode");
+		if (mpeModeJ)
+			mpeMode = json_boolean_value(mpeModeJ);
 	}
 };
 
@@ -173,6 +187,14 @@ struct MIDI_GateVelocityItem : MenuItem {
 	MIDI_Gate* module;
 	void onAction(const event::Action& e) override {
 		module->velocityMode ^= true;
+	}
+};
+
+
+struct MIDI_GateMpeModeItem : MenuItem {
+	MIDI_Gate* module;
+	void onAction(const event::Action& e) override {
+		module->mpeMode ^= true;
 	}
 };
 
@@ -227,6 +249,12 @@ struct MIDI_GateWidget : ModuleWidget {
 		MIDI_GateVelocityItem* velocityItem = createMenuItem<MIDI_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
+
+		MIDI_GateMpeModeItem* mpeModeItem = new MIDI_GateMpeModeItem;
+		mpeModeItem->text = "MPE mode";
+		mpeModeItem->rightText = CHECKMARK(module->mpeMode);
+		mpeModeItem->module = module;
+		menu->addChild(mpeModeItem);
 
 		MIDI_GatePanicItem* panicItem = new MIDI_GatePanicItem;
 		panicItem->text = "Panic";
