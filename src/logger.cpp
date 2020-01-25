@@ -75,6 +75,16 @@ void log(Level level, const char* filename, int line, const char* format, ...) {
 	va_end(args);
 }
 
+static bool fileEndsWith(FILE* file, std::string str) {
+	// Seek to last 3 characters
+	size_t len = str.size();
+	std::fseek(file, -long(len), SEEK_END);
+	char actual[len];
+	if (std::fread(actual, 1, len, file) != len)
+		return false;
+	return std::string(actual, len) == str;
+}
+
 bool isTruncated() {
 	if (settings::devMode)
 		return false;
@@ -87,14 +97,12 @@ bool isTruncated() {
 		std::fclose(file);
 	});
 
-	// Seek to last 3 characters
-	std::fseek(file, -3, SEEK_END);
-	char str[3];
-	if (std::fread(str, 1, 3, file) != 3)
-		return true;
-	if (std::memcmp(str, "END", 3) != 0)
-		return true;
-	return false;
+	if (fileEndsWith(file, "END"))
+		return false;
+	// legacy <=v1
+	if (fileEndsWith(file, "Destroying logger\n"))
+		return false;
+	return true;
 }
 
 
