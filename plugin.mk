@@ -20,24 +20,24 @@ FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 # I don't really understand the side effects (see GCC manual), but so far tests are positive.
 FLAGS += -fno-gnu-unique
 
+LDFLAGS += -shared
+LDFLAGS += -Wl,-rpath=.
+LDFLAGS += -L$(RACK_DIR) -lRack
+
 include $(RACK_DIR)/arch.mk
 
 ifdef ARCH_LIN
-	LDFLAGS += -shared
 	TARGET := plugin.so
 	RACK_USER_DIR ?= $(HOME)/.Rack
-	# Link to glibc 2.23
-# 	FLAGS += -include force_link_glibc_2.23.h
 endif
 
 ifdef ARCH_MAC
-	LDFLAGS += -shared -undefined dynamic_lookup
 	TARGET := plugin.dylib
+	LDFLAGS += -undefined dynamic_lookup
 	RACK_USER_DIR ?= $(HOME)/Documents/Rack
 endif
 
 ifdef ARCH_WIN
-	LDFLAGS += -shared -L$(RACK_DIR) -lRack
 	TARGET := plugin.dll
 	RACK_USER_DIR ?= "$(USERPROFILE)"/Documents/Rack
 endif

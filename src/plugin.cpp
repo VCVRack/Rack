@@ -43,51 +43,66 @@ namespace plugin {
 // private API
 ////////////////////
 
+static void* loadLibrary(std::string libraryPath) {
+	#if defined ARCH_WIN
+		SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
+		std::wstring libraryFilenameW = string::toWstring(libraryPath);
+		HINSTANCE handle = LoadLibraryW(libraryFilenameW.c_str());
+		SetErrorMode(0);
+		if (!handle) {
+			int error = GetLastError();
+			throw Exception(string::f("Failed to load library %s: code %d", libraryPath.c_str(), error));
+		}
+	#else
+		// Plugin uses -rpath=. so change working directory so it can find libRack.
+		char cwd[PATH_MAX];
+		cwd[0] = '\0';
+		getcwd(cwd, sizeof(cwd));
+		chdir(asset::systemDir.c_str());
+		// And then change it back
+		DEFER({
+			chdir(cwd);
+		});
+		// Load library with dlopen
+		void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+		if (!handle) {
+			throw Exception(string::f("Failed to load library %s: %s", libraryPath.c_str(), dlerror()));
+		}
+	#endif
+		return handle;
+}
+
 typedef void (*InitCallback)(Plugin*);
 
-static InitCallback loadLibrary(Plugin* plugin) {
+static InitCallback loadPluginCallback(Plugin* plugin) {
 	// Load plugin library
-	std::string libraryFilename;
+	std::string libraryExt;
 #if defined ARCH_LIN
-	libraryFilename = plugin->path + "/" + "plugin.so";
+	libraryExt = "so";
 #elif defined ARCH_WIN
-	libraryFilename = plugin->path + "/" + "plugin.dll";
+	libraryExt = "dll";
 #elif ARCH_MAC
-	libraryFilename = plugin->path + "/" + "plugin.dylib";
+	libraryExt = "dylib";
 #endif
+	std::string libraryPath = plugin->path + "/plugin." + libraryExt;
 
 	// Check file existence
-	if (!system::isFile(libraryFilename)) {
-		throw Exception(string::f("Library %s does not exist", libraryFilename.c_str()));
+	if (!system::isFile(libraryPath)) {
+		throw Exception(string::f("Library %s does not exist", libraryPath.c_str()));
 	}
 
 	// Load dynamic/shared library
-#if defined ARCH_WIN
-	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
-	std::wstring libraryFilenameW = string::toWstring(libraryFilename);
-	HINSTANCE handle = LoadLibraryW(libraryFilenameW.c_str());
-	SetErrorMode(0);
-	if (!handle) {
-		int error = GetLastError();
-		throw Exception(string::f("Failed to load library %s: code %d", libraryFilename.c_str(), error));
-	}
-#else
-	void* handle = dlopen(libraryFilename.c_str(), RTLD_NOW | RTLD_LOCAL);
-	if (!handle) {
-		throw Exception(string::f("Failed to load library %s: %s", libraryFilename.c_str(), dlerror()));
-	}
-#endif
-	plugin->handle = handle;
+	plugin->handle = loadLibrary(libraryPath);
 
 	// Get plugin's init() function
 	InitCallback initCallback;
 #if defined ARCH_WIN
-	initCallback = (InitCallback) GetProcAddress(handle, "init");
+	initCallback = (InitCallback) GetProcAddress(plugin->handle, "init");
 #else
-	initCallback = (InitCallback) dlsym(handle, "init");
+	initCallback = (InitCallback) dlsym(plugin->handle, "init");
 #endif
 	if (!initCallback) {
-		throw Exception(string::f("Failed to read init() symbol in %s", libraryFilename.c_str()));
+		throw Exception(string::f("Failed to read init() symbol in %s", libraryPath.c_str()));
 	}
 
 	return initCallback;
@@ -139,7 +154,7 @@ static Plugin* loadPlugin(std::string path) {
 			initCallback = core::init;
 		}
 		else {
-			initCallback = loadLibrary(plugin);
+			initCallback = loadPluginCallback(plugin);
 		}
 		initCallback(plugin);
 
