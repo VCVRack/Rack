@@ -17,55 +17,82 @@ SOURCES += $(wildcard dep/jpommier-pffft-*/pffft.c) $(wildcard dep/jpommier-pfff
 SOURCES += $(wildcard src/*.c src/*/*.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
+STANDALONE_SOURCES += $(wildcard standalone/*.cpp)
+
+FLAGS += -fPIC
+LDFLAGS += -shared
+
 ifdef ARCH_LIN
+	TARGET := libRack.so
+	STANDALONE_TARGET := Rack
+
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 build/dep/osdialog/osdialog_gtk2.c.o: FLAGS += $(shell pkg-config --cflags gtk+-2.0)
 
-	LDFLAGS += -rdynamic \
-		-Wl,--whole-archive \
-		dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a \
-		-Wl,--no-whole-archive \
-		-lpthread -lGL -ldl -lX11 -lasound -ljack \
-		$(shell pkg-config --libs gtk+-2.0)
-	TARGET := Rack
+	# This prevents static variables in the DSO (dynamic shared object) from being preserved after dlclose().
+	# I don't really understand the side effects (see GCC manual), but so far tests are positive.
+	FLAGS += -fno-gnu-unique
+
+	LDFLAGS += -Wl,--whole-archive
+	LDFLAGS += dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a
+	LDFLAGS += -Wl,--no-whole-archive
+	LDFLAGS += -lpthread -lGL -ldl -lX11 -lasound -ljack
+	LDFLAGS += $(shell pkg-config --libs gtk+-2.0)
 endif
 
 ifdef ARCH_MAC
+	TARGET := libRack.dylib
+	STANDALONE_TARGET := Rack
+
 	SOURCES += dep/osdialog/osdialog_mac.m
-	LDFLAGS += -lpthread -ldl \
-		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
-		-Wl,-all_load \
-		dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a
+	LDFLAGS += -lpthread -ldl
+	LDFLAGS += -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI
+	LDFLAGS += -Wl,-all_load
+	LDFLAGS += dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a
 	# For LuaJIT
 	LDFLAGS += -Wl,-pagezero_size,10000 -Wl,-image_base,100000000
-	TARGET := Rack
 endif
 
 ifdef ARCH_WIN
+	TARGET := libRack.dll
+	STANDALONE_TARGET := Rack.exe
+
 	SOURCES += dep/osdialog/osdialog_win.c
-	LDFLAGS += -Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
-		-Wl,--whole-archive \
-		dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a \
-		-Wl,--no-whole-archive \
-		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
-	TARGET := Rack.exe
+	LDFLAGS += -Wl,--export-all-symbols
+	LDFLAGS += -Wl,--out-implib,$(TARGET).a -mwindows
+	LDFLAGS += -Wl,--whole-archive
+	LDFLAGS += dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a
+	LDFLAGS += -Wl,--no-whole-archive
+	LDFLAGS += -lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
 	OBJECTS += Rack.res
 endif
 
+include compile.mk
+
+# Standalone launcher
+
+STANDALONE_LDFLAGS += -Wl,-rpath=.
+STANDALONE_OBJECTS := $(patsubst %, build/%.o, $(STANDALONE_SOURCES))
+STANDALONE_DEPENDENCIES := $(patsubst %, build/%.d, $(STANDALONE_SOURCES))
+-include $(STANDALONE_DEPENDENCIES)
+
+$(STANDALONE_TARGET): $(STANDALONE_OBJECTS) $(TARGET)
+	$(CXX) -o $@ $^ $(STANDALONE_LDFLAGS)
+
 # Convenience targets
 
-all: $(TARGET)
+all: $(TARGET) $(STANDALONE_TARGET)
 
 dep:
 	$(MAKE) -C dep
 
-run: $(TARGET)
+run: $(STANDALONE_TARGET)
 	./$< -d
 
-runr: $(TARGET)
+runr: $(STANDALONE_TARGET)
 	./$<
 
-debug: $(TARGET)
+debug: $(STANDALONE_TARGET)
 ifdef ARCH_MAC
 	lldb -- ./$< -d
 endif
@@ -76,20 +103,20 @@ ifdef ARCH_LIN
 	gdb --args ./$< -d
 endif
 
-perf: $(TARGET)
+perf: $(STANDALONE_TARGET)
 	# Requires perf
 	perf record --call-graph dwarf -o perf.data ./$< -d
 	# Analyze with hotspot (https://github.com/KDAB/hotspot) for example
 	hotspot perf.data
 	rm perf.data
 
-valgrind: $(TARGET)
+valgrind: $(STANDALONE_TARGET)
 	# --gen-suppressions=yes
 	# --leak-check=full
 	valgrind --suppressions=valgrind.supp ./$< -d
 
 clean:
-	rm -rfv $(TARGET) libRack.a Rack.res build dist
+	rm -rfv $(TARGET) $(STANDALONE_TARGET) libRack.dll.a Rack.res build dist
 
 
 # For Windows resources
@@ -111,11 +138,13 @@ dist: $(TARGET)
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
 	cp $(TARGET) dist/Rack/
+	cp $(STANDALONE_TARGET) dist/Rack/
 	$(STRIP) -s dist/Rack/$(TARGET)
+	$(STRIP) -s dist/Rack/$(STANDALONE_TARGET)
 	cp -R $(DIST_RES) dist/Rack/
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
-	cp Fundamental.zip dist/Rack/
+	# cp Fundamental.zip dist/Rack/
 	# Make ZIP
 	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
 endif
@@ -215,8 +244,6 @@ endif
 
 
 # Includes
-
-include compile.mk
 
 .DEFAULT_GOAL := all
 .PHONY: all dep run debug clean dist upload src plugins
