@@ -97,7 +97,7 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 	// Get plugin's init() function
 	InitCallback initCallback;
 #if defined ARCH_WIN
-	initCallback = (InitCallback) GetProcAddress(plugin->handle, "init");
+	initCallback = (InitCallback) GetProcAddress((HMODULE) plugin->handle, "init");
 #else
 	initCallback = (InitCallback) dlsym(plugin->handle, "init");
 #endif

@@ -16,9 +16,6 @@ DISTRIBUTABLES += plugin.json
 
 FLAGS += -fPIC
 FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
-# This prevents static variables in the DSO (dynamic shared object) from being preserved after dlclose().
-# I don't really understand the side effects (see GCC manual), but so far tests are positive.
-FLAGS += -fno-gnu-unique
 
 LDFLAGS += -shared
 LDFLAGS += -Wl,-rpath=.
@@ -28,6 +25,9 @@ include $(RACK_DIR)/arch.mk
 
 ifdef ARCH_LIN
 	TARGET := plugin.so
+	# This prevents static variables in the DSO (dynamic shared object) from being preserved after dlclose().
+	# I don't really understand the side effects (see GCC manual), but so far tests are positive.
+	FLAGS += -fno-gnu-unique
 	RACK_USER_DIR ?= $(HOME)/.Rack
 endif
 

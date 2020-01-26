@@ -59,12 +59,13 @@ ifdef ARCH_WIN
 
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -Wl,--export-all-symbols
-	LDFLAGS += -Wl,--out-implib,$(TARGET).a -mwindows
-	LDFLAGS += -Wl,--whole-archive
+	LDFLAGS += -Wl,--out-implib,$(TARGET).a
+	LDFLAGS += -Wl,-Bstatic -Wl,--whole-archive
 	LDFLAGS += dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a
-	LDFLAGS += -Wl,--no-whole-archive
+	LDFLAGS += -Wl,-Bdynamic -Wl,--no-whole-archive
 	LDFLAGS += -lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
-	OBJECTS += Rack.res
+	STANDALONE_LDFLAGS += -mwindows
+	STANDALONE_OBJECTS += build/Rack.res
 endif
 
 include compile.mk
@@ -72,7 +73,7 @@ include compile.mk
 # Standalone launcher
 
 STANDALONE_LDFLAGS += -Wl,-rpath=.
-STANDALONE_OBJECTS := $(patsubst %, build/%.o, $(STANDALONE_SOURCES))
+STANDALONE_OBJECTS += $(patsubst %, build/%.o, $(STANDALONE_SOURCES))
 STANDALONE_DEPENDENCIES := $(patsubst %, build/%.d, $(STANDALONE_SOURCES))
 -include $(STANDALONE_DEPENDENCIES)
 
@@ -120,7 +121,7 @@ clean:
 
 
 # For Windows resources
-%.res: %.rc
+build/%.res: %.rc
 ifdef ARCH_WIN
 	windres $^ -O coff -o $@
 endif
@@ -131,16 +132,14 @@ DIST_NAME := Rack-$(VERSION)-$(ARCH)
 DIST_SDK := Rack-SDK-$(VERSION).zip
 
 # This target is not intended for public use
-dist: $(TARGET)
+dist: $(TARGET) $(STANDALONE_TARGET)
 	rm -rf dist
 	mkdir -p dist
 
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
-	cp $(TARGET) dist/Rack/
-	cp $(STANDALONE_TARGET) dist/Rack/
-	$(STRIP) -s dist/Rack/$(TARGET)
-	$(STRIP) -s dist/Rack/$(STANDALONE_TARGET)
+	cp $(TARGET) $(STANDALONE_TARGET) dist/Rack/
+	$(STRIP) -s dist/Rack/$(TARGET) dist/Rack/$(STANDALONE_TARGET)
 	cp -R $(DIST_RES) dist/Rack/
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
@@ -173,19 +172,19 @@ ifdef ARCH_MAC
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
-	cp $(TARGET) dist/Rack/
-	$(STRIP) -s dist/Rack/$(TARGET)
+	cp $(TARGET) $(STANDALONE_TARGET) dist/Rack/
+	$(STRIP) -s dist/Rack/$(TARGET) dist/Rack/$(STANDALONE_TARGET)
 	cp -R $(DIST_RES) dist/Rack/
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
-	cp Fundamental.zip dist/Rack/
+# 	cp Fundamental.zip dist/Rack/
 	# Make ZIP
 	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
-	makensis -DVERSION=$(VERSION) installer.nsi
-	mv installer.exe dist/$(DIST_NAME).exe
+# 	makensis -DVERSION=$(VERSION) installer.nsi
+# 	mv installer.exe dist/$(DIST_NAME).exe
 endif
 
 	# Rack SDK
@@ -194,7 +193,7 @@ endif
 	mkdir -p dist/Rack-SDK/dep/
 	cp -R dep/include dist/Rack-SDK/dep/
 ifdef ARCH_WIN
-	cp libRack.a dist/Rack-SDK/
+	cp libRack.dll.a dist/Rack-SDK/
 endif
 	cd dist && zip -q -9 -r $(DIST_SDK) Rack-SDK
 
