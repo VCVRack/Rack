@@ -45,15 +45,19 @@ Context::~Context() {
 }
 
 
-static thread_local Context* context = NULL;
+static thread_local Context* threadContext = NULL;
 
 Context* contextGet() {
-	assert(context);
-	return context;
+	assert(threadContext);
+	return threadContext;
 }
 
+// Apple's clang incorrectly compiles this function when -O2 or higher is enabled.
+#ifdef ARCH_MAC
+__attribute__((optnone))
+#endif
 void contextSet(Context* context) {
-	rack::context = context;
+	threadContext = context;
 }
 
 
