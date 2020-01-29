@@ -24,7 +24,6 @@ LDFLAGS += -shared
 
 ifdef ARCH_LIN
 	TARGET := libRack.so
-	STANDALONE_TARGET := Rack
 
 	SOURCES += dep/osdialog/osdialog_gtk2.c
 build/dep/osdialog/osdialog_gtk2.c.o: FLAGS += $(shell pkg-config --cflags gtk+-2.0)
@@ -38,24 +37,28 @@ build/dep/osdialog/osdialog_gtk2.c.o: FLAGS += $(shell pkg-config --cflags gtk+-
 	LDFLAGS += -Wl,--no-whole-archive
 	LDFLAGS += -lpthread -lGL -ldl -lX11 -lasound -ljack
 	LDFLAGS += $(shell pkg-config --libs gtk+-2.0)
+
+	STANDALONE_TARGET := Rack
+	STANDALONE_LDFLAGS += -Wl,-rpath=.
 endif
 
 ifdef ARCH_MAC
 	TARGET := libRack.dylib
-	STANDALONE_TARGET := Rack
 
 	SOURCES += dep/osdialog/osdialog_mac.m
 	LDFLAGS += -lpthread -ldl
 	LDFLAGS += -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI
 	LDFLAGS += -Wl,-all_load
 	LDFLAGS += dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a
-	# For LuaJIT
-	LDFLAGS += -Wl,-pagezero_size,10000 -Wl,-image_base,100000000
+
+	STANDALONE_TARGET := Rack
+	STANDALONE_LDFLAGS += -stdlib=libc++
+	# For LuaJIT to work inside plugins
+	STANDALONE_LDFLAGS += -Wl,-pagezero_size,10000 -Wl,-image_base,100000000
 endif
 
 ifdef ARCH_WIN
 	TARGET := libRack.dll
-	STANDALONE_TARGET := Rack.exe
 
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -Wl,--export-all-symbols
@@ -64,6 +67,8 @@ ifdef ARCH_WIN
 	LDFLAGS += dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a
 	LDFLAGS += -Wl,-Bdynamic -Wl,--no-whole-archive
 	LDFLAGS += -lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
+
+	STANDALONE_TARGET := Rack.exe
 	STANDALONE_LDFLAGS += -mwindows
 	STANDALONE_OBJECTS += build/Rack.res
 endif
@@ -72,7 +77,9 @@ include compile.mk
 
 # Standalone launcher
 
-STANDALONE_LDFLAGS += -Wl,-rpath=.
+ifdef ARCH_MAC
+	STANDALONE_LDFLAGS += $(MAC_SDK_FLAGS)
+endif
 STANDALONE_OBJECTS += $(patsubst %, build/%.o, $(STANDALONE_SOURCES))
 STANDALONE_DEPENDENCIES := $(patsubst %, build/%.d, $(STANDALONE_SOURCES))
 -include $(STANDALONE_DEPENDENCIES)

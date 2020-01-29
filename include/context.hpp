@@ -38,6 +38,7 @@ struct Context {
 	history::State* history = NULL;
 	PatchManager* patch = NULL;
 
+	/** Call this after setting the context for this thread, because initialization of application state accesses APP. */
 	void init();
 	~Context();
 };
@@ -46,11 +47,11 @@ struct Context {
 /** Returns the global Context pointer */
 Context* contextGet();
 /** Sets the context for this thread.
-You must call this every thread if you want to use the APP macro in that thread.
+You must set the context when preparing each thread if the code uses the APP macro in that thread.
 */
 void contextSet(Context* context);
 
-/** Accesses the global Context pointer */
+/** Accesses the global Context pointer. Just an alias for contextGet(). */
 #define APP rack::contextGet()
 
 

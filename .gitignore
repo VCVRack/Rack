@@ -3,6 +3,8 @@
 /Rack.exe
 /Rack.res
 /dep
+/Rack.d
+/Rack.dSYM
 /plugins
 /disabledplugins
 /build
