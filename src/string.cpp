@@ -263,8 +263,32 @@ void uncompress(const uint8_t* compressed, size_t compressedLen, uint8_t* data, 
 }
 
 
-void uncompress(const std::vector<uint8_t>& compressed, uint8_t* data, size_t* dataLen) {
-	uncompress(compressed.data(), compressed.size(), data, dataLen);
+std::vector<uint8_t> uncompress(const std::vector<uint8_t>& compressed) {
+	// We don't know the uncompressed size, so we can't use the easy compress/uncompress API.
+	std::vector<uint8_t> data;
+
+	z_stream zs;
+	std::memset(&zs, 0, sizeof(zs));
+	zs.next_in = (Bytef*) &compressed[0];
+	zs.avail_in = compressed.size();
+	inflateInit(&zs);
+
+	while (true) {
+		uint8_t buffer[16384];
+		zs.next_out = (Bytef*) buffer;
+		zs.avail_out = sizeof(buffer);
+		int err = inflate(&zs, Z_NO_FLUSH);
+
+		if (err < 0)
+			throw Exception(string::f("zlib error %d", err));
+
+		data.insert(data.end(), buffer, zs.next_out);
+		if (err == Z_STREAM_END)
+			break;
+	}
+
+	inflateEnd(&zs);
+	return data;
 }
 
 

@@ -77,11 +77,10 @@ std::vector<uint8_t> compress(const uint8_t* data, size_t dataLen);
 std::vector<uint8_t> compress(const std::vector<uint8_t>& data);
 /** Uncompress bytes with zlib.
 Before calling this function, set `dataLen` to the capacity of `data`.
-After returning, `dataLen` is set to the number of bytes written.
-Unfortunately the output buffer cannot be computed from the compressed data, so you may need to hard-code the maximum expected size.
+After returning, `dataLen` is set to the actual number of bytes written.
 */
 void uncompress(const uint8_t* compressed, size_t compressedLen, uint8_t* data, size_t* dataLen);
-void uncompress(const std::vector<uint8_t>& compressed, uint8_t* data, size_t* dataLen);
+std::vector<uint8_t> uncompress(const std::vector<uint8_t>& compressed);
 
 
 struct CaseInsensitiveCompare {
