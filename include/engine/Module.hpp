@@ -179,7 +179,10 @@ struct Module {
 	*/
 	virtual void processBypass(const ProcessArgs& args);
 
-	json_t* toJson();
+	/** Usually you should override dataToJson() instead.
+	There are very few reasons you should override this (perhaps to lock a mutex while serialization is occurring).
+	*/
+	virtual json_t* toJson();
 	/** This is virtual only for the purpose of unserializing legacy data when you could set properties of the `.modules[]` object itself.
 	Normally you should override dataFromJson().
 	Remember to call `Module::fromJson(rootJ)` within your overridden method.
