@@ -66,10 +66,7 @@ static void initSystemDir() {
 	assert(length > 0);
 	// Get folder of executable
 	PathRemoveFileSpecW(moduleBufW);
-	// Convert to short path to avoid Unicode
-	wchar_t moduleBufShortW[MAX_PATH];
-	GetShortPathNameW(moduleBufW, moduleBufShortW, LENGTHOF(moduleBufShortW));
-	systemDir = string::fromWstring(moduleBufShortW);
+	systemDir = string::fromWstring(moduleBufW);
 #endif
 #if defined ARCH_LIN
 	// Users should launch Rack from their terminal in the system directory
@@ -92,10 +89,7 @@ static void initUserDir() {
 	wchar_t documentsBufW[MAX_PATH] = L".";
 	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
 	assert(result == S_OK);
-	// Convert to short path to avoid Unicode
-	wchar_t documentsBufShortW[MAX_PATH];
-	GetShortPathNameW(documentsBufW, documentsBufShortW, LENGTHOF(documentsBufShortW));
-	userDir = string::fromWstring(documentsBufShortW);
+	userDir = string::fromWstring(documentsBufW);
 	userDir += "/Rack";
 #endif
 #if defined ARCH_MAC
