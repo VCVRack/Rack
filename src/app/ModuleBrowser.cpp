@@ -1,3 +1,6 @@
+#include <set>
+#include <algorithm>
+
 #include <app/ModuleBrowser.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <widget/TransparentWidget.hpp>
@@ -24,9 +27,6 @@
 #include <history.hpp>
 #include <settings.hpp>
 #include <tag.hpp>
-
-#include <set>
-#include <algorithm>
 
 
 namespace rack {

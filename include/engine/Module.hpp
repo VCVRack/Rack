@@ -1,4 +1,8 @@
 #pragma once
+#include <vector>
+
+#include <jansson.h>
+
 #include <common.hpp>
 #include <string.hpp>
 #include <plugin/Model.hpp>
@@ -7,8 +11,6 @@
 #include <engine/Light.hpp>
 #include <engine/ParamQuantity.hpp>
 #include <engine/PortInfo.hpp>
-#include <vector>
-#include <jansson.h>
 
 
 namespace rack {

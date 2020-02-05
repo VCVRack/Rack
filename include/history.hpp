@@ -1,11 +1,13 @@
 #pragma once
+#include <vector>
+#include <deque>
+
+#include <jansson.h>
+
 #include <common.hpp>
 #include <math.hpp>
 #include <color.hpp>
 #include <plugin/Model.hpp>
-#include <vector>
-#include <deque>
-#include <jansson.h>
 
 
 namespace rack {

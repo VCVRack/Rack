@@ -1,3 +1,23 @@
+#include <thread>
+#include <map>
+#include <stdexcept>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <sys/param.h> // for MAXPATHLEN
+#include <fcntl.h>
+#if defined ARCH_WIN
+	#include <windows.h>
+	#include <direct.h>
+#else
+	#include <dlfcn.h>
+#endif
+#include <dirent.h>
+
+#include <osdialog.h>
+#include <jansson.h>
+
 #include <plugin.hpp>
 #include <system.hpp>
 #include <network.hpp>
@@ -8,26 +28,6 @@
 #include <plugin/callbacks.hpp>
 #include <settings.hpp>
 #include <engine/Module.hpp>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <sys/param.h> // for MAXPATHLEN
-#include <fcntl.h>
-#include <thread>
-#include <map>
-#include <stdexcept>
-
-#include <jansson.h>
-
-#if defined ARCH_WIN
-	#include <windows.h>
-	#include <direct.h>
-#else
-	#include <dlfcn.h>
-#endif
-#include <dirent.h>
-#include <osdialog.h>
 
 
 namespace rack {

@@ -1,9 +1,8 @@
 #pragma once
-#include <common.hpp>
-#include <math.hpp>
 
 #include <memory>
 #include <map>
+
 #define GLEW_STATIC
 #define GLEW_NO_GLU
 #include <GL/glew.h>
@@ -13,6 +12,9 @@
 #include <nanovg_gl.h>
 #include <nanovg_gl_utils.h>
 #include <nanosvg.h>
+
+#include <common.hpp>
+#include <math.hpp>
 
 
 namespace rack {

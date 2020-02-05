@@ -1,9 +1,10 @@
 #pragma once
+#include <vector>
+
 #include <common.hpp>
 #include <engine/Module.hpp>
 #include <engine/Cable.hpp>
 #include <engine/ParamHandle.hpp>
-#include <vector>
 
 
 namespace rack {

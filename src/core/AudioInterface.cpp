@@ -1,11 +1,11 @@
-#include "plugin.hpp"
-#include <audio.hpp>
-#include <context.hpp>
 #include <mutex>
 #include <chrono>
 #include <thread>
-#include <mutex>
 #include <condition_variable>
+
+#include "plugin.hpp"
+#include <audio.hpp>
+#include <context.hpp>
 
 
 namespace rack {

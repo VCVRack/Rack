@@ -1,7 +1,8 @@
 #pragma once
-#include <common.hpp>
 #include <nanovg.h>
 #include <blendish.h>
+
+#include <common.hpp>
 
 /** Useful for menu items with a "true" boolean state */
 #define CHECKMARK_STRING "✔"

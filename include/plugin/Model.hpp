@@ -1,8 +1,10 @@
 #pragma once
+#include <set>
+
+#include <jansson.h>
+
 #include <common.hpp>
 #include <plugin/Plugin.hpp>
-#include <jansson.h>
-#include <set>
 
 
 namespace rack {

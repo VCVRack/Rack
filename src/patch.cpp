@@ -1,3 +1,7 @@
+#include <algorithm>
+
+#include <osdialog.h>
+
 #include <patch.hpp>
 #include <asset.hpp>
 #include <system.hpp>
@@ -8,9 +12,6 @@
 #include <app/RackWidget.hpp>
 #include <history.hpp>
 #include <settings.hpp>
-#include <algorithm>
-
-#include <osdialog.h>
 
 
 namespace rack {

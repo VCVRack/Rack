@@ -1,4 +1,5 @@
 #pragma once
+#include <common.hpp>
 #include <math.hpp>
 #include <simd/functions.hpp>
 

@@ -1,8 +1,9 @@
+#include <mutex>
+
 #include <common.hpp>
 #include <asset.hpp>
 #include <settings.hpp>
 #include <system.hpp>
-#include <mutex>
 
 
 namespace rack {

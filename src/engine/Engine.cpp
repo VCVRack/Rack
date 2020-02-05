@@ -1,11 +1,3 @@
-#include <engine/Engine.hpp>
-#include <settings.hpp>
-#include <system.hpp>
-#include <random.hpp>
-#include <context.hpp>
-#include <patch.hpp>
-#include <plugin.hpp>
-
 #include <algorithm>
 #include <thread>
 #include <condition_variable>
@@ -13,6 +5,14 @@
 #include <atomic>
 #include <tuple>
 #include <pmmintrin.h>
+
+#include <engine/Engine.hpp>
+#include <settings.hpp>
+#include <system.hpp>
+#include <random.hpp>
+#include <context.hpp>
+#include <patch.hpp>
+#include <plugin.hpp>
 
 
 namespace rack {

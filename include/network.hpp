@@ -1,6 +1,7 @@
 #pragma once
-#include <common.hpp>
 #include <jansson.h>
+
+#include <common.hpp>
 
 
 namespace rack {

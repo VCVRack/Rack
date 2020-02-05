@@ -1,10 +1,10 @@
 #pragma once
+#include <map>
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <app/PortWidget.hpp>
 #include <app/ModuleWidget.hpp>
 #include <engine/Cable.hpp>
-#include <map>
 
 
 namespace rack {

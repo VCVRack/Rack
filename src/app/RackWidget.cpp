@@ -1,3 +1,9 @@
+#include <map>
+#include <algorithm>
+#include <queue>
+
+#include <osdialog.h>
+
 #include <app/RackWidget.hpp>
 #include <widget/TransparentWidget.hpp>
 #include <app/RackRail.hpp>
@@ -9,10 +15,6 @@
 #include <context.hpp>
 #include <asset.hpp>
 #include <patch.hpp>
-#include <osdialog.h>
-#include <map>
-#include <algorithm>
-#include <queue>
 
 
 namespace rack {

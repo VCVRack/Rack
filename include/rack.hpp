@@ -1,6 +1,5 @@
 #pragma once
 
-
 // The following headers are the "public" API of Rack.
 
 #include <common.hpp>

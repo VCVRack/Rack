@@ -1,8 +1,10 @@
-#include <random.hpp>
-#include <math.hpp>
+#include <atomic>
+
 #include <time.h>
 #include <sys/time.h>
-#include <atomic>
+
+#include <random.hpp>
+#include <math.hpp>
 
 
 namespace rack {

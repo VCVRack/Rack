@@ -1,3 +1,5 @@
+#include <jansson.h>
+
 #include <settings.hpp>
 #include <window.hpp>
 #include <plugin.hpp>
@@ -6,7 +8,6 @@
 #include <engine/Engine.hpp>
 #include <context.hpp>
 #include <patch.hpp>
-#include <jansson.h>
 
 
 namespace rack {

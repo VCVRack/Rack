@@ -1,6 +1,7 @@
 #pragma once
-#include <common.hpp>
 #include <vector>
+
+#include <common.hpp>
 
 
 namespace rack {

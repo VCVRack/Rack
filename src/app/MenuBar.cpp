@@ -1,3 +1,8 @@
+#include <thread>
+#include <utility>
+
+#include <osdialog.h>
+
 #include <app/MenuBar.hpp>
 #include <window.hpp>
 #include <engine/Engine.hpp>
@@ -17,9 +22,6 @@
 #include <plugin.hpp>
 #include <patch.hpp>
 #include <updater.hpp>
-#include <osdialog.h>
-#include <thread>
-#include <utility>
 
 
 namespace rack {

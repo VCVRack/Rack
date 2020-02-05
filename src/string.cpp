@@ -1,10 +1,11 @@
-#include <string.hpp>
 #include <locale> // for wstring_convert
 #include <codecvt> // for codecvt_utf8_utf16
 #include <cctype> // for tolower and toupper
 #include <algorithm> // for transform
 #include <libgen.h> // for dirname and basename
 #include <zlib.h>
+
+#include <string.hpp>
 
 
 namespace rack {

@@ -1,3 +1,7 @@
+#include <thread>
+
+#include <osdialog.h>
+
 #include <app/Scene.hpp>
 #include <app/ModuleBrowser.hpp>
 #include <context.hpp>
@@ -7,8 +11,6 @@
 #include <settings.hpp>
 #include <patch.hpp>
 #include <asset.hpp>
-#include <osdialog.h>
-#include <thread>
 
 
 namespace rack {

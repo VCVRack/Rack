@@ -1,9 +1,7 @@
-#include <system.hpp>
-#include <string.hpp>
-
 #include <thread>
 #include <regex>
 #include <chrono>
+
 #include <dirent.h>
 #include <sys/stat.h>
 #include <cxxabi.h> // for __cxxabiv1::__cxa_demangle
@@ -30,6 +28,9 @@
 
 #define ZIP_STATIC
 #include <zip.h>
+
+#include <system.hpp>
+#include <string.hpp>
 
 
 namespace rack {

@@ -1,6 +1,7 @@
+#include <tinyexpr.h>
+
 #include <Quantity.hpp>
 #include <string.hpp>
-#include <tinyexpr.h>
 
 
 namespace rack {

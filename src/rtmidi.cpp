@@ -1,5 +1,3 @@
-#include <rtmidi.hpp>
-#include <midi.hpp>
 #include <map>
 
 #pragma GCC diagnostic push
@@ -8,6 +6,9 @@
 #endif
 #include <rtmidi/RtMidi.h>
 #pragma GCC diagnostic pop
+
+#include <rtmidi.hpp>
+#include <midi.hpp>
 
 
 namespace rack {

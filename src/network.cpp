@@ -1,7 +1,8 @@
-#include <network.hpp>
-#include <asset.hpp>
 #define CURL_STATICLIB
 #include <curl/curl.h>
+
+#include <network.hpp>
+#include <asset.hpp>
 
 
 namespace rack {

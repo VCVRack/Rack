@@ -1,7 +1,8 @@
 #pragma once
-#include <common.hpp>
 #include <complex>
 #include <algorithm> // for std::min, max
+
+#include <common.hpp>
 
 
 namespace rack {

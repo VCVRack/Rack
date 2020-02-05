@@ -1,6 +1,4 @@
 #pragma once
-#include <logger.hpp>
-
 // Include most of the C stdlib for convenience
 #include <cstdlib>
 #include <cstdio>
@@ -14,6 +12,8 @@
 // Include some of the C++ stdlib for convenience
 #include <string>
 #include <stdexcept>
+
+#include <logger.hpp>
 
 
 namespace rack {

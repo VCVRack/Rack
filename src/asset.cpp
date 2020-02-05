@@ -1,10 +1,3 @@
-#include <asset.hpp>
-#include <system.hpp>
-#include <settings.hpp>
-#include <string.hpp>
-#include <plugin/Plugin.hpp>
-#include <app/common.hpp>
-
 #if defined ARCH_MAC
 	#include <CoreFoundation/CoreFoundation.h>
 	#include <CoreServices/CoreServices.h>
@@ -22,6 +15,13 @@
 	#include <sys/types.h>
 	#include <pwd.h>
 #endif
+
+#include <asset.hpp>
+#include <system.hpp>
+#include <settings.hpp>
+#include <string.hpp>
+#include <plugin/Plugin.hpp>
+#include <app/common.hpp>
 
 
 namespace rack {

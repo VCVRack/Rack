@@ -1,3 +1,15 @@
+#include <map>
+#include <queue>
+#include <thread>
+
+#if defined ARCH_MAC
+	// For CGAssociateMouseAndMouseCursorPosition
+	#include <ApplicationServices/ApplicationServices.h>
+#endif
+
+#include <stb_image_write.h>
+#include <osdialog.h>
+
 #include <window.hpp>
 #include <asset.hpp>
 #include <app/Scene.hpp>
@@ -9,18 +21,6 @@
 #include <settings.hpp>
 #include <plugin.hpp> // used in Window::screenshot
 #include <system.hpp> // used in Window::screenshot
-
-#include <map>
-#include <queue>
-#include <thread>
-
-#if defined ARCH_MAC
-	// For CGAssociateMouseAndMouseCursorPosition
-	#include <ApplicationServices/ApplicationServices.h>
-#endif
-
-#include <osdialog.h>
-#include <stb_image_write.h>
 
 
 namespace rack {

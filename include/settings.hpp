@@ -1,12 +1,14 @@
 #pragma once
-#include <common.hpp>
-#include <math.hpp>
-#include <color.hpp>
 #include <vector>
 #include <map>
 #include <list>
 #include <tuple>
+
 #include <jansson.h>
+
+#include <common.hpp>
+#include <math.hpp>
+#include <color.hpp>
 
 
 namespace rack {

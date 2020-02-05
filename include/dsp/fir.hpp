@@ -1,6 +1,7 @@
 #pragma once
-#include <dsp/common.hpp>
 #include <pffft.h>
+
+#include <dsp/common.hpp>
 
 
 namespace rack {

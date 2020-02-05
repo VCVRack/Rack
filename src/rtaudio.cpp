@@ -1,8 +1,3 @@
-#include <rtaudio.hpp>
-#include <audio.hpp>
-#include <string.hpp>
-#include <math.hpp>
-#include <system.hpp>
 #include <map>
 #include <algorithm>
 
@@ -12,6 +7,12 @@
 #endif
 #include <RtAudio.h>
 #pragma GCC diagnostic pop
+
+#include <rtaudio.hpp>
+#include <audio.hpp>
+#include <string.hpp>
+#include <math.hpp>
+#include <system.hpp>
 
 
 namespace rack {

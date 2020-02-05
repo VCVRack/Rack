@@ -1,6 +1,7 @@
+#include <algorithm>
+
 #include <widget/Widget.hpp>
 #include <context.hpp>
-#include <algorithm>
 
 
 namespace rack {

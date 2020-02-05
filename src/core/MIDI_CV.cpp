@@ -1,5 +1,6 @@
-#include "plugin.hpp"
 #include <algorithm>
+
+#include "plugin.hpp"
 
 
 namespace rack {

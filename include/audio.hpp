@@ -1,9 +1,11 @@
 #pragma once
-#include <common.hpp>
-#include <context.hpp>
-#include <jansson.h>
 #include <vector>
 #include <set>
+
+#include <jansson.h>
+
+#include <common.hpp>
+#include <context.hpp>
 
 namespace rack {
 

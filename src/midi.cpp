@@ -1,8 +1,9 @@
+#include <map>
+#include <utility>
+
 #include <midi.hpp>
 #include <string.hpp>
 #include <system.hpp>
-#include <map>
-#include <utility>
 
 
 namespace rack {

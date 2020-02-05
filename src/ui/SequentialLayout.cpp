@@ -1,5 +1,6 @@
-#include <ui/SequentialLayout.hpp>
 #include <vector>
+
+#include <ui/SequentialLayout.hpp>
 
 
 namespace rack {

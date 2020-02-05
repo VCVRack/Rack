@@ -1,3 +1,5 @@
+#include <thread>
+
 #include <updater.hpp>
 #include <settings.hpp>
 #include <app/common.hpp>
@@ -6,7 +8,6 @@
 #include <context.hpp>
 #include <window.hpp>
 #include <asset.hpp>
-#include <thread>
 
 
 namespace rack {

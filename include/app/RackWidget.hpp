@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <widget/FramebufferWidget.hpp>
@@ -7,7 +9,6 @@
 #include <app/PortWidget.hpp>
 #include <app/ParamWidget.hpp>
 #include <history.hpp>
-#include <map>
 
 
 namespace rack {
