@@ -178,10 +178,17 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 		else if ((GLFW_KEY_SPACE <= e.key && e.key <= GLFW_KEY_WORLD_2) || (GLFW_KEY_KP_0 <= e.key && e.key <= GLFW_KEY_KP_EQUAL)) {
 			e.consume(this);
 		}
+		else if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
+			APP->event->setSelected(NULL);
+			e.consume(this);
+		}
 
 		cursor = math::clamp(cursor, 0, (int) text.size());
 		selection = math::clamp(selection, 0, (int) text.size());
 	}
+
+	// Consume ALL keys with ALL actions. Is this bad? I don't know, need more testing.
+	e.consume(this);
 }
 
 void TextField::insertText(std::string text) {
