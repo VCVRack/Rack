@@ -121,6 +121,13 @@ struct Module {
 		return q;
 	}
 
+	template <class TSwitchQuantity = SwitchQuantity>
+	TSwitchQuantity* configSwitch(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::vector<std::string> labels = {}) {
+		TSwitchQuantity* sq = configParam<TSwitchQuantity>(paramId, minValue, maxValue, defaultValue, name);
+		sq->labels = labels;
+		return sq;
+	}
+
 	template <class TPortInfo = PortInfo>
 	TPortInfo* configInput(int portId, std::string name = "") {
 		assert(portId < (int) inputs.size() && portId < (int) inputInfos.size());

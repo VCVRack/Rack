@@ -75,9 +75,6 @@ struct ParamQuantity : Quantity {
 struct SwitchQuantity : ParamQuantity {
 	std::vector<std::string> labels;
 
-	void setLabels(const std::vector<std::string>& labels) {
-		this->labels = labels;
-	}
 	std::string getDisplayValueString() override;
 	void setDisplayValueString(std::string s) override;
 };
