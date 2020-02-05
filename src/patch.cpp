@@ -247,7 +247,7 @@ void PatchManager::revertDialog() {
 void PatchManager::pushRecentPath(std::string path) {
 	auto& recent = settings::recentPatchPaths;
 	// Remove path from recent patches (if exists)
-	recent.erase(std::remove(recent.begin(), recent.end(), path), recent.end());
+	recent.remove(path);
 	// Add path to top of recent patches
 	recent.push_front(path);
 	// Limit recent patches size
