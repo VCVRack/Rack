@@ -293,5 +293,11 @@ std::vector<uint8_t> uncompress(const std::vector<uint8_t>& compressed) {
 }
 
 
+bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string& b) const {
+	// TODO Make more efficient by iterating characters
+	return lowercase(a) < lowercase(b);
+}
+
+
 } // namespace string
 } // namespace rack

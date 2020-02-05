@@ -98,12 +98,12 @@ struct Module {
 	void config(int numParams, int numInputs, int numOutputs, int numLights = 0);
 
 	template <class TParamQuantity = ParamQuantity>
-	void configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
+	TParamQuantity* configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
 		assert(paramId < (int) params.size() && paramId < (int) paramQuantities.size());
 		if (paramQuantities[paramId])
 			delete paramQuantities[paramId];
 
-		ParamQuantity* q = new TParamQuantity;
+		TParamQuantity* q = new TParamQuantity;
 		q->module = this;
 		q->paramId = paramId;
 		q->minValue = minValue;
@@ -118,34 +118,37 @@ struct Module {
 
 		Param* p = &params[paramId];
 		p->value = q->getDefaultValue();
+		return q;
 	}
 
 	template <class TPortInfo = PortInfo>
-	void configInput(int portId, std::string name = "") {
+	TPortInfo* configInput(int portId, std::string name = "") {
 		assert(portId < (int) inputs.size() && portId < (int) inputInfos.size());
 		if (inputInfos[portId])
 			delete inputInfos[portId];
 
-		PortInfo* p = new TPortInfo;
+		TPortInfo* p = new TPortInfo;
 		p->module = this;
 		p->type = Port::INPUT;
 		p->portId = portId;
 		p->name = name;
 		inputInfos[portId] = p;
+		return p;
 	}
 
 	template <class TPortInfo = PortInfo>
-	void configOutput(int portId, std::string name = "") {
+	TPortInfo* configOutput(int portId, std::string name = "") {
 		assert(portId < (int) outputs.size() && portId < (int) outputInfos.size());
 		if (outputInfos[portId])
 			delete outputInfos[portId];
 
-		PortInfo* p = new TPortInfo;
+		TPortInfo* p = new TPortInfo;
 		p->module = this;
 		p->type = Port::OUTPUT;
 		p->portId = portId;
 		p->name = name;
 		outputInfos[portId] = p;
+		return p;
 	}
 
 	/** Adds a direct route from an input to an output when the module is bypassed. */

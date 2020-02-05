@@ -85,9 +85,7 @@ std::vector<uint8_t> uncompress(const std::vector<uint8_t>& compressed);
 
 
 struct CaseInsensitiveCompare {
-	bool operator()(const std::string& a, const std::string& b) const {
-		return lowercase(a) < lowercase(b);
-	}
+	bool operator()(const std::string& a, const std::string& b) const;
 };
 
 

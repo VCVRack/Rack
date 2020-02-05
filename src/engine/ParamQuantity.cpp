@@ -1,6 +1,9 @@
+#include <algorithm>
+
 #include <engine/ParamQuantity.hpp>
 #include <context.hpp>
 #include <engine/Engine.hpp>
+#include <string.hpp>
 
 
 namespace rack {
@@ -121,6 +124,24 @@ std::string ParamQuantity::getUnit() {
 
 std::string ParamQuantity::getDescription() {
 	return description;
+}
+
+
+std::string SwitchQuantity::getDisplayValueString() {
+	int index = std::floor(getDisplayValue());
+	if (!(0 <= index && index < (int) labels.size()))
+		return "";
+	return labels[index];
+}
+
+void SwitchQuantity::setDisplayValueString(std::string s) {
+	auto it = std::find_if(labels.begin(), labels.end(), [&](const std::string& a) {
+		return string::lowercase(a) == string::lowercase(s);
+	});
+	if (it == labels.end())
+		return;
+	int index = std::distance(labels.begin(), it);
+	setDisplayValue(index);
 }
 
 

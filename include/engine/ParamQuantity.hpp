@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include <Quantity.hpp>
 #include <engine/Param.hpp>
 
@@ -67,6 +69,17 @@ struct ParamQuantity : Quantity {
 	std::string getLabel() override;
 	std::string getUnit() override;
 	virtual std::string getDescription();
+};
+
+
+struct SwitchQuantity : ParamQuantity {
+	std::vector<std::string> labels;
+
+	void setLabels(const std::vector<std::string>& labels) {
+		this->labels = labels;
+	}
+	std::string getDisplayValueString() override;
+	void setDisplayValueString(std::string s) override;
 };
 
 
