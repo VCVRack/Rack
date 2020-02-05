@@ -128,7 +128,7 @@ std::string ParamQuantity::getDescription() {
 
 
 std::string SwitchQuantity::getDisplayValueString() {
-	int index = std::floor(getDisplayValue());
+	int index = (int) std::floor(getValue());
 	if (!(0 <= index && index < (int) labels.size()))
 		return "";
 	return labels[index];
@@ -141,7 +141,7 @@ void SwitchQuantity::setDisplayValueString(std::string s) {
 	if (it == labels.end())
 		return;
 	int index = std::distance(labels.begin(), it);
-	setDisplayValue(index);
+	setValue(index);
 }
 
 

@@ -4,6 +4,7 @@
 #include <app/Scene.hpp>
 #include <context.hpp>
 #include <engine/Engine.hpp>
+#include <engine/ParamQuantity.hpp>
 #include <settings.hpp>
 #include <history.hpp>
 #include <helpers.hpp>
@@ -56,6 +57,32 @@ struct ParamField : ui::TextField {
 
 		if (!e.getTarget())
 			TextField::onSelectKey(e);
+	}
+};
+
+
+struct ParamValueItem : ui::MenuItem {
+	ParamWidget* paramWidget;
+	float value;
+
+	void onAction(const event::Action& e) override {
+		engine::ParamQuantity* pq = paramWidget->getParamQuantity();
+		if (pq) {
+			float oldValue = pq->getValue();
+			pq->setValue(value);
+			float newValue = pq->getValue();
+
+			if (oldValue != newValue) {
+				// Push ParamChange history action
+				history::ParamChange* h = new history::ParamChange;
+				h->name = "set parameter";
+				h->moduleId = paramWidget->module->id;
+				h->paramId = paramWidget->paramId;
+				h->oldValue = oldValue;
+				h->newValue = newValue;
+				APP->history->push(h);
+			}
+		}
 	}
 };
 
@@ -209,14 +236,31 @@ void ParamWidget::onLeave(const event::Leave& e) {
 void ParamWidget::createContextMenu() {
 	ui::Menu* menu = createMenu();
 
+	engine::ParamQuantity* pq = getParamQuantity();
+	engine::SwitchQuantity* switchQuantity = dynamic_cast<engine::SwitchQuantity*>(pq);
+
 	ParamLabel* paramLabel = new ParamLabel;
 	paramLabel->paramWidget = this;
 	menu->addChild(paramLabel);
 
-	ParamField* paramField = new ParamField;
-	paramField->box.size.x = 100;
-	paramField->setParamWidget(this);
-	menu->addChild(paramField);
+	if (switchQuantity) {
+		int index = (int) std::floor(pq->getValue());
+		for (int i = 0; i < (int) switchQuantity->labels.size(); i++) {
+			std::string label = switchQuantity->labels[i];
+			ParamValueItem* paramValueItem = new ParamValueItem;
+			paramValueItem->text = label;
+			paramValueItem->rightText = CHECKMARK(i == index);
+			paramValueItem->paramWidget = this;
+			paramValueItem->value = i;
+			menu->addChild(paramValueItem);
+		}
+	}
+	else {
+		ParamField* paramField = new ParamField;
+		paramField->box.size.x = 100;
+		paramField->setParamWidget(this);
+		menu->addChild(paramField);
+	}
 
 	ParamResetItem* resetItem = new ParamResetItem;
 	resetItem->text = "Initialize";
