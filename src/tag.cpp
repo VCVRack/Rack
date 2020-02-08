@@ -7,32 +7,33 @@ namespace rack {
 namespace tag {
 
 
+/** See https://vcvrack.com/manual/Manifest#modules-tags for documentation of tags. */
 const std::vector<std::vector<std::string>> tagAliases = {
 	{"Arpeggiator"},
-	{"Attenuator"}, // With a level knob and not much else.
-	{"Blank"}, // No parameters or ports. Serves no purpose except visual.
+	{"Attenuator"},
+	{"Blank"},
 	{"Chorus"},
 	{"Clock generator", "Clock"},
-	{"Clock modulator"}, // Clock dividers, multipliers, etc.
-	{"Compressor"}, // With threshold, ratio, knee, etc parameters.
-	{"Controller"}, // Use only if the artist "performs" with this module. Simply having knobs is not enough. Examples: on-screen keyboard, XY pad.
+	{"Clock modulator"},
+	{"Compressor"},
+	{"Controller"},
 	{"Delay"},
 	{"Digital"},
 	{"Distortion"},
 	{"Drum", "Drums", "Percussion"},
-	{"Dual"}, // The core functionality times two. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Dual module.
+	{"Dual"},
 	{"Dynamics"},
 	{"Effect"},
 	{"Envelope follower"},
 	{"Envelope generator"},
 	{"Equalizer", "EQ"},
-	{"Expander"}, // Expands the functionality of a "mother" module when placed next to it. Expanders should inherit the tags of its mother module.
+	{"Expander"},
 	{"External"},
 	{"Filter", "VCF", "Voltage controlled filter"},
 	{"Flanger"},
 	{"Function generator"},
 	{"Granular"},
-	{"Hardware clone", "Hardware"}, // Clones the functionality *and* appearance of a real-world hardware module.
+	{"Hardware clone", "Hardware"},
 	{"Limiter"},
 	{"Logic"},
 	{"Low-frequency oscillator", "LFO", "Low frequency oscillator"},
@@ -46,7 +47,7 @@ const std::vector<std::vector<std::string>> tagAliases = {
 	{"Phaser"},
 	{"Physical modeling"},
 	{"Polyphonic", "Poly"},
-	{"Quad"}, // The core functionality times four. If multiple channels are a requirement for the module to exist (ring modulator, mixer, etc), it is not a Quad module.
+	{"Quad"},
 	{"Quantizer"},
 	{"Random"},
 	{"Recording"},
@@ -58,9 +59,9 @@ const std::vector<std::vector<std::string>> tagAliases = {
 	{"Slew limiter"},
 	{"Speech"},
 	{"Switch"},
-	{"Synth voice"}, // A synth voice must have, at the minimum, a built-in oscillator and envelope.
+	{"Synth voice"},
 	{"Tuner"},
-	{"Utility"}, // Serves only extremely basic functions, like inverting, max, min, multiplying by 2, etc.
+	{"Utility"},
 	{"Visual"},
 	{"Vocoder"},
 	{"Voltage-controlled amplifier", "Amplifier", "VCA", "Voltage controlled amplifier"},
