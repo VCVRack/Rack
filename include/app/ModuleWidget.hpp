@@ -21,12 +21,6 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Owned. */
 	engine::Module* module = NULL;
 
-	/** Note that the indexes of these vectors do not necessarily correspond with the indexes of `Module::params` etc.
-	*/
-	std::vector<ParamWidget*> params;
-	std::vector<PortWidget*> inputs;
-	std::vector<PortWidget*> outputs;
-
 	ModuleWidget();
 	DEPRECATED ModuleWidget(engine::Module* module) : ModuleWidget() {
 		setModule(module);
@@ -53,13 +47,17 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Use `setPanel(createPanel(svg))` instead. */
 	void setPanel(std::shared_ptr<Svg> svg);
 
-	/** Convenience functions for adding special widgets (calls addChild()) */
+	/** Convenience functions for adding special widgets.
+	Just calls addChild() with additional checking.
+	It is not required to call this method. You may instead use addChild() in a child widget for example.
+	*/
 	void addParam(ParamWidget* param);
 	void addInput(PortWidget* input);
 	void addOutput(PortWidget* output);
+	/** Scans children widgets recursively for a ParamWidget with the given paramId. */
 	ParamWidget* getParam(int paramId);
-	PortWidget* getInput(int inputId);
-	PortWidget* getOutput(int outputId);
+	PortWidget* getInput(int portId);
+	PortWidget* getOutput(int portId);
 
 	/** Serializes/unserializes the module state */
 	json_t* toJson();

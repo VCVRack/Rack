@@ -516,7 +516,6 @@ void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
 }
 
 void ModuleWidget::addParam(ParamWidget* param) {
-	params.push_back(param);
 	addChild(param);
 }
 
@@ -524,11 +523,9 @@ void ModuleWidget::addInput(PortWidget* input) {
 	// Check that the port is an input
 	assert(input->type == engine::Port::INPUT);
 	// Check that the port doesn't have a duplicate ID
-	for (PortWidget* input2 : inputs) {
-		assert(input->portId != input2->portId);
-	}
+	PortWidget* input2 = getInput(input->portId);
+	assert(!input2);
 	// Add port
-	inputs.push_back(input);
 	addChild(input);
 }
 
@@ -536,36 +533,42 @@ void ModuleWidget::addOutput(PortWidget* output) {
 	// Check that the port is an output
 	assert(output->type == engine::Port::OUTPUT);
 	// Check that the port doesn't have a duplicate ID
-	for (PortWidget* output2 : outputs) {
-		assert(output->portId != output2->portId);
-	}
+	PortWidget* output2 = getOutput(output->portId);
+	assert(!output2);
 	// Add port
-	outputs.push_back(output);
 	addChild(output);
 }
 
+template <class T, typename F>
+T* getFirstDescendantOfTypeWithCondition(widget::Widget* w, F f) {
+	T* t = dynamic_cast<T*>(w);
+	if (t && f(t))
+		return t;
+
+	for (widget::Widget* child : w->children) {
+		T* foundT = getFirstDescendantOfTypeWithCondition<T>(child, f);
+		if (foundT)
+			return foundT;
+	}
+	return NULL;
+}
+
 ParamWidget* ModuleWidget::getParam(int paramId) {
-	for (ParamWidget* param : params) {
-		if (param->paramId == paramId)
-			return param;
-	}
-	return NULL;
+	return getFirstDescendantOfTypeWithCondition<ParamWidget>(this, [&](ParamWidget* pw) -> bool {
+		return pw->paramId == paramId;
+	});
 }
 
-PortWidget* ModuleWidget::getInput(int inputId) {
-	for (PortWidget* port : inputs) {
-		if (port->portId == inputId)
-			return port;
-	}
-	return NULL;
+PortWidget* ModuleWidget::getInput(int portId) {
+	return getFirstDescendantOfTypeWithCondition<PortWidget>(this, [&](PortWidget* pw) -> bool {
+		return pw->type == engine::Port::INPUT && pw->portId == portId;
+	});
 }
 
-PortWidget* ModuleWidget::getOutput(int outputId) {
-	for (PortWidget* port : outputs) {
-		if (port->portId == outputId)
-			return port;
-	}
-	return NULL;
+PortWidget* ModuleWidget::getOutput(int portId) {
+	return getFirstDescendantOfTypeWithCondition<PortWidget>(this, [&](PortWidget* pw) -> bool {
+		return pw->type == engine::Port::OUTPUT && pw->portId == portId;
+	});
 }
 
 json_t* ModuleWidget::toJson() {
@@ -759,13 +762,21 @@ void ModuleWidget::saveDialog() {
 	save(pathStr);
 }
 
+template <class T, typename F>
+void doOfType(widget::Widget* w, F f) {
+	T* t = dynamic_cast<T*>(w);
+	if (t)
+		f(t);
+
+	for (widget::Widget* child : w->children) {
+		doOfType<T>(child, f);
+	}
+}
+
 void ModuleWidget::disconnect() {
-	for (PortWidget* input : inputs) {
-		APP->scene->rack->clearCablesOnPort(input);
-	}
-	for (PortWidget* output : outputs) {
-		APP->scene->rack->clearCablesOnPort(output);
-	}
+	doOfType<PortWidget>(this, [&](PortWidget* pw) {
+		APP->scene->rack->clearCablesOnPort(pw);
+	});
 }
 
 void ModuleWidget::resetAction() {
@@ -799,31 +810,20 @@ void ModuleWidget::randomizeAction() {
 }
 
 static void disconnectActions(ModuleWidget* mw, history::ComplexAction* complexAction) {
-	// Add CableRemove action for all cables attached to inputs
-	for (PortWidget* input : mw->inputs) {
-		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(input)) {
+	// Add CableRemove action for all cables
+	doOfType<PortWidget>(mw, [&](PortWidget* pw) {
+		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
 			if (!cw->isComplete())
 				continue;
 			// Avoid creating duplicate actions for self-patched cables
-			if (cw->outputPort->module == mw->module)
+			if (pw->type == engine::Port::INPUT && cw->outputPort->module == mw->module)
 				continue;
 			// history::CableRemove
 			history::CableRemove* h = new history::CableRemove;
 			h->setCable(cw);
 			complexAction->push(h);
 		}
-	}
-	// Add CableRemove action for all cables attached to outputs
-	for (PortWidget* output : mw->outputs) {
-		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(output)) {
-			if (!cw->isComplete())
-				continue;
-			// history::CableRemove
-			history::CableRemove* h = new history::CableRemove;
-			h->setCable(cw);
-			complexAction->push(h);
-		}
-	}
+	});
 }
 
 void ModuleWidget::disconnectAction() {
@@ -860,7 +860,9 @@ void ModuleWidget::cloneAction() {
 	h->push(hma);
 
 	// Clone cables attached to input ports
-	for (PortWidget* pw : inputs) {
+	doOfType<PortWidget>(this, [&](PortWidget* pw) {
+		if (pw->type != engine::Port::INPUT)
+			return;
 		std::list<CableWidget*> cables = APP->scene->rack->getCablesOnPort(pw);
 		for (CableWidget* cw : cables) {
 			// Create cable attached to cloned ModuleWidget's input
@@ -886,7 +888,7 @@ void ModuleWidget::cloneAction() {
 			hca->setCable(clonedCw);
 			h->push(hca);
 		}
-	}
+	});
 
 	APP->history->push(h);
 }
