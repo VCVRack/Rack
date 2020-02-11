@@ -128,6 +128,9 @@ void ParamQuantity::reset() {
 }
 
 void ParamQuantity::randomize() {
+	if (!isBounded())
+		return;
+
 	if (snapEnabled) {
 		// Randomize inclusive of the maximum value
 		float value = math::rescale(random::uniform(), 0.f, 1.f, getMinValue(), getMaxValue() + 1.f);
